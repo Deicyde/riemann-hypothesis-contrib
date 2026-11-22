@@ -8,22 +8,27 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsZetaSys
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.KA
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.KA
 open scoped Matrix MatrixGroups
 
 namespace GlobalTheory.K4
 
-theorem shCoc_wsum_props : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω]
-  (ρ : (Ω ≃ₐ[ℚ] Ω) → Matrix (Fin 2) (Fin 2) (Qbar l)) (cf : Coef l) (ι : Type) [Fintype ι] (cw : ι → Qbar l)
-  (Yx : ι → ∀ r : ℕ, (Ω ≃ₐ[ℚ] Ω) → (ZMod (l ^ r))ˣ → Fin 2 → Qbar l),
-  (∀ i r, ShCoc ρ (cycMod (F := ℚ) (Ω := Ω) l r)⁻¹ (Yx i r)) →
-  (∀ i r, Yx i r = push (redL l r) (Yx i (r + 1))) →
-  (∀ i r y j, Continuous fun s => Yx i r s y j) →
-  (∀ i r s u j, Yx i r s u j ∈ cf.O) → (∀ i, cw i ∈ cf.O) →
-  (∀ r, ShCoc ρ (cycMod (F := ℚ) (Ω := Ω) l r)⁻¹ (fun s y => ∑ i, cw i • Yx i r s y)) ∧
-  (∀ r, (fun s y => ∑ i, cw i • Yx i r s y) = push (redL l r) (fun s y => ∑ i, cw i • Yx i (r + 1) s y)) ∧
-  (∀ r y j, Continuous fun s => (∑ i, cw i • Yx i r s y) j) ∧
-  (∀ r s u j, (∑ i, cw i • Yx i r s u) j ∈ cf.O) := by
+theorem shCoc_wsum_props
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω]
+        (ρ : (Ω ≃ₐ[ℚ] Ω) → Matrix (Fin 2) (Fin 2) (Qbar l)) (cf : Coef l) (ι : Type) [Fintype ι]
+        (cw : ι → Qbar l) (Yx : ι → ∀ r : ℕ, (Ω ≃ₐ[ℚ] Ω) → (ZMod (l ^ r))ˣ → Fin 2 → Qbar l),
+      (∀ i r, ShCoc ρ (cycMod (F := ℚ) (Ω := Ω) l r)⁻¹ (Yx i r))
+        → (∀ i r, Yx i r = push (redL l r) (Yx i (r + 1)))
+        → (∀ i r y j, Continuous fun s => Yx i r s y j) → (∀ i r s u j, Yx i r s u j ∈ cf.O)
+        → (∀ i, cw i ∈ cf.O)
+        → (∀ r, ShCoc ρ (cycMod (F := ℚ) (Ω := Ω) l r)⁻¹ (fun s y => ∑ i, cw i • Yx i r s y))
+          ∧ (∀ r,
+            (fun s y => ∑ i, cw i • Yx i r s y)
+              = push (redL l r) (fun s y => ∑ i, cw i • Yx i (r + 1) s y))
+          ∧ (∀ r y j, Continuous fun s => (∑ i, cw i • Yx i r s y) j)
+          ∧ (∀ r s u j, (∑ i, cw i • Yx i r s u) j ∈ cf.O) := by
   intro l _ Ω _ _ ρ cf ι _ cw Yx hC hP hCont hO hw
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro r s t x

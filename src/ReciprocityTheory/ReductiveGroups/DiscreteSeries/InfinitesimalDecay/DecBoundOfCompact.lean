@@ -23,8 +23,10 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.DS.DecInf
 
-theorem hs_eq_of_compact {n : ℕ} {ε : Fin n → Bool} (hpq : pOf ε = 0 ∨ qOf ε = 0) {g : Matrix (Fin n) (Fin n) ℂ}
-    (hg : g ∈ UJset ε) : S7.hs g = n := by
+theorem hs_eq_of_compact
+    {n : ℕ} {ε : Fin n → Bool} (hpq : pOf ε = 0 ∨ qOf ε = 0)
+    {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε)
+    : S7.hs g = n := by
   have h2 : inUJ ε g := hg
   delta inUJ Jm at h2
   delta pOf qOf at hpq
@@ -62,10 +64,12 @@ theorem hs_eq_of_compact {n : ℕ} {ε : Fin n → Bool} (hpq : pOf ε = 0 ∨ q
     exact_mod_cast hjj
   simp [key]
 
-theorem decBound_of_compact {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} (hpq : pOf ε = 0 ∨ qOf ε = 0) (m N : ℕ)
-    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    (hσ : Formalism.MainNotions.S.IsDS ε lam σ) :
-    DecBoundJ ε σ m N := by
+theorem decBound_of_compact
+    {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} (hpq : pOf ε = 0 ∨ qOf ε = 0)
+    (m N : ℕ)
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hσ : Formalism.MainNotions.S.IsDS ε lam σ)
+    : DecBoundJ ε σ m N := by
   obtain ⟨_, _, hU, _⟩ := hσ
   refine ⟨Real.sqrt (n : ℝ) ^ m, [[]], ?_, ?_⟩
   · intro w hw
@@ -78,14 +82,18 @@ theorem decBound_of_compact {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ
     simp only [nuJ, dSW, List.map_cons, List.map_nil, List.sum_cons, List.sum_nil, add_zero]
     rw [hn, mul_assoc]
     apply mul_le_mul_of_nonneg_left _ (pow_nonneg (Real.sqrt_nonneg _) _)
-    calc ‖inner ℂ v (σ g u)‖ ≤ ‖v‖ * ‖σ g u‖ := norm_inner_le_norm v (σ g u)
+    calc
+      ‖inner ℂ v (σ g u)‖
+        ≤ ‖v‖ * ‖σ g u‖ := norm_inner_le_norm v (σ g u)
       _ = ‖u‖ * ‖v‖ := by rw [hnorm, mul_comm]
 
-theorem decSmJ {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} (hlam : S7.IsHCParam lam) {h : ℝ}
-    (hgap : GapAtLeast ε lam h) (m : ℕ) (hm : thrStar ε + m < h)
-    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    (hσ : Formalism.MainNotions.S.IsDS ε lam σ) :
-    DecBoundJ ε σ m (m * (n - 1)) := by
+theorem decSmJ
+    {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} (hlam : S7.IsHCParam lam)
+    {h : ℝ} (hgap : GapAtLeast ε lam h)
+    (m : ℕ) (hm : thrStar ε + m < h)
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hσ : Formalism.MainNotions.S.IsDS ε lam σ)
+    : DecBoundJ ε σ m (m * (n - 1)) := by
   by_cases hpq : pOf ε = 0 ∨ qOf ε = 0
   · exact decBound_of_compact hpq m _ hσ
   have hp : 1 ≤ pOf ε := by omega
@@ -95,7 +103,8 @@ theorem decSmJ {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} (hlam : S7.
     have : (0 : ℝ) ≤ m := Nat.cast_nonneg m
     linarith
   have h8 : 8 * (n : ℝ) * S7.q0 ε < h := by
-    have h1 : 16 * (n : ℝ) * (S7.q0 ε : ℝ) + 8 * Real.sqrt (2 * (S7.q0 ε : ℝ)) ≤ thrStar ε := le_max_right _ _
+    have h1 : 16 * (n : ℝ) * (S7.q0 ε : ℝ) + 8 * Real.sqrt (2 * (S7.q0 ε : ℝ)) ≤ thrStar ε :=
+      le_max_right _ _
     have h2 : 0 ≤ (n : ℝ) * (S7.q0 ε : ℝ) := by positivity
     have h3 : 0 ≤ Real.sqrt (2 * (S7.q0 ε : ℝ)) := Real.sqrt_nonneg _
     linarith
@@ -107,21 +116,27 @@ theorem decSmJ {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} (hlam : S7.
   refine decBoundJ_of_sigLam hlam hgap hth hP hv₀ hσ m _ ?_
   refine decBoundJ_sigLam hlam hstd hP hv₀ m _ ⟨(n : ℝ) ^ (2 * m) * C, fun x hx y hy g hg => ?_⟩
   have := hs_pow_mul_le m g (norm_nonneg _) fun idx => hC x hx y hy g hg idx
-  calc _ ≤ _ := this
+  calc
+    _ ≤ _ := this
     _ = _ := by ring
 
-theorem decSm {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r + k + 1) → ℝ}
-    (hlam : Formalism.QuantumDeterminants.IsHCParam lam) {h : ℝ} (hgap : Formalism.QuantumDeterminants.GapAtLeast ε lam h) (m : ℕ)
-    (hm : thrStar ε + m < h)
-    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)}
-    (hσ : Formalism.MainNotions.S.IsDSHpk k r ε lam σ) :
-    ∃ (C : ℝ) (Ws : List (List (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ))),
-      (∀ w ∈ Ws, w.length ≤ m * (2 * r + k) ∧ ∀ X ∈ w, Formalism.MainNotions.S.InLieHpk k r X) ∧
-      ∀ u ∈ Formalism.MainNotions.S.smoothVecs (k := k) (r := r) σ, ∀ v ∈ Formalism.MainNotions.S.smoothVecs (k := k) (r := r) σ,
-        ∀ g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r),
-          Formalism.FourierDecayAlt.B.gN (k := k) (r := r) g ^ m * ‖inner ℂ v (σ g u)‖ ≤
-            C * (Ws.map fun w => ‖Formalism.MainNotions.S.dsigW (k := k) (r := r) σ w u‖).sum *
-              (Ws.map fun w => ‖Formalism.MainNotions.S.dsigW (k := k) (r := r) σ w v‖).sum := by
+theorem decSm
+    {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r + k + 1) → ℝ}
+    (hlam : Formalism.QuantumDeterminants.IsHCParam lam)
+    {h : ℝ} (hgap : Formalism.QuantumDeterminants.GapAtLeast ε lam h)
+    (m : ℕ) (hm : thrStar ε + m < h)
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    {σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)}
+    (hσ : Formalism.MainNotions.S.IsDSHpk k r ε lam σ)
+    : ∃ (C : ℝ) (Ws : List (List (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ))),
+      (∀ w ∈ Ws, w.length ≤ m * (2 * r + k) ∧ ∀ X ∈ w, Formalism.MainNotions.S.InLieHpk k r X)
+        ∧ ∀ u ∈ Formalism.MainNotions.S.smoothVecs (k := k) (r := r) σ,
+          ∀ v ∈ Formalism.MainNotions.S.smoothVecs (k := k) (r := r) σ,
+            ∀ g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r),
+              Formalism.FourierDecayAlt.B.gN (k := k) (r := r) g ^ m * ‖inner ℂ v (σ g u)‖
+                ≤ C * (Ws.map fun w => ‖Formalism.MainNotions.S.dsigW (k := k) (r := r) σ w u‖).sum
+                  * (Ws.map fun w =>
+                    ‖Formalism.MainNotions.S.dsigW (k := k) (r := r) σ w v‖).sum := by
   obtain ⟨P, hP, hDS⟩ := hσ
   have hJ := decSmJ ((mir_isHCParam_iff lam).1 hlam) ((mir_gapAtLeast_iff ε lam h).1 hgap) m hm hDS
   have hN : m * (2 * r + k + 1 - 1) = m * (2 * r + k) := by rw [Nat.add_sub_cancel]

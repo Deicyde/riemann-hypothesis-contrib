@@ -17,8 +17,8 @@ open MvPolynomial
 
 noncomputable section
 
-theorem flagIntegral_C_mul (f N : ℕ) (b : ℚ) (Φ : RootRing f N) :
-    flagIntegral f N (C b * Φ) = b * flagIntegral f N Φ := by
+theorem flagIntegral_C_mul (f N : ℕ) (b : ℚ) (Φ : RootRing f N)
+    : flagIntegral f N (C b * Φ) = b * flagIntegral f N Φ := by
   simp only [flagIntegral, coeff_C_mul, Finset.mul_sum, mul_assoc]
 
 end

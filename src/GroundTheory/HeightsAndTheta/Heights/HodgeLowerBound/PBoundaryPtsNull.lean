@@ -13,8 +13,9 @@ namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
 open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem segre_torusSmul {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (c : K → ℂ)
-    (z : (Σ k, ι k) → ℂ) : segre (torusSmul c z) = (∏ k, c k) • segre z := by
+theorem segre_torusSmul
+    {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (c : K → ℂ) (z : (Σ k, ι k) → ℂ)
+    : segre (torusSmul c z) = (∏ k, c k) • segre z := by
   funext i
   simp [segre, torusSmul, Finset.prod_mul_distrib]
 
@@ -22,8 +23,9 @@ theorem volume_coord_hyperplane {m : ℕ} (i : Fin m) : volume {t : Fin m → �
   rw [volume_pi]
   exact Measure.pi_hyperplane _ i 0
 
-theorem differentiable_segre {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)] :
-    Differentiable ℂ (segre : ((Σ k, ι k) → ℂ) → ((k : K) → ι k) → ℂ) := by
+theorem differentiable_segre
+    {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
+    : Differentiable ℂ (segre : ((Σ k, ι k) → ℂ) → ((k : K) → ι k) → ℂ) := by
   refine differentiable_pi.2 fun i => ?_
   unfold segre
   fun_prop

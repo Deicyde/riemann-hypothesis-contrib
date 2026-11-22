@@ -10,17 +10,21 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Unram
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain
+  GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.InertOfUnramInv
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
-theorem exists_int_approx (w : HeightOneSpectrum (𝓞 L)) (x : w.adicCompletion L) (hx : Valued.v x ≤ 1) :
-    ∃ a : 𝓞 L, Valued.v (x - algebraMap L (w.adicCompletion L) (a : L)) < 1 := by
-  have hval : ∀ k : L, Valued.v (algebraMap L (w.adicCompletion L) k) = w.valuation L k :=
-    fun k => HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (v := w) k
+theorem exists_int_approx
+    (w : HeightOneSpectrum (𝓞 L)) (x : w.adicCompletion L) (hx : Valued.v x ≤ 1)
+    : ∃ a : 𝓞 L, Valued.v (x - algebraMap L (w.adicCompletion L) (a : L)) < 1 := by
+  have hval : ∀ k : L, Valued.v (algebraMap L (w.adicCompletion L) k) = w.valuation L k := fun k =>
+    HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (v := w) k
   have hU : IsOpen {z : w.adicCompletion L | Valued.v (z - x) < 1} := by
     have h := (Valued.isOpen_ball (w.adicCompletion L) 1).preimage (continuous_sub_right x)
     simpa [Valuation.restrict_lt_one_iff] using h
@@ -29,35 +33,50 @@ theorem exists_int_approx (w : HeightOneSpectrum (𝓞 L)) (x : w.adicCompletion
   have hy' : Valued.v (algebraMap L (w.adicCompletion L) y - x) < 1 := hy
   have hyv : w.valuation L y ≤ 1 := by
     rw [← hval]
-    calc Valued.v (algebraMap L (w.adicCompletion L) y)
+    calc
+      Valued.v (algebraMap L (w.adicCompletion L) y)
         = Valued.v ((algebraMap L (w.adicCompletion L) y - x) + x) := by rw [sub_add_cancel]
-      _ ≤ max (Valued.v (algebraMap L (w.adicCompletion L) y - x)) (Valued.v x) := Valuation.map_add _ _ _
+      _ ≤ max (Valued.v (algebraMap L (w.adicCompletion L) y - x)) (Valued.v x) :=
+        Valuation.map_add _ _ _
       _ ≤ 1 := max_le hy'.le hx
   obtain ⟨a, ha⟩ := HeightOneSpectrum.exists_valuation_sub_lt_of_integer (K := L) (v := w) hyv 1
   refine ⟨a, ?_⟩
-  have e : x - algebraMap L (w.adicCompletion L) (a : L) =
-      -(algebraMap L (w.adicCompletion L) y - x) + -(algebraMap L (w.adicCompletion L) (a : L) -
-        algebraMap L (w.adicCompletion L) y) := by ring
+  have e
+      : x - algebraMap L (w.adicCompletion L) (a : L)
+        = -(algebraMap L (w.adicCompletion L) y - x)
+          + -(algebraMap L (w.adicCompletion L) (a : L) - algebraMap L (w.adicCompletion L) y) := by
+    ring
   rw [e]
   refine Valuation.map_add_lt _ (by rw [Valuation.map_neg]; exact hy') ?_
   rw [Valuation.map_neg, ← map_sub, hval]
   simpa using ha
 
-theorem inert_of_isUnramInv : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (w : HeightOneSpectrum (𝓞 L)), NG.OverPl w v → ∀ (s : w.adicCompletion L →+* w.adicCompletion L) (ϖ : w.adicCompletion L) (q : ℕ), (∀ x : L, s (algebraMap L _ x) = algebraMap L _ (IsCMField.complexConj L x)) → Formalism.UG.IsUnramInv ϖ s q → Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield L)) w.asIdeal ∧ ¬ IsSplitAt w ∧ q = Formalism.UG.qV (maximalRealSubfield L) v := by
+theorem inert_of_isUnramInv
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L]
+        (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (w : HeightOneSpectrum (𝓞 L)),
+      NG.OverPl w v
+        → ∀ (s : w.adicCompletion L →+* w.adicCompletion L) (ϖ : w.adicCompletion L) (q : ℕ),
+          (∀ x : L, s (algebraMap L _ x) = algebraMap L _ (IsCMField.complexConj L x))
+            → Formalism.UG.IsUnramInv ϖ s q
+            → Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield L)) w.asIdeal ∧ ¬ IsSplitAt w
+              ∧ q = Formalism.UG.qV (maximalRealSubfield L) v := by
   intro L _ _ _ v w hvw s ϖ q hsc hU
   unfold Formalism.UG.IsUnramInv at hU
   obtain ⟨-, hsv, -, -, ⟨x, hxO, hx1⟩, -, hcard⟩ := hU
   have hvw' : w.asIdeal.comap (algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L)) = v.asIdeal := hvw
   have hlo : w.asIdeal.LiesOver v.asIdeal := ⟨hvw'.symm⟩
-  let φ : 𝓞 L →+* w.adicCompletion L := (algebraMap L (w.adicCompletion L)).comp (algebraMap (𝓞 L) L)
-  have hφ : ∀ b : 𝓞 L, Valued.v (φ b) = w.valuation L (algebraMap (𝓞 L) L b) :=
-    fun b => HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (v := w) (algebraMap (𝓞 L) L b)
+  let φ : 𝓞 L →+* w.adicCompletion L :=
+    (algebraMap L (w.adicCompletion L)).comp (algebraMap (𝓞 L) L)
+  have hφ : ∀ b : 𝓞 L, Valued.v (φ b) = w.valuation L (algebraMap (𝓞 L) L b) := fun b =>
+    HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (v := w) (algebraMap (𝓞 L) L b)
   have hval : ∀ b : 𝓞 L, Valued.v (φ b) < 1 ↔ b ∈ w.asIdeal := by
     intro b
     rw [hφ]
     exact HeightOneSpectrum.valuation_lt_one_iff_mem (K := L) w b
-  have hfix : ∀ a : 𝓞 (maximalRealSubfield L),
-      s (φ (algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L) a)) = φ (algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L) a) := by
+  have hfix
+      : ∀ a : 𝓞 (maximalRealSubfield L),
+        s (φ (algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L) a))
+          = φ (algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L) a) := by
     intro a
     show s (algebraMap L _ _) = algebraMap L _ _
     rw [hsc]
@@ -69,7 +88,8 @@ theorem inert_of_isUnramInv : ∀ (L : Type) [Field L] [NumberField L] [IsCMFiel
     intro hf
     have hn := Ideal.absNorm_pow_inertiaDeg v.asIdeal w.asIdeal
     rw [hf, pow_one, Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply,
-      Submodule.cardQuot_apply] at hn
+        Submodule.cardQuot_apply]
+      at hn
     have hle : v.asIdeal ≤ w.asIdeal.comap (algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L)) := hvw'.ge
     have hinj : Function.Injective (Ideal.quotientMap w.asIdeal _ hle) :=
       Ideal.quotientMap_injective' hvw'.le
@@ -87,8 +107,7 @@ theorem inert_of_isUnramInv : ∀ (L : Type) [Field L] [NumberField L] [IsCMFiel
       refine Valuation.map_add_lt _ hb ?_
       rw [Valuation.map_neg, hval]
       exact ha
-    have h2 : s x - x = s (x - z) + -(x - z) := by
-      rw [map_sub, hsz]; ring
+    have h2 : s x - x = s (x - z) + -(x - z) := by rw [map_sub, hsz]; ring
     have h3 : Valued.v (s x - x) < 1 := by
       rw [h2]
       refine Valuation.map_add_lt _ ?_ ?_
@@ -100,18 +119,20 @@ theorem inert_of_isUnramInv : ∀ (L : Type) [Field L] [NumberField L] [IsCMFiel
 
   have hG2 : Nat.card (L ≃ₐ[maximalRealSubfield L] L) = 2 := by
     rw [IsGalois.card_aut_eq_finrank, Algebra.IsQuadraticExtension.finrank_eq_two]
-  have hsum := Ideal.sum_ramification_inertia_eq_card v.asIdeal (𝓞 L)
-    (G := L ≃ₐ[maximalRealSubfield L] L)
+  have hsum :=
+    Ideal.sum_ramification_inertia_eq_card v.asIdeal (𝓞 L) (G := L ≃ₐ[maximalRealSubfield L] L)
   let F : v.asIdeal.primesOver (𝓞 L) → ℕ := fun P =>
     P.1.ramificationIdx (𝓞 (maximalRealSubfield L)) * P.1.inertiaDeg (𝓞 (maximalRealSubfield L))
-  have hsum' : ∑ P, F P = 2 := by
-    rw [← hG2, ← hsum]
+  have hsum' : ∑ P, F P = 2 := by rw [← hG2, ← hsum]
   let W : v.asIdeal.primesOver (𝓞 L) := ⟨w.asIdeal, w.isPrime, hlo⟩
   have hW : F W ≤ 2 := by
     rw [← hsum']
     exact Finset.single_le_sum (f := F) (fun _ _ => Nat.zero_le _) (Finset.mem_univ W)
-  have hW' : w.asIdeal.ramificationIdx (𝓞 (maximalRealSubfield L)) *
-      w.asIdeal.inertiaDeg (𝓞 (maximalRealSubfield L)) ≤ 2 := hW
+  have hW'
+      : w.asIdeal.ramificationIdx (𝓞 (maximalRealSubfield L))
+          * w.asIdeal.inertiaDeg (𝓞 (maximalRealSubfield L))
+        ≤ 2 :=
+    hW
   have hf2 : w.asIdeal.inertiaDeg (𝓞 (maximalRealSubfield L)) = 2 := by
     have : 2 ≤ w.asIdeal.inertiaDeg (𝓞 (maximalRealSubfield L)) := by omega
     nlinarith
@@ -124,9 +145,10 @@ theorem inert_of_isUnramInv : ∀ (L : Type) [Field L] [NumberField L] [IsCMFiel
       exact v.isMaximal
     exact Ideal.ramificationIdx_eq_one_iff.mp he1
   · rintro ⟨u, hne, hu⟩
-    have hlu : u.asIdeal.LiesOver v.asIdeal := ⟨by
-      rw [hlo.over]
-      exact (congrArg HeightOneSpectrum.asIdeal hu).symm⟩
+    have hlu : u.asIdeal.LiesOver v.asIdeal :=
+      ⟨by
+        rw [hlo.over]
+        exact (congrArg HeightOneSpectrum.asIdeal hu).symm⟩
     let U : v.asIdeal.primesOver (𝓞 L) := ⟨u.asIdeal, u.isPrime, hlu⟩
     have hWU : W ≠ U := fun h => hne (HeightOneSpectrum.ext (congrArg Subtype.val h).symm)
     have h2 : F W + F U ≤ 2 := by
@@ -140,15 +162,16 @@ theorem inert_of_isUnramInv : ∀ (L : Type) [Field L] [NumberField L] [IsCMFiel
         w.asIdeal.inertiaDeg (𝓞 (maximalRealSubfield L)) = 2
       rw [he1, hf2]
     omega
-  ·
-    let O := (Valued.v : Valuation (w.adicCompletion L) (WithZero (Multiplicative ℤ))).valuationSubring
+  · let O :=
+      (Valued.v : Valuation (w.adicCompletion L) (WithZero (Multiplicative ℤ))).valuationSubring
     have hmemO : ∀ b : 𝓞 L, φ b ∈ O := by
       intro b
       show Valued.v (φ b) ≤ 1
       rw [hφ]
       exact HeightOneSpectrum.valuation_le_one (K := L) w b
     let g : 𝓞 L →+* O := φ.codRestrict O hmemO
-    have hmax : ∀ y : O, y ∈ IsLocalRing.maximalIdeal O ↔ Valued.v (y : w.adicCompletion L) < 1 := by
+    have hmax
+        : ∀ y : O, y ∈ IsLocalRing.maximalIdeal O ↔ Valued.v (y : w.adicCompletion L) < 1 := by
       intro y
       have hle : Valued.v (y : w.adicCompletion L) ≤ 1 := y.2
       have hu : IsUnit y ↔ Valued.v (y : w.adicCompletion L) = 1 :=

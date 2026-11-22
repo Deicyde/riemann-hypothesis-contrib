@@ -7,17 +7,25 @@ public import GroundTheory.AutomorphicForms.Reduction
 
 open NumberField MeasureTheory Matrix
 open scoped NumberField.AdeleRing Pointwise
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global GroundTheory.Global.IdeleGroup
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global
+  GroundTheory.Global.IdeleGroup
 
 noncomputable section
 
 namespace GlobalTheory.SiegelDiagNormOne
 
-theorem exists_siegelSet_diag_normOne : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), ∃ ω : Set (AdelicGLn.AdelicGL K n),
-    IsCompact ω ∧ ω ⊆ ((adelicBorel (K := K) (n := n) : Subgroup (AdelicGLn.AdelicGL K n)) : Set (AdelicGLn.AdelicGL K n)) ∧
-    (∀ b ∈ ω, ∀ i, ∃ u : IdeleGroup K, (b : Matrix (Fin n) (Fin n) 𝔸[K]) i i = u ∧ (ideleModule K u : ℝ) = 1) ∧
-    ∃ t : ℝ, 0 < t ∧ ∀ g : AdelicGLn.AdelicGL K n, ∃ γ : GL (Fin n) K,
-      AdelicGLn.diagonal K n γ * g ∈ Reduction.siegelSet n ω t := by
+theorem exists_siegelSet_diag_normOne
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), ∃ ω : Set (AdelicGLn.AdelicGL K n),
+      IsCompact ω
+        ∧ ω
+          ⊆ ((adelicBorel (K := K) (n := n) : Subgroup (AdelicGLn.AdelicGL K n))
+            : Set (AdelicGLn.AdelicGL K n))
+        ∧ (∀ b ∈ ω, ∀ i, ∃ u : IdeleGroup K,
+          (b : Matrix (Fin n) (Fin n) 𝔸[K]) i i = u ∧ (ideleModule K u : ℝ) = 1)
+        ∧ ∃ t : ℝ,
+          0 < t
+            ∧ ∀ g : AdelicGLn.AdelicGL K n, ∃ γ : GL (Fin n) K,
+              AdelicGLn.diagonal K n γ * g ∈ Reduction.siegelSet n ω t := by
   intro K _ _ n
   classical
   obtain ⟨t₀, ht₀, hred⟩ := exists_reduced (K := K)
@@ -28,8 +36,8 @@ theorem exists_siegelSet_diag_normOne : ∀ (K : Type) [Field K] [NumberField K]
   set FN : Set (AdelicGLn.AdelicGL K n) :=
     unitriangularGL n '' (Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => D) with hFN
   set FT : Set (AdelicGLn.AdelicGL K n) := diagUnits n '' (Set.pi Set.univ fun _ => S) with hFT
-  have hFNc : IsCompact FN := (isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => hD).image
-    (continuous_unitriangularGL n)
+  have hFNc : IsCompact FN :=
+    (isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => hD).image (continuous_unitriangularGL n)
   have hFTc : IsCompact FT := (isCompact_univ_pi fun _ => hS).image (continuous_diagUnits n)
   refine ⟨FN * FT, hFNc.mul hFTc, ?_, ?_, t₀ ^ ((d : ℝ)⁻¹), Real.rpow_pos_of_pos ht₀ _, fun g => ?_⟩
   · rintro _ ⟨x, ⟨p, -, rfl⟩, y, ⟨e, -, rfl⟩, rfl⟩
@@ -63,19 +71,24 @@ theorem exists_siegelSet_diag_normOne : ∀ (K : Type) [Field K] [NumberField K]
   set δA : AdelicGLn.AdelicGL K n := diagUnits n e with hδA
   have hδ : AdelicGLn.diagonal K n (diagUnits n c) = δA := diagonal_diagUnits n c
   set u : AdelicGLn.AdelicGL K n := δA * b * (diagUnits n dU)⁻¹ * δA⁻¹ with hu
-  have hu_apply : ∀ i j, (u : Matrix (Fin n) (Fin n) 𝔸[K]) i j =
-      (e i : 𝔸[K]) * B i j * (((dU j)⁻¹ : IdeleGroup K) : 𝔸[K]) * (((e j)⁻¹ : IdeleGroup K) : 𝔸[K]) := by
+  have hu_apply
+      : ∀ i j,
+        (u : Matrix (Fin n) (Fin n) 𝔸[K]) i j
+          = (e i : 𝔸[K]) * B i j * (((dU j)⁻¹ : IdeleGroup K) : 𝔸[K])
+            * (((e j)⁻¹ : IdeleGroup K) : 𝔸[K]) := by
     intro i j
     rw [hu, ← map_inv, ← map_inv]
-    simp only [Units.val_mul, hδA, coe_diagUnits, Matrix.mul_diagonal, Matrix.diagonal_mul, Pi.inv_apply]
+    simp only [Units.val_mul, hδA, coe_diagUnits, Matrix.mul_diagonal, Matrix.diagonal_mul,
+      Pi.inv_apply]
     rfl
   have huu : IsUnitriangular (u : Matrix (Fin n) (Fin n) 𝔸[K]) := by
     refine ⟨fun i j hij => ?_, fun i => ?_⟩
     · rw [hu_apply, show B i j = 0 from hb hij]
       simp
     · rw [hu_apply, ← hdUv i]
-      calc (e i : 𝔸[K]) * (dU i : 𝔸[K]) * (((dU i)⁻¹ : IdeleGroup K) : 𝔸[K]) *
-            (((e i)⁻¹ : IdeleGroup K) : 𝔸[K])
+      calc
+        (e i : 𝔸[K]) * (dU i : 𝔸[K]) * (((dU i)⁻¹ : IdeleGroup K) : 𝔸[K])
+            * (((e i)⁻¹ : IdeleGroup K) : 𝔸[K])
           = ((e i * dU i * (dU i)⁻¹ * (e i)⁻¹ : IdeleGroup K) : 𝔸[K]) := by simp [Units.val_mul]
         _ = 1 := by rw [mul_inv_cancel_right, mul_inv_cancel, Units.val_one]
   obtain ⟨ν, hν, hνD⟩ := exists_unitriangular_mul_mem hDmem n _ huu
@@ -96,23 +109,31 @@ theorem exists_siegelSet_diag_normOne : ∀ (K : Type) [Field K] [NumberField K]
     · exact hd₀
   have hνu : νA * u = unitriangularGL n p := by
     refine Units.ext ?_
-    have h1 : IsUnitriangular ((νA * u : AdelicGLn.AdelicGL K n) : Matrix (Fin n) (Fin n) 𝔸[K]) := by
+    have h1
+        : IsUnitriangular ((νA * u : AdelicGLn.AdelicGL K n) : Matrix (Fin n) (Fin n) 𝔸[K]) := by
       rw [Units.val_mul, hνAmat]
-      exact IsUnitriangular.mul ⟨fun i j hij => by simp [hν.1 hij],
-        fun i => by simp [hν.2 i]⟩ huu
+      exact IsUnitriangular.mul ⟨fun i j hij => by simp [hν.1 hij], fun i => by simp [hν.2 i]⟩ huu
     rw [h1.eq_unitriangular]
     change unitriangular _ = unitriangular p
     ext i j
     simp only [unitriangular, of_apply, hp]
     split_ifs <;> rfl
-  have hdiag : δA * diagUnits n dU = diagUnits n σ * diagUnits n (fun i => posIdele (r i) (hrpos i)) := by
+  have hdiag
+      : δA * diagUnits n dU = diagUnits n σ * diagUnits n (fun i => posIdele (r i) (hrpos i)) := by
     rw [hδA, ← map_mul, ← map_mul]
     congr 1
     funext i
     simp [hσ, he, mul_assoc]
-  refine ⟨νGL * diagUnits n c * γ, unitriangularGL n p * diagUnits n σ,
+  refine ⟨
+    νGL * diagUnits n c * γ,
+    unitriangularGL n p * diagUnits n σ,
     ⟨_, ⟨p, hpD, rfl⟩, _, ⟨σ, fun i _ => hc i, rfl⟩, rfl⟩,
-    diagUnits n (fun i => posIdele (r i) (hrpos i)), ⟨r, hrpos, fun i j hij => ?_, rfl⟩, k, hk, ?_⟩
+    diagUnits n (fun i => posIdele (r i) (hrpos i)),
+    ⟨r, hrpos, fun i j hij => ?_, rfl⟩,
+    k,
+    hk,
+    ?_
+  ⟩
   · have h := hratio i j hij
     rw [← hdUv j, ← hdUv i, adeleAbs_units, adeleAbs_units, ← hrd i, ← hrd j] at h
     have hrj := (hrpos j).le
@@ -121,15 +142,15 @@ theorem exists_siegelSet_diag_normOne : ∀ (K : Type) [Field K] [NumberField K]
     have htn : 0 ≤ t₀ ^ ((d : ℝ)⁻¹) := (Real.rpow_pos_of_pos ht₀ _).le
     rw [← pow_le_pow_iff_left₀ (mul_nonneg htn hrj) hri hd0.ne', mul_pow, ht]
     exact h
-  · have h1 : δA * b = u * (δA * diagUnits n dU) := by
-      rw [hu]; group
-    calc AdelicGLn.diagonal K n (νGL * diagUnits n c * γ) * g
-        = νA * δA * (AdelicGLn.diagonal K n γ * g) := by
-          rw [map_mul, map_mul, hδ, ← hνA]; simp only [mul_assoc]
+  · have h1 : δA * b = u * (δA * diagUnits n dU) := by rw [hu]; group
+    calc
+      AdelicGLn.diagonal K n (νGL * diagUnits n c * γ) * g
+          = νA * δA * (AdelicGLn.diagonal K n γ * g) := by
+        rw [map_mul, map_mul, hδ, ← hνA]; simp only [mul_assoc]
       _ = νA * (δA * b) * k := by rw [hγ]; simp only [mul_assoc]
       _ = νA * u * (δA * diagUnits n dU) * k := by rw [h1]; simp only [mul_assoc]
       _ = (νA * u) * diagUnits n σ * diagUnits n (fun i => posIdele (r i) (hrpos i)) * k := by
-          rw [hdiag]; simp only [mul_assoc]
+        rw [hdiag]; simp only [mul_assoc]
       _ = _ := by rw [hνu]
 
 end GlobalTheory.SiegelDiagNormOne

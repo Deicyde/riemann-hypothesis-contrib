@@ -11,8 +11,10 @@ open Module
 
 namespace UpperTheory.V.Z.Tf.Orb
 
-private theorem endComm {L V : Type} [Field L] [IsAlgClosed L] [AddCommGroup V] [Module L V] [FiniteDimensional L V]
-    (f x y : Module.End L V) (hf : f.charpoly.Separable) (hx : Commute x f) (hy : Commute y f) : Commute x y := by
+private theorem endComm
+    {L V : Type} [Field L] [IsAlgClosed L] [AddCommGroup V] [Module L V] [FiniteDimensional L V]
+    (f x y : Module.End L V) (hf : f.charpoly.Separable) (hx : Commute x f) (hy : Commute y f)
+    : Commute x y := by
   have key : ∀ μ : L, ∀ v ∈ f.maxGenEigenspace μ, (x * y) v = (y * x) v := by
     intro μ v hv
     have h1 : finrank L (f.maxGenEigenspace μ) ≤ 1 := by
@@ -38,7 +40,8 @@ theorem centComm : CentComm := by
   intro K _ n A X Y hA hX hY
   let L := AlgebraicClosure K
   let φ : Matrix (Fin n) (Fin n) K →+* Module.End L (Fin n → L) :=
-    (Matrix.toLinAlgEquiv' (R := L) (n := Fin n)).toRingEquiv.toRingHom.comp (algebraMap K L).mapMatrix
+    (Matrix.toLinAlgEquiv' (R := L) (n := Fin n)).toRingEquiv.toRingHom.comp
+      (algebraMap K L).mapMatrix
   have hφ : Function.Injective φ :=
     (Matrix.toLinAlgEquiv' (R := L) (n := Fin n)).injective.comp
       (Matrix.map_injective (algebraMap K L).injective)

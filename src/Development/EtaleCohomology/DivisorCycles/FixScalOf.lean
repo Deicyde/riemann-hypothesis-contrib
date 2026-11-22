@@ -19,20 +19,26 @@ theorem comm_aeval (y p : Mat C N) (h : Commute y p) (Q : C[X]) : Commute (aeval
     simp only [map_mul, map_pow, aeval_C, aeval_X]
     exact (Algebra.commute_algebraMap_left a p).mul_left (h.pow_left _)
 
-theorem aeval_eig (y : Mat C N) (μ : C) (v : Fin N → C) (hv : y *ᵥ v = μ • v) (Q : C[X]) :
-    aeval y Q *ᵥ v = Q.eval μ • v :=
+theorem aeval_eig (y : Mat C N) (μ : C) (v : Fin N → C) (hv : y *ᵥ v = μ • v) (Q : C[X])
+    : aeval y Q *ᵥ v = Q.eval μ • v :=
   _root_.UpperTheory.Reformulated.B.Qp10.aeval_eig y μ v hv Q
 
-theorem same_fix {n : ℕ} (π : Equiv.Perm (Fin n)) (i a : Fin n) (hi : π i = i) (h : π.SameCycle i a) : a = i := by
+theorem same_fix {n : ℕ} (π : Equiv.Perm (Fin n)) (i a : Fin n) (hi : π i = i) (h : π.SameCycle i a)
+    : a = i := by
   obtain ⟨z, hz⟩ := h
   rw [Equiv.Perm.zpow_apply_eq_self_of_apply_eq_self hi] at hz
   exact hz.symm
 
-theorem kill {n : ℕ} (p : Fin n → Mat C N) (y : Mat C N) (π : Equiv.Perm (Fin n)) (l : Fin n → C) (hp : Sys p)
-    (hd : Disj y π p)
+theorem kill
+    {n : ℕ} (p : Fin n → Mat C N)
+    (y : Mat C N) (π : Equiv.Perm (Fin n))
+    (l : Fin n → C)
+    (hp : Sys p) (hd : Disj y π p)
     (hv : ∀ j, ∃ v : Fin N → C, v ≠ 0 ∧ y *ᵥ v = l j • v ∧ ∀ k, ¬ π.SameCycle j k → p k *ᵥ v = 0)
-    (i : Fin n) (hi : π i = i) (hyi : Commute y (p i)) (S : Finset (Fin n)) (hS : i ∉ S) :
-    ∀ w : Fin N → C, p i *ᵥ w = w → aeval y (∏ j ∈ S, (X - Polynomial.C (l j))) *ᵥ w = 0 → w = 0 := by
+    (i : Fin n) (hi : π i = i) (hyi : Commute y (p i))
+    (S : Finset (Fin n)) (hS : i ∉ S)
+    : ∀ w : Fin N → C,
+      p i *ᵥ w = w → aeval y (∏ j ∈ S, (X - Polynomial.C (l j))) *ᵥ w = 0 → w = 0 := by
   induction S using Finset.induction_on with
   | empty => intro w _ h; simpa using h
   | insert a s ha ih =>
@@ -46,13 +52,15 @@ theorem kill {n : ℕ} (p : Fin n → Mat C N) (y : Mat C N) (π : Equiv.Perm (F
     set w' := aeval y (∏ j ∈ s, (X - Polynomial.C (l j))) *ᵥ w with hw'
     have heig : y *ᵥ w' = l a • w' := by
       simp only [map_sub, aeval_X, aeval_C, sub_mulVec, Algebra.algebraMap_eq_smul_one, smul_mulVec,
-        one_mulVec, sub_eq_zero] at h
+          one_mulVec, sub_eq_zero]
+        at h
       exact h
     have hc := comm_aeval y (p i) hyi (∏ j ∈ s, (X - Polynomial.C (l j)))
     have hcond : ∀ k, ¬ π.SameCycle i k → p k *ᵥ w' = 0 := by
       intro k hk
       have hki : k ≠ i := fun h' => hk (h' ▸ Equiv.Perm.SameCycle.refl π i)
-      rw [hw', ← hw, mulVec_mulVec, mulVec_mulVec, mul_assoc, hc.eq, ← mul_assoc, hp.1.ortho hki, zero_mul, zero_mulVec]
+      rw [hw', ← hw, mulVec_mulVec, mulVec_mulVec, mul_assoc, hc.eq, ← mul_assoc, hp.1.ortho hki,
+        zero_mul, zero_mulVec]
     obtain ⟨v, hv0, hyv, hvc⟩ := hv a
     exact hd i a (fun h' => hai (same_fix π i a hi h')) (l a) w' v h0 hv0 heig hyv hcond hvc
 
@@ -67,9 +75,10 @@ theorem FixScal_of : LateralTheory.DivDb.CycleCountPf.FixScal := by
     exact this.resolve_right hv0
   set s : Multiset C := Multiset.map l Finset.univ.val with hs
   have hnd : s.Nodup := Multiset.Nodup.map hl Finset.univ.nodup
-  have hle : s ≤ q.roots := (Multiset.le_iff_subset hnd).2 (fun a ha => by
-    obtain ⟨j, -, rfl⟩ := Multiset.mem_map.1 ha
-    exact (mem_roots hq0).2 (hroot j))
+  have hle : s ≤ q.roots :=
+    (Multiset.le_iff_subset hnd).2 (fun a ha => by
+      obtain ⟨j, -, rfl⟩ := Multiset.mem_map.1 ha
+      exact (mem_roots hq0).2 (hroot j))
   obtain ⟨r, hr⟩ := (Multiset.prod_X_sub_C_dvd_iff_le_roots hq0 s).2 hle
   set P := (s.map fun a => X - Polynomial.C a).prod with hPdef
   have hPm : P.Monic := monic_multiset_prod_of_monic _ _ (fun a _ => monic_X_sub_C a)
@@ -79,12 +88,13 @@ theorem FixScal_of : LateralTheory.DivDb.CycleCountPf.FixScal := by
   have hr0 : r ≠ 0 := by rintro rfl; exact hq0 (by rw [hr, mul_zero])
   have hrd : r.natDegree = 0 := by
     have := hPm.natDegree_mul' hr0
-    rw [← hr, hPd] at this; omega
-  have hc0 : r.coeff 0 ≠ 0 := by
-    intro h; apply hr0; rw [eq_C_of_natDegree_eq_zero hrd, h, map_zero]
+    rw [← hr, hPd] at this
+    omega
+  have hc0 : r.coeff 0 ≠ 0 := by intro h; apply hr0; rw [eq_C_of_natDegree_eq_zero hrd, h, map_zero]
   have hPy : aeval y P = 0 := by
-    rw [hr, eq_C_of_natDegree_eq_zero hrd, map_mul, aeval_C, Algebra.algebraMap_eq_smul_one, mul_smul_one,
-      smul_eq_zero] at hqy
+    rw [hr, eq_C_of_natDegree_eq_zero hrd, map_mul, aeval_C, Algebra.algebraMap_eq_smul_one,
+        mul_smul_one, smul_eq_zero]
+      at hqy
     exact hqy.resolve_left hc0
   have hPP : P = ∏ j, (X - Polynomial.C (l j)) := by
     rw [hPdef, hs, Multiset.map_map, Finset.prod_eq_multiset_prod]; rfl
@@ -101,8 +111,9 @@ theorem FixScal_of : LateralTheory.DivDb.CycleCountPf.FixScal := by
     · rw [mulVec_mulVec, ← mul_assoc, ← hMc.eq, mul_assoc, hidem]
     · rw [mulVec_mulVec, ← mul_assoc, hPy, zero_mul, zero_mulVec]
   refine ⟨l i, ?_⟩
-  rw [hM, map_sub, aeval_X, aeval_C, sub_mul, sub_eq_zero, Algebra.algebraMap_eq_smul_one, smul_mul_assoc,
-    one_mul] at hMp
+  rw [hM, map_sub, aeval_X, aeval_C, sub_mul, sub_eq_zero, Algebra.algebraMap_eq_smul_one,
+      smul_mul_assoc, one_mul]
+    at hMp
   exact hMp
 
 end LateralTheory.DivDb.ScalarFixedPointsUnderAeval

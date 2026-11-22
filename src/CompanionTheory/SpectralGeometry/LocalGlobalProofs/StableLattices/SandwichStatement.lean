@@ -12,9 +12,11 @@ namespace GlobalTheory.CompanionTheory.Lattice
 open CompanionTheory.Rg.FlB
 open scoped NormedField Valued
 
-theorem exists_common_denom {L ι : Type} [Field L] (O : Subring L)
-    (hfrac : ∀ x : L, ∃ a : O, (a : L) ≠ 0 ∧ (a : L) * x ∈ O) (s : Finset ι) (g : ι → L) :
-    ∃ d : O, (d : L) ≠ 0 ∧ ∀ i ∈ s, (d : L) * g i ∈ O := by
+theorem exists_common_denom
+    {L ι : Type} [Field L]
+    (O : Subring L) (hfrac : ∀ x : L, ∃ a : O, (a : L) ≠ 0 ∧ (a : L) * x ∈ O)
+    (s : Finset ι) (g : ι → L)
+    : ∃ d : O, (d : L) ≠ 0 ∧ ∀ i ∈ s, (d : L) * g i ∈ O := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨1, by simp, by simp⟩
@@ -30,23 +32,24 @@ theorem exists_common_denom {L ι : Type} [Field L] (O : Subring L)
       rw [this]
       exact O.mul_mem a.2 (h j hj)
 
-theorem exists_basis_of_pid {L V : Type} [Field L] [AddCommGroup V] [Module L V] (O : Subring L)
-    [IsPrincipalIdealRing O]
-    (hfrac : ∀ x : L, ∃ a : O, (a : L) ≠ 0 ∧ (a : L) * x ∈ O) {m : ℕ}
-    (b : Module.Basis (Fin m) L V) (Λ : AddSubgroup V) (c : L) (hc : c ≠ 0)
-    (h1 : ∀ x ∈ Λ, ∀ i, b.repr (c • x) i ∈ O) (hspan : ∀ x : V, ∃ a : L, a ≠ 0 ∧ a • x ∈ Λ)
-    (hO : ∀ a ∈ O, ∀ x ∈ Λ, a • x ∈ Λ) :
-    ∃ (n : ℕ) (B : Module.Basis (Fin n) L V), ∀ x, x ∈ Λ ↔ ∀ i, B.repr x i ∈ O := by
+theorem exists_basis_of_pid
+    {L V : Type} [Field L] [AddCommGroup V] [Module L V]
+    (O : Subring L) [IsPrincipalIdealRing O]
+    (hfrac : ∀ x : L, ∃ a : O, (a : L) ≠ 0 ∧ (a : L) * x ∈ O)
+    {m : ℕ} (b : Module.Basis (Fin m) L V)
+    (Λ : AddSubgroup V) (c : L) (hc : c ≠ 0) (h1 : ∀ x ∈ Λ, ∀ i, b.repr (c • x) i ∈ O)
+    (hspan : ∀ x : V, ∃ a : L, a ≠ 0 ∧ a • x ∈ Λ) (hO : ∀ a ∈ O, ∀ x ∈ Λ, a • x ∈ Λ)
+    : ∃ (n : ℕ) (B : Module.Basis (Fin n) L V), ∀ x, x ∈ Λ ↔ ∀ i, B.repr x i ∈ O := by
   classical
-
-  let ψ : (Fin m → O) →ₗ[O] V :=
-    { toFun := fun y => c⁻¹ • ∑ j, (y j : L) • b j
-      map_add' := fun y z => by
-        simp only [Pi.add_apply, Subring.coe_add, add_smul, Finset.sum_add_distrib, smul_add]
-      map_smul' := fun a y => by
-        simp only [Pi.smul_apply, Subring.smul_def, smul_eq_mul, RingHom.id_apply, Finset.smul_sum,
-          Subring.coe_mul, mul_smul]
-        exact Finset.sum_congr rfl fun j _ => smul_comm _ _ _ }
+  let ψ : (Fin m → O) →ₗ[O] V := {
+    toFun := fun y => c⁻¹ • ∑ j, (y j : L) • b j
+    map_add' := fun y z => by
+      simp only [Pi.add_apply, Subring.coe_add, add_smul, Finset.sum_add_distrib, smul_add]
+    map_smul' := fun a y => by
+      simp only [Pi.smul_apply, Subring.smul_def, smul_eq_mul, RingHom.id_apply, Finset.smul_sum,
+        Subring.coe_mul, mul_smul]
+      exact Finset.sum_congr rfl fun j _ => smul_comm _ _ _
+  }
   have hψ : ∀ y, ψ y = c⁻¹ • ∑ j, (y j : L) • b j := fun _ => rfl
   have hinj : LinearMap.ker ψ = ⊥ := by
     refine LinearMap.ker_eq_bot'.2 fun y hy => ?_
@@ -54,13 +57,12 @@ theorem exists_basis_of_pid {L V : Type} [Field L] [AddCommGroup V] [Module L V]
     have h0 : ∑ j, (y j : L) • b j = 0 := (smul_eq_zero.1 hy).resolve_left (inv_ne_zero hc)
     have := Fintype.linearIndependent_iff.1 b.linearIndependent (fun j => (y j : L)) h0
     exact funext fun j => Subtype.ext (this j)
-  let N : Submodule O (Fin m → O) :=
-    { carrier := {y | ψ y ∈ Λ}
-      add_mem' := fun {y z} hy hz => by
-        simpa [map_add (f := _)] using Λ.add_mem hy hz
-      zero_mem' := by simp [Λ.zero_mem]
-      smul_mem' := fun a y hy => by
-        simpa [map_smul, Subring.smul_def] using hO a a.2 _ hy }
+  let N : Submodule O (Fin m → O) := {
+    carrier := {y | ψ y ∈ Λ}
+    add_mem' := fun {y z} hy hz => by simpa [map_add (f := _)] using Λ.add_mem hy hz
+    zero_mem' := by simp [Λ.zero_mem]
+    smul_mem' := fun a y hy => by simpa [map_smul, Subring.smul_def] using hO a a.2 _ hy
+  }
   obtain ⟨n, bN⟩ := Submodule.basisOfPid (Pi.basisFun O (Fin m)) N
   let v : Fin n → V := fun i => ψ (bN i : Fin m → O)
   have hvΛ : ∀ i, v i ∈ Λ := fun i => (bN i).2
@@ -104,15 +106,14 @@ theorem exists_basis_of_pid {L V : Type} [Field L] [AddCommGroup V] [Module L V]
     obtain ⟨o, ho⟩ := hrep _ hax
     have hx : x = a⁻¹ • (a • x) := by rw [smul_smul, inv_mul_cancel₀ ha, one_smul]
     rw [hx, ho]
-    exact Submodule.smul_mem _ _ (Submodule.sum_mem _ fun i _ =>
-      Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
+    exact Submodule.smul_mem _ _
+      (Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
   let B := Module.Basis.mk hli hsp
   have hB : ∀ i, B i = v i := fun i => by simp [B]
   refine ⟨n, B, fun x => ⟨fun hx i => ?_, fun hx => ?_⟩⟩
   · obtain ⟨o, ho⟩ := hrep x hx
     have h7 : x = ∑ j, (o j : L) • B j := by simpa only [hB] using ho
-    have h8 : B.repr x i = (o i : L) := by
-      rw [h7, B.repr_sum_self]
+    have h8 : B.repr x i = (o i : L) := by rw [h7, B.repr_sum_self]
     rw [h8]
     exact (o i).2
   · rw [← B.sum_repr x]
@@ -147,9 +148,11 @@ theorem stSandwich : StSandwich := by
       · rw [norm_inv]
         exact inv_le_one_of_one_le₀ hlt.le
       · simp [hx0, one_mem]
-  obtain ⟨n, B, hB⟩ := exists_basis_of_pid 𝒪[L] hfrac b Λ c hc
-    (fun x hx i => (hmem _).2 ((hb _).1 (hcΛ x hx) i)) hspan
-    (fun a ha x hx => hO a ((hmem a).1 ha) x hx)
+  obtain ⟨n, B, hB⟩ :=
+    exists_basis_of_pid 𝒪[L] hfrac b Λ c hc
+      (fun x hx i => (hmem _).2 ((hb _).1 (hcΛ x hx) i))
+      hspan
+      (fun a ha x hx => hO a ((hmem a).1 ha) x hx)
   exact ⟨n, B, fun x => (hB x).trans (forall_congr' fun i => hmem _)⟩
 
 end GlobalTheory.CompanionTheory.Lattice

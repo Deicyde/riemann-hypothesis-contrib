@@ -142,7 +142,19 @@ lemma abstract {ι K : Type} [CompleteSpace H] [NormedAddCommGroup K] [InnerProd
     inner_smul_left, RCLike.re_to_complex, Complex.mul_re, Complex.conj_re, Complex.conj_im, h1, h2]
   ring
 
-theorem norm_sq_eq : ∀ (ι H E : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E] (ρ : ι → (H →L[ℂ] H)) (D : Submodule ℂ H), (∀ i v, ‖ρ i v‖ = ‖v‖) → (∀ i, ∃ j, (∀ v, ρ j (ρ i v) = v) ∧ ∀ v, ρ i (ρ j v) = v) → (∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ i, ∀ v ∈ S, ρ i v ∈ S) → S = ⊥ ∨ S = ⊤) → (∀ i, ∀ v ∈ D, ρ i v ∈ D) → ∀ A : H →ₗ[ℂ] E, (∀ i, ∀ w ∈ D, ‖A (ρ i w)‖ = ‖A w‖) → (∀ (u : ℕ → H) (f : E), (∀ i, u i ∈ D) → Tendsto u atTop (𝓝 0) → Tendsto (fun i => A (u i)) atTop (𝓝 f) → f = 0) → ∃ c : ℝ, ∀ w ∈ D, ‖A w‖ ^ 2 = c * ‖w‖ ^ 2 := by
+theorem norm_sq_eq
+    : ∀ (ι H E : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E] (ρ : ι → (H →L[ℂ] H))
+        (D : Submodule ℂ H),
+      (∀ i v, ‖ρ i v‖ = ‖v‖) → (∀ i, ∃ j, (∀ v, ρ j (ρ i v) = v) ∧ ∀ v, ρ i (ρ j v) = v)
+        → (∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ i, ∀ v ∈ S, ρ i v ∈ S) → S = ⊥ ∨ S = ⊤)
+        → (∀ i, ∀ v ∈ D, ρ i v ∈ D)
+        → ∀ A : H →ₗ[ℂ] E,
+          (∀ i, ∀ w ∈ D, ‖A (ρ i w)‖ = ‖A w‖)
+            → (∀ (u : ℕ → H) (f : E),
+              (∀ i, u i ∈ D) → Tendsto u atTop (𝓝 0) → Tendsto (fun i => A (u i)) atTop (𝓝 f)
+                → f = 0)
+            → ∃ c : ℝ, ∀ w ∈ D, ‖A w‖ ^ 2 = c * ‖w‖ ^ 2 := by
   intro ι H E _ _ _ _ _ _ ρ D hn hinv hirr hD A hA hcl
   classical
   let g : D →ₗ[ℂ] WithLp 2 (H × E) :=
@@ -172,7 +184,8 @@ theorem norm_sq_eq : ∀ (ι H E : Type) [NormedAddCommGroup H] [InnerProductSpa
     obtain ⟨w, rfl⟩ := LinearMap.mem_range.mp hb
     exact ⟨w, hd⟩
   have hJ : Function.Injective J := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro γ hγ
     have hmem : (γ : WithLp 2 (H × E)) ∈ closure (G : Set (WithLp 2 (H × E))) := by
       rw [← Submodule.topologicalClosure_coe]

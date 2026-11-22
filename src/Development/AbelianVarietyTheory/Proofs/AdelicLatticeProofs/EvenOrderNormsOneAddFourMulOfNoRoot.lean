@@ -18,13 +18,12 @@ private lemma exists_exp_two_mul_of_eq_sq {K : Type} [Field K] (w : Valuation K 
   rw [h, map_pow, two_mul, WithZero.exp_add, WithZero.exp_log ((Valuation.ne_zero_iff w).mpr hy),
     sq]
 
-
 open NumberField IsDedekindDomain in
 open scoped WithZero in
-theorem _root_.GlobalTheory.QNorm.evenNorms_one_add_four_mul :
-    ∀ (K : Type) [Field K] (w : Valuation K ℤᵐ⁰) (ρ : K), (2 : K) ≠ 0 → w ρ ≤ 1 →
-      (∀ x : K, w x ≤ 1 → w (x ^ 2 + x - ρ) = 1) →
-        _root_.GlobalTheory.QNorm.EvenNorms w (1 + 4 * ρ) := by
+theorem _root_.GlobalTheory.QNorm.evenNorms_one_add_four_mul
+    : ∀ (K : Type) [Field K] (w : Valuation K ℤᵐ⁰) (ρ : K),
+      (2 : K) ≠ 0 → w ρ ≤ 1 → (∀ x : K, w x ≤ 1 → w (x ^ 2 + x - ρ) = 1)
+        → _root_.GlobalTheory.QNorm.EvenNorms w (1 + 4 * ρ) := by
   intro K _ w ρ h2 hρ hroot a b hab
   by_cases hb : b = 0
   · subst hb
@@ -44,7 +43,9 @@ theorem _root_.GlobalTheory.QNorm.evenNorms_one_add_four_mul :
         rw [h, map_zero] at ht
         exact not_lt_of_ge zero_le' ht
       have hlt : w (t - ρ) < w (t ^ 2) := by
-        calc w (t - ρ) ≤ max (w t) (w ρ) := Valuation.map_sub w t ρ
+        calc
+          w (t - ρ)
+            ≤ max (w t) (w ρ) := Valuation.map_sub w t ρ
           _ = w t := max_eq_left (hρ.trans ht.le)
           _ < w t * w t := lt_mul_self ht
           _ = w (t ^ 2) := by rw [map_pow, sq]

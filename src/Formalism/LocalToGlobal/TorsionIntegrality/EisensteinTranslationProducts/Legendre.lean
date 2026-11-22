@@ -16,21 +16,25 @@ def ZetaSummable : Prop :=
 def ZetaHasDeriv : Prop :=
   ∀ (L : PeriodPair) (z : ℂ), z ∉ L.lattice → HasDerivAt (wZeta L) (-(L.weierstrassP z)) z
 
-def ZetaOdd : Prop := ∀ (L : PeriodPair) (z : ℂ), wZeta L (-z) = -wZeta L z
+def ZetaOdd : Prop := ∀ (L : PeriodPair) (z : ℂ), wZeta L (-z) = - wZeta L z
 
 def ZetaQuasi : Prop :=
-  ∀ (L : PeriodPair) (ω z : ℂ), ω ∈ L.lattice → z ∉ L.lattice → wZeta L (z + ω) = wZeta L z + wEta L ω
+  ∀ (L : PeriodPair) (ω z : ℂ),
+    ω ∈ L.lattice → z ∉ L.lattice → wZeta L (z + ω) = wZeta L z + wEta L ω
 
 def SigmaSummable : Prop :=
   ∀ (L : PeriodPair) (z : ℂ), Summable (fun l : L.lattice => ‖wFactor (l : ℂ) z - 1‖)
 
 def SigmaProdLU : Prop :=
-  ∀ L : PeriodPair, HasProdLocallyUniformlyOn (fun (l : L.lattice) (z : ℂ) => wFactor (l : ℂ) z)
-    (fun z => ∏' l : L.lattice, wFactor (l : ℂ) z) Set.univ
+  ∀ L : PeriodPair,
+    HasProdLocallyUniformlyOn
+      (fun (l : L.lattice) (z : ℂ) => wFactor (l : ℂ) z)
+      (fun z => ∏' l : L.lattice, wFactor (l : ℂ) z)
+      Set.univ
 
 def SigmaEntire : Prop := ∀ L : PeriodPair, Differentiable ℂ (wSigma L)
 
-def SigmaOdd : Prop := ∀ (L : PeriodPair) (z : ℂ), wSigma L (-z) = -wSigma L z
+def SigmaOdd : Prop := ∀ (L : PeriodPair) (z : ℂ), wSigma L (-z) = - wSigma L z
 
 def SigmaZero : Prop := ∀ (L : PeriodPair) (z : ℂ), wSigma L z = 0 ↔ z ∈ L.lattice
 
@@ -41,13 +45,14 @@ def SigmaLogDeriv : Prop :=
   ∀ (L : PeriodPair) (z : ℂ), z ∉ L.lattice → HasDerivAt (wSigma L) (wZeta L z * wSigma L z) z
 
 def SigmaQuasi : Prop :=
-  ∀ (L : PeriodPair) (ω z : ℂ), ω ∈ L.lattice →
-    wSigma L (z + ω) = semiChar L ω * Complex.exp (wEta L ω * (z + ω / 2)) * wSigma L z
+  ∀ (L : PeriodPair) (ω z : ℂ),
+    ω ∈ L.lattice
+      → wSigma L (z + ω) = semiChar L ω * Complex.exp (wEta L ω * (z + ω / 2)) * wSigma L z
 
 def EtaEisenstein : Prop :=
   ∀ L : PeriodPair,
-    wEta L L.ω₁ = L.ω₁ * ∑' n : ℤ, ∑' m : ℤ, 1 / ((m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂) ^ 2 ∧
-    wEta L L.ω₂ = L.ω₂ * ∑' m : ℤ, ∑' n : ℤ, 1 / ((m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂) ^ 2
+    wEta L L.ω₁ = L.ω₁ * ∑' n : ℤ, ∑' m : ℤ, 1 / ((m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂) ^ 2
+      ∧ wEta L L.ω₂ = L.ω₂ * ∑' m : ℤ, ∑' n : ℤ, 1 / ((m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂) ^ 2
 
 def Legendre : Prop :=
   ∀ L : PeriodPair,

@@ -10,14 +10,17 @@ open Formalism.REAL Matrix
 
 namespace PositivityTheory.Rg.Cz.TA
 
-variable {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] {P : Type} [Fintype P] [DecidableEq P]
-  {ι : Type} [DecidableEq ι] (lab : P → ι) (τ₀ : ι)
+variable
+  {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
+  {P : Type} [Fintype P] [DecidableEq P]
+  {ι : Type} [DecidableEq ι]
+  (lab : P → ι) (τ₀ : ι)
 
 def labR : {p // ¬ lab p = τ₀} → {τ // τ ≠ τ₀} := fun p => ⟨lab p.1, p.2⟩
 
-theorem conj_tensor_entry_base (F : Fin n → Fin n → Module.End ℂ M) (c d : Fin n) :
-    cj (spl (n := n) (M := M) fun p => lab p = τ₀) (tE Finset.univ (fun a b => lift (F a b)) c d) =
-      tE (fib lab τ₀) F c d := by
+theorem conj_tensor_entry_base (F : Fin n → Fin n → Module.End ℂ M) (c d : Fin n)
+    : cj (spl (n := n) (M := M) fun p => lab p = τ₀) (tE Finset.univ (fun a b => lift (F a b)) c d)
+      = tE (fib lab τ₀) F c d := by
   refine LinearMap.ext fun f => ?_
   rw [cj_apply]
   apply (spl (n := n) (M := M) fun p => lab p = τ₀).injective
@@ -29,9 +32,10 @@ theorem conj_tensor_entry_base (F : Fin n → Fin n → Module.End ℂ M) (c d :
     simp [fib, Finset.mem_subtype, x.2]
   rw [LinearEquiv.apply_symm_apply, spl_tE, h1, h2, tE_empty]
 
-theorem conj_tensor_entry_fibre (τ : {τ // τ ≠ τ₀}) (F : Fin n → Fin n → Module.End ℂ M) (c d : Fin n) :
-    cj (spl (n := n) (M := M) fun p => lab p = τ₀) (lift (tE (fib (labR lab τ₀) τ) F c d)) =
-      tE (fib lab τ.1) F c d := by
+theorem conj_tensor_entry_fibre
+    (τ : {τ // τ ≠ τ₀}) (F : Fin n → Fin n → Module.End ℂ M) (c d : Fin n)
+    : cj (spl (n := n) (M := M) fun p => lab p = τ₀) (lift (tE (fib (labR lab τ₀) τ) F c d))
+      = tE (fib lab τ.1) F c d := by
   refine LinearMap.ext fun f => ?_
   rw [cj_apply]
   apply (spl (n := n) (M := M) fun p => lab p = τ₀).injective
@@ -47,9 +51,9 @@ theorem conj_tensor_entry_fibre (τ : {τ // τ ≠ τ₀}) (F : Fin n → Fin n
   rw [LinearEquiv.apply_symm_apply, spl_tE, h1, h2, tE_empty]
 
 omit [DecidableEq P] in
-theorem card_R (τ : {τ // τ ≠ τ₀}) (co : P → Fin n) (k : Fin n) :
-    (Finset.univ.filter fun p : {p // ¬ lab p = τ₀} => labR lab τ₀ p = τ ∧ co p.1 = k).card =
-      (Finset.univ.filter fun p => lab p = τ.1 ∧ co p = k).card := by
+theorem card_R (τ : {τ // τ ≠ τ₀}) (co : P → Fin n) (k : Fin n)
+    : (Finset.univ.filter fun p : {p // ¬ lab p = τ₀} => labR lab τ₀ p = τ ∧ co p.1 = k).card
+      = (Finset.univ.filter fun p => lab p = τ.1 ∧ co p = k).card := by
   refine Finset.card_bij (fun p _ => p.1) ?_ ?_ ?_
   · intro p hp
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, labR, Subtype.ext_iff] at hp ⊢
@@ -63,13 +67,19 @@ theorem card_R (τ : {τ // τ ≠ τ₀}) (co : P → Fin n) (k : Fin n) :
     exact hp
 
 omit [Fintype P] in
-theorem base (E : ι → Fin n → Fin n → Module.End ℂ M) (l : ι → Fin n → ℤ)
-    (hl : ∀ τ, HasChar (E τ) fun k => (l τ k : ℂ)) (ℓ : M →ₗ[ℂ] ℂ) (hℓ : ℓ ≠ 0) [Fintype P] [IsEmpty P]
-    {C : Type} [DecidableEq C] (col : P → C) (b co : P → Fin n) :
-    ∃ S ∈ envAlg (fun τ => tE (fib lab τ) (E τ)), ℓ ∘ₗ cA col b ∘ₗ S ≠ 0 ∧ ∀ τ (u : ℂ),
-      (ℓ ∘ₗ cA col b ∘ₗ S) ∘ₗ qdet (tE (fib lab τ) (E τ)) u =
-        (∏ k, (u + l τ k + ((Finset.univ.filter fun p => lab p = τ ∧ co p = k).card : ℂ))) •
-          (ℓ ∘ₗ cA col b ∘ₗ S) := by
+theorem base
+    (E : ι → Fin n → Fin n → Module.End ℂ M) (l : ι → Fin n → ℤ)
+    (hl : ∀ τ, HasChar (E τ) fun k => (l τ k : ℂ))
+    (ℓ : M →ₗ[ℂ] ℂ) (hℓ : ℓ ≠ 0)
+    [Fintype P] [IsEmpty P]
+    {C : Type} [DecidableEq C]
+    (col : P → C) (b co : P → Fin n)
+    : ∃ S ∈ envAlg (fun τ => tE (fib lab τ) (E τ)),
+      ℓ ∘ₗ cA col b ∘ₗ S ≠ 0
+        ∧ ∀ τ (u : ℂ),
+          (ℓ ∘ₗ cA col b ∘ₗ S) ∘ₗ qdet (tE (fib lab τ) (E τ)) u
+            = (∏ k, (u + l τ k + ((Finset.univ.filter fun p => lab p = τ ∧ co p = k).card : ℂ)))
+              • (ℓ ∘ₗ cA col b ∘ₗ S) := by
   have hfib : ∀ τ, fib lab τ = ∅ := fun τ => Finset.eq_empty_of_isEmpty _
   have hG : colG col = {1} := by
     ext σ

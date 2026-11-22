@@ -24,11 +24,12 @@ open scoped ENNReal Classical
 
 variable {G α β : Type} [Group G] [MulAction G α] [MulAction G β]
 
-theorem inv_card_stab (π : α → β) (hπ : ∀ (g : G) x, π (g • x) = g • π x) (x : α) (k : G)
-    (hf : (MulAction.orbit G x ∩ π ⁻¹' {k • π x}).encard ≠ ⊤) :
-    ((ENat.card (MulAction.stabilizer G x) : ℕ∞) : ℝ≥0∞)⁻¹ =
-      ((ENat.card (MulAction.stabilizer G (k • π x)) : ℕ∞) : ℝ≥0∞)⁻¹ *
-      (((MulAction.orbit G x ∩ π ⁻¹' {k • π x}).encard : ℕ∞) : ℝ≥0∞) := by
+theorem inv_card_stab
+    (π : α → β) (hπ : ∀ (g : G) x, π (g • x) = g • π x)
+    (x : α) (k : G) (hf : (MulAction.orbit G x ∩ π ⁻¹' {k • π x}).encard ≠ ⊤)
+    : ((ENat.card (MulAction.stabilizer G x) : ℕ∞) : ℝ≥0∞)⁻¹
+      = ((ENat.card (MulAction.stabilizer G (k • π x)) : ℕ∞) : ℝ≥0∞)⁻¹
+        * (((MulAction.orbit G x ∩ π ⁻¹' {k • π x}).encard : ℕ∞) : ℝ≥0∞) := by
   have h := key π hπ x k
   have h0 : ((ENat.card (MulAction.stabilizer G (k • π x)) : ℕ∞) : ℝ≥0∞) ≠ 0 := by
     have : 0 < ENat.card (MulAction.stabilizer G (k • π x)) := ENat.card_pos
@@ -40,14 +41,19 @@ theorem inv_card_stab (π : α → β) (hπ : ∀ (g : G) x, π (g • x) = g �
   generalize (((MulAction.orbit G x ∩ π ⁻¹' {k • π x}).encard : ℕ∞) : ℝ≥0∞) = a at *
   subst h
   have a0 : a ≠ 0 := left_ne_zero_of_mul h0
-  rw [ENNReal.mul_inv (Or.inl a0) (Or.inl at'), mul_right_comm, ENNReal.inv_mul_cancel a0 at', one_mul]
+  rw [ENNReal.mul_inv (Or.inl a0) (Or.inl at'), mul_right_comm, ENNReal.inv_mul_cancel a0 at',
+    one_mul]
 
-theorem orbSum_fibre (X : Set α) (Y : Set β) (π : α → β) (hπ : ∀ (g : G) x, π (g • x) = g • π x)
-    (hX : Stable G X) (hY : Stable G Y) (hXY : Set.MapsTo π X Y) (n : ℕ)
-    (hn : ∀ y ∈ Y, (X ∩ π ⁻¹' {y}).encard = n) (φ : β → ℝ≥0∞) (hφ : ∀ (g : G) y, φ (g • y) = φ y) :
-    orbSum G X (fun x => φ (π x)) = (n : ℝ≥0∞) * orbSum G Y φ := by
-  have e : (n : ℝ≥0∞) * orbSum G Y φ =
-      orbSum G Y (fun y => (((X ∩ π ⁻¹' {y}).encard : ℕ∞) : ℝ≥0∞) * φ y) := by
+theorem orbSum_fibre
+    (X : Set α) (Y : Set β)
+    (π : α → β) (hπ : ∀ (g : G) x, π (g • x) = g • π x)
+    (hX : Stable G X) (hY : Stable G Y) (hXY : Set.MapsTo π X Y)
+    (n : ℕ) (hn : ∀ y ∈ Y, (X ∩ π ⁻¹' {y}).encard = n)
+    (φ : β → ℝ≥0∞) (hφ : ∀ (g : G) y, φ (g • y) = φ y)
+    : orbSum G X (fun x => φ (π x)) = (n : ℝ≥0∞) * orbSum G Y φ := by
+  have e
+      : (n : ℝ≥0∞) * orbSum G Y φ
+        = orbSum G Y (fun y => (((X ∩ π ⁻¹' {y}).encard : ℕ∞) : ℝ≥0∞) * φ y) := by
     unfold orbSum
     rw [← ENNReal.tsum_mul_left]
     refine tsum_congr fun q => ?_
@@ -62,8 +68,7 @@ theorem orbSum_fibre (X : Set α) (Y : Set β) (π : α → β) (hπ : ∀ (g : 
   set x := Quotient.out q with hx
   let r : MulAction.orbitRel.Quotient G β := Quotient.mk (MulAction.orbitRel G β) (π x)
   obtain ⟨g, hg⟩ := (mem_orbit_out r (π x)).2 rfl
-  have hr : Quotient.out r = g⁻¹ • π x := by
-    rw [← hg]; simp
+  have hr : Quotient.out r = g⁻¹ • π x := by rw [← hg]; simp
   have hrY : Quotient.out r ∈ Y := hr ▸ hY _ _ (hXY hq)
   rw [tsum_eq_single (⟨r, hrY⟩ : {q : MulAction.orbitRel.Quotient G β // Quotient.out q ∈ Y})]
   · simp only [hr]
@@ -81,13 +86,18 @@ theorem orbSum_fibre (X : Set α) (Y : Set β) (π : α → β) (hπ : ∀ (g : 
       have h3 : π (u • x) = Quotient.out s.1 := h2
       refine ((mem_orbit_out s.1 (π x)).1 ⟨u⁻¹, ?_⟩).symm
       simp [← h3, hπ]
-    rw [this]; simp
+    rw [this]
+    simp
 
-theorem orbSum_fibre_equiv {G G' α β : Type} [Group G] [Group G'] [MulAction G α] [MulAction G' β]
-    (e : G ≃* G') (X : Set α) (Y : Set β) (π : α → β) (hπ : ∀ (g : G) x, π (g • x) = e g • π x)
-    (hX : Stable G X) (hY : Stable G' Y) (hXY : Set.MapsTo π X Y) (n : ℕ)
-    (hn : ∀ y ∈ Y, (X ∩ π ⁻¹' {y}).encard = n) (φ : β → ℝ≥0∞) (hφ : ∀ (g : G') y, φ (g • y) = φ y) :
-    orbSum G X (fun x => φ (π x)) = (n : ℝ≥0∞) * orbSum G' Y φ := by
+theorem orbSum_fibre_equiv
+    {G G' α β : Type} [Group G] [Group G'] [MulAction G α] [MulAction G' β]
+    (e : G ≃* G')
+    (X : Set α) (Y : Set β)
+    (π : α → β) (hπ : ∀ (g : G) x, π (g • x) = e g • π x)
+    (hX : Stable G X) (hY : Stable G' Y) (hXY : Set.MapsTo π X Y)
+    (n : ℕ) (hn : ∀ y ∈ Y, (X ∩ π ⁻¹' {y}).encard = n)
+    (φ : β → ℝ≥0∞) (hφ : ∀ (g : G') y, φ (g • y) = φ y)
+    : orbSum G X (fun x => φ (π x)) = (n : ℝ≥0∞) * orbSum G' Y φ := by
   letI : MulAction G β := MulAction.compHom β e.toMonoidHom
   have hY' : Stable G Y := fun g y hy => hY (e g) y hy
   rw [orbSum_fibre X Y π hπ hX hY' hXY n hn φ fun g y => hφ (e g) y]
@@ -98,30 +108,39 @@ end Orbits
 
 section Cyclic
 
-open NumberField GlobalTheory.Mass Formalism.HermitianLatticesTheory GlobalTheory.Mass.SplitOver GlobalTheory.NormOneSplit
+open NumberField GlobalTheory.Mass Formalism.HermitianLatticesTheory GlobalTheory.Mass.SplitOver
+  GlobalTheory.NormOneSplit
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 omit [FiniteDimensional K V] in
-theorem gmap_loc_dual (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) (M N : Submodule (𝓞 K) V)
-    (hM : Submodule.IsLattice K M) (hN : Submodule.IsLattice K N) (P : Ideal (𝓞 K)) (hP : P.IsPrime)
-    (g : V ≃ₗ[K] V) (hg : g ∈ isom h) (hgL : gmap g (loc (K := K) P M) = loc (K := K) P N) :
-    gmap g (loc (K := K) P (dual h M)) = loc (K := K) P (dual h N) := by
+theorem gmap_loc_dual
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm)
+    (M N : Submodule (𝓞 K) V) (hM : Submodule.IsLattice K M) (hN : Submodule.IsLattice K N)
+    (P : Ideal (𝓞 K)) (hP : P.IsPrime)
+    (g : V ≃ₗ[K] V) (hg : g ∈ isom h) (hgL : gmap g (loc (K := K) P M) = loc (K := K) P N)
+    : gmap g (loc (K := K) P (dual h M)) = loc (K := K) P (dual h N) := by
   have ld := locDual (𝓞 K) K V h hs star_algebraMap_ringOfIntegers_mem_range
   obtain ⟨a1, a2, -, -, a5⟩ := isomAct (𝓞 K) K V h g hg M
   have b1 := (ld (gmap g M) (a5.2 hM).fg).1 P hP
   have b2 := (ld N hN.fg).1 P hP
   rw [b2.1, ← b2.2, ← hgL, ← a2 P, b1.2, ← b1.1, a1, (isomAct (𝓞 K) K V h g hg (dual h M)).2.1 P]
 
-theorem cyclic_of_genus (h : V →ₗ⋆[K] V →ₗ[K] K) (hK : IsCMUnram K) (hs : h.IsSymm) (hn : h.Nondegenerate)
+theorem cyclic_of_genus
+    (h : V →ₗ⋆[K] V →ₗ[K] K)
+    (hK : IsCMUnram K) (hs : h.IsSymm) (hn : h.Nondegenerate)
     {T : ℕ} (hT : T.Prime)
     (hsp : ∀ P : Ideal (𝓞 K), P.IsMaximal → (T : 𝓞 K) ∈ P → Ideal.absNorm P = T ∧ (T : 𝓞 K) ∉ P ^ 2)
     (L : Submodule (𝓞 K) V) (hL : IsIntLat h L)
-    (e : Nonempty ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ Ideal.span {(T : 𝓞 K)})))
-    (M : Submodule (𝓞 K) V) (hM : M ∈ genus h L) :
-    IsIntLat h M ∧ ∃ x ∈ dual h M, (∀ y ∈ dual h M, ∃ r : 𝓞 K, y - r • x ∈ M) ∧
-      ∀ r : 𝓞 K, r • x ∈ M ↔ r ∈ Ideal.span {(T : 𝓞 K)} := by
+    (e : Nonempty
+      ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ Ideal.span {(T : 𝓞 K)})))
+    (M : Submodule (𝓞 K) V) (hM : M ∈ genus h L)
+    : IsIntLat h M
+      ∧ ∃ x ∈ dual h M,
+        (∀ y ∈ dual h M, ∃ r : 𝓞 K, y - r • x ∈ M)
+          ∧ ∀ r : 𝓞 K, r • x ∈ M ↔ r ∈ Ideal.span {(T : 𝓞 K)} := by
   classical
   haveI := Fact.mk hT
   haveI := finite_hom (E := K) hT
@@ -195,8 +214,9 @@ theorem cyclic_of_genus (h : V →ₗ⋆[K] V →ₗ[K] K) (hK : IsCMUnram K) (h
   let f' := Submodule.liftQ (Ideal.span {(T : 𝓞 K)}) f hk.le
   have inj : Function.Injective f' :=
     LinearMap.ker_eq_bot.1 (Submodule.ker_liftQ_eq_bot _ _ _ hk.ge)
-  have hc : Nat.card (𝓞 K ⧸ Ideal.span {(T : 𝓞 K)}) =
-      Nat.card (↥(dual h M) ⧸ M.comap (dual h M).subtype) := by
+  have hc
+      : Nat.card (𝓞 K ⧸ Ideal.span {(T : 𝓞 K)})
+        = Nat.card (↥(dual h M) ⧸ M.comap (dual h M).subtype) := by
     obtain ⟨e⟩ := e
     rw [← Nat.card_congr e.toEquiv]
     exact hd.symm
@@ -206,15 +226,22 @@ theorem cyclic_of_genus (h : V →ₗ⋆[K] V →ₗ[K] K) (hK : IsCMUnram K) (h
   intro y hy
   obtain ⟨a, ha⟩ := sur (Submodule.Quotient.mk ⟨y, hy⟩)
   obtain ⟨r, rfl⟩ := Submodule.Quotient.mk_surjective _ a
-  exact ⟨r, (Submodule.Quotient.eq (M.comap (dual h M).subtype) (x := ⟨y, hy⟩)
-    (y := r • (⟨x, hx⟩ : dual h M))).1 ha.symm⟩
+  exact ⟨
+    r,
+    (Submodule.Quotient.eq (M.comap (dual h M).subtype) (x := ⟨y, hy⟩)
+      (y := r • (⟨x, hx⟩ : dual h M))).1 ha.symm
+  ⟩
 
-theorem card_classes (hK : IsCMUnram K) {T : ℕ} (hT : T.Prime)
+theorem card_classes
+    (hK : IsCMUnram K)
+    {T : ℕ} (hT : T.Prime)
     (hsp : ∀ P : Ideal (𝓞 K), P.IsMaximal → (T : 𝓞 K) ∈ P → Ideal.absNorm P = T ∧ (T : 𝓞 K) ∉ P ^ 2)
-    (c : 𝓞 K) (hc : cj c = c)
-    (hc' : ∀ r : 𝓞 K, r * c ∈ Ideal.span {(T : 𝓞 K)} → r ∈ Ideal.span {(T : 𝓞 K)}) :
-    Nat.card {a : 𝓞 K ⧸ Ideal.span {(T : 𝓞 K)} // ∃ b : 𝓞 K, Ideal.Quotient.mk _ b = a ∧
-      b * cj b - c ∈ Ideal.span {(T : 𝓞 K)}} = (T - 1) ^ fDeg K := by
+    (c : 𝓞 K)
+    (hc : cj c = c) (hc' : ∀ r : 𝓞 K, r * c ∈ Ideal.span {(T : 𝓞 K)} → r ∈ Ideal.span {(T : 𝓞 K)})
+    : Nat.card
+        {a : 𝓞 K ⧸ Ideal.span {(T : 𝓞 K)}
+          // ∃ b : 𝓞 K, Ideal.Quotient.mk _ b = a ∧ b * cj b - c ∈ Ideal.span {(T : 𝓞 K)}}
+      = (T - 1) ^ fDeg K := by
   classical
   haveI := Fact.mk hT
   haveI := finite_hom (E := K) hT
@@ -230,8 +257,9 @@ theorem card_classes (hK : IsCMUnram K) {T : ℕ} (hT : T.Prime)
         · rw [h1, hψ, mul_zero]
         · rw [if_neg h1, zero_mul]
     obtain ⟨u, hu⟩ := exists_forall_hom_eq (R := 𝓞 K) (T := T) (fun χ => (χ c)⁻¹)
-    have : 1 - u * c ∈ Ideal.span {(T : 𝓞 K)} := (mem_span_iff hT hsp _).2 fun χ => by
-      rw [map_sub, map_mul, hu, inv_mul_cancel₀ (h0 χ), map_one, sub_self]
+    have : 1 - u * c ∈ Ideal.span {(T : 𝓞 K)} :=
+      (mem_span_iff hT hsp _).2 fun χ => by
+        rw [map_sub, map_mul, hu, inv_mul_cancel₀ (h0 χ), map_one, sub_self]
     obtain ⟨v, hv⟩ := Ideal.mem_span_singleton'.1 this
     exact ⟨u, v, by rw [hv]; ring⟩
   have sp : ∀ r : 𝓞 K, ((cj r : 𝓞 K) : K) = star (r : K) := fun r =>
@@ -239,7 +267,9 @@ theorem card_classes (hK : IsCMUnram K) {T : ℕ} (hT : T.Prime)
   have key := card_norm_classes _ K hcm T hT hsp c (by rw [← sp, hc]) hcop
   have hf : Module.finrank ℚ (maximalRealSubfield K) = fDeg K := by
     haveI := hK.1
-    have h1 := (letI : Module.Free (maximalRealSubfield K) K := Module.Free.of_divisionRing _ _; Module.finrank_mul_finrank ℚ (maximalRealSubfield K) K)
+    have h1 :=
+      (letI : Module.Free (maximalRealSubfield K) K := Module.Free.of_divisionRing _ _
+       Module.finrank_mul_finrank ℚ (maximalRealSubfield K) K)
     have h2 := IsTotallyComplex.finrank K
     have h3 := InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces K
     rw [IsTotallyComplex.nrRealPlaces_eq_zero] at h3
@@ -260,19 +290,23 @@ section Glue
 
 open NumberField GlobalTheory.Mass Formalism.HermitianLatticesTheory GlobalTheory.Mass.SplitOver
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 def glue (U : Submodule K V) (M : Submodule (𝓞 K) U) (x : U) (z : V) (t : K) : Submodule (𝓞 K) V :=
-  (M.map (U.subtype.restrictScalars (𝓞 K)) ⊔ Submodule.span (𝓞 K) {(x : V) + t • z}) ⊔
-    Submodule.span (𝓞 K) {z}
+  (M.map (U.subtype.restrictScalars (𝓞 K)) ⊔ Submodule.span (𝓞 K) {(x : V) + t • z})
+    ⊔ Submodule.span (𝓞 K) {z}
 
 omit [NumberField K] [StarRing K] [FiniteDimensional K V] in
-theorem mem_glue (U : Submodule K V) (M : Submodule (𝓞 K) U) (x : U) (z : V) (t : K) (w : V) :
-    w ∈ glue U M x z t ↔ ∃ m ∈ M, ∃ r s : 𝓞 K,
-      w = ((m + r • x : U) : V) + (algebraMap (𝓞 K) K r * t + algebraMap (𝓞 K) K s) • z := by
-  have e : ∀ (m : U) (r s : 𝓞 K), ((m + r • x : U) : V) +
-      (algebraMap (𝓞 K) K r * t + algebraMap (𝓞 K) K s) • z = (m : V) + r • ((x : V) + t • z) + s • z := by
+theorem mem_glue (U : Submodule K V) (M : Submodule (𝓞 K) U) (x : U) (z : V) (t : K) (w : V)
+    : w ∈ glue U M x z t
+      ↔ ∃ m ∈ M, ∃ r s : 𝓞 K,
+        w = ((m + r • x : U) : V) + (algebraMap (𝓞 K) K r * t + algebraMap (𝓞 K) K s) • z := by
+  have e
+      : ∀ (m : U) (r s : 𝓞 K),
+        ((m + r • x : U) : V) + (algebraMap (𝓞 K) K r * t + algebraMap (𝓞 K) K s) • z
+          = (m : V) + r • ((x : V) + t • z) + s • z := by
     intro m r s
     rw [add_smul, mul_smul, algebraMap_smul, algebraMap_smul, smul_add, Submodule.coe_add,
       Submodule.coe_smul_of_tower]
@@ -284,8 +318,10 @@ theorem mem_glue (U : Submodule K V) (M : Submodule (𝓞 K) U) (x : U) (z : V) 
   · rintro ⟨m, hm, r, s, rfl⟩
     exact ⟨_, ⟨_, ⟨m, hm, rfl⟩, _, ⟨r, rfl⟩, rfl⟩, _, ⟨s, rfl⟩, rfl⟩
 
-variable (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) {T : ℕ} (hT : T.Prime) {z : V} {U : Submodule K V}
-  (hz : h z z = -(T : K)) (hU : ∀ v, v ∈ U ↔ h z v = 0)
+variable
+  (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm)
+  {T : ℕ} (hT : T.Prime)
+  {z : V} {U : Submodule K V} (hz : h z z = -(T : K)) (hU : ∀ v, v ∈ U ↔ h z v = 0)
 
 omit [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
 include hT hz hU in
@@ -298,18 +334,19 @@ theorem decomp (v : V) : ∃ (u : U) (t : K), v = u + t • z := by
 
 omit [NumberField K] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
 include hs hz hU in
-theorem pair (u u' : U) (t t' : K) :
-    h (u + t • z) (u' + t' • z) = hRes h U u u' - T * star t * t' := by
+theorem pair (u u' : U) (t t' : K)
+    : h (u + t • z) (u' + t' • z) = hRes h U u u' - T * star t * t' := by
   have h1 : ∀ u : U, h z u = 0 := fun u => (hU _).1 u.2
   have h2 : ∀ u : U, h u z = 0 := fun u => by rw [← hs.eq, h1, map_zero]
   have h3 : hRes h U u u' = h u u' := rfl
-  simp only [map_add (f := _), LinearMap.add_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, h1, h2, hz, h3,
-    smul_eq_mul, starRingEnd_apply, RingHom.id_apply]
+  simp only [map_add (f := _), LinearMap.add_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, h1,
+    h2, hz, h3, smul_eq_mul, starRingEnd_apply, RingHom.id_apply]
   ring
 
 omit [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
 include hT hz hU in
-theorem decomp_unique {u u' : U} {t t' : K} (e : (u : V) + t • z = u' + t' • z) : u = u' ∧ t = t' := by
+theorem decomp_unique {u u' : U} {t t' : K} (e : (u : V) + t • z = u' + t' • z)
+    : u = u' ∧ t = t' := by
   have T0 : (T : K) ≠ 0 := Nat.cast_ne_zero.2 hT.ne_zero
   have h1 : ∀ u : U, h z u = 0 := fun u => (hU _).1 u.2
   have := congrArg (h z) e
@@ -318,20 +355,20 @@ theorem decomp_unique {u u' : U} {t t' : K} (e : (u : V) + t • z = u' + t' •
   rw [ht] at e
   exact ⟨Subtype.ext (add_right_cancel e), ht⟩
 
-variable {M : Submodule (𝓞 K) U} (hM : IsIntLat (hRes h U) M) {x : U} (hx : x ∈ dual (hRes h U) M)
-  (g1 : ∀ y ∈ dual (hRes h U) M, ∃ r : 𝓞 K, y - r • x ∈ M)
+variable
+  {M : Submodule (𝓞 K) U} (hM : IsIntLat (hRes h U) M)
+  {x : U} (hx : x ∈ dual (hRes h U) M) (g1 : ∀ y ∈ dual (hRes h U) M, ∃ r : 𝓞 K, y - r • x ∈ M)
   (g2 : ∀ r : 𝓞 K, r • x ∈ M ↔ r ∈ Ideal.span {(T : 𝓞 K)})
   {c : 𝓞 K} (hc : algebraMap (𝓞 K) K c = T * hRes h U x x)
   (hc' : ∀ r : 𝓞 K, r * c ∈ Ideal.span {(T : 𝓞 K)} → r ∈ Ideal.span {(T : 𝓞 K)})
 
-
 omit [FiniteDimensional K V] in
 include hs hT hz hU hM hx g1 g2 hc hc' in
-theorem glue_spec (b : 𝓞 K) (hb : b * cj b - c ∈ Ideal.span {(T : 𝓞 K)}) :
-    Submodule.IsLattice K (glue U M x z (algebraMap (𝓞 K) K b / T)) ∧
-    IsUnimodular h (glue U M x z (algebraMap (𝓞 K) K b / T)) ∧
-    (∀ t : K, t • z ∈ glue U M x z (algebraMap (𝓞 K) K b / T) ↔ t ∈ (1 : Submodule (𝓞 K) K)) ∧
-    latIn U (glue U M x z (algebraMap (𝓞 K) K b / T)) = M := by
+theorem glue_spec (b : 𝓞 K) (hb : b * cj b - c ∈ Ideal.span {(T : 𝓞 K)})
+    : Submodule.IsLattice K (glue U M x z (algebraMap (𝓞 K) K b / T))
+      ∧ IsUnimodular h (glue U M x z (algebraMap (𝓞 K) K b / T))
+      ∧ (∀ t : K, t • z ∈ glue U M x z (algebraMap (𝓞 K) K b / T) ↔ t ∈ (1 : Submodule (𝓞 K) K))
+      ∧ latIn U (glue U M x z (algebraMap (𝓞 K) K b / T)) = M := by
   have T0 : (T : K) ≠ 0 := Nat.cast_ne_zero.2 hT.ne_zero
   have hsU : (hRes h U).IsSymm := ⟨fun a b => hs.eq (a : V) (b : V)⟩
   have sp : ∀ r : 𝓞 K, star (algebraMap (𝓞 K) K r) = algebraMap (𝓞 K) K (cj r) := fun r =>
@@ -356,11 +393,13 @@ theorem glue_spec (b : 𝓞 K) (hb : b * cj b - c ∈ Ideal.span {(T : 𝓞 K)})
   have mz : z ∈ L := (mem _).2 ⟨0, M.zero_mem, 0, 1, by simp⟩
   have mv : (x : V) + (algebraMap (𝓞 K) K b / T) • z ∈ L := (mem _).2 ⟨0, M.zero_mem, 1, 0, by simp⟩
   have hxx : hRes h U x x = algebraMap (𝓞 K) K c / T := by rw [hc]; field_simp
-  have hkk : algebraMap (𝓞 K) K c =
-      algebraMap (𝓞 K) K b * algebraMap (𝓞 K) K (cj b) - algebraMap (𝓞 K) K k * T := by
+  have hkk
+      : algebraMap (𝓞 K) K c
+        = algebraMap (𝓞 K) K b * algebraMap (𝓞 K) K (cj b) - algebraMap (𝓞 K) K k * T := by
     have := congrArg (algebraMap (𝓞 K) K) hk
     simp only [map_mul, map_sub, map_natCast] at this
-    rw [this]; ring
+    rw [this]
+    ring
   have hint : IsIntegralLat h L := by
     intro w hw w' hw'
     obtain ⟨m, hm, r, s, rfl⟩ := (mem w).1 hw
@@ -374,16 +413,20 @@ theorem glue_spec (b : 𝓞 K) (hb : b * cj b - c ∈ Ideal.span {(T : 𝓞 K)})
     simp only [map_add (f := _), LinearMap.add_apply, genusBasic_hsmul_right,
       genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range]
     rw [← hα, ← hβ, hγ', hxx, hkk]
-    refine Submodule.mem_one.2 ⟨α + r' * β + cj r * cj γ - cj r * r' * k - cj r * cj b * s' -
-      cj s * r' * b - T * cj s * s', ?_⟩
-    simp only [map_add (f := _), map_sub, map_mul, map_natCast, star_add, star_mul', star_div₀, star_natCast, sp]
+    refine Submodule.mem_one.2 ⟨
+      α + r' * β + cj r * cj γ - cj r * r' * k - cj r * cj b * s' - cj s * r' * b - T * cj s * s',
+      ?_
+    ⟩
+    simp only [map_add (f := _), map_sub, map_mul, map_natCast, star_add, star_mul', star_div₀,
+      star_natCast, sp]
     field_simp
     ring
   refine ⟨⟨?_, ?_⟩, ?_, fun t => ⟨fun ht => ?_, ?_⟩, ?_⟩
   · exact ((hM.1.fg.map _).sup (Submodule.fg_span_singleton _)).sup (Submodule.fg_span_singleton _)
   · intro s hs hli
     exact (LinearIndependent.iff_fractionRing _ _).mp hli
-  · refine ((dualBasic (𝓞 K) K V h hs star_algebraMap_ringOfIntegers_mem_range).2.2.2.2 L).2 ⟨hint, fun w hw => ?_⟩
+  · refine ((dualBasic (𝓞 K) K V h hs star_algebraMap_ringOfIntegers_mem_range).2.2.2.2 L).2
+      ⟨hint, fun w hw => ?_⟩
     obtain ⟨u, t, rfl⟩ := decomp h hT hz hU w
     have hw' := (dualBasic_mem_dual h L _).1 hw
     have hu : u ∈ dual (hRes h U) M := by
@@ -396,11 +439,15 @@ theorem glue_spec (b : 𝓞 K) (hb : b * cj b - c ∈ Ideal.span {(T : 𝓞 K)})
     obtain ⟨r, hr⟩ := g1 u hu
     obtain ⟨s, hs'⟩ := Submodule.mem_one.1 (hw' z mz)
     have e1 := pair h hs hz hU 0 u 1 t
-    simp only [one_smul, Submodule.coe_zero, zero_add, star_one, mul_one, map_zero, LinearMap.zero_apply,
-      zero_sub] at e1
+    simp only [one_smul, Submodule.coe_zero, zero_add, star_one, mul_one, map_zero,
+        LinearMap.zero_apply, zero_sub]
+      at e1
     rw [e1] at hs'
-    have w1 : ((u - r • x + r • x : U) : V) + (algebraMap (𝓞 K) K r * (algebraMap (𝓞 K) K b / T) +
-      algebraMap (𝓞 K) K 0) • z ∈ L := (mem _).2 ⟨_, hr, r, 0, rfl⟩
+    have w1
+        : ((u - r • x + r • x : U) : V)
+            + (algebraMap (𝓞 K) K r * (algebraMap (𝓞 K) K b / T) + algebraMap (𝓞 K) K 0) • z
+          ∈ L :=
+      (mem _).2 ⟨_, hr, r, 0, rfl⟩
     have w2 := Submodule.sub_mem _ (hw' _ mv) (hint _ mv _ w1)
     rw [pair h hs hz hU, pair h hs hz hU, sub_add_cancel] at w2
     obtain ⟨p, hp⟩ := Submodule.mem_one.1 w2
@@ -440,17 +487,19 @@ theorem glue_spec (b : 𝓞 K) (hb : b * cj b - c ∈ Ideal.span {(T : 𝓞 K)})
     obtain ⟨m, hm, r, s, e⟩ := (mem _).1 hu
     have e' : (u : V) + (0 : K) • z = _ := (by simp : (u : V) + (0 : K) • z = u).trans e
     obtain ⟨rfl, e2⟩ := decomp_unique h hT hz hU e'
-    refine M.add_mem hm ((g2 r).2 (hbu r (Ideal.mem_span_singleton'.2 ⟨-s, genusCovol_hinj (K := K) ?_⟩)))
+    refine M.add_mem hm
+      ((g2 r).2 (hbu r (Ideal.mem_span_singleton'.2 ⟨-s, genusCovol_hinj (K := K) ?_⟩)))
     simp only [map_neg, map_mul, map_natCast]
     field_simp at e2
     linear_combination e2
 
-
 include hs hT hz hU hM hx g1 g2 hc hc' in
-theorem exists_eq_glue (hn : (hRes h U).Nondegenerate) (L : Submodule (𝓞 K) V)
-    (hL : Submodule.IsLattice K L) (hLu : IsUnimodular h L)
-    (hLz : ∀ t : K, t • z ∈ L ↔ t ∈ (1 : Submodule (𝓞 K) K)) (hLM : latIn U L = M) :
-    ∃ b : 𝓞 K, b * cj b - c ∈ Ideal.span {(T : 𝓞 K)} ∧ glue U M x z (algebraMap (𝓞 K) K b / T) = L := by
+theorem exists_eq_glue
+    (hn : (hRes h U).Nondegenerate)
+    (L : Submodule (𝓞 K) V) (hL : Submodule.IsLattice K L) (hLu : IsUnimodular h L)
+    (hLz : ∀ t : K, t • z ∈ L ↔ t ∈ (1 : Submodule (𝓞 K) K)) (hLM : latIn U L = M)
+    : ∃ b : 𝓞 K,
+      b * cj b - c ∈ Ideal.span {(T : 𝓞 K)} ∧ glue U M x z (algebraMap (𝓞 K) K b / T) = L := by
   have T0 : (T : K) ≠ 0 := Nat.cast_ne_zero.2 hT.ne_zero
   have hsU : (hRes h U).IsSymm := ⟨fun a b => hs.eq (a : V) (b : V)⟩
   have sp : ∀ r : 𝓞 K, star (algebraMap (𝓞 K) K r) = algebraMap (𝓞 K) K (cj r) := fun r =>
@@ -459,19 +508,22 @@ theorem exists_eq_glue (hn : (hRes h U).Nondegenerate) (L : Submodule (𝓞 K) V
   have hLu' : dual h L = L := hLu
   have hint := ((huni L).1 hLu).1
   have mz : z ∈ L := by simpa using (hLz 1).2 (Submodule.mem_one.2 ⟨1, map_one _⟩)
-  let pr : V →ₗ[K] U := LinearMap.codRestrict U
-    (LinearMap.id + ((T : K)⁻¹ • h z).smulRight z) fun v => (hU _).2 (by
-      simp only [LinearMap.add_apply, LinearMap.id_apply, LinearMap.smulRight_apply,
-        LinearMap.smul_apply, map_add, map_smul, hz, smul_eq_mul]
-      field_simp
-      ring)
+  let pr : V →ₗ[K] U :=
+    LinearMap.codRestrict U (LinearMap.id + ((T : K)⁻¹ • h z).smulRight z) fun v =>
+      (hU _).2 (by
+        simp only [LinearMap.add_apply, LinearMap.id_apply, LinearMap.smulRight_apply,
+          LinearMap.smul_apply, map_add, map_smul, hz, smul_eq_mul]
+        field_simp
+        ring)
   have hpr : ∀ v, v = (pr v : V) + (-((T : K)⁻¹ * h z v)) • z := fun v => by simp [pr]
-  have hsur : Function.Surjective pr := fun u => ⟨u, by
-    have e : (u : V) + (0 : K) • z = _ := (by simp : (u : V) + (0 : K) • z = u).trans (hpr u)
-    exact (decomp_unique h hT hz hU e).1.symm⟩
+  have hsur : Function.Surjective pr := fun u => ⟨
+    u,
+    by
+      have e : (u : V) + (0 : K) • z = _ := (by simp : (u : V) + (0 : K) • z = u).trans (hpr u)
+      exact (decomp_unique h hT hz hU e).1.symm
+  ⟩
   let N : Submodule (𝓞 K) U := L.map (pr.restrictScalars (𝓞 K))
-  have hN : Submodule.IsLattice K N := by
-    exact Submodule.IsLattice.of_fg K (hL.fg.map _)
+  have hN : Submodule.IsLattice K N := by exact Submodule.IsLattice.of_fg K (hL.fg.map _)
   have hNfull : Submodule.IsFullLattice K N := by
     letI : Submodule.IsFullLattice K M := hM.1
     letI : Submodule.IsLattice K N := hN
@@ -481,8 +533,7 @@ theorem exists_eq_glue (hn : (hRes h U).Nondegenerate) (L : Submodule (𝓞 K) V
       rw [← hLM] at hu
       exact hu
     refine ⟨u, huL, ?_⟩
-    have e : (u : V) + (0 : K) • z = _ :=
-      (by simp : (u : V) + (0 : K) • z = u).trans (hpr u)
+    have e : (u : V) + (0 : K) • z = _ := (by simp : (u : V) + (0 : K) • z = u).trans (hpr u)
     exact (decomp_unique h hT hz hU e).1.symm
   have hp : ∀ (l : V) (y : U), h l y = hRes h U (pr l) y := fun l y => by
     have := pair h hs hz hU (pr l) y (-((T : K)⁻¹ * h z l)) 0
@@ -500,7 +551,8 @@ theorem exists_eq_glue (hn : (hRes h U).Nondegenerate) (L : Submodule (𝓞 K) V
     · rintro H _ ⟨l, hl, rfl⟩
       exact hp l y ▸ H l hl
   have hxN : x ∈ N := by
-    rw [← (dualLattice (𝓞 K) K U _ hsU hn star_algebraMap_ringOfIntegers_mem_range N hNfull).2.1, hd]
+    rw [← (dualLattice (𝓞 K) K U _ hsU hn star_algebraMap_ringOfIntegers_mem_range N hNfull).2.1,
+      hd]
     exact hx
   obtain ⟨l, hl, e⟩ := hxN
   have e' : pr l = x := e
@@ -534,24 +586,27 @@ theorem exists_eq_glue (hn : (hRes h U).Nondegenerate) (L : Submodule (𝓞 K) V
   rw [← hLu', ← hu]
   exact an _ _ hle
 
-
 include hs hT hz hU hM hx g1 g2 in
-theorem fibre_card (hK : IsCMUnram K) (hn : (hRes h U).Nondegenerate)
-    (hsp : ∀ P : Ideal (𝓞 K), P.IsMaximal → (T : 𝓞 K) ∈ P → Ideal.absNorm P = T ∧ (T : 𝓞 K) ∉ P ^ 2) :
-    {L : Submodule (𝓞 K) V | Submodule.IsLattice K L ∧ IsUnimodular h L ∧
-      (∀ t : K, t • z ∈ L ↔ t ∈ (1 : Submodule (𝓞 K) K)) ∧ latIn U L = M}.encard =
-      (((T - 1) ^ fDeg K : ℕ) : ℕ∞) := by
+theorem fibre_card
+    (hK : IsCMUnram K) (hn : (hRes h U).Nondegenerate)
+    (hsp : ∀ P : Ideal (𝓞 K), P.IsMaximal → (T : 𝓞 K) ∈ P → Ideal.absNorm P = T ∧ (T : 𝓞 K) ∉ P ^ 2)
+    : {L : Submodule (𝓞 K) V | Submodule.IsLattice K L ∧ IsUnimodular h L ∧
+        (∀ t : K, t • z ∈ L ↔ t ∈ (1 : Submodule (𝓞 K) K)) ∧ latIn U L = M}.encard
+      = (((T - 1) ^ fDeg K : ℕ) : ℕ∞) := by
   have T0 : (T : K) ≠ 0 := Nat.cast_ne_zero.2 hT.ne_zero
   have hsU : (hRes h U).IsSymm := ⟨fun a b => hs.eq (a : V) (b : V)⟩
   have sp : ∀ r : 𝓞 K, star (algebraMap (𝓞 K) K r) = algebraMap (𝓞 K) K (cj r) := fun r =>
     (locBasic_sigma_spec genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range r).symm
   have hx' := (dualBasic_mem_dual _ M x).1 hx
   obtain ⟨c, hc⟩ := Submodule.mem_one.1 (hx' _ ((g2 _).2 (Ideal.mem_span_singleton_self _)))
-  rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range, map_natCast, map_natCast] at hc
-  have hcc : cj c = c := genusCovol_hinj (K := K) (by
-    rw [← sp, hc, star_mul', star_natCast]
-    congr 1
-    exact hsU.eq x x)
+  rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range, map_natCast,
+      map_natCast]
+    at hc
+  have hcc : cj c = c :=
+    genusCovol_hinj (K := K) (by
+      rw [← sp, hc, star_mul', star_natCast]
+      congr 1
+      exact hsU.eq x x)
   have hc' : ∀ r : 𝓞 K, r * c ∈ Ideal.span {(T : 𝓞 K)} → r ∈ Ideal.span {(T : 𝓞 K)} := by
     intro r hr
     obtain ⟨k, hk⟩ := Ideal.mem_span_singleton'.1 hr
@@ -559,23 +614,32 @@ theorem fibre_card (hK : IsCMUnram K) (hn : (hRes h U).Nondegenerate)
     rw [map_mul, map_mul, map_natCast, hc] at hk'
     have e : algebraMap (𝓞 K) K r * hRes h U x x = algebraMap (𝓞 K) K k :=
       mul_left_cancel₀ T0 (by linear_combination -hk')
-    rw [← g2, ← (dualLattice (𝓞 K) K U _ hsU hn star_algebraMap_ringOfIntegers_mem_range M hM.1).2.1, dualBasic_mem_dual]
+    rw [← g2,
+      ← (dualLattice (𝓞 K) K U _ hsU hn star_algebraMap_ringOfIntegers_mem_range M hM.1).2.1,
+      dualBasic_mem_dual]
     intro y hy
     obtain ⟨a, ha⟩ := g1 y hy
     rw [← sub_add_cancel y (a • x), map_add (f := _), LinearMap.add_apply]
     refine Submodule.add_mem _ ?_ ?_
     · rw [genusBasic_hsmul_right]
       exact genusBasic_mem_one_mul _ (hx' _ ha) _
-    · rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range, genusBasic_hsmul_right, e]
+    · rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range,
+        genusBasic_hsmul_right, e]
       exact genusBasic_mem_one_mul _ (Submodule.mem_one.2 ⟨k, rfl⟩) _
   have key := card_classes hK hT hsp c hcc hc'
-  have hb : ∀ a : {a : 𝓞 K ⧸ Ideal.span {(T : 𝓞 K)} // ∃ b : 𝓞 K, Ideal.Quotient.mk _ b = a ∧
-      b * cj b - c ∈ Ideal.span {(T : 𝓞 K)}}, ∃ b : 𝓞 K, Ideal.Quotient.mk _ b = a.1 ∧
-      b * cj b - c ∈ Ideal.span {(T : 𝓞 K)} := fun a => a.2
+  have hb
+      : ∀ a
+          : {a : 𝓞 K ⧸ Ideal.span {(T : 𝓞 K)}
+            // ∃ b : 𝓞 K, Ideal.Quotient.mk _ b = a ∧ b * cj b - c ∈ Ideal.span {(T : 𝓞 K)}},
+        ∃ b : 𝓞 K,
+          Ideal.Quotient.mk _ b = a.1 ∧ b * cj b - c ∈ Ideal.span {(T : 𝓞 K)} := fun a =>
+    a.2
   choose β hβ1 hβ2 using hb
-  have eqv : ∀ b b' : 𝓞 K, b * cj b - c ∈ Ideal.span {(T : 𝓞 K)} →
-      (glue U M x z (algebraMap (𝓞 K) K b' / T) ≤ glue U M x z (algebraMap (𝓞 K) K b / T) ↔
-        b' - b ∈ Ideal.span {(T : 𝓞 K)}) := by
+  have eqv
+      : ∀ b b' : 𝓞 K,
+        b * cj b - c ∈ Ideal.span {(T : 𝓞 K)}
+          → (glue U M x z (algebraMap (𝓞 K) K b' / T) ≤ glue U M x z (algebraMap (𝓞 K) K b / T)
+            ↔ b' - b ∈ Ideal.span {(T : 𝓞 K)}) := by
     intro b b' hb
     have mv : ∀ t : K, (x : V) + t • z ∈ glue U M x z t := fun t =>
       (mem_glue U M x z t _).2 ⟨0, M.zero_mem, 1, 0, by simp⟩
@@ -583,7 +647,8 @@ theorem fibre_card (hK : IsCMUnram K) (hn : (hRes h U).Nondegenerate)
     · intro hle
       have := Submodule.sub_mem _ (hle (mv _)) (mv _)
       rw [add_sub_add_left_eq_sub, ← sub_smul,
-        (glue_spec h hs hT hz hU hM hx g1 g2 hc hc' b hb).2.2.1] at this
+          (glue_spec h hs hT hz hU hM hx g1 g2 hc hc' b hb).2.2.1]
+        at this
       obtain ⟨p, hp⟩ := Submodule.mem_one.1 this
       refine Ideal.mem_span_singleton'.2 ⟨p, genusCovol_hinj (K := K) ?_⟩
       rw [map_mul, hp, map_sub, map_natCast]
@@ -601,8 +666,12 @@ theorem fibre_card (hK : IsCMUnram K) (hn : (hRes h U).Nondegenerate)
   haveI : Finite (𝓞 K ⧸ Ideal.span {(T : 𝓞 K)}) := Ideal.finiteQuotientOfFreeOfNeBot _ (by
     simpa [Ideal.span_singleton_eq_bot] using hT.ne_zero)
   rw [← key, ← ENat.card_eq_coe_natCard]
-  refine (ENat.card_congr (Equiv.ofBijective (fun a => ⟨glue U M x z (algebraMap (𝓞 K) K (β a) / T),
-    glue_spec h hs hT hz hU hM hx g1 g2 hc hc' _ (hβ2 a)⟩) ⟨fun a a' e => ?_, ?_⟩)).symm
+  refine (ENat.card_congr (Equiv.ofBijective
+    (fun a => ⟨
+      glue U M x z (algebraMap (𝓞 K) K (β a) / T),
+      glue_spec h hs hT hz hU hM hx g1 g2 hc hc' _ (hβ2 a)
+    ⟩)
+    ⟨fun a a' e => ?_, ?_⟩)).symm
   · apply Subtype.ext
     rw [← hβ1 a, ← hβ1 a', Ideal.Quotient.eq]
     exact (eqv _ _ (hβ2 a')).1 (congrArg Subtype.val e).le
@@ -618,9 +687,11 @@ section Stabiliser
 
 open GlobalTheory.Mass Formalism.HermitianLatticesTheory GlobalTheory.Mass.StabSplit
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) {T : ℕ} (hT : T.Prime) {z : V} {U : Submodule K V}
-  (hz : h z z = -(T : K)) (hU : ∀ v, v ∈ U ↔ h z v = 0)
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+  (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm)
+  {T : ℕ} (hT : T.Prime)
+  {z : V} {U : Submodule K V} (hz : h z z = -(T : K)) (hU : ∀ v, v ∈ U ↔ h z v = 0)
 
 omit [NumberField K] in
 include hU in
@@ -663,13 +734,14 @@ theorem resZ_bijective : Function.Bijective (resZ h hU) := by
       · rw [codisjoint_iff, eq_top_iff]
         intro v _
         obtain ⟨u, t, rfl⟩ := decomp h hT hz hU v
-        exact Submodule.add_mem_sup u.2 (Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self z))
+        exact Submodule.add_mem_sup u.2
+          (Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self z))
     let e := Submodule.prodEquivOfIsCompl U _ hc
     let g : V ≃ₗ[K] V := e.symm ≪≫ₗ (a.1.prodCongr (LinearEquiv.refl K _)) ≪≫ₗ e
     have hg : ∀ (u : U) (t : K), g (u + t • z) = a.1 u + t • z := by
       intro u t
-      have : e.symm (u + t • z) =
-          (u, ⟨t • z, Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self z)⟩) := by
+      have : e.symm (u + t • z)
+          = (u, ⟨t • z, Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self z)⟩) := by
         rw [LinearEquiv.symm_apply_eq]; rfl
       simp only [g, LinearEquiv.trans_apply, this]
       rfl

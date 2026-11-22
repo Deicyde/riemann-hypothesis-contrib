@@ -15,25 +15,15 @@ def ph (y : ℝ) : ℝ := y * Real.log y - y
 def wmean {ι : Type} [Fintype ι] (d X : ι → ℝ) : ℝ := (∑ i, d i * X i) / (∑ i, d i)
 
 structure Consts where
-
   cDiv : ℝ
-
   eDiv : ℝ
-
   cE : ℝ
-
   cH : ℝ
-
   cCount : ℝ
-
   cSlope : ℝ
-
   cSl1 : ℝ
-
   cLoss : ℝ
-
   eLoss : ℝ
-
   cHH : ℝ
 
 structure Data (U0 : Type) (W : U0 → Type) (Top : Type) (m f : ℕ) where
@@ -79,8 +69,11 @@ structure Data (U0 : Type) (W : U0 → Type) (Top : Type) (m f : ℕ) where
 
 namespace Data
 
-variable {U0 : Type} [Fintype U0] [Nonempty U0] {W : U0 → Type} [∀ u0, Fintype (W u0)]
-  [∀ u0, Nonempty (W u0)] {Top : Type} [Fintype Top] {m f : ℕ}
+variable
+  {U0 : Type} [Fintype U0] [Nonempty U0]
+  {W : U0 → Type} [∀ u0, Fintype (W u0)] [∀ u0, Nonempty (W u0)]
+  {Top : Type} [Fintype Top]
+  {m f : ℕ}
 variable (D : Data U0 W Top m f) (C : Consts)
 
 def nT (_ : Data U0 W Top m f) : ℝ := (Fintype.card Top : ℝ)
@@ -97,8 +90,8 @@ def uF (u0 : U0) : ℝ :=
   (Finset.univ.sup' Finset.univ_nonempty (fun u : W u0 => D.muMaxN u0 u - D.h u0 u)) - D.s u0
 
 def Tterm (u0 : U0) (u : W u0) : ℝ :=
-  (4 * (f : ℝ) / D.T u0 u) *
-    (|D.Ga u0| + D.Ta u0 + D.muMaxM u0 u - D.muM u0 u + 2 * (f : ℝ) * Real.log (D.T u0 u))
+  (4 * (f : ℝ) / D.T u0 u)
+    * (|D.Ga u0| + D.Ta u0 + D.muMaxM u0 u - D.muM u0 u + 2 * (f : ℝ) * Real.log (D.T u0 u))
 
 def LoP : ℝ := C.cLoss * D.nT * (m : ℝ) * D.b * D.x ^ (C.eLoss * D.ε)
 
@@ -107,16 +100,16 @@ def Main (u0 : U0) : ℝ :=
     - (1 / (f : ℝ)) * ∑ ρ : Fin f, Real.log (D.w u0 j ρ))
 
 def HidaSetting : Prop :=
-  0 < D.x ∧ 0 < D.b ∧ 0 ≤ D.a ∧ 0 ≤ D.b' ∧ 0 < D.k ∧ 0 < D.v ∧ 0 < f ∧
-  (∀ t, 0 ≤ D.aT t) ∧ (∀ u0 j ρ, 0 < D.w u0 j ρ) ∧
-  (∀ u0 (u : W u0), 0 < D.d u0 u) ∧ (∀ u0 (u : W u0), 0 < D.T u0 u) ∧
-  (∀ u0 (u : W u0), D.muN u0 u ≤ D.muMaxN u0 u) ∧
-  0 ≤ C.cSl1 ∧ D.delBar < 1 ∧ 0 ≤ D.etaBar ∧ 0 ≤ D.eBar ∧ D.eBar ≤ 1 / 4
+  0 < D.x ∧ 0 < D.b ∧ 0 ≤ D.a ∧ 0 ≤ D.b' ∧ 0 < D.k ∧ 0 < D.v ∧ 0 < f ∧ (∀ t, 0 ≤ D.aT t)
+    ∧ (∀ u0 j ρ, 0 < D.w u0 j ρ) ∧ (∀ u0 (u : W u0), 0 < D.d u0 u) ∧ (∀ u0 (u : W u0), 0 < D.T u0 u)
+    ∧ (∀ u0 (u : W u0), D.muN u0 u ≤ D.muMaxN u0 u) ∧ 0 ≤ C.cSl1 ∧ D.delBar < 1 ∧ 0 ≤ D.etaBar
+    ∧ 0 ≤ D.eBar ∧ D.eBar ≤ 1 / 4
 
 def DIV : Prop :=
-  ∀ u0 (u : W u0), D.muCC u0 + D.h u0 u - D.Fo u0 ≤
-    (∑ t, ((m : ℝ) * (ph (D.aT t) - D.aT t * D.logOm) - D.aT t * Real.log (D.T u0 u)))
-      + C.cDiv * D.nT * D.a * D.La + C.cDiv * (m : ℝ) * (D.B0 + D.Nc) * D.x ^ (C.eDiv * D.ε)
+  ∀ u0 (u : W u0),
+    D.muCC u0 + D.h u0 u - D.Fo u0
+      ≤ (∑ t, ((m : ℝ) * (ph (D.aT t) - D.aT t * D.logOm) - D.aT t * Real.log (D.T u0 u)))
+        + C.cDiv * D.nT * D.a * D.La + C.cDiv * (m : ℝ) * (D.B0 + D.Nc) * D.x ^ (C.eDiv * D.ε)
 
 def HComp : Prop :=
   ∀ u0 (u u' : W u0),
@@ -124,22 +117,27 @@ def HComp : Prop :=
       ≤ C.cH * (D.nT * D.a * D.La + (m : ℝ) * D.B0)
 
 def Slopes : Prop :=
-  ∀ u0 (u : W u0), -(C.cSlope * D.nT * D.a * D.La * (1 + (m : ℝ) / D.k)) ≤ D.muM u0 u ∧
-    D.muMaxM u0 u ≤ C.cSlope * D.nT * D.a * D.La
+  ∀ u0 (u : W u0),
+    -(C.cSlope * D.nT * D.a * D.La * (1 + (m : ℝ) / D.k)) ≤ D.muM u0 u
+      ∧ D.muMaxM u0 u ≤ C.cSlope * D.nT * D.a * D.La
 
 def SlopeIneq : Prop :=
-  ∀ u0, 0 ≤ D.del u0 → D.del u0 < 1 → 0 ≤ D.η u0 → 0 ≤ D.e u0 → D.e u0 ≤ 1 / 4 →
-    D.s u0 - D.muMinCC u0 ≤ D.HH u0 → 0 < D.HH u0 →
-    D.s u0 - Real.log (Fintype.card (W u0) : ℝ)
-      - (1 - D.del u0)⁻¹ * (4 * D.uF u0 * Real.log (1 + D.HH u0 / D.uF u0)
-          + (D.η u0 + 4 * Real.sqrt (D.e u0)) * D.HH u0) ≤ D.muCC u0
+  ∀ u0,
+    0 ≤ D.del u0 → D.del u0 < 1 → 0 ≤ D.η u0 → 0 ≤ D.e u0 → D.e u0 ≤ 1 / 4
+      → D.s u0 - D.muMinCC u0 ≤ D.HH u0 → 0 < D.HH u0
+      → D.s u0 - Real.log (Fintype.card (W u0) : ℝ)
+          - (1 - D.del u0)⁻¹
+            * (4 * D.uF u0 * Real.log (1 + D.HH u0 / D.uF u0)
+              + (D.η u0 + 4 * Real.sqrt (D.e u0)) * D.HH u0)
+        ≤ D.muCC u0
 
 def HHBound : Prop :=
   ∀ u0, D.s u0 - D.muMinCC u0 ≤ D.HH u0 ∧ 0 < D.HH u0 ∧ D.HH u0 ≤ D.x ^ C.cHH * D.b
 
 def FParams : Prop :=
-  ∀ u0, 0 ≤ D.del u0 ∧ D.del u0 ≤ D.delBar ∧ 0 ≤ D.η u0 ∧ D.η u0 ≤ D.etaBar ∧
-    0 ≤ D.e u0 ∧ D.e u0 ≤ D.eBar
+  ∀ u0,
+    0 ≤ D.del u0 ∧ D.del u0 ≤ D.delBar ∧ 0 ≤ D.η u0 ∧ D.η u0 ≤ D.etaBar ∧ 0 ≤ D.e u0
+      ∧ D.e u0 ≤ D.eBar
 
 def Vvar : ℝ :=
   2 * (m : ℝ) * C.cE * D.B0 + C.cH * (D.nT * D.a * D.La + (m : ℝ) * D.B0)

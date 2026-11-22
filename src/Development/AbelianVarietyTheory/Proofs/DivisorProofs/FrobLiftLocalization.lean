@@ -8,18 +8,18 @@ open GlobalTheory GlobalTheory.DI
 
 namespace GlobalTheory.DI
 
-theorem frobLift_localization :
-    ∀ (p : ℕ) [Fact p.Prime] {B Kt : Type} [CommRing B] [CommRing Kt] [Algebra B Kt]
-      (S : Submonoid B) [IsLocalization S Kt] (F : B →+* B), (p : B) ^ 2 = 0 →
-      (∀ z, ∃ w, F z = z ^ p + p * w) →
-      ∃ F' : Kt →+* Kt, (∀ b, F' (algebraMap B Kt b) = algebraMap B Kt (F b)) ∧
-        ∀ z, ∃ w, F' z = z ^ p + p * w := by
+theorem frobLift_localization
+    : ∀ (p : ℕ) [Fact p.Prime] {B Kt : Type} [CommRing B] [CommRing Kt] [Algebra B Kt]
+        (S : Submonoid B) [IsLocalization S Kt] (F : B →+* B),
+      (p : B) ^ 2 = 0 → (∀ z, ∃ w, F z = z ^ p + p * w)
+        → ∃ F' : Kt →+* Kt,
+          (∀ b, F' (algebraMap B Kt b) = algebraMap B Kt (F b))
+            ∧ ∀ z, ∃ w, F' z = z ^ p + p * w := by
   intro p _ B Kt _ _ _ S _ F hp2 hF
   have hunit : ∀ s : S, IsUnit ((algebraMap B Kt).comp F s) := by
     intro s
     obtain ⟨w, hw⟩ := hF (s : B)
-    have hu : IsUnit (algebraMap B Kt (s : B) ^ p) :=
-      (IsLocalization.map_units Kt s).pow p
+    have hu : IsUnit (algebraMap B Kt (s : B) ^ p) := (IsLocalization.map_units Kt s).pow p
     have hn : IsNilpotent ((p : Kt) * algebraMap B Kt w) := by
       refine ⟨2, ?_⟩
       have : (p : Kt) ^ 2 = 0 := by
@@ -39,19 +39,20 @@ theorem frobLift_localization :
   have hspec : z * algebraMap B Kt (s : B) = algebraMap B Kt b := IsLocalization.mk'_spec Kt b s
   obtain ⟨v, hv⟩ := hF b
   obtain ⟨u, hu⟩ := hF (s : B)
-  have key : F' z * (algebraMap B Kt (s : B) ^ p + p * algebraMap B Kt u) =
-      algebraMap B Kt b ^ p + p * algebraMap B Kt v := by
+  have key
+      : F' z * (algebraMap B Kt (s : B) ^ p + p * algebraMap B Kt u)
+        = algebraMap B Kt b ^ p + p * algebraMap B Kt v := by
     have := congrArg F' hspec
     rw [map_mul, hF', hF', hu, hv] at this
     simpa [map_add (f := _), map_mul, map_pow, map_natCast] using this
   obtain ⟨t, ht⟩ := (IsLocalization.map_units Kt s).pow p
   refine ⟨(algebraMap B Kt v - F' z * algebraMap B Kt u) * ↑t⁻¹, ?_⟩
-  have hzs : z ^ p * algebraMap B Kt (s : B) ^ p = algebraMap B Kt b ^ p := by
-    rw [← mul_pow, hspec]
+  have hzs : z ^ p * algebraMap B Kt (s : B) ^ p = algebraMap B Kt b ^ p := by rw [← mul_pow, hspec]
   have h1 : (F' z - z ^ p) * (t : Kt) = p * (algebraMap B Kt v - F' z * algebraMap B Kt u) := by
     rw [ht]; linear_combination key - hzs
-  calc F' z = z ^ p + (F' z - z ^ p) * (t : Kt) * ↑t⁻¹ := by
-        rw [mul_assoc, Units.mul_inv, mul_one]; ring
+  calc
+    F' z
+      = z ^ p + (F' z - z ^ p) * (t : Kt) * ↑t⁻¹ := by rw [mul_assoc, Units.mul_inv, mul_one]; ring
     _ = _ := by rw [h1]; ring
 
 end GlobalTheory.DI

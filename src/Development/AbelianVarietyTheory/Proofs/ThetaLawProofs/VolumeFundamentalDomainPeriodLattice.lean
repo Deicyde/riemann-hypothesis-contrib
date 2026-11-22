@@ -7,8 +7,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.PeriodVol
 
@@ -20,39 +22,42 @@ def reImCoord (g : ℕ) : (Fin g → ℂ) ≃ₗ[ℝ] (Fin g ⊕ Fin g → ℝ) 
   left_inv z := rfl
   right_inv p := by ext (i | i) <;> rfl
 
-theorem volume_fundamentalDomain_reImCoord (g : ℕ) :
-    volume (ZSpan.fundamentalDomain (Module.Basis.ofEquivFun (reImCoord g))) = 1 := by
-  have h : ZSpan.fundamentalDomain (Module.Basis.ofEquivFun (reImCoord g)) =
-      Set.pi Set.univ fun _ : Fin g =>
-        Complex.measurableEquivRealProd ⁻¹' (Set.Ico (0 : ℝ) 1 ×ˢ Set.Ico (0 : ℝ) 1) := by
+theorem volume_fundamentalDomain_reImCoord (g : ℕ)
+    : volume (ZSpan.fundamentalDomain (Module.Basis.ofEquivFun (reImCoord g))) = 1 := by
+  have h
+      : ZSpan.fundamentalDomain (Module.Basis.ofEquivFun (reImCoord g))
+        = Set.pi Set.univ fun _ : Fin g =>
+          Complex.measurableEquivRealProd ⁻¹' (Set.Ico (0 : ℝ) 1 ×ˢ Set.Ico (0 : ℝ) 1) := by
     ext z
     simp [ZSpan.fundamentalDomain, forall_and]
     tauto
   rw [h, volume_pi_pi]
   refine Finset.prod_eq_one fun _ _ => ?_
-  rw [Complex.volume_preserving_equiv_real_prod.measure_preimage
-    (measurableSet_Ico.prod measurableSet_Ico).nullMeasurableSet]
+  rw [Complex.volume_preserving_equiv_real_prod.measure_preimage (measurableSet_Ico.prod
+    measurableSet_Ico).nullMeasurableSet]
   simp [Measure.volume_eq_prod]
 
 def periodMap {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) : (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ) :=
-  ((reImCoord g).symm : (Fin g ⊕ Fin g → ℝ) →ₗ[ℝ] (Fin g → ℂ)) ∘ₗ
-    Matrix.toLin' (Matrix.fromBlocks 1 (τ.map Complex.re) 0 (τ.map Complex.im)) ∘ₗ
-      ((reImCoord g).symm.symm : (Fin g → ℂ) →ₗ[ℝ] (Fin g ⊕ Fin g → ℝ))
+  ((reImCoord g).symm : (Fin g ⊕ Fin g → ℝ) →ₗ[ℝ] (Fin g → ℂ))
+    ∘ₗ Matrix.toLin' (Matrix.fromBlocks 1 (τ.map Complex.re) 0 (τ.map Complex.im))
+    ∘ₗ ((reImCoord g).symm.symm : (Fin g → ℂ) →ₗ[ℝ] (Fin g ⊕ Fin g → ℝ))
 
-theorem det_periodMap {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) :
-    LinearMap.det (periodMap τ) = (τ.map Complex.im).det := by
+theorem det_periodMap {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ)
+    : LinearMap.det (periodMap τ) = (τ.map Complex.im).det := by
   rw [periodMap, LinearMap.det_conj, LinearMap.det_toLin', Matrix.det_fromBlocks_zero₂₁,
     Matrix.det_one, _root_.one_mul]
 
-theorem periodMap_apply {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) (z : Fin g → ℂ) :
-    periodMap τ z = (fun i => ((z i).re : ℂ)) + τ.mulVec (fun i => ((z i).im : ℂ)) := by
+theorem periodMap_apply {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) (z : Fin g → ℂ)
+    : periodMap τ z = (fun i => ((z i).re : ℂ)) + τ.mulVec (fun i => ((z i).im : ℂ)) := by
   ext i
   apply Complex.ext
   · change (Matrix.fromBlocks 1 (τ.map Complex.re) 0 (τ.map Complex.im)).mulVec
-      (Sum.elim (fun j => (z j).re) (fun j => (z j).im)) (Sum.inl i) = _
+        (Sum.elim (fun j => (z j).re) (fun j => (z j).im)) (Sum.inl i)
+      = _
     simp [Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.one_apply]
   · change (Matrix.fromBlocks 1 (τ.map Complex.re) 0 (τ.map Complex.im)).mulVec
-      (Sum.elim (fun j => (z j).re) (fun j => (z j).im)) (Sum.inr i) = _
+        (Sum.elim (fun j => (z j).re) (fun j => (z j).im)) (Sum.inr i)
+      = _
     simp [Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.one_apply]
 
 end GlobalTheory.PeriodVol
@@ -61,12 +66,17 @@ namespace GlobalTheory
 
 open PeriodVol
 
-theorem volume_fundamentalDomain_periodLattice :
-    ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (φ : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ)) (τ : Matrix (Fin g) (Fin g) ℂ),
-    (τ.map Complex.im).PosDef →
-    (∀ z, φ z ∈ Λ ↔ ∃ m n : Fin g → ℤ, z = (fun i => (m i : ℂ)) + τ.mulVec (fun i => (n i : ℂ))) →
-    ∀ Fd : Set (Fin g → ℂ), IsAddFundamentalDomain Λ Fd volume →
-    (volume Fd).toReal = ‖LinearMap.det (φ : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ))‖ ^ 2 * (τ.map Complex.im).det := by
+theorem volume_fundamentalDomain_periodLattice
+    : ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (φ : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ))
+        (τ : Matrix (Fin g) (Fin g) ℂ),
+      (τ.map Complex.im).PosDef
+        → (∀ z,
+          φ z ∈ Λ ↔ ∃ m n : Fin g → ℤ, z = (fun i => (m i : ℂ)) + τ.mulVec (fun i => (n i : ℂ)))
+        → ∀ Fd : Set (Fin g → ℂ),
+          IsAddFundamentalDomain Λ Fd volume
+            → (volume Fd).toReal
+              = ‖LinearMap.det (φ : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ))‖ ^ 2
+                * (τ.map Complex.im).det := by
   intro g Λ φ τ hτ hΛ Fd hFd
   have hpos := hτ.det_pos
   let S : (Fin g → ℂ) ≃ₗ[ℝ] (Fin g → ℂ) :=
@@ -97,19 +107,21 @@ theorem volume_fundamentalDomain_periodLattice :
       rw [hS, periodMap_apply]
       simp [h1, h2]
   subst hspan
-  have hdet : b₀.det (b₀.map T) =
-      ‖LinearMap.det (φ : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ))‖ ^ 2 * (τ.map Complex.im).det := by
-    have hT : (T : (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ)) =
-        (φ : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ)).restrictScalars ℝ ∘ₗ periodMap τ := rfl
-    have : ⇑(b₀.map T) = (T : (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ)) ∘ b₀ := by
-      ext1 i; simp
+  have hdet
+      : b₀.det (b₀.map T)
+        = ‖LinearMap.det (φ : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ))‖ ^ 2 * (τ.map Complex.im).det := by
+    have hT
+        : (T : (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ))
+          = (φ : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ)).restrictScalars ℝ ∘ₗ periodMap τ :=
+      rfl
+    have : ⇑(b₀.map T) = (T : (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ)) ∘ b₀ := by ext1 i; simp
     rw [this, Module.Basis.det_comp, Module.Basis.det_self, _root_.mul_one, hT, LinearMap.det_comp,
       det_periodMap, LinearMap.det_restrictScalars, Algebra.norm_complex_apply,
       Complex.normSq_eq_norm_sq]
   have : VAddInvariantMeasure (Submodule.span ℤ (Set.range (b₀.map T))) (Fin g → ℂ) volume :=
     ⟨fun c s _ => measure_preimage_add volume (c : Fin g → ℂ) s⟩
   rw [hFd.measure_eq (ZSpan.isAddFundamentalDomain (b₀.map T) volume),
-    ZSpan.measure_fundamentalDomain _ volume b₀, volume_fundamentalDomain_reImCoord, _root_.mul_one, hdet,
-    ENNReal.toReal_ofReal (abs_nonneg _), abs_of_nonneg (by positivity)]
+    ZSpan.measure_fundamentalDomain _ volume b₀, volume_fundamentalDomain_reImCoord, _root_.mul_one,
+    hdet, ENNReal.toReal_ofReal (abs_nonneg _), abs_of_nonneg (by positivity)]
 
 end GlobalTheory

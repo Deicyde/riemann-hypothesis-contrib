@@ -7,9 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open UpperTheory.V.AlgebraTools
 
-private theorem graph_equiv {k V : Type} [Field k] [AddCommGroup V] [Module k V]
-    (A B W : Submodule k V) (hA : IsCompl A W) (hB : IsCompl B W) :
-    ∃ e : A ≃ₗ[k] B, ∀ v : A, (v : V) - e v ∈ W := by
+private theorem graph_equiv
+    {k V : Type} [Field k] [AddCommGroup V] [Module k V]
+    (A B W : Submodule k V) (hA : IsCompl A W) (hB : IsCompl B W)
+    : ∃ e : A ≃ₗ[k] B, ∀ v : A, (v : V) - e v ∈ W := by
   have key : ∀ x : V, x - (B.projectionOnto W hB x : V) ∈ W := by
     intro x
     rw [← Submodule.projectionOnto_apply_eq_zero_iff hB, map_sub,
@@ -28,15 +29,18 @@ private theorem graph_equiv {k V : Type} [Field k] [AddCommGroup V] [Module k V]
     show B.projectionOnto W hB a = b
     rw [h1, map_sub, h2, sub_zero, Submodule.projectionOnto_apply_left]
 
-theorem UpperTheory.V.AlgebraTools.mackeyTwo :
-    ∀ {k G V : Type} [Field k] [Group G] [AddCommGroup V] [Module k V] (ρ : Representation k G V) (H : Subgroup G) (s : G) (V₁ : Submodule k V), H.index = 2 → s ∉ H → StableOn ρ H V₁ → (∀ W ≤ V₁, StableOn ρ H W → W = ⊥ ∨ W = V₁) → IsCompl V₁ (V₁.map (ρ s)) → (¬ ∃ e : V₁ ≃ₗ[k] V₁.map (ρ s), ∀ h ∈ H, ∀ v w : V₁, (w : V) = ρ h v → (e w : V) = ρ h (e v)) → IrrOn ρ ⊤ := by
+theorem UpperTheory.V.AlgebraTools.mackeyTwo
+    : ∀ {k G V : Type} [Field k] [Group G] [AddCommGroup V] [Module k V] (ρ : Representation k G V)
+        (H : Subgroup G) (s : G) (V₁ : Submodule k V),
+      H.index = 2 → s ∉ H → StableOn ρ H V₁ → (∀ W ≤ V₁, StableOn ρ H W → W = ⊥ ∨ W = V₁)
+        → IsCompl V₁ (V₁.map (ρ s))
+        → (¬ ∃ e : V₁ ≃ₗ[k] V₁.map (ρ s), ∀ h ∈ H, ∀ v w : V₁,
+          (w : V) = ρ h v → (e w : V) = ρ h (e v))
+        → IrrOn ρ ⊤ := by
   intro k G V _ _ _ _ ρ H s V₁ hi hs hst hirr hc hne W hW
-  have hmul : ∀ (a b : G) (x : V), ρ a (ρ b x) = ρ (a * b) x := by
-    intro a b x; rw [map_mul]; rfl
-  have hinv : ∀ x : V, ρ s⁻¹ (ρ s x) = x := by
-    intro x; rw [hmul, inv_mul_cancel, map_one]; rfl
-  have hinv' : ∀ x : V, ρ s (ρ s⁻¹ x) = x := by
-    intro x; rw [hmul, mul_inv_cancel, map_one]; rfl
+  have hmul : ∀ (a b : G) (x : V), ρ a (ρ b x) = ρ (a * b) x := by intro a b x; rw [map_mul]; rfl
+  have hinv : ∀ x : V, ρ s⁻¹ (ρ s x) = x := by intro x; rw [hmul, inv_mul_cancel, map_one]; rfl
+  have hinv' : ∀ x : V, ρ s (ρ s⁻¹ x) = x := by intro x; rw [hmul, mul_inv_cancel, map_one]; rfl
   have hconj : ∀ h ∈ H, s⁻¹ * (h * s) ∈ H := by
     intro h hh
     simp [Subgroup.mul_mem_iff_of_index_two hi, hs, hh]
@@ -46,8 +50,7 @@ theorem UpperTheory.V.AlgebraTools.mackeyTwo :
     refine ⟨ρ (s⁻¹ * (h * s)) v, hst _ (hconj h hh) v hv, ?_⟩
     rw [hmul, hmul, mul_inv_cancel_left]
   have hW' : ∀ g, ∀ v ∈ W, ρ g v ∈ W := fun g => hW g trivial
-  rcases hirr (V₁ ⊓ W) inf_le_left
-      (fun h hh v hv => ⟨hst h hh v hv.1, hW' h v hv.2⟩) with h0 | h1
+  rcases hirr (V₁ ⊓ W) inf_le_left (fun h hh v hv => ⟨hst h hh v hv.1, hW' h v hv.2⟩) with h0 | h1
   swap
   · right
     have hle : V₁ ≤ W := inf_eq_left.1 h1
@@ -61,10 +64,14 @@ theorem UpperTheory.V.AlgebraTools.mackeyTwo :
     rintro _ ⟨v, hv, rfl⟩ hw
     have : v ∈ W := hinv v ▸ hW' s⁻¹ _ hw
     rw [Submodule.disjoint_def.1 d1 v hv this, map_zero]
-  rcases hirr (V₁ ⊓ (V₁.map (ρ s) ⊔ W)) inf_le_left (fun h hh v hv => ⟨hst h hh v hv.1, by
-      obtain ⟨a, ha, w, hw, rfl⟩ := Submodule.mem_sup.1 hv.2
-      rw [map_add (f := _)]
-      exact Submodule.add_mem_sup (hst2 h hh a ha) (hW' h w hw)⟩) with h2 | h2
+  rcases hirr (V₁ ⊓ (V₁.map (ρ s) ⊔ W)) inf_le_left (fun h hh v hv => ⟨
+      hst h hh v hv.1,
+      by
+        obtain ⟨a, ha, w, hw, rfl⟩ := Submodule.mem_sup.1 hv.2
+        rw [map_add (f := _)]
+        exact Submodule.add_mem_sup (hst2 h hh a ha) (hW' h w hw)
+    ⟩)
+    with h2 | h2
   · left
     rw [eq_bot_iff]
     intro w hw

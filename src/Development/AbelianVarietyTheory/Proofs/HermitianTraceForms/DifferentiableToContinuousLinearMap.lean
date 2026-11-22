@@ -45,15 +45,15 @@ section Complex
 
 namespace isoTransvection
 
-variable {W : Type*} [AddCommGroup W] [Module ℂ W] {h : W →ₗ[ℂ] W →ₗ⋆[ℂ] ℂ} (x : W)
-  (hx : h x x = 0)
+variable {W : Type*} [AddCommGroup W] [Module ℂ W] {h : W →ₗ[ℂ] W →ₗ⋆[ℂ] ℂ} (x : W) (hx : h x x = 0)
 
 end isoTransvection
 
 namespace isoTransvection
 
-variable {W : Type*} [NormedAddCommGroup W] [NormedSpace ℂ W] (h : W →ₗ[ℂ] W →ₗ⋆[ℂ] ℂ) (x : W)
-  (hx : h x x = 0)
+variable
+  {W : Type*} [NormedAddCommGroup W] [NormedSpace ℂ W]
+  (h : W →ₗ[ℂ] W →ₗ⋆[ℂ] ℂ) (x : W) (hx : h x x = 0)
 
 end isoTransvection
 
@@ -64,8 +64,7 @@ section Example
 private noncomputable def hyp : (ℂ × ℂ) →ₗ[ℂ] (ℂ × ℂ) →ₗ⋆[ℂ] ℂ :=
   LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
     (fun u v => u.1 * star v.2 + u.2 * star v.1)
-    (by intros; simp; ring) (by intros; simp; ring) (by intros; simp; ring)
-    (by intros; simp; ring)
+    (by intros; simp; ring) (by intros; simp; ring) (by intros; simp; ring) (by intros; simp; ring)
 
 end Example
 

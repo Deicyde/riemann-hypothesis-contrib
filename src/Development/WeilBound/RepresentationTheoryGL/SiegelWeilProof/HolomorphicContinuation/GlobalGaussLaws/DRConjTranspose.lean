@@ -25,11 +25,9 @@ theorem dR_mul (β β' : Fin n → ℝ) : dR β * dR β' = dR (fun j => β j * �
 theorem dR_add (β β' : Fin n → ℝ) : dR β + dR β' = dR (fun j => β j + β' j) := by
   simp [dR, Matrix.diagonal_add]
 
-theorem dR_neg (β : Fin n → ℝ) : -dR β = dR (fun j => -β j) := by
-  simp [dR, Matrix.diagonal_neg]
+theorem dR_neg (β : Fin n → ℝ) : - dR β = dR (fun j => - β j) := by simp [dR, Matrix.diagonal_neg]
 
-theorem dR_one : dR (fun _ : Fin n => (1 : ℝ)) = 1 := by
-  simp [dR]
+theorem dR_one : dR (fun _ : Fin n => (1 : ℝ)) = 1 := by simp [dR]
 
 theorem dR_inv (β : Fin n → ℝ) (hβ : ∀ j, β j ≠ 0) : (dR β)⁻¹ = dR (fun j => (β j)⁻¹) := by
   apply Matrix.inv_eq_left_inv
@@ -39,12 +37,16 @@ theorem dR_inv (β : Fin n → ℝ) (hβ : ∀ j, β j ≠ 0) : (dR β)⁻¹ = d
   funext j
   exact inv_mul_cancel₀ (hβ j)
 
-theorem kth_eq (θ : Fin n → ℝ) : kth θ = fromBlocks (dR fun j => Real.cos (θ j)) (dR fun j => Real.sin (θ j))
-    (-dR fun j => Real.sin (θ j)) (dR fun j => Real.cos (θ j)) := rfl
+theorem kth_eq (θ : Fin n → ℝ)
+    : kth θ
+      = fromBlocks (dR fun j => Real.cos (θ j)) (dR fun j => Real.sin (θ j))
+        (- dR fun j => Real.sin (θ j)) (dR fun j => Real.cos (θ j)) :=
+  rfl
 
-theorem kth_decomp (θ : Fin n → ℝ) (hc : ∀ j, Real.cos (θ j) ≠ 0) :
-    kth θ = nU (dR fun j => Real.tan (θ j)) * nbar (dR fun j => -(Real.sin (θ j) * Real.cos (θ j))) *
-      mM (dR fun j => (Real.cos (θ j))⁻¹) := by
+theorem kth_decomp (θ : Fin n → ℝ) (hc : ∀ j, Real.cos (θ j) ≠ 0)
+    : kth θ
+      = nU (dR fun j => Real.tan (θ j)) * nbar (dR fun j => -(Real.sin (θ j) * Real.cos (θ j)))
+        * mM (dR fun j => (Real.cos (θ j))⁻¹) := by
   have hinv : ((dR fun j => (Real.cos (θ j))⁻¹)ᴴ)⁻¹ = dR fun j => Real.cos (θ j) := by
     rw [dR_conjTranspose, dR_inv _ (fun j => inv_ne_zero (hc j))]
     simp only [inv_inv]
@@ -70,15 +72,19 @@ theorem kth_decomp (θ : Fin n → ℝ) (hc : ∀ j, Real.cos (θ j) ≠ 0) :
     field_simp
 
 theorem kth_half (θ : Fin n → ℝ) : kth θ = kth (fun j => θ j / 2) * kth (fun j => θ j / 2) := by
-  have hc : ∀ j, Real.cos (θ j) = Real.cos (θ j / 2) * Real.cos (θ j / 2) -
-      Real.sin (θ j / 2) * Real.sin (θ j / 2) := by
+  have hc
+      : ∀ j,
+        Real.cos (θ j)
+          = Real.cos (θ j / 2) * Real.cos (θ j / 2) - Real.sin (θ j / 2) * Real.sin (θ j / 2) := by
     intro j
     have := Real.cos_two_mul (θ j / 2)
     rw [show 2 * (θ j / 2) = θ j by ring] at this
     rw [this]
     linear_combination Real.sin_sq_add_cos_sq (θ j / 2)
-  have hs : ∀ j, Real.sin (θ j) = Real.cos (θ j / 2) * Real.sin (θ j / 2) +
-      Real.sin (θ j / 2) * Real.cos (θ j / 2) := by
+  have hs
+      : ∀ j,
+        Real.sin (θ j)
+          = Real.cos (θ j / 2) * Real.sin (θ j / 2) + Real.sin (θ j / 2) * Real.cos (θ j / 2) := by
     intro j
     have := Real.sin_two_mul (θ j / 2)
     rw [show 2 * (θ j / 2) = θ j by ring] at this

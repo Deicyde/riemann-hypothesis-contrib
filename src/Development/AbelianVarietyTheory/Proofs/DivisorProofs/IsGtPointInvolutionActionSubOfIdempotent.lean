@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Glo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum GlobalTheory.TorusExt
@@ -21,18 +24,31 @@ noncomputable section
 
 namespace GlobalTheory.Mum.IdemDiff
 
-variable {R : Type} [CommRing R] [IsDomain R] {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
 variable {O : Type} [Ring O] [StarRing O] [Module O D.X]
 
-theorem val_act (oa : D.OAct O) (a : O)
+theorem val_act
+    (oa : D.OAct O) (a : O)
     (u : LB.Gen (LB.LinComb D.P.L (rosatiφ D.P.A (oa.onB.act (star a)) (oa.onB.act a)) rosatiε))
-    (g : GtPtF D F) (χ : D.X) {y J} (hJ : Good D.P.L y J) :
-    val (LB.mulGen D.P.L _ _ _ _ (g.s (star a • χ))
-        (LB.pullGen D.P.L _ _ u (lift (cP D _ χ) g.b).left)) (𝟙 (TF (R := R) F).left) y J =
-        charVal g (star a • χ) y J * val₂ u y J (cP D _ χ) g.b :=
-  (val_mul hJ _ _ _).trans (congrArg₂ (· * ·) rfl ((val_pull hJ _ _ _).trans (by rw [Category.id_comp]; rfl)))
+    (g : GtPtF D F) (χ : D.X)
+    {y J} (hJ : Good D.P.L y J)
+    : val
+        (LB.mulGen D.P.L _ _ _ _ (g.s (star a • χ))
+          (LB.pullGen D.P.L _ _ u (lift (cP D _ χ) g.b).left))
+        (𝟙 (TF (R := R) F).left) y J
+      = charVal g (star a • χ) y J * val₂ u y J (cP D _ χ) g.b :=
+  (val_mul hJ _ _ _).trans
+    (congrArg₂ (· * ·) rfl ((val_pull hJ _ _ _).trans (by rw [Category.id_comp]; rfl)))
 
-theorem gtPtAct_of_isAdd : ∀ {R : Type} [CommRing R] [IsDomain R] {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F] {O : Type} [Ring O] [StarRing O] [Module O D.X] (oa : D.OAct O) (a : O), a * a = a → ∀ g₀ g h t : GtPtF D F, GtPtAct oa a g₀ g → GtPtAct oa a h h → GtPtF.IsAdd t h g → GtPtAct oa a t t := by
+theorem gtPtAct_of_isAdd
+    : ∀ {R : Type} [CommRing R] [IsDomain R] {D : DegPre R} {F : Type} [Field F]
+        [Algebra (FractionRing R) F] {O : Type} [Ring O] [StarRing O] [Module O D.X] (oa : D.OAct O)
+        (a : O),
+      a * a = a
+        → ∀ g₀ g h t : GtPtF D F,
+          GtPtAct oa a g₀ g → GtPtAct oa a h h → GtPtF.IsAdd t h g → GtPtAct oa a t t := by
   intro R _ _ D F _ _ O _ _ _ oa a ha g₀ g h t hg hh hadd
   have hG : GlobalFnsSt := GlobalTheory.globalFns_holds
   have := oa.onB.hom a
@@ -41,7 +57,8 @@ theorem gtPtAct_of_isAdd : ∀ {R : Type} [CommRing R] [IsDomain R] {D : DegPre 
   have cf : ∀ (T) (x : O) χ, cP D T (x • χ) = cP D T χ ≫ oa.onB.act x := fun T x χ => by
     rw [cP, oa.c_lin, ← Category.assoc]; rfl
   have aa : oa.onB.act a = oa.onB.act a ≫ oa.onB.act a := by rw [← oa.onB.map_mul, ha]
-  have ss : oa.onB.act (star a) = oa.onB.act (star a) ≫ oa.onB.act (star a) := by rw [← oa.onB.map_mul, hs]
+  have ss : oa.onB.act (star a) = oa.onB.act (star a) ≫ oa.onB.act (star a) := by
+    rw [← oa.onB.map_mul, hs]
   obtain ⟨b₁, v₁⟩ := (isAdd_iff_val _ _ _).1 hadd
   have gb : g.b = g.b ≫ oa.onB.act a := by rw [hg.1, Category.assoc, ← aa]
   have tb : t.b = t.b ≫ oa.onB.act a := by
@@ -49,8 +66,8 @@ theorem gtPtAct_of_isAdd : ∀ {R : Type} [CommRing R] [IsDomain R] {D : DegPre 
     rw [b₁, MonObj.mul_comp, ← hh.1] at e
     exact mul_right_cancel e
   refine ⟨tb, fun u hu u₀ χ => corr_of_val D.P.isLB fun y J hJ => (val_act oa a u t χ hJ).trans ?_⟩
-  have vg : ∀ χ, charVal g χ y J = charVal g₀ (star a • χ) y J * val₂ u y J (cP D _ χ) g₀.b := fun χ =>
-    (val_corr hJ (hg.2 u hu u₀ χ) _).symm.trans (val_act oa a u g₀ χ hJ)
+  have vg : ∀ χ, charVal g χ y J = charVal g₀ (star a • χ) y J * val₂ u y J (cP D _ χ) g₀.b :=
+    fun χ => (val_corr hJ (hg.2 u hu u₀ χ) _).symm.trans (val_act oa a u g₀ χ hJ)
   have vh : charVal h χ y J = charVal h (star a • χ) y J * val₂ u y J (cP D _ χ) h.b :=
     (val_corr hJ (hh.2 u hu u₀ χ) _).symm.trans (val_act oa a u h χ hJ)
   have vc := IsRos.val_comp hG D.P.isAb D.P.isLB ss aa ⟨hu, u₀⟩ ⟨hu, u₀⟩ ⟨hu, u₀⟩ hJ (cP D _ χ) g₀.b

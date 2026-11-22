@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IsFibr
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Topology Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding GlobalTheory.CompactDualQuot
+open MeasureTheory Matrix Filter Topology Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding GlobalTheory.CompactDualQuot
 open scoped ENNReal NNReal
 
 namespace GlobalTheory.SphereMassProof
@@ -18,12 +20,13 @@ namespace GlobalTheory.SphereMassProof
 theorem qf_pos_eq (M : ℕ) (x : Sp M 0) : qf x = ∑ i, ‖x i‖ ^ 2 := by
   simp [qf, Fintype.sum_sum_type, Complex.normSq_eq_norm_sq]
 
-theorem dx_ball (M : ℕ) (hM : 1 ≤ M) (b : ℝ) (hb : 0 ≤ b) :
-    dx M 0 {x | qf x ≤ b} = ENNReal.ofReal ((2 * Real.pi) ^ M / (M.factorial : ℝ) * b ^ M) := by
+theorem dx_ball (M : ℕ) (hM : 1 ≤ M) (b : ℝ) (hb : 0 ≤ b)
+    : dx M 0 {x | qf x ≤ b} = ENNReal.ofReal ((2 * Real.pi) ^ M / (M.factorial : ℝ) * b ^ M) := by
   haveI : Nonempty (Fin M ⊕ Fin 0) := ⟨Sum.inl ⟨0, hM⟩⟩
   have h := Complex.volume_sum_rpow_le (Fin M ⊕ Fin 0) (p := 2) (by norm_num) (Real.sqrt b)
-  have e : {x : Sp M 0 | qf x ≤ b} =
-      {x : Fin M ⊕ Fin 0 → ℂ | (∑ i, ‖x i‖ ^ (2 : ℝ)) ^ (1 / (2 : ℝ)) ≤ Real.sqrt b} := by
+  have e
+      : {x : Sp M 0 | qf x ≤ b}
+        = {x : Fin M ⊕ Fin 0 → ℂ | (∑ i, ‖x i‖ ^ (2 : ℝ)) ^ (1 / (2 : ℝ)) ≤ Real.sqrt b} := by
     ext x
     simp only [Set.mem_setOf_eq, ← Real.sqrt_eq_rpow, Real.rpow_two, qf_pos_eq]
     exact (Real.sqrt_le_sqrt_iff hb).symm
@@ -52,32 +55,42 @@ theorem isCompact_shell (M : ℕ) : IsCompact {x : Sp M 0 | qf x ∈ Set.Icc (1 
   rw [qf_pos_eq] at h2
   nlinarith [norm_nonneg (x i)]
 
-theorem exists_mass {M : ℕ} {fib : ℝ → Measure (Sp M 0)} (h : IsDxDq fib) :
-    ∃ G : ℝ → ℝ, Continuous G ∧ (∀ t, 0 ≤ G t) ∧
-      ∀ t ∈ Set.Icc (1 / 2 : ℝ) 2, fib t Set.univ = ENNReal.ofReal (G t) := by
-  obtain ⟨χ, h1, hc, hs, h01⟩ := exists_continuousMap_one_of_isCompact_subset_isOpen
-    (isCompact_shell M) (isOpen_ne (x := (0 : Sp M 0))) (by
-      rintro x hx rfl
-      have : (1 / 2 : ℝ) ≤ qf (0 : Sp M 0) := hx.1
-      rw [qf_pos_eq] at this
-      norm_num at this)
+theorem exists_mass {M : ℕ} {fib : ℝ → Measure (Sp M 0)} (h : IsDxDq fib)
+    : ∃ G : ℝ → ℝ,
+      Continuous G ∧ (∀ t, 0 ≤ G t)
+        ∧ ∀ t ∈ Set.Icc (1 / 2 : ℝ) 2, fib t Set.univ = ENNReal.ofReal (G t) := by
+  obtain ⟨χ, h1, hc, hs, h01⟩ :=
+    exists_continuousMap_one_of_isCompact_subset_isOpen (isCompact_shell M)
+      (isOpen_ne (x := (0 : Sp M 0)))
+      (by
+        rintro x hx rfl
+        have : (1 / 2 : ℝ) ≤ qf (0 : Sp M 0) := hx.1
+        rw [qf_pos_eq] at this
+        norm_num at this)
   obtain ⟨hi, hg⟩ := h.2.2 χ χ.continuous hc hs
-  refine ⟨fun t => ∫ v, χ v ∂(fib t), continuousOn_univ.1 hg,
-    fun t => integral_nonneg fun v => (h01 v).1, fun t ht => ?_⟩
+  refine ⟨
+    fun t => ∫ v, χ v ∂(fib t),
+    continuousOn_univ.1 hg,
+    fun t => integral_nonneg fun v => (h01 v).1,
+    fun t ht => ?_
+  ⟩
   rw [ofReal_integral_eq_lintegral_ofReal (hi t trivial)
-    (Filter.Eventually.of_forall fun v => (h01 v).1), ← lintegral_one]
+      (Filter.Eventually.of_forall fun v => (h01 v).1),
+    ← lintegral_one]
   apply lintegral_congr_ae
   filter_upwards [GlobalTheory.RealPlaceCompare.ae_qf h t] with v hv
   have : χ v = 1 := h1 (show qf v ∈ Set.Icc (1 / 2 : ℝ) 2 from hv ▸ ht)
   simp [this]
 
-theorem dx_shell {M : ℕ} {fib : ℝ → Measure (Sp M 0)} (h : IsDxDq fib) (a b : ℝ) (ha : 0 ≤ a) :
-    dx M 0 (qf ⁻¹' Set.Ioc a b) = ∫⁻ t in Set.Ioc a b, fib t Set.univ := by
+theorem dx_shell {M : ℕ} {fib : ℝ → Measure (Sp M 0)} (h : IsDxDq fib) (a b : ℝ) (ha : 0 ≤ a)
+    : dx M 0 (qf ⁻¹' Set.Ioc a b) = ∫⁻ t in Set.Ioc a b, fib t Set.univ := by
   have hq : Measurable (qf : Sp M 0 → ℝ) := GlobalTheory.RealPlaceCompare.continuous_qf.measurable
   have hO : MeasurableSet {x : Sp M 0 | x ≠ 0} := isOpen_ne.measurableSet
-  have key := GlobalTheory.IsFibreFamily_lintegral_preimage hq isOpen_ne subset_rfl h
-    (({x : Sp M 0 | x ≠ 0}).indicator 1) (measurable_one.indicator hO)
-    (fun v hv => Set.indicator_of_notMem hv _) (Set.Ioc a b) measurableSet_Ioc
+  have key :=
+    GlobalTheory.IsFibreFamily_lintegral_preimage hq isOpen_ne subset_rfl h
+      (({x : Sp M 0 | x ≠ 0}).indicator 1) (measurable_one.indicator hO)
+      (fun v hv => Set.indicator_of_notMem hv _)
+      (Set.Ioc a b) measurableSet_Ioc
   have hsub : qf ⁻¹' Set.Ioc a b ⊆ {x : Sp M 0 | x ≠ 0} := by
     rintro x hx rfl
     have : a < qf (0 : Sp M 0) := hx.1
@@ -85,8 +98,9 @@ theorem dx_shell {M : ℕ} {fib : ℝ → Measure (Sp M 0)} (h : IsDxDq fib) (a 
     norm_num at this
     linarith
   rw [Set.indicator_indicator, Set.inter_eq_left.2 hsub,
-    lintegral_indicator_one (hq measurableSet_Ioc), Measure.restrict_apply (hq measurableSet_Ioc),
-    Set.inter_eq_left.2 hsub] at key
+      lintegral_indicator_one (hq measurableSet_Ioc), Measure.restrict_apply (hq measurableSet_Ioc),
+      Set.inter_eq_left.2 hsub]
+    at key
   rw [key]
   refine lintegral_congr fun t => ?_
   rw [lintegral_indicator_one hO]
@@ -101,33 +115,33 @@ theorem sphereMass : SphereMass := by
   have hq : Measurable (qf : Sp M 0 → ℝ) := GlobalTheory.RealPlaceCompare.continuous_qf.measurable
   set C : ℝ := (2 * Real.pi) ^ M / (M.factorial : ℝ) with hC
   have hC0 : 0 ≤ C := by have := Real.pi_pos; positivity
-  have hint : ∀ b ∈ Set.Ioo (1 / 2 : ℝ) 2,
-      ∫ t in (1 / 2 : ℝ)..b, G t = C * b ^ M - C * (1 / 2) ^ M := by
+  have hint
+      : ∀ b ∈ Set.Ioo (1 / 2 : ℝ) 2, ∫ t in (1 / 2 : ℝ)..b, G t = C * b ^ M - C * (1 / 2) ^ M := by
     intro b hb
     have hb0 : 0 ≤ b := by linarith [hb.1]
-    have e1 : qf ⁻¹' Set.Ioc (1 / 2 : ℝ) b =
-        {x : Sp M 0 | qf x ≤ b} \ {x | qf x ≤ 1 / 2} := by
+    have e1 : qf ⁻¹' Set.Ioc (1 / 2 : ℝ) b = {x : Sp M 0 | qf x ≤ b} \ {x | qf x ≤ 1 / 2} := by
       ext x; simp [and_comm]
     have e2 := dx_shell h (1 / 2) b (by norm_num)
     have hfin : dx M 0 {x : Sp M 0 | qf x ≤ 1 / 2} ≠ ⊤ := by
       rw [dx_ball M hM _ (by norm_num)]; exact ENNReal.ofReal_ne_top
-    rw [e1, measure_diff (s₁ := {x : Sp M 0 | qf x ≤ b}) (s₂ := {x : Sp M 0 | qf x ≤ 1 / 2})
-      (fun x (hx : qf x ≤ 1 / 2) => (hx.trans hb.1.le : qf x ≤ b))
-      (measurableSet_le hq measurable_const).nullMeasurableSet hfin,
-      dx_ball M hM _ hb0, dx_ball M hM _ (by norm_num), ← hC,
-      ← ENNReal.ofReal_sub _ (by positivity),
-      setLIntegral_congr_fun measurableSet_Ioc
-        (fun t ht => hGm t ⟨ht.1.le, ht.2.trans hb.2.le⟩),
-      ← ofReal_integral_eq_lintegral_ofReal (hG.integrableOn_Icc.mono_set Set.Ioc_subset_Icc_self)
-        (Filter.Eventually.of_forall hG0)] at e2
+    rw [e1,
+        measure_diff (s₁ := {x : Sp M 0 | qf x ≤ b}) (s₂ := {x : Sp M 0 | qf x ≤ 1 / 2})
+          (fun x (hx : qf x ≤ 1 / 2) => (hx.trans hb.1.le : qf x ≤ b))
+          (measurableSet_le hq measurable_const).nullMeasurableSet hfin,
+        dx_ball M hM _ hb0, dx_ball M hM _ (by norm_num), ← hC,
+        ← ENNReal.ofReal_sub _ (by positivity),
+        setLIntegral_congr_fun measurableSet_Ioc (fun t ht => hGm t ⟨ht.1.le, ht.2.trans hb.2.le⟩),
+        ← ofReal_integral_eq_lintegral_ofReal (hG.integrableOn_Icc.mono_set Set.Ioc_subset_Icc_self)
+          (Filter.Eventually.of_forall hG0)]
+      at e2
     rw [intervalIntegral.integral_of_le hb.1.le]
     refine ((ENNReal.ofReal_eq_ofReal_iff ?_ (integral_nonneg hG0)).1 e2).symm
     have : (1 / 2 : ℝ) ^ M ≤ b ^ M := pow_le_pow_left₀ (by norm_num) hb.1.le M
     nlinarith
   have d1 : HasDerivAt (fun b => ∫ t in (1 / 2 : ℝ)..b, G t) (G 1) 1 :=
     (hG.integral_hasStrictDerivAt _ _).hasDerivAt
-  have d2 : HasDerivAt (fun b : ℝ => C * b ^ M - C * (1 / 2) ^ M)
-      (C * ((M : ℝ) * 1 ^ (M - 1))) 1 := ((hasDerivAt_pow M 1).const_mul C).sub_const _
+  have d2 : HasDerivAt (fun b : ℝ => C * b ^ M - C * (1 / 2) ^ M) (C * ((M : ℝ) * 1 ^ (M - 1))) 1 :=
+    ((hasDerivAt_pow M 1).const_mul C).sub_const _
   have d3 : HasDerivAt (fun b => ∫ t in (1 / 2 : ℝ)..b, G t) (C * ((M : ℝ) * 1 ^ (M - 1))) 1 := by
     refine d2.congr_of_eventuallyEq ?_
     filter_upwards [Ioo_mem_nhds (show (1 / 2 : ℝ) < 1 by norm_num) (show (1 : ℝ) < 2 by norm_num)]

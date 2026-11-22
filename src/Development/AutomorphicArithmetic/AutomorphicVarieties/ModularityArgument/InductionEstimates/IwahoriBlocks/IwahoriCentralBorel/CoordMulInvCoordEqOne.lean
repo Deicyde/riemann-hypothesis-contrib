@@ -12,9 +12,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RelIndexNeZe
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
@@ -24,13 +28,16 @@ namespace UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 
 section Abs
 
-variable {A B H H₁ H₂ V : Type} [Group A] [Group B] [Group H] [Group H₁] [Group H₂] [AddCommGroup V] [Module ℂ V]
+variable
+  {A B H H₁ H₂ V : Type}
+  [Group A] [Group B] [Group H] [Group H₁] [Group H₂] [AddCommGroup V] [Module ℂ V]
 
 private def tr (a : A) (b : B) (F : A × B → ℂ) : A × B → ℂ := fun x => F (x.1 * a, x.2 * b)
 
-private theorem tens_tr (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) (a : A) (b : B)
-    (h₁ : ∀ φ ∈ X₁, (fun x => φ (x * a)) ∈ X₁) (h₂ : ∀ ψ ∈ X₂, (fun x => ψ (x * b)) ∈ X₂) :
-    ∀ F ∈ tensFn X₁ X₂, tr a b F ∈ tensFn X₁ X₂ := by
+private theorem tens_tr
+    (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) (a : A) (b : B)
+    (h₁ : ∀ φ ∈ X₁, (fun x => φ (x * a)) ∈ X₁) (h₂ : ∀ ψ ∈ X₂, (fun x => ψ (x * b)) ∈ X₂)
+    : ∀ F ∈ tensFn X₁ X₂, tr a b F ∈ tensFn X₁ X₂ := by
   intro F hF
   induction hF using Submodule.span_induction with
   | mem F h =>
@@ -40,12 +47,14 @@ private theorem tens_tr (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ
   | add x y _ _ hx hy => exact add_mem hx hy
   | smul c x _ hx => exact Submodule.smul_mem _ c hx
 
-private theorem irr_sub (ρ : Representation ℂ H V) (X : Submodule ℂ V) (hs : SimpleIn ρ X) (hne : X ≠ ⊥) :
-    (GlobalTheory.PRep.sub ρ X hs.1).IsIrreducible := by
+private theorem irr_sub
+    (ρ : Representation ℂ H V) (X : Submodule ℂ V) (hs : SimpleIn ρ X) (hne : X ≠ ⊥)
+    : (GlobalTheory.PRep.sub ρ X hs.1).IsIrreducible := by
   have hnt : Nontrivial X := Submodule.nontrivial_iff_ne_bot.2 hne
   refine { exists_pair_ne := ⟨⊥, ⊤, fun h => ?_⟩, eq_bot_or_eq_top := fun S => ?_ }
   · obtain ⟨x, hx⟩ := exists_ne (0 : X)
-    have h1 : x ∈ (⊤ : Subrepresentation (GlobalTheory.PRep.sub ρ X hs.1)).toSubmodule := Submodule.mem_top
+    have h1 : x ∈ (⊤ : Subrepresentation (GlobalTheory.PRep.sub ρ X hs.1)).toSubmodule :=
+      Submodule.mem_top
     rw [← h] at h1
     exact hx ((Submodule.mem_bot ℂ).1 h1)
   · have hst : ∀ g, ∀ v ∈ S.toSubmodule.map X.subtype, ρ g v ∈ S.toSubmodule.map X.subtype := by
@@ -63,16 +72,17 @@ private theorem irr_sub (ρ : Representation ℂ H V) (X : Submodule ℂ V) (hs 
       rw [h]
       exact (Submodule.map_subtype_top X).symm
 
-private theorem schur_sub (ρ : Representation ℂ H V) (X : Submodule ℂ V) (hU : ∀ g, ∀ v ∈ X, ρ g v ∈ X)
-    (c : SchurIn ρ X) : Schur (GlobalTheory.PRep.sub ρ X hU) := by
+private theorem schur_sub
+    (ρ : Representation ℂ H V) (X : Submodule ℂ V) (hU : ∀ g, ∀ v ∈ X, ρ g v ∈ X) (c : SchurIn ρ X)
+    : Schur (GlobalTheory.PRep.sub ρ X hU) := by
   intro T hT
   refine c T fun g v v' h => ?_
   have h' : v' = GlobalTheory.PRep.sub ρ X hU g v := Subtype.ext h
   rw [h', hT]
   rfl
 
-private theorem tens_bot_left (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) (h : X₁ = ⊥) :
-    tensFn X₁ X₂ = ⊥ := by
+private theorem tens_bot_left (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) (h : X₁ = ⊥)
+    : tensFn X₁ X₂ = ⊥ := by
   refine Submodule.span_eq_bot.2 ?_
   rintro _ ⟨φ, hφ, ψ, _, rfl⟩
   rw [h, Submodule.mem_bot] at hφ
@@ -80,8 +90,8 @@ private theorem tens_bot_left (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodu
   funext x
   simp
 
-private theorem tens_bot_right (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) (h : X₂ = ⊥) :
-    tensFn X₁ X₂ = ⊥ := by
+private theorem tens_bot_right (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ)) (h : X₂ = ⊥)
+    : tensFn X₁ X₂ = ⊥ := by
   refine Submodule.span_eq_bot.2 ?_
   rintro _ ⟨φ, _, ψ, hψ, rfl⟩
   rw [h, Submodule.mem_bot] at hψ
@@ -89,10 +99,13 @@ private theorem tens_bot_right (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submod
   funext x
   simp
 
-private theorem tens_simple (θ₁ : H₁ →* A) (θ₂ : H₂ →* B) (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ))
+private theorem tens_simple
+    (θ₁ : H₁ →* A) (θ₂ : H₂ →* B) (X₁ : Submodule ℂ (A → ℂ)) (X₂ : Submodule ℂ (B → ℂ))
     (s₁ : SimpleIn ((rightReg ℂ A ℂ).comp θ₁) X₁) (c₁ : SchurIn ((rightReg ℂ A ℂ).comp θ₁) X₁)
-    (s₂ : SimpleIn ((rightReg ℂ B ℂ).comp θ₂) X₂) (Q : Submodule ℂ (A × B → ℂ)) (hQ : Q ≤ tensFn X₁ X₂)
-    (hst : ∀ g₁ g₂, ∀ F ∈ Q, tr (θ₁ g₁) (θ₂ g₂) F ∈ Q) : Q = ⊥ ∨ Q = tensFn X₁ X₂ := by
+    (s₂ : SimpleIn ((rightReg ℂ B ℂ).comp θ₂) X₂)
+    (Q : Submodule ℂ (A × B → ℂ))
+    (hQ : Q ≤ tensFn X₁ X₂) (hst : ∀ g₁ g₂, ∀ F ∈ Q, tr (θ₁ g₁) (θ₂ g₂) F ∈ Q)
+    : Q = ⊥ ∨ Q = tensFn X₁ X₂ := by
   by_cases n₁ : X₁ = ⊥
   · left; exact le_bot_iff.1 (hQ.trans (tens_bot_left X₁ X₂ n₁).le)
   by_cases n₂ : X₂ = ⊥
@@ -114,11 +127,13 @@ private theorem tens_simple (θ₁ : H₁ →* A) (θ₂ : H₂ →* B) (X₁ : 
     | add a b ha hb =>
       simp only [map_add (f := _), Submodule.coe_add, ha, hb]
       rfl
-  let S : Subrepresentation E :=
-    ⟨(Q.comap (tensFn X₁ X₂).subtype).comap e.toLinearMap, fun g y hy => by
+  let S : Subrepresentation E := ⟨
+    (Q.comap (tensFn X₁ X₂).subtype).comap e.toLinearMap,
+    fun g y hy => by
       show (e (E g y)).1 ∈ Q
       rw [law]
-      exact hst _ _ _ hy⟩
+      exact hst _ _ _ hy
+  ⟩
   have hmem : ∀ F (hF : F ∈ tensFn X₁ X₂), F ∈ Q ↔ e.symm ⟨F, hF⟩ ∈ S.toSubmodule := by
     intro F hF
     show _ ↔ (e (e.symm ⟨F, hF⟩)).1 ∈ Q
@@ -144,16 +159,24 @@ section Glob
 variable {K : Type} [Field K] [NumberField K]
 
 private theorem continuous_lev₂ (v : Pl K) : Continuous (lev₂ v) :=
-  GlobalTheory.ParabLevel.continuous_leviTwo_symm.comp (GlobalTheory.ParabLevel.continuous_leviProj _)
+  GlobalTheory.ParabLevel.continuous_leviTwo_symm.comp (GlobalTheory.ParabLevel.continuous_leviProj
+    _)
 
 private theorem lev₂_surj (v : Pl K) (a b : Gw 2 v) : ∃ q : PW v, lev₂ v q = (a, b) := by
-  refine ⟨⟨leviEmb (v.adicCompletion K) (two (stdSum (rfl : 2 + 2 = 2 + 2))) (leviTwo (v.adicCompletion K) (Fin 2) (Fin 2) (a, b)),
-    leviEmb_mem_parab _ _ _⟩, ?_⟩
+  refine ⟨
+    ⟨
+      leviEmb (v.adicCompletion K) (two (stdSum (rfl : 2 + 2 = 2 + 2)))
+        (leviTwo (v.adicCompletion K) (Fin 2) (Fin 2) (a, b)),
+      leviEmb_mem_parab _ _ _
+    ⟩,
+    ?_
+  ⟩
   show (leviTwo (v.adicCompletion K) (Fin 2) (Fin 2)).symm (leviProj (v.adicCompletion K) (two (stdSum (rfl : 2 + 2 = 2 + 2))) ⟨_, _⟩) = _
   rw [leviProj_leviEmb, MulEquiv.symm_apply_apply]
 
 private theorem smooth_dl (v : Pl K) : IsSmoothChar (dl v) :=
-  (isSmoothChar_deltaHalf (v.adicCompletion K)).comp _ (GlobalTheory.ParabLevel.continuous_leviProj _)
+  (isSmoothChar_deltaHalf (v.adicCompletion K)).comp _
+    (GlobalTheory.ParabLevel.continuous_leviProj _)
 
 private theorem smooth_dS {r : ℕ} (w : Fin r → Pl K) : IsSmoothChar (dS w) := by
   unfold dS
@@ -162,10 +185,12 @@ private theorem smooth_dS {r : ℕ} (w : Fin r → Pl K) : IsSmoothChar (dS w) :
   · exact (smooth_dl (w i)).comp _ (continuous_apply i)
 
 private noncomputable def L₁ {r : ℕ} (w : Fin r → Pl K) : (∀ i, PW (w i)) →* GS 2 w :=
-  MonoidHom.pi fun i => (MonoidHom.fst _ _).comp ((lev₂ (w i)).comp (Pi.evalMonoidHom (fun i => PW (w i)) i))
+  MonoidHom.pi fun i =>
+    (MonoidHom.fst _ _).comp ((lev₂ (w i)).comp (Pi.evalMonoidHom (fun i => PW (w i)) i))
 
 private noncomputable def L₂ {r : ℕ} (w : Fin r → Pl K) : (∀ i, PW (w i)) →* GS 2 w :=
-  MonoidHom.pi fun i => (MonoidHom.snd _ _).comp ((lev₂ (w i)).comp (Pi.evalMonoidHom (fun i => PW (w i)) i))
+  MonoidHom.pi fun i =>
+    (MonoidHom.snd _ _).comp ((lev₂ (w i)).comp (Pi.evalMonoidHom (fun i => PW (w i)) i))
 
 private theorem continuous_L₁ {r : ℕ} (w : Fin r → Pl K) : Continuous (L₁ w) :=
   continuous_pi fun i => continuous_fst.comp ((continuous_lev₂ (w i)).comp (continuous_apply i))
@@ -173,24 +198,32 @@ private theorem continuous_L₁ {r : ℕ} (w : Fin r → Pl K) : Continuous (L�
 private theorem continuous_L₂ {r : ℕ} (w : Fin r → Pl K) : Continuous (L₂ w) :=
   continuous_pi fun i => continuous_snd.comp ((continuous_lev₂ (w i)).comp (continuous_apply i))
 
-private theorem L_surj {r : ℕ} (w : Fin r → Pl K) (g₁ g₂ : GS 2 w) : ∃ p, L₁ w p = g₁ ∧ L₂ w p = g₂ := by
+private theorem L_surj {r : ℕ} (w : Fin r → Pl K) (g₁ g₂ : GS 2 w)
+    : ∃ p, L₁ w p = g₁ ∧ L₂ w p = g₂ := by
   choose q hq using fun i => lev₂_surj (w i) (g₁ i) (g₂ i)
   refine ⟨q, funext fun i => ?_, funext fun i => ?_⟩
   · exact congrArg Prod.fst (hq i)
   · exact congrArg Prod.snd (hq i)
 
-private theorem xS_eq {r : ℕ} {w : Fin r → Pl K} (ι : GS 2 w →* FA K 2) (p : ∀ i, PW (w i)) (F : G1 K 2 × G1 K 2 → ℂ) :
-    xS ι p F = ((dS w p : ℂˣ) : ℂ) • tr (fin1 (ι (L₁ w p))) (fin1 (ι (L₂ w p))) F := rfl
+private theorem xS_eq
+    {r : ℕ} {w : Fin r → Pl K} (ι : GS 2 w →* FA K 2) (p : ∀ i, PW (w i)) (F : G1 K 2 × G1 K 2 → ℂ)
+    : xS ι p F = ((dS w p : ℂˣ) : ℂ) • tr (fin1 (ι (L₁ w p))) (fin1 (ι (L₂ w p))) F :=
+  rfl
 
 end Glob
 
 end UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.x12 :
-    ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (μ : Measure (G1 K 2)) [μ.IsHaarMeasure] (τ₁ τ₂ : Submodule ℂ (L2 μ)) (κ : Measure (archCompact K 2)) (p₁ p₂ : archCompact K 2 → ℂ),
-      CuspIrr μ τ₁ → CuspIrr μ τ₂ → RankInf μ τ₁ κ p₁ → RankInf μ τ₂ κ p₂ → ∀ {r : ℕ} (w : Fin r → Pl K) (ι : GS 2 w →* FA K 2), Function.Injective w → IsEmb w ι →
-      SimpleIn (xS ι) (tensFn (Xs μ τ₁ κ p₁ (im w)) (Xs μ τ₂ κ p₂ (im w))) ∧
-        ∀ F ∈ tensFn (Xs μ τ₁ κ p₁ (im w)) (Xs μ τ₂ κ p₂ (im w)), IsOpen {p | xS ι p F = F} := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.x12
+    : ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+        (μ : Measure (G1 K 2)) [μ.IsHaarMeasure] (τ₁ τ₂ : Submodule ℂ (L2 μ))
+        (κ : Measure (archCompact K 2)) (p₁ p₂ : archCompact K 2 → ℂ),
+      CuspIrr μ τ₁ → CuspIrr μ τ₂ → RankInf μ τ₁ κ p₁ → RankInf μ τ₂ κ p₂
+        → ∀ {r : ℕ} (w : Fin r → Pl K) (ι : GS 2 w →* FA K 2),
+          Function.Injective w → IsEmb w ι
+            → SimpleIn (xS ι) (tensFn (Xs μ τ₁ κ p₁ (im w)) (Xs μ τ₂ κ p₂ (im w)))
+              ∧ ∀ F ∈ tensFn (Xs μ τ₁ κ p₁ (im w)) (Xs μ τ₂ κ p₂ (im w)),
+                IsOpen {p | xS ι p F = F} := by
   intro K _ _ _ μ _ τ₁ τ₂ κ p₁ p₂ c₁ c₂ r₁ r₂ r w ι hw hι
   obtain ⟨s₁, sc₁⟩ := xSimple μ τ₁ κ p₁ c₁ r₁ w ι hw hι
   obtain ⟨s₂, -⟩ := xSimple μ τ₂ κ p₂ c₂ r₂ w ι hw hι
@@ -198,22 +231,27 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.x12 :
   have m₂ := (xMem μ τ₂ κ p₂ r₂.1).2 c₂ w ι hw hι
   set X₁ := Xs μ τ₁ κ p₁ (im w) with hX₁
   set X₂ := Xs μ τ₂ κ p₂ (im w) with hX₂
-  have hstab : ∀ p, ∀ F ∈ tensFn X₁ X₂, tr (fin1 (ι (L₁ w p))) (fin1 (ι (L₂ w p))) F ∈ tensFn X₁ X₂ := fun p =>
-    tens_tr X₁ X₂ _ _ (fun φ hφ => (m₁ φ hφ).2 (L₁ w p)) (fun ψ hψ => (m₂ ψ hψ).2 (L₂ w p))
+  have hstab
+      : ∀ p, ∀ F ∈ tensFn X₁ X₂, tr (fin1 (ι (L₁ w p))) (fin1 (ι (L₂ w p))) F ∈ tensFn X₁ X₂ :=
+    fun p => tens_tr X₁ X₂ _ _ (fun φ hφ => (m₁ φ hφ).2 (L₁ w p)) (fun ψ hψ => (m₂ ψ hψ).2 (L₂ w p))
   refine ⟨⟨fun p F hF => ?_, fun Q hQ hst => ?_⟩, fun F hF => ?_⟩
   · rw [xS_eq]
     exact Submodule.smul_mem _ _ (hstab p F hF)
-  · refine tens_simple ((MultiplicityOne.finProj K 2).comp ι) ((MultiplicityOne.finProj K 2).comp ι) X₁ X₂ s₁ sc₁ s₂ Q hQ
-      fun g₁ g₂ F hF => ?_
+  · refine tens_simple ((MultiplicityOne.finProj K 2).comp ι) ((MultiplicityOne.finProj K 2).comp ι)
+      X₁ X₂ s₁ sc₁ s₂ Q hQ fun g₁ g₂ F hF => ?_
     obtain ⟨p, rfl, rfl⟩ := L_surj w g₁ g₂
     have h := Q.smul_mem (((dS w p)⁻¹ : ℂˣ) : ℂ) (hst p F hF)
     rw [xS_eq, smul_smul, ← Units.val_mul, inv_mul_cancel, Units.val_one, one_smul] at h
     exact h
-  · have hsm : tensFn X₁ X₂ ≤ GlobalTheory.PRep.smoothPart ((rightReg ℂ (G1 K 2 × G1 K 2) ℂ).comp (blocks ι)) := by
+  · have hsm
+        : tensFn X₁ X₂
+          ≤ GlobalTheory.PRep.smoothPart ((rightReg ℂ (G1 K 2 × G1 K 2) ℂ).comp (blocks ι)) := by
       refine Submodule.span_le.2 ?_
       rintro _ ⟨φ, hφ, ψ, hψ, rfl⟩
       refine mem_smoothPart_of_nhds (Filter.mem_of_superset
-        ((((m₁ φ hφ).1.preimage (continuous_L₁ w)).inter ((m₂ ψ hψ).1.preimage (continuous_L₂ w))).mem_nhds ?_) ?_)
+        ((((m₁ φ hφ).1.preimage (continuous_L₁ w)).inter
+          ((m₂ ψ hψ).1.preimage (continuous_L₂ w))).mem_nhds ?_)
+        ?_)
       · constructor <;> simp
       · rintro p ⟨h₁, h₂⟩
         funext x
@@ -224,8 +262,7 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.x12 :
     have hF₀ : IsOpen {p | (rightReg ℂ (G1 K 2 × G1 K 2) ℂ).comp (blocks ι) p F = F} := hsm hF
     have hk : IsOpen ((dS w).ker : Set (∀ i, PW (w i))) := smooth_dS w
     have hF' : F ∈ GlobalTheory.PRep.smoothPart (xS ι) := by
-      refine mem_smoothPart_of_nhds (Filter.mem_of_superset
-        ((hF₀.inter hk).mem_nhds ?_) ?_)
+      refine mem_smoothPart_of_nhds (Filter.mem_of_superset ((hF₀.inter hk).mem_nhds ?_) ?_)
       · exact ⟨by simp, one_mem _⟩
       · rintro p ⟨h₁, h₂⟩
         have h₃ : dS w p = 1 := h₂

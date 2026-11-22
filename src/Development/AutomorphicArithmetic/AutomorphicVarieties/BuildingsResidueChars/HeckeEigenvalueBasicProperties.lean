@@ -4,23 +4,28 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published UpperTheory.V.Af.Sol
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published UpperTheory.V.Af.Sol
 
-private theorem algSat_injective (n q : ℕ) (hq : q ≠ 0) (B B' : Multiset ℂˣ)
-    (h : UpperTheory.V.Af.algSat n q B = UpperTheory.V.Af.algSat n q B') : B = B' := by
+private theorem algSat_injective
+    (n q : ℕ) (hq : q ≠ 0)
+    (B B' : Multiset ℂˣ) (h : UpperTheory.V.Af.algSat n q B = UpperTheory.V.Af.algSat n q B')
+    : B = B' := by
   unfold UpperTheory.V.Af.algSat at h
   have hc : ((((q : ℝ) ^ (((n : ℝ) - 1) / 2)) : ℝ) : ℂ) ≠ 0 := by
     have : (0 : ℝ) < (q : ℝ) ^ (((n : ℝ) - 1) / 2) :=
       Real.rpow_pos_of_pos (by exact_mod_cast Nat.pos_of_ne_zero hq) _
     exact_mod_cast this.ne'
   have h1 := Multiset.map_injective (mul_right_injective₀ hc) h
-  have h2 : ∀ s : Multiset ℂˣ, (do let a ← s; pure (a : ℂ)) =
-      Multiset.map (fun a : ℂˣ => (a : ℂ)) s := fun s => Multiset.bind_singleton _ _
+  have h2
+      : ∀ s : Multiset ℂˣ, (do let a ← s; pure (a : ℂ)) = Multiset.map (fun a : ℂˣ => (a : ℂ)) s :=
+    fun s => Multiset.bind_singleton _ _
   rw [h2, h2] at h1
   exact Multiset.map_injective Units.val_injective h1
 
-theorem UpperTheory.hecke_eigenvalue_basic_properties :
-    UpperTheory.V.Af.Sol.EigBasic := by
+theorem UpperTheory.hecke_eigenvalue_basic_properties : UpperTheory.V.Af.Sol.EigBasic := by
   intro F Ω _ _ _ _ _ l _ ι v
   obtain ⟨A, hA⟩ := exists_isPlaceOver Ω v
   obtain ⟨σ, hσ⟩ := ReciprocityTheory.Gal.exists_isFrob hA
@@ -30,8 +35,8 @@ theorem UpperTheory.hecke_eigenvalue_basic_properties :
     obtain ⟨hi', hf'⟩ := hz' A' hA'
     refine ⟨fun s hs => ?_, fun τ hτ => ?_⟩
     · rw [MonoidHom.mul_apply, MonoidHom.inv_apply, hi s hs, hi' s hs, inv_one, mul_one]
-    · rw [MonoidHom.mul_apply, MonoidHom.inv_apply, Units.val_mul, map_mul, Units.val_inv_eq_inv_val,
-        map_inv₀, hf τ hτ, hf' τ hτ]
+    · rw [MonoidHom.mul_apply, MonoidHom.inv_apply, Units.val_mul, map_mul,
+        Units.val_inv_eq_inv_val, map_inv₀, hf τ hτ, hf' τ hτ]
       push_cast
       rfl
   · intro δ z z' hz hz'

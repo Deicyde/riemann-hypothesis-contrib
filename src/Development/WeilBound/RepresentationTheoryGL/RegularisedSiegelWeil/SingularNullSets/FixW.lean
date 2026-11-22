@@ -12,10 +12,14 @@ set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 1000000
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open IsDedekindDomain NumberField
@@ -55,17 +59,18 @@ theorem fixW : IdemEx → GenK → WMaj → FixW := by
     show ω 1 Φ = Φ
     rw [map_one]
     rfl
-  have key := hS4 S h4 {g : G D n | ω g Φ = Φ} hA h1A (by
-    intro g hg hcases x hx
-    have hx' : ω x Φ = Φ := hx
-    show ω (g * x) Φ = Φ
-    rw [map_mul]
-    show ω g (ω x Φ) = Φ
-    rw [hx']
-    rcases hcases with hN | hM | ⟨w, u', hw, hu', hu'K, rfl⟩
-    · exact hS1 S h1 n θ μ ω χ hω g hg hN Φ (fun y hy => by rw [hΦ y, if_neg hy])
-    · exact LFixW.fixM V hω he (hS3 S h3) hg hM Φ hΦ
-    · exact hS2 S h2 e he n θ μ ω χ hω hHaar w u' hw hu' hu'K Φ hΦ)
+  have key :=
+    hS4 S h4 {g : G D n | ω g Φ = Φ} hA h1A (by
+      intro g hg hcases x hx
+      have hx' : ω x Φ = Φ := hx
+      show ω (g * x) Φ = Φ
+      rw [map_mul]
+      show ω g (ω x Φ) = Φ
+      rw [hx']
+      rcases hcases with hN | hM | ⟨w, u', hw, hu', hu'K, rfl⟩
+      · exact hS1 S h1 n θ μ ω χ hω g hg hN Φ (fun y hy => by rw [hΦ y, if_neg hy])
+      · exact LFixW.fixM V hω he (hS3 S h3) hg hM Φ hΦ
+      · exact hS2 S h2 e he n θ μ ω χ hω hHaar w u' hw hu' hu'K Φ hΦ)
   exact key hu
 
 end PositivityTheory.Rg.Rsw.L

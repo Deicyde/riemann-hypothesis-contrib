@@ -38,8 +38,8 @@ lemma weight_continuousOn (W : Weight L) (j : Fin A.n) :
   continuousOn_source_of_comp j (W.φ j) ((W.smooth j j).continuousOn)
 
 def ptInner (W : Weight L) (n : ℕ) (s t : Fin A.n → X → ℂ) (x : X) : ℂ :=
-  s (chartIdx A x) x * conj (t (chartIdx A x) x) *
-    ((Real.exp (-(n : ℝ) * W.φ (chartIdx A x) x) : ℝ) : ℂ)
+  s (chartIdx A x) x * conj (t (chartIdx A x) x)
+    * ((Real.exp (-(n : ℝ) * W.φ (chartIdx A x) x) : ℝ) : ℂ)
 
 lemma ptInner_eq (W : Weight L) {n : ℕ} {s t : Fin A.n → X → ℂ} (hs : s ∈ L.sections n)
     (ht : t ∈ L.sections n) (j : Fin A.n) {x : X} (hx : x ∈ (A.chart j).source) :
@@ -156,8 +156,10 @@ lemma integrable_ptInner (W : Weight L) (dV : SmoothVolume A) {n : ℕ} {s t : F
   exact (continuous_ptInner W hs ht).integrable_of_hasCompactSupport (isClosed_tsupport _).isCompact
 
 @[instance_reducible]
-def l2InnerCore (W : Weight L) (dV : SmoothVolume A) (n : ℕ) (V : Submodule ℂ (Fin A.n → X → ℂ))
-    (hV : V ≤ L.sections n) : InnerProductSpace.Core ℂ V where
+def l2InnerCore
+    (W : Weight L) (dV : SmoothVolume A)
+    (n : ℕ) (V : Submodule ℂ (Fin A.n → X → ℂ)) (hV : V ≤ L.sections n)
+    : InnerProductSpace.Core ℂ V where
   inner s t := ∫ x, ptInner W n t s x ∂dV.μ
   conj_inner_symm s t := by
     rw [← integral_conj]
@@ -187,10 +189,8 @@ def l2InnerCore (W : Weight L) (dV : SmoothVolume A) (n : ℕ) (V : Submodule �
     simp_rw [ptInner_self] at h
     rw [integral_complex_ofReal, Complex.ofReal_eq_zero] at h
     by_contra hne
-    have hne' : (s : Fin A.n → X → ℂ) ≠ 0 := by
-      simpa using hne
+    have hne' : (s : Fin A.n → X → ℂ) ≠ 0 := by simpa using hne
     exact (sectionL2NormSq_pos W dV (hV s.2) hne').ne' h
-
 
 omit [BorelSpace X] [CompactSpace X] in
 lemma integral_ptInner_self (W : Weight L) (dV : SmoothVolume A) (n : ℕ) (s : Fin A.n → X → ℂ) :
@@ -245,15 +245,15 @@ lemma iSup_ratio_eq {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
 
 end IntegralOfBergman
 
-
 open IntegralOfBergman in
 theorem IntegralOfBergman.proof : IntegralOfBergman.Statement := by
   intro D X _ _ _ _ _ A L W dV n V _ hV
   have := dV.isProb
-  let ev : X → V →ₗ[ℂ] ℂ := fun x =>
-    { toFun := fun s => (s : Fin A.n → X → ℂ) (chartIdx A x) x
-      map_add' := fun s t => by simp
-      map_smul' := fun r s => by simp }
+  let ev : X → V →ₗ[ℂ] ℂ := fun x => {
+    toFun := fun s => (s : Fin A.n → X → ℂ) (chartIdx A x) x
+    map_add' := fun s t => by simp
+    map_smul' := fun r s => by simp
+  }
   let c : InnerProductSpace.Core ℂ V := l2InnerCore W dV n V hV
   let _ : NormedAddCommGroup V := c.toNormedAddCommGroup
   let _ : InnerProductSpace ℂ V := InnerProductSpace.ofCore c.toCore
@@ -262,16 +262,20 @@ theorem IntegralOfBergman.proof : IntegralOfBergman.Statement := by
     rw [@norm_sq_eq_re_inner ℂ]
     change (∫ x, ptInner W n (s : Fin A.n → X → ℂ) s x ∂dV.μ).re = _
     rw [integral_ptInner_self, Complex.ofReal_re]
-  have hpt : ∀ (s : V) (x : X), ptNormSq W n (s : Fin A.n → X → ℂ) x =
-      ‖ev x s‖ ^ 2 * Real.exp (-(n : ℝ) * W.φ (chartIdx A x) x) := fun s x => rfl
+  have hpt
+      : ∀ (s : V) (x : X),
+        ptNormSq W n (s : Fin A.n → X → ℂ) x
+          = ‖ev x s‖ ^ 2 * Real.exp (-(n : ℝ) * W.φ (chartIdx A x) x) := fun s x =>
+    rfl
   have hB : ∀ x, bergman W dV V n x = ∑ a, ptNormSq W n (b a : Fin A.n → X → ℂ) x := by
     intro x
     rw [bergman]
     simp_rw [hpt, ← hnorm]
     rw [iSup_ratio_eq b (ev x) _ (Real.exp_pos _).le, Finset.sum_mul]
   simp_rw [hB]
-  rw [integral_finsetSum _ fun a _ => (continuous_ptNormSq W (hV (b a).2)).integrable_of_hasCompactSupport
-    (isClosed_tsupport _).isCompact]
+  rw [integral_finsetSum _ fun a _ =>
+    (continuous_ptNormSq W (hV (b a).2)).integrable_of_hasCompactSupport
+      (isClosed_tsupport _).isCompact]
   have h1 : ∀ a, ∫ x, ptNormSq W n (b a : Fin A.n → X → ℂ) x ∂dV.μ = 1 := fun a => by
     rw [← sectionL2NormSq, ← hnorm, b.orthonormal.1 a, one_pow]
   simp_rw [h1]

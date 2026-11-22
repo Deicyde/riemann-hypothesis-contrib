@@ -11,20 +11,22 @@ variable {E : Type} [Field E] [NumberField E]
 
 namespace ChA
 
-def Inv {dim : (E →+* ℂ) → ℕ} (L I : Submodule ℤ (Vsp dim)) (σ : E →+* ℂ) (ρ : ℕ) (K0 Bu : ℝ)
-    (k : ℕ) (χ w : ℕ → Vsp dim) (R μ : ℕ → ℝ) (ε : ℕ → ℕ → ℂ) : Prop :=
-  (∀ s < k, χ s ∈ Xg L I) ∧
-  (∀ s < k, w s ∈ Wk σ χ (s + 1)) ∧
-  (∀ s < k, ∀ s' < k, inner ℂ (w s) (w s') = if s = s' then (1 : ℂ) else 0) ∧
-  (∀ s < k, prj σ (χ s) =
-    (R s : ℂ) • (w s + ∑ i ∈ Finset.range s, (starRingEnd ℂ) (ε s i) • w i)) ∧
-  (∀ s < k, ∀ i, s ≤ i → ε s i = 0) ∧
-  (∀ s < k, ∑ i ∈ Finset.range s, ‖ε s i‖ ^ 2 ≤ (1 / (30 * (ρ : ℝ) ^ 2)) ^ 2) ∧
-  (∀ s < k, 30 * (ρ : ℝ) ^ 2 * K0 * μ s ≤ R s ∧
-    ‖χ s‖ ≤ (Real.sqrt 2 * (30 * (ρ : ℝ) ^ 2 + 1) + 1) * K0 * μ s) ∧
-  (∀ s < k, 1 ≤ μ s ∧ ∀ y ∈ Xg L I, |2 * inner ℝ (χ s) y| ≤ ‖y‖ ^ 2 ∨ μ s ≤ ‖y‖) ∧
-  (∀ s < k, χ s ∈ Zs L I (μ s) ∧ ∀ y ∈ Xg L I, prj σ y ∉ Wk σ χ s → μ s ≤ ‖y‖) ∧
-  (∀ s < k, μ s ^ 2 ≤ Bu)
+def Inv
+    {dim : (E →+* ℂ) → ℕ} (L I : Submodule ℤ (Vsp dim))
+    (σ : E →+* ℂ) (ρ : ℕ) (K0 Bu : ℝ) (k : ℕ) (χ w : ℕ → Vsp dim) (R μ : ℕ → ℝ) (ε : ℕ → ℕ → ℂ)
+    : Prop :=
+  (∀ s < k, χ s ∈ Xg L I) ∧ (∀ s < k, w s ∈ Wk σ χ (s + 1))
+    ∧ (∀ s < k, ∀ s' < k, inner ℂ (w s) (w s') = if s = s' then (1 : ℂ) else 0)
+    ∧ (∀ s < k,
+      prj σ (χ s) = (R s : ℂ) • (w s + ∑ i ∈ Finset.range s, (starRingEnd ℂ) (ε s i) • w i))
+    ∧ (∀ s < k, ∀ i, s ≤ i → ε s i = 0)
+    ∧ (∀ s < k, ∑ i ∈ Finset.range s, ‖ε s i‖ ^ 2 ≤ (1 / (30 * (ρ : ℝ) ^ 2)) ^ 2)
+    ∧ (∀ s < k,
+      30 * (ρ : ℝ) ^ 2 * K0 * μ s ≤ R s
+        ∧ ‖χ s‖ ≤ (Real.sqrt 2 * (30 * (ρ : ℝ) ^ 2 + 1) + 1) * K0 * μ s)
+    ∧ (∀ s < k, 1 ≤ μ s ∧ ∀ y ∈ Xg L I, |2 * inner ℝ (χ s) y| ≤ ‖y‖ ^ 2 ∨ μ s ≤ ‖y‖)
+    ∧ (∀ s < k, χ s ∈ Zs L I (μ s) ∧ ∀ y ∈ Xg L I, prj σ y ∉ Wk σ χ s → μ s ≤ ‖y‖)
+    ∧ (∀ s < k, μ s ^ 2 ≤ Bu)
 
 set_option maxHeartbeats 1000000 in
 private lemma inv_step_lemma {dim : (E →+* ℂ) → ℕ} {L I : Submodule ℤ (Vsp dim)}

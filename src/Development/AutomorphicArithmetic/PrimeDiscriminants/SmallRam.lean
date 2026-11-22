@@ -13,8 +13,12 @@ namespace Formalism.HC.HostAx
 
 variable {φ : Frame} (H : HostAx φ)
 
-theorem mem_sq_of_dvd_QS (hE : H.toHostRaw.Exact) {l : ℕ} (hl : l.Prime) (hd : l ∣ H.QS) (P : Ideal (𝓞 H.E)) [hP : P.IsPrime]
-    (hm : (l : 𝓞 H.E) ∈ P) : (l : 𝓞 H.E) ∈ P ^ 2 := by
+theorem mem_sq_of_dvd_QS
+    (hE : H.toHostRaw.Exact)
+    {l : ℕ} (hl : l.Prime) (hd : l ∣ H.QS)
+    (P : Ideal (𝓞 H.E)) [hP : P.IsPrime]
+    (hm : (l : 𝓞 H.E) ∈ P)
+    : (l : 𝓞 H.E) ∈ P ^ 2 := by
   have hEgal := H.galois
   have : IsGaloisGroup Gal(H.E/ℚ) ℤ (𝓞 H.E) := IsGaloisGroup.of_isFractionRing _ _ _ ℚ H.E
   have : Fact l.Prime := ⟨hl⟩
@@ -23,7 +27,8 @@ theorem mem_sq_of_dvd_QS (hE : H.toHostRaw.Exact) {l : ℕ} (hl : l.Prime) (hd :
   have hne : span {(l : ℤ)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact hlz.ne_zero
-  have hlo : P.LiesOver (span {(l : ℤ)}) := (Ideal.liesOver_span_iff hP.ne_top hlz).2 (by simpa using hm)
+  have hlo : P.LiesOver (span {(l : ℤ)}) :=
+    (Ideal.liesOver_span_iff hP.ne_top hlz).2 (by simpa using hm)
   obtain ⟨u, hu, hu1⟩ := hE l hl hd
   have hN : l ∣ H.condN := hd.trans H.QS_dvd_condN
   have hdiv : ordCompl[l] H.condN ∣ H.condN / l := by
@@ -37,9 +42,11 @@ theorem mem_sq_of_dvd_QS (hE : H.toHostRaw.Exact) {l : ℕ} (hl : l.Prime) (hd :
     have h2 : H.gal.symm (H.art u) = 1 := congrArg Subtype.val h1
     simpa using congrArg H.gal h2
   rw [card_inertia_eq_ramificationIdxIn (G := Gal(H.E/ℚ)) (span {(l : ℤ)}) P,
-    ramificationIdxIn_eq_ramificationIdx (span {(l : ℤ)}) P Gal(H.E/ℚ),
-    ← ramificationIdx'_eq_ramificationIdx (span {(l : ℤ)}) P hne] at hnt
-  have hle : Ideal.map (algebraMap ℤ (𝓞 H.E)) (span {(l : ℤ)}) ≤ P ^ 2 := le_pow_of_le_ramificationIdx' hnt
+      ramificationIdxIn_eq_ramificationIdx (span {(l : ℤ)}) P Gal(H.E/ℚ),
+      ← ramificationIdx'_eq_ramificationIdx (span {(l : ℤ)}) P hne]
+    at hnt
+  have hle : Ideal.map (algebraMap ℤ (𝓞 H.E)) (span {(l : ℤ)}) ≤ P ^ 2 :=
+    le_pow_of_le_ramificationIdx' hnt
   rw [Ideal.map_span, Set.image_singleton, Ideal.span_singleton_le_iff_mem] at hle
   simpa using hle
 

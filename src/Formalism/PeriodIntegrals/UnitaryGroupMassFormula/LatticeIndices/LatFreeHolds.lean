@@ -13,7 +13,9 @@ namespace MassDataIdxLatFree
 
 open NumberField
 
-variable {E K : Type} [Field E] [NumberField E] [Field K] (O : ValuationSubring K) (ι : E →+* K)
+variable
+  {E K : Type} [Field E] [NumberField E] [Field K]
+  (O : ValuationSubring K) (ι : E →+* K)
   {n : Type} [Fintype n] [DecidableEq n]
 
 theorem int_mem (a : 𝓞 E) : ι (a : E) ∈ O := by
@@ -41,31 +43,38 @@ theorem fg (L : Submodule (𝓞 E) (n → E)) (hL : L.FG) : (Mι O ι L).FG := b
     induction hl using Submodule.span_induction with
     | mem x hx => exact Submodule.subset_span (by simpa using ⟨x, hx, rfl⟩)
     | zero =>
-        have : (fun j => ι ((0 : n → E) j)) = 0 := by funext j; simp
-        beta_reduce; rw [this]; exact Submodule.zero_mem _
+      have : (fun j => ι ((0 : n → E) j)) = 0 := by funext j; simp
+      beta_reduce
+      rw [this]
+      exact Submodule.zero_mem _
     | add x y _ _ hx hy =>
-        have : (fun j => ι ((x + y) j)) = (fun j => ι (x j)) + (fun j => ι (y j)) := by
-          funext j; simp
-        beta_reduce; rw [this]; exact Submodule.add_mem _ hx hy
+      have : (fun j => ι ((x + y) j)) = (fun j => ι (x j)) + (fun j => ι (y j)) := by funext j; simp
+      beta_reduce
+      rw [this]
+      exact Submodule.add_mem _ hx hy
     | smul a x _ hx =>
-        have : (fun j => ι ((a • x) j)) = (⟨ι (a : E), int_mem O ι a⟩ : O) • (fun j => ι (x j)) := by
-          funext j
-          simp [Algebra.smul_def]
-        beta_reduce; rw [this]; exact Submodule.smul_mem _ _ hx
+      have : (fun j => ι ((a • x) j)) = (⟨ι (a : E), int_mem O ι a⟩ : O) • (fun j => ι (x j)) := by
+        funext j
+        simp [Algebra.smul_def]
+      beta_reduce
+      rw [this]
+      exact Submodule.smul_mem _ _ hx
 
-theorem span_top (L : Submodule (𝓞 E) (n → E)) (hL : Submodule.span E (L : Set (n → E)) = ⊤) :
-    Submodule.span K (Mι O ι L : Set (n → K)) = ⊤ :=
-  by apply _root_.UpperTheory.Reformulated.B.SpanTopFamily.span_top <;> assumption
+theorem span_top (L : Submodule (𝓞 E) (n → E)) (hL : Submodule.span E (L : Set (n → E)) = ⊤)
+    : Submodule.span K (Mι O ι L : Set (n → K)) = ⊤ := by
+  apply _root_.UpperTheory.Reformulated.B.SpanTopFamily.span_top <;> assumption
 
 end MassDataIdxLatFree
 
 namespace MassDataIdxSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.TypedSets NumberField IsDedekindDomain Formalism.BasicNotions
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.TypedSets NumberField IsDedekindDomain Formalism.BasicNotions
   Formalism.L2.SG.HidaSetting
 
-theorem latFree_holds {D : D7} (X : HidaSetting D) (p : TypX X) (θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p) :
-    LatFreeP X p θ :=
+theorem latFree_holds
+    {D : D7} (X : HidaSetting D) (p : TypX X) (θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p)
+    : LatFreeP X p θ :=
   MassDataIdxLatFree.exists_gl (OpX X p) (Mlat1 X p θ)
     (MassDataIdxLatFree.fg (OpX X p) (iota1 X p θ) X.B.I.L X.B.I.L_fg)
     (MassDataIdxLatFree.span_top (OpX X p) (iota1 X p θ) X.B.I.L X.B.I.L_span)

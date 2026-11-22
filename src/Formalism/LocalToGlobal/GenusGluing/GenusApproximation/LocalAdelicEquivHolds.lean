@@ -18,10 +18,12 @@ open scoped TensorProduct
 theorem glueExists_holds : GlueExists := glueExists_of idempotentCalculation_holds
 
 theorem genusToPoint_holds : GenusToPoint :=
-  genusToPoint_of localEquality_holds memLocalizedStd_holds idempotentCofinite_holds idempotentCalculation_holds glueExists_holds commensurable_holds
+  genusToPoint_of localEquality_holds memLocalizedStd_holds idempotentCofinite_holds
+    idempotentCalculation_holds glueExists_holds commensurable_holds
 
 theorem pointToGenus_holds : PointToGenus :=
-  pointToGenus_of localEquality_holds memLocalizedStd_holds idempotentDenominator_holds idempotentCalculation_holds
+  pointToGenus_of localEquality_holds memLocalizedStd_holds idempotentDenominator_holds
+    idempotentCalculation_holds
 
 theorem localToAdelic_holds : LocToAd := locToAd_of genusToPoint_holds
 

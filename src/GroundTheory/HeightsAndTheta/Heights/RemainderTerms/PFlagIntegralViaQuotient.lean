@@ -15,8 +15,9 @@ open MvPolynomial
 
 noncomputable section
 
-theorem FlagIntegralViaQuotient.proof (h1 : FlagIntegralAntisymmetrize.Statement)
-    (h2 : FlagIntegralVandermondeMul.Statement) : FlagIntegralViaQuotient.Statement := by
+theorem FlagIntegralViaQuotient.proof
+    (h1 : FlagIntegralAntisymmetrize.Statement) (h2 : FlagIntegralVandermondeMul.Statement)
+    : FlagIntegralViaQuotient.Statement := by
   intro f N H R hR
   have hA := h1 f N H
   rw [hR, h2 f N R] at hA

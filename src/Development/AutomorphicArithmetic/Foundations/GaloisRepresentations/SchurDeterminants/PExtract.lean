@@ -17,7 +17,8 @@ theorem extract : Extract := by
   set v : A → M → K := fun a m => ∏ p, x a p ^ e m p with hvdef
   have htop : Submodule.span K (Set.range v) = ⊤ := by
     by_contra hne
-    obtain ⟨φ, hφ, hmap⟩ := Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hne) inferInstance
+    obtain ⟨φ, hφ, hmap⟩ :=
+      Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hne) inferInstance
     have hφv : ∀ u : M → K, φ u = ∑ m, u m * φ (Pi.single m 1) := by
       intro u
       rw [LinearMap.pi_apply_eq_sum_univ φ u]
@@ -33,7 +34,9 @@ theorem extract : Extract := by
       refine hx Q ?_
       rintro _ ⟨a, rfl⟩
       have h1 : φ (v a) = 0 := by
-        have h2 := Submodule.mem_map_of_mem (f := φ) (Submodule.subset_span ⟨a, rfl⟩ : v a ∈ Submodule.span K (Set.range v))
+        have h2 :=
+          Submodule.mem_map_of_mem (f := φ)
+            (Submodule.subset_span ⟨a, rfl⟩ : v a ∈ Submodule.span K (Set.range v))
         rw [hmap, Submodule.mem_bot] at h2
         exact h2
       rw [hφv] at h1

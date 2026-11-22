@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteSlT
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory
@@ -37,29 +38,40 @@ theorem wt_exists : ∀ L : ℕ, 0 < L → ∃ ρ, Wt L ρ := by
   have hcov : ∀ g : SL(2, ℤ), ∃ s ∈ S, ∃ γ ∈ Gamma0 L, g = s * γ := by
     intro g
     obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul (Gamma0 L) g
-    refine ⟨(QuotientGroup.mk g : SL(2, ℤ) ⧸ Gamma0 L).out, by simp [hS], ((h⁻¹ : Gamma0 L) : SL(2, ℤ)), (h⁻¹).2, ?_⟩
-    rw [hh]; simp
+    refine ⟨
+      (QuotientGroup.mk g : SL(2, ℤ) ⧸ Gamma0 L).out,
+      by simp [hS],
+      ((h⁻¹ : Gamma0 L) : SL(2, ℤ)),
+      (h⁻¹).2,
+      ?_
+    ⟩
+    rw [hh]
+    simp
   set K : Set ℍ := {τ | ∃ s ∈ S, s • τ ∈ ModularGroup.fd} with hK
   have hKm : MeasurableSet K := by
-    have : K = ⋃ s ∈ S, (fun τ : ℍ => s • τ) ⁻¹' ModularGroup.fd := by
-      ext τ; simp [hK]
+    have : K = ⋃ s ∈ S, (fun τ : ℍ => s • τ) ⁻¹' ModularGroup.fd := by ext τ; simp [hK]
     rw [this]
-    exact Finset.measurableSet_biUnion _ fun s _ => (wt_fd_closed.preimage (wt_cont s)).measurableSet
+    exact Finset.measurableSet_biUnion _ fun s _ =>
+      (wt_fd_closed.preimage (wt_cont s)).measurableSet
   have hKfin : ∀ τ : ℍ, {γ : Gamma0 L | (γ : SL(2, ℤ)) • τ ∈ K}.Finite := by
     intro τ
     have h1 : {g : SL(2, ℤ) | g • τ ∈ K}.Finite := by
-      have : {g : SL(2, ℤ) | g • τ ∈ K} = ⋃ s ∈ S, (fun g => s * g) ⁻¹' {g | g • τ ∈ ModularGroup.fd} := by
+      have : {g : SL(2, ℤ) | g • τ ∈ K}
+          = ⋃ s ∈ S, (fun g => s * g) ⁻¹' {g | g • τ ∈ ModularGroup.fd} := by
         ext g; simp [hK, mul_smul]
       rw [this]
       exact Set.Finite.biUnion S.finite_toSet fun s _ =>
-        (GlobalTheory.T.finite_slTwo_smul_mem_fundamentalDomain τ).preimage (mul_right_injective s).injOn
-    exact Set.Finite.preimage (f := (Subtype.val : Gamma0 L → SL(2, ℤ))) Subtype.val_injective.injOn h1
+        (GlobalTheory.T.finite_slTwo_smul_mem_fundamentalDomain τ).preimage
+          (mul_right_injective s).injOn
+    exact Set.Finite.preimage (f := (Subtype.val : Gamma0 L → SL(2, ℤ))) Subtype.val_injective.injOn
+      h1
   have hKne : ∀ τ : ℍ, ∃ γ : Gamma0 L, (γ : SL(2, ℤ)) • τ ∈ K := by
     intro τ
     obtain ⟨g, hg⟩ := ModularGroup.exists_smul_mem_fd τ
     obtain ⟨s, hs, γ, hγ, rfl⟩ := hcov g
     exact ⟨⟨γ, hγ⟩, s, hs, by rwa [mul_smul] at hg⟩
-  let N : ℍ → ENNReal := fun τ => ∑' γ : Gamma0 L, K.indicator (1 : ℍ → ENNReal) ((γ : SL(2, ℤ)) • τ)
+  let N : ℍ → ENNReal := fun τ =>
+    ∑' γ : Gamma0 L, K.indicator (1 : ℍ → ENNReal) ((γ : SL(2, ℤ)) • τ)
   have hNm : Measurable N := by
     refine Measurable.tsum fun γ => ?_
     exact (measurable_one.indicator hKm).comp (wt_cont (γ : SL(2, ℤ))).measurable
@@ -70,14 +82,16 @@ theorem wt_exists : ∀ L : ℕ, 0 < L → ∃ ρ, Wt L ρ := by
     · rw [Finset.card_eq_sum_ones, Nat.cast_sum]
       refine Finset.sum_congr rfl fun γ hγ => ?_
       simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at hγ
-      rw [Set.indicator_of_mem hγ]; simp
+      rw [Set.indicator_of_mem hγ]
+      simp
     · intro γ hγ
       simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at hγ
       rw [Set.indicator_of_notMem hγ]
   have hNinv : ∀ (γ : Gamma0 L) τ, N ((γ : SL(2, ℤ)) • τ) = N τ := by
     intro γ τ
     simp only [N]
-    rw [← (Equiv.mulRight γ).tsum_eq (fun δ : Gamma0 L => K.indicator (1 : ℍ → ENNReal) ((δ : SL(2, ℤ)) • τ))]
+    rw [← (Equiv.mulRight γ).tsum_eq
+      (fun δ : Gamma0 L => K.indicator (1 : ℍ → ENNReal) ((δ : SL(2, ℤ)) • τ))]
     simp [mul_smul]
   let ρ : ℍ → ℝ := fun τ => K.indicator (fun τ => ((N τ).toReal)⁻¹) τ
   refine ⟨ρ, ⟨?_, ?_, ?_, ?_⟩⟩
@@ -87,7 +101,8 @@ theorem wt_exists : ∀ L : ℕ, 0 < L → ∃ ρ, Wt L ρ := by
     have hz : ∀ γ ∉ (hKfin τ).toFinset, ρ ((γ : SL(2, ℤ)) • τ) = 0 := by
       intro γ hγ
       simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at hγ
-      simp only [ρ]; rw [Set.indicator_of_notMem hγ]
+      simp only [ρ]
+      rw [Set.indicator_of_notMem hγ]
     have hpos : 0 < (hKfin τ).toFinset.card := by
       obtain ⟨γ, hγ⟩ := hKne τ
       exact Finset.card_pos.mpr ⟨γ, by simpa using hγ⟩
@@ -104,8 +119,7 @@ theorem wt_exists : ∀ L : ℕ, 0 < L → ∃ ρ, Wt L ρ := by
         simp
     exact heq ▸ hasSum_sum_of_ne_finset_zero hz
   · refine ⟨S, fun τ hτ => ?_⟩
-    have : τ ∈ K := by
-      by_contra h; exact hτ (by simp only [ρ]; rw [Set.indicator_of_notMem h])
+    have : τ ∈ K := by by_contra h; exact hτ (by simp only [ρ]; rw [Set.indicator_of_notMem h])
     exact this
 
 end GlobalTheory

@@ -79,12 +79,17 @@ theorem degree_algebraic : DegAlg := by
   intro K _ _ L M hL hM
   obtain ⟨hLI, hLn⟩ := hL
   obtain ⟨hMI, hMn⟩ := hM
-  refine ⟨⟨mul_ne_zero hLI hMI, fun σ => mul_pos (hLn σ) (hMn σ)⟩, ?_,
-    ⟨inv_ne_zero hLI, fun σ => inv_pos.mpr (hLn σ)⟩, ?_,
-    fun k => ⟨⟨pow_ne_zero _ hLI, fun σ => pow_pos (hLn σ) k⟩, ?_⟩⟩
+  refine ⟨
+    ⟨mul_ne_zero hLI hMI, fun σ => mul_pos (hLn σ) (hMn σ)⟩,
+    ?_,
+    ⟨inv_ne_zero hLI, fun σ => inv_pos.mpr (hLn σ)⟩,
+    ?_,
+    fun k => ⟨⟨pow_ne_zero _ hLI, fun σ => pow_pos (hLn σ) k⟩, ?_⟩
+  ⟩
   · simp only [MLine.deg, MLine.tensor]
     rw [log_absNorm_mul hLI hMI,
-      Finset.sum_congr rfl (fun σ _ => Real.log_mul (hLn σ).ne' (hMn σ).ne'), Finset.sum_add_distrib]
+      Finset.sum_congr rfl (fun σ _ => Real.log_mul (hLn σ).ne' (hMn σ).ne'),
+      Finset.sum_add_distrib]
     ring
   · simp only [MLine.deg, MLine.dual]
     rw [map_inv₀, Rat.cast_inv, Real.log_inv,
@@ -101,11 +106,14 @@ theorem mem_of_loc' : MemOfLoc := by
   · rw [hx]; exact FractionalIdeal.zero_mem I
   have hs : FractionalIdeal.spanSingleton (𝓞 K)⁰ x ≠ 0 := by
     rwa [Ne, FractionalIdeal.spanSingleton_eq_zero_iff]
-  have hge : ∀ p : HeightOneSpectrum (𝓞 K),
-      FractionalIdeal.count K p I ≤ FractionalIdeal.count K p (FractionalIdeal.spanSingleton (𝓞 K)⁰ x) := by
+  have hge
+      : ∀ p : HeightOneSpectrum (𝓞 K),
+        FractionalIdeal.count K p I
+          ≤ FractionalIdeal.count K p (FractionalIdeal.spanSingleton (𝓞 K)⁰ x) := by
     intro p
     obtain ⟨c, ⟨hc0, hcount⟩, hle⟩ := hloc p
-    rw [valuation_eq_exp_count p hx, valuation_eq_exp_count p hc0, WithZero.exp_le_exp, hcount] at hle
+    rw [valuation_eq_exp_count p hx, valuation_eq_exp_count p hc0, WithZero.exp_le_exp, hcount]
+      at hle
     linarith
   set J := FractionalIdeal.spanSingleton (𝓞 K)⁰ x * I⁻¹ with hJdef
   have hJ0 : J ≠ 0 := mul_ne_zero hs (inv_ne_zero hI)
@@ -116,7 +124,9 @@ theorem mem_of_loc' : MemOfLoc := by
   have hJI : J * I = FractionalIdeal.spanSingleton (𝓞 K)⁰ x := by
     rw [hJdef, mul_assoc, inv_mul_cancel₀ hI, mul_one]
   rw [← FractionalIdeal.spanSingleton_le_iff_mem, ← hJI]
-  calc J * I ≤ 1 * I := mul_le_mul_r hJ I
+  calc
+    J * I
+      ≤ 1 * I := mul_le_mul_r hJ I
     _ = I := one_mul I
 
 end Formalism.L2.LamCM

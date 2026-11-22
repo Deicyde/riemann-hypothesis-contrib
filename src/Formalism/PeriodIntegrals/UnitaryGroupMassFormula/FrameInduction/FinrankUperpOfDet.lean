@@ -10,8 +10,8 @@ noncomputable section
 
 namespace PI.FrameInd
 
-def Vc (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) :
-    Matrix (Fin (2 * r + k + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ :=
+def Vc (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r)
+    : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ :=
   Matrix.of fun l i => gramVec k r z z' g i l
 
 lemma herm_mulVec_mulVec {ι κ : Type*} [Fintype ι] [Fintype κ] (H : Matrix ι ι ℂ) (A : Matrix ι κ ℂ)
@@ -53,33 +53,38 @@ lemma Vc_inj (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r)
     rw [← h3, ← h2]
   exact Matrix.eq_zero_of_mulVec_eq_zero hdet h1
 
-theorem indep_of_det (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r)
-    (hdet : (gramM k r z z' g).det ≠ 0) : LinearIndependent ℂ (gramVec k r z z' g) := by
+theorem indep_of_det
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (hdet : (gramM k r z z' g).det ≠ 0)
+    : LinearIndependent ℂ (gramVec k r z z' g) := by
   rw [Fintype.linearIndependent_iff]
   intro c hc i
   have h1 : Vc k r z z' g *ᵥ c = 0 := by rw [Vc_mulVec]; exact hc
   exact congrFun (Vc_inj k r z z' g hdet c h1) i
 
-theorem finrank_Uperp_of_det (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r)
-    (hdet : (gramM k r z z' g).det ≠ 0) :
-    Module.finrank ℂ (Uperp k r z z' g) = k - 1 := by
+theorem finrank_Uperp_of_det
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (hdet : (gramM k r z z' g).det ≠ 0)
+    : Module.finrank ℂ (Uperp k r z z' g) = k - 1 := by
   obtain ⟨R, hR⟩ : ∃ R, R = (Vc k r z z' g)ᴴ * Hpk k r := ⟨_, rfl⟩
   have hRV : R * Vc k r z z' g = gramM k r z z' g := by rw [hR, gramM_eq]
   have hrk1 : (gramM k r z z' g).rank = 2 * r + 2 := by
     rw [Matrix.rank_of_isUnit _ ((Matrix.isUnit_iff_isUnit_det _).2 (isUnit_iff_ne_zero.2 hdet))]
-    simp; ring
+    simp
+    ring
   have hrk2 : (gramM k r z z' g).rank ≤ R.rank := by rw [← hRV]; exact Matrix.rank_mul_le_left _ _
   have hrk3 : R.rank ≤ 2 * r + 2 := by
     have := Matrix.rank_le_card_height R
-    simp at this; omega
+    simp at this
+    omega
   have hrn := LinearMap.finrank_range_add_finrank_ker (Matrix.mulVecLin R)
   have hrank : R.rank = Module.finrank ℂ (LinearMap.range (Matrix.mulVecLin R)) := rfl
   rw [Uperp_mat, ← hR]
   simp only [Module.finrank_fin_fun] at hrn
   omega
 
-theorem det_ne (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (γ : B.Mat k r) (hs : Std k r z z')
-    (hp : PosPt k r z z' γ) : (gramM k r z z' γ).det ≠ 0 := by
+theorem det_ne
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (γ : B.Mat k r)
+    (hs : Std k r z z') (hp : PosPt k r z z' γ)
+    : (gramM k r z z' γ).det ≠ 0 := by
   intro h0
   have h := Formalism.QuantumDeterminants.group_gram_holds k r z z' hs.2.1.1 hs.2.2.1 γ hp.1
   rw [h0, mul_zero] at h

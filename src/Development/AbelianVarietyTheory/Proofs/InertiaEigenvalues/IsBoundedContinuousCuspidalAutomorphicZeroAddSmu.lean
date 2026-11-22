@@ -12,7 +12,8 @@ namespace GlobalTheory.JSW
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem continuous_unip_adele {r : ℕ} : Continuous fun x : BlockIx a r → Ad E => (unip x : GA E a) := by
+theorem continuous_unip_adele {r : ℕ}
+    : Continuous fun x : BlockIx a r → Ad E => (unip x : GA E a) := by
   have hn : Continuous fun x : BlockIx a r → Ad E => (nilM x : Matrix (Fin a) (Fin a) (Ad E)) := by
     refine continuous_pi fun i => continuous_pi fun j => ?_
     simp only [nilM, Matrix.of_apply]
@@ -23,9 +24,10 @@ theorem continuous_unip_adele {r : ℕ} : Continuous fun x : BlockIx a r → Ad 
   · exact continuous_const.add hn
   · exact continuous_const.sub hn
 
-theorem isBCC_zero_and_add : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
-    IsBCC (0 : GA E a → ℂ) ∧
-    ∀ (c : ℂ) (F G : GA E a → ℂ), IsBCC F → IsBCC G → IsBCC (c • F + G) := by
+theorem isBCC_zero_and_add
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
+      IsBCC (0 : GA E a → ℂ)
+        ∧ ∀ (c : ℂ) (F G : GA E a → ℂ), IsBCC F → IsBCC G → IsBCC (c • F + G) := by
   intro E _ _ _ a
   refine ⟨⟨continuous_const, ⟨0, fun g => by simp⟩, ?_, fun _ _ => rfl⟩, ?_⟩
   · intro r _ _ _ _ μ 𝓕 _ _ g
@@ -47,7 +49,8 @@ theorem isBCC_zero_and_add : ∀ (E : Type) [Field E] [NumberField E] [_root_.Nu
         have hc : Continuous fun x : BlockIx a r → Ad E => H (unip x * g) :=
           hH.cont.comp (continuous_unip_adele.mul continuous_const)
         haveI : IsFiniteMeasure (μ.restrict 𝓕) := ⟨by rw [Measure.restrict_apply_univ]; exact hfin⟩
-        exact Integrable.of_bound hc.aestronglyMeasurable C (Filter.Eventually.of_forall fun x => hC _)
+        exact Integrable.of_bound hc.aestronglyMeasurable C
+          (Filter.Eventually.of_forall fun x => hC _)
       simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
       rw [integral_add ((hint F hF).const_mul c) (hint G hG), integral_const_mul,
         hF.cusp r h0 h1 μ 𝓕 hμ hFd g, hG.cusp r h0 h1 μ 𝓕 hμ hFd g]

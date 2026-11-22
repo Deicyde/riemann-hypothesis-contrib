@@ -16,7 +16,8 @@ theorem schwarzBall : ReciprocityTheory.ChartRestriction.G.TB.SchwarzBallSt := b
   · simp
   have hzpos : 0 < ‖z‖ := norm_pos_iff.mpr hz0
   have hzρ : ‖z‖ < ρ := mem_ball_zero_iff.mp hz
-  have hmaps : Set.MapsTo (fun w : ℂ => w • z) (Metric.ball 0 (ρ / ‖z‖)) (Metric.ball (0 : E) ρ) := by
+  have hmaps
+      : Set.MapsTo (fun w : ℂ => w • z) (Metric.ball 0 (ρ / ‖z‖)) (Metric.ball (0 : E) ρ) := by
     intro w hw
     rw [mem_ball_zero_iff] at hw ⊢
     rw [norm_smul]
@@ -27,8 +28,9 @@ theorem schwarzBall : ReciprocityTheory.ChartRestriction.G.TB.SchwarzBallSt := b
   have h1 : (1 : ℂ) ∈ Metric.ball (0 : ℂ) (ρ / ‖z‖) := by
     rw [mem_ball_zero_iff, norm_one, lt_div_iff₀ hzpos, one_mul]
     exact hzρ
-  have hmap2 : Set.MapsTo (fun w : ℂ => u (w • z)) (Metric.ball 0 (ρ / ‖z‖))
-      (Metric.closedBall (u ((0 : ℂ) • z)) M) := by
+  have hmap2 : Set.MapsTo
+      (fun w : ℂ => u (w • z))
+      (Metric.ball 0 (ρ / ‖z‖)) (Metric.closedBall (u ((0 : ℂ) • z)) M) := by
     intro w hw
     rw [Metric.mem_closedBall, dist_eq_norm, zero_smul]
     exact hM _ (hmaps hw)

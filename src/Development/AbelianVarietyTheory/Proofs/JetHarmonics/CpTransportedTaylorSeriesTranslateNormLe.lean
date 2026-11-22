@@ -138,36 +138,50 @@ lemma analyticAt_shift {F : ℂ → ℂ} {t : ℂ} (hF : AnalyticAt ℂ F t) :
     AnalyticAt ℂ (fun z => F (z + t)) 0 :=
   AnalyticAt.comp_of_eq (g := F) (f := fun z => z + t) hF (by fun_prop) (by simp)
 
-theorem translate_norm_le : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ℓ : ℂ_[q]⟦X⟧) (φ : ℂ → ℂ) (t : ℂ) (B : ℝ), M.Chart ℓ → Ell M.L φ → AnalyticAt ℂ φ 0 → AnalyticAt ℂ φ t → (∀ p, meromorphicOrderAt φ p < 0 → ¬ M.Small p) → ¬ M.Small t → Bdd (hat M.ι ℓ (fun z => φ (z + t))) → Bd B (hat M.ι ℓ φ) → Bd B (hat M.ι ℓ (fun z => φ (z + t))) := by
+theorem translate_norm_le
+    : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ℓ : ℂ_[q]⟦X⟧) (φ : ℂ → ℂ) (t : ℂ) (B : ℝ),
+      M.Chart ℓ → Ell M.L φ → AnalyticAt ℂ φ 0 → AnalyticAt ℂ φ t
+        → (∀ p, meromorphicOrderAt φ p < 0 → ¬ M.Small p) → ¬ M.Small t
+        → Bdd (hat M.ι ℓ (fun z => φ (z + t))) → Bd B (hat M.ι ℓ φ)
+        → Bd B (hat M.ι ℓ (fun z => φ (z + t))) := by
   intro q _ M ℓ φ t B hc hE h0 ht hpole hts hbdd hB
   have hB0 : 0 ≤ B := (norm_nonneg _).trans (hB 0)
   have hℓ := hc.2.1
   obtain ⟨hl1, hl2, -⟩ := TaylorRead.hat_laws q M.ι ℓ hℓ
-  obtain ⟨m, P, A, B', hP, hid⟩ := GlobalTheory.T.exists_ellipticFunction_mul_prod_eq_xy q M φ hc.1 hE
-  have hPx : ∀ i, ‖M.ι (M.x (P i))‖ ≤ 1 := fun i =>
-    not_lt.1 fun h => hpole _ (hP i).2 (Or.inr h)
-  obtain ⟨-, v, xs, ys, -, hxs, hys, -, hxs0, hys0, -, -, -, hread⟩ := GlobalTheory.T.integral_weierstrass_chart_xy_unit_series q M ℓ hc
+  obtain ⟨m, P, A, B', hP, hid⟩ :=
+    GlobalTheory.T.exists_ellipticFunction_mul_prod_eq_xy q M φ hc.1 hE
+  have hPx : ∀ i, ‖M.ι (M.x (P i))‖ ≤ 1 := fun i => not_lt.1 fun h => hpole _ (hP i).2 (Or.inr h)
+  obtain ⟨-, v, xs, ys, -, hxs, hys, -, hxs0, hys0, -, -, -, hread⟩ :=
+    GlobalTheory.T.integral_weierstrass_chart_xy_unit_series q M ℓ hc
   set D : Polynomial ℂ := ∏ i, (Polynomial.X - Polynomial.C (M.x (P i))) with hD
   set k := max A.natDegree B'.natDegree with hk
-  have e0 := hread φ A B' k h0 (le_max_left _ _) (le_max_right _ _) (fun _ => 1) analyticAt_const
-    D D.natDegree le_rfl (by simpa only [one_mul] using hid 0)
-  have hS : Bd B (∑ i ∈ Finset.range (k + 1),
-      (C (M.ι (A.coeff i)) * X ^ (2 * (k - i) + 3) * xs ^ i +
-        C (M.ι (B'.coeff i)) * X ^ (2 * (k - i)) * xs ^ i * ys)) := by
+  have e0 :=
+    hread φ A B' k h0 (le_max_left _ _) (le_max_right _ _)
+      (fun _ => 1)
+      analyticAt_const D D.natDegree le_rfl (by simpa only [one_mul] using hid 0)
+  have hS : Bd B
+      (∑ i ∈ Finset.range (k + 1),
+        (C (M.ι (A.coeff i)) * X ^ (2 * (k - i) + 3) * xs ^ i +
+          C (M.ι (B'.coeff i)) * X ^ (2 * (k - i)) * xs ^ i * ys)) := by
     refine (sup_norm_laws q).2.2.2.2.2 _ 1 (2 * D.natDegree) B bd_one (by simp) ?_
     rw [hl2, map_one, map_one, one_mul] at e0
     rw [mul_one, ← e0]
     refine bd_mul_one (bd_mul_one hB (bd_pow bd_X _)) (bd_sum _ _ zero_le_one fun i _ => ?_)
-    exact bd_mul_one (bd_mul_one (bd_C (norm_coeff_prod M.ι _ hPx i)) (bd_pow bd_X _)) (bd_pow hxs _)
-  have hco := Triang.coeff_norm_le q xs ys k (fun i => M.ι (A.coeff i)) (fun i => M.ι (B'.coeff i)) B
-    hxs hys hxs0 hys0 hS
+    exact bd_mul_one (bd_mul_one (bd_C (norm_coeff_prod M.ι _ hPx i)) (bd_pow bd_X _))
+      (bd_pow hxs _)
+  have hco :=
+    Triang.coeff_norm_le q xs ys k
+      (fun i => M.ι (A.coeff i))
+      (fun i => M.ι (B'.coeff i))
+      B hxs hys hxs0 hys0 hS
   obtain ⟨hxt, hyt, hbig⟩ := GlobalTheory.T.chart_hat_coeff_bounds q M ℓ t hc hts
   have htl : t ∉ M.L.lattice := fun h => hts (Or.inl h)
   have ax := analyticAt_shift (analyticAt_x_of_not_mem_lattice M htl)
   have ay := analyticAt_shift (analyticAt_y M htl)
   have aφ := analyticAt_shift ht
-  have hev : ∀ᶠ z in 𝓝[≠] (0 : ℂ), φ (z + t) * D.eval (M.x (z + t)) =
-      A.eval (M.x (z + t)) + B'.eval (M.x (z + t)) * M.y (z + t) := by
+  have hev
+      : ∀ᶠ z in 𝓝[≠] (0 : ℂ), φ (z + t) * D.eval (M.x (z + t)) =
+        A.eval (M.x (z + t)) + B'.eval (M.x (z + t)) * M.y (z + t) := by
     have tt : Filter.Tendsto (fun z : ℂ => z + t) (𝓝[≠] 0) (𝓝[≠] t) := by
       refine tendsto_nhdsWithin_iff.2 ⟨?_, ?_⟩
       · have : Filter.Tendsto (fun z : ℂ => z + t) (𝓝 0) (𝓝 (0 + t)) :=
@@ -177,20 +191,23 @@ theorem translate_norm_le : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ℓ : ℂ_
       · filter_upwards [self_mem_nhdsWithin] with z hz
         simpa using hz
     exact tt.eventually (hid t)
-  have e1 := (hl1 _ _ (aφ.mul (analyticAt_eval D ax))
-    ((analyticAt_eval A ax).add ((analyticAt_eval B' ax).mul ay))).2.2.1 hev
+  have e1 :=
+    (hl1 _ _ (aφ.mul (analyticAt_eval D ax))
+      ((analyticAt_eval A ax).add ((analyticAt_eval B' ax).mul ay))).2.2.1 hev
   have e2 := (hl1 _ _ aφ (analyticAt_eval D ax)).2.1
   have e3 := (hl1 _ _ (analyticAt_eval A ax) ((analyticAt_eval B' ax).mul ay)).1
   have e4 := (hl1 _ _ (analyticAt_eval B' ax) ay).2.1
-  have e5 : hat M.ι ℓ (fun z => φ (z + t)) * hat M.ι ℓ (fun z => D.eval (M.x (z + t))) =
-      hat M.ι ℓ (fun z => A.eval (M.x (z + t))) +
-        hat M.ι ℓ (fun z => B'.eval (M.x (z + t))) * hat M.ι ℓ (fun z => M.y (z + t)) := by
+  have e5
+      : hat M.ι ℓ (fun z => φ (z + t)) * hat M.ι ℓ (fun z => D.eval (M.x (z + t)))
+        = hat M.ι ℓ (fun z => A.eval (M.x (z + t)))
+          + hat M.ι ℓ (fun z => B'.eval (M.x (z + t))) * hat M.ι ℓ (fun z => M.y (z + t)) := by
     rw [← e2, ← e4]
     exact e1.trans e3
   rw [hat_eval _ _ hℓ D ax, hat_eval _ _ hℓ A ax, hat_eval _ _ hℓ B' ax] at e5
-  have e6 : D.eval₂ ((C : ℂ_[q] →+* ℂ_[q]⟦X⟧).comp (M.ι : ℂ →+* ℂ_[q]))
-      (hat M.ι ℓ (fun z => M.x (z + t))) =
-      ∏ i, (hat M.ι ℓ (fun z => M.x (z + t)) - C (M.ι (M.x (P i)))) := by
+  have e6
+      : D.eval₂ ((C : ℂ_[q] →+* ℂ_[q]⟦X⟧).comp (M.ι : ℂ →+* ℂ_[q]))
+          (hat M.ι ℓ (fun z => M.x (z + t)))
+        = ∏ i, (hat M.ι ℓ (fun z => M.x (z + t)) - C (M.ι (M.x (P i)))) := by
     rw [hD, Polynomial.eval₂_finsetProd]
     simp
   rw [e6] at e5

@@ -10,9 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TopologicalK
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
+  GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
 open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW secZ ptF LiesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.CompHt (hodgeWt)
@@ -25,16 +27,29 @@ set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.NefDescent
 
-theorem exists_algebraic_point : ∀ (Y X : Scheme.{0}) (π : Y ⟶ X) [LocallyOfFiniteType π] (y₀ : Y), ∃ y : Y, π y = π y₀ ∧ (letI := (π.residueFieldMap y).hom.toAlgebra; Algebra.IsAlgebraic (X.residueField (π y)) (Y.residueField y)) :=
+theorem exists_algebraic_point
+    : ∀ (Y X : Scheme.{0}) (π : Y ⟶ X) [LocallyOfFiniteType π] (y₀ : Y), ∃ y : Y,
+      π y = π y₀
+        ∧ (letI := (π.residueFieldMap y).hom.toAlgebra
+           Algebra.IsAlgebraic (X.residueField (π y)) (Y.residueField y)) :=
   GlobalTheory.T.exists_mem_fiber_isAlgebraic_residueField_of_lft
 
-theorem dim_closure_eq_of_isAlgebraic : ∀ (F : Type) [Field F] (Y X : Scheme.{0}) (π : Y ⟶ X) (sX : X ⟶ Sp F) [LocallyOfFiniteType sX] [LocallyOfFiniteType (π ≫ sX)] (y : Y), (letI := (π.residueFieldMap y).hom.toAlgebra; Algebra.IsAlgebraic (X.residueField (π y)) (Y.residueField y)) → topologicalKrullDim (closure {y} : Set Y) = topologicalKrullDim (closure {π y} : Set X) :=
+theorem dim_closure_eq_of_isAlgebraic
+    : ∀ (F : Type) [Field F] (Y X : Scheme.{0}) (π : Y ⟶ X) (sX : X ⟶ Sp F) [LocallyOfFiniteType sX]
+        [LocallyOfFiniteType (π ≫ sX)] (y : Y),
+      (letI := (π.residueFieldMap y).hom.toAlgebra
+       Algebra.IsAlgebraic (X.residueField (π y)) (Y.residueField y))
+        → topologicalKrullDim (closure {y} : Set Y) = topologicalKrullDim (closure {π y} : Set X) :=
   GlobalTheory.T.topologicalKrullDim_closure_eq_of_isAlgebraic_residue
 
-theorem exists_curve_over : ∀ (F : Type) [Field F] (Y X : Scheme.{0}) (π : Y ⟶ X) (sX : X ⟶ Sp F) (p : Y ⟶ Sp F),
-    π ≫ sX = p → IsProjOver sX → IsProjOver p → Surjective π → ∀ Z : Closeds X, IsIrreducible (Z : Set X) →
-    topologicalKrullDim (Z : Set X) = 1 → ∃ C : Closeds Y, IsIrreducible (C : Set Y) ∧
-      topologicalKrullDim (C : Set Y) = 1 ∧ π '' (C : Set Y) = (Z : Set X) := by
+theorem exists_curve_over
+    : ∀ (F : Type) [Field F] (Y X : Scheme.{0}) (π : Y ⟶ X) (sX : X ⟶ Sp F) (p : Y ⟶ Sp F),
+      π ≫ sX = p → IsProjOver sX → IsProjOver p → Surjective π
+        → ∀ Z : Closeds X,
+          IsIrreducible (Z : Set X) → topologicalKrullDim (Z : Set X) = 1
+            → ∃ C : Closeds Y,
+              IsIrreducible (C : Set Y) ∧ topologicalKrullDim (C : Set Y) = 1
+                ∧ π '' (C : Set Y) = (Z : Set X) := by
   intro F _ Y X π sX p hπ hX hY hs Z hZi hZd
   obtain ⟨hPX, -⟩ := (isProjOver_iff_isProper_and_exists_isAmpleLB sX).1 hX
   obtain ⟨hPY, -⟩ := (isProjOver_iff_isProper_and_exists_isAmpleLB p).1 hY
@@ -48,9 +63,15 @@ theorem exists_curve_over : ∀ (F : Type) [Field F] (Y X : Scheme.{0}) (π : Y 
   refine ⟨Closeds.closure {y}, isIrreducible_singleton.closure, ?_, ?_⟩
   · exact hd.trans hZd
   · change π '' closure {y} = Z
-    rw [← π.isClosedMap.closure_image_eq_of_continuous π.continuous, Set.image_singleton, hy, hy₀, hη.def]
+    rw [← π.isClosedMap.closure_image_eq_of_continuous π.continuous, Set.image_singleton, hy, hy₀,
+      hη.def]
 
-theorem isNef_of_pull : ∀ (F : Type) [Field F] [NumberField F] (Y X : Scheme.{0}) (π : Y ⟶ X) (sX : X ⟶ Sp F) (p : Y ⟶ Sp F) (L : LB X) (hL : L.IsLB) (L' : LB Y) (hL' : L'.IsLB), π ≫ sX = p → IsProjOver sX → IsProjOver p → Surjective π → CechPic.pull π (cls L hL) = cls L' hL' → (letI := algebraΓOfHom p; IsNef F L') → (letI := algebraΓOfHom sX; IsNef F L) := by
+theorem isNef_of_pull
+    : ∀ (F : Type) [Field F] [NumberField F] (Y X : Scheme.{0}) (π : Y ⟶ X) (sX : X ⟶ Sp F)
+        (p : Y ⟶ Sp F) (L : LB X) (hL : L.IsLB) (L' : LB Y) (hL' : L'.IsLB),
+      π ≫ sX = p → IsProjOver sX → IsProjOver p → Surjective π
+        → CechPic.pull π (cls L hL) = cls L' hL' → (letI := algebraΓOfHom p; IsNef F L')
+        → (letI := algebraΓOfHom sX; IsNef F L) := by
   intro F _ _ Y X π sX p L hL L' hL' hπ hX hY hs hcl hnef
   letI := algebraΓOfHom sX
   letI := algebraΓOfHom p
@@ -66,14 +87,18 @@ theorem isNef_of_pull : ∀ (F : Type) [Field F] [NumberField F] (Y X : Scheme.{
   push_neg at hneg
   have hM := isLB_dual hL
   have hMpos : 0 < interNumRed F Z ![dual L] := by rw [hZ.interNumRed_dual hA hL]; linarith
-  obtain ⟨r, hr, s, hs0⟩ := PosBaseChange.exists_hasNonzeroSec (k := F) hA hM hZ.1 hZ.2.le fun _ => hMpos
+  obtain ⟨r, hr, s, hs0⟩ :=
+    PosBaseChange.exists_hasNonzeroSec (k := F) hA hM hZ.1 hZ.2.le fun _ => hMpos
   have hr' := isLB_lbPow hM r
   have hZc : Closeds.closure (π '' (C : Set Y)) = Z := by
     ext1
     simp only [Closeds.coe_closure, hCZ, Z.isClosed.closure_eq]
-  obtain ⟨φ, hφ⟩ : ∃ φ, φ ≫ redι Z = redι C ≫ π := ⟨IsClosedImmersion.lift (redι Z) (redι C ≫ π) (by
-    rw [← hZc, Scheme.Hom.ker_comp, Scheme.IdealSheafData.ker_subschemeι, Scheme.IdealSheafData.ker_subschemeι,
-      Scheme.IdealSheafData.map_vanishingIdeal]), IsClosedImmersion.lift_fac _ _ _⟩
+  obtain ⟨φ, hφ⟩ : ∃ φ, φ ≫ redι Z = redι C ≫ π := ⟨
+    IsClosedImmersion.lift (redι Z) (redι C ≫ π) (by
+      rw [← hZc, Scheme.Hom.ker_comp, Scheme.IdealSheafData.ker_subschemeι,
+        Scheme.IdealSheafData.ker_subschemeι, Scheme.IdealSheafData.map_vanishingIdeal]),
+    IsClosedImmersion.lift_fac _ _ _
+  ⟩
   have hsφ : Function.Surjective φ := fun z => by
     obtain ⟨y, hy, e⟩ := hCZ.ge ((range_redι Z).le ⟨z, rfl⟩)
     obtain ⟨y, rfl⟩ := (range_redι C).ge hy
@@ -95,19 +120,25 @@ theorem isNef_of_pull : ∀ (F : Type) [Field F] [NumberField F] (Y X : Scheme.{
   letI := algebraΓAlong F (redι C)
   have := hC.isProper_strHom
   obtain ⟨x, hx⟩ := hsφ (genericPoint _)
-  have hx' : x ∈ nonzeroLocus (secPull s φ) := (nonzeroLocus_secPull s φ).ge (by
-    change φ x ∈ nonzeroLocus s
-    rw [hx]; exact (sec_ne_zero_iff s).1 hs0)
+  have hx' : x ∈ nonzeroLocus (secPull s φ) :=
+    (nonzeroLocus_secPull s φ).ge (by
+      change φ x ∈ nonzeroLocus s
+      rw [hx]
+      exact (sec_ne_zero_iff s).1 hs0)
   obtain ⟨c, hc⟩ := hsφ z
-  have h0 := (interNum_one_nonneg_of_sec (k := F) (hA'.pull_of_isClosedImmersion (redι C))
-      ((topologicalKrullDim_red C).trans hCd) (LB.isLB_pull (LB.isLB_pull hr' _) φ) (secPull s φ)
-      ((sec_ne_zero_iff _).1 (sec_ne_zero_of_mem hx'))).2 (fun htop => hz (by
+  have h0 :=
+    (interNum_one_nonneg_of_sec (k := F) (hA'.pull_of_isClosedImmersion (redι C))
+        ((topologicalKrullDim_red C).trans hCd) (LB.isLB_pull (LB.isLB_pull hr' _) φ) (secPull s φ)
+        ((sec_ne_zero_iff _).1 (sec_ne_zero_of_mem hx'))).2 (fun htop =>
+      hz (by
         have := (nonzeroLocus_secPull s φ).le (htop.ge (show c ∈ (⊤ : Opens _) from trivial))
-        rw [← hc]; exact this))
+        rw [← hc]
+        exact this))
   have hD' := isLB_dual hL'
   have hP' := isLB_lbPow hD' r
-  have h1 : interNumRed F C ![lbPow (dual L') r] =
-      interNum F (structureModule _) ![((lbPow (dual L) r).pull (redι Z)).pull φ] := by
+  have h1
+      : interNumRed F C ![lbPow (dual L') r]
+        = interNum F (structureModule _) ![((lbPow (dual L) r).pull (redι Z)).pull φ] := by
     rw [interNumRed_one_eq hP']
     refine interNum_congr_cls F _ (isLB_vecOne (LB.isLB_pull hP' _))
       (isLB_vecOne (LB.isLB_pull (LB.isLB_pull hr' _) φ)) fun i => ?_

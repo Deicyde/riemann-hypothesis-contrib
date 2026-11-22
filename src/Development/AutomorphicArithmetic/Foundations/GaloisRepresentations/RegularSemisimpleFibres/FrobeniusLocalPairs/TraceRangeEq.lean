@@ -14,12 +14,15 @@ open scoped Classical
 
 namespace UpperTheory.Gal.InertialTypesAlt.L
 
-private theorem trace_range_eq {V : Type} [AddCommGroup V] [Module ℂ V] (T : V →ₗ[ℂ] V)
-    (F : Submodule ℂ V) [FiniteDimensional ℂ F] (h : ∀ x, T x ∈ F) :
-    LinearMap.trace ℂ (LinearMap.range T)
-      (T.restrict (p := LinearMap.range T) (q := LinearMap.range T)
-        fun v _ => LinearMap.mem_range_self T v) =
-      LinearMap.trace ℂ F (T.restrict (p := F) (q := F) fun v _ => h v) := by
+private theorem trace_range_eq
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (T : V →ₗ[ℂ] V)
+    (F : Submodule ℂ V) [FiniteDimensional ℂ F]
+    (h : ∀ x, T x ∈ F)
+    : LinearMap.trace ℂ (LinearMap.range T)
+        (T.restrict (p := LinearMap.range T) (q := LinearMap.range T) fun v _ =>
+          LinearMap.mem_range_self T v)
+      = LinearMap.trace ℂ F (T.restrict (p := F) (q := F) fun v _ => h v) := by
   have hRF : LinearMap.range T ≤ F := by
     rintro _ ⟨x, rfl⟩
     exact h x
@@ -27,8 +30,10 @@ private theorem trace_range_eq {V : Type} [AddCommGroup V] [Module ℂ V] (T : V
     FiniteDimensional.of_injective (Submodule.inclusion hRF) (Submodule.inclusion_injective hRF)
   let ι : LinearMap.range T →ₗ[ℂ] F := Submodule.inclusion hRF
   let π : F →ₗ[ℂ] LinearMap.range T := T.rangeRestrict ∘ₗ F.subtype
-  have e1 : (T.restrict (p := LinearMap.range T) (q := LinearMap.range T)
-      fun v _ => LinearMap.mem_range_self T v) = π ∘ₗ ι := by
+  have e1
+      : (T.restrict (p := LinearMap.range T) (q := LinearMap.range T) fun v _ =>
+          LinearMap.mem_range_self T v)
+        = π ∘ₗ ι := by
     ext x
     rfl
   have e2 : (T.restrict (p := F) (q := F) fun v _ => h v) = ι ∘ₗ π := by
@@ -37,11 +42,15 @@ private theorem trace_range_eq {V : Type} [AddCommGroup V] [Module ℂ V] (T : V
   rw [e1, e2]
   exact LinearMap.trace_comp_comm' ι π
 
-private theorem op_mem_fixed {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [MeasurableSpace G] [BorelSpace G] [AddCommGroup V] [Module ℂ V] (μ : Measure G)
-    [μ.IsMulLeftInvariant] (ρ : Representation ℂ G V) (U : Subgroup G) (f : G → ℂ)
-    (hf : ∀ k ∈ U, ∀ x, f (k * x) = f x) (B : V →ₗ[ℂ] V) (hB : IsIntegralOp μ ρ f B) (v : V) :
-    B v ∈ fixed ρ U := by
+private theorem op_mem_fixed
+    {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+    [BorelSpace G] [AddCommGroup V] [Module ℂ V]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (ρ : Representation ℂ G V)
+    (U : Subgroup G) (f : G → ℂ) (hf : ∀ k ∈ U, ∀ x, f (k * x) = f x)
+    (B : V →ₗ[ℂ] V) (hB : IsIntegralOp μ ρ f B)
+    (v : V)
+    : B v ∈ fixed ρ U := by
   rw [GlobalTheory.TwTrLevel.mem_fixed_iff]
   intro u hu
   rw [← sub_eq_zero, ← Module.forall_dual_apply_eq_zero_iff ℂ]
@@ -56,13 +65,17 @@ private theorem op_mem_fixed {G V : Type} [Group G] [TopologicalSpace G] [IsTopo
   funext g
   rw [hf u hu g, map_mul, Module.End.mul_apply, LinearMap.comp_apply]
 
-private theorem op_eq_sum {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [MeasurableSpace G] [BorelSpace G] [AddCommGroup V] [Module ℂ V] (μ : Measure G)
-    [μ.IsMulLeftInvariant] (K U : Subgroup G) (hKc : IsCompact (K : Set G)) (hK1 : μ K = 1)
-    (hUo : IsOpen (U : Set G)) (hUK : U ≤ K) (ρ : Representation ℂ G V) (f : G → ℂ)
-    (hf : GlobalTheory.BCT.IsHecke U f) (B : V →ₗ[ℂ] V) (hB : IsIntegralOp μ ρ f B) (w : V)
-    (hw : w ∈ fixed ρ U) :
-    B w = ((U.relIndex K : ℕ) : ℂ)⁻¹ • ∑ᶠ q : G ⧸ U, f q.out • ρ q.out w := by
+private theorem op_eq_sum
+    {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+    [BorelSpace G] [AddCommGroup V] [Module ℂ V]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (K U : Subgroup G)
+    (hKc : IsCompact (K : Set G)) (hK1 : μ K = 1) (hUo : IsOpen (U : Set G)) (hUK : U ≤ K)
+    (ρ : Representation ℂ G V)
+    (f : G → ℂ) (hf : GlobalTheory.BCT.IsHecke U f)
+    (B : V →ₗ[ℂ] V) (hB : IsIntegralOp μ ρ f B)
+    (w : V) (hw : w ∈ fixed ρ U)
+    : B w = ((U.relIndex K : ℕ) : ℂ)⁻¹ • ∑ᶠ q : G ⧸ U, f q.out • ρ q.out w := by
   have hfs := GlobalTheory.TwTrLevel.finite_supp U hUo f hf.1
   have hUfin : μ (U : Set G) ≠ ⊤ := by
     apply ne_top_of_le_ne_top (b := μ (K : Set G))
@@ -86,7 +99,9 @@ private theorem op_eq_sum {G V : Type} [Group G] [TopologicalSpace G] [IsTopolog
   rw [← sub_eq_zero, ← Module.forall_dual_apply_eq_zero_iff ℂ]
   intro l
   rw [map_sub, sub_eq_zero, (hB w l).2, finsum_eq_sum_of_support_subset _ hsupp]
-  rw [GlobalTheory.HaarSum.integral_eq_sum_cosets μ U hUo hUfin (fun g => f g * l (ρ g w)) ?_ hfs.toFinset ?_]
+  rw [GlobalTheory.HaarSum.integral_eq_sum_cosets μ U hUo hUfin
+    (fun g => f g * l (ρ g w))
+    ?_ hfs.toFinset ?_]
   · set_option synthInstance.maxHeartbeats 100000 in
       rw [hUr, map_smul, map_sum, smul_eq_mul]
     congr 1

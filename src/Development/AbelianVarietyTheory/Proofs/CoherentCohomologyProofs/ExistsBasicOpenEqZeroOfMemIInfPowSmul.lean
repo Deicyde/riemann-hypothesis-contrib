@@ -12,18 +12,19 @@ section Krull
 
 variable {A : Type*} [CommRing A] {M : Type*} [AddCommGroup M] [Module A M]
 
-theorem localizedModule_mk_one_eq_zero_iff (p : Ideal A) [p.IsPrime] (x : M) :
-    (LocalizedModule.mk x 1 : LocalizedModule p.primeCompl M) = 0 ↔ ∃ s ∉ p, s • x = 0 := by
-  have := IsLocalizedModule.eq_zero_iff p.primeCompl
-    (LocalizedModule.mkLinearMap p.primeCompl M) (m := x)
+theorem localizedModule_mk_one_eq_zero_iff (p : Ideal A) [p.IsPrime] (x : M)
+    : (LocalizedModule.mk x 1 : LocalizedModule p.primeCompl M) = 0 ↔ ∃ s ∉ p, s • x = 0 := by
+  have :=
+    IsLocalizedModule.eq_zero_iff p.primeCompl (LocalizedModule.mkLinearMap p.primeCompl M) (m := x)
   rw [LocalizedModule.mkLinearMap_apply] at this
   rw [this]
   exact ⟨fun ⟨s, hs⟩ ↦ ⟨s.1, s.2, hs⟩, fun ⟨s, hs, h⟩ ↦ ⟨⟨s, hs⟩, h⟩⟩
 
 variable [IsNoetherianRing A] [Module.Finite A M]
 
-theorem exists_smul_eq_zero_of_mem_iInf_pow_smul (I : Ideal A) {x : M}
-    (hx : x ∈ (⨅ n : ℕ, I ^ n • ⊤ : Submodule A M)) : ∃ f : A, f - 1 ∈ I ∧ f • x = 0 := by
+theorem exists_smul_eq_zero_of_mem_iInf_pow_smul
+    (I : Ideal A) {x : M} (hx : x ∈ (⨅ n : ℕ, I ^ n • ⊤ : Submodule A M))
+    : ∃ f : A, f - 1 ∈ I ∧ f • x = 0 := by
   obtain ⟨r, hr⟩ := (I.mem_iInf_smul_pow_eq_bot_iff x).1 hx
   refine ⟨1 - r, by simp, ?_⟩
   rw [sub_smul, one_smul, hr, sub_self]
@@ -34,8 +35,9 @@ section Associated
 
 variable {A : Type*} [CommRing A] [IsNoetherianRing A] {M : Type*} [AddCommGroup M] [Module A M]
 
-theorem eq_zero_of_forall_associatedPrimes_exists_smul_eq_zero {x : M}
-    (h : ∀ p ∈ associatedPrimes A M, ∃ s ∉ p, s • x = 0) : x = 0 := by
+theorem eq_zero_of_forall_associatedPrimes_exists_smul_eq_zero
+    {x : M} (h : ∀ p ∈ associatedPrimes A M, ∃ s ∉ p, s • x = 0)
+    : x = 0 := by
   by_contra hx
   obtain ⟨p, hp, hle⟩ := exists_le_isAssociatedPrime_of_isNoetherianRing A x hx
   obtain ⟨s, hs, hsx⟩ := h p hp
@@ -45,11 +47,12 @@ end Associated
 
 section Flat
 
-variable {A B : Type*} [CommRing A] [CommRing B] [Algebra A B]
-  {M : Type*} [AddCommGroup M] [Module A M]
+variable
+  {A B : Type*} [CommRing A] [CommRing B] [Algebra A B] {M : Type*} [AddCommGroup M] [Module A M]
 
-theorem under_mem_associatedPrimes [Module B M] [IsScalarTower A B M] {q : Ideal B}
-    (hq : q ∈ associatedPrimes B M) : q.under A ∈ associatedPrimes A M := by
+theorem under_mem_associatedPrimes
+    [Module B M] [IsScalarTower A B M] {q : Ideal B} (hq : q ∈ associatedPrimes B M)
+    : q.under A ∈ associatedPrimes A M := by
   obtain ⟨hq', x, hx⟩ := hq
   refine ⟨hq'.under A, x, ?_⟩
   ext a
@@ -57,15 +60,15 @@ theorem under_mem_associatedPrimes [Module B M] [IsScalarTower A B M] {q : Ideal
   simp only [Ideal.mem_radical_iff, Submodule.mem_colon_singleton, Submodule.mem_bot, ← map_pow,
     algebraMap_smul]
 
-theorem associatedPrimes_subset_of_flat [IsNoetherianRing A] [Module.Flat A M] :
-    associatedPrimes A M ⊆ associatedPrimes A A := by
+theorem associatedPrimes_subset_of_flat [IsNoetherianRing A] [Module.Flat A M]
+    : associatedPrimes A M ⊆ associatedPrimes A A := by
   intro p hp
   rw [AssociatedPrimes.mem_iff, isAssociatedPrime_iff] at hp ⊢
   obtain ⟨hp, x, hx⟩ := hp
   have hmem : ∀ a, a ∈ p ↔ a • x = 0 := fun a ↦ by simp [hx, Submodule.mem_colon_singleton]
-  obtain ⟨k, a, y, hy, ha⟩ := Module.Flat.exists_factorization_of_comp_eq_zero_of_free
-    (f := p.subtype) (x := LinearMap.toSpanSingleton A M x)
-    (by ext ⟨a, ha⟩; simpa using (hmem a).1 ha)
+  obtain ⟨k, a, y, hy, ha⟩ :=
+    Module.Flat.exists_factorization_of_comp_eq_zero_of_free (f := p.subtype)
+      (x := LinearMap.toSpanSingleton A M x) (by ext ⟨a, ha⟩; simpa using (hmem a).1 ha)
   have hx' : x = y (a 1) := by simpa using congr($hy 1)
   have hk : ∀ r ∈ p, ∀ j, r * a 1 j = 0 := fun r hr j ↦ by
     have : a r = 0 := by simpa using congr($ha ⟨r, hr⟩)
@@ -92,8 +95,9 @@ theorem associatedPrimes_subset_of_flat [IsNoetherianRing A] [Module.Flat A M] :
 
 variable [Module B M] [IsScalarTower A B M] [Module.Flat A M]
 
-theorem under_eq_of_mem_associatedPrimes_tensor_quotient (p : Ideal A) [hp : p.IsPrime]
-    {q : Ideal B} (hq : q ∈ associatedPrimes B (M ⊗[A] (A ⧸ p))) : q.under A = p := by
+theorem under_eq_of_mem_associatedPrimes_tensor_quotient
+    (p : Ideal A) [hp : p.IsPrime] {q : Ideal B} (hq : q ∈ associatedPrimes B (M ⊗[A] (A ⧸ p)))
+    : q.under A = p := by
   obtain ⟨hq', x, hx⟩ := under_mem_associatedPrimes (A := A) hq
   have key : ∀ a : A, a • x = LinearMap.lTensor M (a • LinearMap.id) x := fun a ↦ by
     rw [LinearMap.lTensor_smul, LinearMap.lTensor_id, LinearMap.smul_apply, LinearMap.id_apply]
@@ -103,13 +107,15 @@ theorem under_eq_of_mem_associatedPrimes_tensor_quotient (p : Ideal A) [hp : p.I
     obtain ⟨n, hn⟩ := ha
     rw [Submodule.mem_colon_singleton, Submodule.mem_bot, key] at hn
     have hinj : Function.Injective (a ^ n • LinearMap.id : (A ⧸ p) →ₗ[A] (A ⧸ p)) := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro z hz
       rw [LinearMap.smul_apply, LinearMap.id_apply, Algebra.smul_def, mul_eq_zero,
-        Ideal.Quotient.algebraMap_eq, Ideal.Quotient.eq_zero_iff_mem] at hz
+          Ideal.Quotient.algebraMap_eq, Ideal.Quotient.eq_zero_iff_mem]
+        at hz
       exact hz.resolve_left fun h ↦ hap (hp.mem_of_pow_mem n h)
-    have hx0 : x = 0 := Module.Flat.lTensor_preserves_injective_linearMap _ hinj
-      (hn.trans (map_zero _).symm)
+    have hx0 : x = 0 :=
+      Module.Flat.lTensor_preserves_injective_linearMap _ hinj (hn.trans (map_zero _).symm)
     exact hq'.ne_top (by simp [hx, hx0])
   · rw [hx]
     refine Ideal.le_radical ?_
@@ -119,31 +125,32 @@ theorem under_eq_of_mem_associatedPrimes_tensor_quotient (p : Ideal A) [hp : p.I
       simp [Algebra.smul_def, Ideal.Quotient.eq_zero_iff_mem.2 ha]
     simp [this]
 
-theorem mem_associatedPrimes_tensor_quotient_under [IsNoetherianRing A] {N : Type*}
-    [AddCommGroup N] [Module A N] [hN : Module.Finite A N] {q : Ideal B}
-    (hq : q ∈ associatedPrimes B (M ⊗[A] N)) :
-    q ∈ associatedPrimes B (M ⊗[A] (A ⧸ q.under A)) := by
+theorem mem_associatedPrimes_tensor_quotient_under
+    [IsNoetherianRing A]
+    {N : Type*} [AddCommGroup N] [Module A N] [hN : Module.Finite A N]
+    {q : Ideal B} (hq : q ∈ associatedPrimes B (M ⊗[A] N))
+    : q ∈ associatedPrimes B (M ⊗[A] (A ⧸ q.under A)) := by
   induction hN using IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime A with
   | subsingleton N => simp [associatedPrimes.eq_empty_of_subsingleton] at hq
   | quotient N p e =>
-    rw [LinearEquiv.AssociatedPrimes.eq
-      (AlgebraTensorModule.congr (LinearEquiv.refl B M) e)] at hq
+    rw [LinearEquiv.AssociatedPrimes.eq (AlgebraTensorModule.congr (LinearEquiv.refl B M) e)] at hq
     rwa [under_eq_of_mem_associatedPrimes_tensor_quotient p.asIdeal hq]
   | exact N₁ N₂ N₃ f g hf hg hfg h₁ h₃ =>
     have hf' : Function.Injective (AlgebraTensorModule.lTensor B M f) :=
       Module.Flat.lTensor_preserves_injective_linearMap _ hf
-    have hfg' : Function.Exact (AlgebraTensorModule.lTensor B M f)
-        (AlgebraTensorModule.lTensor B M g) := lTensor_exact M hfg hg
+    have hfg'
+        : Function.Exact (AlgebraTensorModule.lTensor B M f) (AlgebraTensorModule.lTensor B M g) :=
+      lTensor_exact M hfg hg
     exact (associatedPrimes.subset_union_of_exact hf' hfg' hq).elim h₁ h₃
 
-theorem injective_lTensor_residueField (p : Ideal A) [p.IsPrime] :
-    Function.Injective (AlgebraTensorModule.lTensor B M
+theorem injective_lTensor_residueField (p : Ideal A) [p.IsPrime]
+    : Function.Injective (AlgebraTensorModule.lTensor B M
       (IsScalarTower.toAlgHom A (A ⧸ p) p.ResidueField).toLinearMap) :=
   Module.Flat.lTensor_preserves_injective_linearMap _
     (IsFractionRing.injective (A ⧸ p) p.ResidueField)
 
-theorem associatedPrimes_tensor_residueField (p : Ideal A) [hp : p.IsPrime] :
-    associatedPrimes B (M ⊗[A] p.ResidueField) = associatedPrimes B (M ⊗[A] (A ⧸ p)) := by
+theorem associatedPrimes_tensor_residueField (p : Ideal A) [hp : p.IsPrime]
+    : associatedPrimes B (M ⊗[A] p.ResidueField) = associatedPrimes B (M ⊗[A] (A ⧸ p)) := by
   refine subset_antisymm ?_
     (associatedPrimes.subset_of_injective (injective_lTensor_residueField p))
   set φ := AlgebraTensorModule.lTensor B M
@@ -165,11 +172,12 @@ theorem associatedPrimes_tensor_residueField (p : Ideal A) [hp : p.IsPrime] :
       obtain ⟨r, hr, x', hx'⟩ := hx
       obtain ⟨s, hs, y', hy'⟩ := hy
       refine ⟨r * s, p.primeCompl.mul_mem hr hs, s • x' + r • y', ?_⟩
-      rw [map_add (f := _), LinearMap.map_smul_of_tower, LinearMap.map_smul_of_tower, hx', hy', smul_add,
-        smul_smul, smul_smul, mul_comm s r]
+      rw [map_add (f := _), LinearMap.map_smul_of_tower, LinearMap.map_smul_of_tower, hx', hy',
+        smul_add, smul_smul, smul_smul, mul_comm s r]
   have hreg : ∀ r ∉ p, ∀ x : M ⊗[A] p.ResidueField, r • x = 0 → x = 0 := fun r hr x hx ↦ by
     have h1 : Function.Injective (r • LinearMap.id : p.ResidueField →ₗ[A] p.ResidueField) := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro z hz
       simpa [Algebra.smul_def, hr] using hz
     exact Module.Flat.lTensor_preserves_injective_linearMap (M := M) _ h1 (by simpa using hx)
@@ -183,9 +191,10 @@ theorem associatedPrimes_tensor_residueField (p : Ideal A) [hp : p.IsPrime] :
   rw [← map_eq_zero_iff φ hinj, map_smul, hy, smul_comm]
   exact ⟨fun h ↦ by rw [h, smul_zero], hreg r hr _⟩
 
-theorem mem_associatedPrimes_iff_of_flat_module [IsNoetherianRing A] (q : Ideal B) [q.IsPrime] :
-    q ∈ associatedPrimes B M ↔ q.under A ∈ associatedPrimes A A ∧
-      q ∈ associatedPrimes B (M ⊗[A] (q.under A).ResidueField) := by
+theorem mem_associatedPrimes_iff_of_flat_module [IsNoetherianRing A] (q : Ideal B) [q.IsPrime]
+    : q ∈ associatedPrimes B M
+      ↔ q.under A ∈ associatedPrimes A A
+        ∧ q ∈ associatedPrimes B (M ⊗[A] (q.under A).ResidueField) := by
   rw [associatedPrimes_tensor_residueField]
   have e := LinearEquiv.AssociatedPrimes.eq (AlgebraTensorModule.rid A B M)
   constructor
@@ -200,15 +209,16 @@ theorem mem_associatedPrimes_iff_of_flat_module [IsNoetherianRing A] (q : Ideal 
     rw [← e]
     exact associatedPrimes.subset_of_injective hf' hq
 
-theorem mem_associatedPrimes_tensor_residueField_iff (p : Ideal A) [p.IsPrime] (q : Ideal B) :
-    q ∈ associatedPrimes B (B ⊗[A] p.ResidueField) ↔
-      ∃ Q ∈ associatedPrimes (p.Fiber B) (p.Fiber B),
+theorem mem_associatedPrimes_tensor_residueField_iff (p : Ideal A) [p.IsPrime] (q : Ideal B)
+    : q ∈ associatedPrimes B (B ⊗[A] p.ResidueField)
+      ↔ ∃ Q ∈ associatedPrimes (p.Fiber B) (p.Fiber B),
         Q.comap (Algebra.TensorProduct.includeRight : B →ₐ[A] p.Fiber B) = q := by
   let e := Algebra.TensorProduct.comm A B p.ResidueField
-  have key : ∀ (b : B) (x : B ⊗[A] p.ResidueField),
-      (Algebra.TensorProduct.includeRight : B →ₐ[A] p.Fiber B) b ∈
-        ((⊥ : Submodule (p.Fiber B) (p.Fiber B)).colon {e x}).radical ↔
-      b ∈ ((⊥ : Submodule B (B ⊗[A] p.ResidueField)).colon {x}).radical := fun b x ↦ by
+  have key
+      : ∀ (b : B) (x : B ⊗[A] p.ResidueField),
+        (Algebra.TensorProduct.includeRight : B →ₐ[A] p.Fiber B) b
+            ∈ ((⊥ : Submodule (p.Fiber B) (p.Fiber B)).colon {e x}).radical
+          ↔ b ∈ ((⊥ : Submodule B (B ⊗[A] p.ResidueField)).colon {x}).radical := fun b x ↦ by
     simp only [Ideal.mem_radical_iff, Submodule.mem_colon_singleton, Submodule.mem_bot, ← map_pow]
     refine exists_congr fun n ↦ ?_
     rw [← map_eq_zero_iff e e.injective, Algebra.smul_def (b ^ n) x, map_mul]
@@ -216,11 +226,14 @@ theorem mem_associatedPrimes_tensor_residueField_iff (p : Ideal A) [p.IsPrime] (
   constructor
   · rintro ⟨hq, x, hx⟩
     refine ⟨((⊥ : Submodule (p.Fiber B) (p.Fiber B)).colon {e x}).radical, ⟨⟨?_, ?_⟩, e x, rfl⟩, ?_⟩
-    · rw [Ideal.ne_top_iff_one, ← map_one (Algebra.TensorProduct.includeRight :
-        B →ₐ[A] p.Fiber B), key, ← hx, ← Ideal.ne_top_iff_one]
+    · rw [Ideal.ne_top_iff_one, ← map_one (Algebra.TensorProduct.includeRight : B →ₐ[A] p.Fiber B),
+        key, ← hx, ← Ideal.ne_top_iff_one]
       exact hq.ne_top
-    · have aux : ∀ y : p.Fiber B, ∃ u : p.Fiber B, IsUnit u ∧ ∃ b : B,
-          u * y = (Algebra.TensorProduct.includeRight : B →ₐ[A] p.Fiber B) b := fun y ↦ by
+    · have aux
+          : ∀ y : p.Fiber B, ∃ u : p.Fiber B,
+            IsUnit u
+              ∧ ∃ b : B,
+                u * y = (Algebra.TensorProduct.includeRight : B →ₐ[A] p.Fiber B) b := fun y ↦ by
         obtain ⟨r, hr, s, h⟩ := Ideal.Fiber.exists_smul_eq_one_tmul p y
         refine ⟨algebraMap A _ r, ?_, s, by rw [← Algebra.smul_def, h]; rfl⟩
         rw [IsScalarTower.algebraMap_apply A p.ResidueField (p.Fiber B)]
@@ -243,16 +256,17 @@ theorem mem_associatedPrimes_tensor_residueField_iff (p : Ideal A) [p.IsPrime] (
 
 variable [Module.Flat A B]
 
-theorem mem_associatedPrimes_iff_of_flat [IsNoetherianRing A] (q : Ideal B) [q.IsPrime] :
-    q ∈ associatedPrimes B B ↔ q.under A ∈ associatedPrimes A A ∧
-      ∃ Q ∈ associatedPrimes ((q.under A).Fiber B) ((q.under A).Fiber B),
-        Q.comap (Algebra.TensorProduct.includeRight : B →ₐ[A] (q.under A).Fiber B) = q := by
+theorem mem_associatedPrimes_iff_of_flat [IsNoetherianRing A] (q : Ideal B) [q.IsPrime]
+    : q ∈ associatedPrimes B B
+      ↔ q.under A ∈ associatedPrimes A A
+        ∧ ∃ Q ∈ associatedPrimes ((q.under A).Fiber B) ((q.under A).Fiber B),
+          Q.comap (Algebra.TensorProduct.includeRight : B →ₐ[A] (q.under A).Fiber B) = q := by
   rw [mem_associatedPrimes_iff_of_flat_module (A := A),
     mem_associatedPrimes_tensor_residueField_iff]
 
-theorem ker_includeRight_fiber (p : Ideal A) [p.IsPrime] :
-    RingHom.ker (Algebra.TensorProduct.includeRight : B →ₐ[A] p.Fiber B) =
-      p.map (algebraMap A B) := by
+theorem ker_includeRight_fiber (p : Ideal A) [p.IsPrime]
+    : RingHom.ker (Algebra.TensorProduct.includeRight : B →ₐ[A] p.Fiber B)
+      = p.map (algebraMap A B) := by
   ext b
   rw [RingHom.mem_ker, ← Ideal.Quotient.eq_zero_iff_mem,
     ← map_eq_zero_iff _ (Algebra.TensorProduct.quotIdealMapEquivTensorQuot B p).injective,
@@ -261,10 +275,10 @@ theorem ker_includeRight_fiber (p : Ideal A) [p.IsPrime] :
     ← map_eq_zero_iff _ (Algebra.TensorProduct.comm A p.ResidueField B).injective]
   simp
 
-theorem mem_associatedPrimes_iff_eq_map_of_flat [IsNoetherianRing A] (q : Ideal B) [hq : q.IsPrime]
-    [NoZeroDivisors ((q.under A).Fiber B)] :
-    q ∈ associatedPrimes B B ↔ q.under A ∈ associatedPrimes A A ∧
-      q = (q.under A).map (algebraMap A B) := by
+theorem mem_associatedPrimes_iff_eq_map_of_flat
+    [IsNoetherianRing A] (q : Ideal B) [hq : q.IsPrime] [NoZeroDivisors ((q.under A).Fiber B)]
+    : q ∈ associatedPrimes B B
+      ↔ q.under A ∈ associatedPrimes A A ∧ q = (q.under A).map (algebraMap A B) := by
   rw [mem_associatedPrimes_iff_of_flat (A := A), and_congr_right_iff,
     ← ker_includeRight_fiber (q.under A)]
   intro _
@@ -277,7 +291,8 @@ theorem mem_associatedPrimes_iff_eq_map_of_flat [IsNoetherianRing A] (q : Ideal 
       rw [eq_bot_iff, hx]
       rintro y ⟨n, hn⟩
       simp only [Submodule.mem_colon_singleton, smul_eq_mul, Submodule.mem_bot, mul_eq_zero, hx0,
-        or_false] at hn
+          or_false]
+        at hn
       exact eq_zero_of_pow_eq_zero hn
     rw [RingHom.ker_eq_comap_bot, ← this, h]
   · intro h
@@ -291,10 +306,11 @@ theorem mem_associatedPrimes_iff_eq_map_of_flat [IsNoetherianRing A] (q : Ideal 
     simp only [Submodule.mem_colon_singleton, smul_eq_mul, Submodule.mem_bot, mul_one] at hn
     exact eq_zero_of_pow_eq_zero hn
 
-theorem mem_associatedPrimes_iff_generic_of_flat [IsNoetherianRing A] (q : Ideal B)
-    [hq : q.IsPrime] [NoZeroDivisors ((q.under A).Fiber B)] :
-    q ∈ associatedPrimes B B ↔ q.under A ∈ associatedPrimes A A ∧
-      ∀ q' : Ideal B, q'.IsPrime → q'.under A = q.under A → q ≤ q' := by
+theorem mem_associatedPrimes_iff_generic_of_flat
+    [IsNoetherianRing A] (q : Ideal B) [hq : q.IsPrime] [NoZeroDivisors ((q.under A).Fiber B)]
+    : q ∈ associatedPrimes B B
+      ↔ q.under A ∈ associatedPrimes A A
+        ∧ ∀ q' : Ideal B, q'.IsPrime → q'.under A = q.under A → q ≤ q' := by
   rw [mem_associatedPrimes_iff_eq_map_of_flat (A := A), and_congr_right_iff]
   intro _
   constructor
@@ -313,13 +329,18 @@ theorem mem_associatedPrimes_iff_generic_of_flat [IsNoetherianRing A] (q : Ideal
       exact RingHom.ker_isPrime _
     · exact le_antisymm (Ideal.comap_mono hle) Ideal.le_comap_map
 
-theorem eq_zero_of_flat_of_forall_fiber [IsNoetherianRing A] [IsNoetherianRing B]
+theorem eq_zero_of_flat_of_forall_fiber
+    [IsNoetherianRing A] [IsNoetherianRing B]
     {L : Type*} [AddCommGroup L] [Module B L] [Module.Flat B L]
-    (hfib : ∀ p : PrimeSpectrum A, p.asIdeal ∈ associatedPrimes A A →
-      NoZeroDivisors (p.asIdeal.Fiber B)) {x : L}
-    (hx : ∀ q : PrimeSpectrum B, q.asIdeal.under A ∈ associatedPrimes A A →
-      ∃ q' : PrimeSpectrum B, q'.asIdeal.under A = q.asIdeal.under A ∧
-        (LocalizedModule.mk x 1 : LocalizedModule q'.asIdeal.primeCompl L) = 0) : x = 0 := by
+    (hfib : ∀ p : PrimeSpectrum A,
+      p.asIdeal ∈ associatedPrimes A A → NoZeroDivisors (p.asIdeal.Fiber B))
+    {x : L}
+    (hx : ∀ q : PrimeSpectrum B,
+      q.asIdeal.under A ∈ associatedPrimes A A
+        → ∃ q' : PrimeSpectrum B,
+          q'.asIdeal.under A = q.asIdeal.under A
+            ∧ (LocalizedModule.mk x 1 : LocalizedModule q'.asIdeal.primeCompl L) = 0)
+    : x = 0 := by
   refine eq_zero_of_forall_associatedPrimes_exists_smul_eq_zero (A := B) fun q hq ↦ ?_
   have hqB := associatedPrimes_subset_of_flat hq
   haveI := hqB.isPrime
@@ -327,8 +348,12 @@ theorem eq_zero_of_flat_of_forall_fiber [IsNoetherianRing A] [IsNoetherianRing B
   haveI := hfib ⟨q.under A, inferInstance⟩ hp
   obtain ⟨q', h1, h2⟩ := hx ⟨q, inferInstance⟩ hp
   obtain ⟨s, hs, h⟩ := (localizedModule_mk_one_eq_zero_iff q'.asIdeal x).1 h2
-  exact ⟨s, fun hsq ↦ hs (((mem_associatedPrimes_iff_generic_of_flat (A := A) q).1 hqB).2
-    q'.asIdeal q'.2 h1 hsq), h⟩
+  exact ⟨
+    s,
+    fun hsq ↦
+      hs (((mem_associatedPrimes_iff_generic_of_flat (A := A) q).1 hqB).2 q'.asIdeal q'.2 h1 hsq),
+    h
+  ⟩
 
 end Flat
 
@@ -336,45 +361,51 @@ section Symbolic
 
 variable {R : Type*} [CommRing R]
 
-
 open IsLocalRing in
-theorem exists_sup_maximalIdeal_pow_stable [IsNoetherianRing R] [IsLocalRing R]
-    (J : ℕ → Ideal R) (hJ : Antitone J) (k : ℕ) :
-    ∃ m, ∀ m' ≥ m, J m' ⊔ IsLocalRing.maximalIdeal R ^ k =
-      J m ⊔ IsLocalRing.maximalIdeal R ^ k := by
+theorem exists_sup_maximalIdeal_pow_stable
+    [IsNoetherianRing R] [IsLocalRing R] (J : ℕ → Ideal R) (hJ : Antitone J) (k : ℕ)
+    : ∃ m, ∀ m' ≥ m,
+      J m' ⊔ IsLocalRing.maximalIdeal R ^ k = J m ⊔ IsLocalRing.maximalIdeal R ^ k := by
   have hdim : Ring.KrullDimLE 0 (R ⧸ IsLocalRing.maximalIdeal R ^ k) := by
     rw [Ring.krullDimLE_zero_iff]
     intro Q hQ
-    have h1 : IsLocalRing.maximalIdeal R ^ k ≤
-        Q.comap (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k)) :=
-      fun x hx ↦ by simp [Ideal.Quotient.eq_zero_iff_mem.2 hx]
-    have h2 : IsLocalRing.maximalIdeal R =
-        Q.comap (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k)) :=
+    have h1
+        : IsLocalRing.maximalIdeal R ^ k
+          ≤ Q.comap (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k)) := fun x hx ↦ by
+      simp [Ideal.Quotient.eq_zero_iff_mem.2 hx]
+    have h2
+        : IsLocalRing.maximalIdeal R
+          = Q.comap (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k)) :=
       (IsLocalRing.maximalIdeal.isMaximal R).eq_of_le (Ideal.IsPrime.ne_top inferInstance)
         (Ideal.IsPrime.le_of_pow_le h1)
     have h3 : (Q.comap (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k))).IsMaximal :=
       h2 ▸ IsLocalRing.maximalIdeal.isMaximal R
-    have h4 := Ideal.IsMaximal.map_of_surjective_of_ker_le
-      (f := Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k)) Ideal.Quotient.mk_surjective
-      (m := Q.comap (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k))) (by simpa using h1)
+    have h4 :=
+      Ideal.IsMaximal.map_of_surjective_of_ker_le
+        (f := Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k)) Ideal.Quotient.mk_surjective
+        (m := Q.comap (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k))) (by simpa using h1)
     rwa [Ideal.map_comap_of_surjective _ Ideal.Quotient.mk_surjective] at h4
   have hart : IsArtinianRing (R ⧸ IsLocalRing.maximalIdeal R ^ k) :=
     IsNoetherianRing.isArtinianRing_of_krullDimLE_zero
-  obtain ⟨m, hm⟩ := monotone_stabilizes_iff_artinian.2 hart
-    ⟨fun n ↦ OrderDual.toDual ((J n).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k))),
-      fun a b hab ↦ Ideal.map_mono (hJ hab)⟩
+  obtain ⟨m, hm⟩ :=
+    monotone_stabilizes_iff_artinian.2 hart ⟨
+      fun n ↦ OrderDual.toDual ((J n).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k))),
+      fun a b hab ↦ Ideal.map_mono (hJ hab)
+    ⟩
   refine ⟨m, fun m' hm' ↦ ?_⟩
-  have h : (J m).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k)) =
-      (J m').map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k)) := hm m' hm'
+  have h
+      : (J m).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k))
+        = (J m').map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k)) :=
+    hm m' hm'
   have := congrArg (Ideal.comap (Ideal.Quotient.mk (IsLocalRing.maximalIdeal R ^ k))) h
   simpa [Ideal.comap_map_quotientMk, sup_comm] using this.symm
 
-
 open IsLocalRing in
-theorem exists_le_maximalIdeal_pow_of_iInf_eq_bot [IsNoetherianRing R] [IsLocalRing R]
-    [IsPrecomplete (IsLocalRing.maximalIdeal R) R] (J : ℕ → Ideal R)
-    (hJ : Antitone J) (h0 : ⨅ m, J m = ⊥)
-    (k : ℕ) : ∃ m, J m ≤ IsLocalRing.maximalIdeal R ^ k := by
+theorem exists_le_maximalIdeal_pow_of_iInf_eq_bot
+    [IsNoetherianRing R] [IsLocalRing R] [IsPrecomplete (IsLocalRing.maximalIdeal R) R]
+    (J : ℕ → Ideal R) (hJ : Antitone J) (h0 : ⨅ m, J m = ⊥)
+    (k : ℕ)
+    : ∃ m, J m ≤ IsLocalRing.maximalIdeal R ^ k := by
   set 𝔪 := IsLocalRing.maximalIdeal R
   choose s hs using exists_sup_maximalIdeal_pow_stable J hJ
   let B : ℕ → Ideal R := fun k ↦ J (s k) ⊔ 𝔪 ^ k
@@ -398,17 +429,19 @@ theorem exists_le_maximalIdeal_pow_of_iInf_eq_bot [IsNoetherianRing R] [IsLocalR
       have h1 : f (n + d) - f (n + d + 1) ∈ 𝔪 ^ (k + n) :=
         Ideal.pow_le_pow_right (by omega) (hg' _ _ (hf (n + d)))
       simpa [add_assoc] using (𝔪 ^ (k + n)).add_mem ih h1
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := 𝔪) f fun {m n} hmn ↦ by
-    obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hmn
-    rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
-    exact Ideal.pow_le_pow_right (by omega) (hf' m d)
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec' (I := 𝔪) f fun {m n} hmn ↦ by
+      obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hmn
+      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
+      exact Ideal.pow_le_pow_right (by omega) (hf' m d)
   simp only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top] at hL
   have hL0 : L = 0 := by
     rw [← Ideal.mem_bot, ← h0, Submodule.mem_iInf]
     intro m
     rw [← Ideal.Quotient.eq_zero_iff_mem, ← Submodule.mem_bot R,
       ← Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (M := R ⧸ J m) 𝔪
-        (IsLocalRing.maximalIdeal.isMaximal R).ne_top, Submodule.mem_iInf]
+        (IsLocalRing.maximalIdeal.isMaximal R).ne_top,
+      Submodule.mem_iInf]
     intro n
     obtain ⟨y, hy, z, hz, e⟩ := Submodule.mem_sup.1 (hB (k + n) m (hf n))
     have hz' : z - (f n - L) ∈ 𝔪 ^ n :=

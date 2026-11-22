@@ -9,21 +9,25 @@ open TensorProduct
 
 namespace LateralTheory.CohomologicalPurity.ChartCut
 
-theorem pick_span_top (A M K : Type) [CommRing A] [AddCommGroup M] [Module A M] [Field K] [Algebra A K] :
-    Submodule.span K (Set.range fun m : M => (1 : K) ⊗ₜ[A] m) = ⊤ := by
+theorem pick_span_top
+    (A M K : Type) [CommRing A] [AddCommGroup M] [Module A M] [Field K] [Algebra A K]
+    : Submodule.span K (Set.range fun m : M => (1 : K) ⊗ₜ[A] m) = ⊤ := by
   rw [eq_top_iff]
   intro v _
   induction v using TensorProduct.induction_on with
   | zero => exact zero_mem _
   | tmul k m =>
-    have : k ⊗ₜ[A] m = k • ((1 : K) ⊗ₜ[A] m) := by rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
-    rw [this]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨m, rfl⟩)
+    have : k ⊗ₜ[A] m = k • ((1 : K) ⊗ₜ[A] m) := by
+      rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
+    rw [this]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨m, rfl⟩)
   | add a c ha hc => exact add_mem (ha trivial) (hc trivial)
 
 theorem LeafPick_of : LeafPick := by
   intro d A M _ _ _ _ p _ hd
   set K := p.ResidueField
-  obtain ⟨b, hbs, hbspan, hbli⟩ := exists_linearIndependent K (Set.range fun m : M => (1 : K) ⊗ₜ[A] m)
+  obtain ⟨b, hbs, hbspan, hbli⟩ :=
+    exists_linearIndependent K (Set.range fun m : M => (1 : K) ⊗ₜ[A] m)
   rw [pick_span_top] at hbspan
   let B : Module.Basis b K (K ⊗[A] M) := Module.Basis.mk hbli (by rw [Subtype.range_coe, hbspan])
   let _ : Fintype b := FiniteDimensional.fintypeBasisIndex B
@@ -37,8 +41,7 @@ theorem LeafPick_of : LeafPick := by
   choose x hx using hmem
   set N := Submodule.span A (Set.range x)
   let g : K ⊗[A] M →ₗ[K] K ⊗[A] (M ⧸ N) := (N.mkQ).baseChange K
-  have hgsurj : Function.Surjective g :=
-    LinearMap.lTensor_surjective K (Submodule.mkQ_surjective N)
+  have hgsurj : Function.Surjective g := LinearMap.lTensor_surjective K (Submodule.mkQ_surjective N)
   have hg0 : ∀ v, g v = 0 := by
     intro v
     have hv : v ∈ Submodule.span K (Set.range B') := by rw [B'.span_eq]; trivial
@@ -50,7 +53,8 @@ theorem LeafPick_of : LeafPick := by
     · intro a c _ _ ha hc; simp [ha, hc]
     · intro r a _ ha; simp [ha]
   have hsub : Subsingleton (K ⊗[A] (M ⧸ N)) := by
-    constructor; intro u w
+    constructor
+    intro u w
     obtain ⟨u', rfl⟩ := hgsurj u
     obtain ⟨w', rfl⟩ := hgsurj w
     rw [hg0, hg0]

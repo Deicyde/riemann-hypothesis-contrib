@@ -15,8 +15,8 @@ namespace GlobalTheory.CompanionTheory.RgClusterOrder
 
 def rootHt {n : ℕ} (i : Pos n) : ℕ := (i.1.2 : ℕ) - (i.1.1 : ℕ)
 
-theorem exists_sorted_list {α : Type} (S : Finset α) (h : α → ℕ) :
-    ∃ l : List α, l.Nodup ∧ (∀ i, i ∈ l ↔ i ∈ S) ∧ l.Pairwise (fun a b => h a ≤ h b) := by
+theorem exists_sorted_list {α : Type} (S : Finset α) (h : α → ℕ)
+    : ∃ l : List α, l.Nodup ∧ (∀ i, i ∈ l ↔ i ∈ S) ∧ l.Pairwise (fun a b => h a ≤ h b) := by
   classical
   induction S using Finset.strongInduction with
   | H S ih =>
@@ -42,31 +42,35 @@ theorem exists_sorted_list {α : Type} (S : Finset α) (h : α → ℕ) :
         intro b hb
         exact hmin b (Finset.mem_of_mem_erase ((hmem b).1 hb))
 
-theorem adC_ne_zero_cases {n : ℕ} {p q : Fin n} {i k : Pos n} (h : adC p q i k ≠ 0) :
-    (q = i.1.1 ∧ k.1 = (p, i.1.2)) ∨ (i.1.2 = p ∧ k.1 = (i.1.1, q)) := by
+theorem adC_ne_zero_cases {n : ℕ} {p q : Fin n} {i k : Pos n} (h : adC p q i k ≠ 0)
+    : (q = i.1.1 ∧ k.1 = (p, i.1.2)) ∨ (i.1.2 = p ∧ k.1 = (i.1.1, q)) := by
   by_contra hc
   rw [not_or] at hc
   exact h (by simp only [adC, if_neg hc.1, if_neg hc.2, sub_self])
 
-theorem mem_inside_iff {n : ℕ} {ε : Fin n → Bool} {lev : Fin n → ℕ} (hlev : Monotone lev) (i : Pos n) :
-    i ∈ om ε ∧ i ∉ omU ε lev ↔ ε i.1.1 = ε i.1.2 ∧ lev i.1.1 = lev i.1.2 := by
+theorem mem_inside_iff
+    {n : ℕ} {ε : Fin n → Bool} {lev : Fin n → ℕ} (hlev : Monotone lev) (i : Pos n)
+    : i ∈ om ε ∧ i ∉ omU ε lev ↔ ε i.1.1 = ε i.1.2 ∧ lev i.1.1 = lev i.1.2 := by
   have hle : lev i.1.1 ≤ lev i.1.2 := hlev (le_of_lt i.2)
-  simp only [CompanionTheory.D.LK.om, omU, Finset.mem_filter, Finset.mem_univ, true_and, cpt, not_and]
+  simp only [CompanionTheory.D.LK.om, omU, Finset.mem_filter, Finset.mem_univ, true_and, cpt,
+    not_and]
   constructor
   · rintro ⟨h1, h2⟩
     exact ⟨h1, le_antisymm hle (not_lt.1 (h2 h1))⟩
   · rintro ⟨h1, h2⟩
     exact ⟨h1, fun _ => by omega⟩
 
-theorem exists_inside_order : ∀ (n : ℕ) (ε : Fin n → Bool) (lev : Fin n → ℕ), Monotone lev →
-    ∃ l : List (Pos n), l.Nodup ∧ (∀ i, i ∈ l ↔ i ∈ om ε ∧ i ∉ omU ε lev) ∧
-      ∀ (pre : List (Pos n)) (f : Pos n) (post : List (Pos n)), l = pre ++ f :: post → ∀ e ∈ l, ∀ k : Pos n,
-        adC e.1.1 e.1.2 f k ≠ 0 → k ∈ post := by
+theorem exists_inside_order
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (lev : Fin n → ℕ),
+      Monotone lev
+        → ∃ l : List (Pos n),
+          l.Nodup ∧ (∀ i, i ∈ l ↔ i ∈ om ε ∧ i ∉ omU ε lev)
+            ∧ ∀ (pre : List (Pos n)) (f : Pos n) (post : List (Pos n)),
+              l = pre ++ f :: post → ∀ e ∈ l, ∀ k : Pos n, adC e.1.1 e.1.2 f k ≠ 0 → k ∈ post := by
   intro n ε lev hlev
   classical
   obtain ⟨l, hnd, hmem, hs⟩ := exists_sorted_list ((om ε).filter (· ∉ omU ε lev)) (rootHt (n := n))
-  have hmem' : ∀ i, i ∈ l ↔ i ∈ om ε ∧ i ∉ omU ε lev := fun i => by
-    rw [hmem, Finset.mem_filter]
+  have hmem' : ∀ i, i ∈ l ↔ i ∈ om ε ∧ i ∉ omU ε lev := fun i => by rw [hmem, Finset.mem_filter]
   refine ⟨l, hnd, hmem', ?_⟩
   intro pre f post hl e he k hk
   have hfl : f ∈ l := by simp [hl]

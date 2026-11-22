@@ -21,8 +21,8 @@ namespace Formalism.L2.SG.Pf
 open Formalism.L2.SG.Pf.IdMeet
 
 theorem volColC_holds : VolColC :=
-  volColC_of noinfEqC_holds nocolEqC_holds gcCountC_holds fundMeasEqC_holds indexVolC_holds indexTransferC_holds
-    conjUC_holds gcFundC_holds gcConjC_holds hinfConjC_holds
+  volColC_of noinfEqC_holds nocolEqC_holds gcCountC_holds fundMeasEqC_holds indexVolC_holds
+    indexTransferC_holds conjUC_holds gcFundC_holds gcConjC_holds hinfConjC_holds
 
 theorem idMeetOneC_holds : IdMeetOneC := idMeetOneC_of idMeetKeyC_holds
 

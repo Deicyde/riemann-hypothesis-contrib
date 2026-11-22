@@ -6,7 +6,16 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem unfold_sum_conj_invariant : ∀ (P M N : Type) [Group P] [Group M] [Group N] (s : M →* P) (π : P →* M) (u : N →* P), (∀ m, π (s m) = m) → Function.Injective u → (∀ p, π p = 1 ↔ ∃ X, u X = p) → ∀ (KP : Subgroup P) (KM : Subgroup M) (L : Subgroup N), (∀ k ∈ KM, s k ∈ KP) → (∀ k ∈ KP, π k ∈ KM) → (∀ X, u X ∈ KP ↔ X ∈ L) → ∀ F : P → ℂ, (∀ k ∈ KP, ∀ x, F (k⁻¹ * x * k) = F x) → ∀ k ∈ KM, ∀ y : P, (∑ᶠ x : N ⧸ L, F ((u (Quotient.out x))⁻¹ * ((s k)⁻¹ * y * s k) * u (Quotient.out x))) = ∑ᶠ x : N ⧸ L, F ((u (Quotient.out x))⁻¹ * y * u (Quotient.out x)) := by
+theorem unfold_sum_conj_invariant
+    : ∀ (P M N : Type) [Group P] [Group M] [Group N] (s : M →* P) (π : P →* M) (u : N →* P),
+      (∀ m, π (s m) = m) → Function.Injective u → (∀ p, π p = 1 ↔ ∃ X, u X = p)
+        → ∀ (KP : Subgroup P) (KM : Subgroup M) (L : Subgroup N),
+          (∀ k ∈ KM, s k ∈ KP) → (∀ k ∈ KP, π k ∈ KM) → (∀ X, u X ∈ KP ↔ X ∈ L)
+            → ∀ F : P → ℂ,
+              (∀ k ∈ KP, ∀ x, F (k⁻¹ * x * k) = F x)
+                → ∀ k ∈ KM, ∀ y : P,
+                  (∑ᶠ x : N ⧸ L, F ((u (Quotient.out x))⁻¹ * ((s k)⁻¹ * y * s k) * u (Quotient.out x)))
+                    = ∑ᶠ x : N ⧸ L, F ((u (Quotient.out x))⁻¹ * y * u (Quotient.out x)) := by
   intro P M N _ _ _ s π u hπs hu hker KP KM L hsK hπK hL F hF k hk y
   set c := s k with hc_def
   have hc : c ∈ KP := hsK k hk
@@ -27,12 +36,13 @@ theorem unfold_sum_conj_invariant : ∀ (P M N : Type) [Group P] [Group M] [Grou
     · intro h
       exact KP.mul_mem (KP.mul_mem hc h) (KP.inv_mem hc)
   let eN : N ≃ N := ⟨φ, ψ, h2, h1⟩
-  let e : N ⧸ L ≃ N ⧸ L := Quotient.congr eN (by
-    intro a b
-    rw [QuotientGroup.leftRel_apply, QuotientGroup.leftRel_apply, ← hL, ← hL]
-    simp only [eN, Equiv.coe_fn_mk, map_mul, map_inv, hφ]
-    rw [← hconj]
-    constructor <;> intro h <;> convert h using 1 <;> group)
+  let e : N ⧸ L ≃ N ⧸ L :=
+    Quotient.congr eN (by
+      intro a b
+      rw [QuotientGroup.leftRel_apply, QuotientGroup.leftRel_apply, ← hL, ← hL]
+      simp only [eN, Equiv.coe_fn_mk, map_mul, map_inv, hφ]
+      rw [← hconj]
+      constructor <;> intro h <;> convert h using 1 <;> group)
   conv_rhs => rw [← finsum_comp_equiv e]
   apply finsum_congr
   intro x
@@ -46,13 +56,13 @@ theorem unfold_sum_conj_invariant : ∀ (P M N : Type) [Group P] [Group M] [Grou
     rw [← hex']
     exact Quotient.out_eq _
   have hw : u (Z⁻¹ * φ X) ∈ KP := (hL _).2 hZL
-  calc F ((u X)⁻¹ * (c⁻¹ * y * c) * u X) = F (c⁻¹ * ((u (φ X))⁻¹ * y * u (φ X)) * c) := by
-        congr 1; rw [hφ]; group
+  calc
+    F ((u X)⁻¹ * (c⁻¹ * y * c) * u X)
+      = F (c⁻¹ * ((u (φ X))⁻¹ * y * u (φ X)) * c) := by congr 1; rw [hφ]; group
     _ = F ((u (φ X))⁻¹ * y * u (φ X)) := hF c hc _
     _ = F ((u Z * u (Z⁻¹ * φ X))⁻¹ * y * (u Z * u (Z⁻¹ * φ X))) := by
-        rw [← map_mul, mul_inv_cancel_left]
-    _ = F ((u (Z⁻¹ * φ X))⁻¹ * ((u Z)⁻¹ * y * u Z) * u (Z⁻¹ * φ X)) := by
-        congr 1; group
+      rw [← map_mul, mul_inv_cancel_left]
+    _ = F ((u (Z⁻¹ * φ X))⁻¹ * ((u Z)⁻¹ * y * u Z) * u (Z⁻¹ * φ X)) := by congr 1; group
     _ = F ((u Z)⁻¹ * y * u Z) := hF _ hw _
 
 end GlobalTheory

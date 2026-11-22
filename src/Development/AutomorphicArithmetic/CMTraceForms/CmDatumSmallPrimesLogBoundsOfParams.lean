@@ -10,9 +10,11 @@ public import Development.AutomorphicArithmetic.CMTraceForms.SumLogPrimeFactorsM
 
 open NumberField Formalism.BasicNotions Formalism.HC
 
-theorem UpperTheory.cmDatum_smallPrimes_log_bounds_of_params :
-    ∀ (D : D7) (L : SizeData₂ D), ParameterChoice' D L →
-      (∑ p ∈ D.host.small, Real.log (p : ℝ)) * (2 + Real.logb 2 D.host.QS) ≤ 11 * L.sc.L ∧ Real.log D.host.QS ≤ L.sc.x ^ (L.sc.eps / 4) := by
+theorem UpperTheory.cmDatum_smallPrimes_log_bounds_of_params
+    : ∀ (D : D7) (L : SizeData₂ D),
+      ParameterChoice' D L
+        → (∑ p ∈ D.host.small, Real.log (p : ℝ)) * (2 + Real.logb 2 D.host.QS) ≤ 11 * L.sc.L
+          ∧ Real.log D.host.QS ≤ L.sc.x ^ (L.sc.eps / 4) := by
   intro D L P
   have hx : 0 < L.sc.x := lt_trans one_pos L.sc.one_lt_alt
   have hy : 1 ≤ L.sc.x ^ (L.sc.eps / 4) :=

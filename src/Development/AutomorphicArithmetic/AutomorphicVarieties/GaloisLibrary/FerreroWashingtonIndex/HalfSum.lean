@@ -6,11 +6,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-theorem UpperTheory.V.FW.halfSum :
-    ∀ (α k : Type) [AddCommMonoid k] (σ : α → α) (H H' : Finset α) (g : α → k), (∀ x, σ (σ x) = x) → (∀ x, g (σ x) = g x) → (∀ x ∈ H, σ x ∉ H) → (∀ x ∈ H', σ x ∉ H') → (∀ x ∈ H, x ∈ H' ∨ σ x ∈ H') → (∀ x ∈ H', x ∈ H ∨ σ x ∈ H) → ∑ x ∈ H, g x = ∑ x ∈ H', g x := by
+theorem UpperTheory.V.FW.halfSum
+    : ∀ (α k : Type) [AddCommMonoid k] (σ : α → α) (H H' : Finset α) (g : α → k),
+      (∀ x, σ (σ x) = x) → (∀ x, g (σ x) = g x) → (∀ x ∈ H, σ x ∉ H) → (∀ x ∈ H', σ x ∉ H')
+        → (∀ x ∈ H, x ∈ H' ∨ σ x ∈ H') → (∀ x ∈ H', x ∈ H ∨ σ x ∈ H)
+        → ∑ x ∈ H, g x = ∑ x ∈ H', g x := by
   classical
   intro α k _ σ H H' g hσ hg hH hH' hHH' hH'H
-  refine Finset.sum_bij' (fun x _ => if x ∈ H' then x else σ x) (fun y _ => if y ∈ H then y else σ y)
+  refine Finset.sum_bij'
+    (fun x _ => if x ∈ H' then x else σ x)
+    (fun y _ => if y ∈ H then y else σ y)
     ?_ ?_ ?_ ?_ ?_
   · intro x hx
     by_cases h : x ∈ H'

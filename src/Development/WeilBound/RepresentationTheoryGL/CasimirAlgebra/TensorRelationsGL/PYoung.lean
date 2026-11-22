@@ -14,11 +14,15 @@ namespace YoungTableau
 
 section Main
 
-variable {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] {ι : Type} [DecidableEq ι]
-  {Q : Type} [Fintype Q] [DecidableEq Q] {N : ℕ} {C : Type} [DecidableEq C]
+variable
+  {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
+  {ι : Type} [DecidableEq ι]
+  {Q : Type} [Fintype Q] [DecidableEq Q]
+  {N : ℕ} {C : Type} [DecidableEq C]
 
-theorem altPair_apply (tl : Fin N → ι) (f : TV n M (Q ⊕ (Fin N ⊕ Fin N))) (I : Q ⊕ (Fin N ⊕ Fin N) → Fin n) :
-    altPair tl f I = ∑ σ ∈ colG tl, ((Equiv.Perm.sign σ : ℤ) : ℂ) • f (I ∘ dbl σ) := by
+theorem altPair_apply
+    (tl : Fin N → ι) (f : TV n M (Q ⊕ (Fin N ⊕ Fin N))) (I : Q ⊕ (Fin N ⊕ Fin N) → Fin n)
+    : altPair tl f I = ∑ σ ∈ colG tl, ((Equiv.Perm.sign σ : ℤ) : ℂ) • f (I ∘ dbl σ) := by
   rw [altPair, LinearMap.sum_apply, Finset.sum_apply]
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [LinearMap.smul_apply, Pi.smul_apply, pm_apply]
@@ -27,11 +31,17 @@ def inF (Q : Type) (N : ℕ) : Fin N → Q ⊕ (Fin N ⊕ Fin N) := fun k => .in
 
 def inS (Q : Type) (N : ℕ) : Fin N → Q ⊕ (Fin N ⊕ Fin N) := fun k => .inr (.inr k)
 
-theorem term (tl : Fin N → ι) (col : Q ⊕ (Fin N ⊕ Fin N) → C) (b : Q ⊕ (Fin N ⊕ Fin N) → Fin n)
-    (hT : IsTab col b) (h1 : ∀ p k, col (.inl p) ≠ col (.inr k)) (h2 : ∀ k k', col (.inr (.inl k)) ≠ col (.inr (.inr k')))
-    (ξ : TV n M (Q ⊕ (Fin N ⊕ Fin N))) (σ : Equiv.Perm (Fin N)) :
-    alt (colG col) ξ (b ∘ dbl σ) =
-      ((sg (col ∘ inF Q N) (b ∘ inF Q N) ((b ∘ inF Q N) ∘ σ) * sg (col ∘ inS Q N) (b ∘ inS Q N) ((b ∘ inS Q N) ∘ σ) : ℤ) : ℂ)
+theorem term
+    (tl : Fin N → ι)
+    (col : Q ⊕ (Fin N ⊕ Fin N) → C) (b : Q ⊕ (Fin N ⊕ Fin N) → Fin n) (hT : IsTab col b)
+    (h1 : ∀ p k, col (.inl p) ≠ col (.inr k))
+    (h2 : ∀ k k', col (.inr (.inl k)) ≠ col (.inr (.inr k'))) (ξ : TV n M (Q ⊕ (Fin N ⊕ Fin N)))
+    (σ : Equiv.Perm (Fin N))
+    : alt (colG col) ξ (b ∘ dbl σ)
+      = ((sg (col ∘ inF Q N) (b ∘ inF Q N) ((b ∘ inF Q N) ∘ σ)
+              * sg (col ∘ inS Q N) (b ∘ inS Q N) ((b ∘ inS Q N) ∘ σ)
+            : ℤ)
+          : ℂ)
         • alt (colG col) ξ b := by
   have hFtab : IsTab (col ∘ inF Q N) (b ∘ inF Q N) := by
     refine isTab_comp col b hT (inF Q N) ?_ ?_
@@ -53,9 +63,10 @@ theorem term (tl : Fin N → ι) (col : Q ⊕ (Fin N ⊕ Fin N) → C) (b : Q �
       · exact absurd hq (h1 q _)
       · exact absurd hq (h2 k y)
       · exact ⟨k, rfl⟩
-  have key : ColInj col (b ∘ dbl σ) →
-      (∃ π ∈ colG (col ∘ inF Q N), (b ∘ inF Q N) ∘ ⇑π = (b ∘ inF Q N) ∘ ⇑σ) ∧
-      (∃ π ∈ colG (col ∘ inS Q N), (b ∘ inS Q N) ∘ ⇑π = (b ∘ inS Q N) ∘ ⇑σ) := by
+  have key
+      : ColInj col (b ∘ dbl σ)
+        → (∃ π ∈ colG (col ∘ inF Q N), (b ∘ inF Q N) ∘ ⇑π = (b ∘ inF Q N) ∘ ⇑σ)
+          ∧ (∃ π ∈ colG (col ∘ inS Q N), (b ∘ inS Q N) ∘ ⇑π = (b ∘ inS Q N) ∘ ⇑σ) := by
     intro hc
     refine ⟨exists_perm _ _ hFtab σ ?_, exists_perm _ _ hStab σ ?_⟩
     · intro k k' hk hb'
@@ -102,18 +113,23 @@ open YoungTableau in
 theorem young_holds : Young := by
   intro n M _ _ ι _ Q _ _ N tl C _ col b hT h1 h2 h3 h4 ξ h
   rw [cA_apply]
-  have key : altPair tl (alt (colG col) ξ) b = ((kap tl (col ∘ inF Q N) (col ∘ inS Q N) (b ∘ inF Q N)
-      (b ∘ inS Q N) : ℤ) : ℂ) • alt (colG col) ξ b := by
+  have key
+      : altPair tl (alt (colG col) ξ) b
+        = ((kap tl (col ∘ inF Q N) (col ∘ inS Q N) (b ∘ inF Q N) (b ∘ inS Q N) : ℤ) : ℂ)
+          • alt (colG col) ξ b := by
     rw [altPair_apply, kap, Int.cast_sum, Finset.sum_smul]
     refine Finset.sum_congr rfl fun σ _ => ?_
     rw [term tl col b hT h1 h2 ξ σ, smul_smul]
     push_cast
     ring_nf
   rw [h] at key
-  have hk := kap_pos tl (col ∘ inF Q N) (col ∘ inS Q N) (b ∘ inF Q N) (b ∘ inS Q N) (fun k k' => h3 k k')
-    (fun k k' => h4 k k') (fun k k' ht hr hc => by
-      have := hT.1 (inF Q N k) (inF Q N k') ((h3 k k').mpr ⟨ht, hc⟩) hr
-      simpa [inF] using this)
+  have hk :=
+    kap_pos tl (col ∘ inF Q N) (col ∘ inS Q N) (b ∘ inF Q N) (b ∘ inS Q N)
+      (fun k k' => h3 k k')
+      (fun k k' => h4 k k')
+      (fun k k' ht hr hc => by
+        have := hT.1 (inF Q N k) (inF Q N k') ((h3 k k').mpr ⟨ht, hc⟩) hr
+        simpa [inF] using this)
   exact (smul_eq_zero.mp key.symm).resolve_left (by exact_mod_cast hk.ne')
 
 end PositivityTheory.Rg.Cz

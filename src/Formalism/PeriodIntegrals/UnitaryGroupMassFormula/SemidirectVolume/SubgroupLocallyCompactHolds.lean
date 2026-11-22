@@ -18,9 +18,18 @@ theorem subgroup_locally_compact_holds : SubLCSC := by
   haveI := htg
   haveI := hΓc
   haveI := hΓd
-  let f : ratG Γ K → Γ := fun x => ⟨(x : K).1, (Subgroup.mem_inf.1 ((Subgroup.mem_subgroupOf).1 x.2)).1⟩
-  refine ⟨⟨hK.isClosedEmbedding_subtypeVal.locallyCompactSpace, Topology.IsEmbedding.subtypeVal.secondCountableTopology,
-    inferInstance, inferInstance⟩, ?_, ?_⟩
+  let f : ratG Γ K → Γ := fun x =>
+    ⟨(x : K).1, (Subgroup.mem_inf.1 ((Subgroup.mem_subgroupOf).1 x.2)).1⟩
+  refine ⟨
+    ⟨
+      hK.isClosedEmbedding_subtypeVal.locallyCompactSpace,
+      Topology.IsEmbedding.subtypeVal.secondCountableTopology,
+      inferInstance,
+      inferInstance
+    ⟩,
+    ?_,
+    ?_
+  ⟩
   · have hf : Function.Injective f := by
       intro a b h
       apply Subtype.ext

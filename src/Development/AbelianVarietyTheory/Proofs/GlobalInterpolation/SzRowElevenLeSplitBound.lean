@@ -17,7 +17,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.SzRowS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
@@ -40,13 +41,63 @@ private theorem szRow_eleven_le_splitBound : SzRow (fun _ D _ => 11 ≤ D.host.s
   exact h4.trans hH.split_tie
 
 theorem szRow_sizesAt : SzRow (fun _ _ L => SizesAt L) := by
-  have h := ((((((((((GlobalTheory.T.sizes_sizeN_sizeM_sizeK_sizeT_sizeTT_sizeDe2_sizeLw.and GlobalTheory.T.sizes_sizeKRel).and GlobalTheory.T.sizes_sizeCond_sizeQD_sizePde).and GlobalTheory.T.sizes_sizeLa_sizeRho_sizeBot).and GlobalTheory.T.explicitChoice_sizeEta).and
-    GlobalTheory.T.explicitChoice_sizeNodes).and GlobalTheory.T.explicitChoice_sizeLstar).and GlobalTheory.T.sizes_sizeDel).and GlobalTheory.T.sizes_sizeW_sizeBm_sizeXpp).and GlobalTheory.T.sizes_sizeG_sizeWords).and
-    szRow_eleven_le_splitBound)
+  have h :=
+    ((((((((((GlobalTheory.T.sizes_sizeN_sizeM_sizeK_sizeT_sizeTT_sizeDe2_sizeLw.and
+                GlobalTheory.T.sizes_sizeKRel).and GlobalTheory.T.sizes_sizeCond_sizeQD_sizePde).and
+              GlobalTheory.T.sizes_sizeLa_sizeRho_sizeBot).and
+            GlobalTheory.T.explicitChoice_sizeEta).and GlobalTheory.T.explicitChoice_sizeNodes).and
+          GlobalTheory.T.explicitChoice_sizeLstar).and GlobalTheory.T.sizes_sizeDel).and
+        GlobalTheory.T.sizes_sizeW_sizeBm_sizeXpp).and GlobalTheory.T.sizes_sizeG_sizeWords).and
+      szRow_eleven_le_splitBound)
   refine h.imp ?_
-  rintro C cD ch D L - - ⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨hN, hM, hK, hT, hTT, hDe, hLw⟩, hKR⟩, hCo, hQD, hP⟩, hLa, hRho, hBot⟩, hEta⟩,
-    hNo⟩, hLs⟩, hDel⟩, hW, hBm, hX⟩, hG, hWo⟩, h11⟩
-  exact ⟨hN, hM, hK, hKR, hT, hCo, hQD, hTT, hLa, hRho, hBot, hDe, hLw, hEta, hNo, hLs, hDel, hW, hBm, hX, hG,
-    hP, hWo, h11⟩
+  rintro C cD ch D L - -
+    ⟨
+      ⟨
+        ⟨
+          ⟨
+            ⟨
+              ⟨
+                ⟨⟨⟨⟨⟨hN, hM, hK, hT, hTT, hDe, hLw⟩, hKR⟩, hCo, hQD, hP⟩, hLa, hRho, hBot⟩, hEta⟩,
+                hNo
+              ⟩,
+              hLs
+            ⟩,
+            hDel
+          ⟩,
+          hW,
+          hBm,
+          hX
+        ⟩,
+        hG,
+        hWo
+      ⟩,
+      h11
+    ⟩
+  exact ⟨
+    hN,
+    hM,
+    hK,
+    hKR,
+    hT,
+    hCo,
+    hQD,
+    hTT,
+    hLa,
+    hRho,
+    hBot,
+    hDe,
+    hLw,
+    hEta,
+    hNo,
+    hLs,
+    hDel,
+    hW,
+    hBm,
+    hX,
+    hG,
+    hP,
+    hWo,
+    h11
+  ⟩
 
 end GlobalTheory.EX

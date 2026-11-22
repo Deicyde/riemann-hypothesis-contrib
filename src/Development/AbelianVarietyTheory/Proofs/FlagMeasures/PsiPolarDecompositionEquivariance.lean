@@ -44,8 +44,12 @@ lemma star_mem_K {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k 
 
 theorem psiPolar_of (hB : PsBasic) (hE : PsEquiv) : PsiPolar := by
   intro n ε lam W _ _ τ w hl hτ
-  refine ⟨fun k hk X hX => Psi_unitary_mul ε lam τ w hk.1
-    (exp_posDef_of_herm (hermitian_of_mem_hermitian_part hX)), ?_, ?_⟩
+  refine ⟨
+    fun k hk X hX =>
+      Psi_unitary_mul ε lam τ w hk.1 (exp_posDef_of_herm (hermitian_of_mem_hermitian_part hX)),
+    ?_,
+    ?_
+  ⟩
   · have h := Psi_unitary_mul ε lam τ w (one_mem _) (Matrix.PosDef.one (n := Fin n) (R := ℂ))
     rw [Matrix.mul_one] at h
     rw [h, (hB n ε lam W τ w hl hτ).2.2.2, hτ.2.1.1]
@@ -77,4 +81,6 @@ theorem psiPolar_of (hB : PsBasic) (hE : PsEquiv) : PsiPolar := by
 end GlobalTheory.Dec.PsiPolarProof
 
 theorem GlobalTheory.Dec.psiPolar : GlobalTheory.Dec.PsiPolar :=
-  GlobalTheory.Dec.PsiPolarProof.psiPolar_of GlobalTheory.T.psi_holomorphic_near_positive_matrices_at_one GlobalTheory.T.psi_complexifiedK_equivariance
+  GlobalTheory.Dec.PsiPolarProof.psiPolar_of
+    GlobalTheory.T.psi_holomorphic_near_positive_matrices_at_one
+    GlobalTheory.T.psi_complexifiedK_equivariance

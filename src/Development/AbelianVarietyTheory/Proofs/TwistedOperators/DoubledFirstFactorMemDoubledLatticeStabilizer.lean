@@ -14,11 +14,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DiagonalF
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
-theorem GlobalTheory.InertDbl.inlD_mem_KAtD : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (d : ℕ) (W : Spc F E d) (v : Pl (F := F)),
-    ∀ k ∈ GlobalTheory.InertSph.KAt σ W v, GlobalTheory.InertDbl.inlD σ W k ∈ GlobalTheory.InertDbl.KAtD σ W v := by
+theorem GlobalTheory.InertDbl.inlD_mem_KAtD
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (d : ℕ) (W : Spc F E d) (v : Pl (F := F)),
+      ∀ k ∈ GlobalTheory.InertSph.KAt σ W v,
+        GlobalTheory.InertDbl.inlD σ W k ∈ GlobalTheory.InertDbl.KAtD σ W v := by
   intro F E _ _ _ _ _ σ d W v k hk
   refine ⟨?_, fun z hz => ?_⟩
   · intro u hu
@@ -30,7 +35,9 @@ theorem GlobalTheory.InertDbl.inlD_mem_KAtD : ∀ (F E : Type) [Field F] [Number
     · have := congrFun (congrFun h1' i) j
       simpa [Matrix.fromBlocks, Matrix.one_apply] using this
     all_goals simp [Matrix.fromBlocks, Matrix.one_apply]
-  · have hinv : GlobalTheory.InertDbl.matD (GlobalTheory.InertDbl.inlD σ W k)⁻¹ = Matrix.fromBlocks (mat k⁻¹) 0 0 1 := by
+  · have hinv
+        : GlobalTheory.InertDbl.matD (GlobalTheory.InertDbl.inlD σ W k)⁻¹
+          = Matrix.fromBlocks (mat k⁻¹) 0 0 1 := by
       rw [← map_inv]; rfl
     rw [hinv, GlobalTheory.InertDbl.matD_inlD]
     obtain ⟨hz1, hz2⟩ := hz

@@ -10,15 +10,18 @@ namespace GlobalTheory
 
 open Submodule
 
-theorem torsion_pow_card_succ {R : Type} [CommRing R] [IsDedekindDomain R]
-    (M : Type) [AddCommGroup M] [Module R M] (w0 : Ideal R) (hmax : w0.IsMaximal) (hne : w0 ≠ ⊥)
-    (hdiv : ∀ c : R, c ≠ 0 → Function.Surjective (fun g : M => c • g)) (j : ℕ) :
-    Nat.card (torsionBySet R M ((w0 ^ (j + 1) : Ideal R) : Set R)) =
-      Nat.card (torsionBySet R M ((w0 ^ j : Ideal R) : Set R)) *
-        Nat.card (torsionBySet R M ((w0 : Ideal R) : Set R)) := by
+theorem torsion_pow_card_succ
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    (M : Type) [AddCommGroup M] [Module R M]
+    (w0 : Ideal R) (hmax : w0.IsMaximal) (hne : w0 ≠ ⊥)
+    (hdiv : ∀ c : R, c ≠ 0 → Function.Surjective (fun g : M => c • g)) (j : ℕ)
+    : Nat.card (torsionBySet R M ((w0 ^ (j + 1) : Ideal R) : Set R))
+      = Nat.card (torsionBySet R M ((w0 ^ j : Ideal R) : Set R))
+        * Nat.card (torsionBySet R M ((w0 : Ideal R) : Set R)) := by
   have hlt : w0 ^ 2 < w0 := by simpa using Ideal.pow_succ_lt_pow hne 1
   obtain ⟨c0, hc0, hc02⟩ := SetLike.exists_of_lt hlt
-  have hdvd : w0 ∣ Ideal.span {c0} := Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hc0)
+  have hdvd : w0 ∣ Ideal.span {c0} :=
+    Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hc0)
   obtain ⟨b, hb⟩ := hdvd
   have hbw : ¬ b ≤ w0 := by
     intro hle
@@ -43,10 +46,11 @@ theorem torsion_pow_card_succ {R : Type} [CommRing R] [IsDedekindDomain R]
     rintro ⟨a, ha⟩
     have : a * c0 ∈ w0 ^ (j + 1) := by rw [pow_succ]; exact Ideal.mul_mem_mul ha hc0
     simpa [smul_smul] using hx ⟨_, this⟩
-  let φ : Tj1 →ₗ[R] Tj :=
-    { toFun := fun x => ⟨c0 • (x : M), hmapsto x x.2⟩
-      map_add' := fun x y => by ext; simp
-      map_smul' := fun r x => by ext; simp [smul_comm c0 r] }
+  let φ : Tj1 →ₗ[R] Tj := {
+    toFun := fun x => ⟨c0 • (x : M), hmapsto x x.2⟩
+    map_add' := fun x y => by ext; simp
+    map_smul' := fun r x => by ext; simp [smul_comm c0 r]
+  }
   have hsurj : Function.Surjective φ := by
     rintro ⟨g, hg⟩
     obtain ⟨g', hg'⟩ := hdiv c0 hc0ne g
@@ -72,9 +76,10 @@ theorem torsion_pow_card_succ {R : Type} [CommRing R] [IsDedekindDomain R]
       exact (mem_torsionBySet_iff _ _).mp hg ⟨u, this⟩
     have : v = 1 - u := by rw [← huv]; ring
     rw [this, sub_smul, one_smul, hug, sub_zero]
-  have hsub : T1 ≤ Tj1 := torsionBySet_le_torsionBySet_of_subset (by
-    intro a ha
-    exact Ideal.pow_le_self (Nat.succ_ne_zero j) ha)
+  have hsub : T1 ≤ Tj1 :=
+    torsionBySet_le_torsionBySet_of_subset (by
+      intro a ha
+      exact Ideal.pow_le_self (Nat.succ_ne_zero j) ha)
   have hker : ∀ x : Tj1, x ∈ LinearMap.ker φ ↔ (x : M) ∈ T1 := by
     intro x
     rw [LinearMap.mem_ker]
@@ -103,19 +108,23 @@ theorem torsion_pow_card_succ {R : Type} [CommRing R] [IsDedekindDomain R]
   have e1 : Nat.card (Tj1 ⧸ LinearMap.ker φ) = Nat.card Tj :=
     Nat.card_congr (φ.quotKerEquivOfSurjective hsurj).toEquiv
   have e2 : Nat.card (LinearMap.ker φ) = Nat.card T1 :=
-    Nat.card_congr
-      { toFun := fun x => ⟨(x.1 : M), (hker x.1).mp x.2⟩
-        invFun := fun y => ⟨⟨y.1, hsub y.2⟩, (hker _).mpr y.2⟩
-        left_inv := fun x => rfl
-        right_inv := fun y => rfl }
+    Nat.card_congr {
+      toFun := fun x => ⟨(x.1 : M), (hker x.1).mp x.2⟩
+      invFun := fun y => ⟨⟨y.1, hsub y.2⟩, (hker _).mpr y.2⟩
+      left_inv := fun x => rfl
+      right_inv := fun y => rfl
+    }
   rw [Submodule.card_eq_card_quotient_mul_card (LinearMap.ker φ), e1, e2, mul_comm]
 
-theorem torsion_pow_card (F : Type) [Field F] [NumberField F] (M : Type) [AddCommGroup M]
-    [Module (𝓞 F) M] (w0 : Ideal (𝓞 F)) (h : ℕ) :
-    w0.IsMaximal → w0 ≠ ⊥ → (∀ c : 𝓞 F, c ≠ 0 → Function.Surjective (fun g : M => c • g)) →
-    Nat.card (Submodule.torsionBySet (𝓞 F) M (w0 : Set (𝓞 F))) = Nat.card (𝓞 F ⧸ w0) ^ h →
-    ∀ j : ℕ, Nat.card (Submodule.torsionBySet (𝓞 F) M ((w0 ^ j : Ideal (𝓞 F)) : Set (𝓞 F))) =
-      Nat.card (𝓞 F ⧸ w0) ^ (j * h) := by
+theorem torsion_pow_card
+    (F : Type) [Field F] [NumberField F]
+    (M : Type) [AddCommGroup M] [Module (𝓞 F) M]
+    (w0 : Ideal (𝓞 F)) (h : ℕ)
+    : w0.IsMaximal → w0 ≠ ⊥ → (∀ c : 𝓞 F, c ≠ 0 → Function.Surjective (fun g : M => c • g))
+      → Nat.card (Submodule.torsionBySet (𝓞 F) M (w0 : Set (𝓞 F))) = Nat.card (𝓞 F ⧸ w0) ^ h
+      → ∀ j : ℕ,
+        Nat.card (Submodule.torsionBySet (𝓞 F) M ((w0 ^ j : Ideal (𝓞 F)) : Set (𝓞 F)))
+          = Nat.card (𝓞 F ⧸ w0) ^ (j * h) := by
   intro hmax hne hdiv h1 j
   induction j with
   | zero =>

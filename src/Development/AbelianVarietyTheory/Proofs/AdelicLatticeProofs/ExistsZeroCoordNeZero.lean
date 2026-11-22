@@ -18,14 +18,15 @@ namespace HermClass
 
 section Congr
 
-variable {E : Type*} [Field E] {c : E →+* E} {n m : Type*} [Fintype n] [DecidableEq n]
-  [Fintype m] [DecidableEq m]
+variable
+  {E : Type*} [Field E]
+  {c : E →+* E} {n m : Type*} [Fintype n] [DecidableEq n] [Fintype m] [DecidableEq m]
 
 def Congr (c : E →+* E) (G G' : Matrix n n E) : Prop :=
   ∃ P : Matrix n n E, P.det ≠ 0 ∧ G' = Pᵀ * G * P.map c
 
-theorem Congr.trans {G G' G'' : Matrix n n E} (h : Congr c G G') (h' : Congr c G' G'') :
-    Congr c G G'' := by
+theorem Congr.trans {G G' G'' : Matrix n n E} (h : Congr c G G') (h' : Congr c G' G'')
+    : Congr c G G'' := by
   obtain ⟨P, hP, rfl⟩ := h
   obtain ⟨Q, hQ, rfl⟩ := h'
   refine ⟨P * Q, by rw [Matrix.det_mul]; exact mul_ne_zero hP hQ, ?_⟩
@@ -40,40 +41,43 @@ theorem Congr.symm {G G' : Matrix n n E} (h : Congr c G G') : Congr c G' G := by
     rw [← Matrix.transpose_mul, Matrix.mul_nonsing_inv _ hu, Matrix.transpose_one]
   have e2 : P.map c * P⁻¹.map c = 1 := by
     rw [← Matrix.map_mul, Matrix.mul_nonsing_inv _ hu, Matrix.map_one _ (map_zero _) (map_one _)]
-  calc G = (P⁻¹ᵀ * Pᵀ) * G * (P.map c * P⁻¹.map c) := by
-        rw [e1, e2, Matrix.one_mul, Matrix.mul_one]
+  calc
+    G = (P⁻¹ᵀ * Pᵀ) * G * (P.map c * P⁻¹.map c) := by rw [e1, e2, Matrix.one_mul, Matrix.mul_one]
     _ = _ := by simp only [Matrix.mul_assoc]
 
-theorem Congr.det {G G' : Matrix n n E} (h : Congr c G G') :
-    ∃ x : E, x ≠ 0 ∧ G'.det = x * c x * G.det := by
+theorem Congr.det {G G' : Matrix n n E} (h : Congr c G G')
+    : ∃ x : E, x ≠ 0 ∧ G'.det = x * c x * G.det := by
   obtain ⟨P, hP, rfl⟩ := h
   refine ⟨P.det, hP, ?_⟩
   have : (P.map c).det = c P.det := (RingHom.map_det c P).symm
   rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose, this]
   ring
 
-theorem Congr.submatrix {G G' : Matrix n n E} (h : Congr c G G') (e : m ≃ n) :
-    Congr c (G.submatrix e e) (G'.submatrix e e) := by
+theorem Congr.submatrix {G G' : Matrix n n E} (h : Congr c G G') (e : m ≃ n)
+    : Congr c (G.submatrix e e) (G'.submatrix e e) := by
   obtain ⟨P, hP, rfl⟩ := h
   refine ⟨P.submatrix e e, by rwa [Matrix.det_submatrix_equiv_self], ?_⟩
   rw [Matrix.transpose_submatrix, ← Matrix.submatrix_map, Matrix.submatrix_mul_equiv,
     Matrix.submatrix_mul_equiv]
 
-theorem Congr.fromBlocks {G G' : Matrix n n E} (h : Congr c G G') (D : Matrix m m E) :
-    Congr c (Matrix.fromBlocks G 0 0 D) (Matrix.fromBlocks G' 0 0 D) := by
+theorem Congr.fromBlocks {G G' : Matrix n n E} (h : Congr c G G') (D : Matrix m m E)
+    : Congr c (Matrix.fromBlocks G 0 0 D) (Matrix.fromBlocks G' 0 0 D) := by
   obtain ⟨P, hP, rfl⟩ := h
   refine ⟨Matrix.fromBlocks P 0 0 1, by simpa using hP, ?_⟩
   simp [Matrix.fromBlocks_transpose, Matrix.fromBlocks_map, Matrix.fromBlocks_multiply,
     Matrix.map_one _ (map_zero c) (map_one c), Matrix.map_zero _ (map_zero c)]
 
-theorem congr_diagonal_of_tail {r : ℕ} {g g' : Fin (r + 1) → E} (h0 : g 0 = g' 0)
+theorem congr_diagonal_of_tail
+    {r : ℕ} {g g' : Fin (r + 1) → E} (h0 : g 0 = g' 0)
     (h : Congr c (Matrix.diagonal fun i : Fin r => g i.succ)
-      (Matrix.diagonal fun i : Fin r => g' i.succ)) :
-    Congr c (Matrix.diagonal g) (Matrix.diagonal g') := by
+      (Matrix.diagonal fun i : Fin r => g' i.succ))
+    : Congr c (Matrix.diagonal g) (Matrix.diagonal g') := by
   let e : Fin (r + 1) ≃ Fin r ⊕ PUnit.{1} := (finSuccEquiv r).trans (Equiv.optionEquivSumPUnit _)
-  have key : ∀ k : Fin (r + 1) → E, Matrix.diagonal k =
-      (Matrix.fromBlocks (Matrix.diagonal fun i : Fin r => k i.succ) 0 0
-        (Matrix.diagonal fun _ : PUnit.{1} => k 0)).submatrix e e := by
+  have key
+      : ∀ k : Fin (r + 1) → E,
+        Matrix.diagonal k
+          = (Matrix.fromBlocks (Matrix.diagonal fun i : Fin r => k i.succ) 0 0
+            (Matrix.diagonal fun _ : PUnit.{1} => k 0)).submatrix e e := by
     intro k
     rw [Matrix.fromBlocks_diagonal, Matrix.submatrix_diagonal_equiv]
     congr 1
@@ -84,9 +88,13 @@ theorem congr_diagonal_of_tail {r : ℕ} {g g' : Fin (r + 1) → E} (h0 : g 0 = 
 
 end Congr
 
-theorem exists_zero_coord_ne_zero {F : Type*} [Field F] [CharZero F] {ι : Type*} [Fintype ι]
-    {a : ι → F} (ha : ∀ i, a i ≠ 0) {z : ι → F} (hz : z ≠ 0) (h : ∑ i, a i * z i ^ 2 = 0)
-    (i : ι) : ∃ w : ι → F, w i ≠ 0 ∧ ∑ k, a k * w k ^ 2 = 0 := by
+theorem exists_zero_coord_ne_zero
+    {F : Type*} [Field F] [CharZero F]
+    {ι : Type*} [Fintype ι]
+    {a : ι → F} (ha : ∀ i, a i ≠ 0)
+    {z : ι → F} (hz : z ≠ 0) (h : ∑ i, a i * z i ^ 2 = 0)
+    (i : ι)
+    : ∃ w : ι → F, w i ≠ 0 ∧ ∑ k, a k * w k ^ 2 = 0 := by
   classical
   by_cases hi : z i = 0
   swap
@@ -100,9 +108,10 @@ theorem exists_zero_coord_ne_zero {F : Type*} [Field F] [CharZero F] {ι : Type*
   set t : F := -(a i + a j) / (2 * a j * z j) with ht
   refine ⟨fun k => (if k = i then 1 else 0) + (if k = j then 1 else 0) + t * z k, ?_, ?_⟩
   · simp [hij, hi]
-  · have : ∀ k, a k * ((if k = i then 1 else 0) + (if k = j then 1 else 0) + t * z k) ^ 2 =
-        (if k = i then a i else 0) + (if k = j then a j + 2 * t * a j * z j else 0) +
-          t ^ 2 * (a k * z k ^ 2) := by
+  · have : ∀ k,
+        a k * ((if k = i then 1 else 0) + (if k = j then 1 else 0) + t * z k) ^ 2
+          = (if k = i then a i else 0) + (if k = j then a j + 2 * t * a j * z j else 0)
+            + t ^ 2 * (a k * z k ^ 2) := by
       intro k
       by_cases h1 : k = i
       · subst h1
@@ -121,8 +130,8 @@ theorem exists_zero_coord_ne_zero {F : Type*} [Field F] [CharZero F] {ι : Type*
 
 def Isotropy : Prop :=
   ∀ (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι] (a : ι → F),
-    5 ≤ Fintype.card ι → (∀ i, a i ≠ 0) → (∀ σ : F →+* ℝ, ∃ i j, σ (a i) < 0 ∧ 0 < σ (a j)) →
-    ∃ x : ι → F, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0
+    5 ≤ Fintype.card ι → (∀ i, a i ≠ 0) → (∀ σ : F →+* ℝ, ∃ i j, σ (a i) < 0 ∧ 0 < σ (a j))
+      → ∃ x : ι → F, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
@@ -136,10 +145,13 @@ theorem re_ne_zero (τ : E →+* ℂ) {x : E} (hx : cc x = x) (h0 : x ≠ 0) : (
   have h2 : (τ x).im = 0 := Complex.conj_eq_iff_im.mp h1.symm
   exact (map_ne_zero τ).mpr h0 (Complex.ext h h2)
 
-theorem exists_represent (H : Isotropy) {r : ℕ} (hr : 2 ≤ r) {g : Fin r → E}
-    (hg : ∀ i, cc (g i) = g i) (hg0 : ∀ i, g i ≠ 0) {c : E} (hc : cc c = c) (hc0 : c ≠ 0)
-    (hs : ∀ τ : E →+* ℂ, ∃ i, (0 < (τ (g i)).re ↔ 0 < (τ c).re)) :
-    ∃ z : Fin r → E, herm (Matrix.diagonal g) z z = c := by
+theorem exists_represent
+    (H : Isotropy)
+    {r : ℕ} (hr : 2 ≤ r)
+    {g : Fin r → E} (hg : ∀ i, cc (g i) = g i) (hg0 : ∀ i, g i ≠ 0)
+    {c : E}
+    (hc : cc c = c) (hc0 : c ≠ 0) (hs : ∀ τ : E →+* ℂ, ∃ i, (0 < (τ (g i)).re ↔ 0 < (τ c).re))
+    : ∃ z : Fin r → E, herm (Matrix.diagonal g) z z = c := by
   obtain ⟨θ, h0, hθ⟩ := GlobalTheory.Published.exists_cc_eq_neg E
   obtain ⟨d, hd⟩ := GlobalTheory.Published.exists_sq_real hθ
   let γ : Fin r → maximalRealSubfield E := fun i => ⟨g i, mem_real (hg i)⟩
@@ -147,15 +159,15 @@ theorem exists_represent (H : Isotropy) {r : ℕ} (hr : 2 ≤ r) {g : Fin r → 
   have hγ : ∀ i, γ i ≠ 0 := fun i h => hg0 i (congrArg Subtype.val h)
   have hκ : κ ≠ 0 := fun h => hc0 (congrArg Subtype.val h)
   have hd0 : d ≠ 0 := fun h => mul_ne_zero h0 h0 (hd.symm.trans (congrArg Subtype.val h))
-  let a : Option (Fin r ⊕ Fin r) → maximalRealSubfield E :=
-    fun o => o.elim (-κ) (Sum.elim γ fun i => -d * γ i)
+  let a : Option (Fin r ⊕ Fin r) → maximalRealSubfield E := fun o =>
+    o.elim (-κ) (Sum.elim γ fun i => -d * γ i)
   have ha : ∀ o, a o ≠ 0 := by
     rintro (_ | i | i)
     · exact neg_ne_zero.mpr hκ
     · exact hγ i
     · exact mul_ne_zero (neg_ne_zero.mpr hd0) (hγ i)
-  obtain ⟨x, hx, hx0⟩ := H (maximalRealSubfield E) (Option (Fin r ⊕ Fin r)) a
-    (by simp; omega) ha (by
+  obtain ⟨x, hx, hx0⟩ :=
+    H (maximalRealSubfield E) (Option (Fin r ⊕ Fin r)) a (by simp; omega) ha (by
       intro σ
       let τ := ComplexEmbedding.lift E (Complex.ofRealHom.comp σ)
       have hτ : ∀ y : maximalRealSubfield E, (τ (y : E)).re = σ y := fun y => by
@@ -181,17 +193,20 @@ theorem exists_represent (H : Isotropy) {r : ℕ} (hr : 2 ≤ r) {g : Fin r → 
   have hw2 : (w none : E) ≠ 0 := fun h => hw (Subtype.ext h)
   simp [a, γ, κ, hd] at hw1
   refine ⟨fun i => ((w (some (Sum.inl i)) : E) + w (some (Sum.inr i)) * θ) / w none, ?_⟩
-  have hcc : ∀ i, cc (((w (some (Sum.inl i)) : E) + w (some (Sum.inr i)) * θ) / w none) =
-      ((w (some (Sum.inl i)) : E) - w (some (Sum.inr i)) * θ) / w none := by
+  have hcc
+      : ∀ i,
+        cc (((w (some (Sum.inl i)) : E) + w (some (Sum.inr i)) * θ) / w none)
+          = ((w (some (Sum.inl i)) : E) - w (some (Sum.inr i)) * θ) / w none := by
     intro i
     have : IsCMField.complexConj E θ = -θ := hθ
     simp [cc, this, sub_eq_add_neg]
   simp only [herm, hcc, Matrix.diagonal_apply, mul_ite, ite_mul, mul_zero, zero_mul,
     Finset.sum_ite_eq, Finset.mem_univ, if_true]
-  have : ∀ i, ((w (some (Sum.inl i)) : E) + w (some (Sum.inr i)) * θ) / w none * g i *
-      (((w (some (Sum.inl i)) : E) - w (some (Sum.inr i)) * θ) / w none) =
-      (g i * (w (some (Sum.inl i)) : E) ^ 2 -
-        θ * θ * g i * (w (some (Sum.inr i)) : E) ^ 2) / (w none : E) ^ 2 := by
+  have : ∀ i,
+      ((w (some (Sum.inl i)) : E) + w (some (Sum.inr i)) * θ) / w none * g i
+          * (((w (some (Sum.inl i)) : E) - w (some (Sum.inr i)) * θ) / w none)
+        = (g i * (w (some (Sum.inl i)) : E) ^ 2 - θ * θ * g i * (w (some (Sum.inr i)) : E) ^ 2)
+          / (w none : E) ^ 2 := by
     intro i
     field_simp
     ring
@@ -203,26 +218,28 @@ noncomputable def posCount (τ : E →+* ℂ) {r : ℕ} (g : Fin r → E) : ℕ 
   (Finset.univ.filter fun k => 0 < (τ (g k)).re).card
 
 omit [NumberField E] [IsCMField E] in
-theorem posCount_succ (τ : E →+* ℂ) {r : ℕ} (g : Fin (r + 1) → E) :
-    posCount τ g = (if 0 < (τ (g 0)).re then 1 else 0) + posCount τ fun i : Fin r => g i.succ := by
+theorem posCount_succ (τ : E →+* ℂ) {r : ℕ} (g : Fin (r + 1) → E)
+    : posCount τ g
+      = (if 0 < (τ (g 0)).re then 1 else 0) + posCount τ fun i : Fin r => g i.succ := by
   simp only [posCount, Finset.card_filter, Fin.sum_univ_succ]
 
 omit [NumberField E] [IsCMField E] in
-theorem posIndex_diagonal_map (τ : E →+* ℂ) {r : ℕ} (g : Fin r → E) :
-    GlobalTheory.Inertia.posIndex ((Matrix.diagonal g).map τ) = posCount τ g := by
+theorem posIndex_diagonal_map (τ : E →+* ℂ) {r : ℕ} (g : Fin r → E)
+    : GlobalTheory.Inertia.posIndex ((Matrix.diagonal g).map τ) = posCount τ g := by
   rw [Matrix.diagonal_map (map_zero τ), GlobalTheory.Inertia.posIndex_diagonal]
   rfl
 
-theorem posIndex_of_congr (τ : E →+* ℂ) {r : ℕ} {G G' : Matrix (Fin r) (Fin r) E}
-    (h : Congr (IsCMField.complexConj E : E →+* E) G G') :
-    GlobalTheory.Inertia.posIndex (G'.map τ) = GlobalTheory.Inertia.posIndex (G.map τ) := by
+theorem posIndex_of_congr
+    (τ : E →+* ℂ)
+    {r : ℕ} {G G' : Matrix (Fin r) (Fin r) E} (h : Congr (IsCMField.complexConj E : E →+* E) G G')
+    : GlobalTheory.Inertia.posIndex (G'.map τ) = GlobalTheory.Inertia.posIndex (G.map τ) := by
   obtain ⟨P, hP, rfl⟩ := h
   exact GlobalTheory.Inertia.posIndex_map_congr τ G hP
 
 omit [NumberField E] [IsCMField E] in
-theorem exists_sign_iff (τ : E →+* ℂ) {r : ℕ} {g g' : Fin r → E}
-    (h : posCount τ g = posCount τ g') (j : Fin r) :
-    ∃ i, (0 < (τ (g i)).re ↔ 0 < (τ (g' j)).re) := by
+theorem exists_sign_iff
+    (τ : E →+* ℂ) {r : ℕ} {g g' : Fin r → E} (h : posCount τ g = posCount τ g') (j : Fin r)
+    : ∃ i, (0 < (τ (g i)).re ↔ 0 < (τ (g' j)).re) := by
   by_contra hne
   push Not at hne
   by_cases hj : 0 < (τ (g' j)).re
@@ -243,11 +260,11 @@ theorem exists_sign_iff (τ : E →+* ℂ) {r : ℕ} {g g' : Fin r → E}
     rw [h, posCount, Finset.card_eq_iff_eq_univ, Finset.filter_eq_self] at h1
     exact hj (h1 j (Finset.mem_univ j))
 
-theorem congr_diagonal (H : Isotropy) (r : ℕ) : ∀ g g' : Fin r → E,
-    (∀ i, cc (g i) = g i) → (∀ i, cc (g' i) = g' i) → (∀ i, g i ≠ 0) → (∀ i, g' i ≠ 0) →
-    (∀ τ : E →+* ℂ, posCount τ g = posCount τ g') →
-    (∃ x : E, ∏ i, g i = x * cc x * ∏ i, g' i) →
-    Congr (IsCMField.complexConj E : E →+* E) (Matrix.diagonal g) (Matrix.diagonal g') := by
+theorem congr_diagonal (H : Isotropy) (r : ℕ)
+    : ∀ g g' : Fin r → E,
+      (∀ i, cc (g i) = g i) → (∀ i, cc (g' i) = g' i) → (∀ i, g i ≠ 0) → (∀ i, g' i ≠ 0)
+        → (∀ τ : E →+* ℂ, posCount τ g = posCount τ g') → (∃ x : E, ∏ i, g i = x * cc x * ∏ i, g' i)
+        → Congr (IsCMField.complexConj E : E →+* E) (Matrix.diagonal g) (Matrix.diagonal g') := by
   induction r with
   | zero =>
     intro g g' _ _ _ _ _ _
@@ -260,8 +277,8 @@ theorem congr_diagonal (H : Isotropy) (r : ℕ) : ∀ g g' : Fin r → E,
     · refine GlobalTheory.Published.Landherr.size_one _ _ (by rwa [Matrix.det_diagonal])
         (by rwa [Matrix.det_diagonal]) ⟨x, ?_⟩
       rw [Matrix.det_diagonal, Matrix.det_diagonal, hx, mul_div_cancel_right₀ _ hp']
-    obtain ⟨z, hz⟩ := exists_represent H (by omega) hg h0 (hg' 0) (h0' 0)
-      fun τ => exists_sign_iff τ (hs τ) 0
+    obtain ⟨z, hz⟩ :=
+      exists_represent H (by omega) hg h0 (hg' 0) (h0' 0) fun τ => exists_sign_iff τ (hs τ) 0
     have hG : ∀ a b, cc (Matrix.diagonal g a b) = Matrix.diagonal g b a := by
       intro a b
       by_cases hab : a = b
@@ -274,15 +291,16 @@ theorem congr_diagonal (H : Isotropy) (r : ℕ) : ∀ g g' : Fin r → E,
     have hc : Congr (IsCMField.complexConj E : E →+* E) (Matrix.diagonal g) (Matrix.diagonal k) :=
       ⟨P, hP, hPk.symm⟩
     have hk2 : k 0 = g' 0 := hk1.trans hz
-    refine hc.trans (congr_diagonal_of_tail hk2 (ih _ _ (fun i => hk _) (fun i => hg' _)
-      (fun i => hk0 _) (fun i => h0' _) (fun τ => ?_) ?_))
+    refine hc.trans (congr_diagonal_of_tail hk2
+      (ih _ _ (fun i => hk _) (fun i => hg' _) (fun i => hk0 _) (fun i => h0' _) (fun τ => ?_) ?_))
     · have h1 := posIndex_of_congr τ hc
       rw [posIndex_diagonal_map, posIndex_diagonal_map, hs τ, posCount_succ, posCount_succ τ g',
-        hk2] at h1
+          hk2]
+        at h1
       exact Nat.add_left_cancel h1
     · obtain ⟨y, -, hy⟩ := hc.det
-      rw [Matrix.det_diagonal, Matrix.det_diagonal, hx, Fin.prod_univ_succ, Fin.prod_univ_succ,
-        hk2] at hy
+      rw [Matrix.det_diagonal, Matrix.det_diagonal, hx, Fin.prod_univ_succ, Fin.prod_univ_succ, hk2]
+        at hy
       refine ⟨y * x, mul_left_cancel₀ (h0' 0) ?_⟩
       rw [hy]
       simp only [cc, map_mul, RingHom.coe_coe]
@@ -290,13 +308,12 @@ theorem congr_diagonal (H : Isotropy) (r : ℕ) : ∀ g g' : Fin r → E,
 
 end HermClass
 
-
 open HermClass in
 theorem landherr_of_isotropy
     (H : ∀ (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι] (a : ι → F),
-      5 ≤ Fintype.card ι → (∀ i, a i ≠ 0) → (∀ σ : F →+* ℝ, ∃ i j, σ (a i) < 0 ∧ 0 < σ (a j)) →
-      ∃ x : ι → F, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0) :
-    GlobalTheory.Published.Landherr := by
+      5 ≤ Fintype.card ι → (∀ i, a i ≠ 0) → (∀ σ : F →+* ℝ, ∃ i j, σ (a i) < 0 ∧ 0 < σ (a j))
+        → ∃ x : ι → F, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0)
+    : GlobalTheory.Published.Landherr := by
   intro E _ _ _ r G G' hG hG' hd hd' hs ⟨x, hx⟩
   obtain ⟨P, g, hP, hPg, hg, hg0⟩ := GlobalTheory.HermDiag.exists_congr_diagonal_herm hG
   obtain ⟨P', g', hP', hPg', hg', hg0'⟩ := GlobalTheory.HermDiag.exists_congr_diagonal_herm hG'

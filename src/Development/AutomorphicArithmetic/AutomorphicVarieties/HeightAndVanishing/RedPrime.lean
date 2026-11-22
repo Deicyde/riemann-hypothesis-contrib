@@ -10,13 +10,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-theorem UpperTheory.V.HV.redPrime :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (N : ℕ) [NeZero N] (H : Subgroup (ZMod N)ˣ), Chr.HasLevel E N H → ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ¬ l ∣ H.index →
-      ∀ (c : Coef l) [HasEnoughRootsOfUnity c.O (Nat.totient N)] (Ω' : Type) [Field Ω'] [Algebra E Ω'] [IsAlgClosure E Ω'] (D : LData E Ω' l)
-        (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (e : ℕ), e ≠ 0 → ∀ T : Finset (DirichletCharacter c.O N), (T : Set _) = Chr.evenSet c.O H e →
-        plusLen D e * eO l c.O ≤ ∑ ψ ∈ T, Vlen Ω c e ψ := by
+theorem UpperTheory.V.HV.redPrime
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (N : ℕ) [NeZero N]
+        (H : Subgroup (ZMod N)ˣ),
+      Chr.HasLevel E N H
+        → ∀ (l : ℕ) [Fact l.Prime],
+          l ≠ 2 → ¬ l ∣ H.index
+            → ∀ (c : Coef l) [HasEnoughRootsOfUnity c.O (Nat.totient N)] (Ω' : Type) [Field Ω']
+                [Algebra E Ω'] [IsAlgClosure E Ω'] (D : LData E Ω' l) (Ω : Type) [Field Ω]
+                [CharZero Ω] [IsAlgClosure ℚ Ω] (e : ℕ),
+              e ≠ 0
+                → ∀ T : Finset (DirichletCharacter c.O N),
+                  (T : Set _) = Chr.evenSet c.O H e
+                    → plusLen D e * eO l c.O ≤ ∑ ψ ∈ T, Vlen Ω c e ψ := by
   intro E _ _ _ N _ H hH l _ hl2 hlH c _ Ω' _ _ _ D Ω _ _ _ e he T hT
   haveI := c.dvr
   haveI := c.fin
@@ -45,12 +54,10 @@ theorem UpperTheory.V.HV.redPrime :
   have hUker : Chr.levH ℚ Ω H ≤ (Chr.dirG ℚ Ω χ).ker := by
     intro g hg
     exact hker hg
-  have hidx : (Chr.levH ℚ Ω H).index = H.index :=
-    Subgroup.index_comap_of_surjective H hsurj
+  have hidx : (Chr.levH ℚ Ω H).index = H.index := Subgroup.index_comap_of_surjective H hsurj
   have hHidx : H.index ≠ 0 := Subgroup.index_ne_zero_of_finite
   rw [Chr.eigV ℚ Ω l c.O e (Chr.dirG ℚ Ω χ) (Chr.levH ℚ Ω H) hUopen hUker (by rwa [hidx])]
-  have hψopen : IsOpen ((Chr.dirG ℚ Ω χ).ker : Set (G ℚ Ω)) :=
-    Subgroup.isOpen_mono hUker hUopen
+  have hψopen : IsOpen ((Chr.dirG ℚ Ω χ).ker : Set (G ℚ Ω)) := Subgroup.isOpen_mono hUker hUopen
   have hpow : Chr.dirG ℚ Ω χ ^ H.index = 1 := by
     refine MonoidHom.ext fun g => ?_
     have hm : (Chr.cls ℚ Ω N g) ^ H.index ∈ H := Subgroup.pow_index_mem H _

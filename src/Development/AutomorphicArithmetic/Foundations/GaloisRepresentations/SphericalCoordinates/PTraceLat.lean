@@ -4,8 +4,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
@@ -58,8 +60,7 @@ private lemma trace_of_basis (L : Type) [AddCommGroup L] [Module.Free ℤ L] [Mo
   rw [hM, Matrix.trace, Matrix.trace]
   simp
 
-theorem UpperTheory.Gal.W2.traceLat_of :
-    UpperTheory.Gal.W2.TraceLat := by
+theorem UpperTheory.Gal.W2.traceLat_of : UpperTheory.Gal.W2.TraceLat := by
   intro L _ _ _ g P hinj hd hs f H hf
   rw [← realTrace_toLin, ← trace_of_basis L g P hinj hd hs f H hf]
   push_cast

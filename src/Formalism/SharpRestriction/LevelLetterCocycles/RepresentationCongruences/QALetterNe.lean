@@ -12,65 +12,74 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.FrobeniusPowerSeries.DYAa
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.N.Ln17 PowerSeries
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.N.Ln17 PowerSeries
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
 
 variable (W : LocWach PD LL O v n)
 
-theorem phi_smul (T : LocLat G Qp LL O) (a : LetA O n) (x : W.DD T) :
-    W.φD T (a • x) = W.φA a • W.φD T x := by
+theorem phi_smul (T : LocLat G Qp LL O) (a : LetA O n) (x : W.DD T)
+    : W.φD T (a • x) = W.φA a • W.φD T x := by
   show W.φD T (a • x) = (letφ W.φ₀ a) • W.φD T x
   rw [← algebraMap_smul W.EE a x, W.φD_smul, W.φE_ext, algebraMap_smul]
 
 variable {W} [IsDomain O] [FiniteDimensional Qp LL]
 
-theorem π₀_letter_ne (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) (j : ZMod n) : W.π₀ j ≠ 0 := by
+theorem π₀_letter_ne (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) (j : ZMod n)
+    : W.π₀ j ≠ 0 := by
   obtain ⟨w, hw⟩ := hR.1
   intro h0
   have h1 : W.π₀ j = (w : LetA O n) j * PowerSeries.X ^ (PD.p - 1) := by
     rw [hw, Pi.mul_apply, Pi.pow_apply]
     rfl
   rw [h1] at h0
-  have hu : IsUnit ((w : LetA O n) j) := w.isUnit.map (Pi.evalMonoidHom (fun _ : ZMod n => PowerSeries O) j)
+  have hu : IsUnit ((w : LetA O n) j) :=
+    w.isUnit.map (Pi.evalMonoidHom (fun _ : ZMod n => PowerSeries O) j)
   have hX : (PowerSeries.X : PowerSeries O) ^ (PD.p - 1) ≠ 0 := pow_ne_zero _ PowerSeries.X_ne_zero
   exact hX (hu.mul_right_eq_zero.mp h0)
 
-theorem cancel_π₀ (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) {x y : LetA O n} (h : W.π₀ * x = W.π₀ * y) : x = y := by
+theorem cancel_π₀
+    (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W)
+    {x y : LetA O n} (h : W.π₀ * x = W.π₀ * y)
+    : x = y := by
   funext j
   have h' := congrFun h j
   simp only [Pi.mul_apply] at h'
   exact mul_left_cancel₀ (π₀_letter_ne hR j) h'
 
-theorem qA_letter_cc (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) (j : ZMod n) : constantCoeff (qA W j) = ((PD.p : ℕ) : O) := by
+theorem qA_letter_cc (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) (j : ZMod n)
+    : constantCoeff (qA W j) = ((PD.p : ℕ) : O) := by
   obtain ⟨w, hw⟩ := hR.1
   have hp2 : 2 ≤ PD.p := PD.hp.two_le
-  have h1 : qA W j = (w : LetA O n) j * PowerSeries.X ^ (PD.p - 1) + ((PD.p : ℕ) : PowerSeries O) := by
+  have h1
+      : qA W j = (w : LetA O n) j * PowerSeries.X ^ (PD.p - 1) + ((PD.p : ℕ) : PowerSeries O) := by
     show W.π₀ j + (lA W) j = _
     rw [hw, Pi.mul_apply, Pi.pow_apply]
     rfl
-  rw [h1, map_add (f := _), map_mul, map_pow, PowerSeries.constantCoeff_X, zero_pow (by omega), mul_zero, zero_add,
-    map_natCast]
+  rw [h1, map_add (f := _), map_mul, map_pow, PowerSeries.constantCoeff_X, zero_pow (by omega),
+    mul_zero, zero_add, map_natCast]
 
-theorem qA_letter_ne (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) (j : ZMod n) : qA W j ≠ 0 := by
+theorem qA_letter_ne (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) (j : ZMod n)
+    : qA W j ≠ 0 := by
   intro h
   have hc := qA_letter_cc hR j
   rw [h, map_zero] at hc
   have hv := W.v_l
-  have h0 : ((PD.p : ℕ) : LL) = 0 := by
-    rw [← map_natCast (algebraMap O LL), ← hc, map_zero]
+  have h0 : ((PD.p : ℕ) : LL) = 0 := by rw [← map_natCast (algebraMap O LL), ← hc, map_zero]
   rw [h0, AddValuation.map_zero] at hv
   simp at hv
 
-theorem w_mem (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) :
-    ∃ w ∈ W.AΔ, IsUnit w ∧ W.φA W.π₀ = w * W.π₀ * qA W ^ (PD.p - 1) := by
+theorem w_mem (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W)
+    : ∃ w ∈ W.AΔ, IsUnit w ∧ W.φA W.π₀ = w * W.π₀ * qA W ^ (PD.p - 1) := by
   obtain ⟨w, hw⟩ := hR.2.1
   have hinv : ∀ g, g ∈ W.DelF → g⁻¹ ∈ W.DelF := by
     intro g hg
@@ -90,7 +99,8 @@ theorem w_mem (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) :
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_add (f := _), map_sub, map_one, map_natCast, map_sum]
     congr 1
-    have hsum : ∀ x ∈ W.DelF, W.γ₀ δ (W.γ₀ x (1 + PowerSeries.X)) = W.γ₀ (δ * x) (1 + PowerSeries.X) := by
+    have hsum
+        : ∀ x ∈ W.DelF, W.γ₀ δ (W.γ₀ x (1 + PowerSeries.X)) = W.γ₀ (δ * x) (1 + PowerSeries.X) := by
       intro x _
       rw [map_mul, AlgHom.mul_apply]
     rw [Finset.sum_congr rfl hsum]
@@ -126,13 +136,18 @@ theorem w_mem (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) :
   apply mul_left_cancel₀ hne
   linear_combination -e2
 
-theorem coord_mod (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) {T : LocLat G Qp LL O} {i : ZMod n} {d : ℕ} {b : Fin d → W.DD T}
-    (hb : Formalism.MainNotions.LiftingTheory.IsFrameΔ W T i b) {x : W.DD T} (hx : Formalism.MainNotions.LiftingTheory.InNΔi W T i x) :
-    ∃ (c₀ : Fin d → O) (z : W.DD T), Formalism.MainNotions.LiftingTheory.InNΔi W T i z ∧
-      x = Formalism.MainNotions.LiftingTheory.vecB W T b c₀ + W.π₀ • z := by
+theorem coord_mod
+    (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W)
+    {T : LocLat G Qp LL O} {i : ZMod n} {d : ℕ} {b : Fin d → W.DD T}
+    (hb : Formalism.MainNotions.LiftingTheory.IsFrameΔ W T i b)
+    {x : W.DD T} (hx : Formalism.MainNotions.LiftingTheory.InNΔi W T i x)
+    : ∃ (c₀ : Fin d → O) (z : W.DD T),
+      Formalism.MainNotions.LiftingTheory.InNΔi W T i z
+        ∧ x = Formalism.MainNotions.LiftingTheory.vecB W T b c₀ + W.π₀ • z := by
   obtain ⟨a, ⟨haA, hxa⟩, -⟩ := hb.2 x hx
   choose F hF using fun m => hR.2.2.2 (a m) (haA m).1
-  have hs : HasSubst W.π₀₁ := HasSubst.of_constantCoeff_zero' (Formalism.MainNotions.N.FrobeniusPowerSeries.GS.π₀₁_cc hR)
+  have hs : HasSubst W.π₀₁ :=
+    HasSubst.of_constantCoeff_zero' (Formalism.MainNotions.N.FrobeniusPowerSeries.GS.π₀₁_cc hR)
   let c₀ : Fin d → O := fun m => constantCoeff (F m i)
   let g : Fin d → PowerSeries O := fun m => substAlgHom hs (mk fun k => coeff (k + 1) (F m i))
   let a' : Fin d → LetA O n := fun m => Pi.single i (g m)
@@ -159,7 +174,8 @@ theorem coord_mod (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) {T
       simp only [e3, letE, a', g, c₀, Pi.single_eq_same, mul_one]
       show _ = C (constantCoeff (F m j)) + W.π₀₁ * _
       ring
-    · simp only [Pi.add_apply, Pi.mul_apply, letE, Pi.single_apply, hj, if_false, mul_zero, a', zero_add, hzero m j hj]
+    · simp only [Pi.add_apply, Pi.mul_apply, letE, Pi.single_apply, hj, if_false, mul_zero, a',
+        zero_add, hzero m j hj]
   have h1 : ∀ m, W.π₀ * a' m = a m - algebraMap O (LetA O n) (c₀ m) * letE i := by
     intro m
     rw [key m]
@@ -173,11 +189,13 @@ theorem coord_mod (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) {T
     rw [Formalism.MainNotions.N.FrobeniusPowerSeries.GS.γD_smulA, (hb.1 m).1.2 δ hδ]
     congr 1
     apply cancel_π₀ hR
-    calc W.π₀ * W.γA δ (a' m) = W.γA δ (W.π₀ * a' m) := by
-          rw [map_mul, Formalism.MainNotions.N.FrobeniusPowerSeries.GS.π₀_mem W δ hδ]
+    calc
+      W.π₀ * W.γA δ (a' m) = W.γA δ (W.π₀ * a' m) := by
+        rw [map_mul, Formalism.MainNotions.N.FrobeniusPowerSeries.GS.π₀_mem W δ hδ]
       _ = W.γA δ (a m - algebraMap O (LetA O n) (c₀ m) * letE i) := by rw [h1]
       _ = a m - algebraMap O (LetA O n) (c₀ m) * letE i := by
-          rw [map_sub, map_mul, (haA m).1 δ hδ, AlgHom.commutes, Formalism.MainNotions.N.FrobeniusPowerSeries.GS.γA_letE]
+        rw [map_sub, map_mul, (haA m).1 δ hδ, AlgHom.commutes,
+          Formalism.MainNotions.N.FrobeniusPowerSeries.GS.γA_letE]
       _ = W.π₀ * a' m := (h1 m).symm
   · refine ⟨∑ m, a' m • b m, Submodule.sum_mem _ fun m _ => (W.N T).smul_mem _ (hb.1 m).1.1, ?_⟩
     show (letE i : LetA O n) • (∑ m, a' m • b m) = ∑ m, a' m • b m
@@ -194,7 +212,8 @@ theorem coord_mod (hR : Formalism.MainNotions.N.FrobeniusPowerSeries.GS.RD W) {T
     simp only [Formalism.MainNotions.LiftingTheory.vecB]
     rw [Finset.smul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun m _ => ?_
-    have hlet : (letE i : LetA O n) • b m = b m := Formalism.MainNotions.N.FrobeniusPowerSeries.TypesD.nl_letter W (hb.1 m).2
+    have hlet : (letE i : LetA O n) • b m = b m :=
+      Formalism.MainNotions.N.FrobeniusPowerSeries.TypesD.nl_letter W (hb.1 m).2
     rw [key m, add_smul, mul_smul, hlet, algebraMap_smul, mul_smul]
 
 end Formalism.MainNotions.N.FrobeniusPowerSeries.DYAa

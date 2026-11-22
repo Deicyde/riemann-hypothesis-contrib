@@ -7,12 +7,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal.LocalSmoothExtension
 
-theorem UpperTheory.Gal.LocalSmoothExtension.testOf_of :
-    TestOf := by
+theorem UpperTheory.Gal.LocalSmoothExtension.testOf_of : TestOf := by
   intro H _ K f hf
   obtain ⟨hbi, S, hS⟩ := hf
-  have hinv : ∀ k ∈ K, ∀ k' ∈ K, ∀ g, f (k * g * k') = f g :=
-    fun k hk k' hk' g => hbi ⟨k, hk⟩ ⟨k', hk'⟩ g
+  have hinv : ∀ k ∈ K, ∀ k' ∈ K, ∀ g, f (k * g * k') = f g := fun k hk k' hk' g =>
+    hbi ⟨k, hk⟩ ⟨k', hk'⟩ g
   refine ⟨⟨Subgroup.Commensurable.refl K, ?_, ?_, S, ?_⟩, hinv⟩
   · rintro x ⟨y, hy, rfl⟩
     exact hy

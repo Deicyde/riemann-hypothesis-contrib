@@ -14,22 +14,31 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh GlobalTheory.EtaAn
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj
+  Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh
+  GlobalTheory.EtaAn
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AnVal.IsPiAct
 
-theorem negOnePow_natCast_mul (M : ℕ) (k : ℤ) :
-    Int.negOnePow ((M : ℤ) * k) = Int.negOnePow k ^ M := by
+theorem negOnePow_natCast_mul (M : ℕ) (k : ℤ)
+    : Int.negOnePow ((M : ℤ) * k) = Int.negOnePow k ^ M := by
   induction M with
   | zero => simp
   | succ n ih =>
     push_cast
     rw [add_mul, _root_.one_mul, Int.negOnePow_add, ih, pow_succ]
 
-theorem isPi_actL_of_isTorusOf :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (Pm : D.La →+ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ) (T : I2.PT E) (ψ : (Fin g → ℂ) ≃ₗ[ℂ] I2.Vsp T.dim), IsPeriod D ty Pm → IsTorusOf D ty Pm Hm T ψ → ∀ (α : 𝓞 E) (M : ℕ), α * H.bar α = (M : 𝓞 E) → I2.IsPi T M (vspActL α) := by
+theorem isPi_actL_of_isTorusOf
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (g : ℕ)
+        (ty : Fin g → (E →+* ℂ)) (Pm : D.La →+ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ)
+        (T : I2.PT E) (ψ : (Fin g → ℂ) ≃ₗ[ℂ] I2.Vsp T.dim),
+      IsPeriod D ty Pm → IsTorusOf D ty Pm Hm T ψ
+        → ∀ (α : 𝓞 E) (M : ℕ), α * H.bar α = (M : 𝓞 E) → I2.IsPi T M (vspActL α) := by
   intro E _ _ _ H D g ty Pm Hm T ψ hP hT α M hM
   obtain ⟨-, -, -, hL, hact, heps⟩ := hT
 
@@ -51,8 +60,8 @@ theorem isPi_actL_of_isTorusOf :
     funext k
     exact (hP.1 α a k).symm
   unfold I2.IsPi
-  refine ⟨fun β v => ?_, fun x hx => ?_, fun v w => ?_, fun x hx => ?_⟩ <;>
-    simp only [vspActL, LinearMap.coe_mk, AddHom.coe_mk]
+  refine ⟨fun β v => ?_, fun x hx => ?_, fun v w => ?_, fun x hx => ?_⟩
+    <;> simp only [vspActL, LinearMap.coe_mk, AddHom.coe_mk]
   · ext i
     change i.1 (α : E) * (i.1 (β : E) * v i) = i.1 (β : E) * (i.1 (α : E) * v i)
     ring
@@ -67,7 +76,8 @@ theorem isPi_actL_of_isTorusOf :
   · obtain ⟨a, rfl⟩ := (hL x).1 hx
     have hEF : D.EF (α • a) (H.w0 • α • a) = (M : ℤ) * D.EF a (H.w0 • a) := by
       have hc : H.bar α * H.w0 * α = (M : 𝓞 E) * H.w0 := by rw [← hM]; ring
-      rw [D.adj, smul_smul, smul_smul, hc, mul_smul, Nat.cast_smul_eq_nsmul, map_nsmul, nsmul_eq_mul]
+      rw [D.adj, smul_smul, smul_smul, hc, mul_smul, Nat.cast_smul_eq_nsmul, map_nsmul,
+        nsmul_eq_mul]
     rw [hlat, heps, heps, hEF, negOnePow_natCast_mul, Units.val_pow_eq_pow_val]
 
 end GlobalTheory.AnVal.IsPiAct

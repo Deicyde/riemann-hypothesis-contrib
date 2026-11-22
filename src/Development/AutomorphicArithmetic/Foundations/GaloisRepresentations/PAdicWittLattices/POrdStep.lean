@@ -4,14 +4,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
-private theorem mem_range_diagonal_iff {Y Z : Scheme.{0}} (s : Y ⟶ Z) [IsOpenImmersion (pullback.diagonal s)]
-    (Ω : Type) [Field Ω] (y : UpperTheory.Gal.G3.sp Ω ⟶ pullback s s) :
-    y (IsLocalRing.closedPoint Ω) ∈ Set.range (pullback.diagonal s) ↔
-      y ≫ pullback.fst s s = y ≫ pullback.snd s s := by
+private theorem mem_range_diagonal_iff
+    {Y Z : Scheme.{0}} (s : Y ⟶ Z) [IsOpenImmersion (pullback.diagonal s)]
+    (Ω : Type) [Field Ω]
+    (y : UpperTheory.Gal.G3.sp Ω ⟶ pullback s s)
+    : y (IsLocalRing.closedPoint Ω) ∈ Set.range (pullback.diagonal s)
+      ↔ y ≫ pullback.fst s s = y ≫ pullback.snd s s := by
   constructor
   · rintro ⟨z, hz⟩
     have hsub : Set.range y ⊆ Set.range (pullback.diagonal s) := by
@@ -30,8 +33,7 @@ private theorem mem_range_diagonal_iff {Y Z : Scheme.{0}} (s : Y ⟶ Z) [IsOpenI
     conv_rhs => rw [← hy]
     rfl
 
-theorem UpperTheory.Gal.G3.pOrdStep :
-    OrdStep := by
+theorem UpperTheory.Gal.G3.pOrdStep : OrdStep := by
   intro Z Y W s _ _ c d σ hσ
   have hc : ∀ j, pullback.fst s c ≫ s = (pullback.snd s c ≫ σ j) ≫ s := fun j => by
     rw [Category.assoc, hσ j, pullback.condition]
@@ -41,11 +43,19 @@ theorem UpperTheory.Gal.G3.pOrdStep :
     (pullback.diagonal s).isOpenEmbedding.isOpen_range.preimage (φ j).continuous
   have hclosed : ∀ j, IsClosed ((φ j) ⁻¹' Set.range (pullback.diagonal s)) := fun j =>
     (pullback.diagonal s).isClosedEmbedding.isClosed_range.preimage (φ j).continuous
-  refine ⟨⟨(⋃ j, (φ j) ⁻¹' Set.range (pullback.diagonal s))ᶜ,
-    (isClosed_iUnion_of_finite hclosed).isOpen_compl⟩, (isOpen_iUnion hopen).isClosed_compl, ?_⟩
+  refine ⟨
+    ⟨
+      (⋃ j, (φ j) ⁻¹' Set.range (pullback.diagonal s))ᶜ,
+      (isClosed_iUnion_of_finite hclosed).isOpen_compl
+    ⟩,
+    (isOpen_iUnion hopen).isClosed_compl,
+    ?_
+  ⟩
   intro Ω _ x
-  have key : ∀ j, (x ≫ φ j) (IsLocalRing.closedPoint Ω) ∈ Set.range (pullback.diagonal s) ↔
-      x ≫ pullback.fst s c = x ≫ pullback.snd s c ≫ σ j := by
+  have key
+      : ∀ j,
+        (x ≫ φ j) (IsLocalRing.closedPoint Ω) ∈ Set.range (pullback.diagonal s)
+          ↔ x ≫ pullback.fst s c = x ≫ pullback.snd s c ≫ σ j := by
     intro j
     rw [mem_range_diagonal_iff s Ω (x ≫ φ j)]
     simp only [Category.assoc, φ, pullback.lift_fst, pullback.lift_snd]

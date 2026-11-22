@@ -9,8 +9,8 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR
 
-theorem eab_mul_eab {p q : ℕ} (a b c d : Ix p q) :
-    Eab a b * Eab c d = if b = c then Eab a d else 0 := by
+theorem eab_mul_eab {p q : ℕ} (a b c d : Ix p q)
+    : Eab a b * Eab c d = if b = c then Eab a d else 0 := by
   unfold Eab
   split_ifs with h
   · subst h; rw [Matrix.single_mul_single_same, mul_one]
@@ -19,24 +19,32 @@ theorem eab_mul_eab {p q : ℕ} (a b c d : Ix p q) :
 theorem mat_eq_sum_eab {p q : ℕ} (X : Mat p q) : X = ∑ a, ∑ b, X a b • Eab a b := by
   conv_lhs => rw [Matrix.matrix_eq_sum_single X]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
-  unfold Eab; rw [Matrix.smul_single, smul_eq_mul, mul_one]
+  unfold Eab
+  rw [Matrix.smul_single, smul_eq_mul, mul_one]
 
-theorem act_eq_sum_units {p q : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-    (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (X : Mat p q) (v : V) :
-    act X v = ∑ a, ∑ b, X a b • units act a b v := by
+theorem act_eq_sum_units
+    {p q : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (X : Mat p q) (v : V)
+    : act X v = ∑ a, ∑ b, X a b • units act a b v := by
   conv_lhs => rw [mat_eq_sum_eab X]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, units]
+  simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, units]
 
 theorem sameBlock_iff_isLeft {p q : ℕ} (a b : Ix p q) : sameBlock a b ↔ a.isLeft = b.isLeft := by
   cases a <;> cases b <;> simp [sameBlock]
 
-theorem lie_units_stab : ∀ (p q : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (act : Mat p q →ₗ[ℂ] Module.End ℂ V),
-    (IsLieAct act → IsGl (units act)) ∧
-    (∀ N : Submodule ℂ V, (∀ a b : Ix p q, a.isLeft = b.isLeft → ∀ u ∈ N, units act a b u ∈ N) ↔ KStable act N) ∧
-    ∀ N : Submodule ℂ V, (∀ a b, ∀ u ∈ N, units act a b u ∈ N) → Stab act N := by
+theorem lie_units_stab
+    : ∀ (p q : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (act : Mat p q →ₗ[ℂ] Module.End ℂ V),
+      (IsLieAct act → IsGl (units act))
+        ∧ (∀ N : Submodule ℂ V,
+          (∀ a b : Ix p q, a.isLeft = b.isLeft → ∀ u ∈ N, units act a b u ∈ N) ↔ KStable act N)
+        ∧ ∀ N : Submodule ℂ V, (∀ a b, ∀ u ∈ N, units act a b u ∈ N) → Stab act N := by
   intro p q V _ _ act
-  refine ⟨fun hL a b c d => ?_, fun N => ⟨fun h X hX w hw => ?_, fun h a b hab u hu => ?_⟩, fun N h Z y hy => ?_⟩
+  refine ⟨
+    fun hL a b c d => ?_,
+    fun N => ⟨fun h X hX w hw => ?_, fun h a b hab u hu => ?_⟩,
+    fun N h Z y hy => ?_
+  ⟩
   · simp only [units]
     rw [← hL, eab_mul_eab, eab_mul_eab, map_sub]
     congr 1

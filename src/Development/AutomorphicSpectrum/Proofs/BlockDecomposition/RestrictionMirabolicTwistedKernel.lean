@@ -9,10 +9,12 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.BZMir
 
 namespace GlobalTheory.CompanionTheory.BZMirDer
 
-theorem twKer_resM_derUnipM : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (ψ : AddChar k Circle) (m n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (GL (Fin (m + 1)) k) V),
-    twKer (resM k π).ρ (derUnipM k m n) (derCharM k ψ m n) = twKer π (derUnip k (m + 1) n) (derChar k ψ (m + 1) n) := by
+theorem twKer_resM_derUnipM
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ψ : AddChar k Circle) (m n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
+        (π : Representation ℂ (GL (Fin (m + 1)) k) V),
+      twKer (resM k π).ρ (derUnipM k m n) (derCharM k ψ m n)
+        = twKer π (derUnip k (m + 1) n) (derChar k ψ (m + 1) n) := by
   intro k _ _ _ _ ψ m n V _ _ π
   unfold twKer
   congr 1

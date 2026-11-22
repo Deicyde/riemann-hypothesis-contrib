@@ -19,8 +19,8 @@ inductive LowW (T : Fin q → Fin q → Module.End K N) (κ : Fin q → K) : N �
 def lowSpan (T : Fin q → Fin q → Module.End K N) (κ : Fin q → K) : Submodule K N :=
   Submodule.span K {x | LowW T κ x}
 
-theorem lowSpan_low (T : Fin q → Fin q → Module.End K N) (κ : Fin q → K) (c d : Fin q) (h : d < c) :
-    ∀ y ∈ lowSpan T κ, T c d y ∈ lowSpan T κ := by
+theorem lowSpan_low (T : Fin q → Fin q → Module.End K N) (κ : Fin q → K) (c d : Fin q) (h : d < c)
+    : ∀ y ∈ lowSpan T κ, T c d y ∈ lowSpan T κ := by
   intro y hy
   have : (lowSpan T κ).map (T c d) ≤ lowSpan T κ := by
     unfold lowSpan
@@ -29,8 +29,9 @@ theorem lowSpan_low (T : Fin q → Fin q → Module.End K N) (κ : Fin q → K) 
     exact Submodule.subset_span (LowW.step c d x h hx)
   exact this (Submodule.mem_map_of_mem hy)
 
-theorem lowW_all (T : Fin q → Fin q → Module.End K N) (hT : GlRel T) (κ : Fin q → K) (x : N) (hx : LowW T κ x) :
-    ∀ a b, T a b x ∈ lowSpan T κ := by
+theorem lowW_all
+    (T : Fin q → Fin q → Module.End K N) (hT : GlRel T) (κ : Fin q → K) (x : N) (hx : LowW T κ x)
+    : ∀ a b, T a b x ∈ lowSpan T κ := by
   induction hx with
   | base v hv =>
     intro a b
@@ -44,8 +45,11 @@ theorem lowW_all (T : Fin q → Fin q → Module.End K N) (hT : GlRel T) (κ : F
     intro a b
     have h := LinearMap.congr_fun (hT a b c d) x
     simp only [LinearMap.sub_apply, Module.End.mul_apply] at h
-    have e : T a b (T c d x) = T c d (T a b x) +
-        (((if b = c then T a d else 0 : Module.End K N) x) - ((if d = a then T c b else 0 : Module.End K N) x)) := by
+    have e
+        : T a b (T c d x)
+          = T c d (T a b x)
+            + (((if b = c then T a d else 0 : Module.End K N) x)
+              - ((if d = a then T c b else 0 : Module.End K N) x)) := by
       rw [← h]; abel
     rw [e]
     refine Submodule.add_mem _ (lowSpan_low T κ c d hdc _ (ih a b)) (Submodule.sub_mem _ ?_ ?_)
@@ -56,7 +60,8 @@ theorem lowW_all (T : Fin q → Fin q → Module.End K N) (hT : GlRel T) (κ : F
       · exact ih c b
       · simp
 
-theorem lowSpan_stab (T : Fin q → Fin q → Module.End K N) (hT : GlRel T) (κ : Fin q → K) : Stab T (lowSpan T κ) := by
+theorem lowSpan_stab (T : Fin q → Fin q → Module.End K N) (hT : GlRel T) (κ : Fin q → K)
+    : Stab T (lowSpan T κ) := by
   intro a b y hy
   have : (lowSpan T κ).map (T a b) ≤ lowSpan T κ := by
     rw [lowSpan, Submodule.map_span, Submodule.span_le]
@@ -82,8 +87,7 @@ theorem generatedHighestWeight_holds : GeneratedHW := by
       rw [hhw.2 a, hw.2 a, map_smul, map_smul, LinearMap.smul_apply, smul_eq_mul, smul_eq_mul] at h
       have h2 : (μ a - κ a) * B v x = 0 := by rw [sub_mul, h, sub_self]
       exact (mul_eq_zero.1 h2).resolve_left (sub_ne_zero.2 ha)
-    | step c d y hdc _ =>
-      rw [← hF.adj d c v y, hhw.1 d c hdc, map_zero, LinearMap.zero_apply]
+    | step c d y hdc _ => rw [← hF.adj d c v y, hhw.1 d c hdc, map_zero, LinearMap.zero_apply]
   have hall : ∀ y ∈ lowSpan T κ, B v y = 0 := by
     intro y hy
     have : lowSpan T κ ≤ LinearMap.ker (B v) := by

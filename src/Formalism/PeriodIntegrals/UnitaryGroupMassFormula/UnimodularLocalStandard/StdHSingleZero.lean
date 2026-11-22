@@ -31,25 +31,28 @@ lemma stdH_single_zero (L : PeriodPair) (j : m) (w : ℂ) {z : m → ℂ} (hz : 
     · simp [h]
   rw [hsum, zero_mul]
 
-private theorem stdH_sub_eq_and_add_conj_eq_of_stdH_eq (L : PeriodPair) (v f' : m → ℂ)
-    (hvv : PI.ULS.stdH L m v v = PI.ULS.stdH L m f' f') :
-    PI.ULS.stdH L m v (v - f') = PI.ULS.stdH L m v v - PI.ULS.stdH L m v f' ∧
-      PI.ULS.stdH L m v (v - f') + conj (PI.ULS.stdH L m v (v - f')) =
-        PI.ULS.stdH L m (v - f') (v - f') := by
+private theorem stdH_sub_eq_and_add_conj_eq_of_stdH_eq
+    (L : PeriodPair) (v f' : m → ℂ) (hvv : PI.ULS.stdH L m v v = PI.ULS.stdH L m f' f')
+    : PI.ULS.stdH L m v (v - f') = PI.ULS.stdH L m v v - PI.ULS.stdH L m v f'
+      ∧ PI.ULS.stdH L m v (v - f') + conj (PI.ULS.stdH L m v (v - f'))
+        = PI.ULS.stdH L m (v - f') (v - f') := by
   have h1 : PI.ULS.stdH L m v (v - f') = PI.ULS.stdH L m v v - PI.ULS.stdH L m v f' :=
     map_sub (PI.ULS.stdH L m v) v f'
   refine ⟨h1, ?_⟩
-  have h2 : PI.ULS.stdH L m (v - f') (v - f') =
-      PI.ULS.stdH L m v v - PI.ULS.stdH L m v f' - (PI.ULS.stdH L m f' v - PI.ULS.stdH L m f' f') := by
+  have h2
+      : PI.ULS.stdH L m (v - f') (v - f')
+        = PI.ULS.stdH L m v v - PI.ULS.stdH L m v f'
+          - (PI.ULS.stdH L m f' v - PI.ULS.stdH L m f' f') := by
     simp only [map_sub, LinearMap.sub_apply]
     ring
   rw [h1, h2, map_sub, ← stdH_symm L v f', ← stdH_symm L v v, hvv]
   ring
 
-private theorem isKv_sub_stdH_smul {L : PeriodPair} {e : ℤ}
-    (hn : PI.ULS.cmTheta b d * (b - PI.ULS.cmTheta b d) = (e : ℂ)) (hl0 : lam ≠ 0) {z w : m → ℂ} {t : ℂ}
-    (ht : IsK b d t) (hz : IsKv b d lam z) (hw : IsKv b d lam w) :
-    IsKv b d lam (w - ((kappa L lam * t)⁻¹ * PI.ULS.stdH L m w z) • z) := by
+private theorem isKv_sub_stdH_smul
+    {L : PeriodPair} {e : ℤ} (hn : PI.ULS.cmTheta b d * (b - PI.ULS.cmTheta b d) = (e : ℂ))
+    (hl0 : lam ≠ 0)
+    {z w : m → ℂ} {t : ℂ} (ht : IsK b d t) (hz : IsKv b d lam z) (hw : IsKv b d lam w)
+    : IsKv b d lam (w - ((kappa L lam * t)⁻¹ * PI.ULS.stdH L m w z) • z) := by
   obtain ⟨s, hs, hH⟩ := isK_H hn L hl0 hw hz
   rw [hH, mul_inv_rev, mul_assoc, inv_mul_cancel_left₀ (kappa_ne L hl0)]
   exact isKv_sub hw (isKv_smul hn (isK_mul hn (isK_inv hn ht) hs) hz)

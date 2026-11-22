@@ -5,34 +5,41 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-private theorem mul_inv_lt_mul_inv_mul_inv_of_le_of_lt_one {G : Type} [LinearOrderedCommGroupWithZero G] (ua g ux p : G) (hua : ua ≠ 0)
-    (hg : 0 < g) (hgx : g ≤ ux) (hp : p < 1) (hp0 : p ≠ 0) :
-    ua * ux⁻¹ < ua * g⁻¹ * p⁻¹ := by
+private theorem mul_inv_lt_mul_inv_mul_inv_of_le_of_lt_one
+    {G : Type} [LinearOrderedCommGroupWithZero G]
+    (ua g ux p : G) (hua : ua ≠ 0) (hg : 0 < g) (hgx : g ≤ ux) (hp : p < 1) (hp0 : p ≠ 0)
+    : ua * ux⁻¹ < ua * g⁻¹ * p⁻¹ := by
   have h1 : ux⁻¹ ≤ g⁻¹ := inv_anti₀ hg hgx
   have h2 : ua * ux⁻¹ ≤ ua * g⁻¹ := by gcongr
   have h3 : 1 < p⁻¹ := one_lt_inv₀ (zero_lt_iff.mpr hp0) |>.mpr hp
   have h4 : 0 < ua * g⁻¹ := by
     apply zero_lt_iff.mpr
     exact mul_ne_zero hua (inv_ne_zero hg.ne')
-  calc ua * ux⁻¹ ≤ ua * g⁻¹ := h2
+  calc
+    ua * ux⁻¹
+      ≤ ua * g⁻¹ := h2
     _ = ua * g⁻¹ * 1 := (mul_one _).symm
     _ < ua * g⁻¹ * p⁻¹ := mul_lt_mul_of_pos_left h3 h4
 
-private theorem mul_lt_of_lt_mul_inv_of_lt {G : Type} [LinearOrderedCommGroupWithZero G] (q y r g1 : G) (hr : 0 < r)
-    (hy : y < r) (hq : q < g1 * r⁻¹) : q * y < g1 := by
-  calc q * y ≤ q * r := by gcongr
+private theorem mul_lt_of_lt_mul_inv_of_lt
+    {G : Type} [LinearOrderedCommGroupWithZero G]
+    (q y r g1 : G) (hr : 0 < r) (hy : y < r) (hq : q < g1 * r⁻¹)
+    : q * y < g1 := by
+  calc
+    q * y
+      ≤ q * r := by gcongr
     _ < g1 * r⁻¹ * r := mul_lt_mul_of_pos_right hq hr
     _ = g1 := by rw [mul_assoc, inv_mul_cancel₀ hr.ne', mul_one]
 
-theorem UpperTheory.V.Af.Smo.locDual :
-    UpperTheory.V.Af.Smo.LocDual := by
+theorem UpperTheory.V.Af.Smo.locDual : UpperTheory.V.Af.Smo.LocDual := by
   intro E _ _ w ψ hψ V hV
   obtain ⟨a, ha⟩ : ∃ a, ψ a ≠ 1 := by
     by_contra h
@@ -67,9 +74,10 @@ theorem UpperTheory.V.Af.Smo.locDual :
     exact Valued.isOpen_ball _ _
   · rw [Valuation.coe_ltAddSubgroup]
     refine IsCompact.of_isClosed_subset
-      (hC.image (continuous_const.mul continuous_id :
-        Continuous fun z : HeightOneSpectrum.adicCompletion E w =>
-          ((π₀ : HeightOneSpectrum.adicCompletion E w) ^ n)⁻¹ * z))
+      (hC.image
+        (continuous_const.mul continuous_id
+          : Continuous fun z : HeightOneSpectrum.adicCompletion E w =>
+            ((π₀ : HeightOneSpectrum.adicCompletion E w) ^ n)⁻¹ * z))
       (Valued.isClosed_ball _ _) ?_
     intro y hy
     refine ⟨(π₀ : HeightOneSpectrum.adicCompletion E w) ^ n * y, hγ₁ ?_, ?_⟩
@@ -92,7 +100,8 @@ theorem UpperTheory.V.Af.Smo.locDual :
       rw [← SetLike.mem_coe, Valuation.coe_ltAddSubgroup]
       show Valued.v.restrict (a * x⁻¹) < R
       rw [map_mul, map_inv₀, hR, Units.val_mk0, Units.val_inv_eq_inv_val]
-      exact mul_inv_lt_mul_inv_mul_inv_of_le_of_lt_one _ _ _ _ hua (zero_lt_iff.mpr γ.ne_zero) hxg hπ1 hπn
+      exact mul_inv_lt_mul_inv_mul_inv_of_le_of_lt_one _ _ _ _ hua (zero_lt_iff.mpr γ.ne_zero) hxg
+        hπ1 hπn
     have h1 := hx _ hy
     rw [mul_comm a, ← mul_assoc, mul_inv_cancel₀ hx0, one_mul] at h1
     exact ha h1

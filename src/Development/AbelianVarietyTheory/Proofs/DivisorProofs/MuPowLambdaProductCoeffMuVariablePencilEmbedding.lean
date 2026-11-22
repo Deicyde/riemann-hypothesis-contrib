@@ -23,17 +23,21 @@ open MvPolynomial
 
 namespace GlobalTheory.PsCo.Pc1.A
 
-theorem dM_comm : ∀ {n : ℕ} (ε : Fin n → Bool) (w x : Mode ε) (P : Poly n), dM ε w (dM ε x P) = dM ε x (dM ε w P) :=
+theorem dM_comm
+    : ∀ {n : ℕ} (ε : Fin n → Bool) (w x : Mode ε) (P : Poly n),
+      dM ε w (dM ε x P) = dM ε x (dM ε w P) :=
   GlobalTheory.PsCo.DMComm.dM_comm
 
-theorem coefM_dMu : ∀ {n L : ℕ} (ε : Fin n → Bool) (x : Mode ε) (k : ℕ) (s : PolyM n L),
-    coefM n L k (dMu L ε x s) = dL L ε x (coefM n L k s) :=
+theorem coefM_dMu
+    : ∀ {n L : ℕ} (ε : Fin n → Bool) (x : Mode ε) (k : ℕ) (s : PolyM n L),
+      coefM n L k (dMu L ε x s) = dL L ε x (coefM n L k s) :=
   GlobalTheory.PsCo.Cw2a.coefM_dMu
 
-theorem coefM_pencil : ∀ {n L : ℕ} {I : Type} [Fintype I] [DecidableEq I] (A0 B0 : Matrix I I (PolyL n L)),
-    let Z : Matrix I I (PolyM n L) := fun x y => muM n L * inM n L (A0 x y) + inM n L (B0 x y)
-    (∀ k, Fintype.card I < k → coefM n L k Z.det = 0) ∧ coefM n L (Fintype.card I) Z.det = A0.det ∧
-      ∀ k x y, Fintype.card I ≤ k → coefM n L k (Z.adjugate y x) = 0 :=
+theorem coefM_pencil
+    : ∀ {n L : ℕ} {I : Type} [Fintype I] [DecidableEq I] (A0 B0 : Matrix I I (PolyL n L)),
+      let Z : Matrix I I (PolyM n L) := fun x y => muM n L * inM n L (A0 x y) + inM n L (B0 x y)
+      (∀ k, Fintype.card I < k → coefM n L k Z.det = 0) ∧ coefM n L (Fintype.card I) Z.det = A0.det
+        ∧ ∀ k x y, Fintype.card I ≤ k → coefM n L k (Z.adjugate y x) = 0 :=
   GlobalTheory.coefM_pencil
 
 end GlobalTheory.PsCo.Pc1.A
@@ -70,14 +74,17 @@ section Key
 
 variable {n L : ℕ} (ε : Fin n → Bool)
 
-def pencilDerivativePartMatrix (L : ℕ) : Matrix (Mode ε) (Mode ε) (PolyL n L) := fun x y => inL n L (OmP ε x y)
+def pencilDerivativePartMatrix (L : ℕ) : Matrix (Mode ε) (Mode ε) (PolyL n L) := fun x y =>
+  inL n L (OmP ε x y)
 
-def pencilConstantPartMatrix (c : Fin L → Mode ε → Mode ε → ℂ) : Matrix (Mode ε) (Mode ε) (PolyL n L) :=
-  fun x y => ∑ i, laL n i * C (c i x y)
+def pencilConstantPartMatrix (c : Fin L → Mode ε → Mode ε → ℂ)
+    : Matrix (Mode ε) (Mode ε) (PolyL n L) := fun x y =>
+  ∑ i, laL n i * C (c i x y)
 
 def dualNumberFactorsProduct (m : Fin L → Poly n) : PolyL n L := ∏ i, (1 + laL n i * inL n L (m i))
 
-def pencilDeterminantWeight (M : ℕ) (m : Fin L → Poly n) : PolyL n L := inL n L (detbP n ^ M) * dualNumberFactorsProduct m
+def pencilDeterminantWeight (M : ℕ) (m : Fin L → Poly n) : PolyL n L :=
+  inL n L (detbP n ^ M) * dualNumberFactorsProduct m
 
 end Key
 
@@ -472,27 +479,32 @@ private lemma shift_add_lemma_3 (f g : ℕ → _root_.GlobalTheory.PsCo.Pc1.Poly
       _root_.GlobalTheory.PsCo.Pc1.prev f k + _root_.GlobalTheory.PsCo.Pc1.prev g k := by
   cases k <;> simp [_root_.GlobalTheory.PsCo.Pc1.prev]
 
-
 open MvPolynomial in
 variable {n L : ℕ} in
 theorem _root_.GlobalTheory.PsCo.Pc1.A.stAlg : _root_.GlobalTheory.PsCo.Pc1.StAlg := by
   intro n ε M P hP
-  have hP' : P ∈ Submodule.span ℂ (Submonoid.closure
-      {P : _root_.GlobalTheory.PsCo.Pc1.Poly n | ∃ a b, ε a = ε b ∧ P = X (Sum.inl (a, b))} : Set _) := by
+  have hP'
+      : P ∈ Submodule.span ℂ
+        (Submonoid.closure
+            {P : _root_.GlobalTheory.PsCo.Pc1.Poly n | ∃ a b, ε a = ε b ∧ P = X (Sum.inl (a, b))}
+          : Set _) := by
     rw [← Algebra.adjoin_eq_span]
     exact hP
   clear hP
   induction hP' using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨l, hl, rfl⟩ := Submonoid.exists_list_of_mem_closure hx
-    have hgen : ∀ i : Fin l.length, ∃ c : _root_.GlobalTheory.PsCo.Pc1.Mode ε → _root_.GlobalTheory.PsCo.Pc1.Mode ε → ℂ,
-        ∀ x, _root_.GlobalTheory.PsCo.Pc1.dM ε x (l.get i) = ∑ y, C (c x y) * X (Sum.inl y.1) := by
+    have hgen
+        : ∀ i : Fin l.length,
+          ∃ c : _root_.GlobalTheory.PsCo.Pc1.Mode ε → _root_.GlobalTheory.PsCo.Pc1.Mode ε → ℂ, ∀ x,
+            _root_.GlobalTheory.PsCo.Pc1.dM ε x (l.get i) = ∑ y, C (c x y) * X (Sum.inl y.1) := by
       intro i
       obtain ⟨a, b, hab, he⟩ := hl _ (List.get_mem l i)
       rw [he]
       exact _root_.GlobalTheory.PsCo.Cw2a.dM_block_entries ε a b hab
     choose c hc using hgen
-    obtain ⟨p, q, hpq, htop⟩ := koszulRecursion_solvable_of_product_lemma ε M (fun i => l.get i) c hc
+    obtain ⟨p, q, hpq, htop⟩ :=
+      koszulRecursion_solvable_of_product_lemma ε M (fun i => l.get i) c hc
     refine ⟨p, q, hpq, ?_⟩
     rw [htop, ← Fin.prod_ofFn, List.ofFn_get]
   | zero =>
@@ -502,8 +514,12 @@ theorem _root_.GlobalTheory.PsCo.Pc1.A.stAlg : _root_.GlobalTheory.PsCo.Pc1.StAl
   | add x y _ _ hx hy =>
     obtain ⟨p₁, q₁, ⟨r₁, s₁, t₁⟩, e₁⟩ := hx
     obtain ⟨p₂, q₂, ⟨r₂, s₂, t₂⟩, e₂⟩ := hy
-    refine ⟨fun k => p₁ k + p₂ k, fun x k => q₁ x k + q₂ x k,
-      ⟨fun k => ?_, fun k hk => ?_, fun x k hk => ?_⟩, ?_⟩
+    refine ⟨
+      fun k => p₁ k + p₂ k,
+      fun x k => q₁ x k + q₂ x k,
+      ⟨fun k => ?_, fun k hk => ?_, fun x k hk => ?_⟩,
+      ?_
+    ⟩
     · have h₁ := r₁ k
       have h₂ := r₂ k
       simp only [map_add (f := _), shift_add_lemma_3, mul_add, Finset.sum_add_distrib] at h₁ h₂ ⊢
@@ -514,16 +530,24 @@ theorem _root_.GlobalTheory.PsCo.Pc1.A.stAlg : _root_.GlobalTheory.PsCo.Pc1.StAl
       ring
   | smul r x _ hx =>
     obtain ⟨p₁, q₁, ⟨r₁, s₁, t₁⟩, e₁⟩ := hx
-    refine ⟨fun k => C r * p₁ k, fun x k => C r * q₁ x k,
-      ⟨fun k => ?_, fun k hk => ?_, fun x k hk => ?_⟩, ?_⟩
+    refine ⟨
+      fun k => C r * p₁ k,
+      fun x k => C r * q₁ x k,
+      ⟨fun k => ?_, fun k hk => ?_, fun x k hk => ?_⟩,
+      ?_
+    ⟩
     · have h₁ := r₁ k
-      simp only [Derivation.leibniz, MvPolynomial.derivation_C, smul_zero, add_zero, smul_eq_mul, shift_const_mul_lemma_4]
+      simp only [Derivation.leibniz, MvPolynomial.derivation_C, smul_zero, add_zero, smul_eq_mul,
+        shift_const_mul_lemma_4]
       simp only [mul_add, Finset.sum_add_distrib] at h₁ ⊢
-      have hc : ∀ x : _root_.GlobalTheory.PsCo.Pc1.Mode ε,
-          _root_.GlobalTheory.PsCo.Pc1.dM ε x (_root_.GlobalTheory.PsCo.Pc1.rP ε) *
-              (C r * _root_.GlobalTheory.PsCo.Pc1.prev (q₁ x) k) =
-            C r * (_root_.GlobalTheory.PsCo.Pc1.dM ε x (_root_.GlobalTheory.PsCo.Pc1.rP ε) *
-              _root_.GlobalTheory.PsCo.Pc1.prev (q₁ x) k) := fun _ => by ring
+      have hc
+          : ∀ x : _root_.GlobalTheory.PsCo.Pc1.Mode ε,
+            _root_.GlobalTheory.PsCo.Pc1.dM ε x (_root_.GlobalTheory.PsCo.Pc1.rP ε)
+                * (C r * _root_.GlobalTheory.PsCo.Pc1.prev (q₁ x) k)
+              = C r
+                * (_root_.GlobalTheory.PsCo.Pc1.dM ε x (_root_.GlobalTheory.PsCo.Pc1.rP ε)
+                  * _root_.GlobalTheory.PsCo.Pc1.prev (q₁ x) k) := fun _ => by
+        ring
       simp only [mul_zero, Finset.sum_const_zero, add_zero, hc, ← Finset.mul_sum]
       linear_combination C r * h₁
     · simp [s₁ k hk]

@@ -111,8 +111,9 @@ lemma coe_smul_eq (σ : SL(2, ℤ)) (τ : ℍ) :
   rw [coe_specialLinearGroup_apply]
   simp
 
-theorem polySlash_eichler_smul (k : ℕ) (hk : 2 ≤ k) (f : ℍ → ℂ) (hf : MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f)
-    (σ : SL(2, ℤ)) : ∃ C : ℂ[X], ∀ τ : ℍ,
+theorem polySlash_eichler_smul
+    (k : ℕ) (hk : 2 ≤ k) (f : ℍ → ℂ) (hf : MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f) (σ : SL(2, ℤ))
+    : ∃ C : ℂ[X], ∀ τ : ℍ,
       slP (k - 2) (mat σ) (eichler (k - 2) f (σ • τ)) = eichler (k - 2) (f ∣[(k : ℤ)] σ) τ + C := by
   obtain ⟨w, rfl⟩ : ∃ w, k = w + 2 := ⟨k - 2, by omega⟩
   simp only [Nat.add_sub_cancel]
@@ -132,7 +133,8 @@ theorem polySlash_eichler_smul (k : ℕ) (hk : 2 ≤ k) (f : ℍ → ℂ) (hf : 
   refine ⟨slP w (mat σ) (eichler w f (σ • I)) - eichler w h I, fun τ => ?_⟩
   ext n
   set q : ℕ → ℂ := fun i => ((C a * X + C b) ^ i * (C c * X + C d) ^ (w - i)).coeff n with hq
-  have hslP : ∀ p : ℂ[X], (slP w (mat σ) p).coeff n = ∑ i ∈ Finset.range (w + 1), p.coeff i * q i := by
+  have hslP
+      : ∀ p : ℂ[X], (slP w (mat σ) p).coeff n = ∑ i ∈ Finset.range (w + 1), p.coeff i * q i := by
     intro p
     rw [polySlash_apply, finsetSum_coeff]
     simp only [AddMonoidAlgebra.coeff_smul_apply, smul_eq_mul]
@@ -140,7 +142,8 @@ theorem polySlash_eichler_smul (k : ℕ) (hk : 2 ≤ k) (f : ℍ → ℂ) (hf : 
   set Φ : ℂ → ℂ := fun v => ∑ i ∈ Finset.range (w + 1),
       (w.choose i : ℂ) * ecoef w f i ((a * v + b) / (c * v + d)) * q i -
     (w.choose n : ℂ) * ecoef w h n v with hΦ
-  have hΦ1 : ∀ τ : ℍ, Φ τ = (slP w (mat σ) (eichler w f (σ • τ))).coeff n - (eichler w h τ).coeff n := by
+  have hΦ1
+      : ∀ τ : ℍ, Φ τ = (slP w (mat σ) (eichler w f (σ • τ))).coeff n - (eichler w h τ).coeff n := by
     intro τ
     simp only [hΦ, hslP, coeff_eichler, coe_smul_eq]
     rfl
@@ -159,30 +162,41 @@ theorem polySlash_eichler_smul (k : ℕ) (hk : 2 ≤ k) (f : ℍ → ℂ) (hf : 
       refine (h1.fun_div h2 hj).congr_deriv ?_
       rw [inv_pow, div_eq_mul_inv]
       linear_combination ((c * τ + d) ^ 2)⁻¹ * hdet
-    have hA : ∀ i, HasDerivAt (fun v : ℂ => ecoef w f i ((a * v + b) / (c * v + d)))
-        (f (σ • τ) * (-((σ • τ : ℍ) : ℂ)) ^ (w - i) * (c * τ + d)⁻¹ ^ 2) (τ : ℂ) := by
+    have hA
+        : ∀ i,
+          HasDerivAt
+            (fun v : ℂ => ecoef w f i ((a * v + b) / (c * v + d)))
+            (f (σ • τ) * (-((σ • τ : ℍ) : ℂ)) ^ (w - i) * (c * τ + d)⁻¹ ^ 2) (τ : ℂ) := by
       intro i
       have := hasDerivAt_ecoef w f hf i _ (σ • τ).im_pos
       simp only [Function.comp_apply, ofComplex_apply] at this
       exact HasDerivAt.comp (τ : ℂ) (h₂ := ecoef w f i) (by rw [← hs]; exact this) hm
     have hB := hasDerivAt_ecoef w h hh n _ τ.im_pos
     simp only [Function.comp_apply, ofComplex_apply] at hB
-    have hP := congrArg (fun p : ℂ[X] => p.coeff n)
-      (polySlash_pow w (mat σ) ((σ • τ : ℍ) : ℂ) τ (c * τ + d)⁻¹
-        (by rw [hs, ← ha, ← hc]; rw [div_eq_mul_inv]
+    have hP :=
+      congrArg
+        (fun p : ℂ[X] => p.coeff n)
+        (polySlash_pow w (mat σ) ((σ • τ : ℍ) : ℂ) τ (c * τ + d)⁻¹
+          (by
+            rw [hs, ← ha, ← hc]
+            rw [div_eq_mul_inv]
             linear_combination (-a) * mul_inv_cancel₀ hj + (c * τ + d)⁻¹ * hdet)
-        (by rw [hs, ← hb, ← hd]; rw [div_eq_mul_inv]
+          (by
+            rw [hs, ← hb, ← hd]
+            rw [div_eq_mul_inv]
             linear_combination (-b) * mul_inv_cancel₀ hj - (c * τ + d)⁻¹ * τ * hdet))
     simp only [hslP, coeff_C_mul, coeff_X_add_C_pow] at hP
     have hv : h τ = f (σ • τ) * (c * τ + d)⁻¹ ^ (w + 2) := by
-      rw [hdef, ModularForm.SL_slash_apply, ModularGroup.denom_apply, zpow_neg, zpow_natCast, inv_pow]
+      rw [hdef, ModularForm.SL_slash_apply, ModularGroup.denom_apply, zpow_neg, zpow_natCast,
+        inv_pow]
     refine ((HasDerivAt.fun_sum (u := Finset.range (w + 1)) fun i _ =>
-      ((hA i).const_mul (w.choose i : ℂ)).mul_const (q i)).fun_sub
-        (hB.const_mul (w.choose n : ℂ))).congr_deriv ?_
+        ((hA i).const_mul (w.choose i : ℂ)).mul_const (q i)).fun_sub
+      (hB.const_mul (w.choose n : ℂ))).congr_deriv ?_
     have : ∑ i ∈ Finset.range (w + 1), (w.choose i : ℂ) *
-        (f (σ • τ) * (-((σ • τ : ℍ) : ℂ)) ^ (w - i) * (c * τ + d)⁻¹ ^ 2) * q i =
-        f (σ • τ) * (c * τ + d)⁻¹ ^ 2 * ∑ i ∈ Finset.range (w + 1),
-          (-((σ • τ : ℍ) : ℂ)) ^ (w - i) * (w.choose i : ℂ) * q i := by
+          (f (σ • τ) * (-((σ • τ : ℍ) : ℂ)) ^ (w - i) * (c * τ + d)⁻¹ ^ 2) * q i
+        = f (σ • τ) * (c * τ + d)⁻¹ ^ 2
+          * ∑ i ∈ Finset.range (w + 1),
+            (-((σ • τ : ℍ) : ℂ)) ^ (w - i) * (w.choose i : ℂ) * q i := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl fun i _ => by ring
     rw [this, hP, hv]
@@ -190,7 +204,8 @@ theorem polySlash_eichler_smul (k : ℕ) (hk : 2 ≤ k) (f : ℍ → ℂ) (hf : 
   have hconst : Φ τ = Φ (I : ℍ) :=
     isOpen_upperHalfPlaneSet.is_const_of_deriv_eq_zero (convex_halfSpace_im_gt 0).isPreconnected
       (fun z hz => (hder z hz).differentiableAt.differentiableWithinAt)
-      (fun z hz => (hder z hz).deriv) τ.im_pos (I : ℍ).im_pos
+      (fun z hz => (hder z hz).deriv)
+      τ.im_pos (I : ℍ).im_pos
   rw [hΦ1, hΦ1] at hconst
   rw [coeff_add, coeff_sub]
   linear_combination hconst

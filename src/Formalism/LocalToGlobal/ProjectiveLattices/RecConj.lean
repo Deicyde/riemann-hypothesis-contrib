@@ -8,12 +8,14 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions
+  Formalism.MainNotions
 
 section
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {l : Level H}
-  (c : Coeff l)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {l : Level H} (c : Coeff l)
 
 private theorem rt0_conj_ne_lemma : (starRingEnd ℂ) H.rt0 ≠ H.rt0 := by
   intro h2
@@ -70,8 +72,9 @@ end
 
 variable {D : D7} {T : Core D} (h : LawsCore T)
 
-theorem recB_supN_conj (j : ℕ) (w : WeightFamilies.Wt D j) (σ : T.Q.c.F →+* ℂ) (F : (recB h).Cusp j w) :
-    (recB h).supN j w ((starRingEnd ℂ).comp σ) F = (recB h).supN j w σ F := by
+theorem recB_supN_conj
+    (j : ℕ) (w : WeightFamilies.Wt D j) (σ : T.Q.c.F →+* ℂ) (F : (recB h).Cusp j w)
+    : (recB h).supN j w ((starRingEnd ℂ).comp σ) F = (recB h).supN j w σ F := by
   simp [recB, mkB, cutN, Core.Ns, goodOf_conj]
 
 end Formalism.L2.Pj

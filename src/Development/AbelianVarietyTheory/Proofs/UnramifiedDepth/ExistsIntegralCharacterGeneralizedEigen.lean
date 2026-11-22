@@ -11,15 +11,21 @@ public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.HasT
 @[expose] public section
 
 open scoped BigOperators
-open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj
+  GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace GlobalTheory.GenChar
 
-theorem step {C : Type} [Field C] {O κ : Type} [Fintype κ] [DecidableEq κ]
-    (n : O → Matrix κ κ C) (hc : ∀ x y, Commute (n x) (n y)) (w : κ → C) (hw : w ≠ 0)
-    (hn : ∀ x, ∃ k : ℕ, ((n x) ^ k).mulVec w = 0) (x₀ : O) :
-    ∃ u : κ → C, u ≠ 0 ∧ (∀ x, ∃ k : ℕ, ((n x) ^ k).mulVec u = 0) ∧ (n x₀).mulVec u = 0 ∧
-      ∀ y, (n y).mulVec w = 0 → (n y).mulVec u = 0 := by
+theorem step
+    {C : Type} [Field C]
+    {O κ : Type} [Fintype κ] [DecidableEq κ]
+    (n : O → Matrix κ κ C) (hc : ∀ x y, Commute (n x) (n y))
+    (w : κ → C) (hw : w ≠ 0) (hn : ∀ x, ∃ k : ℕ, ((n x) ^ k).mulVec w = 0)
+    (x₀ : O)
+    : ∃ u : κ → C,
+      u ≠ 0 ∧ (∀ x, ∃ k : ℕ, ((n x) ^ k).mulVec u = 0) ∧ (n x₀).mulVec u = 0
+        ∧ ∀ y, (n y).mulVec w = 0 → (n y).mulVec u = 0 := by
   classical
   have hk := Nat.find_spec (hn x₀)
   have hk0 : Nat.find (hn x₀) ≠ 0 := by
@@ -28,8 +34,9 @@ theorem step {C : Type} [Field C] {O κ : Type} [Fintype κ] [DecidableEq κ]
     exact hw hk
   obtain ⟨j, hj⟩ := Nat.exists_eq_succ_of_ne_zero hk0
   have hlt : ¬ ((n x₀) ^ j).mulVec w = 0 := Nat.find_min (hn x₀) (by omega)
-  have key : ∀ (y : O) (k : ℕ), ((n y) ^ k).mulVec w = 0 →
-      ((n y) ^ k).mulVec (((n x₀) ^ j).mulVec w) = 0 := by
+  have key
+      : ∀ (y : O) (k : ℕ),
+        ((n y) ^ k).mulVec w = 0 → ((n y) ^ k).mulVec (((n x₀) ^ j).mulVec w) = 0 := by
     intro y k h
     rw [Matrix.mulVec_mulVec, ((hc y x₀).pow_pow k j).eq, ← Matrix.mulVec_mulVec, h,
       Matrix.mulVec_zero]
@@ -42,13 +49,17 @@ theorem step {C : Type} [Field C] {O κ : Type} [Fintype κ] [DecidableEq κ]
   · have := key y 1 (by rwa [pow_one])
     rwa [pow_one] at this
 
-theorem ge_of_eigen {C : Type} [Field C] (V : VF C) {κ : Type} [Fintype κ]
-    (A : Matrix κ κ C) (hA : ∀ i j, V.Ge 0 (A i j)) (c : C) (u : κ → C) (hu : u ≠ 0)
-    (h : A.mulVec u = c • u) : V.Ge 0 c := by
+theorem ge_of_eigen
+    {C : Type} [Field C]
+    (V : VF C)
+    {κ : Type} [Fintype κ]
+    (A : Matrix κ κ C) (hA : ∀ i j, V.Ge 0 (A i j))
+    (c : C) (u : κ → C) (hu : u ≠ 0) (h : A.mulVec u = c • u)
+    : V.Ge 0 c := by
   classical
   obtain ⟨i₀, hi₀⟩ := Function.ne_iff.mp hu
-  obtain ⟨i, -, hi⟩ := Finset.exists_min_image Finset.univ (fun i => V.v (u i))
-    ⟨i₀, Finset.mem_univ _⟩
+  obtain ⟨i, -, hi⟩ :=
+    Finset.exists_min_image Finset.univ (fun i => V.v (u i)) ⟨i₀, Finset.mem_univ _⟩
   have h0 : V.v (u i₀) ≠ ⊤ := by
     intro h
     exact hi₀ (by simpa using h)
@@ -75,7 +86,13 @@ theorem ge_of_eigen {C : Type} [Field C] (V : VF C) {κ : Type} [Fintype κ]
     have : (0 : ℝ) ≤ s := by linarith
     exact_mod_cast this
 
-theorem exists_character : ∀ (C : Type) [Field C] (V : VF C) (O : Type) [CommRing O] (κ : Type) [Fintype κ] [DecidableEq κ] (L : O →+* Matrix κ κ C), (∀ x i j, V.Ge 0 (L x i j)) → ∀ (χ : O → C) (w : κ → C), w ≠ 0 → (∀ x, ∃ k : ℕ, ((L x - χ x • (1 : Matrix κ κ C)) ^ k).mulVec w = 0) → ∃ ψ : O →+* C, (∀ x, ψ x = χ x) ∧ ∀ x, V.Ge 0 (ψ x) := by
+theorem exists_character
+    : ∀ (C : Type) [Field C] (V : VF C) (O : Type) [CommRing O] (κ : Type) [Fintype κ]
+        [DecidableEq κ] (L : O →+* Matrix κ κ C),
+      (∀ x i j, V.Ge 0 (L x i j))
+        → ∀ (χ : O → C) (w : κ → C),
+          w ≠ 0 → (∀ x, ∃ k : ℕ, ((L x - χ x • (1 : Matrix κ κ C)) ^ k).mulVec w = 0)
+            → ∃ ψ : O →+* C, (∀ x, ψ x = χ x) ∧ ∀ x, V.Ge 0 (ψ x) := by
   intro C _ V O _ κ _ _ L hL χ w hw hn
   set n : O → Matrix κ κ C := fun x => L x - χ x • (1 : Matrix κ κ C) with hndef
   have hLc : ∀ x y, Commute (L x) (L y) := fun x y => (Commute.all x y).map L
@@ -86,8 +103,9 @@ theorem exists_character : ∀ (C : Type) [Field C] (V : VF C) (O : Type) [CommR
     intro x u h
     simp only [hndef, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec] at h
     exact sub_eq_zero.mp h
-  have three : ∀ x y z : O, ∃ u : κ → C, u ≠ 0 ∧ (L x).mulVec u = χ x • u ∧
-      (L y).mulVec u = χ y • u ∧ (L z).mulVec u = χ z • u := by
+  have three
+      : ∀ x y z : O, ∃ u : κ → C,
+        u ≠ 0 ∧ (L x).mulVec u = χ x • u ∧ (L y).mulVec u = χ y • u ∧ (L z).mulVec u = χ z • u := by
     intro x y z
     obtain ⟨u₁, h1, h1n, h1x, -⟩ := step n hc w hw hn x
     obtain ⟨u₂, h2, h2n, h2y, h2p⟩ := step n hc u₁ h1 h1n y

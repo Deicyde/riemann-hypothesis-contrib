@@ -21,10 +21,11 @@ section Points
 
 variable {F E : Type} [Field F] [CommRing E] [Algebra F E] {n : Type} [Fintype n] [DecidableEq n]
 
-def tensInt (R : Type) [CommRing R] [Algebra F R] (S₁ : Subring E) (S₂ : Subring R) :
-    Subring (E ⊗[F] R) :=
-  Subring.closure (Set.range (fun x : S₁ => (x : E) ⊗ₜ[F] (1 : R)) ∪
-    Set.range (fun y : S₂ => (1 : E) ⊗ₜ[F] (y : R)))
+def tensInt (R : Type) [CommRing R] [Algebra F R] (S₁ : Subring E) (S₂ : Subring R)
+    : Subring (E ⊗[F] R) :=
+  Subring.closure
+    (Set.range (fun x : S₁ => (x : E) ⊗ₜ[F] (1 : R))
+      ∪ Set.range (fun y : S₂ => (1 : E) ⊗ₜ[F] (y : R)))
 
 end Points
 
@@ -37,10 +38,11 @@ namespace PI
 open PI.SplitIntLoc in
 def SplitIntLoc : Prop :=
   ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (v : HeightOneSpectrum (𝓞 F))
-    (spl : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F),
-    (∀ a : v.adicCompletion F, spl ((1 : E) ⊗ₜ[F] a) = (a, a)) →
-    ∀ x, x ∈ tensInt (F := F) (v.adicCompletion F) (intOE E) (v.adicCompletionIntegers F).toSubring ↔
-      (spl x).1 ∈ v.adicCompletionIntegers F ∧ (spl x).2 ∈ v.adicCompletionIntegers F
+      (v : HeightOneSpectrum (𝓞 F))
+      (spl : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F),
+    (∀ a : v.adicCompletion F, spl ((1 : E) ⊗ₜ[F] a) = (a, a))
+      → ∀ x,
+        x ∈ tensInt (F := F) (v.adicCompletion F) (intOE E) (v.adicCompletionIntegers F).toSubring
+          ↔ (spl x).1 ∈ v.adicCompletionIntegers F ∧ (spl x).2 ∈ v.adicCompletionIntegers F
 
 end PI

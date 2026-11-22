@@ -10,23 +10,33 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPrimeD
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 set_option autoImplicit false
 noncomputable section
 
 namespace GlobalTheory.BirOrd
 
-theorem formOrd_ratPull_of_over : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [IsIntegral X] [IsIntegral Y] (p : X ⟶ Sp k) (s : Y ⟶ X) [IsDominant s], Function.Bijective (functionFieldMap s) → ∀ (E' : DivOver (s ≫ p)) (E : DivOver p), DivOver.Over s E' E → ∀ (n : ℕ) (η : RatForms p n), η ≠ 0 → E'.formOrd (EtaleKlt.ratPull p s n η) = E.formOrd η := by
+theorem formOrd_ratPull_of_over
+    : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [IsIntegral X] [IsIntegral Y] (p : X ⟶ Sp k)
+        (s : Y ⟶ X) [IsDominant s],
+      Function.Bijective (functionFieldMap s)
+        → ∀ (E' : DivOver (s ≫ p)) (E : DivOver p),
+          DivOver.Over s E' E
+            → ∀ (n : ℕ) (η : RatForms p n),
+              η ≠ 0 → E'.formOrd (EtaleKlt.ratPull p s n η) = E.formOrd η := by
   intro k _ X Y _ _ p s _ hbij E' E hO n η hη
   set φ := functionFieldMap s with hφdef
   let φe : X.functionField ≃+* Y.functionField := RingEquiv.ofBijective φ hbij
   have hpc : φ.comp (Cartier.constFn p) = Cartier.constFn (s ≫ p) :=
     EtaleKlt.functionFieldMap_comp_constFn p s
-  have hcc : (φe.symm : Y.functionField →+* X.functionField).comp (Cartier.constFn (s ≫ p)) =
-      Cartier.constFn p := by
+  have hcc
+      : (φe.symm : Y.functionField →+* X.functionField).comp (Cartier.constFn (s ≫ p))
+        = Cartier.constFn p := by
     ext a
     rw [← hpc]
     exact φe.symm_apply_apply _
@@ -37,8 +47,8 @@ theorem formOrd_ratPull_of_over : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [I
     have e0 : (φe.symm : Y.functionField →+* X.functionField).comp φ = RingHom.id _ := by
       ext x
       exact φe.symm_apply_apply x
-    refine (TopForm.formMap_formMap φ (φe.symm : Y.functionField →+* X.functionField)
-      (RingHom.id _) e0 hpc hcc (RingHom.id_comp _) ξ).trans ?_
+    refine (TopForm.formMap_formMap φ (φe.symm : Y.functionField →+* X.functionField) (RingHom.id _)
+      e0 hpc hcc (RingHom.id_comp _) ξ).trans ?_
     exact TopForm.formMap_of_eq_id _ rfl _ ξ
 
   let ψ : E.ring →+* E'.ring := φ.restrict E.ring E'.ring fun x hx => (hO x).1 hx
@@ -69,17 +79,19 @@ theorem formOrd_ratPull_of_over : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [I
     intro g
     obtain ⟨t, ht⟩ := IsDiscreteValuationRing.exists_irreducible E.ring
     exact EtaleDiv.log_ordFrac_map E.ring E'.ring φ ψ hψv ht (ht.map eψ) g.ne_zero
-  have hfe : ∀ ω : Forms E.const n, IsFreeGen E.ring ω →
-      IsFreeGen E'.ring (TopForm.formMap n ψ hc ω) := fun ω hω =>
-    EtaleDiv.isFreeGen_formMap (EtaleDiv.formallyEtale_of_bijective ψ hψb) hc hω
-  have hfe' : ∀ ω : Forms E'.const n, IsFreeGen E'.ring ω →
-      IsFreeGen E.ring (TopForm.formMap n χ hc' ω) := fun ω hω =>
+  have hfe
+      : ∀ ω : Forms E.const n, IsFreeGen E.ring ω → IsFreeGen E'.ring (TopForm.formMap n ψ hc ω) :=
+    fun ω hω => EtaleDiv.isFreeGen_formMap (EtaleDiv.formallyEtale_of_bijective ψ hψb) hc hω
+  have hfe'
+      : ∀ ω : Forms E'.const n,
+        IsFreeGen E'.ring ω → IsFreeGen E.ring (TopForm.formMap n χ hc' ω) := fun ω hω =>
     EtaleDiv.isFreeGen_formMap (EtaleDiv.formallyEtale_of_bijective χ eψ.symm.bijective) hc' hω
   have hτ : (E'.ring.subtype.comp ψ).comp E.const = Cartier.constFn (s ≫ p) := by
     rw [RingHom.comp_assoc, hc]
     rfl
-  have key : ∀ ω : Forms E.const n,
-      EtaleKlt.ratPull p s n (E.toRat n ω) = E'.toRat n (TopForm.formMap n ψ hc ω) := by
+  have key
+      : ∀ ω : Forms E.const n,
+        EtaleKlt.ratPull p s n (E.toRat n ω) = E'.toRat n (TopForm.formMap n ψ hc ω) := by
     intro ω
     have e : φ.comp E.ring.subtype = E'.ring.subtype.comp ψ := by
       ext x
@@ -90,15 +102,17 @@ theorem formOrd_ratPull_of_over : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [I
   have hτ' : (E.ring.subtype.comp χ).comp E'.const = Cartier.constFn p := by
     rw [RingHom.comp_assoc, hc']
     rfl
-  have key' : ∀ ω : Forms E'.const n,
-      Φ' (E'.toRat n ω) = E.toRat n (TopForm.formMap n χ hc' ω) := by
+  have key'
+      : ∀ ω : Forms E'.const n, Φ' (E'.toRat n ω) = E.toRat n (TopForm.formMap n χ hc' ω) := by
     intro ω
-    have e : (φe.symm : Y.functionField →+* X.functionField).comp E'.ring.subtype =
-        E.ring.subtype.comp χ := by
+    have e
+        : (φe.symm : Y.functionField →+* X.functionField).comp E'.ring.subtype
+          = E.ring.subtype.comp χ := by
       ext y
       exact (hχv y).symm
-    have k1 := TopForm.formMap_formMap (D := n) E'.ring.subtype
-      (φe.symm : Y.functionField →+* X.functionField) _ e rfl hcc hτ' ω
+    have k1 :=
+      TopForm.formMap_formMap (D := n) E'.ring.subtype
+        (φe.symm : Y.functionField →+* X.functionField) _ e rfl hcc hτ' ω
     have k2 := TopForm.formMap_formMap (D := n) χ E.ring.subtype _ rfl hc' rfl hτ' ω
     exact k1.trans k2.symm
   have fwd : ∀ a, E.IsFormOrd η a → E'.IsFormOrd (EtaleKlt.ratPull p s n η) a := by
@@ -108,7 +122,8 @@ theorem formOrd_ratPull_of_over : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [I
     rfl
   have bwd : ∀ a, E'.IsFormOrd (EtaleKlt.ratPull p s n η) a → E.IsFormOrd η a := by
     rintro a ⟨ω, hω, f, hη', hf⟩
-    let g : X.functionFieldˣ := Units.map (φe.symm : Y.functionField →+* X.functionField).toMonoidHom f
+    let g : X.functionFieldˣ :=
+      Units.map (φe.symm : Y.functionField →+* X.functionField).toMonoidHom f
     have hgf : Units.map φ.toMonoidHom g = f := by
       ext
       exact φe.apply_symm_apply (f : Y.functionField)
@@ -123,8 +138,7 @@ theorem formOrd_ratPull_of_over : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [I
   by_cases h : ∃ a, E.IsFormOrd η a
   · obtain ⟨a, ha⟩ := h
     rw [ha.formOrd_eq hη, (fwd a ha).formOrd_eq hne]
-  · have h' : ¬ ∃ a, E'.IsFormOrd (EtaleKlt.ratPull p s n η) a :=
-      fun ⟨a, ha⟩ => h ⟨a, bwd a ha⟩
+  · have h' : ¬ ∃ a, E'.IsFormOrd (EtaleKlt.ratPull p s n η) a := fun ⟨a, ha⟩ => h ⟨a, bwd a ha⟩
     rw [DivOver.formOrd, DivOver.formOrd, dite_eq_right h, dite_eq_right h']
 
 end GlobalTheory.BirOrd

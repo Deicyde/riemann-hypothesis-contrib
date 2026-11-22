@@ -33,8 +33,9 @@ def normTraceIdeal (E : Type) [Field E] [NumberField E] [StarRing E] : Ideal (�
     simp only [ht, star_mul', star_star]
     linear_combination ((c : E) * star (c : E)) * hu
 
-theorem exists_trace_one : ∀ (E : Type) [Field E] [NumberField E] [StarRing E],
-    Formalism.HermitianLatticesTheory.IsCMUnram E → ∃ w : 𝓞 E, (w : E) + star (w : E) = 1 := by
+theorem exists_trace_one
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E],
+      Formalism.HermitianLatticesTheory.IsCMUnram E → ∃ w : 𝓞 E, (w : E) + star (w : E) = 1 := by
   intro E _ _ _ h
   have htop : normTraceIdeal E = ⊤ := by
     by_contra hne

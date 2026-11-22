@@ -12,9 +12,10 @@ universe u
 
 namespace GlobalTheory.LocalizedFinsetForAll
 
-theorem loc_forall_finset {U : Scheme.{0}} {ι : Type u} (s : Finset ι)
-    {P : ι → (V : Scheme.{0}) → (V ⟶ U) → Prop} (h : ∀ i ∈ s, GlobalTheory.EtC.Loc U (P i)) :
-    GlobalTheory.EtC.Loc U fun (V : Scheme.{0}) (g : V ⟶ U) ↦ ∀ i ∈ s, P i V g := by
+theorem loc_forall_finset
+    {U : Scheme.{0}} {ι : Type u} (s : Finset ι)
+    {P : ι → (V : Scheme.{0}) → (V ⟶ U) → Prop} (h : ∀ i ∈ s, GlobalTheory.EtC.Loc U (P i))
+    : GlobalTheory.EtC.Loc U fun (V : Scheme.{0}) (g : V ⟶ U) ↦ ∀ i ∈ s, P i V g := by
   classical
   induction s using Finset.induction_on with
   | empty =>

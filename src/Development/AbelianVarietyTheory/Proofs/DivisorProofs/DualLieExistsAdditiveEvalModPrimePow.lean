@@ -10,14 +10,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CartierDualT
 
 noncomputable section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz
+  GlobalTheory.QLog GlobalTheory.PDivGroup
 
 namespace GlobalTheory
 
-theorem PDivGroup.dual_lie_exists_eval_mod_pow : ∀ (p : ℕ) (O : Type) [CommRing O]
-    (G : PDivGroup p O) (l : G.dual.Lie) (n : ℕ), ∃ (b : G.A n) (z : G.A n ⊗[O] G.A n),
-    cobOne O (G.A n) b = (p : O) ^ n • z ∧ ∀ (w : G.dual.omega) (φ : CartierDual O (G.A n)),
-    dUnit (R := O) φ = w.1 n → (p : O) ^ n ∣ l w - φ b := by
+theorem PDivGroup.dual_lie_exists_eval_mod_pow
+    : ∀ (p : ℕ) (O : Type) [CommRing O] (G : PDivGroup p O) (l : G.dual.Lie) (n : ℕ),
+      ∃ (b : G.A n) (z : G.A n ⊗[O] G.A n),
+        cobOne O (G.A n) b = (p : O) ^ n • z
+          ∧ ∀ (w : G.dual.omega) (φ : CartierDual O (G.A n)),
+            dUnit (R := O) φ = w.1 n → (p : O) ^ n ∣ l w - φ b := by
   intro p O _ G l n
   let I : Ideal O := Ideal.span {(p : O) ^ n}
   let N : Submodule O G.dual.omega := Ideal.span {(p : O)} ^ n • ⊤
@@ -26,7 +29,8 @@ theorem PDivGroup.dual_lie_exists_eval_mod_pow : ∀ (p : ℕ) (O : Type) [CommR
     intro x hx
     have hx' : x ∈ (Ideal.span {(p : O)} ^ n • ⊤ : Submodule O G.dual.omega) := hx
     rw [Ideal.span_singleton_pow, Submodule.ideal_span_singleton_smul,
-      Submodule.mem_smul_pointwise_iff_exists] at hx'
+        Submodule.mem_smul_pointwise_iff_exists]
+      at hx'
     obtain ⟨v, -, rfl⟩ := hx'
     rw [LinearMap.mem_ker]
     change Ideal.Quotient.mk I (l ((p : O) ^ n • v)) = 0
@@ -40,7 +44,8 @@ theorem PDivGroup.dual_lie_exists_eval_mod_pow : ∀ (p : ℕ) (O : Type) [CommR
     change N.liftQ m hN ((G.dual.omegaQuotEquiv n).symm (w.1 n)) = _
     rw [← h, LinearEquiv.symm_apply_apply]
     rfl
-  obtain ⟨b, z, hb, hφ⟩ := GlobalTheory.T.cartierDual_tangent_mod_eq_eval_additive O (G.A n) ((p : O) ^ n) u
+  obtain ⟨b, z, hb, hφ⟩ :=
+    GlobalTheory.T.cartierDual_tangent_mod_eq_eval_additive O (G.A n) ((p : O) ^ n) u
   refine ⟨b, z, hb, fun w φ hφw => ?_⟩
   have h1 := hφ φ
   rw [hφw, hu, Ideal.Quotient.eq] at h1

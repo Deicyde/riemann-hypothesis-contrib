@@ -8,12 +8,21 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PhaseAppl
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum MeasureTheory NumberField Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Twist.NormRed
 
-theorem sq_norm_two_haar : ∀ (D : D7) (V' W : HSp D) (μ' : Measure (WO V' W)) (𝓕' : Set (WO V' W)), μ'.IsAddHaarMeasure → IsAddFundamentalDomain (ratL W V') 𝓕' μ' → ∀ (μ'' : Measure (WO V' W)) (𝓕'' : Set (WO V' W)), IsCovolOne (ratL W V') μ'' 𝓕'' → ∃ c : ENNReal, ∀ g : WO V' W → ℂ, Continuous g → (∀ γ ∈ ratL W V', ∀ w, ‖g (γ + w)‖ = ‖g w‖) → ∫⁻ x in 𝓕', ‖g x‖ₑ ^ 2 ∂μ' = c * ∫⁻ x in 𝓕'', ‖g x‖ₑ ^ 2 ∂μ'' := by
+theorem sq_norm_two_haar
+    : ∀ (D : D7) (V' W : HSp D) (μ' : Measure (WO V' W)) (𝓕' : Set (WO V' W)),
+      μ'.IsAddHaarMeasure → IsAddFundamentalDomain (ratL W V') 𝓕' μ'
+        → ∀ (μ'' : Measure (WO V' W)) (𝓕'' : Set (WO V' W)),
+          IsCovolOne (ratL W V') μ'' 𝓕''
+            → ∃ c : ENNReal, ∀ g : WO V' W → ℂ,
+              Continuous g → (∀ γ ∈ ratL W V', ∀ w, ‖g (γ + w)‖ = ‖g w‖)
+                → ∫⁻ x in 𝓕', ‖g x‖ₑ ^ 2 ∂μ' = c * ∫⁻ x in 𝓕'', ‖g x‖ₑ ^ 2 ∂μ'' := by
   intro D V' W μ' 𝓕' hμ' hF' μ'' 𝓕'' h''
   obtain ⟨i1, i2, i3, i4, i5, -⟩ := GlobalTheory.MixModel.lattice_Mx D W.rank V'.rank
   haveI : BorelSpace (WO V' W) := ⟨rfl⟩
@@ -32,8 +41,7 @@ theorem sq_norm_two_haar : ∀ (D : D7) (V' W : HSp D) (μ' : Measure (WO V' W))
   have e := Measure.isAddLeftInvariant_eq_smul μ' μ''
   set c := Measure.addHaarScalarFactor μ' μ''
   have hc : c ≠ 0 := (Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure μ' μ'').ne'
-  have hac : μ'' ≪ μ' := by
-    rw [e]; exact Measure.absolutelyContinuous_smul (by exact_mod_cast hc)
+  have hac : μ'' ≪ μ' := by rw [e]; exact Measure.absolutelyContinuous_smul (by exact_mod_cast hc)
   have hF2 : IsAddFundamentalDomain (ratL W V') 𝓕' μ'' := hF'.mono hac
   refine ⟨(c : ENNReal), fun g hg hper => ?_⟩
   have hp : ∀ (γ : ratL W V') (x : WO V' W), ‖g (γ +ᵥ x)‖ₑ ^ 2 = ‖g x‖ₑ ^ 2 := by

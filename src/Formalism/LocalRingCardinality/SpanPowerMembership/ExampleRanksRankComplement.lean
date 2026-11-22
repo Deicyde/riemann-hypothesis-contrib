@@ -32,7 +32,6 @@ theorem exampleRanks_o : R0.o = 1 := by
   have h1 : R0.toFrame.n0 = 4 := exampleRanks_baseRank
   have h2 : R0.toFrame.ord = 4 := rfl
   rw [h1, h2]
-theorem exampleRanks_h_injective : Function.Injective R0.h :=
-  Formalism.HC.frameCyc_h_injective 2 1
+theorem exampleRanks_h_injective : Function.Injective R0.h := Formalism.HC.frameCyc_h_injective 2 1
 
 end Formalism.BasicNotions.Examples₂

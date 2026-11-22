@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZlTower
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
 open scoped Topology PowerSeries.WithPiTopology
 set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 1600000
@@ -18,12 +19,14 @@ open Filter Topology
 
 namespace GlobalTheory.WeakClosed
 
-theorem continuous_frac_act {A K G : Type} [CommRing A] [IsDomain A] [ValuationRing A] [Field K]
-    [Algebra A K] [IsFractionRing A K] [TopologicalSpace G] (τ : G → (A ≃+* A))
-    (σ : G → (K ≃+* K)) (hσ : ∀ g a, σ g (algebraMap A K a) = algebraMap A K (τ g a))
-    (ho : ∀ (x a : A) (g₀ : G), a ≠ 0 → ∀ᶠ g in 𝓝 g₀, ¬ (τ g x - τ g₀ x ∣ a)) :
-    letI : Valued K (ValuationRing.ValueGroup A K) := Valued.mk' (ValuationRing.valuation A K)
-    Continuous fun p : G × K => σ p.1 p.2 := by
+theorem continuous_frac_act
+    {A K G : Type} [CommRing A] [IsDomain A] [ValuationRing A] [Field K] [Algebra A K]
+    [IsFractionRing A K] [TopologicalSpace G]
+    (τ : G → (A ≃+* A)) (σ : G → (K ≃+* K))
+    (hσ : ∀ g a, σ g (algebraMap A K a) = algebraMap A K (τ g a))
+    (ho : ∀ (x a : A) (g₀ : G), a ≠ 0 → ∀ᶠ g in 𝓝 g₀, ¬ (τ g x - τ g₀ x ∣ a))
+    : letI : Valued K (ValuationRing.ValueGroup A K) := Valued.mk' (ValuationRing.valuation A K)
+      Continuous fun p : G × K => σ p.1 p.2 := by
   letI V : Valued K (ValuationRing.ValueGroup A K) := Valued.mk' (ValuationRing.valuation A K)
   have hle : ∀ x y : K, Valued.v x ≤ Valued.v y ↔ ∃ c : A, algebraMap A K c * y = x := by
     intro x y
@@ -62,11 +65,15 @@ theorem continuous_frac_act {A K G : Type} [CommRing A] [IsDomain A] [ValuationR
     simp only [map_div₀]
     exact (hA a).div (hA d) fun g => by simpa using hd0
 
-theorem continuous_autCb_cbTop : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI : LocAinf l P),
-    letI := cbTop l; Continuous fun q : GQ l × Cb l => autCb l (AI.actT q.1) q.2 := by
+theorem continuous_autCb_cbTop
+    : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI : LocAinf l P),
+      letI := cbTop l; Continuous fun q : GQ l × Cb l => autCb l (AI.actT q.1) q.2 := by
   intro l _ P AI
-  refine continuous_frac_act (A := OCb l) (fun g => AI.actT g) (fun g => autCb l (AI.actT g))
-    (fun g a => autCb_alg l _ a) fun x a g₀ ha => ?_
+  refine continuous_frac_act (A := OCb l)
+    (fun g => AI.actT g)
+    (fun g => autCb l (AI.actT g))
+    (fun g a => autCb_alg l _ a)
+    fun x a g₀ ha => ?_
   obtain ⟨n, hn⟩ : ∃ n, PreTilt.coeff n a ≠ 0 := by
     by_contra! h
     refine ha (Perfection.ext fun n => ?_)

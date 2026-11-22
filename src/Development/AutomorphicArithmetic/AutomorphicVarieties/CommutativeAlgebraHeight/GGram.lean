@@ -6,14 +6,16 @@ public import Mathlib
 
 open IsLocalRing
 
-theorem UpperTheory.V.CA.g_gram :
-    ∀ (K ι : Type) [Field K] [Fintype ι] [DecidableEq ι] (s : Set (Matrix ι ι K)),
-      Submodule.span K s = ⊤ ↔ ∃ x : ι × ι → Matrix ι ι K, (∀ a, x a ∈ s) ∧
-        Matrix.det (Matrix.of fun a b : ι × ι => (x a * x b).trace) ≠ 0 := by
+theorem UpperTheory.V.CA.g_gram
+    : ∀ (K ι : Type) [Field K] [Fintype ι] [DecidableEq ι] (s : Set (Matrix ι ι K)),
+      Submodule.span K s = ⊤
+        ↔ ∃ x : ι × ι → Matrix ι ι K,
+          (∀ a, x a ∈ s) ∧ Matrix.det (Matrix.of fun a b : ι × ι => (x a * x b).trace) ≠ 0 := by
   intro K ι _ _ _ s
-  have hG : ∀ (x : ι × ι → Matrix ι ι K) (v : ι × ι → K) (a : ι × ι),
-      (Matrix.of (fun a b : ι × ι => (x a * x b).trace)).mulVec v a
-        = (x a * ∑ b, v b • x b).trace := by
+  have hG
+      : ∀ (x : ι × ι → Matrix ι ι K) (v : ι × ι → K) (a : ι × ι),
+        (Matrix.of (fun a b : ι × ι => (x a * x b).trace)).mulVec v a
+          = (x a * ∑ b, v b • x b).trace := by
     intro x v a
     simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, Finset.mul_sum, Matrix.trace_sum,
       Matrix.mul_smul, Matrix.trace_smul, smul_eq_mul]
@@ -70,7 +72,8 @@ theorem UpperTheory.V.CA.g_gram :
         rw [hG, hg, Matrix.mul_zero, Matrix.trace_zero]
         rfl
       exact fun i => congrFun (Matrix.eq_zero_of_mulVec_eq_zero hdet hm) i
-    have htop := hli.span_eq_top_of_card_eq_finrank (by
-      rw [Module.finrank_matrix, Module.finrank_self, mul_one, Fintype.card_prod])
+    have htop :=
+      hli.span_eq_top_of_card_eq_finrank (by
+        rw [Module.finrank_matrix, Module.finrank_self, mul_one, Fintype.card_prod])
     rw [eq_top_iff, ← htop]
     exact Submodule.span_mono (Set.range_subset_iff.mpr hxs)

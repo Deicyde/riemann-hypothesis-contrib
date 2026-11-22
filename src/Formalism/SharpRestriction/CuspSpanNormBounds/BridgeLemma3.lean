@@ -27,20 +27,25 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.B2x1
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  Formalism.FourierDecayAlt.P.B2x1
 
 variable {k r : ℕ}
 
-theorem hu_pull_sigmaFinite {U : Set (Mat k r)} (hU : IsClosedSubgroup U) (μ : Measure (Mt k r)) [SigmaFinite μ] :
-    SigmaFinite (pull hU μ) := by
+theorem hu_pull_sigmaFinite
+    {U : Set (Mat k r)} (hU : IsClosedSubgroup U) (μ : Measure (Mt k r)) [SigmaFinite μ]
+    : SigmaFinite (pull hU μ) := by
   refine (Measure.FiniteSpanningSetsIn.sigmaFinite (C := Set.univ)
     ⟨fun n => (inc : Gp U hU → Mt k r) ⁻¹' spanningSets μ n, fun _ => trivial, fun n => ?_, ?_⟩)
   · rw [pull, inc_memb.comap_apply]
-    exact lt_of_le_of_lt (measure_mono (Set.image_preimage_subset _ _)) (measure_spanningSets_lt_top μ n)
+    exact lt_of_le_of_lt (measure_mono (Set.image_preimage_subset _ _))
+      (measure_spanningSets_lt_top μ n)
   · rw [← Set.preimage_iUnion, iUnion_spanningSets, Set.preimage_univ]
 
-theorem hu_smul {U : Set (Mat k r)} {ν : Measure (Mt k r)} (h : Formalism.FourierDecayAlt.B.IsHaarOn U ν) {c : ℝ≥0∞} (hc0 : c ≠ 0)
-    (hc1 : c ≠ ∞) : Formalism.FourierDecayAlt.B.IsHaarOn U (c • ν) := by
+theorem hu_smul
+    {U : Set (Mat k r)} {ν : Measure (Mt k r)} (h : Formalism.FourierDecayAlt.B.IsHaarOn U ν)
+    {c : ℝ≥0∞} (hc0 : c ≠ 0) (hc1 : c ≠ ∞)
+    : Formalism.FourierDecayAlt.B.IsHaarOn U (c • ν) := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rw [smul_apply, h.conc, smul_zero]
   · intro a ha
@@ -59,8 +64,11 @@ theorem hu_smul {U : Set (Mat k r)} {ν : Measure (Mt k r)} (h : Formalism.Fouri
     · exact absurd h1 hc0
     · simpa using h1
 
-theorem hu_eq_smul {U : Set (Mat k r)} (hU : IsClosedSubgroup U) {ν μ : Measure (Mt k r)}
-    (hν : Formalism.FourierDecayAlt.B.IsHaarOn U ν) (hμ : Formalism.MainNotions.S.IsHaarOn U μ) : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = c • ν := by
+theorem hu_eq_smul
+    {U : Set (Mat k r)} (hU : IsClosedSubgroup U)
+    {ν μ : Measure (Mt k r)}
+    (hν : Formalism.FourierDecayAlt.B.IsHaarOn U ν) (hμ : Formalism.MainNotions.S.IsHaarOn U μ)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = c • ν := by
   obtain ⟨hσ, h0, hc, hl⟩ := hμ
   have hc' : μ Uᶜ = 0 := hc
   have : SigmaFinite ν := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite hν
@@ -100,27 +108,35 @@ theorem hu_eq_smul {U : Set (Mat k r)} (hU : IsClosedSubgroup U) {ν μ : Measur
     · rw [e, ENNReal.top_mul hz] at hfin
       exact lt_irrefl _ hfin
   refine ⟨c, hc0, hc1, ?_⟩
-  calc μ = (pull hU μ).map inc := (map_pull μ hc').symm
+  calc
+    μ = (pull hU μ).map inc := (map_pull μ hc').symm
     _ = (c • pull hU ν).map inc := by rw [← key]
     _ = c • ν := by rw [Measure.map_smul c inc_memb.measurable.aemeasurable, map_pull ν hν.conc]
 
-theorem hu_general {U : Set (Mat k r)} (hU : IsClosedSubgroup U) {ν μ : Measure (Mt k r)}
-    (hν : Formalism.FourierDecayAlt.B.IsHaarOn U ν) (hμ : Formalism.MainNotions.S.IsHaarOn U μ) : Formalism.FourierDecayAlt.B.IsHaarOn U μ := by
+theorem hu_general
+    {U : Set (Mat k r)} (hU : IsClosedSubgroup U)
+    {ν μ : Measure (Mt k r)}
+    (hν : Formalism.FourierDecayAlt.B.IsHaarOn U ν) (hμ : Formalism.MainNotions.S.IsHaarOn U μ)
+    : Formalism.FourierDecayAlt.B.IsHaarOn U μ := by
   obtain ⟨c, hc0, hc1, rfl⟩ := hu_eq_smul hU hν hμ
   exact hu_smul hν hc0 hc1
 
-theorem hu_haarUp :
-    (∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (μ : Measure (Mt k r)), inWb k r z → 0 < Tz k r z →
-      Formalism.MainNotions.S.IsHaarOn (UWset k r z) μ → Formalism.FourierDecayAlt.B.IsHaarOn (UWset k r z) μ) ∧
-    ∀ (k r : ℕ) (μ : Measure (Mt k r)), Formalism.MainNotions.S.IsHaarOn (Nset k r) μ → Formalism.FourierDecayAlt.B.IsHaarOn (Nset k r) μ := by
+theorem hu_haarUp
+    : (∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (μ : Measure (Mt k r)),
+        inWb k r z → 0 < Tz k r z → Formalism.MainNotions.S.IsHaarOn (UWset k r z) μ
+          → Formalism.FourierDecayAlt.B.IsHaarOn (UWset k r z) μ)
+      ∧ ∀ (k r : ℕ) (μ : Measure (Mt k r)),
+        Formalism.MainNotions.S.IsHaarOn (Nset k r) μ
+          → Formalism.FourierDecayAlt.B.IsHaarOn (Nset k r) μ := by
   refine ⟨fun k r z μ hz hT hμ => ?_, fun k r μ hμ => ?_⟩
   · obtain ⟨ν, hν⟩ := Formalism.FourierDecayAlt.P.weyl_haar_exists k r z hz hT
     exact hu_general (Formalism.FourierDecayAlt.P.weyl_subgroup_closed k r z) hν hμ
   · obtain ⟨ν, hν⟩ := Formalism.FourierDecayAlt.P.unipotent_haar_exists k r
     exact hu_general (Formalism.FourierDecayAlt.P.unipotent_radical_closed k r) hν hμ
 
-theorem hu_haarG (k r : ℕ) (μ : Measure (Mt k r)) (hμ : Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) μ) :
-    Formalism.FourierDecayAlt.B.IsHaarOn (GV k r) μ := by
+theorem hu_haarG
+    (k r : ℕ) (μ : Measure (Mt k r)) (hμ : Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) μ)
+    : Formalism.FourierDecayAlt.B.IsHaarOn (GV k r) μ := by
   obtain ⟨ν, hν⟩ := Formalism.FourierDecayAlt.P.unitary_group_haar_exists k r
   exact hu_general (Formalism.FourierDecayAlt.P.unitary_group_closed k r) hν hμ
 
@@ -148,11 +164,13 @@ def rp_Mid (k r : ℕ) (i : Fin (2 * r + k + 1)) : Prop := r ≤ i.val ∧ i.val
 
 def rp_ι (k r : ℕ) (i : Fin k) : Fin (2 * r + k + 1) := ⟨r + i.val, by have := i.2; omega⟩
 
-def rp_blk (k r : ℕ) (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : Matrix (Fin k) (Fin k) ℂ :=
-  fun i j => m (rp_ι k r i) (rp_ι k r j)
+def rp_blk (k r : ℕ) (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : Matrix (Fin k) (Fin k) ℂ := fun i j =>
+  m (rp_ι k r i) (rp_ι k r j)
 
 def rp_Std (k r : ℕ) (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : Prop :=
-  ∀ i, ¬ rp_Mid k r i → (∀ j, m i j = if i = j then 1 else 0) ∧ (∀ j, m j i = if j = i then 1 else 0)
+  ∀ i,
+    ¬ rp_Mid k r i → (∀ j, m i j = if i = j then 1 else 0) ∧ (∀ j, m j i = if j = i then 1 else 0)
 
 theorem rp_mid_ι (i : Fin k) : rp_Mid k r (rp_ι k r i) := by
   have := i.2
@@ -161,8 +179,8 @@ theorem rp_mid_ι (i : Fin k) : rp_Mid k r (rp_ι k r i) := by
 theorem rp_ι_inj : Function.Injective (rp_ι k r) := fun a b hab =>
   Fin.ext (by have := congrArg Fin.val hab; simpa [rp_ι] using this)
 
-theorem rp_eq_blockW (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (h : rp_Std k r m) :
-    m = blockW k r (rp_blk k r m) := by
+theorem rp_eq_blockW (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (h : rp_Std k r m)
+    : m = blockW k r (rp_blk k r m) := by
   ext i j
   unfold blockW
   by_cases hi : r ≤ i.val ∧ i.val < r + k
@@ -177,17 +195,20 @@ theorem rp_eq_blockW (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ
       exact hj hi
   · rw [dite_eq_right hi, (h i hi).1 j]
 
-theorem rp_sum (f : Fin (2 * r + k + 1) → ℂ) (h : ∀ l, ¬ rp_Mid k r l → f l = 0) :
-    ∑ l, f l = ∑ i, f (rp_ι k r i) := by
+theorem rp_sum (f : Fin (2 * r + k + 1) → ℂ) (h : ∀ l, ¬ rp_Mid k r l → f l = 0)
+    : ∑ l, f l = ∑ i, f (rp_ι k r i) := by
   symm
   refine Fintype.sum_of_injective (rp_ι k r) rp_ι_inj _ _ ?_ (fun _ => rfl)
   intro l hl
   apply h
   intro hm
-  exact hl ⟨⟨l.val - r, by have := hm.2; have := hm.1; omega⟩, Fin.ext (by simp only [rp_ι]; have := hm.1; omega)⟩
+  exact hl ⟨
+    ⟨l.val - r, by have := hm.2; have := hm.1; omega⟩,
+    Fin.ext (by simp only [rp_ι]; have := hm.1; omega)
+  ⟩
 
-theorem rp_blk_mul (a b : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (ha : rp_Std k r a) :
-    rp_blk k r (a * b) = rp_blk k r a * rp_blk k r b := by
+theorem rp_blk_mul (a b : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (ha : rp_Std k r a)
+    : rp_blk k r (a * b) = rp_blk k r a * rp_blk k r b := by
   ext i j
   simp only [rp_blk, Matrix.mul_apply]
   refine rp_sum _ fun l hl => ?_
@@ -202,18 +223,23 @@ theorem rp_blk_one : rp_blk k r 1 = 1 := by
   · rw [if_pos h, if_pos (by rw [h])]
   · rw [if_neg h, if_neg (fun e => h (rp_ι_inj e))]
 
-theorem rp_mulVec_bvec {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (c : Fin n) : M *ᵥ bvec c = fun i => M i c := by
+theorem rp_mulVec_bvec {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (c : Fin n)
+    : M *ᵥ bvec c = fun i => M i c := by
   ext i
   simp [bvec, Matrix.mulVec, dotProduct, Pi.single_apply]
 
-theorem rp_col {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) (c : Fin n) (h : g *ᵥ bvec c = bvec c) (l : Fin n) :
-    g l c = if l = c then 1 else 0 := by
+theorem rp_col
+    {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) (c : Fin n) (h : g *ᵥ bvec c = bvec c) (l : Fin n)
+    : g l c = if l = c then 1 else 0 := by
   have e := congrFun h l
   rw [rp_mulVec_bvec] at e
   simpa [bvec, Pi.single_apply] using e
 
-theorem rp_rowOf {n : ℕ} (m H : Matrix (Fin n) (Fin n) ℂ) (hm : mᴴ * H * m = H) (c i : Fin n) (s : ℂ) (hs : s ≠ 0)
-    (hc : m *ᵥ bvec c = bvec c) (hH : H *ᵥ bvec c = s • bvec i) (j : Fin n) : m i j = if i = j then 1 else 0 := by
+theorem rp_rowOf
+    {n : ℕ} (m H : Matrix (Fin n) (Fin n) ℂ) (hm : mᴴ * H * m = H) (c i : Fin n)
+    (s : ℂ) (hs : s ≠ 0)
+    (hc : m *ᵥ bvec c = bvec c) (hH : H *ᵥ bvec c = s • bvec i) (j : Fin n)
+    : m i j = if i = j then 1 else 0 := by
   have h1 : mᴴ *ᵥ (H *ᵥ (m *ᵥ bvec c)) = H *ᵥ bvec c := by
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hm]
   rw [hc, hH, Matrix.mulVec_smul] at h1
@@ -250,17 +276,20 @@ theorem rp_H_w : Hpk k r *ᵥ bvec (wI k r (Fin.last k)) = (-1 : ℂ) • bvec (
   simp only [Hpk, wI, bvec, Pi.smul_apply, Pi.single_apply, Fin.ext_iff, smul_eq_mul, Fin.val_last]
   split_ifs <;> first | rfl | (exfalso; omega) | simp
 
-theorem rp_H_mid (i : Fin (2 * r + k + 1)) (hi : rp_Mid k r i) (j : Fin (2 * r + k + 1)) :
-    Hpk k r i j = if i = j then 1 else 0 := by
+theorem rp_H_mid (i : Fin (2 * r + k + 1)) (hi : rp_Mid k r i) (j : Fin (2 * r + k + 1))
+    : Hpk k r i j = if i = j then 1 else 0 := by
   have := i.2
   have := j.2
   obtain ⟨h1, h2⟩ := hi
   simp only [Hpk, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem rp_std_of_fix (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (hU : m ∈ UH (Hpk k r))
-    (hfix : ∀ a : Fin r, m *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ m *ᵥ bvec (esI k r a) = bvec (esI k r a))
-    (hw : m *ᵥ bvec (wI k r (Fin.last k)) = bvec (wI k r (Fin.last k))) : rp_Std k r m := by
+theorem rp_std_of_fix
+    (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (hU : m ∈ UH (Hpk k r))
+    (hfix : ∀ a : Fin r,
+      m *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ m *ᵥ bvec (esI k r a) = bvec (esI k r a))
+    (hw : m *ᵥ bvec (wI k r (Fin.last k)) = bvec (wI k r (Fin.last k)))
+    : rp_Std k r m := by
   intro i hi
   have hi2 := i.2
   have hcase : i.val < r ∨ i.val = r + k ∨ r + k < i.val := by
@@ -268,22 +297,29 @@ theorem rp_std_of_fix (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) �
     omega
   rcases hcase with h | h | h
   · obtain ⟨a, rfl⟩ : ∃ a, i = eI k r a := ⟨⟨i.val, h⟩, rfl⟩
-    exact ⟨fun j => rp_rowOf m _ hU (esI k r a) _ 1 one_ne_zero (hfix a).2 (rp_H_es a) j,
-      fun j => rp_col m _ (hfix a).1 j⟩
+    exact ⟨
+      fun j => rp_rowOf m _ hU (esI k r a) _ 1 one_ne_zero (hfix a).2 (rp_H_es a) j,
+      fun j => rp_col m _ (hfix a).1 j
+    ⟩
   · obtain rfl : i = wI k r (Fin.last k) := Fin.ext (by simp only [wI, Fin.val_last]; omega)
     exact ⟨fun j => rp_rowOf m _ hU _ _ (-1) (by norm_num) hw rp_H_w j, fun j => rp_col m _ hw j⟩
   · obtain ⟨a, rfl⟩ : ∃ a, i = esI k r a :=
       ⟨⟨2 * r + k - i.val, by omega⟩, Fin.ext (by simp only [esI]; omega)⟩
-    exact ⟨fun j => rp_rowOf m _ hU (eI k r a) _ 1 one_ne_zero (hfix a).1 (rp_H_e a) j,
-      fun j => rp_col m _ (hfix a).2 j⟩
+    exact ⟨
+      fun j => rp_rowOf m _ hU (eI k r a) _ 1 one_ne_zero (hfix a).1 (rp_H_e a) j,
+      fun j => rp_col m _ (hfix a).2 j
+    ⟩
 
-theorem rp_blk_unitary (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (hU : m ∈ UH (Hpk k r))
-    (hs : rp_Std k r m) : (rp_blk k r m)ᴴ * rp_blk k r m = 1 := by
+theorem rp_blk_unitary
+    (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    (hU : m ∈ UH (Hpk k r)) (hs : rp_Std k r m)
+    : (rp_blk k r m)ᴴ * rp_blk k r m = 1 := by
   ext i j
   have e := congrFun (congrFun (show mᴴ * Hpk k r * m = Hpk k r from hU) (rp_ι k r i)) (rp_ι k r j)
   rw [Matrix.mul_assoc, Matrix.mul_apply, rp_H_mid _ (rp_mid_ι i)] at e
-  have e2 : ∑ l, mᴴ (rp_ι k r i) l * (Hpk k r * m) l (rp_ι k r j) =
-      ∑ a, mᴴ (rp_ι k r i) (rp_ι k r a) * (Hpk k r * m) (rp_ι k r a) (rp_ι k r j) :=
+  have e2
+      : ∑ l, mᴴ (rp_ι k r i) l * (Hpk k r * m) l (rp_ι k r j)
+        = ∑ a, mᴴ (rp_ι k r i) (rp_ι k r a) * (Hpk k r * m) (rp_ι k r a) (rp_ι k r j) :=
     rp_sum _ fun l hl => by
       rw [Matrix.conjTranspose_apply, (hs l hl).1 (rp_ι k r i), if_neg, star_zero, zero_mul]
       rintro rfl
@@ -291,7 +327,8 @@ theorem rp_blk_unitary (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) �
   have e3 : ∀ a, (Hpk k r * m) (rp_ι k r a) (rp_ι k r j) = m (rp_ι k r a) (rp_ι k r j) := by
     intro a
     rw [Matrix.mul_apply]
-    simp only [rp_H_mid _ (rp_mid_ι a), ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    simp only [rp_H_mid _ (rp_mid_ι a), ite_mul, one_mul, zero_mul, Finset.sum_ite_eq,
+      Finset.mem_univ, if_true]
   rw [e2] at e
   simp only [e3] at e
   simp only [Matrix.mul_apply, Matrix.conjTranspose_apply, rp_blk, Matrix.one_apply]
@@ -301,34 +338,39 @@ theorem rp_blk_unitary (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) �
   · rw [if_pos h, if_pos (by rw [h])]
   · rw [if_neg h, if_neg (fun e => h (rp_ι_inj e))]
 
-theorem rp_blk_mem (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (hU : m ∈ UH (Hpk k r))
-    (hs : rp_Std k r m) : rp_blk k r m ∈ UJset (allPos k) := by
-  have hJ : Formalism.REAL.Jm (allPos k) = 1 := by
-    simp [Formalism.REAL.Jm, allPos]
+theorem rp_blk_mem
+    (m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    (hU : m ∈ UH (Hpk k r)) (hs : rp_Std k r m)
+    : rp_blk k r m ∈ UJset (allPos k) := by
+  have hJ : Formalism.REAL.Jm (allPos k) = 1 := by simp [Formalism.REAL.Jm, allPos]
   show (rp_blk k r m)ᴴ * Formalism.REAL.Jm (allPos k) * rp_blk k r m = Formalism.REAL.Jm (allPos k)
   rw [hJ, Matrix.mul_one, rp_blk_unitary m hU hs]
 
 end aux
 
-theorem rp_repOfHC :
-    ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (u : Fin k → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-      (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)), inWb k r z → 0 < Tz k r z →
-      Formalism.MainNotions.S.IsHCTypeW k r z u π →
-        IsCRepOn (UWset k r z) π ∧ (∀ h ∈ UWset k r z, ∀ v, ‖π h v‖ = ‖v‖) ∧ ContinuousOn π (UWset k r z) := by
+theorem rp_repOfHC
+    : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (u : Fin k → ℝ) (H : Type) [NormedAddCommGroup H]
+        [InnerProductSpace ℂ H]
+        (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)),
+      inWb k r z → 0 < Tz k r z → Formalism.MainNotions.S.IsHCTypeW k r z u π
+        → IsCRepOn (UWset k r z) π ∧ (∀ h ∈ UWset k r z, ∀ v, ‖π h v‖ = ‖v‖)
+          ∧ ContinuousOn π (UWset k r z) := by
   intro k r z u H _ _ π _ hT hπ0
   obtain ⟨g, ⟨hgU, hgfix, hgz⟩, -, hfd, ⟨⟨hσ1, hσm⟩, hσi, hσc⟩, -⟩ := hπ0
   have hsq : Hpk k r * Hpk k r = 1 := (hpkFacts k r).2.1
-  have hdet : IsUnit (Hpk k r).det := (Matrix.isUnit_iff_isUnit_det _).mp ⟨⟨Hpk k r, Hpk k r, hsq, hsq⟩, rfl⟩
+  have hdet : IsUnit (Hpk k r).det :=
+    (Matrix.isUnit_iff_isUnit_det _).mp ⟨⟨Hpk k r, Hpk k r, hsq, hsq⟩, rfl⟩
   obtain ⟨hone, hmul, hinv⟩ := uHGroup _ (Hpk k r) hdet
   obtain ⟨hgdet, hgi⟩ := hinv g hgU
   have hgg : g⁻¹ * g = 1 := Matrix.nonsing_inv_mul g hgdet
   have hgg' : g * g⁻¹ = 1 := Matrix.mul_nonsing_inv g hgdet
-  have hfixv : ∀ (h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (v : Fin (2 * r + k + 1) → ℂ),
-      h *ᵥ (g *ᵥ v) = g *ᵥ v → (g⁻¹ * h * g) *ᵥ v = v := by
+  have hfixv
+      : ∀ (h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (v : Fin (2 * r + k + 1) → ℂ),
+        h *ᵥ (g *ᵥ v) = g *ᵥ v → (g⁻¹ * h * g) *ᵥ v = v := by
     intro h v hv
-    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_mulVec, hgg, Matrix.one_mulVec]
-  have hs0 : ((Real.sqrt (Tz k r z) : ℝ) : ℂ) ≠ 0 := by
-    exact_mod_cast (Real.sqrt_pos.mpr hT).ne'
+    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_mulVec, hgg,
+      Matrix.one_mulVec]
+  have hs0 : ((Real.sqrt (Tz k r z) : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (Real.sqrt_pos.mpr hT).ne'
   have key : ∀ h ∈ UWset k r z, (g⁻¹ * h * g) ∈ UH (Hpk k r) ∧ rp_Std k r (g⁻¹ * h * g) := by
     intro h hh
     obtain ⟨hhU, hhfix, hhz⟩ := hh
@@ -339,9 +381,12 @@ theorem rp_repOfHC :
     · have h1 := hfixv h _ (by rw [hgz]; exact hhz)
       rw [Matrix.mulVec_smul] at h1
       exact smul_right_injective _ hs0 h1
-  have hback : ∀ h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ, g * (g⁻¹ * h * g) * g⁻¹ = h := by
+  have hback
+      : ∀ h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
+        g * (g⁻¹ * h * g) * g⁻¹ = h := by
     intro h
-    rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hgg', Matrix.one_mul, Matrix.mul_assoc, hgg', Matrix.mul_one]
+    rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hgg', Matrix.one_mul, Matrix.mul_assoc, hgg',
+      Matrix.mul_one]
   have hπ : ∀ h ∈ UWset k r z, π h = π (g * blockW k r (rp_blk k r (g⁻¹ * h * g)) * g⁻¹) := by
     intro h hh
     rw [← rp_eq_blockW _ (key h hh).2, hback]
@@ -371,9 +416,11 @@ theorem rp_repOfHC :
   · have := hfd
     have hσC : ContinuousOn (fun x => π (g * blockW k r x * g⁻¹)) (UJset (allPos k)) :=
       continuousOn_clm_apply.2 hσc
-    have hb : Continuous fun h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ => rp_blk k r (g⁻¹ * h * g) := by
+    have hb : Continuous fun h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ =>
+        rp_blk k r (g⁻¹ * h * g) := by
       refine continuous_matrix fun i j => ?_
-      exact ((continuous_const.matrix_mul continuous_id).matrix_mul continuous_const).matrix_elem _ _
+      exact ((continuous_const.matrix_mul continuous_id).matrix_mul continuous_const).matrix_elem _
+        _
     exact (hσC.comp hb.continuousOn hmem).congr hπ
 
 end Formalism.MainNotions.BridgeLemma₃
@@ -388,7 +435,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -396,13 +444,16 @@ variable {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
 abbrev cal_Ix (k r : ℕ) := Fin (2 * r + k + 1) × Fin (2 * r + k + 1)
 
-def hermitianRealPartUnit (ab : cal_Ix k r) : Mat k r := hpart1 (Hpk k r) (Matrix.single ab.1 ab.2 1)
-def hermitianImagPartUnit (ab : cal_Ix k r) : Mat k r := hpart2 (Hpk k r) (Matrix.single ab.1 ab.2 1)
+def hermitianRealPartUnit (ab : cal_Ix k r) : Mat k r :=
+  hpart1 (Hpk k r) (Matrix.single ab.1 ab.2 1)
+def hermitianImagPartUnit (ab : cal_Ix k r) : Mat k r :=
+  hpart2 (Hpk k r) (Matrix.single ab.1 ab.2 1)
 
 def cal_expE : List (cal_Ix k r) → List (ℂ × List (Mat k r))
   | [] => [(1, [])]
-  | ab :: w => ((cal_expE w).map fun cv => (cv.1, hermitianRealPartUnit ab :: cv.2)) ++
-      ((cal_expE w).map fun cv => (Complex.I * cv.1, hermitianImagPartUnit ab :: cv.2))
+  | ab :: w =>
+    ((cal_expE w).map fun cv => (cv.1, hermitianRealPartUnit ab :: cv.2))
+      ++ ((cal_expE w).map fun cv => (Complex.I * cv.1, hermitianImagPartUnit ab :: cv.2))
 
 theorem cal_Hh : (Hpk k r)ᴴ = Hpk k r := (hpkFacts k r).1
 theorem cal_HH : Hpk k r * Hpk k r = 1 := (hpkFacts k r).2.1
@@ -414,8 +465,9 @@ theorem cal_twoI : (1 / (2 * Complex.I) : ℂ) = -(Complex.I / 2) := by
 
 theorem cal_hpart1_lie (Z : Mat k r) : inLie k r (hpart1 (Hpk k r) Z) := by
   unfold inLie hpart1
-  rw [cal_Hinv, conjTranspose_smul, conjTranspose_sub, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose,
-    cal_Hh, Matrix.smul_mul, Matrix.mul_smul, Matrix.sub_mul, Matrix.mul_sub]
+  rw [cal_Hinv, conjTranspose_smul, conjTranspose_sub, conjTranspose_mul, conjTranspose_mul,
+    conjTranspose_conjTranspose, cal_Hh, Matrix.smul_mul, Matrix.mul_smul, Matrix.sub_mul,
+    Matrix.mul_sub]
   have e1 : Hpk k r * (Z * Hpk k r) * Hpk k r = Hpk k r * Z := by
     rw [Matrix.mul_assoc, Matrix.mul_assoc, cal_HH, Matrix.mul_one]
   have e2 : Hpk k r * (Hpk k r * Zᴴ * Hpk k r) = Zᴴ * Hpk k r := by
@@ -427,8 +479,9 @@ theorem cal_hpart1_lie (Z : Mat k r) : inLie k r (hpart1 (Hpk k r) Z) := by
 
 theorem cal_hpart2_lie (Z : Mat k r) : inLie k r (hpart2 (Hpk k r) Z) := by
   unfold inLie hpart2
-  rw [cal_twoI, cal_Hinv, conjTranspose_smul, conjTranspose_add, conjTranspose_mul, conjTranspose_mul,
-    conjTranspose_conjTranspose, cal_Hh, Matrix.smul_mul, Matrix.mul_smul, Matrix.add_mul, Matrix.mul_add]
+  rw [cal_twoI, cal_Hinv, conjTranspose_smul, conjTranspose_add, conjTranspose_mul,
+    conjTranspose_mul, conjTranspose_conjTranspose, cal_Hh, Matrix.smul_mul, Matrix.mul_smul,
+    Matrix.add_mul, Matrix.mul_add]
   have e1 : Hpk k r * (Z * Hpk k r) * Hpk k r = Hpk k r * Z := by
     rw [Matrix.mul_assoc, Matrix.mul_assoc, cal_HH, Matrix.mul_one]
   have e2 : Hpk k r * (Hpk k r * Zᴴ * Hpk k r) = Zᴴ * Hpk k r := by
@@ -440,8 +493,10 @@ theorem cal_hpart2_lie (Z : Mat k r) : inLie k r (hpart2 (Hpk k r) Z) := by
   rw [this, neg_smul, add_comm (Hpk k r * Z)]
   simp
 
-theorem hermitian_real_part_index_lie (ab : cal_Ix k r) : inLie k r (hermitianRealPartUnit ab) := cal_hpart1_lie _
-theorem hermitian_imag_part_index_lie (ab : cal_Ix k r) : inLie k r (hermitianImagPartUnit ab) := cal_hpart2_lie _
+theorem hermitian_real_part_index_lie (ab : cal_Ix k r) : inLie k r (hermitianRealPartUnit ab) :=
+  cal_hpart1_lie _
+theorem hermitian_imag_part_index_lie (ab : cal_Ix k r) : inLie k r (hermitianImagPartUnit ab) :=
+  cal_hpart2_lie _
 
 theorem cal_expE_lie (w : List (cal_Ix k r)) : ∀ cv ∈ cal_expE w, ∀ X ∈ cv.2, inLie k r X := by
   induction w with
@@ -471,11 +526,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P
 
 section Frob
 
-attribute [local instance] Matrix.frobeniusSeminormedAddCommGroup Matrix.frobeniusNormedAddCommGroup
+attribute [local instance]
+  Matrix.frobeniusSeminormedAddCommGroup Matrix.frobeniusNormedAddCommGroup
   Matrix.frobeniusNormedSpace Matrix.frobeniusNormedRing
 
 end Frob
@@ -498,7 +555,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P Formalism.MainNotions.S.TopsChoicePartA
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P Formalism.MainNotions.S.TopsChoicePartA
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -529,8 +587,9 @@ end cls
 
 section poly
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end poly
 
@@ -553,27 +612,32 @@ namespace Formalism.MainNotions.BridgeLemma₃
 
 section partA
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity
 open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+variable
+  {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
   {E' : Type*} [NormedAddCommGroup E'] [NormedSpace ℂ E']
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end partA
 
 section partB
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.B5
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end partB
 
@@ -583,7 +647,8 @@ open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end partC
@@ -603,11 +668,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+variable
+  {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
   {E' : Type*} [NormedAddCommGroup E'] [NormedSpace ℂ E']
 
 end Formalism.MainNotions.BridgeLemma₃
@@ -627,7 +694,8 @@ namespace Formalism.MainNotions.BridgeLemma₃
 
 open Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end Formalism.MainNotions.BridgeLemma₃
@@ -645,15 +713,16 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 section core
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
-
 
 end core
 
@@ -678,7 +747,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -692,8 +762,9 @@ section adj
 
 open Formalism.FourierDecayAlt.P
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end adj
 
@@ -703,8 +774,9 @@ open Formalism.FourierDecayAlt.P
 
 variable {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end helpers
 
@@ -714,8 +786,9 @@ open Formalism.FourierDecayAlt.P
 
 variable {k r : ℕ}
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end core
 
@@ -723,8 +796,9 @@ section core2
 
 open Formalism.FourierDecayAlt.P
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end core2
 
@@ -732,8 +806,9 @@ section core3
 
 open Formalism.FourierDecayAlt.P
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end core3
 
@@ -762,7 +837,8 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end Formalism.MainNotions.BridgeLemma₃
@@ -775,7 +851,8 @@ section PartCont
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.MainNotions Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.BridgeLemma₅
+open Formalism.MainNotions Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.BridgeLemma₅
 
 theorem lbHaarUp_proved : lbHaarUp := hu_haarUp
 
@@ -794,7 +871,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.BridgeLemma₅
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.MainNotions
+  Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -813,7 +891,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -827,8 +906,9 @@ section adj
 
 open Formalism.FourierDecayAlt.P
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end adj
 
@@ -838,8 +918,9 @@ open Formalism.FourierDecayAlt.P
 
 variable {k r : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end helpers
 
@@ -858,11 +939,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end Formalism.MainNotions.BridgeLemma₃
@@ -880,11 +963,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
   [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end Formalism.MainNotions.BridgeLemma₃
@@ -902,7 +987,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -998,7 +1084,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  Formalism.FourierDecayAlt.P
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -1019,7 +1106,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -1040,7 +1128,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -1061,7 +1150,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -1077,7 +1167,8 @@ section PartPX
 
 namespace Formalism.MainNotions.BridgeLemma₃
 
-open Formalism.MainNotions Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.BridgeLemma₅
+open Formalism.MainNotions Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.BridgeLemma₅
 
 end Formalism.MainNotions.BridgeLemma₃
 

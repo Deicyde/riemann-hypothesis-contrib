@@ -21,7 +21,6 @@ structure AnnulusRing (I : Set ℝ) where
 
 @[ext]
 structure Robba where
-
   coeff : ℤ → K
   exists_convergesAt' : ∃ r < 1, ∀ ρ, r ≤ ρ → ρ < 1 → 0 < ρ → ConvergesAt coeff ρ
 

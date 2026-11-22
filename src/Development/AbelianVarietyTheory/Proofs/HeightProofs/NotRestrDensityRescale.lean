@@ -13,7 +13,9 @@ noncomputable section
 
 namespace GlobalTheory.LowerBoundCompare
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.T0 GlobalTheory.IndefiniteRowSideFullHecke.FrameNormRestrictedDensity
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.T0
+  GlobalTheory.IndefiniteRowSideFullHecke.FrameNormRestrictedDensity
 
 variable {D : D7} {T : Core D}
 
@@ -21,8 +23,9 @@ theorem conjEmb_invol {E : Type} [Field E] (τ : E →+* ℂ) : conjEmb (conjEmb
   ext x
   simp [conjEmb]
 
-theorem wtA_conj_tau (Q : Par D) (hp : Q.PinHost) {j : ℕ} (w : WeightFamilies.Wt D j) (t : D.what₂.Tau) (i : ℕ) :
-    wtA w (conjEmb (DV.tauEmb D t), i) = ext0 (w.aM t) i := by
+theorem wtA_conj_tau
+    (Q : Par D) (hp : Q.PinHost) {j : ℕ} (w : WeightFamilies.Wt D j) (t : D.what₂.Tau) (i : ℕ)
+    : wtA w (conjEmb (DV.tauEmb D t), i) = ext0 (w.aM t) i := by
   classical
   have h1 : ∀ t', conjEmb (DV.tauEmb D t) ≠ DV.tauEmb D t' := fun t' h =>
     GlobalTheory.LeafCompare.tauEmb_ne_conj Q hp t' t h.symm
@@ -36,8 +39,10 @@ theorem wtA_conj_tau (Q : Par D) (hp : Q.PinHost) {j : ℕ} (w : WeightFamilies.
     simp [h1, this]
   · simp
 
-theorem wt_ext (Q : Par D) (hp : Q.PinHost) {j : ℕ} {w w' : WeightFamilies.Wt D j} (hA : wtA w = wtA w') (hn : w.n = w'.n) :
-    w = w' := by
+theorem wt_ext
+    (Q : Par D) (hp : Q.PinHost)
+    {j : ℕ} {w w' : WeightFamilies.Wt D j} (hA : wtA w = wtA w') (hn : w.n = w'.n)
+    : w = w' := by
   have hP : w.aP = w'.aP := by
     funext t i
     have := congrFun hA (DV.tauEmb D t, i.1)
@@ -54,8 +59,8 @@ theorem wt_ext (Q : Par D) (hp : Q.PinHost) {j : ℕ} {w w' : WeightFamilies.Wt 
   subst hP hM hn
   rfl
 
-theorem wtA_wsmul_apply {j : ℕ} (k : ℕ) (w : WeightFamilies.Wt D j) (x : (D.host.E →+* ℂ) × ℕ) :
-    wtA (WeightAlgebra.wsmul k w) x = k * wtA w x := by
+theorem wtA_wsmul_apply {j : ℕ} (k : ℕ) (w : WeightFamilies.Wt D j) (x : (D.host.E →+* ℂ) × ℕ)
+    : wtA (WeightAlgebra.wsmul k w) x = k * wtA w x := by
   have h0 : ∀ {p : ℕ} (f : Fin p → ℕ) (i : ℕ), ext0 (fun s => k * f s) i = k * ext0 f i := by
     intro p f i
     unfold ext0
@@ -67,8 +72,8 @@ theorem wtA_wsmul_apply {j : ℕ} (k : ℕ) (w : WeightFamilies.Wt D j) (x : (D.
   rw [h1, h2]
   split_ifs <;> simp [mul_add]
 
-theorem eq_wsmul_iff (h : LawsCore T) {j : ℕ} (ka wL : WeightFamilies.Wt D j) (n : ℕ) :
-    wtZ (wtA ka) ka.n = n • wtZ (wtA wL) wL.n ↔ ka = WeightAlgebra.wsmul n wL := by
+theorem eq_wsmul_iff (h : LawsCore T) {j : ℕ} (ka wL : WeightFamilies.Wt D j) (n : ℕ)
+    : wtZ (wtA ka) ka.n = n • wtZ (wtA wL) wL.n ↔ ka = WeightAlgebra.wsmul n wL := by
   constructor
   · intro H
     refine wt_ext T.Q h.pins.1 (funext fun x => ?_) ?_
@@ -92,7 +97,9 @@ theorem eq_wsmul_iff (h : LawsCore T) {j : ℕ} (ka wL : WeightFamilies.Wt D j) 
 
 section Density
 
-variable (h : LawsCore T) (j : ℕ) (hG : GenFrEx (T.Q.Xo j) T.Q.c) (fn : FrameNorms T j) (yP : GenericFrames T j)
+variable
+  (h : LawsCore T)
+  (j : ℕ) (hG : GenFrEx (T.Q.Xo j) T.Q.c) (fn : FrameNorms T j) (yP : GenericFrames T j)
   (ka : WeightFamilies.Wt D j)
 
 end Density

@@ -14,7 +14,8 @@ namespace Formalism.HermitianLatticesTheory
 
 section Defs
 
-variable {K V : Type*} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type*} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [Module (NumberField.RingOfIntegers K) V]
 
 abbrev discr (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (NumberField.RingOfIntegers K) V) : Type _ :=

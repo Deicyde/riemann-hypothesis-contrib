@@ -14,8 +14,10 @@ noncomputable section
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH MeasureTheory NumberField IsDedekindDomain
 open Formalism.MainNotions.SchurIrreducible (IrrGK)
-open GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts (delta wtK wtExt wtH IsLowestType IsKIntw)
-open GlobalTheory.IndefiniteRowSideFullHecke.EulerProductLocalFactors (Place eulerProd dPart quadSign SatakeBound)
+open GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts
+  (delta wtK wtExt wtH IsLowestType IsKIntw)
+open GlobalTheory.IndefiniteRowSideFullHecke.EulerProductLocalFactors
+  (Place eulerProd dPart quadSign SatakeBound)
 open scoped TensorProduct
 
 namespace GlobalTheory.BlockSizes

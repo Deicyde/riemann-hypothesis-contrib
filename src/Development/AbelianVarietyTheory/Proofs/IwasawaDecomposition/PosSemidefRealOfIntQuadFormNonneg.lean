@@ -8,10 +8,10 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem intSymm_posSemidef_real :
-    ∀ (g : ℕ) (B : Matrix (Fin g) (Fin g) ℤ), B.IsSymm →
-      (∀ v : Fin g → ℤ, 0 ≤ dotProduct v (B.mulVec v)) →
-      (B.map (Int.cast : ℤ → ℝ)).PosSemidef := by
+theorem intSymm_posSemidef_real
+    : ∀ (g : ℕ) (B : Matrix (Fin g) (Fin g) ℤ),
+      B.IsSymm → (∀ v : Fin g → ℤ, 0 ≤ dotProduct v (B.mulVec v))
+        → (B.map (Int.cast : ℤ → ℝ)).PosSemidef := by
   intro g B hB hQ
   set M : Matrix (Fin g) (Fin g) ℝ := B.map (Int.cast : ℤ → ℝ) with hM
 

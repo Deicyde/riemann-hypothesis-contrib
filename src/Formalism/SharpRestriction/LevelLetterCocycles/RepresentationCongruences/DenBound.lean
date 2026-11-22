@@ -10,14 +10,17 @@ namespace Formalism.MainNotions.N.FrobeniusPowerSeries.ArcLengthTwo
 
 open PowerSeries Formalism.MainNotions.N.FrobeniusPowerSeries
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
 
-theorem den_bound {l : ℕ} [Fact l.Prime] (P : PhiData O l) (y B κ : ℕ) (hy : 1 ≤ y) (hB : 1 ≤ B)
-    (x : O) (U₁ U₂ : O⟦X⟧)
-    (h : P.p 1 ^ y * C x = C (l : O) ^ κ * 1 * U₁ - X ^ B * U₂) :
-    (l : O) ^ (κ - ⌈max 0 ((y : ℝ) - B / l + 2 + Real.logb l y)⌉₊) ∣ x ∧
-      (l * y < B → (l : O) ^ κ ∣ x) := by
+theorem den_bound
+    {l : ℕ} [Fact l.Prime]
+    (P : PhiData O l)
+    (y B κ : ℕ) (hy : 1 ≤ y) (hB : 1 ≤ B)
+    (x : O) (U₁ U₂ : O⟦X⟧) (h : P.p 1 ^ y * C x = C (l : O) ^ κ * 1 * U₁ - X ^ B * U₂)
+    : (l : O) ^ (κ - ⌈max 0 ((y : ℝ) - B / l + 2 + Real.logb l y)⌉₊) ∣ x
+      ∧ (l * y < B → (l : O) ^ κ ∣ x) := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨u, hu⟩ := l_eq_unit_mul_pow hϖ P.hl0
   set e := eO (O := O) l with he
@@ -46,14 +49,17 @@ theorem den_bound {l : ℕ} [Fact l.Prime] (P : PhiData O l) (y B κ : ℕ) (hy 
       rw [hu, mul_pow, ← pow_mul, ← hvk, pow_add]; ring
     have hlk : (C (l : O) : O⟦X⟧) ^ κ = C ϖ ^ v * (C ϖ ^ k * C ((↑u : O) ^ κ)) := by
       rw [← map_pow, hlO, map_mul, map_mul, map_pow, map_pow]
-    have hc : C ϖ ^ v * (P.p 1 ^ y * C (↑ε : O) - C ϖ ^ k * (C ((↑u : O) ^ κ) * U₁)) =
-        (-U₂) * (X : O⟦X⟧) ^ B := by
+    have hc
+        : C ϖ ^ v * (P.p 1 ^ y * C (↑ε : O) - C ϖ ^ k * (C ((↑u : O) ^ κ) * U₁))
+          = (-U₂) * (X : O⟦X⟧) ^ B := by
       have hxC : (C x : O⟦X⟧) = C (↑ε : O) * C ϖ ^ v := by rw [hxe, map_mul, map_pow]
       rw [hxC, hlk] at h
       linear_combination h
     obtain ⟨z, hz⟩ := ContM_cancel_unif hϖ hdist v hc
-    have hε : P.p 1 ^ y = C ϖ ^ k * (C ((↑u : O) ^ κ) * U₁ * C (↑(ε⁻¹) : O)) +
-        (X : O⟦X⟧) ^ B * (z * C (↑(ε⁻¹) : O)) := by
+    have hε
+        : P.p 1 ^ y
+          = C ϖ ^ k * (C ((↑u : O) ^ κ) * U₁ * C (↑(ε⁻¹) : O))
+            + (X : O⟦X⟧) ^ B * (z * C (↑(ε⁻¹) : O)) := by
       have hεε : (C (↑ε : O) : O⟦X⟧) * C (↑(ε⁻¹) : O) = 1 := by
         rw [← map_mul, Units.mul_inv, map_one]
       linear_combination (-(P.p 1 ^ y)) * hεε + C (↑(ε⁻¹) : O) * hz
@@ -70,7 +76,8 @@ theorem den_bound {l : ℕ} [Fact l.Prime] (P : PhiData O l) (y B κ : ℕ) (hy 
     have he0 : (0 : ℝ) ≤ e := Nat.cast_nonneg _
     have hkr : (k : ℝ) ≤ (e : ℝ) * de := by
       have := mul_le_mul_of_nonneg_left hr he0
-      have hk' : (k : ℝ) ≤ ((cont ϖ ((X : O⟦X⟧) ^ B) (P.p 1 ^ y)).toNat : ℝ) := by exact_mod_cast hkc'
+      have hk' : (k : ℝ) ≤ ((cont ϖ ((X : O⟦X⟧) ^ B) (P.p 1 ^ y)).toNat : ℝ) := by
+        exact_mod_cast hkc'
       linarith
     have hkn : k ≤ e * de := by exact_mod_cast hkr
     apply hdiv

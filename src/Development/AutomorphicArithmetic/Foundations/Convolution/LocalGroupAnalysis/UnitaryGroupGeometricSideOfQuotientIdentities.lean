@@ -10,16 +10,19 @@ open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.RightCosetS
 open scoped ENNReal
 
 private theorem UpperTheory.ConvolutionTheory.G.stage_key
-    {X T : Type} [Group X] [TopologicalSpace X] [IsTopologicalGroup X] [LocallyCompactSpace X] [T2Space X]
-    [SecondCountableTopology X] [MeasurableSpace X] [BorelSpace X] [Group T] [TopologicalSpace T]
-    [IsTopologicalGroup T] [LocallyCompactSpace T] [T2Space T]
-    [SecondCountableTopology T] [MeasurableSpace T] [BorelSpace T] (μ : Measure X) [μ.IsHaarMeasure]
-    (ν : Measure T) [ν.IsHaarMeasure] [ν.IsInvInvariant] (i : T →* X) (hi : Continuous i)
-    (hinj : Function.Injective i) (Λ : Subgroup T) [DiscreteTopology Λ] (Γ₀ : Subgroup X)
-    [DiscreteTopology Γ₀] (hΛ : Λ.map i = Γ₀)
+    {X T : Type} [Group X] [TopologicalSpace X] [IsTopologicalGroup X] [LocallyCompactSpace X]
+    [T2Space X] [SecondCountableTopology X] [MeasurableSpace X] [BorelSpace X] [Group T]
+    [TopologicalSpace T] [IsTopologicalGroup T] [LocallyCompactSpace T] [T2Space T]
+    [SecondCountableTopology T] [MeasurableSpace T] [BorelSpace T]
+    (μ : Measure X) [μ.IsHaarMeasure]
+    (ν : Measure T) [ν.IsHaarMeasure] [ν.IsInvInvariant]
+    (i : T →* X) (hi : Continuous i) (hinj : Function.Injective i)
+    (Λ : Subgroup T) [DiscreteTopology Λ]
+    (Γ₀ : Subgroup X) [DiscreteTopology Γ₀]
+    (hΛ : Λ.map i = Γ₀)
     (ρ : X → ℝ≥0∞) (hρ : Measurable ρ) (hρ1 : ∀ x, ∫⁻ t, ρ (i t * x) ∂ν = 1)
-    (F : X → ℝ≥0∞) (hF : Measurable F) (hFi : ∀ t x, F (i t * x) = F x) :
-    ∫⁻ x in fundamentalDomain Γ₀, F x ∂μ = ν (fundamentalDomain Λ) * ∫⁻ x, F x * ρ x ∂μ := by
+    (F : X → ℝ≥0∞) (hF : Measurable F) (hFi : ∀ t x, F (i t * x) = F x)
+    : ∫⁻ x in fundamentalDomain Γ₀, F x ∂μ = ν (fundamentalDomain Λ) * ∫⁻ x, F x * ρ x ∂μ := by
   subst hΛ
   set D := fundamentalDomain Λ with hDdef
   set E := fundamentalDomain (Λ.map i) with hEdef
@@ -43,8 +46,10 @@ private theorem UpperTheory.ConvolutionTheory.G.stage_key
     rw [hE.lintegral_eq_tsum'', ← lintegral_tsum]
     · refine lintegral_congr fun x => ?_
       rw [← (Subgroup.equivMapOfInjective Λ i hinj).toEquiv.tsum_eq]
-      have : ∀ l : Λ, F ((Subgroup.equivMapOfInjective Λ i hinj).toEquiv l • x) *
-          ρ' ((Subgroup.equivMapOfInjective Λ i hinj).toEquiv l • x) = F x * ρ' (i l * x) := fun l => by
+      have : ∀ l : Λ,
+          F ((Subgroup.equivMapOfInjective Λ i hinj).toEquiv l • x)
+              * ρ' ((Subgroup.equivMapOfInjective Λ i hinj).toEquiv l • x)
+            = F x * ρ' (i l * x) := fun l => by
         have h : (Subgroup.equivMapOfInjective Λ i hinj).toEquiv l • x = i l * x := rfl
         rw [h, hFi]
       simp only [this]
@@ -67,10 +72,11 @@ private theorem UpperTheory.ConvolutionTheory.G.stage_key
     · exact ((hF.comp measurable_fst).mul hm).aemeasurable
   rw [← hunf, hfub]
 
-theorem UpperTheory.ConvolutionTheory.G.unitaryGroupGeometricSide_of_quotient_identities :
-    Q1 → Q2 → U2 := by
+theorem UpperTheory.ConvolutionTheory.G.unitaryGroupGeometricSide_of_quotient_identities
+    : Q1 → Q2 → U2 := by
   intro hQ1 hQ2 X T _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ μ _ ν _ _ _ i hi Λ _ Γ₀ _ hΛ hvol Φ hΦc hΦi hint
-  have hD : IsFundamentalDomain Λ (fundamentalDomain Λ) ν := isFundamentalDomain_fundamentalDomain Λ ν
+  have hD : IsFundamentalDomain Λ (fundamentalDomain Λ) ν :=
+    isFundamentalDomain_fundamentalDomain Λ ν
   have hvolD : quotientMeasure Λ ν Set.univ = ν (fundamentalDomain Λ) := quotientMeasure_univ ν hD
   have hD0 : ν (fundamentalDomain Λ) ≠ 0 := hD.measure_ne_zero (NeZero.ne ν)
   have hΦm : Measurable Φ := hΦc.measurable
@@ -95,28 +101,37 @@ theorem UpperTheory.ConvolutionTheory.G.unitaryGroupGeometricSide_of_quotient_id
     exact lt_irrefl _ hEfin
   refine ⟨?_, hfin⟩
   obtain ⟨ρ₀, hρc, hρn, -⟩ := hQ2 X T ν i hi
-  have e1 := hQ1 X X T μ ν (MonoidHom.id X) i measurable_id hic Φ (fun x => (ρ₀ x : ℝ≥0∞)) hΦm hΦi hρn (hfin _ hρn)
-  have hmeas : (μ.restrict (fundamentalDomain Γ₀)).map Φ =
-      (ν (fundamentalDomain Λ) • μ.withDensity (fun x => (ρ₀ x : ℝ≥0∞))).map Φ := by
+  have e1 :=
+    hQ1 X X T μ ν (MonoidHom.id X) i measurable_id hic Φ
+      (fun x => (ρ₀ x : ℝ≥0∞))
+      hΦm hΦi hρn (hfin _ hρn)
+  have hmeas
+      : (μ.restrict (fundamentalDomain Γ₀)).map Φ
+        = (ν (fundamentalDomain Λ) • μ.withDensity (fun x => (ρ₀ x : ℝ≥0∞))).map Φ := by
     rw [Measure.ext_iff_lintegral]
     intro f hf
-    have hw : ∫⁻ a, f (Φ a) ∂μ.withDensity (fun x => (ρ₀ x : ℝ≥0∞)) =
-        ∫⁻ a, f (Φ a) * (ρ₀ a : ℝ≥0∞) ∂μ := by
+    have hw
+        : ∫⁻ a, f (Φ a) ∂μ.withDensity (fun x => (ρ₀ x : ℝ≥0∞))
+          = ∫⁻ a, f (Φ a) * (ρ₀ a : ℝ≥0∞) ∂μ := by
       rw [show (fun a => f (Φ a)) = f ∘ Φ from rfl,
         lintegral_withDensity_eq_lintegral_mul μ hρn.1 (hf.comp hΦm)]
       exact lintegral_congr fun a => mul_comm _ _
     rw [lintegral_map hf hΦm, lintegral_map hf hΦm, lintegral_smul_measure, hw, smul_eq_mul]
     exact key _ hρn.1 hρn.2 (fun x => f (Φ x)) (hf.comp hΦm) (fun t x => by simp only [hΦi])
-  have hq : ∫ y, Φ (Quotient.out y) ∂quotientMeasure Γ₀ μ = ∫ g in fundamentalDomain Γ₀, Φ g ∂μ := by
+  have hq
+      : ∫ y, Φ (Quotient.out y) ∂quotientMeasure Γ₀ μ = ∫ g in fundamentalDomain Γ₀, Φ g ∂μ := by
     rw [integral_quotientMeasure]
     simp only [hout]
-  have hz : ∫ g in fundamentalDomain Γ₀, Φ g ∂μ =
-      ∫ x, Φ x ∂(ν (fundamentalDomain Λ) • μ.withDensity (fun x => (ρ₀ x : ℝ≥0∞))) := by
+  have hz
+      : ∫ g in fundamentalDomain Γ₀, Φ g ∂μ
+        = ∫ x, Φ x ∂(ν (fundamentalDomain Λ) • μ.withDensity (fun x => (ρ₀ x : ℝ≥0∞))) := by
     have h1 : ∀ m : Measure X, ∫ z, z ∂(m.map Φ) = ∫ x, Φ x ∂m := fun m =>
       integral_map hΦm.aemeasurable aestronglyMeasurable_id
     rw [← h1, ← h1, hmeas]
-  rw [hq, hz, integral_smul_measure, integral_withDensity_eq_integral_toReal_smul hρn.1
-    (Filter.Eventually.of_forall fun x => ENNReal.coe_lt_top), hvolD, Complex.real_smul]
+  rw [hq, hz, integral_smul_measure,
+    integral_withDensity_eq_integral_toReal_smul hρn.1
+      (Filter.Eventually.of_forall fun x => ENNReal.coe_lt_top),
+    hvolD, Complex.real_smul]
   congr 1
   have e2 : quotInt μ id i ν Φ = ∫ x, Φ x * (((ρ₀ x : ℝ≥0∞)).toReal : ℂ) ∂μ := e1
   rw [e2]

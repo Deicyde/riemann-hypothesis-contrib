@@ -21,13 +21,12 @@ def Irr (C : ι → Subalgebra ℂ (Module.End ℂ V)) (U : Submodule ℂ V) : P
 
 def Kills (c : Module.End ℂ V) (U : Submodule ℂ V) : Prop := ∀ x ∈ U, c x = 0
 
-def Graph (C : ι → Subalgebra ℂ (Module.End ℂ V)) (U₁ U₂ : Submodule ℂ V)
-    (X : Submodule ℂ (V × V)) : Prop :=
-  X ≠ ⊥ ∧ (∀ z ∈ X, z.1 ∈ U₁ ∧ z.2 ∈ U₂) ∧ (∀ v, ∀ c ∈ C v, ∀ z ∈ X, (c z.1, c z.2) ∈ X) ∧
-    (∀ u, ((0 : V), u) ∈ X → u = 0) ∧ (∀ u, (u, (0 : V)) ∈ X → u = 0)
+def Graph (C : ι → Subalgebra ℂ (Module.End ℂ V)) (U₁ U₂ : Submodule ℂ V) (X : Submodule ℂ (V × V))
+    : Prop :=
+  X ≠ ⊥ ∧ (∀ z ∈ X, z.1 ∈ U₁ ∧ z.2 ∈ U₂) ∧ (∀ v, ∀ c ∈ C v, ∀ z ∈ X, (c z.1, c z.2) ∈ X)
+    ∧ (∀ u, ((0 : V), u) ∈ X → u = 0) ∧ (∀ u, (u, (0 : V)) ∈ X → u = 0)
 
-theorem kills_iff_map (c : Module.End ℂ V) (U : Submodule ℂ V) :
-    Kills c U ↔ U.map c = ⊥ := by
+theorem kills_iff_map (c : Module.End ℂ V) (U : Submodule ℂ V) : Kills c U ↔ U.map c = ⊥ := by
   constructor
   · intro h
     rw [eq_bot_iff]
@@ -38,8 +37,8 @@ theorem kills_iff_map (c : Module.End ℂ V) (U : Submodule ℂ V) :
     rw [h] at this
     simpa using this
 
-theorem kills_scalar {U : Submodule ℂ V} (hU : U ≠ ⊥) (r : ℂ) :
-    Kills (algebraMap ℂ (Module.End ℂ V) r) U ↔ r = 0 := by
+theorem kills_scalar {U : Submodule ℂ V} (hU : U ≠ ⊥) (r : ℂ)
+    : Kills (algebraMap ℂ (Module.End ℂ V) r) U ↔ r = 0 := by
   constructor
   · intro h
     obtain ⟨x, hx, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hU
@@ -49,9 +48,11 @@ theorem kills_scalar {U : Submodule ℂ V} (hU : U ≠ ⊥) (r : ℂ) :
   · rintro rfl x _
     simp
 
-theorem eig_drop (U : Submodule ℂ V) [FiniteDimensional ℂ U] (hU : U ≠ ⊥)
-    (g : Module.End ℂ V) (hg : ∀ x ∈ U, g x ∈ U) :
-    ∃ μ : ℂ, finrank ℂ (U.map (g - algebraMap ℂ (Module.End ℂ V) μ)) < finrank ℂ U := by
+theorem eig_drop
+    (U : Submodule ℂ V) [FiniteDimensional ℂ U]
+    (hU : U ≠ ⊥)
+    (g : Module.End ℂ V) (hg : ∀ x ∈ U, g x ∈ U)
+    : ∃ μ : ℂ, finrank ℂ (U.map (g - algebraMap ℂ (Module.End ℂ V) μ)) < finrank ℂ U := by
   haveI : Nontrivial U := Submodule.nontrivial_iff_ne_bot.mpr hU
   obtain ⟨μ, hμ⟩ := Module.End.exists_eigenvalue (g.restrict hg)
   obtain ⟨z, hz⟩ := hμ.exists_hasEigenvector
@@ -62,8 +63,7 @@ theorem eig_drop (U : Submodule ℂ V) [FiniteDimensional ℂ U] (hU : U ≠ ⊥
   have hz1 : g (z : V) = μ • (z : V) := by
     have h1 := congrArg Subtype.val hz.apply_eq_smul
     simpa [LinearMap.restrict_apply] using h1
-  have hk : z ∈ LinearMap.ker f := by
-    simp [hf, hz1]
+  have hk : z ∈ LinearMap.ker f := by simp [hf, hz1]
   have hsum := LinearMap.finrank_range_add_finrank_ker f
   rw [hr] at hsum
   have hpos : 0 < finrank ℂ (LinearMap.ker f) := by
@@ -73,10 +73,10 @@ theorem eig_drop (U : Submodule ℂ V) [FiniteDimensional ℂ U] (hU : U ≠ ⊥
     exact hz.2 ((Submodule.mem_bot ℂ).mp hk)
   omega
 
-theorem graph_of_scalars (C : ι → Subalgebra ℂ (Module.End ℂ V)) (U₁ U₂ : Submodule ℂ V)
-    (h₁ : U₁ ≠ ⊥) (h₂ : U₂ ≠ ⊥)
-    (hs : ∀ v, ∀ a ∈ C v, ∃ μ : ℂ, (∀ x ∈ U₁, a x = μ • x) ∧ (∀ x ∈ U₂, a x = μ • x)) :
-    ∃ X, Graph C U₁ U₂ X := by
+theorem graph_of_scalars
+    (C : ι → Subalgebra ℂ (Module.End ℂ V)) (U₁ U₂ : Submodule ℂ V) (h₁ : U₁ ≠ ⊥) (h₂ : U₂ ≠ ⊥)
+    (hs : ∀ v, ∀ a ∈ C v, ∃ μ : ℂ, (∀ x ∈ U₁, a x = μ • x) ∧ (∀ x ∈ U₂, a x = μ • x))
+    : ∃ X, Graph C U₁ U₂ X := by
   obtain ⟨x₁, hx₁, hx₁0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot h₁
   obtain ⟨x₂, hx₂, hx₂0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot h₂
   refine ⟨ℂ ∙ (x₁, x₂), ?_, ?_, ?_, ?_, ?_⟩
@@ -107,11 +107,10 @@ theorem graph_of_scalars (C : ι → Subalgebra ℂ (Module.End ℂ V)) (U₁ U�
     have : t = 0 := (smul_eq_zero.mp e2).resolve_right hx₂0
     rw [← e1, this, zero_smul]
 
-
 open Classical in
-noncomputable def drop (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) :
-    ι → Subalgebra ℂ (Module.End ℂ V) :=
-  fun w => if w = v then ⊥ else C w
+noncomputable def drop (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι)
+    : ι → Subalgebra ℂ (Module.End ℂ V) := fun w =>
+  if w = v then ⊥ else C w
 
 theorem drop_le (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v w : ι) : drop C v w ≤ C w := by
   unfold drop
@@ -119,18 +118,22 @@ theorem drop_le (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v w : ι) : drop
   · exact bot_le
   · exact le_rfl
 
-theorem drop_ne (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) {w : ι} (h : w ≠ v) :
-    drop C v w = C w := by
+theorem drop_ne (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) {w : ι} (h : w ≠ v)
+    : drop C v w = C w := by
   simp [drop, h]
 
-theorem drop_self (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) {d : Module.End ℂ V}
-    (hd : d ∈ drop C v v) : ∃ r : ℂ, algebraMap ℂ (Module.End ℂ V) r = d := by
+theorem drop_self
+    (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) {d : Module.End ℂ V} (hd : d ∈ drop C v v)
+    : ∃ r : ℂ, algebraMap ℂ (Module.End ℂ V) r = d := by
   have h : drop C v v = ⊥ := by simp [drop]
   rw [h] at hd
   exact Algebra.mem_bot.mp hd
 
-theorem comm_drop (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) {U U' : Submodule ℂ V}
-    (hc : Comm C U) (hle : U' ≤ U) : Comm (drop C v) U' := by
+theorem comm_drop
+    (C : ι → Subalgebra ℂ (Module.End ℂ V))
+    (v : ι)
+    {U U' : Submodule ℂ V} (hc : Comm C U) (hle : U' ≤ U)
+    : Comm (drop C v) U' := by
   intro w₁ w₂ hw c hc' d hd x hx
   by_cases h1 : w₁ = v
   · rw [h1] at hc'
@@ -144,14 +147,17 @@ theorem comm_drop (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) {U U' 
       rw [drop_ne C v h2] at hd
       exact hc w₁ w₂ hw c hc' d hd x (hle hx)
 
-theorem map_le_self {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V}
-    {c₀ : Module.End ℂ V} (hS : Stab C U) (hc₀ : c₀ ∈ C v) : U.map c₀ ≤ U := by
+theorem map_le_self
+    {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V} {c₀ : Module.End ℂ V}
+    (hS : Stab C U) (hc₀ : c₀ ∈ C v)
+    : U.map c₀ ≤ U := by
   rintro _ ⟨x, hx, rfl⟩
   exact hS v c₀ hc₀ x hx
 
-theorem stab_drop {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V}
-    {c₀ : Module.End ℂ V} (hS : Stab C U) (hC : Comm C U) (hc₀ : c₀ ∈ C v) :
-    Stab (drop C v) (U.map c₀) := by
+theorem stab_drop
+    {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V} {c₀ : Module.End ℂ V}
+    (hS : Stab C U) (hC : Comm C U) (hc₀ : c₀ ∈ C v)
+    : Stab (drop C v) (U.map c₀) := by
   rintro w d hd _ ⟨x, hx, rfl⟩
   by_cases h : w = v
   · rw [h] at hd
@@ -163,13 +169,14 @@ theorem stab_drop {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : S
     rw [e]
     exact Submodule.mem_map_of_mem (hS w d hd x hx)
 
-def orbSpan (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) (Y : Submodule ℂ V) :
-    Submodule ℂ V :=
+def orbSpan (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) (Y : Submodule ℂ V) : Submodule ℂ V :=
   Submodule.span ℂ {x | ∃ a ∈ C v, ∃ y ∈ Y, a y = x}
 
-theorem orbSpan_eq {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V}
-    (hS : Stab C U) (hC : Comm C U) (hI : Irr C U) {Y : Submodule ℂ V}
-    (hYU : Y ≤ U) (hYS : Stab (drop C v) Y) (hY : Y ≠ ⊥) : orbSpan C v Y = U := by
+theorem orbSpan_eq
+    {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V}
+    (hS : Stab C U) (hC : Comm C U) (hI : Irr C U)
+    {Y : Submodule ℂ V} (hYU : Y ≤ U) (hYS : Stab (drop C v) Y) (hY : Y ≠ ⊥)
+    : orbSpan C v Y = U := by
   have hle : orbSpan C v Y ≤ U := by
     rw [orbSpan, Submodule.span_le]
     rintro _ ⟨a, ha, y, hy, rfl⟩
@@ -188,16 +195,16 @@ theorem orbSpan_eq {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : 
         rw [hC w v h c hc a ha y (hYU hy)]
         exact Submodule.subset_span ⟨a, ha, c y, hYS w c hc' y hy, rfl⟩
     exact key hx
-  have hYle : Y ≤ orbSpan C v Y := fun y hy =>
-    Submodule.subset_span ⟨1, one_mem _, y, hy, by simp⟩
+  have hYle : Y ≤ orbSpan C v Y := fun y hy => Submodule.subset_span ⟨1, one_mem _, y, hy, by simp⟩
   rcases hI _ hle hst with h | h
   · exact absurd (eq_bot_iff.mpr (h ▸ hYle)) hY
   · exact h
 
-theorem irr_drop {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V}
-    {c₀ : Module.End ℂ V} (hS : Stab C U) (hC : Comm C U) (hI : Irr C U) (hc₀ : c₀ ∈ C v)
-    (hsc : ∀ a ∈ C v, ∃ μ : ℂ, ∀ x ∈ U, c₀ (a (c₀ x)) = μ • c₀ x) :
-    Irr (drop C v) (U.map c₀) := by
+theorem irr_drop
+    {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V} {c₀ : Module.End ℂ V}
+    (hS : Stab C U) (hC : Comm C U) (hI : Irr C U) (hc₀ : c₀ ∈ C v)
+    (hsc : ∀ a ∈ C v, ∃ μ : ℂ, ∀ x ∈ U, c₀ (a (c₀ x)) = μ • c₀ x)
+    : Irr (drop C v) (U.map c₀) := by
   intro Y hY hYS
   by_cases hb : Y = ⊥
   · exact Or.inl hb
@@ -212,10 +219,11 @@ theorem irr_drop {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Su
   rw [hμ x hx]
   exact Y.smul_mem μ hy
 
-theorem kills_drop {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V}
-    {c₀ : Module.End ℂ V} (hS : Stab C U) (hC : Comm C U) (hI : Irr C U) (hc₀ : c₀ ∈ C v)
-    (hne : U.map c₀ ≠ ⊥) (w : ι) (d : Module.End ℂ V) (hd : d ∈ drop C v w) :
-    Kills d (U.map c₀) ↔ Kills d U := by
+theorem kills_drop
+    {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : Submodule ℂ V} {c₀ : Module.End ℂ V}
+    (hS : Stab C U) (hC : Comm C U) (hI : Irr C U) (hc₀ : c₀ ∈ C v) (hne : U.map c₀ ≠ ⊥)
+    (w : ι) (d : Module.End ℂ V) (hd : d ∈ drop C v w)
+    : Kills d (U.map c₀) ↔ Kills d U := by
   have hU : U ≠ ⊥ := by
     rintro rfl
     exact hne (Submodule.map_bot _)
@@ -238,14 +246,15 @@ theorem kills_drop {C : ι → Subalgebra ℂ (Module.End ℂ V)} {v : ι} {U : 
     · intro hk x hx
       exact hk x (map_le_self hS hc₀ hx)
 
-theorem glue (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) {U₁ U₂ : Submodule ℂ V}
-    {c₀ : Module.End ℂ V} (hc₀ : c₀ ∈ C v)
-    (hS₁ : Stab C U₁) (hS₂ : Stab C U₂) (hC₁ : Comm C U₁) (hC₂ : Comm C U₂)
+theorem glue
+    (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι)
+    {U₁ U₂ : Submodule ℂ V} {c₀ : Module.End ℂ V}
+    (hc₀ : c₀ ∈ C v) (hS₁ : Stab C U₁) (hS₂ : Stab C U₂) (hC₁ : Comm C U₁) (hC₂ : Comm C U₂)
     (hI₁ : Irr C U₁) (hI₂ : Irr C U₂) (hk₁ : ¬ Kills c₀ U₁) (hk₂ : ¬ Kills c₀ U₂)
-    (hsc : ∀ a ∈ C v, ∃ μ : ℂ, (∀ x ∈ U₁, c₀ (a (c₀ x)) = μ • c₀ x) ∧
-      (∀ x ∈ U₂, c₀ (a (c₀ x)) = μ • c₀ x))
-    {X' : Submodule ℂ (V × V)} (hX' : Graph (drop C v) (U₁.map c₀) (U₂.map c₀) X') :
-    ∃ X, Graph C U₁ U₂ X := by
+    (hsc : ∀ a ∈ C v, ∃ μ : ℂ,
+      (∀ x ∈ U₁, c₀ (a (c₀ x)) = μ • c₀ x) ∧ (∀ x ∈ U₂, c₀ (a (c₀ x)) = μ • c₀ x))
+    {X' : Submodule ℂ (V × V)} (hX' : Graph (drop C v) (U₁.map c₀) (U₂.map c₀) X')
+    : ∃ X, Graph C U₁ U₂ X := by
   obtain ⟨hX'0, hX'U, hX'S, hX'l, hX'r⟩ := hX'
   set S : Set (V × V) := {z | ∃ a ∈ C v, ∃ z' ∈ X', (a z'.1, a z'.2) = z} with hSdef
   have hsub : X' ≤ Submodule.span ℂ S := fun z hz =>
@@ -335,91 +344,108 @@ theorem glue (C : ι → Subalgebra ℂ (Module.End ℂ V)) (v : ι) {U₁ U₂ 
       simp only [LinearMap.inl_apply, map_zero] at h0
       exact hX'r _ h0
 
-theorem main_ind (n : ℕ) : ∀ (C : ι → Subalgebra ℂ (Module.End ℂ V)) (U₁ U₂ : Submodule ℂ V),
-    FiniteDimensional ℂ U₁ → finrank ℂ U₁ = n → U₁ ≠ ⊥ → U₂ ≠ ⊥ →
-    Stab C U₁ → Stab C U₂ → Comm C U₁ → Comm C U₂ →
-    (∀ v, ∀ c ∈ C v, Kills c U₁ ↔ Kills c U₂) → Irr C U₁ → Irr C U₂ →
-    ∃ X, Graph C U₁ U₂ X := by
+theorem main_ind (n : ℕ)
+    : ∀ (C : ι → Subalgebra ℂ (Module.End ℂ V)) (U₁ U₂ : Submodule ℂ V),
+      FiniteDimensional ℂ U₁ → finrank ℂ U₁ = n → U₁ ≠ ⊥ → U₂ ≠ ⊥ → Stab C U₁ → Stab C U₂
+        → Comm C U₁ → Comm C U₂ → (∀ v, ∀ c ∈ C v, Kills c U₁ ↔ Kills c U₂) → Irr C U₁ → Irr C U₂
+        → ∃ X, Graph C U₁ U₂ X := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
-  intro C U₁ U₂ hfd hn h₁ h₂ hS₁ hS₂ hC₁ hC₂ hK hI₁ hI₂
-  classical
-  haveI := hfd
-  by_cases hB : ∀ v, ∀ a ∈ C v, ∃ μ : ℂ, ∀ x ∈ U₁, a x = μ • x
-  · apply graph_of_scalars C U₁ U₂ h₁ h₂
-    intro v a ha
-    obtain ⟨μ, hμ⟩ := hB v a ha
-    refine ⟨μ, hμ, ?_⟩
-    have hm : a - algebraMap ℂ (Module.End ℂ V) μ ∈ C v :=
-      sub_mem ha (Subalgebra.algebraMap_mem _ μ)
-    have hk : Kills (a - algebraMap ℂ (Module.End ℂ V) μ) U₁ := by
+    intro C U₁ U₂ hfd hn h₁ h₂ hS₁ hS₂ hC₁ hC₂ hK hI₁ hI₂
+    classical
+    haveI := hfd
+    by_cases hB : ∀ v, ∀ a ∈ C v, ∃ μ : ℂ, ∀ x ∈ U₁, a x = μ • x
+    · apply graph_of_scalars C U₁ U₂ h₁ h₂
+      intro v a ha
+      obtain ⟨μ, hμ⟩ := hB v a ha
+      refine ⟨μ, hμ, ?_⟩
+      have hm : a - algebraMap ℂ (Module.End ℂ V) μ ∈ C v :=
+        sub_mem ha (Subalgebra.algebraMap_mem _ μ)
+      have hk : Kills (a - algebraMap ℂ (Module.End ℂ V) μ) U₁ := by
+        intro x hx
+        simp [hμ x hx]
       intro x hx
-      simp [hμ x hx]
-    intro x hx
-    have := (hK v _ hm).mp hk x hx
-    simpa [sub_eq_zero] using this
-  push_neg at hB
-  obtain ⟨v₁, a₁, ha₁, hna⟩ := hB
-  obtain ⟨μ₁, hμ₁⟩ := eig_drop U₁ h₁ a₁ (fun x hx => hS₁ v₁ a₁ ha₁ x hx)
-  have he₁m : a₁ - algebraMap ℂ (Module.End ℂ V) μ₁ ∈ C v₁ :=
-    sub_mem ha₁ (Subalgebra.algebraMap_mem _ μ₁)
-  have he₁ne : U₁.map (a₁ - algebraMap ℂ (Module.End ℂ V) μ₁) ≠ ⊥ := by
-    intro h
-    obtain ⟨x, hx, hne⟩ := hna μ₁
-    apply hne
-    have := (kills_iff_map _ U₁).mpr h x hx
-    simpa [sub_eq_zero] using this
-  have hex : ∃ m, ∃ v, ∃ c ∈ C v, U₁.map c ≠ ⊥ ∧ finrank ℂ (U₁.map c) = m :=
-    ⟨_, v₁, _, he₁m, he₁ne, rfl⟩
-  obtain ⟨v, c₀, hc₀, hc₀ne, hc₀fr⟩ := Nat.find_spec hex
-  have hmin : ∀ w, ∀ c ∈ C w, U₁.map c ≠ ⊥ → Nat.find hex ≤ finrank ℂ (U₁.map c) :=
-    fun w c hc hne => Nat.find_min' hex ⟨w, c, hc, hne, rfl⟩
-  have hlt : finrank ℂ (U₁.map c₀) < n := by
-    have := hmin v₁ _ he₁m he₁ne
-    omega
-  have hsc : ∀ a ∈ C v, ∃ μ : ℂ, (∀ x ∈ U₁, c₀ (a (c₀ x)) = μ • c₀ x) ∧
-      (∀ x ∈ U₂, c₀ (a (c₀ x)) = μ • c₀ x) := by
-    intro a ha
-    have hg : ∀ x ∈ U₁.map c₀, (c₀ * a) x ∈ U₁.map c₀ := by
-      rintro _ ⟨y, hy, rfl⟩
-      exact Submodule.mem_map_of_mem (hS₁ v a ha _ (hS₁ v c₀ hc₀ y hy))
-    obtain ⟨μ, hμ⟩ := eig_drop (U₁.map c₀) hc₀ne (c₀ * a) hg
-    have hem : (c₀ * a - algebraMap ℂ (Module.End ℂ V) μ) * c₀ ∈ C v :=
-      mul_mem (sub_mem (mul_mem hc₀ ha) (Subalgebra.algebraMap_mem _ μ)) hc₀
-    have hmap : U₁.map ((c₀ * a - algebraMap ℂ (Module.End ℂ V) μ) * c₀) =
-        (U₁.map c₀).map (c₀ * a - algebraMap ℂ (Module.End ℂ V) μ) := by
-      rw [Module.End.mul_eq_comp, Submodule.map_comp]
-    have hk : Kills ((c₀ * a - algebraMap ℂ (Module.End ℂ V) μ) * c₀) U₁ := by
-      rw [kills_iff_map]
-      by_contra hne
-      have := hmin v _ hem hne
-      rw [hmap] at this
+      have := (hK v _ hm).mp hk x hx
+      simpa [sub_eq_zero] using this
+    push_neg at hB
+    obtain ⟨v₁, a₁, ha₁, hna⟩ := hB
+    obtain ⟨μ₁, hμ₁⟩ := eig_drop U₁ h₁ a₁ (fun x hx => hS₁ v₁ a₁ ha₁ x hx)
+    have he₁m : a₁ - algebraMap ℂ (Module.End ℂ V) μ₁ ∈ C v₁ :=
+      sub_mem ha₁ (Subalgebra.algebraMap_mem _ μ₁)
+    have he₁ne : U₁.map (a₁ - algebraMap ℂ (Module.End ℂ V) μ₁) ≠ ⊥ := by
+      intro h
+      obtain ⟨x, hx, hne⟩ := hna μ₁
+      apply hne
+      have := (kills_iff_map _ U₁).mpr h x hx
+      simpa [sub_eq_zero] using this
+    have hex : ∃ m, ∃ v, ∃ c ∈ C v, U₁.map c ≠ ⊥ ∧ finrank ℂ (U₁.map c) = m :=
+      ⟨_, v₁, _, he₁m, he₁ne, rfl⟩
+    obtain ⟨v, c₀, hc₀, hc₀ne, hc₀fr⟩ := Nat.find_spec hex
+    have hmin : ∀ w, ∀ c ∈ C w, U₁.map c ≠ ⊥ → Nat.find hex ≤ finrank ℂ (U₁.map c) :=
+      fun w c hc hne => Nat.find_min' hex ⟨w, c, hc, hne, rfl⟩
+    have hlt : finrank ℂ (U₁.map c₀) < n := by
+      have := hmin v₁ _ he₁m he₁ne
       omega
-    refine ⟨μ, fun x hx => ?_, fun x hx => ?_⟩
-    · have := hk x hx
-      simpa [sub_eq_zero] using this
-    · have := (hK v _ hem).mp hk x hx
-      simpa [sub_eq_zero] using this
-  have hk₁ : ¬ Kills c₀ U₁ := fun h => hc₀ne ((kills_iff_map c₀ U₁).mp h)
-  have hk₂ : ¬ Kills c₀ U₂ := fun h => hk₁ ((hK v c₀ hc₀).mpr h)
-  have h₂' : U₂.map c₀ ≠ ⊥ := fun h => hk₂ ((kills_iff_map c₀ U₂).mpr h)
-  have hsc₁ : ∀ a ∈ C v, ∃ μ : ℂ, ∀ x ∈ U₁, c₀ (a (c₀ x)) = μ • c₀ x :=
-    fun a ha => (hsc a ha).imp fun _ h => h.1
-  have hsc₂ : ∀ a ∈ C v, ∃ μ : ℂ, ∀ x ∈ U₂, c₀ (a (c₀ x)) = μ • c₀ x :=
-    fun a ha => (hsc a ha).imp fun _ h => h.2
-  obtain ⟨X', hX'⟩ := ih _ hlt (drop C v) (U₁.map c₀) (U₂.map c₀) inferInstance rfl hc₀ne h₂'
-    (stab_drop hS₁ hC₁ hc₀) (stab_drop hS₂ hC₂ hc₀)
-    (comm_drop C v hC₁ (map_le_self hS₁ hc₀)) (comm_drop C v hC₂ (map_le_self hS₂ hc₀))
-    (fun w d hd => by
-      rw [kills_drop hS₁ hC₁ hI₁ hc₀ hc₀ne w d hd, kills_drop hS₂ hC₂ hI₂ hc₀ h₂' w d hd]
-      exact hK w d (drop_le C v w hd))
-    (irr_drop hS₁ hC₁ hI₁ hc₀ hsc₁) (irr_drop hS₂ hC₂ hI₂ hc₀ hsc₂)
-  exact glue C v hc₀ hS₁ hS₂ hC₁ hC₂ hI₁ hI₂ hk₁ hk₂ hsc hX'
+    have hsc
+        : ∀ a ∈ C v, ∃ μ : ℂ,
+          (∀ x ∈ U₁, c₀ (a (c₀ x)) = μ • c₀ x) ∧ (∀ x ∈ U₂, c₀ (a (c₀ x)) = μ • c₀ x) := by
+      intro a ha
+      have hg : ∀ x ∈ U₁.map c₀, (c₀ * a) x ∈ U₁.map c₀ := by
+        rintro _ ⟨y, hy, rfl⟩
+        exact Submodule.mem_map_of_mem (hS₁ v a ha _ (hS₁ v c₀ hc₀ y hy))
+      obtain ⟨μ, hμ⟩ := eig_drop (U₁.map c₀) hc₀ne (c₀ * a) hg
+      have hem : (c₀ * a - algebraMap ℂ (Module.End ℂ V) μ) * c₀ ∈ C v :=
+        mul_mem (sub_mem (mul_mem hc₀ ha) (Subalgebra.algebraMap_mem _ μ)) hc₀
+      have hmap
+          : U₁.map ((c₀ * a - algebraMap ℂ (Module.End ℂ V) μ) * c₀)
+            = (U₁.map c₀).map (c₀ * a - algebraMap ℂ (Module.End ℂ V) μ) := by
+        rw [Module.End.mul_eq_comp, Submodule.map_comp]
+      have hk : Kills ((c₀ * a - algebraMap ℂ (Module.End ℂ V) μ) * c₀) U₁ := by
+        rw [kills_iff_map]
+        by_contra hne
+        have := hmin v _ hem hne
+        rw [hmap] at this
+        omega
+      refine ⟨μ, fun x hx => ?_, fun x hx => ?_⟩
+      · have := hk x hx
+        simpa [sub_eq_zero] using this
+      · have := (hK v _ hem).mp hk x hx
+        simpa [sub_eq_zero] using this
+    have hk₁ : ¬ Kills c₀ U₁ := fun h => hc₀ne ((kills_iff_map c₀ U₁).mp h)
+    have hk₂ : ¬ Kills c₀ U₂ := fun h => hk₁ ((hK v c₀ hc₀).mpr h)
+    have h₂' : U₂.map c₀ ≠ ⊥ := fun h => hk₂ ((kills_iff_map c₀ U₂).mpr h)
+    have hsc₁ : ∀ a ∈ C v, ∃ μ : ℂ, ∀ x ∈ U₁, c₀ (a (c₀ x)) = μ • c₀ x := fun a ha =>
+      (hsc a ha).imp fun _ h => h.1
+    have hsc₂ : ∀ a ∈ C v, ∃ μ : ℂ, ∀ x ∈ U₂, c₀ (a (c₀ x)) = μ • c₀ x := fun a ha =>
+      (hsc a ha).imp fun _ h => h.2
+    obtain ⟨X', hX'⟩ :=
+      ih _ hlt (drop C v) (U₁.map c₀) (U₂.map c₀) inferInstance rfl hc₀ne h₂'
+        (stab_drop hS₁ hC₁ hc₀) (stab_drop hS₂ hC₂ hc₀) (comm_drop C v hC₁ (map_le_self hS₁ hc₀))
+        (comm_drop C v hC₂ (map_le_self hS₂ hc₀))
+        (fun w d hd => by
+          rw [kills_drop hS₁ hC₁ hI₁ hc₀ hc₀ne w d hd, kills_drop hS₂ hC₂ hI₂ hc₀ h₂' w d hd]
+          exact hK w d (drop_le C v w hd))
+        (irr_drop hS₁ hC₁ hI₁ hc₀ hsc₁) (irr_drop hS₂ hC₂ hI₂ hc₀ hsc₂)
+    exact glue C v hc₀ hS₁ hS₂ hC₁ hC₂ hI₁ hI₂ hk₁ hk₂ hsc hX'
 
-theorem stable_graph : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ι : Type) (C : ι → Subalgebra ℂ (Module.End ℂ V)) (U₁ U₂ : Submodule ℂ V), FiniteDimensional ℂ U₁ → U₁ ≠ ⊥ → U₂ ≠ ⊥ → (∀ v, ∀ c ∈ C v, ∀ x ∈ U₁, c x ∈ U₁) → (∀ v, ∀ c ∈ C v, ∀ x ∈ U₂, c x ∈ U₂) → (∀ v w, v ≠ w → ∀ c ∈ C v, ∀ d ∈ C w, (∀ x ∈ U₁, c (d x) = d (c x)) ∧ (∀ x ∈ U₂, c (d x) = d (c x))) → (∀ v, ∀ c ∈ C v, (∀ x ∈ U₁, c x = 0) ↔ (∀ x ∈ U₂, c x = 0)) → (∀ Y ≤ U₁, (∀ v, ∀ c ∈ C v, ∀ x ∈ Y, c x ∈ Y) → Y = ⊥ ∨ Y = U₁) → (∀ Y ≤ U₂, (∀ v, ∀ c ∈ C v, ∀ x ∈ Y, c x ∈ Y) → Y = ⊥ ∨ Y = U₂) → ∃ X : Submodule ℂ (V × V), X ≠ ⊥ ∧ (∀ z ∈ X, z.1 ∈ U₁ ∧ z.2 ∈ U₂) ∧ (∀ v, ∀ c ∈ C v, ∀ z ∈ X, (c z.1, c z.2) ∈ X) ∧ (∀ u, ((0 : V), u) ∈ X → u = 0) ∧ (∀ u, (u, (0 : V)) ∈ X → u = 0) := by
+theorem stable_graph
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ι : Type) (C : ι → Subalgebra ℂ (Module.End ℂ V))
+        (U₁ U₂ : Submodule ℂ V),
+      FiniteDimensional ℂ U₁ → U₁ ≠ ⊥ → U₂ ≠ ⊥ → (∀ v, ∀ c ∈ C v, ∀ x ∈ U₁, c x ∈ U₁)
+        → (∀ v, ∀ c ∈ C v, ∀ x ∈ U₂, c x ∈ U₂)
+        → (∀ v w,
+          v ≠ w
+            → ∀ c ∈ C v, ∀ d ∈ C w, (∀ x ∈ U₁, c (d x) = d (c x)) ∧ (∀ x ∈ U₂, c (d x) = d (c x)))
+        → (∀ v, ∀ c ∈ C v, (∀ x ∈ U₁, c x = 0) ↔ (∀ x ∈ U₂, c x = 0))
+        → (∀ Y ≤ U₁, (∀ v, ∀ c ∈ C v, ∀ x ∈ Y, c x ∈ Y) → Y = ⊥ ∨ Y = U₁)
+        → (∀ Y ≤ U₂, (∀ v, ∀ c ∈ C v, ∀ x ∈ Y, c x ∈ Y) → Y = ⊥ ∨ Y = U₂)
+        → ∃ X : Submodule ℂ (V × V),
+          X ≠ ⊥ ∧ (∀ z ∈ X, z.1 ∈ U₁ ∧ z.2 ∈ U₂) ∧ (∀ v, ∀ c ∈ C v, ∀ z ∈ X, (c z.1, c z.2) ∈ X)
+            ∧ (∀ u, ((0 : V), u) ∈ X → u = 0) ∧ (∀ u, (u, (0 : V)) ∈ X → u = 0) := by
   intro V _ _ ι C U₁ U₂ hfd h₁ h₂ hS₁ hS₂ hCm hK hI₁ hI₂
   exact main_ind (finrank ℂ U₁) C U₁ U₂ hfd rfl h₁ h₂ hS₁ hS₂
     (fun v w h c hc d hd x hx => (hCm v w h c hc d hd).1 x hx)
-    (fun v w h c hc d hd x hx => (hCm v w h c hc d hd).2 x hx) hK hI₁ hI₂
+    (fun v w h c hc d hd x hx => (hCm v w h c hc d hd).2 x hx)
+    hK hI₁ hI₂
 
 end GlobalTheory.CommDet

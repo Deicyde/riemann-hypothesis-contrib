@@ -10,6 +10,5 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 open NumberField GlobalTheory.CuspRep UpperTheory.V
 
-theorem UpperTheory.V.Af.newformRep :
-    UpperTheory.V.Published.NewformRep :=
+theorem UpperTheory.V.Af.newformRep : UpperTheory.V.Published.NewformRep :=
   UpperTheory.V.Af.newformRepOf UpperTheory.V.Af.cuspSemisimpleReal UpperTheory.V.Af.admissibleReal

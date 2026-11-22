@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem addValuation_natCast_eq_padicValNat :
-    ∀ (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (p : ℕ), p.Prime →
-      v (p : C) = 1 → ∀ n : ℕ, n ≠ 0 →
-        v (n : C) = (((padicValNat p n : ℕ) : ℝ) : WithTop ℝ) := by
+theorem addValuation_natCast_eq_padicValNat
+    : ∀ (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (p : ℕ),
+      p.Prime → v (p : C) = 1
+        → ∀ n : ℕ, n ≠ 0 → v (n : C) = (((padicValNat p n : ℕ) : ℝ) : WithTop ℝ) := by
   intro C _ _ v p hp hvp n hn
   have h1 : v (1 : C) = 0 := v.map_one
 
@@ -36,7 +36,8 @@ theorem addValuation_natCast_eq_padicValNat :
       have := Nat.gcd_eq_gcd_ab m p
       rw [hm] at this
       simpa using this
-    have hC : (1 : C) = (m : C) * ((Nat.gcdA m p : ℤ) : C) + (p : C) * ((Nat.gcdB m p : ℤ) : C) := by
+    have hC
+        : (1 : C) = (m : C) * ((Nat.gcdA m p : ℤ) : C) + (p : C) * ((Nat.gcdB m p : ℤ) : C) := by
       have := congrArg (fun z : ℤ => (z : C)) hbez
       simpa using this
     have ha : 0 < v ((m : C) * ((Nat.gcdA m p : ℤ) : C)) := by
@@ -50,7 +51,9 @@ theorem addValuation_natCast_eq_padicValNat :
     exact absurd (lt_of_lt_of_le (lt_min ha hb) h) (lt_irrefl _)
 
   haveI : Fact p.Prime := ⟨hp⟩
-  obtain ⟨m, hm⟩ := (fun {p n : ℕ} => _root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat p n)) (p := p) (n := n)
+  obtain ⟨m, hm⟩ :=
+    (fun {p n : ℕ} => _root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat p n))
+      (p := p) (n := n)
   have hm0 : m ≠ 0 := by
     rintro rfl
     exact hn (by simpa using hm)

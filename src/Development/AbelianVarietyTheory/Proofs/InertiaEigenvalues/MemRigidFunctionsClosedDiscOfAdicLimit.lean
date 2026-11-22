@@ -9,10 +9,12 @@ open PowerSeries GlobalTheory.BK Filter Topology
 
 namespace GlobalTheory
 
-theorem mem_R_of_adic_limit (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K]
-    [Algebra O K] [IsUnitBall O K] (l : ℕ) (k : ℝ) (f : K⟦X⟧) (s : ℕ → K⟦X⟧)
+theorem mem_R_of_adic_limit
+    (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+    (l : ℕ) (k : ℝ) (f : K⟦X⟧) (s : ℕ → K⟦X⟧)
     (hs : ∀ n, s n ∈ R O K l k) (hf : ∀ n, (X : K⟦X⟧) ^ (n + 1) ∣ f - s n)
-    (ht : Tendsto (fun n => normR l k (s (n + 1) - s n)) atTop (𝓝 0)) : f ∈ R O K l k := by
+    (ht : Tendsto (fun n => normR l k (s (n + 1) - s n)) atTop (𝓝 0))
+    : f ∈ R O K l k := by
   rw [mem_R]
   have hr : ∀ m : ℕ, 0 ≤ rad l k ^ m := fun m => pow_nonneg (rad_nonneg l k) m
   have hc : ∀ m, coeff m f = coeff m (s m) := fun m => by

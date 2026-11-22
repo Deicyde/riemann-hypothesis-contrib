@@ -5,20 +5,34 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AlgebraMapQr
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.pkTop_of :
-    UpperTheory.Gal.W2.PFrameEx → UpperTheory.Gal.W2.PkLat → UpperTheory.Gal.W2.PkEquiv → UpperTheory.Gal.W2.PkPerf → UpperTheory.Gal.W2.PkInj → UpperTheory.Gal.W2.PkOnto → UpperTheory.Gal.W2.KpMem → UpperTheory.Gal.W2.PDicEx := by
+theorem UpperTheory.Gal.W2.pkTop_of
+    : UpperTheory.Gal.W2.PFrameEx → UpperTheory.Gal.W2.PkLat → UpperTheory.Gal.W2.PkEquiv
+      → UpperTheory.Gal.W2.PkPerf → UpperTheory.Gal.W2.PkInj → UpperTheory.Gal.W2.PkOnto
+      → UpperTheory.Gal.W2.KpMem
+      → UpperTheory.Gal.W2.PDicEx := by
   intro hF hLat hEq hPerf hInj hOnto hKp p _ D G L _ hm B
   obtain ⟨A⟩ := hF p D G L hm B.β B.sym
-  let i : Gp G ≃* Gr G 1 := MulEquiv.ofBijective (inclG G 1) (GlobalTheory.TorCls.AtP.inclG_one_bijective G)
+  let i : Gp G ≃* Gr G 1 :=
+    MulEquiv.ofBijective (inclG G 1) (GlobalTheory.TorCls.AtP.inclG_one_bijective G)
   have hi : ∀ g, i g = inclG G 1 g := fun _ => rfl
   choose M hM hMl using hLat p D G L B.β A hm
-  refine ⟨{ lat := fun hp => M (i.symm hp), isLat := fun hp => hMl _, perf := ?_, equiv := ?_, inj := ?_, onto := ?_ }⟩
+  refine ⟨{
+    lat := fun hp => M (i.symm hp)
+    isLat := fun hp => hMl _
+    perf := ?_
+    equiv := ?_
+    inj := ?_
+    onto := ?_
+  }⟩
   · intro hp
     have hp0 : (p : ℚ) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
     have hp1 : (0 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).pos

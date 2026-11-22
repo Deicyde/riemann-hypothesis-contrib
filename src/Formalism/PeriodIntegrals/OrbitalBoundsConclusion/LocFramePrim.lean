@@ -9,5 +9,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalPrimitiveFr
 @[expose] public section
 
 theorem locFramePrim : PI.LocFramePrim.Statement :=
-  PI.LocFramePrimWork.Steps_top PI.LocFramePrimWork.localDifferentPowerSpan PI.LocFramePrimWork.dualFunctionalsExist
-    PI.LocFramePrimWork.primitiveOfDualFunctionals
+  PI.LocFramePrimWork.Steps_top PI.LocFramePrimWork.localDifferentPowerSpan
+    PI.LocFramePrimWork.dualFunctionalsExist PI.LocFramePrimWork.primitiveOfDualFunctionals

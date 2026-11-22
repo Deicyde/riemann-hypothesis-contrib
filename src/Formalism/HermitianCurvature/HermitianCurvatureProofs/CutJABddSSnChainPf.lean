@@ -6,7 +6,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJABddSSnC
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.ChainPf
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 noncomputable section
 
@@ -16,37 +17,46 @@ structure Tm (k r : ℕ) where
   j : ℕ
   ws : Fin j → List (Bool × Mat k r)
 
-variable {k r : ℕ} {V E' : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
+variable
+  {k r : ℕ} {V E' : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
   [NormedAddCommGroup E'] [NormedSpace ℂ E']
 
 def tval (Ψ : V → E') (F : Mat k r → V) (t : Tm k r) (g : Mat k r) : E' :=
   iteratedFDeriv ℝ t.j Ψ (F g) (fun i => Dw (t.ws i) F g)
 
 def tnext (x : Bool × Mat k r) (t : Tm k r) : List (Tm k r) :=
-  ⟨t.j + 1, Fin.cons [x] t.ws⟩ :: List.ofFn fun i : Fin t.j => (⟨t.j, Function.update t.ws i (x :: t.ws i)⟩ : Tm k r)
+  ⟨t.j + 1, Fin.cons [x] t.ws⟩
+    :: List.ofFn fun i : Fin t.j => (⟨t.j, Function.update t.ws i (x :: t.ws i)⟩ : Tm k r)
 
-theorem hasDerivAt_list_sum {ι : Type} (l : List ι) (f : ι → ℝ → E') (f' : ι → E')
-    (h : ∀ i ∈ l, HasDerivAt (f i) (f' i) 0) :
-    HasDerivAt (fun s => (l.map fun i => f i s).sum) (l.map f').sum 0 := by
+theorem hasDerivAt_list_sum
+    {ι : Type} (l : List ι) (f : ι → ℝ → E') (f' : ι → E') (h : ∀ i ∈ l, HasDerivAt (f i) (f' i) 0)
+    : HasDerivAt (fun s => (l.map fun i => f i s).sum) (l.map f').sum 0 := by
   induction l with
   | nil => simpa using hasDerivAt_const (0 : ℝ) (0 : E')
   | cons a l ih =>
     simp only [List.map_cons, List.sum_cons]
     exact (h a (by simp)).add (ih fun i hi => h i (by simp [hi]))
 
-theorem list_sum_flatMap {ι κ : Type} (l : List ι) (f : ι → List κ) (g : κ → E') :
-    ((l.flatMap f).map g).sum = (l.map fun i => ((f i).map g).sum).sum := by
+theorem list_sum_flatMap {ι κ : Type} (l : List ι) (f : ι → List κ) (g : κ → E')
+    : ((l.flatMap f).map g).sum = (l.map fun i => ((f i).map g).sum).sum := by
   induction l with
   | nil => simp
-  | cons a l ih => rw [List.flatMap_cons, List.map_append, List.sum_append, ih, List.map_cons, List.sum_cons]
+  | cons a l ih =>
+    rw [List.flatMap_cons, List.map_append, List.sum_append, ih, List.map_cons, List.sum_cons]
 
-theorem tval_hasDerivAt {Ψ : V → E'} (hΨ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Ψ) {F : Mat k r → V}
-    {U : Set (Mat k r)} (hF : CkOn ⊤ (U ∩ GV k r) F) {x : Bool × Mat k r} (hx : inLie k r x.2)
-    (t : Tm k r) (hws : ∀ i, ∀ y ∈ t.ws i, inLie k r y.2) {g : Mat k r} (hgU : g ∈ U) (hg : g ∈ GV k r) :
-    HasDerivAt (fun s : ℝ => tval Ψ F t (crv x g s)) (((tnext x t).map fun t' => tval Ψ F t' g).sum) 0 := by
+theorem tval_hasDerivAt
+    {Ψ : V → E'} (hΨ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Ψ)
+    {F : Mat k r → V} {U : Set (Mat k r)} (hF : CkOn ⊤ (U ∩ GV k r) F)
+    {x : Bool × Mat k r} (hx : inLie k r x.2)
+    (t : Tm k r) (hws : ∀ i, ∀ y ∈ t.ws i, inLie k r y.2)
+    {g : Mat k r} (hgU : g ∈ U) (hg : g ∈ GV k r)
+    : HasDerivAt
+      (fun s : ℝ => tval Ψ F t (crv x g s))
+      (((tnext x t).map fun t' => tval Ψ F t' g).sum) 0 := by
   have hg' : g ∈ U ∩ GV k r := ⟨hgU, hg⟩
   have hF1 : ∀ n : ℕ∞, CkOn n (U ∩ GV k r) F := fun n => CkOn_mono le_top hF
-  have hA : HasDerivAt (fun s : ℝ => iteratedFDeriv ℝ t.j Ψ (F (crv x g s)))
+  have hA : HasDerivAt
+      (fun s : ℝ => iteratedFDeriv ℝ t.j Ψ (F (crv x g s)))
       (fderiv ℝ (iteratedFDeriv ℝ t.j Ψ) (F g) (Dx x F g)) 0 := by
     have h1 := CkOn_diff hx (hF1 1) hg' hg
     have hlt : ((t.j : ℕ) : WithTop ℕ∞) < ((⊤ : ℕ∞) : WithTop ℕ∞) :=
@@ -61,10 +71,11 @@ theorem tval_hasDerivAt {Ψ : V → E'} (hΨ : ContDiff ℝ ((⊤ : ℕ∞) : Wi
     exact CkOn_diff hx (CkOn_Dw (hws i) (hF1 _)) hg' hg
   have hD := (hA.hasFDerivAt).continuousMultilinearMap_apply (fun i => (hv i).hasFDerivAt)
   refine hD.hasDerivAt.congr_deriv ?_
-  simp only [crv_zero, ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_comp', Function.comp_apply,
-    ContinuousLinearMap.coe_sum', Finset.sum_apply, ContinuousLinearMap.smulRight_apply,
-    ContinuousLinearMap.one_apply, one_smul, ContinuousMultilinearMap.apply_apply,
-    ContinuousMultilinearMap.toContinuousLinearMap_apply, ContinuousLinearMap.toSpanSingleton_apply]
+  simp only [crv_zero, ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_comp',
+    Function.comp_apply, ContinuousLinearMap.coe_sum', Finset.sum_apply,
+    ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.one_apply, one_smul,
+    ContinuousMultilinearMap.apply_apply, ContinuousMultilinearMap.toContinuousLinearMap_apply,
+    ContinuousLinearMap.toSpanSingleton_apply]
   simp only [tnext, List.map_cons, List.sum_cons, List.map_ofFn, List.sum_ofFn]
   congr 1
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -76,12 +87,17 @@ theorem tval_hasDerivAt {Ψ : V → E'} (hΨ : ContDiff ℝ ((⊤ : ℕ∞) : Wi
     simp
   · simp [Function.update_apply, h]
 
-theorem expand {Ψ : V → E'} (hΨ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Ψ) {F : Mat k r → V}
-    {U : Set (Mat k r)} (hU : IsOpen U) (hF : CkOn ⊤ (U ∩ GV k r) F) :
-    ∀ w : List (Bool × Mat k r), (∀ y ∈ w, inLie k r y.2) →
-      ∃ ts : List (Tm k r), ts.length ≤ (w.length + 1).factorial ∧
-        (∀ t ∈ ts, t.j ≤ w.length ∧ (∑ i, (t.ws i).length) = w.length ∧ ∀ i, (t.ws i).Sublist w) ∧
-        ∀ g ∈ U, g ∈ GV k r → Dw w (fun g => Ψ (F g)) g = (ts.map fun t => tval Ψ F t g).sum := by
+theorem expand
+    {Ψ : V → E'} (hΨ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Ψ)
+    {F : Mat k r → V} {U : Set (Mat k r)} (hU : IsOpen U) (hF : CkOn ⊤ (U ∩ GV k r) F)
+    : ∀ w : List (Bool × Mat k r),
+      (∀ y ∈ w, inLie k r y.2)
+        → ∃ ts : List (Tm k r),
+          ts.length ≤ (w.length + 1).factorial
+            ∧ (∀ t ∈ ts,
+              t.j ≤ w.length ∧ (∑ i, (t.ws i).length) = w.length ∧ ∀ i, (t.ws i).Sublist w)
+            ∧ ∀ g ∈ U,
+              g ∈ GV k r → Dw w (fun g => Ψ (F g)) g = (ts.map fun t => tval Ψ F t g).sum := by
   intro w
   induction w with
   | nil =>
@@ -107,7 +123,8 @@ theorem expand {Ψ : V → E'} (hΨ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ
         List.sum_le_sum hl
       rw [List.map_const', List.sum_replicate, smul_eq_mul] at hs
       rw [List.length_flatMap, List.length_cons, Nat.factorial_succ]
-      calc _ ≤ ts.length * (w.length + 1) := hs
+      calc
+        _ ≤ ts.length * (w.length + 1) := hs
         _ ≤ (w.length + 1).factorial * (w.length + 1 + 1) := Nat.mul_le_mul hlen (by omega)
         _ = (w.length + 1 + 1) * (w.length + 1).factorial := Nat.mul_comm _ _
     · intro t' ht'
@@ -116,14 +133,18 @@ theorem expand {Ψ : V → E'} (hΨ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ
       simp only [tnext, List.mem_cons, List.mem_ofFn] at ht'
       rcases ht' with rfl | ⟨i, rfl⟩
       · refine ⟨by simp only [List.length_cons]; omega, ?_, ?_⟩
-        · simp only [Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, List.length_cons, List.length_nil, hsum]
+        · simp only [Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, List.length_cons,
+            List.length_nil, hsum]
           omega
         · intro i
           refine Fin.cases ?_ (fun i => ?_) i
           · simp
           · simpa using (hsub i).cons x
       · refine ⟨by simp only [List.length_cons]; omega, ?_, ?_⟩
-        · have e : ∀ l, (Function.update t.ws i (x :: t.ws i) l).length = (t.ws l).length + if l = i then 1 else 0 := by
+        · have e
+              : ∀ l,
+                (Function.update t.ws i (x :: t.ws i) l).length
+                  = (t.ws l).length + if l = i then 1 else 0 := by
             intro l
             by_cases h : l = i
             · subst h
@@ -138,15 +159,19 @@ theorem expand {Ψ : V → E'} (hΨ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ
     · intro g hgU hg
       show Dx x (Dw w (fun g => Ψ (F g))) g = _
       rw [Dx_eq]
-      have hev : Filter.EventuallyEq (nhds (0 : ℝ)) (fun s : ℝ => Dw w (fun g => Ψ (F g)) (crv x g s))
+      have hev : Filter.EventuallyEq (nhds (0 : ℝ))
+          (fun s : ℝ => Dw w (fun g => Ψ (F g)) (crv x g s))
           (fun s => (ts.map fun t => tval Ψ F t (crv x g s)).sum) := by
         filter_upwards [crv_ev (x := x) hU hgU] with s hs
         exact hval _ hs (crv_mem hx hg s)
       rw [hev.deriv_eq, list_sum_flatMap]
-      exact (hasDerivAt_list_sum ts (fun t s => tval Ψ F t (crv x g s))
+      exact (hasDerivAt_list_sum ts
+        (fun t s => tval Ψ F t (crv x g s))
         (fun t => ((tnext x t).map fun t' => tval Ψ F t' g).sum)
-        (fun t ht => tval_hasDerivAt hΨ hF hx t
-          (fun i y hy => hw y (List.mem_cons_of_mem _ (((hts t ht).2.2 i).subset hy))) hgU hg)).deriv
+        (fun t ht =>
+          tval_hasDerivAt hΨ hF hx t
+            (fun i y hy => hw y (List.mem_cons_of_mem _ (((hts t ht).2.2 i).subset hy)))
+            hgU hg)).deriv
 
 theorem chain_bound_holds : Formalism.FourierDecayAlt.P.CutMP.JA.SSn.ChainBd := by
   unfold Formalism.FourierDecayAlt.P.CutMP.JA.SSn.ChainBd
@@ -177,12 +202,19 @@ theorem chain_bound_holds : Formalism.FourierDecayAlt.P.CutMP.JA.SSn.ChainBd := 
   have hBj' : ∀ j ≤ m, Bj j ≤ Bs := by
     intro j hj
     rw [hBs]
-    exact (le_abs_self _).trans (Finset.single_le_sum (f := fun j => |Bj j|) (fun j _ => abs_nonneg _)
-      (Finset.mem_range.mpr (by omega)))
+    exact (le_abs_self _).trans
+      (Finset.single_le_sum
+        (f := fun j => |Bj j|)
+        (fun j _ => abs_nonneg _)
+        (Finset.mem_range.mpr (by omega)))
   have hCl' : ∀ l ≤ m, Cl l ≤ Cs := by
     intro l hl
-    have := (le_abs_self (Cl l)).trans (Finset.single_le_sum (f := fun l => |Cl l|) (fun l _ => abs_nonneg _)
-      (Finset.mem_range.mpr (by omega : l < m + 1)))
+    have :=
+      (le_abs_self (Cl l)).trans
+        (Finset.single_le_sum
+          (f := fun l => |Cl l|)
+          (fun l _ => abs_nonneg _)
+          (Finset.mem_range.mpr (by omega : l < m + 1)))
     rw [hCs]
     linarith
   refine ⟨(m + 1).factorial * Bs * Cs ^ m, ?_⟩
@@ -196,7 +228,8 @@ theorem chain_bound_holds : Formalism.FourierDecayAlt.P.CutMP.JA.SSn.ChainBd := 
   have hpow : ∀ l : ℕ, gN g ^ (Bg * l) = a ^ l := by
     intro l
     rw [Real.rpow_mul (by linarith), Real.rpow_natCast, ha]
-  have hsub : ∀ s : List (Bool × Mat k r), s.Sublist (wL u ++ wR v) → ‖Dw s F g‖ ≤ Cs * a ^ s.length := by
+  have hsub
+      : ∀ s : List (Bool × Mat k r), s.Sublist (wL u ++ wR v) → ‖Dw s F g‖ ≤ Cs * a ^ s.length := by
     intro s hs
     unfold wL wR at hs
     obtain ⟨r1, r2, rfl, h1, h2⟩ := List.sublist_append_iff.mp hs
@@ -210,12 +243,19 @@ theorem chain_bound_holds : Formalism.FourierDecayAlt.P.CutMP.JA.SSn.ChainBd := 
       rw [dLR_eq]
       rfl
     rw [e]
-    have hb := hCl (u'.length + v'.length) u' v' (fun X hX => hu X (hu'.subset hX))
-      (fun X hX => hv X (hv'.subset hX)) le_rfl g hg
+    have hb :=
+      hCl (u'.length + v'.length) u' v'
+        (fun X hX => hu X (hu'.subset hX))
+        (fun X hX => hv X (hv'.subset hX))
+        le_rfl g hg
     rw [hpow] at hb
-    have hlen : (u'.map (Prod.mk true) ++ v'.map (Prod.mk false)).length = u'.length + v'.length := by simp
+    have hlen
+        : (u'.map (Prod.mk true) ++ v'.map (Prod.mk false)).length = u'.length + v'.length := by
+      simp
     rw [hlen]
-    calc ‖dLR u' v' F g‖ ≤ Cl (u'.length + v'.length) * a ^ (u'.length + v'.length) := hb
+    calc
+      ‖dLR u' v' F g‖
+        ≤ Cl (u'.length + v'.length) * a ^ (u'.length + v'.length) := hb
       _ ≤ Cs * a ^ (u'.length + v'.length) :=
         mul_le_mul_of_nonneg_right (hCl' _ hl) (pow_nonneg (by linarith) _)
   rw [dLR_eq]
@@ -237,23 +277,26 @@ theorem chain_bound_holds : Formalism.FourierDecayAlt.P.CutMP.JA.SSn.ChainBd := 
     obtain ⟨hj, hsum, hsl⟩ := hts t ht
     rw [hpow]
     unfold tval
-    calc ‖iteratedFDeriv ℝ t.j Ψ (F g) (fun i => Dw (t.ws i) F g)‖
-        ≤ ‖iteratedFDeriv ℝ t.j Ψ (F g)‖ * ∏ i, ‖Dw (t.ws i) F g‖ :=
-          ContinuousMultilinearMap.le_opNorm _ _
+    calc
+      ‖iteratedFDeriv ℝ t.j Ψ (F g) (fun i => Dw (t.ws i) F g)‖
+          ≤ ‖iteratedFDeriv ℝ t.j Ψ (F g)‖ * ∏ i, ‖Dw (t.ws i) F g‖ :=
+        ContinuousMultilinearMap.le_opNorm _ _
       _ ≤ Bs * ∏ i, (Cs * a ^ (t.ws i).length) := by
-          apply mul_le_mul ((hBj t.j (F g) (hFb g hg)).trans (hBj' _ (by omega)))
-            (Finset.prod_le_prod₀ (fun i _ => norm_nonneg _) (fun i _ => hsub _ (hsl i)))
-            (Finset.prod_nonneg fun i _ => norm_nonneg _) hBs0
+        apply mul_le_mul ((hBj t.j (F g) (hFb g hg)).trans (hBj' _ (by omega)))
+          (Finset.prod_le_prod₀ (fun i _ => norm_nonneg _) (fun i _ => hsub _ (hsl i)))
+          (Finset.prod_nonneg fun i _ => norm_nonneg _) hBs0
       _ = Bs * (Cs ^ t.j * a ^ (wL u ++ wR v).length) := by
-          rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
-            Finset.prod_pow_eq_pow_sum, hsum]
+        rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
+          Finset.prod_pow_eq_pow_sum, hsum]
       _ ≤ Bs * (Cs ^ m * a ^ m) := by
-          apply mul_le_mul_of_nonneg_left _ hBs0
-          exact mul_le_mul (pow_le_pow_right₀ hCs1 (by omega)) (pow_le_pow_right₀ ha1 hL)
-            (pow_nonneg (by linarith) _) (pow_nonneg (by linarith) _)
+        apply mul_le_mul_of_nonneg_left _ hBs0
+        exact mul_le_mul (pow_le_pow_right₀ hCs1 (by omega)) (pow_le_pow_right₀ ha1 hL)
+          (pow_nonneg (by linarith) _) (pow_nonneg (by linarith) _)
       _ = Bs * Cs ^ m * a ^ m := by ring
-  have key : ∀ l : List (Tm k r), (∀ t ∈ l, ‖tval Ψ F t g‖ ≤ Bs * Cs ^ m * gN g ^ (Bg * m)) →
-      ‖(l.map fun t => tval Ψ F t g).sum‖ ≤ l.length * (Bs * Cs ^ m * gN g ^ (Bg * m)) := by
+  have key
+      : ∀ l : List (Tm k r),
+        (∀ t ∈ l, ‖tval Ψ F t g‖ ≤ Bs * Cs ^ m * gN g ^ (Bg * m))
+          → ‖(l.map fun t => tval Ψ F t g).sum‖ ≤ l.length * (Bs * Cs ^ m * gN g ^ (Bg * m)) := by
     intro l
     induction l with
     | nil =>
@@ -262,14 +305,18 @@ theorem chain_bound_holds : Formalism.FourierDecayAlt.P.CutMP.JA.SSn.ChainBd := 
     | cons t l ih =>
       intro hl
       simp only [List.map_cons, List.sum_cons, List.length_cons, Nat.cast_succ]
-      calc _ ≤ ‖tval Ψ F t g‖ + ‖(l.map fun t => tval Ψ F t g).sum‖ := norm_add_le _ _
+      calc
+        _ ≤ ‖tval Ψ F t g‖ + ‖(l.map fun t => tval Ψ F t g).sum‖ := norm_add_le _ _
         _ ≤ (Bs * Cs ^ m * gN g ^ (Bg * m)) + l.length * (Bs * Cs ^ m * gN g ^ (Bg * m)) :=
           add_le_add (hl t (by simp)) (ih fun t' ht' => hl t' (by simp [ht']))
         _ = _ := by ring
   have hfac : (ts.length : ℝ) ≤ ((m + 1).factorial : ℝ) := by
     exact_mod_cast hlen.trans (Nat.factorial_le (by omega))
-  calc ‖(ts.map fun t => tval Ψ F t g).sum‖ ≤ ts.length * (Bs * Cs ^ m * gN g ^ (Bg * m)) := key ts hterm
-    _ ≤ ((m + 1).factorial : ℝ) * (Bs * Cs ^ m * gN g ^ (Bg * m)) := mul_le_mul_of_nonneg_right hfac hX
+  calc
+    ‖(ts.map fun t => tval Ψ F t g).sum‖
+      ≤ ts.length * (Bs * Cs ^ m * gN g ^ (Bg * m)) := key ts hterm
+    _ ≤ ((m + 1).factorial : ℝ) * (Bs * Cs ^ m * gN g ^ (Bg * m)) :=
+      mul_le_mul_of_nonneg_right hfac hX
     _ = _ := by ring
 
 end

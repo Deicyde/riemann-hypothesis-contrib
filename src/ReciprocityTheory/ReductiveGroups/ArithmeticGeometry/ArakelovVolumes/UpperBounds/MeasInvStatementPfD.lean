@@ -94,13 +94,14 @@ lemma toMatrix_Lβ_diag (β : ι → Matrix (Fin r) (Fin r) ℂ) (hβ : ∀ τ, 
     LinearMap.toMatrix' (Lβ β) i i = β i.1.1 i.1.2.1 i.1.2.1 := by
   rw [toMatrix_entry_lemma, if_pos ⟨rfl, rfl⟩]
 
-theorem det_Lβ (β : ι → Matrix (Fin r) (Fin r) ℂ) (hβ : ∀ τ, (β τ).BlockTriangular id) :
-    LinearMap.det (Lβ β) = ∏ i : UpI ι r, β i.1.1 i.1.2.1 i.1.2.1 := by
+theorem det_Lβ (β : ι → Matrix (Fin r) (Fin r) ℂ) (hβ : ∀ τ, (β τ).BlockTriangular id)
+    : LinearMap.det (Lβ β) = ∏ i : UpI ι r, β i.1.1 i.1.2.1 i.1.2.1 := by
   rw [← LinearMap.det_toMatrix']
   let e := Fintype.equivFin ι
   letI : LinearOrder (UpI ι r) := LinearOrder.lift' (keyU (r := r) e) (keyU_injective e)
-  have h := Matrix.det_of_lowerTriangular (LinearMap.toMatrix' (Lβ β)) (fun i j hij =>
-    toMatrix_Lβ_zero e β hβ i j hij)
+  have h :=
+    Matrix.det_of_lowerTriangular (LinearMap.toMatrix' (Lβ β))
+      (fun i j hij => toMatrix_Lβ_zero e β hβ i j hij)
   convert h using 2 with i
   exact (toMatrix_Lβ_diag β hβ i).symm
 

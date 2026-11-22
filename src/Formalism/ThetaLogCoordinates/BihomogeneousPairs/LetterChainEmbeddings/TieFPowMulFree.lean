@@ -15,8 +15,8 @@ open MvPolynomial Finset
 section
 variable {k σ : Type} [Field k] {r : ℕ} (w e : Fin r → σ) (zv sv : σ)
 
-theorem mulLeft_pow_apply (a f : MvPolynomial σ k) (m : ℕ) :
-    ((LinearMap.mulLeft k a) ^ m) f = a ^ m * f := by
+theorem mulLeft_pow_apply (a f : MvPolynomial σ k) (m : ℕ)
+    : ((LinearMap.mulLeft k a) ^ m) f = a ^ m * f := by
   induction m with
   | zero => simp
   | succ m ih =>
@@ -28,8 +28,9 @@ private lemma pderiv_mul_of_pderiv_eq_zero (i : σ) (q f : MvPolynomial σ k) (h
     pderiv i (q * f) = q * pderiv i f := by
   rw [Derivation.leibniz, h, smul_zero, add_zero, smul_eq_mul]
 
-theorem tieF_mul_free (q f : MvPolynomial σ k) (hw : ∀ c, pderiv (w c) q = 0) (he : ∀ c, pderiv (e c) q = 0) :
-    tieF w e (q * f) = q * tieF w e f := by
+theorem tieF_mul_free
+    (q f : MvPolynomial σ k) (hw : ∀ c, pderiv (w c) q = 0) (he : ∀ c, pderiv (e c) q = 0)
+    : tieF w e (q * f) = q * tieF w e f := by
   have key : ∀ g : MvPolynomial σ k, tieF w e g = ∑ c, pderiv (w c) (pderiv (e c) g) := by
     intro g
     simp [tieF]
@@ -37,9 +38,9 @@ theorem tieF_mul_free (q f : MvPolynomial σ k) (hw : ∀ c, pderiv (w c) q = 0)
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [pderiv_mul_of_pderiv_eq_zero _ _ _ (he c), pderiv_mul_of_pderiv_eq_zero _ _ _ (hw c)]
 
-theorem tieF_pow_mul_free (q f : MvPolynomial σ k) (hw : ∀ c, pderiv (w c) q = 0)
-    (he : ∀ c, pderiv (e c) q = 0) (m : ℕ) :
-    (tieF w e ^ m) (q * f) = q * (tieF w e ^ m) f := by
+theorem tieF_pow_mul_free
+    (q f : MvPolynomial σ k) (hw : ∀ c, pderiv (w c) q = 0) (he : ∀ c, pderiv (e c) q = 0) (m : ℕ)
+    : (tieF w e ^ m) (q * f) = q * (tieF w e ^ m) f := by
   induction m with
   | zero => simp
   | succ m ih =>
@@ -54,20 +55,24 @@ private lemma pderiv_X_pow_of_ne' (i j : σ) (h : i ≠ j) (n : ℕ) : pderiv i 
   rw [Derivation.leibniz_pow]
   simp [pderiv_X, Pi.single_apply, Ne.symm h]
 
-theorem harmonicProjection_expand (hz : ∀ c, w c ≠ zv ∧ e c ≠ zv) (o n z : ℕ) (x : MvPolynomial σ k) :
-    M.tieP w e zv sv o n z x = ∑ m ∈ range (o + 1),
-      (((-1 : k) ^ m) / (((m.factorial : k) ^ 2) * ((o + n + r + z - 1).choose m : k))) •
-        (ehP w e zv sv ^ m * (X zv ^ z * (tieF w e ^ m) x)) := by
-  have hE : ∀ (m : ℕ) (y : MvPolynomial σ k),
-      (M.tieEh w e zv sv ^ m) y = ehP w e zv sv ^ m * y := by
+theorem harmonicProjection_expand (hz : ∀ c, w c ≠ zv ∧ e c ≠ zv) (o n z : ℕ) (x : MvPolynomial σ k)
+    : M.tieP w e zv sv o n z x
+      = ∑ m ∈ range (o + 1),
+        (((-1 : k) ^ m) / (((m.factorial : k) ^ 2) * ((o + n + r + z - 1).choose m : k))) •
+          (ehP w e zv sv ^ m * (X zv ^ z * (tieF w e ^ m) x)) := by
+  have hE
+      : ∀ (m : ℕ) (y : MvPolynomial σ k), (M.tieEh w e zv sv ^ m) y = ehP w e zv sv ^ m * y := by
     intro m y
     unfold M.tieEh
     exact mulLeft_pow_apply _ _ m
   unfold M.tieP
   refine Finset.sum_congr rfl fun m _ => ?_
   congr 1
-  rw [tieF_pow_mul_free w e _ x (fun c => pderiv_X_pow_of_ne' _ _ (hz c).1 z)
-    (fun c => pderiv_X_pow_of_ne' _ _ (hz c).2 z) m, hE]
+  rw [tieF_pow_mul_free w e _ x
+      (fun c => pderiv_X_pow_of_ne' _ _ (hz c).1 z)
+      (fun c => pderiv_X_pow_of_ne' _ _ (hz c).2 z)
+      m,
+    hE]
 
 private lemma add_single_mem_support_of_mem_support_pderiv (i : σ) (p : MvPolynomial σ k) (t : σ →₀ ℕ) (ht : t ∈ (pderiv i p).support) :
     t + Finsupp.single i 1 ∈ p.support := by
@@ -97,29 +102,42 @@ private lemma add_single_mem_support_of_mem_support_pderiv (i : σ) (p : MvPolyn
     exact hs
   · exact absurd rfl hne
 
-theorem tieF_pow_apply_eq_zero_of_min_lt [CharZero k] (hw : Function.Injective w) (he : Function.Injective e)
-    (hwe : ∀ c d, w c ≠ e d) {o n : ℕ} {x : MvPolynomial σ k} (hx : BiHom w e o n x) :
-    ∀ m, min o n < m → (tieF w e ^ m) x = 0 := by
+theorem tieF_pow_apply_eq_zero_of_min_lt
+    [CharZero k]
+    (hw : Function.Injective w) (he : Function.Injective e) (hwe : ∀ c d, w c ≠ e d)
+    {o n : ℕ} {x : MvPolynomial σ k} (hx : BiHom w e o n x)
+    : ∀ m, min o n < m → (tieF w e ^ m) x = 0 := by
   classical
-  have hsupp : ∀ (y : MvPolynomial σ k) (t : σ →₀ ℕ), t ∈ (tieF w e y).support →
-      ∃ c, t + Finsupp.single (w c) 1 + Finsupp.single (e c) 1 ∈ y.support := by
+  have hsupp
+      : ∀ (y : MvPolynomial σ k) (t : σ →₀ ℕ),
+        t ∈ (tieF w e y).support
+          → ∃ c, t + Finsupp.single (w c) 1 + Finsupp.single (e c) 1 ∈ y.support := by
     intro y t ht
     have key : tieF w e y = ∑ c, pderiv (w c) (pderiv (e c) y) := by simp [tieF]
     rw [key] at ht
     obtain ⟨c, -, hc⟩ := Finset.mem_biUnion.mp (MvPolynomial.support_sum ht)
-    exact ⟨c, add_single_mem_support_of_mem_support_pderiv _ _ _ (add_single_mem_support_of_mem_support_pderiv _ _ _ hc)⟩
-  have hW1 : ∀ (t : σ →₀ ℕ) (c : Fin r),
-      (∑ d, (t + Finsupp.single (w c) 1 + Finsupp.single (e c) 1 : σ →₀ ℕ) (w d)) = (∑ d, t (w d)) + 1 := by
+    exact ⟨
+      c,
+      add_single_mem_support_of_mem_support_pderiv _ _ _
+        (add_single_mem_support_of_mem_support_pderiv _ _ _ hc)
+    ⟩
+  have hW1
+      : ∀ (t : σ →₀ ℕ) (c : Fin r),
+        (∑ d, (t + Finsupp.single (w c) 1 + Finsupp.single (e c) 1 : σ →₀ ℕ) (w d))
+          = (∑ d, t (w d)) + 1 := by
     intro t c
     have h1 : ∀ d, (e c = w d) ↔ False := fun d => ⟨fun h => hwe d c h.symm, False.elim⟩
     simp [Finsupp.single_apply, hw.eq_iff, Finset.sum_add_distrib, h1]
-  have hE1 : ∀ (t : σ →₀ ℕ) (c : Fin r),
-      (∑ d, (t + Finsupp.single (w c) 1 + Finsupp.single (e c) 1 : σ →₀ ℕ) (e d)) = (∑ d, t (e d)) + 1 := by
+  have hE1
+      : ∀ (t : σ →₀ ℕ) (c : Fin r),
+        (∑ d, (t + Finsupp.single (w c) 1 + Finsupp.single (e c) 1 : σ →₀ ℕ) (e d))
+          = (∑ d, t (e d)) + 1 := by
     intro t c
     have h1 : ∀ d, (w c = e d) ↔ False := fun d => ⟨fun h => hwe c d h, False.elim⟩
     simp [Finsupp.single_apply, he.eq_iff, Finset.sum_add_distrib, h1]
-  have claim : ∀ (j : ℕ) (t : σ →₀ ℕ), t ∈ ((tieF w e ^ j) x).support →
-      (∑ d, t (w d)) + j = o ∧ (∑ d, t (e d)) + j = n := by
+  have claim
+      : ∀ (j : ℕ) (t : σ →₀ ℕ),
+        t ∈ ((tieF w e ^ j) x).support → (∑ d, t (w d)) + j = o ∧ (∑ d, t (e d)) + j = n := by
     intro j
     induction j with
     | zero =>
@@ -249,54 +267,64 @@ private lemma factorial_choose_signed_sum_eq_zero [CharZero k] (N j : ℕ) (hj :
   rw [Finset.sum_congr rfl key, Finset.sum_range_sub', hW, hW, if_pos (Nat.zero_le _), if_neg (by omega)]
   simp
 
-theorem decomp [CharZero k] (hr : 1 ≤ r) (hz : ∀ c, w c ≠ zv ∧ e c ≠ zv) (o n z : ℕ) (x : MvPolynomial σ k)
-    (hv : ∀ m, min o n < m → (tieF w e ^ m) x = 0) :
-    X zv ^ z * x = ∑ l ∈ range (min o n + 1), ehP w e zv sv ^ l *
-      M.tieP w e zv sv (o - l) (n - l) z
-        (((((l.factorial : k)) ^ 2 * ((o + n + r + z - l).choose l : k)))⁻¹ • (tieF w e ^ l) x) := by
+theorem decomp
+    [CharZero k]
+    (hr : 1 ≤ r) (hz : ∀ c, w c ≠ zv ∧ e c ≠ zv)
+    (o n z : ℕ) (x : MvPolynomial σ k) (hv : ∀ m, min o n < m → (tieF w e ^ m) x = 0)
+    : X zv ^ z * x
+      = ∑ l ∈ range (min o n + 1), ehP w e zv sv ^ l *
+        M.tieP w e zv sv (o - l) (n - l) z
+          (((((l.factorial : k)) ^ 2 * ((o + n + r + z - l).choose l : k)))⁻¹ • (tieF w e ^ l) x) := by
   classical
   have hT : ∀ l m : ℕ, (tieF w e ^ m) ((tieF w e ^ l) x) = (tieF w e ^ (l + m)) x := by
     intro l m
     rw [add_comm, pow_add]
     rfl
-  have hterm : ∀ l ∈ range (min o n + 1), ehP w e zv sv ^ l *
-      M.tieP w e zv sv (o - l) (n - l) z
-        (((((l.factorial : k)) ^ 2 * ((o + n + r + z - l).choose l : k)))⁻¹ • (tieF w e ^ l) x) =
-      ∑ m ∈ range (min o n - l + 1), ((-1 : k) ^ m / (((m).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (m) : k)) *
-          (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (l + m) * (X zv ^ z * (tieF w e ^ (l + m)) x)) := by
-    intro l hl
-    have hlL : l ≤ min o n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hl)
-    have hsub : range (min o n - l + 1) ⊆ range (o - l + 1) := by
-      intro m hm
-      simp only [Finset.mem_range] at hm ⊢
-      omega
-    rw [harmonicProjection_expand w e zv sv hz, Finset.mul_sum, ← Finset.sum_subset hsub]
-    · refine Finset.sum_congr rfl fun m _ => ?_
-      rw [LinearMap.map_smul, hT]
-      simp only [MvPolynomial.smul_eq_C_mul, map_mul]
-      ring
-    · intro m _ hm
-      simp only [Finset.mem_range, not_lt] at hm
-      have h0 : (tieF w e ^ (l + m)) x = 0 := hv (l + m) (by omega)
-      simp [LinearMap.map_smul, hT, h0]
-  have hre : ∀ l ∈ range (min o n + 1),
-      ∑ m ∈ range (min o n - l + 1), ((-1 : k) ^ m / (((m).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (m) : k)) *
-          (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (l + m) * (X zv ^ z * (tieF w e ^ (l + m)) x)) =
-      ∑ j ∈ Ico l (min o n + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
-          (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (j) * (X zv ^ z * (tieF w e ^ (j)) x)) := by
-    intro l hl
-    have hlL : l ≤ min o n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hl)
-    rw [Finset.sum_Ico_eq_sum_range, show min o n + 1 - l = min o n - l + 1 by omega]
-    refine Finset.sum_congr rfl fun m _ => ?_
-    rw [Nat.add_sub_cancel_left]
-  have hcomm : ∑ l ∈ range (min o n + 1), ∑ j ∈ Ico l (min o n + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
-          (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (j) * (X zv ^ z * (tieF w e ^ (j)) x)) =
-      ∑ j ∈ range (min o n + 1), ∑ l ∈ range (j + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
-          (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (j) * (X zv ^ z * (tieF w e ^ (j)) x)) :=
+  have hterm
+      : ∀ l ∈ range (min o n + 1),
+        ehP w e zv sv ^ l * M.tieP w e zv sv (o - l) (n - l) z
+            (((((l.factorial : k)) ^ 2 * ((o + n + r + z - l).choose l : k)))⁻¹ • (tieF w e ^ l) x)
+          = ∑ m ∈ range (min o n - l + 1), ((-1 : k) ^ m / (((m).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (m) : k)) *
+                (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (l + m) * (X zv ^ z * (tieF w e ^ (l + m)) x)) :=
+    by
+      intro l hl
+      have hlL : l ≤ min o n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hl)
+      have hsub : range (min o n - l + 1) ⊆ range (o - l + 1) := by
+        intro m hm
+        simp only [Finset.mem_range] at hm ⊢
+        omega
+      rw [harmonicProjection_expand w e zv sv hz, Finset.mul_sum, ← Finset.sum_subset hsub]
+      · refine Finset.sum_congr rfl fun m _ => ?_
+        rw [LinearMap.map_smul, hT]
+        simp only [MvPolynomial.smul_eq_C_mul, map_mul]
+        ring
+      · intro m _ hm
+        simp only [Finset.mem_range, not_lt] at hm
+        have h0 : (tieF w e ^ (l + m)) x = 0 := hv (l + m) (by omega)
+        simp [LinearMap.map_smul, hT, h0]
+  have hre
+      : ∀ l ∈ range (min o n + 1),
+        ∑ m ∈ range (min o n - l + 1), ((-1 : k) ^ m / (((m).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (m) : k)) *
+            (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (l + m) * (X zv ^ z * (tieF w e ^ (l + m)) x))
+          = ∑ j ∈ Ico l (min o n + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
+                (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (j) * (X zv ^ z * (tieF w e ^ (j)) x)) :=
+    by
+      intro l hl
+      have hlL : l ≤ min o n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hl)
+      rw [Finset.sum_Ico_eq_sum_range, show min o n + 1 - l = min o n - l + 1 by omega]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      rw [Nat.add_sub_cancel_left]
+  have hcomm
+      : ∑ l ∈ range (min o n + 1), ∑ j ∈ Ico l (min o n + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
+          (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (j) * (X zv ^ z * (tieF w e ^ (j)) x))
+        = ∑ j ∈ range (min o n + 1), ∑ l ∈ range (j + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
+              (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (j) * (X zv ^ z * (tieF w e ^ (j)) x)) :=
     Finset.sum_comm' (fun l j => by simp only [Finset.mem_range, Finset.mem_Ico]; omega)
-  have hid : ∀ j ∈ range (min o n + 1),
-      ∑ l ∈ range (j + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
-          (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (j) * (X zv ^ z * (tieF w e ^ (j)) x)) = if j = 0 then X zv ^ z * x else 0 := by
+  have hid
+      : ∀ j ∈ range (min o n + 1),
+        ∑ l ∈ range (j + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
+            (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) • (ehP w e zv sv ^ (j) * (X zv ^ z * (tieF w e ^ (j)) x))
+          = if j = 0 then X zv ^ z * x else 0 := by
     intro j hj
     have hjL : j ≤ min o n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hj)
     rw [← Finset.sum_smul]
@@ -304,8 +332,10 @@ theorem decomp [CharZero k] (hr : 1 ≤ r) (hz : ∀ c, w c ≠ zv ∧ e c ≠ z
     · subst h0
       simp
     · rw [if_neg (by omega)]
-      have hc2 : ∑ l ∈ range (j + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
-          (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹) = 0 := by
+      have hc2
+          : ∑ l ∈ range (j + 1), ((-1 : k) ^ (j - l) / (((j - l).factorial : k) ^ 2 * ((o - l + (n - l) + r + z - 1).choose (j - l) : k)) *
+              (((l).factorial : k) ^ 2 * ((o + n + r + z - l).choose l : k))⁻¹)
+            = 0 := by
         refine Eq.trans ?_ (factorial_choose_signed_sum_eq_zero (o + n + r + z) j hpos (by omega))
         refine Finset.sum_congr rfl fun l hl => ?_
         have hlj : l ≤ j := Nat.lt_succ_iff.mp (Finset.mem_range.mp hl)

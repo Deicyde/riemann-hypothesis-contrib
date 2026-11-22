@@ -8,15 +8,17 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.LatL
 
-theorem norm_sub_le_max_ultra' {K : Type} [NormedField K] [IsUltrametricDist K] (x y : K) :
-    ‖x - y‖ ≤ max ‖x‖ ‖y‖ := by
+theorem norm_sub_le_max_ultra' {K : Type} [NormedField K] [IsUltrametricDist K] (x y : K)
+    : ‖x - y‖ ≤ max ‖x‖ ‖y‖ := by
   rw [sub_eq_add_neg, ← norm_neg y]
   exact IsUltrametricDist.norm_add_le_max _ _
 
-theorem exists_glO_pair {F : Type} [NormedField F] [IsUltrametricDist F] (r : ℕ)
-    (v w : Fin (r + 1) → F) (hv : ∀ i, ‖v i‖ ≤ 1) (hw : ∀ i, ‖w i‖ ≤ 1) (hwv : w ⬝ᵥ v = 1) :
-    ∃ k ∈ glO (r + 1) F, (k : Matrix _ _ F) *ᵥ Pi.single (Fin.last r) 1 = v ∧
-      w ᵥ* (k : Matrix _ _ F) = Pi.single (Fin.last r) 1 := by
+theorem exists_glO_pair
+    {F : Type} [NormedField F] [IsUltrametricDist F]
+    (r : ℕ) (v w : Fin (r + 1) → F) (hv : ∀ i, ‖v i‖ ≤ 1) (hw : ∀ i, ‖w i‖ ≤ 1) (hwv : w ⬝ᵥ v = 1)
+    : ∃ k ∈ glO (r + 1) F,
+      (k : Matrix _ _ F) *ᵥ Pi.single (Fin.last r) 1 = v
+        ∧ w ᵥ* (k : Matrix _ _ F) = Pi.single (Fin.last r) 1 := by
   classical
   obtain ⟨i₀, hi₀⟩ := Finite.exists_max (fun i => ‖w i‖)
   have hw0 : w i₀ ≠ 0 := by
@@ -27,8 +29,7 @@ theorem exists_glO_pair {F : Type} [NormedField F] [IsUltrametricDist F] (r : �
     rw [norm_div]; exact div_le_one_of_le₀ (hi₀ i) (norm_nonneg _)
   let s : Fin r → Fin (r + 1) := i₀.succAbove
   have hs : ∀ c, s c ≠ i₀ := fun c => Fin.succAbove_ne i₀ c
-  let u : Fin r → Fin (r + 1) → F := fun c =>
-    Pi.single (s c) 1 - (w (s c) / w i₀) • Pi.single i₀ 1
+  let u : Fin r → Fin (r + 1) → F := fun c => Pi.single (s c) 1 - (w (s c) / w i₀) • Pi.single i₀ 1
   let ρ : Fin r → Fin (r + 1) → F := fun c => Pi.single (s c) 1 - v (s c) • w
   let col : Fin (r + 1) → Fin (r + 1) → F := Fin.lastCases v u
   let row : Fin (r + 1) → Fin (r + 1) → F := Fin.lastCases w ρ
@@ -37,7 +38,8 @@ theorem exists_glO_pair {F : Type} [NormedField F] [IsUltrametricDist F] (r : �
   have hwu : ∀ c, w ⬝ᵥ u c = 0 := by
     intro c
     simp only [u, dotProduct_sub, dotProduct_smul, dotProduct_single, smul_eq_mul, mul_one]
-    field_simp; ring
+    field_simp
+    ring
   have hdot : ∀ a b, row a ⬝ᵥ col b = (1 : Matrix (Fin (r + 1)) (Fin (r + 1)) F) a b := by
     intro a b
     induction a using Fin.lastCases with
@@ -66,7 +68,8 @@ theorem exists_glO_pair {F : Type} [NormedField F] [IsUltrametricDist F] (r : �
   have hKL : K * L = 1 := mul_eq_one_comm.mp hLK
   let k : GL (Fin (r + 1)) F := ⟨K, L, hKL, hLK⟩
   have hsingle : ∀ i j : Fin (r + 1), ‖(Pi.single i (1 : F) : Fin (r + 1) → F) j‖ ≤ 1 := by
-    intro i j; by_cases h : j = i
+    intro i j
+    by_cases h : j = i
     · subst h; simp
     · simp [Pi.single_apply, h]
   have hcol : ∀ b a, ‖col b a‖ ≤ 1 := by
@@ -98,10 +101,13 @@ theorem exists_glO_pair {F : Type} [NormedField F] [IsUltrametricDist F] (r : �
     rw [hdot, Matrix.one_apply, Pi.single_apply]
     simp only [eq_comm]
 
-theorem glO_transitive_pairs : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (v w : Fin (r + 1) → F), (∀ i, ‖v i‖ ≤ 1) →
-    (∀ i, ‖w i‖ ≤ 1) → w ⬝ᵥ v = 1 → ∃ k ∈ glO (r + 1) F,
-      (k : Matrix _ _ F) *ᵥ Pi.single (Fin.last r) 1 = v ∧ w ᵥ* (k : Matrix _ _ F) = Pi.single (Fin.last r) 1 := by
+theorem glO_transitive_pairs
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (v w : Fin (r + 1) → F),
+      (∀ i, ‖v i‖ ≤ 1) → (∀ i, ‖w i‖ ≤ 1) → w ⬝ᵥ v = 1
+        → ∃ k ∈ glO (r + 1) F,
+          (k : Matrix _ _ F) *ᵥ Pi.single (Fin.last r) 1 = v
+            ∧ w ᵥ* (k : Matrix _ _ F) = Pi.single (Fin.last r) 1 := by
   intro F E _ _ _ _ hU r v w hv hw hwv
   haveI : IsUltrametricDist F := hU.ultraF
   exact exists_glO_pair r v w hv hw hwv

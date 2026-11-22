@@ -5,15 +5,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Set Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open scoped ENNReal NumberField.AdeleRing InnerProductSpace ComplexConjugate
 open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
 
-private theorem tens_interp {X : Type} (E : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ E] :
-    ∃ (a : ℕ) (φ : Fin a → X → ℂ) (x : Fin a → X), (∀ i, φ i ∈ E) ∧
-      ∀ f ∈ E, ∀ u, f u = ∑ i, f (x i) * φ i u := by
+private theorem tens_interp {X : Type} (E : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ E]
+    : ∃ (a : ℕ) (φ : Fin a → X → ℂ) (x : Fin a → X),
+      (∀ i, φ i ∈ E) ∧ ∀ f ∈ E, ∀ u, f u = ∑ i, f (x i) * φ i u := by
   classical
   let ev : X → Module.Dual ℂ E := fun u => (LinearMap.proj u).comp E.subtype
   have hspan : Submodule.span ℂ (Set.range ev) = ⊤ := by
@@ -32,8 +34,13 @@ private theorem tens_interp {X : Type} (E : Submodule ℂ (X → ℂ)) [FiniteDi
   have hb : ∀ i, b i = ev (c (e.symm i)) := by
     intro i
     simp [b, b0]
-  refine ⟨a, fun i => ((Module.evalEquiv ℂ E).symm (b.coord i) : E), fun i => c (e.symm i),
-    fun i => Subtype.property _, ?_⟩
+  refine ⟨
+    a,
+    fun i => ((Module.evalEquiv ℂ E).symm (b.coord i) : E),
+    fun i => c (e.symm i),
+    fun i => Subtype.property _,
+    ?_
+  ⟩
   intro f hf u
   have h1 := b.sum_repr (ev u)
   have h2 := congrArg (fun l : Module.Dual ℂ E => l ⟨f, hf⟩) h1
@@ -49,19 +56,39 @@ private theorem tens_interp {X : Type} (E : Submodule ℂ (X → ℂ)) [FiniteDi
   rw [← h3, mul_comm]
   rfl
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.tens :
-    ∀ {X Y : Type} (E₁ : Submodule ℂ (X → ℂ)) (E₂ : Submodule ℂ (Y → ℂ)) [FiniteDimensional ℂ E₁] [FiniteDimensional ℂ E₂],
-      ∃ (a b : ℕ) (φ : Fin a → X → ℂ) (ψ : Fin b → Y → ℂ) (x : Fin a → Fin a → X) (y : Fin b → Fin b → Y) (s : Fin a → Fin a → ℂ) (t : Fin b → Fin b → ℂ),
-        (∀ i, φ i ∈ E₁) ∧ (∀ j, ψ j ∈ E₂) ∧ ∀ Φ : X → Y → ℂ, (∀ v, (fun u => Φ u v) ∈ E₁) → (∀ u, Φ u ∈ E₂) →
-          ∀ u v, Φ u v = ∑ i, ∑ j, (∑ p, ∑ q, s i p * t j q * Φ (x i p) (y j q)) * φ i u * ψ j v := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.tens
+    : ∀ {X Y : Type} (E₁ : Submodule ℂ (X → ℂ)) (E₂ : Submodule ℂ (Y → ℂ)) [FiniteDimensional ℂ E₁]
+        [FiniteDimensional ℂ E₂],
+      ∃ (a b : ℕ) (φ : Fin a → X → ℂ) (ψ : Fin b → Y → ℂ) (x : Fin a → Fin a → X)
+          (y : Fin b → Fin b → Y) (s : Fin a → Fin a → ℂ) (t : Fin b → Fin b → ℂ),
+        (∀ i, φ i ∈ E₁) ∧ (∀ j, ψ j ∈ E₂)
+          ∧ ∀ Φ : X → Y → ℂ,
+            (∀ v, (fun u => Φ u v) ∈ E₁) → (∀ u, Φ u ∈ E₂)
+              → ∀ u v,
+                Φ u v
+                  = ∑ i, ∑ j, (∑ p, ∑ q, s i p * t j q * Φ (x i p) (y j q)) * φ i u * ψ j v := by
   intro X Y E₁ E₂ _ _
   obtain ⟨a, φ, x, hφ, hx⟩ := tens_interp E₁
   obtain ⟨b, ψ, y, hψ, hy⟩ := tens_interp E₂
-  refine ⟨a, b, φ, ψ, fun _ p => x p, fun _ q => y q, fun i p => if p = i then 1 else 0,
-    fun j q => if q = j then 1 else 0, hφ, hψ, ?_⟩
+  refine ⟨
+    a,
+    b,
+    φ,
+    ψ,
+    fun _ p => x p,
+    fun _ q => y q,
+    fun i p => if p = i then 1 else 0,
+    fun j q => if q = j then 1 else 0,
+    hφ,
+    hψ,
+    ?_
+  ⟩
   intro Φ h1 h2 u v
-  have hs : ∀ i j, (∑ p, ∑ q, (if p = i then (1 : ℂ) else 0) * (if q = j then (1 : ℂ) else 0) *
-      Φ (x p) (y q)) = Φ (x i) (y j) := by
+  have hs
+      : ∀ i j,
+        (∑ p, ∑ q, (if p = i then (1 : ℂ) else 0) * (if q = j then (1 : ℂ) else 0) *
+          Φ (x p) (y q))
+          = Φ (x i) (y j) := by
     intro i j
     rw [Finset.sum_eq_single i, Finset.sum_eq_single j]
     · simp

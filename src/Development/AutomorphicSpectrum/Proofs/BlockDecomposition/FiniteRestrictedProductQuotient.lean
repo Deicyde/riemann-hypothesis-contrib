@@ -10,26 +10,29 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ImportsB
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.BCT GlobalTheory.LFun PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.CG
-open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.F.FA
+open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.BCT
+  GlobalTheory.LFun PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
+  PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.CG
+open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Tail
+  PositivityTheory.Rg.BcB.F.FA
 open scoped Classical
 open GlobalTheory.CompanionTheory.FinActS
 
 namespace GlobalTheory.CompanionTheory.FinActS
 
 theorem finite_cosets_of_components_mem
-    {ι Γ : Type} [Group Γ] {Hl : ι → Type} [∀ i, Group (Hl i)] (p : ∀ i, Γ →* Hl i)
-    (V : ∀ i, Subgroup (Hl i)) (Q : ∀ i, Set (Hl i))
-    (hQ : ∀ i, ∀ x ∈ Q i, ∀ u ∈ V i, x * u ∈ Q i)
-    (hQf : ∀ i, {q : Hl i ⧸ V i | q.out ∈ Q i}.Finite)
-    (hQV : ∀ᶠ i in cofinite, Q i ⊆ V i) :
-    {q : Γ ⧸ (⨅ i, (V i).comap (p i)) | ∀ i, p i q.out ∈ Q i}.Finite := by
+    {ι Γ : Type} [Group Γ]
+    {Hl : ι → Type} [∀ i, Group (Hl i)]
+    (p : ∀ i, Γ →* Hl i)
+    (V : ∀ i, Subgroup (Hl i)) (Q : ∀ i, Set (Hl i)) (hQ : ∀ i, ∀ x ∈ Q i, ∀ u ∈ V i, x * u ∈ Q i)
+    (hQf : ∀ i, {q : Hl i ⧸ V i | q.out ∈ Q i}.Finite) (hQV : ∀ᶠ i in cofinite, Q i ⊆ V i)
+    : {q : Γ ⧸ (⨅ i, (V i).comap (p i)) | ∀ i, p i q.out ∈ Q i}.Finite := by
   have hT : {i | ¬ Q i ⊆ V i}.Finite := Filter.eventually_cofinite.mp hQV
   haveI : Finite {i | ¬ Q i ⊆ V i} := hT.to_subtype
-  let f : Γ ⧸ (⨅ i, (V i).comap (p i)) → ∀ i : {i | ¬ Q i ⊆ V i}, Hl i.1 ⧸ V i.1 :=
-    fun q i => ((p i.1 q.out : Hl i.1) : Hl i.1 ⧸ V i.1)
-  have hfin : (Set.univ.pi fun i : {i | ¬ Q i ⊆ V i} =>
-      {c : Hl i.1 ⧸ V i.1 | c.out ∈ Q i.1}).Finite :=
+  let f : Γ ⧸ (⨅ i, (V i).comap (p i)) → ∀ i : {i | ¬ Q i ⊆ V i}, Hl i.1 ⧸ V i.1 := fun q i =>
+    ((p i.1 q.out : Hl i.1) : Hl i.1 ⧸ V i.1)
+  have hfin
+      : (Set.univ.pi fun i : {i | ¬ Q i ⊆ V i} => {c : Hl i.1 ⧸ V i.1 | c.out ∈ Q i.1}).Finite :=
     Set.Finite.pi fun i => hQf i.1
   refine Set.Finite.of_injOn (f := f) ?_ ?_ hfin
   · intro q hq i _

@@ -18,32 +18,36 @@ namespace FubiniStudyLeviForm
 
 variable {ι : Type} [Fintype ι]
 
-theorem levi_sum_nonneg {K : Type} {z : ι → ℂ} (f : K → (ι → ℂ) → ℝ)
-    (hf : ∀ k, ContDiffAt ℝ 2 (f k) z) (hl : ∀ k w, 0 ≤ ReciprocityTheory.AnForm.levi (f k) z w)
-    (w : ι → ℂ) (s : Finset K) :
-    ContDiffAt ℝ 2 (fun y => ∑ k ∈ s, f k y) z ∧
-      0 ≤ ReciprocityTheory.AnForm.levi (fun y => ∑ k ∈ s, f k y) z w := by
+theorem levi_sum_nonneg
+    {K : Type} {z : ι → ℂ} (f : K → (ι → ℂ) → ℝ) (hf : ∀ k, ContDiffAt ℝ 2 (f k) z)
+    (hl : ∀ k w, 0 ≤ ReciprocityTheory.AnForm.levi (f k) z w)
+    (w : ι → ℂ) (s : Finset K)
+    : ContDiffAt ℝ 2 (fun y => ∑ k ∈ s, f k y) z
+      ∧ 0 ≤ ReciprocityTheory.AnForm.levi (fun y => ∑ k ∈ s, f k y) z w := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨by simpa using contDiffAt_const, by simp [ReciprocityTheory.AnForm.levi]⟩
   | insert a s ha ih =>
-    have heq : (fun y => ∑ k ∈ insert a s, f k y) =
-        fun y => (fun y' => ∑ k ∈ s, f k y') y + 1 * f a y := by
+    have heq
+        : (fun y => ∑ k ∈ insert a s, f k y)
+          = fun y => (fun y' => ∑ k ∈ s, f k y') y + 1 * f a y := by
       funext y
       rw [Finset.sum_insert ha]
       ring
     rw [heq]
     refine ⟨ih.1.add (contDiffAt_const.mul (hf a)), ?_⟩
-    rw [ReciprocityTheory.AnForm.levi_add_smul (f := fun y' => ∑ k ∈ s, f k y') (g := f a) 1 ih.1 (hf a) w]
+    rw [ReciprocityTheory.AnForm.levi_add_smul
+      (f := fun y' => ∑ k ∈ s, f k y')
+      (g := f a) 1 ih.1 (hf a) w]
     have h1 := hl a w
     have h2 := ih.2
     linarith
 
 noncomputable def blockProj {K : Type} (ι : K → Type) (k : K) : ((Σ k, ι k) → ℂ) →L[ℂ] (ι k → ℂ) :=
-  ContinuousLinearMap.pi fun i => ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : (Σ k, ι k) => ℂ) ⟨k, i⟩
+  ContinuousLinearMap.pi fun i =>
+    ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : (Σ k, ι k) => ℂ) ⟨k, i⟩
 
 end FubiniStudyLeviForm
-
 
 open FubiniStudyLeviForm in
 theorem FsLineLevi.proof : FsLineLevi.Statement := by
@@ -67,8 +71,9 @@ theorem FsLineLevi.proof : FsLineLevi.Statement := by
     have hk0 : (fun i => z ⟨k, i⟩) ≠ 0 := by
       obtain ⟨i, hi⟩ := hz k
       exact fun h0 => hi (congrFun h0 i)
-    have hφ := ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.adens_contDiffAt_logρ_id
-      (HilbertSamuel.ProjLine.isSmoothMetric_fs (J := ι k)) hk0
+    have hφ :=
+      ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.adens_contDiffAt_logρ_id
+        (HilbertSamuel.ProjLine.isSmoothMetric_fs (J := ι k)) hk0
     have hFk : F k = (fun u => Real.log ((fsMetric (ι := ι k)).ρ u)) ∘ blockProj ι k := rfl
     refine ⟨hFk ▸ hφ.comp z ((blockProj ι k).restrictScalars ℝ).contDiff.contDiffAt, fun v => ?_⟩
     rw [hFk, ReciprocityTheory.AnForm.levi_comp v ((blockProj ι k).analyticAt z) hφ]

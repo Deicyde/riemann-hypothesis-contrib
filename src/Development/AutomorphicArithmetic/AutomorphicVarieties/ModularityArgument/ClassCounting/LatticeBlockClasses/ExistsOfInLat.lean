@@ -4,21 +4,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK UpperTheory.V.ZK.Cl
+open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK
+  UpperTheory.V.ZK.Cl
 
 section
 
 variable {L F : Type} [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] {J : Type}
 
-private theorem coe_add' (y y' : J → 𝓞 F) :
-    (fun j => ((y + y') j : F)) = (fun j => (y j : F)) + fun j => (y' j : F) := by
+private theorem coe_add' (y y' : J → 𝓞 F)
+    : (fun j => ((y + y') j : F)) = (fun j => (y j : F)) + fun j => (y' j : F) := by
   funext j
   simp
 
 end
 
-theorem UpperTheory.V.ZK.Cl.cInt :
-    UpperTheory.V.ZK.Cl.CInt := by
+theorem UpperTheory.V.ZK.Cl.cInt : UpperTheory.V.ZK.Cl.CInt := by
   intro L F _ _ _ _ _ J _ b
   classical
   refine ⟨inferInstance, ?_, ?_⟩
@@ -27,12 +27,15 @@ theorem UpperTheory.V.ZK.Cl.cInt :
   have hadd : ∀ u w : 𝓞 F, ((u + w : 𝓞 F) : F) = (u : F) + (w : F) := fun u w => by simp
   have hmul : ∀ u w : 𝓞 F, ((u * w : 𝓞 F) : F) = (u : F) * (w : F) := fun u w => by simp
   have hone1 : ((1 : 𝓞 F) : F) = 1 := by simp
-  have hint : ∀ y : J → F, InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ) y ↔ ∀ j, ∃ a : 𝓞 F, (a : F) = y j := by
+  have hint
+      : ∀ y : J → F,
+        InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ) y ↔ ∀ j, ∃ a : 𝓞 F, (a : F) = y j := by
     intro y
     constructor
     · intro hy j
-      obtain ⟨a, ha⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F (y j)
-        (fun P => by simpa using hy j P)
+      obtain ⟨a, ha⟩ :=
+        HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F (y j)
+          (fun P => by simpa using hy j P)
       exact ⟨a, ha⟩
     · intro hy j P
       obtain ⟨a, ha⟩ := hy j
@@ -40,20 +43,28 @@ theorem UpperTheory.V.ZK.Cl.cInt :
       simpa using HeightOneSpectrum.valuation_le_one (K := F) P a
   let φ : GG L F J → (J → 𝓞 F) → (J → 𝓞 F) := fun g x j =>
     if hx : ∃ a : 𝓞 F, (a : F) = g (fun i => (x i : F)) j then hx.choose else 0
-  have hφ : ∀ g ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)), ∀ x j,
-      ((φ g x j : 𝓞 F) : F) = g (fun i => (x i : F)) j := by
+  have hφ
+      : ∀ g ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)), ∀ x j,
+        ((φ g x j : 𝓞 F) : F) = g (fun i => (x i : F)) j := by
     intro g hg x j
-    have hg' : ∀ y, InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ) y ↔
-        InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ) (g y) := hg
+    have hg'
+        : ∀ y,
+          InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ) y
+            ↔ InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ) (g y) :=
+      hg
     have h1 : InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ) (fun i => (x i : F)) :=
       (hint _).2 (fun i => ⟨x i, rfl⟩)
     have h2 := (hint _).1 ((hg' _).1 h1) j
     simp only [φ, dif_pos h2]
     exact h2.choose_spec
-  have hφf : ∀ g ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)), ∀ x,
-      (fun i => ((φ g x i : 𝓞 F) : F)) = g (fun i => (x i : F)) := fun g hg x => funext (hφ g hg x)
-  have hcomp : ∀ g1 ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)),
-      ∀ g2 ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)), ∀ x, φ g1 (φ g2 x) = φ (g1 * g2) x := by
+  have hφf
+      : ∀ g ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)), ∀ x,
+        (fun i => ((φ g x i : 𝓞 F) : F)) = g (fun i => (x i : F)) := fun g hg x =>
+    funext (hφ g hg x)
+  have hcomp
+      : ∀ g1 ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)),
+        ∀ g2 ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)), ∀ x,
+          φ g1 (φ g2 x) = φ (g1 * g2) x := by
     intro g1 hg1 g2 hg2 x
     funext j
     apply RingOfIntegers.ext
@@ -69,8 +80,9 @@ theorem UpperTheory.V.ZK.Cl.cInt :
     intro a z
     rw [Algebra.smul_def, Algebra.smul_def]
     rfl
-  have hlin : ∀ g ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)), ∀ x y,
-      φ g (x + y) = φ g x + φ g y ∧ ∀ a : 𝓞 L, φ g (a • x) = a • φ g x := by
+  have hlin
+      : ∀ g ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)), ∀ x y,
+        φ g (x + y) = φ g x + φ g y ∧ ∀ a : 𝓞 L, φ g (a • x) = a • φ g x := by
     intro g hg x y
     constructor
     · funext j
@@ -83,35 +95,42 @@ theorem UpperTheory.V.ZK.Cl.cInt :
         funext i
         rw [Pi.smul_apply, Pi.smul_apply, hsmul]
       rw [Pi.smul_apply, hsmul, hφ g hg, hφ g hg, e, map_smul, Pi.smul_apply]
-  let E : ∀ g : GG L F J, g ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ)) →
-      ((J → 𝓞 F) ≃ₗ[𝓞 L] J → 𝓞 F) := fun g hg =>
-    { toFun := φ g
-      invFun := φ g⁻¹
-      map_add' := fun x y => (hlin g hg x y).1
-      map_smul' := fun a x => (hlin g hg x x).2 a
-      left_inv := by
-        intro x
-        show φ g⁻¹ (φ g x) = x
-        rw [hcomp _ (Subgroup.inv_mem _ hg) _ hg, inv_mul_cancel, hone]
-      right_inv := by
-        intro x
-        show φ g (φ g⁻¹ x) = x
-        rw [hcomp _ hg _ (Subgroup.inv_mem _ hg), mul_inv_cancel, hone] }
-  let α : ↥((StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ))).subgroupOf (GLoc F J b)) →*
-      ((J → 𝓞 F) ≃ₗ[𝓞 L] J → 𝓞 F) :=
-    { toFun := fun h => E _ (Subgroup.mem_subgroupOf.1 h.2)
-      map_one' := by
-        apply LinearEquiv.ext
-        intro x
-        exact hone x
-      map_mul' := by
-        intro h1 h2
-        apply LinearEquiv.ext
-        intro x
-        exact (hcomp _ (Subgroup.mem_subgroupOf.1 h1.2) _ (Subgroup.mem_subgroupOf.1 h2.2) x).symm }
+  let E
+      : ∀ g : GG L F J,
+        g ∈ StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ))
+          → ((J → 𝓞 F) ≃ₗ[𝓞 L] J → 𝓞 F) := fun g hg => {
+    toFun := φ g
+    invFun := φ g⁻¹
+    map_add' := fun x y => (hlin g hg x y).1
+    map_smul' := fun a x => (hlin g hg x x).2 a
+    left_inv := by
+      intro x
+      show φ g⁻¹ (φ g x) = x
+      rw [hcomp _ (Subgroup.inv_mem _ hg) _ hg, inv_mul_cancel, hone]
+    right_inv := by
+      intro x
+      show φ g (φ g⁻¹ x) = x
+      rw [hcomp _ hg _ (Subgroup.inv_mem _ hg), mul_inv_cancel, hone]
+  }
+  let α
+      : ↥((StabP L (InLat (0 : J → HeightOneSpectrum (𝓞 F) →₀ ℤ))).subgroupOf (GLoc F J b))
+        →* ((J → 𝓞 F) ≃ₗ[𝓞 L] J → 𝓞 F) := {
+    toFun := fun h => E _ (Subgroup.mem_subgroupOf.1 h.2)
+    map_one' := by
+      apply LinearEquiv.ext
+      intro x
+      exact hone x
+    map_mul' := by
+      intro h1 h2
+      apply LinearEquiv.ext
+      intro x
+      exact (hcomp _ (Subgroup.mem_subgroupOf.1 h1.2) _ (Subgroup.mem_subgroupOf.1 h2.2) x).symm
+  }
   refine ⟨α, ?_⟩
   intro k _ r hr μ hμ
-  have hfix : ∀ (σ : Gal(F/L)) (a : 𝓞 L), actO σ (algebraMap (𝓞 L) (𝓞 F) a) = algebraMap (𝓞 L) (𝓞 F) a := by
+  have hfix
+      : ∀ (σ : Gal(F/L)) (a : 𝓞 L),
+        actO σ (algebraMap (𝓞 L) (𝓞 F) a) = algebraMap (𝓞 L) (𝓞 F) a := by
     intro σ a
     apply RingOfIntegers.ext
     show σ ((algebraMap (𝓞 L) (𝓞 F) a : 𝓞 F) : F) = ((algebraMap (𝓞 L) (𝓞 F) a : 𝓞 F) : F)
@@ -120,15 +139,16 @@ theorem UpperTheory.V.ZK.Cl.cInt :
       simpa [Algebra.smul_def] using this
     rw [e]
     exact σ.commutes _
-  let π : (J → 𝓞 F) →+ (Gal(F/L) × J → k) :=
-    { toFun := fun x p => r (actO p.1 (x p.2))
-      map_zero' := by
-        funext p
-        simp
-      map_add' := by
-        intro x y
-        funext p
-        simp }
+  let π : (J → 𝓞 F) →+ (Gal(F/L) × J → k) := {
+    toFun := fun x p => r (actO p.1 (x p.2))
+    map_zero' := by
+      funext p
+      simp
+    map_add' := by
+      intro x y
+      funext p
+      simp
+  }
   have huniq : ∀ (y : F) (u u' : k), ResF r y u → ResF r y u' → u = u' := by
     rintro y u u' ⟨a, c, hc, hyc, hu⟩ ⟨a', c', hc', hyc', hu'⟩
     have e : a * c' = a' * c := by
@@ -157,12 +177,16 @@ theorem UpperTheory.V.ZK.Cl.cInt :
     choose a ha using fun j => hr.1 (fun σ => v (σ, j))
     exact ⟨a, funext fun p => ha p.2 p.1⟩
   · intro x hx
-    have hj : ∀ j, x j ∈ Ideal.map (algebraMap (𝓞 L) (𝓞 F)) (RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F)))) :=
+    have hj
+        : ∀ j,
+          x j
+            ∈ Ideal.map (algebraMap (𝓞 L) (𝓞 F)) (RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F)))) :=
       fun j => hr.2 (x j) (fun σ => congrFun hx (σ, j))
     rw [← Finset.univ_sum_single x]
     apply Submodule.sum_mem
     intro j _
-    have h1 : x j ∈ ((RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F)))) • ⊤ : Submodule (𝓞 L) (𝓞 F)) := by
+    have h1
+        : x j ∈ ((RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F)))) • ⊤ : Submodule (𝓞 L) (𝓞 F)) := by
       rw [Ideal.smul_top_eq_map]
       exact hj j
     have h2 := Submodule.mem_map_of_mem (f := LinearMap.single (𝓞 L) (fun _ : J => 𝓞 F) j) h1
@@ -175,7 +199,9 @@ theorem UpperTheory.V.ZK.Cl.cInt :
       exact HeightOneSpectrum.valuation_le_one (K := F) P (x j)
     have hred := hμ (h : ↥(GLoc F J b)) (fun i => (x i : F)) (π x) hloc (hR x)
     have hα := hR (α h x)
-    have hc : (fun i => ((α h x i : 𝓞 F) : F)) = ((h : ↥(GLoc F J b)) : GG L F J) (fun i => (x i : F)) :=
+    have hc
+        : (fun i => ((α h x i : 𝓞 F) : F))
+          = ((h : ↥(GLoc F J b)) : GG L F J) (fun i => (x i : F)) :=
       hφf _ (Subgroup.mem_subgroupOf.1 h.2) x
     rw [hc] at hα
     exact huniq _ _ _ (hα p.1 p.2) (hred p.1 p.2)

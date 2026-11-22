@@ -10,13 +10,27 @@ noncomputable section
 
 namespace GlobalTheory.StableLatCount
 
-theorem card_commMaps_eq_card_homQuot : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (E : Type) [Field E] [Algebra O E] [IsFractionRing O E] (A₁ A₂ : Type) [CommRing A₁] [CommRing A₂] [Algebra E A₁] [Algebra E A₂] [Algebra O A₁] [Algebra O A₂] [IsScalarTower O E A₁] [IsScalarTower O E A₂] [Module.Finite E A₁] [Module.Finite E A₂] (g₁ : A₁) (g₂ : A₂) (M₁ : Submodule O A₁) (M₂ : Submodule O A₂), IsLat O E M₂ → (∀ y ∈ M₁, g₁ * y ∈ M₁) → (∀ y ∈ M₂, g₂ * y ∈ M₂) → Nat.card {φ : M₂ →ₗ[O] A₁ ⧸ M₁ // ∀ x y : M₂, (y : A₂) = g₂ * x → ∀ a : A₁, φ x = Submodule.Quotient.mk a → φ y = Submodule.Quotient.mk (g₁ * a)} = Nat.card {z : (A₂ →ₗ[E] A₁) ⧸ homLat E M₁ M₂ // ∀ ψ : A₂ →ₗ[E] A₁, Submodule.Quotient.mk ψ = z → adE E g₁ g₂ ψ ∈ homLat E M₁ M₂} := by
+theorem card_commMaps_eq_card_homQuot
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (E : Type) [Field E]
+        [Algebra O E] [IsFractionRing O E] (A₁ A₂ : Type) [CommRing A₁] [CommRing A₂] [Algebra E A₁]
+        [Algebra E A₂] [Algebra O A₁] [Algebra O A₂] [IsScalarTower O E A₁] [IsScalarTower O E A₂]
+        [Module.Finite E A₁] [Module.Finite E A₂] (g₁ : A₁) (g₂ : A₂) (M₁ : Submodule O A₁)
+        (M₂ : Submodule O A₂),
+      IsLat O E M₂ → (∀ y ∈ M₁, g₁ * y ∈ M₁) → (∀ y ∈ M₂, g₂ * y ∈ M₂)
+        → Nat.card
+            {φ : M₂ →ₗ[O] A₁ ⧸ M₁ // ∀ x y : M₂,
+              (y : A₂) = g₂ * x
+                → ∀ a : A₁, φ x = Submodule.Quotient.mk a → φ y = Submodule.Quotient.mk (g₁ * a)}
+          = Nat.card
+            {z : (A₂ →ₗ[E] A₁) ⧸ homLat E M₁ M₂ // ∀ ψ : A₂ →ₗ[E] A₁,
+              Submodule.Quotient.mk ψ = z → adE E g₁ g₂ ψ ∈ homLat E M₁ M₂} := by
   intro O _ _ _ E _ _ _ A₁ A₂ _ _ _ _ _ _ _ _ _ _ g₁ g₂ M₁ M₂ hM₂ hg₁ hg₂
   classical
-  let F : (A₂ →ₗ[E] A₁) →ₗ[O] (M₂ →ₗ[O] A₁ ⧸ M₁) :=
-    { toFun := fun ψ => M₁.mkQ ∘ₗ (ψ.restrictScalars O) ∘ₗ M₂.subtype
-      map_add' := fun ψ χ => by ext x; simp
-      map_smul' := fun c ψ => by ext x; simp }
+  let F : (A₂ →ₗ[E] A₁) →ₗ[O] (M₂ →ₗ[O] A₁ ⧸ M₁) := {
+    toFun := fun ψ => M₁.mkQ ∘ₗ (ψ.restrictScalars O) ∘ₗ M₂.subtype
+    map_add' := fun ψ χ => by ext x; simp
+    map_smul' := fun c ψ => by ext x; simp
+  }
   have hF : ∀ ψ (x : M₂), F ψ x = Submodule.Quotient.mk (ψ (x : A₂)) := fun _ _ => rfl
   have hsurj : Function.Surjective F := by
     intro φ
@@ -33,7 +47,8 @@ theorem card_commMaps_eq_card_homQuot : ∀ (O : Type) [CommRing O] [IsDomain O]
     haveI : Module.Free O M₂ := Module.free_of_finite_type_torsion_free'
     let b := Module.Free.chooseBasis O M₂
     let bs : Module.Free.ChooseBasisIndex O M₂ → A₂ := fun i => (b i : A₂)
-    have hli : LinearIndependent O bs := b.linearIndependent.map' M₂.subtype (Submodule.ker_subtype M₂)
+    have hli : LinearIndependent O bs :=
+      b.linearIndependent.map' M₂.subtype (Submodule.ker_subtype M₂)
     have hliE : LinearIndependent E bs := (LinearIndependent.iff_fractionRing O E).1 hli
     have hspan : ⊤ ≤ Submodule.span E (Set.range bs) := by
       rw [← hM₂.2, Submodule.span_le]

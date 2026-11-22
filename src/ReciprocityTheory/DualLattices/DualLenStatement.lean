@@ -11,8 +11,8 @@ open Matrix
 
 namespace ReciprocityTheory.PGsh.Up
 
-def zSub {R : Type} [CommRing R] {d : ℕ} {κ : Type} [Fintype κ] (A : Matrix (Fin d) κ R) (c : R) :
-    Submodule R (Fin d → R) where
+def zSub {R : Type} [CommRing R] {d : ℕ} {κ : Type} [Fintype κ] (A : Matrix (Fin d) κ R) (c : R)
+    : Submodule R (Fin d → R) where
   carrier := {y | ∃ z, Aᵀ *ᵥ y = c • z}
   add_mem' := by
     rintro y y' ⟨z, hz⟩ ⟨z', hz'⟩
@@ -24,20 +24,24 @@ def zSub {R : Type} [CommRing R] {d : ℕ} {κ : Type} [Fintype κ] (A : Matrix 
 
 def DualLenStatement : Prop :=
   ∀ (C : Type) [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
-    v.Integers R → ∀ (d : ℕ) (κ : Type) [Fintype κ] [DecidableEq κ] (A : Matrix (Fin d) κ R)
-    (c : R), c ≠ 0 → (∀ w : Fin d → R, ∃ t, A *ᵥ t = c • w) →
-    ∀ c₁ : NNReal, HasLen v R ((Fin d → R) ⧸ LinearMap.range A.mulVecLin) c₁ →
-      ∃ y : NNReal, HasLen v R ((Fin d → R) ⧸ zSub A c) y ∧ y * c₁ = v (algebraMap R C c) ^ d
+    v.Integers R
+      → ∀ (d : ℕ) (κ : Type) [Fintype κ] [DecidableEq κ] (A : Matrix (Fin d) κ R) (c : R),
+        c ≠ 0 → (∀ w : Fin d → R, ∃ t, A *ᵥ t = c • w)
+          → ∀ c₁ : NNReal,
+            HasLen v R ((Fin d → R) ⧸ LinearMap.range A.mulVecLin) c₁
+              → ∃ y : NNReal,
+                HasLen v R ((Fin d → R) ⧸ zSub A c) y ∧ y * c₁ = v (algebraMap R C c) ^ d
 
 section Coord
 
-variable {R : Type} [CommRing R] {g d : ℕ} (P : Matrix (Fin g) (Fin g) R) (hP : P * P = P)
+variable
+  {R : Type} [CommRing R]
+  {g d : ℕ} (P : Matrix (Fin g) (Fin g) R) (hP : P * P = P)
   (φ : LinearMap.range (Matrix.mulVecLin P) ≃ₗ[R] (Fin d → R))
 
 def matU : Matrix (Fin g) (Fin d) R := Matrix.of fun k l => ((φ.symm (Pi.single l 1)) : Fin g → R) k
 
-def matV : Matrix (Fin d) (Fin g) R :=
-  Matrix.of fun l k => φ ⟨P *ᵥ Pi.single k 1, ⟨_, rfl⟩⟩ l
+def matV : Matrix (Fin d) (Fin g) R := Matrix.of fun l k => φ ⟨P *ᵥ Pi.single k 1, ⟨_, rfl⟩⟩ l
 
 lemma sum_single' {n : ℕ} (y : Fin n → R) : y = ∑ l, y l • (Pi.single l 1 : Fin n → R) := by
   funext i
@@ -96,8 +100,8 @@ lemma matU_matV : matU P φ * matV P φ = P := by
 end Coord
 
 theorem lenIdB_of (hPL : DualLenStatement) : LenIdBStatement := by
-  intro C _ v R _ _ hv g m Ht Bt E cp hcp hE hform εT εL π hπ hTo hTs hLo hLs hHt hBt hadj i d hd
-    c₁ hc₁
+  intro C _ v R _ _ hv g m Ht Bt E cp hcp hE hform εT εL π hπ hTo hTs hLo hLs hHt hBt hadj i d hd c₁
+    hc₁
   haveI : IsDomain R := Function.Injective.isDomain _ hv.hom_inj
   obtain ⟨φ⟩ := hd
   have hP : εL i * εL i = εL i := by rw [hLo, if_pos rfl]
@@ -119,22 +123,24 @@ theorem lenIdB_of (hPL : DualLenStatement) : LenIdBStatement := by
     rintro f ⟨z, rfl⟩
     show (εL i)ᵀ *ᵥ ((εL i)ᵀ *ᵥ z) = (εL i)ᵀ *ᵥ z
     rw [mulVec_mulVec, ← transpose_mul, hP]
-  let ψ : LinearMap.range (Matrix.mulVecLin (εL i)ᵀ) ≃ₗ[R] (Fin d → R) :=
-    { toFun := fun f => Uᵀ *ᵥ (f : Fin g → R)
-      invFun := fun y => ⟨Vᵀ *ᵥ y, hmemT y⟩
-      map_add' := fun f f' => by simp [mulVec_add]
-      map_smul' := fun a f => by simp [mulVec_smul]
-      left_inv := fun f => by
-        apply Subtype.ext
-        show Vᵀ *ᵥ (Uᵀ *ᵥ (f : Fin g → R)) = f
-        rw [mulVec_mulVec, ← transpose_mul, hUV, hfixT f f.2]
-      right_inv := fun y => by
-        show Uᵀ *ᵥ (Vᵀ *ᵥ y) = y
-        rw [mulVec_mulVec, ← transpose_mul, hVU, transpose_one, one_mulVec] }
-  have hmapC : (((LinearMap.range (Matrix.mulVecLin (εT (π i)))).map (Matrix.mulVecLin Ht)).comap
-      (LinearMap.range (Matrix.mulVecLin (εL i)ᵀ)).subtype).map
-        (ψ : LinearMap.range (Matrix.mulVecLin (εL i)ᵀ) →ₗ[R] (Fin d → R)) =
-      LinearMap.range A.mulVecLin := by
+  let ψ : LinearMap.range (Matrix.mulVecLin (εL i)ᵀ) ≃ₗ[R] (Fin d → R) := {
+    toFun := fun f => Uᵀ *ᵥ (f : Fin g → R)
+    invFun := fun y => ⟨Vᵀ *ᵥ y, hmemT y⟩
+    map_add' := fun f f' => by simp [mulVec_add]
+    map_smul' := fun a f => by simp [mulVec_smul]
+    left_inv := fun f => by
+      apply Subtype.ext
+      show Vᵀ *ᵥ (Uᵀ *ᵥ (f : Fin g → R)) = f
+      rw [mulVec_mulVec, ← transpose_mul, hUV, hfixT f f.2]
+    right_inv := fun y => by
+      show Uᵀ *ᵥ (Vᵀ *ᵥ y) = y
+      rw [mulVec_mulVec, ← transpose_mul, hVU, transpose_one, one_mulVec]
+  }
+  have hmapC
+      : (((LinearMap.range (Matrix.mulVecLin (εT (π i)))).map (Matrix.mulVecLin Ht)).comap
+            (LinearMap.range (Matrix.mulVecLin (εL i)ᵀ)).subtype).map
+          (ψ : LinearMap.range (Matrix.mulVecLin (εL i)ᵀ) →ₗ[R] (Fin d → R))
+        = LinearMap.range A.mulVecLin := by
     ext y
     constructor
     · rintro ⟨f, ⟨_, ⟨t, rfl⟩, hft⟩, rfl⟩
@@ -158,13 +164,16 @@ theorem lenIdB_of (hPL : DualLenStatement) : LenIdBStatement := by
     intro w
     obtain ⟨t, ht⟩ := cok_kill hcp hE hform εT εL π i (hπ i) hHt _ (hmemT w)
     refine ⟨t, ?_⟩
-    rw [hA, ← mulVec_mulVec, ← mulVec_mulVec, ht, mulVec_smul, mulVec_mulVec, ← transpose_mul,
-      hVU, transpose_one, one_mulVec]
+    rw [hA, ← mulVec_mulVec, ← mulVec_mulVec, ht, mulVec_smul, mulVec_mulVec, ← transpose_mul, hVU,
+      transpose_one, one_mulVec]
   obtain ⟨y, hy, hyc⟩ := hPL C v R hv d (Ix g) A cp hcp hkill c₁ hcA
-  have hmapY : ((sxE Ht Bt εT εL π i).comap (inclE εL i (π i))).map
-      (φ : LinearMap.range (Matrix.mulVecLin (εL i)) →ₗ[R] (Fin d → R)) = zSub A cp := by
-    have key : ∀ x : LinearMap.range (Matrix.mulVecLin (εL i)),
-        x ∈ (sxE Ht Bt εT εL π i).comap (inclE εL i (π i)) ↔ φ x ∈ zSub A cp := by
+  have hmapY
+      : ((sxE Ht Bt εT εL π i).comap (inclE εL i (π i))).map
+          (φ : LinearMap.range (Matrix.mulVecLin (εL i)) →ₗ[R] (Fin d → R))
+        = zSub A cp := by
+    have key
+        : ∀ x : LinearMap.range (Matrix.mulVecLin (εL i)),
+          x ∈ (sxE Ht Bt εT εL π i).comap (inclE εL i (π i)) ↔ φ x ∈ zSub A cp := by
       intro x
       have hx : εL i *ᵥ (x : Fin g → R) = x := P_fix (εL i) hP _ x.2
       have hAx : Aᵀ *ᵥ φ x = Htᵀ *ᵥ (x : Fin g → R) := by

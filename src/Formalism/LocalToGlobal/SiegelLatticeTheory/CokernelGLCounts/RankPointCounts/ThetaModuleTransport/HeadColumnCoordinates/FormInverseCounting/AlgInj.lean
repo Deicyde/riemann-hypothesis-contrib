@@ -12,8 +12,8 @@ namespace Formalism.L2.SG.LocalCountModules.LocCnt0LAlg
 
 variable {E : Type} [CommRing E] (O : Subring E) (cj : E →+* E) {r : ℕ}
 
-theorem bRaw_sub_right (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) O) (y a c : Fin (r + 1) → O) :
-    bRaw O cj Z y (a - c) = bRaw O cj Z y a - bRaw O cj Z y c := by
+theorem bRaw_sub_right (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) O) (y a c : Fin (r + 1) → O)
+    : bRaw O cj Z y (a - c) = bRaw O cj Z y a - bRaw O cj Z y c := by
   unfold bRaw
   rw [← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl (fun j _ => ?_)
@@ -21,28 +21,32 @@ theorem bRaw_sub_right (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) O) (y a c : Fin (
   push_cast
   rw [map_sub, sub_mul]
 
-theorem lamS_sub (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) O) (a c : Fin (r + 1) → O) :
-    lamS O cj Z (a - c) = lamS O cj Z a - lamS O cj Z c := by
+theorem lamS_sub (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) O) (a c : Fin (r + 1) → O)
+    : lamS O cj Z (a - c) = lamS O cj Z a - lamS O cj Z c := by
   unfold lamS
-  have h := lamStarC_add cj (Z.map O.subtype) (fun b => (((a - c) b : O) : E)) (fun b => ((c b : O) : E))
-  have e : ((fun b => (((a - c) b : O) : E)) + fun b => ((c b : O) : E)) = fun b => ((a b : O) : E) := by
+  have h :=
+    lamStarC_add cj (Z.map O.subtype) (fun b => (((a - c) b : O) : E)) (fun b => ((c b : O) : E))
+  have e
+      : ((fun b => (((a - c) b : O) : E)) + fun b => ((c b : O) : E))
+        = fun b => ((a b : O) : E) := by
     funext b
     simp
   rw [e] at h
   exact eq_sub_of_add_eq h.symm
 
-theorem coe_single (a : Fin (r + 1)) :
-    (fun j => (((Pi.single a (1 : O) : Fin (r + 1) → O) j : O) : E)) = Pi.single a 1 := by
+theorem coe_single (a : Fin (r + 1))
+    : (fun j => (((Pi.single a (1 : O) : Fin (r + 1) → O) j : O) : E)) = Pi.single a 1 := by
   funext j
   by_cases h : j = a
   · subst h
     simp
   · simp [Pi.single_apply, h]
 
-theorem mk_eq_zero_of (hcj : ∀ x, cj (cj x) = x) (hO : ∀ x ∈ O, cj x ∈ O)
+theorem mk_eq_zero_of
+    (hcj : ∀ x, cj (cj x) = x) (hO : ∀ x ∈ O, cj x ∈ O)
     (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) O) (hu : IsUnit (Z.map O.subtype).det)
-    (y' : Fin (r + 1) → O) (hB : ∀ y, bRaw O cj Z y y' ∈ O) (hl : lamS O cj Z y' = 0) :
-    (Submodule.Quotient.mk y' : MbMod (cjT O cj hO Z)) = 0 := by
+    (y' : Fin (r + 1) → O) (hB : ∀ y, bRaw O cj Z y y' ∈ O) (hl : lamS O cj Z y' = 0)
+    : (Submodule.Quotient.mk y' : MbMod (cjT O cj hO Z)) = 0 := by
   set Ze := Z.map O.subtype with hZe
   let w' : Fin (r + 1) → E := fun a => ∑ j, cj (Ze⁻¹ j a) * (y' j : E)
   have hB1 : ∀ a, bRaw O cj Z (Pi.single a 1) y' = cj (w' a) := by
@@ -51,7 +55,8 @@ theorem mk_eq_zero_of (hcj : ∀ x, cj (cj x) = x) (hO : ∀ x ∈ O, cj x ∈ O
       simp only [bRaw, w', map_sum, map_mul, hcj]
     rw [coe_single, Matrix.mulVec_single_one]
     refine Finset.sum_congr rfl fun j _ => ?_
-    rw [mul_comm]; rfl
+    rw [mul_comm]
+    rfl
   have hw : ∀ a, w' a ∈ O := by
     intro a
     have := hO _ (hB1 a ▸ hB (Pi.single a 1))
@@ -62,13 +67,15 @@ theorem mk_eq_zero_of (hcj : ∀ x, cj (cj x) = x) (hO : ∀ x ∈ O, cj x ∈ O
     intro b
     simp only [w', Finset.mul_sum]
     rw [Finset.sum_comm]
-    have h2 : ∀ j, ∑ a, cj (Ze a b) * (cj (Ze⁻¹ j a) * (y' j : E)) =
-        cj ((Ze⁻¹ * Ze) j b) * (y' j : E) := by
+    have h2
+        : ∀ j,
+          ∑ a, cj (Ze a b) * (cj (Ze⁻¹ j a) * (y' j : E)) = cj ((Ze⁻¹ * Ze) j b) * (y' j : E) := by
       intro j
       set_option synthInstance.maxHeartbeats 100000 in
         rw [Matrix.mul_apply, map_sum, Finset.sum_mul]
       refine Finset.sum_congr rfl fun a _ => ?_
-      rw [map_mul]; ring
+      rw [map_mul]
+      ring
     simp only [h2, hinv, Matrix.one_apply]
     simp
   let wO : Fin (r + 1) → O := fun a => ⟨w' a, hw a⟩

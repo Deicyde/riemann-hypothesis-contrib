@@ -10,7 +10,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.PoincareInHH Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.HidaSetting
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.PoincareInHH
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.HidaSetting
 
 namespace Formalism.L2.SG.Closed
 
@@ -23,7 +24,8 @@ theorem WuDefinite_holds : Formalism.L2.SG.PoincareInHH.Cut.WuDefinite X u := by
   | exact Formalism.L2.SG.PoincareInHH.Cut.wuDefinite_holds X u
   | exact Formalism.L2.SG.PoincareInHH.Cut.wuDefinite_holds (X := X) (u := u)
 
-theorem ClassFin_holds (hK : X.LevelSubgroupCharacter) : Formalism.L2.SG.PoincareInHH.Cut.ClassFin X u hK := by
+theorem ClassFin_holds (hK : X.LevelSubgroupCharacter)
+    : Formalism.L2.SG.PoincareInHH.Cut.ClassFin X u hK := by
   have hg : 1 ≤ X.B.g := by
     rw [X.g_eq]
     exact Nat.mul_pos (D.host.g_prime 0).pos (D.host.g_prime 1).pos
@@ -36,9 +38,7 @@ theorem ColBound_holds (hK : X.LevelSubgroupCharacter) : Formalism.L2.SG.Pf.ColB
   | exact Formalism.L2.SG.Pf.colBound_of (X := X) (u := u) hK (ClassFin_holds X u hK)
 
 theorem OmCover_holds (I : AutInst) : Formalism.L2.SG.Pf.OmCover I := by
-  first
-  | exact Formalism.L2.SG.Pf.omCover_holds I
-  | exact Formalism.L2.SG.Pf.omCover_holds (I := I)
+  first | exact Formalism.L2.SG.Pf.omCover_holds I | exact Formalism.L2.SG.Pf.omCover_holds (I := I)
 
 theorem MultPoly_holds : Formalism.L2.SG.PoincareInHH.Cut.MultPoly X :=
   Formalism.L2.SG.Pf.multPoly_holds_of'' X (OmCover_holds _)

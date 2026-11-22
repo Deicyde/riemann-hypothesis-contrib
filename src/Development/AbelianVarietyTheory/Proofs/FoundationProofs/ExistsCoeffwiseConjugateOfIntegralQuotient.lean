@@ -24,17 +24,19 @@ namespace GlobalTheory.FN
 theorem conjEx_hasQ_zero (N : ℕ) : HasQ N (fun _ => (0 : ℂ)) (fun _ => 0) := fun _ => by
   simpa using (hasSum_zero : HasSum (fun _ : ℕ => (0 : ℂ)) 0)
 
-theorem conjEx_conv_coeff (a b : ℕ → ℂ) (n : ℕ) :
-    conv a b n = PowerSeries.coeff n (PowerSeries.mk a * PowerSeries.mk b) := by
+theorem conjEx_conv_coeff (a b : ℕ → ℂ) (n : ℕ)
+    : conv a b n = PowerSeries.coeff n (PowerSeries.mk a * PowerSeries.mk b) := by
   simp [conv, PowerSeries.coeff_mul]
 
-theorem conjEx_conv_map (g : ℂ ≃+* ℂ) (a b : ℕ → ℂ) :
-    (fun n => g (conv a b n)) = conv (fun n => g (a n)) (fun n => g (b n)) := by
+theorem conjEx_conv_map (g : ℂ ≃+* ℂ) (a b : ℕ → ℂ)
+    : (fun n => g (conv a b n)) = conv (fun n => g (a n)) (fun n => g (b n)) := by
   funext n; simp [conv, map_sum, map_mul]
 
 theorem conjEx_conv_cancel (a b d : ℕ → ℂ) (hd : d ≠ 0) (h : conv a d = conv b d) : a = b := by
   have hmk : PowerSeries.mk d ≠ 0 := by
-    intro h0; apply hd; funext n
+    intro h0
+    apply hd
+    funext n
     have := congrArg (PowerSeries.coeff n) h0
     simpa using this
   have hm : PowerSeries.mk a * PowerSeries.mk d = PowerSeries.mk b * PowerSeries.mk d := by
@@ -46,7 +48,11 @@ theorem conjEx_conv_cancel (a b d : ℕ → ℂ) (hd : d ≠ 0) (h : conv a d = 
   have := congrArg (PowerSeries.coeff n) this
   simpa using this
 
-theorem conj_exists : ∀ (g : ℂ ≃+* ℂ) (N n : ℕ) (f D D' A A' : ℍ → ℂ) (s s' : Fin n → ℍ → ℂ), 0 < N → (∃ a, HasQ N f a) → QConj g N D D' → QConj g N A A' → (∀ j, QConj g N (s j) (s' j)) → D ≠ 0 → (∀ τ, f τ * D τ = A τ) → (∀ τ, f τ ^ n + ∑ j, s j τ * f τ ^ (j : ℕ) = 0) → ∃ f' : ℍ → ℂ, QConj g N f f' ∧ ∀ τ, f' τ * D' τ = A' τ := by
+theorem conj_exists
+    : ∀ (g : ℂ ≃+* ℂ) (N n : ℕ) (f D D' A A' : ℍ → ℂ) (s s' : Fin n → ℍ → ℂ),
+      0 < N → (∃ a, HasQ N f a) → QConj g N D D' → QConj g N A A' → (∀ j, QConj g N (s j) (s' j))
+        → D ≠ 0 → (∀ τ, f τ * D τ = A τ) → (∀ τ, f τ ^ n + ∑ j, s j τ * f τ ^ (j : ℕ) = 0)
+        → ∃ f' : ℍ → ℂ, QConj g N f f' ∧ ∀ τ, f' τ * D' τ = A' τ := by
   intro g N n f D D' A A' s s' hN ⟨a, ha⟩ ⟨d, hd, hd'⟩ ⟨e, he, he'⟩ hs hD hfA hpol
   obtain ⟨uc, uf⟩ := GlobalTheory.QFam.hasQ_unique_both
   have hz := conjEx_hasQ_zero N
@@ -54,7 +60,9 @@ theorem conj_exists : ∀ (g : ℂ ≃+* ℂ) (N n : ℕ) (f D D' A A' : ℍ →
     rintro rfl
     exact hD (uf N D (fun _ => 0) _ hd hz)
   have hgd0 : (fun n => g (d n)) ≠ 0 := by
-    intro h0; apply hd0; funext k
+    intro h0
+    apply hd0
+    funext k
     have := congrFun h0 k
     simpa using this
   have hD' : D' ≠ 0 := by
@@ -63,24 +71,29 @@ theorem conj_exists : ∀ (g : ℂ ≃+* ℂ) (N n : ℕ) (f D D' A A' : ℍ →
   obtain ⟨_, hadd, _, hmul, hpow, hsumprod⟩ := GlobalTheory.QFam.qConj_ring g N hN
   have hA : QConj g N A A' := ⟨e, he, he'⟩
   have hDD : QConj g N D D' := ⟨d, hd, hd'⟩
-  have hP : QConj g N (fun τ => A τ ^ n + ∑ j, s j τ * A τ ^ (j : ℕ) * D τ ^ (n - j))
+  have hP : QConj g N
+      (fun τ => A τ ^ n + ∑ j, s j τ * A τ ^ (j : ℕ) * D τ ^ (n - j))
       (fun τ => A' τ ^ n + ∑ j, s' j τ * A' τ ^ (j : ℕ) * D' τ ^ (n - j)) := by
     refine hadd _ _ _ _ (hpow _ _ n hA) ?_
-    refine (hsumprod (Fin n) Finset.univ (fun j τ => s j τ * A τ ^ (j : ℕ) * D τ ^ (n - j))
-      (fun j τ => s' j τ * A' τ ^ (j : ℕ) * D' τ ^ (n - j)) ?_).1
+    refine (hsumprod (Fin n) Finset.univ
+      (fun j τ => s j τ * A τ ^ (j : ℕ) * D τ ^ (n - j))
+      (fun j τ => s' j τ * A' τ ^ (j : ℕ) * D' τ ^ (n - j))
+      ?_).1
     intro j _
     exact hmul _ _ _ _ (hmul _ _ _ _ (hs j) (hpow _ _ _ hA)) (hpow _ _ _ hDD)
   have hP0 : (fun τ => A τ ^ n + ∑ j, s j τ * A τ ^ (j : ℕ) * D τ ^ (n - j)) = fun _ => 0 := by
     funext τ
-    have hx : A τ ^ n + ∑ j, s j τ * A τ ^ (j : ℕ) * D τ ^ (n - j) =
-        D τ ^ n * (f τ ^ n + ∑ j, s j τ * f τ ^ (j : ℕ)) := by
+    have hx
+        : A τ ^ n + ∑ j, s j τ * A τ ^ (j : ℕ) * D τ ^ (n - j)
+          = D τ ^ n * (f τ ^ n + ∑ j, s j τ * f τ ^ (j : ℕ)) := by
       rw [mul_add, Finset.mul_sum, ← hfA τ, mul_pow]
       congr 1
       · ring
       · apply Finset.sum_congr rfl
         intro j _
-        rw [mul_pow, show D τ ^ n = D τ ^ (j : ℕ) * D τ ^ (n - j) by
-          rw [← pow_add, Nat.add_sub_cancel' j.2.le]]
+        rw [mul_pow,
+          show D τ ^ n = D τ ^ (j : ℕ) * D τ ^ (n - j) by
+            rw [← pow_add, Nat.add_sub_cancel' j.2.le]]
         ring
     rw [hx, hpol τ, mul_zero]
   have hP'0 : ∀ τ, A' τ ^ n + ∑ j, s' j τ * A' τ ^ (j : ℕ) * D' τ ^ (n - j) = 0 := by
@@ -91,8 +104,10 @@ theorem conj_exists : ∀ (g : ℂ ≃+* ℂ) (N n : ℕ) (f D D' A A' : ℍ →
     simp only [map_zero] at hc'
     have := uf N _ _ _ hc' hz
     exact fun τ => congrFun this τ
-  obtain ⟨h, b, hb, hAh⟩ := GlobalTheory.T.exists_hasQ_quotient_of_integral N n A' D' s' hN ⟨_, he'⟩ ⟨_, hd'⟩
-    (fun j => by obtain ⟨c, _, hc'⟩ := hs j; exact ⟨_, hc'⟩) hD' hP'0
+  obtain ⟨h, b, hb, hAh⟩ :=
+    GlobalTheory.T.exists_hasQ_quotient_of_integral N n A' D' s' hN ⟨_, he'⟩ ⟨_, hd'⟩
+      (fun j => by obtain ⟨c, _, hc'⟩ := hs j; exact ⟨_, hc'⟩)
+      hD' hP'0
   have hfD : HasQ N A (conv a d) := by
     have := GlobalTheory.QFam.hasQ_mul_conv N f D a d hN ha hd
     have hAe : (fun τ => f τ * D τ) = A := funext hfA

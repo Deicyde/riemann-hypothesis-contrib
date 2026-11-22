@@ -13,9 +13,10 @@ open MvPolynomial MeasureTheory
 
 noncomputable section
 
-theorem ConeAverage.proof (h1 : ConeIntegralMass.Statement) (h2 : ChowDegreePos.Statement)
-    (h3 : ConeFubini.Statement) (h4 : FsLogAverage.Statement) (h5 : FsLogMeasurable.Statement) :
-    ConeAverage.Statement := by
+theorem ConeAverage.proof
+    (h1 : ConeIntegralMass.Statement) (h2 : ChowDegreePos.Statement) (h3 : ConeFubini.Statement)
+    (h4 : FsLogAverage.Statement) (h5 : FsLogMeasurable.Statement)
+    : ConeAverage.Statement := by
   intro n e δ h W g hW hg hδ
   set S : Set (EuclideanSpace ℂ (Fin n)) :=
     {y | ‖y‖ < 1 ∧ ∀ q ∈ W, eval (h.pointOf y) q = 0} with hS
@@ -34,8 +35,9 @@ theorem ConeAverage.proof (h1 : ConeIntegralMass.Statement) (h2 : ChowDegreePos.
     have : (δ : ℝ) ≠ 0 := by exact_mod_cast (by omega : δ ≠ 0)
     exact this hmass.symm
   have : IsFiniteMeasure (ν.restrict S) := isFiniteMeasure_restrict.2 hfin
-  have hcone : ∀ φ : (Fin n → ℂ) → ℝ,
-      coneIntegral h W e φ = (∫ y, φ (h.pointOf y) ∂(ν.restrict S)) / D := fun _ => rfl
+  have hcone
+      : ∀ φ : (Fin n → ℂ) → ℝ, coneIntegral h W e φ = (∫ y, φ (h.pointOf y) ∂(ν.restrict S)) / D :=
+    fun _ => rfl
   have hzero : ν.restrict S {(0 : EuclideanSpace ℂ (Fin n))} = 0 := by
     refine nonpos_iff_eq_zero.mp ((Measure.restrict_apply_le S _).trans_eq ?_)
     have hd : (((2 * (e + 1) : ℕ) : ℝ)) = (((2 * (e + 1) : ℕ) : NNReal) : ℝ) := by simp
@@ -46,15 +48,18 @@ theorem ConeAverage.proof (h1 : ConeIntegralMass.Statement) (h2 : ChowDegreePos.
   have hae : ∀ᵐ y ∂(ν.restrict S), y ≠ 0 := by
     rw [ae_iff]
     simpa using hzero
-  have hF := h3 n h (ν.restrict S) (fun v y => fsLog h (nrmv h v) (h.pointOf y))
-    (-(harmonic (n - 1) : ℝ) / 2)
-    ((harmonic (n - 1) : ℝ) / 2 * (volume (ballH h)).toReal) (h5 n h)
-    (hae.mono fun y hy => by
-      obtain ⟨hi, habs, hmean⟩ := h4 n h y hy
-      exact ⟨hi, habs.le, hmean⟩)
+  have hF :=
+    h3 n h (ν.restrict S)
+      (fun v y => fsLog h (nrmv h v) (h.pointOf y))
+      (-(harmonic (n - 1) : ℝ) / 2) ((harmonic (n - 1) : ℝ) / 2 * (volume (ballH h)).toReal)
+      (h5 n h)
+      (hae.mono fun y hy => by
+        obtain ⟨hi, habs, hmean⟩ := h4 n h y hy
+        exact ⟨hi, habs.le, hmean⟩)
   obtain ⟨hFi, hFm⟩ := hF
-  have hfun : (fun v => coneIntegral h W e (fsLog h (nrmv h v))) =
-      fun v => (∫ y, fsLog h (nrmv h v) (h.pointOf y) ∂(ν.restrict S)) / D := by
+  have hfun
+      : (fun v => coneIntegral h W e (fsLog h (nrmv h v)))
+        = fun v => (∫ y, fsLog h (nrmv h v) (h.pointOf y) ∂(ν.restrict S)) / D := by
     funext v
     exact hcone _
   rw [hfun]

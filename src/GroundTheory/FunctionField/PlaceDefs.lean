@@ -15,21 +15,19 @@ section FunctionField
 variable (k K : Type*) [Field k] [Field K] [Algebra k K]
 
 class IsFunctionField : Prop where
-  exists_transcendental_finiteDimensional :
-    ∃ x : K, Transcendental k x ∧ FiniteDimensional (IntermediateField.adjoin k {x}) K
+  exists_transcendental_finiteDimensional
+    : ∃ x : K, Transcendental k x ∧ FiniteDimensional (IntermediateField.adjoin k {x}) K
 
 variable {k K}
 
-
 open scoped IntermediateField.algebraAdjoinAdjoin in
-theorem isTranscendenceBasis_singleton {y : K} (hy : Transcendental k y)
-    (hfin : FiniteDimensional (IntermediateField.adjoin k {y}) K) :
-    IsTranscendenceBasis k ((↑) : ({y} : Set K) → K) := by
+theorem isTranscendenceBasis_singleton
+    {y : K} (hy : Transcendental k y) (hfin : FiniteDimensional (IntermediateField.adjoin k {y}) K)
+    : IsTranscendenceBasis k ((↑) : ({y} : Set K) → K) := by
   rw [isTranscendenceBasis_iff_algebraicIndependent_isAlgebraic]
   refine ⟨(algebraicIndependent_singleton_iff (⟨y, rfl⟩ : ({y} : Set K))).2 hy, ?_⟩
   rw [Subtype.range_coe]
-  have : Algebra.IsAlgebraic (IntermediateField.adjoin k {y}) K :=
-    Algebra.IsAlgebraic.of_finite _ _
+  have : Algebra.IsAlgebraic (IntermediateField.adjoin k {y}) K := Algebra.IsAlgebraic.of_finite _ _
   exact Algebra.IsAlgebraic.trans (Algebra.adjoin k {y}) (IntermediateField.adjoin k {y}) K
 
 theorem trdeg_eq_one [IsFunctionField k K] : Algebra.trdeg k K = 1 := by
@@ -39,11 +37,12 @@ theorem trdeg_eq_one [IsFunctionField k K] : Algebra.trdeg k K = 1 := by
 theorem essFiniteType [IsFunctionField k K] : Algebra.EssFiniteType k K := by
   obtain ⟨y, -, hfin⟩ := IsFunctionField.exists_transcendental_finiteDimensional (k := k) (K := K)
   have : Algebra.EssFiniteType k (IntermediateField.adjoin k {y}) :=
-    IntermediateField.essFiniteType_iff.2 (IntermediateField.fg_adjoin_of_finite (Set.finite_singleton y))
+    IntermediateField.essFiniteType_iff.2 (IntermediateField.fg_adjoin_of_finite
+      (Set.finite_singleton y))
   exact Algebra.EssFiniteType.comp k (IntermediateField.adjoin k {y}) K
 
-theorem finiteDimensional_adjoin [IsFunctionField k K] {x : K} (hx : Transcendental k x) :
-    FiniteDimensional (IntermediateField.adjoin k {x}) K := by
+theorem finiteDimensional_adjoin [IsFunctionField k K] {x : K} (hx : Transcendental k x)
+    : FiniteDimensional (IntermediateField.adjoin k {x}) K := by
   have hbx : IsTranscendenceBasis k ((↑) : ({x} : Set K) → K) :=
     AlgebraicIndependent.isTranscendenceBasis_of_trdeg_le_of_finite
       ((algebraicIndependent_singleton_iff (⟨x, rfl⟩ : ({x} : Set K))).2 hx)
@@ -65,7 +64,6 @@ variable (k K : Type*) [Field k] [Field K] [Algebra k K]
 
 @[ext]
 structure Place where
-
   ring : ValuationSubring K
   ne_top : ring ≠ ⊤
   algebraMap_mem : ∀ c : k, algebraMap k K c ∈ ring
@@ -88,21 +86,22 @@ abbrev ResidueField := IsLocalRing.ResidueField v.ring
 theorem valuation_algebraMap {c : k} (hc : c ≠ 0) : v.ring.valuation (algebraMap k K c) = 1 :=
   (v.ring.valuation_eq_one_iff (algebraMap k v.ring c)).1 ((IsUnit.mk0 c hc).map _)
 
-theorem valuation_aeval_le_one {x : K} (hx : x ∈ v.ring) (p : k[X]) :
-    v.ring.valuation (aeval x p) ≤ 1 := by
+theorem valuation_aeval_le_one {x : K} (hx : x ∈ v.ring) (p : k[X])
+    : v.ring.valuation (aeval x p) ≤ 1 := by
   have h : aeval x p = algebraMap v.ring K (aeval (⟨x, hx⟩ : v.ring) p) :=
     Polynomial.aeval_algebraMap_apply K (⟨x, hx⟩ : v.ring) p
   rw [h]
   exact v.ring.valuation_le_one _
 
-theorem valuation_eq_one_of_sub_lt {z : K} {a : k} (ha : a ≠ 0)
-    (h : v.ring.valuation (z - algebraMap k K a) < 1) : v.ring.valuation z = 1 := by
+theorem valuation_eq_one_of_sub_lt
+    {z : K} {a : k} (ha : a ≠ 0) (h : v.ring.valuation (z - algebraMap k K a) < 1)
+    : v.ring.valuation z = 1 := by
   rw [← v.valuation_algebraMap ha] at h ⊢
   exact Valuation.map_eq_of_sub_lt _ h
 
-theorem exists_aeval_div_pow {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1) (p : k[X])
-    (hp : p ≠ 0) :
-    ∃ m : ℕ, ∃ a : k, a ≠ 0 ∧ v.ring.valuation (aeval x p / x ^ m - algebraMap k K a) < 1 := by
+theorem exists_aeval_div_pow
+    {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1) (p : k[X]) (hp : p ≠ 0)
+    : ∃ m : ℕ, ∃ a : k, a ≠ 0 ∧ v.ring.valuation (aeval x p / x ^ m - algebraMap k K a) < 1 := by
   have hxO : x ∈ v.ring := (v.ring.valuation_le_one_iff x).1 hx.le
   revert hp
   induction p using Polynomial.recOnHorner with
@@ -111,9 +110,11 @@ theorem exists_aeval_div_pow {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 
     intro _
     refine ⟨0, a, ha, ?_⟩
     obtain ⟨q, rfl⟩ : X ∣ p := Polynomial.X_dvd_iff.2 hp0
-    rw [pow_zero, div_one, map_add (f := _), aeval_C, add_sub_cancel_right, map_mul, aeval_X, map_mul]
-    calc v.ring.valuation x * v.ring.valuation (aeval x q) ≤ v.ring.valuation x * 1 :=
-          mul_le_mul' le_rfl (v.valuation_aeval_le_one hxO q)
+    rw [pow_zero, div_one, map_add (f := _), aeval_C, add_sub_cancel_right, map_mul, aeval_X,
+      map_mul]
+    calc
+      v.ring.valuation x * v.ring.valuation (aeval x q)
+        ≤ v.ring.valuation x * 1 := mul_le_mul' le_rfl (v.valuation_aeval_le_one hxO q)
       _ < 1 := by rwa [mul_one]
   | MX p hp0 ih =>
     intro _
@@ -123,32 +124,33 @@ theorem exists_aeval_div_pow {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 
       rw [map_mul, aeval_X, pow_succ, mul_div_mul_right _ _ hx0]
     rwa [this]
 
-theorem transcendental_of_valuation_lt_one {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1) :
-    Transcendental k x := by
+theorem transcendental_of_valuation_lt_one {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1)
+    : Transcendental k x := by
   rintro ⟨p, hp, hpx⟩
   obtain ⟨m, a, ha, h⟩ := v.exists_aeval_div_pow hx0 hx p hp
   have h1 := v.valuation_eq_one_of_sub_lt ha h
   rw [hpx, zero_div, map_zero] at h1
   exact zero_ne_one h1
 
-theorem exists_zpow_of_mem_adjoin {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1) {c : K}
-    (hc : c ∈ IntermediateField.adjoin k {x}) (hc0 : c ≠ 0) :
-    ∃ m : ℤ, ∃ a : k, a ≠ 0 ∧ v.ring.valuation (c / x ^ m - algebraMap k K a) < 1 := by
+theorem exists_zpow_of_mem_adjoin
+    {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1)
+    {c : K} (hc : c ∈ IntermediateField.adjoin k {x}) (hc0 : c ≠ 0)
+    : ∃ m : ℤ, ∃ a : k, a ≠ 0 ∧ v.ring.valuation (c / x ^ m - algebraMap k K a) < 1 := by
   obtain ⟨r, s, rfl⟩ := (IntermediateField.mem_adjoin_simple_iff k c).1 hc
   have hr : r ≠ 0 := by rintro rfl; simp at hc0
   have hs : s ≠ 0 := by rintro rfl; simp at hc0
   obtain ⟨m₁, a₁, ha₁, h₁⟩ := v.exists_aeval_div_pow hx0 hx r hr
   obtain ⟨m₂, a₂, ha₂, h₂⟩ := v.exists_aeval_div_pow hx0 hx s hs
   have hz₂ := v.valuation_eq_one_of_sub_lt ha₂ h₂
-  have hs0 : aeval x s ≠ 0 := by
-    intro h; rw [h, zero_div, map_zero] at hz₂; exact zero_ne_one hz₂
+  have hs0 : aeval x s ≠ 0 := by intro h; rw [h, zero_div, map_zero] at hz₂; exact zero_ne_one hz₂
   have hz₂0 : aeval x s / x ^ m₂ ≠ 0 := div_ne_zero hs0 (pow_ne_zero _ hx0)
   have ha₂' : algebraMap k K a₂ ≠ 0 := (_root_.map_ne_zero _).2 ha₂
   refine ⟨(m₁ : ℤ) - m₂, a₁ / a₂, div_ne_zero ha₁ ha₂, ?_⟩
-  have key : aeval x r / aeval x s / x ^ ((m₁ : ℤ) - m₂) - algebraMap k K (a₁ / a₂) =
-      ((aeval x r / x ^ m₁ - algebraMap k K a₁) * algebraMap k K a₂ -
-          algebraMap k K a₁ * (aeval x s / x ^ m₂ - algebraMap k K a₂)) /
-        (aeval x s / x ^ m₂ * algebraMap k K a₂) := by
+  have key
+      : aeval x r / aeval x s / x ^ ((m₁ : ℤ) - m₂) - algebraMap k K (a₁ / a₂)
+        = ((aeval x r / x ^ m₁ - algebraMap k K a₁) * algebraMap k K a₂
+            - algebraMap k K a₁ * (aeval x s / x ^ m₂ - algebraMap k K a₂))
+          / (aeval x s / x ^ m₂ * algebraMap k K a₂) := by
     rw [map_div₀, zpow_sub₀ hx0, zpow_natCast, zpow_natCast]
     field_simp
     ring
@@ -157,9 +159,10 @@ theorem exists_zpow_of_mem_adjoin {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation
   · rw [map_mul, v.valuation_algebraMap ha₂, mul_one]; exact h₁
   · rw [map_mul, v.valuation_algebraMap ha₁, one_mul]; exact h₂
 
-theorem exists_valuation_eq_zpow {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1) {c : K}
-    (hc : c ∈ IntermediateField.adjoin k {x}) (hc0 : c ≠ 0) :
-    ∃ m : ℤ, v.ring.valuation c = v.ring.valuation x ^ m := by
+theorem exists_valuation_eq_zpow
+    {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1)
+    {c : K} (hc : c ∈ IntermediateField.adjoin k {x}) (hc0 : c ≠ 0)
+    : ∃ m : ℤ, v.ring.valuation c = v.ring.valuation x ^ m := by
   obtain ⟨m, a, ha, h⟩ := v.exists_zpow_of_mem_adjoin hx0 hx hc hc0
   refine ⟨m, ?_⟩
   have h1 := v.valuation_eq_one_of_sub_lt ha h
@@ -173,15 +176,16 @@ theorem exists_valuation_lt_one_ne_zero : ∃ x : K, x ≠ 0 ∧ v.ring.valuatio
     push Not at h
     exact v.ne_top (eq_top_iff.2 fun z _ => h z)
   have hz0 : z ≠ 0 := fun h => hz (h ▸ v.ring.zero_mem)
-  exact ⟨z⁻¹, inv_ne_zero hz0,
-    v.ring.mem_nonunits_iff.1 (v.ring.inv_mem_nonunits_iff.2 (Or.inr hz))⟩
+  exact
+    ⟨z⁻¹, inv_ne_zero hz0, v.ring.mem_nonunits_iff.1 (v.ring.inv_mem_nonunits_iff.2 (Or.inr hz))⟩
 
-theorem linearIndependent_of_valuation {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1)
-    {ι : Type*} [Fintype ι] (a : ι → K)
-    (hlow : ∀ i, v.ring.valuation x < v.ring.valuation (a i))
+theorem linearIndependent_of_valuation
+    {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1)
+    {ι : Type*} [Fintype ι]
+    (a : ι → K) (hlow : ∀ i, v.ring.valuation x < v.ring.valuation (a i))
     (hup : ∀ i, v.ring.valuation (a i) ≤ 1)
-    (hinj : Function.Injective fun i => v.ring.valuation (a i)) :
-    LinearIndependent (IntermediateField.adjoin k {x}) a := by
+    (hinj : Function.Injective fun i => v.ring.valuation (a i))
+    : LinearIndependent (IntermediateField.adjoin k {x}) a := by
   classical
   set V := v.ring.valuation
   have hX0 : 0 < V x := zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 hx0)
@@ -190,7 +194,9 @@ theorem linearIndependent_of_valuation {x : K} (hx0 : x ≠ 0) (hx : v.ring.valu
     have h1 : V x ^ n ≤ V x ^ (m + 1) := (zpow_right_strictAnti₀ hX0 hx).antitone (by omega)
     have h2 : V (a i) * V x ^ m ≤ V x * V x ^ m := by
       rw [h]
-      calc V (a j) * V x ^ n ≤ 1 * V x ^ (m + 1) := mul_le_mul' (hup j) h1
+      calc
+        V (a j) * V x ^ n
+          ≤ 1 * V x ^ (m + 1) := mul_le_mul' (hup j) h1
         _ = V x * V x ^ m := by rw [one_mul, zpow_add_one₀ hX0.ne', mul_comm]
     have hm : 0 < V x ^ m := zpow_pos hX0 m
     exact absurd (le_of_mul_le_mul_right h2 hm) (not_le.2 (hlow i))
@@ -236,10 +242,11 @@ theorem linearIndependent_of_valuation {x : K} (hx0 : x ≠ 0) (hx : v.ring.valu
   have haj : V (a j) ≠ 0 := (lt_trans hX0 (hlow j)).ne'
   exact mul_ne_zero haj (zpow_ne_zero _ hX0.ne') hval.symm
 
-theorem linearIndependent_of_residue {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1)
-    {ι : Type*} [Fintype ι] (z : ι → v.ring)
-    (hz : LinearIndependent k fun i => IsLocalRing.residue v.ring (z i)) :
-    LinearIndependent (IntermediateField.adjoin k {x}) fun i => (z i : K) := by
+theorem linearIndependent_of_residue
+    {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuation x < 1)
+    {ι : Type*} [Fintype ι]
+    (z : ι → v.ring) (hz : LinearIndependent k fun i => IsLocalRing.residue v.ring (z i))
+    : LinearIndependent (IntermediateField.adjoin k {x}) fun i => (z i : K) := by
   classical
   set V := v.ring.valuation
   rw [Fintype.linearIndependent_iff]
@@ -261,21 +268,20 @@ theorem linearIndependent_of_residue {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuat
     intro i
     rcases (hle i).lt_or_eq with hlt | heq
     · exact ⟨0, by rwa [map_zero, sub_zero]⟩
-    · have hne : (g i : K) / g j ≠ 0 := by
-        intro h; rw [h, map_zero] at heq; exact zero_ne_one heq
+    · have hne : (g i : K) / g j ≠ 0 := by intro h; rw [h, map_zero] at heq; exact zero_ne_one heq
       have hmem : (g i : K) / g j ∈ IntermediateField.adjoin k {x} := div_mem (g i).2 (g j).2
       obtain ⟨m, a, ha, h⟩ := v.exists_zpow_of_mem_adjoin hx0 hx hmem hne
       have h1 := v.valuation_eq_one_of_sub_lt ha h
-      rw [map_div₀, map_zpow₀, heq, one_div, inv_eq_one,
-        zpow_eq_one_iff_right₀ zero_le hx.ne] at h1
+      rw [map_div₀, map_zpow₀, heq, one_div, inv_eq_one, zpow_eq_one_iff_right₀ zero_le hx.ne] at h1
       subst h1
       exact ⟨a, by simpa using h⟩
   choose b hb using hh
   let y : ι → v.ring := fun i => ⟨(g i : K) / g j, (v.ring.valuation_le_one_iff _).1 (hle i)⟩
   have hres : ∀ i, IsLocalRing.residue v.ring (y i) = algebraMap k v.ResidueField (b i) := by
     intro i
-    rw [IsScalarTower.algebraMap_apply k v.ring v.ResidueField, IsLocalRing.ResidueField.algebraMap_eq,
-      ← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff, v.ring.valuation_lt_one_iff]
+    rw [IsScalarTower.algebraMap_apply k v.ring v.ResidueField,
+      IsLocalRing.ResidueField.algebraMap_eq, ← sub_eq_zero, ← map_sub,
+      IsLocalRing.residue_eq_zero_iff, v.ring.valuation_lt_one_iff]
     exact hb i
   have hsum0 : ∑ i, y i * z i = 0 := by
     apply Subtype.ext
@@ -299,8 +305,7 @@ theorem linearIndependent_of_residue {x : K} (hx0 : x ≠ 0) (hx : v.ring.valuat
   exact lt_irrefl _ this
 
 theorem isNoetherianRing [IsFunctionField k K] : IsNoetherianRing v.ring := by
-  rw [isNoetherianRing_iff, isNoetherian_iff', WellFoundedGT,
-    RelEmbedding.wellFounded_iff_isEmpty]
+  rw [isNoetherianRing_iff, isNoetherian_iff', WellFoundedGT, RelEmbedding.wellFounded_iff_isEmpty]
   refine ⟨fun f => ?_⟩
   have hf : ∀ n, f n < f (n + 1) := fun n => f.map_rel_iff.2 (Nat.lt_succ_self n)
   choose b hb1 hb2 using fun n => SetLike.exists_of_lt (hf n)
@@ -319,9 +324,10 @@ theorem isNoetherianRing [IsFunctionField k K] : IsNoetherianRing v.ring := by
     · have hc : (b (n + 1) : K) / b n ∈ v.ring := by
         rw [← v.ring.valuation_le_one_iff, map_div₀]
         exact (div_le_one₀ (zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 h0))).2 hle
-      have heq : b (n + 1) = b n * ⟨_, hc⟩ := Subtype.ext (by
-        change (b (n + 1) : K) = b n * ((b (n + 1) : K) / b n)
-        rw [mul_div_cancel₀ _ h0])
+      have heq : b (n + 1) = b n * ⟨_, hc⟩ :=
+        Subtype.ext (by
+          change (b (n + 1) : K) = b n * ((b (n + 1) : K) / b n)
+          rw [mul_div_cancel₀ _ h0])
       rw [heq]
       exact Ideal.mul_mem_right _ _ (hb1 n)
   have hmono : StrictMono fun n => V (b n : K) := strictMono_nat_of_lt_succ hstep
@@ -332,11 +338,13 @@ theorem isNoetherianRing [IsFunctionField k K] : IsNoetherianRing v.ring := by
     exact zero_mem _
   have hb0lt : V (b 0 : K) < 1 := lt_of_lt_of_le (hstep 0) (v.ring.valuation_le_one _)
   have := finiteDimensional_adjoin (v.transcendental_of_valuation_lt_one hb0 hb0lt)
-  have hli := v.linearIndependent_of_valuation hb0 hb0lt
-    (fun i : Fin (Module.finrank (IntermediateField.adjoin k {(b 0 : K)}) K + 1) =>
-      (b ((i : ℕ) + 1) : K))
-    (fun i => hmono (Nat.succ_pos _)) (fun i => v.ring.valuation_le_one _)
-    (fun i j h => Fin.ext (by simpa using hmono.injective h))
+  have hli :=
+    v.linearIndependent_of_valuation hb0 hb0lt
+      (fun i : Fin (Module.finrank (IntermediateField.adjoin k {(b 0 : K)}) K + 1) =>
+        (b ((i : ℕ) + 1) : K))
+      (fun i => hmono (Nat.succ_pos _))
+      (fun i => v.ring.valuation_le_one _)
+      (fun i j h => Fin.ext (by simpa using hmono.injective h))
   have hcard := hli.fintype_card_le_finrank
   rw [Fintype.card_fin] at hcard
   omega
@@ -344,8 +352,10 @@ theorem isNoetherianRing [IsFunctionField k K] : IsNoetherianRing v.ring := by
 instance [IsFunctionField k K] : IsDiscreteValuationRing v.ring := by
   have hN := v.isNoetherianRing
   have : IsPrincipalIdealRing v.ring := ((IsBezout.TFAE (R := v.ring)).out 1 2).1 hN
-  refine { (inferInstance : IsPrincipalIdealRing v.ring), (inferInstance : IsLocalRing v.ring) with
-    not_a_field' := ?_ }
+  refine {
+    (inferInstance : IsPrincipalIdealRing v.ring), (inferInstance : IsLocalRing v.ring) with
+    not_a_field' := ?_
+  }
   obtain ⟨x, hx0, hx⟩ := v.exists_valuation_lt_one_ne_zero
   have hxO : x ∈ v.ring := (v.ring.valuation_le_one_iff x).1 hx.le
   intro h
@@ -407,10 +417,10 @@ theorem valuation_algebraMap' {c : k} (hc : c ≠ 0) : v.valuation (algebraMap k
 theorem valuation_surjective : Function.Surjective v.valuation :=
   IsDedekindDomain.HeightOneSpectrum.valuation_surjective K v.heightOneSpectrum
 
-noncomputable def ord (x : K) : ℤ := -WithZero.log (v.valuation x)
+noncomputable def ord (x : K) : ℤ := - WithZero.log (v.valuation x)
 
-theorem valuation_eq_exp_neg_ord {x : K} (hx : x ≠ 0) :
-    v.valuation x = WithZero.exp (-v.ord x) := by
+theorem valuation_eq_exp_neg_ord {x : K} (hx : x ≠ 0)
+    : v.valuation x = WithZero.exp (- v.ord x) := by
   rw [ord, neg_neg, WithZero.exp_log ((Valuation.ne_zero_iff _).2 hx)]
 
 @[simp]
@@ -425,7 +435,7 @@ theorem ord_mul {x y : K} (hx : x ≠ 0) (hy : y ≠ 0) : v.ord (x * y) = v.ord 
     ((Valuation.ne_zero_iff v.valuation).2 hy)]
   ring
 
-theorem ord_inv (x : K) : v.ord x⁻¹ = -v.ord x := by
+theorem ord_inv (x : K) : v.ord x⁻¹ = - v.ord x := by
   by_cases hx : x = 0
   · simp [hx]
   have h := v.ord_mul (inv_ne_zero hx) hx
@@ -450,17 +460,18 @@ theorem ord_nonneg_iff {x : K} (hx : x ≠ 0) : 0 ≤ v.ord x ↔ x ∈ v.ring :
     WithZero.exp_le_exp]
   omega
 
-theorem min_le_ord_add {x y : K} (hx : x ≠ 0) (hy : y ≠ 0) (hxy : x + y ≠ 0) :
-    min (v.ord x) (v.ord y) ≤ v.ord (x + y) := by
+theorem min_le_ord_add {x y : K} (hx : x ≠ 0) (hy : y ≠ 0) (hxy : x + y ≠ 0)
+    : min (v.ord x) (v.ord y) ≤ v.ord (x + y) := by
   have h := Valuation.map_add v.valuation x y
-  rw [v.valuation_eq_exp_neg_ord hx, v.valuation_eq_exp_neg_ord hy,
-    v.valuation_eq_exp_neg_ord hxy, le_max_iff, WithZero.exp_le_exp, WithZero.exp_le_exp] at h
+  rw [v.valuation_eq_exp_neg_ord hx, v.valuation_eq_exp_neg_ord hy, v.valuation_eq_exp_neg_ord hxy,
+      le_max_iff, WithZero.exp_le_exp, WithZero.exp_le_exp]
+    at h
   omega
 
 theorem exists_ord_eq_one : ∃ π : K, v.ord π = 1 := by
   obtain ⟨π, hπ⟩ := v.heightOneSpectrum.valuation_exists_uniformizer K
   refine ⟨π, ?_⟩
-  change -WithZero.log (v.heightOneSpectrum.valuation K π) = 1
+  change - WithZero.log (v.heightOneSpectrum.valuation K π) = 1
   rw [hπ, WithZero.log_exp, neg_neg]
 
 end Valuation

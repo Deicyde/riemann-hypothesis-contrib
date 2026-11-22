@@ -6,8 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem isSquare_one_add_of_pow_two_pow_eq_zero {A : Type} [CommRing A] (c : A)
-    (hc : 2 * c = 1) : ∀ (m : ℕ) (n : A), n ^ (2 ^ m) = 0 → IsSquare (1 + n) := by
+theorem isSquare_one_add_of_pow_two_pow_eq_zero {A : Type} [CommRing A] (c : A) (hc : 2 * c = 1)
+    : ∀ (m : ℕ) (n : A), n ^ (2 ^ m) = 0 → IsSquare (1 + n) := by
   intro m
   induction m with
   | zero =>
@@ -26,17 +26,19 @@ theorem isSquare_one_add_of_pow_two_pow_eq_zero {A : Type} [CommRing A] (c : A)
     linear_combination (1 + c * n) ^ 2 * hz + (c ^ 2 * n ^ 2 * ((1 + c * n) * v + 1)) * hv
       + (-n) * hc
 
-theorem isSquare_one_add_of_isNilpotent {A : Type} [CommRing A] (c : A) (hc : 2 * c = 1)
-    {n : A} (hn : IsNilpotent n) : IsSquare (1 + n) := by
+theorem isSquare_one_add_of_isNilpotent
+    {A : Type} [CommRing A] (c : A) (hc : 2 * c = 1) {n : A} (hn : IsNilpotent n)
+    : IsSquare (1 + n) := by
   obtain ⟨N, hN⟩ := hn
   exact isSquare_one_add_of_pow_two_pow_eq_zero c hc N n
     (pow_eq_zero_of_le (Nat.lt_two_pow_self).le hN)
 
-theorem units_modSq_finite_of_fields : ∀ (k : Type) [Field k] [CharZero k],
-    (∀ (L : Type) [Field L] [Algebra k L] [FiniteDimensional k L],
-      Finite (Lˣ ⧸ (powMonoidHom 2 : Lˣ →* Lˣ).range)) →
-    ∀ (A : Type) [CommRing A] [Algebra k A] [Module.Finite k A],
-      Finite (Aˣ ⧸ (powMonoidHom 2 : Aˣ →* Aˣ).range) := by
+theorem units_modSq_finite_of_fields
+    : ∀ (k : Type) [Field k] [CharZero k],
+      (∀ (L : Type) [Field L] [Algebra k L] [FiniteDimensional k L],
+          Finite (Lˣ ⧸ (powMonoidHom 2 : Lˣ →* Lˣ).range))
+        → ∀ (A : Type) [CommRing A] [Algebra k A] [Module.Finite k A],
+          Finite (Aˣ ⧸ (powMonoidHom 2 : Aˣ →* Aˣ).range) := by
   intro k _ _ hL A _ _ _
   classical
   haveI : IsArtinianRing A := IsArtinianRing.of_finite k A
@@ -52,12 +54,15 @@ theorem units_modSq_finite_of_fields : ∀ (k : Type) [Field k] [CharZero k],
     have := I.isMaximal
     letI := Ideal.Quotient.field I.asIdeal
     exact hL (A ⧸ I.asIdeal)
-  let φ : Aˣ →* ((I : MaximalSpectrum A) → Q I) := MonoidHom.pi fun I =>
-    (QuotientGroup.mk' _).comp (Units.map (Ideal.Quotient.mk I.asIdeal).toMonoidHom)
-  have key : ∀ (I : MaximalSpectrum A) (u : Aˣ), φ u I = 1 ↔
-      Units.map (Ideal.Quotient.mk I.asIdeal).toMonoidHom u ∈
-        (powMonoidHom 2 : (A ⧸ I.asIdeal)ˣ →* (A ⧸ I.asIdeal)ˣ).range :=
-    fun I u => QuotientGroup.eq_one_iff _
+  let φ : Aˣ →* ((I : MaximalSpectrum A) → Q I) :=
+    MonoidHom.pi fun I =>
+      (QuotientGroup.mk' _).comp (Units.map (Ideal.Quotient.mk I.asIdeal).toMonoidHom)
+  have key
+      : ∀ (I : MaximalSpectrum A) (u : Aˣ),
+        φ u I = 1
+          ↔ Units.map (Ideal.Quotient.mk I.asIdeal).toMonoidHom u
+            ∈ (powMonoidHom 2 : (A ⧸ I.asIdeal)ˣ →* (A ⧸ I.asIdeal)ˣ).range := fun I u =>
+    QuotientGroup.eq_one_iff _
   have hS : (powMonoidHom 2 : Aˣ →* Aˣ).range ≤ φ.ker := by
     rintro _ ⟨y, rfl⟩
     rw [MonoidHom.mem_ker]
@@ -66,8 +71,9 @@ theorem units_modSq_finite_of_fields : ∀ (k : Type) [Field k] [CharZero k],
     exact ⟨Units.map (Ideal.Quotient.mk I.asIdeal).toMonoidHom y, by simp⟩
   have hk : ∀ x : Aˣ, φ x = 1 → x ∈ (powMonoidHom 2 : Aˣ →* Aˣ).range := by
     intro x hx
-    have hloc : ∀ I : MaximalSpectrum A, ∃ w : (A ⧸ I.asIdeal)ˣ,
-        (w : A ⧸ I.asIdeal) ^ 2 = Ideal.Quotient.mk I.asIdeal x := by
+    have hloc
+        : ∀ I : MaximalSpectrum A, ∃ w : (A ⧸ I.asIdeal)ˣ,
+          (w : A ⧸ I.asIdeal) ^ 2 = Ideal.Quotient.mk I.asIdeal x := by
       intro I
       have h1 := (key I x).1 (congrFun hx I)
       obtain ⟨w, hw⟩ := h1
@@ -75,8 +81,11 @@ theorem units_modSq_finite_of_fields : ∀ (k : Type) [Field k] [CharZero k],
       have := congrArg (fun u : (A ⧸ I.asIdeal)ˣ => (u : A ⧸ I.asIdeal)) hw
       simpa using this
     choose w hw using hloc
-    obtain ⟨a, ha⟩ := Ideal.pi_quotient_surjective (I := fun I : MaximalSpectrum A => I.asIdeal)
-      (fun I J h => MaximalSpectrum.isCoprime_of_ne h) (fun I => (w I : A ⧸ I.asIdeal))
+    obtain ⟨a, ha⟩ :=
+      Ideal.pi_quotient_surjective
+        (I := fun I : MaximalSpectrum A => I.asIdeal)
+        (fun I J h => MaximalSpectrum.isCoprime_of_ne h)
+        (fun I => (w I : A ⧸ I.asIdeal))
     have hmem : ∀ I : MaximalSpectrum A, (x : A) - a ^ 2 ∈ I.asIdeal := by
       intro I
       rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_pow]
@@ -98,8 +107,7 @@ theorem units_modSq_finite_of_fields : ∀ (k : Type) [Field k] [CharZero k],
       exact hnil.neg.isUnit_add_left_of_commute x.isUnit (Commute.all _ _)
     have hau : IsUnit a := (isUnit_pow_iff (by norm_num)).1 ha2
     obtain ⟨b, hb⟩ := hau
-    have hn2 : IsNilpotent (((b⁻¹ : Aˣ) : A) ^ 2 * m) :=
-      (Commute.all _ _).isNilpotent_mul_left hnil
+    have hn2 : IsNilpotent (((b⁻¹ : Aˣ) : A) ^ 2 * m) := (Commute.all _ _).isNilpotent_mul_left hnil
     obtain ⟨z, hz⟩ := isSquare_one_add_of_isNilpotent _ hc hn2
     have hzu : IsUnit z := by
       have hu : IsUnit (1 + ((b⁻¹ : Aˣ) : A) ^ 2 * m) := hn2.isUnit_one_add
@@ -117,12 +125,12 @@ theorem units_modSq_finite_of_fields : ∀ (k : Type) [Field k] [CharZero k],
     intro p q hpq
     induction p using QuotientGroup.induction_on with
     | H x =>
-    induction q using QuotientGroup.induction_on with
-    | H y =>
-    rw [QuotientGroup.eq]
-    apply hk
-    have h1 : φ x = φ y := hpq
-    rw [map_mul, map_inv, h1, inv_mul_cancel]
+      induction q using QuotientGroup.induction_on with
+      | H y =>
+        rw [QuotientGroup.eq]
+        apply hk
+        have h1 : φ x = φ y := hpq
+        rw [map_mul, map_inv, h1, inv_mul_cancel]
   exact Finite.of_injective ψ hinj
 
 end GlobalTheory

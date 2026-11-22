@@ -18,8 +18,10 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 universe u w
 
-theorem CutComponent.proof (hZ : CutZeroNotLe.Statement.{u, w}) (hE : CutNonempty.Statement.{u, w})
-    (hD : CutDimLower.Statement.{u, w}) : CutComponent.Statement.{u, w} := by
+theorem CutComponent.proof
+    (hZ : CutZeroNotLe.Statement.{u, w}) (hE : CutNonempty.Statement.{u, w})
+    (hD : CutDimLower.Statement.{u, w})
+    : CutComponent.Statement.{u, w} := by
   intro k _ Ω _ _ N x n pp L s hW hL hs hI
   obtain ⟨qq, hq, j, hj⟩ := hE k Ω N x n pp L s hW hL hs hI
   obtain ⟨f, hfZ, hfp⟩ := hZ k Ω N x (n + 1) pp L s hW hs hI
@@ -35,9 +37,12 @@ theorem CutComponent.proof (hZ : CutZeroNotLe.Statement.{u, w}) (hE : CutNonempt
     rwa [← decomposition.decompose'_apply] at this
   have hZH : (zeroIdeal L.toSubSystem s).IsHomogeneous (homogeneousSubmodule (Fin (N + 1)) k) :=
     Ideal.homogeneous_span _ _ (by rintro f ⟨c, hc, -⟩; exact ⟨c, hc⟩)
-  have hJH : (pp ⊔ zeroIdeal L.toSubSystem s).IsHomogeneous (homogeneousSubmodule (Fin (N + 1)) k) := by
-    have h := (HomogeneousIdeal.toIdeal_sup ⟨pp, hpH⟩ ⟨_, hZH⟩).symm ▸
-      (⟨pp, hpH⟩ ⊔ ⟨_, hZH⟩ : HomogeneousIdeal (homogeneousSubmodule (Fin (N + 1)) k)).isHomogeneous
+  have hJH
+      : (pp ⊔ zeroIdeal L.toSubSystem s).IsHomogeneous (homogeneousSubmodule (Fin (N + 1)) k) := by
+    have h :=
+      (HomogeneousIdeal.toIdeal_sup ⟨pp, hpH⟩ ⟨_, hZH⟩).symm
+        ▸ (⟨pp, hpH⟩ ⊔ ⟨_, hZH⟩
+          : HomogeneousIdeal (homogeneousSubmodule (Fin (N + 1)) k)).isHomogeneous
     exact h
 
   have hcore : qq ≤ (qq.homogeneousCore (homogeneousSubmodule (Fin (N + 1)) k)).toIdeal := by
@@ -47,8 +52,9 @@ theorem CutComponent.proof (hZ : CutZeroNotLe.Statement.{u, w}) (hE : CutNonempt
   have hhom : ∀ p ∈ qq, ∀ d : ℕ, homogeneousComponent d p ∈ qq := by
     intro p hp d
     have := (qq.homogeneousCore (homogeneousSubmodule (Fin (N + 1)) k)).isHomogeneous d (hcore hp)
-    have h2 : homogeneousComponent d p ∈
-        (qq.homogeneousCore (homogeneousSubmodule (Fin (N + 1)) k)).toIdeal := by
+    have h2
+        : homogeneousComponent d p
+          ∈ (qq.homogeneousCore (homogeneousSubmodule (Fin (N + 1)) k)).toIdeal := by
       rw [← decomposition.decompose'_apply]
       exact this
     exact Ideal.toIdeal_homogeneousCore_le _ _ h2

@@ -26,7 +26,9 @@ theorem lagr : Lagr := by
   set W := V⁻¹ with hW
   refine ⟨∑ j, ∑ i, ‖W j i‖, fun c B hB j hj => ?_⟩
   set cv : Fin (D + 1) → ℂ := fun j => c j with hcv
-  have hvals : ∀ i : Fin (D + 1), V.mulVec cv i = ∑ j ∈ Finset.range (D + 1), (((i : ℕ) : ℕ) : ℂ) ^ j * c j := by
+  have hvals
+      : ∀ i : Fin (D + 1),
+        V.mulVec cv i = ∑ j ∈ Finset.range (D + 1), (((i : ℕ) : ℕ) : ℂ) ^ j * c j := by
     intro i
     simp only [Matrix.mulVec, dotProduct, hV, Matrix.vandermonde_apply, hcv]
     rw [Fin.sum_univ_eq_sum_range (fun k => ((i : ℕ) : ℂ) ^ k * c k)]
@@ -41,14 +43,19 @@ theorem lagr : Lagr := by
     simp only [Matrix.mulVec, dotProduct, hcv] at this ⊢
     rw [this]
   rw [hc]
-  calc ‖∑ i, W jj i * V.mulVec cv i‖ ≤ ∑ i, ‖W jj i * V.mulVec cv i‖ := norm_sum_le _ _
+  calc
+    ‖∑ i, W jj i * V.mulVec cv i‖
+      ≤ ∑ i, ‖W jj i * V.mulVec cv i‖ := norm_sum_le _ _
     _ ≤ ∑ i, ‖W jj i‖ * B := by
-        refine Finset.sum_le_sum fun i _ => ?_
-        rw [norm_mul]; exact mul_le_mul_of_nonneg_left (hB' i) (norm_nonneg _)
+      refine Finset.sum_le_sum fun i _ => ?_
+      rw [norm_mul]
+      exact mul_le_mul_of_nonneg_left (hB' i) (norm_nonneg _)
     _ = (∑ i, ‖W jj i‖) * B := by rw [Finset.sum_mul]
     _ ≤ (∑ j, ∑ i, ‖W j i‖) * B := by
-        refine mul_le_mul_of_nonneg_right ?_ hB0
-        exact Finset.single_le_sum (f := fun j => ∑ i, ‖W j i‖) (fun j _ => Finset.sum_nonneg fun i _ => norm_nonneg _)
-          (Finset.mem_univ jj)
+      refine mul_le_mul_of_nonneg_right ?_ hB0
+      exact Finset.single_le_sum
+        (f := fun j => ∑ i, ‖W j i‖)
+        (fun j _ => Finset.sum_nonneg fun i _ => norm_nonneg _)
+        (Finset.mem_univ jj)
 
 end PositivityTheory.Rg.Sw.WR.K.GB

@@ -11,9 +11,11 @@ namespace GlobalTheory.CompanionTheory.Ar.HT
 
 open Module NumberField
 
-theorem projSum_sum_embeddings_eq_trace (K : Type) [Field K] [CharZero K] (E : Type) [Field E]
-    [NumberField E] [Fintype (E →+* K)] (h : Fintype.card (E →+* K) = Module.finrank ℚ E) (y : E) :
-    ∑ σ : E →+* K, σ y = ((Algebra.trace ℚ E y : ℚ) : K) := by
+theorem projSum_sum_embeddings_eq_trace
+    (K : Type) [Field K] [CharZero K]
+    (E : Type) [Field E] [NumberField E] [Fintype (E →+* K)]
+    (h : Fintype.card (E →+* K) = Module.finrank ℚ E) (y : E)
+    : ∑ σ : E →+* K, σ y = ((Algebra.trace ℚ E y : ℚ) : K) := by
   classical
   let L := AlgebraicClosure K
   let f : (E →+* K) → (E →ₐ[ℚ] L) := fun σ => ((algebraMap K L).comp σ).toRatAlgHom
@@ -33,9 +35,9 @@ theorem projSum_sum_embeddings_eq_trace (K : Type) [Field K] [CharZero K] (E : T
     rw [map_sum, map_ratCast, ← eq_ratCast (algebraMap ℚ L), ht]
   exact Fintype.sum_bijective f hbij _ _ (fun σ => by simp [f])
 
-theorem projSum_trace_dualInt (E : Type) [Field E] [NumberField E]
-    (k : Module.Free.ChooseBasisIndex ℤ (𝓞 E)) :
-    Algebra.trace ℚ E (dualInt E k) = (((RingOfIntegers.basis E).repr 1 k : ℤ) : ℚ) := by
+theorem projSum_trace_dualInt
+    (E : Type) [Field E] [NumberField E] (k : Module.Free.ChooseBasisIndex ℤ (𝓞 E))
+    : Algebra.trace ℚ E (dualInt E k) = (((RingOfIntegers.basis E).repr 1 k : ℤ) : ℚ) := by
   classical
   have h1 : (1 : E) = ∑ j, (((RingOfIntegers.basis E).repr 1 j : ℤ) : ℚ) • integralBasis E j := by
     have := congrArg (algebraMap (𝓞 E) E) ((RingOfIntegers.basis E).sum_repr 1)
@@ -53,10 +55,14 @@ theorem projSum_trace_dualInt (E : Type) [Field E] [NumberField E]
   simp only [map_smul, dualInt, LinearMap.BilinForm.apply_dualBasis_left]
   simp
 
-theorem sum_eigProj_eq_one (K : Type) [Field K] [CharZero K] (V : Type) [AddCommGroup V]
-    [Module K V] (E : Type) [Field E] [NumberField E] (ρ : 𝓞 E →+* Module.End K V)
-    [Fintype (E →+* K)] (h : Fintype.card (E →+* K) = Module.finrank ℚ E) :
-    ∑ σ : E →+* K, eigProj ρ σ = 1 := by
+theorem sum_eigProj_eq_one
+    (K : Type) [Field K] [CharZero K]
+    (V : Type) [AddCommGroup V] [Module K V]
+    (E : Type) [Field E] [NumberField E]
+    (ρ : 𝓞 E →+* Module.End K V)
+    [Fintype (E →+* K)]
+    (h : Fintype.card (E →+* K) = Module.finrank ℚ E)
+    : ∑ σ : E →+* K, eigProj ρ σ = 1 := by
   classical
   unfold eigProj
   rw [Finset.sum_comm]

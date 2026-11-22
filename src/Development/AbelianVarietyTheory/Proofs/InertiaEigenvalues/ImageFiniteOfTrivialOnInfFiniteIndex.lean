@@ -6,7 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem image_finite_of_trivial_on_inf_finiteIndex : ∀ (G Q : Type) [Group G] [Group Q] (ρ : G →* Q) (J H : Subgroup G), H.FiniteIndex → (∀ g ∈ J, g ∈ H → ρ g = 1) → (ρ '' (J : Set G)).Finite := by
+theorem image_finite_of_trivial_on_inf_finiteIndex
+    : ∀ (G Q : Type) [Group G] [Group Q] (ρ : G →* Q) (J H : Subgroup G),
+      H.FiniteIndex → (∀ g ∈ J, g ∈ H → ρ g = 1) → (ρ '' (J : Set G)).Finite := by
   intro G Q _ _ ρ J H hH hρ
   classical
   haveI := hH

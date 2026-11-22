@@ -96,14 +96,19 @@ namespace Formalism.RepresentationBoundsCohomology.N2
 
 open Finset
 
-private theorem sum_padicValInt_sub_le_of_injective_bound (ℓ : ℕ) [Fact ℓ.Prime] (S' : Finset ℤ) (a : ℤ) (f : ℤ → ℤ)
-    (n y D : ℕ) (hD : 1 ≤ D) (hf : ∀ b ∈ S', (n : ℤ) < f b ∧ f b ≤ n + (y + 1) ∧ f b ≤ D)
+private theorem sum_padicValInt_sub_le_of_injective_bound
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (S' : Finset ℤ)
+    (a : ℤ)
+    (f : ℤ → ℤ) (n y D : ℕ)
+    (hD : 1 ≤ D) (hf : ∀ b ∈ S', (n : ℤ) < f b ∧ f b ≤ n + (y + 1) ∧ f b ≤ D)
     (hinj : ∀ b ∈ S', ∀ b' ∈ S', f b = f b' → b = b')
-    (hg : ∀ b ∈ S', padicValInt ℓ (a - b) = padicValNat ℓ (f b).toNat) :
-    ((∑ b ∈ S', padicValInt ℓ (a - b) : ℕ) : ℝ) ≤
-      ((y : ℝ) + 1) / ((ℓ : ℝ) - 1) + Real.logb ℓ D := by
-  have hsum : ∑ b ∈ S', padicValInt ℓ (a - b) =
-      ∑ k ∈ S'.image (fun b => (f b).toNat), padicValNat ℓ k := by
+    (hg : ∀ b ∈ S', padicValInt ℓ (a - b) = padicValNat ℓ (f b).toNat)
+    : ((∑ b ∈ S', padicValInt ℓ (a - b) : ℕ) : ℝ)
+      ≤ ((y : ℝ) + 1) / ((ℓ : ℝ) - 1) + Real.logb ℓ D := by
+  have hsum
+      : ∑ b ∈ S', padicValInt ℓ (a - b)
+        = ∑ k ∈ S'.image (fun b => (f b).toNat), padicValNat ℓ k := by
     rw [Finset.sum_image]
     · exact Finset.sum_congr rfl hg
     · intro b hb b' hb' h
@@ -118,12 +123,15 @@ private theorem sum_padicValInt_sub_le_of_injective_bound (ℓ : ℕ) [Fact ℓ.
   obtain ⟨h1, h2, h3⟩ := hf b hb
   omega
 
-private theorem sum_padicValInt_sub_le_of_lt_forall (ℓ : ℕ) [Fact ℓ.Prime] (m : ℤ) (y D : ℕ) (S' : Finset ℤ) (a : ℤ)
-    (hS : S' ⊆ Finset.Icc m (m + y)) (hD : 1 ≤ D) (hSD : ∀ b ∈ S', |a - b| ≤ D)
-    (hlt : ∀ b ∈ S', b < a) :
-    ((∑ b ∈ S', padicValInt ℓ (a - b) : ℕ) : ℝ) ≤
-      ((y : ℝ) + 1) / ((ℓ : ℝ) - 1) + Real.logb ℓ D := by
-  refine sum_padicValInt_sub_le_of_injective_bound ℓ S' a (fun b => a - b) (a - m - y - 1).toNat y D hD ?_ ?_ ?_
+private theorem sum_padicValInt_sub_le_of_lt_forall
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (m : ℤ) (y D : ℕ) (S' : Finset ℤ) (a : ℤ) (hS : S' ⊆ Finset.Icc m (m + y)) (hD : 1 ≤ D)
+    (hSD : ∀ b ∈ S', |a - b| ≤ D) (hlt : ∀ b ∈ S', b < a)
+    : ((∑ b ∈ S', padicValInt ℓ (a - b) : ℕ) : ℝ)
+      ≤ ((y : ℝ) + 1) / ((ℓ : ℝ) - 1) + Real.logb ℓ D := by
+  refine sum_padicValInt_sub_le_of_injective_bound ℓ S' a
+    (fun b => a - b)
+    (a - m - y - 1).toNat y D hD ?_ ?_ ?_
   · intro b hb
     have h1 := Finset.mem_Icc.1 (hS hb)
     have h2 := abs_le.1 (hSD b hb)
@@ -139,12 +147,15 @@ private theorem sum_padicValInt_sub_le_of_lt_forall (ℓ : ℕ) [Fact ℓ.Prime]
     congr 1
     omega
 
-private theorem sum_padicValInt_sub_le_of_gt_forall (ℓ : ℕ) [Fact ℓ.Prime] (m : ℤ) (y D : ℕ) (S' : Finset ℤ) (a : ℤ)
-    (hS : S' ⊆ Finset.Icc m (m + y)) (hD : 1 ≤ D) (hSD : ∀ b ∈ S', |a - b| ≤ D)
-    (hgt : ∀ b ∈ S', a < b) :
-    ((∑ b ∈ S', padicValInt ℓ (a - b) : ℕ) : ℝ) ≤
-      ((y : ℝ) + 1) / ((ℓ : ℝ) - 1) + Real.logb ℓ D := by
-  refine sum_padicValInt_sub_le_of_injective_bound ℓ S' a (fun b => b - a) (m - a - 1).toNat y D hD ?_ ?_ ?_
+private theorem sum_padicValInt_sub_le_of_gt_forall
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (m : ℤ) (y D : ℕ) (S' : Finset ℤ) (a : ℤ) (hS : S' ⊆ Finset.Icc m (m + y)) (hD : 1 ≤ D)
+    (hSD : ∀ b ∈ S', |a - b| ≤ D) (hgt : ∀ b ∈ S', a < b)
+    : ((∑ b ∈ S', padicValInt ℓ (a - b) : ℕ) : ℝ)
+      ≤ ((y : ℝ) + 1) / ((ℓ : ℝ) - 1) + Real.logb ℓ D := by
+  refine sum_padicValInt_sub_le_of_injective_bound ℓ S' a
+    (fun b => b - a)
+    (m - a - 1).toNat y D hD ?_ ?_ ?_
   · intro b hb
     have h1 := Finset.mem_Icc.1 (hS hb)
     have h2 := abs_le.1 (hSD b hb)
@@ -181,9 +192,11 @@ theorem valuation_sum_general_index : StatSumValGen := by
   rw [← Finset.sum_filter_add_sum_filter_not (S.erase a) (fun b => b < a), Nat.cast_add, two_mul]
   apply add_le_add
   · exact sum_padicValInt_sub_le_of_lt_forall ℓ m y D _ a ((Finset.filter_subset _ _).trans hS') hD
-      (fun b hb => hSD' b (Finset.mem_of_mem_filter b hb)) (fun b hb => (Finset.mem_filter.1 hb).2)
+      (fun b hb => hSD' b (Finset.mem_of_mem_filter b hb))
+      (fun b hb => (Finset.mem_filter.1 hb).2)
   · refine sum_padicValInt_sub_le_of_gt_forall ℓ m y D _ a ((Finset.filter_subset _ _).trans hS') hD
-      (fun b hb => hSD' b (Finset.mem_of_mem_filter b hb)) (fun b hb => ?_)
+      (fun b hb => hSD' b (Finset.mem_of_mem_filter b hb))
+      (fun b hb => ?_)
     obtain ⟨hb1, hb2⟩ := Finset.mem_filter.1 hb
     have := Finset.ne_of_mem_erase hb1
     omega

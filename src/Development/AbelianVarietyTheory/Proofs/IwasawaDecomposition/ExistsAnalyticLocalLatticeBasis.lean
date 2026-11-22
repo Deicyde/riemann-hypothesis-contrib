@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsLat
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+  GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,19 +21,21 @@ noncomputable section
 
 namespace GlobalTheory.ShFam.Hor.LogCh
 
-theorem IsLatFam.eventually_mem_of_graph {n g : ℕ} {K : (Fin n → ℂ) → Set (Fin g → ℂ)} {b₀ : Fin n → ℂ}
-    {w₀ : Fin g → ℂ} {ζ : (Fin n → ℂ) → Fin g → ℂ} (hζ0 : ζ b₀ = w₀) (hζc : ContinuousAt ζ b₀)
-    (hζ : ∀ᶠ q in 𝓝 (b₀, w₀), q.2 ∈ K q.1 ↔ q.2 = ζ q.1) : ∀ᶠ b in 𝓝 b₀, ζ b ∈ K b := by
+theorem IsLatFam.eventually_mem_of_graph
+    {n g : ℕ} {K : (Fin n → ℂ) → Set (Fin g → ℂ)} {b₀ : Fin n → ℂ} {w₀ : Fin g → ℂ}
+    {ζ : (Fin n → ℂ) → Fin g → ℂ}
+    (hζ0 : ζ b₀ = w₀) (hζc : ContinuousAt ζ b₀) (hζ : ∀ᶠ q in 𝓝 (b₀, w₀), q.2 ∈ K q.1 ↔ q.2 = ζ q.1)
+    : ∀ᶠ b in 𝓝 b₀, ζ b ∈ K b := by
   have ht : Filter.Tendsto (fun b => (b, ζ b)) (𝓝 b₀) (𝓝 (b₀, w₀)) := by
     have := (continuousAt_id.prodMk hζc).tendsto
     simpa [hζ0] using this
   filter_upwards [ht.eventually hζ] with b hb
   exact hb.2 rfl
 
-theorem exists_isLatBasis_of_discrete {g : ℕ} (H : AddSubgroup (Fin g → ℂ))
-    (hd : ∀ᶠ w in 𝓝 (0 : Fin g → ℂ), w ∈ H → w = 0)
-    (hs : Submodule.span ℝ (H : Set (Fin g → ℂ)) = ⊤) :
-    ∃ β : Fin (2 * g) → Fin g → ℂ, IsLatBasis (H : Set (Fin g → ℂ)) β := by
+theorem exists_isLatBasis_of_discrete
+    {g : ℕ} (H : AddSubgroup (Fin g → ℂ)) (hd : ∀ᶠ w in 𝓝 (0 : Fin g → ℂ), w ∈ H → w = 0)
+    (hs : Submodule.span ℝ (H : Set (Fin g → ℂ)) = ⊤)
+    : ∃ β : Fin (2 * g) → Fin g → ℂ, IsLatBasis (H : Set (Fin g → ℂ)) β := by
   set L : Submodule ℤ (Fin g → ℂ) := H.toIntSubmodule with hL
   have hLset : (L : Set (Fin g → ℂ)) = H := rfl
   haveI : DiscreteTopology L := by
@@ -61,11 +66,13 @@ theorem exists_isLatBasis_of_discrete {g : ℕ} (H : AddSubgroup (Fin g → ℂ)
   · rintro ⟨m, rfl⟩
     exact H.sum_mem fun j _ => H.zsmul_mem (b j).2 _
 
-theorem IsLatFam.eventually_intComb {n g r : ℕ} {B : Set (Fin n → ℂ)} {K : (Fin n → ℂ) → Set (Fin g → ℂ)}
-    {b₀ : Fin n → ℂ} (hK : IsLatFam B K) (hb₀ : b₀ ∈ B) {lam : (Fin n → ℂ) → Fin r → Fin g → ℂ}
-    (hlc : ContinuousAt lam b₀) (hlK : ∀ᶠ b in 𝓝 b₀, ∀ j, lam b j ∈ K b) (hβ : IsLatBasis (K b₀) (lam b₀))
-    (y : Fin g → ℂ) :
-    ∀ᶠ q in 𝓝 (b₀, y), q.2 ∈ K q.1 → ∃ m : Fin r → ℤ, q.2 = ∑ j, m j • lam q.1 j := by
+theorem IsLatFam.eventually_intComb
+    {n g r : ℕ} {B : Set (Fin n → ℂ)} {K : (Fin n → ℂ) → Set (Fin g → ℂ)} {b₀ : Fin n → ℂ}
+    (hK : IsLatFam B K) (hb₀ : b₀ ∈ B)
+    {lam : (Fin n → ℂ) → Fin r → Fin g → ℂ} (hlc : ContinuousAt lam b₀)
+    (hlK : ∀ᶠ b in 𝓝 b₀, ∀ j, lam b j ∈ K b) (hβ : IsLatBasis (K b₀) (lam b₀))
+    (y : Fin g → ℂ)
+    : ∀ᶠ q in 𝓝 (b₀, y), q.2 ∈ K q.1 → ∃ m : Fin r → ℤ, q.2 = ∑ j, m j • lam q.1 j := by
   by_cases hy : y ∈ K b₀
   · obtain ⟨m, hm⟩ := (hβ.2 y).1 hy
     obtain ⟨ζ, hζ0, -, hζ⟩ := hK.2.2.2 b₀ hb₀ y hy
@@ -89,25 +96,39 @@ theorem IsLatFam.eventually_intComb {n g r : ℕ} {B : Set (Fin n → ℂ)} {K :
       (continuous_fst.tendsto (b₀, y)).eventually hfζ
     filter_upwards [hq, hζ] with q h1 h2 h3
     exact ⟨m, (h2.1 h3).trans h1.symm⟩
-  · have ho := hK.2.2.1.mem_nhds (show (b₀, y) ∈ {q : (Fin n → ℂ) × (Fin g → ℂ) | q.1 ∈ B ∧ q.2 ∉ K q.1} from ⟨hb₀, hy⟩)
+  · have ho :=
+      hK.2.2.1.mem_nhds (show (b₀, y) ∈ {q : (Fin n → ℂ) × (Fin g → ℂ) | q.1 ∈ B ∧ q.2 ∉ K q.1} from
+        ⟨hb₀, hy⟩)
     filter_upwards [ho] with q hq h
     exact absurd h hq.2
 
-theorem isLatBasis_of_ball {g : ℕ} (H : AddSubgroup (Fin g → ℂ)) (lam : Fin (2 * g) → Fin g → ℂ) (R : ℝ)
+theorem isLatBasis_of_ball
+    {g : ℕ} (H : AddSubgroup (Fin g → ℂ)) (lam : Fin (2 * g) → Fin g → ℂ)
+    (R : ℝ)
     (hli : LinearIndependent ℝ lam) (hmem : ∀ j, lam j ∈ H) (hR : ∑ j, ‖lam j‖ ≤ R)
-    (hball : ∀ w ∈ Metric.closedBall (0 : Fin g → ℂ) R, w ∈ H → ∃ m : Fin (2 * g) → ℤ, w = ∑ j, m j • lam j) :
-    IsLatBasis (H : Set (Fin g → ℂ)) lam := by
+    (hball : ∀ w ∈ Metric.closedBall (0 : Fin g → ℂ) R,
+      w ∈ H → ∃ m : Fin (2 * g) → ℤ, w = ∑ j, m j • lam j)
+    : IsLatBasis (H : Set (Fin g → ℂ)) lam := by
   first
   | exact @_root_.GlobalTheory.LatticeBasisClosedBall.isLatBasis_of_closedBall
   | exact _root_.GlobalTheory.LatticeBasisClosedBall.isLatBasis_of_closedBall
   | (apply _root_.GlobalTheory.LatticeBasisClosedBall.isLatBasis_of_closedBall <;> assumption)
-  | (intros; apply _root_.GlobalTheory.LatticeBasisClosedBall.isLatBasis_of_closedBall <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.LatticeBasisClosedBall.isLatBasis_of_closedBall <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.LatticeBasisClosedBall.isLatBasis_of_closedBall <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.LatticeBasisClosedBall.isLatBasis_of_closedBall
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.LatticeBasisClosedBall.isLatBasis_of_closedBall ..)
 
-theorem IsLatFam.exists_analytic_locBasis : ∀ (n g : ℕ) (B : Set (Fin n → ℂ)) (K : (Fin n → ℂ) → Set (Fin g → ℂ))
-    (b₀ : Fin n → ℂ), IsLatFam B K → b₀ ∈ B → Submodule.span ℝ (K b₀) = ⊤ →
-    ∃ lam : (Fin n → ℂ) → Fin (2 * g) → Fin g → ℂ, AnalyticAt ℂ lam b₀ ∧ ∀ᶠ b in 𝓝 b₀, IsLatBasis (K b) (lam b) := by
+theorem IsLatFam.exists_analytic_locBasis
+    : ∀ (n g : ℕ) (B : Set (Fin n → ℂ)) (K : (Fin n → ℂ) → Set (Fin g → ℂ)) (b₀ : Fin n → ℂ),
+      IsLatFam B K → b₀ ∈ B → Submodule.span ℝ (K b₀) = ⊤
+        → ∃ lam : (Fin n → ℂ) → Fin (2 * g) → Fin g → ℂ,
+          AnalyticAt ℂ lam b₀ ∧ ∀ᶠ b in 𝓝 b₀, IsLatBasis (K b) (lam b) := by
   intro n g B K b₀ hK hb₀ hs
   obtain ⟨H₀, hH₀⟩ := hK.2.1 b₀ hb₀
   have h0 : (0 : Fin g → ℂ) ∈ K b₀ := by rw [← hH₀]; exact H₀.zero_mem
@@ -120,20 +141,23 @@ theorem IsLatFam.exists_analytic_locBasis : ∀ (n g : ℕ) (B : Set (Fin n → 
     rw [hw.1 hwK, hζ₀0]
   obtain ⟨β, hβ⟩ := exists_isLatBasis_of_discrete H₀ hd (by rw [hH₀]; exact hs)
   rw [hH₀] at hβ
-  have hβK : ∀ j, β j ∈ K b₀ := fun j =>
-    (hβ.2 (β j)).2 ⟨Pi.single j 1, by simp [Pi.single_apply]⟩
+  have hβK : ∀ j, β j ∈ K b₀ := fun j => (hβ.2 (β j)).2 ⟨Pi.single j 1, by simp [Pi.single_apply]⟩
   choose ζ hζ0 hζa hζ using fun j => hK.2.2.2 b₀ hb₀ (β j) (hβK j)
   have hla : AnalyticAt ℂ (fun b j => ζ j b) b₀ := AnalyticAt.pi hζa
   have hlc := hla.continuousAt
   have hl0 : (fun j => ζ j b₀) = β := funext hζ0
   have hlK : ∀ᶠ b in 𝓝 b₀, ∀ j, ζ j b ∈ K b :=
-    Filter.eventually_all.2 fun j => IsLatFam.eventually_mem_of_graph (hζ0 j) (hζa j).continuousAt (hζ j)
+    Filter.eventually_all.2 fun j =>
+      IsLatFam.eventually_mem_of_graph (hζ0 j) (hζa j).continuousAt (hζ j)
   have hβ' : IsLatBasis (K b₀) ((fun b j => ζ j b) b₀) := by
     show IsLatBasis (K b₀) (fun j => ζ j b₀)
-    rw [hl0]; exact hβ
+    rw [hl0]
+    exact hβ
   set R : ℝ := ∑ j, (‖β j‖ + 1) with hR
-  have hball := (isCompact_closedBall (0 : Fin g → ℂ) R).eventually_forall_of_forall_eventually (x₀ := b₀)
-    (P := fun b w => w ∈ K b → ∃ m : Fin (2 * g) → ℤ, w = ∑ j, m j • ζ j b) fun y _ => IsLatFam.eventually_intComb hK hb₀ hlc hlK hβ' y
+  have hball :=
+    (isCompact_closedBall (0 : Fin g → ℂ) R).eventually_forall_of_forall_eventually (x₀ := b₀)
+      (P := fun b w => w ∈ K b → ∃ m : Fin (2 * g) → ℤ, w = ∑ j, m j • ζ j b)
+      fun y _ => IsLatFam.eventually_intComb hK hb₀ hlc hlK hβ' y
   have hli : ∀ᶠ b in 𝓝 b₀, LinearIndependent ℝ (fun j => ζ j b) := by
     have h1 : LinearIndependent ℝ ((fun b j => ζ j b) b₀) := hβ'.1
     exact hlc.tendsto.eventually h1.eventually
@@ -147,7 +171,8 @@ theorem IsLatFam.exists_analytic_locBasis : ∀ (n g : ℕ) (B : Set (Fin n → 
   filter_upwards [hball, hli, hnorm, hlK, hK.1.mem_nhds hb₀] with b h1 h2 h3 h4 h5
   obtain ⟨H, hH⟩ := hK.2.1 b h5
   rw [← hH]
-  refine isLatBasis_of_ball H _ R h2 (fun j => ?_) (Finset.sum_le_sum fun j _ => h3 j) fun w hw hwH => ?_
+  refine
+    isLatBasis_of_ball H _ R h2 (fun j => ?_) (Finset.sum_le_sum fun j _ => h3 j) fun w hw hwH => ?_
   · show ζ j b ∈ (H : Set (Fin g → ℂ)); rw [hH]; exact h4 j
   · exact h1 w hw (by rw [← hH]; exact hwH)
 

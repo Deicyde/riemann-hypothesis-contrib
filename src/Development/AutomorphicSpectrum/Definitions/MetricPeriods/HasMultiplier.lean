@@ -19,19 +19,22 @@ def ptsOver (𝕜 : Type) [Field 𝕜] (P : Ideal (MRing ι)) : Set ((Σ k, ι k
 def algPts (p : ℕ) [Fact p.Prime] (P : Ideal (MRing ι)) : Set ((Σ k, ι k) → PadicAlgCl p) :=
   {z | z ∈ ptsOver (PadicAlgCl p) P ∧ ∀ q, IsAlgebraic ℚ (z q)}
 
-def HasVal (y : (Σ k, ι k) → Ω) (a : K → ℤ) (s : Ω) {𝕜 : Type} [Field 𝕜] (z : (Σ k, ι k) → 𝕜) (w : 𝕜) : Prop :=
-  ∃ (dg dh : K → ℕ) (g h : MRing ι), IsMultiHomog g dg ∧ IsMultiHomog h dh ∧ (∀ k, (dg k : ℤ) = dh k + a k) ∧
-    aeval y g = s * aeval y h ∧ aeval z h ≠ 0 ∧ aeval z g = w * aeval z h
+def HasVal
+    (y : (Σ k, ι k) → Ω) (a : K → ℤ) (s : Ω) {𝕜 : Type} [Field 𝕜] (z : (Σ k, ι k) → 𝕜) (w : 𝕜)
+    : Prop :=
+  ∃ (dg dh : K → ℕ) (g h : MRing ι),
+    IsMultiHomog g dg ∧ IsMultiHomog h dh ∧ (∀ k, (dg k : ℤ) = dh k + a k)
+      ∧ aeval y g = s * aeval y h ∧ aeval z h ≠ 0 ∧ aeval z g = w * aeval z h
 
-def ValLe (y : (Σ k, ι k) → Ω) (a : K → ℤ) (s : Ω) {𝕜 : Type} [NormedField 𝕜] (z : (Σ k, ι k) → 𝕜) (r : ℝ) :
-    Prop :=
+def ValLe
+    (y : (Σ k, ι k) → Ω) (a : K → ℤ) (s : Ω) {𝕜 : Type} [NormedField 𝕜] (z : (Σ k, ι k) → 𝕜) (r : ℝ)
+    : Prop :=
   ∀ w, HasVal y a s z w → ‖w‖ ≤ r
 
 def supMet {𝕜 : Type} [NormedField 𝕜] (a : K → ℤ) (z : (Σ k, ι k) → 𝕜) : ℝ :=
   ∏ k, ‖fun i : ι k => z ⟨k, i⟩‖ ^ a k
 
-def IsFormOff (P : Ideal (MRing ι)) (u : MRing ι) : Prop :=
-  (∃ d, IsMultiHomog u d) ∧ u ∉ P
+def IsFormOff (P : Ideal (MRing ι)) (u : MRing ι) : Prop := (∃ d, IsMultiHomog u d) ∧ u ∉ P
 
 def powH (A : HermLine ι) (q : ℕ) : HermLine ι where
   a := fun k => (q : ℤ) * A.a k
@@ -61,7 +64,10 @@ structure IsGenH (P : Ideal (MRing ι)) (L : HermLine ι) (Λ : ℝ) : Prop wher
   pos : 0 < Λ
   semipos : ∃ P0, P0 ≤ P ∧ IsSemipositiveRel P0 P L
   conj : IsConjInvariantH L
-  mono : ∃ a : K → ℕ, (L.a = fun k => (a k : ℤ)) ∧ ∀ z ∈ mcPts P, ∀ μ : (Σ k, ι k) →₀ ℕ,
-    (∀ k, ∑ i, μ ⟨k, i⟩ = a k) → ‖∏ p, z p ^ μ p‖ ≤ Λ * L.h z
+  mono
+    : ∃ a : K → ℕ,
+      (L.a = fun k => (a k : ℤ))
+        ∧ ∀ z ∈ mcPts P, ∀ μ : (Σ k, ι k) →₀ ℕ,
+          (∀ k, ∑ i, μ ⟨k, i⟩ = a k) → ‖∏ p, z p ^ μ p‖ ≤ Λ * L.h z
 
 end GlobalTheory.CompanionTheory.Ar.Small

@@ -5,12 +5,23 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Finr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.HubLoc Module
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.HubLoc Module
 
 namespace GlobalTheory.HubLoc
 
-theorem window_and_cTB_of_jumps_at_embeddings :
-    ∀ (S : LocalSituation.Sit) (Y : LocLat S.G S.Qp S.LL S.O) (h r n t : ℕ) [CharZero S.Qp] [FiniteDimensional S.Qp S.K], S.W.s = 1 → Nat.card (S.K →ₐ[S.Qp] S.LL) = finrank S.Qp S.K → finrank S.Qp S.K ≤ n → LocalSituation.gK S = 0 → LocalSituation.vdegMs S (LocalSituation.mN (LocalSituation.ell S) 1 (h + h)) = LocalSituation.mN (LocalSituation.ell S) 1 (h + h) - 1 → t ≤ h → (∀ τ : S.K →ₐ[S.Qp] S.LL, ∃ U : Finset ℤ, U.card ≤ r ∧ (∀ u ∈ U, -(h : ℤ) ≤ u ∧ u + 1 ≤ h) ∧ ∀ a, IsJumpV S.PD Y.ρ τ a → a ∈ U) → (∀ a ∈ LocalSituation.Jset S Y, -(h : ℤ) ≤ a ∧ a ≤ h) ∧ ∀ e < t, LocalSituation.cTBY S Y h h e ≤ cBnum (LocalSituation.ell S) h t (n * r) := by
+theorem window_and_cTB_of_jumps_at_embeddings
+    : ∀ (S : LocalSituation.Sit) (Y : LocLat S.G S.Qp S.LL S.O) (h r n t : ℕ) [CharZero S.Qp]
+        [FiniteDimensional S.Qp S.K],
+      S.W.s = 1 → Nat.card (S.K →ₐ[S.Qp] S.LL) = finrank S.Qp S.K → finrank S.Qp S.K ≤ n
+        → LocalSituation.gK S = 0
+        → LocalSituation.vdegMs S (LocalSituation.mN (LocalSituation.ell S) 1 (h + h))
+          = LocalSituation.mN (LocalSituation.ell S) 1 (h + h) - 1
+        → t ≤ h
+        → (∀ τ : S.K →ₐ[S.Qp] S.LL, ∃ U : Finset ℤ,
+          U.card ≤ r ∧ (∀ u ∈ U, -(h : ℤ) ≤ u ∧ u + 1 ≤ h) ∧ ∀ a, IsJumpV S.PD Y.ρ τ a → a ∈ U)
+        → (∀ a ∈ LocalSituation.Jset S Y, -(h : ℤ) ≤ a ∧ a ≤ h)
+          ∧ ∀ e < t, LocalSituation.cTBY S Y h h e ≤ cBnum (LocalSituation.ell S) h t (n * r) := by
   intro S Y h r n t _ _ hs hcard hn hg hv hth hU
   classical
   choose U hUc hUb hUj using hU
@@ -26,7 +37,8 @@ theorem window_and_cTB_of_jumps_at_embeddings :
     obtain ⟨τ, -, hτ⟩ := Finset.mem_biUnion.1 hu
     exact hUb τ u hτ
   have hc : (Finset.univ.biUnion U).card ≤ n * r := by
-    refine (Finset.card_biUnion_le_card_mul _ _ r fun τ _ => hUc τ).trans (Nat.mul_le_mul_right _ ?_)
+    refine (Finset.card_biUnion_le_card_mul _ _ r fun τ _ => hUc τ).trans
+      (Nat.mul_le_mul_right _ ?_)
     rw [Finset.card_univ, ← Nat.card_eq_fintype_card, hcard]
     exact hn
   refine ⟨fun a ha => ?_, fun e he => ?_⟩

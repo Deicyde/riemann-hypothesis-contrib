@@ -16,14 +16,16 @@ noncomputable section
 
 namespace SheetImageAreaSet
 
-theorem exists_adapted_frame {n d : ℕ}
-    (P : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin d)) (hP : Function.Surjective P) :
-    ∃ (m : ℕ) (e : Fin n ≃ Fin d ⊕ Fin m)
-      (Q : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin n))
-      (L : EuclideanSpace ℂ (Fin d) ≃ₗ[ℂ] EuclideanSpace ℂ (Fin d))
-      (π : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin m)),
-      (∀ z, ‖Q z‖ = ‖z‖) ∧
-        ∀ z, Q z = WithLp.toLp 2 (fun j => Sum.elim (fun i => L (P z) i) (fun i => π z i) (e j)) := by
+theorem exists_adapted_frame
+    {n d : ℕ}
+    (P : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin d)) (hP : Function.Surjective P)
+    : ∃ (m : ℕ) (e : Fin n ≃ Fin d ⊕ Fin m)
+        (Q : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin n))
+        (L : EuclideanSpace ℂ (Fin d) ≃ₗ[ℂ] EuclideanSpace ℂ (Fin d))
+        (π : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin m)),
+      (∀ z, ‖Q z‖ = ‖z‖)
+        ∧ ∀ z,
+          Q z = WithLp.toLp 2 (fun j => Sum.elim (fun i => L (P z) i) (fun i => π z i) (e j)) := by
   classical
   set K := LinearMap.ker P with hKdef
   have h1 := K.finrank_add_finrank_orthogonal
@@ -57,47 +59,54 @@ theorem exists_adapted_frame {n d : ℕ}
     rw [← hPR y]
     exact h0
   let L := LinearEquiv.ofInjectiveEndo _ hinj
-  let Q : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin n) :=
-    { toFun := fun z => WithLp.toLp 2 (fun j => Sum.elim (fun i => πW z i) (fun i => π z i) (e j))
-      map_add' := fun z w => by
-        ext j
-        obtain ⟨s, rfl⟩ := e.symm.surjective j
-        rcases s with i | i <;> simp
-      map_smul' := fun c z => by
-        ext j
-        obtain ⟨s, rfl⟩ := e.symm.surjective j
-        rcases s with i | i <;> simp }
+  let Q : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin n) := {
+    toFun := fun z => WithLp.toLp 2 (fun j => Sum.elim (fun i => πW z i) (fun i => π z i) (e j))
+    map_add' := fun z w => by
+      ext j
+      obtain ⟨s, rfl⟩ := e.symm.surjective j
+      rcases s with i | i <;> simp
+    map_smul' := fun c z => by
+      ext j
+      obtain ⟨s, rfl⟩ := e.symm.surjective j
+      rcases s with i | i <;> simp
+  }
   refine ⟨finrank ℂ K, e, Q, L, π, fun z => ?_, fun z => ?_⟩
   · refine (sq_eq_sq₀ (norm_nonneg _) (norm_nonneg _)).1 ?_
     show ‖(WithLp.toLp 2 (fun j => Sum.elim (fun i => πW z i) (fun i => π z i) (e j)) :
       EuclideanSpace ℂ (Fin n))‖ ^ 2 = _
-    rw [GraphAreaHolomorphic.norm_sq_sumElim e (πW z) (π z), Submodule.norm_sq_eq_add_norm_sq_projection z K,
-      add_comm]
+    rw [GraphAreaHolomorphic.norm_sq_sumElim e (πW z) (π z),
+      Submodule.norm_sq_eq_add_norm_sq_projection z K, add_comm]
     simp [πW, π]
   · show WithLp.toLp 2 (fun j => Sum.elim (fun i => πW z i) (fun i => π z i) (e j)) = _
     simp [L, hWR]
 
-theorem areaJacobian_eq_normDet {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
-    (M : E →ₗ[ℝ] F) : areaJacobian M = M.normDet := by
+theorem areaJacobian_eq_normDet
+    {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
+    (M : E →ₗ[ℝ] F)
+    : areaJacobian M = M.normDet := by
   have h := M.normDet_sq
   simp only [RCLike.ofReal_real_eq_id, id_eq] at h
   rw [areaJacobian, ← h, Real.sqrt_sq M.normDet_nonneg]
 
-theorem areaJacobian_comp_of_norm {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
-    (Q : F →ₗ[ℝ] F) (hQ : ∀ v, ‖Q v‖ = ‖v‖) (M : E →ₗ[ℝ] F) :
-    areaJacobian (Q ∘ₗ M) = areaJacobian M := by
+theorem areaJacobian_comp_of_norm
+    {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
+    (Q : F →ₗ[ℝ] F) (hQ : ∀ v, ‖Q v‖ = ‖v‖)
+    (M : E →ₗ[ℝ] F)
+    : areaJacobian (Q ∘ₗ M) = areaJacobian M := by
   rw [areaJacobian_eq_normDet, areaJacobian_eq_normDet, LinearMap.normDet_comp,
     show (Q.domRestrict (LinearMap.range M)).normDet = 1 from
-      LinearIsometry.normDet_eq_one ⟨Q.domRestrict _, fun v => hQ v⟩, one_mul]
+      LinearIsometry.normDet_eq_one ⟨Q.domRestrict _, fun v => hQ v⟩,
+    one_mul]
 
-theorem areaJacobian_comp_endo {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
-    (M : E →ₗ[ℝ] F) (T : E →ₗ[ℝ] E) :
-    areaJacobian (M ∘ₗ T) = areaJacobian M * |LinearMap.det T| := by
-  rw [areaJacobian_eq_normDet, areaJacobian_eq_normDet, LinearMap.normDet_comp_of_finrank_eq _ _ rfl,
-    LinearMap.normDet_eq_abs_det]
+theorem areaJacobian_comp_endo
+    {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
+    (M : E →ₗ[ℝ] F) (T : E →ₗ[ℝ] E)
+    : areaJacobian (M ∘ₗ T) = areaJacobian M * |LinearMap.det T| := by
+  rw [areaJacobian_eq_normDet, areaJacobian_eq_normDet,
+    LinearMap.normDet_comp_of_finrank_eq _ _ rfl, LinearMap.normDet_eq_abs_det]
 
 end SheetImageAreaSet
 

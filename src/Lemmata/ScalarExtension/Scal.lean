@@ -34,24 +34,28 @@ private lemma scal {K A : Type} [Field K] [IsAlgClosed K] [Ring A] [Algebra K A]
   have := LinearMap.congr_fun hz w
   exact sub_eq_zero.mp this
 
-theorem goal1 {K A : Type} [Field K] [IsAlgClosed K] [Ring A] [Algebra K A]
+theorem goal1
+    {K A : Type} [Field K] [IsAlgClosed K] [Ring A] [Algebra K A]
     (S0 : Type) [AddCommGroup S0] [Module K S0] [Module A S0] [IsScalarTower K A S0]
-    [FiniteDimensional K S0] [IsSimpleModule A S0] (φ : S0 →ₗ[K] S0) :
-    ∃ u : A, ∀ v : S0, u • v = φ v := by
+    [FiniteDimensional K S0] [IsSimpleModule A S0]
+    (φ : S0 →ₗ[K] S0)
+    : ∃ u : A, ∀ v : S0, u • v = φ v := by
   classical
-  let f : Module.End (Module.End A S0) S0 :=
-    { toFun := φ
-      map_add' := φ.map_add
-      map_smul' := fun g v => by
-        obtain ⟨c, hc⟩ := scal (K := K) S0 g
-        simp only [Module.End.smul_def, RingHom.id_apply, hc, φ.map_smul] }
+  let f : Module.End (Module.End A S0) S0 := {
+    toFun := φ
+    map_add' := φ.map_add
+    map_smul' := fun g v => by
+      obtain ⟨c, hc⟩ := scal (K := K) S0 g
+      simp only [Module.End.smul_def, RingHom.id_apply, hc, φ.map_smul]
+  }
   let b := Module.finBasis K S0
   obtain ⟨r, hr⟩ := jacobson_density f (Finset.univ.image b)
   refine ⟨r, fun v => ?_⟩
-  let ψ : S0 →ₗ[K] S0 :=
-    { toFun := fun w => r • w
-      map_add' := smul_add r
-      map_smul' := fun c w => (smul_comm c r w).symm }
+  let ψ : S0 →ₗ[K] S0 := {
+    toFun := fun w => r • w
+    map_add' := smul_add r
+    map_smul' := fun c w => (smul_comm c r w).symm
+  }
   have hψ : ψ = φ := b.ext fun i => (hr (b i) (Finset.mem_image_of_mem b (Finset.mem_univ i))).symm
   exact LinearMap.congr_fun hψ v
 

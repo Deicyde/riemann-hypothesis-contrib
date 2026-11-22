@@ -34,15 +34,17 @@ open Filter Set Metric GlobalTheory.Cont
 
 namespace GlobalTheory.CompanionTheory.DivMult
 
-theorem exists_factor {A : ℂ → ℂ} (hA : Differentiable ℂ A) (hne : ∃ z, A z ≠ 0) (s₀ : ℂ) :
-    ∃ (k : ℕ) (u : ℂ → ℂ) (r M : ℝ), 0 < r ∧ DifferentiableOn ℂ u (ball s₀ r) ∧ (∀ s ∈ ball s₀ r, u s ≠ 0) ∧
-      (∀ s ∈ ball s₀ r, A s = (s - s₀) ^ k * u s) ∧ ∀ s ∈ ball s₀ r, ‖(u s)⁻¹‖ ≤ M := by
+theorem exists_factor {A : ℂ → ℂ} (hA : Differentiable ℂ A) (hne : ∃ z, A z ≠ 0) (s₀ : ℂ)
+    : ∃ (k : ℕ) (u : ℂ → ℂ) (r M : ℝ),
+      0 < r ∧ DifferentiableOn ℂ u (ball s₀ r) ∧ (∀ s ∈ ball s₀ r, u s ≠ 0)
+        ∧ (∀ s ∈ ball s₀ r, A s = (s - s₀) ^ k * u s) ∧ ∀ s ∈ ball s₀ r, ‖(u s)⁻¹‖ ≤ M := by
   have hAn : AnalyticOnNhd ℂ A univ := fun z _ => hA.analyticAt z
-  have hnz : ¬∀ᶠ z in 𝓝 s₀, A z = 0 := by
+  have hnz : ¬ ∀ᶠ z in 𝓝 s₀, A z = 0 := by
     intro hev
     obtain ⟨w, hw⟩ := hne
-    have := hAn.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (mem_univ s₀)
-      (hev.mono fun z hz => by simp [hz])
+    have :=
+      hAn.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (mem_univ s₀)
+        (hev.mono fun z hz => by simp [hz])
     exact hw (by simpa using this (mem_univ w))
   obtain ⟨k, g, hg, hg0, hev⟩ := (hA.analyticAt s₀).exists_eventuallyEq_pow_smul_nonzero_iff.mpr hnz
   have hpos : 0 < ‖g s₀‖ := norm_pos_iff.mpr hg0
@@ -67,7 +69,9 @@ theorem exists_factor {A : ℂ → ℂ} (hA : Differentiable ℂ A) (hne : ∃ z
       have h3 := norm_sub_norm_le (g s₀) (g z)
       rw [norm_sub_rev] at h3
       linarith
-    calc ‖(g z)⁻¹‖ = ‖g z‖⁻¹ := norm_inv _
+    calc
+      ‖(g z)⁻¹‖
+        = ‖g z‖⁻¹ := norm_inv _
       _ ≤ (‖g s₀‖ / 2)⁻¹ := inv_anti₀ (by positivity) hlow
       _ = 2 / ‖g s₀‖ := inv_div _ _
 
@@ -75,25 +79,31 @@ def glue (h F A : ℂ → ℂ) (R : ℝ) (z : ℂ) : ℂ := if R < z.re then h z
 
 variable {h F A : ℂ → ℂ} {R : ℝ}
 
-theorem glue_eq (he : ∀ z : ℂ, R < z.re → F z = A z * h z) {z : ℂ} (hz : A z ≠ 0) : glue h F A R z = F z / A z := by
+theorem glue_eq (he : ∀ z : ℂ, R < z.re → F z = A z * h z) {z : ℂ} (hz : A z ≠ 0)
+    : glue h F A R z = F z / A z := by
   unfold glue
   split_ifs with c
   · rw [he z c, mul_div_cancel_left₀ _ hz]
   · rfl
 
-theorem glue_eventuallyEq (hA : Differentiable ℂ A) (hne : ∃ z, A z ≠ 0) (he : ∀ z : ℂ, R < z.re → F z = A z * h z) (s : ℂ) :
-    glue h F A R =ᶠ[𝓝[≠] s] fun z => F z / A z := by
+theorem glue_eventuallyEq
+    (hA : Differentiable ℂ A) (hne : ∃ z, A z ≠ 0) (he : ∀ z : ℂ, R < z.re → F z = A z * h z)
+    (s : ℂ)
+    : glue h F A R =ᶠ[𝓝[≠] s] fun z => F z / A z := by
   have hAn : AnalyticOnNhd ℂ A univ := fun z _ => hA.analyticAt z
   rcases (hA.analyticAt s).eventually_eq_zero_or_eventually_ne_zero with hev | hev
   · exfalso
     obtain ⟨w, hw⟩ := hne
-    have := hAn.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (mem_univ s)
-      (hev.mono fun z hz => by simp [hz])
+    have :=
+      hAn.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (mem_univ s)
+        (hev.mono fun z hz => by simp [hz])
     exact hw (by simpa using this (mem_univ w))
   · filter_upwards [hev] with z hz using glue_eq he hz
 
-theorem isMerExt_glue (hA : Differentiable ℂ A) (hne : ∃ z, A z ≠ 0) (hF : Differentiable ℂ F)
-    (he : ∀ z : ℂ, R < z.re → F z = A z * h z) : IsMerExt h univ (glue h F A R) := by
+theorem isMerExt_glue
+    (hA : Differentiable ℂ A) (hne : ∃ z, A z ≠ 0) (hF : Differentiable ℂ F)
+    (he : ∀ z : ℂ, R < z.re → F z = A z * h z)
+    : IsMerExt h univ (glue h F A R) := by
   refine ⟨isRightDomain_univ, fun s _ => ?_, ⟨R, fun z hz => ?_⟩⟩
   · have hm : MeromorphicAt (fun z => F z / A z) s :=
       (hF.analyticAt s).meromorphicAt.div (hA.analyticAt s).meromorphicAt
@@ -101,8 +111,11 @@ theorem isMerExt_glue (hA : Differentiable ℂ A) (hne : ∃ z, A z ≠ 0) (hF :
   · have hz' : R < z.re := hz
     simp [glue, hz']
 
-theorem cont_eq_div (hA : Differentiable ℂ A) (hne : ∃ z, A z ≠ 0) (hF : Differentiable ℂ F)
-    (he : ∀ z : ℂ, R < z.re → F z = A z * h z) {s : ℂ} (hs : A s ≠ 0) : cont h s = F s / A s := by
+theorem cont_eq_div
+    (hA : Differentiable ℂ A) (hne : ∃ z, A z ≠ 0) (hF : Differentiable ℂ F)
+    (he : ∀ z : ℂ, R < z.re → F z = A z * h z)
+    {s : ℂ} (hs : A s ≠ 0)
+    : cont h s = F s / A s := by
   have hM := isMerExt_glue hA hne hF he
   have hE : IsExtAt h s (glue h F A R) := hM.isExtAt (mem_univ s)
   have hcont : ContinuousAt (fun z => F z / A z) s :=
@@ -118,7 +131,9 @@ theorem div_multiplier : ResidueKilled.Tr.Div := by
   refine ⟨fun g => ⟨_, isMerExt_glue hA hne (hH g) (fun z hz => hmul z hz g)⟩, fun s₀ => ?_⟩
   obtain ⟨k, u, r, M, hr, hu, hu0, hfac, hM⟩ := exists_factor hA hne s₀
   obtain ⟨C, N, hCN⟩ := hbd (‖s₀‖ + r)
-  have hu1 : ContinuousOn (fun x : ℂ × _ => u x.1) (ball s₀ r ×ˢ (univ : Set (Formalism.L2.Theta.GA D T))) :=
+  have hu1 : ContinuousOn
+      (fun x : ℂ × _ => u x.1)
+      (ball s₀ r ×ˢ (univ : Set (Formalism.L2.Theta.GA D T))) :=
     hu.continuousOn.comp continuous_fst.continuousOn (fun x hx => hx.1)
   unfold GlobalTheory.EisCont.RegAt
   refine ⟨k, r, fun s g => H s g * (u s)⁻¹, hr, ?_, ?_, ?_, C * M, N, ?_⟩
@@ -141,8 +156,11 @@ theorem div_multiplier : ResidueKilled.Tr.Div := by
     have hH1 := hCN s hsr g
     have hM1 := hM s hs
     show ‖H s g * (u s)⁻¹‖ ≤ C * M * GlobalTheory.Grow.height T g ^ N
-    calc ‖H s g * (u s)⁻¹‖ = ‖H s g‖ * ‖(u s)⁻¹‖ := norm_mul _ _
-      _ ≤ (C * GlobalTheory.Grow.height T g ^ N) * M := mul_le_mul hH1 hM1 (norm_nonneg _) (le_trans (norm_nonneg _) hH1)
+    calc
+      ‖H s g * (u s)⁻¹‖
+        = ‖H s g‖ * ‖(u s)⁻¹‖ := norm_mul _ _
+      _ ≤ (C * GlobalTheory.Grow.height T g ^ N) * M :=
+        mul_le_mul hH1 hM1 (norm_nonneg _) (le_trans (norm_nonneg _) hH1)
       _ = C * M * GlobalTheory.Grow.height T g ^ N := by ring
 
 end GlobalTheory.CompanionTheory.DivMult

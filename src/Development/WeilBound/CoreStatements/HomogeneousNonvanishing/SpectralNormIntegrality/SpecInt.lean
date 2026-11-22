@@ -10,15 +10,18 @@ open NumberField IsDedekindDomain
 
 namespace PositivityTheory.UnitarySelfGeneration.Mend
 
-theorem specInt_norm_le_one_iff_mem (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
-    (x : v.adicCompletion F) : ‖x‖ ≤ 1 ↔ x ∈ v.adicCompletionIntegers F := by
+theorem specInt_norm_le_one_iff_mem
+    (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (x : v.adicCompletion F)
+    : ‖x‖ ≤ 1 ↔ x ∈ v.adicCompletionIntegers F := by
   rw [HeightOneSpectrum.mem_adicCompletionIntegers]
   exact Valued.toNormedField.norm_le_one_iff
 
 open Polynomial in
-theorem specInt_isIntegral_iff_coeff {K L : Type*} [Field K] [Field L] [Algebra K L] (O : ValuationSubring K)
-    [Algebra O L] [IsScalarTower O K L] (y : L) (hy : IsIntegral K y) :
-    IsIntegral O y ↔ ∀ n, (minpoly K y).coeff n ∈ O := by
+theorem specInt_isIntegral_iff_coeff
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (O : ValuationSubring K) [Algebra O L] [IsScalarTower O K L]
+    (y : L) (hy : IsIntegral K y)
+    : IsIntegral O y ↔ ∀ n, (minpoly K y).coeff n ∈ O := by
   constructor
   · intro h n
     rw [minpoly.isIntegrallyClosed_eq_field_fractions' K h, coeff_map]

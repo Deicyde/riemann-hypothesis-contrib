@@ -5,16 +5,21 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NonUnitAt
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH GlobalTheory.Poinc
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH
+  GlobalTheory.Poinc
 open GlobalTheory.SiegelTor
 
 noncomputable section
 
 namespace GlobalTheory.Poinc
 
-theorem nnnorm_le_of_mem_span {R K : Type} [CommRing R] [NormedField K] [IsUltrametricDist K] (v : R →+* K)
-    (hv : ∀ r, ‖v r‖₊ ≤ 1) {s : Set R} {ρ : NNReal} (hs : ∀ c ∈ s, ‖v c‖₊ ≤ ρ) :
-    ∀ c ∈ Ideal.span s, ‖v c‖₊ ≤ ρ := by
+theorem nnnorm_le_of_mem_span
+    {R K : Type} [CommRing R] [NormedField K] [IsUltrametricDist K]
+    (v : R →+* K) (hv : ∀ r, ‖v r‖₊ ≤ 1)
+    {s : Set R} {ρ : NNReal} (hs : ∀ c ∈ s, ‖v c‖₊ ≤ ρ)
+    : ∀ c ∈ Ideal.span s, ‖v c‖₊ ≤ ρ := by
   intro c hc
   induction hc using Submodule.span_induction with
   | mem x hx => exact hs x hx
@@ -26,9 +31,11 @@ theorem nnnorm_le_of_mem_span {R K : Type} [CommRing R] [NormedField K] [IsUltra
     rw [smul_eq_mul, map_mul, nnnorm_mul]
     exact (mul_le_mul' (hv a) hx).trans (by rw [one_mul])
 
-theorem nnnorm_le_pow_of_mem_pow {R K : Type} [CommRing R] [NormedField K] [IsUltrametricDist K] (v : R →+* K)
-    (hv : ∀ r, ‖v r‖₊ ≤ 1) {I : Ideal R} {ρ : NNReal} (hI : ∀ c ∈ I, ‖v c‖₊ ≤ ρ) :
-    ∀ k : ℕ, ∀ b ∈ I ^ k, ‖v b‖₊ ≤ ρ ^ k := by
+theorem nnnorm_le_pow_of_mem_pow
+    {R K : Type} [CommRing R] [NormedField K] [IsUltrametricDist K]
+    (v : R →+* K) (hv : ∀ r, ‖v r‖₊ ≤ 1)
+    {I : Ideal R} {ρ : NNReal} (hI : ∀ c ∈ I, ‖v c‖₊ ≤ ρ)
+    : ∀ k : ℕ, ∀ b ∈ I ^ k, ‖v b‖₊ ≤ ρ ^ k := by
   intro k
   induction k with
   | zero => intro b _; simpa using hv b
@@ -47,7 +54,20 @@ end GlobalTheory.Poinc
 
 namespace GlobalTheory.Poinc
 
-theorem generates_of_close : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (M₁ M : RatModel o Ω) (π : M.Z ⟶ M₁.Z), M₁.IsHom M (AlgHom.id o Ω) π → ∀ (U : M.Z.Opens) (D : EffCartierData M.Z), (∀ x ∈ D.idealSheaf.support, x ∉ U) → ∀ (x : M.Z) (p : ℕ) [Fact p.Prime] (y₀ : Sp (OO p) ⟶ M.Z), M.Cen U x y₀ → ∀ f, EqAt M D x f → ∃ k : ℕ, ∀ (G b : M₁.O (π x)), ‖M.val (gPt p ≫ y₀) ((G : Ω) + b)‖ = ‖M.val (gPt p ≫ y₀) f‖ → b ∈ Ideal.span {c : M₁.O (π x) | ¬ IsUnit c} ^ k → (G : Ω) / f ∈ M.O x → (G : Ω) ≠ 0 ∧ f / G ∈ M.O x := by
+theorem generates_of_close
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (M₁ M : RatModel o Ω)
+        (π : M.Z ⟶ M₁.Z),
+      M₁.IsHom M (AlgHom.id o Ω) π
+        → ∀ (U : M.Z.Opens) (D : EffCartierData M.Z),
+          (∀ x ∈ D.idealSheaf.support, x ∉ U)
+            → ∀ (x : M.Z) (p : ℕ) [Fact p.Prime] (y₀ : Sp (OO p) ⟶ M.Z),
+              M.Cen U x y₀
+                → ∀ f,
+                  EqAt M D x f
+                    → ∃ k : ℕ, ∀ (G b : M₁.O (π x)),
+                      ‖M.val (gPt p ≫ y₀) ((G : Ω) + b)‖ = ‖M.val (gPt p ≫ y₀) f‖
+                        → b ∈ Ideal.span {c : M₁.O (π x) | ¬ IsUnit c} ^ k → (G : Ω) / f ∈ M.O x
+                        → (G : Ω) ≠ 0 ∧ f / G ∈ M.O x := by
   intro o Ω _ _ _ _ M₁ M π hπ U D hD x p _ y₀ hy f hf
   obtain ⟨i, hxi, rfl⟩ := hf
   set F : Ω := valF M.pt (D.U i) (D.f i) with hFdef
@@ -61,13 +81,15 @@ theorem generates_of_close : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra 
     by_contra h
     exact hD _ ((D.mem_support_iff i hwi).2 h) hwU
   have hF0 : M.val y F ≠ 0 :=
-    (RatModel.val_ne_zero_iff (RatModel.range_eq_singleton y (IsLocalRing.closedPoint (PadicAlgCl p)))
+    (RatModel.val_ne_zero_iff
+      (RatModel.range_eq_singleton y (IsLocalRing.closedPoint (PadicAlgCl p)))
       ⟨_, RatModel.valF_mem_O hwi _⟩).2 ((RatModel.isUnit_valF_iff hwi (D.f i)).2 hwb)
   have hFpos : 0 < ‖M.val y F‖₊ := nnnorm_pos.2 hF0
 
   have hle : M₁.O (π x) ≤ M.O x := fun c hc => hπ.map_mem_O hc
   let v : M₁.O (π x) →+* PadicAlgCl p :=
-    (RatModel.valHomOf y x (RatModel.gPt_specializes hy.1)).comp (Subalgebra.inclusion hle).toRingHom
+    (RatModel.valHomOf y x (RatModel.gPt_specializes hy.1)).comp
+      (Subalgebra.inclusion hle).toRingHom
   have hv_apply : ∀ c : M₁.O (π x), v c = M.val y c := fun c => rfl
   have hv1 : ∀ c, ‖v c‖₊ ≤ 1 := fun c => by
     rw [← NNReal.coe_le_coe, coe_nnnorm, NNReal.coe_one, hv_apply]
@@ -113,7 +135,7 @@ theorem generates_of_close : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra 
     exact NNReal.eq hGb
   have hG : ‖M.val y G‖₊ = ‖M.val y F‖₊ := by
     refine le_antisymm ?_ ?_
-    · have e : M.val y G = (M.val y G + M.val y b) + -M.val y b := by ring
+    · have e : M.val y G = (M.val y G + M.val y b) + - M.val y b := by ring
       rw [e]
       refine (IsUltrametricDist.nnnorm_add_le_max _ _).trans (max_le hGb'.le ?_)
       rw [nnnorm_neg]
@@ -122,8 +144,8 @@ theorem generates_of_close : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra 
       refine (IsUltrametricDist.nnnorm_add_le_max _ _).trans (max_le le_rfl ?_)
       by_contra h
       push_neg at h
-      have := (IsUltrametricDist.nnnorm_add_le_max (M.val y G) (M.val y b)).trans
-        (max_le h.le le_rfl)
+      have :=
+        (IsUltrametricDist.nnnorm_add_le_max (M.val y G) (M.val y b)).trans (max_le h.le le_rfl)
       rw [hGb'] at this
       exact absurd hbk (not_lt.2 this)
   have hG0 : (G : Ω) ≠ 0 := by

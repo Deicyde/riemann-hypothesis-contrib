@@ -6,16 +6,20 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.
 @[expose] public section
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 namespace GlobalTheory
 
-theorem isFibreFamily_univ_of_null_cone (K V : Type) [NormedField K] [IsUltrametricDist K]
-    [MeasurableSpace K] [BorelSpace K] [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V]
-    (μ : Measure V) (ν : Measure K) (q : V → K) (hq : Continuous q) (h0 : μ {x | q x = 0} = 0)
-    (U : Set V) (B : Set K) (fib : K → Measure V) (hU : {x | q x ≠ 0} ⊆ U) (hB : {t | t ≠ 0} ⊆ B)
-    (h : IsFibreFamily μ q id U ν B fib) :
-    IsFibreFamily μ q id Set.univ ν {t | t ≠ 0} fib := by
+theorem isFibreFamily_univ_of_null_cone
+    (K V : Type) [NormedField K] [IsUltrametricDist K] [MeasurableSpace K] [BorelSpace K]
+    [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V]
+    (μ : Measure V)
+    (ν : Measure K)
+    (q : V → K) (hq : Continuous q) (h0 : μ {x | q x = 0} = 0)
+    (U : Set V) (B : Set K) (fib : K → Measure V)
+    (hU : {x | q x ≠ 0} ⊆ U) (hB : {t | t ≠ 0} ⊆ B) (h : IsFibreFamily μ q id U ν B fib)
+    : IsFibreFamily μ q id Set.univ ν {t | t ≠ 0} fib := by
   classical
   obtain ⟨h1, h2, h3⟩ := h
   have hae : ∀ b, ∀ᵐ x ∂(fib b), q x = b := by
@@ -34,8 +38,12 @@ theorem isFibreFamily_univ_of_null_cone (K V : Type) [NormedField K] [IsUltramet
       by_contra hx'
       exact hx (hU hx')
     rw [← h2 φ hφ, hμ, Measure.restrict_univ]
-  · have key : ∀ b0 : K, b0 ≠ 0 → ∃ D : Set K, D ∈ nhds b0 ∧ b0 ∈ D ∧ D ⊆ B ∧
-        (∀ b ∈ D, Integrable φ (fib b)) ∧ ContinuousOn (fun b => ∫ v, φ v ∂(fib b)) D := by
+  · have key
+        : ∀ b0 : K,
+          b0 ≠ 0
+            → ∃ D : Set K,
+              D ∈ nhds b0 ∧ b0 ∈ D ∧ D ⊆ B ∧ (∀ b ∈ D, Integrable φ (fib b))
+                ∧ ContinuousOn (fun b => ∫ v, φ v ∂(fib b)) D := by
       intro b0 hb0
       have hr : 0 < ‖b0‖ := norm_pos_iff.mpr hb0
       have hD : IsClopen (Metric.ball b0 ‖b0‖) := IsUltrametricDist.isClopen_ball b0 _
@@ -52,8 +60,7 @@ theorem isFibreFamily_univ_of_null_cone (K V : Type) [NormedField K] [IsUltramet
         apply hx
         simp [ψ, Set.indicator, hx']
       have hψt : tsupport ψ ⊆ U := by
-        have : tsupport ψ ⊆ q ⁻¹' D :=
-          closure_minimal Set.support_indicator_subset hE.isClosed
+        have : tsupport ψ ⊆ q ⁻¹' D := closure_minimal Set.support_indicator_subset hE.isClosed
         intro x hx
         exact hU (hD0 _ (this hx))
       obtain ⟨hi, hco⟩ := h3 ψ hψc hψs hψt
@@ -63,7 +70,8 @@ theorem isFibreFamily_univ_of_null_cone (K V : Type) [NormedField K] [IsUltramet
         filter_upwards [hae b] with x hx
         have : x ∈ q ⁻¹' D := by
           show q x ∈ D
-          rw [hx]; exact hb
+          rw [hx]
+          exact hb
         simp [ψ, Set.indicator_of_mem this]
       refine ⟨D, Metric.ball_mem_nhds _ hr, Metric.mem_ball_self hr, hDB, fun b hb => ?_, ?_⟩
       · exact (integrable_congr (heq b hb)).mp (hi b (hDB hb))

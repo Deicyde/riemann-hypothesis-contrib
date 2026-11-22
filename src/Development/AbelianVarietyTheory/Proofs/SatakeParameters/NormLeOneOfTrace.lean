@@ -20,15 +20,17 @@ open scoped ComplexConjugate
 
 namespace GlobalTheory.TraceNormCoordinates
 
-theorem exists_coords (b : ℤ) (d : ℕ) (hd : 0 < d) {x : ℂ} (hx : x ∈ PI.UnitaryGroupMassFormula.UnitDetRoot.KF b d) :
-    ∃ p q : ℚ, x = (p : ℂ) + (q : ℂ) * (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) := by
+theorem exists_coords
+    (b : ℤ) (d : ℕ) (hd : 0 < d) {x : ℂ} (hx : x ∈ PI.UnitaryGroupMassFormula.UnitDetRoot.KF b d)
+    : ∃ p q : ℚ, x = (p : ℂ) + (q : ℂ) * (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) := by
   set s : ℂ := Complex.I * ((Real.sqrt d : ℝ) : ℂ) with hs_def
   have hs : s * s = -(d : ℂ) := by
     have h2 : ((Real.sqrt d : ℝ) : ℂ) * ((Real.sqrt d : ℝ) : ℂ) = (d : ℂ) := by
       rw [← Complex.ofReal_mul, Real.mul_self_sqrt (Nat.cast_nonneg d)]
       simp
-    calc s * s = (Complex.I * Complex.I) * (((Real.sqrt d : ℝ) : ℂ) * ((Real.sqrt d : ℝ) : ℂ)) := by
-          rw [hs_def]; ring
+    calc
+      s * s = (Complex.I * Complex.I) * (((Real.sqrt d : ℝ) : ℂ) * ((Real.sqrt d : ℝ) : ℂ)) := by
+        rw [hs_def]; ring
       _ = -(d : ℂ) := by rw [Complex.I_mul_I, h2]; ring
   have hdq : (0 : ℚ) < d := by exact_mod_cast hd
   induction hx using IntermediateField.adjoin_induction with
@@ -39,7 +41,8 @@ theorem exists_coords (b : ℤ) (d : ℕ) (hd : 0 < d) {x : ℂ} (hx : x ∈ PI.
     simp only [PI.UnitDetRootDefs.cmTheta, hs_def]
     push_cast
     ring
-  | algebraMap r => exact ⟨r, 0, by simp⟩
+  | algebraMap r =>
+    exact ⟨r, 0, by simp⟩
   | add x y _ _ ihx ihy =>
     obtain ⟨p, q, rfl⟩ := ihx
     obtain ⟨p', q', rfl⟩ := ihy
@@ -59,21 +62,29 @@ theorem exists_coords (b : ℤ) (d : ℕ) (hd : 0 < d) {x : ℂ} (hx : x ∈ PI.
         intro hz
         apply h0
         have h1 : p ^ 2 = 0 := by nlinarith [sq_nonneg p, mul_nonneg hdq.le (sq_nonneg q)]
-        have h2 : q ^ 2 = 0 := by nlinarith [sq_nonneg p, sq_nonneg q, mul_nonneg hdq.le (sq_nonneg q)]
-        exact ⟨pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h1, pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h2⟩
+        have h2 : q ^ 2 = 0 := by
+          nlinarith [sq_nonneg p, sq_nonneg q, mul_nonneg hdq.le (sq_nonneg q)]
+        exact ⟨
+          pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h1,
+          pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h2
+        ⟩
       have hNc : ((p : ℂ) ^ 2 + (d : ℂ) * (q : ℂ) ^ 2) ≠ 0 := by exact_mod_cast hN
       refine ⟨p / (p ^ 2 + d * q ^ 2), -q / (p ^ 2 + d * q ^ 2), ?_⟩
       apply inv_eq_of_mul_eq_one_right
       clear_value s
-      have e : ((p : ℂ) + q * s) * (((p / (p ^ 2 + d * q ^ 2) : ℚ) : ℂ) + ((-q / (p ^ 2 + d * q ^ 2) : ℚ) : ℂ) * s)
-          = ((p : ℂ) ^ 2 - (q : ℂ) ^ 2 * (s * s)) / ((p : ℂ) ^ 2 + (d : ℂ) * (q : ℂ) ^ 2) := by
+      have e
+          : ((p : ℂ) + q * s)
+              * (((p / (p ^ 2 + d * q ^ 2) : ℚ) : ℂ) + ((-q / (p ^ 2 + d * q ^ 2) : ℚ) : ℂ) * s)
+            = ((p : ℂ) ^ 2 - (q : ℂ) ^ 2 * (s * s)) / ((p : ℂ) ^ 2 + (d : ℂ) * (q : ℂ) ^ 2) := by
         push_cast
         ring
       rw [e, hs, div_eq_one_iff_eq hNc]
       ring
 
-theorem norm_le_one_of_trace {F : Type*} [NormedField F] [IsUltrametricDist F] {y y' : F}
-    (h : y * y' = 1) (ht : ‖y + y'‖ ≤ 1) : ‖y‖ ≤ 1 := by
+theorem norm_le_one_of_trace
+    {F : Type*} [NormedField F] [IsUltrametricDist F]
+    {y y' : F} (h : y * y' = 1) (ht : ‖y + y'‖ ≤ 1)
+    : ‖y‖ ≤ 1 := by
   by_contra hlt
   push Not at hlt
   have hn : ‖y‖ * ‖y'‖ = 1 := by rw [← norm_mul, h, norm_one]
@@ -82,11 +93,12 @@ theorem norm_le_one_of_trace {F : Type*} [NormedField F] [IsUltrametricDist F] {
   rw [hmax, max_eq_left hy'.le] at ht
   linarith
 
-theorem norm_eq_one {a : ℕ} {b c : ℤ} {d : ℕ} (hok : PI.UnitDetRootDefs.CmOK a b c d) (l : ℕ)
-    [inst : Fact (Nat.Prime l)]
-    (hT : ∀ T v : ℚ_[l], T ^ 2 + (d : ℚ_[l]) * v ^ 2 = 4 → ‖T‖ ≤ 1)
-    (ι : ℂ ≃+* ℂ_[l]) {x : ℂ} (hx : x ∈ PI.UnitaryGroupMassFormula.UnitDetRoot.KF b d) (h1 : x * conj x = 1) :
-    ‖ι x‖ = 1 := by
+theorem norm_eq_one
+    {a : ℕ} {b c : ℤ} {d : ℕ} (hok : PI.UnitDetRootDefs.CmOK a b c d)
+    (l : ℕ) [inst : Fact (Nat.Prime l)]
+    (hT : ∀ T v : ℚ_[l], T ^ 2 + (d : ℚ_[l]) * v ^ 2 = 4 → ‖T‖ ≤ 1) (ι : ℂ ≃+* ℂ_[l])
+    {x : ℂ} (hx : x ∈ PI.UnitaryGroupMassFormula.UnitDetRoot.KF b d) (h1 : x * conj x = 1)
+    : ‖ι x‖ = 1 := by
   have hd : 0 < d := hok.2.2.2.pos
   obtain ⟨p, q, rfl⟩ := exists_coords b d hd hx
   set s : ℂ := Complex.I * ((Real.sqrt d : ℝ) : ℂ) with hs_def
@@ -94,8 +106,9 @@ theorem norm_eq_one {a : ℕ} {b c : ℤ} {d : ℕ} (hok : PI.UnitDetRootDefs.Cm
     have h2 : ((Real.sqrt d : ℝ) : ℂ) * ((Real.sqrt d : ℝ) : ℂ) = (d : ℂ) := by
       rw [← Complex.ofReal_mul, Real.mul_self_sqrt (Nat.cast_nonneg d)]
       simp
-    calc s * s = (Complex.I * Complex.I) * (((Real.sqrt d : ℝ) : ℂ) * ((Real.sqrt d : ℝ) : ℂ)) := by
-          rw [hs_def]; ring
+    calc
+      s * s = (Complex.I * Complex.I) * (((Real.sqrt d : ℝ) : ℂ) * ((Real.sqrt d : ℝ) : ℂ)) := by
+        rw [hs_def]; ring
       _ = -(d : ℂ) := by rw [Complex.I_mul_I, h2]; ring
   have hcs : conj s = -s := by simp [hs_def]
   have hconj : conj ((p : ℂ) + (q : ℂ) * s) = (p : ℂ) - (q : ℂ) * s := by
@@ -123,7 +136,8 @@ theorem norm_eq_one {a : ℕ} {b c : ℤ} {d : ℕ} (hok : PI.UnitDetRootDefs.Cm
     rw [this, map_ratCast]
   have htr : ‖y + y'‖ ≤ 1 := by rw [hsum, hnr]; exact hT'
   have hle : ‖y‖ ≤ 1 := norm_le_one_of_trace hyy htr
-  have hle' : ‖y'‖ ≤ 1 := norm_le_one_of_trace (by rw [mul_comm]; exact hyy) (by rw [add_comm]; exact htr)
+  have hle' : ‖y'‖ ≤ 1 :=
+    norm_le_one_of_trace (by rw [mul_comm]; exact hyy) (by rw [add_comm]; exact htr)
   have hn : ‖y‖ * ‖y'‖ = 1 := by rw [← norm_mul, hyy, norm_one]
   nlinarith [norm_nonneg y, norm_nonneg y']
 

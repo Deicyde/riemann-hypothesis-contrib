@@ -8,8 +8,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open Formalism.UG GlobalTheory.LKDef.HeckeTraceForms UpperTheory.Gal.W2.Seed
 open scoped Classical
 
-theorem UpperTheory.Gal.W2.Seed.pAvgK :
-    ∀ (X V : Type) [Group X] [AddCommGroup V] [Module ℂ V] (K K₀ : Subgroup X), K₀ ≤ K → K₀.relIndex K ≠ 0 → ∀ Ψ : X → V, (∀ k ∈ K, ∀ g, Ψ (g * k) = Ψ g) → ∑ᶠ x : X ⧸ K₀, Ψ x.out = ((K₀.relIndex K : ℕ) : ℂ) • ∑ᶠ y : X ⧸ K, Ψ y.out := by
+theorem UpperTheory.Gal.W2.Seed.pAvgK
+    : ∀ (X V : Type) [Group X] [AddCommGroup V] [Module ℂ V] (K K₀ : Subgroup X),
+      K₀ ≤ K → K₀.relIndex K ≠ 0
+        → ∀ Ψ : X → V,
+          (∀ k ∈ K, ∀ g, Ψ (g * k) = Ψ g)
+            → ∑ᶠ x : X ⧸ K₀, Ψ x.out = ((K₀.relIndex K : ℕ) : ℂ) • ∑ᶠ y : X ⧸ K, Ψ y.out := by
   intro X V _ _ _ K K₀ hle hidx Ψ hΨ
   haveI : Finite (K ⧸ K₀.subgroupOf K) := Nat.finite_of_card_ne_zero hidx
   haveI : Fintype (K ⧸ K₀.subgroupOf K) := Fintype.ofFinite _
@@ -36,7 +40,8 @@ theorem UpperTheory.Gal.W2.Seed.pAvgK :
     rw [finsum_curry _ hG, smul_finsum]
     refine finsum_congr fun a => ?_
     show ∑ᶠ _ : K ⧸ K₀.subgroupOf K, Ψ a.out = _
-    rw [finsum_eq_sum_of_fintype, Finset.sum_const, Finset.card_univ, hcard, Nat.cast_smul_eq_nsmul ℂ]
+    rw [finsum_eq_sum_of_fintype, Finset.sum_const, Finset.card_univ, hcard,
+      Nat.cast_smul_eq_nsmul ℂ]
   · have h3 : ∑ᶠ y : X ⧸ K, Ψ y.out = 0 := finsum_of_infinite_support hfin
     rw [h3, smul_zero]
     apply finsum_of_infinite_support

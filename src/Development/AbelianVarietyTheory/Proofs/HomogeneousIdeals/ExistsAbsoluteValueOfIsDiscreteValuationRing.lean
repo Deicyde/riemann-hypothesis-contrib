@@ -11,32 +11,36 @@ namespace GlobalTheory
 
 universe u
 
-noncomputable abbrev normIntegers (C : Type*) [NormedField C] [IsUltrametricDist C] :
-    ValuationSubring C :=
+noncomputable abbrev normIntegers (C : Type*) [NormedField C] [IsUltrametricDist C]
+    : ValuationSubring C :=
   (NormedField.valuation (K := C)).valuationSubring
 
-theorem mem_normIntegers_iff {C : Type*} [NormedField C] [IsUltrametricDist C] {x : C} :
-    x ∈ normIntegers C ↔ ‖x‖ ≤ 1 := by
+theorem mem_normIntegers_iff {C : Type*} [NormedField C] [IsUltrametricDist C] {x : C}
+    : x ∈ normIntegers C ↔ ‖x‖ ≤ 1 := by
   rw [Valuation.mem_valuationSubring_iff, NormedField.valuation_apply, ← NNReal.coe_le_coe]
   simp
 
-theorem normIntegers_integers (C : Type*) [NormedField C] [IsUltrametricDist C] :
-    (NormedField.valuation (K := C)).Integers (normIntegers C) :=
+theorem normIntegers_integers (C : Type*) [NormedField C] [IsUltrametricDist C]
+    : (NormedField.valuation (K := C)).Integers (normIntegers C) :=
   Valuation.valuationSubring.integers _
 
 section Extend
 
 variable {A B : Type*} [CommRing A] [CommRing B]
 
-theorem exists_adicCompletion_ringHom_extend (I : Ideal A) (f : A →+* B)
-    [IsAdicComplete (I.map f) B] :
-    ∃ g : AdicCompletion I A →+* B, g.comp (algebraMap A _) = f := by
+theorem exists_adicCompletion_ringHom_extend
+    (I : Ideal A) (f : A →+* B) [IsAdicComplete (I.map f) B]
+    : ∃ g : AdicCompletion I A →+* B, g.comp (algebraMap A _) = f := by
   first
   | exact @_root_.GlobalTheory.PowerExtensionEvaluation.exists_extension
   | exact _root_.GlobalTheory.PowerExtensionEvaluation.exists_extension
   | (apply _root_.GlobalTheory.PowerExtensionEvaluation.exists_extension <;> assumption)
   | (intros; apply _root_.GlobalTheory.PowerExtensionEvaluation.exists_extension <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.PowerExtensionEvaluation.exists_extension <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.PowerExtensionEvaluation.exists_extension
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.PowerExtensionEvaluation.exists_extension ..)
 
 end Extend
@@ -45,7 +49,9 @@ namespace NormIntegers
 
 section Basic
 
-variable {C : Type*} [NormedField C] [IsUltrametricDist C] {O : Type*} [CommRing O] [Algebra O C]
+variable
+  {C : Type*} [NormedField C] [IsUltrametricDist C]
+  {O : Type*} [CommRing O] [Algebra O C]
   (hO : (NormedField.valuation (K := C)).Integers O)
 include hO
 
@@ -64,12 +70,12 @@ theorem isUnit_iff_norm_eq_one {x : O} : IsUnit x ↔ ‖algebraMap O C x‖ = 1
 theorem norm_pos_iff {x : O} : 0 < ‖algebraMap O C x‖ ↔ x ≠ 0 := by
   simp [map_eq_zero_iff _ hO.hom_inj]
 
-theorem mem_span_singleton_pow_iff {w x : O} {n : ℕ} :
-    x ∈ Ideal.span {w} ^ n ↔ ‖algebraMap O C x‖ ≤ ‖algebraMap O C w‖ ^ n := by
+theorem mem_span_singleton_pow_iff {w x : O} {n : ℕ}
+    : x ∈ Ideal.span {w} ^ n ↔ ‖algebraMap O C x‖ ≤ ‖algebraMap O C w‖ ^ n := by
   rw [Ideal.span_singleton_pow, Ideal.mem_span_singleton, dvd_iff_norm_le hO, map_pow, norm_pow]
 
-theorem mem_maximalIdeal_iff [IsLocalRing O] {x : O} :
-    x ∈ IsLocalRing.maximalIdeal O ↔ ‖algebraMap O C x‖ < 1 := by
+theorem mem_maximalIdeal_iff [IsLocalRing O] {x : O}
+    : x ∈ IsLocalRing.maximalIdeal O ↔ ‖algebraMap O C x‖ < 1 := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_iff_norm_eq_one hO]
   exact (norm_le_one hO x).lt_iff_ne.symm
 
@@ -85,8 +91,8 @@ theorem isPrincipal_of_fg {J : Ideal O} (hJ : J.FG) : J.IsPrincipal :=
   haveI := ValuationRing.of_integers _ hO
   IsBezout.isPrincipal_of_FG J hJ
 
-theorem eq_bot_or_eq_span_of_fg_of_ne_top {J : Ideal O} (hJ : J.FG) (hJ' : J ≠ ⊤) :
-    J = ⊥ ∨ ∃ w : O, 0 < ‖algebraMap O C w‖ ∧ ‖algebraMap O C w‖ < 1 ∧ J = Ideal.span {w} := by
+theorem eq_bot_or_eq_span_of_fg_of_ne_top {J : Ideal O} (hJ : J.FG) (hJ' : J ≠ ⊤)
+    : J = ⊥ ∨ ∃ w : O, 0 < ‖algebraMap O C w‖ ∧ ‖algebraMap O C w‖ < 1 ∧ J = Ideal.span {w} := by
   obtain ⟨w, hw⟩ := isPrincipal_of_fg hO hJ
   rw [Ideal.submodule_span_eq] at hw
   by_cases h0 : w = 0
@@ -95,20 +101,20 @@ theorem eq_bot_or_eq_span_of_fg_of_ne_top {J : Ideal O} (hJ : J.FG) (hJ' : J ≠
     refine ⟨w, (norm_pos_iff hO).2 h0, (norm_le_one hO w).lt_of_ne fun h => hJ' ?_, hw⟩
     rw [hw, Ideal.span_singleton_eq_top, isUnit_iff_norm_eq_one hO, h]
 
-theorem isHausdorff_span_singleton {w : O} (hw : ‖algebraMap O C w‖ < 1) :
-    IsHausdorff (Ideal.span {w}) O where
+theorem isHausdorff_span_singleton {w : O} (hw : ‖algebraMap O C w‖ < 1)
+    : IsHausdorff (Ideal.span {w}) O where
   haus' x hx := by
     simp only [SModEq.zero, smul_eq_mul, Ideal.mul_top, mem_span_singleton_pow_iff hO] at hx
     have := ge_of_tendsto' (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) hw) hx
     by_contra h
     exact absurd this (not_le.2 ((norm_pos_iff hO).2 h))
 
-theorem isAdicComplete_span_singleton [CompleteSpace C] {w : O} (hw : ‖algebraMap O C w‖ < 1) :
-    IsAdicComplete (Ideal.span {w}) O := by
+theorem isAdicComplete_span_singleton [CompleteSpace C] {w : O} (hw : ‖algebraMap O C w‖ < 1)
+    : IsAdicComplete (Ideal.span {w}) O := by
   refine { toIsHausdorff := isHausdorff_span_singleton hO hw, prec' := ?_ }
   intro f hf
-  simp only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, mem_span_singleton_pow_iff hO,
-    map_sub] at hf ⊢
+  simp only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, mem_span_singleton_pow_iff hO, map_sub]
+    at hf ⊢
   have hc : CauchySeq fun n => algebraMap O C (f n) := by
     refine cauchySeq_of_le_geometric ‖algebraMap O C w‖ 1 hw fun n => ?_
     rw [dist_eq_norm, one_mul]
@@ -120,18 +126,18 @@ theorem isAdicComplete_span_singleton [CompleteSpace C] {w : O} (hw : ‖algebra
   refine le_of_tendsto ((tendsto_const_nhds.sub hL).norm) ?_
   filter_upwards [Filter.eventually_ge_atTop n] with m hm using hf hm
 
-theorem isAdicComplete_of_fg [CompleteSpace C] {J : Ideal O} (hJ : J.FG) (hJ' : J ≠ ⊤) :
-    IsAdicComplete J O := by
+theorem isAdicComplete_of_fg [CompleteSpace C] {J : Ideal O} (hJ : J.FG) (hJ' : J ≠ ⊤)
+    : IsAdicComplete J O := by
   rcases eq_bot_or_eq_span_of_fg_of_ne_top hO hJ hJ' with rfl | ⟨w, -, hw, rfl⟩
   · infer_instance
   · exact isAdicComplete_span_singleton hO hw
 
-theorem isAlgClosed_residueField [IsAlgClosed C] [IsLocalRing O] :
-    IsAlgClosed (IsLocalRing.ResidueField O) := by
+theorem isAlgClosed_residueField [IsAlgClosed C] [IsLocalRing O]
+    : IsAlgClosed (IsLocalRing.ResidueField O) := by
   refine IsAlgClosed.of_exists_root _ fun p hp hirr => ?_
-  obtain ⟨q, hq, hdeg, hmon⟩ := Polynomial.lifts_and_degree_eq_and_monic
-    (f := IsLocalRing.residue O)
-    (Polynomial.mem_lifts_of_surjective IsLocalRing.residue_surjective p) hp
+  obtain ⟨q, hq, hdeg, hmon⟩ :=
+    Polynomial.lifts_and_degree_eq_and_monic (f := IsLocalRing.residue O)
+      (Polynomial.mem_lifts_of_surjective IsLocalRing.residue_surjective p) hp
   have hd : (q.map (algebraMap O C)).degree ≠ 0 := by
     rw [hmon.degree_map, hdeg]
     exact (Polynomial.degree_pos_of_irreducible hirr).ne'
@@ -149,17 +155,20 @@ end Basic
 
 end NormIntegers
 
-theorem isAlgClosed_of_denseRange {K L : Type*} [Field K] [NontriviallyNormedField L]
-    [CompleteSpace L] [IsUltrametricDist L] [Algebra K L]
-    (hi : DenseRange (algebraMap K L)) [IsAlgClosed K] : IsAlgClosed L := by
+theorem isAlgClosed_of_denseRange
+    {K L : Type*}
+    [Field K] [NontriviallyNormedField L] [CompleteSpace L] [IsUltrametricDist L] [Algebra K L]
+    (hi : DenseRange (algebraMap K L))
+    [IsAlgClosed K]
+    : IsAlgClosed L := by
   apply IsAlgClosed.of_exists_root
   intro f fmon firr
   have fnatdeg0 : f.natDegree ≠ 0 := (Irreducible.natDegree_pos firr).ne'
   let F := f.SplittingField
   letI : NormedField F := spectralNorm.normedField L F
   letI : NormedAlgebra L F := spectralNorm.normedAlgebra L F
-  let a := rootOfSplits (SplittingField.splits f)
-      (by simpa using degree_ne_of_natDegree_ne fnatdeg0)
+  let a :=
+    rootOfSplits (SplittingField.splits f) (by simpa using degree_ne_of_natDegree_ne fnatdeg0)
   have fa0 : f.aeval a = 0 := by
     rw [← eval_map_algebraMap]
     exact eval_rootOfSplits (Polynomial.SplittingField.splits f)
@@ -172,18 +181,20 @@ theorem isAlgClosed_of_denseRange {K L : Type*} [Field K] [NontriviallyNormedFie
     have hε : (δ / (max ‖a‖ 1)) ^ f.natDegree / (f.natDegree + 1) > 0 := by positivity
     obtain ⟨g, gmon, gdeg, gcoeff⟩ :=
       exists_monic_and_natDegree_eq_and_norm_map_algebraMap_coeff_sub_lt hi fmon hε
-    obtain ⟨b, hb, hab⟩ := exists_aroots_norm_sub_lt_of_norm_coeff_sub_lt
-        hε fa0 fmon (gmon.map _) (gdeg ▸ (g.natDegree_map _)) gcoeff
+    obtain ⟨b, hb, hab⟩ :=
+      exists_aroots_norm_sub_lt_of_norm_coeff_sub_lt hε fa0 fmon (gmon.map _)
+        (gdeg ▸ (g.natDegree_map _)) gcoeff
         (by simpa [Polynomial.map_map] using (IsAlgClosed.splits g).map ((algebraMap L F).comp _))
     have hab : ‖a - b‖ < δ := by
       rw [← Real.rpow_natCast, ← mul_comm_div, div_self, one_mul,
-          ← Real.rpow_mul (div_pos δpos (by positivity)).le, mul_inv_cancel₀] at hab
+          ← Real.rpow_mul (div_pos δpos (by positivity)).le, mul_inv_cancel₀]
+        at hab
       · simpa [mul_assoc, div_mul_cancel₀ _ (by positivity : (max ‖a‖ 1) > 0).ne'] using hab
       · simp [fnatdeg0]
       · positivity
     refine ⟨b, ?_, by rwa [dist_eq_norm]⟩
-    rw [Polynomial.aroots_def, Splits.roots_map ((IsAlgClosed.splits g).map _),
-        Multiset.mem_map] at hb
+    rw [Polynomial.aroots_def, Splits.roots_map ((IsAlgClosed.splits g).map _), Multiset.mem_map]
+      at hb
     obtain ⟨c, _, hc⟩ := hb
     exact ⟨c, hc⟩
   obtain ⟨c, hc⟩ := ha
@@ -192,17 +203,20 @@ theorem isAlgClosed_of_denseRange {K L : Type*} [Field K] [NontriviallyNormedFie
   · rwa [← Polynomial.aeval_algebraMap_apply_eq_algebraMap_eval, hc, map_zero]
   · exact RingHom.injective _
 
-@[reducible] noncomputable def completionNontriviallyNormedField (K : Type*)
-    [NontriviallyNormedField K] : NontriviallyNormedField (UniformSpace.Completion K) where
+@[reducible]
+noncomputable def completionNontriviallyNormedField (K : Type*) [NontriviallyNormedField K]
+    : NontriviallyNormedField (UniformSpace.Completion K) where
   __ : NormedField (UniformSpace.Completion K) := inferInstance
   non_trivial := by
     obtain ⟨x, hx⟩ := NontriviallyNormedField.non_trivial (α := K)
     exact ⟨x, by simpa using hx⟩
 
-theorem exists_complete_isAlgClosed_isometry (K : Type u) [NontriviallyNormedField K]
-    [IsUltrametricDist K] :
-    ∃ (C : Type u) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C)
-      (_ : IsAlgClosed C) (i : K →+* C), ∀ x, ‖i x‖ = ‖x‖ := by
+theorem exists_complete_isAlgClosed_isometry
+    (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K]
+    : ∃ (C : Type u) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C)
+        (_ : IsAlgClosed C) (i : K →+* C),
+      ∀ x,
+        ‖i x‖ = ‖x‖ := by
   let K₁ := UniformSpace.Completion K
   letI : NontriviallyNormedField K₁ := completionNontriviallyNormedField K
   haveI : IsUltrametricDist K₁ := IsUltrametricDist.of_normedAlgebra K
@@ -215,24 +229,31 @@ theorem exists_complete_isAlgClosed_isometry (K : Type u) [NontriviallyNormedFie
   haveI : IsUltrametricDist C := IsUltrametricDist.of_normedAlgebra K₂
   haveI : IsAlgClosed C :=
     isAlgClosed_of_denseRange (K := K₂) UniformSpace.Completion.denseRange_coe
-  refine ⟨C, inferInstance, inferInstance, inferInstance, inferInstance,
-    (algebraMap K₂ C).comp ((algebraMap K₁ K₂).comp (algebraMap K K₁)), fun x => ?_⟩
+  refine ⟨
+    C,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    (algebraMap K₂ C).comp ((algebraMap K₁ K₂).comp (algebraMap K K₁)),
+    fun x => ?_
+  ⟩
   have h₁ : ∀ y : K₂, ‖algebraMap K₂ C y‖ = ‖y‖ := fun y => UniformSpace.Completion.norm_coe y
   have h₂ : ∀ y : K₁, ‖algebraMap K₁ K₂ y‖ = ‖y‖ := fun y => spectralNorm_extends y
   have h₃ : ∀ y : K, ‖algebraMap K K₁ y‖ = ‖y‖ := fun y => UniformSpace.Completion.norm_coe y
   rw [RingHom.comp_apply, RingHom.comp_apply, h₁, h₂, h₃]
 
-
 open IsDedekindDomain in
-theorem exists_absoluteValue_of_isDiscreteValuationRing (V K : Type*) [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
-    {a : V} (ha0 : a ≠ 0) (ha : a ∈ IsLocalRing.maximalIdeal V) {r : ℝ} (hr0 : 0 < r)
-    (hr1 : r < 1) :
-    ∃ w : AbsoluteValue K ℝ, IsNonarchimedean w ∧
-      (∀ x : K, w x ≤ 1 ↔ x ∈ (algebraMap V K).range) ∧ w (algebraMap V K a) = r := by
+theorem exists_absoluteValue_of_isDiscreteValuationRing
+    (V K : Type*) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
+    [IsFractionRing V K]
+    {a : V} (ha0 : a ≠ 0) (ha : a ∈ IsLocalRing.maximalIdeal V)
+    {r : ℝ} (hr0 : 0 < r) (hr1 : r < 1)
+    : ∃ w : AbsoluteValue K ℝ,
+      IsNonarchimedean w ∧ (∀ x : K, w x ≤ 1 ↔ x ∈ (algebraMap V K).range)
+        ∧ w (algebraMap V K a) = r := by
   let v := IsDiscreteValuationRing.maximalIdeal V
-  have h0 : v.valuation K (algebraMap V K a) ≠ 0 := by
-    simpa using ha0
+  have h0 : v.valuation K (algebraMap V K a) ≠ 0 := by simpa using ha0
   have h1 : v.valuation K (algebraMap V K a) < 1 := (v.valuation_lt_one_iff_mem a).2 ha
   set m : ℤ := Multiplicative.toAdd (WithZero.unzero h0) with hm
   have hm0 : m < 0 := by
@@ -248,22 +269,24 @@ theorem exists_absoluteValue_of_isDiscreteValuationRing (V K : Type*) [CommRing 
       rfl
     rw [this]
     exact ⟨IsDiscreteValuationRing.exists_lift_of_le_one, fun ⟨y, hy⟩ => hy ▸ v.valuation_le_one y⟩
-  · change ((WithZeroMulInt.toNNReal (ne_zero_of_lt hb) (v.valuation K (algebraMap V K a)) :
-      NNReal) : ℝ) = r
+  · change ((WithZeroMulInt.toNNReal (ne_zero_of_lt hb) (v.valuation K (algebraMap V K a)) : NNReal)
+        : ℝ)
+      = r
     rw [WithZeroMulInt.toNNReal_neg_apply _ h0, ← WithZero.toAdd_unzero_eq_log h0, ← hm,
       NNReal.coe_zpow]
     change (r ^ ((m : ℝ)⁻¹)) ^ m = r
     rw [← Real.rpow_intCast, ← Real.rpow_mul hr0.le, inv_mul_cancel₀ (by exact_mod_cast hm0.ne),
       Real.rpow_one]
 
-theorem exists_complete_isAlgClosed_of_isDiscreteValuationRing (V : Type*) (K : Type u)
-    [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-    [IsFractionRing V K] {a : V} (ha0 : a ≠ 0) (ha : a ∈ IsLocalRing.maximalIdeal V) {r : ℝ}
-    (hr0 : 0 < r) (hr1 : r < 1) :
-    ∃ (C : Type u) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C)
-      (_ : IsAlgClosed C) (_ : Algebra K C),
-      (∀ x : K, ‖algebraMap K C x‖ ≤ 1 ↔ x ∈ (algebraMap V K).range) ∧
-        ‖algebraMap K C (algebraMap V K a)‖ = r := by
+theorem exists_complete_isAlgClosed_of_isDiscreteValuationRing
+    (V : Type*) (K : Type u) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K]
+    [Algebra V K] [IsFractionRing V K]
+    {a : V} (ha0 : a ≠ 0) (ha : a ∈ IsLocalRing.maximalIdeal V)
+    {r : ℝ} (hr0 : 0 < r) (hr1 : r < 1)
+    : ∃ (C : Type u) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C)
+        (_ : IsAlgClosed C) (_ : Algebra K C),
+      (∀ x : K, ‖algebraMap K C x‖ ≤ 1 ↔ x ∈ (algebraMap V K).range)
+        ∧ ‖algebraMap K C (algebraMap V K a)‖ = r := by
   obtain ⟨w, hw, hw1, hwa⟩ := exists_absoluteValue_of_isDiscreteValuationRing V K ha0 ha hr0 hr1
   letI : NontriviallyNormedField (WithAbs w) :=
     { (inferInstance : NormedField (WithAbs w)) with
@@ -277,12 +300,22 @@ theorem exists_complete_isAlgClosed_of_isDiscreteValuationRing (V : Type*) (K : 
   obtain ⟨C, _, _, _, _, i, hi⟩ := exists_complete_isAlgClosed_isometry (WithAbs w)
   letI : Algebra K C := (i.comp (WithAbs.equiv w).symm.toRingHom).toAlgebra
   have hn : ∀ x : K, ‖algebraMap K C x‖ = w x := fun x => hi _
-  exact ⟨C, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance,
-    fun x => by rw [hn, hw1], by rw [hn, hwa]⟩
+  exact ⟨
+    C,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    fun x => by rw [hn, hw1],
+    by rw [hn, hwa]
+  ⟩
 
-theorem norm_ratCast_eq_padicNorm {C : Type*} [NormedField C] [IsUltrametricDist C] [CharZero C]
-    (p : ℕ) [hp : Fact p.Prime] (h : ‖(p : C)‖ = (p : ℝ)⁻¹) (q : ℚ) :
-    ‖(q : C)‖ = ‖(q : ℚ_[p])‖ := by
+theorem norm_ratCast_eq_padicNorm
+    {C : Type*} [NormedField C] [IsUltrametricDist C] [CharZero C]
+    (p : ℕ) [hp : Fact p.Prime]
+    (h : ‖(p : C)‖ = (p : ℝ)⁻¹) (q : ℚ)
+    : ‖(q : C)‖ = ‖(q : ℚ_[p])‖ := by
   have hlt : ‖(p : C)‖ < 1 := by
     rw [h]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast hp.out.one_lt)
   have hcop : ∀ m : ℕ, ¬ p ∣ m → ‖(m : C)‖ = 1 := by
@@ -313,9 +346,11 @@ theorem norm_ratCast_eq_padicNorm {C : Type*} [NormedField C] [IsUltrametricDist
     obtain ⟨m, rfl | rfl⟩ := n.eq_nat_or_neg <;> simp [hnat]
   rw [Rat.cast_def, Rat.cast_def, norm_div, norm_div, hnat, hint]
 
-theorem exists_padic_isometry {C : Type*} [NormedField C] [IsUltrametricDist C] [CharZero C]
-    [CompleteSpace C] (p : ℕ) [Fact p.Prime] (h : ‖(p : C)‖ = (p : ℝ)⁻¹) :
-    ∃ j : ℚ_[p] →+* C, ∀ x, ‖j x‖ = ‖x‖ := by
+theorem exists_padic_isometry
+    {C : Type*} [NormedField C] [IsUltrametricDist C] [CharZero C] [CompleteSpace C]
+    (p : ℕ) [Fact p.Prime]
+    (h : ‖(p : C)‖ = (p : ℝ)⁻¹)
+    : ∃ j : ℚ_[p] →+* C, ∀ x, ‖j x‖ = ‖x‖ := by
   let w : AbsoluteValue ℚ ℝ := Rat.AbsoluteValue.padic p
   let i : WithAbs w →+* ℚ_[p] := (Rat.castHom ℚ_[p]).comp (WithAbs.equiv w).toRingHom
   let f : WithAbs w →+* C := (Rat.castHom C).comp (WithAbs.equiv w).toRingHom
@@ -337,13 +372,15 @@ theorem exists_padic_isometry {C : Type*} [NormedField C] [IsUltrametricDist C] 
     IsDenseInducing.extend_eq (hi'.isUniformInducing.isDenseInducing hd) hf'.continuous q
   rw [this, hf, hi]
 
-theorem exists_complete_isAlgClosed_padic_of_isDiscreteValuationRing (V : Type*) (K : Type u)
-    [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-    [IsFractionRing V K] [CharZero K] (p : ℕ) [hp : Fact p.Prime]
-    (hV : (p : V) ∈ IsLocalRing.maximalIdeal V) :
-    ∃ (C : Type u) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C)
-      (_ : IsAlgClosed C) (_ : NormedAlgebra ℚ_[p] C) (_ : Algebra K C),
-      ∀ x : K, ‖algebraMap K C x‖ ≤ 1 ↔ x ∈ (algebraMap V K).range := by
+theorem exists_complete_isAlgClosed_padic_of_isDiscreteValuationRing
+    (V : Type*) (K : Type u) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K]
+    [Algebra V K] [IsFractionRing V K] [CharZero K]
+    (p : ℕ) [hp : Fact p.Prime]
+    (hV : (p : V) ∈ IsLocalRing.maximalIdeal V)
+    : ∃ (C : Type u) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C)
+        (_ : IsAlgClosed C) (_ : NormedAlgebra ℚ_[p] C) (_ : Algebra K C),
+      ∀ x : K,
+        ‖algebraMap K C x‖ ≤ 1 ↔ x ∈ (algebraMap V K).range := by
   have hp0 : (p : V) ≠ 0 := fun h => by
     have := congrArg (algebraMap V K) h
     rw [map_natCast, map_zero] at this
@@ -361,14 +398,23 @@ theorem exists_complete_isAlgClosed_padic_of_isDiscreteValuationRing (V : Type*)
       norm_smul_le := fun r x => by
         rw [Algebra.smul_def, norm_mul]
         exact le_of_eq (congrArg (· * ‖x‖) (hj r)) }
-  exact ⟨C, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance,
-    inferInstance, hC⟩
+  exact ⟨
+    C,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    hC
+  ⟩
 
-theorem exists_isLocalHom_normIntegers {V K C : Type*} [CommRing V] [Field K] [Algebra V K]
-    [IsFractionRing V K] [NormedField C] [IsUltrametricDist C] [Algebra K C]
-    (h : ∀ x : K, ‖algebraMap K C x‖ ≤ 1 ↔ x ∈ (algebraMap V K).range) :
-    ∃ φ : V →+* normIntegers C, IsLocalHom φ ∧
-      ∀ a, (φ a : C) = algebraMap K C (algebraMap V K a) := by
+theorem exists_isLocalHom_normIntegers
+    {V K C : Type*} [CommRing V] [Field K] [Algebra V K] [IsFractionRing V K] [NormedField C]
+    [IsUltrametricDist C] [Algebra K C]
+    (h : ∀ x : K, ‖algebraMap K C x‖ ≤ 1 ↔ x ∈ (algebraMap V K).range)
+    : ∃ φ : V →+* normIntegers C,
+      IsLocalHom φ ∧ ∀ a, (φ a : C) = algebraMap K C (algebraMap V K a) := by
   let φ : V →+* normIntegers C :=
     ((algebraMap K C).comp (algebraMap V K)).codRestrict (normIntegers C) fun a =>
       mem_normIntegers_iff.2 ((h _).2 ⟨a, rfl⟩)

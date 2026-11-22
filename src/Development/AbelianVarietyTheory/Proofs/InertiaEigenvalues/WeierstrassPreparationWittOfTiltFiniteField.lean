@@ -8,19 +8,24 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvdSubO
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
 namespace GlobalTheory
 
-theorem weierstrass_prep_not_dvd_l : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (g : (Wq l a)⟦X⟧), ¬ (l : (Wq l a)⟦X⟧) ∣ g →
-    ∃ (P : Polynomial (Wq l a)) (U : (Wq l a)⟦X⟧), IsUnit U ∧ P.Monic ∧
-      (∀ i < P.natDegree, (l : Wq l a) ∣ P.coeff i) ∧ g = U * (P : (Wq l a)⟦X⟧) := by
+theorem weierstrass_prep_not_dvd_l
+    : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (g : (Wq l a)⟦X⟧),
+      ¬ (l : (Wq l a)⟦X⟧) ∣ g
+        → ∃ (P : Polynomial (Wq l a)) (U : (Wq l a)⟦X⟧),
+          IsUnit U ∧ P.Monic ∧ (∀ i < P.natDegree, (l : Wq l a) ∣ P.coeff i)
+            ∧ g = U * (P : (Wq l a)⟦X⟧) := by
   intro l _ a _ g hg
   haveI : IsAdicComplete (Ideal.span {(l : Wq l a)}) (Wq l a) := WittVector.isAdicCompleteIdealSpanP
-  have hsurj : Function.Surjective (WittVector.constantCoeff (p := l) (R := Fq l a)) :=
-    fun x => ⟨WittVector.teichmuller l x, by simp⟩
+  have hsurj : Function.Surjective (WittVector.constantCoeff (p := l) (R := Fq l a)) := fun x =>
+    ⟨WittVector.teichmuller l x, by simp⟩
   have hm : IsLocalRing.maximalIdeal (Wq l a) = Ideal.span {(l : Wq l a)} := by
     rw [← WittVector.ker_constantCoeff]
     haveI := RingHom.ker_isMaximal_of_surjective _ hsurj
@@ -31,8 +36,7 @@ theorem weierstrass_prep_not_dvd_l : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZ
     apply hg
     apply dvd_of_map_eq_zero l a g
     ext n
-    have h1 : IsLocalRing.residue (Wq l a) (coeff n g) = 0 := by
-      simpa using congrArg (coeff n) h0
+    have h1 : IsLocalRing.residue (Wq l a) (coeff n g) = 0 := by simpa using congrArg (coeff n) h0
     rw [IsLocalRing.residue_eq_zero_iff, hm, ← WittVector.ker_constantCoeff, RingHom.mem_ker] at h1
     simpa using h1
   obtain ⟨f, h, H⟩ := g.exists_isWeierstrassFactorization hg'

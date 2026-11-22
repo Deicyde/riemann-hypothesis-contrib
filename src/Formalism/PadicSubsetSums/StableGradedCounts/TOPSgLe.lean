@@ -6,8 +6,8 @@ public import Formalism.PadicSubsetSums.CentralIdempotents.ResidueAvoidanceOfPri
 
 namespace Formalism.IrreducibleCountingLemmas.TOP
 
-private theorem tsum_mul_inv_pow_succ_eq_div_sub_one (ℓ : ℕ) (H : ℝ) (hℓ : (2 : ℝ) ≤ ℓ) :
-    ∑' j : ℕ, H * ((ℓ : ℝ)⁻¹) ^ (j + 1) = H / ((ℓ : ℝ) - 1) := by
+private theorem tsum_mul_inv_pow_succ_eq_div_sub_one (ℓ : ℕ) (H : ℝ) (hℓ : (2 : ℝ) ≤ ℓ)
+    : ∑' j : ℕ, H * ((ℓ : ℝ)⁻¹) ^ (j + 1) = H / ((ℓ : ℝ) - 1) := by
   have hr0 : 0 ≤ (ℓ : ℝ)⁻¹ := by positivity
   have hr1 : (ℓ : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ (by linarith)
   have hl0 : (ℓ : ℝ) ≠ 0 := by positivity
@@ -29,14 +29,17 @@ theorem carryFloorLeGeom : SgLe := by
   have hgeom : Summable (fun j : ℕ => (H : ℝ) * ((ℓ : ℝ)⁻¹) ^ (j + 1)) := by
     have := (summable_geometric_of_lt_one hr0 hr1).mul_left ((H : ℝ) * (ℓ : ℝ)⁻¹)
     refine this.congr ?_
-    intro j; ring
-  have hle : ∀ j : ℕ, (h (i + ((j + 1 : ℕ) : ZMod f)) : ℝ) / (ℓ : ℝ) ^ (j + 1) ≤
-      (H : ℝ) * ((ℓ : ℝ)⁻¹) ^ (j + 1) := by
+    intro j
+    ring
+  have hle
+      : ∀ j : ℕ,
+        (h (i + ((j + 1 : ℕ) : ZMod f)) : ℝ) / (ℓ : ℝ) ^ (j + 1)
+          ≤ (H : ℝ) * ((ℓ : ℝ)⁻¹) ^ (j + 1) := by
     intro j
     rw [inv_pow, ← div_eq_mul_inv]
     exact div_le_div_of_nonneg_right (by exact_mod_cast hH _) (by positivity)
-  have hnn : ∀ j : ℕ, 0 ≤ (h (i + ((j + 1 : ℕ) : ZMod f)) : ℝ) / (ℓ : ℝ) ^ (j + 1) :=
-    fun j => by positivity
+  have hnn : ∀ j : ℕ, 0 ≤ (h (i + ((j + 1 : ℕ) : ZMod f)) : ℝ) / (ℓ : ℝ) ^ (j + 1) := fun j => by
+    positivity
   have hs : Summable (fun j : ℕ => (h (i + ((j + 1 : ℕ) : ZMod f)) : ℝ) / (ℓ : ℝ) ^ (j + 1)) :=
     hgeom.of_nonneg_of_le hnn hle
   have h1 := hs.tsum_le_tsum hle hgeom

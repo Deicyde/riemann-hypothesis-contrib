@@ -6,7 +6,8 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.S4
 
-theorem isIntegral_of_norm_le {l : ℕ} [Fact l.Prime] {z : PadicAlgCl l} (hz : ‖z‖ ≤ 1) : IsIntegral ℤ_[l] z := by
+theorem isIntegral_of_norm_le {l : ℕ} [Fact l.Prime] {z : PadicAlgCl l} (hz : ‖z‖ ≤ 1)
+    : IsIntegral ℤ_[l] z := by
   have hi : IsIntegral ℚ_[l] z := Algebra.IsIntegral.isIntegral z
   have hm : (minpoly ℚ_[l] z).Monic := minpoly.monic hi
   have hv : spectralValue (minpoly ℚ_[l] z) ≤ 1 := hz

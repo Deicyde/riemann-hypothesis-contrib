@@ -13,7 +13,9 @@ public import Formalism.LocalRingCardinality.SpanPowerMembership.HaarDensityNeZe
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
 
 namespace GlobalTheory.FunObjModel
@@ -22,9 +24,13 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc}
 
-theorem isMeasLevW_unique {V : HSp D} {K : Subgroup (GL (Fin V.rank) (Lev.EAf D))} {good} {μ μ' : Measure (GA D V)}
-    (hg : ∀ ρ m, good ρ m → m.IsHaarMeasure) (h : Lev.IsMeasLevW V K good μ) (h' : Lev.IsMeasLevW V K good μ') : μ = μ' := by
-  obtain ⟨hloc, hsc, ht2, hbor, htg, -, -⟩ := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V
+theorem isMeasLevW_unique
+    {V : HSp D} {K : Subgroup (GL (Fin V.rank) (Lev.EAf D))} {good} {μ μ' : Measure (GA D V)}
+    (hg : ∀ ρ m, good ρ m → m.IsHaarMeasure) (h : Lev.IsMeasLevW V K good μ)
+    (h' : Lev.IsMeasLevW V K good μ')
+    : μ = μ' := by
+  obtain ⟨hloc, hsc, ht2, hbor, htg, -, -⟩ :=
+    GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V
   obtain ⟨hμ, ⟨θ, hθ⟩, hall⟩ := h
   obtain ⟨hμ', -, hall'⟩ := h'
   obtain ⟨⟨A, hA⟩, hallA⟩ := hall θ hθ
@@ -48,14 +54,16 @@ theorem isMeasLevW_unique {V : HSp D} {K : Subgroup (GL (Fin V.rank) (Lev.EAf D)
   have := hμ
   have := hμ'
 
-  obtain ⟨c, hs⟩ : ∃ c : NNReal, μ' = c • μ := ⟨_, MeasureTheory.Measure.isMulLeftInvariant_eq_smul μ' μ⟩
+  obtain ⟨c, hs⟩ : ∃ c : NNReal, μ' = c • μ :=
+    ⟨_, MeasureTheory.Measure.isMulLeftInvariant_eq_smul μ' μ⟩
   have e3 : ∀ s, μ' s = c * μ s := fun s => by
     simp only [hs, MeasureTheory.Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
   rw [e3, e1] at e2
   have hc1 : c = 1 := by exact_mod_cast (ENNReal.mul_eq_right hP0 hPtop).1 e2
   rw [hs, hc1, one_smul]
 
-theorem isAt_unique {M M' : Vol G} {X : Node} {K} (h : M.IsAt X K) (h' : M'.IsAt X K) : M.ν X = M'.ν X := by
+theorem isAt_unique {M M' : Vol G} {X : Node} {K} (h : M.IsAt X K) (h' : M'.IsAt X K)
+    : M.ν X = M'.ν X := by
   unfold Vol.IsAt at h h'
   split_ifs at h h'
   · exact isMeasLevW_unique (fun _ _ hm => hm.1) h.1 h'.1

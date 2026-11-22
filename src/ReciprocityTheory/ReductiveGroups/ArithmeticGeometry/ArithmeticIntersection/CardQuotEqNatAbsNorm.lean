@@ -8,16 +8,17 @@ namespace ReciprocityTheory.ChartRestriction.G.AI
 
 open Module
 
-theorem card_quot_eq_natAbs_norm {S : Type*} [CommRing S] [IsDomain S] [Module.Free ℤ S]
-    [Module.Finite ℤ S] (f : S) (hf : f ≠ 0) :
-    Nat.card (S ⧸ Ideal.span {f}) = (Algebra.norm ℤ f).natAbs := by
+theorem card_quot_eq_natAbs_norm
+    {S : Type*} [CommRing S] [IsDomain S] [Module.Free ℤ S] [Module.Finite ℤ S] (f : S) (hf : f ≠ 0)
+    : Nat.card (S ⧸ Ideal.span {f}) = (Algebra.norm ℤ f).natAbs := by
   classical
   let N : Submodule ℤ S := (Ideal.span {f}).restrictScalars ℤ
   have hmem : ∀ x : S, f * x ∈ N := fun x => Ideal.mul_mem_right x _ (Ideal.subset_span rfl)
-  let g : S →+ N :=
-    { toFun := fun x => ⟨f * x, hmem x⟩
-      map_zero' := by ext; simp
-      map_add' := fun x y => by ext; simp [mul_add] }
+  let g : S →+ N := {
+    toFun := fun x => ⟨f * x, hmem x⟩
+    map_zero' := by ext; simp
+    map_add' := fun x y => by ext; simp [mul_add]
+  }
   have hbij : Function.Bijective g := by
     constructor
     · intro x y hxy
@@ -35,9 +36,11 @@ theorem card_quot_eq_natAbs_norm {S : Type*} [CommRing S] [IsDomain S] [Module.F
   rw [h]
   exact Nat.card_congr (Submodule.Quotient.restrictScalarsEquiv ℤ (Ideal.span {f})).toEquiv.symm
 
-theorem norm_int_eq_norm_rat {K : Type*} [Field K] [NumberField K] (O : Subring K)
-    [Module.Free ℤ O] [Module.Finite ℤ O] (h : Module.finrank ℤ O = Module.finrank ℚ K)
-    (f : O) : ((Algebra.norm ℤ f : ℤ) : ℚ) = Algebra.norm ℚ (f : K) := by
+theorem norm_int_eq_norm_rat
+    {K : Type*} [Field K] [NumberField K]
+    (O : Subring K) [Module.Free ℤ O] [Module.Finite ℤ O]
+    (h : Module.finrank ℤ O = Module.finrank ℚ K) (f : O)
+    : ((Algebra.norm ℤ f : ℤ) : ℚ) = Algebra.norm ℚ (f : K) := by
   classical
   let b := Module.Free.chooseBasis ℤ O
   have hli : LinearIndependent ℚ (fun i => ((b i : O) : K)) := by
@@ -56,7 +59,10 @@ theorem norm_int_eq_norm_rat {K : Type*} [Field K] [NumberField K] (O : Subring 
     simp only [b', coe_basisOfLinearIndependentOfCardEqFinrank]
   rw [Algebra.norm_eq_matrix_det b f, Algebra.norm_eq_matrix_det b' (f : K)]
   have hm := RingHom.map_det (Int.castRingHom ℚ) (Algebra.leftMulMatrix b f)
-  rw [show ((Algebra.leftMulMatrix b f).det : ℚ) = (Int.castRingHom ℚ) (Algebra.leftMulMatrix b f).det from rfl, hm]
+  rw [show ((Algebra.leftMulMatrix b f).det : ℚ)
+        = (Int.castRingHom ℚ) (Algebra.leftMulMatrix b f).det from
+      rfl,
+    hm]
   congr 1
   ext i j
   have hx : (f : K) * b' j = ∑ k, ((b.repr (f * b j) k : ℤ) : ℚ) • b' k := by
@@ -66,11 +72,12 @@ theorem norm_int_eq_norm_rat {K : Type*} [Field K] [NumberField K] (O : Subring 
     simp only [map_zsmul] at e1
     simp only [hb', Int.cast_smul_eq_zsmul]
     exact e1.symm
-  simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Algebra.leftMulMatrix_eq_repr_mul, eq_intCast]
+  simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Algebra.leftMulMatrix_eq_repr_mul,
+    eq_intCast]
   rw [hx, b'.repr_sum_self]
 
-theorem abs_norm_eq_prod {K : Type*} [Field K] [NumberField K] (x : K) :
-    |(Algebra.norm ℚ x : ℝ)| = ∏ σ : K →+* ℂ, ‖σ x‖ := by
+theorem abs_norm_eq_prod {K : Type*} [Field K] [NumberField K] (x : K)
+    : |(Algebra.norm ℚ x : ℝ)| = ∏ σ : K →+* ℂ, ‖σ x‖ := by
   have h := Algebra.norm_eq_prod_embeddings ℚ ℂ x
   have h2 := congrArg (fun z : ℂ => ‖z‖) h
   simp only [norm_prod, eq_ratCast, Complex.norm_ratCast] at h2

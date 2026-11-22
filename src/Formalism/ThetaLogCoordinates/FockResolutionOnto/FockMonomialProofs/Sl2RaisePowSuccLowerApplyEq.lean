@@ -9,8 +9,9 @@ namespace Formalism.InvariantFactorPaths.L4
 section
 variable {k V : Type} [Field k] [CharZero k] [AddCommGroup V] [Module k V] {e f h : V →ₗ[k] V}
 
-theorem sl2_weight_raise_pow_apply_eq (he : ∀ x, h (e x) - e (h x) = (2 : k) • e x) {u : V} {μ : k} (hu : h u = μ • u) (m : ℕ) :
-    h ((e ^ m) u) = (μ + 2 * (m : k)) • (e ^ m) u := by
+theorem sl2_weight_raise_pow_apply_eq
+    (he : ∀ x, h (e x) - e (h x) = (2 : k) • e x) {u : V} {μ : k} (hu : h u = μ • u) (m : ℕ)
+    : h ((e ^ m) u) = (μ + 2 * (m : k)) • (e ^ m) u := by
   induction m with
   | zero => simp [hu]
   | succ m ih =>
@@ -22,9 +23,11 @@ theorem sl2_weight_raise_pow_apply_eq (he : ∀ x, h (e x) - e (h x) = (2 : k) �
     push_cast
     ring
 
-theorem sl2_raise_pow_succ_lower_apply_eq (he : ∀ x, h (e x) - e (h x) = (2 : k) • e x) (hef : ∀ x, e (f x) - f (e x) = h x)
-    {u : V} {μ : k} (hu : h u = μ • u) (m : ℕ) :
-    (e ^ (m + 1)) (f u) = f ((e ^ (m + 1)) u) + (((m : k) + 1) * (μ + (m : k))) • (e ^ m) u := by
+theorem sl2_raise_pow_succ_lower_apply_eq
+    (he : ∀ x, h (e x) - e (h x) = (2 : k) • e x) (hef : ∀ x, e (f x) - f (e x) = h x)
+    {u : V} {μ : k} (hu : h u = μ • u)
+    (m : ℕ)
+    : (e ^ (m + 1)) (f u) = f ((e ^ (m + 1)) u) + (((m : k) + 1) * (μ + (m : k))) • (e ^ m) u := by
   induction m with
   | zero =>
     have h1 := hef u
@@ -33,18 +36,21 @@ theorem sl2_raise_pow_succ_lower_apply_eq (he : ∀ x, h (e x) - e (h x) = (2 : 
     rw [h1, hu, add_comm]
   | succ m ih =>
     have hs : e ((e ^ m) u) = (e ^ (m + 1)) u := by rw [pow_succ', Module.End.mul_apply]
-    rw [pow_succ' e (m + 1), Module.End.mul_apply, Module.End.mul_apply, ih, map_add (f := _), map_smul]
+    rw [pow_succ' e (m + 1), Module.End.mul_apply, Module.End.mul_apply, ih, map_add (f := _),
+      map_smul]
     have h1 := hef ((e ^ (m + 1)) u)
     rw [sub_eq_iff_eq_add] at h1
-    rw [h1, sl2_weight_raise_pow_apply_eq he hu (m + 1), hs, add_comm (_ • _) (f _), add_assoc, ← add_smul]
+    rw [h1, sl2_weight_raise_pow_apply_eq he hu (m + 1), hs, add_comm (_ • _) (f _), add_assoc,
+      ← add_smul]
     congr 1
     congr 1
     push_cast
     ring
 
-theorem sl2_eq_zero_of_lower_zero_of_raise_pow_zero (he : ∀ x, h (e x) - e (h x) = (2 : k) • e x) (hef : ∀ x, e (f x) - f (e x) = h x)
-    {u : V} {μ : ℤ} (hu : h u = ((μ : ℤ) : k) • u) (hf : f u = 0) :
-    ∀ j : ℕ, μ + j ≤ 0 → (e ^ j) u = 0 → u = 0 := by
+theorem sl2_eq_zero_of_lower_zero_of_raise_pow_zero
+    (he : ∀ x, h (e x) - e (h x) = (2 : k) • e x) (hef : ∀ x, e (f x) - f (e x) = h x)
+    {u : V} {μ : ℤ} (hu : h u = ((μ : ℤ) : k) • u) (hf : f u = 0)
+    : ∀ j : ℕ, μ + j ≤ 0 → (e ^ j) u = 0 → u = 0 := by
   intro j
   induction j with
   | zero =>

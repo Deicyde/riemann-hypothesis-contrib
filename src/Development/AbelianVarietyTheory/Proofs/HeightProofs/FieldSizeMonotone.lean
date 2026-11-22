@@ -23,15 +23,14 @@ private lemma natAbs_discr_pow_finrank_le_natAbs_discr (K L : Type*) [Field K] [
   rw [h]
   exact Dvd.intro_left _ rfl
 
-
 set_option autoImplicit false in
 open NumberField IsDedekindDomain in
 open scoped IntermediateField nonZeroDivisors in
-theorem _root_.GlobalTheory.FieldSize.log_finrank_rootDiscr_le_of_tower (K L : Type*) [Field K] [NumberField K] [Field L]
-    [NumberField L] [Algebra K L] :
-    Real.log (Module.finrank ℚ K) ≤ Real.log (Module.finrank ℚ L) ∧
-      Real.log |((NumberField.discr K : ℤ) : ℝ)| / Module.finrank ℚ K ≤
-        Real.log |((NumberField.discr L : ℤ) : ℝ)| / Module.finrank ℚ L := by
+theorem _root_.GlobalTheory.FieldSize.log_finrank_rootDiscr_le_of_tower
+    (K L : Type*) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    : Real.log (Module.finrank ℚ K) ≤ Real.log (Module.finrank ℚ L)
+      ∧ Real.log |((NumberField.discr K : ℤ) : ℝ)| / Module.finrank ℚ K
+        ≤ Real.log |((NumberField.discr L : ℤ) : ℝ)| / Module.finrank ℚ L := by
   have hmul := Module.finrank_mul_finrank ℚ K L
   have hn : 0 < Module.finrank ℚ K := Module.finrank_pos
   have hm : 0 < Module.finrank K L := Module.finrank_pos
@@ -52,22 +51,24 @@ theorem _root_.GlobalTheory.FieldSize.log_finrank_rootDiscr_le_of_tower (K L : T
       have h' : (((discr K).natAbs ^ Module.finrank K L : ℕ) : ℝ) ≤ ((discr L).natAbs : ℝ) := by
         exact_mod_cast h
       simpa [Nat.cast_natAbs, Int.cast_abs] using h'
-    have hlog : (Module.finrank K L : ℝ) * Real.log |((discr K : ℤ) : ℝ)| ≤
-        Real.log |((discr L : ℤ) : ℝ)| := by
+    have hlog
+        : (Module.finrank K L : ℝ) * Real.log |((discr K : ℤ) : ℝ)|
+          ≤ Real.log |((discr L : ℤ) : ℝ)| := by
       rw [← Real.log_pow]
       exact Real.log_le_log (pow_pos hK _) hle
     rw [hNR, div_le_div_iff₀ hnR (mul_pos hnR hmR)]
     nlinarith
 
-
 set_option autoImplicit false in
 open NumberField IsDedekindDomain in
 open scoped IntermediateField nonZeroDivisors in
-theorem _root_.GlobalTheory.FieldSize.sz_mono_and_of_le :
-    (∀ (F : IntermediateField ℚ ℂ) (a b a' b' : ℝ), _root_.GlobalTheory.FieldSize.Sz F a b →
-        a ≤ a' → b ≤ b' → _root_.GlobalTheory.FieldSize.Sz F a' b') ∧
-      ∀ (F F' : IntermediateField ℚ ℂ) (a b : ℝ), F ≤ F' →
-        _root_.GlobalTheory.FieldSize.Sz F' a b → _root_.GlobalTheory.FieldSize.Sz F a b := by
+theorem _root_.GlobalTheory.FieldSize.sz_mono_and_of_le
+    : (∀ (F : IntermediateField ℚ ℂ) (a b a' b' : ℝ),
+        _root_.GlobalTheory.FieldSize.Sz F a b → a ≤ a' → b ≤ b'
+          → _root_.GlobalTheory.FieldSize.Sz F a' b')
+      ∧ ∀ (F F' : IntermediateField ℚ ℂ) (a b : ℝ),
+        F ≤ F' → _root_.GlobalTheory.FieldSize.Sz F' a b
+          → _root_.GlobalTheory.FieldSize.Sz F a b := by
   constructor
   · rintro F a b a' b' ⟨hF, h1, h2⟩ ha hb
     exact ⟨hF, h1.trans ha, h2.trans hb⟩

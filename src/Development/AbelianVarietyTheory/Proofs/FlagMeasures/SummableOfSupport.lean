@@ -21,10 +21,12 @@ private lemma indicator_eq_indicator_inter_support {α : Type} (S : Set α) (F :
   funext a
   by_cases hS : a ∈ S <;> by_cases hF : F a = 0 <;> simp [Set.indicator, hS, hF]
 
-theorem summable_of_support {α : Type} (S : Set α) (F : α → ℝ) (C : ℝ)
-    (h : Summable (fun γ : {a // a ∈ S ∧ F a ≠ 0} => F γ.1) ∧
-      ∑' γ : {a // a ∈ S ∧ F a ≠ 0}, F γ.1 ≤ C) :
-    Summable (fun γ : S => F γ.1) ∧ ∑' γ : S, F γ.1 ≤ C := by
+theorem summable_of_support
+    {α : Type} (S : Set α) (F : α → ℝ)
+    (C : ℝ)
+    (h : Summable (fun γ : {a // a ∈ S ∧ F a ≠ 0} => F γ.1)
+      ∧ ∑' γ : {a // a ∈ S ∧ F a ≠ 0}, F γ.1 ≤ C)
+    : Summable (fun γ : S => F γ.1) ∧ ∑' γ : S, F γ.1 ≤ C := by
   obtain ⟨hs, hle⟩ := h
   have key := indicator_eq_indicator_inter_support S F
   have hT : Summable (({a | a ∈ S ∧ F a ≠ 0} : Set α).indicator F) :=

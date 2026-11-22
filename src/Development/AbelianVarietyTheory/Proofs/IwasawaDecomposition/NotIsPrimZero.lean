@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SimpL
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef
 
 namespace GlobalTheory.PolFan
 
@@ -18,8 +19,7 @@ variable {O : Type} [CommRing O] (bar : O → O) {X : Type} [AddCommGroup X] [Mo
 def cellMult {m : ℕ} (δ : Fin m → balForms bar X) : ℕ :=
   Nat.card (Submodule.torsion ℤ (balForms bar X ⧸ Submodule.span ℤ (Set.range δ)))
 
-def IsPrim (β : balForms bar X) : Prop :=
-  ∀ (k : ℕ) (β' : balForms bar X), β = k • β' → k = 1
+def IsPrim (β : balForms bar X) : Prop := ∀ (k : ℕ) (β' : balForms bar X), β = k • β' → k = 1
 
 def maxMult (q : ℕ) (φ : InvFun O) : ℕ∞ :=
   ⨆ (X : Type) (_ : AddCommGroup X) (_ : Module O X) (_ : Module.Finite O X) (_ : Module.Projective O X)

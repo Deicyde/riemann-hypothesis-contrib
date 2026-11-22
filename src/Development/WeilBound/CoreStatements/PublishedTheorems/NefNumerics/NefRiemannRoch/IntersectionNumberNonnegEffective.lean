@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowLeG
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter Asymptotics
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 
 set_option autoImplicit false
@@ -24,7 +25,17 @@ noncomputable section
 
 namespace GlobalTheory.SheafCycle
 
-theorem interNum_nonneg_of_interNumRed_nonneg : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [Algebra k Γ(X, ⊤)], IsProjOver (strHom k (X := X)) → ∀ (d : ℕ) (F : X.Modules) [IsFiniteQC F], suppDim F ≤ (d : ℕ) → ∀ P : Fin d → LB X, (∀ i, (P i).IsLB) → (∀ Z : Closeds X, IsIrreducible (Z : Set X) → topologicalKrullDim (Z : Set X) = (d : ℕ) → 0 ≤ interNumRed k Z P) → 0 ≤ interNum k F P := by
+theorem interNum_nonneg_of_interNumRed_nonneg
+    : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [Algebra k Γ(X, ⊤)],
+      IsProjOver (strHom k (X := X))
+        → ∀ (d : ℕ) (F : X.Modules) [IsFiniteQC F],
+          suppDim F ≤ (d : ℕ)
+            → ∀ P : Fin d → LB X,
+              (∀ i, (P i).IsLB)
+                → (∀ Z : Closeds X,
+                  IsIrreducible (Z : Set X) → topologicalKrullDim (Z : Set X) = (d : ℕ)
+                    → 0 ≤ interNumRed k Z P)
+                → 0 ≤ interNum k F P := by
   intro k _ _ X _ hX d F _ hF P hP hZ
   haveI : NoetherianSpace X := by
     obtain ⟨N, i, hi, hc⟩ := hX
@@ -35,28 +46,34 @@ theorem interNum_nonneg_of_interNumRed_nonneg : ∀ (k : Type) [Field k] [Infini
     haveI : IsNoetherian X := {}
     infer_instance
   obtain ⟨C, hCfin, hCirr, hCeq⟩ :=
-    NoetherianSpace.exists_finite_set_closeds_irreducible (⟨support F, isClosed_support F⟩ : Closeds X)
-  have hT : {w : X | w ∈ support F ∧ topologicalKrullDim (closure {w} : Set X) = (d : WithBot ℕ∞)}.Finite := by
-    refine (hCfin.biUnion fun t _ => (show ({x : X | IsGenericPoint x (t : Set X)}).Subsingleton from
-      fun a ha b hb => ha.eq hb).finite).subset ?_
-    rintro w ⟨hw, hwd⟩
-    have hw' : w ∈ ((sSup C : Closeds X) : Set X) := by rw [← hCeq]; exact hw
-    rw [Closeds.coe_sSup, Set.sUnion_image,
-      (hCfin.isClosed_biUnion fun t _ => t.isClosed).closure_eq, Set.mem_iUnion₂] at hw'
-    obtain ⟨t, ht, hwt⟩ := hw'
-    obtain ⟨g, hg⟩ := QuasiSober.sober (hCirr t ht) t.isClosed
-    have hgs : g ∈ support F := by
-      have : (t : Set X) ⊆ support F := by
-        have h1 : t ≤ sSup C := le_sSup ht
-        rw [← hCeq] at h1
-        exact h1
-      exact this hg.mem
-    have hwg : w ∈ closure {g} := by
-      have hcl' : closure ({g} : Set X) = t := hg
-      rw [hcl']; exact hwt
-    have := eq_of_mem_closure hF hwd g hgs hwg
-    subst this
-    exact Set.mem_biUnion ht hg
+    NoetherianSpace.exists_finite_set_closeds_irreducible
+      (⟨support F, isClosed_support F⟩ : Closeds X)
+  have hT
+      : {w : X | w ∈ support F ∧ topologicalKrullDim (closure {w} : Set X) = (d : WithBot ℕ∞)}.Finite :=
+    by
+      refine (hCfin.biUnion fun t _ =>
+        (show ({x : X | IsGenericPoint x (t : Set X)}).Subsingleton from fun a ha b hb =>
+          ha.eq hb).finite).subset ?_
+      rintro w ⟨hw, hwd⟩
+      have hw' : w ∈ ((sSup C : Closeds X) : Set X) := by rw [← hCeq]; exact hw
+      rw [Closeds.coe_sSup, Set.sUnion_image,
+          (hCfin.isClosed_biUnion fun t _ => t.isClosed).closure_eq, Set.mem_iUnion₂]
+        at hw'
+      obtain ⟨t, ht, hwt⟩ := hw'
+      obtain ⟨g, hg⟩ := QuasiSober.sober (hCirr t ht) t.isClosed
+      have hgs : g ∈ support F := by
+        have : (t : Set X) ⊆ support F := by
+          have h1 : t ≤ sSup C := le_sSup ht
+          rw [← hCeq] at h1
+          exact h1
+        exact this hg.mem
+      have hwg : w ∈ closure {g} := by
+        have hcl' : closure ({g} : Set X) = t := hg
+        rw [hcl']
+        exact hwt
+      have := eq_of_mem_closure hF hwd g hgs hwg
+      subst this
+      exact Set.mem_biUnion ht hg
   rw [interNum_eq_sum_length_mul_interNumRed k X hX (Fin d) P hP F (by simpa using hF) hT.toFinset
     (fun w hw hwd => by
       rw [Set.Finite.mem_toFinset]

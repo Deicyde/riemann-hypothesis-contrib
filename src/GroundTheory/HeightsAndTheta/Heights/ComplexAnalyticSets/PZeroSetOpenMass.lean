@@ -14,8 +14,10 @@ open MvPolynomial MeasureTheory Filter Topology
 
 noncomputable section
 
-theorem exists_eval_ne_zero_of_isOpen {d : ℕ} {P : MvPolynomial (Fin d) ℂ} (hP : P ≠ 0)
-    {S : Set (Fin d → ℂ)} (hS : IsOpen S) (hne : S.Nonempty) : ∃ y ∈ S, eval y P ≠ 0 := by
+theorem exists_eval_ne_zero_of_isOpen
+    {d : ℕ} {P : MvPolynomial (Fin d) ℂ} (hP : P ≠ 0)
+    {S : Set (Fin d → ℂ)} (hS : IsOpen S) (hne : S.Nonempty)
+    : ∃ y ∈ S, eval y P ≠ 0 := by
   obtain ⟨y₀, hy₀⟩ := hne
   obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.mp hS y₀ hy₀
   by_contra h
@@ -27,8 +29,8 @@ theorem exists_eval_ne_zero_of_isOpen {d : ℕ} {P : MvPolynomial (Fin d) ℂ} (
   rw [map_zero]
   exact h y (hball (by rwa [ball_pi _ hr]))
 
-theorem eval_linPoly {n d : ℕ} (A : Matrix (Fin d) (Fin n) ℂ) (z : Fin n → ℂ) :
-    (fun i => eval z (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A i)) = A.mulVec z := by
+theorem eval_linPoly {n d : ℕ} (A : Matrix (Fin d) (Fin n) ℂ) (z : Fin n → ℂ)
+    : (fun i => eval z (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A i)) = A.mulVec z := by
   ext i
   simp [GroundTheory.Heights₂.Heights.ComplexSets.linPoly, Matrix.mulVec, dotProduct]
 
@@ -39,17 +41,22 @@ theorem finrank_real_fin_complex (d : ℕ) : Module.finrank ℝ (Fin d → ℂ) 
 theorem ZeroSetOpenMass.proof
     (hG : GroundTheory.Heights₂.Heights.ComplexSets.GenericProjectionFinite.Statement)
     (hD : GroundTheory.Heights₂.Heights.ComplexSets.DiscriminantCover.Statement)
-    (hF : FiniteMapOpen.Statement) : ZeroSetOpenMass.Statement := by
+    (hF : FiniteMapOpen.Statement)
+    : ZeroSetOpenMass.Statement := by
   intro n d W hW hdim x O hO hxO hxZ
   obtain ⟨A, hA⟩ := (hG n d W hW hdim).2.1
   obtain ⟨P, hP0, hPcov⟩ := hD n d W A hW hdim hA
-  have hopen := hF n d W (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A) hW hA.injective hA.finite x hxZ O
-    (hO.mem_nhds hxO)
-  have hfun : (fun z : Fin n → ℂ => fun i => eval z (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A i)) =
-      fun z => A.mulVec z := funext (eval_linPoly A)
+  have hopen :=
+    hF n d W (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A) hW hA.injective hA.finite x hxZ O
+      (hO.mem_nhds hxO)
+  have hfun
+      : (fun z : Fin n → ℂ => fun i =>
+          eval z (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A i))
+        = fun z => A.mulVec z :=
+    funext (eval_linPoly A)
   rw [hfun, eval_linPoly A x] at hopen
-  obtain ⟨y, hyS, hPy⟩ := exists_eval_ne_zero_of_isOpen hP0 isOpen_interior
-    ⟨_, mem_interior_iff_mem_nhds.mpr hopen⟩
+  obtain ⟨y, hyS, hPy⟩ :=
+    exists_eval_ne_zero_of_isOpen hP0 isOpen_interior ⟨_, mem_interior_iff_mem_nhds.mpr hopen⟩
   obtain ⟨z, ⟨hzW, hzO⟩, hzy⟩ := interior_subset hyS
   subst hzy
   obtain ⟨-, -, hloc⟩ := hPcov _ hPy

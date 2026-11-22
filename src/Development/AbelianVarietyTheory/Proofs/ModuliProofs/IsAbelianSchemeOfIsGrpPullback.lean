@@ -11,40 +11,57 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory.PolPull
 
-variable {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} {G' : Over S'}
+variable
+  {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} {G' : Over S'}
   {φ : G'.left ⟶ G.left} {L : LB G.left} {L' : LB G'.left}
 
-theorem isCommMonObj_of_isGrpPullback [GrpObj G] [GrpObj G'] [IsCommMonObj G]
-    (h : IsGrpPullback G' G f φ) : IsCommMonObj G' := by
+theorem isCommMonObj_of_isGrpPullback
+    [GrpObj G] [GrpObj G'] [IsCommMonObj G] (h : IsGrpPullback G' G f φ)
+    : IsCommMonObj G' := by
   rw [isCommMonObj_iff_isMulCommutative]
   intro T
   refine ⟨⟨fun x y => Over.OverMorphism.ext (h.1.hom_ext ?_ (by rw [Over.w, Over.w]))⟩⟩
   rw [← h.2 T x y (pushPt h.1.w x) (pushPt h.1.w y) rfl rfl,
     ← h.2 T y x (pushPt h.1.w y) (pushPt h.1.w x) rfl rfl, _root_.mul_comm]
 
-theorem isAbelianScheme_of_isGrpPullback [GrpObj G] [GrpObj G'] (hG : IsAbelianScheme G)
-    (h : IsGrpPullback G' G f φ) : IsAbelianScheme G' := by
+theorem isAbelianScheme_of_isGrpPullback
+    [GrpObj G] [GrpObj G'] (hG : IsAbelianScheme G) (h : IsGrpPullback G' G f φ)
+    : IsAbelianScheme G' := by
   have := hG.comm
-  exact
-    { comm := isCommMonObj_of_isGrpPullback h
-      smooth := MorphismProperty.of_isPullback (P := @Smooth) h.1 hG.smooth
-      proper := MorphismProperty.of_isPullback (P := @IsProper) h.1 hG.proper
-      geomConnected := MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hG.geomConnected }
+  exact {
+    comm := isCommMonObj_of_isGrpPullback h
+    smooth := MorphismProperty.of_isPullback (P := @Smooth) h.1 hG.smooth
+    proper := MorphismProperty.of_isPullback (P := @IsProper) h.1 hG.proper
+    geomConnected :=
+      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hG.geomConnected
+  }
 
-theorem relAmple_restrict (h : IsPullback φ G'.hom G.hom f) (hL : L.IsLB) (hL' : L'.IsLB)
-    (e : LBIso L' (L.pull φ)) (hA : Out.RelAmple G L) (V : S.Opens) (hV : IsAffineOpen V) :
-    Out.RelAmple (Over.mk (G'.hom ∣_ (f ⁻¹ᵁ V))) (L'.pull (G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι) := by
-  have H : IsPullback ((G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι ≫ φ) (G'.hom ∣_ (f ⁻¹ᵁ V)) G.hom ((f ⁻¹ᵁ V).ι ≫ f) :=
+theorem relAmple_restrict
+    (h : IsPullback φ G'.hom G.hom f) (hL : L.IsLB) (hL' : L'.IsLB) (e : LBIso L' (L.pull φ))
+    (hA : Out.RelAmple G L)
+    (V : S.Opens) (hV : IsAffineOpen V)
+    : Out.RelAmple (Over.mk (G'.hom ∣_ (f ⁻¹ᵁ V))) (L'.pull (G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι) := by
+  have H
+      : IsPullback ((G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι ≫ φ) (G'.hom ∣_ (f ⁻¹ᵁ V)) G.hom ((f ⁻¹ᵁ V).ι ≫ f) :=
     (isPullback_morphismRestrict G'.hom (f ⁻¹ᵁ V)).flip.paste_horiz h
-  obtain ⟨w, hw⟩ : LBIso (L'.pull (G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι) (L.pull ((G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι ≫ φ)) :=
+  obtain ⟨w, hw⟩
+      : LBIso (L'.pull (G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι) (L.pull ((G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι ≫ φ)) :=
     LBIso.chartPull (chartPullPull L' _ _ rfl)
-      (chartPullSame L (fun _ : PUnit => (G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι ≫ φ) (fun _ => φ) (fun _ => 1) _ fun _ => rfl) e
+      (chartPullSame L
+        (fun _ : PUnit => (G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι ≫ φ)
+        (fun _ => φ)
+        (fun _ => 1)
+        _
+        fun _ => rfl)
+      e
   let i := (G'.hom ⁻¹ᵁ (f ⁻¹ᵁ V)).ι
   have hPull : (L'.pull i).IsLB := by
     refine ⟨top_le_iff.1 ?_, ?_, ?_⟩
@@ -58,18 +75,24 @@ theorem relAmple_restrict (h : IsPullback φ G'.hom G.hom f) (hL : L.IsLB) (hL' 
     · intro I J K
       refine unit_ext fun y hy => ?_
       rw [map_mul, gm_res (𝟙 _) y _ hy, gm_res (𝟙 _) y _ hy, gm_res (𝟙 _) y _ hy,
-        gm_pull_g L' i (𝟙 _) y I J hy.1.1 hy.1.2,
-        gm_pull_g L' i (𝟙 _) y J K hy.1.2 hy.2,
+        gm_pull_g L' i (𝟙 _) y I J hy.1.1 hy.1.2, gm_pull_g L' i (𝟙 _) y J K hy.1.2 hy.2,
         gm_pull_g L' i (𝟙 _) y I K hy.1.1 hy.2]
       exact gm_cocycle hL' i y (mem_pull.1 hy.1.1) (mem_pull.1 hy.1.2) (mem_pull.1 hy.2)
-  exact relAmple_pull (A' := Over.mk (G'.hom ∣_ (f ⁻¹ᵁ V))) H hL hPull
-    ((isGen_iff w).1 hw) V hV (fun y => y.2) hA
+  exact relAmple_pull (A' := Over.mk (G'.hom ∣_ (f ⁻¹ᵁ V))) H hL hPull ((isGen_iff w).1 hw) V hV
+    (fun y => y.2)
+    hA
 
 theorem pol_pull_of_relAmple_local
-    (hloc : ∀ (S : Scheme.{0}) (A : Over S) (L : LB A.left), L.IsLB → QuasiCompact A.hom → QuasiSeparated A.hom →
-      (∀ s : S, ∃ (U : S.Opens) (_ : s ∈ U),
-        Out.RelAmple (Over.mk (A.hom ∣_ U)) (L.pull (A.hom ⁻¹ᵁ U).ι)) → Out.RelAmple A L) :
-    ∀ (S S' : Scheme.{0}) (G : Over S) (G' : Over S') [GrpObj G] [GrpObj G'] (f : S' ⟶ S) (φ : G'.left ⟶ G.left) (L : LB G.left) (L' : LB G'.left), L.IsLB → L'.IsLB → IsAbelianScheme G → IsGrpPullback G' G f φ → LBIso L' (L.pull φ) → IsAbelianScheme G' ∧ (Out.RelAmple G L → Out.RelAmple G' L') ∧ (Out.KTriv G L → Out.KTriv G' L') := by
+    (hloc : ∀ (S : Scheme.{0}) (A : Over S) (L : LB A.left),
+      L.IsLB → QuasiCompact A.hom → QuasiSeparated A.hom
+        → (∀ s : S, ∃ (U : S.Opens) (_ : s ∈ U),
+          Out.RelAmple (Over.mk (A.hom ∣_ U)) (L.pull (A.hom ⁻¹ᵁ U).ι))
+        → Out.RelAmple A L)
+    : ∀ (S S' : Scheme.{0}) (G : Over S) (G' : Over S') [GrpObj G] [GrpObj G'] (f : S' ⟶ S)
+        (φ : G'.left ⟶ G.left) (L : LB G.left) (L' : LB G'.left),
+      L.IsLB → L'.IsLB → IsAbelianScheme G → IsGrpPullback G' G f φ → LBIso L' (L.pull φ)
+        → IsAbelianScheme G' ∧ (Out.RelAmple G L → Out.RelAmple G' L')
+          ∧ (Out.KTriv G L → Out.KTriv G' L') := by
   intro S S' G G' _ _ f φ L L' hL hL' hG h e
   have hG' := isAbelianScheme_of_isGrpPullback hG h
   have := hG'.proper

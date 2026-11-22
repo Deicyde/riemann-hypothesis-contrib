@@ -5,15 +5,17 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.LocalGro
 @[expose] public section
 
 open MeasureTheory in
-theorem UpperTheory.ConvolutionTheory.G.quotFub_of :
-    UpperTheory.ConvolutionTheory.G.NormEx → UpperTheory.ConvolutionTheory.G.QuotEq → UpperTheory.ConvolutionTheory.G.QuotFub := by
+theorem UpperTheory.ConvolutionTheory.G.quotFub_of
+    : UpperTheory.ConvolutionTheory.G.NormEx → UpperTheory.ConvolutionTheory.G.QuotEq
+      → UpperTheory.ConvolutionTheory.G.QuotFub := by
   intro _ hE G _ _ _ _ _ _ _ _ T _ _ _ _ _ _ _ _ μ j ν hP X _ m _ F hF hinv ρ hρ hfin
   haveI : μ.IsHaarMeasure := hP.1.1
   have hρm : Measurable (fun x => ((ρ x).toReal : ℂ)) :=
     Complex.measurable_ofReal.comp hρ.1.ennreal_toReal
   have hH : Measurable (Function.uncurry fun (a : X) (x : G) => F a x * ((ρ x).toReal : ℂ)) :=
     hF.mul (hρm.comp measurable_snd)
-  have hint : Integrable (Function.uncurry fun (a : X) (x : G) => F a x * ((ρ x).toReal : ℂ)) (m.prod μ) := by
+  have hint : Integrable (Function.uncurry fun (a : X) (x : G) => F a x * ((ρ x).toReal : ℂ))
+      (m.prod μ) := by
     refine ⟨hH.aestronglyMeasurable, ?_⟩
     unfold HasFiniteIntegral
     rw [lintegral_prod _ hH.enorm.aemeasurable]
@@ -21,7 +23,8 @@ theorem UpperTheory.ConvolutionTheory.G.quotFub_of :
     refine lintegral_mono fun a => lintegral_mono fun x => ?_
     simp only [Function.uncurry, enorm_mul]
     gcongr
-    rw [← ofReal_norm_eq_enorm, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg ENNReal.toReal_nonneg]
+    rw [← ofReal_norm_eq_enorm, Complex.norm_real, Real.norm_eq_abs,
+      abs_of_nonneg ENNReal.toReal_nonneg]
     exact ENNReal.ofReal_toReal_le
   have hGm : Measurable (fun g => ∫ a, F a g ∂m) :=
     (hF.stronglyMeasurable.integral_prod_left).measurable

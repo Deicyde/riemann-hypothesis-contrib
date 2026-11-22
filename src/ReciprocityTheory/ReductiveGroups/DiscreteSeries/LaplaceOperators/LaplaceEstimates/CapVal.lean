@@ -53,10 +53,10 @@ lemma capelliC_mem {M : Type*} [AddCommGroup M] [Module ℂ M] (E : Fin n → Fi
 
 section Clos
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {D : Submodule ℂ H} {V : Submodule ℂ D} {ε : Fin n → Bool}
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {E : Fin n → Fin n → Module.End ℂ D}
-
 
 variable (ε σ V) in
 def clo : Submodule ℂ H :=
@@ -108,22 +108,31 @@ theorem capVal_main : CapValStatement := by
     obtain ⟨v', rfl⟩ := ι.surjective x'
     rw [opC_coef σ ι g 1 v v', ← hcoef g hg v v']
     rfl
-  have hval : ∀ g, inUJ ε g → ∀ v v' : V,
-      ⟪((v' : D) : H), σ g ((C v : D) : H)⟫_ℂ = P * ⟪((v' : D) : H), σ g ((v : D) : H)⟫_ℂ := by
+  have hval
+      : ∀ g,
+        inUJ ε g
+          → ∀ v v' : V,
+            ⟪((v' : D) : H), σ g ((C v : D) : H)⟫_ℂ
+              = P * ⟪((v' : D) : H), σ g ((v : D) : H)⟫_ℂ := by
     intro g hg v v'
     have h1 := S7.psiM_capelli T μ hμ (ω - ((n : ℂ) - 1) / 2) hg
     rw [show ω - ((n : ℂ) - 1) / 2 + ((n : ℂ) - 1) / 2 = ω by ring] at h1
-    rw [show Formalism.QuantumDeterminants.capelli ε ω (S7.PsiM T μ) = Formalism.QuantumDeterminants.qdetOp (Formalism.REAL.EabV ε) ω (S7.PsiM T μ)
-      from rfl, qdet_opC hσ hD ι hΨ hg ω] at h1
-    have h3 : Formalism.QuantumDeterminants.capP (fun s => (lam s : ℂ)) (ω - ((n : ℂ) - 1) / 2) = P := by
+    rw [show Formalism.QuantumDeterminants.capelli ε ω (S7.PsiM T μ)
+            = Formalism.QuantumDeterminants.qdetOp (Formalism.REAL.EabV ε) ω (S7.PsiM T μ) from
+          rfl,
+        qdet_opC hσ hD ι hΨ hg ω]
+      at h1
+    have h3
+        : Formalism.QuantumDeterminants.capP (fun s => (lam s : ℂ)) (ω - ((n : ℂ) - 1) / 2)
+          = P := by
       unfold Formalism.QuantumDeterminants.capP
       rw [hP]
       refine Finset.prod_congr rfl fun t _ => ?_
       unfold LemK.thV
       push_cast
       ring
-    rw [← opC_coef σ ι g C v v', ← mul_one C, h1, h3, hΨ g hg, _root_.smul_apply,
-      inner_smul_right, opC_coef]
+    rw [← opC_coef σ ι g C v v', ← mul_one C, h1, h3, hΨ g hg, _root_.smul_apply, inner_smul_right,
+      opC_coef]
     rfl
   have hA : ∀ v : V, C v = P • (v : D) := by
     intro v
@@ -160,19 +169,23 @@ theorem capVal_main : CapValStatement := by
   have hB : genSub E V ≤ LinearMap.ker (C - P • (1 : Module.End ℂ D)) := by
     refine sInf_le ⟨?_, ?_⟩
     · intro x hx
-      rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, sub_eq_zero]
+      rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
+        sub_eq_zero]
       exact hA ⟨x, hx⟩
     · intro a b x hx
       rw [LinearMap.mem_ker] at hx ⊢
-      have hcomm := Capelli.capelliCentral (Module.End ℂ D) n E ω
-        ((Capelli.isGlRep_iff_glRelR E).mp hD.glRep) a b
+      have hcomm :=
+        Capelli.capelliCentral (Module.End ℂ D) n E ω ((Capelli.isGlRep_iff_glRelR E).mp hD.glRep) a
+          b
       have hce : C (E a b x) = E a b (C x) := by
         have := congrArg (fun A : Module.End ℂ D => A x) hcomm.eq
         simpa [Module.End.mul_apply] using this.symm
       rw [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply] at hx ⊢
       rw [hce, ← map_smul, ← map_sub, hx, map_zero]
   have hm' := hB hm
-  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, sub_eq_zero] at hm'
+  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
+      sub_eq_zero]
+    at hm'
   exact hm'
 
 end ReciprocityTheory.ChartRestriction.DS.Lap.CapelliClosureMembership

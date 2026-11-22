@@ -14,21 +14,40 @@ noncomputable section
 
 namespace GlobalTheory.Cyc.Decomp
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.Cyc.Decomp TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
+  GlobalTheory.Cyc.Decomp TensorProduct
 
-theorem act_eq_of_mem_intC {l : ℕ} [Fact l.Prime]
+theorem act_eq_of_mem_intC
+    {l : ℕ} [Fact l.Prime]
     {act : GQ l →* (PadicComplex l ≃+* PadicComplex l)} (ha : IsActC act)
     {F : IntermediateField ℚ_[l] (Om l)} {σ : GQ l} (hσ : σ ∈ F.fixingSubgroup)
-    {y : PadicComplex l} (hy : y ∈ intC F) : act σ y = y := by
+    {y : PadicComplex l} (hy : y ∈ intC F)
+    : act σ y = y := by
   simp only [intC, inC, Set.mem_ofPred_eq, Set.mem_image, SetLike.mem_coe] at hy
   obtain ⟨⟨x, hxF, rfl⟩, -⟩ := hy
   rw [ha.1 σ x, (IntermediateField.mem_fixingSubgroup_iff F σ).1 hσ x hxF]
 
-theorem isDec_of_matrix : ∀ (l : ℕ) [Fact l.Prime] (act : GQ l →* (PadicComplex l ≃+* PadicComplex l)) (χ : GQ l →* ℚ_[l]ˣ) (K : FinExt l) (m d : ℕ) (M : GQ l → Matrix (Fin d) (Fin d) (PadicComplex l)) (D : Matrix (Fin d) (Fin d) (PadicComplex l)) (g : GQ l), IsActC act → IsGen χ K m g → (∀ i j, ContinuousOn (fun σ => M σ i j) (Gj K m)) → (∀ σ ∈ Gj K m, ∀ τ ∈ Gj K m, M (σ * τ) = M σ * M τ) → (∀ σ ∈ Gj K m, ∀ τ ∈ Gj K m, (M τ).map (act σ) = M τ) → (∀ i j, ‖D i j‖ ≤ 1) → (∃ X : Matrix (Fin d) (Fin d) (PadicComplex l), (∀ i j, ‖X i j‖ ≤ 1) ∧ D * X = (l : PadicComplex l) • (1 : Matrix (Fin d) (Fin d) (PadicComplex l))) → (∀ σ ∈ Gj K m, ∃ X : Matrix (Fin d) (Fin d) (PadicComplex l), (∀ i j, X i j ∈ intC (Ks K m)) ∧ M σ * D.map (act σ) = D * X) → (∀ σ ∈ Hinf K, M σ * D.map (act σ) = D) → (∃ X : Matrix (Fin d) (Fin d) (PadicComplex l), (∀ i j, ‖X i j‖ < rho1 l) ∧ M g * D.map (act g) - D = D * X) → ∃ U : GQ l → Matrix (Fin d) (Fin d) (PadicComplex l), IsDec act χ K m M D U g := by
+theorem isDec_of_matrix
+    : ∀ (l : ℕ) [Fact l.Prime] (act : GQ l →* (PadicComplex l ≃+* PadicComplex l))
+        (χ : GQ l →* ℚ_[l]ˣ) (K : FinExt l) (m d : ℕ)
+        (M : GQ l → Matrix (Fin d) (Fin d) (PadicComplex l))
+        (D : Matrix (Fin d) (Fin d) (PadicComplex l)) (g : GQ l),
+      IsActC act → IsGen χ K m g → (∀ i j, ContinuousOn (fun σ => M σ i j) (Gj K m))
+        → (∀ σ ∈ Gj K m, ∀ τ ∈ Gj K m, M (σ * τ) = M σ * M τ)
+        → (∀ σ ∈ Gj K m, ∀ τ ∈ Gj K m, (M τ).map (act σ) = M τ) → (∀ i j, ‖D i j‖ ≤ 1)
+        → (∃ X : Matrix (Fin d) (Fin d) (PadicComplex l),
+          (∀ i j, ‖X i j‖ ≤ 1)
+            ∧ D * X = (l : PadicComplex l) • (1 : Matrix (Fin d) (Fin d) (PadicComplex l)))
+        → (∀ σ ∈ Gj K m, ∃ X : Matrix (Fin d) (Fin d) (PadicComplex l),
+          (∀ i j, X i j ∈ intC (Ks K m)) ∧ M σ * D.map (act σ) = D * X)
+        → (∀ σ ∈ Hinf K, M σ * D.map (act σ) = D)
+        → (∃ X : Matrix (Fin d) (Fin d) (PadicComplex l),
+          (∀ i j, ‖X i j‖ < rho1 l) ∧ M g * D.map (act g) - D = D * X)
+        → ∃ U : GQ l → Matrix (Fin d) (Fin d) (PadicComplex l), IsDec act χ K m M D U g := by
   intro l _ act χ K m d M D g ha hg hMc hMmul hMfix hD hDinv hInt hH hgclose
   obtain ⟨Y, hY, hDY⟩ := hDinv
-  have hl : (l : PadicComplex l) ≠ 0 := by
-    exact_mod_cast (Fact.out : l.Prime).ne_zero
+  have hl : (l : PadicComplex l) ≠ 0 := by exact_mod_cast (Fact.out : l.Prime).ne_zero
 
   have hright : D * ((l : PadicComplex l)⁻¹ • Y) = 1 := by
     rw [Matrix.mul_smul, hDY, smul_smul, inv_mul_cancel₀ hl, one_smul]
@@ -37,12 +56,13 @@ theorem isDec_of_matrix : ∀ (l : ℕ) [Fact l.Prime] (act : GQ l →* (PadicCo
   have hDD : D⁻¹ * D = 1 := Matrix.nonsing_inv_mul D hdet
   have hDD' : D * D⁻¹ = 1 := Matrix.mul_nonsing_inv D hdet
 
-  have hmapmul : ∀ (e : PadicComplex l ≃+* PadicComplex l) (A B : Matrix (Fin d) (Fin d) (PadicComplex l)),
-      (A * B).map e = A.map e * B.map e := by
+  have hmapmul
+      : ∀ (e : PadicComplex l ≃+* PadicComplex l) (A B : Matrix (Fin d) (Fin d) (PadicComplex l)),
+        (A * B).map e = A.map e * B.map e := by
     intro e A B
     ext i j
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mul_apply, map_sum, map_mul]
+    simp [Matrix.mul_apply, map_sum, map_mul]
   have hmapcomp : ∀ σ τ : GQ l, D.map (act (σ * τ)) = (D.map (act τ)).map (act σ) := by
     intro σ τ
     ext i j
@@ -73,14 +93,15 @@ theorem isDec_of_matrix : ∀ (l : ℕ) [Fact l.Prime] (act : GQ l →* (PadicCo
       exact act_eq_of_mem_intC ha (show σ ∈ (Ks K m).fixingSubgroup from hσ) (hX i j)
     show D⁻¹ * (M (σ * τ) * D.map (act (σ * τ)))
       = D⁻¹ * (M σ * D.map (act σ)) * (D⁻¹ * (M τ * D.map (act τ)))
-    calc D⁻¹ * (M (σ * τ) * D.map (act (σ * τ)))
-        = D⁻¹ * (M σ * (M τ * D.map (act τ)).map (act σ)) := by
-          rw [hMmul σ hσ τ hτ, hmapmul, hMfix σ hσ τ hτ, hmapcomp]
-          simp only [Matrix.mul_assoc]
+    calc
+      D⁻¹ * (M (σ * τ) * D.map (act (σ * τ)))
+          = D⁻¹ * (M σ * (M τ * D.map (act τ)).map (act σ)) := by
+        rw [hMmul σ hσ τ hτ, hmapmul, hMfix σ hσ τ hτ, hmapcomp]
+        simp only [Matrix.mul_assoc]
       _ = D⁻¹ * (M σ * (D.map (act σ) * X)) := by rw [hMX, hmapmul, hXfix]
       _ = D⁻¹ * (M σ * D.map (act σ)) * (D⁻¹ * (M τ * D.map (act τ))) := by
-          rw [hUτ]
-          simp only [Matrix.mul_assoc]
+        rw [hUτ]
+        simp only [Matrix.mul_assoc]
   · intro σ hσ
     show D⁻¹ * (M σ * D.map (act σ)) = 1
     rw [hH σ hσ, hDD]

@@ -11,16 +11,21 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsPrope
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory CategoryTheory.Limits NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.GoodPts GlobalTheory.DefiniteAbelian
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory.GoodPts GlobalTheory.DefiniteAbelian
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.GoodDefinite
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
-theorem abLocus_eq_univ_of_definite (Xo : Moduli Dw l) (hq : Dw.q = 0) (T : CDVR) (x : Sp T.Fr ⟶ Xo.X)
-    (G : SAB H (Sp T.V)) (t' : SAB H (Sp T.Fr)) (m₁ : SABMap t' Xo.univ.t x)
-    (m₂ : SABMap t' G (spMap (algebraMap T.V T.Fr))) : abLocus G.G = Set.univ := by
+theorem abLocus_eq_univ_of_definite
+    (Xo : Moduli Dw l)
+    (hq : Dw.q = 0)
+    (T : CDVR) (x : Sp T.Fr ⟶ Xo.X) (G : SAB H (Sp T.V)) (t' : SAB H (Sp T.Fr))
+    (m₁ : SABMap t' Xo.univ.t x) (m₂ : SABMap t' G (spMap (algebraMap T.V T.Fr)))
+    : abLocus G.G = Set.univ := by
   obtain ⟨m, hm, hw⟩ := exists_w0_relation H
   obtain ⟨b, hb⟩ := Spec.map_surjective (x ≫ Xo.s)
   let β : KA l →+* T.Fr := b.hom
@@ -31,8 +36,9 @@ theorem abLocus_eq_univ_of_definite (Xo : Moduli Dw l) (hq : Dw.q = 0) (T : CDVR
   have hm' : (4 : T.Fr) * m = 1 + H.d := by exact_mod_cast hm
   let z : T.Fr := (1 + ρ) / 2
   have hz2 : 2 * z = 1 + ρ := mul_div_cancel₀ _ two_ne_zero
-  have hz : z * z + m = z := mul_left_cancel₀ (show (4 : T.Fr) ≠ 0 by norm_num) (by
-    linear_combination (2 * z + ρ - 1) * hz2 + hρ + hm')
+  have hz : z * z + m = z :=
+    mul_left_cancel₀ (show (4 : T.Fr) ≠ 0 by norm_num)
+      (by linear_combination (2 * z + ρ - 1) * hz2 + hρ + hm')
   obtain ⟨z₀, hz₀⟩ : ∃ z₀ : T.V, algebraMap T.V T.Fr z₀ = z := by
     rcases ValuationRing.isInteger_or_isInteger T.V z with h | ⟨u, hu⟩
     · exact h
@@ -46,9 +52,12 @@ theorem abLocus_eq_univ_of_definite (Xo : Moduli Dw l) (hq : Dw.q = 0) (T : CDVR
   let a : T.Fr →+* L := algebraMap T.Fr L
   have : CharZero L := (RingHom.charZero_iff a.injective).1 inferInstance
   have hdet := (Xo.univ.geom L (spMap a ≫ x) (a.comp β) (by rw [Category.assoc, hβ, sp_comp])).1
-  have h₁ := actsBy_of_detCond Dw hq _ (spMap a ≫ x) _ (a z)
-    (by rw [← map_ofNat a 2, ← map_mul, hz2, map_add (f := _), map_one]; rfl) hdet
-  have h₂ := (actsBy_pull m₂.cart (m₂.act H.w0) (spMap a) _).1 ((actsBy_pull m₁.cart (m₁.act H.w0) (spMap a) _).2 h₁)
+  have h₁ :=
+    actsBy_of_detCond Dw hq _ (spMap a ≫ x) _ (a z)
+      (by rw [← map_ofNat a 2, ← map_mul, hz2, map_add (f := _), map_one]; rfl) hdet
+  have h₂ :=
+    (actsBy_pull m₂.cart (m₂.act H.w0) (spMap a) _).1
+      ((actsBy_pull m₁.cart (m₁.act H.w0) (spMap a) _).2 h₁)
   have := G.semi.smooth
   have := G.semi.separated
   have := G.act.hom H.w0
@@ -64,14 +73,23 @@ theorem abLocus_eq_univ_of_definite (Xo : Moduli Dw l) (hq : Dw.q = 0) (T : CDVR
   rw [ht] at h₄
   obtain ⟨X⟩ := G.semi.fibres K t
   exact isProper_of_actsBy X (OAct.pullback t G.G G.act) H.d_prime hm hw _
-    ((actsBy_pull (isGrpPullback_pullback G.G t) (pullback.lift_fst _ _ _) _ _).2 (by rwa [Category.id_comp]))
+    ((actsBy_pull (isGrpPullback_pullback G.G t) (pullback.lift_fst _ _ _) _ _).2
+      (by rwa [Category.id_comp]))
 
-theorem good_of_definite : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
-    (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), Dw.q = 0 →
-    ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io), Good y := by
+theorem good_of_definite
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l),
+      Dw.q = 0 → ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io), Good y := by
   intro E _ _ _ H Dw l Xo c hq T io y
   obtain ⟨G, t', m₁, m₂, -⟩ := y.2.2
-  exact ⟨G, t', m₁, m₂, GlobalTheory.GoodProper.isProper_of_abLocus_eq_univ E H Dw l Xo T _ G t' m₁ m₂
-    (abLocus_eq_univ_of_definite Xo hq T _ G t' m₁ m₂)⟩
+  exact ⟨
+    G,
+    t',
+    m₁,
+    m₂,
+    GlobalTheory.GoodProper.isProper_of_abLocus_eq_univ E H Dw l Xo T _ G t' m₁ m₂
+      (abLocus_eq_univ_of_definite Xo hq T _ G t' m₁ m₂)
+  ⟩
 
 end GlobalTheory.GoodDefinite

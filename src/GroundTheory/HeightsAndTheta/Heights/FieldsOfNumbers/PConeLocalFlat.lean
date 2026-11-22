@@ -15,9 +15,9 @@ noncomputable section
 
 universe u
 
-
 set_option maxHeartbeats 400000 in
-theorem ConeLocalFlat.proof (h : ConePolyLocalization.Statement.{u}) : ConeLocalFlat.Statement.{u} := by
+theorem ConeLocalFlat.proof (h : ConePolyLocalization.Statement.{u})
+    : ConeLocalFlat.Statement.{u} := by
   set_option synthInstance.maxHeartbeats 200000 in
   intro F _ K _ _ ι _ P hP W hW hPW
   have := hP.isPrime
@@ -32,13 +32,15 @@ theorem ConeLocalFlat.proof (h : ConePolyLocalization.Statement.{u}) : ConeLocal
     IsLocalization.AtPrime.isLocalRing (coneLocal P W hPW)
       ((maximalIdeal (degZeroLoc P {W})).map (C : degZeroLoc P {W} →+* MvPolynomial K _))
   refine ⟨hA, hR, ?_, ?_⟩
-  · have := IsLocalization.flat (coneLocal P W hPW)
-      ((maximalIdeal (degZeroLoc P {W})).map (C : degZeroLoc P {W} →+* MvPolynomial K _)).primeCompl
+  · have :=
+      IsLocalization.flat (coneLocal P W hPW)
+        ((maximalIdeal (degZeroLoc P {W})).map
+          (C : degZeroLoc P {W} →+* MvPolynomial K _)).primeCompl
     exact Module.Flat.trans _ (MvPolynomial K (degZeroLoc P {W})) _
   · rw [← IsLocalization.AtPrime.map_eq_maximalIdeal
-      ((maximalIdeal (degZeroLoc P {W})).map (C : degZeroLoc P {W} →+* MvPolynomial K _))
-      (coneLocal P W hPW), Ideal.map_map, ← MvPolynomial.algebraMap_eq,
-      ← IsScalarTower.algebraMap_eq]
+        ((maximalIdeal (degZeroLoc P {W})).map (C : degZeroLoc P {W} →+* MvPolynomial K _))
+        (coneLocal P W hPW),
+      Ideal.map_map, ← MvPolynomial.algebraMap_eq, ← IsScalarTower.algebraMap_eq]
 
 end
 

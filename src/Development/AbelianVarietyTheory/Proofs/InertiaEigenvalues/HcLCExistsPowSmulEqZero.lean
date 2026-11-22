@@ -14,9 +14,11 @@ open ReciprocityTheory.Gal
 open Formalism.NG
 namespace GlobalTheory
 
-theorem hcLC_exists_pow_smul_eq_zero : ∀ {O : Type} [CommRing O] {G : Type} [Group G] [TopologicalSpace G] [CompactSpace G]
-    {M : Type} [AddCommGroup M] [Module O M] (ρ : Representation O G M) (ϖ : O),
-    (∀ m : M, ∃ n : ℕ, ϖ ^ n • m = 0) → ∀ x ∈ ReciprocityTheory.ChartRestriction.T2.HcLC ρ, ∃ n : ℕ, ϖ ^ n • x = 0 := by
+theorem hcLC_exists_pow_smul_eq_zero
+    : ∀ {O : Type} [CommRing O] {G : Type} [Group G] [TopologicalSpace G] [CompactSpace G]
+        {M : Type} [AddCommGroup M] [Module O M] (ρ : Representation O G M) (ϖ : O),
+      (∀ m : M, ∃ n : ℕ, ϖ ^ n • m = 0)
+        → ∀ x ∈ ReciprocityTheory.ChartRestriction.T2.HcLC ρ, ∃ n : ℕ, ϖ ^ n • x = 0 := by
   intro O _ G _ _ _ M _ _ ρ ϖ hM x hx
   obtain ⟨c, hc, rfl⟩ := Submodule.mem_map.1 hx
   have hlc : IsLocallyConstant (c : G → M) := hc

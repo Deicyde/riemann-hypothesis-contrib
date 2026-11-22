@@ -10,18 +10,21 @@ open Filter Topology
 
 namespace GlobalTheory.LinSchur
 
-
 open Classical in
-theorem exists_finset_eq_sum_cind {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
-    (L : AddSubgroup X) (hL : IsOpen (L : Set X)) (f : X → ℂ) (hf : f ∈ GlobalTheory.WeilM.SB X)
-    (hper : ∀ Y, ∀ C ∈ L, f (Y + C) = f Y) :
-    ∃ F : Finset X, f = ∑ y ∈ F, f y • GlobalTheory.LinSchur.cind L y := by
+theorem exists_finset_eq_sum_cind
+    {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
+    (L : AddSubgroup X) (hL : IsOpen (L : Set X))
+    (f : X → ℂ) (hf : f ∈ GlobalTheory.WeilM.SB X) (hper : ∀ Y, ∀ C ∈ L, f (Y + C) = f Y)
+    : ∃ F : Finset X, f = ∑ y ∈ F, f y • GlobalTheory.LinSchur.cind L y := by
   have hK : IsCompact (tsupport f) := hf.2
-  obtain ⟨F0, -, hcov⟩ := hK.elim_nhds_subcover (fun x => {Y | Y - x ∈ L}) (fun x _ =>
-    (hL.preimage (continuous_id.sub continuous_const)).mem_nhds (by simp))
+  obtain ⟨F0, -, hcov⟩ :=
+    hK.elim_nhds_subcover
+      (fun x => {Y | Y - x ∈ L})
+      (fun x _ => (hL.preimage (continuous_id.sub continuous_const)).mem_nhds (by simp))
   refine ⟨(F0.image (QuotientAddGroup.mk (s := L))).image Quotient.out, ?_⟩
-  have hmk : ∀ y ∈ (F0.image (QuotientAddGroup.mk (s := L))).image Quotient.out, ∀ Y : X,
-      Y - y ∈ L ↔ (QuotientAddGroup.mk Y : X ⧸ L) = QuotientAddGroup.mk y := by
+  have hmk
+      : ∀ y ∈ (F0.image (QuotientAddGroup.mk (s := L))).image Quotient.out, ∀ Y : X,
+        Y - y ∈ L ↔ (QuotientAddGroup.mk Y : X ⧸ L) = QuotientAddGroup.mk y := by
     intro y _ Y
     rw [QuotientAddGroup.eq, ← neg_mem_iff]
     simp [sub_eq_add_neg, add_comm]
@@ -52,8 +55,9 @@ theorem exists_finset_eq_sum_cind {X : Type} [AddCommGroup X] [TopologicalSpace 
     have := hcov hY
     simp only [Set.mem_iUnion, Set.mem_setOf_eq, exists_prop] at this
     obtain ⟨y0, hy0, hYy0⟩ := this
-    have hmem : (QuotientAddGroup.mk y0 : X ⧸ L).out ∈
-        (F0.image (QuotientAddGroup.mk (s := L))).image Quotient.out :=
+    have hmem
+        : (QuotientAddGroup.mk y0 : X ⧸ L).out
+          ∈ (F0.image (QuotientAddGroup.mk (s := L))).image Quotient.out :=
       Finset.mem_image.mpr ⟨_, Finset.mem_image.mpr ⟨y0, hy0, rfl⟩, rfl⟩
     apply hex _ hmem
     rw [hmk _ hmem, QuotientAddGroup.out_eq']

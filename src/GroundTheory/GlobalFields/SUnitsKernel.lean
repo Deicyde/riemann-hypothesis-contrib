@@ -15,14 +15,15 @@ variable {K : Type*} [Field K] [NumberField K]
 
 namespace SUnit
 
-theorem forall_valuation_eq_one_iff (x : Kˣ) :
-    (∀ v : HeightOneSpectrum (𝓞 K), v.valuation K (x : K) = 1) ↔
-      x ∈ (Units.map (algebraMap (𝓞 K) K : 𝓞 K →* K)).range := by
+theorem forall_valuation_eq_one_iff (x : Kˣ)
+    : (∀ v : HeightOneSpectrum (𝓞 K), v.valuation K (x : K) = 1)
+      ↔ x ∈ (Units.map (algebraMap (𝓞 K) K : 𝓞 K →* K)).range := by
   constructor
   · intro h
     obtain ⟨a, ha⟩ := mem_integers_of_valuation_le_one (R := 𝓞 K) K (x : K) fun v => (h v).le
-    obtain ⟨b, hb⟩ := mem_integers_of_valuation_le_one (R := 𝓞 K) K ((x⁻¹ : Kˣ) : K) fun v => by
-      rw [Units.val_inv_eq_inv_val, map_inv₀, h v, inv_one]
+    obtain ⟨b, hb⟩ :=
+      mem_integers_of_valuation_le_one (R := 𝓞 K) K ((x⁻¹ : Kˣ) : K) fun v => by
+        rw [Units.val_inv_eq_inv_val, map_inv₀, h v, inv_one]
     have hab : a * b = 1 := by
       apply IsFractionRing.injective (𝓞 K) K
       rw [map_mul, ha, hb, map_one, Units.mul_inv]
@@ -36,8 +37,10 @@ theorem forall_valuation_eq_one_iff (x : Kˣ) :
 variable (S : Set (HeightOneSpectrum (𝓞 K)))
 
 def ofUnits : (𝓞 K)ˣ →* S.unit K where
-  toFun u := ⟨Units.map (algebraMap (𝓞 K) K : 𝓞 K →* K) u, fun v _ =>
-    (forall_valuation_eq_one_iff _).mpr ⟨u, rfl⟩ v⟩
+  toFun u := ⟨
+    Units.map (algebraMap (𝓞 K) K : 𝓞 K →* K) u,
+    fun v _ => (forall_valuation_eq_one_iff _).mpr ⟨u, rfl⟩ v
+  ⟩
   map_one' := by ext; simp
   map_mul' _ _ := by ext; simp
 
@@ -51,18 +54,20 @@ theorem ofUnits_injective : Function.Injective (ofUnits S (K := K)) := by
   exact Units.ext (IsFractionRing.injective (𝓞 K) K this)
 
 def valuationVector : Additive (S.unit K) →ₗ[ℤ] (S → ℤ) :=
-  AddMonoidHom.toIntLinearMap
-    { toFun := fun x v => Multiplicative.toAdd (v.1.valuationOfNeZero ((x.toMul : S.unit K) : Kˣ))
-      map_zero' := by funext v; simp
-      map_add' := fun x y => by funext v; simp }
+  AddMonoidHom.toIntLinearMap {
+    toFun := fun x v => Multiplicative.toAdd (v.1.valuationOfNeZero ((x.toMul : S.unit K) : Kˣ))
+    map_zero' := by funext v; simp
+    map_add' := fun x y => by funext v; simp
+  }
 
-theorem valuationVector_apply (x : S.unit K) (v : S) :
-    valuationVector S (Additive.ofMul x) v = Multiplicative.toAdd (v.1.valuationOfNeZero (x : Kˣ)) :=
+theorem valuationVector_apply (x : S.unit K) (v : S)
+    : valuationVector S (Additive.ofMul x) v
+      = Multiplicative.toAdd (v.1.valuationOfNeZero (x : Kˣ)) :=
   rfl
 
-theorem mem_ker_valuationVector_iff (x : S.unit K) :
-    Additive.ofMul x ∈ LinearMap.ker (valuationVector S) ↔
-      ∀ v : HeightOneSpectrum (𝓞 K), v.valuation K ((x : Kˣ) : K) = 1 := by
+theorem mem_ker_valuationVector_iff (x : S.unit K)
+    : Additive.ofMul x ∈ LinearMap.ker (valuationVector S)
+      ↔ ∀ v : HeightOneSpectrum (𝓞 K), v.valuation K ((x : Kˣ) : K) = 1 := by
   rw [LinearMap.mem_ker]
   constructor
   · intro h v
@@ -77,26 +82,29 @@ theorem mem_ker_valuationVector_iff (x : S.unit K) :
       valuationOfNeZero_eq, WithZero.coe_one]
     exact h v.1
 
-theorem ker_valuationVector :
-    LinearMap.ker (valuationVector S) =
-      LinearMap.range (ofUnits S).toAdditive.toIntLinearMap := by
+theorem ker_valuationVector
+    : LinearMap.ker (valuationVector S)
+      = LinearMap.range (ofUnits S).toAdditive.toIntLinearMap := by
   ext x
   rw [← ofMul_toMul x, mem_ker_valuationVector_iff, LinearMap.mem_range]
   constructor
   · intro h
     obtain ⟨u, hu⟩ := (forall_valuation_eq_one_iff _).mp h
-    exact ⟨Additive.ofMul u, by
-      change Additive.ofMul (ofUnits S u) = _
-      congr 1
-      exact Subtype.ext hu⟩
+    exact ⟨
+      Additive.ofMul u,
+      by
+        change Additive.ofMul (ofUnits S u) = _
+        congr 1
+        exact Subtype.ext hu
+    ⟩
   · rintro ⟨u, hu⟩
     have hx : ofUnits S u.toMul = x.toMul := congrArg Additive.toMul hu
     rw [← hx]
     exact (forall_valuation_eq_one_iff _).mpr ⟨u.toMul, rfl⟩
 
 def unitsEquivKer : Additive (𝓞 K)ˣ ≃ₗ[ℤ] LinearMap.ker (valuationVector S) :=
-  (LinearEquiv.ofInjective (ofUnits S).toAdditive.toIntLinearMap
-    (ofUnits_injective S)).trans (LinearEquiv.ofEq _ _ (ker_valuationVector S).symm)
+  (LinearEquiv.ofInjective (ofUnits S).toAdditive.toIntLinearMap (ofUnits_injective S)).trans
+    (LinearEquiv.ofEq _ _ (ker_valuationVector S).symm)
 
 end SUnit
 

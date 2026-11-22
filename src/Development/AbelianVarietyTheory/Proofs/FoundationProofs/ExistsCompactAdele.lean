@@ -16,7 +16,9 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.ExistsIsFun
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory NumberField Matrix Topology GlobalTheory.Mem.Vol
+open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice MeasureTheory NumberField Matrix Topology
+  GlobalTheory.Mem.Vol
 open Formalism.L2.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.VolPairExists
 open scoped TensorProduct
 
@@ -24,27 +26,37 @@ namespace GlobalTheory.Mem.VolExists
 
 section Chart
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem infEmb_tmul (h : IsCMExt F E σ) {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
-    (a : Ainf F) (x : E) : θ (a ⊗ₜ x) = GlobalTheory.InfAdeleCM.ext (τ.comp (algebraMap F E)) a * τ x :=
+theorem infEmb_tmul
+    (h : IsCMExt F E σ)
+    {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
+    (a : Ainf F) (x : E)
+    : θ (a ⊗ₜ x) = GlobalTheory.InfAdeleCM.ext (τ.comp (algebraMap F E)) a * τ x :=
   haveI := h.1
   GlobalTheory.InfAdeleCM.hom_tmul τ θ hθ.1 hθ.2 a x
 
-theorem infEmb_unique (h : IsCMExt F E σ) {τ : E →+* ℂ} {θ θ' : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
-    (hθ' : IsInfEmb τ θ') : θ = θ' := by
+theorem infEmb_unique
+    (h : IsCMExt F E σ)
+    {τ : E →+* ℂ} {θ θ' : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ) (hθ' : IsInfEmb τ θ')
+    : θ = θ' := by
   refine RingHom.ext fun z => ?_
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul a x => rw [infEmb_tmul h hθ, infEmb_tmul h hθ']
   | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
 
-theorem infEmb_continuous {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ) : Continuous θ :=
+theorem infEmb_continuous {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
+    : Continuous θ :=
   haveI : IsModuleTopology (Ainf F) (Ainf F ⊗[F] E) := ⟨rfl⟩
   IsModuleTopology.continuous_of_ringHom (R := Ainf F) θ hθ.2
 
-theorem infEmb_sigR (h : IsCMExt F E σ) {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
-    (z : Ainf F ⊗[F] E) : θ (sigR (Ainf F) σ z) = starRingEnd ℂ (θ z) := by
+theorem infEmb_sigR
+    (h : IsCMExt F E σ)
+    {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
+    (z : Ainf F ⊗[F] E)
+    : θ (sigR (Ainf F) σ z) = starRingEnd ℂ (θ z) := by
   haveI := h.1
   induction z using TensorProduct.induction_on with
   | zero => simp
@@ -54,9 +66,11 @@ theorem infEmb_sigR (h : IsCMExt F E σ) {τ : E →+* ℂ} {θ : Ainf F ⊗[F] 
     rfl
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-theorem infEmb_bijective (h : IsCMExt F E σ) {I : Type} {τ : I → (E →+* ℂ)} (hτ : IsCMFam τ)
-    {θ : I → (Ainf F ⊗[F] E →+* ℂ)} (hθ : ∀ ρ, IsInfEmb (τ ρ) (θ ρ)) :
-    Function.Bijective fun (z : Ainf F ⊗[F] E) (ρ : I) => θ ρ z := by
+theorem infEmb_bijective
+    (h : IsCMExt F E σ)
+    {I : Type} {τ : I → (E →+* ℂ)} (hτ : IsCMFam τ)
+    {θ : I → (Ainf F ⊗[F] E →+* ℂ)} (hθ : ∀ ρ, IsInfEmb (τ ρ) (θ ρ))
+    : Function.Bijective fun (z : Ainf F ⊗[F] E) (ρ : I) => θ ρ z := by
   haveI := h.1
   haveI := h.2.1
   haveI : Module.Finite F E := Module.Finite.of_restrictScalars_finite ℚ F E
@@ -80,8 +94,10 @@ theorem infEmb_bijective (h : IsCMExt F E σ) {I : Type} {τ : I → (E →+* �
       rcases InfinitePlace.mk_eq_iff.1 hi with e | e
       · exact ⟨i, e⟩
       · exact absurd ⟨i, by rw [← e]; ext x; simp⟩ hn
-  have hb := GlobalTheory.InfAdeleCM.bijective c h.2.2.1 hc1 hc θ₀
-    (fun φ => GlobalTheory.InfAdeleCM.hom_tmul φ (θ₀ φ) (h1 φ) (h2 φ)) _ hΨ
+  have hb :=
+    GlobalTheory.InfAdeleCM.bijective c h.2.2.1 hc1 hc θ₀
+      (fun φ => GlobalTheory.InfAdeleCM.hom_tmul φ (θ₀ φ) (h1 φ) (h2 φ))
+      _ hΨ
   have hinj : Function.Injective τ := fun i j e => hτ.1 (by simp only [e])
   have e0 : ∀ ρ, θ ρ = θ₀ (τ ρ) := fun ρ => infEmb_unique h (hθ ρ) ⟨h1 _, h2 _⟩
   have := ((Equiv.ofInjective τ hinj).symm.arrowCongr (Equiv.refl ℂ)).bijective.comp hb
@@ -90,11 +106,19 @@ theorem infEmb_bijective (h : IsCMExt F E σ) {I : Type} {τ : I → (E →+* �
   rw [e0]
   rfl
 
-theorem exists_compact_adele (h : IsCMExt F E σ) {I : Type} [Fintype I] {τ : I → (E →+* ℂ)} (hτ : IsCMFam τ)
-    {θ : I → (Ainf F ⊗[F] E →+* ℂ)} (hθ : ∀ ρ, IsInfEmb (τ ρ) (θ ρ)) (R : ℝ) (C : Set (Af F ⊗[F] E))
-    (hC : IsCompact C) : ∃ K : Set (AF F ⊗[F] E), IsCompact K ∧ ∀ z : AF F ⊗[F] E,
-      Algebra.TensorProduct.map (sndA F) (AlgHom.id F E) z ∈ C →
-      (∀ ρ, ‖θ ρ (Algebra.TensorProduct.map (fstA F) (AlgHom.id F E) z)‖ ≤ R) → z ∈ K := by
+theorem exists_compact_adele
+    (h : IsCMExt F E σ)
+    {I : Type} [Fintype I]
+    {τ : I → (E →+* ℂ)} (hτ : IsCMFam τ)
+    {θ : I → (Ainf F ⊗[F] E →+* ℂ)} (hθ : ∀ ρ, IsInfEmb (τ ρ) (θ ρ))
+    (R : ℝ)
+    (C : Set (Af F ⊗[F] E)) (hC : IsCompact C)
+    : ∃ K : Set (AF F ⊗[F] E),
+      IsCompact K
+        ∧ ∀ z : AF F ⊗[F] E,
+          Algebra.TensorProduct.map (sndA F) (AlgHom.id F E) z ∈ C
+            → (∀ ρ, ‖θ ρ (Algebra.TensorProduct.map (fstA F) (AlgHom.id F E) z)‖ ≤ R)
+            → z ∈ K := by
   haveI : Module.Finite F E := Module.Finite.of_restrictScalars_finite ℚ F E
   haveI : IsModuleTopology (Ainf F) (Ainf F ⊗[F] E) := ⟨rfl⟩
   haveI : IsTopologicalRing (Ainf F ⊗[F] E) := IsModuleTopology.isTopologicalRing (Ainf F) _
@@ -118,29 +142,34 @@ theorem exists_compact_adele (h : IsCMExt F E σ) {I : Type} [Fintype I] {τ : I
 
 variable {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
 
-theorem continuous_infMat {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ) :
-    Continuous fun h => infMat σ J θ h := by
+theorem continuous_infMat {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
+    : Continuous fun h => infMat σ J θ h := by
   have h1 : Continuous fun h : HA (AF F) σ J => (HA.mat (AF F) σ J h).1 :=
     Units.continuous_val.comp (continuous_subtype_val (p := (· ∈ HR (AF F) σ J)))
-  exact (h1.matrix_map (GlobalTheory.Member.Arch.continuous_inf F E)).matrix_map (infEmb_continuous hθ)
+  exact (h1.matrix_map (GlobalTheory.Member.Arch.continuous_inf F E)).matrix_map
+    (infEmb_continuous hθ)
 
 theorem continuous_finMat : Continuous fun h => finMat σ J h := by
   have h1 : Continuous fun h : HA (AF F) σ J => (HA.mat (AF F) σ J h).1 :=
     Units.continuous_val.comp (continuous_subtype_val (p := (· ∈ HR (AF F) σ J)))
   exact h1.matrix_map (GlobalTheory.LevelOpen.continuous_fin F E)
 
-theorem JR_map {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ) :
-    (JR (F := F) (Ainf F) J).map θ = J.map τ :=
+theorem JR_map {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
+    : (JR (F := F) (Ainf F) J).map θ = J.map τ :=
   Matrix.ext fun _ _ => hθ.1 _
 
-theorem infMat_unitary (h : IsCMExt F E σ) {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
-    (g : HA (AF F) σ J) : (infMat σ J θ g)ᴴ * J.map τ * infMat σ J θ g = J.map τ := by
+theorem infMat_unitary
+    (h : IsCMExt F E σ)
+    {τ : E →+* ℂ} {θ : Ainf F ⊗[F] E →+* ℂ} (hθ : IsInfEmb τ θ)
+    (g : HA (AF F) σ J)
+    : (infMat σ J θ g)ᴴ * J.map τ * infMat σ J θ g = J.map τ := by
   have hm := GlobalTheory.Member.Arch.inf_mem σ J (HA.mat (AF F) σ J g) g.2
-  have h2 := GlobalTheory.Member.Arch.form_map _ θ (infEmb_sigR h hθ)
-    ((HA.mat (AF F) σ J g).1.map (Algebra.TensorProduct.map (fstA F) (AlgHom.id F E))) (JR (Ainf F) J)
+  have h2 :=
+    GlobalTheory.Member.Arch.form_map _ θ (infEmb_sigR h hθ)
+      ((HA.mat (AF F) σ J g).1.map (Algebra.TensorProduct.map (fstA F) (AlgHom.id F E)))
+      (JR (Ainf F) J)
   rw [← JR_map J hθ]
   exact h2.symm.trans (congrArg (fun X => X.map θ) hm)
-
 
 variable (σ) in
 def stab (L : Set (Fin M → E)) : Subgroup (HA (AF F) σ J) where
@@ -153,14 +182,17 @@ def stab (L : Set (Fin M → E)) : Subgroup (HA (AF F) σ J) where
     refine Iff.trans ?_ (ha _).symm
     rw [Matrix.mulVec_mulVec, ← finMat_mul, mul_inv_cancel, finMat_one, Matrix.one_mulVec]
 
-theorem isOpen_stab (L : Submodule (𝓞 E) (Fin M → E)) (hfg : L.FG)
-    (hsp : Submodule.span E (L : Set (Fin M → E)) = ⊤) : IsOpen (stab σ J L : Set (HA (AF F) σ J)) := by
+theorem isOpen_stab
+    (L : Submodule (𝓞 E) (Fin M → E))
+    (hfg : L.FG) (hsp : Submodule.span E (L : Set (Fin M → E)) = ⊤)
+    : IsOpen (stab σ J L : Set (HA (AF F) σ J)) := by
   have := Unfold.topGroupHA σ J
   have hn := GlobalTheory.LevelOpen.congr_mem_nhds F E M L hfg hsp 1 one_pos
   have hc := continuous_finMat (σ := σ) J
   have h1 := hc.continuousAt (x := 1) |>.preimage_mem_nhds (by rw [finMat_one]; exact hn)
-  have h2 := (hc.comp continuous_inv).continuousAt (x := 1) |>.preimage_mem_nhds
-    (by rw [Function.comp_apply, inv_one, finMat_one]; exact hn)
+  have h2 :=
+    (hc.comp continuous_inv).continuousAt (x := 1)
+      |>.preimage_mem_nhds (by rw [Function.comp_apply, inv_one, finMat_one]; exact hn)
   refine Subgroup.isOpen_of_mem_nhds _ (g := 1) (Filter.mem_of_superset (Filter.inter_mem h1 h2) ?_)
   rintro k ⟨hk1, hk2⟩ y
   constructor
@@ -171,7 +203,8 @@ theorem isOpen_stab (L : Submodule (𝓞 E) (Fin M → E)) (hfg : L.FG)
   · intro hy
     obtain ⟨w, hw, h⟩ := hk2 _ hy
     rw [Function.comp_apply, Matrix.mulVec_mulVec, ← finMat_mul, inv_mul_cancel, finMat_one,
-      Matrix.one_mulVec] at h
+        Matrix.one_mulVec]
+      at h
     rw [eq_add_of_sub_eq h]
     exact add_mem (nsmul_mem hw 1) hy
 
@@ -187,8 +220,10 @@ theorem isCMExt (cm : CMData F E) : IsCMExt F E cm.sig :=
 theorem isHermND (cm : CMData F E) (W : HSpace E) : IsHermND cm.sig W.gram :=
   ⟨fun i j => W.herm.eq (W.frame j) (W.frame i), GlobalTheory.StabCompact.det_gram_ne_zero W⟩
 
-theorem exists_lattice (W : HSpace E) : ∃ L : Submodule (𝓞 E) (Fin W.rank → E), L.FG ∧
-    Submodule.span E (L : Set (Fin W.rank → E)) = ⊤ ∧ (L : Set (Fin W.rank → E)) = latC W := by
+theorem exists_lattice (W : HSpace E)
+    : ∃ L : Submodule (𝓞 E) (Fin W.rank → E),
+      L.FG ∧ Submodule.span E (L : Set (Fin W.rank → E)) = ⊤
+        ∧ (L : Set (Fin W.rank → E)) = latC W := by
   let f := W.frame.equivFun.toLinearMap
   refine ⟨W.L0.map (f.restrictScalars (𝓞 E)), W.standardTuple_isLattice.fg.map _, ?_, ?_⟩
   · have : (W.L0.map (f.restrictScalars (𝓞 E)) : Set (Fin W.rank → E)) = f '' W.L0 := rfl
@@ -196,7 +231,8 @@ theorem exists_lattice (W : HSpace E) : ∃ L : Submodule (𝓞 E) (Fin W.rank �
       classical
       by_contra hspan
       obtain ⟨φ, hφ₀, hφ⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hspan)
-      obtain ⟨bs, hbs⟩ := Formalism.HermitianLatticesTheory.dualLattice_dualBasis W.hT W.nondeg W.frame
+      obtain ⟨bs, hbs⟩ :=
+        Formalism.HermitianLatticesTheory.dualLattice_dualBasis W.hT W.nondeg W.frame
       let μ := ∑ j, star (φ (W.frame j)) • bs j
       have hμ : ∀ v, W.hT μ v = φ v := by
         have key : W.hT μ = φ := by
@@ -204,10 +240,13 @@ theorem exists_lattice (W : HSpace E) : ∃ L : Submodule (𝓞 E) (Fin W.rank �
           intro i
           dsimp [μ]
           rw [map_sum, LinearMap.sum_apply]
-          have hs : ∀ j, W.hT (star (φ (W.frame j)) • bs j) (W.frame i) =
-              φ (W.frame j) * (if i = j then 1 else 0) := by
+          have hs
+              : ∀ j,
+                W.hT (star (φ (W.frame j)) • bs j) (W.frame i)
+                  = φ (W.frame j) * (if i = j then 1 else 0) := by
             intro j
-            rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, star_star]
+            rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply,
+              star_star]
             congr 1
             rw [← W.herm.eq (W.frame i) (bs j), hbs]
             split_ifs <;> simp
@@ -227,22 +266,24 @@ theorem exists_lattice (W : HSpace E) : ∃ L : Submodule (𝓞 E) (Fin W.rank �
         intro y hy
         have hy₀ := LinearMap.mem_ker.mp (hφ (Submodule.subset_span hy))
         simp [← W.herm.eq (a • μ) y, LinearMap.map_smulₛₗ, hμ, hy₀]
-      obtain ⟨ψ, hψ, -⟩ := Submodule.exists_le_ker_of_notMem
-        (show μ ∉ (⊥ : Submodule E W.V) by simpa using hμ₀)
+      obtain ⟨ψ, hψ, -⟩ :=
+        Submodule.exists_le_ker_of_notMem (show μ ∉ (⊥ : Submodule E W.V) by simpa using hμ₀)
       let g := ψ.restrictScalars (𝓞 E)
       have hmap (x : E) : x ∈ W.L0.map g := by
         refine ⟨(x / ψ μ) • μ, hline _, ?_⟩
         change ψ ((x / ψ μ) • μ) = x
         rw [map_smul, smul_eq_mul, div_mul_cancel₀ _ hψ]
-      obtain ⟨d, hd₀, hd⟩ := FractionalIdeal.isFractional_of_fg
-        (S := nonZeroDivisors (𝓞 E)) (W.standardTuple_isLattice.fg.map g)
+      obtain ⟨d, hd₀, hd⟩ :=
+        FractionalIdeal.isFractional_of_fg (S := nonZeroDivisors (𝓞 E))
+          (W.standardTuple_isLattice.fg.map g)
       have hinj := IsFractionRing.injective (𝓞 E) E
-      have hne {a : 𝓞 E} (ha : a ≠ 0) : algebraMap (𝓞 E) E a ≠ 0 :=
-        fun h => ha (hinj (h.trans (map_zero _).symm))
+      have hne {a : 𝓞 E} (ha : a ≠ 0) : algebraMap (𝓞 E) E a ≠ 0 := fun h =>
+        ha (hinj (h.trans (map_zero _).symm))
       have hinteger (x : E) : IsLocalization.IsInteger (𝓞 E) x := by
         have hx := hd _ (hmap ((algebraMap (𝓞 E) E d)⁻¹ * x))
         rwa [Algebra.smul_def, ← mul_assoc, mul_inv_cancel₀ (hne (nonZeroDivisors.ne_zero hd₀)),
-          one_mul] at hx
+            one_mul]
+          at hx
       apply RingOfIntegers.not_isField E
       refine ⟨⟨0, 1, zero_ne_one⟩, mul_comm, ?_⟩
       intro a ha

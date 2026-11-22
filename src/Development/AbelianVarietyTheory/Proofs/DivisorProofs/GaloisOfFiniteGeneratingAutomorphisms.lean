@@ -6,7 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem galois_of_finite_generating_automorphisms : ∀ (K K' : Type) [Field K] [Field K'] (i : K →+* K'), i.Finite → ∀ (Γ : Type) [Finite Γ] (s : Γ → (K' ≃+* K')), (∀ g x, s g (i x) = i x) → (∀ y : K', (∀ g, s g y = y) → y ∈ i.range) → (letI := i.toAlgebra; IsGalois K K') ∧ ∀ σ : K' ≃+* K', (∀ x, σ (i x) = i x) → σ ∈ Submonoid.closure (Set.range s) := by
+theorem galois_of_finite_generating_automorphisms
+    : ∀ (K K' : Type) [Field K] [Field K'] (i : K →+* K'),
+      i.Finite
+        → ∀ (Γ : Type) [Finite Γ] (s : Γ → (K' ≃+* K')),
+          (∀ g x, s g (i x) = i x) → (∀ y : K', (∀ g, s g y = y) → y ∈ i.range)
+            → (letI := i.toAlgebra; IsGalois K K')
+              ∧ ∀ σ : K' ≃+* K', (∀ x, σ (i x) = i x) → σ ∈ Submonoid.closure (Set.range s) := by
   intro K K' _ _ i hfin Γ _ s hs hfix
   letI := i.toAlgebra
   haveI : FiniteDimensional K K' := hfin
@@ -30,15 +36,16 @@ theorem galois_of_finite_generating_automorphisms : ∀ (K K' : Type) [Field K] 
   have hmem : σ' ∈ Submonoid.closure (Set.range t) := by
     rw [← Subgroup.closure_toSubmonoid_of_finite]
     show σ' ∈ H
-    rw [hHtop]; exact Subgroup.mem_top _
-  let φ : (K' ≃ₐ[K] K') →* (K' ≃+* K') :=
-    { toFun := fun τ => τ.toRingEquiv
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl }
+    rw [hHtop]
+    exact Subgroup.mem_top _
+  let φ : (K' ≃ₐ[K] K') →* (K' ≃+* K') := {
+    toFun := fun τ => τ.toRingEquiv
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+  }
   have hmap := Submonoid.mem_map_of_mem φ hmem
   rw [MonoidHom.map_mclosure, ← Set.range_comp] at hmap
-  have hc : (φ ∘ t) = s := by
-    funext g; ext y; rfl
+  have hc : (φ ∘ t) = s := by funext g; ext y; rfl
   have hσ' : φ σ' = σ := by ext y; rfl
   rwa [hc, hσ'] at hmap
 

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCycAwa
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZM GlobalTheory.SiegLev GlobalTheory.SiegelTor
 open scoped CategoryTheory.Obj
 
@@ -17,9 +18,12 @@ namespace GlobalTheory.CycLift
 
 open Polynomial
 
-theorem exists_injective_hom {n : ℕ} (hn : n ≠ 0) {V : Type} [CommRing V] [IsDomain V] [CharZero V]
-    {u : V} (hu : IsPrimitiveRoot u n) (hnV : IsUnit (n : V)) :
-    ∃ f : cycAway n →+* V, Function.Injective f ∧ f (zetaAway n) = u := by
+theorem exists_injective_hom
+    {n : ℕ} (hn : n ≠ 0)
+    {V : Type} [CommRing V] [IsDomain V] [CharZero V]
+    {u : V} (hu : IsPrimitiveRoot u n)
+    (hnV : IsUnit (n : V))
+    : ∃ f : cycAway n →+* V, Function.Injective f ∧ f (zetaAway n) = u := by
   have hp := Nat.pos_of_ne_zero hn
   let L := FractionRing V
   have hinj : Function.Injective (algebraMap V L) := IsFractionRing.injective V L
@@ -63,11 +67,16 @@ theorem exists_injective_hom {n : ℕ} (hn : n ≠ 0) {V : Type} [CommRing V] [I
     | add x y hx hy ihx ihy => exact (map_add f₀ ⟨x, hx⟩ ⟨y, hy⟩) ▸ add_mem ihx ihy
     | neg x hx ih => exact (map_neg f₀ ⟨x, hx⟩) ▸ neg_mem ih
     | mul x y hx hy ihx ihy => exact (map_mul f₀ ⟨x, hx⟩ ⟨y, hy⟩) ▸ mul_mem ihx ihy
-  let e := RingEquiv.ofBijective (algebraMap V L).rangeRestrict
-    ⟨fun a b h => hinj (congrArg Subtype.val h), RingHom.rangeRestrict_surjective _⟩
-  have he : ∀ y, algebraMap V L (e.symm y) = y := fun y => congrArg Subtype.val (e.apply_symm_apply y)
-  refine ⟨e.symm.toRingHom.comp (f₀.codRestrict _ hmem),
-    e.symm.injective.comp (fun a b h => hf₀ (congrArg Subtype.val h)), hinj ?_⟩
+  let e :=
+    RingEquiv.ofBijective (algebraMap V L).rangeRestrict
+      ⟨fun a b h => hinj (congrArg Subtype.val h), RingHom.rangeRestrict_surjective _⟩
+  have he : ∀ y, algebraMap V L (e.symm y) = y := fun y =>
+    congrArg Subtype.val (e.apply_symm_apply y)
+  refine ⟨
+    e.symm.toRingHom.comp (f₀.codRestrict _ hmem),
+    e.symm.injective.comp (fun a b h => hf₀ (congrArg Subtype.val h)),
+    hinj ?_
+  ⟩
   rw [RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom, he]
   exact hζ
 

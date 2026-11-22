@@ -8,17 +8,19 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem mvPowerSeries_map_surjective {σ R S : Type} [CommRing R] [CommRing S] (φ : R →+* S)
-    (hφ : Function.Surjective φ) :
-    Function.Surjective (MvPowerSeries.map (σ := σ) φ) := by
+theorem mvPowerSeries_map_surjective
+    {σ R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) (hφ : Function.Surjective φ)
+    : Function.Surjective (MvPowerSeries.map (σ := σ) φ) := by
   intro g
   refine ⟨fun n => Function.surjInv hφ (MvPowerSeries.coeff n g), ?_⟩
   ext n
   exact Function.surjInv_eq hφ _
 
-theorem mvPowerSeries_mem_map_C_of_coeff_mem {σ R : Type} [CommRing R] (I : Ideal R)
-    (hI : I.FG) (g : MvPowerSeries σ R) (hg : ∀ n, MvPowerSeries.coeff n g ∈ I) :
-    g ∈ Ideal.map (MvPowerSeries.C : R →+* MvPowerSeries σ R) I := by
+theorem mvPowerSeries_mem_map_C_of_coeff_mem
+    {σ R : Type} [CommRing R]
+    (I : Ideal R) (hI : I.FG)
+    (g : MvPowerSeries σ R) (hg : ∀ n, MvPowerSeries.coeff n g ∈ I)
+    : g ∈ Ideal.map (MvPowerSeries.C : R →+* MvPowerSeries σ R) I := by
   classical
   obtain ⟨s, rfl⟩ := hI
   have h : ∀ n, ∃ c : R → R, ∑ a ∈ s, c a * a = MvPowerSeries.coeff n g := by
@@ -38,14 +40,21 @@ theorem mvPowerSeries_mem_map_C_of_coeff_mem {σ R : Type} [CommRing R] (I : Ide
   refine Ideal.sum_mem _ fun a ha => Ideal.mul_mem_left _ _ ?_
   exact Ideal.mem_map_of_mem _ (Ideal.subset_span ha)
 
-theorem span_X_pow_le_sup_of_residue :
-    ∀ (T : Type) [CommRing T] [IsLocalRing T] [IsNoetherianRing T] (σ ι : Type) [Finite σ] (f : ι → MvPowerSeries σ T) (M : ℕ), Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ (ResidueField T))) ^ M ≤ Ideal.span (Set.range fun j => MvPowerSeries.map (residue T) (f j)) → Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ T)) ^ M ≤ Ideal.span (Set.range f) ⊔ Ideal.map (MvPowerSeries.C : T →+* MvPowerSeries σ T) (maximalIdeal T) := by
+theorem span_X_pow_le_sup_of_residue
+    : ∀ (T : Type) [CommRing T] [IsLocalRing T] [IsNoetherianRing T] (σ ι : Type) [Finite σ]
+        (f : ι → MvPowerSeries σ T) (M : ℕ),
+      Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ (ResidueField T))) ^ M
+          ≤ Ideal.span (Set.range fun j => MvPowerSeries.map (residue T) (f j))
+        → Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ T)) ^ M
+          ≤ Ideal.span (Set.range f)
+            ⊔ Ideal.map (MvPowerSeries.C : T →+* MvPowerSeries σ T) (maximalIdeal T) := by
   intro T _ _ _ σ ι _ f M h
   set φ : MvPowerSeries σ T →+* MvPowerSeries σ (ResidueField T) :=
     MvPowerSeries.map (residue T) with hφ
   have hs : Function.Surjective φ := mvPowerSeries_map_surjective _ residue_surjective
-  have h1 : Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ (ResidueField T))) =
-      Ideal.map φ (Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ T))) := by
+  have h1
+      : Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ (ResidueField T)))
+        = Ideal.map φ (Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ T))) := by
     rw [Ideal.map_span, ← Set.range_comp]
     congr 2
     ext1 i
@@ -53,8 +62,7 @@ theorem span_X_pow_le_sup_of_residue :
   have h2 : Ideal.span (Set.range fun j => φ (f j)) = Ideal.map φ (Ideal.span (Set.range f)) := by
     rw [Ideal.map_span, ← Set.range_comp]
     rfl
-  rw [h1, h2, ← Ideal.map_pow, Ideal.map_le_iff_le_comap,
-    Ideal.comap_map_of_surjective φ hs] at h
+  rw [h1, h2, ← Ideal.map_pow, Ideal.map_le_iff_le_comap, Ideal.comap_map_of_surjective φ hs] at h
   refine h.trans (sup_le_sup_left ?_ _)
   intro g hg
   refine mvPowerSeries_mem_map_C_of_coeff_mem _ (IsNoetherian.noetherian _) g fun n => ?_

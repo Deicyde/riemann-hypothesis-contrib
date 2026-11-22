@@ -54,13 +54,19 @@ instance fdph_nu_openPos (ε : Fin n → Bool) : Measure.IsOpenPosMeasure (fdphN
 instance fdph_nu_finCpt (ε : Fin n → Bool) : IsFiniteMeasureOnCompacts (fdphNu ε) := by
   refine ⟨fun K hK => ?_⟩
   rw [fdphNu, withDensity_apply' _ K]
-  exact setLIntegral_lt_top_of_isCompact hK.measure_lt_top.ne hK (f := fun z => (Jac z).toNNReal)
+  exact setLIntegral_lt_top_of_isCompact hK.measure_lt_top.ne hK
+    (f := fun z => (Jac z).toNNReal)
     (continuous_real_toNNReal.comp (jac_continuous ε))
 
-def fdphPhi (ε : Fin n → Bool) (kz : KG ε × (PCoord ε → ℂ)) : UJ ε :=
-  ⟨⟨polarM kz, Jm ε * (polarM kz)ᴴ * Jm ε,
-    mul_eq_one_comm.mp (left_inv_of_inUJ ε _ (polarM_inUJ kz)), left_inv_of_inUJ ε _ (polarM_inUJ kz)⟩,
-    polarM_inUJ kz⟩
+def fdphPhi (ε : Fin n → Bool) (kz : KG ε × (PCoord ε → ℂ)) : UJ ε := ⟨
+  ⟨
+    polarM kz,
+    Jm ε * (polarM kz)ᴴ * Jm ε,
+    mul_eq_one_comm.mp (left_inv_of_inUJ ε _ (polarM_inUJ kz)),
+    left_inv_of_inUJ ε _ (polarM_inUJ kz)
+  ⟩,
+  polarM_inUJ kz
+⟩
 
 lemma fdph_toM_phi (ε : Fin n → Bool) (kz : KG ε × (PCoord ε → ℂ)) : toM (fdphPhi ε kz) = polarM kz := rfl
 

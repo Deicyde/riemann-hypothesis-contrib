@@ -15,8 +15,8 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW
 
-theorem bHat_large_of_roomy {D : D7} (L : SizeData₂ D) (C : ℝ) (h : Roomy L C) :
-    (100 : ℝ) ≤ bHat L ∧ 2 * (etaHat L : ℝ) + sHat L ≤ (bHat L : ℝ) / 10 := by
+theorem bHat_large_of_roomy {D : D7} (L : SizeData₂ D) (C : ℝ) (h : Roomy L C)
+    : (100 : ℝ) ≤ bHat L ∧ 2 * (etaHat L : ℝ) + sHat L ≤ (bHat L : ℝ) / 10 := by
   obtain ⟨hC, hw, hr, hwb, -, hb⟩ := h
   have he := L.etaSz_pos
   have hS := L.Sc_pos
@@ -39,9 +39,13 @@ theorem bHat_large_of_roomy {D : D7} (L : SizeData₂ D) (C : ℝ) (h : Roomy L 
     exact le_trans (Nat.le_ceil _) h5
   constructor <;> linarith
 
-theorem conjWord_hypAT {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (ε : ℤˣ) (τ : D.R.GG) (l : ℕ)
-    (hR : Roomy L C) (hl : 11 ≤ l) (hτ : Thick D.host τ) :
-    (pageWord L j ε τ (D.R.cc)).HypAT l ∧ ∀ i, (pageWord L j ε τ (D.R.cc)).thick i := by
+theorem conjWord_hypAT
+    {D : D7} (L : SizeData₂ D)
+    (C : ℝ)
+    (j : Fin D.R.m) (ε : ℤˣ)
+    (τ : D.R.GG) (l : ℕ)
+    (hR : Roomy L C) (hl : 11 ≤ l) (hτ : Thick D.host τ)
+    : (pageWord L j ε τ (D.R.cc)).HypAT l ∧ ∀ i, (pageWord L j ε τ (D.R.cc)).thick i := by
   obtain ⟨hord, hplc⟩ := GlobalTheory.T.complexConjugation_orbit_one_realPlace τ
   have hth : ∀ i, (pageWord L j ε τ (D.R.cc)).thick i := by
     intro i
@@ -56,8 +60,10 @@ theorem conjWord_hypAT {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (�
     obtain ⟨hB, hroom⟩ := bHat_large_of_roomy L C hR
     have hη : (0 : ℝ) ≤ etaHat L := Nat.cast_nonneg _
     have hS : (0 : ℝ) ≤ sHat L := Nat.cast_nonneg _
-    have key : ∀ k, (bHat L : ℝ) ≤ ((pageWord L j ε τ (D.R.cc)).sz k : ℝ) ∧
-        ((pageWord L j ε τ (D.R.cc)).sz k : ℝ) ≤ (bHat L : ℝ) + etaHat L := by
+    have key
+        : ∀ k,
+          (bHat L : ℝ) ≤ ((pageWord L j ε τ (D.R.cc)).sz k : ℝ)
+            ∧ ((pageWord L j ε τ (D.R.cc)).sz k : ℝ) ≤ (bHat L : ℝ) + etaHat L := by
       intro k
       obtain ⟨h1, h2⟩ := hth k
       have h1' : ((bHat L : ℕ) : ℤ) ≤ (pageWord L j ε τ (D.R.cc)).sz k := h1
@@ -67,10 +73,11 @@ theorem conjWord_hypAT {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (�
     have hMk := key k
     rw [hk] at hMk
     have hi := key i
-    obtain ⟨h1, h2⟩ := GlobalTheory.T.alternatingWord_large_size_numerical_bounds l (bHat L) (etaHat L) (sHat L) (M : ℝ)
-      ((pageWord L j ε τ (D.R.cc)).sz i : ℝ) hl hB hη hS hroom
-      (abs_le.2 ⟨by linarith [hMk.1], by linarith [hMk.2]⟩)
-      (abs_le.2 ⟨by linarith [hi.1], by linarith [hi.2]⟩)
+    obtain ⟨h1, h2⟩ :=
+      GlobalTheory.T.alternatingWord_large_size_numerical_bounds l (bHat L) (etaHat L) (sHat L)
+        (M : ℝ) ((pageWord L j ε τ (D.R.cc)).sz i : ℝ) hl hB hη hS hroom
+        (abs_le.2 ⟨by linarith [hMk.1], by linarith [hMk.2]⟩)
+        (abs_le.2 ⟨by linarith [hi.1], by linarith [hi.2]⟩)
     refine ⟨?_, h1, h2⟩
     have : (1 : ℝ) ≤ ((pageWord L j ε τ (D.R.cc)).sz i : ℝ) := by linarith [hi.1]
     exact_mod_cast this

@@ -9,10 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FiniteInt
 
 open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
 
-private theorem UpperTheory.integralClosure_finite_of_finiteType_perfect (k : Type) [Field k] [PerfectField k] (B L : Type)
-    [CommRing B] [IsDomain B] [Algebra k B] [Algebra.FiniteType k B] [Field L] [Algebra B L]
-    [FaithfulSMul B L] [Algebra.EssFiniteType B L] :
-    Module.Finite B (integralClosure B L) := by
+private theorem UpperTheory.integralClosure_finite_of_finiteType_perfect
+    (k : Type) [Field k] [PerfectField k]
+    (B L : Type) [CommRing B] [IsDomain B] [Algebra k B] [Algebra.FiniteType k B] [Field L]
+    [Algebra B L] [FaithfulSMul B L] [Algebra.EssFiniteType B L]
+    : Module.Finite B (integralClosure B L) := by
   letI : Algebra (FractionRing B) L := FractionRing.liftAlgebra B L
   haveI : IsScalarTower B (FractionRing B) L := FractionRing.isScalarTower_liftAlgebra B L
   haveI : Algebra.EssFiniteType (FractionRing B) L :=
@@ -24,16 +25,17 @@ private theorem UpperTheory.integralClosure_finite_of_finiteType_perfect (k : Ty
     GlobalTheory.NormFin.finite_integralClosure_of_perfectField k B (FractionRing B) M
   let g : M →ₐ[B] L := M.val.restrictScalars B
   have hg : Function.Injective g := Subtype.val_injective
-  let φ : integralClosure B M →ₗ[B] integralClosure B L :=
-    { toFun := fun x => ⟨g x, x.2.map g⟩
-      map_add' := by
-        intro x y
-        ext
-        simp
-      map_smul' := by
-        intro r x
-        ext
-        simp }
+  let φ : integralClosure B M →ₗ[B] integralClosure B L := {
+    toFun := fun x => ⟨g x, x.2.map g⟩
+    map_add' := by
+      intro x y
+      ext
+      simp
+    map_smul' := by
+      intro r x
+      ext
+      simp
+  }
   refine Module.Finite.of_surjective φ ?_
   rintro ⟨y, hy⟩
   have hyF : IsIntegral (FractionRing B) y := hy.tower_top
@@ -41,8 +43,10 @@ private theorem UpperTheory.integralClosure_finite_of_finiteType_perfect (k : Ty
   have hz : IsIntegral B z := (isIntegral_algHom_iff g hg).mp hy
   exact ⟨⟨z, hz⟩, rfl⟩
 
-theorem UpperTheory.module_finite_integralClosure_of_finiteType_perfect :
-    ∀ (k : Type) [Field k] [PerfectField k] (A L : Type) [CommRing A] [Algebra k A] [Algebra.FiniteType k A] [Field L] [Algebra A L] [Algebra.EssFiniteType A L], Module.Finite A (integralClosure A L) := by
+theorem UpperTheory.module_finite_integralClosure_of_finiteType_perfect
+    : ∀ (k : Type) [Field k] [PerfectField k] (A L : Type) [CommRing A] [Algebra k A]
+        [Algebra.FiniteType k A] [Field L] [Algebra A L] [Algebra.EssFiniteType A L],
+      Module.Finite A (integralClosure A L) := by
   intro k _ _ A L _ _ _ _ _ _
   let I := RingHom.ker (algebraMap A L)
   letI : Algebra (A ⧸ I) L := (RingHom.kerLift (algebraMap A L)).toAlgebra

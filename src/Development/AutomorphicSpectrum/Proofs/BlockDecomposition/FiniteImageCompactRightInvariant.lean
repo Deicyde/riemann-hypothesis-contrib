@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.TopGroup
 
-theorem finite_image_of_right_invariant_near_one :
-    ∀ {Γ X : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (K : Set Γ),
-      IsCompact K → ∀ Gf : Γ → X, {s : Γ | ∀ x, Gf (x * s) = Gf x} ∈ nhds (1 : Γ) →
-        (Gf '' K).Finite := by
+theorem finite_image_of_right_invariant_near_one
+    : ∀ {Γ X : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (K : Set Γ),
+      IsCompact K
+        → ∀ Gf : Γ → X, {s : Γ | ∀ x, Gf (x * s) = Gf x} ∈ nhds (1 : Γ) → (Gf '' K).Finite := by
   intro Γ X _ _ _ K hK Gf hS
   have hU : ∀ k ∈ K, {y : Γ | k⁻¹ * y ∈ {s : Γ | ∀ x, Gf (x * s) = Gf x}} ∈ nhds k := by
     intro k _

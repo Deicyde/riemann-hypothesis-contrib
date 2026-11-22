@@ -9,18 +9,27 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.HighestWeigh
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.CutBP2 Formalism.FourierDecayAlt.P.CutBPEq Matrix
+open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.CutBP2 Formalism.FourierDecayAlt.P.CutBPEq
+  Matrix
 
 namespace GlobalTheory.CompanionTheory.GapLie
 
-theorem capelli_params_diff_int : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V] (n : ℕ) (E : Fin n → Fin n → Module.End ℂ V) (m : Fin n → ℂ), GlRel E → (∀ w v, qdet E w v = Qr.cpol m w • v) → ∀ i j, ∃ N : ℤ, m i - m j = (N : ℂ) := by
+theorem capelli_params_diff_int
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V] (n : ℕ)
+        (E : Fin n → Fin n → Module.End ℂ V) (m : Fin n → ℂ),
+      GlRel E → (∀ w v, qdet E w v = Qr.cpol m w • v) → ∀ i j, ∃ N : ℤ, m i - m j = (N : ℂ) := by
   intro V _ _ _ _ n E m hE hq
-  obtain ⟨ν, v, -, hv0, hw, -⟩ := Formalism.FourierDecayAlt.P.exists_singular_maximal_vector V n E hE ⊤
-    (fun _ _ _ _ => Submodule.mem_top) top_ne_bot
-  have hc := Formalism.FourierDecayAlt.P.HighestWeightPolynomials.hw_cpol (m := m) hE (Qr.mem_CapSp.2 fun w => hq w v) hv0 hw
+  obtain ⟨ν, v, -, hv0, hw, -⟩ :=
+    Formalism.FourierDecayAlt.P.exists_singular_maximal_vector V n E hE ⊤
+      (fun _ _ _ _ => Submodule.mem_top)
+      top_ne_bot
+  have hc :=
+    Formalism.FourierDecayAlt.P.HighestWeightPolynomials.hw_cpol (m := m) hE
+      (Qr.mem_CapSp.2 fun w => hq w v) hv0 hw
   have hroot : ∀ i, ∃ a : Fin n, m i = ν a - ((a : ℕ) : ℂ) := by
     intro i
-    have h1 := hc (-m i)
+    have h1 := hc (- m i)
     unfold Qr.cpol at h1
     rw [Finset.prod_eq_zero (Finset.mem_univ i) (by ring)] at h1
     obtain ⟨a, -, ha⟩ := Finset.prod_eq_zero_iff.1 h1.symm

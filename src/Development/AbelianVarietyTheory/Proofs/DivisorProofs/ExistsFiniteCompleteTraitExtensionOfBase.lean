@@ -12,15 +12,42 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Exist
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.TraitExt
 
-theorem exists_finite_trait_extension : ∀ (R W R₁ : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [CommRing W] [IsDomain W] [IsLocalRing W] [CommRing R₁] [IsDomain R₁] [IsLocalRing R₁], GlobalTheory.LN.CDvr W → ∀ (φ : R →+* W), Function.Injective φ → IsLocalHom φ → ∀ (ρ : R →+* R₁), FinExt ρ → ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] [Algebra (FractionRing W) Ω] [Algebra.IsAlgebraic (FractionRing W) Ω] (e : FractionRing R₁ →+* Ω), (∀ r, e (algebraMap R₁ (FractionRing R₁) (ρ r)) = algebraMap (FractionRing W) Ω (algebraMap W (FractionRing W) (φ r))) → ∃ (W₁ : Type) (_ : CommRing W₁) (_ : IsDomain W₁) (_ : IsLocalRing W₁) (iw : W →+* W₁) (φ₁ : R₁ →+* W₁) (σ : Ω →+* AlgebraicClosure (FractionRing W₁)), GlobalTheory.LN.CDvr W₁ ∧ Function.Injective iw ∧ iw.Finite ∧ IsLocalHom iw ∧ Function.Injective φ₁ ∧ IsLocalHom φ₁ ∧ φ₁.comp ρ = iw.comp φ ∧ (∀ w, σ (algebraMap (FractionRing W) Ω (algebraMap W (FractionRing W) w)) = algebraMap (FractionRing W₁) (AlgebraicClosure (FractionRing W₁)) (algebraMap W₁ (FractionRing W₁) (iw w))) ∧ ∀ r, σ (e (algebraMap R₁ (FractionRing R₁) r)) = algebraMap (FractionRing W₁) (AlgebraicClosure (FractionRing W₁)) (algebraMap W₁ (FractionRing W₁) (φ₁ r)) := by
+theorem exists_finite_trait_extension
+    : ∀ (R W R₁ : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [CommRing W] [IsDomain W]
+        [IsLocalRing W] [CommRing R₁] [IsDomain R₁] [IsLocalRing R₁],
+      GlobalTheory.LN.CDvr W
+        → ∀ (φ : R →+* W),
+          Function.Injective φ → IsLocalHom φ
+            → ∀ (ρ : R →+* R₁),
+              FinExt ρ
+                → ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] [Algebra (FractionRing W) Ω]
+                    [Algebra.IsAlgebraic (FractionRing W) Ω] (e : FractionRing R₁ →+* Ω),
+                  (∀ r,
+                      e (algebraMap R₁ (FractionRing R₁) (ρ r))
+                        = algebraMap (FractionRing W) Ω (algebraMap W (FractionRing W) (φ r)))
+                    → ∃ (W₁ : Type) (_ : CommRing W₁) (_ : IsDomain W₁) (_ : IsLocalRing W₁)
+                        (iw : W →+* W₁) (φ₁ : R₁ →+* W₁)
+                        (σ : Ω →+* AlgebraicClosure (FractionRing W₁)),
+                      GlobalTheory.LN.CDvr W₁ ∧ Function.Injective iw ∧ iw.Finite ∧ IsLocalHom iw
+                        ∧ Function.Injective φ₁ ∧ IsLocalHom φ₁ ∧ φ₁.comp ρ = iw.comp φ
+                        ∧ (∀ w,
+                          σ (algebraMap (FractionRing W) Ω (algebraMap W (FractionRing W) w))
+                            = algebraMap (FractionRing W₁) (AlgebraicClosure (FractionRing W₁))
+                              (algebraMap W₁ (FractionRing W₁) (iw w)))
+                        ∧ ∀ r,
+                          σ (e (algebraMap R₁ (FractionRing R₁) r))
+                            = algebraMap (FractionRing W₁) (AlgebraicClosure (FractionRing W₁))
+                              (algebraMap W₁ (FractionRing W₁) (φ₁ r)) := by
   intro R W R₁ _ _ _ _ _ _ _ _ _ hW φ hφ hφl ρ hρ Ω _ _ _ _ e he
   obtain ⟨hWd, hWc, hW0⟩ := hW
   obtain ⟨-, hρi, hρf⟩ := hρ
@@ -42,7 +69,8 @@ theorem exists_finite_trait_extension : ∀ (R W R₁ : Type) [CommRing R] [IsDo
   have hf₀ : ∀ r, f₀ (ρ r) = algebraMap W Ω (φ r) := he
   let f : R₁ →ₐ[R] Ω := { f₀ with commutes' := fun r => hf₀ r }
   have hint : ∀ x : R₁, IsIntegral W (f₀ x) := fun x =>
-    IsIntegral.tower_top (A := W) (IsIntegral.map f (show IsIntegral R x from RingHom.Finite.to_isIntegral hρf x))
+    IsIntegral.tower_top (A := W)
+      (IsIntegral.map f (show IsIntegral R x from RingHom.Finite.to_isIntegral hρf x))
   obtain ⟨S, hS⟩ := (Module.Finite.fg_top : (⊤ : Submodule R R₁).FG)
   classical
   obtain ⟨W₁, hd, hc, -, hfin, -, hloc, -, hmem⟩ :=
@@ -58,14 +86,14 @@ theorem exists_finite_trait_extension : ∀ (R W R₁ : Type) [CommRing R] [IsDo
       rw [Algebra.smul_def, map_mul]
       refine W₁.mul_mem ?_ hy
       change f₀ (ρ a) ∈ W₁
-      rw [hf₀]; exact W₁.algebraMap_mem _
+      rw [hf₀]
+      exact W₁.algebraMap_mem _
 
   let iw : W →+* W₁ := algebraMap W W₁
   let φ₁ : R₁ →+* W₁ := f₀.codRestrict W₁ hin
   have hiwinj : Function.Injective iw := fun a b h => hWΩ (congrArg Subtype.val h)
   haveI : CharZero W₁ := charZero_of_injective_ringHom hiwinj
-  have hcomp : φ₁.comp ρ = iw.comp φ := by
-    ext r; exact hf₀ r
+  have hcomp : φ₁.comp ρ = iw.comp φ := by ext r; exact hf₀ r
   have hφ₁inj : Function.Injective φ₁ := fun a b h => by
     have : f₀ a = f₀ b := congrArg Subtype.val h
     exact IsFractionRing.injective R₁ (FractionRing R₁) (e.injective this)
@@ -87,13 +115,31 @@ theorem exists_finite_trait_extension : ∀ (R W R₁ : Type) [CommRing R] [IsDo
       exact (algebraMap (FractionRing W₁) _).injective.comp (IsFractionRing.injective W₁ (FractionRing W₁)))
   let σ' : Ω →ₐ[W₁] AlgebraicClosure (FractionRing W₁) := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
-  have hσ : ∀ x : W₁, σ' (x : Ω) = algebraMap (FractionRing W₁) (AlgebraicClosure (FractionRing W₁))
-      (algebraMap W₁ (FractionRing W₁) x) := fun x => by
+  have hσ
+      : ∀ x : W₁,
+        σ' (x : Ω)
+          = algebraMap (FractionRing W₁) (AlgebraicClosure (FractionRing W₁))
+            (algebraMap W₁ (FractionRing W₁) x) := fun x => by
     rw [← IsScalarTower.algebraMap_apply]; exact σ'.commutes x
-  refine ⟨W₁, inferInstance, inferInstance, inferInstance, iw, φ₁, σ'.toRingHom, ⟨hd, hc, inferInstance⟩,
-    hiwinj, RingHom.finite_algebraMap.2 hfin, hloc, hφ₁inj, hφ₁l, hcomp, fun w => hσ (iw w), fun r => hσ (φ₁ r)⟩
+  refine ⟨
+    W₁,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    iw,
+    φ₁,
+    σ'.toRingHom,
+    ⟨hd, hc, inferInstance⟩,
+    hiwinj,
+    RingHom.finite_algebraMap.2 hfin,
+    hloc,
+    hφ₁inj,
+    hφ₁l,
+    hcomp,
+    fun w => hσ (iw w),
+    fun r => hσ (φ₁ r)
+  ⟩
 
 end GlobalTheory.TraitExt

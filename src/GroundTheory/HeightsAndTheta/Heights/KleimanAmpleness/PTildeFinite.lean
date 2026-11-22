@@ -19,25 +19,28 @@ universe u w
 
 section Compare
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  {x : Fin (N + 1) → Ω}
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
 variable (S x) in
 open Classical in
 def supportRes (I J : StdCell N) (_h : I.1 ⊆ J.1) : ConeLaurent S x →ₗ[S] ConeLaurent S x :=
   if J.1 ⊆ support x then LinearMap.id else 0
 
-theorem supportRes_of_subset {I J : StdCell N} (h : I.1 ⊆ J.1) (hJ : J.1 ⊆ support x) :
-    supportRes S x I J h = LinearMap.id := ite_eq_left hJ
+theorem supportRes_of_subset {I J : StdCell N} (h : I.1 ⊆ J.1) (hJ : J.1 ⊆ support x)
+    : supportRes S x I J h = LinearMap.id :=
+  ite_eq_left hJ
 
-theorem supportRes_of_not {I J : StdCell N} (h : I.1 ⊆ J.1) (hJ : ¬ J.1 ⊆ support x) :
-    supportRes S x I J h = 0 := ite_eq_right hJ
+theorem supportRes_of_not {I J : StdCell N} (h : I.1 ⊆ J.1) (hJ : ¬ J.1 ⊆ support x)
+    : supportRes S x I J h = 0 :=
+  ite_eq_right hJ
 
-def toChartIdx {n : ℕ} (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n) (h : K.1.1 ⊆ support x) :
-    Cech.Idx (support x) n :=
+def toChartIdx {n : ℕ} (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n) (h : K.1.1 ⊆ support x)
+    : Cech.Idx (support x) n :=
   ⟨⟨K.1.1, K.1.2.1, h⟩, K.2⟩
 
-def ofChartIdx {n : ℕ} (K : Cech.Idx (support x) n) : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n :=
+def ofChartIdx {n : ℕ} (K : Cech.Idx (support x) n)
+    : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n :=
   ⟨⟨K.1.1, K.1.2.1, Finset.subset_univ _⟩, K.2⟩
 
 variable (M : FinGradedSub (S := S) (x := x) Ω) (c : ℤ)
@@ -60,8 +63,8 @@ theorem FinGradedSub.cellConeS_injective (I : StdCell N) : Function.Injective (M
     have := locMod_subsingleton M hiI hi
     exact Function.injective_of_subsingleton _
 
-theorem FinGradedSub.cellConeS_res (I J : StdCell N) (h : I.1 ⊆ J.1) (m : LocMod S N M.coneSub I.1) :
-    M.cellConeS J (locResS I J h m) = supportRes S x I J h (M.cellConeS I m) := by
+theorem FinGradedSub.cellConeS_res (I J : StdCell N) (h : I.1 ⊆ J.1) (m : LocMod S N M.coneSub I.1)
+    : M.cellConeS J (locResS I J h m) = supportRes S x I J h (M.cellConeS I m) := by
   by_cases hJ : J.1 ⊆ support x
   · rw [supportRes_of_subset h hJ, LinearMap.id_apply]
     change M.cellCone J (locRes h m) = M.cellCone I m
@@ -75,8 +78,9 @@ theorem FinGradedSub.cellConeS_res (I J : StdCell N) (h : I.1 ⊆ J.1) (m : LocM
 def FinGradedSub.coneDeg (I : StdCell N) : Submodule S (ConeLaurent S x) :=
   (degLoc M.coneGraded c I).map (M.cellConeS I)
 
-theorem FinGradedSub.mem_coneDeg_of_subset {I : StdCell N} (hI : I.1 ⊆ support x) {y : ConeLaurent S x} :
-    y ∈ M.coneDeg c I ↔ ∃ v ∈ M.tilde c ⟨I.1, I.2.1, hI⟩, y = coneSingle S x c v := by
+theorem FinGradedSub.mem_coneDeg_of_subset
+    {I : StdCell N} (hI : I.1 ⊆ support x) {y : ConeLaurent S x}
+    : y ∈ M.coneDeg c I ↔ ∃ v ∈ M.tilde c ⟨I.1, I.2.1, hI⟩, y = coneSingle S x c v := by
   constructor
   · intro hy
     obtain ⟨z, hz, rfl⟩ := Submodule.mem_map.mp hy
@@ -92,8 +96,9 @@ theorem FinGradedSub.mem_coneDeg_of_subset {I : StdCell N} (hI : I.1 ⊆ support
     rw [M.cellCone_of_subset hI]
     exact hzv
 
-theorem FinGradedSub.eq_zero_of_mem_coneDeg {I : StdCell N} (hI : ¬ I.1 ⊆ support x) {y : ConeLaurent S x}
-    (hy : y ∈ M.coneDeg c I) : y = 0 := by
+theorem FinGradedSub.eq_zero_of_mem_coneDeg
+    {I : StdCell N} (hI : ¬ I.1 ⊆ support x) {y : ConeLaurent S x} (hy : y ∈ M.coneDeg c I)
+    : y = 0 := by
   obtain ⟨z, -, rfl⟩ := Submodule.mem_map.mp hy
   change M.cellCone I z = 0
   rw [M.cellCone_of_not hI]
@@ -102,11 +107,10 @@ theorem FinGradedSub.eq_zero_of_mem_coneDeg {I : StdCell N} (hI : ¬ I.1 ⊆ sup
 def FinGradedSub.tildeCone (I : Chart x) : (M.tildeSys c).sub I →ₗ[S] ConeLaurent S x :=
   (coneSingle S x c).comp (((M.tildeSys c).sub I).subtype.restrictScalars S)
 
-
 open Classical in
-def FinGradedSub.embedC (n : ℕ) :
-    Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n →ₗ[S]
-      Cech.Cochain (fun _ : StdCell N => ConeLaurent S x) n where
+def FinGradedSub.embedC (n : ℕ)
+    : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n →ₗ[S]
+        Cech.Cochain (fun _ : StdCell N => ConeLaurent S x) n where
   toFun s K := if h : K.1.1 ⊆ support x then M.tildeCone c _ (s (toChartIdx K h)) else 0
   map_add' s t := by
     funext K
@@ -119,29 +123,31 @@ def FinGradedSub.embedC (n : ℕ) :
     · simp only [dite_eq_left h, Pi.smul_apply, map_smul, RingHom.id_apply]
     · simp only [dite_eq_right h, Pi.smul_apply, smul_zero, RingHom.id_apply]
 
-theorem FinGradedSub.embedC_of_subset {n : ℕ} (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
-    (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n) (h : K.1.1 ⊆ support x) :
-    M.embedC c n s K = coneSingle S x c (s (toChartIdx K h) : Ω) := by
+theorem FinGradedSub.embedC_of_subset
+    {n : ℕ} (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
+    (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n) (h : K.1.1 ⊆ support x)
+    : M.embedC c n s K = coneSingle S x c (s (toChartIdx K h) : Ω) := by
   simp only [FinGradedSub.embedC, LinearMap.coe_mk, AddHom.coe_mk]
   rw [dite_eq_left h]
   rfl
 
-theorem FinGradedSub.embedC_of_subset' {n : ℕ}
-    (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
-    (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n) (h : K.1.1 ⊆ support x) :
-    M.embedC c n s K = M.tildeCone c _ (s (toChartIdx K h)) :=
+theorem FinGradedSub.embedC_of_subset'
+    {n : ℕ} (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
+    (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n) (h : K.1.1 ⊆ support x)
+    : M.embedC c n s K = M.tildeCone c _ (s (toChartIdx K h)) :=
   M.embedC_of_subset c s K h
 
-theorem FinGradedSub.embedC_of_not {n : ℕ} (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
-    (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n) (h : ¬ K.1.1 ⊆ support x) :
-    M.embedC c n s K = 0 := by
+theorem FinGradedSub.embedC_of_not
+    {n : ℕ} (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
+    (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n) (h : ¬ K.1.1 ⊆ support x)
+    : M.embedC c n s K = 0 := by
   simp only [FinGradedSub.embedC, LinearMap.coe_mk, AddHom.coe_mk]
   rw [dite_eq_right h]
 
 set_option synthInstance.maxHeartbeats 100000 in
-theorem FinGradedSub.embedC_d (n : ℕ) (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n) :
-    M.embedC c (n + 1) (Cech.d _ (M.tildeSys c).res n s) =
-      Cech.d (fun _ : StdCell N => ConeLaurent S x) (supportRes S x) n (M.embedC c n s) := by
+theorem FinGradedSub.embedC_d (n : ℕ) (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
+    : M.embedC c (n + 1) (Cech.d _ (M.tildeSys c).res n s)
+      = Cech.d (fun _ : StdCell N => ConeLaurent S x) (supportRes S x) n (M.embedC c n s) := by
   funext J
   rw [Cech.d_apply]
   by_cases hJ : J.1.1 ⊆ support x
@@ -160,11 +166,13 @@ theorem FinGradedSub.embedC_injective (n : ℕ) : Function.Injective (M.embedC c
   funext K
   have h := congrArg (coeffAt S x c) (congrFun hst (ofChartIdx K))
   rw [M.embedC_of_subset c s (ofChartIdx K) K.1.2.2, M.embedC_of_subset c t (ofChartIdx K) K.1.2.2,
-    coeffAt_coneSingle_same, coeffAt_coneSingle_same] at h
+      coeffAt_coneSingle_same, coeffAt_coneSingle_same]
+    at h
   exact Subtype.ext h
 
-theorem FinGradedSub.embedC_mem (n : ℕ) (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n) :
-    M.embedC c n s ∈ Cech.Cdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) n := by
+theorem FinGradedSub.embedC_mem
+    (n : ℕ) (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
+    : M.embedC c n s ∈ Cech.Cdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) n := by
   intro K _
   by_cases h : K.1.1 ⊆ support x
   · rw [M.embedC_of_subset c s K h]
@@ -172,14 +180,18 @@ theorem FinGradedSub.embedC_mem (n : ℕ) (s : Cech.Cochain (fun I : Chart x => 
   · rw [M.embedC_of_not c s K h]
     exact zero_mem _
 
-theorem FinGradedSub.exists_embedC_eq (n : ℕ) (w : Cech.Cochain (fun _ : StdCell N => ConeLaurent S x) n)
-    (hw : w ∈ Cech.Cdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) n) :
-    ∃ s, M.embedC c n s = w := by
-  have hv : ∀ K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n, ∀ h : K.1.1 ⊆ support x,
-      ∃ v ∈ M.tilde c ⟨K.1.1, K.1.2.1, h⟩, w K = coneSingle S x c v :=
-    fun K h => (M.mem_coneDeg_of_subset c h).mp (hw K (Set.mem_univ _))
-  have key : ∀ K : Cech.Idx (support x) n,
-      coeffAt S x c (w (ofChartIdx K)) ∈ (M.tildeSys c).sub K.1 := by
+theorem FinGradedSub.exists_embedC_eq
+    (n : ℕ) (w : Cech.Cochain (fun _ : StdCell N => ConeLaurent S x) n)
+    (hw : w ∈ Cech.Cdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) n)
+    : ∃ s, M.embedC c n s = w := by
+  have hv
+      : ∀ K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) n, ∀ h : K.1.1 ⊆ support x,
+        ∃ v ∈ M.tilde c ⟨K.1.1, K.1.2.1, h⟩,
+          w K = coneSingle S x c v := fun K h =>
+    (M.mem_coneDeg_of_subset c h).mp (hw K (Set.mem_univ _))
+  have key
+      : ∀ K : Cech.Idx (support x) n,
+        coeffAt S x c (w (ofChartIdx K)) ∈ (M.tildeSys c).sub K.1 := by
     intro K
     obtain ⟨v, hv', hwv⟩ := hv (ofChartIdx K) K.1.2.2
     rw [hwv, coeffAt_coneSingle_same]
@@ -193,15 +205,19 @@ theorem FinGradedSub.exists_embedC_eq (n : ℕ) (w : Cech.Cochain (fun _ : StdCe
   · rw [M.embedC_of_not c _ K h]
     exact (M.eq_zero_of_mem_coneDeg c h (hw K (Set.mem_univ _))).symm
 
-theorem FinGradedSub.embedC_mem_cocyDeg (n : ℕ) (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
-    (hs : s ∈ LinearMap.ker (Cech.d _ (M.tildeSys c).res n)) :
-    M.embedC c n s ∈ Cech.cocyDeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) (supportRes S x) n :=
-  ⟨LinearMap.mem_ker.mpr (by rw [← M.embedC_d, LinearMap.mem_ker.mp hs, map_zero]), M.embedC_mem c n s⟩
+theorem FinGradedSub.embedC_mem_cocyDeg
+    (n : ℕ) (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) n)
+    (hs : s ∈ LinearMap.ker (Cech.d _ (M.tildeSys c).res n))
+    : M.embedC c n s
+      ∈ Cech.cocyDeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) (supportRes S x) n := ⟨
+  LinearMap.mem_ker.mpr (by rw [← M.embedC_d, LinearMap.mem_ker.mp hs, map_zero]),
+  M.embedC_mem c n s
+⟩
 
 set_option synthInstance.maxHeartbeats 100000 in
-def FinGradedSub.embedH (n : ℕ) :
-    (M.tildeSys c).H n →ₗ[S]
-      Cech.Hdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) (supportRes S x) n :=
+def FinGradedSub.embedH (n : ℕ)
+    : (M.tildeSys c).H n →ₗ[S]
+        Cech.Hdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) (supportRes S x) n :=
   Submodule.mapQ _ _
     ((M.embedC c n).restrict (p := LinearMap.ker (Cech.d _ (M.tildeSys c).res n))
       (q := Cech.cocyDeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) (supportRes S x) n)
@@ -210,22 +226,26 @@ def FinGradedSub.embedH (n : ℕ) :
       intro s hs
       cases n with
       | zero =>
-        change (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) 0) ∈ (⊥ : Submodule S _) at hs
+        change (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) 0) ∈ (⊥ : Submodule S _)
+          at hs
         rw [Submodule.mem_bot] at hs
-        change M.embedC c 0 (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) 0) ∈
-          (⊥ : Submodule S _)
+        change M.embedC c 0 (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) 0)
+          ∈ (⊥ : Submodule S _)
         rw [hs, map_zero]
         exact zero_mem _
       | succ n =>
         obtain ⟨t, ht⟩ := LinearMap.mem_range.mp hs
-        change M.embedC c (n + 1) (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) (n + 1)) ∈
-          (Cech.Cdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) n).map
+        change M.embedC c (n + 1)
+            (s : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) (n + 1))
+          ∈ (Cech.Cdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) n).map
             (Cech.d (fun _ : StdCell N => ConeLaurent S x) (supportRes S x) n)
-        exact Submodule.mem_map.mpr ⟨M.embedC c n t, M.embedC_mem c n t, by rw [← M.embedC_d, ht]; rfl⟩)
+        exact Submodule.mem_map.mpr
+          ⟨M.embedC c n t, M.embedC_mem c n t, by rw [← M.embedC_d, ht]; rfl⟩)
 
 set_option synthInstance.maxHeartbeats 100000 in
 theorem FinGradedSub.embedH_injective (n : ℕ) : Function.Injective (M.embedH c n) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro y hy
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ y
   change Submodule.Quotient.mk _ = 0 at hy
@@ -233,15 +253,17 @@ theorem FinGradedSub.embedH_injective (n : ℕ) : Function.Injective (M.embedH c
   refine (Submodule.Quotient.mk_eq_zero _).mpr ?_
   cases n with
   | zero =>
-    change M.embedC c 0 (z : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) 0) ∈
-      (⊥ : Submodule S _) at hz
+    change M.embedC c 0 (z : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) 0)
+        ∈ (⊥ : Submodule S _)
+      at hz
     change (z : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) 0) ∈ (⊥ : Submodule S _)
     rw [Submodule.mem_bot] at hz ⊢
     exact M.embedC_injective c 0 (hz.trans (map_zero _).symm)
   | succ n =>
-    change M.embedC c (n + 1) (z : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) (n + 1)) ∈
-      (Cech.Cdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) n).map
-        (Cech.d (fun _ : StdCell N => ConeLaurent S x) (supportRes S x) n) at hz
+    change M.embedC c (n + 1) (z : Cech.Cochain (fun I : Chart x => (M.tildeSys c).sub I) (n + 1))
+        ∈ (Cech.Cdeg (fun _ : StdCell N => ConeLaurent S x) (M.coneDeg c) n).map
+          (Cech.d (fun _ : StdCell N => ConeLaurent S x) (supportRes S x) n)
+      at hz
     obtain ⟨w, hw, hwz⟩ := Submodule.mem_map.mp hz
     obtain ⟨t, rfl⟩ := M.exists_embedC_eq c n w hw
     refine LinearMap.mem_range.mpr ⟨t, M.embedC_injective c (n + 1) ?_⟩
@@ -252,10 +274,14 @@ end Compare
 
 theorem TildeFinite.proof (h : SerreFinite.Statement.{u, w}) : TildeFinite.Statement.{u, w} := by
   intro S _ _ Ω _ _ N x M i c
-  have hT := Cech.Transport.proof (N + 1) (Finset.univ : Finset (Fin (N + 1))) S (locSys S N M.coneSub)
-    (fun _ : StdCell N => ConeLaurent S x) locResS (supportRes S x) (degLoc M.coneGraded c) (M.coneDeg c)
-    M.cellConeS M.cellConeS_res (fun I _ hm => Submodule.mem_map_of_mem hm) M.cellConeS_injective
-    (fun _ => rfl) i
+  have hT :=
+    Cech.Transport.proof (N + 1) (Finset.univ : Finset (Fin (N + 1))) S (locSys S N M.coneSub)
+      (fun _ : StdCell N => ConeLaurent S x)
+      locResS (supportRes S x) (degLoc M.coneGraded c) (M.coneDeg c) M.cellConeS M.cellConeS_res
+      (fun I _ hm => Submodule.mem_map_of_mem hm)
+      M.cellConeS_injective
+      (fun _ => rfl)
+      i
   have : Module.Finite S (Cech.Hdeg (locSys S N M.coneSub) (degLoc M.coneGraded c) locResS i) :=
     h S N M.coneSub M.coneGraded M.coneSub_finite i c
   have : Module.Finite S

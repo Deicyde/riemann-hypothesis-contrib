@@ -14,8 +14,8 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.QFam
 
-theorem isFam_const_of_isMF (ι : Type) (act : ι → SL(2, ℤ) → ι) (k : ℤ) (F : ℍ → ℂ)
-    (h : IsMF k F) : IsFam act k fun _ => F := by
+theorem isFam_const_of_isMF (ι : Type) (act : ι → SL(2, ℤ) → ι) (k : ℤ) (F : ℍ → ℂ) (h : IsMF k F)
+    : IsFam act k fun _ => F := by
   intro i γ
   funext τ
   have hne : UpperHalfPlane.denom γ τ ^ k ≠ 0 := zpow_ne_zero _ (UpperHalfPlane.denom_ne_zero _ _)

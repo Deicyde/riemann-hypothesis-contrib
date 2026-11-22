@@ -6,7 +6,8 @@ public import Development.EtaleCohomology.TateTwists.EtaleTensorTripleProductOfF
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations.EtaleTensorTripleProductLeibnizSeparated
 
@@ -71,10 +72,12 @@ lemma leib_lift {R : Type} [CommRing R] {I J K T M L : Cx R} (τ : Pair I J T) (
 end LateralTheory.EtaleFoundations.EtaleTensorTripleProductLeibnizSeparated
 
 open LateralTheory.EtaleFoundations.EtaleTensorTripleProductLeibnizSeparated in
-theorem LateralTheory.EtaleFoundations.etale_tensor_triple_product_leibniz_of_separated (hsep : LateralTheory.EtaleFoundations.EtaleTensorTripleProductLeibnizSeparated.SecSep) :
-    LateralTheory.EtaleFoundations.EtaleTensorTripleProductLeibniz := by
+theorem LateralTheory.EtaleFoundations.etale_tensor_triple_product_leibniz_of_separated
+    (hsep : LateralTheory.EtaleFoundations.EtaleTensorTripleProductLeibnizSeparated.SecSep)
+    : LateralTheory.EtaleFoundations.EtaleTensorTripleProductLeibniz := by
   intro R _ I J K T τ hτ M L μ' ν' m hnat heq U s t w h a b
   apply hsep R (L.X (w + 1)) U
   refine loc_mono (hτ.1 U s a) ?_
   rintro V g ⟨x, hx⟩
-  rw [res_map, hnat, res_add, res_usmul, hnat, hnat, res_map, res_map, ← hx, leib_lift τ μ' ν' m heq]
+  rw [res_map, hnat, res_add, res_usmul, hnat, hnat, res_map, res_map, ← hx,
+    leib_lift τ μ' ν' m heq]

@@ -4,9 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Yhd1.mem_minimalPrimes_iff.{u_1} :
-    ∀ {A : Type u_1} [inst : CommRing A] [IsDomain A] [IsNoetherianRing A] {z : A},
-      z ≠ (0 : A) → ∀ (W : Ideal A), W ∈ (Ideal.span {z}).minimalPrimes ↔ W.IsPrime ∧ W.height = (1 : ℕ∞) ∧ z ∈ W := by
+theorem UpperTheory.Reformulated.B.Yhd1.mem_minimalPrimes_iff.{u_1}
+    : ∀ {A : Type u_1} [inst : CommRing A] [IsDomain A] [IsNoetherianRing A] {z : A},
+      z ≠ (0 : A)
+        → ∀ (W : Ideal A),
+          W ∈ (Ideal.span {z}).minimalPrimes ↔ W.IsPrime ∧ W.height = (1 : ℕ∞) ∧ z ∈ W := by
   intro A _ _ _ z hz
   have key : ∀ P : Ideal A, P.IsPrime → z ∈ P → (1 : ℕ∞) ≤ P.height := by
     intro P hP hzP
@@ -21,11 +23,14 @@ theorem UpperTheory.Reformulated.B.Yhd1.mem_minimalPrimes_iff.{u_1} :
   · intro hW
     have hP : W.IsPrime := hW.1.1
     have hzW : z ∈ W := hW.1.2 (Ideal.mem_span_singleton_self z)
-    exact ⟨hP, le_antisymm
-      (Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ _ hW) (key W hP hzW), hzW⟩
+    exact ⟨
+      hP,
+      le_antisymm (Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ _ hW) (key W hP hzW),
+      hzW
+    ⟩
   · rintro ⟨hP, hh, hzW⟩
-    obtain ⟨P, hPm, hPW⟩ := Ideal.exists_minimalPrimes_le
-      ((Ideal.span_singleton_le_iff_mem W).mpr hzW)
+    obtain ⟨P, hPm, hPW⟩ :=
+      Ideal.exists_minimalPrimes_le ((Ideal.span_singleton_le_iff_mem W).mpr hzW)
     have hP' : P.IsPrime := hPm.1.1
     have hzP : z ∈ P := hPm.1.2 (Ideal.mem_span_singleton_self z)
     rcases hPW.eq_or_lt with h | h
@@ -33,7 +38,9 @@ theorem UpperTheory.Reformulated.B.Yhd1.mem_minimalPrimes_iff.{u_1} :
     · exfalso
       have h1 := Ideal.height_add_one_le_of_lt_of_isPrime h
       have h2 : (1 : ℕ∞) + 1 ≤ 1 := by
-        calc (1 : ℕ∞) + 1 ≤ P.height + 1 := by gcongr; exact key P hP' hzP
+        calc
+          (1 : ℕ∞) + 1
+            ≤ P.height + 1 := by gcongr; exact key P hP' hzP
           _ ≤ W.height := h1
           _ = 1 := hh
       exact absurd h2 (by decide)

@@ -24,12 +24,14 @@ section Abstract
 
 variable {R : Type} [CommRing R]
 
-theorem les_one {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} (f : Cx.Hom K L (RingHom.id R))
-    (g : Cx.Hom L M (RingHom.id R)) (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
-    (hg : ∀ n, Function.Surjective (g.f n)) (a : ℕ) (hL : ∀ j, j ≠ a → Subsingleton (L.H j))
-    (hM : ∀ j, j ≠ a → Subsingleton (M.H j)) (hga : Function.Surjective (g.mapH a)) :
-    (∀ j, j ≠ a → Subsingleton (K.H j)) ∧ Function.Injective (f.mapH a) ∧
-      ∀ x, x ∈ Set.range (f.mapH a) ↔ g.mapH a x = 0 := by
+theorem les_one
+    {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} (f : Cx.Hom K L (RingHom.id R))
+    (g : Cx.Hom L M (RingHom.id R)) (hf : ∀ n, Function.Injective (f.f n))
+    (hfg : ∀ n, Function.Exact (f.f n) (g.f n)) (hg : ∀ n, Function.Surjective (g.f n))
+    (a : ℕ) (hL : ∀ j, j ≠ a → Subsingleton (L.H j)) (hM : ∀ j, j ≠ a → Subsingleton (M.H j))
+    (hga : Function.Surjective (g.mapH a))
+    : (∀ j, j ≠ a → Subsingleton (K.H j)) ∧ Function.Injective (f.mapH a)
+      ∧ ∀ x, x ∈ Set.range (f.mapH a) ↔ g.mapH a x = 0 := by
   obtain ⟨δ, -, h0, hfg', hgδ, hδf⟩ := CrystallineSemistableComparison.P.les f g hf hfg hg
   refine ⟨fun j hj => ?_, ?_, fun x => (hfg' a x).symm⟩
   · suffices h : ∀ x : K.H j, x = 0 from ⟨fun x y => by rw [h x, h y]⟩
@@ -50,7 +52,8 @@ theorem les_one {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} (f : Cx.Hom K L 
   · cases a with
     | zero => exact h0
     | succ k =>
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro x hx
       obtain ⟨y, rfl⟩ := (hδf k x).1 hx
       have := hM k (by omega)
@@ -60,26 +63,35 @@ end Abstract
 
 section Ses
 
-variable {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] (F : C ⥤ ModuleCat.{0} R)
-  (U Q : ObjectProperty C)
+variable
+  {R : Type} [CommRing R]
+  {C : Type 1} [Category.{0} C]
+  (F : C ⥤ ModuleCat.{0} R) (U Q : ObjectProperty C)
 
-def liftQ (hQ : Cosieve Q) {n : ℕ} (s : ComposableArrows U.FullSubcategory n) (hs : Q (s.obj 0).obj) :
-    ComposableArrows (U ⊓ Q).FullSubcategory n :=
+def liftQ (hQ : Cosieve Q) {n : ℕ} (s : ComposableArrows U.FullSubcategory n) (hs : Q (s.obj 0).obj)
+    : ComposableArrows (U ⊓ Q).FullSubcategory n :=
   ObjectProperty.lift (U ⊓ Q) (s ⋙ U.ι) fun j =>
-    show U (s.obj j).obj ∧ Q (s.obj j).obj from ⟨(s.obj j).property, hQ (s.map (homOfLE (Fin.zero_le j))).hom hs⟩
+    show U (s.obj j).obj ∧ Q (s.obj j).obj from
+      ⟨(s.obj j).property, hQ (s.map (homOfLE (Fin.zero_le j))).hom hs⟩
 
-theorem res_surj (hQ : Cosieve Q) (hle : U ⊓ Q ≤ U) (n : ℕ) : Function.Surjective ((resU F hle).pullC n) := by
+theorem res_surj (hQ : Cosieve Q) (hle : U ⊓ Q ≤ U) (n : ℕ)
+    : Function.Surjective ((resU F hle).pullC n) := by
   classical
   intro z
   refine ⟨fun s => if hs : Q (s.obj 0).obj then z (liftQ U Q hQ s hs) else 0, ?_⟩
   funext s
   have hs : Q ((s ⋙ ObjectProperty.ιOfLE hle).obj 0).obj := (s.obj 0).property.2
-  change (if hs : Q ((s ⋙ ObjectProperty.ιOfLE hle).obj 0).obj then z (liftQ U Q hQ _ hs) else 0) = z s
+  change
+    (if hs : Q ((s ⋙ ObjectProperty.ιOfLE hle).obj 0).obj then z (liftQ U Q hQ _ hs) else 0) = z s
   rw [dite_eq_left hs]
   rfl
 
-theorem res_exact (hQ : Cosieve Q) (hle : U ⊓ Q ≤ U) (ι : Cx.Hom (RC F U hQ) (CH.cx (U.ι ⋙ F)) (RingHom.id R))
-    (hι : ∀ n x, ι.f n x = x.1) (n : ℕ) : Function.Exact (ι.f n) ((resU F hle).pullC n) := by
+theorem res_exact
+    (hQ : Cosieve Q)
+    (hle : U ⊓ Q ≤ U)
+    (ι : Cx.Hom (RC F U hQ) (CH.cx (U.ι ⋙ F)) (RingHom.id R)) (hι : ∀ n x, ι.f n x = x.1)
+    (n : ℕ)
+    : Function.Exact (ι.f n) ((resU F hle).pullC n) := by
   intro y
   constructor
   · intro hy
@@ -99,15 +111,20 @@ theorem affRelOf_pf : AffRelOf := by
   intro hSite hOn hAff hNat hForm K _ _ W Z q i _ hQ V d d' hc hc' a
   have : Mono i := inferInstance
   have hS := hSite K W Z W q i i
-  have h0 : ∀ T, inU (i ≫ q) (i ⁻¹ᵁ V) T → inU q V ((smS i rfl).G.obj T) := fun T h => (hS.2.2.2.2.1 V T).1 h
-  have h2 : ∀ T, inU q V ((smS i rfl).G.obj T) → inU (i ≫ q) (i ⁻¹ᵁ V) T := fun T h => (hS.2.2.2.2.1 V T).2 h
+  have h0 : ∀ T, inU (i ≫ q) (i ⁻¹ᵁ V) T → inU q V ((smS i rfl).G.obj T) := fun T h =>
+    (hS.2.2.2.2.1 V T).1 h
+  have h2 : ∀ T, inU q V ((smS i rfl).G.obj T) → inU (i ≫ q) (i ⁻¹ᵁ V) T := fun T h =>
+    (hS.2.2.2.2.1 V T).2 h
   have hOnW : ∀ T, On q i ((smS i rfl).G.obj T) := by
     intro T
     refine (hS.2.2.2.2.2 T).1 ?_
-    obtain ⟨w, hw⟩ : ∃ w, w = pt (γ := dividedPowersBot K) (p := 0) (q := i ≫ q) (κ := Ideal.Quotient.mk ⊥) T := ⟨_, rfl⟩
+    obtain ⟨w, hw⟩
+        : ∃ w,
+          w = pt (γ := dividedPowersBot K) (p := 0) (q := i ≫ q) (κ := Ideal.Quotient.mk ⊥) T :=
+      ⟨_, rfl⟩
     exact ⟨pullback.lift w w rfl, by rw [pullback.lift_snd, hw]⟩
-  have h1 : ∀ T, inU (i ≫ q) (i ⁻¹ᵁ V) T → (inU q V ⊓ On q i) ((smS i rfl).G.obj T) :=
-    fun T h => show inU q V _ ∧ On q i _ from ⟨h0 T h, hOnW T⟩
+  have h1 : ∀ T, inU (i ≫ q) (i ⁻¹ᵁ V) T → (inU q V ⊓ On q i) ((smS i rfl).G.obj T) := fun T h =>
+    show inU q V _ ∧ On q i _ from ⟨h0 T h, hOnW T⟩
   have hBij := hOn K W Z q i (inU q V) (inU (i ≫ q) (i ⁻¹ᵁ V)) h1 h2 a
   obtain ⟨hVsub, e0, he0, he0b⟩ := hAff K Z q V d hc a
   obtain ⟨hWsub, e', he', he'b⟩ := hAff K W (i ≫ q) (i ⁻¹ᵁ V) d' hc' a
@@ -123,7 +140,10 @@ theorem affRelOf_pf : AffRelOf := by
     rw [RingHom.mem_ker, RingHom.mem_ker, hφ, Scheme.Hom.appLE_eq_app]
     exact Iff.rfl
   have hle : inU q V ⊓ On q i ≤ inU q V := fun T h => h.1
-  have hcomp : ∀ n x, (morV i rfl a h1).pull n ((resU (G q a) hle).hom.mapH n x) = (morV i rfl a h0).pull n x := by
+  have hcomp
+      : ∀ n x,
+        (morV i rfl a h1).pull n ((resU (G q a) hle).hom.mapH n x)
+          = (morV i rfl a h0).pull n x := by
     intro n x
     obtain ⟨z, hz, rfl⟩ := (CrystallineSemistableComparison.P.cls_surj _ n).1 x
     rfl
@@ -138,15 +158,18 @@ theorem affRelOf_pf : AffRelOf := by
     refine ⟨e0 ω, (hBij a).1 ?_⟩
     rw [hcomp, hnat a e0 e' he0 he' ω]
     exact hω'
-  have key : ∀ ι : Cx.Hom (RC (G q a) (inU q V) hQ) (CH.cx ((inU q V).ι ⋙ G q a)) (RingHom.id K),
-      (∀ n x, ι.f n x = x.1) →
-      (∀ j, j ≠ a → Subsingleton ((RC (G q a) (inU q V) hQ).H j)) ∧ Function.Injective (ι.mapH a) ∧
-        ∀ x, x ∈ Set.range (ι.mapH a) ↔ (resU (G q a) hle).hom.mapH a x = 0 := by
+  have key
+      : ∀ ι : Cx.Hom (RC (G q a) (inU q V) hQ) (CH.cx ((inU q V).ι ⋙ G q a)) (RingHom.id K),
+        (∀ n x, ι.f n x = x.1)
+          → (∀ j, j ≠ a → Subsingleton ((RC (G q a) (inU q V) hQ).H j))
+            ∧ Function.Injective (ι.mapH a)
+            ∧ ∀ x, x ∈ Set.range (ι.mapH a) ↔ (resU (G q a) hle).hom.mapH a x = 0 := by
     intro ι hι
     exact les_one ι (resU (G q a) hle).hom
       (fun n x y h => Subtype.ext (by rw [← hι, ← hι]; exact h))
       (fun n => res_exact (G q a) (inU q V) (On q i) hQ hle ι hι n)
-      (fun n => res_surj (G q a) (inU q V) (On q i) hQ hle n) a hVsub hM hga
+      (fun n => res_surj (G q a) (inU q V) (On q i) hQ hle n)
+      a hVsub hM hga
   let ι0 : Cx.Hom (RC (G q a) (inU q V) hQ) (CH.cx ((inU q V).ι ⋙ G q a)) (RingHom.id K) :=
     ⟨fun n => (relS ((inU q V).ι ⋙ G q a) (fun T => On q i T.obj) n).subtype, fun n x => rfl⟩
   refine ⟨(key ι0 fun _ _ => rfl).1, fun e he ι hι => ⟨(key ι hι).2.1, fun ω => ?_⟩⟩

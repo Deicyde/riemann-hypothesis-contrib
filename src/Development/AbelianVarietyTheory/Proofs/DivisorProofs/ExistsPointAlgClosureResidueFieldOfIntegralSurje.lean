@@ -6,14 +6,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory
 
-theorem exists_ringHom_algClosure_residueField_of_isIntegral (A B : Type) [CommRing A]
-    [IsLocalRing A] [CommRing B] (φ : A →+* B) (hφ : φ.IsIntegral) (P : Ideal B) [P.IsPrime]
-    (hP : P.comap φ = IsLocalRing.maximalIdeal A) :
-    ∃ ψ : B →+* AlgebraicClosure (IsLocalRing.ResidueField A),
+theorem exists_ringHom_algClosure_residueField_of_isIntegral
+    (A B : Type) [CommRing A] [IsLocalRing A] [CommRing B]
+    (φ : A →+* B) (hφ : φ.IsIntegral)
+    (P : Ideal B) [P.IsPrime]
+    (hP : P.comap φ = IsLocalRing.maximalIdeal A)
+    : ∃ ψ : B →+* AlgebraicClosure (IsLocalRing.ResidueField A),
       ψ.comp φ = algebraMap A (AlgebraicClosure (IsLocalRing.ResidueField A)) := by
   letI : Algebra A B := φ.toAlgebra
   haveI : Algebra.IsIntegral A B := ⟨hφ⟩
@@ -33,10 +36,13 @@ theorem exists_ringHom_algClosure_residueField_of_isIntegral (A B : Type) [CommR
   rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply] at h
   exact h
 
-theorem exists_point_algClosure_residueField_of_isIntegralHom :
-    ∀ (A : Type) [CommRing A] [IsLocalRing A] (Y : Scheme.{0}) (g : Y ⟶ Spec (CommRingCat.of A)),
-    IsIntegralHom g → Surjective g → ∃ s : Spec (CommRingCat.of (AlgebraicClosure (IsLocalRing.ResidueField A))) ⟶ Y,
-    s ≫ g = Spec.map (CommRingCat.ofHom (algebraMap A (AlgebraicClosure (IsLocalRing.ResidueField A)))) := by
+theorem exists_point_algClosure_residueField_of_isIntegralHom
+    : ∀ (A : Type) [CommRing A] [IsLocalRing A] (Y : Scheme.{0}) (g : Y ⟶ Spec (CommRingCat.of A)),
+      IsIntegralHom g → Surjective g
+        → ∃ s : Spec (CommRingCat.of (AlgebraicClosure (IsLocalRing.ResidueField A))) ⟶ Y,
+          s ≫ g
+            = Spec.map (CommRingCat.ofHom (algebraMap A
+              (AlgebraicClosure (IsLocalRing.ResidueField A)))) := by
   intro A _ _ Y g hi hs
   haveI : IsAffine Y := isAffine_of_isAffineHom g
   obtain ⟨φ, hφ⟩ := Spec.map_surjective (Y.isoSpec.inv ≫ g)
@@ -47,8 +53,9 @@ theorem exists_point_algClosure_residueField_of_isIntegralHom :
   have hP' : (PrimeSpectrum.asIdeal P).comap φ.hom = IsLocalRing.maximalIdeal A :=
     congrArg PrimeSpectrum.asIdeal hP
   haveI := PrimeSpectrum.isPrime P
-  obtain ⟨ψ, hψ⟩ := exists_ringHom_algClosure_residueField_of_isIntegral A Γ(Y, ⊤) φ.hom h3
-    (PrimeSpectrum.asIdeal P) hP'
+  obtain ⟨ψ, hψ⟩ :=
+    exists_ringHom_algClosure_residueField_of_isIntegral A Γ(Y, ⊤) φ.hom h3
+      (PrimeSpectrum.asIdeal P) hP'
   refine ⟨Spec.map (CommRingCat.ofHom ψ) ≫ Y.isoSpec.inv, ?_⟩
   rw [Category.assoc, ← hφ, ← Spec.map_comp, ← hψ]
   rfl

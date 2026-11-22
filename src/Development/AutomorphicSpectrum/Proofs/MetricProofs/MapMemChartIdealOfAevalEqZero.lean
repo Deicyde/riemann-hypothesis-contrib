@@ -14,9 +14,8 @@ open MvPolynomial ReciprocityTheory.AnForm.R
 
 variable {σ : Type}
 
-theorem exists_int_clear (G : MvPolynomial σ ℚ) :
-    ∃ (n : ℤ) (G₀ : MvPolynomial σ ℤ), n ≠ 0 ∧
-      map (Int.castRingHom ℚ) G₀ = C (n : ℚ) * G := by
+theorem exists_int_clear (G : MvPolynomial σ ℚ)
+    : ∃ (n : ℤ) (G₀ : MvPolynomial σ ℤ), n ≠ 0 ∧ map (Int.castRingHom ℚ) G₀ = C (n : ℚ) * G := by
   induction G using MvPolynomial.induction_on with
   | C a =>
     refine ⟨a.den, C a.num, by exact_mod_cast a.den_nz, ?_⟩
@@ -34,17 +33,18 @@ theorem exists_int_clear (G : MvPolynomial σ ℚ) :
     obtain ⟨n, F, h, e⟩ := hf
     exact ⟨n, F * X i, h, by rw [map_mul, map_X, e, mul_assoc]⟩
 
-theorem exists_homog (s : σ → σ) (G₀ : MvPolynomial σ ℤ) :
-    ∃ H m : MvPolynomial σ ℤ, ∀ (T : Type) [CommRing T] (f : MvPolynomial σ ℤ →+* T) (w : σ → T),
-      (∀ q, IsUnit (f (X (s q)))) → (∀ q, f (X q) = f (X (s q)) * w q) →
-      IsUnit (f m) ∧ eval₂Hom (Int.castRingHom T) w G₀ * f m = f H := by
+theorem exists_homog (s : σ → σ) (G₀ : MvPolynomial σ ℤ)
+    : ∃ H m : MvPolynomial σ ℤ, ∀ (T : Type) [CommRing T] (f : MvPolynomial σ ℤ →+* T) (w : σ → T),
+      (∀ q, IsUnit (f (X (s q)))) → (∀ q, f (X q) = f (X (s q)) * w q)
+        → IsUnit (f m) ∧ eval₂Hom (Int.castRingHom T) w G₀ * f m = f H := by
   classical
   let M : Submonoid (MvPolynomial σ ℤ) :=
     Submonoid.closure (Set.range fun q => (X (s q) : MvPolynomial σ ℤ))
   let B := Localization M
   have hs : ∀ q, (X (s q) : MvPolynomial σ ℤ) ∈ M := fun q => Submonoid.subset_closure ⟨q, rfl⟩
-  let ψ : MvPolynomial σ ℤ →+* B := eval₂Hom (Int.castRingHom B)
-    (fun q => IsLocalization.mk' B (X q : MvPolynomial σ ℤ) ⟨X (s q), hs q⟩)
+  let ψ : MvPolynomial σ ℤ →+* B :=
+    eval₂Hom (Int.castRingHom B)
+      (fun q => IsLocalization.mk' B (X q : MvPolynomial σ ℤ) ⟨X (s q), hs q⟩)
   obtain ⟨⟨H, m⟩, hHm⟩ := IsLocalization.surj M (ψ G₀)
   refine ⟨H, m, fun T _ f w hu hw => ?_⟩
   have hM : ∀ y : M, IsUnit (f y) := by
@@ -70,19 +70,23 @@ theorem exists_homog (s : σ → σ) (G₀ : MvPolynomial σ ℤ) :
   rw [← h, ← hcomp]
   rfl
 
-theorem map_mem_chartIdeal_of_aeval_eq_zero :
-    ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [CharZero Ω]
-      (y : (Σ k, ι k) → Ω) (p : (k : K) → ι k), (∀ k, y ⟨k, p k⟩ ≠ 0) →
-      ∀ G : MvPolynomial (Σ k, ι k) ℚ, aeval (fun q : Σ k, ι k => y q / y ⟨q.1, p q.1⟩) G = 0 →
-        map (algebraMap ℚ ℂ) G ∈
-          chartIdeal (ReciprocityTheory.ChartRestriction.G.Geo.pC (ReciprocityTheory.ChartRestriction.G.Geo.mCoordIdeal y)) p := by
+theorem map_mem_chartIdeal_of_aeval_eq_zero
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [CharZero Ω]
+        (y : (Σ k, ι k) → Ω) (p : (k : K) → ι k),
+      (∀ k, y ⟨k, p k⟩ ≠ 0)
+        → ∀ G : MvPolynomial (Σ k, ι k) ℚ,
+          aeval (fun q : Σ k, ι k => y q / y ⟨q.1, p q.1⟩) G = 0
+            → map (algebraMap ℚ ℂ) G ∈ chartIdeal
+              (ReciprocityTheory.ChartRestriction.G.Geo.pC
+                (ReciprocityTheory.ChartRestriction.G.Geo.mCoordIdeal y))
+              p := by
   intro K _ ι _ Ω _ _ y p hy G hG
   classical
   obtain ⟨n, G₀, hn, hG₀⟩ := exists_int_clear G
   obtain ⟨H, m, hHm⟩ := exists_homog (fun q : Σ k, ι k => (⟨q.1, p q.1⟩ : Σ k, ι k)) G₀
   have hz : aeval (fun q : Σ k, ι k => y q / y ⟨q.1, p q.1⟩) G₀ = (0 : Ω) := by
-    have h1 : aeval (fun q : Σ k, ι k => y q / y ⟨q.1, p q.1⟩)
-        (map (algebraMap ℤ ℚ) G₀) = (0 : Ω) := by
+    have h1
+        : aeval (fun q : Σ k, ι k => y q / y ⟨q.1, p q.1⟩) (map (algebraMap ℤ ℚ) G₀) = (0 : Ω) := by
       have : (algebraMap ℤ ℚ) = Int.castRingHom ℚ := rfl
       rw [this, hG₀, map_mul, hG, mul_zero]
     rwa [aeval_map_algebraMap] at h1
@@ -90,13 +94,13 @@ theorem map_mem_chartIdeal_of_aeval_eq_zero :
   have hH : H ∈ ReciprocityTheory.ChartRestriction.G.Geo.mCoordIdeal y := by
     let F := FractionRing (MvPolynomial K Ω)
     let f : MvPolynomial (Σ k, ι k) ℤ →+* F :=
-      (algebraMap (MvPolynomial K Ω) F).comp (ReciprocityTheory.ChartRestriction.G.Geo.mConeMap y).toRingHom
+      (algebraMap (MvPolynomial K Ω) F).comp
+        (ReciprocityTheory.ChartRestriction.G.Geo.mConeMap y).toRingHom
     let w : (Σ k, ι k) → F := fun q => algebraMap (MvPolynomial K Ω) F (C (y q / y ⟨q.1, p q.1⟩))
     have hfX : ∀ q, f (X q) = algebraMap (MvPolynomial K Ω) F (C (y q) * X q.1) := by
       intro q
       simp [f, ReciprocityTheory.ChartRestriction.G.Geo.mConeMap]
-    have hinj : Function.Injective (algebraMap (MvPolynomial K Ω) F) :=
-      IsFractionRing.injective _ _
+    have hinj : Function.Injective (algebraMap (MvPolynomial K Ω) F) := IsFractionRing.injective _ _
     have hu : ∀ q : Σ k, ι k, IsUnit (f (X ⟨q.1, p q.1⟩)) := by
       intro q
       rw [hfX, isUnit_iff_ne_zero]
@@ -107,14 +111,13 @@ theorem map_mem_chartIdeal_of_aeval_eq_zero :
       intro q
       rw [hfX, hfX, ← map_mul]
       congr 1
-      have : y q = y ⟨q.1, p q.1⟩ * (y q / y ⟨q.1, p q.1⟩) := by
-        field_simp [hy q.1]
+      have : y q = y ⟨q.1, p q.1⟩ * (y q / y ⟨q.1, p q.1⟩) := by field_simp [hy q.1]
       show C (y q) * X q.1 = C (y ⟨q.1, p q.1⟩) * X q.1 * C (y q / y ⟨q.1, p q.1⟩)
       rw [mul_right_comm, ← C_mul, ← this]
     obtain ⟨-, h⟩ := hHm F f w hu hw
     have hev : eval₂Hom (Int.castRingHom F) w G₀ = 0 := by
-      have : eval₂Hom (Int.castRingHom F) w =
-          ((algebraMap (MvPolynomial K Ω) F).comp C).comp
+      have : eval₂Hom (Int.castRingHom F) w
+          = ((algebraMap (MvPolynomial K Ω) F).comp C).comp
             (aeval (R := ℤ) (fun q : Σ k, ι k => y q / y ⟨q.1, p q.1⟩)).toRingHom := by
         apply MvPolynomial.ringHom_ext
         · intro r
@@ -136,8 +139,10 @@ theorem map_mem_chartIdeal_of_aeval_eq_zero :
     have : (X ⟨k, p k⟩ - 1 : MvPolynomial (Σ k, ι k) ℂ) ∈ chartIdeal P p :=
       Ideal.mem_sup_right (Ideal.subset_span ⟨k, rfl⟩)
     simpa [f, sub_eq_zero] using Ideal.Quotient.eq_zero_iff_mem.mpr this
-  obtain ⟨hm, h⟩ := hHm A f w (fun q => by rw [hone]; exact isUnit_one)
-    (fun q => by rw [hone, one_mul]; simp [f, w])
+  obtain ⟨hm, h⟩ :=
+    hHm A f w
+      (fun q => by rw [hone]; exact isUnit_one)
+      (fun q => by rw [hone, one_mul]; simp [f, w])
   have hfH : f H = 0 :=
     Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_sup_left (Ideal.subset_span ⟨H, hH, rfl⟩))
   have hev : eval₂Hom (Int.castRingHom A) w = f := by
@@ -148,8 +153,7 @@ theorem map_mem_chartIdeal_of_aeval_eq_zero :
       simp [f, w]
   rw [hev, hfH] at h
   have hG₀0 : f G₀ = 0 := hm.mul_left_eq_zero.mp h
-  have hmem : map (Int.castRingHom ℂ) G₀ ∈ chartIdeal P p :=
-    Ideal.Quotient.eq_zero_iff_mem.mp hG₀0
+  have hmem : map (Int.castRingHom ℂ) G₀ ∈ chartIdeal P p := Ideal.Quotient.eq_zero_iff_mem.mp hG₀0
   have hmap : map (Int.castRingHom ℂ) G₀ = C (n : ℂ) * map (algebraMap ℚ ℂ) G := by
     have h1 : map (Int.castRingHom ℂ) G₀ = map (algebraMap ℚ ℂ) (map (Int.castRingHom ℚ) G₀) := by
       rw [map_map]

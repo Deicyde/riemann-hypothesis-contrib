@@ -21,8 +21,10 @@ def flagStep (Ω : Type) [Field Ω] [Module Ω E] {r : ℕ} (b₀ : Fin r → E)
 namespace Lat
 
 def IsFlagVBOn (L : Lat ξ E) (T : Set (Cpt ξ)) {r : ℕ} (b₀ : Fin r → E) : Prop :=
-  ∀ p ∈ T, ∃ U : X.Opens, p.1 ∈ U ∧ ∃ b : Fin r → E, (∀ i, flagStep Ω b i = flagStep Ω b₀ i) ∧
-    ∀ q ∈ T, q.1 ∈ U → L.IsFrameAt b q
+  ∀ p ∈ T, ∃ U : X.Opens,
+    p.1 ∈ U
+      ∧ ∃ b : Fin r → E,
+        (∀ i, flagStep Ω b i = flagStep Ω b₀ i) ∧ ∀ q ∈ T, q.1 ∈ U → L.IsFrameAt b q
 
 def gr (L : Lat ξ E) {r : ℕ} (b₀ : Fin r → E) (i : Fin r) : Lat ξ Ω := fun p =>
   Submodule.span (regAt ξ p) {t | ∃ e ∈ L p, e - t • b₀ i ∈ flagStep Ω b₀ i}
@@ -34,15 +36,26 @@ def tens {I : Type} [Fintype I] (Λ : I → Lat ξ Ω) (a : I → ℤ) : Lat ξ 
 
 end Lat
 
-def IsGenericFlag {Ω' : Type} [Field Ω'] [Algebra Ω Ω'] {E' : Type} [AddCommGroup E'] [Module Ω' E']
-    (j : E →+ E') {S : Type} {r : S → ℕ} (V : S → Submodule Ω E) (b₀ : ∀ σ, Fin (r σ) → E') (d : ℕ) : Prop :=
+def IsGenericFlag
+    {Ω' : Type} [Field Ω'] [Algebra Ω Ω']
+    {E' : Type} [AddCommGroup E'] [Module Ω' E']
+    (j : E →+ E')
+    {S : Type} {r : S → ℕ} (V : S → Submodule Ω E) (b₀ : ∀ σ, Fin (r σ) → E')
+    (d : ℕ)
+    : Prop :=
   ∃ (c : ∀ σ, Fin (r σ) → E) (u : ∀ σ, Matrix (Fin (r σ)) (Fin (r σ)) Ω'),
-    (∀ σ, LinearIndependent Ω (c σ) ∧ Submodule.span Ω (Set.range (c σ)) = V σ) ∧
-    (∀ (a : Ω) e, j (a • e) = algebraMap Ω Ω' a • j e) ∧ (∀ σ, LinearIndependent Ω' fun k => j (c σ k)) ∧
-    (∀ σ, LinearIndependent Ω' (b₀ σ)) ∧ (∀ σ k, u σ k k = 1) ∧ (∀ σ l k, l < k → u σ l k = 0) ∧
-    (∀ σ i, flagStep Ω' (b₀ σ) i = flagStep Ω' (fun k => ∑ l, u σ l k • j (c σ l)) i) ∧
-    AlgebraicIndependent Ω (fun q : Σ σ, {lk : Fin (r σ) × Fin (r σ) // lk.2 < lk.1} => u q.1 q.2.1.1 q.2.1.2) ∧
-    0 < d ∧ Module.finrank (IntermediateField.adjoin Ω
-      (Set.range fun q : Σ σ, Fin (r σ) × Fin (r σ) => u q.1 q.2.1 q.2.2)) Ω' = d
+    (∀ σ, LinearIndependent Ω (c σ) ∧ Submodule.span Ω (Set.range (c σ)) = V σ)
+      ∧ (∀ (a : Ω) e, j (a • e) = algebraMap Ω Ω' a • j e)
+      ∧ (∀ σ, LinearIndependent Ω' fun k => j (c σ k)) ∧ (∀ σ, LinearIndependent Ω' (b₀ σ))
+      ∧ (∀ σ k, u σ k k = 1) ∧ (∀ σ l k, l < k → u σ l k = 0)
+      ∧ (∀ σ i, flagStep Ω' (b₀ σ) i = flagStep Ω' (fun k => ∑ l, u σ l k • j (c σ l)) i)
+      ∧ AlgebraicIndependent Ω
+        (fun q : Σ σ, {lk : Fin (r σ) × Fin (r σ) // lk.2 < lk.1} => u q.1 q.2.1.1 q.2.1.2)
+      ∧ 0 < d
+      ∧ Module.finrank
+          (IntermediateField.adjoin Ω
+            (Set.range fun q : Σ σ, Fin (r σ) × Fin (r σ) => u q.1 q.2.1 q.2.2))
+          Ω'
+        = d
 
 end GlobalTheory.CompanionTheory.Ar

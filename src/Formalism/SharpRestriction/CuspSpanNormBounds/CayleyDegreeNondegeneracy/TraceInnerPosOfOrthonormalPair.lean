@@ -17,14 +17,16 @@ section Alg
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem norm_embedding_le_trace (a : K) (ha : ∀ σ : K →ₐ[ℚ] ℂ, ∃ r : ℝ, 0 ≤ r ∧ σ a = (r : ℂ)) (φ : K →+* ℂ) :
-    ‖φ a‖ ≤ ((Algebra.trace ℚ K a : ℚ) : ℝ) := by
+theorem norm_embedding_le_trace
+    (a : K) (ha : ∀ σ : K →ₐ[ℚ] ℂ, ∃ r : ℝ, 0 ≤ r ∧ σ a = (r : ℂ)) (φ : K →+* ℂ)
+    : ‖φ a‖ ≤ ((Algebra.trace ℚ K a : ℚ) : ℝ) := by
   classical
   choose r hr0 hr using ha
   have htr : ((Algebra.trace ℚ K a : ℚ) : ℝ) = ∑ σ : K →ₐ[ℚ] ℂ, r σ := by
     apply Complex.ofReal_injective
     have h1 := trace_eq_sum_embeddings (K := ℚ) (L := K) ℂ (x := a)
-    rw [show ((((Algebra.trace ℚ K a : ℚ) : ℝ)) : ℂ) = algebraMap ℚ ℂ (Algebra.trace ℚ K a) by simp, h1]
+    rw [show ((((Algebra.trace ℚ K a : ℚ) : ℝ)) : ℂ) = algebraMap ℚ ℂ (Algebra.trace ℚ K a) by simp,
+      h1]
     push_cast
     exact Finset.sum_congr rfl fun σ _ => hr σ
   rw [htr]
@@ -32,9 +34,10 @@ theorem norm_embedding_le_trace (a : K) (ha : ∀ σ : K →ₐ[ℚ] ℂ, ∃ r 
   rw [hφ, Complex.norm_of_nonneg (hr0 _)]
   exact Finset.single_le_sum (fun σ _ => hr0 σ) (Finset.mem_univ _)
 
-theorem abs_det_trace_form_eq_discr (hK : IsCMUnram K) :
-    |(Matrix.of fun j j' : Free.ChooseBasisIndex ℤ (𝓞 K) =>
-      ((Algebra.trace ℚ K (star (integralBasis K j) * integralBasis K j') : ℚ) : ℝ)).det| = |(discr K : ℝ)| := by
+theorem abs_det_trace_form_eq_discr (hK : IsCMUnram K)
+    : |(Matrix.of fun j j' : Free.ChooseBasisIndex ℤ (𝓞 K) =>
+        ((Algebra.trace ℚ K (star (integralBasis K j) * integralBasis K j') : ℚ) : ℝ)).det|
+      = |(discr K : ℝ)| := by
   classical
   set B := integralBasis K with hB
   let s : K →ₗ[ℚ] K := (starRingEnd K).toRatAlgHom.toLinearMap
@@ -57,46 +60,52 @@ theorem abs_det_trace_form_eq_discr (hK : IsCMUnram K) :
       ext x
       simp [hs]
     rw [← LinearMap.toMatrix_comp, hss, LinearMap.toMatrix_id]
-  have hdet : A.det * A.det = 1 := by
-    rw [← Matrix.det_mul, hA, Matrix.det_one]
-  have hdet' : |A.det| = 1 := by
-    rcases mul_self_eq_one_iff.1 hdet with h | h <;> simp [h]
-  have hcast : (Matrix.of fun j j' : Free.ChooseBasisIndex ℤ (𝓞 K) =>
-      ((Algebra.trace ℚ K (star (integralBasis K j) * integralBasis K j') : ℚ) : ℝ)).det = ((Mq.det : ℚ) : ℝ) := by
+  have hdet : A.det * A.det = 1 := by rw [← Matrix.det_mul, hA, Matrix.det_one]
+  have hdet' : |A.det| = 1 := by rcases mul_self_eq_one_iff.1 hdet with h | h <;> simp [h]
+  have hcast
+      : (Matrix.of fun j j' : Free.ChooseBasisIndex ℤ (𝓞 K) =>
+          ((Algebra.trace ℚ K (star (integralBasis K j) * integralBasis K j') : ℚ) : ℝ)).det
+        = ((Mq.det : ℚ) : ℝ) := by
     rw [show ((Mq.det : ℚ) : ℝ) = Rat.castHom ℝ Mq.det from rfl, RingHom.map_det]
     congr 1
   rw [hcast, hM, Matrix.det_mul, Matrix.det_transpose, ← Algebra.discr_def, ← NumberField.coe_discr]
-  rw [show (((A.det * (discr K : ℚ) : ℚ)) : ℝ) = ((A.det : ℚ) : ℝ) * ((discr K : ℤ) : ℝ) by push_cast; rfl]
+  rw [show (((A.det * (discr K : ℚ) : ℚ)) : ℝ) = ((A.det : ℚ) : ℝ) * ((discr K : ℤ) : ℝ) by
+    push_cast; rfl]
   rw [abs_mul]
-  have : |((A.det : ℚ) : ℝ)| = 1 := by
-    rw [← Rat.cast_abs, hdet', Rat.cast_one]
+  have : |((A.det : ℚ) : ℝ)| = 1 := by rw [← Rat.cast_abs, hdet', Rat.cast_one]
   rw [this, one_mul]
 
 end Alg
 
 section Frame
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {V : Type} [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem inner_sum_orthonormal_pair (h : V →ₗ⋆[K] V →ₗ[K] K) (e : Fin 2 → V)
-    (he : ∀ i j, h (e i) (e j) = if i = j then 1 else 0) (a c : Fin 2 → K) :
-    h (∑ i, a i • e i) (∑ j, c j • e j) = ∑ i, star (a i) * c i := by
+theorem inner_sum_orthonormal_pair
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (e : Fin 2 → V) (he : ∀ i j, h (e i) (e j) = if i = j then 1 else 0)
+    (a c : Fin 2 → K)
+    : h (∑ i, a i • e i) (∑ j, c j • e j) = ∑ i, star (a i) * c i := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul, smul_eq_mul,
-    starRingEnd_apply, he]
+    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul,
+      smul_eq_mul, starRingEnd_apply, he]
   simp [Fin.sum_univ_two]
   ring
 
-theorem exists_coords_basis_fin_two (e : Fin 2 → V) (hli : LinearIndependent K e) (hsp : Submodule.span K (Set.range e) = ⊤) (x : V) :
-    ∃ a : Fin 2 → K, x = ∑ i, a i • e i := by
+theorem exists_coords_basis_fin_two
+    (e : Fin 2 → V) (hli : LinearIndependent K e) (hsp : Submodule.span K (Set.range e) = ⊤) (x : V)
+    : ∃ a : Fin 2 → K, x = ∑ i, a i • e i := by
   have hx : x ∈ Submodule.span K (Set.range e) := hsp ▸ Submodule.mem_top
   obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 hx
   exact ⟨a, ha.symm⟩
 
-theorem conj_inner_self_nonneg (hK : IsCMUnram K) (h : V →ₗ⋆[K] V →ₗ[K] K) (e : Fin 2 → V) (hli : LinearIndependent K e)
-    (hsp : Submodule.span K (Set.range e) = ⊤) (he : ∀ i j, h (e i) (e j) = if i = j then 1 else 0) (x : V)
-    (σ : K →ₐ[ℚ] ℂ) : ∃ r : ℝ, 0 ≤ r ∧ σ (h x x) = (r : ℂ) := by
+theorem conj_inner_self_nonneg
+    (hK : IsCMUnram K)
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (e : Fin 2 → V) (hli : LinearIndependent K e)
+    (hsp : Submodule.span K (Set.range e) = ⊤) (he : ∀ i j, h (e i) (e j) = if i = j then 1 else 0)
+    (x : V) (σ : K →ₐ[ℚ] ℂ)
+    : ∃ r : ℝ, 0 ≤ r ∧ σ (h x x) = (r : ℂ) := by
   obtain ⟨a, rfl⟩ := exists_coords_basis_fin_two e hli hsp x
   rw [inner_sum_orthonormal_pair h e he a a]
   refine ⟨∑ i, ‖σ (a i)‖ ^ 2, by positivity, ?_⟩
@@ -109,9 +118,12 @@ theorem conj_inner_self_nonneg (hK : IsCMUnram K) (h : V →ₗ⋆[K] V →ₗ[K
   simp only [RingHom.coe_coe] at hst
   rw [hst, Complex.conj_mul']
 
-theorem trace_inner_pos_of_orthonormal_pair (hK : IsCMUnram K) (h : V →ₗ⋆[K] V →ₗ[K] K) (e : Fin 2 → V) (hli : LinearIndependent K e)
-    (hsp : Submodule.span K (Set.range e) = ⊤) (he : ∀ i j, h (e i) (e j) = if i = j then 1 else 0) (x : V)
-    (hx : x ≠ 0) : 0 < Algebra.trace ℚ K (h x x) := by
+theorem trace_inner_pos_of_orthonormal_pair
+    (hK : IsCMUnram K)
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (e : Fin 2 → V) (hli : LinearIndependent K e)
+    (hsp : Submodule.span K (Set.range e) = ⊤) (he : ∀ i j, h (e i) (e j) = if i = j then 1 else 0)
+    (x : V) (hx : x ≠ 0)
+    : 0 < Algebra.trace ℚ K (h x x) := by
   obtain ⟨a, rfl⟩ := exists_coords_basis_fin_two e hli hsp x
   rw [inner_sum_orthonormal_pair h e he a a]
   have hi : ∃ i, a i ≠ 0 := by
@@ -120,12 +132,15 @@ theorem trace_inner_pos_of_orthonormal_pair (hK : IsCMUnram K) (h : V →ₗ⋆[
     apply hx
     simp [hne]
   obtain ⟨i, hi⟩ := hi
-  have htr : ((Algebra.trace ℚ K (∑ i, star (a i) * a i) : ℚ) : ℝ) =
-      ∑ σ : K →ₐ[ℚ] ℂ, ∑ i, ‖σ (a i)‖ ^ 2 := by
+  have htr
+      : ((Algebra.trace ℚ K (∑ i, star (a i) * a i) : ℚ) : ℝ)
+        = ∑ σ : K →ₐ[ℚ] ℂ, ∑ i, ‖σ (a i)‖ ^ 2 := by
     apply Complex.ofReal_injective
     have h1 := trace_eq_sum_embeddings (K := ℚ) (L := K) ℂ (x := ∑ i, star (a i) * a i)
-    rw [show ((((Algebra.trace ℚ K (∑ i, star (a i) * a i) : ℚ) : ℝ)) : ℂ) =
-      algebraMap ℚ ℂ (Algebra.trace ℚ K (∑ i, star (a i) * a i)) by simp, h1]
+    rw [show ((((Algebra.trace ℚ K (∑ i, star (a i) * a i) : ℚ) : ℝ)) : ℂ)
+          = algebraMap ℚ ℂ (Algebra.trace ℚ K (∑ i, star (a i) * a i)) by
+        simp,
+      h1]
     push_cast
     refine Finset.sum_congr rfl fun σ _ => ?_
     set_option synthInstance.maxHeartbeats 100000 in
@@ -149,21 +164,26 @@ end Frame
 
 section Covol
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {V : Type} [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem covolume_trace_lattice (hK : IsCMUnram K) (h : V →ₗ⋆[K] V →ₗ[K] K) (e : Fin 2 → V) (hli : LinearIndependent K e)
+theorem covolume_trace_lattice
+    (hK : IsCMUnram K)
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (e : Fin 2 → V) (hli : LinearIndependent K e)
     (hsp : Submodule.span K (Set.range e) = ⊤) (he : ∀ i j, h (e i) (e j) = if i = j then 1 else 0)
     (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N))
     (hι : ∀ x y : V, inner ℝ (ι x) (ι y) = ((Algebra.trace ℚ K (h x y) : ℚ) : ℝ))
     [DiscreteTopology (zmap ι (Submodule.span (𝓞 K) (Set.range e)))]
-    [IsZLattice ℝ (zmap ι (Submodule.span (𝓞 K) (Set.range e)))] :
-    ZLattice.covolume (zmap ι (Submodule.span (𝓞 K) (Set.range e))) = |(discr K : ℝ)| ∧ N = 2 * finrank ℚ K := by
+    [IsZLattice ℝ (zmap ι (Submodule.span (𝓞 K) (Set.range e)))]
+    : ZLattice.covolume (zmap ι (Submodule.span (𝓞 K) (Set.range e))) = |(discr K : ℝ)|
+      ∧ N = 2 * finrank ℚ K := by
   classical
-  let v : Free.ChooseBasisIndex ℤ (𝓞 K) × Fin 2 → EuclideanSpace ℝ (Fin N) :=
-    fun p => ι (integralBasis K p.1 • e p.2)
+  let v : Free.ChooseBasisIndex ℤ (𝓞 K) × Fin 2 → EuclideanSpace ℝ (Fin N) := fun p =>
+    ι (integralBasis K p.1 • e p.2)
   let A : Matrix (Free.ChooseBasisIndex ℤ (𝓞 K)) (Free.ChooseBasisIndex ℤ (𝓞 K)) ℝ :=
-    Matrix.of fun j j' => ((Algebra.trace ℚ K (star (integralBasis K j) * integralBasis K j') : ℚ) : ℝ)
+    Matrix.of fun j j' =>
+      ((Algebra.trace ℚ K (star (integralBasis K j) * integralBasis K j') : ℚ) : ℝ)
   have hAdet : |A.det| = |(discr K : ℝ)| := abs_det_trace_form_eq_discr hK
   have hspan : zmap ι (Submodule.span (𝓞 K) (Set.range e)) = Submodule.span ℤ (Set.range v) := by
     apply le_antisymm
@@ -187,8 +207,8 @@ theorem covolume_trace_lattice (hK : IsCMUnram K) (h : V →ₗ⋆[K] V →ₗ[K
   have hG : Matrix.gram ℝ v = Matrix.blockDiagonal (fun _ : Fin 2 => A) := by
     ext ⟨k, i⟩ ⟨k', i'⟩
     rw [Matrix.gram_apply, Matrix.blockDiagonal_apply]
-    simp only [v, A, hι, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul, smul_eq_mul, starRingEnd_apply,
-      he, Matrix.of_apply]
+    simp only [v, A, hι, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul, smul_eq_mul,
+      starRingEnd_apply, he, Matrix.of_apply]
     split_ifs with hii
     · simp [hii]
       exact congrArg _ (mul_comm _ _)
@@ -213,13 +233,19 @@ theorem covolume_trace_lattice (hK : IsCMUnram K) (h : V →ₗ⋆[K] V →ₗ[K
     intro p
     exact congrFun h0 p
   have hsp' : ⊤ ≤ Submodule.span ℝ (Set.range v) := by
-    have htop : Submodule.span ℝ ((zmap ι (Submodule.span (𝓞 K) (Set.range e)) : Submodule ℤ _) :
-        Set (EuclideanSpace ℝ (Fin N))) = ⊤ := IsZLattice.span_top
+    have htop
+        : Submodule.span ℝ
+            ((zmap ι (Submodule.span (𝓞 K) (Set.range e)) : Submodule ℤ _)
+              : Set (EuclideanSpace ℝ (Fin N)))
+          = ⊤ :=
+      IsZLattice.span_top
     rw [hspan, Submodule.span_span_of_tower] at htop
     exact htop.ge
   let bb := Module.Basis.mk hli' hsp'
   have hbb : ⇑bb = v := Module.Basis.coe_mk hli' hsp'
-  have hcovG := Formalism.E.covolumeEqSqrtDetGram (EuclideanSpace ℝ (Fin N)) (Free.ChooseBasisIndex ℤ (𝓞 K) × Fin 2) bb
+  have hcovG :=
+    Formalism.E.covolumeEqSqrtDetGram (EuclideanSpace ℝ (Fin N))
+      (Free.ChooseBasisIndex ℤ (𝓞 K) × Fin 2) bb
   rw [hbb] at hcovG
   refine ⟨?_, ?_⟩
   · rw [hspan, hcovG, hdetG, Real.sqrt_mul_self_eq_abs, hAdet]
@@ -235,34 +261,42 @@ section Mink
 
 open MeasureTheory
 
-theorem minkowski_discriminant_ineq (n : ℕ) (hn : 1 ≤ n) (Δ rd : ℝ) (hΔ : 0 < Δ) (hrd : rd ^ n = Δ) (hrd0 : 0 < rd) :
-    Δ * 2 ^ (2 * n) < Real.sqrt (2 * n * rd) ^ (2 * n) * (√Real.pi ^ (2 * n) / Real.Gamma (((2 * n : ℕ) : ℝ) / 2 + 1)) := by
+theorem minkowski_discriminant_ineq
+    (n : ℕ) (hn : 1 ≤ n) (Δ rd : ℝ) (hΔ : 0 < Δ) (hrd : rd ^ n = Δ) (hrd0 : 0 < rd)
+    : Δ * 2 ^ (2 * n)
+      < Real.sqrt (2 * n * rd) ^ (2 * n)
+        * (√Real.pi ^ (2 * n) / Real.Gamma (((2 * n : ℕ) : ℝ) / 2 + 1)) := by
   have hpi : (2 : ℝ) < Real.pi := by linarith [Real.pi_gt_three]
   have e1 : Real.sqrt (2 * n * rd) ^ (2 * n) = (2 * n * rd) ^ n := by
     rw [pow_mul, Real.sq_sqrt (by positivity)]
-  have e2 : √Real.pi ^ (2 * n) = Real.pi ^ n := by
-    rw [pow_mul, Real.sq_sqrt Real.pi_pos.le]
+  have e2 : √Real.pi ^ (2 * n) = Real.pi ^ n := by rw [pow_mul, Real.sq_sqrt Real.pi_pos.le]
   have e3 : Real.Gamma (((2 * n : ℕ) : ℝ) / 2 + 1) = (n.factorial : ℝ) := by
-    rw [show (((2 * n : ℕ) : ℝ) / 2 + 1) = (n : ℝ) + 1 by push_cast; ring, Real.Gamma_nat_eq_factorial]
+    rw [show (((2 * n : ℕ) : ℝ) / 2 + 1) = (n : ℝ) + 1 by push_cast; ring,
+      Real.Gamma_nat_eq_factorial]
   rw [e1, e2, e3, mul_pow, mul_pow, hrd]
   have hf : (n.factorial : ℝ) ≤ (n : ℝ) ^ n := by exact_mod_cast Nat.factorial_le_pow n
   have hfpos : (0 : ℝ) < n.factorial := by exact_mod_cast Nat.factorial_pos n
   have hnpos : (0 : ℝ) < n := by exact_mod_cast hn
   have h2pi : (2 : ℝ) ^ n < Real.pi ^ n := pow_lt_pow_left₀ hpi (by norm_num) (by omega)
   have k1 : (2 : ℝ) ^ n * n.factorial < Real.pi ^ n * (n : ℝ) ^ n :=
-    calc (2 : ℝ) ^ n * n.factorial ≤ 2 ^ n * (n : ℝ) ^ n := by gcongr
+    calc
+      (2 : ℝ) ^ n * n.factorial
+        ≤ 2 ^ n * (n : ℝ) ^ n := by gcongr
       _ < Real.pi ^ n * (n : ℝ) ^ n := by gcongr
   rw [← mul_div_assoc, lt_div_iff₀ hfpos]
   have q1 : Δ * 2 ^ (2 * n) * n.factorial = (Δ * 2 ^ n) * (2 ^ n * n.factorial) := by
     rw [two_mul, pow_add]; ring
-  have q2 : 2 ^ n * (n : ℝ) ^ n * Δ * Real.pi ^ n = (Δ * 2 ^ n) * (Real.pi ^ n * (n : ℝ) ^ n) := by ring
+  have q2 : 2 ^ n * (n : ℝ) ^ n * Δ * Real.pi ^ n = (Δ * 2 ^ n) * (Real.pi ^ n * (n : ℝ) ^ n) := by
+    ring
   rw [q1, q2]
   exact mul_lt_mul_of_pos_left k1 (by positivity)
 
-theorem exists_short_vector_minkowski (N : ℕ) (hN : 1 ≤ N) (Λ : Submodule ℤ (EuclideanSpace ℝ (Fin N))) [DiscreteTopology Λ] [IsZLattice ℝ Λ]
+theorem exists_short_vector_minkowski
+    (N : ℕ) (hN : 1 ≤ N) (Λ : Submodule ℤ (EuclideanSpace ℝ (Fin N)))
+    [DiscreteTopology Λ] [IsZLattice ℝ Λ]
     (R : ℝ) (hR : 0 ≤ R)
-    (hvol : ZLattice.covolume Λ * 2 ^ N < R ^ N * (√Real.pi ^ N / Real.Gamma ((N : ℝ) / 2 + 1))) :
-    ∃ v ∈ Λ, v ≠ 0 ∧ ‖v‖ < R := by
+    (hvol : ZLattice.covolume Λ * 2 ^ N < R ^ N * (√Real.pi ^ N / Real.Gamma ((N : ℝ) / 2 + 1)))
+    : ∃ v ∈ Λ, v ≠ 0 ∧ ‖v‖ < R := by
   haveI : Nonempty (Fin N) := ⟨⟨0, hN⟩⟩
   let b := Module.Free.chooseBasis ℤ Λ
   have hF := ZLattice.isAddFundamentalDomain b (volume : Measure (EuclideanSpace ℝ (Fin N)))
@@ -271,36 +305,47 @@ theorem exists_short_vector_minkowski (N : ℕ) (hN : 1 ≤ N) (Λ : Submodule �
     (ZSpan.fundamentalDomain_isBounded _).measure_lt_top.ne
   haveI : Countable Λ.toAddSubgroup := Countable.of_equiv _ b.equivFun.toEquiv.symm
   have hc0 : 0 ≤ ZLattice.covolume Λ := by rw [hcov]; exact measureReal_nonneg
-  have hvolF : volume (ZSpan.fundamentalDomain (b.ofZLatticeBasis ℝ Λ)) = ENNReal.ofReal (ZLattice.covolume Λ) := by
+  have hvolF
+      : volume (ZSpan.fundamentalDomain (b.ofZLatticeBasis ℝ Λ))
+        = ENNReal.ofReal (ZLattice.covolume Λ) := by
     rw [hcov, measureReal_def, ENNReal.ofReal_toReal hfin]
   have hq : 0 < R ^ N * (√Real.pi ^ N / Real.Gamma ((N : ℝ) / 2 + 1)) :=
     lt_of_le_of_lt (mul_nonneg hc0 (by positivity)) hvol
-  obtain ⟨x, hx0, hxs⟩ := exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure
-    (L := Λ.toAddSubgroup) (s := Metric.ball (0 : EuclideanSpace ℝ (Fin N)) R) hF
-    (fun x hx => by simpa using hx) (convex_ball 0 R) (by
-      rw [EuclideanSpace.volume_ball, finrank_euclideanSpace_fin, Fintype.card_fin, hvolF]
-      have h2 : (2 : ENNReal) ^ N = ENNReal.ofReal (2 ^ N) := by
-        rw [ENNReal.ofReal_pow (by norm_num)]; simp
-      rw [h2, ← ENNReal.ofReal_mul hc0, ← ENNReal.ofReal_pow hR, ← ENNReal.ofReal_mul (by positivity)]
-      exact (ENNReal.ofReal_lt_ofReal_iff hq).2 hvol)
+  obtain ⟨x, hx0, hxs⟩ :=
+    exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure (L := Λ.toAddSubgroup)
+      (s := Metric.ball (0 : EuclideanSpace ℝ (Fin N)) R) hF
+      (fun x hx => by simpa using hx)
+      (convex_ball 0 R)
+      (by
+        rw [EuclideanSpace.volume_ball, finrank_euclideanSpace_fin, Fintype.card_fin, hvolF]
+        have h2 : (2 : ENNReal) ^ N = ENNReal.ofReal (2 ^ N) := by
+          rw [ENNReal.ofReal_pow (by norm_num)]; simp
+        rw [h2, ← ENNReal.ofReal_mul hc0, ← ENNReal.ofReal_pow hR,
+          ← ENNReal.ofReal_mul (by positivity)]
+        exact (ENNReal.ofReal_lt_ofReal_iff hq).2 hvol)
   exact ⟨x, x.2, fun h => hx0 (Subtype.ext h), by simpa using hxs⟩
 
 end Mink
 
-theorem short_vector_every_place (K : Type) [Field K] [NumberField K] [StarRing K] (hK : IsCMUnram K) :
-    ShortVectorEveryPlace K (2 * (finrank ℚ K : ℝ) * rootDiscriminant K) := by
+theorem short_vector_every_place
+    (K : Type) [Field K] [NumberField K] [StarRing K] (hK : IsCMUnram K)
+    : ShortVectorEveryPlace K (2 * (finrank ℚ K : ℝ) * rootDiscriminant K) := by
   intro V _ _ _ _ h L hsymm hL M hM
   obtain ⟨e, hli, hsp, rfl, he⟩ := hL
   haveI : FiniteDimensional K V := Module.Finite.of_basis (Module.Basis.mk hli hsp.ge)
-  have hpos : ∀ x : V, x ≠ 0 → 0 < Algebra.trace ℚ K (h x x) := fun x hx => trace_inner_pos_of_orthonormal_pair hK h e hli hsp he x hx
+  have hpos : ∀ x : V, x ≠ 0 → 0 < Algebra.trace ℚ K (h x x) := fun x hx =>
+    trace_inner_pos_of_orthonormal_pair hK h e hli hsp he x hx
   obtain ⟨N, ι, hι, -, hlat⟩ := Formalism.HermitianLatticesTheory.final_traceReal K V h hsymm hpos
   have hLlat : Submodule.IsLattice K (Submodule.span (𝓞 K) (Set.range e)) :=
     Submodule.IsLattice.of_fg _ (Submodule.fg_span (Set.finite_range e))
-  have hLfull : Submodule.IsFullLattice K (Submodule.span (𝓞 K) (Set.range e)) :=
-    { hLlat with span_eq_top := by rw [Submodule.span_span_of_tower, hsp] }
+  have hLfull : Submodule.IsFullLattice K (Submodule.span (𝓞 K) (Set.range e)) := {
+    hLlat with
+    span_eq_top := by rw [Submodule.span_span_of_tower, hsp]
+  }
   obtain ⟨iL1, iL2⟩ := hlat _ hLfull
   obtain ⟨familyMassRatio, familyMassSecondLine⟩ := hlat M hM.1
-  have hcov := Formalism.HermitianLatticesTheory.final_genusCovol K V h hsymm hpos N ι hι _ M hLlat hM
+  have hcov :=
+    Formalism.HermitianLatticesTheory.final_genusCovol K V h hsymm hpos N ι hι _ M hLlat hM
   obtain ⟨hcL, hN⟩ := covolume_trace_lattice hK h e hli hsp he N ι hι
   set n := Module.finrank ℚ K with hn_def
   subst hN
@@ -311,8 +356,10 @@ theorem short_vector_every_place (K : Type) [Field K] [NumberField K] [StarRing 
     rw [rootDiscriminant, ← Real.rpow_natCast, ← Real.rpow_mul (abs_nonneg _), ← hn_def, one_div,
       inv_mul_cancel₀ (Nat.cast_ne_zero.2 (by omega)), Real.rpow_one]
   have hB0 : 0 ≤ 2 * (n : ℝ) * rootDiscriminant K := mul_nonneg (by positivity) hrd0.le
-  obtain ⟨v, hvM, hv0, hvR⟩ := exists_short_vector_minkowski (2 * n) (by omega) (zmap ι M) (Real.sqrt (2 * n * rootDiscriminant K))
-    (Real.sqrt_nonneg _) (by rw [hcov, hcL]; exact minkowski_discriminant_ineq n hn _ _ hΔ hrdn hrd0)
+  obtain ⟨v, hvM, hv0, hvR⟩ :=
+    exists_short_vector_minkowski (2 * n) (by omega) (zmap ι M)
+      (Real.sqrt (2 * n * rootDiscriminant K)) (Real.sqrt_nonneg _)
+      (by rw [hcov, hcL]; exact minkowski_discriminant_ineq n hn _ _ hΔ hrdn hrd0)
   obtain ⟨x, hxM, rfl⟩ := hvM
   have hx0 : x ≠ 0 := by
     rintro rfl

@@ -4,14 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem low_mk {R : Type} [CommRing R] (x y z t : R) :
-    IsLow (!![1, 0, 0, 0; x, 1, 0, 0; y + t * x, t, 1, 0; z, y, -x, 1] : M4 R) := by
+private theorem low_mk {R : Type} [CommRing R] (x y z t : R)
+    : IsLow (!![1, 0, 0, 0; x, 1, 0, 0; y + t * x, t, 1, 0; z, y, -x, 1] : M4 R) := by
   refine ⟨?_, ?_, ?_⟩
   · ext i j
-    fin_cases i <;> fin_cases j <;>
-      simp [adj_apply, sgn, Fin.rev, Matrix.mul_apply, Fin.sum_univ_four] <;> ring
+    fin_cases i <;> fin_cases j
+      <;> simp [adj_apply, sgn, Fin.rev, Matrix.mul_apply, Fin.sum_univ_four] <;> ring
   · intro i
     fin_cases i <;> simp
   · intro i j h
@@ -23,8 +25,11 @@ private theorem low_adj {R : Type} [CommRing R] {m : M4 R} (h : IsLow m) : IsLow
     fin_cases i <;> simp [sgn]
   · rw [adj_apply, h.2.2 _ _ (Fin.rev_lt_rev.2 hij), smul_zero]
 
-private theorem up_of {R : Type} [CommRing R] {w : M4 R} (h : IsGSp 1 w) (h0 : IsUnit (w 0 0))
-    (h1 : w 1 0 = 0) (h2 : w 2 0 = 0) (h3 : w 3 0 = 0) (h4 : w 2 1 = 0) : IsUp w := by
+private theorem up_of
+    {R : Type} [CommRing R]
+    {w : M4 R} (h : IsGSp 1 w) (h0 : IsUnit (w 0 0)) (h1 : w 1 0 = 0) (h2 : w 2 0 = 0)
+    (h3 : w 3 0 = 0) (h4 : w 2 1 = 0)
+    : IsUp w := by
   have e := sp_adj_mul h
   have e1 := congrFun (congrFun e 1) 0
   have e2 := congrFun (congrFun e 2) 0
@@ -34,9 +39,10 @@ private theorem up_of {R : Type} [CommRing R] {w : M4 R} (h : IsGSp 1 w) (h0 : I
   intro i j hij
   fin_cases i <;> fin_cases j <;> simp at hij ⊢ <;> assumption
 
-theorem UpperTheory.V.Ws.Lab.luSp :
-    ∀ (R : Type) [CommRing R] (u : M4 R), IsGSp 1 u → IsUnit (u 0 0) → IsUnit (u 0 0 * u 1 1 - u 0 1 * u 1 0) →
-      ∃ n b : M4 R, IsLow n ∧ IsGSp 1 b ∧ IsUp b ∧ u = n * b := by
+theorem UpperTheory.V.Ws.Lab.luSp
+    : ∀ (R : Type) [CommRing R] (u : M4 R),
+      IsGSp 1 u → IsUnit (u 0 0) → IsUnit (u 0 0 * u 1 1 - u 0 1 * u 1 0)
+        → ∃ n b : M4 R, IsLow n ∧ IsGSp 1 b ∧ IsUp b ∧ u = n * b := by
   intro R _ u hu h0 hD
   obtain ⟨ai, hai⟩ := h0.exists_right_inv
   obtain ⟨di, hdi⟩ := hD.exists_right_inv

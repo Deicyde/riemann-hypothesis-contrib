@@ -11,9 +11,10 @@ open NumberField IsDedekindDomain
 
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-private theorem fixingSubgroup_fieldRange {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω] (K : Type) [Field K]
-    [Algebra E K] [Algebra K Ω] [IsScalarTower E K Ω] :
-    (IsScalarTower.toAlgHom E K Ω).fieldRange.fixingSubgroup = fixGrp E Ω K := by
+private theorem fixingSubgroup_fieldRange
+    {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
+    (K : Type) [Field K] [Algebra E K] [Algebra K Ω] [IsScalarTower E K Ω]
+    : (IsScalarTower.toAlgHom E K Ω).fieldRange.fixingSubgroup = fixGrp E Ω K := by
   ext g
   rw [mem_fixGrp, IntermediateField.mem_fixingSubgroup_iff]
   constructor
@@ -55,8 +56,7 @@ theorem inclOf : InclOf := by
   have fX : Module.finrank E X.K = Module.finrank E f.fieldRange := eX.toLinearEquiv.finrank_eq
   have fY : Module.finrank E Y.K = Module.finrank E g.fieldRange := eY.toLinearEquiv.finrank_eq
   have tw := Module.finrank_mul_finrank E X.K Y.K
-  have hsub : g.fieldRange.fixingSubgroup ≤ f.fieldRange.fixingSubgroup := by
-    rw [hX, hY]; exact hXY
+  have hsub : g.fieldRange.fixingSubgroup ≤ f.fieldRange.fixingSubgroup := by rw [hX, hY]; exact hXY
   have rel := Subgroup.relIndex_mul_index hsub
   haveI : FiniteDimensional E X.K := Module.Finite.of_restrictScalars_finite ℚ E X.K
   have hpos : 0 < Module.finrank E X.K := Module.finrank_pos

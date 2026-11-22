@@ -11,27 +11,30 @@ open Matrix
 
 namespace PI.ScMuExists.UnitaryGroupMassFormula
 
-theorem inst_Kset_star {n : ℕ} (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Formalism.REAL.Kset ε) :
-    star g ∈ Formalism.REAL.Kset ε := by
+theorem inst_Kset_star
+    {n : ℕ} (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Formalism.REAL.Kset ε)
+    : star g ∈ Formalism.REAL.Kset ε := by
   refine ⟨Unitary.star_mem hg.1, ?_⟩
   have h := congrArg star hg.2
   simp only [star_mul, Matrix.star_eq_conjTranspose, Formalism.REAL.Jm_conjTranspose] at h
   simpa [Matrix.star_eq_conjTranspose] using h.symm
 
-theorem inst_Jm_single {n : ℕ} (ε : Fin n → Bool) (i : Fin n) :
-    Formalism.REAL.Jm ε *ᵥ Pi.single i 1 = (if ε i then (1 : ℂ) else -1) • Pi.single i 1 := by
+theorem inst_Jm_single {n : ℕ} (ε : Fin n → Bool) (i : Fin n)
+    : Formalism.REAL.Jm ε *ᵥ Pi.single i 1 = (if ε i then (1 : ℂ) else -1) • Pi.single i 1 := by
   funext r
   simp only [Formalism.REAL.Jm, Matrix.mulVec_diagonal, Pi.smul_apply, Pi.single_apply, smul_eq_mul]
   by_cases h : r = i
   · subst h; simp
   · simp [h]
 
-theorem inst_fix_sum {n : ℕ} (m : Matrix (Fin n) (Fin n) ℂ) (T : Finset (Fin n))
-    (hm : ∀ i ∈ T, m *ᵥ Pi.single i 1 = Pi.single i 1) (c : Fin n → ℂ) (hc : ∀ i ∉ T, c i = 0) :
-    m *ᵥ c = c := by
+theorem inst_fix_sum
+    {n : ℕ} (m : Matrix (Fin n) (Fin n) ℂ) (T : Finset (Fin n))
+    (hm : ∀ i ∈ T, m *ᵥ Pi.single i 1 = Pi.single i 1) (c : Fin n → ℂ) (hc : ∀ i ∉ T, c i = 0)
+    : m *ᵥ c = c := by
   have hc' : c = ∑ i ∈ T, c i • Pi.single i (1 : ℂ) := by
     funext r
-    simp only [Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_one, mul_zero]
+    simp only [Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_one,
+      mul_zero]
     rw [Finset.sum_ite_eq]
     split_ifs with h
     · rfl
@@ -40,8 +43,10 @@ theorem inst_fix_sum {n : ℕ} (m : Matrix (Fin n) (Fin n) ℂ) (T : Finset (Fin
   refine Finset.sum_congr rfl fun i hi => ?_
   rw [Matrix.mulVec_smul, hm i hi]
 
-theorem inst_col_entry {n : ℕ} (m : Matrix (Fin n) (Fin n) ℂ) (i : Fin n)
-    (hm : m *ᵥ Pi.single i 1 = Pi.single i 1) (r : Fin n) : m r i = if r = i then 1 else 0 := by
+theorem inst_col_entry
+    {n : ℕ}
+    (m : Matrix (Fin n) (Fin n) ℂ) (i : Fin n) (hm : m *ᵥ Pi.single i 1 = Pi.single i 1) (r : Fin n)
+    : m r i = if r = i then 1 else 0 := by
   have := congrFun hm r
   simpa [Matrix.mulVec_single_one, Pi.single_apply] using this
 
@@ -61,21 +66,22 @@ theorem placeDecomp_of (hE : InstExpFix) (hAB : InstAdaptBasis) : InstPlaceDecom
   have hAiJ : Aiᴴ * Formalism.REAL.Jm ε' * Ai = Formalism.REAL.Jm ε := by
     rw [← hA]
     have h2 : Aiᴴ * Aᴴ = 1 := by rw [← Matrix.conjTranspose_mul, hAAi, Matrix.conjTranspose_one]
-    calc Aiᴴ * (Aᴴ * Formalism.REAL.Jm ε * A) * Ai = (Aiᴴ * Aᴴ) * Formalism.REAL.Jm ε * (A * Ai) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      Aiᴴ * (Aᴴ * Formalism.REAL.Jm ε * A) * Ai
+        = (Aiᴴ * Aᴴ) * Formalism.REAL.Jm ε * (A * Ai) := by simp only [Matrix.mul_assoc]
       _ = Formalism.REAL.Jm ε := by rw [h2, hAAi, Matrix.one_mul, Matrix.mul_one]
   have tr1 : ∀ m, Formalism.REAL.inUJ ε m → Formalism.REAL.inUJ ε' (Ai * m * A) := by
     intro m hm
     unfold Formalism.REAL.inUJ at *
-    have : (Ai * m * A)ᴴ * Formalism.REAL.Jm ε' * (Ai * m * A) =
-        Aᴴ * (mᴴ * (Aiᴴ * Formalism.REAL.Jm ε' * Ai) * m) * A := by
+    have : (Ai * m * A)ᴴ * Formalism.REAL.Jm ε' * (Ai * m * A)
+        = Aᴴ * (mᴴ * (Aiᴴ * Formalism.REAL.Jm ε' * Ai) * m) * A := by
       simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
     rw [this, hAiJ, hm, hA]
   have tr2 : ∀ m, Formalism.REAL.inUJ ε' m → Formalism.REAL.inUJ ε (A * m * Ai) := by
     intro m hm
     unfold Formalism.REAL.inUJ at *
-    have : (A * m * Ai)ᴴ * Formalism.REAL.Jm ε * (A * m * Ai) =
-        Aiᴴ * (mᴴ * (Aᴴ * Formalism.REAL.Jm ε * A) * m) * Ai := by
+    have : (A * m * Ai)ᴴ * Formalism.REAL.Jm ε * (A * m * Ai)
+        = Aiᴴ * (mᴴ * (Aᴴ * Formalism.REAL.Jm ε * A) * m) * Ai := by
       simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
     rw [this, hA, hm, hAiJ]
   have back : ∀ m, (∀ i ∈ T, m *ᵥ Pi.single i 1 = Pi.single i 1) → A * m * Ai * B = B := by
@@ -90,8 +96,8 @@ theorem placeDecomp_of (hE : InstExpFix) (hAB : InstAdaptBasis) : InstPlaceDecom
   have hg'fix : ∀ i ∈ T, g' *ᵥ Pi.single i 1 = Pi.single i 1 := by
     intro i hi
     obtain ⟨c, hc⟩ := hT1 i hi
-    rw [hg'def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hc, Matrix.mulVec_mulVec c g B, hgB, ← hc,
-      Matrix.mulVec_mulVec, hAiA, Matrix.one_mulVec]
+    rw [hg'def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hc, Matrix.mulVec_mulVec c g B, hgB,
+      ← hc, Matrix.mulVec_mulVec, hAiA, Matrix.one_mulVec]
 
   obtain ⟨k', X', hk', hX', hgkX⟩ := (Formalism.REAL.polar n ε').1 g' hg'
   have hXc := ((Formalism.REAL.pChar n ε' X').1.mp hX')
@@ -102,9 +108,11 @@ theorem placeDecomp_of (hE : InstExpFix) (hAB : InstAdaptBasis) : InstPlaceDecom
   have hk'u2 : k' * star k' = 1 := Matrix.mem_unitaryGroup_iff.mp hk'.1
   have hp'H : p'ᴴ = p' := by rw [hp'def]; exact hXh.exp
   have hgg : g'ᴴ * g' = NormedSpace.exp (X' + X') := by
-    rw [Matrix.exp_add_of_commute X' X' (Commute.refl X'), ← hp'def, hgkX, Matrix.conjTranspose_mul, hp'H,
-      ← Matrix.star_eq_conjTranspose]
-    calc p' * star k' * (k' * p') = p' * (star k' * k') * p' := by simp only [Matrix.mul_assoc]
+    rw [Matrix.exp_add_of_commute X' X' (Commute.refl X'), ← hp'def, hgkX, Matrix.conjTranspose_mul,
+      hp'H, ← Matrix.star_eq_conjTranspose]
+    calc
+      p' * star k' * (k' * p')
+        = p' * (star k' * k') * p' := by simp only [Matrix.mul_assoc]
       _ = p' * p' := by rw [hk'u, Matrix.mul_one]
   have hgHfix : ∀ i ∈ T, g'ᴴ *ᵥ Pi.single i 1 = Pi.single i 1 := by
     intro i hi
@@ -127,15 +135,23 @@ theorem placeDecomp_of (hE : InstExpFix) (hAB : InstAdaptBasis) : InstPlaceDecom
     rw [hgkX, ← Matrix.mulVec_mulVec, hpfix i hi] at h1
     exact h1
 
-  obtain ⟨σ', hσdef⟩ : ∃ σ' : Matrix (Fin n) (Fin n) ℂ,
-      σ' = Matrix.diagonal fun i => if i ∈ T then (1 : ℂ) else (if ε' i then 1 else -1) := ⟨_, rfl⟩
+  obtain ⟨σ', hσdef⟩
+      : ∃ σ' : Matrix (Fin n) (Fin n) ℂ,
+        σ' = Matrix.diagonal fun i => if i ∈ T then (1 : ℂ) else (if ε' i then 1 else -1) :=
+    ⟨_, rfl⟩
   have hσσ' : σ' * σ' = 1 := by
     rw [hσdef, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-    congr 1; funext i; split_ifs <;> norm_num
+    congr 1
+    funext i
+    split_ifs <;> norm_num
   have hσ'UJ : Formalism.REAL.inUJ ε' σ' := by
     unfold Formalism.REAL.inUJ Formalism.REAL.Jm
-    rw [hσdef, Matrix.diagonal_conjTranspose, Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal]
-    congr 1; funext i; simp only [Pi.star_apply]; split_ifs <;> simp
+    rw [hσdef, Matrix.diagonal_conjTranspose, Matrix.diagonal_mul_diagonal,
+      Matrix.diagonal_mul_diagonal]
+    congr 1
+    funext i
+    simp only [Pi.star_apply]
+    split_ifs <;> simp
   have hσfix : ∀ i ∈ T, σ' *ᵥ Pi.single i 1 = Pi.single i 1 := by
     intro i hi
     funext r
@@ -167,44 +183,70 @@ theorem placeDecomp_of (hE : InstExpFix) (hAB : InstAdaptBasis) : InstPlaceDecom
         · simp [hrc]
       · simp [hr, hc]
   have hJinv : (Formalism.REAL.Jm ε')⁻¹ = Formalism.REAL.Jm ε' := Matrix.inv_eq_left_inv hJ'J'
-  have hJX : Formalism.REAL.Jm ε' * X' * Formalism.REAL.Jm ε' = -X' := ((Formalism.REAL.pChar n ε' X').2 hX')
+  have hJX : Formalism.REAL.Jm ε' * X' * Formalism.REAL.Jm ε' = -X' :=
+    ((Formalism.REAL.pChar n ε' X').2 hX')
   have hJp : Formalism.REAL.Jm ε' * p' * Formalism.REAL.Jm ε' = NormedSpace.exp (-X') := by
     have := Matrix.exp_conj (Formalism.REAL.Jm ε') X' ⟨⟨_, _, hJ'J', hJ'J'⟩, rfl⟩
     rw [hJinv, hJX] at this
     rw [hp'def, this]
   have hσp' : σ' * p' * σ' * p' = 1 := by
-    rw [hkey, hJp, hp'def, ← Matrix.exp_add_of_commute _ _ (Commute.refl X').neg_left, neg_add_cancel,
-      NormedSpace.exp_zero]
+    rw [hkey, hJp, hp'def, ← Matrix.exp_add_of_commute _ _ (Commute.refl X').neg_left,
+      neg_add_cancel, NormedSpace.exp_zero]
   have hk'UJ : Formalism.REAL.inUJ ε' k' := (Formalism.REAL.kFacts n ε').1 k' hk'
   have hp'UJ : Formalism.REAL.inUJ ε' p' := by
     have := Formalism.REAL.expUJ n ε' X' hX'.1 1
     simpa [hp'def] using this
 
-  refine ⟨A * k' * Ai, A * p' * Ai, A * σ' * Ai, tr2 _ hk'UJ, tr2 _ hp'UJ, tr2 _ hσ'UJ, back _ hkfix,
-    back _ hpfix, back _ hσfix, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    A * k' * Ai,
+    A * p' * Ai,
+    A * σ' * Ai,
+    tr2 _ hk'UJ,
+    tr2 _ hp'UJ,
+    tr2 _ hσ'UJ,
+    back _ hkfix,
+    back _ hpfix,
+    back _ hσfix,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · have : g = A * g' * Ai := by
       rw [hg'def]
-      calc g = (A * Ai) * g * (A * Ai) := by rw [hAAi, Matrix.one_mul, Matrix.mul_one]
+      calc
+        g = (A * Ai) * g * (A * Ai) := by rw [hAAi, Matrix.one_mul, Matrix.mul_one]
         _ = A * (Ai * g * A) * Ai := by simp only [Matrix.mul_assoc]
     rw [this, hgkX]
     simp only [Matrix.mul_assoc]
     rw [← Matrix.mul_assoc Ai A, hAiA, Matrix.one_mul]
   · simp only [Matrix.mul_assoc]
-    rw [← Matrix.mul_assoc Ai A, hAiA, Matrix.one_mul, ← Matrix.mul_assoc σ' σ', hσσ', Matrix.one_mul, hAAi]
-  · have : A * σ' * Ai * (A * p' * Ai) * (A * σ' * Ai) * (A * p' * Ai) = A * (σ' * p' * σ' * p') * Ai := by
+    rw [← Matrix.mul_assoc Ai A, hAiA, Matrix.one_mul, ← Matrix.mul_assoc σ' σ', hσσ',
+      Matrix.one_mul, hAAi]
+  · have : A * σ' * Ai * (A * p' * Ai) * (A * σ' * Ai) * (A * p' * Ai)
+        = A * (σ' * p' * σ' * p') * Ai := by
       simp only [Matrix.mul_assoc]
-      rw [← Matrix.mul_assoc Ai A, hAiA, Matrix.one_mul, ← Matrix.mul_assoc Ai A, hAiA, Matrix.one_mul,
-        ← Matrix.mul_assoc Ai A, hAiA, Matrix.one_mul]
+      rw [← Matrix.mul_assoc Ai A, hAiA, Matrix.one_mul, ← Matrix.mul_assoc Ai A, hAiA,
+        Matrix.one_mul, ← Matrix.mul_assoc Ai A, hAiA, Matrix.one_mul]
     rw [this, hσp', Matrix.mul_one, hAAi]
-  ·
-    set R : ℝ := (n : ℝ) + 1 with hR
+  · set R : ℝ := (n : ℝ) + 1 with hR
     have hemb := (Formalism.REAL.uJEmb n ε).1
-    refine ⟨{x : Formalism.REAL.UJ ε | Formalism.REAL.hs (Ai * Formalism.MainNotions.S.uMat x * A) ≤ R}, ?_, ?_, ?_⟩
-    · have hcomp : IsCompact ((fun m => A * m * Ai) '' {m | Formalism.REAL.inUJ ε' m ∧ Formalism.REAL.hs m ≤ R}) :=
-        ((Formalism.REAL.hSBall n ε').1 R).image ((continuous_const.mul continuous_id).mul continuous_const)
-      have hset : {x : Formalism.REAL.UJ ε | Formalism.REAL.hs (Ai * Formalism.MainNotions.S.uMat x * A) ≤ R} =
-          (fun g : Formalism.REAL.UJ ε => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) ⁻¹'
-            ((fun m => A * m * Ai) '' {m | Formalism.REAL.inUJ ε' m ∧ Formalism.REAL.hs m ≤ R}) := by
+    refine ⟨
+      {x : Formalism.REAL.UJ ε | Formalism.REAL.hs (Ai * Formalism.MainNotions.S.uMat x * A) ≤ R},
+      ?_,
+      ?_,
+      ?_
+    ⟩
+    · have hcomp : IsCompact
+          ((fun m => A * m * Ai) '' {m | Formalism.REAL.inUJ ε' m ∧ Formalism.REAL.hs m ≤ R}) :=
+        ((Formalism.REAL.hSBall n ε').1 R).image
+          ((continuous_const.mul continuous_id).mul continuous_const)
+      have hset
+          : {x : Formalism.REAL.UJ ε | Formalism.REAL.hs (Ai * Formalism.MainNotions.S.uMat x * A) ≤ R}
+            = (fun g : Formalism.REAL.UJ ε =>
+                ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ))
+              ⁻¹' ((fun m => A * m * Ai)
+                '' {m | Formalism.REAL.inUJ ε' m ∧ Formalism.REAL.hs m ≤ R}) := by
         ext x
         simp only [Set.mem_ofPred_eq, Set.mem_preimage, Set.mem_image]
         constructor
@@ -218,11 +260,13 @@ theorem placeDecomp_of (hE : InstExpFix) (hAB : InstAdaptBasis) : InstPlaceDecom
             rw [hx]
             simp only [Matrix.mul_assoc]
             rw [hAiA, Matrix.mul_one, ← Matrix.mul_assoc, hAiA, Matrix.one_mul]
-          rw [this]; exact hm2
+          rw [this]
+          exact hm2
       rw [hset]
       exact hemb.isCompact_preimage hcomp
     · obtain ⟨U, hUo, h1U, hU⟩ := Formalism.REAL.ballOpen n R (by rw [hR]; linarith)
-      refine mem_interior.mpr ⟨(fun x : Formalism.REAL.UJ ε => Ai * Formalism.MainNotions.S.uMat x * A) ⁻¹' U, ?_, ?_, ?_⟩
+      refine mem_interior.mpr
+        ⟨(fun x : Formalism.REAL.UJ ε => Ai * Formalism.MainNotions.S.uMat x * A) ⁻¹' U, ?_, ?_, ?_⟩
       · intro x hx
         exact (hU _ hx).le
       · exact hUo.preimage ((continuous_const.mul hemb.continuous).mul continuous_const)
@@ -231,14 +275,20 @@ theorem placeDecomp_of (hE : InstExpFix) (hAB : InstAdaptBasis) : InstPlaceDecom
         rw [h1, Matrix.mul_one, hAiA]
         exact h1U
     · intro x y hxy
-      have h1 : Ai * Formalism.MainNotions.S.uMat y * A * k' = k' * (Ai * Formalism.MainNotions.S.uMat x * A) := by
+      have h1
+          : Ai * Formalism.MainNotions.S.uMat y * A * k'
+            = k' * (Ai * Formalism.MainNotions.S.uMat x * A) := by
         have := congrArg (fun M => Ai * M * A) hxy
         simp only [Matrix.mul_assoc] at this ⊢
         rw [hAiA, Matrix.mul_one, ← Matrix.mul_assoc Ai A, hAiA, Matrix.one_mul] at this
         exact this
-      have h2 : Ai * Formalism.MainNotions.S.uMat y * A = k' * (Ai * Formalism.MainNotions.S.uMat x * A) * star k' := by
+      have h2
+          : Ai * Formalism.MainNotions.S.uMat y * A
+            = k' * (Ai * Formalism.MainNotions.S.uMat x * A) * star k' := by
         rw [← h1, Matrix.mul_assoc _ k', hk'u2, Matrix.mul_one]
-      have h3 : Formalism.REAL.hs (Ai * Formalism.MainNotions.S.uMat y * A) = Formalism.REAL.hs (Ai * Formalism.MainNotions.S.uMat x * A) := by
+      have h3
+          : Formalism.REAL.hs (Ai * Formalism.MainNotions.S.uMat y * A)
+            = Formalism.REAL.hs (Ai * Formalism.MainNotions.S.uMat x * A) := by
         rw [h2, ((Formalism.REAL.hSBall n ε').2 _ _ (inst_Kset_star ε' hk')).1,
           ((Formalism.REAL.hSBall n ε').2 _ _ hk').2]
       simp only [Set.mem_ofPred_eq, h3]

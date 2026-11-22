@@ -18,9 +18,10 @@ namespace GenChowIrreducible
 
 variable {n e : ℕ}
 
-theorem map_specRest {R S T : Type*} [CommRing R] [CommRing S] [CommRing T] (φ : R →+* S)
-    (ψ : S →+* T) (f : MvPolynomial (Fin (e + 1) × Fin n) R) (y : Par e n → S) :
-    (specRest φ f y).map ψ = specRest (ψ.comp φ) f (ψ ∘ y) := by
+theorem map_specRest
+    {R S T : Type*} [CommRing R] [CommRing S] [CommRing T]
+    (φ : R →+* S) (ψ : S →+* T) (f : MvPolynomial (Fin (e + 1) × Fin n) R) (y : Par e n → S)
+    : (specRest φ f y).map ψ = specRest (ψ.comp φ) f (ψ ∘ y) := by
   unfold specRest
   induction f using MvPolynomial.induction_on with
   | C a => simp
@@ -29,9 +30,13 @@ theorem map_specRest {R S T : Type*} [CommRing R] [CommRing S] [CommRing T] (φ 
     obtain ⟨i, j⟩ := ij
     induction i using Fin.cases <;> simp [eval₂_mul, hp]
 
-theorem constantCoeff_specRest {R S : Type*} [CommRing R] [CommRing S] (φ : R →+* S) {δ : ℕ}
-    (hδ : 1 ≤ δ) {f : MvPolynomial (Fin (e + 1) × Fin n) R} (hf : IsMultiHomog δ f)
-    (y : Par e n → S) : constantCoeff (specRest φ f y) = 0 := by
+theorem constantCoeff_specRest
+    {R S : Type*} [CommRing R] [CommRing S]
+    (φ : R →+* S)
+    {δ : ℕ} (hδ : 1 ≤ δ)
+    {f : MvPolynomial (Fin (e + 1) × Fin n) R} (hf : IsMultiHomog δ f)
+    (y : Par e n → S)
+    : constantCoeff (specRest φ f y) = 0 := by
   unfold specRest
   rw [← coe_eval₂Hom, ← RingHom.comp_apply, MvPolynomial.comp_eval₂Hom]
   rw [coe_eval₂Hom, eval₂_eq']
@@ -57,9 +62,9 @@ theorem parVar_injective : Function.Injective (parVar e n) := by
   rintro ⟨i, j⟩ ⟨i', j'⟩ h
   induction i using Fin.cases <;> induction i' using Fin.cases <;> simp_all [parVar]
 
-theorem specRest_X {k : Type*} [Field k] (f : MvPolynomial (Fin (e + 1) × Fin n) k) :
-    specRest (algebraMap k (MvPolynomial (Par e n) k)) f X =
-      sumAlgEquiv k (Fin n) (Par e n) (rename (parVar e n) f) := by
+theorem specRest_X {k : Type*} [Field k] (f : MvPolynomial (Fin (e + 1) × Fin n) k)
+    : specRest (algebraMap k (MvPolynomial (Par e n) k)) f X
+      = sumAlgEquiv k (Fin n) (Par e n) (rename (parVar e n) f) := by
   unfold specRest
   rw [MvPolynomial.algebraMap_eq]
   induction f using MvPolynomial.induction_on with
@@ -67,11 +72,13 @@ theorem specRest_X {k : Type*} [Field k] (f : MvPolynomial (Fin (e + 1) × Fin n
   | add p q hp hq => simp [eval₂_add, hp, hq]
   | mul_X p ij hp =>
     obtain ⟨i, j⟩ := ij
-    induction i using Fin.cases <;>
-      simp [eval₂_mul, hp, parVar, sumAlgEquiv_X_inl, sumAlgEquiv_X_inr]
+    induction i using Fin.cases
+      <;> simp [eval₂_mul, hp, parVar, sumAlgEquiv_X_inl, sumAlgEquiv_X_inr]
 
-theorem proof (h1 : GroundTheory.Heights₂.Heights.IncIdealPrime.Statement)
-    (h2 : GroundTheory.Heights₂.Heights.ChowFormMultiHomog.Statement) : GenChowIrreducible.Statement := by
+theorem proof
+    (h1 : GroundTheory.Heights₂.Heights.IncIdealPrime.Statement)
+    (h2 : GroundTheory.Heights₂.Heights.ChowFormMultiHomog.Statement)
+    : GenChowIrreducible.Statement := by
   intro k _ n e Q g hQ hg
 
   have hspan : GroundTheory.Heights₂.Heights.incIdeal Q (e + 1) = Ideal.span {g} := by
@@ -85,8 +92,10 @@ theorem proof (h1 : GroundTheory.Heights₂.Heights.IncIdealPrime.Statement)
   obtain ⟨δ, hδ, hhom⟩ := h2 k n (e + 1) Q g hQ hg
 
   have hren : Prime (rename (parVar e n) g) := by
-    have e1 : rename (parVar e n) g = rename ((↑) : Set.range (parVar e n) → _)
-        (rename (Equiv.ofInjective _ parVar_injective) g) := by
+    have e1
+        : rename (parVar e n) g
+          = rename ((↑) : Set.range (parVar e n) → _)
+            (rename (Equiv.ofInjective _ parVar_injective) g) := by
       rw [rename_rename]; rfl
     rw [e1, prime_rename_iff]
     exact (MulEquiv.prime_iff (renameEquiv k (Equiv.ofInjective _ parVar_injective))).mpr hprime
@@ -94,16 +103,19 @@ theorem proof (h1 : GroundTheory.Heights₂.Heights.IncIdealPrime.Statement)
     rw [specRest_X]
     exact (MulEquiv.prime_iff (sumAlgEquiv k (Fin n) (Par e n))).mpr hren
   set p := specRest (algebraMap k (MvPolynomial (Par e n) k)) g X with hp
-  have hq : specRest (algebraMap k (GenParField k e n)) g (genPar k e n) =
-      p.map (algebraMap (MvPolynomial (Par e n) k) (GenParField k e n)) := by
+  have hq
+      : specRest (algebraMap k (GenParField k e n)) g (genPar k e n)
+        = p.map (algebraMap (MvPolynomial (Par e n) k) (GenParField k e n)) := by
     rw [hp, map_specRest, ← IsScalarTower.algebraMap_eq]; rfl
 
   let _ : Algebra (MvPolynomial (Fin n) (MvPolynomial (Par e n) k))
-      (MvPolynomial (Fin n) (GenParField k e n)) := algebraMvPolynomial
+      (MvPolynomial (Fin n) (GenParField k e n)) :=
+    algebraMvPolynomial
   have hc0 : constantCoeff p = 0 := constantCoeff_specRest _ hδ hhom _
   have hdisj : Disjoint
-      (((nonZeroDivisors (MvPolynomial (Par e n) k)).map (C (σ := Fin n)) : Submonoid _) :
-        Set (MvPolynomial (Fin n) (MvPolynomial (Par e n) k))) ↑(Ideal.span {p}) := by
+      (((nonZeroDivisors (MvPolynomial (Par e n) k)).map (C (σ := Fin n)) : Submonoid _)
+        : Set (MvPolynomial (Fin n) (MvPolynomial (Par e n) k)))
+      ↑(Ideal.span {p}) := by
     rw [Set.disjoint_left]
     rintro _ ⟨r, hr, rfl⟩ hmem
     rw [SetLike.mem_coe, Ideal.mem_span_singleton] at hmem
@@ -111,10 +123,11 @@ theorem proof (h1 : GroundTheory.Heights₂.Heights.IncIdealPrime.Statement)
     have := congrArg constantCoeff hs
     rw [constantCoeff_C, map_mul, hc0, zero_mul] at this
     exact nonZeroDivisors.ne_zero hr this
-  have hpr := IsLocalization.isPrime_of_isPrime_disjoint
-    ((nonZeroDivisors (MvPolynomial (Par e n) k)).map (C (σ := Fin n)))
-    (MvPolynomial (Fin n) (GenParField k e n)) (Ideal.span {p})
-    ((Ideal.span_singleton_prime hpP.ne_zero).mpr hpP) hdisj
+  have hpr :=
+    IsLocalization.isPrime_of_isPrime_disjoint
+      ((nonZeroDivisors (MvPolynomial (Par e n) k)).map (C (σ := Fin n)))
+      (MvPolynomial (Fin n) (GenParField k e n)) (Ideal.span {p})
+      ((Ideal.span_singleton_prime hpP.ne_zero).mpr hpP) hdisj
   rw [Ideal.map_span, Set.image_singleton, algebraMap_def] at hpr
   have hq0 : p.map (algebraMap (MvPolynomial (Par e n) k) (GenParField k e n)) ≠ 0 := by
     intro h

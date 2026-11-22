@@ -39,17 +39,19 @@ def rmulL (B : Matrix (Fin a) (Fin a) (ι → ℂ)) : LieI ι a →L[ℝ] LieI �
 def lmulL (B : Matrix (Fin a) (Fin a) (ι → ℂ)) : LieI ι a →L[ℝ] LieI ι a :=
   LinearMap.toContinuousLinearMap (lmulₗ B)
 
-theorem rmulL_apply (B : Matrix (Fin a) (Fin a) (ι → ℂ)) (M : LieI ι a) :
-    rmulL B M = Matrix.of.symm (Matrix.of M * B) := rfl
+theorem rmulL_apply (B : Matrix (Fin a) (Fin a) (ι → ℂ)) (M : LieI ι a)
+    : rmulL B M = Matrix.of.symm (Matrix.of M * B) :=
+  rfl
 
-theorem lmulL_apply (B : Matrix (Fin a) (Fin a) (ι → ℂ)) (M : LieI ι a) :
-    lmulL B M = Matrix.of.symm (B * Matrix.of M) := rfl
+theorem lmulL_apply (B : Matrix (Fin a) (Fin a) (ι → ℂ)) (M : LieI ι a)
+    : lmulL B M = Matrix.of.symm (B * Matrix.of M) :=
+  rfl
 
 theorem isOpen_U : IsOpen {M : LieI ι a | IsUnit (Matrix.of M)} := by
-  have hc : Continuous fun M : LieI ι a => (Matrix.of M).det :=
-    Continuous.matrix_det continuous_id
-  have e : {M : LieI ι a | IsUnit (Matrix.of M)} =
-      (fun M : LieI ι a => (Matrix.of M).det) ⁻¹' {x | IsUnit x} := by
+  have hc : Continuous fun M : LieI ι a => (Matrix.of M).det := Continuous.matrix_det continuous_id
+  have e
+      : {M : LieI ι a | IsUnit (Matrix.of M)}
+        = (fun M : LieI ι a => (Matrix.of M).det) ⁻¹' {x | IsUnit x} := by
     ext M
     simp [Matrix.isUnit_iff_isUnit_det]
   rw [e]
@@ -61,8 +63,9 @@ theorem one_mem_U : oneI ι a ∈ {M : LieI ι a | IsUnit (Matrix.of M)} := by
   rw [Equiv.apply_symm_apply]
   exact isUnit_one
 
-theorem orb_rmul (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (g : GL (Fin a) (ι → ℂ)) (v : X)
-    (M : LieI ι a) : orb ρ (ρ g v) M = orb ρ v (rmulL g.val M) := by
+theorem orb_rmul
+    (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (g : GL (Fin a) (ι → ℂ)) (v : X) (M : LieI ι a)
+    : orb ρ (ρ g v) M = orb ρ v (rmulL g.val M) := by
   rw [rmulL_apply]
   unfold orb
   have hiff : IsUnit (Matrix.of (Matrix.of.symm (Matrix.of M * g.val))) ↔ IsUnit (Matrix.of M) := by
@@ -75,13 +78,15 @@ theorem orb_rmul (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (g : GL (Fi
     simp only [IsUnit.unit_spec, Units.val_mul, Equiv.apply_symm_apply]
   · rw [dite_eq_right hM, dite_eq_right (mt hiff.mp hM)]
 
-theorem orb_lmul (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (v : X) (M : LieI ι a)
-    (hM : IsUnit (Matrix.of M)) (N : LieI ι a) :
-    orb ρ v (lmulL (Matrix.of M) N) = ρ hM.unit (orb ρ v N) := by
+theorem orb_lmul
+    (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (v : X)
+    (M : LieI ι a) (hM : IsUnit (Matrix.of M))
+    (N : LieI ι a)
+    : orb ρ v (lmulL (Matrix.of M) N) = ρ hM.unit (orb ρ v N) := by
   rw [lmulL_apply]
   unfold orb
-  have hiff : IsUnit (Matrix.of (Matrix.of.symm (Matrix.of M * Matrix.of N))) ↔
-      IsUnit (Matrix.of N) := by
+  have hiff
+      : IsUnit (Matrix.of (Matrix.of.symm (Matrix.of M * Matrix.of N))) ↔ IsUnit (Matrix.of N) := by
     rw [Equiv.apply_symm_apply, ← hM.unit_spec]
     exact Units.isUnit_units_mul _ _
   by_cases hN : IsUnit (Matrix.of N)
@@ -92,17 +97,20 @@ theorem orb_lmul (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (v : X) (M 
   · rw [dite_eq_right hN, dite_eq_right (mt hiff.mp hN), map_zero]
 
 omit [Fintype ι] in
-theorem orbit_map_intertwiner_comm (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (T : X →L[ℂ] X)
-    (hT : ∀ g x, T (ρ g x) = ρ g (T x)) (v : X) :
-    orb ρ (T v) = fun M => T (orb ρ v M) := by
+theorem orbit_map_intertwiner_comm
+    (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (T : X →L[ℂ] X) (hT : ∀ g x, T (ρ g x) = ρ g (T x))
+    (v : X)
+    : orb ρ (T v) = fun M => T (orb ρ v M) := by
   funext M
   unfold orb
   split_ifs with h
   · exact (hT _ _).symm
   · exact (map_zero T).symm
 
-theorem smooth_vector_intertwiner_apply (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (T : X →L[ℂ] X)
-    (hT : ∀ g x, T (ρ g x) = ρ g (T x)) (v : X) (hv : SmV ρ v) : SmV ρ (T v) := by
+theorem smooth_vector_intertwiner_apply
+    (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (T : X →L[ℂ] X) (hT : ∀ g x, T (ρ g x) = ρ g (T x))
+    (v : X) (hv : SmV ρ v)
+    : SmV ρ (T v) := by
   unfold SmV at *
   rw [orbit_map_intertwiner_comm ρ T hT v]
   exact (T.restrictScalars ℝ).contDiff.comp_contDiffOn hv
@@ -130,12 +138,12 @@ theorem smooth_vectors_stable_intertwiner : S2 := by
     rw [e]
     exact hv.add hw
   · intro c v hv
-    have h := smooth_vector_intertwiner_apply ρ (c • ContinuousLinearMap.id ℂ X) (fun g x => by simp) v hv
+    have h :=
+      smooth_vector_intertwiner_apply ρ (c • ContinuousLinearMap.id ℂ X) (fun g x => by simp) v hv
     simpa using h
   · intro g v hv
     unfold SmV at *
-    rw [show orb ρ (ρ g v) = fun M => orb ρ v (rmulL g.val M) from
-      funext fun M => orb_rmul ρ g v M]
+    rw [show orb ρ (ρ g v) = fun M => orb ρ v (rmulL g.val M) from funext fun M => orb_rmul ρ g v M]
     refine hv.comp (rmulL g.val).contDiff.contDiffOn ?_
     intro M hM
     simp only [Set.mem_setOf_eq, rmulL_apply, Equiv.apply_symm_apply] at hM ⊢
@@ -145,19 +153,22 @@ theorem smooth_vectors_stable_intertwiner : S2 := by
     have hd : ∀ N ∈ {M : LieI ι a | IsUnit (Matrix.of M)}, DifferentiableAt ℝ (orb ρ v) N :=
       fun N hN => (hv.differentiableOn (by simp)).differentiableAt (hU.mem_nhds hN)
     refine ⟨fderiv ℝ (orb ρ v) (oneI ι a), (hd _ one_mem_U).hasFDerivAt, fun Z => ?_⟩
-    have key : ∀ N (hN : IsUnit (Matrix.of N)),
-        ρ hN.unit (fderiv ℝ (orb ρ v) (oneI ι a) Z) =
-          fderiv ℝ (orb ρ v) N (rmulL (Matrix.of Z) N) := by
+    have key
+        : ∀ N (hN : IsUnit (Matrix.of N)),
+          ρ hN.unit (fderiv ℝ (orb ρ v) (oneI ι a) Z)
+            = fderiv ℝ (orb ρ v) N (rmulL (Matrix.of Z) N) := by
       intro N hN
       have hL : lmulL (Matrix.of N) (oneI ι a) = N := by
         rw [lmulL_apply, oneI, Equiv.apply_symm_apply, mul_one, Equiv.symm_apply_apply]
       have h0 : HasFDerivAt (orb ρ v) (fderiv ℝ (orb ρ v) N) (lmulL (Matrix.of N) (oneI ι a)) := by
         rw [hL]
         exact (hd N hN).hasFDerivAt
-      have h1 : HasFDerivAt (fun M => orb ρ v (lmulL (Matrix.of N) M))
+      have h1 : HasFDerivAt
+          (fun M => orb ρ v (lmulL (Matrix.of N) M))
           ((fderiv ℝ (orb ρ v) N).comp (lmulL (Matrix.of N))) (oneI ι a) :=
         h0.comp (oneI ι a) (lmulL (Matrix.of N)).hasFDerivAt
-      have h2 : HasFDerivAt (fun M => ρ hN.unit (orb ρ v M))
+      have h2 : HasFDerivAt
+          (fun M => ρ hN.unit (orb ρ v M))
           (((ρ hN.unit).restrictScalars ℝ).comp (fderiv ℝ (orb ρ v) (oneI ι a))) (oneI ι a) :=
         ((ρ hN.unit).restrictScalars ℝ).hasFDerivAt.comp (oneI ι a) (hd _ one_mem_U).hasFDerivAt
       have e : (fun M => orb ρ v (lmulL (Matrix.of N) M)) = fun M => ρ hN.unit (orb ρ v M) :=
@@ -166,7 +177,8 @@ theorem smooth_vectors_stable_intertwiner : S2 := by
       have h3 := congrArg (fun D => D Z) (h2.unique h1)
       simpa [lmulL_apply, rmulL_apply] using h3
     unfold SmV
-    have hc : ContDiffOn ℝ ∞ (fun N => fderiv ℝ (orb ρ v) N (rmulL (Matrix.of Z) N))
+    have hc : ContDiffOn ℝ ∞
+        (fun N => fderiv ℝ (orb ρ v) N (rmulL (Matrix.of Z) N))
         {M : LieI ι a | IsUnit (Matrix.of M)} :=
       (hv.fderiv_of_isOpen hU (by simp)).clm_apply (rmulL (Matrix.of Z)).contDiff.contDiffOn
     refine hc.congr fun N hN => ?_

@@ -13,7 +13,10 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.TheSecStab
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.SettingConstruction Formalism.FourierDecayAlt.P.TwoByOneBlock Formalism.FourierDecayAlt.P.TheSec
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  Formalism.FourierDecayAlt.P.SettingConstruction Formalism.FourierDecayAlt.P.TwoByOneBlock
+  Formalism.FourierDecayAlt.P.TheSec
 
 section block
 
@@ -25,43 +28,56 @@ theorem zero_ne_last (hk : 1 ≤ k) : (0 : Fin (k + 1)) ≠ Fin.last k := by
   simp only [Fin.val_zero, Fin.val_last] at h'
   omega
 
-private theorem col_lemma_2 {h : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} {i : Fin (k + 1)}
-    (hi : h *ᵥ Pi.single i 1 = Pi.single i 1) (l : Fin (k + 1)) : h l i = if l = i then 1 else 0 := by
+private theorem col_lemma_2
+    {h : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} {i : Fin (k + 1)}
+    (hi : h *ᵥ Pi.single i 1 = Pi.single i 1)
+    (l : Fin (k + 1))
+    : h l i = if l = i then 1 else 0 := by
   have e := congrFun hi l
   simpa [Matrix.mulVec, dotProduct, Pi.single_apply] using e
 
-private theorem row_lemma_3 {h : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hh : h ∈ UH (Hb k)) {i : Fin (k + 1)}
-    (hi : h *ᵥ Pi.single i 1 = Pi.single i 1) (j : Fin (k + 1)) : h i j = if i = j then 1 else 0 := by
+private theorem row_lemma_3
+    {h : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hh : h ∈ UH (Hb k))
+    {i : Fin (k + 1)} (hi : h *ᵥ Pi.single i 1 = Pi.single i 1)
+    (j : Fin (k + 1))
+    : h i j = if i = j then 1 else 0 := by
   have hU : hᴴ * Hb k * h = Hb k := hh
   have e := congrFun (congrFun hU i) j
   rw [Matrix.mul_apply] at e
   simp only [Hb, Matrix.mul_diagonal, Matrix.conjTranspose_apply, Matrix.diagonal_apply,
-    col_lemma_2 hi] at e
+      col_lemma_2 hi]
+    at e
   rw [Fintype.sum_eq_single i (by intro x hx; simp [hx])] at e
   by_cases hil : i = Fin.last k <;> by_cases hij : i = j <;> simp_all
 
-private theorem vec_lemma_4 {h : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hh : h ∈ UH (Hb k))
-    {i : Fin (k + 1)} (hi : h *ᵥ Pi.single i 1 = Pi.single i 1) : Pi.single i 1 ᵥ* h = Pi.single i 1 := by
+private theorem vec_lemma_4
+    {h : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hh : h ∈ UH (Hb k))
+    {i : Fin (k + 1)} (hi : h *ᵥ Pi.single i 1 = Pi.single i 1)
+    : Pi.single i 1 ᵥ* h = Pi.single i 1 := by
   funext j
-  have e : (Pi.single i 1 ᵥ* h) j = h i j := by
-    simp [Matrix.vecMul, dotProduct, Pi.single_apply]
+  have e : (Pi.single i 1 ᵥ* h) j = h i j := by simp [Matrix.vecMul, dotProduct, Pi.single_apply]
   rw [e, row_lemma_3 hh hi j]
   by_cases hij : i = j
   · subst hij
     simp
   · simp [hij, Pi.single_apply, Ne.symm hij]
 
-theorem commute_nu {h : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hh : h ∈ UH (Hb k))
-    (h0 : h *ᵥ Pi.single 0 1 = Pi.single 0 1) (hl : h *ᵥ Pi.single (Fin.last k) 1 = Pi.single (Fin.last k) 1)
-    (w s : ℂ) : h * nu k w s = nu k w s * h := by
-  have hu : ∀ a b : ℂ, h *ᵥ (a • Pi.single 0 1 + b • Pi.single (Fin.last k) 1) =
-      a • Pi.single 0 1 + b • Pi.single (Fin.last k) 1 := by
+theorem commute_nu
+    {h : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ}
+    (hh : h ∈ UH (Hb k)) (h0 : h *ᵥ Pi.single 0 1 = Pi.single 0 1)
+    (hl : h *ᵥ Pi.single (Fin.last k) 1 = Pi.single (Fin.last k) 1)
+    (w s : ℂ)
+    : h * nu k w s = nu k w s * h := by
+  have hu
+      : ∀ a b : ℂ,
+        h *ᵥ (a • Pi.single 0 1 + b • Pi.single (Fin.last k) 1)
+          = a • Pi.single 0 1 + b • Pi.single (Fin.last k) 1 := by
     intro a b
     rw [Matrix.mulVec_add, Matrix.mulVec_smul, Matrix.mulVec_smul, h0, hl]
   unfold nu
-  rw [Matrix.mul_add, Matrix.mul_add, Matrix.add_mul, Matrix.add_mul, Matrix.mul_one, Matrix.one_mul,
-    Matrix.mul_vecMulVec, Matrix.mul_vecMulVec, Matrix.vecMulVec_mul, Matrix.vecMulVec_mul,
-    hu, hu, vec_lemma_4 hh h0, vec_lemma_4 hh hl]
+  rw [Matrix.mul_add, Matrix.mul_add, Matrix.add_mul, Matrix.add_mul, Matrix.mul_one,
+    Matrix.one_mul, Matrix.mul_vecMulVec, Matrix.mul_vecMulVec, Matrix.vecMulVec_mul,
+    Matrix.vecMulVec_mul, hu, hu, vec_lemma_4 hh h0, vec_lemma_4 hh hl]
 
 end block
 
@@ -69,11 +85,24 @@ section block2
 
 variable {k : ℕ}
 
-private theorem nu_apply_lemma (hk : 1 ≤ k) (w s : ℂ) (l m : Fin (k + 1)) :
-    nu k w s l m =
-      if m = 0 then (if l = 0 then star w else if l = Fin.last k then s else 0)
-      else if m = Fin.last k then (if l = 0 then s else if l = Fin.last k then w else 0)
-      else (if l = m then 1 else 0) := by
+private theorem nu_apply_lemma (hk : 1 ≤ k) (w s : ℂ) (l m : Fin (k + 1))
+    : nu k w s l m
+      = if m = 0 then
+          (if l = 0 then
+             star w
+           else if l = Fin.last k then
+             s
+           else
+             0)
+        else if m = Fin.last k then
+          (if l = 0 then
+             s
+           else if l = Fin.last k then
+             w
+           else
+             0)
+        else
+          (if l = m then 1 else 0) := by
   have h0L : (0 : Fin (k + 1)) ≠ Fin.last k := by
     intro h
     have h' := congrArg Fin.val h
@@ -102,8 +131,8 @@ private theorem nu_apply_lemma (hk : 1 ≤ k) (w s : ℂ) (l m : Fin (k + 1)) :
         · simp [hl0, hlL, h0L.symm]
     · simp [hm0, hmL]
 
-theorem nu_last_vec (hk : 1 ≤ k) (w s : ℂ) :
-    nu k w s *ᵥ Pi.single (Fin.last k) 1 = s • Pi.single 0 1 + w • Pi.single (Fin.last k) 1 := by
+theorem nu_last_vec (hk : 1 ≤ k) (w s : ℂ)
+    : nu k w s *ᵥ Pi.single (Fin.last k) 1 = s • Pi.single 0 1 + w • Pi.single (Fin.last k) 1 := by
   have h0L := zero_ne_last hk
   funext l
   have e : (nu k w s *ᵥ Pi.single (Fin.last k) 1) l = nu k w s l (Fin.last k) := by
@@ -117,8 +146,9 @@ theorem nu_last_vec (hk : 1 ≤ k) (w s : ℂ) :
       simp [h0L.symm]
     · simp [hl0, hlL, h0L.symm]
 
-private theorem nu_unit_lemma_5 (hk : 1 ≤ k) (w s : ℂ) (hs : star s = s)
-    (hws : star w * w - s * s = 1) : (nu k w s)ᴴ * Hb k * nu k w s = Hb k := by
+private theorem nu_unit_lemma_5
+    (hk : 1 ≤ k) (w s : ℂ) (hs : star s = s) (hws : star w * w - s * s = 1)
+    : (nu k w s)ᴴ * Hb k * nu k w s = Hb k := by
   have h0L : (0 : Fin (k + 1)) ≠ Fin.last k := by
     intro h
     have h' := congrArg Fin.val h
@@ -133,13 +163,13 @@ private theorem nu_unit_lemma_5 (hk : 1 ≤ k) (w s : ℂ) (hs : star s = s)
     rw [Fintype.sum_eq_add 0 (Fin.last k) h0L]
     · by_cases hj0 : j = 0
       · subst hj0
-        simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false,
-          ↓reduceIte, mul_one, one_mul, mul_neg, neg_mul]
+        simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false, ↓ reduceIte,
+          mul_one, one_mul, mul_neg, neg_mul]
         linear_combination hws
       · by_cases hjL : j = Fin.last k
         · subst hjL
-          simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false,
-            ↓reduceIte, mul_one, one_mul, mul_neg, neg_mul]
+          simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false, ↓ reduceIte,
+            mul_one, one_mul, mul_neg, neg_mul]
           ring
         · simp [h0L, h0L.symm, hj0, hjL, Ne.symm hj0, Ne.symm hjL]
     · intro x hx
@@ -149,19 +179,19 @@ private theorem nu_unit_lemma_5 (hk : 1 ≤ k) (w s : ℂ) (hs : star s = s)
       rw [Fintype.sum_eq_add 0 (Fin.last k) h0L]
       · by_cases hj0 : j = 0
         · subst hj0
-          simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false,
-            ↓reduceIte, mul_one, one_mul, mul_neg, neg_mul]
+          simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false, ↓ reduceIte,
+            mul_one, one_mul, mul_neg, neg_mul]
           ring
         · by_cases hjL : j = Fin.last k
           · subst hjL
             simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false,
-              ↓reduceIte, mul_one, one_mul, mul_neg, neg_mul]
+              ↓ reduceIte, mul_one, one_mul, mul_neg, neg_mul]
             linear_combination (-1 : ℂ) * hws
           · simp [h0L, h0L.symm, hj0, hjL, Ne.symm hj0, Ne.symm hjL]
       · intro x hx
         simp [hx.1, hx.2]
     · rw [Fintype.sum_eq_single i]
-      · simp only [hi0, hiL, if_false, if_true, ↓reduceIte, eq_self_iff_true, star_one, one_mul]
+      · simp only [hi0, hiL, if_false, if_true, ↓ reduceIte, eq_self_iff_true, star_one, one_mul]
         by_cases hj0 : j = 0
         · subst hj0
           simp [hi0, hiL]
@@ -175,8 +205,9 @@ private theorem nu_unit_lemma_5 (hk : 1 ≤ k) (w s : ℂ) (hs : star s = s)
       · intro x hx
         simp [hi0, hiL, hx]
 
-theorem nu_mem (hk : 1 ≤ k) {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T') {ζ : ℂ} (hζ : T * T' < Complex.normSq ζ) :
-    nu k (wZ T T' ζ) (sZ T T' ζ) ∈ UH (Hb k) := by
+theorem nu_mem
+    (hk : 1 ≤ k) {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T') {ζ : ℂ} (hζ : T * T' < Complex.normSq ζ)
+    : nu k (wZ T T' ζ) (sZ T T' ζ) ∈ UH (Hb k) := by
   have hTT : 0 < T * T' := mul_pos hT hT'
   have hsr : star (sZ T T' ζ) = sZ T T' ζ := by
     unfold sZ
@@ -190,8 +221,9 @@ theorem nu_mem (hk : 1 ≤ k) {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T') {ζ : ℂ
     have h1 : Complex.normSq (wZ T T' ζ) = Complex.normSq ζ / (T * T') := by
       unfold wZ
       rw [Complex.normSq_mul, Complex.normSq_neg, Complex.normSq_inv, Complex.normSq_ofReal]
-      rw [show Real.sqrt T * Real.sqrt T' * (Real.sqrt T * Real.sqrt T') =
-          (Real.sqrt T * Real.sqrt T) * (Real.sqrt T' * Real.sqrt T') by ring,
+      rw [show Real.sqrt T * Real.sqrt T' * (Real.sqrt T * Real.sqrt T')
+            = (Real.sqrt T * Real.sqrt T) * (Real.sqrt T' * Real.sqrt T') by
+          ring,
         Real.mul_self_sqrt hT.le, Real.mul_self_sqrt hT'.le, div_eq_inv_mul]
     have h2 : star (wZ T T' ζ) * wZ T T' ζ = (Complex.normSq (wZ T T' ζ) : ℂ) :=
       Complex.normSq_eq_conj_mul_self.symm
@@ -203,7 +235,8 @@ theorem nu_mem (hk : 1 ≤ k) {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T') {ζ : ℂ
     ring
   exact nu_unit_lemma_5 hk _ _ hsr hkey
 
-theorem sZ_ne {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T') {ζ : ℂ} (hζ : T * T' < Complex.normSq ζ) : sZ T T' ζ ≠ 0 := by
+theorem sZ_ne {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T') {ζ : ℂ} (hζ : T * T' < Complex.normSq ζ)
+    : sZ T T' ζ ≠ 0 := by
   have hTT : 0 < T * T' := mul_pos hT hT'
   have h1 : 1 < Complex.normSq ζ / (T * T') := by
     rw [lt_div_iff₀ hTT, one_mul]
@@ -212,13 +245,16 @@ theorem sZ_ne {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T') {ζ : ℂ} (hζ : T * T' 
   have hp : 0 < Real.sqrt (Complex.normSq ζ / (T * T') - 1) := Real.sqrt_pos.2 (by linarith)
   exact_mod_cast hp.ne'
 
-theorem block_iff (hk : 1 ≤ k) {a b : Fin (k + 1) → ℂ} {T T' : ℝ} (hT : 0 < T) (hT' : 0 < T')
-    (ha : herm (Hb k) a a = -(T : ℂ)) (hb : herm (Hb k) b b = -(T' : ℂ)) {ζ : ℂ} (hζ : T * T' < Complex.normSq ζ)
-    {μ μ' : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hμ : μ ∈ UH (Hb k)) (hμ' : μ' ∈ UH (Hb k))
-    (hμa : μ *ᵥ a = a) (hμb : μ' *ᵥ b = b) :
-    μ * theSecB k a b T T' ζ * μ' = theSecB k a b T T' ζ ↔
-      ((gA k a T)⁻¹ * μ * gA k a T) *ᵥ Pi.single 0 1 = Pi.single 0 1 ∧
-        gB k b T' * μ' * (gB k b T')⁻¹ = ((gA k a T)⁻¹ * μ * gA k a T)⁻¹ := by
+theorem block_iff
+    (hk : 1 ≤ k)
+    {a b : Fin (k + 1) → ℂ} {T T' : ℝ}
+    (hT : 0 < T) (hT' : 0 < T') (ha : herm (Hb k) a a = -(T : ℂ)) (hb : herm (Hb k) b b = -(T' : ℂ))
+    {ζ : ℂ} (hζ : T * T' < Complex.normSq ζ)
+    {μ μ' : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ}
+    (hμ : μ ∈ UH (Hb k)) (hμ' : μ' ∈ UH (Hb k)) (hμa : μ *ᵥ a = a) (hμb : μ' *ᵥ b = b)
+    : μ * theSecB k a b T T' ζ * μ' = theSecB k a b T T' ζ
+      ↔ ((gA k a T)⁻¹ * μ * gA k a T) *ᵥ Pi.single 0 1 = Pi.single 0 1
+        ∧ gB k b T' * μ' * (gB k b T')⁻¹ = ((gA k a T)⁻¹ * μ * gA k a T)⁻¹ := by
   obtain ⟨hga1, hga2⟩ := gA_spec k hT ha
   obtain ⟨hgb1, hgb2⟩ := gB_spec k hT' hb
   set gA' := gA k a T with hgA'
@@ -245,32 +281,34 @@ theorem block_iff (hk : 1 ≤ k) {a b : Fin (k + 1) → ℂ} {T T' : ℝ} (hT : 
   have hAe : gA' *ᵥ e = ((Real.sqrt T : ℝ) : ℂ)⁻¹ • a := by
     rw [← hga2, Matrix.mulVec_smul, smul_smul, inv_mul_cancel₀ hsT, one_smul]
   have hĥe : ĥ *ᵥ e = e := by
-    rw [hĥdef, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hAe, Matrix.mulVec_smul, hμa, Matrix.mulVec_smul,
-      hAinv, smul_smul, inv_mul_cancel₀ hsT, one_smul]
+    rw [hĥdef, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hAe, Matrix.mulVec_smul, hμa,
+      Matrix.mulVec_smul, hAinv, smul_smul, inv_mul_cancel₀ hsT, one_smul]
   have hBinv : gB'⁻¹ *ᵥ e = ((Real.sqrt T' : ℝ) : ℂ)⁻¹ • b := by
     have : gB'⁻¹ *ᵥ (((Real.sqrt T' : ℝ) : ℂ) • e) = b := by
       rw [← hgb2, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ uB, Matrix.one_mulVec]
     rw [Matrix.mulVec_smul] at this
     rw [← this, smul_smul, inv_mul_cancel₀ hsT', one_smul]
   have hĥ'e : ĥ' *ᵥ e = e := by
-    rw [hĥ'def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hBinv, Matrix.mulVec_smul, hμb, Matrix.mulVec_smul,
-      hgb2, smul_smul, inv_mul_cancel₀ hsT', one_smul]
+    rw [hĥ'def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hBinv, Matrix.mulVec_smul, hμb,
+      Matrix.mulVec_smul, hgb2, smul_smul, inv_mul_cancel₀ hsT', one_smul]
 
   have hequiv : μ * theSecB k a b T T' ζ * μ' = theSecB k a b T T' ζ ↔ ĥ * ν * ĥ' = ν := by
     have hS : theSecB k a b T T' ζ = gA' * ν * gB' := rfl
     rw [hS]
     constructor
     · intro h
-      calc ĥ * ν * ĥ' = gA'⁻¹ * (μ * (gA' * ν * gB') * μ') * gB'⁻¹ := by
-            simp only [hĥdef, hĥ'def, Matrix.mul_assoc]
+      calc
+        ĥ * ν * ĥ' = gA'⁻¹ * (μ * (gA' * ν * gB') * μ') * gB'⁻¹ := by
+          simp only [hĥdef, hĥ'def, Matrix.mul_assoc]
         _ = gA'⁻¹ * (gA' * ν * gB') * gB'⁻¹ := by rw [h]
         _ = ν := by
-            simp only [Matrix.mul_assoc, Matrix.nonsing_inv_mul_cancel_left _ _ uA, Matrix.mul_nonsing_inv _ uB,
-              Matrix.mul_one]
+          simp only [Matrix.mul_assoc, Matrix.nonsing_inv_mul_cancel_left _ _ uA,
+            Matrix.mul_nonsing_inv _ uB, Matrix.mul_one]
     · intro h
-      calc μ * (gA' * ν * gB') * μ' = gA' * (ĥ * ν * ĥ') * gB' := by
-            simp only [hĥdef, hĥ'def, Matrix.mul_assoc, Matrix.mul_nonsing_inv_cancel_left _ _ uA,
-              Matrix.nonsing_inv_mul _ uB, Matrix.mul_one]
+      calc
+        μ * (gA' * ν * gB') * μ' = gA' * (ĥ * ν * ĥ') * gB' := by
+          simp only [hĥdef, hĥ'def, Matrix.mul_assoc, Matrix.mul_nonsing_inv_cancel_left _ _ uA,
+            Matrix.nonsing_inv_mul _ uB, Matrix.mul_one]
         _ = gA' * ν * gB' := by rw [h]
   rw [hequiv]
   constructor
@@ -286,8 +324,7 @@ theorem block_iff (hk : 1 ≤ k) {a b : Fin (k + 1) → ℂ} {T T' : ℝ} (hT : 
       exact smul_right_injective _ hs h2
     refine ⟨h0, ?_⟩
     have hc := commute_nu hĥu h0 hĥe (wZ T T' ζ) (sZ T T' ζ)
-    have h3 : ν * (ĥ * ĥ') = ν * 1 := by
-      rw [Matrix.mul_one, ← Matrix.mul_assoc, ← hc, h]
+    have h3 : ν * (ĥ * ĥ') = ν * 1 := by rw [Matrix.mul_one, ← Matrix.mul_assoc, ← hc, h]
     have h4 : ĥ * ĥ' = 1 := by
       have := congrArg (fun M => ν⁻¹ * M) h3
       simp only [Matrix.nonsing_inv_mul_cancel_left _ _ uν] at this
@@ -303,8 +340,9 @@ section full
 
 variable {k r : ℕ}
 
-theorem uwset_block {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {g : Mat k r} (hg : g ∈ UWset k r z) :
-    ∃ μ ∈ UH (Hb k), g = embWb k r μ ∧ μ *ᵥ wbPart k r z = wbPart k r z := by
+theorem uwset_block
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {g : Mat k r} (hg : g ∈ UWset k r z)
+    : ∃ μ ∈ UH (Hb k), g = embWb k r μ ∧ μ *ᵥ wbPart k r z = wbPart k r z := by
   obtain ⟨μ, hμ, rfl⟩ := (UWb_iff g).1 ⟨hg.1, hg.2.1⟩
   refine ⟨μ, hμ, rfl, ?_⟩
   have h1 : embWb k r μ *ᵥ z = z := hg.2.2
@@ -312,25 +350,31 @@ theorem uwset_block {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {g : Mat
   have := congrArg (wbPart k r) h1
   rwa [wbPart_jV, wbPart_jV] at this
 
-theorem emb_inj {μ μ' : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (h : embWb k r μ = embWb k r μ') : μ = μ' := by
+theorem emb_inj {μ μ' : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (h : embWb k r μ = embWb k r μ')
+    : μ = μ' := by
   ext a b
   have ha : a.val ≤ k := Nat.lt_succ_iff.mp a.isLt
   have hb : b.val ≤ k := Nat.lt_succ_iff.mp b.isLt
   have e := congrFun (congrFun h ⟨r + a.val, by omega⟩) ⟨r + b.val, by omega⟩
   simpa [embWb, ha, hb] using e
 
-theorem stab_sub (hk : 1 ≤ k) {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : inWb k r z')
-    (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z') {ζ ζ' : ℂ} (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ)
-    (hζ' : Tz k r z * Tz k r z' < Complex.normSq ζ') (p : Mat k r × Mat k r)
-    (hp : p ∈ NF.Stab k r z z' (theSection k r z z') ζ) : p ∈ NF.Stab k r z z' (theSection k r z z') ζ' := by
+theorem stab_sub
+    (hk : 1 ≤ k)
+    {z z' : Fin (2 * r + k + 1) → ℂ}
+    (hz : inWb k r z) (hz' : inWb k r z') (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z')
+    {ζ ζ' : ℂ}
+    (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ) (hζ' : Tz k r z * Tz k r z' < Complex.normSq ζ')
+    (p : Mat k r × Mat k r) (hp : p ∈ NF.Stab k r z z' (theSection k r z z') ζ)
+    : p ∈ NF.Stab k r z z' (theSection k r z z') ζ' := by
   obtain ⟨h1, h2, heq⟩ := hp
   obtain ⟨μ, hμ, hp1, hμa⟩ := uwset_block hz h1
   obtain ⟨μ', hμ', hp2, hμb⟩ := uwset_block hz' h2
   refine ⟨h1, h2, ?_⟩
   have ha := herm_self k r z hz
   have hb := herm_self k r z' hz'
-  have hblock : μ * theSecB k (wbPart k r z) (wbPart k r z') (Tz k r z) (Tz k r z') ζ * μ' =
-      theSecB k (wbPart k r z) (wbPart k r z') (Tz k r z) (Tz k r z') ζ := by
+  have hblock
+      : μ * theSecB k (wbPart k r z) (wbPart k r z') (Tz k r z) (Tz k r z') ζ * μ'
+        = theSecB k (wbPart k r z) (wbPart k r z') (Tz k r z) (Tz k r z') ζ := by
     apply emb_inj (r := r)
     rw [emb_mul, emb_mul, ← hp1, ← hp2]
     exact heq
@@ -340,13 +384,19 @@ theorem stab_sub (hk : 1 ≤ k) {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb 
   rw [hp1, hp2, ← emb_mul, ← emb_mul]
   exact congrArg (embWb k r) hblock'
 
-theorem theSection_csec (hk : 1 ≤ k) {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : inWb k r z')
-    (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z') :
-    IsSection k r z z' (theSection k r z z') ∧ ∀ ζ ζ' : ℂ, Tz k r z * Tz k r z' < Complex.normSq ζ →
-      Tz k r z * Tz k r z' < Complex.normSq ζ' →
-        NF.Stab k r z z' (theSection k r z z') ζ = NF.Stab k r z z' (theSection k r z z') ζ' :=
-  ⟨theSection_isSection k r z z' hk hz hz' hT hT', fun ζ ζ' hζ hζ' => Set.ext fun p =>
-    ⟨stab_sub hk hz hz' hT hT' hζ hζ' p, stab_sub hk hz hz' hT hT' hζ' hζ p⟩⟩
+theorem theSection_csec
+    (hk : 1 ≤ k)
+    {z z' : Fin (2 * r + k + 1) → ℂ}
+    (hz : inWb k r z) (hz' : inWb k r z') (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z')
+    : IsSection k r z z' (theSection k r z z')
+      ∧ ∀ ζ ζ' : ℂ,
+        Tz k r z * Tz k r z' < Complex.normSq ζ → Tz k r z * Tz k r z' < Complex.normSq ζ'
+          → NF.Stab k r z z' (theSection k r z z') ζ
+            = NF.Stab k r z z' (theSection k r z z') ζ' := ⟨
+  theSection_isSection k r z z' hk hz hz' hT hT',
+  fun ζ ζ' hζ hζ' =>
+    Set.ext fun p => ⟨stab_sub hk hz hz' hT hT' hζ hζ' p, stab_sub hk hz hz' hT hT' hζ' hζ p⟩
+⟩
 
 end full
 
@@ -356,7 +406,10 @@ namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
 theorem gauge_section_exists : SecExists := by
   intro Wp Wq _ _ _ _ _ _ P Bs _ hk
-  exact ⟨Formalism.FourierDecayAlt.P.TheSec.theSection P.k P.r Bs.z Bs.z',
-    Formalism.FourierDecayAlt.P.TheSecStab.theSection_csec (by omega) Bs.z_mem Bs.z'_mem Bs.T_pos Bs.T'_pos⟩
+  exact ⟨
+    Formalism.FourierDecayAlt.P.TheSec.theSection P.k P.r Bs.z Bs.z',
+    Formalism.FourierDecayAlt.P.TheSecStab.theSection_csec (by omega) Bs.z_mem Bs.z'_mem Bs.T_pos
+      Bs.T'_pos
+  ⟩
 
 end Formalism.FourierDecayAlt.P.CutMP.Gauge.GC

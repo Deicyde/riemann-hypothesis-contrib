@@ -7,8 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Untwisted
 
 open UpperTheory.V.Z.Kato.Joint
 
-theorem UpperTheory.V.Z.Kato.Joint.rhoFrob :
-    UpperTheory.V.Z.Kato.Joint.RhoFrob := by
+theorem UpperTheory.V.Z.Kato.Joint.rhoFrob : UpperTheory.V.Z.Kato.Joint.RhoFrob := by
   intro l _ Ω _ _ _ ι e S A W g χ hN _ hatt ρ hρ
   have h : ∀ s, (ρ s : Matrix (Fin 2) (Fin 2) (Formalism.ConjugateSelfDual.Qbar l)) = _ := fun s =>
     (hρ s).trans (GlobalTheory.RhoAdm.untw_val' e W χ s).symm

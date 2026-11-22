@@ -10,7 +10,8 @@ namespace SheetDecomposition
 
 open Filter Topology Polynomial
 
-theorem eval_monicOf {d : ℕ} (a : Fin d → ℂ) (x : ℂ) : (monicOf a).eval x = x ^ d + ∑ i, a i * x ^ (i : ℕ) := by
+theorem eval_monicOf {d : ℕ} (a : Fin d → ℂ) (x : ℂ)
+    : (monicOf a).eval x = x ^ d + ∑ i, a i * x ^ (i : ℕ) := by
   simp [monicOf, eval_finsetSum]
 
 theorem degree_low_lt {d : ℕ} (a : Fin d → ℂ) : (∑ i, C (a i) * X ^ (i : ℕ) : ℂ[X]).degree < d :=
@@ -26,18 +27,22 @@ theorem natDegree_monicOf {d : ℕ} (a : Fin d → ℂ) : (monicOf a).natDegree 
   rw [degree_X_pow]
   exact degree_low_lt a
 
-theorem root_branch {d : ℕ} (a₀ : Fin d → ℂ) (x₀ : ℂ) (h0 : (monicOf a₀).IsRoot x₀)
-    (h1 : (derivative (monicOf a₀)).eval x₀ ≠ 0) :
-    ∃ ψ : (Fin d → ℂ) → ℂ, ψ a₀ = x₀ ∧ ∀ᶠ a in 𝓝 a₀, DifferentiableAt ℂ ψ a ∧ (monicOf a).IsRoot (ψ a) := by
+theorem root_branch
+    {d : ℕ} (a₀ : Fin d → ℂ)
+    (x₀ : ℂ) (h0 : (monicOf a₀).IsRoot x₀) (h1 : (derivative (monicOf a₀)).eval x₀ ≠ 0)
+    : ∃ ψ : (Fin d → ℂ) → ℂ,
+      ψ a₀ = x₀ ∧ ∀ᶠ a in 𝓝 a₀, DifferentiableAt ℂ ψ a ∧ (monicOf a).IsRoot (ψ a) := by
   set f : (Fin d → ℂ) × ℂ → ℂ := fun u => u.2 ^ d + ∑ i, u.1 i * u.2 ^ (i : ℕ) with hf
   have cdf : ContDiffAt ℂ 1 f (a₀, x₀) := by
     rw [hf]
     fun_prop
-  have hD : fderiv ℂ f (a₀, x₀) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ =
-      ContinuousLinearMap.toSpanSingleton ℂ ((derivative (monicOf a₀)).eval x₀) := by
+  have hD
+      : fderiv ℂ f (a₀, x₀) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ
+        = ContinuousLinearMap.toSpanSingleton ℂ ((derivative (monicOf a₀)).eval x₀) := by
     have e1 : HasFDerivAt (f ∘ fun x : ℂ => (a₀, x))
         (fderiv ℂ f (a₀, x₀) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ) x₀ :=
-      HasFDerivAt.comp x₀ (cdf.differentiableAt one_ne_zero).hasFDerivAt (hasFDerivAt_prodMk_right a₀ x₀)
+      HasFDerivAt.comp x₀ (cdf.differentiableAt one_ne_zero).hasFDerivAt
+        (hasFDerivAt_prodMk_right a₀ x₀)
     have e2 : (f ∘ fun x : ℂ => (a₀, x)) = fun x => (monicOf a₀).eval x := by
       funext x
       simp [hf, eval_monicOf]
@@ -61,8 +66,11 @@ theorem root_branch {d : ℕ} (a₀ : Fin d → ℂ) (x₀ : ℂ) (h0 : (monicOf
   rw [IsRoot.def, eval_monicOf]
   exact hb
 
-theorem root_iff_of_injective {d : ℕ} (a : Fin d → ℂ) (r : Fin d → ℂ) (hr : Function.Injective r)
-    (h : ∀ i, (monicOf a).IsRoot (r i)) (x : ℂ) : (monicOf a).IsRoot x ↔ ∃ i, x = r i := by
+theorem root_iff_of_injective
+    {d : ℕ}
+    (a : Fin d → ℂ) (r : Fin d → ℂ) (hr : Function.Injective r) (h : ∀ i, (monicOf a).IsRoot (r i))
+    (x : ℂ)
+    : (monicOf a).IsRoot x ↔ ∃ i, x = r i := by
   classical
   refine ⟨fun hx => ?_, fun ⟨i, hi⟩ => hi ▸ h i⟩
   by_contra hne
@@ -76,18 +84,21 @@ theorem root_iff_of_injective {d : ℕ} (a : Fin d → ℂ) (r : Fin d → ℂ) 
       exact h i
   have h1 := Finset.card_le_card hsub
   rw [Finset.card_insert_of_notMem (by
-    intro hz
-    obtain ⟨i, -, hi⟩ := Finset.mem_image.mp hz
-    exact hne i hi.symm), Finset.card_image_of_injective _ hr, Finset.card_univ, Fintype.card_fin] at h1
+        intro hz
+        obtain ⟨i, -, hi⟩ := Finset.mem_image.mp hz
+        exact hne i hi.symm),
+      Finset.card_image_of_injective _ hr, Finset.card_univ, Fintype.card_fin]
+    at h1
   have h2 := (Multiset.toFinset_card_le (monicOf a).roots).trans (card_roots' (monicOf a))
   rw [natDegree_monicOf] at h2
   omega
 
-theorem exists_roots {d : ℕ} (a : Fin d → ℂ) (hs : (monicOf a).Separable) :
-    ∃ r : Fin d → ℂ, Function.Injective r ∧ ∀ i, (monicOf a).IsRoot (r i) := by
+theorem exists_roots {d : ℕ} (a : Fin d → ℂ) (hs : (monicOf a).Separable)
+    : ∃ r : Fin d → ℂ, Function.Injective r ∧ ∀ i, (monicOf a).IsRoot (r i) := by
   classical
   have hc : (monicOf a).roots.toFinset.card = d := by
-    rw [Multiset.toFinset_card_of_nodup (nodup_roots hs), IsAlgClosed.card_roots_eq_natDegree, natDegree_monicOf]
+    rw [Multiset.toFinset_card_of_nodup (nodup_roots hs), IsAlgClosed.card_roots_eq_natDegree,
+      natDegree_monicOf]
   let e := Finset.equivFinOfCardEq hc
   refine ⟨fun i => (e.symm i : ℂ), Subtype.val_injective.comp e.symm.injective, fun i => ?_⟩
   have := (e.symm i).2
@@ -104,9 +115,11 @@ theorem rootBranches : RootBranches := by
   have hca : ContinuousAt a t₀ := (ha.differentiableAt (hT.mem_nhds ht₀)).continuousAt
   have hcθ : ∀ i, ContinuousAt (fun t => ψ i (a t)) t₀ := fun i =>
     ContinuousAt.comp (f := a) (hψ i).self_of_nhds.1.continuousAt hca
-  have hev : ∀ᶠ t in 𝓝 t₀, t ∈ T ∧ (∀ i, DifferentiableAt ℂ (ψ i) (a t) ∧ (monicOf (a t)).IsRoot (ψ i (a t))) ∧
-      ∀ i j, i ≠ j → ψ i (a t) ≠ ψ j (a t) := by
-    refine (hT.eventually_mem ht₀).and (Eventually.and (eventually_all.mpr fun i => hca.tendsto.eventually (hψ i)) ?_)
+  have hev
+      : ∀ᶠ t in 𝓝 t₀, t ∈ T ∧ (∀ i, DifferentiableAt ℂ (ψ i) (a t) ∧ (monicOf (a t)).IsRoot (ψ i (a t))) ∧
+        ∀ i j, i ≠ j → ψ i (a t) ≠ ψ j (a t) := by
+    refine (hT.eventually_mem ht₀).and
+      (Eventually.and (eventually_all.mpr fun i => hca.tendsto.eventually (hψ i)) ?_)
     refine eventually_all.mpr fun i => eventually_all.mpr fun j => ?_
     by_cases hij : i = j
     · exact Eventually.of_forall fun _ h => (h hij).elim
@@ -117,8 +130,10 @@ theorem rootBranches : RootBranches := by
           exact sub_ne_zero.mpr (hr.ne hij))
       filter_upwards [this] with t ht _ using sub_ne_zero.mp ht
   obtain ⟨V, hV, hVo, hVt⟩ := eventually_nhds_iff.mp hev
-  refine ⟨V, fun i t => ψ i (a t), hVo, hVt, fun t ht => (hV t ht).1, fun i t ht => ?_, fun t ht => ?_⟩
-  · exact (((hV t ht).2.1 i).1.comp t (ha.differentiableAt (hT.mem_nhds (hV t ht).1))).differentiableWithinAt
+  refine
+    ⟨V, fun i t => ψ i (a t), hVo, hVt, fun t ht => (hV t ht).1, fun i t ht => ?_, fun t ht => ?_⟩
+  · exact (((hV t ht).2.1 i).1.comp t
+      (ha.differentiableAt (hT.mem_nhds (hV t ht).1))).differentiableWithinAt
   · have hi : Function.Injective fun i => ψ i (a t) := fun i j h => by
       by_contra hij
       exact (hV t ht).2.2 i j hij h

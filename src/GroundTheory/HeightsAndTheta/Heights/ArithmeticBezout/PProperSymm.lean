@@ -11,8 +11,9 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial Ideal
 
-theorem localMult_ne_zero_of_mem_minimalPrimes {A : Type*} [CommRing A] [IsNoetherianRing A]
-    {J P : Ideal A} (hP : P ∈ J.minimalPrimes) : localMult J P ≠ 0 := by
+theorem localMult_ne_zero_of_mem_minimalPrimes
+    {A : Type*} [CommRing A] [IsNoetherianRing A] {J P : Ideal A} (hP : P ∈ J.minimalPrimes)
+    : localMult J P ≠ 0 := by
   have hPp : P.IsPrime := hP.1.1
   unfold localMult
   rw [dite_eq_left hPp]

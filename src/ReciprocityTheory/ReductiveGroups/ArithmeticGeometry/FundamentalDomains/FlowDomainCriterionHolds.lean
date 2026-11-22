@@ -7,26 +7,31 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD
 
-open Complex ReciprocityTheory.ChartRestriction.G.FD.GramDeterminantReal ReciprocityTheory.ChartRestriction.G.FD.PositiveMinorUnits ReciprocityTheory.ChartRestriction.G.FD.MajorantFamilyNorms
+open Complex ReciprocityTheory.ChartRestriction.G.FD.GramDeterminantReal
+  ReciprocityTheory.ChartRestriction.G.FD.PositiveMinorUnits
+  ReciprocityTheory.ChartRestriction.G.FD.MajorantFamilyNorms
 
 variable {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E]
 
-private theorem minors_iff {r : ℕ} (X : Data E r) (e : X.Ψ → Fin r → ℂ) (he : X.IsIsoV e)
-    {x : Frame X.Ψ r} (hx : x ∈ X.dom) (s : X.Ψ → ℂ) (τ : X.Ψ) :
-    (∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm (X.flowV e s x) τ i).re) ↔
-      0 < 1 + 2 * X.c τ * (s τ).im * mN τ.1 X.Gm (mat x τ) (e τ) X.p0 := by
+private theorem minors_iff
+    {r : ℕ} (X : Data E r) (e : X.Ψ → Fin r → ℂ) (he : X.IsIsoV e)
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    (s : X.Ψ → ℂ) (τ : X.Ψ)
+    : (∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm (X.flowV e s x) τ i).re)
+      ↔ 0 < 1 + 2 * X.c τ * (s τ).im * mN τ.1 X.Gm (mat x τ) (e τ) X.p0 := by
   have hG := MajorantFamilyNorms.hG_of X τ
   have hdet : (mat x τ).det ≠ 0 := (hx τ).1
   have hsg := MajorantFamilyNorms.hsg_of X hx τ
   have he0 := (he τ).1
-  have key : ∀ i : Fin (r + 1), (dmin X.Gm (X.flowV e s x) τ i).re =
-      (dmin X.Gm x τ i).re * (1 + 2 * X.c τ * (s τ).im * mN τ.1 X.Gm (mat x τ) (e τ) i) := by
+  have key
+      : ∀ i : Fin (r + 1),
+        (dmin X.Gm (X.flowV e s x) τ i).re
+          = (dmin X.Gm x τ i).re * (1 + 2 * X.c τ * (s τ).im * mN τ.1 X.Gm (mat x τ) (e τ) i) := by
     intro i
     rw [MajorantFamilyNorms.dmin_eq X (X.flowV e s x), MajorantFamilyNorms.dmin_flow X hx e τ he0 s,
       ← MajorantFamilyNorms.dmin_eq X x, Complex.re_mul_ofReal]
   have hpos : ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re := (hx τ).2
-  have hb := fun (i : ℕ) (hi : i ≤ r) =>
-    mN_bounds hG X.p0 X.p0_le (mat x τ) hdet hsg (e τ) he0 i hi
+  have hb := fun (i : ℕ) (hi : i ≤ r) => mN_bounds hG X.p0 X.p0_le (mat x τ) hdet hsg (e τ) he0 i hi
   have hmp := mN_pos hG X.p0 X.p0_le (mat x τ) hdet hsg (e τ) he0 (he τ).2
   constructor
   · intro h
@@ -44,15 +49,18 @@ private theorem minors_iff {r : ℕ} (X : Data E r) (e : X.Ψ → Fin r → ℂ)
 theorem flowDomainCriterion_holds : FlowDomainCriterion (E := E) := by
   intro r X e he x hx s
   have hmp : ∀ τ, 0 < mN τ.1 X.Gm (mat x τ) (e τ) X.p0 := fun τ =>
-    mN_pos (MajorantFamilyNorms.hG_of X τ) X.p0 X.p0_le (mat x τ) (hx τ).1 (MajorantFamilyNorms.hsg_of X hx τ) (e τ)
-      (he τ).1 (he τ).2
-  have hm : ∀ τ, 1 + (s τ).im / X.ttV e x τ =
-      1 + 2 * X.c τ * (s τ).im * mN τ.1 X.Gm (mat x τ) (e τ) X.p0 := by
+    mN_pos (MajorantFamilyNorms.hG_of X τ) X.p0 X.p0_le (mat x τ) (hx τ).1
+      (MajorantFamilyNorms.hsg_of X hx τ) (e τ) (he τ).1 (he τ).2
+  have hm
+      : ∀ τ,
+        1 + (s τ).im / X.ttV e x τ
+          = 1 + 2 * X.c τ * (s τ).im * mN τ.1 X.Gm (mat x τ) (e τ) X.p0 := by
     intro τ
     rw [Data.ttV, MajorantFamilyNorms.maj_eq X hx e τ (he τ).1, one_div, div_inv_eq_mul]
     ring
-  have hdom : X.flowV e s x ∈ X.dom ↔
-      ∀ τ, ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm (X.flowV e s x) τ i).re := by
+  have hdom
+      : X.flowV e s x ∈ X.dom
+        ↔ ∀ τ, ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm (X.flowV e s x) τ i).re := by
     constructor
     · intro h τ
       exact (h τ).2
@@ -71,7 +79,8 @@ theorem flowDomainCriterion_holds : FlowDomainCriterion (E := E) := by
     have hc := MajorantFamilyNorms.c_pos X τ
     have hm0 := hmp τ
     simp only [Data.ttV]
-    rw [MajorantFamilyNorms.maj_flow X hx e τ (he τ).1 s hpos.ne', MajorantFamilyNorms.maj_eq X hx e τ (he τ).1]
+    rw [MajorantFamilyNorms.maj_flow X hx e τ (he τ).1 s hpos.ne',
+      MajorantFamilyNorms.maj_eq X hx e τ (he τ).1]
     field_simp
 
 end ReciprocityTheory.ChartRestriction.G.FD

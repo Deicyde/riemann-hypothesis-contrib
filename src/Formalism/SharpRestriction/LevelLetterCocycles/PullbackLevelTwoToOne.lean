@@ -10,29 +10,42 @@ noncomputable section
 
 namespace Formalism.MainNotions.RamifiedCoefficientChains.S9
 
-open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.RamifiedCoefficientChains
+open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.RamifiedCoefficientChains
 
 section LemGAla
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
 
-theorem lemGAla_dl_smul (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) {i : ZMod n} {a : LetA O n}
-    (ha : a ∈ W.AΔ) {x : W.DD T} (hx : Formalism.MainNotions.CrystallineLiftingInputs.DL W T i x) : Formalism.MainNotions.CrystallineLiftingInputs.DL W T i (a • x) := by
+theorem lemGAla_dl_smul
+    (W : LocWach PD LL O v n)
+    (T : LocLat G Qp LL O)
+    {i : ZMod n} {a : LetA O n} (ha : a ∈ W.AΔ)
+    {x : W.DD T} (hx : Formalism.MainNotions.CrystallineLiftingInputs.DL W T i x)
+    : Formalism.MainNotions.CrystallineLiftingInputs.DL W T i (a • x) := by
   refine ⟨?_, fun δ hδ => ?_⟩
   · rw [smul_smul, mul_comm, ← smul_smul, hx.1]
   · rw [Formalism.MainNotions.LiftingTheory.wmap_γD_smul, ha δ hδ, hx.2 δ hδ]
 
-theorem lemGAla_dl_φpow (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) {i : ZMod n} {x : W.DD T}
-    (hx : Formalism.MainNotions.CrystallineLiftingInputs.DL W T i x) (k : ℕ) :
-    Formalism.MainNotions.CrystallineLiftingInputs.DL W T (i + (k : ZMod n)) (((W.φD T) ^ k) x) := by
-  have step : ∀ (j : ZMod n) (y : W.DD T), Formalism.MainNotions.CrystallineLiftingInputs.DL W T j y →
-      Formalism.MainNotions.CrystallineLiftingInputs.DL W T (j + 1) (W.φD T y) := by
+theorem lemGAla_dl_φpow
+    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O)
+    {i : ZMod n} {x : W.DD T} (hx : Formalism.MainNotions.CrystallineLiftingInputs.DL W T i x)
+    (k : ℕ)
+    : Formalism.MainNotions.CrystallineLiftingInputs.DL W T (i + (k : ZMod n))
+      (((W.φD T) ^ k) x) := by
+  have step
+      : ∀ (j : ZMod n) (y : W.DD T),
+        Formalism.MainNotions.CrystallineLiftingInputs.DL W T j y
+          → Formalism.MainNotions.CrystallineLiftingInputs.DL W T (j + 1) (W.φD T y) := by
     intro j y hy
     refine ⟨?_, fun δ hδ => ?_⟩
     · have h := Formalism.MainNotions.LiftingTheory.wmap_φA_letE W (j + 1)
@@ -45,18 +58,31 @@ theorem lemGAla_dl_φpow (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) {i : Z
     rw [Nat.cast_succ, ← add_assoc, pow_succ']
     exact step _ _ ih
 
-theorem lemGAla_dl_trunc (W : LocWach PD LL O v n) (T : LocLat G Qp LL O)
-    (hO : ∀ c : O, ((PD.p : ℕ) : O) * c = 0 → c = 0) (hπ : W.π₀ ∈ W.AΔ) {c : ZMod n}
-    {j M X σ : ℕ} {w z : W.DD T} (hw : Formalism.MainNotions.CrystallineLiftingInputs.DL W T c w)
-    (hz : Formalism.MainNotions.CrystallineLiftingInputs.IsTrunc W T c j M X σ w z) : Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) z := by
+theorem lemGAla_dl_trunc
+    (W : LocWach PD LL O v n)
+    (T : LocLat G Qp LL O)
+    (hO : ∀ c : O, ((PD.p : ℕ) : O) * c = 0 → c = 0) (hπ : W.π₀ ∈ W.AΔ)
+    {c : ZMod n} {j M X σ : ℕ} {w z : W.DD T}
+    (hw : Formalism.MainNotions.CrystallineLiftingInputs.DL W T c w)
+    (hz : Formalism.MainNotions.CrystallineLiftingInputs.IsTrunc W T c j M X σ w z)
+    : Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) z := by
   obtain ⟨cc, r, s, hser, hrem, rfl⟩ := hz
-  have hzero : Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) 0 := ⟨by simp, fun δ hδ => by simp⟩
-  have hsub : ∀ a b : W.DD T, Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) a →
-      Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) b → Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) (a - b) :=
-    fun a b ha hb => ⟨by rw [smul_sub, ha.1, hb.1], fun δ hδ => by rw [map_sub, ha.2 δ hδ, hb.2 δ hδ]⟩
-  have hadd : ∀ a b : W.DD T, Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) a →
-      Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) b → Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) (a + b) :=
-    fun a b ha hb => ⟨by rw [smul_add, ha.1, hb.1], fun δ hδ => by rw [map_add (f := _), ha.2 δ hδ, hb.2 δ hδ]⟩
+  have hzero : Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) 0 :=
+    ⟨by simp, fun δ hδ => by simp⟩
+  have hsub
+      : ∀ a b : W.DD T,
+        Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) a
+          → Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) b
+          → Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n))
+            (a - b) := fun a b ha hb =>
+    ⟨by rw [smul_sub, ha.1, hb.1], fun δ hδ => by rw [map_sub, ha.2 δ hδ, hb.2 δ hδ]⟩
+  have hadd
+      : ∀ a b : W.DD T,
+        Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) a
+          → Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) b
+          → Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n))
+            (a + b) := fun a b ha hb =>
+    ⟨by rw [smul_add, ha.1, hb.1], fun δ hδ => by rw [map_add (f := _), ha.2 δ hδ, hb.2 δ hδ]⟩
   have hsmem : ∀ y, s y ∈ W.AΔ := by
     intro y
     obtain ⟨⟨⟨a, ha⟩, -⟩, hps⟩ := hrem y
@@ -64,24 +90,30 @@ theorem lemGAla_dl_trunc (W : LocWach PD LL O v n) (T : LocLat G Qp LL O)
       rw [ha]
       exact Subalgebra.sum_mem _ fun k _ =>
         Subalgebra.mul_mem _ (Subalgebra.algebraMap_mem _ _) (Subalgebra.pow_mem _ hπ _)
-    refine Formalism.MainNotions.UnusedSlot80.SatW.mem_AΔ_of_p_pow W hO (Formalism.MainNotions.CrystallineLiftingInputs.eY PD.p y) ?_
+    refine Formalism.MainNotions.UnusedSlot80.SatW.mem_AΔ_of_p_pow W hO
+      (Formalism.MainNotions.CrystallineLiftingInputs.eY PD.p y) ?_
     rw [hps]
     exact Subalgebra.mul_mem _ (Subalgebra.pow_mem _ (Subalgebra.natCast_mem _ _) _) hr
-  have hw' : Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n)) (((PD.p : ℕ) : O) ^ σ • ((W.φD T) ^ j) w) := by
+  have hw' : Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n))
+      (((PD.p : ℕ) : O) ^ σ • ((W.φD T) ^ j) w) := by
     rw [← algebraMap_smul (LetA O n)]
     exact lemGAla_dl_smul W T (Subalgebra.algebraMap_mem _ _) (lemGAla_dl_φpow W T hw j)
   refine hsub _ _ hw' ?_
-  exact Finset.sum_induction _ (Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n))) hadd hzero
+  exact Finset.sum_induction _
+    (Formalism.MainNotions.CrystallineLiftingInputs.DL W T (c + (j : ZMod n))) hadd hzero
     (fun y _ => lemGAla_dl_smul W T (hsmem y) (lemGAla_dl_φpow W T (hser.2.1 y).1 j))
 
-theorem pullback_level_two_to_one (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) (c : ZMod n) (k : ℕ)
-    (hπ : W.π₀ ∈ W.AΔ)
-    (hgen : ∀ x, x ∈ W.N T → Formalism.MainNotions.CrystallineLiftingInputs.DL W T c x →
-      Formalism.MainNotions.LiftingTheory.qp W ^ k • W.φD T x ∈ W.N T) :
-    ∀ p ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T c 2,
-      Formalism.MainNotions.LiftingTheory.pk W 1 ^ k • p ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T (c + 1) 1 := by
+theorem pullback_level_two_to_one
+    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) (c : ZMod n) (k : ℕ) (hπ : W.π₀ ∈ W.AΔ)
+    (hgen : ∀ x,
+      x ∈ W.N T → Formalism.MainNotions.CrystallineLiftingInputs.DL W T c x
+        → Formalism.MainNotions.LiftingTheory.qp W ^ k • W.φD T x ∈ W.N T)
+    : ∀ p ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T c 2,
+      Formalism.MainNotions.LiftingTheory.pk W 1 ^ k • p
+        ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T (c + 1) 1 := by
   intro p hp
-  have hqΔ : Formalism.MainNotions.LiftingTheory.qp W ∈ W.AΔ := W.AΔ.add_mem hπ (Subalgebra.natCast_mem _ _)
+  have hqΔ : Formalism.MainNotions.LiftingTheory.qp W ∈ W.AΔ :=
+    W.AΔ.add_mem hπ (Subalgebra.natCast_mem _ _)
   unfold Formalism.MainNotions.CrystallineLiftingInputs.pullJ at hp ⊢
   induction hp using Submodule.span_induction with
   | mem x hx =>
@@ -92,32 +124,44 @@ theorem pullback_level_two_to_one (W : LocWach PD LL O v n) (T : LocLat G Qp LL 
     · simp only [pow_one, Formalism.MainNotions.LiftingTheory.pk]
       rw [Formalism.MainNotions.LiftingTheory.wmap_φD_smul, map_pow, pow_two]
       rfl
-  | zero => simp
-  | add x y _ _ hx hy => rw [smul_add]; exact add_mem hx hy
+  | zero =>
+    simp
+  | add x y _ _ hx hy =>
+    rw [smul_add]; exact add_mem hx hy
   | smul a x _ hx =>
     rw [smul_smul, mul_comm, ← smul_smul]
     exact Submodule.smul_mem _ a hx
 
-theorem lemGAla_pull1N (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) (c : ZMod n) (k : ℕ)
-    (hgen : ∀ x, x ∈ W.N T → Formalism.MainNotions.CrystallineLiftingInputs.DL W T c x →
-      Formalism.MainNotions.LiftingTheory.qp W ^ k • W.φD T x ∈ W.N T) :
-    ∀ p ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T c 1, Formalism.MainNotions.LiftingTheory.qp W ^ k • p ∈ W.N T := by
+theorem lemGAla_pull1N
+    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) (c : ZMod n) (k : ℕ)
+    (hgen : ∀ x,
+      x ∈ W.N T → Formalism.MainNotions.CrystallineLiftingInputs.DL W T c x
+        → Formalism.MainNotions.LiftingTheory.qp W ^ k • W.φD T x ∈ W.N T)
+    : ∀ p ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T c 1,
+      Formalism.MainNotions.LiftingTheory.qp W ^ k • p ∈ W.N T := by
   intro p hp
   unfold Formalism.MainNotions.CrystallineLiftingInputs.pullJ at hp
   induction hp using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨y, ⟨hyN, hyD⟩, rfl⟩ := hx
     simpa using hgen y hyN hyD
-  | zero => simp
-  | add x y _ _ hx hy => rw [smul_add]; exact add_mem hx hy
+  | zero =>
+    simp
+  | add x y _ _ hx hy =>
+    rw [smul_add]; exact add_mem hx hy
   | smul a x _ hx =>
     rw [smul_smul, mul_comm, ← smul_smul]
     exact (W.N T).smul_mem a hx
 
-theorem q_pow_smul_frobenius_mem' (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) (hR : Formalism.MainNotions.LiftingTheory.lifta_Ring W)
-    (hs : W.s = 1) {M h : ZMod n → ℕ} (h5 : Formalism.MainNotions.DeltaInvariantLattices.p5 W T M h) (c : ZMod n) :
-    ∀ x, x ∈ W.N T → Formalism.MainNotions.CrystallineLiftingInputs.DL W T c x →
-      Formalism.MainNotions.LiftingTheory.qp W ^ M (c + 1) • W.φD T x ∈ W.N T := by
+theorem q_pow_smul_frobenius_mem'
+    (W : LocWach PD LL O v n)
+    (T : LocLat G Qp LL O)
+    (hR : Formalism.MainNotions.LiftingTheory.lifta_Ring W) (hs : W.s = 1)
+    {M h : ZMod n → ℕ} (h5 : Formalism.MainNotions.DeltaInvariantLattices.p5 W T M h)
+    (c : ZMod n)
+    : ∀ x,
+      x ∈ W.N T → Formalism.MainNotions.CrystallineLiftingInputs.DL W T c x
+        → Formalism.MainNotions.LiftingTheory.qp W ^ M (c + 1) • W.φD T x ∈ W.N T := by
   intro x hxN hxD
   have hxl : x ∈ W.Nl T c := by
     have h := Formalism.MainNotions.LiftingTheory.liftb_letE_mem W T c hxN
@@ -125,8 +169,9 @@ theorem q_pow_smul_frobenius_mem' (W : LocWach PD LL O v n) (T : LocLat G Qp LL 
   have h := h5.1 (c + 1) x (by rwa [add_sub_cancel_right])
   exact (Formalism.MainNotions.LiftingTheory.lifta_Qq W hR hs T _ _).1 h
 
-theorem lemGAla_parity {n : ℕ} [NeZero n] (hn : Even n) (d : ℕ) (i : ZMod n) (hi : (i.val + d) % 2 = 1) :
-    ((i - 1).val + d) % 2 = 0 := by
+theorem lemGAla_parity
+    {n : ℕ} [NeZero n] (hn : Even n) (d : ℕ) (i : ZMod n) (hi : (i.val + d) % 2 = 1)
+    : ((i - 1).val + d) % 2 = 0 := by
   have h2 : 2 ∣ n := even_iff_two_dvd.1 hn
   have key : ∀ x : ZMod n, (((x.val : ℕ)) : ZMod 2) = ZMod.castHom h2 (ZMod 2) x := by
     intro x
@@ -139,11 +184,16 @@ theorem lemGAla_parity {n : ℕ} [NeZero n] (hn : Even n) (d : ℕ) (i : ZMod n)
   rw [key (i - 1), map_sub, map_one, ← key i]
   linear_combination h1
 
-theorem lemGA_la_of [NeZero n] (W : LocWach PD LL O v n) (hT2 : Formalism.MainNotions.CrystallineLiftingInputs.TTool2 W)
-    (h9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W) (h5 : Formalism.MainNotions.DeltaInvariantLattices.P5W W) (hR : Formalism.MainNotions.LiftingTheory.lifta_Ring W)
+theorem lemGA_la_of
+    [NeZero n]
+    (W : LocWach PD LL O v n) (hT2 : Formalism.MainNotions.CrystallineLiftingInputs.TTool2 W)
+    (h9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    (h5 : Formalism.MainNotions.DeltaInvariantLattices.P5W W)
+    (hR : Formalism.MainNotions.LiftingTheory.lifta_Ring W)
     (hJ : ∀ (d : ℕ) (T₁ T₂ : LocLat G Qp LL O) (F : LatHom T₁.L T₂.L) (b : ZMod n → ℕ) (S η m : ℕ),
-      SetCS W d T₁ T₂ F b S η m → Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T₂ (MiW d b S η) (hiW d b S η)) :
-    LemGA_la W := by
+      SetCS W d T₁ T₂ F b S η m
+        → Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T₂ (MiW d b S η) (hiW d b S η))
+    : LemGA_la W := by
   intro d T₁ T₂ F b S η m hset i hi y hyN hyD
   have hsetc := hset
   obtain ⟨hA, hp11, hn, ⟨hdom, -, -⟩, ⟨ζ, hζ⟩, hsur, -, -, hbig, -⟩ := hset
@@ -168,45 +218,60 @@ theorem lemGA_la_of [NeZero n] (W : LocWach PD LL O v n) (hT2 : Formalism.MainNo
   have hInI : Formalism.MainNotions.CrystallineLiftingInputs.InI W T₂ (i - 2) y := by
     refine ⟨hyD, ⟨0, ?_⟩, ⟨y', hy'Δ.1, hy'Δ.2, by rw [pow_one]; exact hy'⟩⟩
     first
-      | exact hyN
-      | (simp only [LocWach.InvN]; simpa using hyN)
-      | (unfold LocWach.InvN; simpa [Formalism.MainNotions.DeltaInvariantLattices.invN, Formalism.MainNotions.DeltaInvariantLattices.smulA] using hyN)
-  have hqΔ : Formalism.MainNotions.LiftingTheory.qp W ∈ W.AΔ := W.AΔ.add_mem hR.πΔ (Subalgebra.natCast_mem _ _)
+    | exact hyN
+    | (simp only [LocWach.InvN]; simpa using hyN)
+    | (
+        unfold LocWach.InvN
+        simpa [Formalism.MainNotions.DeltaInvariantLattices.invN,
+            Formalism.MainNotions.DeltaInvariantLattices.smulA]
+          using hyN
+      )
+  have hqΔ : Formalism.MainNotions.LiftingTheory.qp W ∈ W.AΔ :=
+    W.AΔ.add_mem hR.πΔ (Subalgebra.natCast_mem _ _)
   set H := hpar n b S + η with hH
-  obtain ⟨hex, hcl, -⟩ := (hT2 hA hp11 2 1 (2 * H) (lemG_sig PD.p H) (Or.inr ⟨rfl, rfl, rfl⟩)).1
-    T₂ hc2 (i - 2)
+  obtain ⟨hex, hcl, -⟩ :=
+    (hT2 hA hp11 2 1 (2 * H) (lemG_sig PD.p H) (Or.inr ⟨rfl, rfl, rfl⟩)).1 T₂ hc2 (i - 2)
   obtain ⟨la, hla⟩ := hex y hInI
   obtain ⟨hdiff, p0, hp0, hγla⟩ := hcl y la hInI hla
   have h5T := h5 T₂ _ _ hc2 (hJ d T₁ T₂ F b S η m hsetc)
   have hpar1 : ((i - 1).val + d) % 2 = 0 := lemGAla_parity hn d i hi
   have hM1 : MiW d b S η (i - 1) = b (i - 1) + S := by simp [MiW, hpar1]
   have hMi : MiW d b S η i = η := by simp [MiW, hi]
-  have hgen1 : ∀ x, x ∈ W.N T₂ → Formalism.MainNotions.CrystallineLiftingInputs.DL W T₂ (i - 2) x →
-      Formalism.MainNotions.LiftingTheory.qp W ^ (b (i - 1) + S) • W.φD T₂ x ∈ W.N T₂ := by
+  have hgen1
+      : ∀ x,
+        x ∈ W.N T₂ → Formalism.MainNotions.CrystallineLiftingInputs.DL W T₂ (i - 2) x
+          → Formalism.MainNotions.LiftingTheory.qp W ^ (b (i - 1) + S) • W.φD T₂ x ∈ W.N T₂ := by
     intro x hx hxD
     have h := q_pow_smul_frobenius_mem' W T₂ hR hs h5T (i - 2) x hx hxD
     rwa [show i - 2 + 1 = i - 1 by ring, hM1] at h
-  have hgen2 : ∀ x, x ∈ W.N T₂ → Formalism.MainNotions.CrystallineLiftingInputs.DL W T₂ (i - 1) x →
-      Formalism.MainNotions.LiftingTheory.qp W ^ η • W.φD T₂ x ∈ W.N T₂ := by
+  have hgen2
+      : ∀ x,
+        x ∈ W.N T₂ → Formalism.MainNotions.CrystallineLiftingInputs.DL W T₂ (i - 1) x
+          → Formalism.MainNotions.LiftingTheory.qp W ^ η • W.φD T₂ x ∈ W.N T₂ := by
     intro x hx hxD
     have h := q_pow_smul_frobenius_mem' W T₂ hR hs h5T (i - 1) x hx hxD
     rwa [sub_add_cancel, hMi] at h
   have hla_mem : la ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T₂ (i - 2) 2 := by
-    have hgenp : ((PD.p : ℕ) : O) ^ lemG_sig PD.p H • ((W.φD T₂) ^ 2) y ∈
-        Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T₂ (i - 2) 2 := by
+    have hgenp
+        : ((PD.p : ℕ) : O) ^ lemG_sig PD.p H • ((W.φD T₂) ^ 2) y
+          ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T₂ (i - 2) 2 := by
       rw [← algebraMap_smul (LetA O n)]
       refine Submodule.smul_mem _ _ ?_
       unfold Formalism.MainNotions.CrystallineLiftingInputs.pullJ
       exact Submodule.subset_span ⟨y, ⟨hyN, hyD⟩, rfl⟩
     have h := Submodule.add_mem _ hdiff hgenp
     rwa [sub_add_cancel] at h
-  have hpull : Formalism.MainNotions.LiftingTheory.pk W 1 ^ (b (i - 1) + S) • la ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T₂ (i - 1) 1 := by
+  have hpull
+      : Formalism.MainNotions.LiftingTheory.pk W 1 ^ (b (i - 1) + S) • la
+        ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T₂ (i - 1) 1 := by
     have h := pullback_level_two_to_one W T₂ (i - 2) (b (i - 1) + S) hR.πΔ hgen1 la hla_mem
     rwa [show i - 2 + 1 = i - 1 by ring] at h
   have hDLi : Formalism.MainNotions.CrystallineLiftingInputs.DL W T₂ i la := by
     have h := lemGAla_dl_trunc W T₂ hO hR.πΔ hyD hla
     simpa using h
-  have hp0' : Formalism.MainNotions.LiftingTheory.pk W 1 ^ (b (i - 1) + S) • p0 ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T₂ (i - 1) 1 := by
+  have hp0'
+      : Formalism.MainNotions.LiftingTheory.pk W 1 ^ (b (i - 1) + S) • p0
+        ∈ Formalism.MainNotions.CrystallineLiftingInputs.pullJ W T₂ (i - 1) 1 := by
     have h := pullback_level_two_to_one W T₂ (i - 2) (b (i - 1) + S) hR.πΔ hgen1 p0 hp0
     rwa [show i - 2 + 1 = i - 1 by ring] at h
   have hN1 := lemGAla_pull1N W T₂ (i - 1) η hgen2 _ hp0'
@@ -235,7 +300,8 @@ theorem lemGA_la_of [NeZero n] (W : LocWach PD LL O v n) (hT2 : Formalism.MainNo
     rw [ha_def, mul_comm, ← smul_smul, ← smul_smul] at h
     have h1 := (Formalism.MainNotions.LiftingTheory.lifta_qpow_bij W hR T₂ _).1 h
     obtain ⟨u, hu⟩ := hR.πU
-    exact Formalism.MainNotions.LiftingTheory.lifta_π₀_cancel W T₂ (↑u⁻¹ : W.EE) (by rw [← hu]; exact u.mul_inv) x x' h1
+    exact Formalism.MainNotions.LiftingTheory.lifta_π₀_cancel W T₂ (↑u⁻¹ : W.EE)
+      (by rw [← hu]; exact u.mul_inv) x x' h1
   set w := Formalism.MainNotions.LiftingTheory.pk W 1 ^ (b (i - 1) + S) • (W.γ T₂ la - la) with hw_def
   have hγDL : Formalism.MainNotions.CrystallineLiftingInputs.DL W T₂ i (W.γ T₂ la) := by
     refine ⟨?_, fun δ hδ => ?_⟩
@@ -257,7 +323,9 @@ theorem lemGA_la_of [NeZero n] (W : LocWach PD LL O v n) (hT2 : Formalism.MainNo
     ring
   refine ⟨la, hla, hDLi, hpull, z, hzN, ⟨hcancel _ _ ?_, fun δ hδ => hcancel _ _ ?_⟩, ?_⟩
   · rw [smul_smul, mul_comm, ← smul_smul, hz_eq, hwDL.1]
-  · calc a • W.γD T₂ δ z = W.γA δ a • W.γD T₂ δ z := by rw [haΔ δ hδ]
+  · calc
+      a • W.γD T₂ δ z
+        = W.γA δ a • W.γD T₂ δ z := by rw [haΔ δ hδ]
       _ = W.γD T₂ δ (a • z) := (Formalism.MainNotions.LiftingTheory.wmap_γD_smul W T₂ δ a z).symm
       _ = a • z := by rw [hz_eq, hwDL.2 δ hδ]
   · rw [← hw_def, ← hz_eq]

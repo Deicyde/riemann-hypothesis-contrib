@@ -8,9 +8,10 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.CutOff
 
-theorem exists_isClopen_isCompact_superset {R : Type} [TopologicalSpace R] [LocallyCompactSpace R]
-    [T2Space R] [TotallyDisconnectedSpace R] {Z : Set R} (hZ : IsCompact Z) :
-    ∃ U : Set R, IsClopen U ∧ IsCompact U ∧ Z ⊆ U := by
+theorem exists_isClopen_isCompact_superset
+    {R : Type} [TopologicalSpace R] [LocallyCompactSpace R] [T2Space R] [TotallyDisconnectedSpace R]
+    {Z : Set R} (hZ : IsCompact Z)
+    : ∃ U : Set R, IsClopen U ∧ IsCompact U ∧ Z ⊆ U := by
   classical
   have h : ∀ z : R, ∃ V : Set R, IsClopen V ∧ IsCompact V ∧ z ∈ V := by
     intro z
@@ -19,12 +20,17 @@ theorem exists_isClopen_isCompact_superset {R : Type} [TopologicalSpace R] [Loca
     exact ⟨V, hV, hK.of_isClosed_subset hV.isClosed hVK, hzV⟩
   choose V hVc hVk hzV using h
   obtain ⟨t, -, ht⟩ := hZ.elim_nhds_subcover V (fun z _ => (hVc z).isOpen.mem_nhds (hzV z))
-  exact ⟨⋃ z ∈ t, V z, isClopen_biUnion_finset fun z _ => hVc z,
-    t.isCompact_biUnion fun z _ => hVk z, ht⟩
+  exact ⟨
+    ⋃ z ∈ t, V z,
+    isClopen_biUnion_finset fun z _ => hVc z,
+    t.isCompact_biUnion fun z _ => hVk z,
+    ht
+  ⟩
 
-theorem exists_nhds_one_mul_mem_iff {R : Type} [Group R] [TopologicalSpace R]
-    [IsTopologicalGroup R] {U : Set R} (hUo : IsOpen U) (hUk : IsCompact U) :
-    ∃ W ∈ 𝓝 (1 : R), ∀ w ∈ W, ∀ x, w * x ∈ U ↔ x ∈ U := by
+theorem exists_nhds_one_mul_mem_iff
+    {R : Type} [Group R] [TopologicalSpace R] [IsTopologicalGroup R]
+    {U : Set R} (hUo : IsOpen U) (hUk : IsCompact U)
+    : ∃ W ∈ 𝓝 (1 : R), ∀ w ∈ W, ∀ x, w * x ∈ U ↔ x ∈ U := by
   open scoped Pointwise in
   obtain ⟨V, hV, hVU⟩ := compact_open_separated_mul_left hUk hUo subset_rfl
   refine ⟨V ∩ V⁻¹, inter_mem hV (inv_mem_nhds_one R hV), ?_⟩
@@ -36,8 +42,9 @@ theorem exists_nhds_one_mul_mem_iff {R : Type} [Group R] [TopologicalSpace R]
   · intro h
     exact hVU (Set.mul_mem_mul hw h)
 
-theorem isLocallyConstant_indicator_one {R : Type} [TopologicalSpace R] {U : Set R}
-    (hU : IsClopen U) : IsLocallyConstant (U.indicator (fun _ => (1 : ℝ))) := by
+theorem isLocallyConstant_indicator_one
+    {R : Type} [TopologicalSpace R] {U : Set R} (hU : IsClopen U)
+    : IsLocallyConstant (U.indicator (fun _ => (1 : ℝ))) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   by_cases hx : x ∈ U
@@ -46,7 +53,16 @@ theorem isLocallyConstant_indicator_one {R : Type} [TopologicalSpace R] {U : Set
   · filter_upwards [hU.isClosed.isOpen_compl.mem_nhds hx] with y hy
     simp [hx, Set.notMem_compl_iff.not.1 (by simpa using hy)]
 
-theorem exists_cutoff : ∀ (R S : Type) [Group R] [TopologicalSpace R] [IsTopologicalGroup R] [LocallyCompactSpace R] [T2Space R] [TotallyDisconnectedSpace R] [Group S] [TopologicalSpace S] [IsTopologicalGroup S] [MeasurableSpace S] [BorelSpace S] (i : S →* R), Topology.IsClosedEmbedding i → ∀ (ν : Measure S) [ν.IsHaarMeasure] (Z : Set R), IsCompact Z → ∃ α : R → ℝ, IsLocallyConstant α ∧ HasCompactSupport α ∧ (∀ g, 0 ≤ α g) ∧ ∀ z ∈ Z, ∀ s₀ : S, ∫ s, α (z * i s₀ * i s) ∂ν = 1 := by
+theorem exists_cutoff
+    : ∀ (R S : Type) [Group R] [TopologicalSpace R] [IsTopologicalGroup R] [LocallyCompactSpace R]
+        [T2Space R] [TotallyDisconnectedSpace R] [Group S] [TopologicalSpace S]
+        [IsTopologicalGroup S] [MeasurableSpace S] [BorelSpace S] (i : S →* R),
+      Topology.IsClosedEmbedding i
+        → ∀ (ν : Measure S) [ν.IsHaarMeasure] (Z : Set R),
+          IsCompact Z
+            → ∃ α : R → ℝ,
+              IsLocallyConstant α ∧ HasCompactSupport α ∧ (∀ g, 0 ≤ α g)
+                ∧ ∀ z ∈ Z, ∀ s₀ : S, ∫ s, α (z * i s₀ * i s) ∂ν = 1 := by
   intro R S _ _ _ _ _ _ _ _ _ _ _ i hi ν _ Z hZ
   classical
   obtain ⟨U, hUc, hUk, hZU⟩ := exists_isClopen_isCompact_superset hZ
@@ -76,8 +92,7 @@ theorem exists_cutoff : ∀ (R S : Type) [Group R] [TopologicalSpace R] [IsTopol
     rwa [inv_mul_cancel_right] at this
   have hFpos : ∀ g ∈ U, 0 < F g := by
     intro g hg
-    have hcont : Continuous (fun s => β (g * i s)) :=
-      hβc.comp (continuous_const.mul hi.continuous)
+    have hcont : Continuous (fun s => β (g * i s)) := hβc.comp (continuous_const.mul hi.continuous)
     have hKc : IsCompact (i ⁻¹' ((Homeomorph.mulLeft g) ⁻¹' U)) :=
       hi.isCompact_preimage ((Homeomorph.mulLeft g).isCompact_preimage.2 hUk)
     have hKcl : IsClosed (i ⁻¹' ((Homeomorph.mulLeft g) ⁻¹' U)) :=
@@ -86,8 +101,8 @@ theorem exists_cutoff : ∀ (R S : Type) [Group R] [TopologicalSpace R] [IsTopol
       refine HasCompactSupport.intro' hKc hKcl fun x hx => ?_
       have hx' : g * i x ∉ U := hx
       simp [hβ, hx']
-    exact hcont.integral_pos_of_hasCompactSupport_nonneg_nonzero (x := 1) hsupp
-      (fun s => hβ0 _) (by simp [hβ, hg])
+    exact hcont.integral_pos_of_hasCompactSupport_nonneg_nonzero (x := 1) hsupp (fun s => hβ0 _) (by
+      simp [hβ, hg])
   refine ⟨fun g => β g / F g, ?_, ?_, ?_, ?_⟩
   · exact IsLocallyConstant.comp₂ hβlc hFlc (· / ·)
   · refine HasCompactSupport.intro hUk fun x hx => ?_
@@ -95,8 +110,8 @@ theorem exists_cutoff : ∀ (R S : Type) [Group R] [TopologicalSpace R] [IsTopol
   · intro g
     exact div_nonneg (hβ0 g) (integral_nonneg fun s => hβ0 _)
   · intro z hz s₀
-    have h1 : ∫ s, β (z * i s₀ * i s) / F (z * i s₀ * i s) ∂ν
-        = ∫ s, β (z * i s) / F (z * i s) ∂ν := by
+    have h1
+        : ∫ s, β (z * i s₀ * i s) / F (z * i s₀ * i s) ∂ν = ∫ s, β (z * i s) / F (z * i s) ∂ν := by
       have := integral_mul_left_eq_self (μ := ν) (fun s => β (z * i s) / F (z * i s)) s₀
       simpa [mul_assoc, map_mul] using this
     rw [h1]

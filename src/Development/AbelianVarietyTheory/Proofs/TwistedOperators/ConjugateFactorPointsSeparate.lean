@@ -13,17 +13,19 @@ open scoped TensorProduct
 
 namespace GlobalTheory.RegSS
 
-theorem nonempty_algHom_algebraicClosure (F A : Type) [Field F] [CommRing A] [Algebra F A]
-    [Module.Finite F A] [Nontrivial A] : Nonempty (A →ₐ[F] AlgebraicClosure F) := by
+theorem nonempty_algHom_algebraicClosure
+    (F A : Type) [Field F] [CommRing A] [Algebra F A] [Module.Finite F A] [Nontrivial A]
+    : Nonempty (A →ₐ[F] AlgebraicClosure F) := by
   obtain ⟨m, hm⟩ := Ideal.exists_maximal A
   letI : Field (A ⧸ m) := Ideal.Quotient.field m
   haveI : Module.Finite F (A ⧸ m) :=
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ F m).toLinearMap (Ideal.Quotient.mkₐ_surjective F m)
   exact ⟨(IsAlgClosed.lift : (A ⧸ m) →ₐ[F] AlgebraicClosure F).comp (Ideal.Quotient.mkₐ F m)⟩
 
-theorem exists_eq_tmul_add_tmul {F E P : Type} [Field F] [CommRing E] [Algebra F E] [CommRing P]
-    [Algebra F P] (b : Module.Basis (Fin 2) F E) (x : P ⊗[F] (E ⊗[F] F)) :
-    ∃ p q : P, x = p ⊗ₜ (b 0 ⊗ₜ (1 : F)) + q ⊗ₜ (b 1 ⊗ₜ (1 : F)) := by
+theorem exists_eq_tmul_add_tmul
+    {F E P : Type} [Field F] [CommRing E] [Algebra F E] [CommRing P] [Algebra F P]
+    (b : Module.Basis (Fin 2) F E) (x : P ⊗[F] (E ⊗[F] F))
+    : ∃ p q : P, x = p ⊗ₜ (b 0 ⊗ₜ (1 : F)) + q ⊗ₜ (b 1 ⊗ₜ (1 : F)) := by
   induction x with
   | tmul p y =>
     obtain ⟨e, rfl⟩ := (TensorProduct.rid F E).symm.surjective y
@@ -53,17 +55,19 @@ theorem separatingPoints : SeparatingPoints := by
     (nonempty_algHom_algebraicClosure F (K i ⊗[F] E)).some
   let π : ∀ i, P ⊗[F] (E ⊗[F] F) →ₐ[F] K i ⊗[F] E := fun i =>
     Algebra.TensorProduct.map (pr i) (Algebra.TensorProduct.rid F F E).toAlgHom
-  have hπ : ∀ i p (y : E), π i (p ⊗ₜ (y ⊗ₜ (1 : F))) = e p i ⊗ₜ y := fun i p y => by
-    simp [π, hpr]
-  have hc : ∀ (p : P) (y : E), tConj3 P σ F (p ⊗ₜ (y ⊗ₜ (1 : F))) = p ⊗ₜ (σ y ⊗ₜ (1 : F)) :=
-    fun p y => by simp [tConj3]
+  have hπ : ∀ i p (y : E), π i (p ⊗ₜ (y ⊗ₜ (1 : F))) = e p i ⊗ₜ y := fun i p y => by simp [π, hpr]
+  have hc
+      : ∀ (p : P) (y : E),
+        tConj3 P σ F (p ⊗ₜ (y ⊗ₜ (1 : F))) = p ⊗ₜ (σ y ⊗ₜ (1 : F)) := fun p y => by
+    simp [tConj3]
   refine ⟨fun i => (χ i).comp (π i), fun x hx => ?_, fun i hi x hx => ?_⟩
   · obtain ⟨p, q, rfl⟩ := exists_eq_tmul_add_tmul b x
     have key : ∀ i, e p i = 0 ∧ e q i = 0 := fun i => by
       obtain ⟨h1, h2⟩ := hx i
       have hm : (e q i ⊗ₜ[F] b 1 : K i ⊗[F] E) = (e q i ⊗ₜ[F] 1) * (1 ⊗ₜ[F] b 1) := by simp
-      simp only [AlgHom.comp_apply, map_add (f := _), hc, hπ, hb0, hb1, map_one, TensorProduct.tmul_neg,
-        map_neg] at h1 h2
+      simp only [AlgHom.comp_apply, map_add (f := _), hc, hπ, hb0, hb1, map_one,
+          TensorProduct.tmul_neg, map_neg]
+        at h1 h2
       rw [hm, map_mul] at h1 h2
       have hδ : χ i (1 ⊗ₜ[F] b 1) ≠ 0 := fun h0 => by
         have : χ i (1 ⊗ₜ[F] b 1) * χ i (1 ⊗ₜ[F] b 1) = algebraMap F _ d := by

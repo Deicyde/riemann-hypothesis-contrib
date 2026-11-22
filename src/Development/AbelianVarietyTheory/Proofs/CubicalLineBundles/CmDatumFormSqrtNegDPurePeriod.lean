@@ -7,19 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.PureTyp
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
 namespace GlobalTheory.CM
 
-
 open PureTypeVector in
-theorem cmDatum_form_sqrtNegD_pure_period {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (D : Datum H) {g : ℕ}
-    {ty : Fin g → (E →+* ℂ)} {Pe : D.La →+ (Fin g → ℂ)} (hP : IsPeriod D ty Pe) {ρ : ℂ}
-    (hty : ∀ i, ty i (H.rt : E) = ρ) {x : D.La} (hx : x ≠ 0) :
-    ∃ r : ℝ, 0 < r ∧ ((D.EF (H.w0 • x) x : ℤ) : ℝ) = ρ.im * r := by
+theorem cmDatum_form_sqrtNegD_pure_period
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} (D : Datum H)
+    {g : ℕ} {ty : Fin g → (E →+* ℂ)} {Pe : D.La →+ (Fin g → ℂ)} (hP : IsPeriod D ty Pe)
+    {ρ : ℂ} (hty : ∀ i, ty i (H.rt : E) = ρ)
+    {x : D.La} (hx : x ≠ 0)
+    : ∃ r : ℝ, 0 < r ∧ ((D.EF (H.w0 • x) x : ℤ) : ℝ) = ρ.im * r := by
   obtain ⟨hlin, hinj, -, -, Hm, hH, hpos, hEF⟩ := hP
   have hw0 : Pe (H.w0 • x) = ((1 + ρ) / 2) • Pe x := by
     funext i
@@ -29,7 +33,8 @@ theorem cmDatum_form_sqrtNegD_pure_period {E : Type} [Field E] [NumberField E] [
       simpa [map_ofNat] using this
     have h3 := congrArg (ty i) h2
     rw [map_mul, map_add (f := _), map_one, map_ofNat, hty i] at h3
-    rw [← h3]; ring
+    rw [← h3]
+    ring
   set r : ℝ := (hermForm Hm (Pe x) (Pe x)).re with hr
   have hre : hermForm Hm (Pe x) (Pe x) = (r : ℂ) :=
     Complex.ext (by simp [hr]) (by simp [hermForm_self_im hH])
@@ -42,19 +47,24 @@ theorem cmDatum_form_sqrtNegD_pure_period {E : Type} [Field E] [NumberField E] [
   simp
   ring
 
-theorem definite_datum_form_pos :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (ε : ℤˣ),
-      (D.q = 0 ∧ 0 < ((ε : ℤ) : ℝ) * H.rt0.im) ∨ (D.p = 0 ∧ ((ε : ℤ) : ℝ) * H.rt0.im < 0) →
-      ∀ x : D.La, x ≠ 0 → 0 < (ε : ℤ) * D.EF (H.w0 • x) x := by
+theorem definite_datum_form_pos
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (ε : ℤˣ),
+      (D.q = 0 ∧ 0 < ((ε : ℤ) : ℝ) * H.rt0.im) ∨ (D.p = 0 ∧ ((ε : ℤ) : ℝ) * H.rt0.im < 0)
+        → ∀ x : D.La, x ≠ 0 → 0 < (ε : ℤ) * D.EF (H.w0 • x) x := by
   intro E _ _ _ H D ε h x hx
   obtain ⟨g, ty, hty⟩ : ∃ (g : ℕ) (ty : Fin g → (E →+* ℂ)), IsTypeFn H D.p D.q ty := by
     classical
     let n : (E →+* ℂ) → ℕ := fun τ => if τ (H.rt : E) = H.rt0 then D.p else D.q
     let e := (Fintype.equivFin (Σ τ, Fin (n τ))).symm
     have key : ∀ τ, Nat.card {i // (e i).1 = τ} = n τ := fun τ => by
-      rw [Nat.card_congr ((e.subtypeEquiv (q := fun s => s.1 = τ) fun _ => Iff.rfl).trans (Equiv.sigmaSubtype τ))]
+      rw [Nat.card_congr ((e.subtypeEquiv (q := fun s => s.1 = τ) fun _ => Iff.rfl).trans
+        (Equiv.sigmaSubtype τ))]
       simp
-    exact ⟨_, fun i => (e i).1, fun τ => ⟨fun h => (key τ).trans (if_pos h), fun h => (key τ).trans (if_neg h)⟩⟩
+    exact ⟨
+      _,
+      fun i => (e i).1,
+      fun τ => ⟨fun h => (key τ).trans (if_pos h), fun h => (key τ).trans (if_neg h)⟩
+    ⟩
   obtain ⟨Pe, hP⟩ := datum_exists_period E H D g ty hty
   have hcard : ∀ i, Nat.card {j // ty j = ty i} ≠ 0 := fun i =>
     haveI : Nonempty {j // ty j = ty i} := ⟨⟨i, rfl⟩⟩
@@ -69,8 +79,7 @@ theorem definite_datum_form_pos :
       have h2 : (H.rt : E) ^ 2 = -(H.d : E) := by
         have := congrArg (algebraMap (𝓞 E) E) H.rt_sq
         simpa using this
-      have h3 : ty i (H.rt : E) ^ 2 = H.rt0 ^ 2 := by
-        rw [← map_pow, h2, H.sqrt_neg_disc_sq]; simp
+      have h3 : ty i (H.rt : E) ^ 2 = H.rt0 ^ 2 := by rw [← map_pow, h2, H.sqrt_neg_disc_sq]; simp
       exact (sq_eq_sq_iff_eq_or_eq_neg.1 h3).resolve_left hne
   obtain ⟨ρ, hρ, hε⟩ := key
   obtain ⟨r, hr, hE⟩ := cmDatum_form_sqrtNegD_pure_period D hP hρ hx

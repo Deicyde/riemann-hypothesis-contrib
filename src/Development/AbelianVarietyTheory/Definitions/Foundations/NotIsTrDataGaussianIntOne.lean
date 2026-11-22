@@ -18,7 +18,8 @@ structure IsDerOn (B : Subalgebra A S) (D : S → M) : Prop where
   mul : ∀ x ∈ B, ∀ y ∈ B, D (x * y) = x • D y + y • D x
   alg : ∀ a : A, D (algebraMap A S a) = 0
 
-structure IsTrData (B C : Subalgebra A S) (tr : S → S) {n : ℕ} (a b : Fin n → S) (e : S) : Prop where
+structure IsTrData (B C : Subalgebra A S) (tr : S → S) {n : ℕ} (a b : Fin n → S) (e : S)
+    : Prop where
   le : B ≤ C
   e_mem : e ∈ B
   a_mem : ∀ i, a i ∈ C
@@ -43,13 +44,17 @@ theorem qq_pow (T : Tower p Ω) (n : ℕ) : T.qq n ^ (p ^ n) = algebraMap (O0 p)
   | zero => simpa using T.q0
   | succ n ih => rw [pow_succ', pow_mul, T.qpow, ih]
 
-def zS (T : Tower p Ω) (n : ℕ) : integralClosure (O0 p) Ω :=
-  ⟨T.ζ n, IsIntegral.of_pow (pow_pos (Fact.out : p.Prime).pos n) (by
-    rw [(T.prim n).pow_eq_one]; exact isIntegral_one)⟩
+def zS (T : Tower p Ω) (n : ℕ) : integralClosure (O0 p) Ω := ⟨
+  T.ζ n,
+  IsIntegral.of_pow (pow_pos (Fact.out : p.Prime).pos n)
+    (by rw [(T.prim n).pow_eq_one]; exact isIntegral_one)
+⟩
 
-def qS (T : Tower p Ω) (n : ℕ) : integralClosure (O0 p) Ω :=
-  ⟨T.qq n, IsIntegral.of_pow (pow_pos (Fact.out : p.Prime).pos n) (by
-    rw [qq_pow]; exact isIntegral_algebraMap)⟩
+def qS (T : Tower p Ω) (n : ℕ) : integralClosure (O0 p) Ω := ⟨
+  T.qq n,
+  IsIntegral.of_pow (pow_pos (Fact.out : p.Prime).pos n)
+    (by rw [qq_pow]; exact isIntegral_algebraMap)
+⟩
 
 def levelAlg (T : Tower p Ω) (n : ℕ) : Subalgebra (O0 p) (integralClosure (O0 p) Ω) :=
   Algebra.adjoin (O0 p) {zS T n, qS T n}

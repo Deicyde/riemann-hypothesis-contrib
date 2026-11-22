@@ -8,17 +8,19 @@ namespace GroundTheory.BlockD.FourierDecayAlt.WaveGridLiftGrid
 
 open Finset
 
-theorem exists_free_family (Y : Finset ℝ) (w : List (Bool × ℝ)) (K D : ℕ)
-    (hw : ∀ l ∈ w, ∃ y ∈ Y, l = (true, y) ∨ l = (false, y + 1))
-    (hcard : w.length + K * D ≤ Y.card) :
-    ∃ g : Fin K → Fin D → ℝ, (∀ a i, g a i ∈ Y) ∧
-      (∀ a i a' i', g a i = g a' i' → a = a' ∧ i = i') ∧
-      ∀ a i, ∀ l ∈ w, ∃ y ∈ Y, y ≠ g a i ∧ (l = (true, y) ∨ l = (false, y + 1)) := by
+theorem exists_free_family
+    (Y : Finset ℝ) (w : List (Bool × ℝ)) (K D : ℕ)
+    (hw : ∀ l ∈ w, ∃ y ∈ Y, l = (true, y) ∨ l = (false, y + 1)) (hcard : w.length + K * D ≤ Y.card)
+    : ∃ g : Fin K → Fin D → ℝ,
+      (∀ a i, g a i ∈ Y) ∧ (∀ a i a' i', g a i = g a' i' → a = a' ∧ i = i')
+        ∧ ∀ a i, ∀ l ∈ w, ∃ y ∈ Y, y ≠ g a i ∧ (l = (true, y) ∨ l = (false, y + 1)) := by
   classical
   choose! f hfY hf using hw
   set S : Finset ℝ := (w.map f).toFinset with hS
   have hSc : S.card ≤ w.length := by
-    calc S.card ≤ (w.map f).length := List.toFinset_card_le _
+    calc
+      S.card
+        ≤ (w.map f).length := List.toFinset_card_le _
       _ = w.length := List.length_map _
   have hT : K * D ≤ (Y \ S).card := by
     have h1 := Finset.le_card_sdiff S Y

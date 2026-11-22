@@ -13,14 +13,13 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open MvPolynomial Finset
 
-theorem hsymm_isHomogeneous (σ : Type*) [Fintype σ] [DecidableEq σ] (n : ℕ) :
-    (hsymm σ ℚ n).IsHomogeneous n := by
+theorem hsymm_isHomogeneous (σ : Type*) [Fintype σ] [DecidableEq σ] (n : ℕ)
+    : (hsymm σ ℚ n).IsHomogeneous n := by
   rw [Schur.hsymm_eq_sum_finsuppAntidiag]
   refine IsHomogeneous.sum _ _ _ fun l hl => ?_
   have hsum : ∑ i, l i = n := (mem_finsuppAntidiag.mp hl).1
   rw [← hsum]
-  exact IsHomogeneous.prod _ _ _ fun i _ => by
-    simpa using (isHomogeneous_X ℚ i).pow (l i)
+  exact IsHomogeneous.prod _ _ _ fun i _ => by simpa using (isHomogeneous_X ℚ i).pow (l i)
 
 theorem SchSchurHomogeneous.proof : SchSchurHomogeneous.Statement := by
   intro σ _ _ r lam
@@ -28,14 +27,16 @@ theorem SchSchurHomogeneous.proof : SchSchurHomogeneous.Statement := by
   rw [Matrix.det_apply]
   refine IsHomogeneous.sum _ _ _ fun π _ => ?_
   rw [Units.smul_def]
-  have hmem : (∏ i, (Matrix.of fun i j : Fin r =>
-      completeSymmetric σ ((lam i : ℤ) - ((i : ℕ) : ℤ) + ((j : ℕ) : ℤ))) (π i) i) ∈
-      homogeneousSubmodule σ ℚ (∑ i, lam i) := by
+  have hmem
+      : (∏ i, (Matrix.of fun i j : Fin r =>
+          completeSymmetric σ ((lam i : ℤ) - ((i : ℕ) : ℤ) + ((j : ℕ) : ℤ))) (π i) i)
+        ∈ homogeneousSubmodule σ ℚ (∑ i, lam i) := by
     rw [mem_homogeneousSubmodule]
     by_cases h : ∀ i, 0 ≤ (lam (π i) : ℤ) - ((π i : ℕ) : ℤ) + ((i : ℕ) : ℤ)
     · have hdeg : ∑ i, ((lam (π i) : ℤ) - ((π i : ℕ) : ℤ) + ((i : ℕ) : ℤ)).toNat = ∑ i, lam i := by
-        have h1 : ((∑ i, ((lam (π i) : ℤ) - ((π i : ℕ) : ℤ) + ((i : ℕ) : ℤ)).toNat : ℕ) : ℤ) =
-            ∑ i, ((lam (π i) : ℤ) - ((π i : ℕ) : ℤ) + ((i : ℕ) : ℤ)) := by
+        have h1
+            : ((∑ i, ((lam (π i) : ℤ) - ((π i : ℕ) : ℤ) + ((i : ℕ) : ℤ)).toNat : ℕ) : ℤ)
+              = ∑ i, ((lam (π i) : ℤ) - ((π i : ℕ) : ℤ) + ((i : ℕ) : ℤ)) := by
           push_cast
           exact Finset.sum_congr rfl fun i _ => Int.toNat_of_nonneg (h i)
         have h2 : ∑ i, ((lam (π i) : ℤ) - ((π i : ℕ) : ℤ) + ((i : ℕ) : ℤ)) = ∑ i, (lam i : ℤ) := by

@@ -28,8 +28,7 @@ def upperBorel (r : ℕ) (k : Type) [CommRing k] : Subgroup (GL (Fin r) k) where
 def maxId : Ideal (Int F) where
   carrier := {x | Valued.v (x : F) < (1 : WithZero (Multiplicative ℤ))}
   zero_mem' := by simp
-  add_mem' := fun {a b} ha hb => by
-    simpa using Valuation.map_add_lt _ ha hb
+  add_mem' := fun {a b} ha hb => by simpa using Valuation.map_add_lt _ ha hb
   smul_mem' := fun c x hx => by
     have hc : Valued.v (c : F) ≤ (1 : WithZero (Multiplicative ℤ)) := c.2
     have hx' : Valued.v (x : F) < (1 : WithZero (Multiplicative ℤ)) := hx
@@ -56,20 +55,23 @@ def iwahoriDoubleCoset {r : ℕ} (t : Matrix (Fin r) (Fin r) F) : Set (Matrix (F
 end Defs
 
 def IwahoriEigenvalues : Prop :=
-  ∀ (F : Type) [Field F] [Valued F (WithZero (Multiplicative ℤ))] [CompleteSpace F]
-    (ϖ : F), Valued.v ϖ = WithZero.exp (-1 : ℤ) →
-    ∀ (r : ℕ) (a : Fin r → ℤ), StrictAnti a →
-    ∀ g ∈ iwahoriDoubleCoset (diagPow ϖ a),
-      (∃ x : Fin r → F, Function.Injective x ∧
-        g.charpoly = ∏ i, (X - C (x i)) ∧
-        ∀ i, Valued.v (x i) = WithZero.exp (-(a i))) ∧
-      g.charpoly.Separable
+  ∀ (F : Type) [Field F] [Valued F (WithZero (Multiplicative ℤ))] [CompleteSpace F] (ϖ : F),
+    Valued.v ϖ = WithZero.exp (-1 : ℤ)
+      → ∀ (r : ℕ) (a : Fin r → ℤ),
+        StrictAnti a
+          → ∀ g ∈ iwahoriDoubleCoset (diagPow ϖ a),
+            (∃ x : Fin r → F,
+                Function.Injective x ∧ g.charpoly = ∏ i, (X - C (x i))
+                  ∧ ∀ i, Valued.v (x i) = WithZero.exp (-(a i)))
+              ∧ g.charpoly.Separable
 
-theorem mem_iwahoriInt_iff (F : Type) [Field F] [Valued F (WithZero (Multiplicative ℤ))] (r : ℕ)
-    (g : GL (Fin r) (Int F)) :
-    g ∈ iwahoriInt F r ↔ ∀ i j : Fin r, j < i →
-      Valued.v (((g : Matrix (Fin r) (Fin r) (Int F)) i j : Int F) : F)
-        < (1 : WithZero (Multiplicative ℤ)) := by
+theorem mem_iwahoriInt_iff
+    (F : Type) [Field F] [Valued F (WithZero (Multiplicative ℤ))] (r : ℕ) (g : GL (Fin r) (Int F))
+    : g ∈ iwahoriInt F r
+      ↔ ∀ i j : Fin r,
+        j < i
+          → Valued.v (((g : Matrix (Fin r) (Fin r) (Int F)) i j : Int F) : F)
+            < (1 : WithZero (Multiplicative ℤ)) := by
   constructor
   · intro h i j hij
     have := h (i := i) (j := j) hij
@@ -77,8 +79,10 @@ theorem mem_iwahoriInt_iff (F : Type) [Field F] [Valued F (WithZero (Multiplicat
   · intro h i j hij
     exact Ideal.Quotient.eq_zero_iff_mem.2 (h i j hij)
 
-theorem self_mem_iwahoriDoubleCoset {F : Type} [Field F] [Valued F (WithZero (Multiplicative ℤ))]
-    {r : ℕ} (t : Matrix (Fin r) (Fin r) F) : t ∈ iwahoriDoubleCoset t :=
+theorem self_mem_iwahoriDoubleCoset
+    {F : Type} [Field F] [Valued F (WithZero (Multiplicative ℤ))]
+    {r : ℕ} (t : Matrix (Fin r) (Fin r) F)
+    : t ∈ iwahoriDoubleCoset t :=
   ⟨1, one_mem _, 1, one_mem _, by simp⟩
 
 end GlobalTheory.IndefiniteRowSideFullHecke.IwahoriSubgroup

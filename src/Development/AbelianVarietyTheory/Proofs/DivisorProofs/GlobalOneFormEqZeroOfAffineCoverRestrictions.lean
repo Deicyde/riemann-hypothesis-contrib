@@ -10,21 +10,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RedHomAlgebr
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory
+  MonObj
 open scoped TensorProduct
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CoverForms
 
 open KaehlerDifferential
 
-theorem exists_pow_smul_eq_zero {R C B : Type} [CommRing R] [CommRing C] [CommRing B]
-    [Algebra R C] [Algebra R B] (g : C →ₐ[R] B) (f : C)
-    (hloc : @IsLocalization.Away C _ f B _ g.toRingHom.toAlgebra)
-    (L : Ω[C⁄R] →ₗ[R] Ω[B⁄R]) (hD : ∀ c, L (D R C c) = D R B (g c))
-    (hs : ∀ (c : C) (α : Ω[C⁄R]), L (c • α) = g c • L α)
-    (α : Ω[C⁄R]) (h : L α = 0) : ∃ m : ℕ, f ^ m • α = 0 := by
+theorem exists_pow_smul_eq_zero
+    {R C B : Type} [CommRing R] [CommRing C] [CommRing B] [Algebra R C] [Algebra R B]
+    (g : C →ₐ[R] B) (f : C) (hloc : @IsLocalization.Away C _ f B _ g.toRingHom.toAlgebra)
+    (L : Ω[C⁄R] →ₗ[R] Ω[B⁄R])
+    (hD : ∀ c, L (D R C c) = D R B (g c)) (hs : ∀ (c : C) (α : Ω[C⁄R]), L (c • α) = g c • L α)
+    (α : Ω[C⁄R]) (h : L α = 0)
+    : ∃ m : ℕ, f ^ m • α = 0 := by
   letI : Algebra C B := g.toRingHom.toAlgebra
   haveI : IsScalarTower R C B := IsScalarTower.of_algebraMap_eq (fun r => (g.commutes r).symm)
   have hL : ∀ β, L β = KaehlerDifferential.map R R C B β := by
@@ -34,9 +37,12 @@ theorem exists_pow_smul_eq_zero {R C B : Type} [CommRing R] [CommRing C] [CommRi
     induction hβ using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨c, rfl⟩ := hx
-      rw [hD, KaehlerDifferential.map_D]; rfl
-    | zero => simp
-    | add x y _ _ hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
+      rw [hD, KaehlerDifferential.map_D]
+      rfl
+    | zero =>
+      simp
+    | add x y _ _ hx hy =>
+      rw [map_add (f := _), map_add (f := _), hx, hy]
     | smul c x _ hx =>
       rw [hs, hx, (KaehlerDifferential.map R R C B).map_smul]
       exact algebraMap_smul B c _
@@ -48,16 +54,23 @@ theorem exists_pow_smul_eq_zero {R C B : Type} [CommRing R] [CommRing C] [CommRi
   refine ⟨m, ?_⟩
   simpa [Submonoid.smul_def] using hc0
 
-theorem eq_zero_of_cover : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp R), CompactSpace X → ∃ (n : ℕ) (V : Fin n → AffOp X), ∀ w : GlobForm s, (∀ k, evForm s (V k) w = 0) → w = 0 := by
+theorem eq_zero_of_cover
+    : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp R),
+      CompactSpace X
+        → ∃ (n : ℕ) (V : Fin n → AffOp X), ∀ w : GlobForm s,
+          (∀ k, evForm s (V k) w = 0) → w = 0 := by
   intro R _ X s hX
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (fun U : X.affineOpens => (U.1 : Set X))
-    (fun U => U.1.isOpen) (fun x _ => by
-      obtain ⟨U, hU, hxU, -⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens)
-        (show x ∈ (⊤ : X.Opens) from trivial)
-      exact Set.mem_iUnion.2 ⟨⟨U, hU⟩, hxU⟩)
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun U : X.affineOpens => (U.1 : Set X))
+      (fun U => U.1.isOpen)
+      (fun x _ => by
+        obtain ⟨U, hU, hxU, -⟩ :=
+          (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens)
+            (show x ∈ (⊤ : X.Opens) from trivial)
+        exact Set.mem_iUnion.2 ⟨⟨U, hU⟩, hxU⟩)
   refine ⟨t.card, fun k => Opposite.op (t.equivFin.symm k).1, fun w hw => ?_⟩
-  have hcov : ∀ x : X, ∃ U ∈ t, x ∈ (U.1 : Set X) := fun x => by
-    simpa using ht (Set.mem_univ x)
+  have hcov : ∀ x : X, ∃ U ∈ t, x ∈ (U.1 : Set X) := fun x => by simpa using ht (Set.mem_univ x)
   have hV0 : ∀ U ∈ t, w.1 (Opposite.op U) = 0 := fun U hU => by
     have : evForm s (Opposite.op (t.equivFin.symm (t.equivFin ⟨U, hU⟩)).1) w = 0 := hw _
     have e : t.equivFin.symm (t.equivFin ⟨U, hU⟩) = ⟨U, hU⟩ := Equiv.symm_apply_apply _ _
@@ -87,8 +100,9 @@ theorem eq_zero_of_cover : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X �
       have e2 := w.2 ψ
       rw [hV0 U hU, map_zero] at e2
       exact e1.symm.trans e2
-    obtain ⟨m, hm⟩ := exists_pow_smul_eq_zero (mp (OAff s) φ) f
-      (hW.isLocalization_basicOpen f) (p1 (OAff s) φ) (p1_D (OAff s) φ) (oneFormsMapOfFunctorMorphism_smul (OAff s) φ) α h0
+    obtain ⟨m, hm⟩ :=
+      exists_pow_smul_eq_zero (mp (OAff s) φ) f (hW.isLocalization_basicOpen f) (p1 (OAff s) φ)
+        (p1_D (OAff s) φ) (oneFormsMapOfFunctorMorphism_smul (OAff s) φ) α h0
     exact ⟨m, by simpa [I] using hm⟩
   have hI : I = ⊤ := by
     rw [← Ideal.radical_eq_top, eq_top_iff]

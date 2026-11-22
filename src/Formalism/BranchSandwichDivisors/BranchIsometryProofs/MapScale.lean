@@ -16,9 +16,9 @@ open Formalism.HN
 
 section SlopeTestRemainingChoices
 
-variable {K V ι : Type} [Field K] [NumberField K] [StarRing K]
-  [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-  [Fintype ι] [DecidableEq ι]
+variable
+  {K V ι : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [Fintype ι] [DecidableEq ι]
 
 theorem ms_rkK_bot : rkK (⊥ : Submodule (𝓞 K) V) = 0 := by
   unfold Formalism.HN.rkK
@@ -37,24 +37,27 @@ theorem ms_nPl_pos : 0 < nPl K := by
   unfold Formalism.HN.nPl
   exact Fintype.card_pos
 
-theorem ms_htQ_bot (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
-    (A : Submodule (𝓞 K) V) : htQ b X A ⊥ = ht b X A := by
+theorem ms_htQ_bot (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (A : Submodule (𝓞 K) V)
+    : htQ b X A ⊥ = ht b X A := by
   have hz : zl (Formalism.HermitianLatticesTheory.realize b X) (⊥ : Submodule (𝓞 K) V) = ⊥ := by
     unfold Formalism.HN.zl
     simp
-  have hq : ∀ L : Submodule ℤ (EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2)),
-      Formalism.F.quot L ⊥ = L := by
+  have hq
+      : ∀ L : Submodule ℤ (EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2)),
+        Formalism.F.quot L ⊥ = L := by
     intro L
     unfold Formalism.F.quot
-    have hp : ∀ y : EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2),
-        (Submodule.span ℝ ((⊥ : Submodule ℤ (EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2))) :
-          Set (EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2))))ᗮ.starProjection y = y := by
+    have hp
+        : ∀ y : EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2),
+          (Submodule.span ℝ ((⊥ : Submodule ℤ (EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2))) :
+            Set (EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2))))ᗮ.starProjection y
+            = y := by
       intro y
       simp only [Submodule.bot_coe, Submodule.span_zero_singleton, Submodule.bot_orthogonal_eq_top]
       first
-        | (rw [Submodule.starProjection_eq_self_iff]; exact Submodule.mem_top)
-        | simp [Submodule.starProjection_top]
-        | exact Submodule.starProjection_top_apply y
+      | (rw [Submodule.starProjection_eq_self_iff]; exact Submodule.mem_top)
+      | simp [Submodule.starProjection_top]
+      | exact Submodule.starProjection_top_apply y
     ext x
     simp only [Submodule.mem_map, LinearMap.coe_restrictScalars, ContinuousLinearMap.coe_coe, hp]
     constructor
@@ -68,9 +71,12 @@ theorem ms_htQ_bot (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
   congr 2
   rw [← Real.rpow_natCast, Nat.cast_mul]
 
-theorem ms_mu_eq [_root_.NumberField.IsTotallyComplex K] (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
-    (hX : ∀ v, IsUnit (X v).det) {L : Submodule (𝓞 K) V} (hfg : L.FG) (hL : L ≠ ⊥) :
-    muDef b X L = -(Real.log (ht b X L) / ((nPl K : ℝ) * (rkK L : ℝ))) := by
+theorem ms_mu_eq
+    [_root_.NumberField.IsTotallyComplex K]
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ) (hX : ∀ v, IsUnit (X v).det)
+    {L : Submodule (𝓞 K) V} (hfg : L.FG) (hL : L ≠ ⊥)
+    : muDef b X L = -(Real.log (ht b X L) / ((nPl K : ℝ) * (rkK L : ℝ))) := by
   have h := size_maximal_slope K V ι b X hX L hfg hL
   obtain ⟨-, h2, -⟩ := h
   obtain ⟨-, -, hpos⟩ := place_lattice_structure K V ι b X hX L hfg
@@ -81,23 +87,30 @@ theorem ms_mu_eq [_root_.NumberField.IsTotallyComplex K] (b : Basis ι K V) (X :
   rw [Real.log_rpow hpos]
   field_simp
 
-theorem ms_opNorm_nat [Nonempty ι] (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
-    (hX : ∀ v, IsUnit (X v).det) (n : ℕ) (v : InfinitePlace K) :
-    opNormAt b X b X v ((n : K) • (LinearMap.id : V →ₗ[K] V)) = n := by
-  have h1 : (LinearMap.toMatrix b b ((n : K) • (LinearMap.id : V →ₗ[K] V))).map v.embedding
-      = (n : ℂ) • (1 : Matrix ι ι ℂ) := by
+theorem ms_opNorm_nat
+    [Nonempty ι]
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (n : ℕ) (v : InfinitePlace K)
+    : opNormAt b X b X v ((n : K) • (LinearMap.id : V →ₗ[K] V)) = n := by
+  have h1
+      : (LinearMap.toMatrix b b ((n : K) • (LinearMap.id : V →ₗ[K] V))).map v.embedding
+        = (n : ℂ) • (1 : Matrix ι ι ℂ) := by
     ext i j
     by_cases h : i = j <;> simp [LinearMap.toMatrix_id, Matrix.one_apply, h]
-  have hM : (X v)⁻¹ * (LinearMap.toMatrix b b ((n : K) • (LinearMap.id : V →ₗ[K] V))).map
-      v.embedding * X v = (n : ℂ) • (1 : Matrix ι ι ℂ) := by
+  have hM
+      : (X v)⁻¹ * (LinearMap.toMatrix b b ((n : K) • (LinearMap.id : V →ₗ[K] V))).map v.embedding
+          * X v
+        = (n : ℂ) • (1 : Matrix ι ι ℂ) := by
     rw [h1, Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul, Matrix.nonsing_inv_mul _ (hX v)]
   have h3 : Matrix.toEuclideanLin (1 : Matrix ι ι ℂ) = LinearMap.id := by
     first
-      | exact Matrix.toEuclideanLin_one
-      | (ext x i; simp [Matrix.toLpLin_apply])
-      | (simp [Matrix.toEuclideanLin, Matrix.toLin'_one])
-  have h4 : LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin ((n : ℂ) • (1 : Matrix ι ι ℂ)))
-      = (n : ℂ) • ContinuousLinearMap.id ℂ (EuclideanSpace ℂ ι) := by
+    | exact Matrix.toEuclideanLin_one
+    | (ext x i; simp [Matrix.toLpLin_apply])
+    | (simp [Matrix.toEuclideanLin, Matrix.toLin'_one])
+  have h4
+      : LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin ((n : ℂ) • (1 : Matrix ι ι ℂ)))
+        = (n : ℂ) • ContinuousLinearMap.id ℂ (EuclideanSpace ℂ ι) := by
     rw [map_smul, h3, map_smul]
     congr 1
   unfold Formalism.HN.opNormAt
@@ -105,15 +118,20 @@ theorem ms_opNorm_nat [Nonempty ι] (b : Basis ι K V) (X : InfinitePlace K → 
   obtain ⟨i⟩ := (inferInstance : Nonempty ι)
   have hid : ‖ContinuousLinearMap.id ℂ (EuclideanSpace ℂ ι)‖ = 1 := by
     first
-      | exact ContinuousLinearMap.norm_id
-      | (apply ContinuousLinearMap.norm_id_of_nontrivial_seminorm
-         exact ⟨EuclideanSpace.single i 1, by simp⟩)
+    | exact ContinuousLinearMap.norm_id
+    | (
+        apply ContinuousLinearMap.norm_id_of_nontrivial_seminorm
+        exact ⟨EuclideanSpace.single i 1, by simp⟩
+      )
   rw [hid, mul_one]
   simp
 
-theorem ms_htMap_nat [Nonempty ι] (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
-    (hX : ∀ v, IsUnit (X v).det) (n : ℕ) :
-    htMap b X b X ((n : K) • (LinearMap.id : V →ₗ[K] V)) = 2 * Real.log n := by
+theorem ms_htMap_nat
+    [Nonempty ι]
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (n : ℕ)
+    : htMap b X b X ((n : K) • (LinearMap.id : V →ₗ[K] V)) = 2 * Real.log n := by
   unfold Formalism.HN.htMap
   simp_rw [ms_opNorm_nat b X hX n]
   rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, Real.log_pow]
@@ -165,15 +183,19 @@ theorem map_slope_mu : MapMu := by
         exact zero_pow (by omega)
       rw [hz, zero_mul] at hht
       exact absurd hposI (not_lt.2 hht)
-  have hlog : Real.log (ht b' X' B) ≤
-      (rkK A : ℝ) * (∑ v, Real.log (opNormAt b X b' X' v φ ^ 2)) + Real.log (ht b X A) := by
-    have h1 : Real.log (ht b' X' B) ≤ Real.log ((∏ v, opNormAt b X b' X' v φ ^ (2 * rkK A)) *
-        ht b X A) := Real.log_le_log hposB (hmono.trans hht)
+  have hlog
+      : Real.log (ht b' X' B)
+        ≤ (rkK A : ℝ) * (∑ v, Real.log (opNormAt b X b' X' v φ ^ 2)) + Real.log (ht b X A) := by
+    have h1
+        : Real.log (ht b' X' B)
+          ≤ Real.log ((∏ v, opNormAt b X b' X' v φ ^ (2 * rkK A)) * ht b X A) :=
+      Real.log_le_log hposB (hmono.trans hht)
     have hpp : (∏ v, opNormAt b X b' X' v φ ^ (2 * rkK A)) ≠ 0 :=
       Finset.prod_ne_zero_iff.2 fun v _ => pow_ne_zero _ (hop v).ne'
     rw [Real.log_mul hpp hposA.ne', Real.log_prod (fun v _ => pow_ne_zero _ (hop v).ne')] at h1
-    have h2 : (∑ v, Real.log (opNormAt b X b' X' v φ ^ (2 * rkK A))) =
-        (rkK A : ℝ) * (∑ v, Real.log (opNormAt b X b' X' v φ ^ 2)) := by
+    have h2
+        : (∑ v, Real.log (opNormAt b X b' X' v φ ^ (2 * rkK A)))
+          = (rkK A : ℝ) * (∑ v, Real.log (opNormAt b X b' X' v φ ^ 2)) := by
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun v _ => ?_
       rw [Real.log_pow, Real.log_pow]
@@ -186,11 +208,11 @@ theorem map_slope_mu : MapMu := by
   have hf : (0 : ℝ) < nPl K := by exact_mod_cast ms_nPl_pos
   have hj' : (0 : ℝ) < rkK A := by exact_mod_cast hj
   set S := ∑ v, Real.log (opNormAt b X b' X' v φ ^ 2) with hS
-  have key : (Real.log (ht b' X' B) - Real.log (ht b X A)) / ((nPl K : ℝ) * (rkK A : ℝ)) ≤
-      1 / (nPl K : ℝ) * S := by
+  have key
+      : (Real.log (ht b' X' B) - Real.log (ht b X A)) / ((nPl K : ℝ) * (rkK A : ℝ))
+        ≤ 1 / (nPl K : ℝ) * S := by
     rw [div_le_iff₀ (mul_pos hf hj')]
-    have : 1 / (nPl K : ℝ) * S * ((nPl K : ℝ) * (rkK A : ℝ)) = (rkK A : ℝ) * S := by
-      field_simp
+    have : 1 / (nPl K : ℝ) * S * ((nPl K : ℝ) * (rkK A : ℝ)) = (rkK A : ℝ) * S := by field_simp
     rw [this]
     linarith
   rw [sub_div] at key
@@ -253,18 +275,21 @@ theorem scale_sandwich_bound : ScaleSandwich := by
     ext x
     simp
   refine ⟨hrk, ?_, ?_, ?_, ?_⟩
-  · have := map_slope_mu K V ι V ι b X b X hX hX LinearMap.id B A hBfg hA hB0
-      (Function.injective_id.injOn) (by rw [hmapid]; exact hBA) hrk.symm
+  · have :=
+      map_slope_mu K V ι V ι b X b X hX hX LinearMap.id B A hBfg hA hB0
+        (Function.injective_id.injOn) (by rw [hmapid]; exact hBA) hrk.symm
     rw [hht1] at this
     linarith
   · have := map_slope_mu K V ι V ι b X b X hX hX φ A B hA hBfg hA0 hinj.injOn hmap hrk
     rw [hht] at this
     exact this
-  · have := ((slope_inequality_mean K V ι V ι b X b X hX hX LinearMap.id B hBfg
-      (by rw [hmapid]; exact hB0)).2 A hA (by rw [hmapid]; exact hBA)).2 Function.injective_id.injOn
+  · have :=
+      ((slope_inequality_mean K V ι V ι b X b X hX hX LinearMap.id B hBfg (by
+        rw [hmapid]; exact hB0)).2 A hA (by rw [hmapid]; exact hBA)).2 Function.injective_id.injOn
     rw [hht1] at this
     linarith
-  · have := ((slope_inequality_mean K V ι V ι b X b X hX hX φ A hA hmap0).2 B hBfg hmap).2 hinj.injOn
+  · have :=
+      ((slope_inequality_mean K V ι V ι b X b X hX hX φ A hA hmap0).2 B hBfg hmap).2 hinj.injOn
     rw [hht] at this
     exact this
 
@@ -280,8 +305,8 @@ theorem levelCompare_statement : LevelCompare := by
   have htw := twist K V ι b X (fun _ => Real.sqrt h) hX (fun _ => hs) R' hR'fg
   obtain ⟨e1, e2, -⟩ := htw.2.2.1 hR'0
   have hf : (0 : ℝ) < nPl K := by exact_mod_cast ms_nPl_pos
-  have ht : 2 * ((1 / (nPl K : ℝ)) * ∑ _v : InfinitePlace K, Real.log (Real.sqrt h)) =
-      Real.log h := by
+  have ht
+      : 2 * ((1 / (nPl K : ℝ)) * ∑ _v : InfinitePlace K, Real.log (Real.sqrt h)) = Real.log h := by
     rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, Real.log_sqrt hh'.le]
     unfold nPl at hf ⊢
     field_simp

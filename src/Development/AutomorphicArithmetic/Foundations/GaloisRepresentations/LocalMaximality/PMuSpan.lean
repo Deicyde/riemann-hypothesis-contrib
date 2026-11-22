@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma muSpan_base {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
@@ -40,16 +41,20 @@ private lemma muSpan_rel {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [Ad
   linear_combination (-((T.X (ofLex l).1 : S) * T.Y (ofLex l).2 - T.X (ofLex l).2 * T.Y (ofLex l).1) *
     ((T.X i * T.Y j)⁻¹ : Sˣ)) * hv
 
-theorem UpperTheory.Gal.productCup_of_system.muSpan_of :
-    MuSpan := by
+theorem UpperTheory.Gal.productCup_of_system.muSpan_of : MuSpan := by
   intro d S E _ _ _ _ T hT I J i hi j hj l
   have hI : I.Nonempty := ⟨i, hi⟩
   obtain ⟨p, hp, hp'⟩ := muSpan_base T (T.R I J) i j (ofLex l).1
   obtain ⟨q, hq, hq'⟩ := muSpan_base T (T.R I J) i j (ofLex l).2
   have hb := hT.memY I J hI j hj (ofLex l).2
   have ha := hT.memY I J hI j hj (ofLex l).1
-  refine ⟨fun t => ((T.Y (ofLex l).2 * (T.Y j)⁻¹ : Sˣ) : S) * p t -
-    ((T.Y (ofLex l).1 * (T.Y j)⁻¹ : Sˣ) : S) * q t, fun t => ?_, ?_⟩
+  refine ⟨
+    fun t =>
+      ((T.Y (ofLex l).2 * (T.Y j)⁻¹ : Sˣ) : S) * p t
+        - ((T.Y (ofLex l).1 * (T.Y j)⁻¹ : Sˣ) : S) * q t,
+    fun t => ?_,
+    ?_
+  ⟩
   · exact sub_mem (mul_mem hb (hp t)) (mul_mem ha (hq t))
   · rw [muSpan_rel T i j l, hp', hq', Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun t _ => ?_

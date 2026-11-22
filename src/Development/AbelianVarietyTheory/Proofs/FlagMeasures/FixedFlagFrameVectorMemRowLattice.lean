@@ -8,13 +8,17 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LocCl
 @[expose] public section
 
 open scoped Classical ENNReal Pointwise
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Unfold.RowFrame
 
-theorem one_mem_ddS_zpow (D : D7) (n : ℕ) :
-    (1 : D.host.E) ∈ (ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
+theorem one_mem_ddS_zpow (D : D7) (n : ℕ)
+    : (1 : D.host.E)
+      ∈ (ddS D ^ (-(n : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
   have hI0 : ddS D ≠ 0 := by
     unfold ddS
     rw [Ne, FractionalIdeal.coeIdeal_eq_zero]
@@ -26,14 +30,15 @@ theorem one_mem_ddS_zpow (D : D7) (n : ℕ) :
   have hJ1 : ddS D ^ n ≤ 1 := pow_le_one' hI1 n
   rw [zpow_neg, zpow_natCast]
   have h1 : (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) ≤ (ddS D ^ n)⁻¹ := by
-    calc (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) = ddS D ^ n * (ddS D ^ n)⁻¹ :=
-          (mul_inv_cancel₀ hJ0).symm
+    calc
+      (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
+        = ddS D ^ n * (ddS D ^ n)⁻¹ := (mul_inv_cancel₀ hJ0).symm
       _ ≤ 1 * (ddS D ^ n)⁻¹ := by gcongr
       _ = (ddS D ^ n)⁻¹ := one_mul _
   exact h1 ((FractionalIdeal.mem_one_iff _).2 ⟨1, map_one _⟩)
 
-theorem frame_mem (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (Λ : LV D) :
-    IsRowLat D F0 Λ → ∀ a, frame (lf D F0) a ∈ Λ := by
+theorem frame_mem (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (Λ : LV D)
+    : IsRowLat D F0 Λ → ∀ a, frame (lf D F0) a ∈ Λ := by
   rintro ⟨-, ⟨-, -, hlift, -⟩, hX⟩ a
   refine Fin.lastCases ?_ (fun i => ?_) a
   · have e : frame (lf D F0) (Fin.last D.R.rS) = (lf D F0).fl.z := by simp [frame, FlagG.fvec]

@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.ClassSteps
 
-open NumberField PI.UJClassFin PI.UJClassMass PI.UnitaryGroupMassFormula.UJClassMass Formalism.HermitianLatticesTheory
+open NumberField PI.UJClassFin PI.UJClassMass PI.UnitaryGroupMassFormula.UJClassMass
+  Formalism.HermitianLatticesTheory
 open scoped TensorProduct ComplexOrder
 
 section Gen

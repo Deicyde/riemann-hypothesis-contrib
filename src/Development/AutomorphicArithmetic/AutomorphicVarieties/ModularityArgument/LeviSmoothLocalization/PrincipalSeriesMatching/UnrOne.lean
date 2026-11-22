@@ -6,22 +6,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
-open Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.HenQ UpperTheory.V.Z.Bc UpperTheory.V.Published
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL UpperTheory.Zero.LLC UpperTheory.V.Z.Inf
+open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam
+  UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
+open Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.HenQ
+  UpperTheory.V.Z.Bc UpperTheory.V.Published
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  UpperTheory.Zero.LLC UpperTheory.V.Z.Inf
 open GroundTheory.Global.SemiLocal
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 attribute [-instance] Formalism.DoubleCosetMeasures.instMeasGL
 
-private theorem unr_one {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    IsUnram (1 : kˣ →* ℂˣ) := by
+private theorem unr_one
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : IsUnram (1 : kˣ →* ℂˣ) := by
   unfold IsUnram
   simp
 
-theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.indX :
-    UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.IndX := by
+theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.indX
+    : UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.IndX := by
   intro K M _ _ _ _ _ _ _ h2 P π hI v s s' hs hs' ξ hξ
   have hM := matchIndX K M h2 P π hI v s s' hs hs' ξ⁻¹ (IsSmoothChar.inv hξ.1)
   have hK := (polFacts (v.adicCompletion K)).2.2.2

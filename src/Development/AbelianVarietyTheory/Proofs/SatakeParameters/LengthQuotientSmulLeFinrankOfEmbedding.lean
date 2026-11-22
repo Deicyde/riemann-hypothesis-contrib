@@ -10,7 +10,14 @@ open Pointwise
 
 namespace GlobalTheory
 
-theorem length_quotient_smul_range_le_finrank_mul : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Field K] [Algebra O K] [IsFractionRing O K] (W M : Type) [AddCommGroup W] [Module K W] [Module O W] [IsScalarTower O K W] [FiniteDimensional K W] [AddCommGroup M] [Module O M] (f : M →ₗ[O] W), Function.Injective f → ∀ a : O, Module.length O (M ⧸ LinearMap.range (a • (LinearMap.id : M →ₗ[O] M))) ≤ (Module.finrank K W : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
+theorem length_quotient_smul_range_le_finrank_mul
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Field K] [Algebra O K]
+        [IsFractionRing O K] (W M : Type) [AddCommGroup W] [Module K W] [Module O W]
+        [IsScalarTower O K W] [FiniteDimensional K W] [AddCommGroup M] [Module O M] (f : M →ₗ[O] W),
+      Function.Injective f
+        → ∀ a : O,
+          Module.length O (M ⧸ LinearMap.range (a • (LinearMap.id : M →ₗ[O] M)))
+            ≤ (Module.finrank K W : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
   intro O K _ _ _ _ _ _ W M _ _ _ _ _ _ _ f hf a
   set R := LinearMap.range (a • (LinearMap.id : M →ₗ[O] M)) with hR
   refine GlobalTheory.T.length_le_of_forall_fg_submodule_length_le O (M ⧸ R) _ ?_
@@ -41,13 +48,15 @@ theorem length_quotient_smul_range_le_finrank_mul : ∀ (O K : Type) [CommRing O
   haveI : Module.Free O N' := Module.free_of_finite_type_torsion_free'
   have hrank : Module.finrank O N' ≤ Module.finrank K W := by
     let b := Module.finBasis O N'
-    have h1 : LinearIndependent O (e ∘ b) := b.linearIndependent.map' e (LinearMap.ker_eq_bot.mpr he)
+    have h1 : LinearIndependent O (e ∘ b) :=
+      b.linearIndependent.map' e (LinearMap.ker_eq_bot.mpr he)
     have h2 : LinearIndependent K (e ∘ b) := (LinearIndependent.iff_fractionRing O K).mp h1
     simpa using h2.fintype_card_le_finrank
-  let p : N' →ₗ[O] N := (R.mkQ ∘ₗ N'.subtype).codRestrict N (by
-    intro x
-    rw [← hmap]
-    exact ⟨x, x.2, rfl⟩)
+  let p : N' →ₗ[O] N :=
+    (R.mkQ ∘ₗ N'.subtype).codRestrict N (by
+      intro x
+      rw [← hmap]
+      exact ⟨x, x.2, rfl⟩)
   have hp : Function.Surjective p := by
     rintro ⟨y, hy⟩
     rw [← hmap] at hy
@@ -67,9 +76,11 @@ theorem length_quotient_smul_range_le_finrank_mul : ∀ (O K : Type) [CommRing O
     intro y
     obtain ⟨x, rfl⟩ := hp y
     exact ⟨R'.mkQ x, by simp [q]⟩
-  calc Module.length O N ≤ Module.length O (N' ⧸ R') := Module.length_le_of_surjective q hq
-    _ = (Module.finrank O N' : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := GlobalTheory.T.length_quotient_scalar_mul O N' a
-    _ ≤ _ := by
-      gcongr
+  calc
+    Module.length O N
+      ≤ Module.length O (N' ⧸ R') := Module.length_le_of_surjective q hq
+    _ = (Module.finrank O N' : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) :=
+      GlobalTheory.T.length_quotient_scalar_mul O N' a
+    _ ≤ _ := by gcongr
 
 end GlobalTheory

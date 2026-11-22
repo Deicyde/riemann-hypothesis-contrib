@@ -38,14 +38,18 @@ variable {n : ℕ}
 
 section One
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+  {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
 variable {lam : Fin n → ℝ}
 
-theorem lowKMultOne_of_cas (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hcas : CasOnSmooth ε lam σ)
-    (S S' : Submodule ℂ H) (hS : Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S)
-    (hS' : Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S') : S = S' := by
+theorem lowKMultOne_of_cas
+    (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hcas : CasOnSmooth ε lam σ)
+    (S S' : Submodule ℂ H)
+    (hS : Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S)
+    (hS' : Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S')
+    : S = S' := by
   obtain ⟨V, hV, hV0, hVK, hc⟩ := ReciprocityTheory.ChartRestriction.DS.arb_datum hDS hcas
   obtain ⟨-, -, hσ, hirr, -⟩ := hDS
   have hD := ReciprocityTheory.ChartRestriction.DS.isDerivedOn_smE hσ
@@ -53,15 +57,20 @@ theorem lowKMultOne_of_cas (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap 
   rw [data_lowK_eq hgap hσ hD hV hc hVK S (htop ▸ le_top) hS,
     data_lowK_eq hgap hσ hD hV hc hVK S' (htop ▸ le_top) hS']
 
-private theorem exists_linearIsometryEquiv_of_eq_top {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (C : Submodule ℂ H) (hC : C = ⊤) : ∃ W : C ≃ₗᵢ[ℂ] H, ∀ y : C, W y = y :=
-  ⟨LinearIsometryEquiv.ofSurjective C.subtypeₗᵢ
-    (fun y => ⟨⟨y, by rw [hC]; exact Submodule.mem_top⟩, rfl⟩), fun _ => rfl⟩
+private theorem exists_linearIsometryEquiv_of_eq_top
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (C : Submodule ℂ H) (hC : C = ⊤)
+    : ∃ W : C ≃ₗᵢ[ℂ] H, ∀ y : C, W y = y := ⟨
+  LinearIsometryEquiv.ofSurjective C.subtypeₗᵢ
+    (fun y => ⟨⟨y, by rw [hC]; exact Submodule.mem_top⟩, rfl⟩),
+  fun _ => rfl
+⟩
 
-theorem equiv_sigLam_of_cas (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hcas : CasOnSmooth ε lam σ)
+theorem equiv_sigLam_of_cas
+    (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hcas : CasOnSmooth ε lam σ)
     {T : S7.KType ε (lowK ε lam)} {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} {v₀ : T.V}
-    (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0) :
-    ∃ U : Hlam ε Ψ v₀ ≃ₗᵢ[ℂ] H, ∀ g ∈ UJset ε, ∀ x : Hlam ε Ψ v₀, U (sigLam ε Ψ v₀ g x) = σ g (U x) := by
+    (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0)
+    : ∃ U : Hlam ε Ψ v₀ ≃ₗᵢ[ℂ] H, ∀ g ∈ UJset ε, ∀ x : Hlam ε Ψ v₀,
+      U (sigLam ε Ψ v₀ g x) = σ g (U x) := by
   obtain ⟨V, hV, hV0, hVK, hc⟩ := ReciprocityTheory.ChartRestriction.DS.arb_datum hDS hcas
   obtain ⟨-, -, hσ, hirr, -⟩ := hDS
   have hD := ReciprocityTheory.ChartRestriction.DS.isDerivedOn_smE hσ
@@ -74,28 +83,39 @@ theorem equiv_sigLam_of_cas (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap
 
 end One
 
-private theorem exists_coe_linearIsometryEquiv_of_eq_top {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (C : Submodule ℂ H) (hC : C = ⊤) : ∃ W : C ≃ₗᵢ[ℂ] H, ∀ y : C, W y = y :=
-  ⟨LinearIsometryEquiv.ofSurjective C.subtypeₗᵢ
-    (fun y => ⟨⟨y, by rw [hC]; exact Submodule.mem_top⟩, rfl⟩), fun _ => rfl⟩
+private theorem exists_coe_linearIsometryEquiv_of_eq_top
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (C : Submodule ℂ H) (hC : C = ⊤)
+    : ∃ W : C ≃ₗᵢ[ℂ] H, ∀ y : C, W y = y := ⟨
+  LinearIsometryEquiv.ofSurjective C.subtypeₗᵢ
+    (fun y => ⟨⟨y, by rw [hC]; exact Submodule.mem_top⟩, rfl⟩),
+  fun _ => rfl
+⟩
 
-theorem dsUnique_of_cas {ε : Fin n → Bool} {lam : Fin n → ℝ} (hgap : StdGap ε lam)
+theorem dsUnique_of_cas
+    {ε : Fin n → Bool} {lam : Fin n → ℝ} (hgap : StdGap ε lam)
     {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hcas : CasOnSmooth ε lam σ)
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+    (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hcas : CasOnSmooth ε lam σ)
     {H' : Type*} [NormedAddCommGroup H'] [InnerProductSpace ℂ H'] [CompleteSpace H']
-    {σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')} (hDS' : Formalism.MainNotions.S.IsDS ε lam σ')
-    (hcas' : CasOnSmooth ε lam σ') :
-    ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ UJset ε, ∀ x : H, U (σ g x) = σ' g (U x) := by
+    {σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')}
+    (hDS' : Formalism.MainNotions.S.IsDS ε lam σ') (hcas' : CasOnSmooth ε lam σ')
+    : ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ UJset ε, ∀ x : H, U (σ g x) = σ' g (U x) := by
   obtain ⟨V, hV, hV0, hVK, hc⟩ := ReciprocityTheory.ChartRestriction.DS.arb_datum hDS hcas
   obtain ⟨V', hV', hV0', hVK', hc'⟩ := ReciprocityTheory.ChartRestriction.DS.arb_datum hDS' hcas'
   obtain ⟨-, -, hσ, hirr, -⟩ := hDS
   obtain ⟨-, -, hσ', hirr', -⟩ := hDS'
   have hD := ReciprocityTheory.ChartRestriction.DS.isDerivedOn_smE hσ
   have hD' := ReciprocityTheory.ChartRestriction.DS.isDerivedOn_smE hσ'
-  obtain ⟨W, hW⟩ := exists_coe_linearIsometryEquiv_of_eq_top _ (data_closGen_eq_top hgap hσ hD hV hc hVK hirr hV0)
-  obtain ⟨W', hW'⟩ := exists_coe_linearIsometryEquiv_of_eq_top _ (data_closGen_eq_top hgap hσ' hD' hV' hc' hVK' hirr' hV0')
+  obtain ⟨W, hW⟩ :=
+    exists_coe_linearIsometryEquiv_of_eq_top _ (data_closGen_eq_top hgap hσ hD hV hc hVK hirr hV0)
+  obtain ⟨W', hW'⟩ :=
+    exists_coe_linearIsometryEquiv_of_eq_top _
+      (data_closGen_eq_top hgap hσ' hD' hV' hc' hVK' hirr' hV0')
   obtain ⟨U, hU⟩ := data_unitary_equiv hgap hσ hD hV hc hVK hV0 hσ' hD' hV' hc' hVK' hV0'
-  have hWs : ∀ z : H, ((W.symm z : closGen (ReciprocityTheory.ChartRestriction.DS.smE ε σ) V) : H) = z := fun z => by
+  have hWs
+      : ∀ z : H,
+        ((W.symm z : closGen (ReciprocityTheory.ChartRestriction.DS.smE ε σ) V) : H)
+          = z := fun z => by
     rw [← hW]; exact W.apply_symm_apply z
   refine ⟨(W.symm.trans U).trans W', fun g hg x => ?_⟩
   simp only [LinearIsometryEquiv.trans_apply, hW']

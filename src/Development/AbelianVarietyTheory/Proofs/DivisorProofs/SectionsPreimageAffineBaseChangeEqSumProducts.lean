@@ -5,25 +5,32 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
 namespace GlobalTheory.BaseChangeSpan
 
-theorem exists_sum_mul_of_closure {S S' T : Type} [CommRing S] [CommRing S'] [CommRing T]
-    (A : S →+* T) (B : S' →+* T) (h : Subring.closure (Set.range A ∪ Set.range B) = ⊤) (x : T) :
-    ∃ (n : ℕ) (a : Fin n → S) (r : Fin n → S'), x = ∑ i, A (a i) * B (r i) := by
+theorem exists_sum_mul_of_closure
+    {S S' T : Type} [CommRing S] [CommRing S'] [CommRing T]
+    (A : S →+* T) (B : S' →+* T) (h : Subring.closure (Set.range A ∪ Set.range B) = ⊤)
+    (x : T)
+    : ∃ (n : ℕ) (a : Fin n → S) (r : Fin n → S'), x = ∑ i, A (a i) * B (r i) := by
   have hx : x ∈ Subring.closure (Set.range A ∪ Set.range B) := h ▸ Subring.mem_top x
   induction hx using Subring.closure_induction with
   | mem y hy =>
     rcases hy with ⟨a, rfl⟩ | ⟨r, rfl⟩
     · exact ⟨1, fun _ => a, fun _ => 1, by simp⟩
     · exact ⟨1, fun _ => 1, fun _ => r, by simp⟩
-  | zero => exact ⟨0, Fin.elim0, Fin.elim0, by simp⟩
-  | one => exact ⟨1, fun _ => 1, fun _ => 1, by simp⟩
+  | zero =>
+    exact ⟨0, Fin.elim0, Fin.elim0, by simp⟩
+  | one =>
+    exact ⟨1, fun _ => 1, fun _ => 1, by simp⟩
   | add y z _ _ hy hz =>
     obtain ⟨n, a, r, rfl⟩ := hy
     obtain ⟨m, b, t, rfl⟩ := hz
@@ -32,12 +39,16 @@ theorem exists_sum_mul_of_closure {S S' T : Type} [CommRing S] [CommRing S'] [Co
     simp [Fin.append_left, Fin.append_right]
   | neg y _ hy =>
     obtain ⟨n, a, r, rfl⟩ := hy
-    exact ⟨n, fun i => -a i, r, by simp [Finset.sum_neg_distrib]⟩
+    exact ⟨n, fun i => - a i, r, by simp [Finset.sum_neg_distrib]⟩
   | mul y z _ _ hy hz =>
     obtain ⟨n, a, r, rfl⟩ := hy
     obtain ⟨m, b, t, rfl⟩ := hz
-    refine ⟨n * m, fun k => a (finProdFinEquiv.symm k).1 * b (finProdFinEquiv.symm k).2,
-      fun k => r (finProdFinEquiv.symm k).1 * t (finProdFinEquiv.symm k).2, ?_⟩
+    refine ⟨
+      n * m,
+      fun k => a (finProdFinEquiv.symm k).1 * b (finProdFinEquiv.symm k).2,
+      fun k => r (finProdFinEquiv.symm k).1 * t (finProdFinEquiv.symm k).2,
+      ?_
+    ⟩
     rw [← finProdFinEquiv.sum_comp, Finset.sum_mul_sum, ← Finset.sum_product']
     refine Finset.sum_congr (by simp) fun p _ => ?_
     simp only [Equiv.symm_apply_apply, map_mul]

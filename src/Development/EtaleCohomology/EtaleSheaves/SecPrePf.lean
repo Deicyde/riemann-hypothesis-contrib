@@ -10,8 +10,11 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC Opposite
 namespace LateralTheory.E.SecPrePf
 open LateralTheory.E.t_E3Cut
 
-theorem id_mem (hSec : SHSection) (A : CommRingCat.{0}) (hA : SH A) {S : Sieve (Spec A)}
-    (hS : S ∈ Scheme.etaleTopology (Spec A)) : S.arrows (𝟙 _) := by
+theorem id_mem
+    (hSec : SHSection)
+    (A : CommRingCat.{0}) (hA : SH A)
+    {S : Sieve (Spec A)} (hS : S ∈ Scheme.etaleTopology (Spec A))
+    : S.arrows (𝟙 _) := by
   obtain ⟨𝒰, hle⟩ := Scheme.exists_cover_of_mem_grothendieckTopology hS
   have : IsLocalRing A := hA.elim fun h _ => h.toIsLocalRing
   obtain ⟨hcov, -⟩ := (Scheme.presieve₀_mem_precoverage_iff _).1 𝒰.mem₀
@@ -28,25 +31,33 @@ theorem id_mem (hSec : SHSection) (A : CommRingCat.{0}) (hA : SH A) {S : Sieve (
   have h2 := S.downward_closed h1 s
   rwa [hs] at h2
 
-theorem mem_of_cov (hSec : SHSection) (A : CommRingCat.{0}) (hA : SH A) {V : Scheme.{0}} (h : Spec A ⟶ V)
-    (S : Sieve V) (hS : S ∈ Scheme.etaleTopology V) : S.arrows h := by
+theorem mem_of_cov
+    (hSec : SHSection)
+    (A : CommRingCat.{0}) (hA : SH A)
+    {V : Scheme.{0}} (h : Spec A ⟶ V) (S : Sieve V) (hS : S ∈ Scheme.etaleTopology V)
+    : S.arrows h := by
   have := id_mem hSec A hA (Scheme.etaleTopology.pullback_stable h hS)
   simpa using this
 
 variable {R : Type} [CommRing R]
 
-def sky (U : Scheme.{0}) (N : ModuleCat.{1} (ULift.{1} R)) : Scheme.{0}ᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} R) where
+def sky (U : Scheme.{0}) (N : ModuleCat.{1} (ULift.{1} R))
+    : Scheme.{0}ᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} R) where
   obj V := ModuleCat.of _ ((U ⟶ V.unop) → N)
-  map g := ModuleCat.ofHom
-    { toFun := fun φ h => φ (h ≫ g.unop)
+  map g :=
+    ModuleCat.ofHom {
+      toFun := fun φ h => φ (h ≫ g.unop)
       map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+      map_smul' := fun _ _ => rfl
+    }
   map_id _ := by ext; simp
   map_comp _ _ := by ext; simp
 
-theorem sky_isSheaf (U : Scheme.{0})
+theorem sky_isSheaf
+    (U : Scheme.{0})
     (hU : ∀ {V : Scheme.{0}} (h : U ⟶ V) (S : Sieve V), S ∈ Scheme.etaleTopology V → S.arrows h)
-    (N : ModuleCat.{1} (ULift.{1} R)) : Presheaf.IsSheaf Scheme.etaleTopology (sky U N) := by
+    (N : ModuleCat.{1} (ULift.{1} R))
+    : Presheaf.IsSheaf Scheme.etaleTopology (sky U N) := by
   rw [Presheaf.isSheaf_iff_isSheaf_forget (s := forget (ModuleCat.{1} (ULift.{1} R))),
     isSheaf_iff_isSheaf_of_type]
   intro V S hS x hx
@@ -67,12 +78,16 @@ theorem sky_isSheaf (U : Scheme.{0})
     exact e
 
 @[simps]
-def toSky (Q : Scheme.{0}ᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} R)) (U : Scheme.{0}) {N : ModuleCat.{1} (ULift.{1} R)}
-    (g : Q.obj (op U) ⟶ N) : Q ⟶ sky U N where
-  app V := ModuleCat.ofHom
-    { toFun := fun p h => g.hom ((Q.map h.op).hom p)
+def toSky
+    (Q : Scheme.{0}ᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} R)) (U : Scheme.{0})
+    {N : ModuleCat.{1} (ULift.{1} R)} (g : Q.obj (op U) ⟶ N)
+    : Q ⟶ sky U N where
+  app V :=
+    ModuleCat.ofHom {
+      toFun := fun p h => g.hom ((Q.map h.op).hom p)
       map_add' := fun _ _ => by funext h; simp
-      map_smul' := fun _ _ => by funext h; simp }
+      map_smul' := fun _ _ => by funext h; simp
+    }
   naturality V W f := by
     ext p
     funext h
@@ -80,10 +95,11 @@ def toSky (Q : Scheme.{0}ᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} R)) (U : Scheme.{0}
     rw [op_comp, Quiver.Hom.op_unop, Q.map_comp]
     rfl
 
-theorem toSheafify_bij (U : Scheme.{0})
+theorem toSheafify_bij
+    (U : Scheme.{0})
     (hU : ∀ {V : Scheme.{0}} (h : U ⟶ V) (S : Sieve V), S ∈ Scheme.etaleTopology V → S.arrows h)
-    (P : Scheme.{0}ᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} R)) :
-    Function.Bijective ((toSheafify Scheme.etaleTopology P).app (op U)).hom := by
+    (P : Scheme.{0}ᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} R))
+    : Function.Bijective ((toSheafify Scheme.etaleTopology P).app (op U)).hom := by
   constructor
   · rw [injective_iff_map_eq_zero]
     intro x hx
@@ -97,15 +113,16 @@ theorem toSheafify_bij (U : Scheme.{0})
     let Q := sheafify Scheme.etaleTopology P
     let g : Q.obj (op U) ⟶ ModuleCat.of _ (Q.obj (op U) ⧸ LinearMap.range (η.app (op U)).hom) :=
       ModuleCat.ofHom (Submodule.mkQ _)
-    have e := sheafify_hom_ext Scheme.etaleTopology (toSky Q U g) 0 (sky_isSheaf U hU _) (by
-      ext V p
-      funext h
-      have nat : (Q.map h.op).hom ((η.app V).hom p) = (η.app (op U)).hom ((P.map h.op).hom p) :=
-        (congrArg (fun φ => φ.hom p) (η.naturality h.op)).symm
-      simp only [NatTrans.comp_app, toSky_app, Limits.comp_zero]
-      change (Submodule.mkQ _) ((Q.map h.op).hom (η.app V |>.hom p)) = 0
-      rw [nat, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
-      exact ⟨_, rfl⟩)
+    have e :=
+      sheafify_hom_ext Scheme.etaleTopology (toSky Q U g) 0 (sky_isSheaf U hU _) (by
+        ext V p
+        funext h
+        have nat : (Q.map h.op).hom ((η.app V).hom p) = (η.app (op U)).hom ((P.map h.op).hom p) :=
+          (congrArg (fun φ => φ.hom p) (η.naturality h.op)).symm
+        simp only [NatTrans.comp_app, toSky_app, Limits.comp_zero]
+        change (Submodule.mkQ _) ((Q.map h.op).hom (η.app V |>.hom p)) = 0
+        rw [nat, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
+        exact ⟨_, rfl⟩)
     have e2 := congrFun (congrArg (fun φ => (φ.app (op U)).hom y) e) (𝟙 U)
     simp only [toSky_app] at e2
     change (Submodule.mkQ _) ((Q.map (𝟙 U).op).hom y) = 0 at e2
@@ -115,6 +132,8 @@ theorem toSheafify_bij (U : Scheme.{0})
 
 theorem SecPre_of (hSec : SHSection) : LateralTheory.E.SHEqvPf.SecPre := by
   intro _ q i A hA
-  exact toSheafify_bij (R := ZMod q) (Spec A) (fun h S hS => mem_of_cov hSec A hA h S hS) (Scheme.Γ ⋙ twF q i)
+  exact toSheafify_bij (R := ZMod q) (Spec A)
+    (fun h S hS => mem_of_cov hSec A hA h S hS)
+    (Scheme.Γ ⋙ twF q i)
 
 end LateralTheory.E.SecPrePf

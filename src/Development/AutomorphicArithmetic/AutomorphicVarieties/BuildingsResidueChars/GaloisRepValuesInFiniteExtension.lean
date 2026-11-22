@@ -4,8 +4,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-theorem UpperTheory.galois_rep_values_in_finite_extension :
-    UpperTheory.V.Af.Wd.FinVal := by
+theorem UpperTheory.galois_rep_values_in_finite_extension : UpperTheory.V.Af.Wd.FinVal := by
   intro F Ω C _ _ _ _ M hM χ hχ
   classical
   have hpos : 0 < M := by omega
@@ -14,10 +13,12 @@ theorem UpperTheory.galois_rep_values_in_finite_extension :
     intro ζ hζ
     simpa [Polynomial.mem_nthRoots hpos] using hζ
   haveI : Finite {ζ : Ω | ζ ^ M = 1} := hR.to_subtype
-  let π : (Ω ≃ₐ[F] Ω) → ({ζ : Ω | ζ ^ M = 1} → {ζ : Ω | ζ ^ M = 1}) := fun s ζ =>
-    ⟨s ζ, by
+  let π : (Ω ≃ₐ[F] Ω) → ({ζ : Ω | ζ ^ M = 1} → {ζ : Ω | ζ ^ M = 1}) := fun s ζ => ⟨
+    s ζ,
+    by
       show (s ζ) ^ M = 1
-      rw [← map_pow, show (ζ : Ω) ^ M = 1 from ζ.2, map_one]⟩
+      rw [← map_pow, show (ζ : Ω) ^ M = 1 from ζ.2, map_one]
+  ⟩
   have hfac : ∀ s t, π s = π t → χ s = χ t := by
     intro s t hst
     have h1 : χ (t⁻¹ * s) = 1 := by

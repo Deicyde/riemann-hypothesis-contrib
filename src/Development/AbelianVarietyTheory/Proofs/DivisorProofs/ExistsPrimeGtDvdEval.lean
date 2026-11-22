@@ -8,9 +8,8 @@ namespace GlobalTheory.PrimeDivisorOfPolynomialValue
 
 open Polynomial
 
-theorem exists_eval_mul_ne (f : ℤ[X]) (hf : 0 < f.natDegree) (c a : ℤ) (ha : a ≠ 0) :
-    ∃ k : ℤ, f.eval (a * k) ≠ c ∧ f.eval (a * k) ≠ -c := by
-
+theorem exists_eval_mul_ne (f : ℤ[X]) (hf : 0 < f.natDegree) (c a : ℤ) (ha : a ≠ 0)
+    : ∃ k : ℤ, f.eval (a * k) ≠ c ∧ f.eval (a * k) ≠ -c := by
   have hdeg : 0 < (f.comp (C a * X)).natDegree := by
     rw [natDegree_comp, natDegree_C_mul_X a ha, mul_one]
     exact hf
@@ -18,17 +17,20 @@ theorem exists_eval_mul_ne (f : ℤ[X]) (hf : 0 < f.natDegree) (c a : ℤ) (ha :
     rw [sub_eq_zero] at h
     rw [h, natDegree_C] at hdeg
     exact lt_irrefl 0 hdeg
-  obtain ⟨k, hk⟩ := Infinite.exists_notMem_finset
-    ((f.comp (C a * X) - C c).roots.toFinset ∪ (f.comp (C a * X) - C (-c)).roots.toFinset)
+  obtain ⟨k, hk⟩ :=
+    Infinite.exists_notMem_finset
+      ((f.comp (C a * X) - C c).roots.toFinset ∪ (f.comp (C a * X) - C (-c)).roots.toFinset)
   refine ⟨k, fun e => hk (Finset.mem_union_left _ ?_), fun e => hk (Finset.mem_union_right _ ?_)⟩
   · rw [Multiset.mem_toFinset, mem_roots (hne c)]
     simp [e]
   · rw [Multiset.mem_toFinset, mem_roots (hne (-c))]
     simp [e]
 
-theorem exists_prime_gt_dvd_eval :
-    ∀ (f : Polynomial ℤ), (0 : ℕ) < Polynomial.natDegree f → ∀ (n : ℕ),
-      ∃ (p : ℕ), Nat.Prime p ∧ n < p ∧ ∃ (x : ℤ), (↑p : ℤ) ∣ Polynomial.eval x f := by
+theorem exists_prime_gt_dvd_eval
+    : ∀ (f : Polynomial ℤ),
+      (0 : ℕ) < Polynomial.natDegree f
+        → ∀ (n : ℕ), ∃ (p : ℕ),
+          Nat.Prime p ∧ n < p ∧ ∃ (x : ℤ), (↑p : ℤ) ∣ Polynomial.eval x f := by
   intro f hf n
 
   have of_root : ∀ x, f.eval x = 0 → ∃ p, Nat.Prime p ∧ n < p ∧ ∃ x : ℤ, (p : ℤ) ∣ f.eval x := by
@@ -53,14 +55,16 @@ theorem exists_prime_gt_dvd_eval :
     · exact ht1 (by simpa using h)
     · exact ht2 (by simpa using h)
   have hp := Nat.minFac_prime hnat
-  have hpt : ((1 + (n.factorial : ℤ) * k * q).natAbs.minFac : ℤ) ∣ (1 + (n.factorial : ℤ) * k * q) :=
+  have hpt
+      : ((1 + (n.factorial : ℤ) * k * q).natAbs.minFac : ℤ) ∣ (1 + (n.factorial : ℤ) * k * q) :=
     Int.ofNat_dvd_left.2 (Nat.minFac_dvd _)
   refine ⟨_, hp, ?_, _, by rw [hft]; exact dvd_mul_of_dvd_right hpt _⟩
 
   by_contra hle
   rw [not_lt] at hle
   have h3 : ((1 + (n.factorial : ℤ) * k * q).natAbs.minFac : ℤ) ∣ (n.factorial : ℤ) * k * q :=
-    dvd_mul_of_dvd_left (dvd_mul_of_dvd_left (Int.natCast_dvd_natCast.2 (Nat.dvd_factorial hp.pos hle)) _) _
+    dvd_mul_of_dvd_left
+      (dvd_mul_of_dvd_left (Int.natCast_dvd_natCast.2 (Nat.dvd_factorial hp.pos hle)) _) _
   have h4 := dvd_sub hpt h3
   rw [add_sub_cancel_right] at h4
   exact hp.not_dvd_one (Int.natCast_dvd_natCast.1 (by simpa using h4))

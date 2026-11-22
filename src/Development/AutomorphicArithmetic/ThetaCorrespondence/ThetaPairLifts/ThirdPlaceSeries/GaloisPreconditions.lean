@@ -13,7 +13,8 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 namespace UpperTheory.GalC
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField
+  IsDedekindDomain
 structure GaloisPreconditions (D : D7) (C : NChoice D) : Prop where
   what₂ : _root_.GlobalTheory.NRows.PointConditions' D
   adm : _root_.Formalism.MainNotions.SumRepresentations.AdmissibleDatum D

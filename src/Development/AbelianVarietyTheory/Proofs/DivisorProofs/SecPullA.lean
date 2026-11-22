@@ -10,7 +10,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry Opposite
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR
 
 namespace GlobalTheory.CechDR.AffLoc
 
@@ -36,9 +37,10 @@ theorem pt_w (T : TT s) : pt T ≫ s = algStr R T.obj.B := by
 
 abbrev affF (s : X ⟶ Sp R) : AffOp X ⥤ TT s where
   obj U := ⟨Thick.triv (Sec s U.unop.1) (affPt s U.unop) (affPt_w s U.unop), rfl⟩
-  map {U V} a := ⟨Thick.trivHom (hx := affPt_w s U.unop)
-    (T := Thick.triv (Sec s V.unop.1) (affPt s V.unop) (affPt_w s V.unop))
-    (Sec.res s (leOfHom a.unop)) (affPt_res s (leOfHom a.unop))⟩
+  map {U V} a :=
+    ⟨Thick.trivHom (hx := affPt_w s U.unop)
+      (T := Thick.triv (Sec s V.unop.1) (affPt s V.unop) (affPt_w s V.unop))
+      (Sec.res s (leOfHom a.unop)) (affPt_res s (leOfHom a.unop))⟩
   map_id U := by
     apply ObjectProperty.hom_ext (IsTriv s)
     apply Thick.Hom.ext'
@@ -50,35 +52,40 @@ abbrev affF (s : X ⟶ Sp R) : AffOp X ⥤ TT s where
     ext c
     exact Sec.res_res s (leOfHom a.unop) (leOfHom b.unop) c
 
-abbrev thk (T : TT s) (p : Pair (pt T)) : TT s :=
-  ⟨Thick.triv (Sec (algStr R T.obj.B) p.1.1.1) (affPt _ p.1.1 ≫ pt T)
-    (by rw [Category.assoc, pt_w]; exact affPt_w _ p.1.1), rfl⟩
+abbrev thk (T : TT s) (p : Pair (pt T)) : TT s := ⟨
+  Thick.triv (Sec (algStr R T.obj.B) p.1.1.1) (affPt _ p.1.1 ≫ pt T)
+    (by rw [Category.assoc, pt_w]; exact affPt_w _ p.1.1),
+  rfl
+⟩
 
-def secPullA (T : TT s) (p : Pair (pt T)) : Sec s p.1.2.1 →ₐ[R] Sec (algStr R T.obj.B) p.1.1.1 :=
-  { secPull s (algStr R T.obj.B) p with
-    commutes' := (semiHom_secPull (σ := RingHom.id R)
-      (by rw [spMap_id, Category.comp_id, pt_w]) p).map_algebraMap }
+def secPullA (T : TT s) (p : Pair (pt T)) : Sec s p.1.2.1 →ₐ[R] Sec (algStr R T.obj.B) p.1.1.1 := {
+  secPull s (algStr R T.obj.B) p with
+  commutes' :=
+    (semiHom_secPull (σ := RingHom.id R) (by rw [spMap_id, Category.comp_id, pt_w])
+      p).map_algebraMap
+}
 
 def aM (T : TT s) (p : Pair (pt T)) : (affF s).obj (op p.1.2) ⟶ thk T p :=
   ⟨Thick.trivHom (hx := affPt_w s p.1.2) (T := (thk T p).obj) (secPullA T p) (secPull_affPt s _ p)⟩
 
-theorem bM_pt (T : TT s) (p : Pair (pt T)) :
-    spMap ((toSec R T.obj.B p.1.1).toRingHom.comp ((πe T).symm : T.obj.B₀ →+* T.obj.B)) =
-      affPt (algStr R T.obj.B) p.1.1 ≫ spMap ((πe T).symm : T.obj.B₀ →+* T.obj.B) := by
+theorem bM_pt (T : TT s) (p : Pair (pt T))
+    : spMap ((toSec R T.obj.B p.1.1).toRingHom.comp ((πe T).symm : T.obj.B₀ →+* T.obj.B))
+      = affPt (algStr R T.obj.B) p.1.1 ≫ spMap ((πe T).symm : T.obj.B₀ →+* T.obj.B) := by
   rw [spMap_comp, affPt_eq]
   rfl
 
 abbrev fv (f : Z1 ((IsTriv s).ι ⋙ O (dp0 R) s)) {T T' : TT s} (a : T ⟶ T') : T'.obj.B := f.1 T T' a
 
-def bM (T : TT s) (p : Pair (pt T)) : T ⟶ thk T p :=
-  ⟨{ φ := toSec R T.obj.B p.1.1
-     φ₀ := (toSec R T.obj.B p.1.1).toRingHom.comp ((πe T).symm : T.obj.B₀ →+* T.obj.B)
-     comm := fun b ↦ congrArg (toSec R T.obj.B p.1.1) ((πe T).symm_apply_apply b)
-     dp := isDPMorphism_of_eq_bot _ T.property _ _
-     pt := (congrArg (· ≫ T.obj.x) (bM_pt T p)).trans (Category.assoc _ _ _) }⟩
+def bM (T : TT s) (p : Pair (pt T)) : T ⟶ thk T p := ⟨{
+  φ := toSec R T.obj.B p.1.1
+  φ₀ := (toSec R T.obj.B p.1.1).toRingHom.comp ((πe T).symm : T.obj.B₀ →+* T.obj.B)
+  comm := fun b ↦ congrArg (toSec R T.obj.B p.1.1) ((πe T).symm_apply_apply b)
+  dp := isDPMorphism_of_eq_bot _ T.property _ _
+  pt := (congrArg (· ≫ T.obj.x) (bM_pt T p)).trans (Category.assoc _ _ _)
+}⟩
 
-def hSec (f : Z1 ((IsTriv s).ι ⋙ O (dp0 R) s)) (g : C0 (OAff s)) (T : TT s) (p : Pair (pt T)) :
-    Sec (algStr R T.obj.B) p.1.1.1 :=
+def hSec (f : Z1 ((IsTriv s).ι ⋙ O (dp0 R) s)) (g : C0 (OAff s)) (T : TT s) (p : Pair (pt T))
+    : Sec (algStr R T.obj.B) p.1.1.1 :=
   secPullA T p (g (op p.1.2)) + fv f (aM T p) - fv f (bM T p)
 
 end GlobalTheory.CechDR.AffLoc

@@ -6,19 +6,24 @@ public import GroundTheory.GlobalFields.TateThesis.AdelicChar
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Xg
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
+  UpperTheory.ConvolutionTheory.RankTwoDescent.Xg
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
 open UpperTheory.V.Af.Smo (EigAt)
 open scoped ComplexOrder
 
-theorem UpperTheory.exists_nat_mul_integral_at_all_finite_places :
-    ∀ (E : Type) [Field E] [NumberField E] (θ : E), ∃ d : ℕ, 0 < d ∧ ∀ e : ℕ, d ∣ e → ∀ w : H.P E, Valued.v (H.cp w (rt ((e : E) * θ))) ≤ 1 := by
+theorem UpperTheory.exists_nat_mul_integral_at_all_finite_places
+    : ∀ (E : Type) [Field E] [NumberField E] (θ : E), ∃ d : ℕ,
+      0 < d ∧ ∀ e : ℕ, d ∣ e → ∀ w : H.P E, Valued.v (H.cp w (rt ((e : E) * θ))) ≤ 1 := by
   intro E _ _ θ
-  obtain ⟨y, hy0, hy⟩ := ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic (R := ℚ) θ)).exists_integral_multiple
-  have hy' : IsIntegral ℤ ((y : E) * θ) := by
-    simpa [zsmul_eq_mul] using hy
+  obtain ⟨y, hy0, hy⟩ :=
+    ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).2
+      (Algebra.IsAlgebraic.isAlgebraic (R := ℚ) θ)).exists_integral_multiple
+  have hy' : IsIntegral ℤ ((y : E) * θ) := by simpa [zsmul_eq_mul] using hy
   have h1 : IsIntegral ℤ ((y.natAbs : E) * θ) := by
     rcases Int.natAbs_eq y with h | h
     · have hc : ((y.natAbs : E)) = (y : E) := by

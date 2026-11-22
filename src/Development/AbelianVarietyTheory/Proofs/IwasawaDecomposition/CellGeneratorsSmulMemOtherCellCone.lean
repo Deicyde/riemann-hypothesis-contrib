@@ -5,23 +5,30 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 namespace GlobalTheory.PolFan
 
-theorem exists_smul_eq_sum_of_sum_toReal_eq {O : Type} [CommRing O] (bar : O → O) (φ : InvFun O) {X : Type} [AddCommGroup X]
-    [Module O X] [Module.Finite O X] {m m' : ℕ} (δ : Fin m → LinearMap.BilinForm ℤ X) (γ : Fin m' → LinearMap.BilinForm ℤ X)
+theorem exists_smul_eq_sum_of_sum_toReal_eq
+    {O : Type} [CommRing O]
+    (bar : O → O) (φ : InvFun O)
+    {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
+    {m m' : ℕ} (δ : Fin m → LinearMap.BilinForm ℤ X) (γ : Fin m' → LinearMap.BilinForm ℤ X)
     (c : Fin m' → ℝ) (hδ : IsCell bar φ δ) (hγ : IsCell bar φ γ) (hc : ∀ j, 0 ≤ c j)
-    (hs : ∑ i, toReal (δ i) = ∑ j, c j • toReal (γ j)) :
-    ∀ i, ∃ (k : ℕ) (a : Fin m' → ℕ), 0 < k ∧ k • δ i = ∑ j, a j • γ j := by
+    (hs : ∑ i, toReal (δ i) = ∑ j, c j • toReal (γ j))
+    : ∀ i, ∃ (k : ℕ) (a : Fin m' → ℕ), 0 < k ∧ k • δ i = ∑ j, a j • γ j := by
   obtain ⟨N, ℓ, hN, h1, h2, h3⟩ := hγ.strict
 
   have hrel : ∑ i, (ℓ (δ i) : ℝ) = ∑ j, c j * (ℓ (γ j) : ℝ) := by
-    have e := sum_mul_eq_zero_of_sum_toReal (X := X) (j := LinearMap.id) (fun _ _ h => h) ℓ
-      (β := Sum.elim δ γ) (c := Sum.elim (fun _ => (1 : ℝ)) (fun j => -c j)) (by
-        rw [Fintype.sum_sum_type]
-        simp only [Sum.elim_inl, Sum.elim_inr, LinearMap.id_apply, one_smul, neg_smul, Finset.sum_neg_distrib, hs,
-          add_neg_cancel])
+    have e :=
+      sum_mul_eq_zero_of_sum_toReal (X := X) (j := LinearMap.id)
+        (fun _ _ h => h)
+        ℓ (β := Sum.elim δ γ) (c := Sum.elim (fun _ => (1 : ℝ)) (fun j => - c j))
+        (by
+          rw [Fintype.sum_sum_type]
+          simp only [Sum.elim_inl, Sum.elim_inr, LinearMap.id_apply, one_smul, neg_smul,
+            Finset.sum_neg_distrib, hs, add_neg_cancel])
     rw [Fintype.sum_sum_type] at e
     simp only [Sum.elim_inl, Sum.elim_inr, one_mul, neg_mul, Finset.sum_neg_distrib] at e
     linarith

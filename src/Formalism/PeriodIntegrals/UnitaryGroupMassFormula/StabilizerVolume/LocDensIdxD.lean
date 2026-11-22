@@ -11,20 +11,24 @@ noncomputable section
 namespace PI.VolStabS
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW
-  IsLocalRing
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW IsLocalRing
 
 namespace IdxHW
 
 section Surj
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
   (b : Module.Basis (Fin 2) F E) (v : HeightOneSpectrum (𝓞 F)) (σ : E →ₐ[F] E) (a : ℕ)
 
-theorem psi_surj (k0 : Fin 2) (hσ : ∀ x, σ (σ x) = x)
+theorem psi_surj
+    (k0 : Fin 2)
+    (hσ : ∀ x, σ (σ x) = x)
     (hC : ∀ k l, algebraMap F (Fv F v) (Cmat b σ k l) ∈ v.adicCompletionIntegers F)
     (hu : ∀ k, algebraMap F (Fv F v) (b.repr 1 k / b.repr 1 k0) ∈ v.adicCompletionIntegers F)
-    (hk0 : b.repr 1 k0 ≠ 0) : Function.Surjective (psi b v σ a k0) := by
+    (hk0 : b.repr 1 k0 ≠ 0)
+    : Function.Surjective (psi b v σ a k0) := by
   intro g
   have hinv : ∀ y : Fv F v ⊗[F] E, sigR (Fv F v) σ (sigR (Fv F v) σ y) = y := by
     intro y
@@ -35,10 +39,16 @@ theorem psi_surj (k0 : Fin 2) (hσ : ∀ x, σ (σ x) = x)
   set u : Fv F v := algebraMap F (Fv F v) (b.repr 1 k0) with hu_def
   have hu0 : u ≠ 0 := (map_ne_zero (algebraMap F (Fv F v))).mpr hk0
   let Y : Fin a → Fin a → Fv F v ⊗[F] E := fun i j =>
-    (Algebra.TensorProduct.basis (Fv F v) b).equivFun.symm ![(g (i, j) : Fv F v), (g (j, i) : Fv F v)]
+    (Algebra.TensorProduct.basis (Fv F v) b).equivFun.symm
+      ![(g (i, j) : Fv F v), (g (j, i) : Fv F v)]
   let D : Fin a → Fv F v ⊗[F] E := fun i => ((g (i, i) : Fv F v) / u) • (1 : Fv F v ⊗[F] E)
   let M : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E) := fun i j =>
-    if i < j then Y i j else if j < i then sigR (Fv F v) σ (Y j i) else D i
+    if i < j then
+      Y i j
+    else if j < i then
+      sigR (Fv F v) σ (Y j i)
+    else
+      D i
   have hD : ∀ i, sigR (Fv F v) σ (D i) = D i := by
     intro i
     simp [D, sigR, Algebra.TensorProduct.one_def, TensorProduct.smul_tmul']
@@ -64,8 +74,9 @@ theorem psi_surj (k0 : Fin 2) (hσ : ∀ x, σ (σ x) = x)
       fin_cases k <;> simp
     · simp only [M, lt_irrefl, if_false]
       rw [hDk]
-      have e : (g (i, i) : Fv F v) / u * algebraMap F (Fv F v) (b.repr 1 k)
-          = (g (i, i) : Fv F v) * algebraMap F (Fv F v) (b.repr 1 k / b.repr 1 k0) := by
+      have e
+          : (g (i, i) : Fv F v) / u * algebraMap F (Fv F v) (b.repr 1 k)
+            = (g (i, i) : Fv F v) * algebraMap F (Fv F v) (b.repr 1 k / b.repr 1 k0) := by
         rw [map_div₀, ← hu_def]
         ring
       rw [e]

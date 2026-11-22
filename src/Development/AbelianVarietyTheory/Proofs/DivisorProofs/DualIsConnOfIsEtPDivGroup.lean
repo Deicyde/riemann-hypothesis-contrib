@@ -8,12 +8,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowCha
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory
 
-theorem PDivGroup.dual_isConn_of_isEt (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p]
-    [PerfectRing k p] (G : PDivGroup p k) : G.IsEt → G.dual.IsConn := by
+theorem PDivGroup.dual_isConn_of_isEt
+    (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (G : PDivGroup p k)
+    : G.IsEt → G.dual.IsConn := by
   intro hG n χ hχ
   have : IsReduced (G.A n) := hG n
   have hp : (p : k) = 0 := CharP.cast_eq_zero k p
@@ -35,8 +37,9 @@ theorem PDivGroup.dual_isConn_of_isEt (p : ℕ) [Fact p.Prime] (k : Type) [Field
   apply CartierDual.ext_apply
   intro a
   obtain ⟨b, rfl⟩ := roots n a
-  rw [GlobalTheory.T.cartierDual_convPow_primePow_apply_pow p k hp G n n χ b, PDivGroup.mulBy_pow_self, Algebra.algebraMap_eq_smul_one,
-    map_smul, h1, smul_zero, zero_pow (pow_ne_zero _ (Fact.out : p.Prime).ne_zero)]
+  rw [GlobalTheory.T.cartierDual_convPow_primePow_apply_pow p k hp G n n χ b,
+    PDivGroup.mulBy_pow_self, Algebra.algebraMap_eq_smul_one, map_smul, h1, smul_zero,
+    zero_pow (pow_ne_zero _ (Fact.out : p.Prime).ne_zero)]
   rfl
 
 end GlobalTheory

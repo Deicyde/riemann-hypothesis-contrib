@@ -33,7 +33,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemMaxCompac
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -65,8 +66,8 @@ end Generic
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem locEl_eventually_mem (n : ℕ) (δ : GL (Fin n) E) :
-    ∀ᶠ w : Pl E in cofinite, locEl n w δ ∈ GlobalTheory.LFun.KGL w (n := n) := by
+theorem locEl_eventually_mem (n : ℕ) (δ : GL (Fin n) E)
+    : ∀ᶠ w : Pl E in cofinite, locEl n w δ ∈ GlobalTheory.LFun.KGL w (n := n) := by
   filter_upwards [UnitStable.eventually_mem_KGL δ, UnitStable.eventually_mem_KGL (δ * thE E n δ)] with w h1 h2
   unfold locEl
   split_ifs

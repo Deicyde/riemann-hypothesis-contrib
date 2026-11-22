@@ -10,9 +10,13 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G MvPolynomial Formalism.MainNotions.LemmaBAlt
 
-theorem psiRes0_ne {X : Loc} [Fact X.p.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Algebra (WF X.p X.n') O] (S : UniformizedDVR X.p O) (g : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n'))
-    (a : Fin (X.m + 1)) (h : WittVector.constantCoeff (g⁻¹ 0 a) ≠ 0) : psiRes0 X O S.w g a ≠ 0 := by
+theorem psiRes0_ne
+    {X : Loc} [Fact X.p.Prime]
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra (WF X.p X.n') O]
+    (S : UniformizedDVR X.p O)
+    (g : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n')) (a : Fin (X.m + 1))
+    (h : WittVector.constantCoeff (g⁻¹ 0 a) ≠ 0)
+    : psiRes0 X O S.w g a ≠ 0 := by
   intro h0
   unfold psiRes0 at h0
   rw [Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton] at h0
@@ -46,12 +50,15 @@ theorem resLineAt : ResLineAt := by
       have hwp : S.w ∣ (X.p : O) := by
         have h1 := S.p_mem
         rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer S.w).mp S.w_irr,
-          Ideal.mem_span_singleton] at h1
+            Ideal.mem_span_singleton]
+          at h1
         exact h1
       exact Dvd.dvd.mul_right (dvd_pow hwp hm) _
-  have hset : ∀ h : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n'),
-      ratPlane X.p X.n' 1 h =
-        Submodule.span (GaloisField X.p X.n') {fun c => WittVector.constantCoeff (h⁻¹ 0 c)} := by
+  have hset
+      : ∀ h : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n'),
+        ratPlane X.p X.n' 1 h
+          = Submodule.span (GaloisField X.p X.n')
+            {fun c => WittVector.constantCoeff (h⁻¹ 0 c)} := by
     intro h
     unfold ratPlane
     congr 1
@@ -64,8 +71,11 @@ theorem resLineAt : ResLineAt := by
     · rintro rfl
       exact ⟨0, by simp, rfl⟩
   rw [hset g, hset 1, inv_one]
-  have hv : (fun c => WittVector.constantCoeff (g⁻¹ 0 c)) = WittVector.constantCoeff (g⁻¹ 0 0) •
-      (fun c => WittVector.constantCoeff ((1 : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n')) 0 c)) := by
+  have hv
+      : (fun c => WittVector.constantCoeff (g⁻¹ 0 c))
+        = WittVector.constantCoeff (g⁻¹ 0 0) • (fun c =>
+          WittVector.constantCoeff
+            ((1 : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n')) 0 c)) := by
     funext c
     refine Fin.cases ?_ (fun c' => ?_) c
     · simp

@@ -4,7 +4,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfFora
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 namespace GlobalTheory.QLog.ValLin
 
@@ -15,7 +17,17 @@ lemma eval_map_hom {σ Q Q' : Type} [CommRing Q] [CommRing Q'] (R : Q →+* Q') 
   show R (MvPolynomial.eval₂ (RingHom.id Q) x P) = _
   rw [MvPolynomial.hom_eval₂, RingHom.comp_id]
 
-theorem hasVal_add_smul_map : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing B] [CommRing Q] [CommRing O] [Algebra B Q] (θ : B →+* O), IsFrame p Q θ → ∀ (σ : Type) [Fintype σ] [DecidableEq σ] (z : σ → B) (f g : MvPowerSeries σ Q) (q r : Q), HasVal p z f q → (HasVal p z g r → HasVal p z (f + g) (q + r)) ∧ (∀ c : Q, HasVal p z (c • f) (c * q)) ∧ ∀ (B' Q' : Type) [CommRing B'] [CommRing Q'] [Algebra B' Q'] (ρ : B →+* B') (R : Q →+* Q'), (∀ b, R (algebraMap B Q b) = algebraMap B' Q' (ρ b)) → HasVal p (fun i => ρ (z i)) (map R f) (R q) := by
+theorem hasVal_add_smul_map
+    : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing B] [CommRing Q] [CommRing O] [Algebra B Q]
+        (θ : B →+* O),
+      IsFrame p Q θ
+        → ∀ (σ : Type) [Fintype σ] [DecidableEq σ] (z : σ → B) (f g : MvPowerSeries σ Q) (q r : Q),
+          HasVal p z f q
+            → (HasVal p z g r → HasVal p z (f + g) (q + r)) ∧ (∀ c : Q, HasVal p z (c • f) (c * q))
+              ∧ ∀ (B' Q' : Type) [CommRing B'] [CommRing Q'] [Algebra B' Q'] (ρ : B →+* B')
+                  (R : Q →+* Q'),
+                (∀ b, R (algebraMap B Q b) = algebraMap B' Q' (ρ b))
+                  → HasVal p (fun i => ρ (z i)) (map R f) (R q) := by
   intro p _ B O Q _ _ _ _ θ hF σ _ _ z f g q r hf
   refine ⟨?_, ?_, ?_⟩
   · intro hg m
@@ -34,9 +46,13 @@ theorem hasVal_add_smul_map : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommR
     obtain ⟨b, hb⟩ := h N' hN
     refine ⟨b₀ * b, ?_⟩
     rw [map_smul, MvPolynomial.smul_eval]
-    have e : c * q - c * MvPolynomial.eval (fun i => algebraMap B Q (z i))
-        (trunc' Q (Finsupp.equivFunOnFinite.symm fun _ => N') f)
-        = c * algebraMap B Q (p ^ (m + k) * b) := by rw [← hb]; ring
+    have e
+        : c * q
+            - c * MvPolynomial.eval
+              (fun i => algebraMap B Q (z i))
+              (trunc' Q (Finsupp.equivFunOnFinite.symm fun _ => N') f)
+          = c * algebraMap B Q (p ^ (m + k) * b) := by
+      rw [← hb]; ring
     rw [e]
     simp only [map_mul, map_pow, map_natCast] at hk ⊢
     rw [← hk]

@@ -10,15 +10,15 @@ namespace GroundTheory.Arith.Toric
 
 variable {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
 
-
 omit [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] in
-theorem smul_mk_eq_zero_iff {b r y : A} :
-    r • (Ideal.Quotient.mk (Ideal.span {b}) y) = 0 ↔ b ∣ r * y := by
+theorem smul_mk_eq_zero_iff {b r y : A}
+    : r • (Ideal.Quotient.mk (Ideal.span {b}) y) = 0 ↔ b ∣ r * y := by
   rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul, Ideal.Quotient.eq_zero_iff_mem,
     Ideal.mem_span_singleton]
 
-theorem height_eq_one_of_isAssociatedPrime {b : A} (hb : b ≠ 0) {P : Ideal A}
-    (hP : IsAssociatedPrime P (A ⧸ Ideal.span {b})) : P.height = 1 := by
+theorem height_eq_one_of_isAssociatedPrime
+    {b : A} (hb : b ≠ 0) {P : Ideal A} (hP : IsAssociatedPrime P (A ⧸ Ideal.span {b}))
+    : P.height = 1 := by
   classical
   obtain ⟨hPp, yb, hPy⟩ := isAssociatedPrime_iff.1 hP
   obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective yb
@@ -63,7 +63,9 @@ theorem height_eq_one_of_isAssociatedPrime {b : A} (hb : b ≠ 0) {P : Ideal A}
       obtain ⟨s, hs⟩ := (hmem r).1 hr
       have key : r * s₀ = r₀ * s := by
         apply mul_left_cancel₀ hb
-        calc b * (r * s₀) = r * (b * s₀) := by ring
+        calc
+          b * (r * s₀)
+            = r * (b * s₀) := by ring
           _ = r * (r₀ * y) := by rw [hrs]
           _ = r₀ * (r * y) := by ring
           _ = b * (r₀ * s) := by rw [hs]; ring
@@ -75,10 +77,12 @@ theorem height_eq_one_of_isAssociatedPrime {b : A} (hb : b ≠ 0) {P : Ideal A}
     have hne : P.height ≠ 0 := fun h => hP0 (Ideal.height_eq_zero_iff_eq_bot.1 h)
     exact le_antisymm hle (Order.one_le_iff_ne_zero.2 hne)
 
-theorem mem_range_of_forall_height_one {K : Type*} [Field K] [Algebra A K] [IsFractionRing A K]
-    (x : K) (h : ∀ p : Ideal A, p.IsPrime → p.height = 1 →
-      ∃ a s : A, s ∉ p ∧ x * algebraMap A K s = algebraMap A K a) :
-    x ∈ (algebraMap A K).range := by
+theorem mem_range_of_forall_height_one
+    {K : Type*} [Field K] [Algebra A K] [IsFractionRing A K]
+    (x : K)
+    (h : ∀ p : Ideal A,
+      p.IsPrime → p.height = 1 → ∃ a s : A, s ∉ p ∧ x * algebraMap A K s = algebraMap A K a)
+    : x ∈ (algebraMap A K).range := by
   classical
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := A) x
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb

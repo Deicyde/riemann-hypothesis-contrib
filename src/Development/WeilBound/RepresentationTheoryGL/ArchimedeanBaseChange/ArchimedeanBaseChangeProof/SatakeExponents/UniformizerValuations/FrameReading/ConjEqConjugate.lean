@@ -15,8 +15,8 @@ open PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.SpectralAccumulation
 
 namespace RegH
 
-theorem conj_ne {E : Type} [Field E] [NumberField E] [IsCMField E] (τ : E →+* ℂ) :
-    (starRingEnd ℂ).comp τ ≠ τ := by
+theorem conj_ne {E : Type} [Field E] [NumberField E] [IsCMField E] (τ : E →+* ℂ)
+    : (starRingEnd ℂ).comp τ ≠ τ := by
   intro h
   have hc : (InfinitePlace.mk τ).IsComplex := IsTotallyComplex.isComplex _
   rw [InfinitePlace.isComplex_iff] at hc
@@ -28,16 +28,17 @@ theorem conj_ne {E : Type} [Field E] [NumberField E] [IsCMField E] (τ : E →+*
   · rw [e]; exact hr
   · rw [e, ComplexEmbedding.isReal_iff.1 hr]; exact hr
 
-theorem conj_eq_conjugate {E : Type} [Field E] (τ : E →+* ℂ) :
-    (starRingEnd ℂ).comp τ = ComplexEmbedding.conjugate τ := RingHom.ext fun _ => rfl
+theorem conj_eq_conjugate {E : Type} [Field E] (τ : E →+* ℂ)
+    : (starRingEnd ℂ).comp τ = ComplexEmbedding.conjugate τ :=
+  RingHom.ext fun _ => rfl
 
-theorem mk_conj {E : Type} [Field E] [NumberField E] (τ : E →+* ℂ) :
-    InfinitePlace.mk ((starRingEnd ℂ).comp τ) = InfinitePlace.mk τ := by
+theorem mk_conj {E : Type} [Field E] [NumberField E] (τ : E →+* ℂ)
+    : InfinitePlace.mk ((starRingEnd ℂ).comp τ) = InfinitePlace.mk τ := by
   rw [conj_eq_conjugate, InfinitePlace.mk_conjugate_eq]
 
-theorem dec_conj {E : Type} [Field E] [NumberField E] [IsCMField E] (τ : E →+* ℂ) :
-    decide ((starRingEnd ℂ).comp τ = (InfinitePlace.mk ((starRingEnd ℂ).comp τ)).embedding) =
-      !decide (τ = (InfinitePlace.mk τ).embedding) := by
+theorem dec_conj {E : Type} [Field E] [NumberField E] [IsCMField E] (τ : E →+* ℂ)
+    : decide ((starRingEnd ℂ).comp τ = (InfinitePlace.mk ((starRingEnd ℂ).comp τ)).embedding)
+      = ! decide (τ = (InfinitePlace.mk τ).embedding) := by
   rw [mk_conj]
   have hne := conj_ne τ
   rcases InfinitePlace.embedding_mk_eq τ with e | e
@@ -47,24 +48,30 @@ theorem dec_conj {E : Type} [Field E] [NumberField E] [IsCMField E] (τ : E →+
     have : τ ≠ (starRingEnd ℂ).comp τ := fun h => hne h.symm
     simp [this]
 
-theorem infOf_not {n : ℕ} (lam : Fin n → ℤ) (s : Bool) (a : Fin n) :
-    PositivityTheory.RgBcC.infOf lam (!s) a = -PositivityTheory.RgBcC.infOf lam s a := by
+theorem infOf_not {n : ℕ} (lam : Fin n → ℤ) (s : Bool) (a : Fin n)
+    : PositivityTheory.RgBcC.infOf lam (!s) a = - PositivityTheory.RgBcC.infOf lam s a := by
   cases s <;> simp [PositivityTheory.RgBcC.infOf]
 
-theorem infOf_im {n : ℕ} (lam : Fin n → ℤ) (s : Bool) (a : Fin n) : (PositivityTheory.RgBcC.infOf lam s a).im = 0 := by
+theorem infOf_im {n : ℕ} (lam : Fin n → ℤ) (s : Bool) (a : Fin n)
+    : (PositivityTheory.RgBcC.infOf lam s a).im = 0 := by
   cases s <;> simp [PositivityTheory.RgBcC.infOf]
 
-theorem infOf_sep {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam) (s : Bool) (a b : Fin n) (hab : a ≠ b) :
-    (1 : ℝ) ≤ ‖PositivityTheory.RgBcC.infOf lam s a - PositivityTheory.RgBcC.infOf lam s b‖ := by
-  have key : ∀ a b : Fin n, a < b → (1 : ℝ) ≤ ((lam a : ℝ) - (a : ℕ)) - ((lam b : ℝ) - (b : ℕ)) := by
+theorem infOf_sep
+    {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam) (s : Bool) (a b : Fin n) (hab : a ≠ b)
+    : (1 : ℝ) ≤ ‖PositivityTheory.RgBcC.infOf lam s a - PositivityTheory.RgBcC.infOf lam s b‖ := by
+  have key
+      : ∀ a b : Fin n, a < b → (1 : ℝ) ≤ ((lam a : ℝ) - (a : ℕ)) - ((lam b : ℝ) - (b : ℕ)) := by
     intro a b h
     have h1 : lam b ≤ lam a := hl h.le
     have h2 : (a : ℕ) + 1 ≤ (b : ℕ) := h
     have h1' : (lam b : ℝ) ≤ lam a := by exact_mod_cast h1
     have h2' : ((a : ℕ) : ℝ) + 1 ≤ (b : ℕ) := by exact_mod_cast h2
     linarith
-  have e : ∀ a b : Fin n, PositivityTheory.RgBcC.infOf lam s a - PositivityTheory.RgBcC.infOf lam s b =
-      ((if s then 1 else -1 : ℂ)) * ((((lam a : ℝ) - (a : ℕ)) - ((lam b : ℝ) - (b : ℕ)) : ℝ) : ℂ) := by
+  have e
+      : ∀ a b : Fin n,
+        PositivityTheory.RgBcC.infOf lam s a - PositivityTheory.RgBcC.infOf lam s b
+          = ((if s then 1 else -1 : ℂ))
+            * ((((lam a : ℝ) - (a : ℕ)) - ((lam b : ℝ) - (b : ℕ)) : ℝ) : ℂ) := by
     intro a b
     simp only [PositivityTheory.RgBcC.infOf]
     push_cast
@@ -77,8 +84,8 @@ theorem infOf_sep {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam) (s : Bool)
     have := key b a h
     exact le_abs.mpr (Or.inr (by linarith))
 
-theorem infOf_inj {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam) (s : Bool) :
-    Function.Injective (PositivityTheory.RgBcC.infOf lam s) := by
+theorem infOf_inj {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam) (s : Bool)
+    : Function.Injective (PositivityTheory.RgBcC.infOf lam s) := by
   intro a b h
   by_contra hab
   have := infOf_sep lam hl s a b hab
@@ -97,8 +104,11 @@ theorem regDom : RegDom := by
     obtain ⟨a, -, rfl⟩ := hx
     exact infOf_im _ _ _
   · simp only [mOf]
-    rw [mk_conj, show decide ((starRingEnd ℂ).comp τ = (InfinitePlace.mk τ).embedding) =
-        !decide (τ = (InfinitePlace.mk τ).embedding) from by rw [← dec_conj τ, mk_conj], Multiset.map_map]
+    rw [mk_conj,
+      show decide ((starRingEnd ℂ).comp τ = (InfinitePlace.mk τ).embedding)
+          = ! decide (τ = (InfinitePlace.mk τ).embedding) from by
+        rw [← dec_conj τ, mk_conj],
+      Multiset.map_map]
     congr 1
     funext a
     exact infOf_not _ _ _

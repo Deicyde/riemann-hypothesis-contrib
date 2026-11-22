@@ -14,7 +14,9 @@ public import Development.AutomorphicSpectrum.Proofs.NonGaloisProofs.ExistsDualL
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
 
 noncomputable section
 
@@ -22,12 +24,15 @@ namespace GlobalTheory.CompanionTheory.LocDual.Top
 
 section Hom
 
-variable {O LL : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field LL] [Algebra O LL]
+variable
+  {O LL : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field LL] [Algebra O LL]
   [IsFractionRing O LL]
 
-theorem exists_mul_of_linear (T : Submodule O LL) (hT : T = LinearMap.range (Algebra.linearMap O LL))
-    {ϖ : O} (hϖ : Irreducible ϖ) (hc : IsAdicComplete (Ideal.span {ϖ}) O) (ψ : LL →ₗ[O] LL ⧸ T) :
-    ∃ u : LL, ∀ a, ψ a = Submodule.Quotient.mk (a * u) := by
+theorem exists_mul_of_linear
+    (T : Submodule O LL) (hT : T = LinearMap.range (Algebra.linearMap O LL))
+    {ϖ : O} (hϖ : Irreducible ϖ) (hc : IsAdicComplete (Ideal.span {ϖ}) O)
+    (ψ : LL →ₗ[O] LL ⧸ T)
+    : ∃ u : LL, ∀ a, ψ a = Submodule.Quotient.mk (a * u) := by
   obtain ⟨p, hp⟩ : ∃ p : LL, p = algebraMap O LL ϖ := ⟨_, rfl⟩
   have hp0 : p ≠ 0 := fun h => hϖ.ne_zero (IsFractionRing.injective O LL (by simpa [hp] using h))
   have hmem : ∀ x : LL, x ∈ T ↔ ∃ o : O, algebraMap O LL o = x := by
@@ -38,8 +43,9 @@ theorem exists_mul_of_linear (T : Submodule O LL) (hT : T = LinearMap.range (Alg
   have step : ∀ n, ∃ o : O, algebraMap O LL o = p * u (n + 1) - u n := by
     intro n
     rw [← hmem, ← Submodule.Quotient.eq]
-    have h1 : (Submodule.Quotient.mk (p * u (n + 1)) : LL ⧸ T) =
-        ϖ • Submodule.Quotient.mk (u (n + 1)) := by
+    have h1
+        : (Submodule.Quotient.mk (p * u (n + 1)) : LL ⧸ T)
+          = ϖ • Submodule.Quotient.mk (u (n + 1)) := by
       rw [← Submodule.Quotient.mk_smul, Algebra.smul_def, hp]
     rw [h1, hu, hu, ← map_smul, Algebra.smul_def, ← hp]
     congr 1
@@ -74,7 +80,8 @@ theorem exists_mul_of_linear (T : Submodule O LL) (hT : T = LinearMap.range (Alg
       exact dvd_sub ih (Dvd.dvd.mul_right (pow_dvd_pow _ hmn) _)
   obtain ⟨Y, hY⟩ := IsPrecomplete.prec hc.toIsPrecomplete hcauchy
   refine ⟨u 0 + algebraMap O LL Y, ?_⟩
-  have hpow : ∀ n, ψ ((p⁻¹) ^ n) = Submodule.Quotient.mk ((p⁻¹) ^ n * (u 0 + algebraMap O LL Y)) := by
+  have hpow
+      : ∀ n, ψ ((p⁻¹) ^ n) = Submodule.Quotient.mk ((p⁻¹) ^ n * (u 0 + algebraMap O LL Y)) := by
     intro n
     rw [← hu, Submodule.Quotient.eq, hmem]
     have h4 := hY n
@@ -86,7 +93,8 @@ theorem exists_mul_of_linear (T : Submodule O LL) (hT : T = LinearMap.range (Alg
     have h6 : u n = (p⁻¹) ^ n * (u 0 + algebraMap O LL (y n)) := by
       rw [← hy, ← mul_assoc, ← mul_pow, inv_mul_cancel₀ hp0, one_pow, one_mul]
     rw [h6, ← mul_sub]
-    have h7 : u 0 + algebraMap O LL (y n) - (u 0 + algebraMap O LL Y) = p ^ n * algebraMap O LL t := by
+    have h7
+        : u 0 + algebraMap O LL (y n) - (u 0 + algebraMap O LL Y) = p ^ n * algebraMap O LL t := by
       rw [← h5]
       ring
     rw [h7, ← mul_assoc, ← mul_pow, inv_mul_cancel₀ hp0, one_pow, one_mul]
@@ -94,7 +102,8 @@ theorem exists_mul_of_linear (T : Submodule O LL) (hT : T = LinearMap.range (Alg
   obtain ⟨x, w, hw, rfl⟩ := IsFractionRing.div_surjective (A := O) a
   have hw0 : w ≠ 0 := nonZeroDivisors.ne_zero hw
   obtain ⟨n, e, he⟩ := IsDiscreteValuationRing.associated_pow_irreducible hw0 hϖ
-  have hw1 : algebraMap O LL w ≠ 0 := fun h => hw0 (IsFractionRing.injective O LL (by simpa using h))
+  have hw1 : algebraMap O LL w ≠ 0 := fun h =>
+    hw0 (IsFractionRing.injective O LL (by simpa using h))
   have ha : algebraMap O LL x / algebraMap O LL w = (x * e) • (p⁻¹) ^ n := by
     rw [Algebra.smul_def, map_mul, div_eq_iff hw1]
     have h8 : p ^ n = algebraMap O LL w * algebraMap O LL (e : O) := by
@@ -104,19 +113,22 @@ theorem exists_mul_of_linear (T : Submodule O LL) (hT : T = LinearMap.range (Alg
     field_simp
     rw [h8]
     ring
-  rw [ha, map_smul, hpow, ← Submodule.Quotient.mk_smul, Algebra.smul_def, Algebra.smul_def, mul_assoc]
+  rw [ha, map_smul, hpow, ← Submodule.Quotient.mk_smul, Algebra.smul_def, Algebra.smul_def,
+    mul_assoc]
 
 end Hom
 
 section Red
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR}
-    {LL : Type} [Field LL] [Algebra Qp LL] {O : Type} [CommRing O] [Algebra O LL]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL]
 
 def red (L1 : Lattice (O := O) (charRep (cycLL PD LL))) : (G × G → LL) →ₗ[O] (G × G → LL ⧸ L1.T) :=
   LinearMap.compLeft L1.T.mkQ (G × G)
@@ -124,19 +136,23 @@ def red (L1 : Lattice (O := O) (charRep (cycLL PD LL))) : (G × G → LL) →ₗ
 def Zc (L1 : Lattice (O := O) (charRep (cycLL PD LL))) : Submodule O (G × G → LL) :=
   (ReciprocityTheory.Def.Z2 (repD L1) ⊤).comap (red L1)
 
-def cls (L1 : Lattice (O := O) (charRep (cycLL PD LL))) : Zc L1 →ₗ[O] ReciprocityTheory.Def.H2 (repD L1) ⊤ :=
-  (Submodule.mkQ _) ∘ₗ ((red L1).restrict (q := ReciprocityTheory.Def.Z2 (repD L1) ⊤) (fun _ h => h))
+def cls (L1 : Lattice (O := O) (charRep (cycLL PD LL)))
+    : Zc L1 →ₗ[O] ReciprocityTheory.Def.H2 (repD L1) ⊤ :=
+  (Submodule.mkQ _)
+    ∘ₗ ((red L1).restrict (q := ReciprocityTheory.Def.Z2 (repD L1) ⊤) (fun _ h => h))
 
-theorem cls_eq_zero_iff (L1 : Lattice (O := O) (charRep (cycLL PD LL))) (w : Zc L1) :
-    cls L1 w = 0 ↔ CobO PD L1 (w : G × G → LL) := by
+theorem cls_eq_zero_iff (L1 : Lattice (O := O) (charRep (cycLL PD LL))) (w : Zc L1)
+    : cls L1 w = 0 ↔ CobO PD L1 (w : G × G → LL) := by
   simp only [cls, LinearMap.comp_apply, Submodule.mkQ_apply]
   rw [Submodule.Quotient.mk_eq_zero]
   rfl
 
-theorem mem_Zc [TopologicalSpace LL] [IsTopologicalRing LL]
-    (L1 : Lattice (O := O) (charRep (cycLL PD LL)))
-    (hop : IsOpen (L1.T : Set LL)) {z : G × G → LL} (hz : Continuous z)
-    (hd : ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) z = 0) : z ∈ Zc L1 := by
+theorem mem_Zc
+    [TopologicalSpace LL] [IsTopologicalRing LL]
+    (L1 : Lattice (O := O) (charRep (cycLL PD LL))) (hop : IsOpen (L1.T : Set LL))
+    {z : G × G → LL}
+    (hz : Continuous z) (hd : ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) z = 0)
+    : z ∈ Zc L1 := by
   refine ⟨⟨?_, fun _ => trivial⟩, ?_⟩
   · intro s
     have h1 : IsOpen ((Submodule.Quotient.mk : LL → LL ⧸ L1.T) ⁻¹' s) := by
@@ -151,35 +167,46 @@ theorem mem_Zc [TopologicalSpace LL] [IsTopologicalRing LL]
     exact h1.preimage hz
   · ext x
     have h3 := congrFun hd x
-    have h4 : (Submodule.Quotient.mk (ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) z x) : LL ⧸ L1.T) = 0 := by
+    have h4
+        : (Submodule.Quotient.mk (ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) z x) : LL ⧸ L1.T)
+          = 0 := by
       rw [h3]
       simp
     exact h4
 
-theorem topLine_at [TopologicalSpace LL] [IsTopologicalRing LL] [IsDomain O] [IsDiscreteValuationRing O]
-    [IsFractionRing O LL] (L1 : Lattice (O := O) (charRep (cycLL PD LL)))
+theorem topLine_at
+    [TopologicalSpace LL] [IsTopologicalRing LL] [IsDomain O] [IsDiscreteValuationRing O]
+    [IsFractionRing O LL]
+    (L1 : Lattice (O := O) (charRep (cycLL PD LL)))
     (hT : L1.T = LinearMap.range (Algebra.linearMap O LL)) (hop : IsOpen (L1.T : Set LL))
     {ϖ : O} (hϖ : Irreducible ϖ) (hc : IsAdicComplete (Ideal.span {ϖ}) O)
     (φ : ReciprocityTheory.Def.H2 (repD L1) ⊤ ≃ₗ[O] (LL ⧸ L1.T))
     (hC : ∀ z : G × G → LL, Continuous z → (CobL PD z ↔ ∀ a : LL, CobO PD L1 (a • z)))
     {z z' : G × G → LL} (hz : Continuous z) (hz' : Continuous z')
     (hd : ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) z = 0)
-    (hd' : ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) z' = 0) (hn : ¬ CobL PD z) :
-    ∃ a : LL, CobL PD (z' - a • z) := by
-  have hsm : ∀ {w : G × G → LL}, Continuous w → ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) w = 0 →
-      ∀ a : LL, a • w ∈ Zc L1 := by
+    (hd' : ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) z' = 0) (hn : ¬ CobL PD z)
+    : ∃ a : LL, CobL PD (z' - a • z) := by
+  have hsm
+      : ∀ {w : G × G → LL},
+        Continuous w → ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) w = 0
+          → ∀ a : LL, a • w ∈ Zc L1 := by
     intro w hw hdw a
     refine mem_Zc L1 hop (hw.const_smul a) ?_
     rw [map_smul, hdw, smul_zero]
-  have key : ∀ {w : G × G → LL} (hw : Continuous w) (hdw : ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) w = 0),
-      ∃ u : LL, ∀ a : LL, φ (cls L1 ⟨a • w, hsm hw hdw a⟩) = Submodule.Quotient.mk (a * u) := by
+  have key
+      : ∀ {w : G × G → LL} (hw : Continuous w)
+          (hdw : ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) w = 0),
+        ∃ u : LL, ∀ a : LL,
+          φ (cls L1 ⟨a • w, hsm hw hdw a⟩) = Submodule.Quotient.mk (a * u) := by
     intro w hw hdw
-    let ι : LL →ₗ[O] Zc L1 :=
-      { toFun := fun a => ⟨a • w, hsm hw hdw a⟩
-        map_add' := fun a b => Subtype.ext (add_smul a b w)
-        map_smul' := fun r a => Subtype.ext (by
+    let ι : LL →ₗ[O] Zc L1 := {
+      toFun := fun a => ⟨a • w, hsm hw hdw a⟩
+      map_add' := fun a b => Subtype.ext (add_smul a b w)
+      map_smul' := fun r a =>
+        Subtype.ext (by
           ext x
-          simp [Algebra.smul_def, mul_assoc]) }
+          simp [Algebra.smul_def, mul_assoc])
+    }
     exact exists_mul_of_linear L1.T hT hϖ hc ((φ.toLinearMap ∘ₗ cls L1) ∘ₗ ι)
   obtain ⟨u, hu⟩ := key hz hd
   obtain ⟨u', hu'⟩ := key hz' hd'
@@ -197,8 +224,9 @@ theorem topLine_at [TopologicalSpace LL] [IsTopologicalRing LL] [IsDomain O] [Is
     rw [map_sub, map_smul, hd, hd', smul_zero, sub_zero]
   rw [hC _ hwc]
   intro b
-  have h2 : (⟨b • (z' - (u' / u) • z), hsm hwc hdw b⟩ : Zc L1) =
-      ⟨b • z', hsm hz' hd' b⟩ - ⟨(b * (u' / u)) • z, hsm hz hd _⟩ := by
+  have h2
+      : (⟨b • (z' - (u' / u) • z), hsm hwc hdw b⟩ : Zc L1)
+        = ⟨b • z', hsm hz' hd' b⟩ - ⟨(b * (u' / u)) • z, hsm hz hd _⟩ := by
     apply Subtype.ext
     simp [smul_sub, mul_smul]
   have h3 : φ (cls L1 ⟨b • (z' - (u' / u) • z), hsm hwc hdw b⟩) = 0 := by

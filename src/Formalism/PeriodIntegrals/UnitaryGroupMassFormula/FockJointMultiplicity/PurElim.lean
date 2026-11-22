@@ -13,7 +13,8 @@ namespace PI.FJMB
 variable {σ : Type*}
 
 def HWB {m n : ℕ} (ι : Fin m × Fin n → σ) (f : MvPolynomial σ ℂ) : Prop :=
-  (∀ a b : Fin m, a < b → PI.FJM.bRow ι a b f = 0) ∧ (∀ c d : Fin n, c < d → PI.FJM.bCol ι c d f = 0)
+  (∀ a b : Fin m, a < b → PI.FJM.bRow ι a b f = 0)
+    ∧ (∀ c d : Fin n, c < d → PI.FJM.bCol ι c d f = 0)
 
 def offD {m n : ℕ} (ι : Fin m × Fin n → σ) : Set σ := {v | ∃ i k, ι (i, k) = v ∧ (i : ℕ) ≠ k}
 
@@ -22,8 +23,10 @@ def killS (S : Set σ) : σ → MvPolynomial σ ℂ := fun v => if v ∈ S then 
 def edge {m n : ℕ} (ι : Fin (m + 1) × Fin (n + 1) → σ) : Set σ :=
   {v | (∃ l : Fin n, ι (0, l.succ) = v) ∨ (∃ j : Fin m, ι (j.succ, 0) = v)}
 
-theorem aeval_aeval' {K : Type*} [CommRing K] [Algebra ℂ K] (g : σ → K) (φ : σ → MvPolynomial σ ℂ)
-    (f : MvPolynomial σ ℂ) : aeval g (aeval φ f) = aeval (fun v => aeval g (φ v)) f := by
+theorem aeval_aeval'
+    {K : Type*} [CommRing K] [Algebra ℂ K]
+    (g : σ → K) (φ : σ → MvPolynomial σ ℂ) (f : MvPolynomial σ ℂ)
+    : aeval g (aeval φ f) = aeval (fun v => aeval g (φ v)) f := by
   induction f using MvPolynomial.induction_on with
   | C a => simp
   | add f h hf hh => simp only [map_add (f := _), hf, hh]
@@ -33,8 +36,8 @@ theorem aeval_killS_empty (f : MvPolynomial σ ℂ) : aeval (killS (∅ : Set σ
   have : killS (∅ : Set σ) = X := by funext v; simp [killS]
   rw [this, aeval_X_left_apply]
 
-theorem aeval_killS_union (S T : Set σ) (f : MvPolynomial σ ℂ) :
-    aeval (killS S) (aeval (killS T) f) = aeval (killS (S ∪ T)) f := by
+theorem aeval_killS_union (S T : Set σ) (f : MvPolynomial σ ℂ)
+    : aeval (killS S) (aeval (killS T) f) = aeval (killS (S ∪ T)) f := by
   rw [aeval_aeval']
   congr 2
   funext v
@@ -42,16 +45,22 @@ theorem aeval_killS_union (S T : Set σ) (f : MvPolynomial σ ℂ) :
   · simp [killS, hT]
   · by_cases hS : v ∈ S <;> simp [killS, hT, hS]
 
-theorem pderiv_aeval_killS (S : Set σ) (w : σ) (hw : w ∉ S) (f : MvPolynomial σ ℂ) :
-    pderiv w (aeval (killS S) f) = aeval (killS S) (pderiv w f) := by
-  have h := deriv_aeval (R := ℂ) (pderiv w) (killS S) {w} (fun v hv => by
-    have hv' : v ≠ w := by simpa using hv
-    by_cases h : v ∈ S <;> simp [killS, h, pderiv_X_of_ne hv']) f
+theorem pderiv_aeval_killS (S : Set σ) (w : σ) (hw : w ∉ S) (f : MvPolynomial σ ℂ)
+    : pderiv w (aeval (killS S) f) = aeval (killS S) (pderiv w f) := by
+  have h :=
+    deriv_aeval (R := ℂ) (pderiv w) (killS S) {w}
+      (fun v hv => by
+        have hv' : v ≠ w := by simpa using hv
+        by_cases h : v ∈ S <;> simp [killS, h, pderiv_X_of_ne hv'])
+      f
   rw [h]
   simp [killS, hw]
 
-theorem aeval_killS_of_zero {K : Type*} [CommRing K] [Algebra ℂ K] (S : Set σ) (y : σ → K)
-    (hy : ∀ v ∈ S, y v = 0) (f : MvPolynomial σ ℂ) : aeval y (aeval (killS S) f) = aeval y f := by
+theorem aeval_killS_of_zero
+    {K : Type*} [CommRing K] [Algebra ℂ K]
+    (S : Set σ) (y : σ → K) (hy : ∀ v ∈ S, y v = 0)
+    (f : MvPolynomial σ ℂ)
+    : aeval y (aeval (killS S) f) = aeval y f := by
   rw [aeval_aeval']
   congr 2
   funext v
@@ -69,8 +78,8 @@ theorem edge_succ_succ (i : Fin m) (k : Fin n) : ι (i.succ, k.succ) ∉ edge ι
   · have := hι hl; simp at this; exact Fin.succ_ne_zero _ this.1.symm
   · have := hι hj; simp at this; exact Fin.succ_ne_zero _ this.2.symm
 
-theorem hwb_restrict (f : MvPolynomial σ ℂ) (hf : HWB ι f) :
-    HWB (fun x : Fin m × Fin n => ι (x.1.succ, x.2.succ)) (aeval (killS (edge ι)) f) := by
+theorem hwb_restrict (f : MvPolynomial σ ℂ) (hf : HWB ι f)
+    : HWB (fun x : Fin m × Fin n => ι (x.1.succ, x.2.succ)) (aeval (killS (edge ι)) f) := by
   constructor
   · intro a b hab
     rw [bRow_apply]

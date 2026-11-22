@@ -9,14 +9,15 @@ noncomputable section
 
 namespace PI.LocMassTypU
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol MeasureTheory NumberField IsDedekindDomain
-  Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol MeasureTheory NumberField IsDedekindDomain Topology
 open scoped TensorProduct
 open PI.LocMassTypW
 
 section Oev
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F))
 
 theorem sc_mul_eq_smul (x : Fv F v) (y : Fv F v ⊗[F] E) : sc (E := E) v x * y = x • y := by
@@ -26,12 +27,14 @@ theorem sc_mul_eq_smul (x : Fv F v) (y : Fv F v ⊗[F] E) : sc (E := E) v x * y 
 theorem sc_mul_sc (x y : Fv F v) : sc (E := E) v x * sc (E := E) v y = sc (E := E) v (x * y) := by
   simp [sc, Algebra.TensorProduct.tmul_mul_tmul]
 
-theorem oev_smul {c : Fv F v} (hc : c ∈ v.adicCompletionIntegers F) {x : Fv F v ⊗[F] E}
-    (hx : x ∈ OEv (E := E) v) : c • x ∈ OEv (E := E) v :=
+theorem oev_smul
+    {c : Fv F v} (hc : c ∈ v.adicCompletionIntegers F) {x : Fv F v ⊗[F] E} (hx : x ∈ OEv (E := E) v)
+    : c • x ∈ OEv (E := E) v :=
   Submodule.smul_mem _ (⟨c, hc⟩ : v.adicCompletionIntegers F) hx
 
-theorem oev_add {x y : Fv F v ⊗[F] E} (hx : x ∈ OEv (E := E) v) (hy : y ∈ OEv (E := E) v) :
-    x + y ∈ OEv (E := E) v := Submodule.add_mem _ hx hy
+theorem oev_add {x y : Fv F v ⊗[F] E} (hx : x ∈ OEv (E := E) v) (hy : y ∈ OEv (E := E) v)
+    : x + y ∈ OEv (E := E) v :=
+  Submodule.add_mem _ hx hy
 
 theorem oev_neg {x : Fv F v ⊗[F] E} (hx : x ∈ OEv (E := E) v) : -x ∈ OEv (E := E) v :=
   Submodule.neg_mem _ hx
@@ -49,8 +52,8 @@ theorem inclR_mem (a : 𝓞 E) : inclR (F := F) (Fv F v) (a : E) ∈ OEv (E := E
 
 attribute [local instance] LocMassOrdSF.finDim_FE
 
-theorem exists_intBasis : ∃ b : Module.Basis (Fin (Module.finrank F E)) F E,
-    ∀ i, IsIntegral ℤ (b i) := by
+theorem exists_intBasis
+    : ∃ b : Module.Basis (Fin (Module.finrank F E)) F E, ∀ i, IsIntegral ℤ (b i) := by
   classical
   let b0 := Module.finBasis F E
   obtain ⟨y, hy0, hy⟩ := exists_integral_multiples ℤ ℚ (L := E) (Finset.univ.image b0)
@@ -59,8 +62,7 @@ theorem exists_intBasis : ∃ b : Module.Basis (Fin (Module.finrank F E)) F E,
   refine ⟨b0.isUnitSMul hu, fun i => ?_⟩
   have h := hy (b0 i) (Finset.mem_image_of_mem _ (Finset.mem_univ i))
   rw [Module.Basis.isUnitSMul_apply]
-  have e : ((y : F)) • b0 i = y • b0 i := by
-    rw [← Int.cast_smul_eq_zsmul F y (b0 i)]
+  have e : ((y : F)) • b0 i = y • b0 i := by rw [← Int.cast_smul_eq_zsmul F y (b0 i)]
   rw [e]
   exact h
 
@@ -72,8 +74,8 @@ theorem ib_int (i : Fin (Module.finrank F E)) : IsIntegral ℤ (ib (F := F) (E :
 def bas : Module.Basis (Fin (Module.finrank F E)) (Fv F v) (Fv F v ⊗[F] E) :=
   Algebra.TensorProduct.basis (Fv F v) (ib (F := F) (E := E))
 
-theorem bas_apply (i : Fin (Module.finrank F E)) :
-    bas (E := E) v i = inclR (F := F) (Fv F v) (ib (F := F) (E := E) i) := by
+theorem bas_apply (i : Fin (Module.finrank F E))
+    : bas (E := E) v i = inclR (F := F) (Fv F v) (ib (F := F) (E := E) i) := by
   simp [bas, Algebra.TensorProduct.basis_apply, inclR]
 
 theorem bas_mem (i : Fin (Module.finrank F E)) : bas (E := E) v i ∈ OEv (E := E) v := by
@@ -99,7 +101,8 @@ end Oev
 
 section Box
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F))
 
 def boxS {r : ℕ} (c : UIdx r → Fv F v) : Set (UIdx r → Fv F v ⊗[F] E) :=
@@ -119,22 +122,26 @@ theorem boxS_zero {r : ℕ} (c : UIdx r → Fv F v) : (0 : UIdx r → Fv F v ⊗
   intro p
   simpa using oev_zero (E := E) v
 
-theorem boxS_add {r : ℕ} {c : UIdx r → Fv F v} {x y : UIdx r → Fv F v ⊗[F] E}
-    (hx : x ∈ boxS v c) (hy : y ∈ boxS v c) : x + y ∈ boxS v c := by
+theorem boxS_add
+    {r : ℕ} {c : UIdx r → Fv F v} {x y : UIdx r → Fv F v ⊗[F] E}
+    (hx : x ∈ boxS v c) (hy : y ∈ boxS v c)
+    : x + y ∈ boxS v c := by
   intro p
   simpa [mul_add] using oev_add v (hx p) (hy p)
 
-theorem boxS_neg {r : ℕ} {c : UIdx r → Fv F v} {x : UIdx r → Fv F v ⊗[F] E}
-    (hx : x ∈ boxS v c) : -x ∈ boxS v c := by
+theorem boxS_neg {r : ℕ} {c : UIdx r → Fv F v} {x : UIdx r → Fv F v ⊗[F] E} (hx : x ∈ boxS v c)
+    : -x ∈ boxS v c := by
   intro p
   simpa [mul_neg] using oev_neg v (hx p)
 
 theorem isOpen_boxS {r : ℕ} (c : UIdx r → Fv F v) : IsOpen (boxS (E := E) v c) := by
   have := LocMassOrdSF.isTopRing_tens (F := F) (E := E) (Fv F v)
-  have e : boxS (E := E) v c =
-      ⋂ p, (fun x : UIdx r → Fv F v ⊗[F] E => sc (E := E) v (c p) * x p) ⁻¹' OEv (E := E) v := by
-    ext x
-    simp [boxS]
+  have e
+      : boxS (E := E) v c
+        = ⋂ p, (fun x : UIdx r → Fv F v ⊗[F] E => sc (E := E) v (c p) * x p) ⁻¹' OEv (E := E) v :=
+    by
+      ext x
+      simp [boxS]
   rw [e]
   exact isOpen_iInter_of_finite fun p =>
     (isOpen_oev v).preimage (continuous_const.mul (continuous_apply p))
@@ -147,8 +154,10 @@ theorem natCast_ne_zero {g : ℕ} (hg : g.Prime) : (g : Fv F v) ≠ 0 := by
 theorem uog_subset {g : ℕ} (hg : g.Prime) (r : ℕ) : UOg (E := E) v g r ⊆ UO v r := by
   intro x hx p
   have h := hx p
-  have e : sc (E := E) v ((alp v r p.1.1)⁻¹ * alp v r p.1.2) * x p =
-      (g : Fv F v) • (sc (E := E) v ((alp v r p.1.1)⁻¹ * alp v r p.1.2 * (g : Fv F v)⁻¹) * x p) := by
+  have e
+      : sc (E := E) v ((alp v r p.1.1)⁻¹ * alp v r p.1.2) * x p
+        = (g : Fv F v)
+          • (sc (E := E) v ((alp v r p.1.1)⁻¹ * alp v r p.1.2 * (g : Fv F v)⁻¹) * x p) := by
     rw [← sc_mul_eq_smul, ← mul_assoc, sc_mul_sc]
     congr 2
     field_simp [natCast_ne_zero (F := F) (v := v) hg]
@@ -164,7 +173,8 @@ theorem unitary_local_mass_identity : StepU := by
   have := LocMassOrdSF.sc_tens (F := F) (E := E) (Fv F v)
   have := LocMassOrdSF.isTopRing_tens (F := F) (E := E) (Fv F v)
   have : BorelSpace (Fv F v ⊗[F] E) := ⟨rfl⟩
-  have hSF : SFinite (sdE (E := E) ψ v (UIdx r)) := LocMassOrdSF.self_dual_measure_sFinite σ J ψ v hStd r
+  have hSF : SFinite (sdE (E := E) ψ v (UIdx r)) :=
+    LocMassOrdSF.self_dual_measure_sFinite σ J ψ v hStd r
   have hInv : (sdE (E := E) ψ v (UIdx r)).IsAddLeftInvariant := by
     unfold sdE
     split_ifs with h
@@ -172,10 +182,12 @@ theorem unitary_local_mass_identity : StepU := by
       infer_instance
     · exact ⟨fun _ => Measure.map_zero _⟩
   set μ := sdE (E := E) ψ v (UIdx r) with hμ
-  have hmp : MeasurePreserving (MeasurableEquiv.shearAddRight (UIdx r → Fv F v ⊗[F] E))
-      (μ.prod μ) (μ.prod μ) := measurePreserving_prod_add μ μ
-  have hpre : (MeasurableEquiv.shearAddRight (UIdx r → Fv F v ⊗[F] E)) ⁻¹' deepCongruenceVolume v g r =
-      UO v r ×ˢ UOg (E := E) v g r := by
+  have hmp : MeasurePreserving (MeasurableEquiv.shearAddRight (UIdx r → Fv F v ⊗[F] E)) (μ.prod μ)
+      (μ.prod μ) :=
+    measurePreserving_prod_add μ μ
+  have hpre
+      : (MeasurableEquiv.shearAddRight (UIdx r → Fv F v ⊗[F] E)) ⁻¹' deepCongruenceVolume v g r
+        = UO v r ×ˢ UOg (E := E) v g r := by
     ext ⟨x, y⟩
     show (x, x + y) ∈ deepCongruenceVolume v g r ↔ x ∈ UO v r ∧ y ∈ UOg (E := E) v g r
     constructor

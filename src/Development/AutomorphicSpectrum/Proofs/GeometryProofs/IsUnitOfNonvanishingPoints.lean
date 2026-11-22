@@ -17,16 +17,22 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.UnitAtDivOfI
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
-open ReciprocityTheory.ChartRestriction.G.TB.ValAt ReciprocityTheory.ChartRestriction.G.PullbackSections
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
+open ReciprocityTheory.ChartRestriction.G.TB.ValAt
+  ReciprocityTheory.ChartRestriction.G.PullbackSections
 open GlobalTheory.CompanionTheory.Ar.Flat.GagaC
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat.GagaC
 
-theorem exists_algHom_eq_zero_of_not_isUnit {T : Type} [CommRing T] [Algebra ℂ T] [Algebra.FiniteType ℂ T]
-    (a : T) (h : ¬ IsUnit a) : ∃ χ : T →ₐ[ℂ] ℂ, χ a = 0 := by
-  obtain ⟨M, hM, haM⟩ := Ideal.exists_le_maximal (Ideal.span {a}) (by rwa [Ne, Ideal.span_singleton_eq_top])
+theorem exists_algHom_eq_zero_of_not_isUnit
+    {T : Type} [CommRing T] [Algebra ℂ T] [Algebra.FiniteType ℂ T] (a : T) (h : ¬ IsUnit a)
+    : ∃ χ : T →ₐ[ℂ] ℂ, χ a = 0 := by
+  obtain ⟨M, hM, haM⟩ :=
+    Ideal.exists_le_maximal (Ideal.span {a}) (by rwa [Ne, Ideal.span_singleton_eq_top])
   have hmem : a ∈ M := haM (Ideal.mem_span_singleton_self a)
   letI := Ideal.Quotient.field M
   haveI : Algebra.FiniteType ℂ (T ⧸ M) :=
@@ -38,16 +44,18 @@ theorem exists_algHom_eq_zero_of_not_isUnit {T : Type} [CommRing T] [Algebra ℂ
   refine ⟨e.symm.toAlgHom.comp (Ideal.Quotient.mkₐ ℂ M), ?_⟩
   simp [Ideal.Quotient.eq_zero_iff_mem.2 hmem]
 
-theorem fromSpec_comp_structure {X : Scheme.{0}} (s : X ⟶ Sp ℂ) {V : X.Opens} (hV : IsAffineOpen V) :
-    hV.fromSpec ≫ s = Spec.map ((Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv ≫ s.appLE ⊤ V (fun _ _ => trivial)) := by
-  rw [Spec.map_comp, ← IsAffineOpen.SpecMap_appLE_fromSpec s (isAffineOpen_top _) hV (fun _ _ => trivial)]
+theorem fromSpec_comp_structure {X : Scheme.{0}} (s : X ⟶ Sp ℂ) {V : X.Opens} (hV : IsAffineOpen V)
+    : hV.fromSpec ≫ s
+      = Spec.map ((Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv ≫ s.appLE ⊤ V (fun _ _ => trivial)) := by
+  rw [Spec.map_comp,
+    ← IsAffineOpen.SpecMap_appLE_fromSpec s (isAffineOpen_top _) hV (fun _ _ => trivial)]
   congr 1
   rw [IsAffineOpen.fromSpec_top, Scheme.isoSpec_Spec_inv]
 
-private theorem germ_comp_stalkClosedPointTo_eq {X : Scheme.{0}} {V : X.Opens} (hV : IsAffineOpen V)
-    (χ : Γ(X, V) ⟶ CommRingCat.of ℂ)
-    (hp : (Spec.map χ ≫ hV.fromSpec) (IsLocalRing.closedPoint (CommRingCat.of ℂ)) ∈ V) :
-    X.presheaf.germ V _ hp ≫ Scheme.stalkClosedPointTo (Spec.map χ ≫ hV.fromSpec) = χ := by
+private theorem germ_comp_stalkClosedPointTo_eq
+    {X : Scheme.{0}} {V : X.Opens} (hV : IsAffineOpen V) (χ : Γ(X, V) ⟶ CommRingCat.of ℂ)
+    (hp : (Spec.map χ ≫ hV.fromSpec) (IsLocalRing.closedPoint (CommRingCat.of ℂ)) ∈ V)
+    : X.presheaf.germ V _ hp ≫ Scheme.stalkClosedPointTo (Spec.map χ ≫ hV.fromSpec) = χ := by
   rw [Scheme.stalkClosedPointTo_comp]
   erw [Scheme.Hom.germ_stalkMap_assoc]
   rw [IsAffineOpen.fromSpec_app_self, Category.assoc]
@@ -55,10 +63,11 @@ private theorem germ_comp_stalkClosedPointTo_eq {X : Scheme.{0}} {V : X.Opens} (
   erw [Scheme.germ_stalkClosedPointTo_Spec]
   simp
 
-theorem isUnit_res_of_forall_point {X : Scheme.{0}} (s : X ⟶ Sp ℂ) [LocallyOfFiniteType s] {U V : X.Opens}
-    (hV : IsAffineOpen V) (hVU : V ≤ U) (a : Γ(X, U))
-    (h : ∀ x : Sp ℂ ⟶ X, x ≫ s = 𝟙 _ → centre x ∈ U → valAt' x U a ≠ 0) :
-    IsUnit (X.presheaf.map (homOfLE hVU).op a) := by
+theorem isUnit_res_of_forall_point
+    {X : Scheme.{0}} (s : X ⟶ Sp ℂ) [LocallyOfFiniteType s]
+    {U V : X.Opens} (hV : IsAffineOpen V) (hVU : V ≤ U) (a : Γ(X, U))
+    (h : ∀ x : Sp ℂ ⟶ X, x ≫ s = 𝟙 _ → centre x ∈ U → valAt' x U a ≠ 0)
+    : IsUnit (X.presheaf.map (homOfLE hVU).op a) := by
   by_contra hr
   let φ : CommRingCat.of ℂ ⟶ Γ(X, V) :=
     (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv ≫ s.appLE ⊤ V (fun _ _ => trivial)
@@ -80,21 +89,27 @@ theorem isUnit_res_of_forall_point {X : Scheme.{0}} (s : X ⟶ Sp ℂ) [LocallyO
     rw [← Spec.map_comp]
     exact (congrArg Spec.map hc).trans (Spec.map_id _)
   have hxV : (Spec.map χ' ≫ hV.fromSpec) (IsLocalRing.closedPoint (CommRingCat.of ℂ)) ∈ V := by
-    have hr' : (Spec.map χ' ≫ hV.fromSpec) (IsLocalRing.closedPoint (CommRingCat.of ℂ)) ∈
-        Set.range hV.fromSpec := ⟨_, rfl⟩
+    have hr'
+        : (Spec.map χ' ≫ hV.fromSpec) (IsLocalRing.closedPoint (CommRingCat.of ℂ))
+          ∈ Set.range hV.fromSpec :=
+      ⟨_, rfl⟩
     rwa [hV.range_fromSpec] at hr'
   have hxU : centre x ∈ U := hVU hxV
   apply h x hxs hxU
   rw [← val_germ x U hxU a]
-  have e1 := congrArg (fun f => f.hom (X.presheaf.map (homOfLE hVU).op a)) (germ_comp_stalkClosedPointTo_eq hV χ' hxV)
+  have e1 :=
+    congrArg
+      (fun f => f.hom (X.presheaf.map (homOfLE hVU).op a))
+      (germ_comp_stalkClosedPointTo_eq hV χ' hxV)
   have e2 := TopCat.Presheaf.germ_res_apply X.presheaf (homOfLE hVU) _ hxV a
   simp only [CommRingCat.comp_apply] at e1
   erw [← e2]
   exact e1.trans hχ
 
-theorem isUnit_of_forall_complexPoint (X : Scheme.{0}) (s : X ⟶ Sp ℂ) (U : X.Opens) (a : Γ(X, U))
-    (hs : LocallyOfFiniteType s)
-    (h : ∀ x : Sp ℂ ⟶ X, x ≫ s = 𝟙 _ → centre x ∈ U → valAt' x U a ≠ 0) : IsUnit a := by
+theorem isUnit_of_forall_complexPoint
+    (X : Scheme.{0}) (s : X ⟶ Sp ℂ) (U : X.Opens) (a : Γ(X, U))
+    (hs : LocallyOfFiniteType s) (h : ∀ x : Sp ℂ ⟶ X, x ≫ s = 𝟙 _ → centre x ∈ U → valAt' x U a ≠ 0)
+    : IsUnit a := by
   refine RingedSpace.isUnit_of_isUnit_germ X.toRingedSpace U a fun p hp => ?_
   obtain ⟨V, hV, hpV, hVU⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens) hp
   haveI := hs

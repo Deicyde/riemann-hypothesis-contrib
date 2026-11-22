@@ -6,14 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Finrank
 
 @[expose] public section
 
-open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.BasicNotions.Loc
 
 namespace GlobalTheory.UnramCyc
 
-
 open PowerSeries in
-theorem _root_.GlobalTheory.UnramCyc.chi_onto_of_unramified : ∀ {l : ℕ} [Fact l.Prime] (P : _root_.Formalism.BasicNotions.LocPrime l) (K : _root_.Formalism.BasicNotions.Loc.FinExt l),
-    K.1 ≤ _root_.Formalism.BasicNotions.Loc.MaximalUnramifiedExtension l → ∀ c : ℤ_[l]ˣ, ∃ g ∈ _root_.Formalism.BasicNotions.Loc.GK K, (P.χQ g : ℚ_[l]) = ((c : ℤ_[l]) : ℚ_[l]) := by
+theorem _root_.GlobalTheory.UnramCyc.chi_onto_of_unramified
+    : ∀ {l : ℕ} [Fact l.Prime] (P : _root_.Formalism.BasicNotions.LocPrime l)
+        (K : _root_.Formalism.BasicNotions.Loc.FinExt l),
+      K.1 ≤ _root_.Formalism.BasicNotions.Loc.MaximalUnramifiedExtension l
+        → ∀ c : ℤ_[l]ˣ, ∃ g ∈ _root_.Formalism.BasicNotions.Loc.GK K,
+          (P.χQ g : ℚ_[l]) = ((c : ℤ_[l]) : ℚ_[l]) := by
   intro l _ P K hK c
   have hnorm : ‖((c : ℤ_[l]) : ℚ_[l])‖ = 1 := by
     rw [PadicInt.padic_norm_e_of_padicInt]

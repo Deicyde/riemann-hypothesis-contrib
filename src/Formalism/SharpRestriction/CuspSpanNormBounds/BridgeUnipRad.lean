@@ -37,8 +37,8 @@ section Form
 
 variable {n : ℕ}
 
-theorem hform_eq (J : Matrix (Fin n) (Fin n) ℂ) (x y : Fin n → ℂ) :
-    Formalism.UG.hform (starRingEnd ℂ) J x y = star x ⬝ᵥ (J *ᵥ y) := by
+theorem hform_eq (J : Matrix (Fin n) (Fin n) ℂ) (x y : Fin n → ℂ)
+    : Formalism.UG.hform (starRingEnd ℂ) J x y = star x ⬝ᵥ (J *ᵥ y) := by
   rw [Formalism.UG.hform.eq_1]
   simp [dotProduct, mulVec, Finset.mul_sum, mul_assoc]
 

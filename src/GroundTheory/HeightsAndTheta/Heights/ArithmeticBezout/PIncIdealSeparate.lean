@@ -15,23 +15,27 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem IncIdealSeparate.proof (hZ : IncidenceZeroLocus.Statement) (hT : FormsThroughPoint.Statement)
-    (hD : IncIdealNeBotDim.Statement) : IncIdealSeparate.Statement := by
+theorem IncIdealSeparate.proof
+    (hZ : IncidenceZeroLocus.Statement) (hT : FormsThroughPoint.Statement)
+    (hD : IncIdealNeBotDim.Statement)
+    : IncIdealSeparate.Statement := by
   intro F _ n k P Q hP hQ hne hle q hqQ
   by_contra hqP
   have := hP.isPrime
 
-  obtain ⟨φ, hφ⟩ : ∃ φ : (MvPolynomial (Fin n) F ⧸ P) →ₐ[F] AlgebraicClosure F,
-      φ (Ideal.Quotient.mk P q) ≠ 0 := by
+  obtain ⟨φ, hφ⟩
+      : ∃ φ : (MvPolynomial (Fin n) F ⧸ P) →ₐ[F] AlgebraicClosure F,
+        φ (Ideal.Quotient.mk P q) ≠ 0 := by
     by_contra h
     push Not at h
-    exact hqP (Ideal.Quotient.eq_zero_iff_mem.mp
-      (FGNullstellensatz.proof F (MvPolynomial (Fin n) F ⧸ P) (Ideal.Quotient.mk P q) h))
+    exact hqP (Ideal.Quotient.eq_zero_iff_mem.mp (FGNullstellensatz.proof F
+      (MvPolynomial (Fin n) F ⧸ P) (Ideal.Quotient.mk P q) h))
   let x : Fin n → AlgebraicClosure F := fun j => φ (Ideal.Quotient.mk P (X j))
   have hev : ∀ g, aeval x g = φ (Ideal.Quotient.mk P g) := by
     intro g
-    have h : (aeval x : MvPolynomial (Fin n) F →ₐ[F] AlgebraicClosure F) =
-        φ.comp (Ideal.Quotient.mkₐ F P) := by
+    have h
+        : (aeval x : MvPolynomial (Fin n) F →ₐ[F] AlgebraicClosure F)
+          = φ.comp (Ideal.Quotient.mkₐ F P) := by
       ext j
       simp [x]
     rw [h]

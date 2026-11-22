@@ -5,8 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChartSome
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -15,7 +17,16 @@ noncomputable section
 
 namespace GlobalTheory.Mum
 
-theorem isPullback_of_openCover_target : ∀ (X G S B : Scheme.{0}) (β : X ⟶ G) (f : X ⟶ S) (g : G ⟶ B) (π : S ⟶ B), β ≫ g = f ≫ π → ∀ (J : Type) (Y P : J → Scheme.{0}) (ψ : ∀ j, Y j ⟶ G) (e : ∀ j, P j ⟶ X) (p : ∀ j, P j ⟶ Y j) (q : ∀ j, P j ⟶ S), (∀ j, IsOpenImmersion (ψ j)) → (∀ y : G, ∃ j, y ∈ Set.range (ψ j)) → (∀ j, IsOpenImmersion (e j)) → (∀ j, IsPullback (p j) (q j) (ψ j ≫ g) π) → (∀ j, e j ≫ β = p j ≫ ψ j) → (∀ j, e j ≫ f = q j) → (∀ (j : J) (x : X), β x ∈ Set.range (ψ j) → x ∈ Set.range (e j)) → IsPullback β f g π := by
+theorem isPullback_of_openCover_target
+    : ∀ (X G S B : Scheme.{0}) (β : X ⟶ G) (f : X ⟶ S) (g : G ⟶ B) (π : S ⟶ B),
+      β ≫ g = f ≫ π
+        → ∀ (J : Type) (Y P : J → Scheme.{0}) (ψ : ∀ j, Y j ⟶ G) (e : ∀ j, P j ⟶ X)
+            (p : ∀ j, P j ⟶ Y j) (q : ∀ j, P j ⟶ S),
+          (∀ j, IsOpenImmersion (ψ j)) → (∀ y : G, ∃ j, y ∈ Set.range (ψ j))
+            → (∀ j, IsOpenImmersion (e j)) → (∀ j, IsPullback (p j) (q j) (ψ j ≫ g) π)
+            → (∀ j, e j ≫ β = p j ≫ ψ j) → (∀ j, e j ≫ f = q j)
+            → (∀ (j : J) (x : X), β x ∈ Set.range (ψ j) → x ∈ Set.range (e j))
+            → IsPullback β f g π := by
   intro X G S B β f g π w J Y P ψ e p q hψ hcov he hP hβ hf hr
   let ψ' : ∀ j, P j ⟶ pullback g π := fun j =>
     pullback.lift (p j ≫ ψ j) (q j) (by rw [Category.assoc]; exact (hP j).w)
@@ -39,15 +50,16 @@ theorem isPullback_of_openCover_target : ∀ (X G S B : Scheme.{0}) (β : X ⟶ 
     · rw [Category.assoc, pullback.lift_snd, hf, hψ's]
   have loc : ∀ j, IsPullback (e j) (𝟙 (P j)) c (ψ' j) := fun j => by
     haveI := he j
-    refine (IsOpenImmersion.isPullback (𝟙 (P j)) (e j) (ψ' j) c
-      (by rw [hce, Category.id_comp]) ?_).flip
+    refine (IsOpenImmersion.isPullback (𝟙 (P j)) (e j) (ψ' j) c (by rw [hce, Category.id_comp])
+      ?_).flip
     ext x
     change c x ∈ Set.range (ψ' j) ↔ x ∈ Set.range (e j)
     constructor
     · rintro ⟨y, hy⟩
       apply hr j x
       refine ⟨p j y, ?_⟩
-      rw [← hcf, Scheme.Hom.comp_apply, ← hy, ← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, hψ'f]
+      rw [← hcf, Scheme.Hom.comp_apply, ← hy, ← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply,
+        hψ'f]
     · rintro ⟨y, rfl⟩
       exact ⟨y, by rw [← Scheme.Hom.comp_apply, hce]⟩
   have key : ∀ j : J, (MorphismProperty.isomorphisms Scheme) (pullback.snd c (ψ' j)) := fun j => by

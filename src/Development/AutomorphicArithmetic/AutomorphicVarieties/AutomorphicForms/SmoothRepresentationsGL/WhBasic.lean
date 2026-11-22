@@ -6,7 +6,8 @@ public import GroundTheory.AutomorphicForms.MultiplicityOne.Equivariance
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
@@ -14,8 +15,9 @@ open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspS
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
 open GroundTheory.Automorphic.FourierWhittaker in
-private theorem exists_uGL {E : Type} [Field E] [NumberField E] {n : ℕ} (ν : GA E n) (hν : IsY 0 ν.val) :
-    ∃ X : Pos n → Ad E, ν = uGL X ∧ supN ν.val = supSum 0 X := by
+private theorem exists_uGL
+    {E : Type} [Field E] [NumberField E] {n : ℕ} (ν : GA E n) (hν : IsY 0 ν.val)
+    : ∃ X : Pos n → Ad E, ν = uGL X ∧ supN ν.val = supSum 0 X := by
   classical
   refine ⟨fun p => ν.val p.1.1 p.1.2, Units.ext (Matrix.ext fun a b => ?_), ?_⟩
   · rw [coe_uGL, uMat_apply]
@@ -41,20 +43,22 @@ private theorem exists_uGL {E : Type} [Field E] [NumberField E] {n : ℕ} (ν : 
       rfl
 
 open GroundTheory.Automorphic.FourierWhittaker in
-theorem UpperTheory.V.Af.Smo.whBasic :
-    UpperTheory.V.Af.Smo.WhBasic := by
+theorem UpperTheory.V.Af.Smo.whBasic : UpperTheory.V.Af.Smo.WhBasic := by
   intro E _ _ n f hf
   refine ⟨?_, ?_, ?_⟩
-  · have : whittaker f = partialCoeff f 0 := funext fun g => whittaker_eq_partialCoeff_zero hf.cont g
+  · have : whittaker f = partialCoeff f 0 :=
+      funext fun g => whittaker_eq_partialCoeff_zero hf.cont g
     rw [this]
     exact continuous_partialCoeff hf.cont 0
   · obtain ⟨C, hC⟩ := hf.bdd
     refine ⟨C, fun g => ?_⟩
-    have h := norm_setIntegral_le_of_norm_le_const (μ := vecMeasure E (Pos n)) (s := vecDomain E (Pos n))
-      (f := fun X => f (uGL X * g) * (GroundTheory.Global.adelicChar E (-supSum 0 X) : ℂ)) (C := C)
-      (by rw [vecMeasure_vecDomain]; exact ENNReal.one_lt_top) fun X _ => by
-        rw [norm_mul, Circle.norm_coe, mul_one]
-        exact hC _
+    have h :=
+      norm_setIntegral_le_of_norm_le_const (μ := vecMeasure E (Pos n)) (s := vecDomain E (Pos n))
+        (f := fun X => f (uGL X * g) * (GroundTheory.Global.adelicChar E (- supSum 0 X) : ℂ))
+        (C := C) (by rw [vecMeasure_vecDomain]; exact ENNReal.one_lt_top)
+        fun X _ => by
+          rw [norm_mul, Circle.norm_coe, mul_one]
+          exact hC _
     rwa [measureReal_def, vecMeasure_vecDomain, ENNReal.toReal_one, mul_one] at h
   · intro ν hν g
     obtain ⟨X, h1, h2⟩ := exists_uGL ν hν

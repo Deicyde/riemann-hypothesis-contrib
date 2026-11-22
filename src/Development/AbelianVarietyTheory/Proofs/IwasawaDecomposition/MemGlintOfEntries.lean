@@ -8,17 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SplitPl
 
 namespace GlobalTheory.MemGlintOfEntries
 
-theorem mem_glint_of_entries {K : Type} [inst : Field K] {n : ℕ} (O : Subring K)
-    (g : GL (Fin n) K)
+theorem mem_glint_of_entries
+    {K : Type} [inst : Field K]
+    {n : ℕ} (O : Subring K) (g : GL (Fin n) K)
     (h : ∀ (i j : Fin n), (↑g : Matrix (Fin n) (Fin n) K) i j ∈ O)
-    (h' : ∀ (i j : Fin n), (↑g⁻¹ : Matrix (Fin n) (Fin n) K) i j ∈ O) :
-    g ∈ Formalism.UG.GLint (Fin n) O := by
+    (h' : ∀ (i j : Fin n), (↑g⁻¹ : Matrix (Fin n) (Fin n) K) i j ∈ O)
+    : g ∈ Formalism.UG.GLint (Fin n) O := by
   let A : Matrix (Fin n) (Fin n) O := Matrix.of fun i j => ⟨_, h i j⟩
   let B : Matrix (Fin n) (Fin n) O := Matrix.of fun i j => ⟨_, h' i j⟩
-  have hA : O.subtype.mapMatrix A = (↑g : Matrix (Fin n) (Fin n) K) := by
-    ext i j; rfl
-  have hB : O.subtype.mapMatrix B = (↑g⁻¹ : Matrix (Fin n) (Fin n) K) := by
-    ext i j; rfl
+  have hA : O.subtype.mapMatrix A = (↑g : Matrix (Fin n) (Fin n) K) := by ext i j; rfl
+  have hB : O.subtype.mapMatrix B = (↑g⁻¹ : Matrix (Fin n) (Fin n) K) := by ext i j; rfl
   have hinj : Function.Injective
       (O.subtype.mapMatrix : Matrix (Fin n) (Fin n) O → Matrix (Fin n) (Fin n) K) := by
     intro X Y hXY

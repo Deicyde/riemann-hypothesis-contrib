@@ -28,7 +28,9 @@ theorem primeOrderFinrank : PrimeOrderFinrank := by
   have hdeg : (Polynomial.cyclotomic g ℚ).natDegree = g - 1 := by
     rw [Polynomial.natDegree_cyclotomic, Nat.totient_prime hg]
   have hle : (minpoly ℚ f).natDegree ≤ Module.finrank ℚ K * n := by
-    have h1 := Polynomial.natDegree_le_of_dvd (LinearMap.minpoly_dvd_charpoly f) (LinearMap.charpoly_monic f).ne_zero
+    have h1 :=
+      Polynomial.natDegree_le_of_dvd (LinearMap.minpoly_dvd_charpoly f)
+        (LinearMap.charpoly_monic f).ne_zero
     rw [LinearMap.charpoly_natDegree] at h1
     have h2 : Module.finrank ℚ (Fin n → K) = Module.finrank ℚ K * n := by
       rw [Module.finrank_pi_fintype]
@@ -43,15 +45,14 @@ theorem primeOrderFinrank : PrimeOrderFinrank := by
       ((hirr.coprime_iff_not_dvd).2 hc).symm
     have h1 : minpoly ℚ f ∣ Polynomial.X - 1 := by
       first
-        | exact hcop.dvd_of_dvd_mul_left hdvd
-        | exact hcop.dvd_of_dvd_mul_right hdvd
-        | exact hcop.dvd_of_dvd_mul_left (by rwa [mul_comm] at hdvd)
-        | exact hcop.dvd_of_dvd_mul_right (by rwa [mul_comm] at hdvd)
+      | exact hcop.dvd_of_dvd_mul_left hdvd
+      | exact hcop.dvd_of_dvd_mul_right hdvd
+      | exact hcop.dvd_of_dvd_mul_left (by rwa [mul_comm] at hdvd)
+      | exact hcop.dvd_of_dvd_mul_right (by rwa [mul_comm] at hdvd)
     have h2 : Polynomial.aeval f (Polynomial.X - 1 : Polynomial ℚ) = 0 := by
       obtain ⟨q, hq⟩ := h1
       rw [hq, map_mul, minpoly.aeval, zero_mul]
-    have hf1 : f = 1 := by
-      simpa [sub_eq_zero] using h2
+    have hf1 : f = 1 := by simpa [sub_eq_zero] using h2
     apply Matrix.toLin'.injective
     rw [Matrix.toLin'_one]
     refine LinearMap.ext fun v => ?_

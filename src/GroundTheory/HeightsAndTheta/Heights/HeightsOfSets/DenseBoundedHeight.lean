@@ -29,9 +29,14 @@ theorem denseBoundedHeight : DenseBoundedHeight.Statement := by
   have hR0pos : 0 < R0 := by
     have := Finset.sum_nonneg fun v (_ : v ∈ Finset.univ) ↦ hRnn v
     linarith
-  refine ⟨{z | ∃ ψ : P.ChartAlg c →ₐ[ℚ] AlgebraicClosure ℚ,
+  refine ⟨
+    {z | ∃ ψ : P.ChartAlg c →ₐ[ℚ] AlgebraicClosure ℚ,
       (∀ j, ∃ N : ℕ, 0 < N ∧ ψ (g0 (X j)) ^ N = 1) ∧ z = P.chartPoint c ψ},
-    ∑ k, (Real.log Δ + Real.log (Real.sqrt (n k + 1) * R0)), ?_, ?_, ?_⟩
+    ∑ k, (Real.log Δ + Real.log (Real.sqrt (n k + 1) * R0)),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rintro z ⟨ψ, -, rfl⟩
     exact P.chartPoint_mem c hc ψ
   · intro m f hf hvan
@@ -45,19 +50,24 @@ theorem denseBoundedHeight : DenseBoundedHeight.Statement := by
     refine height_standard_le (P.chartPoint c ψ) (P.chartPoint_mem c hc ψ).1 hΔpos hR0pos ?_ ?_
     · intro k i
       have h1 := (hbd ⟨k, i⟩ ψ hroots).1
-      have h2 : (Δ : AlgebraicClosure ℚ) * P.chartPoint c ψ k i =
-          ((∏ w ∈ Finset.univ.erase ⟨k, i⟩, δ w : ℕ) : AlgebraicClosure ℚ) *
-            ((δ ⟨k, i⟩ : AlgebraicClosure ℚ) * ψ (b ⟨k, i⟩)) := by
+      have h2
+          : (Δ : AlgebraicClosure ℚ) * P.chartPoint c ψ k i
+            = ((∏ w ∈ Finset.univ.erase ⟨k, i⟩, δ w : ℕ) : AlgebraicClosure ℚ)
+              * ((δ ⟨k, i⟩ : AlgebraicClosure ℚ) * ψ (b ⟨k, i⟩)) := by
         rw [← mul_assoc, ← Nat.cast_mul, Finset.prod_erase_mul _ _ (Finset.mem_univ _)]
         rfl
       rw [h2]
-      have h3 : IsIntegral ℤ (((∏ w ∈ Finset.univ.erase ⟨k, i⟩, δ w : ℕ) : AlgebraicClosure ℚ)) := by
-        have := isIntegral_algebraMap (R := ℤ) (A := AlgebraicClosure ℚ)
-          (x := ((∏ w ∈ Finset.univ.erase ⟨k, i⟩, δ w : ℕ) : ℤ))
+      have h3
+          : IsIntegral ℤ (((∏ w ∈ Finset.univ.erase ⟨k, i⟩, δ w : ℕ) : AlgebraicClosure ℚ)) := by
+        have :=
+          isIntegral_algebraMap (R := ℤ) (A := AlgebraicClosure ℚ)
+            (x := ((∏ w ∈ Finset.univ.erase ⟨k, i⟩, δ w : ℕ) : ℤ))
         simpa using this
       exact h3.mul h1
     · intro σ k i
-      calc ‖σ (P.chartPoint c ψ k i)‖ ≤ R ⟨k, i⟩ := (hbd ⟨k, i⟩ ψ hroots).2 σ
+      calc
+        ‖σ (P.chartPoint c ψ k i)‖
+          ≤ R ⟨k, i⟩ := (hbd ⟨k, i⟩ ψ hroots).2 σ
         _ ≤ ∑ v, R v := Finset.single_le_sum (fun v _ ↦ hRnn v) (Finset.mem_univ _)
         _ ≤ R0 := by linarith
 

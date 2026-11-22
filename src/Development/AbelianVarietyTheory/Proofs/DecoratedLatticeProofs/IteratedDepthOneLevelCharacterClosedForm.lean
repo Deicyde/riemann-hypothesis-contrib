@@ -5,16 +5,32 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PhiTopA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.SymBridge
+open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.BasicNotions
+  Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.SplitWeil
+  GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.SymBridge
 
 namespace GlobalTheory.SymBridge
 
-theorem iter_lam_closed : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (r t : Type) [Fintype r] [DecidableEq r] [Fintype t] [DecidableEq t] (P : TypeDatum k r) (μ : ℕ → kˣ →* ℂˣ) (hμ : ∀ j, IsTame (μ j)) (j : ℕ) (g : (P.iter t μ hμ j).J), ∃ (g₀ : P.J) (D : Fin j → GL t k), (g₀ : GL r k).val = (g : GL (Ix r t j) k).val.submatrix Sum.inl Sum.inl ∧ (∀ i, D i ∈ KO k t ∧ (D i).val = Ix.diagonalBlockOfMatrix (g : GL (Ix r t j) k).val i) ∧ (P.iter t μ hμ j).lam g = P.lam g₀ * ∏ i : Fin j, μ (i.val + 1) (Matrix.GeneralLinearGroup.det (D i)) := by
+theorem iter_lam_closed
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (r t : Type) [Fintype r] [DecidableEq r] [Fintype t] [DecidableEq t] (P : TypeDatum k r)
+        (μ : ℕ → kˣ →* ℂˣ) (hμ : ∀ j, IsTame (μ j)) (j : ℕ) (g : (P.iter t μ hμ j).J),
+      ∃ (g₀ : P.J) (D : Fin j → GL t k),
+        (g₀ : GL r k).val = (g : GL (Ix r t j) k).val.submatrix Sum.inl Sum.inl
+          ∧ (∀ i, D i ∈ KO k t ∧ (D i).val = Ix.diagonalBlockOfMatrix (g : GL (Ix r t j) k).val i)
+          ∧ (P.iter t μ hμ j).lam g
+            = P.lam g₀ * ∏ i : Fin j, μ (i.val + 1) (Matrix.GeneralLinearGroup.det (D i)) := by
   intro k _ _ _ _ r t _ _ _ _ P μ hμ j
   induction j with
   | zero =>
     intro g
-    refine ⟨⟨(reGL (ixZero r t)).symm (g : GL (Ix r t 0) k), g.2⟩, fun i => i.elim0, rfl, fun i => i.elim0, ?_⟩
+    refine ⟨
+      ⟨(reGL (ixZero r t)).symm (g : GL (Ix r t 0) k), g.2⟩,
+      fun i => i.elim0,
+      rfl,
+      fun i => i.elim0,
+      ?_
+    ⟩
     rw [Fin.prod_univ_zero, mul_one]
     rfl
   | succ j ih =>
@@ -32,7 +48,8 @@ theorem iter_lam_closed : ∀ (k : Type) [Field k] [ValuativeRel k] [Topological
       | cast i =>
         simp only [Fin.snoc_castSucc]
         refine ⟨(hD' i).1, ?_⟩
-        rw [(hD' i).2, eu]; rfl
+        rw [(hD' i).2, eu]
+        rfl
     · rw [Fin.prod_univ_castSucc]
       simp only [Fin.snoc_castSucc, Fin.snoc_last, Fin.coe_castSucc, Fin.val_last]
       rw [← mul_assoc, ← el]

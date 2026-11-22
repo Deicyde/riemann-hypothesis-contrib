@@ -12,16 +12,21 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.TypeRec GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.SerSys
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.TypeRec
+  GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.SerSys
 attribute [local instance] GlobalTheory.TypeRec.factG
 open GlobalTheory.PRep GlobalTheory.SmGL
 
 namespace GlobalTheory.SmGL.IrrQuot
 
-theorem exists_irreducible_smooth_quotient : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V), IsSmooth ρ → HasFiniteLength ρ → Nontrivial V →
-    ∃ (Y : Type) (_ : AddCommGroup Y) (_ : Module ℂ Y) (τ : Representation ℂ G Y),
-      IsSmooth τ ∧ τ.IsIrreducible ∧ ∃ q : ρ.IntertwiningMap τ, Function.Surjective q := by
+theorem exists_irreducible_smooth_quotient
+    : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+        [Module ℂ V] (ρ : Representation ℂ G V),
+      IsSmooth ρ → HasFiniteLength ρ → Nontrivial V
+        → ∃ (Y : Type) (_ : AddCommGroup Y) (_ : Module ℂ Y) (τ : Representation ℂ G Y),
+          IsSmooth τ ∧ τ.IsIrreducible ∧ ∃ q : ρ.IntertwiningMap τ, Function.Surjective q := by
   intro G V _ _ _ _ _ ρ hsm hfl hnt
   haveI : WellFoundedGT (Subrepresentation ρ) := ((hasFiniteLength_iff_wellFounded ρ).1 hfl).1
   have hbt : (⊥ : Subrepresentation ρ) ≠ ⊤ := by
@@ -30,7 +35,8 @@ theorem exists_irreducible_smooth_quotient : ∀ {G V : Type} [Group G] [Topolog
     have hmem : x ∈ (⊤ : Subrepresentation ρ).toSubmodule := Submodule.mem_top
     rw [← h] at hmem
     exact hx ((Submodule.mem_bot ℂ).1 hmem)
-  obtain ⟨M, hM, -⟩ := (IsCoatomic.eq_top_or_exists_le_coatom (⊥ : Subrepresentation ρ)).resolve_left hbt
+  obtain ⟨M, hM, -⟩ :=
+    (IsCoatomic.eq_top_or_exists_le_coatom (⊥ : Subrepresentation ρ)).resolve_left hbt
   let W : Submodule ℂ V := M.toSubmodule
   have hW : ∀ g : G, W ≤ W.comap (ρ g) := fun g v hv => M.apply_mem_toSubmodule g hv
   let τ : Representation ℂ G (V ⧸ W) := ρ.quotient W hW
@@ -38,30 +44,30 @@ theorem exists_irreducible_smooth_quotient : ∀ {G V : Type} [Group G] [Topolog
   let q : ρ.IntertwiningMap τ := ⟨W.mkQ, fun g => by ext v; rfl⟩
   have hq : Function.Surjective q := Submodule.mkQ_surjective W
   refine ⟨V ⧸ W, inferInstance, inferInstance, τ, ?_, ?_, q, hq⟩
-  ·
-    intro x
+  · intro x
     obtain ⟨v, rfl⟩ := Submodule.mkQ_surjective W x
-    let stab : (u : Type) → [AddCommGroup u] → [Module ℂ u] → (σ : Representation ℂ G u) → u → Subgroup G :=
-      fun u _ _ σ y =>
-        { carrier := {g | σ g y = y}
-          mul_mem' := by
-            intro a b ha hb
-            simp only [Set.mem_setOf_eq] at ha hb ⊢
-            rw [map_mul, Module.End.mul_apply, hb, ha]
-          one_mem' := by simp
-          inv_mem' := by
-            intro a ha
-            simp only [Set.mem_setOf_eq] at ha ⊢
-            conv_lhs => rw [← ha]
-            rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply] }
+    let stab
+        : (u : Type) → [AddCommGroup u] → [Module ℂ u] → (σ : Representation ℂ G u) → u
+          → Subgroup G := fun u _ _ σ y => {
+      carrier := {g | σ g y = y}
+      mul_mem' := by
+        intro a b ha hb
+        simp only [Set.mem_setOf_eq] at ha hb ⊢
+        rw [map_mul, Module.End.mul_apply, hb, ha]
+      one_mem' := by simp
+      inv_mem' := by
+        intro a ha
+        simp only [Set.mem_setOf_eq] at ha ⊢
+        conv_lhs => rw [← ha]
+        rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+    }
     have hle : stab V ρ v ≤ stab (V ⧸ W) τ (W.mkQ v) := by
       intro g hg
       change τ g (W.mkQ v) = W.mkQ v
       rw [hτ]
       exact congrArg W.mkQ hg
     exact Subgroup.isOpen_mono hle (hsm v)
-  ·
-    have hMtop : M ≠ ⊤ := hM.1
+  · have hMtop : M ≠ ⊤ := hM.1
     refine { exists_pair_ne := ⟨⊥, ⊤, ?_⟩, eq_bot_or_eq_top := ?_ }
     · intro h
       apply hMtop
@@ -72,10 +78,13 @@ theorem exists_irreducible_smooth_quotient : ∀ {G V : Type} [Group G] [Topolog
       rw [← h] at hmem
       exact (Submodule.Quotient.mk_eq_zero W).1 ((Submodule.mem_bot ℂ).1 hmem)
     · intro S
-      let T : Subrepresentation ρ := ⟨S.toSubmodule.comap W.mkQ, fun g v hv => by
-        change W.mkQ (ρ g v) ∈ S.toSubmodule
-        rw [← hτ]
-        exact S.apply_mem_toSubmodule g hv⟩
+      let T : Subrepresentation ρ := ⟨
+        S.toSubmodule.comap W.mkQ,
+        fun g v hv => by
+          change W.mkQ (ρ g v) ∈ S.toSubmodule
+          rw [← hτ]
+          exact S.apply_mem_toSubmodule g hv
+      ⟩
       have hMT : M ≤ T := by
         intro v hv
         change W.mkQ v ∈ S.toSubmodule
@@ -96,6 +105,7 @@ theorem exists_irreducible_smooth_quotient : ∀ {G V : Type} [Group G] [Topolog
         obtain ⟨v, rfl⟩ := Submodule.mkQ_surjective W x
         have hvT : v ∈ T.toSubmodule := hx
         rw [h] at hvT
-        exact (Submodule.mem_bot ℂ).2 (by rw [Submodule.mkQ_apply]; exact (Submodule.Quotient.mk_eq_zero W).2 hvT)
+        exact (Submodule.mem_bot ℂ).2
+          (by rw [Submodule.mkQ_apply]; exact (Submodule.Quotient.mk_eq_zero W).2 hvT)
 
 end GlobalTheory.SmGL.IrrQuot

@@ -8,12 +8,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem eigenProjections_of_comaximal :
-    ∀ (R F : Type) [CommRing R] [CommRing F] (a : ℕ) (t : Fin a → (F →+* R)),
-      (∀ i j, i ≠ j → Ideal.span (Set.range fun x => t i x - t j x) = ⊤) →
-      ∃ e : Fin a → R ⊗[ℤ] F, ∀ (M : Type) [AddCommGroup M] (Θ : R ⊗[ℤ] F →+* AddMonoid.End M)
-        (i l : Fin a) (m : M), (∀ c : F, Θ (1 ⊗ₜ c) m = Θ (t l c ⊗ₜ 1) m) →
-          Θ (e i) m = if i = l then m else 0 := by
+theorem eigenProjections_of_comaximal
+    : ∀ (R F : Type) [CommRing R] [CommRing F] (a : ℕ) (t : Fin a → (F →+* R)),
+      (∀ i j, i ≠ j → Ideal.span (Set.range fun x => t i x - t j x) = ⊤)
+        → ∃ e : Fin a → R ⊗[ℤ] F,
+          ∀ (M : Type) [AddCommGroup M] (Θ : R ⊗[ℤ] F →+* AddMonoid.End M) (i l : Fin a) (m : M),
+            (∀ c : F, Θ (1 ⊗ₜ c) m = Θ (t l c ⊗ₜ 1) m) → Θ (e i) m = if i = l then m else 0 := by
   intro R F _ _ a t ht
   have hf : ∀ i j : Fin a, ∃ f : F →₀ R, i ≠ j → (f.sum fun c r => r * (t i c - t j c)) = 1 := by
     intro i j
@@ -28,17 +28,21 @@ theorem eigenProjections_of_comaximal :
     Algebra.TensorProduct.productMap (AlgHom.id ℤ R) (t l).toIntAlgHom
   have hχ : ∀ l r c, χ l (r ⊗ₜ c) = r * t l c := by
     intro l r c; simp [χ, Algebra.TensorProduct.productMap_apply_tmul]
-  refine ⟨fun i => ∏ j, if j = i then 1 else
-    (f i j).sum fun c r => (r ⊗ₜ (1:F)) * ((1:R) ⊗ₜ c - t j c ⊗ₜ (1:F)), ?_⟩
+  refine ⟨
+    fun i =>
+      ∏ j, if j = i then 1 else
+        (f i j).sum fun c r => (r ⊗ₜ (1:F)) * ((1:R) ⊗ₜ c - t j c ⊗ₜ (1:F)),
+    ?_
+  ⟩
   intro M _ Θ i l m hm
-  have key : ∀ z, Θ z m = Θ (χ l z ⊗ₜ (1:F)) m := by
+  have key : ∀ z, Θ z m = Θ (χ l z ⊗ₜ (1 : F)) m := by
     intro z
     induction z using TensorProduct.induction_on with
     | zero => simp
     | tmul r c =>
-      have e1 : (r ⊗ₜ c : R ⊗[ℤ] F) = (r ⊗ₜ (1:F)) * ((1:R) ⊗ₜ c) := by
+      have e1 : (r ⊗ₜ c : R ⊗[ℤ] F) = (r ⊗ₜ (1 : F)) * ((1 : R) ⊗ₜ c) := by
         simp [Algebra.TensorProduct.tmul_mul_tmul]
-      have e2 : ((r * t l c) ⊗ₜ (1:F) : R ⊗[ℤ] F) = (r ⊗ₜ (1:F)) * (t l c ⊗ₜ (1:F)) := by
+      have e2 : ((r * t l c) ⊗ₜ (1 : F) : R ⊗[ℤ] F) = (r ⊗ₜ (1 : F)) * (t l c ⊗ₜ (1 : F)) := by
         simp [Algebra.TensorProduct.tmul_mul_tmul]
       rw [hχ, e1, e2, map_mul, map_mul]
       change Θ (r ⊗ₜ 1) (Θ (1 ⊗ₜ c) m) = Θ (r ⊗ₜ 1) (Θ (t l c ⊗ₜ 1) m)

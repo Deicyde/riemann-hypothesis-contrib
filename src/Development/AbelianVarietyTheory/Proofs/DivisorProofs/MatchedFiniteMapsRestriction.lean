@@ -91,13 +91,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HermitianSel
 @[expose] public section
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
 noncomputable section
 namespace GlobalTheory.FinUniq
 
-theorem rank_SB_le (X : Type) [TopologicalSpace X] [SecondCountableTopology X] :
-    Module.rank ℂ (SB X) ≤ Cardinal.aleph0 := by
+theorem rank_SB_le (X : Type) [TopologicalSpace X] [SecondCountableTopology X]
+    : Module.rank ℂ (SB X) ≤ Cardinal.aleph0 := by
   classical
   set 𝓑 := TopologicalSpace.countableBasis X
   have hB := TopologicalSpace.isBasis_countableBasis X
@@ -111,8 +113,11 @@ theorem rank_SB_le (X : Type) [TopologicalSpace X] [SecondCountableTopology X] :
       intro x hx
       obtain ⟨b, hb, hxb, hbU⟩ := hB.exists_subset_of_mem_open hx hU
       exact Set.mem_iUnion.2 ⟨⟨⟨b, hb⟩, hbU⟩, hxb⟩
-    obtain ⟨t, ht⟩ := hK.elim_finite_subcover (fun i : {b : 𝓑 // (b : Set X) ⊆ U} => (i.1 : Set X))
-      (fun i => hB.isOpen i.1.2) hcov
+    obtain ⟨t, ht⟩ :=
+      hK.elim_finite_subcover
+        (fun i : {b : 𝓑 // (b : Set X) ⊆ U} => (i.1 : Set X))
+        (fun i => hB.isOpen i.1.2)
+        hcov
     refine ⟨t.image Subtype.val, ?_⟩
     show Set.indicator _ 1 = _
     congr 1
@@ -139,7 +144,8 @@ theorem rank_SB_le (X : Type) [TopologicalSpace X] [SecondCountableTopology X] :
       by_cases hx : f x = 0
       · exact Or.inl hx
       · exact Or.inr ⟨⟨x, subset_tsupport _ hx⟩, rfl⟩
-    have heq : f = ∑ c ∈ hfin.toFinset.filter (· ≠ 0), c • Set.indicator (f ⁻¹' {c}) (1 : X → ℂ) := by
+    have heq
+        : f = ∑ c ∈ hfin.toFinset.filter (· ≠ 0), c • Set.indicator (f ⁻¹' {c}) (1 : X → ℂ) := by
       funext x
       rw [Finset.sum_apply]
       by_cases hx : f x = 0
@@ -154,26 +160,36 @@ theorem rank_SB_le (X : Type) [TopologicalSpace X] [SecondCountableTopology X] :
         · intro h
           exact absurd (Finset.mem_filter.2 ⟨hfin.mem_toFinset.2 ⟨x, rfl⟩, hx⟩) h
     rw [heq]
-    refine Submodule.sum_mem _ fun c hc => Submodule.smul_mem _ _ (Submodule.subset_span (hco _ ?_ ?_))
+    refine Submodule.sum_mem _ fun c hc =>
+      Submodule.smul_mem _ _ (Submodule.subset_span (hco _ ?_ ?_))
     · exact hlc.isOpen_fiber c
     · have hc0 : c ≠ 0 := (Finset.mem_filter.1 hc).2
       refine hK.of_isClosed_subset (hlc.isClosed_fiber c) ?_
       intro x hx
-      exact subset_tsupport _ (by rw [Set.mem_preimage, Set.mem_singleton_iff] at hx; rw [Function.mem_support, hx]; exact hc0)
-  calc Module.rank ℂ (SB X) ≤ Module.rank ℂ (Submodule.span ℂ S) := Submodule.rank_mono hle
+      exact subset_tsupport _ (by
+        rw [Set.mem_preimage, Set.mem_singleton_iff] at hx
+        rw [Function.mem_support, hx]
+        exact hc0)
+  calc
+    Module.rank ℂ (SB X)
+      ≤ Module.rank ℂ (Submodule.span ℂ S) := Submodule.rank_mono hle
     _ ≤ Cardinal.mk S := rank_span_le S
     _ ≤ Cardinal.aleph0 := Cardinal.mk_le_aleph0_iff.2 hS.to_subtype
 
-theorem sc_Fv {F : Type} [Field F] [NumberField F] (v : Pl (F := F)) : SecondCountableTopology (Fv F v) := by
+theorem sc_Fv {F : Type} [Field F] [NumberField F] (v : Pl (F := F))
+    : SecondCountableTopology (Fv F v) := by
   have : Countable F := (Module.finBasis ℚ F).equivFun.injective.countable
   have : TopologicalSpace.SeparableSpace (v.adicCompletion F) :=
     ⟨_, Set.countable_range _, v.denseRange_algebraMap F⟩
   infer_instance
 
-theorem scalar_of_irred {V : Type} [AddCommGroup V] [Module ℂ V] (P : Submodule ℂ V → Prop)
-    (hrank : Module.rank ℂ V ≤ Cardinal.aleph0) (hirr : ∀ N, P N → N = ⊥ ∨ N = ⊤) (T : Module.End ℂ V)
-    (hker : ∀ c : ℂ, P (LinearMap.ker (T - c • 1))) (hran : ∀ c : ℂ, P (LinearMap.range (T - c • 1))) :
-    ∃ c : ℂ, T = c • 1 := by
+theorem scalar_of_irred
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (P : Submodule ℂ V → Prop)
+    (hrank : Module.rank ℂ V ≤ Cardinal.aleph0) (hirr : ∀ N, P N → N = ⊥ ∨ N = ⊤)
+    (T : Module.End ℂ V) (hker : ∀ c : ℂ, P (LinearMap.ker (T - c • 1)))
+    (hran : ∀ c : ℂ, P (LinearMap.range (T - c • 1)))
+    : ∃ c : ℂ, T = c • 1 := by
   by_contra hne
   push_neg at hne
   have hinj : ∀ c : ℂ, Function.Injective ⇑(T - c • (1 : Module.End ℂ V)) := by
@@ -183,7 +199,8 @@ theorem scalar_of_irred {V : Type} [AddCommGroup V] [Module ℂ V] (P : Submodul
     · exact h
     · exact absurd (sub_eq_zero.mp (LinearMap.ker_eq_top.mp h)) (hne c)
   obtain ⟨v₀, hv₀⟩ : ∃ v : V, v ≠ 0 := by
-    by_contra h; push_neg at h
+    by_contra h
+    push_neg at h
     exact hne 0 (LinearMap.ext fun v => (h _).trans (h _).symm)
   have hsurj : ∀ c : ℂ, Function.Surjective ⇑(T - c • (1 : Module.End ℂ V)) := by
     intro c
@@ -196,20 +213,27 @@ theorem scalar_of_irred {V : Type} [AddCommGroup V] [Module ℂ V] (P : Submodul
     · exact h
   have hrep : ∀ p : Polynomial ℂ, p ≠ 0 → Function.Injective (Polynomial.aeval T p) := by
     intro p hp
-    have hs := Polynomial.C_leadingCoeff_mul_prod_multiset_X_sub_C (p := p) IsAlgClosed.card_roots_eq_natDegree
+    have hs :=
+      Polynomial.C_leadingCoeff_mul_prod_multiset_X_sub_C (p := p)
+        IsAlgClosed.card_roots_eq_natDegree
     have hlin : ∀ a : ℂ, Polynomial.aeval T (Polynomial.X - Polynomial.C a) = T - a • 1 := by
       intro a; simp [Algebra.algebraMap_eq_smul_one]
-    have key : ∀ m : Multiset ℂ,
-        Function.Injective (Polynomial.aeval T (m.map fun a => Polynomial.X - Polynomial.C a).prod) := by
+    have key
+        : ∀ m : Multiset ℂ,
+          Function.Injective (Polynomial.aeval T
+            (m.map fun a => Polynomial.X - Polynomial.C a).prod) := by
       intro m
       induction m using Multiset.induction_on with
       | empty =>
-        simp only [Multiset.map_zero, Multiset.prod_zero, map_one, Module.End.one_eq_id, LinearMap.id_coe]
+        simp only [Multiset.map_zero, Multiset.prod_zero, map_one, Module.End.one_eq_id,
+          LinearMap.id_coe]
         exact Function.injective_id
       | cons a m ih =>
-        rw [Multiset.map_cons, Multiset.prod_cons, map_mul, Module.End.mul_eq_comp, LinearMap.coe_comp]
+        rw [Multiset.map_cons, Multiset.prod_cons, map_mul, Module.End.mul_eq_comp,
+          LinearMap.coe_comp]
         refine Function.Injective.comp ?_ ih
-        rw [hlin]; exact hinj a
+        rw [hlin]
+        exact hinj a
     rw [← hs, map_mul, Module.End.mul_eq_comp, LinearMap.coe_comp]
     refine Function.Injective.comp ?_ (key _)
     rw [Polynomial.aeval_C, Algebra.algebraMap_eq_smul_one]
@@ -225,8 +249,10 @@ theorem scalar_of_irred {V : Type} [AddCommGroup V] [Module ℂ V] (P : Submodul
     rw [linearIndependent_iff']
     intro s g hsum i hi
     let q : ℂ → Polynomial ℂ := fun c => ∏ d ∈ s.erase c, (Polynomial.X - Polynomial.C d)
-    have hq : ∀ c ∈ s, Polynomial.aeval T (∏ d ∈ s, (Polynomial.X - Polynomial.C d)) (w c) =
-        Polynomial.aeval T (q c) v₀ := by
+    have hq
+        : ∀ c ∈ s,
+          Polynomial.aeval T (∏ d ∈ s, (Polynomial.X - Polynomial.C d)) (w c)
+            = Polynomial.aeval T (q c) v₀ := by
       intro c hc
       rw [← Finset.mul_prod_erase s _ hc, mul_comm, map_mul, Module.End.mul_apply, hlin, hw]
     have h0 : Polynomial.aeval T (∑ c ∈ s, g c • q c) v₀ = 0 := by
@@ -242,8 +268,9 @@ theorem scalar_of_irred {V : Type} [AddCommGroup V] [Module ℂ V] (P : Submodul
       exact hv₀ (hrep _ hp (by rw [h0, map_zero]))
     have h3 := congrArg (Polynomial.eval i) hp0
     rw [Polynomial.eval_finsetSum, Finset.sum_eq_single i] at h3
-    · simp only [Polynomial.eval_smul, q, Polynomial.eval_prod, Polynomial.eval_sub, Polynomial.eval_X,
-        Polynomial.eval_C, smul_eq_mul, Polynomial.eval_zero] at h3
+    · simp only [Polynomial.eval_smul, q, Polynomial.eval_prod, Polynomial.eval_sub,
+          Polynomial.eval_X, Polynomial.eval_C, smul_eq_mul, Polynomial.eval_zero]
+        at h3
       rcases mul_eq_zero.mp h3 with h | h
       · exact h
       · exfalso
@@ -251,50 +278,69 @@ theorem scalar_of_irred {V : Type} [AddCommGroup V] [Module ℂ V] (P : Submodul
         obtain ⟨d, hd, hd0⟩ := h
         exact (Finset.ne_of_mem_erase hd) (sub_eq_zero.mp hd0).symm
     · intro c hc hci
-      simp only [Polynomial.eval_smul, q, Polynomial.eval_prod, Polynomial.eval_sub, Polynomial.eval_X,
-        Polynomial.eval_C, smul_eq_mul]
+      simp only [Polynomial.eval_smul, q, Polynomial.eval_prod, Polynomial.eval_sub,
+        Polynomial.eval_X, Polynomial.eval_C, smul_eq_mul]
       rw [Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨Ne.symm hci, hi⟩) (sub_self i), mul_zero]
     · intro h; exact absurd hi h
   have h4 := hli.cardinal_le_rank
   rw [Cardinal.mk_complex] at h4
   exact absurd (h4.trans hrank) (not_le.mpr Cardinal.aleph0_lt_continuum)
 
-theorem exists_equiv_of_ker_eq {M P Q : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup P] [Module ℂ P]
-    [AddCommGroup Q] [Module ℂ Q] (f : M →ₗ[ℂ] P) (g : M →ₗ[ℂ] Q) (hf : Function.Surjective f)
-    (hg : Function.Surjective g) (h : LinearMap.ker f = LinearMap.ker g) : ∃ e : P ≃ₗ[ℂ] Q, ∀ x, g x = e (f x) := by
-  refine ⟨(f.quotKerEquivOfSurjective hf).symm.trans ((Submodule.quotEquivOfEq _ _ h).trans
-    (g.quotKerEquivOfSurjective hg)), fun x => ?_⟩
-  rw [← LinearMap.quotKerEquivOfSurjective_apply_mk f hf, LinearEquiv.trans_apply, LinearEquiv.symm_apply_apply,
-    LinearEquiv.trans_apply, Submodule.quotEquivOfEq_mk, LinearMap.quotKerEquivOfSurjective_apply_mk]
+theorem exists_equiv_of_ker_eq
+    {M P Q : Type}
+    [AddCommGroup M] [Module ℂ M] [AddCommGroup P] [Module ℂ P] [AddCommGroup Q] [Module ℂ Q]
+    (f : M →ₗ[ℂ] P) (g : M →ₗ[ℂ] Q) (hf : Function.Surjective f) (hg : Function.Surjective g)
+    (h : LinearMap.ker f = LinearMap.ker g)
+    : ∃ e : P ≃ₗ[ℂ] Q, ∀ x, g x = e (f x) := by
+  refine ⟨
+    (f.quotKerEquivOfSurjective hf).symm.trans
+      ((Submodule.quotEquivOfEq _ _ h).trans (g.quotKerEquivOfSurjective hg)),
+    fun x => ?_
+  ⟩
+  rw [← LinearMap.quotKerEquivOfSurjective_apply_mk f hf, LinearEquiv.trans_apply,
+    LinearEquiv.symm_apply_apply, LinearEquiv.trans_apply, Submodule.quotEquivOfEq_mk,
+    LinearMap.quotKerEquivOfSurjective_apply_mk]
 
 section Ker
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem acts_zero_zero {κ : Type} [Fintype κ] (v : Pl (F := F)) (T : Module.End ℂ ((κ → AF F) → ℂ)) :
-    Acts (evFin F v) T (0 : (κ → Fv F v) → ℂ) 0 := by
+theorem acts_zero_zero {κ : Type} [Fintype κ] (v : Pl (F := F)) (T : Module.End ℂ ((κ → AF F) → ℂ))
+    : Acts (evFin F v) T (0 : (κ → Fv F v) → ℂ) 0 := by
   intro r _
   have e : tens (evFin F v) (0 : (κ → Fv F v) → ℂ) r = 0 := by funext x; simp [tens]
   rw [e, map_zero]
 
-theorem ker_maximal {n d : ℕ} {Y : Spc F E n} {Z : Spc F E d} (om : Rep σ Y Z) (v : Pl (F := F)) {P : Type} [AddCommGroup P]
-    [Module ℂ P] [Nontrivial P] (p : ((Fin n × Fin d → Fv F v) → ℂ) →ₗ[ℂ] P)
+theorem ker_maximal
+    {n d : ℕ} {Y : Spc F E n} {Z : Spc F E d} (om : Rep σ Y Z)
+    (v : Pl (F := F))
+    {P : Type} [AddCommGroup P] [Module ℂ P] [Nontrivial P]
+    (p : ((Fin n × Fin d → Fv F v) → ℂ) →ₗ[ℂ] P)
     (onto : (SB (Fin n × Fin d → Fv F v)).map p = ⊤) (inv : augAt om v ≤ LinearMap.ker p)
-    (stab : ∀ h ∈ UAt σ Z (evFin F v), ∀ φ ∈ SB (Fin n × Fin d → Fv F v), ∀ φ₁ ∈ SB (Fin n × Fin d → Fv F v),
-      Acts (evFin F v) (om (1, h)) φ φ₁ → p φ = 0 → p φ₁ = 0)
-    (irred : ∀ N : Submodule ℂ P, (∀ h ∈ UAt σ Z (evFin F v), ∀ φ ∈ SB (Fin n × Fin d → Fv F v),
-      ∀ φ₁ ∈ SB (Fin n × Fin d → Fv F v), Acts (evFin F v) (om (1, h)) φ φ₁ → p φ ∈ N → p φ₁ ∈ N) → N = ⊥ ∨ N = ⊤) :
-    Maximal (fun N => GlobalTheory.Published.ThetaSub om v N ∧ N ≠ SB (Fin n × Fin d → Fv F v))
+    (stab : ∀ h ∈ UAt σ Z (evFin F v), ∀ φ ∈ SB (Fin n × Fin d → Fv F v),
+      ∀ φ₁ ∈ SB (Fin n × Fin d → Fv F v),
+        Acts (evFin F v) (om (1, h)) φ φ₁ → p φ = 0 → p φ₁ = 0)
+    (irred : ∀ N : Submodule ℂ P,
+      (∀ h ∈ UAt σ Z (evFin F v), ∀ φ ∈ SB (Fin n × Fin d → Fv F v),
+          ∀ φ₁ ∈ SB (Fin n × Fin d → Fv F v),
+            Acts (evFin F v) (om (1, h)) φ φ₁ → p φ ∈ N → p φ₁ ∈ N)
+        → N = ⊥ ∨ N = ⊤)
+    : Maximal
+      (fun N => GlobalTheory.Published.ThetaSub om v N ∧ N ≠ SB (Fin n × Fin d → Fv F v))
       (LinearMap.ker p ⊓ SB (Fin n × Fin d → Fv F v)) := by
   have haug : augAt om v ≤ SB (Fin n × Fin d → Fv F v) := by
     refine Submodule.span_le.2 ?_
     rintro z ⟨g, -, φ, hφ, φ₁, hφ₁, -, rfl⟩
     exact sub_mem hφ₁ hφ
 
-  have hfill : ∀ Q : Submodule ℂ _, LinearMap.ker p ⊓ SB (Fin n × Fin d → Fv F v) ≤ Q →
-      Q ≤ SB (Fin n × Fin d → Fv F v) → ∀ φ ∈ SB (Fin n × Fin d → Fv F v), ∀ ψ ∈ Q, p ψ = p φ → φ ∈ Q := by
+  have hfill
+      : ∀ Q : Submodule ℂ _,
+        LinearMap.ker p ⊓ SB (Fin n × Fin d → Fv F v) ≤ Q → Q ≤ SB (Fin n × Fin d → Fv F v)
+          → ∀ φ ∈ SB (Fin n × Fin d → Fv F v), ∀ ψ ∈ Q, p ψ = p φ → φ ∈ Q := by
     intro Q hNQ hQ φ hφ ψ hψ e
-    have h1 : φ - ψ ∈ Q := hNQ ⟨LinearMap.mem_ker.2 (by rw [map_sub, e, sub_self]), sub_mem hφ (hQ hψ)⟩
+    have h1 : φ - ψ ∈ Q :=
+      hNQ ⟨LinearMap.mem_ker.2 (by rw [map_sub, e, sub_self]), sub_mem hφ (hQ hψ)⟩
     simpa using add_mem h1 hψ
   refine ⟨⟨⟨le_inf inv haug, inf_le_right, ?_⟩, ?_⟩, ?_⟩
   · intro h hh φ hφ φ₁ hφ₁ hact
@@ -307,8 +353,9 @@ theorem ker_maximal {n d : ℕ} {Y : Spc F E n} {Z : Spc F E d} (om : Rep σ Y Z
     exact hy this.1
   · rintro Q ⟨⟨-, hQ, hQs⟩, hQne⟩ hNQ
     rcases irred (Q.map p) (fun h hh φ hφ φ₁ hφ₁ hact hmem => by
-      obtain ⟨ψ, hψ, e⟩ := hmem
-      exact ⟨φ₁, hQs h hh φ (hfill Q hNQ hQ φ hφ ψ hψ e) φ₁ hφ₁ hact, rfl⟩) with h0 | h1
+        obtain ⟨ψ, hψ, e⟩ := hmem
+        exact ⟨φ₁, hQs h hh φ (hfill Q hNQ hQ φ hφ ψ hψ e) φ₁ hφ₁ hact, rfl⟩)
+      with h0 | h1
     · intro x hx
       refine ⟨?_, hQ hx⟩
       have : p x ∈ Q.map p := ⟨x, hx, rfl⟩
@@ -320,21 +367,26 @@ theorem ker_maximal {n d : ℕ} {Y : Spc F E n} {Z : Spc F E d} (om : Rep σ Y Z
       obtain ⟨ψ, hψ, e⟩ := this
       exact hfill Q hNQ hQ φ hφ ψ hψ e
 
-theorem det_ne_zero_herm {B : Base F E} {n : ℕ} {Y : Spc F E n} {r s : ℕ} (h : Y.IsHerm σ B r s) : Y.J.det ≠ 0 := by
+theorem det_ne_zero_herm {B : Base F E} {n : ℕ} {Y : Spc F E n} {r s : ℕ} (h : Y.IsHerm σ B r s)
+    : Y.J.det ≠ 0 := by
   obtain ⟨w⟩ : Nonempty (InfinitePlace F) := inferInstance
   intro h0
   apply GlobalTheory.WeilSchrodingerHerm.det_ne_zero_of_hasSig (h.sig w)
   rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, h0, map_zero]
 
-theorem det_ne_zero_skew {B : Base F E} {n : ℕ} {Y : Spc F E n} {r s : ℕ} (h : Y.IsSkew σ B r s) : Y.J.det ≠ 0 := by
+theorem det_ne_zero_skew {B : Base F E} {n : ℕ} {Y : Spc F E n} {r s : ℕ} (h : Y.IsSkew σ B r s)
+    : Y.J.det ≠ 0 := by
   obtain ⟨w⟩ : Nonempty (InfinitePlace F) := inferInstance
   intro h0
   apply GlobalTheory.WeilSchrodingerHerm.det_ne_zero_of_hasSig (h.sig w)
   rw [Matrix.det_smul, ← RingHom.mapMatrix_apply, ← RingHom.map_det, h0, map_zero, mul_zero]
 
-theorem equiv_of_ker_eq' {κ : Type} [TopologicalSpace κ] {P Q : Type} [AddCommGroup P] [Module ℂ P] [AddCommGroup Q]
-    [Module ℂ Q] (p : (κ → ℂ) →ₗ[ℂ] P) (q : (κ → ℂ) →ₗ[ℂ] Q) (hp : (SB κ).map p = ⊤) (hq : (SB κ).map q = ⊤)
-    (h : LinearMap.ker p ⊓ SB κ = LinearMap.ker q ⊓ SB κ) : ∃ e : P ≃ₗ[ℂ] Q, ∀ φ ∈ SB κ, q φ = e (p φ) := by
+theorem equiv_of_ker_eq'
+    {κ : Type} [TopologicalSpace κ]
+    {P Q : Type} [AddCommGroup P] [Module ℂ P] [AddCommGroup Q] [Module ℂ Q]
+    (p : (κ → ℂ) →ₗ[ℂ] P) (q : (κ → ℂ) →ₗ[ℂ] Q) (hp : (SB κ).map p = ⊤) (hq : (SB κ).map q = ⊤)
+    (h : LinearMap.ker p ⊓ SB κ = LinearMap.ker q ⊓ SB κ)
+    : ∃ e : P ≃ₗ[ℂ] Q, ∀ φ ∈ SB κ, q φ = e (p φ) := by
   have sp : Function.Surjective (p.comp (SB κ).subtype) := fun y => by
     have : y ∈ (SB κ).map p := by rw [hp]; trivial
     obtain ⟨x, hx, rfl⟩ := this

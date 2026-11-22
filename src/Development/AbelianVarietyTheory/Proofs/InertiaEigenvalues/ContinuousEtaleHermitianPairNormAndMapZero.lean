@@ -9,8 +9,11 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem etale_norm_continuous_and_zero (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) : Continuous A.NL ∧ A.NL 0 = 0 := by
+theorem etale_norm_continuous_and_zero
+    (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+    [StarRing E] [Unram F E]
+    (A : Et F E)
+    : Continuous A.NL ∧ A.NL 0 = 0 := by
   classical
   have h2 : Module.finrank F E = 2 := Unram.finrank_eq
   haveI : Module.Finite F E := Module.finite_of_finrank_pos (by omega)

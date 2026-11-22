@@ -9,34 +9,48 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsIsS
 @[expose] public section
 
 open scoped Matrix GlobalTheory.VacAny
-open NumberField IsDedekindDomain MeasureTheory Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RatWeilOp
+open NumberField IsDedekindDomain MeasureTheory Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RatWeilOp
 
 noncomputable section
 namespace GlobalTheory.FourierLocBij
 
-def toCircle {k : Type} [AddMonoid k] (ψ : AddChar k ℂ) (hn : ∀ t, ‖ψ t‖ = 1) : AddChar k Circle where
+def toCircle {k : Type} [AddMonoid k] (ψ : AddChar k ℂ) (hn : ∀ t, ‖ψ t‖ = 1)
+    : AddChar k Circle where
   toFun t := ⟨ψ t, by simp [Submonoid.unitSphere, hn t]⟩
   map_zero_eq_one' := Circle.ext (by simp)
   map_add_eq_mul' a b := Circle.ext (AddChar.map_add_eq_mul ψ a b)
 
-theorem coe_toCircle {k : Type} [AddMonoid k] (ψ : AddChar k ℂ) (hn : ∀ t, ‖ψ t‖ = 1) (t : k) :
-    ((toCircle ψ hn t : Circle) : ℂ) = ψ t := rfl
+theorem coe_toCircle {k : Type} [AddMonoid k] (ψ : AddChar k ℂ) (hn : ∀ t, ‖ψ t‖ = 1) (t : k)
+    : ((toCircle ψ hn t : Circle) : ℂ) = ψ t :=
+  rfl
 
 section General
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem translate_fourier [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) {κ : Type} [Fintype κ]
-    (m : Measure (κ → k)) [m.IsAddRightInvariant] (φ : (κ → k) → ℂ) (a y : κ → k) :
-    ∫ x, φ (x + a) * (ψ (x ⬝ᵥ y) : ℂ) ∂m = (ψ (-(a ⬝ᵥ y)) : ℂ) * ∫ x, φ x * (ψ (x ⬝ᵥ y) : ℂ) ∂m := by
-  rw [← integral_add_right_eq_self (μ := m) (fun x => φ (x + a) * (ψ (x ⬝ᵥ y) : ℂ)) (-a), ← integral_const_mul]
+theorem translate_fourier
+    [MeasurableSpace k] [BorelSpace k]
+    (ψ : AddChar k Circle)
+    {κ : Type} [Fintype κ]
+    (m : Measure (κ → k)) [m.IsAddRightInvariant]
+    (φ : (κ → k) → ℂ) (a y : κ → k)
+    : ∫ x, φ (x + a) * (ψ (x ⬝ᵥ y) : ℂ) ∂m
+      = (ψ (-(a ⬝ᵥ y)) : ℂ) * ∫ x, φ x * (ψ (x ⬝ᵥ y) : ℂ) ∂m := by
+  rw [← integral_add_right_eq_self (μ := m) (fun x => φ (x + a) * (ψ (x ⬝ᵥ y) : ℂ)) (-a),
+    ← integral_const_mul]
   congr 1
   funext x
   rw [neg_add_cancel_right, add_dotProduct, AddChar.map_add_eq_mul, Circle.coe_mul, neg_dotProduct]
   ring
 
-theorem bijOn_circle [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) (hc : Continuous ψ) (h1 : ψ ≠ 1)
-    (κ : Type) [Fintype κ] (μ : Measure (κ → k)) [μ.IsAddHaarMeasure] :
-    Set.BijOn (fun (φ : (κ → k) → ℂ) (y : κ → k) => ∫ x, φ x * (ψ (x ⬝ᵥ y) : ℂ) ∂μ)
+theorem bijOn_circle
+    [MeasurableSpace k] [BorelSpace k]
+    (ψ : AddChar k Circle) (hc : Continuous ψ) (h1 : ψ ≠ 1)
+    (κ : Type) [Fintype κ]
+    (μ : Measure (κ → k)) [μ.IsAddHaarMeasure]
+    : Set.BijOn
+      (fun (φ : (κ → k) → ℂ) (y : κ → k) => ∫ x, φ x * (ψ (x ⬝ᵥ y) : ℂ) ∂μ)
       (SB (κ → k) : Set _) (SB (κ → k) : Set _) := by
   classical
   haveI := GlobalTheory.SplitWeil.secondCountable k
@@ -50,8 +64,10 @@ theorem bijOn_circle [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) 
     intro h0
     rw [h0, zero_smul] at hμ
     exact NeZero.ne μ hμ
-  have hT : ∀ φ : (κ → k) → ℂ, (fun y => ∫ x, φ x * (ψ (x ⬝ᵥ y) : ℂ) ∂μ) =
-      fun y => ((r : ℝ) : ℂ) * ∫ x, φ x * (ψ (x ⬝ᵥ y) : ℂ) ∂m := by
+  have hT
+      : ∀ φ : (κ → k) → ℂ,
+        (fun y => ∫ x, φ x * (ψ (x ⬝ᵥ y) : ℂ) ∂μ)
+          = fun y => ((r : ℝ) : ℂ) * ∫ x, φ x * (ψ (x ⬝ᵥ y) : ℂ) ∂m := by
     intro φ
     funext y
     rw [hμ, integral_smul_nnreal_measure, NNReal.smul_def, Complex.real_smul]
@@ -67,8 +83,9 @@ theorem bijOn_circle [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) 
       intro y
       have := congrFun he y
       simp only at this
-      rw [hμ, integral_smul_nnreal_measure, integral_smul_nnreal_measure, NNReal.smul_def, NNReal.smul_def,
-        Complex.real_smul, Complex.real_smul] at this
+      rw [hμ, integral_smul_nnreal_measure, integral_smul_nnreal_measure, NNReal.smul_def,
+          NNReal.smul_def, Complex.real_smul, Complex.real_smul]
+        at this
       exact mul_left_cancel₀ hr' this
     funext a
     have h1a := (key _ (hcomp (Homeomorph.addRight a) _ h₁)).2
@@ -94,10 +111,14 @@ end General
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem fourier_bijOn : ∀ (F : Type) [Field F] [NumberField F] (v : Pl (F := F)) (ψ : AddChar (Fv F v) ℂ), Continuous ψ → (∀ t, ‖ψ t‖ = 1) → ψ ≠ 1 → ∀ (κ : Type) [Fintype κ]
-    [MeasurableSpace (κ → Fv F v)] [BorelSpace (κ → Fv F v)] (μ : Measure (κ → Fv F v)) [μ.IsAddHaarMeasure],
-    Set.BijOn (fun (φ : (κ → Fv F v) → ℂ) (y : κ → Fv F v) => ∫ x, φ x * ψ (x ⬝ᵥ y) ∂μ)
-      (SB (κ → Fv F v) : Set _) (SB (κ → Fv F v) : Set _) := by
+theorem fourier_bijOn
+    : ∀ (F : Type) [Field F] [NumberField F] (v : Pl (F := F)) (ψ : AddChar (Fv F v) ℂ),
+      Continuous ψ → (∀ t, ‖ψ t‖ = 1) → ψ ≠ 1
+        → ∀ (κ : Type) [Fintype κ] [MeasurableSpace (κ → Fv F v)] [BorelSpace (κ → Fv F v)]
+            (μ : Measure (κ → Fv F v)) [μ.IsAddHaarMeasure],
+          Set.BijOn
+            (fun (φ : (κ → Fv F v) → ℂ) (y : κ → Fv F v) => ∫ x, φ x * ψ (x ⬝ᵥ y) ∂μ)
+            (SB (κ → Fv F v) : Set _) (SB (κ → Fv F v) : Set _) := by
   intro F _ _ v ψ hc hn h1 κ _ inst _ μ _
   letI : MeasurableSpace (Fv F v) := borel _
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩

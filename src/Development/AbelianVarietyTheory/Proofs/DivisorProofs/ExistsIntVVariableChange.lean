@@ -12,9 +12,11 @@ open WeierstrassCurve
 
 namespace GlobalTheory.CMModel
 
-theorem exists_intV_variableChange (W : WeierstrassCurve ℂ) [W.IsElliptic] (V : ValuationSubring ℂ)
-    (u : ℂˣ) (hj : W.j ∈ V) (hu : V.valuation (u : ℂ) ^ 12 = V.valuation W.Δ) :
-    ∃ r s t : ℂ, IntV V ((⟨u, r, s, t⟩ : VariableChange ℂ) • W) := by
+theorem exists_intV_variableChange
+    (W : WeierstrassCurve ℂ) [W.IsElliptic]
+    (V : ValuationSubring ℂ) (u : ℂˣ)
+    (hj : W.j ∈ V) (hu : V.valuation (u : ℂ) ^ 12 = V.valuation W.Δ)
+    : ∃ r s t : ℂ, IntV V ((⟨u, r, s, t⟩ : VariableChange ℂ) • W) := by
   have : IsIntegrallyClosedIn V ℂ := (isIntegrallyClosed_iff_isIntegrallyClosedIn ℂ).1 inferInstance
   have ht : HasRationalTorsion W ℂ 12 := by
     intro x y h hn
@@ -41,14 +43,19 @@ theorem exists_intV_variableChange (W : WeierstrassCurve ℂ) [W.IsElliptic] (V 
   have h6 : (C • W).a₆ ∈ V := by rw [e]; exact W₀.a₆.2
   refine ⟨C.r, C.s, C.t, ?_, ?_, ?_, ?_, ?_⟩
   · convert V.mul_mem _ _ hw h1 using 1
-    simp only [variableChange_a₁, Units.val_inv_eq_inv_val]; field_simp
+    simp only [variableChange_a₁, Units.val_inv_eq_inv_val]
+    field_simp
   · convert V.mul_mem _ _ (pow_mem hw 2) h2 using 1
-    simp only [variableChange_a₂, Units.val_inv_eq_inv_val]; field_simp
+    simp only [variableChange_a₂, Units.val_inv_eq_inv_val]
+    field_simp
   · convert V.mul_mem _ _ (pow_mem hw 3) h3 using 1
-    simp only [variableChange_a₃, Units.val_inv_eq_inv_val]; field_simp
+    simp only [variableChange_a₃, Units.val_inv_eq_inv_val]
+    field_simp
   · convert V.mul_mem _ _ (pow_mem hw 4) h4 using 1
-    simp only [variableChange_a₄, Units.val_inv_eq_inv_val]; field_simp
+    simp only [variableChange_a₄, Units.val_inv_eq_inv_val]
+    field_simp
   · convert V.mul_mem _ _ (pow_mem hw 6) h6 using 1
-    simp only [variableChange_a₆, Units.val_inv_eq_inv_val]; field_simp
+    simp only [variableChange_a₆, Units.val_inv_eq_inv_val]
+    field_simp
 
 end GlobalTheory.CMModel

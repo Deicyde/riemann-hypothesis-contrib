@@ -21,8 +21,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.Grow
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.Grow
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup (coefPlus Cols SizeRows)
 open GlobalTheory.SepRows GlobalTheory.CoreOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -31,31 +35,39 @@ noncomputable section
 
 namespace GlobalTheory.HeisJointEigen
 
-theorem coeff_zero_of_separated {ι V : Type*} [AddCommGroup V] [Module ℂ V] [DecidableEq ι] (v : ι → V) :
-    ∀ R : Finset ι, (∀ z ∈ R, v z ≠ 0) →
-      (∀ y ∈ R, ∀ y' ∈ R, y ≠ y' → ∃ (A : V →ₗ[ℂ] V) (χ : ι → ℂ), (∀ z ∈ R, A (v z) = χ z • v z) ∧ χ y ≠ χ y') →
-      ∀ c : ι → ℂ, ∑ z ∈ R, c z • v z = 0 → ∀ z ∈ R, c z = 0 := by
+theorem coeff_zero_of_separated
+    {ι V : Type*} [AddCommGroup V] [Module ℂ V] [DecidableEq ι] (v : ι → V)
+    : ∀ R : Finset ι,
+      (∀ z ∈ R, v z ≠ 0)
+        → (∀ y ∈ R, ∀ y' ∈ R,
+          y ≠ y' → ∃ (A : V →ₗ[ℂ] V) (χ : ι → ℂ), (∀ z ∈ R, A (v z) = χ z • v z) ∧ χ y ≠ χ y')
+        → ∀ c : ι → ℂ, ∑ z ∈ R, c z • v z = 0 → ∀ z ∈ R, c z = 0 := by
   intro R
   induction R using Finset.induction_on with
   | empty => intro _ _ c _ z hz; simp at hz
   | insert a s ha ih =>
     intro hv hsep c hsum
     have hv' : ∀ z ∈ s, v z ≠ 0 := fun z hz => hv z (Finset.mem_insert_of_mem hz)
-    have hsep' : ∀ y ∈ s, ∀ y' ∈ s, y ≠ y' →
-        ∃ (A : V →ₗ[ℂ] V) (χ : ι → ℂ), (∀ z ∈ s, A (v z) = χ z • v z) ∧ χ y ≠ χ y' := by
+    have hsep'
+        : ∀ y ∈ s, ∀ y' ∈ s,
+          y ≠ y' → ∃ (A : V →ₗ[ℂ] V) (χ : ι → ℂ), (∀ z ∈ s, A (v z) = χ z • v z) ∧ χ y ≠ χ y' := by
       intro y hy y' hy' hne
-      obtain ⟨A, χ, hA, hχ⟩ := hsep y (Finset.mem_insert_of_mem hy) y' (Finset.mem_insert_of_mem hy') hne
+      obtain ⟨A, χ, hA, hχ⟩ :=
+        hsep y (Finset.mem_insert_of_mem hy) y' (Finset.mem_insert_of_mem hy') hne
       exact ⟨A, χ, fun z hz => hA z (Finset.mem_insert_of_mem hz), hχ⟩
     rw [Finset.sum_insert ha] at hsum
     have hs0 : ∀ b ∈ s, c b = 0 := by
       intro b hb
       have hab : b ≠ a := fun h => ha (h ▸ hb)
-      obtain ⟨A, χ, hA, hχ⟩ := hsep b (Finset.mem_insert_of_mem hb) a (Finset.mem_insert_self a s) hab
-      have key : ∑ z ∈ s, (c z * (χ z - χ a)) • v z =
-          A (c a • v a + ∑ z ∈ s, c z • v z) - χ a • (c a • v a + ∑ z ∈ s, c z • v z) := by
+      obtain ⟨A, χ, hA, hχ⟩ :=
+        hsep b (Finset.mem_insert_of_mem hb) a (Finset.mem_insert_self a s) hab
+      have key
+          : ∑ z ∈ s, (c z * (χ z - χ a)) • v z
+            = A (c a • v a + ∑ z ∈ s, c z • v z) - χ a • (c a • v a + ∑ z ∈ s, c z • v z) := by
         set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_add (f := _), map_sum, map_smul, hA a (Finset.mem_insert_self a s), smul_add, Finset.smul_sum,
-          add_sub_add_comm, smul_comm (χ a) (c a), sub_self, zero_add, ← Finset.sum_sub_distrib]
+          rw [map_add (f := _), map_sum, map_smul, hA a (Finset.mem_insert_self a s), smul_add,
+            Finset.smul_sum, add_sub_add_comm, smul_comm (χ a) (c a), sub_self, zero_add,
+            ← Finset.sum_sub_distrib]
         refine Finset.sum_congr rfl fun z hz => ?_
         rw [map_smul, hA z (Finset.mem_insert_of_mem hz), smul_smul, smul_smul, ← sub_smul]
         congr 1
@@ -65,7 +77,8 @@ theorem coeff_zero_of_separated {ι V : Type*} [AddCommGroup V] [Module ℂ V] [
       rcases mul_eq_zero.1 h with h | h
       · exact h
       · exact absurd (sub_eq_zero.1 h) hχ
-    have hsum0 : ∑ z ∈ s, c z • v z = 0 := Finset.sum_eq_zero fun z hz => by rw [hs0 z hz, zero_smul]
+    have hsum0 : ∑ z ∈ s, c z • v z = 0 :=
+      Finset.sum_eq_zero fun z hz => by rw [hs0 z hz, zero_smul]
     rw [hsum0, add_zero] at hsum
     have hca : c a = 0 := (smul_eq_zero.1 hsum).resolve_right (hv a (Finset.mem_insert_self a s))
     intro z hz
@@ -73,7 +86,20 @@ theorem coeff_zero_of_separated {ι V : Type*} [AddCommGroup V] [Module ℂ V] [
     · exact hca
     · exact hs0 z hz
 
-theorem sum_heisO_ne_zero : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (P : Finset (Formalism.L2.DIV.Pl D.host.E)) (e : AE D), IsIdemSum e P → ∀ (R : Finset (WO S T)), (∀ y ∈ R, ∀ y' ∈ R, y ≠ y' → ∃ u ∈ latO S T (ΛS : Set _) (ΛT : Set _) (fun _ => True), IsHalf e u ∧ ψ (symplO S T u y) ≠ ψ (symplO S T u y')) → ∀ g : WO S T → ℂ, IsLatVac (heisO ψ S T) (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) g → g ≠ 0 → ∀ c : WO S T → ℂ, (∃ z ∈ R, c z ≠ 0) → ∑ z ∈ R, c z • heisO ψ S T z g ≠ 0 := by
+theorem sum_heisO_ne_zero
+    : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D)
+        (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+        (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E))
+        (P : Finset (Formalism.L2.DIV.Pl D.host.E)) (e : AE D),
+      IsIdemSum e P
+        → ∀ (R : Finset (WO S T)),
+          (∀ y ∈ R, ∀ y' ∈ R,
+              y ≠ y'
+                → ∃ u ∈ latO S T (ΛS : Set _) (ΛT : Set _) (fun _ => True),
+                  IsHalf e u ∧ ψ (symplO S T u y) ≠ ψ (symplO S T u y'))
+            → ∀ g : WO S T → ℂ,
+              IsLatVac (heisO ψ S T) (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) g → g ≠ 0
+                → ∀ c : WO S T → ℂ, (∃ z ∈ R, c z ≠ 0) → ∑ z ∈ R, c z • heisO ψ S T z g ≠ 0 := by
   intro D ψ S T ΛS ΛT P e he R hsep g hg hg0 c hc hsum
   obtain ⟨z0, hz0, hcz⟩ := hc
   apply hcz

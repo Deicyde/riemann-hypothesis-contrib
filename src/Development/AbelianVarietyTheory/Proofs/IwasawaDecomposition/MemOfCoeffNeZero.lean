@@ -13,31 +13,42 @@ namespace GlobalTheory.PolFan
 
 namespace ConeMeet
 
-variable {O : Type} [CommRing O] {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X] [Module O X]
-  [Module.Finite O X] {m m' : ℕ}
+variable
+  {O : Type} [CommRing O]
+  {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
+  {m m' : ℕ}
 
-theorem inCone {n : ℕ} {γ' : Fin m' → LinearMap.BilinForm ℤ X} (hγ' : IsCone bar φ γ')
-    {β : Fin n → LinearMap.BilinForm ℤ X} (hβ : ∀ i, β i ∈ balForms bar X) (hβp : ∀ i y, 0 ≤ β i y y)
+theorem inCone
+    {n : ℕ} {γ' : Fin m' → LinearMap.BilinForm ℤ X} (hγ' : IsCone bar φ γ')
+    {β : Fin n → LinearMap.BilinForm ℤ X}
+    (hβ : ∀ i, β i ∈ balForms bar X) (hβp : ∀ i y, 0 ≤ β i y y)
     {a : Fin n → ℝ} {b : Fin m' → ℝ} (ha : ∀ i, 0 ≤ a i) (hb : ∀ j, 0 ≤ b j)
     (hlin : evalR φ (∑ i, a i • toReal (β i)) = ∑ i, a i * φ.evalZ (β i))
-    (hrel : ∑ i, a i • toReal (β i) = ∑ j, b j • toReal (γ' j)) :
-    ∀ i, a i ≠ 0 → ∃ (k : ℕ) (d : Fin m' → ℕ), 0 < k ∧ k • β i = ∑ j, d j • γ' j := by
+    (hrel : ∑ i, a i • toReal (β i) = ∑ j, b j • toReal (γ' j))
+    : ∀ i, a i ≠ 0 → ∃ (k : ℕ) (d : Fin m' → ℕ), 0 < k ∧ k • β i = ∑ j, d j • γ' j := by
   obtain ⟨N, ℓ, hN, h1, h2, h3⟩ := hγ'.strict
   have hsum : ∑ i, a i * (ℓ (β i) : ℝ) = ∑ j, b j * (ℓ (γ' j) : ℝ) := by
-    have := sum_mul_eq_zero_of_sum_toReal (X := X) (j := LinearMap.id) (fun _ _ h => h) ℓ
-      (β := Sum.elim β γ') (c := Sum.elim a (-b)) (by
-        rw [Fintype.sum_sum_type]
-        simp only [Sum.elim_inl, Sum.elim_inr, LinearMap.id_apply, Pi.neg_apply, neg_smul, Finset.sum_neg_distrib, hrel,
-          add_neg_cancel])
+    have :=
+      sum_mul_eq_zero_of_sum_toReal (X := X) (j := LinearMap.id)
+        (fun _ _ h => h)
+        ℓ (β := Sum.elim β γ') (c := Sum.elim a (-b))
+        (by
+          rw [Fintype.sum_sum_type]
+          simp only [Sum.elim_inl, Sum.elim_inr, LinearMap.id_apply, Pi.neg_apply, neg_smul,
+            Finset.sum_neg_distrib, hrel, add_neg_cancel])
     rw [Fintype.sum_sum_type] at this
-    simp only [Sum.elim_inl, Sum.elim_inr, LinearMap.id_apply, Pi.neg_apply, neg_mul, Finset.sum_neg_distrib] at this
+    simp only [Sum.elim_inl, Sum.elim_inr, LinearMap.id_apply, Pi.neg_apply, neg_mul,
+        Finset.sum_neg_distrib]
+      at this
     linarith
   have hφ : ∑ i, a i * φ.evalZ (β i) = ∑ j, b j * φ.evalZ (γ' j) := by
     rw [← hlin, hrel]; exact (linearOn_iff φ γ').1 hγ'.linear b hb
   have hterm : ∑ i, a i * ((ℓ (β i) : ℝ) - N * φ.evalZ (β i)) = 0 := by
     simp only [mul_sub, Finset.sum_sub_distrib]
-    rw [hsum, show ∑ i, a i * (N * φ.evalZ (β i)) = N * ∑ i, a i * φ.evalZ (β i) by
-      rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun _ _ => by ring, hφ, Finset.mul_sum, sub_eq_zero]
+    rw [hsum,
+      show ∑ i, a i * (N * φ.evalZ (β i)) = N * ∑ i, a i * φ.evalZ (β i) by
+        rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun _ _ => by ring,
+      hφ, Finset.mul_sum, sub_eq_zero]
     exact Finset.sum_congr rfl fun j _ => by rw [h1]; ring
   have hnn : ∀ i ∈ Finset.univ, 0 ≤ a i * ((ℓ (β i) : ℝ) - N * φ.evalZ (β i)) := fun i _ =>
     mul_nonneg (ha i) (sub_nonneg.2 (h2 _ (hβ i) (hβp i)))
@@ -49,15 +60,18 @@ theorem inCone {n : ℕ} {γ' : Fin m' → LinearMap.BilinForm ℤ X} (hγ' : Is
     · linarith
   exact h3 _ (hβ i) (hβp i) he
 
-theorem apply_sum_nsmul {L : Type} [AddCommGroup L] (F : L →ₗ[ℤ] ℤ) {p : ℕ} (n : Fin p → ℕ) (v : Fin p → L) :
-    F (∑ j, n j • v j) = ∑ j, (n j : ℤ) * F (v j) := by
+theorem apply_sum_nsmul
+    {L : Type} [AddCommGroup L] (F : L →ₗ[ℤ] ℤ) {p : ℕ} (n : Fin p → ℕ) (v : Fin p → L)
+    : F (∑ j, n j • v j) = ∑ j, (n j : ℤ) * F (v j) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, map_nsmul]
+  simp [map_sum, map_nsmul]
 
-theorem ray {γ : Fin m → LinearMap.BilinForm ℤ X} {γ' : Fin m' → LinearMap.BilinForm ℤ X} (hγ : IsCone bar φ γ)
-    (hγ' : IsCone bar φ γ') {i : Fin m} {k : ℕ} {d : Fin m' → ℕ} (hk : 0 < k) (hkd : k • γ i = ∑ j, d j • γ' j)
-    (hback : ∀ j, d j ≠ 0 → ∃ (kj : ℕ) (e : Fin m → ℕ), 0 < kj ∧ kj • γ' j = ∑ l, e l • γ l) :
-    ∃ j, γ i = γ' j := by
+theorem ray
+    {γ : Fin m → LinearMap.BilinForm ℤ X} {γ' : Fin m' → LinearMap.BilinForm ℤ X}
+    (hγ : IsCone bar φ γ) (hγ' : IsCone bar φ γ')
+    {i : Fin m} {k : ℕ} {d : Fin m' → ℕ} (hk : 0 < k) (hkd : k • γ i = ∑ j, d j • γ' j)
+    (hback : ∀ j, d j ≠ 0 → ∃ (kj : ℕ) (e : Fin m → ℕ), 0 < kj ∧ kj • γ' j = ∑ l, e l • γ l)
+    : ∃ j, γ i = γ' j := by
   classical
   let g : Fin m → balForms bar X := fun l => ⟨γ l, hγ.mem l⟩
   let g' : Fin m' → balForms bar X := fun l => ⟨γ' l, hγ'.mem l⟩
@@ -66,12 +80,17 @@ theorem ray {γ : Fin m → LinearMap.BilinForm ℤ X} {γ' : Fin m' → LinearM
   have hf : ∀ a b, f a (g b) = if a = b then 1 else 0 := hf
   have hf' : ∀ a b, f' a (g' b) = if a = b then 1 else 0 := hf'
   have H1 : k • g i = ∑ j, d j • g' j := Subtype.ext (by simpa [g, g', Submodule.coe_sum] using hkd)
-  have H2 : ∀ j, d j ≠ 0 → ∃ (kj : ℕ) (e : Fin m → ℕ), 0 < kj ∧ kj • g' j = ∑ l, e l • g l := fun j hj => by
+  have H2
+      : ∀ j,
+        d j ≠ 0 → ∃ (kj : ℕ) (e : Fin m → ℕ), 0 < kj ∧ kj • g' j = ∑ l, e l • g l := fun j hj => by
     obtain ⟨kj, e, hkj, he⟩ := hback j hj
     exact ⟨kj, e, hkj, Subtype.ext (by simpa [g, g', Submodule.coe_sum] using he)⟩
 
-  have coord : ∀ j, d j ≠ 0 → ∃ (kj : ℕ) (e : Fin m → ℕ), 0 < kj ∧ kj • g' j = ∑ l, e l • g l ∧
-      ∀ l, (kj : ℤ) * f l (g' j) = e l := fun j hj => by
+  have coord
+      : ∀ j,
+        d j ≠ 0
+          → ∃ (kj : ℕ) (e : Fin m → ℕ),
+            0 < kj ∧ kj • g' j = ∑ l, e l • g l ∧ ∀ l, (kj : ℤ) * f l (g' j) = e l := fun j hj => by
     obtain ⟨kj, e, hkj, he⟩ := H2 j hj
     refine ⟨kj, e, hkj, he, fun l => ?_⟩
     have t := congrArg (f l) he
@@ -86,7 +105,8 @@ theorem ray {γ : Fin m → LinearMap.BilinForm ℤ X} {γ' : Fin m' → LinearM
       · simp [hd]
       · obtain ⟨kj, e, hkj, -, he⟩ := coord j hd
         have : 0 ≤ (kj : ℤ) * f l (g' j) := (he l).symm ▸ Int.natCast_nonneg _
-        exact mul_nonneg (Int.natCast_nonneg _) ((mul_nonneg_iff_of_pos_left (by exact_mod_cast hkj)).1 this)
+        exact mul_nonneg (Int.natCast_nonneg _)
+          ((mul_nonneg_iff_of_pos_left (by exact_mod_cast hkj)).1 this)
     intro j hd
     have := (Finset.sum_eq_zero_iff_of_nonneg hnn).1 s.symm j (Finset.mem_univ _)
     exact (mul_eq_zero.1 this).resolve_left (by exact_mod_cast hd)
@@ -109,7 +129,8 @@ theorem ray {γ : Fin m → LinearMap.BilinForm ℤ X} {γ' : Fin m' → LinearM
   rw [map_nsmul, map_nsmul, hf', if_pos rfl] at t
   simp only [nsmul_eq_mul, mul_one] at t
   have hx := hc i
-  have hx0 : 0 ≤ f i (g' j) := (mul_nonneg_iff_of_pos_left (by exact_mod_cast hkj)).1 (hx ▸ Int.natCast_nonneg _)
+  have hx0 : 0 ≤ f i (g' j) :=
+    (mul_nonneg_iff_of_pos_left (by exact_mod_cast hkj)).1 (hx ▸ Int.natCast_nonneg _)
   have hxy : f i (g' j) * f' j (g i) = 1 := by
     have : (kj : ℤ) * (f i (g' j) * f' j (g i)) = kj * 1 := by
       rw [← mul_assoc, hx, mul_one]; exact_mod_cast t.symm
@@ -124,15 +145,22 @@ theorem ray {γ : Fin m → LinearMap.BilinForm ℤ X} {γ' : Fin m' → LinearM
   · exact h.symm
   · omega
 
-theorem mem_of_coeff_ne_zero {γ : Fin m → LinearMap.BilinForm ℤ X} {γ' : Fin m' → LinearMap.BilinForm ℤ X}
-    (hγ : IsCone bar φ γ) (hγ' : IsCone bar φ γ') {c : Fin m → ℝ} {c' : Fin m' → ℝ} (hc : ∀ i, 0 ≤ c i)
-    (hc' : ∀ j, 0 ≤ c' j) (hrel : ∑ i, c i • toReal (γ i) = ∑ j, c' j • toReal (γ' j)) (i : Fin m) (hi : c i ≠ 0) :
-    ∃ j, γ i = γ' j := by
+theorem mem_of_coeff_ne_zero
+    {γ : Fin m → LinearMap.BilinForm ℤ X} {γ' : Fin m' → LinearMap.BilinForm ℤ X}
+    (hγ : IsCone bar φ γ) (hγ' : IsCone bar φ γ')
+    {c : Fin m → ℝ} {c' : Fin m' → ℝ} (hc : ∀ i, 0 ≤ c i) (hc' : ∀ j, 0 ≤ c' j)
+    (hrel : ∑ i, c i • toReal (γ i) = ∑ j, c' j • toReal (γ' j))
+    (i : Fin m) (hi : c i ≠ 0)
+    : ∃ j, γ i = γ' j := by
   classical
-  obtain ⟨k, d, hk, hkd⟩ := inCone hγ' hγ.mem hγ.nonneg hc hc' ((linearOn_iff φ γ).1 hγ.linear c hc) hrel i hi
+  obtain ⟨k, d, hk, hkd⟩ :=
+    inCone hγ' hγ.mem hγ.nonneg hc hc' ((linearOn_iff φ γ).1 hγ.linear c hc) hrel i hi
   refine ray hγ hγ' hk hkd fun j hj => ?_
-  refine inCone (a := fun j => (d j : ℝ)) (b := Pi.single i (k : ℝ)) hγ hγ'.mem hγ'.nonneg
-    (fun j => Nat.cast_nonneg _) (fun l => by by_cases h : l = i <;> simp [h])
+  refine inCone
+    (a := fun j => (d j : ℝ))
+    (b := Pi.single i (k : ℝ)) hγ hγ'.mem hγ'.nonneg
+    (fun j => Nat.cast_nonneg _)
+    (fun l => by by_cases h : l = i <;> simp [h])
     ((linearOn_iff φ γ').1 hγ'.linear _ fun j => Nat.cast_nonneg _) ?_ j (by exact_mod_cast hj)
   refine LinearMap.ext₂ fun a b => ?_
   have := LinearMap.congr_fun₂ hkd a b
@@ -143,12 +171,14 @@ theorem mem_of_coeff_ne_zero {γ : Fin m → LinearMap.BilinForm ℤ X} {γ' : F
 
 end ConeMeet
 
-
 open ConeMeet in
-theorem cone_meet : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X : Type) [AddCommGroup X] [Module O X]
-    [Module.Finite O X] (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X) (γ' : Fin m' → LinearMap.BilinForm ℤ X)
-    (c : Fin m → ℝ) (c' : Fin m' → ℝ), IsCone bar φ γ → IsCone bar φ γ' → (∀ i, 0 ≤ c i) → (∀ j, 0 ≤ c' j) →
-    ∑ i, c i • toReal (γ i) = ∑ j, c' j • toReal (γ' j) → ∀ i, c i ≠ 0 → ∃ j, γ i = γ' j ∧ c i = c' j := by
+theorem cone_meet
+    : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X : Type) [AddCommGroup X]
+        [Module O X] [Module.Finite O X] (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X)
+        (γ' : Fin m' → LinearMap.BilinForm ℤ X) (c : Fin m → ℝ) (c' : Fin m' → ℝ),
+      IsCone bar φ γ → IsCone bar φ γ' → (∀ i, 0 ≤ c i) → (∀ j, 0 ≤ c' j)
+        → ∑ i, c i • toReal (γ i) = ∑ j, c' j • toReal (γ' j)
+        → ∀ i, c i ≠ 0 → ∃ j, γ i = γ' j ∧ c i = c' j := by
   intro O _ bar φ X _ _ _ m m' γ γ' c c' hγ hγ' hc hc' hrel i hi
   classical
   obtain ⟨j, hj⟩ := mem_of_coeff_ne_zero hγ hγ' hc hc' hrel i hi
@@ -157,14 +187,18 @@ theorem cone_meet : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) 
   let g' : Fin m' → balForms bar X := fun l => ⟨γ' l, hγ'.mem l⟩
   obtain ⟨f', hf'⟩ := hγ'.basis.exists_dual
   have hf' : ∀ a b, f' a (g' b) = if a = b then 1 else 0 := hf'
-  have s := sum_mul_eq_zero_of_sum_toReal (X := X) (j := (balForms bar X).subtype) Subtype.val_injective (f' j)
-    (β := Sum.elim g g') (c := Sum.elim c (-c')) (by
-      rw [Fintype.sum_sum_type]
-      simp only [Sum.elim_inl, Sum.elim_inr, Submodule.subtype_apply, Pi.neg_apply, neg_smul, Finset.sum_neg_distrib,
-        g, g', hrel, add_neg_cancel])
+  have s :=
+    sum_mul_eq_zero_of_sum_toReal (X := X) (j := (balForms bar X).subtype) Subtype.val_injective
+      (f' j) (β := Sum.elim g g') (c := Sum.elim c (-c'))
+      (by
+        rw [Fintype.sum_sum_type]
+        simp only [Sum.elim_inl, Sum.elim_inr, Submodule.subtype_apply, Pi.neg_apply, neg_smul,
+          Finset.sum_neg_distrib, g, g', hrel, add_neg_cancel])
   rw [Fintype.sum_sum_type] at s
-  simp only [Sum.elim_inl, Sum.elim_inr, Pi.neg_apply, neg_mul, Finset.sum_neg_distrib, hf', Int.cast_ite,
-    Int.cast_one, Int.cast_zero, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true] at s
+  simp only [Sum.elim_inl, Sum.elim_inr, Pi.neg_apply, neg_mul, Finset.sum_neg_distrib, hf',
+      Int.cast_ite, Int.cast_one, Int.cast_zero, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq,
+      Finset.mem_univ, if_true]
+    at s
   have h1 : ∑ l, c l * (f' j (g l) : ℝ) = c i := by
     rw [Finset.sum_eq_single i]
     · have : g i = g' j := Subtype.ext hj

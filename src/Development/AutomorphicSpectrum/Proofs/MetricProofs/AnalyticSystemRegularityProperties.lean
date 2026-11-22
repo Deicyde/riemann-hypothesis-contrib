@@ -10,11 +10,18 @@ public import ReciprocityTheory.AnalyticForms.LeviForms.TailCut
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
 open scoped ContDiff
 
-theorem GlobalTheory.CompanionTheory.Ar.PB.anSys_open_basics : ∀ (e : ℕ) (σ : Type) (S : AnSys e σ), IsOpen S.open' ∧ IsNull S.A S.open'ᶜ ∧ (∀ a, ∀ x ∈ S.open', IsTwiceDifferentiableAt S.A (S.potH a) x) ∧ (∀ a t, 0 < t → t ≤ S.t₀ → IsPotential S.A (S.potT a t)) ∧ ∀ y ∈ S.open', Real.exp 1 ≤ rW S.L S.s y := by
+theorem GlobalTheory.CompanionTheory.Ar.PB.anSys_open_basics
+    : ∀ (e : ℕ) (σ : Type) (S : AnSys e σ),
+      IsOpen S.open' ∧ IsNull S.A S.open'ᶜ
+        ∧ (∀ a, ∀ x ∈ S.open', IsTwiceDifferentiableAt S.A (S.potH a) x)
+        ∧ (∀ a t, 0 < t → t ≤ S.t₀ → IsPotential S.A (S.potT a t))
+        ∧ ∀ y ∈ S.open', Real.exp 1 ≤ rW S.L S.s y := by
   intro e σ S
   have hcl : IsClosed (bdry S.s) := LeviFormBoundaryTopology.isClosed_bdry S.sec
   refine ⟨hcl.isOpen_compl, ?_, ?_, ?_, fun y _ => rW_ge S.L S.s S.norm_le y⟩
@@ -43,12 +50,13 @@ theorem GlobalTheory.CompanionTheory.Ar.PB.anSys_open_basics : ∀ (e : ℕ) (σ
     have hO2 : IsOpen ((S.A.chart j).target ∩ (S.A.chart j).symm ⁻¹' (bdry S.s)ᶜ) :=
       (S.A.chart j).isOpen_inter_preimage_symm hcl.isOpen_compl
     have hm1 : S.A.chart j x ∈ (S.A.chart j).target ∩ (S.A.chart j).symm ⁻¹' (S.th a).U x :=
-      ⟨(S.A.chart j).map_source hj, by
-        simpa [(S.A.chart j).left_inv hj] using (S.th a).mem_U x⟩
-    have hm2 : S.A.chart j x ∈ (S.A.chart j).target ∩ (S.A.chart j).symm ⁻¹' (bdry S.s)ᶜ :=
-      ⟨(S.A.chart j).map_source hj, by
+      ⟨(S.A.chart j).map_source hj, by simpa [(S.A.chart j).left_inv hj] using (S.th a).mem_U x⟩
+    have hm2 : S.A.chart j x ∈ (S.A.chart j).target ∩ (S.A.chart j).symm ⁻¹' (bdry S.s)ᶜ := ⟨
+      (S.A.chart j).map_source hj,
+      by
         have hx' : x ∈ (bdry S.s)ᶜ := hx
-        simpa [(S.A.chart j).left_inv hj] using hx'⟩
+        simpa [(S.A.chart j).left_inv hj] using hx'
+    ⟩
     have hle : (2 : WithTop ℕ∞) ≤ ∞ := ENat.LEInfty.out
     have hA := (h1.contDiffAt (hO1.mem_nhds hm1)).of_le hle
     have hB := (h2.contDiffAt (hO2.mem_nhds hm2)).of_le hle

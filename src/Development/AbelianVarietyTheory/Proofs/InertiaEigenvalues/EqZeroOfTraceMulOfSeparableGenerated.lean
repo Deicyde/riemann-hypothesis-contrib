@@ -12,8 +12,10 @@ noncomputable section
 
 namespace GlobalTheory.UnitLemma.TraceNondeg
 
-theorem isNilpotent_of_trace_mul {F A : Type} [Field F] [CharZero F] [CommRing A] [Algebra F A]
-    [Module.Finite F A] (w : A) (h : ∀ y : A, Algebra.trace F A (w * y) = 0) : IsNilpotent w := by
+theorem isNilpotent_of_trace_mul
+    {F A : Type} [Field F] [CharZero F] [CommRing A] [Algebra F A] [Module.Finite F A]
+    (w : A) (h : ∀ y : A, Algebra.trace F A (w * y) = 0)
+    : IsNilpotent w := by
   classical
   let b := Module.finBasis F A
   have hn : IsNilpotent (Algebra.leftMulMatrix b w) := by
@@ -33,9 +35,10 @@ theorem minpoly_dvd_P {K : UQ} (B : InvAlg K) : minpoly K.E B.g ∣ B.P := by
   rw [← h1]
   exact LinearMap.minpoly_dvd_charpoly _
 
-theorem eq_zero_of_trace_mul_eq_zero : ∀ (K : UQ) (B : InvAlg K), B.P.Separable →
-    (∀ a : B.A, ∃ f : K.E[X], a = aeval B.g f) →
-    ∀ w : B.A, (∀ y, Algebra.trace K.E B.A (w * y) = 0) → w = 0 := by
+theorem eq_zero_of_trace_mul_eq_zero
+    : ∀ (K : UQ) (B : InvAlg K),
+      B.P.Separable → (∀ a : B.A, ∃ f : K.E[X], a = aeval B.g f)
+        → ∀ w : B.A, (∀ y, Algebra.trace K.E B.A (w * y) = 0) → w = 0 := by
   intro K B hP hgen w hw
   obtain ⟨m, hm⟩ := isNilpotent_of_trace_mul w hw
   obtain ⟨f, rfl⟩ := hgen w

@@ -15,15 +15,18 @@ open scoped Classical
 
 namespace Formalism.MainNotions.S.Pv.HH
 
-open Finset NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt
+open Finset NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable (D : D7)
 
-def Gbd (b C β : ℝ) (Z : GramM D) : ℝ := (2 * β ^ 2 * (b ^ (C * (D.R.m : ℝ) ^ 2)) ^ 2) ^ D.R.f * sizeZ D b C Z ^ 2
+def Gbd (b C β : ℝ) (Z : GramM D) : ℝ :=
+  (2 * β ^ 2 * (b ^ (C * (D.R.m : ℝ) ^ 2)) ^ 2) ^ D.R.f * sizeZ D b C Z ^ 2
 
-theorem embS_star (τ : D.what₂.Tau) (x : D.host.E) : embS D τ (star x) = starRingEnd ℂ (embS D τ x) := by
+theorem embS_star (τ : D.what₂.Tau) (x : D.host.E)
+    : embS D τ (star x) = starRingEnd ℂ (embS D τ x) := by
   unfold embS
   first
   | exact NumberField.IsCMField.complexEmbedding_complexConj _ _
@@ -50,15 +53,20 @@ theorem wG_pos : 0 < wG D := by
   unfold wG
   exact Real.rpow_pos_of_pos (lt_of_lt_of_le one_pos (one_le_host_rdE D)) _
 
-theorem absGz_eq {u u' : D.what₂.Word} (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)) (F' : FlagU D u')
-    (τ : D.what₂.Tau) :
-    |Cnt.Gz D (Tu D u) (Tu D u') (ZhatL (lf D F0) F') τ| = ‖embS D τ (Gval (lf D F0) F')‖ * wG D ^ 2 := by
+theorem absGz_eq
+    {u u' : D.what₂.Word} (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)) (F' : FlagU D u')
+    (τ : D.what₂.Tau)
+    : |Cnt.Gz D (Tu D u) (Tu D u') (ZhatL (lf D F0) F') τ|
+      = ‖embS D τ (Gval (lf D F0) F')‖ * wG D ^ 2 := by
   have e1 : ∀ x : D.host.E, embS D τ (x * star x) = ((Complex.normSq (embS D τ x) : ℝ) : ℂ) := by
     intro x; rw [map_mul, embS_star, Complex.mul_conj]
-  have hG : embS D τ (Gval (lf D F0) F') =
-      (((Complex.normSq (embS D τ (leadMinorE (ZhatL (lf D F0) F') (D.R.rS + 1)))) -
-        ((Tu D u : ℕ) : ℝ) * ((Tu D u' : ℕ) : ℝ) *
-          Complex.normSq (embS D τ (leadMinorE (ZhatL (lf D F0) F') D.R.rS)) : ℝ) : ℂ) := by
+  have hG
+      : embS D τ (Gval (lf D F0) F')
+        = (((Complex.normSq (embS D τ (leadMinorE (ZhatL (lf D F0) F') (D.R.rS + 1))))
+              - ((Tu D u : ℕ) : ℝ) * ((Tu D u' : ℕ) : ℝ)
+                * Complex.normSq (embS D τ (leadMinorE (ZhatL (lf D F0) F') D.R.rS))
+            : ℝ)
+          : ℂ) := by
     show embS D τ (Gflag (lf D F0).fl F'.fl) = _
     unfold Gflag Dl
     rw [map_sub, e1, map_mul, e1, map_mul, map_natCast, map_natCast]

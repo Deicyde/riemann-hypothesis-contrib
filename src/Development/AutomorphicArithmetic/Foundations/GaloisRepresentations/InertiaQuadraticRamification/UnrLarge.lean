@@ -11,14 +11,19 @@ open NumberField IsDedekindDomain
 
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-private theorem natCast_notMem_sq {K : Type} [Field K] [NumberField K] {p : ℕ} (hp : p.Prime)
-    (hd : ¬ (p : ℤ) ∣ discr K) (w : HeightOneSpectrum (𝓞 K)) : (p : 𝓞 K) ∉ w.asIdeal ^ 2 := by
+private theorem natCast_notMem_sq
+    {K : Type} [Field K] [NumberField K]
+    {p : ℕ} (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr K)
+    (w : HeightOneSpectrum (𝓞 K))
+    : (p : 𝓞 K) ∉ w.asIdeal ^ 2 := by
   intro h
   have hv : (p : 𝓞 K) ∈ w.asIdeal := Ideal.pow_le_self two_ne_zero h
   have hpz : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
-  have hmax : (Ideal.span {(p : ℤ)}).IsMaximal := PrincipalIdealRing.isMaximal_of_irreducible hpz.irreducible
+  have hmax : (Ideal.span {(p : ℤ)}).IsMaximal :=
+    PrincipalIdealRing.isMaximal_of_irreducible hpz.irreducible
   have hP := w.isPrime
-  have hlo : w.asIdeal.LiesOver (Ideal.span {(p : ℤ)}) := (Ideal.liesOver_span_iff hP.ne_top hpz).2 (by simpa using hv)
+  have hlo : w.asIdeal.LiesOver (Ideal.span {(p : ℤ)}) :=
+    (Ideal.liesOver_span_iff hP.ne_top hpz).2 (by simpa using hv)
   have hb : Ideal.span {(p : ℤ)} ≠ ⊥ := by simpa using hp.ne_zero
   have hun := (not_dvd_discr_iff_forall_mem K (𝓞 K) hpz).1 hd w.asIdeal hP (by simpa using hv)
   have hu : w.asIdeal.under ℤ = Ideal.span {(p : ℤ)} := hlo.over.symm

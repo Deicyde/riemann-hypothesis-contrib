@@ -20,8 +20,8 @@ def gS (q a : ℂ) : ℂ := ∑' m : ℕ, q ^ (m + 1) * a / (1 - q ^ (m + 1) * a
 
 open scoped UpperHalfPlane MatrixGroups Manifold in
 open Filter Topology in
-theorem _root_.GlobalTheory.Sieg.DlogOne.hasProd_gP {q : ℂ} (hq : ‖q‖ < 1) (a : ℂ) :
-    HasProd (fun m : ℕ => 1 - q ^ (m + 1) * a) (_root_.GlobalTheory.Sieg.DlogOne.gP q a) := by
+theorem _root_.GlobalTheory.Sieg.DlogOne.hasProd_gP {q : ℂ} (hq : ‖q‖ < 1) (a : ℂ)
+    : HasProd (fun m : ℕ => 1 - q ^ (m + 1) * a) (_root_.GlobalTheory.Sieg.DlogOne.gP q a) := by
   have hs : Summable fun m : ℕ => ‖-(q ^ (m + 1) * a)‖ := by
     have := (summable_geometric_of_lt_one (norm_nonneg q) hq).mul_right (‖q‖ * ‖a‖)
     refine this.congr fun m => ?_
@@ -33,8 +33,8 @@ theorem _root_.GlobalTheory.Sieg.DlogOne.hasProd_gP {q : ℂ} (hq : ‖q‖ < 1)
 
 open scoped UpperHalfPlane MatrixGroups Manifold in
 open Filter Topology in
-theorem _root_.GlobalTheory.Sieg.DlogOne.summable_lambert {q : ℂ} (hq : ‖q‖ < 1) (a : ℂ) :
-    Summable fun m : ℕ => q ^ (m + 1) / (1 - q ^ (m + 1) * a) := by
+theorem _root_.GlobalTheory.Sieg.DlogOne.summable_lambert {q : ℂ} (hq : ‖q‖ < 1) (a : ℂ)
+    : Summable fun m : ℕ => q ^ (m + 1) / (1 - q ^ (m + 1) * a) := by
   have hq0 : Tendsto (fun m : ℕ => q ^ (m + 1)) atTop (𝓝 0) :=
     (tendsto_pow_atTop_nhds_zero_of_norm_lt_one hq).comp (tendsto_add_atTop_nat 1)
   have hden : Tendsto (fun m : ℕ => (1 - q ^ (m + 1) * a)⁻¹) atTop (𝓝 1) := by
@@ -44,8 +44,7 @@ theorem _root_.GlobalTheory.Sieg.DlogOne.summable_lambert {q : ℂ} (hq : ‖q�
   have hsum : Summable fun m : ℕ => ‖q‖ ^ (m + 1) := by
     simpa [pow_succ] using (summable_geometric_of_lt_one (norm_nonneg _) hq).mul_right ‖q‖
   refine summable_of_isBigO_nat hsum ?_
-  have h1 : (fun m : ℕ => (1 - q ^ (m + 1) * a)⁻¹) =O[atTop] (fun _ => (1 : ℝ)) :=
-    hden.isBigO_one ℝ
+  have h1 : (fun m : ℕ => (1 - q ^ (m + 1) * a)⁻¹) =O[atTop] (fun _ => (1 : ℝ)) := hden.isBigO_one ℝ
   have h2 : (fun m : ℕ => q ^ (m + 1)) =O[atTop] (fun m : ℕ => ‖q‖ ^ (m + 1)) :=
     Asymptotics.isBigO_of_le _ fun m => by simp [norm_pow]
   simpa [div_eq_mul_inv] using h2.mul h1
@@ -54,22 +53,35 @@ def E (q t : ℂ) : ℂ := -(t / (1 - t)) - gS q t + gS q t⁻¹
 
 open scoped UpperHalfPlane MatrixGroups Manifold in
 open Filter Topology in
-theorem _root_.GlobalTheory.Sieg.DlogOne.tprod_cthFac_eq {q : ℂ} (hq : ‖q‖ < 1) (c : ℕ) {t : ℂ}
-    (h : _root_.GlobalTheory.Sieg.DlogOne.gP q (t ^ c) * _root_.GlobalTheory.Sieg.DlogOne.gP q (t ^ c)⁻¹ ≠ 0) :
-    ∏' m : ℕ, _root_.GlobalTheory.Sieg.cthFac c q t (m + 1) =
-      _root_.GlobalTheory.Sieg.DlogOne.gP q t ^ (c ^ 2) * _root_.GlobalTheory.Sieg.DlogOne.gP q t⁻¹ ^ (c ^ 2) /
-        (_root_.GlobalTheory.Sieg.DlogOne.gP q (t ^ c) * _root_.GlobalTheory.Sieg.DlogOne.gP q (t ^ c)⁻¹) := by
-  have hA := (_root_.GlobalTheory.Sieg.Model.hasProd_pow (_root_.GlobalTheory.Sieg.DlogOne.hasProd_gP hq t) (c ^ 2)).mul
-    (_root_.GlobalTheory.Sieg.Model.hasProd_pow (_root_.GlobalTheory.Sieg.DlogOne.hasProd_gP hq t⁻¹) (c ^ 2))
-  have hB := _root_.GlobalTheory.Sieg.Model.hasProd_inv
-    ((_root_.GlobalTheory.Sieg.DlogOne.hasProd_gP hq (t ^ c)).mul (_root_.GlobalTheory.Sieg.DlogOne.hasProd_gP hq (t ^ c)⁻¹)) h
+theorem _root_.GlobalTheory.Sieg.DlogOne.tprod_cthFac_eq
+    {q : ℂ} (hq : ‖q‖ < 1)
+    (c : ℕ)
+    {t : ℂ}
+    (h : _root_.GlobalTheory.Sieg.DlogOne.gP q (t ^ c)
+        * _root_.GlobalTheory.Sieg.DlogOne.gP q (t ^ c)⁻¹
+      ≠ 0)
+    : ∏' m : ℕ, _root_.GlobalTheory.Sieg.cthFac c q t (m + 1)
+      = _root_.GlobalTheory.Sieg.DlogOne.gP q t ^ (c ^ 2)
+        * _root_.GlobalTheory.Sieg.DlogOne.gP q t⁻¹ ^ (c ^ 2)
+        / (_root_.GlobalTheory.Sieg.DlogOne.gP q (t ^ c)
+          * _root_.GlobalTheory.Sieg.DlogOne.gP q (t ^ c)⁻¹) := by
+  have hA :=
+    (_root_.GlobalTheory.Sieg.Model.hasProd_pow (_root_.GlobalTheory.Sieg.DlogOne.hasProd_gP hq t)
+        (c ^ 2)).mul
+      (_root_.GlobalTheory.Sieg.Model.hasProd_pow
+        (_root_.GlobalTheory.Sieg.DlogOne.hasProd_gP hq t⁻¹) (c ^ 2))
+  have hB :=
+    _root_.GlobalTheory.Sieg.Model.hasProd_inv
+      ((_root_.GlobalTheory.Sieg.DlogOne.hasProd_gP hq (t ^ c)).mul
+        (_root_.GlobalTheory.Sieg.DlogOne.hasProd_gP hq (t ^ c)⁻¹))
+      h
   rw [div_eq_mul_inv, ← (hA.mul hB).tprod_eq]
   congr 1
 
 open scoped UpperHalfPlane MatrixGroups Manifold in
 open Filter Topology in
-theorem _root_.GlobalTheory.Sieg.DlogOne.ee_int_mul (n : ℤ) (z : ℂ) :
-    _root_.GlobalTheory.Sieg.ee (n * z) = _root_.GlobalTheory.Sieg.ee z ^ n := by
+theorem _root_.GlobalTheory.Sieg.DlogOne.ee_int_mul (n : ℤ) (z : ℂ)
+    : _root_.GlobalTheory.Sieg.ee (n * z) = _root_.GlobalTheory.Sieg.ee z ^ n := by
   unfold _root_.GlobalTheory.Sieg.ee
   rw [← Complex.exp_int_mul]
   congr 1
@@ -335,14 +347,15 @@ private lemma E_zpow_mul_eq_sub {q : ℂ} (hq : ‖q‖ < 1) (hq0 : q ≠ 0) {t 
 
 open scoped UpperHalfPlane MatrixGroups Manifold in
 open Filter Topology in
-theorem _root_.GlobalTheory.Sieg.DlogOne.E_eq {x : Fin 2 → ℚ}
-    (hx : ¬ (x 0 ∈ Set.range ((↑) : ℤ → ℚ) ∧ x 1 ∈ Set.range ((↑) : ℤ → ℚ))) (τ : ℍ) :
-    _root_.GlobalTheory.Sieg.DlogOne.E (_root_.GlobalTheory.Sieg.ee τ) (_root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt x τ)) =
-      -(_root_.GlobalTheory.Sieg.F 1 x τ - 1 / 2 + x 0) := by
+theorem _root_.GlobalTheory.Sieg.DlogOne.E_eq
+    {x : Fin 2 → ℚ} (hx : ¬(x 0 ∈ Set.range ((↑) : ℤ → ℚ) ∧ x 1 ∈ Set.range ((↑) : ℤ → ℚ))) (τ : ℍ)
+    : _root_.GlobalTheory.Sieg.DlogOne.E (_root_.GlobalTheory.Sieg.ee τ)
+        (_root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt x τ))
+      = -(_root_.GlobalTheory.Sieg.F 1 x τ - 1 / 2 + x 0) := by
   let y : Fin 2 → ℚ := ![Int.fract (x 0), x 1]
   have hy0 : y 0 = Int.fract (x 0) := rfl
   have hy1 : y 1 = x 1 := rfl
-  have hy : ¬ (y 0 ∈ Set.range ((↑) : ℤ → ℚ) ∧ y 1 ∈ Set.range ((↑) : ℤ → ℚ)) := by
+  have hy : ¬(y 0 ∈ Set.range ((↑) : ℤ → ℚ) ∧ y 1 ∈ Set.range ((↑) : ℤ → ℚ)) := by
     rintro ⟨⟨m, hm⟩, h1⟩
     rw [hy1] at h1
     refine hx ⟨⟨m + ⌊x 0⌋, ?_⟩, h1⟩
@@ -353,15 +366,20 @@ theorem _root_.GlobalTheory.Sieg.DlogOne.E_eq {x : Fin 2 → ℚ}
   have hq := _root_.GlobalTheory.Sieg.Model.norm_ee_lt_one τ
   have hne := _root_.GlobalTheory.Sieg.Model.ne_one_of_not_int hy τ
   have ht0 := _root_.GlobalTheory.Sieg.Model.ee_ne_zero (_root_.GlobalTheory.Sieg.pt y τ)
-  have hpt : _root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt x τ) =
-      _root_.GlobalTheory.Sieg.ee τ ^ ⌊x 0⌋ * _root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt y τ) := by
+  have hpt
+      : _root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt x τ)
+        = _root_.GlobalTheory.Sieg.ee τ ^ ⌊x 0⌋
+          * _root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt y τ) := by
     rw [← _root_.GlobalTheory.Sieg.DlogOne.ee_int_mul, ← _root_.GlobalTheory.Sieg.Model.ee_add]
     congr 1
     simp only [_root_.GlobalTheory.Sieg.pt, hy0, hy1, Int.fract]
     push_cast
     ring
-  have hzt : ∀ j : ℤ, _root_.GlobalTheory.Sieg.ee τ ^ j *
-      _root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt y τ) ≠ 1 := by
+  have hzt
+      : ∀ j : ℤ,
+        _root_.GlobalTheory.Sieg.ee τ ^ j
+            * _root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt y τ)
+          ≠ 1 := by
     intro j hj
     obtain ⟨m, rfl | rfl⟩ := Int.eq_nat_or_neg j
     · rw [zpow_natCast] at hj
@@ -383,8 +401,7 @@ theorem _root_.GlobalTheory.Sieg.DlogOne.E_eq {x : Fin 2 → ℚ}
         Equiv.coe_refl, Prod.map_apply, id_eq, hy1]
       rw [key]
       rfl
-  have hbase := E_ee_pt_eq_neg_F_of_mem_Ico hy (Int.fract_nonneg _)
-    (Int.fract_lt_one _) τ
+  have hbase := E_ee_pt_eq_neg_F_of_mem_Ico hy (Int.fract_nonneg _) (Int.fract_lt_one _) τ
   rw [hpt, E_zpow_mul_eq_sub hq hq0 ht0 hzt, hbase, hF, hy0]
   have hx0 : ((x 0 : ℚ) : ℂ) = ((Int.fract (x 0) : ℚ) : ℂ) + ((⌊x 0⌋ : ℤ) : ℂ) := by
     exact_mod_cast (Int.fract_add_floor (x 0)).symm

@@ -5,12 +5,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.S2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V
+  UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.S2
 open scoped Pointwise
 
-private theorem two_primes {K : Type} [Field K] [NumberField K] (h2 : Module.finrank ℚ K = 2) {p : ℕ} (hp : p.Prime)
-    {w w' : HeightOneSpectrum (𝓞 K)} (hne : w ≠ w') (hw : ((p : ℕ) : 𝓞 K) ∈ w.asIdeal) (hw' : ((p : ℕ) : 𝓞 K) ∈ w'.asIdeal) :
-    Ideal.absNorm w.asIdeal = p ∧ Ideal.span {((p : ℕ) : 𝓞 K)} = w.asIdeal * w'.asIdeal := by
+private theorem two_primes
+    {K : Type} [Field K] [NumberField K]
+    (h2 : Module.finrank ℚ K = 2)
+    {p : ℕ} (hp : p.Prime)
+    {w w' : HeightOneSpectrum (𝓞 K)}
+    (hne : w ≠ w') (hw : ((p : ℕ) : 𝓞 K) ∈ w.asIdeal) (hw' : ((p : ℕ) : 𝓞 K) ∈ w'.asIdeal)
+    : Ideal.absNorm w.asIdeal = p ∧ Ideal.span {((p : ℕ) : 𝓞 K)} = w.asIdeal * w'.asIdeal := by
   have hco : IsCoprime w.asIdeal w'.asIdeal := by
     rw [Ideal.isCoprime_iff_sup_eq]
     exact w.isMaximal.coprime_of_ne w'.isMaximal fun h => hne (HeightOneSpectrum.ext h)
@@ -25,9 +30,12 @@ private theorem two_primes {K : Type} [Field K] [NumberField K] (h2 : Module.fin
   have a2 := NumberField.HeightOneSpectrum.one_lt_absNorm w'
   generalize Ideal.absNorm w.asIdeal = a at *
   generalize Ideal.absNorm w'.asIdeal = b at *
-  obtain ⟨i, -, rfl⟩ := (Nat.dvd_prime_pow hp).1 (show a ∣ p ^ 2 from ⟨b * Ideal.absNorm J, by rw [e, mul_assoc]⟩)
-  obtain ⟨j, -, rfl⟩ := (Nat.dvd_prime_pow hp).1 (show b ∣ p ^ 2 from ⟨p ^ i * Ideal.absNorm J, by rw [e]; ring⟩)
-  obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow hp).1 (show Ideal.absNorm J ∣ p ^ 2 from ⟨p ^ i * p ^ j, by rw [e]; ring⟩)
+  obtain ⟨i, -, rfl⟩ :=
+    (Nat.dvd_prime_pow hp).1 (show a ∣ p ^ 2 from ⟨b * Ideal.absNorm J, by rw [e, mul_assoc]⟩)
+  obtain ⟨j, -, rfl⟩ :=
+    (Nat.dvd_prime_pow hp).1 (show b ∣ p ^ 2 from ⟨p ^ i * Ideal.absNorm J, by rw [e]; ring⟩)
+  obtain ⟨k, -, hk⟩ :=
+    (Nat.dvd_prime_pow hp).1 (show Ideal.absNorm J ∣ p ^ 2 from ⟨p ^ i * p ^ j, by rw [e]; ring⟩)
   rw [hk, ← pow_add, ← pow_add] at e
   have e2 := Nat.pow_right_injective hp.two_le e
   have i0 : i ≠ 0 := by rintro rfl; simp at a1
@@ -38,23 +46,30 @@ private theorem two_primes {K : Type} [Field K] [NumberField K] (h2 : Module.fin
   refine ⟨by rw [i1, pow_one], ?_⟩
   rw [hJ, hk, Ideal.mul_top]
 
-private theorem only_two {K : Type} [Field K] [NumberField K] {I : Ideal (𝓞 K)}
-    {w w' u : HeightOneSpectrum (𝓞 K)} (h : I = w.asIdeal * w'.asIdeal) (hu : I ≤ u.asIdeal) : u = w ∨ u = w' := by
+private theorem only_two
+    {K : Type} [Field K] [NumberField K]
+    {I : Ideal (𝓞 K)} {w w' u : HeightOneSpectrum (𝓞 K)}
+    (h : I = w.asIdeal * w'.asIdeal) (hu : I ≤ u.asIdeal)
+    : u = w ∨ u = w' := by
   rw [h] at hu
   rcases u.isPrime.mul_le.1 hu with h1 | h1
   · exact Or.inl (HeightOneSpectrum.ext (w.isMaximal.eq_of_le u.isPrime.ne_top h1).symm)
   · exact Or.inr (HeightOneSpectrum.ext (w'.isMaximal.eq_of_le u.isPrime.ne_top h1).symm)
 
-theorem UpperTheory.quadratic_field_split_prime_two_places :
-    UpperTheory.V.Sd.S2.QuadSplit := by
+theorem UpperTheory.quadratic_field_split_prime_two_places : UpperTheory.V.Sd.S2.QuadSplit := by
   intro Ω _ _ _ k₀ _ h2 p hp hs
   haveI : Fact p.Prime := ⟨hp⟩
   haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : IsAlgClosure k₀ Ω := ⟨inferInstance, inferInstance⟩
-  have key : ∀ A A' : ValuationSubring Ω, A.valuation (p : Ω) < 1 → ∀ g : G ℚ Ω, g ∉ k₀.fixingSubgroup →
-      (∀ y, g y ∈ A ↔ y ∈ A') → ∃ w w' : Pl k₀, w ≠ w' ∧ ((p : ℕ) : 𝓞 k₀) ∈ w.asIdeal ∧ ((p : ℕ) : 𝓞 k₀) ∈ w'.asIdeal ∧
-        IsPlaceOver A w ∧ IsPlaceOver A' w' := by
+  have key
+      : ∀ A A' : ValuationSubring Ω,
+        A.valuation (p : Ω) < 1
+          → ∀ g : G ℚ Ω,
+            g ∉ k₀.fixingSubgroup → (∀ y, g y ∈ A ↔ y ∈ A')
+              → ∃ w w' : Pl k₀,
+                w ≠ w' ∧ ((p : ℕ) : 𝓞 k₀) ∈ w.asIdeal ∧ ((p : ℕ) : 𝓞 k₀) ∈ w'.asIdeal
+                  ∧ IsPlaceOver A w ∧ IsPlaceOver A' w' := by
     intro A A' hA g hg hAA
     have hA' : A'.valuation (p : Ω) < 1 := by
       rw [valuation_lt_one_iff'] at hA ⊢
@@ -82,14 +97,18 @@ theorem UpperTheory.quadratic_field_split_prime_two_places :
     push Not at hc
     haveI : IsGalois ℚ Ω := {}
     have e : k₀ = ⊥ := by
-      rw [← InfiniteGalois.fixedField_fixingSubgroup k₀, (Subgroup.eq_top_iff' _).2 hc, InfiniteGalois.fixedField_bot]
+      rw [← InfiniteGalois.fixedField_fixingSubgroup k₀, (Subgroup.eq_top_iff' _).2 hc,
+        InfiniteGalois.fixedField_bot]
     rw [IntermediateField.finrank_eq_one_iff.2 e] at h2
     omega
-  have other : ∀ w : Pl k₀, ((p : ℕ) : 𝓞 k₀) ∈ w.asIdeal → ∃ w' : Pl k₀, w ≠ w' ∧ ((p : ℕ) : 𝓞 k₀) ∈ w'.asIdeal := by
+  have other
+      : ∀ w : Pl k₀,
+        ((p : ℕ) : 𝓞 k₀) ∈ w.asIdeal → ∃ w' : Pl k₀, w ≠ w' ∧ ((p : ℕ) : 𝓞 k₀) ∈ w'.asIdeal := by
     intro w hw
     obtain ⟨A, hA⟩ := exists_isPlaceOver Ω w
-    obtain ⟨v, u, hne, hv, hu, h1, -⟩ := key A (A.comap g.toRingEquiv.toRingHom)
-      (((places k₀ Ω p A).2.2.1 w hA).2 hw) g hg fun _ => Iff.rfl
+    obtain ⟨v, u, hne, hv, hu, h1, -⟩ :=
+      key A (A.comap g.toRingEquiv.toRingHom) (((places k₀ Ω p A).2.2.1 w hA).2 hw) g hg fun _ =>
+        Iff.rfl
     have e : v = w := HeightOneSpectrum.ext (Ideal.ext fun x => (h1 x).symm.trans (hA x))
     exact ⟨u, e ▸ hne, hu⟩
   refine ⟨fun w hw => ?_, ?_⟩
@@ -113,6 +132,6 @@ theorem UpperTheory.quadratic_field_split_prime_two_places :
     obtain ⟨-, h3⟩ := two_primes h2 hp hne hw hw'
     refine ⟨w, w', hne, hw, hw', fun A A' hA g hg hAA => ?_⟩
     obtain ⟨v, u, hvu, hv, hu, h1, h4⟩ := key A A' hA g hg hAA
-    rcases only_two h3 ((Ideal.span_singleton_le_iff_mem _).2 hv) with rfl | rfl <;>
-      rcases only_two h3 ((Ideal.span_singleton_le_iff_mem _).2 hu) with rfl | rfl
+    rcases only_two h3 ((Ideal.span_singleton_le_iff_mem _).2 hv) with rfl | rfl
+      <;> rcases only_two h3 ((Ideal.span_singleton_le_iff_mem _).2 hu) with rfl | rfl
     exacts [absurd rfl hvu, Or.inl ⟨h1, h4⟩, Or.inr ⟨h1, h4⟩, absurd rfl hvu]

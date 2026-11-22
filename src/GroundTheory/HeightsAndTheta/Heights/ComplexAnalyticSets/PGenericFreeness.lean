@@ -17,10 +17,13 @@ universe u v w
 
 namespace GenericFreeness
 
-theorem isGenericallyFree_of_primes {A : Type u} [CommRing A] [IsDomain A] {R : Type u} [CommRing R]
-    [IsNoetherianRing R] [Algebra A R] (hq : ∀ p : PrimeSpectrum R, IsGenericallyFree A (R ⧸ p.asIdeal))
-    (M : Type w) [AddCommGroup M] [Module R M] [Module A M] [IsScalarTower A R M] [Module.Finite R M] :
-    IsGenericallyFree A M := by
+theorem isGenericallyFree_of_primes
+    {A : Type u} [CommRing A] [IsDomain A]
+    {R : Type u} [CommRing R] [IsNoetherianRing R] [Algebra A R]
+    (hq : ∀ p : PrimeSpectrum R, IsGenericallyFree A (R ⧸ p.asIdeal))
+    (M : Type w)
+    [AddCommGroup M] [Module R M] [Module A M] [IsScalarTower A R M] [Module.Finite R M]
+    : IsGenericallyFree A M := by
   refine IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime R (M := M) inferInstance
     (motive := fun N _ _ _ ↦ ∀ (_ : Module A N) (_ : IsScalarTower A R N), IsGenericallyFree A N)
     ?_ ?_ ?_ ‹Module A M› ‹IsScalarTower A R M›
@@ -31,17 +34,21 @@ theorem isGenericallyFree_of_primes {A : Type u} [CommRing A] [IsDomain A] {R : 
   · intro N₁ _ _ _ N₂ _ _ _ N₃ _ _ _ f g hf hg hfg h₁ h₃ _ _
     letI : Module A N₁ := Module.compHom N₁ (algebraMap A R)
     letI : Module A N₃ := Module.compHom N₃ (algebraMap A R)
-    have t₁ : IsScalarTower A R N₁ := ⟨fun a r n ↦ by
-      show (a • r) • n = algebraMap A R a • r • n
-      rw [Algebra.smul_def, mul_smul]⟩
-    have t₃ : IsScalarTower A R N₃ := ⟨fun a r n ↦ by
-      show (a • r) • n = algebraMap A R a • r • n
-      rw [Algebra.smul_def, mul_smul]⟩
+    have t₁ : IsScalarTower A R N₁ :=
+      ⟨fun a r n ↦ by
+        show (a • r) • n = algebraMap A R a • r • n
+        rw [Algebra.smul_def, mul_smul]⟩
+    have t₃ : IsScalarTower A R N₃ :=
+      ⟨fun a r n ↦ by
+        show (a • r) • n = algebraMap A R a • r • n
+        rw [Algebra.smul_def, mul_smul]⟩
     exact IsGenericallyFree.of_exact (f.restrictScalars A) (g.restrictScalars A) hf hg hfg
       (h₁ inferInstance t₁) (h₃ inferInstance t₃)
 
-theorem isGenericallyFree_of_comap_ne_bot {A : Type u} [CommRing A] {σ : Type*} (q : Ideal (MvPolynomial σ A))
-    (h : q.comap (C : A →+* MvPolynomial σ A) ≠ ⊥) : IsGenericallyFree A (MvPolynomial σ A ⧸ q) := by
+theorem isGenericallyFree_of_comap_ne_bot
+    {A : Type u} [CommRing A]
+    {σ : Type*} (q : Ideal (MvPolynomial σ A)) (h : q.comap (C : A →+* MvPolynomial σ A) ≠ ⊥)
+    : IsGenericallyFree A (MvPolynomial σ A ⧸ q) := by
   obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot h
   refine isGenericallyFree_of_smul_eq_zero a ha0 fun d ↦ ?_
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective d
@@ -50,13 +57,14 @@ theorem isGenericallyFree_of_comap_ne_bot {A : Type u} [CommRing A] {σ : Type*}
   rw [e, Ideal.Quotient.eq_zero_iff_mem, smul_eq_C_mul]
   exact q.mul_mem_right x ha
 
-theorem isGenericallyFree_quotient_bot {A : Type u} [CommRing A] [IsDomain A] (σ : Type*) :
-    IsGenericallyFree A (MvPolynomial σ A ⧸ (⊥ : Ideal (MvPolynomial σ A))) :=
+theorem isGenericallyFree_quotient_bot {A : Type u} [CommRing A] [IsDomain A] (σ : Type*)
+    : IsGenericallyFree A (MvPolynomial σ A ⧸ (⊥ : Ideal (MvPolynomial σ A))) :=
   (isGenericallyFree_of_free (M := MvPolynomial σ A)).of_linearEquiv
     (AlgEquiv.quotientBot A (MvPolynomial σ A)).toLinearEquiv.symm
 
-theorem isGenericallyFree_quotient (hNN : GenericNoetherNormalisation.Statement.{u}) (n : ℕ) :
-    ∀ (A : Type u) [CommRing A] [IsDomain A] [IsNoetherianRing A] (q : Ideal (MvPolynomial (Fin n) A)),
+theorem isGenericallyFree_quotient (hNN : GenericNoetherNormalisation.Statement.{u}) (n : ℕ)
+    : ∀ (A : Type u) [CommRing A] [IsDomain A] [IsNoetherianRing A]
+        (q : Ideal (MvPolynomial (Fin n) A)),
       q.IsPrime → IsGenericallyFree A (MvPolynomial (Fin n) A ⧸ q) := by
   set_option synthInstance.maxHeartbeats 400000 in
   induction n with
@@ -83,8 +91,9 @@ theorem isGenericallyFree_quotient (hNN : GenericNoetherNormalisation.Statement.
       let D := MvPolynomial (Fin (n + 1)) A ⧸ q
       let Rn := MvPolynomial (Fin n) A
       letI : Algebra Rn D := (aeval z : Rn →ₐ[A] D).toRingHom.toAlgebra
-      have : IsScalarTower A Rn D := IsScalarTower.of_algebraMap_eq (R := A) (S := Rn) (A := D)
-        fun x ↦ ((aeval z : Rn →ₐ[A] D).commutes x).symm
+      have : IsScalarTower A Rn D :=
+        IsScalarTower.of_algebraMap_eq (R := A) (S := Rn) (A := D) fun x ↦
+          ((aeval z : Rn →ₐ[A] D).commutes x).symm
       let N : Submodule Rn D := Submodule.span Rn (s : Set D)
       have hN : IsGenericallyFree A N :=
         isGenericallyFree_of_primes (R := Rn) (fun p ↦ ih A p.asIdeal p.isPrime) N
@@ -97,21 +106,24 @@ theorem isGenericallyFree_quotient (hNN : GenericNoetherNormalisation.Statement.
 
 end GenericFreeness
 
-theorem GenericFreeness.proof (hNN : GenericNoetherNormalisation.Statement.{u}) :
-    GenericFreeness.Statement.{u, v, w} := by
+theorem GenericFreeness.proof (hNN : GenericNoetherNormalisation.Statement.{u})
+    : GenericFreeness.Statement.{u, v, w} := by
   intro A _ _ _ B _ _ _ M _ _ _ _ _
   obtain ⟨n, g, hg⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.mp ‹Algebra.FiniteType A B›
   letI : Algebra (MvPolynomial (Fin n) A) B := g.toRingHom.toAlgebra
   letI : Module (MvPolynomial (Fin n) A) M := Module.compHom M (algebraMap (MvPolynomial (Fin n) A) B)
-  have : IsScalarTower (MvPolynomial (Fin n) A) B M := ⟨fun x b m ↦ by
-    show (g x * b) • m = g x • b • m
-    rw [mul_smul]⟩
-  have : IsScalarTower A (MvPolynomial (Fin n) A) M := ⟨fun a x m ↦ by
-    show g (a • x) • m = a • g x • m
-    rw [map_smul, smul_assoc]⟩
+  have : IsScalarTower (MvPolynomial (Fin n) A) B M :=
+    ⟨fun x b m ↦ by
+      show (g x * b) • m = g x • b • m
+      rw [mul_smul]⟩
+  have : IsScalarTower A (MvPolynomial (Fin n) A) M :=
+    ⟨fun a x m ↦ by
+      show g (a • x) • m = a • g x • m
+      rw [map_smul, smul_assoc]⟩
   have : Module.Finite (MvPolynomial (Fin n) A) B := RingHom.Finite.of_surjective g.toRingHom hg
   have : Module.Finite (MvPolynomial (Fin n) A) M := Module.Finite.trans B M
   exact GenericFreeness.isGenericallyFree_of_primes (R := MvPolynomial (Fin n) A)
-    (fun p ↦ GenericFreeness.isGenericallyFree_quotient hNN n A p.asIdeal p.isPrime) M
+    (fun p ↦ GenericFreeness.isGenericallyFree_quotient hNN n A p.asIdeal p.isPrime)
+    M
 
 end GroundTheory.Heights₂.Heights

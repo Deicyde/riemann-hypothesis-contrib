@@ -11,17 +11,20 @@ namespace Formalism.L2.Pj
 
 open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
 section Clauses
 
 variable (Xo : Moduli Dw l) (c : Coeff l)
 
-def FrChartF : Prop :=
-  FrChart (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z)
+def FrChartF : Prop := FrChart (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z)
 
 def BorChartF : Prop :=
-  BorChart (K := c.F) (ι := Ix Dw) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) (fun t y y' => FrBor t y y')
+  BorChart (K := c.F) (ι := Ix Dw)
+    (fun S _ _ => FrPt Xo c S)
+    (fun φ y z => FrMap φ y z)
+    (fun t y y' => FrBor t y y')
 
 end Clauses
 
@@ -29,8 +32,8 @@ section Proofs
 
 variable {Xo : Moduli Dw l} {c : Coeff l}
 
-theorem evalWD_fr (h : FrChartF Xo c) :
-    EvalWD (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) :=
+theorem evalWD_fr (h : FrChartF Xo c)
+    : EvalWD (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) :=
   evalWD_of_frChart h
 
 theorem wtField_of_borChart (h : BorChartF Xo c) : WtField Xo c := by

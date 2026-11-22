@@ -94,15 +94,18 @@ private lemma valuation_algebraMap_eq_of_unit_at_under {F E : Type} [Field F] [N
   rw [WithZero.log_exp, WithZero.log_pow, nsmul_eq_mul] at hl
   rcases Int.eq_one_or_neg_one_of_mul_eq_neg_one hl.symm with h1 | h1 <;> omega
 
-
 open NumberField IsDedekindDomain in
 open scoped WithZero in
-theorem _root_.GlobalTheory.QNorm.hilbert90_sUnits_quadratic_extension_qnorm : ∀ (F E : Type) [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] (δ : F) (θ : E) (σ : E ≃ₐ[F] E), _root_.GlobalTheory.QNorm.IsQuad δ θ σ →
-    ∀ (S : Finset (HeightOneSpectrum (𝓞 F))) (SE : Finset (HeightOneSpectrum (𝓞 E))),
-    (∀ w : HeightOneSpectrum (𝓞 E), w ∈ SE ↔ w.under (𝓞 F) ∈ S) → _root_.GlobalTheory.QNorm.admitted F S →
-    (∀ v, v ∉ S → v.valuation F δ = 1) → ∀ u : Eˣ, u ∈ _root_.GlobalTheory.QNorm.sUnits E SE →
-    (u : E) * σ u = 1 → ∃ y : Eˣ, y ∈ _root_.GlobalTheory.QNorm.sUnits E SE ∧ (u : E) = y / σ y := by
+theorem _root_.GlobalTheory.QNorm.hilbert90_sUnits_quadratic_extension_qnorm
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (δ : F)
+        (θ : E) (σ : E ≃ₐ[F] E),
+      _root_.GlobalTheory.QNorm.IsQuad δ θ σ
+        → ∀ (S : Finset (HeightOneSpectrum (𝓞 F))) (SE : Finset (HeightOneSpectrum (𝓞 E))),
+          (∀ w : HeightOneSpectrum (𝓞 E), w ∈ SE ↔ w.under (𝓞 F) ∈ S)
+            → _root_.GlobalTheory.QNorm.admitted F S → (∀ v, v ∉ S → v.valuation F δ = 1)
+            → ∀ u : Eˣ,
+              u ∈ _root_.GlobalTheory.QNorm.sUnits E SE → (u : E) * σ u = 1
+                → ∃ y : Eˣ, y ∈ _root_.GlobalTheory.QNorm.sUnits E SE ∧ (u : E) = y / σ y := by
   intro F E _ _ _ _ _ δ θ σ hq S SE hSE hS hδ u hu hnu
   classical
   obtain ⟨-, -, -, -, h90, -⟩ := _root_.GlobalTheory.QNorm.isQuad_basic F E δ θ σ hq
@@ -113,28 +116,24 @@ theorem _root_.GlobalTheory.QNorm.hilbert90_sUnits_quadratic_extension_qnorm : �
   rw [_root_.GlobalTheory.QNorm.mem_sUnits] at hu
   have hadm := hS
   unfold _root_.GlobalTheory.QNorm.admitted at hadm
-  have hinv : ∀ w : HeightOneSpectrum (𝓞 E), w ∉ SE →
-      w.valuation E (σ y) = w.valuation E y := by
+  have hinv : ∀ w : HeightOneSpectrum (𝓞 E), w ∉ SE → w.valuation E (σ y) = w.valuation E y := by
     intro w hw
     have h1 := hu w hw
     rw [hy, map_div₀] at h1
-    have hσy0 : w.valuation E (σ y) ≠ 0 :=
-      (Valuation.ne_zero_iff _).mpr ((map_ne_zero σ).mpr hy0)
+    have hσy0 : w.valuation E (σ y) ≠ 0 := (Valuation.ne_zero_iff _).mpr ((map_ne_zero σ).mpr hy0)
     exact ((div_eq_one_iff_eq hσy0).mp h1).symm
-  have hfib : ∀ w : HeightOneSpectrum (𝓞 E), w ∉ SE →
-      w.valuation E y = (ch (w.under (𝓞 F))).valuation E y := by
+  have hfib
+      : ∀ w : HeightOneSpectrum (𝓞 E),
+        w ∉ SE → w.valuation E y = (ch (w.under (𝓞 F))).valuation E y := by
     intro w hw
     have hv : (ch (w.under (𝓞 F))).under (𝓞 F) = w.under (𝓞 F) := hch _
-    have hw0 : ch (w.under (𝓞 F)) ∉ SE := by
-      rw [hSE, hv]; rwa [hSE] at hw
+    have hw0 : ch (w.under (𝓞 F)) ∉ SE := by rw [hSE, hv]; rwa [hSE] at hw
     rcases hdich (ch (w.under (𝓞 F))) w hv.symm with h | h
     · rw [← h]
     · rw [h y, hinv _ hw0]
-  let n : HeightOneSpectrum (𝓞 F) → ℤ := fun v =>
-    if v ∈ S then 0 else -((ch v).valuation E y).log
+  let n : HeightOneSpectrum (𝓞 F) → ℤ := fun v => if v ∈ S then 0 else -((ch v).valuation E y).log
   have hfin := _root_.GlobalTheory.QNorm.finite_valuation_ne_one E (Units.mk0 y hy0)
-  let T : Finset (HeightOneSpectrum (𝓞 F)) :=
-    hfin.toFinset.image (fun w => w.under (𝓞 F))
+  let T : Finset (HeightOneSpectrum (𝓞 F)) := hfin.toFinset.image (fun w => w.under (𝓞 F))
   have hnT : ∀ v ∉ T, n v = 0 := by
     intro v hv
     by_cases hvS : v ∈ S

@@ -13,8 +13,8 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial
 
-theorem ProjectionInjectiveOffHypersurface.proof (hF : FrameJacobianGeneric.Statement) :
-    ProjectionInjectiveOffHypersurface.Statement := by
+theorem ProjectionInjectiveOffHypersurface.proof (hF : FrameJacobianGeneric.Statement)
+    : ProjectionInjectiveOffHypersurface.Statement := by
   classical
   intro σ _ I k hI hk
   set n := Fintype.card σ
@@ -29,8 +29,9 @@ theorem ProjectionInjectiveOffHypersurface.proof (hF : FrameJacobianGeneric.Stat
   obtain ⟨I₀, f, -, hcard, hfJ, -, hdet, -⟩ := hF n k J hJ hJk b
 
   let T : (σ → ℂ) → EuclideanSpace ℂ (Fin n) := fun x => WithLp.toLp 2 (x ∘ e.symm)
-  have hT : ∀ (x : σ → ℂ) (p : MvPolynomial (Fin n) ℂ),
-      eval (fun i => T x i) p = eval x (φ.symm p) := by
+  have hT
+      : ∀ (x : σ → ℂ) (p : MvPolynomial (Fin n) ℂ),
+        eval (fun i => T x i) p = eval x (φ.symm p) := by
     intro x p
     have : φ.symm p = rename e.symm p := rfl
     rw [this, eval_rename]
@@ -76,8 +77,9 @@ theorem ProjectionInjectiveOffHypersurface.proof (hF : FrameJacobianGeneric.Stat
     simpa [A, T] using this
   rw [← hback x hx, ← hback y hy, hproj]
 
-theorem ProjectionInjectiveOffHypersurface.proof_of_rank (hR : JacobianRankGeneric.Statement)
-    (hC : ConormalGenerationGeneric.Statement) : ProjectionInjectiveOffHypersurface.Statement :=
+theorem ProjectionInjectiveOffHypersurface.proof_of_rank
+    (hR : JacobianRankGeneric.Statement) (hC : ConormalGenerationGeneric.Statement)
+    : ProjectionInjectiveOffHypersurface.Statement :=
   ProjectionInjectiveOffHypersurface.proof (FrameJacobianGeneric.proof hR hC)
 
 end GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets

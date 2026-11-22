@@ -5,12 +5,13 @@ public import Development.EtaleCohomology.EtaleSheaves.EmbedNonDeg
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut LateralTheory.E.StandardEtaleChartsIdempotentGluing LateralTheory.E.ChartsGeom_vpaPf
+open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut
+  LateralTheory.E.StandardEtaleChartsIdempotentGluing LateralTheory.E.ChartsGeom_vpaPf
 
 namespace LateralTheory.E.GeometricData
 
-theorem rA_top {A : Type} [CommRing A] {Z : Scheme.{0}} (p : Z ⟶ Spec (CommRingCat.of A)) :
-    rA p ⊤ = p.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom := by
+theorem rA_top {A : Type} [CommRing A] {Z : Scheme.{0}} (p : Z ⟶ Spec (CommRingCat.of A))
+    : rA p ⊤ = p.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom := by
   have h : p.appLE ⊤ ⊤ le_top = p.appTop := p.appLE_eq_app (U := ⊤)
   rw [rA, h]
 
@@ -22,10 +23,14 @@ theorem topInt : TopInt := by
   have h1 := isIntegral_appTop_of_universallyClosed (u ≫ l)
   rw [rA_top]
   refine RingHom.IsIntegral.trans _ _ ?_ h1
-  exact RingHom.isIntegral_of_surjective _ (Scheme.ΓSpecIso (CommRingCat.of A)).commRingCatIsoToRingEquiv.symm.surjective
+  exact RingHom.isIntegral_of_surjective _
+    (Scheme.ΓSpecIso (CommRingCat.of A)).commRingCatIsoToRingEquiv.symm.surjective
 
-theorem germ_res_eq {Z : Scheme.{0}} [IsIntegral Z] (U W : Z.Opens) (h : W ≤ U) [Nonempty U] [Nonempty W]
-    (s : Γ(Z, U)) : Z.germToFunctionField W (Z.presheaf.map (homOfLE h).op s) = Z.germToFunctionField U s := by
+theorem germ_res_eq
+    {Z : Scheme.{0}} [IsIntegral Z]
+    (U W : Z.Opens) (h : W ≤ U) [Nonempty U] [Nonempty W]
+    (s : Γ(Z, U))
+    : Z.germToFunctionField W (Z.presheaf.map (homOfLE h).op s) = Z.germToFunctionField U s := by
   simp only [Scheme.germToFunctionField]
   exact TopCat.Presheaf.germ_res_apply _ _ _ _ _
 
@@ -36,13 +41,16 @@ theorem embedAffine : EmbedAffine := by
   have : Nonempty (⊤ ⊓ ⊤ : Z.Opens) := ⟨⟨z, trivial, trivial⟩⟩
   let φ : Γ(Z, ⊤) →+* Z.functionField := (Z.germToFunctionField ⊤).hom
   let _ : Algebra A Z.functionField := (φ.comp (rA p ⊤)).toAlgebra
-  let B : Subalgebra A Z.functionField :=
-    { toSubsemiring := φ.rangeS, algebraMap_mem' := fun a => ⟨rA p ⊤ a, rfl⟩ }
+  let B : Subalgebra A Z.functionField := {
+    toSubsemiring := φ.rangeS
+    algebraMap_mem' := fun a => ⟨rA p ⊤ a, rfl⟩
+  }
   have hBint : ∀ x ∈ B, IsIntegral A x := by
     rintro x ⟨g, rfl⟩
     obtain ⟨P, hP, hP0⟩ := hTop g
     refine ⟨P, hP, ?_⟩
-    have : Polynomial.eval₂ (algebraMap A Z.functionField) (φ g) P = φ (Polynomial.eval₂ (rA p ⊤) g P) := by
+    have : Polynomial.eval₂ (algebraMap A Z.functionField) (φ g) P
+        = φ (Polynomial.eval₂ (rA p ⊤) g P) := by
       rw [Polynomial.hom_eval₂]; rfl
     rw [this, hP0, map_zero]
   have hDov : AdjoinInv B 1 = B := by
@@ -64,9 +72,27 @@ theorem embedAffine : EmbedAffine := by
         rintro x (hx | hx)
         · exact hx
         · rw [Set.mem_singleton_iff.mp hx]; exact B.one_mem
-  · refine ⟨⊤, ⊤, φ, φ, (Z.germToFunctionField (⊤ ⊓ ⊤)).hom, hAff, hAff, by simpa using hAff, sup_idem _,
-      Z.germToFunctionField_injective _, Z.germToFunctionField_injective _, Z.germToFunctionField_injective _,
-      rfl, rfl, ?_, ?_, ?_, fun a => rfl, fun a => rfl⟩
+  · refine ⟨
+      ⊤,
+      ⊤,
+      φ,
+      φ,
+      (Z.germToFunctionField (⊤ ⊓ ⊤)).hom,
+      hAff,
+      hAff,
+      by simpa using hAff,
+      sup_idem _,
+      Z.germToFunctionField_injective _,
+      Z.germToFunctionField_injective _,
+      Z.germToFunctionField_injective _,
+      rfl,
+      rfl,
+      ?_,
+      ?_,
+      ?_,
+      fun a => rfl,
+      fun a => rfl
+    ⟩
     · rw [hDov]
       ext x
       constructor

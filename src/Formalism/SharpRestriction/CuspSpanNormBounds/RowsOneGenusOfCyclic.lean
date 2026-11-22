@@ -14,7 +14,8 @@ open NumberField Formalism.HermitianLatticesTheory
 
 section Cyc
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E]
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
   {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
 
 theorem cyc_star_int (o : 𝓞 E) : star (algebraMap (𝓞 E) E o) ∈ Set.range (algebraMap (𝓞 E) E) := by
@@ -26,7 +27,8 @@ end Cyc
 
 section Rows
 
-open Module Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.MainNotions.BridgeLemma₂
+open Module Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.MainNotions.BridgeLemma₂
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

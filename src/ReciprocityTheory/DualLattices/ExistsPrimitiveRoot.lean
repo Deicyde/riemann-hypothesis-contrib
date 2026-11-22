@@ -15,7 +15,7 @@ variable {p : ℕ} [hp : Fact p.Prime]
 
 section Untilt
 
-variable {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
+variable {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 private lemma pow_p_pow_eq (f : ℕ → O) (hf : ∀ n, f (n + 1) ^ p = f n) (n : ℕ) :
     f n ^ p ^ n = f 0 := by
@@ -29,10 +29,12 @@ lemma untilt_eq_of_coeff (x : PreTilt O p) (f : ℕ → O) (hf : ∀ n, f (n + 1
   show Perfection.teichmuller p (span {(p : O)}) x = f 0
   exact Perfection.teichmuller_spec fun n => ⟨f n, (hx n).symm, by rw [pow_p_pow_eq f hf n]⟩
 
-def ofRoots (f : ℕ → O) (hf : ∀ n, f (n + 1) ^ p = f n) : PreTilt O p :=
-  ⟨fun n => Ideal.Quotient.mk (span {(p : O)}) (f n), fun n => by
+def ofRoots (f : ℕ → O) (hf : ∀ n, f (n + 1) ^ p = f n) : PreTilt O p := ⟨
+  fun n => Ideal.Quotient.mk (span {(p : O)}) (f n),
+  fun n => by
     show (Ideal.Quotient.mk (span {(p : O)}) (f (n + 1))) ^ p = _
-    rw [← map_pow, hf]⟩
+    rw [← map_pow, hf]
+⟩
 
 lemma coeff_ofRoots (f : ℕ → O) (hf : ∀ n, f (n + 1) ^ p = f n) (n : ℕ) :
     Perfection.coeff (ModP O p) p n (ofRoots f hf) = Ideal.Quotient.mk (span {(p : O)}) (f n) :=
@@ -53,7 +55,9 @@ end Untilt
 
 section Roots
 
-variable (C : Type) [Field C] [IsAlgClosed C] (v : Valuation C NNReal)
+variable
+  (C : Type) [Field C] [IsAlgClosed C]
+  (v : Valuation C NNReal)
   (O : Type) [CommRing O] [Algebra O C]
 
 private lemma le_one_of_pow (hv : v.Integers O) {z : C} {w : O} (h : z ^ p = algebraMap O C w) :
@@ -83,14 +87,14 @@ private def rootSeq (r : O → O) (c : O) : ℕ → O
   | 0 => c
   | n + 1 => r (rootSeq r c n)
 
-variable [Fact ¬IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
+variable [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 theorem exists_pflat (hv : v.Integers O) : ∃ pflat : PreTilt O p, pflat.untilt = (p : O) := by
   choose r hr using exists_root (p := p) C v O hv
   exact ⟨ofRoots (rootSeq O r p) (fun n => hr _), untilt_ofRoots _ _⟩
 
-theorem exists_eps [CharZero C] (hv : v.Integers O) :
-    ∃ ε : PreTilt O p,
+theorem exists_eps [CharZero C] (hv : v.Integers O)
+    : ∃ ε : PreTilt O p,
       IsPrimitiveRoot (((_root_.frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p := by
   choose r hr using exists_root (p := p) C v O hv
   obtain ⟨ζ, hζ⟩ := exists_primitiveRoot (p := p) C v O hv

@@ -9,17 +9,20 @@ public import GroundTheory.AutomorphicForms.DixmierMalliavin
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
 open scoped ContDiff
 
-private theorem UpperTheory.exists_smooth_bump_units {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸]
-    [FiniteDimensional ℝ 𝔸] (h : IsExpLieAlgebra (⊤ : Subgroup 𝔸ˣ) (⊤ : Submodule ℝ 𝔸))
-    (κ : (⊤ : Subgroup 𝔸ˣ) → ℝ) (hs : h.IsSmoothFun (fun A => (κ A : ℂ)))
-    (hc : HasCompactSupport κ) :
-    ∃ β : 𝔸 → ℝ, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) β ∧ HasCompactSupport β ∧
-      tsupport β ⊆ Set.range (Units.val : 𝔸ˣ → 𝔸) ∧
-      ∀ A : (⊤ : Subgroup 𝔸ˣ), β ((A : 𝔸ˣ) : 𝔸) = κ A := by
+private theorem UpperTheory.exists_smooth_bump_units
+    {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸]
+    (h : IsExpLieAlgebra (⊤ : Subgroup 𝔸ˣ) (⊤ : Submodule ℝ 𝔸)) (κ : (⊤ : Subgroup 𝔸ˣ) → ℝ)
+    (hs : h.IsSmoothFun (fun A => (κ A : ℂ))) (hc : HasCompactSupport κ)
+    : ∃ β : 𝔸 → ℝ,
+      ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) β ∧ HasCompactSupport β
+        ∧ tsupport β ⊆ Set.range (Units.val : 𝔸ˣ → 𝔸)
+        ∧ ∀ A : (⊤ : Subgroup 𝔸ˣ), β ((A : 𝔸ˣ) : 𝔸) = κ A := by
   classical
   let ι : (⊤ : Subgroup 𝔸ˣ) → 𝔸 := fun A => ((A : 𝔸ˣ) : 𝔸)
   have hemb : Topology.IsOpenEmbedding ι :=
@@ -54,8 +57,8 @@ private theorem UpperTheory.exists_smooth_bump_units {𝔸 : Type*} [NormedRing 
       have h1 : gi * ι g = 1 := Units.inv_mul _
       have hn : e.target ∈ nhds (gi * ι g) := by
         rw [h1]; exact e.open_target.mem_nhds (one_mem_expPartialHomeomorph_target ℝ _)
-      have hl : ContDiffAt ℝ ∞
-          (fun x => subspaceProj (⊤ : Submodule ℝ 𝔸) (e.symm (gi * x))) (ι g) :=
+      have hl
+          : ContDiffAt ℝ ∞ (fun x => subspaceProj (⊤ : Submodule ℝ 𝔸) (e.symm (gi * x))) (ι g) :=
         (subspaceProj (⊤ : Submodule ℝ 𝔸)).contDiff.contDiffAt.comp _
           (((contDiffOn_expPartialHomeomorph_symm ℝ _).contDiffAt hn).comp _ hm.contDiffAt)
       refine (hF'.contDiffAt.comp _ hl).congr_of_eventuallyEq ?_
@@ -75,11 +78,12 @@ private theorem UpperTheory.exists_smooth_bump_units {𝔸 : Type*} [NormedRing 
     obtain ⟨A, -, rfl⟩ := hts hx
     exact ⟨(A : 𝔸ˣ), rfl⟩
 
-theorem UpperTheory.exists_contDiff_archMatrix_extension_of_smooth :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (κ : archGroup K n → ℝ),
-        (isExpLieAlgebra K n).IsSmoothFun (fun A => (κ A : ℂ)) → HasCompactSupport κ →
-        ∃ β : ArchMatrix K n → ℝ, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) β ∧ HasCompactSupport β ∧
-          tsupport β ⊆ Set.range (Units.val : ArchUnits K n → ArchMatrix K n) ∧
-          ∀ A : archGroup K n, β ((A : ArchUnits K n) : ArchMatrix K n) = κ A := by
+theorem UpperTheory.exists_contDiff_archMatrix_extension_of_smooth
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (κ : archGroup K n → ℝ),
+      (isExpLieAlgebra K n).IsSmoothFun (fun A => (κ A : ℂ)) → HasCompactSupport κ
+        → ∃ β : ArchMatrix K n → ℝ,
+          ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) β ∧ HasCompactSupport β
+            ∧ tsupport β ⊆ Set.range (Units.val : ArchUnits K n → ArchMatrix K n)
+            ∧ ∀ A : archGroup K n, β ((A : ArchUnits K n) : ArchMatrix K n) = κ A := by
   intro K _ _ n κ hs hc
   exact UpperTheory.exists_smooth_bump_units (isExpLieAlgebra K n) κ hs hc

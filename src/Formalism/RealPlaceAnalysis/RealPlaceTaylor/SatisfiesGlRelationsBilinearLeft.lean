@@ -46,9 +46,11 @@ variable {σ : Type*} [DecidableEq σ]
 
 set_option quotPrecheck false
 
-local notation "D" v => ((pderiv v : Derivation ℂ (MvPolynomial σ ℂ) (MvPolynomial σ ℂ)).toLinearMap :
-  Module.End ℂ (MvPolynomial σ ℂ))
-local notation "Mx" v => (LinearMap.mulLeft ℂ (X v : MvPolynomial σ ℂ) : Module.End ℂ (MvPolynomial σ ℂ))
+local notation "D" v =>
+  ((pderiv v : Derivation ℂ (MvPolynomial σ ℂ) (MvPolynomial σ ℂ)).toLinearMap :
+    Module.End ℂ (MvPolynomial σ ℂ))
+local notation "Mx" v =>
+  (LinearMap.mulLeft ℂ (X v : MvPolynomial σ ℂ) : Module.End ℂ (MvPolynomial σ ℂ))
 
 lemma deriv_mulX_commutator (v w : σ) : (D v) * (Mx w) - (Mx w) * (D v) = if v = w then 1 else 0 := by
   by_cases h : v = w
@@ -87,8 +89,9 @@ end ops
 
 theorem canonicalCommutation_holds : CCR := by
   intro M n' ε ε' i j a b
-  have hI : (if (i, a) = (j, b) then 1 else 0 : Module.End ℂ (MvPolynomial (Fin M × Fin n') ℂ)) =
-      if i = j ∧ a = b then 1 else 0 := by
+  have hI
+      : (if (i, a) = (j, b) then 1 else 0 : Module.End ℂ (MvPolynomial (Fin M × Fin n') ℂ))
+        = if i = j ∧ a = b then 1 else 0 := by
     by_cases hh : i = j ∧ a = b
     · obtain ⟨rfl, rfl⟩ := hh
       simp
@@ -136,9 +139,9 @@ def bilinearLeft (i j : Fin m) : A := ∑ a, P i a * B j a
 def bilinearRight (a b : Fin n) : A := ∑ i, P i b * B i a
 
 variable {B P}
-variable (hBP : ∀ i j a b, B i a * P j b - P j b * B i a = if i = j ∧ a = b then 1 else 0)
-  (hBB : ∀ i j a b, B i a * B j b = B j b * B i a)
-  (hPP : ∀ i j a b, P i a * P j b = P j b * P i a)
+variable
+  (hBP : ∀ i j a b, B i a * P j b - P j b * B i a = if i = j ∧ a = b then 1 else 0)
+  (hBB : ∀ i j a b, B i a * B j b = B j b * B i a) (hPP : ∀ i j a b, P i a * P j b = P j b * P i a)
 include hBP hBB hPP
 
 lemma bilinear_product_commutator (i j k l : Fin m) (a b c d : Fin n) :
@@ -147,7 +150,6 @@ lemma bilinear_product_commutator (i j k l : Fin m) (a b c d : Fin n) :
         (if l = i ∧ d = a then 1 else 0) * (P k c * B j b) :=
   bilinear_commutator_identity _ _ _ _ _ _ (hBP j k b c) (hBP l i d a) (hPP i k a c) (hBB j l b d)
     (by split_ifs <;> simp) (by split_ifs <;> simp)
-
 
 lemma satisfiesGlRelations_bilinearLeft : GlRel (bilinearLeft B P) := by
   intro a b c d
@@ -180,23 +182,23 @@ lemma bilinearLeft_mul_bilinearRight (i j : Fin m) (a b : Fin n) :
   rw [sub_eq_zero]
   simp [ite_and, ite_mul]
 
-
-
-
 end weyl
 
 theorem fockPairGl_of (h : CCR) : FockPairGl := by
   intro M n' ε ε'
-  have hBP : ∀ i j a b, bop ε ε' i a * bpl ε ε' j b - bpl ε ε' j b * bop ε ε' i a =
-      if i = j ∧ a = b then 1 else 0 := fun i j a b => (h M n' ε ε' i j a b).1
-  have hBB : ∀ i j a b, bop ε ε' i a * bop ε ε' j b = bop ε ε' j b * bop ε ε' i a :=
-    fun i j a b => (h M n' ε ε' i j a b).2.1
-  have hPP : ∀ i j a b, bpl ε ε' i a * bpl ε ε' j b = bpl ε ε' j b * bpl ε ε' i a :=
-    fun i j a b => (h M n' ε ε' i j a b).2.2
+  have hBP
+      : ∀ i j a b,
+        bop ε ε' i a * bpl ε ε' j b - bpl ε ε' j b * bop ε ε' i a
+          = if i = j ∧ a = b then 1 else 0 := fun i j a b =>
+    (h M n' ε ε' i j a b).1
+  have hBB : ∀ i j a b, bop ε ε' i a * bop ε ε' j b = bop ε ε' j b * bop ε ε' i a := fun i j a b =>
+    (h M n' ε ε' i j a b).2.1
+  have hPP : ∀ i j a b, bpl ε ε' i a * bpl ε ε' j b = bpl ε ε' j b * bpl ε ε' i a := fun i j a b =>
+    (h M n' ε ε' i j a b).2.2
   have hEg : Eg ε ε' = bilinearLeft (bop ε ε') (bpl ε ε') := by
     funext i j
     rfl
-  have hEg' : Eg' ε ε' = fun a b => -bilinearRight (bop ε ε') (bpl ε ε') a b := by
+  have hEg' : Eg' ε ε' = fun a b => - bilinearRight (bop ε ε') (bpl ε ε') a b := by
     funext a b
     rfl
   refine ⟨?_, ?_, ?_⟩

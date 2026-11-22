@@ -8,9 +8,11 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open IsLocalRing
 
-theorem not_isUnit_algebraMap_of_finite {O V : Type} [CommRing O] [IsLocalRing O] [CommRing V]
-    [Nontrivial V] [Algebra O V] [Module.Finite O V] (π : O) (hπ : π ∈ maximalIdeal O) :
-    ¬ IsUnit (algebraMap O V π) := by
+theorem not_isUnit_algebraMap_of_finite
+    {O V : Type}
+    [CommRing O] [IsLocalRing O] [CommRing V] [Nontrivial V] [Algebra O V] [Module.Finite O V]
+    (π : O) (hπ : π ∈ maximalIdeal O)
+    : ¬ IsUnit (algebraMap O V π) := by
   intro hu
   have htop : (⊤ : Submodule O V) ≤ maximalIdeal O • ⊤ := by
     intro v _
@@ -18,24 +20,30 @@ theorem not_isUnit_algebraMap_of_finite {O V : Type} [CommRing O] [IsLocalRing O
       ⟨hu.unit⁻¹ * v, by rw [← mul_assoc, IsUnit.mul_val_inv, one_mul]⟩
     rw [← hw, ← Algebra.smul_def]
     exact Submodule.smul_mem_smul hπ Submodule.mem_top
-  have hbot := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal O) ⊤
-    Module.Finite.fg_top htop (IsLocalRing.maximalIdeal_le_jacobson _)
+  have hbot :=
+    Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal O) ⊤ Module.Finite.fg_top htop
+      (IsLocalRing.maximalIdeal_le_jacobson _)
   have h1 : (1 : V) ∈ (⊥ : Submodule O V) := hbot ▸ Submodule.mem_top
   exact one_ne_zero ((Submodule.mem_bot O).mp h1)
 
-theorem reg_horizontal_pf {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-    [CommRing A] [IsDomain A] [Algebra O A] [Algebra.FiniteType O A] [Module.Flat O A]
-    (P : Ideal A) [P.IsPrime] (hh : ¬ Ideal.map (algebraMap O A) (maximalIdeal O) ≤ P)
-    (hmeet : P ⊔ Ideal.map (algebraMap O A) (maximalIdeal O) ≠ ⊤) (e : A) (he : e ≠ 0)
+theorem reg_horizontal_pf
+    {O A : Type}
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O]
+    [CharZero O] [CommRing A] [IsDomain A] [Algebra O A] [Algebra.FiniteType O A] [Module.Flat O A]
+    (P : Ideal A) [P.IsPrime]
+    (hh : ¬ Ideal.map (algebraMap O A) (maximalIdeal O) ≤ P)
+    (hmeet : P ⊔ Ideal.map (algebraMap O A) (maximalIdeal O) ≠ ⊤)
+    (e : A) (he : e ≠ 0)
     (f : FractionRing A)
-    (hdvr : (¬ ∃ a s : A, s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a) →
-      ∃ a s : A, a ∈ P ∧ s ∉ P ∧ f⁻¹ * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a)
+    (hdvr
+      : (¬ ∃ a s : A, s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a)
+        → ∃ a s : A,
+          a ∈ P ∧ s ∉ P ∧ f⁻¹ * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a)
     (hf : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Algebra O V]
-      [Module.Finite O V] (φ : A →ₐ[O] V) (a b : A),
-      f * algebraMap A (FractionRing A) b = algebraMap A (FractionRing A) a → φ b ≠ 0 → φ e ≠ 0 →
-      ∃ v : V, φ a = v * φ b) :
-    ∃ a s : A, s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a := by
+        [Module.Finite O V] (φ : A →ₐ[O] V) (a b : A),
+      f * algebraMap A (FractionRing A) b = algebraMap A (FractionRing A) a → φ b ≠ 0 → φ e ≠ 0
+        → ∃ v : V, φ a = v * φ b)
+    : ∃ a s : A, s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a := by
   classical
   by_contra hno
   obtain ⟨a, s, haP, hsP, hfas⟩ := hdvr hno
@@ -67,7 +75,8 @@ theorem reg_horizontal_pf {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValu
     rw [map_ne_zero_iff _ hinj]; rintro h; exact hws (h ▸ P.zero_mem)
 
   have hOA : Function.Injective (algebraMap O A) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra hx0
     obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hx0 hϖ
@@ -81,45 +90,60 @@ theorem reg_horizontal_pf {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValu
   let B : Subalgebra A (FractionRing A) := Algebra.adjoin A {y}
   have hyB : y ∈ B := Algebra.subset_adjoin rfl
 
-  let S : Subalgebra A (FractionRing A) :=
-    { carrier := {x | ∃ a' p t : A, p ∈ P ∧ t ∉ P ∧
+  let S : Subalgebra A (FractionRing A) := {
+    carrier :=
+      {x | ∃ a' p t : A, p ∈ P ∧ t ∉ P ∧
         x * algebraMap A (FractionRing A) t = algebraMap A (FractionRing A) (a' * t + p)}
-      mul_mem' := by
-        rintro x1 x2 ⟨a1, p1, t1, hp1, ht1, h1⟩ ⟨a2, p2, t2, hp2, ht2, h2⟩
-        refine ⟨a1 * a2, a1 * t1 * p2 + a2 * t2 * p1 + p1 * p2, t1 * t2,
-          P.add_mem (P.add_mem (P.mul_mem_left _ hp2) (P.mul_mem_left _ hp1)) (P.mul_mem_left _ hp2),
-          fun h => (Ideal.IsPrime.mem_or_mem ‹_› h).elim ht1 ht2, ?_⟩
-        have : x1 * x2 * algebraMap A (FractionRing A) (t1 * t2) =
-            (x1 * algebraMap A (FractionRing A) t1) * (x2 * algebraMap A (FractionRing A) t2) := by
-          rw [map_mul]; ring
-        rw [this, h1, h2, ← map_mul]
-        congr 1
-        ring
-      add_mem' := by
-        rintro x1 x2 ⟨a1, p1, t1, hp1, ht1, h1⟩ ⟨a2, p2, t2, hp2, ht2, h2⟩
-        refine ⟨a1 + a2, p1 * t2 + p2 * t1, t1 * t2,
-          P.add_mem (P.mul_mem_right _ hp1) (P.mul_mem_right _ hp2),
-          fun h => (Ideal.IsPrime.mem_or_mem ‹_› h).elim ht1 ht2, ?_⟩
-        have : (x1 + x2) * algebraMap A (FractionRing A) (t1 * t2) =
-            (x1 * algebraMap A (FractionRing A) t1) * algebraMap A (FractionRing A) t2 +
-              (x2 * algebraMap A (FractionRing A) t2) * algebraMap A (FractionRing A) t1 := by
-          rw [map_mul]; ring
-        rw [this, h1, h2, ← map_mul, ← map_mul, ← map_add (f := _)]
-        congr 1
-        ring
-      algebraMap_mem' := fun r => ⟨r, 0, 1, P.zero_mem, (Ideal.ne_top_iff_one P).mp
-        (Ideal.IsPrime.ne_top ‹_›), by simp⟩ }
-  have hyS : y ∈ S := ⟨0, a, algebraMap O A ϖ * s, haP, hws, by
-    rw [hy, div_mul_cancel₀ _ hws0]; simp⟩
+    mul_mem' := by
+      rintro x1 x2 ⟨a1, p1, t1, hp1, ht1, h1⟩ ⟨a2, p2, t2, hp2, ht2, h2⟩
+      refine ⟨
+        a1 * a2,
+        a1 * t1 * p2 + a2 * t2 * p1 + p1 * p2,
+        t1 * t2,
+        P.add_mem (P.add_mem (P.mul_mem_left _ hp2) (P.mul_mem_left _ hp1)) (P.mul_mem_left _ hp2),
+        fun h => (Ideal.IsPrime.mem_or_mem ‹_› h).elim ht1 ht2,
+        ?_
+      ⟩
+      have : x1 * x2 * algebraMap A (FractionRing A) (t1 * t2)
+          = (x1 * algebraMap A (FractionRing A) t1) * (x2 * algebraMap A (FractionRing A) t2) := by
+        rw [map_mul]; ring
+      rw [this, h1, h2, ← map_mul]
+      congr 1
+      ring
+    add_mem' := by
+      rintro x1 x2 ⟨a1, p1, t1, hp1, ht1, h1⟩ ⟨a2, p2, t2, hp2, ht2, h2⟩
+      refine ⟨
+        a1 + a2,
+        p1 * t2 + p2 * t1,
+        t1 * t2,
+        P.add_mem (P.mul_mem_right _ hp1) (P.mul_mem_right _ hp2),
+        fun h => (Ideal.IsPrime.mem_or_mem ‹_› h).elim ht1 ht2,
+        ?_
+      ⟩
+      have : (x1 + x2) * algebraMap A (FractionRing A) (t1 * t2)
+          = (x1 * algebraMap A (FractionRing A) t1) * algebraMap A (FractionRing A) t2
+            + (x2 * algebraMap A (FractionRing A) t2) * algebraMap A (FractionRing A) t1 := by
+        rw [map_mul]; ring
+      rw [this, h1, h2, ← map_mul, ← map_mul, ← map_add (f := _)]
+      congr 1
+      ring
+    algebraMap_mem' := fun r =>
+      ⟨r, 0, 1, P.zero_mem, (Ideal.ne_top_iff_one P).mp (Ideal.IsPrime.ne_top ‹_›), by simp⟩
+  }
+  have hyS : y ∈ S :=
+    ⟨0, a, algebraMap O A ϖ * s, haP, hws, by rw [hy, div_mul_cancel₀ _ hws0]; simp⟩
   have hBS : B ≤ S := Algebra.adjoin_le (Set.singleton_subset_iff.mpr hyS)
 
-  have hcoe : ∀ r : O, ((algebraMap O B r : B) : FractionRing A) =
-      algebraMap A (FractionRing A) (algebraMap O A r) := fun r => by
+  have hcoe
+      : ∀ r : O,
+        ((algebraMap O B r : B) : FractionRing A)
+          = algebraMap A (FractionRing A) (algebraMap O A r) := fun r => by
     rw [← IsScalarTower.algebraMap_apply O A (FractionRing A)]
     rfl
   have hOB : Function.Injective (algebraMap O B) := by
     intro r1 r2 h
-    apply hOA; apply hinj
+    apply hOA
+    apply hinj
     rw [← hcoe, ← hcoe, h]
   have : Module.Flat O B := by
     rw [Module.Flat.flat_iff_torsion_eq_bot_of_isBezout]
@@ -130,7 +154,8 @@ theorem reg_horizontal_pf {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValu
     · exact absurd (hOB (h.trans (map_zero _).symm)) (nonZeroDivisors.coe_ne_zero r)
     · rw [h]; exact Submodule.zero_mem _
   have : Algebra.FiniteType A B :=
-    (Subalgebra.fg_iff_finiteType B).mp (by simpa using Subalgebra.fg_adjoin_finset ({y} : Finset _))
+    (Subalgebra.fg_iff_finiteType B).mp
+      (by simpa using Subalgebra.fg_adjoin_finset ({y} : Finset _))
   have : Algebra.FiniteType O B := Algebra.FiniteType.trans (S := A) inferInstance inferInstance
 
   have hsp : Ideal.map (algebraMap O B) (maximalIdeal O) ≠ ⊤ := by
@@ -139,28 +164,32 @@ theorem reg_horizontal_pf {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValu
     obtain ⟨a', p, t, hp, ht, h⟩ := hBS (↑u⁻¹ : B).2
     apply hmeet
     rw [eq_top_iff, hmapw]
-    have hwb : algebraMap A (FractionRing A) (algebraMap O A ϖ) * ((↑u⁻¹ : B) : FractionRing A) = 1 := by
+    have hwb
+        : algebraMap A (FractionRing A) (algebraMap O A ϖ) * ((↑u⁻¹ : B) : FractionRing A) = 1 := by
       rw [← hcoe, ← hu, ← Subalgebra.coe_mul, Units.mul_inv, Subalgebra.coe_one]
     have hkey : algebraMap A (FractionRing A) (t - algebraMap O A ϖ * (a' * t + p)) = 0 := by
       rw [map_sub, map_mul, ← h]
-      calc algebraMap A (FractionRing A) t - algebraMap A (FractionRing A) (algebraMap O A ϖ) *
-            (((↑u⁻¹ : B) : FractionRing A) * algebraMap A (FractionRing A) t)
-          = algebraMap A (FractionRing A) t - (algebraMap A (FractionRing A) (algebraMap O A ϖ) *
-            ((↑u⁻¹ : B) : FractionRing A)) * algebraMap A (FractionRing A) t := by ring
+      calc
+        algebraMap A (FractionRing A) t
+              - algebraMap A (FractionRing A) (algebraMap O A ϖ)
+                * (((↑u⁻¹ : B) : FractionRing A) * algebraMap A (FractionRing A) t)
+            = algebraMap A (FractionRing A) t
+              - (algebraMap A (FractionRing A) (algebraMap O A ϖ) * ((↑u⁻¹ : B) : FractionRing A))
+                * algebraMap A (FractionRing A) t := by
+          ring
         _ = 0 := by rw [hwb, one_mul, sub_self]
     have hk := hinj (hkey.trans (map_zero _).symm)
     have htw : t * (1 - algebraMap O A ϖ * a') ∈ P := by
-      have : t * (1 - algebraMap O A ϖ * a') = algebraMap O A ϖ * p := by
-        linear_combination hk
-      rw [this]; exact P.mul_mem_left _ hp
-    have h1 : 1 - algebraMap O A ϖ * a' ∈ P :=
-      (Ideal.IsPrime.mem_or_mem ‹_› htw).resolve_left ht
+      have : t * (1 - algebraMap O A ϖ * a') = algebraMap O A ϖ * p := by linear_combination hk
+      rw [this]
+      exact P.mul_mem_left _ hp
+    have h1 : 1 - algebraMap O A ϖ * a' ∈ P := (Ideal.IsPrime.mem_or_mem ‹_› htw).resolve_left ht
     have : (1 : A) = (1 - algebraMap O A ϖ * a') + algebraMap O A ϖ * a' := by ring
     intro z _
     rw [← mul_one z, this, mul_add]
     exact Submodule.add_mem _ (Ideal.mem_sup_left (P.mul_mem_left _ h1))
-      (Ideal.mem_sup_right (Ideal.mul_mem_left _ _ (Ideal.mul_mem_right _ _
-        (Ideal.subset_span rfl))))
+      (Ideal.mem_sup_right (Ideal.mul_mem_left _ _
+        (Ideal.mul_mem_right _ _ (Ideal.subset_span rfl))))
 
   have heas : algebraMap A B (e * a * s) ≠ 0 := by
     intro h
@@ -191,8 +220,7 @@ theorem reg_horizontal_pf {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValu
     rfl
   rw [hφab] at hv
   have hunit : algebraMap O V ϖ * (v * φ ⟨y, hyB⟩) = 1 := by
-    have h2 : φA s * (1 - algebraMap O V ϖ * (v * φ ⟨y, hyB⟩)) = 0 := by
-      linear_combination hv
+    have h2 : φA s * (1 - algebraMap O V ϖ * (v * φ ⟨y, hyB⟩)) = 0 := by linear_combination hv
     have h3 := (mul_eq_zero.mp h2).resolve_left hφs
     linear_combination -h3
   exact not_isUnit_algebraMap_of_finite ϖ hϖm

@@ -9,41 +9,55 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 
 namespace GlobalTheory
 
-theorem _root_.GlobalTheory.isIrrSub_mapRep_of_span_restrict_eq_top {k Γ : Type} [Field k] [Group Γ] {L : Type}
-    [Field L] (f : k →+* L) {a : ℕ} (ρ : Γ →* GL (Fin a) k) (W : Submodule k (Fin a → k))
-    (hW : _root_.Formalism.MainNotions.N.Stable (_root_.Formalism.MainNotions.N.matRep ((Units.coeHom _).comp ρ)) W) (hne : W ≠ ⊥)
-    (hsp : Submodule.span k (Set.range fun g =>
-      (_root_.Formalism.MainNotions.N.matRep ((Units.coeHom _).comp ρ) g).restrict (hW g)) = ⊤) :
-    _root_.Formalism.MainNotions.N.IsIrrSub (_root_.Formalism.MainNotions.N.mapRep f ρ)
+theorem _root_.GlobalTheory.isIrrSub_mapRep_of_span_restrict_eq_top
+    {k Γ : Type} [Field k] [Group Γ]
+    {L : Type} [Field L]
+    (f : k →+* L)
+    {a : ℕ} (ρ : Γ →* GL (Fin a) k) (W : Submodule k (Fin a → k))
+    (hW : _root_.Formalism.MainNotions.N.Stable
+      (_root_.Formalism.MainNotions.N.matRep ((Units.coeHom _).comp ρ)) W)
+    (hne : W ≠ ⊥)
+    (hsp : Submodule.span k
+        (Set.range fun g =>
+          (_root_.Formalism.MainNotions.N.matRep ((Units.coeHom _).comp ρ) g).restrict (hW g))
+      = ⊤)
+    : _root_.Formalism.MainNotions.N.IsIrrSub (_root_.Formalism.MainNotions.N.mapRep f ρ)
       (Submodule.span L ((fun v => f ∘ v) '' (W : Set (Fin a → k)))) := by
   classical
-  have hmul : ∀ (g : Γ) (w : Fin a → k),
-      ((_root_.Formalism.MainNotions.N.mapRep f ρ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L).mulVec (f ∘ w) =
-        f ∘ ((ρ g : Matrix (Fin a) (Fin a) k).mulVec w) := by
+  have hmul
+      : ∀ (g : Γ) (w : Fin a → k),
+        ((_root_.Formalism.MainNotions.N.mapRep f ρ g : GL (Fin a) L)
+            : Matrix (Fin a) (Fin a) L).mulVec (f ∘ w)
+          = f ∘ ((ρ g : Matrix (Fin a) (Fin a) k).mulVec w) := by
     intro g w
     funext i
     exact (RingHom.map_mulVec f _ w i).symm
   let T : Γ → (Fin a → L) →ₗ[L] (Fin a → L) := fun g =>
-    Matrix.toLin' ((_root_.Formalism.MainNotions.N.mapRep f ρ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L)
+    Matrix.toLin'
+      ((_root_.Formalism.MainNotions.N.mapRep f ρ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L)
   let A := Submodule.span L (Set.range T)
-  let P : Submodule k (Module.End k W) :=
-    { carrier := {E | ∃ M ∈ A, ∀ w : W, M (f ∘ (w : Fin a → k)) = f ∘ ((E w : W) : Fin a → k)}
-      add_mem' := by
-        rintro E₁ E₂ ⟨M₁, hM₁, h₁⟩ ⟨M₂, hM₂, h₂⟩
-        refine ⟨M₁ + M₂, A.add_mem hM₁ hM₂, fun w => ?_⟩
-        rw [LinearMap.add_apply, h₁, h₂]
-        funext i
-        simp
-      zero_mem' := ⟨0, A.zero_mem, fun w => by funext i; simp⟩
-      smul_mem' := by
-        rintro c E ⟨M, hM, h⟩
-        refine ⟨f c • M, A.smul_mem _ hM, fun w => ?_⟩
-        rw [LinearMap.smul_apply, h]
-        funext i
-        simp }
+  let P : Submodule k (Module.End k W) := {
+    carrier := {E | ∃ M ∈ A, ∀ w : W, M (f ∘ (w : Fin a → k)) = f ∘ ((E w : W) : Fin a → k)}
+    add_mem' := by
+      rintro E₁ E₂ ⟨M₁, hM₁, h₁⟩ ⟨M₂, hM₂, h₂⟩
+      refine ⟨M₁ + M₂, A.add_mem hM₁ hM₂, fun w => ?_⟩
+      rw [LinearMap.add_apply, h₁, h₂]
+      funext i
+      simp
+    zero_mem' := ⟨0, A.zero_mem, fun w => by funext i; simp⟩
+    smul_mem' := by
+      rintro c E ⟨M, hM, h⟩
+      refine ⟨f c • M, A.smul_mem _ hM, fun w => ?_⟩
+      rw [LinearMap.smul_apply, h]
+      funext i
+      simp
+  }
   have hP : ∀ E, E ∈ P := by
-    have hle : Submodule.span k (Set.range fun g =>
-        (_root_.Formalism.MainNotions.N.matRep ((Units.coeHom _).comp ρ) g).restrict (hW g)) ≤ P := by
+    have hle
+        : Submodule.span k
+            (Set.range fun g =>
+              (_root_.Formalism.MainNotions.N.matRep ((Units.coeHom _).comp ρ) g).restrict (hW g))
+          ≤ P := by
       rw [Submodule.span_le]
       rintro _ ⟨g, rfl⟩
       refine ⟨T g, Submodule.subset_span ⟨g, rfl⟩, fun w => ?_⟩
@@ -53,8 +67,10 @@ theorem _root_.GlobalTheory.isIrrSub_mapRep_of_span_restrict_eq_top {k Γ : Type
     apply hle
     rw [hsp]
     exact Submodule.mem_top
-  have hA : ∀ W' : Submodule L (Fin a → L), _root_.Formalism.MainNotions.N.IsInv (_root_.Formalism.MainNotions.N.mapRep f ρ) W' →
-      ∀ M ∈ A, ∀ v ∈ W', M v ∈ W' := by
+  have hA
+      : ∀ W' : Submodule L (Fin a → L),
+        _root_.Formalism.MainNotions.N.IsInv (_root_.Formalism.MainNotions.N.mapRep f ρ) W'
+          → ∀ M ∈ A, ∀ v ∈ W', M v ∈ W' := by
     intro W' hW' M hM
     induction hM using Submodule.span_induction with
     | mem x hx =>
@@ -99,8 +115,9 @@ theorem _root_.GlobalTheory.isIrrSub_mapRep_of_span_restrict_eq_top {k Γ : Type
     let φ : W →ₗ[k] k := (LinearMap.proj i : (Fin a → k) →ₗ[k] k).comp W.subtype
     let E : Module.End k W := φ.smulRight ⟨w₀, hw₀⟩
     obtain ⟨M, hMA, hM⟩ := hP E
-    have key : ∀ y ∈ Submodule.span L ((fun v => f ∘ v) '' (W : Set (Fin a → k))),
-        M y = y i • (f ∘ w₀) := by
+    have key
+        : ∀ y ∈ Submodule.span L ((fun v => f ∘ v) '' (W : Set (Fin a → k))),
+          M y = y i • (f ∘ w₀) := by
       intro y hy
       induction hy using Submodule.span_induction with
       | mem y hy =>

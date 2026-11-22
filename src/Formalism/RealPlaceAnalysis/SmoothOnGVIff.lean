@@ -21,7 +21,8 @@ open Classical in
 def expG {n : ℕ} (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) : UJ ε :=
   if h : inG ε X then
     ⟨(Matrix.isUnit_exp ((t : ℂ) • X)).unit, exp_indefinite_unitary_holds n ε X h t⟩
-  else 1
+  else
+    1
 
 lemma toM_expG {n : ℕ} (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) (h : inG ε X) :
     toM (expG ε X t) = NormedSpace.exp ((t : ℂ) • X) := by
@@ -55,8 +56,9 @@ def KG {n : ℕ} (ε : Fin n → Bool) : Subgroup (UJ ε) where
     rw [Matrix.one_mul, Matrix.mul_one]
   inv_mem' := by
     intro g hg
-    have hinv : ((((g⁻¹ : UJ ε) : (Matrix (Fin n) (Fin n) ℂ)ˣ)) : Matrix (Fin n) (Fin n) ℂ) =
-        star (toM g) := by
+    have hinv
+        : ((((g⁻¹ : UJ ε) : (Matrix (Fin n) (Fin n) ℂ)ˣ)) : Matrix (Fin n) (Fin n) ℂ)
+          = star (toM g) := by
       show (((g : (Matrix (Fin n) (Fin n) ℂ)ˣ)⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) :
         Matrix (Fin n) (Fin n) ℂ) = _
       exact Units.inv_eq_of_mul_eq_one_right (Unitary.mul_star_self_of_mem hg.1)
@@ -104,61 +106,77 @@ lemma inK_smul_real {n : ℕ} (ε : Fin n → Bool) {Z : Matrix (Fin n) (Fin n) 
     rw [Matrix.conjTranspose_smul, hs, Matrix.smul_mul, Matrix.mul_smul, ← smul_add, hG, smul_zero]
   · rw [Matrix.smul_mul, Matrix.mul_smul, hJ]
 
-
 open scoped Classical in
 open Classical in
 def expK {n : ℕ} (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) : KG ε :=
-  if h : inK ε Z then
-    ⟨expG ε Z t, by
+  if h : inK ε Z then ⟨
+    expG ε Z t,
+    by
       show toM (expG ε Z t) ∈ Kset ε
       rw [toM_expG ε Z t h.1]
-      exact (maximal_compact_facts n ε).2.2.2.1 _ (inK_smul_real ε h t)⟩
-  else 1
+      exact (maximal_compact_facts n ε).2.2.2.1 _ (inK_smul_real ε h t)
+  ⟩
+  else
+    1
 
 def ExpGFacts : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ), inG ε X →
-    expG ε X 0 = 1 ∧ (∀ s t : ℝ, expG ε X (s + t) = expG ε X s * expG ε X t) ∧
-    Continuous (fun t : ℝ => expG ε X t) ∧
-    (inK ε X → (∀ t : ℝ, ((expK ε X t : KG ε) : UJ ε) = expG ε X t) ∧ Continuous (fun t : ℝ => expK ε X t))
+  ∀ (n : ℕ) (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ),
+    inG ε X
+      → expG ε X 0 = 1 ∧ (∀ s t : ℝ, expG ε X (s + t) = expG ε X s * expG ε X t)
+        ∧ Continuous (fun t : ℝ => expG ε X t)
+        ∧ (inK ε X
+          → (∀ t : ℝ, ((expK ε X t : KG ε) : UJ ε) = expG ε X t)
+            ∧ Continuous (fun t : ℝ => expK ε X t))
 
 def KHaar : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool),
-    IsProbabilityMeasure (muK ε) ∧
-    (∀ k : KG ε, Measure.map (fun x => k * x) (muK ε) = muK ε) ∧
-    (∀ k : KG ε, Measure.map (fun x => x * k) (muK ε) = muK ε) ∧
-    Measure.map (fun x : KG ε => x⁻¹) (muK ε) = muK ε
+    IsProbabilityMeasure (muK ε) ∧ (∀ k : KG ε, Measure.map (fun x => k * x) (muK ε) = muK ε)
+      ∧ (∀ k : KG ε, Measure.map (fun x => x * k) (muK ε) = muK ε)
+      ∧ Measure.map (fun x : KG ε => x⁻¹) (muK ε) = muK ε
 
 def KExp : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (k : Matrix (Fin n) (Fin n) ℂ), k ∈ Kset ε →
-    ∃ Y : Matrix (Fin n) (Fin n) ℂ, inK ε Y ∧ NormedSpace.exp Y = k ∧ hs Y ≤ 3 * hs (k - 1)
+  ∀ (n : ℕ) (ε : Fin n → Bool) (k : Matrix (Fin n) (Fin n) ℂ),
+    k ∈ Kset ε
+      → ∃ Y : Matrix (Fin n) (Fin n) ℂ, inK ε Y ∧ NormedSpace.exp Y = k ∧ hs Y ≤ 3 * hs (k - 1)
 
 def GenExp : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (g : Matrix (Fin n) (Fin n) ℂ), inUJ ε g →
-    ∃ Z X : Matrix (Fin n) (Fin n) ℂ, inK ε Z ∧ inP ε X ∧
-      g = NormedSpace.exp Z * NormedSpace.exp X
+  ∀ (n : ℕ) (ε : Fin n → Bool) (g : Matrix (Fin n) (Fin n) ℂ),
+    inUJ ε g
+      → ∃ Z X : Matrix (Fin n) (Fin n) ℂ,
+        inK ε Z ∧ inP ε X ∧ g = NormedSpace.exp Z * NormedSpace.exp X
 
 def KByParts : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (E : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
-    (F D : KG ε → E) (Z : Matrix (Fin n) (Fin n) ℂ),
-    inK ε Z → Continuous F → Continuous D →
-    (∀ k : KG ε, HasDerivAt (fun t : ℝ => F (k * expK ε Z t)) (D k) 0) →
-    ∫ k, D k ∂(muK ε) = 0
+      (F D : KG ε → E) (Z : Matrix (Fin n) (Fin n) ℂ),
+    inK ε Z → Continuous F → Continuous D
+      → (∀ k : KG ε, HasDerivAt (fun t : ℝ => F (k * expK ε Z t)) (D k) 0)
+      → ∫ k, D k ∂(muK ε) = 0
 
-def SmoothOnGV {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (ε : Fin n → Bool)
-    (f : Matrix (Fin n) (Fin n) ℂ → E) : Prop :=
-  ∀ g₀, inUJ ε g₀ → ∃ (U : Set (Matrix (Fin n) (Fin n) ℂ)) (F : Matrix (Fin n) (Fin n) ℂ → E),
-    IsOpen U ∧ g₀ ∈ U ∧ ContDiffOn ℝ ∞ F U ∧ ∀ g ∈ U, inUJ ε g → f g = F g
+def SmoothOnGV
+    {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (ε : Fin n → Bool) (f : Matrix (Fin n) (Fin n) ℂ → E)
+    : Prop :=
+  ∀ g₀,
+    inUJ ε g₀
+      → ∃ (U : Set (Matrix (Fin n) (Fin n) ℂ)) (F : Matrix (Fin n) (Fin n) ℂ → E),
+        IsOpen U ∧ g₀ ∈ U ∧ ContDiffOn ℝ ∞ F U ∧ ∀ g ∈ U, inUJ ε g → f g = F g
 
-def RdV {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (X : Matrix (Fin n) (Fin n) ℂ)
-    (f : Matrix (Fin n) (Fin n) ℂ → E) : Matrix (Fin n) (Fin n) ℂ → E :=
-  fun g => deriv (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) 0
+def RdV
+    {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (X : Matrix (Fin n) (Fin n) ℂ) (f : Matrix (Fin n) (Fin n) ℂ → E)
+    : Matrix (Fin n) (Fin n) ℂ → E := fun g =>
+  deriv (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) 0
 
-def EcV {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (ε : Fin n → Bool)
-    (Z : Matrix (Fin n) (Fin n) ℂ) (f : Matrix (Fin n) (Fin n) ℂ → E) : Matrix (Fin n) (Fin n) ℂ → E :=
-  fun g => RdV (cpart1 ε Z) f g + Complex.I • RdV (cpart2 ε Z) f g
+def EcV
+    {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ) (f : Matrix (Fin n) (Fin n) ℂ → E)
+    : Matrix (Fin n) (Fin n) ℂ → E := fun g =>
+  RdV (cpart1 ε Z) f g + Complex.I • RdV (cpart2 ε Z) f g
 
-def EabV {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (ε : Fin n → Bool) (a b : Fin n)
-    (f : Matrix (Fin n) (Fin n) ℂ → E) : Matrix (Fin n) (Fin n) ℂ → E :=
+def EabV
+    {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (ε : Fin n → Bool) (a b : Fin n) (f : Matrix (Fin n) (Fin n) ℂ → E)
+    : Matrix (Fin n) (Fin n) ℂ → E :=
   EcV ε (Matrix.single a b 1) f
 
 lemma smoothOnGV_iff {n : ℕ} (ε : Fin n → Bool) (f : Matrix (Fin n) (Fin n) ℂ → ℂ) :
@@ -172,52 +190,52 @@ lemma eabV_eq {n : ℕ} (ε : Fin n → Bool) (a b : Fin n) (f : Matrix (Fin n) 
 
 def RdExtV : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (f F : Matrix (Fin n) (Fin n) ℂ → E) (U : Set (Matrix (Fin n) (Fin n) ℂ)) (g X : Matrix (Fin n) (Fin n) ℂ),
-    IsOpen U → g ∈ U → inUJ ε g → ContDiffOn ℝ ∞ F U → (∀ h ∈ U, inUJ ε h → f h = F h) →
-    inG ε X → RdV X f g = fderiv ℝ F g (g * X)
+      (f F : Matrix (Fin n) (Fin n) ℂ → E) (U : Set (Matrix (Fin n) (Fin n) ℂ))
+      (g X : Matrix (Fin n) (Fin n) ℂ),
+    IsOpen U → g ∈ U → inUJ ε g → ContDiffOn ℝ ∞ F U → (∀ h ∈ U, inUJ ε h → f h = F h) → inG ε X
+      → RdV X f g = fderiv ℝ F g (g * X)
 
 def RdSmoothV : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (f : Matrix (Fin n) (Fin n) ℂ → E) (X : Matrix (Fin n) (Fin n) ℂ),
+      (f : Matrix (Fin n) (Fin n) ℂ → E) (X : Matrix (Fin n) (Fin n) ℂ),
     SmoothOnGV ε f → inG ε X → SmoothOnGV ε (RdV X f)
 
 def RdLinV : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (f f' : Matrix (Fin n) (Fin n) ℂ → E) (X Y : Matrix (Fin n) (Fin n) ℂ) (r : ℝ) (c : ℂ)
-    (g : Matrix (Fin n) (Fin n) ℂ),
-    SmoothOnGV ε f → SmoothOnGV ε f' → inG ε X → inG ε Y → inUJ ε g →
-    RdV (X + Y) f g = RdV X f g + RdV Y f g ∧ RdV ((r : ℂ) • X) f g = (r : ℂ) • RdV X f g ∧
-    RdV X (fun h => f h + c • f' h) g = RdV X f g + c • RdV X f' g
+      (f f' : Matrix (Fin n) (Fin n) ℂ → E) (X Y : Matrix (Fin n) (Fin n) ℂ) (r : ℝ) (c : ℂ)
+      (g : Matrix (Fin n) (Fin n) ℂ),
+    SmoothOnGV ε f → SmoothOnGV ε f' → inG ε X → inG ε Y → inUJ ε g
+      → RdV (X + Y) f g = RdV X f g + RdV Y f g ∧ RdV ((r : ℂ) • X) f g = (r : ℂ) • RdV X f g
+        ∧ RdV X (fun h => f h + c • f' h) g = RdV X f g + c • RdV X f' g
 
 def RdBracketV : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (f : Matrix (Fin n) (Fin n) ℂ → E) (X Y g : Matrix (Fin n) (Fin n) ℂ),
-    SmoothOnGV ε f → inG ε X → inG ε Y → inUJ ε g →
-    RdV X (RdV Y f) g - RdV Y (RdV X f) g = RdV (X * Y - Y * X) f g
+      (f : Matrix (Fin n) (Fin n) ℂ → E) (X Y g : Matrix (Fin n) (Fin n) ℂ),
+    SmoothOnGV ε f → inG ε X → inG ε Y → inUJ ε g
+      → RdV X (RdV Y f) g - RdV Y (RdV X f) g = RdV (X * Y - Y * X) f g
 
 def EabGlV : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (f : Matrix (Fin n) (Fin n) ℂ → E) (a b c d : Fin n) (g : Matrix (Fin n) (Fin n) ℂ),
-    SmoothOnGV ε f → inUJ ε g →
-    EabV ε a b (EabV ε c d f) g - EabV ε c d (EabV ε a b f) g =
-      (if b = c then EabV ε a d f g else 0) - (if d = a then EabV ε c b f g else 0)
+      (f : Matrix (Fin n) (Fin n) ℂ → E) (a b c d : Fin n) (g : Matrix (Fin n) (Fin n) ℂ),
+    SmoothOnGV ε f → inUJ ε g
+      → EabV ε a b (EabV ε c d f) g - EabV ε c d (EabV ε a b f) g
+        = (if b = c then EabV ε a d f g else 0) - (if d = a then EabV ε c b f g else 0)
 
 def RdLeftV : Prop :=
-  ∀ (n : ℕ) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (f : Matrix (Fin n) (Fin n) ℂ → E) (X h g : Matrix (Fin n) (Fin n) ℂ),
+  ∀ (n : ℕ) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (f : Matrix (Fin n) (Fin n) ℂ → E)
+      (X h g : Matrix (Fin n) (Fin n) ℂ),
     RdV X (fun x => f (h * x)) g = RdV X f (h * g)
 
 def RdVPair : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (E E' : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
-    [NormedAddCommGroup E'] [NormedSpace ℂ E'] (φ : E →L[ℂ] E')
-    (f : Matrix (Fin n) (Fin n) ℂ → E) (X g : Matrix (Fin n) (Fin n) ℂ),
-    SmoothOnGV ε f → inG ε X → inUJ ε g →
-    SmoothOnGV ε (fun x => φ (f x)) ∧ φ (RdV X f g) = RdV X (fun x => φ (f x)) g
+      [NormedAddCommGroup E'] [NormedSpace ℂ E'] (φ : E →L[ℂ] E') (f : Matrix (Fin n) (Fin n) ℂ → E)
+      (X g : Matrix (Fin n) (Fin n) ℂ),
+    SmoothOnGV ε f → inG ε X → inUJ ε g
+      → SmoothOnGV ε (fun x => φ (f x)) ∧ φ (RdV X f g) = RdV X (fun x => φ (f x)) g
 
 def EcSumV : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (f : Matrix (Fin n) (Fin n) ℂ → E) (Z g : Matrix (Fin n) (Fin n) ℂ),
-    SmoothOnGV ε f → inUJ ε g →
-    EcV ε Z f g = ∑ a, ∑ b, Z a b • EabV ε a b f g
+      (f : Matrix (Fin n) (Fin n) ℂ → E) (Z g : Matrix (Fin n) (Fin n) ℂ),
+    SmoothOnGV ε f → inUJ ε g → EcV ε Z f g = ∑ a, ∑ b, Z a b • EabV ε a b f g
 
 end Formalism.REAL

@@ -13,46 +13,72 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuL
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th GlobalTheory.GalOfCusp
+open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV
+  UpperTheory.V.Th GlobalTheory.GalOfCusp
 
-private theorem card_inv_le {A M Γ : Type} [CommRing A] [AddCommGroup M] [Module A M] [Finite M] [Group Γ]
-    (r : Representation A Γ M) (S : Set M)
-    (h : ∀ y : M, (∀ g, r g y = y) → y ∈ S) : Nat.card r.invariants ≤ S.ncard := by
+private theorem card_inv_le
+    {A M Γ : Type} [CommRing A] [AddCommGroup M] [Module A M] [Finite M] [Group Γ]
+    (r : Representation A Γ M) (S : Set M) (h : ∀ y : M, (∀ g, r g y = y) → y ∈ S)
+    : Nat.card r.invariants ≤ S.ncard := by
   rw [← Nat.card_coe_set_eq]
-  exact Nat.card_le_card_of_injective (fun y : r.invariants => (⟨y.1, h y.1 y.2⟩ : S))
+  exact Nat.card_le_card_of_injective
+    (fun y : r.invariants => (⟨y.1, h y.1 y.2⟩ : S))
     fun a b e => Subtype.ext (congrArg (fun z : S => z.1) e)
 
-private theorem cancel_pow {s K u w : ℕ} (hK : 0 < K) (h : s * K ^ u ≤ K ^ (w + u)) : s ≤ K ^ w := by
+private theorem cancel_pow {s K u w : ℕ} (hK : 0 < K) (h : s * K ^ u ≤ K ^ (w + u))
+    : s ≤ K ^ w := by
   rw [pow_add] at h
   exact Nat.le_of_mul_le_mul_right h (pow_pos hK u)
 
-private theorem sum_exp {V : Type} [Fintype V] (m n ν d q c₁ c₂ c₀ : ℕ) (dv C : V → ℕ) (Cq : Fin q → ℕ)
-    (h2 : ∑ v, dv v = d) :
-    c₁ + c₂ + ∑ v, (m * ((n + ν) * (1 + dv v)) + C v) +
-      ∑ j : Option (Fin q), (j.elim c₀ fun i => m * n + Cq i) =
-    (m * (n * d + n * q) + (c₁ + c₂ + c₀ + ∑ v, C v + ∑ j, Cq j)) + (m * (n + ν) * Fintype.card V + m * ν * d) := by
+private theorem sum_exp
+    {V : Type} [Fintype V]
+    (m n ν d q c₁ c₂ c₀ : ℕ)
+    (dv C : V → ℕ)
+    (Cq : Fin q → ℕ) (h2 : ∑ v, dv v = d)
+    : c₁ + c₂ + ∑ v, (m * ((n + ν) * (1 + dv v)) + C v)
+        + ∑ j : Option (Fin q), (j.elim c₀ fun i => m * n + Cq i)
+      = (m * (n * d + n * q) + (c₁ + c₂ + c₀ + ∑ v, C v + ∑ j, Cq j))
+        + (m * (n + ν) * Fintype.card V + m * ν * d) := by
   rw [Fintype.sum_option]
-  simp only [Option.elim, Finset.sum_add_distrib, ← Finset.mul_sum, h2, Finset.sum_const, Finset.card_univ,
-    Fintype.card_fin, smul_eq_mul, mul_one]
+  simp only [Option.elim, Finset.sum_add_distrib, ← Finset.mul_sum, h2, Finset.sum_const,
+    Finset.card_univ, Fintype.card_fin, smul_eq_mul, mul_one]
   ring
 
-private theorem residual_rep_one {l : ℕ} [Fact l.Prime] {L : Loc} {G0 : Glob l L} {O : Type} [CommRing O] [IsLocalRing O]
-    [Algebra ℤ_[l] O] {n : ℕ} (y : Pt G0.frame O n) (m : ℕ) : y.ρ0 m 1 = 1 := by
+private theorem residual_rep_one
+    {l : ℕ} [Fact l.Prime]
+    {L : Loc} {G0 : Glob l L} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+    {n : ℕ} (y : Pt G0.frame O n)
+    (m : ℕ)
+    : y.ρ0 m 1 = 1 := by
   simp [Pt.ρ0, red, mat]
 
-private theorem residual_rep_mul {l : ℕ} [Fact l.Prime] {L : Loc} {G0 : Glob l L} {O : Type} [CommRing O] [IsLocalRing O]
-    [Algebra ℤ_[l] O] {n : ℕ} (y : Pt G0.frame O n) (m : ℕ) (g h : G0.G₀) :
-    y.ρ0 m (g * h) = y.ρ0 m g * y.ρ0 m h := by
+private theorem residual_rep_mul
+    {l : ℕ} [Fact l.Prime]
+    {L : Loc} {G0 : Glob l L} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+    {n : ℕ} (y : Pt G0.frame O n)
+    (m : ℕ) (g h : G0.G₀)
+    : y.ρ0 m (g * h) = y.ρ0 m g * y.ρ0 m h := by
   simp [Pt.ρ0, red, mat, Matrix.map_mul]
 
-theorem UpperTheory.V.Th.b1absO :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (n : ℕ) (y : Pt G0.frame O n) (al : Fin T.q → Fin n → O) (d : ℕ) (D0 : Subgroup G0.G₀) (_ : Sys T d D0), l ≠ 2 → PhiCond G0.Γ l → (∀ v, ∃ g, algebraMap ℤ_[l] O (G0.ε (G0.φ v g) : ℤ_[l]) ≠ 1) → (∀ g : G0.G₀, (g : G0.Γ) ∈ PL l T.H.toSubgroup → y.ρ g = 1) → y.N4 D0 → Eig y T al → DetO y (Set.range T.sg) → B1 y T (n * d + n * T.q) := by
+theorem UpperTheory.V.Th.b1absO
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (O : Type) [CommRing O]
+        [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (n : ℕ)
+        (y : Pt G0.frame O n) (al : Fin T.q → Fin n → O) (d : ℕ) (D0 : Subgroup G0.G₀)
+        (_ : Sys T d D0),
+      l ≠ 2 → PhiCond G0.Γ l → (∀ v, ∃ g, algebraMap ℤ_[l] O (G0.ε (G0.φ v g) : ℤ_[l]) ≠ 1)
+        → (∀ g : G0.G₀, (g : G0.Γ) ∈ PL l T.H.toSubgroup → y.ρ g = 1) → y.N4 D0 → Eig y T al
+        → DetO y (Set.range T.sg)
+        → B1 y T (n * d + n * T.q) := by
   intro l _ L G0 T O _ _ _ _ _ n y al d D0 S hl hΦ hε hPL hN4 hE hD
   classical
-  have hloc : ∀ v : L.Vl, LocCnt (L.Gv v) (G0.ε.comp (G0.η.ker.subtype.comp (G0.φ v))) (S.dv v) := fun v => by
+  have hloc
+      : ∀ v : L.Vl,
+        LocCnt (L.Gv v) (G0.ε.comp (G0.η.ker.subtype.comp (G0.φ v))) (S.dv v) := fun v => by
     have h1 := (S.counts 0).locV v
     rw [S.dv_eq 0] at h1
-    have h2 : (T.GN 0).ε.comp ((S.a 0).ι (.inl v)) = G0.ε.comp (G0.η.ker.subtype.comp (G0.φ v)) := by
+    have h2
+        : (T.GN 0).ε.comp ((S.a 0).ι (.inl v)) = G0.ε.comp (G0.η.ker.subtype.comp (G0.φ v)) := by
       refine MonoidHom.ext fun g => ?_
       show (T.GN 0).ε ((T.GN 0).φ v g) = G0.ε (G0.φ v g)
       rw [← (T.h 0).φ v g, (T.h 0).ε]
@@ -77,9 +103,13 @@ theorem UpperTheory.V.Th.b1absO :
   have hm : ∀ g, y.ρm (T.h N) m g = y.ρ0 m ((T.h N).p₀ g) := fun _ => rfl
   have he : ∀ g, epsm O (T.GN N) m g = epsm O G0 m ((T.h N).p g) := fun g => by
     simp only [epsm, (T.h N).ε]
-  have key := oneLevelO l L (T.GN N) G0 (T.h N) O n y m T.q d (S.a N) rep rep'
-    (fun v => m * ((n + n.choose 2) * (1 + S.dv v)) + Cv v)
-    (fun j => j.elim c₀ fun i => m * n + Cq i) c₁ c₂ hl (S.counts N) hr hr' (fun v => hCv v m) ?_ ?_ ?_
+  have key :=
+    oneLevelO l L (T.GN N) G0 (T.h N) O n y m T.q d (S.a N) rep rep'
+      (fun v => m * ((n + n.choose 2) * (1 + S.dv v)) + Cv v)
+      (fun j => j.elim c₀ fun i => m * n + Cq i)
+      c₁ c₂ hl (S.counts N) hr hr'
+      (fun v => hCv v m)
+      ?_ ?_ ?_
   · have h2 : ∑ v, S.dv v = d := by rw [← S.dv_eq N]; exact (S.a N).sum_dv
     have k2 := key.2
     rw [sum_exp m n (n.choose 2) d T.q c₁ c₂ c₀ S.dv Cv Cq h2] at k2
@@ -115,8 +145,7 @@ theorem UpperTheory.V.Th.b1absO :
       rw [e2, one_smul] at e1
       exact e1
     · obtain ⟨γ, hγ⟩ := (T.h N).surj g
-      have hγm : γ ∈ (T.GN N).η.ker := by
-        rw [MonoidHom.mem_ker, ← (T.h N).η, hγ]; exact g.2
+      have hγm : γ ∈ (T.GN N).η.ker := by rw [MonoidHom.mem_ker, ← (T.h N).η, hγ]; exact g.2
       have e0 : (T.h N).p₀ ⟨γ, hγm⟩ = g := Subtype.ext hγ
       have e1 := hr.1 ⟨γ, hγm⟩ Y
       have e2 : rep ((⟨γ, hγm⟩ : (T.GN N).G₀) : (T.GN N).Γ) Y = Y := hy _

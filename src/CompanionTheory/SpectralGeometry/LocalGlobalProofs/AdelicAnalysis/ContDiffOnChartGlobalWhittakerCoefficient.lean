@@ -8,21 +8,29 @@ public import GroundTheory.GlobalFields.LocalAtPlace
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.LatCpt
 
-theorem latV_compact_open : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (n M : ℕ) (v : HeightOneSpectrum (𝓞 F)), IsCompact (latV b v : Set (Fin n → Fin M → Fv F v ⊗[F] E)) ∧ IsOpen (latV b v : Set (Fin n → Fin M → Fv F v ⊗[F] E)) := by
+theorem latV_compact_open
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (n M : ℕ) (v : HeightOneSpectrum (𝓞 F)),
+          IsCompact (latV b v : Set (Fin n → Fin M → Fv F v ⊗[F] E))
+            ∧ IsOpen (latV b v : Set (Fin n → Fin M → Fv F v ⊗[F] E)) := by
   intro F E _ _ _ _ _ σ hCM d b n M v
   haveI := GlobalTheory.AdelicUnitaryTop.properSpace_adicCompletion F v
   haveI : LocallyCompactSpace (Fv F v) := inferInstance
   haveI : SecondCountableTopology (Fv F v) := inferInstance
   haveI : T2Space (Fv F v) := inferInstance
   haveI : IsTopologicalRing (Fv F v) := inferInstance
-  obtain ⟨-, -, -, -, -, -, hH, -, -, -⟩ := GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (Fv F v)
+  obtain ⟨-, -, -, -, -, -, hH, -, -, -⟩ :=
+    GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (Fv F v)
   have hcoord := hH d b
   let H : (Fin n → Fin M → Fv F v ⊗[F] E) ≃ₜ (Fin n → Fin M → Fin d → Fv F v) :=
     Homeomorph.piCongrRight fun _ => Homeomorph.piCongrRight fun _ => hcoord.homeomorph
@@ -38,8 +46,8 @@ theorem latV_compact_open : ∀ (F E : Type) [Field F] [NumberField F] [Field E]
   have hPc : IsCompact P :=
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => hOc
   have hPo : IsOpen P :=
-    isOpen_set_pi Set.finite_univ fun _ _ => isOpen_set_pi Set.finite_univ fun _ _ =>
-      isOpen_set_pi Set.finite_univ fun _ _ => hOo
+    isOpen_set_pi Set.finite_univ fun _ _ =>
+      isOpen_set_pi Set.finite_univ fun _ _ => isOpen_set_pi Set.finite_univ fun _ _ => hOo
   rw [hE]
   exact ⟨H.isCompact_preimage.2 hPc, hPo.preimage H.continuous⟩
 

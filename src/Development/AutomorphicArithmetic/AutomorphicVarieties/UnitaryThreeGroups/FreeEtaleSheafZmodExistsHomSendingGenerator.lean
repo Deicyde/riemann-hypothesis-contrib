@@ -9,10 +9,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 open Matrix UpperTheory.V.U3
 
-private theorem offdiag_zero {κ : Type} [Field κ] (M : Matrix (Fin 3) (Fin 3) κ) (z z' : κ)
-    (hz : z ≠ 0) (hz' : z' ≠ 0) (hne : z' ≠ -z)
-    (h : M * Matrix.diagonal ![z, 0, -z] = Matrix.diagonal ![z', 0, -z'] * M) :
-    ∀ i j, i ≠ j → M i j = 0 := by
+private theorem offdiag_zero
+    {κ : Type} [Field κ]
+    (M : Matrix (Fin 3) (Fin 3) κ) (z z' : κ) (hz : z ≠ 0) (hz' : z' ≠ 0) (hne : z' ≠ -z)
+    (h : M * Matrix.diagonal ![z, 0, -z] = Matrix.diagonal ![z', 0, -z'] * M)
+    : ∀ i j, i ≠ j → M i j = 0 := by
   intro i j hij
   have e := congrFun (congrFun h i) j
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul, mul_comm] at e
@@ -21,11 +22,12 @@ private theorem offdiag_zero {κ : Type} [Field κ] (M : Matrix (Fin 3) (Fin 3) 
   have hne' : z ≠ -z' := fun h => hne (by rw [h, neg_neg])
   fin_cases i <;> fin_cases j <;> simp_all [eq_comm]
 
-private theorem free_etale_sheaf_zmod_exists_hom_sending_generator {κ ι : Type} [Field κ] [IsAlgClosed κ] (m : Fin 3 → κ) (hm : ∀ i, m i ≠ 0)
-    (a a' : ι → Matrix (Fin 3) (Fin 3) κ)
-    (h1 : ∀ g i j, m i * a g i j = a' g i j * m j)
-    (h2 : ∀ g i j, m j.rev * a g i j = a' g i j * m i.rev) :
-    ∃ t : κˣ, ∀ g i j, a' g i j = ((t ^ wt i j : κˣ) : κ) * a g i j := by
+private theorem free_etale_sheaf_zmod_exists_hom_sending_generator
+    {κ ι : Type} [Field κ] [IsAlgClosed κ]
+    (m : Fin 3 → κ) (hm : ∀ i, m i ≠ 0)
+    (a a' : ι → Matrix (Fin 3) (Fin 3) κ) (h1 : ∀ g i j, m i * a g i j = a' g i j * m j)
+    (h2 : ∀ g i j, m j.rev * a g i j = a' g i j * m i.rev)
+    : ∃ t : κˣ, ∀ g i j, a' g i j = ((t ^ wt i j : κˣ) : κ) * a g i j := by
   have h0 := hm 0
   have h1' := hm 1
   have h2' := hm 2
@@ -58,13 +60,16 @@ private theorem free_etale_sheaf_zmod_exists_hom_sending_generator {κ ι : Type
     have z12 : a g 1 2 = 0 := (mul_eq_zero.1 (hz g 1 2)).resolve_left hd4
     have e0 : m 0 = s * s * m 2 := by rw [← hs]; field_simp
     rw [ha]
-    fin_cases i <;> fin_cases j <;>
-      simp [wt, wt1, z01, z21, z10, z12, e0, zpow_ofNat, h1', h2', hs0] <;> left <;> field_simp
+    fin_cases i <;> fin_cases j
+      <;> simp [wt, wt1, z01, z21, z10, z12, e0, zpow_ofNat, h1', h2', hs0] <;> left <;> field_simp
 
-theorem UpperTheory.V.U3.conjBy_tor_of_iso :
-    ∀ {G κ : Type} [Group G] [Field κ] [IsAlgClosed κ] (η : G →* ℤˣ) (r r' : G →* GG (m := 3) (R := κ)) (c g₁ : G), (2 : κ) ≠ 0 → HasMult η r → HasMult η r' →
-      η c = -1 → η g₁ = 1 → Normalised c g₁ r → Normalised c g₁ r' → zeta c g₁ r ≠ 0 → zeta c g₁ r' ≠ 0 → zeta c g₁ r' ≠ -zeta c g₁ r →
-      (TypeI η r ∨ TypeII η r) → MatIso η.ker (mats r) (mats r') → ∃ t : κˣ, r' = conjBy (tor κ t) r := by
+theorem UpperTheory.V.U3.conjBy_tor_of_iso
+    : ∀ {G κ : Type} [Group G] [Field κ] [IsAlgClosed κ] (η : G →* ℤˣ)
+        (r r' : G →* GG (m := 3) (R := κ)) (c g₁ : G),
+      (2 : κ) ≠ 0 → HasMult η r → HasMult η r' → η c = -1 → η g₁ = 1 → Normalised c g₁ r
+        → Normalised c g₁ r' → zeta c g₁ r ≠ 0 → zeta c g₁ r' ≠ 0 → zeta c g₁ r' ≠ - zeta c g₁ r
+        → (TypeI η r ∨ TypeII η r) → MatIso η.ker (mats r) (mats r')
+        → ∃ t : κˣ, r' = conjBy (tor κ t) r := by
   intro G κ _ _ _ η r r' c g₁ h2 hr hr' hc hg hN hN' hz hz' hne _ hiso
   obtain ⟨M, hM⟩ := hiso
   have hstar : ∀ g, η g = 1 → η (gstar c g) = 1 := by
@@ -76,7 +81,8 @@ theorem UpperTheory.V.U3.conjBy_tor_of_iso :
     unfold mats at e1 e2
     rw [zmat, zmat, Matrix.mul_sub, Matrix.sub_mul, e1, e2]
   rw [zmat_diag r c g₁ h2.isUnit ((hr c).trans hc) ((hr g₁).trans hg) hN,
-    zmat_diag r' c g₁ h2.isUnit ((hr' c).trans hc) ((hr' g₁).trans hg) hN'] at hZ
+      zmat_diag r' c g₁ h2.isUnit ((hr' c).trans hc) ((hr' g₁).trans hg) hN']
+    at hZ
   have hoff := offdiag_zero _ _ _ hz hz' hne hZ
   have hdiag : (M : Matrix (Fin 3) (Fin 3) κ) = Matrix.diagonal fun i => M i i := by
     ext i j
@@ -94,35 +100,46 @@ theorem UpperTheory.V.U3.conjBy_tor_of_iso :
     rw [hdiag] at e
     have e' := congrFun (congrFun e i) j
     rwa [Matrix.mul_diagonal, Matrix.diagonal_mul] at e'
-  have hJ : ∀ (X : Matrix (Fin 3) (Fin 3) κ) (i j : Fin 3),
-      (Jmat (R := κ) 3 * Xᵀ * Jmat (R := κ) 3) j.rev i.rev = X i j := by
+  have hJ
+      : ∀ (X : Matrix (Fin 3) (Fin 3) κ) (i j : Fin 3),
+        (Jmat (R := κ) 3 * Xᵀ * Jmat (R := κ) 3) j.rev i.rev = X i j := by
     intro X i j
-    fin_cases i <;> fin_cases j <;>
-      simp [Matrix.mul_apply, Fin.sum_univ_three, Jmat, Fin.rev]
-  have h2' : ∀ g, η g = 1 → ∀ i j : Fin 3,
-      M j.rev j.rev * (r g).mat i j = (r' g).mat i j * M i.rev i.rev := by
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three, Jmat, Fin.rev]
+  have h2'
+      : ∀ g,
+        η g = 1
+          → ∀ i j : Fin 3, M j.rev j.rev * (r g).mat i j = (r' g).mat i j * M i.rev i.rev := by
     intro g h i j
     have e := h1 _ (hstar g h) j.rev i.rev
     rwa [(mat_gstar r c g hN.atc ((hr c).trans hc) ((hr g).trans h)).1,
-      (mat_gstar r' c g hN'.atc ((hr' c).trans hc) ((hr' g).trans h)).1, hJ, hJ] at e
-  obtain ⟨t, ht⟩ := free_etale_sheaf_zmod_exists_hom_sending_generator (ι := η.ker) (fun i => M i i) hm (fun g => (r g).mat)
-    (fun g => (r' g).mat) (fun g => h1 g g.2) (fun g => h2' g g.2)
-  have htor_val (u : κˣ) : (tor κ u : Matrix (Fin 3) (Fin 3) κ) =
-      Matrix.diagonal (fun i => ((u ^ wt1 i : κˣ) : κ)) := rfl
+        (mat_gstar r' c g hN'.atc ((hr' c).trans hc) ((hr' g).trans h)).1, hJ, hJ]
+      at e
+  obtain ⟨t, ht⟩ :=
+    free_etale_sheaf_zmod_exists_hom_sending_generator (ι := η.ker)
+      (fun i => M i i)
+      hm
+      (fun g => (r g).mat)
+      (fun g => (r' g).mat)
+      (fun g => h1 g g.2)
+      (fun g => h2' g g.2)
+  have htor_val (u : κˣ)
+      : (tor κ u : Matrix (Fin 3) (Fin 3) κ) = Matrix.diagonal (fun i => ((u ^ wt1 i : κˣ) : κ)) :=
+    rfl
   have htheta : theta (tor κ t) = tor κ t := by
     apply Units.ext
     rw [theta_val, ← map_inv, htor_val, htor_val]
     ext i j
-    fin_cases i <;> fin_cases j <;>
-      simp [Matrix.mul_apply, Fin.sum_univ_three, Jmat, wt1, Matrix.diagonal, Fin.rev]
+    fin_cases i <;> fin_cases j
+      <;> simp [Matrix.mul_apply, Fin.sum_univ_three, Jmat, wt1, Matrix.diagonal, Fin.rev]
   have hact (s : ℤˣ) : sgnAct (m := 3) (R := κ) s (tor κ t) = tor κ t := by
     rcases Int.units_eq_one_or s with rfl | rfl <;> simp [htheta]
   have hleft (g : G) : (conjBy (tor κ t) r g).left = tor κ t * (r g).left * tor κ t⁻¹ := by
-    simp [conjBy, MulAut.conj_apply, SemidirectProduct.mul_left, SemidirectProduct.inv_left, hact, map_inv]
+    simp [conjBy, MulAut.conj_apply, SemidirectProduct.mul_left, SemidirectProduct.inv_left, hact,
+      map_inv]
   have hright (g : G) : (conjBy (tor κ t) r g).right = (r g).right := by
     simp [conjBy, MulAut.conj_apply, SemidirectProduct.mul_right, SemidirectProduct.inv_right]
-  have hmat (g : G) (i j : Fin 3) :
-      (conjBy (tor κ t) r g).mat i j = ((t ^ wt i j : κˣ) : κ) * (r g).mat i j := by
+  have hmat (g : G) (i j : Fin 3)
+      : (conjBy (tor κ t) r g).mat i j = ((t ^ wt i j : κˣ) : κ) * (r g).mat i j := by
     show (((conjBy (tor κ t) r g).left : GL (Fin 3) κ) : Matrix (Fin 3) (Fin 3) κ) i j = _
     rw [hleft, Units.val_mul, Units.val_mul, htor_val, htor_val, mul_diagonal, diagonal_mul]
     have hweight : ((t ^ wt1 i : κˣ) : κ) * ((t⁻¹ ^ wt1 j : κˣ) : κ) = ((t ^ wt i j : κˣ) : κ) := by
@@ -143,8 +160,7 @@ theorem UpperTheory.V.U3.conjBy_tor_of_iso :
       simp [wt]
     · simp [Matrix.one_apply_ne hij]
   have hcc : r' c = conjBy (tor κ t) r c :=
-    SemidirectProduct.ext (Units.ext (hN'.atc.trans hconj_c.symm))
-      (by rw [hright, hr c, hr' c])
+    SemidirectProduct.ext (Units.ext (hN'.atc.trans hconj_c.symm)) (by rw [hright, hr c, hr' c])
   refine MonoidHom.ext fun g => ?_
   rcases Int.units_eq_one_or (η g) with h | h
   · exact hker g h

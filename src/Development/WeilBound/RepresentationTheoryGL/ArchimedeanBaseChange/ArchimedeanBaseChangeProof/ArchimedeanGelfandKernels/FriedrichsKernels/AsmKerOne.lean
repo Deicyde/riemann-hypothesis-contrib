@@ -30,16 +30,37 @@ namespace PositivityTheory.RgBcC.Fc
 
 open PositivityTheory.RgBcC
 
-theorem calcSteps : CalcSteps :=
-  ⟨GlobalTheory.T.absolute_fourier_coefficients, GlobalTheory.T.absolute_cutoff_bound, GlobalTheory.T.functional_calculus_curve, GlobalTheory.CompanionTheory.WaveFc.wvAlg, GlobalTheory.T.closure_operator_facts, GlobalTheory.T.sobolev_operator_facts, GlobalTheory.T.compact_sobolev_embedding,
-    GlobalTheory.T.section_norm_bound, GlobalTheory.T.sobolev_space_preserved, GlobalTheory.T.concentration_time_bound, GlobalTheory.T.functional_calculus_joint_curve, GlobalTheory.T.friedrichs_extension_facts, GlobalTheory.T.casimir_operator_formula, GlobalTheory.T.sobolev_integration_by_parts,
-    GlobalTheory.T.dense_domain_facts⟩
+theorem calcSteps : CalcSteps := ⟨
+  GlobalTheory.T.absolute_fourier_coefficients,
+  GlobalTheory.T.absolute_cutoff_bound,
+  GlobalTheory.T.functional_calculus_curve,
+  GlobalTheory.CompanionTheory.WaveFc.wvAlg,
+  GlobalTheory.T.closure_operator_facts,
+  GlobalTheory.T.sobolev_operator_facts,
+  GlobalTheory.T.compact_sobolev_embedding,
+  GlobalTheory.T.section_norm_bound,
+  GlobalTheory.T.sobolev_space_preserved,
+  GlobalTheory.T.concentration_time_bound,
+  GlobalTheory.T.functional_calculus_joint_curve,
+  GlobalTheory.T.friedrichs_extension_facts,
+  GlobalTheory.T.casimir_operator_formula,
+  GlobalTheory.T.sobolev_integration_by_parts,
+  GlobalTheory.T.dense_domain_facts
+⟩
 
 theorem asmCpt : AsmCpt :=
-  GlobalTheory.T.functional_calculus_first_assumption GlobalTheory.T.absolute_fourier_coefficients GlobalTheory.T.absolute_cutoff_bound GlobalTheory.T.functional_calculus_curve GlobalTheory.CompanionTheory.WaveFc.wvAlg GlobalTheory.T.closure_operator_facts GlobalTheory.T.sobolev_operator_facts GlobalTheory.T.compact_sobolev_embedding
-    GlobalTheory.T.section_norm_bound GlobalTheory.T.sobolev_space_preserved GlobalTheory.T.concentration_time_bound GlobalTheory.T.functional_calculus_joint_curve GlobalTheory.T.friedrichs_extension_facts GlobalTheory.T.casimir_operator_formula GlobalTheory.T.sobolev_integration_by_parts GlobalTheory.T.dense_domain_facts
+  GlobalTheory.T.functional_calculus_first_assumption GlobalTheory.T.absolute_fourier_coefficients
+    GlobalTheory.T.absolute_cutoff_bound GlobalTheory.T.functional_calculus_curve
+    GlobalTheory.CompanionTheory.WaveFc.wvAlg GlobalTheory.T.closure_operator_facts
+    GlobalTheory.T.sobolev_operator_facts GlobalTheory.T.compact_sobolev_embedding
+    GlobalTheory.T.section_norm_bound GlobalTheory.T.sobolev_space_preserved
+    GlobalTheory.T.concentration_time_bound GlobalTheory.T.functional_calculus_joint_curve
+    GlobalTheory.T.friedrichs_extension_facts GlobalTheory.T.casimir_operator_formula
+    GlobalTheory.T.sobolev_integration_by_parts GlobalTheory.T.dense_domain_facts
 
 theorem asmKerOne : AsmKerOne :=
-  asmKerOne_of_steps asmCpt calcSteps GlobalTheory.T.smooth_operator_facts GlobalTheory.T.paley_wiener_decay GlobalTheory.T.kernel_regularity GlobalTheory.T.kernel_localization GlobalTheory.T.kernel_weight_facts
+  asmKerOne_of_steps asmCpt calcSteps GlobalTheory.T.smooth_operator_facts
+    GlobalTheory.T.paley_wiener_decay GlobalTheory.T.kernel_regularity
+    GlobalTheory.T.kernel_localization GlobalTheory.T.kernel_weight_facts
 
 end PositivityTheory.RgBcC.Fc

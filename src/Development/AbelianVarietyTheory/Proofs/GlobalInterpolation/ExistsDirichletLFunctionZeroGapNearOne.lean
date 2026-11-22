@@ -71,9 +71,12 @@ lemma real_case {x a C c δ : ℝ} (hx : 1 ≤ x) (hC : 0 < C) (hδ : 0 ≤ δ) 
   have h5 : c * (4 * C) ≤ δ * (x ^ 2 * Real.log (3 * x)) * (4 * C) := by linarith
   exact le_of_mul_le_mul_right h5 (by positivity)
 
-theorem exists_gap : ∃ c : ℝ, 0 < c ∧ ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (ρ : ℂ),
-    (χ ≠ 1 ∨ ρ ≠ 1) → LFunction χ ρ = 0 → |ρ.im| ≤ 1 →
-      c / ((q : ℝ) ^ 2 * Real.log (3 * q)) ≤ 1 - ρ.re := by
+theorem exists_gap
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (ρ : ℂ),
+          (χ ≠ 1 ∨ ρ ≠ 1) → LFunction χ ρ = 0 → |ρ.im| ≤ 1
+            → c / ((q : ℝ) ^ 2 * Real.log (3 * q)) ≤ 1 - ρ.re := by
   obtain ⟨a, ha, Ha⟩ := GlobalTheory.LOneLower.exists_le_norm_LFunction_one
   obtain ⟨C, hC, HC⟩ := GlobalTheory.DirichletDeriv.exists_norm_deriv_LFunction_le
   obtain ⟨d, hd, Hd⟩ := GlobalTheory.ZeroFreeComplex.zero_free_region
@@ -108,15 +111,16 @@ theorem exists_gap : ∃ c : ℝ, 0 < c ∧ ∀ (q : ℕ) [NeZero q] (χ : Diric
       nlinarith [mul_le_mul_of_nonneg_left hx2 hs, mul_le_mul_of_nonneg_left hy2 ht]
     · simp only [add_re, smul_re, smul_eq_mul]
       nlinarith [mul_le_mul_of_nonneg_left hx3 hs, mul_le_mul_of_nonneg_left hy3 ht]
-  have key := Convex.norm_image_sub_le_of_norm_deriv_le (𝕜 := ℂ) (f := LFunction χ)
-    (C := C * Real.log (3 * q) ^ 2) (x := ρ) (y := 1)
-    (fun z _ => differentiable_LFunction h1 z)
-    (fun z hz' => by
-      obtain ⟨h4, h5, h6⟩ := hz'
-      have : z = (z.re : ℂ) := Complex.ext (by simp) (by simp [h4])
-      rw [this]
-      exact HC q χ h1 z.re (by linarith) h6)
-    hconv ⟨hreal, le_rfl, hlt.le⟩ ⟨by simp, by simpa using hlt.le, by simp⟩
+  have key :=
+    Convex.norm_image_sub_le_of_norm_deriv_le (𝕜 := ℂ) (f := LFunction χ)
+      (C := C * Real.log (3 * q) ^ 2) (x := ρ) (y := 1)
+      (fun z _ => differentiable_LFunction h1 z)
+      (fun z hz' => by
+        obtain ⟨h4, h5, h6⟩ := hz'
+        have : z = (z.re : ℂ) := Complex.ext (by simp) (by simp [h4])
+        rw [this]
+        exact HC q χ h1 z.re (by linarith) h6)
+      hconv ⟨hreal, le_rfl, hlt.le⟩ ⟨by simp, by simpa using hlt.le, by simp⟩
   rw [hz, sub_zero] at key
   have hn : ‖(1 : ℂ) - ρ‖ = 1 - ρ.re := by
     have : (1 : ℂ) - ρ = ((1 - ρ.re : ℝ) : ℂ) := Complex.ext (by simp) (by simp [hreal])

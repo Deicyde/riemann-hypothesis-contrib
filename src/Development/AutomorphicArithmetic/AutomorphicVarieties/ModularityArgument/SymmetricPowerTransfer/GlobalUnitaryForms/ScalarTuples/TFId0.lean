@@ -8,8 +8,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open UpperTheory.V.Z.Sym.Glob
 
-private theorem alg {g e c k : ℝ} (hc : 0 < c) (hk : 0 < k) {A B C S K : ℂ} (h1 : A = g * (S + e * K)) (h2 : B = c * S) (h3 : C = k * K) :
-    A = ((g / c : ℝ) : ℂ) * B + ((g * e / k : ℝ) : ℂ) * C := by
+private theorem alg
+    {g e c k : ℝ} (hc : 0 < c) (hk : 0 < k)
+    {A B C S K : ℂ} (h1 : A = g * (S + e * K)) (h2 : B = c * S) (h3 : C = k * K)
+    : A = ((g / c : ℝ) : ℂ) * B + ((g * e / k : ℝ) : ℂ) * C := by
   subst h1 h2 h3
   have hc' : (c : ℂ) ≠ 0 := by exact_mod_cast hc.ne'
   have hk' : (k : ℂ) ≠ 0 := by exact_mod_cast hk.ne'
@@ -28,4 +30,5 @@ theorem UpperTheory.V.Z.Sym.Glob.tFId0 : TFId0 := by
   obtain ⟨cS, hS⟩ := hS
   refine ⟨n, x, cG / cS, cG * e / cK, hS.1, hS.2.1, div_pos hG.1 hS.2.2.1, ?_⟩
   intro VG VS VK a1 a2 a3 a4 a5 a6 a7 a8 a9 ch BG s BS BK hBG hBS hBK t ht
-  exact alg hS.2.2.1 hK.1 (@hG.2 VG a1 a2 a3 ch BG s hBG t ht) (@hS.2.2.2 VS a4 a5 a6 ch BS hBS t ht) (@hK.2 VK a7 a8 a9 ch BK hBK t ht)
+  exact alg hS.2.2.1 hK.1 (@hG.2 VG a1 a2 a3 ch BG s hBG t ht)
+    (@hS.2.2.2 VS a4 a5 a6 ch BS hBS t ht) (@hK.2 VK a7 a8 a9 ch BK hBK t ht)

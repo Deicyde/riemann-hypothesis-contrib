@@ -12,20 +12,26 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl
 
 section Comb
 
 variable {S : Scheme.{0}} {R : Type} [CommRing R]
 
-theorem epsMul_zero_eq : GlobalTheory.CompanionTheory.Ar.epsMul (0 : R) =
-    (algebraMap R (DualNumber R)).comp (TrivSqZeroExt.fstHom R R R).toRingHom := by
+theorem epsMul_zero_eq
+    : GlobalTheory.CompanionTheory.Ar.epsMul (0 : R)
+      = (algebraMap R (DualNumber R)).comp (TrivSqZeroExt.fstHom R R R).toRingHom := by
   apply RingHom.ext
   intro x
-  apply TrivSqZeroExt.ext <;> simp [GlobalTheory.CompanionTheory.Ar.epsMul, TrivSqZeroExt.algebraMap_eq_inl]
+  apply TrivSqZeroExt.ext
+    <;> simp [GlobalTheory.CompanionTheory.Ar.epsMul, TrivSqZeroExt.algebraMap_eq_inl]
 
-theorem epsMul_one_eq : GlobalTheory.CompanionTheory.Ar.epsMul (1 : R) = RingHom.id (DualNumber R) := by
+theorem epsMul_one_eq
+    : GlobalTheory.CompanionTheory.Ar.epsMul (1 : R) = RingHom.id (DualNumber R) := by
   apply RingHom.ext
   intro x
   apply TrivSqZeroExt.ext <;> simp [GlobalTheory.CompanionTheory.Ar.epsMul]
@@ -33,8 +39,8 @@ theorem epsMul_one_eq : GlobalTheory.CompanionTheory.Ar.epsMul (1 : R) = RingHom
 theorem comp_one_over {Y Z M : Over S} [GrpObj M] (f : Y ⟶ Z) : f ≫ (1 : Z ⟶ M) = 1 := by
   exact MonObj.comp_one f
 
-theorem prod_ofFn_single {M : Type*} [Monoid M] : ∀ {n : ℕ} (u : Fin n → M) (j : Fin n),
-    (∀ i, i ≠ j → u i = 1) → (List.ofFn u).prod = u j := by
+theorem prod_ofFn_single {M : Type*} [Monoid M]
+    : ∀ {n : ℕ} (u : Fin n → M) (j : Fin n), (∀ i, i ≠ j → u i = 1) → (List.ofFn u).prod = u j := by
   intro n
   induction n with
   | zero => intro u j; exact j.elim0
@@ -43,17 +49,21 @@ theorem prod_ofFn_single {M : Type*} [Monoid M] : ∀ {n : ℕ} (u : Fin n → M
     rw [List.ofFn_succ, List.prod_cons]
     by_cases hj : j = 0
     · subst hj
-      have h1 : (List.ofFn fun i : Fin n => u i.succ).prod = 1 := List.prod_eq_one fun x hx => by
-        simp only [List.mem_ofFn] at hx
-        obtain ⟨i, rfl⟩ := hx
-        exact hu _ (Fin.succ_ne_zero i)
+      have h1 : (List.ofFn fun i : Fin n => u i.succ).prod = 1 :=
+        List.prod_eq_one fun x hx => by
+          simp only [List.mem_ofFn] at hx
+          obtain ⟨i, rfl⟩ := hx
+          exact hu _ (Fin.succ_ne_zero i)
       rw [h1, _root_.mul_one]
     · obtain ⟨j', rfl⟩ := Fin.exists_succ_eq.2 hj
       rw [hu 0 (Fin.succ_ne_zero j').symm, _root_.one_mul]
       exact ih (fun i => u i.succ) j' fun i hi => hu _ fun h => hi (Fin.succ_injective _ h)
 
-theorem isComb_single {G : Over S} [GrpObj G] {x : Sp R ⟶ S} {n : ℕ} (w : Fin n → (epsAt x ⟶ G))
-    (hw : ∀ i, GlobalTheory.CompanionTheory.Ar.IsTanAt G x (w i)) (j : Fin n) : GlobalTheory.CompanionTheory.Ar.Fl.IsComb (Pi.single j 1) w (w j) := by
+theorem isComb_single
+    {G : Over S} [GrpObj G]
+    {x : Sp R ⟶ S} {n : ℕ} (w : Fin n → (epsAt x ⟶ G))
+    (hw : ∀ i, GlobalTheory.CompanionTheory.Ar.IsTanAt G x (w i)) (j : Fin n)
+    : GlobalTheory.CompanionTheory.Ar.Fl.IsComb (Pi.single j 1) w (w j) := by
   classical
   refine ⟨fun i => if i = j then w i else 1, fun i => ?_, ?_⟩
   · show Over.Hom.left (if i = j then w i else 1) = _
@@ -61,22 +71,28 @@ theorem isComb_single {G : Over S} [GrpObj G] {x : Sp R ⟶ S} {n : ℕ} (w : Fi
     · subst hij
       simp [epsMul_one_eq, spMap]
     · rw [if_neg hij, Pi.single_eq_of_ne hij, epsMul_zero_eq]
-      have h1 := comp_one_over (M := G)
-        (Over.homMk (Spec.map (CommRingCat.ofHom (algebraMap R (DualNumber R)))) rfl :
-          GlobalTheory.CompanionTheory.Ar.epsAt x ⟶ Over.mk x)
+      have h1 :=
+        comp_one_over (M := G)
+          (Over.homMk (Spec.map (CommRingCat.ofHom (algebraMap R (DualNumber R)))) rfl
+            : GlobalTheory.CompanionTheory.Ar.epsAt x ⟶ Over.mk x)
       rw [← h1, Over.comp_left, ← hw i]
       simp [spMap]
   · rw [prod_ofFn_single _ j fun i hi => if_neg hi, if_pos rfl]
 
 end Comb
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l}
 
-theorem eq_mul_of_frames {U : Set (Xo.XF c)} {τ : E →+* ℂ} {φ φ₀ : FrameFn Xo c} (hφ : IsLineFn U τ φ)
-    (hφ₀ : IsLineFn U τ φ₀) {F : Type} [Field F] {β : c.F →+* F} {y : Sp F ⟶ Xo.XF c} {v v' : Vecs y D.p}
-    {w w' : Vecs y D.q} (h : IsFramed U τ β y v w) (h' : IsFramed U τ β y v' w') {b : F}
-    (hb : φ F y v' w' = b * φ₀ F y v' w') : φ F y v w = b * φ₀ F y v w := by
+theorem eq_mul_of_frames
+    {U : Set (Xo.XF c)} {τ : E →+* ℂ} {φ φ₀ : FrameFn Xo c}
+    (hφ : IsLineFn U τ φ) (hφ₀ : IsLineFn U τ φ₀)
+    {F : Type} [Field F]
+    {β : c.F →+* F} {y : Sp F ⟶ Xo.XF c} {v v' : Vecs y D.p} {w w' : Vecs y D.q}
+    (h : IsFramed U τ β y v w) (h' : IsFramed U τ β y v' w')
+    {b : F} (hb : φ F y v' w' = b * φ₀ F y v' w')
+    : φ F y v w = b * φ₀ F y v w := by
   have hv := h.2.2.1
   have hw := h.2.2.2
   have hv' := h'.2.2.1
@@ -106,36 +122,57 @@ theorem eq_mul_of_frames {U : Set (Xo.XF c)} {τ : E →+* ℂ} {φ φ₀ : Fram
     rw [h0, mul_zero] at e1
     exact hφ.ne F β y v w' hvw' e1
   apply mul_right_cancel₀ hBne
-  calc φ F y v w * B.det = φ F y v w' := e1.symm
+  calc
+    φ F y v w * B.det
+      = φ F y v w' := e1.symm
     _ = φ F y v' w' * A.det := e2.symm
     _ = b * (φ₀ F y v' w' * A.det) := by rw [hb, _root_.mul_assoc]
     _ = b * φ₀ F y v w * B.det := by rw [e2₀, e1₀, _root_.mul_assoc]
 
-theorem ratio_at {U : Set (Xo.XF c)} {τ : E →+* ℂ} {φ φ₀ : FrameFn Xo c} (hφ : IsLineFn U τ φ)
-    (hφ₀ : IsLineFn U τ φ₀) {a : ℂ}
-    (ha : ∀ y v w, IsFramed U τ (algebraMap c.F ℂ) y v w → φ ℂ y v w = a * φ₀ ℂ y v w)
-    {k : Type} [Field k] {β₀ : c.F →+* k} {y₀ : Sp k ⟶ Xo.XF c} {v₀ : Vecs y₀ D.p} {w₀ : Vecs y₀ D.q}
+theorem ratio_at
+    {U : Set (Xo.XF c)} {τ : E →+* ℂ} {φ φ₀ : FrameFn Xo c}
+    (hφ : IsLineFn U τ φ) (hφ₀ : IsLineFn U τ φ₀)
+    {a : ℂ} (ha : ∀ y v w, IsFramed U τ (algebraMap c.F ℂ) y v w → φ ℂ y v w = a * φ₀ ℂ y v w)
+    {k : Type} [Field k]
+    {β₀ : c.F →+* k} {y₀ : Sp k ⟶ Xo.XF c} {v₀ : Vecs y₀ D.p} {w₀ : Vecs y₀ D.q}
     (h₀ : IsFramed U τ β₀ y₀ v₀ w₀)
-    (hb : ∀ (F' : Type) [Field F'] (f' : k →+* F'), ∃ (v' : Vecs (spMap f' ≫ y₀) D.p)
-      (w' : Vecs (spMap f' ≫ y₀) D.q), IsFramed U τ (f'.comp β₀) (spMap f' ≫ y₀) v' w' ∧
-        (∀ a, (v' a).left = spMap (GlobalTheory.CompanionTheory.Ar.dualMap f') ≫ (v₀ a).left) ∧
-        ∀ b, (w' b).left = spMap (GlobalTheory.CompanionTheory.Ar.dualMap f') ≫ (w₀ b).left)
-    (j : k →+* ℂ) (hj : j.comp β₀ = algebraMap c.F ℂ) : j (φ k y₀ v₀ w₀) = a * j (φ₀ k y₀ v₀ w₀) := by
+    (hb : ∀ (F' : Type) [Field F'] (f' : k →+* F'),
+      ∃ (v' : Vecs (spMap f' ≫ y₀) D.p) (w' : Vecs (spMap f' ≫ y₀) D.q),
+        IsFramed U τ (f'.comp β₀) (spMap f' ≫ y₀) v' w'
+          ∧ (∀ a, (v' a).left = spMap (GlobalTheory.CompanionTheory.Ar.dualMap f') ≫ (v₀ a).left)
+          ∧ ∀ b, (w' b).left = spMap (GlobalTheory.CompanionTheory.Ar.dualMap f') ≫ (w₀ b).left)
+    (j : k →+* ℂ) (hj : j.comp β₀ = algebraMap c.F ℂ)
+    : j (φ k y₀ v₀ w₀) = a * j (φ₀ k y₀ v₀ w₀) := by
   obtain ⟨v', w', hfr, hv', hw'⟩ := hb ℂ j
   have hfr' : IsFramed U τ (algebraMap c.F ℂ) (spMap j ≫ y₀) v' w' := by
     rw [← hj]
     exact hfr
   have e := ha _ v' w' hfr'
   rw [hφ.nat k ℂ j β₀ y₀ v₀ w₀ _ v' w' h₀ rfl hv' hw',
-    hφ₀.nat k ℂ j β₀ y₀ v₀ w₀ _ v' w' h₀ rfl hv' hw'] at e
+      hφ₀.nat k ℂ j β₀ y₀ v₀ w₀ _ v' w' h₀ rfl hv' hw']
+    at e
   exact e
 
-theorem flatGen_unique : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (U : Set (Xo.XF c)) (τ : E →+* ℂ) (φ φ₀ : FrameFn Xo c) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (FU : FamilyUnif Xo (algebraMap (KA l) ℂ) ty) (i : Fin FU.n), IsTypeFn H D.p D.q ty → IsFlatGen U τ φ FU i → IsFlatGen U τ φ₀ FU i → (∀ y : Sp ℂ ⟶ Xo.XF c, y ≫ pullback.snd _ _ = spMap (algebraMap c.F ℂ) → Set.range y ⊆ U → ∃ P, IsPeriod (FU.Di i) ty P ∧ under y = FU.u i P) → ∃ a : c.F, a ≠ 0 ∧ ∀ (F : Type) [Field F] (β : c.F →+* F) y v w, IsFramed U τ β y v w → φ F y v w = β a * φ₀ F y v w := by
+theorem flatGen_unique
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (U : Set (Xo.XF c)) (τ : E →+* ℂ) (φ φ₀ : FrameFn Xo c)
+        (g : ℕ) (ty : Fin g → (E →+* ℂ)) (FU : FamilyUnif Xo (algebraMap (KA l) ℂ) ty)
+        (i : Fin FU.n),
+      IsTypeFn H D.p D.q ty → IsFlatGen U τ φ FU i → IsFlatGen U τ φ₀ FU i
+        → (∀ y : Sp ℂ ⟶ Xo.XF c,
+          y ≫ pullback.snd _ _ = spMap (algebraMap c.F ℂ) → Set.range y ⊆ U
+            → ∃ P, IsPeriod (FU.Di i) ty P ∧ under y = FU.u i P)
+        → ∃ a : c.F,
+          a ≠ 0
+            ∧ ∀ (F : Type) [Field F] (β : c.F →+* F) y v w,
+              IsFramed U τ β y v w → φ F y v w = β a * φ₀ F y v w := by
   intro E _ _ _ H D l Xo c U τ φ φ₀ g ty FU i hty hφ hφ₀ hper
-  obtain ⟨a, ha⟩ := GlobalTheory.T.flat_gen_frame_independent E H D l Xo c U τ φ φ₀ g ty FU i hty hφ hφ₀ hper
+  obtain ⟨a, ha⟩ :=
+    GlobalTheory.T.flat_gen_frame_independent E H D l Xo c U τ φ φ₀ g ty FU i hty hφ hφ₀ hper
   have hL := hφ.line
   have hL₀ := hφ₀.line
-  by_cases hex : ∃ (y : Sp ℂ ⟶ Xo.XF c) (v : Vecs y D.p) (w : Vecs y D.q),
+  by_cases hex
+    : ∃ (y : Sp ℂ ⟶ Xo.XF c) (v : Vecs y D.p) (w : Vecs y D.q),
       IsFramed U τ (algebraMap c.F ℂ) y v w
   · obtain ⟨y1, v1, w1, h1⟩ := hex
     obtain ⟨k, _, β₀, y₀, v₀, w₀, f, j, h₀, -, hj, -, hb⟩ :=

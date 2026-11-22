@@ -9,8 +9,9 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace GlobalTheory.EtC.Tr
 
-theorem fibrePointsLE_diagComplHom {Z X : Scheme.{0}} (f : Z ⟶ X) [IsFinite f] [Etale f] (n : ℕ)
-    (h : FibrePointsLE f (n + 1)) : FibrePointsLE (diagComplHom f) n := by
+theorem fibrePointsLE_diagComplHom
+    {Z X : Scheme.{0}} (f : Z ⟶ X) [IsFinite f] [Etale f] (n : ℕ) (h : FibrePointsLE f (n + 1))
+    : FibrePointsLE (diagComplHom f) n := by
   intro K _ y s hs hinj
   set t : Fin (n + 1) → (Spec (CommRingCat.of K) ⟶ Z) := fun j => s j ≫ (diagCompl f).ι ≫ pullback.fst f f
     with ht

@@ -17,13 +17,16 @@ section Avoid
 
 variable {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} {R : Type*} [CommRing R]
 
-theorem exists_multiHomog_not_mem_of_isRelevant {H : Ideal (MRing ι R)} (hH : H.IsPrime)
-    (hrel : IsRelevant H) (c : K → ℕ) : ∃ m : MRing ι R, IsMultiHomog m c ∧ m ∉ H := by
+theorem exists_multiHomog_not_mem_of_isRelevant
+    {H : Ideal (MRing ι R)} (hH : H.IsPrime) (hrel : IsRelevant H) (c : K → ℕ)
+    : ∃ m : MRing ι R, IsMultiHomog m c ∧ m ∉ H := by
   choose i hi using hrel
   refine ⟨∏ k, X ⟨k, i k⟩ ^ c k, ?_, ?_⟩
-  · have hprod := IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ
-      (fun k => (X ⟨k, i k⟩ : MRing ι R) ^ c k) (fun k => c k • blockWeight ι ⟨k, i k⟩)
-      (fun k _ => (isWeightedHomogeneous_X R _ _).pow _)
+  · have hprod :=
+      IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ
+        (fun k => (X ⟨k, i k⟩ : MRing ι R) ^ c k)
+        (fun k => c k • blockWeight ι ⟨k, i k⟩)
+        (fun k _ => (isWeightedHomogeneous_X R _ _).pow _)
     have hc : (∑ k, c k • blockWeight ι ⟨k, i k⟩) = c := by
       funext k'
       simp [blockWeight, Finset.sum_apply, Pi.single_apply]
@@ -33,9 +36,12 @@ theorem exists_multiHomog_not_mem_of_isRelevant {H : Ideal (MRing ι R)} (hH : H
     obtain ⟨k, -, hk⟩ := hH.prod_mem_iff.mp hm
     exact hi k (hH.mem_of_pow_mem _ hk)
 
-theorem exists_multiHomog_not_mem_finset [Infinite R] (c : K → ℕ) (S : Finset (Ideal (MRing ι R)))
-    (hS : ∀ Q ∈ S, Q.IsPrime ∧ IsRelevant Q ∧ ∀ a : R, C a ∈ Q → a = 0) :
-    ∃ m : MRing ι R, IsMultiHomog m c ∧ ∀ Q ∈ S, m ∉ Q := by
+theorem exists_multiHomog_not_mem_finset
+    [Infinite R]
+    (c : K → ℕ)
+    (S : Finset (Ideal (MRing ι R)))
+    (hS : ∀ Q ∈ S, Q.IsPrime ∧ IsRelevant Q ∧ ∀ a : R, C a ∈ Q → a = 0)
+    : ∃ m : MRing ι R, IsMultiHomog m c ∧ ∀ Q ∈ S, m ∉ Q := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨0, isWeightedHomogeneous_zero _ _ _, by simp⟩
@@ -59,7 +65,8 @@ theorem exists_multiHomog_not_mem_finset [Infinite R] (c : K → ℕ) (S : Finse
       (S.finite_toSet.biUnion fun Q hQ => (hsub Q hQ).finite).insert 0
     obtain ⟨t, ht⟩ := Infinite.exists_notMem_finset hfin.toFinset
     simp only [Set.Finite.mem_toFinset, Set.mem_insert_iff, Set.mem_iUnion, Set.mem_ofPred_eq,
-      not_or, not_exists] at ht
+        not_or, not_exists]
+      at ht
     obtain ⟨ht0, htS⟩ := ht
     by_cases hxQ₀ : x ∈ Q₀
     · refine ⟨x + C t * y, hx.add (by simpa using (isWeightedHomogeneous_C _ t).mul hy), ?_⟩
@@ -93,8 +100,9 @@ theorem HorizontalAvoidingForm.proof : HorizontalAvoidingForm.Statement.{u} := b
     rw [dite_eq_right]
     exact fun h => hmin h.1
 
-  have hT : ∀ Q ∈ insert P (hfin.toFinset.filter fun H => (C ϖ : MRing ι O) ∉ H),
-      Q.IsPrime ∧ IsRelevant Q ∧ ∀ a : O, C a ∈ Q → a = 0 := by
+  have hT
+      : ∀ Q ∈ insert P (hfin.toFinset.filter fun H => (C ϖ : MRing ι O) ∉ H),
+        Q.IsPrime ∧ IsRelevant Q ∧ ∀ a : O, C a ∈ Q → a = 0 := by
     intro Q hQ
     rcases Finset.mem_insert.mp hQ with rfl | hQ
     · refine ⟨hP.multiProj.isPrime, hP.multiProj.relevant, fun a ha => ?_⟩
@@ -102,8 +110,8 @@ theorem HorizontalAvoidingForm.proof : HorizontalAvoidingForm.Statement.{u} := b
       rw [hP.noTorsion] at h
       exact (Submodule.mem_bot O).mp h
     · obtain ⟨hQs, hϖQ⟩ := Finset.mem_filter.mp hQ
-      obtain ⟨hQp, -, hrel⟩ := le_and_isRelevant_of_divCycle_ne_zero
-        (Function.mem_support.mp (hfin.mem_toFinset.mp hQs))
+      obtain ⟨hQp, -, hrel⟩ :=
+        le_and_isRelevant_of_divCycle_ne_zero (Function.mem_support.mp (hfin.mem_toFinset.mp hQs))
       refine ⟨hQp, hrel, fun a ha => ?_⟩
       by_contra ha0
       obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible ha0 hϖ
@@ -113,7 +121,7 @@ theorem HorizontalAvoidingForm.proof : HorizontalAvoidingForm.Statement.{u} := b
       · exact hϖQ (hQp.mem_of_pow_mem _ h)
   obtain ⟨m, hm, hmT⟩ := exists_multiHomog_not_mem_finset e _ hT
   refine ⟨m, hm, hmT P (Finset.mem_insert_self _ _), fun H hH hϖH => hmT H ?_⟩
-  exact Finset.mem_insert_of_mem
-    (Finset.mem_filter.mpr ⟨hfin.mem_toFinset.mpr (Function.mem_support.mpr hH), hϖH⟩)
+  exact Finset.mem_insert_of_mem (Finset.mem_filter.mpr
+    ⟨hfin.mem_toFinset.mpr (Function.mem_support.mpr hH), hϖH⟩)
 
 end GroundTheory.Heights₂.Heights.NumbersDVR

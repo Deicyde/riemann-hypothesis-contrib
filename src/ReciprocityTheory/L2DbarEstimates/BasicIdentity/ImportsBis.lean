@@ -129,50 +129,67 @@ theorem comm (n : ℕ) (M : Type*) [TopologicalSpace M] : CommStatement n M := b
   have hdP : DifferentiableAt ℝ (fderiv ℝ ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm)) (z x) :=
     (hcP.fderiv_right (m := 1) (by norm_num)).differentiableAt (by norm_num)
   have hH : DifferentiableAt ℝ (u ∘ e0.symm) (z x) := hcH.differentiableAt (by norm_num)
-  have hsymH : ∀ v w : V n, fderiv ℝ (fderiv ℝ (u ∘ e0.symm)) (z x) v w =
-      fderiv ℝ (fderiv ℝ (u ∘ e0.symm)) (z x) w v := by
+  have hsymH
+      : ∀ v w : V n,
+        fderiv ℝ (fderiv ℝ (u ∘ e0.symm)) (z x) v w
+          = fderiv ℝ (fderiv ℝ (u ∘ e0.symm)) (z x) w v := by
     intro v w
     first
-      | exact hcH.isSymmSndFDerivAt (by simp) v w
-      | exact hcH.isSymmSndFDerivAt (by simp [minSmoothness_of_isRCLikeNormedField]) v w
-  have hsymP : ∀ v w : V n, fderiv ℝ (fderiv ℝ ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm)) (z x) v w =
-      fderiv ℝ (fderiv ℝ ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm)) (z x) w v := by
+    | exact hcH.isSymmSndFDerivAt (by simp) v w
+    | exact hcH.isSymmSndFDerivAt (by simp [minSmoothness_of_isRCLikeNormedField]) v w
+  have hsymP
+      : ∀ v w : V n,
+        fderiv ℝ (fderiv ℝ ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm)) (z x) v w
+          = fderiv ℝ (fderiv ℝ ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm)) (z x) w v := by
     intro v w
     first
-      | exact hcP.isSymmSndFDerivAt (by simp) v w
-      | exact hcP.isSymmSndFDerivAt (by simp [minSmoothness_of_isRCLikeNormedField]) v w
+    | exact hcP.isSymmSndFDerivAt (by simp) v w
+    | exact hcP.isSymmSndFDerivAt (by simp [minSmoothness_of_isRCLikeNormedField]) v w
   have hloc1 : ((db n z j u) ∘ e0.symm) =ᶠ[nhds (z x)] wdb n j (u ∘ e0.symm) := by
     filter_upwards [hnb] with y hy
     rw [Function.comp_apply, db_eq_wdb_comp_chart_symm z e0 he0 j u _ (e0.map_target hy),
       he0' (e0.map_target hy), e0.right_inv hy]
-  have hloc2 : ((db n z j (fun y => ((ph y : ℝ) : ℂ))) ∘ e0.symm) =ᶠ[nhds (z x)] wdb n j ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm) := by
-    filter_upwards [hnb] with y hy
-    rw [Function.comp_apply, db_eq_wdb_comp_chart_symm z e0 he0 j _ _ (e0.map_target hy),
-      he0' (e0.map_target hy), e0.right_inv hy]
-  have hloc3 : ((fun y => d n z k u y - u y * d n z k (fun y => ((ph y : ℝ) : ℂ)) y) ∘ e0.symm) =ᶠ[nhds (z x)]
-      (fun y => wd n k (u ∘ e0.symm) y - (u ∘ e0.symm) y * wd n k ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm) y) := by
-    filter_upwards [hnb] with y hy
-    have hp := e0.map_target hy
-    rw [Function.comp_apply, d_apply_eq_wd_of_mem_source z e0 he0 k u _ hp, d_apply_eq_wd_of_mem_source z e0 he0 k _ _ hp,
-      he0' hp, e0.right_inv hy]
-    rfl
-  have hux : u x = (u ∘ e0.symm) (z x) := by
-    rw [Function.comp_apply, he0' hx0, e0.left_inv hx0]
+  have hloc2
+      : ((db n z j (fun y => ((ph y : ℝ) : ℂ))) ∘ e0.symm) =ᶠ[nhds (z x)] wdb n j ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm) :=
+    by
+      filter_upwards [hnb] with y hy
+      rw [Function.comp_apply, db_eq_wdb_comp_chart_symm z e0 he0 j _ _ (e0.map_target hy),
+        he0' (e0.map_target hy), e0.right_inv hy]
+  have hloc3
+      : ((fun y => d n z k u y - u y * d n z k (fun y => ((ph y : ℝ) : ℂ)) y) ∘ e0.symm) =ᶠ[nhds (z x)]
+        (fun y => wd n k (u ∘ e0.symm) y - (u ∘ e0.symm) y * wd n k ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm) y) :=
+    by
+      filter_upwards [hnb] with y hy
+      have hp := e0.map_target hy
+      rw [Function.comp_apply, d_apply_eq_wd_of_mem_source z e0 he0 k u _ hp,
+        d_apply_eq_wd_of_mem_source z e0 he0 k _ _ hp, he0' hp, e0.right_inv hy]
+      rfl
+  have hux : u x = (u ∘ e0.symm) (z x) := by rw [Function.comp_apply, he0' hx0, e0.left_inv hx0]
   have hW1 := (differentiableAt_wdb_and_fderiv_wdb_eq j _ _ hdH).2
   have hW2 := differentiableAt_wd_and_fderiv_wd_eq k _ _ hdH
   have hW3 := differentiableAt_wd_and_fderiv_wd_eq k _ _ hdP
   have hW4 := (differentiableAt_wdb_and_fderiv_wdb_eq j _ _ hdP).2
-  have hFG : fderiv ℝ (fun y => wd n k (u ∘ e0.symm) y - (u ∘ e0.symm) y * wd n k ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm) y) (z x) =
-      fderiv ℝ (wd n k (u ∘ e0.symm)) (z x) - ((u ∘ e0.symm) (z x) • fderiv ℝ (wd n k ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm)) (z x) +
-        wd n k ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm) (z x) • fderiv ℝ (u ∘ e0.symm) (z x)) := by
-    have h1 := HasFDerivAt.sub (DifferentiableAt.hasFDerivAt hW2.1)
-      (HasFDerivAt.mul (DifferentiableAt.hasFDerivAt hH) (DifferentiableAt.hasFDerivAt hW3.1))
+  have hFG
+      : fderiv ℝ
+          (fun y =>
+            wd n k (u ∘ e0.symm) y
+              - (u ∘ e0.symm) y * wd n k ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm) y)
+          (z x)
+        = fderiv ℝ (wd n k (u ∘ e0.symm)) (z x)
+          - ((u ∘ e0.symm) (z x) • fderiv ℝ (wd n k ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm)) (z x)
+            + wd n k ((fun y => ((ph y : ℝ) : ℂ)) ∘ e0.symm) (z x)
+              • fderiv ℝ (u ∘ e0.symm) (z x)) := by
+    have h1 :=
+      HasFDerivAt.sub (DifferentiableAt.hasFDerivAt hW2.1)
+        (HasFDerivAt.mul (DifferentiableAt.hasFDerivAt hH) (DifferentiableAt.hasFDerivAt hW3.1))
     exact HasFDerivAt.fderiv h1
   show (d n z k (db n z j u) x - db n z j u x * d n z k (fun y => ((ph y : ℝ) : ℂ)) x) -
       db n z j (fun y => d n z k u y - u y * d n z k (fun y => ((ph y : ℝ) : ℂ)) y) x =
     d n z k (db n z j (fun y => ((ph y : ℝ) : ℂ))) x * u x
-  rw [d_apply_eq_wd_of_mem_source z e0 he0 k (db n z j u) x hx0, db_eq_wdb_comp_chart_symm z e0 he0 j u x hx0,
-    d_apply_eq_wd_of_mem_source z e0 he0 k (fun y => ((ph y : ℝ) : ℂ)) x hx0, db_eq_wdb_comp_chart_symm z e0 he0 j _ x hx0,
+  rw [d_apply_eq_wd_of_mem_source z e0 he0 k (db n z j u) x hx0,
+    db_eq_wdb_comp_chart_symm z e0 he0 j u x hx0,
+    d_apply_eq_wd_of_mem_source z e0 he0 k (fun y => ((ph y : ℝ) : ℂ)) x hx0,
+    db_eq_wdb_comp_chart_symm z e0 he0 j _ x hx0,
     d_apply_eq_wd_of_mem_source z e0 he0 k (db n z j (fun y => ((ph y : ℝ) : ℂ))) x hx0, hux]
   unfold wd wdb
   rw [hloc1.fderiv_eq, hloc2.fderiv_eq, hloc3.fderiv_eq, hFG]

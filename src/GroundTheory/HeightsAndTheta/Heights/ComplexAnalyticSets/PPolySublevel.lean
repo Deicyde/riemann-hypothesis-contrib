@@ -16,9 +16,10 @@ open scoped ENNReal
 
 noncomputable section
 
-theorem pow_card_le_norm_eval_prod_X_sub_C (z : ℂ) {c : ℝ} (hc : 0 ≤ c) :
-    ∀ s : Multiset ℂ, (∀ r ∈ s, c ≤ ‖z - r‖) →
-      c ^ Multiset.card s ≤ ‖(s.map fun r => Polynomial.X - Polynomial.C r).prod.eval z‖ := by
+theorem pow_card_le_norm_eval_prod_X_sub_C (z : ℂ) {c : ℝ} (hc : 0 ≤ c)
+    : ∀ s : Multiset ℂ,
+      (∀ r ∈ s, c ≤ ‖z - r‖)
+        → c ^ Multiset.card s ≤ ‖(s.map fun r => Polynomial.X - Polynomial.C r).prod.eval z‖ := by
   intro s
   induction s using Multiset.induction_on with
   | empty => intro _; simp
@@ -30,10 +31,10 @@ theorem pow_card_le_norm_eval_prod_X_sub_C (z : ℂ) {c : ℝ} (hc : 0 ≤ c) :
     exact mul_le_mul (h r (Multiset.mem_cons_self r s))
       (ih fun r' hr' => h r' (Multiset.mem_cons_of_mem hr')) (pow_nonneg hc _) (norm_nonneg _)
 
-theorem volume_sublevel_one_var (p : Polynomial ℂ) {η : ℝ} (hη : 0 < η) (hη1 : η ≤ 1)
-    (ha : η < ‖p.leadingCoeff‖ ^ 2) :
-    volume {z : ℂ | ‖p.eval z‖ ≤ η} ≤
-      ENNReal.ofReal (4 * Real.pi * p.natDegree * η ^ ((p.natDegree : ℝ)⁻¹)) := by
+theorem volume_sublevel_one_var
+    (p : Polynomial ℂ) {η : ℝ} (hη : 0 < η) (hη1 : η ≤ 1) (ha : η < ‖p.leadingCoeff‖ ^ 2)
+    : volume {z : ℂ | ‖p.eval z‖ ≤ η}
+      ≤ ENNReal.ofReal (4 * Real.pi * p.natDegree * η ^ ((p.natDegree : ℝ)⁻¹)) := by
   classical
   have ha0 : 0 < ‖p.leadingCoeff‖ := by
     rcases (norm_nonneg p.leadingCoeff).eq_or_lt with h | h
@@ -63,26 +64,30 @@ theorem volume_sublevel_one_var (p : Polynomial ℂ) {η : ℝ} (hη : 0 < η) (
   have hρ0 : 0 < ρ := Real.rpow_pos_of_pos (div_pos hη ha0) _
   have hρm : ρ ^ m = η / ‖a‖ := Real.rpow_inv_natCast_pow (div_pos hη ha0).le hm0
   have hroots : Multiset.card p.roots = m := IsAlgClosed.card_roots_eq_natDegree
-  have hsub : {z : ℂ | ‖p.eval z‖ ≤ η} ⊆
-      ⋃ r ∈ p.roots.toFinset, Metric.closedBall r (2 * ρ) := by
+  have hsub : {z : ℂ | ‖p.eval z‖ ≤ η} ⊆ ⋃ r ∈ p.roots.toFinset, Metric.closedBall r (2 * ρ) := by
     intro z hz
     by_contra hcon
-    simp only [Set.mem_iUnion, Metric.mem_closedBall, Multiset.mem_toFinset, not_exists,
-      not_le] at hcon
+    simp only [Set.mem_iUnion, Metric.mem_closedBall, Multiset.mem_toFinset, not_exists, not_le]
+      at hcon
     have hfac := Polynomial.C_leadingCoeff_mul_prod_multiset_X_sub_C hroots
-    have hlow := pow_card_le_norm_eval_prod_X_sub_C z (by positivity : (0 : ℝ) ≤ 2 * ρ) p.roots
-      (fun r hr => by rw [← dist_eq_norm]; exact (hcon r hr).le)
-    have heval : ‖p.eval z‖ =
-        ‖a‖ * ‖(p.roots.map fun r => Polynomial.X - Polynomial.C r).prod.eval z‖ := by
+    have hlow :=
+      pow_card_le_norm_eval_prod_X_sub_C z (by positivity : (0 : ℝ) ≤ 2 * ρ) p.roots
+        (fun r hr => by rw [← dist_eq_norm]; exact (hcon r hr).le)
+    have heval
+        : ‖p.eval z‖
+          = ‖a‖ * ‖(p.roots.map fun r => Polynomial.X - Polynomial.C r).prod.eval z‖ := by
       conv_lhs => rw [← hfac]
       rw [Polynomial.eval_mul, Polynomial.eval_C, norm_mul]
     rw [hroots, mul_pow] at hlow
-    have hz' : ‖p.eval z‖ ≤ ‖a‖ * ρ ^ m := by
-      rw [hρm, mul_div_cancel₀ _ ha0.ne']; exact hz
+    have hz' : ‖p.eval z‖ ≤ ‖a‖ * ρ ^ m := by rw [hρm, mul_div_cancel₀ _ ha0.ne']; exact hz
     have h2 : (1 : ℝ) < 2 ^ m := one_lt_pow₀ one_lt_two hm0
     have hρpos : 0 < ρ ^ m := pow_pos hρ0 m
-    have h3 : ‖a‖ * (2 ^ m * ρ ^ m) ≤ ‖a‖ * ‖(p.roots.map fun r => Polynomial.X -
-        Polynomial.C r).prod.eval z‖ := mul_le_mul_of_nonneg_left hlow ha0.le
+    have h3
+        : ‖a‖ * (2 ^ m * ρ ^ m)
+          ≤ ‖a‖
+            * ‖(p.roots.map fun r => Polynomial.X -
+              Polynomial.C r).prod.eval z‖ :=
+      mul_le_mul_of_nonneg_left hlow ha0.le
     have h4 : ‖a‖ * ρ ^ m < ‖a‖ * (2 ^ m * ρ ^ m) := mul_lt_mul_of_pos_left (by nlinarith) ha0
     linarith
   have hρsq : ρ ^ 2 ≤ η ^ ((m : ℝ)⁻¹) := by
@@ -92,31 +97,38 @@ theorem volume_sublevel_one_var (p : Polynomial ℂ) {η : ℝ} (hη : 0 < η) (
     nlinarith
   have hcard : (p.roots.toFinset.card : ℝ) ≤ m := by
     exact_mod_cast hroots ▸ Multiset.toFinset_card_le p.roots
-  calc volume {z : ℂ | ‖p.eval z‖ ≤ η}
+  calc
+    volume {z : ℂ | ‖p.eval z‖ ≤ η}
       ≤ volume (⋃ r ∈ p.roots.toFinset, Metric.closedBall r (2 * ρ)) := measure_mono hsub
     _ ≤ ∑ r ∈ p.roots.toFinset, volume (Metric.closedBall r (2 * ρ)) :=
-        measure_biUnion_finset_le _ _
+      measure_biUnion_finset_le _ _
     _ ≤ ENNReal.ofReal (4 * Real.pi * m * η ^ ((m : ℝ)⁻¹)) := by
-        simp only [Complex.volume_closedBall, Finset.sum_const, nsmul_eq_mul]
-        rw [← ENNReal.ofReal_pow (by positivity), ← ENNReal.ofReal_coe_nnreal, NNReal.coe_real_pi,
-          ← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_natCast,
-          ← ENNReal.ofReal_mul (by positivity)]
-        apply ENNReal.ofReal_le_ofReal
-        have := Real.pi_pos
-        calc (p.roots.toFinset.card : ℝ) * ((2 * ρ) ^ 2 * Real.pi)
-            = (p.roots.toFinset.card : ℝ) * (4 * Real.pi * ρ ^ 2) := by ring
-          _ ≤ m * (4 * Real.pi * η ^ ((m : ℝ)⁻¹)) := by gcongr
-          _ = 4 * Real.pi * m * η ^ ((m : ℝ)⁻¹) := by ring
+      simp only [Complex.volume_closedBall, Finset.sum_const, nsmul_eq_mul]
+      rw [← ENNReal.ofReal_pow (by positivity), ← ENNReal.ofReal_coe_nnreal, NNReal.coe_real_pi,
+        ← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_natCast,
+        ← ENNReal.ofReal_mul (by positivity)]
+      apply ENNReal.ofReal_le_ofReal
+      have := Real.pi_pos
+      calc
+        (p.roots.toFinset.card : ℝ) * ((2 * ρ) ^ 2 * Real.pi)
+          = (p.roots.toFinset.card : ℝ) * (4 * Real.pi * ρ ^ 2) := by ring
+        _ ≤ m * (4 * Real.pi * η ^ ((m : ℝ)⁻¹)) := by gcongr
+        _ = 4 * Real.pi * m * η ^ ((m : ℝ)⁻¹) := by ring
 
-theorem polySublevel_zero (Q : MvPolynomial (Fin 0) ℂ) (hQ : Q ≠ 0) (R : ℝ) :
-    ∃ C α : ℝ, 0 < C ∧ 0 < α ∧ ∀ η : ℝ, 0 < η → η ≤ 1 →
-      volume {x : Fin 0 → ℂ | x ∈ Metric.ball 0 R ∧ ‖eval x Q‖ ≤ η} ≤ ENNReal.ofReal (C * η ^ α) := by
+theorem polySublevel_zero (Q : MvPolynomial (Fin 0) ℂ) (hQ : Q ≠ 0) (R : ℝ)
+    : ∃ C α : ℝ,
+      0 < C ∧ 0 < α
+        ∧ ∀ η : ℝ,
+          0 < η → η ≤ 1
+            → volume {x : Fin 0 → ℂ | x ∈ Metric.ball 0 R ∧ ‖eval x Q‖ ≤ η}
+              ≤ ENNReal.ofReal (C * η ^ α) := by
   have hQc := eq_C_of_isEmpty Q
   have hc : Q.coeff 0 ≠ 0 := fun h => hQ (by rw [hQc, h, map_zero])
   have hc0 : 0 < ‖Q.coeff 0‖ := norm_pos_iff.2 hc
   refine ⟨‖Q.coeff 0‖⁻¹, 1, inv_pos.2 hc0, one_pos, fun η hη hη1 => ?_⟩
   by_cases hle : ‖Q.coeff 0‖ ≤ η
-  · calc volume {x : Fin 0 → ℂ | x ∈ Metric.ball 0 R ∧ ‖eval x Q‖ ≤ η}
+  · calc
+      volume {x : Fin 0 → ℂ | x ∈ Metric.ball 0 R ∧ ‖eval x Q‖ ≤ η}
         ≤ volume (Set.univ : Set (Fin 0 → ℂ)) := measure_mono (Set.subset_univ _)
       _ = 1 := by simp [volume_pi]
       _ ≤ ENNReal.ofReal (‖Q.coeff 0‖⁻¹ * η ^ (1 : ℝ)) := by
@@ -150,28 +162,42 @@ theorem PolySublevel.proof : PolySublevel.Statement := by
     set V : ℝ := (volume (Metric.ball (0 : Fin d → ℂ) R)).toReal with hV
     have hW0 : 0 ≤ W := ENNReal.toReal_nonneg
     have hV0 : 0 ≤ V := ENNReal.toReal_nonneg
-    refine ⟨W * C' + 4 * Real.pi * m * V + 1, min (α' / 2) ((m : ℝ) + 1)⁻¹,
-      by positivity, lt_min (by positivity) (by positivity), fun η hη hη1 => ?_⟩
+    refine ⟨
+      W * C' + 4 * Real.pi * m * V + 1,
+      min (α' / 2) ((m : ℝ) + 1)⁻¹,
+      by positivity,
+      lt_min (by positivity) (by positivity),
+      fun η hη hη1 => ?_
+    ⟩
     set S := {x : Fin (d + 1) → ℂ | x ∈ Metric.ball 0 R ∧ ‖eval x Q‖ ≤ η} with hS_def
-    have hS : MeasurableSet S := Metric.isOpen_ball.measurableSet.inter
-      (isClosed_le (MvPolynomial.continuous_eval Q).norm continuous_const).measurableSet
+    have hS : MeasurableSet S :=
+      Metric.isOpen_ball.measurableSet.inter (isClosed_le (MvPolynomial.continuous_eval Q).norm
+        continuous_const).measurableSet
     set e := MeasurableEquiv.piFinSuccAbove (fun _ : Fin (d + 1) => ℂ) 0
     have he := measurePreserving_piFinSuccAbove (fun _ : Fin (d + 1) => (volume : Measure ℂ)) 0
-    have hmem : ∀ z y, (z, y) ∈ e.symm ⁻¹' S ↔
-        (‖z‖ < R ∧ y ∈ Metric.ball 0 R) ∧ ‖(Polynomial.map (eval y) P).eval z‖ ≤ η := by
+    have hmem
+        : ∀ z y,
+          (z, y) ∈ e.symm ⁻¹' S
+            ↔ (‖z‖ < R ∧ y ∈ Metric.ball 0 R) ∧ ‖(Polynomial.map (eval y) P).eval z‖ ≤ η := by
       intro z y
       simp only [Set.mem_preimage, e, MeasurableEquiv.piFinSuccAbove_symm_apply, hS_def,
         Set.mem_ofPred_eq, mem_ball_zero_iff, pi_norm_lt_iff hR, Fin.forall_fin_succ]
       simp [← eval_eq_eval_mv_eval', hP_def]
-    have hvol : volume S = (volume.prod (Measure.pi fun _ : Fin d => (volume : Measure ℂ)))
-        (e.symm ⁻¹' S) := ((MeasurePreserving.symm e he).measure_preimage hS.nullMeasurableSet).symm
+    have hvol
+        : volume S
+          = (volume.prod (Measure.pi fun _ : Fin d => (volume : Measure ℂ))) (e.symm ⁻¹' S) :=
+      ((MeasurePreserving.symm e he).measure_preimage hS.nullMeasurableSet).symm
     set A := {y : Fin d → ℂ | y ∈ Metric.ball 0 R ∧ ‖eval y q‖ ≤ Real.sqrt η} with hA_def
-    have hA : MeasurableSet A := Metric.isOpen_ball.measurableSet.inter
-      (isClosed_le (MvPolynomial.continuous_eval q).norm continuous_const).measurableSet
-    have hfib : ∀ y : Fin d → ℂ, volume ((fun z => (z, y)) ⁻¹' (e.symm ⁻¹' S)) ≤
-        A.indicator (fun _ => volume (Metric.ball (0 : ℂ) R)) y +
-          (Metric.ball (0 : Fin d → ℂ) R).indicator
-            (fun _ => ENNReal.ofReal (4 * Real.pi * m * η ^ ((m : ℝ)⁻¹))) y := by
+    have hA : MeasurableSet A :=
+      Metric.isOpen_ball.measurableSet.inter (isClosed_le (MvPolynomial.continuous_eval q).norm
+        continuous_const).measurableSet
+    have hfib
+        : ∀ y : Fin d → ℂ,
+          volume ((fun z => (z, y)) ⁻¹' (e.symm ⁻¹' S))
+            ≤ A.indicator (fun _ => volume (Metric.ball (0 : ℂ) R)) y
+              + (Metric.ball (0 : Fin d → ℂ) R).indicator
+                (fun _ => ENNReal.ofReal (4 * Real.pi * m * η ^ ((m : ℝ)⁻¹)))
+                y := by
       intro y
       by_cases hy : y ∈ Metric.ball (0 : Fin d → ℂ) R
       · by_cases hyA : ‖eval y q‖ ≤ Real.sqrt η
@@ -202,9 +228,11 @@ theorem PolySublevel.proof : PolySublevel.Statement := by
           exact fun h => hy h.1.2
         rw [h0, measure_empty]
         exact bot_le
-    have hint : volume S ≤ volume (Metric.ball (0 : ℂ) R) * volume A +
-        ENNReal.ofReal (4 * Real.pi * m * η ^ ((m : ℝ)⁻¹)) *
-          volume (Metric.ball (0 : Fin d → ℂ) R) := by
+    have hint
+        : volume S
+          ≤ volume (Metric.ball (0 : ℂ) R) * volume A
+            + ENNReal.ofReal (4 * Real.pi * m * η ^ ((m : ℝ)⁻¹))
+              * volume (Metric.ball (0 : Fin d → ℂ) R) := by
       rw [hvol, Measure.prod_apply_symm (e.symm.measurable hS)]
       refine le_trans (lintegral_mono hfib) (le_of_eq ?_)
       rw [lintegral_add_left (measurable_const.indicator hA), lintegral_indicator_const hA,
@@ -225,23 +253,28 @@ theorem PolySublevel.proof : PolySublevel.Statement := by
       · simp [h0]
       · apply mul_le_mul_of_nonneg_left _ (Nat.cast_nonneg m)
         apply Real.rpow_le_rpow_of_exponent_ge hη hη1
-        calc min (α' / 2) ((m : ℝ) + 1)⁻¹ ≤ ((m : ℝ) + 1)⁻¹ := min_le_right _ _
+        calc
+          min (α' / 2) ((m : ℝ) + 1)⁻¹
+            ≤ ((m : ℝ) + 1)⁻¹ := min_le_right _ _
           _ ≤ (m : ℝ)⁻¹ := inv_anti₀ (Nat.cast_pos.2 hpos) (by linarith)
-    have hreal : W * (C' * Real.sqrt η ^ α') + 4 * Real.pi * m * η ^ ((m : ℝ)⁻¹) * V ≤
-        (W * C' + 4 * Real.pi * m * V + 1) * η ^ min (α' / 2) ((m : ℝ) + 1)⁻¹ := by
+    have hreal
+        : W * (C' * Real.sqrt η ^ α') + 4 * Real.pi * m * η ^ ((m : ℝ)⁻¹) * V
+          ≤ (W * C' + 4 * Real.pi * m * V + 1) * η ^ min (α' / 2) ((m : ℝ) + 1)⁻¹ := by
       have hpα : 0 ≤ η ^ min (α' / 2) ((m : ℝ) + 1)⁻¹ := Real.rpow_nonneg hη.le _
       have hpi := Real.pi_pos
       nlinarith [mul_le_mul_of_nonneg_left hsqrt (mul_nonneg hW0 hC'.le),
         mul_le_mul_of_nonneg_left hmη (mul_nonneg (by positivity : (0 : ℝ) ≤ 4 * Real.pi) hV0)]
-    calc volume S ≤ volume (Metric.ball (0 : ℂ) R) * volume A +
-          ENNReal.ofReal (4 * Real.pi * m * η ^ ((m : ℝ)⁻¹)) *
-            volume (Metric.ball (0 : Fin d → ℂ) R) := hint
-      _ ≤ ENNReal.ofReal W * ENNReal.ofReal (C' * Real.sqrt η ^ α') +
-          ENNReal.ofReal (4 * Real.pi * m * η ^ ((m : ℝ)⁻¹)) * ENNReal.ofReal V := by
+    calc
+      volume S
+          ≤ volume (Metric.ball (0 : ℂ) R) * volume A
+            + ENNReal.ofReal (4 * Real.pi * m * η ^ ((m : ℝ)⁻¹))
+              * volume (Metric.ball (0 : Fin d → ℂ) R) :=
+        hint
+      _ ≤ ENNReal.ofReal W * ENNReal.ofReal (C' * Real.sqrt η ^ α')
+          + ENNReal.ofReal (4 * Real.pi * m * η ^ ((m : ℝ)⁻¹)) * ENNReal.ofReal V := by
         rw [hc1, hc2]
         exact add_le_add (by gcongr) le_rfl
-      _ = ENNReal.ofReal (W * (C' * Real.sqrt η ^ α') +
-          4 * Real.pi * m * η ^ ((m : ℝ)⁻¹) * V) := by
+      _ = ENNReal.ofReal (W * (C' * Real.sqrt η ^ α') + 4 * Real.pi * m * η ^ ((m : ℝ)⁻¹) * V) := by
         rw [← ENNReal.ofReal_mul hW0, ← ENNReal.ofReal_mul (by positivity),
           ← ENNReal.ofReal_add (by positivity) (by positivity)]
       _ ≤ _ := ENNReal.ofReal_le_ofReal hreal

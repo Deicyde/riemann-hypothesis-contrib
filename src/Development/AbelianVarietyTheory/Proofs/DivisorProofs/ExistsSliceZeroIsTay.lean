@@ -12,14 +12,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TaylorPolyno
 
 set_option autoImplicit false
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory Filter Topology TopologicalSpace TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.AnPer GlobalTheory.PeriodFamily
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory Filter Topology TopologicalSpace TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.AnPer
+  GlobalTheory.PeriodFamily
 
 namespace GlobalTheory.AnPer.SliceZero
 
-theorem prod_sumElim_zero {I : Type} {g : ℕ} {R : Type} [CommRing R] (N : ℕ) (t : I → R)
-    (ht : ∀ s : Fin (N + 1) → I, ∏ a, t (s a) = 0) (s : Fin (N + 1) → I ⊕ Fin g) :
-    ∏ a, (Sum.elim t (0 : Fin g → R)) (s a) = 0 := by
+theorem prod_sumElim_zero
+    {I : Type} {g : ℕ} {R : Type} [CommRing R]
+    (N : ℕ) (t : I → R) (ht : ∀ s : Fin (N + 1) → I, ∏ a, t (s a) = 0)
+    (s : Fin (N + 1) → I ⊕ Fin g)
+    : ∏ a, (Sum.elim t (0 : Fin g → R)) (s a) = 0 := by
   by_cases h : ∀ a, ∃ i, s a = Sum.inl i
   · choose f hf using h
     rw [Finset.prod_congr rfl fun a _ ↦ by rw [hf a]]
@@ -34,13 +39,20 @@ theorem prod_sumElim_zero {I : Type} {g : ℕ} {R : Type} [CommRing R] (N : ℕ)
 
 end GlobalTheory.AnPer.SliceZero
 
-
 open GlobalTheory.AnPer.SliceZero in
-theorem GlobalTheory.AnPer.exists_sliceZero_isTay : ∀ {I : Type} [Fintype I] [DecidableEq I] {g : ℕ} {R : Type} [CommRing R] [Algebra ℂ R] (N : ℕ) (t : I → R), (∀ s : Fin (N + 1) → I, ∏ a, t (s a) = 0) → ∀ (W : Opens (Tot I g)) (W₀ : Opens (Tot Empty g)), (∀ p ∈ W₀, (((0 : I → ℂ), p.2) : Tot I g) ∈ W) → ∃ ρ : Hol W →+* R ⊗[ℂ] Hol W₀, IsTay N t ρ := by
+theorem GlobalTheory.AnPer.exists_sliceZero_isTay
+    : ∀ {I : Type} [Fintype I] [DecidableEq I] {g : ℕ} {R : Type} [CommRing R] [Algebra ℂ R] (N : ℕ)
+        (t : I → R),
+      (∀ s : Fin (N + 1) → I, ∏ a, t (s a) = 0)
+        → ∀ (W : Opens (Tot I g)) (W₀ : Opens (Tot Empty g)),
+          (∀ p ∈ W₀, (((0 : I → ℂ), p.2) : Tot I g) ∈ W)
+            → ∃ ρ : Hol W →+* R ⊗[ℂ] Hol W₀, IsTay N t ρ := by
   intro I _ _ g R _ _ N t ht W W₀ hW
-  obtain ⟨ρ, hρ⟩ := GlobalTheory.AnPer.exists_sliceTaylor_algHom N (Sum.elim t (0 : Fin g → R))
-    (prod_sumElim_zero N t ht) (E := Tot Empty g) W W₀ Prod.snd
-    (fun p _ ↦ analyticAt_snd) hW
+  obtain ⟨ρ, hρ⟩ :=
+    GlobalTheory.AnPer.exists_sliceTaylor_algHom N (Sum.elim t (0 : Fin g → R))
+      (prod_sumElim_zero N t ht) (E := Tot Empty g) W W₀ Prod.snd
+      (fun p _ ↦ analyticAt_snd)
+      hW
   refine ⟨ρ.toRingHom, fun h p hp ↦ ?_⟩
   refine (hρ h p hp).trans ?_
   have hh : AnalyticAt ℂ h.fn (0, p.2 + (fun _ : I → ℂ ↦ (0 : Fin g → ℂ)) 0) := by

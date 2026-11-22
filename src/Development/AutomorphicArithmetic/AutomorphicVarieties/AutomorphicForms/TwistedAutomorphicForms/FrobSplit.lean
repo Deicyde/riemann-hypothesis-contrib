@@ -4,44 +4,63 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial UpperTheory.V.Af UpperTheory.V.Af.Tw
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+  UpperTheory.V.Af UpperTheory.V.Af.Tw
 
-private theorem int_mem {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω]
-    (A : ValuationSubring Ω) (x : 𝓞 L) : algebraMap L Ω x ∈ A := by
+private theorem int_mem
+    {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω]
+    (A : ValuationSubring Ω) (x : 𝓞 L)
+    : algebraMap L Ω x ∈ A := by
   have hi : IsIntegral ℤ (algebraMap L Ω x) := x.isIntegral_coe.algebraMap
   obtain ⟨y, hy⟩ := (IsIntegrallyClosed.isIntegral_iff (R := A) (K := Ω)).1 (hi.tower_top (A := A))
   rw [← hy]
   exact y.2
 
-private theorem exists_above {F L Ω : Type} [Field F] [NumberField F] [Field L] [NumberField L] [Field Ω]
-    [Algebra F L] [Algebra F Ω] [Algebra L Ω] [IsScalarTower F L Ω] {v : HeightOneSpectrum (𝓞 F)}
-    {A : ValuationSubring Ω} (hA : IsPlaceOver A v) :
-    ∃ w : HeightOneSpectrum (𝓞 L), w.under (𝓞 F) = v ∧ IsPlaceOver A w := by
-  let φ : 𝓞 L →+* A := ((algebraMap L Ω).comp (algebraMap (𝓞 L) L)).codRestrict A.toSubring (int_mem A)
-  have hP : ∀ x : 𝓞 L, A.valuation (algebraMap L Ω (x : L)) < 1 ↔ x ∈ (IsLocalRing.maximalIdeal A).comap φ :=
+private theorem exists_above
+    {F L Ω : Type} [Field F] [NumberField F] [Field L] [NumberField L] [Field Ω] [Algebra F L]
+    [Algebra F Ω] [Algebra L Ω] [IsScalarTower F L Ω]
+    {v : HeightOneSpectrum (𝓞 F)} {A : ValuationSubring Ω} (hA : IsPlaceOver A v)
+    : ∃ w : HeightOneSpectrum (𝓞 L), w.under (𝓞 F) = v ∧ IsPlaceOver A w := by
+  let φ : 𝓞 L →+* A :=
+    ((algebraMap L Ω).comp (algebraMap (𝓞 L) L)).codRestrict A.toSubring (int_mem A)
+  have hP
+      : ∀ x : 𝓞 L,
+        A.valuation (algebraMap L Ω (x : L)) < 1 ↔ x ∈ (IsLocalRing.maximalIdeal A).comap φ :=
     fun x => (A.valuation_lt_one_iff (φ x)).symm
   have hu : ((IsLocalRing.maximalIdeal A).comap φ).under (𝓞 F) = v.asIdeal := by
     ext x
     rw [← hA x, IsScalarTower.algebraMap_apply F L Ω]
     exact (hP (algebraMap (𝓞 F) (𝓞 L) x)).symm
   haveI : ((IsLocalRing.maximalIdeal A).comap φ).LiesOver v.asIdeal := ⟨hu.symm⟩
-  exact ⟨⟨(IsLocalRing.maximalIdeal A).comap φ, inferInstance, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot _⟩,
-    HeightOneSpectrum.ext hu, hP⟩
+  exact ⟨
+    ⟨
+      (IsLocalRing.maximalIdeal A).comap φ,
+      inferInstance,
+      Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot _
+    ⟩,
+    HeightOneSpectrum.ext hu,
+    hP
+  ⟩
 
-private theorem normV_under' {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K'] [Algebra K K']
-    (w : HeightOneSpectrum (𝓞 K')) : normV w = normV (w.under (𝓞 K)) ^ w.asIdeal.inertiaDeg (𝓞 K) := by
+private theorem normV_under'
+    {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K'] [Algebra K K']
+    (w : HeightOneSpectrum (𝓞 K'))
+    : normV w = normV (w.under (𝓞 K)) ^ w.asIdeal.inertiaDeg (𝓞 K) := by
   have : w.asIdeal.LiesOver (w.under (𝓞 K)).asIdeal := ⟨rfl⟩
   have := w.isMaximal
   have := (w.under (𝓞 K)).isMaximal
   rw [show normV w = Ideal.absNorm w.asIdeal by
-        rw [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply],
-      show normV (w.under (𝓞 K)) = Ideal.absNorm (w.under (𝓞 K)).asIdeal by
-        rw [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]]
+      rw [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply],
+    show normV (w.under (𝓞 K)) = Ideal.absNorm (w.under (𝓞 K)).asIdeal by
+      rw [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]]
   rw [← Ideal.absNorm_relNorm (𝓞 K) (𝓞 K') w.asIdeal,
     Ideal.relNorm_eq_pow_of_isMaximal w.asIdeal (w.under (𝓞 K)).asIdeal, map_pow]
 
-private theorem normV_le {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (𝓞 K)) {q : ℕ} (hq : 1 < q)
-    (h : ∀ x : 𝓞 K, x - x ^ q ∈ w.asIdeal) : normV w ≤ q := by
+private theorem normV_le
+    {K : Type} [Field K] [NumberField K]
+    (w : HeightOneSpectrum (𝓞 K))
+    {q : ℕ} (hq : 1 < q) (h : ∀ x : 𝓞 K, x - x ^ q ∈ w.asIdeal)
+    : normV w ≤ q := by
   have := w.isMaximal
   letI : Field (𝓞 K ⧸ w.asIdeal) := Ideal.Quotient.field _
   have : Finite (𝓞 K ⧸ w.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ w.ne_bot
@@ -58,8 +77,11 @@ private theorem normV_le {K : Type} [Field K] [NumberField K] (w : HeightOneSpec
   · rw [Polynomial.natDegree_X_pow_sub_X hq, Finset.card_univ]
     exact not_le.1 hlt
 
-private theorem two_of_sum {ι : Type} [Fintype ι] (f : ι → ℕ) (hf : ∀ i, 0 < f i) (hs : ∑ i, f i = 2) (a : ι)
-    (ha : f a = 1) : ∃ b, b ≠ a ∧ f b = 1 ∧ ∀ c, c = a ∨ c = b := by
+private theorem two_of_sum
+    {ι : Type} [Fintype ι]
+    (f : ι → ℕ) (hf : ∀ i, 0 < f i) (hs : ∑ i, f i = 2)
+    (a : ι) (ha : f a = 1)
+    : ∃ b, b ≠ a ∧ f b = 1 ∧ ∀ c, c = a ∨ c = b := by
   classical
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ a), ha] at hs
   have h1 : ∑ i ∈ Finset.univ.erase a, f i = 1 := by omega
@@ -78,8 +100,7 @@ private theorem two_of_sum {ι : Type} [Fintype ι] (f : ι → ℕ) (hf : ∀ i
   have := hf c
   omega
 
-theorem UpperTheory.V.Af.Tw.frobSplit :
-    UpperTheory.V.Af.Tw.FrobSplit := by
+theorem UpperTheory.V.Af.Tw.frobSplit : UpperTheory.V.Af.Tw.FrobSplit := by
   intro F L Ω _ _ _ _ _ _ _ _ _ _ _ h2 v A hur hA s hs
   classical
   obtain ⟨w, hwv, hw⟩ := exists_above (L := L) hA
@@ -98,10 +119,10 @@ theorem UpperTheory.V.Af.Tw.frobSplit :
   have hf : w.asIdeal.inertiaDeg (𝓞 F) = 1 := by
     rw [normV_under' (K := F) w, hwv] at hle
     have h5 : 0 < w.asIdeal.inertiaDeg (𝓞 F) := Ideal.inertiaDeg_pos _ _
-    have h6 : w.asIdeal.inertiaDeg (𝓞 F) ≤ 1 :=
-      (Nat.pow_le_pow_iff_right hq).1 (by rwa [pow_one])
+    have h6 : w.asIdeal.inertiaDeg (𝓞 F) ≤ 1 := (Nat.pow_le_pow_iff_right hq).1 (by rwa [pow_one])
     omega
-  have hl : ∀ u : HeightOneSpectrum (𝓞 L), u.under (𝓞 F) = v → u.asIdeal ∈ v.asIdeal.primesOver (𝓞 L) :=
+  have hl
+      : ∀ u : HeightOneSpectrum (𝓞 L), u.under (𝓞 F) = v → u.asIdeal ∈ v.asIdeal.primesOver (𝓞 L) :=
     fun u hu => ⟨u.isPrime, ⟨(congrArg HeightOneSpectrum.asIdeal hu).symm⟩⟩
   have he : w.asIdeal.ramificationIdx (𝓞 F) = 1 := by
     haveI : w.asIdeal.LiesOver (w.under (𝓞 F)).asIdeal := ⟨rfl⟩
@@ -110,14 +131,22 @@ theorem UpperTheory.V.Af.Tw.frobSplit :
   haveI := (IsDedekindDomain.primesOver_finite v.asIdeal (𝓞 L)).fintype
   have hsum := Ideal.sum_ramification_inertia_eq_finrank v.asIdeal (𝓞 L)
   rw [← IsFractionRing.finrank_eq (𝓞 F) F (𝓞 L) L, h2] at hsum
-  obtain ⟨⟨Q, hQ, hQv⟩, hne, h1, hall⟩ := two_of_sum _
-    (fun P => Nat.mul_pos (Ideal.ramificationIdx_pos _ _) (Ideal.inertiaDeg_pos _ _)) hsum
-    ⟨w.asIdeal, hl w hwv⟩ (by simp only [he, hf])
+  obtain ⟨⟨Q, hQ, hQv⟩, hne, h1, hall⟩ :=
+    two_of_sum _
+      (fun P => Nat.mul_pos (Ideal.ramificationIdx_pos _ _) (Ideal.inertiaDeg_pos _ _))
+      hsum ⟨w.asIdeal, hl w hwv⟩ (by simp only [he, hf])
   let w' : HeightOneSpectrum (𝓞 L) := ⟨Q, hQ, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩
   have hw' : w'.under (𝓞 F) = v := HeightOneSpectrum.ext hQv.over.symm
   have hf' : w'.asIdeal.inertiaDeg (𝓞 F) = 1 := Nat.eq_one_of_mul_eq_one_left h1
-  refine ⟨w, w', fun h => hne (Subtype.ext (congrArg HeightOneSpectrum.asIdeal h)), fun u => ⟨fun hu => ?_, ?_⟩,
-    hw, ?_, ?_⟩
+  refine ⟨
+    w,
+    w',
+    fun h => hne (Subtype.ext (congrArg HeightOneSpectrum.asIdeal h)),
+    fun u => ⟨fun hu => ?_, ?_⟩,
+    hw,
+    ?_,
+    ?_
+  ⟩
   · rcases hall ⟨u.asIdeal, hl u hu⟩ with h | h
     · exact Or.inl (HeightOneSpectrum.ext (congrArg Subtype.val h))
     · exact Or.inr (HeightOneSpectrum.ext (congrArg Subtype.val h))

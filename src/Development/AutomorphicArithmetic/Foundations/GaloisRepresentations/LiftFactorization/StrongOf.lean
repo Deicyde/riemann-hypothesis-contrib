@@ -11,11 +11,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspidalGLLo
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp GlobalTheory.GalCut GlobalTheory.RealGal GlobalTheory.UnitaryBC UpperTheory.V.Published UpperTheory.Gal.UnramifiedFromSplittingCriterion UpperTheory.ConvolutionTheory.Sph
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp GlobalTheory.GalCut
+  GlobalTheory.RealGal GlobalTheory.UnitaryBC UpperTheory.V.Published
+  UpperTheory.Gal.UnramifiedFromSplittingCriterion UpperTheory.ConvolutionTheory.Sph
 
-theorem UpperTheory.Gal.AbelianGaloisNormality.strongOf :
-    UpperTheory.Gal.AbelianGaloisNormality.StrongOf := by
+theorem UpperTheory.Gal.AbelianGaloisNormality.strongOf
+    : UpperTheory.Gal.AbelianGaloisNormality.StrongOf := by
   intro hL hR K M _ _ _ _ _ _ _ _ hp a ha π hη
   have hno : ∀ η : HChar K, IsNormChar M η → (CG.mk π).twist η ≠ CG.mk π := by
     intro η hn he

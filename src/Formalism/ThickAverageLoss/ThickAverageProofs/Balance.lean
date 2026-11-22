@@ -102,5 +102,4 @@ end
 
 end Bal
 
-
 end Formalism.D5

@@ -5,15 +5,23 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsHilbert
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
+open MeasureTheory ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
 
-theorem UpperTheory.V.Z.Tf.L4.idemOp :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G), μ.IsHaarMeasure →
-      ∀ (J : Subgroup G), IsOpen (J : Set G) → IsCompact (J : Set G) → ∀ χ : G → ℂ, IsLocallyConstant χ → (∀ x, ‖χ x‖ = 1) →
-      (∀ x ∈ J, ∀ y ∈ J, χ (x * y) = χ x * χ y) →
-      ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V), IsSmooth π →
-        ∃ (B : V →ₗ[ℂ] V) (m : ℂ), m ≠ 0 ∧ IsIntegralOp μ π ((J : Set G).indicator fun x => (χ x)⁻¹) B ∧
-          (∀ v, ∀ x ∈ J, π x (B v) = χ x • B v) ∧ ∀ v, (∀ x ∈ J, π x v = χ x • v) → B v = m • v := by
+theorem UpperTheory.V.Z.Tf.L4.idemOp
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+        [MeasurableSpace G] [BorelSpace G] (μ : Measure G),
+      μ.IsHaarMeasure
+        → ∀ (J : Subgroup G),
+          IsOpen (J : Set G) → IsCompact (J : Set G)
+            → ∀ χ : G → ℂ,
+              IsLocallyConstant χ → (∀ x, ‖χ x‖ = 1) → (∀ x ∈ J, ∀ y ∈ J, χ (x * y) = χ x * χ y)
+                → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V),
+                  IsSmooth π
+                    → ∃ (B : V →ₗ[ℂ] V) (m : ℂ),
+                      m ≠ 0 ∧ IsIntegralOp μ π ((J : Set G).indicator fun x => (χ x)⁻¹) B
+                        ∧ (∀ v, ∀ x ∈ J, π x (B v) = χ x • B v)
+                        ∧ ∀ v, (∀ x ∈ J, π x v = χ x • v) → B v = m • v := by
   intro G _ _ _ _ _ _ μ hμ J hJo hJc χ hχ hn hm V _ _ π hπ
   classical
   set f : G → ℂ := (J : Set G).indicator fun x => (χ x)⁻¹ with hfdef

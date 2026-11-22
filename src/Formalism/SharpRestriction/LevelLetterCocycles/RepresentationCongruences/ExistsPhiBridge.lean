@@ -10,17 +10,19 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.FrobeniusPowerSeries
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup PowerSeries
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup PowerSeries
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
-    [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
+  [IsDomain O] [IsDiscreteValuationRing O]
 
 structure PhiBridge (W : LocWach PD LL O v n) where
   P : PhiData O PD.p
@@ -69,9 +71,13 @@ theorem qA_eq : qA W = Br.cst X := by
 theorem π₀_eq : W.π₀ = Br.cst (X - C ((PD.p : ℕ) : O)) := by
   funext i
   show W.π₀ i = Br.ι (X - C ((PD.p : ℕ) : O))
-  rw [map_sub, Br.ι_X, show (C ((PD.p : ℕ) : O) : PowerSeries O) = algebraMap O (PowerSeries O) ((PD.p : ℕ) : O)
-    from rfl, AlgHom.commutes, ← show (C ((PD.p : ℕ) : O) : PowerSeries O) = algebraMap O (PowerSeries O) ((PD.p : ℕ) : O)
-    from rfl, add_sub_cancel_right]
+  rw [map_sub, Br.ι_X,
+    show (C ((PD.p : ℕ) : O) : PowerSeries O) = algebraMap O (PowerSeries O) ((PD.p : ℕ) : O) from
+      rfl,
+    AlgHom.commutes,
+    ← show (C ((PD.p : ℕ) : O) : PowerSeries O) = algebraMap O (PowerSeries O) ((PD.p : ℕ) : O) from
+      rfl,
+    add_sub_cancel_right]
   rfl
 theorem lA_eq : lA W = Br.cst (C ((PD.p : ℕ) : O)) := by
   rw [Br.cst_C]
@@ -96,35 +102,42 @@ theorem ps_eq (s : ℕ) : ps W s = Br.cst (Br.P.p s) := by
       Br.cst ((Br.P.φ : PowerSeries O → PowerSeries O)^[s + 1] X)
     rw [Function.iterate_succ_apply']
 
-theorem inFr_const (c : ZMod n) {N₁ N₂ D : PowerSeries O} {f : W.EE} {κ : ℕ} {x : O}
-    (hf : InFr W c (Br.cst N₁) (Br.cst D) f)
+theorem inFr_const
+    (c : ZMod n)
+    {N₁ N₂ D : PowerSeries O} {f : W.EE} {κ : ℕ} {x : O} (hf : InFr W c (Br.cst N₁) (Br.cst D) f)
     (hx : InFr W c (Br.cst N₂) (Br.cst D)
-      (lE W κ * f - algebraMap (LetA O n) W.EE (letE c) * algebraMap O W.EE x)) :
-    ∃ U₁ U₂ : PowerSeries O, D * C x = C ((PD.p : ℕ) : O) ^ κ * N₁ * U₁ - N₂ * U₂ := by
+      (lE W κ * f - algebraMap (LetA O n) W.EE (letE c) * algebraMap O W.EE x))
+    : ∃ U₁ U₂ : PowerSeries O, D * C x = C ((PD.p : ℕ) : O) ^ κ * N₁ * U₁ - N₂ * U₂ := by
   obtain ⟨u₁, hu₁, h₁⟩ := hf
   obtain ⟨u₂, hu₂, h₂⟩ := hx
   obtain ⟨U₁, hU₁⟩ := Br.range u₁ hu₁ c
   obtain ⟨U₂, hU₂⟩ := Br.range u₂ hu₂ c
   refine ⟨U₁, U₂, Br.inj ?_⟩
-  have key : algebraMap (LetA O n) W.EE (((PD.p : ℕ) : LetA O n) ^ κ * (letE c * Br.cst N₁ * u₁) -
-      Br.cst D * (letE c * algebraMap O (LetA O n) x)) =
-      algebraMap (LetA O n) W.EE (letE c * Br.cst N₂ * u₂) := by
+  have key
+      : algebraMap (LetA O n) W.EE
+          (((PD.p : ℕ) : LetA O n) ^ κ * (letE c * Br.cst N₁ * u₁)
+            - Br.cst D * (letE c * algebraMap O (LetA O n) x))
+        = algebraMap (LetA O n) W.EE (letE c * Br.cst N₂ * u₂) := by
     rw [lE, IsScalarTower.algebraMap_apply O (LetA O n) W.EE x] at h₂
     simp only [_root_.map_mul, _root_.map_sub, _root_.map_pow, _root_.map_natCast] at h₁ h₂ ⊢
     linear_combination h₂ - ((PD.p : ℕ) : W.EE) ^ κ * h₁
   have h3 := congrFun (W.EE_inj key) c
   simp only [Pi.sub_apply, Pi.mul_apply, Pi.pow_apply, Pi.natCast_apply, letE, Pi.single_eq_same,
-    one_mul, cst, hU₁, hU₂, Pi.algebraMap_apply, PowerSeries.algebraMap_apply, Algebra.algebraMap_self,
-    RingHom.id_apply] at h3
+      one_mul, cst, hU₁, hU₂, Pi.algebraMap_apply, PowerSeries.algebraMap_apply,
+      Algebra.algebraMap_self, RingHom.id_apply]
+    at h3
   simp only [_root_.map_mul, _root_.map_sub, _root_.map_pow, PB.algC, _root_.map_natCast]
   linear_combination -h3
 
 end PhiBridge
 
-theorem exists_phiBridge [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (W : LocWach PD LL O v n)
-    (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W) (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ)
-    (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x)) (hinj : Function.Injective (algebraMap O LL)) :
-    Nonempty (PhiBridge W) := by
+theorem exists_phiBridge
+    [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
+    (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
+    (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ)
+    (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x)) (hinj : Function.Injective (algebraMap O LL))
+    : Nonempty (PhiBridge W) := by
   classical
   have hp1 : PD.p - 1 + 1 = PD.p := Nat.sub_add_cancel PD.hp.one_lt.le
   have hpos : PD.p - 1 ≠ 0 := by have := PD.hp.two_le; omega
@@ -140,14 +153,18 @@ theorem exists_phiBridge [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (W : Lo
     have h1 : ((PD.p : ℕ) : O) * ((u⁻¹ : Oˣ) : O) = 1 := by rw [← hu, Units.mul_inv]
     have h2 := congrArg (fun z => v (algebraMap O LL z)) h1
     simp only [_root_.map_mul, _root_.map_one, AddValuation.map_mul, AddValuation.map_one,
-      map_natCast, W.v_l] at h2
+        map_natCast, W.v_l]
+      at h2
     have h3 : (1 : WithTop ℚ) ≤ 0 := by
-      calc (1 : WithTop ℚ) = 1 + 0 := (add_zero _).symm
+      calc
+        (1 : WithTop ℚ)
+          = 1 + 0 := (add_zero _).symm
         _ ≤ 1 + v (algebraMap O LL ((u⁻¹ : Oˣ) : O)) := add_le_add le_rfl (hO _)
         _ = 0 := h2
     have h4 : (0 : WithTop ℚ) < 1 := by exact_mod_cast (zero_lt_one : (0 : ℚ) < 1)
     exact absurd h3 (not_le.2 h4)
-  have hres : IsLocalRing.residue O ((PD.p : ℕ) : O) = 0 := (IsLocalRing.residue_eq_zero_iff _).2 hlm
+  have hres : IsLocalRing.residue O ((PD.p : ℕ) : O) = 0 :=
+    (IsLocalRing.residue_eq_zero_iff _).2 hlm
 
   obtain ⟨hK, hs, hp2⟩ := hcase
   have hfr : Module.finrank K₀ K = 1 := by
@@ -167,8 +184,7 @@ theorem exists_phiBridge [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (W : Lo
   set σ : PowerSeries O →ₐ[O] PowerSeries O := substAlgHom (HasSubst.of_constantCoeff_zero' h0) with hσdef
   have hσX : σ X = W.π₀₁ := substAlgHom_X _
   have hσinj : Function.Injective σ := PB.subst_injective h0 hne
-  have hσapp : ∀ F, σ F = PowerSeries.subst W.π₀₁ F := fun F => by
-    rw [hσdef, coe_substAlgHom]
+  have hσapp : ∀ F, σ F = PowerSeries.subst W.π₀₁ F := fun F => by rw [hσdef, coe_substAlgHom]
 
   have hw₂mem : (w₂ : LetA O n) ∈ W.AΔ := by
     have hc : W.π₀ * qA W ^ (PD.p - 1) ∈ W.AΔ :=
@@ -193,7 +209,8 @@ theorem exists_phiBridge [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (W : Lo
     rw [_root_.map_mul, _root_.map_mul, constantCoeff_X, mul_zero, zero_mul]
   set φY : PowerSeries O →ₐ[O] PowerSeries O := substAlgHom (HasSubst.of_constantCoeff_zero' hφ0)
   have hφYX : φY X = W' * X * (X + C ((PD.p : ℕ) : O)) ^ (PD.p - 1) := substAlgHom_X _
-  have hφ₀π : W.φ₀ W.π₀₁ = (w₂ : LetA O n) 0 * W.π₀₁ * (W.π₀₁ + C ((PD.p : ℕ) : O)) ^ (PD.p - 1) := by
+  have hφ₀π
+      : W.φ₀ W.π₀₁ = (w₂ : LetA O n) 0 * W.π₀₁ * (W.π₀₁ + C ((PD.p : ℕ) : O)) ^ (PD.p - 1) := by
     have h := congrFun hw₂ 0
     have e1 : W.φA W.π₀ 0 = W.φ₀ W.π₀₁ := rfl
     rw [e1] at h
@@ -201,8 +218,9 @@ theorem exists_phiBridge [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (W : Lo
     show (w₂ : LetA O n) 0 * W.π₀₁ * (W.π₀₁ + ((PD.p : ℕ) : LetA O n) 0) ^ (PD.p - 1) = _
     rw [Pi.natCast_apply, map_natCast]
   have hσφ : σ.toRingHom.comp φY.toRingHom = W.φ₀.toRingHom.comp σ.toRingHom := by
-    have hX1 : (σ.toRingHom.comp φY.toRingHom) X =
-        (w₂ : LetA O n) 0 * W.π₀₁ * (W.π₀₁ + C ((PD.p : ℕ) : O)) ^ (PD.p - 1) := by
+    have hX1
+        : (σ.toRingHom.comp φY.toRingHom) X
+          = (w₂ : LetA O n) 0 * W.π₀₁ * (W.π₀₁ + C ((PD.p : ℕ) : O)) ^ (PD.p - 1) := by
       simp only [AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, RingHom.comp_apply, hφYX,
         _root_.map_mul, _root_.map_pow, _root_.map_add, hσX, hσW', PB.algC]
     apply PB.ringHom_ext_nil
@@ -220,52 +238,62 @@ theorem exists_phiBridge [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (W : Lo
   have hτC' : ∀ r, τ (C r) = C r := fun r => PB.algC τ.toAlgHom r
   set φX : PowerSeries O →ₐ[O] PowerSeries O := τ.symm.toAlgHom.comp (φY.comp τ.toAlgHom)
   have hφXapp : ∀ F, φX F = τ.symm (φY (τ F)) := fun F => rfl
-  have hτXl : τ (X - C ((PD.p : ℕ) : O)) = X := by
-    rw [_root_.map_sub, hτX, hτC']; ring
+  have hτXl : τ (X - C ((PD.p : ℕ) : O)) = X := by rw [_root_.map_sub, hτX, hτC']; ring
   set u := τ.symm W'
   have hφX0 : φX (X - C ((PD.p : ℕ) : O)) = u * (X - C ((PD.p : ℕ) : O)) * X ^ (PD.p - 1) := by
-    rw [hφXapp, hτXl, hφYX, _root_.map_mul, _root_.map_mul, _root_.map_pow, _root_.map_add (f := _), hτsX, hτC]
+    rw [hφXapp, hτXl, hφYX, _root_.map_mul, _root_.map_mul, _root_.map_pow, _root_.map_add (f := _),
+      hτsX, hτC]
     ring
   have hφXX : φX X = u * (X - C ((PD.p : ℕ) : O)) * X ^ (PD.p - 1) + C ((PD.p : ℕ) : O) := by
     have : X = (X - C ((PD.p : ℕ) : O)) + C ((PD.p : ℕ) : O) := by ring
     conv_lhs => rw [this]
     rw [_root_.map_add (f := _), hφX0, PB.algC]
-  have hφred : ∀ f : PowerSeries O, (φX f).map (IsLocalRing.residue O) =
-      PowerSeries.subst ((u * X ^ PD.p).map (IsLocalRing.residue O)) (f.map (IsLocalRing.residue O)) := by
+  have hφred
+      : ∀ f : PowerSeries O,
+        (φX f).map (IsLocalRing.residue O)
+          = PowerSeries.subst ((u * X ^ PD.p).map (IsLocalRing.residue O))
+            (f.map (IsLocalRing.residue O)) := by
     have hc0 : constantCoeff ((u * X ^ PD.p).map (IsLocalRing.residue O)) = 0 := by
       rw [← coeff_zero_eq_constantCoeff_apply, coeff_map, coeff_zero_eq_constantCoeff_apply,
         _root_.map_mul, _root_.map_pow, constantCoeff_X, zero_pow (by have := PD.hp.two_le; omega),
         mul_zero, _root_.map_zero]
-    let ψ : PowerSeries (IsLocalRing.ResidueField O) →ₐ[IsLocalRing.ResidueField O]
-      PowerSeries (IsLocalRing.ResidueField O) := substAlgHom (HasSubst.of_constantCoeff_zero' hc0)
+    let ψ
+        : PowerSeries (IsLocalRing.ResidueField O) →ₐ[IsLocalRing.ResidueField O]
+          PowerSeries (IsLocalRing.ResidueField O) :=
+      substAlgHom (HasSubst.of_constantCoeff_zero' hc0)
     have hψX : ψ X = (u * X ^ PD.p).map (IsLocalRing.residue O) := substAlgHom_X _
-    have hX1 : ((map (IsLocalRing.residue O)).comp φX.toRingHom) X =
-        (u * X ^ PD.p).map (IsLocalRing.residue O) := by
+    have hX1
+        : ((map (IsLocalRing.residue O)).comp φX.toRingHom) X
+          = (u * X ^ PD.p).map (IsLocalRing.residue O) := by
       simp only [AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, RingHom.comp_apply, hφXX,
         _root_.map_add, _root_.map_mul, _root_.map_sub, _root_.map_pow, map_X, map_C, hres,
         _root_.map_zero, sub_zero, add_zero]
       rw [mul_assoc, ← pow_succ', hp1]
-    have h := PB.ringHom_ext_nil (h₁ := (map (IsLocalRing.residue O)).comp φX.toRingHom)
-      (h₂ := ψ.toRingHom.comp (map (IsLocalRing.residue O)))
-      (fun r => by simp only [AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, RingHom.comp_apply,
-        PB.algC, map_C])
-      (by rw [hX1]; simp only [AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, RingHom.comp_apply,
-        map_X, hψX])
-      (by rw [hX1, hc0]; exact IsNilpotent.zero)
+    have h :=
+      PB.ringHom_ext_nil (h₁ := (map (IsLocalRing.residue O)).comp φX.toRingHom)
+        (h₂ := ψ.toRingHom.comp (map (IsLocalRing.residue O)))
+        (fun r => by
+          simp only [AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, RingHom.comp_apply, PB.algC,
+            map_C])
+        (by
+          rw [hX1]
+          simp only [AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, RingHom.comp_apply, map_X, hψX])
+        (by rw [hX1, hc0]; exact IsNilpotent.zero)
     intro f
     have := RingHom.congr_fun h f
     simp only [AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, RingHom.comp_apply] at this
     rw [this]
     show ψ _ = _
     rw [coe_substAlgHom]
-  let P : PhiData O PD.p :=
-    { φ := φX
-      u := u
-      hu := hW'u.map τ.symm
-      hl := hlm
-      hl0 := hlO0
-      hφ0 := hφX0
-      hred := hφred }
+  let P : PhiData O PD.p := {
+    φ := φX
+    u := u
+    hu := hW'u.map τ.symm
+    hl := hlm
+    hl0 := hlO0
+    hφ0 := hφX0
+    hred := hφred
+  }
   let ι : PowerSeries O →ₐ[O] PowerSeries O := σ.comp τ.toAlgHom
   have hιapp : ∀ F, ι F = σ (τ F) := fun F => rfl
   have hγ : ∀ δ ∈ W.DelF, (W.γ₀ δ).toRingHom.comp σ.toRingHom = σ.toRingHom := by
@@ -295,6 +323,7 @@ theorem exists_phiBridge [IsAdicComplete (IsLocalRing.maximalIdeal O) O] (W : Lo
     mem := fun F δ hδ => by
       funext i
       rw [GS.γA_apply]
-      exact RingHom.congr_fun (hγ δ hδ) (τ F) }⟩
+      exact RingHom.congr_fun (hγ δ hδ) (τ F)
+  }⟩
 
 end Formalism.MainNotions.N.FrobeniusPowerSeries

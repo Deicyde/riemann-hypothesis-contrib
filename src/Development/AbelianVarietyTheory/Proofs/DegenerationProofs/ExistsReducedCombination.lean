@@ -12,12 +12,12 @@ namespace LatticeIneq
 
 variable {X : Type} [AddCommGroup X]
 
-theorem weighted_add_le (q : QuadraticMap ℤ X ℝ) (hq : ∀ x, 0 ≤ q x) (j : ℕ) (a b : X) :
-    (j : ℝ) * q (a + b) ≤ (j + 1) * q a + j * (j + 1) * q b := by
-  have h1 : q (a + b) = q a + q b + QuadraticMap.polar q a b := by
-    simp [QuadraticMap.polar]
-  have h2 : q (a + (-(j : ℤ)) • b) = q a + q ((-(j : ℤ)) • b)
-      + QuadraticMap.polar q a ((-(j : ℤ)) • b) := by
+theorem weighted_add_le (q : QuadraticMap ℤ X ℝ) (hq : ∀ x, 0 ≤ q x) (j : ℕ) (a b : X)
+    : (j : ℝ) * q (a + b) ≤ (j + 1) * q a + j * (j + 1) * q b := by
+  have h1 : q (a + b) = q a + q b + QuadraticMap.polar q a b := by simp [QuadraticMap.polar]
+  have h2
+      : q (a + (-(j : ℤ)) • b)
+        = q a + q ((-(j : ℤ)) • b) + QuadraticMap.polar q a ((-(j : ℤ)) • b) := by
     simp only [QuadraticMap.polar]; ring
   rw [QuadraticMap.polar_smul_right, QuadraticMap.map_smul] at h2
   have h3 := hq (a + (-(j : ℤ)) • b)
@@ -27,8 +27,9 @@ theorem weighted_add_le (q : QuadraticMap ℤ X ℝ) (hq : ∀ x, 0 ≤ q x) (j 
   rw [h1]
   nlinarith
 
-theorem map_sum_le (q : QuadraticMap ℤ X ℝ) (hq : ∀ x, 0 ≤ q x) {I : Type} (s : Finset I)
-    (v : I → X) : q (∑ x ∈ s, v x) ≤ s.card * ∑ x ∈ s, q (v x) := by
+theorem map_sum_le
+    (q : QuadraticMap ℤ X ℝ) (hq : ∀ x, 0 ≤ q x) {I : Type} (s : Finset I) (v : I → X)
+    : q (∑ x ∈ s, v x) ≤ s.card * ∑ x ∈ s, q (v x) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -44,10 +45,11 @@ theorem map_sum_le (q : QuadraticMap ℤ X ℝ) (hq : ∀ x, 0 ≤ q x) {I : Typ
       have h2 := mul_le_mul_of_nonneg_left ih (by positivity : (0 : ℝ) ≤ (s.card : ℝ) + 1)
       nlinarith
 
-theorem exists_int_combination {I : Type} [Fintype I] (N : ℕ) (yy w : I → X)
-    (hw : ∀ x, ∃ μ, w x = yy x + N • μ) (z : X)
-    (hz : z ∈ AddSubgroup.closure (Set.range yy ∪ Set.range fun μ : X => N • μ)) :
-    ∃ (k : I → ℤ) (μ : X), z + N • μ = ∑ x, k x • w x := by
+theorem exists_int_combination
+    {I : Type} [Fintype I]
+    (N : ℕ) (yy w : I → X) (hw : ∀ x, ∃ μ, w x = yy x + N • μ)
+    (z : X) (hz : z ∈ AddSubgroup.closure (Set.range yy ∪ Set.range fun μ : X => N • μ))
+    : ∃ (k : I → ℤ) (μ : X), z + N • μ = ∑ x, k x • w x := by
   classical
   induction hz using AddSubgroup.closure_induction with
   | mem y hy =>
@@ -59,7 +61,8 @@ theorem exists_int_combination {I : Type} [Fintype I] (N : ℕ) (yy w : I → X)
       · intro b _ hb; simp [Pi.single_eq_of_ne hb]
       · simp
     · exact ⟨0, -μ, by simp⟩
-  | zero => exact ⟨0, 0, by simp⟩
+  | zero =>
+    exact ⟨0, 0, by simp⟩
   | add a b _ _ ha hb =>
     obtain ⟨k, μ, h⟩ := ha
     obtain ⟨k', μ', h'⟩ := hb
@@ -72,14 +75,20 @@ theorem exists_int_combination {I : Type} [Fintype I] (N : ℕ) (yy w : I → X)
     simp only [Pi.neg_apply, neg_smul, Finset.sum_neg_distrib, ← h, smul_neg]
     abel
 
-theorem exists_reduced_combination {I : Type} [Fintype I] (N : ℕ) (hN : 1 ≤ N) (yy w : I → X)
-    (hw : ∀ x, ∃ μ, w x = yy x + N • μ) (z : X)
-    (hz : z ∈ AddSubgroup.closure (Set.range yy ∪ Set.range fun μ : X => N • μ)) :
-    ∃ (k : I → ℤ) (μ : X), (∀ x, 0 ≤ k x ∧ k x ≤ N) ∧ z + N • μ = ∑ x, k x • w x := by
+theorem exists_reduced_combination
+    {I : Type} [Fintype I]
+    (N : ℕ) (hN : 1 ≤ N)
+    (yy w : I → X) (hw : ∀ x, ∃ μ, w x = yy x + N • μ)
+    (z : X) (hz : z ∈ AddSubgroup.closure (Set.range yy ∪ Set.range fun μ : X => N • μ))
+    : ∃ (k : I → ℤ) (μ : X), (∀ x, 0 ≤ k x ∧ k x ≤ N) ∧ z + N • μ = ∑ x, k x • w x := by
   obtain ⟨k, μ, h⟩ := exists_int_combination N yy w hw z hz
   have hN' : (0 : ℤ) < N := by exact_mod_cast hN
-  refine ⟨fun x => k x % N, μ - ∑ x, (k x / N) • w x,
-    fun x => ⟨Int.emod_nonneg _ hN'.ne', (Int.emod_lt_of_pos _ hN').le⟩, ?_⟩
+  refine ⟨
+    fun x => k x % N,
+    μ - ∑ x, (k x / N) • w x,
+    fun x => ⟨Int.emod_nonneg _ hN'.ne', (Int.emod_lt_of_pos _ hN').le⟩,
+    ?_
+  ⟩
   rw [smul_sub, ← add_sub_assoc, h, Finset.smul_sum, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [← natCast_zsmul, smul_smul, ← sub_smul]
@@ -87,10 +96,20 @@ theorem exists_reduced_combination {I : Type} [Fintype I] (N : ℕ) (hN : 1 ≤ 
 
 end LatticeIneq
 
-
 open LatticeIneq in
-theorem lattice_inequality :
-    ∀ (X : Type) [AddCommGroup X] (q : QuadraticMap ℤ X ℝ), (∀ x, 0 ≤ q x) → ∀ (I : Type) [Fintype I] (N N' j : ℕ), 1 ≤ N → N ∣ N' → 1 ≤ j → ∀ (yy w : I → X) (vth : I → ℝ) (αs c : X) (vf' : ℝ), (∀ x, ∃ μ, w x = yy x + N' • μ) → (∀ x, q (w x) ≤ (N' : ℝ) ^ 2 * vth x) → q αs ≤ N * vf' → c - αs ∈ AddSubgroup.closure (Set.range yy ∪ Set.range fun μ : X => N • μ) → ∃ μ : X, j * (q (c + N • μ) / N) ≤ (j + 1) * vf' + (j * (j + 1) * Fintype.card I * N * N' ^ 2 : ℕ) * ∑ x, vth x := by
+theorem lattice_inequality
+    : ∀ (X : Type) [AddCommGroup X] (q : QuadraticMap ℤ X ℝ),
+      (∀ x, 0 ≤ q x)
+        → ∀ (I : Type) [Fintype I] (N N' j : ℕ),
+          1 ≤ N → N ∣ N' → 1 ≤ j
+            → ∀ (yy w : I → X) (vth : I → ℝ) (αs c : X) (vf' : ℝ),
+              (∀ x, ∃ μ, w x = yy x + N' • μ) → (∀ x, q (w x) ≤ (N' : ℝ) ^ 2 * vth x)
+                → q αs ≤ N * vf'
+                → c - αs ∈ AddSubgroup.closure (Set.range yy ∪ Set.range fun μ : X => N • μ)
+                → ∃ μ : X,
+                  j * (q (c + N • μ) / N)
+                    ≤ (j + 1) * vf'
+                      + (j * (j + 1) * Fintype.card I * N * N' ^ 2 : ℕ) * ∑ x, vth x := by
   intro X _ q hq I _ N N' j hN hNN' _ yy w vth αs c vf' hw hwq hα hc
   obtain ⟨m, rfl⟩ := hNN'
   have hw' : ∀ x, ∃ μ, w x = yy x + N • μ := fun x => by
@@ -109,7 +128,8 @@ theorem lattice_inequality :
     have a0 : (0 : ℝ) ≤ k x := by exact_mod_cast (hk x).1
     have a1 : (k x : ℝ) ≤ N := by exact_mod_cast (hk x).2
     have a2 : ((k x * k x : ℤ) : ℝ) ≤ (N : ℝ) ^ 2 := by push_cast; nlinarith
-    calc _ ≤ (N : ℝ) ^ 2 * q (w x) := mul_le_mul_of_nonneg_right a2 (hq _)
+    calc
+      _ ≤ (N : ℝ) ^ 2 * q (w x) := mul_le_mul_of_nonneg_right a2 (hq _)
       _ ≤ (N : ℝ) ^ 2 * (((N * m : ℕ) : ℝ) ^ 2 * vth x) :=
         mul_le_mul_of_nonneg_left (hwq x) (by positivity)
       _ = _ := by ring

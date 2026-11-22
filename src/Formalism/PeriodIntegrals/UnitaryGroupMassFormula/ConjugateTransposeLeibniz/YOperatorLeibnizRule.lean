@@ -12,7 +12,8 @@ noncomputable section
 
 namespace QnYLeibnizW
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -21,16 +22,18 @@ section Gen
 variable {n : ℕ}
 
 def evL (w : Fin n → ℂ) (p : Fin n) : Matrix (Fin n) (Fin n) ℂ →L[ℝ] ℂ :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun M => (M *ᵥ w) p
-      map_add' := fun M N => by simp [Matrix.add_mulVec]
-      map_smul' := fun c M => by simp [Matrix.smul_mulVec] }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun M => (M *ᵥ w) p
+    map_add' := fun M N => by simp [Matrix.add_mulVec]
+    map_smul' := fun c M => by simp [Matrix.smul_mulVec]
+  }
 
 def hermL (H : Matrix (Fin n) (Fin n) ℂ) (w x : Fin n → ℂ) : Matrix (Fin n) (Fin n) ℂ →L[ℝ] ℂ :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun M => herm H (M *ᵥ w) x
-      map_add' := fun M N => by simp [herm, Matrix.add_mulVec, Matrix.mulVec_add, dotProduct_add]
-      map_smul' := fun c M => by simp [herm, Matrix.smul_mulVec, Matrix.mulVec_smul, dotProduct_smul] }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun M => herm H (M *ᵥ w) x
+    map_add' := fun M N => by simp [herm, Matrix.add_mulVec, Matrix.mulVec_add, dotProduct_add]
+    map_smul' := fun c M => by simp [herm, Matrix.smul_mulVec, Matrix.mulVec_smul, dotProduct_smul]
+  }
 
 lemma curve_zero (g X : Matrix (Fin n) (Fin n) ℂ) :
     g * NormedSpace.exp (((0 : ℝ) : ℂ) • X) = g := by
@@ -211,12 +214,14 @@ section Deriv
 
 variable {k r : ℕ} {i : Fin (r + 1)}
 
-private theorem hasDerivAt_mul_exp_smul_zero' {n : ℕ} (g X : Matrix (Fin n) (Fin n) ℂ) :
-    HasDerivAt (fun t : ℝ => g * NormedSpace.exp ((t : ℂ) • X)) (g * X) 0 := by
-  let large₂ : Matrix (Fin n) (Fin n) ℂ →L[ℝ] Matrix (Fin n) (Fin n) ℂ := LinearMap.toContinuousLinearMap
-    { toFun := fun M => g * M
+private theorem hasDerivAt_mul_exp_smul_zero' {n : ℕ} (g X : Matrix (Fin n) (Fin n) ℂ)
+    : HasDerivAt (fun t : ℝ => g * NormedSpace.exp ((t : ℂ) • X)) (g * X) 0 := by
+  let large₂ : Matrix (Fin n) (Fin n) ℂ →L[ℝ] Matrix (Fin n) (Fin n) ℂ :=
+    LinearMap.toContinuousLinearMap {
+      toFun := fun M => g * M
       map_add' := fun M N => Matrix.mul_add g M N
-      map_smul' := fun c M => by simp [Matrix.mul_smul] }
+      map_smul' := fun c M => by simp [Matrix.mul_smul]
+    }
   have h := large₂.hasFDerivAt.comp_hasDerivAt (0 : ℝ) (hasDerivAt_matrix_exp_smul_at_zero X)
   exact h
 
@@ -269,62 +274,151 @@ theorem y_operator_leibniz_rule : YLeibniz := by
   obtain ⟨hgG, hgD⟩ := hg
   obtain ⟨U, F, hU, hgU, hF, hfF⟩ := hf g ⟨hgG, hgD⟩
   have hmem := hpart_mem (k := k) (r := r) (i := i) a b
-  have hf1 := hasDerivAt_f f F U g (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) hU hgU hgG hF hfF hmem.1
-  have hf2 := hasDerivAt_f f F U g (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) hU hgU hgG hF hfF hmem.2
-  have L1 : RdV (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) f g = fderiv ℝ F g (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) := rdV_of_hasDerivAt _ g f _ hf1
-  have L2 : RdV (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) f g = fderiv ℝ F g (g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) := rdV_of_hasDerivAt _ g f _ hf2
-  have eEH : ∀ h : Mx k r → E, EH k r (posL k r i a) (posL k r i b) h g =
-      RdV (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) h g + Complex.I • RdV (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) h g := fun h => rfl
-  have e1 : ∀ (s d1 d2 : ℂ) (M1 M2 v : E), s • M1 + d1 • v + Complex.I • (s • M2 + d2 • v) =
-      s • (M1 + Complex.I • M2) + (d1 + Complex.I * d2) • v := by
+  have hf1 :=
+    hasDerivAt_f f F U g (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) hU hgU
+      hgG hF hfF hmem.1
+  have hf2 :=
+    hasDerivAt_f f F U g (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) hU hgU
+      hgG hF hfF hmem.2
+  have L1
+      : RdV (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) f g
+        = fderiv ℝ F g (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) :=
+    rdV_of_hasDerivAt _ g f _ hf1
+  have L2
+      : RdV (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) f g
+        = fderiv ℝ F g (g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) :=
+    rdV_of_hasDerivAt _ g f _ hf2
+  have eEH
+      : ∀ h : Mx k r → E,
+        EH k r (posL k r i a) (posL k r i b) h g
+          = RdV (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) h g
+            + Complex.I
+              • RdV (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) h g :=
+    fun h => rfl
+  have e1
+      : ∀ (s d1 d2 : ℂ) (M1 M2 v : E),
+        s • M1 + d1 • v + Complex.I • (s • M2 + d2 • v)
+          = s • (M1 + Complex.I • M2) + (d1 + Complex.I * d2) • v := by
     intro s d1 d2 M1 M2 v
     simp only [smul_add, add_smul, mul_smul]
     rw [smul_comm Complex.I s M2]
     abel
-  have hsum : (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1) + Complex.I • hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) = Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) := hpart_sum _ _
+  have hsum
+      : (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)
+          + Complex.I • hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+        = Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) :=
+    hpart_sum _ _
   constructor
-  · have R1 : RdV (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) (fun x => yv k r z i x c • f x) g =
-        yv k r z i g c • fderiv ℝ F g (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) + (-((hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1) *ᵥ (g⁻¹ *ᵥ fvec k r z i)) (posL k r i c))) • f g :=
+  · have R1
+        : RdV (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+            (fun x => yv k r z i x c • f x)
+            g
+          = yv k r z i g c
+              • fderiv ℝ F g (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+            + (-((hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)
+                  *ᵥ (g⁻¹ *ᵥ fvec k r z i))
+                (posL k r i c)))
+              • f g :=
       rdV_smul_of _ g (fun x => yv k r z i x c) f _ _ (hasDerivAt_yv z c g _) hf1
-    have R2 : RdV (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) (fun x => yv k r z i x c • f x) g =
-        yv k r z i g c • fderiv ℝ F g (g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) + (-((hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1) *ᵥ (g⁻¹ *ᵥ fvec k r z i)) (posL k r i c))) • f g :=
+    have R2
+        : RdV (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+            (fun x => yv k r z i x c • f x)
+            g
+          = yv k r z i g c
+              • fderiv ℝ F g (g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+            + (-((hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)
+                  *ᵥ (g⁻¹ *ᵥ fvec k r z i))
+                (posL k r i c)))
+              • f g :=
       rdV_smul_of _ g (fun x => yv k r z i x c) f _ _ (hasDerivAt_yv z c g _) hf2
-    have hZw : (Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) *ᵥ (g⁻¹ *ᵥ fvec k r z i)) (posL k r i c) = if a = c then yv k r z i g b else 0 := by
+    have hZw
+        : (Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) *ᵥ (g⁻¹ *ᵥ fvec k r z i)) (posL k r i
+            c)
+          = if a = c then yv k r z i g b else 0 := by
       simp only [Matrix.mulVec, dotProduct, Matrix.single_apply]
       by_cases hac : a = c
       · subst hac
         simp [yv, Matrix.mulVec, dotProduct]
       · have hne : posL k r i a ≠ posL k r i c := fun h => hac ((posL_inj a c).mp h)
         simp [hne, hac]
-    have key1 : (-((hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1) *ᵥ (g⁻¹ *ᵥ fvec k r z i)) (posL k r i c))) + Complex.I * (-((hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1) *ᵥ (g⁻¹ *ᵥ fvec k r z i)) (posL k r i c))) =
-        -(if a = c then yv k r z i g b else 0) := by
-      have hc : ((hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1) + Complex.I • hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) *ᵥ (g⁻¹ *ᵥ fvec k r z i)) (posL k r i c) =
-          (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1) *ᵥ (g⁻¹ *ᵥ fvec k r z i)) (posL k r i c) + Complex.I * (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1) *ᵥ (g⁻¹ *ᵥ fvec k r z i)) (posL k r i c) := by
+    have key1
+        : (-((hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)
+                *ᵥ (g⁻¹ *ᵥ fvec k r z i))
+              (posL k r i c)))
+            + Complex.I * (-((hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)
+                *ᵥ (g⁻¹ *ᵥ fvec k r z i))
+              (posL k r i c)))
+          = -(if a = c then yv k r z i g b else 0) := by
+      have hc
+          : ((hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)
+                  + Complex.I • hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+                *ᵥ (g⁻¹ *ᵥ fvec k r z i))
+              (posL k r i c)
+            = (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)
+                  *ᵥ (g⁻¹ *ᵥ fvec k r z i))
+                (posL k r i c)
+              + Complex.I
+                * (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)
+                    *ᵥ (g⁻¹ *ᵥ fvec k r z i))
+                  (posL k r i c) := by
         rw [Matrix.add_mulVec, Matrix.smul_mulVec, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
       rw [hsum, hZw] at hc
       rw [hc]
       ring
     rw [eEH, eEH, R1, R2, L1, L2, e1, key1, neg_smul, ← sub_eq_add_neg, ite_smul, zero_smul]
-  · have R1 : RdV (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) (fun x => ybv k r z i x c • f x) g =
-        ybv k r z i g c • fderiv ℝ F g (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) +
-          herm (Hpk k r) ((g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) *ᵥ bvec (posL k r i c)) (fvec k r z i) • f g :=
+  · have R1
+        : RdV (hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+            (fun x => ybv k r z i x c • f x)
+            g
+          = ybv k r z i g c
+              • fderiv ℝ F g (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+            + herm (Hpk k r)
+                ((g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+                  *ᵥ bvec (posL k r i c))
+                (fvec k r z i)
+              • f g :=
       rdV_smul_of _ g (fun x => ybv k r z i x c) f _ _ (hasDerivAt_ybv z c g _) hf1
-    have R2 : RdV (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) (fun x => ybv k r z i x c • f x) g =
-        ybv k r z i g c • fderiv ℝ F g (g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) +
-          herm (Hpk k r) ((g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) *ᵥ bvec (posL k r i c)) (fvec k r z i) • f g :=
+    have R2
+        : RdV (hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+            (fun x => ybv k r z i x c • f x)
+            g
+          = ybv k r z i g c
+              • fderiv ℝ F g (g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+            + herm (Hpk k r)
+                ((g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+                  *ᵥ bvec (posL k r i c))
+                (fvec k r z i)
+              • f g :=
       rdV_smul_of _ g (fun x => ybv k r z i x c) f _ _ (hasDerivAt_ybv z c g _) hf2
-    have hlin : ∀ u v : Fin (2 * r + k + 1) → ℂ, herm (Hpk k r) u (fvec k r z i) + Complex.I * herm (Hpk k r) v (fvec k r z i) =
-        herm (Hpk k r) (u + Complex.I • v) (fvec k r z i) := by
+    have hlin
+        : ∀ u v : Fin (2 * r + k + 1) → ℂ,
+          herm (Hpk k r) u (fvec k r z i) + Complex.I * herm (Hpk k r) v (fvec k r z i)
+            = herm (Hpk k r) (u + Complex.I • v) (fvec k r z i) := by
       intro u v
-      simp only [herm, Matrix.mulVec_add, Matrix.mulVec_smul, dotProduct_add, dotProduct_smul, smul_eq_mul]
-    have hv : g *ᵥ ((hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1) + Complex.I • hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) *ᵥ bvec (posL k r i c)) =
-        (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) *ᵥ bvec (posL k r i c) + Complex.I • ((g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) *ᵥ bvec (posL k r i c)) := by
-      rw [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.mulVec_add, Matrix.mulVec_smul, Matrix.mulVec_mulVec,
-        Matrix.mulVec_mulVec]
+      simp only [herm, Matrix.mulVec_add, Matrix.mulVec_smul, dotProduct_add, dotProduct_smul,
+        smul_eq_mul]
+    have hv
+        : g *ᵥ ((hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)
+              + Complex.I • hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+            *ᵥ bvec (posL k r i c))
+          = (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+              *ᵥ bvec (posL k r i c)
+            + Complex.I
+              • ((g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+                *ᵥ bvec (posL k r i c)) := by
+      rw [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.mulVec_add, Matrix.mulVec_smul,
+        Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
     rw [hsum] at hv
-    have key2 : herm (Hpk k r) ((g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) *ᵥ bvec (posL k r i c)) (fvec k r z i) +
-        Complex.I * herm (Hpk k r) ((g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) *ᵥ bvec (posL k r i c)) (fvec k r z i) =
-        if b = c then ybv k r z i g a else 0 := by
+    have key2
+        : herm (Hpk k r)
+              ((g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+                *ᵥ bvec (posL k r i c))
+              (fvec k r z i)
+            + Complex.I * herm (Hpk k r)
+              ((g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+                *ᵥ bvec (posL k r i c))
+              (fvec k r z i)
+          = if b = c then ybv k r z i g a else 0 := by
       rw [hlin, ← hv, single_mulVec_bvec]
       by_cases hbc : b = c
       · subst hbc

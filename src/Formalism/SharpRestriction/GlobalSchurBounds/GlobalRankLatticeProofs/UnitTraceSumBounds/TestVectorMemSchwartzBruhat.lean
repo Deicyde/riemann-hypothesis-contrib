@@ -8,25 +8,30 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProo
 
 namespace Formalism.MainNotions.Ext
 
-open Formalism.BasicNotions Formalism.MainNotions.GL3Theta Formalism.MainNotions.TaylorLogMetric NumberField
+open Formalism.BasicNotions Formalism.MainNotions.GL3Theta Formalism.MainNotions.TaylorLogMetric
+  NumberField
 
 variable (D : D7) {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p])
 
-theorem exists_conj_OK (a : 𝓞 D.host.K) : ∃ a' : 𝓞 D.host.K, (((a' : D.host.K)) : D.host.E) = D.host.conj ((a : D.host.K) : D.host.E) := by
+theorem exists_conj_OK (a : 𝓞 D.host.K)
+    : ∃ a' : 𝓞 D.host.K,
+      (((a' : D.host.K)) : D.host.E) = D.host.conj ((a : D.host.K) : D.host.E) := by
   have hsq : D.host.conj D.host.sqd ∈ IntermediateField.adjoin ℚ {D.host.sqd} := by
     rw [D.host.gal_sqd]
     exact mul_mem (intCast_mem _ _) (IntermediateField.mem_adjoin_simple_self ℚ _)
-  have hmap : IntermediateField.map (D.host.conj : D.host.E →ₐ[ℚ] D.host.E)
-      (IntermediateField.adjoin ℚ {D.host.sqd}) ≤ IntermediateField.adjoin ℚ {D.host.sqd} := by
+  have hmap
+      : IntermediateField.map (D.host.conj : D.host.E →ₐ[ℚ] D.host.E)
+          (IntermediateField.adjoin ℚ {D.host.sqd})
+        ≤ IntermediateField.adjoin ℚ {D.host.sqd} := by
     rw [IntermediateField.adjoin_map, Set.image_singleton]
     exact IntermediateField.adjoin_simple_le_iff.2 hsq
-  have hx : ((a : D.host.K) : D.host.E) ∈ IntermediateField.adjoin ℚ {D.host.sqd} := (a : D.host.K).2
+  have hx : ((a : D.host.K) : D.host.E) ∈ IntermediateField.adjoin ℚ {D.host.sqd} :=
+    (a : D.host.K).2
   have hK : D.host.conj ((a : D.host.K) : D.host.E) ∈ D.host.K :=
     hmap ((IntermediateField.mem_map _).2 ⟨_, hx, rfl⟩)
   have hint : IsIntegral ℤ (⟨_, hK⟩ : D.host.K) := by
     rw [← isIntegral_algebraMap_iff (B := D.host.E)]
-    have ha : IsIntegral ℤ ((a : D.host.K) : D.host.E) :=
-      a.isIntegral_coe.algebraMap
+    have ha : IsIntegral ℤ ((a : D.host.K) : D.host.E) := a.isIntegral_coe.algebraMap
     exact ha.map D.host.conj.toAlgHom.toRingHom.toIntAlgHom
   let b : integralClosure ℤ D.host.K := ⟨⟨_, hK⟩, hint⟩
   exact ⟨b, rfl⟩
@@ -47,32 +52,44 @@ theorem test_vector_mem_schwartz_bruhat (z : D.host.E) : D.host.φ₀ z ∈ Qbar
   have h : IsIntegral ℚ z := Algebra.IsIntegral.isIntegral z
   exact mem_algebraicClosure_iff.2 (h.map D.host.φ₀.toRatAlgHom).isAlgebraic
 
-theorem lamPhi_add (x y : D.host.E) : lamC lam (D.host.φ₀ (x + y)) = lamC lam (D.host.φ₀ x) + lamC lam (D.host.φ₀ y) := by
+theorem lamPhi_add (x y : D.host.E)
+    : lamC lam (D.host.φ₀ (x + y)) = lamC lam (D.host.φ₀ x) + lamC lam (D.host.φ₀ y) := by
   unfold lamC
-  rw [dite_eq_left (test_vector_mem_schwartz_bruhat D (x + y)), dite_eq_left (test_vector_mem_schwartz_bruhat D x), dite_eq_left (test_vector_mem_schwartz_bruhat D y), ← map_add lam]
+  rw [dite_eq_left (test_vector_mem_schwartz_bruhat D (x + y)),
+    dite_eq_left (test_vector_mem_schwartz_bruhat D x),
+    dite_eq_left (test_vector_mem_schwartz_bruhat D y), ← map_add lam]
   exact congrArg lam (Subtype.ext (by simp))
 
-theorem lamPhi_mul (x y : D.host.E) : lamC lam (D.host.φ₀ (x * y)) = lamC lam (D.host.φ₀ x) * lamC lam (D.host.φ₀ y) := by
+theorem lamPhi_mul (x y : D.host.E)
+    : lamC lam (D.host.φ₀ (x * y)) = lamC lam (D.host.φ₀ x) * lamC lam (D.host.φ₀ y) := by
   unfold lamC
-  rw [dite_eq_left (test_vector_mem_schwartz_bruhat D (x * y)), dite_eq_left (test_vector_mem_schwartz_bruhat D x), dite_eq_left (test_vector_mem_schwartz_bruhat D y), ← map_mul lam]
+  rw [dite_eq_left (test_vector_mem_schwartz_bruhat D (x * y)),
+    dite_eq_left (test_vector_mem_schwartz_bruhat D x),
+    dite_eq_left (test_vector_mem_schwartz_bruhat D y), ← map_mul lam]
   exact congrArg lam (Subtype.ext (by simp))
 
-theorem okp_add (α β : ℂ_[p] × ℂ_[p]) (hα : α ∈ OKp D lam) (hβ : β ∈ OKp D lam) : α + β ∈ OKp D lam := by
+theorem okp_add (α β : ℂ_[p] × ℂ_[p]) (hα : α ∈ OKp D lam) (hβ : β ∈ OKp D lam)
+    : α + β ∈ OKp D lam := by
   unfold OKp at hα hβ ⊢
   refine map_mem_closure₂ (f := fun u v : ℂ_[p] × ℂ_[p] => u + v) continuous_add hα hβ ?_
   rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩
   refine ⟨a + b, ?_⟩
-  have hab : (((a + b : 𝓞 D.host.K) : D.host.K) : D.host.E)
-      = ((a : D.host.K) : D.host.E) + ((b : D.host.K) : D.host.E) := by simp
+  have hab
+      : (((a + b : 𝓞 D.host.K) : D.host.K) : D.host.E)
+        = ((a : D.host.K) : D.host.E) + ((b : D.host.K) : D.host.E) := by
+    simp
   simp only [tauK, tauKc, hab, map_add D.host.conj, lamPhi_add, Prod.mk_add_mk]
 
-theorem okp_mul (α β : ℂ_[p] × ℂ_[p]) (hα : α ∈ OKp D lam) (hβ : β ∈ OKp D lam) : α * β ∈ OKp D lam := by
+theorem okp_mul (α β : ℂ_[p] × ℂ_[p]) (hα : α ∈ OKp D lam) (hβ : β ∈ OKp D lam)
+    : α * β ∈ OKp D lam := by
   unfold OKp at hα hβ ⊢
   refine map_mem_closure₂ (f := fun u v : ℂ_[p] × ℂ_[p] => u * v) continuous_mul hα hβ ?_
   rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩
   refine ⟨a * b, ?_⟩
-  have hab : (((a * b : 𝓞 D.host.K) : D.host.K) : D.host.E)
-      = ((a : D.host.K) : D.host.E) * ((b : D.host.K) : D.host.E) := by simp
+  have hab
+      : (((a * b : 𝓞 D.host.K) : D.host.K) : D.host.E)
+        = ((a : D.host.K) : D.host.E) * ((b : D.host.K) : D.host.E) := by
+    simp
   simp only [tauK, tauKc, hab, map_mul D.host.conj, lamPhi_mul, Prod.mk_mul_mk]
 
 end Formalism.MainNotions.Ext

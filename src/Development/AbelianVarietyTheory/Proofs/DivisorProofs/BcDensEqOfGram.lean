@@ -11,8 +11,10 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Points GlobalTheory.CxPts GlobalTheory.VB GlobalTheory.HermFrame GlobalTheory.ChartGlue
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Points GlobalTheory.CxPts GlobalTheory.VB GlobalTheory.HermFrame
+  GlobalTheory.ChartGlue
 open GlobalTheory.Twist (resM resM_resM resM_self app_resM)
 open GlobalTheory.QCoh (pullbackSections)
 open GlobalTheory.VBExt (AdaptedChart)
@@ -38,8 +40,10 @@ end Vert.Flag
 
 namespace VMetric
 
-variable {k : Type} [CommRing k] {X Y : Scheme.{0}} {p : X ⟶ Sp k} {q : Y ⟶ Sp k} {σ : k →+* ℂ}
-  {E : X.Modules} {r : ℕ} (fl : Vert.Flag E r) (π : Y ⟶ X) (i : Fin r)
+variable
+  {k : Type} [CommRing k]
+  {X Y : Scheme.{0}} {p : X ⟶ Sp k} {q : Y ⟶ Sp k} {σ : k →+* ℂ} {E : X.Modules} {r : ℕ}
+  (fl : Vert.Flag E r) (π : Y ⟶ X) (i : Fin r)
 
 variable {fl π i}
 

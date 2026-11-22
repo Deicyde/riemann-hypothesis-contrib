@@ -25,7 +25,6 @@ lemma hasVal_mul {c d : FractionRing V} {n m : ℤ} (hc : HasVal ϖ c n) (hd : H
   rw [hu, hw, zpow_add₀ hπ, Units.val_mul, map_mul]
   ring
 
-
 open scoped Classical in
 def valE (hϖ : Irreducible ϖ) (c : FractionRing V) : ℤ :=
   if h : c = 0 then 0 else (hasVal_of_ne_zero hϖ h).choose
@@ -35,10 +34,10 @@ lemma hasVal_valE (hϖ : Irreducible ϖ) {c : FractionRing V} (hc : c ≠ 0) : H
   rw [dite_eq_right hc]
   exact (hasVal_of_ne_zero hϖ hc).choose_spec
 
-
 open scoped Classical in
 def vK (hϖ : Irreducible ϖ) : AddValuation (FractionRing V) (WithTop ℚ) :=
-  AddValuation.of (fun c => if c = 0 then ⊤ else ((valE hϖ c : ℚ) : WithTop ℚ))
+  AddValuation.of
+    (fun c => if c = 0 then ⊤ else ((valE hϖ c : ℚ) : WithTop ℚ))
     (by simp)
     (by
       have h1 : HasVal ϖ (1 : FractionRing V) 0 := ⟨1, by simp⟩
@@ -54,8 +53,9 @@ def vK (hϖ : Irreducible ϖ) : AddValuation (FractionRing V) (WithTop ℚ) :=
       simp only [hx, hy, hxy, if_false]
       have hπ : algebraMap V (FractionRing V) ϖ ≠ 0 :=
         (map_ne_zero_iff _ (IsFractionRing.injective V (FractionRing V))).mpr hϖ.ne_zero
-      have key : ∀ {a b : FractionRing V}, a ≠ 0 → b ≠ 0 → a + b ≠ 0 → valE hϖ a ≤ valE hϖ b →
-          valE hϖ a ≤ valE hϖ (a + b) := by
+      have key
+          : ∀ {a b : FractionRing V},
+            a ≠ 0 → b ≠ 0 → a + b ≠ 0 → valE hϖ a ≤ valE hϖ b → valE hϖ a ≤ valE hϖ (a + b) := by
         intro a b ha hb hab hle
         have hva := hasVal_valE hϖ ha
         have hvb := hasVal_valE hϖ hb
@@ -67,7 +67,8 @@ def vK (hϖ : Irreducible ϖ) : AddValuation (FractionRing V) (WithTop ℚ) :=
         obtain ⟨w, hw⟩ := hvb
         obtain ⟨d, hd⟩ : ∃ d : ℕ, nb = na + d := ⟨(nb - na).toNat, by omega⟩
         set r : V := (u : V) + ϖ ^ d * (w : V)
-        have hab' : a + b = algebraMap V (FractionRing V) ϖ ^ na * algebraMap V (FractionRing V) r := by
+        have hab'
+            : a + b = algebraMap V (FractionRing V) ϖ ^ na * algebraMap V (FractionRing V) r := by
           rw [hu, hw, hd, zpow_add₀ hπ, zpow_natCast]
           simp only [r, map_add (f := _), map_mul, map_pow]
           ring
@@ -94,7 +95,8 @@ def vK (hϖ : Irreducible ϖ) : AddValuation (FractionRing V) (WithTop ℚ) :=
       · simp [hy]
       have hxy : x * y ≠ 0 := mul_ne_zero hx hy
       simp only [hx, hy, hxy, if_false]
-      rw [hasVal_unique hϖ (hasVal_valE hϖ hxy) (hasVal_mul (hasVal_valE hϖ hx) (hasVal_valE hϖ hy) hϖ)]
+      rw [hasVal_unique hϖ (hasVal_valE hϖ hxy)
+        (hasVal_mul (hasVal_valE hϖ hx) (hasVal_valE hϖ hy) hϖ)]
       push_cast
       rfl)
 

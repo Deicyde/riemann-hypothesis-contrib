@@ -28,15 +28,10 @@ def ufGL [StarRing E] : UF E n →* GL (Fin n) E := (toGLm E n).toMonoidHom.comp
 end GLmat
 
 structure CoefPk (X : Fields) (n : ℕ) (D : Type) where
-
   lam : X.Tau → DomWeight n
-
   rho : UF X.E n →* Module.End X.K (VV X.K lam)
-
   pair : VV X.K lam →ₗ⋆[X.K] VV X.K lam →ₗ[X.K] X.K
-
   Nab : D → Submodule (𝓞 X.K) (VV X.K lam)
-
   Del : D → Submodule (𝓞 X.K) (VV X.K lam)
 
 namespace CoefPk
@@ -60,14 +55,16 @@ section Pk
 
 variable (X : Fields) {n : ℕ}
 
-def roundPk (lam : X.Tau → DomWeight n) {D : Type} (L : D → Submodule (𝓞 X.E) (Sp X.E n)) : CoefPk X n D where
+def roundPk (lam : X.Tau → DomWeight n) {D : Type} (L : D → Submodule (𝓞 X.E) (Sp X.E n))
+    : CoefPk X n D where
   lam := lam
   rho := (rhoVr X.emb lam).comp (ufGL X.E n)
   pair := pairVr X.emb lam 1
   Nab d := nabAtr X.emb lam (L d)
   Del d := delAtr X.emb lam (L d)
 
-def squarePk (lam : X.Tau → DomWeight n) {D : Type} (L : D → Submodule (𝓞 X.E) (Sp X.E n)) : CoefPk X n D where
+def squarePk (lam : X.Tau → DomWeight n) {D : Type} (L : D → Submodule (𝓞 X.E) (Sp X.E n))
+    : CoefPk X n D where
   lam := lam
   rho := (rhoV X.emb lam).comp (ufGL X.E n)
   pair := pairV X.emb lam 1
@@ -78,8 +75,9 @@ end Pk
 
 section DecoKer
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
-  {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
 
 def Deco.LshKer (d : Deco E n ST SG) (P : ST) : Submodule (𝓞 E) (Sp E n) :=
   Submodule.span (𝓞 E) {x | x ∈ d.Lsh ∧ d.f P x = 0}
@@ -90,20 +88,24 @@ section Vals
 
 variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R)
 
-def colVal (u : Pr.Word) (j : ℕ) (ST SG : Finset (HeightOneSpectrum (𝓞 X.E))) :
-    CoefPk X (R.N j) (DecoSet (E := X.E) (n := R.N j) (ST := ST) (SG := SG)) :=
+def colVal (u : Pr.Word) (j : ℕ) (ST SG : Finset (HeightOneSpectrum (𝓞 X.E)))
+    : CoefPk X (R.N j) (DecoSet (E := X.E) (n := R.N j) (ST := ST) (SG := SG)) :=
   roundPk X (W.lamTrue u j) fun d => d.1.Lsh
 
-def rowVal (SG : Finset (HeightOneSpectrum (𝓞 X.E))) :
-    CoefPk X (R.N R.m - 1) (DecoSet (E := X.E) (n := R.N R.m - 1) (ST := ∅) (SG := SG)) :=
+def rowVal (SG : Finset (HeightOneSpectrum (𝓞 X.E)))
+    : CoefPk X (R.N R.m - 1) (DecoSet (E := X.E) (n := R.N R.m - 1) (ST := ∅) (SG := SG)) :=
   squarePk X W.sgTrue fun d => d.1.N
 
-def mtVal (j : ℕ) (SG : Finset (HeightOneSpectrum (𝓞 X.E))) :
-    CoefPk X R.nV (DecoSet (E := X.E) (n := R.nV) (ST := ∅) (SG := SG)) :=
+def mtVal (j : ℕ) (SG : Finset (HeightOneSpectrum (𝓞 X.E)))
+    : CoefPk X R.nV (DecoSet (E := X.E) (n := R.nV) (ST := ∅) (SG := SG)) :=
   roundPk X (W.lamV j) fun d => d.1.N
 
-def BvLat (u : Pr.Word) (j : ℕ) {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
-    (P : ST) (d : DecoSet (E := X.E) (n := R.N j) (ST := ST) (SG := SG)) : Submodule (𝓞 X.K) (VV X.K (W.lamTrue u j)) :=
+def BvLat
+    (u : Pr.Word)
+    (j : ℕ)
+    {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
+    (P : ST) (d : DecoSet (E := X.E) (n := R.N j) (ST := ST) (SG := SG))
+    : Submodule (𝓞 X.K) (VV X.K (W.lamTrue u j)) :=
   delAtr X.emb (W.lamTrue u j) (d.1.LshKer P)
 
 end Vals

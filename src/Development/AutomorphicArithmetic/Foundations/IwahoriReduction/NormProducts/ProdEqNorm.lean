@@ -15,8 +15,8 @@ open scoped Matrix MatrixGroups
 set_option maxHeartbeats 200000
 set_option synthInstance.maxHeartbeats 40000
 
-private theorem val_one_iff {K : Type} [Field K] (A : ValuationSubring K) (x : K) :
-    A.valuation x = 1 ↔ x ≠ 0 ∧ x ∈ A ∧ x⁻¹ ∈ A := by
+private theorem val_one_iff {K : Type} [Field K] (A : ValuationSubring K) (x : K)
+    : A.valuation x = 1 ↔ x ≠ 0 ∧ x ∈ A ∧ x⁻¹ ∈ A := by
   constructor
   · intro h
     refine ⟨?_, ?_, ?_⟩
@@ -30,13 +30,13 @@ private theorem val_one_iff {K : Type} [Field K] (A : ValuationSubring K) (x : K
     have h3 : A.valuation x ≠ 0 := by simpa using h0
     exact le_antisymm h1 ((inv_le_one₀ (zero_lt_iff.2 h3)).1 h2)
 
-private theorem val_comap {K : Type} [Field K] (F : Subfield K) (W : ValuationSubring K) (x : F) :
-    (W.comap F.subtype).valuation x = 1 ↔ W.valuation (x : K) = 1 := by
+private theorem val_comap {K : Type} [Field K] (F : Subfield K) (W : ValuationSubring K) (x : F)
+    : (W.comap F.subtype).valuation x = 1 ↔ W.valuation (x : K) = 1 := by
   rw [val_one_iff, val_one_iff]
   simp [ValuationSubring.mem_comap]
 
-private theorem exists_ext {K : Type} [Field K] (F : Subfield K) (B : ValuationSubring F) :
-    ∃ W : ValuationSubring K, W.comap F.subtype = B := by
+private theorem exists_ext {K : Type} [Field K] (F : Subfield K) (B : ValuationSubring F)
+    : ∃ W : ValuationSubring K, W.comap F.subtype = B := by
   obtain ⟨W, hW, hloc⟩ := IsLocalRing.exists_factor_valuationRing (F.subtype.comp B.subtype)
   refine ⟨W, ?_⟩
   ext x
@@ -61,8 +61,8 @@ private theorem exists_ext {K : Type} [Field K] (F : Subfield K) (B : ValuationS
 section
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ}
 
-private theorem over_iff (X : Tower Ω ε) (H : Subgroup SL(2, ℤ)) (W : ValuationSubring X.K) :
-    X.OverY W ↔ ∀ p : Polynomial Ω, jPoly X H p ∈ W.comap (lev X H).subtype := by
+private theorem over_iff (X : Tower Ω ε) (H : Subgroup SL(2, ℤ)) (W : ValuationSubring X.K)
+    : X.OverY W ↔ ∀ p : Polynomial Ω, jPoly X H p ∈ W.comap (lev X H).subtype := by
   constructor
   · rintro ⟨h1, h2⟩ p
     rw [ValuationSubring.mem_comap]
@@ -79,9 +79,12 @@ private theorem over_iff (X : Tower Ω ε) (H : Subgroup SL(2, ℤ)) (W : Valuat
       exact h p
     exact ⟨fun c => by simpa using h' (C c), by simpa using h' Polynomial.X⟩
 
-private theorem lun_iff (X : Tower Ω ε) (H : Subgroup SL(2, ℤ)) (m : ℕ) (f : lev X H) :
-    (∀ W : ValuationSubring X.K, X.OverY W → ∃ c ∈ lev X H, c ≠ 0 ∧ W.valuation ((f : X.K) / c ^ m) = 1) ↔
-      ∀ B : ValuationSubring (lev X H), (∀ p : Polynomial Ω, jPoly X H p ∈ B) → ∃ c : lev X H, c ≠ 0 ∧ B.valuation (f / c ^ m) = 1 := by
+private theorem lun_iff (X : Tower Ω ε) (H : Subgroup SL(2, ℤ)) (m : ℕ) (f : lev X H)
+    : (∀ W : ValuationSubring X.K,
+        X.OverY W → ∃ c ∈ lev X H, c ≠ 0 ∧ W.valuation ((f : X.K) / c ^ m) = 1)
+      ↔ ∀ B : ValuationSubring (lev X H),
+        (∀ p : Polynomial Ω, jPoly X H p ∈ B)
+          → ∃ c : lev X H, c ≠ 0 ∧ B.valuation (f / c ^ m) = 1 := by
   constructor
   · intro h B hB
     obtain ⟨W, rfl⟩ := exists_ext (lev X H) B
@@ -94,27 +97,33 @@ private theorem lun_iff (X : Tower Ω ε) (H : Subgroup SL(2, ℤ)) (m : ℕ) (f
     rw [val_comap] at hv
     exact ⟨c, c.2, fun e => hc0 (Subtype.ext e), by simpa using hv⟩
 
-private theorem lev_anti (X : Tower Ω ε) {H H' : Subgroup SL(2, ℤ)} (h : H' ≤ H) : lev X H ≤ lev X H' := fun f hf =>
+private theorem lev_anti (X : Tower Ω ε) {H H' : Subgroup SL(2, ℤ)} (h : H' ≤ H)
+    : lev X H ≤ lev X H' := fun f hf =>
   (mem_lev_iff X H' f).2 fun γ hγ => (mem_lev_iff X H f).1 hf γ (h hγ)
 
 end
 
-private theorem fd_tower (k K K' : Type) [Field k] [Field K] [Field K'] [Algebra (Polynomial k) K] [Algebra (RatFunc k) K]
-    [IsScalarTower (Polynomial k) (RatFunc k) K] [Algebra (Polynomial k) K'] [Algebra (RatFunc k) K']
-    [IsScalarTower (Polynomial k) (RatFunc k) K'] [Algebra K K'] [IsScalarTower (Polynomial k) K K']
-    [FiniteDimensional (RatFunc k) K'] : FiniteDimensional K K' := by
+private theorem fd_tower
+    (k K K' : Type) [Field k] [Field K] [Field K'] [Algebra (Polynomial k) K]
+    [Algebra (RatFunc k) K] [IsScalarTower (Polynomial k) (RatFunc k) K] [Algebra (Polynomial k) K']
+    [Algebra (RatFunc k) K'] [IsScalarTower (Polynomial k) (RatFunc k) K'] [Algebra K K']
+    [IsScalarTower (Polynomial k) K K'] [FiniteDimensional (RatFunc k) K']
+    : FiniteDimensional K K' := by
   have e : algebraMap (RatFunc k) K' = (algebraMap K K').comp (algebraMap (RatFunc k) K) := by
     refine IsLocalization.ringHom_ext (nonZeroDivisors (Polynomial k)) (RingHom.ext fun p => ?_)
     simp only [RingHom.comp_apply]
-    rw [← IsScalarTower.algebraMap_apply (Polynomial k) (RatFunc k) K', ← IsScalarTower.algebraMap_apply (Polynomial k) (RatFunc k) K,
+    rw [← IsScalarTower.algebraMap_apply (Polynomial k) (RatFunc k) K',
+      ← IsScalarTower.algebraMap_apply (Polynomial k) (RatFunc k) K,
       ← IsScalarTower.algebraMap_apply (Polynomial k) K K']
   haveI : IsScalarTower (RatFunc k) K K' := IsScalarTower.of_algebraMap_eq' e
   exact Module.Finite.of_restrictScalars_finite (RatFunc k) _ _
 
 section
-variable {L Γ : Type} [Field L] [Group Γ] (a : Γ → L ≃+* L) (a1 : ∀ f, a 1 f = f)
-  (am : ∀ x y f, a (x * y) f = a y (a x f)) {H H' : Subgroup Γ}
-  (hn : ∀ γ ∈ H, ∀ δ ∈ H', γ * δ * γ⁻¹ ∈ H') {F F' : Subfield L}
+variable
+  {L Γ : Type} [Field L] [Group Γ]
+  (a : Γ → L ≃+* L) (a1 : ∀ f, a 1 f = f) (am : ∀ x y f, a (x * y) f = a y (a x f))
+  {H H' : Subgroup Γ} (hn : ∀ γ ∈ H, ∀ δ ∈ H', γ * δ * γ⁻¹ ∈ H')
+  {F F' : Subfield L}
   (hF : ∀ f, f ∈ F ↔ ∀ γ ∈ H, a γ f = f) (hF' : ∀ f, f ∈ F' ↔ ∀ γ ∈ H', a γ f = f)
 
 include a1 am hn hF hF' in
@@ -125,15 +134,21 @@ private theorem a_mem {γ : Γ} (hγ : γ ∈ H) {f : L} (hf : f ∈ F') : a γ 
   rw [← am, e, am, hf _ (hn γ hγ δ hδ)]
 
 include a1 am hn hF hF' in
-private theorem exists_aut' [Algebra F F'] (ha : ∀ x : F, ((algebraMap F F' x : F') : L) = x) {γ : Γ} (hγ : γ ∈ H) :
-    ∃ τ : F' ≃ₐ[F] F', ∀ x : F', ((τ x : F') : L) = a γ x := by
-  refine ⟨{ toFun := fun x => ⟨a γ x, a_mem a a1 am hn hF hF' hγ x.2⟩
-            invFun := fun x => ⟨a γ⁻¹ x, a_mem a a1 am hn hF hF' (H.inv_mem hγ) x.2⟩
-            left_inv := fun x => Subtype.ext ?_
-            right_inv := fun x => Subtype.ext ?_
-            map_mul' := fun x y => Subtype.ext ?_
-            map_add' := fun x y => Subtype.ext ?_
-            commutes' := fun x => Subtype.ext ?_ }, fun x => rfl⟩
+private theorem exists_aut'
+    [Algebra F F'] (ha : ∀ x : F, ((algebraMap F F' x : F') : L) = x) {γ : Γ} (hγ : γ ∈ H)
+    : ∃ τ : F' ≃ₐ[F] F', ∀ x : F', ((τ x : F') : L) = a γ x := by
+  refine ⟨
+    {
+      toFun := fun x => ⟨a γ x, a_mem a a1 am hn hF hF' hγ x.2⟩
+      invFun := fun x => ⟨a γ⁻¹ x, a_mem a a1 am hn hF hF' (H.inv_mem hγ) x.2⟩
+      left_inv := fun x => Subtype.ext ?_
+      right_inv := fun x => Subtype.ext ?_
+      map_mul' := fun x y => Subtype.ext ?_
+      map_add' := fun x y => Subtype.ext ?_
+      commutes' := fun x => Subtype.ext ?_
+    },
+    fun x => rfl
+  ⟩
   · show a γ⁻¹ (a γ x) = x
     rw [← am, mul_inv_cancel, a1]
   · show a γ (a γ⁻¹ x) = x
@@ -145,29 +160,32 @@ private theorem exists_aut' [Algebra F F'] (ha : ∀ x : F, ((algebraMap F F' x 
     exact (hF _).1 x.2 γ hγ
 
 include a1 am hn hF hF' in
-private theorem gal_surj' [Algebra F F'] (ha : ∀ x : F, ((algebraMap F F' x : F') : L) = x) [FiniteDimensional F F'] :
-    IsGalois F F' ∧ ∀ τ : F' ≃ₐ[F] F', ∃ γ ∈ H, ∀ x : F', ((τ x : F') : L) = a γ x := by
-  let S : Subgroup (F' ≃ₐ[F] F') :=
-    { carrier := {τ | ∃ γ ∈ H, ∀ x : F', ((τ x : F') : L) = a γ x}
-      one_mem' := ⟨1, H.one_mem, fun x => (a1 _).symm⟩
-      mul_mem' := by
-        rintro σ τ ⟨p, hpH, hσ⟩ ⟨q, hqH, hτ⟩
-        refine ⟨q * p, H.mul_mem hqH hpH, fun x => ?_⟩
-        rw [am, ← hτ, ← hσ]
-        rfl
-      inv_mem' := by
-        rintro σ ⟨p, hpH, hσ⟩
-        refine ⟨p⁻¹, H.inv_mem hpH, fun x => ?_⟩
-        have e : (x : L) = a p (σ⁻¹ x : F') := by
-          rw [← hσ]
-          exact congrArg Subtype.val (σ.apply_symm_apply x).symm
-        rw [e, ← am, mul_inv_cancel, a1] }
+private theorem gal_surj'
+    [Algebra F F'] (ha : ∀ x : F, ((algebraMap F F' x : F') : L) = x) [FiniteDimensional F F']
+    : IsGalois F F' ∧ ∀ τ : F' ≃ₐ[F] F', ∃ γ ∈ H, ∀ x : F', ((τ x : F') : L) = a γ x := by
+  let S : Subgroup (F' ≃ₐ[F] F') := {
+    carrier := {τ | ∃ γ ∈ H, ∀ x : F', ((τ x : F') : L) = a γ x}
+    one_mem' := ⟨1, H.one_mem, fun x => (a1 _).symm⟩
+    mul_mem' := by
+      rintro σ τ ⟨p, hpH, hσ⟩ ⟨q, hqH, hτ⟩
+      refine ⟨q * p, H.mul_mem hqH hpH, fun x => ?_⟩
+      rw [am, ← hτ, ← hσ]
+      rfl
+    inv_mem' := by
+      rintro σ ⟨p, hpH, hσ⟩
+      refine ⟨p⁻¹, H.inv_mem hpH, fun x => ?_⟩
+      have e : (x : L) = a p (σ⁻¹ x : F') := by
+        rw [← hσ]
+        exact congrArg Subtype.val (σ.apply_symm_apply x).symm
+      rw [e, ← am, mul_inv_cancel, a1]
+  }
   have hS : IntermediateField.fixedField S = ⊥ := by
     refine le_bot_iff.1 fun x hx => ?_
     rw [IntermediateField.mem_fixedField_iff] at hx
-    have hxH : (x : L) ∈ F := (hF _).2 fun γ hγ => by
-      obtain ⟨τ, hτ⟩ := exists_aut' a a1 am hn hF hF' ha hγ
-      rw [← hτ, hx τ ⟨γ, hγ, hτ⟩]
+    have hxH : (x : L) ∈ F :=
+      (hF _).2 fun γ hγ => by
+        obtain ⟨τ, hτ⟩ := exists_aut' a a1 am hn hF hF' ha hγ
+        rw [← hτ, hx τ ⟨γ, hγ, hτ⟩]
     exact IntermediateField.mem_bot.2 ⟨⟨x, hxH⟩, Subtype.ext (ha _)⟩
   have hT : S = ⊤ := by
     rw [← IntermediateField.fixingSubgroup_fixedField S, hS, IntermediateField.fixingSubgroup_bot]
@@ -176,10 +194,15 @@ private theorem gal_surj' [Algebra F F'] (ha : ∀ x : F, ((algebraMap F F' x : 
   exact this
 
 include a1 am hn hF hF' in
-private theorem prod_eq_norm [Algebra F F'] (ha : ∀ x : F, ((algebraMap F F' x : F') : L) = x) [FiniteDimensional F F']
-    [IsGalois F F'] (faith : ∀ γ ∈ H, (∀ f ∈ F', a γ f = f) → γ ∈ H') {ι : Type} [Fintype ι] (δ : ι → Γ)
-    (hδ1 : ∀ i, δ i ∈ H) (hδ2 : ∀ x ∈ H, ∃! i, x * (δ i)⁻¹ ∈ H') (f' : F') :
-    ∏ i, a (δ i) (f' : L) = ((Algebra.norm F f' : F) : L) := by
+private theorem prod_eq_norm
+    [Algebra F F']
+    (ha : ∀ x : F, ((algebraMap F F' x : F') : L) = x)
+    [FiniteDimensional F F'] [IsGalois F F']
+    (faith : ∀ γ ∈ H, (∀ f ∈ F', a γ f = f) → γ ∈ H')
+    {ι : Type} [Fintype ι]
+    (δ : ι → Γ) (hδ1 : ∀ i, δ i ∈ H) (hδ2 : ∀ x ∈ H, ∃! i, x * (δ i)⁻¹ ∈ H')
+    (f' : F')
+    : ∏ i, a (δ i) (f' : L) = ((Algebra.norm F f' : F) : L) := by
   classical
   obtain ⟨-, hsurj⟩ := gal_surj' a a1 am hn hF hF' ha
   choose σ hσ using fun i => exists_aut' a a1 am hn hF hF' ha (hδ1 i)
@@ -199,30 +222,37 @@ private theorem prod_eq_norm [Algebra F F'] (ha : ∀ x : F, ((algebraMap F F' x
   have h1 := Algebra.norm_eq_prod_automorphisms F f'
   rw [← hbij.prod_comp (fun τ => τ f')] at h1
   have h2 := congrArg (fun y : F' => (y : L)) h1
-  change F'.subtype (algebraMap F F' (Algebra.norm F f')) =
-    F'.subtype (∏ i, σ i f') at h2
+  change F'.subtype (algebraMap F F' (Algebra.norm F f')) = F'.subtype (∏ i, σ i f') at h2
   rw [map_prod] at h2
-  change ((algebraMap F F' (Algebra.norm F f') : F') : L) =
-    ∏ i, ((σ i f' : F') : L) at h2
+  change ((algebraMap F F' (Algebra.norm F f') : F') : L) = ∏ i, ((σ i f' : F') : L) at h2
   simpa only [ha, hσ] using h2.symm
 end
 
-private theorem abs_step {k L Γ : Type} [Field k] [IsAlgClosed k] [CharZero k] [Field L] [Group Γ] (a : Γ → L ≃+* L)
-    (a1 : ∀ f, a 1 f = f) (am : ∀ x y f, a (x * y) f = a y (a x f)) {H H' : Subgroup Γ}
-    (hn : ∀ γ ∈ H, ∀ δ ∈ H', γ * δ * γ⁻¹ ∈ H') {F F' : Subfield L} (hle : F ≤ F')
-    (hF : ∀ f, f ∈ F ↔ ∀ γ ∈ H, a γ f = f) (hF' : ∀ f, f ∈ F' ↔ ∀ γ ∈ H', a γ f = f)
+private theorem abs_step
+    {k L Γ : Type} [Field k] [IsAlgClosed k] [CharZero k] [Field L] [Group Γ]
+    (a : Γ → L ≃+* L) (a1 : ∀ f, a 1 f = f) (am : ∀ x y f, a (x * y) f = a y (a x f))
+    {H H' : Subgroup Γ} (hn : ∀ γ ∈ H, ∀ δ ∈ H', γ * δ * γ⁻¹ ∈ H')
+    {F F' : Subfield L}
+    (hle : F ≤ F') (hF : ∀ f, f ∈ F ↔ ∀ γ ∈ H, a γ f = f) (hF' : ∀ f, f ∈ F' ↔ ∀ γ ∈ H', a γ f = f)
     [Algebra (Polynomial k) F] [Algebra (RatFunc k) F] [IsScalarTower (Polynomial k) (RatFunc k) F]
     [FiniteDimensional (RatFunc k) F] [Algebra (Polynomial k) F'] [Algebra (RatFunc k) F']
     [IsScalarTower (Polynomial k) (RatFunc k) F'] [FiniteDimensional (RatFunc k) F']
-    (hc : ∀ p : Polynomial k, ((algebraMap (Polynomial k) F p : F) : L) = (algebraMap (Polynomial k) F' p : F'))
-    (faith : ∀ γ ∈ H, (∀ f ∈ F', a γ f = f) → γ ∈ H') {ι : Type} [Fintype ι] (δ : ι → Γ)
-    (hδ1 : ∀ i, δ i ∈ H) (hδ2 : ∀ x ∈ H, ∃! i, x * (δ i)⁻¹ ∈ H') (m m' : ℕ) (hm : 0 < m) (hm' : 0 < m') (f : F)
-    (hf0 : f ≠ 0)
-    (hf : ∀ B : ValuationSubring F, (∀ p : Polynomial k, algebraMap (Polynomial k) F p ∈ B) →
-      ∃ c : F, c ≠ 0 ∧ B.valuation (f / c ^ m) = 1) :
-    ∃ f' : F', f' ≠ 0 ∧ (∀ B : ValuationSubring F', (∀ p : Polynomial k, algebraMap (Polynomial k) F' p ∈ B) →
-      ∃ c : F', c ≠ 0 ∧ B.valuation (f' / c ^ (m * m')) = 1) ∧
-      ∃ h : L, h ≠ 0 ∧ ∏ i, a (δ i) (f' : L) = (f : L) * h ^ m := by
+    (hc : ∀ p : Polynomial k,
+      ((algebraMap (Polynomial k) F p : F) : L) = (algebraMap (Polynomial k) F' p : F'))
+    (faith : ∀ γ ∈ H, (∀ f ∈ F', a γ f = f) → γ ∈ H')
+    {ι : Type} [Fintype ι]
+    (δ : ι → Γ) (hδ1 : ∀ i, δ i ∈ H) (hδ2 : ∀ x ∈ H, ∃! i, x * (δ i)⁻¹ ∈ H')
+    (m m' : ℕ) (hm : 0 < m) (hm' : 0 < m')
+    (f : F) (hf0 : f ≠ 0)
+    (hf : ∀ B : ValuationSubring F,
+      (∀ p : Polynomial k, algebraMap (Polynomial k) F p ∈ B)
+        → ∃ c : F, c ≠ 0 ∧ B.valuation (f / c ^ m) = 1)
+    : ∃ f' : F',
+      f' ≠ 0
+        ∧ (∀ B : ValuationSubring F',
+          (∀ p : Polynomial k, algebraMap (Polynomial k) F' p ∈ B)
+            → ∃ c : F', c ≠ 0 ∧ B.valuation (f' / c ^ (m * m')) = 1)
+        ∧ ∃ h : L, h ≠ 0 ∧ ∏ i, a (δ i) (f' : L) = (f : L) * h ^ m := by
   letI : Algebra F F' := (Subfield.inclusion hle).toAlgebra
   have ha : ∀ x : F, ((algebraMap F F' x : F') : L) = x := fun _ => rfl
   haveI : IsScalarTower (Polynomial k) F F' := IsScalarTower.of_algebraMap_eq fun p => Subtype.ext <| by
@@ -231,30 +261,45 @@ private theorem abs_step {k L Γ : Type} [Field k] [IsAlgClosed k] [CharZero k] 
   haveI : FiniteDimensional F F' := fd_tower k F F'
   haveI := (gal_surj' a a1 am hn hF hF' ha).1
   obtain ⟨h, hh0, hh⟩ := UpperTheory.Kd.K4.cdAbs k F m m' f hm hm' hf0 hf
-  obtain ⟨f', hf'0, hN, hf'⟩ := UpperTheory.Kd.K4.nsAbs k F F' (m * m') (f / h ^ m) (Nat.mul_pos hm hm')
-    (div_ne_zero hf0 (pow_ne_zero _ hh0)) hh
+  obtain ⟨f', hf'0, hN, hf'⟩ :=
+    UpperTheory.Kd.K4.nsAbs k F F' (m * m') (f / h ^ m) (Nat.mul_pos hm hm')
+      (div_ne_zero hf0 (pow_ne_zero _ hh0)) hh
   refine ⟨f', hf'0, hf', (h : L)⁻¹, inv_ne_zero fun e => hh0 (Subtype.ext e), ?_⟩
   rw [prod_eq_norm a a1 am hn hF hF' ha faith δ hδ1 hδ2 f', hN, inv_pow, ← div_eq_mul_inv]
   simp
 
-theorem UpperTheory.Kd.K4.step :
-    ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε), ∀ (H H' : Subgroup SL(2, ℤ)) (M m m' : ℕ), 0 < M → 0 < m → 0 < m' → CongruenceSubgroup.Gamma M ≤ H' → H' ≤ H → -1 ∉ H →
-      (∀ γ ∈ H, ∀ δ ∈ H', γ * δ * γ⁻¹ ∈ H') → ∀ (ι : Type) [Fintype ι] (δ : ι → SL(2, ℤ)), IsTr H' H δ → ∀ f : X.K, LUnH X H m f →
-      ∃ f' : X.K, LUnH X H' (m * m') f' ∧ ∃ h : X.K, h ≠ 0 ∧ ∏ i, X.sl (ofSL (δ i)) f' = f * h ^ m := by
+theorem UpperTheory.Kd.K4.step
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
+      ∀ (H H' : Subgroup SL(2, ℤ)) (M m m' : ℕ),
+        0 < M → 0 < m → 0 < m' → CongruenceSubgroup.Gamma M ≤ H' → H' ≤ H → -1 ∉ H
+          → (∀ γ ∈ H, ∀ δ ∈ H', γ * δ * γ⁻¹ ∈ H')
+          → ∀ (ι : Type) [Fintype ι] (δ : ι → SL(2, ℤ)),
+            IsTr H' H δ
+              → ∀ f : X.K,
+                LUnH X H m f
+                  → ∃ f' : X.K,
+                    LUnH X H' (m * m') f'
+                      ∧ ∃ h : X.K, h ≠ 0 ∧ ∏ i, X.sl (ofSL (δ i)) f' = f * h ^ m := by
   intro Ω _ _ _ ε X H H' M m m' hM hm hm' hΓ hle hneg hn ι _ δ hδ f hf
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := algebraRat.charZero Ω
   obtain ⟨hf0, hfH, hfW⟩ := hf
   have hF0 : (⟨f, hfH⟩ : lev X H) ≠ 0 := fun e => hf0 (congrArg Subtype.val e)
   have hfaith : ∀ γ ∈ H, (∀ g ∈ lev X H', X.sl (ofSL γ) g = g) → γ ∈ H' := fun γ hγ hfix =>
-    (UpperTheory.Kd.K4.faith ε X H' M hM hΓ γ hfix).resolve_right fun h1 => hneg <| by
-      have h2 := H.mul_mem (hle h1) (H.inv_mem hγ)
-      rwa [neg_mul, mul_inv_cancel] at h2
+    (UpperTheory.Kd.K4.faith ε X H' M hM hΓ γ hfix).resolve_right fun h1 =>
+      hneg <| by
+        have h2 := H.mul_mem (hle h1) (H.inv_mem hγ)
+        rwa [neg_mul, mul_inv_cancel] at h2
   obtain ⟨f', hf'0, hf', h, hh0, hprod⟩ :=
-    @abs_step Ω X.K SL(2, ℤ) _ _ _ _ _ (fun γ => (X.sl (ofSL γ)).toRingEquiv)
-      (fun g => by simp [X.sl_one]) (fun x y g => by simp [X.sl_mul]) H H' hn (lev X H) (lev X H') (lev_anti X hle)
-      (mem_lev_iff X H) (mem_lev_iff X H') (algPoly X H) (algRat X H) (isScalarTower_poly_rat X H)
-      (GlobalTheory.T.finiteDimensional_lev_of_gamma_le Ω ε X H M hM (hΓ.trans hle)) (algPoly X H') (algRat X H') (isScalarTower_poly_rat X H')
-      (GlobalTheory.T.finiteDimensional_lev_of_gamma_le Ω ε X H' M hM hΓ) (fun p => (coe_jPoly X H p).trans (coe_jPoly X H' p).symm) hfaith ι _ δ hδ.1 hδ.2
-      m m' hm hm' ⟨f, hfH⟩ hF0 ((lun_iff X H m ⟨f, hfH⟩).1 hfW)
+    @abs_step Ω X.K SL(2, ℤ) _ _ _ _ _
+      (fun γ => (X.sl (ofSL γ)).toRingEquiv)
+      (fun g => by simp [X.sl_one])
+      (fun x y g => by simp [X.sl_mul])
+      H H' hn (lev X H) (lev X H') (lev_anti X hle) (mem_lev_iff X H) (mem_lev_iff X H')
+      (algPoly X H) (algRat X H) (isScalarTower_poly_rat X H)
+      (GlobalTheory.T.finiteDimensional_lev_of_gamma_le Ω ε X H M hM (hΓ.trans hle)) (algPoly X H')
+      (algRat X H') (isScalarTower_poly_rat X H')
+      (GlobalTheory.T.finiteDimensional_lev_of_gamma_le Ω ε X H' M hM hΓ)
+      (fun p => (coe_jPoly X H p).trans (coe_jPoly X H' p).symm)
+      hfaith ι _ δ hδ.1 hδ.2 m m' hm hm' ⟨f, hfH⟩ hF0 ((lun_iff X H m ⟨f, hfH⟩).1 hfW)
   exact ⟨f', ⟨fun e => hf'0 (Subtype.ext e), f'.2, (lun_iff X H' (m * m') f').2 hf'⟩, h, hh0, hprod⟩

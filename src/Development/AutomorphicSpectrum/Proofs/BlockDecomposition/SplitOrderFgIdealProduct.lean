@@ -6,14 +6,16 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.NonemptyA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR GlobalTheory.CompanionTheory.KFin
+open NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
+  GlobalTheory.CompanionTheory.KFin
 open Formalism.UG (cT)
 open scoped TensorProduct NNReal
 
 namespace GlobalTheory.CompanionTheory.KFin
 
-theorem exists_larger_of_valuationSubring {k : Type} [Field k] (O : ValuationSubring k) (a b : k) :
-    ∃ c : k, (c = a ∨ c = b) ∧ (∃ u ∈ O, a = c * u) ∧ (∃ u ∈ O, b = c * u) := by
+theorem exists_larger_of_valuationSubring {k : Type} [Field k] (O : ValuationSubring k) (a b : k)
+    : ∃ c : k, (c = a ∨ c = b) ∧ (∃ u ∈ O, a = c * u) ∧ (∃ u ∈ O, b = c * u) := by
   by_cases ha : a = 0
   · exact ⟨b, Or.inr rfl, ⟨0, O.zero_mem, by simp [ha]⟩, ⟨1, O.one_mem, by simp⟩⟩
   by_cases hb : b = 0
@@ -23,10 +25,11 @@ theorem exists_larger_of_valuationSubring {k : Type} [Field k] (O : ValuationSub
   · refine ⟨a, Or.inl rfl, ⟨1, O.one_mem, by simp⟩, ⟨(a / b)⁻¹, h, ?_⟩⟩
     field_simp
 
-theorem fg_eq_prod_principal {k R : Type} [Field k] [CommRing R] (O : ValuationSubring k)
-    (φ : R ≃+* k × k) (𝔬 : Subring R)
-    (h𝔬 : ∀ r, r ∈ 𝔬 ↔ (φ r).1 ∈ O ∧ (φ r).2 ∈ O) (I : Submodule 𝔬 R) (hI : I.FG) :
-    ∃ α β : k, ∀ r, r ∈ I ↔ (∃ x ∈ O, (φ r).1 = α * x) ∧ (∃ y ∈ O, (φ r).2 = β * y) := by
+theorem fg_eq_prod_principal
+    {k R : Type} [Field k] [CommRing R]
+    (O : ValuationSubring k) (φ : R ≃+* k × k) (𝔬 : Subring R)
+    (h𝔬 : ∀ r, r ∈ 𝔬 ↔ (φ r).1 ∈ O ∧ (φ r).2 ∈ O) (I : Submodule 𝔬 R) (hI : I.FG)
+    : ∃ α β : k, ∀ r, r ∈ I ↔ (∃ x ∈ O, (φ r).1 = α * x) ∧ (∃ y ∈ O, (φ r).2 = β * y) := by
   induction I, hI using Submodule.fg_induction with
   | singleton r₀ =>
     refine ⟨(φ r₀).1, (φ r₀).2, fun r => ?_⟩
@@ -34,8 +37,7 @@ theorem fg_eq_prod_principal {k R : Type} [Field k] [CommRing R] (O : ValuationS
     constructor
     · rintro ⟨t, rfl⟩
       have ht := (h𝔬 t).1 t.2
-      have hs : φ (t • r₀) = φ (t : R) * φ r₀ := by
-        rw [Subring.smul_def, smul_eq_mul, map_mul]
+      have hs : φ (t • r₀) = φ (t : R) * φ r₀ := by rw [Subring.smul_def, smul_eq_mul, map_mul]
       refine ⟨⟨(φ (t : R)).1, ht.1, ?_⟩, ⟨(φ (t : R)).2, ht.2, ?_⟩⟩
       · rw [hs, Prod.fst_mul, mul_comm]
       · rw [hs, Prod.snd_mul, mul_comm]
@@ -60,8 +62,10 @@ theorem fg_eq_prod_principal {k R : Type} [Field k] [CommRing R] (O : ValuationS
       obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 hr
       obtain ⟨⟨x₁, hx₁, p₁⟩, ⟨y₁, hy₁, q₁⟩⟩ := (h₁ a).1 ha
       obtain ⟨⟨x₂, hx₂, p₂⟩, ⟨y₂, hy₂, q₂⟩⟩ := (h₂ b).1 hb
-      refine ⟨⟨u₁ * x₁ + u₂ * x₂, O.add_mem _ _ (O.mul_mem _ _ hu₁ hx₁) (O.mul_mem _ _ hu₂ hx₂), ?_⟩,
-        ⟨v₁ * y₁ + v₂ * y₂, O.add_mem _ _ (O.mul_mem _ _ hv₁ hy₁) (O.mul_mem _ _ hv₂ hy₂), ?_⟩⟩
+      refine ⟨
+        ⟨u₁ * x₁ + u₂ * x₂, O.add_mem _ _ (O.mul_mem _ _ hu₁ hx₁) (O.mul_mem _ _ hu₂ hx₂), ?_⟩,
+        ⟨v₁ * y₁ + v₂ * y₂, O.add_mem _ _ (O.mul_mem _ _ hv₁ hy₁) (O.mul_mem _ _ hv₂ hy₂), ?_⟩
+      ⟩
       · rw [map_add (f := _), Prod.fst_add, p₁, p₂, e₁, e₂]
         ring
       · rw [map_add (f := _), Prod.snd_add, q₁, q₂, f₁, f₂]

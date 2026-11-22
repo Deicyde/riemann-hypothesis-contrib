@@ -7,7 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp UpperTheory.V.Ws.Lk
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+  UpperTheory.V.Ws.Lk
 open scoped Pointwise
 
 namespace UpperTheory.V.Ws.Lk.BetaCyclotomicPlace
@@ -26,16 +29,20 @@ private noncomputable def vQ : HeightOneSpectrum (𝓞 ℚ) where
 
 variable {l} {Ω : Type} [Field Ω]
 
-private theorem isPlaceOver_vQ [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω)
-    (hA : A.valuation ((l : ℕ) : Ω) < 1) : IsPlaceOver (F := ℚ) A (vQ l) := by
+private theorem isPlaceOver_vQ
+    [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1)
+    : IsPlaceOver (F := ℚ) A (vQ l) := by
   intro x
-  obtain ⟨n, rfl⟩ : ∃ n : ℤ, x = (n : 𝓞 ℚ) :=
-    ⟨Rat.ringOfIntegersEquiv x, by rw [← map_intCast Rat.ringOfIntegersEquiv.symm, Int.cast_id, RingEquiv.symm_apply_apply]⟩
+  obtain ⟨n, rfl⟩ : ∃ n : ℤ, x = (n : 𝓞 ℚ) := ⟨
+    Rat.ringOfIntegersEquiv x,
+    by rw [← map_intCast Rat.ringOfIntegersEquiv.symm, Int.cast_id, RingEquiv.symm_apply_apply]
+  ⟩
   have hcast : algebraMap ℚ Ω (((n : 𝓞 ℚ)) : ℚ) = (n : Ω) := by simp
   rw [hcast]
   show _ ↔ (n : 𝓞 ℚ) ∈ Ideal.span {((l : ℕ) : 𝓞 ℚ)}
   rw [Ideal.mem_span_singleton]
-  have hle : ∀ m : ℤ, A.valuation (m : Ω) ≤ 1 := fun m => (A.valuation_le_one_iff _).2 (intCast_mem A m)
+  have hle : ∀ m : ℤ, A.valuation (m : Ω) ≤ 1 := fun m =>
+    (A.valuation_le_one_iff _).2 (intCast_mem A m)
   have hdvd : ((l : ℕ) : 𝓞 ℚ) ∣ (n : 𝓞 ℚ) ↔ (l : ℤ) ∣ n := by
     rw [show ((l : ℕ) : 𝓞 ℚ) = Rat.ringOfIntegersEquiv.symm (l : ℤ) by simp,
       show (n : 𝓞 ℚ) = Rat.ringOfIntegersEquiv.symm n by simp, map_dvd_iff]
@@ -50,26 +57,49 @@ private theorem isPlaceOver_vQ [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : Valua
       apply lt_of_le_of_lt (A.valuation.map_add _ _)
       apply max_lt
       · rw [map_mul]
-        calc A.valuation (a : Ω) * A.valuation ((l : ℕ) : Ω) ≤ 1 * A.valuation ((l : ℕ) : Ω) :=
-              mul_le_mul' (hle a) le_rfl
+        calc
+          A.valuation (a : Ω) * A.valuation ((l : ℕ) : Ω)
+            ≤ 1 * A.valuation ((l : ℕ) : Ω) := mul_le_mul' (hle a) le_rfl
           _ < 1 := by rw [one_mul]; exact hA
       · rw [map_mul]
-        calc A.valuation (b : Ω) * A.valuation (n : Ω) ≤ 1 * A.valuation (n : Ω) := mul_le_mul' (hle b) le_rfl
+        calc
+          A.valuation (b : Ω) * A.valuation (n : Ω)
+            ≤ 1 * A.valuation (n : Ω) := mul_le_mul' (hle b) le_rfl
           _ < 1 := by rw [one_mul]; exact hv
     rw [hab] at h1
     simp at h1
   · rintro ⟨y, rfl⟩
     push_cast
     rw [map_mul]
-    calc A.valuation ((l : ℕ) : Ω) * A.valuation (y : Ω) ≤ A.valuation ((l : ℕ) : Ω) * 1 :=
-          mul_le_mul' le_rfl (hle y)
+    calc
+      A.valuation ((l : ℕ) : Ω) * A.valuation (y : Ω)
+        ≤ A.valuation ((l : ℕ) : Ω) * 1 := mul_le_mul' le_rfl (hle y)
       _ < 1 := by rw [mul_one]; exact hA
 
 end UpperTheory.V.Ws.Lk.BetaCyclotomicPlace
 
 open UpperTheory.V.Ws.Lk.BetaCyclotomicPlace in
-theorem UpperTheory.V.Ws.Lk.betaCyc :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ Ω) [NumberField K], Module.finrank ℚ K = 2 → ∀ A₀ : ValuationSubring Ω, A₀.valuation (l : Ω) < 1 → ∀ β : G K Ω →* (PadicAlgCl l)ˣ, (∀ σ ∉ K.fixingSubgroup, ∀ s s' : G K Ω, resQ K s' = σ * resQ K s * σ⁻¹ → β s * β s' = 1) → ∀ U : Subgroup (G K Ω), IsOpen (U : Set (G K Ω)) → (∀ B : ValuationSubring Ω, (∀ x ∈ K, x ∈ B ↔ x ∈ A₀) → ∀ s ∈ U ⊓ Ine (F := K) B, (β s : PadicAlgCl l) ^ 2 = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ K Ω l s : ℤ_[l])) → ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∃ (b : ℤ) (k : ℕ), 0 < k ∧ Odd b ∧ ∀ s ∈ Ine (F := K) A, (β s ^ 2 * cycBar K Ω l s ^ (-b)) ^ k = 1 := by
+theorem UpperTheory.V.Ws.Lk.betaCyc
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime]
+        (K : IntermediateField ℚ Ω) [NumberField K],
+      Module.finrank ℚ K = 2
+        → ∀ A₀ : ValuationSubring Ω,
+          A₀.valuation (l : Ω) < 1
+            → ∀ β : G K Ω →* (PadicAlgCl l)ˣ,
+              (∀ σ ∉ K.fixingSubgroup, ∀ s s' : G K Ω,
+                  resQ K s' = σ * resQ K s * σ⁻¹ → β s * β s' = 1)
+                → ∀ U : Subgroup (G K Ω),
+                  IsOpen (U : Set (G K Ω))
+                    → (∀ B : ValuationSubring Ω,
+                      (∀ x ∈ K, x ∈ B ↔ x ∈ A₀)
+                        → ∀ s ∈ U ⊓ Ine (F := K) B,
+                          (β s : PadicAlgCl l) ^ 2
+                            = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ K Ω l s : ℤ_[l]))
+                    → ∀ A : ValuationSubring Ω,
+                      A.valuation (l : Ω) < 1
+                        → ∃ (b : ℤ) (k : ℕ),
+                          0 < k ∧ Odd b
+                            ∧ ∀ s ∈ Ine (F := K) A, (β s ^ 2 * cycBar K Ω l s ^ (-b)) ^ k = 1 := by
   intro Ω _ _ _ l _ K _ hK A₀ hA₀ β hconj U hU hcyc A hA
   have hn : U.index ≠ 0 := by
     haveI : Finite (G K Ω ⧸ U) := U.quotient_finite_of_isOpen hU
@@ -77,8 +107,11 @@ theorem UpperTheory.V.Ws.Lk.betaCyc :
   have hpow : ∀ s : G K Ω, s ^ U.index.factorial ∈ U := fun s =>
     Subgroup.pow_mem_of_index_ne_zero_of_dvd hn s (fun m h1 h2 => Nat.dvd_factorial h1 h2)
   have hkpos : 0 < U.index.factorial := Nat.factorial_pos _
-  have hval : ∀ t : G K Ω, ((cycBar K Ω l t : (Qbar l)ˣ) : PadicAlgCl l) =
-      algebraMap ℤ_[l] (PadicAlgCl l) (cycZ K Ω l t : ℤ_[l]) := fun t => rfl
+  have hval
+      : ∀ t : G K Ω,
+        ((cycBar K Ω l t : (Qbar l)ˣ) : PadicAlgCl l)
+          = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ K Ω l t : ℤ_[l]) := fun t =>
+    rfl
   obtain ⟨σ, hσ⟩ := exists_smul_eq_of_isPlaceOver (isPlaceOver_vQ A₀ hA₀) (isPlaceOver_vQ A hA)
   by_cases hσK : σ ∈ K.fixingSubgroup
   · refine ⟨1, U.index.factorial, hkpos, odd_one, ?_⟩
@@ -91,8 +124,9 @@ theorem UpperTheory.V.Ws.Lk.betaCyc :
     have ht : s ^ U.index.factorial ∈ U ⊓ Ine (F := K) A := ⟨hpow s, pow_mem hs _⟩
     have h1 : β (s ^ U.index.factorial) ^ 2 = cycBar K Ω l (s ^ U.index.factorial) :=
       Units.ext (by push_cast; rw [hcyc A hB _ ht, hval])
-    have e1 : (β s ^ 2 * cycBar K Ω l s ^ (-1 : ℤ)) ^ U.index.factorial =
-        β (s ^ U.index.factorial) ^ 2 * (cycBar K Ω l (s ^ U.index.factorial))⁻¹ := by
+    have e1
+        : (β s ^ 2 * cycBar K Ω l s ^ (-1 : ℤ)) ^ U.index.factorial
+          = β (s ^ U.index.factorial) ^ 2 * (cycBar K Ω l (s ^ U.index.factorial))⁻¹ := by
       rw [map_pow, map_pow, zpow_neg, zpow_one]
       simp only [mul_pow, inv_pow, ← pow_mul]
       rw [mul_comm 2]
@@ -129,8 +163,9 @@ theorem UpperTheory.V.Ws.Lk.betaCyc :
     have h1 : β (s' ^ U.index.factorial) ^ 2 = cycBar K Ω l (s' ^ U.index.factorial) :=
       Units.ext (by push_cast; rw [hcyc A₀ (fun _ _ => Iff.rfl) _ ht', hval])
     have hbs : β s = (β s')⁻¹ := eq_inv_of_mul_eq_one_left hbb
-    have e2 : (β s ^ 2 * cycBar K Ω l s ^ (-(-1) : ℤ)) ^ U.index.factorial =
-        (β (s' ^ U.index.factorial) ^ 2)⁻¹ * cycBar K Ω l (s' ^ U.index.factorial) := by
+    have e2
+        : (β s ^ 2 * cycBar K Ω l s ^ (-(-1) : ℤ)) ^ U.index.factorial
+          = (β (s' ^ U.index.factorial) ^ 2)⁻¹ * cycBar K Ω l (s' ^ U.index.factorial) := by
       rw [neg_neg, zpow_one, hbs, ← hcy, map_pow, map_pow]
       simp only [mul_pow, inv_pow, ← pow_mul]
       rw [mul_comm 2]

@@ -11,13 +11,17 @@ noncomputable section
 namespace PI.VolStabSW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW
 
-def hermO {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {d : ℕ}
-    (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (σ : E →ₐ[F] E) (a : ℕ) :
-    AddSubgroup (HermR (Fv F v) σ a) where
-  carrier := {S | ∀ i j k, (Algebra.TensorProduct.basis (Fv F v) b).repr
-    ((S : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) i j) k ∈ v.adicCompletionIntegers F}
+def hermO
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (σ : E →ₐ[F] E) (a : ℕ)
+    : AddSubgroup (HermR (Fv F v) σ a) where
+  carrier :=
+    {S | ∀ i j k, (Algebra.TensorProduct.basis (Fv F v) b).repr
+      ((S : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) i j) k ∈ v.adicCompletionIntegers F}
   add_mem' := by
     intro x y hx hy
     simp only [Set.mem_setOf_eq] at hx hy ⊢

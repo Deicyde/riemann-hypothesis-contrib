@@ -8,8 +8,8 @@ namespace KStar.TotallyRealRoots
 
 variable {l : ℕ} [Fact l.Prime]
 
-private theorem units_map_surj_of_zmod (n : ℕ) (f : ℤ_[l] →+* ZMod n) :
-    Function.Surjective (Units.map f.toMonoidHom) := by
+private theorem units_map_surj_of_zmod (n : ℕ) (f : ℤ_[l] →+* ZMod n)
+    : Function.Surjective (Units.map f.toMonoidHom) := by
   by_cases hn : n = 1
   · subst hn
     intro y
@@ -33,10 +33,8 @@ theorem princ_one_eq_ker : princ l 1 = (red l).ker := by
   rw [← key, map_sub, map_one, sub_eq_zero]
   simp [red, Units.ext_iff]
 
-theorem redPow_surjective (a : ℕ) : Function.Surjective (redPow l a) :=
-  units_map_surj_of_zmod _ _
+theorem redPow_surjective (a : ℕ) : Function.Surjective (redPow l a) := units_map_surj_of_zmod _ _
 
-theorem red_surjective : Function.Surjective (red l) :=
-  units_map_surj_of_zmod _ _
+theorem red_surjective : Function.Surjective (red l) := units_map_surj_of_zmod _ _
 
 end KStar.TotallyRealRoots

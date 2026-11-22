@@ -4,15 +4,21 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C Polynomial Topology
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C Polynomial Topology
 
-theorem UpperTheory.re_inner_ge_of_span_eigenvectors :
-    ∀ (M H : Type) [AddCommGroup M] [Module ℂ M] [NormedAddCommGroup H] [InnerProductSpace ℂ H] (j : M →ₗ[ℂ] H) (V : Submodule ℂ M) (T : Module.End ℂ M) (c : ℝ) (s : Set M), (∀ x ∈ V, ∀ y ∈ V, inner ℂ (j (T x)) (j y) = inner ℂ (j x) (j (T y))) → (∀ x ∈ s, x ∈ V ∧ ∃ κ : ℂ, -c ≤ κ.re ∧ T x = κ • x) → ∀ v ∈ Submodule.span ℂ s, -c * ‖j v‖ ^ 2 ≤ (inner ℂ (j v) (j (T v))).re := by
+theorem UpperTheory.re_inner_ge_of_span_eigenvectors
+    : ∀ (M H : Type) [AddCommGroup M] [Module ℂ M] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        (j : M →ₗ[ℂ] H) (V : Submodule ℂ M) (T : Module.End ℂ M) (c : ℝ) (s : Set M),
+      (∀ x ∈ V, ∀ y ∈ V, inner ℂ (j (T x)) (j y) = inner ℂ (j x) (j (T y)))
+        → (∀ x ∈ s, x ∈ V ∧ ∃ κ : ℂ, -c ≤ κ.re ∧ T x = κ • x)
+        → ∀ v ∈ Submodule.span ℂ s, -c * ‖j v‖ ^ 2 ≤ (inner ℂ (j v) (j (T v))).re := by
   intro M H _ _ _ _ j V T c s hsym hs v hv
   classical
-  have hle : Submodule.span ℂ s ≤
-      ⨆ κ : {κ : ℂ // -c ≤ κ.re}, (V ⊓ Module.End.eigenspace T (κ : ℂ)) := by
+  have hle
+      : Submodule.span ℂ s ≤ ⨆ κ : {κ : ℂ // -c ≤ κ.re}, (V ⊓ Module.End.eigenspace T (κ : ℂ)) := by
     refine Submodule.span_le.2 fun x hx => ?_
     obtain ⟨hxV, κ, hκ, hT⟩ := hs x hx
     exact Submodule.mem_iSup_of_mem (⟨κ, hκ⟩ : {κ : ℂ // -c ≤ κ.re})
@@ -20,8 +26,10 @@ theorem UpperTheory.re_inner_ge_of_span_eigenvectors :
   obtain ⟨f, hf, hfv⟩ := (Submodule.mem_iSup_iff_exists_finsupp _ _).1 (hle hv)
   have hV : ∀ κ, f κ ∈ V := fun κ => (hf κ).1
   have hT : ∀ κ, T (f κ) = (κ : ℂ) • f κ := fun κ => Module.End.mem_eigenspace_iff.1 (hf κ).2
-  have hrel : ∀ a b : {κ : ℂ // -c ≤ κ.re}, (starRingEnd ℂ) (a : ℂ) * inner ℂ (j (f a)) (j (f b))
-      = (b : ℂ) * inner ℂ (j (f a)) (j (f b)) := by
+  have hrel
+      : ∀ a b : {κ : ℂ // -c ≤ κ.re},
+        (starRingEnd ℂ) (a : ℂ) * inner ℂ (j (f a)) (j (f b))
+          = (b : ℂ) * inner ℂ (j (f a)) (j (f b)) := by
     intro a b
     have := hsym _ (hV a) _ (hV b)
     rwa [hT, hT, map_smul, map_smul, inner_smul_left, inner_smul_right] at this
@@ -43,8 +51,7 @@ theorem UpperTheory.re_inner_ge_of_span_eigenvectors :
     rw [inner_sum, Finset.sum_eq_single_of_mem a ha]
     intro b _ hb
     exact horth a b hb.symm
-  have e2 : inner ℂ (j v) (j (T v))
-      = ∑ a ∈ f.support, (a : ℂ) * inner ℂ (j (f a)) (j (f a)) := by
+  have e2 : inner ℂ (j v) (j (T v)) = ∑ a ∈ f.support, (a : ℂ) * inner ℂ (j (f a)) (j (f a)) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hv', map_sum T, map_sum, map_sum, sum_inner]
     refine Finset.sum_congr rfl fun a ha => ?_

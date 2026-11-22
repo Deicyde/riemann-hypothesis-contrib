@@ -176,14 +176,17 @@ private lemma trace_mul_finrank_eq_finrank_mul_trace {A M : Type} [Ring A] [Alge
   push_cast
   ring
 
-
 set_option autoImplicit false in
-theorem _root_.GlobalTheory.QTrace.q_trace : ∀ {F A V : Type} [Field F] [NumberField F] [Ring A] [Algebra F A] [FiniteDimensional F A] [Algebra.IsCentral F A]
-    [IsSimpleRing A] [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V] (n : ℕ), Module.finrank F A = n ^ 2 →
-    ∀ (ρ : A →+* Module.End ℚ V) (ψ : (F →+* ℂ) → (A →+* Matrix (Fin n) (Fin n) ℂ)),
-    (∀ σ (x : F), ψ σ (algebraMap F A x) = Matrix.scalar (Fin n) (σ x)) → ∀ c : A,
-    ((n * Module.finrank ℚ F : ℕ) : ℂ) * ((LinearMap.trace ℚ V (ρ c) : ℚ) : ℂ) =
-      (Module.finrank ℚ V : ℂ) * ∑ σ, Matrix.trace (ψ σ c) := by
+theorem _root_.GlobalTheory.QTrace.q_trace
+    : ∀ {F A V : Type} [Field F] [NumberField F] [Ring A] [Algebra F A] [FiniteDimensional F A]
+        [Algebra.IsCentral F A] [IsSimpleRing A] [AddCommGroup V] [Module ℚ V]
+        [FiniteDimensional ℚ V] (n : ℕ),
+      Module.finrank F A = n ^ 2
+        → ∀ (ρ : A →+* Module.End ℚ V) (ψ : (F →+* ℂ) → (A →+* Matrix (Fin n) (Fin n) ℂ)),
+          (∀ σ (x : F), ψ σ (algebraMap F A x) = Matrix.scalar (Fin n) (σ x))
+            → ∀ c : A,
+              ((n * Module.finrank ℚ F : ℕ) : ℂ) * ((LinearMap.trace ℚ V (ρ c) : ℚ) : ℂ)
+                = (Module.finrank ℚ V : ℂ) * ∑ σ, Matrix.trace (ψ σ c) := by
   intro F A V _ _ _ _ _ _ _ _ _ _ n hn ρ ψ hψ c
   have hn0 : n ≠ 0 := by
     rintro rfl
@@ -195,18 +198,21 @@ theorem _root_.GlobalTheory.QTrace.q_trace : ∀ {F A V : Type} [Field F] [Numbe
   haveI : FiniteDimensional ℚ A := Module.Finite.trans F A
   letI : Module A V := Module.compHom V ρ
   have hρq : ∀ q : ℚ, ρ (algebraMap ℚ A q) = algebraMap ℚ (Module.End ℚ V) q := fun q =>
-    congrArg (fun f : ℚ →+* Module.End ℚ V => f q)
+    congrArg
+      (fun f : ℚ →+* Module.End ℚ V => f q)
       (RingHom.ext_rat (ρ.comp (algebraMap ℚ A)) (algebraMap ℚ (Module.End ℚ V)))
   haveI : IsScalarTower ℚ A V := ⟨fun q a v => by
     show ρ (q • a) v = q • ρ a v
     rw [Algebra.smul_def, map_mul, Module.End.mul_apply, hρq, Module.algebraMap_end_apply]⟩
   have hV : LinearMap.trace ℚ V (DistribSMul.toLinearMap ℚ V c) = LinearMap.trace ℚ V (ρ c) := rfl
-  have hA : LinearMap.trace ℚ A (DistribSMul.toLinearMap ℚ A c) =
-      Algebra.trace ℚ F (LinearMap.trace F A (LinearMap.mulLeft F c)) := by
+  have hA
+      : LinearMap.trace ℚ A (DistribSMul.toLinearMap ℚ A c)
+        = Algebra.trace ℚ F (LinearMap.trace F A (LinearMap.mulLeft F c)) := by
     rw [← trace_restrictScalars_rat]
     rfl
-  have hsum : (algebraMap ℚ ℂ (Algebra.trace ℚ F (LinearMap.trace F A (LinearMap.mulLeft F c)))) =
-      n * ∑ σ, Matrix.trace (ψ σ c) := by
+  have hsum
+      : (algebraMap ℚ ℂ (Algebra.trace ℚ F (LinearMap.trace F A (LinearMap.mulLeft F c))))
+        = n * ∑ σ, Matrix.trace (ψ σ c) := by
     rw [trace_eq_sum_embeddings ℂ, Finset.mul_sum]
     refine (Fintype.sum_equiv (RingHom.equivRatAlgHom F ℂ).symm _ _ fun τ => ?_)
     exact embedding_trace_mulLeft_eq_mul_trace n hn _ (ψ _) (hψ _) c
@@ -216,8 +222,10 @@ theorem _root_.GlobalTheory.QTrace.q_trace : ∀ {F A V : Type} [Field F] [Numbe
   rw [hV, hA, hdim] at key
   have key' := congrArg (fun t : ℚ => (t : ℂ)) key
   simp only [Rat.cast_mul, Rat.cast_natCast] at key'
-  have hsum' : ((Algebra.trace ℚ F (LinearMap.trace F A (LinearMap.mulLeft F c)) : ℚ) : ℂ) =
-      n * ∑ σ, Matrix.trace (ψ σ c) := hsum
+  have hsum'
+      : ((Algebra.trace ℚ F (LinearMap.trace F A (LinearMap.mulLeft F c)) : ℚ) : ℂ)
+        = n * ∑ σ, Matrix.trace (ψ σ c) :=
+    hsum
   rw [hsum'] at key'
   have hnC : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hn0
   apply mul_left_cancel₀ hnC

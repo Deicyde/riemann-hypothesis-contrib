@@ -21,8 +21,8 @@ private lemma smulMV2 {R : Type} [CommRing R] {κ μ : Type} [Fintype μ] (c : R
   ext k; simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc]
 
 theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
-  intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hS H m e π horth hσ hsT hPT hsL hPL w hw r Bw hrange
-    hker X hX
+  intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hS H m e π horth hσ hsT hPT hsL hPL w hw r Bw hrange hker
+    X hX
   haveI : IsDomain R := htd_domain hS
   have hv := hS.integers
   have hcp : cp ≠ 0 := htd_cp_ne hS
@@ -31,10 +31,10 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
   obtain ⟨L, hLB, hBL⟩ := PullbackHopfOrder.exists_split (H.ρ (e w)) hidw Bw hrange hker
   set B := Bw.map ι with hB
   set εw := (H.ρ (e w)).map ι with hεw
-  have hLB' : L.map ι * B = 1 := by rw [hB, ← Matrix.map_mul, hLB, Matrix.map_one _ (map_zero ι) (map_one ι)]
+  have hLB' : L.map ι * B = 1 := by
+    rw [hB, ← Matrix.map_mul, hLB, Matrix.map_one _ (map_zero ι) (map_one ι)]
   have hBL' : B * L.map ι = εw := by rw [hB, ← Matrix.map_mul, hBL]
-  have hεB : εw * B = B := by
-    rw [← hBL', Matrix.mul_assoc, hLB', Matrix.mul_one]
+  have hεB : εw * B = B := by rw [← hBL', Matrix.mul_assoc, hLB', Matrix.mul_one]
   set Φ := phiP H e with hΦ
   set M := Φ * B with hM
   obtain ⟨hform, hblock, hPblock⟩ := btP_facts hS H e π horth hσ hsT hPT hsL hPL
@@ -68,8 +68,9 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
       rw [Matrix.sub_mul, Matrix.mul_assoc, hΦpΦ, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one,
         Matrix.one_mul, sub_self]
     have h2 : Φ.det • (Φ * Φp - cp • 1) = 0 := by
-      calc Φ.det • (Φ * Φp - cp • 1) = (Φ * Φp - cp • 1) * (Φ.det • 1) := by
-            rw [Matrix.mul_smul, Matrix.mul_one]
+      calc
+        Φ.det • (Φ * Φp - cp • 1)
+          = (Φ * Φp - cp • 1) * (Φ.det • 1) := by rw [Matrix.mul_smul, Matrix.mul_one]
         _ = (Φ * Φp - cp • 1) * (Φ * Φ.adjugate) := by rw [mul_adjugate]
         _ = ((Φ * Φp - cp • 1) * Φ) * Φ.adjugate := by rw [Matrix.mul_assoc]
         _ = 0 := by rw [h1, Matrix.zero_mul]
@@ -80,8 +81,9 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
   have hidL : ∀ a : O, a * a = a → H.ρL a * H.ρL a = H.ρL a := fun a ha => by rw [← map_mul, ha]
   have hidwL := hidL (e w) (by rw [horth, if_pos rfl])
   have hidwbL := hidL (e (π w)) (by rw [horth, if_pos rfl])
-  have hPwmv : ∀ q, Pw *ᵥ q = Sum.elim ((H.ρL (e (π w)))ᵀ *ᵥ (q ∘ Sum.inl))
-      (H.ρL (e w) *ᵥ (q ∘ Sum.inr)) := by
+  have hPwmv
+      : ∀ q,
+        Pw *ᵥ q = Sum.elim ((H.ρL (e (π w)))ᵀ *ᵥ (q ∘ Sum.inl)) (H.ρL (e w) *ᵥ (q ∘ Sum.inr)) := by
     intro q
     rw [hPw, ← Sum.elim_comp_inl_inr q, fromBlocks_mulVec]
     simp
@@ -92,8 +94,9 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
     rcases i with i | i
     · simp [hPw, Matrix.mul_apply, Fintype.sum_sum_type, fromBlocks]
     · simp [hPw, Matrix.mul_apply, Fintype.sum_sum_type, fromBlocks]
-  have hrangeP : ∀ (P : Matrix (Fin g) (Fin g) R), P * P = P → ∀ x,
-      x ∈ LinearMap.range (Matrix.mulVecLin P) ↔ P *ᵥ x = x := by
+  have hrangeP
+      : ∀ (P : Matrix (Fin g) (Fin g) R),
+        P * P = P → ∀ x, x ∈ LinearMap.range (Matrix.mulVecLin P) ↔ P *ᵥ x = x := by
     intro P hP x
     constructor
     · rintro ⟨y, rfl⟩
@@ -110,10 +113,13 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
       hrangeP _ hidT, hrangeP _ hidwL, hPwmv]
     constructor
     · rintro ⟨h1, h2⟩
-      rw [h1, h2]; exact Sum.elim_comp_inl_inr q
+      rw [h1, h2]
+      exact Sum.elim_comp_inl_inr q
     · intro h
-      exact ⟨by rw [← h] at *; funext k; exact (congrFun h (Sum.inl k)),
-        by funext k; exact congrFun h (Sum.inr k)⟩
+      exact ⟨
+        by rw [← h] at *; funext k; exact (congrFun h (Sum.inl k)),
+        by funext k; exact congrFun h (Sum.inr k)
+      ⟩
 
   have hmapT : (tPart H (e w)).map (Matrix.mulVecLin Φ) = LinearMap.range (Matrix.mulVecLin M) := by
     ext q
@@ -128,13 +134,15 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
       rw [mulVec_mulVec (M := εw), hεB, hM, mulVec_mulVec]
   have hMQ : ∀ t, Pw *ᵥ (M *ᵥ t) = M *ᵥ t := by
     intro t
-    rw [hM, ← mulVec_mulVec, mulVec_mulVec (M := Pw), ← hΦεw, ← mulVec_mulVec, mulVec_mulVec (M := εw), hεB]
+    rw [hM, ← mulVec_mulVec, mulVec_mulVec (M := Pw), ← hΦεw, ← mulVec_mulVec,
+      mulVec_mulVec (M := εw), hεB]
   have hkillQ : ∀ q, Pw *ᵥ q = q → ∃ t, M *ᵥ t = cp • q := by
     intro q hq
     refine ⟨L.map ι *ᵥ (εw *ᵥ (Φp *ᵥ q)), ?_⟩
     have hεε : εw * εw = εw := by rw [hεw, ← Matrix.map_mul, hidw]
-    rw [hM, ← mulVec_mulVec, mulVec_mulVec (M := B), hBL', mulVec_mulVec (M := εw), hεε, mulVec_mulVec (M := Φ),
-      hΦεw, ← mulVec_mulVec, mulVec_mulVec (M := Φ), hΦΦp, smulMV2, one_mulVec, mulVec_smul, hq]
+    rw [hM, ← mulVec_mulVec, mulVec_mulVec (M := B), hBL', mulVec_mulVec (M := εw), hεε,
+      mulVec_mulVec (M := Φ), hΦεw, ← mulVec_mulVec, mulVec_mulVec (M := Φ), hΦΦp, smulMV2,
+      one_mulVec, mulVec_smul, hq]
   have hsat : ∀ q (c : R), c ≠ 0 → Pw *ᵥ (c • q) = c • q → Pw *ᵥ q = q := by
     intro q c hc h
     rw [mulVec_smul] at h
@@ -169,8 +177,7 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
     simpa using h1
   have hDz : ∀ s, D *ᵥ s = 0 → s = 0 := by
     intro s hs
-    have h1 : M' *ᵥ (Q *ᵥ s) = 0 := by
-      rw [← hPP' (M' *ᵥ (Q *ᵥ s)), hM'D, hQQ', hs, mulVec_zero]
+    have h1 : M' *ᵥ (Q *ᵥ s) = 0 := by rw [← hPP' (M' *ᵥ (Q *ᵥ s)), hM'D, hQQ', hs, mulVec_zero]
     rw [← hQQ' s, hMzero _ h1, mulVec_zero]
   have hsingle_ne : ∀ {n : ℕ} (k : Fin n), (Pi.single k (1 : R) : Fin n → R) ≠ 0 := by
     intro n k h
@@ -189,7 +196,8 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
       · intro hjk; apply hk; rw [← hjk]; exact j.isLt
     · rfl
   set dj : Fin r → R := fun k => a ⟨k, hrle k⟩ with hdj
-  have hDsingle : ∀ k : Fin r, D *ᵥ Pi.single k 1 = dj k • Pi.single (⟨k, hrle k⟩ : Fin (g + g)) 1 := by
+  have hDsingle
+      : ∀ k : Fin r, D *ᵥ Pi.single k 1 = dj k • Pi.single (⟨k, hrle k⟩ : Fin (g + g)) 1 := by
     intro k
     funext j
     rw [hDv]
@@ -208,8 +216,7 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
     apply hDz
     rw [hDsingle, hk, zero_smul]
   refine ⟨Q⁻¹, dj, isUnit_nonsing_inv_det Q hQu, ?_, ?_, ?_⟩
-  ·
-    intro k
+  · intro k
     have hDQ : D * Q⁻¹ = P * M' := by
       rw [hDdef, Matrix.mul_assoc, mul_nonsing_inv _ hQu, Matrix.mul_one]
     have h1 : dj k • (Q⁻¹) k = (D * Q⁻¹) ⟨k, hrle k⟩ := by
@@ -225,9 +232,9 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
       funext i
       simp [Matrix.mul_apply, Finset.sum_apply, hM']
     rw [h3]
-    exact Submodule.sum_mem _ fun l _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨e2.symm l, rfl⟩)
-  ·
-    intro k
+    exact Submodule.sum_mem _ fun l _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨e2.symm l, rfl⟩)
+  · intro k
     set j : Fin (g + g) := ⟨k, hrle k⟩
     set u := P⁻¹ *ᵥ Pi.single j 1
     have hu : M *ᵥ (Q *ᵥ Pi.single k 1) = dj k • (u ∘ e2) := by
@@ -237,8 +244,7 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
       have h2 := congrFun h1 (e2 x)
       rw [hM'v] at h2
       simpa using h2
-    have hsatu : Pw *ᵥ (u ∘ e2) = u ∘ e2 :=
-      hsat (u ∘ e2) (dj k) (ha0 k) (by rw [← hu]; exact hMQ _)
+    have hsatu : Pw *ᵥ (u ∘ e2) = u ∘ e2 := hsat (u ∘ e2) (dj k) (ha0 k) (by rw [← hu]; exact hMQ _)
     obtain ⟨t, ht⟩ := hkillQ _ hsatu
     have h3 : D *ᵥ (Q⁻¹ *ᵥ t) = cp • Pi.single j 1 := by
       rw [← hM'D, hM'v, ht]
@@ -249,25 +255,29 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
     simp only [Pi.smul_apply, Pi.single_eq_same, smul_eq_mul, mul_one] at h4
     apply hv.le_of_dvd
     exact ⟨_, h4.symm⟩
-  ·
-    let F : qW H (e w) (e (π w)) →ₗ[R] ((k : Fin r) → R ⧸ Ideal.span {dj k}) :=
-      LinearMap.pi fun k => (Submodule.mkQ (Ideal.span {dj k})) ∘ₗ
-        (LinearMap.proj (⟨k, hrle k⟩ : Fin (g + g))) ∘ₗ P.mulVecLin ∘ₗ
-        (LinearMap.funLeft R R e2.symm) ∘ₗ (qW H (e w) (e (π w))).subtype
-    have hF : ∀ q k, F q k = Ideal.Quotient.mk _
-        ((P *ᵥ ((q : Fin g ⊕ Fin g → R) ∘ e2.symm)) ⟨k, hrle k⟩) := fun q k => rfl
-    have hker : LinearMap.ker F =
-        (LinearMap.range (Matrix.mulVecLin M)).comap (qW H (e w) (e (π w))).subtype := by
+  · let F : qW H (e w) (e (π w)) →ₗ[R] ((k : Fin r) → R ⧸ Ideal.span {dj k}) :=
+      LinearMap.pi fun k =>
+        (Submodule.mkQ (Ideal.span {dj k})) ∘ₗ (LinearMap.proj (⟨k, hrle k⟩ : Fin (g + g)))
+          ∘ₗ P.mulVecLin ∘ₗ (LinearMap.funLeft R R e2.symm) ∘ₗ (qW H (e w) (e (π w))).subtype
+    have hF
+        : ∀ q k,
+          F q k = Ideal.Quotient.mk _ ((P *ᵥ ((q : Fin g ⊕ Fin g → R) ∘ e2.symm)) ⟨k, hrle k⟩) :=
+      fun q k => rfl
+    have hker
+        : LinearMap.ker F
+          = (LinearMap.range (Matrix.mulVecLin M)).comap (qW H (e w) (e (π w))).subtype := by
       ext q
       rw [LinearMap.mem_ker, Submodule.mem_comap]
       constructor
       · intro hq
-        have hq' : ∀ k, (P *ᵥ ((q : Fin g ⊕ Fin g → R) ∘ e2.symm)) ⟨k, hrle k⟩ ∈ Ideal.span {dj k} :=
+        have hq'
+            : ∀ k, (P *ᵥ ((q : Fin g ⊕ Fin g → R) ∘ e2.symm)) ⟨k, hrle k⟩ ∈ Ideal.span {dj k} :=
           fun k => Ideal.Quotient.eq_zero_iff_mem.1 ((hF q k).symm.trans (congrFun hq k))
         choose s hs using fun k => Ideal.mem_span_singleton'.1 (hq' k)
         obtain ⟨t, ht⟩ := hkillQ q ((hQw q).1 q.2)
-        have hhigh : ∀ j : Fin (g + g), ¬ (j : ℕ) < r →
-            (P *ᵥ ((q : Fin g ⊕ Fin g → R) ∘ e2.symm)) j = 0 := by
+        have hhigh
+            : ∀ j : Fin (g + g),
+              ¬ (j : ℕ) < r → (P *ᵥ ((q : Fin g ⊕ Fin g → R) ∘ e2.symm)) j = 0 := by
           intro j hj
           have h1 : D *ᵥ (Q⁻¹ *ᵥ t) = cp • (P *ᵥ ((q : Fin g ⊕ Fin g → R) ∘ e2.symm)) := by
             rw [← hM'D, hM'v, ht, ← mulVec_smul]
@@ -317,8 +327,7 @@ theorem smith_normal_form_statement : EigenQuotientSmithStatement := by
         · simp [yt, dif_neg h]
       have hαu : M *ᵥ (Q *ᵥ s) = α • (u ∘ e2) := by
         funext x
-        have h1 : M' *ᵥ (Q *ᵥ s) = α • u := by
-          rw [← hPP' (M' *ᵥ _), hM'D, hQQ', hDs, mulVec_smul]
+        have h1 : M' *ᵥ (Q *ᵥ s) = α • u := by rw [← hPP' (M' *ᵥ _), hM'D, hQQ', hDs, mulVec_smul]
         have h2 := congrFun h1 (e2 x)
         rw [hM'v] at h2
         simpa using h2

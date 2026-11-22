@@ -26,8 +26,8 @@ theorem next_even_top_holds : NextEvenTop := by
     have h2 := Nat.mod_lt n hℓpos
     have h3 : t * ℓ = ℓ * t := Nat.mul_comm _ _
     omega
-  obtain ⟨si, hsi_lt, hsi_le, hsi_case⟩ :
-      ∃ si, si < t ∧ si * ℓ ≤ i ∧ (i < si * ℓ + ℓ ∨ si + 1 = t) := by
+  obtain ⟨si, hsi_lt, hsi_le, hsi_case⟩
+      : ∃ si, si < t ∧ si * ℓ ≤ i ∧ (i < si * ℓ + ℓ ∨ si + 1 = t) := by
     by_cases hc : i < t * ℓ
     · refine ⟨i / ℓ, ?_, Nat.div_mul_le_self i ℓ, Or.inl ?_⟩
       · exact (Nat.div_lt_iff_lt_mul hℓpos).2 hc
@@ -103,12 +103,12 @@ theorem top_count_holds : TopCount := by
       have h3 : n * q ≤ n * G' := Nat.mul_le_mul_left _ hqG
       have h4 : x + n * G' - D = i + n * (G' - q) := by omega
       rw [h4, Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hi]
-    calc n = (range n).card := (card_range n).symm
+    calc
+      n = (range n).card := (card_range n).symm
       _ ≤ _ := card_le_card hsub
       _ ≤ (T ×ˢ Icc 1 G').card := card_image_le
       _ = T.card * G' := by rw [card_product, Nat.card_Icc]; simp
-  · have hcov : T ⊆ (T.image (fun p => p / G')).biUnion
-        (fun c => T ∩ window n (c * G') G') := by
+  · have hcov : T ⊆ (T.image (fun p => p / G')).biUnion (fun c => T ∩ window n (c * G') G') := by
       intro p hp
       rw [mem_biUnion]
       refine ⟨p / G', mem_image_of_mem _ hp, mem_inter.2 ⟨hp, ?_⟩⟩
@@ -120,32 +120,36 @@ theorem top_count_holds : TopCount := by
       refine ⟨p - p / G' * G', mem_range.2 (by omega), ?_⟩
       rw [show p / G' * G' + (p - p / G' * G') = p by omega, Nat.mod_eq_of_lt hpn]
     have hcard : T.card ≤ (T.image (fun p => p / G')).card * N₁ := by
-      calc T.card ≤ _ := card_le_card hcov
-        _ ≤ ∑ c ∈ T.image (fun p => p / G'), (T ∩ window n (c * G') G').card :=
-            card_biUnion_le
+      calc
+        T.card
+          ≤ _ := card_le_card hcov
+        _ ≤ ∑ c ∈ T.image (fun p => p / G'), (T ∩ window n (c * G') G').card := card_biUnion_le
         _ ≤ ∑ c ∈ T.image (fun p => p / G'), N₁ := by
-            apply sum_le_sum
-            intro c hc
-            obtain ⟨p, hp, rfl⟩ := mem_image.1 hc
-            apply hInt
-            have := Nat.div_mul_le_self p G'
-            have := mem_range.1 (hT hp)
-            omega
+          apply sum_le_sum
+          intro c hc
+          obtain ⟨p, hp, rfl⟩ := mem_image.1 hc
+          apply hInt
+          have := Nat.div_mul_le_self p G'
+          have := mem_range.1 (hT hp)
+          omega
         _ = _ := by rw [sum_const, smul_eq_mul]
     have himg : (T.image (fun p => p / G')).card ≤ n / G' + 1 := by
-      calc _ ≤ (range (n / G' + 1)).card := by
-            apply card_le_card
-            intro c hc
-            obtain ⟨p, hp, rfl⟩ := mem_image.1 hc
-            rw [mem_range]
-            have := Nat.div_le_div_right (c := G') (mem_range.1 (hT hp)).le
-            omega
+      calc
+        _ ≤ (range (n / G' + 1)).card := by
+          apply card_le_card
+          intro c hc
+          obtain ⟨p, hp, rfl⟩ := mem_image.1 hc
+          rw [mem_range]
+          have := Nat.div_le_div_right (c := G') (mem_range.1 (hT hp)).le
+          omega
         _ = _ := card_range _
     have h5 : (n / G' + 1) * G' ≤ n + G' := by
       have := Nat.div_mul_le_self n G'
-      rw [add_mul, one_mul]; omega
-    calc T.card * G' ≤ ((n / G' + 1) * N₁) * G' :=
-          Nat.mul_le_mul_right _ (hcard.trans (Nat.mul_le_mul_right _ himg))
+      rw [add_mul, one_mul]
+      omega
+    calc
+      T.card * G' ≤ ((n / G' + 1) * N₁) * G' :=
+        Nat.mul_le_mul_right _ (hcard.trans (Nat.mul_le_mul_right _ himg))
       _ = N₁ * ((n / G' + 1) * G') := by ring
       _ ≤ N₁ * (n + G') := Nat.mul_le_mul_left _ h5
 

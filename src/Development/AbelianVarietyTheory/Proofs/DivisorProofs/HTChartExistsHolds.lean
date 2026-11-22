@@ -8,11 +8,13 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_order_integers_mul_finite_index (F B : Type) [Field F] [NumberField F] [Ring B]
-    [Algebra F B] [Algebra ℚ B] [IsScalarTower ℚ F B] (OB : Subring B) (hfin : Module.Finite ℤ OB)
-    (hsat : ∀ b : B, ∃ m : ℕ, 0 < m ∧ (m : B) * b ∈ OB) :
-    ∃ Λ : Subring B, OB ≤ Λ ∧ (∀ a : NumberField.RingOfIntegers F, algebraMap F B (a : F) ∈ Λ) ∧
-      Module.Finite ℤ Λ ∧ ∃ N : ℕ, 0 < N ∧ ∀ x ∈ Λ, (N : B) * x ∈ OB := by
+theorem exists_order_integers_mul_finite_index
+    (F B : Type)
+    [Field F] [NumberField F] [Ring B] [Algebra F B] [Algebra ℚ B] [IsScalarTower ℚ F B]
+    (OB : Subring B) (hfin : Module.Finite ℤ OB) (hsat : ∀ b : B, ∃ m : ℕ, 0 < m ∧ (m : B) * b ∈ OB)
+    : ∃ Λ : Subring B,
+      OB ≤ Λ ∧ (∀ a : NumberField.RingOfIntegers F, algebraMap F B (a : F) ∈ Λ) ∧ Module.Finite ℤ Λ
+        ∧ ∃ N : ℕ, 0 < N ∧ ∀ x ∈ Λ, (N : B) * x ∈ OB := by
   classical
   let f : NumberField.RingOfIntegers F →ₐ[ℤ] B :=
     ((algebraMap F B).comp (algebraMap (NumberField.RingOfIntegers F) F)).toIntAlgHom
@@ -27,17 +29,18 @@ theorem exists_order_integers_mul_finite_index (F B : Type) [Field F] [NumberFie
   have hN0 : 0 < N := Finset.prod_pos fun a _ => hm0 a
   have hnat : ∀ (k : ℕ) (y : B), y ∈ OB → (k : B) * y ∈ OB := fun k y hy =>
     OB.mul_mem (natCast_mem OB k) hy
-  let P : Submodule ℤ (NumberField.RingOfIntegers F) :=
-    { carrier := {a | (N : B) * f a ∈ OB}
-      add_mem' := by
-        intro a b ha hb
-        simp only [Set.mem_setOf_eq, map_add (f := _), mul_add] at *
-        exact OB.add_mem ha hb
-      zero_mem' := by simp
-      smul_mem' := by
-        intro n a ha
-        simp only [Set.mem_setOf_eq, map_zsmul, mul_smul_comm] at *
-        exact OB.zsmul_mem ha n }
+  let P : Submodule ℤ (NumberField.RingOfIntegers F) := {
+    carrier := {a | (N : B) * f a ∈ OB}
+    add_mem' := by
+      intro a b ha hb
+      simp only [Set.mem_setOf_eq, map_add (f := _), mul_add] at *
+      exact OB.add_mem ha hb
+    zero_mem' := by simp
+    smul_mem' := by
+      intro n a ha
+      simp only [Set.mem_setOf_eq, map_zsmul, mul_smul_comm] at *
+      exact OB.zsmul_mem ha n
+  }
   have hsP : (s : Set (NumberField.RingOfIntegers F)) ⊆ SetLike.coe P := by
     intro a ha
     obtain ⟨k, hk⟩ := Finset.dvd_prod_of_mem m ha
@@ -54,11 +57,13 @@ theorem exists_order_integers_mul_finite_index (F B : Type) [Field F] [NumberFie
   · intro b hb
     refine ⟨1 ⊗ₜ ⟨b, hb⟩, ?_⟩
     show L _ = b
-    rw [hL]; simp [f, g]
+    rw [hL]
+    simp [f, g]
   · intro a
     refine ⟨a ⊗ₜ 1, ?_⟩
     show L _ = _
-    rw [hL]; simp [f, g]
+    rw [hL]
+    simp [f, g]
   · haveI : Module.Finite ℤ OB := hfin
     haveI : Module.Finite ℤ (NumberField.RingOfIntegers F ⊗[ℤ] OB) := Module.Finite.tensorProduct _ _ _
     exact Module.Finite.of_surjective (L.toRingHom.rangeRestrict.toIntAlgHom.toLinearMap)

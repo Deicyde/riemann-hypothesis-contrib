@@ -5,17 +5,20 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LowersMulZero
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 namespace GlobalTheory.CovScal
 
-theorem abs_det_mul_covolume_eq_nat_mul {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] (μ : Measure E)
-    [μ.IsAddHaarMeasure] (A B : Submodule ℤ E) [DiscreteTopology A] [IsZLattice ℝ A]
-    [DiscreteTopology B] [IsZLattice ℝ B] (T : E →ₗ[ℝ] E) (hT : ∀ y ∈ A, T y ∈ B) :
-    ∃ n : ℕ, |LinearMap.det T| * ZLattice.covolume A μ = n * ZLattice.covolume B μ := by
+theorem abs_det_mul_covolume_eq_nat_mul
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (A B : Submodule ℤ E)
+    [DiscreteTopology A] [IsZLattice ℝ A] [DiscreteTopology B] [IsZLattice ℝ B]
+    (T : E →ₗ[ℝ] E) (hT : ∀ y ∈ A, T y ∈ B)
+    : ∃ n : ℕ, |LinearMap.det T| * ZLattice.covolume A μ = n * ZLattice.covolume B μ := by
   classical
-
   let bA := Module.Free.chooseBasis ℤ A
   let bB := Module.Free.chooseBasis ℤ B
   let b₀ := bA.ofZLatticeBasis ℝ A
@@ -33,10 +36,9 @@ theorem abs_det_mul_covolume_eq_nat_mul {E : Type} [NormedAddCommGroup E] [Norme
       show b₀ j = ((bA j : A) : E) from bA.ofZLatticeBasis_apply ℝ A j]
     exact bB'.ofZLatticeBasis_repr_apply ℝ B ⟨T (bA j), hT _ (bA j).2⟩ i
   have hdet : LinearMap.det T = b₀.det c * (M.det : ℝ) := by
-    have h1 : b₀.det (T ∘ b₀) = LinearMap.det T := by
-      rw [b₀.det_comp T b₀, b₀.det_self, mul_one]
-    rw [← h1, b₀.det_apply, ← b₀.toMatrix_mul_toMatrix c (T ∘ b₀), Matrix.det_mul,
-      ← b₀.det_apply, hM, Int.cast_det]
+    have h1 : b₀.det (T ∘ b₀) = LinearMap.det T := by rw [b₀.det_comp T b₀, b₀.det_self, mul_one]
+    rw [← h1, b₀.det_apply, ← b₀.toMatrix_mul_toMatrix c (T ∘ b₀), Matrix.det_mul, ← b₀.det_apply,
+      hM, Int.cast_det]
   have hcA := ZLattice.covolume_eq_det_mul_measureReal A μ bA b₀
   have hcB := ZLattice.covolume_eq_det_mul_measureReal B μ bB' b₀
   rw [hb₀, b₀.det_self, abs_one, one_mul] at hcA
@@ -48,20 +50,21 @@ theorem abs_det_mul_covolume_eq_nat_mul {E : Type} [NormedAddCommGroup E] [Norme
 noncomputable def blockScal {ι : Type} (κ : Type) (d : ι → ℝ) : (ι → κ → ℝ) →ₗ[ℝ] (ι → κ → ℝ) :=
   LinearMap.pi fun v => (d v • (LinearMap.id : (κ → ℝ) →ₗ[ℝ] (κ → ℝ))).comp (LinearMap.proj v)
 
-theorem blockScal_apply {ι κ : Type} (d : ι → ℝ) (y : ι → κ → ℝ) :
-    blockScal κ d y = fun v i => d v * y v i := by
+theorem blockScal_apply {ι κ : Type} (d : ι → ℝ) (y : ι → κ → ℝ)
+    : blockScal κ d y = fun v i => d v * y v i := by
   funext v i
   simp [blockScal]
 
-theorem det_blockScal {ι κ : Type} [Fintype ι] [Fintype κ] (d : ι → ℝ) :
-    LinearMap.det (blockScal κ d) = ∏ v, d v ^ Fintype.card κ := by
+theorem det_blockScal {ι κ : Type} [Fintype ι] [Fintype κ] (d : ι → ℝ)
+    : LinearMap.det (blockScal κ d) = ∏ v, d v ^ Fintype.card κ := by
   unfold blockScal
   rw [LinearMap.det_pi]
   refine Finset.prod_congr rfl fun v _ => ?_
   rw [LinearMap.det_smul, LinearMap.det_id, mul_one, Module.finrank_fintype_fun_eq_card]
 
-theorem eq_one_of_forall_prime {ρ : ℝ} (hρ : 0 < ρ)
-    (h : ∀ p : ℕ, p.Prime → ∃ a b : ℕ, ¬ p ∣ a * b ∧ ρ ^ 2 * b = a) : ρ = 1 := by
+theorem eq_one_of_forall_prime
+    {ρ : ℝ} (hρ : 0 < ρ) (h : ∀ p : ℕ, p.Prime → ∃ a b : ℕ, ¬ p ∣ a * b ∧ ρ ^ 2 * b = a)
+    : ρ = 1 := by
   obtain ⟨a₀, b₀, h2, hab₀⟩ := h 2 Nat.prime_two
   have ha₀ : a₀ ≠ 0 := by rintro rfl; simp at h2
   have hb₀ : b₀ ≠ 0 := by rintro rfl; simp at h2
@@ -82,8 +85,9 @@ theorem eq_one_of_forall_prime {ρ : ℝ} (hρ : 0 < ρ)
       have hpb : b.factorization p = 0 :=
         Nat.factorization_eq_zero_of_not_dvd fun hd => hp' (dvd_mul_of_dvd_right hd a)
       have hf := congrArg (fun n => n.factorization p) hnat
-      simp only [Nat.factorization_mul ha₀ hb, Nat.factorization_mul ha hb₀, Finsupp.add_apply,
-        hpa, hpb] at hf
+      simp only [Nat.factorization_mul ha₀ hb, Nat.factorization_mul ha hb₀, Finsupp.add_apply, hpa,
+          hpb]
+        at hf
       omega
     · simp [Nat.factorization_eq_zero_of_not_prime _ hp]
   rw [key] at hab₀
@@ -92,7 +96,15 @@ theorem eq_one_of_forall_prime {ρ : ℝ} (hρ : 0 < ρ)
   have hfac : (ρ - 1) * (ρ + 1) = 0 := by linear_combination hsq
   rcases mul_eq_zero.mp hfac with h' | h' <;> linarith
 
-theorem covolume_eq_of_scalars : ∀ (ι κ : Type) [Fintype ι] [Fintype κ] (A B : Submodule ℤ (ι → κ → ℝ)) [DiscreteTopology A] [IsZLattice ℝ A] [DiscreteTopology B] [IsZLattice ℝ B], (∀ p : ℕ, p.Prime → ∃ (d : ι → ℝ) (N : ℕ), ¬ p ∣ N ∧ ∏ v, d v ^ 2 = N ∧ (∀ y ∈ A, (fun v i => d v * y v i) ∈ B) ∧ ∀ y ∈ B, (fun v i => d v * y v i) ∈ A) → ZLattice.covolume A volume = ZLattice.covolume B volume := by
+theorem covolume_eq_of_scalars
+    : ∀ (ι κ : Type) [Fintype ι] [Fintype κ] (A B : Submodule ℤ (ι → κ → ℝ)) [DiscreteTopology A]
+        [IsZLattice ℝ A] [DiscreteTopology B] [IsZLattice ℝ B],
+      (∀ p : ℕ,
+          p.Prime
+            → ∃ (d : ι → ℝ) (N : ℕ),
+              ¬ p ∣ N ∧ ∏ v, d v ^ 2 = N ∧ (∀ y ∈ A, (fun v i => d v * y v i) ∈ B)
+                ∧ ∀ y ∈ B, (fun v i => d v * y v i) ∈ A)
+        → ZLattice.covolume A volume = ZLattice.covolume B volume := by
   intro ι κ _ _ A B _ _ _ _ h
   have hA : 0 < ZLattice.covolume A volume := ZLattice.covolume_pos A volume
   have hB : 0 < ZLattice.covolume B volume := ZLattice.covolume_pos B volume

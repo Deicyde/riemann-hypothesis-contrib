@@ -15,30 +15,37 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.NonzeroTypes.Det
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.Gal.TypesAndIwahori
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem supp_unique (L : Loc) {N : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] {π : Representation ℂ (GL (Fin N) k) V}
-    {s t : Multiset (IrrGL (k := k))} (hs : HasSupport π s) (ht : HasSupport π t) : s = t := by
-  exact SupportUnique.eq_of_hasSupport L.geo L.zel N (IrrGL.of π hs.isSmooth hs.isIrreducible) rfl s t
-    (hs.of_equiv (IrrGL.equivOf _ _ _)) (ht.of_equiv (IrrGL.equivOf _ _ _))
+theorem supp_unique
+    (L : Loc)
+    {N : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    {π : Representation ℂ (GL (Fin N) k) V} {s t : Multiset (IrrGL (k := k))}
+    (hs : HasSupport π s) (ht : HasSupport π t)
+    : s = t := by
+  exact SupportUnique.eq_of_hasSupport L.geo L.zel N (IrrGL.of π hs.isSmooth hs.isIrreducible) rfl s
+    t (hs.of_equiv (IrrGL.equivOf _ _ _)) (ht.of_equiv (IrrGL.equivOf _ _ _))
 
 theorem ne_nu_one_of_char {x : IrrGL (k := k)} (hx : x.IsUnramChar) : x ≠ x.nu 1 := by
   obtain ⟨μ, hμ, rfl⟩ := hx
   intro h
-  have h' : (IrrGL.ofChar μ (isSmoothChar_of_isUnram hμ)).nu ((0:ℝ):ℂ) =
-      (IrrGL.ofChar μ (isSmoothChar_of_isUnram hμ)).nu ((1:ℝ):ℂ) := by
+  have h'
+      : (IrrGL.ofChar μ (isSmoothChar_of_isUnram hμ)).nu ((0 : ℝ) : ℂ)
+        = (IrrGL.ofChar μ (isSmoothChar_of_isUnram hμ)).nu ((1 : ℝ) : ℂ) := by
     rw [Complex.ofReal_zero, Complex.ofReal_one]
     simpa using h
   have := (IrrGL.nu_ofChar_inj μ _).1 h'
   norm_num at this
 
-private theorem unlinked_sum_ms_of_len_one_unram_not_linked {h : ℕ} (Δ : Fin h → Segment k) (hl : ∀ i, (Δ i).len = 1)
-    (hu : ∀ i, (Δ i).first.IsUnramChar) (hn : ∀ i j, i ≠ j → ¬ (Δ i).Linked (Δ j)) :
-    GlobalTheory.RoadU.Unlinked (∑ i, (Δ i).ms) := by
+private theorem unlinked_sum_ms_of_len_one_unram_not_linked
+    {h : ℕ} (Δ : Fin h → Segment k) (hl : ∀ i, (Δ i).len = 1) (hu : ∀ i, (Δ i).first.IsUnramChar)
+    (hn : ∀ i j, i ≠ j → ¬ (Δ i).Linked (Δ j))
+    : GlobalTheory.RoadU.Unlinked (∑ i, (Δ i).ms) := by
   have c1 : ∀ i, (Δ i).carrier = {(Δ i).first} := by
     intro i
     ext w
@@ -83,47 +90,67 @@ private theorem unlinked_sum_ms_of_len_one_unram_not_linked {h : ℕ} (Δ : Fin 
     · rw [c1 i, c1 j, Set.singleton_subset_iff, Set.mem_singleton_iff, heq]
       exact hz1
 
-theorem unlinked_of_spherical [CharZero k] (L : Loc) (hGU : GlobalTheory.Published.GenericUnlinkedGL)
-    (hM : GlobalTheory.Published.LanglandsMultisegments) (hC : GlobalTheory.Published.StandardCosocleGL)
-    {N : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] {π : Representation ℂ (GL (Fin N) k) V}
-    (hs : IsSmooth π) (hi : π.IsIrreducible) (hg : IsGeneric π) (hsp : IsSpherical π) {s : Multiset (IrrGL (k := k))}
-    (hS : HasSupport π s) : GlobalTheory.RoadU.Unlinked s := by
+theorem unlinked_of_spherical
+    [CharZero k]
+    (L : Loc) (hGU : GlobalTheory.Published.GenericUnlinkedGL)
+    (hM : GlobalTheory.Published.LanglandsMultisegments)
+    (hC : GlobalTheory.Published.StandardCosocleGL)
+    {N : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    {π : Representation ℂ (GL (Fin N) k) V}
+    (hs : IsSmooth π) (hi : π.IsIrreducible) (hg : IsGeneric π) (hsp : IsSpherical π)
+    {s : Multiset (IrrGL (k := k))} (hS : HasSupport π s)
+    : GlobalTheory.RoadU.Unlinked s := by
   obtain ⟨h, Δ, x, hd, hlink, hL, ⟨e⟩⟩ := hGU k N V π hs hi hg
   have hsq : IsSubquotient π (prodIrr x hd) :=
     IsSubquotient.of_injective e.toIntertwiningMap (by
       intro a b hab
       exact e.toLinearEquiv.injective hab)
   have hsph := GlobalTheory.LocLanglands.SphFac.isSpherical_factor k h N x hd V π hsq hsp
-  have key := fun a => GlobalTheory.SphSeg.len_eq_one_and_isUnramChar hM hC L.zel L.geo L.bz k (Δ a) (x a) (hL a) (hsph a)
+  have key := fun a =>
+    GlobalTheory.SphSeg.len_eq_one_and_isUnramChar hM hC L.zel L.geo L.bz k (Δ a) (x a) (hL a)
+      (hsph a)
   have hsupp : HasSupport π (∑ a, (Δ a).ms) := by
     obtain ⟨Z, Ψ, -, hΨ, -⟩ := L.zel k
     exact SupportRing.hasSupport_of_isSubquotient_prodIrr hΨ (fun a => (hL a).hasSupport) hi hsq
   rw [supp_unique L hS hsupp]
-  exact unlinked_sum_ms_of_len_one_unram_not_linked Δ (fun a => (key a).1) (fun a => (key a).2) hlink
+  exact
+    unlinked_sum_ms_of_len_one_unram_not_linked Δ (fun a => (key a).1) (fun a => (key a).2) hlink
 
-theorem unlinked_of_detVec [CharZero k] (L : Loc) (hGU : GlobalTheory.Published.GenericUnlinkedGL)
-    (hM : GlobalTheory.Published.LanglandsMultisegments) (hC : GlobalTheory.Published.StandardCosocleGL)
-    {N : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] {π : Representation ℂ (GL (Fin N) k) V}
-    (hg : IsGeneric π) {η : kˣ →* ℂˣ} (hη : IsSmoothChar η) (hv : UpperTheory.TNZ.HasDetVec π η) {s : Multiset (IrrGL (k := k))}
-    (hS : HasSupport π s) : GlobalTheory.RoadU.Unlinked s := by
+theorem unlinked_of_detVec
+    [CharZero k]
+    (L : Loc) (hGU : GlobalTheory.Published.GenericUnlinkedGL)
+    (hM : GlobalTheory.Published.LanglandsMultisegments)
+    (hC : GlobalTheory.Published.StandardCosocleGL)
+    {N : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    {π : Representation ℂ (GL (Fin N) k) V} (hg : IsGeneric π)
+    {η : kˣ →* ℂˣ} (hη : IsSmoothChar η) (hv : UpperTheory.TNZ.HasDetVec π η)
+    {s : Multiset (IrrGL (k := k))} (hS : HasSupport π s)
+    : GlobalTheory.RoadU.Unlinked s := by
   have hη' : IsSmoothChar η⁻¹ := hη.inv
   have hsph := (UpperTheory.TNZ.step_detVec k N V π η).2 hv
   have hS' := hS.tw η⁻¹ hη'
   have hg' := (isGeneric_twist_iff (π := π) η⁻¹).2 hg
   have hU := unlinked_of_spherical L hGU hM hC hS'.isSmooth hS'.isIrreducible hg' hsph hS'
   intro y hy z hz heq
-  apply hU (y.tw η⁻¹ hη') (Multiset.mem_map_of_mem _ hy) (z.tw η⁻¹ hη') (Multiset.mem_map_of_mem _ hz)
+  apply hU (y.tw η⁻¹ hη') (Multiset.mem_map_of_mem _ hy) (z.tw η⁻¹ hη')
+    (Multiset.mem_map_of_mem _ hz)
   rw [heq, IrrGL.tw_nu]
 
-theorem unlinked_of_tameSphProd [CharZero k] (L : Loc) (hGU : GlobalTheory.Published.GenericUnlinkedGL)
-    (hM : GlobalTheory.Published.LanglandsMultisegments) (hC : GlobalTheory.Published.StandardCosocleGL) (hP : GlobalTheory.BZMir.Leib.GenericProdIff k)
+theorem unlinked_of_tameSphProd
+    [CharZero k]
+    (L : Loc) (hGU : GlobalTheory.Published.GenericUnlinkedGL)
+    (hM : GlobalTheory.Published.LanglandsMultisegments)
+    (hC : GlobalTheory.Published.StandardCosocleGL) (hP : GlobalTheory.BZMir.Leib.GenericProdIff k)
     {N c : ℕ} {d : Fin c → ℕ} {hd : ∑ a, d a = N} {V : Type} [AddCommGroup V] [Module ℂ V]
-    {π : Representation ℂ (GL (Fin N) k) V} (hg : IsGeneric π) {θ : Fin c → 𝓀[k]ˣ →* ℂˣ} (hθ : Function.Injective θ)
-    (h : IsTameSphProd π d hd θ) {s : Multiset (IrrGL (k := k))} (hS : HasSupport π s) : GlobalTheory.RoadU.Unlinked s := by
+    {π : Representation ℂ (GL (Fin N) k) V} (hg : IsGeneric π)
+    {θ : Fin c → 𝓀[k]ˣ →* ℂˣ} (hθ : Function.Injective θ) (h : IsTameSphProd π d hd θ)
+    {s : Multiset (IrrGL (k := k))} (hS : HasSupport π s)
+    : GlobalTheory.RoadU.Unlinked s := by
   obtain ⟨η, hη, X, _, _, σ, hsm, hirr, hdv, ⟨e⟩⟩ := h
   have hgM : IsGeneric (multiProd (stdBlocks d hd) σ) := (isGeneric_congr e).1 hg
   have hgσ := (hP c N d hd X σ hsm).1 hgM
-  have hcs := fun a => UpperTheory.TNZ.stepL_cuspSupp L k (d a) (X a) (σ a) (hsm a) (hirr a) (η a) (hη a).1 (hdv a)
+  have hcs := fun a =>
+    UpperTheory.TNZ.stepL_cuspSupp L k (d a) (X a) (σ a) (hsm a) (hirr a) (η a) (hη a).1 (hdv a)
   choose μ hμ hcsp using hcs
   let t : Fin c → Multiset (IrrGL (k := k)) := fun a =>
     Multiset.map (fun j => IrrGL.ofChar (μ a j) (hμ a j).1) Finset.univ.val

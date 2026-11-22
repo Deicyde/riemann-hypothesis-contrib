@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal.Int.Geo
 
-theorem UpperTheory.tower_point_count_statement :
-    Count := by
+theorem UpperTheory.tower_point_count_statement : Count := by
   intro Γ _ K₀ H K hKH hHK₀ hK F κ hF hκ ζ
   classical
   have hmul : K.relIndex H * H.relIndex K₀ = K.relIndex K₀ :=
@@ -23,12 +22,12 @@ theorem UpperTheory.tower_point_count_statement :
     intro ξ
     by_cases hne : Nonempty {x // κ x = ξ}
     · obtain ⟨⟨q0, hq0⟩⟩ := hne
-      have memH : ∀ q : {x // κ x = ξ},
-          ((q0.out : ↥K₀) : Γ)⁻¹ * ((q.1.out : ↥K₀) : Γ) ∈ H := by
+      have memH : ∀ q : {x // κ x = ξ}, ((q0.out : ↥K₀) : Γ)⁻¹ * ((q.1.out : ↥K₀) : Γ) ∈ H := by
         intro q
         apply hκ
         rw [QuotientGroup.out_eq', QuotientGroup.out_eq', hq0, q.2]
-      let f : {x // κ x = ξ} → ↥H ⧸ K.subgroupOf H := fun q => ((⟨_, memH q⟩ : ↥H) : ↥H ⧸ K.subgroupOf H)
+      let f : {x // κ x = ξ} → ↥H ⧸ K.subgroupOf H := fun q =>
+        ((⟨_, memH q⟩ : ↥H) : ↥H ⧸ K.subgroupOf H)
       have hinj : Function.Injective f := by
         intro q1 q2 h12
         have h' := QuotientGroup.eq.mp h12
@@ -38,8 +37,9 @@ theorem UpperTheory.tower_point_count_statement :
         apply QuotientGroup.eq.mpr
         rw [Subgroup.mem_subgroupOf]
         simpa [mul_assoc] using h'
-      calc Nat.card {x // κ x = ξ} ≤ Nat.card (↥H ⧸ K.subgroupOf H) :=
-            Nat.card_le_card_of_injective f hinj
+      calc
+        Nat.card {x // κ x = ξ}
+          ≤ Nat.card (↥H ⧸ K.subgroupOf H) := Nat.card_le_card_of_injective f hinj
         _ = K.relIndex H := rfl
     · haveI := not_nonempty_iff.mp hne
       rw [Nat.card_of_isEmpty]

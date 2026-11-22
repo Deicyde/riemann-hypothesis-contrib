@@ -4,8 +4,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 
 @[expose] public section
 
-theorem UpperTheory.V.Pr.globProp :
-    UpperTheory.V.Pr.GlobProp := by
+theorem UpperTheory.V.Pr.globProp : UpperTheory.V.Pr.GlobProp := by
   intro X _ _ M hM
   classical
   have hfin := TopologicalSpace.NoetherianSpace.finite_irreducibleComponents (α := X)
@@ -37,7 +36,8 @@ theorem UpperTheory.V.Pr.globProp :
       exact ⟨x, hxC, Set.mem_biUnion (show Ys ∈ {Y | M.CompI Y ∧ Y ⊆ M.Good} from ⟨hYs, hYsg⟩) hxY⟩
     have hB' : (M.Core ∩ B).Nonempty := by
       obtain ⟨x, hxY, hxC⟩ := hM.meets Yb hYb
-      exact ⟨x, hxC, Set.mem_biUnion (show Yb ∈ {Y | M.CompI Y ∧ ¬ Y ⊆ M.Good} from ⟨hYb, hYbn⟩) hxY⟩
+      exact
+        ⟨x, hxC, Set.mem_biUnion (show Yb ∈ {Y | M.CompI Y ∧ ¬ Y ⊆ M.Good} from ⟨hYb, hYbn⟩) hxY⟩
     obtain ⟨x, hxC, hxG, hxB⟩ := isPreconnected_closed_iff.mp hM.conn G B hGc hBc hcov hG' hB'
     obtain ⟨z, hzGB, hzCl⟩ := hM.jac (G ∩ B) (hGc.inter hBc) ⟨x, ⟨hxG, hxB⟩, hxC⟩
     rw [hG, hB] at hzGB

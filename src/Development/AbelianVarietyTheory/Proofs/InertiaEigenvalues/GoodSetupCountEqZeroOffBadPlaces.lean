@@ -26,8 +26,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsOpe
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2 Formalism.L2.Host Formalism.L2.DIV Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links
-  Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.TwInputs GlobalTheory.SeriesTie NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2 Formalism.L2.Host Formalism.L2.DIV
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.NX
+  GlobalTheory.HeightCounting GlobalTheory.TwInputs GlobalTheory.SeriesTie NumberField
+  IsDedekindDomain Polynomial
 open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx V0 Fm0)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin IsAlgPos)
@@ -42,8 +45,10 @@ namespace GlobalTheory.TwInputs.SetupPin
 
 variable {D : D7}
 
-theorem goodSetup_badPlaces_conj (F : TwFrameC D) {low : Finset ℕ} (T : TwistFrameLowIndexCompatibility D F low) :
-    ∀ i, ∀ P ∈ D.ntw.S0 i, ∀ P', Formalism.BasicNotions.IsConjPl D.host P P' → P' ∈ D.ntw.S0 i := by
+theorem goodSetup_badPlaces_conj
+    (F : TwFrameC D) {low : Finset ℕ} (T : TwistFrameLowIndexCompatibility D F low)
+    : ∀ i, ∀ P ∈ D.ntw.S0 i, ∀ P',
+      Formalism.BasicNotions.IsConjPl D.host P P' → P' ∈ D.ntw.S0 i := by
   intro i P hP P' hc
   have hP' : P ∈ (D.ntw.S0 i : Set (HeightOneSpectrum (𝓞 D.host.E))) := hP
   rw [T.ringSpec_excludedPlaces_eq i] at hP'
@@ -52,13 +57,15 @@ theorem goodSetup_badPlaces_conj (F : TwFrameC D) {low : Finset ℕ} (T : TwistF
   rcases hP' with (((h | h) | h) | h) | h
   · exact Or.inl (Or.inl (Or.inl (Or.inl (Formalism.L2.placesOver_conj D _ h hc))))
   · obtain ⟨k, hk⟩ := Set.mem_iUnion.1 h
-    exact Or.inl (Or.inl (Or.inl (Or.inr (Set.mem_iUnion.2 ⟨k, Formalism.L2.placesOver_conj D _ hk hc⟩))))
+    exact Or.inl (Or.inl (Or.inl (Or.inr (Set.mem_iUnion.2
+      ⟨k, Formalism.L2.placesOver_conj D _ hk hc⟩))))
   · exact Or.inl (Or.inl (Or.inr (Formalism.L2.placesOver_conj D _ h hc)))
   · exact Or.inl (Or.inr (Formalism.L2.placesOver_conj D _ h hc))
   · exact Or.inr (T.concreteTwistFrame_extraExcludedPlaces_conj i P P' h hc)
 
-theorem goodSetup_placesOverTwo_subset (F : TwFrameC D) {low : Finset ℕ} (T : TwistFrameLowIndexCompatibility D F low) (h2 : 2 ∈ low) :
-    ∀ i, placesOver D.host.E 2 ⊆ ↑(D.ntw.S0 i) := by
+theorem goodSetup_placesOverTwo_subset
+    (F : TwFrameC D) {low : Finset ℕ} (T : TwistFrameLowIndexCompatibility D F low) (h2 : 2 ∈ low)
+    : ∀ i, placesOver D.host.E 2 ⊆ ↑(D.ntw.S0 i) := by
   intro i P hP
   show P ∈ (D.ntw.S0 i : Set (HeightOneSpectrum (𝓞 D.host.E)))
   rw [T.ringSpec_excludedPlaces_eq i]
@@ -67,9 +74,12 @@ theorem goodSetup_placesOverTwo_subset (F : TwFrameC D) {low : Finset ℕ} (T : 
 theorem q_dvd_discr (D : D7) : D.host.q ∣ (NumberField.discr D.host.E).natAbs :=
   Int.natCast_dvd.1 D.host.q_dvd_discr
 
-theorem goodSetup_count_eq_zero_off_badPlaces (F : TwFrameC D) {low : Finset ℕ} (T : TwistFrameLowIndexCompatibility D F low) (h2 : 2 ∈ low)
-    (hd : (NumberField.discr D.host.E).natAbs.primeFactors ⊆ low) (hc : (Ideal.absNorm D.host.ccK).primeFactors ⊆ low) :
-    ∀ i P, P ∉ D.ntw.S0 i → FractionalIdeal.count D.host.E P D.host.AA = 0 := by
+theorem goodSetup_count_eq_zero_off_badPlaces
+    (F : TwFrameC D)
+    {low : Finset ℕ} (T : TwistFrameLowIndexCompatibility D F low) (h2 : 2 ∈ low)
+    (hd : (NumberField.discr D.host.E).natAbs.primeFactors ⊆ low)
+    (hc : (Ideal.absNorm D.host.ccK).primeFactors ⊆ low)
+    : ∀ i P, P ∉ D.ntw.S0 i → FractionalIdeal.count D.host.E P D.host.AA = 0 := by
   intro i P hP
   by_contra hA
   have hb : ((GlobalTheory.HalfCompare.badInt D : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal := by
@@ -80,28 +90,34 @@ theorem goodSetup_count_eq_zero_off_badPlaces (F : TwFrameC D) {low : Finset ℕ
   have hlow : p ∈ low := by
     unfold GlobalTheory.HalfCompare.badInt at hdiv
     rcases hp.dvd_mul.1 hdiv with h | h
-    · exact hd (Nat.mem_primeFactors.2 ⟨hp,
+    · exact hd (Nat.mem_primeFactors.2 ⟨
+        hp,
         Int.natCast_dvd.1 ((D.host.dvd_discr_iff_dvd_condN hp).2 (h.mul_right D.host.d)),
-        Int.natAbs_ne_zero.2 (NumberField.discr_ne_zero _)⟩)
-    · exact hc (Nat.mem_primeFactors.2 ⟨hp, h, by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact D.host.ccK_ne_bot⟩)
+        Int.natAbs_ne_zero.2 (NumberField.discr_ne_zero _)
+      ⟩)
+    · exact hc (Nat.mem_primeFactors.2
+        ⟨hp, h, by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact D.host.ccK_ne_bot⟩)
   apply hP
   show P ∈ (D.ntw.S0 i : Set (HeightOneSpectrum (𝓞 D.host.E)))
   rw [T.ringSpec_excludedPlaces_eq i]
   exact Or.inr (T.concreteTwistFrame_extraExcluded_over_smallPrimes i p hlow ((hpP p).2 dvd_rfl))
 
-theorem mk_fractionRing_le {R : Type} [CommRing R] [IsDomain R] (h : Cardinal.mk R ≤ Cardinal.continuum) :
-    Cardinal.mk (FractionRing R) ≤ Cardinal.continuum := by
-  have hs : Function.Surjective
-      (fun p : R × nonZeroDivisors R => IsLocalization.mk' (FractionRing R) p.1 p.2) := fun z => by
+theorem mk_fractionRing_le
+    {R : Type} [CommRing R] [IsDomain R] (h : Cardinal.mk R ≤ Cardinal.continuum)
+    : Cardinal.mk (FractionRing R) ≤ Cardinal.continuum := by
+  have hs : Function.Surjective (fun p : R × nonZeroDivisors R =>
+      IsLocalization.mk' (FractionRing R) p.1 p.2) := fun z => by
     obtain ⟨⟨x, y⟩, hxy⟩ := IsLocalization.mk'_surjective (nonZeroDivisors R) z
     exact ⟨(x, y), hxy⟩
   refine (Cardinal.mk_le_of_surjective hs).trans ?_
   rw [Cardinal.mk_prod, Cardinal.lift_id, Cardinal.lift_id]
-  calc Cardinal.mk R * Cardinal.mk (nonZeroDivisors R) ≤ Cardinal.continuum * Cardinal.continuum :=
-        mul_le_mul' h ((Cardinal.mk_subtype_le _).trans h)
+  calc
+    Cardinal.mk R * Cardinal.mk (nonZeroDivisors R) ≤ Cardinal.continuum * Cardinal.continuum :=
+      mul_le_mul' h ((Cardinal.mk_subtype_le _).trans h)
     _ = Cardinal.continuum := Cardinal.continuum_mul_self
 
-theorem mk_frac_Ok (F : TwFrameC D) : ∀ i k, Cardinal.mk (FractionRing (D.ntw.Ok i k)) ≤ Cardinal.continuum := by
+theorem mk_frac_Ok (F : TwFrameC D)
+    : ∀ i k, Cardinal.mk (FractionRing (D.ntw.Ok i k)) ≤ Cardinal.continuum := by
   intro i k
   haveI := D.ntw.lPrime i
   apply mk_fractionRing_le
@@ -110,14 +126,22 @@ theorem mk_frac_Ok (F : TwFrameC D) : ∀ i k, Cardinal.mk (FractionRing (D.ntw.
   refine (Cardinal.mk_le_of_injective hinj).trans ?_
   rw [(GlobalTheory.PadicCard.card_padicAlgCl_padicComplex (D.ntw.l i)).2, Cardinal.mk_complex]
 
-theorem continuous_comp_of_isOpen_ker {Γ B Y : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group B]
-    [TopologicalSpace Y] (φ : Γ →* B) (f : B → Y) (h : IsOpen (φ.ker : Set Γ)) : Continuous (f ∘ φ) := by
+theorem continuous_comp_of_isOpen_ker
+    {Γ B Y : Type}
+    [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group B] [TopologicalSpace Y]
+    (φ : Γ →* B)
+    (f : B → Y) (h : IsOpen (φ.ker : Set Γ))
+    : Continuous (f ∘ φ) := by
   have hloc : IsLocallyConstant (f ∘ φ) := by
     intro s
     rw [isOpen_iff_forall_mem_open]
     intro g hg
-    refine ⟨(fun g' => g⁻¹ * g') ⁻¹' (φ.ker : Set Γ), fun g' hg' => ?_,
-      h.preimage (continuous_const.mul continuous_id), ?_⟩
+    refine ⟨
+      (fun g' => g⁻¹ * g') ⁻¹' (φ.ker : Set Γ),
+      fun g' hg' => ?_,
+      h.preimage (continuous_const.mul continuous_id),
+      ?_
+    ⟩
     · have h1 : φ (g⁻¹ * g') = 1 := hg'
       rw [map_mul, map_inv, inv_mul_eq_one] at h1
       show f (φ g') ∈ s
@@ -141,28 +165,43 @@ namespace GlobalTheory.TwInputs.SetupPin
 
 variable {D : D7}
 
-theorem exists_art_gal (hA : GlobalTheory.Published.GlobalArtinReciprocity) (cf : CharFrame D) (hR : DeltaRead D cf) :
-    ∃ art : Ideles D.host.E →* Gab D.host.E D.nd.Om, IsGlobalArtin art ∧ ∀ i b,
-      ∃ (κ : FractionRing (D.ntw.O0 i) →+* Qbar (D.ntw.l i)) (ι : Qbar (D.ntw.l i) ≃+* ℂ),
-        (∀ x, ι (κ ((if b then D.ntw.emb0 i else D.ntw.emb0b i) x)) = embLL0 D x) ∧
-        GlobalTheory.GalChar.IsGal art κ ι (cf.delAt (D.ntw.l i)) (fun _ => 0) (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i)) := by
+theorem exists_art_gal
+    (hA : GlobalTheory.Published.GlobalArtinReciprocity) (cf : CharFrame D) (hR : DeltaRead D cf)
+    : ∃ art : Ideles D.host.E →* Gab D.host.E D.nd.Om,
+      IsGlobalArtin art
+        ∧ ∀ i b,
+          ∃ (κ : FractionRing (D.ntw.O0 i) →+* Qbar (D.ntw.l i)) (ι : Qbar (D.ntw.l i) ≃+* ℂ),
+            (∀ x, ι (κ ((if b then D.ntw.emb0 i else D.ntw.emb0b i) x)) = embLL0 D x)
+              ∧ GlobalTheory.GalChar.IsGal art κ ι (cf.delAt (D.ntw.l i))
+                (fun _ => 0)
+                (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i)) := by
   obtain ⟨art, hart⟩ := hA D.host.E D.nd.Om
   refine ⟨art, hart, fun i b => ?_⟩
   haveI := D.ntw.lPrime i
   obtain ⟨ρ⟩ := GlobalTheory.Triple.Reading.nonempty (X := D.ntw) i b
-  have hker : IsOpen ((Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i)).ker : Set (G D.host.E D.nd.Om)) := by
-    have e : ((Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i)).ker : Set (G D.host.E D.nd.Om)) = (D.ntw.delta i).ker := by
+  have hker : IsOpen
+      ((Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i)).ker
+        : Set (G D.host.E D.nd.Om)) := by
+    have e
+        : ((Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i)).ker
+            : Set (G D.host.E D.nd.Om))
+          = (D.ntw.delta i).ker := by
       ext g
       cases b <;> simp [Formalism.MainNotions.BlochKatoReduction.Gen.psiAt, MonoidHom.mem_ker]
     rw [e]
     exact D.ntw.delta_open i
   have hχ : IsAlgPos (cf.delAt (D.ntw.l i)) 0 := delAt_alg cf _
   obtain ⟨r0, hr0, hL⟩ := hart.exists_isLAdicOf ρ.ι hχ
-  have hc : Continuous (GlobalTheory.GalChar.inQ ρ.κ (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i))) :=
-    continuous_comp_of_isOpen_ker (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i))
+  have hc : Continuous (GlobalTheory.GalChar.inQ ρ.κ
+      (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i))) :=
+    continuous_comp_of_isOpen_ker
+      (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i))
       (Units.map (GlobalTheory.GalChar.toQ ρ.κ).toMonoidHom) hker
   have hz : ∀ v, ‖(((cf.delAt (D.ntw.l i)).val v : ℂˣ) : ℂ)‖ = 1 := fun v => cf.delAt_unitary _ _
-  have heq : GlobalTheory.GalChar.inQ ρ.κ (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i)) = r0 := by
+  have heq
+      : GlobalTheory.GalChar.inQ ρ.κ
+          (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i))
+        = r0 := by
     refine GlobalTheory.GalChar.eq_of_frob hart hc hr0 ?_
     filter_upwards [GlobalTheory.GalChar.away_ae (E := D.host.E) (D.ntw.l i) (Fact.out : (D.ntw.l i).Prime).ne_zero,
       GlobalTheory.GalChar.unr_ae (cf.delAt (D.ntw.l i))] with v hv hu A hA σ hσ
@@ -174,7 +213,8 @@ theorem exists_art_gal (hA : GlobalTheory.Published.GlobalArtinReciprocity) (cf 
     cases b
     · have hstar : (x : D.what₂.LL) = star ((x⁻¹ : D.LL0) : D.what₂.LL) := by
         apply D.what₂.embLL.injective
-        rw [D.starLL_cx, IntermediateField.coe_inv, map_inv₀, hx', inv_inv, ← Complex.inv_eq_conj (hz v)]
+        rw [D.starLL_cx, IntermediateField.coe_inv, map_inv₀, hx', inv_inv,
+          ← Complex.inv_eq_conj (hz v)]
       have h1 : ρ.ι (ρ.κ (D.ntw.emb0 i x)) = (((cf.delAt (D.ntw.l i)).val v : ℂˣ) : ℂ) := by
         rw [← D.ntw.restX_coefficientEmbedding_conj i x⁻¹ x hstar]
         have := ρ.read x⁻¹
@@ -197,7 +237,8 @@ theorem exists_art_gal (hA : GlobalTheory.Published.GlobalArtinReciprocity) (cf 
   refine ⟨ρ.κ, ρ.ι, fun x => ?_, hχ, ?_, ?_⟩
   · have := ρ.read x
     cases b <;> simpa [GlobalTheory.Triple.embSide] using this
-  · exact continuous_comp_of_isOpen_ker (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i)) Units.val hker
+  · exact continuous_comp_of_isOpen_ker
+      (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i)) Units.val hker
   · rw [heq]
     exact hL
 

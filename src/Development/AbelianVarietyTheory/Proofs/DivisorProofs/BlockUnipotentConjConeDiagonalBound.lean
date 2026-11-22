@@ -7,11 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConeCoordina
 
 @[expose] public section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory
+  GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
 
 namespace GlobalTheory
 
-theorem unip_mul_diag_cone : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (t : ℝ), 0 < t → ∀ i j : Fin a, (j : ℕ) = i + 1 → ∃ C : ℝ, 0 ≤ C ∧ ∀ (r : Fin a → ℝ) (d : GL (Fin a) (Cinf E)), (∀ i, 0 < r i) → (∀ i j : Fin a, (j : ℕ) = i + 1 → t * r j ≤ r i) → d.val = Matrix.diagonal (fun i => fun _ => (r i : ℂ)) → r j / r i ≤ C ∧ ∀ z : BlockIx a j → Cinf E, ∃ z' : BlockIx a j → Cinf E, ‖z'‖ ≤ C * (r j / r i) * ‖z‖ ∧ ∀ τ : ℝ, unip (τ • z) * d = d * unip (τ • z') := by
+theorem unip_mul_diag_cone
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (t : ℝ),
+      0 < t
+        → ∀ i j : Fin a,
+          (j : ℕ) = i + 1
+            → ∃ C : ℝ,
+              0 ≤ C
+                ∧ ∀ (r : Fin a → ℝ) (d : GL (Fin a) (Cinf E)),
+                  (∀ i, 0 < r i) → (∀ i j : Fin a, (j : ℕ) = i + 1 → t * r j ≤ r i)
+                    → d.val = Matrix.diagonal (fun i => fun _ => (r i : ℂ))
+                    → r j / r i ≤ C
+                      ∧ ∀ z : BlockIx a j → Cinf E, ∃ z' : BlockIx a j → Cinf E,
+                        ‖z'‖ ≤ C * (r j / r i) * ‖z‖
+                          ∧ ∀ τ : ℝ, unip (τ • z) * d = d * unip (τ • z') := by
   intro E _ _ _ a t ht i j hij
   obtain ⟨C0, hC0, hb⟩ := GlobalTheory.T.cone_coordinate_ratio_bounded a t ht
   refine ⟨C0 * C0 + C0, by positivity, ?_⟩
@@ -29,14 +44,17 @@ theorem unip_mul_diag_cone : ∀ (E : Type) [Field E] [NumberField E] [_root_.Nu
     have h3 : r i / r p.1.1 ≤ C0 := hb r hr hcone p.1.1 i hk
     have hpos : 0 < r p.1.2 / r p.1.1 := div_pos (hr _) (hr _)
     have heq : r p.1.2 / r p.1.1 = (r p.1.2 / r j) * (r j / r i) * (r i / r p.1.1) := by
-      have := hr j; have := hr i; have := hr p.1.1
+      have := hr j
+      have := hr i
+      have := hr p.1.1
       field_simp
     have hbd : r p.1.2 / r p.1.1 ≤ (C0 * C0 + C0) * (r j / r i) := by
       rw [heq]
       have e1 : 0 ≤ r p.1.2 / r j := (div_pos (hr _) (hr _)).le
       have e3 : 0 ≤ r i / r p.1.1 := (div_pos (hr _) (hr _)).le
-      calc r p.1.2 / r j * (r j / r i) * (r i / r p.1.1) ≤ C0 * (r j / r i) * C0 := by
-            apply mul_le_mul (mul_le_mul_of_nonneg_right h1 hji0) h3 e3 (by positivity)
+      calc
+        r p.1.2 / r j * (r j / r i) * (r i / r p.1.1) ≤ C0 * (r j / r i) * C0 := by
+          apply mul_le_mul (mul_le_mul_of_nonneg_right h1 hji0) h3 e3 (by positivity)
         _ ≤ (C0 * C0 + C0) * (r j / r i) := by nlinarith
     rw [norm_smul, Real.norm_eq_abs, abs_of_pos hpos]
     exact mul_le_mul hbd (norm_le_pi_norm z p) (norm_nonneg _) hX
@@ -50,7 +68,8 @@ theorem unip_mul_diag_cone : ∀ (E : Type) [Field E] [NumberField E] [_root_.Nu
     congr 1
     simp only [nilM, Matrix.of_apply]
     split_ifs with h
-    · simp only [Pi.add_apply, Pi.mul_apply, Pi.smul_apply, smul_eq_mul, Complex.real_smul, add_right_inj]
+    · simp only [Pi.add_apply, Pi.mul_apply, Pi.smul_apply, smul_eq_mul, Complex.real_smul,
+        add_right_inj]
       have := hr k
       have hk0 : (r k : ℂ) ≠ 0 := by exact_mod_cast this.ne'
       push_cast

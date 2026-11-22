@@ -26,7 +26,8 @@ theorem hpk_herm : (Hpk k r)ᴴ = Hpk k r := by
 
 abbrev mid (k r : ℕ) (i : Fin (2 * r + k + 1)) : Prop := r ≤ i.val ∧ i.val ≤ r + k
 
-def midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : Fin (k + 1) := ⟨i.val - r, by have := hi; omega⟩
+def midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : Fin (k + 1) :=
+  ⟨i.val - r, by have := hi; omega⟩
 
 lemma wI_midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : wI k r (midx hi) = i := by
   have := hi
@@ -65,7 +66,8 @@ lemma emb_mid (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (q j : Fin (2 * r + 
   rw [dite_eq_left ⟨hq, hj⟩]
   rfl
 
-def Em (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (k + 1)) ℂ := fun i m => if i = wI k r m then 1 else 0
+def Em (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (k + 1)) ℂ := fun i m =>
+  if i = wI k r m then 1 else 0
 
 lemma Em_mul_mid {X : Type*} (A : Matrix (Fin (k + 1)) X ℂ) (i : Fin (2 * r + k + 1)) (x : X) (hi : mid k r i) :
     (Em k r * A) i x = A (midx hi) x := by
@@ -290,7 +292,9 @@ theorem mBaseMem : MBaseMem := by
   have hζ : Tz k r z * Tz k r z' < Complex.normSq (zeta0 k r z z') := by
     unfold zeta0
     rw [Complex.normSq_ofReal]
-    have hs : Real.sqrt (Tz k r z * Tz k r z') * Real.sqrt (Tz k r z * Tz k r z') = Tz k r z * Tz k r z' :=
+    have hs
+        : Real.sqrt (Tz k r z * Tz k r z') * Real.sqrt (Tz k r z * Tz k r z')
+          = Tz k r z * Tz k r z' :=
       Real.mul_self_sqrt hp.le
     nlinarith
   exact MB.emb_mem_UWb (hD.sec.2 _ hζ).1

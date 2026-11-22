@@ -4,11 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qj7.seq_ex :
-    ∀ (S : ℕ → Type),
-    (∀ (n : ℕ), Finite (S n)) →
-      (∀ (n : ℕ), Nonempty (S n)) →
-        ∀ (t : (n : ℕ) → S (n + (1 : ℕ)) → S n), ∃ (u : (n : ℕ) → S n), ∀ (n : ℕ), t n (u (n + (1 : ℕ))) = u n := by
+theorem UpperTheory.Reformulated.B.Qj7.seq_ex
+    : ∀ (S : ℕ → Type),
+      (∀ (n : ℕ), Finite (S n)) → (∀ (n : ℕ), Nonempty (S n))
+        → ∀ (t : (n : ℕ) → S (n + (1 : ℕ)) → S n), ∃ (u : (n : ℕ) → S n), ∀ (n : ℕ),
+          t n (u (n + (1 : ℕ))) = u n := by
   intro S hfin hne t
   classical
   letI : ∀ n, TopologicalSpace (S n) := fun _ => ⊥
@@ -46,6 +46,7 @@ theorem UpperTheory.Reformulated.B.Qj7.seq_ex :
     obtain ⟨u, hu, _⟩ := hstep k (Classical.choice (hne k))
     exact ⟨u, hu⟩
   have hmono : ∀ k, C (k + 1) ⊆ C k := fun k u hu n hn => hu n (Nat.lt_succ_of_lt hn)
-  obtain ⟨u, hu⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed C hmono hnon
-    (hclosed 0).isCompact hclosed
+  obtain ⟨u, hu⟩ :=
+    IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed C hmono hnon
+      (hclosed 0).isCompact hclosed
   exact ⟨u, fun n => Set.mem_iInter.mp hu (n + 1) n (Nat.lt_succ_self n)⟩

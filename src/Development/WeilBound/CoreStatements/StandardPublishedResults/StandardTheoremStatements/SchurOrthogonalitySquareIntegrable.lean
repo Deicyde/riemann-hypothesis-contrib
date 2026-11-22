@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 namespace PositivityTheory.Stage1.PM
 
-theorem schurOrthogonalitySquareIntegrable : GlobalTheory.Published.SchurOrthogonalitySquareIntegrable :=
+theorem schurOrthogonalitySquareIntegrable
+    : GlobalTheory.Published.SchurOrthogonalitySquareIntegrable :=
   GlobalTheory.Published.schurOrthogonalitySquareIntegrable'
 
 theorem heckeLPartialContinuation : GlobalTheory.Published.HeckeLPartialContinuation :=

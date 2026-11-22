@@ -5,10 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published.Kato
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.GalOfCusp
+  UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published.Kato
 
-theorem UpperTheory.V.X.Kato.embConj :
-    ∀ (l : ℕ) [Fact l.Prime] (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra ℚ Ω] [Algebra K Ω] [IsScalarTower ℚ K Ω] [IsAlgClosure K Ω] (j₀ : Ω →+* Om l) (τ : K →+* Om l), ∃ g : G ℚ Ω, (j₀.comp (g : Ω →+* Ω)).comp (algebraMap K Ω) = τ := by
+theorem UpperTheory.V.X.Kato.embConj
+    : ∀ (l : ℕ) [Fact l.Prime] (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra ℚ Ω]
+        [Algebra K Ω] [IsScalarTower ℚ K Ω] [IsAlgClosure K Ω] (j₀ : Ω →+* Om l) (τ : K →+* Om l),
+      ∃ g : G ℚ Ω,
+        (j₀.comp (g : Ω →+* Ω)).comp (algebraMap K Ω) = τ := by
   intro l _ K Ω _ _ _ _ _ _ _ j₀ τ
   haveI : IsAlgClosure ℚ Ω := IsAlgClosure.ofAlgebraic ℚ K Ω
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed K
@@ -23,12 +28,13 @@ theorem UpperTheory.V.X.Kato.embConj :
     obtain ⟨b, -, hb⟩ := Multiset.mem_map.mp hroot
     exact ⟨b, hb⟩
   choose f hf using hsub
-  let τ' : K →+* Ω :=
-    { toFun := f
-      map_one' := j₀.injective (by rw [hf, map_one, map_one])
-      map_mul' := fun a b => j₀.injective (by rw [hf, map_mul, map_mul, hf, hf])
-      map_zero' := j₀.injective (by rw [hf, map_zero, map_zero])
-      map_add' := fun a b => j₀.injective (by rw [hf, map_add (f := _), map_add (f := _), hf, hf]) }
+  let τ' : K →+* Ω := {
+    toFun := f
+    map_one' := j₀.injective (by rw [hf, map_one, map_one])
+    map_mul' := fun a b => j₀.injective (by rw [hf, map_mul, map_mul, hf, hf])
+    map_zero' := j₀.injective (by rw [hf, map_zero, map_zero])
+    map_add' := fun a b => j₀.injective (by rw [hf, map_add (f := _), map_add (f := _), hf, hf])
+  }
   haveI : Normal ℚ Ω := IsAlgClosure.normal ℚ Ω
   let g0 : Ω →ₐ[ℚ] Ω := (τ'.toRatAlgHom).liftNormal Ω
   refine ⟨AlgEquiv.ofBijective g0 (Algebra.IsAlgebraic.algHom_bijective g0), ?_⟩

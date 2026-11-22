@@ -14,16 +14,18 @@ open MeasureTheory NumberField Formalism.BasicNotions Matrix
 
 namespace Formalism.L2.SG.Pf.NcReal.JX.NOf
 
-open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.S Formalism.L2.SG.Pf.NcReal.JX
+open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.S
+  Formalism.L2.SG.Pf.NcReal.JX
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem hJ_add_l {n : ℕ} (ε : Fin n → Bool) (x y z : Fin n → ℂ) : hJ ε (x + y) z = hJ ε x z + hJ ε y z := by
+theorem hJ_add_l {n : ℕ} (ε : Fin n → Bool) (x y z : Fin n → ℂ)
+    : hJ ε (x + y) z = hJ ε x z + hJ ε y z := by
   first
-    | simp only [hJ, star_add, Matrix.add_dotProduct]
-    | simp only [hJ, star_add, add_dotProduct]
-    | simp [hJ, Matrix.add_dotProduct]
-    | simp [hJ, add_dotProduct]
+  | simp only [hJ, star_add, Matrix.add_dotProduct]
+  | simp only [hJ, star_add, add_dotProduct]
+  | simp [hJ, Matrix.add_dotProduct]
+  | simp [hJ, add_dotProduct]
 
 theorem hJ_conj' {n : ℕ} (ε : Fin n → Bool) (x y : Fin n → ℂ) : hJ ε y x = star (hJ ε x y) := by
   simp only [hJ, Formalism.REAL.Jm, dotProduct, Matrix.mulVec_diagonal, star_sum, Pi.star_apply]
@@ -32,24 +34,34 @@ theorem hJ_conj' {n : ℕ} (ε : Fin n → Bool) (x y : Fin n → ℂ) : hJ ε y
 
 variable {D : D7} (X : HidaSetting D) (u : D.what₂.Word)
 
-theorem emb_star (v : InfinitePlace X.B.I.F) (t : D.host.E) :
-    embS D (X.pl v) (star t) = star (embS D (X.pl v) t) := by
+theorem emb_star (v : InfinitePlace X.B.I.F) (t : D.host.E)
+    : embS D (X.pl v) (star t) = star (embS D (X.pl v) t) := by
   first
-    | exact NumberField.IsCMField.complexEmbedding_complexConj _ t
-    | (simp only [Formalism.MainNotions.S.embS]; exact NumberField.IsCMField.complexEmbedding_complexConj _ t)
-    | (haveI := D.host.isCMField_hostE
-       rw [show (star t : D.host.E) = NumberField.IsCMField.complexConj D.host.E t from rfl]
-       exact NumberField.IsCMField.complexEmbedding_complexConj _ _ t)
-    | (haveI := D.host.isCMField_hostE
-       exact NumberField.IsCMField.complexEmbedding_complexConj D.host.E (embS D (X.pl v)) t)
+  | exact NumberField.IsCMField.complexEmbedding_complexConj _ t
+  | (
+      simp only [Formalism.MainNotions.S.embS]
+      exact NumberField.IsCMField.complexEmbedding_complexConj _ t
+    )
+  | (
+      haveI := D.host.isCMField_hostE
+      rw [show (star t : D.host.E) = NumberField.IsCMField.complexConj D.host.E t from rfl]
+      exact NumberField.IsCMField.complexEmbedding_complexConj _ _ t
+    )
+  | (
+      haveI := D.host.isCMField_hostE
+      exact NumberField.IsCMField.complexEmbedding_complexConj D.host.E (embS D (X.pl v)) t
+    )
 
 theorem rowV_add (x y : (VS D).V) : rowV X u (x + y) = rowV X u x + rowV X u y := by
   funext v j
   have hc : X.crd (x + y) = X.crd x + X.crd y := by
     first
-      | exact Formalism.L2.SG.Pf.Vanish2.crd_add X x y
-      | exact Formalism.L2.SG.HidaSetting.crd_add X x y
-      | (funext i; simp [Formalism.L2.SG.HidaSetting.HidaSetting.crd, Formalism.L2.SG.HidaSetting.crdOf])
+    | exact Formalism.L2.SG.Pf.Vanish2.crd_add X x y
+    | exact Formalism.L2.SG.HidaSetting.crd_add X x y
+    | (
+        funext i
+        simp [Formalism.L2.SG.HidaSetting.HidaSetting.crd, Formalism.L2.SG.HidaSetting.crdOf]
+      )
   have hr : rv X.B.I v (X.crd x + X.crd y) = rv X.B.I v (X.crd x) + rv X.B.I v (X.crd y) := by
     unfold rv
     rw [← Matrix.mulVec_add]
@@ -64,7 +76,7 @@ theorem rowV_zero : rowV X u 0 = 0 := by
   rw [add_zero] at h
   simpa using h
 
-theorem rowV_neg (x : (VS D).V) : rowV X u (-x) = -rowV X u x := by
+theorem rowV_neg (x : (VS D).V) : rowV X u (-x) = - rowV X u x := by
   rw [eq_neg_iff_add_eq_zero, add_comm (rowV X u (-x)), ← rowV_add, add_neg_cancel, rowV_zero]
 
 theorem rowV_sub (x y : (VS D).V) : rowV X u (x - y) = rowV X u x - rowV X u y := by

@@ -15,28 +15,34 @@ universe u
 
 section AlgClosed
 
-variable {K : Type u} [Field K] [IsAlgClosed K] [DecidableEq K]
+variable
+  {K : Type u} [Field K] [IsAlgClosed K] [DecidableEq K]
   {A B C : WeierstrassCurve K} [A.IsElliptic] [B.IsElliptic] [C.IsElliptic]
 
 end AlgClosed
 
 section DualOver
 
-variable {F : Type u} [Field F] {E E' E'' : WeierstrassCurve F} [E.IsElliptic] [E'.IsElliptic]
-  [E''.IsElliptic]
+variable
+  {F : Type u} [Field F]
+  {E E' E'' : WeierstrassCurve F} [E.IsElliptic] [E'.IsElliptic] [E''.IsElliptic]
 
 theorem respectsAdd_dualPtOver (φ : Isogeny E E') : RespectsAdd E' E (dualPtOver φ) := by
   classical
   have hQ := isGenPt_dualPtOver φ
-  have hxy : ∀ Q : (E.baseChange E'.toAffine.FunctionField).toAffine.Point, IsGenPt E Q →
-      xOf _ (Point.map (W' := E) (bcEmb (F' := AlgebraicClosure F) E') Q :
-        ((E.baseChange (AlgebraicClosure F)).baseChange
-          (E'.baseChange (AlgebraicClosure F)).toAffine.FunctionField).toAffine.Point) =
-        bcEmb (F' := AlgebraicClosure F) E' (xOf _ Q) ∧
-      yOf _ (Point.map (W' := E) (bcEmb (F' := AlgebraicClosure F) E') Q :
-        ((E.baseChange (AlgebraicClosure F)).baseChange
-          (E'.baseChange (AlgebraicClosure F)).toAffine.FunctionField).toAffine.Point) =
-        bcEmb (F' := AlgebraicClosure F) E' (yOf _ Q) := by
+  have hxy
+      : ∀ Q : (E.baseChange E'.toAffine.FunctionField).toAffine.Point,
+        IsGenPt E Q
+          → xOf _
+                (Point.map (W' := E) (bcEmb (F' := AlgebraicClosure F) E') Q
+                  : ((E.baseChange (AlgebraicClosure F)).baseChange
+                    (E'.baseChange (AlgebraicClosure F)).toAffine.FunctionField).toAffine.Point)
+              = bcEmb (F' := AlgebraicClosure F) E' (xOf _ Q)
+            ∧ yOf _
+                (Point.map (W' := E) (bcEmb (F' := AlgebraicClosure F) E') Q
+                  : ((E.baseChange (AlgebraicClosure F)).baseChange
+                    (E'.baseChange (AlgebraicClosure F)).toAffine.FunctionField).toAffine.Point)
+              = bcEmb (F' := AlgebraicClosure F) E' (yOf _ Q) := by
     intro Q hQ
     cases Q with
     | zero => exact hQ.elim
@@ -55,19 +61,19 @@ theorem respectsAdd_dualPtOver (φ : Isogeny E E') : RespectsAdd E' E (dualPtOve
 noncomputable def dualOver (φ : Isogeny E E') : Isogeny E' E :=
   ⟨dualPtOver φ, (isIsogeny_iff _).mpr ⟨isGenPt_dualPtOver φ, respectsAdd_dualPtOver φ⟩⟩
 
-theorem isogBaseChange_dualOver [DecidableEq (AlgebraicClosure F)] (φ : Isogeny E E') :
-    isogBaseChange (F' := AlgebraicClosure F) (dualOver φ) = (isogBaseChange φ).dual :=
+theorem isogBaseChange_dualOver [DecidableEq (AlgebraicClosure F)] (φ : Isogeny E E')
+    : isogBaseChange (F' := AlgebraicClosure F) (dualOver φ) = (isogBaseChange φ).dual :=
   Subtype.ext (map_bcEmb_dualPtOver φ)
 
-theorem dualOver_comp (φ : Isogeny E E') :
-    (dualOver φ).comp φ = mulIsogeny E φ.degree (isogeny_degree_ne_zero φ) := by
+theorem dualOver_comp (φ : Isogeny E E')
+    : (dualOver φ).comp φ = mulIsogeny E φ.degree (isogeny_degree_ne_zero φ) := by
   classical
   apply isogBaseChange_injective (Ω := AlgebraicClosure F)
   rw [isogBaseChange_comp, isogBaseChange_dualOver, isogBaseChange_mulIsogeny,
     mulIsogeny_eq_dual_comp_isogBaseChange]
 
-theorem comp_dualOver (φ : Isogeny E E') :
-    φ.comp (dualOver φ) = mulIsogeny E' φ.degree (isogeny_degree_ne_zero φ) := by
+theorem comp_dualOver (φ : Isogeny E E')
+    : φ.comp (dualOver φ) = mulIsogeny E' φ.degree (isogeny_degree_ne_zero φ) := by
   classical
   apply isogBaseChange_injective (Ω := AlgebraicClosure F)
   rw [isogBaseChange_comp, isogBaseChange_dualOver, isogBaseChange_mulIsogeny, Isogeny.comp_dual]

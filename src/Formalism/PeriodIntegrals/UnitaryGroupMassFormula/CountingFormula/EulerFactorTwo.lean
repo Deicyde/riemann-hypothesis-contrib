@@ -11,9 +11,11 @@ namespace PI.UnitaryGroupMassFormula.CntFormula
 
 open Formalism.MainNotions.S
 
-theorem locE_isUnit_or_exists_algEquiv_prod_swap {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : Loc.LocE F E) :
-    (∀ x : E, x ≠ 0 → IsUnit x) ∨ ∃ e : E ≃ₐ[F] F × F, ∀ x, e (L.cj x) = (e x).swap := by
+theorem locE_isUnit_or_exists_algEquiv_prod_swap
+    {F E : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : Loc.LocE F E)
+    : (∀ x : E, x ≠ 0 → IsUnit x) ∨ ∃ e : E ≃ₐ[F] F × F, ∀ x, e (L.cj x) = (e x).swap := by
   classical
   have hrank := L.rank
   have : Module.Free F E := L.free
@@ -73,23 +75,25 @@ theorem locE_isUnit_or_exists_algEquiv_prod_swap {F E : Type} [Field F] [Valuati
     have h1 : p = 1 := by rw [← hpq, h, add_zero]
     apply one_ne_zero (α := E)
     rw [← h1, ← hcq, h, map_zero]
-  let g : (F × F) →ₐ[F] E :=
-    { toFun := fun z => z.1 • p + z.2 • q
-      map_one' := by simp [hpq]
-      map_mul' := fun z w => by
-        simp only [Prod.fst_mul, Prod.snd_mul, Algebra.smul_def, map_mul]
-        linear_combination (-(algebraMap F E z.1 * algebraMap F E w.1)) * hpp -
-          (algebraMap F E z.2 * algebraMap F E w.2) * hqq -
-          (algebraMap F E z.1 * algebraMap F E w.2 + algebraMap F E z.2 * algebraMap F E w.1) * hpq0
-      map_zero' := by simp
-      map_add' := fun z w => by
-        simp only [Prod.fst_add, Prod.snd_add, add_smul]
-        abel
-      commutes' := fun r => by
-        simp only [Prod.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
-        rw [← smul_add, hpq, Algebra.algebraMap_eq_smul_one] }
+  let g : (F × F) →ₐ[F] E := {
+    toFun := fun z => z.1 • p + z.2 • q
+    map_one' := by simp [hpq]
+    map_mul' := fun z w => by
+      simp only [Prod.fst_mul, Prod.snd_mul, Algebra.smul_def, map_mul]
+      linear_combination (-(algebraMap F E z.1 * algebraMap F E w.1)) * hpp -
+        (algebraMap F E z.2 * algebraMap F E w.2) * hqq -
+        (algebraMap F E z.1 * algebraMap F E w.2 + algebraMap F E z.2 * algebraMap F E w.1) * hpq0
+    map_zero' := by simp
+    map_add' := fun z w => by
+      simp only [Prod.fst_add, Prod.snd_add, add_smul]
+      abel
+    commutes' := fun r => by
+      simp only [Prod.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
+      rw [← smul_add, hpq, Algebra.algebraMap_eq_smul_one]
+  }
   have ginj : Function.Injective g := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro z hz
     have hz' : z.1 • p + z.2 • q = 0 := hz
     have h1 : z.1 • p = 0 := by
@@ -105,7 +109,8 @@ theorem locE_isUnit_or_exists_algEquiv_prod_swap {F E : Type} [Field F] [Valuati
   have gsurj : Function.Surjective g := by
     have hdim : Module.finrank F (F × F) = Module.finrank F E := by
       rw [Module.finrank_prod, Module.finrank_self, hrank]
-    exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim (f := g.toLinearMap)).1 ginj
+    exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim (f := g.toLinearMap)).1
+      ginj
   let e0 := AlgEquiv.ofBijective g ⟨ginj, gsurj⟩
   refine ⟨e0.symm, fun y => ?_⟩
   obtain ⟨z, rfl⟩ := gsurj y

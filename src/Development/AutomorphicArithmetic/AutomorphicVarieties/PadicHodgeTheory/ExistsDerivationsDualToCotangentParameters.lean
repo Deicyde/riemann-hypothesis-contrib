@@ -6,8 +6,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing UpperTheory.V.Alg
 
-theorem UpperTheory.exists_derivations_dual_to_cotangent_parameters :
-    ∀ (O E : Type) [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E] (R : Type) [CommRing R] [Algebra O R] [IsNoetherianRing R] (I : Ideal R) (x : R →ₐ[O] O), I ≤ RingHom.ker x → ∃ (n : ℕ) (D : Fin n → (R →ₗ[O] E)) (t : Fin n → R) (c : O), c ≠ 0 ∧ (∀ i a b, D i (a * b) = algebraMap O E (x a) * D i b + algebraMap O E (x b) * D i a) ∧ (∀ i, ∀ a ∈ I, D i a = 0) ∧ (∀ i, x (t i) = 0) ∧ (∀ i j, D j (t i) = if j = i then algebraMap O E c else 0) ∧ ∀ a, x a = 0 → ∃ (e : O) (o : Fin n → O), e ≠ 0 ∧ e • a - ∑ i, o i • t i ∈ RingHom.ker x ^ 2 ⊔ I := by
+theorem UpperTheory.exists_derivations_dual_to_cotangent_parameters
+    : ∀ (O E : Type) [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E]
+        (R : Type) [CommRing R] [Algebra O R] [IsNoetherianRing R] (I : Ideal R) (x : R →ₐ[O] O),
+      I ≤ RingHom.ker x
+        → ∃ (n : ℕ) (D : Fin n → (R →ₗ[O] E)) (t : Fin n → R) (c : O),
+          c ≠ 0
+            ∧ (∀ i a b, D i (a * b) = algebraMap O E (x a) * D i b + algebraMap O E (x b) * D i a)
+            ∧ (∀ i, ∀ a ∈ I, D i a = 0) ∧ (∀ i, x (t i) = 0)
+            ∧ (∀ i j, D j (t i) = if j = i then algebraMap O E c else 0)
+            ∧ ∀ a,
+              x a = 0
+                → ∃ (e : O) (o : Fin n → O),
+                  e ≠ 0 ∧ e • a - ∑ i, o i • t i ∈ RingHom.ker x ^ 2 ⊔ I := by
   intro O E _ _ _ _ _ R _ _ _ I x hI
   classical
   set p : Ideal R := RingHom.ker x with hp
@@ -34,8 +45,10 @@ theorem UpperTheory.exists_derivations_dual_to_cotangent_parameters :
       apply Submodule.mem_sup_left
       rw [pow_two]
       exact Ideal.mul_mem_mul (hsub a) (hsub b)
-    have h2 : a * b = (a - x a • (1 : R)) * (b - x b • (1 : R)) - (x a * x b) • (1 : R)
-        + (x a • b + x b • a) := by
+    have h2
+        : a * b
+          = (a - x a • (1 : R)) * (b - x b • (1 : R)) - (x a * x b) • (1 : R)
+            + (x a • b + x b • a) := by
       simp only [Algebra.smul_def, map_mul]
       ring
     rw [h2, map_add (f := _), hπN _ (N.sub_mem h1 (N.smul_mem _ h1N))]
@@ -78,15 +91,13 @@ theorem UpperTheory.exists_derivations_dual_to_cotangent_parameters :
     | add u v hu hv => exact Submodule.add_mem _ hu hv
     | tmul e q =>
       obtain ⟨a, rfl⟩ := N.mkQ_surjective q
-      have : e ⊗ₜ[O] N.mkQ a = e • π a := by
-        simp [π, f, TensorProduct.smul_tmul']
+      have : e ⊗ₜ[O] N.mkQ a = e • π a := by simp [π, f, TensorProduct.smul_tmul']
       rw [this]
       exact Submodule.smul_mem _ _ (key2 a)
   obtain ⟨κ, a, hainj, hsp, hli⟩ := exists_linearIndependent' E (π ∘ g)
   haveI : Finite κ := Finite.of_injective a hainj
   obtain ⟨n, ⟨ε⟩⟩ := Finite.exists_equiv_fin κ
-  let b0 : Module.Basis κ E (TensorProduct O E (R ⧸ N)) :=
-    Module.Basis.mk hli (by rw [hsp, hspan])
+  let b0 : Module.Basis κ E (TensorProduct O E (R ⧸ N)) := Module.Basis.mk hli (by rw [hsp, hspan])
   let b := b0.reindex ε
   let t : Fin n → R := fun i => g (a (ε.symm i))
   have hbt : ∀ i, π (t i) = b i := by
@@ -94,7 +105,8 @@ theorem UpperTheory.exists_derivations_dual_to_cotangent_parameters :
     simp [b, b0, t]
   refine ⟨n, fun i => ((b.coord i).restrictScalars O) ∘ₗ π, t, 1, one_ne_zero, ?_, ?_, ?_, ?_, ?_⟩
   · intro i u v
-    rw [LinearMap.comp_apply, hder, map_add (f := _), map_smul, map_smul, Algebra.smul_def, Algebra.smul_def]
+    rw [LinearMap.comp_apply, hder, map_add (f := _), map_smul, map_smul, Algebra.smul_def,
+      Algebra.smul_def]
     rfl
   · intro i u hu
     simp [hπN u (hJN u (Submodule.mem_sup_right hu))]
@@ -103,8 +115,8 @@ theorem UpperTheory.exists_derivations_dual_to_cotangent_parameters :
   · intro i j
     simp [hbt, Finsupp.single_apply, eq_comm]
   · intro u hu
-    obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O)
-      (fun i => b.repr (π u) i)
+    obtain ⟨d, hd⟩ :=
+      IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O) (fun i => b.repr (π u) i)
     choose o ho using hd
     have h0 : π ((d : O) • u - ∑ i, o i • t i) = 0 := by
       set_option synthInstance.maxHeartbeats 100000 in

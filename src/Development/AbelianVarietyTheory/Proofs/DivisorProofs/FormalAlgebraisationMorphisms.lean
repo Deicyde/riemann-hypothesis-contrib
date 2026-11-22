@@ -24,14 +24,16 @@ variable {R : Type} [CommRing R]
 instance isClosedImmersion_thick (I : Ideal R) (e : ℕ) : IsClosedImmersion (thick R I e) :=
   IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective
 
-theorem isPullback_trans {I : Ideal R} (X : Over (Spec (CommRingCat.of R)))
+theorem isPullback_trans
+    {I : Ideal R} (X : Over (Spec (CommRingCat.of R)))
     (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))))
     (β : ∀ e, (Y e).left ⟶ (Y (e + 1)).left) (b : ∀ e, (Y e).left ⟶ X.left)
     (hb : ∀ e, IsPullback (b e) (Y e).hom X.hom (thick R I e)) (hβ : ∀ e, β e ≫ b (e + 1) = b e)
-    (e : ℕ) : IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e) := by
+    (e : ℕ)
+    : IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e) := by
   have hw : β e ≫ (Y (e + 1)).hom = (Y e).hom ≫ thickTrans R I e := by
-    rw [← cancel_mono (thick R I (e + 1)), Category.assoc, ← (hb (e + 1)).w, ← Category.assoc,
-      hβ, (hb e).w, Category.assoc, thickTrans_comp]
+    rw [← cancel_mono (thick R I (e + 1)), Category.assoc, ← (hb (e + 1)).w, ← Category.assoc, hβ,
+      (hb e).w, Category.assoc, thickTrans_comp]
   refine IsPullback.of_right ?_ hw (hb (e + 1))
   rw [hβ, thickTrans_comp]
   exact hb e
@@ -49,7 +51,9 @@ theorem formalAlgebraisation_morphisms : GlobalTheory.Published.FormalAlgebraisa
     MorphismProperty.of_isPullback (P := @LocallyOfFiniteType) (IsPullback.of_hasPullback X.hom Z.hom).flip hZl
   haveI : QuasiCompact (pullback.fst X.hom Z.hom) :=
     MorphismProperty.of_isPullback (P := @QuasiCompact) (IsPullback.of_hasPullback X.hom Z.hom).flip hZq
-  have hAlg : Alg fW I := GlobalTheory.T.grothendieck_existence_closedSubschemes_separated R I hI _ fW inferInstance inferInstance inferInstance
+  have hAlg : Alg fW I :=
+    GlobalTheory.T.grothendieck_existence_closedSubschemes_separated R I hI _ fW inferInstance
+      inferInstance inferInstance
 
   have hcomm : ∀ e, b e ≫ X.hom = f e ≫ Z.hom := fun e => by rw [(hb e).w, hf e]
   let j : ∀ e, (Y e).left ⟶ pullback X.hom Z.hom := fun e => pullback.lift (b e) (f e) (hcomm e)
@@ -69,8 +73,9 @@ theorem formalAlgebraisation_morphisms : GlobalTheory.Published.FormalAlgebraisa
     · rw [Category.assoc, hj₂, hj₂, hfβ]
   have hYp : ∀ e, IsProper (Y e).hom := fun e =>
     MorphismProperty.of_isPullback (P := @IsProper) (hb e) hX
-  obtain ⟨T, i, c, hi, hip, hci, hcpb⟩ := GlobalTheory.T.formal_algebraisation_tower R I _ fW hAlg Y β
-    (isPullback_trans X Y β b hb hβ) hYp j hjci hjf hjβ
+  obtain ⟨T, i, c, hi, hip, hci, hcpb⟩ :=
+    GlobalTheory.T.formal_algebraisation_tower R I _ fW hAlg Y β (isPullback_trans X Y β b hb hβ)
+      hYp j hjci hjf hjβ
 
   let φ : T ⟶ X.left := i ≫ pullback.fst X.hom Z.hom
   have hφX : φ ≫ X.hom = i ≫ fW := Category.assoc _ _ _
@@ -91,7 +96,8 @@ theorem formalAlgebraisation_morphisms : GlobalTheory.Published.FormalAlgebraisa
   · show b e ≫ gl = f e
     simp only [gl]
     rw [← hcφ e, Category.assoc, IsIso.hom_inv_id_assoc, ← Category.assoc, hci, hj₂]
-  · refine GlobalTheory.T.morphism_eq_of_eq_on_thickenings R I hIj X Z hX hZs Y b hb g' _ fun e => ?_
+  · refine GlobalTheory.T.morphism_eq_of_eq_on_thickenings R I hIj X Z hX hZs Y b hb g' _ fun e =>
+      ?_
     rw [hg' e]
     show f e = b e ≫ gl
     simp only [gl]

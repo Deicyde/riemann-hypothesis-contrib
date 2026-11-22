@@ -13,7 +13,8 @@ open PowerSeries
 
 section Core
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
 variable {l : ℕ} [Fact l.Prime] (P : PhiData O l)
 
@@ -40,11 +41,12 @@ theorem ceil_le (b₀ : ℕ) (hl : 1 ≤ l) : b₀ ≤ l * ((b₀ + l - 1) / l) 
   have h2 := Nat.mod_lt (b₀ + l - 1) (show 0 < l by omega)
   omega
 
-theorem content_bound_level_ideal {ϖ : O} (hϖ : Irreducible ϖ) (w b₀ B s₁ : ℕ) (hw : 1 ≤ w) (hs₁ : 1 ≤ s₁)
-    (hB : (b₀ + l - 1) / l + s₁ ≤ B)
-    (h : P.p 2 ^ w * X ^ b₀ ∈ Ideal.span {C ϖ ^ (eO (O := O) l * s₁), P.p 1 ^ B}) :
-    (s₁ : ℝ) ≤ max 0 ((w : ℝ) - ((B - ((b₀ + l - 1) / l + s₁ - 1) : ℕ) : ℝ) / l + 2 +
-      Real.logb l w) := by
+theorem content_bound_level_ideal
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    (w b₀ B s₁ : ℕ) (hw : 1 ≤ w) (hs₁ : 1 ≤ s₁) (hB : (b₀ + l - 1) / l + s₁ ≤ B)
+    (h : P.p 2 ^ w * X ^ b₀ ∈ Ideal.span {C ϖ ^ (eO (O := O) l * s₁), P.p 1 ^ B})
+    : (s₁ : ℝ)
+      ≤ max 0 ((w : ℝ) - ((B - ((b₀ + l - 1) / l + s₁ - 1) : ℕ) : ℝ) / l + 2 + Real.logb l w) := by
   have hl1 : 1 ≤ l := (Fact.out : l.Prime).one_lt.le
   have hb₀ : b₀ ≤ l * ((b₀ + l - 1) / l) := ceil_le b₀ hl1
   generalize ha' : (b₀ + l - 1) / l = a' at hB hb₀ ⊢
@@ -56,10 +58,14 @@ theorem content_bound_level_ideal {ϖ : O} (hϖ : Irreducible ϖ) (w b₀ B s₁
   have hXa : (X : O⟦X⟧) ^ (l * a') = X ^ (l * a' - b₀) * X ^ b₀ := by
     rw [← pow_add, Nat.sub_add_cancel hb₀]
   have hCl : (C (l : O) : O⟦X⟧) ^ s₁ = C ((vl : O) ^ s₁) * C ϖ ^ k := by
-    rw [hvl, map_mul, mul_pow, map_pow, map_pow, ← pow_mul, hk, mul_comm (eO (O := O) l) s₁, pow_mul]
+    rw [hvl, map_mul, mul_pow, map_pow, map_pow, ← pow_mul, hk, mul_comm (eO (O := O) l) s₁,
+      pow_mul]
   have hm1 : P.p 1 ^ (a' + s₁ - 1) * P.p 2 ^ w ∈ Ideal.span {C ϖ ^ k, P.p 1 ^ B} := by
-    refine Ideal.mem_span_pair.2 ⟨g₁ * X ^ (l * a' - b₀) * α + C ((vl : O) ^ s₁) * g₂ * P.p 2 ^ w,
-      g₁ * X ^ (l * a' - b₀) * β, ?_⟩
+    refine Ideal.mem_span_pair.2 ⟨
+      g₁ * X ^ (l * a' - b₀) * α + C ((vl : O) ^ s₁) * g₂ * P.p 2 ^ w,
+      g₁ * X ^ (l * a' - b₀) * β,
+      ?_
+    ⟩
     rw [← hg, hXa, hCl]
     linear_combination (g₁ * X ^ (l * a' - b₀)) * hαβ
 
@@ -81,8 +87,9 @@ theorem content_bound_level_ideal {ϖ : O} (hϖ : Irreducible ϖ) (w b₀ B s₁
   have hkc : (k : ℝ) ≤ c' := by exact_mod_cast hk'
   rw [ENat.toNat_natCast] at hle
   have he : (1 : ℝ) ≤ eO (O := O) l := by exact_mod_cast eO_pos (O := O) P
-  have : (eO (O := O) l : ℝ) * s₁ ≤ eO (O := O) l *
-      max 0 ((w : ℝ) - ((B - (a' + s₁ - 1) : ℕ) : ℝ) / l + 2 + Real.logb l w) := by
+  have : (eO (O := O) l : ℝ) * s₁
+      ≤ eO (O := O) l
+        * max 0 ((w : ℝ) - ((B - (a' + s₁ - 1) : ℕ) : ℝ) / l + 2 + Real.logb l w) := by
     have : (k : ℝ) = (eO (O := O) l : ℝ) * s₁ := by rw [hk]; push_cast; ring
     linarith
   exact le_of_mul_le_mul_left this (by linarith)
@@ -91,9 +98,11 @@ end Core
 
 section Real
 
-theorem realA (L w' Bq hh lg wS : ℝ) (hL : 11 ≤ L) (hw' : 0 ≤ w') (hBq : 0 ≤ Bq) (hhh : 0 ≤ hh)
-    (hlg : 0 ≤ lg) (hwS : w' / L ≤ wS) :
-    (L / (L - 1)) * max 0 (w' - Bq + hh + 2 + lg) ≤ max 0 (w' - Bq + 16 / 5 * (hh + wS + lg + 1)) := by
+theorem realA
+    (L w' Bq hh lg wS : ℝ)
+    (hL : 11 ≤ L) (hw' : 0 ≤ w') (hBq : 0 ≤ Bq) (hhh : 0 ≤ hh) (hlg : 0 ≤ lg) (hwS : w' / L ≤ wS)
+    : (L / (L - 1)) * max 0 (w' - Bq + hh + 2 + lg)
+      ≤ max 0 (w' - Bq + 16 / 5 * (hh + wS + lg + 1)) := by
   have hL0 : (0 : ℝ) < L := by linarith
   have hL1 : (0 : ℝ) < L - 1 := by linarith
   have hw : w' ≤ wS * L := by rwa [div_le_iff₀ hL0] at hwS
@@ -107,17 +116,23 @@ theorem realA (L w' Bq hh lg wS : ℝ) (hL : 11 ≤ L) (hw' : 0 ≤ w') (hBq : 0
     nlinarith [mul_nonneg (show (0 : ℝ) ≤ L - 11 by linarith) hS, mul_nonneg (show (0 : ℝ) ≤ L - 11 by linarith) hhh,
       mul_nonneg (show (0 : ℝ) ≤ L - 11 by linarith) hlg, mul_nonneg (show (0 : ℝ) ≤ L - 11 by linarith) hBq]
 
-
 set_option maxHeartbeats 800000 in
-theorem exists_s1_bound_choice (l b w S η b₀ b₁ w' : ℕ) (hl : 11 ≤ l) (Sg : ℝ)
-    (hSg : Sg = ((b + η + S : ℕ) : ℝ) / (l : ℝ) ^ 2 + ((w : ℝ) + S + η) / l +
-      Real.logb l (2 * ((b + η + S : ℕ) : ℝ)) + 1)
-    (hsm : 40 * Sg ≤ (b : ℝ) / 4) (h20w : 20 * w ≤ b) (h20η : 20 * η ≤ b) (hw'1 : 1 ≤ w')
-    (hw'w : w' ≤ w) (hbb₁ : b ≤ b₁) (hb₀ : b₀ ≤ b + η) :
-    ∃ s₁ : ℕ, 1 ≤ s₁ ∧ (s₁ : ℝ) ≤ max 1 ((w' : ℝ) - ((b₁ : ℝ) + S) / l + 16 / 5 * Sg) + 1 ∧
-      (b₀ + l - 1) / l + s₁ ≤ b₁ + S ∧
-      ¬ ((s₁ : ℝ) ≤ max 0 ((w' : ℝ) - ((b₁ + S - ((b₀ + l - 1) / l + s₁ - 1) : ℕ) : ℝ) / l + 2 +
-        Real.logb l w')) := by
+theorem exists_s1_bound_choice
+    (l b w S η b₀ b₁ w' : ℕ) (hl : 11 ≤ l)
+    (Sg : ℝ)
+    (hSg : Sg
+      = ((b + η + S : ℕ) : ℝ) / (l : ℝ) ^ 2 + ((w : ℝ) + S + η) / l
+        + Real.logb l (2 * ((b + η + S : ℕ) : ℝ)) + 1)
+    (hsm : 40 * Sg ≤ (b : ℝ) / 4)
+    (h20w : 20 * w ≤ b) (h20η : 20 * η ≤ b) (hw'1 : 1 ≤ w') (hw'w : w' ≤ w) (hbb₁ : b ≤ b₁)
+    (hb₀ : b₀ ≤ b + η)
+    : ∃ s₁ : ℕ,
+      1 ≤ s₁ ∧ (s₁ : ℝ) ≤ max 1 ((w' : ℝ) - ((b₁ : ℝ) + S) / l + 16 / 5 * Sg) + 1
+        ∧ (b₀ + l - 1) / l + s₁ ≤ b₁ + S
+        ∧ ¬((s₁ : ℝ)
+          ≤ max 0
+            ((w' : ℝ) - ((b₁ + S - ((b₀ + l - 1) / l + s₁ - 1) : ℕ) : ℝ) / l + 2
+              + Real.logb l w')) := by
   have hL : (11 : ℝ) ≤ l := by exact_mod_cast hl
   have hL0 : (0 : ℝ) < l := by linarith
   have hL1 : (0 : ℝ) < (l : ℝ) - 1 := by linarith
@@ -175,17 +190,18 @@ theorem exists_s1_bound_choice (l b w S η b₀ b₁ w' : ℕ) (hl : 11 ≤ l) (
     rw [hs₁]
     push_cast
     linarith [Nat.floor_le (le_max_left 0 (Q * l / (l - 1)))]
-  have hA := realA (l : ℝ) w' (((b₁ : ℝ) + S) / l) ((c : ℝ) / l) lg (((w : ℝ) + S + η) / l) hL
-    (by linarith) (by positivity) (by positivity) hlg0
-    (div_le_div_of_nonneg_right (by linarith) hL0.le)
+  have hA :=
+    realA (l : ℝ) w' (((b₁ : ℝ) + S) / l) ((c : ℝ) / l) lg (((w : ℝ) + S + η) / l) hL (by linarith)
+      (by positivity) (by positivity) hlg0 (div_le_div_of_nonneg_right (by linarith) hL0.le)
   have hQle : Q ≤ (w' : ℝ) - ((b₁ : ℝ) + S) / l + (c : ℝ) / l + 2 + lg := by
     have e : ((b₁ : ℝ) + S - c + 1) / l = ((b₁ : ℝ) + S) / l - c / l + 1 / l := by ring
     have : 0 < 1 / (l : ℝ) := by positivity
     rw [hQ, e]
     linarith
   have hfrac : 0 < (l : ℝ) / (l - 1) := div_pos hL0 hL1
-  have hX : max 0 (Q * l / (l - 1)) ≤
-      ((l : ℝ) / (l - 1)) * max 0 ((w' : ℝ) - ((b₁ : ℝ) + S) / l + (c : ℝ) / l + 2 + lg) := by
+  have hX
+      : max 0 (Q * l / (l - 1))
+        ≤ ((l : ℝ) / (l - 1)) * max 0 ((w' : ℝ) - ((b₁ : ℝ) + S) / l + (c : ℝ) / l + 2 + lg) := by
     apply max_le (mul_nonneg hfrac.le (le_max_left _ _))
     have e : Q * l / (l - 1) = ((l : ℝ) / (l - 1)) * Q := by ring
     rw [e]
@@ -194,8 +210,9 @@ theorem exists_s1_bound_choice (l b w S η b₀ b₁ w' : ℕ) (hl : 11 ≤ l) (
   have hcL : (c : ℝ) / l ≤ ((b + η + S : ℕ) : ℝ) / (l : ℝ) ^ 2 + 1 / l := by
     rw [hN, div_add_div _ _ (by positivity) (by positivity), div_le_div_iff₀ hL0 (by positivity)]
     nlinarith [mul_le_mul_of_nonneg_left hc1 (sq_nonneg (l : ℝ))]
-  have hR : (w' : ℝ) - ((b₁ : ℝ) + S) / l + 16 / 5 * ((c : ℝ) / l + ((w : ℝ) + S + η) / l + lg + 1) ≤
-      (w' : ℝ) - ((b₁ : ℝ) + S) / l + 16 / 5 * Sg := by
+  have hR
+      : (w' : ℝ) - ((b₁ : ℝ) + S) / l + 16 / 5 * ((c : ℝ) / l + ((w : ℝ) + S + η) / l + lg + 1)
+        ≤ (w' : ℝ) - ((b₁ : ℝ) + S) / l + 16 / 5 * Sg := by
     rw [hSg]
     linarith
   have hupper : (s₁ : ℝ) ≤ max 1 ((w' : ℝ) - ((b₁ : ℝ) + S) / l + 16 / 5 * Sg) + 1 := by
@@ -242,14 +259,17 @@ end Real
 
 section End
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
 variable {l : ℕ} [Fact l.Prime]
 
-theorem den_of_rel (P : PhiData O l) {ϖ : O} (hϖ : Irreducible ϖ) {D U₁ U₂ : O⟦X⟧} {x : O} {κ B s₁ : ℕ}
-    (hU : D * C x = C (l : O) ^ κ * 1 * U₁ - P.p 1 ^ B * U₂)
-    (hC : D ∉ Ideal.span {C ϖ ^ (eO (O := O) l * s₁), P.p 1 ^ B}) :
-    (l : O) ^ κ ∣ (l : O) ^ s₁ * x := by
+theorem den_of_rel
+    (P : PhiData O l)
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {D U₁ U₂ : O⟦X⟧} {x : O} {κ B s₁ : ℕ} (hU : D * C x = C (l : O) ^ κ * 1 * U₁ - P.p 1 ^ B * U₂)
+    (hC : D ∉ Ideal.span {C ϖ ^ (eO (O := O) l * s₁), P.p 1 ^ B})
+    : (l : O) ^ κ ∣ (l : O) ^ s₁ * x := by
   by_cases hx0 : x = 0
   · simp [hx0]
   by_contra hnd
@@ -289,9 +309,12 @@ theorem den_of_rel (P : PhiData O l) {ϖ : O} (hϖ : Irreducible ϖ) {D U₁ U�
     omega
   rw [hx, hl] at hU
   simp only [map_mul, map_pow] at hU ⊢
-  have key : C ϖ ^ m * (D - C ϖ ^ (e * s₁) *
-      (C ϖ ^ (e * κ - m - e * s₁) * C ((v⁻¹ : Oˣ) : O) * C (u : O) ^ κ * U₁)) =
-      P.p 1 ^ B * (-(C ((v⁻¹ : Oˣ) : O)) * U₂) := by
+  have key
+      : C ϖ ^ m
+          * (D
+            - C ϖ ^ (e * s₁)
+              * (C ϖ ^ (e * κ - m - e * s₁) * C ((v⁻¹ : Oˣ) : O) * C (u : O) ^ κ * U₁))
+        = P.p 1 ^ B * (-(C ((v⁻¹ : Oˣ) : O)) * U₂) := by
     linear_combination C ((v⁻¹ : Oˣ) : O) * hU - C ϖ ^ m * D * hvv +
       C ((v⁻¹ : Oˣ) : O) * C (u : O) ^ κ * U₁ * hpow2
   rw [key]

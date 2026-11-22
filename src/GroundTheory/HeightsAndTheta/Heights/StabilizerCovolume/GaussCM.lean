@@ -55,7 +55,7 @@ theorem ringHom_ext {σ σ' : Em →+* ℂ} (h : σ ζ = σ' ζ) : σ = σ' := b
   ext x
   exact congrArg (fun f : Em →ₐ[ℚ] ℂ => f x) this
 
-theorem conj_emb_ζ (σ : Em →+* ℂ) : conj (σ ζ) = -σ ζ := by
+theorem conj_emb_ζ (σ : Em →+* ℂ) : conj (σ ζ) = - σ ζ := by
   rcases emb_ζ σ with h | h <;> rw [h] <;> simp [Complex.conj_I]
 
 theorem cc_ζ : cc ζ = -ζ := by

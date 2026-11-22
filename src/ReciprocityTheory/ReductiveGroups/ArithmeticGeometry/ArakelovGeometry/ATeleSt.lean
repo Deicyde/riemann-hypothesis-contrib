@@ -6,12 +6,14 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeome
 
 namespace ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.GeometryOfNumbersTheory MvPolynomial MeasureTheory Module Filter Asymptotics
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.GeometryOfNumbersTheory MvPolynomial
+  MeasureTheory Module Filter Asymptotics
 open scoped ComplexOrder
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ] {D : ℕ}
 
-noncomputable def ratioLine (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)) : HermLine (GlobalTheory κ) where
+noncomputable def ratioLine (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ))
+    : HermLine (GlobalTheory κ) where
   a := 0
   h z := m₁.ρ z / m₀.ρ z
   pos z hz := by
@@ -27,11 +29,15 @@ noncomputable def ratioLine (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)) : 
     rw [this, m₀.smul, m₁.smul, mul_div_mul_left _ _ hc0]
     simp
 
-theorem tele_ptsIntegral_neg {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] {e : ℕ}
-    (P : Ideal (MRing ι)) (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (g : ((Σ k, ι k) → ℂ) → ℝ) :
-    ptsIntegral P φ (fun z => - g z) = - ptsIntegral P φ g := by
-  have hsd : ∀ (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) y w,
-      sheetDensity P Ψ φ (fun z => -g z) y w = -sheetDensity P Ψ φ g y w := by
+theorem tele_ptsIntegral_neg
+    {K : Type*} [Fintype K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    {e : ℕ}
+    (P : Ideal (MRing ι)) (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (g : ((Σ k, ι k) → ℂ) → ℝ)
+    : ptsIntegral P φ (fun z => - g z) = - ptsIntegral P φ g := by
+  have hsd
+      : ∀ (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) y w,
+        sheetDensity P Ψ φ (fun z => - g z) y w = - sheetDensity P Ψ φ g y w := by
     intro Ψ y w
     unfold sheetDensity
     split_ifs <;> ring
@@ -45,11 +51,12 @@ theorem tele_ptsIntegral_neg {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, 
     rw [finsum_mem_def, finsum_mem_def, ← finsum_neg_distrib]
     congr 1
     funext w
-    by_cases hw : w ∈ fibre P h.choose y <;> simp [Set.indicator_of_mem, Set.indicator_of_notMem, hw]
+    by_cases hw : w ∈ fibre P h.choose y
+      <;> simp [Set.indicator_of_mem, Set.indicator_of_notMem, hw]
   · simp
 
-theorem tele_one_homog {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] :
-    IsMultiHomog (1 : MRing ι) (0 : K → ℕ) := by
+theorem tele_one_homog {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
+    : IsMultiHomog (1 : MRing ι) (0 : K → ℕ) := by
   classical
   intro m hm k
   have h0 : m = 0 := by
@@ -59,8 +66,9 @@ theorem tele_one_homog {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintyp
   subst h0
   simp
 
-theorem tele_divSupp_one {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-    (P : Ideal (MRing ι)) : divSupp P 1 = ∅ := by
+theorem tele_divSupp_one
+    {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] (P : Ideal (MRing ι))
+    : divSupp P 1 = ∅ := by
   ext W
   simp only [divSupp, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
   rintro ⟨hW, -⟩
@@ -68,10 +76,13 @@ theorem tele_divSupp_one {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fint
   rw [Ideal.span_singleton_one, sup_top_eq] at h1
   exact h1.1.ne_top (top_le_iff.1 h1.2)
 
-theorem fam_degZero (I : AllFam) (hI : I.IsFamily) {P : Ideal (MRing (GlobalTheory κ))} {n : ℕ}
-    (hP : IsArithVar P (n + 1)) (L : Fin n → HermLine (GlobalTheory κ)) (hL : ∀ j, IsSmoothHerm (L j))
-    (B : HermLine (GlobalTheory κ)) (hB : IsSmoothHerm B) (hB0 : B.a = 0) :
-    I Unit (GlobalTheory κ) P (n + 1) (Fin.snoc L B) = ptsIntegral P (pot L) fun z => Real.log (B.h z) := by
+theorem fam_degZero
+    (I : AllFam) (hI : I.IsFamily)
+    {P : Ideal (MRing (GlobalTheory κ))} {n : ℕ} (hP : IsArithVar P (n + 1))
+    (L : Fin n → HermLine (GlobalTheory κ)) (hL : ∀ j, IsSmoothHerm (L j))
+    (B : HermLine (GlobalTheory κ)) (hB : IsSmoothHerm B) (hB0 : B.a = 0)
+    : I Unit (GlobalTheory κ) P (n + 1) (Fin.snoc L B)
+      = ptsIntegral P (pot L) fun z => Real.log (B.h z) := by
   obtain ⟨-, -, h3⟩ := hI Unit (GlobalTheory κ)
   have hP1 : (1 : MRing (GlobalTheory κ)) ∉ P := by
     intro h1
@@ -86,14 +97,17 @@ theorem fam_degZero (I : AllFam) (hI : I.IsFamily) {P : Ideal (MRing (GlobalTheo
   unfold recR
   rw [tele_divSupp_one, finsum_mem_empty, zero_sub]
   unfold arInt
-  have hln : logNorm B 1 = fun z => -Real.log (B.h z) := by
+  have hln : logNorm B 1 = fun z => - Real.log (B.h z) := by
     funext z
     simp [logNorm, Real.log_inv]
   rw [hln, tele_ptsIntegral_neg, neg_neg]
   rfl
 
-theorem tele_herm_ext {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-    {A B : HermLine ι} (ha : A.a = B.a) (hh : A.h = B.h) : A = B := by
+theorem tele_herm_ext
+    {K : Type*} [Fintype K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    {A B : HermLine ι} (ha : A.a = B.a) (hh : A.h = B.h)
+    : A = B := by
   obtain ⟨a, h, _, _⟩ := A
   obtain ⟨a', h', _, _⟩ := B
   simp only at ha hh
@@ -105,8 +119,8 @@ theorem tele_rho_zero (m : ConeMetric (C := ℂ) (ι := Ix κ)) : m.ρ 0 = 0 := 
   have h := m.smul 0 0
   simpa using h
 
-theorem tele_ofCone_tensor (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)) :
-    HermLine.ofCone m₁ = (HermLine.ofCone m₀).tensor (ratioLine m₀ m₁) := by
+theorem tele_ofCone_tensor (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ))
+    : HermLine.ofCone m₁ = (HermLine.ofCone m₀).tensor (ratioLine m₀ m₁) := by
   apply tele_herm_ext
   · show (1 : Unit → ℤ) = 1 + 0
     simp
@@ -118,15 +132,16 @@ theorem tele_ofCone_tensor (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)) :
       simp
     · rw [mul_div_cancel₀ _ (m₀.pos z hz).ne']
 
-theorem tele_smooth_ofCone {m : ConeMetric (C := ℂ) (ι := Ix κ)} (hm : IsSmoothMetric m) :
-    IsSmoothHerm (HermLine.ofCone m) := by
+theorem tele_smooth_ofCone {m : ConeMetric (C := ℂ) (ι := Ix κ)} (hm : IsSmoothMetric m)
+    : IsSmoothHerm (HermLine.ofCone m) := by
   show ContDiffOn ℝ _ m.ρ _
   refine hm.mono fun z hz h0 => ?_
   obtain ⟨i, hi⟩ := hz ()
   exact hi (congrFun h0 _)
 
-theorem tele_smooth_ratio {m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)} (h₀ : IsSmoothMetric m₀)
-    (h₁ : IsSmoothMetric m₁) : IsSmoothHerm (ratioLine m₀ m₁) := by
+theorem tele_smooth_ratio
+    {m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)} (h₀ : IsSmoothMetric m₀) (h₁ : IsSmoothMetric m₁)
+    : IsSmoothHerm (ratioLine m₀ m₁) := by
   have hsub : {z : Ix κ → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} ⊆ {z | z ≠ 0} := by
     intro z hz h0
     obtain ⟨i, hi⟩ := hz ()
@@ -137,43 +152,54 @@ theorem tele_smooth_ratio {m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)} (h�
 def tele_perm {n : ℕ} (i : Fin (n + 1)) : Equiv.Perm (Fin (n + 1)) :=
   finSuccEquivLast.trans (finSuccEquiv' i).symm
 
-theorem tele_comp_perm {α : Type*} {n : ℕ} (F : Fin (n + 1) → α) (i : Fin (n + 1)) :
-    F ∘ tele_perm i = Fin.snoc (F ∘ i.succAbove) (F i) := by
+theorem tele_comp_perm {α : Type*} {n : ℕ} (F : Fin (n + 1) → α) (i : Fin (n + 1))
+    : F ∘ tele_perm i = Fin.snoc (F ∘ i.succAbove) (F i) := by
   funext j
   refine Fin.lastCases ?_ (fun k => ?_) j
   · simp [tele_perm]
   · simp [tele_perm]
 
-def tele_fam (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)) (N i : ℕ) : Fin N → HermLine (GlobalTheory κ) :=
-  fun j => if j.val < i then HermLine.ofCone m₁ else HermLine.ofCone m₀
+def tele_fam (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)) (N i : ℕ)
+    : Fin N → HermLine (GlobalTheory κ) := fun j =>
+  if j.val < i then HermLine.ofCone m₁ else HermLine.ofCone m₀
 
-theorem tele_fam_succAbove (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)) (D i : ℕ) (hi : i < D + 1) (k : ℕ)
-    (hk : k = i ∨ k = i + 1) :
-    tele_fam m₀ m₁ (D + 1) k ∘ (⟨i, hi⟩ : Fin (D + 1)).succAbove = tele_fam m₀ m₁ D i := by
+theorem tele_fam_succAbove
+    (m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ))
+    (D i : ℕ) (hi : i < D + 1)
+    (k : ℕ) (hk : k = i ∨ k = i + 1)
+    : tele_fam m₀ m₁ (D + 1) k ∘ (⟨i, hi⟩ : Fin (D + 1)).succAbove = tele_fam m₀ m₁ D i := by
   funext j
   simp only [Function.comp, tele_fam]
-  have hv : (Fin.succAbove (⟨i, hi⟩ : Fin (D + 1)) j).val = if j.val < i then j.val else j.val + 1 := by
+  have hv
+      : (Fin.succAbove (⟨i, hi⟩ : Fin (D + 1)) j).val = if j.val < i then j.val else j.val + 1 := by
     unfold Fin.succAbove
     split_ifs with h1 h2 h2 <;> simp_all [Fin.lt_def] <;> omega
   rw [hv]
   split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem tele_fam_smooth {m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)} (h₀ : IsSmoothMetric m₀)
-    (h₁ : IsSmoothMetric m₁) (N i : ℕ) (j : Fin N) : IsSmoothHerm (tele_fam m₀ m₁ N i j) := by
+theorem tele_fam_smooth
+    {m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)} (h₀ : IsSmoothMetric m₀) (h₁ : IsSmoothMetric m₁)
+    (N i : ℕ) (j : Fin N)
+    : IsSmoothHerm (tele_fam m₀ m₁ N i j) := by
   unfold tele_fam
   split_ifs
   · exact tele_smooth_ofCone h₁
   · exact tele_smooth_ofCone h₀
 
-theorem top_sub_top (I : AllFam) (hI : I.IsFamily) {x : Ix κ → Ω} {m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)}
-    {μ : Measure (Ix κ → ℂ)} (hg₀ : IsGood D x m₀ μ) (hg₁ : IsGood D x m₁ μ) :
-    top I x m₁ D - top I x m₀ D = ∑ i ∈ Finset.range (D + 1),
-      ptsIntegral (ι := GlobalTheory κ) (coordIdeal ℤ x) (mixPot m₀ m₁ D i) (logRatio m₀ m₁) := by
+theorem top_sub_top
+    (I : AllFam) (hI : I.IsFamily)
+    {x : Ix κ → Ω} {m₀ m₁ : ConeMetric (C := ℂ) (ι := Ix κ)} {μ : Measure (Ix κ → ℂ)}
+    (hg₀ : IsGood D x m₀ μ) (hg₁ : IsGood D x m₁ μ)
+    : top I x m₁ D - top I x m₀ D
+      = ∑ i ∈ Finset.range (D + 1),
+        ptsIntegral (ι := GlobalTheory κ) (coordIdeal ℤ x) (mixPot m₀ m₁ D i) (logRatio m₀ m₁) := by
   have h₀ : IsSmoothMetric m₀ := hg₀.semipos.1
   have h₁ : IsSmoothMetric m₁ := hg₁.semipos.1
   have hP := hg₀.arith
   obtain ⟨hperm, hadd, -⟩ := hI Unit (GlobalTheory κ)
-  obtain ⟨F, hF⟩ : ∃ F : ℕ → ℝ, F = fun i => I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1) (tele_fam m₀ m₁ (D + 1) i) :=
+  obtain ⟨F, hF⟩
+      : ∃ F : ℕ → ℝ,
+        F = fun i => I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1) (tele_fam m₀ m₁ (D + 1) i) :=
     ⟨_, rfl⟩
   have hF0 : F 0 = top I x m₀ D := by
     rw [hF, top]
@@ -185,30 +211,42 @@ theorem top_sub_top (I : AllFam) (hI : I.IsFamily) {x : Ix κ → Ω} {m₀ m₁
     show I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1) (tele_fam m₀ m₁ (D + 1) (D + 1)) = _
     congr 1
     try (funext j; simp [tele_fam, j.isLt])
-  have hstep : ∀ i ∈ Finset.range (D + 1), F (i + 1) - F i =
-      ptsIntegral (ι := GlobalTheory κ) (coordIdeal ℤ x) (mixPot m₀ m₁ D i) (logRatio m₀ m₁) := by
+  have hstep
+      : ∀ i ∈ Finset.range (D + 1),
+        F (i + 1) - F i
+          = ptsIntegral (ι := GlobalTheory κ) (coordIdeal ℤ x) (mixPot m₀ m₁ D i)
+            (logRatio m₀ m₁) := by
     intro i hi
     rw [Finset.mem_range] at hi
     have hsm : ∀ k j, IsSmoothHerm (tele_fam m₀ m₁ (D + 1) k j) := tele_fam_smooth h₀ h₁ (D + 1)
-    have hσ : ∀ k, F k = I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1)
-        (tele_fam m₀ m₁ (D + 1) k ∘ tele_perm ⟨i, hi⟩) := by
+    have hσ
+        : ∀ k,
+          F k
+            = I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1)
+              (tele_fam m₀ m₁ (D + 1) k ∘ tele_perm ⟨i, hi⟩) := by
       intro k
       rw [hF]
       exact (hperm _ _ _ _ hP (hsm k)).symm
     rw [hσ (i + 1), hσ i, tele_comp_perm, tele_comp_perm,
-      tele_fam_succAbove m₀ m₁ D i hi (i + 1) (Or.inr rfl), tele_fam_succAbove m₀ m₁ D i hi i (Or.inl rfl)]
+      tele_fam_succAbove m₀ m₁ D i hi (i + 1) (Or.inr rfl),
+      tele_fam_succAbove m₀ m₁ D i hi i (Or.inl rfl)]
     have e1 : tele_fam m₀ m₁ (D + 1) (i + 1) ⟨i, hi⟩ = HermLine.ofCone m₁ := by simp [tele_fam]
     have e2 : tele_fam m₀ m₁ (D + 1) i ⟨i, hi⟩ = HermLine.ofCone m₀ := by simp [tele_fam]
-    rw [e1, e2, tele_ofCone_tensor m₀ m₁, hadd _ _ _ _ _ hP (tele_fam_smooth h₀ h₁ D i)
-      (tele_smooth_ofCone h₀) (tele_smooth_ratio h₀ h₁), add_sub_cancel_left,
+    rw [e1, e2, tele_ofCone_tensor m₀ m₁,
+      hadd _ _ _ _ _ hP (tele_fam_smooth h₀ h₁ D i) (tele_smooth_ofCone h₀)
+        (tele_smooth_ratio h₀ h₁),
+      add_sub_cancel_left,
       fam_degZero I hI hP (tele_fam m₀ m₁ D i) (tele_fam_smooth h₀ h₁ D i) (ratioLine m₀ m₁)
         (tele_smooth_ratio h₀ h₁) rfl]
     congr 1
-    all_goals first
+    all_goals
+      first
       | rfl
-      | (funext j z
-         simp only [pot, mixPot, tele_fam]
-         split_ifs <;> rfl)
+      | (
+          funext j z
+          simp only [pot, mixPot, tele_fam]
+          split_ifs <;> rfl
+        )
   rw [← hFD, ← hF0, ← Finset.sum_range_sub F (D + 1)]
   exact Finset.sum_congr rfl hstep
 

@@ -13,8 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.RangeSu
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -22,10 +24,14 @@ open Classical
 
 namespace GlobalTheory.Mum
 
-theorem eq_gp_of_lies_over_bot {R : Type} [CommRing R] [IsDomain R] {S : Scheme.{0}} [IsReduced S] (π : S ⟶ Sp R)
-    (gp : Sp (FractionRing R) ⟶ S) (hgp : gp ≫ π = jK R) (hd : IsDominant gp)
-    {B : CommRingCat} (e₀ : Spec B ⟶ S) [he₀ : IsOpenImmersion e₀] (P : Spec B)
-    (hP : π (e₀ P) = (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum R)) (k : Sp (FractionRing R)) : e₀ P = gp k := by
+theorem eq_gp_of_lies_over_bot
+    {R : Type} [CommRing R] [IsDomain R]
+    {S : Scheme.{0}} [IsReduced S]
+    (π : S ⟶ Sp R) (gp : Sp (FractionRing R) ⟶ S) (hgp : gp ≫ π = jK R) (hd : IsDominant gp)
+    {B : CommRingCat} (e₀ : Spec B ⟶ S) [he₀ : IsOpenImmersion e₀]
+    (P : Spec B) (hP : π (e₀ P) = (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum R))
+    (k : Sp (FractionRing R))
+    : e₀ P = gp k := by
   have hsub : Set.range gp ⊆ Set.range e₀ := by
     obtain ⟨a, ha⟩ := hd.denseRange.exists_mem_open e₀.isOpenEmbedding.isOpen_range ⟨e₀ P, P, rfl⟩
     rintro _ ⟨x, rfl⟩
@@ -43,8 +49,8 @@ theorem eq_gp_of_lies_over_bot {R : Type} [CommRing R] [IsDomain R] {S : Scheme.
     have := congrArg (fun f => f.hom r) hcomp
     simpa using this
   have hden : DenseRange g' := by
-    rw [denseRange_iff_closure_range, e₀.isOpenEmbedding.isInducing.closure_eq_preimage_closure_image,
-      ← Set.range_comp]
+    rw [denseRange_iff_closure_range,
+      e₀.isOpenEmbedding.isInducing.closure_eq_preimage_closure_image, ← Set.range_comp]
     have : (e₀ ∘ g') = gp := by funext x; rw [← hfac]; rfl
     rw [this, hd.denseRange.closure_range, Set.preimage_univ]
   have hred : _root_.IsReduced B := by
@@ -84,7 +90,11 @@ theorem eq_gp_of_lies_over_bot {R : Type} [CommRing R] [IsDomain R] {S : Scheme.
   have hk : k.asIdeal = ⊥ := @Ideal.eq_bot_of_prime _ _ _ k.isPrime
   rw [hPb, hk, Ideal.comap_bot_of_injective _ hinj]
 
-theorem modif_pt_over_gen : ∀ (R : Type) [CommRing R] [IsDomain R] (M' : Modif R) (W : Type) [CommRing W] [IsDomain W] (φ : R →+* W) (ξ : Sp W ⟶ M'.S), Function.Injective φ → ξ ≫ M'.π = spMap φ → ∃ (w : Sp W) (k : Sp (FractionRing R)), ξ w = M'.gp k := by
+theorem modif_pt_over_gen
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (M' : Modif R) (W : Type) [CommRing W] [IsDomain W]
+        (φ : R →+* W) (ξ : Sp W ⟶ M'.S),
+      Function.Injective φ → ξ ≫ M'.π = spMap φ
+        → ∃ (w : Sp W) (k : Sp (FractionRing R)), ξ w = M'.gp k := by
   intro R _ _ M' W _ _ φ ξ hφ hξ
   have : IsReduced M'.S := by have := M'.integral; infer_instance
   let w : Sp W := (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum W)
@@ -94,7 +104,8 @@ theorem modif_pt_over_gen : ∀ (R : Type) [CommRing R] [IsDomain R] (M' : Modif
   have hoi : IsOpenImmersion (M'.S.affineCover.f j) := M'.S.affineCover.map_prop j
   obtain ⟨P, hP⟩ := M'.S.affineCover.covers (ξ w)
   rw [← hP]
-  refine eq_gp_of_lies_over_bot (he₀ := hoi) M'.π M'.gp M'.gp_π M'.dominant (M'.S.affineCover.f j) P ?_ k
+  refine eq_gp_of_lies_over_bot (he₀ := hoi) M'.π M'.gp M'.gp_π M'.dominant (M'.S.affineCover.f j) P
+    ?_ k
   refine (congrArg M'.π hP).trans ?_
   have h1 : M'.π (ξ w) = (spMap φ) w := by rw [← hξ]; rfl
   rw [h1]

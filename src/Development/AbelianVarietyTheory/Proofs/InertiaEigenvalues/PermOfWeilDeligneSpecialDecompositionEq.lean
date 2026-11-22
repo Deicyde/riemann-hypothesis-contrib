@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Mono0
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -21,19 +23,22 @@ namespace GlobalTheory.WeilDeligne.SpUnique
 
 open SpSummand
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
   {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
 
 section Rep
 
-variable {V U U' : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-  [AddCommGroup U] [Module ℂ U] [FiniteDimensional ℂ U] [AddCommGroup U'] [Module ℂ U']
-  [FiniteDimensional ℂ U'] {ρ : Representation ℂ (Weil h) V} {k : ℕ} {c : Weil h → ℂ}
+variable
+  {V U U' : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [AddCommGroup U]
+  [Module ℂ U] [FiniteDimensional ℂ U] [AddCommGroup U'] [Module ℂ U'] [FiniteDimensional ℂ U']
+  {ρ : Representation ℂ (Weil h) V} {k : ℕ} {c : Weil h → ℂ}
 
-theorem hasCopy_sum_left {b : WDRep h U} (b' : WDRep h U') (H : HasCopy ρ k c b) :
-    HasCopy ρ k c (b.sum b') := by
+theorem hasCopy_sum_left {b : WDRep h U} (b' : WDRep h U') (H : HasCopy ρ k c b)
+    : HasCopy ρ k c (b.sum b') := by
   obtain ⟨f, g, hf, hc, rfl⟩ := H
-  refine ⟨LinearMap.inl ℂ U U' ∘ₗ ((b.N ^ k) ∘ₗ g), LinearMap.inl ℂ U U' ∘ₗ g, ?_, fun σ v => ?_, ?_⟩
+  refine
+    ⟨LinearMap.inl ℂ U U' ∘ₗ ((b.N ^ k) ∘ₗ g), LinearMap.inl ℂ U U' ∘ₗ g, ?_, fun σ v => ?_, ?_⟩
   · intro h0
     apply hf
     refine LinearMap.ext fun v => ?_
@@ -47,10 +52,11 @@ theorem hasCopy_sum_left {b : WDRep h U} (b' : WDRep h U') (H : HasCopy ρ k c b
     rw [LinearMap.comp_apply, sum_N_pow]
     refine Prod.ext ?_ ?_ <;> simp
 
-theorem hasCopy_sum_right (b : WDRep h U) {b' : WDRep h U'} (H : HasCopy ρ k c b') :
-    HasCopy ρ k c (b.sum b') := by
+theorem hasCopy_sum_right (b : WDRep h U) {b' : WDRep h U'} (H : HasCopy ρ k c b')
+    : HasCopy ρ k c (b.sum b') := by
   obtain ⟨f, g, hf, hc, rfl⟩ := H
-  refine ⟨LinearMap.inr ℂ U U' ∘ₗ ((b'.N ^ k) ∘ₗ g), LinearMap.inr ℂ U U' ∘ₗ g, ?_, fun σ v => ?_, ?_⟩
+  refine
+    ⟨LinearMap.inr ℂ U U' ∘ₗ ((b'.N ^ k) ∘ₗ g), LinearMap.inr ℂ U U' ∘ₗ g, ?_, fun σ v => ?_, ?_⟩
   · intro h0
     apply hf
     refine LinearMap.ext fun v => ?_
@@ -64,13 +70,13 @@ theorem hasCopy_sum_right (b : WDRep h U) {b' : WDRep h U'} (H : HasCopy ρ k c 
     rw [LinearMap.comp_apply, sum_N_pow]
     refine Prod.ext ?_ ?_ <;> simp
 
-theorem powZero_sum {b : WDRep h U} {b' : WDRep h U'} (H : PowZero k b) (H' : PowZero k b') :
-    PowZero k (b.sum b') := by
+theorem powZero_sum {b : WDRep h U} {b' : WDRep h U'} (H : PowZero k b) (H' : PowZero k b')
+    : PowZero k (b.sum b') := by
   unfold PowZero at *
   rw [sum_N_pow, H, H', LinearMap.prodMap_zero]
 
-theorem powZero_of_le (a : WDRep h U) (ha : a.ρ.IsIrreducible) {m : ℕ} (hmk : m ≤ k) :
-    PowZero k (a.tensor (WDRep.sp h (m + 1))) := by
+theorem powZero_of_le (a : WDRep h U) (ha : a.ρ.IsIrreducible) {m : ℕ} (hmk : m ≤ k)
+    : PowZero k (a.tensor (WDRep.sp h (m + 1))) := by
   unfold PowZero
   rw [tensor_sp_N_pow a (N_eq_zero_of_irr a ha), shiftEnd_pow_eq_zero (by omega),
     LinearMap.lTensor_zero]
@@ -93,8 +99,8 @@ theorem hasCopyW_lpSum_right (x y : WD h) (H : HasCopyW ρ k c y) : HasCopyW ρ 
       rw [hasCopyW_mk] at H
       exact hasCopy_sum_right a H
 
-theorem powZeroW_lpSum_of (x y : WD h) (H : PowZeroW k x) (H' : PowZeroW k y) :
-    PowZeroW k (x.lpSum y) := by
+theorem powZeroW_lpSum_of (x y : WD h) (H : PowZeroW k x) (H' : PowZeroW k y)
+    : PowZeroW k (x.lpSum y) := by
   induction x using WD.ind with
   | hP n a =>
     induction y using WD.ind with
@@ -108,8 +114,9 @@ theorem powZeroW_lpZero : PowZeroW k (WD.lpZero (h := h)) := by
   show (WDRep.diag h _).N ^ (k + 1) = 0
   rw [WDRep.diag_N, zero_pow (Nat.succ_ne_zero k)]
 
-theorem hasCopyW_sumList {α : Type} (F : α → WD h) (l : List α) (p : α) (hp : p ∈ l)
-    (H : HasCopyW ρ k c (F p)) : HasCopyW ρ k c (sumList (l.map F)) := by
+theorem hasCopyW_sumList
+    {α : Type} (F : α → WD h) (l : List α) (p : α) (hp : p ∈ l) (H : HasCopyW ρ k c (F p))
+    : HasCopyW ρ k c (sumList (l.map F)) := by
   induction l with
   | nil => cases hp
   | cons q l ih =>
@@ -118,13 +125,14 @@ theorem hasCopyW_sumList {α : Type} (F : α → WD h) (l : List α) (p : α) (h
     · exact hasCopyW_lpSum_left _ _ H
     · exact hasCopyW_lpSum_right _ _ (ih hp)
 
-theorem powZeroW_sumList {α : Type} (F : α → WD h) (l : List α) (H : ∀ p ∈ l, PowZeroW k (F p)) :
-    PowZeroW k (sumList (l.map F)) := by
+theorem powZeroW_sumList {α : Type} (F : α → WD h) (l : List α) (H : ∀ p ∈ l, PowZeroW k (F p))
+    : PowZeroW k (sumList (l.map F)) := by
   induction l with
   | nil => exact powZeroW_lpZero
   | cons q l ih =>
     change PowZeroW k ((F q).lpSum (sumList (l.map F)))
-    exact powZeroW_lpSum_of _ _ (H q List.mem_cons_self) (ih fun p hp => H p (List.mem_cons_of_mem _ hp))
+    exact powZeroW_lpSum_of _ _ (H q List.mem_cons_self)
+      (ih fun p hp => H p (List.mem_cons_of_mem _ hp))
 
 end Rep
 
@@ -139,8 +147,8 @@ theorem sumList_perm {l l' : List (WD h)} (hp : l.Perm l') : sumList l = sumList
     rw [← WD.lpSum_assoc, ← WD.lpSum_assoc, WD.lpSum_comm x y]
   | trans _ _ ih1 ih2 => exact ih1.trans ih2
 
-theorem lpDim_pos (p : WD h × ℕ) (hp : IsIrrWD p.1) :
-    0 < WD.lpDim (p.1.lpChar (WD.lpSp h (p.2 + 1))) := by
+theorem lpDim_pos (p : WD h × ℕ) (hp : IsIrrWD p.1)
+    : 0 < WD.lpDim (p.1.lpChar (WD.lpSp h (p.2 + 1))) := by
   obtain ⟨n, a, ha, hirr⟩ := hp
   rw [WD.lpDim_tensor, WD.lpDim_lpSp, ← ha, WD.lpDim_mk, Module.finrank_fin_fun]
   obtain ⟨v, hv⟩ := exists_ne_zero hirr
@@ -149,13 +157,22 @@ theorem lpDim_pos (p : WD h × ℕ) (hp : IsIrrWD p.1) :
     exact hv (Subsingleton.elim _ _)
   exact Nat.mul_pos (Nat.pos_of_ne_zero hn) (Nat.succ_pos _)
 
-theorem perm_of_sumList_lpChar_lpSp_eq : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (l l' : List (WD h × ℕ)), (∀ p ∈ l, IsIrrWD p.1) → (∀ p ∈ l', IsIrrWD p.1) → sumList (l.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1)))) = sumList (l'.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1)))) → l.Perm l' := by
+theorem perm_of_sumList_lpChar_lpSp_eq
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w)
+        (l l' : List (WD h × ℕ)),
+      (∀ p ∈ l, IsIrrWD p.1) → (∀ p ∈ l', IsIrrWD p.1)
+        → sumList (l.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1))))
+          = sumList (l'.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1))))
+        → l.Perm l' := by
   intro E Ω _ _ _ _ _ A w h l l'
   classical
-  suffices H : ∀ n (l l' : List (WD h × ℕ)), l.length = n → (∀ p ∈ l, IsIrrWD p.1) →
-      (∀ p ∈ l', IsIrrWD p.1) →
-      sumList (l.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1)))) =
-        sumList (l'.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1)))) → l.Perm l' from
+  suffices H
+      : ∀ n (l l' : List (WD h × ℕ)),
+        l.length = n → (∀ p ∈ l, IsIrrWD p.1) → (∀ p ∈ l', IsIrrWD p.1)
+          → sumList (l.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1))))
+            = sumList (l'.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1))))
+          → l.Perm l' from
     H _ l l' rfl
   intro n
   induction n with
@@ -178,8 +195,9 @@ theorem perm_of_sumList_lpChar_lpSp_eq : ∀ (E Ω : Type) [Field E] [NumberFiel
       rintro rfl
       simp at hn
     obtain ⟨⟨y, k⟩, hp, hmax⟩ : ∃ p ∈ l, ∀ q ∈ l, q.2 ≤ p.2 := by
-      obtain ⟨p, hp, hmax⟩ := l.toFinset.exists_max_image Prod.snd
-        (by obtain ⟨x, hx⟩ := List.exists_mem_of_ne_nil l hne; exact ⟨x, List.mem_toFinset.2 hx⟩)
+      obtain ⟨p, hp, hmax⟩ :=
+        l.toFinset.exists_max_image Prod.snd
+          (by obtain ⟨x, hx⟩ := List.exists_mem_of_ne_nil l hne; exact ⟨x, List.mem_toFinset.2 hx⟩)
       exact ⟨p, List.mem_toFinset.1 hp, fun q hq => hmax q (List.mem_toFinset.2 hq)⟩
     obtain ⟨m, a, rfl, ha⟩ := hl _ hp
 
@@ -189,8 +207,8 @@ theorem perm_of_sumList_lpChar_lpSp_eq : ∀ (E Ω : Type) [Field E] [NumberFiel
       show HasCopyW a.ρ k (lastEig h k) ((WD.mk a).lpChar (WD.lpSp h (k + 1)))
       rw [WD.lpSp, WD.lpChar_mk, hasCopyW_mk]
       exact hasCopy_self a ha k
-    have hZ : PowZeroW k
-        (sumList (l.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1))))) := by
+    have hZ
+        : PowZeroW k (sumList (l.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp h (p.2 + 1))))) := by
       refine powZeroW_sumList _ l fun q hq => ?_
       rcases q with ⟨y', k'⟩
       obtain ⟨m', a', rfl, ha'⟩ := hl _ hq
@@ -222,8 +240,11 @@ theorem perm_of_sumList_lpChar_lpSp_eq : ∀ (E Ω : Type) [Field E] [NumberFiel
     have hlen : (l.erase p).length = n := by
       rw [List.length_erase_of_mem hp, hn]
       rfl
-    have := ih (l.erase p) (l'.erase p) hlen (fun q hq => hl q (List.mem_of_mem_erase hq))
-      (fun q hq => hl' q (List.mem_of_mem_erase hq)) hc
+    have :=
+      ih (l.erase p) (l'.erase p) hlen
+        (fun q hq => hl q (List.mem_of_mem_erase hq))
+        (fun q hq => hl' q (List.mem_of_mem_erase hq))
+        hc
     exact ((List.perm_cons_erase hp).trans (this.cons p)).trans (List.perm_cons_erase hp').symm
 
 end GlobalTheory.WeilDeligne.SpUnique

@@ -7,11 +7,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
 open scoped TensorProduct
 
-theorem UpperTheory.V.Lit.Bor.admEx :
-    UpperTheory.V.Lit.Bor.AdmEx := by
+theorem UpperTheory.V.Lit.Bor.admEx : UpperTheory.V.Lit.Bor.AdmEx := by
   intro E _ _ _ a Ξ
   obtain ⟨R, D, hRD, hD⟩ := cxExt E a Ξ
   obtain ⟨G, hG, hadj⟩ := admissible_abs_bound (E →+* ℂ) a Ξ.d R D hRD

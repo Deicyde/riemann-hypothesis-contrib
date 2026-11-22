@@ -18,41 +18,43 @@ variable {Γ k : Type} [Group Γ] [Field k] {n : ℕ}
 def tr (ρ : Γ →* GL (Fin n) k) (g : Γ) (U : Submodule k (Fin n → k)) : Submodule k (Fin n → k) :=
   U.map (Matrix.toLin' ((ρ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k))
 
-theorem tr_mul (ρ : Γ →* GL (Fin n) k) (g h : Γ) (U : Submodule k (Fin n → k)) :
-    tr ρ (g * h) U = tr ρ g (tr ρ h U) := by
+theorem tr_mul (ρ : Γ →* GL (Fin n) k) (g h : Γ) (U : Submodule k (Fin n → k))
+    : tr ρ (g * h) U = tr ρ g (tr ρ h U) := by
   unfold tr
   rw [map_mul, Units.val_mul, Matrix.toLin'_mul, Submodule.map_comp]
 
-theorem tr_mono (ρ : Γ →* GL (Fin n) k) (g : Γ) {U V : Submodule k (Fin n → k)} (h : U ≤ V) :
-    tr ρ g U ≤ tr ρ g V := Submodule.map_mono h
+theorem tr_mono (ρ : Γ →* GL (Fin n) k) (g : Γ) {U V : Submodule k (Fin n → k)} (h : U ≤ V)
+    : tr ρ g U ≤ tr ρ g V :=
+  Submodule.map_mono h
 
-theorem tr_sup (ρ : Γ →* GL (Fin n) k) (g : Γ) (U V : Submodule k (Fin n → k)) :
-    tr ρ g (U ⊔ V) = tr ρ g U ⊔ tr ρ g V := Submodule.map_sup _ _ _
+theorem tr_sup (ρ : Γ →* GL (Fin n) k) (g : Γ) (U V : Submodule k (Fin n → k))
+    : tr ρ g (U ⊔ V) = tr ρ g U ⊔ tr ρ g V :=
+  Submodule.map_sup _ _ _
 
-theorem tr_inf_le (ρ : Γ →* GL (Fin n) k) (g : Γ) (U V : Submodule k (Fin n → k)) :
-    tr ρ g (U ⊓ V) ≤ tr ρ g U ⊓ tr ρ g V :=
+theorem tr_inf_le (ρ : Γ →* GL (Fin n) k) (g : Γ) (U V : Submodule k (Fin n → k))
+    : tr ρ g (U ⊓ V) ≤ tr ρ g U ⊓ tr ρ g V :=
   le_inf (tr_mono ρ g inf_le_left) (tr_mono ρ g inf_le_right)
 
-theorem tr_le_iff (ρ : Γ →* GL (Fin n) k) (g : Γ) (U : Submodule k (Fin n → k)) :
-    tr ρ g U ≤ U ↔ ∀ v ∈ U, ((ρ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).mulVec v ∈ U := by
+theorem tr_le_iff (ρ : Γ →* GL (Fin n) k) (g : Γ) (U : Submodule k (Fin n → k))
+    : tr ρ g U ≤ U ↔ ∀ v ∈ U, ((ρ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).mulVec v ∈ U := by
   unfold tr
   rw [Submodule.map_le_iff_le_comap]
   rfl
 
-theorem isInv_iff (ρ : Γ →* GL (Fin n) k) (U : Submodule k (Fin n → k)) :
-    IsInv ρ U ↔ ∀ g, tr ρ g U ≤ U :=
+theorem isInv_iff (ρ : Γ →* GL (Fin n) k) (U : Submodule k (Fin n → k))
+    : IsInv ρ U ↔ ∀ g, tr ρ g U ≤ U :=
   forall_congr' fun g => (tr_le_iff ρ g U).symm
 
-theorem isInv_ker_iff (ρ : Γ →* GL (Fin n) k) (η : Γ →* ℤˣ) (U : Submodule k (Fin n → k)) :
-    IsInv (ρ.comp η.ker.subtype) U ↔ ∀ g, η g = 1 → tr ρ g U ≤ U := by
+theorem isInv_ker_iff (ρ : Γ →* GL (Fin n) k) (η : Γ →* ℤˣ) (U : Submodule k (Fin n → k))
+    : IsInv (ρ.comp η.ker.subtype) U ↔ ∀ g, η g = 1 → tr ρ g U ≤ U := by
   constructor
   · intro h g hg
     exact (tr_le_iff ρ g U).2 (h ⟨g, hg⟩)
   · intro h g
     exact (tr_le_iff ρ g.1 U).1 (h g.1 g.2)
 
-theorem isSSRep_ker (ρ : Γ →* GL (Fin n) k) (η : Γ →* ℤˣ) (hρ : IsSSRep ρ) :
-    IsSSRep (ρ.comp η.ker.subtype) := by
+theorem isSSRep_ker (ρ : Γ →* GL (Fin n) k) (η : Γ →* ℤˣ) (hρ : IsSSRep ρ)
+    : IsSSRep (ρ.comp η.ker.subtype) := by
   intro W hW
   rw [isInv_ker_iff] at hW
   by_cases hη : ∀ g, η g = 1
@@ -61,7 +63,8 @@ theorem isSSRep_ker (ρ : Γ →* GL (Fin n) k) (η : Γ →* ℤˣ) (hρ : IsSS
   obtain ⟨t, ht⟩ := not_forall.1 hη
   have ht' : η t = -1 := (Int.units_eq_one_or (η t)).resolve_left ht
 
-  have hconj : ∀ U, (∀ g, η g = 1 → tr ρ g U ≤ U) → ∀ g, η g = 1 → tr ρ g (tr ρ t U) ≤ tr ρ t U := by
+  have hconj
+      : ∀ U, (∀ g, η g = 1 → tr ρ g U ≤ U) → ∀ g, η g = 1 → tr ρ g (tr ρ t U) ≤ tr ρ t U := by
     intro U hU g hg
     have e : g * t = t * (t⁻¹ * g * t) := by group
     rw [← tr_mul, e, tr_mul]
@@ -102,7 +105,9 @@ theorem isSSRep_ker (ρ : Γ →* GL (Fin n) k) (η : Γ →* ℤˣ) (hρ : IsSS
       top_inf_eq]
   have hsup : W ⊔ tr ρ t (W ⊓ D) = W ⊔ tr ρ t W := by
     refine le_antisymm (sup_le_sup_left (tr_mono ρ t inf_le_left) _) (sup_le le_sup_left ?_)
-    calc tr ρ t W = tr ρ t ((W ⊓ tr ρ t W) ⊔ (W ⊓ D)) := by rw [hWeq]
+    calc
+      tr ρ t W
+        = tr ρ t ((W ⊓ tr ρ t W) ⊔ (W ⊓ D)) := by rw [hWeq]
       _ ≤ W ⊔ tr ρ t (W ⊓ D) := by
         rw [tr_sup]
         exact sup_le_sup_right (hAt.trans inf_le_left) _
@@ -118,24 +123,39 @@ theorem isSSRep_ker (ρ : Γ →* GL (Fin n) k) (η : Γ →* ℤˣ) (hρ : IsSS
 
 end Restrict
 
-theorem charpoly_eq_of_trace_pow {k : Type} [Field k] [CharZero k] {n : ℕ} (A B : Matrix (Fin n) (Fin n) k)
-    (h : ∀ m : ℕ, (A ^ m).trace = (B ^ m).trace) : A.charpoly = B.charpoly := by
-  have h1 := GroundTheory.Global.reverse_charpoly_eq_of_trace_pow_eq (Matrix.toLin' A) (Matrix.toLin' B)
-    (fun m _ => by
-      rw [← Matrix.toLin'_pow, ← Matrix.toLin'_pow, Matrix.trace_toLin'_eq, Matrix.trace_toLin'_eq, h m])
+theorem charpoly_eq_of_trace_pow
+    {k : Type} [Field k] [CharZero k]
+    {n : ℕ} (A B : Matrix (Fin n) (Fin n) k) (h : ∀ m : ℕ, (A ^ m).trace = (B ^ m).trace)
+    : A.charpoly = B.charpoly := by
+  have h1 :=
+    GroundTheory.Global.reverse_charpoly_eq_of_trace_pow_eq (Matrix.toLin' A) (Matrix.toLin' B)
+      (fun m _ => by
+        rw [← Matrix.toLin'_pow, ← Matrix.toLin'_pow, Matrix.trace_toLin'_eq,
+          Matrix.trace_toLin'_eq, h m])
   rw [Matrix.charpoly_toLin', Matrix.charpoly_toLin', Polynomial.reverse, Polynomial.reverse,
-    Matrix.charpoly_natDegree_eq_dim, Matrix.charpoly_natDegree_eq_dim] at h1
+      Matrix.charpoly_natDegree_eq_dim, Matrix.charpoly_natDegree_eq_dim]
+    at h1
   have h2 := congrArg (Polynomial.reflect (Fintype.card (Fin n))) h1
   rwa [Polynomial.reflect_reflect, Polynomial.reflect_reflect] at h2
 
-theorem conj_on_ker_inf_ker : ∀ (Γ k : Type) [Group Γ] [Field k] [CharZero k] (n : ℕ) (ρ ρ' : Γ →* GL (Fin n) k) (χ₁ χ₂ : Γ →* ℤˣ), IsSSRep ρ → IsSSRep ρ' → (∀ g, χ₁ g = 1 → χ₂ g = 1 → ((ρ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace = ((ρ' g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace) → ∃ P : GL (Fin n) k, ∀ g, χ₁ g = 1 → χ₂ g = 1 → ρ' g = P⁻¹ * ρ g * P := by
+theorem conj_on_ker_inf_ker
+    : ∀ (Γ k : Type) [Group Γ] [Field k] [CharZero k] (n : ℕ) (ρ ρ' : Γ →* GL (Fin n) k)
+        (χ₁ χ₂ : Γ →* ℤˣ),
+      IsSSRep ρ → IsSSRep ρ'
+        → (∀ g,
+          χ₁ g = 1 → χ₂ g = 1
+            → ((ρ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace
+              = ((ρ' g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace)
+        → ∃ P : GL (Fin n) k, ∀ g, χ₁ g = 1 → χ₂ g = 1 → ρ' g = P⁻¹ * ρ g * P := by
   intro Γ k _ _ _ n ρ ρ' χ₁ χ₂ hρ hρ' htr
-  obtain ⟨P, hP⟩ := Formalism.MainNotions.SumRepresentations.brauerNesbitt_matrix _ _
-    (isSSRep_ker _ (χ₁.comp χ₂.ker.subtype) (isSSRep_ker ρ χ₂ hρ))
-    (isSSRep_ker _ (χ₁.comp χ₂.ker.subtype) (isSSRep_ker ρ' χ₂ hρ')) (fun g => by
-      refine charpoly_eq_of_trace_pow _ _ fun m => ?_
-      rw [← Units.val_pow_eq_pow_val, ← Units.val_pow_eq_pow_val, ← map_pow, ← map_pow]
-      exact htr (g ^ m).1.1 (g ^ m).2 (g ^ m).1.2)
+  obtain ⟨P, hP⟩ :=
+    Formalism.MainNotions.SumRepresentations.brauerNesbitt_matrix _ _
+      (isSSRep_ker _ (χ₁.comp χ₂.ker.subtype) (isSSRep_ker ρ χ₂ hρ))
+      (isSSRep_ker _ (χ₁.comp χ₂.ker.subtype) (isSSRep_ker ρ' χ₂ hρ'))
+      (fun g => by
+        refine charpoly_eq_of_trace_pow _ _ fun m => ?_
+        rw [← Units.val_pow_eq_pow_val, ← Units.val_pow_eq_pow_val, ← map_pow, ← map_pow]
+        exact htr (g ^ m).1.1 (g ^ m).2 (g ^ m).1.2)
   exact ⟨P, fun g h1 h2 => hP ⟨⟨g, h2⟩, h1⟩⟩
 
 end GlobalTheory.QuadKernelConj

@@ -4,9 +4,8 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Ue24.eq_one_of_pow_near :
-    ∀ {z : ℂ},
-    (∀ (k : ℕ), ‖z ^ (2 : ℕ) ^ k - (1 : ℂ)‖ ≤ (1 / 2 : ℝ)) → z = (1 : ℂ) := by
+theorem UpperTheory.Reformulated.B.Ue24.eq_one_of_pow_near
+    : ∀ {z : ℂ}, (∀ (k : ℕ), ‖z ^ (2 : ℕ) ^ k - (1 : ℂ)‖ ≤ (1 / 2 : ℝ)) → z = (1 : ℂ) := by
   intro z h
   have key : ∀ k : ℕ, (3 / 2 : ℝ) ^ k * ‖z - 1‖ ≤ ‖z ^ (2 : ℕ) ^ k - (1 : ℂ)‖ := by
     intro k
@@ -23,7 +22,9 @@ theorem UpperTheory.Reformulated.B.Ue24.eq_one_of_pow_near :
         have h6 := h k
         linarith
       rw [e, norm_mul]
-      calc (3 / 2 : ℝ) ^ (k + 1) * ‖z - 1‖ = ((3 / 2 : ℝ) ^ k * ‖z - 1‖) * (3 / 2) := by ring
+      calc
+        (3 / 2 : ℝ) ^ (k + 1) * ‖z - 1‖
+          = ((3 / 2 : ℝ) ^ k * ‖z - 1‖) * (3 / 2) := by ring
         _ ≤ _ := mul_le_mul ih h2 (by norm_num) (norm_nonneg _)
   by_contra hne
   have hpos : 0 < ‖z - 1‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hne)

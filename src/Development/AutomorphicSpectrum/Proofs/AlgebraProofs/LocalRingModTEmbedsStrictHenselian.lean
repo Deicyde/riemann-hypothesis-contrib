@@ -6,23 +6,27 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem exists_basis_split_of_exact_of_fg_valuationRing :
-    ∀ (V C A W B : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field C] [Algebra V C]
-      [IsFractionRing V C] [AddCommGroup A] [Module C A] [Module V A] [IsScalarTower V C A]
-      [AddCommGroup W] [Module C W] [Module V W] [IsScalarTower V C W] [AddCommGroup B]
-      [Module C B] [Module V B] [IsScalarTower V C B] (b : A →ₗ[C] W) (al : W →ₗ[C] B),
-      Function.Injective b → Function.Exact b al → ∀ (T : Submodule V W), T.FG →
-      ∃ (p q : ℕ) (w : Fin p → A) (t : Fin q → W), LinearIndependent C w ∧
-        Submodule.span V (Set.range w) = T.comap (b.restrictScalars V) ∧
-        LinearIndependent C (fun j => al (t j)) ∧
-        Submodule.span V (Set.range fun j => al (t j)) = T.map (al.restrictScalars V) ∧
-        LinearIndependent C (Sum.elim (fun i => b (w i)) t) ∧
-        Submodule.span V (Set.range (Sum.elim (fun i => b (w i)) t)) = T := by
+theorem exists_basis_split_of_exact_of_fg_valuationRing
+    : ∀ (V C A W B : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field C] [Algebra V C]
+        [IsFractionRing V C] [AddCommGroup A] [Module C A] [Module V A] [IsScalarTower V C A]
+        [AddCommGroup W] [Module C W] [Module V W] [IsScalarTower V C W] [AddCommGroup B]
+        [Module C B] [Module V B] [IsScalarTower V C B] (b : A →ₗ[C] W) (al : W →ₗ[C] B),
+      Function.Injective b → Function.Exact b al
+        → ∀ (T : Submodule V W),
+          T.FG
+            → ∃ (p q : ℕ) (w : Fin p → A) (t : Fin q → W),
+              LinearIndependent C w ∧ Submodule.span V (Set.range w) = T.comap (b.restrictScalars V)
+                ∧ LinearIndependent C (fun j => al (t j))
+                ∧ Submodule.span V (Set.range fun j => al (t j)) = T.map (al.restrictScalars V)
+                ∧ LinearIndependent C (Sum.elim (fun i => b (w i)) t)
+                ∧ Submodule.span V (Set.range (Sum.elim (fun i => b (w i)) t)) = T := by
   intro V C A W B _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ b al hb hex T hT
   have : IsBezout V := ValuationRing.instIsBezout
 
-  have hfree : ∀ (X : Type) [AddCommGroup X] [Module C X] [Module V X] [IsScalarTower V C X]
-      (N : Submodule V X), N.FG → Module.Free V N := by
+  have hfree
+      : ∀ (X : Type) [AddCommGroup X] [Module C X] [Module V X] [IsScalarTower V C X]
+          (N : Submodule V X),
+        N.FG → Module.Free V N := by
     intro X _ _ _ _ N hN
     have : Module.Finite V N := Module.Finite.iff_fg.mpr hN
     have : Module.Flat V N := by
@@ -34,8 +38,7 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing :
       have h3 : (a : V) • (x : X) = 0 := by
         have h4 := congrArg Subtype.val h2
         simpa using h4
-      have h1 : (algebraMap V C (a : V)) • (x : X) = 0 := by
-        rw [algebraMap_smul]; exact h3
+      have h1 : (algebraMap V C (a : V)) • (x : X) = 0 := by rw [algebraMap_smul]; exact h3
       have ha0 : algebraMap V C (a : V) ≠ 0 := by
         intro h
         have h5 : (a : V) = 0 := (IsFractionRing.injective V C) (by rw [h, map_zero])
@@ -44,14 +47,17 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing :
       exact Subtype.ext (by simp [hx0])
     exact Module.free_of_flat_of_isLocalRing
 
-  have hL : ∀ (X : Type) [AddCommGroup X] [Module C X] [Module V X] [IsScalarTower V C X]
-      (N : Submodule V X), N.FG → ∃ (n : ℕ) (v : Fin n → X),
-        LinearIndependent C v ∧ Submodule.span V (Set.range v) = N := by
+  have hL
+      : ∀ (X : Type) [AddCommGroup X] [Module C X] [Module V X] [IsScalarTower V C X]
+          (N : Submodule V X),
+        N.FG
+          → ∃ (n : ℕ) (v : Fin n → X),
+            LinearIndependent C v ∧ Submodule.span V (Set.range v) = N := by
     intro X _ _ _ _ N hN
     have := hfree X N hN
     have : Module.Finite V N := Module.Finite.iff_fg.mpr hN
-    let e := (Module.Free.chooseBasis V N).reindex
-      (Fintype.equivFin (Module.Free.ChooseBasisIndex V N))
+    let e :=
+      (Module.Free.chooseBasis V N).reindex (Fintype.equivFin (Module.Free.ChooseBasisIndex V N))
     refine ⟨Fintype.card (Module.Free.ChooseBasisIndex V N), fun i => (e i : X), ?_, ?_⟩
     · rw [← LinearIndependent.iff_fractionRing V C]
       exact e.linearIndependent.map' N.subtype (Submodule.ker_subtype N)
@@ -77,8 +83,9 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing :
     Module.FinitePresentation.fg_ker _ (LinearMap.submoduleMap_surjective _ _)
   have hK : (T.comap (b.restrictScalars V)).FG := by
     apply Submodule.fg_of_fg_map_injective (b.restrictScalars V) hb
-    have heq : (T.comap (b.restrictScalars V)).map (b.restrictScalars V)
-        = (LinearMap.ker ((al.restrictScalars V).submoduleMap T)).map T.subtype := by
+    have heq
+        : (T.comap (b.restrictScalars V)).map (b.restrictScalars V)
+          = (LinearMap.ker ((al.restrictScalars V).submoduleMap T)).map T.subtype := by
       ext x
       constructor
       · rintro ⟨a, ha, rfl⟩
@@ -106,15 +113,14 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing :
     have h2 : ∑ j, g (Sum.inr j) • u j = 0 := by
       have h7 := congrArg al hg
       set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_add (f := _), map_sum, map_smul, h1, hta'] using h7
+      simpa [map_add (f := _), map_sum, map_smul, h1, hta'] using h7
     have h3 : ∀ j, g (Sum.inr j) = 0 :=
       Fintype.linearIndependent_iff.mp hu (fun j => g (Sum.inr j)) h2
-    have h4 : ∑ i, g (Sum.inl i) • b (w i) = 0 := by
-      simpa [h3] using hg
+    have h4 : ∑ i, g (Sum.inl i) • b (w i) = 0 := by simpa [h3] using hg
     have h5 : ∑ i, g (Sum.inl i) • w i = 0 := by
       apply hb
       set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_sum, map_smul] using h4
+      simpa [map_sum, map_smul] using h4
     have h6 := Fintype.linearIndependent_iff.mp hw (fun i => g (Sum.inl i)) h5
     intro i
     cases i with
@@ -151,7 +157,6 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing :
           rw [← Set.range_comp]; rfl
         rw [hr, Submodule.span_image]
         exact Submodule.mem_map_of_mem haK
-      · exact Submodule.sum_mem _ fun j _ =>
-          Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
+      · exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
 
 end GlobalTheory.CompanionTheory.Ar.Flat

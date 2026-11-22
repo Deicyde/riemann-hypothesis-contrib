@@ -49,15 +49,16 @@ lemma isOpen_omega : IsOpen (OmegaSet n : Set (Matrix (Fin n) (Fin n) ℂ)) := b
 lemma sm_phi (μ : Fin n → ℤ) : ContDiffOn ℂ ∞ (PhiM μ) (OmegaSet n) := by
   exact phiM_contDiffOn μ
 
-def Wset (n : ℕ) : Set (Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ) :=
+def Wset (n : ℕ)
+    : Set (Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ) :=
   {p | p.2.2 * p.1 * p.2.1 ∈ OmegaSet n}
 
 lemma isOpen_kappaOpenNeighbourhood : IsOpen (Wset n) := by
   exact isOpen_omega.preimage contDiff_trip.continuous
 
-def g0 (μ : Fin n → ℤ) :
-    Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ → ℂ :=
-  fun p => PhiM μ (p.2.2 * p.1 * p.2.1)
+def g0 (μ : Fin n → ℤ)
+    : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ → ℂ := fun p =>
+  PhiM μ (p.2.2 * p.1 * p.2.1)
 
 lemma smooth_g0_on_Wset (μ : Fin n → ℤ) : ContDiffOn ℂ ∞ (g0 μ) (Wset n) := by
   exact (sm_phi μ).comp contDiff_trip.contDiffOn (fun p hp => hp)
@@ -66,10 +67,11 @@ lemma dAtW {g : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matr
     (hg : ContDiffOn ℂ ∞ g (Wset n)) {p} (hp : p ∈ Wset n) : DifferentiableAt ℂ g p := by
   exact (hg.contDiffAt (isOpen_kappaOpenNeighbourhood.mem_nhds hp)).differentiableAt (by simp)
 
-def DH (X : Matrix (Fin n) (Fin n) ℂ)
-    (g : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ → ℂ) :
-    Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ → ℂ :=
-  fun p => fderiv ℂ g p (X * p.1, 0)
+def DH
+    (X : Matrix (Fin n) (Fin n) ℂ)
+    (g : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ → ℂ)
+    : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ → ℂ := fun p =>
+  fderiv ℂ g p (X * p.1, 0)
 
 lemma sm_DH (X : Matrix (Fin n) (Fin n) ℂ)
     {g : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ → ℂ}
@@ -92,8 +94,11 @@ lemma DH_slice (X : Matrix (Fin n) (Fin n) ℂ)
   rw [h2]
   rfl
 
-def I0 (n : ℕ) := fderiv ℂ (fun y : Matrix (Fin n) (Fin n) ℂ =>
-  ((y, 0) : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ)) 0
+def I0 (n : ℕ) :=
+  fderiv ℂ
+    (fun y : Matrix (Fin n) (Fin n) ℂ =>
+      ((y, 0) : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ))
+    0
 
 lemma zeroEmbedding_apply (H : Matrix (Fin n) (Fin n) ℂ) : I0 n H = (H, 0) := by
   have hs : HasFDerivAt (fun y : Matrix (Fin n) (Fin n) ℂ => ((y, 0) : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ))
@@ -116,13 +121,15 @@ def cK (T : KType ε Λ) : ℂ := (Module.finrank ℂ T.V : ℂ) / ((muK ε Set.
 
 def Pk (T : KType ε Λ) (k : KG ε) : T.V →L[ℂ] T.V := T.op k * projW T * T.op k⁻¹
 
-def emb (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε) :
-    Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ :=
+def emb (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε)
+    : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ :=
   (x, toMK k, toMK k⁻¹)
 
-def Fint (T : KType ε Λ)
+def Fint
+    (T : KType ε Λ)
     (g : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ → ℂ)
-    (x : Matrix (Fin n) (Fin n) ℂ) : T.V →L[ℂ] T.V :=
+    (x : Matrix (Fin n) (Fin n) ℂ)
+    : T.V →L[ℂ] T.V :=
   cK T • ∫ k, g (emb x k) • Pk T k ∂(muK ε)
 
 lemma psM_eq (T : KType ε Λ) (μ : Fin n → ℤ) : psM T μ = Fint T (g0 μ) := rfl
@@ -139,9 +146,11 @@ lemma continuous_emb : Continuous (fun q : Matrix (Fin n) (Fin n) ℂ × KG ε =
 lemma emb_mem {x : Matrix (Fin n) (Fin n) ℂ} (hx : x ∈ Ps1.Uset ε) (k : KG ε) : emb x k ∈ Wset n := by
   exact hx k
 
-def FD (T : KType ε Λ)
+def FD
+    (T : KType ε Λ)
     (g : Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ × Matrix (Fin n) (Fin n) ℂ → ℂ)
-    (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε) : 𝕄f →L[ℂ] (T.V →L[ℂ] T.V) :=
+    (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε)
+    : 𝕄f →L[ℂ] (T.V →L[ℂ] T.V) :=
   fderiv ℂ (fun y : 𝕄f => g (emb y k) • Pk T k) x
 
 lemma hasFDerivAt_FD (T : KType ε Λ)
@@ -305,25 +314,30 @@ lemma opPow_Fint (T : KType ε Λ) (M : Fin n → Fin n → Matrix (Fin n) (Fin 
     rw [GPs.lhol_congr (Ps1.isOpen_Uset (ε := ε)) (fun y hy => ih c b y hy) (M a c) hz]
     exact lhol_Fint T (sm_opPowH M hg m c b) (M a c) hz
 
-theorem gelfand_Fint (T : KType ε Λ) (μ : Fin n → ℤ) (M : Fin n → Fin n → Matrix (Fin n) (Fin n) ℂ)
-    (m : ℕ) (C : ℂ)
-    (hM : ∀ (k : KG ε) (z : Matrix (Fin n) (Fin n) ℂ), toMK k⁻¹ * z * toMK k ∈ OmegaSet n →
-      opGelfand (fun a b => Lhol (M a b)) m (fun y => PhiM μ (toMK k⁻¹ * y * toMK k)) z =
-        C * PhiM μ (toMK k⁻¹ * z * toMK k))
-    {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ Ps1.Uset ε) :
-    opGelfand (fun a b => Lhol (M a b)) m (psM T μ) z = C • psM T μ z := by
-  have key : ∀ k : KG ε, (∑ a, opPow (fun a b => DH (M a b)) m a a (g0 μ)) (emb z k) =
-      C * g0 μ (emb z k) := by
+theorem gelfand_Fint
+    (T : KType ε Λ)
+    (μ : Fin n → ℤ) (M : Fin n → Fin n → Matrix (Fin n) (Fin n) ℂ) (m : ℕ) (C : ℂ)
+    (hM : ∀ (k : KG ε) (z : Matrix (Fin n) (Fin n) ℂ),
+      toMK k⁻¹ * z * toMK k ∈ OmegaSet n
+        → opGelfand (fun a b => Lhol (M a b)) m (fun y => PhiM μ (toMK k⁻¹ * y * toMK k)) z
+          = C * PhiM μ (toMK k⁻¹ * z * toMK k))
+    {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ Ps1.Uset ε)
+    : opGelfand (fun a b => Lhol (M a b)) m (psM T μ) z = C • psM T μ z := by
+  have key
+      : ∀ k : KG ε,
+        (∑ a, opPow (fun a b => DH (M a b)) m a a (g0 μ)) (emb z k) = C * g0 μ (emb z k) := by
     intro k
     have hp := emb_mem hz k
-    rw [Finset.sum_apply, Finset.sum_congr rfl fun a _ => opPowH_slice M (smooth_g0_on_Wset μ) m a a _ hp]
+    rw [Finset.sum_apply,
+      Finset.sum_congr rfl fun a _ => opPowH_slice M (smooth_g0_on_Wset μ) m a a _ hp]
     have h := hM k z (hz k)
     unfold opGelfand at h
     rw [Finset.sum_apply] at h
     exact h
   rw [psM_eq]
   unfold opGelfand
-  rw [Finset.sum_apply, Finset.sum_congr rfl fun a _ => opPow_Fint T M (smooth_g0_on_Wset μ) m a a z hz,
+  rw [Finset.sum_apply,
+    Finset.sum_congr rfl fun a _ => opPow_Fint T M (smooth_g0_on_Wset μ) m a a z hz,
     ← Fint_sum T Finset.univ _ (fun a _ => sm_opPowH M (smooth_g0_on_Wset μ) m a a) hz]
   unfold Fint
   simp_rw [key, mul_smul]

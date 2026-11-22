@@ -7,7 +7,8 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.FiniteH1Unrami
 
 noncomputable section
 
-open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh GroundTheory.Global ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh GroundTheory.Global
+  ReciprocityTheory.Gal Formalism.ConjugateSelfDual
 
 namespace PositivityTheory.Lit1.GF
 

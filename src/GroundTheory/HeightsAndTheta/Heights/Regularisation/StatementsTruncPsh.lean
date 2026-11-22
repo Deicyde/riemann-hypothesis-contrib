@@ -17,9 +17,12 @@ noncomputable section
 
 def TruncPsh.Statement : Prop :=
   ∀ (X : Type) [TopologicalSpace X] [CompactSpace X] [T2Space X] (D : ℕ) (A : FinHolAtlas D X)
-    (R : RegChartData A), ∃ δ B : ℝ, 0 < δ ∧ ∀ j : Fin R.N, ∃ V : Set (Fin D → ℂ), IsOpen V ∧
-      V ⊆ (R.chart j).target ∧ (∀ x ∈ R.mid j, closedBall (R.chart j x) δ ⊆ V) ∧
-      ∀ K : ℝ, IsPsh V (R.trunc K j) ∧ ∀ y ∈ V, R.trunc K j y ≤ max B (-K)
+      (R : RegChartData A),
+    ∃ δ B : ℝ,
+      0 < δ
+        ∧ ∀ j : Fin R.N, ∃ V : Set (Fin D → ℂ),
+          IsOpen V ∧ V ⊆ (R.chart j).target ∧ (∀ x ∈ R.mid j, closedBall (R.chart j x) δ ⊆ V)
+            ∧ ∀ K : ℝ, IsPsh V (R.trunc K j) ∧ ∀ y ∈ V, R.trunc K j y ≤ max B (-K)
 
 end
 

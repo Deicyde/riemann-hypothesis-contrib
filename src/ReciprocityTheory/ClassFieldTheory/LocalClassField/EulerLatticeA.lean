@@ -20,8 +20,9 @@ variable (p : ℕ) [Fact p.Prime] (K : IntermediateField ℚ_[p] (PadicAlgCl p))
 
 attribute [local instance] zpAlgOK
 
-theorem card_OK_quot_natCast (hK : FiniteDimensional ℚ_[p] K) {n : ℕ} (hn : n ≠ 0) :
-    Nat.card (OK p K ⧸ Ideal.span {(n : OK p K)}) = (p ^ padicValNat p n) ^ Module.finrank ℚ_[p] K := by
+theorem card_OK_quot_natCast (hK : FiniteDimensional ℚ_[p] K) {n : ℕ} (hn : n ≠ 0)
+    : Nat.card (OK p K ⧸ Ideal.span {(n : OK p K)})
+      = (p ^ padicValNat p n) ^ Module.finrank ℚ_[p] K := by
   have := isScalarTower_zp_OK p K
   have : IsIntegralClosure (OK p K) ℤ_[p] K := by
     refine ⟨Subtype.val_injective, ?_⟩

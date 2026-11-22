@@ -12,8 +12,8 @@ open Formalism.UG GlobalTheory.SatakeWeyl
 
 namespace GlobalTheory.SatakeWeyl.Heis
 
-theorem index_eq_map_mul_ker {A B : Type} [Group A] [Group B] (φ : A →* B) (V : Subgroup A) :
-    V.index = (V.map φ).relIndex φ.range * V.relIndex φ.ker := by
+theorem index_eq_map_mul_ker {A B : Type} [Group A] [Group B] (φ : A →* B) (V : Subgroup A)
+    : V.index = (V.map φ).relIndex φ.range * V.relIndex φ.ker := by
   have h1 : (V.map φ).relIndex φ.range = (V ⊔ φ.ker).index := by
     rw [← Subgroup.index_comap, Subgroup.comap_map_eq]
   have h2 : V.relIndex φ.ker = V.relIndex (V ⊔ φ.ker) := by
@@ -26,16 +26,18 @@ theorem index_eq_map_mul_ker {A B : Type} [Group A] [Group B] (φ : A →* B) (V
     rw [Subgroup.normal_mul] at hg'
     obtain ⟨a, ha, v, hv, rfl⟩ := hg'
     refine ⟨QuotientGroup.mk ⟨a, ha⟩, ?_⟩
-    rw [Subgroup.quotientSubgroupOfEmbeddingOfLE_apply_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf]
+    rw [Subgroup.quotientSubgroupOfEmbeddingOfLE_apply_mk, QuotientGroup.eq,
+      Subgroup.mem_subgroupOf]
     simpa using hv
   rw [h1, h2, mul_comm, Subgroup.relIndex_mul_index le_sup_left]
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L →+* L}
 
-def Heisenberg₂ (σ : L →+* L) (x y : L) : Matrix (Fin 3) (Fin 3) L := !![1, x, y; 0, 1, -σ x; 0, 0, 1]
+def Heisenberg₂ (σ : L →+* L) (x y : L) : Matrix (Fin 3) (Fin 3) L :=
+  !![1, x, y; 0, 1, -σ x; 0, 0, 1]
 
-theorem mem_root_iff (hσ : ∀ x, σ (σ x) = x) (g : GU σ 3) :
-    g ∈ rootU σ ![0, 0, 0] ↔ ∃ x y, y + σ y + x * σ x = 0 ∧ mat g = Heisenberg₂ σ x y := by
+theorem mem_root_iff (hσ : ∀ x, σ (σ x) = x) (g : GU σ 3)
+    : g ∈ rootU σ ![0, 0, 0] ↔ ∃ x y, y + σ y + x * σ x = 0 ∧ mat g = Heisenberg₂ σ x y := by
   constructor
   · rintro ⟨hg, -⟩
     have hg : ∀ i j : Fin 3, j.val ≤ i.val → mat g i j = (1 : Matrix (Fin 3) (Fin 3) L) i j := hg
@@ -53,7 +55,7 @@ theorem mem_root_iff (hσ : ∀ x, σ (σ x) = x) (g : GU σ 3) :
     have b := congrFun (congrFun h1 2) 2
     rw [Matrix.mul_apply, Fin.sum_univ_three] at a b
     simp only [P.fSatake_cTJ, r0, r1, r2, e11, e21, e22, map_one, map_zero] at a b
-    have a' : mat g 1 2 = -σ (mat g 0 1) := by
+    have a' : mat g 1 2 = - σ (mat g 0 1) := by
       have : antiJ L 3 1 2 = 0 := by simp [antiJ]
       linear_combination a + this
     have : antiJ L 3 2 2 = 0 := by simp [antiJ]
@@ -67,8 +69,8 @@ theorem mem_root_iff (hσ : ∀ x, σ (σ x) = x) (g : GU σ 3) :
       fin_cases i <;> fin_cases j <;> simp [Heisenberg₂] at h ⊢
     · fin_cases i <;> fin_cases j <;> simp at h
 
-theorem exists_heis (hσ : ∀ x, σ (σ x) = x) {x y : L} (h : y + σ y + x * σ x = 0) :
-    ∃ g : GU σ 3, mat g = Heisenberg₂ σ x y := by
+theorem exists_heis (hσ : ∀ x, σ (σ x) = x) {x y : L} (h : y + σ y + x * σ x = 0)
+    : ∃ g : GU σ 3, mat g = Heisenberg₂ σ x y := by
   apply exists_mat
   ext i j
   rw [Matrix.mul_apply, Fin.sum_univ_three]
@@ -79,9 +81,9 @@ theorem exists_heis (hσ : ∀ x, σ (σ x) = x) {x y : L} (h : y + σ y + x * �
   fin_cases i <;> fin_cases j <;> simp [Heisenberg₂, antiJ, hσ]
   linear_combination h
 
-theorem mem_int_iff (hσ : ∀ x, σ (σ x) = x) (hv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ 3) :
-    g ∈ KU σ 3 ⊓ rootU σ ![0, 0, 0] ↔
-      ∃ x ∈ intL L, ∃ y ∈ intL L, y + σ y + x * σ x = 0 ∧ mat g = Heisenberg₂ σ x y := by
+theorem mem_int_iff (hσ : ∀ x, σ (σ x) = x) (hv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ 3)
+    : g ∈ KU σ 3 ⊓ rootU σ ![0, 0, 0]
+      ↔ ∃ x ∈ intL L, ∃ y ∈ intL L, y + σ y + x * σ x = 0 ∧ mat g = Heisenberg₂ σ x y := by
   rw [Subgroup.mem_inf, mem_root_iff hσ, mem_KU_iff hv]
   constructor
   · rintro ⟨h, x, y, hr, e⟩
@@ -92,14 +94,17 @@ theorem mem_int_iff (hσ : ∀ x, σ (σ x) = x) (hv : ∀ x, Valued.v (σ x) = 
     refine ⟨fun i j => ?_, x, y, hr, e⟩
     have hx' : σ x ∈ intL L := by
       show Valued.v (σ x) ≤ 1
-      rw [hv]; exact hx
+      rw [hv]
+      exact hx
     rw [e]
     fin_cases i <;> fin_cases j <;> simp [Heisenberg₂, hx, hy, hx', one_mem, zero_mem]
 
 omit [Valued L (WithZero (Multiplicative ℤ))] in
-theorem conj_iff {ϖ : L} (h0 : ϖ ≠ 0) (hϖ : σ ϖ = ϖ) {s : GU σ 3}
-    (hs : mat s = Matrix.diagonal (fun i => ϖ ^ (![1, 0, -1] : Fin 3 → ℤ) i)) (g : GU σ 3) (x y : L)
-    (e : mat g = Heisenberg₂ σ x y) : mat (s * g * s⁻¹) = Heisenberg₂ σ (ϖ * x) (ϖ * (ϖ * y)) := by
+theorem conj_iff
+    {ϖ : L} (h0 : ϖ ≠ 0) (hϖ : σ ϖ = ϖ)
+    {s : GU σ 3} (hs : mat s = Matrix.diagonal (fun i => ϖ ^ (![1, 0, -1] : Fin 3 → ℤ) i))
+    (g : GU σ 3) (x y : L) (e : mat g = Heisenberg₂ σ x y)
+    : mat (s * g * s⁻¹) = Heisenberg₂ σ (ϖ * x) (ϖ * (ϖ * y)) := by
   have : mat s * mat g = Heisenberg₂ σ (ϖ * x) (ϖ * (ϖ * y)) * mat s := by
     rw [e, hs]
     ext i j
@@ -108,8 +113,8 @@ theorem conj_iff {ϖ : L} (h0 : ϖ ≠ 0) (hϖ : σ ϖ = ϖ) {s : GU σ 3}
   rw [mat_mul, mat_mul, this, Matrix.mul_assoc, mat_mul_inv, Matrix.mul_one]
 
 omit [Valued L (WithZero (Multiplicative ℤ))] in
-theorem heis_mul (x y x' y' : L) :
-    Heisenberg₂ σ x y * Heisenberg₂ σ x' y' = Heisenberg₂ σ (x + x') (y + y' - x * σ x') := by
+theorem heis_mul (x y x' y' : L)
+    : Heisenberg₂ σ x y * Heisenberg₂ σ x' y' = Heisenberg₂ σ (x + x') (y + y' - x * σ x') := by
   ext i j
   rw [Matrix.mul_apply, Fin.sum_univ_three]
   fin_cases i <;> fin_cases j <;> simp [Heisenberg₂] <;> ring
@@ -120,11 +125,10 @@ theorem heis_01 (x y : L) : Heisenberg₂ σ x y 0 1 = x := rfl
 omit [Valued L (WithZero (Multiplicative ℤ))] in
 theorem heis_02 (x y : L) : Heisenberg₂ σ x y 0 2 = y := rfl
 
-theorem exists_snd {ϖ : L} {q : ℕ} (hU : IsUnramInv ϖ σ q) {x : L} (hx : x ∈ intL L) :
-    ∃ y ∈ intL L, y + σ y + x * σ x = 0 := by
+theorem exists_snd {ϖ : L} {q : ℕ} (hU : IsUnramInv ϖ σ q) {x : L} (hx : x ∈ intL L)
+    : ∃ y ∈ intL L, y + σ y + x * σ x = 0 := by
   obtain ⟨hσ, hv, -, -, ⟨a, ha, ha1⟩, -⟩ := hU
-  have h0 : σ a - a ≠ 0 := by
-    intro h; rw [h, map_zero] at ha1; exact zero_ne_one ha1
+  have h0 : σ a - a ≠ 0 := by intro h; rw [h, map_zero] at ha1; exact zero_ne_one ha1
   have h0' : a - σ a ≠ 0 := fun h => h0 (by linear_combination -h)
   refine ⟨-(σ a / (σ a - a)) * (x * σ x), ?_, ?_⟩
   · show Valued.v (-(σ a / (σ a - a)) * (x * σ x)) ≤ 1
@@ -142,8 +146,7 @@ theorem indexThree : IntIndex → TraceZeroIndex → IndexThree := by
   have hT := hT L ϖ σ q hU
   have hsnd := fun x => exists_snd hU (x := x)
   obtain ⟨hσ, hv, hϖ, hvϖ, -⟩ := hU
-  have h0 : ϖ ≠ 0 := by
-    intro h; rw [h, map_zero] at hvϖ; exact WithZero.zero_ne_coe hvϖ
+  have h0 : ϖ ≠ 0 := by intro h; rw [h, map_zero] at hvϖ; exact WithZero.zero_ne_coe hvϖ
   have hϖO : ϖ ∈ intL L := by
     show Valued.v ϖ ≤ 1
     rw [hvϖ, ← WithZero.coe_one, WithZero.coe_le_coe]
@@ -151,11 +154,16 @@ theorem indexThree : IntIndex → TraceZeroIndex → IndexThree := by
   set T := (intL L).toAddSubgroup ⊓ (σ.toAddMonoidHom + AddMonoidHom.id L).ker with hTdef
   have mT : ∀ y, y ∈ T ↔ y ∈ intL L ∧ σ y + y = 0 := fun y => Iff.rfl
   set U := KU σ 3 ⊓ rootU σ ![0, 0, 0] with hUdef
-  have mU : ∀ g, g ∈ U ↔ ∃ x ∈ intL L, ∃ y ∈ intL L, y + σ y + x * σ x = 0 ∧ mat g = Heisenberg₂ σ x y :=
+  have mU
+      : ∀ g,
+        g ∈ U ↔ ∃ x ∈ intL L, ∃ y ∈ intL L, y + σ y + x * σ x = 0 ∧ mat g = Heisenberg₂ σ x y :=
     mem_int_iff hσ hv
   set V := U.map (MulAut.conj s).toMonoidHom with hVdef
-  have mV : ∀ g, g ∈ V ↔ ∃ x ∈ intL L, ∃ y ∈ intL L, y + σ y + x * σ x = 0 ∧
-      mat g = Heisenberg₂ σ (ϖ * x) (ϖ * (ϖ * y)) := by
+  have mV
+      : ∀ g,
+        g ∈ V
+          ↔ ∃ x ∈ intL L, ∃ y ∈ intL L,
+            y + σ y + x * σ x = 0 ∧ mat g = Heisenberg₂ σ (ϖ * x) (ϖ * (ϖ * y)) := by
     intro g
     constructor
     · rintro ⟨u, hu, rfl⟩
@@ -163,19 +171,24 @@ theorem indexThree : IntIndex → TraceZeroIndex → IndexThree := by
       exact ⟨x, hx, y, hy, hr, conj_iff h0 hϖ hs u x y e⟩
     · rintro ⟨x, hx, y, hy, hr, e⟩
       obtain ⟨u, hu⟩ := exists_heis hσ hr
-      exact ⟨u, (mU u).2 ⟨x, hx, y, hy, hr, hu⟩, mat_injective ((conj_iff h0 hϖ hs u x y hu).trans e.symm)⟩
+      exact ⟨
+        u,
+        (mU u).2 ⟨x, hx, y, hy, hr, hu⟩,
+        mat_injective ((conj_iff h0 hϖ hs u x y hu).trans e.symm)
+      ⟩
   have VU : V ≤ U := by
     intro g hg
     obtain ⟨x, hx, y, hy, hr, e⟩ := (mV g).1 hg
     refine (mU g).2 ⟨_, mul_mem hϖO hx, _, mul_mem hϖO (mul_mem hϖO hy), ?_, e⟩
     simp only [map_mul, hϖ]
     linear_combination ϖ * ϖ * hr
-  let φ : U →* Multiplicative L := MonoidHom.mk' (fun g => Multiplicative.ofAdd (mat g.1 0 1)) (by
-    intro a b
-    obtain ⟨x, -, y, -, -, e⟩ := (mU a).1 a.2
-    obtain ⟨x', -, y', -, -, e'⟩ := (mU b).1 b.2
-    rw [← ofAdd_add, Subgroup.coe_mul, mat_mul, e, e', heis_mul]
-    rfl)
+  let φ : U →* Multiplicative L :=
+    MonoidHom.mk' (fun g => Multiplicative.ofAdd (mat g.1 0 1)) (by
+      intro a b
+      obtain ⟨x, -, y, -, -, e⟩ := (mU a).1 a.2
+      obtain ⟨x', -, y', -, -, e'⟩ := (mU b).1 b.2
+      rw [← ofAdd_add, Subgroup.coe_mul, mat_mul, e, e', heis_mul]
+      rfl)
   have hφ : ∀ g, φ g = Multiplicative.ofAdd (mat g.1 0 1) := fun _ => rfl
   have hker : ∀ g : φ.ker, ∃ y ∈ T, mat g.1.1 = Heisenberg₂ σ 0 y := by
     intro g
@@ -184,33 +197,38 @@ theorem indexThree : IntIndex → TraceZeroIndex → IndexThree := by
     rw [e, heis_01] at this
     subst this
     exact ⟨y, (mT y).2 ⟨hy, by linear_combination hr⟩, e⟩
-  let χ : φ.ker →* Multiplicative L := MonoidHom.mk' (fun g => Multiplicative.ofAdd (mat g.1.1 0 2)) (by
-    intro a b
-    obtain ⟨y, -, e⟩ := hker a
-    obtain ⟨y', -, e'⟩ := hker b
-    rw [← ofAdd_add, Subgroup.coe_mul, Subgroup.coe_mul, mat_mul, e, e', heis_mul, heis_02, heis_02, heis_02,
-      zero_mul, sub_zero])
+  let χ : φ.ker →* Multiplicative L :=
+    MonoidHom.mk' (fun g => Multiplicative.ofAdd (mat g.1.1 0 2)) (by
+      intro a b
+      obtain ⟨y, -, e⟩ := hker a
+      obtain ⟨y', -, e'⟩ := hker b
+      rw [← ofAdd_add, Subgroup.coe_mul, Subgroup.coe_mul, mat_mul, e, e', heis_mul, heis_02,
+        heis_02, heis_02, zero_mul, sub_zero])
   have r1 : φ.range = AddSubgroup.toSubgroup (intL L).toAddSubgroup := by
     ext z
     constructor
     · rintro ⟨g, rfl⟩
       obtain ⟨x, hx, y, -, -, e⟩ := (mU g).1 g.2
       show mat g.1 0 1 ∈ intL L
-      rw [e]; exact hx
+      rw [e]
+      exact hx
     · intro hz
       obtain ⟨y, hy, hr⟩ := hsnd z.toAdd hz
       obtain ⟨u, hu⟩ := exists_heis hσ hr
       refine ⟨⟨u, (mU u).2 ⟨_, hz, y, hy, hr, hu⟩⟩, ?_⟩
-      rw [hφ, hu]; rfl
-  have r2 : (V.subgroupOf U).map φ =
-      AddSubgroup.toSubgroup ((intL L).toAddSubgroup.map (AddMonoidHom.mulLeft ϖ)) := by
+      rw [hφ, hu]
+      rfl
+  have r2
+      : (V.subgroupOf U).map φ
+        = AddSubgroup.toSubgroup ((intL L).toAddSubgroup.map (AddMonoidHom.mulLeft ϖ)) := by
     ext z
     constructor
     · rintro ⟨g, hg, rfl⟩
       obtain ⟨x, hx, y, -, -, e⟩ := (mV g).1 hg
       refine ⟨x, hx, ?_⟩
       show ϖ * x = mat g.1 0 1
-      rw [e]; rfl
+      rw [e]
+      rfl
     · rintro ⟨x, hx, hz⟩
       have hz : ϖ * x = z.toAdd := hz
       obtain ⟨y, hy, hr⟩ := hsnd x hx
@@ -220,25 +238,31 @@ theorem indexThree : IntIndex → TraceZeroIndex → IndexThree := by
       obtain ⟨u, hu⟩ := exists_heis hσ hr'
       have huV : u ∈ V := (mV u).2 ⟨x, hx, y, hy, hr, hu⟩
       refine ⟨⟨u, VU huV⟩, huV, ?_⟩
-      rw [hφ, hu, heis_01, hz]; rfl
+      rw [hφ, hu, heis_01, hz]
+      rfl
   have r3 : χ.range = AddSubgroup.toSubgroup T := by
     ext z
     constructor
     · rintro ⟨g, rfl⟩
       obtain ⟨y, hy, e⟩ := hker g
       show mat g.1.1 0 2 ∈ T
-      rw [e]; exact hy
+      rw [e]
+      exact hy
     · intro hz
       obtain ⟨hy, hr⟩ := (mT z.toAdd).1 hz
       have hr' : z.toAdd + σ z.toAdd + 0 * σ 0 = 0 := by linear_combination hr
       obtain ⟨u, hu⟩ := exists_heis hσ hr'
       refine ⟨⟨⟨u, (mU u).2 ⟨_, zero_mem _, _, hy, hr', hu⟩⟩, ?_⟩, ?_⟩
       · show mat u 0 1 = 0
-        rw [hu]; rfl
+        rw [hu]
+        rfl
       · show Multiplicative.ofAdd (mat u 0 2) = z
-        rw [hu]; rfl
-  have r4 : (V.subgroupOf U).subgroupOf φ.ker = (AddSubgroup.toSubgroup
-      ((T.map (AddMonoidHom.mulLeft ϖ)).map (AddMonoidHom.mulLeft ϖ))).comap χ := by
+        rw [hu]
+        rfl
+  have r4
+      : (V.subgroupOf U).subgroupOf φ.ker
+        = (AddSubgroup.toSubgroup ((T.map (AddMonoidHom.mulLeft ϖ)).map
+          (AddMonoidHom.mulLeft ϖ))).comap χ := by
     ext g
     obtain ⟨w, -, e⟩ := hker g
     constructor
@@ -249,7 +273,8 @@ theorem indexThree : IntIndex → TraceZeroIndex → IndexThree := by
       subst hx0
       refine ⟨ϖ * y, ⟨y, (mT y).2 ⟨hy, by linear_combination hr⟩, rfl⟩, ?_⟩
       show ϖ * (ϖ * y) = mat g.1.1 0 2
-      rw [e']; rfl
+      rw [e']
+      rfl
     · rintro ⟨_, ⟨y, hy, rfl⟩, hz⟩
       have hz : ϖ * (ϖ * y) = mat g.1.1 0 2 := hz
       rw [e, heis_02] at hz

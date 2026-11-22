@@ -10,9 +10,11 @@ open scoped BigOperators
 
 namespace GlobalTheory.NormFormGauss
 
-theorem card_eq_sq {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ x, s (s x) = x)
-    (r : k) (hr : s r - r ≠ 0) :
-    Fintype.card k = (Finset.univ.filter (fun x : k => s x = x)).card ^ 2 := by
+theorem card_eq_sq
+    {k : Type} [Field k] [Fintype k]
+    (s : k →+* k) (hs : ∀ x, s (s x) = x)
+    (r : k) (hr : s r - r ≠ 0)
+    : Fintype.card k = (Finset.univ.filter (fun x : k => s x = x)).card ^ 2 := by
   let T : k →+ k := s.toAddMonoidHom - AddMonoidHom.id k
   have hT : ∀ x, T x = s x - x := fun x => rfl
   have h1 : Nat.card k = Nat.card (k ⧸ T.ker) * Nat.card T.ker :=
@@ -27,13 +29,14 @@ theorem card_eq_sq {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ x,
   have hθ : s (s r - r) = -(s r - r) := by rw [map_sub, hs]; ring
   have h4 : Nat.card T.range = Nat.card T.ker := by
     symm
-    refine Nat.card_congr (Equiv.ofBijective
-      (fun u : T.ker => (⟨(s r - r) * u, ⟨r * u, ?_⟩⟩ : T.range)) ⟨?_, ?_⟩)
+    refine Nat.card_congr
+      (Equiv.ofBijective (fun u : T.ker => (⟨(s r - r) * u, ⟨r * u, ?_⟩⟩ : T.range)) ⟨?_, ?_⟩)
     · have hu : s u = u := by
         have := u.2
         rw [AddMonoidHom.mem_ker, hT, sub_eq_zero] at this
         exact this
-      rw [hT, map_mul, hu]; ring
+      rw [hT, map_mul, hu]
+      ring
     · intro u v huv
       have := congrArg Subtype.val huv
       exact Subtype.ext (mul_left_cancel₀ hr this)
@@ -47,18 +50,20 @@ theorem card_eq_sq {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ x,
         field_simp
   rw [← Nat.card_eq_fintype_card, h1, h2, h4, h3, sq]
 
-theorem sum_norm_units {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ x, s (s x) = x)
-    (r : k) (hr : s r - r ≠ 0) :
-    ∃ m : ℕ, Fintype.card kˣ = m * (Finset.univ.filter (fun x : kˣ => s x = x)).card ∧
-      ∀ f : k → ℂ, ∑ x : kˣ, f (x * s x) =
-        m * ∑ y ∈ Finset.univ.filter (fun x : kˣ => s x = x), f y := by
+theorem sum_norm_units
+    {k : Type} [Field k] [Fintype k]
+    (s : k →+* k) (hs : ∀ x, s (s x) = x)
+    (r : k) (hr : s r - r ≠ 0)
+    : ∃ m : ℕ,
+      Fintype.card kˣ = m * (Finset.univ.filter (fun x : kˣ => s x = x)).card
+        ∧ ∀ f : k → ℂ,
+          ∑ x : kˣ, f (x * s x) = m * ∑ y ∈ Finset.univ.filter (fun x : kˣ => s x = x), f y := by
   let S : kˣ →* kˣ := Units.map s.toMonoidHom
   have hS : ∀ x : kˣ, ((S x : kˣ) : k) = s x := fun x => rfl
   let N : kˣ →* kˣ := MonoidHom.id _ * S
   let D : kˣ →* kˣ := MonoidHom.id _ / S
   have hN : ∀ x : kˣ, ((N x : kˣ) : k) = x * s x := fun x => rfl
-  have hD : ∀ x : kˣ, ((D x : kˣ) : k) = x / s x := fun x => by
-    simp [D, hS]
+  have hD : ∀ x : kˣ, ((D x : kˣ) : k) = x / s x := fun x => by simp [D, hS]
   have hθ : s (s r - r) = -(s r - r) := by rw [map_sub, hs]; ring
   have hne : ∀ x : kˣ, s x ≠ 0 := fun x => by simp
   have hDk : ∀ x : kˣ, x ∈ D.ker ↔ s x = x := fun x => by
@@ -116,8 +121,9 @@ theorem sum_norm_units {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : �
       Nat.card_eq_fintype_card, Fintype.card_subtype]
     congr 1
 
-theorem sum_eq_zero_add_units {k : Type} [Field k] [Fintype k] {M : Type} [AddCommMonoid M]
-    (g : k → M) : ∑ x : k, g x = g 0 + ∑ x : kˣ, g x := by
+theorem sum_eq_zero_add_units
+    {k : Type} [Field k] [Fintype k] {M : Type} [AddCommMonoid M] (g : k → M)
+    : ∑ x : k, g x = g 0 + ∑ x : kˣ, g x := by
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (0 : k))]
   congr 1
   symm
@@ -128,10 +134,13 @@ theorem sum_eq_zero_add_units {k : Type} [Field k] [Fintype k] {M : Type} [AddCo
     exact ⟨Units.mk0 b (by simpa using hb), by simp, rfl⟩
   · intro a _; rfl
 
-theorem gauss_field {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ x, s (s x) = x)
-    (r : k) (hr : s r - r ≠ 0) (f : k → ℂ) (hadd : ∀ a b, f (a + b) = f a * f b) (h0 : f 0 = 1)
-    (u : k) (hu : s u = u) (hfu : f u ≠ 1) :
-    ∑ x : k, f (x * s x) = -(Real.sqrt (Fintype.card k) : ℂ) := by
+theorem gauss_field
+    {k : Type} [Field k] [Fintype k]
+    (s : k →+* k) (hs : ∀ x, s (s x) = x)
+    (r : k) (hr : s r - r ≠ 0)
+    (f : k → ℂ) (hadd : ∀ a b, f (a + b) = f a * f b) (h0 : f 0 = 1)
+    (u : k) (hu : s u = u) (hfu : f u ≠ 1)
+    : ∑ x : k, f (x * s x) = -(Real.sqrt (Fintype.card k) : ℂ) := by
   obtain ⟨m, hm, hsum⟩ := sum_norm_units s hs r hr
   have hq := card_eq_sq s hs r hr
   set q := (Finset.univ.filter (fun x : k => s x = x)).card with hqdef
@@ -149,8 +158,9 @@ theorem gauss_field {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ x
     rw [hqa]
     nlinarith
   have hz : ∑ y ∈ Finset.univ.filter (fun x : k => s x = x), f y = 0 := by
-    have h1 : ∑ y ∈ Finset.univ.filter (fun x : k => s x = x), f (u + y) =
-        ∑ y ∈ Finset.univ.filter (fun x : k => s x = x), f y := by
+    have h1
+        : ∑ y ∈ Finset.univ.filter (fun x : k => s x = x), f (u + y)
+          = ∑ y ∈ Finset.univ.filter (fun x : k => s x = x), f y := by
       refine Finset.sum_equiv (Equiv.addLeft u) ?_ ?_
       · intro i; simp [hu]
       · intro i _; rfl
@@ -168,7 +178,16 @@ theorem gauss_field {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ x
   rw [Real.sqrt_sq (Nat.cast_nonneg q)]
   simp [h0]
 
-theorem gauss_quotient : ∀ {R : Type} [CommRing R] (σ : R →+* R) (w : R), (∀ r, σ (σ r) = r) → w + σ w = 1 → ∀ P : Ideal R, P.IsMaximal → Finite (R ⧸ P) → (∀ r ∈ P, σ r ∈ P) → (∃ r, σ r - r ∉ P) → ∀ χ : R → ℂ, (∀ s t, χ (s + t) = χ s * χ t) → χ 0 = 1 → (∀ r ∈ P, χ r = 1) → (∀ t, χ (σ t) = χ t) → (∃ t, χ t ≠ 1) → (∑ᶠ q : R ⧸ P, χ (w * (Quotient.out q : R) * σ (Quotient.out q : R))) = -(Real.sqrt (Nat.card (R ⧸ P)) : ℂ) := by
+theorem gauss_quotient
+    : ∀ {R : Type} [CommRing R] (σ : R →+* R) (w : R),
+      (∀ r, σ (σ r) = r) → w + σ w = 1
+        → ∀ P : Ideal R,
+          P.IsMaximal → Finite (R ⧸ P) → (∀ r ∈ P, σ r ∈ P) → (∃ r, σ r - r ∉ P)
+            → ∀ χ : R → ℂ,
+              (∀ s t, χ (s + t) = χ s * χ t) → χ 0 = 1 → (∀ r ∈ P, χ r = 1) → (∀ t, χ (σ t) = χ t)
+                → (∃ t, χ t ≠ 1)
+                → (∑ᶠ q : R ⧸ P, χ (w * (Quotient.out q : R) * σ (Quotient.out q : R)))
+                  = -(Real.sqrt (Nat.card (R ⧸ P)) : ℂ) := by
   intro R _ σ w hσ hw P hP hfin hst ⟨r, hr⟩ χ hadd h0 hχP hχσ ⟨t, ht⟩
   letI : Field (R ⧸ P) := Ideal.Quotient.field P
   letI : Fintype (R ⧸ P) := Fintype.ofFinite _
@@ -184,25 +203,25 @@ theorem gauss_quotient : ∀ {R : Type} [CommRing R] (σ : R →+* R) (w : R), (
   let f : R ⧸ P → ℂ := fun q => χ (w * Quotient.out q)
   have hf : ∀ a : R, f (Ideal.Quotient.mk P a) = χ (w * a) := fun a =>
     hcongr _ _ (by rw [map_mul, map_mul, hout])
-  have key := gauss_field s
-    (fun x => by
-      obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
-      rw [hs, hs, hσ])
-    (Ideal.Quotient.mk P r)
-    (by
-      rw [hs, ← map_sub]
-      exact fun h => hr (Ideal.Quotient.eq_zero_iff_mem.1 h))
-    f
-    (fun a b => by
-      obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a
-      obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective b
-      rw [← map_add (f := _), hf, hf, hf, mul_add, hadd])
-    (by rw [← map_zero (Ideal.Quotient.mk P), hf, mul_zero, h0])
-    (Ideal.Quotient.mk P (t + σ t))
-    (by rw [hs, map_add σ, hσ, add_comm])
-    (by
-      rw [hf, mul_add, hadd, ← hχσ (w * σ t), map_mul, hσ, ← hadd, ← add_mul, hw, one_mul]
-      exact ht)
+  have key :=
+    gauss_field s
+      (fun x => by
+        obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
+        rw [hs, hs, hσ])
+      (Ideal.Quotient.mk P r)
+      (by
+        rw [hs, ← map_sub]
+        exact fun h => hr (Ideal.Quotient.eq_zero_iff_mem.1 h))
+      f
+      (fun a b => by
+        obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a
+        obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective b
+        rw [← map_add (f := _), hf, hf, hf, mul_add, hadd])
+      (by rw [← map_zero (Ideal.Quotient.mk P), hf, mul_zero, h0]) (Ideal.Quotient.mk P (t + σ t))
+      (by rw [hs, map_add σ, hσ, add_comm])
+      (by
+        rw [hf, mul_add, hadd, ← hχσ (w * σ t), map_mul, hσ, ← hadd, ← add_mul, hw, one_mul]
+        exact ht)
   rw [finsum_eq_sum_of_fintype, Nat.card_eq_fintype_card, ← key]
   refine Finset.sum_congr rfl fun q _ => ?_
   conv_rhs => rw [← hout q]

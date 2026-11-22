@@ -10,12 +10,12 @@ namespace Formalism.CoboundaryTransfers
 
 namespace WachMod
 
-variable {O A : Type} [CommRing O] [CommRing A] [Algebra O A] {B : Base O A} {M : ℕ}
-  {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
+variable
+  {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+  {B : Base O A} {M : ℕ} {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
   (W : WachMod B M D)
 
-theorem smulO_eq (c : O) (x : D) : c • x = algebraMap O A c • x := by
-  rw [algebraMap_smul]
+theorem smulO_eq (c : O) (x : D) : c • x = algebraMap O A c • x := by rw [algebraMap_smul]
 
 theorem smulO_mem (c : O) {x : D} (hx : x ∈ W.N) : c • x ∈ W.N := by
   rw [smulO_eq (A := A)]; exact W.N.smul_mem _ hx

@@ -12,18 +12,17 @@ namespace GlobalTheory.SpecialConn
 
 variable {O : Type} [CommRing O] [IsLocalRing O] {Y : Scheme.{0}} (f : Y ⟶ Spec (.of O))
 
-abbrev thickQ (O : Type) [CommRing O] [IsLocalRing O] (n : ℕ) :
-    O →+* O ⧸ IsLocalRing.maximalIdeal O ^ (n + 1) :=
+abbrev thickQ (O : Type) [CommRing O] [IsLocalRing O] (n : ℕ)
+    : O →+* O ⧸ IsLocalRing.maximalIdeal O ^ (n + 1) :=
   Ideal.Quotient.mk _
 
-def thickR (O : Type) [CommRing O] [IsLocalRing O] (n : ℕ) :
-    O ⧸ IsLocalRing.maximalIdeal O ^ (n + 1 + 1) →+* O ⧸ IsLocalRing.maximalIdeal O ^ (n + 1) :=
+def thickR (O : Type) [CommRing O] [IsLocalRing O] (n : ℕ)
+    : O ⧸ IsLocalRing.maximalIdeal O ^ (n + 1 + 1) →+* O ⧸ IsLocalRing.maximalIdeal O ^ (n + 1) :=
   Ideal.Quotient.factor (Ideal.pow_le_pow_right (Nat.le_succ (n + 1)))
 
 theorem thickR_comp (n : ℕ) : (thickR O n).comp (thickQ O (n + 1)) = thickQ O n := rfl
 
-def thickFib (n : ℕ) : Scheme.{0} :=
-  pullback f (Spec.map (CommRingCat.ofHom (thickQ O n)))
+def thickFib (n : ℕ) : Scheme.{0} := pullback f (Spec.map (CommRingCat.ofHom (thickQ O n)))
 
 def thickι (n : ℕ) : thickFib f n ⟶ Y := pullback.fst _ _
 

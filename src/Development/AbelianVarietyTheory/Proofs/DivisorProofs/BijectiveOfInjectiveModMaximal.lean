@@ -8,8 +8,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory.ProjBij
 
-theorem eq_bot_of_forall_le_smul {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    (K : Submodule R M) (hK : K.FG) (h : ∀ m : Ideal R, m.IsMaximal → K ≤ m • K) : K = ⊥ := by
+theorem eq_bot_of_forall_le_smul
+    {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+    (K : Submodule R M) (hK : K.FG) (h : ∀ m : Ideal R, m.IsMaximal → K ≤ m • K)
+    : K = ⊥ := by
   rw [← Submodule.annihilator_eq_top_iff]
   by_contra hne
   obtain ⟨m, hm, hle⟩ := Ideal.exists_le_maximal _ hne
@@ -21,32 +23,35 @@ theorem eq_bot_of_forall_le_smul {R M : Type*} [CommRing R] [AddCommGroup M] [Mo
   have := m.sub_mem h1 hr
   simpa using this
 
-theorem one_tmul_eq_zero_iff {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    (m : Ideal R) (x : M) :
-    ((1 : R ⧸ m) ⊗ₜ[R] x : (R ⧸ m) ⊗[R] M) = 0 ↔ x ∈ m • (⊤ : Submodule R M) := by
+theorem one_tmul_eq_zero_iff
+    {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M] (m : Ideal R) (x : M)
+    : ((1 : R ⧸ m) ⊗ₜ[R] x : (R ⧸ m) ⊗[R] M) = 0 ↔ x ∈ m • (⊤ : Submodule R M) := by
   rw [← (TensorProduct.quotTensorEquivQuotSMul M m).map_eq_zero_iff,
     TensorProduct.quotTensorEquivQuotSMul_mk_one_tmul, Submodule.Quotient.mk_eq_zero]
 
-theorem exists_one_tmul {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    (m : Ideal R) (y : (R ⧸ m) ⊗[R] M) : ∃ x : M, (1 : R ⧸ m) ⊗ₜ[R] x = y :=
+theorem exists_one_tmul
+    {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M] (m : Ideal R) (y : (R ⧸ m) ⊗[R] M)
+    : ∃ x : M, (1 : R ⧸ m) ⊗ₜ[R] x = y :=
   TensorProduct.mk_surjective R M (R ⧸ m) Ideal.Quotient.mk_surjective y
 
 theorem bijective_of_injective_mod_maximal
     (R M N : Type) [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
     [Module.Finite R M] [Module.Projective R M] [Module.Finite R N] [Module.Projective R N]
     (f : M →ₗ[R] N)
-    (hrk : ∀ m : Ideal R, m.IsMaximal →
-      Module.finrank (R ⧸ m) ((R ⧸ m) ⊗[R] M) = Module.finrank (R ⧸ m) ((R ⧸ m) ⊗[R] N))
-    (hinj : ∀ m : Ideal R, m.IsMaximal → ∀ x, f x ∈ m • (⊤ : Submodule R N) →
-      x ∈ m • (⊤ : Submodule R M)) :
-    Function.Bijective f := by
+    (hrk : ∀ m : Ideal R,
+      m.IsMaximal
+        → Module.finrank (R ⧸ m) ((R ⧸ m) ⊗[R] M) = Module.finrank (R ⧸ m) ((R ⧸ m) ⊗[R] N))
+    (hinj : ∀ m : Ideal R,
+      m.IsMaximal → ∀ x, f x ∈ m • (⊤ : Submodule R N) → x ∈ m • (⊤ : Submodule R M))
+    : Function.Bijective f := by
   have hsurj : Function.Surjective f := by
     have key : (⊤ : Submodule R (N ⧸ LinearMap.range f)) = ⊥ := by
       apply eq_bot_of_forall_le_smul _ Module.Finite.fg_top
       intro m hm y _
       letI := Ideal.Quotient.field m
       have hi : Function.Injective (f.baseChange (R ⧸ m)) := by
-        set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+        set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+          rw [injective_iff_map_eq_zero]
         intro z hz
         obtain ⟨x, rfl⟩ := exists_one_tmul m z
         rw [LinearMap.baseChange_tmul, one_tmul_eq_zero_iff] at hz
@@ -55,8 +60,8 @@ theorem bijective_of_injective_mod_maximal
       obtain ⟨n, rfl⟩ := Submodule.Quotient.mk_surjective _ y
       obtain ⟨z, hz⟩ := hs (1 ⊗ₜ n)
       obtain ⟨x, rfl⟩ := exists_one_tmul m z
-      rw [LinearMap.baseChange_tmul, ← sub_eq_zero, ← TensorProduct.tmul_sub,
-        one_tmul_eq_zero_iff] at hz
+      rw [LinearMap.baseChange_tmul, ← sub_eq_zero, ← TensorProduct.tmul_sub, one_tmul_eq_zero_iff]
+        at hz
       have h2 := Submodule.mem_map_of_mem (f := (LinearMap.range f).mkQ) hz
       rw [Submodule.map_smul''] at h2
       have h3 := Submodule.smul_mono (le_refl m) le_top h2

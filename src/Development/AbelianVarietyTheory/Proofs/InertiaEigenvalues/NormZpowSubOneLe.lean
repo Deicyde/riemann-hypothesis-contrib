@@ -6,8 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory.UnitNormPowerSubOne
 
-theorem norm_eq_one {C : Type} [NormedField C] [IsUltrametricDist C] (u : C)
-    (h : ‖u - 1‖ < 1) : ‖u‖ = 1 := by
+theorem norm_eq_one {C : Type} [NormedField C] [IsUltrametricDist C] (u : C) (h : ‖u - 1‖ < 1)
+    : ‖u‖ = 1 := by
   apply le_antisymm
   · have h1 := IsUltrametricDist.norm_add_le_max (u - 1) (1 : C)
     rw [sub_add_cancel, norm_one] at h1
@@ -19,8 +19,9 @@ theorem norm_eq_one {C : Type} [NormedField C] [IsUltrametricDist C] (u : C)
     · exact h2
     · exact absurd h (not_lt.mpr h2)
 
-theorem norm_pow_sub_one_le {C : Type} [NormedField C] [IsUltrametricDist C] (u : C)
-    (h : ‖u - 1‖ < 1) (n : ℕ) : ‖u ^ n - 1‖ ≤ ‖u - 1‖ := by
+theorem norm_pow_sub_one_le
+    {C : Type} [NormedField C] [IsUltrametricDist C] (u : C) (h : ‖u - 1‖ < 1) (n : ℕ)
+    : ‖u ^ n - 1‖ ≤ ‖u - 1‖ := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -29,8 +30,9 @@ theorem norm_pow_sub_one_le {C : Type} [NormedField C] [IsUltrametricDist C] (u 
     rw [e, norm_mul, norm_pow, norm_eq_one u h, one_pow, one_mul] at h1
     exact h1.trans (max_le le_rfl ih)
 
-theorem norm_zpow_sub_one_le {C : Type} [NormedField C] [IsUltrametricDist C] (u : C)
-    (h : ‖u - 1‖ < 1) (i : ℤ) : ‖u ^ i - 1‖ ≤ ‖u - 1‖ := by
+theorem norm_zpow_sub_one_le
+    {C : Type} [NormedField C] [IsUltrametricDist C] (u : C) (h : ‖u - 1‖ < 1) (i : ℤ)
+    : ‖u ^ i - 1‖ ≤ ‖u - 1‖ := by
   have hn := norm_eq_one u h
   have hu : u ≠ 0 := by
     intro h0

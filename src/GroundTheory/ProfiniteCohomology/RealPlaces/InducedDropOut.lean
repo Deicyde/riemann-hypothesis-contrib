@@ -17,11 +17,9 @@ section ProdSeq
 
 variable {k : Type u} [CommRing k] (M N : CochainComplex (ModuleCat.{u} k) ℕ)
 
-noncomputable def prodInr : N ⟶ prodComplex M N :=
-  prodLift 0 (𝟙 N)
+noncomputable def prodInr : N ⟶ prodComplex M N := prodLift 0 (𝟙 N)
 
-theorem prodInr_f_hom_apply (n : ℕ) (y : N.X n) :
-    ((prodInr M N).f n).hom y = ((0 : M.X n), y) :=
+theorem prodInr_f_hom_apply (n : ℕ) (y : N.X n) : ((prodInr M N).f n).hom y = ((0 : M.X n), y) :=
   rfl
 
 noncomputable def prodSeq : ShortComplex (CochainComplex (ModuleCat.{u} k) ℕ) :=
@@ -35,18 +33,19 @@ theorem prodSeq_shortExact : (prodSeq M N).ShortExact :=
       intro (p : M.X n × N.X n) hp
       exact ⟨p.2, Prod.ext hp.symm rfl⟩
     mono_f := (ModuleCat.mono_iff_injective _).2 fun _ _ h => congrArg Prod.snd h
-    epi_g := (ModuleCat.epi_iff_surjective _).2 fun (x : M.X n) =>
-      ⟨((x, 0) : M.X n × N.X n), rfl⟩ }
+    epi_g := (ModuleCat.epi_iff_surjective _).2 fun (x : M.X n) => ⟨((x, 0) : M.X n × N.X n), rfl⟩
+  }
 
 end ProdSeq
 
 section NormClass
 
-variable {k F' : Type u} [CommRing k] [Group F'] [TopologicalSpace F'] [IsTopologicalGroup F']
-  [Fintype F'] (B : Rep.{u} k F') [IsDiscreteRep B]
+variable
+  {k F' : Type u} [CommRing k] [Group F'] [TopologicalSpace F'] [IsTopologicalGroup F'] [Fintype F']
+  (B : Rep.{u} k F') [IsDiscreteRep B]
 
-theorem exists_normClass_eq (hB : ∀ x ∈ B.ρ.invariants, ∃ m, B.ρ.norm m = x) (c : cohomology B 0) :
-    ∃ m, normClass B m = c := by
+theorem exists_normClass_eq (hB : ∀ x ∈ B.ρ.invariants, ∃ m, B.ρ.norm m = x) (c : cohomology B 0)
+    : ∃ m, normClass B m = c := by
   obtain ⟨z, rfl⟩ := homologyπ_hom_surjective (cochainsComplex B) 0 c
   obtain ⟨v, hx⟩ : ∃ v, ((cochainsComplex B).iCycles 0).hom z = zeroCochain B v := by
     refine ⟨cochainOf B (((cochainsComplex B).iCycles 0).hom z) Fin.elim0, ?_⟩
@@ -71,46 +70,51 @@ end NormClass
 
 section Tate
 
-variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  {ι : Type u} {H : ι → Type u} [∀ v, Group (H v)] [∀ v, TopologicalSpace (H v)]
-  [∀ v, IsTopologicalGroup (H v)] (φ : ∀ v, H v →ₜ* G)
+variable
+  {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+  {ι : Type u} {H : ι → Type u}
+  [∀ v, Group (H v)] [∀ v, TopologicalSpace (H v)] [∀ v, IsTopologicalGroup (H v)]
+  (φ : ∀ v, H v →ₜ* G)
   {κ : Type u} {F : κ → Type u} [∀ w, Group (F w)] [∀ w, TopologicalSpace (F w)]
-  [∀ w, IsTopologicalGroup (F w)] [∀ w, Fintype (F w)] (ψ : ∀ w, F w →ₜ* G)
-  (A : Rep.{u} k G) [IsDiscreteRep A] (Aᵥ : ∀ v, Rep.{u} k (H v))
-  [∀ v, IsDiscreteRep (Aᵥ v)] (a : ∀ v, Rep.res (φ v).toMonoidHom A ⟶ Aᵥ v)
+  [∀ w, IsTopologicalGroup (F w)] [∀ w, Fintype (F w)]
+  (ψ : ∀ w, F w →ₜ* G)
+  (A : Rep.{u} k G) [IsDiscreteRep A]
+  (Aᵥ : ∀ v, Rep.{u} k (H v)) [∀ v, IsDiscreteRep (Aᵥ v)]
+  (a : ∀ v, Rep.res (φ v).toMonoidHom A ⟶ Aᵥ v)
   (Aᵣ : ∀ w, Rep.{u} k (F w)) [∀ w, IsDiscreteRep (Aᵣ w)]
   (ar : ∀ w, Rep.res (ψ w).toMonoidHom A ⟶ Aᵣ w)
 
-theorem normCochains_prodInr :
-    normCochains Aᵣ ≫ prodInr _ _ = prodInr _ _ ≫ tateCompactRes φ ψ A Aᵥ a Aᵣ ar := by
+theorem normCochains_prodInr
+    : normCochains Aᵣ ≫ prodInr _ _ = prodInr _ _ ≫ tateCompactRes φ ψ A Aᵥ a Aᵣ ar := by
   ext n : 1
   refine ModuleCat.hom_ext (LinearMap.ext fun m => ?_)
-  change ((prodInr _ _).f n).hom (((normCochains Aᵣ).f n).hom m) =
-    ((tateCompactRes φ ψ A Aᵥ a Aᵣ ar).f n).hom (((prodInr _ _).f n).hom m)
+  change ((prodInr _ _).f n).hom (((normCochains Aᵣ).f n).hom m)
+    = ((tateCompactRes φ ψ A Aᵥ a Aᵣ ar).f n).hom (((prodInr _ _).f n).hom m)
   rw [prodInr_f_hom_apply, prodInr_f_hom_apply]
   refine Prod.ext ?_ ?_
   · change (0 : (piComplex fun v => cochainsComplex (Aᵥ v)).X n) = ((localRes φ A Aᵥ a).f n).hom 0
     exact (map_zero _).symm
-  · change ((normCochains Aᵣ).f n).hom m =
-      ((localRes ψ A Aᵣ ar).f n).hom 0 + ((normCochains Aᵣ).f n).hom m
+  · change ((normCochains Aᵣ).f n).hom m
+      = ((localRes ψ A Aᵣ ar).f n).hom 0 + ((normCochains Aᵣ).f n).hom m
     rw [map_zero, zero_add]
 
-noncomputable def tateResSeqHom :
-    prodSeq (cochainsComplex A) (degZeroComplex (ModuleCat.of k (∀ w, Aᵣ w))) ⟶
-      prodSeq (piComplex fun v => cochainsComplex (Aᵥ v)) (piComplex fun w => cochainsComplex (Aᵣ w)) where
+noncomputable def tateResSeqHom
+    : prodSeq (cochainsComplex A) (degZeroComplex (ModuleCat.of k (∀ w, Aᵣ w))) ⟶ prodSeq
+      (piComplex fun v => cochainsComplex (Aᵥ v)) (piComplex fun w => cochainsComplex (Aᵣ w)) where
   τ₁ := normCochains Aᵣ
   τ₂ := tateCompactRes φ ψ A Aᵥ a Aᵣ ar
   τ₃ := localRes φ A Aᵥ a
   comm₁₂ := normCochains_prodInr φ ψ A Aᵥ a Aᵣ ar
   comm₂₃ := tateCompactRes_prodFst φ ψ A Aᵥ a Aᵣ ar
 
-theorem tateForgetShortComplex_shortExact :
-    (mappingCoconeNat.mapShortComplex (tateResSeqHom φ ψ A Aᵥ a Aᵣ ar)).ShortExact :=
+theorem tateForgetShortComplex_shortExact
+    : (mappingCoconeNat.mapShortComplex (tateResSeqHom φ ψ A Aᵥ a Aᵣ ar)).ShortExact :=
   mappingCoconeNat.shortExact_mapShortComplex _ (prodSeq_shortExact _ _) (prodSeq_shortExact _ _)
 
-theorem isZero_homology_normCocone (hcoh : ∀ w n, IsZero (cohomology (Aᵣ w) (n + 1)))
-    (hnorm : ∀ w, ∀ x ∈ (Aᵣ w).ρ.invariants, ∃ m, (Aᵣ w).ρ.norm m = x) (n : ℕ) :
-    IsZero ((mappingCoconeNat (normCochains Aᵣ)).homology (n + 1)) := by
+theorem isZero_homology_normCocone
+    (hcoh : ∀ w n, IsZero (cohomology (Aᵣ w) (n + 1)))
+    (hnorm : ∀ w, ∀ x ∈ (Aᵣ w).ρ.invariants, ∃ m, (Aᵣ w).ρ.norm m = x) (n : ℕ)
+    : IsZero ((mappingCoconeNat (normCochains Aᵣ)).homology (n + 1)) := by
   have hK : IsZero ((degZeroComplex (ModuleCat.of k (∀ w, Aᵣ w))).homology (n + 1)) :=
     isZero_degZeroComplex_homology_succ _ n
   have hepi : Epi (HomologicalComplex.homologyMap (normCochains Aᵣ) n) := by
@@ -120,13 +124,17 @@ theorem isZero_homology_normCocone (hcoh : ∀ w n, IsZero (cohomology (Aᵣ w) 
       intro z
       choose m hm using fun w =>
         exists_normClass_eq (Aᵣ w) (hnorm w) ((localCohomologyIso Aᵣ 0).hom.hom z w)
-      refine ⟨(degZeroHomologyIso (ModuleCat.of k (∀ w, Aᵣ w))).inv.hom
-        (show ModuleCat.of k (∀ w, Aᵣ w) from m), ?_⟩
+      refine ⟨
+        (degZeroHomologyIso (ModuleCat.of k (∀ w, Aᵣ w))).inv.hom
+          (show ModuleCat.of k (∀ w, Aᵣ w) from m),
+        ?_
+      ⟩
       have hinj : Function.Injective (localCohomologyIso Aᵣ 0).hom.hom :=
         (ModuleCat.mono_iff_injective _).1 inferInstance
       apply hinj
-      rw [localCohomologyIso_homologyMap_normCochains, hom_apply_hom_apply_of_comp_eq
-        (Iso.inv_hom_id (degZeroHomologyIso (ModuleCat.of k (∀ w, Aᵣ w))))]
+      rw [localCohomologyIso_homologyMap_normCochains,
+        hom_apply_hom_apply_of_comp_eq (Iso.inv_hom_id (degZeroHomologyIso (ModuleCat.of k
+          (∀ w, Aᵣ w))))]
       exact funext hm
     | succ n =>
       have hsub : ∀ w, Subsingleton (cohomology (Aᵣ w) (n + 1)) := fun w =>
@@ -140,9 +148,10 @@ theorem isZero_homology_normCocone (hcoh : ∀ w n, IsZero (cohomology (Aᵣ w) 
       ((mappingCoconeNat.homologyMap_homologyδ _ n).trans comp_zero.symm)
   exact hex.isZero_X₂ hδ (hK.eq_of_tgt _ _)
 
-theorem isIso_tateForget (hcoh : ∀ w n, IsZero (cohomology (Aᵣ w) (n + 1)))
-    (hnorm : ∀ w, ∀ x ∈ (Aᵣ w).ρ.invariants, ∃ m, (Aᵣ w).ρ.norm m = x) (n : ℕ) :
-    IsIso (tateForget φ ψ A Aᵥ a Aᵣ ar (n + 1)) := by
+theorem isIso_tateForget
+    (hcoh : ∀ w n, IsZero (cohomology (Aᵣ w) (n + 1)))
+    (hnorm : ∀ w, ∀ x ∈ (Aᵣ w).ρ.invariants, ∃ m, (Aᵣ w).ρ.norm m = x) (n : ℕ)
+    : IsIso (tateForget φ ψ A Aᵥ a Aᵣ ar (n + 1)) := by
   have hS := tateForgetShortComplex_shortExact φ ψ A Aᵥ a Aᵣ ar
   have h0 := isZero_homology_normCocone Aᵣ hcoh hnorm n
   have h1 := isZero_homology_normCocone Aᵣ hcoh hnorm (n + 1)
@@ -150,9 +159,10 @@ theorem isIso_tateForget (hcoh : ∀ w n, IsZero (cohomology (Aᵣ w) (n + 1)))
   have hepi := (hS.homology_exact₃ (n + 1) (n + 1 + 1) rfl).epi_f (h1.eq_of_tgt _ _)
   exact @isIso_of_mono_of_epi _ _ _ _ _ (tateForget φ ψ A Aᵥ a Aᵣ ar (n + 1)) hmono hepi
 
-noncomputable def tateForgetIso (hcoh : ∀ w n, IsZero (cohomology (Aᵣ w) (n + 1)))
-    (hnorm : ∀ w, ∀ x ∈ (Aᵣ w).ρ.invariants, ∃ m, (Aᵣ w).ρ.norm m = x) (n : ℕ) :
-    tateCompactCohomology φ ψ A Aᵥ a Aᵣ ar (n + 1) ≅ compactCohomology φ A Aᵥ a (n + 1) :=
+noncomputable def tateForgetIso
+    (hcoh : ∀ w n, IsZero (cohomology (Aᵣ w) (n + 1)))
+    (hnorm : ∀ w, ∀ x ∈ (Aᵣ w).ρ.invariants, ∃ m, (Aᵣ w).ρ.norm m = x) (n : ℕ)
+    : tateCompactCohomology φ ψ A Aᵥ a Aᵣ ar (n + 1) ≅ compactCohomology φ A Aᵥ a (n + 1) :=
   @asIso _ _ _ _ (tateForget φ ψ A Aᵥ a Aᵣ ar (n + 1))
     (isIso_tateForget φ ψ A Aᵥ a Aᵣ ar hcoh hnorm n)
 

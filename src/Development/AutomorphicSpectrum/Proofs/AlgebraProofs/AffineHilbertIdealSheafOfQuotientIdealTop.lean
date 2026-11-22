@@ -10,7 +10,13 @@ namespace GlobalTheory.CompanionTheory.Ar.Num.DualLattice
 
 open GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Num.Reflexive
 
-theorem locFree_dual : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Subalgebra o Ω) {E E₁ : Type} [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁] (β : E →ₗ[Ω] E₁ →ₗ[Ω] Ω), Function.Bijective β.flip → ∀ (r : ℕ) (L : AddSubgroup E) (L₁ : AddSubgroup E₁), LocFree R r L → (∀ w, w ∈ L₁ ↔ ∀ v ∈ L, β v w ∈ R) → LocFree R r L₁ ∧ ∀ v, v ∈ L ↔ ∀ w ∈ L₁, β v w ∈ R := by
+theorem locFree_dual
+    : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Subalgebra o Ω) {E E₁ : Type}
+        [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁] (β : E →ₗ[Ω] E₁ →ₗ[Ω] Ω),
+      Function.Bijective β.flip
+        → ∀ (r : ℕ) (L : AddSubgroup E) (L₁ : AddSubgroup E₁),
+          LocFree R r L → (∀ w, w ∈ L₁ ↔ ∀ v ∈ L, β v w ∈ R)
+            → LocFree R r L₁ ∧ ∀ v, v ∈ L ↔ ∀ w ∈ L₁, β v w ∈ R := by
   intro o Ω _ _ _ R E E₁ _ _ _ _ β hβ r L L₁ h h₁
   classical
   refine ⟨?_, fun v => ⟨fun hv w hw => (h₁ w).1 hw v hv, fun hv => ?_⟩⟩
@@ -28,8 +34,7 @@ theorem locFree_dual : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] 
   have hB : ∀ q, B q = b q := fun q => Module.Basis.mk_apply _ _ q
   let e : E₁ ≃ₗ[Ω] Module.Dual Ω E := LinearEquiv.ofBijective β.flip hβ
   let C : Module.Basis (Fin r) Ω E₁ := B.dualBasis.map e.symm
-  have hrepr : ∀ w q, C.repr w q = β (b q) w := fun w q => by
-    simp [C, e, ← hB]
+  have hrepr : ∀ w q, C.repr w q = β (b q) w := fun w q => by simp [C, e, ← hB]
   have hsum : ∀ (a : Fin r → Ω) q, β (b q) (∑ q', a q' • C q') = a q := fun a q => by
     rw [← hrepr]
     exact congrFun (C.repr_sum_self a) q
@@ -52,8 +57,8 @@ theorem locFree_dual : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] 
   · rintro ⟨a, ha, rfl⟩
     let R' : AddSubgroup Ω := R.toSubring.toAddSubgroup
     have hR' : ∀ a ∈ R, ∀ e ∈ R', a • e ∈ R' := fun a ha e he => R.mul_mem ha he
-    obtain ⟨m, hm⟩ := exists_uniform_denominator R r L h (f l) (hf l)
-      (β.flip (∑ q, a q • C q)) fun v hv => by
+    obtain ⟨m, hm⟩ :=
+      exists_uniform_denominator R r L h (f l) (hf l) (β.flip (∑ q, a q • C q)) fun v hv => by
         obtain ⟨a', ha', rfl⟩ := (hb v).1 ⟨0, by simpa using hv⟩
         have key : ∀ q, ∃ n : ℕ, f l ^ n • (a' q * a q) ∈ R' := fun q => by
           obtain ⟨n, hn⟩ := ha q

@@ -6,10 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistSec
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.sumExLoc_of :
-    SecFun → FunSec → FibFin → SumExLoc := by
+theorem UpperTheory.Gal.TranscendenceTraces.sumExLoc_of : SecFun → FunSec → FibFin → SumExLoc := by
   intro hSF hFS hFF q _ i Z S p _ w hw A hζ a
   obtain ⟨ζ⟩ := hζ
   haveI : IsFinite A.r := Sq.finite A

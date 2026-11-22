@@ -8,9 +8,10 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicClassFinit
 open Matrix
 open scoped ComplexOrder
 
-private theorem UpperTheory.V.KT.gramlow_fin (N : ℕ) (G : Matrix (Fin N) (Fin N) ℝ) (hG : G.PosDef)
-    (h : ∀ c : Fin N → ℤ, c ≠ 0 → 1 ≤ (fun i => (c i : ℝ)) ⬝ᵥ (G *ᵥ fun i => (c i : ℝ))) :
-    1 ≤ (4 * (N : ℝ)) ^ N * G.det := by
+private theorem UpperTheory.V.KT.gramlow_fin
+    (N : ℕ) (G : Matrix (Fin N) (Fin N) ℝ) (hG : G.PosDef)
+    (h : ∀ c : Fin N → ℤ, c ≠ 0 → 1 ≤ (fun i => (c i : ℝ)) ⬝ᵥ (G *ᵥ fun i => (c i : ℝ)))
+    : 1 ≤ (4 * (N : ℝ)) ^ N * G.det := by
   rcases Nat.eq_zero_or_pos N with rfl | hN
   · simp
   obtain ⟨B, rfl⟩ := PIW.AdelClassFin.hmk_factor G hG
@@ -30,7 +31,9 @@ private theorem UpperTheory.V.KT.gramlow_fin (N : ℕ) (G : Matrix (Fin N) (Fin 
       intro i
       rw [← sq, ← sq_abs]
       exact pow_le_pow_left₀ (abs_nonneg _) (hbox i) 2
-    calc y ⬝ᵥ y = ∑ i, y i * y i := rfl
+    calc
+      y ⬝ᵥ y
+        = ∑ i, y i * y i := rfl
       _ ≤ ∑ _i : Fin N, (2 * t) ^ 2 := Finset.sum_le_sum fun i _ => hi i
       _ = 4 * N * t ^ 2 := by
         simp
@@ -39,15 +42,17 @@ private theorem UpperTheory.V.KT.gramlow_fin (N : ℕ) (G : Matrix (Fin N) (Fin 
   have htN : t ^ N = |B.det| := by
     rw [ht, ← Real.rpow_natCast, ← Real.rpow_mul (abs_nonneg _), one_div,
       inv_mul_cancel₀ (by exact_mod_cast hN.ne'), Real.rpow_one]
-  calc (1 : ℝ) = 1 ^ N := (one_pow N).symm
+  calc
+    (1 : ℝ)
+      = 1 ^ N := (one_pow N).symm
     _ ≤ (4 * N * t ^ 2) ^ N := pow_le_pow_left₀ zero_le_one h1 N
     _ = (4 * N) ^ N * (Bᵀ * B).det := by
       rw [mul_pow, ← pow_mul, mul_comm 2 N, pow_mul, htN, sq_abs, hdetG]
 
-theorem UpperTheory.V.KT.gramlow :
-    ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (G : Matrix ι ι ℝ), G.PosDef →
-    (∀ c : ι → ℤ, c ≠ 0 → 1 ≤ (fun i => (c i : ℝ)) ⬝ᵥ (G *ᵥ fun i => (c i : ℝ))) →
-    1 ≤ (4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * G.det := by
+theorem UpperTheory.V.KT.gramlow
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (G : Matrix ι ι ℝ),
+      G.PosDef → (∀ c : ι → ℤ, c ≠ 0 → 1 ≤ (fun i => (c i : ℝ)) ⬝ᵥ (G *ᵥ fun i => (c i : ℝ)))
+        → 1 ≤ (4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * G.det := by
   intro ι _ _ G hG h
   let e : ι ≃ Fin (Fintype.card ι) := Fintype.equivFin ι
   have hG' : (G.submatrix e.symm e.symm).PosDef := hG.submatrix e.symm.injective

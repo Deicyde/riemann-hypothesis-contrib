@@ -7,12 +7,14 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBas
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver
 open scoped Classical
 
 namespace GlobalTheory.LocDual
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
   {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
 
@@ -44,9 +46,17 @@ private lemma h_sum_right (H : HermSp M V) {ι : Type} (s : Finset ι) (v : ι �
 
 end GlobalTheory.LocDual
 
-
 open GlobalTheory.LocDual in
-theorem GlobalTheory.LocDual.frameD_exists : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ), ∀ (f : Fin (r + 1) → V) (T : F), T ≠ 0 → (∀ a b : Fin (r + 1), (a ≠ Fin.last r ∨ b ≠ Fin.last r) → H.h (f a) (f b) = 0) → H.h (f (Fin.last r)) (f (Fin.last r)) = -(algebraMap F E T) → (∃ y : Fin r → V, ∀ i j : Fin r, H.h (f i.castSucc) (y j) = if i = j then 1 else 0) → ∃ Fr : FrameD H r, Fr.f = f ∧ Fr.T = T := by
+theorem GlobalTheory.LocDual.frameD_exists
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ),
+          ∀ (f : Fin (r + 1) → V) (T : F),
+            T ≠ 0 → (∀ a b : Fin (r + 1), (a ≠ Fin.last r ∨ b ≠ Fin.last r) → H.h (f a) (f b) = 0)
+              → H.h (f (Fin.last r)) (f (Fin.last r)) = -(algebraMap F E T)
+              → (∃ y : Fin r → V, ∀ i j : Fin r, H.h (f i.castSucc) (y j) = if i = j then 1 else 0)
+              → ∃ Fr : FrameD H r, Fr.f = f ∧ Fr.T = T := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r f T hT hiso hzz hy
   obtain ⟨y, hy⟩ := hy
   haveI := hM.char0
@@ -59,8 +69,9 @@ theorem GlobalTheory.LocDual.frameD_exists : ∀ {F : Type} [Field F] [Valuative
   have hy'z : ∀ j, H.h (y' j) z = 0 := by
     intro j
     simp only [y', H.h_add_left, H.h_smul_left, hzz]
-    rw [show H.h (y j) z * algebraMap F E T⁻¹ * -algebraMap F E T
-        = - (H.h (y j) z * algebraMap F E (T⁻¹ * T)) by rw [map_mul]; ring]
+    rw [show H.h (y j) z * algebraMap F E T⁻¹ * - algebraMap F E T
+        = -(H.h (y j) z * algebraMap F E (T⁻¹ * T)) by
+      rw [map_mul]; ring]
     rw [inv_mul_cancel₀ hT, map_one, mul_one, add_neg_cancel]
   have hey' : ∀ k j, H.h (e k) (y' j) = if k = j then 1 else 0 := by
     intro k j
@@ -68,8 +79,7 @@ theorem GlobalTheory.LocDual.frameD_exists : ∀ {F : Type} [Field F] [Valuative
     exact hy k j
   let half : E := algebraMap F E (1 / 2)
   have hhalf : M.L.cj half = half := M.L.cj.commutes _
-  have hhalf2 : half + half = 1 := by
-    simp only [half, ← map_add (f := _), add_halves, map_one]
+  have hhalf2 : half + half = 1 := by simp only [half, ← map_add (f := _), add_halves, map_one]
   let b : Fin r → Fin r → E := fun j k => half * H.h (y' j) (y' k)
   let es : Fin r → V := fun j => y' j - ∑ k, b j k • e k
   have hesL : ∀ i v, H.h (es i) v = H.h (y' i) v - ∑ k, b i k * H.h (e k) v := by

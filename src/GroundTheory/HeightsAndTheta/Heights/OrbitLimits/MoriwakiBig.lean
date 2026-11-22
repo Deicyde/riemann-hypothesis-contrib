@@ -13,8 +13,9 @@ namespace GroundTheory.Heights₂.Heights.Targets
 
 open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
-theorem MoriwakiBig.of_found (hG6 : HilbertSamuel.ArithmeticVolumeBig.Statement) (hC : MoriwakiBigCurve.Statement) :
-    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.MoriwakiBigStatement := by
+theorem MoriwakiBig.of_found
+    (hG6 : HilbertSamuel.ArithmeticVolumeBig.Statement) (hC : MoriwakiBigCurve.Statement)
+    : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.MoriwakiBigStatement := by
   intro K _ ι _ Ω _ y D A P0 II hII har hb hP0 hs hc hnef hgen
   rcases Nat.eq_zero_or_pos D with rfl | hD
   · exact hC K ι Ω y A P0 II hII har hb hP0 hs hc hnef hgen

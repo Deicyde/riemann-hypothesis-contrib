@@ -54,8 +54,8 @@ lemma qh_det_ne [IsDomain R] {B : Type} [CommRing B] (φ : MvPolynomial (Fin n �
   rw [h, Matrix.det_transpose, ← RingHom.map_det, map_ne_zero_iff _ hφ]
   exact Matrix.det_mvPolynomialX_ne_zero _ _
 
-def qhPhi (R : Type) [CommRing R] (n : ℕ) :
-    MvPolynomial (Fin n × Fin n) R →ₐ[R] MvPolynomial (Fin n) (MvPolynomial (Fin n × Fin n) R) :=
+def qhPhi (R : Type) [CommRing R] (n : ℕ)
+    : MvPolynomial (Fin n × Fin n) R →ₐ[R] MvPolynomial (Fin n) (MvPolynomial (Fin n × Fin n) R) :=
   aeval fun v : Fin n × Fin n => X v.2 * C (X v)
 
 lemma qh_phi_mono1 (d : Fin n × Fin n →₀ ℕ) :

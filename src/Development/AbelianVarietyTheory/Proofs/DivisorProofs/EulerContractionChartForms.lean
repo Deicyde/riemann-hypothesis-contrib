@@ -10,11 +10,14 @@ namespace GlobalTheory.LogDR.StabTheta
 
 variable {K : Type} [Field K]
 
-theorem smul_mem_spanForms (M M' : Set K) (H : Set Ω[K⁄ℤ]) (a : ℕ) (c : K)
-    (h : ∀ m ∈ M, c * m ∈ M') {η : abelian₂ K} (hη : η ∈ spanForms M H a) :
-    c • η ∈ spanForms M' H a := by
-  have key : spanForms M H a ≤
-      (spanForms M' H a).comap (DistribSMul.toAddMonoidHom (abelian₂ K) c) := by
+theorem smul_mem_spanForms
+    (M M' : Set K)
+    (H : Set Ω[K⁄ℤ]) (a : ℕ)
+    (c : K) (h : ∀ m ∈ M, c * m ∈ M')
+    {η : abelian₂ K} (hη : η ∈ spanForms M H a)
+    : c • η ∈ spanForms M' H a := by
+  have key
+      : spanForms M H a ≤ (spanForms M' H a).comap (DistribSMul.toAddMonoidHom (abelian₂ K) c) := by
     unfold spanForms
     rw [AddSubgroup.closure_le]
     rintro _ ⟨m, hm, v, hv, rfl⟩
@@ -24,11 +27,16 @@ theorem smul_mem_spanForms (M M' : Set K) (H : Set Ω[K⁄ℤ]) (a : ℕ) (c : K
     exact AddSubgroup.subset_closure ⟨c * m, h m hm, v, hv, rfl⟩
   exact key hη
 
-theorem iota_mul_mem_spanForms (M : Set K) (H : Set Ω[K⁄ℤ]) (q : ℕ) (w : Ω[K⁄ℤ]) (hw : w ∈ H)
-    {η : abelian₂ K} (hη : η ∈ spanForms M H q) :
-    ExteriorAlgebra.ι K w * η ∈ spanForms M H (q + 1) := by
-  have key : spanForms M H q ≤
-      (spanForms M H (q + 1)).comap (AddMonoidHom.mulLeft (ExteriorAlgebra.ι K w)) := by
+theorem iota_mul_mem_spanForms
+    (M : Set K)
+    (H : Set Ω[K⁄ℤ])
+    (q : ℕ)
+    (w : Ω[K⁄ℤ]) (hw : w ∈ H)
+    {η : abelian₂ K} (hη : η ∈ spanForms M H q)
+    : ExteriorAlgebra.ι K w * η ∈ spanForms M H (q + 1) := by
+  have key
+      : spanForms M H q
+        ≤ (spanForms M H (q + 1)).comap (AddMonoidHom.mulLeft (ExteriorAlgebra.ι K w)) := by
     unfold spanForms
     rw [AddSubgroup.closure_le]
     rintro _ ⟨m, hm, v, hv, rfl⟩
@@ -44,15 +52,21 @@ theorem iota_mul_mem_spanForms (M : Set K) (H : Set Ω[K⁄ℤ]) (q : ℕ) (w : 
       simp [Matrix.vecTail]
   exact key hη
 
-theorem theta_dlog {n : ℕ} (x : Fin n → Kˣ) (i : Fin n) (θ : abelian₂ K →ₗ[K] abelian₂ K)
-    (hθ : IsEulerContraction x i θ) (j : Fin n) :
-    θ (ExteriorAlgebra.ι K (dlog (x j))) = algebraMap K (abelian₂ K) (if j = i then 1 else 0) := by
+theorem theta_dlog
+    {n : ℕ} (x : Fin n → Kˣ) (i : Fin n)
+    (θ : abelian₂ K →ₗ[K] abelian₂ K) (hθ : IsEulerContraction x i θ)
+    (j : Fin n)
+    : θ (ExteriorAlgebra.ι K (dlog (x j)))
+      = algebraMap K (abelian₂ K) (if j = i then 1 else 0) := by
   rw [hθ.2.2 j]
   split_ifs <;> simp
 
-theorem theta_frame (A : Subring K) {n : ℕ} (x : Fin n → Kˣ) (J : Finset (Fin n)) (i : Fin n)
-    (θ : abelian₂ K →ₗ[K] abelian₂ K) (hx : ∀ j, (x j : K) ∈ A) (hθ : IsEulerContraction x i θ) (j : Fin n) :
-    ∃ a ∈ A, θ (ExteriorAlgebra.ι K (frame x J j)) = algebraMap K (abelian₂ K) a := by
+theorem theta_frame
+    (A : Subring K)
+    {n : ℕ} (x : Fin n → Kˣ) (J : Finset (Fin n)) (i : Fin n)
+    (θ : abelian₂ K →ₗ[K] abelian₂ K)
+    (hx : ∀ j, (x j : K) ∈ A) (hθ : IsEulerContraction x i θ) (j : Fin n)
+    : ∃ a ∈ A, θ (ExteriorAlgebra.ι K (frame x J j)) = algebraMap K (abelian₂ K) a := by
   have hif : (if j = i then (1 : K) else 0) ∈ A := by split_ifs <;> simp
   unfold frame
   split_ifs with hj
@@ -64,10 +78,15 @@ theorem theta_frame (A : Subring K) {n : ℕ} (x : Fin n → Kˣ) (J : Finset (F
     refine ⟨(x j : K) * (if j = i then 1 else 0), A.mul_mem (hx j) hif, ?_⟩
     rw [hd, map_smul, map_smul, theta_dlog x i θ hθ j, Algebra.smul_def, ← map_mul]
 
-theorem theta_iotaMulti (A : Subring K) {n : ℕ} (x : Fin n → Kˣ) (J : Finset (Fin n)) (i : Fin n)
-    (θ : abelian₂ K →ₗ[K] abelian₂ K) (hx : ∀ j, (x j : K) ∈ A) (hθ : IsEulerContraction x i θ) :
-    ∀ (q : ℕ) (v : Fin (q + 1) → Ω[K⁄ℤ]), (∀ k, v k ∈ Set.range (frame x J)) →
-      θ (ExteriorAlgebra.ιMulti K (q + 1) v) ∈ spanForms (A : Set K) (Set.range (frame x J)) q := by
+theorem theta_iotaMulti
+    (A : Subring K)
+    {n : ℕ} (x : Fin n → Kˣ) (J : Finset (Fin n)) (i : Fin n)
+    (θ : abelian₂ K →ₗ[K] abelian₂ K)
+    (hx : ∀ j, (x j : K) ∈ A) (hθ : IsEulerContraction x i θ)
+    : ∀ (q : ℕ) (v : Fin (q + 1) → Ω[K⁄ℤ]),
+      (∀ k, v k ∈ Set.range (frame x J))
+        → θ (ExteriorAlgebra.ιMulti K (q + 1) v)
+          ∈ spanForms (A : Set K) (Set.range (frame x J)) q := by
   intro q
   induction q with
   | zero =>
@@ -93,8 +112,12 @@ theorem theta_iotaMulti (A : Subring K) {n : ℕ} (x : Fin n → Kˣ) (J : Finse
 end GlobalTheory.LogDR.StabTheta
 
 open GlobalTheory.LogDR.StabTheta in
-theorem GlobalTheory.LogDR.chartForms_stable_euler :
-    ∀ (K : Type) [Field K] (A : Subring K) (n : ℕ) (x : Fin n → Kˣ) (J : Finset (Fin n)) (t : Kˣ) (i : Fin n) (θ : abelian₂ K →ₗ[K] abelian₂ K), (∀ j, (x j : K) ∈ A) → IsEulerContraction x i θ → (∀ q, ∀ η ∈ chartForms A x J t (q + 1), θ η ∈ chartForms A x J t q) ∧ ∀ η ∈ chartForms A x J t 0, θ η = 0 := by
+theorem GlobalTheory.LogDR.chartForms_stable_euler
+    : ∀ (K : Type) [Field K] (A : Subring K) (n : ℕ) (x : Fin n → Kˣ) (J : Finset (Fin n)) (t : Kˣ)
+        (i : Fin n) (θ : abelian₂ K →ₗ[K] abelian₂ K),
+      (∀ j, (x j : K) ∈ A) → IsEulerContraction x i θ
+        → (∀ q, ∀ η ∈ chartForms A x J t (q + 1), θ η ∈ chartForms A x J t q)
+          ∧ ∀ η ∈ chartForms A x J t 0, θ η = 0 := by
   intro K _ A n x J t i θ hx hθ
   constructor
   · intro q η hη

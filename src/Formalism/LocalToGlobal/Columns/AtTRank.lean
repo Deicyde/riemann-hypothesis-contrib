@@ -13,14 +13,17 @@ namespace Formalism.L2.Col
 
 namespace RamFun
 
-variable {K : Type} [Field K] {ι : Type} [Fintype ι] [DecidableEq ι] {G : ι → Type} [∀ i, CommGroup (G i)]
-  [∀ i, Fintype (G i)] {M : Type} [AddCommGroup M] [Module K M]
-
+variable
+  {K : Type} [Field K]
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {G : ι → Type} [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)]
+  {M : Type} [AddCommGroup M] [Module K M]
 
 variable (K M) in
 def trl (b : ∀ i, G i) : Module.End K ((∀ i, G i) → M) := LinearMap.funLeft K M fun c => b * c
 
-theorem trl_apply (b : ∀ i, G i) (F : (∀ i, G i) → M) (c : ∀ i, G i) : trl K M b F c = F (b * c) := rfl
+theorem trl_apply (b : ∀ i, G i) (F : (∀ i, G i) → M) (c : ∀ i, G i) : trl K M b F c = F (b * c) :=
+  rfl
 
 theorem trl_one : trl K M (1 : ∀ i, G i) = 1 := by
   refine LinearMap.ext fun F => funext fun c => ?_
@@ -37,14 +40,11 @@ theorem trl_comm (b b' : ∀ i, G i) : Commute (trl K M b) (trl K M b') := by
   show trl K M b * trl K M b' = trl K M b' * trl K M b
   rw [trl_mul, trl_mul, mul_comm]
 
-
 variable (K M) in
 def nmF (i : ι) : Module.End K ((∀ i, G i) → M) := ∑ g : G i, trl K M (Pi.mulSingle i g)
 
-
 variable (K M G) in
 def ramFun : Submodule K ((∀ i, G i) → M) := ⨅ i, LinearMap.ker (nmF K M (G := G) i)
-
 
 variable (K M G) in
 def offAlg (i : ι) : Submodule K (Module.End K ((∀ i, G i) → M)) :=
@@ -54,8 +54,10 @@ theorem one_mem_offAlg (i : ι) : (1 : Module.End K ((∀ i, G i) → M)) ∈ of
   have h : trl K M (1 : ∀ i, G i) ∈ offAlg K G M i := Submodule.subset_span ⟨1, rfl, rfl⟩
   rwa [trl_one] at h
 
-theorem mul_mem_offAlg (i : ι) {x y : Module.End K ((∀ i, G i) → M)} (hx : x ∈ offAlg K G M i)
-    (hy : y ∈ offAlg K G M i) : x * y ∈ offAlg K G M i := by
+theorem mul_mem_offAlg
+    (i : ι)
+    {x y : Module.End K ((∀ i, G i) → M)} (hx : x ∈ offAlg K G M i) (hy : y ∈ offAlg K G M i)
+    : x * y ∈ offAlg K G M i := by
   unfold offAlg at *
   induction hx using Submodule.span_induction with
   | mem x hx' =>
@@ -90,11 +92,12 @@ theorem nmF_sq (i : ι) : nmF K M (G := G) i * nmF K M i = (Fintype.card (G i) :
     rw [Finset.sum_mul]
     simp_rw [trl_mul, ← Pi.mulSingle_mul]
     exact Fintype.sum_equiv (Equiv.mulRight g) _ _ fun _ => rfl
-  calc nmF K M (G := G) i * nmF K M i = ∑ g : G i, nmF K M (G := G) i * trl K M (Pi.mulSingle i g) := by
-        rw [← Finset.mul_sum]; rfl
+  calc
+    nmF K M (G := G) i * nmF K M i
+      = ∑ g : G i, nmF K M (G := G) i * trl K M (Pi.mulSingle i g) := by rw [← Finset.mul_sum]; rfl
     _ = ∑ _g : G i, nmF K M (G := G) i := Finset.sum_congr rfl fun g _ => key g
     _ = (Fintype.card (G i) : K) • nmF K M i := by
-        rw [Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul K]
+      rw [Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul K]
 
 section Trace
 
@@ -102,7 +105,8 @@ variable [FiniteDimensional K M]
 
 theorem trace_trl {b : ∀ i, G i} (hb : b ≠ 1) : LinearMap.trace K _ (trl K M b) = 0 := by
   classical
-  rw [LinearMap.trace_eq_matrix_trace K (Pi.basis fun _ : (∀ i, G i) => Module.finBasis K M), Matrix.trace]
+  rw [LinearMap.trace_eq_matrix_trace K (Pi.basis fun _ : (∀ i, G i) => Module.finBasis K M),
+    Matrix.trace]
   refine Finset.sum_eq_zero fun p _ => ?_
   obtain ⟨c, k⟩ := p
   have hc : b * c ≠ c := fun h => hb (mul_right_cancel (h.trans (one_mul c).symm))
@@ -110,8 +114,9 @@ theorem trace_trl {b : ∀ i, G i} (hb : b ≠ 1) : LinearMap.trace K _ (trl K M
   rw [Pi.single_eq_of_ne hc]
   simp
 
-theorem trace_mul_offAlg {i : ι} {g : G i} (hg : g ≠ 1) {x : Module.End K ((∀ i, G i) → M)}
-    (hx : x ∈ offAlg K G M i) : LinearMap.trace K _ (trl K M (Pi.mulSingle i g) * x) = 0 := by
+theorem trace_mul_offAlg
+    {i : ι} {g : G i} (hg : g ≠ 1) {x : Module.End K ((∀ i, G i) → M)} (hx : x ∈ offAlg K G M i)
+    : LinearMap.trace K _ (trl K M (Pi.mulSingle i g) * x) = 0 := by
   unfold offAlg at hx
   induction hx using Submodule.span_induction with
   | mem x hx =>
@@ -124,8 +129,8 @@ theorem trace_mul_offAlg {i : ι} {g : G i} (hg : g ≠ 1) {x : Module.End K ((�
   | add x y _ _ hx hy => rw [mul_add, map_add (f := _), hx, hy, add_zero]
   | smul a x _ hx => rw [mul_smul_comm, map_smul, hx, smul_zero]
 
-theorem trace_nmF_mul {i : ι} {x : Module.End K ((∀ i, G i) → M)} (hx : x ∈ offAlg K G M i) :
-    LinearMap.trace K _ (nmF K M i * x) = LinearMap.trace K _ x := by
+theorem trace_nmF_mul {i : ι} {x : Module.End K ((∀ i, G i) → M)} (hx : x ∈ offAlg K G M i)
+    : LinearMap.trace K _ (nmF K M i * x) = LinearMap.trace K _ x := by
   show LinearMap.trace K _ ((∑ g : G i, trl K M (Pi.mulSingle i g)) * x) = _
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Finset.sum_mul, map_sum, Finset.sum_eq_single (1 : G i)]
@@ -143,27 +148,27 @@ namespace RamFun
 
 section Proj
 
-variable {K : Type} [Field K] [CharZero K] {ι : Type} [Fintype ι] [DecidableEq ι] {G : ι → Type}
-  [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)] {M : Type} [AddCommGroup M] [Module K M]
-
+variable
+  {K : Type} [Field K] [CharZero K]
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {G : ι → Type} [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)]
+  {M : Type} [AddCommGroup M] [Module K M]
 
 variable (K M G) in
 def eF (i : ι) : Module.End K ((∀ i, G i) → M) := 1 - ((Fintype.card (G i) : K)⁻¹) • nmF K M i
 
-theorem card_ne (i : ι) : (Fintype.card (G i) : K) ≠ 0 :=
-  Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+theorem card_ne (i : ι) : (Fintype.card (G i) : K) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
 
 theorem nmF_mul_eF (i : ι) : nmF K M i * eF K G M i = 0 := by
   unfold eF
-  rw [mul_sub, mul_one, mul_smul_comm, nmF_sq, smul_smul, inv_mul_cancel₀ (card_ne (K := K) (G := G) i),
-    one_smul, sub_self]
+  rw [mul_sub, mul_one, mul_smul_comm, nmF_sq, smul_smul,
+    inv_mul_cancel₀ (card_ne (K := K) (G := G) i), one_smul, sub_self]
 
 theorem eF_mem_offAlg {i j : ι} (h : j ≠ i) : eF K G M j ∈ offAlg K G M i :=
   Submodule.sub_mem _ (one_mem_offAlg i) (Submodule.smul_mem _ _ (nmF_mem_offAlg h))
 
 theorem nmF_comm_eF (i j : ι) : Commute (nmF K M (G := G) i) (eF K G M j) :=
   (Commute.one_right _).sub_right ((nmF_comm i j).smul_right _)
-
 
 variable (K M G) in
 def eL (l : List ι) : Module.End K ((∀ i, G i) → M) := (l.map (eF K G M)).prod
@@ -201,9 +206,10 @@ theorem eL_fix {F : (∀ i, G i) → M} (hF : F ∈ ramFun K G M) (l : List ι) 
 
 variable [FiniteDimensional K M]
 
-theorem trace_eL {l : List ι} (hl : l.Nodup) :
-    LinearMap.trace K _ (eL K G M l) =
-      (l.map fun i => (1 - (Fintype.card (G i) : K)⁻¹)).prod * LinearMap.trace K ((∀ i, G i) → M) 1 := by
+theorem trace_eL {l : List ι} (hl : l.Nodup)
+    : LinearMap.trace K _ (eL K G M l)
+      = (l.map fun i => (1 - (Fintype.card (G i) : K)⁻¹)).prod
+        * LinearMap.trace K ((∀ i, G i) → M) 1 := by
   induction l with
   | nil => simp [eL]
   | cons a l ih =>
@@ -221,13 +227,16 @@ theorem isProj_eL : LinearMap.IsProj (ramFun K G M) (eL K G M Finset.univ.toList
   rw [← mul_apply_eq_comp, nmF_mul_eL (Finset.mem_toList.2 (Finset.mem_univ i))]
   rfl
 
-theorem finrank_ramFun : finrank K (ramFun K G M) = finrank K M * ∏ i, (Fintype.card (G i) - 1) := by
+theorem finrank_ramFun
+    : finrank K (ramFun K G M) = finrank K M * ∏ i, (Fintype.card (G i) - 1) := by
   have h := (isProj_eL (K := K) (G := G) (M := M)).trace
   rw [trace_eL (Finset.nodup_toList _), LinearMap.trace_one, Finset.prod_map_toList] at h
   have hV : finrank K ((∀ i, G i) → M) = (∏ i, Fintype.card (G i)) * finrank K M := by
     rw [Module.finrank_pi_fintype, Finset.sum_const, Finset.card_univ, Fintype.card_pi, smul_eq_mul]
-  have hc : ∀ i, ((Fintype.card (G i) - 1 : ℕ) : K) =
-      (Fintype.card (G i) : K) * (1 - (Fintype.card (G i) : K)⁻¹) := by
+  have hc
+      : ∀ i,
+        ((Fintype.card (G i) - 1 : ℕ) : K)
+          = (Fintype.card (G i) : K) * (1 - (Fintype.card (G i) : K)⁻¹) := by
     intro i
     rw [Nat.cast_sub (Fintype.card_pos : 1 ≤ Fintype.card (G i)), Nat.cast_one, mul_sub, mul_one,
       mul_inv_cancel₀ (card_ne (K := K) (G := G) i)]
@@ -247,9 +256,6 @@ section ColsRank
 open NumberField IsDedekindDomain Formalism.BasicNotions
 
 variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m)
-
-
-
 
 end ColsRank
 

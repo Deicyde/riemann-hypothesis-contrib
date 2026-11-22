@@ -35,15 +35,16 @@ lemma isMu_unique {lam : Fin n → ℝ} {μ μ' : Fin n → ℤ} (hμ : IsMu lam
     have h2 : ((μ' a : ℤ) : ℝ) = ((μ a : ℤ) : ℝ) := (hμ' a).trans (hμ a).symm
     exact_mod_cast h2
 
-theorem psiM_exp_formula {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ) {X : Matrix (Fin n) (Fin n) ℂ}
-    (hX : inP ε X) :
-    PsiM T μ (NormedSpace.exp X) =
-      ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ)) •
-        ∫ k, PhiM μ (toMK k⁻¹ * NormedSpace.exp X * toMK k)⁻¹ • (T.op k * projW T * T.op k⁻¹) ∂(muK ε) := by
-  have h1 := psiM_kexp T μ 1 hX
-  rw [toMK_one', op_one', Matrix.one_mul, one_mul] at h1
-  rw [h1, ← psM_exp_neg T μ hX]
-  simp_rw [inv_conj_exp]
-  rfl
+theorem psiM_exp_formula
+    {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X)
+    : PsiM T μ (NormedSpace.exp X)
+      = ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ))
+        • ∫ k, PhiM μ (toMK k⁻¹ * NormedSpace.exp X * toMK k)⁻¹ • (T.op k * projW T * T.op k⁻¹) ∂(muK ε) :=
+  by
+    have h1 := psiM_kexp T μ 1 hX
+    rw [toMK_one', op_one', Matrix.one_mul, one_mul] at h1
+    rw [h1, ← psM_exp_neg T μ hX]
+    simp_rw [inv_conj_exp]
+    rfl
 
 end ReciprocityTheory.ChartRestriction.DS.S7

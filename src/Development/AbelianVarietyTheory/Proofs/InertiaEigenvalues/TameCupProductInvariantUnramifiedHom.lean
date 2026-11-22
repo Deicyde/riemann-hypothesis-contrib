@@ -7,18 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TamePai
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun GlobalTheory.Published GlobalTheory.ResSel GlobalTheory.StepTwo GlobalTheory.TwistDet GlobalTheory.NewPrime GlobalTheory.Published.PoitouTate
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun
+  GlobalTheory.Published GlobalTheory.ResSel GlobalTheory.StepTwo GlobalTheory.TwistDet
+  GlobalTheory.NewPrime GlobalTheory.Published.PoitouTate
 
 namespace GlobalTheory.TamePairing
 
 open GlobalTheory.TameQuot
 
-theorem isProGen_of_char_eq_one (hQ : TameQuotient) {F Ω : Type} [Field F] [NumberField F] [Field Ω]
-    [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ} [hl : Fact l.Prime] {A : ValuationSubring Ω}
-    {v : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A v) (hv : ((l : ℕ) : 𝓞 F) ∉ v.asIdeal)
-    {M : ℕ} (hM : 1 ≤ M) (d : G F Ω →* Multiplicative (ZMod (l ^ M)))
-    (hd : IsOpen (d.ker : Set (G F Ω))) {γ : G F Ω} (hγ : γ ∈ Ine (F := F) A)
-    (hdγ : d γ = Multiplicative.ofAdd 1) : IsProGen F A l γ := by
+theorem isProGen_of_char_eq_one
+    (hQ : TameQuotient)
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {l : ℕ} [hl : Fact l.Prime]
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)}
+    (hA : IsPlaceOver A v) (hv : ((l : ℕ) : 𝓞 F) ∉ v.asIdeal)
+    {M : ℕ}
+    (hM : 1 ≤ M) (d : G F Ω →* Multiplicative (ZMod (l ^ M))) (hd : IsOpen (d.ker : Set (G F Ω)))
+    {γ : G F Ω} (hγ : γ ∈ Ine (F := F) A) (hdγ : d γ = Multiplicative.ofAdd 1)
+    : IsProGen F A l γ := by
   classical
   obtain ⟨-, -, -, ⟨t, ht, htsurj, htker⟩, -, -⟩ := hQ F Ω l A v hA hv
 
@@ -27,20 +35,21 @@ theorem isProGen_of_char_eq_one (hQ : TameQuotient) {F Ω : Type} [Field F] [Num
     obtain ⟨τ, hτ, rfl⟩ := Subgroup.mem_map.1 hσ
     rw [mem_proKer] at hτ
     have : NeZero (l ^ M) := ⟨pow_ne_zero _ hl.out.ne_zero⟩
-    have key := hτ ((d.comp (Ine (F := F) A).subtype).ker) inferInstance
-      (continuous_subtype_val.isOpen_preimage _ hd) (by
-        rw [Subgroup.index_ker]
-        have hdvd : Nat.card (d.comp (Ine (F := F) A).subtype).range ∣ l ^ M := by
-          have h1 := Subgroup.card_subgroup_dvd_card (d.comp (Ine (F := F) A).subtype).range
-          have h2 : Nat.card (Multiplicative (ZMod (l ^ M))) = l ^ M := Nat.card_zmod (l ^ M)
-          rwa [h2] at h1
-        obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow hl.out).1 hdvd
-        exact ⟨j, hj⟩)
+    have key :=
+      hτ ((d.comp (Ine (F := F) A).subtype).ker) inferInstance
+        (continuous_subtype_val.isOpen_preimage _ hd)
+        (by
+          rw [Subgroup.index_ker]
+          have hdvd : Nat.card (d.comp (Ine (F := F) A).subtype).range ∣ l ^ M := by
+            have h1 := Subgroup.card_subgroup_dvd_card (d.comp (Ine (F := F) A).subtype).range
+            have h2 : Nat.card (Multiplicative (ZMod (l ^ M))) = l ^ M := Nat.card_zmod (l ^ M)
+            rwa [h2] at h1
+          obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow hl.out).1 hdvd
+          exact ⟨j, hj⟩)
     simpa using key
 
   set s : Ine (F := F) A → ℤ_[l] := fun σ => Multiplicative.toAdd (t σ) with hs
-  have hsmul : ∀ σ τ, s (σ * τ) = s σ + s τ := fun σ τ => by
-    simp only [hs, map_mul, toAdd_mul]
+  have hsmul : ∀ σ τ, s (σ * τ) = s σ + s τ := fun σ τ => by simp only [hs, map_mul, toAdd_mul]
   have hscont : Continuous s := continuous_toAdd.comp ht
   set γ' : Ine (F := F) A := ⟨γ, hγ⟩ with hγ'
 
@@ -55,8 +64,8 @@ theorem isProGen_of_char_eq_one (hQ : TameQuotient) {F Ω : Type} [Field F] [Num
     have h2 : ((((σ ^ l)⁻¹ * γ' : Ine (F := F) A)) : G F Ω) ∈ ineKer F A l := by
       rw [← htker, map_mul, map_inv, h1, inv_mul_cancel]
     have h3 := hJd _ h2
-    simp only [Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_pow, map_mul, map_inv,
-      map_pow, hγ'] at h3
+    simp only [Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_pow, map_mul, map_inv, map_pow, hγ']
+      at h3
     rw [hdγ, inv_mul_eq_one] at h3
     have h4 : (1 : ZMod (l ^ M)) = l • Multiplicative.toAdd (d σ) := by
       rw [← toAdd_pow, h3, toAdd_ofAdd]
@@ -100,7 +109,32 @@ theorem isProGen_of_char_eq_one (hQ : TameQuotient) {F Ω : Type} [Field F] [Num
   have := C.mul_mem hκ hmem
   simpa using this
 
-theorem tame_pairing_hom : TameLocal → ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (n : ℕ) (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)), 0 < n → IsPlaceOver A v → ((l : ℕ) : 𝓞 F) ∉ v.asIdeal → normV v ≡ 1 [MOD l ^ n] → ∀ e : H2 (muLoc F l n A) →ₗ[ZMod (l ^ n)] ZMod (l ^ n), Function.Bijective e → ∀ (M : ℕ), 1 ≤ M → ∀ d : G F Ω →* Multiplicative (ZMod (l ^ M)), IsOpen (d.ker : Set (G F Ω)) → ∀ γ φ : Dec (F := F) A, (γ : G F Ω) ∈ Ine (F := F) A → d γ = Multiplicative.ofAdd 1 → IsFrob A (normV v) (φ : G F Ω) → ∃ u : (ZMod (l ^ n))ˣ, ∀ (W W' : Type) [AddCommGroup W] [TopologicalSpace W] [DiscreteTopology W] [AddCommGroup W'] [TopologicalSpace W'] [DiscreteTopology W'] (P : W →+ W' →+ ZMod (l ^ n)) (x : Dec (F := F) A → W) (y : Dec (F := F) A → W'), (∀ m : W', l ^ n • m = 0) → Continuous x → Continuous y → (∀ g h, x (g * h) = x g + x h) → (∀ g h, y (g * h) = y g + y h) → (∀ g : Dec (F := F) A, (g : G F Ω) ∈ Ine (F := F) A → y g = 0) → ∀ w : Z2 (muLoc F l n A), (∀ g h, w.1 (g, h) = P (x g) (y h)) → e (Submodule.Quotient.mk w) = (u : ZMod (l ^ n)) * P (x γ) (y φ) := by
+theorem tame_pairing_hom
+    : TameLocal
+      → ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+          [Fact l.Prime] (n : ℕ) (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)),
+        0 < n → IsPlaceOver A v → ((l : ℕ) : 𝓞 F) ∉ v.asIdeal → normV v ≡ 1 [MOD l ^ n]
+          → ∀ e : H2 (muLoc F l n A) →ₗ[ZMod (l ^ n)] ZMod (l ^ n),
+            Function.Bijective e
+              → ∀ (M : ℕ),
+                1 ≤ M
+                  → ∀ d : G F Ω →* Multiplicative (ZMod (l ^ M)),
+                    IsOpen (d.ker : Set (G F Ω))
+                      → ∀ γ φ : Dec (F := F) A,
+                        (γ : G F Ω) ∈ Ine (F := F) A → d γ = Multiplicative.ofAdd 1
+                          → IsFrob A (normV v) (φ : G F Ω)
+                          → ∃ u : (ZMod (l ^ n))ˣ,
+                            ∀ (W W' : Type) [AddCommGroup W] [TopologicalSpace W]
+                                [DiscreteTopology W] [AddCommGroup W'] [TopologicalSpace W']
+                                [DiscreteTopology W'] (P : W →+ W' →+ ZMod (l ^ n))
+                                (x : Dec (F := F) A → W) (y : Dec (F := F) A → W'),
+                              (∀ m : W', l ^ n • m = 0) → Continuous x → Continuous y
+                                → (∀ g h, x (g * h) = x g + x h) → (∀ g h, y (g * h) = y g + y h)
+                                → (∀ g : Dec (F := F) A, (g : G F Ω) ∈ Ine (F := F) A → y g = 0)
+                                → ∀ w : Z2 (muLoc F l n A),
+                                  (∀ g h, w.1 (g, h) = P (x g) (y h))
+                                    → e (Submodule.Quotient.mk w)
+                                      = (u : ZMod (l ^ n)) * P (x γ) (y φ) := by
   intro hTL F Ω _ _ _ _ _ l hl n A v hn hA hv hq e he M hM d hd γ φ hγ hdγ hφ
   classical
   obtain ⟨hQ, hS⟩ := hTL
@@ -109,8 +143,11 @@ theorem tame_pairing_hom : TameLocal → ∀ (F Ω : Type) [Field F] [NumberFiel
   obtain ⟨-, -, -, -, -, hgen⟩ := hQ F Ω l A v hA hv
   obtain ⟨hdense, -, hhom⟩ := hgen φ γ hφ hpg
 
-  have hall : ∀ S : Subgroup (Dec (F := F) A), IsClosed (S : Set (Dec (F := F) A)) → φ ∈ S →
-      (∀ σ : Dec (F := F) A, (σ : G F Ω) ∈ Ine (F := F) A → σ ∈ S) → S = ⊤ := by
+  have hall
+      : ∀ S : Subgroup (Dec (F := F) A),
+        IsClosed (S : Set (Dec (F := F) A)) → φ ∈ S
+          → (∀ σ : Dec (F := F) A, (σ : G F Ω) ∈ Ine (F := F) A → σ ∈ S)
+          → S = ⊤ := by
     intro S hSc hφS hIS
     rw [eq_top_iff, ← hdense]
     apply Subgroup.topologicalClosure_minimal _ _ hSc
@@ -131,40 +168,45 @@ theorem tame_pairing_hom : TameLocal → ∀ (F Ω : Type) [Field F] [NumberFiel
       (GlobalTheory.TameQuot.continuous_cycMod (F := F) (Ω := Ω) l n).comp continuous_subtype_val
     let S : Subgroup (Dec (F := F) A) := ((cycMod F Ω l n).comp (Dec (F := F) A).subtype).ker
     have hSc : IsClosed (S : Set (Dec (F := F) A)) := by
-      have : (S : Set (Dec (F := F) A)) = (fun g : Dec (F := F) A =>
-          ((cycMod F Ω l n (g : G F Ω) : (ZMod (l ^ n))ˣ) : ZMod (l ^ n))) ⁻¹' {1} := by
+      have : (S : Set (Dec (F := F) A))
+          = (fun g : Dec (F := F) A =>
+              ((cycMod F Ω l n (g : G F Ω) : (ZMod (l ^ n))ˣ) : ZMod (l ^ n)))
+            ⁻¹' {1} := by
         ext g
         simp [S, MonoidHom.mem_ker, Units.val_eq_one]
       rw [this]
       exact isClosed_singleton.preimage hcont
-    have hone : ∀ σ : G F Ω, (∀ x : Ω, A.valuation x ≤ 1 → A.valuation (σ x - x ^ 1) < 1) →
-        cycMod F Ω l n σ = 1 := by
+    have hone
+        : ∀ σ : G F Ω,
+          (∀ x : Ω, A.valuation x ≤ 1 → A.valuation (σ x - x ^ 1) < 1) → cycMod F Ω l n σ = 1 := by
       intro σ hσ
       have := cycZ_toZModPow_eq hv hA hσ n
       ext
       simp only [cycMod, MonoidHom.coe_comp, Function.comp_apply, Units.coe_map,
         RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, Units.val_one]
       rw [this, Nat.cast_one, map_one]
-    have hSt := hall S hSc (by
-        show cycMod F Ω l n (φ : G F Ω) = 1
-        have h1 := cycZ_of_isFrob hv hA hφ
-        ext
-        simp only [cycMod, MonoidHom.coe_comp, Function.comp_apply, Units.coe_map,
-          RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, Units.val_one]
-        rw [h1, map_natCast, ← Nat.cast_one, ZMod.natCast_eq_natCast_iff]
-        exact hq)
-      (fun σ hσ => by
-        show cycMod F Ω l n (σ : G F Ω) = 1
-        apply hone
-        intro x hx
-        rw [pow_one]
-        exact ((mem_Ine.1 hσ).2 x hx))
+    have hSt :=
+      hall S hSc
+        (by
+          show cycMod F Ω l n (φ : G F Ω) = 1
+          have h1 := cycZ_of_isFrob hv hA hφ
+          ext
+          simp only [cycMod, MonoidHom.coe_comp, Function.comp_apply, Units.coe_map,
+            RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, Units.val_one]
+          rw [h1, map_natCast, ← Nat.cast_one, ZMod.natCast_eq_natCast_iff]
+          exact hq)
+        (fun σ hσ => by
+          show cycMod F Ω l n (σ : G F Ω) = 1
+          apply hone
+          intro x hx
+          rw [pow_one]
+          exact ((mem_Ine.1 hσ).2 x hx))
     intro g
     have hg : g ∈ S := hSt ▸ Subgroup.mem_top g
     exact hg
 
-  obtain ⟨f, hfker, -, hfφ, hfγ⟩ := hhom (Multiplicative (ZMod (l ^ n)))
-    (Multiplicative.ofAdd 1) 1 ⟨0, by simp⟩ (by simp)
+  obtain ⟨f, hfker, -, hfφ, hfγ⟩ :=
+    hhom (Multiplicative (ZMod (l ^ n))) (Multiplicative.ofAdd 1) 1 ⟨0, by simp⟩ (by simp)
   have hfc : Continuous f := by
     rw [continuous_discrete_rng]
     intro b
@@ -189,8 +231,8 @@ theorem tame_pairing_hom : TameLocal → ∀ (F Ω : Type) [Field F] [NumberFiel
   have hkadd : ∀ g h, k (g * h) = k g + k h := fun g h => by simp [hk, toAdd_mul]
   have hkγ : k γ = 0 := by simp [hk, hfγ]
   have hkφ : k φ = 1 := by simp [hk, hfφ]
-  have hkI : ∀ σ : Dec (F := F) A, (σ : G F Ω) ∈ Ine (F := F) A → k σ = 0 :=
-    fun σ hσ => eq_zero_of_isProGen hpg k hkc hkadd hkγ σ hσ
+  have hkI : ∀ σ : Dec (F := F) A, (σ : G F Ω) ∈ Ine (F := F) A → k σ = 0 := fun σ hσ =>
+    eq_zero_of_isProGen hpg k hkc hkadd hkγ σ hσ
 
   have hCZ : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   have hAC : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
@@ -213,64 +255,77 @@ theorem tame_pairing_hom : TameLocal → ∀ (F Ω : Type) [Field F] [NumberFiel
     rw [ZMod.intCast_zmod_cast] at h
     exact h.trans (by simp)
   have hψ1 : ψ 1 = y φ :=
-    (by simpa using ZMod.lift_coe (l ^ n) ⟨zmultiplesHom W' (y φ), hψ0⟩ 1 :
-      ZMod.lift (l ^ n) ⟨zmultiplesHom W' (y φ), hψ0⟩ 1 = y φ)
+    (by simpa using ZMod.lift_coe (l ^ n) ⟨zmultiplesHom W' (y φ), hψ0⟩ 1
+      : ZMod.lift (l ^ n) ⟨zmultiplesHom W' (y φ), hψ0⟩ 1 = y φ)
   let yH : Dec (F := F) A →* Multiplicative W' :=
     MonoidHom.mk' (fun g => Multiplicative.ofAdd (y g)) (fun a b => by rw [hyadd, ofAdd_add])
   let kH : Dec (F := F) A →* Multiplicative W' :=
-    MonoidHom.mk' (fun g => Multiplicative.ofAdd (ψ (k g))) (fun a b => by
-      rw [hkadd, map_add (f := _), ofAdd_add])
-  have hE := hall (yH.eqLocus kH) (by
-      have : ((yH.eqLocus kH : Subgroup (Dec (F := F) A)) : Set (Dec (F := F) A)) =
-          {g | Multiplicative.ofAdd (y g) = Multiplicative.ofAdd (ψ (k g))} := rfl
-      rw [this]
-      exact isClosed_eq (continuous_ofAdd.comp hyc)
-        (continuous_ofAdd.comp (continuous_of_discreteTopology.comp hkc)))
-    (by
-      show Multiplicative.ofAdd (y φ) = Multiplicative.ofAdd (ψ (k φ))
-      rw [hkφ, hψ1])
-    (fun σ hσ => by
-      show Multiplicative.ofAdd (y σ) = Multiplicative.ofAdd (ψ (k σ))
-      rw [hyI σ hσ, hkI σ hσ, map_zero ψ])
+    MonoidHom.mk'
+      (fun g => Multiplicative.ofAdd (ψ (k g)))
+      (fun a b => by rw [hkadd, map_add (f := _), ofAdd_add])
+  have hE :=
+    hall (yH.eqLocus kH)
+      (by
+        have : ((yH.eqLocus kH : Subgroup (Dec (F := F) A)) : Set (Dec (F := F) A))
+            = {g | Multiplicative.ofAdd (y g) = Multiplicative.ofAdd (ψ (k g))} :=
+          rfl
+        rw [this]
+        exact isClosed_eq (continuous_ofAdd.comp hyc)
+          (continuous_ofAdd.comp (continuous_of_discreteTopology.comp hkc)))
+      (by
+        show Multiplicative.ofAdd (y φ) = Multiplicative.ofAdd (ψ (k φ))
+        rw [hkφ, hψ1])
+      (fun σ hσ => by
+        show Multiplicative.ofAdd (y σ) = Multiplicative.ofAdd (ψ (k σ))
+        rw [hyI σ hσ, hkI σ hσ, map_zero ψ])
   have hyk : ∀ h, y h = ψ (k h) := fun h => by
     have hh : h ∈ yH.eqLocus kH := hE ▸ Subgroup.mem_top h
     exact Multiplicative.ofAdd.injective hh
 
   set z : Dec (F := F) A → ZMod (l ^ n) := fun g => P (x g) (y φ) with hz
-  have hzc : Continuous z :=
-    (continuous_of_discreteTopology (f := fun m : W => P m (y φ))).comp hxc
+  have hzc : Continuous z := (continuous_of_discreteTopology (f := fun m : W => P m (y φ))).comp hxc
   have hzadd : ∀ g h, z (g * h) = z g + z h := fun g h => by
     simp only [hz, hxadd, map_add (f := _), AddMonoidHom.add_apply]
   have hw' : ∀ g h, w.1 (g, h) = z g * k h := fun g h => by
     rw [hw, hyk h, hψ, map_zsmul, zsmul_eq_mul, ZMod.intCast_zmod_cast, mul_comm]
-  let zZ : Z1 (trivDec F A l n) := ⟨z, (mem_Z1_iff_cocycle _ _).2 ⟨hzc, fun g h => by
-    rw [hzadd, Representation.trivial_apply]⟩⟩
-  let kZ : Z1 (muDec F A l n) := ⟨k, (mem_Z1_iff_cocycle _ _).2 ⟨hkc, fun g h => by
-    rw [hkadd, charRep_apply, MonoidHom.comp_apply, Subgroup.coe_subtype, hχ g, Units.val_one,
-      one_mul]⟩⟩
-  have hur : (Submodule.Quotient.mk kZ : H1 (muDec F A l n)) ∈
-      H1ur (muDec F A l n) ((Ine (F := F) A).subgroupOf (Dec (F := F) A)) := by
+  let zZ : Z1 (trivDec F A l n) :=
+    ⟨z, (mem_Z1_iff_cocycle _ _).2 ⟨hzc, fun g h => by rw [hzadd, Representation.trivial_apply]⟩⟩
+  let kZ : Z1 (muDec F A l n) := ⟨
+    k,
+    (mem_Z1_iff_cocycle _ _).2 ⟨
+      hkc,
+      fun g h => by
+        rw [hkadd, charRep_apply, MonoidHom.comp_apply, Subgroup.coe_subtype, hχ g, Units.val_one,
+          one_mul]
+    ⟩
+  ⟩
+  have hur
+      : (Submodule.Quotient.mk kZ : H1 (muDec F A l n))
+        ∈ H1ur (muDec F A l n) ((Ine (F := F) A).subgroupOf (Dec (F := F) A)) := by
     rw [H1ur, LinearMap.mem_ker]
     delta ReciprocityTheory.Gal.resH1
     rw [Submodule.mapQ_apply]
-    have : ReciprocityTheory.Gal.restrictCocycles1 (muDec F A l n) ((Ine (F := F) A).subgroupOf (Dec (F := F) A)).subtype
-        continuous_subtype_val kZ = 0 := by
+    have : ReciprocityTheory.Gal.restrictCocycles1 (muDec F A l n)
+          ((Ine (F := F) A).subgroupOf (Dec (F := F) A)).subtype continuous_subtype_val kZ
+        = 0 := by
       apply Subtype.ext
       funext h
       show k (h : Dec (F := F) A) = 0
       exact hkI _ (Subgroup.mem_subgroupOf.1 h.2)
     rw [this, Submodule.Quotient.mk_zero]
-  have hcup := cupMu_mk zZ kZ w (fun g h => by
-    rw [hw', charRep_apply, MonoidHom.comp_apply, Subgroup.coe_subtype, hχ g, Units.val_one,
-      one_mul])
+  have hcup :=
+    cupMu_mk zZ kZ w (fun g h => by
+      rw [hw', charRep_apply, MonoidHom.comp_apply, Subgroup.coe_subtype, hχ g, Units.val_one,
+        one_mul])
   have key := hu₀ x₀ hx₀ γ c hγ hc φ hφ zZ kZ hur
   rw [hcup] at key
   change c * e (Submodule.Quotient.mk w) = u₀ * (z γ * k φ) at key
   rw [hkφ, mul_one] at key
-  calc e (Submodule.Quotient.mk w)
-      = ((hcu.unit⁻¹ : (ZMod (l ^ n))ˣ) : ZMod (l ^ n)) * (c * e (Submodule.Quotient.mk w)) := by
-        rw [← mul_assoc, hcu.val_inv_mul, one_mul]
+  calc
+    e (Submodule.Quotient.mk w)
+        = ((hcu.unit⁻¹ : (ZMod (l ^ n))ˣ) : ZMod (l ^ n)) * (c * e (Submodule.Quotient.mk w)) := by
+      rw [← mul_assoc, hcu.val_inv_mul, one_mul]
     _ = ((hcu.unit⁻¹ * u₀ : (ZMod (l ^ n))ˣ) : ZMod (l ^ n)) * P (x γ) (y φ) := by
-        rw [key, Units.val_mul, mul_assoc]
+      rw [key, Units.val_mul, mul_assoc]
 
 end GlobalTheory.TamePairing

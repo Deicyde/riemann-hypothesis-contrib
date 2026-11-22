@@ -10,7 +10,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4
 
 noncomputable section
 
@@ -18,9 +19,12 @@ namespace PowerBlockArith
 
 variable {K : Type} [Fintype K] {ι : K → Type}
 
-theorem blockFnField_addBlock {Ω : Type} [Field Ω] [CharZero Ω] {y : (Σ k, ι k) → Ω} {a : K → ℤ} {m N : ℕ}
-    {v : Fin N → Ω} (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) (hv : ∀ j, v j ∈ chartLat y a m) :
-    blockFnField (addBlock y v) = blockFnField y := by
+theorem blockFnField_addBlock
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    {y : (Σ k, ι k) → Ω} {a : K → ℤ} {m N : ℕ} {v : Fin N → Ω}
+    (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    (hv : ∀ j, v j ∈ chartLat y a m)
+    : blockFnField (addBlock y v) = blockFnField y := by
   have hZ : ∀ s ∈ chartRingZ y c, s ∈ blockFnField y := by
     intro s hs
     have : chartRingZ y c ≤ (blockFnField y).toSubalgebra.restrictScalars ℤ := by
@@ -33,8 +37,10 @@ theorem blockFnField_addBlock {Ω : Type} [Field Ω] [CharZero Ω] {y : (Σ k, �
     rintro t ⟨⟨_ | k, i⟩, ⟨_ | k', i'⟩, hpq, rfl⟩
     · have hP0 : (∏ k, y ⟨k, c k⟩ ^ (-((m : ℤ) * a k))) ≠ 0 :=
         Finset.prod_ne_zero_iff.mpr fun k _ => zpow_ne_zero _ (hc k)
-      have e : addBlock y v ⟨none, i⟩ / addBlock y v ⟨none, i'⟩ =
-          (v i * ∏ k, y ⟨k, c k⟩ ^ (-((m : ℤ) * a k))) / (v i' * ∏ k, y ⟨k, c k⟩ ^ (-((m : ℤ) * a k))) := by
+      have e
+          : addBlock y v ⟨none, i⟩ / addBlock y v ⟨none, i'⟩
+            = (v i * ∏ k, y ⟨k, c k⟩ ^ (-((m : ℤ) * a k)))
+              / (v i' * ∏ k, y ⟨k, c k⟩ ^ (-((m : ℤ) * a k))) := by
         rw [mul_div_mul_right _ _ hP0]
         rfl
       rw [e]
@@ -45,12 +51,14 @@ theorem blockFnField_addBlock {Ω : Type} [Field Ω] [CharZero Ω] {y : (Σ k, �
       exact IntermediateField.subset_adjoin ℚ _ ⟨⟨k, i⟩, ⟨k, i'⟩, rfl, rfl⟩
   · rw [blockFnField, IntermediateField.adjoin_le_iff]
     rintro t ⟨p, q, hpq, rfl⟩
-    exact IntermediateField.subset_adjoin ℚ _
-      ⟨(⟨some p.1, p.2⟩ : Σ k, addIdx ι N k), (⟨some q.1, (hpq ▸ q.2 : ι q.1)⟩ : Σ k, addIdx ι N k),
-        by simp [hpq], by cases p; cases q; simp at hpq; subst hpq; rfl⟩
+    exact IntermediateField.subset_adjoin ℚ _ ⟨
+      (⟨some p.1, p.2⟩ : Σ k, addIdx ι N k),
+      (⟨some q.1, (hpq ▸ q.2 : ι q.1)⟩ : Σ k, addIdx ι N k),
+      by simp [hpq],
+      by cases p; cases q; simp at hpq; subst hpq; rfl
+    ⟩
 
 end PowerBlockArith
-
 
 open PowerBlockArith in
 theorem PowerBlockArith.proof (hF : CoordArithOfFnField.Statement) : PowerBlockArith.Statement := by

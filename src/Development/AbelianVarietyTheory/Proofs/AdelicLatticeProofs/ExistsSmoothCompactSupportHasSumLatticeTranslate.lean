@@ -10,9 +10,10 @@ open scoped ContDiff nonZeroDivisors
 
 namespace GlobalTheory
 
-theorem exists_radius_lattice_translate_norm_le (V : Type) [NormedAddCommGroup V]
-    [NormedSpace ℝ V] [FiniteDimensional ℝ V] (L : Submodule ℤ V) [DiscreteTopology L]
-    [IsZLattice ℝ L] : ∃ R : ℝ, 0 < R ∧ ∀ y : V, ∃ l : L, ‖y + l‖ ≤ R := by
+theorem exists_radius_lattice_translate_norm_le
+    (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+    (L : Submodule ℤ V) [DiscreteTopology L] [IsZLattice ℝ L]
+    : ∃ R : ℝ, 0 < R ∧ ∀ y : V, ∃ l : L, ‖y + l‖ ≤ R := by
   classical
   let b := (Module.Free.chooseBasis ℤ L).ofZLatticeBasis ℝ L
   refine ⟨∑ i, ‖b i‖ + 1, by positivity, fun y => ?_⟩
@@ -26,8 +27,11 @@ theorem exists_radius_lattice_translate_norm_le (V : Type) [NormedAddCommGroup V
   rw [e]
   linarith
 
-theorem exists_smooth_compactSupport_hasSum_lattice_translates :
-    ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V] (L : Submodule ℤ V) [DiscreteTopology L] [IsZLattice ℝ L], ∃ η : V → ℝ, ContDiff ℝ ∞ η ∧ HasCompactSupport η ∧ ∀ y, HasSum (fun l : L => η (y + l)) 1 := by
+theorem exists_smooth_compactSupport_hasSum_lattice_translates
+    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+        (L : Submodule ℤ V) [DiscreteTopology L] [IsZLattice ℝ L],
+      ∃ η : V → ℝ,
+        ContDiff ℝ ∞ η ∧ HasCompactSupport η ∧ ∀ y, HasSum (fun l : L => η (y + l)) 1 := by
   intro V _ _ _ L _ _
   classical
   obtain ⟨R, hR, hcov⟩ := exists_radius_lattice_translate_norm_le V L
@@ -54,12 +58,13 @@ theorem exists_smooth_compactSupport_hasSum_lattice_translates :
       rw [← φ.support_eq]
       exact hl
     simpa [mem_ball_zero_iff] using h
-  have hsum : ∀ y, HasSum (fun l : L => φ (y + l)) (S y) :=
-    fun y => (summable_of_hasFiniteSupport (hsupp y)).hasSum
+  have hsum : ∀ y, HasSum (fun l : L => φ (y + l)) (S y) := fun y =>
+    (summable_of_hasFiniteSupport (hsupp y)).hasSum
   have hper : ∀ y (l₀ : L), S (y + l₀) = S y := by
     intro y l₀
-    calc S (y + l₀) = ∑' c : L, φ (y + ((l₀ + c : L) : V)) := by
-          simp only [S, Submodule.coe_add, add_assoc]
+    calc
+      S (y + l₀)
+        = ∑' c : L, φ (y + ((l₀ + c : L) : V)) := by simp only [S, Submodule.coe_add, add_assoc]
       _ = S y := (Equiv.addLeft l₀).tsum_eq (fun l : L => φ (y + l))
   have hpos : ∀ y, 0 < S y := by
     intro y
@@ -80,7 +85,9 @@ theorem exists_smooth_compactSupport_hasSum_lattice_translates :
       apply φ.zero_of_le_dist
       rw [dist_zero_right]
       have h2 : ‖x + (l : V)‖ ≤ ‖y + (l : V)‖ + ‖x - y‖ := by
-        calc ‖x + (l : V)‖ = ‖(y + (l : V)) + (x - y)‖ := by congr 1; abel
+        calc
+          ‖x + (l : V)‖
+            = ‖(y + (l : V)) + (x - y)‖ := by congr 1; abel
           _ ≤ _ := norm_add_le _ _
       have h3 : ‖x - y‖ < 1 := by
         rw [← dist_eq_norm, dist_comm]

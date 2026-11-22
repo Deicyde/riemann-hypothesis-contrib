@@ -59,7 +59,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm UpperTheory.Zero.ConvolutionTheory.EB
+  PositivityTheory.Rg.BcB.Desc
 
 theorem slotFacts : SlotBasic := slotFacts_pf places
 theorem levTop : LevTop := levTop_pf slotFacts
@@ -69,23 +70,30 @@ theorem pfHecke : PfHecke := pfHecke_pf slotFacts levTop
 theorem prodOp : ProdOp := prodOp_pf slotFacts levTop absStep_pf pfHecke
 theorem locComm : LocComm := locComm_pf slotFacts levTop
 theorem yLoc : YLoc := yLoc_pf pfHecke prodOp
-theorem zSimple : ZSimple := zSimple_pf (genLoc_pf slotFacts levTop pfHecke prodOp) locComm (sphOp_pf cvOp) yLoc
-theorem zTr : ZTr := zTr_pf adm pfHecke prodOp locComm yLoc zSimple (ySwap_pf slotFacts pfHecke prodOp) (isot_pf slotFacts)
-  (simpleFix_pf cvOp) (absCore_pf traceForm_pf)
+theorem zSimple : ZSimple :=
+  zSimple_pf (genLoc_pf slotFacts levTop pfHecke prodOp) locComm (sphOp_pf cvOp) yLoc
+theorem zTr : ZTr :=
+  zTr_pf adm pfHecke prodOp locComm yLoc zSimple (ySwap_pf slotFacts pfHecke prodOp)
+    (isot_pf slotFacts) (simpleFix_pf cvOp) (absCore_pf traceForm_pf)
 theorem tTr : TTr := tTr_pf places pfHecke prodOp locComm yLoc (ex2Act_pf exAct) satAll_pf
 theorem levelTr : LevelTr := levelTr_pf adm zTr (seenTr_pf trLevel adm cvOp) tTr
 
-theorem piTerm_eq_traceSum_of_degreeFourTest (h : ThetaFixedGlobalWeights) : PiTerm := piTerm_of_weights_levels h wtEx_pf levTop levFix lcLevel_pf toYd levelTr twUniq_pf
+theorem piTerm_eq_traceSum_of_degreeFourTest (h : ThetaFixedGlobalWeights) : PiTerm :=
+  piTerm_of_weights_levels h wtEx_pf levTop levFix lcLevel_pf toYd levelTr twUniq_pf
 
-theorem piTerm_of (h : ThetaFixOf) : PiTerm := piTerm_eq_traceSum_of_degreeFourTest (aux_statement_11 UpperTheory.V.Z.GSp4Splitting.global_haarAverage_trace_identity h)
+theorem piTerm_of (h : ThetaFixOf) : PiTerm :=
+  piTerm_eq_traceSum_of_degreeFourTest (aux_statement_11
+    UpperTheory.V.Z.GSp4Splitting.global_haarAverage_trace_identity h)
 
 theorem piTerm_holds : PiTerm := piTerm_of UpperTheory.V.Z.Tf.GOne.thetaFixOf
 
 theorem cvIn : CvIn := cvIn_pf basic_pf (aeEq_pf basic_pf)
 theorem wtInd : WtInd := wtInd_pf basic_pf
-theorem typeIn : TypeIn := typeIn_pf piAdm_pf detZero_pf evalBasis_pf cvIn (formEx_pf basic_pf (aeEq_pf basic_pf) wtInd)
-  (orthZero_pf basic_pf (aeEq_pf basic_pf) wtInd) absType_pf
+theorem typeIn : TypeIn :=
+  typeIn_pf piAdm_pf detZero_pf evalBasis_pf cvIn (formEx_pf basic_pf (aeEq_pf basic_pf) wtInd)
+    (orthZero_pf basic_pf (aeEq_pf basic_pf) wtInd) absType_pf
 
-theorem piFin_holds : PiFin := piFinOf_pf piAdm_pf tensType_pf (cvType_pf detZero_pf evalBasis_pf) cvIn typeIn
+theorem piFin_holds : PiFin :=
+  piFinOf_pf piAdm_pf tensType_pf (cvType_pf detZero_pf evalBasis_pf) cvIn typeIn
 
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi

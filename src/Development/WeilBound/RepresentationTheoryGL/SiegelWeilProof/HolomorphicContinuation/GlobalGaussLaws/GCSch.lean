@@ -25,18 +25,25 @@ theorem gCSch : GCSch := by
   have hP1 : ((-(Complex.I / 2)) • (Zᵀ - Zᵀᴴ)).PosDef := by
     have h := hZ.transpose
     rwa [Matrix.transpose_smul, Matrix.transpose_sub, Matrix.conjTranspose_transpose] at h
-  have hP2 : ((-(Complex.I / 2)) • (-Z'ᵀ - (-Z'ᵀ)ᴴ)).PosDef := by
+  have hP2 : ((-(Complex.I / 2)) • (- Z'ᵀ - (- Z'ᵀ)ᴴ)).PosDef := by
     have h := hZ'.transpose
     unfold IsSiegel at h
     rw [Matrix.conjTranspose_conjTranspose, Matrix.transpose_smul, Matrix.transpose_sub,
-      Matrix.conjTranspose_transpose] at h
+        Matrix.conjTranspose_transpose]
+      at h
     rwa [Matrix.conjTranspose_neg, sub_neg_eq_add, neg_add_eq_sub]
-  have hre : ∀ u : Fin m → Fin n → ℂ, (B u u).re = c * (∑ a ∈ S, (star (u a) ⬝ᵥ
-      (((-(Complex.I / 2)) • (Zᵀ - Zᵀᴴ)) *ᵥ u a)).re + ∑ a ∈ S', (star (u a) ⬝ᵥ
-      (((-(Complex.I / 2)) • (-Z'ᵀ - (-Z'ᵀ)ᴴ)) *ᵥ u a)).re) := by
+  have hre
+      : ∀ u : Fin m → Fin n → ℂ,
+        (B u u).re
+          = c
+            * (∑ a ∈ S, (star (u a) ⬝ᵥ
+                (((-(Complex.I / 2)) • (Zᵀ - Zᵀᴴ)) *ᵥ u a)).re
+              + ∑ a ∈ S', (star (u a) ⬝ᵥ
+                (((-(Complex.I / 2)) • (-Z'ᵀ - (-Z'ᵀ)ᴴ)) *ᵥ u a)).re) := by
     intro u
-    rw [hB, qB_apply, qF, Complex.neg_re, Complex.sub_re, re_I_mul, re_I_mul, Complex.im_sum, Complex.im_sum]
-    have e2 : ∀ a, (star (u a) ⬝ᵥ (Z'ᵀ *ᵥ u a)).im = -(star (u a) ⬝ᵥ ((-Z'ᵀ) *ᵥ u a)).im := by
+    rw [hB, qB_apply, qF, Complex.neg_re, Complex.sub_re, re_I_mul, re_I_mul, Complex.im_sum,
+      Complex.im_sum]
+    have e2 : ∀ a, (star (u a) ⬝ᵥ (Z'ᵀ *ᵥ u a)).im = -(star (u a) ⬝ᵥ ((- Z'ᵀ) *ᵥ u a)).im := by
       intro a; rw [Matrix.neg_mulVec, dotProduct_neg, Complex.neg_im, neg_neg]
     simp only [e2, Finset.sum_neg_distrib, im_quad]
     ring

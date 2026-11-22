@@ -7,23 +7,28 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Host Formalism.ConjugateSelfDual Neutral.B1 ReciprocityTheory.Gal
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.HeckeGal GlobalTheory.CuspRep
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.L2.Host Formalism.ConjugateSelfDual Neutral.B1 ReciprocityTheory.Gal
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.HeckeGal
+  GlobalTheory.CuspRep
 
 namespace UpperTheory.Gal.TP.Chr
 
-private theorem pl_emb {E : Type} [Field E] [NumberField E] [IsCMField E]
-    {w : InfinitePlace (maximalRealSubfield E)} (τ : EmbOver E w) : pl τ.1 = w := by
+private theorem pl_emb
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {w : InfinitePlace (maximalRealSubfield E)} (τ : EmbOver E w)
+    : pl τ.1 = w := by
   unfold pl
   rw [InfinitePlace.comap_mk, τ.2, InfinitePlace.mk_embedding]
 
-private theorem pl_conj {E : Type} [Field E] [NumberField E] [IsCMField E] (φ : E →+* ℂ) :
-    pl (ComplexEmbedding.conjugate φ) = pl φ := by
+private theorem pl_conj {E : Type} [Field E] [NumberField E] [IsCMField E] (φ : E →+* ℂ)
+    : pl (ComplexEmbedding.conjugate φ) = pl φ := by
   unfold pl
   rw [InfinitePlace.mk_conjugate_eq]
 
-private theorem conj_ne {E : Type} [Field E] [NumberField E] [IsCMField E] (φ : E →+* ℂ) :
-    ComplexEmbedding.conjugate φ ≠ φ := fun h =>
+private theorem conj_ne {E : Type} [Field E] [NumberField E] [IsCMField E] (φ : E →+* ℂ)
+    : ComplexEmbedding.conjugate φ ≠ φ := fun h =>
   IsTotallyComplex.complexEmbedding_not_isReal φ (ComplexEmbedding.isReal_iff.mpr h)
 
 theorem typVal : TypVal := by

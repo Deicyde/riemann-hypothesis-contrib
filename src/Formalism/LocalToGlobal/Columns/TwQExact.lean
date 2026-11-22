@@ -17,44 +17,66 @@ open Formalism.UG Formalism.HermitianLatticesTheory
 section QExact
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
-variable {hc : Formalism.BasicNotions.CMData F E} {n : ℕ} [NeZero n] {ST SG Q : Finset (Pl E)} {K : Type} [Field K] {Θ : LevQFam E K n Q}
+variable
+  {hc : Formalism.BasicNotions.CMData F E} {n : ℕ} [NeZero n]
+  {ST SG Q : Finset (Pl E)} {K : Type} [Field K]
+  {Θ : LevQFam E K n Q}
 
-def FrExact (q : QLoc hc n Q Θ) (x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) (p : DecoF E n ST SG Q) : Prop :=
+def FrExact
+    (q : QLoc hc n Q Θ) (x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) (p : DecoF E n ST SG Q)
+    : Prop :=
   decoOf ST SG x = p.deco ∧ ∀ P : Q, q.at P x = bc (q.phi P) (qGL n (p.fr P))
 
-theorem FrExact.over {q : QLoc hc n Q Θ} {x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)} {p : DecoF E n ST SG Q} (h : FrExact q x p) :
-    FrOver q x p := by
+theorem FrExact.over
+    {q : QLoc hc n Q Θ} {x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)} {p : DecoF E n ST SG Q}
+    (h : FrExact q x p)
+    : FrOver q x p := by
   refine ⟨h.1, fun P => ?_⟩
   rw [h.2 P, inv_mul_cancel]
   exact (q.U P).one_mem
 
 variable {H : Subgroup (GLG (E := E) (n := n) (SG := SG))}
 
-def recClsFy (q : QLoc hc n Q Θ) (hF : FrLat ST SG q) (hE : FrExists (n := n) ST SG Q)
-    (s : DecoFCl (K := K) n ST SG Q H Θ → DecoF E n ST SG Q) (hs : ∀ c, (Quotient.mk'' (s c) : DecoFCl (K := K) n ST SG Q H Θ) = c)
-    (y : DecoFCl (K := K) n ST SG Q H Θ → UAd hc n) (hy : ∀ c, FrOver q (y c).1 (s c)) :
-    RecClsF hc n ST SG Q H q s where
+def recClsFy
+    (q : QLoc hc n Q Θ) (hF : FrLat ST SG q)
+    (hE : FrExists (n := n) ST SG Q)
+    (s : DecoFCl (K := K) n ST SG Q H Θ → DecoF E n ST SG Q)
+    (hs : ∀ c, (Quotient.mk'' (s c) : DecoFCl (K := K) n ST SG Q H Θ) = c)
+    (y : DecoFCl (K := K) n ST SG Q H Θ → UAd hc n) (hy : ∀ c, FrOver q (y c).1 (s c))
+    : RecClsF hc n ST SG Q H q s where
   y c := y c
   y_bij := by
     constructor
     · intro c c' h
       have hr := Quotient.exact' h
       obtain ⟨h0, hh, k, hk, e⟩ := DoubleCoset.rel_iff.1 hr
-      obtain ⟨γ, hγ⟩ := Formalism.L2.DIV.ratEl_surjective (⟨h0, hh⟩ : Formalism.L2.DIV.UQ hc (1 : Matrix (Fin n) (Fin n) E))
-      have hh' : ((h0 : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) = Formalism.UG.bc (iA F E) (γ : GL (Fin n) E) :=
-        (congrArg (fun z : Formalism.L2.DIV.UQ hc (1 : Matrix (Fin n) (Fin n) E) =>
-          ((z : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))) hγ).symm
-      have hk' : ((k : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))⁻¹ ∈ levUQ hc n ST SG Q H q :=
+      obtain ⟨γ, hγ⟩ :=
+        Formalism.L2.DIV.ratEl_surjective
+          (⟨h0, hh⟩ : Formalism.L2.DIV.UQ hc (1 : Matrix (Fin n) (Fin n) E))
+      have hh'
+          : ((h0 : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))
+            = Formalism.UG.bc (iA F E) (γ : GL (Fin n) E) :=
+        (congrArg
+          (fun z : Formalism.L2.DIV.UQ hc (1 : Matrix (Fin n) (Fin n) E) =>
+            ((z : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)))
+          hγ).symm
+      have hk'
+          : ((k : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))⁻¹
+            ∈ levUQ hc n ST SG Q H q :=
         Subgroup.inv_mem _ (Subgroup.mem_subgroupOf.1 hk)
-      have e' : ((y c' : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) =
-          Formalism.UG.bc (iA F E) (γ : GL (Fin n) E) * ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) *
-            (((⟨_, hk'⟩ : levUQ hc n ST SG Q H q) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)))⁻¹ := by
+      have e'
+          : ((y c' : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))
+            = Formalism.UG.bc (iA F E) (γ : GL (Fin n) E)
+              * ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))
+              * (((⟨_, hk'⟩ : levUQ hc n ST SG Q H q)
+                : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)))⁻¹ := by
         have e2 := congrArg (fun z : UAd hc n => (z : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))) e
         simp only [Subgroup.coe_mul] at e2
         rw [e2, hh', inv_inv]
       obtain ⟨a, -, -, ha⟩ := qdf_orbit_of_rel H q (hy c) (hy c') γ ⟨_, hk'⟩ e'
       rw [← hs c, ← hs c']
-      exact Quotient.sound (MulAction.orbitRel_apply.2 ⟨a⁻¹, by show a⁻¹ • s c' = s c; rw [ha, inv_smul_smul]⟩)
+      exact Quotient.sound (MulAction.orbitRel_apply.2
+        ⟨a⁻¹, by show a⁻¹ • s c' = s c; rw [ha, inv_smul_smul]⟩)
     · intro Qc
       induction Qc using Quotient.inductionOn' with
       | h x =>
@@ -62,8 +84,7 @@ def recClsFy (q : QLoc hc n Q Θ) (hF : FrLat ST SG q) (hE : FrExists (n := n) S
         refine ⟨Quotient.mk'' p, ?_⟩
         obtain ⟨a, ha⟩ := MulAction.orbitRel_apply.1 (Quotient.exact (hs (Quotient.mk'' p)))
         have ha' : a • p = s (Quotient.mk'' p) := ha
-        have hx' : FrOver q (y (Quotient.mk'' p)).1 (a • p) := by
-          rw [ha']; exact hy _
+        have hx' : FrOver q (y (Quotient.mk'' p)).1 (a • p) := by rw [ha']; exact hy _
         obtain ⟨γ, κ, -, e⟩ := qdf_rel_of_orbit H q a hp hx'
         exact (qdf_mk_eq H q γ κ e).symm
   y_lat c x := by
@@ -73,11 +94,22 @@ def recClsFy (q : QLoc hc n Q Θ) (hF : FrLat ST SG q) (hE : FrExists (n := n) S
   stabI c := qdStab H (s c)
   stabI_inj c := by
     intro a b hab
-    have h1 : a.1.1 = b.1.1 := by rw [← qdf_ratHom_stab (hc := hc) H (s c) a, ← qdf_ratHom_stab (hc := hc) H (s c) b, hab]
+    have h1 : a.1.1 = b.1.1 := by
+      rw [← qdf_ratHom_stab (hc := hc) H (s c) a, ← qdf_ratHom_stab (hc := hc) H (s c) b, hab]
     have ha := qdf_stab_deco H (s c) a
     have hb := qdf_stab_deco H (s c) b
-    have hab' : ((a.1.1, (a.1.2.1 : GLG (E := E) (n := n) (SG := SG))) : UF E n × GLG (E := E) (n := n) (SG := SG)) • (s c).deco = (s c).deco := ha
-    have hbb' : ((b.1.1, (b.1.2.1 : GLG (E := E) (n := n) (SG := SG))) : UF E n × GLG (E := E) (n := n) (SG := SG)) • (s c).deco = (s c).deco := hb
+    have hab'
+        : ((a.1.1, (a.1.2.1 : GLG (E := E) (n := n) (SG := SG)))
+              : UF E n × GLG (E := E) (n := n) (SG := SG))
+            • (s c).deco
+          = (s c).deco :=
+      ha
+    have hbb'
+        : ((b.1.1, (b.1.2.1 : GLG (E := E) (n := n) (SG := SG)))
+              : UF E n × GLG (E := E) (n := n) (SG := SG))
+            • (s c).deco
+          = (s c).deco :=
+      hb
     have h2 := DecoSet.stab_fst_injective (s c).deco hab' hbb' h1
     have h3 : a.1.2.2 = b.1.2.2 := by
       apply Subtype.ext
@@ -97,18 +129,24 @@ def recClsFy (q : QLoc hc n Q Θ) (hF : FrLat ST SG q) (hE : FrExists (n := n) S
       refine ⟨κ.1, κ.2, ?_⟩
       show ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) * κ.1 *
         ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))⁻¹ = _
-      have e' : Formalism.UG.bc (iA F E) (γ' : GL (Fin n) E) = ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) *
-          κ.1 * ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))⁻¹ :=
+      have e'
+          : Formalism.UG.bc (iA F E) (γ' : GL (Fin n) E)
+            = ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) * κ.1
+              * ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))⁻¹ :=
         eq_mul_inv_of_mul_eq (eq_mul_inv_iff_mul_eq.1 e).symm
       rw [← e', hγ']
     · rintro ⟨k, hk, e⟩
-      have e' : ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) * k *
-          ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))⁻¹ =
-          Formalism.UG.bc (iA F E) ((⟨γ, hγ⟩ : URat hc n) : GL (Fin n) E) := e
-      have e2 : ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) =
-          Formalism.UG.bc (iA F E) ((⟨γ, hγ⟩ : URat hc n) : GL (Fin n) E) *
-            ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) *
-            ((⟨k, hk⟩ : levUQ hc n ST SG Q H q) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))⁻¹ := by
+      have e'
+          : ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) * k
+              * ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))⁻¹
+            = Formalism.UG.bc (iA F E) ((⟨γ, hγ⟩ : URat hc n) : GL (Fin n) E) :=
+        e
+      have e2
+          : ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))
+            = Formalism.UG.bc (iA F E) ((⟨γ, hγ⟩ : URat hc n) : GL (Fin n) E)
+              * ((y c : UAd hc n) : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))
+              * ((⟨k, hk⟩ : levUQ hc n ST SG Q H q)
+                : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))⁻¹ := by
         rw [← e']; group
       obtain ⟨a, ha1, -, ha⟩ := qdf_orbit_of_rel H q (hy c) (hy c) ⟨γ, hγ⟩ ⟨k, hk⟩ e2
       refine ⟨⟨a, ha.symm⟩, ?_⟩
@@ -117,7 +155,8 @@ def recClsFy (q : QLoc hc n Q Θ) (hF : FrLat ST SG q) (hE : FrExists (n := n) S
   stabI_lat c a x := by
     have h := stabRat_lat hc n ST SG H (s c).deco ⟨_, qdf_stab_deco H (s c) a⟩ x
     have e : stabRat hc n ST SG H (s c).deco ⟨_, qdf_stab_deco H (s c) a⟩ = qdStab H (s c) a :=
-      (ratHom_bijective hc n).1 ((rlc_ratHom_stabRat hc n ST SG H _ _).trans (qdf_ratHom_stab (hc := hc) H (s c) a).symm)
+      (ratHom_bijective hc n).1
+        ((rlc_ratHom_stabRat hc n ST SG H _ _).trans (qdf_ratHom_stab (hc := hc) H (s c) a).symm)
     rw [e] at h
     exact h
 

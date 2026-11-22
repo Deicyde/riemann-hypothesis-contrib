@@ -31,12 +31,13 @@ lemma mem_of_split {H : Subgroup G} {s : G → ℝ} {c : ℝ → G}
     (g : G) : g * c (-s g) ∈ H := by
   rw [hH, hsa, hsc]; ring
 
-def splitHomeo {H : Subgroup G} {s : G → ℝ} {c : ℝ → G} (hs : Continuous s)
-    (hsa : ∀ g h, s (g * h) = s g + s h) (hc : Continuous c)
-    (hca : ∀ x y, c (x + y) = c x * c y) (hsc : ∀ t, s (c t) = t) (hH : ∀ g, g ∈ H ↔ s g = 0) :
-    H × ℝ ≃ₜ G where
+def splitHomeo
+    {H : Subgroup G} {s : G → ℝ} {c : ℝ → G}
+    (hs : Continuous s) (hsa : ∀ g h, s (g * h) = s g + s h) (hc : Continuous c)
+    (hca : ∀ x y, c (x + y) = c x * c y) (hsc : ∀ t, s (c t) = t) (hH : ∀ g, g ∈ H ↔ s g = 0)
+    : H × ℝ ≃ₜ G where
   toFun p := (p.1 : G) * c p.2
-  invFun g := (⟨g * c (-s g), mem_of_split hsa hsc hH g⟩, s g)
+  invFun g := (⟨g * c (- s g), mem_of_split hsa hsc hH g⟩, s g)
   left_inv p := by
     rcases p with ⟨⟨h, hh⟩, t⟩
     have h0 : s h = 0 := (hH h).1 hh
@@ -56,11 +57,21 @@ end GlobalTheory.KernelCovolume
 open scoped Pointwise
 
 open GlobalTheory.KernelCovolume in
-theorem GlobalTheory.finiteCovolume_kernel : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (H Γ Λ : Subgroup G) (s : G → ℝ) (c : ℝ → G), Continuous s → (∀ g h, s (g * h) = s g + s h) → Continuous c → (∀ x y, c (x + y) = c x * c y) → (∀ t g, c t * g = g * c t) → (∀ t, s (c t) = t) → (∀ g, g ∈ H ↔ s g = 0) → Γ ≤ H → Λ = Γ ⊔ Subgroup.zpowers (c 1) → DiscreteTopology Λ → (∀ (ν : Measure G) (D : Set G), ν.IsHaarMeasure → IsFundamentalDomain Λ D ν → ν D ≠ ⊤) → ∀ (π : Measure H) (D : Set H), π.IsHaarMeasure → IsFundamentalDomain (Γ.subgroupOf H) D π → π D ≠ ⊤ := by
+theorem GlobalTheory.finiteCovolume_kernel
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
+        (H Γ Λ : Subgroup G) (s : G → ℝ) (c : ℝ → G),
+      Continuous s → (∀ g h, s (g * h) = s g + s h) → Continuous c → (∀ x y, c (x + y) = c x * c y)
+        → (∀ t g, c t * g = g * c t) → (∀ t, s (c t) = t) → (∀ g, g ∈ H ↔ s g = 0) → Γ ≤ H
+        → Λ = Γ ⊔ Subgroup.zpowers (c 1) → DiscreteTopology Λ
+        → (∀ (ν : Measure G) (D : Set G), ν.IsHaarMeasure → IsFundamentalDomain Λ D ν → ν D ≠ ⊤)
+        → ∀ (π : Measure H) (D : Set H),
+          π.IsHaarMeasure → IsFundamentalDomain (Γ.subgroupOf H) D π → π D ≠ ⊤ := by
   intro G _ _ _ _ _ _ _ _ H Γ Λ s c hs hsa hc hca hcc hsc hH hΓ hΛ _hdisc hfin π D hπ hD
   have hcl : IsClosed (H : Set G) := by
     have : (H : Set G) = s ⁻¹' {0} := by ext g; exact hH g
-    rw [this]; exact isClosed_singleton.preimage hs
+    rw [this]
+    exact isClosed_singleton.preimage hs
   haveI : LocallyCompactSpace H := hcl.locallyCompactSpace
   haveI : SigmaCompactSpace H := hcl.sigmaCompactSpace
   haveI : SigmaFinite π := inferInstance
@@ -113,14 +124,19 @@ theorem GlobalTheory.finiteCovolume_kernel : ∀ (G : Type) [Group G] [Topologic
   set S : Set (H × ℝ) := D ×ˢ Set.Ico (0:ℝ) 1 with hS
   set D' : Set G := φ.symm ⁻¹' S with hD'
   have hφD' : φ ⁻¹' D' = S := by ext p; simp [hD']
-  have hsub : ∀ (l : Λ) (γ : G) (hγ : γ ∈ Γ) (n : ℤ), (l : G) = γ * c n → ∀ p : H × ℝ,
-      φ p ∈ l • D' → (⟨γ, hΓ hγ⟩ : H)⁻¹ * p.1 ∈ D ∧ ((-n : ℤ) : ℝ) + p.2 ∈ Set.Ico (0:ℝ) 1 := by
+  have hsub
+      : ∀ (l : Λ) (γ : G) (hγ : γ ∈ Γ) (n : ℤ),
+        (l : G) = γ * c n
+          → ∀ p : H × ℝ,
+            φ p ∈ l • D'
+              → (⟨γ, hΓ hγ⟩ : H)⁻¹ * p.1 ∈ D ∧ ((-n : ℤ) : ℝ) + p.2 ∈ Set.Ico (0 : ℝ) 1 := by
     intro l γ hγ n e p hp
     rw [Set.mem_smul_set_iff_inv_smul_mem] at hp
     have hx : l⁻¹ • φ p = φ ((⟨γ, hΓ hγ⟩ : H)⁻¹ * p.1, ((-n : ℤ) : ℝ) + p.2) := by
       rw [← hmulφ, Subgroup.smul_def, smul_eq_mul]
       congr 1
-      simp only [Subgroup.coe_inv, e, mul_inv_rev, GlobalTheory.KernelCovolume.c_neg hca, Int.cast_neg]
+      simp only [Subgroup.coe_inv, e, mul_inv_rev, GlobalTheory.KernelCovolume.c_neg hca,
+        Int.cast_neg]
       exact hcc _ _
     rw [hx] at hp
     simpa [hD', hS] using hp
@@ -133,12 +149,11 @@ theorem GlobalTheory.finiteCovolume_kernel : ∀ (G : Type) [Group G] [Topologic
       filter_upwards [Measure.quasiMeasurePreserving_fst.ae hD.ae_covers] with p hp
       obtain ⟨γ, hγ⟩ := hp
       have hγΓ : ((γ : H) : G) ∈ Γ := Subgroup.mem_subgroupOf.1 γ.2
-      refine ⟨⟨((γ : H) : G) * c ((-⌊p.2⌋ : ℤ) : ℝ), hmemΛ _ hγΓ _⟩, ?_⟩
+      refine ⟨⟨((γ : H) : G) * c ((- ⌊p.2⌋ : ℤ) : ℝ), hmemΛ _ hγΓ _⟩, ?_⟩
       rw [Subgroup.smul_def, smul_eq_mul]
       show _ ∈ φ.symm ⁻¹' S
       rw [Set.mem_preimage, show (φ.toMeasurableEquiv p) = φ p from rfl, hmulφ, φ.symm_apply_apply]
-      have hfr : ((-⌊p.2⌋ : ℤ) : ℝ) + p.2 = Int.fract p.2 := by
-        rw [Int.cast_neg, Int.fract]; ring
+      have hfr : ((- ⌊p.2⌋ : ℤ) : ℝ) + p.2 = Int.fract p.2 := by rw [Int.cast_neg, Int.fract]; ring
       rw [hfr]
       exact Set.mk_mem_prod hγ ⟨Int.fract_nonneg _, Int.fract_lt_one _⟩
     · intro l1 l2 hne
@@ -148,8 +163,7 @@ theorem GlobalTheory.finiteCovolume_kernel : ∀ (G : Type) [Group G] [Topologic
       rw [hνapp]
       by_cases hn : n1 = n2
       · subst hn
-        have hγne : γ1 ≠ γ2 := by
-          rintro rfl; exact hne (Subtype.ext (e1.trans e2.symm))
+        have hγne : γ1 ≠ γ2 := by rintro rfl; exact hne (Subtype.ext (e1.trans e2.symm))
         let g1 : Γ.subgroupOf H := ⟨⟨γ1, hΓ hγ1⟩, Subgroup.mem_subgroupOf.2 hγ1⟩
         let g2 : Γ.subgroupOf H := ⟨⟨γ2, hΓ hγ2⟩, Subgroup.mem_subgroupOf.2 hγ2⟩
         have hg : g1 ≠ g2 := fun h => hγne (congrArg (fun x : Γ.subgroupOf H => ((x : H) : G)) h)

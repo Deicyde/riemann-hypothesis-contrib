@@ -4,23 +4,21 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.NoSmallSubgroupsNormedAlgebra.step {A : Type} [NormedRing A] [NormedAlgebra ℝ A] (a : A)
-    (h : ‖a - 1‖ ≤ (1 / 2 : ℝ)) : ‖a - 1‖ ≤ (2 / 3 : ℝ) * ‖a * a - 1‖ := by
-  have e : (2 : ℝ) • (a - 1) = (a * a - 1) - (a - 1) * (a - 1) := by
-    rw [two_smul]; noncomm_ring
-  have h1 : ‖(2 : ℝ) • (a - 1)‖ = 2 * ‖a - 1‖ := by
-    rw [norm_smul]; simp
+private theorem UpperTheory.Reformulated.B.NoSmallSubgroupsNormedAlgebra.step
+    {A : Type} [NormedRing A] [NormedAlgebra ℝ A] (a : A) (h : ‖a - 1‖ ≤ (1 / 2 : ℝ))
+    : ‖a - 1‖ ≤ (2 / 3 : ℝ) * ‖a * a - 1‖ := by
+  have e : (2 : ℝ) • (a - 1) = (a * a - 1) - (a - 1) * (a - 1) := by rw [two_smul]; noncomm_ring
+  have h1 : ‖(2 : ℝ) • (a - 1)‖ = 2 * ‖a - 1‖ := by rw [norm_smul]; simp
   have h2 : ‖(a * a - 1) - (a - 1) * (a - 1)‖ ≤ ‖a * a - 1‖ + ‖a - 1‖ * ‖a - 1‖ :=
     (norm_sub_le _ _).trans (by gcongr; exact norm_mul_le _ _)
   rw [← e, h1] at h2
-  have h3 : ‖a - 1‖ * ‖a - 1‖ ≤ ‖a - 1‖ * (1 / 2) :=
-    mul_le_mul_of_nonneg_left h (norm_nonneg _)
+  have h3 : ‖a - 1‖ * ‖a - 1‖ ≤ ‖a - 1‖ * (1 / 2) := mul_le_mul_of_nonneg_left h (norm_nonneg _)
   linarith
 
-theorem UpperTheory.Reformulated.B.NoSmallSubgroupsNormedAlgebra.nss :
-    ∀ {G A : Type} [inst : Group G]
-    [inst_1 : NormedRing A] [NormedAlgebra ℝ A] (ρ : G →* A) (H : Subgroup G),
-    (∀ g ∈ H, ‖(ρ : G → A) g - (1 : A)‖ ≤ (1 / 2 : ℝ)) → ∀ g ∈ H, (ρ : G → A) g = (1 : A) := by
+theorem UpperTheory.Reformulated.B.NoSmallSubgroupsNormedAlgebra.nss
+    : ∀ {G A : Type} [inst : Group G] [inst_1 : NormedRing A] [NormedAlgebra ℝ A] (ρ : G →* A)
+        (H : Subgroup G),
+      (∀ g ∈ H, ‖(ρ : G → A) g - (1 : A)‖ ≤ (1 / 2 : ℝ)) → ∀ g ∈ H, (ρ : G → A) g = (1 : A) := by
   intro G A _ _ _ ρ H h
   have key : ∀ n : ℕ, ∀ g ∈ H, ‖ρ g - 1‖ ≤ (2 / 3 : ℝ) ^ n := by
     intro n

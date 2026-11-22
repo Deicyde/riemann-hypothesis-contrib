@@ -18,8 +18,7 @@ private lemma natDvd_of_eq_mul {F : Type} [Field F] [NumberField F] {n m : ℕ} 
     ⟨_, hn.symm⟩
   exact Int.natCast_dvd_natCast.1 ((Int.pow_dvd_pow_iff hd).1 hdvd)
 
-theorem UpperTheory.exists_number_field_point_of_generic :
-    GenEx → NumEx := by
+theorem UpperTheory.exists_number_field_point_of_generic : GenEx → NumEx := by
   intro hG p _ D E _ _ gb w q _ r 𝔴 𝔫 S N hN
   refine ⟨fun hmem => ?_, fun c a t h => ?_⟩
   · rw [S.lev] at hmem

@@ -11,9 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Uniform
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -22,8 +25,43 @@ open GlobalTheory.Poinc.Eq8 GlobalTheory.Poinc.Sep.Spz Classical
 
 namespace GlobalTheory.Poinc.Sep.Spz
 
-theorem torAt_of_closedPoint : ∀ (B : Scheme.{0}) (H : Over B) [GrpObj H] (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], GlobalTheory.Mum.Base V → ∀ (G : Over (Sp V)) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G → ∀ (D : DegData V (maximalIdeal V)) (A : PolAV (Sp (FractionRing V))) (U : Unif (maximalIdeal V) D A G) (ξ : Sp V ⟶ B) (β : G.left ⟶ H.left), IsGrpPullback G H ξ β → ∀ (σ : Sp V ⟶ H.left), σ ≫ H.hom = ξ → ∀ (k : ℕ) (w : V), 1 ≤ k → IsUnit (k : V) → w ^ k = 1 → ∀ (F : Type) [Field F] [IsAlgClosed F] [Algebra (FractionRing V) F] (c : D.toPre.X →+ ℤ) (x : TFK (R := V) F ⟶ A.A), x ^ k = 1 → x.left ≫ genMap U ≫ β = spMap (algebraMap (FractionRing V) F) ≫ jK V ≫ σ → ∀ (κ : Type) [Field κ] (b : V →+* κ) (hb : ∀ y ∈ maximalIdeal V ^ (0 + 1), b y = 0) (Gκ : Over (Sp κ)) [GrpObj Gκ] (m : Gκ.left ⟶ G.left) (hm : IsGrpPullback Gκ G (spMap b) m) (τ : Multiplicative D.toPre.X →* κˣ), (∀ χ, (τ (Multiplicative.ofAdd χ) : κ) = b w ^ c χ) → ∀ (z : Over.mk (spMap (RingHom.id κ)) ⟶ splitTorus (Sp κ) D.toPre.X), (∀ χ, GlobalTheory.UU.chV z χ = unitOn (τ (Multiplicative.ofAdd χ))) → spMap b ≫ σ = (z ≫ GlobalTheory.TorusPart.gtTorus (U.gt 0) hb hm).left ≫ m ≫ β → TorAt U F k (algebraMap (FractionRing V) F (algebraMap V (FractionRing V) w)) c x := by
-  intro B H _ V _ _ _ hV G _ _ hG D A U ξ β hβ σ hσ k w hk hkV hw F _ _ _ c x hx hxσ κ _ b hb Gκ _ m hm τ hτ z hz hbσ
+theorem torAt_of_closedPoint
+    : ∀ (B : Scheme.{0}) (H : Over B) [GrpObj H] (V : Type) [CommRing V] [IsDomain V]
+        [IsLocalRing V],
+      GlobalTheory.Mum.Base V
+        → ∀ (G : Over (Sp V)) [GrpObj G] [IsCommMonObj G],
+          IsSemiAbelian G
+            → ∀ (D : DegData V (maximalIdeal V)) (A : PolAV (Sp (FractionRing V)))
+                (U : Unif (maximalIdeal V) D A G) (ξ : Sp V ⟶ B) (β : G.left ⟶ H.left),
+              IsGrpPullback G H ξ β
+                → ∀ (σ : Sp V ⟶ H.left),
+                  σ ≫ H.hom = ξ
+                    → ∀ (k : ℕ) (w : V),
+                      1 ≤ k → IsUnit (k : V) → w ^ k = 1
+                        → ∀ (F : Type) [Field F] [IsAlgClosed F] [Algebra (FractionRing V) F]
+                            (c : D.toPre.X →+ ℤ) (x : TFK (R := V) F ⟶ A.A),
+                          x ^ k = 1
+                            → x.left ≫ genMap U ≫ β
+                              = spMap (algebraMap (FractionRing V) F) ≫ jK V ≫ σ
+                            → ∀ (κ : Type) [Field κ] (b : V →+* κ)
+                                (hb : ∀ y ∈ maximalIdeal V ^ (0 + 1), b y = 0) (Gκ : Over (Sp κ))
+                                [GrpObj Gκ] (m : Gκ.left ⟶ G.left)
+                                (hm : IsGrpPullback Gκ G (spMap b) m)
+                                (τ : Multiplicative D.toPre.X →* κˣ),
+                              (∀ χ, (τ (Multiplicative.ofAdd χ) : κ) = b w ^ c χ)
+                                → ∀ (z
+                                    : Over.mk (spMap (RingHom.id κ)) ⟶ splitTorus (Sp κ) D.toPre.X),
+                                  (∀ χ,
+                                      GlobalTheory.UU.chV z χ = unitOn (τ (Multiplicative.ofAdd χ)))
+                                    → spMap b ≫ σ
+                                      = (z ≫ GlobalTheory.TorusPart.gtTorus (U.gt 0) hb hm).left ≫ m
+                                        ≫ β
+                                    → TorAt U F k
+                                      (algebraMap (FractionRing V) F
+                                        (algebraMap V (FractionRing V) w))
+                                      c x := by
+  intro B H _ V _ _ _ hV G _ _ hG D A U ξ β hβ σ hσ k w hk hkV hw F _ _ _ c x hx hxσ κ _ b hb Gκ _ m
+    hm τ hτ z hz hbσ
   haveI : CharZero V := hV.2
   have hid : spMap (RingHom.id V) = 𝟙 (Sp V) := Spec.map_id _
   let σ₀ : Sp V ⟶ G.left := hβ.1.lift σ (𝟙 _) (hσ.trans (Category.id_comp _).symm)
@@ -34,16 +72,23 @@ theorem torAt_of_closedPoint : ∀ (B : Scheme.{0}) (H : Over B) [GrpObj H] (V :
   have hwu : IsUnit w := IsUnit.of_pow_eq_one hw (by omega)
   obtain ⟨u, rfl⟩ := hwu
   have hu : u ^ k = 1 := Units.ext (by simpa using hw)
-  let τV : Multiplicative D.toPre.X →* Vˣ := (zpowersHom Vˣ u).comp (AddMonoidHom.toMultiplicative c)
+  let τV : Multiplicative D.toPre.X →* Vˣ :=
+    (zpowersHom Vˣ u).comp (AddMonoidHom.toMultiplicative c)
   have hτV' : ∀ χ, τV χ = u ^ c (Multiplicative.toAdd χ) := fun χ => rfl
-  have hτV : τV ^ k = 1 := MonoidHom.ext fun χ => by
-    rw [MonoidHom.pow_apply, hτV', ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hu, one_zpow]; rfl
-  have hval : ∀ (L : Type) [Field L] (f : V →+* L) (n : ℤ), f ((u ^ n : Vˣ) : V) = f u ^ n := fun L _ f n => by
+  have hτV : τV ^ k = 1 :=
+    MonoidHom.ext fun χ => by
+      rw [MonoidHom.pow_apply, hτV', ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast,
+        hu, one_zpow]
+      rfl
+  have hval
+      : ∀ (L : Type) [Field L] (f : V →+* L) (n : ℤ),
+        f ((u ^ n : Vˣ) : V) = f u ^ n := fun L _ f n => by
     have := congrArg Units.val (map_zpow (Units.map (f : V →* L)) u n)
     rw [Units.val_zpow_eq_zpow_val] at this
     exact this
   let a : V →+* F := (algebraMap (FractionRing V) F).comp (algebraMap V (FractionRing V))
-  have ha : spMap a = spMap (algebraMap (FractionRing V) F) ≫ jK V := GlobalTheory.ToricTorsionSec.spMap_comp _ _
+  have ha : spMap a = spMap (algebraMap (FractionRing V) F) ≫ jK V :=
+    GlobalTheory.ToricTorsionSec.spMap_comp _ _
   have hainj : Function.Injective a :=
     (algebraMap (FractionRing V) F).injective.comp (IsFractionRing.injective V (FractionRing V))
   haveI := U.gen_hom
@@ -54,7 +99,8 @@ theorem torAt_of_closedPoint : ∀ (B : Scheme.{0}) (H : Over B) [GrpObj H] (V :
   have hp : IsGrpPullback A.A G (jK V) (genMap U) := (hp₁.comp hp₂).congr (Category.id_comp _) rfl
   obtain ⟨e, he⟩ := GlobalTheory.LiePull.exists_pushEquiv hp (TFK (R := V) F) (spMap a) ha
   let ρ : Over.mk (spMap a) ⟶ Over.mk (spMap (RingHom.id V)) :=
-    Over.homMk (spMap a) (by show spMap a ≫ spMap (RingHom.id V) = spMap a; rw [hid, Category.comp_id])
+    Over.homMk (spMap a)
+      (by show spMap a ≫ spMap (RingHom.id V) = spMap a; rw [hid, Category.comp_id])
   have hex : e x = ρ ≫ σ₁ := by
     refine Over.OverMorphism.ext (hβ.1.hom_ext ?_ ((Over.w _).trans (Over.w _).symm))
     rw [he]
@@ -72,17 +118,22 @@ theorem torAt_of_closedPoint : ∀ (B : Scheme.{0}) (H : Over B) [GrpObj H] (V :
     refine Over.OverMorphism.ext (ext_of_isDominant_of_isSeparated G.hom
       ((Over.w _).trans (Over.w _).symm) (spMap a) ?_)
     exact congrArg (·.left) h1
-  have hbl : IsLocalHom b := ⟨fun y hy => by
-    by_contra hn
-    rw [hb y (by simpa using (mem_maximalIdeal y).2 hn)] at hy
-    exact not_isUnit_zero hy⟩
+  have hbl : IsLocalHom b :=
+    ⟨fun y hy => by
+      by_contra hn
+      rw [hb y (by simpa using (mem_maximalIdeal y).2 hn)] at hy
+      exact not_isUnit_zero hy⟩
   have hτb : ∀ χ, (τ χ : κ) = b (τV χ : V) := fun χ => by
     rw [hτV', hval]; exact hτ (Multiplicative.toAdd χ)
-  have hτk : τ ^ k = 1 := MonoidHom.ext fun χ => Units.ext (by
-    rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val, hτb, ← map_pow, ← Units.val_pow_eq_pow_val,
-      ← MonoidHom.pow_apply, hτV]; simp)
+  have hτk : τ ^ k = 1 :=
+    MonoidHom.ext fun χ =>
+      Units.ext (by
+        rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val, hτb, ← map_pow,
+          ← Units.val_pow_eq_pow_val, ← MonoidHom.pow_apply, hτV]
+        simp)
   have hσs : σ₁ = s V (RingHom.id V) τV hτV := by
-    refine GlobalTheory.LocalRigid.eq_of_pow_eq_of_closedPoint (Sp V) G hG.smooth V _ k hkV _ _ (by rw [hσ₁, s1]) κ b hbl ?_
+    refine GlobalTheory.LocalRigid.eq_of_pow_eq_of_closedPoint (Sp V) G hG.smooth V _ k hkV _ _
+      (by rw [hσ₁, s1]) κ b hbl ?_
     rw [← s2 V κ (RingHom.id V) b b τV hτV τ hτk rfl hτb,
       s3 κ κ b hb b (RingHom.id κ) Gκ m hm τ hτk z rfl hz]
     refine hβ.1.hom_ext ?_ ?_
@@ -93,12 +144,14 @@ theorem torAt_of_closedPoint : ∀ (B : Scheme.{0}) (H : Over B) [GrpObj H] (V :
         ← s3 κ κ b hb b (RingHom.id κ) Gκ m hm τ hτk z rfl hz]
       exact (Over.w (s κ b τ hτk)).symm
   let τF : Multiplicative D.toPre.X →* Fˣ := (Units.map (a : V →* F)).comp τV
-  have hτF : τF ^ k = 1 := MonoidHom.ext fun χ => by
-    rw [MonoidHom.pow_apply]
-    show Units.map (a : V →* F) (τV χ) ^ k = 1
-    rw [← map_pow, ← MonoidHom.pow_apply, hτV, MonoidHom.one_apply, map_one]
+  have hτF : τF ^ k = 1 :=
+    MonoidHom.ext fun χ => by
+      rw [MonoidHom.pow_apply]
+      show Units.map (a : V →* F) (τV χ) ^ k = 1
+      rw [← map_pow, ← MonoidHom.pow_apply, hτV, MonoidHom.one_apply, map_one]
   obtain ⟨q, hqy, hqt⟩ := GlobalTheory.ZH.TorusPerp.exists_qkPt_tor D.tau_bimult (k := k) τF hτF
-  obtain ⟨f, ⟨i, -⟩, -⟩ := GlobalTheory.TorsionIso.torsion_clause V (maximalIdeal V) hV.1 D A G hG U F k hk
+  obtain ⟨f, ⟨i, -⟩, -⟩ :=
+    GlobalTheory.TorsionIso.torsion_clause V (maximalIdeal V) hV.1 D A G hG U F k hk
   have hq := (i q _).2 rfl
   have hxq : x = f q := by
     apply e.injective

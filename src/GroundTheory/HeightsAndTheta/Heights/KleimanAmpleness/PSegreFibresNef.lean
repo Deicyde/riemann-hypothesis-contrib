@@ -20,19 +20,26 @@ open GroundTheory.Heights₂.Heights.NumbersDVR (MRing IsMultiProjPrime intNum)
 open GroundTheory.Heights₂.Heights.FieldNumbers (relDim)
 open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH (mIdealOver)
 
-theorem segreFibresNef_of_map (hA : SegreLiftComap.Statement) (hB : SegreLiftPrime.Statement)
-    (hC : SegreLiftRelDim.Statement) (hN : SegreLiftIntNum.Statement)
-    (hD : SegreFibreIdeal.Statement) (O : Type) [CommRing O] (Ω : Type) [Field Ω] [Algebra O Ω]
-    (F : Type) [Field F] (φ : O →+* F) (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (y : (Σ k, ι k) → Ω) (β : K → ℤ) :
-    IndefiniteRowSideFullHecke.Kleiman2.IsNefIdeal F ((mIdealOver O (segreJoin y)).map (MvPolynomial.map φ))
-                              (IndefiniteRowSideFullHecke.Kleiman2.pullDeg β) ↔
-      IndefiniteRowSideFullHecke.Kleiman2.IsNefIdeal F ((mIdealOver O y).map (MvPolynomial.map φ)) β := by
+theorem segreFibresNef_of_map
+    (hA : SegreLiftComap.Statement) (hB : SegreLiftPrime.Statement) (hC : SegreLiftRelDim.Statement)
+    (hN : SegreLiftIntNum.Statement) (hD : SegreFibreIdeal.Statement)
+    (O : Type) [CommRing O]
+    (Ω : Type) [Field Ω] [Algebra O Ω]
+    (F : Type) [Field F]
+    (φ : O →+* F)
+    (K : Type) [Fintype K] [DecidableEq K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    (y : (Σ k, ι k) → Ω) (β : K → ℤ)
+    : IndefiniteRowSideFullHecke.Kleiman2.IsNefIdeal F
+        ((mIdealOver O (segreJoin y)).map (MvPolynomial.map φ))
+        (IndefiniteRowSideFullHecke.Kleiman2.pullDeg β)
+      ↔ IndefiniteRowSideFullHecke.Kleiman2.IsNefIdeal F ((mIdealOver O y).map (MvPolynomial.map φ))
+        β := by
   obtain ⟨hrel, hle, hlift⟩ := hD O Ω F φ K ι y
   constructor
   · intro h W hW hPW hdim
-    have hpos := h (segreLift ι F W) (hB F K ι W hW) (hlift W hPW)
-      (by rw [hC F K ι W hW]; exact hdim)
+    have hpos :=
+      h (segreLift ι F W) (hB F K ι W hW) (hlift W hPW) (by rw [hC F K ι W hW]; exact hdim)
     rwa [hN F K ι W hW β] at hpos
   · intro h W' hW' hPW' hdim
     obtain ⟨hWp, heq⟩ := hA F K ι W' hW' fun g hg => hPW' (hrel hg)

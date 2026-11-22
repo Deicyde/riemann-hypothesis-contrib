@@ -11,7 +11,14 @@ namespace GlobalTheory.Nef.PathJet
 
 open PowerSeries
 
-theorem firstOrder_isJet : ∀ (A B R : Type) [CommRing A] [CommRing B] [CommRing R] (π : B →+* A) (ε : A →+* B) (m : A →+* A) (β : B →+* R) (δ : A →+ R), ε.comp π = RingHom.id B → m.comp π = π → ε.comp m = ε → (∀ f ∈ RingHom.ker ε, m f - 2 * f ∈ RingHom.ker ε ^ 2) → (∀ f g, δ (f * g) = β (ε f) * δ g + β (ε g) * δ f) → (∀ a, δ (π a) = 0) → GlobalTheory.Nef.PathJet.IsJet π ε m β δ 2 (fun f => PowerSeries.C (β (ε f)) + PowerSeries.C (δ f) * PowerSeries.X) := by
+theorem firstOrder_isJet
+    : ∀ (A B R : Type) [CommRing A] [CommRing B] [CommRing R] (π : B →+* A) (ε : A →+* B)
+        (m : A →+* A) (β : B →+* R) (δ : A →+ R),
+      ε.comp π = RingHom.id B → m.comp π = π → ε.comp m = ε
+        → (∀ f ∈ RingHom.ker ε, m f - 2 * f ∈ RingHom.ker ε ^ 2)
+        → (∀ f g, δ (f * g) = β (ε f) * δ g + β (ε g) * δ f) → (∀ a, δ (π a) = 0)
+        → GlobalTheory.Nef.PathJet.IsJet π ε m β δ 2
+          (fun f => PowerSeries.C (β (ε f)) + PowerSeries.C (δ f) * PowerSeries.X) := by
   intro A B R _ _ _ π ε m β δ hεπ hmπ hεm hm2 hδ hδπ
   have hεπ' : ∀ b, ε (π b) = b := fun b => by rw [← RingHom.comp_apply, hεπ, RingHom.id_apply]
   have hεm' : ∀ f, ε (m f) = ε f := fun f => by rw [← RingHom.comp_apply, hεm]
@@ -20,8 +27,7 @@ theorem firstOrder_isJet : ∀ (A B R : Type) [CommRing A] [CommRing B] [CommRin
     simp only [mul_one, map_one, one_mul] at h
     have : δ 1 + δ 1 = δ 1 + 0 := by rw [add_zero]; exact h.symm
     exact add_left_cancel this
-  have hdm : ∀ f, δ (m f) = 2 * δ f :=
-    deriv_comp_m π ε m β δ hεπ hmπ hm2 hδ hδπ
+  have hdm : ∀ f, δ (m f) = 2 * δ f := deriv_comp_m π ε m β δ hεπ hmπ hm2 hδ hδπ
   refine ⟨⟨?_, ?_, ?_, ?_⟩, ?_, ?_, ?_⟩
   · intro f g
     refine ⟨C (-(δ f * δ g)), ?_⟩

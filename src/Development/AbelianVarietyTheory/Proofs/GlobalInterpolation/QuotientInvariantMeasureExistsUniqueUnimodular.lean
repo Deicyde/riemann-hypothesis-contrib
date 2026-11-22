@@ -11,14 +11,17 @@ open scoped ENNReal
 
 namespace GlobalTheory.Proof.quotientInvariantMeasure_exists_unique_unimodular
 
-theorem modularCharacter_eq_one {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [MeasurableSpace G] [BorelSpace G] (hG : IsUnimodular G) (g : G) :
-    Measure.modularCharacter g = 1 := by
+theorem modularCharacter_eq_one
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [MeasurableSpace G] [BorelSpace G]
+    (hG : IsUnimodular G) (g : G)
+    : Measure.modularCharacter g = 1 := by
   haveI := hG Measure.haar inferInstance
   change Measure.modularCharacterFun g = 1
   rw [Measure.modularCharacterFun_eq_haarScalarFactor (Measure.haar : Measure G) g]
-  have key : ∀ (μ' : Measure G) [IsFiniteMeasureOnCompacts μ'] [μ'.IsMulLeftInvariant],
-      μ' = Measure.haar → Measure.haarScalarFactor μ' (Measure.haar : Measure G) = 1 := by
+  have key
+      : ∀ (μ' : Measure G) [IsFiniteMeasureOnCompacts μ'] [μ'.IsMulLeftInvariant],
+        μ' = Measure.haar → Measure.haarScalarFactor μ' (Measure.haar : Measure G) = 1 := by
     intro μ' _ _ h
     subst h
     exact Measure.haarScalarFactor_self _

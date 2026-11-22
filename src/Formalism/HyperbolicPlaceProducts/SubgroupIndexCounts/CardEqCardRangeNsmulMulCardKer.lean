@@ -16,8 +16,7 @@ theorem card_eq_card_range_nsmul_mul_card_ker : Formalism.SLP.TorsionIndexEq := 
 
 theorem card_range_nsmul_mul_card_le : Formalism.SLP.TorsionIndex := by
   intro A _ _ g K hK
-  have hle : K ≤ (nsmulAddMonoidHom g : A →+ A).ker := fun x hx => by
-    simpa using hK x hx
+  have hle : K ≤ (nsmulAddMonoidHom g : A →+ A).ker := fun x hx => by simpa using hK x hx
   rw [card_eq_card_range_nsmul_mul_card_ker A g]
   exact Nat.mul_le_mul_left _ (AddSubgroup.card_le_of_le hle)
 

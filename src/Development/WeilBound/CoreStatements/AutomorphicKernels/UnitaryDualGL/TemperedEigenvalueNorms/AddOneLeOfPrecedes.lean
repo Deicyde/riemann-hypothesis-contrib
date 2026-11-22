@@ -7,7 +7,8 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.UnitaryDua
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace PositivityTheory.UdReth2
 
@@ -15,8 +16,10 @@ section Local
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem add_one_le_of_precedes (Δ Δ' : Segment k) (hΔ : IsCentred Δ) (hΔ' : IsCentred Δ') (x y : ℝ)
-    (hP : (Δ.nu x).Precedes (Δ'.nu y)) : x + 1 ≤ y := by
+theorem add_one_le_of_precedes
+    (Δ Δ' : Segment k) (hΔ : IsCentred Δ) (hΔ' : IsCentred Δ')
+    (x y : ℝ) (hP : (Δ.nu x).Precedes (Δ'.nu y))
+    : x + 1 ≤ y := by
   obtain ⟨⟨-, -, hnsub⟩, j, hj, hfirst⟩ := hP
   have hf : Δ'.first.nu (y : ℂ) = (Δ.first.nu (x : ℂ)).nu (j : ℂ) := hfirst
   have hρ' : Δ'.first = Δ.first.nu (((x + j - y : ℝ)) : ℂ) := by

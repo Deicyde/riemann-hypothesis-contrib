@@ -9,4 +9,5 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.QmSkip
 @[expose] public section
 
 theorem quantum_minor_border_full : PI.QmBorderFull :=
-  PI.qmBorderFull_of quantum_minor_border_es quantum_minor_column_expansion quantum_minor_row_expansion quantum_minor_skip
+  PI.qmBorderFull_of quantum_minor_border_es quantum_minor_column_expansion
+    quantum_minor_row_expansion quantum_minor_skip

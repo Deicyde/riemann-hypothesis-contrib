@@ -50,8 +50,11 @@ lemma dslowk_lowK_eq {n : ℕ} (ε : Fin n → Bool) (lam : Fin n → ℝ) (a : 
 theorem low_k_integrable_holds : LowKInt := by
   intro n ε lam h a
   obtain ⟨m, hm⟩ := h a
-  refine ⟨m + n - 1 - a - ((univ.filter fun b => a < b ∧ ε b = ε a).card : ℤ) +
-    ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℤ), ?_⟩
+  refine ⟨
+    m + n - 1 - a - ((univ.filter fun b => a < b ∧ ε b = ε a).card : ℤ)
+      + ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℤ),
+    ?_
+  ⟩
   rw [dslowk_lowK_eq]
   unfold rhoC
   push_cast

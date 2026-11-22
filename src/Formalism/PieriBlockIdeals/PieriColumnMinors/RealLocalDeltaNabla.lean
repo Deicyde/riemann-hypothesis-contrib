@@ -14,7 +14,9 @@ noncomputable section
 
 namespace Formalism.CohomologicalDescent.RealLocalDeltaNabla
 
-open Formalism.GradedWeylDivisibility Formalism.UG Formalism.RankGapBounds.JumpSetsAlt Formalism.RankGapBounds.FormsTensorLocalization Formalism.CohomologicalDescent.LA Formalism.CohomologicalDescent.SL2BinomialLattices
+open Formalism.GradedWeylDivisibility Formalism.UG Formalism.RankGapBounds.JumpSetsAlt
+  Formalism.RankGapBounds.FormsTensorLocalization Formalism.CohomologicalDescent.LA
+  Formalism.CohomologicalDescent.SL2BinomialLattices
 
 theorem units_of_local_holds : UnitsOfLocal := by
   intro O _ _ l hl hlO m hm
@@ -35,9 +37,12 @@ theorem units_of_local_holds : UnitsOfLocal := by
 
 section core
 
-variable (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] [CharZero O] (l : ℕ) (hl : l.Prime)
-  (hlO : ¬ IsUnit (l : O)) (ι : Type) [Fintype ι] (r n : ι → ℕ) (hn : ∀ i, n i ≤ r i)
-  (ν : ∀ i, Fin (n i) → ℕ) (e : ι → ℕ) (he : ∀ i, InclZ (r i) (n i) (hn i) (ν i) l (e i))
+variable
+  (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] [CharZero O]
+  (l : ℕ) (hl : l.Prime) (hlO : ¬ IsUnit (l : O))
+  (ι : Type) [Fintype ι]
+  (r n : ι → ℕ) (hn : ∀ i, n i ≤ r i) (ν : ∀ i, Fin (n i) → ℕ)
+  (e : ι → ℕ) (he : ∀ i, InclZ (r i) (n i) (hn i) (ν i) l (e i))
 
 include hl hlO he
 
@@ -51,19 +56,28 @@ theorem delta_lattice_stable_holds : DeltaInStable := by
   intro O _ r n hn ν g x hx
   exact Formalism.UG.P.weyl_module_GL_stable O r n hn ν g _ hx
 
-theorem nablaRep_mem_delta (O : Type) [CommRing O] (ι : Type) (r n : ι → ℕ) (hn : ∀ i, n i ≤ r i)
-    (ν : ∀ i, Fin (n i) → ℕ) (g : ∀ i, Matrix.GeneralLinearGroup (Fin (r i)) O)
-    (x : Nabla O r n ν) (hx : x ∈ Delta O r n hn ν) : nablaRep O r n ν g x ∈ Delta O r n hn ν := by
+theorem nablaRep_mem_delta
+    (O : Type) [CommRing O]
+    (ι : Type) (r n : ι → ℕ) (hn : ∀ i, n i ≤ r i) (ν : ∀ i, Fin (n i) → ℕ)
+    (g : ∀ i, Matrix.GeneralLinearGroup (Fin (r i)) O) (x : Nabla O r n ν)
+    (hx : x ∈ Delta O r n hn ν)
+    : nablaRep O r n ν g x ∈ Delta O r n hn ν := by
   unfold Delta tensSub at hx ⊢
   obtain ⟨z, rfl⟩ := LinearMap.mem_range.mp hx
   clear hx
   induction z using PiTensorProduct.induction_on with
   | smul_tprod c a =>
     rw [map_smul, map_smul, PiTensorProduct.map_tprod, (nabla_rep_tensor_product O ι r n ν g _).1]
-    refine Submodule.smul_mem _ c (LinearMap.mem_range.mpr ⟨PiTensorProduct.tprod O (fun i =>
-      (⟨dualWeylRep O (r i) (n i) (ν i) (g i) (a i),
-        delta_lattice_stable_holds O (r i) (n i) (hn i) (ν i) (g i) _ (a i).2⟩ :
-          deltaIn O (r i) (n i) (hn i) (ν i))), ?_⟩)
+    refine Submodule.smul_mem _ c
+      (LinearMap.mem_range.mpr ⟨
+        PiTensorProduct.tprod O (fun i =>
+          (⟨
+             dualWeylRep O (r i) (n i) (ν i) (g i) (a i),
+             delta_lattice_stable_holds O (r i) (n i) (hn i) (ν i) (g i) _ (a i).2
+           ⟩
+            : deltaIn O (r i) (n i) (hn i) (ν i))),
+        ?_
+      ⟩)
     rw [PiTensorProduct.map_tprod]
     all_goals rfl
   | add x y ihx ihy =>

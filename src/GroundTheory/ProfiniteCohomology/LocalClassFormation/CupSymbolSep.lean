@@ -13,7 +13,8 @@ open IntermediateField GroundTheory.LocalField
 
 section Sep
 
-variable (K Ω : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  (K Ω : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   [Field Ω] [Algebra K Ω] [IsSepClosure K Ω]
 
 noncomputable def brauerInvZOfIsSepClosure : cohomology (galUnitsZ K Ω) 2 →+ QZ :=
@@ -32,10 +33,11 @@ theorem brauerInvZOfIsSepClosure_bijective : Function.Bijective (brauerInvZOfIsS
 
 variable {K Ω}
 
-theorem brauerInvZOfIsSepClosure_galCupClass (χ : Additive Gal(Ω/K) →ₜ+ QZ) (a : Kˣ) (g : Gal(Ω/K))
-    (hg : ∀ (y : Ω) (hy : y ∈ maximalAbelianExtension K Ω),
-      g y = (localArtinMap K Ω a ⟨y, hy⟩ : Ω)) :
-    brauerInvZOfIsSepClosure K Ω (galCupClass K Ω χ a) = χ (Additive.ofMul g) :=
+theorem brauerInvZOfIsSepClosure_galCupClass
+    (χ : Additive Gal(Ω/K) →ₜ+ QZ)
+    (a : Kˣ) (g : Gal(Ω/K))
+    (hg : ∀ (y : Ω) (hy : y ∈ maximalAbelianExtension K Ω), g y = (localArtinMap K Ω a ⟨y, hy⟩ : Ω))
+    : brauerInvZOfIsSepClosure K Ω (galCupClass K Ω χ a) = χ (Additive.ofMul g) :=
   letI := algebraicValuativeRel K Ω
   letI := algebraicTopology K Ω
   haveI := algebraicTopology_isValuativeTopology K Ω

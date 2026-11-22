@@ -14,8 +14,10 @@ open MvPowerSeries Formalism.FG.SolveVAux
 
 variable {E σ τ Y : Type} [CommRing E] [AddCommGroup Y]
 
-private theorem cc_P_mem {w : σ → Y} {w' : τ → Y} {k : σ → MvPowerSeries τ E}
-    (hw : ∀ i, k i ∈ wtPart E w' (w i)) (e : σ →₀ ℕ) : P k e ∈ wtPart E w' (Finsupp.weight w e) := by
+private theorem cc_P_mem
+    {w : σ → Y} {w' : τ → Y} {k : σ → MvPowerSeries τ E} (hw : ∀ i, k i ∈ wtPart E w' (w i))
+    (e : σ →₀ ℕ)
+    : P k e ∈ wtPart E w' (Finsupp.weight w e) := by
   induction e using Finsupp.induction with
   | zero => simpa [P_zero] using one_mem_wtPart E w'
   | single_add i n f _ hn ih =>
@@ -28,9 +30,12 @@ private theorem cc_P_mem {w : σ → Y} {w' : τ → Y} {k : σ → MvPowerSerie
       rw [pow_succ, succ_nsmul]
       exact mul_mem_wtPart E w' ihm (hw i)
 
-private theorem cc_subst_mem [Finite σ] {w : σ → Y} {w' : τ → Y} {k : σ → MvPowerSeries τ E}
-    (hk : ∀ i, Low 1 (k i)) (hw : ∀ i, k i ∈ wtPart E w' (w i)) {j : Y} {g : MvPowerSeries σ E}
-    (hg : g ∈ wtPart E w j) : subst k g ∈ wtPart E w' j := by
+private theorem cc_subst_mem
+    [Finite σ]
+    {w : σ → Y} {w' : τ → Y} {k : σ → MvPowerSeries τ E}
+    (hk : ∀ i, Low 1 (k i)) (hw : ∀ i, k i ∈ wtPart E w' (w i))
+    {j : Y} {g : MvPowerSeries σ E} (hg : g ∈ wtPart E w j)
+    : subst k g ∈ wtPart E w' j := by
   intro n hn
   rw [coeff_subst (hasSubst_of_low hk)]
   refine finsum_eq_zero_of_forall_eq_zero fun e => ?_
@@ -40,8 +45,11 @@ private theorem cc_subst_mem [Finite σ] {w : σ → Y} {w' : τ → Y} {k : σ 
     rw [this, smul_zero]
   · rw [hg e he, zero_smul]
 
-private theorem cc_subst_low [Finite σ] {k : σ → MvPowerSeries τ E} (hk : ∀ i, Low 1 (k i)) {N : ℕ}
-    {g : MvPowerSeries σ E} (hg : Low N g) : Low N (subst k g) := by
+private theorem cc_subst_low
+    [Finite σ]
+    {k : σ → MvPowerSeries τ E} (hk : ∀ i, Low 1 (k i))
+    {N : ℕ} {g : MvPowerSeries σ E} (hg : Low N g)
+    : Low N (subst k g) := by
   intro d hd
   rw [coeff_subst (hasSubst_of_low hk)]
   refine finsum_eq_zero_of_forall_eq_zero fun e => ?_
@@ -51,10 +59,13 @@ private theorem cc_subst_low [Finite σ] {k : σ → MvPowerSeries τ E} (hk : �
     simp only [P] at this
     rw [this, smul_zero]
 
-private theorem cc_lim_mem [Finite σ] {w : σ → Y} {w' : τ → Y} {G : σ → MvPowerSeries τ E}
-    {g : σ → MvPowerSeries σ E} (hG : ∀ j, Low 1 (G j)) (hg : ∀ j, Low 2 (g j))
-    (hGw : ∀ i, G i ∈ wtPart E w' (w i)) (hgw : ∀ i, g i ∈ wtPart E w (w i)) (i : σ) :
-    Formalism.FG.SolveVAux.lim G g i ∈ wtPart E w' (w i) := by
+private theorem cc_lim_mem
+    [Finite σ]
+    {w : σ → Y} {w' : τ → Y} {G : σ → MvPowerSeries τ E} {g : σ → MvPowerSeries σ E}
+    (hG : ∀ j, Low 1 (G j)) (hg : ∀ j, Low 2 (g j)) (hGw : ∀ i, G i ∈ wtPart E w' (w i))
+    (hgw : ∀ i, g i ∈ wtPart E w (w i))
+    (i : σ)
+    : Formalism.FG.SolveVAux.lim G g i ∈ wtPart E w' (w i) := by
   have key : ∀ n, ∀ i, Formalism.FG.SolveVAux.seq G g n i ∈ wtPart E w' (w i) := by
     intro n
     induction n with
@@ -69,8 +80,9 @@ private theorem cc_lim_mem [Finite σ] {w : σ → Y} {w' : τ → Y} {G : σ �
   rw [coeff_lim]
   exact key _ i d hd
 
-private theorem cc_low_two {p : MvPowerSeries σ E} (h0 : constantCoeff p = 0)
-    (h1 : ∀ i, coeff (Finsupp.single i 1) p = 0) : Low 2 p := by
+private theorem cc_low_two
+    {p : MvPowerSeries σ E} (h0 : constantCoeff p = 0) (h1 : ∀ i, coeff (Finsupp.single i 1) p = 0)
+    : Low 2 p := by
   intro d hd
   obtain h | h : Finsupp.degree d = 0 ∨ Finsupp.degree d = 1 := by omega
   · rw [(Finsupp.degree_eq_zero_iff d).mp h]
@@ -78,50 +90,60 @@ private theorem cc_low_two {p : MvPowerSeries σ E} (h0 : constantCoeff p = 0)
   · obtain ⟨i, rfl⟩ := degree_eq_one d h
     exact h1 i
 
-private theorem cc_coeff_X [DecidableEq σ] (i j : σ) :
-    coeff (Finsupp.single i 1) (X j : MvPowerSeries σ E) = if i = j then 1 else 0 := by
+private theorem cc_coeff_X [DecidableEq σ] (i j : σ)
+    : coeff (Finsupp.single i 1) (X j : MvPowerSeries σ E) = if i = j then 1 else 0 := by
   rw [coeff_X]
   by_cases h : i = j
   · simp [h]
   · rw [if_neg h, if_neg]
     exact fun h' => h (Finsupp.single_left_injective one_ne_zero h')
 
-private theorem cc_expand [Fintype σ] (g : MvPowerSeries σ E) :
-    Low 2 (g - (constantCoeff g • 1 + ∑ s, coeff (Finsupp.single s 1) g • X s)) := by
+private theorem cc_expand [Fintype σ] (g : MvPowerSeries σ E)
+    : Low 2 (g - (constantCoeff g • 1 + ∑ s, coeff (Finsupp.single s 1) g • X s)) := by
   classical
   refine cc_low_two (by simp [map_sum]) fun i => ?_
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, cc_coeff_X, coeff_one]
+  simp [map_sum, cc_coeff_X, coeff_one]
 
-private theorem coeff_low_degree_algHom_apply_eq [Fintype σ] (ψ : MvPowerSeries σ E →ₐ[E] MvPowerSeries τ E)
-    (h2 : ∀ f, Low 2 f → Low 2 (ψ f)) (f : MvPowerSeries σ E) (d : τ →₀ ℕ)
-    (hd : Finsupp.degree d < 2) :
-    coeff d (ψ f) = constantCoeff f * coeff d 1 +
-      ∑ s, coeff (Finsupp.single s 1) f * coeff d (ψ (X s)) := by
+private theorem coeff_low_degree_algHom_apply_eq
+    [Fintype σ]
+    (ψ : MvPowerSeries σ E →ₐ[E] MvPowerSeries τ E) (h2 : ∀ f, Low 2 f → Low 2 (ψ f))
+    (f : MvPowerSeries σ E)
+    (d : τ →₀ ℕ) (hd : Finsupp.degree d < 2)
+    : coeff d (ψ f)
+      = constantCoeff f * coeff d 1 + ∑ s, coeff (Finsupp.single s 1) f * coeff d (ψ (X s)) := by
   have hr := h2 _ (cc_expand f) d hd
   simp only [map_sub, sub_eq_zero] at hr
   rw [hr]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_sum, map_smul, map_one, coeff_smul, smul_eq_mul]
+  simp only [map_add (f := _), map_sum, map_smul, map_one, coeff_smul, smul_eq_mul]
 
-private theorem cc_fix [Fintype σ] {w : σ → Y} {w' : τ → Y} {G : σ → MvPowerSeries τ E}
-    {g : σ → MvPowerSeries σ E} (hG : ∀ j, Low 1 (G j)) (hg : ∀ j, Low 2 (g j))
-    (hGw : ∀ i, G i ∈ wtPart E w' (w i)) (hgw : ∀ i, g i ∈ wtPart E w (w i)) :
-    ∃ ψ : MvPowerSeries σ E →ₐ[E] MvPowerSeries τ E, (∀ j, ∀ f ∈ wtPart E w j, ψ f ∈ wtPart E w' j) ∧
-      (∀ i, ψ (X i) = G i - ψ (g i)) ∧ (∀ f, constantCoeff (ψ f) = constantCoeff f) ∧
-      ∀ f i, coeff (Finsupp.single i 1) (ψ f) =
-        ∑ s, coeff (Finsupp.single s 1) f * coeff (Finsupp.single i 1) (G s) := by
+private theorem cc_fix
+    [Fintype σ]
+    {w : σ → Y} {w' : τ → Y} {G : σ → MvPowerSeries τ E} {g : σ → MvPowerSeries σ E}
+    (hG : ∀ j, Low 1 (G j)) (hg : ∀ j, Low 2 (g j)) (hGw : ∀ i, G i ∈ wtPart E w' (w i))
+    (hgw : ∀ i, g i ∈ wtPart E w (w i))
+    : ∃ ψ : MvPowerSeries σ E →ₐ[E] MvPowerSeries τ E,
+      (∀ j, ∀ f ∈ wtPart E w j, ψ f ∈ wtPart E w' j) ∧ (∀ i, ψ (X i) = G i - ψ (g i))
+        ∧ (∀ f, constantCoeff (ψ f) = constantCoeff f)
+        ∧ ∀ f i,
+          coeff (Finsupp.single i 1) (ψ f)
+            = ∑ s, coeff (Finsupp.single s 1) f * coeff (Finsupp.single i 1) (G s) := by
   classical
   have hk : ∀ i, Low 1 (Formalism.FG.SolveVAux.lim G g i) := lim_low hG hg
   have ha := hasSubst_of_low hk
-  obtain ⟨ψ, hψ⟩ : ∃ ψ : MvPowerSeries σ E →ₐ[E] MvPowerSeries τ E,
-      ⇑ψ = subst (Formalism.FG.SolveVAux.lim G g) := ⟨substAlgHom ha, coe_substAlgHom ha⟩
+  obtain ⟨ψ, hψ⟩
+      : ∃ ψ : MvPowerSeries σ E →ₐ[E] MvPowerSeries τ E,
+        ⇑ψ = subst (Formalism.FG.SolveVAux.lim G g) :=
+    ⟨substAlgHom ha, coe_substAlgHom ha⟩
   have h2 : ∀ f, Low 2 f → Low 2 (ψ f) := fun f hf => by
     rw [hψ]
     exact cc_subst_low hk hf
   have h0 : ∀ s, coeff 0 (Formalism.FG.SolveVAux.lim G g s) = 0 := fun s => hk s 0 (by simp)
-  have h1 : ∀ s i, coeff (Finsupp.single i 1) (Formalism.FG.SolveVAux.lim G g s) =
-      coeff (Finsupp.single i 1) (G s) := by
+  have h1
+      : ∀ s i,
+        coeff (Finsupp.single i 1) (Formalism.FG.SolveVAux.lim G g s)
+          = coeff (Finsupp.single i 1) (G s) := by
     intro s i
     rw [← lim_fixed hG hg s]
     simp only [Formalism.FG.SolveVAux.phi, map_sub]
@@ -140,112 +162,123 @@ private theorem cc_fix [Fintype σ] {w : σ → Y} {w' : τ → Y} {G : σ → M
     rw [coeff_low_degree_algHom_apply_eq _ h2 f _ (by simp)]
     simp [hψ, subst_X ha, h1, coeff_one]
 
-private theorem cc_ift {κ τ' : Type} [Fintype σ] [Fintype κ] [Fintype τ'] [DecidableEq κ] (w : σ → Y)
-    (e : κ ⊕ τ' ≃ σ) (z : κ → MvPowerSeries σ E) (hz : ∀ k, z k ∈ wtPart E w (w (e (.inl k))))
-    (hz0 : ∀ k, constantCoeff (z k) = 0)
-    (hδ : ∀ k k', coeff (Finsupp.single (e (.inl k')) 1) (z k) = if k = k' then 1 else 0) :
-    ∃ ψ : MvPowerSeries σ E →ₐ[E] MvPowerSeries τ' E,
-      (∀ j, ∀ f ∈ wtPart E w j, ψ f ∈ wtPart E (fun i => w (e (.inr i))) j) ∧
-      (∀ k, ψ (z k) = 0) ∧ (∀ f, constantCoeff (ψ f) = constantCoeff f) ∧
-      ∀ f i, coeff (Finsupp.single i 1) (ψ f) = coeff (Finsupp.single (e (.inr i)) 1) f -
-        ∑ k, coeff (Finsupp.single (e (.inl k)) 1) f * coeff (Finsupp.single (e (.inr i)) 1) (z k) := by
-  classical
-  obtain ⟨b, hb⟩ : ∃ b : κ → τ' → E,
-      ∀ k i, b k i = coeff (Finsupp.single (e (.inr i)) 1) (z k) := ⟨_, fun _ _ => rfl⟩
-  obtain ⟨h, hh⟩ : ∃ h : κ → MvPowerSeries σ E,
-      ∀ k, h k = z k - X (e (.inl k)) - ∑ i, b k i • X (e (.inr i)) := ⟨_, fun _ => rfl⟩
-  obtain ⟨G, hGl, hGr⟩ : ∃ G : σ → MvPowerSeries τ' E,
-      (∀ k, G (e (.inl k)) = -∑ i, b k i • (X i : MvPowerSeries τ' E)) ∧
-        ∀ i, G (e (.inr i)) = X i :=
-    ⟨fun s => Sum.elim (fun k => -∑ i, b k i • (X i : MvPowerSeries τ' E)) (fun i => X i) (e.symm s),
-      fun k => by simp, fun i => by simp⟩
-  obtain ⟨g, hgl, hgr⟩ : ∃ g : σ → MvPowerSeries σ E,
-      (∀ k, g (e (.inl k)) = h k) ∧ ∀ i, g (e (.inr i)) = 0 :=
-    ⟨fun s => Sum.elim h (fun _ => 0) (e.symm s), fun k => by simp, fun i => by simp⟩
-  have hbw : ∀ k i, w (e (.inr i)) ≠ w (e (.inl k)) → b k i = 0 := by
-    intro k i hne
-    rw [hb]
-    exact hz k _ (by simpa [Finsupp.weight_single] using hne)
-  have hG : ∀ s, Low 1 (G s) := by
-    intro s
-    obtain ⟨x, rfl⟩ := e.surjective s
-    rcases x with k | i
-    · rw [hGl, low_one_iff]
-      simp
-    · rw [hGr, low_one_iff]
-      simp
-  have hg : ∀ s, Low 2 (g s) := by
-    intro s
-    obtain ⟨x, rfl⟩ := e.surjective s
-    rcases x with k | i
-    · rw [hgl, hh]
-      apply cc_low_two
-      · simp [hz0]
-      · intro t
-        obtain ⟨y, rfl⟩ := e.surjective t
-        rcases y with k' | i'
-        · simp [cc_coeff_X, hδ, eq_comm]
-        · simp [cc_coeff_X, hb]
-    · rw [hgr]
-      exact low_of_zero 2
-  have hGw : ∀ s, G s ∈ wtPart E (fun i => w (e (.inr i))) (w s) := by
-    intro s
-    obtain ⟨x, rfl⟩ := e.surjective s
-    rcases x with k | i
-    · rw [hGl]
-      refine Submodule.neg_mem _ (Submodule.sum_mem _ fun i _ => ?_)
-      by_cases hbi : w (e (.inr i)) = w (e (.inl k))
-      · rw [← hbi]
-        exact Submodule.smul_mem _ _ (X_mem_wtPart E _ i)
-      · rw [hbw k i hbi, zero_smul]
+private theorem cc_ift
+    {κ τ' : Type} [Fintype σ] [Fintype κ] [Fintype τ'] [DecidableEq κ]
+    (w : σ → Y) (e : κ ⊕ τ' ≃ σ) (z : κ → MvPowerSeries σ E)
+    (hz : ∀ k, z k ∈ wtPart E w (w (e (.inl k)))) (hz0 : ∀ k, constantCoeff (z k) = 0)
+    (hδ : ∀ k k', coeff (Finsupp.single (e (.inl k')) 1) (z k) = if k = k' then 1 else 0)
+    : ∃ ψ : MvPowerSeries σ E →ₐ[E] MvPowerSeries τ' E,
+      (∀ j, ∀ f ∈ wtPart E w j, ψ f ∈ wtPart E (fun i => w (e (.inr i))) j) ∧ (∀ k, ψ (z k) = 0)
+        ∧ (∀ f, constantCoeff (ψ f) = constantCoeff f)
+        ∧ ∀ f i,
+          coeff (Finsupp.single i 1) (ψ f)
+            = coeff (Finsupp.single (e (.inr i)) 1) f
+              - ∑ k, coeff (Finsupp.single (e (.inl k)) 1) f * coeff (Finsupp.single (e (.inr i)) 1) (z k) :=
+  by
+    classical
+    obtain ⟨b, hb⟩ : ∃ b : κ → τ' → E, ∀ k i, b k i = coeff (Finsupp.single (e (.inr i)) 1) (z k) :=
+      ⟨_, fun _ _ => rfl⟩
+    obtain ⟨h, hh⟩
+        : ∃ h : κ → MvPowerSeries σ E, ∀ k,
+          h k = z k - X (e (.inl k)) - ∑ i, b k i • X (e (.inr i)) :=
+      ⟨_, fun _ => rfl⟩
+    obtain ⟨G, hGl, hGr⟩
+        : ∃ G : σ → MvPowerSeries τ' E,
+          (∀ k, G (e (.inl k)) = - ∑ i, b k i • (X i : MvPowerSeries τ' E))
+            ∧ ∀ i, G (e (.inr i)) = X i := ⟨
+      fun s =>
+        Sum.elim (fun k => - ∑ i, b k i • (X i : MvPowerSeries τ' E)) (fun i => X i) (e.symm s),
+      fun k => by simp,
+      fun i => by simp
+    ⟩
+    obtain ⟨g, hgl, hgr⟩
+        : ∃ g : σ → MvPowerSeries σ E, (∀ k, g (e (.inl k)) = h k) ∧ ∀ i, g (e (.inr i)) = 0 :=
+      ⟨fun s => Sum.elim h (fun _ => 0) (e.symm s), fun k => by simp, fun i => by simp⟩
+    have hbw : ∀ k i, w (e (.inr i)) ≠ w (e (.inl k)) → b k i = 0 := by
+      intro k i hne
+      rw [hb]
+      exact hz k _ (by simpa [Finsupp.weight_single] using hne)
+    have hG : ∀ s, Low 1 (G s) := by
+      intro s
+      obtain ⟨x, rfl⟩ := e.surjective s
+      rcases x with k | i
+      · rw [hGl, low_one_iff]
+        simp
+      · rw [hGr, low_one_iff]
+        simp
+    have hg : ∀ s, Low 2 (g s) := by
+      intro s
+      obtain ⟨x, rfl⟩ := e.surjective s
+      rcases x with k | i
+      · rw [hgl, hh]
+        apply cc_low_two
+        · simp [hz0]
+        · intro t
+          obtain ⟨y, rfl⟩ := e.surjective t
+          rcases y with k' | i'
+          · simp [cc_coeff_X, hδ, eq_comm]
+          · simp [cc_coeff_X, hb]
+      · rw [hgr]
+        exact low_of_zero 2
+    have hGw : ∀ s, G s ∈ wtPart E (fun i => w (e (.inr i))) (w s) := by
+      intro s
+      obtain ⟨x, rfl⟩ := e.surjective s
+      rcases x with k | i
+      · rw [hGl]
+        refine Submodule.neg_mem _ (Submodule.sum_mem _ fun i _ => ?_)
+        by_cases hbi : w (e (.inr i)) = w (e (.inl k))
+        · rw [← hbi]
+          exact Submodule.smul_mem _ _ (X_mem_wtPart E _ i)
+        · rw [hbw k i hbi, zero_smul]
+          exact Submodule.zero_mem _
+      · rw [hGr]
+        exact X_mem_wtPart E _ i
+    have hgw : ∀ s, g s ∈ wtPart E w (w s) := by
+      intro s
+      obtain ⟨x, rfl⟩ := e.surjective s
+      rcases x with k | i
+      · rw [hgl, hh]
+        refine Submodule.sub_mem _ (Submodule.sub_mem _ (hz k) (X_mem_wtPart E w _))
+          (Submodule.sum_mem _ fun i _ => ?_)
+        by_cases hbi : w (e (.inr i)) = w (e (.inl k))
+        · rw [← hbi]
+          exact Submodule.smul_mem _ _ (X_mem_wtPart E w _)
+        · rw [hbw k i hbi, zero_smul]
+          exact Submodule.zero_mem _
+      · rw [hgr]
         exact Submodule.zero_mem _
-    · rw [hGr]
-      exact X_mem_wtPart E _ i
-  have hgw : ∀ s, g s ∈ wtPart E w (w s) := by
-    intro s
-    obtain ⟨x, rfl⟩ := e.surjective s
-    rcases x with k | i
-    · rw [hgl, hh]
-      refine Submodule.sub_mem _ (Submodule.sub_mem _ (hz k) (X_mem_wtPart E w _))
-        (Submodule.sum_mem _ fun i _ => ?_)
-      by_cases hbi : w (e (.inr i)) = w (e (.inl k))
-      · rw [← hbi]
-        exact Submodule.smul_mem _ _ (X_mem_wtPart E w _)
-      · rw [hbw k i hbi, zero_smul]
-        exact Submodule.zero_mem _
-    · rw [hgr]
-      exact Submodule.zero_mem _
-  obtain ⟨ψ, hψw, hX, hc, hlin⟩ := cc_fix hG hg hGw hgw
-  have hψr : ∀ i, ψ (X (e (.inr i))) = X i := by
-    intro i
-    rw [hX, hGr, hgr, map_zero, sub_zero]
-  have hψl : ∀ k, ψ (X (e (.inl k))) = -∑ i, b k i • (X i : MvPowerSeries τ' E) - ψ (h k) := by
-    intro k
-    rw [hX, hGl, hgl]
-  refine ⟨ψ, hψw, ?_, hc, ?_⟩
-  · intro k
-    have hzk : z k = h k + X (e (.inl k)) + ∑ i, b k i • X (e (.inr i)) := by
-      rw [hh]
+    obtain ⟨ψ, hψw, hX, hc, hlin⟩ := cc_fix hG hg hGw hgw
+    have hψr : ∀ i, ψ (X (e (.inr i))) = X i := by
+      intro i
+      rw [hX, hGr, hgr, map_zero, sub_zero]
+    have hψl : ∀ k, ψ (X (e (.inl k))) = - ∑ i, b k i • (X i : MvPowerSeries τ' E) - ψ (h k) := by
+      intro k
+      rw [hX, hGl, hgl]
+    refine ⟨ψ, hψw, ?_, hc, ?_⟩
+    · intro k
+      have hzk : z k = h k + X (e (.inl k)) + ∑ i, b k i • X (e (.inr i)) := by
+        rw [hh]
+        abel
+      set_option synthInstance.maxHeartbeats 100000 in
+        rw [hzk, map_add (f := _), map_add (f := _), map_sum]
+      simp only [map_smul, hψr, hψl]
       abel
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hzk, map_add (f := _), map_add (f := _), map_sum]
-    simp only [map_smul, hψr, hψl]
-    abel
-  · intro f i
-    rw [hlin, ← Equiv.sum_comp e, Fintype.sum_sum_type]
-    simp [hGl, hGr, cc_coeff_X, hb]
-    ring
+    · intro f i
+      rw [hlin, ← Equiv.sum_comp e, Fintype.sum_sum_type]
+      simp [hGl, hGr, cc_coeff_X, hb]
+      ring
 
 end SlopeTestRemainingChoices
 
-private theorem exists_columns_det_ne_zero_of_rows_linearIndependent {E τ κ : Type} [Field E] [Fintype τ] [Fintype κ] [DecidableEq κ]
-    (l : Matrix κ τ E) (hl : LinearIndependent E l.row) :
-    ∃ s : κ → τ, (l.submatrix id s).det ≠ 0 := by
+private theorem exists_columns_det_ne_zero_of_rows_linearIndependent
+    {E τ κ : Type} [Field E] [Fintype τ] [Fintype κ] [DecidableEq κ]
+    (l : Matrix κ τ E) (hl : LinearIndependent E l.row)
+    : ∃ s : κ → τ, (l.submatrix id s).det ≠ 0 := by
   classical
   have hspan : Submodule.span E (Set.range l.col) = ⊤ := by
     apply Submodule.eq_top_of_finrank_eq
-    rw [← Matrix.rank_eq_finrank_span_cols, Matrix.rank_eq_finrank_span_row, finrank_span_eq_card hl,
-      Module.finrank_fintype_fun_eq_card]
+    rw [← Matrix.rank_eq_finrank_span_cols, Matrix.rank_eq_finrank_span_row,
+      finrank_span_eq_card hl, Module.finrank_fintype_fun_eq_card]
   obtain ⟨ι, a, ha, hsa, hli⟩ := exists_linearIndependent' E l.col
   haveI : Fintype ι := Fintype.ofInjective a ha
   have hcard : Fintype.card ι = Fintype.card κ := by
@@ -258,8 +291,9 @@ private theorem exists_columns_det_ne_zero_of_rows_linearIndependent {E τ κ : 
   rw [Matrix.linearIndependent_cols_iff_isUnit, Matrix.isUnit_iff_isUnit_det] at hli'
   exact hli'.ne_zero
 
-private theorem exists_perm_diag_ne_zero_of_det_ne_zero {E κ : Type} [Field E] [Fintype κ] [DecidableEq κ]
-    (M : Matrix κ κ E) (hM : M.det ≠ 0) : ∃ π : Equiv.Perm κ, ∀ k, M (π k) k ≠ 0 := by
+private theorem exists_perm_diag_ne_zero_of_det_ne_zero
+    {E κ : Type} [Field E] [Fintype κ] [DecidableEq κ] (M : Matrix κ κ E) (hM : M.det ≠ 0)
+    : ∃ π : Equiv.Perm κ, ∀ k, M (π k) k ≠ 0 := by
   by_contra h
   push_neg at h
   apply hM
@@ -268,10 +302,13 @@ private theorem exists_perm_diag_ne_zero_of_det_ne_zero {E κ : Type} [Field E] 
   obtain ⟨k, hk⟩ := h π
   rw [Finset.prod_eq_zero (f := fun i => M (π i) i) (Finset.mem_univ k) hk, smul_zero]
 
-private theorem cc_pivot {E τ κ Y : Type} [Field E] [Fintype τ] [Fintype κ] [DecidableEq κ] (wt : τ → Y) (c : κ → Y)
-    (l : Matrix κ τ E) (hl : LinearIndependent E l.row) (hw : ∀ k i, wt i ≠ c k → l k i = 0) :
-    ∃ (s : κ → τ) (N : Matrix κ κ E), Function.Injective s ∧ (∀ k, wt (s k) = c k) ∧
-      (∀ k k', c k ≠ c k' → N k k' = 0) ∧ N * l.submatrix id s = 1 := by
+private theorem cc_pivot
+    {E τ κ Y : Type} [Field E] [Fintype τ] [Fintype κ] [DecidableEq κ]
+    (wt : τ → Y) (c : κ → Y) (l : Matrix κ τ E)
+    (hl : LinearIndependent E l.row) (hw : ∀ k i, wt i ≠ c k → l k i = 0)
+    : ∃ (s : κ → τ) (N : Matrix κ κ E),
+      Function.Injective s ∧ (∀ k, wt (s k) = c k) ∧ (∀ k k', c k ≠ c k' → N k k' = 0)
+        ∧ N * l.submatrix id s = 1 := by
   classical
   obtain ⟨s0, hs0⟩ := exists_columns_det_ne_zero_of_rows_linearIndependent l hl
   obtain ⟨π, hπ⟩ := exists_perm_diag_ne_zero_of_det_ne_zero _ hs0
@@ -321,18 +358,23 @@ private theorem cc_pivot {E τ κ Y : Type} [Field E] [Fintype τ] [Fintype κ] 
   · rw [← hM, ← Matrix.inv_eq_right_inv hMN]
     exact Matrix.nonsing_inv_mul M hu
 
-private theorem cc_series {E τ κ Y : Type} [Field E] [Fintype τ] [Fintype κ] [AddCommGroup Y] (wt : τ → Y)
-    (c : κ → Y) (z : κ → MvPowerSeries τ E) (hz : ∀ k, z k ∈ wtPart E wt (c k))
-    (hz0 : ∀ k, constantCoeff (z k) = 0)
-    (hl : LinearIndependent E fun k i => coeff (Finsupp.single i 1) (z k)) :
-    ∃ (τ' : Type) (_ : Fintype τ') (t : τ' → τ) (ψ : MvPowerSeries τ E →ₐ[E] MvPowerSeries τ' E),
-      Function.Injective t ∧ (∀ j, ∀ f ∈ wtPart E wt j, ψ f ∈ wtPart E (fun i => wt (t i)) j) ∧
-      (∀ k, ψ (z k) = 0) ∧ (∀ f, constantCoeff (ψ f) = constantCoeff f) ∧
-      (∀ f i, (∀ i', i' ≠ t i → coeff (Finsupp.single i' 1) f = 0) →
-        ∀ i', coeff (Finsupp.single i' 1) (ψ f) = coeff (Finsupp.single (t i') 1) f) ∧
-      (∀ f, (∀ i, coeff (Finsupp.single i 1) (ψ f) = 0) →
-        ∃ b : κ → E, ∀ i, coeff (Finsupp.single i 1) f = ∑ k, b k * coeff (Finsupp.single i 1) (z k)) ∧
-      ∀ j, Nat.card {i // wt (t i) = j} + Nat.card {i // c i = j} = Nat.card {i // wt i = j} := by
+private theorem cc_series
+    {E τ κ Y : Type} [Field E] [Fintype τ] [Fintype κ] [AddCommGroup Y]
+    (wt : τ → Y) (c : κ → Y) (z : κ → MvPowerSeries τ E)
+    (hz : ∀ k, z k ∈ wtPart E wt (c k)) (hz0 : ∀ k, constantCoeff (z k) = 0)
+    (hl : LinearIndependent E fun k i => coeff (Finsupp.single i 1) (z k))
+    : ∃ (τ' : Type) (_ : Fintype τ') (t : τ' → τ) (ψ : MvPowerSeries τ E →ₐ[E] MvPowerSeries τ' E),
+      Function.Injective t ∧ (∀ j, ∀ f ∈ wtPart E wt j, ψ f ∈ wtPart E (fun i => wt (t i)) j)
+        ∧ (∀ k, ψ (z k) = 0) ∧ (∀ f, constantCoeff (ψ f) = constantCoeff f)
+        ∧ (∀ f i,
+          (∀ i', i' ≠ t i → coeff (Finsupp.single i' 1) f = 0)
+            → ∀ i', coeff (Finsupp.single i' 1) (ψ f) = coeff (Finsupp.single (t i') 1) f)
+        ∧ (∀ f,
+          (∀ i, coeff (Finsupp.single i 1) (ψ f) = 0)
+            → ∃ b : κ → E, ∀ i,
+              coeff (Finsupp.single i 1) f = ∑ k, b k * coeff (Finsupp.single i 1) (z k))
+        ∧ ∀ j,
+          Nat.card {i // wt (t i) = j} + Nat.card {i // c i = j} = Nat.card {i // wt i = j} := by
   classical
   let l : Matrix κ τ E := fun k i => coeff (Finsupp.single i 1) (z k)
   have hw : ∀ k i, wt i ≠ c k → l k i = 0 := fun k i h =>
@@ -341,10 +383,13 @@ private theorem cc_series {E τ κ Y : Type} [Field E] [Fintype τ] [Fintype κ]
   have hMN : l.submatrix id s * N = 1 := mul_eq_one_comm.mp hN
   obtain ⟨z', hz'⟩ : ∃ z' : κ → MvPowerSeries τ E, ∀ k, z' k = ∑ k', N k k' • z k' :=
     ⟨_, fun _ => rfl⟩
-  obtain ⟨e, he1, he2⟩ : ∃ e : κ ⊕ {i // i ∉ Set.range s} ≃ τ,
-      (∀ k, e (.inl k) = s k) ∧ ∀ i, e (.inr i) = i.1 :=
-    ⟨(Equiv.sumCongr (Equiv.ofInjective s hs) (Equiv.refl _)).trans
-      (Equiv.sumCompl (fun i => i ∈ Set.range s)), fun k => by simp, fun i => by simp⟩
+  obtain ⟨e, he1, he2⟩
+      : ∃ e : κ ⊕ {i // i ∉ Set.range s} ≃ τ, (∀ k, e (.inl k) = s k) ∧ ∀ i, e (.inr i) = i.1 := ⟨
+    (Equiv.sumCongr (Equiv.ofInjective s hs) (Equiv.refl _)).trans
+      (Equiv.sumCompl (fun i => i ∈ Set.range s)),
+    fun k => by simp,
+    fun i => by simp
+  ⟩
   have hz'w : ∀ k, z' k ∈ wtPart E wt (wt (e (.inl k))) := by
     intro k
     rw [he1, hsw, hz']
@@ -367,8 +412,19 @@ private theorem cc_series {E τ κ Y : Type} [Field E] [Fintype τ] [Fintype κ]
     simp only [coeff_smul]
     exact h
   obtain ⟨ψ, hψw, hψz, hψc, hψlin⟩ := cc_ift wt e z' hz'w hz'0 hδ
-  refine ⟨{i // i ∉ Set.range s}, inferInstance, Subtype.val, ψ, Subtype.val_injective, ?_, ?_, hψc,
-    ?_, ?_, ?_⟩
+  refine ⟨
+    {i // i ∉ Set.range s},
+    inferInstance,
+    Subtype.val,
+    ψ,
+    Subtype.val_injective,
+    ?_,
+    ?_,
+    hψc,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro j f hf
     simpa only [he2] using hψw j f hf
   · intro k
@@ -385,27 +441,30 @@ private theorem cc_series {E τ κ Y : Type} [Field E] [Fintype τ] [Fintype κ]
       rw [hzz, map_sum]
     simp [map_smul, hψz]
   · intro f i hf i'
-    have h0 : ∀ k, coeff (Finsupp.single (s k) 1) f = 0 := fun k =>
-      hf _ (fun h => i.2 ⟨k, h⟩)
+    have h0 : ∀ k, coeff (Finsupp.single (s k) 1) f = 0 := fun k => hf _ (fun h => i.2 ⟨k, h⟩)
     rw [hψlin, he2]
     simp [he1, h0]
   · intro f hf0
-    have hf : ∀ i : {i // i ∉ Set.range s}, coeff (Finsupp.single i.1 1) f =
-        ∑ k, coeff (Finsupp.single (s k) 1) f * coeff (Finsupp.single i.1 1) (z' k) := by
+    have hf
+        : ∀ i : {i // i ∉ Set.range s},
+          coeff (Finsupp.single i.1 1) f
+            = ∑ k, coeff (Finsupp.single (s k) 1) f * coeff (Finsupp.single i.1 1) (z' k) := by
       intro i
       have := hf0 i
       rw [hψlin, he2] at this
       simp only [he1] at this
       exact sub_eq_zero.mp this
     refine ⟨fun k' => ∑ k, coeff (Finsupp.single (s k) 1) f * N k k', fun i => ?_⟩
-    have hzi : ∀ k, coeff (Finsupp.single i 1) (z' k) =
-        ∑ k', N k k' * coeff (Finsupp.single i 1) (z k') := by
+    have hzi
+        : ∀ k,
+          coeff (Finsupp.single i 1) (z' k) = ∑ k', N k k' * coeff (Finsupp.single i 1) (z k') := by
       intro k
       set_option synthInstance.maxHeartbeats 100000 in
         rw [hz', map_sum]
       simp only [coeff_smul]
-    have step : coeff (Finsupp.single i 1) f =
-        ∑ k, coeff (Finsupp.single (s k) 1) f * coeff (Finsupp.single i 1) (z' k) := by
+    have step
+        : coeff (Finsupp.single i 1) f
+          = ∑ k, coeff (Finsupp.single (s k) 1) f * coeff (Finsupp.single i 1) (z' k) := by
       by_cases hi : i ∈ Set.range s
       · obtain ⟨k0, rfl⟩ := hi
         have hd : ∀ k, coeff (Finsupp.single (s k0) 1) (z' k) = if k = k0 then 1 else 0 := by
@@ -418,36 +477,49 @@ private theorem cc_series {E τ κ Y : Type} [Field E] [Fintype τ] [Fintype κ]
     simp only [hzi, Finset.mul_sum, Finset.sum_mul, mul_assoc]
     exact Finset.sum_comm
   · intro j
-    have h1 : Nat.card {i // wt i = j} = Nat.card {x : κ ⊕ {i // i ∉ Set.range s} // wt (e x) = j} :=
-      Nat.card_congr (e.subtypeEquiv (p := fun x => wt (e x) = j) (q := fun i => wt i = j)
-        fun _ => Iff.rfl).symm
-    have h2 : Nat.card {x : κ ⊕ {i // i ∉ Set.range s} // wt (e x) = j} =
-        Nat.card {k : κ // wt (e (.inl k)) = j} +
-          Nat.card {i : {i // i ∉ Set.range s} // wt (e (.inr i)) = j} := by
+    have h1
+        : Nat.card {i // wt i = j} = Nat.card {x : κ ⊕ {i // i ∉ Set.range s} // wt (e x) = j} :=
+      Nat.card_congr
+        (e.subtypeEquiv (p := fun x => wt (e x) = j) (q := fun i => wt i = j) fun _ => Iff.rfl).symm
+    have h2
+        : Nat.card {x : κ ⊕ {i // i ∉ Set.range s} // wt (e x) = j}
+          = Nat.card {k : κ // wt (e (.inl k)) = j}
+            + Nat.card {i : {i // i ∉ Set.range s} // wt (e (.inr i)) = j} := by
       rw [Nat.card_congr Equiv.subtypeSum, Nat.card_sum]
     have h3 : Nat.card {k : κ // wt (e (.inl k)) = j} = Nat.card {k // c k = j} :=
       Nat.card_congr (Equiv.subtypeEquivRight fun k => by rw [he1, hsw])
-    have h4 : Nat.card {i : {i // i ∉ Set.range s} // wt (e (.inr i)) = j} =
-        Nat.card {i : {i // i ∉ Set.range s} // wt i.1 = j} :=
+    have h4
+        : Nat.card {i : {i // i ∉ Set.range s} // wt (e (.inr i)) = j}
+          = Nat.card {i : {i // i ∉ Set.range s} // wt i.1 = j} :=
       Nat.card_congr (Equiv.subtypeEquivRight fun i => by rw [he2])
     omega
 
-private theorem cc_smul {O A τ : Type} [CommRing O] [IsDomain O] [CommRing A] [Algebra O A]
-    (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (n : τ →₀ ℕ) (c : O) (f : A) :
-    MvPowerSeries.coeff n (φ (c • f)) = algebraMap O (FractionRing O) c * MvPowerSeries.coeff n (φ f) := by
+private theorem cc_smul
+    {O A τ : Type} [CommRing O] [IsDomain O] [CommRing A] [Algebra O A]
+    (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (n : τ →₀ ℕ) (c : O) (f : A)
+    : MvPowerSeries.coeff n (φ (c • f))
+      = algebraMap O (FractionRing O) c * MvPowerSeries.coeff n (φ f) := by
   rw [map_smul, Algebra.smul_def, MvPowerSeries.algebraMap_apply, coeff_C_mul]
 
-theorem UpperTheory.V.Alg.chart_cut :
-    ∀ (O A X : Type) [CommRing O] [IsDomain O] [CommRing A] [Algebra O A] [AddCommGroup X] (𝒜 : X → Submodule O A) (x : A →ₐ[O] O) (τ : Type) [Fintype τ] (wt : τ → X) (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)), IsChart 𝒜 x wt φ →
-      ∀ (κ : Type) [Fintype κ] (g : κ → A) (c : κ → X), (∀ i, g i ∈ 𝒜 (c i) ∧ x (g i) = 0) → LinearIndependent O (fun i => (satSq x).mkQ (g i)) →
-      ∀ (A' : Type) [CommRing A'] [Algebra O A'] (p : A →ₐ[O] A') (x' : A' →ₐ[O] O), Function.Surjective p → RingHom.ker p = Ideal.span (Set.range g) → x'.comp p = x →
-      ∃ (τ' : Type) (_ : Fintype τ') (wt' : τ' → X) (φ' : A' →ₐ[O] MvPowerSeries τ' (FractionRing O)), IsChart (fun j => (𝒜 j).map p.toLinearMap) x' wt' φ' ∧
-        ∀ j, Nat.card {i // wt' i = j} + Nat.card {i // c i = j} = Nat.card {i // wt i = j} := by
+theorem UpperTheory.V.Alg.chart_cut
+    : ∀ (O A X : Type) [CommRing O] [IsDomain O] [CommRing A] [Algebra O A] [AddCommGroup X]
+        (𝒜 : X → Submodule O A) (x : A →ₐ[O] O) (τ : Type) [Fintype τ] (wt : τ → X)
+        (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)),
+      IsChart 𝒜 x wt φ
+        → ∀ (κ : Type) [Fintype κ] (g : κ → A) (c : κ → X),
+          (∀ i, g i ∈ 𝒜 (c i) ∧ x (g i) = 0) → LinearIndependent O (fun i => (satSq x).mkQ (g i))
+            → ∀ (A' : Type) [CommRing A'] [Algebra O A'] (p : A →ₐ[O] A') (x' : A' →ₐ[O] O),
+              Function.Surjective p → RingHom.ker p = Ideal.span (Set.range g) → x'.comp p = x
+                → ∃ (τ' : Type) (_ : Fintype τ') (wt' : τ' → X)
+                    (φ' : A' →ₐ[O] MvPowerSeries τ' (FractionRing O)),
+                  IsChart (fun j => (𝒜 j).map p.toLinearMap) x' wt' φ'
+                    ∧ ∀ j,
+                      Nat.card {i // wt' i = j} + Nat.card {i // c i = j}
+                        = Nat.card {i // wt i = j} := by
   classical
   intro O A X _ _ _ _ _ 𝒜 x τ _ wt φ hφ κ _ g c hg hli A' _ _ p x' hp hker hx'
   have hz : ∀ k, φ (g k) ∈ wtPart (FractionRing O) wt (c k) := fun k => hφ.graded _ _ (hg k).1
-  have hz0 : ∀ k, constantCoeff (φ (g k)) = 0 := fun k => by
-    rw [hφ.const, (hg k).2, map_zero]
+  have hz0 : ∀ k, constantCoeff (φ (g k)) = 0 := fun k => by rw [hφ.const, (hg k).2, map_zero]
   have hl : LinearIndependent (FractionRing O) fun k i => coeff (Finsupp.single i 1) (φ (g k)) := by
     rw [Fintype.linearIndependent_iff]
     intro β hβ k0
@@ -486,7 +558,8 @@ theorem UpperTheory.V.Alg.chart_cut :
       rintro _ ⟨k, rfl⟩
       exact (hχ _).trans (hψz k)
     exact hle ha
-  obtain ⟨φ', hφ'⟩ : ∃ φ' : A' →ₐ[O] MvPowerSeries τ' (FractionRing O), ∀ f, φ' (p f) = ψ (φ f) := by
+  obtain ⟨φ', hφ'⟩
+      : ∃ φ' : A' →ₐ[O] MvPowerSeries τ' (FractionRing O), ∀ f, φ' (p f) = ψ (φ f) := by
     let e := Ideal.quotientKerAlgEquivOfSurjective hp
     have he : ∀ f, e.symm (p f) = Ideal.Quotient.mk (RingHom.ker p) f := fun f => by
       rw [AlgEquiv.symm_apply_eq]
@@ -553,5 +626,5 @@ theorem UpperTheory.V.Alg.chart_cut :
       exact Ideal.mem_map_of_mem p heF
     have h2 : p (e • (d • f - ∑ k, a k • g k)) = (e * d) • p f := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sub, map_sum, map_smul, hpg, mul_smul]
+      simp [map_sub, map_sum, map_smul, hpg, mul_smul]
     rwa [h2] at h1

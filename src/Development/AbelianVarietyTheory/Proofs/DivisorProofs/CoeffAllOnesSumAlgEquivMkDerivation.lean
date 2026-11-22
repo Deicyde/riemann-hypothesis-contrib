@@ -8,20 +8,25 @@ open MvPolynomial
 
 namespace GlobalTheory
 
-theorem sumAlgEquiv_rename_inr_eq_C {σ : Type} {L : ℕ} (q : MvPolynomial σ ℂ) :
-    MvPolynomial.sumAlgEquiv ℂ (Fin L) σ (MvPolynomial.rename Sum.inr q) = MvPolynomial.C q := by
+theorem sumAlgEquiv_rename_inr_eq_C {σ : Type} {L : ℕ} (q : MvPolynomial σ ℂ)
+    : MvPolynomial.sumAlgEquiv ℂ (Fin L) σ (MvPolynomial.rename Sum.inr q) = MvPolynomial.C q := by
   induction q using MvPolynomial.induction_on with
   | C a => simp [sumAlgEquiv_C_inl]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
   | mul_X p v hp => simp only [map_mul, hp, rename_X, sumAlgEquiv_X_inr]
 
-theorem coeff_sumAlgEquiv_mkDerivation_gen {σ : Type} {L : ℕ}
-    (D : Derivation ℂ (MvPolynomial σ ℂ) (MvPolynomial σ ℂ))
-    (b : MvPolynomial (Fin L ⊕ σ) ℂ) (m : Fin L →₀ ℕ) :
-    AddMonoidAlgebra.coeff (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ
-      (MvPolynomial.mkDerivation ℂ (Sum.elim (fun _ : Fin L => (0 : MvPolynomial (Fin L ⊕ σ) ℂ))
-        (fun v : σ => MvPolynomial.rename Sum.inr (D (MvPolynomial.X v)))) b)) m =
-      D (AddMonoidAlgebra.coeff (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ b) m) := by
+theorem coeff_sumAlgEquiv_mkDerivation_gen
+    {σ : Type} {L : ℕ} (D : Derivation ℂ (MvPolynomial σ ℂ) (MvPolynomial σ ℂ))
+    (b : MvPolynomial (Fin L ⊕ σ) ℂ) (m : Fin L →₀ ℕ)
+    : AddMonoidAlgebra.coeff
+        (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ
+          (MvPolynomial.mkDerivation ℂ
+            (Sum.elim
+              (fun _ : Fin L => (0 : MvPolynomial (Fin L ⊕ σ) ℂ))
+              (fun v : σ => MvPolynomial.rename Sum.inr (D (MvPolynomial.X v))))
+            b))
+        m
+      = D (AddMonoidAlgebra.coeff (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ b) m) := by
   induction b using MvPolynomial.induction_on generalizing m with
   | C a =>
     have h1 : (MvPolynomial.C a : MvPolynomial (Fin L ⊕ σ) ℂ) = algebraMap ℂ _ a := rfl
@@ -30,9 +35,11 @@ theorem coeff_sumAlgEquiv_mkDerivation_gen {σ : Type} {L : ℕ}
     split_ifs
     · exact (D.map_algebraMap a).symm
     · simp
-  | add p q hp hq => simp only [map_add (f := _), MvPolynomial.coeff_add, hp, hq]
+  | add p q hp hq =>
+    simp only [map_add (f := _), MvPolynomial.coeff_add, hp, hq]
   | mul_X p i hp =>
-    rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul, map_add (f := _), map_mul, map_mul, map_mul, MvPolynomial.coeff_add]
+    rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul, map_add (f := _), map_mul, map_mul, map_mul,
+      MvPolynomial.coeff_add]
     rcases i with j | v
     · simp only [mkDerivation_X, Sum.elim_inl, map_zero, mul_zero, AddMonoidAlgebra.coeff_zero,
         sumAlgEquiv_X_inl]
@@ -48,8 +55,19 @@ theorem coeff_sumAlgEquiv_mkDerivation_gen {σ : Type} {L : ℕ}
         Derivation.leibniz, smul_eq_mul, smul_eq_mul]
       ring
 
-theorem coeff_allOnes_sumAlgEquiv_mkDerivation :
-    ∀ {σ : Type} {L : ℕ} (D : Derivation ℂ (MvPolynomial σ ℂ) (MvPolynomial σ ℂ)) (b : MvPolynomial (Fin L ⊕ σ) ℂ), AddMonoidAlgebra.coeff (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ (MvPolynomial.mkDerivation ℂ (Sum.elim (fun _ : Fin L => (0 : MvPolynomial (Fin L ⊕ σ) ℂ)) (fun v : σ => MvPolynomial.rename Sum.inr (D (MvPolynomial.X v)))) b)) (Finsupp.equivFunOnFinite.symm fun _ : Fin L => (1 : ℕ)) = D (AddMonoidAlgebra.coeff (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ (b)) (Finsupp.equivFunOnFinite.symm fun _ : Fin L => (1 : ℕ))) :=
-  fun D b => coeff_sumAlgEquiv_mkDerivation_gen D b _
+theorem coeff_allOnes_sumAlgEquiv_mkDerivation
+    : ∀ {σ : Type} {L : ℕ} (D : Derivation ℂ (MvPolynomial σ ℂ) (MvPolynomial σ ℂ))
+        (b : MvPolynomial (Fin L ⊕ σ) ℂ),
+      AddMonoidAlgebra.coeff
+          (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ
+            (MvPolynomial.mkDerivation ℂ
+              (Sum.elim
+                (fun _ : Fin L => (0 : MvPolynomial (Fin L ⊕ σ) ℂ))
+                (fun v : σ => MvPolynomial.rename Sum.inr (D (MvPolynomial.X v))))
+              b))
+          (Finsupp.equivFunOnFinite.symm fun _ : Fin L => (1 : ℕ))
+        = D (AddMonoidAlgebra.coeff (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ (b))
+          (Finsupp.equivFunOnFinite.symm fun _ : Fin L => (1 : ℕ))) := fun D b =>
+  coeff_sumAlgEquiv_mkDerivation_gen D b _
 
 end GlobalTheory

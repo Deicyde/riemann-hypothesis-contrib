@@ -12,17 +12,22 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GroundTheory.Heights₂.Heights.LowerBoundFree
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped Matrix ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.Ar.HodgeMetric
 
-theorem injective_ringOfIntegers_toComplex {F : Type} [Field F] [NumberField F] (g : 𝓞 F →+* ℂ) :
-    Function.Injective g := by
+theorem injective_ringOfIntegers_toComplex {F : Type} [Field F] [NumberField F] (g : 𝓞 F →+* ℂ)
+    : Function.Injective g := by
   rw [RingHom.injective_iff_ker_eq_bot]
   apply Ideal.eq_bot_of_comap_eq_bot (R := ℤ)
-  have h : Ideal.comap (algebraMap ℤ (𝓞 F)) (RingHom.ker g) = RingHom.ker (g.comp (algebraMap ℤ (𝓞 F))) :=
+  have h
+      : Ideal.comap (algebraMap ℤ (𝓞 F)) (RingHom.ker g)
+        = RingHom.ker (g.comp (algebraMap ℤ (𝓞 F))) :=
     RingHom.comap_ker _ _
   change Ideal.comap (algebraMap ℤ (𝓞 F)) (RingHom.ker g) = ⊥
   rw [h, (RingHom.injective_iff_ker_eq_bot _).1]
@@ -30,23 +35,28 @@ theorem injective_ringOfIntegers_toComplex {F : Type} [Field F] [NumberField F] 
   rw [e]
   exact Int.cast_injective
 
-theorem exists_comp_eq_of_ringOfIntegers {F : Type} [Field F] [NumberField F] (g : 𝓞 F →+* ℂ) :
-    ∃ g' : F →+* ℂ, g'.comp (algebraMap (𝓞 F) F) = g :=
-  ⟨IsFractionRing.lift (injective_ringOfIntegers_toComplex g), by
+theorem exists_comp_eq_of_ringOfIntegers {F : Type} [Field F] [NumberField F] (g : 𝓞 F →+* ℂ)
+    : ∃ g' : F →+* ℂ, g'.comp (algebraMap (𝓞 F) F) = g := ⟨
+  IsFractionRing.lift (injective_ringOfIntegers_toComplex g),
+  by
     ext a
-    simp⟩
+    simp
+⟩
 
-theorem exists_spMap_of_ringOfIntegers {F : Type} [Field F] [NumberField F] {X : Scheme.{0}} (s : X ⟶ Sp (𝓞 F))
-    (u : Sp ℂ ⟶ X) : ∃ g' : F →+* ℂ, u ≫ s = spMap g' ≫ spMap (algebraMap (𝓞 F) F) := by
+theorem exists_spMap_of_ringOfIntegers
+    {F : Type} [Field F] [NumberField F] {X : Scheme.{0}} (s : X ⟶ Sp (𝓞 F)) (u : Sp ℂ ⟶ X)
+    : ∃ g' : F →+* ℂ, u ≫ s = spMap g' ≫ spMap (algebraMap (𝓞 F) F) := by
   obtain ⟨g', hg'⟩ := exists_comp_eq_of_ringOfIntegers (Spec.preimage (u ≫ s)).hom
   refine ⟨g', ?_⟩
   rw [← spMap_comp, hg']
   exact (Spec.map_preimage (u ≫ s)).symm
 
-theorem polarisedAt_of_interior : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
-    (l : Level H) (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ) (Ω : Type)
-    [Field Ω] [CharZero Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω)
-    (𝔐 : HodgeCpt Y S y) (z : Spec (CommRingCat.of ℂ) ⟶ 𝔐.X), 𝔐.Interior z → HodgeMetric.PolarisedAt 𝔐.t z := by
+theorem polarisedAt_of_interior
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ)
+        (Ω : Type) [Field Ω] [CharZero Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)]
+        (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y) (z : Spec (CommRingCat.of ℂ) ⟶ 𝔐.X),
+      𝔐.Interior z → HodgeMetric.PolarisedAt 𝔐.t z := by
   intro E _ _ _ H D l Xo c Y S Ω _ _ K _ J _ y 𝔐 z hz
   haveI : FiniteDimensional ℚ c.F := c.fin
   haveI : NumberField c.F := { to_charZero := inferInstance, to_finiteDimensional := c.fin }
@@ -66,7 +76,8 @@ theorem polarisedAt_of_interior : ∀ (E : Type) [Field E] [NumberField E] [IsCM
     show (pullback.fst Y.s _) (w p) ∈ abLocus Y.t.G
     have : (pullback.fst Y.s (spMap (algebraMap (𝓞 c.F) c.F))) (w p) = (z ≫ 𝔐.f) p := by
       rw [← hw]; simp
-    rw [this]; exact h₁
+    rw [this]
+    exact h₁
   have h₃ : Set.range w ⊆ Set.range Y.jQ := by
     rintro _ ⟨q, rfl⟩
     rwa [Subsingleton.elim q p]
@@ -77,13 +88,16 @@ theorem polarisedAt_of_interior : ∀ (E : Type) [Field E] [NumberField E] [IsCM
 
   obtain ⟨t', ⟨m₁⟩⟩ := exists_sab z 𝔐.t
   obtain ⟨n, -⟩ := sabComp pullCubComp E H _ _ _ _ _ _ _ _ 𝔐.m m₁
-  have cancel : ∀ (q : Sp ℂ ⟶ Y.X) (_ : q = v ≫ Y.jQ ≫ pullback.fst _ _) (_ : SABMap t' Y.t q),
-      Nonempty (SABMap t' Y.oF.t v) := by
-    intro q hq n; subst hq
+  have cancel
+      : ∀ (q : Sp ℂ ⟶ Y.X) (_ : q = v ≫ Y.jQ ≫ pullback.fst _ _) (_ : SABMap t' Y.t q),
+        Nonempty (SABMap t' Y.oF.t v) := by
+    intro q hq n
+    subst hq
     exact ⟨(sabCancel pullCubCancel E H _ _ _ _ _ _ _ _ Y.m n).choose⟩
   obtain ⟨m₃⟩ := cancel _ hv.symm n
   obtain ⟨w₂, g₂, -⟩ := m₃.lin
-  obtain ⟨am, -⟩ := amplePt _ _ v _ _ m₃.φ m₃.cart _ _ Y.oF.t.PP.isLB t'.PP.isLB ⟨w₂, g₂⟩ Y.oF.ample Y.oF.ktriv
+  obtain ⟨am, -⟩ :=
+    amplePt _ _ v _ _ m₃.φ m₃.cart _ _ Y.oF.t.PP.isLB t'.PP.isLB ⟨w₂, g₂⟩ Y.oF.ample Y.oF.ktriv
   exact ⟨t', m₁, MorphismProperty.of_isPullback (P := @IsProper) m₃.cart.1 Y.oF.proper, am⟩
 
 end GlobalTheory.CompanionTheory.Ar.HodgeMetric

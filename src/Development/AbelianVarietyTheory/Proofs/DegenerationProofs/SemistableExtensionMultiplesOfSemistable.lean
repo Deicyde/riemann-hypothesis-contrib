@@ -23,13 +23,15 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsProjByB
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory
 
-theorem isAbelianScheme_overPullback {S S' : Scheme.{0}} (f : S' ⟶ S) (A : Over S) [GrpObj A]
-    (h : IsAbelianScheme A) : IsAbelianScheme ((Over.pullback f).obj A) := by
+theorem isAbelianScheme_overPullback
+    {S S' : Scheme.{0}} (f : S' ⟶ S) (A : Over S) [GrpObj A] (h : IsAbelianScheme A)
+    : IsAbelianScheme ((Over.pullback f).obj A) := by
   constructor
   · have := h.comm
     infer_instance

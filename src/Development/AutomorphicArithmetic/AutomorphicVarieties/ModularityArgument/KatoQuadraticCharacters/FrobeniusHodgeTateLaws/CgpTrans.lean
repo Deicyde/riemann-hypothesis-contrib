@@ -6,7 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.CyclotomicQExpansion GlobalTheory.KummerEisensteinGalois GlobalTheory.K4 GlobalTheory.LambdaValuationPowers
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.CyclotomicQExpansion
+  GlobalTheory.KummerEisensteinGalois GlobalTheory.K4 GlobalTheory.LambdaValuationPowers
 open scoped Matrix MatrixGroups TensorProduct
 
 namespace UpperTheory.V.Z.Kato.Joint
@@ -19,7 +22,8 @@ private theorem cgp_symm {n : ℕ} {x y : Qbar l} (h : Cg n x y) : Cg n y x := b
   unfold Cg at *
   rwa [norm_sub_rev]
 
-private theorem cgp_add {n : ℕ} {x y x' y' : Qbar l} (h : Cg n x y) (h' : Cg n x' y') : Cg n (x + x') (y + y') := by
+private theorem cgp_add {n : ℕ} {x y x' y' : Qbar l} (h : Cg n x y) (h' : Cg n x' y')
+    : Cg n (x + x') (y + y') := by
   unfold Cg at *
   rw [add_sub_add_comm]
   exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le h h')
@@ -29,11 +33,16 @@ private theorem cgp_trans {n : ℕ} {x y z : Qbar l} (h : Cg n x y) (h' : Cg n y
   rw [← sub_add_sub_cancel x y z]
   exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le h h')
 
-private theorem cgp_mul {n : ℕ} {a x y : Qbar l} (ha : ‖a‖ ≤ 1) (h : Cg n x y) : Cg n (a * x) (a * y) := by
+private theorem cgp_mul {n : ℕ} {a x y : Qbar l} (ha : ‖a‖ ≤ 1) (h : Cg n x y)
+    : Cg n (a * x) (a * y) := by
   simpa using cg_mul_left (k := 0) (Nat.zero_le _) (by simpa using ha) h
 
-private theorem fop_cg {k n : ℕ} {χ : ℕ → Qbar l} (hχ : ∀ d, ‖χ d‖ ≤ 1) (T : Letter) {f g : ℕ → Qbar l}
-    (h : ∀ i, Cg n (f i) (g i)) (i : ℕ) : Cg n (fop k l χ T f i) (fop k l χ T g i) := by
+private theorem fop_cg
+    {k n : ℕ} {χ : ℕ → Qbar l} (hχ : ∀ d, ‖χ d‖ ≤ 1)
+    (T : Letter)
+    {f g : ℕ → Qbar l} (h : ∀ i, Cg n (f i) (g i))
+    (i : ℕ)
+    : Cg n (fop k l χ T f i) (fop k l χ T g i) := by
   cases T with
   | T q =>
     show Cg n (GlobalTheory.EisM.To k (χ q) q f i) (GlobalTheory.EisM.To k (χ q) q g i)
@@ -55,19 +64,29 @@ theorem thP : ThP := by
   have hχ : ∀ d, ‖((χ d : ℤ_[l]) : Qbar l)‖ ≤ 1 := fun d => by
     rw [norm_algebraMap']
     exact (χ d).2
-  have hw : ∀ x ∈ Submonoid.closure (FreeAlgebra.ι (Qbar l) '' {T | GlobalTheory.KZ.admitted N l T}), ∀ n : ℕ,
-      (∀ f g : ℕ → Qbar l, (∀ i, Cg n (f i) (g i)) → ∀ i, Cg n (F x f i) (F x g i)) ∧
-      ∀ b, InChi X N w χ b → ∃ b', InChi X N w χ b' ∧
-        G x ((1 : Qbar l) ⊗ₜ[ℤ_[l]] b) = (1 : Qbar l) ⊗ₜ[ℤ_[l]] b' ∧
-        ∀ i, Cg n (F x (th X A N j n b) i) (th X A N j n b' i) := by
+  have hw
+      : ∀ x ∈ Submonoid.closure (FreeAlgebra.ι (Qbar l) '' {T | GlobalTheory.KZ.admitted N l T}),
+        ∀ n : ℕ,
+          (∀ f g : ℕ → Qbar l, (∀ i, Cg n (f i) (g i)) → ∀ i, Cg n (F x f i) (F x g i))
+            ∧ ∀ b,
+              InChi X N w χ b
+                → ∃ b',
+                  InChi X N w χ b' ∧ G x ((1 : Qbar l) ⊗ₜ[ℤ_[l]] b) = (1 : Qbar l) ⊗ₜ[ℤ_[l]] b'
+                    ∧ ∀ i, Cg n (F x (th X A N j n b) i) (th X A N j n b' i) := by
     intro x hx n
     induction hx using Submonoid.closure_induction with
     | mem x hx =>
       obtain ⟨T, hT, rfl⟩ := hx
       rw [hF, hG, FreeAlgebra.lift_ι_apply, FreeAlgebra.lift_ι_apply]
-      refine ⟨fun f g h i => fop_cg hχ T h i, fun b hb => ⟨X.op N l T b,
-        hStab l Ω ε X N w χ hS.2.1 hS.2.2.1 hS.2.2.2.1 hS.2.2.2.2.1 T b hT hb, ?_,
-        fun i => cgp_symm (hOp l Ω ε X A N w j χ hS n T b hT hb i)⟩⟩
+      refine ⟨
+        fun f g h i => fop_cg hχ T h i,
+        fun b hb => ⟨
+          X.op N l T b,
+          hStab l Ω ε X N w χ hS.2.1 hS.2.2.1 hS.2.2.2.1 hS.2.2.2.2.1 T b hT hb,
+          ?_,
+          fun i => cgp_symm (hOp l Ω ε X A N w j χ hS n T b hT hb i)
+        ⟩
+      ⟩
       rw [Tower.opV, LinearMap.baseChange_tmul]
     | one =>
       rw [map_one, map_one]
@@ -79,8 +98,10 @@ theorem thP : ThP := by
       obtain ⟨b'', hb'', e'', c''⟩ := hx.2 b' hb'
       refine ⟨b'', hb'', ?_, fun i => cgp_trans (hx.1 _ _ c' i) (c'' i)⟩
       rw [Module.End.mul_apply, e', e'']
-  have hP' : P ∈ Submodule.span (Qbar l)
-      (Submonoid.closure (FreeAlgebra.ι (Qbar l) '' {T | GlobalTheory.KZ.admitted N l T}) : Set (FreeAlgebra (Qbar l) Letter)) := by
+  have hP'
+      : P ∈ Submodule.span (Qbar l)
+        (Submonoid.closure (FreeAlgebra.ι (Qbar l) '' {T | GlobalTheory.KZ.admitted N l T})
+          : Set (FreeAlgebra (Qbar l) Letter)) := by
     rw [← Algebra.adjoin_eq_span]
     exact hP
   clear hP

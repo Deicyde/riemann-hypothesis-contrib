@@ -8,19 +8,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsS
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.PRep
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.PRep
 open UpperTheory.Gal.CharacterCongruences
 
-theorem UpperTheory.Gal.CharacterCongruences.neatOfPlace_holds :
-    UpperTheory.Gal.CharacterCongruences.NeatOfPlace := by
+theorem UpperTheory.Gal.CharacterCongruences.neatOfPlace_holds
+    : UpperTheory.Gal.CharacterCongruences.NeatOfPlace := by
   intro E _ _ _ a C hC u hT g γ hγ c hc x hx h
   have hxl : cLoc u x = 1 := by
     have h0 : Matrix.GeneralLinearGroup.map (pFin E) x.1 = 1 := hx
-    have h1 : cLoc u x = Matrix.GeneralLinearGroup.map (pLoc E u)
-        (Matrix.GeneralLinearGroup.map (pFin E) x.1) :=
+    have h1
+        : cLoc u x
+          = Matrix.GeneralLinearGroup.map (pLoc E u) (Matrix.GeneralLinearGroup.map (pFin E) x.1) :=
       Units.ext (Matrix.ext fun i j => rfl)
     rw [h1, h0, map_one]
   haveI := GlobalTheory.InfUCompact.compactSpace_infU E a
@@ -31,13 +35,14 @@ theorem UpperTheory.Gal.CharacterCongruences.neatOfPlace_holds :
   have hd : c * x ∈ C ⊔ infU E a :=
     Subgroup.mul_mem _ (le_sup_left (a := C) hc) (le_sup_right (a := C) hx)
   have e : γ = g * (c * x) * g⁻¹ := by rw [← mul_assoc, ← h, mul_inv_cancel_right]
-  have hfo : IsOfFinOrder (c * x) := GlobalTheory.T.isOfFinOrder_of_compact_conj_mem_unitaryRationalPoints E a _ hDc g (c * x) hd (e ▸ hγ)
+  have hfo : IsOfFinOrder (c * x) :=
+    GlobalTheory.T.isOfFinOrder_of_compact_conj_mem_unitaryRationalPoints E a _ hDc g (c * x) hd
+      (e ▸ hγ)
   have hcx : cLoc u (c * x) = cLoc u c := by rw [map_mul, hxl, mul_one]
   have ht := MonoidHom.isOfFinOrder (cLoc u) (x := c * x) hfo
   rw [hcx] at ht
   have h1 : cLoc u c = 1 := hT c hc ht
-  have hγ1 : cLoc u γ = 1 := by
-    rw [e, map_mul, map_mul, map_inv, hcx, h1, mul_one, mul_inv_cancel]
+  have hγ1 : cLoc u γ = 1 := by rw [e, map_mul, map_mul, map_inv, hcx, h1, mul_one, mul_inv_cancel]
   obtain ⟨γ₀, hγ₀⟩ : γ.1 ∈ (ratGL E a).range := Subgroup.mem_subgroupOf.1 hγ
   have hent : ∀ i j, algebraMap E (u.adicCompletion E) (γ₀.val i j) = (cLoc u γ).val i j := by
     intro i j
@@ -54,4 +59,6 @@ theorem UpperTheory.Gal.CharacterCongruences.neatOfPlace_holds :
     have : g * (c * x) = g * 1 := by rw [mul_one, ← mul_assoc]; exact h.symm
     exact mul_left_cancel this
   have hf := congrArg GlobalTheory.EllU.finPart hcx1
-  rwa [map_mul, GlobalTheory.EllU.finPart_of_finU (hC.fin hc), GlobalTheory.EllU.finPart_of_infU hx, mul_one, map_one] at hf
+  rwa [map_mul, GlobalTheory.EllU.finPart_of_finU (hC.fin hc), GlobalTheory.EllU.finPart_of_infU hx,
+      mul_one, map_one]
+    at hf

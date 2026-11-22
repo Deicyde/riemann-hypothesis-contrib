@@ -9,20 +9,25 @@ open MeasureTheory Matrix ValuativeRel
 
 namespace GlobalTheory.SBNorm
 
-theorem schwartzBruhat_memL2_inner_self : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n d : ℕ}
-    (μ : @Measure (Fin n × Fin d → k) (borel _)), @Measure.IsAddHaarMeasure _ _ _ (borel _) μ →
-    ∀ f ∈ GlobalTheory.WeilM.SB (Fin n × Fin d → k),
-      ∫⁻ y, ‖f y‖ₑ ^ 2 ∂μ ≠ ⊤ ∧
-      ∫ y, f y * (starRingEnd ℂ) (f y) ∂μ = (((∫⁻ y, ‖f y‖ₑ ^ 2 ∂μ).toReal : ℝ) : ℂ) ∧
-      (f ≠ 0 → ∫⁻ y, ‖f y‖ₑ ^ 2 ∂μ ≠ 0) ∧
-      ∀ g ∈ GlobalTheory.WeilM.SB (Fin n × Fin d → k), Integrable (fun y => f y * (starRingEnd ℂ) (g y)) μ := by
+theorem schwartzBruhat_memL2_inner_self
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {n d : ℕ} (μ : @Measure (Fin n × Fin d → k) (borel _)),
+      @Measure.IsAddHaarMeasure _ _ _ (borel _) μ
+        → ∀ f ∈ GlobalTheory.WeilM.SB (Fin n × Fin d → k),
+          ∫⁻ y, ‖f y‖ₑ ^ 2 ∂μ ≠ ⊤
+            ∧ ∫ y, f y * (starRingEnd ℂ) (f y) ∂μ = (((∫⁻ y, ‖f y‖ₑ ^ 2 ∂μ).toReal : ℝ) : ℂ)
+            ∧ (f ≠ 0 → ∫⁻ y, ‖f y‖ₑ ^ 2 ∂μ ≠ 0)
+            ∧ ∀ g ∈ GlobalTheory.WeilM.SB (Fin n × Fin d → k),
+              Integrable (fun y => f y * (starRingEnd ℂ) (g y)) μ := by
   intro k _ _ _ _ n d μ hμ f hf
   letI : MeasurableSpace (Fin n × Fin d → k) := borel _
   haveI : BorelSpace (Fin n × Fin d → k) := ⟨rfl⟩
   haveI := hμ
   obtain ⟨_, _⟩ := GlobalTheory.SplitWeil.Model.secondCountable_and_t2_local_field (k := k)
   have hfc : Continuous f := hf.1.continuous
-  have hint : ∀ g ∈ GlobalTheory.WeilM.SB (Fin n × Fin d → k), Integrable (fun y => f y * (starRingEnd ℂ) (g y)) μ := by
+  have hint
+      : ∀ g ∈ GlobalTheory.WeilM.SB (Fin n × Fin d → k),
+        Integrable (fun y => f y * (starRingEnd ℂ) (g y)) μ := by
     intro g hg
     have hgc : Continuous g := hg.1.continuous
     exact (hfc.mul (Complex.continuous_conj.comp hgc)).integrable_of_hasCompactSupport
@@ -44,9 +49,9 @@ theorem schwartzBruhat_memL2_inner_self : ∀ {k : Type} [Field k] [ValuativeRel
     simp_rw [h1]
     rw [integral_complex_ofReal]
     congr 1
-    rw [integral_eq_lintegral_of_nonneg_ae (f := fun y => ‖f y‖ ^ 2)
-      (Filter.Eventually.of_forall fun y => by positivity)
-      ((hfc.norm.pow 2).aestronglyMeasurable)]
+    rw [integral_eq_lintegral_of_nonneg_ae
+      (f := fun y => ‖f y‖ ^ 2)
+      (Filter.Eventually.of_forall fun y => by positivity) ((hfc.norm.pow 2).aestronglyMeasurable)]
     congr 1
     apply lintegral_congr
     intro y

@@ -26,22 +26,28 @@ structure Frames (L : LocE F E) (r k : ℕ) where
   f' : Fin (r + 1) → Fin (k + 2 * r + 1) → E
   es : Fin r → Fin (k + 2 * r + 1) → E
   es' : Fin r → Fin (k + 2 * r + 1) → E
-  gram : ∀ a b, hf L Hm (f a) (f b) =
-    if a = Fin.last r ∧ b = Fin.last r then -algebraMap F E T else 0
-  gram' : ∀ a b, hf L Hm (f' a) (f' b) =
-    if a = Fin.last r ∧ b = Fin.last r then -algebraMap F E T' else 0
+  gram
+    : ∀ a b, hf L Hm (f a) (f b) = if a = Fin.last r ∧ b = Fin.last r then - algebraMap F E T else 0
+  gram'
+    : ∀ a b,
+      hf L Hm (f' a) (f' b) = if a = Fin.last r ∧ b = Fin.last r then - algebraMap F E T' else 0
   dual : ∀ a j, hf L Hm (f a) (es j) = if a = j.castSucc then 1 else 0
   dual' : ∀ a j, hf L Hm (f' a) (es' j) = if a = j.castSucc then 1 else 0
   iso : ∀ i j, hf L Hm (es i) (es j) = 0
   iso' : ∀ i j, hf L Hm (es' i) (es' j) = 0
   w : Pt E (r + 1)
   relevant : ∀ a b, hf L Hm (f' b) (f a) = w.mat a b * (-1) ^ (r - (b : ℕ))
-  G_ne : lead (Matrix.of fun a b => hf L Hm (f' b) (f a)) (Fin.last (r + 1)) *
-      L.cj (lead (Matrix.of fun a b => hf L Hm (f' b) (f a)) (Fin.last (r + 1))) -
-    algebraMap F E ((T : F) * T') * (lead (Matrix.of fun a b => hf L Hm (f' b) (f a)) (Fin.last r).castSucc *
-      L.cj (lead (Matrix.of fun a b => hf L Hm (f' b) (f a)) (Fin.last r).castSucc)) ≠ 0
+  G_ne
+    : lead (Matrix.of fun a b => hf L Hm (f' b) (f a)) (Fin.last (r + 1))
+          * L.cj (lead (Matrix.of fun a b => hf L Hm (f' b) (f a)) (Fin.last (r + 1)))
+        - algebraMap F E ((T : F) * T')
+          * (lead (Matrix.of fun a b => hf L Hm (f' b) (f a)) (Fin.last r).castSucc
+            * L.cj (lead (Matrix.of fun a b => hf L Hm (f' b) (f a)) (Fin.last r).castSucc))
+      ≠ 0
   gg : Bool
-  gg_ok : gg = true → ¬ IsField E ∧ (∃ u : (𝒪[F])ˣ, ((u : 𝒪[F]) : F) = T) ∧ ∃ u : (𝒪[F])ˣ, ((u : 𝒪[F]) : F) = T'
+  gg_ok
+    : gg = true
+      → ¬ IsField E ∧ (∃ u : (𝒪[F])ˣ, ((u : 𝒪[F]) : F) = T) ∧ ∃ u : (𝒪[F])ˣ, ((u : 𝒪[F]) : F) = T'
 
 namespace Frames
 
@@ -61,8 +67,10 @@ def Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E := Matrix.of fun a b => S.h (S.f' 
 
 def D (l : Fin (r + 2)) : E := lead S.Zh l
 
-def G : E := S.D (Fin.last (r + 1)) * L.cj (S.D (Fin.last (r + 1))) -
-  algebraMap F E ((S.T : F) * S.T') * (S.D (Fin.last r).castSucc * L.cj (S.D (Fin.last r).castSucc))
+def G : E :=
+  S.D (Fin.last (r + 1)) * L.cj (S.D (Fin.last (r + 1)))
+    - algebraMap F E ((S.T : F) * S.T')
+      * (S.D (Fin.last r).castSucc * L.cj (S.D (Fin.last r).castSucc))
 
 def vth : ℤ := if S.gg then 1 else 0
 
@@ -72,13 +80,15 @@ def vD : ℤ := ∑ l : Fin (r + 2), if l ≠ 0 ∧ S.D l ≠ 0 then vE L S.ϖ (
 
 def Hp : ℝ := (S.q : ℝ) ^ (S.vth + S.a + S.vD)
 
-def spanTo (g : Fin (r + 1) → S.V) (j : ℕ) : Submodule E S.V := Submodule.span E (g '' {i | (i : ℕ) < j})
+def spanTo (g : Fin (r + 1) → S.V) (j : ℕ) : Submodule E S.V :=
+  Submodule.span E (g '' {i | (i : ℕ) < j})
 
 def Nof (g : Fin (r + 1) → S.V) : Subgroup S.GLV :=
-  isomG L S.Hm ⊓ (⨅ j : Fin r, unipOn (S.spanTo g (j + 1)) (S.spanTo g j)) ⊓
-    unipOn (perp L S.Hm (S.spanTo g r)) (S.spanTo g r)
+  isomG L S.Hm ⊓ (⨅ j : Fin r, unipOn (S.spanTo g (j + 1)) (S.spanTo g j))
+    ⊓ unipOn (perp L S.Hm (S.spanTo g r)) (S.spanTo g r)
 
-def coef (g : Fin (r + 1) → S.V) (gs : Fin r → S.V) (n : S.GLV) (j : Fin r) : E := S.h (n (g j.succ)) (gs j)
+def coef (g : Fin (r + 1) → S.V) (gs : Fin r → S.V) (n : S.GLV) (j : Fin r) : E :=
+  S.h (n (g j.succ)) (gs j)
 
 def psiOf (g : Fin (r + 1) → S.V) (gs : Fin r → S.V) (n : S.GLV) : ℂ :=
   L.psi0 (algebraMap F E S.th⁻¹ * ∑ j, S.coef g gs n j)
@@ -106,15 +116,15 @@ def H0 : Subgroup S.GLV := isomG L S.Hm ⊓ unipOn S.ME ⊥
 def InTh (Λ : Submodule L.O S.V) (x : S.V) : Prop := ∃ y ∈ Λ, x = algebraMap F E S.th • y
 
 def IsInner (g : Fin (r + 1) → S.V) (gs : Fin r → S.V) (A : Submodule L.O S.V) : Prop :=
-  (∀ x ∈ S.spanTo g r, x ∈ A) ∧ (∀ x ∈ A, x ∈ perp L S.Hm (S.spanTo g r)) ∧
-  (A ⊓ (perp L S.Hm (Submodule.span E (Set.range gs))).restrictScalars L.O).FG ∧
-  (∀ y ∈ perp L S.Hm (S.spanTo g r), (∀ x ∈ A, S.h x y ∈ L.O) ↔ y ∈ A) ∧
-  g (Fin.last r) ∈ A ∧ ∃ y ∈ A, S.h (g (Fin.last r)) y = 1
+  (∀ x ∈ S.spanTo g r, x ∈ A) ∧ (∀ x ∈ A, x ∈ perp L S.Hm (S.spanTo g r))
+    ∧ (A ⊓ (perp L S.Hm (Submodule.span E (Set.range gs))).restrictScalars L.O).FG
+    ∧ (∀ y ∈ perp L S.Hm (S.spanTo g r), (∀ x ∈ A, S.h x y ∈ L.O) ↔ y ∈ A) ∧ g (Fin.last r) ∈ A
+    ∧ ∃ y ∈ A, S.h (g (Fin.last r)) y = 1
 
 def stdLat (g : Fin (r + 1) → S.V) (gs : Fin r → S.V) (A : Submodule L.O S.V) : Submodule L.O S.V :=
-  Submodule.span L.O (Set.range fun j : Fin r => g j.castSucc) ⊔
-    (A ⊓ (perp L S.Hm (Submodule.span E (Set.range gs))).restrictScalars L.O) ⊔
-    Submodule.span L.O (Set.range gs)
+  Submodule.span L.O (Set.range fun j : Fin r => g j.castSucc)
+    ⊔ (A ⊓ (perp L S.Hm (Submodule.span E (Set.range gs))).restrictScalars L.O)
+    ⊔ Submodule.span L.O (Set.range gs)
 
 abbrev Datum : Type := Submodule L.O S.V × Submodule L.O S.V × Set (S.V × S.V)
 
@@ -123,11 +133,12 @@ def graphOf (Λ : Submodule L.O S.V) : Set (S.V × S.V) :=
     S.InTh Λ (y' - y)}
 
 def IsTermW (d : S.Datum) (Λ : Submodule L.O S.V) (n n' : S.GLV) : Prop :=
-  S.IsInner S.f S.es d.1 ∧ S.IsInner S.f' S.es' d.2.1 ∧ n ∈ S.N ∧ n' ∈ S.N' ∧
-  Λ = n • S.stdLat S.f S.es d.1 ∧ Λ = n' • S.stdLat S.f' S.es' d.2.1 ∧
-  (∀ b, S.InTh Λ (n' (S.f' b) - n (S.f b))) ∧ d.2.2 = S.graphOf Λ
+  S.IsInner S.f S.es d.1 ∧ S.IsInner S.f' S.es' d.2.1 ∧ n ∈ S.N ∧ n' ∈ S.N'
+    ∧ Λ = n • S.stdLat S.f S.es d.1 ∧ Λ = n' • S.stdLat S.f' S.es' d.2.1
+    ∧ (∀ b, S.InTh Λ (n' (S.f' b) - n (S.f b))) ∧ d.2.2 = S.graphOf Λ
 
-def IsTerm (d : S.Datum) (Λ : Submodule L.O S.V) : Prop := ∃ p : S.GLV × S.GLV, S.IsTermW d Λ p.1 p.2
+def IsTerm (d : S.Datum) (Λ : Submodule L.O S.V) : Prop :=
+  ∃ p : S.GLV × S.GLV, S.IsTermW d Λ p.1 p.2
 
 def wit (d : S.Datum) (Λ : Submodule L.O S.V) : S.GLV × S.GLV :=
   if H : S.IsTerm d Λ then H.choose else (1, 1)
@@ -145,13 +156,14 @@ def M (d : S.Datum) (Λ : Submodule L.O S.V) : Submodule L.O S.V := S.Mof (S.fr 
 
 def sat (Λ : Submodule L.O S.V) : Submodule L.O S.V := Λ ⊓ S.ME.restrictScalars L.O
 
-def be (d : S.Datum) (Λ : Submodule L.O S.V) : ℕ := (S.M d Λ).toAddSubgroup.relIndex (S.sat Λ).toAddSubgroup
+def be (d : S.Datum) (Λ : Submodule L.O S.V) : ℕ :=
+  (S.M d Λ).toAddSubgroup.relIndex (S.sat Λ).toAddSubgroup
 
 def BBzero (d : S.Datum) (Λ : Submodule L.O S.V) : Prop := S.M d Λ = S.sat Λ
 
 def K0 : Subgroup S.GLV :=
-  S.St ⊓ MulAction.stabilizer S.GLV (Submodule.span L.O (Set.range S.f)) ⊓
-    MulAction.stabilizer S.GLV (Submodule.span L.O (Set.range S.f'))
+  S.St ⊓ MulAction.stabilizer S.GLV (Submodule.span L.O (Set.range S.f))
+    ⊓ MulAction.stabilizer S.GLV (Submodule.span L.O (Set.range S.f'))
 
 def mu (Λ : Submodule L.O S.V) : ℝ := invVol S.K0 (S.St ⊓ MulAction.stabilizer S.GLV Λ)
 
@@ -166,7 +178,8 @@ def mass (d : S.Datum) (P : Submodule L.O S.V → Prop) : ℝ≥0∞ :=
 def complementReferenceCompactSubgroup : Subgroup S.GLV :=
   S.H0 ⊓ MulAction.stabilizer S.GLV (Submodule.span L.O (Set.range fun i => (Pi.single i 1 : S.V)))
 
-def nu (d : S.Datum) : ℝ := invVol S.complementReferenceCompactSubgroup (S.H0 ⊓ MulAction.stabilizer S.GLV d)
+def nu (d : S.Datum) : ℝ :=
+  invVol S.complementReferenceCompactSubgroup (S.H0 ⊓ MulAction.stabilizer S.GLV d)
 
 def sumData (φ : S.Datum → ℝ≥0∞) : ℝ≥0∞ :=
   ∑' o : MulAction.orbitRel.Quotient S.H0 S.Datum, ENNReal.ofReal (S.nu o.out) * φ o.out
@@ -179,29 +192,32 @@ def ampSq (P : S.Datum → Submodule L.O S.V → Prop) : ℝ≥0∞ :=
 def RR (x y : E) : Prop := y ∈ L.O ∧ ∃ c ∈ L.O, x + y = algebraMap F E S.th * c
 
 def lev (g g' : Fin (r + 1) → S.V) (b : S.V) : ℕ :=
-  sInf {j | ∃ al al' : Fin (r + 1) → E, b = ∑ i, al i • g i + ∑ i, al' i • g' i ∧
-    ∀ i : Fin (r + 1), j ≤ (i : ℕ) → S.RR (al i) (al' i)}
+  sInf
+    {j | ∃ al al' : Fin (r + 1) → E, b = ∑ i, al i • g i + ∑ i, al' i • g' i ∧
+      ∀ i : Fin (r + 1), j ≤ (i : ℕ) → S.RR (al i) (al' i)}
 
 def levC (d : S.Datum) (Λ : Submodule L.O S.V) (y : S.V) : ℕ :=
   S.lev (S.fr d Λ) (S.fr' d Λ) (algebraMap F E S.th • y)
 
 def TypeBe (d : S.Datum) (Λ : Submodule L.O S.V) : Prop :=
-  ¬ S.BBzero d Λ ∧ (∀ y ∈ S.sat Λ, S.levC d Λ y ≤ r) ∧
-    ∀ x₁ ∈ S.X, ∀ x₁' ∈ S.X', ∀ x₂ ∈ S.X, ∀ x₂' ∈ S.X', S.InTh Λ (x₁ + x₁') → S.InTh Λ (x₂ + x₂') →
-      ∃ c ∈ L.O, S.h x₁ x₂' = algebraMap F E S.th * c
+  ¬ S.BBzero d Λ ∧ (∀ y ∈ S.sat Λ, S.levC d Λ y ≤ r)
+    ∧ ∀ x₁ ∈ S.X, ∀ x₁' ∈ S.X', ∀ x₂ ∈ S.X, ∀ x₂' ∈ S.X',
+      S.InTh Λ (x₁ + x₁') → S.InTh Λ (x₂ + x₂') → ∃ c ∈ L.O, S.h x₁ x₂' = algebraMap F E S.th * c
 
 def nLev (d : S.Datum) (Λ : Submodule L.O S.V) (J : ℕ) : ℕ :=
   Set.ncard {C : Set S.V | ∃ y ∈ S.sat Λ, S.levC d Λ y = J ∧ C = {x | x - y ∈ S.M d Λ}}
 
 def InFF (β J βJ : ℕ) (d : S.Datum) (Λ : Submodule L.O S.V) : Prop :=
-  S.TypeBe d Λ ∧ S.be d Λ = β ∧ (∀ y ∈ S.sat Λ, S.levC d Λ y ≤ J) ∧ (∃ y ∈ S.sat Λ, S.levC d Λ y = J) ∧
-    S.nLev d Λ J = βJ
+  S.TypeBe d Λ ∧ S.be d Λ = β ∧ (∀ y ∈ S.sat Λ, S.levC d Λ y ≤ J)
+    ∧ (∃ y ∈ S.sat Λ, S.levC d Λ y = J) ∧ S.nLev d Λ J = βJ
 
-def complementLatticeOfDatum (d : S.Datum) : Set S.V := {w | w ∈ S.W0 ∧ w ∈ d.1 ∧ w ∈ d.2.1 ∧ (w, w) ∈ d.2.2}
+def complementLatticeOfDatum (d : S.Datum) : Set S.V :=
+  {w | w ∈ S.W0 ∧ w ∈ d.1 ∧ w ∈ d.2.1 ∧ (w, w) ∈ d.2.2}
 
 def TauRel (d : S.Datum) (Λ : Submodule L.O S.V) (w y : S.V) : Prop :=
-  ∃ la ∈ S.X, ∃ la' ∈ S.X', w + la ∈ Λ ∧ w + la' ∈ Λ ∧ S.InTh Λ (la' - la) ∧
-    y - algebraMap F E S.th⁻¹ • (la' - la) ∈ S.M d Λ
+  ∃ la ∈ S.X, ∃ la' ∈ S.X',
+    w + la ∈ Λ ∧ w + la' ∈ Λ ∧ S.InTh Λ (la' - la)
+      ∧ y - algebraMap F E S.th⁻¹ • (la' - la) ∈ S.M d Λ
 
 def Ihat (d : S.Datum) (Λ : Submodule L.O S.V) : Submodule L.O S.V :=
   S.M d Λ ⊔ Submodule.span L.O {y | ∃ w ∈ S.complementLatticeOfDatum d, S.TauRel d Λ w y}
@@ -239,10 +255,10 @@ def massSig (Mh : Submodule L.O S.V) : ℝ≥0∞ :=
       ENNReal.ofReal (invVol S.complementReferenceCompactSubgroup (S.H0 ⊓ MulAction.stabilizer S.GLV o.out)) else 0
 
 def IsMove (J : ℕ) (d : S.Datum) (Λ : Submodule L.O S.V) (x x' u : S.V) (s : E) : Prop :=
-  x ∈ S.spanTo S.f J ∧ x' ∈ S.spanTo S.f' J ∧ S.InTh Λ (x + x') ∧
-    S.lev (S.fr d Λ) (S.fr' d Λ) (x + x') = J ∧ u ∈ Λ ∧
-    u ∈ perp L S.Hm (S.spanTo S.f J ⊔ S.spanTo S.f' J) ∧
-    (∃ c ∈ L.O, s = algebraMap F E ((S.ϖ : F) ^ S.a) * c) ∧ s + L.cj s = S.h u u
+  x ∈ S.spanTo S.f J ∧ x' ∈ S.spanTo S.f' J ∧ S.InTh Λ (x + x')
+    ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (x + x') = J ∧ u ∈ Λ
+    ∧ u ∈ perp L S.Hm (S.spanTo S.f J ⊔ S.spanTo S.f' J)
+    ∧ (∃ c ∈ L.O, s = algebraMap F E ((S.ϖ : F) ^ S.a) * c) ∧ s + L.cj s = S.h u u
 
 def moved (Λ : Submodule L.O S.V) (x u : S.V) (s : E) : Set S.V := {v | eich L S.Hm x u s v ∈ Λ}
 

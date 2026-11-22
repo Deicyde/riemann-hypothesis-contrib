@@ -7,27 +7,39 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProo
 
 namespace Formalism.MainNotions.Ext.CutA
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3Theta Formalism.MainNotions.Ext NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.GL3Theta Formalism.MainNotions.Ext NumberField
 
 def PhNormOK (D : D7) : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (g : G1 p), At D cc δ g → p ≠ 2 →
-    ∀ a : 𝓞 D.host.K, Nat.Coprime (Algebra.norm ℤ a).natAbs p →
-      Simeq (g.phAt (g.mulBy (tauK D g.lam (a : D.host.K)) (Xv ())) : MvPowerSeries Unit ℂ_[p])
-        (MvPowerSeries.C (tauK D g.lam (a : D.host.K) * tauKc D g.lam (a : D.host.K)) * g.phAt (Xv ()))
+  ∀ (p : ℕ) [Fact p.Prime] (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (g : G1 p),
+    At D cc δ g → p ≠ 2
+      → ∀ a : 𝓞 D.host.K,
+        Nat.Coprime (Algebra.norm ℤ a).natAbs p
+          → Simeq
+            (g.phAt (g.mulBy (tauK D g.lam (a : D.host.K)) (Xv ())) : MvPowerSeries Unit ℂ_[p])
+            (MvPowerSeries.C (tauK D g.lam (a : D.host.K) * tauKc D g.lam (a : D.host.K))
+              * g.phAt (Xv ()))
 
 def OkpUnitsDense (D : D7) : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p]), p ≠ 2 → ∀ α ∈ OKp D lam, ‖α.1‖ = 1 → ‖α.2‖ = 1 →
-    α ∈ closure {x | ∃ a : 𝓞 D.host.K, Nat.Coprime (Algebra.norm ℤ a).natAbs p ∧
-      x = (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K))}
+  ∀ (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p]),
+    p ≠ 2
+      → ∀ α ∈ OKp D lam,
+        ‖α.1‖ = 1 → ‖α.2‖ = 1
+          → α ∈ closure
+            {x | ∃ a : 𝓞 D.host.K, Nat.Coprime (Algebra.norm ℤ a).natAbs p ∧
+              x = (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K))}
 
 def OkpTwoUnits2 (D : D7) : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p]), p ≠ 2 →
-    ∀ α ∈ OKp D lam, ∃ β ∈ OKp D lam, ∃ γ ∈ OKp D lam,
-      ‖β.1‖ = 1 ∧ ‖β.2‖ = 1 ∧ ‖γ.1‖ = 1 ∧ ‖γ.2‖ = 1 ∧ α = β + γ
+  ∀ (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p]),
+    p ≠ 2
+      → ∀ α ∈ OKp D lam, ∃ β ∈ OKp D lam, ∃ γ ∈ OKp D lam,
+        ‖β.1‖ = 1 ∧ ‖β.2‖ = 1 ∧ ‖γ.1‖ = 1 ∧ ‖γ.2‖ = 1 ∧ α = β + γ
 
-theorem phNorm_of (H1 : PhNormOfUnits) (H2 : PhNormClosed) (D : D7) (hOK : PhNormOK D) (hd : OkpUnitsDense D)
-    (hU : OkpTwoUnits2 D) (ht : OkpTrace D) (hN : OkpNorm D) (he : endInt D) (ha : addInt D) (hB : beBiadd D) :
-    phNorm D := by
+theorem phNorm_of
+    (H1 : PhNormOfUnits) (H2 : PhNormClosed)
+    (D : D7) (hOK : PhNormOK D) (hd : OkpUnitsDense D) (hU : OkpTwoUnits2 D) (ht : OkpTrace D)
+    (hN : OkpNorm D) (he : endInt D) (ha : addInt D) (hB : beBiadd D)
+    : phNorm D := by
   have hsqK : D.host.conj D.host.sqd ∈ D.host.K := by
     unfold Formalism.HC.HostRaw.K
     rw [D.host.gal_sqd]
@@ -40,14 +52,16 @@ theorem phNorm_of (H1 : PhNormOfUnits) (H2 : PhNormClosed) (D : D7) (hOK : PhNor
       | (rcases Int.units_eq_one_or u with h | h <;> simp [h])
     rw [D.host.gal_sqd, map_mul, map_intCast, D.host.gal_sqd, ← mul_assoc, ← Int.cast_mul, hu,
       Int.cast_one, one_mul]
-  have hmemK : ∀ y : D.host.E, y ∈ D.host.K →
-      D.host.conj y ∈ D.host.K ∧ D.host.conj (D.host.conj y) = y := by
+  have hmemK
+      : ∀ y : D.host.E,
+        y ∈ D.host.K → D.host.conj y ∈ D.host.K ∧ D.host.conj (D.host.conj y) = y := by
     clear H1 H2 hOK hd hU ht hN he ha hB
     unfold Formalism.HC.HostRaw.K at hsqK ⊢
     intro y hy
     induction hy using IntermediateField.adjoin_induction
-    all_goals simp_all [Set.mem_singleton_iff, map_add (f := _), map_mul, map_inv₀, map_neg, AlgEquiv.commutes,
-      add_mem, mul_mem, inv_mem, neg_mem, IntermediateField.algebraMap_mem]
+    all_goals
+      simp_all [Set.mem_singleton_iff, map_add (f := _), map_mul, map_inv₀, map_neg,
+        AlgEquiv.commutes, add_mem, mul_mem, inv_mem, neg_mem, IntermediateField.algebraMap_mem]
   have hQ : ∀ x : D.host.E, D.host.φ₀ x ∈ Qbar := by
     intro x
     have hx : IsIntegral ℚ (D.host.φ₀ x) :=
@@ -56,16 +70,17 @@ theorem phNorm_of (H1 : PhNormOfUnits) (H2 : PhNormClosed) (D : D7) (hOK : PhNor
     | exact hx
     | exact (mem_algebraicClosure_iff' (F := ℚ)).2 hx
     | exact mem_algebraicClosure_iff.2 hx.isAlgebraic
-  have hL : ∀ {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) (x : D.host.E),
-      lamC lam (D.host.φ₀ x) = lam ⟨D.host.φ₀ x, hQ x⟩ := by
+  have hL
+      : ∀ {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) (x : D.host.E),
+        lamC lam (D.host.φ₀ x) = lam ⟨D.host.φ₀ x, hQ x⟩ := by
     intro p _ lam x
     unfold lamC
     rw [dite_eq_left (hQ x)]
-  have key : ∀ {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]),
-      (∀ α ∈ OKp D lam, ∀ β ∈ OKp D lam, α + β ∈ OKp D lam) ∧
-      (∀ α ∈ OKp D lam, ∀ β ∈ OKp D lam, α * β ∈ OKp D lam) ∧
-      ((2 : ℂ_[p]), (2 : ℂ_[p])) ∈ OKp D lam ∧
-      (∀ α ∈ OKp D lam, α.swap ∈ OKp D lam) := by
+  have key
+      : ∀ {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]),
+        (∀ α ∈ OKp D lam, ∀ β ∈ OKp D lam, α + β ∈ OKp D lam)
+          ∧ (∀ α ∈ OKp D lam, ∀ β ∈ OKp D lam, α * β ∈ OKp D lam)
+          ∧ ((2 : ℂ_[p]), (2 : ℂ_[p])) ∈ OKp D lam ∧ (∀ α ∈ OKp D lam, α.swap ∈ OKp D lam) := by
     intro p _ lam
     let ψ : D.host.E →+* Qbar := D.host.φ₀.codRestrict Qbar hQ
     let ι : 𝓞 D.host.K →+* D.host.E :=
@@ -96,8 +111,7 @@ theorem phNorm_of (H1 : PhNormOfUnits) (H2 : PhNormClosed) (D : D7) (hOK : PhNor
     · intro α hα β hβ
       rw [hcl] at hα hβ ⊢
       exact mul_mem hα hβ
-    · have e : ((2 : ℂ_[p]), (2 : ℂ_[p])) = 1 + 1 := by
-        ext <;> norm_num
+    · have e : ((2 : ℂ_[p]), (2 : ℂ_[p])) = 1 + 1 := by ext <;> norm_num
       rw [hcl, e]
       exact add_mem (one_mem _) (one_mem _)
     · intro α hα
@@ -109,11 +123,10 @@ theorem phNorm_of (H1 : PhNormOfUnits) (H2 : PhNormClosed) (D : D7) (hOK : PhNor
       obtain ⟨hc, hcc⟩ := hmemK ((a : D.host.K) : D.host.E) (a : D.host.K).2
       let z : D.host.K := ⟨D.host.conj ((a : D.host.K) : D.host.E), hc⟩
       have h1 : IsIntegral ℤ (a : D.host.K) := by
-        first
-        | exact a.2
-        | exact NumberField.RingOfIntegers.isIntegral_coe a
-      have h2 := h1.map (((D.host.conj : D.host.E →+* D.host.E).comp
-        (algebraMap D.host.K D.host.E)).toIntAlgHom)
+        first | exact a.2 | exact NumberField.RingOfIntegers.isIntegral_coe a
+      have h2 :=
+        h1.map
+          (((D.host.conj : D.host.E →+* D.host.E).comp (algebraMap D.host.K D.host.E)).toIntAlgHom)
       have hz : IsIntegral ℤ z :=
         (isIntegral_algHom_iff (x := z) ((algebraMap D.host.K D.host.E).toIntAlgHom)
           (algebraMap D.host.K D.host.E).injective).1 h2

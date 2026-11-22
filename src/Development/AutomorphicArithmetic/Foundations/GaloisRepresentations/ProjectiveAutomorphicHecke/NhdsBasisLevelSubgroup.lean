@@ -58,9 +58,11 @@ theorem locComm_holds : LocComm := pLocComm_of
 theorem locMem_holds : LocMem := pLocMem_of intConj_holds locComm_holds
 theorem levOpen_holds : LevOpen := pLevOpen_of
 theorem intCompact_holds : IntCompact := pIntCompact_of
-theorem levCompact_holds : LevCompact := pLevCompact_of intCompact_holds intConj_holds locComm_holds levOpen_holds
+theorem levCompact_holds : LevCompact :=
+  pLevCompact_of intCompact_holds intConj_holds locComm_holds levOpen_holds
 theorem nhds_basis_levelSubgroup : Nbhd2 := pNbhd2_of
-theorem nbhdU_holds : NbhdU := pNbhdU_of nhds_basis_levelSubgroup intConj_holds locComm_holds ofUBij_holds
+theorem nbhdU_holds : NbhdU :=
+  pNbhdU_of nhds_basis_levelSubgroup intConj_holds locComm_holds ofUBij_holds
 theorem sphType_holds : SphType := pSphType_of intConj_holds locComm_holds
 theorem stepAt_holds : StepAt := pStepAt_of locAdj_holds locComm_holds ofUBij_holds
 theorem vecU_holds : VecU := pVecU_of nbhdU_holds stepAt_holds sphType_holds locComm_holds
@@ -70,10 +72,11 @@ theorem heckePres_holds : HeckePres := pHeckePres_of locComm_holds locMem_holds
 theorem kapOf_holds : KapOf := pKapOf_of finToHecke_holds xiZeta_holds intSim_holds levOpen_holds
 
 theorem formGU_holds : FormGU :=
-  pFormGU_of extEig2_holds classFin_holds xiZeta_holds kerFormU_holds heckePres_holds satVal_holds locMem_holds locComm_holds
-    levOpen_holds ofUBij_holds
+  pFormGU_of extEig2_holds classFin_holds xiZeta_holds kerFormU_holds heckePres_holds satVal_holds
+    locMem_holds locComm_holds levOpen_holds ofUBij_holds
 
 theorem seedGU_holds : SeedGU :=
-  seedGU_of zetaEx_holds vecU_holds sphType_holds formGU_holds kapOf_holds levOpen_holds levCompact_holds
+  seedGU_of zetaEx_holds vecU_holds sphType_holds formGU_holds kapOf_holds levOpen_holds
+    levCompact_holds
 
 end UpperTheory.Gal.CertificateRingHomMap

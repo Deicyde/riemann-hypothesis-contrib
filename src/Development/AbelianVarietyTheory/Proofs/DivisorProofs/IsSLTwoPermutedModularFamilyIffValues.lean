@@ -10,9 +10,10 @@ open GlobalTheory.QFam
 
 namespace GlobalTheory.QFam
 
-theorem isFam_iff_values (ι : Type) (act : ι → SL(2, ℤ) → ι) (w : ℤ) (f : ι → ℍ → ℂ) :
-    IsFam act w f ↔ ∀ (i : ι) (γ : SL(2, ℤ)) (τ : ℍ),
-      f i (γ • τ) = (((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ)) ^ w * f (act i γ) τ := by
+theorem isFam_iff_values (ι : Type) (act : ι → SL(2, ℤ) → ι) (w : ℤ) (f : ι → ℍ → ℂ)
+    : IsFam act w f
+      ↔ ∀ (i : ι) (γ : SL(2, ℤ)) (τ : ℍ),
+        f i (γ • τ) = (((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ)) ^ w * f (act i γ) τ := by
   unfold IsFam
   refine forall_congr' fun i => forall_congr' fun γ => ?_
   rw [funext_iff]

@@ -17,28 +17,30 @@ section
 
 variable {K : Type*}
 
-theorem diffStep_add (b b' : K → ℤ) (h : (K → ℤ) → ℤ) (m : K → ℤ) :
-    diffStep (b + b') h m = diffStep b h m + diffStep b' h (m - b) := by
+theorem diffStep_add (b b' : K → ℤ) (h : (K → ℤ) → ℤ) (m : K → ℤ)
+    : diffStep (b + b') h m = diffStep b h m + diffStep b' h (m - b) := by
   simp only [diffStep, sub_add_eq_sub_sub]
   ring
 
-theorem foldr_diffStep_set_add (h : (K → ℤ) → ℤ) (b b' : K → ℤ) :
-    ∀ (L : List (K → ℤ)) (i : ℕ), i < L.length → ∀ m : K → ℤ,
-      (L.set i (b + b')).foldr diffStep h m =
-        (L.set i b).foldr diffStep h m + (L.set i b').foldr diffStep h (m - b)
+theorem foldr_diffStep_set_add (h : (K → ℤ) → ℤ) (b b' : K → ℤ)
+    : ∀ (L : List (K → ℤ)) (i : ℕ),
+      i < L.length
+        → ∀ m : K → ℤ,
+          (L.set i (b + b')).foldr diffStep h m
+            = (L.set i b).foldr diffStep h m + (L.set i b').foldr diffStep h (m - b)
   | [], i, hi, _ => absurd hi (Nat.not_lt_zero _)
   | a :: L, 0, _, m => by
-      simp only [List.set_cons_zero, List.foldr_cons]
-      exact diffStep_add b b' _ m
+    simp only [List.set_cons_zero, List.foldr_cons]
+    exact diffStep_add b b' _ m
   | a :: L, i + 1, hi, m => by
-      simp only [List.set_cons_succ, List.foldr_cons, diffStep]
-      have hi' : i < L.length := by simpa using hi
-      rw [foldr_diffStep_set_add h b b' L i hi' m, foldr_diffStep_set_add h b b' L i hi' (m - a),
-        ← sub_right_comm m a b]
-      ring
+    simp only [List.set_cons_succ, List.foldr_cons, diffStep]
+    have hi' : i < L.length := by simpa using hi
+    rw [foldr_diffStep_set_add h b b' L i hi' m, foldr_diffStep_set_add h b b' L i hi' (m - a),
+      ← sub_right_comm m a b]
+    ring
 
-theorem ofFn_update {α : Type*} {n : ℕ} (bs : Fin n → α) (i : Fin n) (x : α) :
-    List.ofFn (Function.update bs i x) = (List.ofFn bs).set i x := by
+theorem ofFn_update {α : Type*} {n : ℕ} (bs : Fin n → α) (i : Fin n) (x : α)
+    : List.ofFn (Function.update bs i x) = (List.ofFn bs).set i x := by
   apply List.ext_getElem
   · simp
   · intro j h1 h2
@@ -49,15 +51,15 @@ theorem ofFn_update {α : Type*} {n : ℕ} (bs : Fin n → α) (i : Fin n) (x : 
     · exact absurd h'.symm h
     · rfl
 
-theorem mixedDiff_update_add {n : ℕ} (bs : Fin n → K → ℤ) (i : Fin n) (b b' : K → ℤ)
-    (h : (K → ℤ) → ℤ) (m : K → ℤ) :
-    mixedDiff (Function.update bs i (b + b')) h m =
-      mixedDiff (Function.update bs i b) h m + mixedDiff (Function.update bs i b') h (m - b) := by
+theorem mixedDiff_update_add
+    {n : ℕ} (bs : Fin n → K → ℤ) (i : Fin n) (b b' : K → ℤ) (h : (K → ℤ) → ℤ) (m : K → ℤ)
+    : mixedDiff (Function.update bs i (b + b')) h m
+      = mixedDiff (Function.update bs i b) h m + mixedDiff (Function.update bs i b') h (m - b) := by
   simp only [mixedDiff, ofFn_update]
   exact foldr_diffStep_set_add h b b' _ i (by simp) m
 
-theorem tendsto_sub_const_atTop (b : K → ℤ) :
-    Filter.Tendsto (fun m : K → ℤ => m - b) Filter.atTop Filter.atTop :=
+theorem tendsto_sub_const_atTop (b : K → ℤ)
+    : Filter.Tendsto (fun m : K → ℤ => m - b) Filter.atTop Filter.atTop :=
   Filter.tendsto_atTop_atTop.2 fun c => ⟨c + b, fun _ hm => le_sub_iff_add_le.mpr hm⟩
 
 theorem IntNumAdd.proof (h1 : MixedDiffConst.Statement.{u}) : IntNumAdd.Statement.{u} := by

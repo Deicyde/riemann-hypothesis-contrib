@@ -22,12 +22,15 @@ noncomputable section
 
 namespace GlobalTheory.HL.GlobalOrbits
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
-  {A : Places F E sig} {r k : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {sig : E →ₐ[F] E} {A : Places F E sig} {r k : ℕ}
 
-theorem mem_rat {n : ℕ}
-    {K : ∀ p, Subgroup ((Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep))}
-    {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} (hg : g ∈ A.rat K) : ∀ p, ∃ g' ∈ K p, A.Ext p g g' := hg
+theorem mem_rat
+    {n : ℕ} {K : ∀ p, Subgroup ((Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep))}
+    {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} (hg : g ∈ A.rat K)
+    : ∀ p, ∃ g' ∈ K p, A.Ext p g g' :=
+  hg
 
 theorem lrel_equivalence (G : GFrames A r k) : Equivalence G.LRel := by
   refine ⟨fun Λ => ⟨1, G.St.one_mem, ?_⟩, ?_, ?_⟩
@@ -35,7 +38,8 @@ theorem lrel_equivalence (G : GFrames A r k) : Equivalence G.LRel := by
   · rintro Λ Λ' ⟨g, hg, rfl⟩
     refine ⟨g⁻¹, G.St.inv_mem hg, ?_⟩
     rw [← Submodule.map_comp]
-    ext x; simp
+    ext x
+    simp
   · rintro a b c ⟨g, hg, rfl⟩ ⟨g2, hg2, rfl⟩
     refine ⟨g2 * g, G.St.mul_mem hg2 hg, ?_⟩
     rw [← Submodule.map_comp]
@@ -61,8 +65,8 @@ theorem drel_equivalence (G : GFrames A r k) : Equivalence G.DRel := by
       rw [he x, he2 (g x)]
     · rw [mul_smul, hd, hd2]
 
-theorem local_of_lrel (G : GFrames A r k) {Γ Γ' : G.Lt} (h : G.LRel Γ Γ') :
-    ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ' = h • A.lat p Γ := by
+theorem local_of_lrel (G : GFrames A r k) {Γ Γ' : G.Lt} (h : G.LRel Γ Γ')
+    : ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ' = h • A.lat p Γ := by
   obtain ⟨g, hg, rfl⟩ := h
   intro p
   obtain ⟨g', hg', he⟩ := mem_rat hg p
@@ -72,10 +76,13 @@ end GlobalTheory.HL.GlobalOrbits
 
 namespace GlobalTheory.HL.GlobalOrbits
 
-theorem smul_eq_of_le {F' E' : Type} [Field F'] [ValuativeRel F'] [TopologicalSpace F'] [CommRing E']
-    [Algebra F' E'] [TopologicalSpace E'] (L : LocE F' E') {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E')
-    (Λ : Submodule L.O (Fin n → E')) (hΛ : IsSD L Hm Λ) (u : (Fin n → E') ≃ₗ[E'] (Fin n → E'))
-    (hu : u ∈ isomG L Hm) (hle : ∀ x ∈ Λ, u x ∈ Λ) : u • Λ = Λ := by
+theorem smul_eq_of_le
+    {F' E' : Type} [Field F'] [ValuativeRel F'] [TopologicalSpace F'] [CommRing E'] [Algebra F' E']
+    [TopologicalSpace E']
+    (L : LocE F' E')
+    {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E') (Λ : Submodule L.O (Fin n → E')) (hΛ : IsSD L Hm Λ)
+    (u : (Fin n → E') ≃ₗ[E'] (Fin n → E')) (hu : u ∈ isomG L Hm) (hle : ∀ x ∈ Λ, u x ∈ Λ)
+    : u • Λ = Λ := by
   have hu' : ∀ x y, hf L Hm (u x) (u y) = hf L Hm x y := hu
   ext y
   constructor
@@ -93,14 +100,17 @@ theorem smul_eq_of_le {F' E' : Type} [Field F'] [ValuativeRel F'] [TopologicalSp
     rw [h2]
     exact Submodule.smul_mem_pointwise_smul _ _ _ h1
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
-  {A : Places F E sig} {r k : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {sig : E →ₐ[F] E} {A : Places F E sig} {r k : ℕ}
 
-private theorem full_of_local_span {n : ℕ} (A : Places F E sig)
+private theorem full_of_local_span
+    {n : ℕ}
+    (A : Places F E sig)
     (Λ : Submodule (𝓞 E) (Fin n → E)) (hΛ : Submodule.IsLattice E Λ)
     (p : HeightOneSpectrum (𝓞 F))
-    (hp : Submodule.span (A.loc p).Ep (A.lat p Λ : Set (Fin n → (A.loc p).Ep)) = ⊤) :
-    Submodule.IsFullLattice E Λ := by
+    (hp : Submodule.span (A.loc p).Ep (A.lat p Λ : Set (Fin n → (A.loc p).Ep)) = ⊤)
+    : Submodule.IsFullLattice E Λ := by
   haveI := PlacesInt.nontrivial_Ep (A.loc p)
   refine { toIsLattice := hΛ, span_eq_top := ?_ }
   apply (Submodule.dualAnnihilator_eq_bot_iff).1
@@ -119,8 +129,8 @@ private theorem full_of_local_span {n : ℕ} (A : Places F E sig)
       have h : f y = ∑ i, f (Pi.single i 1) * y i := by
         conv_lhs => rw [pi_eq_sum_univ' y]
         simp [mul_comm]
-      simp only [g, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.proj_apply,
-        smul_eq_mul, Places.bc, ← map_mul, ← map_sum, ← h, hfΛ y hy, map_zero]
+      simp only [g, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.proj_apply, smul_eq_mul,
+        Places.bc, ← map_mul, ← map_sum, ← h, hfΛ y hy, map_zero]
     | zero => exact map_zero g
     | add x y _ _ hx hy => simp [hx, hy]
     | smul c x _ hx => simp [hx]
@@ -145,19 +155,23 @@ private theorem full_of_local_span {n : ℕ} (A : Places F E sig)
     simp [hi]
   simpa [hf0]
 
-theorem lrel_of_local (G : GFrames A r k) {d : G.Dat} {Γ Γ' : G.Lt} (hT : G.IsTerm d Γ)
-    (hL' : Submodule.IsLattice E Γ') (H : ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ' = h • A.lat p Γ) :
-    G.LRel Γ Γ' := by
+theorem lrel_of_local
+    (G : GFrames A r k)
+    {d : G.Dat} {Γ Γ' : G.Lt} (hT : G.IsTerm d Γ) (hL' : Submodule.IsLattice E Γ')
+    (H : ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ' = h • A.lat p Γ)
+    : G.LRel Γ Γ' := by
   obtain ⟨p₀⟩ : Nonempty (HeightOneSpectrum (𝓞 F)) := by
     obtain ⟨P, hP⟩ := Ideal.exists_maximal (𝓞 F)
-    exact ⟨⟨P, hP.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField F)⟩⟩
+    exact
+      ⟨⟨P, hP.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField F)⟩⟩
   haveI := (A.loc p₀).lf
   haveI := (A.loc p₀).char0
   have hspan := (TermBasic.term_basic _ _ _ _ _ _ (hT.2 p₀)).1.1.2
   have hfull := full_of_local_span A Γ hT.1 p₀ hspan
   obtain ⟨u, _, hu⟩ := H p₀
-  have hspan' : Submodule.span (A.loc p₀).Ep
-      (A.lat p₀ Γ' : Set (Fin (k + 2 * r + 1) → (A.loc p₀).Ep)) = ⊤ := by
+  have hspan'
+      : Submodule.span (A.loc p₀).Ep (A.lat p₀ Γ' : Set (Fin (k + 2 * r + 1) → (A.loc p₀).Ep))
+        = ⊤ := by
     rw [hu, Submodule.coe_pointwise_smul, Submodule.span_smul, hspan, smul_top]
   have hfull' := full_of_local_span A Γ' hL' p₀ hspan'
   have recΓ := GlobalTheory.T.numberField_lattice_determined_by_local_lattices A _ Γ hfull
@@ -176,13 +190,22 @@ theorem lrel_of_local (G : GFrames A r k) {d : G.Dat} {Γ Γ' : G.Lt} (hT : G.Is
     have : A.lat p Γ' = A.lat p Γ := by rw [hc.1, hc.2]
     simp only [n, if_pos this]
     exact (G.S p).K0.one_mem
-  have hc : {p | ¬ ∃ u : (𝒪[(A.loc p).Fp])ˣ,
-      ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = (((fun _ => 1 : ∀ p, ((A.loc p).Fp)ˣ) p) : (A.loc p).Fp)}.Finite :=
+  have hc
+      : {p | ¬ ∃ u : (𝒪[(A.loc p).Fp])ˣ,
+        ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = (((fun _ => 1 : ∀ p, ((A.loc p).Fp)ˣ) p) : (A.loc p).Fp)}.Finite :=
     Set.finite_empty.subset fun p hp => hp ⟨1, by simp⟩
   have happrox := by
     first
-    | exact GlobalTheory.T.exists_mem_St_approximating_local_elements A r k G Γ hfull (fun _ => 1) hc n (fun p => (hn p).1) hfin
-    | exact GlobalTheory.T.exists_mem_St_approximating_local_elements A r k G Γ hfull.toIsLattice (fun _ => 1) hc n (fun p => (hn p).1) hfin
+    | exact GlobalTheory.T.exists_mem_St_approximating_local_elements A r k G Γ hfull
+        (fun _ => 1)
+        hc n
+        (fun p => (hn p).1)
+        hfin
+    | exact GlobalTheory.T.exists_mem_St_approximating_local_elements A r k G Γ hfull.toIsLattice
+        (fun _ => 1)
+        hc n
+        (fun p => (hn p).1)
+        hfin
   obtain ⟨g, hg, hgp⟩ := happrox
   have hloc : ∀ p, A.lat p Γ' = A.lat p (Γ.map ((g : G.V →ₗ[E] G.V).restrictScalars (𝓞 E))) := by
     intro p
@@ -206,7 +229,8 @@ theorem lrel_of_local (G : GFrames A r k) {d : G.Dat} {Γ Γ' : G.Lt} (hT : G.Is
     have hst := smul_eq_of_le (A.L p) _ _ hSD _ hu hle
     rw [(RatExt.rational_extend A _ p).2.2.2.1 g g' Γ he, (hn p).2]
     rw [show g' • A.lat p Γ = n p • (((n p)⁻¹ * g') • A.lat p Γ) by
-      rw [← mul_smul, mul_inv_cancel_left], hst]
+        rw [← mul_smul, mul_inv_cancel_left],
+      hst]
   refine ⟨g, hg, le_antisymm ?_ ?_⟩
   · intro x hx
     refine (recΓ'.1 x).2 fun p => ?_
@@ -230,38 +254,52 @@ end GlobalTheory.HL.GlobalOrbits
 
 namespace GlobalTheory.HL.GlobalOrbits
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
-  {A : Places F E sig} {r k : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {sig : E →ₐ[F] E} {A : Places F E sig} {r k : ℕ}
 
-theorem glue_terms (G : GFrames A r k) (hk : 4 * r + 7 ≤ k) {d : G.Dat} {Λ₀ : G.Lt}
-    (h₀ : G.IsTerm d Λ₀) (Λ : ∀ p, Submodule (A.L p).O (G.S p).V)
-    (hΛ : ∀ p, (G.S p).IsTerm (d p) (Λ p)) :
-    ∃ Γ, G.IsTerm d Γ ∧ ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ = h • Λ p := by
+theorem glue_terms
+    (G : GFrames A r k)
+    (hk : 4 * r + 7 ≤ k)
+    {d : G.Dat} {Λ₀ : G.Lt} (h₀ : G.IsTerm d Λ₀)
+    (Λ : ∀ p, Submodule (A.L p).O (G.S p).V) (hΛ : ∀ p, (G.S p).IsTerm (d p) (Λ p))
+    : ∃ Γ, G.IsTerm d Γ ∧ ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ = h • Λ p := by
   have hstd := GlobalTheory.T.coordinateLattice_unique_term_almost_all_places A r k G hk
   obtain ⟨p₀⟩ : Nonempty (HeightOneSpectrum (𝓞 F)) := by
     obtain ⟨P, hP⟩ := Ideal.exists_maximal (𝓞 F)
-    exact ⟨⟨P, hP.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField F)⟩⟩
+    exact
+      ⟨⟨P, hP.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField F)⟩⟩
   haveI := (A.loc p₀).lf
   haveI := (A.loc p₀).char0
   have hspan := (TermBasic.term_basic _ _ _ _ _ _ (h₀.2 p₀)).1.1.2
   have hfull := full_of_local_span A Λ₀ h₀.1 p₀ hspan
   have rec₀ := GlobalTheory.T.numberField_lattice_determined_by_local_lattices A _ Λ₀ hfull
-  obtain ⟨B, hBfin, hB⟩ : ∃ B : Set (HeightOneSpectrum (𝓞 F)), B.Finite ∧ ∀ p ∉ B,
-      A.lat p Λ₀ = Submodule.span (A.L p).O (Set.range fun i => (Pi.single i 1 : (G.S p).V)) ∧
-      ∃ h ∈ (G.S p).St, Λ p = h • Submodule.span (A.L p).O (Set.range fun i => (Pi.single i 1 : (G.S p).V)) := by
+  obtain ⟨B, hBfin, hB⟩
+      : ∃ B : Set (HeightOneSpectrum (𝓞 F)),
+        B.Finite
+          ∧ ∀ p ∉ B,
+            A.lat p Λ₀ = Submodule.span (A.L p).O (Set.range fun i => (Pi.single i 1 : (G.S p).V))
+              ∧ ∃ h ∈ (G.S p).St,
+                Λ p
+                  = h • Submodule.span (A.L p).O
+                    (Set.range fun i => (Pi.single i 1 : (G.S p).V)) := by
     refine ⟨_, hstd.union rec₀.2.2, fun p hp => ?_⟩
     haveI := (A.loc p).lf
     haveI := (A.loc p).char0
     simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hp
     obtain ⟨⟨-, -, -, d₀, hW, -, -, hT1, -, -⟩, hl⟩ := hp
-    have hTp : (G.S p).IsTerm (d p) (Submodule.span (A.L p).O (Set.range fun i => (Pi.single i 1 : (G.S p).V))) := by
+    have hTp : (G.S p).IsTerm (d p)
+        (Submodule.span (A.L p).O (Set.range fun i => (Pi.single i 1 : (G.S p).V))) := by
       rw [← hl]; exact h₀.2 p
-    have hd : d₀ = d p :=
-      (TermBasic.term_basic _ _ _ _ _ _ hTp).2.2.2.2.2.2.2 d₀ ⟨(1, 1), hW⟩
+    have hd : d₀ = d p := (TermBasic.term_basic _ _ _ _ _ _ hTp).2.2.2.2.2.2.2 d₀ ⟨(1, 1), hW⟩
     refine ⟨hl, hT1 (Λ p) ?_⟩
-    rw [hd]; exact hΛ p
-  let Λ' : ∀ p, Submodule (A.L p).O (G.S p).V := fun p => if p ∈ B then Λ p else
-    Submodule.span (A.L p).O (Set.range fun i => (Pi.single i 1 : (G.S p).V))
+    rw [hd]
+    exact hΛ p
+  let Λ' : ∀ p, Submodule (A.L p).O (G.S p).V := fun p =>
+    if p ∈ B then
+      Λ p
+    else
+      Submodule.span (A.L p).O (Set.range fun i => (Pi.single i 1 : (G.S p).V))
   have hterm : ∀ p, (G.S p).IsTerm (d p) (Λ' p) := by
     intro p
     by_cases hp : p ∈ B
@@ -272,13 +310,15 @@ theorem glue_terms (G : GFrames A r k) (hk : 4 * r + 7 ≤ k) {d : G.Dat} {Λ₀
     haveI := (A.loc p).lf
     haveI := (A.loc p).char0
     exact (TermBasic.term_basic _ _ _ _ _ _ (hterm p)).1.1
-  have hfin : {p | Λ' p ≠ Submodule.span (A.L p).O
-      (Set.range fun i => (Pi.single i 1 : Fin (k + 2 * r + 1) → (A.loc p).Ep))}.Finite := by
+  have hfin
+      : {p | Λ' p ≠ Submodule.span (A.L p).O
+        (Set.range fun i => (Pi.single i 1 : Fin (k + 2 * r + 1) → (A.loc p).Ep))}.Finite := by
     refine hBfin.subset fun p hp => ?_
     by_contra hc
     apply hp
     simp only [Λ', if_neg hc]
-  obtain ⟨Γ, ⟨hL, hlatΓ⟩, -⟩ := GlobalTheory.T.exists_unique_global_lattice_of_local_lattices A _ Λ' hlat hfin
+  obtain ⟨Γ, ⟨hL, hlatΓ⟩, -⟩ :=
+    GlobalTheory.T.exists_unique_global_lattice_of_local_lattices A _ Λ' hlat hfin
   refine ⟨Γ, ⟨hL, fun p => (hlatΓ p).symm ▸ hterm p⟩, fun p => ?_⟩
   by_cases hp : p ∈ B
   · refine ⟨1, (G.S p).St.one_mem, ?_⟩
@@ -291,11 +331,26 @@ theorem glue_terms (G : GFrames A r k) (hk : 4 * r + 7 ≤ k) {d : G.Dat} {Λ₀
 
 end GlobalTheory.HL.GlobalOrbits
 
-
 open GlobalTheory.HL.GlobalOrbits in
-theorem GlobalTheory.HL.GlobalOrbits.global_terms_orbits : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E} (A : Places F E sig), ∀ (r k : ℕ) (G : GFrames A r k), 4 * r + 7 ≤ k → ∀ d : G.Dat, (∃ Λ₀, G.IsTerm d Λ₀) → (∀ Λ : ∀ p, Submodule (A.L p).O (G.S p).V, (∀ p, (G.S p).IsTerm (d p) (Λ p)) → ∃ Γ, G.IsTerm d Γ ∧ ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ = h • Λ p) ∧ (∀ Γ Γ', G.IsTerm d Γ → Submodule.IsLattice E Γ' → (G.LRel Γ Γ' ↔ ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ' = h • A.lat p Γ)) ∧ Equivalence G.LRel ∧ Equivalence G.DRel := by
+theorem GlobalTheory.HL.GlobalOrbits.global_terms_orbits
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {sig : E →ₐ[F] E} (A : Places F E sig),
+      ∀ (r k : ℕ) (G : GFrames A r k),
+        4 * r + 7 ≤ k
+          → ∀ d : G.Dat,
+            (∃ Λ₀, G.IsTerm d Λ₀)
+              → (∀ Λ : ∀ p, Submodule (A.L p).O (G.S p).V,
+                  (∀ p, (G.S p).IsTerm (d p) (Λ p))
+                    → ∃ Γ, G.IsTerm d Γ ∧ ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ = h • Λ p)
+                ∧ (∀ Γ Γ',
+                  G.IsTerm d Γ → Submodule.IsLattice E Γ'
+                    → (G.LRel Γ Γ' ↔ ∀ p, ∃ h ∈ (G.S p).St, A.lat p Γ' = h • A.lat p Γ))
+                ∧ Equivalence G.LRel ∧ Equivalence G.DRel := by
   intro F E _ _ _ _ _ sig A r k G hk d hex
   obtain ⟨Λ₀, h₀⟩ := hex
-  exact ⟨fun Λ hΛ => glue_terms G hk h₀ Λ hΛ,
+  exact ⟨
+    fun Λ hΛ => glue_terms G hk h₀ Λ hΛ,
     fun Γ Γ' hT hL' => ⟨fun h => local_of_lrel G h, fun H => lrel_of_local G hT hL' H⟩,
-    lrel_equivalence G, drel_equivalence G⟩
+    lrel_equivalence G,
+    drel_equivalence G
+  ⟩

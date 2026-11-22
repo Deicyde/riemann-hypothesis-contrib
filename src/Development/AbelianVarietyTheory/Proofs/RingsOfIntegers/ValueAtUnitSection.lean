@@ -8,8 +8,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj
 
@@ -55,15 +57,18 @@ lemma trF_unique {X Y Z : Scheme.{0}} {L : LB X} {K : Type} [Fintype K] [Unique 
   subst hq
   exact Fintype.prod_unique _
 
-def thU (R : Type) [CommRing R] (I : Ideal R) (e : ℕ) :
-    (𝟙_ (Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))))).left ⟶ (𝟙_ (Over (Spec (CommRingCat.of R)))).left :=
+def thU (R : Type) [CommRing R] (I : Ideal R) (e : ℕ)
+    : (𝟙_ (Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))))).left
+      ⟶ (𝟙_ (Over (Spec (CommRingCat.of R)))).left :=
   thick R I e
 
 section Thick
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegData R I}
-  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] (U : UnifPre I D A G) (e : ℕ)
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+  (U : UnifPre I D A G) (e : ℕ)
 
 lemma eSec_fGl : eSec (thickObj R I e G) ≫ fGl I G e = thU R I e ≫ eSec G :=
   eSec_pullback_fst _ _
@@ -139,39 +144,57 @@ lemma unit_value_thick (f : G ⟶ G) [IsMonHom f] {g : D.toPre.P.A.left ⟶ D.to
 
 end Thick
 
-theorem unit_value {V : Type} [CommRing V] [IsDomain V] [IsNoetherianRing V] [IsLocalRing V]
+theorem unit_value
+    {V : Type} [CommRing V] [IsDomain V] [IsNoetherianRing V] [IsLocalRing V]
     {G : Over (Spec (CommRingCat.of V))} [GrpObj G] [IsCommMonObj G]
     {D : DegData V (maximalIdeal V)} {A : PolAV (Spec (CommRingCat.of (FractionRing V)))}
-    (U : UnifPre (maximalIdeal V) D A G) {N : ℕ} (hN : 0 < N) (k : ℕ) (σ'' : H0 U.LG.L (k * N)) (τ : H0 U.LG.L k)
-    (H : ∀ (e : ℕ) (z) (j : U.LG.L.ι), (thU V (maximalIdeal V) e ≫ eSec G) z ∈ U.LG.L.U j →
-      sv U (k * N) σ'' (thU V (maximalIdeal V) e ≫ eSec G) z j =
-      (gm (thU V (maximalIdeal V) e) z ((U.LG.L.pull (eSec G)).U (fun _ => j))
-        (U.LG.rig.s (fun _ => j)) ^ (k * (N - 1))).val * sv U k τ (thU V (maximalIdeal V) e ≫ eSec G) z j)
-    (Z : Scheme.{0}) (r : Z ⟶ (𝟙_ (Over (Spec (CommRingCat.of V)))).left) (y : Z) (J) (hJ : Good U.LG.L y J) :
-    sval σ'' (r ≫ eSec G) y J =
-      (val (L := U.LG.L) U.LG.rig r y J ^ (k * (N - 1))).val * sval τ (r ≫ eSec G) y J := by
+    (U : UnifPre (maximalIdeal V) D A G)
+    {N : ℕ} (hN : 0 < N)
+    (k : ℕ) (σ'' : H0 U.LG.L (k * N)) (τ : H0 U.LG.L k)
+    (H : ∀ (e : ℕ) (z) (j : U.LG.L.ι),
+      (thU V (maximalIdeal V) e ≫ eSec G) z ∈ U.LG.L.U j
+        → sv U (k * N) σ'' (thU V (maximalIdeal V) e ≫ eSec G) z j
+          = (gm (thU V (maximalIdeal V) e) z ((U.LG.L.pull (eSec G)).U (fun _ => j))
+                (U.LG.rig.s (fun _ => j))
+              ^ (k * (N - 1))).val
+            * sv U k τ (thU V (maximalIdeal V) e ≫ eSec G) z j)
+    (Z : Scheme.{0}) (r : Z ⟶ (𝟙_ (Over (Spec (CommRingCat.of V)))).left) (y : Z)
+    (J) (hJ : Good U.LG.L y J)
+    : sval σ'' (r ≫ eSec G) y J
+      = (val (L := U.LG.L) U.LG.rig r y J ^ (k * (N - 1))).val * sval τ (r ≫ eSec G) y J := by
   obtain ⟨j, hj⟩ := exists_chart U.LG.isLB (eSec G (IsLocalRing.closedPoint V))
   have hj' : ∀ x, eSec G x ∈ U.LG.L.U j := fun x =>
-    ((IsLocalRing.specializes_closedPoint (R := V) x).map (eSec G).continuous).mem_open (U.LG.L.U j).isOpen hj
+    ((IsLocalRing.specializes_closedPoint (R := V) x).map (eSec G).continuous).mem_open
+      (U.LG.L.U j).isOpen hj
   let W₁ : G.left.Opens := LB.wchart U.LG.L (fun _ : Fin 1 => 𝟙 G.left) (fun _ => j)
   have m₁ : ∀ x, eSec G x ∈ W₁ := fun x => Set.mem_iInter.2 fun _ => hj' x
   let W : (𝟙_ (Over (Spec (CommRingCat.of V)))).left.Opens := (U.LG.L.pull (eSec G)).U (fun _ => j)
   have m : ∀ x, x ∈ W := fun x => mem_pull.2 (hj' x)
   have hle : W ≤ eSec G ⁻¹ᵁ W₁ := fun x _ => m₁ x
-  have ev : ∀ (Z : Scheme.{0}) (r : Z ⟶ (𝟙_ (Over (Spec (CommRingCat.of V)))).left) (y : Z) (s : Γ(G.left, W₁)),
-      gs r y W (rs hle (((eSec G).app W₁).hom s)) = gs (r ≫ eSec G) y W₁ s := fun Z r y s =>
+  have ev
+      : ∀ (Z : Scheme.{0}) (r : Z ⟶ (𝟙_ (Over (Spec (CommRingCat.of V)))).left) (y : Z)
+          (s : Γ(G.left, W₁)),
+        gs r y W (rs hle (((eSec G).app W₁).hom s)) = gs (r ≫ eSec G) y W₁ s := fun Z r y s =>
     (gs_res r y hle (m _) _).trans (gs_pull r (eSec G) y W₁ (m₁ _) s)
-  have ev' : ∀ (Z : Scheme.{0}) (r : Z ⟶ (𝟙_ (Over (Spec (CommRingCat.of V)))).left) (y : Z),
-      gs r y W ((@id Γ((𝟙_ (Over (Spec (CommRingCat.of V)))).left, W)ˣ (U.LG.rig.s (fun _ => j)) ^ (k * (N - 1))).val *
-        rs hle (((eSec G).app W₁).hom (τ.f (fun _ => j)))) =
-      (gm r y W (U.LG.rig.s (fun _ => j)) ^ (k * (N - 1))).val * sv U k τ (r ≫ eSec G) y j := fun Z r y =>
-    (gs_mul r y W (m _) _ _).trans (congrArg₂ (· * ·) ((gs_unit r y W (m _) _).trans
-      (congrArg Units.val (map_pow _ _ _))) (ev Z r y _))
-  have key : rs hle (((eSec G).app W₁).hom (σ''.f (fun _ => j))) =
-      (@id Γ((𝟙_ (Over (Spec (CommRingCat.of V)))).left, W)ˣ (U.LG.rig.s (fun _ => j)) ^ (k * (N - 1))).val *
-        rs hle (((eSec G).app W₁).hom (τ.f (fun _ => j))) :=
+  have ev'
+      : ∀ (Z : Scheme.{0}) (r : Z ⟶ (𝟙_ (Over (Spec (CommRingCat.of V)))).left) (y : Z),
+        gs r y W
+            ((@id Γ((𝟙_ (Over (Spec (CommRingCat.of V)))).left, W)ˣ (U.LG.rig.s (fun _ => j))
+                ^ (k * (N - 1))).val
+              * rs hle (((eSec G).app W₁).hom (τ.f (fun _ => j))))
+          = (gm r y W (U.LG.rig.s (fun _ => j)) ^ (k * (N - 1))).val
+            * sv U k τ (r ≫ eSec G) y j := fun Z r y =>
+    (gs_mul r y W (m _) _ _).trans
+      (congrArg₂ (· * ·) ((gs_unit r y W (m _) _).trans (congrArg Units.val (map_pow _ _ _)))
+        (ev Z r y _))
+  have key
+      : rs hle (((eSec G).app W₁).hom (σ''.f (fun _ => j)))
+        = (@id Γ((𝟙_ (Over (Spec (CommRingCat.of V)))).left, W)ˣ (U.LG.rig.s (fun _ => j))
+            ^ (k * (N - 1))).val
+          * rs hle (((eSec G).app W₁).hom (τ.f (fun _ => j))) :=
     krull_ext W (eq_top_iff.2 fun x _ => m x) _ _ fun e z =>
-      (ev _ (thU V (maximalIdeal V) e) z _).trans ((H e z j (hj' _)).trans (ev' _ (thU V (maximalIdeal V) e) z).symm)
+      (ev _ (thU V (maximalIdeal V) e) z _).trans
+        ((H e z j (hj' _)).trans (ev' _ (thU V (maximalIdeal V) e) z).symm)
   have E := (ev Z r y _).symm.trans ((congrArg (gs r y W) key).trans (ev' Z r y))
   have a₁ : sval σ'' (r ≫ eSec G) y J = _ :=
     sec_trans σ'' (r ≫ eSec G) y (hJ.mem _ (r ≫ eSec G)) (j' := fun _ => j) (m₁ _)
@@ -181,19 +204,72 @@ theorem unit_value {V : Type} [CommRing V] [IsDomain V] [IsNoetherianRing V] [Is
     gen_trans (L := U.LG.L) U.LG.rigGen r y (hJ.mem _ r) (j' := fun _ => j) (m _)
   rw [a₁, a₂, a₃]
   refine (congrArg _ E).trans ?_
-  rw [trF_unique _ _ _ _ J j (r ≫ eSec G) (Category.comp_id _), trF_unique _ _ _ _ J j (r ≫ eSec G) (Category.comp_id _),
+  rw [trF_unique _ _ _ _ J j (r ≫ eSec G) (Category.comp_id _),
+    trF_unique _ _ _ _ J j (r ≫ eSec G) (Category.comp_id _),
     trF_unique _ _ _ _ J j (r ≫ eSec G) rfl]
   simp only [zpow_natCast, zpow_one]
   obtain ⟨n, rfl⟩ : ∃ n, N = n + 1 := ⟨N - 1, by omega⟩
-  have alg : ∀ (c u : (Z.presheaf.stalk y)ˣ) (s : Z.presheaf.stalk y), (c ^ (k * (n + 1))).val * ((u ^ (k * n)).val * s) =
-      ((c * u) ^ (k * n)).val * ((c ^ k).val * s) := fun c u s => by
+  have alg
+      : ∀ (c u : (Z.presheaf.stalk y)ˣ) (s : Z.presheaf.stalk y),
+        (c ^ (k * (n + 1))).val * ((u ^ (k * n)).val * s)
+          = ((c * u) ^ (k * n)).val * ((c ^ k).val * s) := fun c u s => by
     simp only [Units.val_pow_eq_pow_val, Units.val_mul]
     ring
   exact alg _ _ _
 
-theorem value_at_unit_section : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (E : Type) [Field E] [NumberField E] [NumberField.IsCMField E] (H : Geo.Tor.Host E) (t : Geo.Tor.SAB H (Spec (CommRingCat.of V))) (P : Geo.Tor.PELUnif (maximalIdeal V) t) (a : NumberField.RingOfIntegers E) (N : ℕ), (letI := H.starRing; a * star a = (N : NumberField.RingOfIntegers E)) → 0 < N → letI := H.starRing;  ∀ (X : LB.Gen (LB.LinComb P.D.toPre.P.L (K := Fin 2) ![𝟙 P.D.toPre.P.A.left, (P.oD.onB.act a).left] ![((1 * N : ℕ) : ℤ), -((1 : ℕ) : ℤ)])), X.IsGen → LB.Gen.Corr P.D.toPre.P.L _ _ _ _ (LB.pullGen P.D.toPre.P.L _ _ X (eSec P.D.toPre.P.A)) (GeneratorPullback.powGen P.D.toPre.P.L _ _ P.D.toPre.rig (1 * (N - 1))) → ∀ (k : ℕ) (σ'' : H0 P.U.LG.L (k * N)) (τ : H0 P.U.LG.L k), (∀ e : ℕ, (∀ (Z : Scheme.{0}) (r : Z ⟶ (thickObj V (maximalIdeal V) e t.G).left) (z : Z) (J), Geo.Tor.Good P.D.toPre.P.L z J → ∀ jL jL', (r ≫ fGl (maximalIdeal V) t.G e) z ∈ P.U.LG.L.U jL → ((r ≫ ((Over.pullback (thick V (maximalIdeal V) e)).map (t.act.act a)).left) ≫ fGl (maximalIdeal V) t.G e) z ∈ P.U.LG.L.U jL' → (wv P.U.toUnifPre e r z (J (r ≫ pGl P.U.toUnifPre e)) jL ^ (k * N)).val * sv P.U.toUnifPre (k * N) σ'' (r ≫ fGl (maximalIdeal V) t.G e) z jL = (Geo.Tor.val X (r ≫ pGl P.U.toUnifPre e) z J ^ k).val * ((wv P.U.toUnifPre e (r ≫ ((Over.pullback (thick V (maximalIdeal V) e)).map (t.act.act a)).left) z (J ((r ≫ ((Over.pullback (thick V (maximalIdeal V) e)).map (t.act.act a)).left) ≫ pGl P.U.toUnifPre e)) jL' ^ k).val * sv P.U.toUnifPre k τ ((r ≫ ((Over.pullback (thick V (maximalIdeal V) e)).map (t.act.act a)).left) ≫ fGl (maximalIdeal V) t.G e) z jL'))) → ∀ (Z : Scheme.{0}) (r : Z ⟶ (𝟙_ (Over (Spec (CommRingCat.of V)))).left) (y : Z) (J), Geo.Tor.Good P.U.LG.L y J → Geo.Tor.sval σ'' (r ≫ eSec t.G) y J = (Geo.Tor.val (L := P.U.LG.L) P.U.LG.rig r y J ^ (k * (N - 1))).val * Geo.Tor.sval τ (r ≫ eSec t.G) y J := by
+theorem value_at_unit_section
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (E : Type) [Field E]
+        [NumberField E] [NumberField.IsCMField E] (H : Geo.Tor.Host E)
+        (t : Geo.Tor.SAB H (Spec (CommRingCat.of V))) (P : Geo.Tor.PELUnif (maximalIdeal V) t)
+        (a : NumberField.RingOfIntegers E) (N : ℕ),
+      (letI := H.starRing; a * star a = (N : NumberField.RingOfIntegers E)) → 0 < N
+        → letI := H.starRing
+          ∀ (X : LB.Gen (LB.LinComb P.D.toPre.P.L (K := Fin 2)
+              ![𝟙 P.D.toPre.P.A.left, (P.oD.onB.act a).left] ![((1 * N : ℕ) : ℤ), -((1 : ℕ) : ℤ)])),
+            X.IsGen
+              → LB.Gen.Corr P.D.toPre.P.L _ _ _ _
+                (LB.pullGen P.D.toPre.P.L _ _ X (eSec P.D.toPre.P.A))
+                (GeneratorPullback.powGen P.D.toPre.P.L _ _ P.D.toPre.rig (1 * (N - 1)))
+              → ∀ (k : ℕ) (σ'' : H0 P.U.LG.L (k * N)) (τ : H0 P.U.LG.L k),
+                (∀ e : ℕ,
+                    (∀ (Z : Scheme.{0}) (r : Z ⟶ (thickObj V (maximalIdeal V) e t.G).left) (z : Z)
+                        (J),
+                      Geo.Tor.Good P.D.toPre.P.L z J
+                        → ∀ jL jL',
+                          (r ≫ fGl (maximalIdeal V) t.G e) z ∈ P.U.LG.L.U jL
+                            → ((r ≫ ((Over.pullback (thick V (maximalIdeal V) e)).map
+                                    (t.act.act a)).left)
+                                  ≫ fGl (maximalIdeal V) t.G e)
+                                z
+                              ∈ P.U.LG.L.U jL'
+                            → (wv P.U.toUnifPre e r z (J (r ≫ pGl P.U.toUnifPre e)) jL
+                                  ^ (k * N)).val
+                                * sv P.U.toUnifPre (k * N) σ'' (r ≫ fGl (maximalIdeal V) t.G e) z jL
+                              = (Geo.Tor.val X (r ≫ pGl P.U.toUnifPre e) z J ^ k).val
+                                * ((wv P.U.toUnifPre e
+                                      (r ≫ ((Over.pullback (thick V (maximalIdeal V) e)).map
+                                        (t.act.act a)).left)
+                                      z
+                                      (J
+                                        ((r ≫ ((Over.pullback (thick V (maximalIdeal V) e)).map
+                                            (t.act.act a)).left)
+                                          ≫ pGl P.U.toUnifPre e))
+                                      jL'
+                                    ^ k).val
+                                  * sv P.U.toUnifPre k τ
+                                    ((r ≫ ((Over.pullback (thick V (maximalIdeal V) e)).map
+                                        (t.act.act a)).left)
+                                      ≫ fGl (maximalIdeal V) t.G e)
+                                    z jL')))
+                  → ∀ (Z : Scheme.{0}) (r : Z ⟶ (𝟙_ (Over (Spec (CommRingCat.of V)))).left) (y : Z)
+                      (J),
+                    Geo.Tor.Good P.U.LG.L y J
+                      → Geo.Tor.sval σ'' (r ≫ eSec t.G) y J
+                        = (Geo.Tor.val (L := P.U.LG.L) P.U.LG.rig r y J ^ (k * (N - 1))).val
+                          * Geo.Tor.sval τ (r ≫ eSec t.G) y J := by
   intro V _ _ _ E _ _ _ H t P a N _ hN X _ hX k σ'' τ h
   have := t.act.hom a
-  exact unit_value P.U.toUnifPre hN k σ'' τ fun e => unit_value_thick P.U.toUnifPre e (t.act.act a) hN X hX k σ'' τ (h e)
+  exact unit_value P.U.toUnifPre hN k σ'' τ fun e =>
+    unit_value_thick P.U.toUnifPre e (t.act.act a) hN X hX k σ'' τ (h e)
 
 end GlobalTheory.UnitValue

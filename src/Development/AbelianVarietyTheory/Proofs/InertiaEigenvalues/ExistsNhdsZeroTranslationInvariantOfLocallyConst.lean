@@ -8,8 +8,9 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem isTest_nhds_inv : ∀ (X : Type) [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] (f : X → ℂ),
-    IsTest f → ∃ U ∈ 𝓝 (0 : X), ∀ x : X, ∀ u ∈ U, f (x + u) = f x := by
+theorem isTest_nhds_inv
+    : ∀ (X : Type) [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] (f : X → ℂ),
+      IsTest f → ∃ U ∈ 𝓝 (0 : X), ∀ x : X, ∀ u ∈ U, f (x + u) = f x := by
   intro X _ _ _ f hf
   obtain ⟨hlc, hcs⟩ := hf
   have hK : IsCompact (tsupport f) := hcs
@@ -27,8 +28,12 @@ theorem isTest_nhds_inv : ∀ (X : Type) [AddCommGroup X] [TopologicalSpace X] [
     exact hp1.trans hp2.symm
   have hneg : Filter.Tendsto (fun u : X => -u) (𝓝 0) (𝓝 0) := by
     simpa using (continuous_neg.tendsto (0 : X))
-  refine ⟨{u | ∀ y ∈ tsupport f, f (y + u) = f y} ∩ (fun u : X => -u) ⁻¹' {u | ∀ y ∈ tsupport f, f (y + u) = f y},
-    Filter.inter_mem key (hneg key), ?_⟩
+  refine ⟨
+    {u | ∀ y ∈ tsupport f, f (y + u) = f y}
+      ∩ (fun u : X => -u) ⁻¹' {u | ∀ y ∈ tsupport f, f (y + u) = f y},
+    Filter.inter_mem key (hneg key),
+    ?_
+  ⟩
   rintro x u ⟨h1, h2⟩
   by_cases hx : x ∈ tsupport f
   · exact h1 x hx

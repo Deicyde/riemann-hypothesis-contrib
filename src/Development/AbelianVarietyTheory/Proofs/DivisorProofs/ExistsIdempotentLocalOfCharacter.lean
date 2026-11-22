@@ -9,15 +9,17 @@ universe u
 
 namespace GlobalTheory
 
-theorem exists_idem_local_of_character :
-    ∀ (k : Type) [Field k] (A : Type) [CommRing A] [Algebra k A] [FiniteDimensional k A]
-      (φ : A →ₐ[k] k), ∃ e : A, IsIdempotentElem e ∧ φ e = 1 ∧
-        ∀ a, φ a = 0 → IsNilpotent (e * a) := by
+theorem exists_idem_local_of_character
+    : ∀ (k : Type) [Field k] (A : Type) [CommRing A] [Algebra k A] [FiniteDimensional k A]
+        (φ : A →ₐ[k] k),
+      ∃ e : A,
+        IsIdempotentElem e ∧ φ e = 1 ∧ ∀ a, φ a = 0 → IsNilpotent (e * a) := by
   intro k _ A _ _ _ φ
   haveI : IsArtinianRing A := IsArtinianRing.of_finite k A
   set m : Ideal A := RingHom.ker φ with hm
-  obtain ⟨n, hn⟩ := IsArtinian.monotone_stabilizes (R := A) (M := A)
-    ⟨fun n => OrderDual.toDual (m ^ n), fun _ _ h => Ideal.pow_le_pow_right h⟩
+  obtain ⟨n, hn⟩ :=
+    IsArtinian.monotone_stabilizes (R := A) (M := A)
+      ⟨fun n => OrderDual.toDual (m ^ n), fun _ _ h => Ideal.pow_le_pow_right h⟩
   have hst : ∀ j, n ≤ j → m ^ n = m ^ j := fun j hj => hn j hj
   set N := n + 1 with hN
   have hI : IsIdempotentElem (m ^ N) := by
@@ -39,7 +41,9 @@ theorem exists_idem_local_of_character :
     refine ⟨N, ?_⟩
     rw [mul_pow, hf.one_sub.pow_succ_eq n, ← hy]
     have : (1 - f) * f = 0 := by rw [sub_mul, one_mul, hf.eq, sub_self]
-    calc (1 - f) * (y * f) = y * ((1 - f) * f) := by ring
+    calc
+      (1 - f) * (y * f)
+        = y * ((1 - f) * f) := by ring
       _ = 0 := by rw [this, mul_zero]
 
 end GlobalTheory

@@ -57,8 +57,8 @@ private lemma wop_restrict {M J : Type} [AddCommGroup M] [Module ℂ M] (U : Sub
 
 end UpperTheory.Gal.LocalSmoothExtension
 
-theorem UpperTheory.Gal.LocalSmoothExtension.eigOf_of :
-    UpperTheory.Gal.CertificateRingHomMap.ProjOne.{0} → EigOf := by
+theorem UpperTheory.Gal.LocalSmoothExtension.eigOf_of
+    : UpperTheory.Gal.CertificateRingHomMap.ProjOne.{0} → EigOf := by
   open UpperTheory.Gal.CertificateRingHomMap Module in
   intro hP B J _ W _ _ _ T u θ hc
   let U : ∀ b, Submodule ℂ (W b) := fun b =>

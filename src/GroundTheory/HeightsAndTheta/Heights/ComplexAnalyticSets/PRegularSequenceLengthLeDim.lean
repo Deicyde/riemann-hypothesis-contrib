@@ -14,10 +14,11 @@ open IsLocalRing RingTheory.Sequence Pointwise
 universe u
 
 theorem RegularSequenceLengthLeDim.proof : RegularSequenceLengthLeDim.Statement.{u} := by
-  suffices key : ∀ (n : ℕ) (R : Type u) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (rs : List R),
-      rs.length = n → (∀ r ∈ rs, r ∈ maximalIdeal R) → IsWeaklyRegular R rs →
-        (rs.length : WithBot ℕ∞) ≤ ringKrullDim R from
-    fun R _ _ _ rs hmem hreg => key _ R rs rfl hmem hreg
+  suffices key
+      : ∀ (n : ℕ) (R : Type u) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (rs : List R),
+        rs.length = n → (∀ r ∈ rs, r ∈ maximalIdeal R) → IsWeaklyRegular R rs
+          → (rs.length : WithBot ℕ∞) ≤ ringKrullDim R from fun R _ _ _ rs hmem hreg =>
+    key _ R rs rfl hmem hreg
   intro n
   induction n with
   | zero =>
@@ -37,7 +38,8 @@ theorem RegularSequenceLengthLeDim.proof : RegularSequenceLengthLeDim.Statement.
       rw [Ne, Ideal.span_singleton_eq_top]
       exact (mem_maximalIdeal _).mp hrm
     have : Nontrivial S := Ideal.Quotient.nontrivial_iff.mpr hne
-    have : IsLocalRing S := IsLocalRing.of_surjective' (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective
+    have : IsLocalRing S :=
+      IsLocalRing.of_surjective' (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective
     have : IsLocalHom (Ideal.Quotient.mk (Ideal.span {r})) :=
       IsLocalHom.of_surjective _ Ideal.Quotient.mk_surjective
     have hdim : ringKrullDim S + 1 = ringKrullDim R :=
@@ -51,7 +53,8 @@ theorem RegularSequenceLengthLeDim.proof : RegularSequenceLengthLeDim.Statement.
     have hmem' : ∀ s ∈ rs.map (algebraMap R S), s ∈ maximalIdeal S := by
       intro s hs
       obtain ⟨t, ht, rfl⟩ := List.mem_map.mp hs
-      refine (mem_maximalIdeal _).mpr fun hu => (mem_maximalIdeal _).mp (hmem t (List.mem_cons_of_mem _ ht)) ?_
+      refine (mem_maximalIdeal _).mpr fun hu =>
+        (mem_maximalIdeal _).mp (hmem t (List.mem_cons_of_mem _ ht)) ?_
       exact isUnit_of_map_unit (Ideal.Quotient.mk (Ideal.span {r})) t hu
     have h := ih S _ (by rw [List.length_map, hlen]) hmem' hS'
     rw [List.length_map] at h

@@ -11,9 +11,11 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets Filter Topology
 
-theorem CurveProperClosedFinite.no_chain_two {R : Type*} [CommRing R] {W P Q : Ideal R}
-    (hW : W.IsPrime) (hP : P.IsPrime) (hQ : Q.IsPrime) (hdim : ringKrullDim (R ⧸ W) = 1)
-    (hWP : W < P) (hPQ : P < Q) : False := by
+theorem CurveProperClosedFinite.no_chain_two
+    {R : Type*} [CommRing R]
+    {W P Q : Ideal R} (hW : W.IsPrime) (hP : P.IsPrime) (hQ : Q.IsPrime)
+    (hdim : ringKrullDim (R ⧸ W) = 1) (hWP : W < P) (hPQ : P < Q)
+    : False := by
   let a : PrimeSpectrum.zeroLocus (R := R) (W : Set R) :=
     ⟨⟨W, hW⟩, (PrimeSpectrum.mem_zeroLocus _ _).2 le_rfl⟩
   let b : PrimeSpectrum.zeroLocus (R := R) (W : Set R) :=
@@ -25,8 +27,7 @@ theorem CurveProperClosedFinite.no_chain_two {R : Type*} [CommRing R] {W P Q : I
   let p0 : LTSeries (PrimeSpectrum.zeroLocus (R := R) (W : Set R)) := RelSeries.singleton _ a
   have h2 := Order.LTSeries.length_le_krullDim ((p0.snoc b hab).snoc c hbc)
   rw [← ringKrullDim_quotient, hdim] at h2
-  have hl : ((p0.snoc b hab).snoc c hbc).length = 2 := by
-    rfl
+  have hl : ((p0.snoc b hab).snoc c hbc).length = 2 := by rfl
   rw [hl] at h2
   norm_num at h2
 
@@ -51,8 +52,8 @@ theorem CurveProperClosedFinite.proof : CurveProperClosedFinite.Statement := by
       refine lt_of_le_of_ne (le_sup_left.trans hJQ) ?_
       rintro rfl
       exact hK (le_sup_right.trans hJQ)
-    exact CurveProperClosedFinite.no_chain_two hW hQ hmax.isPrime hdim hWQ (lt_of_le_of_ne hQm
-      (fun h => hmQ (h ▸ le_rfl)))
+    exact CurveProperClosedFinite.no_chain_two hW hQ hmax.isPrime hdim hWQ
+      (lt_of_le_of_ne hQm (fun h => hmQ (h ▸ le_rfl)))
   exact Set.Finite.of_finite_image
     ((Ideal.finite_minimalPrimes_of_isNoetherianRing _ _).subset hsub) hinj.injOn
 

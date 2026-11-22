@@ -8,8 +8,8 @@ open CategoryTheory Limits
 
 namespace GlobalTheory
 
-theorem index_range_eq_card_ker_of_finite {D : Type} [AddCommGroup D] [Finite D] (f : D →+ D) :
-    f.range.index = Nat.card f.ker := by
+theorem index_range_eq_card_ker_of_finite {D : Type} [AddCommGroup D] [Finite D] (f : D →+ D)
+    : f.range.index = Nat.card f.ker := by
   have h1 := f.range.card_mul_index
   have h2 := f.ker.card_mul_index
   rw [AddSubgroup.index_ker] at h2
@@ -17,11 +17,13 @@ theorem index_range_eq_card_ker_of_finite {D : Type} [AddCommGroup D] [Finite D]
   apply Nat.eq_of_mul_eq_mul_left h3
   rw [h1, mul_comm, h2]
 
-theorem card_quot_smul_eq_of_equiv_prod {M D : Type} [AddCommGroup M] [AddCommGroup D] [Finite D]
-    {n : ℕ} (e : M ≃+ (Fin n → ℤ) × D) (p : ℕ) (hp : p ≠ 0) :
-    Nat.card (M ⧸ LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))) =
-      Nat.card (LinearMap.ker ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))) *
-        p ^ Module.finrank ℤ M := by
+theorem card_quot_smul_eq_of_equiv_prod
+    {M D : Type} [AddCommGroup M] [AddCommGroup D] [Finite D]
+    {n : ℕ} (e : M ≃+ (Fin n → ℤ) × D)
+    (p : ℕ) (hp : p ≠ 0)
+    : Nat.card (M ⧸ LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M)))
+      = Nat.card (LinearMap.ker ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M)))
+        * p ^ Module.finrank ℤ M := by
   have hp' : (p : ℤ) ≠ 0 := by exact_mod_cast hp
   let f : D →+ D := zsmulAddGroupHom (p : ℤ)
   have hf : ∀ d, f d = (p : ℤ) • d := fun d => rfl
@@ -42,13 +44,13 @@ theorem card_quot_smul_eq_of_equiv_prod {M D : Type} [AddCommGroup M] [AddCommGr
         LinearMap.range_eq_top.2 LinearMap.fst_surjective]
       simp
     simp [Module.finrank, this]
-  have hker : Nat.card (LinearMap.ker ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))) =
-      Nat.card f.ker := by
-    refine Nat.card_congr
-      { toFun := fun x => ⟨(e x.1).2, ?_⟩
-        invFun := fun d => ⟨e.symm (0, d.1), ?_⟩
-        left_inv := ?_
-        right_inv := ?_ }
+  have hker : Nat.card (LinearMap.ker ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))) = Nat.card f.ker := by
+    refine Nat.card_congr {
+      toFun := fun x => ⟨(e x.1).2, ?_⟩
+      invFun := fun d => ⟨e.symm (0, d.1), ?_⟩
+      left_inv := ?_
+      right_inv := ?_
+    }
     · have hx : (p : ℤ) • x.1 = 0 := x.2
       have := congrArg (fun y => (e y).2) hx
       simpa [hf] using this
@@ -69,9 +71,10 @@ theorem card_quot_smul_eq_of_equiv_prod {M D : Type} [AddCommGroup M] [AddCommGr
     · intro d
       apply Subtype.ext
       simp
-  have hrange : (LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))).toAddSubgroup =
-      ((AddSubgroup.pi Set.univ fun _ : Fin n => AddSubgroup.zmultiples (p : ℤ)).prod
-        f.range).comap e.toAddMonoidHom := by
+  have hrange
+      : (LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))).toAddSubgroup
+        = ((AddSubgroup.pi Set.univ fun _ : Fin n => AddSubgroup.zmultiples (p : ℤ)).prod
+          f.range).comap e.toAddMonoidHom := by
     ext x
     constructor
     · rintro ⟨y, rfl⟩
@@ -89,17 +92,19 @@ theorem card_quot_smul_eq_of_equiv_prod {M D : Type} [AddCommGroup M] [AddCommGr
       refine Prod.ext (funext fun i => ?_) hd
       rw [← hk i]
       simp [mul_comm]
-  have hq : Nat.card (M ⧸ LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))) =
-      (LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))).toAddSubgroup.index := rfl
+  have hq
+      : Nat.card (M ⧸ LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M)))
+        = (LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))).toAddSubgroup.index :=
+    rfl
   rw [hq, hrange, AddSubgroup.index_comap_of_surjective _ e.surjective, AddSubgroup.index_prod,
     AddSubgroup.index_pi, index_range_eq_card_ker_of_finite, hker, hrank, mul_comm]
   simp [Int.index_zmultiples]
 
-theorem card_quot_prime_smul_eq_card_ker_mul_pow_finrank (M : Type) [AddCommGroup M]
-    [inst : Module ℤ M] [Module.Finite ℤ M] (p : ℕ) [Fact p.Prime] :
-    Nat.card (M ⧸ LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))) =
-      Nat.card (LinearMap.ker ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M))) *
-        p ^ Module.finrank ℤ M := by
+theorem card_quot_prime_smul_eq_card_ker_mul_pow_finrank
+    (M : Type) [AddCommGroup M] [inst : Module ℤ M] [Module.Finite ℤ M] (p : ℕ) [Fact p.Prime]
+    : Nat.card (M ⧸ LinearMap.range ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M)))
+      = Nat.card (LinearMap.ker ((p : ℤ) • (LinearMap.id : M →ₗ[ℤ] M)))
+        * p ^ Module.finrank ℤ M := by
   obtain rfl : inst = AddCommGroup.toIntModule M := Subsingleton.elim _ _
   haveI : AddGroup.FG M := Module.Finite.iff_addGroup_fg.1 inferInstance
   obtain ⟨n, ι, _, q, hq, k, ⟨e⟩⟩ := AddCommGroup.equiv_free_prod_directSum_zmod M

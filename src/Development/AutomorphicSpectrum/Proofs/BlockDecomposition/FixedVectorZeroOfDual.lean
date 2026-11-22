@@ -10,11 +10,13 @@ open GlobalTheory.PRep GlobalTheory.SmGL ValuativeRel PositivityTheory.Lbc
 
 namespace GlobalTheory.CompanionTheory.CompactAvg
 
-theorem invariant_forms_separate_fixed :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (J : Subgroup G),
-      IsCompact (J : Set G) → ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
-      (π : Representation ℂ G V), IsSmooth π → ∀ u ∈ fixed π J,
-      (∀ l : Module.Dual ℂ V, (∀ x ∈ J, l ∘ₗ π x = l) → l u = 0) → u = 0 := by
+theorem invariant_forms_separate_fixed
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (J : Subgroup G),
+      IsCompact (J : Set G)
+        → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V),
+          IsSmooth π
+            → ∀ u ∈ fixed π J,
+              (∀ l : Module.Dual ℂ V, (∀ x ∈ J, l ∘ₗ π x = l) → l u = 0) → u = 0 := by
   intro G _ _ _ J hJ V _ _ π hπ u hu hl
   obtain ⟨E, -, hfix, -, hinv, -⟩ := GlobalTheory.T.compact_fixed_vector_projection G J hJ V π hπ
   by_contra hne

@@ -16,35 +16,27 @@ namespace Formalism.L2.DIV
 open Formalism.DivisionValues
 
 structure CSD (K : Type) [Field K] [NumberField K] [StarRing K] where
-
   Cl : Type
   [finCl : Fintype Cl]
-
   V : Type
   [addV : AddCommGroup V]
   [modV : Module K V]
   [modOV : Module (𝓞 K) V]
   [towV : IsScalarTower (𝓞 K) K V]
-
   ιV : Type
   [finιV : Fintype ιV]
   [decιV : DecidableEq ιV]
   bV : Basis ιV K V
-
   pair : V →ₗ⋆[K] V →ₗ[K] K
-
   Gam : Cl → Type
   [grpGam : ∀ c, Group (Gam c)]
   [finGam : ∀ c, Fintype (Gam c)]
-
   ρ : ∀ c, Gam c →* Module.End K V
-
   Nab : Cl → Submodule (𝓞 K) V
-
   Del : Cl → Submodule (𝓞 K) V
 
-attribute [instance] CSD.finCl CSD.addV CSD.modV CSD.modOV CSD.towV CSD.finιV CSD.decιV CSD.grpGam
-  CSD.finGam
+attribute [instance]
+  CSD.finCl CSD.addV CSD.modV CSD.modOV CSD.towV CSD.finιV CSD.decιV CSD.grpGam CSD.finGam
 
 namespace CSD
 
@@ -69,7 +61,6 @@ def dim : ℕ := finrank K S.Forms
 def IsRat (f : S.Cl → S.V) : Prop := ∀ c i, S.bV.repr (f c) i ∈ cmMax K
 
 def HasRatBasis : Prop := ∃ b : Basis (Fin S.dim) K S.Forms, ∀ i, S.IsRat (b i : S.Cl → S.V)
-
 
 open Classical in
 def basis : Basis (Fin S.dim) K S.Forms :=
@@ -101,8 +92,10 @@ structure Good (s : ℕ) : Prop where
   del_le : ∀ c, S.Del c ≤ S.Nab c
   del_stable : ∀ c (γ : S.Gam c), ∀ y ∈ S.Del c, S.ρ c γ y ∈ S.Del c
   s_pos : 0 < s
-  dual_le : ∀ c, ∀ y ∈ Formalism.HermitianLatticesTheory.dual S.pair (S.Nab c), (s : 𝓞 K) • y ∈ S.Del c
-  del_dual : ∀ c, ∀ y ∈ S.Del c, (s : 𝓞 K) • y ∈ Formalism.HermitianLatticesTheory.dual S.pair (S.Nab c)
+  dual_le
+    : ∀ c, ∀ y ∈ Formalism.HermitianLatticesTheory.dual S.pair (S.Nab c), (s : 𝓞 K) • y ∈ S.Del c
+  del_dual
+    : ∀ c, ∀ y ∈ S.Del c, (s : 𝓞 K) • y ∈ Formalism.HermitianLatticesTheory.dual S.pair (S.Nab c)
 
 structure Rat : Prop where
   pair_rat : ∀ i j, S.gramV i j ∈ cmMax K

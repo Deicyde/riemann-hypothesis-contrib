@@ -45,7 +45,8 @@ lemma loc_ker (hw : u * v = w) (ρ : Localization.Away u →+* Localization.Away
 end Loc
 
 section T
-variable {q : ℕ} [NeZero q] {S : Type} [CommRing S] {f g : S} {ε : ZMod q → Localization.Away (f * g)}
+variable
+  {q : ℕ} [NeZero q] {S : Type} [CommRing S] {f g : S} {ε : ZMod q → Localization.Away (f * g)}
 
 lemma mem_tor (hε : CompleteOrthogonalIdempotents ε) (x : Amb f g q) :
     x ∈ Tor f g hε ↔ ∀ k, rL f g (x.1 k) = ∑ c, ε c * rR f g (x.2 (k + c)) := by
@@ -81,14 +82,16 @@ def lcOf (hδ : CompleteOrthogonalIdempotents δ) : LocallyConstant (PrimeSpectr
   isLocallyConstant := by
     rw [IsLocallyConstant.iff_isOpen_fiber]
     intro y
-    have : (fun p => Classical.choose (exists_not_mem hδ p)) ⁻¹' {y} =
-        (PrimeSpectrum.basicOpen (δ y) : Set (PrimeSpectrum R)) := by
+    have : (fun p => Classical.choose (exists_not_mem hδ p)) ⁻¹' {y}
+        = (PrimeSpectrum.basicOpen (δ y) : Set (PrimeSpectrum R)) := by
       ext p
-      simp only [Set.mem_preimage, Set.mem_singleton_iff, SetLike.mem_coe, PrimeSpectrum.mem_basicOpen]
+      simp only [Set.mem_preimage, Set.mem_singleton_iff, SetLike.mem_coe,
+        PrimeSpectrum.mem_basicOpen]
       constructor
       · rintro rfl; exact Classical.choose_spec (exists_not_mem hδ p)
       · intro h; exact uniq hδ p (Classical.choose_spec (exists_not_mem hδ p)) h
-    rw [this]; exact (PrimeSpectrum.basicOpen (δ y)).isOpen
+    rw [this]
+    exact (PrimeSpectrum.basicOpen (δ y)).isOpen
 
 lemma lcOf_spec (hδ : CompleteOrthogonalIdempotents δ) (p : PrimeSpectrum R) : δ (lcOf hδ p) ∉ p.asIdeal :=
   Classical.choose_spec (exists_not_mem hδ p)
@@ -122,8 +125,10 @@ lemma twist_inv (hε : CompleteOrthogonalIdempotents ε) (z : ZMod q → A) (j :
 end Tw
 
 section Main
-variable {q : ℕ} [NeZero q] {S : Type} [CommRing S] {f g : S} {ε : ZMod q → Localization.Away (f * g)}
-  (hε : CompleteOrthogonalIdempotents ε)
+variable
+  {q : ℕ} [NeZero q]
+  {S : Type} [CommRing S]
+  {f g : S} {ε : ZMod q → Localization.Away (f * g)} (hε : CompleteOrthogonalIdempotents ε)
 include hε
 
 lemma kill (s : Tor f g hε →+* S) (hs : ∀ a, s (torMap f g hε a) = a) (t : Tor f g hε) (a : S)
@@ -242,8 +247,10 @@ lemma idem_family {B : Type} [CommRing B] (F : B) (hF : IsUnit F) (N : ℕ) (σ 
 end IF
 
 section Sheets
-variable {q : ℕ} [NeZero q] {S : Type} [CommRing S] {f g : S} {ε : ZMod q → Localization.Away (f * g)}
-  (hε : CompleteOrthogonalIdempotents ε)
+variable
+  {q : ℕ} [NeZero q]
+  {S : Type} [CommRing S]
+  {f g : S} {ε : ZMod q → Localization.Away (f * g)} (hε : CompleteOrthogonalIdempotents ε)
 include hε
 
 lemma uniformF : ∃ (N : ℕ) (t : ZMod q → Tor f g hε),
@@ -362,7 +369,7 @@ theorem TorSec_of : TorSec := by
   have hs : ∀ a, s.toRingHom (torMap f g hε a) = a := fun a => s.commutes a
   obtain ⟨N, t, δ, hδ, ht, hσ⟩ := sheetF hε s.toRingHom hs
   obtain ⟨δ', hδ', hev⟩ := sheetG hε s.toRingHom hs
-  refine ⟨-lcOf hδ, -lcOf hδ', ?_⟩
+  refine ⟨- lcOf hδ, - lcOf hδ', ?_⟩
   ext P
   show φ P = -(lcOf hδ (PrimeSpectrum.comap (rL f g) P)) - -(lcOf hδ' (PrimeSpectrum.comap (rR f g) P))
   have hk0 : rL f g (δ (lcOf hδ (PrimeSpectrum.comap (rL f g) P))) ∉ P.asIdeal := fun h =>
@@ -391,7 +398,8 @@ theorem TorSec_of : TorSec := by
     rw [rL_alg]; rwa [rR_alg] at h3
   rw [hσ k0, map_mul, map_pow, rL_alg] at h4
   have hu : IsUnit (algebraMap S (Localization.Away (f * g)) f) :=
-    isUnit_of_mul_isUnit_left (by rw [← map_mul]; exact IsLocalization.Away.algebraMap_isUnit (f * g))
+    isUnit_of_mul_isUnit_left (by
+      rw [← map_mul]; exact IsLocalization.Away.algebraMap_isUnit (f * g))
   rcases P.isPrime.mem_or_mem h4 with h | h
   · exact P.isPrime.ne_top (Ideal.eq_top_of_isUnit_mem _ h (hu.pow N))
   · exact hk0 h

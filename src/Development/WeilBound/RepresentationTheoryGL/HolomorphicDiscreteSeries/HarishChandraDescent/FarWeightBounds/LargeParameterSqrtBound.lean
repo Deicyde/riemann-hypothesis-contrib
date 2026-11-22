@@ -11,12 +11,13 @@ open scoped InnerProductSpace
 
 namespace PositivityTheory.RgHe3
 
-open ReciprocityTheory.ChartRestriction.DS PositivityTheory.UnitaryDecomposition PositivityTheory.RgHe
+open ReciprocityTheory.ChartRestriction.DS PositivityTheory.UnitaryDecomposition
+  PositivityTheory.RgHe
 
 namespace FarParameters
 
-theorem large_parameter_sqrt_bound {A B t : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B) (ht : (A + B + 1) ^ 2 ≤ t) :
-    A + B * Real.sqrt t < t ∧ 1 ≤ Real.sqrt t := by
+theorem large_parameter_sqrt_bound {A B t : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B) (ht : (A + B + 1) ^ 2 ≤ t)
+    : A + B * Real.sqrt t < t ∧ 1 ≤ Real.sqrt t := by
   have ht0 : 0 ≤ t := le_trans (sq_nonneg _) ht
   have hs : A + B + 1 ≤ Real.sqrt t := by
     have h2 := Real.sqrt_le_sqrt ht
@@ -29,8 +30,7 @@ theorem large_parameter_sqrt_bound {A B t : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B) (
   have h4 : 0 ≤ (Real.sqrt t - 1) * A := mul_nonneg (by linarith) hA
   nlinarith
 
-theorem umem {n : ℕ} {ε : Fin n → Bool} (h : Formalism.REAL.UJ ε) : um h ∈ UJset ε :=
-  h.2
+theorem umem {n : ℕ} {ε : Fin n → Bool} (h : Formalism.REAL.UJ ε) : um h ∈ UJset ε := h.2
 
 end FarParameters
 
@@ -46,7 +46,8 @@ theorem far_of_trial_bound : Trial → Core → Far := by
     linarith [Nat.le_ceil C0]
   have hJ0 : (0 : ℝ) ≤ J := Nat.cast_nonneg J
   have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
-  obtain ⟨A, hA⟩ : ∃ A : ℝ, A = ((n : ℝ) ^ 3 + 4 * n + 2 + 2 * J) + (4 * (J : ℝ) ^ 2 + 2 * J * n + 2 * J) :=
+  obtain ⟨A, hA⟩
+      : ∃ A : ℝ, A = ((n : ℝ) ^ 3 + 4 * n + 2 + 2 * J) + (4 * (J : ℝ) ^ 2 + 2 * J * n + 2 * J) :=
     ⟨_, rfl⟩
   obtain ⟨B, hB⟩ : ∃ B : ℝ, B = 2 * k + 4 * J * k := ⟨_, rfl⟩
   have hA0 : 0 ≤ A := by rw [hA]; positivity
@@ -65,18 +66,22 @@ theorem far_of_trial_bound : Trial → Core → Far := by
   rw [← hs] at hbig hs1 hsqrt hsq
   have hks : 0 ≤ k * s := mul_nonneg hk0 (by linarith)
   have hJks : 0 ≤ (J : ℝ) * (k * s) := mul_nonneg hJ0 hks
-  have hbig' : A + B * s = ((n : ℝ) ^ 3 + 4 * n + 2 + 2 * J) + 2 * (k * s) +
-      ((4 * (J : ℝ) ^ 2 + 2 * J * n + 2 * J) + 4 * (J * (k * s))) := by
+  have hbig'
+      : A + B * s
+        = ((n : ℝ) ^ 3 + 4 * n + 2 + 2 * J) + 2 * (k * s)
+          + ((4 * (J : ℝ) ^ 2 + 2 * J * n + 2 * J) + 4 * (J * (k * s))) := by
     rw [hA, hB]
     ring
   have hP1 : 0 ≤ (n : ℝ) ^ 3 + 4 * n + 2 + 2 * J := by positivity
   have hP2 : 0 ≤ 4 * (J : ℝ) ^ 2 + 2 * J * n + 2 * J := by positivity
-  have hcond1 : 2 * (C0 * t) <
-      (J : ℝ) * (2 * (t - 2 * (Real.sqrt (2 * (C0 * t)) + J)) - 2 * n - 2) := by
+  have hcond1
+      : 2 * (C0 * t) < (J : ℝ) * (2 * (t - 2 * (Real.sqrt (2 * (C0 * t)) + J)) - 2 * n - 2) := by
     rw [hsqrt]
     have h1 : (4 * (J : ℝ) ^ 2 + 2 * J * n + 2 * J) + 4 * (J * (k * s)) < t := by linarith
-    have h2 : (J : ℝ) * (2 * (t - 2 * (k * s + J)) - 2 * n - 2) =
-        2 * J * t - ((4 * (J : ℝ) ^ 2 + 2 * J * n + 2 * J) + 4 * (J * (k * s))) := by ring
+    have h2
+        : (J : ℝ) * (2 * (t - 2 * (k * s + J)) - 2 * n - 2)
+          = 2 * J * t - ((4 * (J : ℝ) ^ 2 + 2 * J * n + 2 * J) + 4 * (J * (k * s))) := by
+      ring
     rw [h2]
     have h3 : (2 * C0 + 1) * t ≤ 2 * J * t := by
       apply mul_le_mul_of_nonneg_right _ ht0
@@ -90,8 +95,9 @@ theorem far_of_trial_bound : Trial → Core → Far := by
     simp only [Pi.smul_apply, smul_eq_mul]
     have := mul_le_mul_of_nonneg_left (hd' a b hab) ht0
     linarith [mul_sub t (d' a) (d' b)]
-  obtain ⟨mu, hmu, hbd, hmap⟩ := hC n ε' H (res e π) hU hDense (t • d') (C0 * t) t J x hS0 hx0 hxK
-    (by simpa [mul_assoc] using hxq) hτ hcond1 hcond2
+  obtain ⟨mu, hmu, hbd, hmap⟩ :=
+    hC n ε' H (res e π) hU hDense (t • d') (C0 * t) t J x hS0 hx0 hxK
+      (by simpa [mul_assoc] using hxq) hτ hcond1 hcond2
   refine ⟨mu, hmu, ?_, ?_⟩
   · intro a
     have h1 := hbd a

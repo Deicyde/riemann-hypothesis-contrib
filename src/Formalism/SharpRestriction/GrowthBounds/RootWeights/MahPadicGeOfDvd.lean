@@ -47,8 +47,8 @@ theorem mah_smul (a : ℚ) (f : ℕ → ℚ) (j : ℕ) : mah (fun n => a * f n) 
     simp only [fwdDiff]
     ring
 
-theorem mah_sum {ι : Type*} (s : Finset ι) (F : ι → ℕ → ℚ) (j : ℕ) :
-    mah (fun n => ∑ l ∈ s, F l n) j = ∑ l ∈ s, mah (F l) j := by
+theorem mah_sum {ι : Type*} (s : Finset ι) (F : ι → ℕ → ℚ) (j : ℕ)
+    : mah (fun n => ∑ l ∈ s, F l n) j = ∑ l ∈ s, mah (F l) j := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using mah_zero_fn j
@@ -68,16 +68,17 @@ theorem mah_choose (l j : ℕ) : mah (fun n => (n.choose l : ℚ)) j = if j = l 
     rw [mah_succ]
     cases l with
     | zero =>
-      have : fwdDiff 1 (fun n : ℕ => (n.choose 0 : ℚ)) = fun _ => 0 := by
-        ext n; simp [fwdDiff]
-      rw [this, mah_zero_fn]; simp
+      have : fwdDiff 1 (fun n : ℕ => (n.choose 0 : ℚ)) = fun _ => 0 := by ext n; simp [fwdDiff]
+      rw [this, mah_zero_fn]
+      simp
     | succ l =>
       have : fwdDiff 1 (fun n : ℕ => (n.choose (l + 1) : ℚ)) = fun n => (n.choose l : ℚ) := by
         ext n; simp [fwdDiff, Nat.choose_succ_succ']
-      rw [this, ih]; simp
+      rw [this, ih]
+      simp
 
-theorem mah_leibniz (f g : ℕ → ℚ) :
-    fwdDiff 1 (f * g) = fwdDiff 1 f * g + f * fwdDiff 1 g + fwdDiff 1 f * fwdDiff 1 g := by
+theorem mah_leibniz (f g : ℕ → ℚ)
+    : fwdDiff 1 (f * g) = fwdDiff 1 f * g + f * fwdDiff 1 g + fwdDiff 1 f * fwdDiff 1 g := by
   ext n
   simp only [fwdDiff, Pi.mul_apply, Pi.add_apply]
   ring
@@ -88,20 +89,21 @@ theorem mah_newton (f : ℕ → ℚ) (m : ℕ) : f m = ∑ j ∈ range (m + 1), 
   rw [h]
   exact sum_congr rfl fun j _ => by rw [mah, mul_comm]
 
-theorem mah_decLe_mono {p : ℕ} {θ s : ℝ} {K K' : ℕ} {f : ℕ → ℚ} (h : DecLe p θ s K f) (hK : K' ≤ K) :
-    DecLe p θ s K' f := fun j hj => h j (hj.trans hK)
+theorem mah_decLe_mono {p : ℕ} {θ s : ℝ} {K K' : ℕ} {f : ℕ → ℚ} (h : DecLe p θ s K f) (hK : K' ≤ K)
+    : DecLe p θ s K' f := fun j hj =>
+  h j (hj.trans hK)
 
-theorem mah_decLe_diff {p : ℕ} {θ s : ℝ} {K : ℕ} {f : ℕ → ℚ} (h : DecLe p θ s (K + 1) f) :
-    DecLe p θ (s + θ) K (fwdDiff 1 f) := by
+theorem mah_decLe_diff {p : ℕ} {θ s : ℝ} {K : ℕ} {f : ℕ → ℚ} (h : DecLe p θ s (K + 1) f)
+    : DecLe p θ (s + θ) K (fwdDiff 1 f) := by
   intro j hj
   rw [← mah_succ]
   refine padicGe_mono (h (j + 1) (by omega)) ?_
   push_cast
   linarith
 
-theorem mah_prodLe {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 ≤ θ) (N : ℕ) :
-    ∀ (s s' : ℝ) (f g : ℕ → ℚ), DecLe p θ s N f → DecLe p θ s' N g →
-      PadicGe p (mah (f * g) N) (θ * N + (s + s')) := by
+theorem mah_prodLe {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 ≤ θ) (N : ℕ)
+    : ∀ (s s' : ℝ) (f g : ℕ → ℚ),
+      DecLe p θ s N f → DecLe p θ s' N g → PadicGe p (mah (f * g) N) (θ * N + (s + s')) := by
   induction N with
   | zero =>
     intro s s' f g hf hg
@@ -122,24 +124,30 @@ theorem mah_prodLe {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 ≤ θ) (N : ℕ
     · exact padicGe_mono (ih _ _ _ _ hf0 hg') (by push_cast; linarith)
     · exact padicGe_mono (ih _ _ _ _ hf' hg') (by push_cast; linarith)
 
-theorem mah_dec_mul {p : ℕ} [Fact p.Prime] {θ s s' : ℝ} {f g : ℕ → ℚ} (hθ : 0 ≤ θ)
-    (hf : Dec p θ s f) (hg : Dec p θ s' g) : Dec p θ (s + s') (f * g) :=
-  fun N => mah_prodLe hθ N s s' f g (fun j _ => hf j) (fun j _ => hg j)
+theorem mah_dec_mul
+    {p : ℕ} [Fact p.Prime]
+    {θ s s' : ℝ} {f g : ℕ → ℚ} (hθ : 0 ≤ θ) (hf : Dec p θ s f) (hg : Dec p θ s' g)
+    : Dec p θ (s + s') (f * g) := fun N =>
+  mah_prodLe hθ N s s' f g (fun j _ => hf j) (fun j _ => hg j)
 
 theorem hMul_proved {p : ℕ} (hp : p.Prime) : HMul p := by
   intro θ s s' f g hθ hf hg
   have := Fact.mk hp
   exact mah_dec_mul hθ hf hg
 
-theorem mah_dec_weaken {p : ℕ} {θ θ' s s' : ℝ} {f : ℕ → ℚ} (h : Dec p θ s f) (h1 : θ' ≤ θ) (h2 : s' ≤ s) :
-    Dec p θ' s' f := by
+theorem mah_dec_weaken
+    {p : ℕ} {θ θ' s s' : ℝ} {f : ℕ → ℚ} (h : Dec p θ s f) (h1 : θ' ≤ θ) (h2 : s' ≤ s)
+    : Dec p θ' s' f := by
   intro j
   refine padicGe_mono (h j) ?_
   have : θ' * (j : ℝ) ≤ θ * j := mul_le_mul_of_nonneg_right h1 (by positivity)
   linarith
 
-theorem mah_running {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 ≤ θ) (g u : ℕ → ℚ) (h0 : g 0 = 1)
-    (hs : ∀ n, g (n + 1) = g n * (1 + u n)) (hu : Dec p θ θ u) : Dec p θ 0 g := by
+theorem mah_running
+    {p : ℕ} [Fact p.Prime]
+    {θ : ℝ} (hθ : 0 ≤ θ)
+    (g u : ℕ → ℚ) (h0 : g 0 = 1) (hs : ∀ n, g (n + 1) = g n * (1 + u n)) (hu : Dec p θ θ u)
+    : Dec p θ 0 g := by
   have hD : fwdDiff 1 g = g * u := by
     ext n
     simp only [fwdDiff, Pi.mul_apply, hs]
@@ -162,15 +170,15 @@ theorem mah_running {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 ≤ θ) (g u : 
         exact padicGe_mono (mah_prodLe hθ N 0 θ g u ih (fun j _ => hu j)) (by push_cast; linarith)
   exact fun j => key j j le_rfl
 
-theorem mah_val {p : ℕ} [Fact p.Prime] {θ s : ℝ} {f : ℕ → ℚ} (hθ : 0 ≤ θ) (h : Dec p θ s f) (n : ℕ) :
-    PadicGe p (f n) s := by
+theorem mah_val {p : ℕ} [Fact p.Prime] {θ s : ℝ} {f : ℕ → ℚ} (hθ : 0 ≤ θ) (h : Dec p θ s f) (n : ℕ)
+    : PadicGe p (f n) s := by
   rw [mah_newton f n]
   refine padicGe_sum _ _ fun j _ => padicGe_mul_nat (padicGe_mono (h j) ?_) _
   have : 0 ≤ θ * (j : ℝ) := by positivity
   linarith
 
-theorem mah_of_vals {p : ℕ} [Fact p.Prime] {r : ℝ} (N : ℕ) :
-    ∀ f : ℕ → ℚ, (∀ n, PadicGe p (f n) r) → PadicGe p (mah f N) r := by
+theorem mah_of_vals {p : ℕ} [Fact p.Prime] {r : ℝ} (N : ℕ)
+    : ∀ f : ℕ → ℚ, (∀ n, PadicGe p (f n) r) → PadicGe p (mah f N) r := by
   induction N with
   | zero => intro f h; exact h 0
   | succ N ih =>
@@ -180,8 +188,8 @@ theorem mah_of_vals {p : ℕ} [Fact p.Prime] {r : ℝ} (N : ℕ) :
     simp only [fwdDiff, sub_eq_add_neg]
     exact padicGe_add (h _) (padicGe_neg (h _))
 
-theorem mah_unit {p : ℕ} [Fact p.Prime] {x : ℚ} {θ : ℝ} (hθ : 0 < θ) (hx : PadicGe p x θ) :
-    1 + x ≠ 0 ∧ padicValRat p (1 + x) = 0 := by
+theorem mah_unit {p : ℕ} [Fact p.Prime] {x : ℚ} {θ : ℝ} (hθ : 0 < θ) (hx : PadicGe p x θ)
+    : 1 + x ≠ 0 ∧ padicValRat p (1 + x) = 0 := by
   by_cases h0 : x = 0
   · simp [h0]
   rcases hx with hx | hx
@@ -198,8 +206,8 @@ theorem mah_unit {p : ℕ} [Fact p.Prime] {x : ℚ} {θ : ℝ} (hθ : 0 < θ) (h
   have := padicValRat.add_eq_of_lt (p := p) hne one_ne_zero h0 (by rw [padicValRat.one]; exact hpos)
   rw [this, padicValRat.one]
 
-theorem mah_padicGe_pow {p : ℕ} [Fact p.Prime] {x : ℚ} {r : ℝ} (hx : PadicGe p x r) (m : ℕ) :
-    PadicGe p (x ^ m) (m * r) := by
+theorem mah_padicGe_pow {p : ℕ} [Fact p.Prime] {x : ℚ} {r : ℝ} (hx : PadicGe p x r) (m : ℕ)
+    : PadicGe p (x ^ m) (m * r) := by
   induction m with
   | zero => right; simp
   | succ m ih =>
@@ -213,42 +221,50 @@ theorem mah_dec_const {p : ℕ} {θ s : ℝ} {c : ℚ} (hc : PadicGe p c s) : De
   · subst h; simpa using hc
   · exact Or.inl rfl
 
-theorem mah_dec_add {p : ℕ} [Fact p.Prime] {θ s : ℝ} {f g : ℕ → ℚ} (hf : Dec p θ s f) (hg : Dec p θ s g) :
-    Dec p θ s (f + g) := fun j => by rw [mah_add]; exact padicGe_add (hf j) (hg j)
+theorem mah_dec_add
+    {p : ℕ} [Fact p.Prime] {θ s : ℝ} {f g : ℕ → ℚ} (hf : Dec p θ s f) (hg : Dec p θ s g)
+    : Dec p θ s (f + g) := fun j => by
+  rw [mah_add]; exact padicGe_add (hf j) (hg j)
 
-theorem mah_dec_neg {p : ℕ} {θ s : ℝ} {f : ℕ → ℚ} (hf : Dec p θ s f) : Dec p θ s (-f) :=
-  fun j => by rw [mah_neg]; exact padicGe_neg (hf j)
+theorem mah_dec_neg {p : ℕ} {θ s : ℝ} {f : ℕ → ℚ} (hf : Dec p θ s f) : Dec p θ s (-f) := fun j => by
+  rw [mah_neg]; exact padicGe_neg (hf j)
 
-theorem mah_dec_pow {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 ≤ θ) {w : ℕ → ℚ} (hw : Dec p θ θ w) (i : ℕ) :
-    Dec p θ (i * θ) (w ^ i) := by
+theorem mah_dec_pow
+    {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 ≤ θ) {w : ℕ → ℚ} (hw : Dec p θ θ w) (i : ℕ)
+    : Dec p θ (i * θ) (w ^ i) := by
   induction i with
   | zero =>
     rw [pow_zero]
     refine mah_dec_const (c := 1) ?_
-    right; simp
+    right
+    simp
   | succ i ih =>
     rw [pow_succ]
     exact mah_dec_weaken (mah_dec_mul hθ ih hw) le_rfl (by push_cast; linarith)
 
-theorem mah_dec_sum {p : ℕ} [Fact p.Prime] {θ s : ℝ} {ι : Type*} (t : Finset ι) (F : ι → ℕ → ℚ)
-    (h : ∀ i ∈ t, Dec p θ s (F i)) : Dec p θ s (fun n => ∑ i ∈ t, F i n) := by
+theorem mah_dec_sum
+    {p : ℕ} [Fact p.Prime]
+    {θ s : ℝ} {ι : Type*} (t : Finset ι) (F : ι → ℕ → ℚ) (h : ∀ i ∈ t, Dec p θ s (F i))
+    : Dec p θ s (fun n => ∑ i ∈ t, F i n) := by
   intro j
   rw [mah_sum]
   exact padicGe_sum _ _ fun i hi => h i hi j
 
-theorem mah_geom (x : ℚ) (hx : 1 + x ≠ 0) (N : ℕ) :
-    (1 + x)⁻¹ - 1 = ∑ i ∈ range (N + 1), (-x) ^ (i + 1) + (-x) ^ (N + 2) * (1 + x)⁻¹ := by
+theorem mah_geom (x : ℚ) (hx : 1 + x ≠ 0) (N : ℕ)
+    : (1 + x)⁻¹ - 1 = ∑ i ∈ range (N + 1), (-x) ^ (i + 1) + (-x) ^ (N + 2) * (1 + x)⁻¹ := by
   have g := geom_sum_mul (-x) (N + 2)
   rw [sum_range_succ', pow_zero] at g
   have hI : (1 + x)⁻¹ * (1 + x) = 1 := inv_mul_cancel₀ hx
   linear_combination (1 + x)⁻¹ * g + (∑ i ∈ range (N + 1), (-x) ^ (i + 1) + 1) * hI
 
-theorem mah_inv {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 < θ) {u : ℕ → ℚ} (hu : Dec p θ θ u) :
-    Dec p θ θ (fun n => (1 + u n)⁻¹ - 1) := by
+theorem mah_inv {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 < θ) {u : ℕ → ℚ} (hu : Dec p θ θ u)
+    : Dec p θ θ (fun n => (1 + u n)⁻¹ - 1) := by
   intro N
   have hval : ∀ n, PadicGe p (u n) θ := mah_val hθ.le hu
-  have hdec : (fun n => (1 + u n)⁻¹ - 1) =
-      (fun n => ∑ i ∈ range (N + 1), ((-u) ^ (i + 1)) n) + fun n => (-u n) ^ (N + 2) * (1 + u n)⁻¹ := by
+  have hdec
+      : (fun n => (1 + u n)⁻¹ - 1)
+        = (fun n => ∑ i ∈ range (N + 1), ((-u) ^ (i + 1)) n)
+          + fun n => (- u n) ^ (N + 2) * (1 + u n)⁻¹ := by
     ext n
     simp only [Pi.add_apply, Pi.pow_apply, Pi.neg_apply]
     exact mah_geom (u n) (mah_unit hθ (hval n)).1 N
@@ -269,8 +285,8 @@ theorem mah_inv {p : ℕ} [Fact p.Prime] {θ : ℝ} (hθ : 0 < θ) {u : ℕ → 
     push_cast
     linarith
 
-theorem mah_padicGe_of_dvd {p : ℕ} [Fact p.Prime] {a : ℤ} {l : ℕ} (h : (p : ℤ) ^ l ∣ a) :
-    PadicGe p (a : ℚ) l := by
+theorem mah_padicGe_of_dvd {p : ℕ} [Fact p.Prime] {a : ℤ} {l : ℕ} (h : (p : ℤ) ^ l ∣ a)
+    : PadicGe p (a : ℚ) l := by
   obtain ⟨b, rfl⟩ := h
   have h1 : PadicGe p ((p : ℚ) ^ l) l := by
     right
@@ -280,8 +296,8 @@ theorem mah_padicGe_of_dvd {p : ℕ} [Fact p.Prime] {a : ℤ} {l : ℕ} (h : (p 
   push_cast
   simpa using this
 
-theorem mah_dU {p : ℕ} [Fact p.Prime] (h : HdU p) (t rho : ℕ) (hr : rho < p ^ (t + 1)) :
-    Dec p (1 / 2) (1 / 2) (fun n => dUnit (p ^ (t + 1)) n rho - 1) := by
+theorem mah_dU {p : ℕ} [Fact p.Prime] (h : HdU p) (t rho : ℕ) (hr : rho < p ^ (t + 1))
+    : Dec p (1 / 2) (1 / 2) (fun n => dUnit (p ^ (t + 1)) n rho - 1) := by
   obtain ⟨a, ha, hdiv⟩ := h t rho hr
   intro j
   cases j with
@@ -290,8 +306,9 @@ theorem mah_dU {p : ℕ} [Fact p.Prime] (h : HdU p) (t rho : ℕ) (hr : rho < p 
     rw [mah_zero]
     simp [dUnit]
   | succ j =>
-    have e1 : fwdDiff 1 (fun n => dUnit (p ^ (t + 1)) n rho - 1) =
-        fwdDiff 1 (fun n => ∑ l ∈ range (rho + 1), (a l : ℚ) * (n.choose l : ℚ)) := by
+    have e1
+        : fwdDiff 1 (fun n => dUnit (p ^ (t + 1)) n rho - 1)
+          = fwdDiff 1 (fun n => ∑ l ∈ range (rho + 1), (a l : ℚ) * (n.choose l : ℚ)) := by
       ext n
       simp only [fwdDiff, ha]
       ring
@@ -307,44 +324,44 @@ theorem mah_dU {p : ℕ} [Fact p.Prime] (h : HdU p) (t rho : ℕ) (hr : rho < p 
       linarith
     · left; simp
 
-theorem mah_one_add {p : ℕ} [Fact p.Prime] {θ s : ℝ} {u : ℕ → ℚ} (hs : 0 ≤ s) (hu : Dec p θ s u) :
-    Dec p θ 0 (fun n => 1 + u n) := by
+theorem mah_one_add {p : ℕ} [Fact p.Prime] {θ s : ℝ} {u : ℕ → ℚ} (hs : 0 ≤ s) (hu : Dec p θ s u)
+    : Dec p θ 0 (fun n => 1 + u n) := by
   have : (fun n => 1 + u n) = (fun _ => (1 : ℚ)) + u := rfl
   rw [this]
   refine mah_dec_add (mah_dec_const ?_) (mah_dec_weaken hu le_rfl hs)
-  right; simp
+  right
+  simp
 
 theorem mah_cUnit_zero (P : ℕ) : cUnit P 0 = 1 := by simp [cUnit]
 
-theorem mah_cUnit_succ (P n : ℕ) (hP : 1 ≤ P) :
-    cUnit P (n + 1) = cUnit P n * (1 + (dUnit P n (P - 1) - 1)) := by
+theorem mah_cUnit_succ (P n : ℕ) (hP : 1 ≤ P)
+    : cUnit P (n + 1) = cUnit P n * (1 + (dUnit P n (P - 1) - 1)) := by
   have h1 : cUnit P (n + 1) = _ := Formalism.GrowthSums.blockFactorialQuotientProd P (n + 1) hP
   have h2 : cUnit P n = _ := Formalism.GrowthSums.blockFactorialQuotientProd P n hP
   rw [h1, h2, prod_range_succ]
   congr 1
-  have : Icc 1 (P - 1) = Ico 1 P := by
-    ext y; simp only [mem_Icc, mem_Ico]; omega
+  have : Icc 1 (P - 1) = Ico 1 P := by ext y; simp only [mem_Icc, mem_Ico]; omega
   rw [dUnit, this]
   ring
 
-theorem mah_unitFn_ff (p t rho : ℕ) :
-    unitFn p ⟨t, rho, false, false⟩ = fun m => dUnit (p ^ (t + 1)) m rho := by
+theorem mah_unitFn_ff (p t rho : ℕ)
+    : unitFn p ⟨t, rho, false, false⟩ = fun m => dUnit (p ^ (t + 1)) m rho := by
   funext m; simp [unitFn]
 
-theorem mah_unitFn_ft (p t rho : ℕ) :
-    unitFn p ⟨t, rho, false, true⟩ = fun m => (dUnit (p ^ (t + 1)) m rho)⁻¹ := by
+theorem mah_unitFn_ft (p t rho : ℕ)
+    : unitFn p ⟨t, rho, false, true⟩ = fun m => (dUnit (p ^ (t + 1)) m rho)⁻¹ := by
   funext m; simp [unitFn]
 
-theorem mah_unitFn_tf (p t rho : ℕ) :
-    unitFn p ⟨t, rho, true, false⟩ = fun m => cUnit (p ^ (t + 1)) m := by
+theorem mah_unitFn_tf (p t rho : ℕ)
+    : unitFn p ⟨t, rho, true, false⟩ = fun m => cUnit (p ^ (t + 1)) m := by
   funext m; simp [unitFn]
 
-theorem mah_unitFn_tt (p t rho : ℕ) :
-    unitFn p ⟨t, rho, true, true⟩ = fun m => (cUnit (p ^ (t + 1)) m)⁻¹ := by
+theorem mah_unitFn_tt (p t rho : ℕ)
+    : unitFn p ⟨t, rho, true, true⟩ = fun m => (cUnit (p ^ (t + 1)) m)⁻¹ := by
   funext m; simp [unitFn]
 
-theorem mah_unitFn_half {p : ℕ} (hp : p.Prime) (h : HdU p) (u : UnitFn) (hu : u.rho < p ^ (u.t + 1)) :
-    Dec p (1 / 2) 0 (unitFn p u) := by
+theorem mah_unitFn_half {p : ℕ} (hp : p.Prime) (h : HdU p) (u : UnitFn) (hu : u.rho < p ^ (u.t + 1))
+    : Dec p (1 / 2) 0 (unitFn p u) := by
   have := Fact.mk hp
   obtain ⟨t, rho, isC, inv⟩ := u
   simp only at hu
@@ -354,23 +371,31 @@ theorem mah_unitFn_half {p : ℕ} (hp : p.Prime) (h : HdU p) (u : UnitFn) (hu : 
   have half : (0 : ℝ) < 1 / 2 := by norm_num
   cases isC <;> cases inv
   · rw [mah_unitFn_ff]
-    have e : (fun m => dUnit (p ^ (t + 1)) m rho) = fun n => 1 + (dUnit (p ^ (t + 1)) n rho - 1) := by
+    have e
+        : (fun m => dUnit (p ^ (t + 1)) m rho) = fun n => 1 + (dUnit (p ^ (t + 1)) n rho - 1) := by
       funext n; ring
     rw [e]
     exact mah_one_add half.le hd
   · rw [mah_unitFn_ft]
-    have e : (fun m => (dUnit (p ^ (t + 1)) m rho)⁻¹) =
-        fun n => 1 + ((1 + (dUnit (p ^ (t + 1)) n rho - 1))⁻¹ - 1) := by
+    have e
+        : (fun m => (dUnit (p ^ (t + 1)) m rho)⁻¹)
+          = fun n => 1 + ((1 + (dUnit (p ^ (t + 1)) n rho - 1))⁻¹ - 1) := by
       funext n; ring
     rw [e]
     exact mah_one_add half.le (mah_inv half hd)
   · rw [mah_unitFn_tf]
-    exact mah_running half.le (fun m => cUnit (p ^ (t + 1)) m)
-      (fun n => dUnit (p ^ (t + 1)) n (p ^ (t + 1) - 1) - 1) (mah_cUnit_zero _)
-      (fun n => mah_cUnit_succ _ n hP) hd'
+    exact mah_running half.le
+      (fun m => cUnit (p ^ (t + 1)) m)
+      (fun n => dUnit (p ^ (t + 1)) n (p ^ (t + 1) - 1) - 1)
+      (mah_cUnit_zero _)
+      (fun n => mah_cUnit_succ _ n hP)
+      hd'
   · rw [mah_unitFn_tt]
-    refine mah_running half.le (fun m => (cUnit (p ^ (t + 1)) m)⁻¹)
-      (fun n => (1 + (dUnit (p ^ (t + 1)) n (p ^ (t + 1) - 1) - 1))⁻¹ - 1) ?_ (fun n => ?_)
+    refine mah_running half.le
+      (fun m => (cUnit (p ^ (t + 1)) m)⁻¹)
+      (fun n => (1 + (dUnit (p ^ (t + 1)) n (p ^ (t + 1) - 1) - 1))⁻¹ - 1)
+      ?_
+      (fun n => ?_)
       (mah_inv half hd')
     · simp [mah_cUnit_zero]
     · rw [mah_cUnit_succ _ n hP, mul_inv]
@@ -387,8 +412,11 @@ theorem hUnit_of {p : ℕ} (hp : p.Prime) (h : HdU p) : HUnit p := by
   simp only at hu
   have hP : 1 ≤ p ^ (t + 1) := Nat.one_le_pow _ _ hp.pos
   have half : (0 : ℝ) < 1 / 2 := by norm_num
-  have hdv : ∀ rho', rho' < p ^ (t + 1) → ∀ n, dUnit (p ^ (t + 1)) n rho' ≠ 0 ∧
-      padicValRat p (dUnit (p ^ (t + 1)) n rho') = 0 := by
+  have hdv
+      : ∀ rho',
+        rho' < p ^ (t + 1)
+          → ∀ n,
+            dUnit (p ^ (t + 1)) n rho' ≠ 0 ∧ padicValRat p (dUnit (p ^ (t + 1)) n rho') = 0 := by
     intro rho' hr n
     have h1 := mah_unit half (mah_val half.le (mah_dU h t rho' hr) n)
     simpa only [add_sub_cancel] using h1

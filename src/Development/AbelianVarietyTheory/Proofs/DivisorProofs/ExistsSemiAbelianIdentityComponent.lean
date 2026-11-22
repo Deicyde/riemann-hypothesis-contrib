@@ -13,9 +13,12 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Geometri
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.CxPts GlobalTheory.Points
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.CxPts
+  GlobalTheory.Points
 open scoped CategoryTheory.Obj
 
 noncomputable section
@@ -28,8 +31,9 @@ namespace GlobalTheory.SemiStableId
 
 variable {S : Scheme.{0}} {G G₀ : Over S} [GrpObj G] (j : G₀ ⟶ G)
 
-abbrev RangeIsId : Prop := ∀ x : G.left, x ∈ Set.range j.left ↔
-  x ∈ connectedComponentIn (G.hom ⁻¹' {G.hom x}) ((η[G]).left (G.hom x))
+abbrev RangeIsId : Prop :=
+  ∀ x : G.left,
+    x ∈ Set.range j.left ↔ x ∈ connectedComponentIn (G.hom ⁻¹' {G.hom x}) ((η[G]).left (G.hom x))
 
 include j in
 theorem unit_mem_fibre (s : S) : (η[G]).left s ∈ G.hom ⁻¹' {s} := by
@@ -37,11 +41,11 @@ theorem unit_mem_fibre (s : S) : (η[G]).left s ∈ G.hom ⁻¹' {s} := by
   rw [← Scheme.Hom.comp_apply, Over.w]
   rfl
 
-theorem isConnected_fibre [IsOpenImmersion j.left] (hr : RangeIsId j) (s : S) :
-    _root_.IsConnected (G₀.hom ⁻¹' {s}) := by
-  have hw : ∀ x, G.hom (j.left x) = G₀.hom x := fun x => by
-    rw [← Scheme.Hom.comp_apply, Over.w]
-  have himg : j.left '' (G₀.hom ⁻¹' {s}) = connectedComponentIn (G.hom ⁻¹' {s}) ((η[G]).left s) := by
+theorem isConnected_fibre [IsOpenImmersion j.left] (hr : RangeIsId j) (s : S)
+    : _root_.IsConnected (G₀.hom ⁻¹' {s}) := by
+  have hw : ∀ x, G.hom (j.left x) = G₀.hom x := fun x => by rw [← Scheme.Hom.comp_apply, Over.w]
+  have himg
+      : j.left '' (G₀.hom ⁻¹' {s}) = connectedComponentIn (G.hom ⁻¹' {s}) ((η[G]).left s) := by
     ext y
     constructor
     · rintro ⟨x, hx, rfl⟩
@@ -54,7 +58,10 @@ theorem isConnected_fibre [IsOpenImmersion j.left] (hr : RangeIsId j) (s : S) :
   have hc : _root_.IsConnected (connectedComponentIn (G.hom ⁻¹' {s}) ((η[G]).left s)) :=
     isConnected_connectedComponentIn_iff.mpr (unit_mem_fibre j s)
   rw [← himg] at hc
-  exact ⟨hc.nonempty.of_image, j.left.isOpenEmbedding.isInducing.isPreconnected_image.1 hc.isPreconnected⟩
+  exact ⟨
+    hc.nonempty.of_image,
+    j.left.isOpenEmbedding.isInducing.isPreconnected_image.1 hc.isPreconnected
+  ⟩
 
 end GlobalTheory.SemiStableId
 

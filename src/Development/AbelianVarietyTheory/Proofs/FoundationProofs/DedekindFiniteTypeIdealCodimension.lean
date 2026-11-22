@@ -9,11 +9,12 @@ open Polynomial
 namespace GlobalTheory
 namespace DedekindCodim
 
-variable {k A : Type} [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
-  [Algebra.FiniteType k A]
+variable
+  {k A : Type}
+  [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A]
 
-theorem algebraMap_quot_bijective (P : Ideal A) [P.IsMaximal] :
-    Function.Bijective (algebraMap k (A ⧸ P)) := by
+theorem algebraMap_quot_bijective (P : Ideal A) [P.IsMaximal]
+    : Function.Bijective (algebraMap k (A ⧸ P)) := by
   letI : Field (A ⧸ P) := Ideal.Quotient.field P
   haveI : Algebra.FiniteType k (A ⧸ P) :=
     Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ k P)
@@ -22,8 +23,8 @@ theorem algebraMap_quot_bijective (P : Ideal A) [P.IsMaximal] :
   haveI : Algebra.IsIntegral k (A ⧸ P) := Algebra.IsIntegral.of_finite k (A ⧸ P)
   exact IsAlgClosed.algebraMap_bijective_of_isIntegral
 
-theorem maximal_part (P : Ideal A) (hP : P.IsMaximal) :
-    Module.finrank k (A ⧸ P) = 1 ∧ ∃ φ : A →ₐ[k] k, ∀ u, u ∈ P ↔ φ u = 0 := by
+theorem maximal_part (P : Ideal A) (hP : P.IsMaximal)
+    : Module.finrank k (A ⧸ P) = 1 ∧ ∃ φ : A →ₐ[k] k, ∀ u, u ∈ P ↔ φ u = 0 := by
   have hb := algebraMap_quot_bijective (k := k) P
   let e : k ≃ₐ[k] (A ⧸ P) := AlgEquiv.ofBijective (Algebra.ofId k (A ⧸ P)) hb
   refine ⟨?_, ⟨(e.symm : (A ⧸ P) →ₐ[k] k).comp (Ideal.Quotient.mkₐ k P), fun u => ?_⟩⟩
@@ -32,30 +33,30 @@ theorem maximal_part (P : Ideal A) (hP : P.IsMaximal) :
     rw [map_eq_zero_iff _ e.symm.injective, Ideal.Quotient.mkₐ_eq_mk,
       Ideal.Quotient.eq_zero_iff_mem]
 
-theorem exists_sub_mem (P : Ideal A) [P.IsMaximal] (a : A) :
-    ∃ c : k, a - algebraMap k A c ∈ P := by
+theorem exists_sub_mem (P : Ideal A) [P.IsMaximal] (a : A) : ∃ c : k, a - algebraMap k A c ∈ P := by
   obtain ⟨c, hc⟩ := (algebraMap_quot_bijective (k := k) P).2 (Ideal.Quotient.mk P a)
   refine ⟨c, ?_⟩
   rw [← Ideal.Quotient.mk_algebraMap, Ideal.Quotient.eq] at hc
   rw [← P.neg_mem_iff, neg_sub]
   exact hc
 
-theorem span_sup_mul_eq (I P : Ideal A) (hI : I ≠ ⊥) (hP : P.IsMaximal) (x : A) (hx : x ∈ I)
-    (hxP : x ∉ I * P) : Ideal.span {x} ⊔ I * P = I := by
+theorem span_sup_mul_eq
+    (I P : Ideal A) (hI : I ≠ ⊥) (hP : P.IsMaximal) (x : A) (hx : x ∈ I) (hxP : x ∉ I * P)
+    : Ideal.span {x} ⊔ I * P = I := by
   have hKI : Ideal.span {x} ⊔ I * P ≤ I :=
     sup_le ((Ideal.span_singleton_le_iff_mem _).2 hx) Ideal.mul_le_left
   obtain ⟨L, hL⟩ := Ideal.dvd_iff_le.2 hKI
   have hPL : I * P ≤ I * L := hL ▸ le_sup_right
-  have hLP : P ≤ L := Ideal.dvd_iff_le.1 ((mul_dvd_mul_iff_left (show I ≠ 0 from hI)).1
-    (Ideal.dvd_iff_le.2 hPL))
+  have hLP : P ≤ L :=
+    Ideal.dvd_iff_le.1 ((mul_dvd_mul_iff_left (show I ≠ 0 from hI)).1 (Ideal.dvd_iff_le.2 hPL))
   by_cases hLt : L = ⊤
   · rw [hL, hLt, Ideal.mul_top]
   · have := hP.eq_of_le hLt hLP
     subst this
     exact absurd (hL ▸ (le_sup_left : Ideal.span {x} ≤ _) (Ideal.mem_span_singleton_self x)) hxP
 
-theorem rank_quot_mul_maximal (I P : Ideal A) (hI : I ≠ ⊥) (hP : P.IsMaximal) :
-    Module.rank k (A ⧸ (I * P)) = Module.rank k (A ⧸ I) + 1 := by
+theorem rank_quot_mul_maximal (I P : Ideal A) (hI : I ≠ ⊥) (hP : P.IsMaximal)
+    : Module.rank k (A ⧸ (I * P)) = Module.rank k (A ⧸ I) + 1 := by
   haveI := hP
   have hne : I * P ≠ I := by
     intro h
@@ -80,8 +81,7 @@ theorem rank_quot_mul_maximal (I P : Ideal A) (hI : I ≠ ⊥) (hP : P.IsMaximal
       have hy : y ∈ I := by
         have h0 : f (Ideal.Quotient.mk _ y) = 0 := hz
         exact Ideal.Quotient.eq_zero_iff_mem.1 h0
-      have hyK : y ∈ Ideal.span {x} ⊔ I * P := by
-        rw [span_sup_mul_eq I P hI hP x hx hxP]; exact hy
+      have hyK : y ∈ Ideal.span {x} ⊔ I * P := by rw [span_sup_mul_eq I P hI hP x hx hxP]; exact hy
       obtain ⟨a', ha', z', hz', hsum⟩ := Submodule.mem_sup.1 hyK
       obtain ⟨a, rfl⟩ := Ideal.mem_span_singleton'.1 ha'
       obtain ⟨c, hc⟩ := exists_sub_mem (k := k) P a
@@ -89,8 +89,7 @@ theorem rank_quot_mul_maximal (I P : Ideal A) (hI : I ≠ ⊥) (hP : P.IsMaximal
       refine ⟨c, ?_⟩
       rw [← hsum, hvdef, Algebra.smul_def, ← Ideal.Quotient.mk_algebraMap, ← map_mul,
         Ideal.Quotient.eq]
-      have h3 : algebraMap k A c * x - (a * x + z') = -((a - algebraMap k A c) * x) - z' := by
-        ring
+      have h3 : algebraMap k A c * x - (a * x + z') = -((a - algebraMap k A c) * x) - z' := by ring
       rw [h3]
       refine Ideal.sub_mem _ ((I * P).neg_mem ?_) hz'
       rw [mul_comm I P]
@@ -110,8 +109,9 @@ end GlobalTheory
 namespace GlobalTheory
 namespace DedekindCodim
 
-variable {k A : Type} [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
-  [Algebra.FiniteType k A]
+variable
+  {k A : Type}
+  [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A]
 
 theorem rank_quot_top : Module.rank k (A ⧸ (⊤ : Ideal A)) = 0 := by
   haveI : Subsingleton (A ⧸ (⊤ : Ideal A)) := Ideal.Quotient.subsingleton_iff.2 rfl
@@ -124,15 +124,15 @@ theorem maximal_of_prime {p : Ideal A} (hp : Prime p) : p ≠ ⊥ ∧ p.IsMaxima
 theorem rank_quot_lt (J : Ideal A) (hJ : J ≠ ⊥) : Module.rank k (A ⧸ J) < Cardinal.aleph0 := by
   induction J using UniqueFactorizationMonoid.induction_on_prime with
   | h₁ => exact absurd rfl hJ
-  | h₂ x hx =>
-    rw [Ideal.isUnit_iff.1 hx, rank_quot_top]; exact Cardinal.aleph0_pos
+  | h₂ x hx => rw [Ideal.isUnit_iff.1 hx, rank_quot_top]; exact Cardinal.aleph0_pos
   | h₃ a p ha hp ih =>
     obtain ⟨_, hpm⟩ := maximal_of_prime hp
     rw [mul_comm, rank_quot_mul_maximal a p ha hpm]
     exact Cardinal.add_lt_aleph0 (ih ha) Cardinal.one_lt_aleph0
 
-theorem rank_quot_mul (J : Ideal A) (hJ : J ≠ ⊥) : ∀ I : Ideal A, I ≠ ⊥ →
-    Module.rank k (A ⧸ (I * J)) = Module.rank k (A ⧸ I) + Module.rank k (A ⧸ J) := by
+theorem rank_quot_mul (J : Ideal A) (hJ : J ≠ ⊥)
+    : ∀ I : Ideal A,
+      I ≠ ⊥ → Module.rank k (A ⧸ (I * J)) = Module.rank k (A ⧸ I) + Module.rank k (A ⧸ J) := by
   induction J using UniqueFactorizationMonoid.induction_on_prime with
   | h₁ => exact absurd rfl hJ
   | h₂ x hx =>
@@ -148,8 +148,8 @@ theorem rank_quot_mul (J : Ideal A) (hJ : J ≠ ⊥) : ∀ I : Ideal A, I ≠ �
 theorem finite_quot (I : Ideal A) (hI : I ≠ ⊥) : Module.Finite k (A ⧸ I) :=
   Module.rank_lt_aleph0_iff.1 (rank_quot_lt I hI)
 
-theorem finrank_quot_mul (I J : Ideal A) (hI : I ≠ ⊥) (hJ : J ≠ ⊥) :
-    Module.finrank k (A ⧸ (I * J)) = Module.finrank k (A ⧸ I) + Module.finrank k (A ⧸ J) := by
+theorem finrank_quot_mul (I J : Ideal A) (hI : I ≠ ⊥) (hJ : J ≠ ⊥)
+    : Module.finrank k (A ⧸ (I * J)) = Module.finrank k (A ⧸ I) + Module.finrank k (A ⧸ J) := by
   haveI := finite_quot (k := k) I hI
   haveI := finite_quot (k := k) J hJ
   haveI := finite_quot (k := k) (I * J) (mul_ne_zero (show I ≠ 0 from hI) (show J ≠ 0 from hJ))
@@ -157,8 +157,10 @@ theorem finrank_quot_mul (I J : Ideal A) (hI : I ≠ ⊥) (hJ : J ≠ ⊥) :
   rw [← Module.finrank_eq_rank, ← Module.finrank_eq_rank, ← Module.finrank_eq_rank] at h
   exact_mod_cast h
 
-theorem eq_of_le_of_finrank_le (I J : Ideal A) (hI : I ≠ ⊥) (hIJ : I ≤ J)
-    (hr : Module.finrank k (A ⧸ I) ≤ Module.finrank k (A ⧸ J)) : I = J := by
+theorem eq_of_le_of_finrank_le
+    (I J : Ideal A)
+    (hI : I ≠ ⊥) (hIJ : I ≤ J) (hr : Module.finrank k (A ⧸ I) ≤ Module.finrank k (A ⧸ J))
+    : I = J := by
   obtain ⟨L, rfl⟩ := Ideal.dvd_iff_le.2 hIJ
   have hJ : J ≠ ⊥ := fun h => hI (by rw [h]; exact (zero_mul L : (0 : Ideal A) * L = 0))
   have hL : L ≠ ⊥ := fun h => hI (by rw [h]; exact (mul_zero J : J * (0 : Ideal A) = 0))
@@ -168,19 +170,24 @@ theorem eq_of_le_of_finrank_le (I J : Ideal A) (hI : I ≠ ⊥) (hIJ : I ≤ J)
   have hs : Subsingleton (A ⧸ L) := Module.finrank_zero_iff.1 h0
   rw [Ideal.Quotient.subsingleton_iff.1 hs, Ideal.mul_top]
 
-theorem dedekind_finiteType_codim : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k]
-    [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A],
-    (∀ I : Ideal A, I ≠ ⊥ → Module.Finite k (A ⧸ I)) ∧
-    (∀ P : Ideal A, P.IsMaximal → Module.finrank k (A ⧸ P) = 1 ∧
-      ∃ φ : A →ₐ[k] k, ∀ u, u ∈ P ↔ φ u = 0) ∧
-    (∀ I J : Ideal A, I ≠ ⊥ → J ≠ ⊥ →
-      Module.finrank k (A ⧸ (I * J)) = Module.finrank k (A ⧸ I) + Module.finrank k (A ⧸ J)) ∧
-    (∀ I J : Ideal A, I ≠ ⊥ → I ≤ J → Module.finrank k (A ⧸ I) ≤ Module.finrank k (A ⧸ J) →
-      I = J) := by
+theorem dedekind_finiteType_codim
+    : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k] [CommRing A] [IsDedekindDomain A]
+        [Algebra k A] [Algebra.FiniteType k A],
+      (∀ I : Ideal A, I ≠ ⊥ → Module.Finite k (A ⧸ I))
+        ∧ (∀ P : Ideal A,
+          P.IsMaximal → Module.finrank k (A ⧸ P) = 1 ∧ ∃ φ : A →ₐ[k] k, ∀ u, u ∈ P ↔ φ u = 0)
+        ∧ (∀ I J : Ideal A,
+          I ≠ ⊥ → J ≠ ⊥
+            → Module.finrank k (A ⧸ (I * J)) = Module.finrank k (A ⧸ I) + Module.finrank k (A ⧸ J))
+        ∧ (∀ I J : Ideal A,
+          I ≠ ⊥ → I ≤ J → Module.finrank k (A ⧸ I) ≤ Module.finrank k (A ⧸ J) → I = J) := by
   intro k A _ _ _ _ _ _ _
-  exact ⟨fun I hI => finite_quot I hI, fun P hP => maximal_part P hP,
+  exact ⟨
+    fun I hI => finite_quot I hI,
+    fun P hP => maximal_part P hP,
     fun I J hI hJ => finrank_quot_mul I J hI hJ,
-    fun I J hI hIJ hr => eq_of_le_of_finrank_le I J hI hIJ hr⟩
+    fun I J hI hIJ hr => eq_of_le_of_finrank_le I J hI hIJ hr
+  ⟩
 
 end DedekindCodim
 end GlobalTheory

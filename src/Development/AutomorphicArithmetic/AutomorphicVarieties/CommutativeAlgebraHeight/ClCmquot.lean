@@ -9,8 +9,11 @@ public import ReciprocityTheory.CommutativeAlgebra.PolynomialHeights.PolyCM
 
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.CA ReciprocityTheory.CA
 
-private theorem UpperTheory.V.CA.cmquot_of_finite {P R : Type} [CommRing P] [IsLocalRing P] [CommRing R]
-    [IsLocalRing R] (hP : IsCM P) (φ : P →+* R) (hf : φ.Finite) [IsLocalHom φ] : IsCMQuot R := by
+private theorem UpperTheory.V.CA.cmquot_of_finite
+    {P R : Type} [CommRing P] [IsLocalRing P] [CommRing R] [IsLocalRing R]
+    (hP : IsCM P)
+    (φ : P →+* R) (hf : φ.Finite) [IsLocalHom φ]
+    : IsCMQuot R := by
   letI := φ.toAlgebra
   obtain ⟨n, g, hg⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.mp hf.finiteType
   let N : Ideal (MvPolynomial (Fin n) P) := Ideal.comap g.toRingHom (maximalIdeal R)
@@ -33,8 +36,10 @@ private theorem UpperTheory.V.CA.cmquot_of_finite {P R : Type} [CommRing P] [IsL
   obtain ⟨p, rfl⟩ := hg r
   exact ⟨algebraMap _ _ p, IsLocalization.lift_eq hu p⟩
 
-theorem UpperTheory.V.CA.cl_cmquot :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] (R : Type) [CommRing R] [Algebra O R] [IsLocalRing R], IsCL O R → IsCMQuot R := by
+theorem UpperTheory.V.CA.cl_cmquot
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] (R : Type) [CommRing R] [Algebra O R] [IsLocalRing R],
+      IsCL O R → IsCMQuot R := by
   intro O _ _ _ _ R _ _ _ hR
   haveI := hR.noeth
   obtain ⟨n, a, ha⟩ :=
@@ -44,8 +49,9 @@ theorem UpperTheory.V.CA.cl_cmquot :
     intro s
     rw [← hspan]
     exact Ideal.subset_span ⟨s, rfl⟩
-  have hrad : maximalIdeal R ≤
-      (Ideal.span (Set.range a) ⊔ Ideal.map (algebraMap O R) (maximalIdeal O)).radical := by
+  have hrad
+      : maximalIdeal R
+        ≤ (Ideal.span (Set.range a) ⊔ Ideal.map (algebraMap O R) (maximalIdeal O)).radical := by
     rw [hspan]
     exact le_sup_left.trans Ideal.le_radical
   obtain ⟨φ, -, hfin, hloc⟩ := cl_mvps O R hR (Fin n) a hmem hrad

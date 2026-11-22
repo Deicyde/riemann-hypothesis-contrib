@@ -128,11 +128,12 @@ lemma diagPart_conjTranspose {B : Matrix (Fin n) (Fin n) ℂ} (hBh : Bᴴ = B) :
     exact h'
   · rw [Matrix.diagonal_apply_ne _ (Ne.symm h), Matrix.diagonal_apply_ne _ h, star_zero]
 
-theorem tau_part {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) {B : Matrix (Fin n) (Fin n) ℂ}
-    (hB : IsBlock ε B) (hBh : Bᴴ = B) :
-    T.dτ B * projW T + projW T * T.dτ B =
-      (T.dτ (lowMinusUp B) * projW T - projW T * T.dτ (lowMinusUp B)) +
-        (2 * ∑ a, ((Λ a : ℝ) : ℂ) * B a a) • projW T := by
+theorem tau_part
+    {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
+    {B : Matrix (Fin n) (Fin n) ℂ} (hB : IsBlock ε B) (hBh : Bᴴ = B)
+    : T.dτ B * projW T + projW T * T.dτ B
+      = (T.dτ (lowMinusUp B) * projW T - projW T * T.dτ (lowMinusUp B))
+        + (2 * ∑ a, ((Λ a : ℝ) : ℂ) * B a a) • projW T := by
   have hP : ∀ v, projW T v = inner ℂ T.w v • T.w := fun v => by
     simp only [projW, ContinuousLinearMap.smulRight_apply, innerSL_apply_apply]
   have hBaa : ∀ a, (starRingEnd ℂ) (B a a) = B a a := fun a => by
@@ -141,36 +142,38 @@ theorem tau_part {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) {B
     exact h
   have hc : (starRingEnd ℂ) (∑ a, ((Λ a : ℝ) : ℂ) * B a a) = ∑ a, ((Λ a : ℝ) : ℂ) * B a a := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, Complex.conj_ofReal, hBaa]
+    simp only [map_sum, map_mul, Complex.conj_ofReal, hBaa]
   have h1 : T.dτ (upPart B) * projW T = 0 := by
     ext v
     rw [ContinuousLinearMap.mul_apply, hP, map_smul, dtau_upPart_w T hB, smul_zero,
       ContinuousLinearMap.zero_apply]
   have h2 : T.dτ (diagPart B) * projW T = (∑ a, ((Λ a : ℝ) : ℂ) * B a a) • projW T := by
     ext v
-    rw [ContinuousLinearMap.mul_apply, hP, map_smul, dtau_diagPart_w, ContinuousLinearMap.smul_apply,
-      hP, smul_comm]
+    rw [ContinuousLinearMap.mul_apply, hP, map_smul, dtau_diagPart_w,
+      ContinuousLinearMap.smul_apply, hP, smul_comm]
   have h3 : projW T * T.dτ (lowPart B) = 0 := by
     ext v
     rw [ContinuousLinearMap.mul_apply, hP, ← ContinuousLinearMap.adjoint_inner_left,
-      dtau_adj T (isBlock_lowPart hB), lowPart_conjTranspose hBh, dtau_upPart_w T hB, inner_zero_left,
-      zero_smul, ContinuousLinearMap.zero_apply]
+      dtau_adj T (isBlock_lowPart hB), lowPart_conjTranspose hBh, dtau_upPart_w T hB,
+      inner_zero_left, zero_smul, ContinuousLinearMap.zero_apply]
   have h4 : projW T * T.dτ (diagPart B) = (∑ a, ((Λ a : ℝ) : ℂ) * B a a) • projW T := by
     ext v
     rw [ContinuousLinearMap.mul_apply, hP, ← ContinuousLinearMap.adjoint_inner_left,
-      dtau_adj T (isBlock_diagPart B), diagPart_conjTranspose hBh, dtau_diagPart_w, inner_smul_left, hc,
-      ContinuousLinearMap.smul_apply, hP, mul_smul]
+      dtau_adj T (isBlock_diagPart B), diagPart_conjTranspose hBh, dtau_diagPart_w, inner_smul_left,
+      hc, ContinuousLinearMap.smul_apply, hP, mul_smul]
   have eB1 : T.dτ B = T.dτ (lowMinusUp B) + (2 : ℂ) • T.dτ (upPart B) + T.dτ (diagPart B) := by
     conv_lhs => rw [decomp_up B]
     rw [map_add (f := _), map_add (f := _), map_smul]
-  have eB2 : T.dτ B = -T.dτ (lowMinusUp B) + (2 : ℂ) • T.dτ (lowPart B) + T.dτ (diagPart B) := by
+  have eB2 : T.dτ B = - T.dτ (lowMinusUp B) + (2 : ℂ) • T.dτ (lowPart B) + T.dτ (diagPart B) := by
     conv_lhs => rw [decomp_low B]
     rw [map_add (f := _), map_add (f := _), map_smul, map_neg]
-  have hL : T.dτ B * projW T =
-      T.dτ (lowMinusUp B) * projW T + (∑ a, ((Λ a : ℝ) : ℂ) * B a a) • projW T := by
+  have hL
+      : T.dτ B * projW T
+        = T.dτ (lowMinusUp B) * projW T + (∑ a, ((Λ a : ℝ) : ℂ) * B a a) • projW T := by
     rw [eB1, add_mul, add_mul, smul_mul_assoc, h1, smul_zero, add_zero, h2]
-  have hR : projW T * T.dτ B =
-      -(projW T * T.dτ (lowMinusUp B)) + (∑ a, ((Λ a : ℝ) : ℂ) * B a a) • projW T := by
+  have hR
+      : projW T * T.dτ B
+        = -(projW T * T.dτ (lowMinusUp B)) + (∑ a, ((Λ a : ℝ) : ℂ) * B a a) • projW T := by
     rw [eB2, mul_add, mul_add, mul_smul_comm, h3, smul_zero, add_zero, h4, mul_neg]
   rw [hL, hR, two_mul, add_smul]
   abel

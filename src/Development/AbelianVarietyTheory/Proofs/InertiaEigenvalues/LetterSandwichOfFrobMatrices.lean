@@ -10,18 +10,23 @@ noncomputable section
 
 namespace GlobalTheory.WachLettersCompare
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module GlobalTheory.IndefiniteRowSideFullHecke.LetterBasisDecomposition GlobalTheory.IndefiniteRowSideFullHecke.WachLettersFreeness
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  GlobalTheory.IndefiniteRowSideFullHecke.LetterBasisDecomposition
+  GlobalTheory.IndefiniteRowSideFullHecke.WachLettersFreeness
 
 section Generic
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
+  (T : LocLat G Qp LL O)
 
 attribute [local instance] letterModule
 
@@ -34,8 +39,8 @@ theorem mul_letE (i : ZMod n) (a : LetA O n) : a * letE i = Pi.single i (a i) :=
 theorem letE_mul_self (i : ZMod n) : (letE i : LetA O n) * letE i = letE i := by
   rw [mul_letE]; simp [letE]
 
-theorem mem_Nl_iff (i : ZMod n) (x : W.DD T) :
-    x ∈ W.Nl T i ↔ x ∈ W.N T ∧ (letE i : LetA O n) • x = x := by
+theorem mem_Nl_iff (i : ZMod n) (x : W.DD T)
+    : x ∈ W.Nl T i ↔ x ∈ W.N T ∧ (letE i : LetA O n) • x = x := by
   constructor
   · rintro ⟨y, hy, rfl⟩
     refine ⟨(W.N T).smul_mem _ hy, ?_⟩
@@ -44,14 +49,14 @@ theorem mem_Nl_iff (i : ZMod n) (x : W.DD T) :
   · rintro ⟨hx, he⟩
     exact ⟨x, hx, he⟩
 
-theorem letE_smul_mem (i : ZMod n) {x : W.DD T} (hx : x ∈ W.N T) :
-    (letE i : LetA O n) • x ∈ W.Nl T i := ⟨x, hx, rfl⟩
+theorem letE_smul_mem (i : ZMod n) {x : W.DD T} (hx : x ∈ W.N T)
+    : (letE i : LetA O n) • x ∈ W.Nl T i :=
+  ⟨x, hx, rfl⟩
 
 theorem φD_smulA (a : LetA O n) (x : W.DD T) : W.φD T (a • x) = W.φA a • W.φD T x := by
   have := W.φD_smul T (algebraMap (LetA O n) W.EE a) x
   rw [algebraMap_smul, W.φE_ext, algebraMap_smul] at this
   exact this
-
 
 include W in
 theorem neZero_letters : NeZero n := by
@@ -71,8 +76,9 @@ theorem isUnit_Q : IsUnit (algebraMap (LetA O n) W.EE W.Q) := by
       IsAdicComplete.le_jacobson_bot (Ideal.span {((PD.p : ℕ) : W.EE)})
         (Ideal.mem_span_singleton_self _)
     have h2 := (Ideal.mem_jacobson_bot.1 hj) (x * r * (↑u⁻¹ : W.EE))
-    have h3 : x * algebraMap (LetA O n) W.EE W.q =
-        (((PD.p : ℕ) : W.EE) * (x * r * (↑u⁻¹ : W.EE)) + 1) * u := by
+    have h3
+        : x * algebraMap (LetA O n) W.EE W.q
+          = (((PD.p : ℕ) : W.EE) * (x * r * (↑u⁻¹ : W.EE)) + 1) * u := by
       rw [hx, ← map_mul, h1, map_sub, map_pow, map_add (f := _), map_one, ← hx, hr, ← hu]
       have := u.inv_mul
       linear_combination (-((PD.p : ℕ) : W.EE) * x * r) * this

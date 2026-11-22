@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting
 open Matrix
 
 noncomputable section
@@ -19,8 +20,8 @@ section Gen
 
 variable {n : ℕ} (ε : Fin n → Bool)
 
-private theorem hJ_eq_lemma (x y : Fin n → ℂ) :
-    hJ ε x y = ∑ i, star (x i) * ((if ε i then 1 else -1) * y i) := by
+private theorem hJ_eq_lemma (x y : Fin n → ℂ)
+    : hJ ε x y = ∑ i, star (x i) * ((if ε i then 1 else -1) * y i) := by
   simp only [hJ, Formalism.REAL.Jm, dotProduct, mulVec_diagonal, Pi.star_apply]
 
 theorem hJa (x y y' : Fin n → ℂ) : hJ ε x (y + y') = hJ ε x y + hJ ε x y' := by
@@ -72,16 +73,16 @@ theorem hJsubl (x x' y : Fin n → ℂ) : hJ ε (x - x') y = hJ ε x y - hJ ε x
   simp only [Pi.sub_apply, star_sub]
   ring
 
-theorem hJsumr {ι : Type*} (s : Finset ι) (x : Fin n → ℂ) (c : ι → ℂ) (y : ι → Fin n → ℂ) :
-    hJ ε x (∑ i ∈ s, c i • y i) = ∑ i ∈ s, c i * hJ ε x (y i) := by
+theorem hJsumr {ι : Type*} (s : Finset ι) (x : Fin n → ℂ) (c : ι → ℂ) (y : ι → Fin n → ℂ)
+    : hJ ε x (∑ i ∈ s, c i • y i) = ∑ i ∈ s, c i * hJ ε x (y i) := by
   classical
   refine Finset.induction_on s ?_ ?_
   · simp [hJzr]
   · intro a s ha ih
     rw [Finset.sum_insert ha, Finset.sum_insert ha, hJa, hJs, ih]
 
-theorem hJsuml {ι : Type*} (s : Finset ι) (x : Fin n → ℂ) (c : ι → ℂ) (y : ι → Fin n → ℂ) :
-    hJ ε (∑ i ∈ s, c i • y i) x = ∑ i ∈ s, star (c i) * hJ ε (y i) x := by
+theorem hJsuml {ι : Type*} (s : Finset ι) (x : Fin n → ℂ) (c : ι → ℂ) (y : ι → Fin n → ℂ)
+    : hJ ε (∑ i ∈ s, c i • y i) x = ∑ i ∈ s, star (c i) * hJ ε (y i) x := by
   classical
   refine Finset.induction_on s ?_ ?_
   · simp [hJzl]
@@ -97,8 +98,10 @@ theorem hJ_nondeg {d : Fin n → ℂ} (h : ∀ y, hJ ε y d = 0) : d = 0 := by
   · simpa using h1
   · simpa using h1
 
-theorem hJ_test {ι : Type*} (b : ι → Fin n → ℂ) (hs : Submodule.span ℂ (Set.range b) = ⊤)
-    {x x' : Fin n → ℂ} (h : ∀ i, hJ ε (b i) x = hJ ε (b i) x') : x = x' := by
+theorem hJ_test
+    {ι : Type*} (b : ι → Fin n → ℂ) (hs : Submodule.span ℂ (Set.range b) = ⊤)
+    {x x' : Fin n → ℂ} (h : ∀ i, hJ ε (b i) x = hJ ε (b i) x')
+    : x = x' := by
   have key : ∀ y, hJ ε y (x - x') = 0 := by
     intro y
     have hy : y ∈ Submodule.span ℂ (Set.range b) := by
@@ -113,9 +116,11 @@ theorem hJ_test {ι : Type*} (b : ι → Fin n → ℂ) (hs : Submodule.span ℂ
     | smul c a _ ha => rw [hJsl, ha, mul_zero]
   exact sub_eq_zero.mp (hJ_nondeg ε key)
 
-theorem span_perp {r : ℕ} (e : Fin r → Fin n → ℂ) (S : Set (Fin r)) (y : Fin n → ℂ)
-    (hy : ∀ c ∈ S, hJ ε y (e c) = 0) {d : Fin n → ℂ} (hd : d ∈ Submodule.span ℂ (e '' S)) :
-    hJ ε y d = 0 := by
+theorem span_perp
+    {r : ℕ} (e : Fin r → Fin n → ℂ) (S : Set (Fin r))
+    (y : Fin n → ℂ) (hy : ∀ c ∈ S, hJ ε y (e c) = 0)
+    {d : Fin n → ℂ} (hd : d ∈ Submodule.span ℂ (e '' S))
+    : hJ ε y d = 0 := by
   induction hd using Submodule.span_induction with
   | mem z hz =>
     obtain ⟨c, hc, rfl⟩ := hz
@@ -124,15 +129,18 @@ theorem span_perp {r : ℕ} (e : Fin r → Fin n → ℂ) (S : Set (Fin r)) (y :
   | add a c _ _ ha hc => rw [hJa, ha, hc, add_zero]
   | smul c a _ ha => rw [hJs, ha, mul_zero]
 
-theorem span_recon {r : ℕ} (e f : Fin r → Fin n → ℂ) (S : Set (Fin r))
-    (hfe : ∀ b c, hJ ε (f b) (e c) = if b = c then 1 else 0) {d : Fin n → ℂ}
-    (hd : d ∈ Submodule.span ℂ (e '' S)) : d = ∑ c, hJ ε (f c) d • e c := by
+theorem span_recon
+    {r : ℕ} (e f : Fin r → Fin n → ℂ) (S : Set (Fin r))
+    (hfe : ∀ b c, hJ ε (f b) (e c) = if b = c then 1 else 0)
+    {d : Fin n → ℂ} (hd : d ∈ Submodule.span ℂ (e '' S))
+    : d = ∑ c, hJ ε (f c) d • e c := by
   induction hd using Submodule.span_induction with
   | mem z hz =>
     obtain ⟨c, _, rfl⟩ := hz
     simp only [hfe]
     simp [ite_smul]
-  | zero => simp [hJzr]
+  | zero =>
+    simp [hJzr]
   | add a c _ _ ha hc =>
     conv_lhs => rw [ha, hc]
     rw [← Finset.sum_add_distrib]
@@ -144,7 +152,8 @@ theorem span_recon {r : ℕ} (e f : Fin r → Fin n → ℂ) (S : Set (Fin r))
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [hJs, smul_smul]
 
-theorem mulVec_split (G : Matrix (Fin n) (Fin n) ℂ) (x : Fin n → ℂ) : G *ᵥ x = x + (G - 1) *ᵥ x := by
+theorem mulVec_split (G : Matrix (Fin n) (Fin n) ℂ) (x : Fin n → ℂ)
+    : G *ᵥ x = x + (G - 1) *ᵥ x := by
   rw [sub_mulVec, one_mulVec]
   abel
 
@@ -162,13 +171,15 @@ theorem fr_ff (a b : Fin D.R.rS) : hJ (X.B.I.ε v) (fV X v a) (fV X v b) = 0 := 
   unfold Formalism.L2.SG.Pf.UnipB.hE at h
   rw [fV, fV, Formalism.L2.SG.Pf.hJ_rv_sc, h, map_zero]
 
-theorem fr_ef (a b : Fin D.R.rS) : hJ (X.B.I.ε v) (eV X v a) (fV X v b) = if a = b then 1 else 0 := by
+theorem fr_ef (a b : Fin D.R.rS)
+    : hJ (X.B.I.ε v) (eV X v a) (fV X v b) = if a = b then 1 else 0 := by
   have h := Formalism.L2.SG.Pf.UnipB.hE_ef X a b
   unfold Formalism.L2.SG.Pf.UnipB.hE at h
   rw [eV, fV, Formalism.L2.SG.Pf.hJ_rv_sc, h]
   split_ifs <;> simp
 
-theorem fr_fe (a b : Fin D.R.rS) : hJ (X.B.I.ε v) (fV X v a) (eV X v b) = if a = b then 1 else 0 := by
+theorem fr_fe (a b : Fin D.R.rS)
+    : hJ (X.B.I.ε v) (fV X v a) (eV X v b) = if a = b then 1 else 0 := by
   rw [hJswap, fr_ef]
   by_cases h : a = b
   · subst h
@@ -188,7 +199,8 @@ theorem fr_fz (a : Fin D.R.rS) : hJ (X.B.I.ε v) (fV X v a) (zV X u v) = 0 := by
 theorem frame_z_z_eq_neg_t : hJ (X.B.I.ε v) (zV X u v) (zV X u v) = -(((D.mem u).A.T : ℕ) : ℂ) := by
   have h := Formalism.L2.SG.Pf.UnipB.hE_crd X (X.zu u) (X.zu u)
   unfold Formalism.L2.SG.Pf.UnipB.hE at h
-  rw [zV, HidaSetting.zR, Formalism.L2.SG.Pf.hJ_rv_sc, h, X.zu_norm, map_neg, map_natCast, map_neg, map_natCast]
+  rw [zV, HidaSetting.zR, Formalism.L2.SG.Pf.hJ_rv_sc, h, X.zu_norm, map_neg, map_natCast, map_neg,
+    map_natCast]
 
 theorem fr_ew (a : Fin D.R.rS) (j : Fin D.R.k) : hJ (X.B.I.ε v) (eV X v a) (X.wfr u v j) = 0 :=
   ((X.wfr_perp u v j).1 a).1
@@ -196,10 +208,10 @@ theorem fr_ew (a : Fin D.R.rS) (j : Fin D.R.k) : hJ (X.B.I.ε v) (eV X v a) (X.w
 theorem fr_fw (a : Fin D.R.rS) (j : Fin D.R.k) : hJ (X.B.I.ε v) (fV X v a) (X.wfr u v j) = 0 :=
   ((X.wfr_perp u v j).1 a).2
 
-theorem fr_zw (j : Fin D.R.k) : hJ (X.B.I.ε v) (zV X u v) (X.wfr u v j) = 0 :=
-  (X.wfr_perp u v j).2
+theorem fr_zw (j : Fin D.R.k) : hJ (X.B.I.ε v) (zV X u v) (X.wfr u v j) = 0 := (X.wfr_perp u v j).2
 
-theorem fr_ww (i j : Fin D.R.k) : hJ (X.B.I.ε v) (X.wfr u v i) (X.wfr u v j) = if i = j then 1 else 0 :=
+theorem fr_ww (i j : Fin D.R.k)
+    : hJ (X.B.I.ε v) (X.wfr u v i) (X.wfr u v j) = if i = j then 1 else 0 :=
   X.wfr_on u v i j
 
 theorem fr_we (j : Fin D.R.k) (a : Fin D.R.rS) : hJ (X.B.I.ε v) (X.wfr u v j) (eV X v a) = 0 := by

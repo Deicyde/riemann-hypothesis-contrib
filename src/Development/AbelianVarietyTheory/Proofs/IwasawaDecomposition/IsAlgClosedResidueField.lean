@@ -12,8 +12,8 @@ namespace GlobalTheory.ResidueFieldAlgClosed
 
 open Polynomial
 
-theorem isAlgClosed_residueField {Ω : Type} [Field Ω] [IsAlgClosed Ω] (A : ValuationSubring Ω) :
-    IsAlgClosed (IsLocalRing.ResidueField A) := by
+theorem isAlgClosed_residueField {Ω : Type} [Field Ω] [IsAlgClosed Ω] (A : ValuationSubring Ω)
+    : IsAlgClosed (IsLocalRing.ResidueField A) := by
   refine IsAlgClosed.of_exists_root _ fun p hmon hirr => ?_
   have hlift : p ∈ Polynomial.lifts (IsLocalRing.residue A) :=
     Polynomial.map_surjective _ IsLocalRing.residue_surjective p
@@ -32,9 +32,12 @@ theorem isAlgClosed_residueField {Ω : Type} [Field Ω] [IsAlgClosed Ω] (A : Va
   refine ⟨IsLocalRing.residue A a, ?_⟩
   rw [← hPmap, Polynomial.eval_map, Polynomial.eval₂_hom, h0, map_zero]
 
-theorem isAlgebraic_residueField {Ω : Type} [Field Ω] [CharZero Ω] (A : ValuationSubring Ω)
-    (hΩ : ∀ y : Ω, IsAlgebraic ℤ y) (g : ℕ) [Fact g.Prime] [Algebra (ZMod g) (IsLocalRing.ResidueField A)] :
-    Algebra.IsAlgebraic (ZMod g) (IsLocalRing.ResidueField A) := by
+theorem isAlgebraic_residueField
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (A : ValuationSubring Ω)
+    (hΩ : ∀ y : Ω, IsAlgebraic ℤ y)
+    (g : ℕ) [Fact g.Prime] [Algebra (ZMod g) (IsLocalRing.ResidueField A)]
+    : Algebra.IsAlgebraic (ZMod g) (IsLocalRing.ResidueField A) := by
   refine ⟨fun x => ?_⟩
   obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective x
   obtain ⟨p, hp0, hpa⟩ := hΩ (a : Ω)
@@ -45,9 +48,10 @@ theorem isAlgebraic_residueField {Ω : Type} [Field Ω] [CharZero Ω] (A : Valua
   have hA0 : Polynomial.aeval a p.primPart = 0 := by
     apply IsFractionRing.injective A Ω
     rw [map_zero]
-    calc algebraMap A Ω (Polynomial.aeval a p.primPart)
-        = Polynomial.aeval (algebraMap A Ω a) p.primPart :=
-          (Polynomial.aeval_algHom_apply (algebraMap A Ω).toIntAlgHom a p.primPart).symm
+    calc
+      algebraMap A Ω (Polynomial.aeval a p.primPart)
+          = Polynomial.aeval (algebraMap A Ω a) p.primPart :=
+        (Polynomial.aeval_algHom_apply (algebraMap A Ω).toIntAlgHom a p.primPart).symm
       _ = 0 := hqa
   have hqg : p.primPart.map (Int.castRingHom (ZMod g)) ≠ 0 := by
     intro h
@@ -66,16 +70,20 @@ theorem isAlgebraic_residueField {Ω : Type} [Field Ω] [CharZero Ω] (A : Valua
   rw [hA0, map_zero] at h2
   rw [Polynomial.aeval_def, Polynomial.eval₂_map]
   rw [Polynomial.aeval_def] at h2
-  have hφ : (algebraMap (ZMod g) (IsLocalRing.ResidueField A)).comp (Int.castRingHom (ZMod g)) =
-      algebraMap ℤ (IsLocalRing.ResidueField A) := RingHom.ext_int _ _
+  have hφ
+      : (algebraMap (ZMod g) (IsLocalRing.ResidueField A)).comp (Int.castRingHom (ZMod g))
+        = algebraMap ℤ (IsLocalRing.ResidueField A) :=
+    RingHom.ext_int _ _
   rw [hφ]
   exact h2
 
-theorem residueField_equiv (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+theorem residueField_equiv
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
     (A : ValuationSubring Ω) (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E))
-    (hA : Formalism.ConjugateSelfDual.IsPlaceOver A v) (g : ℕ) [Fact (Nat.Prime g)]
-    (hg : (g : NumberField.RingOfIntegers E) ∈ v.asIdeal) :
-    Nonempty (IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g) := by
+    (hA : Formalism.ConjugateSelfDual.IsPlaceOver A v)
+    (g : ℕ) [Fact (Nat.Prime g)]
+    (hg : (g : NumberField.RingOfIntegers E) ∈ v.asIdeal)
+    : Nonempty (IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g) := by
   classical
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
@@ -93,7 +101,8 @@ theorem residueField_equiv (E Ω : Type) [Field E] [NumberField E] [Field Ω] [A
   have _ := isAlgClosed_residueField A
   have _ := isAlgebraic_residueField A hΩ g
   have : IsAlgClosure (ZMod g) (IsLocalRing.ResidueField A) := ⟨inferInstance, inferInstance⟩
-  exact ⟨(IsAlgClosure.equiv (ZMod g) (IsLocalRing.ResidueField A) (Formalism.CyclotomicNorms.Fbar g)).toRingEquiv⟩
+  exact ⟨(IsAlgClosure.equiv (ZMod g) (IsLocalRing.ResidueField A)
+    (Formalism.CyclotomicNorms.Fbar g)).toRingEquiv⟩
 
 end GlobalTheory.ResidueFieldAlgClosed
 

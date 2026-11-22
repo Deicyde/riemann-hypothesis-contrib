@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CobOneEqZero
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz
+  GlobalTheory.QLog GlobalTheory.PDivGroup
 
 noncomputable section
 
@@ -16,17 +17,20 @@ namespace PDiv
 
 open Coalgebra Bialgebra
 
-theorem exists_tangent_of_cobOne_eq_smul (O A : Type) [CommRing O] [CommRing A] [Bialgebra O A]
-    [Module.Finite O A] [Module.Projective O A] [Coalgebra.IsCocomm O A] (a : O) (b : A)
-    (z : A ⊗[O] A) (h : cobOne O A b = a • z) :
-    ∃ u : Cot O (CartierDual O A) →ₗ[O] O ⧸ Ideal.span {a},
-      ∀ φ : CartierDual O A, u (dUnit (R := O) φ) = Ideal.Quotient.mk _ (φ b) := by
+theorem exists_tangent_of_cobOne_eq_smul
+    (O A : Type) [CommRing O] [CommRing A] [Bialgebra O A] [Module.Finite O A]
+    [Module.Projective O A] [Coalgebra.IsCocomm O A]
+    (a : O) (b : A) (z : A ⊗[O] A) (h : cobOne O A b = a • z)
+    : ∃ u : Cot O (CartierDual O A) →ₗ[O] O ⧸ Ideal.span {a}, ∀ φ : CartierDual O A,
+      u (dUnit (R := O) φ) = Ideal.Quotient.mk _ (φ b) := by
   let D : CartierDual O A →ₗ[O] O ⧸ Ideal.span {a} :=
     (Ideal.Quotient.mkₐ O (Ideal.span {a})).toLinearMap ∘ₗ CartierDual.evalAt O A b
-  have hcomul : comul b = b ⊗ₜ 1 + 1 ⊗ₜ b + a • z := by
-    rw [← h, cobOne_apply]; abel
-  have hD : ∀ φ ψ : CartierDual O A, D (φ * ψ) =
-      counitAlgHom O (CartierDual O A) φ • D ψ + counitAlgHom O (CartierDual O A) ψ • D φ := by
+  have hcomul : comul b = b ⊗ₜ 1 + 1 ⊗ₜ b + a • z := by rw [← h, cobOne_apply]; abel
+  have hD
+      : ∀ φ ψ : CartierDual O A,
+        D (φ * ψ)
+          = counitAlgHom O (CartierDual O A) φ • D ψ
+            + counitAlgHom O (CartierDual O A) ψ • D φ := by
     intro φ ψ
     have e : (φ * ψ) b = φ b * ψ 1 + φ 1 * ψ b + a * CartierDual.pair O A A (φ ⊗ₜ ψ) z := by
       rw [CartierDual.mul_apply, hcomul, map_add (f := _), map_add (f := _), map_smul]

@@ -14,7 +14,9 @@ open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField 
 open scoped Pointwise nonZeroDivisors
 open Formalism.L2.Host (HChar embTau)
 open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.FunObj
+  GlobalTheory.FunObj.SqNum
 
 noncomputable section
 
@@ -22,8 +24,10 @@ namespace GlobalTheory.NuTrivSq
 variable {D : D7}
 
 open GlobalTheory.Mem.Col2.SplitChar in
-theorem vl_le_of_mem_hatId' {I : Ideal (𝓞 D.host.E)} {PP : HeightOneSpectrum (𝓞 D.host.E)} {n : ℕ}
-    (hI : I ≤ PP.asIdeal ^ n) {x : AE D} (hx : x ∈ hatId D I) : vl D PP x ≤ WithZero.exp (-(n : ℤ)) := by
+theorem vl_le_of_mem_hatId'
+    {I : Ideal (𝓞 D.host.E)} {PP : HeightOneSpectrum (𝓞 D.host.E)} {n : ℕ} (hI : I ≤ PP.asIdeal ^ n)
+    {x : AE D} (hx : x ∈ hatId D I)
+    : vl D PP x ≤ WithZero.exp (-(n : ℤ)) := by
   induction hx using AddSubgroup.closure_induction with
   | mem y hy =>
     obtain ⟨b, hb, s, hs, rfl⟩ := hy
@@ -35,15 +39,19 @@ theorem vl_le_of_mem_hatId' {I : Ideal (𝓞 D.host.E)} {PP : HeightOneSpectrum 
   | add a b _ _ ha hb => exact (Valuation.map_add _ _ _).trans (max_le ha hb)
   | neg a _ ha => rwa [Valuation.map_neg]
 
-
 open GlobalTheory.Mem.Col2.SplitChar in
-theorem sgA_mem_hatId' {I : Ideal (𝓞 D.host.E)} {x : AE D} (hx : x ∈ hatId D I) :
-    sgA D x ∈ hatId D (D.host.conj • I) := by
+theorem sgA_mem_hatId' {I : Ideal (𝓞 D.host.E)} {x : AE D} (hx : x ∈ hatId D I)
+    : sgA D x ∈ hatId D (D.host.conj • I) := by
   induction hx using AddSubgroup.closure_induction with
   | mem y hy =>
     obtain ⟨b, hb, s, hs, rfl⟩ := hy
-    refine AddSubgroup.subset_closure ⟨D.host.conj • b, Ideal.smul_mem_pointwise_smul _ _ _ hb, sgA D s,
-      GlobalTheory.NormSum.UnramHecke.sgA_mem D hs, ?_⟩
+    refine AddSubgroup.subset_closure ⟨
+      D.host.conj • b,
+      Ideal.smul_mem_pointwise_smul _ _ _ hb,
+      sgA D s,
+      GlobalTheory.NormSum.UnramHecke.sgA_mem D hs,
+      ?_
+    ⟩
     rw [map_mul, GlobalTheory.Mem.Col2.SplitChar.sgA_inc]
     rfl
   | zero => simp
@@ -51,20 +59,26 @@ theorem sgA_mem_hatId' {I : Ideal (𝓞 D.host.E)} {x : AE D} (hx : x ∈ hatId 
   | neg a _ ha => rw [map_neg]; exact neg_mem ha
 
 theorem conj_conj_smul (𝔪 : Ideal (𝓞 D.host.E)) : D.host.conj • D.host.conj • 𝔪 = 𝔪 := by
-  have h : D.host.conj * D.host.conj = 1 := AlgEquiv.ext fun z => GlobalTheory.NormSum.UnramHecke.conj_conj D z
+  have h : D.host.conj * D.host.conj = 1 :=
+    AlgEquiv.ext fun z => GlobalTheory.NormSum.UnramHecke.conj_conj D z
   rw [smul_smul, h, one_smul]
 
-
 open GlobalTheory.Mem.Col2.SplitChar in
-theorem vl_sub_le' {T : Type} {L : LevCh D T} (P : Places L) {y : AE D}
-    (h1 : y ∈ hatId D (condE P)) (h2 : y ∈ hatId D (D.host.conj • condE P))
-    {PP : HeightOneSpectrum (𝓞 D.host.E)} (hv : (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) ∈ P.S0) :
-    vl D PP y ≤ WithZero.exp (-(condExp P ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)) : ℤ)) := by
+theorem vl_sub_le'
+    {T : Type} {L : LevCh D T} (P : Places L)
+    {y : AE D} (h1 : y ∈ hatId D (condE P)) (h2 : y ∈ hatId D (D.host.conj • condE P))
+    {PP : HeightOneSpectrum (𝓞 D.host.E)}
+    (hv : (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) ∈ P.S0)
+    : vl D PP y
+      ≤ WithZero.exp
+        (-(condExp P ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)) : ℤ)) := by
   obtain ⟨c, hc, hcm, -⟩ := GlobalTheory.Mem.HostCM.host_cm D.R D.host
   set v := (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) with hvdef
   have hw : (P.w v).under (𝓞 D.host.F) = v := P.under_w hv
-  have hle : condE P ≤ (P.w v).asIdeal ^ condExp P v := Ideal.le_of_dvd (Finset.dvd_prod_of_mem _ hv)
-  rcases (GlobalTheory.Mem.Chr.under_eq_iff_conjPl c hcm.rank hcm.ne (P.w v) PP).1 (by rw [hw]) with e | h
+  have hle : condE P ≤ (P.w v).asIdeal ^ condExp P v :=
+    Ideal.le_of_dvd (Finset.dvd_prod_of_mem _ hv)
+  rcases (GlobalTheory.Mem.Chr.under_eq_iff_conjPl c hcm.rank hcm.ne (P.w v) PP).1 (by rw [hw]) with
+    e | h
   · rw [e]
     exact vl_le_of_mem_hatId' (e ▸ hle) h1
   · have e : c.toRingEquiv = D.host.conj.toRingEquiv := RingEquiv.ext hc
@@ -76,15 +90,20 @@ theorem vl_sub_le' {T : Type} {L : LevCh D T} (P : Places L) {y : AE D}
 
 end GlobalTheory.NuTrivSq
 
-
 open GlobalTheory.Mem.Col2.SplitChar Formalism.L2.Host GlobalTheory.NuTrivSq in
-theorem GlobalTheory.NuTrivSq.nuH_finIdl_eq_one : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (i j : Fin D.R.m) {μ₀ : T},
-    L.Is μ₀ → ∀ x : (AE D)ˣ, IntU D x → (x : AE D) - 1 ∈ hatId D (condE G.pl) →
-      (x : AE D) - 1 ∈ hatId D (D.host.conj • condE G.pl) →
-      (nuH G μ₀ i j).1 (GlobalTheory.Mem.Col2.SplitChar.finIdl D x) = 1 := by
+theorem GlobalTheory.NuTrivSq.nuH_finIdl_eq_one
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (i j : Fin D.R.m)
+        {μ₀ : T},
+      L.Is μ₀
+        → ∀ x : (AE D)ˣ,
+          IntU D x → (x : AE D) - 1 ∈ hatId D (condE G.pl)
+            → (x : AE D) - 1 ∈ hatId D (D.host.conj • condE G.pl)
+            → (nuH G μ₀ i j).1 (GlobalTheory.Mem.Col2.SplitChar.finIdl D x) = 1 := by
   intro D T L sc G i j μ₀ hL u hu hc1 hc2
-  refine GlobalTheory.Mem.LocTriv.eq_one_of_local D.host.E _ (nuH G μ₀ i j).2.1 (finIdl D u) (finIdl_unit hu)
-    (fun w => by rw [finIdl_fst]; rfl) fun PP x hx => ?_
+  refine GlobalTheory.Mem.LocTriv.eq_one_of_local D.host.E _ (nuH G μ₀ i j).2.1 (finIdl D u)
+    (finIdl_unit hu)
+    (fun w => by rw [finIdl_fst]; rfl)
+    fun PP x hx => ?_
   have hunit : IsUnitAt PP x := by
     unfold IsUnitAt
     rw [hx]
@@ -96,7 +115,8 @@ theorem GlobalTheory.NuTrivSq.nuH_finIdl_eq_one : ∀ {D : D7} {T : Type} {L : L
     · obtain ⟨k, hk⟩ := hg
       have hS : (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) ∈ G.pl.S0 := by
         refine G.pl.mem_S0_of_sum_eq.2 (Or.inr ((S1_mem_OmF D).2 ?_))
-        have : ((D.host.g k : ℕ) : 𝓞 D.host.F) ∈ ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)).asIdeal := by
+        have : ((D.host.g k : ℕ) : 𝓞 D.host.F)
+            ∈ ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)).asIdeal := by
           change _ ∈ PP.asIdeal.comap (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))
           rw [Ideal.mem_comap, map_natCast]
           exact hk
@@ -106,7 +126,9 @@ theorem GlobalTheory.NuTrivSq.nuH_finIdl_eq_one : ∀ {D : D7} {T : Type} {L : L
       refine (L.C.isMu0 j).tame PP x hunit ?_
       rw [hsub]
       refine (vl_sub_le' G.pl hc1 hc2 hS).trans ?_
-      have : 1 ≤ condExp G.pl ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)) := by unfold condExp; split_ifs <;> omega
+      have : 1
+          ≤ condExp G.pl ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)) := by
+        unfold condExp; split_ifs <;> omega
       exact WithZero.exp_le_exp.2 (by omega)
     · push_neg at hg
       exact (L.C.isMu0 j).unr PP hg x hunit
@@ -119,7 +141,8 @@ theorem GlobalTheory.NuTrivSq.nuH_finIdl_eq_one : ∀ {D : D7} {T : Type} {L : L
       rcases G.pl.mem_S0_of_sum_eq.1 hS with h0 | h1'
       · rw [condExp, if_pos h0] at hb
         exact (G.ch.lev0 _ h1 h2 PP h0).1 x hunit (by simpa using hb)
-      · have hne : (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) ≠ G.pl.v0 := fun e => G.ch.basePlace_not_mem_chiGridBadPlaces (e ▸ h1')
+      · have hne : (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) ≠ G.pl.v0 :=
+          fun e => G.ch.basePlace_not_mem_chiGridBadPlaces (e ▸ h1')
         rw [condExp, if_neg hne] at hb
         exact (G.ch.lev1 _ h1 h2 PP h1').1 x hunit (by simpa using hb)
     · exact G.ch.unr _ h1 h2 PP hS x hunit

@@ -9,11 +9,13 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
 
 namespace Data
 
@@ -22,14 +24,17 @@ variable (d : Data K ι Ω WT A)
 def HtOne : Set (Ideal (KTp K d.D d.N)) := {p | p.IsPrime ∧ p.height = 1}
 
 noncomputable def gen (p : Ideal (KTp K d.D d.N)) : KTp K d.D d.N :=
-  open Classical in if hp : p.IsPrincipal then (haveI := hp; Submodule.IsPrincipal.generator p) else 0
+  open Classical in
+  if hp : p.IsPrincipal then (haveI := hp; Submodule.IsPrincipal.generator p) else 0
 
 noncomputable def dg (q : KTp K d.D d.N) : ℕ := q.support.sup fun s => ∑ j, s (1, j)
 
-def OverP (c : ι) (p : Ideal (KTp K d.D d.N)) : Set (AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) :=
+def OverP (c : ι) (p : Ideal (KTp K d.D d.N))
+    : Set (AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) :=
   {w | IsNormDiscrete w ∧ ∀ x : KTp K d.D d.N, 0 ≤ w (d.sH c x) ∧ (0 < w (d.sH c x) ↔ x ∈ p)}
 
-def GoodP (c : ι) (p : Ideal (KTp K d.D d.N)) : Set (AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) :=
+def GoodP (c : ι) (p : Ideal (KTp K d.D d.N))
+    : Set (AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) :=
   {w | w ∈ d.OverP c p ∧ ∃ a : Ω c, a ≠ 0 ∧ d.Wres c w a ≠ 0}
 
 noncomputable def nP (h : d.S1) (c : ι) (G : WT) (ta : A c) (p : Ideal (KTp K d.D d.N)) : ℤ :=
@@ -50,8 +55,9 @@ noncomputable def h0f (h : d.S1) (G : WT) (ta : ∀ c, A c) : ℝ :=
   ∑ c, ∑ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
     (d.nP h c G (ta c) p : ℝ) * ReciprocityTheory.MultiplicativeHeights.h0 (d.gen p)
 
-noncomputable def NlaG (h : d.S1) (G : WT) (ta : ∀ c, A c)
-    (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) : ℝ :=
+noncomputable def NlaG
+    (h : d.S1) (G : WT) (ta : ∀ c, A c) (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
+    : ℝ :=
   ∑ c, ∑ᶠ (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (_ : w ∈ d.PlOver la c),
     (d.fze h c w : ℝ) * (d.ord c (d.Wres c w) G (ta c) : ℝ)
 
@@ -60,10 +66,11 @@ noncomputable def Nsg (G : WT) (ta : ∀ c, A c) (sg : K →+* ℂ) : ℝ :=
     -Real.log (d.nrm c G (ta c) P)) ∂(ReciprocityTheory.MultiplicativeHeights.blockSphereProb d.D (d.N + 1))
 
 noncomputable def Hgt (h : d.S1) (G : WT) (ta : ∀ c, A c) : ℝ :=
-  (∑ᶠ la, d.NlaG h G ta la * logNorm la) / (Module.finrank ℚ K : ℝ) + meanK (d.Nsg G ta) +
-    d.h0f h G ta
+  (∑ᶠ la, d.NlaG h G ta la * logNorm la) / (Module.finrank ℚ K : ℝ) + meanK (d.Nsg G ta)
+    + d.h0f h G ta
 
-noncomputable def NlaMM (h : d.S1) (f : ∀ c, A c) (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) : ℝ :=
+noncomputable def NlaMM (h : d.S1) (f : ∀ c, A c) (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
+    : ℝ :=
   ∑ c, ∑ᶠ (w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)) (_ : w ∈ d.PlOver la c),
     (d.fze h c w : ℝ) * (d.ordMM c (d.Wres c w) (f c) : ℝ)
 
@@ -76,8 +83,8 @@ noncomputable def mahlerMeasureHeight (h : d.S1) (f : ∀ c, A c) : ℝ :=
     (d.nPMM h c (f c) p : ℝ) * ReciprocityTheory.MultiplicativeHeights.h0 (d.gen p)
 
 noncomputable def HgtMM (h : d.S1) (f : ∀ c, A c) : ℝ :=
-  (∑ᶠ la, d.NlaMM h f la * logNorm la) / (Module.finrank ℚ K : ℝ) + meanK (d.NsgMM f) +
-    d.mahlerMeasureHeight h f
+  (∑ᶠ la, d.NlaMM h f la * logNorm la) / (Module.finrank ℚ K : ℝ) + meanK (d.NsgMM f)
+    + d.mahlerMeasureHeight h f
 
 noncomputable def wx (x : Fin (d.N + 1) → K) : ∀ c, A c := ∑ j, x j • d.w j
 
@@ -87,9 +94,9 @@ noncomputable def rationalBaseRow (c : ι) : OmS (Ω c) d.D d.N :=
 
 noncomputable def fZ (h : d.S1) (c : ι) : KTf K d.D d.N :=
   letI : Algebra (KTf K d.D d.N) (OmS (Ω c) d.D d.N) := (d.KTtoS h c).toAlgebra
-  Algebra.norm (KTf K d.D d.N) (d.rationalBaseRow c) *
-    ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
-      algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ d.nPMM h c (d.w (d.jc c) c) p
+  Algebra.norm (KTf K d.D d.N) (d.rationalBaseRow c)
+    * ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
+        algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ d.nPMM h c (d.w (d.jc c) c) p
 
 end Data
 

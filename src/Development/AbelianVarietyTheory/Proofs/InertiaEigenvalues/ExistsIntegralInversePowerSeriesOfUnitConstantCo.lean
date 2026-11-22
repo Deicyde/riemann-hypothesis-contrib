@@ -9,17 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BddOfMe
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 namespace GlobalTheory
 
-theorem powerSeries_inv_coeff_norm_le_one :
-    ∀ (K : Type) [NormedField K] [IsUltrametricDist K] (f : K⟦X⟧), (∀ n, ‖coeff n f‖ ≤ 1) →
-      ‖constantCoeff f‖ = 1 → ∃ g : K⟦X⟧, (∀ n, ‖coeff n g‖ ≤ 1) ∧ f * g = 1 := by
+theorem powerSeries_inv_coeff_norm_le_one
+    : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] (f : K⟦X⟧),
+      (∀ n, ‖coeff n f‖ ≤ 1) → ‖constantCoeff f‖ = 1
+        → ∃ g : K⟦X⟧, (∀ n, ‖coeff n g‖ ≤ 1) ∧ f * g = 1 := by
   intro K _ _ f hf hc
-  have hc0 : constantCoeff f ≠ 0 := by
-    intro h; rw [h, norm_zero] at hc; exact zero_ne_one hc
+  have hc0 : constantCoeff f ≠ 0 := by intro h; rw [h, norm_zero] at hc; exact zero_ne_one hc
   refine ⟨f⁻¹, ?_, PowerSeries.mul_inv_cancel f hc0⟩
   intro n
   induction n using Nat.strong_induction_on with

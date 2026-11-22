@@ -5,8 +5,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open CategoryTheory in
-theorem UpperTheory.rankCohHom_of_rankHomology :
-    UpperTheory.V.Af.CohB.RankHomology → UpperTheory.V.Af.BA.RankCohHom := by
+theorem UpperTheory.rankCohHom_of_rankHomology
+    : UpperTheory.V.Af.CohB.RankHomology → UpperTheory.V.Af.BA.RankCohHom := by
   intro hR Γ _ P q X hX A
   obtain ⟨i⟩ := hX
   rw [(groupCohomologyIsoExt A q ≪≫ P.isoExt q A).toLinearEquiv.rank_eq]

@@ -9,18 +9,19 @@ open GlobalTheory.PRep GlobalTheory.SmGL ValuativeRel PositivityTheory.Lbc
 
 namespace GlobalTheory.CompanionTheory.CosetReps
 
-theorem exists_fin_coset_reps (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (J H A : Subgroup G) (hJ : IsCompact (J : Set G)) (hH : IsOpen (H : Set G))
-    (_hHJ : H ≤ J) (_hAJ : A ≤ J) (hcov : ∀ y ∈ J, ∃ a ∈ A, a⁻¹ * y ∈ H) :
-    ∃ r : ℕ, 0 < r ∧ ∃ x : Fin r → G, (∀ i, x i ∈ A) ∧
-      ∀ y ∈ J, ∃! i, (x i)⁻¹ * y ∈ H := by
+theorem exists_fin_coset_reps
+    (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (J H A : Subgroup G) (hJ : IsCompact (J : Set G)) (hH : IsOpen (H : Set G)) (_hHJ : H ≤ J)
+    (_hAJ : A ≤ J) (hcov : ∀ y ∈ J, ∃ a ∈ A, a⁻¹ * y ∈ H)
+    : ∃ r : ℕ, 0 < r ∧ ∃ x : Fin r → G, (∀ i, x i ∈ A) ∧ ∀ y ∈ J, ∃! i, (x i)⁻¹ * y ∈ H := by
   classical
-  obtain ⟨t, ht⟩ := hJ.elim_finite_subcover
-    (fun a : A => (fun y : G => (a : G)⁻¹ * y) ⁻¹' (H : Set G))
-    (fun a => hH.preimage (continuous_const.mul continuous_id))
-    (fun y hy => by
-      obtain ⟨a, ha, hay⟩ := hcov y hy
-      exact Set.mem_iUnion.2 ⟨⟨a, ha⟩, hay⟩)
+  obtain ⟨t, ht⟩ :=
+    hJ.elim_finite_subcover
+      (fun a : A => (fun y : G => (a : G)⁻¹ * y) ⁻¹' (H : Set G))
+      (fun a => hH.preimage (continuous_const.mul continuous_id))
+      (fun y hy => by
+        obtain ⟨a, ha, hay⟩ := hcov y hy
+        exact Set.mem_iUnion.2 ⟨⟨a, ha⟩, hay⟩)
   let T : Finset (G ⧸ H) := t.image (fun a : A => ((a : G) : G ⧸ H))
   have rep : ∀ q : T, ∃ a : A, ((a : G) : G ⧸ H) = q := by
     rintro ⟨q, hq⟩

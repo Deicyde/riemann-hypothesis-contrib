@@ -16,7 +16,10 @@ namespace GlobalTheory
 
 theorem maxCusps_iff_killed_coeff_vanish : MaxCuspsStatement := by
   intro E _ _ _ r ρ X hspan hbas la hχ c P hP
-  exact ⟨fun h => GlobalTheory.T.maxCusp_killedCoefficient_eq_zero E r ρ X hbas la hχ c P h,
-    fun h => GlobalTheory.T.maxCusp_mem_cuspForms_of_killedCoef_zero E r ρ X hspan hbas la hχ c P hP h⟩
+  exact ⟨
+    fun h => GlobalTheory.T.maxCusp_killedCoefficient_eq_zero E r ρ X hbas la hχ c P h,
+    fun h =>
+      GlobalTheory.T.maxCusp_mem_cuspForms_of_killedCoef_zero E r ρ X hspan hbas la hχ c P hP h
+  ⟩
 
 end GlobalTheory

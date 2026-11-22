@@ -14,20 +14,28 @@ open Formalism.MainNotions Formalism.BasicNotions Formalism.MainNotions.G Classi
 
 namespace GlobalTheory
 
-theorem nuD_card_le_a_sq : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m, ∀ (z : Bool × HH (Fm.D x i)), (((nuD (Fm.D x i) u j z).card : ℕ) : ℝ) ≤ (Fm.L x i).sc.a ^ 2 := by
+theorem nuD_card_le_a_sq
+    : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x
+        → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m,
+          ∀ (z : Bool × HH (Fm.D x i)),
+            (((nuD (Fm.D x i) u j z).card : ℕ) : ℝ) ≤ (Fm.L x i).sc.a ^ 2 := by
   intro eps Fm
   obtain ⟨x1, h1⟩ := GlobalTheory.nuRow_nonneg_le_ten_mul eps Fm
   obtain ⟨x2, h2⟩ := GlobalTheory.ShNums.size_rel Fm
   refine ⟨max x1 x2, fun x hx hx1 i u j hj z => ?_⟩
-  have hr := h1 x (le_trans (le_max_left _ _) hx) hx1 i u (j + 1)
-    (Finset.mem_Icc.2 ⟨by omega, by omega⟩) (tauPl (Fm.D x i) z)
+  have hr :=
+    h1 x (le_trans (le_max_left _ _) hx) hx1 i u (j + 1) (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
+      (tauPl (Fm.D x i) z)
   simp only [Nat.add_sub_cancel] at hr
   obtain ⟨hkN, -, -, -, -, h4, -, -, -, hS⟩ := h2 x (le_trans (le_max_right _ _) hx) hx1 i
   have hsx := Fm.L_x x i hx1
   rw [GlobalTheory.nuD_card_eq_sum_nuRow _ (nuRowOK _) u j hj z]
-  have hsum := Finset.sum_le_card_nsmul (Finset.range ((Fm.D x i).R.N j))
-    (fun r => DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r) (10 * x * (Fm.L x i).sc.b)
-    (fun r hr' => (hr r (Finset.mem_range.1 hr')).2)
+  have hsum :=
+    Finset.sum_le_card_nsmul (Finset.range ((Fm.D x i).R.N j))
+      (fun r => DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r)
+      (10 * x * (Fm.L x i).sc.b)
+      (fun r hr' => (hr r (Finset.mem_range.1 hr')).2)
   rw [Finset.card_range, nsmul_eq_mul] at hsum
   have hNle : ((Fm.D x i).R.N j : ℝ) ≤ (Fm.D x i).R.N (Fm.D x i).R.m := by
     have : (Fm.D x i).R.N j ≤ (Fm.D x i).R.N (Fm.D x i).R.m := by

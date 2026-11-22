@@ -7,7 +7,9 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsHermRi
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR GlobalTheory.CompanionTheory.KFin
+open NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
+  GlobalTheory.CompanionTheory.KFin
 open Formalism.UG (cT)
 open scoped TensorProduct
 
@@ -15,8 +17,10 @@ namespace GlobalTheory.CompanionTheory.KFin.Adapted
 
 section Lemmas
 
-variable {R : Type} [CommRing R] {c : R →+* R} {𝔬 : Subring R}
-  {V : Type} [AddCommGroup V] [Module R V] {h : V → V → R}
+variable
+  {R : Type} [CommRing R]
+  {c : R →+* R} {𝔬 : Subring R} {V : Type} [AddCommGroup V] [Module R V]
+  {h : V → V → R}
 
 theorem herm_zero_right (H : IsHerm c h) (x : V) : h x 0 = 0 := by
   have := H.smul_right 0 x 0
@@ -36,13 +40,15 @@ def hl (H : IsHerm c h) (w : V) : V →ₗ[R] R where
   map_add' := H.add_right w
   map_smul' a y := by simpa using H.smul_right a w y
 
-@[simp] theorem hl_apply (H : IsHerm c h) (w z : V) : hl H w z = h w z := rfl
+@[simp]
+theorem hl_apply (H : IsHerm c h) (w z : V) : hl H w z = h w z := rfl
 
 theorem smul_mem_of {L : Submodule 𝔬 V} {a : R} (ha : a ∈ 𝔬) {v : V} (hv : v ∈ L) : a • v ∈ L :=
   L.smul_mem ⟨a, ha⟩ hv
 
-theorem common_denom (den : ∀ a : R, ∃ s ∈ 𝔬, IsUnit s ∧ s * a ∈ 𝔬) {ι : Type} (S : Finset ι) (a : ι → R) :
-    ∃ s ∈ 𝔬, IsUnit s ∧ ∀ i ∈ S, s * a i ∈ 𝔬 := by
+theorem common_denom
+    (den : ∀ a : R, ∃ s ∈ 𝔬, IsUnit s ∧ s * a ∈ 𝔬) {ι : Type} (S : Finset ι) (a : ι → R)
+    : ∃ s ∈ 𝔬, IsUnit s ∧ ∀ i ∈ S, s * a i ∈ 𝔬 := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨1, 𝔬.one_mem, isUnit_one, by simp⟩
@@ -54,9 +60,10 @@ theorem common_denom (den : ∀ a : R, ∃ s ∈ 𝔬, IsUnit s ∧ s * a ∈ �
     · rw [mul_assoc]; exact 𝔬.mul_mem hs hi
     · rw [mul_right_comm]; exact 𝔬.mul_mem (hS j hj) ht
 
-theorem evenInt_span (H : IsHerm c h) (inv : ∀ a, c (c a) = a) (cm : ∀ a ∈ 𝔬, c a ∈ 𝔬) (G : Set V)
-    (h1 : ∀ g ∈ G, ∀ g' ∈ G, h g g' ∈ 𝔬) (h2 : ∀ g ∈ G, ∃ a ∈ 𝔬, h g g = a + c a) :
-    IsEvenInt c 𝔬 h (Submodule.span 𝔬 G) := by
+theorem evenInt_span
+    (H : IsHerm c h) (inv : ∀ a, c (c a) = a) (cm : ∀ a ∈ 𝔬, c a ∈ 𝔬)
+    (G : Set V) (h1 : ∀ g ∈ G, ∀ g' ∈ G, h g g' ∈ 𝔬) (h2 : ∀ g ∈ G, ∃ a ∈ 𝔬, h g g = a + c a)
+    : IsEvenInt c 𝔬 h (Submodule.span 𝔬 G) := by
   have s1 : ∀ g ∈ G, ∀ z ∈ Submodule.span 𝔬 G, h g z ∈ 𝔬 := by
     intro g hg z hz
     induction hz using Submodule.span_induction with
@@ -83,7 +90,8 @@ theorem evenInt_span (H : IsHerm c h) (inv : ∀ a, c (c a) = a) (cm : ∀ a ∈
     obtain ⟨a, ha, ea⟩ := hx
     obtain ⟨b, hb, eb⟩ := hy
     refine ⟨a + b + h x y, 𝔬.add_mem (𝔬.add_mem ha hb) (s2 x hx' y hy'), ?_⟩
-    rw [H.add_right, herm_add_left H, herm_add_left H, ea, eb, H.symm x y, map_add (f := _), map_add (f := _)]
+    rw [H.add_right, herm_add_left H, herm_add_left H, ea, eb, H.symm x y, map_add (f := _),
+      map_add (f := _)]
     ring
   | smul a x _ hx =>
     obtain ⟨b, hb, eb⟩ := hx
@@ -91,26 +99,28 @@ theorem evenInt_span (H : IsHerm c h) (inv : ∀ a, c (c a) = a) (cm : ∀ a ∈
     rw [Subring.smul_def, H.smul_right, herm_smul_left H, eb, map_mul, map_mul, inv]
     ring
 
-theorem exists_maxEven (Hr : IsHermRing c 𝔬) (H : IsHerm c h) (Hp : IsPerfect h) (L₀ : Submodule 𝔬 V)
-    (hL : IsLat 𝔬 L₀) (hE : IsEvenInt c 𝔬 h L₀) : ∃ L, L₀ ≤ L ∧ IsMaxEven c 𝔬 h L := by
+theorem exists_maxEven
+    (Hr : IsHermRing c 𝔬) (H : IsHerm c h) (Hp : IsPerfect h)
+    (L₀ : Submodule 𝔬 V) (hL : IsLat 𝔬 L₀) (hE : IsEvenInt c 𝔬 h L₀)
+    : ∃ L, L₀ ≤ L ∧ IsMaxEven c 𝔬 h L := by
   haveI := Hr.noeth
   obtain ⟨m, g, hg⟩ := Submodule.fg_iff_exists_fin_generating_family.1 hL.1
   have hgL : ∀ i, g i ∈ L₀ := fun i => hg ▸ Submodule.subset_span ⟨i, rfl⟩
-  let D : Submodule 𝔬 V :=
-    { carrier := {z | ∀ i, h (g i) z ∈ 𝔬}
-      add_mem' := fun {a b} ha hb i => by
-        rw [H.add_right]; exact 𝔬.add_mem (ha i) (hb i)
-      zero_mem' := fun i => by rw [herm_zero_right H]; exact 𝔬.zero_mem
-      smul_mem' := fun a z hz i => by
-        rw [Subring.smul_def, H.smul_right]; exact 𝔬.mul_mem a.2 (hz i) }
-  let f : D →ₗ[𝔬] (Fin m → 𝔬) :=
-    { toFun := fun z i => ⟨h (g i) z, z.2 i⟩
-      map_add' := fun a b => by
-        funext i; apply Subtype.ext; exact H.add_right _ _ _
-      map_smul' := fun a z => by
-        funext i; apply Subtype.ext
-        change h (g i) ((a : R) • (z : V)) = (a : R) * h (g i) z
-        exact H.smul_right _ _ _ }
+  let D : Submodule 𝔬 V := {
+    carrier := {z | ∀ i, h (g i) z ∈ 𝔬}
+    add_mem' := fun {a b} ha hb i => by rw [H.add_right]; exact 𝔬.add_mem (ha i) (hb i)
+    zero_mem' := fun i => by rw [herm_zero_right H]; exact 𝔬.zero_mem
+    smul_mem' := fun a z hz i => by rw [Subring.smul_def, H.smul_right]; exact 𝔬.mul_mem a.2 (hz i)
+  }
+  let f : D →ₗ[𝔬] (Fin m → 𝔬) := {
+    toFun := fun z i => ⟨h (g i) z, z.2 i⟩
+    map_add' := fun a b => by funext i; apply Subtype.ext; exact H.add_right _ _ _
+    map_smul' := fun a z => by
+      funext i
+      apply Subtype.ext
+      change h (g i) ((a : R) • (z : V)) = (a : R) * h (g i) z
+      exact H.smul_right _ _ _
+  }
   have finj : Function.Injective f := by
     refine (injective_iff_map_eq_zero f).2 fun z hz => ?_
     have h0 : ∀ i, h (g i) z = 0 := fun i => congrArg Subtype.val (congrFun hz i)
@@ -133,10 +143,11 @@ theorem exists_maxEven (Hr : IsHermRing c 𝔬) (H : IsHerm c h) (Hp : IsPerfect
     refine Hp.nondeg _ fun w => ?_
     rw [H.symm w, h2 w (by rw [hL.2]; trivial), map_zero]
   haveI : IsNoetherian 𝔬 D := isNoetherian_of_injective f finj
-  have hD : ∀ L' : Submodule 𝔬 V, IsEvenInt c 𝔬 h L' → L₀ ≤ L' → L' ≤ D :=
-    fun L' hE' hle z hz i => hE'.1 _ (hle (hgL i)) _ hz
+  have hD : ∀ L' : Submodule 𝔬 V, IsEvenInt c 𝔬 h L' → L₀ ≤ L' → L' ≤ D := fun L' hE' hle z hz i =>
+    hE'.1 _ (hle (hgL i)) _ hz
   let S : Set (Submodule 𝔬 D) := {N | IsEvenInt c 𝔬 h (N.map D.subtype) ∧ L₀ ≤ N.map D.subtype}
-  have hcm : ∀ L' : Submodule 𝔬 V, L' ≤ D → (L'.comap D.subtype).map D.subtype = L' := fun L' hl => by
+  have hcm
+      : ∀ L' : Submodule 𝔬 V, L' ≤ D → (L'.comap D.subtype).map D.subtype = L' := fun L' hl => by
     rw [Submodule.map_comap_subtype]; exact inf_eq_right.2 hl
   have hS : (L₀.comap D.subtype) ∈ S := by
     have := hcm L₀ (hD L₀ hE le_rfl)
@@ -152,16 +163,17 @@ theorem exists_maxEven (Hr : IsHermRing c 𝔬) (H : IsHerm c h) (Hp : IsPerfect
     have hmem : L'.comap D.subtype ∈ S := by
       simp only [S, Set.mem_setOf_eq, hcm L' hDL]
       exact ⟨hE', hN.2.trans hle⟩
-    have hNle : N ≤ L'.comap D.subtype := by
-      rw [← Submodule.map_le_iff_le_comap]; exact hle
+    have hNle : N ≤ L'.comap D.subtype := by rw [← Submodule.map_le_iff_le_comap]; exact hle
     have : ¬ N < L'.comap D.subtype := hmin _ hmem
     have heq : N = L'.comap D.subtype := by
       by_contra hne
       exact this (lt_of_le_of_ne hNle hne)
     rw [heq, hcm L' hDL]
 
-theorem isAdapted_of {r : ℕ} {x y : Fin r → V} {L : Submodule 𝔬 V} (hE : IsEvenInt c 𝔬 h L)
-    (hx : ∀ i, x i ∈ L) (hy : ∀ i, y i ∈ L) : IsAdapted 𝔬 h x y L := by
+theorem isAdapted_of
+    {r : ℕ} {x y : Fin r → V} {L : Submodule 𝔬 V}
+    (hE : IsEvenInt c 𝔬 h L) (hx : ∀ i, x i ∈ L) (hy : ∀ i, y i ∈ L)
+    : IsAdapted 𝔬 h x y L := by
   intro z
   constructor
   · intro hz
@@ -171,8 +183,11 @@ theorem isAdapted_of {r : ℕ} {x y : Fin r → V} {L : Submodule 𝔬 V} (hE : 
     · exact L.sum_mem fun i _ => smul_mem_of (hb i) (hx i)
     · exact L.sum_mem fun i _ => smul_mem_of (ha i) (hy i)
   · rintro ⟨ha, hb, hz⟩
-    have e : z = (z - ∑ i, h (y i) z • x i - ∑ i, h (x i) z • y i) + ∑ i, h (y i) z • x i
-        + ∑ i, h (x i) z • y i := by abel
+    have e
+        : z
+          = (z - ∑ i, h (y i) z • x i - ∑ i, h (x i) z • y i) + ∑ i, h (y i) z • x i
+            + ∑ i, h (x i) z • y i := by
+      abel
     rw [e]
     refine L.add_mem (L.add_mem hz ?_) ?_
     · exact L.sum_mem fun i _ => smul_mem_of (hb i) (hx i)
@@ -180,9 +195,13 @@ theorem isAdapted_of {r : ℕ} {x y : Fin r → V} {L : Submodule 𝔬 V} (hE : 
 
 end Lemmas
 
-theorem exists_maxEven_adapted : ∀ {R : Type} [CommRing R] (c : R →+* R) (𝔬 : Subring R), IsHermRing c 𝔬 →
-    ∀ {V : Type} [AddCommGroup V] [Module R V] [Module.Finite R V] (h : V → V → R), IsHerm c h → IsPerfect h →
-    ∀ {r : ℕ} (x y : Fin r → V), IsFrame h x y → ∃ L : Submodule 𝔬 V, IsMaxEven c 𝔬 h L ∧ IsAdapted 𝔬 h x y L := by
+theorem exists_maxEven_adapted
+    : ∀ {R : Type} [CommRing R] (c : R →+* R) (𝔬 : Subring R),
+      IsHermRing c 𝔬
+        → ∀ {V : Type} [AddCommGroup V] [Module R V] [Module.Finite R V] (h : V → V → R),
+          IsHerm c h → IsPerfect h
+            → ∀ {r : ℕ} (x y : Fin r → V),
+              IsFrame h x y → ∃ L : Submodule 𝔬 V, IsMaxEven c 𝔬 h L ∧ IsAdapted 𝔬 h x y L := by
   intro R _ c 𝔬 Hr V _ _ _ h H Hp r x y F
   obtain ⟨m, e, he⟩ := Module.Finite.exists_fin (R := R) (M := V)
   have hyx : ∀ j i, h (y j) (x i) = if i = j then 1 else 0 := by
@@ -210,23 +229,22 @@ theorem exists_maxEven_adapted : ∀ {R : Type} [CommRing R] (c : R →+* R) (�
       have := congrArg c ht
       rw [map_mul, map_ofNat c 2, map_one] at this
       exact this
-    calc c t = (2 * t) * c t := by rw [ht, one_mul]
+    calc
+      c t
+        = (2 * t) * c t := by rw [ht, one_mul]
       _ = t * (2 * c t) := by ring
       _ = t := by rw [h2, mul_one]
-  obtain ⟨s, hs𝔬, hsu, hs⟩ := common_denom Hr.denom
-    (Finset.univ : Finset (Fin m × Fin m)) (fun p => h (u p.1) (u p.2) * t)
+  obtain ⟨s, hs𝔬, hsu, hs⟩ :=
+    common_denom Hr.denom (Finset.univ : Finset (Fin m × Fin m)) (fun p => h (u p.1) (u p.2) * t)
   have two𝔬 : (2 : R) ∈ 𝔬 := by
     have : (2 : R) = 1 + 1 := by norm_num
-    rw [this]; exact 𝔬.add_mem 𝔬.one_mem 𝔬.one_mem
+    rw [this]
+    exact 𝔬.add_mem 𝔬.one_mem 𝔬.one_mem
   let w : Fin m → V := fun k => s • u k
-  have hxw : ∀ i k, h (x i) (w k) = 0 := fun i k => by
-    simp only [w, H.smul_right, hux, mul_zero]
-  have hyw : ∀ i k, h (y i) (w k) = 0 := fun i k => by
-    simp only [w, H.smul_right, huy, mul_zero]
-  have hwx : ∀ k i, h (w k) (x i) = 0 := fun k i => by
-    rw [H.symm (x i) (w k), hxw, map_zero]
-  have hwy : ∀ k i, h (w k) (y i) = 0 := fun k i => by
-    rw [H.symm (y i) (w k), hyw, map_zero]
+  have hxw : ∀ i k, h (x i) (w k) = 0 := fun i k => by simp only [w, H.smul_right, hux, mul_zero]
+  have hyw : ∀ i k, h (y i) (w k) = 0 := fun i k => by simp only [w, H.smul_right, huy, mul_zero]
+  have hwx : ∀ k i, h (w k) (x i) = 0 := fun k i => by rw [H.symm (x i) (w k), hxw, map_zero]
+  have hwy : ∀ k i, h (w k) (y i) = 0 := fun k i => by rw [H.symm (y i) (w k), hyw, map_zero]
   have hA : ∀ i j, c s * (s * (h (u i) (u j) * t)) ∈ 𝔬 := fun i j =>
     𝔬.mul_mem (Hr.conj_mem _ hs𝔬) (hs (i, j) (Finset.mem_univ _))
   have hww : ∀ i j, h (w i) (w j) = 2 * (c s * (s * (h (u i) (u j) * t))) := fun i j => by
@@ -259,7 +277,8 @@ theorem exists_maxEven_adapted : ∀ {R : Type} [CommRing R] (c : R →+* R) (�
       rw [hc, hww]
       ring
   have hE := evenInt_span (𝔬 := 𝔬) H Hr.invol Hr.conj_mem G g1 g2
-  have hfin : G.Finite := ((Set.finite_range x).union (Set.finite_range y)).union (Set.finite_range w)
+  have hfin : G.Finite :=
+    ((Set.finite_range x).union (Set.finite_range y)).union (Set.finite_range w)
   have hLat : IsLat 𝔬 (Submodule.span 𝔬 G) := by
     refine ⟨Submodule.fg_span hfin, ?_⟩
     set T := Submodule.span R ((Submodule.span 𝔬 G : Submodule 𝔬 V) : Set V) with hT
@@ -267,8 +286,7 @@ theorem exists_maxEven_adapted : ∀ {R : Type} [CommRing R] (c : R →+* R) (�
     have hu : ∀ k, u k ∈ T := by
       intro k
       obtain ⟨v, rfl⟩ := hsu
-      have : u k = (↑v⁻¹ : R) • w k := by
-        simp only [w, smul_smul, Units.inv_mul, one_smul]
+      have : u k = (↑v⁻¹ : R) • w k := by simp only [w, smul_smul, Units.inv_mul, one_smul]
       rw [this]
       exact T.smul_mem _ (hG _ (Or.inr ⟨k, rfl⟩))
     refine top_le_iff.1 ?_

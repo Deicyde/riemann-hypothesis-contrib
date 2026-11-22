@@ -12,7 +12,8 @@ noncomputable section
 
 namespace PI.SplitIntLoc.Proof
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F))
 
 lemma intsV : (Valued.v (R := (v.adicCompletion F))).Integers (v.adicCompletionIntegers F) :=
@@ -33,8 +34,11 @@ lemma exists_unif : ∃ π : 𝓞 F, (algebraMap (𝓞 F) F π) ≠ 0 ∧
 
 variable {v} (spl : E ⊗[F] (v.adicCompletion F) ≃+* (v.adicCompletion F) × (v.adicCompletion F))
 
-def emb (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F)) : E →+* (v.adicCompletion F) :=
-  p.comp ((spl : E ⊗[F] (v.adicCompletion F) →+* (v.adicCompletion F) × (v.adicCompletion F)).comp Algebra.TensorProduct.includeLeftRingHom)
+def emb (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F))
+    : E →+* (v.adicCompletion F) :=
+  p.comp
+    ((spl : E ⊗[F] (v.adicCompletion F) →+* (v.adicCompletion F) × (v.adicCompletion F)).comp
+      Algebra.TensorProduct.includeLeftRingHom)
 
 lemma emb_apply (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F)) (e : E) : emb spl p e = p (spl (e ⊗ₜ[F] 1)) := rfl
 
@@ -57,16 +61,20 @@ lemma emb_mem_of_isIntegral (p : (v.adicCompletion F) × (v.adicCompletion F) �
     RingHom.ext_int _ _
   rw [hc, ← Polynomial.hom_eval₂, hf, map_zero]
 
-def phi (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F)) : 𝓞 E →+* (v.adicCompletionIntegers F) :=
+def phi (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F))
+    : 𝓞 E →+* (v.adicCompletionIntegers F) :=
   ((emb spl p).comp (algebraMap (𝓞 E) E)).codRestrict (v.adicCompletionIntegers F)
     (fun z => emb_mem_of_isIntegral spl p _ (RingOfIntegers.isIntegral_coe z))
 
 lemma coe_phi (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F)) (z : 𝓞 E) :
     (phi spl p z : (v.adicCompletion F)) = emb spl p (algebraMap (𝓞 E) E z) := rfl
 
-def P (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F)) : Ideal (𝓞 E) := (IsLocalRing.maximalIdeal (v.adicCompletionIntegers F)).comap (phi spl p)
+def P (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F)) : Ideal (𝓞 E) :=
+  (IsLocalRing.maximalIdeal (v.adicCompletionIntegers F)).comap (phi spl p)
 
-instance (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F)) : (P spl p).IsPrime := Ideal.IsPrime.comap _
+instance (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F))
+    : (P spl p).IsPrime :=
+  Ideal.IsPrime.comap _
 
 lemma mem_P (p : (v.adicCompletion F) × (v.adicCompletion F) →+* (v.adicCompletion F)) (z : 𝓞 E) :
     z ∈ P spl p ↔ Valued.v (emb spl p (algebraMap (𝓞 E) E z)) < 1 := by
@@ -87,12 +95,18 @@ lemma prime_ne_bot (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ[F] 
   rw [map_zero, ← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply (𝓞 F) F E] at this
   exact (map_eq_zero_iff _ (algebraMap F E).injective).1 this
 
-theorem sub_dir (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ[F] a) = (a, a)) (x : E ⊗[F] (v.adicCompletion F))
-    (hx : x ∈ tensInt (F := F) (v.adicCompletion F) (intOE E) ((v.adicCompletionIntegers F)).toSubring) :
-    (spl x).1 ∈ (v.adicCompletionIntegers F) ∧ (spl x).2 ∈ (v.adicCompletionIntegers F) := by
+theorem sub_dir
+    (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ[F] a) = (a, a))
+    (x : E ⊗[F] (v.adicCompletion F))
+    (hx : x
+      ∈ tensInt (F := F) (v.adicCompletion F) (intOE E) ((v.adicCompletionIntegers F)).toSubring)
+    : (spl x).1 ∈ (v.adicCompletionIntegers F) ∧ (spl x).2 ∈ (v.adicCompletionIntegers F) := by
   let S : Subring (E ⊗[F] (v.adicCompletion F)) :=
-    (((v.adicCompletionIntegers F)).toSubring.prod ((v.adicCompletionIntegers F)).toSubring).comap (spl : E ⊗[F] (v.adicCompletion F) →+* (v.adicCompletion F) × (v.adicCompletion F))
-  have hS : tensInt (F := F) (v.adicCompletion F) (intOE E) ((v.adicCompletionIntegers F)).toSubring ≤ S := by
+    (((v.adicCompletionIntegers F)).toSubring.prod ((v.adicCompletionIntegers F)).toSubring).comap
+      (spl : E ⊗[F] (v.adicCompletion F) →+* (v.adicCompletion F) × (v.adicCompletion F))
+  have hS
+      : tensInt (F := F) (v.adicCompletion F) (intOE E) ((v.adicCompletionIntegers F)).toSubring
+        ≤ S := by
     refine Subring.closure_le.2 ?_
     rintro _ (⟨⟨e, he⟩, rfl⟩ | ⟨⟨y, hy⟩, rfl⟩)
     · obtain ⟨z, rfl⟩ := RingHom.mem_range.1 he
@@ -100,8 +114,10 @@ theorem sub_dir (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ[F] a) 
       show spl (algebraMap (𝓞 E) E z ⊗ₜ[F] 1) ∈
         ((v.adicCompletionIntegers F)).toSubring.prod ((v.adicCompletionIntegers F)).toSubring
       rw [spl_tmul_one, Subring.mem_prod]
-      exact ⟨emb_mem_of_isIntegral spl (RingHom.fst _ _) _ hz,
-        emb_mem_of_isIntegral spl (RingHom.snd _ _) _ hz⟩
+      exact ⟨
+        emb_mem_of_isIntegral spl (RingHom.fst _ _) _ hz,
+        emb_mem_of_isIntegral spl (RingHom.snd _ _) _ hz
+      ⟩
     · show spl ((1 : E) ⊗ₜ[F] y) ∈
         ((v.adicCompletionIntegers F)).toSubring.prod ((v.adicCompletionIntegers F)).toSubring
       rw [Subring.mem_prod, hspl]

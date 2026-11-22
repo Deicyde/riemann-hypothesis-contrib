@@ -22,7 +22,6 @@ section C
 open Finset MeasureTheory
 open scoped ComplexOrder
 
-
 end C
 
 section D
@@ -39,8 +38,20 @@ end E
 section F
 open Finset
 
-def bb (k rS : ℕ) (i : ℕ) : ℕ := if i < rS then i else if i < rS + (k + 1) then rS else i - k
-def cc (k rS : ℕ) (j : ℕ) : ℕ := if j < rS then j else if j < rS + (k + 1) then rS else j
+def bb (k rS : ℕ) (i : ℕ) : ℕ :=
+  if i < rS then
+    i
+  else if i < rS + (k + 1) then
+    rS
+  else
+    i - k
+def cc (k rS : ℕ) (j : ℕ) : ℕ :=
+  if j < rS then
+    j
+  else if j < rS + (k + 1) then
+    rS
+  else
+    j
 
 lemma inner (k rS j : ℕ) (hj : j < rS + (k + 1) + rS) :
     ((range (rS + (k + 1) + rS)).filter (fun i => bb k rS i < bb k rS j)).card = cc k rS j := by

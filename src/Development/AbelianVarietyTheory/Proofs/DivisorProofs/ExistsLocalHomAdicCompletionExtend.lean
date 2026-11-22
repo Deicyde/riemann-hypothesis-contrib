@@ -12,11 +12,13 @@ open IsLocalRing
 
 namespace GlobalTheory.LocalCompletion
 
-theorem exists_localHom_adicCompletion_extend :
-    ∀ (A R : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [CommRing R] [IsLocalRing R],
-      IsAdicComplete (maximalIdeal R) R → ∀ (φ : A →+* R), IsLocalHom φ →
-      ∃ ψ : AdicCompletion (maximalIdeal A) A →+* R,
-        IsLocalHom ψ ∧ ψ.comp (algebraMap A (AdicCompletion (maximalIdeal A) A)) = φ := by
+theorem exists_localHom_adicCompletion_extend
+    : ∀ (A R : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [CommRing R] [IsLocalRing R],
+      IsAdicComplete (maximalIdeal R) R
+        → ∀ (φ : A →+* R),
+          IsLocalHom φ
+            → ∃ ψ : AdicCompletion (maximalIdeal A) A →+* R,
+              IsLocalHom ψ ∧ ψ.comp (algebraMap A (AdicCompletion (maximalIdeal A) A)) = φ := by
   intro A R _ _ _ _ _ hR φ hφ
   let I : Ideal A := maximalIdeal A
   let J : Ideal R := maximalIdeal R
@@ -25,7 +27,8 @@ theorem exists_localHom_adicCompletion_extend :
     rw [← Ideal.map_le_iff_le_comap, Ideal.map_pow]
     exact Ideal.pow_right_mono hmap n
   let g : ∀ n : ℕ, AdicCompletion I A →+* R ⧸ J ^ n := fun n =>
-    (Ideal.quotientMap (J ^ n) φ (hle n)).comp (AdicCompletion.evalₐ I n : AdicCompletion I A →+* A ⧸ I ^ n)
+    (Ideal.quotientMap (J ^ n) φ (hle n)).comp
+      (AdicCompletion.evalₐ I n : AdicCompletion I A →+* A ⧸ I ^ n)
   have hg : ∀ {m n : ℕ} (h : m ≤ n), (Ideal.Quotient.factorPow J h).comp (g n) = g m := by
     intro m n h
     refine RingHom.ext fun x => ?_
@@ -34,7 +37,8 @@ theorem exists_localHom_adicCompletion_extend :
     rw [AdicCompletion.evalₐ_mk, AdicCompletion.evalₐ_mk, ← AdicCompletion.Ideal.mk_eq_mk I h x]
     rfl
   let e : R ≃ₐ[R] AdicCompletion J R := AdicCompletion.ofAlgEquiv J
-  let ψ : AdicCompletion I A →+* R := (e.symm : AdicCompletion J R →+* R).comp (AdicCompletion.liftRingHom J g hg)
+  let ψ : AdicCompletion I A →+* R :=
+    (e.symm : AdicCompletion J R →+* R).comp (AdicCompletion.liftRingHom J g hg)
   have hψ : ψ.comp (algebraMap A (AdicCompletion I A)) = φ := by
     refine RingHom.ext fun b => e.injective ?_
     refine AdicCompletion.ext_evalₐ fun n => ?_

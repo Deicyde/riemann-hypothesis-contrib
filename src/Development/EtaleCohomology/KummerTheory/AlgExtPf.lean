@@ -11,13 +11,16 @@ namespace LateralTheory.KummerTheory.AlgExtPf
 
 variable {R : Type} [CommRing R] (F : Shv R)
 
-theorem eqv_comp {E E' E'' : Spc} {f : E ⟶ E'} {g : E' ⟶ E''} (hf : Eqv R f F) (hg : Eqv R g F) :
-    Eqv R (f ≫ g) F := fun n => by
-  have : (pull R (f ≫ g) F n : _ → _) = (pull R f F n) ∘ (pull R g F n) := funext (pull_comp R f g F n)
-  rw [this]; exact (hf n).comp (hg n)
+theorem eqv_comp {E E' E'' : Spc} {f : E ⟶ E'} {g : E' ⟶ E''} (hf : Eqv R f F) (hg : Eqv R g F)
+    : Eqv R (f ≫ g) F := fun n => by
+  have : (pull R (f ≫ g) F n : _ → _) = (pull R f F n) ∘ (pull R g F n) :=
+    funext (pull_comp R f g F n)
+  rw [this]
+  exact (hf n).comp (hg n)
 
-theorem eqv_cancel {E E' E'' : Spc} {f : E ⟶ E'} {g : E' ⟶ E''} (h : Eqv R (f ≫ g) F) (hf : Eqv R f F) :
-    Eqv R g F := fun n => by
+theorem eqv_cancel
+    {E E' E'' : Spc} {f : E ⟶ E'} {g : E' ⟶ E''} (h : Eqv R (f ≫ g) F) (hf : Eqv R f F)
+    : Eqv R g F := fun n => by
   have hc : ∀ x, pull R (f ≫ g) F n x = pull R f F n (pull R g F n x) := pull_comp R f g F n
   refine ⟨fun a b hab => (h n).1 (by rw [hc, hc, hab]), fun y => ?_⟩
   obtain ⟨z, hz⟩ := (h n).2 (pull R f F n y)
@@ -30,14 +33,16 @@ theorem eqv_iso {E E' : Spc} (f : E ⟶ E') [IsIso f] : Eqv R f F := fun n => by
 
 theorem eqv_sch_iso {X Y : Scheme.{0}} (f : X ⟶ Y) [IsIso f] : Eqv R (sch.map f) F := eqv_iso F _
 
-theorem eqv_fst_comp {W X Y Z : Scheme.{0}} (f : X ⟶ Z) (g : Y ⟶ Z) (g' : W ⟶ Y)
-    (h1 : Eqv R (sch.map (pullback.fst (pullback.snd f g) g')) F) (h2 : Eqv R (sch.map (pullback.fst f g)) F) :
-    Eqv R (sch.map (pullback.fst f (g' ≫ g))) F := by
+theorem eqv_fst_comp
+    {W X Y Z : Scheme.{0}} (f : X ⟶ Z) (g : Y ⟶ Z) (g' : W ⟶ Y)
+    (h1 : Eqv R (sch.map (pullback.fst (pullback.snd f g) g')) F)
+    (h2 : Eqv R (sch.map (pullback.fst f g)) F)
+    : Eqv R (sch.map (pullback.fst f (g' ≫ g))) F := by
   rw [← pullbackLeftPullbackSndIso_inv_fst, Functor.map_comp, Functor.map_comp]
   exact eqv_comp F (eqv_sch_iso F _) (eqv_comp F h1 h2)
 
-theorem eqv_fst_congr {X Z W : Scheme.{0}} (f : X ⟶ Z) {h h' : W ⟶ Z} (e : h = h') :
-    Eqv R (sch.map (pullback.fst f h)) F → Eqv R (sch.map (pullback.fst f h')) F := by
+theorem eqv_fst_congr {X Z W : Scheme.{0}} (f : X ⟶ Z) {h h' : W ⟶ Z} (e : h = h')
+    : Eqv R (sch.map (pullback.fst f h)) F → Eqv R (sch.map (pullback.fst f h')) F := by
   subst e; exact id
 
 end LateralTheory.KummerTheory.AlgExtPf
@@ -66,17 +71,20 @@ theorem AlgExt_of (hP : Place) : AlgExt := by
     eqv_cancel _ (eqv_cancel _ hs (eqv_sch_iso _ _)) e2
 
   have e3 := hE3 q T hAIC hqT (pullback.snd p gσ) i
-  let eK : FractionRing T ≃+* K := (IsLocalization.algEquiv (nonZeroDivisors T) (FractionRing T) K).toRingEquiv
+  let eK : FractionRing T ≃+* K :=
+    (IsLocalization.algEquiv (nonZeroDivisors T) (FractionRing T) K).toRingEquiv
   set gj : Spec (CommRingCat.of (FractionRing T)) ⟶ Spec (CommRingCat.of T) :=
     Spec.map (CommRingCat.ofHom (algebraMap T (FractionRing T))) with hgj
   set ge : Spec (CommRingCat.of K) ⟶ Spec (CommRingCat.of (FractionRing T)) :=
     Spec.map (CommRingCat.ofHom eK.toRingHom) with hge
   have hge_iso : IsIso ge := by
     have : IsIso (CommRingCat.ofHom eK.toRingHom) := eK.toCommRingCatIso.isIso_hom
-    rw [hge]; infer_instance
+    rw [hge]
+    infer_instance
   have hfac : (ge ≫ gj) ≫ gσ = Spec.map (CommRingCat.ofHom f) := by
     rw [hge, hgj, hgσ, ← Spec.map_comp, ← Spec.map_comp]
-    congr 1; ext x
+    congr 1
+    ext x
     have h1 := hσ x
     simp only [CommRingCat.hom_comp, CommRingCat.hom_ofHom, RingHom.comp_apply]
     change eK (algebraMap T (FractionRing T) (σ x)) = f x

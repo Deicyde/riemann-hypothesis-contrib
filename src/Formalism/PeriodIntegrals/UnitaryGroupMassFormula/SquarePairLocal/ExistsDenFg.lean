@@ -16,7 +16,8 @@ open PI.SqPair Formalism.L2.PairingIndexBounds.Eq.SqG
 theorem powLoc : PowLoc := by
   intro E _ _ Q hQ c hc
   have := hQ.isPrime
-  have hQ0 : Q ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField hQ (NumberField.RingOfIntegers.not_isField E)
+  have hQ0 : Q ≠ ⊥ :=
+    Ring.ne_bot_of_isMaximal_of_not_isField hQ (NumberField.RingOfIntegers.not_isField E)
   have : IsDiscreteValuationRing (Localization.AtPrime Q) :=
     IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (𝓞 E) hQ0 _
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible (Localization.AtPrime Q)
@@ -25,21 +26,24 @@ theorem powLoc : PowLoc := by
     apply hc
     apply IsLocalization.injective (Localization.AtPrime Q) (Ideal.primeCompl_le_nonZeroDivisors Q)
     rw [h, map_zero]
-  obtain ⟨K, hK⟩ := IsDiscreteValuationRing.ideal_eq_span_pow_irreducible
-    (s := Ideal.span {algebraMap (𝓞 E) (Localization.AtPrime Q) c})
-    (by rwa [Ne, Ideal.span_singleton_eq_bot]) hϖ
+  obtain ⟨K, hK⟩ :=
+    IsDiscreteValuationRing.ideal_eq_span_pow_irreducible
+      (s := Ideal.span {algebraMap (𝓞 E) (Localization.AtPrime Q) c})
+      (by rwa [Ne, Ideal.span_singleton_eq_bot]) hϖ
   refine ⟨K, fun x hx => ?_⟩
   have hmax : IsLocalRing.maximalIdeal (Localization.AtPrime Q) = Ideal.span {ϖ} :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ
-  have hxA : algebraMap (𝓞 E) (Localization.AtPrime Q) x ∈
-      Ideal.span {algebraMap (𝓞 E) (Localization.AtPrime Q) c} := by
+  have hxA
+      : algebraMap (𝓞 E) (Localization.AtPrime Q) x
+        ∈ Ideal.span {algebraMap (𝓞 E) (Localization.AtPrime Q) c} := by
     rw [hK, ← Ideal.span_singleton_pow, ← hmax,
       ← IsLocalization.AtPrime.map_eq_maximalIdeal (p := Q), ← Ideal.map_pow]
     exact Ideal.mem_map_of_mem _ hx
   obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.mp hxA
   obtain ⟨⟨w, s⟩, rfl⟩ := IsLocalization.mk'_surjective Q.primeCompl y
-  have key : algebraMap (𝓞 E) (Localization.AtPrime Q) (c * w) =
-      algebraMap (𝓞 E) (Localization.AtPrime Q) (s * x) := by
+  have key
+      : algebraMap (𝓞 E) (Localization.AtPrime Q) (c * w)
+        = algebraMap (𝓞 E) (Localization.AtPrime Q) (s * x) := by
     rw [map_mul, map_mul, ← hy, ← IsLocalization.mk'_spec (Localization.AtPrime Q) w s]
     ring
   obtain ⟨t, ht⟩ := (IsLocalization.eq_iff_exists Q.primeCompl (Localization.AtPrime Q)).mp key
@@ -50,8 +54,7 @@ theorem powLoc : PowLoc := by
 theorem locGlob : LocGlob := by
   intro E _ _ W _ _ X x p hp hloc
   let J : Ideal (𝓞 E) := X.comap (LinearMap.toSpanSingleton (𝓞 E) W x)
-  have hJ : ∀ a, a ∈ J ↔ a • x ∈ X := fun a => by
-    simp [J, LinearMap.toSpanSingleton_apply]
+  have hJ : ∀ a, a ∈ J ↔ a • x ∈ X := fun a => by simp [J, LinearMap.toSpanSingleton_apply]
   have htop : J ⊔ Ideal.span {(p : 𝓞 E)} = ⊤ := by
     by_contra h
     obtain ⟨Q, hQ, hle⟩ := Ideal.exists_le_maximal _ h
@@ -61,7 +64,8 @@ theorem locGlob : LocGlob := by
     intro h
     have h2 := congrArg Ideal.absNorm h
     rw [Ideal.absNorm_span_singleton, Algebra.norm_natCast, Ideal.absNorm_top, Int.natAbs_pow,
-      Int.natAbs_natCast] at h2
+        Int.natAbs_natCast]
+      at h2
     have hd : 0 < Module.finrank ℤ (𝓞 E) := Module.finrank_pos
     rcases Nat.pow_eq_one.mp h2 with h1 | h1
     · exact hp.one_lt.ne' h1
@@ -89,7 +93,8 @@ theorem locGlob : LocGlob := by
     have hpz : Ideal.Quotient.mk J (p : 𝓞 E) * z = 0 := by
       rw [map_natCast, ← nsmul_eq_mul, ← hz, addOrderOf_nsmul_eq_zero]
     have hz0 : z = 0 := by
-      calc z = (Ideal.Quotient.mk J r * Ideal.Quotient.mk J (p : 𝓞 E)) * z := by rw [hunit, one_mul]
+      calc
+        z = (Ideal.Quotient.mk J r * Ideal.Quotient.mk J (p : 𝓞 E)) * z := by rw [hunit, one_mul]
         _ = 0 := by rw [mul_assoc, hpz, mul_zero]
     rw [hz0, addOrderOf_zero] at hz
     exact hp.one_lt.ne hz
@@ -102,14 +107,22 @@ section IntMulSec
 
 variable {E : Type} [Field E] [NumberField E] {N : ℕ}
 
-theorem exists_den (L'' : Submodule (𝓞 E) (Fin N → E))
-    (hsp : Submodule.span E (L'' : Set (Fin N → E)) = ⊤) (v : Fin N → E) :
-    ∃ d : 𝓞 E, d ≠ 0 ∧ d • v ∈ L'' := by
-  first | exact Bl.general_b_fact_left_bis.goal1 .. | (apply Bl.general_b_fact_left_bis.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_left_bis.goal1 <;> assumption) | (apply @Bl.general_b_fact_left_bis.goal1 <;> assumption) | (intros; apply @Bl.general_b_fact_left_bis.goal1 <;> assumption) | (apply @Bl.general_b_fact_left_bis.goal1 <;> first | assumption | infer_instance)
+theorem exists_den
+    (L'' : Submodule (𝓞 E) (Fin N → E)) (hsp : Submodule.span E (L'' : Set (Fin N → E)) = ⊤)
+    (v : Fin N → E)
+    : ∃ d : 𝓞 E, d ≠ 0 ∧ d • v ∈ L'' := by
+  first
+  | exact Bl.general_b_fact_left_bis.goal1 ..
+  | (apply Bl.general_b_fact_left_bis.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_left_bis.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_left_bis.goal1 <;> assumption)
+  | (intros; apply @Bl.general_b_fact_left_bis.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_left_bis.goal1 <;> first | assumption | infer_instance)
 
-theorem exists_den_fg (L' L'' : Submodule (𝓞 E) (Fin N → E)) (hfg : L'.FG)
-    (hsp : Submodule.span E (L'' : Set (Fin N → E)) = ⊤) :
-    ∃ d : 𝓞 E, d ≠ 0 ∧ ∀ y ∈ L', d • y ∈ L'' := by
+theorem exists_den_fg
+    (L' L'' : Submodule (𝓞 E) (Fin N → E))
+    (hfg : L'.FG) (hsp : Submodule.span E (L'' : Set (Fin N → E)) = ⊤)
+    : ∃ d : 𝓞 E, d ≠ 0 ∧ ∀ y ∈ L', d • y ∈ L'' := by
   classical
   obtain ⟨S, rfl⟩ := hfg
   choose f hf0 hf using fun v => exists_den L'' hsp v
@@ -122,9 +135,10 @@ theorem exists_den_fg (L' L'' : Submodule (𝓞 E) (Fin N → E)) (hfg : L'.FG)
   | add y z _ _ hy hz => rw [smul_add]; exact L''.add_mem hy hz
   | smul r y _ h => rw [smul_comm]; exact L''.smul_mem r h
 
-theorem nat_mul (d : 𝓞 E) (hd : d ≠ 0) :
-    ∃ d' : 𝓞 E, ((Ideal.absNorm (Ideal.span {d}) : ℕ) : 𝓞 E) = d * d' ∧
-      Ideal.absNorm (Ideal.span {d}) ≠ 0 := by
+theorem nat_mul (d : 𝓞 E) (hd : d ≠ 0)
+    : ∃ d' : 𝓞 E,
+      ((Ideal.absNorm (Ideal.span {d}) : ℕ) : 𝓞 E) = d * d'
+        ∧ Ideal.absNorm (Ideal.span {d}) ≠ 0 := by
   obtain ⟨d', hd'⟩ := Ideal.mem_span_singleton.mp (Ideal.absNorm_mem (Ideal.span {d}))
   refine ⟨d', hd', ?_⟩
   rw [Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]
@@ -138,8 +152,11 @@ theorem intMul : IntMul := by
   obtain ⟨d2, hd2, k2⟩ := exists_den_fg L'' L' h''.1 h'.2.1
   obtain ⟨D', hD', hD0⟩ := nat_mul (d1 * d2) (mul_ne_zero hd1 hd2)
   obtain ⟨n', hn', hn0⟩ := nat_mul n hn
-  refine ⟨Ideal.absNorm (Ideal.span {d1 * d2}) * Ideal.absNorm (Ideal.span {n}),
-    mul_ne_zero hD0 hn0, fun y hy => ?_⟩
+  refine ⟨
+    Ideal.absNorm (Ideal.span {d1 * d2}) * Ideal.absNorm (Ideal.span {n}),
+    mul_ne_zero hD0 hn0,
+    fun y hy => ?_
+  ⟩
   have hDy : (d1 * d2) • y ∈ L' ∧ (d1 * d2) • y ∈ L'' := by
     rcases hy with hy | hy
     · have e : (d1 * d2) • y = d2 • (d1 • y) := by rw [smul_smul, mul_comm]

@@ -8,9 +8,10 @@ open Matrix PositivityTheory.AutomorphicGaloisHodgeTate.Div
 
 namespace LateralTheory.DivDb.FinDensePf
 
-theorem cont_ev {Γ K : Type} [TopologicalSpace Γ] [Field K] [TopologicalSpace K] [IsTopologicalRing K]
-    (n : ℕ) (x : Γ → Matrix (Fin n) (Fin n) K) (hx : Continuous x) (f : LateralTheory.DivDb.MP K n) :
-    Continuous (fun g => LateralTheory.DivDb.ev (x g) f) := by
+theorem cont_ev
+    {Γ K : Type} [TopologicalSpace Γ] [Field K] [TopologicalSpace K] [IsTopologicalRing K]
+    (n : ℕ) (x : Γ → Matrix (Fin n) (Fin n) K) (hx : Continuous x) (f : LateralTheory.DivDb.MP K n)
+    : Continuous (fun g => LateralTheory.DivDb.ev (x g) f) := by
   have h1 : Continuous (fun g => (fun p : Fin n × Fin n => x g p.1 p.2)) :=
     continuous_pi fun p => hx.matrix_elem p.1 p.2
   exact (MvPolynomial.continuous_eval f).comp h1

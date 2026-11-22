@@ -14,12 +14,13 @@ open Polynomial
 
 section Act
 
-variable (O : Type) [CommRing O] (E : Type) [Field E] {A : Type} [CommRing A] [Algebra O A] [Algebra E A]
+variable
+  (O : Type) [CommRing O] (E : Type) [Field E] {A : Type} [CommRing A] [Algebra O A] [Algebra E A]
 
 def stLat (g : A) : Set (Submodule O A) := {L | IsLat O E L ∧ ∀ y ∈ L, g * y ∈ L}
 
-theorem mem_mulLat_iff (t : Aˣ) (L : Submodule O A) (x : A) :
-    x ∈ mulLat O (t : A) L ↔ ((t⁻¹ : Aˣ) : A) * x ∈ L := by
+theorem mem_mulLat_iff (t : Aˣ) (L : Submodule O A) (x : A)
+    : x ∈ mulLat O (t : A) L ↔ ((t⁻¹ : Aˣ) : A) * x ∈ L := by
   unfold mulLat
   constructor
   · rintro ⟨y, hy, rfl⟩
@@ -30,14 +31,17 @@ theorem mem_mulLat_iff (t : Aˣ) (L : Submodule O A) (x : A) :
 theorem mulLat_one (L : Submodule O A) : mulLat O (1 : A) L = L := by
   simp [mulLat, LinearMap.mulLeft_one]
 
-theorem mulLat_mul (a b : A) (L : Submodule O A) : mulLat O (a * b) L = mulLat O a (mulLat O b L) := by
+theorem mulLat_mul (a b : A) (L : Submodule O A)
+    : mulLat O (a * b) L = mulLat O a (mulLat O b L) := by
   simp [mulLat, LinearMap.mulLeft_mul, Submodule.map_comp]
 
 variable {O E} in
-theorem mulLat_mem_stLat {g : A} (t : Aˣ) {L : Submodule O A} (hL : L ∈ stLat O E g) :
-    mulLat O (t : A) L ∈ stLat O E g := by
+theorem mulLat_mem_stLat {g : A} (t : Aˣ) {L : Submodule O A} (hL : L ∈ stLat O E g)
+    : mulLat O (t : A) L ∈ stLat O E g := by
   refine ⟨⟨hL.1.1.map _, ?_⟩, ?_⟩
-  · have himg : ((mulLat O (t : A) L : Submodule O A) : Set A) = (LinearMap.mulLeft E (t : A)) '' (L : Set A) := by
+  · have himg
+        : ((mulLat O (t : A) L : Submodule O A) : Set A)
+          = (LinearMap.mulLeft E (t : A)) '' (L : Set A) := by
       ext x; simp [mulLat]
     rw [himg, Submodule.span_image, hL.1.2, Submodule.map_top, LinearMap.range_eq_top]
     intro z
@@ -49,18 +53,27 @@ theorem mulLat_mem_stLat {g : A} (t : Aˣ) {L : Submodule O A} (hL : L ∈ stLat
 
 instance (g : A) : MulAction Aˣ (stLat O E g) where
   smul t L := ⟨mulLat O (t : A) L, mulLat_mem_stLat t L.2⟩
-  one_smul L := Subtype.ext (by change mulLat O ((1 : Aˣ) : A) L = L; rw [Units.val_one]; exact mulLat_one O _)
-  mul_smul a b L := Subtype.ext (by change mulLat O ((a * b : Aˣ) : A) L = mulLat O (a : A) (mulLat O (b : A) L); rw [Units.val_mul]; exact mulLat_mul O _ _ _)
+  one_smul L :=
+    Subtype.ext (by change mulLat O ((1 : Aˣ) : A) L = L; rw [Units.val_one]; exact mulLat_one O _)
+  mul_smul a b L :=
+    Subtype.ext (by
+      change mulLat O ((a * b : Aˣ) : A) L = mulLat O (a : A) (mulLat O (b : A) L)
+      rw [Units.val_mul]
+      exact mulLat_mul O _ _ _)
 
-theorem stLat_smul_val (g : A) (t : Aˣ) (L : stLat O E g) :
-    ((t • L : stLat O E g) : Submodule O A) = mulLat O (t : A) L := rfl
+theorem stLat_smul_val (g : A) (t : Aˣ) (L : stLat O E g)
+    : ((t • L : stLat O E g) : Submodule O A) = mulLat O (t : A) L :=
+  rfl
 
 end Act
 
 section Pair
 
-variable (O : Type) [CommRing O] (E : Type) [Field E] {A₁ A₂ : Type} [CommRing A₁] [CommRing A₂]
-  [Algebra O A₁] [Algebra O A₂] [Algebra E A₁] [Algebra E A₂]
+variable
+  (O : Type) [CommRing O]
+  (E : Type) [Field E]
+  {A₁ A₂ : Type}
+  [CommRing A₁] [CommRing A₂] [Algebra O A₁] [Algebra O A₂] [Algebra E A₁] [Algebra E A₂]
 
 def LatPair (g₁ : A₁) (g₂ : A₂) : Type := stLat O E g₁ × stLat O E g₂
 
@@ -75,21 +88,26 @@ instance (g₁ : A₁) (g₂ : A₂) : MulAction (A₁ × A₂)ˣ (LatPair O E g
     rw [map_mul, map_mul, mul_smul, mul_smul]
     rfl
 
-theorem latPair_smul (g₁ : A₁) (g₂ : A₂) (t : (A₁ × A₂)ˣ) (p : LatPair O E g₁ g₂) :
-    t • p = ((Units.map (MonoidHom.fst A₁ A₂) t • p.1, Units.map (MonoidHom.snd A₁ A₂) t • p.2) :
-      LatPair O E g₁ g₂) := rfl
+theorem latPair_smul (g₁ : A₁) (g₂ : A₂) (t : (A₁ × A₂)ˣ) (p : LatPair O E g₁ g₂)
+    : t • p
+      = ((Units.map (MonoidHom.fst A₁ A₂) t • p.1, Units.map (MonoidHom.snd A₁ A₂) t • p.2)
+        : LatPair O E g₁ g₂) :=
+  rfl
 
-variable [IsDomain O] [IsNoetherianRing O] [Algebra O E] [IsFractionRing O E]
-  [IsScalarTower O E A₁] [IsScalarTower O E A₂]
+variable
+  [IsDomain O] [IsNoetherianRing O] [Algebra O E] [IsFractionRing O E] [IsScalarTower O E A₁]
+  [IsScalarTower O E A₂]
 
 variable {O E} in
-theorem comap_inl_mem_stLat {g₁ : A₁} {g₂ : A₂} {M : Submodule O (A₁ × A₂)}
-    (hM : M ∈ stLat O E ((g₁, g₂) : A₁ × A₂)) :
-    M.comap (LinearMap.inl O A₁ A₂) ∈ stLat O E g₁ := by
+theorem comap_inl_mem_stLat
+    {g₁ : A₁} {g₂ : A₂} {M : Submodule O (A₁ × A₂)} (hM : M ∈ stLat O E ((g₁, g₂) : A₁ × A₂))
+    : M.comap (LinearMap.inl O A₁ A₂) ∈ stLat O E g₁ := by
   refine ⟨⟨?_, ?_⟩, ?_⟩
   · haveI := isNoetherian_of_fg_of_noetherian M hM.1.1
-    have hle : (M.comap (LinearMap.inl O A₁ A₂)).map (LinearMap.inl O A₁ A₂) ≤ M := Submodule.map_comap_le _ _
-    have h1 : (((M.comap (LinearMap.inl O A₁ A₂)).map (LinearMap.inl O A₁ A₂)).comap M.subtype).FG :=
+    have hle : (M.comap (LinearMap.inl O A₁ A₂)).map (LinearMap.inl O A₁ A₂) ≤ M :=
+      Submodule.map_comap_le _ _
+    have h1
+        : (((M.comap (LinearMap.inl O A₁ A₂)).map (LinearMap.inl O A₁ A₂)).comap M.subtype).FG :=
       IsNoetherian.noetherian _
     have h2 := h1.map M.subtype
     rw [Submodule.map_comap_subtype, inf_eq_right.mpr hle] at h2
@@ -97,12 +115,12 @@ theorem comap_inl_mem_stLat {g₁ : A₁} {g₂ : A₂} {M : Submodule O (A₁ �
   · rw [Submodule.eq_top_iff']
     intro y
     have hy : ((y, 0) : A₁ × A₂) ∈ Submodule.span E (M : Set (A₁ × A₂)) := by rw [hM.1.2]; trivial
-    obtain ⟨r, hr, hrM⟩ := ReciprocityTheory.PGsh.L2.SecondCohomologyLattice.exists_smul_mem_of_mem_span M hy
+    obtain ⟨r, hr, hrM⟩ :=
+      ReciprocityTheory.PGsh.L2.SecondCohomologyLattice.exists_smul_mem_of_mem_span M hy
     have hrC : algebraMap O E r ≠ 0 := by
       rw [Ne, ← (algebraMap O E).map_zero]
       exact fun h => hr (IsFractionRing.injective O E h)
-    have hmem : r • y ∈ M.comap (LinearMap.inl O A₁ A₂) := by
-      simpa [Submodule.mem_comap] using hrM
+    have hmem : r • y ∈ M.comap (LinearMap.inl O A₁ A₂) := by simpa [Submodule.mem_comap] using hrM
     have : y = (algebraMap O E r)⁻¹ • (algebraMap O E r • y) := by
       rw [smul_smul, inv_mul_cancel₀ hrC, one_smul]
     rw [this, algebraMap_smul]
@@ -113,14 +131,16 @@ theorem comap_inl_mem_stLat {g₁ : A₁} {g₂ : A₂} {M : Submodule O (A₁ �
     simpa using this
 
 variable {O E} in
-theorem map_snd_mem_stLat {g₁ : A₁} {g₂ : A₂} {M : Submodule O (A₁ × A₂)}
-    (hM : M ∈ stLat O E ((g₁, g₂) : A₁ × A₂)) :
-    M.map (LinearMap.snd O A₁ A₂) ∈ stLat O E g₂ := by
+theorem map_snd_mem_stLat
+    {g₁ : A₁} {g₂ : A₂} {M : Submodule O (A₁ × A₂)} (hM : M ∈ stLat O E ((g₁, g₂) : A₁ × A₂))
+    : M.map (LinearMap.snd O A₁ A₂) ∈ stLat O E g₂ := by
   refine ⟨⟨hM.1.1.map _, ?_⟩, ?_⟩
-  · have himg : ((M.map (LinearMap.snd O A₁ A₂) : Submodule O A₂) : Set A₂) =
-        (LinearMap.snd E A₁ A₂) '' (M : Set (A₁ × A₂)) := by
+  · have himg
+        : ((M.map (LinearMap.snd O A₁ A₂) : Submodule O A₂) : Set A₂)
+          = (LinearMap.snd E A₁ A₂) '' (M : Set (A₁ × A₂)) := by
       ext x; simp
-    rw [himg, Submodule.span_image, hM.1.2, Submodule.map_top, LinearMap.range_eq_top.mpr LinearMap.snd_surjective]
+    rw [himg, Submodule.span_image, hM.1.2, Submodule.map_top,
+      LinearMap.range_eq_top.mpr LinearMap.snd_surjective]
   · rintro _ ⟨m, hm, rfl⟩
     exact ⟨_, hM.2 m hm, by simp⟩
 

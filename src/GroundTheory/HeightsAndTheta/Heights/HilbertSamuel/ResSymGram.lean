@@ -13,7 +13,9 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 namespace ResSym
 
-open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory ReciprocityTheory.AnForm.M
+open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory
+  ReciprocityTheory.AnForm.M
 open scoped ENNReal ComplexOrder
 
 noncomputable section
@@ -22,45 +24,52 @@ set_option linter.unusedSectionVars false
 
 variable {D : ℕ} {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ]
 
-theorem gramFun_smul {m : ConeMetric ℂ (Ix κ)} {n : ℕ} {b b' : MvPolynomial (Ix κ) ℚ}
+theorem gramFun_smul
+    {m : ConeMetric ℂ (Ix κ)} {n : ℕ} {b b' : MvPolynomial (Ix κ) ℚ}
     (hb : ∃ f : MvPolynomial (Ix κ) ℤ, f.IsHomogeneous n ∧ b = map (Int.castRingHom ℚ) f)
     (hb' : ∃ f : MvPolynomial (Ix κ) ℤ, f.IsHomogeneous n ∧ b' = map (Int.castRingHom ℚ) f)
-    (c : ℂ) (z : Ix κ → ℂ) (hc : c ≠ 0) :
-    starRingEnd ℂ (secFun b (c • z)) * secFun b' (c • z) * (wgt m n (c • z) : ℂ) =
-      starRingEnd ℂ (secFun b z) * secFun b' z * (wgt m n z : ℂ) := by
+    (c : ℂ)
+    (z : Ix κ → ℂ) (hc : c ≠ 0)
+    : starRingEnd ℂ (secFun b (c • z)) * secFun b' (c • z) * (wgt m n (c • z) : ℂ)
+      = starRingEnd ℂ (secFun b z) * secFun b' z * (wgt m n z : ℂ) := by
   rw [secFun_smul hb, secFun_smul hb', wgt, wgt, m.smul, map_mul, map_pow]
   have hc' : (‖c‖ : ℂ) ≠ 0 := by simpa using hc
   have hk : starRingEnd ℂ c ^ n * c ^ n = (‖c‖ : ℂ) ^ (2 * n) := by
     rw [← mul_pow, Complex.conj_mul', ← pow_mul]
   push_cast
-  calc _ = (starRingEnd ℂ c ^ n * c ^ n) * ((‖c‖ : ℂ) ^ (2 * n))⁻¹ *
-          (starRingEnd ℂ (secFun b z) * secFun b' z * ((m.ρ z : ℂ) ^ (2 * n))⁻¹) := by ring
-    _ = _ := by
-        rw [hk, mul_inv_cancel₀ (pow_ne_zero _ hc'), one_mul]
+  calc
+    _ = (starRingEnd ℂ c ^ n * c ^ n) * ((‖c‖ : ℂ) ^ (2 * n))⁻¹
+        * (starRingEnd ℂ (secFun b z) * secFun b' z * ((m.ρ z : ℂ) ^ (2 * n))⁻¹) := by
+      ring
+    _ = _ := by rw [hk, mul_inv_cancel₀ (pow_ne_zero _ hc'), one_mul]
 
-theorem continuousOn_gramFun {m : ConeMetric ℂ (Ix κ)} (hm : IsSmoothMetric m) (n : ℕ)
-    (b b' : MvPolynomial (Ix κ) ℚ) :
-    ContinuousOn (fun z => starRingEnd ℂ (secFun b z) * secFun b' z * (wgt m n z : ℂ)) {0}ᶜ := by
+theorem continuousOn_gramFun
+    {m : ConeMetric ℂ (Ix κ)} (hm : IsSmoothMetric m) (n : ℕ) (b b' : MvPolynomial (Ix κ) ℚ)
+    : ContinuousOn (fun z => starRingEnd ℂ (secFun b z) * secFun b' z * (wgt m n z : ℂ)) {0}ᶜ := by
   have hρ : ContinuousOn m.ρ {0}ᶜ := continuousOn_rho hm
   refine (((continuous_secFun _).continuousOn.star).mul (continuous_secFun _).continuousOn).mul
     (Complex.continuous_ofReal.comp_continuousOn ((hρ.pow _).inv₀ fun z hz => ?_))
   exact pow_ne_zero _ (m.pos z hz).ne'
 
-theorem integrable_gram (d : HSMDatum D Ω κ) {n r : ℕ} {b : Fin r → MvPolynomial (Ix κ) ℚ}
+theorem integrable_gram
+    (d : HSMDatum D Ω κ)
+    {n r : ℕ} {b : Fin r → MvPolynomial (Ix κ) ℚ}
     (hb : ∀ k, ∃ f : MvPolynomial (Ix κ) ℤ, f.IsHomogeneous n ∧ b k = map (Int.castRingHom ℚ) f)
-    (i j : Fin r) :
-    Integrable (fun z => starRingEnd ℂ (secFun (b i) z) * secFun (b j) z * (wgt d.m n z : ℂ))
+    (i j : Fin r)
+    : Integrable
+      (fun z => starRingEnd ℂ (secFun (b i) z) * secFun (b j) z * (wgt d.m n z : ℂ))
       (symMeasure d) := by
   set h : (Ix κ → ℂ) → ℂ := fun z => starRingEnd ℂ (secFun (b i) z) * secFun (b j) z * (wgt d.m n z : ℂ)
     with hh
   have hcont : ContinuousOn h {0}ᶜ := continuousOn_gramFun d.smooth n (b i) (b j)
   have hsm : ∀ (c : ℂ) (z : Ix κ → ℂ), c ≠ 0 → h (c • z) = h z := fun c z hc =>
     gramFun_smul (hb i) (hb j) c z hc
-  obtain ⟨C, hC⟩ := (isCompact_sphere (0 : Ix κ → ℂ) 1).exists_bound_of_continuousOn
-    (hcont.mono fun z hz => by
-      simp only [Set.mem_compl_iff, Set.mem_singleton_iff]
-      rintro rfl
-      simp at hz)
+  obtain ⟨C, hC⟩ :=
+    (isCompact_sphere (0 : Ix κ → ℂ) 1).exists_bound_of_continuousOn
+      (hcont.mono fun z hz => by
+        simp only [Set.mem_compl_iff, Set.mem_singleton_iff]
+        rintro rfl
+        simp at hz)
   have hbd : ∀ z, ‖h z‖ ≤ max C ‖h 0‖ := by
     intro z
     by_cases hz : z = 0
@@ -72,20 +81,20 @@ theorem integrable_gram (d : HSMDatum D Ω κ) {n r : ℕ} {b : Fin r → MvPoly
       have : z = (‖z‖ : ℂ) • ((‖z‖ : ℂ)⁻¹ • z) := by rw [smul_smul, mul_inv_cancel₀ hz', one_smul]
       rw [this, hsm _ _ hz']
       exact (hC _ hu).trans (le_max_left _ _)
-  exact Integrable.of_bound (measurable_of_continuousOn_compl_singleton 0 hcont).aestronglyMeasurable
-    _ (Filter.Eventually.of_forall hbd)
+  exact Integrable.of_bound
+    (measurable_of_continuousOn_compl_singleton 0 hcont).aestronglyMeasurable _
+    (Filter.Eventually.of_forall hbd)
 
-theorem mem_mcPts_of_pts {x : Ix κ → Ω} {z : Ix κ → ℂ} (hz : z ∈ pts (coordIdeal ℤ x)) :
-    z ∈ mcPts (ι := GlobalTheory κ) (coordIdeal ℤ x) := by
+theorem mem_mcPts_of_pts {x : Ix κ → Ω} {z : Ix κ → ℂ} (hz : z ∈ pts (coordIdeal ℤ x))
+    : z ∈ mcPts (ι := GlobalTheory κ) (coordIdeal ℤ x) := by
   refine ⟨fun k => ?_, hz.2⟩
   obtain ⟨p, hp⟩ := Function.ne_iff.mp hz.1
   exact ⟨p.2, by cases k; exact hp⟩
 
-theorem exists_form_J (d : HSMDatum D Ω κ) :
-    ∃ (g : MvPolynomial (Ix κ) ℤ) (N : ℕ), g ∈ d.J ∧ g.IsHomogeneous N ∧ aeval d.x g ≠ 0 := by
+theorem exists_form_J (d : HSMDatum D Ω κ)
+    : ∃ (g : MvPolynomial (Ix κ) ℤ) (N : ℕ), g ∈ d.J ∧ g.IsHomogeneous N ∧ aeval d.x g ≠ 0 := by
   obtain ⟨S, hS, hJ⟩ := d.R.homog
-  have : ¬ S ⊆ coordIdeal ℤ d.x := fun hsub => d.R.nondeg (by
-    rw [hJ]; exact Ideal.span_le.mpr hsub)
+  have : ¬ S ⊆ coordIdeal ℤ d.x := fun hsub => d.R.nondeg (by rw [hJ]; exact Ideal.span_le.mpr hsub)
   obtain ⟨g, hgS, hgP⟩ := Set.not_subset.mp this
   obtain ⟨a, ha⟩ := hS g hgS
   have hhom : g.IsHomogeneous (a ()) := by
@@ -98,8 +107,9 @@ theorem exists_form_J (d : HSMDatum D Ω κ) :
   rw [hJ]
   exact Ideal.subset_span hgS
 
-theorem posDef_gram (d : HSMDatum D Ω κ) {n r : ℕ} {b : Fin r → MvPolynomial (Ix κ) ℚ}
-    (hb : IsSecBasis d.x n b) : (bGram (symMeasure d) (fun k => secFun (b k)) (wgt d.m n)).PosDef := by
+theorem posDef_gram
+    (d : HSMDatum D Ω κ) {n r : ℕ} {b : Fin r → MvPolynomial (Ix κ) ℚ} (hb : IsSecBasis d.x n b)
+    : (bGram (symMeasure d) (fun k => secFun (b k)) (wgt d.m n)).PosDef := by
   classical
   have hint := integrable_gram d hb.1
   refine Matrix.PosDef.of_dotProduct_mulVec_pos (bGram_isHermitian _ _ _) fun c hc => ?_
@@ -194,11 +204,12 @@ theorem posDef_gram (d : HSMDatum D Ω κ) {n r : ℕ} {b : Fin r → MvPolynomi
     · rw [hzJ.2 g hgJ, mul_zero]
     · rw [hFpts z hzp hzJ, zero_mul]
 
-theorem sup_le_gram (hR : ResolutionSupBound.Statement) (d : HSMDatum D Ω κ) :
-    ∃ K : ℝ, ∀ (n r : ℕ) (b : Fin r → MvPolynomial (Ix κ) ℚ), 1 ≤ n → IsSecBasis d.x n b →
-      ∀ (c : Fin r → ℂ), ∀ z ∈ pts (coordIdeal ℤ d.x),
-        ‖∑ k, c k * secFun (b k) z‖ ^ 2 * wgt d.m n z ≤
-          K * (n : ℝ) ^ D * bNormSq (symMeasure d) (fun k => secFun (b k)) (wgt d.m n) c := by
+theorem sup_le_gram (hR : ResolutionSupBound.Statement) (d : HSMDatum D Ω κ)
+    : ∃ K : ℝ, ∀ (n r : ℕ) (b : Fin r → MvPolynomial (Ix κ) ℚ),
+      1 ≤ n → IsSecBasis d.x n b
+        → ∀ (c : Fin r → ℂ), ∀ z ∈ pts (coordIdeal ℤ d.x),
+          ‖∑ k, c k * secFun (b k) z‖ ^ 2 * wgt d.m n z
+            ≤ K * (n : ℝ) ^ D * bNormSq (symMeasure d) (fun k => secFun (b k)) (wgt d.m n) c := by
   classical
   obtain ⟨C, hC⟩ := hR D Ω κ d
   refine ⟨2 * C ^ 2, fun n r b hn hb c z hz => ?_⟩
@@ -216,7 +227,7 @@ theorem sup_le_gram (hR : ResolutionSupBound.Statement) (d : HSMDatum D Ω κ) :
   have hevf : ∀ w, eval w f = ∑ i, c i * secFun (b i) w := by
     intro w
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [hf, secFun, map_sum]
+    simp [hf, secFun, map_sum]
   have hpt : ∀ w : Ix κ → ℂ, w ≠ 0 → ptNorm d.m (RingHom.id ℂ) n f w ^ 2 = h w := by
     intro w hw
     have hρ : 0 < d.m.ρ w := d.m.pos w hw
@@ -224,14 +235,19 @@ theorem sup_le_gram (hR : ResolutionSupBound.Statement) (d : HSMDatum D Ω κ) :
     simp only [hh, wgt]
     rw [div_pow, ← pow_mul, mul_comm n 2, div_eq_mul_inv]
 
-  have hL : resolutionVolumeL2Complex d n f ^ 2 ≤ 2 * bNormSq (symMeasure d) (fun k => secFun (b k)) (wgt d.m n) c := by
+  have hL
+      : resolutionVolumeL2Complex d n f ^ 2
+        ≤ 2 * bNormSq (symMeasure d) (fun k => secFun (b k)) (wgt d.m n) c := by
     have hI : 0 ≤ ∫ y, ptNorm d.m (RingHom.id ℂ) n f (resPt d y) ^ 2 ∂d.dV :=
       integral_nonneg fun y => sq_nonneg _
     rw [resolutionVolumeL2Complex, Real.sq_sqrt hI]
-    have he : (fun y => ptNorm d.m (RingHom.id ℂ) n f (resPt d y) ^ 2) = fun y => h (resPt d y) := by
+    have he
+        : (fun y => ptNorm d.m (RingHom.id ℂ) n f (resPt d y) ^ 2) = fun y => h (resPt d y) := by
       funext y
       exact hpt _ (resPt_mem_pts d y).1
-    have hbn : bNormSq (symMeasure d) (fun k => secFun (b k)) (wgt d.m n) c = ∫ z, h z ∂(symMeasure d) := rfl
+    have hbn
+        : bNormSq (symMeasure d) (fun k => secFun (b k)) (wgt d.m n) c = ∫ z, h z ∂(symMeasure d) :=
+      rfl
     rw [he, hbn, integral_symMeasure d hcont hdeg, smul_eq_mul]
     have hB : 0 ≤ ∫ y, h (conjPt (resPt d y)) ∂d.dV := integral_nonneg fun y => hnn _
     linarith
@@ -244,23 +260,30 @@ theorem sup_le_gram (hR : ResolutionSupBound.Statement) (d : HSMDatum D Ω κ) :
   have hpow : ((n : ℝ) ^ ((D : ℝ) / 2)) ^ 2 = (n : ℝ) ^ D := by
     rw [← Real.rpow_mul_natCast hn0, show (D : ℝ) / 2 * ((2 : ℕ) : ℝ) = (D : ℝ) by push_cast; ring,
       Real.rpow_natCast]
-  calc h z ≤ (C * (n : ℝ) ^ ((D : ℝ) / 2) * resolutionVolumeL2Complex d n f) ^ 2 := h2
+  calc
+    h z
+      ≤ (C * (n : ℝ) ^ ((D : ℝ) / 2) * resolutionVolumeL2Complex d n f) ^ 2 := h2
     _ = C ^ 2 * (n : ℝ) ^ D * resolutionVolumeL2Complex d n f ^ 2 := by rw [mul_pow, mul_pow, hpow]
     _ ≤ C ^ 2 * (n : ℝ) ^ D * (2 * bNormSq (symMeasure d) (fun k => secFun (b k)) (wgt d.m n) c) :=
-        mul_le_mul_of_nonneg_left hL (by positivity)
+      mul_le_mul_of_nonneg_left hL (by positivity)
     _ = _ := by ring
 
-theorem pairVal_eq_conj (m : ConeMetric ℂ (Ix κ)) (n : ℕ) (b b' : MvPolynomial (Ix κ) ℚ) (z : Ix κ → ℂ) :
-    pairVal m n b b' z = starRingEnd ℂ (starRingEnd ℂ (secFun b z) * secFun b' z * (wgt m n z : ℂ)) := by
+theorem pairVal_eq_conj
+    (m : ConeMetric ℂ (Ix κ)) (n : ℕ) (b b' : MvPolynomial (Ix κ) ℚ) (z : Ix κ → ℂ)
+    : pairVal m n b b' z
+      = starRingEnd ℂ (starRingEnd ℂ (secFun b z) * secFun b' z * (wgt m n z : ℂ)) := by
   simp only [pairVal, secFun, wgt, map_mul, Complex.conj_conj, Complex.conj_ofReal, div_eq_mul_inv]
   push_cast
   ring
 
-theorem det_resGram (d : HSMDatum D Ω κ) {n r : ℕ} {b : Fin r → MvPolynomial (Ix κ) ℚ}
-    (hb : ∀ k, ∃ f : MvPolynomial (Ix κ) ℤ, f.IsHomogeneous n ∧ b k = map (Int.castRingHom ℚ) f) :
-    (resGram d n b).det = (bGram (symMeasure d) (fun k => secFun (b k)) (wgt d.m n)).det.re := by
-  have hG : bGram (symMeasure d) (fun k => secFun (b k)) (wgt d.m n) =
-      Complex.ofRealHom.mapMatrix (resGram d n b) := by
+theorem det_resGram
+    (d : HSMDatum D Ω κ)
+    {n r : ℕ} {b : Fin r → MvPolynomial (Ix κ) ℚ}
+    (hb : ∀ k, ∃ f : MvPolynomial (Ix κ) ℤ, f.IsHomogeneous n ∧ b k = map (Int.castRingHom ℚ) f)
+    : (resGram d n b).det = (bGram (symMeasure d) (fun k => secFun (b k)) (wgt d.m n)).det.re := by
+  have hG
+      : bGram (symMeasure d) (fun k => secFun (b k)) (wgt d.m n)
+        = Complex.ofRealHom.mapMatrix (resGram d n b) := by
     ext k l
     rw [RingHom.mapMatrix_apply, Matrix.map_apply, Complex.ofRealHom_eq_coe]
     have hreal := conj_bGram d.conjInv (map_conjPt_symMeasure d) n b k l
@@ -275,10 +298,12 @@ theorem det_resGram (d : HSMDatum D Ω κ) {n r : ℕ} {b : Fin r → MvPolynomi
     ring
   rw [hG, ← RingHom.map_det, Complex.ofRealHom_eq_coe, Complex.ofReal_re]
 
-theorem resChi_eq (d : HSMDatum D Ω κ) (n : ℕ)
-    (h : ∃ p : (Σ r : ℕ, Fin r → MvPolynomial (Ix κ) ℚ), IsSecBasis d.x n p.2) :
-    resChi d n = -(1 / 2) * Real.log
-      (bGram (symMeasure d) (fun k => secFun (h.choose.2 k)) (wgt d.m n)).det.re := by
+theorem resChi_eq
+    (d : HSMDatum D Ω κ) (n : ℕ)
+    (h : ∃ p : (Σ r : ℕ, Fin r → MvPolynomial (Ix κ) ℚ), IsSecBasis d.x n p.2)
+    : resChi d n
+      = -(1 / 2)
+        * Real.log (bGram (symMeasure d) (fun k => secFun (h.choose.2 k)) (wgt d.m n)).det.re := by
   unfold resChi
   rw [dite_eq_left h, det_resGram d h.choose_spec.1]
 

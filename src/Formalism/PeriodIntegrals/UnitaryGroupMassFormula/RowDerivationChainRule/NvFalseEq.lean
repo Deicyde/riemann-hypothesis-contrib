@@ -14,19 +14,25 @@ namespace PI.RL.W
 
 open PI.RL
 
-theorem Nv_false_eq (K : Type) [Field K] (m : ℕ) (c : Fin (m + 1)) :
-    Nv K m false c = ((genM K m).updateRow c (Pi.single (Fin.last m) 1)).det := by
+theorem Nv_false_eq (K : Type) [Field K] (m : ℕ) (c : Fin (m + 1))
+    : Nv K m false c = ((genM K m).updateRow c (Pi.single (Fin.last m) 1)).det := by
   simp [Nv, Matrix.adjugate_apply]
 
 theorem keyCov : KeyCov := by
   intro K _ m a b c
-  have hN : ∀ d, Nv K m false d =
-      ((genM K m).updateRow d (Pi.single (Fin.last m) 1)).det := fun d => Nv_false_eq K m d
+  have hN : ∀ d, Nv K m false d = ((genM K m).updateRow d (Pi.single (Fin.last m) 1)).det :=
+    fun d => Nv_false_eq K m d
   have hG : ∀ i j, genM K m i j = X (i, j) := fun i j => rfl
   rw [RE_eq_REder, hN c, hN b, derivation_det]
-  have hrow : ∀ i j, REder K (m + 1) a b
-      (((genM K m).updateRow c (Pi.single (Fin.last m) 1)) i j) =
-        if i = c then 0 else if i = b then X (a, j) else 0 := by
+  have hrow
+      : ∀ i j,
+        REder K (m + 1) a b (((genM K m).updateRow c (Pi.single (Fin.last m) 1)) i j)
+          = if i = c then
+              0
+            else if i = b then
+              X (a, j)
+            else
+              0 := by
     intro i j
     by_cases hic : i = c
     · subst hic
@@ -36,9 +42,10 @@ theorem keyCov : KeyCov := by
       · simp [Pi.single_apply, hj]
     · rw [Matrix.updateRow_ne hic, hG, REder_X, if_neg hic]
   simp_rw [hrow]
-  have hz : ∀ (M : Matrix (Fin (m + 1)) (Fin (m + 1)) (MvPolynomial (Fin (m + 1) × Fin (m + 1)) K))
-      (i : Fin (m + 1)) (r : Fin (m + 1) → MvPolynomial (Fin (m + 1) × Fin (m + 1)) K),
-      (∀ j, r j = 0) → (M.updateRow i r).det = 0 := by
+  have hz
+      : ∀ (M : Matrix (Fin (m + 1)) (Fin (m + 1)) (MvPolynomial (Fin (m + 1) × Fin (m + 1)) K))
+          (i : Fin (m + 1)) (r : Fin (m + 1) → MvPolynomial (Fin (m + 1) × Fin (m + 1)) K),
+        (∀ j, r j = 0) → (M.updateRow i r).det = 0 := by
     intro M i r hr
     exact Matrix.det_eq_zero_of_row_eq_zero i (fun j => by rw [Matrix.updateRow_self]; exact hr j)
   by_cases hbc : b = c
@@ -71,9 +78,9 @@ theorem keyCov : KeyCov := by
   by_cases hac : a = c
   · subst hac
     rw [if_pos rfl, zero_sub]
-    have hperm : (((genM K m).updateRow a (Pi.single (Fin.last m) 1)).updateRow b
-        (fun j => X (a, j))) =
-        ((genM K m).updateRow b (Pi.single (Fin.last m) 1)).submatrix (Equiv.swap b a) id := by
+    have hperm
+        : (((genM K m).updateRow a (Pi.single (Fin.last m) 1)).updateRow b (fun j => X (a, j)))
+          = ((genM K m).updateRow b (Pi.single (Fin.last m) 1)).submatrix (Equiv.swap b a) id := by
       refine Matrix.ext fun i j => ?_
       simp only [Matrix.submatrix_apply, id, Matrix.updateRow_apply, Equiv.swap_apply_def, hG]
       split_ifs <;> simp_all

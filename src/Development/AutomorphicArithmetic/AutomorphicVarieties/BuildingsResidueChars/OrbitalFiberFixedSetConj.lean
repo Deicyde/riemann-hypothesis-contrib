@@ -34,8 +34,7 @@ private lemma conj_sup {G : Type} [Group G] (Z J : Subgroup G) (f : G → ℂ)
     rw [mul_assoc, ← hZ z hz, inv_mul_cancel_left]
   exact fun u hu => h hu
 
-theorem UpperTheory.orbitalFiber_fixedSet_conj :
-    UpperTheory.V.Z.Sym.Glob.Fib.FSConj := by
+theorem UpperTheory.orbitalFiber_fixedSet_conj : UpperTheory.V.Z.Sym.Glob.Fib.FSConj := by
   intro F _ _ Δ D hD t ht u hu g
   unfold Dat.FS
   refine finprod_congr fun v => ?_

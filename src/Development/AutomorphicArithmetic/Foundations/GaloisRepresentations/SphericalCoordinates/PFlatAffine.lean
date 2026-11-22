@@ -5,14 +5,15 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.Holomorph
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
 open GlobalTheory.HolHom in
-theorem UpperTheory.Gal.W2.flatAffine_of :
-    UpperTheory.Gal.W2.FlatAffine := by
+theorem UpperTheory.Gal.W2.flatAffine_of : UpperTheory.Gal.W2.FlatAffine := by
   intro V _ _ Y B s v₀ w hB hv₀ hs W hW hsW hder U f hU
   have hhol := holAt_of_isHolTo hs hv₀
   have hpU := (le_preimage_iff _ _).1 hU
@@ -26,8 +27,9 @@ theorem UpperTheory.Gal.W2.flatAffine_of :
   simp only [RingHom.algebraMap_toAlgebra] at e
   have hD0 : ⊤ ≤ s v₀ ⁻¹ᵁ Y.basicOpen g := (le_preimage_iff _ _).2 hpg
   have hev : ∀ᶠ v in 𝓝 v₀, ⊤ ≤ s v ⁻¹ᵁ Y.basicOpen g := (hhol _ hD0).1
-  have heq : (fun v => valAt' (s v) W h) =ᶠ[𝓝 v₀]
-      (fun v => valAt' (s v) U f * valAt' (s v) W g ^ k) := by
+  have heq
+      : (fun v => valAt' (s v) W h) =ᶠ[𝓝 v₀]
+        (fun v => valAt' (s v) U f * valAt' (s v) W g ^ k) := by
     filter_upwards [hev] with v hv
     have e' := congrArg (HolHom.evalHom (s v) _ hv) e
     simp only [map_mul, map_pow, ← valR_eq] at e'

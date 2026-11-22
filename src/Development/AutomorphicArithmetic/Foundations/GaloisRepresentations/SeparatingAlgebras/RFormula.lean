@@ -59,8 +59,7 @@ private lemma evalAt_alternant {n : ℕ} (z : Fin n → ℂˣ) :
     rw [alternant_staircase_eq_vdm hn, map_mul, evalAt_vdm_det, ← h, mul_comm]
     simp
 
-theorem UpperTheory.Gal.Gen.rFormula_pf :
-    UpperTheory.Gal.Gen.RFormula := by
+theorem UpperTheory.Gal.Gen.rFormula_pf : UpperTheory.Gal.Gen.RFormula := by
   intro n t l z hz
   have hD : ∏ p ∈ prs n, ((z p.1 : ℂ) - (z p.2 : ℂ)) ≠ 0 := by
     refine Finset.prod_ne_zero_iff.mpr fun p hp h => ?_
@@ -73,8 +72,9 @@ theorem UpperTheory.Gal.Gen.rFormula_pf :
   rw [hR, key, Finset.mul_sum]
   refine Finset.sum_congr rfl fun σ _ => ?_
   have hs := sign_sq_one σ
-  have hc : ∏ p ∈ prs n, ((z (σ p.1) : ℂ) - (z (σ p.2) : ℂ)) =
-      ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ p ∈ prs n, ((z p.1 : ℂ) - (z p.2 : ℂ)) :=
+  have hc
+      : ∏ p ∈ prs n, ((z (σ p.1) : ℂ) - (z (σ p.2) : ℂ))
+        = ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ p ∈ prs n, ((z p.1 : ℂ) - (z p.2 : ℂ)) :=
     prod_comp (fun i => (z i : ℂ)) σ
   rw [map_mul, monomial, evalAt_single, one_mul, evalAt_hlFactor, Finset.prod_div_distrib, hc]
   simp only [Function.comp_apply]

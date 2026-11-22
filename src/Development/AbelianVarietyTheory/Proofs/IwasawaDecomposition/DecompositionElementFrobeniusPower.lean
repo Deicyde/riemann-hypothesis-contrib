@@ -5,15 +5,17 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne
 
 noncomputable section
 
 namespace GlobalTheory.WeilDeligne
 
-theorem frobAlg_pow_apply (K L : Type*) [Field K] [Fintype K] [Field L] [Algebra K L]
-    [Algebra.IsAlgebraic K L] (m : ℕ) (a : L) :
-    (FiniteField.frobeniusAlgEquivOfAlgebraic K L ^ m) a = a ^ (Fintype.card K ^ m) := by
+theorem frobAlg_pow_apply
+    (K L : Type*) [Field K] [Fintype K] [Field L] [Algebra K L] [Algebra.IsAlgebraic K L]
+    (m : ℕ) (a : L)
+    : (FiniteField.frobeniusAlgEquivOfAlgebraic K L ^ m) a = a ^ (Fintype.card K ^ m) := by
   induction m with
   | zero => simp
   | succ m ih =>
@@ -22,15 +24,18 @@ theorem frobAlg_pow_apply (K L : Type*) [Field K] [Fintype K] [Field L] [Algebra
 
 end GlobalTheory.WeilDeligne
 
-
 open GlobalTheory.WeilDeligne Pointwise in
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
-theorem GlobalTheory.WeilDeligne.exists_pow_normV_resPow (E Ω : Type) [Field E] [NumberField E] [Field Ω]
-    [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) :
-    IsPlaceOver A w → ∀ (L : IntermediateField E Ω), FiniteDimensional E L → ∀ g : G E Ω,
-      g ∈ Dec (F := E) A → ∃ k : ℕ, ∀ x ∈ L, IsIntegral ℤ x →
-        A.valuation ((g x) ^ (normV w ^ k) - x) < 1 := by
+theorem GlobalTheory.WeilDeligne.exists_pow_normV_resPow
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E))
+    : IsPlaceOver A w
+      → ∀ (L : IntermediateField E Ω),
+        FiniteDimensional E L
+          → ∀ g : G E Ω,
+            g ∈ Dec (F := E) A
+              → ∃ k : ℕ, ∀ x ∈ L, IsIntegral ℤ x → A.valuation ((g x) ^ (normV w ^ k) - x) < 1 := by
   intro hA L hL g hg
   classical
   set Q := primeBelow (F := E) A with hQ
@@ -51,14 +56,15 @@ theorem GlobalTheory.WeilDeligne.exists_pow_normV_resPow (E Ω : Type) [Field E]
 
   have hgQ : g • Q = Q := by rw [hQ, ← primeBelow_smul, (mem_Dec.mp hg)]
   let ψ := Ideal.Quotient.stabilizerHom Q w.asIdeal (Ω ≃ₐ[E] Ω) ⟨g, hgQ⟩
-  have hψ : ∀ b : IntCl E Ω, ψ (Ideal.Quotient.mk Q b) = Ideal.Quotient.mk Q (g • b) :=
-    fun b => Ideal.Quotient.stabilizerHom_apply _ _ _ _ b
+  have hψ : ∀ b : IntCl E Ω, ψ (Ideal.Quotient.mk Q b) = Ideal.Quotient.mk Q (g • b) := fun b =>
+    Ideal.Quotient.stabilizerHom_apply _ _ _ _ b
 
   set n := Module.finrank E L with hn
   set M := n.factorial with hM
 
-  have hres : ∀ b : IntCl E Ω, (b : Ω) ∈ L →
-      (Ideal.Quotient.mk Q b) ^ (normV w ^ M) = Ideal.Quotient.mk Q b := by
+  have hres
+      : ∀ b : IntCl E Ω,
+        (b : Ω) ∈ L → (Ideal.Quotient.mk Q b) ^ (normV w ^ M) = Ideal.Quotient.mk Q b := by
     intro b hbL
     set y := Ideal.Quotient.mk Q b with hy
     have hbi : IsIntegral (𝓞 E) (b : Ω) := b.2
@@ -93,15 +99,13 @@ theorem GlobalTheory.WeilDeligne.exists_pow_normV_resPow (E Ω : Type) [Field E]
       rw [Module.card_eq_pow_finrank (K := 𝓞 E ⧸ w.asIdeal), hqc,
         IntermediateField.adjoin.finrank hyInt]
     obtain ⟨m, hm⟩ := Nat.dvd_factorial hpos hle
-    have key := FiniteField.pow_card_pow m
-      (⟨y, IntermediateField.mem_adjoin_simple_self _ y⟩ : K')
+    have key := FiniteField.pow_card_pow m (⟨y, IntermediateField.mem_adjoin_simple_self _ y⟩ : K')
     rw [hcard, ← pow_mul, ← hm] at key
     exact congrArg Subtype.val key
 
   let frob := FiniteField.frobeniusAlgEquivOfAlgebraic (𝓞 E ⧸ w.asIdeal) (IntCl E Ω ⧸ Q)
   let τ := frob ^ M
-  have hτ : ∀ y, τ y = y ^ (normV w ^ M) := fun y => by
-    rw [frobAlg_pow_apply, hqc]
+  have hτ : ∀ y, τ y = y ^ (normV w ^ M) := fun y => by rw [frobAlg_pow_apply, hqc]
   let R := IntermediateField.fixedField (Subgroup.zpowers τ)
   have hmemR : ∀ y, y ∈ R ↔ y ^ (normV w ^ M) = y := by
     intro y
@@ -111,8 +115,8 @@ theorem GlobalTheory.WeilDeligne.exists_pow_normV_resPow (E Ω : Type) [Field E]
     · intro h
       rw [IntermediateField.mem_fixedField_iff]
       intro f hf
-      have hs : τ ∈ MulAction.stabilizer
-        ((IntCl E Ω ⧸ Q) ≃ₐ[𝓞 E ⧸ w.asIdeal] (IntCl E Ω ⧸ Q)) y := h
+      have hs : τ ∈ MulAction.stabilizer ((IntCl E Ω ⧸ Q) ≃ₐ[𝓞 E ⧸ w.asIdeal] (IntCl E Ω ⧸ Q)) y :=
+        h
       exact (Subgroup.zpowers_le.mpr hs) hf
   have hqM : 1 < normV w ^ M := Nat.one_lt_pow (Nat.factorial_ne_zero n) hq1
   haveI : Finite R := by
@@ -125,9 +129,12 @@ theorem GlobalTheory.WeilDeligne.exists_pow_normV_resPow (E Ω : Type) [Field E]
     rw [(hmemR y).mp hy, sub_self]
 
   obtain ⟨j, hj⟩ :=
-    (FiniteField.bijective_frobeniusAlgEquivOfAlgebraic_pow (𝓞 E ⧸ w.asIdeal) R).2 (ψ.restrictNormal R)
-  have hj' : FiniteField.frobeniusAlgEquivOfAlgebraic (𝓞 E ⧸ w.asIdeal) R ^ (j : ℕ) =
-      ψ.restrictNormal R := hj
+    (FiniteField.bijective_frobeniusAlgEquivOfAlgebraic_pow (𝓞 E ⧸ w.asIdeal) R).2
+      (ψ.restrictNormal R)
+  have hj'
+      : FiniteField.frobeniusAlgEquivOfAlgebraic (𝓞 E ⧸ w.asIdeal) R ^ (j : ℕ)
+        = ψ.restrictNormal R :=
+    hj
   have hψR : ∀ y ∈ R, ψ y = y ^ (normV w ^ (j : ℕ)) := by
     intro y hy
     have h1 := AlgEquiv.restrictNormal_commutes ψ R ⟨y, hy⟩

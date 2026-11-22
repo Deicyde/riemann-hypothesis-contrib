@@ -15,7 +15,8 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 section PY
 
-variable (II : IntersectionSystem)
+variable
+  (II : IntersectionSystem)
   (hII : ∀ W : Ideal (MRing (PBlk 2)), IsArithVar W 1 → 0 ≤ II Unit (PBlk 2) W 1 ![fsLine 2])
 
 end PY

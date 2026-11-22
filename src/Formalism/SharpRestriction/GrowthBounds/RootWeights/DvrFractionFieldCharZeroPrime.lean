@@ -16,7 +16,8 @@ section Arith
 
 variable {p : ℕ} {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem natCast_unit_of_coprime (S : UniformizedDVR p O) {c : ℕ} (hc : Nat.Coprime c p) : IsUnit (c : O) := by
+theorem natCast_unit_of_coprime (S : UniformizedDVR p O) {c : ℕ} (hc : Nat.Coprime c p)
+    : IsUnit (c : O) := by
   by_contra h
   have hc' : (c : O) ∈ IsLocalRing.maximalIdeal O :=
     (IsLocalRing.mem_maximalIdeal _).2 (mem_nonunits_iff.2 h)
@@ -42,7 +43,8 @@ theorem dvr_charZero_of_prime (S : UniformizedDVR p O) (hp : p.Prime) : CharZero
   rw [hm0] at hu
   exact not_isUnit_zero hu
 
-theorem dvr_fraction_field_charZero_prime (S : UniformizedDVR p O) (hp : p.Prime) : CharZero (KK O) := by
+theorem dvr_fraction_field_charZero_prime (S : UniformizedDVR p O) (hp : p.Prime)
+    : CharZero (KK O) := by
   haveI := dvr_charZero_of_prime S hp
   refine charZero_of_inj_zero (fun n hn => ?_)
   have h1 : algebraMap O (KK O) (n : O) = algebraMap O (KK O) 0 := by

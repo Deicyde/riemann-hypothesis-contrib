@@ -4,7 +4,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
 namespace UpperTheory.V.GradeZeroInterpolatingElement.OrdinaryLocal
 
@@ -12,74 +14,87 @@ open Polynomial
 
 variable {B : Type} [CommRing B]
 
-private theorem aeval_conj (u : (M4 B)ˣ) (X : M4 B) (p : B[X]) :
-    aeval ((u : M4 B) * X * (u⁻¹ : (M4 B)ˣ)) p = (u : M4 B) * aeval X p * (u⁻¹ : (M4 B)ˣ) := by
+private theorem aeval_conj (u : (M4 B)ˣ) (X : M4 B) (p : B[X])
+    : aeval ((u : M4 B) * X * (u⁻¹ : (M4 B)ˣ)) p = (u : M4 B) * aeval X p * (u⁻¹ : (M4 B)ˣ) := by
   induction p using Polynomial.induction_on' with
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, mul_add, add_mul]
   | monomial n a =>
-    rw [aeval_monomial, aeval_monomial, Units.conj_pow, ← Algebra.smul_def, ← Algebra.smul_def, mul_smul_comm,
-      smul_mul_assoc]
+    rw [aeval_monomial, aeval_monomial, Units.conj_pow, ← Algebra.smul_def, ← Algebra.smul_def,
+      mul_smul_comm, smul_mul_assoc]
 
-private theorem prj_conj (c : Fin 4 → B) (u : (M4 B)ˣ) (X : M4 B) (i : Fin 4) :
-    prj c ((u : M4 B) * X * (u⁻¹ : (M4 B)ˣ)) i = (u : M4 B) * prj c X i * (u⁻¹ : (M4 B)ˣ) :=
+private theorem prj_conj (c : Fin 4 → B) (u : (M4 B)ˣ) (X : M4 B) (i : Fin 4)
+    : prj c ((u : M4 B) * X * (u⁻¹ : (M4 B)ˣ)) i = (u : M4 B) * prj c X i * (u⁻¹ : (M4 B)ˣ) :=
   aeval_conj u X _
 
-private theorem eig_left (c : Fin 4 → B) (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) (i : Fin 4) :
-    (X - c i • (1 : M4 B)) * prj c X i = 0 := by
+private theorem eig_left
+    (c : Fin 4 → B) (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) (i : Fin 4)
+    : (X - c i • (1 : M4 B)) * prj c X i = 0 := by
   have h1 := Matrix.aeval_self_charpoly X
-  rw [h, ← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i), map_mul, map_sub, aeval_X, aeval_C,
-    Algebra.algebraMap_eq_smul_one] at h1
+  rw [h, ← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i), map_mul, map_sub, aeval_X,
+      aeval_C, Algebra.algebraMap_eq_smul_one]
+    at h1
   exact h1
 
-private theorem eig_right (c : Fin 4 → B) (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) (i : Fin 4) :
-    prj c X i * (X - c i • (1 : M4 B)) = 0 := by
+private theorem eig_right
+    (c : Fin 4 → B) (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) (i : Fin 4)
+    : prj c X i * (X - c i • (1 : M4 B)) = 0 := by
   have h1 := Matrix.aeval_self_charpoly X
-  rw [h, ← Finset.prod_erase_mul Finset.univ _ (Finset.mem_univ i), map_mul, map_sub, aeval_X, aeval_C,
-    Algebra.algebraMap_eq_smul_one] at h1
+  rw [h, ← Finset.prod_erase_mul Finset.univ _ (Finset.mem_univ i), map_mul, map_sub, aeval_X,
+      aeval_C, Algebra.algebraMap_eq_smul_one]
+    at h1
   exact h1
 
-private theorem aeval_sub (X : M4 B) (a : B) (p : B[X]) :
-    ∃ Y : M4 B, aeval X p - p.eval a • (1 : M4 B) = Y * (X - a • (1 : M4 B)) := by
+private theorem aeval_sub (X : M4 B) (a : B) (p : B[X])
+    : ∃ Y : M4 B, aeval X p - p.eval a • (1 : M4 B) = Y * (X - a • (1 : M4 B)) := by
   obtain ⟨s, hs⟩ : Polynomial.X - C a ∣ p - C (p.eval a) := X_sub_C_dvd_sub_C_eval
   refine ⟨aeval X s, ?_⟩
   have h := congrArg (aeval X) hs
-  rw [mul_comm, map_mul, map_sub, map_sub, aeval_X, aeval_C, aeval_C, Algebra.algebraMap_eq_smul_one,
-    Algebra.algebraMap_eq_smul_one] at h
+  rw [mul_comm, map_mul, map_sub, map_sub, aeval_X, aeval_C, aeval_C,
+      Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one]
+    at h
   exact h
 
-private theorem prj_sub (c : Fin 4 → B) (X : M4 B) (i j : Fin 4) :
-    ∃ Y : M4 B, prj c X i - (∏ a ∈ Finset.univ.erase i, (c j - c a)) • (1 : M4 B) = Y * (X - c j • (1 : M4 B)) := by
+private theorem prj_sub (c : Fin 4 → B) (X : M4 B) (i j : Fin 4)
+    : ∃ Y : M4 B,
+      prj c X i - (∏ a ∈ Finset.univ.erase i, (c j - c a)) • (1 : M4 B)
+        = Y * (X - c j • (1 : M4 B)) := by
   obtain ⟨Y, hY⟩ := aeval_sub X (c j) (∏ a ∈ Finset.univ.erase i, (Polynomial.X - C (c a)))
   refine ⟨Y, ?_⟩
   rw [← hY, eval_prod]
   simp only [eval_sub, eval_X, eval_C]
   rfl
 
-private theorem prj_mul (c : Fin 4 → B) (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) (i j : Fin 4) :
-    prj c X i * prj c X j = (∏ a ∈ Finset.univ.erase i, (c j - c a)) • prj c X j := by
+private theorem prj_mul
+    (c : Fin 4 → B) (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) (i j : Fin 4)
+    : prj c X i * prj c X j = (∏ a ∈ Finset.univ.erase i, (c j - c a)) • prj c X j := by
   obtain ⟨Y, hY⟩ := prj_sub c X i j
   have h1 := congrArg (· * prj c X j) hY
   simp only [mul_assoc, eig_left c X h j, mul_zero, sub_mul, smul_mul_assoc, one_mul] at h1
   exact sub_eq_zero.mp h1
 
-private theorem unit_d (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j)) (i : Fin 4) :
-    IsUnit (∏ a ∈ Finset.univ.erase i, (c i - c a)) :=
+private theorem unit_d (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j)) (i : Fin 4)
+    : IsUnit (∏ a ∈ Finset.univ.erase i, (c i - c a)) :=
   IsUnit.prod_iff.mpr fun a ha => hc i a (Finset.ne_of_mem_erase ha).symm
 
-private theorem zero_d (c : Fin 4 → B) {i j : Fin 4} (hij : j ≠ i) :
-    (∏ a ∈ Finset.univ.erase i, (c j - c a)) = 0 :=
+private theorem zero_d (c : Fin 4 → B) {i j : Fin 4} (hij : j ≠ i)
+    : (∏ a ∈ Finset.univ.erase i, (c j - c a)) = 0 :=
   Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨hij, Finset.mem_univ j⟩) (sub_self _)
 
-private theorem det_eig (c : Fin 4 → B) (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) (i : Fin 4) :
-    (X - c i • (1 : M4 B)).det = 0 := by
+private theorem det_eig
+    (c : Fin 4 → B) (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) (i : Fin 4)
+    : (X - c i • (1 : M4 B)).det = 0 := by
   have h1 := Matrix.eval_charpoly X (c i)
   rw [h, eval_prod, Finset.prod_eq_zero (Finset.mem_univ i) (by simp)] at h1
   have h2 : X - c i • (1 : M4 B) = -(Matrix.scalar (Fin 4) (c i) - X) := by
     rw [neg_sub, Matrix.scalar_apply, Matrix.smul_one_eq_diagonal]
   rw [h2, Matrix.det_neg, ← h1, mul_zero]
 
-private theorem exists_unit [IsLocalRing B] (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j)) (X : M4 B)
-    (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) (i : Fin 4) : ∃ ab : Fin 4 × Fin 4, IsUnit (prj c X i ab.1 ab.2) := by
+private theorem exists_unit
+    [IsLocalRing B]
+    (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j))
+    (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j)))
+    (i : Fin 4)
+    : ∃ ab : Fin 4 × Fin 4, IsUnit (prj c X i ab.1 ab.2) := by
   by_contra hn
   push Not at hn
   obtain ⟨Y, hY⟩ := prj_sub c X i i
@@ -87,7 +102,9 @@ private theorem exists_unit [IsLocalRing B] (c : Fin 4 → B) (hc : ∀ i j, i �
   rw [Matrix.det_mul, det_eig c X h i, mul_zero] at h1
   have h2 := congrArg (residue B) h1
   set d := ∏ a ∈ Finset.univ.erase i, (c i - c a) with hd
-  have h3 : (residue B).mapMatrix (prj c X i - d • (1 : M4 B)) = Matrix.diagonal fun _ => -residue B d := by
+  have h3
+      : (residue B).mapMatrix (prj c X i - d • (1 : M4 B))
+        = Matrix.diagonal fun _ => - residue B d := by
     ext a b
     have h0 : residue B (prj c X i a b) = 0 := (residue_eq_zero_iff _).mpr (hn (a, b))
     by_cases hab : a = b
@@ -97,13 +114,18 @@ private theorem exists_unit [IsLocalRing B] (c : Fin 4 → B) (hc : ∀ i j, i �
   obtain ⟨_, -, h4⟩ := h2
   exact ((unit_d c hc i).map (residue B)).ne_zero (neg_eq_zero.mp h4)
 
-private theorem diagonalize [IsLocalRing B] (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j)) (X : M4 B)
-    (h : X.charpoly = ∏ j, (Polynomial.X - C (c j))) :
-    ∃ u : (M4 B)ˣ, (u : M4 B) * X * (u⁻¹ : (M4 B)ˣ) = Matrix.diagonal c := by
+private theorem diagonalize
+    [IsLocalRing B]
+    (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j))
+    (X : M4 B) (h : X.charpoly = ∏ j, (Polynomial.X - C (c j)))
+    : ∃ u : (M4 B)ˣ, (u : M4 B) * X * (u⁻¹ : (M4 B)ˣ) = Matrix.diagonal c := by
   choose ab hab using exists_unit c hc X h
   let P : M4 B := Matrix.of fun x j => prj c X j x (ab j).2
   let Q : M4 B := Matrix.of fun i x => prj c X i (ab i).1 x
-  have hQP : Q * P = Matrix.diagonal fun i => (∏ a ∈ Finset.univ.erase i, (c i - c a)) * prj c X i (ab i).1 (ab i).2 := by
+  have hQP
+      : Q * P
+        = Matrix.diagonal fun i =>
+          (∏ a ∈ Finset.univ.erase i, (c i - c a)) * prj c X i (ab i).1 (ab i).2 := by
     ext i j
     have h1 : (Q * P) i j = (prj c X i * prj c X j) (ab i).1 (ab j).2 := rfl
     rw [h1, prj_mul c X h]
@@ -125,8 +147,9 @@ private theorem diagonalize [IsLocalRing B] (c : Fin 4 → B) (hc : ∀ i j, i �
   refine ⟨v⁻¹, ?_⟩
   rw [inv_inv, mul_assoc, hv, hXP, ← hv, Units.inv_mul_cancel_left]
 
-private theorem prj_diag (c : Fin 4 → B) (i : Fin 4) :
-    prj c (Matrix.diagonal c) i = Matrix.diagonal fun x => ∏ a ∈ Finset.univ.erase i, (c x - c a) := by
+private theorem prj_diag (c : Fin 4 → B) (i : Fin 4)
+    : prj c (Matrix.diagonal c) i
+      = Matrix.diagonal fun x => ∏ a ∈ Finset.univ.erase i, (c x - c a) := by
   have h1 : Matrix.diagonal c = Matrix.diagonalAlgHom B c := rfl
   unfold prj
   rw [h1, aeval_algHom_apply]
@@ -137,29 +160,37 @@ private theorem prj_diag (c : Fin 4 → B) (i : Fin 4) :
   refine Finset.prod_congr rfl fun a _ => ?_
   simp
 
-private theorem sandwich (c : Fin 4 → B) (u : (M4 B)ˣ) (X Y : M4 B) (i j : Fin 4) :
-    prj c ((u : M4 B) * X * (u⁻¹ : (M4 B)ˣ)) j * ((u : M4 B) * Y * (u⁻¹ : (M4 B)ˣ)) *
-      prj c ((u : M4 B) * X * (u⁻¹ : (M4 B)ˣ)) i = (u : M4 B) * (prj c X j * Y * prj c X i) * (u⁻¹ : (M4 B)ˣ) := by
+private theorem sandwich (c : Fin 4 → B) (u : (M4 B)ˣ) (X Y : M4 B) (i j : Fin 4)
+    : prj c ((u : M4 B) * X * (u⁻¹ : (M4 B)ˣ)) j * ((u : M4 B) * Y * (u⁻¹ : (M4 B)ˣ))
+        * prj c ((u : M4 B) * X * (u⁻¹ : (M4 B)ˣ)) i
+      = (u : M4 B) * (prj c X j * Y * prj c X i) * (u⁻¹ : (M4 B)ˣ) := by
   rw [prj_conj, prj_conj]
   simp only [mul_assoc, Units.inv_mul_cancel_left]
 
-private theorem entry_zero (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j)) (u : (M4 B)ˣ) (X Y : M4 B)
-    (hu : (u : M4 B) * X * (u⁻¹ : (M4 B)ˣ) = Matrix.diagonal c) (i j : Fin 4) (h : prj c X j * Y * prj c X i = 0) :
-    ((u : M4 B) * Y * (u⁻¹ : (M4 B)ˣ)) j i = 0 := by
+private theorem entry_zero
+    (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j))
+    (u : (M4 B)ˣ) (X Y : M4 B) (hu : (u : M4 B) * X * (u⁻¹ : (M4 B)ˣ) = Matrix.diagonal c)
+    (i j : Fin 4) (h : prj c X j * Y * prj c X i = 0)
+    : ((u : M4 B) * Y * (u⁻¹ : (M4 B)ˣ)) j i = 0 := by
   have h1 := sandwich c u X Y i j
   rw [h, mul_zero, zero_mul, hu, prj_diag, prj_diag] at h1
   have h2 := congrFun (congrFun h1 j) i
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.zero_apply, (unit_d c hc i).mul_left_eq_zero,
-    (unit_d c hc j).mul_right_eq_zero] at h2
+      (unit_d c hc j).mul_right_eq_zero]
+    at h2
   exact h2
 
-private theorem row_zero (T P : M4 B) (hT : ∀ i j, j < i → T i j = 0) (hP : T * P = 0) (i : Fin 4)
-    (hu : ∀ a, i < a → IsUnit (T a a)) (b a : Fin 4) : i < a → P a b = 0 := by
+private theorem row_zero
+    (T P : M4 B) (hT : ∀ i j, j < i → T i j = 0) (hP : T * P = 0)
+    (i : Fin 4) (hu : ∀ a, i < a → IsUnit (T a a))
+    (b a : Fin 4)
+    : i < a → P a b = 0 := by
   induction a using WellFoundedGT.induction with
   | ind a ih =>
     intro ha
     have h1 := congrFun (congrFun hP a) b
-    rw [Matrix.mul_apply, Finset.sum_eq_single a, Matrix.zero_apply, (hu a ha).mul_right_eq_zero] at h1
+    rw [Matrix.mul_apply, Finset.sum_eq_single a, Matrix.zero_apply, (hu a ha).mul_right_eq_zero]
+      at h1
     · exact h1
     · intro x _ hx
       rcases lt_or_gt_of_ne hx with h | h
@@ -167,13 +198,17 @@ private theorem row_zero (T P : M4 B) (hT : ∀ i j, j < i → T i j = 0) (hP : 
       · rw [ih x h (ha.trans h), mul_zero]
     · simp
 
-private theorem col_zero (T P : M4 B) (hT : ∀ i j, j < i → T i j = 0) (hP : P * T = 0) (i : Fin 4)
-    (hu : ∀ a, a < i → IsUnit (T a a)) (b a : Fin 4) : a < i → P b a = 0 := by
+private theorem col_zero
+    (T P : M4 B) (hT : ∀ i j, j < i → T i j = 0) (hP : P * T = 0)
+    (i : Fin 4) (hu : ∀ a, a < i → IsUnit (T a a))
+    (b a : Fin 4)
+    : a < i → P b a = 0 := by
   induction a using WellFoundedLT.induction with
   | ind a ih =>
     intro ha
     have h1 := congrFun (congrFun hP b) a
-    rw [Matrix.mul_apply, Finset.sum_eq_single a, Matrix.zero_apply, (hu a ha).mul_left_eq_zero] at h1
+    rw [Matrix.mul_apply, Finset.sum_eq_single a, Matrix.zero_apply, (hu a ha).mul_left_eq_zero]
+      at h1
     · exact h1
     · intro x _ hx
       rcases lt_or_gt_of_ne hx with h | h
@@ -181,14 +216,18 @@ private theorem col_zero (T P : M4 B) (hT : ∀ i j, j < i → T i j = 0) (hP : 
       · rw [hT x a h, mul_zero]
     · simp
 
-private theorem charpoly_tri (c : Fin 4 → B) (T : M4 B) (hT : ∀ i j, j < i → T i j = 0) (hd : ∀ i, T i i = c i) :
-    T.charpoly = ∏ j, (Polynomial.X - C (c j)) := by
+private theorem charpoly_tri
+    (c : Fin 4 → B) (T : M4 B) (hT : ∀ i j, j < i → T i j = 0) (hd : ∀ i, T i i = c i)
+    : T.charpoly = ∏ j, (Polynomial.X - C (c j)) := by
   rw [Matrix.charpoly_of_upperTriangular T (fun i j h => hT i j h)]
   simp only [hd]
 
-private theorem tri_zero (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j)) (T R : M4 B)
-    (hT : ∀ i j, j < i → T i j = 0) (hd : ∀ i, T i i = c i) (hR : ∀ i j, j < i → R i j = 0) (i j : Fin 4) (hij : i ≤ j)
-    (h0 : R j i = 0) : prj c T j * R * prj c T i = 0 := by
+private theorem tri_zero
+    (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c i - c j))
+    (T R : M4 B)
+    (hT : ∀ i j, j < i → T i j = 0) (hd : ∀ i, T i i = c i) (hR : ∀ i j, j < i → R i j = 0)
+    (i j : Fin 4) (hij : i ≤ j) (h0 : R j i = 0)
+    : prj c T j * R * prj c T i = 0 := by
   have hch := charpoly_tri c T hT hd
   have hT' : ∀ k i j, j < i → (T - c k • (1 : M4 B)) i j = 0 := fun k i j h => by
     simp [hT i j h, Matrix.one_apply_ne h.ne']
@@ -211,18 +250,26 @@ private theorem tri_zero (c : Fin 4 → B) (hc : ∀ i j, i ≠ j → IsUnit (c 
         have e2 : y = i := le_antisymm hy (hij.trans (hx.trans hxy))
         rw [e1, e2, h0, mul_zero]
 
-private theorem conj_sub (u : (M4 B)ˣ) (Y : M4 B) (a : B) :
-    (u : M4 B) * (Y - a • (1 : M4 B)) * (u⁻¹ : (M4 B)ˣ) = (u : M4 B) * Y * (u⁻¹ : (M4 B)ˣ) - a • (1 : M4 B) := by
+private theorem conj_sub (u : (M4 B)ˣ) (Y : M4 B) (a : B)
+    : (u : M4 B) * (Y - a • (1 : M4 B)) * (u⁻¹ : (M4 B)ˣ)
+      = (u : M4 B) * Y * (u⁻¹ : (M4 B)ˣ) - a • (1 : M4 B) := by
   rw [mul_sub, sub_mul, mul_smul_comm, smul_mul_assoc, mul_one, Units.mul_inv]
 
-private theorem conj_zero (u : (M4 B)ˣ) (Y : M4 B) (h : (u : M4 B) * Y * (u⁻¹ : (M4 B)ˣ) = 0) : Y = 0 := by
+private theorem conj_zero (u : (M4 B)ˣ) (Y : M4 B) (h : (u : M4 B) * Y * (u⁻¹ : (M4 B)ˣ) = 0)
+    : Y = 0 := by
   rwa [Units.mul_left_eq_zero, Units.mul_right_eq_zero] at h
 
 end UpperTheory.V.GradeZeroInterpolatingElement.OrdinaryLocal
 
 open UpperTheory.V.GradeZeroInterpolatingElement.OrdinaryLocal in
-theorem UpperTheory.V.GradeZeroInterpolatingElement.ordLocal :
-    ∀ {H : Type} [Group H] (I : Subgroup H) (B : Type) [CommRing B] [IsLocalRing B] (ps : Fin 4 → H → B) (s₀ : H) (r : H →* M4 B), s₀ ∈ I → (∀ i j, i ≠ j → IsUnit (ps i s₀ - ps j s₀)) → (Ord I ps s₀ r ↔ ∃ u : (M4 B)ˣ, (∀ g i j, j < i → ((u : M4 B) * r g * (u⁻¹ : (M4 B)ˣ)) i j = 0) ∧ ∀ s ∈ I, ∀ i, ((u : M4 B) * r s * (u⁻¹ : (M4 B)ˣ)) i i = ps i s) := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.ordLocal
+    : ∀ {H : Type} [Group H] (I : Subgroup H) (B : Type) [CommRing B] [IsLocalRing B]
+        (ps : Fin 4 → H → B) (s₀ : H) (r : H →* M4 B),
+      s₀ ∈ I → (∀ i j, i ≠ j → IsUnit (ps i s₀ - ps j s₀))
+        → (Ord I ps s₀ r
+          ↔ ∃ u : (M4 B)ˣ,
+            (∀ g i j, j < i → ((u : M4 B) * r g * (u⁻¹ : (M4 B)ˣ)) i j = 0)
+              ∧ ∀ s ∈ I, ∀ i, ((u : M4 B) * r s * (u⁻¹ : (M4 B)ˣ)) i i = ps i s) := by
   intro H _ I B _ _ ps s₀ r hs₀ hc
   constructor
   · intro h

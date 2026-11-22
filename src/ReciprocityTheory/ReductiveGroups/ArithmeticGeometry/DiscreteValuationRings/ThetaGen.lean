@@ -10,7 +10,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,12 +19,17 @@ namespace ReciprocityTheory.ChartRestriction.G.DVR
 
 open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out IsLocalRing
 
-def SecIsMul {R : Type} [CommRing R] {Y : Scheme.{0}} (p : Y ⟶ Spec (CommRingCat.of R)) {L : LB Y} (a : R)
-    (σ τ : LB.Sec L) : Prop :=
+def SecIsMul
+    {R : Type} [CommRing R]
+    {Y : Scheme.{0}} (p : Y ⟶ Spec (CommRingCat.of R))
+    {L : LB Y}
+    (a : R) (σ τ : LB.Sec L)
+    : Prop :=
   ∀ j, σ.f j = resTop _ (scal p a) * τ.f j
 
-variable {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R] {I : Ideal R}
-  {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+variable
+  {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R]
+  {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
   {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
 
 def SecBGenerates (k : ℕ) (α : D.toPre.X) (s : D.toPre.SecB k α) : Prop :=

@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianLatt
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix GlobalTheory.St.G
+open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix
+  GlobalTheory.St.G
 open scoped TensorProduct
 
 namespace GlobalTheory.St.G.FunFix
@@ -21,30 +22,34 @@ section Abstract
 
 variable {A : Type} [CommRing A] {k : ℕ} (τ : A →+* A) (J : Matrix (Fin k) (Fin k) A)
 
-theorem hform_sub_left (x x' y : Fin k → A) : hform τ J (x - x') y = hform τ J x y - hform τ J x' y := by
+theorem hform_sub_left (x x' y : Fin k → A)
+    : hform τ J (x - x') y = hform τ J x y - hform τ J x' y := by
   simp only [hform, Pi.sub_apply, map_sub, sub_mul, Finset.sum_sub_distrib]
 
-theorem hform_sub_right (x y y' : Fin k → A) : hform τ J x (y - y') = hform τ J x y - hform τ J x y' := by
+theorem hform_sub_right (x y y' : Fin k → A)
+    : hform τ J x (y - y') = hform τ J x y - hform τ J x y' := by
   simp only [hform, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
-theorem hform_smul_swap (c : A) (x y : Fin k → A) : hform τ J x (τ c • y) = hform τ J (c • x) y := by
+theorem hform_smul_swap (c : A) (x y : Fin k → A)
+    : hform τ J x (τ c • y) = hform τ J (c • x) y := by
   simp only [hform, Pi.smul_apply, smul_eq_mul, map_mul]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hform_unitary {g : GL (Fin k) A} (hg : g ∈ UJ τ J) (x y : Fin k → A) :
-    hform τ J (g.1 *ᵥ x) (g.1 *ᵥ y) = hform τ J x y := by
+theorem hform_unitary {g : GL (Fin k) A} (hg : g ∈ UJ τ J) (x y : Fin k → A)
+    : hform τ J (g.1 *ᵥ x) (g.1 *ᵥ y) = hform τ J x y := by
   have h : cT τ g.1 * J * g.1 = J := hg
   rw [GlobalTheory.DualFrame.hform_mulVec, mulVec_mulVec, h, GlobalTheory.DualFrame.hform_eq_dot]
 
-theorem hform_move {g : GL (Fin k) A} (hg : g ∈ UJ τ J) (x y : Fin k → A) :
-    hform τ J x (g.1 *ᵥ y) = hform τ J ((g⁻¹).1 *ᵥ x) y := by
+theorem hform_move {g : GL (Fin k) A} (hg : g ∈ UJ τ J) (x y : Fin k → A)
+    : hform τ J x (g.1 *ᵥ y) = hform τ J ((g⁻¹).1 *ᵥ x) y := by
   rw [← hform_unitary τ J hg ((g⁻¹).1 *ᵥ x) y, mulVec_mulVec, Units.mul_inv, one_mulVec]
 
 variable {τ J} {O : Subring A} {L D : Submodule O (Fin k → A)}
 
-theorem stab_dual (hD : ∀ y, y ∈ D ↔ ∀ x ∈ L, hform τ J x y ∈ O) {g : GL (Fin k) A}
-    (hg : g ∈ level τ J L) : g ∈ stabGL D := by
+theorem stab_dual
+    (hD : ∀ y, y ∈ D ↔ ∀ x ∈ L, hform τ J x y ∈ O) {g : GL (Fin k) A} (hg : g ∈ level τ J L)
+    : g ∈ stabGL D := by
   obtain ⟨hu, hs⟩ := hg
   intro y
   rw [hD, hD]
@@ -56,14 +61,15 @@ theorem stab_dual (hD : ∀ y, y ∈ D ↔ ∀ x ∈ L, hform τ J x y ∈ O) {g
     rw [← hform_unitary τ J hu]
     exact h _ ((hs x).1 hx)
 
-theorem triv_iff_stabFun (hD : ∀ y, y ∈ D ↔ ∀ x ∈ L, hform τ J x y ∈ O)
-    (hL : ∀ y, y ∈ L ↔ ∀ x ∈ D, hform τ J x y ∈ O)
-    {M : Type} [AddCommGroup M] [Module O M] (f : D →ₗ[O] M) (hf0 : f ≠ 0)
-    (hfL : ∀ x : D, x.1 ∈ L → f x = 0) (e : O) (hτe : τ e = 1 - e) (hact : ∀ m : M, e • m = m)
+theorem triv_iff_stabFun
+    (hD : ∀ y, y ∈ D ↔ ∀ x ∈ L, hform τ J x y ∈ O) (hL : ∀ y, y ∈ L ↔ ∀ x ∈ D, hform τ J x y ∈ O)
+    {M : Type} [AddCommGroup M] [Module O M]
+    (f : D →ₗ[O] M) (hf0 : f ≠ 0) (hfL : ∀ x : D, x.1 ∈ L → f x = 0)
+    (e : O) (hτe : τ e = 1 - e) (hact : ∀ m : M, e • m = m)
     (hfield : ∀ a : O, (∃ b : O, b * a * e = e) ∨ ∀ x ∈ D, (e * a) • x ∈ L)
     (d : Fin k → A) (hd : d ∈ D) (hgen : ∀ x ∈ D, ∃ a ∈ O, x - a • d ∈ L)
-    {g : GL (Fin k) A} (hg : g ∈ level τ J L) :
-    (∀ x ∈ D, (g.1 - 1) *ᵥ x ∈ L) ↔ g ∈ stabFun D f := by
+    {g : GL (Fin k) A} (hg : g ∈ level τ J L)
+    : (∀ x ∈ D, (g.1 - 1) *ᵥ x ∈ L) ↔ g ∈ stabFun D f := by
   have hgD := stab_dual hD hg
   have hval : ∀ (x : D) (a : O), x.1 - a.1 • d ∈ L → f x = a • f ⟨d, hd⟩ := by
     intro x a h
@@ -106,7 +112,8 @@ theorem triv_iff_stabFun (hD : ∀ y, y ∈ D ↔ ∀ x ∈ L, hform τ J x y �
     have h2 : τ e • (g.1 *ᵥ x - x) ∈ L := by
       rw [hL]
       intro z hz
-      rw [hform_smul_swap, hform_sub_right, hform_move τ J hg.1, ← hform_sub_left, mulVec_smul, ← smul_sub]
+      rw [hform_smul_swap, hform_sub_right, hform_move τ J hg.1, ← hform_sub_left, mulVec_smul,
+        ← smul_sub]
       exact (hD x).1 hx _ (hhalf g⁻¹ ((stabFun D f).inv_mem h) z hz)
     have h3 := L.add_mem h1 h2
     have h4 : e • (g.1 *ᵥ x - x) + τ e • (g.1 *ᵥ x - x) = g.1 *ᵥ x - x := by
@@ -114,11 +121,16 @@ theorem triv_iff_stabFun (hD : ∀ y, y ∈ D ↔ ∀ x ∈ L, hform τ J x y �
       exact add_sub_cancel _ _
     rwa [h4] at h3
 
-theorem idem_act {R : Type} [Ring R] {G : Type} [AddCommGroup G] [Module R G] {p : ℕ} (hp : p.Prime)
-    (hG : Nat.card G = p) {e : R} (he : e * e = e) : (∀ y : G, e • y = 0) ∨ (∀ y : G, e • y = y) := by
+theorem idem_act
+    {R : Type} [Ring R]
+    {G : Type} [AddCommGroup G] [Module R G]
+    {p : ℕ} (hp : p.Prime) (hG : Nat.card G = p)
+    {e : R} (he : e * e = e)
+    : (∀ y : G, e • y = 0) ∨ (∀ y : G, e • y = y) := by
   have : Fact p.Prime := ⟨hp⟩
   have := isSimpleAddGroup_of_prime_card hG
-  rcases IsSimpleAddGroup.eq_bot_or_eq_top_of_normal (DistribSMul.toAddMonoidHom G e).range inferInstance
+  rcases IsSimpleAddGroup.eq_bot_or_eq_top_of_normal (DistribSMul.toAddMonoidHom G e).range
+      inferInstance
     with h | h
   · left
     intro y
@@ -131,10 +143,13 @@ theorem idem_act {R : Type} [Ring R] {G : Type} [AddCommGroup G] [Module R G] {p
     show e • e • z = e • z
     rw [smul_smul, he]
 
-theorem unit_or_dvd {K : Type} [Field K] (V : ValuationSubring K) (T : ℕ)
-    (hmax : IsLocalRing.maximalIdeal V = Ideal.span {(T : V)}) (sp : A ≃+* K × K)
-    (hint : ∀ x, x ∈ O ↔ (sp x).1 ∈ V ∧ (sp x).2 ∈ V) (e : O) (he : sp e = (1, 0)) (a : O) :
-    (∃ b : O, b * a * e = e) ∨ ∃ c : O, e * a = c * T := by
+theorem unit_or_dvd
+    {K : Type} [Field K]
+    (V : ValuationSubring K) (T : ℕ) (hmax : IsLocalRing.maximalIdeal V = Ideal.span {(T : V)})
+    (sp : A ≃+* K × K) (hint : ∀ x, x ∈ O ↔ (sp x).1 ∈ V ∧ (sp x).2 ∈ V)
+    (e : O) (he : sp e = (1, 0))
+    (a : O)
+    : (∃ b : O, b * a * e = e) ∨ ∃ c : O, e * a = c * T := by
   have ha := ((hint a).1 a.2).1
   have hm : ∀ c : V, sp.symm (c, 0) ∈ O := fun c => by
     rw [hint, sp.apply_symm_apply]; exact ⟨c.2, zero_mem _⟩
@@ -150,7 +165,8 @@ theorem unit_or_dvd {K : Type} [Field K] (V : ValuationSubring K) (T : ℕ)
     obtain ⟨c, hc⟩ := h1
     have hc' : (c : K) * T = (sp a).1 := by simpa using congrArg Subtype.val hc
     refine Or.inr ⟨⟨_, hm c⟩, Subtype.ext (sp.injective ?_)⟩
-    rw [Subring.coe_mul, Subring.coe_mul, Subring.coe_natCast, map_mul, map_mul, sp.apply_symm_apply, he, map_natCast]
+    rw [Subring.coe_mul, Subring.coe_mul, Subring.coe_natCast, map_mul, map_mul,
+      sp.apply_symm_apply, he, map_natCast]
     ext <;> simp [hc']
 
 end Abstract
@@ -159,19 +175,22 @@ section Local
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-theorem sigR_mem (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) :
-    ∀ a ∈ intV E v, sigR σ (v.adicCompletion F) a ∈ intV E v := by
+theorem sigR_mem (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F))
+    : ∀ a ∈ intV E v, sigR σ (v.adicCompletion F) a ∈ intV E v := by
   have : intV E v ≤ (intV E v).comap (sigR σ (v.adicCompletion F)) := by
     refine Subring.closure_le.2 ?_
     rintro _ (⟨⟨_, a, rfl⟩, rfl⟩ | ⟨a, rfl⟩)
-    · exact Subring.subset_closure (Or.inl ⟨⟨_, (⟨σ a, (a.isIntegral_coe).map (σ.restrictScalars ℤ)⟩ : 𝓞 E), rfl⟩, rfl⟩)
+    · exact Subring.subset_closure (Or.inl
+        ⟨⟨_, (⟨σ a, (a.isIntegral_coe).map (σ.restrictScalars ℤ)⟩ : 𝓞 E), rfl⟩, rfl⟩)
     · show (σ 1) ⊗ₜ[F] (a : v.adicCompletion F) ∈ intV E v
       rw [map_one]
       exact Subring.subset_closure (Or.inr ⟨a, rfl⟩)
   exact this
 
-theorem nsmul_mem_loc (v : HeightOneSpectrum (𝓞 F)) (T : ℕ) (L L' : Submodule (𝓞 E) (Fin n → E))
-    (h : ∀ x ∈ L', (T : E) • x ∈ L) : ∀ x ∈ loc v L', (T : intV E v) • x ∈ loc v L := by
+theorem nsmul_mem_loc
+    (v : HeightOneSpectrum (𝓞 F))
+    (T : ℕ) (L L' : Submodule (𝓞 E) (Fin n → E)) (h : ∀ x ∈ L', (T : E) • x ∈ L)
+    : ∀ x ∈ loc v L', (T : intV E v) • x ∈ loc v L := by
   intro x hx
   induction hx using Submodule.span_induction with
   | mem x hx =>
@@ -185,30 +204,55 @@ theorem nsmul_mem_loc (v : HeightOneSpectrum (𝓞 F)) (T : ℕ) (L L' : Submodu
 
 end Local
 
-theorem trivial_iff_mem_Uloc : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (cm : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHerm (cm.sig : E →+* E) J → J.det ≠ 0 → ∀ (T f : ℕ) (bad : Set (HeightOneSpectrum (𝓞 F))) (S : StepLevel F E cm.sig J T f bad), T.Prime → SplitsIn E T → Module.finrank ℚ E = 2 * f → ∀ (v : HeightOneSpectrum (𝓞 F)), (T : 𝓞 F) ∈ v.asIdeal → ∀ y ∈ levelVL cm.sig J v S.Lb, (∀ x ∈ loc v (dualL cm.sig J S.Lb), (y.1 - 1) *ᵥ x ∈ loc v S.Lb) ↔ y ∈ S.Uloc v := by
+theorem trivial_iff_mem_Uloc
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+        (cm : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
+      IsHerm (cm.sig : E →+* E) J → J.det ≠ 0
+        → ∀ (T f : ℕ) (bad : Set (HeightOneSpectrum (𝓞 F))) (S : StepLevel F E cm.sig J T f bad),
+          T.Prime → SplitsIn E T → Module.finrank ℚ E = 2 * f
+            → ∀ (v : HeightOneSpectrum (𝓞 F)),
+              (T : 𝓞 F) ∈ v.asIdeal
+                → ∀ y ∈ levelVL cm.sig J v S.Lb,
+                  (∀ x ∈ loc v (dualL cm.sig J S.Lb), (y.1 - 1) *ᵥ x ∈ loc v S.Lb)
+                    ↔ y ∈ S.Uloc v := by
   intro F E _ _ _ _ _ _ cm n J hJ hdet T f bad S hT hsp hdeg v hv y hy
-  obtain ⟨-, d, hd, hgen⟩ := GlobalTheory.T.hermitianLattice_level_local_dual_quotient_length_one F E cm n J hJ hdet T f S.Lb hT hsp hdeg
-    (stepLevel_tLat F E n cm.sig J T f bad S) v hv
-  obtain ⟨-, hmax, sp, hsig, hdiag⟩ := (GlobalTheory.T.cmField_splitCompletely_place_structure F E cm T hT hsp).2 v hv
-  have hint : ∀ x, x ∈ intV E v ↔
-      (sp x).1 ∈ v.adicCompletionIntegers F ∧ (sp x).2 ∈ v.adicCompletionIntegers F :=
+  obtain ⟨-, d, hd, hgen⟩ :=
+    GlobalTheory.T.hermitianLattice_level_local_dual_quotient_length_one F E cm n J hJ hdet T f S.Lb
+      hT hsp hdeg (stepLevel_tLat F E n cm.sig J T f bad S) v hv
+  obtain ⟨-, hmax, sp, hsig, hdiag⟩ :=
+    (GlobalTheory.T.cmField_splitCompletely_place_structure F E cm T hT hsp).2 v hv
+  have hint
+      : ∀ x,
+        x ∈ intV E v
+          ↔ (sp x).1 ∈ v.adicCompletionIntegers F ∧ (sp x).2 ∈ v.adicCompletionIntegers F :=
     split_integral_local F E v sp hdiag
-  obtain ⟨B, C, hBC, hB, hC⟩ := GlobalTheory.DualFrame.exists_dual_frames F E cm.sig n J (isUnit_iff_ne_zero.2 hdet) S.Lb
-    S.Lb_fin S.Lb_span v
-  obtain ⟨hD, hL, -⟩ := GlobalTheory.DualFrames.dual_of_dual_frames _ (intV E v) (sigR cm.sig (v.adicCompletion F))
-    (fun a => sp.injective (by rw [hsig, hsig]; rfl)) (sigR_mem _ v) n _
-    (by ext i j; exact congrArg (inclE (F := F) (v.adicCompletion F)) (congrFun (congrFun hJ i) j))
-    B C _ _ hBC hB hC
-  have hTD := nsmul_mem_loc v T S.Lb (dualL cm.sig J S.Lb)
-    fun x hx => S.Lb_dual x (GlobalTheory.DualFrame.mem_dualSet_of_mem_span _ _ _ hx)
-  have key : ∀ (sp' : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F),
-      (∀ x, x ∈ intV E v ↔
-        (sp' x).1 ∈ v.adicCompletionIntegers F ∧ (sp' x).2 ∈ v.adicCompletionIntegers F) →
-      ∀ e : intV E v, sp' e = (1, 0) → sigR cm.sig (v.adicCompletion F) e = 1 - e →
-      (∀ m : S.fM v hv, e • m = m) →
-      ((∀ x ∈ loc v (dualL cm.sig J S.Lb), (y.1 - 1) *ᵥ x ∈ loc v S.Lb) ↔ y ∈ stabFun _ (S.fT v hv)) := by
+  obtain ⟨B, C, hBC, hB, hC⟩ :=
+    GlobalTheory.DualFrame.exists_dual_frames F E cm.sig n J (isUnit_iff_ne_zero.2 hdet) S.Lb
+      S.Lb_fin S.Lb_span v
+  obtain ⟨hD, hL, -⟩ :=
+    GlobalTheory.DualFrames.dual_of_dual_frames _ (intV E v) (sigR cm.sig (v.adicCompletion F))
+      (fun a => sp.injective (by rw [hsig, hsig]; rfl))
+      (sigR_mem _ v) n _
+      (by
+        ext i j; exact congrArg (inclE (F := F) (v.adicCompletion F)) (congrFun (congrFun hJ i) j))
+      B C _ _ hBC hB hC
+  have hTD :=
+    nsmul_mem_loc v T S.Lb (dualL cm.sig J S.Lb) fun x hx =>
+      S.Lb_dual x (GlobalTheory.DualFrame.mem_dualSet_of_mem_span _ _ _ hx)
+  have key
+      : ∀ (sp' : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F),
+        (∀ x,
+            x ∈ intV E v
+              ↔ (sp' x).1 ∈ v.adicCompletionIntegers F ∧ (sp' x).2 ∈ v.adicCompletionIntegers F)
+          → ∀ e : intV E v,
+            sp' e = (1, 0) → sigR cm.sig (v.adicCompletion F) e = 1 - e
+              → (∀ m : S.fM v hv, e • m = m)
+              → ((∀ x ∈ loc v (dualL cm.sig J S.Lb), (y.1 - 1) *ᵥ x ∈ loc v S.Lb)
+                ↔ y ∈ stabFun _ (S.fT v hv)) := by
     intro sp' hint' e he hτe hact
-    refine triv_iff_stabFun hD hL (S.fT v hv) (S.fT_ne v hv) (S.fT_L v hv) e hτe hact (fun a => ?_) d hd hgen hy
+    refine triv_iff_stabFun hD hL (S.fT v hv) (S.fT_ne v hv) (S.fT_L v hv) e hτe hact
+      (fun a => ?_)
+      d hd hgen hy
     refine (unit_or_dvd _ T hmax sp' hint' e he a).imp id ?_
     rintro ⟨c, hc⟩ x hx
     rw [hc, mul_smul]
@@ -226,7 +270,10 @@ theorem trivial_iff_mem_Uloc : ∀ (F E : Type) [Field F] [NumberField F] [Field
     simp
   rw [S.UlocAlt v hv, Subgroup.mem_inf, and_iff_right hy]
   rcases idem_act hT (S.fM_card v hv) hee with h0 | h1
-  · refine key (sp.trans RingEquiv.prodComm) (fun x => (hint x).trans and_comm) (1 - ⟨_, he⟩) ?_ ?_ fun m => ?_
+  · refine key (sp.trans RingEquiv.prodComm)
+      (fun x => (hint x).trans and_comm)
+      (1 - ⟨_, he⟩) ?_ ?_
+      fun m => ?_
     · change RingEquiv.prodComm (sp (1 - sp.symm (1, 0))) = _
       rw [map_sub sp, map_one, sp.apply_symm_apply]
       ext <;> simp

@@ -7,20 +7,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-private theorem val_int {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) {r : 𝓞 E} (hr : r ≠ 0) :
-    v.valuation E (algebraMap (𝓞 E) E r) = WithZero.exp (-FractionalIdeal.count E v
-      (FractionalIdeal.spanSingleton (𝓞 E)⁰ (algebraMap (𝓞 E) E r))) := by
+private theorem val_int
+    {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) {r : 𝓞 E} (hr : r ≠ 0)
+    : v.valuation E (algebraMap (𝓞 E) E r)
+      = WithZero.exp (- FractionalIdeal.count E v
+        (FractionalIdeal.spanSingleton (𝓞 E)⁰ (algebraMap (𝓞 E) E r))) := by
   classical
   have hr' : algebraMap (𝓞 E) E r ≠ 0 :=
     (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).mpr hr
   have hI : FractionalIdeal.spanSingleton (𝓞 E)⁰ (algebraMap (𝓞 E) E r) ≠ 0 := by
     rw [Ne, FractionalIdeal.spanSingleton_eq_zero_iff]
     exact hr'
-  have h : FractionalIdeal.spanSingleton (𝓞 E)⁰ (algebraMap (𝓞 E) E r) =
-      FractionalIdeal.spanSingleton (𝓞 E)⁰ ((algebraMap (𝓞 E) E 1)⁻¹) * ↑(Ideal.span {r}) := by
+  have h
+      : FractionalIdeal.spanSingleton (𝓞 E)⁰ (algebraMap (𝓞 E) E r)
+        = FractionalIdeal.spanSingleton (𝓞 E)⁰ ((algebraMap (𝓞 E) E 1)⁻¹) * ↑(Ideal.span {r}) := by
     rw [map_one, inv_one, FractionalIdeal.spanSingleton_one, one_mul,
       FractionalIdeal.coeIdeal_span_singleton]
   rw [FractionalIdeal.count_well_defined E v hI h, HeightOneSpectrum.valuation_of_algebraMap,
@@ -28,9 +33,10 @@ private theorem val_int {E : Type} [Field E] [NumberField E] (v : HeightOneSpect
     Associates.factors_one, Associates.count_zero v.associates_irreducible]
   simp
 
-private theorem val_count {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) {α : E} (hα : α ≠ 0) :
-    v.valuation E α = WithZero.exp (-FractionalIdeal.count E v
-      (FractionalIdeal.spanSingleton (𝓞 E)⁰ α)) := by
+private theorem val_count
+    {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) {α : E} (hα : α ≠ 0)
+    : v.valuation E α
+      = WithZero.exp (- FractionalIdeal.count E v (FractionalIdeal.spanSingleton (𝓞 E)⁰ α)) := by
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (𝓞 E) α
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   have ha0 : a ≠ 0 := by
@@ -46,26 +52,35 @@ private theorem val_count {E : Type} [Field E] [NumberField E] (v : HeightOneSpe
   have hIb : (FractionalIdeal.spanSingleton (𝓞 E)⁰ (algebraMap (𝓞 E) E b))⁻¹ ≠ 0 := by
     rw [Ne, inv_eq_zero, FractionalIdeal.spanSingleton_eq_zero_iff]
     exact hb'
-  rw [div_eq_mul_inv, ← FractionalIdeal.spanSingleton_mul_spanSingleton, ← FractionalIdeal.spanSingleton_inv,
-    FractionalIdeal.count_mul E v hIa hIb, FractionalIdeal.count_inv, map_mul, map_inv₀,
-    val_int v ha0, val_int v hb0, neg_add, neg_neg, WithZero.exp_add]
+  rw [div_eq_mul_inv, ← FractionalIdeal.spanSingleton_mul_spanSingleton,
+    ← FractionalIdeal.spanSingleton_inv, FractionalIdeal.count_mul E v hIa hIb,
+    FractionalIdeal.count_inv, map_mul, map_inv₀, val_int v ha0, val_int v hb0, neg_add, neg_neg,
+    WithZero.exp_add]
   rw [← WithZero.exp_neg, neg_neg]
 
-private theorem count_fam {E ι : Type} [Field E] [NumberField E] [Fintype ι]
-    (P : ι → HeightOneSpectrum (𝓞 E)) (hP : Function.Injective P) (k : ι → ℤ) (t : ι) :
-    FractionalIdeal.count E (P t) (∏ s, (((P s).asIdeal : FractionalIdeal (𝓞 E)⁰ E)) ^ k s) = k t := by
+private theorem count_fam
+    {E ι : Type} [Field E] [NumberField E] [Fintype ι]
+    (P : ι → HeightOneSpectrum (𝓞 E)) (hP : Function.Injective P)
+    (k : ι → ℤ) (t : ι)
+    : FractionalIdeal.count E (P t) (∏ s, (((P s).asIdeal : FractionalIdeal (𝓞 E)⁰ E)) ^ k s)
+      = k t := by
   classical
   rw [FractionalIdeal.count_prod E (P t) _ _ fun s _ =>
     zpow_ne_zero _ (FractionalIdeal.coeIdeal_ne_zero.2 (P s).ne_bot)]
   rw [Finset.sum_eq_single t]
   · exact FractionalIdeal.count_zpow_self E (P t) _
   · intro s _ hs
-    rw [FractionalIdeal.count_zpow, FractionalIdeal.count_maximal_coprime E (P t) fun h => hs (hP h), mul_zero]
+    rw [FractionalIdeal.count_zpow,
+      FractionalIdeal.count_maximal_coprime E (P t) fun h => hs (hP h), mul_zero]
   · intro h
     exact absurd (Finset.mem_univ t) h
 
-theorem UpperTheory.valuation_kummerElement_at_conjugate_prime :
-    ∀ (M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K] (b r : ℕ) (v w : HeightOneSpectrum (𝓞 K)) (X : K) (t : (ZMod M)ˣ), r.Prime → r ≡ 1 [MOD M] → IsX M K b v.asIdeal X → (r : 𝓞 K) ∈ v.asIdeal → w.asIdeal = conjI M K v.asIdeal t → w.valuation K X = w.valuation K (r : K) ^ th M b t := by
+theorem UpperTheory.valuation_kummerElement_at_conjugate_prime
+    : ∀ (M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K]
+        (b r : ℕ) (v w : HeightOneSpectrum (𝓞 K)) (X : K) (t : (ZMod M)ˣ),
+      r.Prime → r ≡ 1 [MOD M] → IsX M K b v.asIdeal X → (r : 𝓞 K) ∈ v.asIdeal
+        → w.asIdeal = conjI M K v.asIdeal t
+        → w.valuation K X = w.valuation K (r : K) ^ th M b t := by
   intro M _ K _ _ _ b r v w X t hr hr1 hX hrv hw
   haveI : Fact r.Prime := ⟨hr⟩
   have hndvd : ¬ r ∣ M := by
@@ -110,11 +125,14 @@ theorem UpperTheory.valuation_kummerElement_at_conjugate_prime :
   have hrK : (r : K) = algebraMap (𝓞 K) K (r : 𝓞 K) := by simp
   rw [val_count (fam t) hX0, hX.2, hrK, val_int (fam t) hr0,
     ← FractionalIdeal.coeIdeal_span_singleton, ← hprod]
-  have hcoe : ((∏ s, conjI M K v.asIdeal s : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K) =
-      ∏ s, (((fam s).asIdeal : FractionalIdeal (𝓞 K)⁰ K)) ^ ((fun _ => (1 : ℤ)) s) := by
+  have hcoe
+      : ((∏ s, conjI M K v.asIdeal s : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K)
+        = ∏ s, (((fam s).asIdeal : FractionalIdeal (𝓞 K)⁰ K)) ^ ((fun _ => (1 : ℤ)) s) := by
     simp only [zpow_one]
     exact map_prod (FractionalIdeal.coeIdealHom (𝓞 K)⁰ K) _ _
-  have hX2 : (∏ s, ((conjI M K v.asIdeal s : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K) ^ th M b (s : ZMod M)) =
-      ∏ s, (((fam s).asIdeal : FractionalIdeal (𝓞 K)⁰ K)) ^ ((fun s : (ZMod M)ˣ => th M b (s : ZMod M)) s) := rfl
+  have hX2
+      : (∏ s, ((conjI M K v.asIdeal s : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K) ^ th M b (s : ZMod M))
+        = ∏ s, (((fam s).asIdeal : FractionalIdeal (𝓞 K)⁰ K)) ^ ((fun s : (ZMod M)ˣ => th M b (s : ZMod M)) s) :=
+    rfl
   rw [hcoe, hX2, count_fam fam hfam, count_fam fam hfam, ← WithZero.exp_zsmul]
   simp

@@ -25,9 +25,9 @@ theorem norm_coeffB_toB_le_one (z : 𝔸) (n : ℤ) : ‖(teichLift K p).coeffB 
   rw [TeichLift.coeffB_eq _ h]
   exact norm_zcoeff_incl_le_one x _
 
-theorem exists_gn_eq_monomial {z : 𝔸} (hz : z ≠ 0) {r₀ : ℝ} (hr0 : 0 < r₀) (hr1 : r₀ < 1) :
-    ∃ (β : ℝ) (i : ℤ) (ρ₃ : ℝ), 0 < β ∧ r₀ < ρ₃ ∧ ρ₃ < 1 ∧
-      ∀ ρ ∈ Set.Icc r₀ ρ₃, gn K p ρ z = β * ρ ^ i := by
+theorem exists_gn_eq_monomial {z : 𝔸} (hz : z ≠ 0) {r₀ : ℝ} (hr0 : 0 < r₀) (hr1 : r₀ < 1)
+    : ∃ (β : ℝ) (i : ℤ) (ρ₃ : ℝ),
+      0 < β ∧ r₀ < ρ₃ ∧ ρ₃ < 1 ∧ ∀ ρ ∈ Set.Icc r₀ ρ₃, gn K p ρ z = β * ρ ^ i := by
   set a := (teichLift K p).coeffB (toB K p z) with ha_def
   have hconv : ∀ ρ, 0 < ρ → ρ < 1 → ConvergesAt a ρ := fun ρ h0 h1 => convergesAt_toB z h0 h1
   have ha0 : a ≠ 0 := by
@@ -57,8 +57,15 @@ theorem exists_gn_eq_monomial {z : 𝔸} (hz : z ≠ 0) {r₀ : ℝ} (hr0 : 0 < 
     filter_upwards [hc.eventually (lt_mem_nhds (sub_pos.2 hlt))] with ρ hρ
     exact sub_pos.1 hρ
   obtain ⟨δ, hδ, hδf⟩ := Metric.eventually_nhds_iff.1 hev
-  refine ⟨β, i, min (r₀ + δ / 2) ρt, hβ, lt_min (by linarith) (by linarith),
-    (min_le_right _ _).trans_lt hρt1, fun ρ hρ => ?_⟩
+  refine ⟨
+    β,
+    i,
+    min (r₀ + δ / 2) ρt,
+    hβ,
+    lt_min (by linarith) (by linarith),
+    (min_le_right _ _).trans_lt hρt1,
+    fun ρ hρ => ?_
+  ⟩
   have hρ0 : 0 < ρ := hr0.trans_le hρ.1
   have hρ1 : ρ < 1 := hρ.2.trans_lt ((min_le_right _ _).trans_lt hρt1)
   have hρt' : ρ ≤ ρt := hρ.2.trans (min_le_right _ _)
@@ -70,8 +77,7 @@ theorem exists_gn_eq_monomial {z : 𝔸} (hz : z ≠ 0) {r₀ : ℝ} (hr0 : 0 < 
   rw [← ha_def]
   refine le_antisymm (gaussNorm_le fun n => ?_) ((hconv ρ hρ0 hρ1).le_gaussNorm i)
   rcases le_or_gt n i with hni | hni
-  ·
-    have h1 : ‖a n‖ * r₀ ^ n ≤ β * r₀ ^ i := hG ▸ (hconv r₀ hr0 hr1).le_gaussNorm n
+  · have h1 : ‖a n‖ * r₀ ^ n ≤ β * r₀ ^ i := hG ▸ (hconv r₀ hr0 hr1).le_gaussNorm n
     have hq : 1 ≤ ρ / r₀ := (one_le_div hr0).2 hρ.1
     have h2 : (ρ / r₀) ^ n ≤ (ρ / r₀) ^ i := zpow_le_zpow_right₀ hq hni
     have e1 : ‖a n‖ * ρ ^ n = (‖a n‖ * r₀ ^ n) * (ρ / r₀) ^ n := by
@@ -83,16 +89,15 @@ theorem exists_gn_eq_monomial {z : 𝔸} (hz : z ≠ 0) {r₀ : ℝ} (hr0 : 0 < 
       (mul_nonneg hβ.le (zpow_nonneg hr0.le i))
   · rcases le_or_gt n (i + L) with hnL | hnL
     · exact (hnear n (Finset.mem_Ioc.2 ⟨hni, hnL⟩)).le
-    ·
-      have h1 : ‖a n‖ * ρ ^ n ≤ ρ ^ n :=
+    · have h1 : ‖a n‖ * ρ ^ n ≤ ρ ^ n :=
         mul_le_of_le_one_left (zpow_nonneg hρ0.le n) (norm_coeffB_toB_le_one z n)
       have h2 : ρ ^ n = ρ ^ i * ρ ^ (n - i) := by rw [← zpow_add₀ hρ0.ne']; ring_nf
-      have h3 : ρ ^ (n - i) ≤ ρ ^ (L : ℤ) :=
-        zpow_le_zpow_right_of_le_one₀ hρ0 hρ1.le (by omega)
-      have h4 : ρ ^ (L : ℤ) ≤ ρt ^ L := by
-        rw [zpow_natCast]; exact pow_le_pow_left₀ hρ0.le hρt' L
+      have h3 : ρ ^ (n - i) ≤ ρ ^ (L : ℤ) := zpow_le_zpow_right_of_le_one₀ hρ0 hρ1.le (by omega)
+      have h4 : ρ ^ (L : ℤ) ≤ ρt ^ L := by rw [zpow_natCast]; exact pow_le_pow_left₀ hρ0.le hρt' L
       have h5 : ρ ^ (n - i) ≤ β := (h3.trans h4).trans hL.le
-      calc ‖a n‖ * ρ ^ n ≤ ρ ^ i * ρ ^ (n - i) := h1.trans h2.le
+      calc
+        ‖a n‖ * ρ ^ n
+          ≤ ρ ^ i * ρ ^ (n - i) := h1.trans h2.le
         _ ≤ ρ ^ i * β := mul_le_mul_of_nonneg_left h5 (zpow_nonneg hρ0.le i)
         _ = β * ρ ^ i := mul_comm _ _
 

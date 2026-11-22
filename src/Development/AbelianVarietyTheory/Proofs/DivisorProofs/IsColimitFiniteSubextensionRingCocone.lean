@@ -5,12 +5,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RingCocone
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.SepCech
 
-theorem ringCocone_isColimit (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω] :
-    Nonempty (IsColimit (ringCocone K Ω)) := by
+theorem ringCocone_isColimit
+    (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω]
+    : Nonempty (IsColimit (ringCocone K Ω)) := by
   haveI : ReflectsColimitsOfShape (FinSub K Ω) (forget CommRingCat.{0}) :=
     reflectsColimitsOfShape_of_reflectsIsomorphisms
   refine ⟨isColimitOfReflects (forget CommRingCat.{0}) ?_⟩
@@ -19,11 +21,18 @@ theorem ringCocone_isColimit (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [
     change Ω at x
     have hx : _root_.IsIntegral K x := (Algebra.IsAlgebraic.isAlgebraic x).isIntegral
     haveI := IntermediateField.adjoin.finiteDimensional hx
-    exact ⟨⟨IntermediateField.adjoin K {x}, inferInstance⟩,
-      ⟨x, IntermediateField.mem_adjoin_simple_self K x⟩, rfl⟩
+    exact ⟨
+      ⟨IntermediateField.adjoin K {x}, inferInstance⟩,
+      ⟨x, IntermediateField.mem_adjoin_simple_self K x⟩,
+      rfl
+    ⟩
   · intro i j xi xj h
-    refine ⟨⟨i.1 ⊔ j.1, by haveI := i.2; haveI := j.2; infer_instance⟩,
-      homOfLE (le_sup_left (a := i.1)), homOfLE (le_sup_right (b := j.1)), ?_⟩
+    refine ⟨
+      ⟨i.1 ⊔ j.1, by haveI := i.2; haveI := j.2; infer_instance⟩,
+      homOfLE (le_sup_left (a := i.1)),
+      homOfLE (le_sup_right (b := j.1)),
+      ?_
+    ⟩
     apply Subtype.ext
     exact h
 

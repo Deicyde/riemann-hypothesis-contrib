@@ -10,9 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CondESupConj
 
 open scoped Pointwise
 open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3
 open Formalism.L2.Host (HChar)
-open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum GlobalTheory.NormSum
+open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum
+  GlobalTheory.NormSum
 open GlobalTheory.Mem.Col2.SplitChar (finIdl)
 open GlobalTheory.SqTop (twPl Qn modT)
 
@@ -22,13 +24,18 @@ namespace GlobalTheory.SqTop
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem modT_sup_conj : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {μ₀ : T}, L.Is μ₀ → ∀ (G : GridData L sc) (t : T),
-    modT G t ⊔ D.host.conj • modT G t = ⊤ := by
+theorem modT_sup_conj
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {μ₀ : T},
+      L.Is μ₀ → ∀ (G : GridData L sc) (t : T), modT G t ⊔ D.host.conj • modT G t = ⊤ := by
   intro D T L sc μ₀ hL G t
   classical
-  have hcc : ∀ x : D.host.E, GlobalTheory.Member.cF D x = D.host.conj x := fun x => Formalism.BasicNotions.bridge_star_holds D.R D.host x
-  have hund : ∀ PP PP' : HeightOneSpectrum (𝓞 D.host.E), PP.asIdeal = D.host.conj • PP'.asIdeal →
-      (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) = (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP') := by
+  have hcc : ∀ x : D.host.E, GlobalTheory.Member.cF D x = D.host.conj x := fun x =>
+    Formalism.BasicNotions.bridge_star_holds D.R D.host x
+  have hund
+      : ∀ PP PP' : HeightOneSpectrum (𝓞 D.host.E),
+        PP.asIdeal = D.host.conj • PP'.asIdeal
+          → (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)
+            = (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP') := by
     intro PP PP' h
     have hc : GlobalTheory.Mem.Chr.ConjPl (GlobalTheory.Member.cF D).toRingEquiv PP' PP := by
       rw [GlobalTheory.Mem.Chr.conjPl_iff_mem]
@@ -36,8 +43,8 @@ theorem modT_sup_conj : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {�
       have hy : y = D.host.conj • x := RingOfIntegers.ext (by rw [hxy]; exact hcc _)
       rw [hy, h]
       exact Ideal.smul_mem_pointwise_smul_iff.symm
-    exact (GlobalTheory.Mem.Chr.under_eq_iff_conjPl (GlobalTheory.Member.cF D) D.sp.cm.deg2 (GlobalTheory.IdeleNinety.conj_ne_one D) PP' PP).2
-      (Or.inr hc)
+    exact (GlobalTheory.Mem.Chr.under_eq_iff_conjPl (GlobalTheory.Member.cF D) D.sp.cm.deg2
+      (GlobalTheory.IdeleNinety.conj_ne_one D) PP' PP).2 (Or.inr hc)
   have hmax' : ∀ PP : HeightOneSpectrum (𝓞 D.host.E), (D.host.conj • PP.asIdeal).IsMaximal := by
     intro PP
     have := PP.isPrime
@@ -68,18 +75,21 @@ theorem modT_sup_conj : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {�
     · rw [h]; exact Ideal.smul_mem_pointwise_smul _ _ _ hc
     · exact (Formalism.BasicNotions.bridge_star_holds D.R D.host _).symm
   rw [modT, smul_mul', ← Ideal.isCoprime_iff_sup_eq]
-  refine IsCoprime.mul_left (IsCoprime.mul_right ?_ ?_) (IsCoprime.mul_right ?_ ?_) <;> rw [Ideal.isCoprime_iff_sup_eq]
+  refine IsCoprime.mul_left (IsCoprime.mul_right ?_ ?_) (IsCoprime.mul_right ?_ ?_)
+    <;> rw [Ideal.isCoprime_iff_sup_eq]
   · exact condE_sup_conj G.pl
   · rw [Finset.smul_prod']
     refine Ideal.prod_sup_eq_top fun v hv => Ideal.sup_prod_eq_top fun w hw => ?_
-    exact Ideal.pow_sup_eq_top (Ideal.IsMaximal.coprime_of_ne (G.pl.w v).isMaximal (hmax' w) (hAB v hv w hw))
+    exact Ideal.pow_sup_eq_top (Ideal.IsMaximal.coprime_of_ne (G.pl.w v).isMaximal (hmax' w)
+      (hAB v hv w hw))
   · rw [GlobalTheory.FunObj.SqNum.condE, Finset.smul_prod']
     simp only [smul_pow']
     refine Ideal.prod_sup_eq_top fun w hw => Ideal.sup_prod_eq_top fun v hv => ?_
     exact Ideal.sup_pow_eq_top (Ideal.IsMaximal.coprime_of_ne w.isMaximal (hmax' _) (hBA w hw v hv))
   · rw [Finset.smul_prod']
-    exact Ideal.prod_sup_eq_top fun w hw => Ideal.sup_prod_eq_top fun w' hw' =>
-      Ideal.IsMaximal.coprime_of_ne w.isMaximal (hmax' w') (hBB w hw w' hw')
+    exact Ideal.prod_sup_eq_top fun w hw =>
+      Ideal.sup_prod_eq_top fun w' hw' =>
+        Ideal.IsMaximal.coprime_of_ne w.isMaximal (hmax' w') (hBB w hw w' hw')
 
 end GlobalTheory.SqTop
 

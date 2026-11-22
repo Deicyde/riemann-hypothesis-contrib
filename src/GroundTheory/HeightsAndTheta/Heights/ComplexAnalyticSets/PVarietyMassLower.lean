@@ -17,9 +17,10 @@ open scoped ENNReal
 
 noncomputable section
 
-theorem VarietyMassLower.proof (hG : VarietyTangentGraphDense.Statement)
-    (hL : TangentGraphLowerDensity.Statement) (hM : VarietyLelongMono.Statement) :
-    VarietyMassLower.Statement := by
+theorem VarietyMassLower.proof
+    (hG : VarietyTangentGraphDense.Statement) (hL : TangentGraphLowerDensity.Statement)
+    (hM : VarietyLelongMono.Statement)
+    : VarietyMassLower.Statement := by
   intro n d J hJ hd R
   set τ := μH[((2 * d : ℕ) : ℝ)] (Metric.ball (0 : EuclideanSpace ℂ (Fin d)) 1) with hτdef
   have hτ : 0 < τ := TangentGraphLowerDensity.unitBall_pos d
@@ -36,8 +37,9 @@ theorem VarietyMassLower.proof (hG : VarietyTangentGraphDense.Statement)
     have h : g w₀ ∈ g '' Ω := ⟨w₀, hw₀, rfl⟩
     rw [← hZV] at h
     exact h.1
-  obtain ⟨r₀, hr₀, hlow⟩ := hL n d b I₀ (zeroSetEuc J) Ω V g w₀ hcard hΩ hV hw₀ hg hproj hZV htan
-    (1 / 2) ⟨by norm_num, by norm_num⟩
+  obtain ⟨r₀, hr₀, hlow⟩ :=
+    hL n d b I₀ (zeroSetEuc J) Ω V g w₀ hcard hΩ hV hw₀ hg hproj hZV htan (1 / 2)
+      ⟨by norm_num, by norm_num⟩
   set t := min (r₀ / 2) (ρ / 2) with htdef
   have ht0 : 0 < t := lt_min (by linarith) (by linarith)
   have htr : t < r₀ := lt_of_le_of_lt (min_le_left _ _) (by linarith)
@@ -47,24 +49,31 @@ theorem VarietyMassLower.proof (hG : VarietyTangentGraphDense.Statement)
   have hsub : zeroSetEuc J ∩ Metric.ball (g w₀) (ρ / 2) ⊆ zeroSetEuc J ∩ Metric.ball z ρ :=
     Set.inter_subset_inter_right _ (Metric.ball_subset_ball' (by linarith))
   have h3 := measure_mono (μ := μH[((2 * d : ℕ) : ℝ)]) hsub
-  have key : ENNReal.ofReal (t ^ (2 * d)) * (ENNReal.ofReal ((1 / 2) * (ρ / 2) ^ (2 * d)) * τ) ≤
-      ENNReal.ofReal (t ^ (2 * d)) * μH[((2 * d : ℕ) : ℝ)] (zeroSetEuc J ∩ Metric.ball (g w₀) (ρ / 2)) := by
-    calc ENNReal.ofReal (t ^ (2 * d)) * (ENNReal.ofReal ((1 / 2) * (ρ / 2) ^ (2 * d)) * τ)
-        = ENNReal.ofReal ((ρ / 2) ^ (2 * d)) * (ENNReal.ofReal ((1 / 2) * t ^ (2 * d)) * τ) := by
-          rw [ENNReal.ofReal_mul (by norm_num), ENNReal.ofReal_mul (by norm_num)]
-          ring
-      _ ≤ ENNReal.ofReal ((ρ / 2) ^ (2 * d)) *
-            μH[((2 * d : ℕ) : ℝ)] (zeroSetEuc J ∩ Metric.ball (g w₀) t) := by gcongr
+  have key
+      : ENNReal.ofReal (t ^ (2 * d)) * (ENNReal.ofReal ((1 / 2) * (ρ / 2) ^ (2 * d)) * τ)
+        ≤ ENNReal.ofReal (t ^ (2 * d))
+          * μH[((2 * d : ℕ) : ℝ)] (zeroSetEuc J ∩ Metric.ball (g w₀) (ρ / 2)) := by
+    calc
+      ENNReal.ofReal (t ^ (2 * d)) * (ENNReal.ofReal ((1 / 2) * (ρ / 2) ^ (2 * d)) * τ)
+          = ENNReal.ofReal ((ρ / 2) ^ (2 * d)) * (ENNReal.ofReal ((1 / 2) * t ^ (2 * d)) * τ) := by
+        rw [ENNReal.ofReal_mul (by norm_num), ENNReal.ofReal_mul (by norm_num)]
+        ring
+      _ ≤ ENNReal.ofReal ((ρ / 2) ^ (2 * d))
+          * μH[((2 * d : ℕ) : ℝ)] (zeroSetEuc J ∩ Metric.ball (g w₀) t) := by
+        gcongr
       _ ≤ _ := h2
-  have key' := (ENNReal.mul_le_mul_iff_right (ENNReal.ofReal_pos.2 (pow_pos ht0 _)).ne'
-    ENNReal.ofReal_ne_top).1 key
-  have hc : (1 / 2) * (1 / 2) ^ (2 * d) * m.toReal * ρ ^ (2 * d) =
-      ((1 / 2) * (ρ / 2) ^ (2 * d)) * m.toReal := by
+  have key' :=
+    (ENNReal.mul_le_mul_iff_right (ENNReal.ofReal_pos.2 (pow_pos ht0 _)).ne'
+      ENNReal.ofReal_ne_top).1 key
+  have hc
+      : (1 / 2) * (1 / 2) ^ (2 * d) * m.toReal * ρ ^ (2 * d)
+        = ((1 / 2) * (ρ / 2) ^ (2 * d)) * m.toReal := by
     rw [div_pow, div_pow, one_pow]
     ring
-  calc ENNReal.ofReal ((1 / 2) * (1 / 2) ^ (2 * d) * m.toReal * ρ ^ (2 * d))
-      = ENNReal.ofReal ((1 / 2) * (ρ / 2) ^ (2 * d)) * m := by
-        rw [hc, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_toReal hmtop]
+  calc
+    ENNReal.ofReal ((1 / 2) * (1 / 2) ^ (2 * d) * m.toReal * ρ ^ (2 * d))
+        = ENNReal.ofReal ((1 / 2) * (ρ / 2) ^ (2 * d)) * m := by
+      rw [hc, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_toReal hmtop]
     _ ≤ ENNReal.ofReal ((1 / 2) * (ρ / 2) ^ (2 * d)) * τ := by gcongr
     _ ≤ μH[((2 * d : ℕ) : ℝ)] (zeroSetEuc J ∩ Metric.ball (g w₀) (ρ / 2)) := key'
     _ ≤ μH[((2 * d : ℕ) : ℝ)] (zeroSetEuc J ∩ Metric.ball z ρ) := h3

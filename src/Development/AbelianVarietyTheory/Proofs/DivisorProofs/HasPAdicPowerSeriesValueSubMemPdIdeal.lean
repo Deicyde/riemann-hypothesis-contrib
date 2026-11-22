@@ -4,7 +4,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfFora
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 set_option autoImplicit false
 
@@ -16,9 +18,9 @@ section Ring
 
 variable {B : Type} [CommRing B]
 
-theorem pow_eq_pow_factorization_mul (p : ℕ) (hp : p.Prime) (J : Ideal B)
-    (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y) :
-    ∀ n : ℕ, 0 < n → ∀ x ∈ J, ∃ y ∈ J, x ^ n = (p : B) ^ ((n)!.factorization p) * y := by
+theorem pow_eq_pow_factorization_mul
+    (p : ℕ) (hp : p.Prime) (J : Ideal B) (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y)
+    : ∀ n : ℕ, 0 < n → ∀ x ∈ J, ∃ y ∈ J, x ^ n = (p : B) ^ ((n)!.factorization p) * y := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -44,21 +46,25 @@ theorem pow_eq_pow_factorization_mul (p : ℕ) (hp : p.Prime) (J : Ideal B)
         Finsupp.coe_add, Pi.add_apply, h0, zero_add, pow_succ, hxy]
       ring
 
-theorem pow_eq_factorial_mul (p : ℕ) (hp : p.Prime)
-    (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B)) (J : Ideal B)
-    (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y) (n : ℕ) (hn : 0 < n) (x : B) (hx : x ∈ J) :
-    ∃ y ∈ J, x ^ n = ((n ! : ℕ) : B) * y := by
+theorem pow_eq_factorial_mul
+    (p : ℕ) (hp : p.Prime) (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B))
+    (J : Ideal B) (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y)
+    (n : ℕ) (hn : 0 < n)
+    (x : B) (hx : x ∈ J)
+    : ∃ y ∈ J, x ^ n = ((n ! : ℕ) : B) * y := by
   obtain ⟨y, hy, hxy⟩ := pow_eq_pow_factorization_mul p hp J hJ n hn x hx
-  obtain ⟨u, hu'⟩ := hu (n ! / p ^ (n !).factorization p)
-    (Nat.coprime_ordCompl hp (Nat.factorial_ne_zero n)).symm
+  obtain ⟨u, hu'⟩ :=
+    hu (n ! / p ^ (n !).factorization p) (Nat.coprime_ordCompl hp (Nat.factorial_ne_zero n)).symm
   refine ⟨(↑u⁻¹ : B) * y, J.mul_mem_left _ hy, ?_⟩
-  have hfac : ((n ! : ℕ) : B) =
-      (p : B) ^ (n !).factorization p * ((n ! / p ^ (n !).factorization p : ℕ) : B) := by
+  have hfac
+      : ((n ! : ℕ) : B)
+        = (p : B) ^ (n !).factorization p * ((n ! / p ^ (n !).factorization p : ℕ) : B) := by
     rw [← Nat.cast_pow, ← Nat.cast_mul, Nat.ordProj_mul_ordCompl_eq_self]
   rw [hxy, hfac, ← hu', mul_assoc, ← mul_assoc (u : B), Units.mul_inv, one_mul]
 
-theorem sum_eq_mul_mem {ι : Type} (s : Finset ι) (c : B) (J : Ideal B) (f : ι → B)
-    (h : ∀ i ∈ s, ∃ y ∈ J, f i = c * y) : ∃ y ∈ J, ∑ i ∈ s, f i = c * y := by
+theorem sum_eq_mul_mem
+    {ι : Type} (s : Finset ι) (c : B) (J : Ideal B) (f : ι → B) (h : ∀ i ∈ s, ∃ y ∈ J, f i = c * y)
+    : ∃ y ∈ J, ∑ i ∈ s, f i = c * y := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨0, J.zero_mem, by simp⟩
@@ -67,10 +73,12 @@ theorem sum_eq_mul_mem {ι : Type} (s : Finset ι) (c : B) (J : Ideal B) (f : ι
     obtain ⟨y', hy', e'⟩ := ih (fun k hk => h k (Finset.mem_insert_of_mem hk))
     exact ⟨y + y', J.add_mem hy hy', by rw [Finset.sum_insert hi, e, e', mul_add]⟩
 
-theorem add_pow_sub_pow (p : ℕ) (hp : p.Prime)
-    (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B)) (J : Ideal B)
-    (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y) (a j : B) (hj : j ∈ J) (n : ℕ) :
-    ∃ y ∈ J, (a + j) ^ n - a ^ n = (n : B) * y := by
+theorem add_pow_sub_pow
+    (p : ℕ) (hp : p.Prime) (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B))
+    (J : Ideal B) (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y)
+    (a j : B) (hj : j ∈ J)
+    (n : ℕ)
+    : ∃ y ∈ J, (a + j) ^ n - a ^ n = (n : B) * y := by
   rcases n with _ | n
   · exact ⟨0, J.zero_mem, by simp⟩
   rw [add_comm a j, add_pow, Finset.sum_range_succ']
@@ -82,8 +90,9 @@ theorem add_pow_sub_pow (p : ℕ) (hp : p.Prime)
   refine ⟨((n.descFactorial k : ℕ) : B) * a ^ (n + 1 - (k + 1)) * y, J.mul_mem_left _ hy, ?_⟩
   have h : (n + 1).choose (k + 1) * (k + 1)! = (n + 1) * n.descFactorial k := by
     rw [mul_comm, ← Nat.descFactorial_eq_factorial_mul_choose, Nat.succ_descFactorial_succ]
-  have h' : (((n + 1).choose (k + 1) : ℕ) : B) * (((k + 1)! : ℕ) : B) =
-      ((n + 1 : ℕ) : B) * ((n.descFactorial k : ℕ) : B) := by
+  have h'
+      : (((n + 1).choose (k + 1) : ℕ) : B) * (((k + 1)! : ℕ) : B)
+        = ((n + 1 : ℕ) : B) * ((n.descFactorial k : ℕ) : B) := by
     rw [← Nat.cast_mul, ← Nat.cast_mul, h]
   rw [hjy]
   linear_combination (a ^ (n + 1 - (k + 1)) * y) * h'
@@ -94,12 +103,13 @@ section Monomial
 
 variable {B : Type} [CommRing B] {σ : Type}
 
-theorem prod_pow_sub_prod_pow (p : ℕ) (hp : p.Prime)
-    (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B)) (J : Ideal B)
-    (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y) (z z' : σ → B) (hz : ∀ i, z i - z' i ∈ J)
-    (α : σ → ℕ) (s : Finset σ) :
-    ∃ b : σ → B, (∀ i, b i ∈ J) ∧
-      ∏ i ∈ s, z i ^ α i - ∏ i ∈ s, z' i ^ α i = ∑ i ∈ s, (α i : B) * b i := by
+theorem prod_pow_sub_prod_pow
+    (p : ℕ) (hp : p.Prime) (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B))
+    (J : Ideal B) (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y)
+    (z z' : σ → B) (hz : ∀ i, z i - z' i ∈ J)
+    (α : σ → ℕ) (s : Finset σ)
+    : ∃ b : σ → B,
+      (∀ i, b i ∈ J) ∧ ∏ i ∈ s, z i ^ α i - ∏ i ∈ s, z' i ^ α i = ∑ i ∈ s, (α i : B) * b i := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨0, fun _ => J.zero_mem, by simp⟩
@@ -117,9 +127,10 @@ theorem prod_pow_sub_prod_pow (p : ℕ) (hp : p.Prime)
       · rw [Function.update_of_ne hk]
         exact J.mul_mem_left _ (hb k)
     · rw [Finset.prod_insert hi, Finset.prod_insert hi, Finset.sum_insert hi, Function.update_self]
-      have h1 : ∑ k ∈ s, (α k : B) *
-          Function.update (fun k => z' i ^ α i * b k) i (y * ∏ k ∈ s, z k ^ α k) k =
-          z' i ^ α i * ∑ k ∈ s, (α k : B) * b k := by
+      have h1
+          : ∑ k ∈ s, (α k : B) *
+              Function.update (fun k => z' i ^ α i * b k) i (y * ∏ k ∈ s, z k ^ α k) k
+            = z' i ^ α i * ∑ k ∈ s, (α k : B) * b k := by
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl fun k hk => ?_
         rw [Function.update_of_ne (by rintro rfl; exact hi hk)]
@@ -127,9 +138,11 @@ theorem prod_pow_sub_prod_pow (p : ℕ) (hp : p.Prime)
       rw [h1]
       linear_combination (∏ k ∈ s, z k ^ α k) * ey + z' i ^ α i * e
 
-theorem sum_eq_map_mem {Q : Type} [CommRing Q] [Algebra B Q] {ι : Type} (s : Finset ι)
-    (J : Ideal B) (f : ι → Q) (h : ∀ i ∈ s, ∃ b ∈ J, f i = algebraMap B Q b) :
-    ∃ b ∈ J, ∑ i ∈ s, f i = algebraMap B Q b := by
+theorem sum_eq_map_mem
+    {Q : Type} [CommRing Q] [Algebra B Q]
+    {ι : Type} (s : Finset ι)
+    (J : Ideal B) (f : ι → Q) (h : ∀ i ∈ s, ∃ b ∈ J, f i = algebraMap B Q b)
+    : ∃ b ∈ J, ∑ i ∈ s, f i = algebraMap B Q b := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨0, J.zero_mem, by simp⟩
@@ -140,12 +153,14 @@ theorem sum_eq_map_mem {Q : Type} [CommRing Q] [Algebra B Q] {ι : Type} (s : Fi
 
 variable [Fintype σ] {Q : Type} [CommRing Q] [Algebra B Q]
 
-theorem monomial_val_sub (p : ℕ) (hp : p.Prime)
-    (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B)) (J : Ideal B)
-    (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y) (z z' : σ → B) (hz : ∀ i, z i - z' i ∈ J)
-    (α : σ →₀ ℕ) (a : Q) (ha : ∀ i, ∃ c : B, (α i : Q) * a = algebraMap B Q c) :
-    ∃ b ∈ J, a * (∏ i, algebraMap B Q (z i) ^ α i) - a * ∏ i, algebraMap B Q (z' i) ^ α i =
-      algebraMap B Q b := by
+theorem monomial_val_sub
+    (p : ℕ) (hp : p.Prime) (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B))
+    (J : Ideal B) (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y)
+    (z z' : σ → B) (hz : ∀ i, z i - z' i ∈ J)
+    (α : σ →₀ ℕ) (a : Q) (ha : ∀ i, ∃ c : B, (α i : Q) * a = algebraMap B Q c)
+    : ∃ b ∈ J,
+      a * (∏ i, algebraMap B Q (z i) ^ α i) - a * ∏ i, algebraMap B Q (z' i) ^ α i
+        = algebraMap B Q b := by
   choose c hc using ha
   obtain ⟨b, hb, e⟩ := prod_pow_sub_prod_pow p hp hu J hJ z z' hz α Finset.univ
   refine ⟨∑ i, b i * c i, J.sum_mem (fun i _ => J.mul_mem_right _ (hb i)), ?_⟩
@@ -158,13 +173,16 @@ theorem monomial_val_sub (p : ℕ) (hp : p.Prime)
   rw [map_mul, ← hc i]
   ring
 
-theorem eval_sub_eval (p : ℕ) (hp : p.Prime)
-    (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B)) (J : Ideal B)
-    (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y) (z z' : σ → B) (hz : ∀ i, z i - z' i ∈ J)
+theorem eval_sub_eval
+    (p : ℕ) (hp : p.Prime) (hu : ∀ n : ℕ, Nat.Coprime n p → IsUnit (n : B))
+    (J : Ideal B) (hJ : ∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y)
+    (z z' : σ → B) (hz : ∀ i, z i - z' i ∈ J)
     (P : MvPolynomial σ Q)
-    (hP : ∀ (α : σ →₀ ℕ) i, ∃ c : B, (α i : Q) * P.coeff α = algebraMap B Q c) :
-    ∃ b ∈ J, MvPolynomial.eval (fun i => algebraMap B Q (z i)) P -
-      MvPolynomial.eval (fun i => algebraMap B Q (z' i)) P = algebraMap B Q b := by
+    (hP : ∀ (α : σ →₀ ℕ) i, ∃ c : B, (α i : Q) * P.coeff α = algebraMap B Q c)
+    : ∃ b ∈ J,
+      MvPolynomial.eval (fun i => algebraMap B Q (z i)) P
+          - MvPolynomial.eval (fun i => algebraMap B Q (z' i)) P
+        = algebraMap B Q b := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [P.as_sum, map_sum, map_sum, ← Finset.sum_sub_distrib]
   apply sum_eq_map_mem
@@ -175,21 +193,27 @@ theorem eval_sub_eval (p : ℕ) (hp : p.Prime)
 
 end Monomial
 
-theorem hasVal_sub_mem : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing B] [CommRing Q]
-    [CommRing O] [Algebra B Q] (θ : B →+* O), IsFrame p Q θ → ∀ (σ : Type) [Fintype σ]
-    [DecidableEq σ] (z : σ → B), (∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N) → ∀ J : Ideal B,
-    (∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y) → ∀ (z' : σ → B) (f : MvPowerSeries σ Q) (q q' : Q),
-    (∀ i, z i - z' i ∈ J) → DIn (⊤ : Ideal B) f → HasVal p z f q → HasVal p z' f q' →
-    ∀ m : ℕ, ∃ b ∈ J, ∃ b' : B, q - q' = algebraMap B Q (b + p ^ m * b') := by
+theorem hasVal_sub_mem
+    : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing B] [CommRing Q] [CommRing O] [Algebra B Q]
+        (θ : B →+* O),
+      IsFrame p Q θ
+        → ∀ (σ : Type) [Fintype σ] [DecidableEq σ] (z : σ → B),
+          (∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N)
+            → ∀ J : Ideal B,
+              (∀ x ∈ J, ∃ y ∈ J, x ^ p = p * y)
+                → ∀ (z' : σ → B) (f : MvPowerSeries σ Q) (q q' : Q),
+                  (∀ i, z i - z' i ∈ J) → DIn (⊤ : Ideal B) f → HasVal p z f q → HasVal p z' f q'
+                    → ∀ m : ℕ, ∃ b ∈ J, ∃ b' : B, q - q' = algebraMap B Q (b + p ^ m * b') := by
   intro p hpf B O Q _ _ _ _ θ hF σ _ _ z _ J hJ z' f q q' hzz hD hv hv' m
   have hp : p.Prime := hpf.out
   obtain ⟨N1, h1⟩ := hv m
   obtain ⟨N2, h2⟩ := hv' m
   obtain ⟨b1, e1⟩ := h1 (max N1 N2) (le_max_left _ _)
   obtain ⟨b2, e2⟩ := h2 (max N1 N2) (le_max_right _ _)
-  have hP : ∀ (α : σ →₀ ℕ) i, ∃ c : B, (α i : Q) *
-      (trunc' Q (Finsupp.equivFunOnFinite.symm fun _ => max N1 N2) f).coeff α =
-        algebraMap B Q c := by
+  have hP
+      : ∀ (α : σ →₀ ℕ) i, ∃ c : B,
+        (α i : Q) * (trunc' Q (Finsupp.equivFunOnFinite.symm fun _ => max N1 N2) f).coeff α
+          = algebraMap B Q c := by
     intro α i
     rw [coeff_trunc']
     split_ifs

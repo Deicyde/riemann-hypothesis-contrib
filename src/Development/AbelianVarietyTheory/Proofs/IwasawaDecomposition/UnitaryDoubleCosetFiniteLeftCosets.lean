@@ -4,7 +4,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GEqui
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial Formalism.UG GlobalTheory.SatInd
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial Formalism.UG GlobalTheory.SatInd
 
 noncomputable section
 
@@ -12,8 +15,8 @@ namespace GlobalTheory.SatInd.DCoset
 
 variable {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))]
 
-theorem le_ofAdd_neg_one_of_lt_one {y : WithZero (Multiplicative ℤ)} (h : y < 1) :
-    y ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+theorem le_ofAdd_neg_one_of_lt_one {y : WithZero (Multiplicative ℤ)} (h : y < 1)
+    : y ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
   induction y using WithZero.recZeroCoe with
   | zero => exact zero_le'
   | coe a =>
@@ -23,17 +26,22 @@ theorem le_ofAdd_neg_one_of_lt_one {y : WithZero (Multiplicative ℤ)} (h : y < 
     show Multiplicative.toAdd a ≤ -1
     omega
 
-theorem exists_residue_reps {q : ℕ} (hq : 2 ≤ q)
-    (hcard : Nat.card ((Valued.v : Valuation K (WithZero (Multiplicative ℤ))).integer ⧸
-      IsLocalRing.maximalIdeal (Valued.v : Valuation K (WithZero (Multiplicative ℤ))).valuationSubring) = q ^ 2) :
-    ∃ R : Set K, R.Finite ∧ R ⊆ intL K ∧ ∀ x ∈ intL K, ∃ r ∈ R,
-      (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (x - r) < 1 := by
+theorem exists_residue_reps
+    {q : ℕ} (hq : 2 ≤ q)
+    (hcard : Nat.card
+        ((Valued.v : Valuation K (WithZero (Multiplicative ℤ))).integer ⧸
+          IsLocalRing.maximalIdeal (Valued.v : Valuation K (WithZero (Multiplicative ℤ))).valuationSubring)
+      = q ^ 2)
+    : ∃ R : Set K,
+      R.Finite ∧ R ⊆ intL K
+        ∧ ∀ x ∈ intL K, ∃ r ∈ R,
+          (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (x - r) < 1 := by
   set v := (Valued.v : Valuation K (WithZero (Multiplicative ℤ)))
   have hfin : Finite (v.integer ⧸ IsLocalRing.maximalIdeal v.valuationSubring) :=
     Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
   haveI : Finite (v.valuationSubring ⧸ IsLocalRing.maximalIdeal v.valuationSubring) := hfin
-  let f : v.valuationSubring ⧸ IsLocalRing.maximalIdeal v.valuationSubring → K :=
-    fun c => ((Ideal.Quotient.mk_surjective c).choose : K)
+  let f : v.valuationSubring ⧸ IsLocalRing.maximalIdeal v.valuationSubring → K := fun c =>
+    ((Ideal.Quotient.mk_surjective c).choose : K)
   refine ⟨Set.range f, Set.finite_range f, ?_, ?_⟩
   · rintro _ ⟨c, rfl⟩
     show _ ∈ v.integer
@@ -46,7 +54,9 @@ theorem exists_residue_reps {q : ℕ} (hq : 2 ≤ q)
     let c := Ideal.Quotient.mk (IsLocalRing.maximalIdeal v.valuationSubring) xs
     refine ⟨f c, ⟨c, rfl⟩, ?_⟩
     have hspec := (Ideal.Quotient.mk_surjective c).choose_spec
-    have hmem : xs - (Ideal.Quotient.mk_surjective c).choose ∈ IsLocalRing.maximalIdeal v.valuationSubring :=
+    have hmem
+        : xs - (Ideal.Quotient.mk_surjective c).choose
+          ∈ IsLocalRing.maximalIdeal v.valuationSubring :=
       Ideal.Quotient.eq.1 (hspec.symm)
     rw [ValuationSubring.valuation_lt_one_iff] at hmem
     have := (Valuation.isEquiv_valuation_valuationSubring v).lt_one_iff_lt_one.2 hmem
@@ -58,14 +68,17 @@ namespace GlobalTheory.SatInd.DCoset
 
 variable {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))]
 
-theorem exists_trunc (ϖ : K)
-    (hϖ : (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ϖ =
-      ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
+theorem exists_trunc
+    (ϖ : K)
+    (hϖ : (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ϖ
+      = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
     {R : Set K} (hRf : R.Finite) (hRO : R ⊆ intL K)
-    (hR : ∀ x ∈ intL K, ∃ r ∈ R, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (x - r) < 1) :
-    ∀ N : ℕ, ∃ T : Set K, T.Finite ∧ T ⊆ intL K ∧ ∀ x ∈ intL K, ∃ t ∈ T,
-      (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (x - t) ≤
-        (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ϖ ^ N := by
+    (hR : ∀ x ∈ intL K, ∃ r ∈ R, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (x - r) < 1)
+    : ∀ N : ℕ, ∃ T : Set K,
+      T.Finite ∧ T ⊆ intL K
+        ∧ ∀ x ∈ intL K, ∃ t ∈ T,
+          (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (x - t)
+            ≤ (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ϖ ^ N := by
   set v := (Valued.v : Valuation K (WithZero (Multiplicative ℤ)))
   have h0 : v ϖ ≠ 0 := by rw [hϖ]; exact WithZero.coe_ne_zero
   have hϖ0 : ϖ ≠ 0 := fun h => h0 (by rw [h, map_zero])
@@ -95,20 +108,24 @@ theorem exists_trunc (ϖ : K)
       have hyO : y ∈ intL K := by
         apply (Valuation.mem_integer_iff _ _).2
         rw [hy, map_mul, map_inv₀]
-        calc v (x - r) * (v ϖ)⁻¹ ≤ v ϖ * (v ϖ)⁻¹ := mul_le_mul' hle le_rfl
+        calc
+          v (x - r) * (v ϖ)⁻¹
+            ≤ v ϖ * (v ϖ)⁻¹ := mul_le_mul' hle le_rfl
           _ = 1 := mul_inv_cancel₀ h0
       obtain ⟨t, ht, hyt⟩ := hT y hyO
       refine ⟨r + ϖ * t, ⟨r, hr, t, ht, rfl⟩, ?_⟩
-      have he : x - (r + ϖ * t) = ϖ * (y - t) := by
-        rw [hy]; field_simp; ring
+      have he : x - (r + ϖ * t) = ϖ * (y - t) := by rw [hy]; field_simp; ring
       rw [he, map_mul, pow_succ']
       exact mul_le_mul' le_rfl hyt
 
-theorem exists_le_inv_pow (ϖ : K)
-    (hϖ : (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ϖ =
-      ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ))) (x : K) :
-    ∃ M : ℕ, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) x ≤
-      ((Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ϖ)⁻¹ ^ M := by
+theorem exists_le_inv_pow
+    (ϖ : K)
+    (hϖ : (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ϖ
+      = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
+    (x : K)
+    : ∃ M : ℕ,
+      (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) x
+        ≤ ((Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ϖ)⁻¹ ^ M := by
   rw [hϖ]
   generalize (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) x = y
   induction y using WithZero.recZeroCoe with
@@ -127,36 +144,48 @@ namespace GlobalTheory.SatInd.DCoset
 
 variable {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))]
 
-theorem entry_mul_le {n : ℕ} {A B : Matrix (Fin n) (Fin n) K} {α β : WithZero (Multiplicative ℤ)}
+theorem entry_mul_le
+    {n : ℕ} {A B : Matrix (Fin n) (Fin n) K} {α β : WithZero (Multiplicative ℤ)}
     (hA : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (A i j) ≤ α)
-    (hB : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (B i j) ≤ β) :
-    ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ((A * B) i j) ≤ α * β := by
+    (hB : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (B i j) ≤ β)
+    : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ((A * B) i j) ≤ α * β := by
   intro i j
   rw [Matrix.mul_apply]
   exact Valuation.map_sum_le _ (fun k _ => by rw [map_mul]; exact mul_le_mul' (hA i k) (hB k j))
 
-theorem entry_le_one_of_mem_KU {σ : K →+* K} {n : ℕ} {a : GU σ n} (ha : a ∈ KU σ n) (i j : Fin n) :
-    (Valued.v : Valuation K (WithZero (Multiplicative ℤ)))
-      (((a : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) i j) ≤ 1 := by
+theorem entry_le_one_of_mem_KU {σ : K →+* K} {n : ℕ} {a : GU σ n} (ha : a ∈ KU σ n) (i j : Fin n)
+    : (Valued.v : Valuation K (WithZero (Multiplicative ℤ)))
+        (((a : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) i j)
+      ≤ 1 := by
   rw [KU, Subgroup.mem_subgroupOf, intPts, Subgroup.mem_inf] at ha
   obtain ⟨g, hg⟩ := ha.2
-  have h : ((a : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) i j =
-      ((g : Matrix (Fin n) (Fin n) (intL K)) i j : K) := by rw [← hg]; rfl
+  have h
+      : ((a : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) i j
+        = ((g : Matrix (Fin n) (Fin n) (intL K)) i j : K) := by
+    rw [← hg]; rfl
   rw [h]
   exact (Valuation.mem_integer_iff _ _).1 (((g : Matrix (Fin n) (Fin n) (intL K)) i j).2)
 
-theorem mem_KU_of_entries {σ : K →+* K} {n : ℕ} (g : GU σ n)
-    (h1 : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ)))
-      (((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) i j) ≤ 1)
-    (h2 : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ)))
-      ((((g⁻¹ : GU σ n) : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) i j) ≤ 1) :
-    g ∈ KU σ n := by
+theorem mem_KU_of_entries
+    {σ : K →+* K} {n : ℕ} (g : GU σ n)
+    (h1 : ∀ i j,
+      (Valued.v : Valuation K (WithZero (Multiplicative ℤ)))
+          (((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) i j)
+        ≤ 1)
+    (h2 : ∀ i j,
+      (Valued.v : Valuation K (WithZero (Multiplicative ℤ)))
+          ((((g⁻¹ : GU σ n) : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) i j)
+        ≤ 1)
+    : g ∈ KU σ n := by
   rw [KU, Subgroup.mem_subgroupOf, intPts, Subgroup.mem_inf]
   refine ⟨g.2, ?_⟩
-  let A : Matrix (Fin n) (Fin n) (intL K) := fun i j => ⟨_, (Valuation.mem_integer_iff _ _).2 (h1 i j)⟩
-  let B : Matrix (Fin n) (Fin n) (intL K) := fun i j => ⟨_, (Valuation.mem_integer_iff _ _).2 (h2 i j)⟩
+  let A : Matrix (Fin n) (Fin n) (intL K) := fun i j =>
+    ⟨_, (Valuation.mem_integer_iff _ _).2 (h1 i j)⟩
+  let B : Matrix (Fin n) (Fin n) (intL K) := fun i j =>
+    ⟨_, (Valuation.mem_integer_iff _ _).2 (h2 i j)⟩
   have hA : A.map (intL K).subtype = ((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by ext; rfl
-  have hB : B.map (intL K).subtype = (((g⁻¹ : GU σ n) : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by
+  have hB
+      : B.map (intL K).subtype = (((g⁻¹ : GU σ n) : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) := by
     ext; rfl
   have hAB : A * B = 1 := by
     apply Matrix.map_injective Subtype.val_injective
@@ -178,36 +207,48 @@ namespace GlobalTheory.SatInd.DCoset
 
 variable {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))]
 
-theorem conj_entry_le_one {n : ℕ} {S Si A A' Ai' : Matrix (Fin n) (Fin n) K}
-    {C ε : WithZero (Multiplicative ℤ)} (hSi : Si * S = 1) (hA' : Ai' * A' = 1)
+theorem conj_entry_le_one
+    {n : ℕ} {S Si A A' Ai' : Matrix (Fin n) (Fin n) K} {C ε : WithZero (Multiplicative ℤ)}
+    (hSi : Si * S = 1) (hA' : Ai' * A' = 1)
     (hS : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (S i j) ≤ C)
     (hSi' : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (Si i j) ≤ C)
     (hAi : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (Ai' i j) ≤ 1)
     (hD : ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (A i j - A' i j) ≤ ε)
-    (hCε : C * 1 * ε * C ≤ 1) :
-    ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ((Si * Ai' * A * S) i j) ≤ 1 := by
+    (hCε : C * 1 * ε * C ≤ 1)
+    : ∀ i j,
+      (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ((Si * Ai' * A * S) i j) ≤ 1 := by
   have e : Si * Ai' * A * S = 1 + Si * Ai' * (A - A') * S := by
     have h1 : Si * Ai' * A' * S = 1 := by rw [Matrix.mul_assoc Si, hA', Matrix.mul_one, hSi]
     rw [Matrix.mul_sub, Matrix.sub_mul, h1]
     abel
-  have hX := entry_mul_le (entry_mul_le (entry_mul_le hSi' hAi)
-    (show ∀ i j, (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ((A - A') i j) ≤ ε from
-      fun i j => by rw [Matrix.sub_apply]; exact hD i j)) hS
+  have hX :=
+    entry_mul_le
+      (entry_mul_le (entry_mul_le hSi' hAi)
+        (show ∀ i j,
+            (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) ((A - A') i j)
+              ≤ ε from fun i j => by
+          rw [Matrix.sub_apply]; exact hD i j))
+      hS
   intro i j
   rw [e, Matrix.add_apply]
   refine Valuation.map_add_le _ ?_ ((hX i j).trans hCε)
   rw [Matrix.one_apply]
   split_ifs <;> simp
 
-theorem finite_dcoset : ∀ {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))] (ϖ : K)
-    (σ : K →+* K) (q n : ℕ), IsUnramInv ϖ σ q → ∀ s : GU σ n,
-      Set.Finite {c : GU σ n ⧸ KU σ n | ∃ a ∈ KU σ n, ((a * s : GU σ n) : GU σ n ⧸ KU σ n) = c} := by
+theorem finite_dcoset
+    : ∀ {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))] (ϖ : K) (σ : K →+* K)
+        (q n : ℕ),
+      IsUnramInv ϖ σ q
+        → ∀ s : GU σ n,
+          Set.Finite
+            {c : GU σ n ⧸ KU σ n | ∃ a ∈ KU σ n, ((a * s : GU σ n) : GU σ n ⧸ KU σ n) = c} := by
   intro K _ _ ϖ σ q n hU s
   obtain ⟨-, -, -, hϖ, -, hq, hcard⟩ := hU
   obtain ⟨R, hRf, hRO, hR⟩ := exists_residue_reps hq hcard
   set v := (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) with hv
   have h0 : v ϖ ≠ 0 := by rw [hϖ]; exact WithZero.coe_ne_zero
-  let mat : GU σ n → Matrix (Fin n) (Fin n) K := fun g => ((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)
+  let mat : GU σ n → Matrix (Fin n) (Fin n) K := fun g =>
+    ((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)
   have hx := exists_le_inv_pow ϖ hϖ
   set C := (v ϖ)⁻¹ with hCdef
   have hC1 : 1 ≤ C := by
@@ -226,43 +267,58 @@ theorem finite_dcoset : ∀ {K : Type} [Field K] [Valued K (WithZero (Multiplica
   obtain ⟨T, hTf, hTO, hT⟩ := exists_trunc ϖ hϖ hRf hRO hR (M + M)
   have hCε : C ^ M * 1 * (v ϖ) ^ (M + M) * C ^ M ≤ 1 := by
     apply le_of_eq
-    calc C ^ M * 1 * (v ϖ) ^ (M + M) * C ^ M = (C * v ϖ) ^ M * (v ϖ * C) ^ M := by
-          rw [mul_one, pow_add, ← mul_assoc, mul_assoc (C ^ M * v ϖ ^ M), mul_pow, mul_pow]
+    calc
+      C ^ M * 1 * (v ϖ) ^ (M + M) * C ^ M = (C * v ϖ) ^ M * (v ϖ * C) ^ M := by
+        rw [mul_one, pow_add, ← mul_assoc, mul_assoc (C ^ M * v ϖ ^ M), mul_pow, mul_pow]
       _ = 1 := by rw [hCdef, inv_mul_cancel₀ h0, mul_inv_cancel₀ h0, one_pow, one_mul]
   have hent : ∀ a : KU σ n, ∀ i j, mat (a : GU σ n) i j ∈ intL K := fun a i j =>
     (Valuation.mem_integer_iff _ _).2 (entry_le_one_of_mem_KU a.2 i j)
   let F : KU σ n → (Fin n → Fin n → T) := fun a i j =>
     ⟨(hT _ (hent a i j)).choose, (hT _ (hent a i j)).choose_spec.1⟩
-  have hF : ∀ (a : KU σ n) i j, v (mat (a : GU σ n) i j - (F a i j : K)) ≤ v ϖ ^ (M + M) := fun a i j =>
-    (hT _ (hent a i j)).choose_spec.2
-  have half : ∀ a a' : KU σ n, F a = F a' → ∀ i j,
-      v ((mat s⁻¹ * mat ((a' : GU σ n)⁻¹) * mat (a : GU σ n) * mat s) i j) ≤ 1 := by
+  have hF : ∀ (a : KU σ n) i j, v (mat (a : GU σ n) i j - (F a i j : K)) ≤ v ϖ ^ (M + M) :=
+    fun a i j => (hT _ (hent a i j)).choose_spec.2
+  have half
+      : ∀ a a' : KU σ n,
+        F a = F a'
+          → ∀ i j, v ((mat s⁻¹ * mat ((a' : GU σ n)⁻¹) * mat (a : GU σ n) * mat s) i j) ≤ 1 := by
     intro a a' haa'
     refine conj_entry_le_one (Units.inv_mul (s : GL (Fin n) K))
-      (Units.inv_mul ((a' : GU σ n) : GL (Fin n) K)) hs hsi
-      (entry_le_one_of_mem_KU (inv_mem a'.2)) (fun i j => ?_) hCε
-    have e : mat (a : GU σ n) i j - mat (a' : GU σ n) i j =
-        (mat (a : GU σ n) i j - (F a i j : K)) - (mat (a' : GU σ n) i j - (F a' i j : K)) := by
+      (Units.inv_mul ((a' : GU σ n) : GL (Fin n) K)) hs hsi (entry_le_one_of_mem_KU (inv_mem a'.2))
+      (fun i j => ?_)
+      hCε
+    have e
+        : mat (a : GU σ n) i j - mat (a' : GU σ n) i j
+          = (mat (a : GU σ n) i j - (F a i j : K)) - (mat (a' : GU σ n) i j - (F a' i j : K)) := by
       rw [haa']; ring
     rw [e]
     exact Valuation.map_sub_le _ (hF a i j) (hF a' i j)
-  have key : ∀ a a' : KU σ n, F a = F a' →
-      (((a' : GU σ n) * s : GU σ n) : GU σ n ⧸ KU σ n) = (((a : GU σ n) * s : GU σ n) : GU σ n ⧸ KU σ n) := by
+  have key
+      : ∀ a a' : KU σ n,
+        F a = F a'
+          → (((a' : GU σ n) * s : GU σ n) : GU σ n ⧸ KU σ n)
+            = (((a : GU σ n) * s : GU σ n) : GU σ n ⧸ KU σ n) := by
     intro a a' haa'
     apply QuotientGroup.eq.2
     apply mem_KU_of_entries
-    · have hg : ((a' : GU σ n) * s)⁻¹ * ((a : GU σ n) * s) = s⁻¹ * (a' : GU σ n)⁻¹ * (a : GU σ n) * s := by
+    · have hg
+          : ((a' : GU σ n) * s)⁻¹ * ((a : GU σ n) * s)
+            = s⁻¹ * (a' : GU σ n)⁻¹ * (a : GU σ n) * s := by
         group
       rw [hg]
       exact half a a' haa'
-    · have hg : (((a' : GU σ n) * s)⁻¹ * ((a : GU σ n) * s))⁻¹ = s⁻¹ * (a : GU σ n)⁻¹ * (a' : GU σ n) * s := by
+    · have hg
+          : (((a' : GU σ n) * s)⁻¹ * ((a : GU σ n) * s))⁻¹
+            = s⁻¹ * (a : GU σ n)⁻¹ * (a' : GU σ n) * s := by
         group
       rw [hg]
       exact half a' a haa'.symm
   haveI : Finite T := hTf.to_subtype
   classical
   let G : (Fin n → Fin n → T) → GU σ n ⧸ KU σ n := fun τ =>
-    if h : ∃ a, F a = τ then (((h.choose : GU σ n) * s : GU σ n) : GU σ n ⧸ KU σ n) else ((1 : GU σ n) : GU σ n ⧸ KU σ n)
+    if h : ∃ a, F a = τ then
+      (((h.choose : GU σ n) * s : GU σ n) : GU σ n ⧸ KU σ n)
+    else
+      ((1 : GU σ n) : GU σ n ⧸ KU σ n)
   apply (Set.finite_range G).subset
   rintro c ⟨a, ha, rfl⟩
   refine ⟨F ⟨a, ha⟩, ?_⟩

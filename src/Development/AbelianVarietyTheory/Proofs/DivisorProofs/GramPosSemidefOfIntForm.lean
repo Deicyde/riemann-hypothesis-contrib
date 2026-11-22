@@ -8,26 +8,29 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem gram_posSemidef_of_int_form {X : Type} [AddCommGroup X] {r : ℕ}
+theorem gram_posSemidef_of_int_form
+    {X : Type} [AddCommGroup X]
+    {r : ℕ}
     (b : LinearMap.BilinForm ℤ X) (hsymm : ∀ y z, b y z = b z y) (hpos : ∀ y, 0 ≤ b y y)
-    (v : Fin r → X) : (Matrix.of fun i j => (b (v i) (v j) : ℝ)).PosSemidef := by
+    (v : Fin r → X)
+    : (Matrix.of fun i j => (b (v i) (v j) : ℝ)).PosSemidef := by
   set G : Matrix (Fin r) (Fin r) ℝ := Matrix.of fun i j => (b (v i) (v j) : ℝ) with hG
   have hint : ∀ m : Fin r → ℤ, 0 ≤ ∑ i, ∑ j, (m i : ℝ) * (m j : ℝ) * G i j := by
     intro m
-    have key : (∑ i, ∑ j, m i * m j * b (v i) (v j) : ℤ)
-        = b (∑ i, m i • v i) (∑ j, m j • v j) := by
+    have key : (∑ i, ∑ j, m i * m j * b (v i) (v j) : ℤ) = b (∑ i, m i • v i) (∑ j, m j • v j) := by
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [map_sum, LinearMap.sum_apply, map_zsmul, LinearMap.smul_apply, smul_eq_mul,
-        Finset.mul_sum]
+          Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-      rw [hsymm (v i) (v j)]; ring
-    have h0 : (0:ℝ) ≤ ((∑ i, ∑ j, m i * m j * b (v i) (v j) : ℤ) : ℝ) := by
+      rw [hsymm (v i) (v j)]
+      ring
+    have h0 : (0 : ℝ) ≤ ((∑ i, ∑ j, m i * m j * b (v i) (v j) : ℤ) : ℝ) := by
       rw [key]; exact_mod_cast hpos _
     simpa [hG] using h0
   have hrat : ∀ c : Fin r → ℚ, 0 ≤ ∑ i, ∑ j, (c i : ℝ) * (c j : ℝ) * G i j := by
     intro c
     set N : ℕ := ∏ i, (c i).den with hN
-    have hNpos : (0:ℝ) < N := by
+    have hNpos : (0 : ℝ) < N := by
       have : 0 < N := Finset.prod_pos (fun i _ => (c i).den_pos)
       exact_mod_cast this
     have hm : ∀ i, ∃ k : ℤ, (k : ℝ) = N * (c i : ℝ) := by
@@ -36,13 +39,16 @@ theorem gram_posSemidef_of_int_form {X : Type} [AddCommGroup X] {r : ℕ}
       refine ⟨(c i).num * t, ?_⟩
       have h1 : ((c i).num : ℚ) = c i * (c i).den := (Rat.mul_den_eq_num (c i)).symm
       have h2 : ((c i).num : ℝ) = (c i : ℝ) * (c i).den := by exact_mod_cast h1
-      rw [ht]; push_cast
-      rw [h2]; ring
+      rw [ht]
+      push_cast
+      rw [h2]
+      ring
     choose m hm using hm
     have h3 := hint m
     simp_rw [hm] at h3
-    have e : ∑ i, ∑ j, ((N:ℝ) * c i) * (N * c j) * G i j
-        = (N:ℝ) ^ 2 * ∑ i, ∑ j, (c i : ℝ) * (c j : ℝ) * G i j := by
+    have e
+        : ∑ i, ∑ j, ((N:ℝ) * c i) * (N * c j) * G i j
+          = (N : ℝ) ^ 2 * ∑ i, ∑ j, (c i : ℝ) * (c j : ℝ) * G i j := by
       simp_rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       ring
@@ -64,6 +70,7 @@ theorem gram_posSemidef_of_int_form {X : Type} [AddCommGroup X] {r : ℕ}
       simp only [dotProduct, mulVec, star_trivial, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       ring
-    rw [e]; exact hreal x
+    rw [e]
+    exact hreal x
 
 end GlobalTheory

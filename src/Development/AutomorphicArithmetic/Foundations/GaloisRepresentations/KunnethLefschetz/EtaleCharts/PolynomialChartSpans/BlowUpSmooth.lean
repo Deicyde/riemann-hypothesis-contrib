@@ -15,32 +15,41 @@ open CategoryTheory Limits AlgebraicGeometry UpperTheory.Gal.DifferentialFormSec
 
 namespace UpperTheory.Gal.KunnethLefschetz.G
 
-private theorem stdC (A : Type) [CommRing A] (D : ℕ) :
-    (MvPolynomial.C : A →+* MvPolynomial (Fin D) A).IsStandardSmoothOfRelativeDimension D := by
+private theorem stdC (A : Type) [CommRing A] (D : ℕ)
+    : (MvPolynomial.C : A →+* MvPolynomial (Fin D) A).IsStandardSmoothOfRelativeDimension D := by
   rw [← MvPolynomial.algebraMap_eq, RingHom.isStandardSmoothOfRelativeDimension_algebraMap]
   let v : PEmpty.{1} → MvPolynomial (Fin D) A := PEmpty.elim
-  let P0 := Algebra.PreSubmersivePresentation.naive (R := A) (v := v) (σ := Fin D)
-    (ι := PEmpty.{1}) PEmpty.elim (fun a => a.elim)
-  let P1 : Algebra.SubmersivePresentation A _ (Fin D) PEmpty.{1} :=
-    { toPreSubmersivePresentation := P0
-      jacobian_isUnit := by
-        classical
-        rw [Algebra.PreSubmersivePresentation.jacobian_eq_jacobiMatrix_det]
-        simp }
+  let P0 :=
+    Algebra.PreSubmersivePresentation.naive (R := A) (v := v) (σ := Fin D) (ι := PEmpty.{1})
+      PEmpty.elim (fun a => a.elim)
+  let P1 : Algebra.SubmersivePresentation A _ (Fin D) PEmpty.{1} := {
+    toPreSubmersivePresentation := P0
+    jacobian_isUnit := by
+      classical
+      rw [Algebra.PreSubmersivePresentation.jacobian_eq_jacobiMatrix_det]
+      simp
+  }
   have hv : Ideal.span (Set.range v) = ⊥ := by simp [v]
   let e : (MvPolynomial (Fin D) A ⧸ Ideal.span (Set.range v)) ≃ₐ[A] MvPolynomial (Fin D) A :=
     (Ideal.quotientEquivAlgOfEq A hv).trans (AlgEquiv.quotientBot A _)
-  exact ⟨⟨Fin D, PEmpty.{1}, inferInstance, inferInstance, P1.ofAlgEquiv e,
-    by simp [Algebra.Presentation.dimension]⟩⟩
+  exact ⟨⟨
+    Fin D,
+    PEmpty.{1},
+    inferInstance,
+    inferInstance,
+    P1.ofAlgEquiv e,
+    by simp [Algebra.Presentation.dimension]
+  ⟩⟩
 
-private theorem chart {X Y : Scheme.{0}} (f : X ⟶ Y) (n : ℕ) {U : Y.Opens} {V : X.Opens}
-    (hU : IsAffineOpen U) (hV : IsAffineOpen V) (e : V ≤ f ⁻¹ᵁ U)
-    (h : RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U V e).hom) :
-    SmoothOfRelativeDimension n (V.ι ≫ f) := by
+private theorem chart
+    {X Y : Scheme.{0}} (f : X ⟶ Y)
+    (n : ℕ)
+    {U : Y.Opens} {V : X.Opens} (hU : IsAffineOpen U) (hV : IsAffineOpen V) (e : V ≤ f ⁻¹ᵁ U)
+    (h : RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U V e).hom)
+    : SmoothOfRelativeDimension n (V.ι ≫ f) := by
   haveI : IsAffine U := hU
   haveI : IsAffine V := hV
-  have H := (HasRingHomProperty.isLocal_ringHomProperty
-    (@SmoothOfRelativeDimension n)).respectsIso
+  have H := (HasRingHomProperty.isLocal_ringHomProperty (@SmoothOfRelativeDimension n)).respectsIso
   have hr : SmoothOfRelativeDimension n (f.resLE U V e) := by
     rw [HasRingHomProperty.iff_of_isAffine (P := @SmoothOfRelativeDimension n)]
     rw [Scheme.Hom.appTop, Scheme.Hom.resLE_app_top, CommRingCat.hom_comp, H.cancel_left_isIso,
@@ -52,9 +61,10 @@ private theorem chart {X Y : Scheme.{0}} (f : X ⟶ Y) (n : ℕ) {U : Y.Opens} {
   rw [← Scheme.Hom.resLE_comp_ι f e]
   simpa using smoothOfRelativeDimension_comp n 0 (f.resLE U V e) U.ι
 
-private theorem ofPts {X Y : Scheme.{0}} (f : X ⟶ Y) (n : ℕ)
-    (H : ∀ x : X, ∃ O : X.Opens, x ∈ O ∧ SmoothOfRelativeDimension n (O.ι ≫ f)) :
-    SmoothOfRelativeDimension n f := by
+private theorem ofPts
+    {X Y : Scheme.{0}} (f : X ⟶ Y)
+    (n : ℕ) (H : ∀ x : X, ∃ O : X.Opens, x ∈ O ∧ SmoothOfRelativeDimension n (O.ι ≫ f))
+    : SmoothOfRelativeDimension n f := by
   haveI : IsZariskiLocalAtSource (@SmoothOfRelativeDimension n) :=
     HasRingHomProperty.instIsZariskiLocalAtSource
   choose O hxO hO using H
@@ -97,9 +107,10 @@ theorem blSmooth : BlowUpSmooth := by
     · haveI : IsClosedImmersion (Over.Hom.left (dg Z)) := by
         change IsClosedImmersion (pullback.diagonal (Over.hom Z))
         infer_instance
-      let O0 : (Over.left (XX Z)).Opens :=
-        ⟨(Set.range (Over.Hom.left (dg Z)))ᶜ,
-          (Over.Hom.left (dg Z)).isClosedEmbedding.isClosed_range.isOpen_compl⟩
+      let O0 : (Over.left (XX Z)).Opens := ⟨
+        (Set.range (Over.Hom.left (dg Z)))ᶜ,
+        (Over.Hom.left (dg Z)).isClosedEmbedding.isClosed_range.isOpen_compl
+      ⟩
       obtain ⟨hiso, -⟩ := hoff O0 rfl
       refine ⟨Over.Hom.left π ⁻¹ᵁ O0, hw, ?_⟩
       change SmoothOfRelativeDimension D

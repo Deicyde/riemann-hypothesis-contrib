@@ -38,18 +38,21 @@ theorem norm_sqrt_le (c : ℂ) : ‖c ^ (1 / 2 : ℂ)‖ ≤ 1 + ‖c‖ := by
   have h : ‖c ^ (1 / 2 : ℂ)‖ ^ 2 = ‖c‖ := by rw [← norm_pow, sqrt_sq']
   nlinarith [sq_nonneg (‖c ^ (1 / 2 : ℂ)‖ - 1), norm_nonneg (c ^ (1 / 2 : ℂ))]
 
-theorem continuous_cosh_sqrt (t : ℂ) : Continuous fun c : ℂ => Complex.cosh (t * c ^ (1 / 2 : ℂ)) := by
+theorem continuous_cosh_sqrt (t : ℂ)
+    : Continuous fun c : ℂ => Complex.cosh (t * c ^ (1 / 2 : ℂ)) := by
   rw [Metric.continuous_iff]
   intro c₀ ε hε
   have hc : Continuous fun w : ℂ => Complex.cosh (t * w) :=
     Complex.continuous_cosh.comp (continuous_const.mul continuous_id)
   obtain ⟨δ, hδ, hδε⟩ := Metric.continuous_iff.1 hc (c₀ ^ (1 / 2 : ℂ)) ε hε
   refine ⟨δ ^ 2, by positivity, fun c hcc => ?_⟩
-  have hprod : (c ^ (1 / 2 : ℂ) - c₀ ^ (1 / 2 : ℂ)) * (c ^ (1 / 2 : ℂ) + c₀ ^ (1 / 2 : ℂ)) = c - c₀ := by
+  have hprod
+      : (c ^ (1 / 2 : ℂ) - c₀ ^ (1 / 2 : ℂ)) * (c ^ (1 / 2 : ℂ) + c₀ ^ (1 / 2 : ℂ)) = c - c₀ := by
     have h1 := sqrt_sq' c
     have h2 := sqrt_sq' c₀
     linear_combination h1 - h2
-  have hlt : ‖c ^ (1 / 2 : ℂ) - c₀ ^ (1 / 2 : ℂ)‖ * ‖c ^ (1 / 2 : ℂ) + c₀ ^ (1 / 2 : ℂ)‖ < δ * δ := by
+  have hlt
+      : ‖c ^ (1 / 2 : ℂ) - c₀ ^ (1 / 2 : ℂ)‖ * ‖c ^ (1 / 2 : ℂ) + c₀ ^ (1 / 2 : ℂ)‖ < δ * δ := by
     rw [← norm_mul, hprod, ← dist_eq_norm, ← sq]
     exact hcc
   by_cases h : ‖c ^ (1 / 2 : ℂ) - c₀ ^ (1 / 2 : ℂ)‖ < δ
@@ -64,14 +67,15 @@ theorem continuous_cosh_sqrt (t : ℂ) : Continuous fun c : ℂ => Complex.cosh 
       push Not at h2
       have := mul_le_mul h h2 hδ.le (norm_nonneg _)
       linarith
-    have := hδε (-c ^ (1 / 2 : ℂ)) (by rwa [dist_eq_norm])
+    have := hδε (- c ^ (1 / 2 : ℂ)) (by rwa [dist_eq_norm])
     simpa only [mul_neg, Complex.cosh_neg] using this
 
 theorem continuous_coshT {g : ℝ → ℝ} {T : ℝ} (hg : IsBump g T) : Continuous (coshT g) := by
   rw [continuous_iff_continuousAt]
   intro c₀
   have hgc : Continuous g := hg.1.continuous
-  have hF : ∀ c : ℂ, Continuous fun t : ℝ => (g t : ℂ) * Complex.cosh (t * c ^ (1 / 2 : ℂ)) := fun c =>
+  have hF
+      : ∀ c : ℂ, Continuous fun t : ℝ => (g t : ℂ) * Complex.cosh (t * c ^ (1 / 2 : ℂ)) := fun c =>
     (Complex.continuous_ofReal.comp hgc).mul
       (Complex.continuous_cosh.comp (Complex.continuous_ofReal.mul continuous_const))
   have hbc : Continuous fun t : ℝ => ‖(g t : ℂ)‖ * Real.exp (|t| * (2 + ‖c₀‖)) :=
@@ -89,8 +93,10 @@ theorem continuous_coshT {g : ℝ → ℝ} {T : ℝ} (hg : IsBump g T) : Continu
         exact lt_of_lt_of_le ht (le_abs_self t)
     simp [hg.2.2 t hT]
   unfold coshT
-  refine continuousAt_of_dominated (bound := fun t : ℝ => ‖(g t : ℂ)‖ * Real.exp (|t| * (2 + ‖c₀‖)))
-    (Eventually.of_forall fun c => (hF c).aestronglyMeasurable) ?_ (hbc.integrable_of_hasCompactSupport hbs)
+  refine continuousAt_of_dominated
+    (bound := fun t : ℝ => ‖(g t : ℂ)‖ * Real.exp (|t| * (2 + ‖c₀‖)))
+    (Eventually.of_forall fun c => (hF c).aestronglyMeasurable) ?_
+    (hbc.integrable_of_hasCompactSupport hbs)
     (ae_of_all _ fun t => (continuous_const.mul (continuous_cosh_sqrt (t : ℂ))).continuousAt)
   filter_upwards [Metric.ball_mem_nhds c₀ one_pos] with c hc
   refine ae_of_all _ fun t => ?_

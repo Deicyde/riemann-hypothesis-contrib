@@ -17,8 +17,11 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.QuadraticFiel
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
-open GroundTheory.Heights₂.Heights.LowerBoundFree (ComponentData ComponentSetting degMu ArLimExists slX)
+open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open GroundTheory.Heights₂.Heights.LowerBoundFree
+  (ComponentData ComponentSetting degMu ArLimExists slX)
 
 namespace GlobalTheory.CompanionTheory.Ar.Top.HostNumbers
 
@@ -34,39 +37,49 @@ theorem seven_le_d (H : Host E) : 7 ≤ H.d := by
   omega
 
 private theorem two_mul_pow_self_le_succ_pow (m : ℕ) (hm : 1 ≤ m) : 2 * m ^ m ≤ (m + 1) ^ m := by
-  have hm' : (0:ℝ) < m := by exact_mod_cast hm
-  have hb : (1:ℝ) + m * (1 / m) ≤ (1 + 1 / m) ^ m :=
-    one_add_mul_le_pow (by have : (0:ℝ) ≤ 1 / m := by positivity
-                           linarith) m
-  have h1 : (1:ℝ) + m * (1 / m) = 2 := by field_simp; ring
-  have hR : (2:ℝ) * (m:ℝ) ^ m ≤ ((m:ℝ) + 1) ^ m := by
-    calc (2:ℝ) * (m:ℝ) ^ m = (1 + m * (1 / m)) * (m:ℝ) ^ m := by rw [h1]
-      _ ≤ (1 + 1 / m) ^ m * (m:ℝ) ^ m := by gcongr
+  have hm' : (0 : ℝ) < m := by exact_mod_cast hm
+  have hb : (1 : ℝ) + m * (1 / m) ≤ (1 + 1 / m) ^ m :=
+    one_add_mul_le_pow
+      (by
+        have : (0 : ℝ) ≤ 1 / m := by positivity
+        linarith)
+      m
+  have h1 : (1 : ℝ) + m * (1 / m) = 2 := by field_simp; ring
+  have hR : (2 : ℝ) * (m : ℝ) ^ m ≤ ((m : ℝ) + 1) ^ m := by
+    calc
+      (2 : ℝ) * (m : ℝ) ^ m
+        = (1 + m * (1 / m)) * (m : ℝ) ^ m := by rw [h1]
+      _ ≤ (1 + 1 / m) ^ m * (m : ℝ) ^ m := by gcongr
       _ = ((1 + 1 / m) * m) ^ m := by rw [mul_pow]
-      _ = ((m:ℝ) + 1) ^ m := by congr 1; field_simp
+      _ = ((m : ℝ) + 1) ^ m := by congr 1; field_simp
   exact_mod_cast hR
 
-private theorem two_pow_mul_factorial_le_two_mul_pow_self (m : ℕ) (hm : 1 ≤ m) : 2 ^ m * m.factorial ≤ 2 * m ^ m := by
+private theorem two_pow_mul_factorial_le_two_mul_pow_self (m : ℕ) (hm : 1 ≤ m)
+    : 2 ^ m * m.factorial ≤ 2 * m ^ m := by
   induction m, hm using Nat.le_induction with
   | base => norm_num
   | succ k hk ih =>
     have h1 := two_mul_pow_self_le_succ_pow k hk
-    calc 2 ^ (k+1) * (k+1).factorial = 2 * (k+1) * (2 ^ k * k.factorial) := by
-          rw [Nat.factorial_succ, pow_succ]; ring
-      _ ≤ 2 * (k+1) * (2 * k ^ k) := Nat.mul_le_mul_left _ ih
-      _ ≤ 2 * (k+1) * (k+1) ^ k := Nat.mul_le_mul_left _ h1
-      _ = 2 * (k+1) ^ (k+1) := by ring
+    calc
+      2 ^ (k + 1) * (k + 1).factorial
+        = 2 * (k + 1) * (2 ^ k * k.factorial) := by rw [Nat.factorial_succ, pow_succ]; ring
+      _ ≤ 2 * (k + 1) * (2 * k ^ k) := Nat.mul_le_mul_left _ ih
+      _ ≤ 2 * (k + 1) * (k + 1) ^ k := Nat.mul_le_mul_left _ h1
+      _ = 2 * (k + 1) ^ (k + 1) := by ring
 
-private theorem two_pow_mul_factorial_sq_le_pow_two_mul (m : ℕ) (hm : 2 ≤ m) :
-    2 ^ m * m.factorial ^ 2 ≤ m ^ (2 * m) := by
+private theorem two_pow_mul_factorial_sq_le_pow_two_mul (m : ℕ) (hm : 2 ≤ m)
+    : 2 ^ m * m.factorial ^ 2 ≤ m ^ (2 * m) := by
   have h := two_pow_mul_factorial_le_two_mul_pow_self m (by omega)
   have hsq : (2 ^ m * m.factorial) ^ 2 ≤ (2 * m ^ m) ^ 2 := Nat.pow_le_pow_left h 2
   have h4' : 4 ≤ 2 ^ m := by
-    calc 4 = 2 ^ 2 := by norm_num
+    calc
+      4 = 2 ^ 2 := by norm_num
       _ ≤ 2 ^ m := Nat.pow_le_pow_right (by norm_num) hm
   have h4 : 4 * 2 ^ m ≤ 2 ^ m * 2 ^ m := Nat.mul_le_mul_right _ h4'
   have h5 : 4 * (2 ^ m * m.factorial ^ 2) ≤ 4 * m ^ (2 * m) := by
-    calc 4 * (2 ^ m * m.factorial ^ 2) = (4 * 2 ^ m) * m.factorial ^ 2 := by ring
+    calc
+      4 * (2 ^ m * m.factorial ^ 2)
+        = (4 * 2 ^ m) * m.factorial ^ 2 := by ring
       _ ≤ (2 ^ m * 2 ^ m) * m.factorial ^ 2 := Nat.mul_le_mul_right _ h4
       _ = (2 ^ m * m.factorial) ^ 2 := by ring
       _ ≤ (2 * m ^ m) ^ 2 := hsq
@@ -101,7 +114,8 @@ theorem two_pow_le_host (H : Host E) : 2 ^ Module.finrank ℚ E ≤ (discr E).na
       (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
         (f := (Algebra.ofId ℚ F).toLinearMap) (by rw [Module.finrank_self, hm1])).mp hinj
     have hF : discr F = 1 := by
-      rw [← NumberField.discr_eq_discr_of_algEquiv ℚ (AlgEquiv.ofBijective (Algebra.ofId ℚ F) ⟨hinj, hsurj⟩),
+      rw [← NumberField.discr_eq_discr_of_algEquiv ℚ
+          (AlgEquiv.ofBijective (Algebra.ofId ℚ F) ⟨hinj, hsurj⟩),
         NumberField.discr_rat]
     rw [hF] at htow
     have h1 : (discr E).natAbs = 1 := by simpa using htow
@@ -110,34 +124,36 @@ theorem two_pow_le_host (H : Host E) : 2 ^ Module.finrank ℚ E ≤ (discr E).na
   · have hF := NumberField.abs_discr_ge' F
     rw [NumberField.IsTotallyReal.nrComplexPlaces_eq_zero, mul_zero, pow_zero, one_mul] at hF
     have key := two_pow_mul_factorial_sq_le_pow_two_mul _ hm
-    have hR : (2:ℝ) ^ Module.finrank ℚ F ≤ (((discr F).natAbs : ℤ) : ℝ) := by
+    have hR : (2 : ℝ) ^ Module.finrank ℚ F ≤ (((discr F).natAbs : ℤ) : ℝ) := by
       rw [← Int.abs_eq_natAbs]
       refine le_trans ?_ hF
       rw [le_div_iff₀ (by positivity)]
       exact_mod_cast key
     have hN : 2 ^ Module.finrank ℚ F ≤ (discr F).natAbs := by exact_mod_cast hR
     rw [htow, hfr, pow_mul]
-    calc (2 ^ 2) ^ Module.finrank ℚ F = (2 ^ Module.finrank ℚ F) ^ 2 := by
-          rw [← pow_mul, ← pow_mul, mul_comm]
+    calc
+      (2 ^ 2) ^ Module.finrank ℚ F
+        = (2 ^ Module.finrank ℚ F) ^ 2 := by rw [← pow_mul, ← pow_mul, mul_comm]
       _ ≤ (discr F).natAbs ^ 2 := Nat.pow_le_pow_left hN 2
 
 theorem two_le_hostRd (H : Host E) : 2 ≤ hostRd E := by
   have h := two_pow_le_host H
   have hn : (Module.finrank ℚ E : ℝ) ≠ 0 := by
     exact_mod_cast (Module.finrank_pos (R := ℚ) (M := E)).ne'
-  have h' : ((2:ℝ) ^ Module.finrank ℚ E) ≤ |((discr E : ℤ) : ℝ)| := by
+  have h' : ((2 : ℝ) ^ Module.finrank ℚ E) ≤ |((discr E : ℤ) : ℝ)| := by
     rw [← Int.cast_abs, Int.abs_eq_natAbs]
     exact_mod_cast h
   unfold hostRd
-  calc (2:ℝ) = ((2:ℝ) ^ Module.finrank ℚ E) ^ (1 / (Module.finrank ℚ E : ℝ)) := by
-        rw [← Real.rpow_natCast, ← Real.rpow_mul (by norm_num), mul_one_div_cancel hn, Real.rpow_one]
+  calc
+    (2 : ℝ) = ((2 : ℝ) ^ Module.finrank ℚ E) ^ (1 / (Module.finrank ℚ E : ℝ)) := by
+      rw [← Real.rpow_natCast, ← Real.rpow_mul (by norm_num), mul_one_div_cancel hn, Real.rpow_one]
     _ ≤ _ := Real.rpow_le_rpow (by positivity) h' (by positivity)
 
 theorem rt0_conj_neg_ne_zero (H : Host E) : starRingEnd ℂ H.rt0 = -H.rt0 := by
   have h := H.sqrt_neg_disc_sq
   rw [pow_two] at h
-  have hd : (7:ℝ) ≤ H.d := by exact_mod_cast seven_le_d H
-  have hre : H.rt0.re * H.rt0.re - H.rt0.im * H.rt0.im = -(H.d:ℝ) := by
+  have hd : (7 : ℝ) ≤ H.d := by exact_mod_cast seven_le_d H
+  have hre : H.rt0.re * H.rt0.re - H.rt0.im * H.rt0.im = -(H.d : ℝ) := by
     have h1 := congrArg Complex.re h
     simp only [Complex.mul_re, Complex.neg_re, Complex.natCast_re] at h1
     exact h1
@@ -167,34 +183,42 @@ theorem rt0_ne_zero (H : Host E) : H.rt0 ≠ 0 := by
   omega
 
 theorem emb_rt (H : Host E) (τ : E →+* ℂ) : τ (H.rt : E) = H.rt0 ∨ τ (H.rt : E) = -H.rt0 := by
-  have h1 : τ (H.rt : E) ^ 2 = -(H.d : ℂ) := by
-    rw [← map_pow, rt_sq H, map_neg, map_natCast]
+  have h1 : τ (H.rt : E) ^ 2 = -(H.d : ℂ) := by rw [← map_pow, rt_sq H, map_neg, map_natCast]
   have h2 := H.sqrt_neg_disc_sq
-  have h3 : (τ (H.rt : E) - H.rt0) * (τ (H.rt : E) + H.rt0) = 0 := by
-    linear_combination h1 - h2
+  have h3 : (τ (H.rt : E) - H.rt0) * (τ (H.rt : E) + H.rt0) = 0 := by linear_combination h1 - h2
   rcases mul_eq_zero.mp h3 with h | h
   · exact Or.inl (sub_eq_zero.mp h)
   · exact Or.inr (eq_neg_of_add_eq_zero_left h)
 
-def conjEquiv (H : Host E) :
-    {τ : E →+* ℂ // τ (H.rt : E) = H.rt0} ≃ {τ : E →+* ℂ // ¬ τ (H.rt : E) = H.rt0} where
-  toFun τ := ⟨ComplexEmbedding.conjugate τ.1, by
-    rw [ComplexEmbedding.conjugate_coe_eq, τ.2, rt0_conj_neg_ne_zero]
-    intro h
-    exact rt0_ne_zero H (self_eq_neg.1 h.symm)⟩
-  invFun τ := ⟨ComplexEmbedding.conjugate τ.1, by
-    rw [ComplexEmbedding.conjugate_coe_eq, (emb_rt H τ.1).resolve_left τ.2, map_neg, rt0_conj_neg_ne_zero, neg_neg]⟩
+def conjEquiv (H : Host E)
+    : {τ : E →+* ℂ // τ (H.rt : E) = H.rt0} ≃ {τ : E →+* ℂ // ¬ τ (H.rt : E) = H.rt0} where
+  toFun τ := ⟨
+    ComplexEmbedding.conjugate τ.1,
+    by
+      rw [ComplexEmbedding.conjugate_coe_eq, τ.2, rt0_conj_neg_ne_zero]
+      intro h
+      exact rt0_ne_zero H (self_eq_neg.1 h.symm)
+  ⟩
+  invFun τ := ⟨
+    ComplexEmbedding.conjugate τ.1,
+    by
+      rw [ComplexEmbedding.conjugate_coe_eq, (emb_rt H τ.1).resolve_left τ.2, map_neg,
+        rt0_conj_neg_ne_zero, neg_neg]
+  ⟩
   left_inv τ := Subtype.ext (by simp)
   right_inv τ := Subtype.ext (by simp)
 
 theorem two_mul_card_CMType (H : Host E) : 2 * Fintype.card (CMType H) = Module.finrank ℚ E := by
   classical
-  have h1 : Nat.card (E →+* ℂ) = Nat.card {τ : E →+* ℂ // τ (H.rt : E) = H.rt0} +
-      Nat.card {τ : E →+* ℂ // ¬ τ (H.rt : E) = H.rt0} := by
+  have h1
+      : Nat.card (E →+* ℂ)
+        = Nat.card {τ : E →+* ℂ // τ (H.rt : E) = H.rt0}
+          + Nat.card {τ : E →+* ℂ // ¬ τ (H.rt : E) = H.rt0} := by
     rw [← Nat.card_sum]
     exact Nat.card_congr (Equiv.sumCompl (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0)).symm
-  have h2 : Nat.card {τ : E →+* ℂ // ¬ τ (H.rt : E) = H.rt0} =
-      Nat.card {τ : E →+* ℂ // τ (H.rt : E) = H.rt0} :=
+  have h2
+      : Nat.card {τ : E →+* ℂ // ¬ τ (H.rt : E) = H.rt0}
+        = Nat.card {τ : E →+* ℂ // τ (H.rt : E) = H.rt0} :=
     (Nat.card_congr (conjEquiv H)).symm
   have h3 : Nat.card (E →+* ℂ) = Module.finrank ℚ E := by
     rw [Nat.card_eq_fintype_card]
@@ -203,7 +227,9 @@ theorem two_mul_card_CMType (H : Host E) : 2 * Fintype.card (CMType H) = Module.
     rw [← Nat.card_eq_fintype_card]
   omega
 
-theorem host_numbers : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E), 2 ≤ hostRd E ∧ Nonempty (CMType H) ∧ 2 * Fintype.card (CMType H) = Module.finrank ℚ E := by
+theorem host_numbers
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E),
+      2 ≤ hostRd E ∧ Nonempty (CMType H) ∧ 2 * Fintype.card (CMType H) = Module.finrank ℚ E := by
   intro E _ _ _ H
   refine ⟨two_le_hostRd H, ?_, two_mul_card_CMType H⟩
   rw [← Fintype.card_pos_iff]

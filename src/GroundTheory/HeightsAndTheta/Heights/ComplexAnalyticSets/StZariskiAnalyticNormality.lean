@@ -27,8 +27,8 @@ def holGerms {σ : Type} [Fintype σ] (w : σ → ℂ) : Subring (Germ (𝓝 w) 
     rintro _ ⟨f, hf, rfl⟩
     exact ⟨-f, hf.neg, rfl⟩
 
-theorem analyticAt_eval_polynomial {σ : Type} [Fintype σ] (w : σ → ℂ) (q : MvPolynomial σ ℂ) :
-    AnalyticAt ℂ (fun z : σ → ℂ => eval z q) w := by
+theorem analyticAt_eval_polynomial {σ : Type} [Fintype σ] (w : σ → ℂ) (q : MvPolynomial σ ℂ)
+    : AnalyticAt ℂ (fun z : σ → ℂ => eval z q) w := by
   induction q using MvPolynomial.induction_on with
   | C a => simpa using (analyticAt_const : AnalyticAt ℂ (fun _ : σ → ℂ => a) w)
   | add p q hp hq =>
@@ -46,8 +46,8 @@ def polyGerm {σ : Type} [Fintype σ] (w : σ → ℂ) : MvPolynomial σ ℂ →
 
 def ZariskiAnalyticNormality.Statement : Prop :=
   ∀ (σ : Type) [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ),
-    I.IsPrime → IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I) → w ∈ zeroSetIn I →
-      (I.map (polyGerm w)).IsPrime ∧ IsIntegrallyClosed (holGerms w ⧸ I.map (polyGerm w))
+    I.IsPrime → IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I) → w ∈ zeroSetIn I
+      → (I.map (polyGerm w)).IsPrime ∧ IsIntegrallyClosed (holGerms w ⧸ I.map (polyGerm w))
 
 end
 

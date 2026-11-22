@@ -9,10 +9,13 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR.GLift
 
-theorem glO_isOpen_isCompact : ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [ProperSpace F] (n : ℕ), IsOpen (glO n F) ∧ IsCompact (glO n F) := by
+theorem glO_isOpen_isCompact
+    : ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [ProperSpace F] (n : ℕ),
+      IsOpen (glO n F) ∧ IsCompact (glO n F) := by
   intro F _ _ _ n
   let B : Set (Matrix (Fin n) (Fin n) F) :=
-    Set.pi Set.univ (fun _ : Fin n => Set.pi Set.univ (fun _ : Fin n => Metric.closedBall (0 : F) 1))
+    Set.pi Set.univ
+      (fun _ : Fin n => Set.pi Set.univ (fun _ : Fin n => Metric.closedBall (0 : F) 1))
   have hB : ∀ A : Matrix (Fin n) (Fin n) F, A ∈ B ↔ ∀ i j, ‖A i j‖ ≤ 1 := by
     intro A
     constructor
@@ -30,8 +33,8 @@ theorem glO_isOpen_isCompact : ∀ (F : Type) [NontriviallyNormedField F] [IsUlt
     B ×ˢ (MulOpposite.unop ⁻¹' B)
   have hS : glO n F = Units.embedProduct _ ⁻¹' S := by
     ext g
-    simp only [glO, Set.mem_setOf_eq, Set.mem_preimage, S, Set.mem_prod, hB, Units.embedProduct_apply,
-      MulOpposite.unop_op]
+    simp only [glO, Set.mem_setOf_eq, Set.mem_preimage, S, Set.mem_prod, hB,
+      Units.embedProduct_apply, MulOpposite.unop_op]
     constructor
     · intro h; exact ⟨fun i j => (h i j).1, fun i j => (h i j).2⟩
     · intro h i j; exact ⟨h.1 i j, h.2 i j⟩
@@ -43,9 +46,12 @@ theorem glO_isOpen_isCompact : ∀ (F : Type) [NontriviallyNormedField F] [IsUlt
       constructor
       · intro h; exact ⟨_, h, MulOpposite.op_unop x⟩
       · rintro ⟨y, hy, rfl⟩; simpa using hy
-    rw [this]; exact hBc.image MulOpposite.continuous_op
+    rw [this]
+    exact hBc.image MulOpposite.continuous_op
   rw [hS]
-  exact ⟨hSo.preimage Units.continuous_embedProduct,
-    Units.isClosedEmbedding_embedProduct.isCompact_preimage hSc⟩
+  exact ⟨
+    hSo.preimage Units.continuous_embedProduct,
+    Units.isClosedEmbedding_embedProduct.isCompact_preimage hSc
+  ⟩
 
 end GlobalTheory.JR.GLift

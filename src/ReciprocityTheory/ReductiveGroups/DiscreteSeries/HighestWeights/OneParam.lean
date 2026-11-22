@@ -62,21 +62,27 @@ lemma onep_Kset {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK
   refine ⟨?_, (onep_commJ hX t).eq.symm⟩
   rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, onep_exp_conjT hX t, onep_exp_mul_neg]
 
-def onepCurve (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (t : ℝ) : KG ε :=
-  ⟨⟨(Matrix.isUnit_exp ((t : ℂ) • X)).unit, by
+def onepCurve (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (t : ℝ) : KG ε := ⟨
+  ⟨
+    (Matrix.isUnit_exp ((t : ℂ) • X)).unit,
+    by
       show inUJ ε ((Matrix.isUnit_exp ((t : ℂ) • X)).unit : Matrix (Fin n) (Fin n) ℂ)
       rw [IsUnit.unit_spec]
-      exact onep_inUJ hX t⟩, by
+      exact onep_inUJ hX t
+  ⟩,
+  by
     show ((Matrix.isUnit_exp ((t : ℂ) • X)).unit : Matrix (Fin n) (Fin n) ℂ) ∈ Kset ε
     rw [IsUnit.unit_spec]
-    exact onep_Kset hX t⟩
+    exact onep_Kset hX t
+⟩
 
 lemma toMK_onepCurve (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (t : ℝ) :
     toMK (onepCurve ε hX t) = NormedSpace.exp ((t : ℂ) • X) :=
   IsUnit.unit_spec _
 
-theorem exists_curve (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) :
-    ∃ γ : ℝ → KG ε, ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X) := ⟨onepCurve ε hX, toMK_onepCurve ε hX⟩
+theorem exists_curve (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
+    : ∃ γ : ℝ → KG ε, ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X) :=
+  ⟨onepCurve ε hX, toMK_onepCurve ε hX⟩
 
 lemma onep_KG_ext {ε : Fin n → Bool} {g h : KG ε} (hgh : toMK g = toMK h) : g = h := by
   unfold toMK at hgh
@@ -85,17 +91,20 @@ lemma onep_KG_ext {ε : Fin n → Bool} {g h : KG ε} (hgh : toMK g = toMK h) : 
     | exact Subtype.ext (Subtype.ext (Units.ext hgh))
     | (unfold toM at hgh; done)
 
-theorem KType.op_curve {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
-    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (γ : ℝ → KG ε)
-    (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X)) (t : ℝ) :
-    T.op (γ t) = NormedSpace.exp ((t : ℂ) • T.dτ X) := by
+theorem KType.op_curve
+    {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
+    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
+    (γ : ℝ → KG ε) (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
+    (t : ℝ)
+    : T.op (γ t) = NormedSpace.exp ((t : ℂ) • T.dτ X) := by
   set A := T.dτ X with hAdef
   set F : ℝ → T.V →L[ℂ] T.V := fun s => T.op (γ s) with hFdef
   have hmul : ∀ s u : ℝ, γ (s + u) = γ s * γ u := by
     intro s u
     apply onep_KG_ext
     show toMK (γ (s + u)) = toMK (γ s) * toMK (γ u)
-    rw [hγ, hγ, hγ, show (((s + u : ℝ) : ℂ) • X) = (s : ℂ) • X + (u : ℂ) • X by push_cast; exact add_smul _ _ _]
+    rw [hγ, hγ, hγ,
+      show (((s + u : ℝ) : ℂ) • X) = (s : ℂ) • X + (u : ℂ) • X by push_cast; exact add_smul _ _ _]
     exact Matrix.exp_add_of_commute _ _ (((Commute.refl X).smul_left _).smul_right _)
   have h0 : γ 0 = 1 := by
     apply onep_KG_ext
@@ -133,16 +142,16 @@ theorem KType.op_curve {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε 
     show F 0 * NormedSpace.exp ((0 : ℝ) • (-A)) = 1
     rw [hF0, zero_smul, NormedSpace.exp_zero, one_mul]
   show F t = _
-  have hs : ((t : ℂ) • A) = t • A := by
-    exact Complex.coe_smul t A
+  have hs : ((t : ℂ) • A) = t • A := by exact Complex.coe_smul t A
   rw [hs]
   have hc : Commute (t • (-A)) (t • A) := (((Commute.refl A).neg_left).smul_left t).smul_right t
-  calc F t = F t * E t * NormedSpace.exp (t • A) := by
-        rw [mul_assoc, hEdef, ← NormedSpace.exp_add_of_commute_of_mem_ball (𝕂 := ℝ) hc
+  calc
+    F t = F t * E t * NormedSpace.exp (t • A) := by
+      rw [mul_assoc, hEdef,
+        ← NormedSpace.exp_add_of_commute_of_mem_ball (𝕂 := ℝ) hc
           ((NormedSpace.expSeries_radius_eq_top ℝ (T.V →L[ℂ] T.V)).symm ▸ edist_lt_top _ _)
-          ((NormedSpace.expSeries_radius_eq_top ℝ (T.V →L[ℂ] T.V)).symm ▸ edist_lt_top _ _), smul_neg, neg_add_cancel,
-          NormedSpace.exp_zero, mul_one]
-    _ = NormedSpace.exp (t • A) := by
-        rw [show F t * E t = (F * E) t from rfl, hGc, hG0, one_mul]
+          ((NormedSpace.expSeries_radius_eq_top ℝ (T.V →L[ℂ] T.V)).symm ▸ edist_lt_top _ _),
+        smul_neg, neg_add_cancel, NormedSpace.exp_zero, mul_one]
+    _ = NormedSpace.exp (t • A) := by rw [show F t * E t = (F * E) t from rfl, hGc, hG0, one_mul]
 
 end ReciprocityTheory.ChartRestriction.DS.HW

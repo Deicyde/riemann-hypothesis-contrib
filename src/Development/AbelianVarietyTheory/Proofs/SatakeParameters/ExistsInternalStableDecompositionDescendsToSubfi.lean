@@ -9,24 +9,29 @@ open Formalism.MainNotions Formalism.MainNotions.N GlobalTheory.SplitField
 
 namespace GlobalTheory.SplitField
 
-def coordMap {L E : Type} [Field L] [Field E] (f : L →+* E) (a : ℕ) :
-    (Fin a → L) →ₛₗ[f] (Fin a → E) where
+def coordMap {L E : Type} [Field L] [Field E] (f : L →+* E) (a : ℕ)
+    : (Fin a → L) →ₛₗ[f] (Fin a → E) where
   toFun v := f ∘ v
   map_add' v w := by funext i; simp
   map_smul' c v := by funext i; simp [smul_eq_mul]
 
-theorem coordMap_injective {L E : Type} [Field L] [Field E] (f : L →+* E) (a : ℕ) :
-    Function.Injective (coordMap f a) := by
+theorem coordMap_injective {L E : Type} [Field L] [Field E] (f : L →+* E) (a : ℕ)
+    : Function.Injective (coordMap f a) := by
   intro v w h
   funext i
   exact f.injective (congrFun h i)
 
-theorem descend_decomp {Γ L E : Type} [Group Γ] [Field L] [Field E] (f : L →+* E) {a n : ℕ}
-    (τ : Γ →* GL (Fin a) L) (Vs : Fin n → Submodule E (Fin a → E)) (hint : DirectSum.IsInternal Vs)
-    (hinv : ∀ m, IsInv (mapRep f τ) (Vs m))
-    (hspan : ∀ m, Vs m ≤ Submodule.span E ((fun v => f ∘ v) '' {v : Fin a → L | f ∘ v ∈ Vs m})) :
-    ∃ Us : Fin n → Submodule L (Fin a → L), DirectSum.IsInternal Us ∧
-      ∀ m, IsInv τ (Us m) ∧ Submodule.span E ((fun v => f ∘ v) '' (Us m : Set (Fin a → L))) = Vs m := by
+theorem descend_decomp
+    {Γ L E : Type} [Group Γ] [Field L] [Field E]
+    (f : L →+* E)
+    {a n : ℕ} (τ : Γ →* GL (Fin a) L) (Vs : Fin n → Submodule E (Fin a → E))
+    (hint : DirectSum.IsInternal Vs) (hinv : ∀ m, IsInv (mapRep f τ) (Vs m))
+    (hspan : ∀ m, Vs m ≤ Submodule.span E ((fun v => f ∘ v) '' {v : Fin a → L | f ∘ v ∈ Vs m}))
+    : ∃ Us : Fin n → Submodule L (Fin a → L),
+      DirectSum.IsInternal Us
+        ∧ ∀ m,
+          IsInv τ (Us m)
+            ∧ Submodule.span E ((fun v => f ∘ v) '' (Us m : Set (Fin a → L))) = Vs m := by
   classical
   set F := coordMap f a with hF
   let Us : Fin n → Submodule L (Fin a → L) := fun m => (Vs m).comap F
@@ -47,7 +52,10 @@ theorem descend_decomp {Γ L E : Type} [Group Γ] [Field L] [Field E] (f : L →
       exact coordMap_injective f a (by rw [h3, map_zero])
     · rw [eq_top_iff]
       intro v _
-      have hle : (⨆ m, Vs m) ≤ Submodule.span E ((fun v => f ∘ v) '' ((⨆ m, Us m : Submodule L (Fin a → L)) : Set (Fin a → L))) := by
+      have hle
+          : (⨆ m, Vs m)
+            ≤ Submodule.span E
+              ((fun v => f ∘ v) '' ((⨆ m, Us m : Submodule L (Fin a → L)) : Set (Fin a → L))) := by
         refine iSup_le fun m => (hspan m).trans (Submodule.span_mono (Set.image_mono ?_))
         rw [← hUs m]
         exact le_iSup Us m
@@ -57,8 +65,9 @@ theorem descend_decomp {Γ L E : Type} [Group Γ] [Field L] [Field E] (f : L →
   · intro g v hv
     have hv' : f ∘ v ∈ Vs m := hv
     show f ∘ ((τ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L).mulVec v ∈ Vs m
-    have hm : f ∘ ((τ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L).mulVec v =
-        ((mapRep f τ g : GL (Fin a) E) : Matrix (Fin a) (Fin a) E).mulVec (f ∘ v) := by
+    have hm
+        : f ∘ ((τ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L).mulVec v
+          = ((mapRep f τ g : GL (Fin a) E) : Matrix (Fin a) (Fin a) E).mulVec (f ∘ v) := by
       funext i
       exact RingHom.map_mulVec f _ v i
     rw [hm]

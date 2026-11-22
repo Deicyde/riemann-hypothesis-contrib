@@ -22,12 +22,18 @@ theorem continuous_expCG (ε : Fin n → Bool) : Continuous (expC ε) :=
 
 theorem measurable_expCG (ε : Fin n → Bool) : Measurable (expC ε) := (continuous_expCG ε).measurable
 
-def nuG (ε : Fin n → Bool) (s : ℝ) (xs : ℕ → Formalism.REAL.UJ ε) (D : ℕ → Set (Formalism.REAL.UJ ε)) : Measure (Formalism.REAL.UJ ε) :=
+def nuG
+    (ε : Fin n → Bool) (s : ℝ) (xs : ℕ → Formalism.REAL.UJ ε) (D : ℕ → Set (Formalism.REAL.UJ ε))
+    : Measure (Formalism.REAL.UJ ε) :=
   Measure.sum fun i => ((lamM ε s).map (fun h => xs i * h)).restrict (D i)
 
-theorem lamM_map_agree {s : ℝ} (hL : LocInv ε s) (x y : Formalism.REAL.UJ ε) {B : Set (Formalism.REAL.UJ ε)} (hB : MeasurableSet B)
-    (hBx : B ⊆ (fun h => x * h) '' (expC ε '' Metric.ball 0 s)) (hBy : B ⊆ (fun h => y * h) '' (expC ε '' Metric.ball 0 s)) :
-    (lamM ε s).map (fun h => x * h) B = (lamM ε s).map (fun h => y * h) B := by
+theorem lamM_map_agree
+    {s : ℝ} (hL : LocInv ε s)
+    (x y : Formalism.REAL.UJ ε)
+    {B : Set (Formalism.REAL.UJ ε)}
+    (hB : MeasurableSet B) (hBx : B ⊆ (fun h => x * h) '' (expC ε '' Metric.ball 0 s))
+    (hBy : B ⊆ (fun h => y * h) '' (expC ε '' Metric.ball 0 s))
+    : (lamM ε s).map (fun h => x * h) B = (lamM ε s).map (fun h => y * h) B := by
   rw [Measure.map_apply (measurable_const_mul x) hB, Measure.map_apply (measurable_const_mul y) hB]
   set A' := (fun h => x * h) ⁻¹' B with hA'
   have himg : (fun h => (y⁻¹ * x) * h) '' A' = (fun h => y * h) ⁻¹' B := by
@@ -35,11 +41,13 @@ theorem lamM_map_agree {s : ℝ} (hL : LocInv ε s) (x y : Formalism.REAL.UJ ε)
     constructor
     · rintro ⟨a, ha, rfl⟩
       show y * (y⁻¹ * x * a) ∈ B
-      rw [← mul_assoc, ← mul_assoc, mul_inv_cancel, one_mul]; exact ha
+      rw [← mul_assoc, ← mul_assoc, mul_inv_cancel, one_mul]
+      exact ha
     · intro hg
       refine ⟨x⁻¹ * y * g, ?_, ?_⟩
       · show x * (x⁻¹ * y * g) ∈ B
-        rw [← mul_assoc, ← mul_assoc, mul_inv_cancel, one_mul]; exact hg
+        rw [← mul_assoc, ← mul_assoc, mul_inv_cancel, one_mul]
+        exact hg
       · show y⁻¹ * x * (x⁻¹ * y * g) = g
         simp [mul_assoc]
   rw [← himg]
@@ -47,34 +55,48 @@ theorem lamM_map_agree {s : ℝ} (hL : LocInv ε s) (x y : Formalism.REAL.UJ ε)
   · intro a ha
     obtain ⟨w, hw, hwa⟩ := hBx ha
     have : w = a := mul_left_cancel hwa
-    rw [← this]; exact hw
+    rw [← this]
+    exact hw
   · rw [himg]
     intro g hg
     obtain ⟨w, hw, hwg⟩ := hBy hg
     have : w = g := mul_left_cancel hwg
-    rw [← this]; exact hw
+    rw [← this]
+    exact hw
 
 section Cover
 
-variable {s : ℝ} {xs : ℕ → Formalism.REAL.UJ ε} {D : ℕ → Set (Formalism.REAL.UJ ε)} {V : Set (Formalism.REAL.UJ ε)}
+variable
+  {s : ℝ} {xs : ℕ → Formalism.REAL.UJ ε} {D : ℕ → Set (Formalism.REAL.UJ ε)}
+  {V : Set (Formalism.REAL.UJ ε)}
 
-theorem nuG_eq (hL : LocInv ε s) (hVW : V ⊆ expC ε '' Metric.ball 0 s)
-    (hD : ∀ i, MeasurableSet (D i)) (hdisj : Pairwise (Disjoint on D)) (hcov : ⋃ i, D i = univ)
-    (hDV : ∀ i, D i ⊆ (fun h => xs i * h) '' V) (y : Formalism.REAL.UJ ε) {A : Set (Formalism.REAL.UJ ε)} (hA : MeasurableSet A)
-    (hAy : A ⊆ (fun h => y * h) '' (expC ε '' Metric.ball 0 s)) :
-    nuG ε s xs D A = (lamM ε s).map (fun h => y * h) A := by
+theorem nuG_eq
+    (hL : LocInv ε s) (hVW : V ⊆ expC ε '' Metric.ball 0 s) (hD : ∀ i, MeasurableSet (D i))
+    (hdisj : Pairwise (Disjoint on D)) (hcov : ⋃ i, D i = univ)
+    (hDV : ∀ i, D i ⊆ (fun h => xs i * h) '' V)
+    (y : Formalism.REAL.UJ ε)
+    {A : Set (Formalism.REAL.UJ ε)}
+    (hA : MeasurableSet A) (hAy : A ⊆ (fun h => y * h) '' (expC ε '' Metric.ball 0 s))
+    : nuG ε s xs D A = (lamM ε s).map (fun h => y * h) A := by
   rw [nuG, Measure.sum_apply _ hA]
   simp only [Measure.restrict_apply hA]
-  have e : ∀ i, (lamM ε s).map (fun h => xs i * h) (A ∩ D i) = (lamM ε s).map (fun h => y * h) (A ∩ D i) := fun i =>
-    lamM_map_agree hL (xs i) y (hA.inter (hD i)) ((inter_subset_right.trans (hDV i)).trans (image_mono hVW))
-      (inter_subset_left.trans hAy)
-  rw [tsum_congr e, ← measure_iUnion (fun i j hij => (hdisj hij).mono inter_subset_right inter_subset_right)
-    (fun i => hA.inter (hD i)), ← inter_iUnion, hcov, inter_univ]
+  have e
+      : ∀ i,
+        (lamM ε s).map (fun h => xs i * h) (A ∩ D i)
+          = (lamM ε s).map (fun h => y * h) (A ∩ D i) := fun i =>
+    lamM_map_agree hL (xs i) y (hA.inter (hD i))
+      ((inter_subset_right.trans (hDV i)).trans (image_mono hVW)) (inter_subset_left.trans hAy)
+  rw [tsum_congr e,
+    ← measure_iUnion
+      (fun i j hij => (hdisj hij).mono inter_subset_right inter_subset_right)
+      (fun i => hA.inter (hD i)),
+    ← inter_iUnion, hcov, inter_univ]
 
-theorem nuG_leftInv (hL : LocInv ε s) (hVW : V ⊆ expC ε '' Metric.ball 0 s)
-    (hD : ∀ i, MeasurableSet (D i)) (hdisj : Pairwise (Disjoint on D)) (hcov : ⋃ i, D i = univ)
-    (hDV : ∀ i, D i ⊆ (fun h => xs i * h) '' V) (g : Formalism.REAL.UJ ε) :
-    (nuG ε s xs D).map (fun h => g * h) = nuG ε s xs D := by
+theorem nuG_leftInv
+    (hL : LocInv ε s) (hVW : V ⊆ expC ε '' Metric.ball 0 s) (hD : ∀ i, MeasurableSet (D i))
+    (hdisj : Pairwise (Disjoint on D)) (hcov : ⋃ i, D i = univ)
+    (hDV : ∀ i, D i ⊆ (fun h => xs i * h) '' V) (g : Formalism.REAL.UJ ε)
+    : (nuG ε s xs D).map (fun h => g * h) = nuG ε s xs D := by
   ext A hA
   rw [Measure.map_apply (measurable_const_mul g) hA]
   set B := (fun h => g * h) ⁻¹' A with hBdef
@@ -83,49 +105,65 @@ theorem nuG_leftInv (hL : LocInv ε s) (hVW : V ⊆ expC ε '' Metric.ball 0 s)
   have hUB : ⋃ i, B ∩ D i = B := by rw [← inter_iUnion, hcov, inter_univ]
   have hUA : ⋃ i, (fun h => g⁻¹ * h) ⁻¹' (B ∩ D i) = A := by
     rw [← preimage_iUnion, hUB, hBdef, ← preimage_comp]
-    ext h; simp
+    ext h
+    simp
   have hWsub : ∀ i, B ∩ D i ⊆ (fun h => xs i * h) '' (expC ε '' Metric.ball 0 s) := fun i =>
     (inter_subset_right.trans (hDV i)).trans (image_mono hVW)
   have e : ∀ i, nuG ε s xs D ((fun h => g⁻¹ * h) ⁻¹' (B ∩ D i)) = nuG ε s xs D (B ∩ D i) := by
     intro i
-    have hm : MeasurableSet ((fun h => g⁻¹ * h) ⁻¹' (B ∩ D i)) := (hmB i).preimage (measurable_const_mul _)
-    have hsub : (fun h => g⁻¹ * h) ⁻¹' (B ∩ D i) ⊆ (fun h => (g * xs i) * h) '' (expC ε '' Metric.ball 0 s) := by
+    have hm : MeasurableSet ((fun h => g⁻¹ * h) ⁻¹' (B ∩ D i)) :=
+      (hmB i).preimage (measurable_const_mul _)
+    have hsub
+        : (fun h => g⁻¹ * h) ⁻¹' (B ∩ D i)
+          ⊆ (fun h => (g * xs i) * h) '' (expC ε '' Metric.ball 0 s) := by
       intro h hh
       obtain ⟨w, hw, hwe⟩ := hWsub i hh
       refine ⟨w, hw, ?_⟩
       show g * xs i * w = h
       have hwe' : xs i * w = g⁻¹ * h := hwe
-      rw [mul_assoc, hwe']; simp
-    rw [nuG_eq hL hVW hD hdisj hcov hDV (g * xs i) hm hsub, nuG_eq hL hVW hD hdisj hcov hDV (xs i) (hmB i) (hWsub i),
-      Measure.map_apply (measurable_const_mul _) hm, Measure.map_apply (measurable_const_mul _) (hmB i), ← preimage_comp]
+      rw [mul_assoc, hwe']
+      simp
+    rw [nuG_eq hL hVW hD hdisj hcov hDV (g * xs i) hm hsub,
+      nuG_eq hL hVW hD hdisj hcov hDV (xs i) (hmB i) (hWsub i),
+      Measure.map_apply (measurable_const_mul _) hm,
+      Measure.map_apply (measurable_const_mul _) (hmB i), ← preimage_comp]
     congr 1
-    ext h; simp [mul_assoc]
-  calc nuG ε s xs D B = nuG ε s xs D (⋃ i, B ∩ D i) := by rw [hUB]
+    ext h
+    simp [mul_assoc]
+  calc
+    nuG ε s xs D B
+      = nuG ε s xs D (⋃ i, B ∩ D i) := by rw [hUB]
     _ = ∑' i, nuG ε s xs D (B ∩ D i) :=
-        measure_iUnion (fun i j hij => (hdisj hij).mono inter_subset_right inter_subset_right) hmB
+      measure_iUnion (fun i j hij => (hdisj hij).mono inter_subset_right inter_subset_right) hmB
     _ = ∑' i, nuG ε s xs D ((fun h => g⁻¹ * h) ⁻¹' (B ∩ D i)) := (tsum_congr e).symm
     _ = nuG ε s xs D (⋃ i, (fun h => g⁻¹ * h) ⁻¹' (B ∩ D i)) :=
-        (measure_iUnion (fun i j hij => ((hdisj hij).mono inter_subset_right inter_subset_right).preimage _)
-          (fun i => (hmB i).preimage (measurable_const_mul _))).symm
+      (measure_iUnion
+        (fun i j hij => ((hdisj hij).mono inter_subset_right inter_subset_right).preimage _)
+        (fun i => (hmB i).preimage (measurable_const_mul _))).symm
     _ = nuG ε s xs D A := by rw [hUA]
 
 end Cover
 
-theorem lamM_applyG (ε : Fin n → Bool) (s : ℝ) {A : Set (Formalism.REAL.UJ ε)} (hA : MeasurableSet A) :
-    lamM ε s A = ∫⁻ t in expC ε ⁻¹' A ∩ Metric.ball 0 s, jd ε t := by
-  rw [lamM, Measure.map_apply (measurable_expCG ε) hA, withDensity_apply _ (hA.preimage (measurable_expCG ε)),
+theorem lamM_applyG
+    (ε : Fin n → Bool) (s : ℝ) {A : Set (Formalism.REAL.UJ ε)} (hA : MeasurableSet A)
+    : lamM ε s A = ∫⁻ t in expC ε ⁻¹' A ∩ Metric.ball 0 s, jd ε t := by
+  rw [lamM, Measure.map_apply (measurable_expCG ε) hA,
+    withDensity_apply _ (hA.preimage (measurable_expCG ε)),
     Measure.restrict_restrict (hA.preimage (measurable_expCG ε))]
 
 theorem lamM_univ_lt_top (ε : Fin n → Bool) (s : ℝ) : lamM ε s univ < ∞ := by
   rw [lamM_applyG ε s MeasurableSet.univ, preimage_univ, univ_inter]
-  calc ∫⁻ t in Metric.ball (0 : EL ε) s, jd ε t ≤ ∫⁻ t in Metric.closedBall (0 : EL ε) s, jd ε t :=
-        lintegral_mono_set Metric.ball_subset_closedBall
-    _ = ∫⁻ t in Metric.closedBall (0 : EL ε) s, ((Real.toNNReal (chartJac (thetaExp ε) t) : NNReal) : ℝ≥0∞) := rfl
-    _ < ∞ := setLIntegral_lt_top_of_isCompact (measure_closedBall_lt_top).ne (isCompact_closedBall 0 s)
+  calc
+    ∫⁻ t in Metric.ball (0 : EL ε) s, jd ε t ≤ ∫⁻ t in Metric.closedBall (0 : EL ε) s, jd ε t :=
+      lintegral_mono_set Metric.ball_subset_closedBall
+    _ = ∫⁻ t in Metric.closedBall (0 : EL ε) s, ((Real.toNNReal (chartJac (thetaExp ε) t) : NNReal) : ℝ≥0∞) :=
+      rfl
+    _ < ∞ :=
+      setLIntegral_lt_top_of_isCompact (measure_closedBall_lt_top).ne (isCompact_closedBall 0 s)
         (continuous_real_toNNReal.comp (continuous_chartJac_thetaExp ε))
 
-theorem expSet_ball_eq_image (ε : Fin n → Bool) (ρ : ℝ) :
-    expSet ε (Metric.ball (0 : gLie ε) ρ) = expC ε '' Metric.ball 0 ρ := by
+theorem expSet_ball_eq_image (ε : Fin n → Bool) (ρ : ℝ)
+    : expSet ε (Metric.ball (0 : gLie ε) ρ) = expC ε '' Metric.ball 0 ρ := by
   rw [← expSet_ball_eq]
   ext g
   constructor
@@ -142,12 +180,14 @@ theorem ballFormOf (ε : Fin n → Bool) : BallFormOf ε := by
   have hLs : LocInv ε s := hL s hs (min_le_left _ _)
   have hinjs : Set.InjOn (expC ε) (Metric.ball 0 s) := by
     intro a ha b hb e
-    apply hinj (Metric.ball_subset_ball (min_le_right _ _) ha) (Metric.ball_subset_ball (min_le_right _ _) hb)
+    apply hinj (Metric.ball_subset_ball (min_le_right _ _) ha)
+      (Metric.ball_subset_ball (min_le_right _ _) hb)
     have := congrArg uMat e
     rw [uMat_expC, uMat_expC] at this
     exact Matrix.of.injective this
   have hVo : IsOpen (interior (expC ε '' Metric.ball (0 : EL ε) s)) := isOpen_interior
-  have hVW : interior (expC ε '' Metric.ball (0 : EL ε) s) ⊆ expC ε '' Metric.ball (0 : EL ε) s := interior_subset
+  have hVW : interior (expC ε '' Metric.ball (0 : EL ε) s) ⊆ expC ε '' Metric.ball (0 : EL ε) s :=
+    interior_subset
   have hV1 : (1 : Formalism.REAL.UJ ε) ∈ interior (expC ε '' Metric.ball (0 : EL ε) s) :=
     mem_interior_iff_mem_nhds.2 (hN s hs)
   set V := interior (expC ε '' Metric.ball (0 : EL ε) s) with hVdef
@@ -160,7 +200,8 @@ theorem ballFormOf (ε : Fin n → Bool) : BallFormOf ε := by
     by_contra h
     rw [Set.not_nonempty_iff_eq_empty] at h
     have : (1 : Formalism.REAL.UJ ε) ∈ ⋃ x ∈ S, (fun h => x * h) '' V := by rw [hSU]; trivial
-    rw [h] at this; simp at this
+    rw [h] at this
+    simp at this
   obtain ⟨xs, hxs⟩ := hSc.exists_eq_range hSne
   let O : ℕ → Set (Formalism.REAL.UJ ε) := fun i => (fun h => xs i * h) '' V
   have hOU : ⋃ i, O i = univ := by rw [← hSU, hxs, Set.biUnion_range]
@@ -178,13 +219,19 @@ theorem ballFormOf (ε : Fin n → Bool) : BallFormOf ε := by
   haveI : Measure.IsHaarMeasure (Formalism.REAL.muG ε) := by unfold Formalism.REAL.muG; infer_instance
   have hνμ := Measure.isMulLeftInvariant_eq_smul (nuG ε s xs (disjointed O)) (Formalism.REAL.muG ε)
   set κ := Measure.haarScalarFactor (nuG ε s xs (disjointed O)) (Formalism.REAL.muG ε) with hκdef
-  have hform : ∀ ρ, 0 < ρ → ρ ≤ s →
-      nuG ε s xs (disjointed O) (expC ε '' Metric.ball 0 ρ) = ∫⁻ t in Metric.ball (0 : EL ε) ρ, jd ε t := by
+  have hform
+      : ∀ ρ,
+        0 < ρ → ρ ≤ s
+          → nuG ε s xs (disjointed O) (expC ε '' Metric.ball 0 ρ)
+            = ∫⁻ t in Metric.ball (0 : EL ε) ρ, jd ε t := by
     intro ρ hρ hρs
     have hsub : Metric.ball (0 : EL ε) ρ ⊆ Metric.ball 0 s := Metric.ball_subset_ball hρs
     have hm : MeasurableSet (expC ε '' Metric.ball 0 ρ) :=
-      measurableSet_ball.image_of_continuousOn_injOn (continuous_expCG ε).continuousOn (hinjs.mono hsub)
-    have hsubW : expC ε '' Metric.ball 0 ρ ⊆ (fun h => (1 : Formalism.REAL.UJ ε) * h) '' (expC ε '' Metric.ball 0 s) := by
+      measurableSet_ball.image_of_continuousOn_injOn (continuous_expCG ε).continuousOn
+        (hinjs.mono hsub)
+    have hsubW
+        : expC ε '' Metric.ball 0 ρ
+          ⊆ (fun h => (1 : Formalism.REAL.UJ ε) * h) '' (expC ε '' Metric.ball 0 s) := by
       simp only [one_mul, image_id']; exact image_mono hsub
     rw [nuG_eq hLs hVW hD hdisj hcov hDV 1 hm hsubW]
     have hmap : (lamM ε s).map (fun h => (1 : Formalism.REAL.UJ ε) * h) = lamM ε s := by
@@ -194,14 +241,17 @@ theorem ballFormOf (ε : Fin n → Bool) : BallFormOf ε := by
     ext t
     constructor
     · rintro ⟨⟨t', ht', e⟩, ht⟩
-      rw [← hinjs (hsub ht') ht e]; exact ht'
+      rw [← hinjs (hsub ht') ht e]
+      exact ht'
     · intro ht; exact ⟨⟨t, ht, rfl⟩, hsub ht⟩
-  obtain ⟨η, hη, hcont⟩ := Metric.continuousAt_iff.1 ((continuous_chartJac_thetaExp ε).continuousAt (x := 0)) (1 / 2)
-    (by norm_num)
+  obtain ⟨η, hη, hcont⟩ :=
+    Metric.continuousAt_iff.1 ((continuous_chartJac_thetaExp ε).continuousAt (x := 0)) (1 / 2)
+      (by norm_num)
   have hρ1 : 0 < min s η := lt_min hs hη
   have hpos : ∫⁻ t in Metric.ball (0 : EL ε) (min s η), jd ε t ≠ 0 := by
-    have hle : ENNReal.ofReal (1 / 2) * volume (Metric.ball (0 : EL ε) (min s η)) ≤
-        ∫⁻ t in Metric.ball (0 : EL ε) (min s η), jd ε t := by
+    have hle
+        : ENNReal.ofReal (1 / 2) * volume (Metric.ball (0 : EL ε) (min s η))
+          ≤ ∫⁻ t in Metric.ball (0 : EL ε) (min s η), jd ε t := by
       rw [← setLIntegral_const]
       refine lintegral_mono_ae ?_
       filter_upwards [ae_restrict_mem measurableSet_ball] with t ht

@@ -6,16 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIntBTmulBa
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount IsDedekindDomain GlobalTheory.AdicSpan
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount IsDedekindDomain GlobalTheory.AdicSpan
 open scoped TensorProduct Classical
 
 noncomputable section
 
 namespace GlobalTheory.AdicSpan
 
-theorem rat_mem_adicCompletionIntegers_eventually (x : ℚ) :
-    ∀ᶠ v : HeightOneSpectrum ℤ in Filter.cofinite,
-      algebraMap ℚ (v.adicCompletion ℚ) x ∈ v.adicCompletionIntegers ℚ := by
+theorem rat_mem_adicCompletionIntegers_eventually (x : ℚ)
+    : ∀ᶠ v : HeightOneSpectrum ℤ in Filter.cofinite,
+        algebraMap ℚ (v.adicCompletion ℚ) x ∈ v.adicCompletionIntegers ℚ := by
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := ℤ) x
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   have hI : Ideal.span {b} ≠ (0 : Ideal ℤ) := by
@@ -34,32 +35,38 @@ theorem rat_mem_adicCompletionIntegers_eventually (x : ℚ) :
 
 section
 
-variable {C : Type} [Ring C] [Algebra ℚ C] {κ : Type} (b : Module.Basis κ ℚ C) (v : HeightOneSpectrum ℤ)
+variable
+  {C : Type} [Ring C] [Algebra ℚ C] {κ : Type} (b : Module.Basis κ ℚ C) (v : HeightOneSpectrum ℤ)
 
-theorem repr_tmul_apply (a : v.adicCompletion ℚ) (x : C) (k : κ) :
-    (Algebra.TensorProduct.basis (v.adicCompletion ℚ) b).repr (a ⊗ₜ[ℚ] x) k =
-      a * algebraMap ℚ (v.adicCompletion ℚ) (b.repr x k) := by
-  rw [Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply, smul_eq_mul]
+theorem repr_tmul_apply (a : v.adicCompletion ℚ) (x : C) (k : κ)
+    : (Algebra.TensorProduct.basis (v.adicCompletion ℚ) b).repr (a ⊗ₜ[ℚ] x) k
+      = a * algebraMap ℚ (v.adicCompletion ℚ) (b.repr x k) := by
+  rw [Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply,
+    smul_eq_mul]
 
-theorem eq_sum_tmul [Fintype κ] (y : v.adicCompletion ℚ ⊗[ℚ] C) :
-    y = ∑ i, (Algebra.TensorProduct.basis (v.adicCompletion ℚ) b).repr y i ⊗ₜ[ℚ] b i := by
+theorem eq_sum_tmul [Fintype κ] (y : v.adicCompletion ℚ ⊗[ℚ] C)
+    : y = ∑ i, (Algebra.TensorProduct.basis (v.adicCompletion ℚ) b).repr y i ⊗ₜ[ℚ] b i := by
   conv_lhs => rw [← (Algebra.TensorProduct.basis (v.adicCompletion ℚ) b).sum_repr y]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Algebra.TensorProduct.basis_apply, TensorProduct.smul_tmul', smul_eq_mul, mul_one]
 
 end
 
-theorem isIntB_mul_star_eventually : ∀ (C : Type) [Ring C] [Algebra ℚ C] [FiniteDimensional ℚ C] (σ : C →+* Cᵐᵒᵖ) (κ : Type)
-    (b : Module.Basis κ ℚ C), ∃ S : Finset (HeightOneSpectrum ℤ), ∀ v ∉ S,
-      (∀ y z, IsIntB v b y → IsIntB v b z → IsIntB v b (y * z)) ∧
-      (∀ y, IsIntB v b y → IsIntB v b (starT σ (v.adicCompletion ℚ) y).unop) := by
+theorem isIntB_mul_star_eventually
+    : ∀ (C : Type) [Ring C] [Algebra ℚ C] [FiniteDimensional ℚ C] (σ : C →+* Cᵐᵒᵖ) (κ : Type)
+        (b : Module.Basis κ ℚ C),
+      ∃ S : Finset (HeightOneSpectrum ℤ), ∀ v ∉ S,
+        (∀ y z, IsIntB v b y → IsIntB v b z → IsIntB v b (y * z))
+          ∧ (∀ y, IsIntB v b y → IsIntB v b (starT σ (v.adicCompletion ℚ) y).unop) := by
   intro C _ _ _ σ κ b
   haveI : Fintype κ := FiniteDimensional.fintypeBasisIndex b
-  have hc : ∀ᶠ v : HeightOneSpectrum ℤ in Filter.cofinite, ∀ t : κ × κ × κ,
-      algebraMap ℚ (v.adicCompletion ℚ) (b.repr (b t.1 * b t.2.1) t.2.2) ∈ v.adicCompletionIntegers ℚ :=
+  have hc
+      : ∀ᶠ v : HeightOneSpectrum ℤ in Filter.cofinite, ∀ t : κ × κ × κ,
+        algebraMap ℚ (v.adicCompletion ℚ) (b.repr (b t.1 * b t.2.1) t.2.2) ∈ v.adicCompletionIntegers ℚ :=
     Filter.eventually_all.2 fun t => rat_mem_adicCompletionIntegers_eventually _
-  have hs : ∀ᶠ v : HeightOneSpectrum ℤ in Filter.cofinite, ∀ t : κ × κ,
-      algebraMap ℚ (v.adicCompletion ℚ) (b.repr (σ (b t.1)).unop t.2) ∈ v.adicCompletionIntegers ℚ :=
+  have hs
+      : ∀ᶠ v : HeightOneSpectrum ℤ in Filter.cofinite, ∀ t : κ × κ,
+        algebraMap ℚ (v.adicCompletion ℚ) (b.repr (σ (b t.1)).unop t.2) ∈ v.adicCompletionIntegers ℚ :=
     Filter.eventually_all.2 fun t => rat_mem_adicCompletionIntegers_eventually _
   have hfin := Filter.eventually_cofinite.1 (hc.and hs)
   refine ⟨hfin.toFinset, fun v hv => ?_⟩
@@ -67,7 +74,8 @@ theorem isIntB_mul_star_eventually : ∀ (C : Type) [Ring C] [Algebra ℚ C] [Fi
   obtain ⟨hcv, hsv⟩ := hv
   refine ⟨fun y z hy hz k => ?_, fun y hy k => ?_⟩
   · set_option synthInstance.maxHeartbeats 100000 in
-      rw [eq_sum_tmul b v y, eq_sum_tmul b v z, Finset.sum_mul_sum, map_sum, Finsupp.finsetSum_apply]
+      rw [eq_sum_tmul b v y, eq_sum_tmul b v z, Finset.sum_mul_sum, map_sum,
+        Finsupp.finsetSum_apply]
     refine sum_mem fun i _ => ?_
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finsupp.finsetSum_apply]

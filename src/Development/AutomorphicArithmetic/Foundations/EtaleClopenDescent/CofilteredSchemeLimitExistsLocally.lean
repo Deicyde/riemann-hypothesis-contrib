@@ -12,19 +12,19 @@ namespace UpperTheory.Cb.GluingProjections
 
 variable {J : Type} [SmallCategory J] (D : J ⥤ Scheme.{0}) (j₀ : J)
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-private def res {V U : (D.obj j₀).Opens} (h : V ≤ U) : opensDiagram D j₀ V ⟶ opensDiagram D j₀ U where
+private def res {V U : (D.obj j₀).Opens} (h : V ≤ U)
+    : opensDiagram D j₀ V ⟶ opensDiagram D j₀ U where
   app j := Scheme.homOfLE _ (Scheme.Hom.preimage_mono _ h)
   naturality j k f := by
     rw [← cancel_mono (Scheme.Opens.ι _)]
     simp
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-private def q (U : (D.obj j₀).Opens) : opensDiagram D j₀ U ⟶ (Functor.const _).obj (U : Scheme) where
+private def q (U : (D.obj j₀).Opens)
+    : opensDiagram D j₀ U ⟶ (Functor.const _).obj (U : Scheme) where
   app j := D.map j.hom ∣_ U
   naturality j k f := by
     rw [← cancel_mono (Scheme.Opens.ι _)]
@@ -106,7 +106,6 @@ section Glue
 
 variable [∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j₀ U.1)]
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 private def P : (D.obj j₀).directedAffineCover.I₀ ⥤ Scheme.{0} where
@@ -119,7 +118,6 @@ private def P : (D.obj j₀).directedAffineCover.I₀ ⥤ Scheme.{0} where
     refine limit.hom_ext fun j => ?_
     simp [res]
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 private def pr : P D j₀ ⟶ (D.obj j₀).directedAffineCover.functorOfLocallyDirected where
@@ -131,17 +129,18 @@ private def gd : (D.obj j₀).directedAffineCover.RelativeGluingData where
   natTrans := pr D j₀
   equifibered {U V} f := isPullback_limMap D j₀ (leOfHom f : U.1 ≤ V.1)
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 private def glπ (j : Over j₀) : (gd D j₀).glued ⟶ D.obj j.left :=
-  colimit.desc (gd D j₀).functor
-    { pt := D.obj j.left
-      ι :=
-        { app U := limit.π (opensDiagram D j₀ U.1) j ≫ (opensDiagramι D j₀ U.1).app j
-          naturality {U V} f := by
-            change limMap (res D j₀ (leOfHom f : U.1 ≤ V.1)) ≫ _ ≫ _ = (_ ≫ _) ≫ 𝟙 _
-            simp [res] } }
+  colimit.desc (gd D j₀).functor {
+    pt := D.obj j.left
+    ι := {
+      app U := limit.π (opensDiagram D j₀ U.1) j ≫ (opensDiagramι D j₀ U.1).app j
+      naturality {U V} f := by
+        change limMap (res D j₀ (leOfHom f : U.1 ≤ V.1)) ≫ _ ≫ _ = (_ ≫ _) ≫ 𝟙 _
+        simp [res]
+    }
+  }
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
@@ -158,21 +157,21 @@ private lemma gluing_projection_T_eq_base : glπ D j₀ (T j₀) = (gd D j₀).t
   refine Eq.trans ?_ ((gd D j₀).ι_toBase U).symm
   simp [gd, pr, q, morphismRestrict_ι]
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 private def glCone : Cone (Over.forget j₀ ⋙ D) where
   pt := (gd D j₀).glued
-  π :=
-    { app j := glπ D j₀ j
-      naturality j k f := by
-        refine colimit.hom_ext fun U => ?_
-        change colimit.ι (gd D j₀).functor U ≫ 𝟙 _ ≫ glπ D j₀ k =
-          colimit.ι (gd D j₀).functor U ≫ glπ D j₀ j ≫ D.map f.left
-        rw [Category.id_comp, ι_glπ, reassoc_of% (ι_glπ D j₀ U j)]
-        have := (opensDiagramι D j₀ U.1).naturality f
-        rw [← limit.w (opensDiagram D j₀ U.1) f, Category.assoc]
-        exact congrArg (limit.π (opensDiagram D j₀ U.1) j ≫ ·) this }
+  π := {
+    app j := glπ D j₀ j
+    naturality j k f := by
+      refine colimit.hom_ext fun U => ?_
+      change colimit.ι (gd D j₀).functor U ≫ 𝟙 _ ≫ glπ D j₀ k
+        = colimit.ι (gd D j₀).functor U ≫ glπ D j₀ j ≫ D.map f.left
+      rw [Category.id_comp, ι_glπ, reassoc_of% (ι_glπ D j₀ U j)]
+      have := (opensDiagramι D j₀ U.1).naturality f
+      rw [← limit.w (opensDiagram D j₀ U.1) f, Category.assoc]
+      exact congrArg (limit.π (opensDiagram D j₀ U.1) j ≫ ·) this
+  }
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
@@ -223,13 +222,13 @@ set_option backward.isDefEq.respectTransparency false in
 private lemma s_w (j : Over j₀) : s.π.app j ≫ D.map j.hom = sT D j₀ s :=
   s.w (Over.homMk j.hom : j ⟶ T j₀)
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-private def leg (U : (D.obj j₀).Opens) (j : Over j₀) :
-    pullback (sT D j₀ s) U.ι ⟶ (opensDiagram D j₀ U).obj j :=
+private def leg (U : (D.obj j₀).Opens) (j : Over j₀)
+    : pullback (sT D j₀ s) U.ι ⟶ (opensDiagram D j₀ U).obj j :=
   (isPullback_morphismRestrict (D.map j.hom) U).lift (pullback.snd _ _)
-    (pullback.fst _ _ ≫ s.π.app j) (by
+    (pullback.fst _ _ ≫ s.π.app j)
+    (by
       rw [Category.assoc]
       have := s_w D j₀ s j
       dsimp only [Functor.comp_obj, Over.forget_obj] at this
@@ -242,23 +241,23 @@ private lemma leg_ι (U : (D.obj j₀).Opens) (j : Over j₀) :
     leg D j₀ s U j ≫ (opensDiagramι D j₀ U).app j = pullback.fst _ _ ≫ s.π.app j :=
   (isPullback_morphismRestrict (D.map j.hom) U).lift_snd _ _ _
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 private def legCone (U : (D.obj j₀).Opens) : Cone (opensDiagram D j₀ U) where
   pt := pullback (sT D j₀ s) U.ι
-  π :=
-    { app j := leg D j₀ s U j
-      naturality j k f := by
-        rw [← cancel_mono ((opensDiagramι D j₀ U).app k)]
-        have h1 := (opensDiagramι D j₀ U).naturality f
-        have h2 := s.w f
-        simp only [Functor.const_obj_map, Category.id_comp, Category.assoc, h1, leg_ι]
-        rw [reassoc_of% (leg_ι D j₀ s U j), h2]
-        exact Category.id_comp _ }
+  π := {
+    app j := leg D j₀ s U j
+    naturality j k f := by
+      rw [← cancel_mono ((opensDiagramι D j₀ U).app k)]
+      have h1 := (opensDiagramι D j₀ U).naturality f
+      have h2 := s.w f
+      simp only [Functor.const_obj_map, Category.id_comp, Category.assoc, h1, leg_ι]
+      rw [reassoc_of% (leg_ι D j₀ s U j), h2]
+      exact Category.id_comp _
+  }
 
-private def locLift (U : (D.obj j₀).directedAffineCover.I₀) :
-    pullback (sT D j₀ s) U.1.ι ⟶ (gd D j₀).glued :=
+private def locLift (U : (D.obj j₀).directedAffineCover.I₀)
+    : pullback (sT D j₀ s) U.1.ι ⟶ (gd D j₀).glued :=
   limit.lift _ (legCone D j₀ s U.1) ≫ colimit.ι (gd D j₀).functor U
 
 set_option backward.defeqAttrib.useBackward true in
@@ -268,12 +267,12 @@ private lemma locLift_glπ (U : (D.obj j₀).directedAffineCover.I₀) (j : Over
   rw [locLift, Category.assoc, ι_glπ, limit.lift_π_assoc]
   exact leg_ι D j₀ s U.1 j
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 private def glLift : s.pt ⟶ (gd D j₀).glued :=
   Scheme.Cover.glueMorphisms ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s))
-    (fun U => locLift D j₀ s U) (fun U V => by
+    (fun U => locLift D j₀ s U)
+    (fun U V => by
       refine gl_hom_ext D j₀ _ _ fun j => ?_
       simp only [Category.assoc]
       rw [locLift_glπ, locLift_glπ, ← Category.assoc, ← Category.assoc]
@@ -292,17 +291,22 @@ end Lift
 private def isLimitGlCone : IsLimit (glCone D j₀) where
   lift s := glLift D j₀ s
   fac s j := glLift_glπ D j₀ s j
-  uniq s m hm := gl_hom_ext D j₀ _ _ fun j => by
-    rw [glLift_glπ]
-    exact hm j
+  uniq s m hm :=
+    gl_hom_ext D j₀ _ _ fun j => by
+      rw [glLift_glπ]
+      exact hm j
 
 end Glue
 
 end UpperTheory.Cb.GluingProjections
 
-theorem UpperTheory.Cb.cofiltered_scheme_limit_exists_locally :
-    LateralTheory.E.BuildCut.LimInt → LateralTheory.E.t_E2Cut.Cont → LateralTheory.E.t_E2Cut.MV → LateralTheory.E.HasLimPf.Loc := by
+theorem UpperTheory.Cb.cofiltered_scheme_limit_exists_locally
+    : LateralTheory.E.BuildCut.LimInt → LateralTheory.E.t_E2Cut.Cont → LateralTheory.E.t_E2Cut.MV
+      → LateralTheory.E.HasLimPf.Loc := by
   intro _ _ _ J _ _ D j₀ _ hlim
   haveI : ∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j₀ U.1) :=
     fun U => hlim U.1 U.2
-  exact ⟨⟨⟨UpperTheory.Cb.GluingProjections.glCone D j₀, UpperTheory.Cb.GluingProjections.isLimitGlCone D j₀⟩⟩⟩
+  exact ⟨⟨⟨
+    UpperTheory.Cb.GluingProjections.glCone D j₀,
+    UpperTheory.Cb.GluingProjections.isLimitGlCone D j₀
+  ⟩⟩⟩

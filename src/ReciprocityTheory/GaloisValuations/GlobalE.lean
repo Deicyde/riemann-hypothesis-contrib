@@ -14,11 +14,14 @@ open Formalism.ConjugateSelfDual ReciprocityTheory.Hyp
 
 section split
 
-variable {F L Ω : Type*} [Field F] [NumberField F] [Field L] [NumberField L] [Field Ω] [Algebra F L]
-  [Algebra F Ω] [Algebra L Ω] [IsScalarTower F L Ω] {A : ValuationSubring Ω}
+variable
+  {F L Ω : Type*} [Field F] [NumberField F] [Field L] [NumberField L] [Field Ω] [Algebra F L]
+  [Algebra F Ω] [Algebra L Ω] [IsScalarTower F L Ω]
+  {A : ValuationSubring Ω}
 
-private theorem mem_decompositionSubgroup_iff_galois_valuations {K : Type*} [Field K] [Algebra K Ω] {B : ValuationSubring Ω}
-    {σ : Ω ≃ₐ[K] Ω} : σ ∈ B.decompositionSubgroup K ↔ ∀ x, σ x ∈ B ↔ x ∈ B := by
+private theorem mem_decompositionSubgroup_iff_galois_valuations
+    {K : Type*} [Field K] [Algebra K Ω] {B : ValuationSubring Ω} {σ : Ω ≃ₐ[K] Ω}
+    : σ ∈ B.decompositionSubgroup K ↔ ∀ x, σ x ∈ B ↔ x ∈ B := by
   constructor
   · intro h x
     have h' : σ • B = B := h
@@ -31,12 +34,11 @@ private theorem mem_decompositionSubgroup_iff_galois_valuations {K : Type*} [Fie
     rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, ← h (σ⁻¹ • x), AlgEquiv.smul_def]
     rw [show σ (σ⁻¹ x) = x from AlgEquiv.apply_symm_apply σ x]
 
-theorem resGal_mem_Dec_iff {σ : G L Ω} :
-    resGal F L Ω σ ∈ Dec (F := F) A ↔ σ ∈ Dec (F := L) A := by
+theorem resGal_mem_Dec_iff {σ : G L Ω} : resGal F L Ω σ ∈ Dec (F := F) A ↔ σ ∈ Dec (F := L) A := by
   show resGal F L Ω σ ∈ A.decompositionSubgroup F ↔ σ ∈ A.decompositionSubgroup L
-  rw [mem_decompositionSubgroup_iff_galois_valuations, mem_decompositionSubgroup_iff_galois_valuations]
+  rw [mem_decompositionSubgroup_iff_galois_valuations,
+    mem_decompositionSubgroup_iff_galois_valuations]
   simp only [resGal_apply]
-
 
 variable (F L) in
 def decRes (A : ValuationSubring Ω) : Dec (F := L) A →* Dec (F := F) A :=
@@ -53,8 +55,8 @@ theorem decRes_injective : Function.Injective (decRes F L A) := by
   have := congrArg (fun g : Dec (F := F) A => (g : G F Ω) x) h
   simpa [decRes_apply, resGal_apply] using this
 
-theorem decRes_surjective (h : Dec (F := F) A ≤ (resGal F L Ω).range) :
-    Function.Surjective (decRes F L A) := by
+theorem decRes_surjective (h : Dec (F := F) A ≤ (resGal F L Ω).range)
+    : Function.Surjective (decRes F L A) := by
   intro τ
   obtain ⟨σ, hσ⟩ := MonoidHom.mem_range.mp (h τ.2)
   refine ⟨⟨σ, resGal_mem_Dec_iff.mp (by rw [hσ]; exact τ.2)⟩, ?_⟩
@@ -66,15 +68,16 @@ theorem continuous_decRes [IsAlgClosure F Ω] : Continuous (decRes F L A) := by
   refine continuous_induced_rng.2 ?_
   have hc : Continuous (resGal F L Ω) :=
     (isClosedEmbedding_resGal (F := F) (L := L) (Ω := Ω)).continuous
-  have e : ((↑) : Dec (F := F) A → G F Ω) ∘ decRes F L A =
-      resGal F L Ω ∘ ((↑) : Dec (F := L) A → G L Ω) := by
+  have e
+      : ((↑) : Dec (F := F) A → G F Ω) ∘ decRes F L A
+        = resGal F L Ω ∘ ((↑) : Dec (F := L) A → G L Ω) := by
     funext σ
     exact decRes_apply σ
   rw [e]
   exact hc.comp continuous_subtype_val
 
-def decEquiv [IsAlgClosure F Ω] (h : Dec (F := F) A ≤ (resGal F L Ω).range) :
-    Dec (F := L) A ≃ₜ* Dec (F := F) A where
+def decEquiv [IsAlgClosure F Ω] (h : Dec (F := F) A ≤ (resGal F L Ω).range)
+    : Dec (F := L) A ≃ₜ* Dec (F := F) A where
   toMulEquiv := MulEquiv.ofBijective (decRes F L A) ⟨decRes_injective, decRes_surjective h⟩
   continuous_toFun := continuous_decRes
   continuous_invFun := by
@@ -84,7 +87,8 @@ def decEquiv [IsAlgClosure F Ω] (h : Dec (F := F) A ≤ (resGal F L Ω).range) 
     convert (continuous_subtype_val : Continuous (fun τ : Dec (F := F) A => (τ : G F Ω))) using 1
     funext τ
     exact congrArg Subtype.val
-      ((MulEquiv.ofBijective (decRes F L A) ⟨decRes_injective, decRes_surjective h⟩).apply_symm_apply τ)
+      ((MulEquiv.ofBijective (decRes F L A)
+        ⟨decRes_injective, decRes_surjective h⟩).apply_symm_apply τ)
 
 theorem one_lt_normV (v : HeightOneSpectrum (𝓞 F)) : 1 < normV v := by
   have e : normV v = Ideal.absNorm v.asIdeal := by
@@ -103,8 +107,10 @@ end split
 
 section frob
 
-variable {F L Ω : Type*} [Field F] [NumberField F] [Field L] [NumberField L] [Field Ω] [Algebra F L]
-  [Algebra F Ω] [Algebra L Ω] [IsScalarTower F L Ω] {A : ValuationSubring Ω}
+variable
+  {F L Ω : Type*} [Field F] [NumberField F] [Field L] [NumberField L] [Field Ω] [Algebra F L]
+  [Algebra F Ω] [Algebra L Ω] [IsScalarTower F L Ω]
+  {A : ValuationSubring Ω}
 
 end frob
 

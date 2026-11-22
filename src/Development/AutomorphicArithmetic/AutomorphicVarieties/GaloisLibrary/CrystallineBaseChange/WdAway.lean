@@ -8,15 +8,15 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PlaceOv
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
 open GlobalTheory.WeilDeligne GlobalTheory.LocLanglands UpperTheory.V UpperTheory.V.Af
 
-theorem UpperTheory.V.Br.wdAway :
-    UpperTheory.V.Br.WdAway := by
+theorem UpperTheory.V.Br.wdAway : UpperTheory.V.Br.WdAway := by
   intro F K Ω _ _ _ _ _ _ _ _ _ _ _ l _ ι A v w h h' i hP hl hl' n r x y hx hy
   haveI : Algebra.IsAlgebraic K Ω := IsAlgClosure.isAlgebraic
-  obtain ⟨c, hc, hdegc, hq, hsm⟩ := GlobalTheory.T.place_over_transport_ring_iso F Ω A v h K Ω A w h' _ _ i hP
-  have hd1 : ∀ σ, deg (c.symm σ) = deg σ := fun σ => by
-    rw [← hdegc, MulEquiv.apply_symm_apply]
-  have hs1 : ∀ (M : Type) [Monoid M] (g : Weil h →* M), IsSmooth g →
-      IsSmooth (g.comp c.symm.toMonoidHom) := fun M _ g hg => by
+  obtain ⟨c, hc, hdegc, hq, hsm⟩ :=
+    GlobalTheory.T.place_over_transport_ring_iso F Ω A v h K Ω A w h' _ _ i hP
+  have hd1 : ∀ σ, deg (c.symm σ) = deg σ := fun σ => by rw [← hdegc, MulEquiv.apply_symm_apply]
+  have hs1
+      : ∀ (M : Type) [Monoid M] (g : Weil h →* M),
+        IsSmooth g → IsSmooth (g.comp c.symm.toMonoidHom) := fun M _ g hg => by
     have e : (g.comp c.symm.toMonoidHom).comp c.toMonoidHom = g := by ext σ; simp
     have hg' : IsSmooth ((g.comp c.symm.toMonoidHom).comp c.toMonoidHom) := by rwa [e]
     exact (hsm M _).mpr hg'
@@ -27,7 +27,8 @@ theorem UpperTheory.V.Br.wdAway :
     rw [ContinuousAt, map_one]
     intro U' hU'
     obtain ⟨U, hU, hU1, H⟩ := GlobalTheory.WeilTransport.conj_nhds K Ω F Ω (RingEquiv.refl Ω) U' hU'
-    exact Filter.mem_map.mpr (Filter.mem_of_superset (hU.mem_nhds hU1) fun σ hσ => H σ hσ _ fun z => rfl)
+    exact Filter.mem_map.mpr (Filter.mem_of_superset (hU.mem_nhds hU1) fun σ hσ =>
+      H σ hσ _ fun z => rfl)
   have hmem : ∀ σ : Ine (F := K) A, Bc.res F Ω K (σ : G K Ω) ∈ Ine (F := F) A := fun σ => by
     have h1 : ((c.symm (ineIncl h' σ) : Weil h) : G F Ω) ∈ Ine (F := F) A := by
       rw [← deg_eq_zero_iff, hd1, deg_ineIncl]
@@ -49,9 +50,11 @@ theorem UpperTheory.V.Br.wdAway :
     have h2 := key (((c φ) ^ deg g)⁻¹ * g)
     rw [map_mul, map_inv, map_zpow, MulEquiv.symm_apply_apply, ← hd1] at h2
     refine Eq.trans ?_ h2.symm
-    rw [hd1]; rfl
-  have hmat : ∀ g : Weil h', wdMat (t.comp d) hφ' (r.comp (Bc.res F Ω K)) N g =
-      wdMat t hφ r N (c.symm g) := fun g => by
+    rw [hd1]
+    rfl
+  have hmat
+      : ∀ g : Weil h',
+        wdMat (t.comp d) hφ' (r.comp (Bc.res F Ω K)) N g = wdMat t hφ r N (c.symm g) := fun g => by
     rw [wdMat, wdMat, key, ← hine]; rfl
   let b := GlobalTheory.WDTransport.pull c.symm.toMonoidHom hd1 hq.symm hs1 a
   have hb : IsWDOf ι (r.comp (Bc.res F Ω K)) (WD.mk b) := by

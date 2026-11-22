@@ -19,13 +19,16 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeylCellRange.Re
 
 @[expose] public section
 
-theorem Formalism.FourierDecayAlt.P.border_first_expansion : Formalism.FourierDecayAlt.Q.BorderE := by
+theorem Formalism.FourierDecayAlt.P.border_first_expansion
+    : Formalism.FourierDecayAlt.Q.BorderE := by
   exact quantum_minor_border_es.1
 
-theorem Formalism.FourierDecayAlt.P.border_last_expansion : Formalism.FourierDecayAlt.Q.BorderS := by
+theorem Formalism.FourierDecayAlt.P.border_last_expansion
+    : Formalism.FourierDecayAlt.Q.BorderS := by
   exact quantum_minor_border_es.2
 
-theorem Formalism.FourierDecayAlt.P.border_full_expansion : Formalism.FourierDecayAlt.Q.BorderFull := by
+theorem Formalism.FourierDecayAlt.P.border_full_expansion
+    : Formalism.FourierDecayAlt.Q.BorderFull := by
   exact quantum_minor_border_full
 
 theorem Formalism.FourierDecayAlt.P.rtt_sandwich : Formalism.FourierDecayAlt.Q.RTTSandwich := by
@@ -44,14 +47,18 @@ theorem Formalism.FourierDecayAlt.P.left_action_rule : Formalism.FourierDecayAlt
 theorem Formalism.FourierDecayAlt.P.torus_action_rule : Formalism.FourierDecayAlt.Q.RuleTorus := by
   exact qnRuleTorus
 
-theorem Formalism.FourierDecayAlt.P.operator_invariance : Formalism.FourierDecayAlt.Q.TInvariant := by
+theorem Formalism.FourierDecayAlt.P.operator_invariance
+    : Formalism.FourierDecayAlt.Q.TInvariant := by
   exact qnTInv
 
-theorem Formalism.FourierDecayAlt.P.operator_preserves_fusion_forms : Formalism.FourierDecayAlt.Q.TPreservesFF := by
+theorem Formalism.FourierDecayAlt.P.operator_preserves_fusion_forms
+    : Formalism.FourierDecayAlt.Q.TPreservesFF := by
   exact qnTPres
 
-theorem Formalism.FourierDecayAlt.P.capelli_commutation : Formalism.FourierDecayAlt.Q.CapCommute := by
+theorem Formalism.FourierDecayAlt.P.capelli_commutation
+    : Formalism.FourierDecayAlt.Q.CapCommute := by
   exact capelli_det_commute
 
-theorem Formalism.FourierDecayAlt.P.hermitian_haar_invariance : Formalism.FourierDecayAlt.Q.HermHaar := by
+theorem Formalism.FourierDecayAlt.P.hermitian_haar_invariance
+    : Formalism.FourierDecayAlt.Q.HermHaar := by
   exact qnHermHaar

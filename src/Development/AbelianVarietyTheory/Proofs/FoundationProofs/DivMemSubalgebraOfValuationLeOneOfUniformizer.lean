@@ -8,41 +8,52 @@ namespace GlobalTheory.K5.IntFrac
 
 open Polynomial
 
-theorem mem_adjoin_inv_of_isIntegral' {R K : Type*} [CommRing R] [Field K] [Algebra R K] {z : K}
-    (hz : z ≠ 0) (hi : IsIntegral R z) : z ∈ Algebra.adjoin R {z⁻¹} := by
+theorem mem_adjoin_inv_of_isIntegral'
+    {R K : Type*} [CommRing R] [Field K] [Algebra R K] {z : K} (hz : z ≠ 0) (hi : IsIntegral R z)
+    : z ∈ Algebra.adjoin R {z⁻¹} := by
   obtain ⟨p, hpm, hp⟩ := hi
-  rw [Polynomial.eval₂_eq_sum_range, Finset.sum_range_succ, hpm.coeff_natDegree, map_one,
-    one_mul] at hp
+  rw [Polynomial.eval₂_eq_sum_range, Finset.sum_range_succ, hpm.coeff_natDegree, map_one, one_mul]
+    at hp
   obtain ⟨m, hm⟩ : ∃ m, p.natDegree = m + 1 := by
     refine Nat.exists_eq_succ_of_ne_zero fun h => ?_
     rw [h, Finset.sum_range_zero, pow_zero, zero_add] at hp
     exact one_ne_zero hp
   rw [hm] at hp
-  have hzn : z ^ (m + 1) = -∑ i ∈ Finset.range (m + 1), algebraMap R K (p.coeff i) * z ^ i := by
+  have hzn : z ^ (m + 1) = - ∑ i ∈ Finset.range (m + 1), algebraMap R K (p.coeff i) * z ^ i := by
     rw [eq_neg_iff_add_eq_zero, add_comm]
     exact hp
   have h1 : z = z ^ (m + 1) * z⁻¹ ^ m := by
     rw [pow_succ, mul_comm (z ^ m) z, mul_assoc, ← mul_pow, mul_inv_cancel₀ hz, one_pow, mul_one]
-  have hterm : ∀ i ∈ Finset.range (m + 1), algebraMap R K (p.coeff i) * z ^ i * z⁻¹ ^ m =
-      algebraMap R K (p.coeff i) * z⁻¹ ^ (m - i) := by
+  have hterm
+      : ∀ i ∈ Finset.range (m + 1),
+        algebraMap R K (p.coeff i) * z ^ i * z⁻¹ ^ m
+          = algebraMap R K (p.coeff i) * z⁻¹ ^ (m - i) := by
     intro i hi
     obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le (Nat.lt_succ_iff.mp (Finset.mem_range.mp hi))
     rw [hk, Nat.add_sub_cancel_left, mul_assoc, pow_add, ← mul_assoc (z ^ i), ← mul_pow,
       mul_inv_cancel₀ hz, one_pow, one_mul]
-  have key : z = -∑ i ∈ Finset.range (m + 1), algebraMap R K (p.coeff i) * z⁻¹ ^ (m - i) := by
+  have key : z = - ∑ i ∈ Finset.range (m + 1), algebraMap R K (p.coeff i) * z⁻¹ ^ (m - i) := by
     rw [← Finset.sum_congr rfl hterm, ← Finset.sum_mul, ← neg_mul, ← hzn]
     exact h1
-  have hmem : -∑ i ∈ Finset.range (m + 1), algebraMap R K (p.coeff i) * z⁻¹ ^ (m - i) ∈
-      Algebra.adjoin R {z⁻¹} := by
-    refine Subalgebra.neg_mem _ (Subalgebra.sum_mem _ fun i _ => Subalgebra.mul_mem _
-      (Subalgebra.algebraMap_mem _ _) (Subalgebra.pow_mem _ (Algebra.subset_adjoin ?_) _))
+  have hmem
+      : - ∑ i ∈ Finset.range (m + 1), algebraMap R K (p.coeff i) * z⁻¹ ^ (m - i)
+        ∈ Algebra.adjoin R {z⁻¹} := by
+    refine Subalgebra.neg_mem _
+      (Subalgebra.sum_mem _ fun i _ =>
+        Subalgebra.mul_mem _ (Subalgebra.algebraMap_mem _ _)
+          (Subalgebra.pow_mem _ (Algebra.subset_adjoin ?_) _))
     exact Set.mem_singleton _
   rw [← key] at hmem
   exact hmem
 
-theorem mem_of_div_le_one : ∀ (O Ω : Type) [CommRing O] [Field Ω] [Algebra O Ω] (v : Valuation Ω NNReal), (∀ x : Ω, v x ≤ 1 ↔ IsIntegral O x) →
-  ∀ (B : Subalgebra O Ω), (∀ x ∈ B, v x ≤ 1) → ∀ π ∈ B, π ≠ 0 → v π < 1 → (∀ x ∈ B, v x < 1 → x / π ∈ B) →
-  ∀ a ∈ B, ∀ b ∈ B, v (a / b) ≤ 1 → a / b ∈ B := by
+theorem mem_of_div_le_one
+    : ∀ (O Ω : Type) [CommRing O] [Field Ω] [Algebra O Ω] (v : Valuation Ω NNReal),
+      (∀ x : Ω, v x ≤ 1 ↔ IsIntegral O x)
+        → ∀ (B : Subalgebra O Ω),
+          (∀ x ∈ B, v x ≤ 1)
+            → ∀ π ∈ B,
+              π ≠ 0 → v π < 1 → (∀ x ∈ B, v x < 1 → x / π ∈ B)
+                → ∀ a ∈ B, ∀ b ∈ B, v (a / b) ≤ 1 → a / b ∈ B := by
   intro O Ω _ _ _ v hv B hB π hπB hπ0 hπ1 hdiv
   have hvπ : 0 < v π := pos_iff_ne_zero.mpr ((Valuation.ne_zero_iff v).mpr hπ0)
   have hA : ∀ n : ℕ, ∀ a ∈ B, v (a / π ^ n) ≤ 1 → a / π ^ n ∈ B := by
@@ -56,7 +67,9 @@ theorem mem_of_div_le_one : ∀ (O Ω : Type) [CommRing O] [Field Ω] [Algebra O
           rw [map_div₀, map_pow, div_mul_cancel₀]
           exact pow_ne_zero _ hvπ.ne'
         rw [he]
-        calc v (a / π ^ (k + 1)) * v π ^ (k + 1) ≤ 1 * v π ^ (k + 1) := by gcongr
+        calc
+          v (a / π ^ (k + 1)) * v π ^ (k + 1)
+            ≤ 1 * v π ^ (k + 1) := by gcongr
           _ < 1 := by
             rw [one_mul]
             exact pow_lt_one₀ hvπ.le hπ1 (Nat.succ_ne_zero k)

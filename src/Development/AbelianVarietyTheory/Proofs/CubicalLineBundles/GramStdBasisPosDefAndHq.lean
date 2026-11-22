@@ -7,15 +7,23 @@ public import ReciprocityTheory.GeometryOfNumbers.LatticeCovolumes.CountStA
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.LamCM
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.LamCM
 open scoped CategoryTheory.Obj ComplexOrder
 open GlobalTheory GlobalTheory.CM GlobalTheory.LamF
 
 namespace GlobalTheory.LamF
 
-theorem gram_stdBasis_posDef_and_hq :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (h : HermFam K (Fin n → K)) (s : K →+* ℂ), (h.gram s (fun i => Pi.single i 1) : Matrix (Fin n) (Fin n) ℂ).PosDef ∧ ∀ c, ReciprocityTheory.MultiplicativeHeights.hq (h.gram s (fun i => Pi.single i 1)) (ReciprocityTheory.MultiplicativeHeights.embVec s c) = (h.form s c c).re := by
+theorem gram_stdBasis_posDef_and_hq
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (h : HermFam K (Fin n → K)) (s : K →+* ℂ),
+      (h.gram s (fun i => Pi.single i 1) : Matrix (Fin n) (Fin n) ℂ).PosDef
+        ∧ ∀ c,
+          ReciprocityTheory.MultiplicativeHeights.hq (h.gram s (fun i => Pi.single i 1))
+              (ReciprocityTheory.MultiplicativeHeights.embVec s c)
+            = (h.form s c c).re := by
   intro K _ _ n h s
   refine ⟨h.posDef s n _ ?_, fun c => ?_⟩
   · have hb := (Pi.basisFun K (Fin n)).linearIndependent
@@ -29,8 +37,8 @@ theorem gram_stdBasis_posDef_and_hq :
     rw [← hc] at hx
     rw [hx, ReciprocityTheory.MultiplicativeHeights.hq]
     congr 1
-    simp only [dotProduct, Matrix.mulVec, Finset.mul_sum, ReciprocityTheory.MultiplicativeHeights.embVec, Pi.star_apply,
-      Complex.star_def]
+    simp only [dotProduct, Matrix.mulVec, Finset.mul_sum,
+      ReciprocityTheory.MultiplicativeHeights.embVec, Pi.star_apply, Complex.star_def]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => (mul_assoc _ _ _).symm
 
 end GlobalTheory.LamF

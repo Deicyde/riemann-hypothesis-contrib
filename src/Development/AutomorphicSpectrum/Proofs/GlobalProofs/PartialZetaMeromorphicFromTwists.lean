@@ -6,7 +6,8 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.AbelContinuati
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.TwoRelations
 
@@ -16,8 +17,8 @@ noncomputable def mult (l : ℕ) (s : ℂ) : ℂ := (l : ℂ) ^ (1 - s)
 
 noncomputable def efac (l h : ℕ) (s : ℂ) : ℂ := mult l s ^ h - 1
 
-noncomputable def wsum {G : Type} (T : G → ℂ → ℂ) (l : ℕ) (τ : Equiv.Perm G) (h : ℕ)
-    (c : G) (s : ℂ) : ℂ :=
+noncomputable def wsum {G : Type} (T : G → ℂ → ℂ) (l : ℕ) (τ : Equiv.Perm G) (h : ℕ) (c : G) (s : ℂ)
+    : ℂ :=
   ∑ e ∈ Finset.range h, mult l s ^ e * T ((τ ^ e) c) s
 
 lemma mult_differentiable {l : ℕ} (hl : l.Prime) : Differentiable ℂ (mult l) := by
@@ -167,43 +168,53 @@ lemma glue_differentiableAt {E E' W W' : ℂ → ℂ} (hE : Differentiable ℂ E
 lemma mult_at_neg {l k : ℕ} : mult l (1 - (k : ℂ)) = ((l ^ k : ℕ) : ℂ) := by
   simp [mult]
 
-theorem continuation_of_two_relations :
-    ∀ (G : Type) [Fintype G] (D T T' : G → ℂ → ℂ) (l l' : ℕ) (τ τ' : Equiv.Perm G),
-    l.Prime → l'.Prime → l ≠ l' →
-    (∀ c, Differentiable ℂ (T c)) → (∀ c, Differentiable ℂ (T' c)) →
-    (∀ c s, 1 < s.re → (l : ℂ) ^ (1 - s) * D (τ c) s - D c s = T c s) →
-    (∀ c s, 1 < s.re → (l' : ℂ) ^ (1 - s) * D (τ' c) s - D c s = T' c s) →
-    ∃ Z : G → ℂ → ℂ, (∀ c, DifferentiableOn ℂ (Z c) {1}ᶜ) ∧ (∀ c s, 1 < s.re → Z c s = D c s) ∧
-      ∀ k : ℕ, 1 ≤ k → (∀ c, ∃ q : ℚ, T c (1 - (k : ℂ)) = (q : ℂ)) →
-        ∀ c, ∃ q : ℚ, Z c (1 - (k : ℂ)) = (q : ℂ) := by
+theorem continuation_of_two_relations
+    : ∀ (G : Type) [Fintype G] (D T T' : G → ℂ → ℂ) (l l' : ℕ) (τ τ' : Equiv.Perm G),
+      l.Prime → l'.Prime → l ≠ l' → (∀ c, Differentiable ℂ (T c)) → (∀ c, Differentiable ℂ (T' c))
+        → (∀ c s, 1 < s.re → (l : ℂ) ^ (1 - s) * D (τ c) s - D c s = T c s)
+        → (∀ c s, 1 < s.re → (l' : ℂ) ^ (1 - s) * D (τ' c) s - D c s = T' c s)
+        → ∃ Z : G → ℂ → ℂ,
+          (∀ c, DifferentiableOn ℂ (Z c) {1}ᶜ) ∧ (∀ c s, 1 < s.re → Z c s = D c s)
+            ∧ ∀ k : ℕ,
+              1 ≤ k → (∀ c, ∃ q : ℚ, T c (1 - (k : ℂ)) = (q : ℂ))
+                → ∀ c, ∃ q : ℚ, Z c (1 - (k : ℂ)) = (q : ℂ) := by
   intro G _ D T T' l l' τ τ' hl hl' hne hT hT' hrel hrel'
   have hh : orderOf τ ≠ 0 := (orderOf_pos τ).ne'
   have hh' : orderOf τ' ≠ 0 := (orderOf_pos τ').ne'
-  have hED : ∀ c s, 1 < s.re →
-      efac l (orderOf τ) s * D c s = wsum T l τ (orderOf τ) c s :=
+  have hED : ∀ c s, 1 < s.re → efac l (orderOf τ) s * D c s = wsum T l τ (orderOf τ) c s :=
     fun c s hs => efac_mul_eq (fun c => hrel c s hs) c
-  have hED' : ∀ c s, 1 < s.re →
-      efac l' (orderOf τ') s * D c s = wsum T' l' τ' (orderOf τ') c s :=
+  have hED' : ∀ c s, 1 < s.re → efac l' (orderOf τ') s * D c s = wsum T' l' τ' (orderOf τ') c s :=
     fun c s hs => efac_mul_eq (fun c => hrel' c s hs) c
   have hEd := efac_differentiable hl (orderOf τ)
   have hEd' := efac_differentiable hl' (orderOf τ')
   have hWd := fun c => wsum_differentiable hl hT τ (orderOf τ) c
   have hWd' := fun c => wsum_differentiable hl' hT' τ' (orderOf τ') c
-  have hcross : ∀ c s, wsum T l τ (orderOf τ) c s * efac l' (orderOf τ') s
-      = wsum T' l' τ' (orderOf τ') c s * efac l (orderOf τ) s := by
+  have hcross
+      : ∀ c s,
+        wsum T l τ (orderOf τ) c s * efac l' (orderOf τ') s
+          = wsum T' l' τ' (orderOf τ') c s * efac l (orderOf τ) s := by
     intro c s
-    have := entire_eq_of_halfplane
-      (f := fun s => wsum T l τ (orderOf τ) c s * efac l' (orderOf τ') s)
-      (g := fun s => wsum T' l' τ' (orderOf τ') c s * efac l (orderOf τ) s)
-      ((hWd c).mul hEd') ((hWd' c).mul hEd)
-      (fun s hs => by
-        show wsum T l τ (orderOf τ) c s * efac l' (orderOf τ') s
-          = wsum T' l' τ' (orderOf τ') c s * efac l (orderOf τ) s
-        rw [← hED c s hs, ← hED' c s hs]; ring)
+    have :=
+      entire_eq_of_halfplane
+        (f := fun s => wsum T l τ (orderOf τ) c s * efac l' (orderOf τ') s)
+        (g := fun s => wsum T' l' τ' (orderOf τ') c s * efac l (orderOf τ) s)
+        ((hWd c).mul hEd') ((hWd' c).mul hEd)
+        (fun s hs => by
+          show wsum T l τ (orderOf τ) c s * efac l' (orderOf τ') s
+            = wsum T' l' τ' (orderOf τ') c s * efac l (orderOf τ) s
+          rw [← hED c s hs, ← hED' c s hs]
+          ring)
     exact congrFun this s
-  refine ⟨fun c t => if efac l (orderOf τ) t ≠ 0 then
-      wsum T l τ (orderOf τ) c t / efac l (orderOf τ) t
-    else wsum T' l' τ' (orderOf τ') c t / efac l' (orderOf τ') t, ?_, ?_, ?_⟩
+  refine ⟨
+    fun c t =>
+      if efac l (orderOf τ) t ≠ 0 then
+        wsum T l τ (orderOf τ) c t / efac l (orderOf τ) t
+      else
+        wsum T' l' τ' (orderOf τ') c t / efac l' (orderOf τ') t,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro c s hs
     have hs1 : s ≠ 1 := hs
     have hor : efac l (orderOf τ) s ≠ 0 ∨ efac l' (orderOf τ') s ≠ 0 := by
@@ -220,7 +231,8 @@ theorem continuation_of_two_relations :
     have hm : mult l (1 - (k : ℂ)) = ((l ^ k : ℕ) : ℂ) := mult_at_neg
     have hnat : (l ^ k) ^ orderOf τ ≠ 1 :=
       ne_of_gt (Nat.one_lt_pow hh (Nat.one_lt_pow (by omega) hl.one_lt))
-    have hE : efac l (orderOf τ) (1 - (k : ℂ)) = (((((l ^ k) ^ orderOf τ : ℕ) : ℚ) - 1 : ℚ) : ℂ) := by
+    have hE
+        : efac l (orderOf τ) (1 - (k : ℂ)) = (((((l ^ k) ^ orderOf τ : ℕ) : ℚ) - 1 : ℚ) : ℂ) := by
       simp only [efac, hm]
       push_cast
       ring
@@ -231,13 +243,18 @@ theorem continuation_of_two_relations :
       apply hnat
       have : (((l ^ k) ^ orderOf τ : ℕ) : ℚ) = 1 := by linarith
       exact_mod_cast this
-    have hW : wsum T l τ (orderOf τ) c (1 - (k : ℂ))
-        = ((∑ e ∈ Finset.range (orderOf τ), (((l ^ k : ℕ) : ℚ)) ^ e * q ((τ ^ e) c) : ℚ) : ℂ) := by
+    have hW
+        : wsum T l τ (orderOf τ) c (1 - (k : ℂ))
+          = ((∑ e ∈ Finset.range (orderOf τ), (((l ^ k : ℕ) : ℚ)) ^ e * q ((τ ^ e) c) : ℚ)
+            : ℂ) := by
       simp only [wsum, hm, hq]
       push_cast
       rfl
-    refine ⟨(∑ e ∈ Finset.range (orderOf τ), (((l ^ k : ℕ) : ℚ)) ^ e * q ((τ ^ e) c)) /
-      ((((l ^ k) ^ orderOf τ : ℕ) : ℚ) - 1), ?_⟩
+    refine ⟨
+      (∑ e ∈ Finset.range (orderOf τ), (((l ^ k : ℕ) : ℚ)) ^ e * q ((τ ^ e) c))
+        / ((((l ^ k) ^ orderOf τ : ℕ) : ℚ) - 1),
+      ?_
+    ⟩
     show (if efac l (orderOf τ) (1 - (k : ℂ)) ≠ 0 then _ else _) = _
     rw [if_pos h0, hW, hE, Rat.cast_div]
 

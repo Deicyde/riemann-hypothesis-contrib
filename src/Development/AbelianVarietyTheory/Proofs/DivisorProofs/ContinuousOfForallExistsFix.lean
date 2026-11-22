@@ -10,11 +10,11 @@ namespace GlobalTheory.ContinuityFromFixedPoints
 
 open Topology
 
-theorem continuous_of_forall_exists_fix {k : Type u_1} {F : Type u_2} {k' : Type u_3}
-    {F' : Type u_4} [Field k] [Field F] [Algebra k F] [Field k'] [Field F'] [Algebra k' F']
-    [Algebra.IsIntegral k F] (φ : Gal(F/k) →* Gal(F'/k'))
-    (h : ∀ y : F', ∃ x : F, ∀ σ : Gal(F/k), σ x = x → φ σ y = y) :
-    Continuous φ := by
+theorem continuous_of_forall_exists_fix
+    {k : Type u_1} {F : Type u_2} {k' : Type u_3} {F' : Type u_4}
+    [Field k] [Field F] [Algebra k F] [Field k'] [Field F'] [Algebra k' F'] [Algebra.IsIntegral k F]
+    (φ : Gal(F/k) →* Gal(F'/k')) (h : ∀ y : F', ∃ x : F, ∀ σ : Gal(F/k), σ x = x → φ σ y = y)
+    : Continuous φ := by
   classical
   choose x hx using h
   refine continuous_of_continuousAt_one φ ?_

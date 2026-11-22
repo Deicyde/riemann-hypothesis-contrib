@@ -11,9 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsReduce
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -29,8 +32,10 @@ open ReciprocityTheory.ChartRestriction.G.Semi TopologicalSpace
 
 attribute [local instance] SplitExt.free SplitExt.finite
 
-theorem mem_chart_of_mem {S : Scheme.{0}} (E : SplitExt S) (j : E.ChartIdx) (b : E.B.left)
-    (h : ∀ k, b ∈ (E.O (E.basis k)).L.U (j k)) : b ∈ E.chart j := by
+theorem mem_chart_of_mem
+    {S : Scheme.{0}}
+    (E : SplitExt S) (j : E.ChartIdx) (b : E.B.left) (h : ∀ k, b ∈ (E.O (E.basis k)).L.U (j k))
+    : b ∈ E.chart j := by
   have e : E.chart j = Finset.univ.inf (fun k => (E.O (E.basis k)).L.U (j k)) :=
     (Finset.inf_univ_eq_iInf _).symm
   rw [e, ← SetLike.mem_coe, Opens.coe_finset_inf]
@@ -38,15 +43,19 @@ theorem mem_chart_of_mem {S : Scheme.{0}} (E : SplitExt S) (j : E.ChartIdx) (b :
     Function.comp_apply, SetLike.mem_coe]
   exact h
 
-theorem isIntegral_of_isGt (R : Type) [CommRing R] [IsDomain R] (E : SplitExt (Spec (CommRingCat.of R)))
-    (G : Over (Spec (CommRingCat.of R))) [GrpObj G] (hG : E.IsGt G) (hs : Smooth G.hom) :
-    IsIntegral G.left := by
+theorem isIntegral_of_isGt
+    (R : Type) [CommRing R] [IsDomain R]
+    (E : SplitExt (Spec (CommRingCat.of R)))
+    (G : Over (Spec (CommRingCat.of R))) [GrpObj G]
+    (hG : E.IsGt G) (hs : Smooth G.hom)
+    : IsIntegral G.left := by
   obtain ⟨d⟩ := hG
   have hB := E.isAbelian
   haveI : Smooth E.B.hom := hB.smooth
   haveI : GeometricallyConnected E.B.hom := hB.geomConnected
   have hSne : Nonempty (Spec (CommRingCat.of R)) := inferInstance
-  have hBne : Nonempty E.B.left := ⟨(η[E.B] : 𝟙_ _ ⟶ E.B).left (show (𝟙_ (Over _)).left from hSne.some)⟩
+  have hBne : Nonempty E.B.left :=
+    ⟨(η[E.B] : 𝟙_ _ ⟶ E.B).left (show (𝟙_ (Over _)).left from hSne.some)⟩
   haveI : IrreducibleSpace E.B.left :=
     GlobalTheory.irreducibleSpace_of_smooth_of_geometricallyConnected_domain R E.B ‹_› ‹_› hBne
   haveI : IsReduced E.B.left := GlobalTheory.isReduced_of_smooth_of_isReduced E.B.hom
@@ -81,7 +90,8 @@ theorem isIntegral_of_isGt (R : Type) [CommRing R] [IsDomain R] (E : SplitExt (S
       (W.topIso).commRingCatIsoToRingEquiv.injective
   haveI : IsIntegral W := isIntegral_of_isAffine_of_isDomain W
   have hirrW : IsIrreducible (W : Set G.left) := by
-    have hI := (IrreducibleSpace.isIrreducible_univ W).image (⇑W.ι) (Scheme.Hom.continuous _).continuousOn
+    have hI :=
+      (IrreducibleSpace.isIrreducible_univ W).image (⇑W.ι) (Scheme.Hom.continuous _).continuousOn
     rwa [Set.image_univ, Scheme.Opens.range_ι] at hI
   have hη : genericPoint E.B.left ∈ V :=
     ((genericPoint_spec E.B.left).mem_open_set_iff V.isOpen).2 ⟨b, trivial, hbV'⟩
@@ -96,7 +106,10 @@ theorem isIntegral_of_isGt (R : Type) [CommRing R] [IsDomain R] (E : SplitExt (S
     rwa [hcl] at this
   exact isIntegral_of_irreducibleSpace_of_isReduced _
 
-theorem isIntegral_H : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R] (Q : DegPre R) (O : Type) [CommRing O] [StarRing O] [Module O Q.X] (oa : Q.OAct O) (Y : Ray oa), IsIntegral Y.H.left := by
+theorem isIntegral_H
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R] (Q : DegPre R)
+        (O : Type) [CommRing O] [StarRing O] [Module O Q.X] (oa : Q.OAct O) (Y : Ray oa),
+      IsIntegral Y.H.left := by
   intro R _ _ _ _ Q O _ _ _ oa Y
   exact isIntegral_of_isGt R _ Y.H Y.isGt (GlobalTheory.RayTan.smooth_H R Q O oa Y)
 

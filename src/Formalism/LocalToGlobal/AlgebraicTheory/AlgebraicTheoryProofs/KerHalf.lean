@@ -13,9 +13,11 @@ open NumberField IsDedekindDomain
 namespace Formalism.L2.AlgTh
 
 open Formalism.L2.Th1.H (IsReps)
-open Formalism.L2.Col (Fields Sp HomE homAt divLat mulLat IsSdLat conjPrime₂ cO algebraMap_cO mem_conjP)
-open Formalism.L2.Ker (Amb VCx LamC BC embH perO halfAO halfBO twist₂ expS mem_twO nat_smul_mem mem_of_forall_locP
-  expS_cases expS_eq_one embH_inj homAt_le_locP_perO lf_mulLat ti_exists_lift)
+open Formalism.L2.Col
+  (Fields Sp HomE homAt divLat mulLat IsSdLat conjPrime₂ cO algebraMap_cO mem_conjP)
+open Formalism.L2.Ker
+  (Amb VCx LamC BC embH perO halfAO halfBO twist₂ expS mem_twO nat_smul_mem mem_of_forall_locP
+    expS_cases expS_eq_one embH_inj homAt_le_locP_perO lf_mulLat ti_exists_lift)
 open Formalism.HermitianLatticesTheory (localization₂)
 
 namespace KH
@@ -24,15 +26,16 @@ section Emb
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {ι : Type} [Fintype ι] {a b : ℕ}
 
-theorem embH_smul (emb : ι → E →+* ℂ) (δ : ℂ) (r : E) (k : ℂ) (hr : ∀ τ, emb τ r = k) (x : HomE E a b) :
-    embH emb δ (r • x) = k • embH emb δ x := by
+theorem embH_smul
+    (emb : ι → E →+* ℂ) (δ : ℂ) (r : E) (k : ℂ) (hr : ∀ τ, emb τ r = k) (x : HomE E a b)
+    : embH emb δ (r • x) = k • embH emb δ x := by
   funext τ i j
   show δ * emb τ ((r • x) (Pi.single j 1) i) = k * (δ * emb τ (x (Pi.single j 1) i))
   rw [LinearMap.smul_apply, Pi.smul_apply, smul_eq_mul, map_mul, hr]
   ring
 
-theorem embH_nat (emb : ι → E →+* ℂ) (δ : ℂ) (n : ℕ) (x : HomE E a b) :
-    embH emb δ ((n : E) • x) = (n : ℂ) • embH emb δ x :=
+theorem embH_nat (emb : ι → E →+* ℂ) (δ : ℂ) (n : ℕ) (x : HomE E a b)
+    : embH emb δ ((n : E) • x) = (n : ℂ) • embH emb δ x :=
   embH_smul emb δ (n : E) (n : ℂ) (fun τ => map_natCast (emb τ) n) x
 
 end Emb
@@ -42,14 +45,17 @@ section Loc
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 variable {W : Type} [AddCommGroup W] [Module E W] [Module (𝓞 E) W] [IsScalarTower (𝓞 E) E W]
 
-theorem smul_mem_of (M : Submodule (𝓞 E) W) {m : W} (hm : m ∈ M) (r : 𝓞 E) {e : E} (he : algebraMap (𝓞 E) E r = e) :
-    e • m ∈ M := by
+theorem smul_mem_of
+    (M : Submodule (𝓞 E) W) {m : W} (hm : m ∈ M) (r : 𝓞 E) {e : E} (he : algebraMap (𝓞 E) E r = e)
+    : e • m ∈ M := by
   subst he
   rw [algebraMap_smul]
   exact M.smul_mem r hm
 
-theorem loc_of (M : Submodule (𝓞 E) W) (Q : HeightOneSpectrum (𝓞 E)) {z : W} (s : 𝓞 E) (hs : s ∉ Q.asIdeal)
-    (hz : (algebraMap (𝓞 E) E s) • z ∈ M) : z ∈ localization₂ Q.asIdeal M := by
+theorem loc_of
+    (M : Submodule (𝓞 E) W) (Q : HeightOneSpectrum (𝓞 E))
+    {z : W} (s : 𝓞 E) (hs : s ∉ Q.asIdeal) (hz : (algebraMap (𝓞 E) E s) • z ∈ M)
+    : z ∈ localization₂ Q.asIdeal M := by
   refine ⟨s, hs, ?_⟩
   rw [← algebraMap_smul E s z]
   exact hz
@@ -99,7 +105,8 @@ theorem chosen_lift_killed_level : LiftKill := by
         simp [hj]
       · simp
     have hline (r : X.E) : r • v ∈ N' := by
-      rw [← show Formalism.HermitianLatticesTheory.dual (Formalism.L2.Col.hStd X.E b) N' = N' from hN'.2,
+      rw [← show Formalism.HermitianLatticesTheory.dual (Formalism.L2.Col.hStd X.E b) N' = N' from
+          hN'.2,
         Formalism.HermitianLatticesTheory.dualBasic_mem_dual]
       intro y hy
       have hy0 : Formalism.L2.Col.hStd X.E b v y = 0 := by
@@ -119,7 +126,8 @@ theorem chosen_lift_killed_level : LiftKill := by
         exact ⟨(x / v i) • v, hline _, div_mul_cancel₀ _ hi⟩
       have : Module.Finite (𝓞 X.E) X.E := Module.finite_def.mpr (htop ▸ hN'.1.fg.map coord)
       exact RingOfIntegers.not_isField X.E
-        (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E) (Field.toIsField X.E))
+        (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E)
+          (Field.toIsField X.E))
     rw [Submodule.mem_bot]
     simpa [hv] using hpair.symm
   have hx0 : (c' : 𝓞 X.E) • x ∈ homAt S N N' := hx
@@ -140,29 +148,34 @@ theorem chosen_lift_killed_level : LiftKill := by
   · obtain ⟨-, h2⟩ := lf_mulLat S A.AA N N' hNfg hAU c hc hsx'' Q hQ
     have h3 : (c' : 𝓞 X.E) • x ∈ localization₂ Q.asIdeal (perO A.AA N N') :=
       homAt_le_locP_perO S A.AA N N' hNfg hQ (hAU Q hQ) hx0
-    have e : (c' : X.E) • A.liftW S N N' c x
-        = (c' : 𝓞 X.E) • (A.liftW S N N' c x - x) + (c' : 𝓞 X.E) • x := by
+    have e
+        : (c' : X.E) • A.liftW S N N' c x
+          = (c' : 𝓞 X.E) • (A.liftW S N N' c x - x) + (c' : 𝓞 X.E) • x := by
       rw [← smul_add, sub_add_cancel, ← algebraMap_smul X.E (c' : 𝓞 X.E), map_natCast]
     rw [e]
     exact add_mem ((localization₂ Q.asIdeal _).smul_mem _ h2) h3
-  · have ht := (mem_twO (perO A.AA N N') c'' (fun Q => -expS S Q) (A.liftW S N N' c x)).mp hs'' Q
+  · have ht := (mem_twO (perO A.AA N N') c'' (fun Q => - expS S Q) (A.liftW S N N' c x)).mp hs'' Q
     have hc0 : (c'' : X.E) ≠ 0 := Nat.cast_ne_zero.mpr hc''.ne'
     by_cases hQ' : conjPrime₂ Q ∈ S
-    · rw [show -expS S Q = 1 from by simp [expS, hQ, hQ'], zpow_one] at ht
-      have e : (c' : X.E) • A.liftW S N N' c x
-          = algebraMap (𝓞 X.E) X.E ((c' : 𝓞 X.E) * (c'' : 𝓞 X.E)) • ((c'' : X.E))⁻¹ • A.liftW S N N' c x := by
+    · rw [show - expS S Q = 1 from by simp [expS, hQ, hQ'], zpow_one] at ht
+      have e
+          : (c' : X.E) • A.liftW S N N' c x
+            = algebraMap (𝓞 X.E) X.E ((c' : 𝓞 X.E) * (c'' : 𝓞 X.E)) • ((c'' : X.E))⁻¹
+              • A.liftW S N N' c x := by
         rw [smul_smul, map_mul, map_natCast, map_natCast, mul_assoc, mul_inv_cancel₀ hc0, mul_one]
       rw [e]
       exact KH.smul_mem_of _ ht _ rfl
-    · rw [show -expS S Q = 0 from by simp [expS, hQ, hQ'], zpow_zero, inv_one, one_smul] at ht
+    · rw [show - expS S Q = 0 from by simp [expS, hQ, hQ'], zpow_zero, inv_one, one_smul] at ht
       exact KH.smul_mem_of _ ht (c' : 𝓞 X.E) (by simp)
 
 namespace KH
 
 section Arith
 
-theorem trace_coprime (d p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (hpd : ¬ p ∣ d) (π : ℂ) (hq : IsQInt d π)
-    (hpp : π * conj π = p) : ∃ T : ℤ, π + conj π = T ∧ IsCoprime T (p : ℤ) := by
+theorem trace_coprime
+    (d p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (hpd : ¬ p ∣ d)
+    (π : ℂ) (hq : IsQInt d π) (hpp : π * conj π = p)
+    : ∃ T : ℤ, π + conj π = T ∧ IsCoprime T (p : ℤ) := by
   obtain ⟨m, n, hπ⟩ := hq
   simp only [Formalism.L2.Th1.CM.omegaK] at hπ
   have hs : ((Real.sqrt d : ℝ) : ℂ) ^ 2 = (d : ℂ) := by
@@ -170,7 +183,8 @@ theorem trace_coprime (d p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (hpd : ¬ p ∣
     simp
   have hc : conj π = (m : ℂ) + (n : ℂ) * ((1 - Complex.I * ((Real.sqrt d : ℝ) : ℂ)) / 2) := by
     rw [hπ]
-    simp only [map_add (f := _), map_mul, map_div₀, map_one, Complex.conj_ofReal, Complex.conj_I, map_intCast, map_ofNat]
+    simp only [map_add (f := _), map_mul, map_div₀, map_one, Complex.conj_ofReal, Complex.conj_I,
+      map_intCast, map_ofNat]
     ring
   refine ⟨2 * m + n, ?_, ?_⟩
   · rw [hc, hπ]
@@ -195,14 +209,15 @@ theorem trace_coprime (d p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (hpd : ¬ p ∣
       linear_combination key' - (2 * m + n + p * t) * ht - (d : ℤ) * (n + p * s) * hs'
     have h5 : (p : ℤ) ∣ 4 := Dvd.intro _ h4
     have h6 : p ∣ 4 := by exact_mod_cast h5
-    have h7 : p ∣ 2 := by
-      rcases hp.dvd_mul.mp (show p ∣ 2 * 2 from h6) with h | h <;> exact h
+    have h7 : p ∣ 2 := by rcases hp.dvd_mul.mp (show p ∣ 2 * 2 from h6) with h | h <;> exact h
     exact hp2 ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).mp h7)
 
-theorem ring_facts {X : Fields} (σ₀ : X.K →+* ℂ) (π : ℂ) (pE : 𝓞 X.E) (p : ℕ) (T : ℤ) (hne : Nonempty X.Tau)
-    (h1 : ∀ τ, X.embC σ₀ τ (pE : X.E) = π) (h2 : ∀ τ, X.embC σ₀ τ (star (pE : X.E)) = conj π)
-    (hpp : π * conj π = p) (hT : π + conj π = T) :
-    pE * cO X.E pE = (p : 𝓞 X.E) ∧ pE + cO X.E pE = (T : 𝓞 X.E) := by
+theorem ring_facts
+    {X : Fields} (σ₀ : X.K →+* ℂ)
+    (π : ℂ) (pE : 𝓞 X.E) (p : ℕ) (T : ℤ)
+    (hne : Nonempty X.Tau) (h1 : ∀ τ, X.embC σ₀ τ (pE : X.E) = π)
+    (h2 : ∀ τ, X.embC σ₀ τ (star (pE : X.E)) = conj π) (hpp : π * conj π = p) (hT : π + conj π = T)
+    : pE * cO X.E pE = (p : 𝓞 X.E) ∧ pE + cO X.E pE = (T : 𝓞 X.E) := by
   obtain ⟨τ⟩ := hne
   let f : 𝓞 X.E →+* ℂ := (X.embC σ₀ τ).comp (algebraMap (𝓞 X.E) X.E)
   have hinj : Function.Injective f :=
@@ -219,20 +234,25 @@ end Arith
 
 section Primes
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] (S : Finset (HeightOneSpectrum (𝓞 E))) (p : ℕ) (ϖ : 𝓞 E)
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  (S : Finset (HeightOneSpectrum (𝓞 E))) (p : ℕ) (ϖ : 𝓞 E)
   (hS : ∀ P : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ P.asIdeal → (P ∈ S ↔ ϖ ∉ P.asIdeal))
   (hprod : ϖ * cO E ϖ = p) (hcop : ∃ α β : 𝓞 E, α * (ϖ + cO E ϖ) + β * (p : 𝓞 E) = 1)
 
 include hcop hprod in
-theorem not_both (Q : HeightOneSpectrum (𝓞 E)) (h1 : ϖ ∈ Q.asIdeal) (h2 : cO E ϖ ∈ Q.asIdeal) : False := by
+theorem not_both (Q : HeightOneSpectrum (𝓞 E)) (h1 : ϖ ∈ Q.asIdeal) (h2 : cO E ϖ ∈ Q.asIdeal)
+    : False := by
   obtain ⟨α, β, h⟩ := hcop
   have hp : (p : 𝓞 E) ∈ Q.asIdeal := hprod ▸ Q.asIdeal.mul_mem_right _ h1
   have hs : ϖ + cO E ϖ ∈ Q.asIdeal := Q.asIdeal.add_mem h1 h2
-  have h1' : (1 : 𝓞 E) ∈ Q.asIdeal := h ▸ Q.asIdeal.add_mem (Q.asIdeal.mul_mem_left α hs) (Q.asIdeal.mul_mem_left β hp)
+  have h1' : (1 : 𝓞 E) ∈ Q.asIdeal :=
+    h ▸ Q.asIdeal.add_mem (Q.asIdeal.mul_mem_left α hs) (Q.asIdeal.mul_mem_left β hp)
   exact Q.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h1')
 
 include hprod in
-theorem p_of (Q : HeightOneSpectrum (𝓞 E)) (h : ϖ ∈ Q.asIdeal ∨ cO E ϖ ∈ Q.asIdeal) : (p : 𝓞 E) ∈ Q.asIdeal := by
+theorem p_of (Q : HeightOneSpectrum (𝓞 E)) (h : ϖ ∈ Q.asIdeal ∨ cO E ϖ ∈ Q.asIdeal)
+    : (p : 𝓞 E) ∈ Q.asIdeal := by
   rw [← hprod]
   rcases h with h | h
   · exact Q.asIdeal.mul_mem_right _ h
@@ -253,7 +273,8 @@ theorem pibar_notin (Q : HeightOneSpectrum (𝓞 E)) (hQ : Q ∉ S) : cO E ϖ �
   exact not_both p ϖ hprod hcop Q h1 h
 
 include hS hprod hcop in
-theorem pi_notin_off (Q : HeightOneSpectrum (𝓞 E)) (hQ : Q ∉ S) (hQ' : conjPrime₂ Q ∉ S) : ϖ ∉ Q.asIdeal := by
+theorem pi_notin_off (Q : HeightOneSpectrum (𝓞 E)) (hQ : Q ∉ S) (hQ' : conjPrime₂ Q ∉ S)
+    : ϖ ∉ Q.asIdeal := by
   intro h
   have hp := p_of p ϖ hprod Q (Or.inl h)
   have hp' : (p : 𝓞 E) ∈ (conjPrime₂ Q).asIdeal := by
@@ -276,16 +297,21 @@ namespace KH
 
 section Halves
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] (S : Finset (HeightOneSpectrum (𝓞 E))) (p : ℕ) (ϖ : 𝓞 E)
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  (S : Finset (HeightOneSpectrum (𝓞 E))) (p : ℕ) (ϖ : 𝓞 E)
   (hS : ∀ P : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ P.asIdeal → (P ∈ S ↔ ϖ ∉ P.asIdeal))
   (hprod : ϖ * cO E ϖ = p) (hcop : ∃ α β : 𝓞 E, α * (ϖ + cO E ϖ) + β * (p : 𝓞 E) = 1)
-variable {W : Type} [AddCommGroup W] [Module E W] [Module (𝓞 E) W] [IsScalarTower (𝓞 E) E W] (M : Submodule (𝓞 E) W)
+variable
+  {W : Type} [AddCommGroup W] [Module E W] [Module (𝓞 E) W] [IsScalarTower (𝓞 E) E W]
+  (M : Submodule (𝓞 E) W)
 
-theorem prod_E (hprod : ϖ * cO E ϖ = p) : algebraMap (𝓞 E) E ϖ * algebraMap (𝓞 E) E (cO E ϖ) = (p : E) := by
+theorem prod_E (hprod : ϖ * cO E ϖ = p)
+    : algebraMap (𝓞 E) E ϖ * algebraMap (𝓞 E) E (cO E ϖ) = (p : E) := by
   rw [← map_mul, hprod, map_natCast]
 
-theorem ne_zero_E (hp : 0 < p) (hprod : ϖ * cO E ϖ = p) :
-    algebraMap (𝓞 E) E ϖ ≠ 0 ∧ algebraMap (𝓞 E) E (cO E ϖ) ≠ 0 := by
+theorem ne_zero_E (hp : 0 < p) (hprod : ϖ * cO E ϖ = p)
+    : algebraMap (𝓞 E) E ϖ ≠ 0 ∧ algebraMap (𝓞 E) E (cO E ϖ) ≠ 0 := by
   have h := prod_E p ϖ hprod
   have hp' : (p : E) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.pos_iff_ne_zero.mp hp)
   constructor
@@ -296,10 +322,12 @@ theorem ne_zero_E (hp : 0 < p) (hprod : ϖ * cO E ϖ = p) :
     rw [h0, mul_zero] at h
     exact hp' h.symm
 
-
 include hS hprod hcop in
-theorem half_to (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') {w : W} (hw : w ∈ twist₂ M (p * c') (expS S)) (hpw : (p : E) • w ∈ M) :
-    (algebraMap (𝓞 E) E ϖ / algebraMap (𝓞 E) E (cO E ϖ)) • w ∈ M := by
+theorem half_to
+    (hp : 0 < p)
+    (c' : ℕ) (hc' : 0 < c')
+    {w : W} (hw : w ∈ twist₂ M (p * c') (expS S)) (hpw : (p : E) • w ∈ M)
+    : (algebraMap (𝓞 E) E ϖ / algebraMap (𝓞 E) E (cO E ϖ)) • w ∈ M := by
   obtain ⟨ha, hb⟩ := ne_zero_E p ϖ hp hprod
   have hab := prod_E p ϖ hprod
   have hc0 : (c' : E) ≠ 0 := Nat.cast_ne_zero.mpr hc'.ne'
@@ -308,8 +336,9 @@ theorem half_to (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') {w : W} (hw : w ∈ twist
   by_cases hQ : Q ∈ S
   · have h1 := (mem_twO M (p * c') (expS S) w).mp hw Q
     rw [show expS S Q = 1 from if_pos hQ, zpow_one] at h1
-    have e : (algebraMap (𝓞 E) E ϖ / algebraMap (𝓞 E) E (cO E ϖ)) • w
-        = algebraMap (𝓞 E) E (ϖ * ϖ * (c' : 𝓞 E)) • (((p * c' : ℕ) : E))⁻¹ • w := by
+    have e
+        : (algebraMap (𝓞 E) E ϖ / algebraMap (𝓞 E) E (cO E ϖ)) • w
+          = algebraMap (𝓞 E) E (ϖ * ϖ * (c' : 𝓞 E)) • (((p * c' : ℕ) : E))⁻¹ • w := by
       rw [smul_smul]
       congr 1
       rw [map_mul, map_mul, map_natCast, Nat.cast_mul, ← hab]
@@ -318,8 +347,10 @@ theorem half_to (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') {w : W} (hw : w ∈ twist
     exact smul_mem_of _ h1 _ rfl
   · have hb' := pibar_notin S p ϖ hS hprod hcop Q hQ
     apply loc_of M Q (cO E ϖ * cO E ϖ) (fun h => hb' ((Q.isPrime.mem_or_mem h).elim id id))
-    have e : algebraMap (𝓞 E) E (cO E ϖ * cO E ϖ) • (algebraMap (𝓞 E) E ϖ / algebraMap (𝓞 E) E (cO E ϖ)) • w
-        = (p : E) • w := by
+    have e
+        : algebraMap (𝓞 E) E (cO E ϖ * cO E ϖ)
+            • (algebraMap (𝓞 E) E ϖ / algebraMap (𝓞 E) E (cO E ϖ)) • w
+          = (p : E) • w := by
       rw [smul_smul]
       congr 1
       rw [map_mul, ← hab]
@@ -327,11 +358,12 @@ theorem half_to (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') {w : W} (hw : w ∈ twist
     rw [e]
     exact hpw
 
-
 include hS hprod hcop in
-theorem half_of (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') (u : ℤ) {m : W} (hm : m ∈ M) :
-    ((u * c' : ℤ) : E) • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m ∈ twist₂ M (p * c') (expS S) ∧
-      (p : E) • (((u * c' : ℤ) : E) • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m) ∈ M := by
+theorem half_of (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') (u : ℤ) {m : W} (hm : m ∈ M)
+    : ((u * c' : ℤ) : E) • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m
+        ∈ twist₂ M (p * c') (expS S)
+      ∧ (p : E) • (((u * c' : ℤ) : E) • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m)
+        ∈ M := by
   obtain ⟨ha, hb⟩ := ne_zero_E p ϖ hp hprod
   have hab := prod_E p ϖ hprod
   have hc0 : (c' : E) ≠ 0 := Nat.cast_ne_zero.mpr hc'.ne'
@@ -344,8 +376,10 @@ theorem half_of (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') (u : ℤ) {m : W} (hm : m
     · rw [show expS S Q = 1 from if_pos hQ, zpow_one]
       have hpi := pi_notin_S S p ϖ hS hprod Q hQ
       apply loc_of M Q (ϖ * ϖ) (fun h => hpi ((Q.isPrime.mem_or_mem h).elim id id))
-      have e : algebraMap (𝓞 E) E (ϖ * ϖ) • (((p * c' : ℕ) : E))⁻¹ • ((u * c' : ℤ) : E) •
-          (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m = algebraMap (𝓞 E) E (u : 𝓞 E) • m := by
+      have e
+          : algebraMap (𝓞 E) E (ϖ * ϖ) • (((p * c' : ℕ) : E))⁻¹ • ((u * c' : ℤ) : E)
+              • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m
+            = algebraMap (𝓞 E) E (u : 𝓞 E) • m := by
         simp only [smul_smul]
         congr 1
         rw [map_mul, map_intCast, Nat.cast_mul, ← hab]
@@ -356,8 +390,10 @@ theorem half_of (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') (u : ℤ) {m : W} (hm : m
     · by_cases hQ' : conjPrime₂ Q ∈ S
       · rw [show expS S Q = -1 from by simp [expS, hQ, hQ'], zpow_neg_one, inv_inv]
         apply hM Q
-        have e : ((p * c' : ℕ) : E) • ((u * c' : ℤ) : E) • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m
-            = algebraMap (𝓞 E) E ((u : 𝓞 E) * c' * c' * cO E ϖ * cO E ϖ) • m := by
+        have e
+            : ((p * c' : ℕ) : E) • ((u * c' : ℤ) : E)
+                • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m
+              = algebraMap (𝓞 E) E ((u : 𝓞 E) * c' * c' * cO E ϖ * cO E ϖ) • m := by
           simp only [smul_smul]
           congr 1
           simp only [map_mul, map_intCast, map_natCast, Nat.cast_mul]
@@ -369,8 +405,10 @@ theorem half_of (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') (u : ℤ) {m : W} (hm : m
       · rw [show expS S Q = 0 from by simp [expS, hQ, hQ'], zpow_zero, inv_one, one_smul]
         have hpi := pi_notin_off S p ϖ hS hprod hcop Q hQ hQ'
         apply loc_of M Q ϖ hpi
-        have e : algebraMap (𝓞 E) E ϖ • ((u * c' : ℤ) : E) • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m
-            = algebraMap (𝓞 E) E ((u : 𝓞 E) * c' * cO E ϖ) • m := by
+        have e
+            : algebraMap (𝓞 E) E ϖ • ((u * c' : ℤ) : E)
+                • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m
+              = algebraMap (𝓞 E) E ((u : 𝓞 E) * c' * cO E ϖ) • m := by
           simp only [smul_smul]
           congr 1
           simp only [map_mul, map_intCast, map_natCast]
@@ -378,8 +416,9 @@ theorem half_of (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') (u : ℤ) {m : W} (hm : m
           field_simp
         rw [e]
         exact smul_mem_of M hm _ rfl
-  · have e : (p : E) • ((u * c' : ℤ) : E) • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m
-        = algebraMap (𝓞 E) E ((u : 𝓞 E) * c' * cO E ϖ * cO E ϖ) • m := by
+  · have e
+        : (p : E) • ((u * c' : ℤ) : E) • (algebraMap (𝓞 E) E (cO E ϖ) / algebraMap (𝓞 E) E ϖ) • m
+          = algebraMap (𝓞 E) E ((u : 𝓞 E) * c' * cO E ϖ * cO E ϖ) • m := by
       simp only [smul_smul]
       congr 1
       simp only [map_mul, map_intCast, map_natCast]
@@ -391,11 +430,12 @@ theorem half_of (hp : 0 < p) (c' : ℕ) (hc' : 0 < c') (u : ℤ) {m : W} (hm : m
 
 end Halves
 
-theorem mem_killIn {V : Type*} [AddCommGroup V] [Module ℂ V] (m : ℂ) (L M : AddSubgroup V) (y : V) :
-    y ∈ killIn m L M ↔ y ∈ L ∧ m • y ∈ M := Iff.rfl
+theorem mem_killIn {V : Type*} [AddCommGroup V] [Module ℂ V] (m : ℂ) (L M : AddSubgroup V) (y : V)
+    : y ∈ killIn m L M ↔ y ∈ L ∧ m • y ∈ M :=
+  Iff.rfl
 
-theorem mem_cLat' {V : Type*} [AddCommGroup V] [Module ℂ V] (c : ℂ) (Λ : AddSubgroup V) (y : V) :
-    y ∈ cLat c Λ ↔ ∃ x ∈ Λ, c • x = y := by
+theorem mem_cLat' {V : Type*} [AddCommGroup V] [Module ℂ V] (c : ℂ) (Λ : AddSubgroup V) (y : V)
+    : y ∈ cLat c Λ ↔ ∃ x ∈ Λ, c • x = y := by
   show y ∈ AddSubgroup.map ((c • LinearMap.id : V →ₗ[ℂ] V).toAddMonoidHom) Λ ↔ _
   rw [AddSubgroup.mem_map]
   rfl

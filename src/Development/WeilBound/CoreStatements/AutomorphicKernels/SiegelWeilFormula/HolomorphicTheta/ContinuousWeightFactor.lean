@@ -18,11 +18,12 @@ open PositivityTheory.Rg.Sw PositivityTheory.SiegelWeilFormula PositivityTheory.
 
 variable {n : ℕ}
 
-def bmap (q : ℕ) (y : GR n) : Matrix (Fin n) (Fin n) ℂ := if q = 0 then zOf y else -(zOf y)ᴴ
+def bmap (q : ℕ) (y : GR n) : Matrix (Fin n) (Fin n) ℂ := if q = 0 then zOf y else - (zOf y)ᴴ
 
-def negConj (W : Fin n → Fin n → ℂ) : Fin n → Fin n → ℂ := fun i j => -star (W j i)
+def negConj (W : Fin n → Fin n → ℂ) : Fin n → Fin n → ℂ := fun i j => - star (W j i)
 
-theorem negConj_eq (W : Fin n → Fin n → ℂ) : negConj W = (-(Matrix.of W)ᴴ : Matrix (Fin n) (Fin n) ℂ) := by
+theorem negConj_eq (W : Fin n → Fin n → ℂ)
+    : negConj W = (- (Matrix.of W)ᴴ : Matrix (Fin n) (Fin n) ℂ) := by
   ext i j; simp [negConj]
 
 theorem negConj_negConj (W : Fin n → Fin n → ℂ) : negConj (negConj W) = W := by
@@ -32,15 +33,20 @@ theorem negConj_mem {W : Fin n → Fin n → ℂ} (hW : W ∈ Dom n) : negConj W
   rw [negConj_eq]; exact neg_conj_mem' hW
 
 theorem norm_negConj_sub (W W' : Fin n → Fin n → ℂ) : ‖negConj W - negConj W'‖ ≤ ‖W - W'‖ := by
-  refine (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun i => (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun j => ?_
-  have h : (negConj W - negConj W') i j = -star ((W - W') j i) := by
+  refine (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun i =>
+    (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun j => ?_
+  have h : (negConj W - negConj W') i j = - star ((W - W') j i) := by
     show -star (W j i) - -star (W' j i) = -star (W j i - W' j i)
-    rw [star_sub]; ring
+    rw [star_sub]
+    ring
   rw [h, norm_neg, norm_star]
   exact (norm_le_pi_norm ((W - W') j) i).trans (norm_le_pi_norm (W - W') j)
 
-theorem bmap_local (q : ℕ) (W₀ : Fin n → Fin n → ℂ) (hW₀ : W₀ ∈ Dom n) : ∃ r > 0, closedBall W₀ r ⊆ Dom n ∧
-    ∃ S : Set (GR n), IsCompact S ∧ ∀ W ∈ closedBall W₀ r, ∃ y ∈ S, (bmap q y : Fin n → Fin n → ℂ) = W := by
+theorem bmap_local (q : ℕ) (W₀ : Fin n → Fin n → ℂ) (hW₀ : W₀ ∈ Dom n)
+    : ∃ r > 0,
+      closedBall W₀ r ⊆ Dom n
+        ∧ ∃ S : Set (GR n),
+          IsCompact S ∧ ∀ W ∈ closedBall W₀ r, ∃ y ∈ S, (bmap q y : Fin n → Fin n → ℂ) = W := by
   by_cases hq : q = 0
   · obtain ⟨r, hr, hsub, S, hS, hcov⟩ := zOf_surj_bdd' W₀ hW₀
     refine ⟨r, hr, hsub, S, hS, fun W hW => ?_⟩
@@ -65,7 +71,8 @@ theorem bmap_local (q : ℕ) (W₀ : Fin n → Fin n → ℂ) (hW₀ : W₀ ∈ 
       show -star (negConj W j i) = W i j
       simp [negConj]
 
-theorem bmap_surj (q : ℕ) {W : Fin n → Fin n → ℂ} (hW : W ∈ Dom n) : ∃ y : GR n, (bmap q y : Fin n → Fin n → ℂ) = W := by
+theorem bmap_surj (q : ℕ) {W : Fin n → Fin n → ℂ} (hW : W ∈ Dom n)
+    : ∃ y : GR n, (bmap q y : Fin n → Fin n → ℂ) = W := by
   by_cases hq : q = 0
   · obtain ⟨y, hy⟩ := zOf_surj' hW
     refine ⟨y, ?_⟩
@@ -84,10 +91,12 @@ theorem continuous_mR : Continuous (mR : GR n → M2 n) :=
   Units.continuous_val.comp continuous_subtype_val
 
 theorem continuous_toBlocks₂₁ : Continuous fun M : M2 n => M.toBlocks₂₁ :=
-  continuous_pi fun i => continuous_pi fun j => (continuous_apply (Sum.inl j)).comp (continuous_apply (Sum.inr i))
+  continuous_pi fun i =>
+    continuous_pi fun j => (continuous_apply (Sum.inl j)).comp (continuous_apply (Sum.inr i))
 
 theorem continuous_toBlocks₂₂ : Continuous fun M : M2 n => M.toBlocks₂₂ :=
-  continuous_pi fun i => continuous_pi fun j => (continuous_apply (Sum.inr j)).comp (continuous_apply (Sum.inr i))
+  continuous_pi fun i =>
+    continuous_pi fun j => (continuous_apply (Sum.inr j)).comp (continuous_apply (Sum.inr i))
 
 theorem zpow_cond {a : ℂ} {k : ℤ} (h : a ^ k ≠ 0) : a ≠ 0 ∨ 0 ≤ k := by
   by_contra hc
@@ -97,8 +106,10 @@ theorem zpow_cond {a : ℂ} {k : ℤ} (h : a ^ k ≠ 0) : a ≠ 0 ∨ 0 ≤ k :=
 
 theorem continuous_weight_factor (p q : ℕ) (e : ℤ) : Continuous (F0 p q e : GR n → ℂ) := by
   have hd : Continuous fun y : GR n => (mR y).det := continuous_mR.matrix_det
-  have hb1 : Continuous fun y : GR n => toBlocks₂₁ (mR y) := continuous_toBlocks₂₁.comp continuous_mR
-  have hb2 : Continuous fun y : GR n => toBlocks₂₂ (mR y) := continuous_toBlocks₂₂.comp continuous_mR
+  have hb1 : Continuous fun y : GR n => toBlocks₂₁ (mR y) :=
+    continuous_toBlocks₂₁.comp continuous_mR
+  have hb2 : Continuous fun y : GR n => toBlocks₂₂ (mR y) :=
+    continuous_toBlocks₂₂.comp continuous_mR
   have h1 : Continuous fun y : GR n => (u1 (mR y)).det := by
     unfold u1
     exact (((continuous_const (y := Complex.I)).smul hb1).add hb2).matrix_det

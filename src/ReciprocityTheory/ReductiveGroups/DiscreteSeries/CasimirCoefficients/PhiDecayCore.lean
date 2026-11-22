@@ -28,24 +28,29 @@ variable {ε : Fin n → Bool} {lam : Fin n → ℝ}
 def phiReal (ν : Fin n → ℝ) (x : Matrix (Fin n) (Fin n) ℂ) : ℝ :=
   ∏ i : Fin n, (lead ((i : ℕ) + 1) x).re ^ (-(ν i - nuNext ν i))
 
-theorem phi_decay_core (ν : Fin n → ℝ) (hν : Antitone ν) {g : ℝ}
-    (hg : ∀ a b : Fin n, ε a ≠ ε b → b < a → g ≤ ν b - ν a) (hq : 1 ≤ q0 ε) {Y : Matrix (Fin n) (Fin n) ℂ}
-    (hY : inP ε Y) :
-    phiReal ν (NormedSpace.exp Y) ≤
-      Real.exp (-(g / 8) * min (hs Y) (Real.sqrt (hs Y) / Real.sqrt (2 * q0 ε))) := by
+theorem phi_decay_core
+    (ν : Fin n → ℝ) (hν : Antitone ν)
+    {g : ℝ} (hg : ∀ a b : Fin n, ε a ≠ ε b → b < a → g ≤ ν b - ν a)
+    (hq : 1 ≤ q0 ε)
+    {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inP ε Y)
+    : phiReal ν (NormedSpace.exp Y)
+      ≤ Real.exp (-(g / 8) * min (hs Y) (Real.sqrt (hs Y) / Real.sqrt (2 * q0 ε))) := by
   classical
   by_cases h0 : hs Y = 0
   · have hY0 : Y = 0 := by
       ext a b
-      have hsum := (Finset.sum_eq_zero_iff_of_nonneg
-        (fun a _ => Finset.sum_nonneg fun b _ => sq_nonneg ‖Y a b‖)).mp h0 a (Finset.mem_univ _)
-      have := (Finset.sum_eq_zero_iff_of_nonneg (fun b _ => sq_nonneg ‖Y a b‖)).mp hsum b (Finset.mem_univ _)
+      have hsum :=
+        (Finset.sum_eq_zero_iff_of_nonneg (fun a _ =>
+          Finset.sum_nonneg fun b _ => sq_nonneg ‖Y a b‖)).mp h0 a (Finset.mem_univ _)
+      have :=
+        (Finset.sum_eq_zero_iff_of_nonneg (fun b _ => sq_nonneg ‖Y a b‖)).mp hsum b
+          (Finset.mem_univ _)
       simpa using this
     subst hY0
     have hl : ∀ i : Fin n, lead ((i : ℕ) + 1) (1 : Matrix (Fin n) (Fin n) ℂ) = 1 := fun i => by
       unfold lead
-      rw [dif_pos (show (i : ℕ) + 1 ≤ n from i.isLt), Matrix.submatrix_one _ (Fin.castLE_injective _),
-        Matrix.det_one]
+      rw [dif_pos (show (i : ℕ) + 1 ≤ n from i.isLt),
+        Matrix.submatrix_one _ (Fin.castLE_injective _), Matrix.det_one]
     unfold phiReal
     rw [NormedSpace.exp_zero, h0]
     simp [hl]
@@ -63,7 +68,8 @@ theorem phi_decay_core (ν : Fin n → ℝ) (hν : Antitone ν) {g : ℝ}
   have hx := exp_noncompactPart_posDef hY
   set c : Fin n → ℝ := fun i => (lead ((i : ℕ) + 1) (NormedSpace.exp Y)).re with hcdef
   have hc : ∀ i, 0 < c i := fun i => (lead_posDef hx _ i.isLt).1
-  have hterm : ∀ i : Fin n, (ν i - nuNext ν i) * (t * V i / 4) ≤ (ν i - nuNext ν i) * Real.log (c i) := by
+  have hterm
+      : ∀ i : Fin n, (ν i - nuNext ν i) * (t * V i / 4) ≤ (ν i - nuNext ν i) * Real.log (c i) := by
     intro i
     by_cases hlast : (i : ℕ) + 1 < n
     · have hnn : 0 ≤ ν i - nuNext ν i := by
@@ -74,7 +80,8 @@ theorem phi_decay_core (ν : Fin n → ℝ) (hν : Antitone ν) {g : ℝ}
       simp only [Nat.lt_add_one_iff, Nat.add_one_le_iff] at h
       exact h
     · have hV : V i = 0 :=
-        Finset.sum_eq_zero fun a _ => Finset.sum_eq_zero fun b _ => if_neg (by have := a.isLt; omega)
+        Finset.sum_eq_zero fun a _ =>
+          Finset.sum_eq_zero fun b _ => if_neg (by have := a.isLt; omega)
       have hn : (i : ℕ) + 1 = n := by have := i.isLt; omega
       have hL : c i = 1 := by
         simp only [hcdef, hn]
@@ -83,15 +90,17 @@ theorem phi_decay_core (ν : Fin n → ℝ) (hν : Antitone ν) {g : ℝ}
       simp
   have hsum : t * (g * hs Y / 2) / 4 ≤ ∑ i, (ν i - nuNext ν i) * Real.log (c i) := by
     have hw := dec_weighted ν hν hg hY
-    calc t * (g * hs Y / 2) / 4 ≤ t * (∑ i, (ν i - nuNext ν i) * V i) / 4 := by
-          have := mul_le_mul_of_nonneg_left hw ht0
-          linarith
+    calc
+      t * (g * hs Y / 2) / 4 ≤ t * (∑ i, (ν i - nuNext ν i) * V i) / 4 := by
+        have := mul_le_mul_of_nonneg_left hw ht0
+        linarith
       _ = ∑ i, (ν i - nuNext ν i) * (t * V i / 4) := by
-          rw [Finset.mul_sum, Finset.sum_div]
-          refine Finset.sum_congr rfl fun i _ => ?_
-          ring
+        rw [Finset.mul_sum, Finset.sum_div]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        ring
       _ ≤ _ := Finset.sum_le_sum fun i _ => hterm i
-  have hphi : phiReal ν (NormedSpace.exp Y) = Real.exp (-∑ i, (ν i - nuNext ν i) * Real.log (c i)) := by
+  have hphi
+      : phiReal ν (NormedSpace.exp Y) = Real.exp (- ∑ i, (ν i - nuNext ν i) * Real.log (c i)) := by
     unfold phiReal
     rw [← Finset.sum_neg_distrib, Real.exp_sum]
     refine Finset.prod_congr rfl fun i _ => ?_
@@ -132,10 +141,14 @@ private lemma lead_exp_pos_of_hermitian {Y : Matrix (Fin n) (Fin n) ℂ} (hY : Y
   rw [lead, dif_pos hle]
   exact ((posDef_exp_of_hermitian hY).submatrix (Fin.castLE_injective hle)).det_pos
 
-theorem phiM_exp_le (μ : Fin n → ℤ) (hμ : IsMu lam μ) (hlam : IsHCParam lam) {h : ℝ}
-    (hgap : GapAtLeast ε lam h) (hq : 1 ≤ q0 ε) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inP ε Y) :
-    (PhiM μ (NormedSpace.exp Y)).re ≤
-      Real.exp (-(h / 8) * min (hs Y) (Real.sqrt (hs Y) / Real.sqrt (2 * q0 ε))) := by
+theorem phiM_exp_le
+    (μ : Fin n → ℤ) (hμ : IsMu lam μ)
+    (hlam : IsHCParam lam)
+    {h : ℝ} (hgap : GapAtLeast ε lam h)
+    (hq : 1 ≤ q0 ε)
+    {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inP ε Y)
+    : (PhiM μ (NormedSpace.exp Y)).re
+      ≤ Real.exp (-(h / 8) * min (hs Y) (Real.sqrt (hs Y) / Real.sqrt (2 * q0 ε))) := by
   have hYh : Yᴴ = Y := by
     obtain ⟨h1, h2⟩ := hY
     have h1' : Yᴴ * Jm ε + Jm ε * Y = 0 := h1
@@ -147,10 +160,13 @@ theorem phiM_exp_le (μ : Fin n → ℤ) (hμ : IsMu lam μ) (hlam : IsHCParam l
     have h3 : Yᴴ * Jm ε = Y * Jm ε := by
       rw [h2]
       exact eq_neg_of_add_eq_zero_left h1'
-    calc Yᴴ = Yᴴ * Jm ε * Jm ε := by rw [Matrix.mul_assoc, hJ, Matrix.mul_one]
+    calc
+      Yᴴ
+        = Yᴴ * Jm ε * Jm ε := by rw [Matrix.mul_assoc, hJ, Matrix.mul_one]
       _ = Y * Jm ε * Jm ε := by rw [h3]
       _ = Y := by rw [Matrix.mul_assoc, hJ, Matrix.mul_one]
-  have hpos : ∀ i : Fin n, 0 < lead ((i : ℕ) + 1) (NormedSpace.exp Y) := fun i => lead_exp_pos_of_hermitian hYh i
+  have hpos : ∀ i : Fin n, 0 < lead ((i : ℕ) + 1) (NormedSpace.exp Y) := fun i =>
+    lead_exp_pos_of_hermitian hYh i
   have hν : Antitone fun i => (μ i : ℝ) := by
     intro a b hab
     show (μ b : ℝ) ≤ μ a
@@ -170,30 +186,43 @@ theorem phiM_exp_le (μ : Fin n → ℤ) (hμ : IsMu lam μ) (hlam : IsHCParam l
     linarith
   have hcore := phi_decay_core (fun i => (μ i : ℝ)) hν hg hq hY
   refine le_trans (le_of_eq ?_) hcore
-  have hfac : ∀ i : Fin n, lead ((i : ℕ) + 1) (NormedSpace.exp Y) ^ (-(μ i - muNext μ i)) =
-      (((lead ((i : ℕ) + 1) (NormedSpace.exp Y)).re ^
-        (-((μ i : ℝ) - nuNext (fun j => (μ j : ℝ)) i)) : ℝ) : ℂ) := by
+  have hfac
+      : ∀ i : Fin n,
+        lead ((i : ℕ) + 1) (NormedSpace.exp Y) ^ (-(μ i - muNext μ i))
+          = (((lead ((i : ℕ) + 1) (NormedSpace.exp Y)).re
+                ^ (-((μ i : ℝ) - nuNext (fun j => (μ j : ℝ)) i))
+              : ℝ)
+            : ℂ) := by
     intro i
     have him : (lead ((i : ℕ) + 1) (NormedSpace.exp Y)).im = 0 := by
       have := (Complex.lt_def.1 (hpos i)).2
       simpa using this.symm
-    have hre : lead ((i : ℕ) + 1) (NormedSpace.exp Y) =
-        ((lead ((i : ℕ) + 1) (NormedSpace.exp Y)).re : ℂ) :=
+    have hre
+        : lead ((i : ℕ) + 1) (NormedSpace.exp Y)
+          = ((lead ((i : ℕ) + 1) (NormedSpace.exp Y)).re : ℂ) :=
       Complex.ext (by simp) (by simp [him])
-    have hexp : (-((μ i : ℝ) - nuNext (fun j => (μ j : ℝ)) i)) = ((-(μ i - muNext μ i) : ℤ) : ℝ) := by
+    have hexp
+        : (-((μ i : ℝ) - nuNext (fun j => (μ j : ℝ)) i)) = ((-(μ i - muNext μ i) : ℤ) : ℝ) := by
       simp only [nuNext, muNext]
       split_ifs <;> push_cast <;> ring
     rw [hexp, Real.rpow_intCast, Complex.ofReal_zpow, ← hre]
   simp only [PhiM, phiReal]
   rw [Finset.prod_congr rfl fun i _ => hfac i, ← Complex.ofReal_prod, Complex.ofReal_re]
 
-theorem psiM_dec (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsMu lam μ) (hlam : IsHCParam lam)
-    {h : ℝ} (hgap : GapAtLeast ε lam h) (hq : 1 ≤ q0 ε) (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) :
-    ‖PsiM T μ (toMK k * NormedSpace.exp X)‖ ≤
-      Real.exp (-(h / 8) * min (hs X) (Real.sqrt (hs X) / Real.sqrt (2 * q0 ε))) := by
+theorem psiM_dec
+    (T : KType ε (lowK ε lam))
+    (μ : Fin n → ℤ) (hμ : IsMu lam μ)
+    (hlam : IsHCParam lam)
+    {h : ℝ} (hgap : GapAtLeast ε lam h)
+    (hq : 1 ≤ q0 ε) (k : KG ε)
+    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X)
+    : ‖PsiM T μ (toMK k * NormedSpace.exp X)‖
+      ≤ Real.exp (-(h / 8) * min (hs X) (Real.sqrt (hs X) / Real.sqrt (2 * q0 ε))) := by
   rw [psiM_kexp T μ k hX]
-  have hB : ∀ k' : KG ε, (PhiM μ (toMK k'⁻¹ * NormedSpace.exp X * toMK k')).re ≤
-      Real.exp (-(h / 8) * min (hs X) (Real.sqrt (hs X) / Real.sqrt (2 * q0 ε))) := by
+  have hB
+      : ∀ k' : KG ε,
+        (PhiM μ (toMK k'⁻¹ * NormedSpace.exp X * toMK k')).re
+          ≤ Real.exp (-(h / 8) * min (hs X) (Real.sqrt (hs X) / Real.sqrt (2 * q0 ε))) := by
     intro k'
     obtain ⟨hP, hE⟩ := inP_conj k'⁻¹ hX
     rw [inv_inv] at hP hE
@@ -201,8 +230,9 @@ theorem psiM_dec (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsMu l
     have := phiM_exp_le μ hμ hlam hgap hq hP
     rw [toMK_inv, decA_hs_conj (toMK_facts k').2.1] at this
     rwa [toMK_inv]
-  calc ‖T.op k * psM T μ (NormedSpace.exp X)‖ = ‖psM T μ (NormedSpace.exp X)‖ :=
-        CStarRing.norm_coe_unitary_mul _ _
+  calc
+    ‖T.op k * psM T μ (NormedSpace.exp X)‖
+      = ‖psM T μ (NormedSpace.exp X)‖ := CStarRing.norm_coe_unitary_mul _ _
     _ ≤ _ := psM_norm_le T μ (exp_noncompactPart_posDef hX) hB
 
 end ReciprocityTheory.ChartRestriction.DS.S7

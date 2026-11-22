@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.CntLocal Formalism.L2.SG.Pf.Cnt IsDedekindDomain
+open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.CntLocal
+  Formalism.L2.SG.Pf.Cnt IsDedekindDomain
 
 noncomputable section
 
@@ -16,13 +17,17 @@ section Loc
 
 variable {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
 
-theorem le_locS (S : Submonoid R) (L : Submodule R W) : L ≤ Formalism.HermitianLatticesTheory.locS S L := fun x hx => ⟨1, S.one_mem, by simpa using hx⟩
+theorem le_locS (S : Submonoid R) (L : Submodule R W)
+    : L ≤ Formalism.HermitianLatticesTheory.locS S L := fun x hx =>
+  ⟨1, S.one_mem, by simpa using hx⟩
 
-theorem locS_mono (S : Submonoid R) {L M : Submodule R W} (h : L ≤ M) :
-    Formalism.HermitianLatticesTheory.locS S L ≤ Formalism.HermitianLatticesTheory.locS S M := fun x ⟨s, hs, hx⟩ => ⟨s, hs, h hx⟩
+theorem locS_mono (S : Submonoid R) {L M : Submodule R W} (h : L ≤ M)
+    : Formalism.HermitianLatticesTheory.locS S L ≤ Formalism.HermitianLatticesTheory.locS S M :=
+  fun x ⟨s, hs, hx⟩ => ⟨s, hs, h hx⟩
 
-theorem locS_idem (S : Submonoid R) (L : Submodule R W) :
-    Formalism.HermitianLatticesTheory.locS S (Formalism.HermitianLatticesTheory.locS S L) = Formalism.HermitianLatticesTheory.locS S L := by
+theorem locS_idem (S : Submonoid R) (L : Submodule R W)
+    : Formalism.HermitianLatticesTheory.locS S (Formalism.HermitianLatticesTheory.locS S L)
+      = Formalism.HermitianLatticesTheory.locS S L := by
   apply le_antisymm
   · rintro x ⟨s, hs, t, ht, hx⟩
     refine ⟨t * s, S.mul_mem ht hs, ?_⟩
@@ -30,16 +35,26 @@ theorem locS_idem (S : Submonoid R) (L : Submodule R W) :
     exact hx
   · exact le_locS S _
 
-theorem locS_eq_of (S : Submonoid R) {L M : Submodule R W} (h1 : L ≤ Formalism.HermitianLatticesTheory.locS S M)
-    (h2 : M ≤ Formalism.HermitianLatticesTheory.locS S L) : Formalism.HermitianLatticesTheory.locS S L = Formalism.HermitianLatticesTheory.locS S M := by
+theorem locS_eq_of
+    (S : Submonoid R)
+    {L M : Submodule R W} (h1 : L ≤ Formalism.HermitianLatticesTheory.locS S M)
+    (h2 : M ≤ Formalism.HermitianLatticesTheory.locS S L)
+    : Formalism.HermitianLatticesTheory.locS S L = Formalism.HermitianLatticesTheory.locS S M := by
   apply le_antisymm
-  · calc Formalism.HermitianLatticesTheory.locS S L ≤ Formalism.HermitianLatticesTheory.locS S (Formalism.HermitianLatticesTheory.locS S M) := locS_mono S h1
+  · calc
+      Formalism.HermitianLatticesTheory.locS S L
+          ≤ Formalism.HermitianLatticesTheory.locS S (Formalism.HermitianLatticesTheory.locS S M) :=
+        locS_mono S h1
       _ = Formalism.HermitianLatticesTheory.locS S M := locS_idem S M
-  · calc Formalism.HermitianLatticesTheory.locS S M ≤ Formalism.HermitianLatticesTheory.locS S (Formalism.HermitianLatticesTheory.locS S L) := locS_mono S h2
+  · calc
+      Formalism.HermitianLatticesTheory.locS S M
+          ≤ Formalism.HermitianLatticesTheory.locS S (Formalism.HermitianLatticesTheory.locS S L) :=
+        locS_mono S h2
       _ = Formalism.HermitianLatticesTheory.locS S L := locS_idem S L
 
-theorem iInf_localization_eq [IsDedekindDomain R] (hR : ¬ IsField R) (L : Submodule R W) :
-    (⨅ P : HeightOneSpectrum R, haveI := P.isPrime; Formalism.HermitianLatticesTheory.localization₂ P.asIdeal L) = L := by
+theorem iInf_localization_eq [IsDedekindDomain R] (hR : ¬ IsField R) (L : Submodule R W)
+    : (⨅ P : HeightOneSpectrum R, haveI := P.isPrime; Formalism.HermitianLatticesTheory.localization₂ P.asIdeal L)
+      = L := by
   apply le_antisymm
   · intro x hx
     rw [Submodule.mem_iInf] at hx
@@ -68,61 +83,82 @@ def JdS (D : Formalism.BasicNotions.D7) : Ideal (𝓞 D.host.E) :=
   Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (differentIdeal ℤ (𝓞 D.host.F))
 
 def GDiffPrime : Prop :=
-  ∀ (D : Formalism.BasicNotions.D7) (P : HeightOneSpectrum (𝓞 D.host.E)), ((gS D : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal →
-    ∃ s ∈ JdS D, s ∉ P.asIdeal
+  ∀ (D : Formalism.BasicNotions.D7) (P : HeightOneSpectrum (𝓞 D.host.E)),
+    ((gS D : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal → ∃ s ∈ JdS D, s ∉ P.asIdeal
 
-theorem differentIdealPowers_eq_inv (D : Formalism.BasicNotions.D7) (i : Fin (D.R.rS + 1)) :
-    ∃ k : ℕ, differentIdealPowers D i = ((((JdS D) ^ k : Ideal (𝓞 D.host.E)) :
-      FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E))⁻¹ := by
+theorem differentIdealPowers_eq_inv (D : Formalism.BasicNotions.D7) (i : Fin (D.R.rS + 1))
+    : ∃ k : ℕ,
+      differentIdealPowers D i
+        = ((((JdS D) ^ k : Ideal (𝓞 D.host.E))
+          : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E))⁻¹ := by
   refine Fin.lastCases ?_ (fun a => ?_) i
   · refine ⟨0, ?_⟩
-    rw [differentIdealPowers, Fin.snoc_last, pow_zero, Ideal.one_eq_top, FractionalIdeal.coeIdeal_top, inv_one]
+    rw [differentIdealPowers, Fin.snoc_last, pow_zero, Ideal.one_eq_top,
+      FractionalIdeal.coeIdeal_top, inv_one]
   · refine ⟨D.R.rS - (a : ℕ), ?_⟩
     have hcast : ((D.R.rS : ℤ) - (a : ℕ)) = ((D.R.rS - (a : ℕ) : ℕ) : ℤ) := by
       have := a.isLt
       omega
-    rw [differentIdealPowers, Fin.snoc_castSucc, hcast, zpow_neg, zpow_natCast, FractionalIdeal.coeIdeal_pow]
+    rw [differentIdealPowers, Fin.snoc_castSucc, hcast, zpow_neg, zpow_natCast,
+      FractionalIdeal.coeIdeal_pow]
     rfl
 
-theorem JdS_pow_ne_zero (D : Formalism.BasicNotions.D7) (k : ℕ) :
-    ((((JdS D) ^ k : Ideal (𝓞 D.host.E)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)) ≠ 0 := by
+theorem JdS_pow_ne_zero (D : Formalism.BasicNotions.D7) (k : ℕ)
+    : ((((JdS D) ^ k : Ideal (𝓞 D.host.E))
+        : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E))
+      ≠ 0 := by
   rw [Ne, FractionalIdeal.coeIdeal_eq_zero, ← Ideal.zero_eq_bot]
   apply pow_ne_zero
-  rw [Ideal.zero_eq_bot, JdS, Ne, Ideal.map_eq_bot_iff_of_injective (FaithfulSMul.algebraMap_injective _ _)]
+  rw [Ideal.zero_eq_bot, JdS, Ne,
+    Ideal.map_eq_bot_iff_of_injective (FaithfulSMul.algebraMap_injective _ _)]
   exact differentIdeal_ne_bot
 
-theorem one_mem_aa (D : Formalism.BasicNotions.D7) (i : Fin (D.R.rS + 1)) (o : 𝓞 D.host.E) :
-    (o : D.host.E) ∈ differentIdealPowers D i := by
+theorem one_mem_aa (D : Formalism.BasicNotions.D7) (i : Fin (D.R.rS + 1)) (o : 𝓞 D.host.E)
+    : (o : D.host.E) ∈ differentIdealPowers D i := by
   obtain ⟨k, hk⟩ := differentIdealPowers_eq_inv D i
   rw [hk, FractionalIdeal.mem_inv_iff (JdS_pow_ne_zero D k)]
   intro y hy
   obtain ⟨a, -, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hy
   exact (FractionalIdeal.mem_one_iff _).2 ⟨o * a, by rw [map_mul]⟩
 
-theorem clear_aa (D : Formalism.BasicNotions.D7) (i : Fin (D.R.rS + 1)) (s : 𝓞 D.host.E) (hs : s ∈ JdS D) :
-    ∃ k : ℕ, ∀ c ∈ differentIdealPowers D i, ∃ o : 𝓞 D.host.E, (o : D.host.E) = ((s ^ k : 𝓞 D.host.E) : D.host.E) * c := by
+theorem clear_aa
+    (D : Formalism.BasicNotions.D7) (i : Fin (D.R.rS + 1)) (s : 𝓞 D.host.E) (hs : s ∈ JdS D)
+    : ∃ k : ℕ, ∀ c ∈ differentIdealPowers D i, ∃ o : 𝓞 D.host.E,
+      (o : D.host.E) = ((s ^ k : 𝓞 D.host.E) : D.host.E) * c := by
   obtain ⟨k, hk⟩ := differentIdealPowers_eq_inv D i
   refine ⟨k, fun c hc => ?_⟩
   rw [hk, FractionalIdeal.mem_inv_iff (JdS_pow_ne_zero D k)] at hc
-  have hsk : ((s ^ k : 𝓞 D.host.E) : D.host.E) ∈
-      ((JdS D ^ k : Ideal (𝓞 D.host.E)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) :=
+  have hsk
+      : ((s ^ k : 𝓞 D.host.E) : D.host.E)
+        ∈ ((JdS D ^ k : Ideal (𝓞 D.host.E))
+          : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) :=
     (FractionalIdeal.mem_coeIdeal _).2 ⟨s ^ k, Ideal.pow_mem_pow hs k, rfl⟩
   have h1 := hc _ hsk
   rw [mul_comm] at h1
   obtain ⟨o, ho⟩ := (FractionalIdeal.mem_one_iff _).1 h1
   exact ⟨o, ho⟩
 
-theorem smul_O_E {D : Formalism.BasicNotions.D7} (o : 𝓞 D.host.E) (v : (VS D).V) : o • v = ((o : D.host.E)) • v := (algebraMap_smul D.host.E o v).symm
+theorem smul_O_E {D : Formalism.BasicNotions.D7} (o : 𝓞 D.host.E) (v : (VS D).V)
+    : o • v = ((o : D.host.E)) • v :=
+  (algebraMap_smul D.host.E o v).symm
 
-theorem mem_pb {D : Formalism.BasicNotions.D7} {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
-    (i : Fin (D.R.rS + 1) ⊕ Fin (D.R.rS + 1)) (c : D.host.E) (hc : c ∈ Sum.elim (differentIdealPowers D) (differentIdealPowers D) i) :
-    c • flagDifferenceVectors D F0 F' i ∈ pbLat (flagDifferenceVectors D F0 F') (Sum.elim (differentIdealPowers D) (differentIdealPowers D)) := Submodule.subset_span ⟨i, c, hc, rfl⟩
+theorem mem_pb
+    {D : Formalism.BasicNotions.D7} {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
+    (F' : LFlag (D.sp.Y 0) D.R.rS T') (i : Fin (D.R.rS + 1) ⊕ Fin (D.R.rS + 1)) (c : D.host.E)
+    (hc : c ∈ Sum.elim (differentIdealPowers D) (differentIdealPowers D) i)
+    : c • flagDifferenceVectors D F0 F' i ∈ pbLat (flagDifferenceVectors D F0 F')
+      (Sum.elim (differentIdealPowers D) (differentIdealPowers D)) :=
+  Submodule.subset_span ⟨i, c, hc, rfl⟩
 
-theorem loc_g (D : Formalism.BasicNotions.D7) {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
-    (P : HeightOneSpectrum (𝓞 D.host.E)) (s : 𝓞 D.host.E) (hsJ : s ∈ JdS D) (hsP : s ∉ P.asIdeal) :
-    haveI := P.isPrime
-    Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (MMg D F0 F') =
-      Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (pbLat (flagDifferenceVectors D F0 F') (Sum.elim (differentIdealPowers D) (differentIdealPowers D))) := by
+theorem loc_g
+    (D : Formalism.BasicNotions.D7)
+    {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
+    (P : HeightOneSpectrum (𝓞 D.host.E)) (s : 𝓞 D.host.E) (hsJ : s ∈ JdS D) (hsP : s ∉ P.asIdeal)
+    : haveI := P.isPrime
+      Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (MMg D F0 F')
+        = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+          (pbLat (flagDifferenceVectors D F0 F')
+            (Sum.elim (differentIdealPowers D) (differentIdealPowers D))) := by
   haveI := P.isPrime
   apply locS_eq_of
   · refine (Submodule.span_le.mpr ?_).trans (le_locS _ _)
@@ -148,16 +184,18 @@ theorem gS_ne_zero' (D : Formalism.BasicNotions.D7) : ((gS D : D.host.E)) ≠ 0 
   have h : gS D ≠ 0 := mul_ne_zero (D.host.g_prime 0).ne_zero (D.host.g_prime 1).ne_zero
   exact_mod_cast h
 
-theorem aa_castSucc (D : Formalism.BasicNotions.D7) (a : Fin D.R.rS) :
-    differentIdealPowers D (Fin.castSucc a) = ddS D ^ (-((D.R.rS : ℤ) - (a : ℕ))) := by
+theorem aa_castSucc (D : Formalism.BasicNotions.D7) (a : Fin D.R.rS)
+    : differentIdealPowers D (Fin.castSucc a) = ddS D ^ (-((D.R.rS : ℤ) - (a : ℕ))) := by
   rw [differentIdealPowers, Fin.snoc_castSucc]
 
 theorem aa_last (D : Formalism.BasicNotions.D7) : differentIdealPowers D (Fin.last D.R.rS) = 1 := by
   rw [differentIdealPowers, Fin.snoc_last]
 
-theorem mem_UUS_fvec (D : Formalism.BasicNotions.D7) {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
-    (F' : LFlag (D.sp.Y 0) D.R.rS T') (a : Fin (D.R.rS + 1)) (c : D.host.E) (hc : c ∈ differentIdealPowers D a) :
-    c • F0.fvec a ∈ UUS D F0 F' ∧ c • F'.fl.fvec a ∈ UUS D F0 F' := by
+theorem mem_UUS_fvec
+    (D : Formalism.BasicNotions.D7)
+    {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
+    (a : Fin (D.R.rS + 1)) (c : D.host.E) (hc : c ∈ differentIdealPowers D a)
+    : c • F0.fvec a ∈ UUS D F0 F' ∧ c • F'.fl.fvec a ∈ UUS D F0 F' := by
   induction a using Fin.lastCases with
   | last =>
     rw [aa_last, FractionalIdeal.mem_one_iff] at hc
@@ -176,21 +214,35 @@ theorem mem_UUS_fvec (D : Formalism.BasicNotions.D7) {T T' : D.host.E} (F0 : Fla
         (Submodule.subset_span ⟨a, c, hc, rfl⟩)))
     · exact Submodule.mem_sup_left (Submodule.mem_sup_right (Submodule.subset_span ⟨a, c, hc, rfl⟩))
 
-theorem UUS_le_pb (D : Formalism.BasicNotions.D7) {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
-    (F' : LFlag (D.sp.Y 0) D.R.rS T') : UUS D F0 F' ≤ pbLat (flagDifferenceVectors D F0 F') (Sum.elim (differentIdealPowers D) (differentIdealPowers D)) := by
+theorem UUS_le_pb
+    (D : Formalism.BasicNotions.D7)
+    {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
+    : UUS D F0 F'
+      ≤ pbLat (flagDifferenceVectors D F0 F')
+        (Sum.elim (differentIdealPowers D) (differentIdealPowers D)) := by
   have hg := gS_ne_zero' D
-  have key : ∀ (a : Fin (D.R.rS + 1)) (c : D.host.E), c ∈ differentIdealPowers D a →
-      c • F0.fvec a ∈ pbLat (flagDifferenceVectors D F0 F') (Sum.elim (differentIdealPowers D) (differentIdealPowers D)) ∧
-      c • F'.fl.fvec a ∈ pbLat (flagDifferenceVectors D F0 F') (Sum.elim (differentIdealPowers D) (differentIdealPowers D)) := by
+  have key
+      : ∀ (a : Fin (D.R.rS + 1)) (c : D.host.E),
+        c ∈ differentIdealPowers D a
+          → c • F0.fvec a ∈ pbLat (flagDifferenceVectors D F0 F')
+              (Sum.elim (differentIdealPowers D) (differentIdealPowers D))
+            ∧ c • F'.fl.fvec a ∈ pbLat (flagDifferenceVectors D F0 F')
+              (Sum.elim (differentIdealPowers D) (differentIdealPowers D)) := by
     intro a c hc
     refine ⟨mem_pb F0 F' (Sum.inl a) c hc, ?_⟩
     have hgc : ((gS D : D.host.E)) * c ∈ differentIdealPowers D a := by
-      have := Submodule.smul_mem (differentIdealPowers D a : Submodule (𝓞 D.host.E) D.host.E) ((gS D : ℕ) : 𝓞 D.host.E) hc
+      have :=
+        Submodule.smul_mem (differentIdealPowers D a : Submodule (𝓞 D.host.E) D.host.E)
+          ((gS D : ℕ) : 𝓞 D.host.E) hc
       rwa [Algebra.smul_def, map_natCast] at this
-    have e : c • F'.fl.fvec a = (((gS D : D.host.E)) * c) • flagDifferenceVectors D F0 F' (Sum.inr a) + c • flagDifferenceVectors D F0 F' (Sum.inl a) := by
+    have e
+        : c • F'.fl.fvec a
+          = (((gS D : D.host.E)) * c) • flagDifferenceVectors D F0 F' (Sum.inr a)
+            + c • flagDifferenceVectors D F0 F' (Sum.inl a) := by
       simp only [flagDifferenceVectors, Sum.elim_inr, Sum.elim_inl]
-      have hgc' : (((gS D : D.host.E)) * c) • (((gS D : D.host.E))⁻¹ • (F'.fl.fvec a - F0.fvec a)) =
-          c • (F'.fl.fvec a - F0.fvec a) := by
+      have hgc'
+          : (((gS D : D.host.E)) * c) • (((gS D : D.host.E))⁻¹ • (F'.fl.fvec a - F0.fvec a))
+            = c • (F'.fl.fvec a - F0.fvec a) := by
         rw [smul_smul]
         congr 1
         field_simp
@@ -214,11 +266,15 @@ theorem UUS_le_pb (D : Formalism.BasicNotions.D7) {T T' : D.host.E} (F0 : FlagG 
     have := (key (Fin.last _) 1 (by simpa using one_mem_aa D (Fin.last D.R.rS) 1)).2
     simpa [FlagG.fvec] using this
 
-theorem loc_ng (D : Formalism.BasicNotions.D7) {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
-    (P : HeightOneSpectrum (𝓞 D.host.E)) (hP : ((gS D : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal) :
-    haveI := P.isPrime
-    Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (UUS D F0 F') =
-      Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (pbLat (flagDifferenceVectors D F0 F') (Sum.elim (differentIdealPowers D) (differentIdealPowers D))) := by
+theorem loc_ng
+    (D : Formalism.BasicNotions.D7)
+    {T T' : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
+    (P : HeightOneSpectrum (𝓞 D.host.E)) (hP : ((gS D : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal)
+    : haveI := P.isPrime
+      Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (UUS D F0 F')
+        = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+          (pbLat (flagDifferenceVectors D F0 F')
+            (Sum.elim (differentIdealPowers D) (differentIdealPowers D))) := by
   haveI := P.isPrime
   have hg := gS_ne_zero' D
   apply locS_eq_of
@@ -228,7 +284,9 @@ theorem loc_ng (D : Formalism.BasicNotions.D7) {T T' : D.host.E} (F0 : FlagG (VS
     rcases i with a | b
     · exact le_locS _ _ (mem_UUS_fvec D F0 F' a c hc).1
     · refine ⟨((gS D : ℕ) : 𝓞 D.host.E), hP, ?_⟩
-      have e : ((gS D : ℕ) : 𝓞 D.host.E) • (c • flagDifferenceVectors D F0 F' (Sum.inr b)) = c • F'.fl.fvec b - c • F0.fvec b := by
+      have e
+          : ((gS D : ℕ) : 𝓞 D.host.E) • (c • flagDifferenceVectors D F0 F' (Sum.inr b))
+            = c • F'.fl.fvec b - c • F0.fvec b := by
         rw [smul_O_E]
         simp only [flagDifferenceVectors, Sum.elim_inr, smul_smul]
         push_cast
@@ -241,12 +299,17 @@ theorem loc_ng (D : Formalism.BasicNotions.D7) {T T' : D.host.E} (F0 : FlagG (VS
 open Classical in
 theorem mmPseudo_of (hg : GDiffPrime) : MMPseudo := by
   intro D u u' _ F0 what₂ _ Z F' _ _ _ _
-  have hP : ∀ P : HeightOneSpectrum (𝓞 D.host.E),
-      (haveI := P.isPrime
-       if ((gS D : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal then Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (MMg D F0 F')
-       else Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (UUS D F0 F')) =
-      (haveI := P.isPrime
-       Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (pbLat (flagDifferenceVectors D F0 F') (Sum.elim (differentIdealPowers D) (differentIdealPowers D)))) := by
+  have hP
+      : ∀ P : HeightOneSpectrum (𝓞 D.host.E),
+        (haveI := P.isPrime
+         if ((gS D : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal then
+           Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (MMg D F0 F')
+         else
+           Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (UUS D F0 F'))
+          = (haveI := P.isPrime
+             Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+               (pbLat (flagDifferenceVectors D F0 F')
+                 (Sum.elim (differentIdealPowers D) (differentIdealPowers D)))) := by
     intro P
     split_ifs with h
     · obtain ⟨s, hsJ, hsP⟩ := hg D P h
@@ -259,18 +322,22 @@ theorem mmPseudo_of (hg : GDiffPrime) : MMPseudo := by
 theorem congruence_prime_different : GDiffPrime := by
   intro D P hP
   haveI := P.isPrime
-  have hg : ((D.host.g 0 : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal ∨ ((D.host.g 1 : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal := by
+  have hg
+      : ((D.host.g 0 : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal
+        ∨ ((D.host.g 1 : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal := by
     apply P.isPrime.mem_or_mem
     unfold gS at hP
     exact_mod_cast hP
-  have key : ∀ i : Fin 2, ((D.host.g i : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal → ∃ s ∈ JdS D, s ∉ P.asIdeal := by
+  have key
+      : ∀ i : Fin 2, ((D.host.g i : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal → ∃ s ∈ JdS D, s ∉ P.asIdeal := by
     intro i hi
     set n := Ideal.absNorm (differentIdeal ℤ (𝓞 D.host.F))
     refine ⟨algebraMap (𝓞 D.host.F) (𝓞 D.host.E) (n : 𝓞 D.host.F), ?_, ?_⟩
     · exact Ideal.mem_map_of_mem _ (Ideal.absNorm_mem _)
     · intro hn
       rw [map_natCast] at hn
-      have hc := (Formalism.L2.SG.SplitPrimeNormLemmas.IntG.coprime_gi (D := D) i).cast (R := 𝓞 D.host.E)
+      have hc :=
+        (Formalism.L2.SG.SplitPrimeNormLemmas.IntG.coprime_gi (D := D) i).cast (R := 𝓞 D.host.E)
       obtain ⟨a, b, hab⟩ := hc
       have h1 : (1 : 𝓞 D.host.E) ∈ P.asIdeal := by
         rw [← hab]

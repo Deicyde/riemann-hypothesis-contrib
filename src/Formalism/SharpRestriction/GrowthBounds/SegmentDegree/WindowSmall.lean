@@ -13,7 +13,9 @@ open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
 variable {N r K : ℕ}
 
 section
-variable {n0 : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} {od : Fin N → Fin N} {bb : Fin N → ℝ} {a La : ℝ} {p : ℕ}
+variable
+  {n0 : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} {od : Fin N → Fin N} {bb : Fin N → ℝ} {a La : ℝ}
+  {p : ℕ}
 
 theorem two_N_lt_K (H : HypT N n0 r K LL B od bb a La p) : 2 * N < K := by
   have h := H.H4
@@ -24,16 +26,22 @@ theorem two_N_lt_K (H : HypT N n0 r K LL B od bb a La p) : 2 * N < K := by
   have : (2 * N : ℝ) < (K : ℝ) := by linarith
   exact_mod_cast this
 
-theorem dplus_le_beA (_H : HypT N n0 r K LL B od bb a La p) {dd : Fin N → ℕ}
-    (hdd : ∀ i : Fin N, i.val < n0 → dd i = B i) (s : ℕ) (hs : s ≤ n0) : dplus LL dd s ≤ beA n0 B := by
+theorem dplus_le_beA
+    (_H : HypT N n0 r K LL B od bb a La p)
+    {dd : Fin N → ℕ} (hdd : ∀ i : Fin N, i.val < n0 → dd i = B i)
+    (s : ℕ) (hs : s ≤ n0)
+    : dplus LL dd s ≤ beA n0 B := by
   unfold dplus beA
   refine Finset.sum_le_sum fun l _ => ?_
   by_cases hl : l.val < s ∧ LL.vec l = true
   · rw [if_pos hl, if_pos (by omega), hdd l (by omega)]
   · rw [if_neg hl]; exact Nat.zero_le _
 
-theorem dminus_le_beA (H : HypT N n0 r K LL B od bb a La p) {dd : Fin N → ℕ}
-    (hdd : ∀ i : Fin N, i.val < n0 → dd i = B i) (s : ℕ) : dminus LL dd s ≤ beA n0 B := by
+theorem dminus_le_beA
+    (H : HypT N n0 r K LL B od bb a La p)
+    {dd : Fin N → ℕ} (hdd : ∀ i : Fin N, i.val < n0 → dd i = B i)
+    (s : ℕ)
+    : dminus LL dd s ≤ beA n0 B := by
   unfold dminus beA
   refine Finset.sum_le_sum fun l _ => ?_
   by_cases hl : l.val < s ∧ LL.vec l = false
@@ -45,15 +53,17 @@ theorem dminus_le_beA (H : HypT N n0 r K LL B od bb a La p) {dd : Fin N → ℕ}
     rw [if_pos hl, if_pos hln, hdd l hln]
   · rw [if_neg hl]; exact Nat.zero_le _
 
-theorem path_le_beA (H : HypT N n0 r K LL B od bb a La p) {dd : Fin N → ℕ} (P : PPath (r + K) N LL dd)
-    (hP : IsPATHa LL n0 B P.mu dd) :
-    ∀ (s : ℕ) (hs : s < N + 1) (m : Fin (r + K)), P.mu ⟨s, hs⟩ m ≤ (beA n0 B : ℤ) := by
+theorem path_le_beA
+    (H : HypT N n0 r K LL B od bb a La p)
+    {dd : Fin N → ℕ} (P : PPath (r + K) N LL dd) (hP : IsPATHa LL n0 B P.mu dd)
+    : ∀ (s : ℕ) (hs : s < N + 1) (m : Fin (r + K)), P.mu ⟨s, hs⟩ m ≤ (beA n0 B : ℤ) := by
   intro s
   induction s with
   | zero =>
     intro hs m
     have h0 : (⟨0, hs⟩ : Fin (N + 1)) = 0 := rfl
-    rw [h0, P.zero]; simp
+    rw [h0, P.zero]
+    simp
   | succ s ih =>
     intro hs m
     by_cases hsn : s + 1 ≤ n0
@@ -75,18 +85,24 @@ theorem beA_le (H : HypT N n0 r K LL B od bb a La p) : (beA n0 B : ℝ) ≤ 2 * 
   unfold beA
   push_cast
   have ha : (0 : ℝ) ≤ 2 * a := by have := H.a3; linarith
-  calc ∑ i : Fin N, (if i.val < n0 then (B i : ℝ) else 0) ≤ ∑ _i : Fin N, 2 * a := by
-        refine Finset.sum_le_sum fun i _ => ?_
-        by_cases hi : i.val < n0
-        · rw [if_pos hi]; exact (H.H1 i hi).2
-        · rw [if_neg hi]; exact ha
-    _ = 2 * a * (N : ℝ) := by rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring
+  calc
+    ∑ i : Fin N, (if i.val < n0 then (B i : ℝ) else 0) ≤ ∑ _i : Fin N, 2 * a := by
+      refine Finset.sum_le_sum fun i _ => ?_
+      by_cases hi : i.val < n0
+      · rw [if_pos hi]; exact (H.H1 i hi).2
+      · rw [if_neg hi]; exact ha
+    _ = 2 * a * (N : ℝ) := by
+      rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring
 
 end
 
 def code (N r K : ℕ) (μ : Fin (N + 1) → Fin (r + K) → ℤ) : Fin N × Fin (2 * N) → ℕ := fun v =>
-  if h : v.2.val < N ∧ v.2.val < r + K then (μ v.1.succ ⟨v.2.val, h.2⟩).toNat
-  else if h' : r + K - 2 * N + v.2.val < r + K then (-μ v.1.succ ⟨r + K - 2 * N + v.2.val, h'⟩).toNat else 0
+  if h : v.2.val < N ∧ v.2.val < r + K then
+    (μ v.1.succ ⟨v.2.val, h.2⟩).toNat
+  else if h' : r + K - 2 * N + v.2.val < r + K then
+    (- μ v.1.succ ⟨r + K - 2 * N + v.2.val, h'⟩).toNat
+  else
+    0
 
 theorem path_count_finite : PathCountFinite := by
   classical
@@ -94,17 +110,24 @@ theorem path_count_finite : PathCountFinite := by
   have hK := two_N_lt_K H
   set M := beA n0 B with hM
   let t : Finset (Fin N × Fin (2 * N) → ℕ) := Fintype.piFinset fun _ => Finset.range (M + 1)
-  have hshape : ∀ μ ∈ SP (r := r) (K := K) LL n0 B, ∀ (s : Fin (N + 1)) (m : Fin (r + K)),
-      (m.val + N < r + K → 0 ≤ μ s m) ∧ (N ≤ m.val → μ s m ≤ 0) ∧ μ s m ≤ (M : ℤ) ∧ -(M : ℤ) ≤ μ s m := by
+  have hshape
+      : ∀ μ ∈ SP (r := r) (K := K) LL n0 B, ∀ (s : Fin (N + 1)) (m : Fin (r + K)),
+        (m.val + N < r + K → 0 ≤ μ s m) ∧ (N ≤ m.val → μ s m ≤ 0) ∧ μ s m ≤ (M : ℤ)
+          ∧ -(M : ℤ) ≤ μ s m := by
     rintro μ ⟨dd, hP⟩ s m
     obtain ⟨P, rfl⟩ := hP.path
-    refine ⟨fun h => mu_nonneg P s.val s.2 m (by have := s.2; omega),
-      fun h => mu_nonpos P s.val s.2 m (by have := s.2; omega), path_le_beA H P hP s.val s.2 m, ?_⟩
+    refine ⟨
+      fun h => mu_nonneg P s.val s.2 m (by have := s.2; omega),
+      fun h => mu_nonpos P s.val s.2 m (by have := s.2; omega),
+      path_le_beA H P hP s.val s.2 m,
+      ?_
+    ⟩
     refine le_trans ?_ (neg_dminus_le_mu P s.val s.2 m)
     have := dminus_le_beA H hP.degs s.val
     have h' : (dminus LL dd s.val : ℤ) ≤ (M : ℤ) := by exact_mod_cast this
     linarith
-  have hmaps : ∀ μ ∈ SP (r := r) (K := K) LL n0 B, code N r K μ ∈ (t : Set (Fin N × Fin (2 * N) → ℕ)) := by
+  have hmaps
+      : ∀ μ ∈ SP (r := r) (K := K) LL n0 B, code N r K μ ∈ (t : Set (Fin N × Fin (2 * N) → ℕ)) := by
     intro μ hμ
     simp only [t, Finset.mem_coe, Fintype.mem_piFinset, Finset.mem_range]
     intro v
@@ -145,13 +168,14 @@ theorem path_count_finite : PathCountFinite := by
         · have hidx : m.val - (r + K - 2 * N) < 2 * N := by have := m.2; omega
           have hcv := congrFun hc (i, ⟨m.val - (r + K - 2 * N), hidx⟩)
           unfold code at hcv
-          have hn1 : ¬ ((m.val - (r + K - 2 * N)) < N ∧ (m.val - (r + K - 2 * N)) < r + K) := by omega
+          have hn1 : ¬((m.val - (r + K - 2 * N)) < N ∧ (m.val - (r + K - 2 * N)) < r + K) := by
+            omega
           have hn2 : r + K - 2 * N + (m.val - (r + K - 2 * N)) < r + K := by have := m.2; omega
           rw [dite_eq_right hn1, dite_eq_right hn1, dite_eq_left hn2, dite_eq_left hn2] at hcv
           have hme : (⟨r + K - 2 * N + (m.val - (r + K - 2 * N)), hn2⟩ : Fin (r + K)) = m :=
             Fin.ext (by simp only; omega)
           rw [hme] at hcv
-          have hcv' : (-μ i.succ m).toNat = (-μ' i.succ m).toNat := hcv
+          have hcv' : (- μ i.succ m).toNat = (- μ' i.succ m).toNat := hcv
           have e3 := h1.2.1 (by omega)
           have e4 := h2.2.1 (by omega)
           omega
@@ -160,8 +184,7 @@ theorem path_count_finite : PathCountFinite := by
   refine ⟨hfin, ?_⟩
   have hle := Set.ncard_le_ncard_of_injOn (code N r K) hmaps hinj t.finite_toSet
   rw [Set.ncard_coe_finset] at hle
-  have hcard : t.card = (M + 1) ^ (N * (2 * N)) := by
-    simp [t, Fintype.card_piFinset]
+  have hcard : t.card = (M + 1) ^ (N * (2 * N)) := by simp [t, Fintype.card_piFinset]
   rw [hcard] at hle
   have hA : (0 : ℝ) < 1 + 2 * a * (N : ℝ) := by
     have := H.a3
@@ -171,14 +194,16 @@ theorem path_count_finite : PathCountFinite := by
     have := beA_le H
     push_cast
     linarith
-  calc ((SP (r := r) (K := K) LL n0 B).ncard : ℝ) ≤ (((M + 1) ^ (N * (2 * N)) : ℕ) : ℝ) := by exact_mod_cast hle
+  calc
+    ((SP (r := r) (K := K) LL n0 B).ncard : ℝ)
+      ≤ (((M + 1) ^ (N * (2 * N)) : ℕ) : ℝ) := by exact_mod_cast hle
     _ = ((M + 1 : ℕ) : ℝ) ^ (N * (2 * N)) := by push_cast; rfl
     _ ≤ (1 + 2 * a * (N : ℝ)) ^ (N * (2 * N)) := pow_le_pow_left₀ (Nat.cast_nonneg _) hM1 _
     _ = Real.exp (2 * (N : ℝ) ^ 2 * ell0 N a) := by
-        unfold ell0
-        rw [← Real.exp_log hA, ← Real.exp_nat_mul, Real.log_exp]
-        congr 1
-        push_cast
-        ring
+      unfold ell0
+      rw [← Real.exp_log hA, ← Real.exp_nat_mul, Real.log_exp]
+      congr 1
+      push_cast
+      ring
 
 end Formalism.MainNotions.SelectionLemmas.Pf.T

@@ -94,7 +94,8 @@ section KummerInd
 
 variable {E : Type*} [Field E] [CharZero E]
 
-def mqkField (F : Type*) [Field F] [Algebra F E] {k : ℕ} (α : Fin k → E) (T : Finset (Fin k)) : IntermediateField F E :=
+def mqkField (F : Type*) [Field F] [Algebra F E] {k : ℕ} (α : Fin k → E) (T : Finset (Fin k))
+    : IntermediateField F E :=
   IntermediateField.adjoin F (α '' (T : Set (Fin k)))
 
 omit [CharZero E] in

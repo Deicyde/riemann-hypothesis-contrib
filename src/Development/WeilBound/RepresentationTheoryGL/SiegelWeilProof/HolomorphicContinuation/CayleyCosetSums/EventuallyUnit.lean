@@ -15,11 +15,12 @@ open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.LVs
 
 variable {m n : ℕ}
 
-theorem eventually_unit (y : M2 n) (hy : InG y) :
-    ∀ᶠ t in 𝓝[≠] (0 : ℝ), IsUnit (y * nbar t).toBlocks₂₁.det := by
+theorem eventually_unit (y : M2 n) (hy : InG y)
+    : ∀ᶠ t in 𝓝[≠] (0 : ℝ), IsUnit (y * nbar t).toBlocks₂₁.det := by
   set C := y.toBlocks₂₁ with hC
   set D := y.toBlocks₂₂ with hD
-  let M : Matrix (Fin n) (Fin n) ℂ[X] := C.map Polynomial.C + (Polynomial.X : ℂ[X]) • D.map Polynomial.C
+  let M : Matrix (Fin n) (Fin n) ℂ[X] :=
+    C.map Polynomial.C + (Polynomial.X : ℂ[X]) • D.map Polynomial.C
   have hev : ∀ z : ℂ, (M.det).eval z = (C + z • D).det := by
     intro z
     rw [← Polynomial.coe_evalRingHom, RingHom.map_det]
@@ -36,7 +37,9 @@ theorem eventually_unit (y : M2 n) (hy : InG y) :
       rw [hu, smul_add, smul_smul]
       simp
     rw [hmat, Matrix.det_smul] at h1
-    exact (mul_ne_zero (pow_ne_zero _ (neg_ne_zero.2 Complex.I_ne_zero)) (det_first_cayley_block_ne_group y hy)) h1.symm
+    exact (mul_ne_zero (pow_ne_zero _ (neg_ne_zero.2 Complex.I_ne_zero))
+        (det_first_cayley_block_ne_group y hy))
+      h1.symm
   have hfin : {t : ℝ | (M.det).eval (t : ℂ) = 0}.Finite := by
     refine ((M.det.roots.toFinset.finite_toSet).preimage Complex.ofReal_injective.injOn).subset ?_
     intro t ht
@@ -53,21 +56,25 @@ theorem eventually_unit (y : M2 n) (hy : InG y) :
 private theorem inG_mul' {x y : M2 n} (hx : InG x) (hy : InG y) : InG (x * y) := by
   unfold InG at *
   rw [Matrix.conjTranspose_mul]
-  calc yᴴ * xᴴ * JJ n * (x * y) = yᴴ * (xᴴ * JJ n * x) * y := by simp only [Matrix.mul_assoc]
+  calc
+    yᴴ * xᴴ * JJ n * (x * y)
+      = yᴴ * (xᴴ * JJ n * x) * y := by simp only [Matrix.mul_assoc]
     _ = JJ n := by rw [hx, hy]
 
 private theorem inG_nU_herm' (s : Fin n → Fin n → ℝ) : InG (nU (herm s)) := by
   have hh : (herm s)ᴴ = herm s := by
     ext i j
-    simp only [herm, Matrix.conjTranspose_apply, Complex.star_def, map_add (f := _), map_div₀, map_mul,
-      Complex.conj_ofReal, Complex.conj_I, map_ofNat]
+    simp only [herm, Matrix.conjTranspose_apply, Complex.star_def, map_add (f := _), map_div₀,
+      map_mul, Complex.conj_ofReal, Complex.conj_I, map_ofNat]
     push_cast
     ring
   simp [InG, nU, JJ, Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply, hh]
 
-theorem vanish_all (hmn : m < n) (e : ℤ) (y b : M2 n) (hy : InG y) (hb : InG b)
-    (ψ : (Fin n → Fin n → ℝ) → ℂ) (hψ : IsSingTest ψ) :
-    ∫ s, fz m e 0 (y * nU (herm s) * b) * ψ s = 0 := by
+theorem vanish_all
+    (hmn : m < n) (e : ℤ)
+    (y b : M2 n) (hy : InG y) (hb : InG b)
+    (ψ : (Fin n → Fin n → ℝ) → ℂ) (hψ : IsSingTest ψ)
+    : ∫ s, fz m e 0 (y * nU (herm s) * b) * ψ s = 0 := by
   let G : ℝ → (Fin n → Fin n → ℝ) → ℂ := fun t s => fz m e 0 (y * nbar t * nU (herm s) * b) * ψ s
   let X : ℝ × (Fin n → Fin n → ℝ) → M2 n := fun p => y * nbar p.1 * nU (herm p.2) * b
   have hIn : ∀ p, InG (X p) := fun p =>
@@ -86,19 +93,21 @@ theorem vanish_all (hmn : m < n) (e : ℤ) (y b : M2 n) (hy : InG y) (hb : InG b
     ((continuous_const.matrix_mul h1).matrix_mul h2).matrix_mul continuous_const
   have hU : Continuous fun p => u1 (X p) := by
     unfold u1
-    refine (Continuous.const_smul ?_ Complex.I).add ?_ <;>
-      exact continuous_pi fun i => continuous_pi fun j => hX.matrix_elem _ _
+    refine (Continuous.const_smul ?_ Complex.I).add ?_
+      <;> exact continuous_pi fun i => continuous_pi fun j => hX.matrix_elem _ _
   have hcont : Continuous (Function.uncurry G) := by
-    have hG : Function.uncurry G = fun p => (X p).det ^ e * (u1 (X p)).det ^ (-(m : ℤ)) * ψ p.2 := by
+    have hG
+        : Function.uncurry G = fun p => (X p).det ^ e * (u1 (X p)).det ^ (-(m : ℤ)) * ψ p.2 := by
       funext ⟨t, s⟩
       simp only [Function.uncurry_apply_pair, G, X, fz_zero]
     rw [hG]
     exact ((hX.matrix_det.zpow₀ e fun p => Or.inl (det_ne_of_inG _ (hIn p))).mul
-      (hU.matrix_det.zpow₀ _ fun p => Or.inl (det_first_cayley_block_ne_group _ (hIn p)))).mul (hψ.1.comp continuous_snd)
+        (hU.matrix_det.zpow₀ _ fun p => Or.inl (det_first_cayley_block_ne_group _ (hIn p)))).mul
+      (hψ.1.comp continuous_snd)
   have hK : IsCompact (tsupport ψ) := hψ.2.1
   have hInt : ∀ t, ∫ s, G t s = ∫ s in tsupport ψ, G t s := fun t =>
-    (setIntegral_eq_integral_of_forall_compl_eq_zero
-      (fun s hs => by simp [G, image_eq_zero_of_notMem_tsupport hs])).symm
+    (setIntegral_eq_integral_of_forall_compl_eq_zero (fun s hs => by
+      simp [G, image_eq_zero_of_notMem_tsupport hs])).symm
   have hc : Continuous fun t => ∫ s in tsupport ψ, G t s :=
     continuous_parametric_integral_of_continuous hcont hK
   have hev : ∀ᶠ t in 𝓝[≠] (0 : ℝ), ∫ s in tsupport ψ, G t s = 0 := by

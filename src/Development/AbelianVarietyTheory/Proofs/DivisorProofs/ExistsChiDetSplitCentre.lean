@@ -10,15 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Conti
 noncomputable section
 
 open NumberField MeasureTheory Matrix Polynomial Formalism.L2.Host
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CuspRep.Central
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.CuspRep
+  GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CuspRep.Central
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele GlobalTheory.IdeleCovolume
 
 namespace GlobalTheory.CuspQuot
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem commute_Zalg {T : Module.End ℂ (Sm E a)} (hT : ∀ X, Commute T (lie E a X)) {z : Module.End ℂ (Sm E a)}
-    (hz : z ∈ Zalg E a) : Commute T z := by
+theorem commute_Zalg
+    {T : Module.End ℂ (Sm E a)} (hT : ∀ X, Commute T (lie E a X))
+    {z : Module.End ℂ (Sm E a)} (hz : z ∈ Zalg E a)
+    : Commute T z := by
   let S : Subalgebra ℂ (Module.End ℂ (Sm E a)) := Subalgebra.centralizer ℂ {T}
   have hS : ∀ {z}, z ∈ S ↔ Commute T z := by
     intro z
@@ -35,26 +38,33 @@ theorem commute_Zalg {T : Module.End ℂ (Sm E a)} (hT : ∀ X, Commute T (lie E
   · exact S.algebraMap_mem _
   · exact S.zero_mem
 
-
 variable (E) in
-def cpowChar (s : ℂ) : HChar E :=
-  ⟨MonoidHom.toHomUnits
-      { toFun := fun x => Complex.exp (s * Real.log (ideleNorm (E := E) x))
-        map_one' := by simp
-        map_mul' := fun x y => by
-          rw [map_mul, Real.log_mul (ideleNorm_ne_zero _) (ideleNorm_ne_zero _), ← Complex.exp_add]
-          push_cast; ring_nf },
-    Units.isEmbedding_val₀.continuous_iff.2 (Complex.continuous_exp.comp (continuous_const.mul
-      (Complex.continuous_ofReal.comp (continuous_ideleNorm.log fun _ => ideleNorm_ne_zero _)))),
-    fun k => Units.ext (by
+def cpowChar (s : ℂ) : HChar E := ⟨
+  MonoidHom.toHomUnits {
+    toFun := fun x => Complex.exp (s * Real.log (ideleNorm (E := E) x))
+    map_one' := by simp
+    map_mul' := fun x y => by
+      rw [map_mul, Real.log_mul (ideleNorm_ne_zero _) (ideleNorm_ne_zero _), ← Complex.exp_add]
+      push_cast
+      ring_nf
+  },
+  Units.isEmbedding_val₀.continuous_iff.2 (Complex.continuous_exp.comp (continuous_const.mul
+    (Complex.continuous_ofReal.comp (continuous_ideleNorm.log fun _ => ideleNorm_ne_zero _)))),
+  fun k =>
+    Units.ext (by
       have h := ideleNorm_principalIdele (E := E) k
-      exact (congrArg (fun r : ℝ => Complex.exp (s * Real.log r)) h).trans (by simp))⟩
+      exact (congrArg (fun r : ℝ => Complex.exp (s * Real.log r)) h).trans (by simp))
+⟩
 
-theorem exists_chiDet_splitCentre (ha : 0 < a) (c : ℂ) :
-    ∃ χ : HChar E, ∀ t : ℝ, ((chiDet a χ (splitCentre E a t) : ℂˣ) : ℂ) = Complex.exp (c * t) := by
-  let D : ℝ →+ ℝ := AddMonoidHom.mk'
-    (fun t => Real.log (ideleNorm (E := E) (GeneralLinearGroup.det (splitCentre E a t)))) fun x y => by
-      rw [splitCentre_add, map_mul, map_mul, Real.log_mul (ideleNorm_ne_zero _) (ideleNorm_ne_zero _)]
+theorem exists_chiDet_splitCentre (ha : 0 < a) (c : ℂ)
+    : ∃ χ : HChar E, ∀ t : ℝ,
+      ((chiDet a χ (splitCentre E a t) : ℂˣ) : ℂ) = Complex.exp (c * t) := by
+  let D : ℝ →+ ℝ :=
+    AddMonoidHom.mk'
+      (fun t => Real.log (ideleNorm (E := E) (GeneralLinearGroup.det (splitCentre E a t))))
+      fun x y => by
+        rw [splitCentre_add, map_mul, map_mul,
+          Real.log_mul (ideleNorm_ne_zero _) (ideleNorm_ne_zero _)]
   have hD : Continuous D :=
     (continuous_ideleNorm.comp (GeneralLinearGroup.continuous_det.comp
       GlobalTheory.OneRep.SplitTwist.continuous_splitCentre)).log fun _ => ideleNorm_ne_zero _
@@ -66,8 +76,10 @@ theorem exists_chiDet_splitCentre (ha : 0 < a) (c : ℂ) :
   refine ⟨cpowChar E (c / D 1), fun t => ?_⟩
   change Complex.exp (c / D 1 * (D t : ℝ)) = _
   have : (D 1 : ℂ) ≠ 0 := by exact_mod_cast hD1.ne'
-  rw [hDt t]; push_cast
-  congr 1; field_simp
+  rw [hDt t]
+  push_cast
+  congr 1
+  field_simp
 
 end GlobalTheory.CuspQuot
 

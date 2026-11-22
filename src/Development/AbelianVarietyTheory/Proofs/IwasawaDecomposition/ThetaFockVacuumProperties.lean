@@ -9,9 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsFockVac
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
 open MeasureTheory IsDedekindDomain NumberField Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.ClsVal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.ThFr
+  GlobalTheory.Dict GlobalTheory.ClsVal
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff SABMap)
 open GlobalTheory.SW hiding Level
 open scoped TensorProduct ComplexConjugate
@@ -20,20 +24,23 @@ open GlobalTheory.OneMapRef GlobalTheory.WeilParts
 
 namespace GlobalTheory.OneMapRef.VecP
 
-
 open scoped ComplexOrder in
-theorem isCartanInv_one_of_onb {k : ℕ} {G B : Matrix (Fin k) (Fin k) ℂ} (h : IsONBasis G 1 B k) : IsCartanInv G 1 := by
+theorem isCartanInv_one_of_onb {k : ℕ} {G B : Matrix (Fin k) (Fin k) ℂ} (h : IsONBasis G 1 B k)
+    : IsCartanInv G 1 := by
   obtain ⟨ε, hε, hB, -⟩ := h
   have hε1 : ∀ a, ε a = 1 := fun a =>
     ((hε a).resolve_right fun h' => absurd h'.2 (not_le.mpr a.2)).1
   have hB1 : Bᴴ * G * B = 1 := by simpa [hε1] using hB
   have hBC : B * (Bᴴ * G) = 1 := mul_eq_one_comm.mp hB1
   have hGB : G * B = (Bᴴ * G)ᴴ := by
-    calc G * B = (B * (Bᴴ * G))ᴴ * (G * B) := by rw [hBC, conjTranspose_one, Matrix.one_mul]
+    calc
+      G * B
+        = (B * (Bᴴ * G))ᴴ * (G * B) := by rw [hBC, conjTranspose_one, Matrix.one_mul]
       _ = (Bᴴ * G)ᴴ * (Bᴴ * G * B) := by simp only [conjTranspose_mul, Matrix.mul_assoc]
       _ = (Bᴴ * G)ᴴ := by rw [hB1, Matrix.mul_one]
   have hG : G = (Bᴴ * G)ᴴ * (Bᴴ * G) := by
-    calc G = G * (B * (Bᴴ * G)) := by rw [hBC, Matrix.mul_one]
+    calc
+      G = G * (B * (Bᴴ * G)) := by rw [hBC, Matrix.mul_one]
       _ = G * B * (Bᴴ * G) := by rw [Matrix.mul_assoc]
       _ = (Bᴴ * G)ᴴ * (Bᴴ * G) := by rw [hGB]
   have hinj : Function.Injective (Bᴴ * G).mulVec := by

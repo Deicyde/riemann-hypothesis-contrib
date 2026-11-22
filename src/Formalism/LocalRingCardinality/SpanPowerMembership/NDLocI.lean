@@ -13,7 +13,8 @@ noncomputable section
 
 namespace Formalism.BasicNotions.Examples₂
 
-open NumberField IsDedekindDomain IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc LB
+open NumberField IsDedekindDomain IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc LB
 
 namespace TwB
 
@@ -25,8 +26,10 @@ end Settings
 
 section OneLL
 
-variable {l : ℕ} [hl : Fact l.Prime] {F : Type} [Field F] (LL : FinExt l) (φ : F →+* PadicAlgCl l)
-  (hφ : ∀ x, φ x ∈ LL.1)
+variable
+  {l : ℕ} [hl : Fact l.Prime]
+  {F : Type} [Field F]
+  (LL : FinExt l) (φ : F →+* PadicAlgCl l) (hφ : ∀ x, φ x ∈ LL.1)
 
 def phiL : F →+* ↥LL.1 := φ.codRestrict LL.1.toSubfield hφ
 

@@ -8,23 +8,26 @@ namespace GlobalTheory.UnipotentDecomposition
 
 open Matrix
 
-theorem udl_apply {O : Type} [CommRing O] {m : ℕ} (A B : Matrix (Fin m) (Fin m) O) (d : Fin m → O) (i j : Fin m) :
-    (A * Matrix.diagonal d * B) i j = ∑ k, A i k * d k * B k j := by
+theorem udl_apply
+    {O : Type} [CommRing O] {m : ℕ} (A B : Matrix (Fin m) (Fin m) O) (d : Fin m → O) (i j : Fin m)
+    : (A * Matrix.diagonal d * B) i j = ∑ k, A i k * d k * B k j := by
   rw [Matrix.mul_apply]; simp_rw [Matrix.mul_diagonal]
 
-theorem key {O : Type} [CommRing O] [IsLocalRing O] {α β : O} (hab : ¬ IsUnit (α * β)) :
-    ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) O),
-      (∀ i j, (i < j → α ∣ g i j) ∧ (j < i → β ∣ g i j)) → (∀ i, IsUnit (g i i)) →
-      ∃ (u : Matrix (Fin n) (Fin n) O) (d : Fin n → Oˣ) (l : Matrix (Fin n) (Fin n) O),
-        (∀ i j, (j < i → u i j = 0) ∧ (i = j → u i j = 1) ∧ (i < j → α ∣ u i j)) ∧
-        (∀ i j, (i < j → l i j = 0) ∧ (i = j → l i j = 1) ∧ (j < i → β ∣ l i j)) ∧
-        g = (u * Matrix.diagonal fun i => (d i : O)) * l ∧ ∀ i, α * β ∣ (d i : O) - g i i := by
+theorem key {O : Type} [CommRing O] [IsLocalRing O] {α β : O} (hab : ¬ IsUnit (α * β))
+    : ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) O),
+      (∀ i j, (i < j → α ∣ g i j) ∧ (j < i → β ∣ g i j)) → (∀ i, IsUnit (g i i))
+        → ∃ (u : Matrix (Fin n) (Fin n) O) (d : Fin n → Oˣ) (l : Matrix (Fin n) (Fin n) O),
+          (∀ i j, (j < i → u i j = 0) ∧ (i = j → u i j = 1) ∧ (i < j → α ∣ u i j))
+            ∧ (∀ i j, (i < j → l i j = 0) ∧ (i = j → l i j = 1) ∧ (j < i → β ∣ l i j))
+            ∧ g = (u * Matrix.diagonal fun i => (d i : O)) * l
+            ∧ ∀ i, α * β ∣ (d i : O) - g i i := by
   intro n
   induction n with
   | zero =>
     intro g _ _
     refine ⟨1, fun i => i.elim0, 1, fun i => i.elim0, fun i => i.elim0, ?_, fun i => i.elim0⟩
-    ext i; exact i.elim0
+    ext i
+    exact i.elim0
   | succ n ih =>
     intro g hg hu
     set a : Oˣ := (hu (Fin.last n)).unit with ha
@@ -56,27 +59,42 @@ theorem key {O : Type} [CommRing O] [IsLocalRing O] {α β : O} (hab : ¬ IsUnit
       rw [h3] at h2
       exact h2 (hu _)
     obtain ⟨U, D, L, hU, hL, hUDL, hD⟩ := ih G hG hGu
-    refine ⟨Matrix.of fun i j => Fin.lastCases (motive := fun _ => O)
-              (Fin.lastCases (motive := fun _ => O) 1 (fun _ => 0) j)
-              (fun i' => Fin.lastCases (motive := fun _ => O) (r i' * ↑a⁻¹) (fun j' => U i' j') j) i,
-            fun i => Fin.lastCases (motive := fun _ => Oˣ) a D i,
-            Matrix.of fun i j => Fin.lastCases (motive := fun _ => O)
-              (Fin.lastCases (motive := fun _ => O) 1 (fun j' => ↑a⁻¹ * c j') j)
-              (fun i' => Fin.lastCases (motive := fun _ => O) 0 (fun j' => L i' j') j) i,
-            ?_, ?_, ?_, ?_⟩
+    refine ⟨
+      Matrix.of fun i j =>
+        Fin.lastCases
+          (motive := fun _ => O)
+          (Fin.lastCases (motive := fun _ => O) 1 (fun _ => 0) j)
+          (fun i' => Fin.lastCases (motive := fun _ => O) (r i' * ↑a⁻¹) (fun j' => U i' j') j)
+          i,
+      fun i => Fin.lastCases (motive := fun _ => Oˣ) a D i,
+      Matrix.of fun i j =>
+        Fin.lastCases
+          (motive := fun _ => O)
+          (Fin.lastCases (motive := fun _ => O) 1 (fun j' => ↑a⁻¹ * c j') j)
+          (fun i' => Fin.lastCases (motive := fun _ => O) 0 (fun j' => L i' j') j)
+          i,
+      ?_,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · intro i j
       refine Fin.lastCases ?_ (fun i => ?_) i <;> refine Fin.lastCases ?_ (fun j => ?_) j
       · simp
-      · simp [Fin.castSucc_lt_last, (Fin.castSucc_lt_last j).ne', not_lt_of_gt (Fin.castSucc_lt_last j)]
-      · simp [Fin.castSucc_lt_last, (Fin.castSucc_lt_last i).ne, not_lt_of_gt (Fin.castSucc_lt_last i)]
+      · simp [Fin.castSucc_lt_last, (Fin.castSucc_lt_last j).ne',
+          not_lt_of_gt (Fin.castSucc_lt_last j)]
+      · simp [Fin.castSucc_lt_last, (Fin.castSucc_lt_last i).ne,
+          not_lt_of_gt (Fin.castSucc_lt_last i)]
         first | exact hr i | exact (hr i).mul_right _
       · simpa using hU i j
     · intro i j
       refine Fin.lastCases ?_ (fun i => ?_) i <;> refine Fin.lastCases ?_ (fun j => ?_) j
       · simp
-      · simp [Fin.castSucc_lt_last, (Fin.castSucc_lt_last j).ne', not_lt_of_gt (Fin.castSucc_lt_last j)]
+      · simp [Fin.castSucc_lt_last, (Fin.castSucc_lt_last j).ne',
+          not_lt_of_gt (Fin.castSucc_lt_last j)]
         first | exact hc j | exact (hc j).mul_left _
-      · simp [Fin.castSucc_lt_last, (Fin.castSucc_lt_last i).ne, not_lt_of_gt (Fin.castSucc_lt_last i)]
+      · simp [Fin.castSucc_lt_last, (Fin.castSucc_lt_last i).ne,
+          not_lt_of_gt (Fin.castSucc_lt_last i)]
       · simpa using hL i j
     · ext i j
       rw [udl_apply, Fin.sum_univ_castSucc]
@@ -88,18 +106,38 @@ theorem key {O : Type} [CommRing O] [IsLocalRing O] {α β : O} (hab : ¬ IsUnit
         done
       · have e := congrFun (congrFun hUDL i) j
         rw [udl_apply] at e
-        simp only [Matrix.of_apply, Fin.lastCases_castSucc, Fin.lastCases_last, mul_zero, add_zero, mul_one]
+        simp only [Matrix.of_apply, Fin.lastCases_castSucc, Fin.lastCases_last, mul_zero, add_zero,
+          mul_one]
         rw [← e]
         simp only [G]
         linear_combination (-(r i * ↑a⁻¹ * c j)) * hinv
     · intro i
       refine Fin.lastCases ?_ (fun i => ?_) i
       · simp [haa]
-      · have e : ((D i : O)) - g i.castSucc i.castSucc = ((D i : O) - G i i) - r i * ↑a⁻¹ * c i := by
+      · have e
+            : ((D i : O)) - g i.castSucc i.castSucc = ((D i : O) - G i i) - r i * ↑a⁻¹ * c i := by
           simp [G]; ring
         simpa [e] using dvd_sub (hD i) (hrc i)
 
-theorem main : (let d1 : {O : Type} → [CommRing O] → {n : ℕ} → O → Matrix (Fin n) (Fin n) O → Prop := @(fun {O : Type} [CommRing O] {n : ℕ} (β : O) (l : Matrix (Fin n) (Fin n) O) ↦ ∀ (i j : Fin n), (i < j → l i j = (0 : O)) ∧ (i = j → l i j = (1 : O)) ∧ (j < i → β ∣ l i j)); let d2 : {O : Type} → [CommRing O] → {n : ℕ} → O → O → Matrix (Fin n) (Fin n) O → Prop := @(fun {O : Type} [CommRing O] {n : ℕ} (α β : O) (g : Matrix (Fin n) (Fin n) O) ↦ ∀ (i j : Fin n), (i < j → α ∣ g i j) ∧ (j < i → β ∣ g i j)); let d3 : {O : Type} → [CommRing O] → {n : ℕ} → O → Matrix (Fin n) (Fin n) O → Prop := @(fun {O : Type} [CommRing O] {n : ℕ} (α : O) (u : Matrix (Fin n) (Fin n) O) ↦ ∀ (i j : Fin n), (j < i → u i j = (0 : O)) ∧ (i = j → u i j = (1 : O)) ∧ (i < j → α ∣ u i j)); ∀ {O : Type} [inst : CommRing O] [IsLocalRing O] {α β : O}, ¬IsUnit (α * β) → ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) O), d2 α β g → (∀ (i : Fin n), IsUnit (g i i)) → ∃ (u : Matrix (Fin n) (Fin n) O) (d : Fin n → Oˣ) (l : Matrix (Fin n) (Fin n) O), d3 α u ∧ d1 β l ∧ g = (u * Matrix.diagonal fun (i : Fin n) ↦ (↑(d i) : O)) * l ∧ ∀ (i : Fin n), α * β ∣ (↑(d i) : O) - g i i) := by
+theorem main
+    : (let d1 : {O : Type} → [CommRing O] → {n : ℕ} → O → Matrix (Fin n) (Fin n) O → Prop :=
+         @(fun {O : Type} [CommRing O] {n : ℕ} (β : O) (l : Matrix (Fin n) (Fin n) O) ↦
+           ∀ (i j : Fin n),
+             (i < j → l i j = (0 : O)) ∧ (i = j → l i j = (1 : O)) ∧ (j < i → β ∣ l i j))
+       let d2 : {O : Type} → [CommRing O] → {n : ℕ} → O → O → Matrix (Fin n) (Fin n) O → Prop :=
+         @(fun {O : Type} [CommRing O] {n : ℕ} (α β : O) (g : Matrix (Fin n) (Fin n) O) ↦
+           ∀ (i j : Fin n), (i < j → α ∣ g i j) ∧ (j < i → β ∣ g i j))
+       let d3 : {O : Type} → [CommRing O] → {n : ℕ} → O → Matrix (Fin n) (Fin n) O → Prop :=
+         @(fun {O : Type} [CommRing O] {n : ℕ} (α : O) (u : Matrix (Fin n) (Fin n) O) ↦
+           ∀ (i j : Fin n),
+             (j < i → u i j = (0 : O)) ∧ (i = j → u i j = (1 : O)) ∧ (i < j → α ∣ u i j))
+       ∀ {O : Type} [inst : CommRing O] [IsLocalRing O] {α β : O},
+         ¬ IsUnit (α * β)
+           → ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) O),
+             d2 α β g → (∀ (i : Fin n), IsUnit (g i i))
+               → ∃ (u : Matrix (Fin n) (Fin n) O) (d : Fin n → Oˣ) (l : Matrix (Fin n) (Fin n) O),
+                 d3 α u ∧ d1 β l ∧ g = (u * Matrix.diagonal fun (i : Fin n) ↦ (↑(d i) : O)) * l
+                   ∧ ∀ (i : Fin n), α * β ∣ (↑(d i) : O) - g i i) := by
   intro d1 d2 d3 O _ _ α β hab n g hg hu
   exact key hab n g hg hu
 

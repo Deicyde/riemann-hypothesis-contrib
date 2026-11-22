@@ -13,8 +13,10 @@ namespace GlobalTheory.K4.LevNormal
 
 open GlobalTheory.KZ
 
-theorem normal_of_fixed (F L : Type) [Field F] [Field L] [Algebra F L] [Algebra.IsAlgebraic F L]
-    (h : ∀ x : L, (∀ σ : L ≃ₐ[F] L, σ x = x) → x ∈ Set.range (algebraMap F L)) : Normal F L := by
+theorem normal_of_fixed
+    (F L : Type) [Field F] [Field L] [Algebra F L] [Algebra.IsAlgebraic F L]
+    (h : ∀ x : L, (∀ σ : L ≃ₐ[F] L, σ x = x) → x ∈ Set.range (algebraMap F L))
+    : Normal F L := by
   classical
   rw [normal_iff]
   intro x
@@ -65,15 +67,17 @@ theorem normal_of_fixed (F L : Type) [Field F] [Field L] [Algebra F L] [Algebra.
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ}
 
-theorem isAlgebraic_of_jK_mem [Algebra.IsAlgebraic ℚ Ω] (X : Tower Ω ε) (F : Subfield X.K) (hj : X.jK ∈ F) (f : X.K) :
-    IsAlgebraic F f := by
+theorem isAlgebraic_of_jK_mem
+    [Algebra.IsAlgebraic ℚ Ω] (X : Tower Ω ε) (F : Subfield X.K) (hj : X.jK ∈ F) (f : X.K)
+    : IsAlgebraic F f := by
   haveI : CharZero Ω := algebraRat.charZero Ω
   haveI : CharZero X.K := charZero_of_injective_algebraMap (algebraMap Ω X.K).injective
   let A : IntermediateField F X.K := algebraicClosure F X.K
   have hc : ∀ c : Ω, algebraMap Ω X.K c ∈ A := by
     intro c
     rw [mem_algebraicClosure_iff]
-    have h1 : IsAlgebraic ℤ c := (IsFractionRing.isAlgebraic_iff ℤ ℚ Ω).2 (Algebra.IsAlgebraic.isAlgebraic c)
+    have h1 : IsAlgebraic ℤ c :=
+      (IsFractionRing.isAlgebraic_iff ℤ ℚ Ω).2 (Algebra.IsAlgebraic.isAlgebraic c)
     have h2 : IsAlgebraic ℤ (algebraMap Ω X.K c) := h1.algHom (algebraMap Ω X.K).toIntAlgHom
     exact h2.extendScalars (R := ℤ) (S := F) (RingHom.injective_int _)
   let B : IntermediateField Ω X.K := A.toSubfield.toIntermediateField hc
@@ -89,15 +93,27 @@ theorem isAlgebraic_of_jK_mem [Algebra.IsAlgebraic ℚ Ω] (X : Tower Ω ε) (F 
     exact h0
   exact h3.restrictScalars F
 
-theorem gal_mem_lev (X : Tower Ω ε) (Γ' : Subgroup SL(2, ℤ)) (m : ℕ) (ζ : Ω) (hm : 0 < m) (hζ : IsPrimitiveRoot ζ m)
-    (hΓ : CongruenceSubgroup.Gamma m ≤ Γ') (s : Ω ≃ₐ[ℚ] Ω) (hs : s ζ = ζ) (f : X.K) (hf : f ∈ lev X Γ') :
-    X.gal s f ∈ lev X Γ' := by
+theorem gal_mem_lev
+    (X : Tower Ω ε)
+    (Γ' : Subgroup SL(2, ℤ))
+    (m : ℕ)
+    (ζ : Ω)
+    (hm : 0 < m) (hζ : IsPrimitiveRoot ζ m) (hΓ : CongruenceSubgroup.Gamma m ≤ Γ')
+    (s : Ω ≃ₐ[ℚ] Ω) (hs : s ζ = ζ)
+    (f : X.K) (hf : f ∈ lev X Γ')
+    : X.gal s f ∈ lev X Γ' := by
   rw [mem_lev_iff] at hf ⊢
   intro γ hγ
   have := X.recip m f hm (fun δ hδ => hf δ (hΓ hδ)) ζ hζ s 1 (by simpa using hs) γ γ (by simp)
   rw [← this, hf γ hγ]
 
-theorem normal : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [Algebra.IsAlgebraic ℚ Ω] (ε : Ω →+* ℂ) (X : GlobalTheory.KZ.Tower Ω ε) (Γ' : Subgroup SL(2, ℤ)) (m : ℕ) (ζ : Ω), 0 < m → IsPrimitiveRoot ζ m → CongruenceSubgroup.Gamma m ≤ Γ' → letI := GlobalTheory.K4.algMdl X Γ' (IntermediateField.adjoin ℚ {ζ}).fixingSubgroup; Normal (GlobalTheory.K4.mdl X Γ' (IntermediateField.adjoin ℚ {ζ}).fixingSubgroup) (GlobalTheory.K4.lev X Γ') := by
+theorem normal
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [Algebra.IsAlgebraic ℚ Ω] (ε : Ω →+* ℂ)
+        (X : GlobalTheory.KZ.Tower Ω ε) (Γ' : Subgroup SL(2, ℤ)) (m : ℕ) (ζ : Ω),
+      0 < m → IsPrimitiveRoot ζ m → CongruenceSubgroup.Gamma m ≤ Γ'
+        → letI := GlobalTheory.K4.algMdl X Γ' (IntermediateField.adjoin ℚ {ζ}).fixingSubgroup
+          Normal (GlobalTheory.K4.mdl X Γ' (IntermediateField.adjoin ℚ {ζ}).fixingSubgroup)
+            (GlobalTheory.K4.lev X Γ') := by
   intro Ω _ _ _ ε X Γ' m ζ hm hζ hΓ
   set S := (IntermediateField.adjoin ℚ {ζ}).fixingSubgroup with hS
   letI := algMdl X Γ' S
@@ -109,10 +125,11 @@ theorem normal : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [Algebra.IsAlgebrai
   intro x hx
   refine ⟨⟨x, (mem_mdl_iff X Γ' S _).2 ⟨x.2, fun s hs => ?_⟩⟩, rfl⟩
   have hsζ : s ζ = ζ := hs ⟨ζ, IntermediateField.subset_adjoin ℚ {ζ} rfl⟩
-  let φ : lev X Γ' →ₐ[mdl X Γ' S] lev X Γ' :=
-    { ((X.gal s).toRingHom.comp (lev X Γ').subtype).codRestrict (lev X Γ')
-        (fun f => gal_mem_lev X Γ' m ζ hm hζ hΓ s hsζ f f.2) with
-      commutes' := fun y => Subtype.ext (((mem_mdl_iff X Γ' S _).1 y.2).2 s hs) }
+  let φ : lev X Γ' →ₐ[mdl X Γ' S] lev X Γ' := {
+    ((X.gal s).toRingHom.comp (lev X Γ').subtype).codRestrict (lev X Γ')
+      (fun f => gal_mem_lev X Γ' m ζ hm hζ hΓ s hsζ f f.2) with
+    commutes' := fun y => Subtype.ext (((mem_mdl_iff X Γ' S _).1 y.2).2 s hs)
+  }
   exact congrArg Subtype.val (hx (AlgEquiv.ofBijective φ (Algebra.IsAlgebraic.algHom_bijective φ)))
 
 end GlobalTheory.K4.LevNormal

@@ -137,33 +137,46 @@ lemma apra_blow (d : ℕ) (hd : 1 ≤ d) (hMVI : MVIntStatement d) (ε : ℝ) (h
     exact (ENNReal.add_ne_top.2 ⟨hne, hc⟩) (eq_top_iff.2 (hT ▸ hle))
   exact eq_top_iff.2 (hind ▸ lintegral_mono_ae hae)
 
-theorem ap_prod_blowup (d k : ℕ) (hd : 1 ≤ d) (hMVd : MVStatement d) (hMVk : MVStatement k)
-    (hMVI : MVIntStatement d) (ε : ℝ) (hε : 0 < ε) (M : ℝ) :
-    ∃ τ0 : ℝ, 0 < τ0 ∧ ∀ τ : ℝ, 0 < τ → τ ≤ τ0 → ∀ u : V d × V k → ℂ,
-      DifferentiableOn ℂ u (Metric.ball (0 : V d) ε ×ˢ Metric.ball (0 : V k) ε) →
-      ENNReal.ofReal (M * ‖u 0‖ ^ 2) ≤
-        ∫⁻ z in Metric.ball (0 : V d) ε ×ˢ Metric.ball (0 : V k) ε,
-          ENNReal.ofReal (‖u z‖ ^ 2 * (max (‖z.1‖ ^ 2) τ) ^ (-(d : ℝ))) := by
+theorem ap_prod_blowup
+    (d k : ℕ) (hd : 1 ≤ d) (hMVd : MVStatement d) (hMVk : MVStatement k) (hMVI : MVIntStatement d)
+    (ε : ℝ) (hε : 0 < ε)
+    (M : ℝ)
+    : ∃ τ0 : ℝ,
+      0 < τ0
+        ∧ ∀ τ : ℝ,
+          0 < τ → τ ≤ τ0
+            → ∀ u : V d × V k → ℂ,
+              DifferentiableOn ℂ u (Metric.ball (0 : V d) ε ×ˢ Metric.ball (0 : V k) ε)
+                → ENNReal.ofReal (M * ‖u 0‖ ^ 2)
+                  ≤ ∫⁻ z in Metric.ball (0 : V d) ε ×ˢ Metric.ball (0 : V k) ε,
+                      ENNReal.ofReal (‖u z‖ ^ 2 * (max (‖z.1‖ ^ 2) τ) ^ (-(d : ℝ))) := by
   have hvol : volume (ball (0 : V k) ε) ≠ 0 := (measure_ball_pos volume (0 : V k) hε).ne'
-  have hsup : ⨆ n : ℕ, volume (ball (0 : V k) ε) *
-      ∫⁻ x : V d, apraW d ε (1 / ((n : ℝ) + 1)) ‖x‖ = ⊤ := by
+  have hsup
+      : ⨆ n : ℕ, volume (ball (0 : V k) ε) *
+          ∫⁻ x : V d, apraW d ε (1 / ((n : ℝ) + 1)) ‖x‖
+        = ⊤ := by
     rw [← ENNReal.mul_iSup, apra_blow d hd hMVI ε hε, ENNReal.mul_top hvol]
-  have hlt : ENNReal.ofReal M < ⨆ n : ℕ, volume (ball (0 : V k) ε) *
-      ∫⁻ x : V d, apraW d ε (1 / ((n : ℝ) + 1)) ‖x‖ := by
+  have hlt
+      : ENNReal.ofReal M
+        < ⨆ n : ℕ, volume (ball (0 : V k) ε) *
+          ∫⁻ x : V d, apraW d ε (1 / ((n : ℝ) + 1)) ‖x‖ := by
     rw [hsup]
     exact ENNReal.ofReal_lt_top
   obtain ⟨n, hn⟩ := lt_iSup_iff.1 hlt
   refine ⟨1 / ((n : ℝ) + 1), by positivity, fun τ hτ hτ0 u hu => ?_⟩
   have hIτ : ∫⁻ x : V d, apraW d ε (1 / ((n : ℝ) + 1)) ‖x‖ ≤ ∫⁻ x : V d, apraW d ε τ ‖x‖ :=
     lintegral_mono fun x => apraW_anti d ε hτ hτ0 _
-  have hslice : ∀ ζ ∈ ball (0 : V k) ε,
-      ENNReal.ofReal (‖u (0, ζ)‖ ^ 2) * ∫⁻ x : V d, apraW d ε τ ‖x‖ ≤
-        ∫⁻ x in ball (0 : V d) ε,
-          ENNReal.ofReal (‖u (x, ζ)‖ ^ 2 * (max (‖x‖ ^ 2) τ) ^ (-(d : ℝ))) :=
-    fun ζ hζ => apra_slice d k hMVd ε τ u hu ζ hζ
-  have hbase := apra_base k hMVk ε (fun ζ => u (0, ζ))
-    (hu.comp ((differentiableOn_const (0 : V d)).prodMk differentiableOn_id)
-      (fun ζ hζ => ⟨mem_ball_self hε, hζ⟩))
+  have hslice
+      : ∀ ζ ∈ ball (0 : V k) ε,
+        ENNReal.ofReal (‖u (0, ζ)‖ ^ 2) * ∫⁻ x : V d, apraW d ε τ ‖x‖
+          ≤ ∫⁻ x in ball (0 : V d) ε,
+              ENNReal.ofReal (‖u (x, ζ)‖ ^ 2 * (max (‖x‖ ^ 2) τ) ^ (-(d : ℝ))) := fun ζ hζ =>
+    apra_slice d k hMVd ε τ u hu ζ hζ
+  have hbase :=
+    apra_base k hMVk ε
+      (fun ζ => u (0, ζ))
+      (hu.comp ((differentiableOn_const (0 : V d)).prodMk differentiableOn_id)
+        (fun ζ hζ => ⟨mem_ball_self hε, hζ⟩))
   have hmeasF : AEMeasurable
       (fun z : V d × V k => ENNReal.ofReal (‖u z‖ ^ 2 * (max (‖z.1‖ ^ 2) τ) ^ (-(d : ℝ))))
       ((volume.restrict (ball (0 : V d) ε)).prod (volume.restrict (ball (0 : V k) ε))) := by
@@ -172,27 +185,31 @@ theorem ap_prod_blowup (d k : ℕ) (hd : 1 ≤ d) (hMVd : MVStatement d) (hMVk :
       letI : IsBoundedSMul ℂ (V d × V k) := NormedSpace.toIsBoundedSMul
       letI : ContinuousSMul ℂ (V d × V k) := IsBoundedSMul.continuousSMul
       exact hu.continuousOn.aemeasurable (measurableSet_ball.prod measurableSet_ball)
-    exact ((hu'.norm.pow_const 2).mul (((measurable_fst.norm.pow_const 2).max
-      measurable_const).pow_const _).aemeasurable).ennreal_ofReal
-  have hfub : ∫⁻ z in ball (0 : V d) ε ×ˢ ball (0 : V k) ε,
-      ENNReal.ofReal (‖u z‖ ^ 2 * (max (‖z.1‖ ^ 2) τ) ^ (-(d : ℝ))) =
-      ∫⁻ ζ in ball (0 : V k) ε, ∫⁻ x in ball (0 : V d) ε,
-        ENNReal.ofReal (‖u (x, ζ)‖ ^ 2 * (max (‖x‖ ^ 2) τ) ^ (-(d : ℝ))) := by
+    exact ((hu'.norm.pow_const 2).mul
+      (((measurable_fst.norm.pow_const 2).max measurable_const).pow_const
+        _).aemeasurable).ennreal_ofReal
+  have hfub
+      : ∫⁻ z in ball (0 : V d) ε ×ˢ ball (0 : V k) ε,
+          ENNReal.ofReal (‖u z‖ ^ 2 * (max (‖z.1‖ ^ 2) τ) ^ (-(d : ℝ)))
+        = ∫⁻ ζ in ball (0 : V k) ε, ∫⁻ x in ball (0 : V d) ε,
+            ENNReal.ofReal (‖u (x, ζ)‖ ^ 2 * (max (‖x‖ ^ 2) τ) ^ (-(d : ℝ))) := by
     rw [Measure.volume_eq_prod, ← Measure.prod_restrict, lintegral_prod_symm _ hmeasF]
   rw [hfub]
-  calc ENNReal.ofReal (M * ‖u 0‖ ^ 2)
-      = ENNReal.ofReal (‖u (0, 0)‖ ^ 2) * ENNReal.ofReal M := by
-        rw [ENNReal.ofReal_mul' (by positivity), mul_comm]
-        rfl
-    _ ≤ ENNReal.ofReal (‖u (0, 0)‖ ^ 2) *
-          (volume (ball (0 : V k) ε) * ∫⁻ x : V d, apraW d ε τ ‖x‖) :=
-        mul_le_mul' le_rfl (hn.le.trans (mul_le_mul' le_rfl hIτ))
-    _ = (ENNReal.ofReal (‖u (0, 0)‖ ^ 2) * volume (ball (0 : V k) ε)) *
-          ∫⁻ x : V d, apraW d ε τ ‖x‖ := (mul_assoc _ _ _).symm
-    _ ≤ (∫⁻ ζ in ball (0 : V k) ε, ENNReal.ofReal (‖u (0, ζ)‖ ^ 2)) *
-          ∫⁻ x : V d, apraW d ε τ ‖x‖ := mul_le_mul' hbase le_rfl
+  calc
+    ENNReal.ofReal (M * ‖u 0‖ ^ 2) = ENNReal.ofReal (‖u (0, 0)‖ ^ 2) * ENNReal.ofReal M := by
+      rw [ENNReal.ofReal_mul' (by positivity), mul_comm]
+      rfl
+    _ ≤ ENNReal.ofReal (‖u (0, 0)‖ ^ 2)
+        * (volume (ball (0 : V k) ε) * ∫⁻ x : V d, apraW d ε τ ‖x‖) :=
+      mul_le_mul' le_rfl (hn.le.trans (mul_le_mul' le_rfl hIτ))
+    _ = (ENNReal.ofReal (‖u (0, 0)‖ ^ 2) * volume (ball (0 : V k) ε))
+        * ∫⁻ x : V d, apraW d ε τ ‖x‖ :=
+      (mul_assoc _ _ _).symm
+    _ ≤ (∫⁻ ζ in ball (0 : V k) ε, ENNReal.ofReal (‖u (0, ζ)‖ ^ 2)) * ∫⁻ x : V d, apraW d ε τ ‖x‖ :=
+      mul_le_mul' hbase le_rfl
     _ ≤ ∫⁻ ζ in ball (0 : V k) ε, ENNReal.ofReal (‖u (0, ζ)‖ ^ 2) *
-          ∫⁻ x : V d, apraW d ε τ ‖x‖ := lintegral_mul_const_le _ _
+          ∫⁻ x : V d, apraW d ε τ ‖x‖ :=
+      lintegral_mul_const_le _ _
     _ ≤ _ := setLIntegral_mono' measurableSet_ball hslice
 
 end

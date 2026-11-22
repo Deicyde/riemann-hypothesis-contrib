@@ -8,16 +8,22 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.AdeleI
 
 @[expose] public section
 
-open NumberField IsDedekindDomain NumberField.mixedEmbedding Complex Classical HeckeCharacterZeroLocus.ThmBIn
+open NumberField IsDedekindDomain NumberField.mixedEmbedding Complex Classical
+  HeckeCharacterZeroLocus.ThmBIn
 open scoped TensorProduct ContDiff nonZeroDivisors
 
 namespace GlobalTheory.PrimeIdemExists
 
-theorem exists_indicator (K : Type) [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) :
-    ∃ a : FiniteAdeleRing (𝓞 K) K, a v = 1 ∧ ∀ w, w ≠ v → a w = 0 := by
-  refine ⟨(⟨fun w => if w = v then 1 else 0, ?_⟩ :
-    RestrictedProduct (fun w : HeightOneSpectrum (𝓞 K) => w.adicCompletion K)
-      (fun w => (w.adicCompletionIntegers K : Set (w.adicCompletion K))) Filter.cofinite), ?_, ?_⟩
+theorem exists_indicator (K : Type) [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
+    : ∃ a : FiniteAdeleRing (𝓞 K) K, a v = 1 ∧ ∀ w, w ≠ v → a w = 0 := by
+  refine ⟨
+    (⟨fun w => if w = v then 1 else 0, ?_⟩ : RestrictedProduct
+      (fun w : HeightOneSpectrum (𝓞 K) => w.adicCompletion K)
+      (fun w => (w.adicCompletionIntegers K : Set (w.adicCompletion K)))
+      Filter.cofinite),
+    ?_,
+    ?_
+  ⟩
   · refine Filter.Eventually.of_forall fun w => ?_
     beta_reduce
     by_cases h : w = v
@@ -26,26 +32,36 @@ theorem exists_indicator (K : Type) [Field K] [NumberField K] (v : HeightOneSpec
   · exact if_pos rfl
   · intro w hw; exact if_neg hw
 
-theorem cA_algebraMap {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (ε : AF F) :
-    cA σ (algebraMap (AF F) (AE F E) ε) = algebraMap (AF F) (AE F E) ε := by
+theorem cA_algebraMap
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (ε : AF F)
+    : cA σ (algebraMap (AF F) (AE F E) ε) = algebraMap (AF F) (AE F E) ε := by
   change Algebra.TensorProduct.map (AlgHom.id F (AF F)) σ (ε ⊗ₜ[F] (1 : E)) = ε ⊗ₜ[F] (1 : E)
   simp
 
-theorem cA_incA {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (x : E) :
-    cA σ (incA F E x) = incA F E (σ x) := by
-  change Algebra.TensorProduct.map (AlgHom.id F (AF F)) σ ((1 : AF F) ⊗ₜ[F] x) = (1 : AF F) ⊗ₜ[F] (σ x)
+theorem cA_incA
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (x : E)
+    : cA σ (incA F E x) = incA F E (σ x) := by
+  change Algebra.TensorProduct.map (AlgHom.id F (AF F)) σ ((1 : AF F) ⊗ₜ[F] x)
+    = (1 : AF F) ⊗ₜ[F] (σ x)
   simp
 
-theorem prod_ext {K : Type} [Field K] [NumberField K] {M : Type} {a b : M × FiniteAdeleRing (𝓞 K) K}
-    (h1 : a.1 = b.1) (h2 : ∀ P, a.2 P = b.2 P) : a = b :=
+theorem prod_ext
+    {K : Type} [Field K] [NumberField K]
+    {M : Type} {a b : M × FiniteAdeleRing (𝓞 K) K} (h1 : a.1 = b.1) (h2 : ∀ P, a.2 P = b.2 P)
+    : a = b :=
   Prod.ext h1 (DFunLike.ext _ _ h2)
 
-theorem exists_isPrimeIdem : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ P : HeightOneSpectrum (𝓞 E), ∃ e f, IsPrimeIdem σ P e f := by
+theorem exists_isPrimeIdem
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ → ∀ P : HeightOneSpectrum (𝓞 E), ∃ e f, IsPrimeIdem σ P e f := by
   intro F E _ _ _ _ _ σ hσ P
-  obtain ⟨c, hcc, -, hcmem, hcund, -, hcint, -⟩ := GlobalTheory.cmConjugation_on_primes_adeles_idempotents F E σ hσ
-  obtain ⟨Φ, hΦ1, hΦ2, hΦ3, -, -⟩ := GlobalTheory.T.cmExtension_adeles_standardModel_dictionary F E σ hσ
+  obtain ⟨c, hcc, -, hcmem, hcund, -, hcint, -⟩ :=
+    GlobalTheory.cmConjugation_on_primes_adeles_idempotents F E σ hσ
+  obtain ⟨Φ, hΦ1, hΦ2, hΦ3, -, -⟩ :=
+    GlobalTheory.T.cmExtension_adeles_standardModel_dictionary F E σ hσ
   have crit := GlobalTheory.adele_idem_prime_criterion F E Φ hΦ1 hΦ2 hΦ3
   obtain ⟨α, hα1, hα0⟩ := exists_indicator F (P.under (𝓞 F))
   have hε : IsPlaceIdem F (P.under (𝓞 F)) (pairA F 0 α) := ⟨α, rfl, hα1, hα0⟩
@@ -72,7 +88,8 @@ theorem exists_isPrimeIdem : ∀ (F E : Type) [Field F] [NumberField F] [Field E
     refine (crit η P _ ε hε hηη hηη).2 ⟨hη1, ?_, fun Q hQ => ?_⟩
     · rw [hη3, if_pos (Or.inl rfl)]
     · rw [hη3, if_neg]
-      rw [hP]; simpa using hQ
+      rw [hP]
+      simpa using hQ
   · obtain ⟨β, hβ1, hβ0⟩ := exists_indicator E P
     set e : AE F E := Φ.symm (0, β) with he
     have hΦe : Φ e = (0, β) := Φ.apply_symm_apply _
@@ -103,8 +120,10 @@ theorem exists_isPrimeIdem : ∀ (F E : Type) [Field F] [NumberField F] [Field E
       obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
       apply τ.injective
       rw [hσ.2.2.2, hσ.2.2.2, star_star]
-    have hcr' : ∀ x : 𝓞 E, x ≠ 0 → (x ∈ (c P).asIdeal ↔
-        finPart F E (cA σ e * incA F E ((x : E)⁻¹)) ∉ intAE F E) := by
+    have hcr'
+        : ∀ x : 𝓞 E,
+          x ≠ 0
+            → (x ∈ (c P).asIdeal ↔ finPart F E (cA σ e * incA F E ((x : E)⁻¹)) ∉ intAE F E) := by
       intro x hx
       have hint : IsIntegral ℤ (σ (x : E)) :=
         (RingOfIntegers.isIntegral_coe x).map (σ.toRingHom.toIntAlgHom)
@@ -115,7 +134,8 @@ theorem exists_isPrimeIdem : ∀ (F E : Type) [Field F] [NumberField F] [Field E
         intro h0
         apply hx
         apply RingOfIntegers.ext
-        rw [hxy, h0]; simp
+        rw [hxy, h0]
+        simp
       rw [(hcmem P y x hxy).1, hcr y hy0, ← hcint, map_mul (cA σ), cA_incA, map_inv₀, ← hxy]
     have hee' : cA σ e * cA σ e = cA σ e := by rw [← map_mul, hee]
     have heη' : cA σ e * η = cA σ e := by

@@ -137,10 +137,9 @@ lemma pair_root (l μ : Ix p q → ℚ) (a b : Ix p q) :
 def Below (ν μ : Ix p q → ℚ) : Prop :=
   ∀ l : Ix p q → ℚ, (∀ a b, posC a b → l b < l a) → pair l ν < pair l μ
 
-
 open Classical in
-def rho (p q : ℕ) : Ix p q → ℚ :=
-  fun x => ∑ c, ((if posC x c then 1 else 0) - (if posC c x then 1 else 0))
+def rho (p q : ℕ) : Ix p q → ℚ := fun x =>
+  ∑ c, ((if posC x c then 1 else 0) - (if posC c x then 1 else 0))
 
 lemma rho_lt {a b : Ix p q} (h : posC a b) : rho p q b < rho p q a := by
   refine Finset.sum_lt_sum (fun c _ => ?_) ⟨a, Finset.mem_univ _, ?_⟩
@@ -150,7 +149,6 @@ lemma rho_lt {a b : Ix p q} (h : posC a b) : rho p q b < rho p q a := by
       by_cases h4 : posC c b <;> simp_all
   · have h1 : ¬ posC a a := fun h => posC_ne h rfl
     simp [h, h1, posC_asymm h]
-
 
 open Classical in
 def casVal (μ : Ix p q → ℚ) : ℚ :=
@@ -587,16 +585,41 @@ lemma exists_compl (hL : IsKLieAct act) {W : Submodule ℂ V} [FiniteDimensional
     exact Submodule.mem_sup_right (this (Submodule.mem_sup_right (mem_gen v)))
   · exact h.1
 
-theorem finite_module_structure : ∀ (p q : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (act : Mat p q →ₗ[ℂ] Module.End ℂ V), IsKLieAct act → ∀ W : Submodule ℂ V, FiniteDimensional ℂ W → KStable act W → (∀ v ∈ W, v ∈ ⨆ μ : Ix p q → ℚ, wtSub act μ) → (∀ U : Submodule ℂ V, U ≤ W → KStable act U → ∃ U' : Submodule ℂ V, KStable act U' ∧ U ⊓ U' = ⊥ ∧ U ⊔ U' = W) ∧ (W ≠ ⊥ → ∃ μ v, v ∈ W ∧ IsHW act μ v) ∧ (∀ v ∈ W, v ∈ ⨆ μ : Ix p q → ℚ, Submodule.span ℂ {w | w ∈ W ∧ OfType act μ w}) ∧ (∀ μ v, v ∈ W → IsHW act μ v → (∀ a b, posC a b → ∃ k : ℕ, μ a - μ b = k) ∧ OfType act μ v ∧ ∀ U : Submodule ℂ V, KStable act U → U ≤ sInf {N | v ∈ N ∧ KStable act N} → U = ⊥ ∨ v ∈ U) := by
+theorem finite_module_structure
+    : ∀ (p q : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (act : Mat p q →ₗ[ℂ] Module.End ℂ V),
+      IsKLieAct act
+        → ∀ W : Submodule ℂ V,
+          FiniteDimensional ℂ W → KStable act W → (∀ v ∈ W, v ∈ ⨆ μ : Ix p q → ℚ, wtSub act μ)
+            → (∀ U : Submodule ℂ V,
+                U ≤ W → KStable act U
+                  → ∃ U' : Submodule ℂ V, KStable act U' ∧ U ⊓ U' = ⊥ ∧ U ⊔ U' = W)
+              ∧ (W ≠ ⊥ → ∃ μ v, v ∈ W ∧ IsHW act μ v)
+              ∧ (∀ v ∈ W, v ∈ ⨆ μ : Ix p q → ℚ, Submodule.span ℂ {w | w ∈ W ∧ OfType act μ w})
+              ∧ (∀ μ v,
+                v ∈ W → IsHW act μ v
+                  → (∀ a b, posC a b → ∃ k : ℕ, μ a - μ b = k) ∧ OfType act μ v
+                    ∧ ∀ U : Submodule ℂ V,
+                      KStable act U → U ≤ sInf {N | v ∈ N ∧ KStable act N} → U = ⊥ ∨ v ∈ U) := by
   intro p q V _ _ act hL W _ hW hd
-  refine ⟨exists_compl hL hW hd, exists_hw hL hW hd, ?_, fun μ v hvW hv =>
-    ⟨fun a b hab => hw_dominant hL hW hvW hv hab, ofType_hw hL hW hvW hv, gen_irred hL hW hd hvW hv⟩⟩
-  refine le_of_hw hL hW hd (fun Z hZ => ?_) fun μ v hvW hv =>
-    Submodule.mem_iSup_of_mem μ (Submodule.subset_span ⟨hvW, ofType_hw hL hW hvW hv⟩)
-  refine (iSup_le fun μ => Submodule.span_le.2 ?_ :
-    (⨆ μ : Ix p q → ℚ, Submodule.span ℂ {w | w ∈ W ∧ OfType act μ w}) ≤
-      (⨆ μ : Ix p q → ℚ, Submodule.span ℂ {w | w ∈ W ∧ OfType act μ w}).comap (act Z))
+  refine ⟨
+    exists_compl hL hW hd,
+    exists_hw hL hW hd,
+    ?_,
+    fun μ v hvW hv => ⟨
+      fun a b hab => hw_dominant hL hW hvW hv hab,
+      ofType_hw hL hW hvW hv,
+      gen_irred hL hW hd hvW hv
+    ⟩
+  ⟩
+  refine le_of_hw hL hW hd
+    (fun Z hZ => ?_)
+    fun μ v hvW hv =>
+      Submodule.mem_iSup_of_mem μ (Submodule.subset_span ⟨hvW, ofType_hw hL hW hvW hv⟩)
+  refine (iSup_le fun μ => Submodule.span_le.2 ?_
+    : (⨆ μ : Ix p q → ℚ, Submodule.span ℂ {w | w ∈ W ∧ OfType act μ w})
+      ≤ (⨆ μ : Ix p q → ℚ, Submodule.span ℂ {w | w ∈ W ∧ OfType act μ w}).comap (act Z))
   rintro w ⟨hwW, M, h1, h2, h3, h4⟩
-  exact Submodule.mem_iSup_of_mem μ (Submodule.subset_span ⟨hW Z hZ w hwW, M, h1, h3 Z hZ w h2, h3, h4⟩)
+  exact Submodule.mem_iSup_of_mem μ
+    (Submodule.subset_span ⟨hW Z hZ w hwW, M, h1, h3 Z hZ w h2, h3, h4⟩)
 
 end GlobalTheory.BlockReps

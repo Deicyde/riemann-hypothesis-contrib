@@ -14,27 +14,71 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InertPlaceDo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 noncomputable section
 namespace GlobalTheory.InertDblLine
 
-theorem line : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E)
-    (a a' : ℕ) (G : Geo σ a a') (X : Chars F E) (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W), IsTriple B G X om om' →
-    ∀ (v : Pl (F := F)) (w : HeightOneSpectrum (𝓞 E)), Formalism.UG.IsInertAt F E v w →
-    ∀ (dd : Darboux (symp (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (-1) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) G.V'.J) (dbl ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) G.W.J))) (Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a')))
-      (omd : UG (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (dbl ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) G.W.J)) →* Module.End ℂ ((Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a') → AF F) → ℂ)),
-      IsDblCoord (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (-1) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) G.V'.J) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) G.W.J) G.M'.co dd →
-      IsUWeilSplit (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (adeleClass F) B.ψ (-1) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) G.V'.J) (dbl ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) G.W.J)) dd X.α (diagCols (Fin (a + a'))) omd →
-    ∀ R : (Fin a' × Fin (a + a') → AF F) → ℂ, Rest (evFin F v) (G.M'.vac v) R →
-    ∀ g ∈ GlobalTheory.InertDbl.KAtD σ G.W v, ∃ c : ℂ, omd g (GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R)) =
-      c • GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R) := by
+theorem line
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E) (a a' : ℕ) (G : Geo σ a a') (X : Chars F E)
+        (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W),
+      IsTriple B G X om om'
+        → ∀ (v : Pl (F := F)) (w : HeightOneSpectrum (𝓞 E)),
+          Formalism.UG.IsInertAt F E v w
+            → ∀ (dd : Darboux
+                (symp (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (-1)
+                  ((_root_.Matrix.map ·
+                      (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR
+                        (F := F) (AF F)))
+                    G.V'.J)
+                  (dbl ((_root_.Matrix.map ·
+                      (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR
+                        (F := F) (AF F)))
+                    G.W.J)))
+                (Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a')))
+                (omd : UG (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ)
+                    (dbl ((_root_.Matrix.map ·
+                        (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR
+                          (F := F) (AF F)))
+                      G.W.J))
+                  →* Module.End ℂ ((Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a') → AF F) → ℂ)),
+              IsDblCoord (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (-1)
+                  ((_root_.Matrix.map ·
+                      (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR
+                        (F := F) (AF F)))
+                    G.V'.J)
+                  ((_root_.Matrix.map ·
+                      (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR
+                        (F := F) (AF F)))
+                    G.W.J)
+                  G.M'.co dd
+                → IsUWeilSplit (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ)
+                  (adeleClass F) B.ψ (-1)
+                  ((_root_.Matrix.map ·
+                      (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR
+                        (F := F) (AF F)))
+                    G.V'.J)
+                  (dbl ((_root_.Matrix.map ·
+                      (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR
+                        (F := F) (AF F)))
+                    G.W.J))
+                  dd X.α (diagCols (Fin (a + a'))) omd
+                → ∀ R : (Fin a' × Fin (a + a') → AF F) → ℂ,
+                  Rest (evFin F v) (G.M'.vac v) R
+                    → ∀ g ∈ GlobalTheory.InertDbl.KAtD σ G.W v, ∃ c : ℂ,
+                      omd g (GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R))
+                        = c • GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R) := by
   intro F E _ _ _ _ _ σ B a a' G X om om' hTr v w hw dd omd hdd hsp R hR g hg
   obtain ⟨hvSB, hv0, θ, hθ, hvac⟩ := hTr.geo.hM'.vac v
   set φ₀ := boxFun (G.M'.vac v) (fun x => star (G.M'.vac v x)) with hφ₀
   set r₀ : ((Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a')) → AF F) → ℂ := boxFun R (fun x => star (R x)) with hr₀
-  have hΦ : GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R) = tens (evFin F v) φ₀ r₀ := by
+  have hΦ
+      : GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R)
+        = tens (evFin F v) φ₀ r₀ := by
     funext x
     show (_ * _) * star (_ * _) = (_ * _) * (_ * _)
     rw [star_mul']
@@ -52,11 +96,20 @@ theorem line : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField
       rw [show (x + z) ∘ Sum.inl = x ∘ Sum.inl + z ∘ Sum.inl from rfl,
         show (x + z) ∘ Sum.inr = x ∘ Sum.inr + z ∘ Sum.inr from rfl, hR.1 _ _ hl, hR.1 _ _ hr]
     · rw [← hΦ]
-      exact GlobalTheory.SchwartzBox.boxFun_mem_schA F _ _ _ hR.2 _ (GlobalTheory.SchAConj.star_mem_schA F _ _ hR.2)
-  obtain ⟨φ₁, hφ₁, hact⟩ := GlobalTheory.T.doubledWeilRepresentation_locality_finitePlace F E σ B a a' G X om om' hTr v dd omd hsp g hg.1 φ₀ hφ₀SB
-  have h₀ := GlobalTheory.T.doubledVacuum_twistedVacuumCondition_doubledLattice F E σ B a a' G X om om' hTr v dd hdd θ hθ hvac
-  have h₁ := GlobalTheory.T.doubledVacuumCondition_stable_latticeStabilizer_inert F E σ B a a' G X om om' hTr v dd omd hsp θ hθ g hg φ₀ hφ₀SB φ₁ hφ₁ h₀ hact
-  obtain ⟨c, hc⟩ := GlobalTheory.T.inertPlace_doubledVacuumCondition_unique F E σ B a a' G X om om' hTr v w hw dd hdd θ hθ hvac φ₁ hφ₁ h₁
+      exact GlobalTheory.SchwartzBox.boxFun_mem_schA F _ _ _ hR.2 _
+        (GlobalTheory.SchAConj.star_mem_schA F _ _ hR.2)
+  obtain ⟨φ₁, hφ₁, hact⟩ :=
+    GlobalTheory.T.doubledWeilRepresentation_locality_finitePlace F E σ B a a' G X om om' hTr v dd
+      omd hsp g hg.1 φ₀ hφ₀SB
+  have h₀ :=
+    GlobalTheory.T.doubledVacuum_twistedVacuumCondition_doubledLattice F E σ B a a' G X om om' hTr v
+      dd hdd θ hθ hvac
+  have h₁ :=
+    GlobalTheory.T.doubledVacuumCondition_stable_latticeStabilizer_inert F E σ B a a' G X om om' hTr
+      v dd omd hsp θ hθ g hg φ₀ hφ₀SB φ₁ hφ₁ h₀ hact
+  obtain ⟨c, hc⟩ :=
+    GlobalTheory.T.inertPlace_doubledVacuumCondition_unique F E σ B a a' G X om om' hTr v w hw dd
+      hdd θ hθ hvac φ₁ hφ₁ h₁
   refine ⟨c, ?_⟩
   rw [hΦ, hact r₀ hRest, hc]
   funext x

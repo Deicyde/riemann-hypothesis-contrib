@@ -11,15 +11,17 @@ namespace GlobalTheory.CompanionTheory.Ar.Cmp.RegularTensor
 
 open Polynomial
 
-theorem natDegree_minpoly_eq_of_closed {k F A : Type*} [Field k] [Field F] [Field A] [Algebra k F]
-    [Algebra F A] [Algebra k A] [IsScalarTower k F A]
+theorem natDegree_minpoly_eq_of_closed
+    {k F A : Type*}
+    [Field k] [Field F] [Field A] [Algebra k F] [Algebra F A] [Algebra k A] [IsScalarTower k F A]
     (h : ∀ x : F, IsAlgebraic k x → x ∈ Set.range (algebraMap k F))
-    {θ : A} (hθ : IsIntegral k θ) : (minpoly F θ).natDegree = (minpoly k θ).natDegree := by
+    {θ : A} (hθ : IsIntegral k θ)
+    : (minpoly F θ).natDegree = (minpoly k θ).natDegree := by
   have hF : IsIntegral F θ := hθ.tower_top
   have hd : minpoly F θ ∣ (minpoly k θ).map (algebraMap k F) :=
     minpoly.dvd_map_of_isScalarTower k F θ
-  have h1 := integralClosure.mem_lifts_of_monic_of_dvd_map F (minpoly.monic hθ)
-    (minpoly.monic hF) hd
+  have h1 :=
+    integralClosure.mem_lifts_of_monic_of_dvd_map F (minpoly.monic hθ) (minpoly.monic hF) hd
   have h2 : minpoly F θ ∈ lifts (algebraMap k F) := by
     rw [lifts_iff_coeff_lifts] at h1 ⊢
     intro n

@@ -9,19 +9,18 @@ open MeasureTheory MeasureTheory.Measure GlobalTheory.SplitWeil PositivityTheory
 
 namespace GlobalTheory.CompanionTheory.TestFunctionFibreIntegral
 
-theorem eventually_slice_eq {A B : Type} [TopologicalSpace A] [TopologicalSpace B]
-    (F : SB (A × B)) (a₀ : A) :
-    ∀ᶠ a in nhds a₀, ∀ b, (F : A × B → ℂ) (a, b) = (F : A × B → ℂ) (a₀, b) := by
+theorem eventually_slice_eq
+    {A B : Type} [TopologicalSpace A] [TopologicalSpace B] (F : SB (A × B)) (a₀ : A)
+    : ∀ᶠ a in nhds a₀, ∀ b, (F : A × B → ℂ) (a, b) = (F : A × B → ℂ) (a₀, b) := by
   obtain ⟨hF, hc⟩ := mem_SB_iff.1 F.2
   have hK : IsCompact (Prod.snd '' tsupport (F : A × B → ℂ)) := hc.isCompact.image continuous_snd
   have hopen : IsOpen {p : A × B | (F : A × B → ℂ) p = (F : A × B → ℂ) (a₀, p.2)} := by
-    have h2 : IsLocallyConstant
-        (fun p : A × B => (F : A × B → ℂ) p - (F : A × B → ℂ) (a₀, p.2)) :=
+    have h2 : IsLocallyConstant (fun p : A × B => (F : A × B → ℂ) p - (F : A × B → ℂ) (a₀, p.2)) :=
       hF.sub (hF.comp_continuous (by fun_prop))
     have h3 := h2.isOpen_fiber 0
     simpa [Set.preimage, sub_eq_zero] using h3
-  obtain ⟨U, V, hU, -, haU, hKV, hUV⟩ := generalized_tube_lemma (isCompact_singleton (x := a₀)) hK
-    hopen (by
+  obtain ⟨U, V, hU, -, haU, hKV, hUV⟩ :=
+    generalized_tube_lemma (isCompact_singleton (x := a₀)) hK hopen (by
       rintro ⟨a, b⟩ ⟨ha, -⟩
       have ha' : a = a₀ := ha
       subst ha'
@@ -33,11 +32,12 @@ theorem eventually_slice_eq {A B : Type} [TopologicalSpace A] [TopologicalSpace 
     have h2 : (a₀, b) ∉ tsupport (F : A × B → ℂ) := fun h => hb ⟨_, h, rfl⟩
     rw [image_eq_zero_of_notMem_tsupport h1, image_eq_zero_of_notMem_tsupport h2]
 
-theorem integral_mem_SB : ∀ (A B : Type) [TopologicalSpace A] [T2Space A] [LocallyCompactSpace A]
-    [TotallyDisconnectedSpace A] [TopologicalSpace B] [T2Space B] [LocallyCompactSpace B]
-    [TotallyDisconnectedSpace B] [MeasurableSpace B] [BorelSpace B] (μ : Measure B)
-    [IsFiniteMeasureOnCompacts μ] (w : B → ℂ), Continuous w → ∀ F : SB (A × B),
-    (fun a => ∫ b, (F : A × B → ℂ) (a, b) * w b ∂μ) ∈ SB A := by
+theorem integral_mem_SB
+    : ∀ (A B : Type) [TopologicalSpace A] [T2Space A] [LocallyCompactSpace A]
+        [TotallyDisconnectedSpace A] [TopologicalSpace B] [T2Space B] [LocallyCompactSpace B]
+        [TotallyDisconnectedSpace B] [MeasurableSpace B] [BorelSpace B] (μ : Measure B)
+        [IsFiniteMeasureOnCompacts μ] (w : B → ℂ),
+      Continuous w → ∀ F : SB (A × B), (fun a => ∫ b, (F : A × B → ℂ) (a, b) * w b ∂μ) ∈ SB A := by
   intro A B _ _ _ _ _ _ _ _ _ _ μ _ w _ F
   obtain ⟨-, hc⟩ := mem_SB_iff.1 F.2
   refine mem_SB_iff.2 ⟨?_, ?_⟩

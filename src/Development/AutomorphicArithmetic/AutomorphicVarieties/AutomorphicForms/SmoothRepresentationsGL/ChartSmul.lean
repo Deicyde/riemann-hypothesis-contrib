@@ -5,15 +5,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-private theorem isY_map {R R' : Type} [CommRing R] [CommRing R'] {n m : ℕ} (f : R →+* R') (p : GL (Fin n) R)
-    (hp : IsY m p.val) : IsY m (GeneralLinearGroup.map f p).val := by
+private theorem isY_map
+    {R R' : Type} [CommRing R] [CommRing R']
+    {n m : ℕ}
+    (f : R →+* R')
+    (p : GL (Fin n) R) (hp : IsY m p.val)
+    : IsY m (GeneralLinearGroup.map f p).val := by
   intro i hi
   obtain ⟨h1, h2⟩ := hp i hi
   refine ⟨?_, fun j hj => ?_⟩
@@ -22,21 +27,31 @@ private theorem isY_map {R R' : Type} [CommRing R] [CommRing R'] {n m : ℕ} (f 
   · change f (p.val i j) = 0
     rw [h2 j hj, map_zero]
 
-private theorem chart_smul {E : Type} [Field E] [NumberField E] [IsTotallyReal E] {n : ℕ} (f f' : GA E n → ℂ)
-    (g g' : GA E n) (a : ℂ) (h : ∀ y, f (g * infGL E n y) = a * f' (g' * infGL E n y)) (x : Lie E n) :
-    chart f g x = a * chart f' g' x := by
+private theorem chart_smul
+    {E : Type} [Field E] [NumberField E] [IsTotallyReal E]
+    {n : ℕ} (f f' : GA E n → ℂ) (g g' : GA E n)
+    (a : ℂ) (h : ∀ y, f (g * infGL E n y) = a * f' (g' * infGL E n y))
+    (x : Lie E n)
+    : chart f g x = a * chart f' g' x := by
   unfold chart
   split_ifs with hx
   · exact h _
   · simp
 
-theorem UpperTheory.V.Af.Smo.killP :
-    UpperTheory.V.Af.Smo.ArchKir → UpperTheory.V.Af.Smo.FinKir → UpperTheory.V.Af.Smo.EmbY → UpperTheory.V.Af.Smo.PsiInf → UpperTheory.V.Af.Smo.ChartCont → UpperTheory.V.Af.Smo.KillP := by
+theorem UpperTheory.V.Af.Smo.killP
+    : UpperTheory.V.Af.Smo.ArchKir → UpperTheory.V.Af.Smo.FinKir → UpperTheory.V.Af.Smo.EmbY
+      → UpperTheory.V.Af.Smo.PsiInf → UpperTheory.V.Af.Smo.ChartCont
+      → UpperTheory.V.Af.Smo.KillP := by
   intro hA hF hE hP hC E _ _ _ n hn S U
   obtain ⟨c, Hf, hf1, hc, hf⟩ := hF E n hn S U
   obtain ⟨Hi, hi1, hi⟩ := hA E n (n - 1) (by omega)
-  refine ⟨c, fun p => Hi (GeneralLinearGroup.map (pInf E) p) * Hf (GeneralLinearGroup.map (pFin E) p),
-    by simp [hi1, hf1], hc, fun α => ?_⟩
+  refine ⟨
+    c,
+    fun p => Hi (GeneralLinearGroup.map (pInf E) p) * Hf (GeneralLinearGroup.map (pFin E) p),
+    by simp [hi1, hf1],
+    hc,
+    fun α => ?_
+  ⟩
   obtain ⟨β, hβ⟩ := hi α
   refine ⟨β, fun W hW hb hWh hU p hp => ?_⟩
   obtain ⟨C, hb⟩ := hb
@@ -44,13 +59,21 @@ theorem UpperTheory.V.Af.Smo.killP :
   have hpf := isY_map (pFin E) p hp.1
   have hS := hp.2
   beta_reduce
-  have e : p = finGL E n (GeneralLinearGroup.map (pFin E) p) * infGL E n (GeneralLinearGroup.map (pInf E) p) := by
+  have e
+      : p
+        = finGL E n (GeneralLinearGroup.map (pFin E) p)
+          * infGL E n (GeneralLinearGroup.map (pInf E) p) := by
     rw [← TR.infGL_comm, TR.infGL_mul_finGL]
   generalize GeneralLinearGroup.map (pInf E) p = a at *
   generalize GeneralLinearGroup.map (pFin E) p = b at *
   have h1 : ∀ x, chart (fop c W) (finGL E n b) x = Hf b * chart W 1 x := by
     refine chart_smul _ _ _ _ _ fun y => ?_
-    have := hf (fun k => W (finGL E n k * infGL E n y)) (fun ν _ hν g _ => ?_) (fun g _ u hu _ => ?_) b hS hpf
+    have :=
+      hf
+        (fun k => W (finGL E n k * infGL E n y))
+        (fun ν _ hν g _ => ?_)
+        (fun g _ u hu _ => ?_)
+        b hS hpf
     · simp only [map_one] at this
       rw [← this]
       unfold fop comb

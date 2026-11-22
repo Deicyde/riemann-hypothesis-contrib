@@ -4,17 +4,19 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.tspDiag_of :
-    UpperTheory.Gal.W2.TspDiag := by
+theorem UpperTheory.Gal.W2.tspDiag_of : UpperTheory.Gal.W2.TspDiag := by
   intro F _ _ g ty t₀ i₀ hc hi hij W hW
   classical
-  have hpat : ∀ S : Matrix (Fin g) (Fin g) ℂ, S ∈ W → ∀ i j, S i j ≠ 0 →
-      ty j = ComplexEmbedding.conjugate (ty i) := by
+  have hpat
+      : ∀ S : Matrix (Fin g) (Fin g) ℂ,
+        S ∈ W → ∀ i j, S i j ≠ 0 → ty j = ComplexEmbedding.conjugate (ty i) := by
     intro S hS i j hne
     have h := ((hW S).1 hS).2
     have hcc : ∀ c : 𝓞 F, ty j (c : F) = (starRingEnd ℂ) (ty i (c : F)) := fun c =>
@@ -54,18 +56,23 @@ theorem UpperTheory.Gal.W2.tspDiag_of :
     · subst h1; exact hrow j
     · by_cases h2 : j = i₀
       · subst h2
-        rw [hsym _ S.2, hsym _ S'.2]; exact hrow i
+        rw [hsym _ S.2, hsym _ S'.2]
+        exact hrow i
       · rw [hzero _ S.2 i j h1 h2, hzero _ S'.2 i j h1 h2]
   · intro v
     let T : Matrix (Fin g) (Fin g) ℂ := fun i j =>
-      if h : i = i₀ ∧ ty j = ComplexEmbedding.conjugate t₀ then v ⟨j, h.2⟩
-      else if h' : j = i₀ ∧ ty i = ComplexEmbedding.conjugate t₀ then v ⟨i, h'.2⟩ else 0
+      if h : i = i₀ ∧ ty j = ComplexEmbedding.conjugate t₀ then
+        v ⟨j, h.2⟩
+      else if h' : j = i₀ ∧ ty i = ComplexEmbedding.conjugate t₀ then
+        v ⟨i, h'.2⟩
+      else
+        0
     have hT : T ∈ W := by
       refine (hW T).2 ⟨?_, ?_⟩
       · ext i j
         show T j i = T i j
         by_cases h1 : i = i₀ ∧ ty j = ComplexEmbedding.conjugate t₀
-        · have h2 : ¬ (j = i₀ ∧ ty i = ComplexEmbedding.conjugate t₀) := fun h => hnot j h1.2 h.1
+        · have h2 : ¬(j = i₀ ∧ ty i = ComplexEmbedding.conjugate t₀) := fun h => hnot j h1.2 h.1
           simp only [T, dif_pos h1, dif_neg h2]
         · by_cases h2 : j = i₀ ∧ ty i = ComplexEmbedding.conjugate t₀
           · simp only [T, dif_pos h2, dif_neg h1]

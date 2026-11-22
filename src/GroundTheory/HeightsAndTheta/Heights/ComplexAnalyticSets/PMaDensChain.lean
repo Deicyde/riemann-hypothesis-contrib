@@ -19,34 +19,41 @@ namespace MaDensChain
 
 variable {D : ℕ}
 
-theorem fderiv_comp_real (h : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (y : Fin D → ℂ)
-    (hh : DifferentiableAt ℝ h (g y)) (hg : DifferentiableAt ℝ g y) :
-    fderiv ℝ (h ∘ g) y = deriv h (g y) • fderiv ℝ g y :=
+theorem fderiv_comp_real
+    (h : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (y : Fin D → ℂ)
+    (hh : DifferentiableAt ℝ h (g y)) (hg : DifferentiableAt ℝ g y)
+    : fderiv ℝ (h ∘ g) y = deriv h (g y) • fderiv ℝ g y :=
   (hh.hasDerivAt.comp_hasFDerivAt y hg.hasFDerivAt).fderiv
 
-theorem dz_cplx_comp (j : Fin D) (h : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (y : Fin D → ℂ)
-    (hh : DifferentiableAt ℝ h (g y)) (hg : DifferentiableAt ℝ g y) :
-    dz j (cplx (h ∘ g)) y = ((deriv h (g y) : ℝ) : ℂ) * dz j (cplx g) y := by
+theorem dz_cplx_comp
+    (j : Fin D)
+    (h : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (y : Fin D → ℂ)
+    (hh : DifferentiableAt ℝ h (g y)) (hg : DifferentiableAt ℝ g y)
+    : dz j (cplx (h ∘ g)) y = ((deriv h (g y) : ℝ) : ℂ) * dz j (cplx g) y := by
   rw [dz_cplx, dz_cplx, fderiv_comp_real h g y hh hg]
   simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   push_cast
   ring
 
-theorem dzb_cplx_comp (k : Fin D) (h : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (y : Fin D → ℂ)
-    (hh : DifferentiableAt ℝ h (g y)) (hg : DifferentiableAt ℝ g y) :
-    dzb k (cplx (h ∘ g)) y = ((deriv h (g y) : ℝ) : ℂ) * dzb k (cplx g) y := by
+theorem dzb_cplx_comp
+    (k : Fin D)
+    (h : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (y : Fin D → ℂ)
+    (hh : DifferentiableAt ℝ h (g y)) (hg : DifferentiableAt ℝ g y)
+    : dzb k (cplx (h ∘ g)) y = ((deriv h (g y) : ℝ) : ℂ) * dzb k (cplx g) y := by
   rw [dzb_cplx, dzb_cplx, fderiv_comp_real h g y hh hg]
   simp only [FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   push_cast
   ring
 
-theorem hessC_comp_real (F : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) (hF : ContDiff ℝ 2 F)
-    (hg : ContDiffAt ℝ 2 g z) :
-    hessC (F ∘ g) z = ((deriv F (g z) : ℝ) : ℂ) • hessC g z + ((deriv (deriv F) (g z) : ℝ) : ℂ) • gradMat g g z := by
+theorem hessC_comp_real
+    (F : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    (hF : ContDiff ℝ 2 F) (hg : ContDiffAt ℝ 2 g z)
+    : hessC (F ∘ g) z
+      = ((deriv F (g z) : ℝ) : ℂ) • hessC g z
+        + ((deriv (deriv F) (g z) : ℝ) : ℂ) • gradMat g g z := by
   obtain ⟨U, hU, hzU, hgU, -⟩ := MaDensLeibniz.exists_open_contDiffOn g g z hg hg
   have hF1 : Differentiable ℝ F := hF.differentiable (by norm_num)
-  have hF' : Differentiable ℝ (deriv F) :=
-    (hF.deriv' (n := 1)).differentiable (by norm_num)
+  have hF' : Differentiable ℝ (deriv F) := (hF.deriv' (n := 1)).differentiable (by norm_num)
   ext j k
   simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
   rw [hessCDz_thm D _ U hU (hF.comp_contDiffOn hgU) z hzU j k, hessCDz_thm D g U hU hgU z hzU j k]
@@ -65,9 +72,10 @@ theorem hessC_comp_real (F : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (z : Fin
   simp only [gradMat, cplx, Function.comp_apply]
   ring
 
-theorem gradMat_comp (F : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
-    (hF : DifferentiableAt ℝ F (g z)) (hg : DifferentiableAt ℝ g z) :
-    gradMat (F ∘ g) (F ∘ g) z = ((deriv F (g z) ^ 2 : ℝ) : ℂ) • gradMat g g z := by
+theorem gradMat_comp
+    (F : ℝ → ℝ) (g : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    (hF : DifferentiableAt ℝ F (g z)) (hg : DifferentiableAt ℝ g z)
+    : gradMat (F ∘ g) (F ∘ g) z = ((deriv F (g z) ^ 2 : ℝ) : ℂ) • gradMat g g z := by
   ext j k
   simp only [gradMat, Matrix.smul_apply, smul_eq_mul]
   rw [dz_cplx_comp j F g z hF hg, dzb_cplx_comp k F g z hF hg]

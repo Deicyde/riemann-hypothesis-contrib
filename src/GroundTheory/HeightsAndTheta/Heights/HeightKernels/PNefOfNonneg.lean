@@ -13,15 +13,22 @@ open ReciprocityTheory.ChartRestriction.G.Geo
 
 namespace NefOfNonnegAlt
 
-theorem geoNum_zero_nonneg {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-    (V : Ideal (MRing ι)) (a : Fin 0 → K → ℤ) : 0 ≤ geoNum 0 V a := by
+theorem geoNum_zero_nonneg
+    {K : Type*} [Fintype K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    (V : Ideal (MRing ι)) (a : Fin 0 → K → ℤ)
+    : 0 ≤ geoNum 0 V a := by
   unfold geoNum
   split_ifs
   · exact Int.natCast_nonneg _
   · exact le_rfl
 
-theorem geoNum_one_nonneg {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-    (V : Ideal (MRing ι)) (a : K → ℤ) (ha : ∀ k, 0 ≤ a k) : 0 ≤ geoNum 1 V (fun _ => a) := by
+theorem geoNum_one_nonneg
+    {K : Type*} [Fintype K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    (V : Ideal (MRing ι))
+    (a : K → ℤ) (ha : ∀ k, 0 ≤ a k)
+    : 0 ≤ geoNum 1 V (fun _ => a) := by
   unfold geoNum
   split_ifs
   · refine Finset.sum_nonneg fun k _ => mul_nonneg (ha k) ?_

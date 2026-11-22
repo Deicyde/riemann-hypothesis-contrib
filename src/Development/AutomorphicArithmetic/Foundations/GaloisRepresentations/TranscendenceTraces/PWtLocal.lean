@@ -5,21 +5,22 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.wtLocal_of :
-    WtCrit → WtLocal := by
+theorem UpperTheory.Gal.TranscendenceTraces.wtLocal_of : WtCrit → WtLocal := by
   intro hcrit Z S p w hloc
   apply hcrit p w
   intro B φ hφ b
   obtain ⟨A, hAo, ⟨a, ha⟩, hA⟩ := hloc (B.u b)
-  obtain ⟨W, f1, f2, hW, hf1, c0, hc0⟩ : ∃ (W : Scheme) (f1 : W ⟶ B.U) (f2 : W ⟶ A.U),
-      IsPullback f1 f2 B.u A.u ∧ IsOpenImmersion f1 ∧ ∃ c0, f1 c0 = b := by
+  obtain ⟨W, f1, f2, hW, hf1, c0, hc0⟩
+      : ∃ (W : Scheme) (f1 : W ⟶ B.U) (f2 : W ⟶ A.U),
+        IsPullback f1 f2 B.u A.u ∧ IsOpenImmersion f1 ∧ ∃ c0, f1 c0 = b := by
     obtain ⟨c0, hc0, -⟩ :=
       Scheme.Pullback.exists_preimage_pullback (f := B.u) (g := A.u) b a ha.symm
     exact ⟨_, _, _, IsPullback.of_hasPullback B.u A.u, inferInstance, c0, hc0⟩
-  obtain ⟨V', q1, q2, hq⟩ : ∃ (V' : Scheme) (q1 : V' ⟶ A.V) (q2 : V' ⟶ W),
-      IsPullback q1 q2 A.r f2 :=
+  obtain ⟨V', q1, q2, hq⟩
+      : ∃ (V' : Scheme) (q1 : V' ⟶ A.V) (q2 : V' ⟶ W), IsPullback q1 q2 A.r f2 :=
     ⟨_, _, _, IsPullback.of_hasPullback A.r f2⟩
   have hcomm : (q1 ≫ A.v) ≫ p = (q2 ≫ f1) ≫ B.u := by
     simp only [Category.assoc]
@@ -32,8 +33,13 @@ theorem UpperTheory.Gal.TranscendenceTraces.wtLocal_of :
     exact hq.paste_horiz A.pb
   obtain ⟨ψ, hψ, hψs⟩ :=
     hA ⟨W, V', f2, q1, q2, hq⟩ (fun y => φ (g y)) (hφ.comp_continuous g.continuous)
-  refine ⟨f1 '' {y | ψ y = ψ c0}, ψ c0, f1.isOpenEmbedding.isOpenMap _ (hψ.isOpen_fiber _),
-    ⟨c0, rfl, hc0⟩, ?_⟩
+  refine ⟨
+    f1 '' {y | ψ y = ψ c0},
+    ψ c0,
+    f1.isOpenEmbedding.isOpenMap _ (hψ.isOpen_fiber _),
+    ⟨c0, rfl, hc0⟩,
+    ?_
+  ⟩
   rintro Ω _ _ x ⟨y, hy, hyx⟩
   have hr : Set.range x ⊆ Set.range f1 := by
     rintro _ ⟨t, rfl⟩

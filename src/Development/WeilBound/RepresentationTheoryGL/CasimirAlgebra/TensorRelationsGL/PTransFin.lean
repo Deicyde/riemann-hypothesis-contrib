@@ -13,19 +13,21 @@ namespace PositivityTheory.Rg.Cz
 
 namespace TF
 
-def rc {W : Type*} [AddCommGroup W] [Module ℂ W] (A : Module.End ℂ W) : Module.End ℂ (W →ₗ[ℂ] ℂ) where
+def rc {W : Type*} [AddCommGroup W] [Module ℂ W] (A : Module.End ℂ W)
+    : Module.End ℂ (W →ₗ[ℂ] ℂ) where
   toFun f := f ∘ₗ A
   map_add' f f' := LinearMap.add_comp A f' f
   map_smul' c f := LinearMap.smul_comp c f A
 
-theorem rc_comm {W : Type*} [AddCommGroup W] [Module ℂ W] (A B : Module.End ℂ W) (h : Commute A B) :
-    Commute (rc A) (rc B) := by
+theorem rc_comm {W : Type*} [AddCommGroup W] [Module ℂ W] (A B : Module.End ℂ W) (h : Commute A B)
+    : Commute (rc A) (rc B) := by
   show rc A * rc B = rc B * rc A
   refine LinearMap.ext fun f => LinearMap.ext fun w => ?_
   change f (B (A w)) = f (A (B w))
   exact congrArg f (LinearMap.congr_fun h.eq.symm w)
 
-def lc {W : Type*} [AddCommGroup W] [Module ℂ W] (ψ : W →ₗ[ℂ] ℂ) : Module.End ℂ W →ₗ[ℂ] (W →ₗ[ℂ] ℂ) where
+def lc {W : Type*} [AddCommGroup W] [Module ℂ W] (ψ : W →ₗ[ℂ] ℂ)
+    : Module.End ℂ W →ₗ[ℂ] (W →ₗ[ℂ] ℂ) where
   toFun r := ψ ∘ₗ r
   map_add' r r' := LinearMap.comp_add r r' ψ
   map_smul' c r := by ext; simp
@@ -35,14 +37,15 @@ def ev {W : Type*} [AddCommGroup W] [Module ℂ W] (v : W) : (W →ₗ[ℂ] ℂ)
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem lift_alg {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] {P : Type} (c : ℂ) :
-    (lift (algebraMap ℂ (Module.End ℂ M) c) : Module.End ℂ (TV n M P)) = algebraMap ℂ _ c := by
+theorem lift_alg {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] {P : Type} (c : ℂ)
+    : (lift (algebraMap ℂ (Module.End ℂ M) c) : Module.End ℂ (TV n M P)) = algebraMap ℂ _ c := by
   refine LinearMap.ext fun f => funext fun I => ?_
   simp [lift, Algebra.algebraMap_eq_smul_one]
 
 end TF
 
-theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spectrum → Chain → ColAnti → TransFin := by
+theorem transFin_of
+    : TensorGl → JMComm → StepFormula → QdetFacts → Spectrum → Chain → ColAnti → TransFin := by
   intro hT hJ hS hQ hSp hC hCA
   intro n M _ _ E hE l hl ℓ hℓ hW hn m col b co hmono htab hcol
   let top : Fin n := ⟨n - 1, by omega⟩
@@ -63,8 +66,9 @@ theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spec
     refine (Algebra.commute_of_mem_adjoin_of_forall_mem_commute hx ?_).symm
     rintro _ ⟨i, rfl⟩
     exact hxcomm j i
-  have hcs : ∀ (f : TV n M (Fin m) →ₗ[ℂ] ℂ) (h : ℕ → Module.End ℂ (TV n M (Fin m))),
-      f ∘ₗ (∑ i ∈ Finset.range (n + 1), h i) = ∑ i ∈ Finset.range (n + 1), f ∘ₗ h i := by
+  have hcs
+      : ∀ (f : TV n M (Fin m) →ₗ[ℂ] ℂ) (h : ℕ → Module.End ℂ (TV n M (Fin m))),
+        f ∘ₗ (∑ i ∈ Finset.range (n + 1), h i) = ∑ i ∈ Finset.range (n + 1), f ∘ₗ h i := by
     intro f h
     refine LinearMap.ext fun v => ?_
     simp
@@ -75,11 +79,19 @@ theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spec
       Finset.single_le_sum (f := fun k => |l k|) (fun k _ => abs_nonneg _) (Finset.mem_univ k)
     have h2 := neg_abs_le (l k)
     linarith
-  have hsp := hSp n M E hE (fun k => (l k : ℂ)) (-(N : ℂ)) hl (fun k => ⟨(l k + N).toNat, by
-      rw [show (((l k + N).toNat : ℕ) : ℂ) = ((l k + N : ℤ) : ℂ) by
-        rw [← Int.cast_natCast, Int.toNat_of_nonneg (hlN k)]]
-      push_cast
-      ring⟩) m
+  have hsp :=
+    hSp n M E hE
+      (fun k => (l k : ℂ))
+      (-(N : ℂ)) hl
+      (fun k => ⟨
+        (l k + N).toNat,
+        by
+          rw [show (((l k + N).toNat : ℕ) : ℂ) = ((l k + N : ℤ) : ℂ) by
+            rw [← Int.cast_natCast, Int.toNat_of_nonneg (hlN k)]]
+          push_cast
+          ring
+      ⟩)
+      m
   choose L hL using hsp.2
   let L' : Fin m → List ℂ := fun j => (L j).map (fun r : ℕ => -(N : ℂ) + r)
   have hL' : ∀ j, (List.map (fun c => xJ E j - algebraMap ℂ _ c) (L' j)).prod = 0 := by
@@ -88,22 +100,27 @@ theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spec
     exact hL j
   haveI hBfin : FiniteDimensional ℂ (Subalgebra.toSubmodule B) :=
     TF.fin_adjoin (fun j : Fin m => xJ E j) hxcomm (fun j => ⟨L' j, hL' j⟩)
-  have hlift : ∀ u : ℂ, (lift (qdet E u) : Module.End ℂ (TV n M (Fin m))) =
-      algebraMap ℂ _ (∏ k, (u + (l k : ℂ))) := by
+  have hlift
+      : ∀ u : ℂ,
+        (lift (qdet E u) : Module.End ℂ (TV n M (Fin m)))
+          = algebraMap ℂ _ (∏ k, (u + (l k : ℂ))) := by
     intro u
     rw [hl u]
     exact TF.lift_alg _
   have hqB : ∀ u : ℂ, (∀ j : Fin m, ∀ c ∈ L' j, u + c ≠ 0) → qdet (tE Finset.univ E) u ∈ B := by
     intro u hu
-    obtain ⟨h, hhB, hh⟩ := TF.left_inv_prod B.toSubring
-      (List.ofFn fun j : Fin m => algebraMap ℂ (Module.End ℂ (TV n M (Fin m))) u + xJ E j) (by
-        intro a ha
-        obtain ⟨j, rfl⟩ := List.mem_ofFn.mp ha
-        exact TF.inv_of_alg B (xJ E j) (hxB j) u (L' j) (hL' j) (hu j))
+    obtain ⟨h, hhB, hh⟩ :=
+      TF.left_inv_prod B.toSubring
+        (List.ofFn fun j : Fin m => algebraMap ℂ (Module.End ℂ (TV n M (Fin m))) u + xJ E j)
+        (by
+          intro a ha
+          obtain ⟨j, rfl⟩ := List.mem_ofFn.mp ha
+          exact TF.inv_of_alg B (xJ E j) (hxB j) u (L' j) (hL' j) (hu j))
     have hstep := hS n M E hE m u
     rw [hlift] at hstep
-    have e1 : qdet (tE Finset.univ E) u =
-        h * (algebraMap ℂ _ (∏ k, (u + (l k : ℂ))) * PiJ m E (u + 1)) := by
+    have e1
+        : qdet (tE Finset.univ E) u
+          = h * (algebraMap ℂ _ (∏ k, (u + (l k : ℂ))) * PiJ m E (u + 1)) := by
       rw [← hstep, ← mul_assoc, show h * PiJ m E u = 1 from hh, one_mul]
     rw [e1]
     refine B.mul_mem hhB (B.mul_mem (B.algebraMap_mem _) ?_)
@@ -113,40 +130,59 @@ theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spec
     exact B.add_mem (B.algebraMap_mem _) (hxB j)
   have hinf : {u : ℂ | ∀ j : Fin m, ∀ c ∈ L' j, u + c ≠ 0}.Infinite := by
     refine Set.Infinite.mono ?_
-      (Finset.finite_toSet (Finset.univ.biUnion fun j => ((L' j).map (fun c => -c)).toFinset)).infinite_compl
+      (Finset.finite_toSet (Finset.univ.biUnion fun j =>
+        ((L' j).map (fun c => -c)).toFinset)).infinite_compl
     intro u hu j c hc h
     apply hu
     rw [Finset.mem_coe, Finset.mem_biUnion]
-    exact ⟨j, Finset.mem_univ _, List.mem_toFinset.mpr (List.mem_map.mpr ⟨c, hc, by linear_combination -h⟩)⟩
+    exact ⟨
+      j,
+      Finset.mem_univ _,
+      List.mem_toFinset.mpr (List.mem_map.mpr ⟨c, hc, by linear_combination -h⟩)
+    ⟩
   have hqA : ∀ u, qdet (tE Finset.univ E) u ∈ A :=
     TF.qdet_mem _ A (fun a b => Algebra.subset_adjoin ⟨(), a, b, rfl⟩)
-  have hcoefmem : ∀ (K : Subalgebra ℂ (Module.End ℂ (TV n M (Fin m)))) (Su : Set ℂ), Su.Infinite →
-      (∀ u ∈ Su, qdet (tE Finset.univ E) u ∈ K) → ∀ i ∈ Finset.range (n + 1), c i ∈ K := by
+  have hcoefmem
+      : ∀ (K : Subalgebra ℂ (Module.End ℂ (TV n M (Fin m)))) (Su : Set ℂ),
+        Su.Infinite → (∀ u ∈ Su, qdet (tE Finset.univ E) u ∈ K)
+          → ∀ i ∈ Finset.range (n + 1), c i ∈ K := by
     intro K Su hSu hK i hi
-    have := TF.coef (n + 1) (fun i => (Subalgebra.toSubmodule K).mkQ (c i)) Su hSu (by
-      intro u hu
-      have h1 := hK u hu
-      rw [hc u] at h1
-      have h2 : (Subalgebra.toSubmodule K).mkQ (∑ i ∈ Finset.range (n + 1), u ^ i • c i) = 0 := by
-        rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
-        exact h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_sum, map_smul] using h2) i hi
+    have :=
+      TF.coef (n + 1)
+        (fun i => (Subalgebra.toSubmodule K).mkQ (c i))
+        Su hSu
+        (by
+          intro u hu
+          have h1 := hK u hu
+          rw [hc u] at h1
+          have h2
+              : (Subalgebra.toSubmodule K).mkQ (∑ i ∈ Finset.range (n + 1), u ^ i • c i) = 0 := by
+            rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
+            exact h1
+          set_option synthInstance.maxHeartbeats 100000 in
+          simpa [map_sum, map_smul] using h2)
+        i hi
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at this
     exact this
   have hcB : ∀ i ∈ Finset.range (n + 1), c i ∈ B := hcoefmem B _ hinf (fun u hu => hqB u hu)
   have hcA : ∀ i ∈ Finset.range (n + 1), c i ∈ A :=
     hcoefmem A Set.univ Set.infinite_univ (fun u _ => hqA u)
-  let p : Polynomial ℂ := ∏ k : Fin n,
-    (Polynomial.X + Polynomial.C ((l k : ℂ) + (((Finset.univ.filter fun q : Fin m => co q = k).card : ℕ) : ℂ)))
+  let p : Polynomial ℂ :=
+    ∏ k : Fin n,
+      (Polynomial.X + Polynomial.C ((l k : ℂ) + (((Finset.univ.filter fun q : Fin m => co q = k).card : ℕ) : ℂ)))
   have hpdeg : p.natDegree < n + 1 := by
-    have := Polynomial.natDegree_prod_le (Finset.univ : Finset (Fin n)) (fun k : Fin n =>
-      Polynomial.X + Polynomial.C ((l k : ℂ) + (((Finset.univ.filter fun q : Fin m => co q = k).card : ℕ) : ℂ)))
+    have :=
+      Polynomial.natDegree_prod_le (Finset.univ : Finset (Fin n)) (fun k : Fin n =>
+        Polynomial.X + Polynomial.C
+          ((l k : ℂ) + (((Finset.univ.filter fun q : Fin m => co q = k).card : ℕ) : ℂ)))
     simp only [Polynomial.natDegree_X_add_C, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
-      smul_eq_mul, mul_one] at this
+        smul_eq_mul, mul_one]
+      at this
     exact lt_of_le_of_lt this (by omega)
-  have hpev : ∀ u : ℂ, (∏ k : Fin n, (u + (l k : ℂ) + (((Finset.univ.filter fun q : Fin m => co q = k).card : ℕ) : ℂ))) =
-      ∑ i ∈ Finset.range (n + 1), p.coeff i * u ^ i := by
+  have hpev
+      : ∀ u : ℂ,
+        (∏ k : Fin n, (u + (l k : ℂ) + (((Finset.univ.filter fun q : Fin m => co q = k).card : ℕ) : ℂ)))
+          = ∑ i ∈ Finset.range (n + 1), p.coeff i * u ^ i := by
     intro u
     rw [← Polynomial.eval_eq_sum_range' hpdeg u]
     simp [p, Polynomial.eval_prod, add_assoc]
@@ -174,14 +210,33 @@ theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spec
     intro a ha
     obtain ⟨i, rfl⟩ := List.mem_ofFn.mp ha
     split_ifs with hij
-    · refine ⟨((l (co i) : ℂ) + (((Finset.univ.filter fun q : Fin m => q < i ∧ co q = co i).card : ℕ) : ℂ)) -
-          ((l (co j) : ℂ) + (((Finset.univ.filter fun q : Fin m => q < j ∧ co q = co j).card : ℕ) : ℂ)) + 1, ?_, ?_⟩
+    · refine ⟨
+        ((l (co i) : ℂ)
+            + (((Finset.univ.filter fun q : Fin m => q < i ∧ co q = co i).card : ℕ) : ℂ))
+          - ((l (co j) : ℂ)
+            + (((Finset.univ.filter fun q : Fin m => q < j ∧ co q = co j).card : ℕ) : ℂ))
+          + 1,
+        ?_,
+        ?_
+      ⟩
       · have h := hcol i j hij.1 hij.2
-        have hpos : (0 : ℤ) < (l (co i) + (((Finset.univ.filter fun q : Fin m => q < i ∧ co q = co i).card : ℕ) : ℤ)) -
-            (l (co j) + (((Finset.univ.filter fun q : Fin m => q < j ∧ co q = co j).card : ℕ) : ℤ)) + 1 := by
+        have hpos
+            : (0 : ℤ)
+              < (l (co i)
+                  + (((Finset.univ.filter fun q : Fin m => q < i ∧ co q = co i).card : ℕ) : ℤ))
+                - (l (co j)
+                  + (((Finset.univ.filter fun q : Fin m => q < j ∧ co q = co j).card : ℕ) : ℤ))
+                + 1 := by
           linarith
-        have h3 : ((((l (co i) + (((Finset.univ.filter fun q : Fin m => q < i ∧ co q = co i).card : ℕ) : ℤ)) -
-            (l (co j) + (((Finset.univ.filter fun q : Fin m => q < j ∧ co q = co j).card : ℕ) : ℤ)) + 1 : ℤ)) : ℂ) ≠ 0 := by
+        have h3
+            : ((((l (co i)
+                      + (((Finset.univ.filter fun q : Fin m => q < i ∧ co q = co i).card : ℕ) : ℤ))
+                    - (l (co j)
+                      + (((Finset.univ.filter fun q : Fin m => q < j ∧ co q = co j).card : ℕ) : ℤ))
+                    + 1
+                  : ℤ))
+                : ℂ)
+              ≠ 0 := by
           exact_mod_cast hpos.ne'
         push_cast at h3
         exact h3
@@ -228,8 +283,10 @@ theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spec
     intro i
     by_cases h : i < n + 1
     · rw [hTmi i (Finset.mem_range.mpr h)]
-      exact ⟨B.sub_mem (hcB i (Finset.mem_range.mpr h)) (B.algebraMap_mem _),
-        A.sub_mem (hcA i (Finset.mem_range.mpr h)) (A.algebraMap_mem _)⟩
+      exact ⟨
+        B.sub_mem (hcB i (Finset.mem_range.mpr h)) (B.algebraMap_mem _),
+        A.sub_mem (hcA i (Finset.mem_range.mpr h)) (A.algebraMap_mem _)
+      ⟩
     · have e : Tm i = 0 := if_neg h
       rw [e]
       exact ⟨B.zero_mem, A.zero_mem⟩
@@ -244,31 +301,39 @@ theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spec
     exact hg0 (LinearMap.ext h)
   haveI hQfin : FiniteDimensional ℂ (Subalgebra.toSubmodule (B ⊓ A)) :=
     Submodule.finiteDimensional_of_le (S₂ := Subalgebra.toSubmodule B) (fun x hx => hx.1)
-  obtain ⟨z, hzZ, hz0, hzT⟩ := TF.common_ker (fun i => TF.rc (Tm i))
-    (fun i j => TF.rc_comm _ _ (hBcomm _ (hTmB i).1 _ (hTmB j).1)) (TF.ev (g v0))
-    (Finset.range (n + 1)) (Submodule.map (TF.lc ρ) (Subalgebra.toSubmodule (B ⊓ A))) inferInstance
-    (by
-      intro i _ z hz
-      obtain ⟨S, hS, rfl⟩ := Submodule.mem_map.mp hz
-      exact Submodule.mem_map.mpr ⟨S * Tm i, (B ⊓ A).mul_mem hS ⟨(hTmB i).1, (hTmB i).2⟩, rfl⟩)
-    (by
-      intro i hi z hz
-      obtain ⟨S, hS, rfl⟩ := Submodule.mem_map.mp hz
-      show ρ (S (Tm i (g v0))) = 0
-      have hSB : S ∈ B := hS.1
-      have h1 : S * (Tm i * g) = g * (Tm i * S) := by
-        rw [← mul_assoc, (hBcomm _ (B.mul_mem hSB (hTmB i).1) g hgB).eq, (hBcomm S hSB _ (hTmB i).1).eq]
-      have h2 := LinearMap.congr_fun h1 v0
-      simp only [Module.End.mul_apply] at h2
-      rw [h2]
-      have h3 := LinearMap.congr_fun (hρgT i hi) (S v0)
-      simpa using h3)
-    ⟨TF.lc ρ 1, Submodule.mem_map.mpr ⟨1, (B ⊓ A).one_mem, rfl⟩, by
-      show ρ (g v0) ≠ 0
-      have h1 := LinearMap.congr_fun hρg v0
-      simp only [LinearMap.comp_apply, LinearMap.smul_apply, smul_eq_mul] at h1
-      rw [h1]
-      exact mul_ne_zero (mul_ne_zero (inv_ne_zero hc0ne) hd0) hv0⟩
+  obtain ⟨z, hzZ, hz0, hzT⟩ :=
+    TF.common_ker
+      (fun i => TF.rc (Tm i))
+      (fun i j => TF.rc_comm _ _ (hBcomm _ (hTmB i).1 _ (hTmB j).1))
+      (TF.ev (g v0)) (Finset.range (n + 1))
+      (Submodule.map (TF.lc ρ) (Subalgebra.toSubmodule (B ⊓ A))) inferInstance
+      (by
+        intro i _ z hz
+        obtain ⟨S, hS, rfl⟩ := Submodule.mem_map.mp hz
+        exact Submodule.mem_map.mpr ⟨S * Tm i, (B ⊓ A).mul_mem hS ⟨(hTmB i).1, (hTmB i).2⟩, rfl⟩)
+      (by
+        intro i hi z hz
+        obtain ⟨S, hS, rfl⟩ := Submodule.mem_map.mp hz
+        show ρ (S (Tm i (g v0))) = 0
+        have hSB : S ∈ B := hS.1
+        have h1 : S * (Tm i * g) = g * (Tm i * S) := by
+          rw [← mul_assoc, (hBcomm _ (B.mul_mem hSB (hTmB i).1) g hgB).eq,
+            (hBcomm S hSB _ (hTmB i).1).eq]
+        have h2 := LinearMap.congr_fun h1 v0
+        simp only [Module.End.mul_apply] at h2
+        rw [h2]
+        have h3 := LinearMap.congr_fun (hρgT i hi) (S v0)
+        simpa using h3)
+      ⟨
+        TF.lc ρ 1,
+        Submodule.mem_map.mpr ⟨1, (B ⊓ A).one_mem, rfl⟩,
+        by
+          show ρ (g v0) ≠ 0
+          have h1 := LinearMap.congr_fun hρg v0
+          simp only [LinearMap.comp_apply, LinearMap.smul_apply, smul_eq_mul] at h1
+          rw [h1]
+          exact mul_ne_zero (mul_ne_zero (inv_ne_zero hc0ne) hd0) hv0
+      ⟩
   obtain ⟨S, hS, rfl⟩ := Submodule.mem_map.mp hzZ
   refine ⟨S, hS.2, hz0, fun u => ?_⟩
   show (ρ ∘ₗ S) ∘ₗ qdet (tE Finset.univ E) u = _ • (ρ ∘ₗ S)
@@ -276,7 +341,8 @@ theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spec
     intro i hi
     have h3 : (ρ ∘ₗ S) ∘ₗ Tm i = 0 := hzT i hi
     rw [hTmi i hi, LinearMap.comp_sub, Algebra.algebraMap_eq_smul_one, LinearMap.comp_smul,
-      sub_eq_zero] at h3
+        sub_eq_zero]
+      at h3
     exact h3
   rw [hc u, hpev u, hcs, Finset.sum_smul]
   refine Finset.sum_congr rfl fun i hi => ?_

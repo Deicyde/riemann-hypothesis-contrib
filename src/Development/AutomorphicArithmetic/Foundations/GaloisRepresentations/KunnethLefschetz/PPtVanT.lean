@@ -11,8 +11,10 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.Etal
 
 namespace UpperTheory.Gal.KunnethLefschetz
 
-private theorem sec_of {k : Type} [Field k] [IsAlgClosed k] {Y : Scheme.{0}} (f : Y ⟶ S k) (hf : Etale f)
-    (hs : Surjective f) : ∃ s : S k ⟶ Y, s ≫ f = 𝟙 _ := by
+private theorem sec_of
+    {k : Type} [Field k] [IsAlgClosed k]
+    {Y : Scheme.{0}} (f : Y ⟶ S k) (hf : Etale f) (hs : Surjective f)
+    : ∃ s : S k ⟶ Y, s ≫ f = 𝟙 _ := by
   have hmem : Sieve.generate (Presieve.singleton f) ∈ Scheme.etaleTopology (S k) := by
     rw [GlobalTheory.etale_mem_iff_points]
     intro u
@@ -28,7 +30,8 @@ theorem ptVanT_holds : PtVanT := by
     intro x
     obtain ⟨Y, f, hf, hs, hx⟩ := hIn.a5 (ZMod q) (S k) (tw q i) n hn x
     obtain ⟨s, hsf⟩ := sec_of f hf hs
-    calc x = pull (ZMod q) (𝟙 (sch.obj (S k))) (tw q i) n x := (pull_id _ _ _ _ x).symm
+    calc
+      x = pull (ZMod q) (𝟙 (sch.obj (S k))) (tw q i) n x := (pull_id _ _ _ _ x).symm
       _ = pull (ZMod q) (sch.map s ≫ sch.map f) (tw q i) n x := by
         rw [← CategoryTheory.Functor.map_comp, hsf, CategoryTheory.Functor.map_id]
       _ = pull (ZMod q) (sch.map s) (tw q i) n (pull (ZMod q) (sch.map f) (tw q i) n x) :=

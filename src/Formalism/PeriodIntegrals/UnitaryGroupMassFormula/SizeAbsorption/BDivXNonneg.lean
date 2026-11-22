@@ -42,23 +42,28 @@ theorem b'_div_x_le : L.sc.b' / L.sc.x ≤ L.sc.b' := div_le_self (b'_pos L).le 
 
 theorem b'_div_x_nonneg : 0 ≤ L.sc.b' / L.sc.x := div_nonneg (b'_pos L).le (x_pos L).le
 
-theorem bT_le (hSz : Formalism.MainNotions.SizesAt L) (t : D.host.TT) : (L.bT t : ℝ) ≤ 2 * L.sc.b' := by
+theorem bT_le (hSz : Formalism.MainNotions.SizesAt L) (t : D.host.TT)
+    : (L.bT t : ℝ) ≤ 2 * L.sc.b' := by
   obtain ⟨-, -, -, -, -, -, -, -, hLa, hRho, hBot, -⟩ := hSz
   have hx := x_pos L
   have hLa0 : 0 ≤ L.LaG := le_trans (Real.rpow_nonneg hx.le _) hLa.1
   set q := Formalism.MainNotions.szNst L * L.sc.x ^ L.sc.eps * L.LaG / (D.R.k : ℝ) with hq
   have h2 : 0 ≤ L.sc.x ^ Formalism.MainNotions.szTh L * Real.log L.sc.x * L.LaG / (D.R.k : ℝ) :=
-    div_nonneg (mul_nonneg (mul_nonneg (Real.rpow_nonneg hx.le _) (Real.log_nonneg (x_one_le L))) hLa0)
+    div_nonneg
+      (mul_nonneg (mul_nonneg (Real.rpow_nonneg hx.le _) (Real.log_nonneg (x_one_le L))) hLa0)
       (Nat.cast_nonneg _)
   have h3 : L.sc.x ^ (-2 : ℝ) ≤ 1 := Real.rpow_le_one_of_one_le_of_nonpos (x_one_le L) (by norm_num)
-  have h4 : 4 * Formalism.MainNotions.szNst L * L.sc.x ^ L.sc.eps * L.LaG / (D.R.k : ℝ) = 4 * q := by
+  have h4
+      : 4 * Formalism.MainNotions.szNst L * L.sc.x ^ L.sc.eps * L.LaG / (D.R.k : ℝ) = 4 * q := by
     rw [hq]; ring
   have hR := hRho
   unfold Formalism.MainNotions.SizeRho at hR
   rw [h4] at hR
   have hq1 : q ≤ 1 := by linarith
   have hB := hBot t
-  have h5 : Formalism.MainNotions.szNst L * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / (D.R.k : ℝ) = q * L.sc.b' := by
+  have h5
+      : Formalism.MainNotions.szNst L * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / (D.R.k : ℝ)
+        = q * L.sc.b' := by
     rw [hq]; ring
   rw [h5] at hB
   have h6 : q * L.sc.b' ≤ L.sc.b' := mul_le_of_le_one_left (b'_pos L).le hq1

@@ -18,24 +18,25 @@ theorem torus_parameter : GTCTT := by
 
 section frame
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 theorem hsVec_smul (c : ℂ) (A : Wq →L[ℂ] Wp) : B.hsVec (c • A) = c • B.hsVec A := by
-  first
-  | rfl
-  | (simp [B.hsVec]; done)
-  | (unfold B.hsVec; rw [← WithLp.toLp_smul]; rfl)
+  first | rfl | (simp [B.hsVec]; done) | (unfold B.hsVec; rw [← WithLp.toLp_smul]; rfl)
 
 theorem star_mul_self_of_norm {z : ℂ} (h : ‖z‖ = 1) : star z * z = 1 := by
-  calc star z * z = (starRingEnd ℂ) z * z := rfl
+  calc
+    star z * z
+      = (starRingEnd ℂ) z * z := rfl
     _ = ((‖z‖ : ℝ) : ℂ) ^ 2 := Complex.conj_mul' _
     _ = 1 := by rw [h]; norm_num
 
-theorem isFrameB_phase (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq) (e : M.Ty P → ℂ → (Wq →L[ℂ] Wp))
+theorem isFrameB_phase
+    (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq) (e : M.Ty P → ℂ → (Wq →L[ℂ] Wp))
     (u : M.Ty P → ℂ → ℂ) (he : IsFrameB P Bs e)
-    (hu : ∀ ρ, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (u ρ) (Ann P) ∧ ∀ ζ ∈ Ann P, ‖u ρ ζ‖ = 1) :
-    IsFrameB P Bs (fun ρ ζ => u ρ ζ • e ρ ζ) := by
+    (hu : ∀ ρ, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (u ρ) (Ann P) ∧ ∀ ζ ∈ Ann P, ‖u ρ ζ‖ = 1)
+    : IsFrameB P Bs (fun ρ ζ => u ρ ζ • e ρ ζ) := by
   obtain ⟨hs, hf⟩ := he
   refine ⟨fun ρ => (hu ρ).1.smul (hs ρ), fun ζ hζ => ?_⟩
   obtain ⟨hF, hO, hX⟩ := hf ζ hζ
@@ -65,22 +66,25 @@ end frame
 
 section trans
 
-theorem comp_snd_mem_smSub (P : M.Par) {v : ℂ → ℂ} (hv : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) v (Ann P)) :
-    (fun q : MA.Qp P.r P.TT => v q.1.2) ∈ MA.smSub P.r P.TT := by
+theorem comp_snd_mem_smSub
+    (P : M.Par) {v : ℂ → ℂ} (hv : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) v (Ann P))
+    : (fun q : MA.Qp P.r P.TT => v q.1.2) ∈ MA.smSub P.r P.TT := by
   show ContDiffOn ℝ MA.sm (MA.ext (fun q : MA.Qp P.r P.TT => v q.1.2)) (MA.Qset P.r P.TT)
   have h1 : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun x : MA.E P.r => v x.2) (MA.Qset P.r P.TT) :=
     hv.comp contDiff_snd.contDiffOn (fun x hx => show P.TT < Complex.normSq x.2 from hx.2)
   exact h1.congr (fun x hx => by simp [MA.ext, hx])
 
-theorem fnZ_eq_mk (P : M.Par) {v : ℂ → ℂ} (hv : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) v (Ann P)) :
-    fnZ P v = ⟨fun q => v q.1.2, comp_snd_mem_smSub P hv⟩ := by
+theorem fnZ_eq_mk (P : M.Par) {v : ℂ → ℂ} (hv : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) v (Ann P))
+    : fnZ P v = ⟨fun q => v q.1.2, comp_snd_mem_smSub P hv⟩ := by
   unfold fnZ MA.toSm
   exact dif_pos (comp_snd_mem_smSub P hv)
 
-theorem toSm_mulZ (P : M.Par) {v w : ℂ → ℂ} (hv : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) v (Ann P))
+theorem toSm_mulZ
+    (P : M.Par)
+    {v w : ℂ → ℂ} (hv : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) v (Ann P))
     (hw : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) w (Ann P)) (hvw : ∀ ζ ∈ Ann P, w ζ * v ζ = 1)
-    (g : MA.Qp P.r P.TT → ℂ) :
-    MA.toSm P (fun q => v q.1.2 * g q) = fnZ P v * MA.toSm P g := by
+    (g : MA.Qp P.r P.TT → ℂ)
+    : MA.toSm P (fun q => v q.1.2 * g q) = fnZ P v * MA.toSm P g := by
   by_cases hg : g ∈ MA.smSub P.r P.TT
   · have hvg : (fun q : MA.Qp P.r P.TT => v q.1.2 * g q) ∈ MA.smSub P.r P.TT :=
       (MA.smSub P.r P.TT).mul_mem (comp_snd_mem_smSub P hv) hg
@@ -100,19 +104,23 @@ theorem toSm_mulZ (P : M.Par) {v w : ℂ → ℂ} (hv : ContDiffOn ℝ ((⊤ : �
     unfold MA.toSm
     rw [dite_eq_right hvg, dite_eq_right hg, mul_zero]
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-theorem rawR_phase (P : M.Par) (μsec : ℂ → Matrix (Fin (P.k + 1)) (Fin (P.k + 1)) ℂ)
-    (e : M.Ty P → ℂ → (Wq →L[ℂ] Wp)) (u : M.Ty P → ℂ → ℂ) (Φ : Q.Fn P.k P.r (Wq →L[ℂ] Wp)) (ρ : M.Ty P) :
-    rawR P μsec (fun ρ ζ => u ρ ζ • e ρ ζ) Φ ρ = fun q => star (u ρ q.1.2) * rawR P μsec e Φ ρ q := by
+theorem rawR_phase
+    (P : M.Par)
+    (μsec : ℂ → Matrix (Fin (P.k + 1)) (Fin (P.k + 1)) ℂ) (e : M.Ty P → ℂ → (Wq →L[ℂ] Wp))
+    (u : M.Ty P → ℂ → ℂ) (Φ : Q.Fn P.k P.r (Wq →L[ℂ] Wp)) (ρ : M.Ty P)
+    : rawR P μsec (fun ρ ζ => u ρ ζ • e ρ ζ) Φ ρ
+      = fun q => star (u ρ q.1.2) * rawR P μsec e Φ ρ q := by
   funext q
   simp only [rawR, hsVec_smul, inner_smul_left]
   rw [show star (u ρ q.1.2) = (starRingEnd ℂ) (u ρ q.1.2) from rfl]
   ring
 
-theorem conj_smooth {v : ℂ → ℂ} {s : Set ℂ} (hv : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) v s) :
-    ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun ζ => star (v ζ)) s := by
+theorem conj_smooth {v : ℂ → ℂ} {s : Set ℂ} (hv : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) v s)
+    : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun ζ => star (v ζ)) s := by
   have hs : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun ζ : ℂ => star ζ) := by
     first
     | exact contDiff_id.star
@@ -120,18 +128,20 @@ theorem conj_smooth {v : ℂ → ℂ} {s : Set ℂ} (hv : ContDiffOn ℝ ((⊤ :
     | simpa using (Complex.conjCLE.contDiff (n := ((⊤ : ℕ∞) : WithTop ℕ∞)))
   exact hs.comp_contDiffOn hv
 
-theorem trR_phase (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq) (e : M.Ty P → ℂ → (Wq →L[ℂ] Wp))
+theorem trR_phase
+    (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq) (e : M.Ty P → ℂ → (Wq →L[ℂ] Wp))
     (u : M.Ty P → ℂ → ℂ)
     (hu : ∀ ρ, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (u ρ) (Ann P) ∧ ∀ ζ ∈ Ann P, ‖u ρ ζ‖ = 1)
-    (Φ : Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π') (ρ : M.Ty P) :
-    trR P Bs (fun ρ ζ => u ρ ζ • e ρ ζ) Φ ρ = fnZ P (fun ζ => star (u ρ ζ)) * trR P Bs e Φ ρ := by
+    (Φ : Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π') (ρ : M.Ty P)
+    : trR P Bs (fun ρ ζ => u ρ ζ • e ρ ζ) Φ ρ = fnZ P (fun ζ => star (u ρ ζ)) * trR P Bs e Φ ρ := by
   simp only [trR]
   rw [rawR_phase]
   exact toSm_mulZ P (conj_smooth (hu ρ).1) (hu ρ).1
     (fun ζ hζ => by
       show u ρ ζ * star (u ρ ζ) = 1
       rw [mul_comm]
-      exact star_mul_self_of_norm ((hu ρ).2 ζ hζ)) _
+      exact star_mul_self_of_norm ((hu ρ).2 ζ hζ))
+    _
 
 end trans
 
@@ -139,36 +149,40 @@ section act
 
 def mulQ (P : M.Par) (x : (MA.DQ P).Pr) (f : MA.SmQ P.r P.TT) : MA.SmQ P.r P.TT := x.1 f
 
-theorem actA_diag (P : M.Par) (x : M.Ty P → (MA.DQ P).Pr) (g : M.Ty P → MA.SmQ P.r P.TT) (ρ : M.Ty P) :
-    MA.actA P (Matrix.diagonal x : MA.A P (MA.DQ P)) g ρ = (x ρ).1 (g ρ) := by
+theorem actA_diag
+    (P : M.Par) (x : M.Ty P → (MA.DQ P).Pr) (g : M.Ty P → MA.SmQ P.r P.TT) (ρ : M.Ty P)
+    : MA.actA P (Matrix.diagonal x : MA.A P (MA.DQ P)) g ρ = (x ρ).1 (g ρ) := by
   unfold MA.actA
   refine (Fintype.sum_eq_single ρ (fun b hb => ?_)).trans ?_
-  · have h0 := congrArg (fun m : (MA.DQ P).Pr => m.1 (g b)) (Matrix.diagonal_apply_ne x (Ne.symm hb))
+  · have h0 :=
+      congrArg (fun m : (MA.DQ P).Pr => m.1 (g b)) (Matrix.diagonal_apply_ne x (Ne.symm hb))
     exact h0.trans (by first | rfl | simp)
   · exact congrArg (fun m : (MA.DQ P).Pr => m.1 (g ρ)) (Matrix.diagonal_apply_eq x ρ)
 
-theorem algebraMap_fst_apply (P : M.Par) (c : ℂ) (f : MA.SmQ P.r P.TT) :
-    (algebraMap ℂ (MA.DQ P).Pr c).1 f = c • f := rfl
+theorem algebraMap_fst_apply (P : M.Par) (c : ℂ) (f : MA.SmQ P.r P.TT)
+    : (algebraMap ℂ (MA.DQ P).Pr c).1 f = c • f :=
+  rfl
 
-theorem actA_kap (P : M.Par) (f : M.Ty P → ℂ) (g : M.Ty P → MA.SmQ P.r P.TT) (ρ : M.Ty P) :
-    MA.actA P (MA.kap P (MA.DQ P) f) g ρ = f ρ • g ρ := by
-  have hk : (MA.kap P (MA.DQ P) f : MA.A P (MA.DQ P)) =
-      Matrix.diagonal (fun π => algebraMap ℂ (MA.DQ P).Pr (f π)) := by
-    first
-    | rfl
-    | (ext i j; simp [MA.kap, Matrix.diagonal_apply])
+theorem actA_kap (P : M.Par) (f : M.Ty P → ℂ) (g : M.Ty P → MA.SmQ P.r P.TT) (ρ : M.Ty P)
+    : MA.actA P (MA.kap P (MA.DQ P) f) g ρ = f ρ • g ρ := by
+  have hk
+      : (MA.kap P (MA.DQ P) f : MA.A P (MA.DQ P))
+        = Matrix.diagonal (fun π => algebraMap ℂ (MA.DQ P).Pr (f π)) := by
+    first | rfl | (ext i j; simp [MA.kap, Matrix.diagonal_apply])
   rw [hk, actA_diag, algebraMap_fst_apply]
 
-theorem actA_nabA (P : M.Par) (g : M.Ty P → MA.SmQ P.r P.TT) (ρ : M.Ty P) :
-    MA.actA P (MA.nabA P (MA.DQ P)) g ρ =
-      dzQ P (g ρ) + (M.aC P ρ : ℂ) • mulQ P (MA.DQ P).zbP (mulQ P ((MA.DQ P).ggiP P.TT) (g ρ)) := by
+theorem actA_nabA (P : M.Par) (g : M.Ty P → MA.SmQ P.r P.TT) (ρ : M.Ty P)
+    : MA.actA P (MA.nabA P (MA.DQ P)) g ρ
+      = dzQ P (g ρ)
+        + (M.aC P ρ : ℂ) • mulQ P (MA.DQ P).zbP (mulQ P ((MA.DQ P).ggiP P.TT) (g ρ)) := by
   unfold MA.nabA
   rw [actA_diag]
   rfl
 
-theorem actA_nabsA (P : M.Par) (g : M.Ty P → MA.SmQ P.r P.TT) (ρ : M.Ty P) :
-    MA.actA P (MA.nabsA P (MA.DQ P)) g ρ =
-      -dzbQ P (g ρ) + (M.aC P ρ : ℂ) • mulQ P (MA.DQ P).zP (mulQ P ((MA.DQ P).ggiP P.TT) (g ρ)) := by
+theorem actA_nabsA (P : M.Par) (g : M.Ty P → MA.SmQ P.r P.TT) (ρ : M.Ty P)
+    : MA.actA P (MA.nabsA P (MA.DQ P)) g ρ
+      = - dzbQ P (g ρ)
+        + (M.aC P ρ : ℂ) • mulQ P (MA.DQ P).zP (mulQ P ((MA.DQ P).ggiP P.TT) (g ρ)) := by
   unfold MA.nabsA
   rw [actA_diag]
   rfl
@@ -177,14 +191,17 @@ end act
 
 section kap
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-theorem kapF_phase (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq)
+theorem kapF_phase
+    (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq)
     (d : Q.NFData P (Q.Pr (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π'))) (e : M.Ty P → ℂ → (Wq →L[ℂ] Wp))
     (u : M.Ty P → ℂ → ℂ)
     (hu : ∀ ρ, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (u ρ) (Ann P) ∧ ∀ ζ ∈ Ann P, ‖u ρ ζ‖ = 1)
-    (hk : KapF P Bs d e) : KapF P Bs d (fun ρ ζ => u ρ ζ • e ρ ζ) := by
+    (hk : KapF P Bs d e)
+    : KapF P Bs d (fun ρ ζ => u ρ ζ • e ρ ζ) := by
   unfold KapF at hk ⊢
   intro f Φ
   funext ρ

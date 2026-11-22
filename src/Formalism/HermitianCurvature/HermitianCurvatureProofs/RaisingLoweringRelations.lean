@@ -16,12 +16,14 @@ theorem raising_lowering_relations : KrAA := by
   exact (PBG.kr_AA_cpt Bs hs (Formalism.FourierDecayAlt.P.PBE.isCompact_gN_le k r R)
     (fun g hg hgC => by
       by_contra hne
-      exact hgC (hR g hg hne)) r le_rfl u 0 hx).1
+      exact hgC (hR g hg hne))
+    r le_rfl u 0 hx).1
 
 end Formalism.FourierDecayAlt.P.VandermondePolynomialIntegral
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem polynomial_top : PBN.PolyTop := VandermondePolynomialIntegral.polyTop_of VandermondePolynomialIntegral.raising_lowering_relations
+theorem polynomial_top : PBN.PolyTop :=
+  VandermondePolynomialIntegral.polyTop_of VandermondePolynomialIntegral.raising_lowering_relations
 
 end Formalism.FourierDecayAlt.P

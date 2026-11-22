@@ -13,14 +13,18 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Formalism.L2.Host GlobalTheory.CuspRep
-open Formalism.UG GlobalTheory.PRep GlobalTheory.LFun GlobalTheory.LGrp GlobalTheory.LFun.SatCompare GlobalTheory.LocGL GlobalTheory.WeylGL
+open Formalism.UG GlobalTheory.PRep GlobalTheory.LFun GlobalTheory.LGrp GlobalTheory.LFun.SatCompare
+  GlobalTheory.LocGL GlobalTheory.WeylGL
 
 namespace GlobalTheory.CompanionTheory.SatAe
 
-theorem scalar_of_simple {F : Type} [AddCommGroup F] [Module ℂ F] (hr : Module.rank ℂ F ≤ Cardinal.aleph0)
+theorem scalar_of_simple
+    {F : Type} [AddCommGroup F] [Module ℂ F]
+    (hr : Module.rank ℂ F ≤ Cardinal.aleph0)
     (A : Set (Module.End ℂ F))
     (hs : ∀ W : Submodule ℂ F, (∀ f ∈ A, ∀ x ∈ W, f x ∈ W) → W = ⊥ ∨ W = ⊤)
-    (T : Module.End ℂ F) (hT : ∀ f ∈ A, f * T = T * f) : ∃ c : ℂ, ∀ x, T x = c • x := by
+    (T : Module.End ℂ F) (hT : ∀ f ∈ A, f * T = T * f)
+    : ∃ c : ℂ, ∀ x, T x = c • x := by
   by_cases hF : Nontrivial F
   swap
   · rw [not_nontrivial_iff_subsingleton] at hF
@@ -29,14 +33,16 @@ theorem scalar_of_simple {F : Type} [AddCommGroup F] [Module ℂ F] (hr : Module
   set S : Module.End ℂ F := T - algebraMap ℂ _ c with hS
   have hSc : ∀ f ∈ A, f * S = S * f := fun f hf => by
     rw [hS, mul_sub, sub_mul, hT f hf, Algebra.commutes]
-  have h1 := hs (LinearMap.ker S) fun f hf x hx => by
-    rw [LinearMap.mem_ker] at hx ⊢
-    have := LinearMap.congr_fun (hSc f hf) x
-    simp only [Module.End.mul_apply, hx, map_zero] at this
-    exact this.symm
-  have h2 := hs (LinearMap.range S) fun f hf x hx => by
-    obtain ⟨y, rfl⟩ := hx
-    exact ⟨f y, (LinearMap.congr_fun (hSc f hf) y).symm⟩
+  have h1 :=
+    hs (LinearMap.ker S) fun f hf x hx => by
+      rw [LinearMap.mem_ker] at hx ⊢
+      have := LinearMap.congr_fun (hSc f hf) x
+      simp only [Module.End.mul_apply, hx, map_zero] at this
+      exact this.symm
+  have h2 :=
+    hs (LinearMap.range S) fun f hf x hx => by
+      obtain ⟨y, rfl⟩ := hx
+      exact ⟨f y, (LinearMap.congr_fun (hSc f hf) y).symm⟩
   refine ⟨c, fun x => ?_⟩
   rcases h1 with h1 | h1
   · exfalso
@@ -57,13 +63,17 @@ theorem scalar_of_simple {F : Type} [AddCommGroup F] [Module ℂ F] (hr : Module
     have e2 : T x - c • x = 0 := by simpa [hS, Module.algebraMap_end_apply] using e
     exact sub_eq_zero.1 e2
 
-theorem rank_le_of_simple {M ι : Type} [AddCommGroup M] [Module ℂ M] (S : Submodule ℂ M) (O : ι → Module.End ℂ M)
+theorem rank_le_of_simple
+    {M ι : Type} [AddCommGroup M] [Module ℂ M]
+    (S : Submodule ℂ M) (O : ι → Module.End ℂ M)
     (hne : S ≠ ⊥) (hirr : ∀ W ≤ S, (∀ i, ∀ x ∈ W, O i x ∈ W) → W = ⊥ ∨ W = S)
-    (hc : ∀ x ∈ S, ∃ C : Set M, C.Countable ∧ C ⊆ S ∧ ∀ i, O i x ∈ Submodule.span ℂ C) :
-    Module.rank ℂ S ≤ Cardinal.aleph0 := by
+    (hc : ∀ x ∈ S, ∃ C : Set M, C.Countable ∧ C ⊆ S ∧ ∀ i, O i x ∈ Submodule.span ℂ C)
+    : Module.rank ℂ S ≤ Cardinal.aleph0 := by
   classical
   obtain ⟨x0, hx0, h0⟩ := (Submodule.ne_bot_iff _).1 hne
-  have hc' : ∀ x : M, ∃ C : Set M, C.Countable ∧ C ⊆ S ∧ (x ∈ S → ∀ i, O i x ∈ Submodule.span ℂ C) := fun x => by
+  have hc'
+      : ∀ x : M, ∃ C : Set M,
+        C.Countable ∧ C ⊆ S ∧ (x ∈ S → ∀ i, O i x ∈ Submodule.span ℂ C) := fun x => by
     by_cases hx : x ∈ S
     · obtain ⟨C, h1, h2, h3⟩ := hc x hx
       exact ⟨C, h1, h2, fun _ => h3⟩
@@ -88,22 +98,26 @@ theorem rank_le_of_simple {M ι : Type} [AddCommGroup M] [Module ℂ M] (S : Sub
     induction hx using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨n, hn⟩ := Set.mem_iUnion.1 hx
-      exact Submodule.span_mono (fun y hy => Set.mem_iUnion.2 ⟨n + 1, by
-        rw [Ts]; exact Or.inr (Set.mem_biUnion hn hy)⟩) (c3 x (hTS n hn) i)
+      exact Submodule.span_mono
+        (fun y hy => Set.mem_iUnion.2 ⟨n + 1, by rw [Ts]; exact Or.inr (Set.mem_biUnion hn hy)⟩)
+        (c3 x (hTS n hn) i)
     | zero => simp
     | add a b _ _ ha hb => rw [map_add]; exact add_mem ha hb
     | smul r a _ ha => rw [map_smul]; exact Submodule.smul_mem _ r ha
-  have hx0U : x0 ∈ Submodule.span ℂ (⋃ n, T n) :=
-    Submodule.subset_span (Set.mem_iUnion.2 ⟨0, rfl⟩)
-  have e : Submodule.span ℂ (⋃ n, T n) = S := (hirr _ hW hst).resolve_left fun h => h0 (by
-    rw [h] at hx0U
-    exact (Submodule.mem_bot ℂ).1 hx0U)
+  have hx0U : x0 ∈ Submodule.span ℂ (⋃ n, T n) := Submodule.subset_span (Set.mem_iUnion.2 ⟨0, rfl⟩)
+  have e : Submodule.span ℂ (⋃ n, T n) = S :=
+    (hirr _ hW hst).resolve_left fun h =>
+      h0 (by
+        rw [h] at hx0U
+        exact (Submodule.mem_bot ℂ).1 hx0U)
   rw [← e]
   exact (rank_span_le _).trans (Cardinal.le_aleph0_iff_set_countable.2 hUc)
 
-theorem countable_orbit {G M : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
-    [AddCommGroup M] [Module ℂ M] (ρ : Representation ℂ G M) (x : M) (h : IsOpen {g | ρ g x = x}) :
-    (Set.range fun g => ρ g x).Countable :=
+theorem countable_orbit
+    {G M : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+    [AddCommGroup M] [Module ℂ M]
+    (ρ : Representation ℂ G M) (x : M) (h : IsOpen {g | ρ g x = x})
+    : (Set.range fun g => ρ g x).Countable :=
   _root_.UpperTheory.Reformulated.B.Yhd2.main ρ x h
 
 section Cusp
@@ -121,14 +135,20 @@ theorem secondCountable_GL : SecondCountableTopology (GL (Fin a) (Af E)) := by
 
 theorem rank_cuspSub (π : CuspSub E a) : Module.rank ℂ π.V ≤ Cardinal.aleph0 := by
   haveI := secondCountable_GL (E := E) (a := a)
-  refine rank_le_of_simple π.V (act (E := E) (a := a)) π.ne_bot (fun W hW hs => π.irred W hW hs) fun x hx => ?_
+  refine rank_le_of_simple π.V (act (E := E) (a := a)) π.ne_bot
+    (fun W hW hs => π.irred W hW hs)
+    fun x hx => ?_
   have hcusp := (π.cusp x hx).1
   have hk := hcusp.kfin
-  obtain ⟨s, hs1, hs2⟩ := (Submodule.fg_span_iff_fg_span_finset_subset _).1
-    (Module.Finite.iff_fg.1 hk)
+  obtain ⟨s, hs1, hs2⟩ :=
+    (Submodule.fg_span_iff_fg_span_finset_subset _).1 (Module.Finite.iff_fg.1 hk)
   let b := Module.finBasis ℝ (Lie E a)
-  refine ⟨(Set.range fun g => finRep E a g x) ∪ ((s : Set (Sm E a)) ∪ Set.range fun i => lie E a (b i) x),
-    (countable_orbit _ _ hcusp.level).union (s.countable_toSet.union (Set.countable_range _)), ?_, fun o => ?_⟩
+  refine ⟨
+    (Set.range fun g => finRep E a g x) ∪ ((s : Set (Sm E a)) ∪ Set.range fun i => lie E a (b i) x),
+    (countable_orbit _ _ hcusp.level).union (s.countable_toSet.union (Set.countable_range _)),
+    ?_,
+    fun o => ?_
+  ⟩
   · rintro y (⟨g, rfl⟩ | hy | ⟨i, rfl⟩)
     · exact π.stable (.fin g) x hx
     · obtain ⟨k, rfl⟩ := hs1 hy
@@ -137,7 +157,8 @@ theorem rank_cuspSub (π : CuspSub E a) : Module.rank ℂ π.V ≤ Cardinal.alep
   · cases o with
     | fin k => exact Submodule.subset_span (Or.inl ⟨k, rfl⟩)
     | cpt k =>
-      have h1 : cptRep E a k x ∈ Submodule.span ℂ (s : Set (Sm E a)) := hs2 ▸ Submodule.subset_span ⟨k, rfl⟩
+      have h1 : cptRep E a k x ∈ Submodule.span ℂ (s : Set (Sm E a)) :=
+        hs2 ▸ Submodule.subset_span ⟨k, rfl⟩
       exact Submodule.span_mono (fun y hy => Or.inr (Or.inl hy)) h1
     | lie X =>
       change lie E a X x ∈ _
@@ -154,16 +175,20 @@ end Cusp
 
 section Hecke
 
-variable {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+variable
+  {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
   {π : Representation ℂ G V} {K : Subgroup G}
 
-theorem heckeVec_dosetInd_eq_idem (hs : IsSmooth π) (hc : IsCompact (K : Set G)) (hK : IsCommensurated K)
-    (g : G) {z : V} (hz : z ∈ fixed π K) :
-    ∃ N : ℂ, N ≠ 0 ∧ heckeVec π K (dosetInd ℂ K g) z = N • idem hs hc (π g z) := by
+theorem heckeVec_dosetInd_eq_idem
+    (hs : IsSmooth π) (hc : IsCompact (K : Set G)) (hK : IsCommensurated K) (g : G)
+    {z : V} (hz : z ∈ fixed π K)
+    : ∃ N : ℂ, N ≠ 0 ∧ heckeVec π K (dosetInd ℂ K g) z = N • idem hs hc (π g z) := by
   classical
   have hm := Final.DosetIndMem G K ℂ g
   have hfin := Formalism.UG.P.finite_support_cosets hK hm.2
-  have hS : ∀ c : G ⧸ K, c ∈ hfin.toFinset ↔ c.out ∈ DoubleCoset.doubleCoset g (K : Set G) K := fun c => by
+  have hS
+      : ∀ c : G ⧸ K,
+        c ∈ hfin.toFinset ↔ c.out ∈ DoubleCoset.doubleCoset g (K : Set G) K := fun c => by
     simp [dosetInd]
   refine ⟨hfin.toFinset.card, ?_, ?_⟩
   · refine Nat.cast_ne_zero.2 (Finset.card_ne_zero.2 ⟨(g : G ⧸ K), (hS _).2 ?_⟩)
@@ -171,12 +196,13 @@ theorem heckeVec_dosetInd_eq_idem (hs : IsSmooth π) (hc : IsCompact (K : Set G)
     exact DoubleCoset.mem_doubleCoset.2 ⟨1, K.one_mem, k, k.2, by rw [hk, one_mul]⟩
   · set_option synthInstance.maxHeartbeats 100000 in
       rw [← idem_of_mem hs hc (heckeVec_mem_fixed hK hm hz), heckeVec,
-      finsum_eq_sum_of_support_subset (s := hfin.toFinset), map_sum, Nat.cast_smul_eq_nsmul, ← Finset.sum_const]
+        finsum_eq_sum_of_support_subset (s := hfin.toFinset), map_sum, Nat.cast_smul_eq_nsmul,
+        ← Finset.sum_const]
     · refine Finset.sum_congr rfl fun c hcS => ?_
       have h1 := (hS c).1 hcS
       obtain ⟨a, ha, b, hb, e⟩ := DoubleCoset.mem_doubleCoset.1 h1
-      rw [dosetInd, Set.indicator_of_mem h1, e, map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply,
-        GlobalTheory.LGrp.mem_fixed.1 hz b hb]
+      rw [dosetInd, Set.indicator_of_mem h1, e, map_mul, map_mul, Module.End.mul_apply,
+        Module.End.mul_apply, GlobalTheory.LGrp.mem_fixed.1 hz b hb]
       simpa using idem_apply_mem hs hc ha (π g z)
     · intro c hc'
       refine Finset.mem_coe.2 ((hS c).2 ?_)
@@ -184,13 +210,15 @@ theorem heckeVec_dosetInd_eq_idem (hs : IsSmooth π) (hc : IsCompact (K : Set G)
       exact hc' (by simp [dosetInd, h0])
 
 def IsBiSimple (π : Representation ℂ G V) : Prop :=
-  ∀ S : Submodule ℂ V, (∀ g, ∀ x ∈ S, π g x ∈ S) →
-    (∀ b : Module.End ℂ V, (∀ g, b * π g = π g * b) → ∀ x ∈ S, b x ∈ S) → S = ⊥ ∨ S = ⊤
+  ∀ S : Submodule ℂ V,
+    (∀ g, ∀ x ∈ S, π g x ∈ S) → (∀ b : Module.End ℂ V, (∀ g, b * π g = π g * b) → ∀ x ∈ S, b x ∈ S)
+      → S = ⊥ ∨ S = ⊤
 
-theorem fixed_simple (hs : IsSmooth π) (hc : IsCompact (K : Set G)) (hK : IsCommensurated K) (hirr : IsBiSimple π)
-    (W : Submodule ℂ V) (hW : W ≤ fixed π K)
-    (hH : ∀ f ∈ Hecke ℂ K, ∀ x ∈ W, heckeVec π K f x ∈ W)
-    (hB : ∀ b : Module.End ℂ V, (∀ g, b * π g = π g * b) → ∀ x ∈ W, b x ∈ W) : W = ⊥ ∨ W = fixed π K := by
+theorem fixed_simple
+    (hs : IsSmooth π) (hc : IsCompact (K : Set G)) (hK : IsCommensurated K) (hirr : IsBiSimple π)
+    (W : Submodule ℂ V) (hW : W ≤ fixed π K) (hH : ∀ f ∈ Hecke ℂ K, ∀ x ∈ W, heckeVec π K f x ∈ W)
+    (hB : ∀ b : Module.End ℂ V, (∀ g, b * π g = π g * b) → ∀ x ∈ W, b x ∈ W)
+    : W = ⊥ ∨ W = fixed π K := by
   by_cases h0 : W = ⊥
   · exact Or.inl h0
   refine Or.inr (le_antisymm hW fun x hx => ?_)
@@ -204,12 +232,15 @@ theorem fixed_simple (hs : IsSmooth π) (hc : IsCompact (K : Set G)) (hK : IsCom
     | zero => simp
     | add u v _ _ hu hv => rw [map_add]; exact add_mem hu hv
     | smul r u _ hu => rw [map_smul]; exact Submodule.smul_mem _ r hu
-  have h2 : ∀ b : Module.End ℂ V, (∀ g, b * π g = π g * b) → ∀ y ∈ Submodule.span ℂ C, b y ∈ Submodule.span ℂ C :=
-    fun b hb y hy => by
+  have h2
+      : ∀ b : Module.End ℂ V,
+        (∀ g, b * π g = π g * b)
+          → ∀ y ∈ Submodule.span ℂ C, b y ∈ Submodule.span ℂ C := fun b hb y hy => by
     induction hy using Submodule.span_induction with
     | mem y hy =>
       obtain ⟨g', b', hb', rfl⟩ := hy
-      refine Submodule.subset_span ⟨g', b * b', fun g => by rw [mul_assoc, hb' g, ← mul_assoc, hb g, mul_assoc], ?_⟩
+      refine Submodule.subset_span
+        ⟨g', b * b', fun g => by rw [mul_assoc, hb' g, ← mul_assoc, hb g, mul_assoc], ?_⟩
       have := LinearMap.congr_fun (hb g') (b' w0)
       simpa [Module.End.mul_apply] using this
     | zero => simp
@@ -217,9 +248,11 @@ theorem fixed_simple (hs : IsSmooth π) (hc : IsCompact (K : Set G)) (hK : IsCom
     | smul r u _ hu => rw [map_smul]; exact Submodule.smul_mem _ r hu
   have hw0C : w0 ∈ Submodule.span ℂ C :=
     Submodule.subset_span ⟨1, 1, fun g => by rw [one_mul, mul_one], by simp⟩
-  have htop : Submodule.span ℂ C = ⊤ := (hirr _ h1 h2).resolve_left fun h => hw00 (by
-    rw [h] at hw0C
-    exact (Submodule.mem_bot ℂ).1 hw0C)
+  have htop : Submodule.span ℂ C = ⊤ :=
+    (hirr _ h1 h2).resolve_left fun h =>
+      hw00 (by
+        rw [h] at hw0C
+        exact (Submodule.mem_bot ℂ).1 hw0C)
   have key : ∀ y ∈ Submodule.span ℂ C, idem hs hc y ∈ W := fun y hy => by
     induction hy using Submodule.span_induction with
     | mem y hy =>
@@ -236,34 +269,40 @@ theorem fixed_simple (hs : IsSmooth π) (hc : IsCompact (K : Set G)) (hK : IsCom
   have := key x (htop ▸ Submodule.mem_top)
   rwa [idem_of_mem hs hc hx] at this
 
-theorem exists_scalar (hs : IsSmooth π) (hc : IsCompact (K : Set G)) (hK : IsCommensurated K)
+theorem exists_scalar
+    (hs : IsSmooth π) (hc : IsCompact (K : Set G)) (hK : IsCommensurated K)
     (hcomm : ∀ f₁ ∈ Hecke ℂ K, ∀ f₂ ∈ Hecke ℂ K, conv K f₁ f₂ = conv K f₂ f₁) (hirr : IsBiSimple π)
-    (hr : Module.rank ℂ V ≤ Cardinal.aleph0) (h : G → ℂ) (hh : h ∈ Hecke ℂ K) :
-    ∃ c : ℂ, ∀ x ∈ fixed π K, heckeVec π K h x = c • x := by
-  have hbF : ∀ b : Module.End ℂ V, (∀ g, b * π g = π g * b) → ∀ x ∈ fixed π K, b x ∈ fixed π K := fun b hb x hx =>
-    GlobalTheory.LGrp.mem_fixed.2 fun k hk => by
-      have := LinearMap.congr_fun (hb k) x
-      simp only [Module.End.mul_apply, GlobalTheory.LGrp.mem_fixed.1 hx k hk] at this
-      exact this.symm
+    (hr : Module.rank ℂ V ≤ Cardinal.aleph0)
+    (h : G → ℂ) (hh : h ∈ Hecke ℂ K)
+    : ∃ c : ℂ, ∀ x ∈ fixed π K, heckeVec π K h x = c • x := by
+  have hbF : ∀ b : Module.End ℂ V, (∀ g, b * π g = π g * b) → ∀ x ∈ fixed π K, b x ∈ fixed π K :=
+    fun b hb x hx =>
+      GlobalTheory.LGrp.mem_fixed.2 fun k hk => by
+        have := LinearMap.congr_fun (hb k) x
+        simp only [Module.End.mul_apply, GlobalTheory.LGrp.mem_fixed.1 hx k hk] at this
+        exact this.symm
   let R : ∀ f, f ∈ Hecke ℂ K → Module.End ℂ (fixed π K) := fun f hf =>
     (heckeLin hK hf π).restrict fun x hx => heckeVec_mem_fixed hK hf hx
   let Rb : ∀ b : Module.End ℂ V, (∀ g, b * π g = π g * b) → Module.End ℂ (fixed π K) := fun b hb =>
     b.restrict (hbF b hb)
-  let A : Set (Module.End ℂ (fixed π K)) :=
-    {f | ∃ f' hf, f = R f' hf} ∪ {f | ∃ b hb, f = Rb b hb}
+  let A : Set (Module.End ℂ (fixed π K)) := {f | ∃ f' hf, f = R f' hf} ∪ {f | ∃ b hb, f = Rb b hb}
   have hrF : Module.rank ℂ (fixed π K) ≤ Cardinal.aleph0 := (Submodule.rank_le _).trans hr
   have hsim : ∀ W : Submodule ℂ (fixed π K), (∀ f ∈ A, ∀ x ∈ W, f x ∈ W) → W = ⊥ ∨ W = ⊤ := by
     intro W hWs
     have hWf : W.map (fixed π K).subtype ≤ fixed π K := by
       rintro _ ⟨x, -, rfl⟩
       exact x.2
-    have := fixed_simple hs hc hK hirr (W.map (fixed π K).subtype) hWf (by
-      rintro f hf _ ⟨x, hx, rfl⟩
-      exact ⟨_, hWs _ (Or.inl ⟨f, hf, rfl⟩) x hx, rfl⟩) (by
-      rintro b hb _ ⟨x, hx, rfl⟩
-      exact ⟨_, hWs _ (Or.inr ⟨b, hb, rfl⟩) x hx, rfl⟩)
+    have :=
+      fixed_simple hs hc hK hirr (W.map (fixed π K).subtype) hWf
+        (by
+          rintro f hf _ ⟨x, hx, rfl⟩
+          exact ⟨_, hWs _ (Or.inl ⟨f, hf, rfl⟩) x hx, rfl⟩)
+        (by
+          rintro b hb _ ⟨x, hx, rfl⟩
+          exact ⟨_, hWs _ (Or.inr ⟨b, hb, rfl⟩) x hx, rfl⟩)
     refine this.imp (fun e => ?_) fun e => ?_
-    · exact Submodule.map_injective_of_injective (Submodule.subtype_injective _) (by rw [e, Submodule.map_bot])
+    · exact Submodule.map_injective_of_injective (Submodule.subtype_injective _)
+        (by rw [e, Submodule.map_bot])
     · refine Submodule.map_injective_of_injective (Submodule.subtype_injective (fixed π K)) ?_
       rw [e, Submodule.map_top, Submodule.range_subtype]
   have hcm : ∀ f ∈ A, f * R h hh = R h hh * f := by
@@ -280,12 +319,16 @@ end Hecke
 
 section Main
 
-variable {E : Type} [Field E] [NumberField E] {w : HeightOneSpectrum (𝓞 E)} {n : ℕ}
-  {V : Type} [AddCommGroup V] [Module ℂ V]
+variable
+  {E : Type} [Field E] [NumberField E]
+  {w : HeightOneSpectrum (𝓞 E)} {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem exists_hasSatGL_of_scalar {π : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V}
-    (hsc : ∀ h ∈ Hecke ℂ (KGL w (n := n)), ∃ c : ℂ, ∀ x ∈ fixed π (KGL w (n := n)), heckeVec π (KGL w (n := n)) h x = c • x)
-    (hs : GlobalTheory.LGrp.IsSpherical π (KGL w (n := n))) : ∃ B, HasSatGL w π B := by
+theorem exists_hasSatGL_of_scalar
+    {π : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V}
+    (hsc : ∀ h ∈ Hecke ℂ (KGL w (n := n)), ∃ c : ℂ, ∀ x ∈ fixed π (KGL w (n := n)),
+      heckeVec π (KGL w (n := n)) h x = c • x)
+    (hs : GlobalTheory.LGrp.IsSpherical π (KGL w (n := n)))
+    : ∃ B, HasSatGL w π B := by
   have hK : IsCommensurated (KGL w (n := n)) := Final.GLintComm E w n
   obtain ⟨ϖ, hu⟩ := exists_isUnifV w
   have h0 := ne_zero_of_isUnifV hu
@@ -302,8 +345,10 @@ theorem exists_hasSatGL_of_scalar {π : Representation ℂ (GL (Fin n) (w.adicCo
     have h1 := hc n x hx
     have hTn : Tj ℂ n (Ov E w) ϖ n = dosetInd ℂ (KGL w (n := n)) (tor h0 fun _ => 1) := by
       rw [Tj_eq h0]; simp
-    rw [e, zero_smul, hTn, heckeVec_dosetInd (R := {tor h0 fun _ => 1}) hx, Finset.sum_singleton] at h1
-    · exact hx0 (by simpa [← Module.End.mul_apply, ← map_mul] using congrArg (π (tor h0 fun _ => 1)⁻¹) h1)
+    rw [e, zero_smul, hTn, heckeVec_dosetInd (R := {tor h0 fun _ => 1}) hx, Finset.sum_singleton]
+      at h1
+    · exact hx0 (by
+        simpa [← Module.End.mul_apply, ← map_mul] using congrArg (π (tor h0 fun _ => 1)⁻¹) h1)
     · intro γ hγ
       exact mem_doset.2 ⟨1, one_mem _, 1, one_mem _, by simpa using hγ⟩
     · intro g hg
@@ -311,31 +356,39 @@ theorem exists_hasSatGL_of_scalar {π : Representation ℂ (GL (Fin n) (w.adicCo
       refine ⟨_, ⟨Finset.mem_singleton_self _, ?_⟩, fun γ hγ => Finset.mem_singleton.1 hγ.1⟩
       rw [← tor_const_comm, mul_assoc, inv_mul_cancel_left]
       exact mul_mem ha hb
-  obtain ⟨B, hB, hBc⟩ := GlobalTheory.T.exists_multiset_satakeEigenvalue_eq (qV E w) n (qV_ne_zero w) c c0 cn
+  obtain ⟨B, hB, hBc⟩ :=
+    GlobalTheory.T.exists_multiset_satakeEigenvalue_eq (qV E w) n (qV_ne_zero w) c c0 cn
   refine ⟨B, hs, fun y hy hy0 => ⟨hy0, hy, hB, fun ϖ' hu' j hj => ?_⟩⟩
-  have hv : Valued.v (ϖ' / ϖ) = 1 := by
-    rw [map_div₀, hu, hu', div_self WithZero.coe_ne_zero]
-  have e := Final.TjIndep _ (Ov E w) ϖ (ϖ' / ϖ) ℂ n j hv.le
-    (show Valued.v (ϖ' / ϖ)⁻¹ ≤ 1 by rw [map_inv₀, hv, inv_one]) (div_ne_zero (ne_zero_of_isUnifV hu') h0)
+  have hv : Valued.v (ϖ' / ϖ) = 1 := by rw [map_div₀, hu, hu', div_self WithZero.coe_ne_zero]
+  have e :=
+    Final.TjIndep _ (Ov E w) ϖ (ϖ' / ϖ) ℂ n j hv.le
+      (show Valued.v (ϖ' / ϖ)⁻¹ ≤ 1 by rw [map_inv₀, hv, inv_one])
+      (div_ne_zero (ne_zero_of_isUnifV hu') h0)
   rw [div_mul_cancel₀ _ h0] at e
   rw [e, hc j y hy, hBc j hj]
 
 variable [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem isBiSimple_locRep (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) : IsBiSimple (π.locRep w) := by
+theorem isBiSimple_locRep (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E))
+    : IsBiSimple (π.locRep w) := by
   intro S h1 h2
-  have comm : ∀ o : Op E a, (∀ g, act o * finRep E a (locGL E a w g) = finRep E a (locGL E a w g) * act o) →
-      ∀ x ∈ S, π.op o x ∈ S := fun o ho =>
+  have comm
+      : ∀ o : Op E a,
+        (∀ g, act o * finRep E a (locGL E a w g) = finRep E a (locGL E a w g) * act o)
+          → ∀ x ∈ S, π.op o x ∈ S := fun o ho =>
     h2 (π.op o) fun g => LinearMap.ext fun φ => Subtype.ext (LinearMap.congr_fun (ho g) φ.1)
   have hop : ∀ o : Op E a, ∀ x ∈ S, π.op o x ∈ S := by
     intro o x hx
     cases o with
     | fin k =>
       let g := Matrix.GeneralLinearGroup.map (pLoc E w) k
-      have h3 := comm (.fin (k * (locGL E a w g)⁻¹)) (fun g' => by
-        change finRep E a _ * _ = _ * finRep E a _
-        rw [← map_mul, ← map_mul, LocSph.comm_locGL w _ (by rw [map_mul, map_inv, pLoc_locGL, mul_inv_cancel])])
-        _ (h1 g x hx)
+      have h3 :=
+        comm (.fin (k * (locGL E a w g)⁻¹))
+          (fun g' => by
+            change finRep E a _ * _ = _ * finRep E a _
+            rw [← map_mul, ← map_mul,
+              LocSph.comm_locGL w _ (by rw [map_mul, map_inv, pLoc_locGL, mul_inv_cancel])])
+          _ (h1 g x hx)
       have h4 : π.op (.fin (k * (locGL E a w g)⁻¹)) (π.locRep w g x) = π.op (.fin k) x := by
         refine Subtype.ext ?_
         change finRep E a _ (finRep E a _ x.1) = finRep E a k x.1
@@ -353,23 +406,32 @@ theorem isBiSimple_locRep (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) : 
   refine (π.irred _ hle ?_).imp (fun e => ?_) fun e => ?_
   · rintro o _ ⟨x, hx, rfl⟩
     exact ⟨_, hop o x hx, rfl⟩
-  · exact Submodule.map_injective_of_injective (Submodule.subtype_injective _) (by rw [e, Submodule.map_bot])
+  · exact Submodule.map_injective_of_injective (Submodule.subtype_injective _)
+      (by rw [e, Submodule.map_bot])
   · refine Submodule.map_injective_of_injective (Submodule.subtype_injective π.V) ?_
     rw [e, Submodule.map_top, Submodule.range_subtype]
 
-theorem exists_hasSatGL_locRep (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E))
-    (hs : GlobalTheory.LGrp.IsSpherical (π.locRep w) (KGL w (n := a))) : ∃ B, HasSatGL w (π.locRep w) B :=
-  exists_hasSatGL_of_scalar (fun h hh => exists_scalar (π.isSmooth_locRep w) (isOpen_isCompact_KGL w a).2
-    (Final.GLintComm E w a) (Final.HeckeCommGL E w a ℂ) (isBiSimple_locRep π w) (rank_cuspSub π) h hh) hs
+theorem exists_hasSatGL_locRep
+    (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E))
+    (hs : GlobalTheory.LGrp.IsSpherical (π.locRep w) (KGL w (n := a)))
+    : ∃ B, HasSatGL w (π.locRep w) B :=
+  exists_hasSatGL_of_scalar
+    (fun h hh =>
+      exists_scalar (π.isSmooth_locRep w) (isOpen_isCompact_KGL w a).2 (Final.GLintComm E w a)
+        (Final.HeckeCommGL E w a ℂ) (isBiSimple_locRep π w) (rank_cuspSub π) h hh)
+    hs
 
-theorem eventually_exists_hasSat : ∀ {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ},
-    ∀ (π : CuspSub E a), ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∃ B : Multiset ℂˣ, (CG.mk π).HasSat w B := by
-  intro E _ _ _ a π
-  obtain ⟨y, hy, h0⟩ := (Submodule.ne_bot_iff _).1 π.ne_bot
-  let x : π.V := ⟨y, hy⟩
-  have hx : x ≠ 0 := fun e => h0 (congrArg Subtype.val e)
-  filter_upwards [AeFix.eventually_mem_fixed E a π x] with w hw
-  exact exists_hasSatGL_locRep π w ((Submodule.ne_bot_iff _).2 ⟨x, hw, hx⟩)
+theorem eventually_exists_hasSat
+    : ∀ {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ},
+      ∀ (π : CuspSub E a),
+        ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∃ B : Multiset ℂˣ, (CG.mk π).HasSat w B :=
+  by
+    intro E _ _ _ a π
+    obtain ⟨y, hy, h0⟩ := (Submodule.ne_bot_iff _).1 π.ne_bot
+    let x : π.V := ⟨y, hy⟩
+    have hx : x ≠ 0 := fun e => h0 (congrArg Subtype.val e)
+    filter_upwards [AeFix.eventually_mem_fixed E a π x] with w hw
+    exact exists_hasSatGL_locRep π w ((Submodule.ne_bot_iff _).2 ⟨x, hw, hx⟩)
 
 end Main
 

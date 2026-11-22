@@ -17,8 +17,8 @@ universe u w
 
 def InterSumTopVanish.Statement : Prop :=
   ∀ (k : Type u) [Field k] (Ω : Type w) [Field Ω] [Algebra k Ω] (N : ℕ) (x : Fin (N + 1) → Ω)
-    (n : ℕ) (pp : Ideal (Poly k N)) (L : Fin (n + 1) → LineBundle k x), IsSubvar x pp n →
-      ∀ᶠ c : ℕ in atTop, interSum pp (fun i => (L i).toSubSystem) c = 0
+      (n : ℕ) (pp : Ideal (Poly k N)) (L : Fin (n + 1) → LineBundle k x),
+    IsSubvar x pp n → ∀ᶠ c : ℕ in atTop, interSum pp (fun i => (L i).toSubSystem) c = 0
 
 end
 

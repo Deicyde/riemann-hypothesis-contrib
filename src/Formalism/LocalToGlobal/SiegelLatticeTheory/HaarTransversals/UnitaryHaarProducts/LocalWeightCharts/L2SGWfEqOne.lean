@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 noncomputable section
 
-open MeasureTheory Formalism.MainNotions.S Formalism.MainNotions.CayleySignature Formalism.L2.SG.SplitPrimeNormLemmas Matrix
+open MeasureTheory Formalism.MainNotions.S Formalism.MainNotions.CayleySignature
+  Formalism.L2.SG.SplitPrimeNormLemmas Matrix
 open scoped InnerProductSpace ENNReal
 
 namespace WlocSk
@@ -61,36 +62,68 @@ lemma lint_smul (ν : Measure (Formalism.QuantumDeterminants.Mt k r)) (A : Mat k
 end Scale
 
 def WlocShape : Prop :=
-  BesselNVGap → CoefWeightedLoc → ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ)
-    (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ), RealPlaceNumericalSetting k r z c u v b →
-  ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Mat k r → (H →L[ℂ] H)),
-    IsDSHpk k r (eps48 k r) (lam48 k r v b) σ →
-  ∀ (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp]
-    (π : Mat k r → (Vp →L[ℂ] Vp)), IsHCTypeW k r z u π →
-  ∀ w : H, IsLowUnitH k r (eps48 k r) (lam48 k r v b) σ w →
-  ∀ μG μS ν : MeasureTheory.Measure (Formalism.QuantumDeterminants.Mt k r),
-    IsHaarOn (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) μG → IsHaarOn (Formalism.QuantumDeterminants.Sset k r z) μS →
-    IsQuotMeas μG μS ν →
-  ∃ W : Mat k r → Vp, (ContinuousOn W (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) ∧ IsSPsiEquiv z (psiGen k r z c) π W ∧
-    (∀ x ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r),
-      MeasureTheory.Integrable (fun g : Formalism.QuantumDeterminants.Mt k r => eFun μG σ w (Matrix.of g) • W (x * Matrix.of g)) μG ∧
-      rconv μG (eFun μG σ w) W x = W x) ∧
-    ∫⁻ x, ‖W (Matrix.of x)‖ₑ ∂ν < ⊤ ∧ l2SG ν W = 1 ∧
-    ∫⁻ x, ‖W (Matrix.of x)‖ₑ * ENNReal.ofReal (nuH k r z (Matrix.of x) ^ N1H k r) ∂ν < ⊤ ∧
-    ∃ (α : Mat k r → ℂ) (Ω : Set (Mat k r)) (a : ℝ), IsCompact Ω ∧ (1 : Mat k r) ∈ Ω ∧
-      Ω ⊆ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r) ∧
-      Measurable (fun g : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of g)) ∧ (∀ y, α y ≠ 0 → y ∈ Ω) ∧ (∀ y, ‖α y‖ ≤ a) ∧
-      ∀ x ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r),
-        MeasureTheory.Integrable (fun g : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of g) • W (x * Matrix.of g)) μG ∧
-        rconv μG α W x = W x) ∧
-  ∃ (μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)) (cc : ℂ) (x₀ : Mat k r) (ξ : Vp),
-    IsHaarOn (Formalism.QuantumDeterminants.UWset k r z) μW ∧ IsHaarOn (Formalism.QuantumDeterminants.Nset k r) μN ∧
-    x₀ ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r) ∧
-    ∀ x, W x = cc • B0 z c σ π μW μN (σ x₀ w) ξ (σ x w)
+  BesselNVGap → CoefWeightedLoc
+    → ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ)
+        (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ),
+      RealPlaceNumericalSetting k r z c u v b
+        → ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+            (σ : Mat k r → (H →L[ℂ] H)),
+          IsDSHpk k r (eps48 k r) (lam48 k r v b) σ
+            → ∀ (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+                [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)),
+              IsHCTypeW k r z u π
+                → ∀ w : H,
+                  IsLowUnitH k r (eps48 k r) (lam48 k r v b) σ w
+                    → ∀ μG μS ν : MeasureTheory.Measure (Formalism.QuantumDeterminants.Mt k r),
+                      IsHaarOn
+                          (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r))
+                          μG
+                        → IsHaarOn (Formalism.QuantumDeterminants.Sset k r z) μS
+                        → IsQuotMeas μG μS ν
+                        → ∃ W : Mat k r → Vp,
+                          (ContinuousOn W
+                                (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk
+                                  k r))
+                              ∧ IsSPsiEquiv z (psiGen k r z c) π W
+                              ∧ (∀ x
+                                  ∈ Formalism.QuantumDeterminants.UH
+                                    (Formalism.QuantumDeterminants.Hpk k r),
+                                MeasureTheory.Integrable
+                                    (fun g : Formalism.QuantumDeterminants.Mt k r =>
+                                      eFun μG σ w (Matrix.of g) • W (x * Matrix.of g))
+                                    μG
+                                  ∧ rconv μG (eFun μG σ w) W x = W x)
+                              ∧ ∫⁻ x, ‖W (Matrix.of x)‖ₑ ∂ν < ⊤ ∧ l2SG ν W = 1
+                              ∧ ∫⁻ x, ‖W (Matrix.of x)‖ₑ * ENNReal.ofReal (nuH k r z (Matrix.of x) ^ N1H k r) ∂ν
+                                < ⊤
+                              ∧ ∃ (α : Mat k r → ℂ) (Ω : Set (Mat k r)) (a : ℝ),
+                                IsCompact Ω ∧ (1 : Mat k r) ∈ Ω
+                                  ∧ Ω
+                                    ⊆ Formalism.QuantumDeterminants.UH
+                                      (Formalism.QuantumDeterminants.Hpk k r)
+                                  ∧ Measurable (fun g : Formalism.QuantumDeterminants.Mt k r =>
+                                    α (Matrix.of g))
+                                  ∧ (∀ y, α y ≠ 0 → y ∈ Ω) ∧ (∀ y, ‖α y‖ ≤ a)
+                                  ∧ ∀ x
+                                      ∈ Formalism.QuantumDeterminants.UH
+                                        (Formalism.QuantumDeterminants.Hpk k r),
+                                    MeasureTheory.Integrable
+                                        (fun g : Formalism.QuantumDeterminants.Mt k r =>
+                                          α (Matrix.of g) • W (x * Matrix.of g))
+                                        μG
+                                      ∧ rconv μG α W x = W x)
+                            ∧ ∃ (μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)) (cc : ℂ)
+                                (x₀ : Mat k r) (ξ : Vp),
+                              IsHaarOn (Formalism.QuantumDeterminants.UWset k r z) μW
+                                ∧ IsHaarOn (Formalism.QuantumDeterminants.Nset k r) μN
+                                ∧ x₀ ∈ Formalism.QuantumDeterminants.UH
+                                  (Formalism.QuantumDeterminants.Hpk k r)
+                                ∧ ∀ x, W x = cc • B0 z c σ π μW μN (σ x₀ w) ξ (σ x w)
 
-theorem scWlocShape_of (hWN : HaarWN) (hEq : AEquiv) (hC : ACont) (hK : AKind) (hRp : AReprod)
-    (hL : WavePacketL1L2) (hWt : AWeighted) (hNz : ANonzero) (hR : Formalism.L2.SG.HCReprodM.HCReprodDSm) :
-    WlocShape := by
+theorem scWlocShape_of
+    (hWN : HaarWN) (hEq : AEquiv) (hC : ACont) (hK : AKind) (hRp : AReprod) (hL : WavePacketL1L2)
+    (hWt : AWeighted) (hNz : ANonzero) (hR : Formalism.L2.SG.HCReprodM.HCReprodDSm)
+    : WlocShape := by
   intro hBNV hCW k r z c u v b hS H _ _ _ σ hσ Vp _ _ _ π hπ w hw μG μS ν hG hSμ hQ
   obtain ⟨μW, μN, hW, hN, hWf, hNc⟩ := hWN k r z hS.2.2.1 hS.2.2.2.1
   have hyp : Hyp k r z c u v b σ π w μG μS ν μW μN :=
@@ -99,16 +132,27 @@ theorem scWlocShape_of (hWN : HaarWN) (hEq : AEquiv) (hC : ACont) (hK : AKind) (
   have hL' := hL k r z c u v b H σ Vp π w μG μS ν μW μN hyp hR hCW x₀ hx₀ ξ
   set A := Af z c σ π μW μN w x₀ ξ with hA_def
   set cc : ℂ := (((Real.sqrt (l2SG ν A).toReal)⁻¹ : ℝ) : ℂ) with hcc
-  have hW' : Wf ν A = fun g => cc • A g := by
-    funext g; unfold Wf; congr 1; rw [hcc]; push_cast; rfl
-  refine ⟨Wf ν A, ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩, μW, μN, cc, x₀, ξ, hW, hN, hx₀, fun x => by rw [hW']; rfl⟩
+  have hW' : Wf ν A = fun g => cc • A g := by funext g; unfold Wf; congr 1; rw [hcc]; push_cast; rfl
+  refine ⟨
+    Wf ν A,
+    ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩,
+    μW,
+    μN,
+    cc,
+    x₀,
+    ξ,
+    hW,
+    hN,
+    hx₀,
+    fun x => by rw [hW']; rfl
+  ⟩
   · rw [hW']
     exact (hC k r z c u v b H σ Vp π w μG μS ν μW μN hyp hR hCW x₀ hx₀ ξ).const_smul cc
   · intro h hh m hm g hg
     rw [hW']
     have := hEq k r z c u v b H σ Vp π w μG μS ν μW μN hyp hR hCW x₀ hx₀ ξ h hh m hm g hg
-    change cc • Af z c σ π μW μN w x₀ ξ (h * m * g) =
-      psiGen k r z c m • (π h) (cc • Af z c σ π μW μN w x₀ ξ g)
+    change cc • Af z c σ π μW μN w x₀ ξ (h * m * g)
+      = psiGen k r z c m • (π h) (cc • Af z c σ π μW μN w x₀ ξ g)
     rw [this, smul_comm cc (psiGen k r z c m), map_smul]
   · intro x hx
     obtain ⟨hi, he⟩ := hK k r z c u v b H σ Vp π w μG μS ν μW μN hyp hR hCW x₀ hx₀ ξ x hx
@@ -127,12 +171,14 @@ theorem scWlocShape_of (hWN : HaarWN) (hEq : AEquiv) (hC : ACont) (hK : AKind) (
     rw [hW']
     exact ⟨integrable_smul_fun μG _ A cc x hi, by rw [rconv_smul, he]⟩
 
-theorem scWlocExists_of (hWN : HaarWN) (hEq : AEquiv) (hC : ACont) (hK : AKind) (hRp : AReprod)
-    (hL : WavePacketL1L2) (hWt : AWeighted) (hNz : ANonzero) (hR : Formalism.L2.SG.HCReprodM.HCReprodDSm) :
-    WlocExists := by
+theorem scWlocExists_of
+    (hWN : HaarWN) (hEq : AEquiv) (hC : ACont) (hK : AKind) (hRp : AReprod) (hL : WavePacketL1L2)
+    (hWt : AWeighted) (hNz : ANonzero) (hR : Formalism.L2.SG.HCReprodM.HCReprodDSm)
+    : WlocExists := by
   intro hBNV hCW k r z c u v b hS H _ _ _ σ hσ Vp _ _ _ π hπ w hw μG μS ν hG hSμ hQ
-  obtain ⟨W, hWc, _⟩ := scWlocShape_of hWN hEq hC hK hRp hL hWt hNz hR hBNV hCW k r z c u v b hS H σ hσ
-    Vp π hπ w hw μG μS ν hG hSμ hQ
+  obtain ⟨W, hWc, _⟩ :=
+    scWlocShape_of hWN hEq hC hK hRp hL hWt hNz hR hBNV hCW k r z c u v b hS H σ hσ Vp π hπ w hw μG
+      μS ν hG hSμ hQ
   exact ⟨W, hWc⟩
 
 end WlocSk

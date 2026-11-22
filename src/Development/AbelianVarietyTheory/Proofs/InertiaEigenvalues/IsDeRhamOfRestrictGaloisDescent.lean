@@ -9,20 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DeRhamJum
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
 open scoped TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.DeRhamDescent
 
-theorem finrank_fixed {R G M K L : Type} [Field R] [Group G] [AddCommGroup M] [Module R M]
-    [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [IsGalois K L]
+theorem finrank_fixed
+    {R G M K L : Type} [Field R] [Group G] [AddCommGroup M] [Module R M] [Field K] [Field L]
+    [Algebra K L] [FiniteDimensional K L] [IsGalois K L]
     (A : G →* Module.End R M) (m : L →+* Module.End R M) (ε : G →* (L ≃ₐ[K] L))
     (hs : Function.Surjective ε) (hε : ∀ g a x, A g (m a x) = m (ε g a) (A g x))
-    (D D' : Submodule R M) (hD : ∀ x, x ∈ D ↔ ∀ g, A g x = x)
-    (hD' : ∀ x, x ∈ D' ↔ ∀ g, ε g = 1 → A g x = x) :
-    Module.finrank R D' = Module.finrank K L * Module.finrank R D := by
+    (D D' : Submodule R M)
+    (hD : ∀ x, x ∈ D ↔ ∀ g, A g x = x) (hD' : ∀ x, x ∈ D' ↔ ∀ g, ε g = 1 → A g x = x)
+    : Module.finrank R D' = Module.finrank K L * Module.finrank R D := by
   classical
   have hc : Fintype.card (L ≃ₐ[K] L) = Module.finrank K L := by
     rw [← Nat.card_eq_fintype_card]; exact IsGalois.card_aut_eq_finrank K L
@@ -44,8 +46,8 @@ theorem finrank_fixed {R G M K L : Type} [Field R] [Group G] [AddCommGroup M] [M
     simpa only [Matrix.mul_apply, Pm, Qm, Matrix.of_apply, Matrix.one_apply] using this
   have h2 : ∀ σ : L ≃ₐ[K] L, ∑ i, b i * σ (μ i) = if 1 = σ then 1 else 0 := fun σ => by
     have := congrFun (congrFun hPQ 1) σ
-    simpa only [Matrix.mul_apply, Pm, Qm, Matrix.of_apply, Matrix.one_apply,
-      AlgEquiv.one_apply] using this
+    simpa only [Matrix.mul_apply, Pm, Qm, Matrix.of_apply, Matrix.one_apply, AlgEquiv.one_apply]
+      using this
   choose s hs' using hs
   have hm : ∀ a, ∀ x ∈ D', m a x ∈ D' := fun a x hx => by
     rw [hD'] at hx ⊢
@@ -56,12 +58,11 @@ theorem finrank_fixed {R G M K L : Type} [Field R] [Group G] [AddCommGroup M] [M
     have := (hD' x).1 hx (g'⁻¹ * g) (by rw [map_mul, map_inv, h, inv_mul_cancel])
     conv_rhs => rw [← this]
     rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel_left]
-  let Φ₀ : ((L ≃ₐ[K] L) → D) →ₗ[R] M :=
-    ∑ i, (m (b i)) ∘ₗ D.subtype ∘ₗ LinearMap.proj i
-  have hΦ : ∀ x, Φ₀ x = ∑ i, m (b i) (x i) := fun x => by
-    simp [Φ₀]
+  let Φ₀ : ((L ≃ₐ[K] L) → D) →ₗ[R] M := ∑ i, (m (b i)) ∘ₗ D.subtype ∘ₗ LinearMap.proj i
+  have hΦ : ∀ x, Φ₀ x = ∑ i, m (b i) (x i) := fun x => by simp [Φ₀]
   have hinj : Function.Injective Φ₀ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     have h3 : ∀ σ : L ≃ₐ[K] L, ∑ i, m (σ (b i)) (x i) = 0 := fun σ => by
       have := congrArg (A (s σ)) hx
@@ -89,8 +90,7 @@ theorem finrank_fixed {R G M K L : Type} [Field R] [Group G] [AddCommGroup M] [M
     · intro x hx
       refine ⟨fun i => ⟨∑ σ, A (s σ) (m (μ i) x), (hD _).2 fun g => ?_⟩, ?_⟩
       · set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, ← Equiv.sum_comp (Equiv.mulLeft (ε g))
-          (fun σ => A (s σ) (m (μ i) x))]
+          rw [map_sum, ← Equiv.sum_comp (Equiv.mulLeft (ε g)) (fun σ => A (s σ) (m (μ i) x))]
         refine Finset.sum_congr rfl fun σ _ => ?_
         rw [← Module.End.mul_apply, ← map_mul]
         exact hA _ (hm _ _ hx) _ _ (by simp [hs'])
@@ -113,13 +113,13 @@ theorem finrank_fixed {R G M K L : Type} [Field R] [Group G] [AddCommGroup M] [M
       (LinearMap.proj (R := R) (φ := fun _ : L ≃ₐ[K] L => D) (1 : L ≃ₐ[K] L))
       (fun y => ⟨fun _ => y, rfl⟩))
 
-
 open GlobalTheory.JumpDescent TensorProduct in
-theorem isDR_of_restrict : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K K' LL : FinExt l)
-    (hle : GK K' ≤ GK K), K.1 ≤ K'.1 → (∀ g ∈ GK K, ∀ x ∈ K'.1, g x ∈ K'.1) →
-    ∀ (V : Type) [AddCommGroup V] [Module ↥LL.1 V] [Module ℚ_[l] V]
-      [IsScalarTower ℚ_[l] ↥LL.1 V] (ρ : Representation ↥LL.1 ↥(GK K) V),
-      IsDR (P.PD K') (V := V) (ρ.comp (Subgroup.inclusion hle)) → IsDR (P.PD K) ρ := by
+theorem isDR_of_restrict
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K K' LL : FinExt l) (hle : GK K' ≤ GK K),
+      K.1 ≤ K'.1 → (∀ g ∈ GK K, ∀ x ∈ K'.1, g x ∈ K'.1)
+        → ∀ (V : Type) [AddCommGroup V] [Module ↥LL.1 V] [Module ℚ_[l] V]
+            [IsScalarTower ℚ_[l] ↥LL.1 V] (ρ : Representation ↥LL.1 ↥(GK K) V),
+          IsDR (P.PD K') (V := V) (ρ.comp (Subgroup.inclusion hle)) → IsDR (P.PD K) ρ := by
   intro l _ P K K' LL hle h hst V _ _ _ _ ρ hρ
   unfold IsDR at hρ ⊢
   haveI : FiniteDimensional ℚ_[l] ↥K'.1 := K'.2
@@ -137,45 +137,48 @@ theorem isDR_of_restrict : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K K' L
   let ε : ↥(GK K) →* (↥L ≃ₐ[↥K.1] ↥L) := (AlgEquiv.restrictNormalHom ↥L).comp e.toMonoidHom
   have hεa : ∀ (g : ↥(GK K)) (x : ↥L), ((ε g x : ↥L) : Om l) = (g : GQ l) x := fun g x =>
     AlgEquiv.restrictNormalHom_apply L (e g) x
-  let A : ↥(GK K) →* Module.End ↥LL.1 (V ⊗[ℚ_[l]] P.R.BdR) :=
-    { toFun := actVdR (P.PD K) ρ
-      map_one' := by ext v b; simp [actVdR_tmul]
-      map_mul' := fun g g' => by ext v b; simp [actVdR_tmul] }
-  let m : ↥L →+* Module.End ↥LL.1 (V ⊗[ℚ_[l]] P.R.BdR) :=
-    { toFun := fun c => mulOm P (c : Om l)
-      map_one' := by ext v b; simp [mulOm_tmul]
-      map_mul' := fun g g' => by ext v b; simp [mulOm_tmul, mul_assoc]
-      map_zero' := by ext v b; simp [mulOm_tmul]
-      map_add' := fun g g' => by ext v b; simp [mulOm_tmul, add_mul, tmul_add] }
-  have key := finrank_fixed A m ε
-    ((AlgEquiv.restrictNormalHom_surjective (F := ↥K.1) (K₁ := ↥L) (Om l)).comp e.surjective)
-    (fun g c x => by
-      change actVdR (P.PD K) ρ g (mulOm (LL := ↥LL.1) P (c : Om l) x) =
-        mulOm (LL := ↥LL.1) P ((ε g c : ↥L) : Om l) (actVdR (P.PD K) ρ g x)
-      rw [hεa]
-      induction x using TensorProduct.induction_on with
-      | zero => simp only [map_zero]
-      | tmul v b => simp [mulOm_tmul, actVdR_tmul, P.actQdR_Om]
-      | add y z hy hz => simp only [map_add (f := _), hy, hz])
-    (DdR (P.PD K) ρ) (DdR (P.PD K') (ρ.comp (Subgroup.inclusion hle)))
-    (fun x => mem_DdR P K ρ x)
-    (fun x => by
-      rw [mem_DdR]
-      constructor
-      · intro hx g hg
-        have hg' : g.1 ∈ GK K' := fun a => by
-          have := hεa g ⟨a.1, a.2⟩
-          rw [hg] at this
-          exact this.symm
-        have := hx ⟨g.1, hg'⟩
-        rw [actVdR_comp P h] at this
-        exact this
-      · intro hx g
-        rw [actVdR_comp P h]
-        apply hx
-        ext a
+  let A : ↥(GK K) →* Module.End ↥LL.1 (V ⊗[ℚ_[l]] P.R.BdR) := {
+    toFun := actVdR (P.PD K) ρ
+    map_one' := by ext v b; simp [actVdR_tmul]
+    map_mul' := fun g g' => by ext v b; simp [actVdR_tmul]
+  }
+  let m : ↥L →+* Module.End ↥LL.1 (V ⊗[ℚ_[l]] P.R.BdR) := {
+    toFun := fun c => mulOm P (c : Om l)
+    map_one' := by ext v b; simp [mulOm_tmul]
+    map_mul' := fun g g' => by ext v b; simp [mulOm_tmul, mul_assoc]
+    map_zero' := by ext v b; simp [mulOm_tmul]
+    map_add' := fun g g' => by ext v b; simp [mulOm_tmul, add_mul, tmul_add]
+  }
+  have key :=
+    finrank_fixed A m ε
+      ((AlgEquiv.restrictNormalHom_surjective (F := ↥K.1) (K₁ := ↥L) (Om l)).comp e.surjective)
+      (fun g c x => by
+        change actVdR (P.PD K) ρ g (mulOm (LL := ↥LL.1) P (c : Om l) x)
+          = mulOm (LL := ↥LL.1) P ((ε g c : ↥L) : Om l) (actVdR (P.PD K) ρ g x)
         rw [hεa]
-        exact g.2 ⟨a.1, a.2⟩)
+        induction x using TensorProduct.induction_on with
+        | zero => simp only [map_zero]
+        | tmul v b => simp [mulOm_tmul, actVdR_tmul, P.actQdR_Om]
+        | add y z hy hz => simp only [map_add (f := _), hy, hz])
+      (DdR (P.PD K) ρ) (DdR (P.PD K') (ρ.comp (Subgroup.inclusion hle)))
+      (fun x => mem_DdR P K ρ x)
+      (fun x => by
+        rw [mem_DdR]
+        constructor
+        · intro hx g hg
+          have hg' : g.1 ∈ GK K' := fun a => by
+            have := hεa g ⟨a.1, a.2⟩
+            rw [hg] at this
+            exact this.symm
+          have := hx ⟨g.1, hg'⟩
+          rw [actVdR_comp P h] at this
+          exact this
+        · intro hx g
+          rw [actVdR_comp P h]
+          apply hx
+          ext a
+          rw [hεa]
+          exact g.2 ⟨a.1, a.2⟩)
   have hfin : Module.finrank ℚ_[l] ↥K'.1 = Module.finrank ℚ_[l] ↥K.1 * Module.finrank ↥K.1 ↥L :=
     (Module.finrank_mul_finrank ℚ_[l] ↥K.1 ↥L).symm
   have hpos : 0 < Module.finrank ↥K.1 ↥L := Module.finrank_pos

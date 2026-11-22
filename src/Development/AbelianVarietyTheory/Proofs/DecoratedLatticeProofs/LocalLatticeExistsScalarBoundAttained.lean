@@ -4,10 +4,18 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Nor
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Core.Rk GlobalTheory.Core.Mi
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain
+  NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict
+  Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf
+  GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (latV Moves MonoAt OrthAt PrimAt idAt intAt grpAt colMul Lat SplitPt GoodBF GluedCore IsSumFrame)
+open GlobalTheory.FinPl
+  (latV Moves MonoAt OrthAt PrimAt idAt intAt grpAt colMul Lat SplitPt GoodBF GluedCore IsSumFrame)
 open GlobalTheory.SeeSaw (idV dI FI)
 open ValuativeRel
 open GlobalTheory.Core.Mi.LatMatch
@@ -15,7 +23,11 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem lattice_exists_scalar_bound_attained : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] (L : Submodule 𝒪[k] (n → k)), L.IsFullLattice k → Nonempty n → ∃ c : k, c ≠ 0 ∧ (∀ x ∈ L, ∀ j, c⁻¹ * x j ∈ 𝒪[k]) ∧ ∃ x ∈ L, ∃ j, x j = c := by
+theorem lattice_exists_scalar_bound_attained
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : Type) [Fintype n] (L : Submodule 𝒪[k] (n → k)),
+      L.IsFullLattice k → Nonempty n
+        → ∃ c : k, c ≠ 0 ∧ (∀ x ∈ L, ∀ j, c⁻¹ * x j ∈ 𝒪[k]) ∧ ∃ x ∈ L, ∃ j, x j = c := by
   intro k _ _ _ _ n _ L hL hn
   obtain ⟨s, hs⟩ := hL.fg
 
@@ -37,8 +49,10 @@ theorem lattice_exists_scalar_bound_attained : ∀ (k : Type) [Field k] [Valuati
     simp at this
   obtain ⟨x0, hx0, j0, hx0j⟩ := hex
   have hne : (s ×ˢ (Finset.univ : Finset n)).Nonempty := ⟨(x0, j0), by simp [hx0]⟩
-  obtain ⟨p, hp, hmax⟩ := Finset.exists_max_image (s ×ˢ (Finset.univ : Finset n))
-    (fun q : (n → k) × n => valuation k (q.1 q.2)) hne
+  obtain ⟨p, hp, hmax⟩ :=
+    Finset.exists_max_image (s ×ˢ (Finset.univ : Finset n))
+      (fun q : (n → k) × n => valuation k (q.1 q.2))
+      hne
   have hc : p.1 p.2 ≠ 0 := by
     intro h0
     have := hmax (x0, j0) (by simp [hx0])
@@ -56,10 +70,12 @@ theorem lattice_exists_scalar_bound_attained : ∀ (k : Type) [Field k] [Valuati
       simp only at hle
       have hvc : valuation k (p.1 p.2) ≠ 0 := by simpa using hc
       rw [map_mul, map_inv₀]
-      calc (valuation k (p.1 p.2))⁻¹ * valuation k (y j)
+      calc
+        (valuation k (p.1 p.2))⁻¹ * valuation k (y j)
           ≤ (valuation k (p.1 p.2))⁻¹ * valuation k (p.1 p.2) := by gcongr
         _ = 1 := inv_mul_cancel₀ hvc
-    | zero => intro j; simp
+    | zero =>
+      intro j; simp
     | add y z _ _ hy hz =>
       intro j
       simpa [mul_add] using add_mem (hy j) (hz j)

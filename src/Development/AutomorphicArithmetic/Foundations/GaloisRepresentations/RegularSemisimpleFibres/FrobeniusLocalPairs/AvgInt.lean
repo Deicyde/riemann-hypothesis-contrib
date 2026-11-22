@@ -78,16 +78,16 @@ theorem avgInt : AvgInt := by
     rw [Subgroup.index_eq_card, Nat.card_eq_fintype_card]
   have hreal : ∀ c, μ.real (A c) = ((S.index : ℝ))⁻¹ := by
     intro c
-    have hne : (Fintype.card (K ⧸ S) : ℝ≥0∞) ≠ 0 := by
-      simp
+    have hne : (Fintype.card (K ⧸ S) : ℝ≥0∞) ≠ 0 := by simp
     have h1 : μ S' = ((Fintype.card (K ⧸ S) : ℝ≥0∞))⁻¹ := by
       rw [← ENNReal.eq_div_iff hne (by simp), ENNReal.div_eq_inv_mul, mul_one] at hsum
       exact hsum
     rw [Measure.real, hAμ, h1, ENNReal.toReal_inv, ENNReal.toReal_natCast, hcard]
   haveI : IsFiniteMeasure (μ.restrict (K : Set G)) :=
     ⟨by rw [Measure.restrict_apply_univ, hK1]; exact ENNReal.one_lt_top⟩
-  have hint : ∫ y in (K : Set G), F (q * y) ∂μ =
-      ∫ y in (K : Set G), ∑ c, (A c).indicator (fun _ => u (Quotient.out c)) y ∂μ := by
+  have hint
+      : ∫ y in (K : Set G), F (q * y) ∂μ
+        = ∫ y in (K : Set G), ∑ c, (A c).indicator (fun _ => u (Quotient.out c)) y ∂μ := by
     refine setIntegral_congr_fun hKo.measurableSet fun y hy => ?_
     rw [Finset.sum_eq_single (QuotientGroup.mk (⟨y, hy⟩ : K) : K ⧸ S)]
     · rw [Set.indicator_of_mem ((hmemA _ y).mpr ⟨hy, rfl⟩)]

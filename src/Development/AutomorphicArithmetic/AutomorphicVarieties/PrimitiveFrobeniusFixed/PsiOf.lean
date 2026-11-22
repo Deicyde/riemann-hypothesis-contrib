@@ -10,11 +10,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-theorem UpperTheory.V.ML.psiOf :
-    Rec → PsiBound := by
+theorem UpperTheory.V.ML.psiOf : Rec → PsiBound := by
   intro hR E Ω _ _ _ _ _ _ _ _ _ _ N _ ρ hρ l _ hl2 hlE O _ _ e he ψ hodd a ha
   haveI : IsGalois ℚ E := inferInstance
   let c : HV.Coef l := ⟨O, inferInstance, inferInstance⟩
@@ -30,8 +31,7 @@ theorem UpperTheory.V.ML.psiOf :
     apply orderOf_dvd_of_pow_eq_one
     ext b
     simp only [ψ', MulChar.pow_apply_coe, MulChar.ofUnitHom_coe, MulChar.one_apply_coe]
-    have h2 : ψ (ρ b) ^ Fintype.card Gal(E/ℚ) = 1 := by
-      rw [← map_pow, pow_card_eq_one, map_one]
+    have h2 : ψ (ρ b) ^ Fintype.card Gal(E/ℚ) = 1 := by rw [← map_pow, pow_card_eq_one, map_one]
     have h3 := congrArg (fun u : (↥O)ˣ => ((u : ↥O) : PadicAlgCl l)) h2
     simpa using h3
   have hodd' : ψ' (-1) = (-1) ^ (e + 1) := by
@@ -61,8 +61,10 @@ theorem UpperTheory.V.ML.psiOf :
     intro g hg
     rw [MonoidHom.mem_ker] at hg ⊢
     simp [hg]
-  have heig := Chr.eigV ℚ Ω l O e (ψ.comp (AlgEquiv.restrictNormalHom E)) (galOf ℚ E Ω) hopen hle
-    (by rw [hidx]; exact hlE)
-  have hpsi : psiLen Ω e ψ = Chr.eigL l e (galOf ℚ E Ω) (ψ.comp (AlgEquiv.restrictNormalHom E)) := rfl
+  have heig :=
+    Chr.eigV ℚ Ω l O e (ψ.comp (AlgEquiv.restrictNormalHom E)) (galOf ℚ E Ω) hopen hle
+      (by rw [hidx]; exact hlE)
+  have hpsi : psiLen Ω e ψ = Chr.eigL l e (galOf ℚ E Ω) (ψ.comp (AlgEquiv.restrictNormalHom E)) :=
+    rfl
   rw [hpsi, heig, ← hdir]
   exact key

@@ -21,25 +21,30 @@ set_option maxSynthPendingDepth 1
 
 noncomputable section
 
-open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Pub.CxInt GlobalTheory.CompanionTheory.Ar.Pub.CxComp Filter Topology
+open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
+  GlobalTheory.CompanionTheory.Ar.Pub.CxInt GlobalTheory.CompanionTheory.Ar.Pub.CxComp Filter
+  Topology
 open ReciprocityTheory.AnForm.R (conePts)
-open GlobalTheory.CompanionTheory.Ar.Pub.CxChart (chartSet chartComponents chartSection domCell absLogNorm)
+open GlobalTheory.CompanionTheory.Ar.Pub.CxChart
+  (chartSet chartComponents chartSection domCell absLogNorm)
 open GroundTheory.Heights₂.Heights (chartProjMatrix chartWeight chartPot chartDens chartAbsDens)
 
 namespace GlobalTheory.CompanionTheory.Ar.Pub.CxChart.FibSum
 
 open scoped Matrix
-open GroundTheory.Heights₂.Heights (chartLift chartProjMatrix_mulVec chartWeight_of_coord segre_chartLift
-  chartLift_segre_apply IsSheetAt sheetSum)
+open GroundTheory.Heights₂.Heights
+  (chartLift chartProjMatrix_mulVec chartWeight_of_coord segre_chartLift chartLift_segre_apply
+    IsSheetAt sheetSum)
 open GroundTheory.Heights₂.Heights.ComplexSets (zeroSet IsFiniteProjection)
-open GroundTheory.Heights₂.Heights.PtsSegreChartFibreSum (isClosed_zeroSet exists_minimalPrime_of_mem_zeroSet
-  exists_poly_of_not_mem logNorm_ofWeight_one isSectionOn_ofWeight_one)
+open GroundTheory.Heights₂.Heights.PtsSegreChartFibreSum
+  (isClosed_zeroSet exists_minimalPrime_of_mem_zeroSet exists_poly_of_not_mem logNorm_ofWeight_one
+    isSectionOn_ofWeight_one)
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem eval_bsmul_of_isMultiHomogC {s : MRingOver ℂ ι} {a : K → ℕ} (hs : IsMultiHomog s a) (c : K → ℂ)
-    (z : (Σ k, ι k) → ℂ) :
-    eval (bsmul c z) s = (∏ k, c k ^ a k) * eval z s := by
+theorem eval_bsmul_of_isMultiHomogC
+    {s : MRingOver ℂ ι} {a : K → ℕ} (hs : IsMultiHomog s a) (c : K → ℂ) (z : (Σ k, ι k) → ℂ)
+    : eval (bsmul c z) s = (∏ k, c k ^ a k) * eval z s := by
   rw [eval_eq', eval_eq', Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
   have hprod : ∏ p, (bsmul c z p) ^ m p = (∏ k, c k ^ a k) * ∏ p, z p ^ m p := by
@@ -52,8 +57,11 @@ theorem eval_bsmul_of_isMultiHomogC {s : MRingOver ℂ ι} {a : K → ℕ} (hs :
   rw [hprod]
   ring
 
-theorem bsmul_mem_conePts {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q) {c : K → ℂ}
-    (hc : ∀ k, c k ≠ 0) {z : (Σ k, ι k) → ℂ} (hz : z ∈ conePts Q) : bsmul c z ∈ conePts Q := by
+theorem bsmul_mem_conePts
+    {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
+    {c : K → ℂ} (hc : ∀ k, c k ≠ 0)
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ conePts Q)
+    : bsmul c z ∈ conePts Q := by
   refine ⟨fun k => ?_, fun f hf => ?_⟩
   · obtain ⟨j, hj⟩ := hz.1 k
     exact ⟨j, mul_ne_zero (hc k) hj⟩
@@ -66,18 +74,20 @@ theorem bsmul_mem_conePts {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal
         hz.2 s (by rw [hQS]; exact Ideal.subset_span hs), mul_zero]
     exact hle hf
 
-theorem isSheet_bot_of_isSetSheet {e : ℕ} {Q : Ideal (MRingOver ℂ ι)}
-    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {y : Fin e → ℂ}
-    {w : ((k : K) → ι k) → ℂ} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ}
-    (h : IsSetSheet (conePts Q) Ψ y w γ) : IsSheet (⊥ : Ideal (MRing ι)) Ψ y w γ := by
+theorem isSheet_bot_of_isSetSheet
+    {e : ℕ} {Q : Ideal (MRingOver ℂ ι)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
+    {y : Fin e → ℂ} {w : ((k : K) → ι k) → ℂ} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ}
+    (h : IsSetSheet (conePts Q) Ψ y w γ)
+    : IsSheet (⊥ : Ideal (MRing ι)) Ψ y w γ := by
   refine ⟨h.1, h.2.mono fun y' hy' => ⟨hy'.1, ⟨hy'.2.1.1, fun f hf => ?_⟩, hy'.2.2⟩⟩
   rw [Ideal.mem_bot.1 hf]
   simp
 
-theorem mem_setFibre_of_chart {e m : ℕ} {S : Set ((Σ k, ι k) → ℂ)} {σ : Fin m ≃ ((k : K) → ι k)}
-    {i : (k : K) → ι k} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hΨ0 : ∀ w, Ψ w 0 = w i)
-    {x : Fin m → ℂ} (hx : x ∈ chartSet S σ i) :
-    (fun i' => x (σ.symm i')) ∈ setFibre S Ψ (chartProjMatrix σ Ψ *ᵥ x) := by
+theorem mem_setFibre_of_chart
+    {e m : ℕ} {S : Set ((Σ k, ι k) → ℂ)} {σ : Fin m ≃ ((k : K) → ι k)} {i : (k : K) → ι k}
+    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hΨ0 : ∀ w, Ψ w 0 = w i)
+    {x : Fin m → ℂ} (hx : x ∈ chartSet S σ i)
+    : (fun i' => x (σ.symm i')) ∈ setFibre S Ψ (chartProjMatrix σ Ψ *ᵥ x) := by
   obtain ⟨z, hz, hzi, hxe⟩ := hx
   have hw : (fun i' => x (σ.symm i')) = segre z := by
     funext i'
@@ -89,10 +99,11 @@ theorem mem_setFibre_of_chart {e m : ℕ} {S : Set ((Σ k, ι k) → ℂ)} {σ :
   · rw [hΨ0, hzi, Fin.cons_zero]
   · rw [Fin.cons_succ, chartProjMatrix_mulVec, hw]
 
-theorem chart_of_mem_setFibre {e m : ℕ} {S : Set ((Σ k, ι k) → ℂ)} {σ : Fin m ≃ ((k : K) → ι k)}
-    {i : (k : K) → ι k} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hΨ0 : ∀ w, Ψ w 0 = w i)
-    {y : Fin e → ℂ} {w : ((k : K) → ι k) → ℂ} (hw : w ∈ setFibre S Ψ y) :
-    (fun a => w (σ a)) ∈ chartSet S σ i ∧ chartProjMatrix σ Ψ *ᵥ (fun a => w (σ a)) = y := by
+theorem chart_of_mem_setFibre
+    {e m : ℕ} {S : Set ((Σ k, ι k) → ℂ)} {σ : Fin m ≃ ((k : K) → ι k)} {i : (k : K) → ι k}
+    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hΨ0 : ∀ w, Ψ w 0 = w i)
+    {y : Fin e → ℂ} {w : ((k : K) → ι k) → ℂ} (hw : w ∈ setFibre S Ψ y)
+    : (fun a => w (σ a)) ∈ chartSet S σ i ∧ chartProjMatrix σ Ψ *ᵥ (fun a => w (σ a)) = y := by
   obtain ⟨z, hz, rfl, hΨw⟩ := hw
   have hzi : segre z i = 1 := by
     have h := hΨ0 (segre z)
@@ -105,10 +116,11 @@ theorem chart_of_mem_setFibre {e m : ℕ} {S : Set ((Σ k, ι k) → ℂ)} {σ :
 
 variable [DecidableEq K]
 
-theorem chartLift_of_chartSet {m : ℕ} {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
+theorem chartLift_of_chartSet
+    {m : ℕ} {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
     {σ : Fin m ≃ ((k : K) → ι k)} {i : (k : K) → ι k} {x : Fin m → ℂ}
-    (hx : x ∈ chartSet (conePts Q) σ i) :
-    chartLift σ i x ∈ conePts Q ∧ segre (chartLift σ i x) = fun i' => x (σ.symm i') := by
+    (hx : x ∈ chartSet (conePts Q) σ i)
+    : chartLift σ i x ∈ conePts Q ∧ segre (chartLift σ i x) = fun i' => x (σ.symm i') := by
   obtain ⟨z, hz, hzi, rfl⟩ := hx
   have hne : ∀ k, z ⟨k, i k⟩ ≠ 0 := by
     have h1 : ∏ k, z ⟨k, i k⟩ ≠ 0 := by
@@ -129,7 +141,8 @@ theorem chartLift_of_chartSet {m : ℕ} {Q : Ideal (MRingOver ℂ ι)} (hQ : IsM
     funext i'
     simp
 
-theorem term_eq {e m : ℕ} {Q : Ideal (MRingOver ℂ ι)} {σ : Fin m ≃ ((k : K) → ι k)} {i : (k : K) → ι k}
+theorem term_eq
+    {e m : ℕ} {Q : Ideal (MRingOver ℂ ι)} {σ : Fin m ≃ ((k : K) → ι k)} {i : (k : K) → ι k}
     {L : Fin e → HermLine ι} {g : ((Σ k, ι k) → ℂ) → ℝ}
     {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
     (hMH : IsMultiHomogIdeal Q) (hL : ∀ j, IsSmoothHerm (L j))
@@ -141,9 +154,10 @@ theorem term_eq {e m : ℕ} {Q : Ideal (MRingOver ℂ ι)} {σ : Fin m ≃ ((k :
     {y : Fin e → ℂ} {x : Fin m → ℂ}
     (hx : x ∈ GroundTheory.Heights₂.Heights.ComplexSets.fibre J (chartProjMatrix σ Ψ) y)
     (hsep : ∀ J' ∈ chartComponents (conePts Q) σ i, J' ≠ J → x ∉ zeroSet J')
-    (hsh : ∃ s, IsSheetAt J (chartProjMatrix σ Ψ) x s) :
-    chartWeight σ i g x * ReciprocityTheory.AnForm.maDens (fun k => chartPot σ i L k ∘ hsh.choose) y =
-      setSheetDensity (conePts Q) Ψ (pot L) g y (fun i' => x (σ.symm i')) := by
+    (hsh : ∃ s, IsSheetAt J (chartProjMatrix σ Ψ) x s)
+    : chartWeight σ i g x
+        * ReciprocityTheory.AnForm.maDens (fun k => chartPot σ i L k ∘ hsh.choose) y
+      = setSheetDensity (conePts Q) Ψ (pot L) g y (fun i' => x (σ.symm i')) := by
   classical
   obtain ⟨U, hUo, hxU, hsd, hsx, hsU, V, hV, hloc⟩ := hsh.choose_spec
   generalize hsh.choose = s at hsd hsx hsU hloc ⊢
@@ -190,13 +204,16 @@ theorem term_eq {e m : ℕ} {Q : Ideal (MRingOver ℂ ι)} {σ : Fin m ≃ ((k :
     have h2 := (hcseg.continuousAt.comp hγan.continuousAt).tendsto
     simp only [Function.comp_def] at h2
     rwa [hxy0] at h2
-  have hE4 : ∀ᶠ y' in 𝓝 y, ∀ J' ∈ chartComponents (conePts Q) σ i, J' ≠ J →
-      (fun a => segre (γ y') (σ a)) ∉ zeroSet J' := by
+  have hE4
+      : ∀ᶠ y' in 𝓝 y, ∀ J' ∈ chartComponents (conePts Q) σ i, J' ≠ J →
+        (fun a => segre (γ y') (σ a)) ∉ zeroSet J' := by
     refine (eventually_all_finset _).2 fun J' hJ' => ?_
     by_cases hJJ : J' = J
     · exact Eventually.of_forall fun _ h => absurd hJJ h
-    · exact Filter.Eventually.mono (p := fun y' => (fun a => segre (γ y') (σ a)) ∈ (zeroSet J')ᶜ)
-        (ht ((isClosed_zeroSet J').isOpen_compl.mem_nhds (hsep J' hJ' hJJ))) fun _ h _ => h
+    · exact Filter.Eventually.mono
+        (p := fun y' => (fun a => segre (γ y') (σ a)) ∈ (zeroSet J')ᶜ)
+        (ht ((isClosed_zeroSet J').isOpen_compl.mem_nhds (hsep J' hJ' hJJ)))
+        fun _ h _ => h
   have hseg : (fun y' => segre (γ y')) =ᶠ[𝓝 y] fun y' => segre (chartLift σ i (s y')) := by
     filter_upwards [hγ.2, hUo.mem_nhds hxU, ht hV, hE4] with y' hy' hyU hxV h4
     obtain ⟨-, hmc, hΨy⟩ := hy'
@@ -218,34 +235,41 @@ theorem term_eq {e m : ℕ} {Q : Ideal (MRingOver ℂ ι)} {σ : Fin m ≃ ((k :
     rw [← hxs]
     exact (segre_chartLift σ i (γ y') hzi).symm
   have hy0 : ∀ k, ∃ j, γ y ⟨k, j⟩ ≠ 0 := hγ.2.self_of_nhds.2.1.1
-  have hde := density_eq hL (isSectionOn_ofWeight_one (P := (⊥ : Ideal (MRing ι))) Ideal.isPrime_bot g hg)
-    hγan hγ'an hy0 hseg
+  have hde :=
+    density_eq hL (isSectionOn_ofWeight_one (P := (⊥ : Ideal (MRing ι))) Ideal.isPrime_bot g hg)
+      hγan hγ'an hy0 hseg
   rw [logNorm_ofWeight_one, logNorm_ofWeight_one] at hde
   rw [hde, chartWeight_of_coord g hx1, hsx]
   rfl
 
-theorem fibreSum : ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
-    (Q : Ideal (MRingOver ℂ ι)) (e m : ℕ) (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k)
-    (L : Fin e → HermLine ι) (g : ((Σ k, ι k) → ℂ) → ℝ)
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)),
-    IsCxVar Q e → (∀ j, IsSmoothHerm (L j)) →
-    (∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ), (∀ k, c k ≠ 0) → g (fun p => c p.1 * z p) = g z) →
-    (∀ w, Ψ w 0 = w i) → (∀ y, (setFibre (conePts Q) Ψ y).Finite) →
-    GroundTheory.Heights₂.Heights.ComplexSets.zeroSet (GlobalTheory.CompanionTheory.Ar.Pub.CxChart.chartIdeal (conePts Q) σ i) =
-      chartSet (conePts Q) σ i →
-    (∀ J ∈ chartComponents (conePts Q) σ i, ringKrullDim (MvPolynomial (Fin m) ℂ ⧸ J) = (e : ℕ)) →
-    (∀ J ∈ chartComponents (conePts Q) σ i,
-      GroundTheory.Heights₂.Heights.ComplexSets.IsFiniteProjection J (chartProjMatrix σ Ψ)) →
-    ∀ᵐ y, ∑ᶠ w ∈ setFibre (conePts Q) Ψ y, setSheetDensity (conePts Q) Ψ (pot L) g y w =
-      ∑ J ∈ chartComponents (conePts Q) σ i,
-        chartDens J (chartProjMatrix σ Ψ) (chartWeight σ i g) (chartPot σ i L) y := by
+theorem fibreSum
+    : ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
+        (Q : Ideal (MRingOver ℂ ι)) (e m : ℕ) (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k)
+        (L : Fin e → HermLine ι) (g : ((Σ k, ι k) → ℂ) → ℝ)
+        (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)),
+      IsCxVar Q e → (∀ j, IsSmoothHerm (L j))
+        → (∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ), (∀ k, c k ≠ 0) → g (fun p => c p.1 * z p) = g z)
+        → (∀ w, Ψ w 0 = w i) → (∀ y, (setFibre (conePts Q) Ψ y).Finite)
+        → GroundTheory.Heights₂.Heights.ComplexSets.zeroSet
+            (GlobalTheory.CompanionTheory.Ar.Pub.CxChart.chartIdeal (conePts Q) σ i)
+          = chartSet (conePts Q) σ i
+        → (∀ J ∈ chartComponents (conePts Q) σ i,
+          ringKrullDim (MvPolynomial (Fin m) ℂ ⧸ J) = (e : ℕ))
+        → (∀ J ∈ chartComponents (conePts Q) σ i,
+          GroundTheory.Heights₂.Heights.ComplexSets.IsFiniteProjection J (chartProjMatrix σ Ψ))
+        → ∀ᵐ y, ∑ᶠ w ∈ setFibre (conePts Q) Ψ y, setSheetDensity (conePts Q) Ψ (pot L) g y w =
+            ∑ J ∈ chartComponents (conePts Q) σ i,
+              chartDens J (chartProjMatrix σ Ψ) (chartWeight σ i g) (chartPot σ i L) y := by
   intro K _ _ ι _ Q e m σ i L g Ψ hQ hL hg hΨ0 hfinF hzero hdim hfinp
   classical
   set A := chartProjMatrix σ Ψ with hAdef
   set C := chartComponents (conePts Q) σ i with hCdef
   have hMH : IsMultiHomogIdeal Q := hQ.2.1.2.1
-  have hmin : ∀ J ∈ C, J ∈ (GlobalTheory.CompanionTheory.Ar.Pub.CxChart.chartIdeal (conePts Q) σ i).minimalPrimes :=
-    fun J hJ => GlobalTheory.CompanionTheory.Ar.Pub.CxChart.mem_chartComponents.1 hJ
+  have hmin
+      : ∀ J ∈ C,
+        J ∈ (GlobalTheory.CompanionTheory.Ar.Pub.CxChart.chartIdeal (conePts Q) σ
+          i).minimalPrimes := fun J hJ =>
+    GlobalTheory.CompanionTheory.Ar.Pub.CxChart.mem_chartComponents.1 hJ
   have hprime : ∀ J ∈ C, J.IsPrime := fun J hJ => (hmin J hJ).1.1
   have hsub : ∀ J ∈ C, zeroSet J ⊆ chartSet (conePts Q) σ i := by
     intro J hJ x hx
@@ -257,21 +281,25 @@ theorem fibreSum : ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) 
     obtain ⟨J, hJ, hxJ⟩ := exists_minimalPrime_of_mem_zeroSet hx
     exact ⟨J, GlobalTheory.CompanionTheory.Ar.Pub.CxChart.mem_chartComponents.2 hJ, hxJ⟩
 
-  have hG1 : ∀ᵐ y, ∀ J ∈ C, ∀ x ∈ GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y, ∃ s, IsSheetAt J A x s := by
-    refine (eventually_all_finset C).2 fun J hJ => ?_
-    obtain ⟨Q', U, D, N, s, -, hUD, -, -, hvol, hfib⟩ :=
-      GroundTheory.Heights₂.Heights.DiscriminantSheetCover.proof GroundTheory.Heights₂.Heights.ComplexSets.DiscriminantCover.full
-        m e J A (hprime J hJ) (hdim J hJ) (hfinp J hJ)
-    have hae : (⋃ k, D k) ∈ ae volume := mem_ae_iff.2 hvol
-    filter_upwards [hae] with y hy x hx
-    obtain ⟨k, hk⟩ := Set.mem_iUnion.1 hy
-    obtain ⟨hrange, -, hsheet⟩ := hfib k y ((hUD k).2.2.1 hk)
-    rw [hrange] at hx
-    obtain ⟨j, rfl⟩ := hx
-    exact ⟨_, hsheet j⟩
+  have hG1
+      : ∀ᵐ y, ∀ J ∈ C, ∀ x ∈ GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y, ∃ s, IsSheetAt J A x s :=
+    by
+      refine (eventually_all_finset C).2 fun J hJ => ?_
+      obtain ⟨Q', U, D, N, s, -, hUD, -, -, hvol, hfib⟩ :=
+        GroundTheory.Heights₂.Heights.DiscriminantSheetCover.proof
+          GroundTheory.Heights₂.Heights.ComplexSets.DiscriminantCover.full m e J A (hprime J hJ)
+          (hdim J hJ) (hfinp J hJ)
+      have hae : (⋃ k, D k) ∈ ae volume := mem_ae_iff.2 hvol
+      filter_upwards [hae] with y hy x hx
+      obtain ⟨k, hk⟩ := Set.mem_iUnion.1 hy
+      obtain ⟨hrange, -, hsheet⟩ := hfib k y ((hUD k).2.2.1 hk)
+      rw [hrange] at hx
+      obtain ⟨j, rfl⟩ := hx
+      exact ⟨_, hsheet j⟩
 
-  have hG2 : ∀ᵐ y, ∀ J ∈ C, ∀ J' ∈ C, J' ≠ J →
-      ∀ x ∈ GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y, x ∉ zeroSet J' := by
+  have hG2
+      : ∀ᵐ y, ∀ J ∈ C, ∀ J' ∈ C, J' ≠ J →
+        ∀ x ∈ GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y, x ∉ zeroSet J' := by
     refine (eventually_all_finset C).2 fun J hJ => (eventually_all_finset C).2 fun J' hJ' => ?_
     by_cases hJJ : J' = J
     · exact Eventually.of_forall fun _ h => absurd hJJ h
@@ -299,32 +327,36 @@ theorem fibreSum : ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) 
     · obtain ⟨hC, hAw⟩ := chart_of_mem_setFibre hΨ0 hw
       obtain ⟨J, hJ, hxJ⟩ := hcov _ hC
       exact ⟨_, Set.mem_iUnion₂.2 ⟨J, hJ, hxJ, hAw⟩, funext fun i' => by simp [hψ]⟩
-  have hinj : Set.InjOn ψ S := fun x _ x' _ h => funext fun a => by
-    simpa [hψ] using congrFun h (σ a)
-  have hfinJ : ∀ J ∈ (C : Set (Ideal (MvPolynomial (Fin m) ℂ))),
-      (GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y).Finite := by
+  have hinj : Set.InjOn ψ S := fun x _ x' _ h =>
+    funext fun a => by simpa [hψ] using congrFun h (σ a)
+  have hfinJ
+      : ∀ J ∈ (C : Set (Ideal (MvPolynomial (Fin m) ℂ))),
+        (GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y).Finite := by
     intro J hJ
     refine ((hfinF y).image fun w a => w (σ a)).subset fun x hx => ?_
     refine ⟨ψ x, hψS x (Set.mem_iUnion₂.2 ⟨J, hJ, hx⟩), funext fun a => by simp [hψ]⟩
-  have hdisj : (C : Set (Ideal (MvPolynomial (Fin m) ℂ))).PairwiseDisjoint
-      fun J => GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y :=
-    fun J hJ J' hJ' hne => Set.disjoint_left.2 fun x hx hx' => hy2 J hJ J' hJ' (Ne.symm hne) x hx hx'.1
-  calc ∑ᶠ w ∈ setFibre (conePts Q) Ψ y, setSheetDensity (conePts Q) Ψ (pot L) g y w
+  have hdisj
+      : (C : Set (Ideal (MvPolynomial (Fin m) ℂ))).PairwiseDisjoint fun J =>
+        GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y := fun J hJ J' hJ' hne =>
+    Set.disjoint_left.2 fun x hx hx' => hy2 J hJ J' hJ' (Ne.symm hne) x hx hx'.1
+  calc
+    ∑ᶠ w ∈ setFibre (conePts Q) Ψ y, setSheetDensity (conePts Q) Ψ (pot L) g y w
       = ∑ᶠ w ∈ ψ '' S, setSheetDensity (conePts Q) Ψ (pot L) g y w := by rw [himg]
     _ = ∑ᶠ x ∈ S, setSheetDensity (conePts Q) Ψ (pot L) g y (ψ x) := finsum_mem_image hinj
     _ = ∑ᶠ J ∈ (C : Set (Ideal (MvPolynomial (Fin m) ℂ))),
           ∑ᶠ x ∈ GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y,
             setSheetDensity (conePts Q) Ψ (pot L) g y (ψ x) :=
-        finsum_mem_biUnion hdisj C.finite_toSet hfinJ
+      finsum_mem_biUnion hdisj C.finite_toSet hfinJ
     _ = ∑ J ∈ C, ∑ᶠ x ∈ GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y,
           setSheetDensity (conePts Q) Ψ (pot L) g y (ψ x) :=
-        finsum_mem_coe_finset _ _
+      finsum_mem_coe_finset _ _
     _ = ∑ J ∈ C, chartDens J A (chartWeight σ i g) (chartPot σ i L) y := by
-        refine Finset.sum_congr rfl fun J hJ => ?_
-        simp only [chartDens, sheetSum]
-        refine finsum_mem_congr rfl fun x hx => ?_
-        rw [dite_eq_left (hy1 J hJ x hx)]
-        exact (term_eq hMH hL hg hΨ0 hsub hcov hJ hx (fun J' hJ' h => hy2 J hJ J' hJ' h x hx)
-          (hy1 J hJ x hx)).symm
+      refine Finset.sum_congr rfl fun J hJ => ?_
+      simp only [chartDens, sheetSum]
+      refine finsum_mem_congr rfl fun x hx => ?_
+      rw [dite_eq_left (hy1 J hJ x hx)]
+      exact (term_eq hMH hL hg hΨ0 hsub hcov hJ hx
+        (fun J' hJ' h => hy2 J hJ J' hJ' h x hx)
+        (hy1 J hJ x hx)).symm
 
 end GlobalTheory.CompanionTheory.Ar.Pub.CxChart.FibSum

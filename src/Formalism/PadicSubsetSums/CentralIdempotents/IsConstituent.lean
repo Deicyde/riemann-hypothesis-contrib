@@ -14,8 +14,11 @@ def IsBlockUT {ι : Type} {s : ℕ} (b : ι → Fin s) (M : Matrix ι ι K) : Pr
   ∀ i j, b j < b i → M i j = 0
 
 variable {K} in
-theorem isBlockUT_mul {ι : Type} [Fintype ι] {s : ℕ} (b : ι → Fin s) {A B : Matrix ι ι K}
-    (hA : IsBlockUT K b A) (hB : IsBlockUT K b B) : IsBlockUT K b (A * B) := by
+theorem isBlockUT_mul
+    {ι : Type} [Fintype ι]
+    {s : ℕ} (b : ι → Fin s)
+    {A B : Matrix ι ι K} (hA : IsBlockUT K b A) (hB : IsBlockUT K b B)
+    : IsBlockUT K b (A * B) := by
   intro i j h
   simp only [Matrix.mul_apply]
   apply Finset.sum_eq_zero
@@ -27,10 +30,10 @@ theorem isBlockUT_mul {ι : Type} [Fintype ι] {s : ℕ} (b : ι → Fin s) {A B
 def parab {ι : Type} [Fintype ι] [DecidableEq ι] {s : ℕ} (b : ι → Fin s) : Subgroup (GL ι K) where
   carrier := {g | IsBlockUT K b (g : Matrix ι ι K) ∧ IsBlockUT K b ((g⁻¹ : GL ι K) : Matrix ι ι K)}
   one_mem' := by
-    refine ⟨?_, ?_⟩ <;>
-    · intro i j h
-      have hij : i ≠ j := by rintro rfl; exact lt_irrefl _ h
-      simp [Matrix.one_apply_ne hij]
+    refine ⟨?_, ?_⟩
+      <;> · intro i j h
+            have hij : i ≠ j := by rintro rfl; exact lt_irrefl _ h
+            simp [Matrix.one_apply_ne hij]
   mul_mem' := by
     rintro g h ⟨hg, hg'⟩ ⟨hh, hh'⟩
     refine ⟨?_, ?_⟩
@@ -44,17 +47,19 @@ def unip {ι : Type} [Fintype ι] [DecidableEq ι] {s : ℕ} (b : ι → Fin s) 
   {g | g ∈ parab K b ∧ ∀ i j, b i = b j → (g : Matrix ι ι K) i j = if i = j then 1 else 0}
 
 def IsCuspidal {ι : Type} [Fintype ι] [DecidableEq ι] (τ : FDRep ℂ (GL ι K)) : Prop :=
-  ∀ (s : ℕ) (b : ι → Fin s), Function.Surjective b → 2 ≤ s →
-    ∀ v : τ, (∀ u ∈ unip K b, τ.ρ u v = v) → v = 0
+  ∀ (s : ℕ) (b : ι → Fin s),
+    Function.Surjective b → 2 ≤ s → ∀ v : τ, (∀ u ∈ unip K b, τ.ρ u v = v) → v = 0
 
-def blk {ι : Type} {s : ℕ} (b : ι → Fin s) (c : Fin s) (M : Matrix ι ι K) :
-    Matrix {i // b i = c} {i // b i = c} K :=
+def blk {ι : Type} {s : ℕ} (b : ι → Fin s) (c : Fin s) (M : Matrix ι ι K)
+    : Matrix {i // b i = c} {i // b i = c} K :=
   M.submatrix Subtype.val Subtype.val
 
 variable {K} in
-theorem blk_mul {ι : Type} [Fintype ι] [DecidableEq ι] {s : ℕ} (b : ι → Fin s) (c : Fin s)
-    {A B : Matrix ι ι K} (hA : IsBlockUT K b A) (hB : IsBlockUT K b B) :
-    blk K b c (A * B) = blk K b c A * blk K b c B := by
+theorem blk_mul
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {s : ℕ} (b : ι → Fin s) (c : Fin s)
+    {A B : Matrix ι ι K} (hA : IsBlockUT K b A) (hB : IsBlockUT K b B)
+    : blk K b c (A * B) = blk K b c A * blk K b c B := by
   ext ⟨i, hi⟩ ⟨j, hj⟩
   simp only [blk, Matrix.submatrix_apply, Matrix.mul_apply]
   rw [← Fintype.sum_subtype_add_sum_subtype (fun k => b k = c)]
@@ -66,18 +71,25 @@ theorem blk_mul {ι : Type} [Fintype ι] [DecidableEq ι] {s : ℕ} (b : ι → 
     · rw [hB k j (by rw [hj]; exact h)]; simp
   rw [h0, add_zero]
 
-def levi {ι : Type} [Fintype ι] [DecidableEq ι] {s : ℕ} (b : ι → Fin s) (c : Fin s)
-    (p : parab K b) : GL {i // b i = c} K :=
-  ⟨blk K b c (p.1 : Matrix ι ι K), blk K b c ((p.1⁻¹ : GL ι K) : Matrix ι ι K),
-    by rw [← blk_mul b c p.2.1 p.2.2, Units.mul_inv]; exact Matrix.submatrix_one _ Subtype.val_injective,
-    by rw [← blk_mul b c p.2.2 p.2.1, Units.inv_mul]; exact Matrix.submatrix_one _ Subtype.val_injective⟩
+def levi {ι : Type} [Fintype ι] [DecidableEq ι] {s : ℕ} (b : ι → Fin s) (c : Fin s) (p : parab K b)
+    : GL {i // b i = c} K := ⟨
+  blk K b c (p.1 : Matrix ι ι K),
+  blk K b c ((p.1⁻¹ : GL ι K) : Matrix ι ι K),
+  by
+    rw [← blk_mul b c p.2.1 p.2.2, Units.mul_inv]
+    exact Matrix.submatrix_one _ Subtype.val_injective,
+  by
+    rw [← blk_mul b c p.2.2 p.2.1, Units.inv_mul]
+    exact Matrix.submatrix_one _ Subtype.val_injective
+⟩
 
 section HC
-variable {ι : Type} [Fintype ι] [DecidableEq ι] {s : ℕ} (b : ι → Fin s)
-  (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K))
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {s : ℕ} (b : ι → Fin s) (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K))
 
-def infl (p : parab K b) :
-    PiTensorProduct ℂ (fun c => (lam c : Type)) →ₗ[ℂ] PiTensorProduct ℂ (fun c => (lam c : Type)) :=
+def infl (p : parab K b)
+    : PiTensorProduct ℂ (fun c => (lam c : Type)) →ₗ[ℂ] PiTensorProduct ℂ (fun c => (lam c : Type)) :=
   PiTensorProduct.map (fun c => (lam c).ρ (levi K b c p))
 
 def hcSpace : Submodule ℂ (GL ι K → PiTensorProduct ℂ (fun c => (lam c : Type))) where
@@ -93,10 +105,11 @@ def hcSpace : Submodule ℂ (GL ι K → PiTensorProduct ℂ (fun c => (lam c : 
     simp [hf p x]
 
 def hcRep : Representation ℂ (GL ι K) (hcSpace K b lam) where
-  toFun g :=
-    { toFun := fun f => ⟨fun x => f.1 (x * g), fun p x => by simpa [mul_assoc] using f.2 p (x * g)⟩
-      map_add' := by intros; rfl
-      map_smul' := by intros; rfl }
+  toFun g := {
+    toFun := fun f => ⟨fun x => f.1 (x * g), fun p x => by simpa [mul_assoc] using f.2 p (x * g)⟩
+    map_add' := by intros; rfl
+    map_smul' := by intros; rfl
+  }
   map_one' := by
     ext f x
     simp
@@ -109,8 +122,10 @@ end HC
 section Reps
 variable {Γ : Type} [Group Γ]
 
-def Intw {V V' : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V']
-    (ρ : Representation ℂ Γ V) (ρ' : Representation ℂ Γ V') : Submodule ℂ (V →ₗ[ℂ] V') where
+def Intw
+    {V V' : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V']
+    (ρ : Representation ℂ Γ V) (ρ' : Representation ℂ Γ V')
+    : Submodule ℂ (V →ₗ[ℂ] V') where
   carrier := {φ | ∀ g, φ ∘ₗ ρ g = ρ' g ∘ₗ φ}
   add_mem' := by
     intro φ ψ hφ hψ g
@@ -122,8 +137,9 @@ def Intw {V V' : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module
     intro a φ hφ g
     rw [LinearMap.smul_comp, LinearMap.comp_smul, hφ g]
 
-def IsConstituent {V : Type} [AddCommGroup V] [Module ℂ V] (τ : FDRep ℂ Γ)
-    (ρ : Representation ℂ Γ V) : Prop :=
+def IsConstituent
+    {V : Type} [AddCommGroup V] [Module ℂ V] (τ : FDRep ℂ Γ) (ρ : Representation ℂ Γ V)
+    : Prop :=
   ∃ φ ∈ Intw τ.ρ ρ, φ ≠ 0
 
 def IsIrrRep {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ Γ V) : Prop :=
@@ -139,44 +155,55 @@ structure LabelConv where
   ι_inj : ∀ x y : AlgebraicClosure K, x ≠ 0 → y ≠ 0 → ι x = ι y → x = y
   gen : ℕ → AlgebraicClosure K
   gen_order : ∀ d, 1 ≤ d → orderOf (gen d) = Fintype.card K ^ d - 1
-  gen_norm : ∀ d e, 1 ≤ d → 1 ≤ e →
-    gen (d * e) ^ ((Fintype.card K ^ (d * e) - 1) / (Fintype.card K ^ d - 1)) = gen d
+  gen_norm
+    : ∀ d e,
+      1 ≤ d → 1 ≤ e
+        → gen (d * e) ^ ((Fintype.card K ^ (d * e) - 1) / (Fintype.card K ^ d - 1)) = gen d
 
 def rootsBar (f : K[X]) : Multiset (AlgebraicClosure K) :=
   (f.map (algebraMap K (AlgebraicClosure K))).roots
 
+variable {K} in
+def HasCuspLabel
+    (C : LabelConv K) {ι : Type} [Fintype ι] [DecidableEq ι] (τ : FDRep ℂ (GL ι K)) (P : K[X])
+    : Prop :=
+  P.Monic ∧ Irreducible P ∧ P ≠ X ∧ P.natDegree = Fintype.card ι
+    ∧ ∀ x : AlgebraicClosure K,
+      aeval x P = 0
+        → ∀ γ : GL ι K,
+          Irreducible (Matrix.charpoly (γ : Matrix ι ι K))
+            → ∀ z : AlgebraicClosure K,
+              aeval z (Matrix.charpoly (γ : Matrix ι ι K)) = 0
+                → ∀ m : ℕ,
+                  C.gen (Fintype.card ι) ^ m = z
+                    → LinearMap.trace ℂ τ (τ.ρ γ)
+                      = (-1) ^ (Fintype.card ι - 1)
+                        * ∑ a ∈ Finset.range (Fintype.card ι), C.ι x ^ (m * Fintype.card K ^ a)
 
 variable {K} in
-def HasCuspLabel (C : LabelConv K) {ι : Type} [Fintype ι] [DecidableEq ι] (τ : FDRep ℂ (GL ι K))
-    (P : K[X]) : Prop :=
-  P.Monic ∧ Irreducible P ∧ P ≠ X ∧ P.natDegree = Fintype.card ι ∧
-    ∀ x : AlgebraicClosure K, aeval x P = 0 →
-    ∀ γ : GL ι K, Irreducible (Matrix.charpoly (γ : Matrix ι ι K)) →
-    ∀ z : AlgebraicClosure K, aeval z (Matrix.charpoly (γ : Matrix ι ι K)) = 0 →
-    ∀ m : ℕ, C.gen (Fintype.card ι) ^ m = z →
-      LinearMap.trace ℂ τ (τ.ρ γ) =
-        (-1) ^ (Fintype.card ι - 1) *
-          ∑ a ∈ Finset.range (Fintype.card ι), C.ι x ^ (m * Fintype.card K ^ a)
-
-
-variable {K} in
-def HasLabel (C : LabelConv K) {ι : Type} [Fintype ι] [DecidableEq ι] (τ : FDRep ℂ (GL ι K))
-    (f : K[X]) : Prop :=
+def HasLabel
+    (C : LabelConv K) {ι : Type} [Fintype ι] [DecidableEq ι] (τ : FDRep ℂ (GL ι K)) (f : K[X])
+    : Prop :=
   ∃ (s : ℕ) (b : ι → Fin s) (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)) (P : Fin s → K[X]),
-    Function.Surjective b ∧
-    (∀ c, Simple (lam c) ∧ IsCuspidal K (lam c) ∧ HasCuspLabel C (lam c) (P c)) ∧
-    IsConstituent τ (hcRep K b lam) ∧ f = ∏ c, P c
+    Function.Surjective b
+      ∧ (∀ c, Simple (lam c) ∧ IsCuspidal K (lam c) ∧ HasCuspLabel C (lam c) (P c))
+      ∧ IsConstituent τ (hcRep K b lam) ∧ f = ∏ c, P c
 
 abbrev q : ℕ := Fintype.card K
 
 def CuspParam (C : LabelConv K) : Prop :=
-  ∀ d : ℕ, 1 ≤ d →
-    (∀ τ : FDRep ℂ (GL (Fin d) K), Simple τ → IsCuspidal K τ →
-      (∃! P : K[X], HasCuspLabel C τ P) ∧
-      (Module.finrank ℂ τ : ℤ) = ∏ i ∈ Finset.Ico 1 d, ((q K : ℤ) ^ i - 1)) ∧
-    (∀ P : K[X], P.Monic → Irreducible P → P ≠ X → P.natDegree = d →
-      ∃ τ : FDRep ℂ (GL (Fin d) K), Simple τ ∧ IsCuspidal K τ ∧ HasCuspLabel C τ P) ∧
-    (∀ (τ τ' : FDRep ℂ (GL (Fin d) K)) (P : K[X]), Simple τ → IsCuspidal K τ → Simple τ' → IsCuspidal K τ' →
-      HasCuspLabel C τ P → HasCuspLabel C τ' P → Nonempty (τ ≅ τ'))
+  ∀ d : ℕ,
+    1 ≤ d
+      → (∀ τ : FDRep ℂ (GL (Fin d) K),
+          Simple τ → IsCuspidal K τ
+            → (∃! P : K[X], HasCuspLabel C τ P)
+              ∧ (Module.finrank ℂ τ : ℤ) = ∏ i ∈ Finset.Ico 1 d, ((q K : ℤ) ^ i - 1))
+        ∧ (∀ P : K[X],
+          P.Monic → Irreducible P → P ≠ X → P.natDegree = d
+            → ∃ τ : FDRep ℂ (GL (Fin d) K), Simple τ ∧ IsCuspidal K τ ∧ HasCuspLabel C τ P)
+        ∧ (∀ (τ τ' : FDRep ℂ (GL (Fin d) K)) (P : K[X]),
+          Simple τ → IsCuspidal K τ → Simple τ' → IsCuspidal K τ' → HasCuspLabel C τ P
+            → HasCuspLabel C τ' P
+            → Nonempty (τ ≅ τ'))
 
 end Formalism.IrreducibleCountingLemmas.TYPES

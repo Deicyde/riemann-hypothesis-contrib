@@ -162,7 +162,8 @@ theorem choice_of_generators : Choose := by
 
   set B : Matrix (Fin I.n) (Fin I.n) I.E := (δ * I.J⁻¹)ᵀ with hB
   have hBr : B.rank = k := by
-    rw [hB, Matrix.rank_transpose, Matrix.rank_mul_eq_left_of_isUnit_det _ _ (Matrix.isUnit_nonsing_inv_det I.J hJ)]
+    rw [hB, Matrix.rank_transpose,
+      Matrix.rank_mul_eq_left_of_isUnit_det _ _ (Matrix.isUnit_nonsing_inv_det I.J hJ)]
   obtain ⟨t, htli, htsp⟩ := basis_range B k hBr
   have hsc' : ∀ a, ∃ m : ℤ, m ≠ 0 ∧ ((m : I.E) • sv (B *ᵥ t a)) ∈ Λ := fun a => scale Λ hΛs _
   choose mb hmb0 hmbΛ using hsc'
@@ -173,8 +174,19 @@ theorem choice_of_generators : Choose := by
     intro s w hw
     rw [hB, Matrix.mulVec_transpose, Matrix.vecMul_vecMul, Matrix.mul_assoc,
       Matrix.nonsing_inv_mul _ hJ, Matrix.mul_one, ← Matrix.dotProduct_mulVec, hw, dotProduct_zero]
-  refine ⟨k, fun c => ((mu c : ℤ) : I.E) • z c, fun a => ((mb a : ℤ) : I.E) • sv (B *ᵥ t a), hk1,
-    ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    k,
+    fun c => ((mu c : ℤ) : I.E) • z c,
+    fun a => ((mb a : ℤ) : I.E) • sv (B *ᵥ t a),
+    hk1,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro c; rw [hΛ]; exact hmuΛ c
   · simp only [Matrix.mulVec_smul]
     exact scaled_li (fun c => δ *ᵥ z c) hzli (fun c => ((mu c : ℤ) : I.E)) hmu0'
@@ -182,8 +194,11 @@ theorem choice_of_generators : Choose := by
     simp only [Matrix.mulVec_smul]
     exact scaled_span (fun c => δ *ᵥ z c) (fun c => ((mu c : ℤ) : I.E)) hmu0' (hzsp w)
   · intro a; rw [hΛ]; exact hmbΛ a
-  · exact scaled_li (fun a => sv (B *ᵥ t a)) (star_li (fun a => B *ᵥ t a) htli)
-      (fun a => ((mb a : ℤ) : I.E)) hmb0'
+  · exact scaled_li
+      (fun a => sv (B *ᵥ t a))
+      (star_li (fun a => B *ᵥ t a) htli)
+      (fun a => ((mb a : ℤ) : I.E))
+      hmb0'
   · intro a w hw
     rw [hf_eq]
     have hs : sv (((mb a : ℤ) : I.E) • sv (B *ᵥ t a)) = ((mb a : ℤ) : I.E) • (B *ᵥ t a) := by
@@ -198,7 +213,9 @@ theorem choice_of_generators : Choose := by
         rw [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv _ hJ, Matrix.vecMul_one]
       rw [this, hs, Matrix.vecMul_vecMul, hB, Matrix.mulVec_transpose]
     have h1 : sv w ∈ Submodule.span I.E (Set.range fun a => B *ᵥ t a) := hsv ▸ htsp s
-    exact scaled_span (fun a => sv (B *ᵥ t a)) (fun a => ((mb a : ℤ) : I.E)) hmb0'
-      (star_span (fun a => B *ᵥ t a) w h1)
+    exact scaled_span
+      (fun a => sv (B *ᵥ t a))
+      (fun a => ((mb a : ℤ) : I.E))
+      hmb0' (star_span (fun a => B *ᵥ t a) w h1)
 
 end PI.UnitaryGroupMassFormula.LCG

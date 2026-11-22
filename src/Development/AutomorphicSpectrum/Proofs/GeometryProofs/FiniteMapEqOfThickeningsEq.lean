@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.IsAdicColimit
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open GlobalTheory.CompanionTheory.Ar.BT ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
+open GlobalTheory.CompanionTheory.Ar.BT ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 
 noncomputable section
@@ -22,11 +24,14 @@ open GlobalTheory.AdicColimit
 
 variable {R : Type} [CommRing R] [IsNoetherianRing R] (I : Ideal R) [IsAdicComplete I R]
 
-theorem eq_zero_of_forall_mem_map (A : Type) [CommRing A] [Algebra R A] [Module.Finite R A] (x : A)
-    (h : ∀ e : ℕ, x ∈ (I ^ (e + 1)).map (algebraMap R A)) : x = 0 := by
+theorem eq_zero_of_forall_mem_map
+    (A : Type) [CommRing A] [Algebra R A] [Module.Finite R A]
+    (x : A) (h : ∀ e : ℕ, x ∈ (I ^ (e + 1)).map (algebraMap R A))
+    : x = 0 := by
   have hI : I ≤ (⊥ : Ideal R).jacobson := IsAdicComplete.le_jacobson_bot I
-  have key := Ideal.iInf_pow_smul_eq_bot_of_le_jacobson (M := A) I
-    (by simpa only [Ideal.jacobson_bot] using hI)
+  have key :=
+    Ideal.iInf_pow_smul_eq_bot_of_le_jacobson (M := A) I
+      (by simpa only [Ideal.jacobson_bot] using hI)
   have hx : x ∈ (⨅ i : ℕ, I ^ i • (⊤ : Submodule R A)) := by
     refine Submodule.mem_iInf _ |>.2 fun i => ?_
     have h1 : x ∈ (I ^ (i + 1) • (⊤ : Submodule R A)) := by
@@ -36,9 +41,13 @@ theorem eq_zero_of_forall_mem_map (A : Type) [CommRing A] [Algebra R A] [Module.
   rw [key] at hx
   simpa using hx
 
-theorem eq_of_reductions (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R) [IsAdicComplete I R]
-    (X Y : Over (Spec (CommRingCat.of R))) [IsFinite X.hom] [IsFinite Y.hom] (f g : X ⟶ Y)
-    (h : ∀ e, (Over.pullback (thick R I e)).map f = (Over.pullback (thick R I e)).map g) : f = g := by
+theorem eq_of_reductions
+    (R : Type) [CommRing R] [IsNoetherianRing R]
+    (I : Ideal R) [IsAdicComplete I R]
+    (X Y : Over (Spec (CommRingCat.of R))) [IsFinite X.hom] [IsFinite Y.hom]
+    (f g : X ⟶ Y)
+    (h : ∀ e, (Over.pullback (thick R I e)).map f = (Over.pullback (thick R I e)).map g)
+    : f = g := by
   have : IsAffine X.left := isAffine_of_isAffineHom X.hom
   have : IsAffine Y.left := isAffine_of_isAffineHom Y.hom
 
@@ -54,15 +63,19 @@ theorem eq_of_reductions (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal
   have hu : Spec.map (Spec.preimage u) = u := Spec.map_preimage _
   have hv : Spec.map (Spec.preimage v) = v := Spec.map_preimage _
 
-  have hred : ∀ e : ℕ, Spec.preimage u ≫ CommRingCat.ofHom (Ideal.Quotient.mk
-      ((I ^ (e + 1)).map (algebraMap R Γ(X.left, ⊤)))) = Spec.preimage v ≫ CommRingCat.ofHom (Ideal.Quotient.mk
-      ((I ^ (e + 1)).map (algebraMap R Γ(X.left, ⊤)))) := by
+  have hred
+      : ∀ e : ℕ,
+        Spec.preimage u
+            ≫ CommRingCat.ofHom (Ideal.Quotient.mk ((I ^ (e + 1)).map (algebraMap R Γ(X.left, ⊤))))
+          = Spec.preimage v ≫ CommRingCat.ofHom (Ideal.Quotient.mk
+            ((I ^ (e + 1)).map (algebraMap R Γ(X.left, ⊤)))) := by
     intro e
     let J := (I ^ (e + 1)).map (algebraMap R Γ(X.left, ⊤))
     let m : Spec (CommRingCat.of (Γ(X.left, ⊤) ⧸ J)) ⟶ Spec Γ(X.left, ⊤) :=
       Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))
     let q : Spec (CommRingCat.of (Γ(X.left, ⊤) ⧸ J)) ⟶ Spec (CommRingCat.of (R ⧸ I ^ (e + 1))) :=
-      Spec.map (CommRingCat.ofHom (Ideal.quotientMap J (algebraMap R Γ(X.left, ⊤)) Ideal.le_comap_map))
+      Spec.map (CommRingCat.ofHom (Ideal.quotientMap J (algebraMap R Γ(X.left, ⊤))
+        Ideal.le_comap_map))
     have hcond : (m ≫ X.left.isoSpec.inv) ≫ X.hom = q ≫ thick R I e := by
       rw [Category.assoc, ← hψ]
       simp only [m, q, thick, ← Spec.map_comp, ← CommRingCat.ofHom_comp]
@@ -85,7 +98,8 @@ theorem eq_of_reductions (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal
     exact Ideal.Quotient.eq.1 (congrArg (fun φ => φ.hom b) (hred e))
   have huv : u = v := by rw [← hu, ← hv, hpre]
   apply Over.OverMorphism.ext
-  have h1 : f.left ≫ Y.left.isoSpec.hom = g.left ≫ Y.left.isoSpec.hom := (cancel_epi X.left.isoSpec.inv).1 huv
+  have h1 : f.left ≫ Y.left.isoSpec.hom = g.left ≫ Y.left.isoSpec.hom :=
+    (cancel_epi X.left.isoSpec.inv).1 huv
   exact (cancel_mono Y.left.isoSpec.hom).1 h1
 
 end GlobalTheory.CompanionTheory.Ar.BT.EqRed

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EtaleEmpty
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory
@@ -19,8 +20,7 @@ theorem exists_isCut (T : ℝ) : ∃ θ : ℝ → ℝ, IsCut T θ := by
     ⟨_, ReciprocityTheory.L2DbarEstimates.I.SmoothCutoff.isCutoff_chi⟩
   obtain ⟨hs, h1, h0, hb, hd⟩ := hχ
   set a : ℝ → ℝ := fun x => (x + T + 1) / 4 + 1 / 2 with ha
-  have haS : ContDiff ℝ ∞ a := by
-    simp only [ha]; fun_prop
+  have haS : ContDiff ℝ ∞ a := by simp only [ha]; fun_prop
   have hda : ∀ x, HasDerivAt a (1 / 4) x := by
     intro x
     have := (((hasDerivAt_id x).add_const T).add_const 1).div_const 4
@@ -34,10 +34,8 @@ theorem exists_isCut (T : ℝ) : ∃ θ : ℝ → ℝ, IsCut T θ := by
   · intro x
     exact hb _
   · intro x
-    have hχd : DifferentiableAt ℝ χ (a x) :=
-      (hs.differentiable (by simp)) _
-    have hD : HasDerivAt (χ ∘ a) (deriv χ (a x) * (1 / 4)) x :=
-      hχd.hasDerivAt.comp x (hda x)
+    have hχd : DifferentiableAt ℝ χ (a x) := (hs.differentiable (by simp)) _
+    have hD : HasDerivAt (χ ∘ a) (deriv χ (a x) * (1 / 4)) x := hχd.hasDerivAt.comp x (hda x)
     rw [hD.deriv, abs_mul]
     have := hd (a x)
     rw [abs_of_pos (by norm_num : (0 : ℝ) < 1 / 4)]

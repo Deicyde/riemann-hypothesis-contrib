@@ -9,12 +9,12 @@ open scoped ContDiff
 
 namespace GlobalTheory
 
-
 open MeasureTheory Filter Topology in
 open scoped ContDiff in
-theorem _root_.GlobalTheory.contDiff_of_continuous_oneParameter (A : Type) [NormedRing A] [NormedAlgebra ℝ A]
-    [CompleteSpace A] (T : ℝ → A) (hT : Continuous T) (h0 : T 0 = 1)
-    (hadd : ∀ s t, T (s + t) = T s * T t) : ContDiff ℝ ∞ T := by
+theorem _root_.GlobalTheory.contDiff_of_continuous_oneParameter
+    (A : Type) [NormedRing A] [NormedAlgebra ℝ A] [CompleteSpace A]
+    (T : ℝ → A) (hT : Continuous T) (h0 : T 0 = 1) (hadd : ∀ s t, T (s + t) = T s * T t)
+    : ContDiff ℝ ∞ T := by
   obtain ⟨G, hGdef⟩ : ∃ G : ℝ → A, G = fun x => ∫ s in (0:ℝ)..x, T s := ⟨_, rfl⟩
   have hG : ∀ x, HasDerivAt G (T x) x := fun x => by
     rw [hGdef]; exact (hT.integral_hasStrictDerivAt 0 x).hasDerivAt
@@ -34,13 +34,15 @@ theorem _root_.GlobalTheory.contDiff_of_continuous_oneParameter (A : Type) [Norm
     exact ((Ne.isUnit hδ).map (algebraMap ℝ A)).mul hδu
   have key : ∀ t, T t * G δ = G (t + δ) - G t := by
     intro t
-    have h1 := (ContinuousLinearMap.mul ℝ A (T t)).intervalIntegral_comp_comm
-      (hT.intervalIntegrable (μ := volume) 0 δ)
+    have h1 :=
+      (ContinuousLinearMap.mul ℝ A (T t)).intervalIntegral_comp_comm
+        (hT.intervalIntegrable (μ := volume) 0 δ)
     simp only [ContinuousLinearMap.mul_apply'] at h1
     rw [hGdef]
     dsimp only
-    rw [← h1, intervalIntegral.integral_interval_sub_left (hT.intervalIntegrable (μ := volume) _ _)
-      (hT.intervalIntegrable (μ := volume) _ _)]
+    rw [← h1,
+      intervalIntegral.integral_interval_sub_left (hT.intervalIntegrable (μ := volume) _ _)
+        (hT.intervalIntegrable (μ := volume) _ _)]
     simp_rw [← hadd]
     rw [intervalIntegral.integral_comp_add_left (fun x => T x) t, add_zero]
   have hform : T = fun t => (G (t + δ) - G t) * ↑hu.unit⁻¹ := by

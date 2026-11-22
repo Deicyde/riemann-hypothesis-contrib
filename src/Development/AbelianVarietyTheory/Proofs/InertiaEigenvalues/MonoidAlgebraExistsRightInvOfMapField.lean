@@ -8,9 +8,9 @@ namespace GlobalTheory
 
 open MonoidAlgebra
 
-theorem groupAlgebra_coeff_mul_fintype {R G : Type} [CommRing R] [Group G] [Fintype G]
-    (x y : MonoidAlgebra R G) (a : G) :
-    (x * y).coeff a = ∑ c : G, x.coeff (a * c⁻¹) * y.coeff c := by
+theorem groupAlgebra_coeff_mul_fintype
+    {R G : Type} [CommRing R] [Group G] [Fintype G] (x y : MonoidAlgebra R G) (a : G)
+    : (x * y).coeff a = ∑ c : G, x.coeff (a * c⁻¹) * y.coeff c := by
   classical
   have hs : ∀ (f : G →₀ R) (g : G → R → R), (∀ i, g i 0 = 0) → f.sum g = ∑ i, g i (f i) :=
     fun f g h => Finsupp.sum_fintype f g h
@@ -22,10 +22,10 @@ theorem groupAlgebra_coeff_mul_fintype {R G : Type} [CommRing R] [Group G] [Fint
   simp_rw [this]
   simp
 
-theorem groupAlgebra_exists_right_inv_of_map {E L G : Type} [Field E] [Field L] [Group G]
-    [Fintype G] (j : E →+* L) (x : MonoidAlgebra E G) :
-    (∃ v : MonoidAlgebra L G, MonoidAlgebra.mapRingHom G j x * v = 1) →
-      ∃ v : MonoidAlgebra E G, x * v = 1 := by
+theorem groupAlgebra_exists_right_inv_of_map
+    {E L G : Type} [Field E] [Field L] [Group G] [Fintype G] (j : E →+* L) (x : MonoidAlgebra E G)
+    : (∃ v : MonoidAlgebra L G, MonoidAlgebra.mapRingHom G j x * v = 1)
+      → ∃ v : MonoidAlgebra E G, x * v = 1 := by
   classical
   rintro ⟨vL, hvL⟩
   let M : Matrix G G E := fun a c => x.coeff (a * c⁻¹)
@@ -50,8 +50,8 @@ theorem groupAlgebra_exists_right_inv_of_map {E L G : Type} [Field E] [Field L] 
     rw [h, map_zero] at hdetL
     exact not_isUnit_zero hdetL
   have hM : IsUnit M := (Matrix.isUnit_iff_isUnit_det M).2 (isUnit_iff_ne_zero.2 hdet)
-  obtain ⟨u, hu⟩ := Matrix.mulVec_surjective_iff_isUnit.2 hM
-    (fun a => (1 : MonoidAlgebra E G).coeff a)
+  obtain ⟨u, hu⟩ :=
+    Matrix.mulVec_surjective_iff_isUnit.2 hM (fun a => (1 : MonoidAlgebra E G).coeff a)
   refine ⟨ofCoeff (Finsupp.equivFunOnFinite.symm u), ?_⟩
   apply MonoidAlgebra.ext
   ext a

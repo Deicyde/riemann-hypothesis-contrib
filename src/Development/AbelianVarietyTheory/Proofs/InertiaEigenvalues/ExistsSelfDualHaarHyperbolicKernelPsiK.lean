@@ -11,15 +11,22 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR.Hyp
 
-noncomputable def trxForm {F E : Type} [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
-    [StarRing E] (A : Et F E) (x : A.K) : LinearMap.BilinForm F A.K :=
-  LinearMap.mk₂ F (fun u b => Algebra.trace F A.K (x * u * b))
+noncomputable def trxForm
+    {F E : Type}
+    [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
+    (A : Et F E) (x : A.K)
+    : LinearMap.BilinForm F A.K :=
+  LinearMap.mk₂ F
+    (fun u b => Algebra.trace F A.K (x * u * b))
     (fun m₁ m₂ n => by simp [mul_add, add_mul])
     (fun c m n => by simp [mul_smul_comm, smul_mul_assoc])
     (fun m n₁ n₂ => by simp [mul_add])
     (fun c m n => by simp [mul_smul_comm, smul_mul_assoc])
 
-theorem selfDual_kx_exists : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ), IsStdChar ψ → ∀ x : A.Kˣ, ∃ ν : Measure A.K, SelfDual ν (Hyp.kx A ψ x) := by
+theorem selfDual_kx_exists
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ),
+      IsStdChar ψ → ∀ x : A.Kˣ, ∃ ν : Measure A.K, SelfDual ν (Hyp.kx A ψ x) := by
   intro F E _ _ _ _ _ A ψ hψ x
   have hT := (GlobalTheory.T.etaleHermitianPair_structure_facts F E A).2.2.1
   obtain ⟨hL, -⟩ := hT
@@ -29,9 +36,10 @@ theorem selfDual_kx_exists : ∀ (F E : Type) [NontriviallyNormedField F] [Nontr
     ring_nf
   have hleft : ∀ u : A.K, (∀ b, trxForm A (x : A.K) u b = 0) → u = 0 := by
     intro u hu
-    have h0 : (x : A.K) * u = 0 := hL _ (fun b => by
-      have := hu b
-      simpa [trxForm, Algebra.traceForm_apply, mul_assoc] using this)
+    have h0 : (x : A.K) * u = 0 :=
+      hL _ (fun b => by
+        have := hu b
+        simpa [trxForm, Algebra.traceForm_apply, mul_assoc] using this)
     have := congrArg (fun t => ((x⁻¹ : A.Kˣ) : A.K) * t) h0
     simpa [← mul_assoc] using this
   have hnd : (trxForm A (x : A.K)).Nondegenerate := by
@@ -40,7 +48,9 @@ theorem selfDual_kx_exists : ∀ (F E : Type) [NontriviallyNormedField F] [Nontr
     simp only [trxForm, LinearMap.mk₂_apply] at this ⊢
     rw [show (x : A.K) * b * u = x * u * b by ring]
     exact this
-  obtain ⟨⟨μ, hμ, -⟩, -⟩ := GlobalTheory.T.selfDual_measure_exists_unique_fourier_inversion F E ψ hψ A.K (trxForm A (x : A.K)) hsymm hnd
+  obtain ⟨⟨μ, hμ, -⟩, -⟩ :=
+    GlobalTheory.T.selfDual_measure_exists_unique_fourier_inversion F E ψ hψ A.K
+      (trxForm A (x : A.K)) hsymm hnd
   refine ⟨μ, ?_⟩
   have hk : (fun u b => ψ (trxForm A (x : A.K) u b)) = Hyp.kx A ψ x := by
     funext u b

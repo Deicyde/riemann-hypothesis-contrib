@@ -7,13 +7,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NadelVanishi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
 open Polynomial
 
 namespace GlobalTheory
 
-theorem valuationSubring_fractions_of_essFiniteType : ∀ (L : Type) [Field L] (ψ : ℂ →+* L) (V : ValuationSubring L) (hψ : ∀ a, ψ a ∈ V), (ψ.codRestrict V hψ).EssFiniteType → ∃ s₀ : Finset L, (∀ x ∈ s₀, x ∈ V) ∧ ∀ s ∈ V, ∃ b ∈ Subring.closure (Set.range ψ ∪ ↑s₀), ∃ d ∈ Subring.closure (Set.range ψ ∪ ↑s₀), d ≠ 0 ∧ d⁻¹ ∈ V ∧ s = b / d := by
+theorem valuationSubring_fractions_of_essFiniteType
+    : ∀ (L : Type) [Field L] (ψ : ℂ →+* L) (V : ValuationSubring L) (hψ : ∀ a, ψ a ∈ V),
+      (ψ.codRestrict V hψ).EssFiniteType
+        → ∃ s₀ : Finset L,
+          (∀ x ∈ s₀, x ∈ V)
+            ∧ ∀ s ∈ V, ∃ b ∈ Subring.closure (Set.range ψ ∪ ↑s₀),
+              ∃ d ∈ Subring.closure (Set.range ψ ∪ ↑s₀),
+                d ≠ 0 ∧ d⁻¹ ∈ V ∧ s = b / d := by
   classical
   intro L _ ψ V hψ h
   letI : Algebra ℂ V := (ψ.codRestrict V hψ).toAlgebra
@@ -24,8 +32,9 @@ theorem valuationSubring_fractions_of_essFiniteType : ∀ (L : Type) [Field L] (
     rw [Finset.mem_image] at hx
     obtain ⟨y, -, rfl⟩ := hx
     exact y.2
-  have key : ∀ x ∈ Algebra.adjoin ℂ (s : Set V),
-      ((x : V) : L) ∈ Subring.closure (Set.range ψ ∪ ↑(s.image (fun x : V => (x : L)))) := by
+  have key
+      : ∀ x ∈ Algebra.adjoin ℂ (s : Set V),
+        ((x : V) : L) ∈ Subring.closure (Set.range ψ ∪ ↑(s.image (fun x : V => (x : L)))) := by
     intro x hx
     induction hx using Algebra.adjoin_induction with
     | mem x hx =>
@@ -37,13 +46,13 @@ theorem valuationSubring_fractions_of_essFiniteType : ∀ (L : Type) [Field L] (
       apply Subring.subset_closure
       left
       exact ⟨r, rfl⟩
-    | add x y _ _ hx hy =>
-      simpa using Subring.add_mem _ hx hy
-    | mul x y _ _ hx hy =>
-      simpa using Subring.mul_mem _ hx hy
+    | add x y _ _ hx hy => simpa using Subring.add_mem _ hx hy
+    | mul x y _ _ hx hy => simpa using Subring.mul_mem _ hx hy
   intro v hv
-  obtain ⟨⟨a, m⟩, hm⟩ := IsLocalization.surj
-    (Submonoid.comap (algebraMap (↥(Algebra.adjoin ℂ (s : Set V))) V) (IsUnit.submonoid V)) (⟨v, hv⟩ : V)
+  obtain ⟨⟨a, m⟩, hm⟩ :=
+    IsLocalization.surj
+      (Submonoid.comap (algebraMap (↥(Algebra.adjoin ℂ (s : Set V))) V) (IsUnit.submonoid V))
+      (⟨v, hv⟩ : V)
   have hu : IsUnit ((m : Algebra.adjoin ℂ (s : Set V)) : V) := m.2
   obtain ⟨u, hu'⟩ := hu
   have hinv : (((m : Algebra.adjoin ℂ (s : Set V)) : V) : L) * (((u⁻¹ : Vˣ) : V) : L) = 1 := by
@@ -56,8 +65,15 @@ theorem valuationSubring_fractions_of_essFiniteType : ∀ (L : Type) [Field L] (
     exact zero_ne_one hinv
   have hmL := congrArg (fun z : V => (z : L)) hm
   simp only at hmL
-  refine ⟨((a : V) : L), key _ a.2, (((m : Algebra.adjoin ℂ (s : Set V)) : V) : L),
-    key _ (m : Algebra.adjoin ℂ (s : Set V)).2, hd0, ?_, ?_⟩
+  refine ⟨
+    ((a : V) : L),
+    key _ a.2,
+    (((m : Algebra.adjoin ℂ (s : Set V)) : V) : L),
+    key _ (m : Algebra.adjoin ℂ (s : Set V)).2,
+    hd0,
+    ?_,
+    ?_
+  ⟩
   · rw [inv_eq_of_mul_eq_one_right hinv]
     exact ((u⁻¹ : Vˣ) : V).2
   · rw [eq_div_iff hd0]

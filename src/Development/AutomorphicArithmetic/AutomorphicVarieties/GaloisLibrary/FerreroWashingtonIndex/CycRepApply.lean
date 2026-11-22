@@ -22,9 +22,10 @@ def clA (t : (ZMod M)ˣ) : Cl L →* Cl L := clMap (sg M L t)⁻¹.toRingEquiv
 def cycRep : Representation ℤ (ZMod M)ˣ (Additive (Cl L)) :=
   (clRep L).comp (((sg M L).toMonoidHom).comp invMonoidHom)
 
-theorem cycRep_apply (t : (ZMod M)ˣ) (x : Cl L) :
-    cycRep M L t (Additive.ofMul x) = Additive.ofMul (clA M L t x) := by
-  rw [cycRep, MonoidHom.comp_apply, MonoidHom.comp_apply, invMonoidHom_apply, MulEquiv.coe_toMonoidHom, map_inv, clRep_apply]
+theorem cycRep_apply (t : (ZMod M)ˣ) (x : Cl L)
+    : cycRep M L t (Additive.ofMul x) = Additive.ofMul (clA M L t x) := by
+  rw [cycRep, MonoidHom.comp_apply, MonoidHom.comp_apply, invMonoidHom_apply,
+    MulEquiv.coe_toMonoidHom, map_inv, clRep_apply]
   rfl
 
 def embT (φ : L →+* ℂ) (t : (ZMod M)ˣ) : L →+* ℂ := φ.comp (sg M L t).toRingEquiv.toRingHom
@@ -38,8 +39,8 @@ variable {K ι : Type} [Field K] [NumberField K]
 def sgn (e : ι → K →+* ℂ) (a : K) : ι → ZMod 2 := fun i => if (e i a).re < 0 then 1 else 0
 
 def sgnE [IsCMField K] (e : ι → K →+* ℂ) : AddSubgroup (ι → ZMod 2) :=
-  AddSubgroup.closure {f | ∃ u : (𝓞 K)ˣ, cE K ((u : 𝓞 K) : K) = ((u : 𝓞 K) : K) ∧ f = sgn e ((u : 𝓞 K) : K)}
-
+  AddSubgroup.closure
+    {f | ∃ u : (𝓞 K)ˣ, cE K ((u : 𝓞 K) : K) = ((u : 𝓞 K) : K) ∧ f = sgn e ((u : 𝓞 K) : K)}
 
 variable (K) in
 def UnrFin : Prop :=

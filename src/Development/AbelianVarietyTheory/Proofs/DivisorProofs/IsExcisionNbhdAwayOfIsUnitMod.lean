@@ -10,9 +10,10 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
-theorem isExcisionNbhd_away_of_isUnit_mod : ∀ (B A' : Type) [CommRing B] [CommRing A'] [Algebra B A'] (f s : B),
-    IsExcisionNbhd B A' f → IsUnit (Ideal.Quotient.mk (Ideal.span {f}) s) →
-    IsExcisionNbhd B (Localization.Away (algebraMap B A' s)) f := by
+theorem isExcisionNbhd_away_of_isUnit_mod
+    : ∀ (B A' : Type) [CommRing B] [CommRing A'] [Algebra B A'] (f s : B),
+      IsExcisionNbhd B A' f → IsUnit (Ideal.Quotient.mk (Ideal.span {f}) s)
+        → IsExcisionNbhd B (Localization.Away (algebraMap B A' s)) f := by
   intro B A' _ _ _ f s hA hs
   obtain ⟨hEt, h2, h3⟩ := hA
   obtain ⟨σ, hσ⟩ : ∃ σ : A', σ = algebraMap B A' s := ⟨_, rfl⟩
@@ -46,18 +47,23 @@ theorem isExcisionNbhd_away_of_isUnit_mod : ∀ (B A' : Type) [CommRing B] [Comm
     have hv' := congrArg (algebraMap A' (Localization.Away σ)) (congrArg (algebraMap B A') hv)
     rw [Ideal.mem_span_singleton']
     refine ⟨-(x * algebraMap A' _ (algebraMap B A' v)) + algebraMap A' _ c, ?_⟩
-    simp only [IsScalarTower.algebraMap_apply B A' (Localization.Away σ), map_mul, map_sub, map_pow, map_one,
-      ← hσ] at hxs hc' hv' ⊢
+    simp only [IsScalarTower.algebraMap_apply B A' (Localization.Away σ), map_mul, map_sub, map_pow,
+        map_one, ← hσ]
+      at hxs hc' hv' ⊢
     linear_combination hc' - x * hv' - (algebraMap A' (Localization.Away σ) (algebraMap B A' t)) ^ n * hxs
   · intro a ha
     obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 ha
     obtain ⟨⟨c, _, n, rfl⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers σ) y
-    have hys := IsLocalization.mk'_spec (Localization.Away σ) c (⟨σ ^ n, n, rfl⟩ : Submonoid.powers σ)
-    have key : algebraMap A' (Localization.Away σ) (algebraMap B A' a * σ ^ n) =
-        algebraMap A' (Localization.Away σ) (c * algebraMap B A' f) := by
-      rw [map_mul, map_mul, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply, ← hy]
+    have hys :=
+      IsLocalization.mk'_spec (Localization.Away σ) c (⟨σ ^ n, n, rfl⟩ : Submonoid.powers σ)
+    have key
+        : algebraMap A' (Localization.Away σ) (algebraMap B A' a * σ ^ n)
+          = algebraMap A' (Localization.Away σ) (c * algebraMap B A' f) := by
+      rw [map_mul, map_mul, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply,
+        ← hy]
       simp only at hys
-      rw [← hys]; ring
+      rw [← hys]
+      ring
     obtain ⟨⟨_, k, rfl⟩, hk⟩ := (IsLocalization.eq_iff_exists (Submonoid.powers σ) _).1 key
     have hmem : algebraMap B A' (s ^ (k + n) * a) ∈ Ideal.span {algebraMap B A' f} := by
       rw [Ideal.mem_span_singleton']

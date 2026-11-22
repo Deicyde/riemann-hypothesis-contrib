@@ -27,26 +27,27 @@ def hdiff (ts : List (Deg k × R)) (F : GMod B R k) (m : Deg k) : ℤ :=
   ∑ I ∈ (Finset.univ : Finset (Fin ts.length)).powerset,
     (-1 : ℤ) ^ I.card * ((Module.length B (F.gr (m - ∑ i ∈ I, (ts.get i).1))).toNat : ℤ)
 
-theorem hdiff_nil (F : GMod B R k) (m : Deg k) :
-    hdiff ([] : List (Deg k × R)) F m = ((Module.length B (F.gr m)).toNat : ℤ) := by
+theorem hdiff_nil (F : GMod B R k) (m : Deg k)
+    : hdiff ([] : List (Deg k × R)) F m = ((Module.length B (F.gr m)).toNat : ℤ) := by
   have : (Finset.univ : Finset (Fin ([] : List (Deg k × R)).length)) = ∅ := rfl
   rw [hdiff, this, Finset.powerset_empty, Finset.sum_singleton, Finset.sum_empty, sub_zero,
     Finset.card_empty, pow_zero, one_mul]
 
-theorem hdiff_cons (d : Deg k) (s : R) (ts : List (Deg k × R)) (F : GMod B R k) (m : Deg k) :
-    hdiff ((d, s) :: ts) F m = hdiff ts F m - hdiff ts F (m - d) := by
+theorem hdiff_cons (d : Deg k) (s : R) (ts : List (Deg k × R)) (F : GMod B R k) (m : Deg k)
+    : hdiff ((d, s) :: ts) F m = hdiff ts F m - hdiff ts F (m - d) := by
   show ∑ I ∈ (Finset.univ : Finset (Fin (ts.length + 1))).powerset,
         (-1 : ℤ) ^ I.card *
           ((Module.length B (F.gr (m - ∑ i ∈ I, (((d, s) :: ts).get i).1))).toNat : ℤ) = _
   rw [hdiff, hdiff, sum_powerset_fin_succ, sub_eq_add_neg, ← Finset.sum_neg_distrib]
-  have hsum : ∀ J : Finset (Fin ts.length),
-      ∑ i ∈ J.image Fin.succ, (((d, s) :: ts).get i).1 = ∑ j ∈ J, (ts.get j).1 := fun J => by
+  have hsum
+      : ∀ J : Finset (Fin ts.length),
+        ∑ i ∈ J.image Fin.succ, (((d, s) :: ts).get i).1 = ∑ j ∈ J, (ts.get j).1 := fun J => by
     rw [Finset.sum_image (fun a _ b _ hab => Fin.succ_injective _ hab)]
     rfl
-  have h0 : ∀ J : Finset (Fin ts.length), (0 : Fin (ts.length + 1)) ∉ J.image Fin.succ :=
-    fun J => by
-      simp only [mem_image, not_exists, not_and]
-      exact fun j _ => Fin.succ_ne_zero j
+  have h0
+      : ∀ J : Finset (Fin ts.length), (0 : Fin (ts.length + 1)) ∉ J.image Fin.succ := fun J => by
+    simp only [mem_image, not_exists, not_and]
+    exact fun j _ => Fin.succ_ne_zero j
   congr 1
   · refine Finset.sum_congr rfl fun J _ => ?_
     rw [hsum, Finset.card_image_of_injective _ (Fin.succ_injective _)]
@@ -60,14 +61,18 @@ theorem hdiff_cons (d : Deg k) (s : R) (ts : List (Deg k × R)) (F : GMod B R k)
     rw [this]
     ring
 
-theorem ev_shift {p : Deg k → Prop} (d : Deg k) (h : ∀ᶠ m in atTop, p m) :
-    ∀ᶠ m in atTop, p (m - d) := by
+theorem ev_shift {p : Deg k → Prop} (d : Deg k) (h : ∀ᶠ m in atTop, p m)
+    : ∀ᶠ m in atTop, p (m - d) := by
   rw [eventually_atTop] at h ⊢
   obtain ⟨a, ha⟩ := h
   exact ⟨a + d, fun b hb => ha _ (le_sub_iff_add_le.mpr hb)⟩
 
-theorem admissible_of_admissible_nil [IsLocalRing B] (𝒜 : Deg k → Submodule B R) {J : Ideal R}
-    (ts : List (Deg k × R)) (h : admitted 𝒜 [] J) : admitted 𝒜 ts J := by
+theorem admissible_of_admissible_nil
+    [IsLocalRing B]
+    (𝒜 : Deg k → Submodule B R)
+    {J : Ideal R}
+    (ts : List (Deg k × R)) (h : admitted 𝒜 [] J)
+    : admitted 𝒜 ts J := by
   obtain ⟨N, hN⟩ := h
   refine ⟨N, hN.trans (sup_le_sup_left ?_ _)⟩
   rw [secs, Ideal.span_le]
@@ -90,8 +95,9 @@ def sesSubQuo (F : GMod B R k) (N : Submodule R F.M) : SES (F.sub N) F (F.quo N)
 
 def mulS (F : GMod B R k) (s : R) (d : Deg k) : (F.shift d).M →ₗ[R] F.M := LinearMap.lsmul R F.M s
 
-theorem mulS_gr (𝒜 : Deg k → Submodule B R) {F : GMod B R k} (hF : F.IsGr 𝒜) {s : R} {d : Deg k}
-    (hs : s ∈ 𝒜 d) : E7.IsGrHom (F.shift d) F (mulS F s d) := by
+theorem mulS_gr
+    (𝒜 : Deg k → Submodule B R) {F : GMod B R k} (hF : F.IsGr 𝒜) {s : R} {d : Deg k} (hs : s ∈ 𝒜 d)
+    : E7.IsGrHom (F.shift d) F (mulS F s d) := by
   intro m x hx
   have hx' : x ∈ F.gr (m - d) := hx
   have h := hF.smul_mem hs hx'
@@ -99,28 +105,34 @@ theorem mulS_gr (𝒜 : Deg k → Submodule B R) {F : GMod B R k} (hF : F.IsGr �
 
 end Gen
 
-theorem step (hE1 : EulerAdditivityExactSequence) (hGr : RuleGr) {k : ℕ} (X : HidaSetting k) (ts : List (Deg k × X.R))
-    (F : X.Mod) (d : Deg k) (s : X.R) (hV : Valid X.𝒜 ts) (hs : s ∈ X.𝒜 d) (hF : F.IsGr X.𝒜)
-    (hA : admitted X.𝒜 [] F.Ann) :
-    ∀ᶠ m in atTop, chi ((d, s) :: ts) F m = chi ts F m - chi ts F (m - d) := by
+theorem step
+    (hE1 : EulerAdditivityExactSequence) (hGr : RuleGr)
+    {k : ℕ} (X : HidaSetting k) (ts : List (Deg k × X.R)) (F : X.Mod) (d : Deg k) (s : X.R)
+    (hV : Valid X.𝒜 ts) (hs : s ∈ X.𝒜 d) (hF : F.IsGr X.𝒜) (hA : admitted X.𝒜 [] F.Ann)
+    : ∀ᶠ m in atTop, chi ((d, s) :: ts) F m = chi ts F m - chi ts F (m - d) := by
   have hFd := (hGr k X F hF).2.1 d
   obtain ⟨hq, ha⟩ := (hGr k X F hF).2.2 d s hs
   have g := mulS_gr X.𝒜 hF hs
   have hI := ((hGr k X F hF).1 _ (g.range_hom hFd.internal)).1
   have hAt : admitted X.𝒜 ts F.Ann := admissible_of_admissible_nil X.𝒜 ts hA
-  have e1 := hE1 k X ts (F.ann s d) (F.shift d) _ hV ha hFd hI
-    (E7.sesOfKer (G := F.shift d) (H := F) (LinearMap.ker (LinearMap.lsmul X.R F.M s)) (mulS F s d)
-      (fun _ => Iff.rfl) g hFd.internal hF.internal) hAt
-  have e2 := hE1 k X ts _ F (F.quot s) hV hI hF hq
-    (sesSubQuo F (LinearMap.range (LinearMap.lsmul X.R F.M s))) hAt
+  have e1 :=
+    hE1 k X ts (F.ann s d) (F.shift d) _ hV ha hFd hI
+      (E7.sesOfKer (G := F.shift d) (H := F) (LinearMap.ker (LinearMap.lsmul X.R F.M s))
+        (mulS F s d)
+        (fun _ => Iff.rfl)
+        g hFd.internal hF.internal)
+      hAt
+  have e2 :=
+    hE1 k X ts _ F (F.quot s) hV hI hF hq
+      (sesSubQuo F (LinearMap.range (LinearMap.lsmul X.R F.M s))) hAt
   filter_upwards [e1, e2] with m h1 h2
   rw [chi_shift] at h1
   show chi ts (F.quot s) m - chi ts (F.ann s d) m = _
-  have h2' : chi ts F m = chi ts (F.sub (LinearMap.range (mulS F s d))) m + chi ts (F.quot s) m := h2
+  have h2' : chi ts F m = chi ts (F.sub (LinearMap.range (mulS F s d))) m + chi ts (F.quot s) m :=
+    h2
   linarith
 
 end Sm
-
 
 open Sm in
 theorem ruleSmall : RuleSmall := by

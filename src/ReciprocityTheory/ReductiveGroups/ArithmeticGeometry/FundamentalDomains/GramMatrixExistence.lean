@@ -6,8 +6,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.GramMatrixExistence
 
-open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.PerpBasisExistence
-  ReciprocityTheory.ChartRestriction.G.FD.PerpLatticeTransfer ReciprocityTheory.ChartRestriction.G.FD.PerpComponentCombination
+open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.PerpBasisExistence
+  ReciprocityTheory.ChartRestriction.G.FD.PerpLatticeTransfer
+  ReciprocityTheory.ChartRestriction.G.FD.PerpComponentCombination
 open scoped ComplexConjugate
 
 noncomputable section
@@ -68,18 +70,25 @@ private lemma emb_sum_smul' (τ : E →+* ℂ) {n : ℕ} (c : Fin n → E) (β :
   set_option synthInstance.maxHeartbeats 100000 in
     simp [Data.emb, Finset.sum_apply, map_sum, map_mul]
 
-theorem Q_exists (X : DataX E r) (ξ : Fin r → E) (z0 : Frame X.Ψ r)
-    (f : X.Ψ → Fin (r - 2) → Fin r → ℂ) (hξ : X.IsIso ξ) (hz : z0 ∈ X.dom) (hf : X.UBasis z0 ξ f)
+theorem Q_exists
+    (X : DataX E r)
+    (ξ : Fin r → E)
+    (z0 : Frame X.Ψ r) (f : X.Ψ → Fin (r - 2) → Fin r → ℂ)
+    (hξ : X.IsIso ξ) (hz : z0 ∈ X.dom) (hf : X.UBasis z0 ξ f)
     (β : Fin (r - 2) → Fin r → E) (hβξ : ∀ k, herm X.Gm (β k) ξ = 0)
     (hli : LinearIndependent E (Fin.cons ξ β : Fin (r - 2 + 1) → Fin r → E))
-    (hspan : ∀ x : Fin r → E, herm X.Gm x ξ = 0 →
-      ∃ (c : Fin (r - 2) → E) (e : E), x = ∑ k, c k • β k + e • ξ) :
-    ∃ Q : X.Ψ → Matrix (Fin (r - 2)) (Fin (r - 2)) ℂ, (∀ τ, (Q τ).det ≠ 0) ∧
-      (∀ τ (c c' : Fin (r - 2) → E), τ.1 ((Sform X β).h c c') =
-        ReciprocityTheory.MultiplicativeHeights.jForm (X.p0 - 1) (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c)
-          (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c')) ∧
-      (∀ τ (c : Fin (r - 2) → E), X.ucomp z0 ξ (X.embV (∑ k, c k • β k)) τ =
-        ∑ k, (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c) k • f τ k) := by
+    (hspan : ∀ x : Fin r → E,
+      herm X.Gm x ξ = 0 → ∃ (c : Fin (r - 2) → E) (e : E), x = ∑ k, c k • β k + e • ξ)
+    : ∃ Q : X.Ψ → Matrix (Fin (r - 2)) (Fin (r - 2)) ℂ,
+      (∀ τ, (Q τ).det ≠ 0)
+        ∧ (∀ τ (c c' : Fin (r - 2) → E),
+          τ.1 ((Sform X β).h c c')
+            = ReciprocityTheory.MultiplicativeHeights.jForm (X.p0 - 1)
+              (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c)
+              (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c'))
+        ∧ (∀ τ (c : Fin (r - 2) → E),
+          X.ucomp z0 ξ (X.embV (∑ k, c k • β k)) τ
+            = ∑ k, (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c) k • f τ k) := by
   classical
   have hξξ : herm X.Gm ξ ξ = 0 := hξ.2.1
   have hξ0 : ξ ≠ 0 := hξ.2.2
@@ -94,16 +103,21 @@ theorem Q_exists (X : DataX E r) (ξ : Fin r → E) (z0 : Frame X.Ψ r)
     intro τ
     rw [Data.Hf_self X.toData hz]
     exact_mod_cast (Data.maj_pos X.toData hz τ (he0 τ)).ne'
-  have hperp : ∀ (τ : X.Ψ) (y : Fin r → E), herm X.Gm y ξ = 0 →
-      hermC τ.1 X.Gm (Data.emb τ.1 y) (Data.emb τ.1 ξ) = 0 := by
+  have hperp
+      : ∀ (τ : X.Ψ) (y : Fin r → E),
+        herm X.Gm y ξ = 0 → hermC τ.1 X.Gm (Data.emb τ.1 y) (Data.emb τ.1 ξ) = 0 := by
     intro τ y hy
     rw [← herm_eq_hermC_emb_emb, hy, map_zero]
-  have hee : ∀ τ : X.Ψ, hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0 :=
-    fun τ => hperp τ ξ hξξ
-  have huc : ∀ (τ : X.Ψ) (v : Fin r → E),
-      X.ucomp z0 ξ (X.embV v) τ = uc X.toData z0 ξ τ (Data.emb τ.1 v) := fun τ v => rfl
-  have hmem : ∀ (τ : X.Ψ) (v : Fin r → ℂ), hermC τ.1 X.Gm v (Data.emb τ.1 ξ) = 0 →
-      uc X.toData z0 ξ τ v ∈ Submodule.span ℂ (Set.range (f τ)) := by
+  have hee : ∀ τ : X.Ψ, hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0 := fun τ =>
+    hperp τ ξ hξξ
+  have huc
+      : ∀ (τ : X.Ψ) (v : Fin r → E),
+        X.ucomp z0 ξ (X.embV v) τ = uc X.toData z0 ξ τ (Data.emb τ.1 v) := fun τ v =>
+    rfl
+  have hmem
+      : ∀ (τ : X.Ψ) (v : Fin r → ℂ),
+        hermC τ.1 X.Gm v (Data.emb τ.1 ξ) = 0
+          → uc X.toData z0 ξ τ v ∈ Submodule.span ℂ (Set.range (f τ)) := by
     intro τ v hv
     set e := Data.emb τ.1 ξ with he
     set t := X.Hf z0 τ v e / X.Hf z0 τ e e with ht
@@ -112,12 +126,13 @@ theorem Q_exists (X : DataX E r) (ξ : Fin r → E) (z0 : Frame X.Ψ r)
       rw [hu, hermC_sub_smul_left, hv, hee τ]
       ring
     have h2 : X.Hf z0 τ (uc X.toData z0 ξ τ v) e = 0 := by
-      have hl : (2 : ℂ) • X.ppos z0 τ (v - t • e) - (v - t • e) =
-          ((2 : ℂ) • X.ppos z0 τ v - v) - t • ((2 : ℂ) • X.ppos z0 τ e - e) := by
-        rw [ReciprocityTheory.ChartRestriction.G.FD.OrthogonalComplementLines.ppos_sub X.toData, Data.ppos_smul_eq]
+      have hl
+          : (2 : ℂ) • X.ppos z0 τ (v - t • e) - (v - t • e)
+            = ((2 : ℂ) • X.ppos z0 τ v - v) - t • ((2 : ℂ) • X.ppos z0 τ e - e) := by
+        rw [ReciprocityTheory.ChartRestriction.G.FD.OrthogonalComplementLines.ppos_sub X.toData,
+          Data.ppos_smul_eq]
         module
-      have hd : X.Hf z0 τ (uc X.toData z0 ξ τ v) e =
-          X.Hf z0 τ v e - t * X.Hf z0 τ e e := by
+      have hd : X.Hf z0 τ (uc X.toData z0 ξ τ v) e = X.Hf z0 τ v e - t * X.Hf z0 τ e e := by
         rw [hu]
         show hermC τ.1 X.Gm ((2 : ℂ) • X.ppos z0 τ (v - t • e) - (v - t • e)) e = _
         rw [hl, hermC_sub_smul_left]
@@ -130,44 +145,58 @@ theorem Q_exists (X : DataX E r) (ξ : Fin r → E) (z0 : Frame X.Ψ r)
       change I * X.Hf z0 τ (uc X.toData z0 ξ τ v) e = 0
       rw [h2, mul_zero]
     exact (hf τ).2.2.2.2 _ h1 h3
-  have hcoord : ∀ (τ : X.Ψ) (w : Fin r → ℂ), w ∈ Submodule.span ℂ (Set.range (f τ)) →
-      w = ∑ j : Fin (r - 2), ((if (j : ℕ) < X.p0 - 1 then (1 : ℂ) else -1) * hermC τ.1 X.Gm w (f τ j)) • f τ j := by
-    intro τ w hw
-    obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).1 hw
-    refine Finset.sum_congr rfl fun j _ => ?_
-    congr 1
-    rw [hermC_sum_smul_left]
-    simp_rw [(hf τ).2.2.1]
-    simp only [mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-    split_ifs <;> ring
-  let Q : X.Ψ → Matrix (Fin (r - 2)) (Fin (r - 2)) ℂ := fun τ => Matrix.of fun j k =>
-    (if (j : ℕ) < X.p0 - 1 then (1 : ℂ) else -1) *
-      hermC τ.1 X.Gm (uc X.toData z0 ξ τ (Data.emb τ.1 (β k))) (f τ j)
-  have hb : ∀ (τ : X.Ψ) (k : Fin (r - 2)),
-      uc X.toData z0 ξ τ (Data.emb τ.1 (β k)) = ∑ j, Q τ j k • f τ j := by
+  have hcoord
+      : ∀ (τ : X.Ψ) (w : Fin r → ℂ),
+        w ∈ Submodule.span ℂ (Set.range (f τ))
+          → w
+            = ∑ j : Fin (r - 2), ((if (j : ℕ) < X.p0 - 1 then (1 : ℂ) else -1) * hermC τ.1 X.Gm w (f τ j)) • f τ j :=
+    by
+      intro τ w hw
+      obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).1 hw
+      refine Finset.sum_congr rfl fun j _ => ?_
+      congr 1
+      rw [hermC_sum_smul_left]
+      simp_rw [(hf τ).2.2.1]
+      simp only [mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      split_ifs <;> ring
+  let Q : X.Ψ → Matrix (Fin (r - 2)) (Fin (r - 2)) ℂ := fun τ =>
+    Matrix.of fun j k =>
+      (if (j : ℕ) < X.p0 - 1 then (1 : ℂ) else -1)
+        * hermC τ.1 X.Gm (uc X.toData z0 ξ τ (Data.emb τ.1 (β k))) (f τ j)
+  have hb
+      : ∀ (τ : X.Ψ) (k : Fin (r - 2)),
+        uc X.toData z0 ξ τ (Data.emb τ.1 (β k)) = ∑ j, Q τ j k • f τ j := by
     intro τ k
     exact hcoord τ _ (hmem τ _ (hperp τ _ (hβξ k)))
-  have hQf : ∀ τ (c : Fin (r - 2) → E), X.ucomp z0 ξ (X.embV (∑ k, c k • β k)) τ =
-      ∑ k, (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c) k • f τ k := by
+  have hQf
+      : ∀ τ (c : Fin (r - 2) → E),
+        X.ucomp z0 ξ (X.embV (∑ k, c k • β k)) τ
+          = ∑ k, (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c) k • f τ k := by
     intro τ c
     rw [huc, emb_sum_smul', uc_comb (X := X.toData) (z0 := z0) (ξ := ξ) (τ := τ) hz]
     simp_rw [hb τ, Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_
-    simp only [Matrix.mulVec, dotProduct, ReciprocityTheory.MultiplicativeHeights.embVec, Finset.sum_smul]
+    simp only [Matrix.mulVec, dotProduct, ReciprocityTheory.MultiplicativeHeights.embVec,
+      Finset.sum_smul]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [mul_comm]
-  have hp : ∀ (τ : X.Ψ) (c : Fin (r - 2) → E),
-      hermC τ.1 X.Gm (Data.emb τ.1 (∑ k, c k • β k)) (Data.emb τ.1 ξ) = 0 := by
+  have hp
+      : ∀ (τ : X.Ψ) (c : Fin (r - 2) → E),
+        hermC τ.1 X.Gm (Data.emb τ.1 (∑ k, c k • β k)) (Data.emb τ.1 ξ) = 0 := by
     intro τ c
     rw [emb_sum_smul', hermC_sum_smul_left]
     simp [hperp τ _ (hβξ _)]
-  have hSQ : ∀ τ (c c' : Fin (r - 2) → E), τ.1 ((Sform X β).h c c') =
-      ReciprocityTheory.MultiplicativeHeights.jForm (X.p0 - 1) (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c)
-        (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c') := by
+  have hSQ
+      : ∀ τ (c c' : Fin (r - 2) → E),
+        τ.1 ((Sform X β).h c c')
+          = ReciprocityTheory.MultiplicativeHeights.jForm (X.p0 - 1)
+            (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c)
+            (Q τ *ᵥ ReciprocityTheory.MultiplicativeHeights.embVec τ.1 c') := by
     intro τ c c'
-    rw [Sform_h, herm_eq_hermC_emb_emb, ← uc_perp (X := X.toData) (z0 := z0) (ξ := ξ) (τ := τ) (hee τ)
-      (Data.emb τ.1 (∑ k, c k • β k)) (Data.emb τ.1 (∑ k, c' k • β k)) (hp τ c) (hp τ c'),
+    rw [Sform_h, herm_eq_hermC_emb_emb,
+      ← uc_perp (X := X.toData) (z0 := z0) (ξ := ξ) (τ := τ) (hee τ) (Data.emb τ.1 (∑ k, c k • β k))
+        (Data.emb τ.1 (∑ k, c' k • β k)) (hp τ c) (hp τ c'),
       ← huc, ← huc, hQf, hQf, hermC_sum_smul_left]
     simp_rw [hermC_sum_smul_right, (hf τ).2.2.1]
     simp only [mul_ite, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
@@ -177,13 +206,21 @@ theorem Q_exists (X : DataX E r) (ξ : Fin r → E) (z0 : Frame X.Ψ r)
   refine ⟨Q, ?_, hSQ, hQf⟩
   intro τ hdet
   apply detG_ne (X := X) (ξ := ξ) (β := β) hξ hβξ hli hspan
-  have hmap : τ.1.mapMatrix (Sform X β).G = (Q τ)ᴴ *
-      Matrix.diagonal (fun k : Fin (r - 2) => ReciprocityTheory.MultiplicativeHeights.sgn (X.p0 - 1) k) * Q τ := by
+  have hmap
+      : τ.1.mapMatrix (Sform X β).G
+        = (Q τ)ᴴ
+          * Matrix.diagonal (fun k : Fin (r - 2) =>
+            ReciprocityTheory.MultiplicativeHeights.sgn (X.p0 - 1) k)
+          * Q τ := by
     ext a b
     have h := hSQ τ (Pi.single a 1) (Pi.single b 1)
     have hh : (Sform X β).h (Pi.single a 1) (Pi.single b 1) = (Sform X β).G a b := by
-      simp [ReciprocityTheory.MultiplicativeHeights.HermForm.h, Pi.single_apply, apply_ite, ite_mul, mul_ite]
-    have hs : ∀ a : Fin (r - 2), ReciprocityTheory.MultiplicativeHeights.embVec τ.1 (Pi.single a (1 : E)) = Pi.single a 1 := by
+      simp [ReciprocityTheory.MultiplicativeHeights.HermForm.h, Pi.single_apply, apply_ite, ite_mul,
+        mul_ite]
+    have hs
+        : ∀ a : Fin (r - 2),
+          ReciprocityTheory.MultiplicativeHeights.embVec τ.1 (Pi.single a (1 : E))
+            = Pi.single a 1 := by
       intro a
       funext i
       by_cases hi : i = a
@@ -191,7 +228,8 @@ theorem Q_exists (X : DataX E r) (ξ : Fin r → E) (z0 : Frame X.Ψ r)
       · simp [ReciprocityTheory.MultiplicativeHeights.embVec, hi]
     rw [hh, hs, hs, Matrix.mulVec_single_one, Matrix.mulVec_single_one] at h
     rw [RingHom.mapMatrix_apply, Matrix.map_apply, h]
-    simp [ReciprocityTheory.MultiplicativeHeights.jForm, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.diagonal_apply]
+    simp [ReciprocityTheory.MultiplicativeHeights.jForm, Matrix.mul_apply,
+      Matrix.conjTranspose_apply, Matrix.diagonal_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     ring
   have hdm := RingHom.map_det τ.1 (Sform X β).G

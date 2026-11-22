@@ -10,72 +10,111 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD
 
 variable {D : D7} {T : Top D}
 
-def evCH (h : LawsP T) {j : ℕ} (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c) (Z : Comp (T.Q.Xo j) T.Q.c) :
-    T.R j →+* Om Z where
+def evCH
+    (h : LawsP T) {j : ℕ} (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c) (Z : Comp (T.Q.Xo j) T.Q.c)
+    : T.R j →+* Om Z where
   toFun f := evC hG Z f
-  map_one' := evalAt_one (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) _
-    (h.allTest j hj (Om Z) _)
-  map_mul' f g := evalAt_mul (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) f g _
-  map_zero' := evalAt_zero (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) _
-  map_add' f g := evalAt_add (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) f g _
+  map_one' :=
+    evalAt_one (K := T.Q.c.F)
+      (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S)
+      (fun φ y z => FrMap φ y z)
+      _ (h.allTest j hj (Om Z) _)
+  map_mul' f g :=
+    evalAt_mul (K := T.Q.c.F)
+      (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S)
+      (fun φ y z => FrMap φ y z)
+      f g _
+  map_zero' :=
+    evalAt_zero (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) _
+  map_add' f g :=
+    evalAt_add (K := T.Q.c.F)
+      (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S)
+      (fun φ y z => FrMap φ y z)
+      f g _
 
-theorem rdU_one_of (h : LawsP T) {j : ℕ} (hj : InR D j) (k : (T.U j T.σ₀).Comp)
-    {y : Frame ((T.U j T.σ₀).X k).Ψ D.R.r} (hy : y ∈ ((T.U j T.σ₀).X k).dom) : rdU (T.U j T.σ₀) 1 k y = 1 := by
+theorem rdU_one_of
+    (h : LawsP T)
+    {j : ℕ} (hj : InR D j) (k : (T.U j T.σ₀).Comp)
+    {y : Frame ((T.U j T.σ₀).X k).Ψ D.R.r} (hy : y ∈ ((T.U j T.σ₀).X k).dom)
+    : rdU (T.U j T.σ₀) 1 k y = 1 := by
   haveI : IsReduced (CAt T.σ₀) := inferInstanceAs (IsReduced ℂ)
   unfold rdU
   simp only [LinearMap.coe_mk, AddHom.coe_mk, dif_pos hy]
   show toC (evalAt (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) 1
     ((T.U j T.σ₀).un k ⟨y, hy⟩)) = 1
-  rw [evalAt_one (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) _
-    (h.allTest j hj _ _)]
+  rw [evalAt_one (K := T.Q.c.F)
+    (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S)
+    (fun φ y z => FrMap φ y z)
+    _ (h.allTest j hj _ _)]
   rfl
 
-
 open Classical in
-def frAt {j : ℕ} {k : (T.U j T.σ₀).Comp} (x₀ x : Frame ((T.U j T.σ₀).X k).Ψ D.R.r) :
-    Frame ((T.U j T.σ₀).X k).Ψ D.R.r :=
+def frAt {j : ℕ} {k : (T.U j T.σ₀).Comp} (x₀ x : Frame ((T.U j T.σ₀).X k).Ψ D.R.r)
+    : Frame ((T.U j T.σ₀).X k).Ψ D.R.r :=
   if x ∈ ((T.U j T.σ₀).X k).dom then x else x₀
 
-theorem frAt_mem {j : ℕ} {k : (T.U j T.σ₀).Comp} {x₀ : Frame ((T.U j T.σ₀).X k).Ψ D.R.r}
-    (hx0 : x₀ ∈ ((T.U j T.σ₀).X k).dom) (x : Frame ((T.U j T.σ₀).X k).Ψ D.R.r) :
-    frAt x₀ x ∈ ((T.U j T.σ₀).X k).dom := by
+theorem frAt_mem
+    {j : ℕ} {k : (T.U j T.σ₀).Comp} {x₀ : Frame ((T.U j T.σ₀).X k).Ψ D.R.r}
+    (hx0 : x₀ ∈ ((T.U j T.σ₀).X k).dom) (x : Frame ((T.U j T.σ₀).X k).Ψ D.R.r)
+    : frAt x₀ x ∈ ((T.U j T.σ₀).X k).dom := by
   unfold frAt
   split_ifs with hx
   · exact hx
   · exact hx0
 
-def evFr (h : LawsP T) {j : ℕ} (hj : InR D j) {k : (T.U j T.σ₀).Comp} {x₀ : Frame ((T.U j T.σ₀).X k).Ψ D.R.r}
-    (hx0 : x₀ ∈ ((T.U j T.σ₀).X k).dom) : T.R j →+* (Frame ((T.U j T.σ₀).X k).Ψ D.R.r → ℂ) where
+def evFr
+    (h : LawsP T)
+    {j : ℕ} (hj : InR D j)
+    {k : (T.U j T.σ₀).Comp} {x₀ : Frame ((T.U j T.σ₀).X k).Ψ D.R.r}
+    (hx0 : x₀ ∈ ((T.U j T.σ₀).X k).dom)
+    : T.R j →+* (Frame ((T.U j T.σ₀).X k).Ψ D.R.r → ℂ) where
   toFun f x := rdU (T.U j T.σ₀) f k (frAt x₀ x)
   map_one' := funext fun x => rdU_one_of h hj k (frAt_mem hx0 x)
-  map_mul' f g := funext fun x => by
-    show rdU (T.U j T.σ₀) (f * g) k (frAt x₀ x) = rdU (T.U j T.σ₀) f k (frAt x₀ x) * rdU (T.U j T.σ₀) g k (frAt x₀ x)
-    rw [rdU_mul]; rfl
+  map_mul' f g :=
+    funext fun x => by
+      show rdU (T.U j T.σ₀) (f * g) k (frAt x₀ x) = rdU (T.U j T.σ₀) f k (frAt x₀ x) * rdU (T.U j T.σ₀) g k (frAt x₀ x)
+      rw [rdU_mul]
+      rfl
   map_zero' := funext fun x => by simp
   map_add' f g := funext fun x => by simp
 
-def augF {j : ℕ} (k : (T.U j T.σ₀).Comp) :
-    AddMonoidAlgebra (Frame ((T.U j T.σ₀).X k).Ψ D.R.r → ℂ) (WTZ D.host.E) →+* (Frame ((T.U j T.σ₀).X k).Ψ D.R.r → ℂ) :=
+def augF {j : ℕ} (k : (T.U j T.σ₀).Comp)
+    : AddMonoidAlgebra (Frame ((T.U j T.σ₀).X k).Ψ D.R.r → ℂ) (WTZ D.host.E)
+      →+* (Frame ((T.U j T.σ₀).X k).Ψ D.R.r → ℂ) :=
   AddMonoidAlgebra.liftNCRingHom (RingHom.id _) 1 (fun _ _ => Commute.all _ _)
 
-def thR (h : LawsP T) {j : ℕ} (hj : InR D j) {k : (T.U j T.σ₀).Comp} {x₀ : Frame ((T.U j T.σ₀).X k).Ψ D.R.r}
-    (hx0 : x₀ ∈ ((T.U j T.σ₀).X k).dom) :
-    AddMonoidAlgebra (T.R j) (WTZ D.host.E) →+* (Frame ((T.U j T.σ₀).X k).Ψ D.R.r → ℂ) :=
+def thR
+    (h : LawsP T)
+    {j : ℕ} (hj : InR D j)
+    {k : (T.U j T.σ₀).Comp} {x₀ : Frame ((T.U j T.σ₀).X k).Ψ D.R.r}
+    (hx0 : x₀ ∈ ((T.U j T.σ₀).X k).dom)
+    : AddMonoidAlgebra (T.R j) (WTZ D.host.E) →+* (Frame ((T.U j T.σ₀).X k).Ψ D.R.r → ℂ) :=
   (augF k).comp (AddMonoidAlgebra.mapRingHom (WTZ D.host.E) (evFr h hj hx0))
 
 def secZ (T : Top D) (j : ℕ) (G : WTZ D.host.E) : Submodule T.Q.c.F (T.R j) :=
   ⨆ u : {u : WeightFamilies.Wt D j // wtZ (wtA u) u.n = G}, sec (T.Q.Xo j) T.Q.c (wtA u.1) u.1.n
 
-theorem secZ_mul {j : ℕ} {G G' : WTZ D.host.E} {f g : T.R j} (hf : f ∈ secZ T j G) (hg : g ∈ secZ T j G') :
-    f * g ∈ secZ T j (G + G') := by
-  refine Submodule.iSup_induction _ (motive := fun f => f * g ∈ secZ T j (G + G')) hf (fun p f hf => ?_)
-    (by rw [zero_mul]; exact zero_mem _) (fun f1 f2 h1 h2 => by rw [add_mul]; exact add_mem h1 h2)
-  refine Submodule.iSup_induction _ (motive := fun g => f * g ∈ secZ T j (G + G')) hg (fun q g hg => ?_)
-    (by rw [mul_zero]; exact zero_mem _) (fun g1 g2 h1 h2 => by rw [mul_add]; exact add_mem h1 h2)
+theorem secZ_mul
+    {j : ℕ} {G G' : WTZ D.host.E} {f g : T.R j} (hf : f ∈ secZ T j G) (hg : g ∈ secZ T j G')
+    : f * g ∈ secZ T j (G + G') := by
+  refine Submodule.iSup_induction _
+    (motive := fun f => f * g ∈ secZ T j (G + G'))
+    hf
+    (fun p f hf => ?_)
+    (by rw [zero_mul]; exact zero_mem _)
+    (fun f1 f2 h1 h2 => by rw [add_mul]; exact add_mem h1 h2)
+  refine Submodule.iSup_induction _
+    (motive := fun g => f * g ∈ secZ T j (G + G'))
+    hg
+    (fun q g hg => ?_)
+    (by rw [mul_zero]; exact zero_mem _)
+    (fun g1 g2 h1 h2 => by rw [mul_add]; exact add_mem h1 h2)
   have hs := sec_mul (T.Q.Xo j) T.Q.c _ _ _ _ hf hg
   rw [← wtA_wadd] at hs
   refine Submodule.mem_iSup_of_mem ⟨WeightAlgebra.wadd p.1 q.1, ?_⟩ hs
@@ -112,32 +151,34 @@ def secSub (T : Top D) (j : ℕ) : Subring (AddMonoidAlgebra (T.R j) (WTZ D.host
   mul_mem' {a b} ha hb G := by
     classical
     rw [AddMonoidAlgebra.coeff_mul]
-    refine Submodule.finsuppSum_mem _ _ _ _ fun m1 _ => Submodule.finsuppSum_mem _ _ _ _ fun m2 _ => ?_
+    refine Submodule.finsuppSum_mem _ _ _ _ fun m1 _ =>
+      Submodule.finsuppSum_mem _ _ _ _ fun m2 _ => ?_
     split_ifs with hm
     · subst hm; exact secZ_mul (ha m1) (hb m2)
     · exact zero_mem _
   zero_mem' G := by simp
   add_mem' {a b} ha hb G := by
     rw [AddMonoidAlgebra.coeff_add, Finsupp.add_apply]; exact add_mem (ha G) (hb G)
-  neg_mem' {a} ha G := by
-    rw [AddMonoidAlgebra.coeff_neg, Finsupp.neg_apply]; exact neg_mem (ha G)
+  neg_mem' {a} ha G := by rw [AddMonoidAlgebra.coeff_neg, Finsupp.neg_apply]; exact neg_mem (ha G)
 
 section Kappa
-variable (h : LawsP T) {j : ℕ} (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
-  {κ : Comp (T.Q.Xo j) T.Q.c → (T.U j T.σ₀).Comp} (hκ : KappaTie j hG κ) (Z : Comp (T.Q.Xo j) T.Q.c)
-
+variable
+  (h : LawsP T)
+  {j : ℕ} (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
+  {κ : Comp (T.Q.Xo j) T.Q.c → (T.U j T.σ₀).Comp} (hκ : KappaTie j hG κ)
+  (Z : Comp (T.Q.Xo j) T.Q.c)
 
 variable {x₀ : Frame ((T.U j T.σ₀).X (κ Z)).Ψ D.R.r} (hx0 : x₀ ∈ ((T.U j T.σ₀).X (κ Z)).dom)
-
 
 end Kappa
 
 section Rd
-variable (h : LawsP T) {j : ℕ} (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
-  {κ : Comp (T.Q.Xo j) T.Q.c → (T.U j T.σ₀).Comp} (hκ : KappaTie j hG κ) (Z : Comp (T.Q.Xo j) T.Q.c)
+variable
+  (h : LawsP T)
+  {j : ℕ} (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
+  {κ : Comp (T.Q.Xo j) T.Q.c → (T.U j T.σ₀).Comp} (hκ : KappaTie j hG κ)
+  (Z : Comp (T.Q.Xo j) T.Q.c)
   {x₀ : Frame ((T.U j T.σ₀).X (κ Z)).Ψ D.R.r} (hx0 : x₀ ∈ ((T.U j T.σ₀).X (κ Z)).dom)
-
-
 
 end Rd
 

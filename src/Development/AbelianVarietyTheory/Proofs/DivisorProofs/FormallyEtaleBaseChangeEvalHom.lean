@@ -10,10 +10,10 @@ namespace GlobalTheory
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial
 
-theorem formallyEtale_mvPolynomial_eval₂_tensor {k R B : Type} [CommRing k] [CommRing R]
-    [CommRing B] [Algebra k R] [Algebra k B] {r : ℕ} (τ : Fin r → B)
-    (hf : (MvPolynomial.eval₂Hom (algebraMap k B) τ).FormallyEtale) :
-    (MvPolynomial.eval₂Hom (Algebra.TensorProduct.includeLeftRingHom : R →+* R ⊗[k] B)
+theorem formallyEtale_mvPolynomial_eval₂_tensor
+    {k R B : Type} [CommRing k] [CommRing R] [CommRing B] [Algebra k R] [Algebra k B]
+    {r : ℕ} (τ : Fin r → B) (hf : (MvPolynomial.eval₂Hom (algebraMap k B) τ).FormallyEtale)
+    : (MvPolynomial.eval₂Hom (Algebra.TensorProduct.includeLeftRingHom : R →+* R ⊗[k] B)
       (fun i => (1 : R) ⊗ₜ[k] τ i)).FormallyEtale := by
   set f := MvPolynomial.eval₂Hom (algebraMap k B) τ with hfdef
   set g := MvPolynomial.eval₂Hom (Algebra.TensorProduct.includeLeftRingHom : R →+* R ⊗[k] B)
@@ -24,8 +24,9 @@ theorem formallyEtale_mvPolynomial_eval₂_tensor {k R B : Type} [CommRing k] [C
   letI : Algebra (MvPolynomial (Fin r) k) (R ⊗[k] B) :=
     (g.comp (algebraMap (MvPolynomial (Fin r) k) (MvPolynomial (Fin r) R))).toAlgebra
   haveI : Algebra.FormallyEtale (MvPolynomial (Fin r) k) B := hf
-  have key : g.comp (algebraMap (MvPolynomial (Fin r) k) (MvPolynomial (Fin r) R)) =
-      (algebraMap B (R ⊗[k] B)).comp f := by
+  have key
+      : g.comp (algebraMap (MvPolynomial (Fin r) k) (MvPolynomial (Fin r) R))
+        = (algebraMap B (R ⊗[k] B)).comp f := by
     apply MvPolynomial.ringHom_ext
     · intro a
       simp only [RingHom.comp_apply, MvPolynomial.algebraMap_def, MvPolynomial.map_C, f, g,
@@ -60,8 +61,8 @@ theorem formallyEtale_mvPolynomial_eval₂_tensor {k R B : Type} [CommRing k] [C
   haveI : Algebra.IsPushout (MvPolynomial (Fin r) k) (MvPolynomial (Fin r) R) B (R ⊗[k] B) :=
     h2.symm
   have : Algebra.FormallyEtale (MvPolynomial (Fin r) R) (R ⊗[k] B) :=
-    Algebra.FormallyEtale.of_equiv
-      (Algebra.IsPushout.equiv (MvPolynomial (Fin r) k) (MvPolynomial (Fin r) R) B (R ⊗[k] B))
+    Algebra.FormallyEtale.of_equiv (Algebra.IsPushout.equiv (MvPolynomial (Fin r) k)
+      (MvPolynomial (Fin r) R) B (R ⊗[k] B))
   exact this
 
 end GlobalTheory

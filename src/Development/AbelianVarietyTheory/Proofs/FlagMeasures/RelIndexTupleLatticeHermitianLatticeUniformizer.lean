@@ -15,10 +15,13 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.LatCard
 
-theorem relIndex_map_of_param {G W : Type*} [AddCommGroup G] [AddCommGroup W] (f : G →+ W)
-    (hf : Function.Injective f) (A : AddSubgroup W) (hA : ∀ w, w ∈ A ↔ ∃ g, f g = w)
-    (T : W →+ W) (t : G → G) (ht : ∀ g, f (t g) = T (f g)) (H : AddSubgroup G)
-    (hH : ∀ g, g ∈ H ↔ ∃ g', t g' = g) : (A.map T).relIndex A = H.index := by
+theorem relIndex_map_of_param
+    {G W : Type*} [AddCommGroup G] [AddCommGroup W]
+    (f : G →+ W) (hf : Function.Injective f)
+    (A : AddSubgroup W) (hA : ∀ w, w ∈ A ↔ ∃ g, f g = w)
+    (T : W →+ W) (t : G → G) (ht : ∀ g, f (t g) = T (f g))
+    (H : AddSubgroup G) (hH : ∀ g, g ∈ H ↔ ∃ g', t g' = g)
+    : (A.map T).relIndex A = H.index := by
   have hA' : A = (⊤ : AddSubgroup G).map f := by
     ext w
     simp [hA]
@@ -27,28 +30,32 @@ theorem relIndex_map_of_param {G W : Type*} [AddCommGroup G] [AddCommGroup W] (f
     simp [hA, hH, ht]
   rw [hT, hA', AddSubgroup.relIndex_map_map_of_injective _ _ hf, AddSubgroup.relIndex_top_right]
 
-theorem card_pairs (m : ℕ) :
-    m + 2 * Fintype.card {p : Fin m × Fin m // p.1 < p.2} = m ^ 2 := by
+theorem card_pairs (m : ℕ) : m + 2 * Fintype.card {p : Fin m × Fin m // p.1 < p.2} = m ^ 2 := by
   rw [← Nat.card_eq_fintype_card]
   have e1 : {p : Fin m × Fin m // p.1 < p.2} ≃ {p : Fin m × Fin m // p.2 < p.1} :=
     Equiv.subtypeEquiv (Equiv.prodComm _ _) (fun p => Iff.rfl)
-  have e2 : {p : Fin m × Fin m // p.1 = p.2} ≃ Fin m :=
-    { toFun := fun p => p.1.1
-      invFun := fun a => ⟨(a, a), rfl⟩
-      left_inv := fun p => by
-        obtain ⟨⟨a, b⟩, h⟩ := p
-        simp only at h
-        subst h
-        rfl
-      right_inv := fun a => rfl }
-  have e3 : {p : Fin m × Fin m // ¬ p.1 = p.2} ≃
-      {p : Fin m × Fin m // p.1 < p.2} ⊕ {p : Fin m × Fin m // p.2 < p.1} :=
+  have e2 : {p : Fin m × Fin m // p.1 = p.2} ≃ Fin m := {
+    toFun := fun p => p.1.1
+    invFun := fun a => ⟨(a, a), rfl⟩
+    left_inv := fun p => by
+      obtain ⟨⟨a, b⟩, h⟩ := p
+      simp only at h
+      subst h
+      rfl
+    right_inv := fun a => rfl
+  }
+  have e3
+      : {p : Fin m × Fin m // ¬ p.1 = p.2}
+        ≃ {p : Fin m × Fin m // p.1 < p.2} ⊕ {p : Fin m × Fin m // p.2 < p.1} :=
     (Equiv.subtypeEquivRight (fun p => ne_iff_lt_or_gt)).trans
       (subtypeOrEquiv _ _ (by
         intro r h1 h2 x hx
         exact (lt_asymm (h1 x hx) (h2 x hx)).elim))
-  have hcard : Nat.card (Fin m × Fin m) = m + (Nat.card {p : Fin m × Fin m // p.1 < p.2} +
-      Nat.card {p : Fin m × Fin m // p.1 < p.2}) := by
+  have hcard
+      : Nat.card (Fin m × Fin m)
+        = m
+          + (Nat.card {p : Fin m × Fin m // p.1 < p.2}
+            + Nat.card {p : Fin m × Fin m // p.1 < p.2}) := by
     rw [Nat.card_congr (Equiv.sumCompl (fun p : Fin m × Fin m => p.1 = p.2)).symm, Nat.card_sum,
       Nat.card_congr e2, Nat.card_congr e3, Nat.card_sum, ← Nat.card_congr e1]
     simp
@@ -60,11 +67,16 @@ theorem card_pairs (m : ℕ) :
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-noncomputable def hermOf (L : LocE F E) (m : ℕ) :
-    ((Fin m → 𝒪[F]) × ({p : Fin m × Fin m // p.1 < p.2} → L.O)) →+ Matrix (Fin m) (Fin m) E where
-  toFun x := Matrix.of fun a b =>
-    if h : a < b then (x.2 ⟨(a, b), h⟩ : E)
-    else if h' : b < a then L.cj (x.2 ⟨(b, a), h'⟩ : E) else algebraMap F E (x.1 a : F)
+noncomputable def hermOf (L : LocE F E) (m : ℕ)
+    : ((Fin m → 𝒪[F]) × ({p : Fin m × Fin m // p.1 < p.2} → L.O)) →+ Matrix (Fin m) (Fin m) E where
+  toFun x :=
+    Matrix.of fun a b =>
+      if h : a < b then
+        (x.2 ⟨(a, b), h⟩ : E)
+      else if h' : b < a then
+        L.cj (x.2 ⟨(b, a), h'⟩ : E)
+      else
+        algebraMap F E (x.1 a : F)
   map_zero' := by
     ext a b
     simp
@@ -73,13 +85,21 @@ noncomputable def hermOf (L : LocE F E) (m : ℕ) :
     simp only [Matrix.of_apply, Matrix.add_apply]
     split_ifs <;> simp
 
-theorem hermOf_apply (L : LocE F E) (m : ℕ) (x) (a b : Fin m) : hermOf L m x a b =
-    if h : a < b then (x.2 ⟨(a, b), h⟩ : E)
-    else if h' : b < a then L.cj (x.2 ⟨(b, a), h'⟩ : E) else algebraMap F E (x.1 a : F) := rfl
+theorem hermOf_apply (L : LocE F E) (m : ℕ) (x) (a b : Fin m)
+    : hermOf L m x a b
+      = if h : a < b then
+          (x.2 ⟨(a, b), h⟩ : E)
+        else if h' : b < a then
+          L.cj (x.2 ⟨(b, a), h'⟩ : E)
+        else
+          algebraMap F E (x.1 a : F) :=
+  rfl
 
-theorem hf_sum_smul (L : LocE F E) {n k : ℕ} (Hm : Matrix (Fin n) (Fin n) E)
-    (c : Fin k → E) (b : Fin k → Fin n → E) (y : Fin n → E) :
-    hf L Hm (∑ i, c i • b i) y = ∑ i, c i * hf L Hm (b i) y := by
+theorem hf_sum_smul
+    (L : LocE F E)
+    {n k : ℕ}
+    (Hm : Matrix (Fin n) (Fin n) E) (c : Fin k → E) (b : Fin k → Fin n → E) (y : Fin n → E)
+    : hf L Hm (∑ i, c i • b i) y = ∑ i, c i * hf L Hm (b i) y := by
   have key : ∀ x : Fin n → E, hf L Hm x y = ∑ i, x i * ∑ j, Hm i j * L.cj (y j) := by
     intro x
     simp only [hf, Finset.mul_sum, mul_assoc]
@@ -88,8 +108,8 @@ theorem hf_sum_smul (L : LocE F E) {n k : ℕ} (Hm : Matrix (Fin n) (Fin n) E)
     mul_assoc]
   exact Finset.sum_comm
 
-noncomputable def tupOf (L : LocE F E) {n : ℕ} (b : Fin n → Fin n → E) (m : ℕ) :
-    (Fin m → Fin n → L.O) →+ (Fin m → Fin n → E) where
+noncomputable def tupOf (L : LocE F E) {n : ℕ} (b : Fin n → Fin n → E) (m : ℕ)
+    : (Fin m → Fin n → L.O) →+ (Fin m → Fin n → E) where
   toFun x := fun a => ∑ i, (x a i : E) • b i
   map_zero' := by
     ext a
@@ -98,15 +118,17 @@ noncomputable def tupOf (L : LocE F E) {n : ℕ} (b : Fin n → Fin n → E) (m 
     funext a
     simp [add_smul, Finset.sum_add_distrib]
 
-theorem tupOf_apply (L : LocE F E) {n : ℕ} (b : Fin n → Fin n → E) (m : ℕ) (x) (a : Fin m) :
-    tupOf L b m x a = ∑ i, (x a i : E) • b i := rfl
+theorem tupOf_apply (L : LocE F E) {n : ℕ} (b : Fin n → Fin n → E) (m : ℕ) (x) (a : Fin m)
+    : tupOf L b m x a = ∑ i, (x a i : E) • b i :=
+  rfl
 
-private theorem index_range_smul_pi {R M ι : Type*} [Monoid R] [AddCommGroup M]
-    [DistribMulAction R M] [Fintype ι] (r : R) :
-    (DistribSMul.toAddMonoidHom (ι → M) r).range.index =
-      (DistribSMul.toAddMonoidHom M r).range.index ^ Fintype.card ι := by
-  have h : (DistribSMul.toAddMonoidHom (ι → M) r).range =
-      AddSubgroup.pi Set.univ (fun _ => (DistribSMul.toAddMonoidHom M r).range) := by
+private theorem index_range_smul_pi
+    {R M ι : Type*} [Monoid R] [AddCommGroup M] [DistribMulAction R M] [Fintype ι] (r : R)
+    : (DistribSMul.toAddMonoidHom (ι → M) r).range.index
+      = (DistribSMul.toAddMonoidHom M r).range.index ^ Fintype.card ι := by
+  have h
+      : (DistribSMul.toAddMonoidHom (ι → M) r).range
+        = AddSubgroup.pi Set.univ (fun _ => (DistribSMul.toAddMonoidHom M r).range) := by
     ext x
     simp only [AddMonoidHom.mem_range, DistribSMul.toAddMonoidHom_apply, AddSubgroup.mem_pi,
       Set.mem_univ, true_imp_iff]
@@ -118,9 +140,10 @@ private theorem index_range_smul_pi {R M ι : Type*} [Monoid R] [AddCommGroup M]
       exact ⟨y, funext hy⟩
   rw [h, AddSubgroup.index_pi, Finset.prod_const, Finset.card_univ]
 
-private theorem index_range_smul_pow {R : Type*} [CommRing R] [IsDomain R] {r : R} (hr : r ≠ 0)
-    (j : ℕ) : (DistribSMul.toAddMonoidHom R (r ^ j)).range.index =
-      (DistribSMul.toAddMonoidHom R r).range.index ^ j := by
+private theorem index_range_smul_pow
+    {R : Type*} [CommRing R] [IsDomain R] {r : R} (hr : r ≠ 0) (j : ℕ)
+    : (DistribSMul.toAddMonoidHom R (r ^ j)).range.index
+      = (DistribSMul.toAddMonoidHom R r).range.index ^ j := by
   induction j with
   | zero =>
     rw [pow_zero, pow_zero]
@@ -131,9 +154,9 @@ private theorem index_range_smul_pow {R : Type*} [CommRing R] [IsDomain R] {r : 
   | succ j ih =>
     have hinj : Function.Injective (DistribSMul.toAddMonoidHom R r) := fun x y h =>
       mul_left_cancel₀ hr (by simpa using h)
-    have hmap : (DistribSMul.toAddMonoidHom R (r ^ (j + 1))).range =
-        (DistribSMul.toAddMonoidHom R (r ^ j)).range.map
-          (DistribSMul.toAddMonoidHom R r) := by
+    have hmap
+        : (DistribSMul.toAddMonoidHom R (r ^ (j + 1))).range
+          = (DistribSMul.toAddMonoidHom R (r ^ j)).range.map (DistribSMul.toAddMonoidHom R r) := by
       ext x
       simp only [AddMonoidHom.mem_range, AddSubgroup.mem_map, DistribSMul.toAddMonoidHom_apply,
         smul_eq_mul]
@@ -144,8 +167,8 @@ private theorem index_range_smul_pow {R : Type*} [CommRing R] [IsDomain R] {r : 
         exact ⟨y, by ring⟩
     rw [hmap, AddSubgroup.index_map_of_injective _ hinj, ih, pow_succ]
 
-private theorem index_range_smul_eq_card_quotient {R : Type*} [CommRing R] (r : R) :
-    (DistribSMul.toAddMonoidHom R r).range.index = Nat.card (R ⧸ Ideal.span {r}) := by
+private theorem index_range_smul_eq_card_quotient {R : Type*} [CommRing R] (r : R)
+    : (DistribSMul.toAddMonoidHom R r).range.index = Nat.card (R ⧸ Ideal.span {r}) := by
   have h : (DistribSMul.toAddMonoidHom R r).range = (Ideal.span {r}).toAddSubgroup := by
     ext x
     simp only [AddMonoidHom.mem_range, DistribSMul.toAddMonoidHom_apply, smul_eq_mul,
@@ -154,7 +177,24 @@ private theorem index_range_smul_eq_card_quotient {R : Type*} [CommRing R] (r : 
   rw [h, AddSubgroup.index_eq_card]
   rfl
 
-theorem relIndex_tupLat_hermLat : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (ϖ : 𝒪[F]), Irreducible ϖ → ∀ {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E), IsHermND L Hm → ∀ Λs, IsSD L Hm Λs → ∀ m j : ℕ, ((tupLat L Λs m).map (DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)))).relIndex (tupLat L Λs m) = resQ ϖ ^ (2 * n * m * j) ∧ ((hermLat L m).map (DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)))).relIndex (hermLat L m) = resQ ϖ ^ (m ^ 2 * j) := by
+theorem relIndex_tupLat_hermLat
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (ϖ : 𝒪[F]),
+        Irreducible ϖ
+          → ∀ {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E),
+            IsHermND L Hm
+              → ∀ Λs,
+                IsSD L Hm Λs
+                  → ∀ m j : ℕ,
+                    ((tupLat L Λs m).map
+                            (DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)))).relIndex
+                          (tupLat L Λs m)
+                        = resQ ϖ ^ (2 * n * m * j)
+                      ∧ ((hermLat L m).map
+                            (DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)))).relIndex
+                          (hermLat L m)
+                        = resQ ϖ ^ (m ^ 2 * j) := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ n Hm hH Λs hΛ m j
   obtain ⟨b, hbo, hΛb⟩ := GlobalTheory.HL.SelfDual.exists_orthonormal L hH hΛ
   have hmemO : ∀ c : 𝒪[F], algebraMap F E (c : F) ∈ L.O := fun c =>
@@ -192,15 +232,18 @@ theorem relIndex_tupLat_hermLat : ∀ {F : Type} [Field F] [ValuativeRel F] [Top
       exact ⟨g, funext fun a => by rw [tupOf_apply]; exact hg a⟩
     · rintro ⟨g, rfl⟩ a
       exact ⟨g a, (tupOf_apply L b m g a).symm⟩
-  have ht1 : ∀ g, tupOf L b m (DistribSMul.toAddMonoidHom _ sO g) =
-      DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)) (tupOf L b m g) := by
+  have ht1
+      : ∀ g,
+        tupOf L b m (DistribSMul.toAddMonoidHom _ sO g)
+          = DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)) (tupOf L b m g) := by
     intro g
     funext a
     simp only [DistribSMul.toAddMonoidHom_apply, tupOf_apply, Pi.smul_apply, smul_eq_mul,
       MulMemClass.coe_mul, hsO, mul_smul, Finset.smul_sum]
-  have P1 := relIndex_map_of_param (tupOf L b m) hinj1 (tupLat L Λs m) hA1
-    (DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)))
-    (DistribSMul.toAddMonoidHom _ sO) ht1 _ (fun g => AddMonoidHom.mem_range)
+  have P1 :=
+    relIndex_map_of_param (tupOf L b m) hinj1 (tupLat L Λs m) hA1
+      (DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)))
+      (DistribSMul.toAddMonoidHom _ sO) ht1 _ (fun g => AddMonoidHom.mem_range)
   rw [index_range_smul_pi, index_range_smul_pi, hqO, Fintype.card_fin, Fintype.card_fin] at P1
   have herm_iff : ∀ X : Matrix (Fin m) (Fin m) E, IsHerm L X ↔ ∀ a b, L.cj (X b a) = X a b :=
     fun X => ⟨fun h a b => congrFun (congrFun h a) b, fun h => Matrix.ext h⟩
@@ -232,7 +275,8 @@ theorem relIndex_tupLat_hermLat : ∀ {F : Type} [Field F] [ValuativeRel F] [Top
     refine Prod.ext (funext fun a => ?_) (funext fun p => ?_)
     · have := hd a a
       rw [hermOf_apply, hermOf_apply, dite_eq_right (lt_irrefl a), dite_eq_right (lt_irrefl a),
-        dite_eq_right (lt_irrefl a), dite_eq_right (lt_irrefl a)] at this
+          dite_eq_right (lt_irrefl a), dite_eq_right (lt_irrefl a)]
+        at this
       exact Subtype.ext (GlobalTheory.UnramOrder.algebraMap_inj L this)
     · have := hd p.1.1 p.1.2
       rw [hermOf_apply, hermOf_apply, dite_eq_left p.2, dite_eq_left p.2] at this
@@ -265,18 +309,23 @@ theorem relIndex_tupLat_hermLat : ∀ {F : Type} [Field F] [ValuativeRel F] [Top
         · exact Subtype.prop _
         · exact GlobalTheory.UnramOrder.cj_mem L (Subtype.prop _)
         · exact hmemO _
-  have ht2 : ∀ g, hermOf L m (((DistribSMul.toAddMonoidHom (Fin m → 𝒪[F]) (ϖ ^ j)).prodMap
-      (DistribSMul.toAddMonoidHom ({p : Fin m × Fin m // p.1 < p.2} → L.O) sO)) g) =
-      DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)) (hermOf L m g) := by
+  have ht2
+      : ∀ g,
+        hermOf L m
+            (((DistribSMul.toAddMonoidHom (Fin m → 𝒪[F]) (ϖ ^ j)).prodMap
+                (DistribSMul.toAddMonoidHom ({p : Fin m × Fin m // p.1 < p.2} → L.O) sO))
+              g)
+          = DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j)) (hermOf L m g) := by
     intro g
     ext a b
     simp only [DistribSMul.toAddMonoidHom_apply, Matrix.smul_apply, hermOf_apply,
       AddMonoidHom.coe_prodMap, Prod.map_fst, Prod.map_snd, Prod.map_apply]
     split_ifs <;> simp [smul_eq_mul, MulMemClass.coe_mul, hsO, cj_alg, map_mul]
-  have hR2 : ((DistribSMul.toAddMonoidHom (Fin m → 𝒪[F]) (ϖ ^ j)).prodMap
-      (DistribSMul.toAddMonoidHom ({p : Fin m × Fin m // p.1 < p.2} → L.O) sO)).range =
-      (DistribSMul.toAddMonoidHom (Fin m → 𝒪[F]) (ϖ ^ j)).range.prod
-        (DistribSMul.toAddMonoidHom ({p : Fin m × Fin m // p.1 < p.2} → L.O) sO).range := by
+  have hR2
+      : ((DistribSMul.toAddMonoidHom (Fin m → 𝒪[F]) (ϖ ^ j)).prodMap
+          (DistribSMul.toAddMonoidHom ({p : Fin m × Fin m // p.1 < p.2} → L.O) sO)).range
+        = (DistribSMul.toAddMonoidHom (Fin m → 𝒪[F]) (ϖ ^ j)).range.prod
+          (DistribSMul.toAddMonoidHom ({p : Fin m × Fin m // p.1 < p.2} → L.O) sO).range := by
     ext ⟨x, y⟩
     simp only [AddMonoidHom.mem_range, AddSubgroup.mem_prod, AddMonoidHom.coe_prodMap, Prod.exists,
       Prod.map_apply, Prod.mk.injEq]
@@ -285,11 +334,13 @@ theorem relIndex_tupLat_hermLat : ∀ {F : Type} [Field F] [ValuativeRel F] [Top
       exact ⟨⟨u, h1⟩, ⟨v, h2⟩⟩
     · rintro ⟨⟨u, h1⟩, ⟨v, h2⟩⟩
       exact ⟨u, v, h1, h2⟩
-  have P2 := relIndex_map_of_param (hermOf L m) hinj2 (hermLat L m) hA2
-    (DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j))) _ ht2 _
-    (fun g => AddMonoidHom.mem_range)
+  have P2 :=
+    relIndex_map_of_param (hermOf L m) hinj2 (hermLat L m) hA2
+      (DistribSMul.toAddMonoidHom _ (algebraMap F E ((ϖ : F) ^ j))) _ ht2 _
+      (fun g => AddMonoidHom.mem_range)
   rw [hR2, AddSubgroup.index_prod, index_range_smul_pi, index_range_smul_pi, hqF, hqO,
-    Fintype.card_fin] at P2
+      Fintype.card_fin]
+    at P2
   refine ⟨?_, ?_⟩
   · rw [P1]
     ring

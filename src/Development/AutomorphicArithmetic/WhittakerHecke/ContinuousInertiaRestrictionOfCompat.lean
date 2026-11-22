@@ -4,12 +4,14 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.RecTT
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+  GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
 
-theorem UpperTheory.continuous_inertia_restriction_of_compat :
-    ∀ {E L Ω : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Field Ω] [Algebra E L] [Algebra E Ω] [Algebra L Ω]
-        [IsScalarTower E L Ω] (A : ValuationSubring Ω) (ι : Ine (F := E) A →* Ine (F := L) A),
-        (∀ (t : Ine (F := E) A) (x : Ω), (ι t : G L Ω) x = (t : G E Ω) x) → Continuous ι := by
+theorem UpperTheory.continuous_inertia_restriction_of_compat
+    : ∀ {E L Ω : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Field Ω] [Algebra E L]
+        [Algebra E Ω] [Algebra L Ω] [IsScalarTower E L Ω] (A : ValuationSubring Ω)
+        (ι : Ine (F := E) A →* Ine (F := L) A),
+      (∀ (t : Ine (F := E) A) (x : Ω), (ι t : G L Ω) x = (t : G E Ω) x) → Continuous ι := by
   intro E L Ω _ _ _ _ _ _ _ _ _ A ι hι
   haveI : FiniteDimensional E L := Module.Finite.of_restrictScalars_finite ℚ E L
   apply continuous_of_continuousAt_one ι

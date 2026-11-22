@@ -109,18 +109,21 @@ private lemma part2 {a : A} {N : ℕ} {𝔞 : Ideal A}
 
 end UpperTheory.ActionSupremumCommute
 
-theorem UpperTheory.lattice_generation :
-    LatGen := by
+theorem UpperTheory.lattice_generation : LatGen := by
   intro q _ D a N 𝔞 hN hG
   haveI := D.freeLa
   have inj : ∀ u v : D.La, N • u = N • v → u = v := by
     intro u v huv
-    have h0 : (N : ℤ) • (u - v) = 0 := by
-      rw [smul_sub, natCast_zsmul, natCast_zsmul, huv, sub_self]
+    have h0 : (N : ℤ) • (u - v) = 0 := by rw [smul_sub, natCast_zsmul, natCast_zsmul, huv, sub_self]
     rcases smul_eq_zero.mp h0 with h1 | h1
     · exact absurd (Int.natCast_eq_zero.mp h1) hN.ne'
     · exact sub_eq_zero.mp h1
-  refine ⟨fun y => ⟨fun ⟨z, hz⟩ => UpperTheory.ActionSupremumCommute.fwd hG inj _ ?_ hz,
-    fun hy => UpperTheory.ActionSupremumCommute.bwd hG hy⟩, fun x hx => UpperTheory.ActionSupremumCommute.part2 hG inj hx⟩
+  refine ⟨
+    fun y => ⟨
+      fun ⟨z, hz⟩ => UpperTheory.ActionSupremumCommute.fwd hG inj _ ?_ hz,
+      fun hy => UpperTheory.ActionSupremumCommute.bwd hG hy
+    ⟩,
+    fun x hx => UpperTheory.ActionSupremumCommute.part2 hG inj hx
+  ⟩
   intro c hc z
   exact Submodule.subset_span ⟨c, by rwa [pow_one], z, rfl⟩

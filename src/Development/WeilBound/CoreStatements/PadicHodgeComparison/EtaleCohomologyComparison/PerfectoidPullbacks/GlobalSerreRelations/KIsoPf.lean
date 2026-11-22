@@ -17,6 +17,7 @@ open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris Divided
 namespace CrystallineSemistableComparison.Pb
 
 theorem k_iso_pf : KH.KIso :=
-  GlobalTheory.T.hodge_filtration_via_truncation locGr_h locVan_h polyTf_h globSerreSt_h globVanSt_h gr_aff_pf
+  GlobalTheory.T.hodge_filtration_via_truncation locGr_h locVan_h polyTf_h globSerreSt_h globVanSt_h
+    gr_aff_pf
 
 end CrystallineSemistableComparison.Pb

@@ -19,10 +19,11 @@ theorem muN_smul {k r : ℕ} (L : LocBessel k r) : L.μN = L.κN • haarLie (Ns
   unfold haarLie
   rw [one_smul]
 
-theorem exists_isOrbQuot_of_isHaarOn {k r : ℕ} (L : LocBessel k r) (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (μR : Measure (Mt k r)) (hg : g ∈ UH (Hpk k r)) (hμ : IsHaarOn (RStab k r g) μR)
-    [SFinite L.μN] (hN : ∀ s ∈ Nset k r, L.μN.map (lmulM s) = L.μN) (hc : L.μN (NS k r)ᶜ = 0) :
-    ∃ ν : Measure (PairSp k r), IsOrbQuot L g μR ν := by
+theorem exists_isOrbQuot_of_isHaarOn
+    {k r : ℕ} (L : LocBessel k r) (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    (μR : Measure (Mt k r)) (hg : g ∈ UH (Hpk k r)) (hμ : IsHaarOn (RStab k r g) μR) [SFinite L.μN]
+    (hN : ∀ s ∈ Nset k r, L.μN.map (lmulM s) = L.μN) (hc : L.μN (NS k r)ᶜ = 0)
+    : ∃ ν : Measure (PairSp k r), IsOrbQuot L g μR ν := by
   have : SigmaFinite μR := hμ.1
   have : IsFiniteMeasure L.μW := ⟨by rw [L.hμW.2]; exact ENNReal.one_lt_top⟩
   have : IsFiniteMeasure L.μW' := ⟨by rw [L.hμW'.2]; exact ENNReal.one_lt_top⟩
@@ -34,20 +35,25 @@ theorem exists_isOrbQuot_of_isHaarOn {k r : ℕ} (L : LocBessel k r) (g : Matrix
   have hin : Measurable (fun x : PairSp k r => ∫⁻ a, f (stabAct g (Matrix.of a) x) ∂μR) :=
     hJ.lintegral_prod_left'
   rw [lintegral_withDensity_eq_lintegral_mul _ hθ hin]
-  have step1 : ∀ x : PairSp k r, (θ * fun x => ∫⁻ a, f (stabAct g (Matrix.of a) x) ∂μR) x =
-      ∫⁻ a, θ x * f (stabAct g (Matrix.of a) x) ∂μR := by
+  have step1
+      : ∀ x : PairSp k r,
+        (θ * fun x => ∫⁻ a, f (stabAct g (Matrix.of a) x) ∂μR) x
+          = ∫⁻ a, θ x * f (stabAct g (Matrix.of a) x) ∂μR := by
     intro x
     simp only [Pi.mul_apply]
     have hmx : Measurable fun a : Mt k r => f (stabAct g (Matrix.of a) x) :=
       hJ.comp (f := fun a : Mt k r => (a, x)) (measurable_id.prodMk measurable_const)
     rw [lintegral_const_mul _ hmx]
   simp_rw [step1]
-  have hm1 : Measurable (Function.uncurry fun (x : PairSp k r) (a : Mt k r) => θ x * f (stabAct g (Matrix.of a) x)) :=
+  have hm1 : Measurable (Function.uncurry fun (x : PairSp k r) (a : Mt k r) =>
+      θ x * f (stabAct g (Matrix.of a) x)) :=
     (hθ.comp measurable_fst).mul (hJ.comp (f := Prod.swap) measurable_swap)
   rw [lintegral_lintegral_swap hm1.aemeasurable]
-  have step2 : ∀ a : Mt k r, Matrix.of a ∈ RStab k r g →
-      ∫⁻ x, θ x * f (stabAct g (Matrix.of a) x) ∂(pairMeas L) =
-        ∫⁻ y, θ (stabAct g (Matrix.of a)⁻¹ y) * f y ∂(pairMeas L) := by
+  have step2
+      : ∀ a : Mt k r,
+        Matrix.of a ∈ RStab k r g
+          → ∫⁻ x, θ x * f (stabAct g (Matrix.of a) x) ∂(pairMeas L)
+            = ∫⁻ y, θ (stabAct g (Matrix.of a)⁻¹ y) * f y ∂(pairMeas L) := by
     intro a ha
     have hh : Measurable fun y : PairSp k r => θ (stabAct g (Matrix.of a)⁻¹ y) * f y :=
       (hθ.comp (measurable_stabAct_one g _)).mul hf
@@ -57,15 +63,19 @@ theorem exists_isOrbQuot_of_isHaarOn {k r : ℕ} (L : LocBessel k r) (g : Matrix
     rw [stabAct_inv_cancel hg ha.1.1]
   have hR : ∀ᵐ a ∂μR, Matrix.of a ∈ RStab k r g := ae_iff.2 hμ.2.2.1
   rw [lintegral_congr_ae (hR.mono step2)]
-  have hm2 : Measurable (Function.uncurry fun (a : Mt k r) (y : PairSp k r) => θ (stabAct g (Matrix.of a)⁻¹ y) * f y) :=
+  have hm2 : Measurable (Function.uncurry fun (a : Mt k r) (y : PairSp k r) =>
+      θ (stabAct g (Matrix.of a)⁻¹ y) * f y) :=
     (hθ.comp (measurable_stabAct_inv g)).mul (hf.comp measurable_snd)
   rw [lintegral_lintegral_swap hm2.aemeasurable]
-  have hNae : ∀ᵐ y ∂(pairMeas L), y.1.2 ∈ NS k r := ae_iff.2 (by
-    have := pairMeas_null L hc
-    simpa using this)
+  have hNae : ∀ᵐ y ∂(pairMeas L), y.1.2 ∈ NS k r :=
+    ae_iff.2 (by
+      have := pairMeas_null L hc
+      simpa using this)
   refine lintegral_congr_ae (hNae.mono fun y hy => ?_)
   have hmy : Measurable fun a : Mt k r => θ (stabAct g (Matrix.of a)⁻¹ y) :=
-    hθ.comp ((measurable_stabAct_inv g).comp (f := fun a : Mt k r => (a, y)) (measurable_id.prodMk measurable_const))
+    hθ.comp ((measurable_stabAct_inv g).comp
+      (f := fun a : Mt k r => (a, y))
+      (measurable_id.prodMk measurable_const))
   show f y = ∫⁻ a, θ (stabAct g (Matrix.of a)⁻¹ y) * f y ∂μR
   rw [lintegral_mul_const _ hmy, hθ1 y hy, one_mul]
 

@@ -11,7 +11,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ScalarConvolutio
 @[expose] public section
 
 theorem convolution_scalar : Formalism.L2.SG.GGMirabolic.ConvScalarOfLit :=
-  PI.GGConvScalarW.convScalarOfLit_of PI.GGConvScalarW.representation_conjugate_gamma PI.GGConvScalarW.representation_commutes_gamma
-    PI.GGConvScalarW.averaging_operator_idempotent PI.GGConvScalarW.generic_iff_criterion PI.GGConvScalarW.intertwiner_rank_le_one
-    PI.GGConvScalarW.schur_lemma_complex PI.GGConvScalarW.trace_representation_gamma PI.GGConvScalarW.idempotent_trace_formula
-    PI.GGConvScalarW.representation_dimension_pos
+  PI.GGConvScalarW.convScalarOfLit_of PI.GGConvScalarW.representation_conjugate_gamma
+    PI.GGConvScalarW.representation_commutes_gamma PI.GGConvScalarW.averaging_operator_idempotent
+    PI.GGConvScalarW.generic_iff_criterion PI.GGConvScalarW.intertwiner_rank_le_one
+    PI.GGConvScalarW.schur_lemma_complex PI.GGConvScalarW.trace_representation_gamma
+    PI.GGConvScalarW.idempotent_trace_formula PI.GGConvScalarW.representation_dimension_pos

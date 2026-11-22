@@ -11,56 +11,72 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published GlobalTheory.RealGal GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+  GlobalTheory.RealGal GlobalTheory.UnitaryBC
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion.WeylLatticeInDetCoeffSpan
 
-private theorem normV_mem' {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) :
-    ((normV v : ℕ) : 𝓞 K) ∈ v.asIdeal := by
+private theorem normV_mem' {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
+    : ((normV v : ℕ) : 𝓞 K) ∈ v.asIdeal := by
   have h : Nat.card (𝓞 K ⧸ v.asIdeal) = Ideal.absNorm v.asIdeal := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
   show ((Nat.card (𝓞 K ⧸ v.asIdeal) : ℕ) : 𝓞 K) ∈ v.asIdeal
   rw [h]
   exact Ideal.absNorm_mem _
 
-private theorem normV_pos' {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) : 0 < normV v := by
+private theorem normV_pos' {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
+    : 0 < normV v := by
   have h : Nat.card (𝓞 K ⧸ v.asIdeal) = Ideal.absNorm v.asIdeal := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
   show 0 < Nat.card (𝓞 K ⧸ v.asIdeal)
   rw [h]
   exact Nat.pos_of_ne_zero (fun h0 => v.ne_bot (Ideal.absNorm_eq_zero_iff.1 h0))
 
-private theorem val_lt_of_dvd {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω] (A : ValuationSubring Ω)
-    (v : HeightOneSpectrum (𝓞 K)) (hA : IsPlaceOver A v) {c : ℕ} (h : normV v ∣ c) : A.valuation (c : Ω) < 1 := by
+private theorem val_lt_of_dvd
+    {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω]
+    (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)) (hA : IsPlaceOver A v)
+    {c : ℕ} (h : normV v ∣ c)
+    : A.valuation (c : Ω) < 1 := by
   obtain ⟨k, rfl⟩ := h
   refine GlobalTheory.TameCoupledEx.val_g_lt A v hA ?_
   rw [Nat.cast_mul]
   exact v.asIdeal.mul_mem_right _ (normV_mem' v)
 
-private theorem val_prime_of_lt {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (n : ℕ) :
-    n ≠ 0 → A.valuation (n : Ω) < 1 → ∃ t : ℕ, t.Prime ∧ t ∣ n ∧ A.valuation (t : Ω) < 1 :=
+private theorem val_prime_of_lt {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (n : ℕ)
+    : n ≠ 0 → A.valuation (n : Ω) < 1 → ∃ t : ℕ, t.Prime ∧ t ∣ n ∧ A.valuation (t : Ω) < 1 :=
   _root_.UpperTheory.Reformulated.B.Qi55.val_prime_of_lt A n
 
-private theorem fix_of_val {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (hS : SqrtFix)
-    (A : ValuationSubring Ω) (x : Ω) (a : ℤ) (hx : x ^ 2 = (a : Ω)) (c : ℕ) (hc : c ≠ 0)
-    (hd : ((8 * c : ℕ) : ℤ) ∣ a - 1) (hv : A.valuation (c : Ω) < 1) (g : G F Ω) (hg : g ∈ Dec (F := F) A) : g x = x := by
+private theorem fix_of_val
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (hS : SqrtFix)
+    (A : ValuationSubring Ω)
+    (x : Ω) (a : ℤ) (hx : x ^ 2 = (a : Ω))
+    (c : ℕ) (hc : c ≠ 0) (hd : ((8 * c : ℕ) : ℤ) ∣ a - 1) (hv : A.valuation (c : Ω) < 1)
+    (g : G F Ω) (hg : g ∈ Dec (F := F) A)
+    : g x = x := by
   obtain ⟨t, ht, htc, htv⟩ := val_prime_of_lt A c hc hv
   refine (hS F Ω A x a hx).1 t ht htv (dvd_trans ?_ hd) g hg
   rw [Int.natCast_dvd_natCast]
   exact Nat.mul_dvd_mul_left 8 htc
 
-private theorem moved_at_ram {Y Ω : Type} [Field Y] [NumberField Y] [Field Ω] [Algebra Y Ω] [IsAlgClosure Y Ω]
-    (hS : SqrtFix) (A : ValuationSubring Ω) (u : HeightOneSpectrum (𝓞 Y)) (hA : IsPlaceOver A u) (p₁ p₂ : ℕ)
-    (h1 : p₁.Prime) (h2 : p₂.Prime) (hodd : 2 < p₁) (hlt : p₁ < p₂) (hu : ((p₁ : ℕ) : 𝓞 Y) ∈ u.asIdeal)
-    (hu2 : ((p₁ : ℕ) : 𝓞 Y) ∉ u.asIdeal ^ 2) (x : Ω) (hx : x ^ 2 = ((-((p₁ * p₂ : ℕ) : ℤ) : ℤ) : Ω)) :
-    ∃ τ ∈ Ine (F := Y) A, τ x ≠ x := by
+private theorem moved_at_ram
+    {Y Ω : Type} [Field Y] [NumberField Y] [Field Ω] [Algebra Y Ω] [IsAlgClosure Y Ω]
+    (hS : SqrtFix)
+    (A : ValuationSubring Ω) (u : HeightOneSpectrum (𝓞 Y)) (hA : IsPlaceOver A u)
+    (p₁ p₂ : ℕ) (h1 : p₁.Prime) (h2 : p₂.Prime) (hodd : 2 < p₁) (hlt : p₁ < p₂)
+    (hu : ((p₁ : ℕ) : 𝓞 Y) ∈ u.asIdeal) (hu2 : ((p₁ : ℕ) : 𝓞 Y) ∉ u.asIdeal ^ 2)
+    (x : Ω) (hx : x ^ 2 = ((-((p₁ * p₂ : ℕ) : ℤ) : ℤ) : Ω))
+    : ∃ τ ∈ Ine (F := Y) A, τ x ≠ x := by
   haveI : Fact p₁.Prime := ⟨h1⟩
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap Y Ω).injective
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed Y
   obtain ⟨Y0, hY0⟩ := IsAlgClosed.exists_pow_nat_eq ((p₁ : ℕ) : Ω) two_pos
   have hnd : ¬ p₁ ∣ 2 := fun h => by have := Nat.le_of_dvd two_pos h; omega
-  obtain ⟨τ, hτ, hτY⟩ := GlobalTheory.TameKummerInertia.tame_kummer_surj Y Ω A u hA p₁ hu hu2 2 two_pos hnd Y0 (-1) hY0 (by norm_num)
+  obtain ⟨τ, hτ, hτY⟩ :=
+    GlobalTheory.TameKummerInertia.tame_kummer_surj Y Ω A u hA p₁ hu hu2 2 two_pos hnd Y0 (-1) hY0
+      (by norm_num)
   have hp10 : ((p₁ : ℕ) : Ω) ≠ 0 := Nat.cast_ne_zero.2 h1.ne_zero
   have hY00 : Y0 ≠ 0 := by
     rintro rfl
@@ -74,8 +90,8 @@ private theorem moved_at_ram {Y Ω : Type} [Field Y] [NumberField Y] [Field Ω] 
     field_simp
   have hcop : IsCoprime (p₁ : ℤ) (2 * (-(p₂ : ℤ))) := by
     have ha : IsCoprime (p₁ : ℤ) 2 := by
-      have : Nat.Coprime p₁ 2 := (Nat.Prime.coprime_iff_not_dvd h1).2 (by
-        intro h; have := Nat.le_of_dvd two_pos h; omega)
+      have : Nat.Coprime p₁ 2 :=
+        (Nat.Prime.coprime_iff_not_dvd h1).2 (by intro h; have := Nat.le_of_dvd two_pos h; omega)
       exact_mod_cast Nat.isCoprime_iff_coprime.2 this
     have hb : IsCoprime (p₁ : ℤ) (p₂ : ℤ) := by
       have : Nat.Coprime p₁ p₂ := (Nat.coprime_primes h1 h2).2 hlt.ne
@@ -114,9 +130,13 @@ private theorem moved_at_ram {Y Ω : Type} [Field Y] [NumberField Y] [Field Ω] 
   have h7 : (2 : Ω) * x = 0 := by linear_combination h6
   exact hx0 ((mul_eq_zero.1 h7).resolve_left two_ne_zero)
 
-private theorem fix_of_real {Z Ω F' : Type} [Field Z] [NumberField Z] [IsCMField Z] [Field Ω] [Algebra Z Ω] [Field F']
-    [Algebra F' Ω] (g : G F' Ω) (X : Z) (d : ℕ) (hd : 0 < d) (hX : X ^ 2 = -(d : Z))
-    (hreal : Fixes (maximalRealSubfield Z) g) (hgx : g (algebraMap Z Ω X) = algebraMap Z Ω X) : Fixes Z g := by
+private theorem fix_of_real
+    {Z Ω F' : Type}
+    [Field Z] [NumberField Z] [IsCMField Z] [Field Ω] [Algebra Z Ω] [Field F'] [Algebra F' Ω]
+    (g : G F' Ω)
+    (X : Z) (d : ℕ) (hd : 0 < d) (hX : X ^ 2 = -(d : Z))
+    (hreal : Fixes (maximalRealSubfield Z) g) (hgx : g (algebraMap Z Ω X) = algebraMap Z Ω X)
+    : Fixes Z g := by
   have hd0 : (d : Z) ≠ 0 := Nat.cast_ne_zero.2 hd.ne'
   have hX0 : X ≠ 0 := by
     rintro rfl
@@ -140,17 +160,20 @@ private theorem fix_of_real {Z Ω F' : Type} [Field Z] [NumberField Z] [IsCMFiel
     · exact h
   intro y
   have ha : (y + c y) / 2 ∈ maximalRealSubfield Z := by
-    rw [← IsCMField.complexConj_eq_self_iff, map_div₀, map_add (f := _), IsCMField.complexConj_apply_apply, map_ofNat]
+    rw [← IsCMField.complexConj_eq_self_iff, map_div₀, map_add (f := _),
+      IsCMField.complexConj_apply_apply, map_ofNat]
     ring
   have hb : (y - c y) / (2 * X) ∈ maximalRealSubfield Z := by
-    rw [← IsCMField.complexConj_eq_self_iff, map_div₀, map_sub, map_mul, IsCMField.complexConj_apply_apply, map_ofNat, ← hc, hcX]
+    rw [← IsCMField.complexConj_eq_self_iff, map_div₀, map_sub, map_mul,
+      IsCMField.complexConj_apply_apply, map_ofNat, ← hc, hcX]
     field_simp
     ring
   have hy : y = (y + c y) / 2 + X * ((y - c y) / (2 * X)) := by
     field_simp
     ring
   have h1 : g (algebraMap Z Ω ((y + c y) / 2)) = algebraMap Z Ω ((y + c y) / 2) := hreal ⟨_, ha⟩
-  have h2 : g (algebraMap Z Ω ((y - c y) / (2 * X))) = algebraMap Z Ω ((y - c y) / (2 * X)) := hreal ⟨_, hb⟩
+  have h2 : g (algebraMap Z Ω ((y - c y) / (2 * X))) = algebraMap Z Ω ((y - c y) / (2 * X)) :=
+    hreal ⟨_, hb⟩
   rw [hy, map_add (f := _), map_mul, map_add (f := _), map_mul, h1, h2, hgx]
 
 private theorem conj_of_sq {u : ℂ} {q : ℕ} (hq : 0 < q) (h : u ^ 2 = (q : ℂ)) : star u = u := by
@@ -168,47 +191,64 @@ private theorem conj_of_sq {u : ℂ} {q : ℕ} (hq : 0 < q) (h : u ^ 2 = (q : �
 
 section
 
-variable {Y Ω : Type} [Field Y] [NumberField Y] [IsCMField Y] [Field Ω] [Algebra Y Ω] [IsAlgClosure Y Ω]
+variable
+  {Y Ω : Type} [Field Y] [NumberField Y] [IsCMField Y] [Field Ω] [Algebra Y Ω] [IsAlgClosure Y Ω]
 
-private theorem algClosure_real (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
-    [IsAlgClosure L Ω] : IsAlgClosure (maximalRealSubfield L) Ω :=
+private theorem algClosure_real
+    (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+    : IsAlgClosure (maximalRealSubfield L) Ω :=
   ⟨IsAlgClosure.isAlgClosed L, Algebra.IsAlgebraic.trans _ L Ω⟩
 
-private theorem unram_of_fix (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
-    [IsAlgClosure L Ω] (w : HeightOneSpectrum (𝓞 L)) (A : ValuationSubring Ω) (hA : IsPlaceOver A w)
-    (hfix : ∀ σ ∈ Ine (F := maximalRealSubfield L) A, ∀ z : L, σ (algebraMap L Ω z) = algebraMap L Ω z) :
-    Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield L)) w.asIdeal := by
+private theorem unram_of_fix
+    (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+    (w : HeightOneSpectrum (𝓞 L)) (A : ValuationSubring Ω) (hA : IsPlaceOver A w)
+    (hfix
+      : ∀ σ ∈ Ine (F := maximalRealSubfield L) A, ∀ z : L, σ (algebraMap L Ω z) = algebraMap L Ω z)
+    : Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield L)) w.asIdeal := by
   haveI : IsAlgClosure (maximalRealSubfield L) Ω := algClosure_real L Ω
   have hAv : IsPlaceOver A (w.under (𝓞 (maximalRealSubfield L))) := fun x => by
     rw [IsScalarTower.algebraMap_apply (maximalRealSubfield L) L Ω]
     exact hA (algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L) x)
-  obtain ⟨-, he⟩ := GlobalTheory.InertFixVal.ramificationIdx_eq_one A (w.under (𝓞 (maximalRealSubfield L))) w hAv hA hfix
+  obtain ⟨-, he⟩ :=
+    GlobalTheory.InertFixVal.ramificationIdx_eq_one A (w.under (𝓞 (maximalRealSubfield L))) w hAv hA
+      hfix
   exact Ideal.ramificationIdx_eq_one_iff.1 he
 
-private theorem real_of_real (Q : QCM Y Ω) (y : maximalRealSubfield Y) :
-    algebraMap Y ↥Q.K (y : Y) ∈ maximalRealSubfield ↥Q.K := by
+private theorem real_of_real (Q : QCM Y Ω) (y : maximalRealSubfield Y)
+    : algebraMap Y ↥Q.K (y : Y) ∈ maximalRealSubfield ↥Q.K := by
   refine (mem_maximalRealSubfield_iff _).2 fun φ => ?_
   exact (mem_maximalRealSubfield_iff _).1 y.2 (φ.comp (algebraMap Y ↥Q.K))
 
-private theorem fixes_F (Q : QCM Y Ω) (g : G (maximalRealSubfield ↥Q.K) Ω) (y : maximalRealSubfield Y) :
-    g.toRingEquiv (algebraMap (maximalRealSubfield Y) Ω y) = algebraMap (maximalRealSubfield Y) Ω y := by
-  have h : g (algebraMap (maximalRealSubfield ↥Q.K) Ω ⟨_, real_of_real Q y⟩) =
-      algebraMap (maximalRealSubfield ↥Q.K) Ω ⟨_, real_of_real Q y⟩ := g.commutes _
+private theorem fixes_F
+    (Q : QCM Y Ω) (g : G (maximalRealSubfield ↥Q.K) Ω) (y : maximalRealSubfield Y)
+    : g.toRingEquiv (algebraMap (maximalRealSubfield Y) Ω y)
+      = algebraMap (maximalRealSubfield Y) Ω y := by
+  have h
+      : g (algebraMap (maximalRealSubfield ↥Q.K) Ω ⟨_, real_of_real Q y⟩)
+        = algebraMap (maximalRealSubfield ↥Q.K) Ω ⟨_, real_of_real Q y⟩ :=
+    g.commutes _
   exact h
 
 private def down (Q : QCM Y Ω) (g : G (maximalRealSubfield ↥Q.K) Ω) : G (maximalRealSubfield Y) Ω :=
   AlgEquiv.ofRingEquiv (f := g.toRingEquiv) (fixes_F Q g)
 
-private theorem nonsplit_of_sqrt_conductor (hSI : SplitIff) (hRS : RealSpan) (hS : SqrtFix) (Q : QCM Y Ω) (x : Ω) (hx : x ∈ Q.K)
-    (p : ℕ) (hp : 0 < p) (hx2 : x ^ 2 = ((-(p : ℤ) : ℤ) : Ω)) (δ : Y) (q : ℕ) (hq : 0 < q) (hδ : δ ^ 2 = (q : Y))
+private theorem nonsplit_of_sqrt_conductor
+    (hSI : SplitIff) (hRS : RealSpan) (hS : SqrtFix)
+    (Q : QCM Y Ω) (x : Ω) (hx : x ∈ Q.K)
+    (p : ℕ) (hp : 0 < p) (hx2 : x ^ 2 = ((-(p : ℤ) : ℤ) : Ω))
+    (δ : Y) (q : ℕ) (hq : 0 < q) (hδ : δ ^ 2 = (q : Y))
     (c : ℕ) (hc0 : c ≠ 0) (hc2 : 2 ∣ c) (hd : ((8 * c : ℕ) : ℤ) ∣ (-(p : ℤ)) - 1)
-    (hTP : ∀ A : ValuationSubring Ω, A.valuation ((p : ℕ) : Ω) < 1 → ∀ h : Ω ≃+* Ω, (∀ z, h z ∈ A ↔ z ∈ A) →
-        h (algebraMap Y Ω δ) = algebraMap Y Ω δ → ∀ y : Y, h (algebraMap Y Ω y) = algebraMap Y Ω y)
-    (w : HeightOneSpectrum (𝓞 ↥Q.K)) (hw : ¬ IsSplitAt w) (A : ValuationSubring Ω) (hA : IsPlaceOver A w) :
-    ¬ A.valuation (c : Ω) < 1 ∧ A.valuation ((2 * (-(p : ℤ)) : ℤ) : Ω) = 1 ∧
-      ∃ g ∈ Dec (F := maximalRealSubfield Y) A, ¬ Fixes Y g := by
-  have hnot : ¬ ∀ g ∈ Dec (F := maximalRealSubfield ↥Q.K) A, Fixes ↥Q.K g :=
-    fun h => hw ((hSI ↥Q.K Ω A w hA).2 h)
+    (hTP : ∀ A : ValuationSubring Ω,
+      A.valuation ((p : ℕ) : Ω) < 1
+        → ∀ h : Ω ≃+* Ω,
+          (∀ z, h z ∈ A ↔ z ∈ A) → h (algebraMap Y Ω δ) = algebraMap Y Ω δ
+            → ∀ y : Y, h (algebraMap Y Ω y) = algebraMap Y Ω y)
+    (w : HeightOneSpectrum (𝓞 ↥Q.K)) (hw : ¬ IsSplitAt w)
+    (A : ValuationSubring Ω) (hA : IsPlaceOver A w)
+    : ¬ A.valuation (c : Ω) < 1 ∧ A.valuation ((2 * (-(p : ℤ)) : ℤ) : Ω) = 1
+      ∧ ∃ g ∈ Dec (F := maximalRealSubfield Y) A, ¬ Fixes Y g := by
+  have hnot : ¬ ∀ g ∈ Dec (F := maximalRealSubfield ↥Q.K) A, Fixes ↥Q.K g := fun h =>
+    hw ((hSI ↥Q.K Ω A w hA).2 h)
   push_neg at hnot
   obtain ⟨g, hg, hng⟩ := hnot
   have hZr : Fixes (maximalRealSubfield ↥Q.K) g := fun y => g.commutes y
@@ -224,13 +264,20 @@ private theorem nonsplit_of_sqrt_conductor (hSI : SplitIff) (hRS : RealSpan) (hS
     exact h
   have hvp : ¬ A.valuation ((p : ℕ) : Ω) < 1 := fun h =>
     hgY (fun y => hTP A h g.toRingEquiv (fun z => apply_mem_iff_of_mem_Dec hg z) hgδ y)
-  have hvp1 : A.valuation ((p : ℕ) : Ω) = 1 := le_antisymm (valuation_natCast_le_one A p) (not_lt.1 hvp)
+  have hvp1 : A.valuation ((p : ℕ) : Ω) = 1 :=
+    le_antisymm (valuation_natCast_le_one A p) (not_lt.1 hvp)
   have hv2 : A.valuation ((2 : ℕ) : Ω) = 1 := by
     refine le_antisymm (valuation_natCast_le_one A 2) (not_lt.1 fun h => hvc ?_)
     obtain ⟨k, rfl⟩ := hc2
     rw [Nat.cast_mul, map_mul]
     exact lt_of_le_of_lt (mul_le_of_le_one_right' (valuation_natCast_le_one A k)) h
-  refine ⟨hvc, ?_, down Q g, (GlobalTheory.AboveL.mem_dec_congr A (down Q g) g (fun _ => rfl)).2 hg, fun h => hgY h⟩
+  refine ⟨
+    hvc,
+    ?_,
+    down Q g,
+    (GlobalTheory.AboveL.mem_dec_congr A (down Q g) g (fun _ => rfl)).2 hg,
+    fun h => hgY h
+  ⟩
   have : ((2 * (-(p : ℤ)) : ℤ) : Ω) = -(((2 : ℕ) : Ω) * ((p : ℕ) : Ω)) := by push_cast; ring
   rw [this, Valuation.map_neg, map_mul, hv2, hvp1, one_mul]
 

@@ -33,12 +33,15 @@ theorem eta_neg_one_pow {F : Type} [NormedField F] (r : ℕ) : eta ((-1 : F) ^ r
   rw [if_pos]
   exact ⟨1, by simp⟩
 
-variable {F E : Type} [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
-  (A : Et F E) {r : ℕ} {τ : A.K} {p : Fin r → F}
+variable
+  {F E : Type}
+  [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
+  (A : Et F E)
+  {r : ℕ} {τ : A.K} {p : Fin r → F}
 
-theorem row_pow (hG : A.IsGen τ p) (c : A.K) (n : ℕ) :
-    (fun i : Fin r => Algebra.trace F A.K (τ ^ (i : ℕ) * c)) ᵥ* (companion p) ^ n =
-      fun j : Fin r => Algebra.trace F A.K (τ ^ (j : ℕ) * (τ ^ n * c)) := by
+theorem row_pow (hG : A.IsGen τ p) (c : A.K) (n : ℕ)
+    : (fun i : Fin r => Algebra.trace F A.K (τ ^ (i : ℕ) * c)) ᵥ* (companion p) ^ n
+      = fun j : Fin r => Algebra.trace F A.K (τ ^ (j : ℕ) * (τ ^ n * c)) := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -47,8 +50,9 @@ theorem row_pow (hG : A.IsGen τ p) (c : A.K) (n : ℕ) :
     congr 2
     ring
 
-theorem Cm_pt_one (hG : A.IsGen τ p) (lam : F) (a : A.K) :
-    Cm (pt A hG lam 1 a) = Algebra.traceMatrix F (bas A hG) * Algebra.leftMulMatrix (bas A hG) a := by
+theorem Cm_pt_one (hG : A.IsGen τ p) (lam : F) (a : A.K)
+    : Cm (pt A hG lam 1 a)
+      = Algebra.traceMatrix F (bas A hG) * Algebra.leftMulMatrix (bas A hG) a := by
   ext i j
   have h1 : Cm (pt A hG lam 1 a) i j = Algebra.trace F A.K (τ ^ (j : ℕ) * (τ ^ (i : ℕ) * a)) := by
     simp only [Cm, pt, Matrix.of_apply]
@@ -64,10 +68,15 @@ end GlobalTheory.JR.LinDesc
 
 namespace GlobalTheory.JR.LinDesc
 
-theorem omega_pt_one : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
-    [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (τ : A.K) (p : Fin r → F) (hG : A.IsGen τ p) (lam : F),
-    ∃ κ₀ : ℂ, ∀ a : A.K, IsUnit a → ∀ g : GL (Fin r) F,
-      omega (act g (LinDesc.pt A hG lam 1 a)) = κ₀ * eta ((g : Matrix (Fin r) (Fin r) F).det) * A.etaK a := by
+theorem omega_pt_one
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (τ : A.K) (p : Fin r → F) (hG : A.IsGen τ p)
+        (lam : F),
+      ∃ κ₀ : ℂ, ∀ a : A.K,
+        IsUnit a
+          → ∀ g : GL (Fin r) F,
+            omega (act g (LinDesc.pt A hG lam 1 a))
+              = κ₀ * eta ((g : Matrix (Fin r) (Fin r) F).det) * A.etaK a := by
   intro F E _ _ _ _ _ A r τ p hG lam
   obtain ⟨hmul, -, -, -⟩ := GlobalTheory.T.unramifiedValuationParitySign_character_kernel_norms F E
   have hnd := (GlobalTheory.T.etaleHermitianPair_structure_facts F E A).2.2.1
@@ -78,7 +87,9 @@ theorem omega_pt_one : ∀ (F E : Type) [NontriviallyNormedField F] [Nontriviall
     rw [Algebra.traceForm_toMatrix, Algebra.traceMatrix_apply, Algebra.traceForm_apply]
   refine ⟨eta (Algebra.traceMatrix F (bas A hG)).det, fun a ha g => ?_⟩
   have hL := GlobalTheory.T.jacquetRallis_transfer_factor_krylov_det F r
-  have hdet : (g : Matrix (Fin r) (Fin r) F).det * ((g⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F).det = 1 := by
+  have hdet
+      : (g : Matrix (Fin r) (Fin r) F).det * ((g⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F).det
+        = 1 := by
     rw [← Matrix.det_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.det_one]
   have hg : (g : Matrix (Fin r) (Fin r) F).det ≠ 0 := left_ne_zero_of_mul_eq_one hdet
   have hginv := eq_inv_of_mul_eq_one_right hdet

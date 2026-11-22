@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
@@ -72,8 +74,13 @@ private lemma lamR_props (β : ℝ) (hβ : β ≠ 0) :
       simp
       positivity
 
-theorem UpperTheory.ConvolutionTheory.R2.C.lamReal :
-    ∀ β : ℝ, β ≠ 0 → abelian₂ (volume : Measure ℝ) (fun x => Complex.exp (-(2 * Real.pi * Complex.I) * (β : ℂ) * (x : ℂ) ^ 2)) (fun x => Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2)) = lamR β := by
+theorem UpperTheory.ConvolutionTheory.R2.C.lamReal
+    : ∀ β : ℝ,
+      β ≠ 0
+        → abelian₂ (volume : Measure ℝ)
+            (fun x => Complex.exp (-(2 * Real.pi * Complex.I) * (β : ℂ) * (x : ℂ) ^ 2))
+            (fun x => Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2))
+          = lamR β := by
   intro β hβ
   have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
   have hbc : (β : ℂ) ≠ 0 := by exact_mod_cast hβ
@@ -105,18 +112,22 @@ theorem UpperTheory.ConvolutionTheory.R2.C.lamReal :
   have hinvs : 0 < (1 / s).re := by
     rw [one_div, Complex.inv_re]
     exact div_pos hsre (Complex.normSq_pos.2 hs0)
-  have hb : (-(Real.pi : ℂ) * D).re < 0 := by
-    simp [hDre, hDim, Real.pi_pos]
-  have hinner : ∀ y : ℝ,
-      (∫ x : ℝ, Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2) *
-        Complex.exp (-(2 * Real.pi * Complex.I) * (β : ℂ) * ((x + y : ℝ) : ℂ) ^ 2)) =
-      (1 / D) ^ (1 / 2 : ℂ) * Complex.exp (-((Real.pi : ℂ) * s) * (y : ℂ) ^ 2) := by
+  have hb : (-(Real.pi : ℂ) * D).re < 0 := by simp [hDre, hDim, Real.pi_pos]
+  have hinner
+      : ∀ y : ℝ,
+        (∫ x : ℝ, Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2) *
+          Complex.exp (-(2 * Real.pi * Complex.I) * (β : ℂ) * ((x + y : ℝ) : ℂ) ^ 2))
+          = (1 / D) ^ (1 / 2 : ℂ) * Complex.exp (-((Real.pi : ℂ) * s) * (y : ℂ) ^ 2) := by
     intro y
-    have hfun : (fun x : ℝ => Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2) *
-        Complex.exp (-(2 * Real.pi * Complex.I) * (β : ℂ) * ((x + y : ℝ) : ℂ) ^ 2)) =
-        fun x : ℝ => Complex.exp ((-(Real.pi : ℂ) * D) * (x : ℂ) ^ 2 +
-          (-(4 * Real.pi * Complex.I * (β : ℂ) * (y : ℂ))) * (x : ℂ) +
-          (-(2 * Real.pi * Complex.I) * (β : ℂ) * (y : ℂ) ^ 2)) := by
+    have hfun
+        : (fun x : ℝ =>
+            Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2)
+              * Complex.exp (-(2 * Real.pi * Complex.I) * (β : ℂ) * ((x + y : ℝ) : ℂ) ^ 2))
+          = fun x : ℝ =>
+            Complex.exp
+              ((-(Real.pi : ℂ) * D) * (x : ℂ) ^ 2
+                + (-(4 * Real.pi * Complex.I * (β : ℂ) * (y : ℂ))) * (x : ℂ)
+                + (-(2 * Real.pi * Complex.I) * (β : ℂ) * (y : ℂ) ^ 2)) := by
       funext x
       rw [← Complex.exp_add, hDdef]
       congr 1
@@ -134,9 +145,9 @@ theorem UpperTheory.ConvolutionTheory.R2.C.lamReal :
   unfold abelian₂
   simp only [hinner]
   rw [integral_const_mul]
-  have houter : (∫ y : ℝ, Complex.exp (-((Real.pi : ℂ) * s) * (y : ℂ) ^ 2)) = (1 / s) ^ (1 / 2 : ℂ) := by
-    have hre : 0 < ((Real.pi : ℂ) * s).re := by
-      simpa using mul_pos Real.pi_pos hsre
+  have houter
+      : (∫ y : ℝ, Complex.exp (-((Real.pi : ℂ) * s) * (y : ℂ) ^ 2)) = (1 / s) ^ (1 / 2 : ℂ) := by
+    have hre : 0 < ((Real.pi : ℂ) * s).re := by simpa using mul_pos Real.pi_pos hsre
     rw [integral_gaussian_complex hre]
     congr 1
     field_simp
@@ -154,8 +165,7 @@ theorem UpperTheory.ConvolutionTheory.R2.C.lamReal :
     have h1 : A.im * B.im ≤ |A.im| * |B.im| := by
       rw [← abs_mul]
       exact le_abs_self _
-    have h2 : |A.im| * |B.im| < A.re * B.re :=
-      mul_lt_mul'' hAim hBim (abs_nonneg _) (abs_nonneg _)
+    have h2 : |A.im| * |B.im| < A.re * B.re := mul_lt_mul'' hAim hBim (abs_nonneg _) (abs_nonneg _)
     linarith
   rcases sq_eq_sq_iff_eq_or_eq_neg.1 hsq with h | h
   · exact h

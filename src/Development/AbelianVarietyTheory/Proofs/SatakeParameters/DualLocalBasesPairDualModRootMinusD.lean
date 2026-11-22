@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ColR
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker Formalism.L2.Col Classical
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker Formalism.L2.Col
+  Classical
 open Formalism.L2.Th1.H (cmL CmOK matH IsIsom taylorMv)
 open Formalism.L2.Th1.GD (LocNorm InMul frameM thetaLin)
 open Formalism.L2.Th1.E (IntCurve curveL Unif)
@@ -22,12 +23,16 @@ noncomputable section
 
 namespace GlobalTheory.DFrame
 
-theorem pair_value_eq {D : D7} {p : ℕ} [Fact p.Prime] {ι : ℂ ≃+* ℂ_[p]} {th : ℂ_[p]} (hth : th ≠ 0)
+theorem pair_value_eq
+    {D : D7} {p : ℕ} [Fact p.Prime]
+    {ι : ℂ ≃+* ℂ_[p]} {th : ℂ_[p]} (hth : th ≠ 0)
     {z₁ z₂ : Bool × HH D} {s₁ s₂ : D.host.E} (h₁ : ‖rho D ι z₁ s₁‖ = 1) (h₂ : ‖rho D ι z₂ s₂‖ = 1)
-    (hc : ‖rho D ι z₁ (D.host.conj s₂) - rho D ι z₂ s₂‖ ≤ ‖th‖) {N : ℕ} {a b : Fin N} {X : D.host.E}
-    (hX : X = s₁ * D.host.conj s₂ * (if a = b then 1 else 0)) :
-    ∃ e : ℂ_[p], ‖e‖ ≤ 1 ∧ (rho D ι z₁ s₁)⁻¹ * rho D ι z₁ X * (rho D ι z₂ s₂)⁻¹ =
-      (if a = b then 1 else 0) + th * e := by
+    (hc : ‖rho D ι z₁ (D.host.conj s₂) - rho D ι z₂ s₂‖ ≤ ‖th‖)
+    {N : ℕ} {a b : Fin N} {X : D.host.E} (hX : X = s₁ * D.host.conj s₂ * (if a = b then 1 else 0))
+    : ∃ e : ℂ_[p],
+      ‖e‖ ≤ 1
+        ∧ (rho D ι z₁ s₁)⁻¹ * rho D ι z₁ X * (rho D ι z₂ s₂)⁻¹
+          = (if a = b then 1 else 0) + th * e := by
   have n₁ : rho D ι z₁ s₁ ≠ 0 := fun h => by simp [h] at h₁
   have n₂ : rho D ι z₂ s₂ ≠ 0 := fun h => by simp [h] at h₂
   by_cases hab : a = b
@@ -42,11 +47,15 @@ theorem pair_value_eq {D : D7} {p : ℕ} [Fact p.Prime] {ι : ℂ ≃+* ℂ_[p]}
     subst hX
     simp [hab]
 
-theorem sum_pc_pc {D : D7} {p : ℕ} [Fact p.Prime] (ι : ℂ ≃+* ℂ_[p]) {N : ℕ}
+theorem sum_pc_pc
+    {D : D7} {p : ℕ} [Fact p.Prime]
+    (ι : ℂ ≃+* ℂ_[p])
+    {N : ℕ}
     (σ : Bool × HH D → 𝓞 D.host.E) (z₁ z₂ : Bool × HH D) (a₁ a₂ : Fin N)
-    (F : (Bool × HH D) × Fin N → (Bool × HH D) × Fin N → ℂ_[p]) :
-    ∑ l, ∑ l₂, pc D ι σ z₁ l a₁ * F l l₂ * pc D ι σ z₂ l₂ a₂ =
-      (rho D ι z₁ (σ z₁ : D.host.E))⁻¹ * F (z₁, a₁) (z₂, a₂) * (rho D ι z₂ (σ z₂ : D.host.E))⁻¹ := by
+    (F : (Bool × HH D) × Fin N → (Bool × HH D) × Fin N → ℂ_[p])
+    : ∑ l, ∑ l₂, pc D ι σ z₁ l a₁ * F l l₂ * pc D ι σ z₂ l₂ a₂
+      = (rho D ι z₁ (σ z₁ : D.host.E))⁻¹ * F (z₁, a₁) (z₂, a₂)
+        * (rho D ι z₂ (σ z₂ : D.host.E))⁻¹ := by
   rw [Finset.sum_eq_single (z₁, a₁), Finset.sum_eq_single (z₂, a₂)]
   · simp [pc]
   · intro b _ hb; simp [pc, hb]

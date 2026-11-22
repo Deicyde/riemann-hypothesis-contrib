@@ -12,16 +12,17 @@ noncomputable section
 
 namespace GlobalTheory.Poinc.SumSq
 
-theorem exists_nat_smul_sub_posDef {ι : Type*} [Fintype ι] {G B : Matrix ι ι ℝ} (hG : G.PosDef)
-    (hB : B.IsHermitian) : ∃ κ₀ : ℕ, ∀ κ : ℕ, κ₀ ≤ κ → ((κ : ℝ) • G - B).PosDef := by
+theorem exists_nat_smul_sub_posDef
+    {ι : Type*} [Fintype ι] {G B : Matrix ι ι ℝ} (hG : G.PosDef) (hB : B.IsHermitian)
+    : ∃ κ₀ : ℕ, ∀ κ : ℕ, κ₀ ≤ κ → ((κ : ℝ) • G - B).PosDef := by
   have hp : ∀ x : ι → ℝ, x ≠ 0 → 0 < x ⬝ᵥ G *ᵥ x := fun x hx => by
     simpa using hG.dotProduct_mulVec_pos hx
   have hne : ∀ x ∈ Metric.sphere (0 : ι → ℝ) 1, x ≠ 0 := by
     rintro x hx rfl
     simp at hx
   have hc : ContinuousOn (fun x : ι → ℝ => (x ⬝ᵥ B *ᵥ x) / (x ⬝ᵥ G *ᵥ x)) (Metric.sphere 0 1) := by
-    refine ContinuousOn.div (Continuous.continuousOn ?_) (Continuous.continuousOn ?_)
-      fun x hx => (hp x (hne x hx)).ne'
+    refine ContinuousOn.div (Continuous.continuousOn ?_) (Continuous.continuousOn ?_) fun x hx =>
+      (hp x (hne x hx)).ne'
     · exact continuous_id.dotProduct (continuous_const.matrix_mulVec continuous_id)
     · exact continuous_id.dotProduct (continuous_const.matrix_mulVec continuous_id)
   obtain ⟨C, hC⟩ := ((isCompact_sphere (0 : ι → ℝ) 1).image_of_continuousOn hc).bddAbove
@@ -32,12 +33,12 @@ theorem exists_nat_smul_sub_posDef {ι : Type*} [Fintype ι] {G B : Matrix ι ι
   · refine IsHermitian.sub ?_ hB
     rw [IsHermitian, conjTranspose_smul, hG.isHermitian.eq, star_trivial]
   · have hn : 0 < ‖x‖ := norm_pos_iff.2 hx
-    have hs : ‖x‖⁻¹ • x ∈ Metric.sphere (0 : ι → ℝ) 1 := by
-      simp [norm_smul, hn.ne']
+    have hs : ‖x‖⁻¹ • x ∈ Metric.sphere (0 : ι → ℝ) 1 := by simp [norm_smul, hn.ne']
     have h1 := hC ⟨_, hs, rfl⟩
     simp only [mulVec_smul, dotProduct_smul, smul_dotProduct, smul_eq_mul] at h1
     rw [mul_div_mul_left _ _ (inv_pos.2 hn).ne', mul_div_mul_left _ _ (inv_pos.2 hn).ne',
-      div_le_iff₀ (hp x hx)] at h1
+        div_le_iff₀ (hp x hx)]
+      at h1
     have h2 := mul_lt_mul_of_pos_right hκ' (hp x hx)
     rw [star_trivial, sub_mulVec, smul_mulVec, dotProduct_sub, dotProduct_smul, smul_eq_mul]
     linarith
@@ -46,8 +47,8 @@ theorem posDef_symm {n : Type*} {M : Matrix n n ℝ} (hM : M.PosDef) (i j : n) :
   have := congrFun₂ hM.isHermitian.eq i j
   simpa using this
 
-theorem schur_posDef {n : ℕ} {M : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ} (hM : M.PosDef) :
-    (Matrix.of fun i j : Fin n => M 0 0 * M i.succ j.succ - M i.succ 0 * M 0 j.succ).PosDef := by
+theorem schur_posDef {n : ℕ} {M : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ} (hM : M.PosDef)
+    : (Matrix.of fun i j : Fin n => M 0 0 * M i.succ j.succ - M i.succ 0 * M 0 j.succ).PosDef := by
   have hs := posDef_symm hM
   have ha : 0 < M 0 0 := hM.diag_pos
   refine PosDef.of_dotProduct_mulVec_pos ?_ fun y hy => ?_
@@ -64,8 +65,10 @@ theorem schur_posDef {n : ℕ} {M : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ} (hM 
       simpa [hx] using this
     have h1 := hM.dotProduct_mulVec_pos hx0
     rw [star_trivial] at h1 ⊢
-    have e1 : x ⬝ᵥ M *ᵥ x = M 0 0 * (-B / M 0 0) ^ 2 + 2 * (-B / M 0 0) * B +
-        ∑ i, y i * ∑ j, M i.succ j.succ * y j := by
+    have e1
+        : x ⬝ᵥ M *ᵥ x
+          = M 0 0 * (-B / M 0 0) ^ 2 + 2 * (-B / M 0 0) * B
+            + ∑ i, y i * ∑ j, M i.succ j.succ * y j := by
       have hc : ∀ i : Fin n, M i.succ 0 = M 0 i.succ := fun i => hs 0 i.succ
       have h3 : ∑ i, y i * (M 0 i.succ * (-B / M 0 0)) = (-B / M 0 0) * B := by
         rw [hB, Finset.mul_sum]
@@ -74,8 +77,9 @@ theorem schur_posDef {n : ℕ} {M : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ} (hM 
         mul_add, Finset.sum_add_distrib, h3]
       rw [← hB]
       ring
-    have e2 : y ⬝ᵥ (Matrix.of fun i j : Fin n => M 0 0 * M i.succ j.succ - M i.succ 0 * M 0 j.succ) *ᵥ y =
-        M 0 0 * ∑ i, y i * ∑ j, M i.succ j.succ * y j - B ^ 2 := by
+    have e2
+        : y ⬝ᵥ (Matrix.of fun i j : Fin n => M 0 0 * M i.succ j.succ - M i.succ 0 * M 0 j.succ) *ᵥ y
+          = M 0 0 * ∑ i, y i * ∑ j, M i.succ j.succ * y j - B ^ 2 := by
       have hc : ∀ i : Fin n, M i.succ 0 = M 0 i.succ := fun i => hs 0 i.succ
       simp only [dotProduct, mulVec, of_apply, hc, sub_mul, Finset.sum_sub_distrib, mul_sub]
       rw [hB, sq, Finset.mul_sum, Finset.sum_mul]
@@ -91,9 +95,11 @@ theorem schur_posDef {n : ℕ} {M : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ} (hM 
     field_simp at h1
     nlinarith
 
-theorem exists_smul_eq_sum_vecMulVec : ∀ (r : ℕ) (L : Matrix (Fin r) (Fin r) ℤ),
-    (L.map (Int.cast : ℤ → ℝ)).PosDef → ∃ (ι : Type) (_ : Fintype ι) (D : ℕ) (a : ι → Fin r → ℤ),
-      1 ≤ D ∧ (D : ℤ) • L = ∑ i, vecMulVec (a i) (a i) := by
+theorem exists_smul_eq_sum_vecMulVec
+    : ∀ (r : ℕ) (L : Matrix (Fin r) (Fin r) ℤ),
+      (L.map (Int.cast : ℤ → ℝ)).PosDef
+        → ∃ (ι : Type) (_ : Fintype ι) (D : ℕ) (a : ι → Fin r → ℤ),
+          1 ≤ D ∧ (D : ℤ) • L = ∑ i, vecMulVec (a i) (a i) := by
   intro r
   induction r with
   | zero =>
@@ -118,12 +124,20 @@ theorem exists_smul_eq_sum_vecMulVec : ∀ (r : ℕ) (L : Matrix (Fin r) (Fin r)
       ext i j
       simp [hS]
     obtain ⟨ι, _, D, y, hD, hy⟩ := ih S hSr
-    refine ⟨Fin D ⊕ ι, inferInstance, D * (L 0 0).toNat,
-      Sum.elim (fun _ => fun j => L 0 j) (fun i => Fin.cons 0 (y i)), ?_, ?_⟩
+    refine ⟨
+      Fin D ⊕ ι,
+      inferInstance,
+      D * (L 0 0).toNat,
+      Sum.elim (fun _ => fun j => L 0 j) (fun i => Fin.cons 0 (y i)),
+      ?_,
+      ?_
+    ⟩
     · have : 1 ≤ (L 0 0).toNat := by omega
       nlinarith
-    · have hy' : ∀ p q, (D : ℤ) * (L 0 0 * L p.succ q.succ - L p.succ 0 * L 0 q.succ) =
-          ∑ i, y i p * y i q := fun p q => by
+    · have hy'
+          : ∀ p q,
+            (D : ℤ) * (L 0 0 * L p.succ q.succ - L p.succ 0 * L 0 q.succ)
+              = ∑ i, y i p * y i q := fun p q => by
         have := congrFun₂ hy p q
         simpa [hS, Matrix.sum_apply, vecMulVec_apply] using this
       have hc : ((L 0 0).toNat : ℤ) = L 0 0 := Int.toNat_of_nonneg ha'.le
@@ -144,10 +158,12 @@ theorem exists_smul_eq_sum_vecMulVec : ∀ (r : ℕ) (L : Matrix (Fin r) (Fin r)
         rw [← hy' p q, hsz 0 p.succ]
         ring
 
-theorem exists_smul_eq_sum_vecMulVec_span :
-    ∀ (r : ℕ) (L : Matrix (Fin r) (Fin r) ℤ), (L.map (Int.cast : ℤ → ℝ)).PosDef →
-      ∃ (D m : ℕ) (a : Fin m → Fin r → ℤ), 1 ≤ D ∧ Submodule.span ℤ (Set.range a) = ⊤ ∧
-        (D : ℤ) • L = ∑ i, Matrix.vecMulVec (a i) (a i) := by
+theorem exists_smul_eq_sum_vecMulVec_span
+    : ∀ (r : ℕ) (L : Matrix (Fin r) (Fin r) ℤ),
+      (L.map (Int.cast : ℤ → ℝ)).PosDef
+        → ∃ (D m : ℕ) (a : Fin m → Fin r → ℤ),
+          1 ≤ D ∧ Submodule.span ℤ (Set.range a) = ⊤
+            ∧ (D : ℤ) • L = ∑ i, Matrix.vecMulVec (a i) (a i) := by
   intro r L hL
   obtain ⟨κ₀, hκ⟩ := exists_nat_smul_sub_posDef hL (isHermitian_one (α := ℝ) (n := Fin r))
   set d := max κ₀ 1 with hdd
@@ -172,8 +188,9 @@ theorem exists_smul_eq_sum_vecMulVec_span :
       vecMulVec_apply, smul_eq_mul, Matrix.one_apply]
     simp only [nsmul_eq_mul]
     push_cast
-    have hδ : ∑ c : Fin r, (Pi.single c (1 : ℤ) : Fin r → ℤ) i * (Pi.single c (1 : ℤ) : Fin r → ℤ) j =
-        if i = j then 1 else 0 := by
+    have hδ
+        : ∑ c : Fin r, (Pi.single c (1 : ℤ) : Fin r → ℤ) i * (Pi.single c (1 : ℤ) : Fin r → ℤ) j
+          = if i = j then 1 else 0 := by
       by_cases h : i = j
       · subst h
         simp [Pi.single_apply]

@@ -6,19 +6,39 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Ws.H5 GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Ws.H5
+  GlobalTheory.GalOfCusp
 
-private theorem lift_map {A K Q : Type} [CommRing A] [CommRing K] [CommGroup Q] (x : A →+* K) (χ : Q →* K) :
-    ∃ e : MonoidAlgebra A Q →+* K, (∀ a, e (algebraMap A _ a) = x a) ∧ (∀ z, e (MonoidAlgebra.single z 1) = χ z) ∧
-      ∀ y, e y = MonoidAlgebra.lift K K Q χ (MonoidAlgebra.mapRingHom Q x y) := by
-  refine ⟨(MonoidAlgebra.lift K K Q χ).toRingHom.comp (MonoidAlgebra.mapRingHom Q x), ?_, ?_, fun y => rfl⟩
+private theorem lift_map
+    {A K Q : Type} [CommRing A] [CommRing K] [CommGroup Q] (x : A →+* K) (χ : Q →* K)
+    : ∃ e : MonoidAlgebra A Q →+* K,
+      (∀ a, e (algebraMap A _ a) = x a) ∧ (∀ z, e (MonoidAlgebra.single z 1) = χ z)
+        ∧ ∀ y, e y = MonoidAlgebra.lift K K Q χ (MonoidAlgebra.mapRingHom Q x y) := by
+  refine ⟨
+    (MonoidAlgebra.lift K K Q χ).toRingHom.comp (MonoidAlgebra.mapRingHom Q x),
+    ?_,
+    ?_,
+    fun y => rfl
+  ⟩
   · intro a
     simp [MonoidAlgebra.coe_algebraMap, MonoidAlgebra.mapRingHom_single, MonoidAlgebra.lift_single]
   · intro z
     simp [MonoidAlgebra.mapRingHom_single, MonoidAlgebra.lift_single]
 
-theorem UpperTheory.V.Ws.H5.levelJ :
-    ∀ {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] {s : HidaSetting l L Ω} {V : s.Lev} {c : Coef l} {n : ℕ} {r : Resid V.frame c.O n} (B : UniversalOrdinaryDeterminantRing r) (J : Ideal B.B), B.Dense J → B.TwistOk J → ∀ (Q : Type) [CommGroup Q] [Finite Q], IsPGroup l Q → ∀ q : V.frame.G₀ →* Q, IsOpen (q.ker : Set V.frame.G₀) → Anti V.frame q → ∀ tw : B.B →ₐ[c.O] MonoidAlgebra B.B Q, TwMap B (algebraMap B.B (MonoidAlgebra B.B Q)) (tw : B.B →+* MonoidAlgebra B.B Q) ((MonoidAlgebra.of B.B Q).toHomUnits.comp q) → ∀ b ∈ J, ∀ z : Q, (tw b).coeff z ∈ J := by
+theorem UpperTheory.V.Ws.H5.levelJ
+    : ∀ {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω]
+        [Algebra L Ω] [IsAlgClosure L Ω] {s : HidaSetting l L Ω} {V : s.Lev} {c : Coef l} {n : ℕ}
+        {r : Resid V.frame c.O n} (B : UniversalOrdinaryDeterminantRing r) (J : Ideal B.B),
+      B.Dense J → B.TwistOk J
+        → ∀ (Q : Type) [CommGroup Q] [Finite Q],
+          IsPGroup l Q
+            → ∀ q : V.frame.G₀ →* Q,
+              IsOpen (q.ker : Set V.frame.G₀) → Anti V.frame q
+                → ∀ tw : B.B →ₐ[c.O] MonoidAlgebra B.B Q,
+                  TwMap B (algebraMap B.B (MonoidAlgebra B.B Q)) (tw : B.B →+* MonoidAlgebra B.B Q)
+                      ((MonoidAlgebra.of B.B Q).toHomUnits.comp q)
+                    → ∀ b ∈ J, ∀ z : Q, (tw b).coeff z ∈ J := by
   intro l _ L Ω _ _ _ _ _ _ s V c n r B J hD hT Q _ _ hQ q hq hA tw htw b hb z
   let h0 : s.Wt n := fun _ j _ => (j : ℤ)
   have hinc : h0.Incr := by
@@ -34,13 +54,14 @@ theorem UpperTheory.V.Ws.H5.levelJ :
     obtain ⟨e, he1, he2, he3⟩ := lift_map (x : B.B →+* Qbar l) ((Units.coeHom (Qbar l)).comp χ)
     rw [← he3]
     let β : V.frame.G₀ →* (Qbar l)ˣ := χ.comp q
-    let x' : B.Pt :=
-      { toRingHom := e.comp (tw : B.B →+* MonoidAlgebra B.B Q)
-        commutes' := by
-          intro o
-          show e (tw (algebraMap c.O B.B o)) = algebraMap c.O (Qbar l) o
-          rw [tw.commutes, IsScalarTower.algebraMap_apply c.O B.B (MonoidAlgebra B.B Q), he1]
-          exact x.commutes o }
+    let x' : B.Pt := {
+      toRingHom := e.comp (tw : B.B →+* MonoidAlgebra B.B Q)
+      commutes' := by
+        intro o
+        show e (tw (algebraMap c.O B.B o)) = algebraMap c.O (Qbar l) o
+        rw [tw.commutes, IsScalarTower.algebraMap_apply c.O B.B (MonoidAlgebra B.B Q), he1]
+        exact x.commutes o
+    }
     have hker : q.ker ≤ β.ker := by
       intro g hg
       rw [MonoidHom.mem_ker] at hg ⊢

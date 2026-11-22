@@ -9,16 +9,20 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace LateralTheory.EtaleTrace.Cov
 
-theorem finrank_frac_of_stdSmooth (k R K : Type) [Field k] [CommRing R] [IsDomain R] [Field K]
-    [Algebra k R] [Algebra R K] [Algebra k K] [IsScalarTower k R K] [IsFractionRing R K] (d : ℕ)
-    [Algebra.IsStandardSmoothOfRelativeDimension d k R] :
-    Module.finrank K Ω[K⁄k] = d := by
+theorem finrank_frac_of_stdSmooth
+    (k R K : Type) [Field k] [CommRing R] [IsDomain R] [Field K] [Algebra k R] [Algebra R K]
+    [Algebra k K] [IsScalarTower k R K] [IsFractionRing R K]
+    (d : ℕ) [Algebra.IsStandardSmoothOfRelativeDimension d k R]
+    : Module.finrank K Ω[K⁄k] = d := by
   have : Algebra.FormallyEtale R K := Algebra.FormallyEtale.of_isLocalization (nonZeroDivisors R)
-  have : Algebra.IsStandardSmooth k R := Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth d
+  have : Algebra.IsStandardSmooth k R :=
+    Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth d
   have : Module.Free R Ω[R⁄k] := Algebra.IsStandardSmooth.free_kaehlerDifferential
-  have hr : Module.rank R Ω[R⁄k] = d := Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential d
+  have hr : Module.rank R Ω[R⁄k] = d :=
+    Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential d
   have hf : Module.finrank R Ω[R⁄k] = d := Module.finrank_eq_of_rank_eq hr
-  rw [← (KaehlerDifferential.tensorKaehlerEquivOfFormallyEtale k R K).finrank_eq, Module.finrank_baseChange, hf]
+  rw [← (KaehlerDifferential.tensorKaehlerEquivOfFormallyEtale k R K).finrank_eq,
+    Module.finrank_baseChange, hf]
 
 theorem FieldDim_of : FieldDim := by
   intro k _ d X _ p hp
@@ -34,8 +38,9 @@ theorem FieldDim_of : FieldDim := by
   have : Nonempty V := ⟨⟨_, hx⟩⟩
   let ψ : CommRingCat.of k ⟶ Γ(X, V) := (Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫ p.appLE ⊤ V e
   have hψ : ψ.hom.IsStandardSmoothOfRelativeDimension d := by
-    have := hf.comp (RingHom.IsStandardSmoothOfRelativeDimension.equiv
-      (Scheme.ΓSpecIso (CommRingCat.of k)).symm.commRingCatIsoToRingEquiv)
+    have :=
+      hf.comp (RingHom.IsStandardSmoothOfRelativeDimension.equiv (Scheme.ΓSpecIso (CommRingCat.of
+        k)).symm.commRingCatIsoToRingEquiv)
     exact this
   letI : Algebra k Γ(X, V) := ψ.hom.toAlgebra
   haveI : Algebra.IsStandardSmoothOfRelativeDimension d k Γ(X, V) := hψ

@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Geo GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions
+  Formalism.MainNotions Formalism.L2.Geo GlobalTheory.ShFam GlobalTheory.ShFam.Pad
 
 namespace GlobalTheory.LocM
 
@@ -30,7 +31,11 @@ variable {S : Sig A N j} {κ : Lv A}
 def Ats.Over (cts : Ats S κ) (jC : ∀ (p : ℕ) [Fact p.Prime], PlL D p → (DV.KW p →+* ℂ)) : Prop :=
   ∀ (p : ℕ) [Fact p.Prime] (v : PlL D p), (cts p v).W = placeW D p v (jC p v)
 
-def Stages.fix {p : ℕ} {ct : At S κ p} (st : Stages ct) : Stages ct := { st with mo := motTrue ct, ky := keyTrue ct }
+def Stages.fix {p : ℕ} {ct : At S κ p} (st : Stages ct) : Stages ct := {
+  st with
+  mo := motTrue ct
+  ky := keyTrue ct
+}
 
 structure LocAt (S : Sig A N j) (κ : Lv A) (p : ℕ) : Type 1 where
   loc : ModuliIntegralCharts.Loc D N j p
@@ -39,7 +44,6 @@ structure LocAt (S : Sig A N j) (κ : Lv A) (p : ℕ) : Type 1 where
   pbKF : ∀ {c : ℕ}, ngTrue.KF (D.R.f * N) c → loc.Sec (loc.keySh c)
   bc : CodeAt S κ → loc.Mdl
 
-
 open Classical in
 def bcAt {p : ℕ} (ct : At S κ p) (Z : CodeAt S κ) : ct.Mdl :=
   if h : ∃ Z', IsBCAt ct Z Z' then h.choose else ct.Xm
@@ -47,13 +51,15 @@ def bcAt {p : ℕ} (ct : At S κ p) (Z : CodeAt S κ) : ct.Mdl :=
 def primeAt (F : StFam S κ) (cts : Ats S κ) (p : ℕ) [Fact p.Prime] : LocAt S κ p :=
   haveI : Fintype (PlL D p) := finPl D p
   haveI : Nonempty (PlL D p) := plL_ne D p
-  { loc := Loc.pi fun v => (F.st (cts p v)).fix.loc
+  {
+    loc := Loc.pi fun v => (F.st (cts p v)).fix.loc
     ex := ExtA.pi fun v => (F.st (cts p v)).fix.ex
     locB := fun _ => LocB.pi (fun v => (F.st (cts p v)).fix.locB) (F.α p) fun v => F.hα (cts p v)
     pbKF := fun kf v => (cts p v).pbKF kf
-    bc := fun Z v => bcAt (cts p v) Z }
+    bc := fun Z v => bcAt (cts p v) Z
+  }
 
-def fillAt (S : Sig A N j) (κ : Lv A) (p : ℕ) (hp : ¬ p.Prime) : LocAt S κ p where
+def fillAt (S : Sig A N j) (κ : Lv A) (p : ℕ) (hp : ¬p.Prime) : LocAt S κ p where
   loc := (exists_loc_extA_nat D N j p).choose
   ex := (exists_loc_extA_nat D N j p).choose_spec.some
   locB h := absurd h hp

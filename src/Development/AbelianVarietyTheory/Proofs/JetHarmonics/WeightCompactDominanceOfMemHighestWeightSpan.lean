@@ -7,14 +7,16 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactCasimirHighestW
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory
 
-theorem cdom_add_lowering_word {n : ℕ} (ε : Fin n → Bool) (Λ : Fin n → ℝ)
-    (w : List (Fin n × Fin n)) (hw : ∀ p ∈ w, ε p.1 = ε p.2 ∧ p.2 < p.1) :
-    PI.UpqRep.CDom ε (Λ + Formalism.REAL.wordWeightShift w) Λ := by
+theorem cdom_add_lowering_word
+    {n : ℕ} (ε : Fin n → Bool) (Λ : Fin n → ℝ) (w : List (Fin n × Fin n))
+    (hw : ∀ p ∈ w, ε p.1 = ε p.2 ∧ p.2 < p.1)
+    : PI.UpqRep.CDom ε (Λ + Formalism.REAL.wordWeightShift w) Λ := by
   induction w with
   | nil => exact ⟨fun _ _ => 0, by simp, by simp [Formalism.REAL.wordWeightShift]⟩
   | cons p w ih =>
@@ -29,8 +31,10 @@ theorem cdom_add_lowering_word {n : ℕ} (ε : Fin n → Bool) (Λ : Fin n → �
           · simp [h0, h2] at hab
         · simp [h0, h1] at hab
       · exact hc a b h0
-    · have h1 : ∑ a, ∑ b, (((if a = p.2 then if b = p.1 then 1 else 0 else 0 : ℕ) : ℝ)) •
-          PI.UpqRep.root a b = PI.UpqRep.root p.2 p.1 := by
+    · have h1
+          : ∑ a, ∑ b, (((if a = p.2 then if b = p.1 then 1 else 0 else 0 : ℕ) : ℝ)) •
+              PI.UpqRep.root a b
+            = PI.UpqRep.root p.2 p.1 := by
         rw [Finset.sum_eq_single p.2]
         · rw [Finset.sum_eq_single p.1]
           · simp
@@ -43,8 +47,13 @@ theorem cdom_add_lowering_word {n : ℕ} (ε : Fin n → Bool) (Λ : Fin n → �
       simp only [Formalism.REAL.wordWeightShift, PI.UpqRep.root]
       abel
 
-theorem weight_cdom_of_mem_kSpan :
-    ∀ (k : ℕ) (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W] (E : Fin k → Fin k → Module.End ℂ W) (Λ μ : Fin k → ℝ) (x v : W), Formalism.REAL.GlRel E → Formalism.REAL.IsUnitary (PI.UpqRep.allPos k) E → Formalism.REAL.KHighest (PI.UpqRep.allPos k) E Λ x → v ∈ Formalism.REAL.kSpan (PI.UpqRep.allPos k) E x → v ≠ 0 → Formalism.REAL.IsWeight E μ v → PI.UpqRep.CDom (PI.UpqRep.allPos k) μ Λ := by
+theorem weight_cdom_of_mem_kSpan
+    : ∀ (k : ℕ) (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+        (E : Fin k → Fin k → Module.End ℂ W) (Λ μ : Fin k → ℝ) (x v : W),
+      Formalism.REAL.GlRel E → Formalism.REAL.IsUnitary (PI.UpqRep.allPos k) E
+        → Formalism.REAL.KHighest (PI.UpqRep.allPos k) E Λ x
+        → v ∈ Formalism.REAL.kSpan (PI.UpqRep.allPos k) E x → v ≠ 0 → Formalism.REAL.IsWeight E μ v
+        → PI.UpqRep.CDom (PI.UpqRep.allPos k) μ Λ := by
   intro k W _ _ E Λ μ x v hg hu hΛ hv hv0 hμ
   by_contra hne
   have hk := Formalism.REAL.isUnitary_kUnit _ E hu

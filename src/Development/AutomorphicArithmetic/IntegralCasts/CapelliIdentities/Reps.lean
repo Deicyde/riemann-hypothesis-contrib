@@ -4,9 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qh68.reps.{u_1} :
-    ∀ {α : Type u_1} (r : α → α → Prop),
-    Equivalence r → ∀ (A : Finset α), ∃ T ⊆ A, (∀ t ∈ T, ∀ t' ∈ T, r t t' → t = t') ∧ ∀ a ∈ A, ∃ t ∈ T, r a t := by
+theorem UpperTheory.Reformulated.B.Qh68.reps.{u_1}
+    : ∀ {α : Type u_1} (r : α → α → Prop),
+      Equivalence r
+        → ∀ (A : Finset α), ∃ T ⊆ A,
+          (∀ t ∈ T, ∀ t' ∈ T, r t t' → t = t') ∧ ∀ a ∈ A, ∃ t ∈ T, r a t := by
   intro α r hr A
   classical
   induction A using Finset.induction_on with

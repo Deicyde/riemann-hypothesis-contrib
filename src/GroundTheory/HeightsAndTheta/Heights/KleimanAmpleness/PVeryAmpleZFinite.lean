@@ -20,20 +20,27 @@ namespace VeryAmpleZFinite
 
 variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {r : ℕ}
 
-theorem ampleBase_le_chartRing {h : Fin (r + 1) → Ω} (J : Chart h) {j : Fin (r + 1)} (hj : j ∈ J.1) :
-    ampleBase (S := S) h j ≤ chartRing S h J := by
+theorem ampleBase_le_chartRing {h : Fin (r + 1) → Ω} (J : Chart h) {j : Fin (r + 1)} (hj : j ∈ J.1)
+    : ampleBase (S := S) h j ≤ chartRing S h J := by
   rw [ampleBase, Algebra.adjoin_le_iff]
   rintro _ ⟨l, rfl⟩
-  exact ⟨MvPolynomial.X l, MvPolynomial.X j, 1, X_mem_monos hj, MvPolynomial.isHomogeneous_X S l,
-    MvPolynomial.isHomogeneous_X S j, by simp⟩
+  exact ⟨
+    MvPolynomial.X l,
+    MvPolynomial.X j,
+    1,
+    X_mem_monos hj,
+    MvPolynomial.isHomogeneous_X S l,
+    MvPolynomial.isHomogeneous_X S j,
+    by simp
+  ⟩
 
 end VeryAmpleZFinite
 
-
 open VeryAmpleZFinite in
-theorem VeryAmpleZFinite.proof (hExt : VeryAmpleZExtend.Statement.{u, v, w})
-    (hSpan : VeryAmpleZChartSpan.Statement.{u, v, w}) (hRing : VeryAmpleZChartRing.Statement.{u, w}) :
-    VeryAmpleZFinite.Statement.{u, v, w} := by
+theorem VeryAmpleZFinite.proof
+    (hExt : VeryAmpleZExtend.Statement.{u, v, w}) (hSpan : VeryAmpleZChartSpan.Statement.{u, v, w})
+    (hRing : VeryAmpleZChartRing.Statement.{u, w})
+    : VeryAmpleZFinite.Statement.{u, v, w} := by
   classical
   intro S _ _ Ω _ _ N x E _ _ _ _ F hF H r h hH J
   obtain ⟨j, hj⟩ := J.2.1
@@ -44,8 +51,10 @@ theorem VeryAmpleZFinite.proof (hExt : VeryAmpleZExtend.Statement.{u, v, w})
     ampleBase_le_chartRing J hj (hH.closed j hj0 hz)
   choose g hg using fun k => hF (Jk k)
 
-  have hext : ∀ k, ∀ᶠ M in atTop, ∀ y ∈ g k, b k ^ M • y ∈ secsOnZ F.toSubSystem H.toSubSystem h J :=
-    fun k => (eventually_all_finset _).mpr fun y hy =>
+  have hext
+      : ∀ k,
+        ∀ᶠ M in atTop, ∀ y ∈ g k, b k ^ M • y ∈ secsOnZ F.toSubSystem H.toSubSystem h J := fun k =>
+    (eventually_all_finset _).mpr fun y hy =>
       hExt S Ω N x E F H.toSubSystem r h hsec J j hj (b k) (hb k) (Jk k) (hrat k) y
         (by rw [← hg k]; exact Submodule.subset_span hy)
   choose M0 hM0 using fun k => eventually_atTop.mp (hext k)
@@ -62,10 +71,11 @@ theorem VeryAmpleZFinite.proof (hExt : VeryAmpleZExtend.Statement.{u, v, w})
     intro k
     have heK : e ∈ secsOnZChart F.toSubSystem H.toSubSystem h (Jk k) J :=
       (Submodule.mem_iInf _).mp he (Jk k)
-    obtain ⟨β, hβ, rfl⟩ := hSpan S Ω N x E F.toSubSystem H.toSubSystem r h hsec (Jk k) J (g k)
-      (hg k).ge _ heK
-    obtain ⟨L0, hL0⟩ := eventually_atTop.mp ((eventually_all_finset (g k)).mpr fun y hy =>
-      hRing S Ω N x H r h hH J j hj (b k) (hb k) (Jk k) (hrat k) (β y) (hβ y hy))
+    obtain ⟨β, hβ, rfl⟩ :=
+      hSpan S Ω N x E F.toSubSystem H.toSubSystem r h hsec (Jk k) J (g k) (hg k).ge _ heK
+    obtain ⟨L0, hL0⟩ :=
+      eventually_atTop.mp ((eventually_all_finset (g k)).mpr fun y hy =>
+        hRing S Ω N x H r h hH J j hj (b k) (hb k) (Jk k) (hrat k) (β y) (hβ y hy))
     refine eventually_atTop.mpr ⟨L0 + M0 k, fun L hL => ?_⟩
     rw [Finset.smul_sum]
     refine Submodule.sum_mem _ fun y hy => ?_

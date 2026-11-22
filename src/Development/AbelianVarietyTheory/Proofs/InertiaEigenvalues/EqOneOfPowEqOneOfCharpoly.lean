@@ -8,9 +8,11 @@ open Polynomial
 
 namespace GlobalTheory.FinOrd
 
-theorem eq_one_of_pow_eq_one_of_charpoly (K : Type) [Field K] [CharZero K] (N : ℕ)
-    (M : Matrix (Fin N) (Fin N) K) (h : ∃ m : ℕ, 0 < m ∧ M ^ m = 1)
-    (hc : M.charpoly = (X - 1) ^ N) : M = 1 := by
+theorem eq_one_of_pow_eq_one_of_charpoly
+    (K : Type) [Field K] [CharZero K]
+    (N : ℕ) (M : Matrix (Fin N) (Fin N) K)
+    (h : ∃ m : ℕ, 0 < m ∧ M ^ m = 1) (hc : M.charpoly = (X - 1) ^ N)
+    : M = 1 := by
   obtain ⟨m, hm, hM⟩ := h
   have hpr : Prime (X - 1 : K[X]) := by simpa using prime_X_sub_C (1 : K)
 

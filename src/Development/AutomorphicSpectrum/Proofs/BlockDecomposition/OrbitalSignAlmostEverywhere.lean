@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EventuallyUn
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.G8.G2
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -21,47 +22,63 @@ namespace GlobalTheory.CompanionTheory.KapOrbAE
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_integral_unitary (hE : Unr E) (n : ℕ) (P : E[X]) (hP : P ∈ Ell E n) :
-    ∀ᶠ w : Pl E in cofinite, ¬ IsSplitAt w → ∃ γ : UL n w, γ ∈ KL n w ∧ γ.1.val.charpoly = atPl w P := by
-  obtain ⟨M, G, hMP, hG, hGh, hMG⟩ := GlobalTheory.EllHermGlobal.exists_charpoly_herm E n P hP
-  have h1 : ∀ᶠ w : Pl E in cofinite, ∀ i j,
-      algebraMap E (w.adicCompletion E) (M i j) ∈ w.adicCompletionIntegers E :=
-    eventually_all.2 fun i => eventually_all.2 fun j => GlobalTheory.ExInertUnit.eventually_mem_integers _
-  have h2 : ∀ᶠ w : Pl E in cofinite, ∀ i j,
-      algebraMap E (w.adicCompletion E) (G i j) ∈ w.adicCompletionIntegers E :=
-    eventually_all.2 fun i => eventually_all.2 fun j => GlobalTheory.ExInertUnit.eventually_mem_integers _
-  have h3 : ∀ᶠ w : Pl E in cofinite, ∀ i j,
-      algebraMap E (w.adicCompletion E) (G⁻¹ i j) ∈ w.adicCompletionIntegers E :=
-    eventually_all.2 fun i => eventually_all.2 fun j => GlobalTheory.ExInertUnit.eventually_mem_integers _
-  filter_upwards [h1, h2, h3] with w hw1 hw2 hw3 hw
-  obtain ⟨γ, hγ, hc⟩ := GlobalTheory.ExInertUnit.local_step hE w hw M G hG hGh hMG hw1 hw2 hw3
-  exact ⟨γ, hγ, by rw [hc, hMP]⟩
-
+theorem exists_integral_unitary (hE : Unr E) (n : ℕ) (P : E[X]) (hP : P ∈ Ell E n)
+    : ∀ᶠ w : Pl E in cofinite, ¬ IsSplitAt w → ∃ γ : UL n w, γ ∈ KL n w ∧ γ.1.val.charpoly = atPl w P :=
+  by
+    obtain ⟨M, G, hMP, hG, hGh, hMG⟩ := GlobalTheory.EllHermGlobal.exists_charpoly_herm E n P hP
+    have h1
+        : ∀ᶠ w : Pl E in cofinite, ∀ i j,
+          algebraMap E (w.adicCompletion E) (M i j) ∈ w.adicCompletionIntegers E :=
+      eventually_all.2 fun i =>
+        eventually_all.2 fun j => GlobalTheory.ExInertUnit.eventually_mem_integers _
+    have h2
+        : ∀ᶠ w : Pl E in cofinite, ∀ i j,
+          algebraMap E (w.adicCompletion E) (G i j) ∈ w.adicCompletionIntegers E :=
+      eventually_all.2 fun i =>
+        eventually_all.2 fun j => GlobalTheory.ExInertUnit.eventually_mem_integers _
+    have h3
+        : ∀ᶠ w : Pl E in cofinite, ∀ i j,
+          algebraMap E (w.adicCompletion E) (G⁻¹ i j) ∈ w.adicCompletionIntegers E :=
+      eventually_all.2 fun i =>
+        eventually_all.2 fun j => GlobalTheory.ExInertUnit.eventually_mem_integers _
+    filter_upwards [h1, h2, h3] with w hw1 hw2 hw3 hw
+    obtain ⟨γ, hγ, hc⟩ := GlobalTheory.ExInertUnit.local_step hE w hw M G hG hGh hMG hw1 hw2 hw3
+    exact ⟨γ, hγ, by rw [hc, hMP]⟩
 
 open GlobalTheory.UnitOrbCount in
-theorem kapOrb_unit_pos (hU : Unr E) (n : ℕ) (hn : 1 ≤ n) (p₁ p₂ : E[X]) (h1 : p₁ ∈ Ell E p₁.natDegree)
-    (h2 : p₂ ∈ Ell E p₂.natDegree) (hc : IsCoprime p₁ p₂) (hd : p₁.natDegree + p₂.natDegree = n) :
-    ∀ᶠ w : Pl E in cofinite, kapOrb n w (atPl w p₁) (atPl w p₂) ((KL n w : Set (UL n w)).indicator 1) = 1 := by
+theorem kapOrb_unit_pos
+    (hU : Unr E)
+    (n : ℕ) (hn : 1 ≤ n)
+    (p₁ p₂ : E[X]) (h1 : p₁ ∈ Ell E p₁.natDegree) (h2 : p₂ ∈ Ell E p₂.natDegree)
+    (hc : IsCoprime p₁ p₂) (hd : p₁.natDegree + p₂.natDegree = n)
+    : ∀ᶠ w : Pl E in cofinite, kapOrb n w (atPl w p₁) (atPl w p₂) ((KL n w : Set (UL n w)).indicator 1) = 1 := by
   have hP := ell_mul p₁ p₂ h1 h2 hc hd
   obtain ⟨S, hS⟩ := exists_section (E := E)
   filter_upwards [GlobalTheory.BCT.OrbUnit.orbUnit_ae E hU n hn S hS _ hP, GlobalTheory.T.eventually_exists_integral_charpoly_split_place E hU n hn _ hP,
     exists_integral_unitary hU n _ hP, GlobalTheory.T.eventually_unitary_conj_of_same_elliptic_charpoly_inert E hU n hn _ hP] with w hA hE1 hE2 hU2
   have hmap : atPl w (p₁ * p₂) = atPl w p₁ * atPl w p₂ := Polynomial.map_mul _
   rw [hmap] at hA hE1 hE2 hU2
-  obtain ⟨γ₀, hγ₀K, hγ₀P⟩ : ∃ γ : UL n w, γ ∈ KL n w ∧ γ.1.val.charpoly = atPl w p₁ * atPl w p₂ := by
+  obtain ⟨γ₀, hγ₀K, hγ₀P⟩
+      : ∃ γ : UL n w, γ ∈ KL n w ∧ γ.1.val.charpoly = atPl w p₁ * atPl w p₂ := by
     by_cases hs : IsSplitAt w
     · exact hE1 hs
     · exact hE2 hs
-  have huniq : ∀ γ γ' : UL n w, γ ∈ KL n w → γ' ∈ KL n w → γ.1.val.charpoly = atPl w p₁ * atPl w p₂ →
-      γ'.1.val.charpoly = atPl w p₁ * atPl w p₂ → ∃ g : UL n w, γ' = g⁻¹ * γ * g := by
+  have huniq
+      : ∀ γ γ' : UL n w,
+        γ ∈ KL n w → γ' ∈ KL n w → γ.1.val.charpoly = atPl w p₁ * atPl w p₂
+          → γ'.1.val.charpoly = atPl w p₁ * atPl w p₂
+          → ∃ g : UL n w, γ' = g⁻¹ * γ * g := by
     intro γ γ' hk hk' hp hp'
     by_cases hs : IsSplitAt w
     · have := GlobalTheory.T.exists_conj_same_separable_charpoly_split_place E n _ hP w hs γ γ'
       rw [hmap] at this
       exact this hp hp'
     · exact hU2 hs γ γ' hk hk' hp hp'
-  have key : ∀ γ : UL n w, γ.1.val.charpoly = atPl w p₁ * atPl w p₂ →
-      ((∃ g : UL n w, g⁻¹ * γ * g ∈ KL n w) ↔ (Quot.mk _ γ : TwCl (MonoidHom.id (UL n w))) = Quot.mk _ γ₀) := by
+  have key
+      : ∀ γ : UL n w,
+        γ.1.val.charpoly = atPl w p₁ * atPl w p₂
+          → ((∃ g : UL n w, g⁻¹ * γ * g ∈ KL n w)
+            ↔ (Quot.mk _ γ : TwCl (MonoidHom.id (UL n w))) = Quot.mk _ γ₀) := by
     intro γ hp
     rw [mk_eq_iff]
     constructor
@@ -78,10 +95,8 @@ theorem kapOrb_unit_pos (hU : Unr E) (n : ℕ) (hn : 1 ≤ n) (p₁ p₂ : E[X])
   · have hc : (Quot.mk _ c₀.rep : TwCl (MonoidHom.id (UL n w))) = Quot.mk _ γ₀ := by
       rw [hc₀]; exact Quot.out_eq _
     obtain ⟨g, hg⟩ := (mk_eq_iff _ _).1 hc
-    have hp : c₀.rep.1.val.charpoly = atPl w p₁ * atPl w p₂ := by
-      rw [← hγ₀P, hg, cp_conj]
-    have hex : ∃ g : UL n w, g⁻¹ * c₀.rep * g ∈ KL n w :=
-      ⟨g, hg ▸ hγ₀K⟩
+    have hp : c₀.rep.1.val.charpoly = atPl w p₁ * atPl w p₂ := by rw [← hγ₀P, hg, cp_conj]
+    have hex : ∃ g : UL n w, g⁻¹ * c₀.rep * g ∈ KL n w := ⟨g, hg ▸ hγ₀K⟩
     obtain ⟨hT, -, hQ⟩ := hA _ hp
     rw [if_pos hp, hT, if_pos hex, hQ (atPl w p₁) (dvd_mul_right _ _) hex, mul_one]
   · intro c hne
@@ -99,7 +114,8 @@ instance subsingleton_units_rank_zero (w : Pl E) : Subsingleton (UL 0 w) := by
   refine ⟨fun a b => Subtype.ext (Units.ext ?_)⟩
   exact Subsingleton.elim _ _
 
-theorem kapSign_zero (w : Pl E) (Q : (w.adicCompletion E)[X]) (γ : GLw 0 w) : kapSign 0 w Q γ = 1 := by
+theorem kapSign_zero (w : Pl E) (Q : (w.adicCompletion E)[X]) (γ : GLw 0 w)
+    : kapSign 0 w Q γ = 1 := by
   unfold kapSign
   split_ifs with hs
   · rfl
@@ -113,8 +129,8 @@ theorem kapSign_zero (w : Pl E) (Q : (w.adicCompletion E)[X]) (γ : GLw 0 w) : k
     simp [ordL]
     exact zpow_zero _
 
-theorem kapOrb_unit_zero (w : Pl E) (Q₁ Q₂ : (w.adicCompletion E)[X]) (hQ : Q₁ * Q₂ = 1) :
-    kapOrb 0 w Q₁ Q₂ ((KL 0 w : Set (UL 0 w)).indicator 1) = 1 := by
+theorem kapOrb_unit_zero (w : Pl E) (Q₁ Q₂ : (w.adicCompletion E)[X]) (hQ : Q₁ * Q₂ = 1)
+    : kapOrb 0 w Q₁ Q₂ ((KL 0 w : Set (UL 0 w)).indicator 1) = 1 := by
   haveI : Subsingleton (TwCl (MonoidHom.id (UL 0 w))) := by
     refine ⟨fun a b => ?_⟩
     induction a using Quot.ind with | _ x => ?_
@@ -145,14 +161,16 @@ end GlobalTheory.CompanionTheory.KapOrbAE
 
 theorem GlobalTheory.CompanionTheory.KapOrbAE.kapOrbAE : KapOrbAE := by
   intro E _ _ _ hU n K' f hf p₁ p₂ h1 h2 hc hd
-  have hunit : ∀ᶠ w : Pl E in cofinite,
-      kapOrb n w (atPl w p₁) (atPl w p₂) ((KL n w : Set (UL n w)).indicator 1) = 1 := by
+  have hunit
+      : ∀ᶠ w : Pl E in cofinite,
+        kapOrb n w (atPl w p₁) (atPl w p₂) ((KL n w : Set (UL n w)).indicator 1) = 1 := by
     rcases Nat.eq_zero_or_pos n with rfl | hn
     · have d1 : p₁.natDegree = 0 := by omega
       have d2 : p₂.natDegree = 0 := by omega
       have e1 : p₁ = 1 := h1.1.natDegree_eq_zero.1 d1
       have e2 : p₂ = 1 := h2.1.natDegree_eq_zero.1 d2
-      refine Eventually.of_forall fun w => GlobalTheory.CompanionTheory.KapOrbAE.kapOrb_unit_zero w _ _ ?_
+      refine Eventually.of_forall fun w =>
+        GlobalTheory.CompanionTheory.KapOrbAE.kapOrb_unit_zero w _ _ ?_
       simp [e1, e2]
     · exact GlobalTheory.CompanionTheory.KapOrbAE.kapOrb_unit_pos hU n hn p₁ p₂ h1 h2 hc hd
   have hall : ∀ᶠ w : Pl E in cofinite, kapOrb n w (atPl w p₁) (atPl w p₂) (f w) = 1 := by

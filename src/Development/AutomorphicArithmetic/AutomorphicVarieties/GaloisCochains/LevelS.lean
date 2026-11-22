@@ -6,19 +6,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LengthC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module UpperTheory.V UpperTheory.V.Fr UpperTheory.V.GC
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module
+  UpperTheory.V UpperTheory.V.Fr UpperTheory.V.GC
 
-private theorem ine_le_open (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    (K : Subgroup (G F Ω)) (hK : IsOpen (K : Set (G F Ω))) :
-    ∃ T : Finset (HeightOneSpectrum (𝓞 F)), ∀ v, v ∉ T → ∀ A : ValuationSubring Ω, IsPlaceOver A v →
-      Ine (F := F) A ≤ K := by
-  obtain ⟨E, hE, hEK⟩ := (krullTopology_mem_nhds_one_iff F Ω (K : Set (G F Ω))).1 (hK.mem_nhds K.one_mem)
+private theorem ine_le_open
+    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (K : Subgroup (G F Ω)) (hK : IsOpen (K : Set (G F Ω)))
+    : ∃ T : Finset (HeightOneSpectrum (𝓞 F)), ∀ v,
+      v ∉ T → ∀ A : ValuationSubring Ω, IsPlaceOver A v → Ine (F := F) A ≤ K := by
+  obtain ⟨E, hE, hEK⟩ :=
+    (krullTopology_mem_nhds_one_iff F Ω (K : Set (G F Ω))).1 (hK.mem_nhds K.one_mem)
   haveI : NumberField E := NumberField.of_module_finite F E
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   haveI : IsAlgClosure E Ω := ⟨inferInstance, Algebra.IsAlgebraic.tower_top (K := F) E⟩
   obtain ⟨T, hT⟩ := (Base.ramFinite F F E Ω).1
   refine ⟨T, fun v hv A hA g hg => hEK ?_⟩
-  have h := hT v hv A hA (show g ∈ Base.galOf F F Ω ⊓ Ine (F := F) A from ⟨fun x => g.commutes x, hg⟩)
+  have h :=
+    hT v hv A hA (show g ∈ Base.galOf F F Ω ⊓ Ine (F := F) A from ⟨fun x => g.commutes x, hg⟩)
   exact (IntermediateField.mem_fixingSubgroup_iff E g).2 fun x hx => h ⟨x, hx⟩
 
 theorem UpperTheory.V.GC.levelS :

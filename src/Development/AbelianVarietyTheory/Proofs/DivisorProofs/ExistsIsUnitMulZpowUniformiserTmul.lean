@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ToQMemMaxima
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair GlobalTheory.GraphLocal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair GlobalTheory.GraphLocal
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -19,12 +21,17 @@ noncomputable section
 
 namespace GlobalTheory.GraphLocal
 
-theorem exists_isUnit_mul_zpow_tmul :
-    ∀ {K κ' L : Type} [Field K] [Field κ'] [Field L] [Algebra ℂ K] [Algebra ℂ κ'] [Algebra (K ⊗[ℂ] κ') L]
-    (E : Place (algebraMap ℂ K)) (𝔭 : Ideal (tens (κ' := κ') (placeAlg E))) [𝔭.IsPrime] (t : E.ring),
-  Function.Injective (algebraMap (K ⊗[ℂ] κ') L) → Irreducible t →
-  ∀ g : K, g ≠ 0 → ∃ q : locAt (L := L) 𝔭, IsUnit q ∧
-    algebraMap (K ⊗[ℂ] κ') L (g ⊗ₜ 1) = q * (algebraMap (K ⊗[ℂ] κ') L ((t : K) ⊗ₜ 1)) ^ E.ord g := by
+theorem exists_isUnit_mul_zpow_tmul
+    : ∀ {K κ' L : Type} [Field K] [Field κ'] [Field L] [Algebra ℂ K] [Algebra ℂ κ']
+        [Algebra (K ⊗[ℂ] κ') L] (E : Place (algebraMap ℂ K))
+        (𝔭 : Ideal (tens (κ' := κ') (placeAlg E))) [𝔭.IsPrime] (t : E.ring),
+      Function.Injective (algebraMap (K ⊗[ℂ] κ') L) → Irreducible t
+        → ∀ g : K,
+          g ≠ 0
+            → ∃ q : locAt (L := L) 𝔭,
+              IsUnit q
+                ∧ algebraMap (K ⊗[ℂ] κ') L (g ⊗ₜ 1)
+                  = q * (algebraMap (K ⊗[ℂ] κ') L ((t : K) ⊗ₜ 1)) ^ E.ord g := by
   intro K κ' L _ _ _ _ _ _ E 𝔭 _ t _ ht g hg
   set n := E.ord g
   have ht0 : (t : K) ≠ 0 := fun h => ht.ne_zero (Subtype.ext h)

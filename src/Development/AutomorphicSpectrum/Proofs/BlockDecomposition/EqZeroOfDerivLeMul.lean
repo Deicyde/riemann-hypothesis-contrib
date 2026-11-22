@@ -12,19 +12,23 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace GlobalTheory.CompanionTheory.WaveSpd.GronwallZero
 
-theorem eq_zero_of_deriv_le_mul :
-    ∀ (e e' : ℝ → ℝ) (K t : ℝ), 0 ≤ t → (∀ s, HasDerivAt e (e' s) s) →
-      (∀ s, e' s ≤ K * e s) → (∀ s, 0 ≤ e s) → e 0 = 0 → e t = 0 := by
+theorem eq_zero_of_deriv_le_mul
+    : ∀ (e e' : ℝ → ℝ) (K t : ℝ),
+      0 ≤ t → (∀ s, HasDerivAt e (e' s) s) → (∀ s, e' s ≤ K * e s) → (∀ s, 0 ≤ e s) → e 0 = 0
+        → e t = 0 := by
   intro e e' K t ht hd hle hnn h0
-  have hg : ∀ s, HasDerivAt (fun s => e s * Real.exp (-K * s))
-      ((e' s - K * e s) * Real.exp (-K * s)) s := by
+  have hg
+      : ∀ s,
+        HasDerivAt (fun s => e s * Real.exp (-K * s)) ((e' s - K * e s) * Real.exp (-K * s)) s := by
     intro s
     have h1 : HasDerivAt (fun s : ℝ => Real.exp (-K * s)) (Real.exp (-K * s) * (-K)) s := by
       have h2 : HasDerivAt (fun s : ℝ => -K * s) (-K) s := by
         simpa using (hasDerivAt_id s).const_mul (-K)
       exact h2.exp
-    have h5 : HasDerivAt (fun s => e s * Real.exp (-K * s))
-        (e' s * Real.exp (-K * s) + e s * (Real.exp (-K * s) * (-K))) s := (hd s).mul h1
+    have h5 : HasDerivAt
+        (fun s => e s * Real.exp (-K * s))
+        (e' s * Real.exp (-K * s) + e s * (Real.exp (-K * s) * (-K))) s :=
+      (hd s).mul h1
     exact h5.congr_deriv (by ring)
   have hanti : Antitone (fun s => e s * Real.exp (-K * s)) := by
     apply antitone_of_deriv_nonpos

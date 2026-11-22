@@ -11,17 +11,22 @@ public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.IsLoca
 
 set_option autoImplicit false
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
 namespace FlatRoots
 
-theorem exists_lift {X Y : Scheme.{0}} (f : X ⟶ Y) [IsFinite f] [Flat f] [Surjective f]
-    (S : Type) [CommRing S] (t : Sp S ⟶ Y) :
-    ∃ (B : Type) (_ : CommRing B) (φ : S →+* B) (w : Sp B ⟶ X),
+theorem exists_lift
+    {X Y : Scheme.{0}} (f : X ⟶ Y) [IsFinite f] [Flat f] [Surjective f]
+    (S : Type) [CommRing S]
+    (t : Sp S ⟶ Y)
+    : ∃ (B : Type) (_ : CommRing B) (φ : S →+* B) (w : Sp B ⟶ X),
       φ.FaithfullyFlat ∧ w ≫ f = spMap φ ≫ t := by
   haveI : IsAffine (pullback t f) := isAffine_of_isAffineHom (pullback.fst t f)
   let e := (pullback t f).isoSpec
@@ -33,22 +38,36 @@ theorem exists_lift {X Y : Scheme.{0}} (f : X ⟶ Y) [IsFinite f] [Flat f] [Surj
   change _ = Spec.map ψ ≫ t
   rw [hψ, Category.assoc, Category.assoc, pullback.condition]
 
-theorem spMap_comp {R S T : Type} [CommRing R] [CommRing S] [CommRing T] (f : R →+* S) (g : S →+* T) :
-    spMap (g.comp f) = spMap g ≫ spMap f := by
+theorem spMap_comp {R S T : Type} [CommRing R] [CommRing S] [CommRing T] (f : R →+* S) (g : S →+* T)
+    : spMap (g.comp f) = spMap g ≫ spMap f := by
   rw [← Spec.map_comp]; rfl
 
-theorem exists_lifts {X Y : Scheme.{0}} (f : X ⟶ Y) [IsFinite f] [Flat f] [Surjective f]
-    (S : Type) [CommRing S] (J : Type) (t : J → (Sp S ⟶ Y)) (s : Finset J) :
-    ∃ (B : Type) (_ : CommRing B) (φ : S →+* B), φ.FaithfullyFlat ∧
-      ∀ i ∈ s, ∃ w : Sp B ⟶ X, w ≫ f = spMap φ ≫ t i := by
+theorem exists_lifts
+    {X Y : Scheme.{0}} (f : X ⟶ Y) [IsFinite f] [Flat f] [Surjective f]
+    (S : Type) [CommRing S]
+    (J : Type) (t : J → (Sp S ⟶ Y)) (s : Finset J)
+    : ∃ (B : Type) (_ : CommRing B) (φ : S →+* B),
+      φ.FaithfullyFlat ∧ ∀ i ∈ s, ∃ w : Sp B ⟶ X, w ≫ f = spMap φ ≫ t i := by
   classical
   induction s using Finset.induction_on with
-  | empty => exact ⟨S, inferInstance, RingHom.id S, RingHom.FaithfullyFlat.of_bijective Function.bijective_id,
-      fun i hi => absurd hi (Finset.notMem_empty i)⟩
+  | empty =>
+    exact ⟨
+      S,
+      inferInstance,
+      RingHom.id S,
+      RingHom.FaithfullyFlat.of_bijective Function.bijective_id,
+      fun i hi => absurd hi (Finset.notMem_empty i)
+    ⟩
   | insert j s _ ih =>
     obtain ⟨B, _, φ, hφ, h⟩ := ih
     obtain ⟨C, _, ψ, w, hψ, hw⟩ := exists_lift f B (spMap φ ≫ t j)
-    refine ⟨C, inferInstance, ψ.comp φ, RingHom.FaithfullyFlat.stableUnderComposition φ ψ hφ hψ, fun i hi => ?_⟩
+    refine ⟨
+      C,
+      inferInstance,
+      ψ.comp φ,
+      RingHom.FaithfullyFlat.stableUnderComposition φ ψ hφ hψ,
+      fun i hi => ?_
+    ⟩
     rw [spMap_comp, Category.assoc]
     rcases Finset.mem_insert.1 hi with rfl | hi
     · exact ⟨w, hw⟩
@@ -57,8 +76,16 @@ theorem exists_lifts {X Y : Scheme.{0}} (f : X ⟶ Y) [IsFinite f] [Flat f] [Sur
 
 end FlatRoots
 
-theorem exists_faithfullyFlat_roots :
-    Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (S : Type) [CommRing S] (x0 : Sp S ⟶ Xo.X) (N k : ℕ), 0 < N → 0 < k → ∀ (J : Type) [Fintype J] (t : J → (ptO Xo x0 ⟶ Xo.univ.t.G)), (∀ i, t i ^ k = 1) → ∃ (B : Type) (_ : CommRing B) (φ : S →+* B) (w : J → (ptO Xo (spMap φ ≫ x0) ⟶ Xo.univ.t.G)), φ.FaithfullyFlat ∧ ∀ i, (w i ^ N).left = spMap φ ≫ (t i).left := by
+theorem exists_faithfullyFlat_roots
+    : Laws
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+          (l : Level H) (Xo : Moduli Dw l) (S : Type) [CommRing S] (x0 : Sp S ⟶ Xo.X) (N k : ℕ),
+        0 < N → 0 < k
+          → ∀ (J : Type) [Fintype J] (t : J → (ptO Xo x0 ⟶ Xo.univ.t.G)),
+            (∀ i, t i ^ k = 1)
+              → ∃ (B : Type) (_ : CommRing B) (φ : S →+* B)
+                  (w : J → (ptO Xo (spMap φ ≫ x0) ⟶ Xo.univ.t.G)),
+                φ.FaithfullyFlat ∧ ∀ i, (w i ^ N).left = spMap φ ≫ (t i).left := by
   intro hL E _ _ _ H Dw l Xo S _ x0 N k hN _ J _ t _
   haveI := UnivPol.isLocallyNoetherian Xo
   obtain ⟨h1, h2, h3, -⟩ := hL.mulN _ (UnivPol.pol Xo) N hN

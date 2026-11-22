@@ -6,23 +6,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RepresentsKi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PtClosed
+open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.PtClosed
 
 namespace GlobalTheory.PtClosed
 
-theorem fromSpec_Sp_eq (R' : Type) [CommRing R'] {W : (Sp R').Opens} (hW : IsAffineOpen W) :
-    hW.fromSpec = spMap ((Scheme.ΓSpecIso (CommRingCat.of R')).inv ≫
-      (Sp R').presheaf.map (homOfLE le_top : W ⟶ ⊤).op).hom := by
+theorem fromSpec_Sp_eq (R' : Type) [CommRing R'] {W : (Sp R').Opens} (hW : IsAffineOpen W)
+    : hW.fromSpec
+      = spMap
+        ((Scheme.ΓSpecIso (CommRingCat.of R')).inv
+          ≫ (Sp R').presheaf.map (homOfLE le_top : W ⟶ ⊤).op).hom := by
   have h := IsAffineOpen.SpecMap_appLE_fromSpec (𝟙 (Sp R')) (isAffineOpen_top (Sp R')) hW le_top
   rw [Category.comp_id, IsAffineOpen.fromSpec_top, Scheme.isoSpec_Spec_inv, ← Spec.map_comp] at h
   rw [← h]
   simp [spMap, Scheme.Hom.appLE]
 
-theorem killIdeal_le_ker_app : ∀ (S : Scheme.{0}) (P : ∀ (R' : Type) [CommRing R'], (Sp R' ⟶ S) → Prop),
-  (∀ (R' : Type) [CommRing R'] (R'' : Type) [CommRing R''] (g : R' →+* R'') (x : Sp R' ⟶ S),
-    P R' x → P R'' (spMap g ≫ x)) →
-  ∀ (R' : Type) [CommRing R'] (x : Sp R' ⟶ S), P R' x →
-    ∀ (V : S.Opens) (hV : IsAffineOpen V), killIdeal (ptQ P V hV) ≤ RingHom.ker (x.app V).hom := by
+theorem killIdeal_le_ker_app
+    : ∀ (S : Scheme.{0}) (P : ∀ (R' : Type) [CommRing R'], (Sp R' ⟶ S) → Prop),
+      (∀ (R' : Type) [CommRing R'] (R'' : Type) [CommRing R''] (g : R' →+* R'') (x : Sp R' ⟶ S),
+          P R' x → P R'' (spMap g ≫ x))
+        → ∀ (R' : Type) [CommRing R'] (x : Sp R' ⟶ S),
+          P R' x
+            → ∀ (V : S.Opens) (hV : IsAffineOpen V),
+              killIdeal (ptQ P V hV) ≤ RingHom.ker (x.app V).hom := by
   intro S P hP R' _ x hx V hV a ha
   rw [RingHom.mem_ker]
   apply (Sp R').IsSheaf.section_ext

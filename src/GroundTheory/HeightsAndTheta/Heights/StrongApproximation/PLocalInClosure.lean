@@ -13,9 +13,11 @@ namespace StrongApprox
 
 open Matrix NumberField IsDedekindDomain TensorProduct ReciprocityTheory.ChartRestriction.G.SA
 
-theorem LocalInClosure.proof (hHP : HypPairExists.Statement) (hCl : ClosureIsSubmonoid.Statement)
+theorem LocalInClosure.proof
+    (hHP : HypPairExists.Statement) (hCl : ClosureIsSubmonoid.Statement)
     (hLR : LocalRingHypotheses.Statement) (hPM : PlaceMaps.Statement)
-    (hEA : EichlerAtPlace.Statement) : LocalInClosure.Statement := by
+    (hEA : EichlerAtPlace.Statement)
+    : LocalInClosure.Statement := by
   intro F E _ _ _ _ _ c hrk hc N J hJ hdet ⟨e, he0, hee⟩ _ _ v g hg
   obtain ⟨hinv, hfix, hrank2, hred, h2, hcomm, hform⟩ := hLR F E c hrk hc v
 
@@ -39,14 +41,18 @@ theorem LocalInClosure.proof (hHP : HypPairExists.Statement) (hCl : ClosureIsSub
   have hdetv : IsUnit (J.map (inclV E v)).det := by
     rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
     exact hdet.map _
-  have hzero : ∀ x y : Fin N → E, hf c.toRingHom J x y = 0 →
-      hf (sigV c v).toRingHom (J.map (inclV E v)) (inclV E v ∘ x) (inclV E v ∘ y) = 0 :=
-    fun x y h => by rw [← hform, h, map_zero]
+  have hzero
+      : ∀ x y : Fin N → E,
+        hf c.toRingHom J x y = 0
+          → hf (sigV c v).toRingHom (J.map (inclV E v)) (inclV E v ∘ x) (inclV E v ∘ y)
+            = 0 := fun x y h => by
+    rw [← hform, h, map_zero]
   have hefv : hf (sigV c v).toRingHom (J.map (inclV E v)) (inclV E v ∘ e) (inclV E v ∘ f) = 1 := by
     rw [← hform, hef, map_one]
   have hg' := hg
   rw [locGen _ _ (sigV c v) hinv hfix hrank2 hred h2 N _ hJv hdetv _ _ (hzero e e hee)
-    (hzero f f hff) hefv] at hg'
+      (hzero f f hff) hefv]
+    at hg'
   clear hg
 
   obtain ⟨-, hPv⟩ := hPM F E c hrk hc

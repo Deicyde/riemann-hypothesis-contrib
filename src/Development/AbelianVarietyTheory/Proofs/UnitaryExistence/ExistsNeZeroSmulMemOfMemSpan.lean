@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.NonzeroSmulMemSpan
 
-theorem exists_ne_zero_smul_mem_of_mem_span {E : Type} [Field E] [NumberField E] {n : ℕ}
-    (A : Submodule (NumberField.RingOfIntegers E) (Fin n → E)) {x : Fin n → E}
-    (hx : x ∈ Submodule.span E (↑A : Set (Fin n → E))) :
-    ∃ (o : NumberField.RingOfIntegers E), o ≠ (0 : NumberField.RingOfIntegers E) ∧ o • x ∈ A := by
+theorem exists_ne_zero_smul_mem_of_mem_span
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} (A : Submodule (NumberField.RingOfIntegers E) (Fin n → E))
+    {x : Fin n → E} (hx : x ∈ Submodule.span E (↑A : Set (Fin n → E)))
+    : ∃ (o : NumberField.RingOfIntegers E), o ≠ (0 : NumberField.RingOfIntegers E) ∧ o • x ∈ A := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -25,13 +26,12 @@ theorem exists_ne_zero_smul_mem_of_mem_span {E : Type} [Field E] [NumberField E]
       exact A.smul_mem a hbz
   | smul c y _ hy =>
     obtain ⟨a, ha, hay⟩ := hy
-    obtain ⟨⟨p, q⟩, hpq⟩ :=
-      IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers E)) c
-    refine ⟨(q : NumberField.RingOfIntegers E) * a,
-      mul_ne_zero (nonZeroDivisors.ne_zero q.2) ha, ?_⟩
+    obtain ⟨⟨p, q⟩, hpq⟩ := IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers E)) c
+    refine
+      ⟨(q : NumberField.RingOfIntegers E) * a, mul_ne_zero (nonZeroDivisors.ne_zero q.2) ha, ?_⟩
     have key : ((q : NumberField.RingOfIntegers E) * a) • c • y = p • a • y := by
-      rw [← algebraMap_smul E ((q : NumberField.RingOfIntegers E) * a),
-        ← algebraMap_smul E p, ← algebraMap_smul E a y, smul_smul, smul_smul, map_mul]
+      rw [← algebraMap_smul E ((q : NumberField.RingOfIntegers E) * a), ← algebraMap_smul E p,
+        ← algebraMap_smul E a y, smul_smul, smul_smul, map_mul]
       simp only at hpq
       rw [← hpq]
       congr 1

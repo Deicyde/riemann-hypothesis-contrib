@@ -23,8 +23,9 @@ theorem BallVolume.proof : BallVolume.Statement := by
   have hR : 0 ≤ ∑ j', ∑ l, ‖h.mat⁻¹ j' l‖ :=
     Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _
   have hbdd : Bornology.IsBounded (ballH h) := by
-    refine (Metric.isBounded_closedBall (x := (0 : Fin n → ℂ))
-      (r := ∑ j', ∑ l, ‖h.mat⁻¹ j' l‖)).subset fun v hv => ?_
+    refine
+      (Metric.isBounded_closedBall (x := (0 : Fin n → ℂ)) (r := ∑ j', ∑ l, ‖h.mat⁻¹ j' l‖)).subset
+        fun v hv => ?_
     rw [Metric.mem_closedBall, dist_zero_right, pi_norm_le_iff_of_nonneg hR]
     intro j
     exact norm_le_of_hermNorm_lt h hv j

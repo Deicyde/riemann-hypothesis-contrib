@@ -6,8 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open ReciprocityTheory.Gal UpperTheory.V.Base
 
-private theorem contMod (l : ℕ) [Fact l.Prime] (k : ℕ) {N : Type} [TopologicalSpace N] (c : ZMod (l ^ k) → N) :
-    Continuous fun x : ℤ_[l] => c (PadicInt.toZModPow k x) := by
+private theorem contMod
+    (l : ℕ) [Fact l.Prime] (k : ℕ) {N : Type} [TopologicalSpace N] (c : ZMod (l ^ k) → N)
+    : Continuous fun x : ℤ_[l] => c (PadicInt.toZModPow k x) := by
   apply IsLocallyConstant.continuous
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
@@ -21,27 +22,34 @@ private theorem contMod (l : ℕ) [Fact l.Prime] (k : ℕ) {N : Type} [Topologic
   rw [← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, sub_eq_zero] at h1
   rw [h1]
 
-private theorem clopenEq {X N : Type} [TopologicalSpace X] [TopologicalSpace N] [DiscreteTopology N] {f g : X → N}
-    (hf : Continuous f) (hg : Continuous g) : IsClopen {x | f x = g x} := by
+private theorem clopenEq
+    {X N : Type} [TopologicalSpace X] [TopologicalSpace N] [DiscreteTopology N]
+    {f g : X → N} (hf : Continuous f) (hg : Continuous g)
+    : IsClopen {x | f x = g x} := by
   have h : {x | f x = g x} = (fun x => (f x, g x)) ⁻¹' {p : N × N | p.1 = p.2} := rfl
   rw [h]
   exact (isClopen_discrete _).preimage (hf.prodMk hg)
 
-private theorem powGen (l : ℕ) [Fact l.Prime] (n : ℕ) :
-    (Multiplicative.ofAdd (1 : ℤ_[l])) ^ n = Multiplicative.ofAdd (n : ℤ_[l]) := by
+private theorem powGen (l : ℕ) [Fact l.Prime] (n : ℕ)
+    : (Multiplicative.ofAdd (1 : ℤ_[l])) ^ n = Multiplicative.ofAdd (n : ℤ_[l]) := by
   rw [← ofAdd_nsmul, nsmul_one]
 
-private theorem denseGen (l : ℕ) [Fact l.Prime] :
-    DenseRange fun n : ℕ => (Multiplicative.ofAdd (1 : ℤ_[l])) ^ n := by
-  have h : (fun n : ℕ => (Multiplicative.ofAdd (1 : ℤ_[l])) ^ n) =
-      fun n : ℕ => Multiplicative.ofAdd (n : ℤ_[l]) := funext (powGen l)
+private theorem denseGen (l : ℕ) [Fact l.Prime]
+    : DenseRange fun n : ℕ => (Multiplicative.ofAdd (1 : ℤ_[l])) ^ n := by
+  have h
+      : (fun n : ℕ => (Multiplicative.ofAdd (1 : ℤ_[l])) ^ n)
+        = fun n : ℕ => Multiplicative.ofAdd (n : ℤ_[l]) :=
+    funext (powGen l)
   rw [h]
   exact PadicInt.denseRange_natCast
 
-private theorem tendGen (l : ℕ) [Fact l.Prime] :
-    Filter.Tendsto (fun a : ℕ => (Multiplicative.ofAdd (1 : ℤ_[l])) ^ (l ^ a)) Filter.atTop (nhds 1) := by
-  have h : (fun a : ℕ => (Multiplicative.ofAdd (1 : ℤ_[l])) ^ (l ^ a)) =
-      fun a : ℕ => Multiplicative.ofAdd ((l : ℤ_[l]) ^ a) := by
+private theorem tendGen (l : ℕ) [Fact l.Prime]
+    : Filter.Tendsto
+      (fun a : ℕ => (Multiplicative.ofAdd (1 : ℤ_[l])) ^ (l ^ a))
+      Filter.atTop (nhds 1) := by
+  have h
+      : (fun a : ℕ => (Multiplicative.ofAdd (1 : ℤ_[l])) ^ (l ^ a))
+        = fun a : ℕ => Multiplicative.ofAdd ((l : ℤ_[l]) ^ a) := by
     funext a
     rw [powGen]
     push_cast
@@ -52,11 +60,17 @@ private theorem tendGen (l : ℕ) [Fact l.Prime] :
     exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : l.Prime).one_lt)
   exact tendsto_pow_atTop_nhds_zero_of_norm_lt_one h2
 
-private theorem solveGen (l : ℕ) [Fact l.Prime] (R N : Type) [CommRing R] [AddCommGroup N] [Module R N]
-    [TopologicalSpace N] [DiscreteTopology N] (σ : Representation R (Multiplicative ℤ_[l]) N) (hσ : ContAction σ)
-    (ht : ∀ m : N, ∃ n : ℕ, l ^ n • m = 0) (φ : Multiplicative ℤ_[l] → N) (hφ : Continuous φ) (m₀ : N) :
-    ∃ C : Multiplicative ℤ_[l] → N, Continuous C ∧ C 1 = m₀ ∧
-      ∀ x, C (Multiplicative.ofAdd 1 * x) = σ (Multiplicative.ofAdd 1) (C x) - φ x := by
+private theorem solveGen
+    (l : ℕ) [Fact l.Prime]
+    (R N : Type)
+    [CommRing R] [AddCommGroup N] [Module R N] [TopologicalSpace N] [DiscreteTopology N]
+    (σ : Representation R (Multiplicative ℤ_[l]) N) (hσ : ContAction σ)
+    (ht : ∀ m : N, ∃ n : ℕ, l ^ n • m = 0)
+    (φ : Multiplicative ℤ_[l] → N) (hφ : Continuous φ)
+    (m₀ : N)
+    : ∃ C : Multiplicative ℤ_[l] → N,
+      Continuous C ∧ C 1 = m₀
+        ∧ ∀ x, C (Multiplicative.ofAdd 1 * x) = σ (Multiplicative.ofAdd 1) (C x) - φ x := by
   let γ : Multiplicative ℤ_[l] := Multiplicative.ofAdd 1
   let a : ℕ → N := fun n => Nat.rec (motive := fun _ => N) m₀ (fun k ak => σ γ ak - φ (γ ^ k)) n
   have ha0 : a 0 = m₀ := rfl
@@ -70,29 +84,31 @@ private theorem solveGen (l : ℕ) [Fact l.Prime] (R N : Type) [CommRing R] [Add
     rw [map_one σ, Module.End.one_apply, nhds_discrete, Filter.tendsto_pure] at ht2
     exact ht2
   have hφper : ∀ᶠ k in Filter.atTop, ∀ x, φ (γ ^ (l ^ k) * x) = φ x := by
-    have hev : ∀ᶠ y in nhds (1 : Multiplicative ℤ_[l]),
-        ∀ x ∈ (Set.univ : Set (Multiplicative ℤ_[l])), φ (y * x) = φ x := by
+    have hev
+        : ∀ᶠ y in nhds (1 : Multiplicative ℤ_[l]),
+          ∀ x ∈ (Set.univ : Set (Multiplicative ℤ_[l])), φ (y * x) = φ x := by
       apply isCompact_univ.eventually_forall_of_forall_eventually
       intro x _
-      have hopen : IsOpen {z : Multiplicative ℤ_[l] × Multiplicative ℤ_[l] | φ (z.1 * z.2) = φ z.2} :=
+      have hopen
+          : IsOpen {z : Multiplicative ℤ_[l] × Multiplicative ℤ_[l] | φ (z.1 * z.2) = φ z.2} :=
         (clopenEq (hφ.comp continuous_mul) (hφ.comp continuous_snd)).isOpen
       exact hopen.mem_nhds (by simp)
     filter_upwards [(tendGen l).eventually hev] with k hk x
     exact hk x (Set.mem_univ x)
-  have L1 : ∀ q : ℕ, (∀ x, φ (γ ^ q * x) = φ x) →
-      ∀ n, a (n + q) - a n = σ (γ ^ n) (a q - a 0) := by
+  have L1 : ∀ q : ℕ, (∀ x, φ (γ ^ q * x) = φ x) → ∀ n, a (n + q) - a n = σ (γ ^ n) (a q - a 0) := by
     intro q hq n
     induction n with
     | zero => simp
     | succ n ih =>
       rw [show n + 1 + q = n + q + 1 by omega, haS, haS, pow_succ', map_mul, Module.End.mul_apply,
         ← ih, map_sub]
-      have h1 : φ (γ ^ (n + q)) = φ (γ ^ n) := by
-        rw [pow_add, mul_comm (γ ^ n), hq]
+      have h1 : φ (γ ^ (n + q)) = φ (γ ^ n) := by rw [pow_add, mul_comm (γ ^ n), hq]
       rw [h1]
       abel
-  have L2 : ∀ q : ℕ, (∀ x, φ (γ ^ q * x) = φ x) →
-      ∀ s, a (s * q) - a 0 = ∑ t ∈ Finset.range s, σ (γ ^ (t * q)) (a q - a 0) := by
+  have L2
+      : ∀ q : ℕ,
+        (∀ x, φ (γ ^ q * x) = φ x)
+          → ∀ s, a (s * q) - a 0 = ∑ t ∈ Finset.range s, σ (γ ^ (t * q)) (a q - a 0) := by
     intro q hq s
     induction s with
     | zero => simp
@@ -111,8 +127,9 @@ private theorem solveGen (l : ℕ) [Fact l.Prime] (R N : Type) [CommRing R] [Add
   have hφQ : ∀ x, φ (γ ^ (l ^ (max A k)) * x) = φ x := by
     rw [hK1]
     exact Lmul _ hk _
-  have hdQ : a (l ^ (max A k)) - a 0 =
-      ∑ t ∈ Finset.range (l ^ (max A k - k)), σ (γ ^ (t * l ^ k)) (a (l ^ k) - a 0) := by
+  have hdQ
+      : a (l ^ (max A k)) - a 0
+        = ∑ t ∈ Finset.range (l ^ (max A k - k)), σ (γ ^ (t * l ^ k)) (a (l ^ k) - a 0) := by
     rw [← L2 _ hk, hK1, mul_comm (l ^ k)]
   have hfixQ : σ (γ ^ (l ^ (max A k))) (a (l ^ (max A k)) - a 0) = a (l ^ (max A k)) - a 0 := by
     set_option synthInstance.maxHeartbeats 100000 in
@@ -126,8 +143,9 @@ private theorem solveGen (l : ℕ) [Fact l.Prime] (R N : Type) [CommRing R] [Add
     exact Lmul _ hφQ _
   have haK : a (l ^ (max A k + j)) = a 0 := by
     have h2 := L2 _ hφQ (l ^ j)
-    have h3 : ∀ t ∈ Finset.range (l ^ j),
-        σ (γ ^ (t * l ^ (max A k))) (a (l ^ (max A k)) - a 0) = a (l ^ (max A k)) - a 0 := by
+    have h3
+        : ∀ t ∈ Finset.range (l ^ j),
+          σ (γ ^ (t * l ^ (max A k))) (a (l ^ (max A k)) - a 0) = a (l ^ (max A k)) - a 0 := by
       intro t _
       rw [mul_comm t, pow_mul, map_pow, Module.End.pow_apply, Function.iterate_fixed hfixQ]
     rw [Finset.sum_congr rfl h3, Finset.sum_const, Finset.card_range, hj] at h2
@@ -147,8 +165,8 @@ private theorem solveGen (l : ℕ) [Fact l.Prime] (R N : Type) [CommRing R] [Add
     intro n
     conv_rhs => rw [← Nat.mod_add_div n (l ^ (max A k + j))]
     rw [hperiod']
-  let C : Multiplicative ℤ_[l] → N :=
-    fun x => a (PadicInt.toZModPow (max A k + j) (Multiplicative.toAdd x)).val
+  let C : Multiplicative ℤ_[l] → N := fun x =>
+    a (PadicInt.toZModPow (max A k + j) (Multiplicative.toAdd x)).val
   have hCc : Continuous C :=
     (contMod l (max A k + j) (fun i : ZMod (l ^ (max A k + j)) => a i.val)).comp continuous_toAdd
   have hCn : ∀ n : ℕ, C (γ ^ n) = a n := by
@@ -156,24 +174,25 @@ private theorem solveGen (l : ℕ) [Fact l.Prime] (R N : Type) [CommRing R] [Add
     simp only [C, γ, powGen, toAdd_ofAdd, map_natCast, ZMod.val_natCast]
     exact hmod n
   refine ⟨C, hCc, ?_, ?_⟩
-  · have h5 : C 1 = a 0 := by
-      simp only [C, toAdd_one, map_zero, ZMod.val_zero]
+  · have h5 : C 1 = a 0 := by simp only [C, toAdd_one, map_zero, ZMod.val_zero]
     rw [h5, ha0]
   · intro x
     refine (denseGen l).induction_on
-      (p := fun x => C (Multiplicative.ofAdd 1 * x) = σ (Multiplicative.ofAdd 1) (C x) - φ x) x ?_ ?_
+      (p := fun x => C (Multiplicative.ofAdd 1 * x) = σ (Multiplicative.ofAdd 1) (C x) - φ x)
+      x ?_ ?_
     · exact (clopenEq (hCc.comp (continuous_const_mul _))
         ((continuous_of_discreteTopology
-          (f := fun pr : N × N => σ (Multiplicative.ofAdd 1) pr.1 - pr.2)).comp
+            (f := fun pr : N × N => σ (Multiplicative.ofAdd 1) pr.1 - pr.2)).comp
           (hCc.prodMk hφ))).isClosed
     · intro n
       show C (γ * γ ^ n) = σ γ (C (γ ^ n)) - φ (γ ^ n)
       rw [← pow_succ', hCn, hCn, haS]
 
-theorem UpperTheory.V.Base.h2Zl :
-    ∀ (l : ℕ) [Fact l.Prime] (R N : Type) [CommRing R] [AddCommGroup N] [Module R N] [TopologicalSpace N] [IsTopologicalAddGroup N]
-      [ContinuousConstSMul R N] [DiscreteTopology N] (σ : Representation R (Multiplicative ℤ_[l]) N), ContAction σ →
-      (∀ m : N, ∃ n : ℕ, l ^ n • m = 0) → Subsingleton (H2 σ) := by
+theorem UpperTheory.V.Base.h2Zl
+    : ∀ (l : ℕ) [Fact l.Prime] (R N : Type) [CommRing R] [AddCommGroup N] [Module R N]
+        [TopologicalSpace N] [IsTopologicalAddGroup N] [ContinuousConstSMul R N]
+        [DiscreteTopology N] (σ : Representation R (Multiplicative ℤ_[l]) N),
+      ContAction σ → (∀ m : N, ∃ n : ℕ, l ^ n • m = 0) → Subsingleton (H2 σ) := by
   intro l _ R N _ _ _ _ _ _ _ σ hσ ht
   refine subsingleton_of_forall_eq 0 ?_
   intro x

@@ -15,25 +15,36 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Chevall
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
+open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
+  GlobalTheory.CompanionTheory.LTHodge
 open scoped Classical
 open ValuativeRel GroundTheory.LocalField GroundTheory.LocalField.FormalGroup
 open scoped GroundTheory.PAdicHodge.CyclNorms
 
 namespace GlobalTheory.CompanionTheory.LTLink
 
-
 open GroundTheory.Global GroundTheory.Global.SemiLocal in
-theorem local_restriction_abelianization_artin : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (w : HeightOneSpectrum (𝓞 E)) {Ωv : Type} [Field Ωv] [Algebra (w.adicCompletion E) Ωv]
-    [IsSepClosure (w.adicCompletion E) Ωv] (j : Ω →+* Ωv),
-    (∀ y : E, j (algebraMap E Ω y) = algebraMap (w.adicCompletion E) Ωv (algebraMap E (w.adicCompletion E) y)) →
-    ∀ (a : (w.adicCompletion E)ˣ) (σ : G E Ω) (g : Ωv ≃ₐ[w.adicCompletion E] Ωv),
-    (∀ x : Ω, g (j x) = j (σ x)) →
-    (∀ (y : Ωv) (hy : y ∈ maximalAbelianExtension (w.adicCompletion E) Ωv),
-      ((localArtinMap (w.adicCompletion E) Ωv a ⟨y, hy⟩ : maximalAbelianExtension (w.adicCompletion E) Ωv) : Ωv) = g y) →
-    ∀ (L : IntermediateField E Ω) [FiniteDimensional E L] [IsAbelianGalois E L],
-    PositivityTheory.FamInh.res L (toAb E Ω σ) = PositivityTheory.FamInh.res L (PositivityTheory.FamInh.art0 E Ω (localIdele E w a)) := by
+theorem local_restriction_abelianization_artin
+    : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (w : HeightOneSpectrum (𝓞 E)) {Ωv : Type} [Field Ωv] [Algebra (w.adicCompletion E) Ωv]
+        [IsSepClosure (w.adicCompletion E) Ωv] (j : Ω →+* Ωv),
+      (∀ y : E,
+          j (algebraMap E Ω y)
+            = algebraMap (w.adicCompletion E) Ωv (algebraMap E (w.adicCompletion E) y))
+        → ∀ (a : (w.adicCompletion E)ˣ) (σ : G E Ω) (g : Ωv ≃ₐ[w.adicCompletion E] Ωv),
+          (∀ x : Ω, g (j x) = j (σ x))
+            → (∀ (y : Ωv) (hy : y ∈ maximalAbelianExtension (w.adicCompletion E) Ωv),
+              ((localArtinMap (w.adicCompletion E) Ωv a ⟨y, hy⟩
+                    : maximalAbelianExtension (w.adicCompletion E) Ωv)
+                  : Ωv)
+                = g y)
+            → ∀ (L : IntermediateField E Ω) [FiniteDimensional E L] [IsAbelianGalois E L],
+              PositivityTheory.FamInh.res L (toAb E Ω σ)
+                = PositivityTheory.FamInh.res L
+                  (PositivityTheory.FamInh.art0 E Ω (localIdele E w a)) := by
   intro E Ω _ _ _ _ _ w Ωv _ _ _ j hj a σ g hgj hloc L _ _
   haveI : IsGalois E Ω := IsAlgClosure.isGalois E Ω
   obtain ⟨w'⟩ := GroundTheory.Global.IdeleGroup.nonempty_placesOver_of_finite (K := E) (L := L) w
@@ -43,32 +54,40 @@ theorem local_restriction_abelianization_artin : ∀ {E Ω : Type} [Field E] [Nu
   let ι : w'.1.adicCompletion L →ₐ[w.adicCompletion E] Ωv := IsSepClosed.lift
   set s := restrictAb L (le_maximalAbelianExtension L)
     (artinMap E Ω (GroundTheory.Global.IdeleClassGroup.mk E (IdeleGroup.finiteEmbedding w a))) with hs
-  have hres : PositivityTheory.FamInh.res L (PositivityTheory.FamInh.art0 E Ω (localIdele E w a)) = s :=
+  have hres
+      : PositivityTheory.FamInh.res L (PositivityTheory.FamInh.art0 E Ω (localIdele E w a)) = s :=
     congrArg (restrictAb L (le_maximalAbelianExtension L))
       ((topologicalAbelianizationEquiv E Ω).apply_symm_apply _)
-  have h1 : ∀ l : L, ι (algebraMap L (w'.1.adicCompletion L) (s l)) =
-      g (ι (algebraMap L (w'.1.adicCompletion L) l)) := fun l => by
+  have h1
+      : ∀ l : L,
+        ι (algebraMap L (w'.1.adicCompletion L) (s l))
+          = g (ι (algebraMap L (w'.1.adicCompletion L) l)) := fun l => by
     rw [hs, artinMap_finiteEmbedding_apply L w w' ι a l]
     exact hloc _ _
   rw [hres, PositivityTheory.FamInh.res_toAb]
   letI : Algebra E Ωv := ((algebraMap (w.adicCompletion E) Ωv).comp (algebraMap E (w.adicCompletion E))).toAlgebra
-  let m₂ : L →ₐ[E] Ωv :=
-    { toRingHom := j.comp (algebraMap L Ω)
-      commutes' := fun y => by
-        show j (algebraMap L Ω (algebraMap E L y)) = _
-        rw [← IsScalarTower.algebraMap_apply]
-        exact hj y }
-  have hcomp : ∀ y : E, algebraMap L (w'.1.adicCompletion L) (algebraMap E L y) =
-      algebraMap (w.adicCompletion E) (w'.1.adicCompletion L) (algebraMap E (w.adicCompletion E) y) := by
+  let m₂ : L →ₐ[E] Ωv := {
+    toRingHom := j.comp (algebraMap L Ω)
+    commutes' := fun y => by
+      show j (algebraMap L Ω (algebraMap E L y)) = _
+      rw [← IsScalarTower.algebraMap_apply]
+      exact hj y
+  }
+  have hcomp
+      : ∀ y : E,
+        algebraMap L (w'.1.adicCompletion L) (algebraMap E L y)
+          = algebraMap (w.adicCompletion E) (w'.1.adicCompletion L)
+            (algebraMap E (w.adicCompletion E) y) := by
     intro y
     rw [← IsScalarTower.algebraMap_apply E L (w'.1.adicCompletion L),
       ← IsScalarTower.algebraMap_apply E (w.adicCompletion E) (w'.1.adicCompletion L)]
-  let m₁ : L →ₐ[E] Ωv :=
-    { toRingHom := (ι : w'.1.adicCompletion L →+* Ωv).comp (algebraMap L (w'.1.adicCompletion L))
-      commutes' := fun y => by
-        show ι (algebraMap L (w'.1.adicCompletion L) (algebraMap E L y)) = _
-        rw [hcomp, ι.commutes]
-        rfl }
+  let m₁ : L →ₐ[E] Ωv := {
+    toRingHom := (ι : w'.1.adicCompletion L →+* Ωv).comp (algebraMap L (w'.1.adicCompletion L))
+    commutes' := fun y => by
+      show ι (algebraMap L (w'.1.adicCompletion L) (algebraMap E L y)) = _
+      rw [hcomp, ι.commutes]
+      rfl
+  }
   letI : Algebra L Ωv := m₂.toRingHom.toAlgebra
   haveI : IsScalarTower E L Ωv := IsScalarTower.of_algebraMap_eq fun y => (m₂.commutes y).symm
   let τ : L ≃ₐ[E] L := Normal.algHomEquivAut E Ωv L m₁

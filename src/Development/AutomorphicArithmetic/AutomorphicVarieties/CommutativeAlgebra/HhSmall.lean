@@ -7,11 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
 open Matrix in
-private theorem expand_small {O : Type} [CommRing O] [IsLocalRing O] {ι : Type} [Fintype ι] [DecidableEq ι]
-    {R : Type} [CommRing R] [Algebra O R] [IsCO O R] {R' : Type} [CommRing R'] [Algebra O R'] [IsCO O R']
-    (p : R →ₐ[O] R') (hs : maximalIdeal R * RingHom.ker p = ⊥) (J h Z : Matrix ι ι R)
-    (hh : h.map (res O R) = 1) (hZ : Z.map p = 0) :
-    (h + Z)ᵀ * J * (h + Z) = hᵀ * J * h + (Zᵀ * J + J * Z) ∧ (h + Z).map (res O R) = 1 := by
+private theorem expand_small
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
+    {R' : Type} [CommRing R'] [Algebra O R'] [IsCO O R']
+    (p : R →ₐ[O] R') (hs : maximalIdeal R * RingHom.ker p = ⊥)
+    (J h Z : Matrix ι ι R) (hh : h.map (res O R) = 1) (hZ : Z.map p = 0)
+    : (h + Z)ᵀ * J * (h + Z) = hᵀ * J * h + (Zᵀ * J + J * Z) ∧ (h + Z).map (res O R) = 1 := by
   have k : ∀ x y : R, res O R x = 0 → p y = 0 → x * y = 0 := fun x y hx hy => by
     have : x * y ∈ maximalIdeal R * RingHom.ker p :=
       Ideal.mul_mem_mul ((res_eq_zero_iff O R x).1 hx) hy
@@ -25,8 +28,10 @@ private theorem expand_small {O : Type} [CommRing O] [IsLocalRing O] {ι : Type}
     by_cases e : a = b
     · subst e; simp
     · simp [one_apply_ne e]
-  have K : ∀ A B : Matrix ι ι R, (∀ a b, res O R (A a b) = 0) → (∀ a b, p (B a b) = 0) →
-      Aᵀ * J * B = 0 ∧ Bᵀ * J * A = 0 := fun A B hA hB => by
+  have K
+      : ∀ A B : Matrix ι ι R,
+        (∀ a b, res O R (A a b) = 0) → (∀ a b, p (B a b) = 0)
+          → Aᵀ * J * B = 0 ∧ Bᵀ * J * A = 0 := fun A B hA hB => by
     constructor
     · ext a b
       simp only [Matrix.mul_apply, transpose_apply, Matrix.zero_apply, Finset.sum_mul]
@@ -49,18 +54,29 @@ private theorem expand_small {O : Type} [CommRing O] [IsLocalRing O] {ι : Type}
     rw [map_apply, Matrix.add_apply, map_add (f := _), z2, add_zero, this]
 
 open Matrix in
-theorem UpperTheory.V.Alg.hh_small :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (ι X : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup X] (w : ι → X) (Φ : FormData O w), IsUnit (2 : O) → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (p : R →ₐ[O] R'), Function.Surjective p → maximalIdeal R * RingHom.ker p = ⊥ →
-      (∀ h' : Matrix ι ι R', Φ.HH h' → ∃ h : Matrix ι ι R, Φ.HH h ∧ h.map p = h') ∧
-      (∀ h₁ h₂ : Matrix ι ι R, Φ.HH h₁ → Φ.HH h₂ → h₁.map p = h₂.map p → h₂ - h₁ ∈ Φ.g R) ∧
-      ∀ h Y : Matrix ι ι R, Φ.HH h → Y ∈ Φ.g R → Y.map p = 0 → Φ.HH (h + Y) := by
+theorem UpperTheory.V.Alg.hh_small
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (maximalIdeal O) O] (ι X : Type) [Fintype ι] [DecidableEq ι]
+        [AddCommGroup X] (w : ι → X) (Φ : FormData O w),
+      IsUnit (2 : O)
+        → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (R' : Type) [CommRing R']
+            [Algebra O R'] [IsCO O R'] (p : R →ₐ[O] R'),
+          Function.Surjective p → maximalIdeal R * RingHom.ker p = ⊥
+            → (∀ h' : Matrix ι ι R', Φ.HH h' → ∃ h : Matrix ι ι R, Φ.HH h ∧ h.map p = h')
+              ∧ (∀ h₁ h₂ : Matrix ι ι R, Φ.HH h₁ → Φ.HH h₂ → h₁.map p = h₂.map p → h₂ - h₁ ∈ Φ.g R)
+              ∧ ∀ h Y : Matrix ι ι R, Φ.HH h → Y ∈ Φ.g R → Y.map p = 0 → Φ.HH (h + Y) := by
   intro O _ _ _ _ ι X _ _ _ w Φ h2 R _ _ _ R' _ _ _ p hp hs
   refine ⟨?_, ?_, ?_⟩
   · classical
     rintro h' ⟨a1, a2, a3⟩
     choose s hs' using hp
-    obtain ⟨h0, b1, b2⟩ : ∃ h0 : Matrix ι ι R, h0.map p = h' ∧ ∀ a b, Φ.blk a ≠ Φ.blk b → h0 a b = 0 := by
-      refine ⟨Matrix.of fun a b => if Φ.blk a = Φ.blk b then s (h' a b) else 0, ?_, fun a b e => by simp [e]⟩
+    obtain ⟨h0, b1, b2⟩
+        : ∃ h0 : Matrix ι ι R, h0.map p = h' ∧ ∀ a b, Φ.blk a ≠ Φ.blk b → h0 a b = 0 := by
+      refine ⟨
+        Matrix.of fun a b => if Φ.blk a = Φ.blk b then s (h' a b) else 0,
+        ?_,
+        fun a b e => by simp [e]
+      ⟩
       ext a b
       by_cases e : Φ.blk a = Φ.blk b
       · simp [e, hs']
@@ -93,7 +109,8 @@ theorem UpperTheory.V.Alg.hh_small :
         simp [FormData.JR, this]
     set E := h0ᵀ * Φ.JR R * h0 - Φ.JR R with hE
     have E1 : E.map p = 0 := by
-      rw [hE, Matrix.map_sub _ (map_sub p), Matrix.map_mul, Matrix.map_mul, transpose_map, b1, jp, a1, sub_self]
+      rw [hE, Matrix.map_sub _ (map_sub p), Matrix.map_mul, Matrix.map_mul, transpose_map, b1, jp,
+        a1, sub_self]
     have E2 : Eᵀ = ε • E := by
       rw [hE, transpose_sub, transpose_mul, transpose_mul, transpose_transpose, hε, smul_sub]
       simp [mul_assoc]

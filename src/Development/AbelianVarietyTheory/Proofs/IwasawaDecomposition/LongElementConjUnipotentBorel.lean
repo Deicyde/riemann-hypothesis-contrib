@@ -7,29 +7,40 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocDict
+open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocDict
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 noncomputable section
 
 namespace GlobalTheory.UnipFlip
 
-theorem longElt_conj_apply {R : Type} [CommRing R] {n : ℕ} (A : Matrix (Fin n) (Fin n) R) (i j : Fin n) :
-    ((longElt n R : Matrix (Fin n) (Fin n) R) * A * (longElt n R : Matrix (Fin n) (Fin n) R)) i j
+theorem longElt_conj_apply
+    {R : Type} [CommRing R] {n : ℕ} (A : Matrix (Fin n) (Fin n) R) (i j : Fin n)
+    : ((longElt n R : Matrix (Fin n) (Fin n) R) * A * (longElt n R : Matrix (Fin n) (Fin n) R)) i j
       = A i.rev j.rev := by
-  simp only [Matrix.mul_apply, longElt, Matrix.of_apply, ite_mul, one_mul, zero_mul, mul_ite, mul_one, mul_zero]
+  simp only [Matrix.mul_apply, longElt, Matrix.of_apply, ite_mul, one_mul, zero_mul, mul_ite,
+    mul_one, mul_zero]
   simp only [Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
   rw [Finset.sum_eq_single j.rev]
   · simp
   · intro b _ hb; rw [if_neg]; intro e; exact hb (by rw [e, Fin.rev_rev])
   · simp
 
-theorem inv_apply_succ {R : Type} [CommRing R] {n : ℕ} {u : GL (Fin n) R} (hu : u ∈ unipB R (Fin n))
-    (p q : Fin n) (h : (q : ℕ) = p + 1) :
-    ((u⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) p q = - (u : Matrix (Fin n) (Fin n) R) p q := by
+theorem inv_apply_succ
+    {R : Type} [CommRing R]
+    {n : ℕ} {u : GL (Fin n) R} (hu : u ∈ unipB R (Fin n)) (p q : Fin n) (h : (q : ℕ) = p + 1)
+    : ((u⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) p q
+      = - (u : Matrix (Fin n) (Fin n) R) p q := by
   have hv : u⁻¹ ∈ unipB R (Fin n) := inv_mem hu
   rw [mem_unipB] at hu hv
   have hpq : p ≠ q := by intro e; subst e; omega
-  have key := congrFun (congrFun (congrArg (fun g : GL (Fin n) R => (g : Matrix (Fin n) (Fin n) R)) (mul_inv_cancel u)) p) q
+  have key :=
+    congrFun
+      (congrFun
+        (congrArg (fun g : GL (Fin n) R => (g : Matrix (Fin n) (Fin n) R)) (mul_inv_cancel u)) p)
+      q
   simp only [Units.val_mul, Units.val_one, Matrix.mul_apply, Matrix.one_apply_ne hpq] at key
   rw [Fintype.sum_eq_add p q hpq] at key
   · rw [hu.2 p, hv.2 q, one_mul, mul_one] at key
@@ -44,14 +55,20 @@ theorem inv_apply_succ {R : Type} [CommRing R] {n : ℕ} {u : GL (Fin n) R} (hu 
         omega
       rw [hv.1 c q this, mul_zero]
 
-theorem longElt_invT_conj_unipB : ∀ (R : Type) [CommRing R] (n : ℕ) (u : GL (Fin n) R), u ∈ unipB R (Fin n) →
-    longElt n R * GlobalTheory.CuspRep.invT n R u * longElt n R ∈ unipB R (Fin n) ∧
-      superDiag (longElt n R * GlobalTheory.CuspRep.invT n R u * longElt n R) = -superDiag u := by
+theorem longElt_invT_conj_unipB
+    : ∀ (R : Type) [CommRing R] (n : ℕ) (u : GL (Fin n) R),
+      u ∈ unipB R (Fin n)
+        → longElt n R * GlobalTheory.CuspRep.invT n R u * longElt n R ∈ unipB R (Fin n)
+          ∧ superDiag (longElt n R * GlobalTheory.CuspRep.invT n R u * longElt n R)
+            = - superDiag u := by
   intro R _ n u hu
   have hv : u⁻¹ ∈ unipB R (Fin n) := inv_mem hu
-  have hval : ∀ i j : Fin n,
-      ((longElt n R * GlobalTheory.CuspRep.invT n R u * longElt n R : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j
-        = ((u⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) j.rev i.rev := by
+  have hval
+      : ∀ i j : Fin n,
+        ((longElt n R * GlobalTheory.CuspRep.invT n R u * longElt n R : GL (Fin n) R)
+              : Matrix (Fin n) (Fin n) R)
+            i j
+          = ((u⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) j.rev i.rev := by
     intro i j
     rw [Units.val_mul, Units.val_mul]
     rw [longElt_conj_apply]

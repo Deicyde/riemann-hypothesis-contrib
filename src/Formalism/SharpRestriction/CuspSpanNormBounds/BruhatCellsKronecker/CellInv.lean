@@ -36,8 +36,9 @@ theorem cinv_inv_up {U : Matrix (Fin n) (Fin n) K} (hU : IsUpUni U) : IsUpUni U�
     · rw [(hU k i).1 h, mul_zero]
   · simp
 
-theorem cinv_mul_left {U A : Matrix (Fin n) (Fin n) K} (hU : IsUpUni U) (hA : StrictUp A) :
-    StrictUp (U * A) ∧ ∀ (a : Fin n) (h : a.val + 1 < n), (U * A) a ⟨a.val + 1, h⟩ = A a ⟨a.val + 1, h⟩ := by
+theorem cinv_mul_left {U A : Matrix (Fin n) (Fin n) K} (hU : IsUpUni U) (hA : StrictUp A)
+    : StrictUp (U * A)
+      ∧ ∀ (a : Fin n) (h : a.val + 1 < n), (U * A) a ⟨a.val + 1, h⟩ = A a ⟨a.val + 1, h⟩ := by
   constructor
   · intro a b hba
     rw [Matrix.mul_apply]
@@ -55,8 +56,9 @@ theorem cinv_mul_left {U A : Matrix (Fin n) (Fin n) K} (hU : IsUpUni U) (hA : St
       · rw [hA k _ (Fin.le_def.2 (Nat.succ_le_of_lt (Fin.lt_def.1 h1))), mul_zero]
     · simp
 
-theorem cinv_mul_right {U A : Matrix (Fin n) (Fin n) K} (hU : IsUpUni U) (hA : StrictUp A) :
-    StrictUp (A * U) ∧ ∀ (a : Fin n) (h : a.val + 1 < n), (A * U) a ⟨a.val + 1, h⟩ = A a ⟨a.val + 1, h⟩ := by
+theorem cinv_mul_right {U A : Matrix (Fin n) (Fin n) K} (hU : IsUpUni U) (hA : StrictUp A)
+    : StrictUp (A * U)
+      ∧ ∀ (a : Fin n) (h : a.val + 1 < n), (A * U) a ⟨a.val + 1, h⟩ = A a ⟨a.val + 1, h⟩ := by
   constructor
   · intro a b hba
     rw [Matrix.mul_apply]
@@ -74,16 +76,18 @@ theorem cinv_mul_right {U A : Matrix (Fin n) (Fin n) K} (hU : IsUpUni U) (hA : S
       · rw [(hU k _).1 h1, mul_zero]
     · simp
 
-theorem cinv_supSum_congr {A B : Matrix (Fin n) (Fin n) K}
-    (h : ∀ (a : Fin n) (h : a.val + 1 < n), B a ⟨a.val + 1, h⟩ = A a ⟨a.val + 1, h⟩) : supSum B = supSum A := by
+theorem cinv_supSum_congr
+    {A B : Matrix (Fin n) (Fin n) K}
+    (h : ∀ (a : Fin n) (h : a.val + 1 < n), B a ⟨a.val + 1, h⟩ = A a ⟨a.val + 1, h⟩)
+    : supSum B = supSum A := by
   unfold supSum
   refine Finset.sum_congr rfl (fun a _ => ?_)
   split_ifs with h1
   · exact h a h1
   · rfl
 
-theorem cinv_conj {U A : Matrix (Fin n) (Fin n) K} (hU : IsUpUni U) (hA : StrictUp A) :
-    StrictUp (U⁻¹ * A * U) ∧ supSum (U⁻¹ * A * U) = supSum A := by
+theorem cinv_conj {U A : Matrix (Fin n) (Fin n) K} (hU : IsUpUni U) (hA : StrictUp A)
+    : StrictUp (U⁻¹ * A * U) ∧ supSum (U⁻¹ * A * U) = supSum A := by
   have b1 := cinv_mul_left (cinv_inv_up hU) hA
   have b2 := cinv_mul_right hU b1.1
   exact ⟨b2.1, cinv_supSum_congr (fun a h => (b2.2 a h).trans (b1.2 a h))⟩
@@ -108,13 +112,20 @@ theorem cell_inv : RelevanceUnipotentInvariant := by
     rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_nonsing_inv,
       Matrix.conjTranspose_conjTranspose, Matrix.mul_assoc]
   have e2 : L * Aᴴ * L⁻¹ * (L * Z * U) = L * (Aᴴ * Z) * U := by
-    calc L * Aᴴ * L⁻¹ * (L * Z * U) = L * Aᴴ * (L⁻¹ * L) * Z * U := by simp only [Matrix.mul_assoc]
-      _ = L * (Aᴴ * Z) * U := by rw [Matrix.nonsing_inv_mul _ dL, Matrix.mul_one]; simp only [Matrix.mul_assoc]
+    calc
+      L * Aᴴ * L⁻¹ * (L * Z * U)
+        = L * Aᴴ * (L⁻¹ * L) * Z * U := by simp only [Matrix.mul_assoc]
+      _ = L * (Aᴴ * Z) * U := by
+        rw [Matrix.nonsing_inv_mul _ dL, Matrix.mul_one]; simp only [Matrix.mul_assoc]
   have e3 : L * Z * U * (U⁻¹ * A' * U) = L * (Z * A') * U := by
-    calc L * Z * U * (U⁻¹ * A' * U) = L * Z * (U * U⁻¹) * A' * U := by simp only [Matrix.mul_assoc]
-      _ = L * (Z * A') * U := by rw [Matrix.mul_nonsing_inv _ dU, Matrix.mul_one]; simp only [Matrix.mul_assoc]
-  have key := hrel ((Lᴴ)⁻¹ * A * Lᴴ) (U⁻¹ * A' * U) b.1 c.1 (by
-    rw [e1, e2, e3, ← Matrix.add_mul, ← Matrix.mul_add, hAA, Matrix.mul_zero, Matrix.zero_mul])
+    calc
+      L * Z * U * (U⁻¹ * A' * U)
+        = L * Z * (U * U⁻¹) * A' * U := by simp only [Matrix.mul_assoc]
+      _ = L * (Z * A') * U := by
+        rw [Matrix.mul_nonsing_inv _ dU, Matrix.mul_one]; simp only [Matrix.mul_assoc]
+  have key :=
+    hrel ((Lᴴ)⁻¹ * A * Lᴴ) (U⁻¹ * A' * U) b.1 c.1 (by
+      rw [e1, e2, e3, ← Matrix.add_mul, ← Matrix.mul_add, hAA, Matrix.mul_zero, Matrix.zero_mul])
   rwa [b.2, c.2] at key
 
 theorem cell_sign : ColumnScalingBruhatShape := by
@@ -133,14 +144,17 @@ theorem cell_sign : ColumnScalingBruhatShape := by
       split_ifs <;> ring
     have hd : diagonal ε * diagonal (fun a => (ε a)⁻¹) = (1 : Matrix (Fin n) (Fin n) K) := by
       rw [Matrix.diagonal_mul_diagonal]
-      have h1 : (fun i => ε i * (ε i)⁻¹) = fun _ => (1 : K) := funext fun i => mul_inv_cancel₀ (hε i)
+      have h1 : (fun i => ε i * (ε i)⁻¹) = fun _ => (1 : K) :=
+        funext fun i => mul_inv_cancel₀ (hε i)
       rw [h1, Matrix.diagonal_one]
     have hl : (fun a b => ε b * (L * mono σ t * U) a b) = L * mono σ t * U * diagonal ε := by
       funext a b
       rw [Matrix.mul_diagonal, mul_comm]
     refine hl.trans ?_
     rw [hm]
-    calc L * mono σ t * U * diagonal ε = L * mono σ t * 1 * U * diagonal ε := by rw [Matrix.mul_one]
+    calc
+      L * mono σ t * U * diagonal ε
+        = L * mono σ t * 1 * U * diagonal ε := by rw [Matrix.mul_one]
       _ = L * (mono σ t * diagonal ε) * (diagonal (fun a => (ε a)⁻¹) * U * diagonal ε) := by
         rw [← hd]; simp only [Matrix.mul_assoc]
 

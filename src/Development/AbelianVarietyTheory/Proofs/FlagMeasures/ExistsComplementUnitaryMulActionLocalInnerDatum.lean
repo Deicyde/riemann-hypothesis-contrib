@@ -49,8 +49,8 @@ lemma FixesFrame.mem_perp {f : Fin (r + 1) → V} {g : V ≃ₗ[E] V} (hg : Fixe
   rw [h1]
   exact (hv : ∀ x ∈ H.X f, H.h v x = 0) _ hx'
 
-def perpMap {f : Fin (r + 1) → V} {g : V ≃ₗ[E] V} (hg : FixesFrame H f g) :
-    ↥(H.perp (H.X f)) →ₗ[E] ↥(H.perp (H.X f)) :=
+def perpMap {f : Fin (r + 1) → V} {g : V ≃ₗ[E] V} (hg : FixesFrame H f g)
+    : ↥(H.perp (H.X f)) →ₗ[E] ↥(H.perp (H.X f)) :=
   (g : V →ₗ[E] V).restrict (fun _ hv => hg.mem_perp hv)
 
 def wMap {f : Fin (r + 1) → V} {g : V ≃ₗ[E] V} (hg : FixesFrame H f g) : H.Wb f →ₗ[E] H.Wb f :=
@@ -210,7 +210,16 @@ lemma moves_comp {P : FPair H r} {g g' : V ≃ₗ[E] V} (hg : InU P g) {d₁ d�
   · exact (h₁₂.2.2 x' ⟨g x', hg.2.mem_perp x'.2⟩ x ⟨g x, hg.1.mem_perp x.2⟩ rfl rfl).trans
       (h₂₃.2.2 _ y' _ y (by rw [hx', LinearEquiv.mul_apply]) (by rw [hx, LinearEquiv.mul_apply]))
 
-theorem exists_mulAction : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r), Module.finrank E V = k + 2 * r + 1 → P.RelG (LocNG.theta M) → ∃ act : MulAction P.UW0 (LocNG.Datum P), (∀ (g : P.UW0) d d', LocNG.Datum.Moves g.1 d d' ↔ act.smul g d = d') ∧ ∀ d (g : P.UW0), g.1 ∈ LocNG.Datum.Stab d ↔ act.smul g d = d := by
+theorem exists_mulAction
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ)
+            (P : LocNG.FPair H r),
+          Module.finrank E V = k + 2 * r + 1 → P.RelG (LocNG.theta M)
+            → ∃ act : MulAction P.UW0 (LocNG.Datum P),
+              (∀ (g : P.UW0) d d', LocNG.Datum.Moves g.1 d d' ↔ act.smul g d = d')
+                ∧ ∀ d (g : P.UW0), g.1 ∈ LocNG.Datum.Stab d ↔ act.smul g d = d := by
   intro F _ _ _ E _ _ _ _ M _ V _ _ H r k P _ _
   let sm : P.UW0 → Datum P → Datum P := fun g d => act (inU_of_mem g.2) d
   have key : ∀ (g : P.UW0) d d', Datum.Moves g.1 d d' ↔ sm g d = d' := fun g d d' =>
@@ -223,8 +232,9 @@ theorem exists_mulAction : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologica
   refine ⟨act', key, fun d g => ?_⟩
   have hS : Datum.Stab d = (MulAction.stabilizer P.UW0 d).map P.UW0.subtype := by
     unfold Datum.Stab
-    have hset : {g | g ∈ P.UW0 ∧ Datum.Moves g d d} =
-        ((MulAction.stabilizer P.UW0 d).map P.UW0.subtype : Set (V ≃ₗ[E] V)) := by
+    have hset
+        : {g | g ∈ P.UW0 ∧ Datum.Moves g d d}
+          = ((MulAction.stabilizer P.UW0 d).map P.UW0.subtype : Set (V ≃ₗ[E] V)) := by
       ext g
       simp only [Set.mem_setOf_eq, SetLike.mem_coe, Subgroup.mem_map, MulAction.mem_stabilizer_iff,
         Subgroup.coe_subtype]

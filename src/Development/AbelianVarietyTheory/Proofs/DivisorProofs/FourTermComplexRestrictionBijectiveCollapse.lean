@@ -17,9 +17,11 @@ set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.CxCoh.Collapse
 
-theorem bij_of_two {A B X Y : Type*} (r : A → B) (w : B → X) (s : X → Y) (U : A → X) (E : B → Y)
-    (hU : ∀ x, U x = w (r x)) (hE : ∀ y, E y = s (w y))
-    (bU : Function.Bijective U) (bE : Function.Bijective E) : Function.Bijective r := by
+theorem bij_of_two
+    {A B X Y : Type*}
+    (r : A → B) (w : B → X) (s : X → Y) (U : A → X) (E : B → Y) (hU : ∀ x, U x = w (r x))
+    (hE : ∀ y, E y = s (w y)) (bU : Function.Bijective U) (bE : Function.Bijective E)
+    : Function.Bijective r := by
   have wi : Function.Injective w := fun y y' h ↦ bE.1 (by rw [hE, hE, h])
   refine ⟨fun x x' h ↦ bU.1 (by rw [hU, hU, h]), fun y ↦ ?_⟩
   obtain ⟨x, hx⟩ := bU.2 (w y)
@@ -49,7 +51,8 @@ def uMap (K : Cx C) (S : C ⥤ C) (u : 𝟭 C ⟶ S) : CxMap K (K.res S) where
   comp_commutes_diffOne T x := (K.diffOne_natural _ x).symm
   comp_commutes_diffTwo T x := (K.diffTwo_natural _ x).symm
 
-def wMap (K : Cx C) (ℓ : D ⥤ C) (q : C ⥤ D) (S : C ⥤ C) (w : q ⋙ ℓ ⟶ S) : CxMap (K.res ℓ) (K.res S) where
+def wMap (K : Cx C) (ℓ : D ⥤ C) (q : C ⥤ D) (S : C ⥤ C) (w : q ⋙ ℓ ⟶ S)
+    : CxMap (K.res ℓ) (K.res S) where
   G := q
   a0 T := K.M0.map (w.app T)
   a1 T := K.M1.map (w.app T)
@@ -58,24 +61,27 @@ def wMap (K : Cx C) (ℓ : D ⥤ C) (q : C ⥤ D) (S : C ⥤ C) (w : q ⋙ ℓ �
   compDegreeZero_natural {T T'} φ x := by
     have := w.naturality φ
     simp only [Functor.comp_map] at this
-    change K.M0.map (w.app T') (K.M0.map (ℓ.map (q.map φ)) x) = K.M0.map (S.map φ) (K.M0.map (w.app T) x)
+    change K.M0.map (w.app T') (K.M0.map (ℓ.map (q.map φ)) x)
+      = K.M0.map (S.map φ) (K.M0.map (w.app T) x)
     rw [← K.M0.map_comp, ← K.M0.map_comp, this]
   compDegreeOne_natural {T T'} φ x := by
     have := w.naturality φ
     simp only [Functor.comp_map] at this
-    change K.M1.map (w.app T') (K.M1.map (ℓ.map (q.map φ)) x) = K.M1.map (S.map φ) (K.M1.map (w.app T) x)
+    change K.M1.map (w.app T') (K.M1.map (ℓ.map (q.map φ)) x)
+      = K.M1.map (S.map φ) (K.M1.map (w.app T) x)
     rw [← K.M1.map_comp, ← K.M1.map_comp, this]
   compDegreeTwo_natural {T T'} φ x := by
     have := w.naturality φ
     simp only [Functor.comp_map] at this
-    change K.M2.map (w.app T') (K.M2.map (ℓ.map (q.map φ)) x) = K.M2.map (S.map φ) (K.M2.map (w.app T) x)
+    change K.M2.map (w.app T') (K.M2.map (ℓ.map (q.map φ)) x)
+      = K.M2.map (S.map φ) (K.M2.map (w.app T) x)
     rw [← K.M2.map_comp, ← K.M2.map_comp, this]
   comp_commutes_diffZero T x := (K.diffZero_natural _ x).symm
   comp_commutes_diffOne T x := (K.diffOne_natural _ x).symm
   comp_commutes_diffTwo T x := (K.diffTwo_natural _ x).symm
 
-def eMap (K : Cx C) (ℓ : D ⥤ C) (q : C ⥤ D) (S : C ⥤ C) (w : q ⋙ ℓ ⟶ S) (ε : 𝟭 D ⟶ ℓ ⋙ q) :
-    CxMap (K.res ℓ) ((K.res S).res ℓ) where
+def eMap (K : Cx C) (ℓ : D ⥤ C) (q : C ⥤ D) (S : C ⥤ C) (w : q ⋙ ℓ ⟶ S) (ε : 𝟭 D ⟶ ℓ ⋙ q)
+    : CxMap (K.res ℓ) ((K.res S).res ℓ) where
   G := 𝟭 D
   a0 T := K.M0.map (ℓ.map (ε.app T) ≫ w.app (ℓ.obj T))
   a1 T := K.M1.map (ℓ.map (ε.app T) ≫ w.app (ℓ.obj T))
@@ -111,20 +117,24 @@ def eMap (K : Cx C) (ℓ : D ⥤ C) (q : C ⥤ D) (S : C ⥤ C) (w : q ⋙ ℓ �
 
 end GlobalTheory.CxCoh.Collapse
 
-
 open GlobalTheory.CxCoh.Collapse in
-theorem GlobalTheory.CxCoh.collapse_resMap_bij : ∀ (C : Type 1) [Category.{0} C] (D : Type) [Category.{0} D] (K : Cx C) (ℓ : D ⥤ C)
-    (q : C ⥤ D) (S : C ⥤ C) (u : 𝟭 C ⟶ S) (w : q ⋙ ℓ ⟶ S) (ε : 𝟭 D ⟶ ℓ ⋙ q), (∀ T, K.QAt (u.app T)) →
-    (∀ U, K.QAt (ℓ.map (ε.app U) ≫ w.app (ℓ.obj U))) → (K.resMap ℓ).Bij := by
+theorem GlobalTheory.CxCoh.collapse_resMap_bij
+    : ∀ (C : Type 1) [Category.{0} C] (D : Type) [Category.{0} D] (K : Cx C) (ℓ : D ⥤ C) (q : C ⥤ D)
+        (S : C ⥤ C) (u : 𝟭 C ⟶ S) (w : q ⋙ ℓ ⟶ S) (ε : 𝟭 D ⟶ ℓ ⋙ q),
+      (∀ T, K.QAt (u.app T)) → (∀ U, K.QAt (ℓ.map (ε.app U) ≫ w.app (ℓ.obj U)))
+        → (K.resMap ℓ).Bij := by
   intro C _ D _ K ℓ q S u w ε hu hε
   let U := uMap K S u
   let W := wMap K ℓ q S w
   let E := eMap K ℓ q S w ε
   have jU : U.Joined (K.resMap S) u := ⟨fun _ _ ↦ rfl, fun _ _ ↦ rfl, fun _ _ ↦ rfl⟩
-  have jW : ((K.resMap ℓ).comp W).Joined (K.resMap S) w := ⟨fun _ _ ↦ rfl, fun _ _ ↦ rfl, fun _ _ ↦ rfl⟩
-  have jE : E.Joined (W.comp ((K.res S).resMap ℓ)) ε :=
-    ⟨fun _ x ↦ (K.M0.map_comp _ _ x).symm, fun _ x ↦ (K.M1.map_comp _ _ x).symm,
-      fun _ x ↦ (K.M2.map_comp _ _ x).symm⟩
+  have jW : ((K.resMap ℓ).comp W).Joined (K.resMap S) w :=
+    ⟨fun _ _ ↦ rfl, fun _ _ ↦ rfl, fun _ _ ↦ rfl⟩
+  have jE : E.Joined (W.comp ((K.res S).resMap ℓ)) ε := ⟨
+    fun _ x ↦ (K.M0.map_comp _ _ x).symm,
+    fun _ x ↦ (K.M1.map_comp _ _ x).symm,
+    fun _ x ↦ (K.M2.map_comp _ _ x).symm
+  ⟩
   have qU : U.QAll := hu
   have qE : E.QAll := hε
   have a0U := GlobalTheory.T.vertical_h0_bijective_h1_injective_universes.1 U qU
@@ -141,9 +151,17 @@ theorem GlobalTheory.CxCoh.collapse_resMap_bij : ∀ (C : Type 1) [Category.{0} 
   have tU := GlobalTheory.T.joinedMapsAgreeCohomologyTwo_instances.1 _ _ _ jU
   have tW := GlobalTheory.T.joinedMapsAgreeCohomologyTwo_instances.1 _ _ _ jW
   have tE := GlobalTheory.T.joinedMapsAgreeCohomologyTwo_instances.2.2 _ _ _ jE
-  refine ⟨bij_of_two _ W.h0 ((K.res S).resMap ℓ).h0 U.h0 E.h0 (fun x ↦ ?_) (fun y ↦ ?_) a0U.1 a0E.1,
-    bij_of_two _ W.h1 ((K.res S).resMap ℓ).h1 U.h1 E.h1 (fun x ↦ ?_) (fun y ↦ ?_) ⟨a0U.2, a1U⟩ ⟨a0E.2, a1E⟩,
-    bij_of_two _ W.h2 ((K.res S).resMap ℓ).h2 U.h2 E.h2 (fun x ↦ ?_) (fun y ↦ ?_) ⟨a2U, a3U⟩ ⟨a2E, a3E⟩⟩
+  refine ⟨
+    bij_of_two _ W.h0 ((K.res S).resMap ℓ).h0 U.h0 E.h0 (fun x ↦ ?_) (fun y ↦ ?_) a0U.1 a0E.1,
+    bij_of_two _ W.h1 ((K.res S).resMap ℓ).h1 U.h1 E.h1 (fun x ↦ ?_) (fun y ↦ ?_) ⟨a0U.2, a1U⟩ ⟨
+      a0E.2,
+      a1E
+    ⟩,
+    bij_of_two _ W.h2 ((K.res S).resMap ℓ).h2 U.h2 E.h2 (fun x ↦ ?_) (fun y ↦ ?_) ⟨a2U, a3U⟩ ⟨
+      a2E,
+      a3E
+    ⟩
+  ⟩
   · rw [oU.1, ← oW.1, CxMap.cohomZero_pullback_comp]
   · rw [oE.1, CxMap.cohomZero_pullback_comp]
   · rw [oU.2, ← oW.2, CxMap.cohomOne_pullback_comp]

@@ -13,11 +13,9 @@ open PI
 def StepI : Prop :=
   ∀ (p : ℕ) [Fact p.Prime] (σ : Type) (f : MvPowerSeries σ ℂ_[p]), CoefWf f → CoefWf (expMv f)
 
-def KeyW : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (x : ℂ_[p]), x ∈ Wp p → ‖x‖ < 1 → x / (p : ℂ_[p]) ∈ Wp p
+def KeyW : Prop := ∀ (p : ℕ) [Fact p.Prime] (x : ℂ_[p]), x ∈ Wp p → ‖x‖ < 1 → x / (p : ℂ_[p]) ∈ Wp p
 
-def StepIII : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (x : ℂ_[p]), InWf x → ‖x‖ ≤ 1 → x ∈ Wp p
+def StepIII : Prop := ∀ (p : ℕ) [Fact p.Prime] (x : ℂ_[p]), InWf x → ‖x‖ ≤ 1 → x ∈ Wp p
 
 theorem expIntW_of_steps (h1 : StepI) (h3 : StepIII) : ExpIntW := by
   intro p _ σ f hf hs

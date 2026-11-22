@@ -18,26 +18,29 @@ namespace FormalGroup
 section Associated
 
 variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-variable {L : Type*} [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
+variable
+  {L : Type*} [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
   [Algebra K L] [ValuativeExtension K L]
 
-
 omit [TopologicalSpace K] [IsNonarchimedeanLocalField K] in
-theorem associated_psEval {φ : PowerSeries 𝒪[K]} (h0 : PowerSeries.constantCoeff φ = 0)
-    (h1 : IsUnit (PowerSeries.coeff 1 φ)) (a : 𝒪[L]) (ha : a ∈ 𝓂[L]) :
-    Associated a ⟨psEval φ (fun _ => (a : L)), psEval_mem_integer φ (fun _ => a) fun _ => ha⟩ := by
+theorem associated_psEval
+    {φ : PowerSeries 𝒪[K]}
+    (h0 : PowerSeries.constantCoeff φ = 0) (h1 : IsUnit (PowerSeries.coeff 1 φ))
+    (a : 𝒪[L]) (ha : a ∈ 𝓂[L])
+    : Associated a
+      ⟨psEval φ (fun _ => (a : L)), psEval_mem_integer φ (fun _ => a) fun _ => ha⟩ := by
   let _ : UniformSpace L := IsTopologicalAddGroup.rightUniformSpace L
   have _ : IsUniformAddGroup L := isUniformAddGroup_of_addCommGroup
   let _ : UniformSpace 𝒪[K] := ⊥
   have _ : DiscreteUniformity 𝒪[K] := ⟨rfl⟩
-  have hφc : Continuous[(⊥ : UniformSpace 𝒪[K]).toTopologicalSpace, _]
-      (algebraMap 𝒪[K] 𝒪[L]) := by
+  have hφc : Continuous[(⊥ : UniformSpace 𝒪[K]).toTopologicalSpace, _] (algebraMap 𝒪[K] 𝒪[L]) := by
     rw [UniformSpace.toTopologicalSpace_bot]
     exact continuous_bot
   have hev := hasEval_of_mem_maximalIdeal (a := fun _ : Unit => a) fun _ => ha
   set ε := MvPowerSeries.eval₂Hom hφc hev
-  have hval : (⟨psEval φ (fun _ => (a : L)), psEval_mem_integer φ (fun _ => a) fun _ => ha⟩ : 𝒪[L])
-      = ε φ := by
+  have hval
+      : (⟨psEval φ (fun _ => (a : L)), psEval_mem_integer φ (fun _ => a) fun _ => ha⟩ : 𝒪[L])
+        = ε φ := by
     apply Subtype.ext
     rw [MvPowerSeries.coe_eval₂Hom]
     exact psEval_eq_eval₂ φ (fun _ => a) fun _ => ha
@@ -52,8 +55,8 @@ theorem associated_psEval {φ : PowerSeries 𝒪[K]} (h0 : PowerSeries.constantC
   set c := PowerSeries.constantCoeff ψ
   have hc : c = PowerSeries.coeff 1 φ := by
     rw [hψ, PowerSeries.coeff_succ_X_mul, PowerSeries.coeff_zero_eq_constantCoeff_apply]
-  obtain ⟨χ, hχ⟩ := PowerSeries.X_dvd_iff.mpr
-    (show PowerSeries.constantCoeff (ψ - PowerSeries.C c) = 0 by simp [c])
+  obtain ⟨χ, hχ⟩ :=
+    PowerSeries.X_dvd_iff.mpr (show PowerSeries.constantCoeff (ψ - PowerSeries.C c) = 0 by simp [c])
   have hψ' : ψ = PowerSeries.C c + PowerSeries.X * χ := by
     rw [← hχ]
     ring
@@ -74,40 +77,42 @@ end Associated
 section Torsion
 
 variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-variable {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω]
-  [Algebra K Ω] [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω]
+variable
+  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra K Ω]
+  [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω]
 variable {π : 𝒪[K]} (hπ : Irreducible π) {f g : PowerSeries 𝒪[K]}
 
-theorem lubinTateTorsion_mono (hf : IsLubinTateSeries π f) {m n : ℕ} (h : m ≤ n) :
-    lubinTateTorsion Ω (hπ := hπ) hf m ≤ lubinTateTorsion Ω (hπ := hπ) hf n :=
+theorem lubinTateTorsion_mono (hf : IsLubinTateSeries π f) {m n : ℕ} (h : m ≤ n)
+    : lubinTateTorsion Ω (hπ := hπ) hf m ≤ lubinTateTorsion Ω (hπ := hπ) hf n :=
   Submodule.torsionBy_le_torsionBy_of_dvd _ _ (pow_dvd_pow π h)
 
-theorem lubinTateField_mono (hf : IsLubinTateSeries π f) {m n : ℕ} (h : m ≤ n) :
-    lubinTateField Ω hπ hf m ≤ lubinTateField Ω hπ hf n := by
+theorem lubinTateField_mono (hf : IsLubinTateSeries π f) {m n : ℕ} (h : m ≤ n)
+    : lubinTateField Ω hπ hf m ≤ lubinTateField Ω hπ hf n := by
   rw [lubinTateField, adjoin_le_iff]
   rintro _ ⟨x, hx, rfl⟩
   exact val_mem_lubinTateField hπ hf (lubinTateTorsion_mono hπ hf h hx)
 
-theorem aeval_ltEisenstein_of_primitive {k : ℕ}
-    {l : IdealPoint Ω (lubinTateFormalGroup hπ (isLubinTateSeries_ltPoly π))}
+theorem aeval_ltEisenstein_of_primitive
+    {k : ℕ} {l : IdealPoint Ω (lubinTateFormalGroup hπ (isLubinTateSeries_ltPoly π))}
     (hl : l ∈ lubinTateTorsion Ω (isLubinTateSeries_ltPoly π) (k + 1))
-    (hl' : l ∉ lubinTateTorsion Ω (isLubinTateSeries_ltPoly π) k) :
-    aeval l.val ((ltEisenstein π k).map (algebraMap 𝒪[K] K)) = 0 :=
-  aeval_ltEisenstein_eq_zero ((mem_lubinTateTorsion_ltPoly_iff _ l).mp hl)
-    fun h => hl' ((mem_lubinTateTorsion_ltPoly_iff k l).mpr h)
-
+    (hl' : l ∉ lubinTateTorsion Ω (isLubinTateSeries_ltPoly π) k)
+    : aeval l.val ((ltEisenstein π k).map (algebraMap 𝒪[K] K)) = 0 :=
+  aeval_ltEisenstein_eq_zero ((mem_lubinTateTorsion_ltPoly_iff _ l).mp hl) fun h =>
+    hl' ((mem_lubinTateTorsion_ltPoly_iff k l).mpr h)
 
 omit [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] [TopologicalSpace Ω]
   [IsValuativeTopology Ω] [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] in
-theorem exists_integer_eq {E : IntermediateField K Ω} {x : Ω} (hxE : x ∈ E)
-    (hx : valuation Ω x < 1) : ∃ y : 𝒪[E], ((y : E) : Ω) = x :=
+theorem exists_integer_eq {E : IntermediateField K Ω} {x : Ω} (hxE : x ∈ E) (hx : valuation Ω x < 1)
+    : ∃ y : 𝒪[E], ((y : E) : Ω) = x :=
   ⟨⟨⟨x, hxE⟩, ((valuation_coe_lt_one_iff E ⟨x, hxE⟩).mp hx).le⟩, rfl⟩
 
-
-theorem irreducible_of_eq_adjoin_of_isEisensteinAt {E : IntermediateField K Ω} [FiniteDimensional K E]
-    {a : Ω} (hE : E = K⟮a⟯) {p : 𝒪[K][X]} (hp : p.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K]))
-    (hn : 0 < p.natDegree) (ha : aeval a (p.map (algebraMap 𝒪[K] K)) = 0) {x : 𝒪[E]}
-    (hx : ((x : E) : Ω) = a) : Irreducible x := by
+theorem irreducible_of_eq_adjoin_of_isEisensteinAt
+    {E : IntermediateField K Ω} [FiniteDimensional K E]
+    {a : Ω} (hE : E = K⟮a⟯)
+    {p : 𝒪[K][X]} (hp : p.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < p.natDegree)
+    (ha : aeval a (p.map (algebraMap 𝒪[K] K)) = 0)
+    {x : 𝒪[E]} (hx : ((x : E) : Ω) = a)
+    : Irreducible x := by
   have haE : a ∈ E := hx ▸ (x : E).2
   set α : E := ⟨a, haE⟩
   have hgen : K⟮α⟯ = ⊤ := adjoin_simple_eq_top_of_eq hE
@@ -124,16 +129,19 @@ theorem irreducible_of_eq_adjoin_of_isEisensteinAt {E : IntermediateField K Ω} 
 
 variable [IsSepClosed Ω]
 
-theorem val_mem_lubinTateField_of_mem (hf : IsLubinTateSeries π f) (hg : IsLubinTateSeries π g)
-    {n : ℕ} {x : IdealPoint Ω (lubinTateFormalGroup hπ hg)} (hx : x ∈ lubinTateTorsion Ω hg n) :
-    x.val ∈ lubinTateField Ω hπ hf n :=
+theorem val_mem_lubinTateField_of_mem
+    (hf : IsLubinTateSeries π f)
+    (hg : IsLubinTateSeries π g)
+    {n : ℕ} {x : IdealPoint Ω (lubinTateFormalGroup hπ hg)} (hx : x ∈ lubinTateTorsion Ω hg n)
+    : x.val ∈ lubinTateField Ω hπ hf n :=
   lubinTateField_eq (Ω := Ω) hπ hg hf n ▸ val_mem_lubinTateField hπ hg hx
 
-theorem primitive_spec (hf : IsLubinTateSeries π f) {n : ℕ}
-    {l : IdealPoint Ω (lubinTateFormalGroup hπ hf)} (hl : l ∈ lubinTateTorsion Ω hf n)
-    (hl' : l ∉ lubinTateTorsion Ω hf (n - 1)) :
-    (∀ a : 𝒪[K], a • l = 0 ↔ a ∈ Ideal.span {π ^ n}) ∧
-      ∀ m ∈ lubinTateTorsion Ω (hπ := hπ) hf n, ∃ a : 𝒪[K], a • l = m := by
+theorem primitive_spec
+    (hf : IsLubinTateSeries π f)
+    {n : ℕ} {l : IdealPoint Ω (lubinTateFormalGroup hπ hf)}
+    (hl : l ∈ lubinTateTorsion Ω hf n) (hl' : l ∉ lubinTateTorsion Ω hf (n - 1))
+    : (∀ a : 𝒪[K], a • l = 0 ↔ a ∈ Ideal.span {π ^ n})
+      ∧ ∀ m ∈ lubinTateTorsion Ω (hπ := hπ) hf n, ∃ a : 𝒪[K], a • l = m := by
   obtain ⟨l₀, -, hann, hgen⟩ := exists_generator_lubinTateTorsion (Ω := Ω) (hπ := hπ) hf n
   obtain ⟨b, rfl⟩ := hgen l hl
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := by
@@ -155,18 +163,20 @@ theorem primitive_spec (hf : IsLubinTateSeries π f) {n : ℕ}
   · obtain ⟨a, rfl⟩ := hgen m hm
     exact ⟨a * ↑u⁻¹, by rw [smul_smul, mul_assoc, Units.inv_mul, mul_one]⟩
 
-theorem exists_primitive (hf : IsLubinTateSeries π f) {n : ℕ} (hn : 0 < n) :
-    ∃ l ∈ lubinTateTorsion Ω (hπ := hπ) hf n, l ∉ lubinTateTorsion Ω (hπ := hπ) hf (n - 1) := by
+theorem exists_primitive (hf : IsLubinTateSeries π f) {n : ℕ} (hn : 0 < n)
+    : ∃ l ∈ lubinTateTorsion Ω (hπ := hπ) hf n, l ∉ lubinTateTorsion Ω (hπ := hπ) hf (n - 1) := by
   obtain ⟨l, hl, hann, -⟩ := exists_generator_lubinTateTorsion (Ω := Ω) (hπ := hπ) hf n
   refine ⟨l, hl, fun h => ?_⟩
   rw [mem_lubinTateTorsion, hann, Ideal.mem_span_singleton,
-    pow_dvd_pow_iff hπ.ne_zero hπ.not_isUnit] at h
+      pow_dvd_pow_iff hπ.ne_zero hπ.not_isUnit]
+    at h
   omega
 
-theorem lubinTateField_eq_adjoin_of_primitive (hf : IsLubinTateSeries π f) {n : ℕ}
-    {l : IdealPoint Ω (lubinTateFormalGroup hπ hf)} (hl : l ∈ lubinTateTorsion Ω hf n)
-    (hl' : l ∉ lubinTateTorsion Ω hf (n - 1)) :
-    lubinTateField Ω hπ hf n = K⟮l.val⟯ := by
+theorem lubinTateField_eq_adjoin_of_primitive
+    (hf : IsLubinTateSeries π f)
+    {n : ℕ} {l : IdealPoint Ω (lubinTateFormalGroup hπ hf)}
+    (hl : l ∈ lubinTateTorsion Ω hf n) (hl' : l ∉ lubinTateTorsion Ω hf (n - 1))
+    : lubinTateField Ω hπ hf n = K⟮l.val⟯ := by
   obtain ⟨-, hgen⟩ := primitive_spec hπ hf hl hl'
   refine le_antisymm ?_ ?_
   · rw [lubinTateField, adjoin_le_iff]
@@ -177,12 +187,13 @@ theorem lubinTateField_eq_adjoin_of_primitive (hf : IsLubinTateSeries π f) {n :
   · rw [adjoin_simple_le_iff]
     exact val_mem_lubinTateField hπ hf hl
 
-theorem irreducible_of_primitive_ltPoly (hf : IsLubinTateSeries π f) {n : ℕ}
-    {l : IdealPoint Ω (lubinTateFormalGroup hπ (isLubinTateSeries_ltPoly π))}
+theorem irreducible_of_primitive_ltPoly
+    (hf : IsLubinTateSeries π f)
+    {n : ℕ} {l : IdealPoint Ω (lubinTateFormalGroup hπ (isLubinTateSeries_ltPoly π))}
     (hl : l ∈ lubinTateTorsion Ω (isLubinTateSeries_ltPoly π) n)
     (hl' : l ∉ lubinTateTorsion Ω (isLubinTateSeries_ltPoly π) (n - 1))
-    {x : 𝒪[lubinTateField Ω hπ hf n]} (hx : ((x : lubinTateField Ω hπ hf n) : Ω) = l.val) :
-    Irreducible x := by
+    {x : 𝒪[lubinTateField Ω hπ hf n]} (hx : ((x : lubinTateField Ω hπ hf n) : Ω) = l.val)
+    : Irreducible x := by
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := by
     cases n with
     | zero => exact absurd hl hl'
@@ -198,11 +209,12 @@ theorem irreducible_of_primitive_ltPoly (hf : IsLubinTateSeries π f) {n : ℕ}
   exact irreducible_of_eq_adjoin_of_isEisensteinAt hE (isEisensteinAt_ltEisenstein hπ k) hdeg
     (aeval_ltEisenstein_of_primitive hπ hl hl') hx
 
-theorem irreducible_of_primitive (hf : IsLubinTateSeries π f) {n : ℕ}
-    {l : IdealPoint Ω (lubinTateFormalGroup hπ hf)} (hl : l ∈ lubinTateTorsion Ω hf n)
-    (hl' : l ∉ lubinTateTorsion Ω hf (n - 1))
-    {x : 𝒪[lubinTateField Ω hπ hf n]} (hx : ((x : lubinTateField Ω hπ hf n) : Ω) = l.val) :
-    Irreducible x := by
+theorem irreducible_of_primitive
+    (hf : IsLubinTateSeries π f)
+    {n : ℕ} {l : IdealPoint Ω (lubinTateFormalGroup hπ hf)}
+    (hl : l ∈ lubinTateTorsion Ω hf n) (hl' : l ∉ lubinTateTorsion Ω hf (n - 1))
+    {x : 𝒪[lubinTateField Ω hπ hf n]} (hx : ((x : lubinTateField Ω hπ hf n) : Ω) = l.val)
+    : Irreducible x := by
   have hg₀ : IsLubinTateSeries π (ltPoly π : PowerSeries 𝒪[K]) := isLubinTateSeries_ltPoly π
   obtain ⟨m, rfl⟩ := (lubinTatePointEquiv hf hg₀).surjective l
   replace hl := (lubinTatePointEquiv_mem_torsion_iff hf hg₀ n m).mp hl
@@ -212,16 +224,20 @@ theorem irreducible_of_primitive (hf : IsLubinTateSeries π f) {n : ℕ}
   have hyirr : Irreducible y := irreducible_of_primitive_ltPoly hπ hf hl hl' hy
   have hym : y ∈ 𝓂[lubinTateField Ω hπ hf n] := hyirr.not_isUnit
   set φ := (lubinTateHom hπ hf hg₀ 1).toPowerSeries
-  have hassoc := associated_psEval (K := K) (L := lubinTateField Ω hπ hf n) (φ := φ)
-    (lubinTateHom hπ hf hg₀ 1).constantCoeff_eq_zero'
-    (by rw [coeff_one_lubinTateHom]; exact isUnit_one) y hym
+  have hassoc :=
+    associated_psEval (K := K) (L := lubinTateField Ω hπ hf n) (φ := φ)
+      (lubinTateHom hπ hf hg₀ 1).constantCoeff_eq_zero'
+      (by rw [coeff_one_lubinTateHom]; exact isUnit_one) y hym
   have hxe : x = ⟨_, psEval_mem_integer φ (fun _ => y) fun _ => hym⟩ := by
     apply Subtype.ext
     apply Subtype.ext
     rw [hx, lubinTatePointEquiv_val]
-    change psEval φ (fun _ => m.val) =
-      ((psEval φ (fun _ => (y : lubinTateField Ω hπ hf n)) : lubinTateField Ω hπ hf n) : Ω)
-    rw [← psEval_coe _ φ (fun _ => (y : lubinTateField Ω hπ hf n)) (fun _ => by rw [hy]; exact m.valuation_lt_one), hy]
+    change psEval φ (fun _ => m.val)
+      = ((psEval φ (fun _ => (y : lubinTateField Ω hπ hf n)) : lubinTateField Ω hπ hf n) : Ω)
+    rw [← psEval_coe _ φ
+        (fun _ => (y : lubinTateField Ω hπ hf n))
+        (fun _ => by rw [hy]; exact m.valuation_lt_one),
+      hy]
   rw [hxe]
   exact hassoc.irreducible hyirr
 

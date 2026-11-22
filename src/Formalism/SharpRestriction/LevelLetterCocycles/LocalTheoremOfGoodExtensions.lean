@@ -9,10 +9,11 @@ noncomputable section
 
 namespace Formalism.MainNotions.ElementDenominator.CongruenceModules
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
 
-theorem leg (l n : ℕ) (hp : l.Prime) (hl : l ≠ 2) :
-    ((n + padicValNat l n.factorial : ℕ) : ℝ) ≤ 3 / 2 * n := by
+theorem leg (l n : ℕ) (hp : l.Prime) (hl : l ≠ 2)
+    : ((n + padicValNat l n.factorial : ℕ) : ℝ) ≤ 3 / 2 * n := by
   have : Fact l.Prime := ⟨hp⟩
   have h3 : 3 ≤ l := by have := hp.two_le; omega
   have h1 := Nat.Prime.sub_one_mul_multiplicity_factorial (n := n) hp
@@ -24,8 +25,8 @@ theorem leg (l n : ℕ) (hp : l.Prime) (hl : l ≠ 2) :
   push_cast
   linarith
 
-theorem logA (l h h' S : ℕ) (h3 : 3 ≤ l) (h1 : 1 ≤ h') (h2 : h' ≤ h + S + 1) :
-    Real.logb l h' ≤ Real.logb l h + S + 1 := by
+theorem logA (l h h' S : ℕ) (h3 : 3 ≤ l) (h1 : 1 ≤ h') (h2 : h' ≤ h + S + 1)
+    : Real.logb l h' ≤ Real.logb l h + S + 1 := by
   have hL : (1 : ℝ) < l := by exact_mod_cast (by omega : 1 < l)
   have hpow : S + 1 < l ^ (S + 1) := Nat.lt_pow_self (by omega)
   have hp : Real.logb l ((l : ℝ) ^ (S + 1)) = S + 1 := by
@@ -44,7 +45,23 @@ theorem logA (l h h' S : ℕ) (h3 : 3 ≤ l) (h1 : 1 ≤ h') (h2 : h' ≤ h + S 
     linarith
 
 set_option maxHeartbeats 800000 in
-theorem Ynum : ∀ (l e s h h' S η : ℕ), l.Prime → l ≠ 2 → e * s = l - 1 → 1 ≤ h' → h' ≤ h + S + 1 → (((2 * (2 * ⌈(2 * e * h' : ℝ) / ((l : ℝ) - 1)⌉₊ - 1 + padicValNat l (2 * ⌈(2 * e * h' : ℝ) / ((l : ℝ) - 1)⌉₊ - 1).factorial) + 4 * (⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1 + padicValNat l (⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1).factorial) + e * (S + padicValNat l S.factorial + Nat.log l h') + max (2 * (⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1 + padicValNat l (⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1).factorial)) ⌈(η : ℝ) + 1 / 2 + Real.logb l h'⌉₊ : ℕ) : ℝ)) ≤ 80 * ((e : ℝ) * h / l + (e : ℝ) * S + (e : ℝ) * Real.logb l h + 1 + η) := by
+theorem Ynum
+    : ∀ (l e s h h' S η : ℕ),
+      l.Prime → l ≠ 2 → e * s = l - 1 → 1 ≤ h' → h' ≤ h + S + 1
+        → (((2 * (2 * ⌈(2 * e * h' : ℝ) / ((l : ℝ) - 1)⌉₊ - 1
+                  + padicValNat l (2 * ⌈(2 * e * h' : ℝ) / ((l : ℝ) - 1)⌉₊ - 1).factorial)
+                + 4
+                  * (⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1
+                    + padicValNat l (⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1).factorial)
+                + e * (S + padicValNat l S.factorial + Nat.log l h')
+                + max
+                  (2
+                    * (⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1
+                      + padicValNat l (⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1).factorial))
+                  ⌈(η : ℝ) + 1 / 2 + Real.logb l h'⌉₊
+              : ℕ)
+            : ℝ))
+          ≤ 80 * ((e : ℝ) * h / l + (e : ℝ) * S + (e : ℝ) * Real.logb l h + 1 + η) := by
   intro l e s h h' S η hp hl hes hh1 hh2
   have hl3 : 3 ≤ l := by have := hp.two_le; omega
   have he : 1 ≤ e := by
@@ -73,8 +90,7 @@ theorem Ynum : ∀ (l e s h h' S η : ℕ), l.Prime → l ≠ 2 → e * s = l - 
   have hx0 : 0 < x := by rw [hx]; positivity
   have hxs : x * s = h' := by rw [hx]; field_simp
   have hxp : x * (l - 1) = e * h' := by rw [← hES, ← hxs]; ring
-  have h1 : (2 * e * h' : ℝ) / (l - 1) = 2 * x := by
-    rw [div_eq_iff (by linarith)]; linarith
+  have h1 : (2 * e * h' : ℝ) / (l - 1) = 2 * x := by rw [div_eq_iff (by linarith)]; linarith
   have h2 : (4 * h' : ℝ) / s = 4 * x := by rw [hx]; ring
   rw [h1, h2]
   have ha1 : 1 ≤ ⌈2 * x⌉₊ := Nat.ceil_pos.mpr (by positivity)
@@ -137,7 +153,8 @@ theorem Ynum : ∀ (l e s h h' S η : ℕ), l.Prime → l ≠ 2 → e * s = l - 
   have k3 : (S : ℝ) ≤ e * S := le_mul_of_one_le_left hS0 hE
   have k4 : Real.logb l h ≤ e * Real.logb l h := le_mul_of_one_le_left hLh hE
   have k5 : 0 ≤ (e : ℝ) * u := by positivity
-  rw [Nat.cast_add, Nat.cast_add, Nat.cast_add, Nat.cast_mul, Nat.cast_mul, Nat.cast_mul, Nat.cast_add]
+  rw [Nat.cast_add, Nat.cast_add, Nat.cast_add, Nat.cast_mul, Nat.cast_mul, Nat.cast_mul,
+    Nat.cast_add]
   simp only [Nat.cast_ofNat]
   linarith
 
@@ -145,8 +162,8 @@ def sigA (l s h' : ℕ) : ℕ :=
   ⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1 + padicValNat l (⌈(4 * h' : ℝ) / (s : ℝ)⌉₊ - 1).factorial
 
 def rhoA (l e h' : ℕ) : ℕ :=
-  2 * ⌈(2 * e * h' : ℝ) / ((l : ℝ) - 1)⌉₊ - 1 +
-    padicValNat l (2 * ⌈(2 * e * h' : ℝ) / ((l : ℝ) - 1)⌉₊ - 1).factorial
+  2 * ⌈(2 * e * h' : ℝ) / ((l : ℝ) - 1)⌉₊ - 1
+    + padicValNat l (2 * ⌈(2 * e * h' : ℝ) / ((l : ℝ) - 1)⌉₊ - 1).factorial
 
 def kapA (l e h' S : ℕ) : ℕ := e * (S + padicValNat l S.factorial + Nat.log l h')
 
@@ -156,35 +173,44 @@ def YA (l e s h' S η : ℕ) : ℕ :=
   2 * rhoA l e h' + 4 * sigA l s h' + kapA l e h' S + max (2 * sigA l s h') (ycA l h' η)
 
 def expLift (l h : ℕ) (J : Finset ℤ) : ℕ :=
-  2 * (2 * (2 * h) + padicValNat l (2 * (2 * h)).factorial) +
-    ((∑ j ∈ J, (1 + padicValInt l j)) + h + padicValNat l h.factorial)
+  2 * (2 * (2 * h) + padicValNat l (2 * (2 * h)).factorial)
+    + ((∑ j ∈ J, (1 + padicValInt l j)) + h + padicValNat l h.factorial)
 
 def claimA {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K LL : FinExt l) : Prop :=
   ∀ (T₁ T₂ : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (F : LatHom T₁.L T₂.L) (r S η m h : ℕ)
-    (up : (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) → Bool) (b : (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) → ℕ),
-    HypA P K LL T₁ T₂ F r S η m h up b →
-    ∃ (s h' g : ℕ) (J : Finset ℤ), finrank ↥(K0 K) ↥K.1 * s = l - 1 ∧ 1 ≤ h' ∧ h' ≤ h + S + 1 ∧
-      J ⊆ Finset.Icc (-(h : ℤ)) (2 * h) ∧ (0 : ℤ) ∉ J ∧
-      g ≤ 2 * ((finrank ℚ_[l] ↥(K0 K) * finrank ↥(K0 K) ↥K.1 + 1) * r) ∧
-      TwoStep l g (finrank ℚ_[l] ↥(K0 K) * finrank ↥(K0 K) ↥K.1 * (finrank ↥(K0 K) ↥K.1 + 1) * m)
-        (YA l (finrank ↥(K0 K) ↥K.1) s h' S η) (expLift l h J)
-        (latticeFiniteCocycles (P.PD K) T₂.L) (latticeCoboundaries T₂.L) (F.ImF (P.PD K))
+      (up : (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) → Bool) (b : (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) → ℕ),
+    HypA P K LL T₁ T₂ F r S η m h up b
+      → ∃ (s h' g : ℕ) (J : Finset ℤ),
+        finrank ↥(K0 K) ↥K.1 * s = l - 1 ∧ 1 ≤ h' ∧ h' ≤ h + S + 1
+          ∧ J ⊆ Finset.Icc (-(h : ℤ)) (2 * h) ∧ (0 : ℤ) ∉ J
+          ∧ g ≤ 2 * ((finrank ℚ_[l] ↥(K0 K) * finrank ↥(K0 K) ↥K.1 + 1) * r)
+          ∧ TwoStep l g
+            (finrank ℚ_[l] ↥(K0 K) * finrank ↥(K0 K) ↥K.1 * (finrank ↥(K0 K) ↥K.1 + 1) * m)
+            (YA l (finrank ↥(K0 K) ↥K.1) s h' S η) (expLift l h J)
+            (latticeFiniteCocycles (P.PD K) T₂.L) (latticeCoboundaries T₂.L) (F.ImF (P.PD K))
 
 def LocalTheoremAtGoodExtensions (D : D7) : Prop :=
   ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ K LL : FinExt l, Good K 1 LL → claimA (D.loc l) K LL
 
-theorem thmA_of_claim {l : ℕ} [hp : Fact l.Prime] (P : LocPrime l) (K LL : FinExt l) (hl : l ≠ 2) (C : ℝ)
-    (hC : 160 ≤ C) (H : claimA P K LL) : thmA P K LL C := by
+theorem thmA_of_claim
+    {l : ℕ} [hp : Fact l.Prime]
+    (P : LocPrime l) (K LL : FinExt l)
+    (hl : l ≠ 2)
+    (C : ℝ) (hC : 160 ≤ C)
+    (H : claimA P K LL)
+    : thmA P K LL C := by
   intro T₁ T₂ F r S η m h up b h1 h2 h3 h4 h5 h6 h7 h8 h9
   obtain ⟨s, h', g, J, hes, hh1, hh2, hJ, h0, hg, hT⟩ :=
     H T₁ T₂ F r S η m h up b ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9⟩
   refine colLe_mono P K LL F ?_ (colLe_of_twoStep P K LL F _ _ _ _ hT)
   generalize finrank ℚ_[l] ↥(K0 K) = n at hg ⊢
   generalize finrank ↥(K0 K) ↥K.1 = e at hg hes ⊢
-  have hY : ((YA l e s h' S η : ℕ) : ℝ) ≤
-      80 * ((e : ℝ) * h / l + (e : ℝ) * S + (e : ℝ) * Real.logb l h + 1 + η) :=
+  have hY
+      : ((YA l e s h' S η : ℕ) : ℝ)
+        ≤ 80 * ((e : ℝ) * h / l + (e : ℝ) * S + (e : ℝ) * Real.logb l h + 1 + η) :=
     Ynum l e s h h' S η hp.out hl hes hh1 hh2
-  have hE : expLift l h J ≤ 18 * h := Formalism.IrreducibleCountingLemmas.WindowSums.valuationSumBound l h J hp.out hl hJ h0
+  have hE : expLift l h J ≤ 18 * h :=
+    Formalism.IrreducibleCountingLemmas.WindowSums.valuationSumBound l h J hp.out hl hJ h0
   have hE' : ((expLift l h J : ℕ) : ℝ) ≤ C * ((h : ℝ) + 1) := by
     have : ((expLift l h J : ℕ) : ℝ) ≤ 18 * (h : ℝ) := by exact_mod_cast hE
     have h0' : (0 : ℝ) ≤ h := Nat.cast_nonneg h
@@ -199,14 +225,17 @@ theorem thmA_of_claim {l : ℕ} [hp : Fact l.Prime] (P : LocPrime l) (K LL : Fin
     mul_le_mul hg' hY hY0 (by positivity)
   have e2 : 160 * ((((n : ℝ) * e + 1) * r) * B) ≤ C * ((((n : ℝ) * e + 1) * r) * B) :=
     mul_le_mul_of_nonneg_right hC (mul_nonneg hA0 hB0)
-  have e3 : ((n * e * (e + 1) * m : ℕ) : ℝ) * ((expLift l h J : ℕ) : ℝ) ≤
-      ((n * e * (e + 1) * m : ℕ) : ℝ) * (C * ((h : ℝ) + 1)) :=
+  have e3
+      : ((n * e * (e + 1) * m : ℕ) : ℝ) * ((expLift l h J : ℕ) : ℝ)
+        ≤ ((n * e * (e + 1) * m : ℕ) : ℝ) * (C * ((h : ℝ) + 1)) :=
     mul_le_mul_of_nonneg_left hE' (Nat.cast_nonneg _)
   push_cast at e3 ⊢
   nlinarith
 
-theorem local_theorem_of_good_extensions (D : D7) (C : ℝ) (hC : 160 ≤ C) (H : LocalTheoremAtGoodExtensions D) : Conclusion1 D C :=
-  fun l _ hl K LL hg => thmA_of_claim (D.loc l) K LL hl C hC (H l hl K LL hg)
+theorem local_theorem_of_good_extensions
+    (D : D7) (C : ℝ) (hC : 160 ≤ C) (H : LocalTheoremAtGoodExtensions D)
+    : Conclusion1 D C := fun l _ hl K LL hg =>
+  thmA_of_claim (D.loc l) K LL hl C hC (H l hl K LL hg)
 
 end Formalism.MainNotions.ElementDenominator.CongruenceModules
 

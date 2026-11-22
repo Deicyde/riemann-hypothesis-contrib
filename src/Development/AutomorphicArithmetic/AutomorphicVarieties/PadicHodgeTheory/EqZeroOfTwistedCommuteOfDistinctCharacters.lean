@@ -10,13 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Finit
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N GlobalTheory.WeilDeligne GlobalTheory.Pst Polynomial Module Matrix UpperTheory.V.W UpperTheory.V.Hi
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  Formalism.MainNotions.N GlobalTheory.WeilDeligne GlobalTheory.Pst Polynomial Module Matrix
+  UpperTheory.V.W UpperTheory.V.Hi
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem UpperTheory.linearIndependent_distinct_characters {Γ W ι : Type} [Group Γ] [AddCommGroup W] [Module ℂ W] [Fintype ι]
-    (ρ : Γ →* Module.End ℂ W) (χ : ι → Γ →* ℂˣ) (y : ι → W) (hy : ∀ i, y i ≠ 0)
-    (he : ∀ i σ, ρ σ (y i) = (χ i σ : ℂ) • y i) (hχ : Function.Injective χ) :
-    LinearIndependent ℂ y := by
+private theorem UpperTheory.linearIndependent_distinct_characters
+    {Γ W ι : Type} [Group Γ] [AddCommGroup W] [Module ℂ W] [Fintype ι]
+    (ρ : Γ →* Module.End ℂ W) (χ : ι → Γ →* ℂˣ) (y : ι → W)
+    (hy : ∀ i, y i ≠ 0) (he : ∀ i σ, ρ σ (y i) = (χ i σ : ℂ) • y i)
+    (hχ : Function.Injective χ)
+    : LinearIndependent ℂ y := by
   rw [Fintype.linearIndependent_iff]
   intro c hc i
   have hinj : Function.Injective (fun i => (Units.coeHom ℂ).comp (χ i)) := by
@@ -36,7 +41,8 @@ private theorem UpperTheory.linearIndependent_distinct_characters {Γ W ι : Typ
     rw [Finset.sum_apply, Pi.zero_apply, ← h1]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, he, map_smul, map_smul]
-    simp only [Pi.smul_apply, Function.comp_apply, MonoidHom.comp_apply, Units.coeHom_apply, smul_eq_mul]
+    simp only [Pi.smul_apply, Function.comp_apply, MonoidHom.comp_apply, Units.coeHom_apply,
+      smul_eq_mul]
     ring
   by_contra hci
   apply hy i
@@ -44,16 +50,23 @@ private theorem UpperTheory.linearIndependent_distinct_characters {Γ W ι : Typ
   intro φ
   exact (mul_eq_zero.mp (key φ)).resolve_left hci
 
-theorem UpperTheory.eq_zero_of_twisted_commute_of_distinct_characters :
-    ∀ {Γ W : Type} [Group Γ] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] {n : ℕ} (ρ : Γ →* Module.End ℂ W) (μ : Fin n → Γ →* ℂˣ) (ν : Γ →* ℂˣ) (N : Module.End ℂ W), Module.finrank ℂ W = n → (∀ j, ∃ y : W, y ≠ 0 ∧ ∀ σ, ρ σ y = (μ j σ : ℂ) • y) → Function.Injective μ → (∀ j k, μ j ≠ μ k * ν) → (∀ σ, ρ σ * N = (ν σ : ℂ) • (N * ρ σ)) → N = 0 := by
+theorem UpperTheory.eq_zero_of_twisted_commute_of_distinct_characters
+    : ∀ {Γ W : Type} [Group Γ] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] {n : ℕ}
+        (ρ : Γ →* Module.End ℂ W) (μ : Fin n → Γ →* ℂˣ) (ν : Γ →* ℂˣ) (N : Module.End ℂ W),
+      Module.finrank ℂ W = n → (∀ j, ∃ y : W, y ≠ 0 ∧ ∀ σ, ρ σ y = (μ j σ : ℂ) • y)
+        → Function.Injective μ → (∀ j k, μ j ≠ μ k * ν) → (∀ σ, ρ σ * N = (ν σ : ℂ) • (N * ρ σ))
+        → N = 0 := by
   intro Γ W _ _ _ _ n ρ μ ν N hn hy hμ hlink hN
   choose y hy0 hye using hy
-  have hli : LinearIndependent ℂ y := UpperTheory.linearIndependent_distinct_characters ρ μ y hy0 hye hμ
+  have hli : LinearIndependent ℂ y :=
+    UpperTheory.linearIndependent_distinct_characters ρ μ y hy0 hye hμ
   have hNy : ∀ k, N (y k) = 0 := by
     intro k
     by_contra hk
     have h2 : LinearIndependent ℂ (fun o : Option (Fin n) => o.elim (N (y k)) y) := by
-      refine UpperTheory.linearIndependent_distinct_characters ρ (fun o : Option (Fin n) => o.elim (μ k * ν) μ) _ ?_ ?_ ?_
+      refine UpperTheory.linearIndependent_distinct_characters ρ
+        (fun o : Option (Fin n) => o.elim (μ k * ν) μ)
+        _ ?_ ?_ ?_
       · rintro (_ | j)
         · exact hk
         · exact hy0 j

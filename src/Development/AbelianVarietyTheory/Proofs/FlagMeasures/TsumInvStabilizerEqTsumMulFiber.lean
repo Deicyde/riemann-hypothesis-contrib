@@ -10,10 +10,11 @@ namespace GlobalTheory
 
 open MulAction
 
-theorem encard_fiber_orbit_mul_stabilizer {Γ L Y : Type} [Group Γ] [MulAction Γ L] [MulAction Γ Y]
-    (π : L → Y) (hπ : ∀ (g : Γ) (x : L), π (g • x) = g • π x) (x : L) (y : Y) (g : Γ)
-    (hg : g • π x = y) :
-    ({z : L | π z = y ∧ z ∈ orbit Γ x}).encard * (stabilizer Γ x : Set Γ).encard
+theorem encard_fiber_orbit_mul_stabilizer
+    {Γ L Y : Type} [Group Γ] [MulAction Γ L] [MulAction Γ Y]
+    (π : L → Y) (hπ : ∀ (g : Γ) (x : L), π (g • x) = g • π x)
+    (x : L) (y : Y) (g : Γ) (hg : g • π x = y)
+    : ({z : L | π z = y ∧ z ∈ orbit Γ x}).encard * (stabilizer Γ x : Set Γ).encard
       = (stabilizer Γ y : Set Γ).encard := by
   classical
   have hx0 : π (g • x) = y := by rw [hπ, hg]
@@ -30,37 +31,52 @@ theorem encard_fiber_orbit_mul_stabilizer {Γ L Y : Type} [Group Γ] [MulAction 
     · rintro ⟨hz, k, rfl⟩
       have hk : k * g⁻¹ ∈ stabilizer Γ y := by
         rw [mem_stabilizer_iff]
-        calc (k * g⁻¹) • y = (k * g⁻¹) • g • π x := by rw [hg]
+        calc
+          (k * g⁻¹) • y
+            = (k * g⁻¹) • g • π x := by rw [hg]
           _ = π (k • x) := by rw [mul_smul, inv_smul_smul, hπ]
           _ = y := hz
       exact ⟨⟨k * g⁻¹, hk⟩, show (k * g⁻¹) • g • x = k • x by rw [mul_smul, inv_smul_smul]⟩
-  have e : stabilizer (stabilizer Γ y) (g • x) ≃ stabilizer Γ x :=
-    { toFun := fun s => ⟨g⁻¹ * ((s : stabilizer Γ y) : Γ) * g, by
+  have e : stabilizer (stabilizer Γ y) (g • x) ≃ stabilizer Γ x := {
+    toFun := fun s => ⟨
+      g⁻¹ * ((s : stabilizer Γ y) : Γ) * g,
+      by
         have hs : ((s : stabilizer Γ y) : Γ) • g • x = g • x := mem_stabilizer_iff.mp s.2
-        rw [mem_stabilizer_iff, mul_smul, mul_smul, hs, inv_smul_smul]⟩
-      invFun := fun t => ⟨⟨g * (t : Γ) * g⁻¹, by
+        rw [mem_stabilizer_iff, mul_smul, mul_smul, hs, inv_smul_smul]
+    ⟩
+    invFun := fun t => ⟨
+      ⟨
+        g * (t : Γ) * g⁻¹,
+        by
           have ht : (t : Γ) • x = x := mem_stabilizer_iff.mp t.2
-          rw [mem_stabilizer_iff, ← hg, mul_smul, mul_smul, inv_smul_smul, ← hπ, ht]⟩, by
-          have ht : (t : Γ) • x = x := mem_stabilizer_iff.mp t.2
-          show (g * (t : Γ) * g⁻¹) • g • x = g • x
-          rw [mul_smul, mul_smul, inv_smul_smul, ht]⟩
-      left_inv := fun s => by
-        apply Subtype.ext; apply Subtype.ext
-        show g * (g⁻¹ * ((s : stabilizer Γ y) : Γ) * g) * g⁻¹ = ((s : stabilizer Γ y) : Γ)
-        group
-      right_inv := fun t => by
-        apply Subtype.ext
-        show g⁻¹ * (g * (t : Γ) * g⁻¹) * g = (t : Γ)
-        group }
-  have key := ENat.card_congr
-    (Subgroup.groupEquivQuotientProdSubgroup (s := stabilizer (stabilizer Γ y) (g • x)))
+          rw [mem_stabilizer_iff, ← hg, mul_smul, mul_smul, inv_smul_smul, ← hπ, ht]
+      ⟩,
+      by
+        have ht : (t : Γ) • x = x := mem_stabilizer_iff.mp t.2
+        show (g * (t : Γ) * g⁻¹) • g • x = g • x
+        rw [mul_smul, mul_smul, inv_smul_smul, ht]
+    ⟩
+    left_inv := fun s => by
+      apply Subtype.ext
+      apply Subtype.ext
+      show g * (g⁻¹ * ((s : stabilizer Γ y) : Γ) * g) * g⁻¹ = ((s : stabilizer Γ y) : Γ)
+      group
+    right_inv := fun t => by
+      apply Subtype.ext
+      show g⁻¹ * (g * (t : Γ) * g⁻¹) * g = (t : Γ)
+      group
+  }
+  have key :=
+    ENat.card_congr (Subgroup.groupEquivQuotientProdSubgroup
+      (s := stabilizer (stabilizer Γ y) (g • x)))
   rw [ENat.card_prod, ← ENat.card_congr (orbitEquivQuotientStabilizer (stabilizer Γ y) (g • x)),
-    ENat.card_congr e] at key
+      ENat.card_congr e]
+    at key
   rw [← hset]
   exact key.symm
 
-theorem encard_eq_tsum_fibers {L Q : Type} (F : Set L) (q : L → Q) :
-    (F.encard : ℝ≥0∞) = ∑' o : Q, (({z | z ∈ F ∧ q z = o}).encard : ℝ≥0∞) := by
+theorem encard_eq_tsum_fibers {L Q : Type} (F : Set L) (q : L → Q)
+    : (F.encard : ℝ≥0∞) = ∑' o : Q, (({z | z ∈ F ∧ q z = o}).encard : ℝ≥0∞) := by
   classical
   have h1 : ∑' _ : F, (1 : ℝ≥0∞) = ∑' _ : (Σ o : Q, {z : F // q z = o}), (1 : ℝ≥0∞) :=
     ((Equiv.sigmaFiberEquiv (fun z : F => q z)).tsum_eq (fun _ => (1 : ℝ≥0∞))).symm
@@ -68,11 +84,12 @@ theorem encard_eq_tsum_fibers {L Q : Type} (F : Set L) (q : L → Q) :
   refine tsum_congr fun o => ?_
   simp only [ENNReal.tsum_one]
   congr 1
-  exact ENat.card_congr
-    { toFun := fun z => ⟨z.1.1, z.1.2, z.2⟩
-      invFun := fun z => ⟨⟨z.1, z.2.1⟩, z.2.2⟩
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+  exact ENat.card_congr {
+    toFun := fun z => ⟨z.1.1, z.1.2, z.2⟩
+    invFun := fun z => ⟨⟨z.1, z.2.1⟩, z.2.2⟩
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
 
 private lemma inv_coe_mul_mul_coe_eq_inv_coe (a b : ℕ∞) (h0 : a * b ≠ 0) (ht : a * b ≠ ⊤) :
     (((a * b : ℕ∞) : ℝ≥0∞))⁻¹ * (a : ℝ≥0∞) = (b : ℝ≥0∞)⁻¹ := by
@@ -99,27 +116,30 @@ private lemma quotient_mk_map_eq_of_mem_orbit {Γ L Y : Type} [Group Γ] [MulAct
   rw [hπ]
   exact mem_orbit _ g
 
-theorem tsum_inv_stabilizer_eq_tsum_mul_fiber {Γ L Y : Type} [Group Γ] [MulAction Γ L]
-    [MulAction Γ Y] (π : L → Y) (hπ : ∀ (g : Γ) (x : L), π (g • x) = g • π x)
-    (hfin : ∀ y : Y, (∃ x, π x = y) → Finite (MulAction.stabilizer Γ y)) :
-    (∑' o : MulAction.orbitRel.Quotient Γ L,
-        (((MulAction.stabilizer Γ o.out : Set Γ).encard : ℝ≥0∞))⁻¹)
+theorem tsum_inv_stabilizer_eq_tsum_mul_fiber
+    {Γ L Y : Type} [Group Γ] [MulAction Γ L] [MulAction Γ Y]
+    (π : L → Y) (hπ : ∀ (g : Γ) (x : L), π (g • x) = g • π x)
+    (hfin : ∀ y : Y, (∃ x, π x = y) → Finite (MulAction.stabilizer Γ y))
+    : (∑' o : MulAction.orbitRel.Quotient Γ L,
+          (((MulAction.stabilizer Γ o.out : Set Γ).encard : ℝ≥0∞))⁻¹)
       = ∑' o : MulAction.orbitRel.Quotient Γ Y,
         (((MulAction.stabilizer Γ o.out : Set Γ).encard : ℝ≥0∞))⁻¹
           * (((π ⁻¹' {o.out}).encard : ℝ≥0∞)) := by
   classical
   set φ : orbitRel.Quotient Γ L → orbitRel.Quotient Γ Y :=
     fun o => Quotient.mk (orbitRel Γ Y) (π o.out) with hφ
-  have hsplit := ((Equiv.sigmaFiberEquiv φ).tsum_eq
-      (fun o : orbitRel.Quotient Γ L => (((stabilizer Γ o.out : Set Γ).encard : ℝ≥0∞))⁻¹)).symm.trans
-    (ENNReal.tsum_sigma' _)
+  have hsplit :=
+    ((Equiv.sigmaFiberEquiv φ).tsum_eq (fun o : orbitRel.Quotient Γ L =>
+      (((stabilizer Γ o.out : Set Γ).encard : ℝ≥0∞))⁻¹)).symm.trans (ENNReal.tsum_sigma' _)
   refine hsplit.trans (tsum_congr fun O => ?_)
   change ∑' o : {o // φ o = O}, (((stabilizer Γ o.1.out : Set Γ).encard : ℝ≥0∞))⁻¹ = _
-  have hsupp : Function.support (fun o : orbitRel.Quotient Γ L =>
-      ((({z | z ∈ π ⁻¹' {O.out} ∧ Quotient.mk (orbitRel Γ L) z = o}).encard : ℕ∞) : ℝ≥0∞))
-      ⊆ {o | φ o = O} := by
+  have hsupp
+      : Function.support (fun o : orbitRel.Quotient Γ L =>
+          ((({z | z ∈ π ⁻¹' {O.out} ∧ Quotient.mk (orbitRel Γ L) z = o}).encard : ℕ∞) : ℝ≥0∞))
+        ⊆ {o | φ o = O} := by
     intro o ho
-    obtain ⟨z, hz, hzo⟩ : ({z | z ∈ π ⁻¹' {O.out} ∧ Quotient.mk (orbitRel Γ L) z = o}).Nonempty := by
+    obtain ⟨z, hz, hzo⟩
+        : ({z | z ∈ π ⁻¹' {O.out} ∧ Quotient.mk (orbitRel Γ L) z = o}).Nonempty := by
       rw [← Set.encard_pos, pos_iff_ne_zero]
       intro h0
       exact ho (by simp only [h0, ENat.toENNReal_zero])
@@ -139,8 +159,9 @@ theorem tsum_inv_stabilizer_eq_tsum_mul_fiber {Γ L Y : Type} [Group Γ] [MulAct
     exact o.2
   obtain ⟨h, hh⟩ : π o.1.out ∈ orbit Γ O.out := orbitRel_apply.mp (Quotient.exact hx)
   have hg : h⁻¹ • π o.1.out = O.out := by rw [← hh, inv_smul_smul]
-  have hF : {z | z ∈ π ⁻¹' {O.out} ∧ Quotient.mk (orbitRel Γ L) z = o.1}
-      = {z : L | π z = O.out ∧ z ∈ orbit Γ o.1.out} := by
+  have hF
+      : {z | z ∈ π ⁻¹' {O.out} ∧ Quotient.mk (orbitRel Γ L) z = o.1}
+        = {z : L | π z = O.out ∧ z ∈ orbit Γ o.1.out} := by
     ext z
     simp only [Set.mem_ofPred_eq, Set.mem_preimage, Set.mem_singleton_iff]
     refine and_congr Iff.rfl ⟨fun hz => ?_, fun hz => ?_⟩

@@ -9,9 +9,9 @@ open Finset
 
 namespace GlobalTheory
 
-theorem exceptional_primes_finite_card_le (n m : ℕ) (hn : n ≠ 0) (hm : n < m) :
-    Set.Finite {ℓ : ℕ | ℓ.Prime ∧ m < ℓ ^ (4 * padicValNat ℓ n)} ∧
-      Set.ncard {ℓ : ℕ | ℓ.Prime ∧ m < ℓ ^ (4 * padicValNat ℓ n)} ≤ 3 := by
+theorem exceptional_primes_finite_card_le (n m : ℕ) (hn : n ≠ 0) (hm : n < m)
+    : Set.Finite {ℓ : ℕ | ℓ.Prime ∧ m < ℓ ^ (4 * padicValNat ℓ n)}
+      ∧ Set.ncard {ℓ : ℕ | ℓ.Prime ∧ m < ℓ ^ (4 * padicValNat ℓ n)} ≤ 3 := by
   classical
   set F : Finset ℕ := n.primeFactors.filter (fun ℓ => m < ℓ ^ (4 * padicValNat ℓ n)) with hF
   have hS : {ℓ : ℕ | ℓ.Prime ∧ m < ℓ ^ (4 * padicValNat ℓ n)} = (F : Set ℕ) := by
@@ -54,8 +54,11 @@ theorem exceptional_primes_finite_card_le (n m : ℕ) (hn : n ≠ 0) (hm : n < m
 
 theorem exceptional_set_count : Formalism.CyclotomicNorms.BBCount := by
   intro g hg
-  have key : ∀ d : ℕ, 1 ≤ d → Set.Finite {ℓ | Formalism.CyclotomicNorms.Exc g d ℓ} ∧
-      Set.ncard {ℓ | Formalism.CyclotomicNorms.Exc g d ℓ} ≤ 3 := by
+  have key
+      : ∀ d : ℕ,
+        1 ≤ d
+          → Set.Finite {ℓ | Formalism.CyclotomicNorms.Exc g d ℓ}
+            ∧ Set.ncard {ℓ | Formalism.CyclotomicNorms.Exc g d ℓ} ≤ 3 := by
     intro d hd
     have h1 : 1 < g ^ d := Nat.one_lt_pow (by omega) (by omega)
     exact exceptional_primes_finite_card_le (g ^ d - 1) (g ^ d) (by omega) (by omega)
@@ -73,7 +76,8 @@ theorem exceptional_set_count : Formalism.CyclotomicNorms.BBCount := by
     rw [this]
     simp
   | succ N ih =>
-    have : Formalism.CyclotomicNorms.BB (N + 1) g = Formalism.CyclotomicNorms.BB N g ∪ {ℓ | Formalism.CyclotomicNorms.Exc g (N + 1) ℓ} := by
+    have : Formalism.CyclotomicNorms.BB (N + 1) g
+        = Formalism.CyclotomicNorms.BB N g ∪ {ℓ | Formalism.CyclotomicNorms.Exc g (N + 1) ℓ} := by
       ext ℓ
       simp only [Formalism.CyclotomicNorms.BB, Set.mem_union, Set.mem_ofPred_eq]
       constructor
@@ -90,7 +94,9 @@ theorem exceptional_set_count : Formalism.CyclotomicNorms.BBCount := by
     rw [this]
     obtain ⟨hf, hc⟩ := key (N + 1) (by omega)
     refine ⟨ih.1.union hf, ?_⟩
-    have := Set.ncard_union_le (Formalism.CyclotomicNorms.BB N g) {ℓ | Formalism.CyclotomicNorms.Exc g (N + 1) ℓ}
+    have :=
+      Set.ncard_union_le (Formalism.CyclotomicNorms.BB N g)
+        {ℓ | Formalism.CyclotomicNorms.Exc g (N + 1) ℓ}
     have := ih.2
     omega
 

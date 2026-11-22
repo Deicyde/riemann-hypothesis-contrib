@@ -22,18 +22,18 @@ noncomputable def incl (p : ℕ) [Fact p.Prime] : ℤ_[p] →+* ℂ_[p] :=
 theorem continuous_incl : Continuous (incl p) :=
   (continuous_algebraMap ℚ_[p] ℂ_[p]).comp continuous_subtype_val
 
-theorem factorial_mul_binomC (k : ℕ) (x : ℤ_[p]) :
-    (k.factorial : ℂ_[p]) * binomC k x
-      = incl p (Polynomial.aeval x (descPochhammer ℤ k)) := by
+theorem factorial_mul_binomC (k : ℕ) (x : ℤ_[p])
+    : (k.factorial : ℂ_[p]) * binomC k x = incl p (Polynomial.aeval x (descPochhammer ℤ k)) := by
   have h1 : binomC k x = incl p (Ring.choose x k) := rfl
   have h2 := Ring.descPochhammer_eq_factorial_smul_choose x k
   rw [← Polynomial.aeval_eq_smeval] at h2
   rw [h1, h2, nsmul_eq_mul, map_mul, map_natCast]
 
-theorem exists_mahler_expansion {E : Type*} [NormedAddCommGroup E] [NormedSpace ℚ_[p] E]
-    [IsUltrametricDist E] [CompleteSpace E] (f : C(ℤ_[p], E)) :
-    ∃ t : ℕ → C(ℤ_[p], E), HasSum t f ∧
-      ∀ n, ∃ a : E, ∀ x, t n x = ((mahler n x : ℤ_[p]) : ℚ_[p]) • a := by
+theorem exists_mahler_expansion
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℚ_[p] E] [IsUltrametricDist E] [CompleteSpace E]
+    (f : C(ℤ_[p], E))
+    : ∃ t : ℕ → C(ℤ_[p], E),
+      HasSum t f ∧ ∀ n, ∃ a : E, ∀ x, t n x = ((mahler n x : ℤ_[p]) : ℚ_[p]) • a := by
   letI : Module ℤ_[p] E := Module.compHom E (algebraMap ℤ_[p] ℚ_[p])
   haveI : IsBoundedSMul ℤ_[p] E := IsBoundedSMul.of_norm_smul_le fun r x =>
     norm_smul_le (r : ℚ_[p]) x
@@ -42,9 +42,11 @@ theorem exists_mahler_expansion {E : Type*} [NormedAddCommGroup E] [NormedSpace 
 variable {Z : Type} [TopologicalSpace Z] [CompactSpace Z]
 
 omit [CompactSpace Z] in
-theorem binomC_comp_mem (S : Subalgebra ℂ_[p] C(Z, ℂ_[p])) (φ : C(Z, ℤ_[p]))
-    (X : C(Z, ℂ_[p])) (hX : ∀ z, X z = incl p (φ z)) (hS : X ∈ S) (k : ℕ) :
-    (binomC k).comp φ ∈ S := by
+theorem binomC_comp_mem
+    (S : Subalgebra ℂ_[p] C(Z, ℂ_[p])) (φ : C(Z, ℤ_[p])) (X : C(Z, ℂ_[p]))
+    (hX : ∀ z, X z = incl p (φ z)) (hS : X ∈ S)
+    (k : ℕ)
+    : (binomC k).comp φ ∈ S := by
   have hmem : ∀ P : Polynomial ℤ, ∃ G ∈ S, ∀ z, G z = incl p (Polynomial.aeval (φ z) P) := by
     intro P
     induction P using Polynomial.induction_on' with
@@ -64,21 +66,24 @@ theorem binomC_comp_mem (S : Subalgebra ℂ_[p] C(Z, ℂ_[p])) (φ : C(Z, ℤ_[p
   rw [this]
   exact S.smul_mem hG _
 
-noncomputable def evalAlong {Y : Type} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
-    (φ : C(Z, ℤ_[p])) (ψ : C(Z, Y)) :
-    C(ℤ_[p], C(Y, ℂ_[p])) →L[ℂ_[p]] C(Z, ℂ_[p]) :=
+noncomputable def evalAlong
+    {Y : Type} [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] (φ : C(Z, ℤ_[p])) (ψ : C(Z, Y))
+    : C(ℤ_[p], C(Y, ℂ_[p])) →L[ℂ_[p]] C(Z, ℂ_[p]) :=
   LinearMap.mkContinuous
-    { toFun := fun G => ⟨fun z => G (φ z) (ψ z), by fun_prop⟩
+    {
+      toFun := fun G => ⟨fun z => G (φ z) (ψ z), by fun_prop⟩
       map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl } 1 (fun G => by
+      map_smul' := fun _ _ => rfl
+    }
+    1
+    (fun G => by
       rw [one_mul, ContinuousMap.norm_le _ (norm_nonneg _)]
       intro z
       exact ((G (φ z)).norm_coe_le_norm _).trans (G.norm_coe_le_norm _))
 
-theorem comp_mem (S : Subalgebra ℂ_[p] C(Z, ℂ_[p])) (hS : IsClosed (S : Set C(Z, ℂ_[p])))
-    (g : ℕ) : ∀ (φ : C(Z, Fin g → ℤ_[p])),
-      (∀ i, ∃ X ∈ S, ∀ z, X z = incl p (φ z i)) →
-      ∀ F : C(Fin g → ℤ_[p], ℂ_[p]), F.comp φ ∈ S := by
+theorem comp_mem (S : Subalgebra ℂ_[p] C(Z, ℂ_[p])) (hS : IsClosed (S : Set C(Z, ℂ_[p]))) (g : ℕ)
+    : ∀ (φ : C(Z, Fin g → ℤ_[p])),
+      (∀ i, ∃ X ∈ S, ∀ z, X z = incl p (φ z i)) → ∀ F : C(Fin g → ℤ_[p], ℂ_[p]), F.comp φ ∈ S := by
   induction g with
   | zero =>
     intro φ _ F
@@ -110,7 +115,11 @@ theorem comp_mem (S : Subalgebra ℂ_[p] C(Z, ℂ_[p])) (hS : IsClosed (S : Set 
     obtain ⟨X, hX, hX'⟩ := hφ 0
     exact S.mul_mem (binomC_comp_mem S φ0 X hX' hX n) (ih ψ (fun i => hφ i.succ) a)
 
-theorem eq_zero_of_monomials : ∀ (p r : ℕ) [Fact p.Prime] (μ : C(Fin r → ℤ_[p], ℂ_[p]) →L[ℂ_[p]] ℂ_[p]), (∀ (m : ℕ) (k : Fin m → Fin r) (g : C(Fin r → ℤ_[p], ℂ_[p])), (∀ a, g a = ∏ j, zc (a (k j))) → μ g = 0) → μ = 0 := by
+theorem eq_zero_of_monomials
+    : ∀ (p r : ℕ) [Fact p.Prime] (μ : C(Fin r → ℤ_[p], ℂ_[p]) →L[ℂ_[p]] ℂ_[p]),
+      (∀ (m : ℕ) (k : Fin m → Fin r) (g : C(Fin r → ℤ_[p], ℂ_[p])),
+          (∀ a, g a = ∏ j, zc (a (k j))) → μ g = 0)
+        → μ = 0 := by
   intro p r _ μ hμ
   let X : Fin r → C(Fin r → ℤ_[p], ℂ_[p]) := fun i =>
     ⟨fun a => incl p (a i), continuous_incl.comp (continuous_apply i)⟩
@@ -133,8 +142,10 @@ theorem eq_zero_of_monomials : ∀ (p r : ℕ) [Fact p.Prime] (μ : C(Fin r → 
     obtain ⟨m, k, hk⟩ := this
     exact hμ m k g hk
   ext F
-  have hF := comp_mem A.topologicalClosure A.isClosed_topologicalClosure r (ContinuousMap.id _)
-    (fun i => ⟨X i, A.le_topologicalClosure (Algebra.subset_adjoin ⟨i, rfl⟩), fun _ => rfl⟩) F
+  have hF :=
+    comp_mem A.topologicalClosure A.isClosed_topologicalClosure r (ContinuousMap.id _)
+      (fun i => ⟨X i, A.le_topologicalClosure (Algebra.subset_adjoin ⟨i, rfl⟩), fun _ => rfl⟩)
+      F
   have hcl : closure (A : Set C(Fin r → ℤ_[p], ℂ_[p])) ⊆ {f | μ f = 0} :=
     closure_minimal hA (isClosed_eq μ.continuous continuous_const)
   exact hcl hF

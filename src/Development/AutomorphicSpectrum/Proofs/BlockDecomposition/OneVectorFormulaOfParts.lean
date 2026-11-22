@@ -6,7 +6,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 open PositivityTheory.Rg.Mass
 
@@ -20,8 +21,9 @@ theorem anisotropic_binary_one_vector_formula : Prop1 → Simil → Hasse → Cn
   have hsph : {X : Fin 1 → Fin 2 → E | gramE σ J X = fun _ _ => algebraMap F E β} = sph σ J β := rfl
   rw [hsph]
   obtain ⟨c, hc⟩ := hP F E σ J d b li lam μ 𝓕 mi m hcm hJ hA hli hlam hμ h𝓕 hmi hm β hβ0
-  by_cases h0 : mi (hermScal (Ainf F) σ (algebraMap F _ β)) = 0 ∨
-      ∃ v, m v (hermScal (Fv F v) σ (algebraMap F _ β)) = 0
+  by_cases h0
+    : mi (hermScal (Ainf F) σ (algebraMap F _ β)) = 0
+      ∨ ∃ v, m v (hermScal (Fv F v) σ (algebraMap F _ β)) = 0
   · rw [(GlobalTheory.T.euler_product_measure_zero F E σ hcm d b 1 2 _ c _ _).2.1 hc h0]
     exact (GlobalTheory.T.euler_product_measure_zero F E σ hcm d b 1 2 0 1 _ _).2.2 hc.1 hc.2.1 h0
   push Not at h0
@@ -40,7 +42,8 @@ theorem anisotropic_binary_one_vector_formula : Prop1 → Simil → Hasse → Cn
         simp [thetaMeas]
       unfold EP
       rw [ht]
-      exact (GlobalTheory.T.euler_product_measure_zero F E σ hcm d b 1 2 0 c _ _).2.2 hc'.1 hc'.2.1 (Or.inl hz)
+      exact (GlobalTheory.T.euler_product_measure_zero F E σ hcm d b 1 2 0 c _ _).2.2 hc'.1 hc'.2.1
+        (Or.inl hz)
   have h1 : c = 1 := hC F E σ J d b li lam μ 𝓕 mi m hcm hJ hA hli hlam hμ h𝓕 hmi hm c hall
   exact h1 ▸ hc
 

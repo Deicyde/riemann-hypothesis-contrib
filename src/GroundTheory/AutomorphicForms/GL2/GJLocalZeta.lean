@@ -16,14 +16,15 @@ namespace GodementJacquet
 
 open Matrix GLnLocal Parabolic MeasureTheory Polynomial
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   {n : ℕ} [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)]
   {V : Type*} [AddCommGroup V] [Module ℂ V]
 
 section RatFunc
 
-theorem exists_eval_ne_zero {Q : ℂ[X]} (hQ : Q ≠ 0) :
-    ∃ ε > 0, ∀ x : ℂ, x ≠ 0 → ‖x‖ < ε → Q.eval x ≠ 0 := by
+theorem exists_eval_ne_zero {Q : ℂ[X]} (hQ : Q ≠ 0)
+    : ∃ ε > 0, ∀ x : ℂ, x ≠ 0 → ‖x‖ < ε → Q.eval x ≠ 0 := by
   classical
   set S : Finset ℝ := ((Q.roots.toFinset).filter (· ≠ 0)).image (‖·‖)
   by_cases hS : S.Nonempty
@@ -31,19 +32,30 @@ theorem exists_eval_ne_zero {Q : ℂ[X]} (hQ : Q ≠ 0) :
     · obtain ⟨y, hy, hyeq⟩ := Finset.mem_image.1 (S.min'_mem hS)
       rw [← hyeq]
       exact norm_pos_iff.2 (Finset.mem_filter.1 hy).2
-    · have hmem : ‖x‖ ∈ S := Finset.mem_image.2 ⟨x, Finset.mem_filter.2
-        ⟨Multiset.mem_toFinset.2 ((mem_roots hQ).2 hQx), hx⟩, rfl⟩
+    · have hmem : ‖x‖ ∈ S :=
+        Finset.mem_image.2
+          ⟨x, Finset.mem_filter.2 ⟨Multiset.mem_toFinset.2 ((mem_roots hQ).2 hQx), hx⟩, rfl⟩
       exact absurd (S.min'_le _ hmem) (not_le.2 hxε)
-  · refine ⟨1, one_pos, fun x hx _ hQx => hS ⟨‖x‖, Finset.mem_image.2 ⟨x, Finset.mem_filter.2
-      ⟨Multiset.mem_toFinset.2 ((mem_roots hQ).2 hQx), hx⟩, rfl⟩⟩⟩
+  · refine ⟨
+      1,
+      one_pos,
+      fun x hx _ hQx =>
+        hS ⟨
+          ‖x‖,
+          Finset.mem_image.2
+            ⟨x, Finset.mem_filter.2 ⟨Multiset.mem_toFinset.2 ((mem_roots hQ).2 hQx), hx⟩, rfl⟩
+        ⟩
+    ⟩
 
-theorem exists_eval_denom_ne_zero (R : RatFunc ℂ) :
-    ∃ ε > 0, ∀ x : ℂ, x ≠ 0 → ‖x‖ < ε → R.denom.eval x ≠ 0 :=
+theorem exists_eval_denom_ne_zero (R : RatFunc ℂ)
+    : ∃ ε > 0, ∀ x : ℂ, x ≠ 0 → ‖x‖ < ε → R.denom.eval x ≠ 0 :=
   exists_eval_ne_zero R.denom_ne_zero
 
-theorem exists_eval_mul (R₁ R₂ : RatFunc ℂ) :
-    ∃ ε > 0, ∀ x : ℂ, x ≠ 0 → ‖x‖ < ε →
-      (R₁ * R₂).eval (RingHom.id ℂ) x = R₁.eval (RingHom.id ℂ) x * R₂.eval (RingHom.id ℂ) x := by
+theorem exists_eval_mul (R₁ R₂ : RatFunc ℂ)
+    : ∃ ε > 0, ∀ x : ℂ,
+      x ≠ 0 → ‖x‖ < ε
+        → (R₁ * R₂).eval (RingHom.id ℂ) x
+          = R₁.eval (RingHom.id ℂ) x * R₂.eval (RingHom.id ℂ) x := by
   obtain ⟨ε₁, hε₁, h₁⟩ := exists_eval_denom_ne_zero R₁
   obtain ⟨ε₂, hε₂, h₂⟩ := exists_eval_denom_ne_zero R₂
   refine ⟨min ε₁ ε₂, lt_min hε₁ hε₂, fun x hx hxε => ?_⟩
@@ -53,37 +65,41 @@ theorem exists_eval_mul (R₁ R₂ : RatFunc ℂ) :
 end RatFunc
 
 theorem qs_add (a b : ℂ) : qs F (a + b) = qs F a * qs F b := by
-  rw [qs, qs, qs, neg_add, Complex.cpow_add _ _
-    (Nat.cast_ne_zero.2 LocalField.residueCard_ne_zero)]
+  rw [qs, qs, qs, neg_add, Complex.cpow_add _ _ (Nat.cast_ne_zero.2 LocalField.residueCard_ne_zero)]
 
-theorem exists_qs_of_small (S : ℝ) : ∃ ε > 0, ∀ x : ℂ, x ≠ 0 → ‖x‖ < ε →
-    ∃ s : ℂ, S < s.re ∧ qs F s = x := by
+theorem exists_qs_of_small (S : ℝ)
+    : ∃ ε > 0, ∀ x : ℂ, x ≠ 0 → ‖x‖ < ε → ∃ s : ℂ, S < s.re ∧ qs F s = x := by
   have hq : (1 : ℝ) < LocalField.residueCard F := by
     exact_mod_cast LocalField.one_lt_residueCard (K := F)
-  refine ⟨(LocalField.residueCard F : ℝ) ^ (-S), Real.rpow_pos_of_pos (by linarith) _,
-    fun x hx hxε => ?_⟩
+  refine ⟨
+    (LocalField.residueCard F : ℝ) ^ (-S),
+    Real.rpow_pos_of_pos (by linarith) _,
+    fun x hx hxε => ?_
+  ⟩
   obtain ⟨s, hs, hre⟩ := exists_qs_eq (F := F) hx
   refine ⟨s, ?_, hs⟩
   rw [hre]
-  have h1 : Real.logb (LocalField.residueCard F) ‖x‖ <
-      Real.logb (LocalField.residueCard F) ((LocalField.residueCard F : ℝ) ^ (-S)) :=
+  have h1
+      : Real.logb (LocalField.residueCard F) ‖x‖
+        < Real.logb (LocalField.residueCard F) ((LocalField.residueCard F : ℝ) ^ (-S)) :=
     Real.logb_lt_logb hq (norm_pos_iff.2 hx) hxε
   rw [Real.logb_rpow (by linarith) hq.ne'] at h1
   linarith
 
-def zetaIntegral (μ : Measure (GL (Fin n) F)) (Φ : Matrix (Fin n) (Fin n) F → ℂ)
-    (f : GL (Fin n) F → ℂ) (s : ℂ) : ℂ :=
+def zetaIntegral
+    (μ : Measure (GL (Fin n) F)) (Φ : Matrix (Fin n) (Fin n) F → ℂ) (f : GL (Fin n) F → ℂ) (s : ℂ)
+    : ℂ :=
   ∫ g, Φ (g : Matrix (Fin n) (Fin n) F) * f g * detPow g (s + ((n : ℂ) - 1) / 2) ∂μ
 
-def zetaSet (π : Representation ℂ (GL (Fin n) F) V) (μ : Measure (GL (Fin n) F)) :
-    Set (RatFunc ℂ) :=
+def zetaSet (π : Representation ℂ (GL (Fin n) F) V) (μ : Measure (GL (Fin n) F))
+    : Set (RatFunc ℂ) :=
   {R | ∃ (Φ : Matrix (Fin n) (Fin n) F → ℂ) (v : V) (ℓ : Module.Dual ℂ V),
     IsSchwartzBruhat Φ ∧ ℓ ∈ smoothVectors (Representation.dual π) ∧
       ∃ s₀ : ℝ, ∀ s : ℂ, s₀ < s.re →
         zetaIntegral μ Φ (matrixCoeff π v ℓ) s = R.eval (RingHom.id ℂ) (qs F s)}
 
-def zetaIdeal (π : Representation ℂ (GL (Fin n) F) V) (μ : Measure (GL (Fin n) F)) :
-    Submodule ℂ (RatFunc ℂ) :=
+def zetaIdeal (π : Representation ℂ (GL (Fin n) F) V) (μ : Measure (GL (Fin n) F))
+    : Submodule ℂ (RatFunc ℂ) :=
   Submodule.span ℂ (zetaSet π μ)
 
 variable {π : Representation ℂ (GL (Fin n) F) V}
@@ -91,18 +107,26 @@ variable {π : Representation ℂ (GL (Fin n) F) V}
 theorem re_shift (s : ℂ) : (s + ((n : ℂ) - 1) / 2).re = s.re + ((n : ℝ) - 1) / 2 := by
   simp [Complex.add_re, Complex.sub_re]
 
-theorem exists_zeta_rat [π.IsIrreducible] (hπ : IsAdmissible π) (μ : Measure (GL (Fin n) F))
-    [μ.IsHaarMeasure] :
-    ∃ s₀ : ℝ, ∃ D : ℂ[X], D.eval 0 = 1 ∧ (∀ s : ℂ, s₀ < s.re → D.eval (qs F s) ≠ 0) ∧
-      ∀ Φ : Matrix (Fin n) (Fin n) F → ℂ, IsSchwartzBruhat Φ → ∀ (v : V) (ℓ : Module.Dual ℂ V),
-        ℓ ∈ smoothVectors (Representation.dual π) →
-        (∀ s : ℂ, s₀ < s.re → Integrable (fun g : GL (Fin n) F =>
-          Φ (g : Matrix (Fin n) (Fin n) F) * matrixCoeff π v ℓ g *
-            detPow g (s + ((n : ℂ) - 1) / 2)) μ) ∧
-        ∃ (N : ℕ) (P : ℂ[X]), ∀ s : ℂ, s₀ < s.re →
-          zetaIntegral μ Φ (matrixCoeff π v ℓ) s =
-            (algebraMap ℂ[X] (RatFunc ℂ) P / algebraMap ℂ[X] (RatFunc ℂ) (X ^ N * D)).eval
-              (RingHom.id ℂ) (qs F s) := by
+theorem exists_zeta_rat
+    [π.IsIrreducible] (hπ : IsAdmissible π) (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    : ∃ s₀ : ℝ, ∃ D : ℂ[X],
+      D.eval 0 = 1 ∧ (∀ s : ℂ, s₀ < s.re → D.eval (qs F s) ≠ 0)
+        ∧ ∀ Φ : Matrix (Fin n) (Fin n) F → ℂ,
+          IsSchwartzBruhat Φ
+            → ∀ (v : V) (ℓ : Module.Dual ℂ V),
+              ℓ ∈ smoothVectors (Representation.dual π)
+                → (∀ s : ℂ,
+                    s₀ < s.re
+                      → Integrable
+                        (fun g : GL (Fin n) F =>
+                          Φ (g : Matrix (Fin n) (Fin n) F) * matrixCoeff π v ℓ g
+                            * detPow g (s + ((n : ℂ) - 1) / 2))
+                        μ)
+                  ∧ ∃ (N : ℕ) (P : ℂ[X]), ∀ s : ℂ,
+                    s₀ < s.re
+                      → zetaIntegral μ Φ (matrixCoeff π v ℓ) s
+                        = (algebraMap ℂ[X] (RatFunc ℂ) P / algebraMap ℂ[X] (RatFunc ℂ)
+                          (X ^ N * D)).eval (RingHom.id ℂ) (qs F s) := by
   obtain ⟨s₀, D, hD0, hcore⟩ := exists_zeta_core hπ μ
   set c : ℂ := qs F (((n : ℂ) - 1) / 2) with hcdef
   have hc : c ≠ 0 := qs_ne_zero _
@@ -111,13 +135,14 @@ theorem exists_zeta_rat [π.IsIrreducible] (hπ : IsAdmissible π) (μ : Measure
   have hD'ne : D' ≠ 0 := fun h => by rw [h, eval_zero] at hD'0; exact zero_ne_one hD'0
   obtain ⟨ε, hε, hεD⟩ := exists_eval_ne_zero hD'ne
   obtain ⟨s₁, hs₁⟩ := exists_re_of_norm_qs_lt (F := F) hε
-  have hre : ∀ s : ℂ, max (s₀ - ((n : ℝ) - 1) / 2) s₁ < s.re →
-      s₀ < (s + ((n : ℂ) - 1) / 2).re := fun s hs => by
+  have hre
+      : ∀ s : ℂ,
+        max (s₀ - ((n : ℝ) - 1) / 2) s₁ < s.re → s₀ < (s + ((n : ℂ) - 1) / 2).re := fun s hs => by
     have := (le_max_left _ _).trans_lt hs
     rw [re_shift]
     linarith
-  have hDs : ∀ s : ℂ, max (s₀ - ((n : ℝ) - 1) / 2) s₁ < s.re → D'.eval (qs F s) ≠ 0 :=
-    fun s hs => hεD _ (qs_ne_zero s) (hs₁ s ((le_max_right _ _).trans_lt hs))
+  have hDs : ∀ s : ℂ, max (s₀ - ((n : ℝ) - 1) / 2) s₁ < s.re → D'.eval (qs F s) ≠ 0 := fun s hs =>
+    hεD _ (qs_ne_zero s) (hs₁ s ((le_max_right _ _).trans_lt hs))
   refine ⟨max (s₀ - ((n : ℝ) - 1) / 2) s₁, D', hD'0, hDs, fun Φ hΦ v ℓ hℓ => ?_⟩
   obtain ⟨hint, N, P, hP⟩ := hcore Φ hΦ v ℓ hℓ
   refine ⟨fun s hs => hint _ (hre s hs), N, C (c ^ N)⁻¹ * P.comp (C c * X), fun s hs => ?_⟩
@@ -139,52 +164,71 @@ theorem exists_zeta_rat [π.IsIrreducible] (hπ : IsAdmissible π) (μ : Measure
   rw [mul_comm c (qs F s), mul_pow]
   field_simp
 
-theorem exists_integrable_zetaIntegral [π.IsIrreducible] (hπ : IsAdmissible π)
-    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] :
-    ∃ s₀ : ℝ, ∀ Φ : Matrix (Fin n) (Fin n) F → ℂ, IsSchwartzBruhat Φ → ∀ (v : V) (ℓ : Module.Dual ℂ V),
-      ℓ ∈ smoothVectors (Representation.dual π) → ∀ s : ℂ, s₀ < s.re →
-        Integrable (fun g : GL (Fin n) F => Φ (g : Matrix (Fin n) (Fin n) F) * matrixCoeff π v ℓ g *
-          detPow g (s + ((n : ℂ) - 1) / 2)) μ := by
+theorem exists_integrable_zetaIntegral
+    [π.IsIrreducible] (hπ : IsAdmissible π) (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    : ∃ s₀ : ℝ, ∀ Φ : Matrix (Fin n) (Fin n) F → ℂ,
+      IsSchwartzBruhat Φ
+        → ∀ (v : V) (ℓ : Module.Dual ℂ V),
+          ℓ ∈ smoothVectors (Representation.dual π)
+            → ∀ s : ℂ,
+              s₀ < s.re
+                → Integrable
+                  (fun g : GL (Fin n) F =>
+                    Φ (g : Matrix (Fin n) (Fin n) F) * matrixCoeff π v ℓ g
+                      * detPow g (s + ((n : ℂ) - 1) / 2))
+                  μ := by
   obtain ⟨s₀, _, _, _, h⟩ := exists_zeta_rat hπ μ
   exact ⟨s₀, fun Φ hΦ v ℓ hℓ => (h Φ hΦ v ℓ hℓ).1⟩
 
-theorem zetaIntegral_translate (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] (a : GL (Fin n) F)
-    (Φ : Matrix (Fin n) (Fin n) F → ℂ) (v : V) (ℓ : Module.Dual ℂ V) (s : ℂ) :
-    zetaIntegral μ (fun Y => Φ (((a⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) * Y))
-      (matrixCoeff π v (Representation.dual π a ℓ)) s =
-      detPow a (s + ((n : ℂ) - 1) / 2) * zetaIntegral μ Φ (matrixCoeff π v ℓ) s := by
-  rw [zetaIntegral, zetaIntegral, ← integral_const_mul,
-    ← integral_mul_left_eq_self (μ := μ) _ a]
+theorem zetaIntegral_translate
+    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    (a : GL (Fin n) F) (Φ : Matrix (Fin n) (Fin n) F → ℂ) (v : V) (ℓ : Module.Dual ℂ V) (s : ℂ)
+    : zetaIntegral μ
+        (fun Y => Φ (((a⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) * Y))
+        (matrixCoeff π v (Representation.dual π a ℓ)) s
+      = detPow a (s + ((n : ℂ) - 1) / 2) * zetaIntegral μ Φ (matrixCoeff π v ℓ) s := by
+  rw [zetaIntegral, zetaIntegral, ← integral_const_mul, ← integral_mul_left_eq_self (μ := μ) _ a]
   refine integral_congr_ae (Filter.Eventually.of_forall fun g => ?_)
   simp only [matrixCoeff, dual_apply_apply, ← Module.End.mul_apply, ← map_mul, ← mul_assoc,
     ← Units.val_mul, inv_mul_cancel, one_mul, detPow_mul]
   ring
 
-theorem mem_zetaSet_of_translate (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] {R R' : RatFunc ℂ}
-    (hR : R ∈ zetaSet π μ) (a : GL (Fin n) F)
-    (hR' : ∃ s₁ : ℝ, ∀ s : ℂ, s₁ < s.re → R'.eval (RingHom.id ℂ) (qs F s) =
-      detPow a (s + ((n : ℂ) - 1) / 2) * R.eval (RingHom.id ℂ) (qs F s)) :
-    R' ∈ zetaSet π μ := by
+theorem mem_zetaSet_of_translate
+    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    {R R' : RatFunc ℂ} (hR : R ∈ zetaSet π μ)
+    (a : GL (Fin n) F)
+    (hR' : ∃ s₁ : ℝ, ∀ s : ℂ,
+      s₁ < s.re
+        → R'.eval (RingHom.id ℂ) (qs F s)
+          = detPow a (s + ((n : ℂ) - 1) / 2) * R.eval (RingHom.id ℂ) (qs F s))
+    : R' ∈ zetaSet π μ := by
   obtain ⟨Φ, v, ℓ, hΦ, hℓ, s₀, hZ⟩ := hR
   obtain ⟨s₁, hs₁⟩ := hR'
-  refine ⟨fun Y => Φ (((a⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) * Y), v,
-    Representation.dual π a ℓ, hΦ.comp_mul_left a⁻¹, smooth_apply_mem _ hℓ a, max s₀ s₁,
-    fun s hs => ?_⟩
+  refine ⟨
+    fun Y => Φ (((a⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) * Y),
+    v,
+    Representation.dual π a ℓ,
+    hΦ.comp_mul_left a⁻¹,
+    smooth_apply_mem _ hℓ a,
+    max s₀ s₁,
+    fun s hs => ?_
+  ⟩
   rw [zetaIntegral_translate, hZ s ((le_max_left _ _).trans_lt hs),
     hs₁ s ((le_max_right _ _).trans_lt hs)]
 
-
 omit [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)] in
-theorem ordDet_diagPow_single [NeZero n] :
-    ordDet (Cartan.diagPow F n (Pi.single 0 1)) = 1 := by
+theorem ordDet_diagPow_single [NeZero n] : ordDet (Cartan.diagPow F n (Pi.single 0 1)) = 1 := by
   rw [ordDet, Cartan.coe_diagPow, det_diagonal, Finset.prod_eq_single (0 : Fin n)]
   · simp [LocalField.ord_uniformizer (irreducible_uniformizer F)]
   · intro b _ hb
     simp [hb]
   · simp
 
-theorem X_mul_mem_zetaIdeal [NeZero n] (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
-    {R : RatFunc ℂ} (hR : R ∈ zetaIdeal π μ) : RatFunc.X * R ∈ zetaIdeal π μ := by
+theorem X_mul_mem_zetaIdeal
+    [NeZero n]
+    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    {R : RatFunc ℂ} (hR : R ∈ zetaIdeal π μ)
+    : RatFunc.X * R ∈ zetaIdeal π μ := by
   set c : ℂ := qs F (((n : ℂ) - 1) / 2) with hcdef
   have hc : c ≠ 0 := qs_ne_zero _
   refine Submodule.span_induction (p := fun R _ => RatFunc.X * R ∈ zetaIdeal π μ) ?_ ?_ ?_ ?_ hR
@@ -213,8 +257,11 @@ theorem X_mul_mem_zetaIdeal [NeZero n] (μ : Measure (GL (Fin n) F)) [μ.IsHaarM
     rw [mul_smul_comm]
     exact Submodule.smul_mem _ _ hx
 
-theorem X_inv_mul_mem_zetaIdeal [NeZero n] (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
-    {R : RatFunc ℂ} (hR : R ∈ zetaIdeal π μ) : RatFunc.X⁻¹ * R ∈ zetaIdeal π μ := by
+theorem X_inv_mul_mem_zetaIdeal
+    [NeZero n]
+    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    {R : RatFunc ℂ} (hR : R ∈ zetaIdeal π μ)
+    : RatFunc.X⁻¹ * R ∈ zetaIdeal π μ := by
   set c : ℂ := qs F (((n : ℂ) - 1) / 2) with hcdef
   have hc : c ≠ 0 := qs_ne_zero _
   refine Submodule.span_induction (p := fun R _ => RatFunc.X⁻¹ * R ∈ zetaIdeal π μ) ?_ ?_ ?_ ?_ hR
@@ -256,10 +303,12 @@ theorem X_inv_mul_mem_zetaIdeal [NeZero n] (μ : Measure (GL (Fin n) F)) [μ.IsH
     rw [mul_smul_comm]
     exact Submodule.smul_mem _ _ hx
 
-theorem exists_zetaSet_eq [π.IsIrreducible] (hπ : IsAdmissible π) (μ : Measure (GL (Fin n) F))
-    [μ.IsHaarMeasure] :
-    ∃ D : ℂ[X], D.eval 0 = 1 ∧ ∀ R ∈ zetaSet π μ, ∃ (N : ℕ) (P : ℂ[X]),
-      R = algebraMap ℂ[X] (RatFunc ℂ) P / algebraMap ℂ[X] (RatFunc ℂ) (X ^ N * D) := by
+theorem exists_zetaSet_eq
+    [π.IsIrreducible] (hπ : IsAdmissible π) (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    : ∃ D : ℂ[X],
+      D.eval 0 = 1
+        ∧ ∀ R ∈ zetaSet π μ, ∃ (N : ℕ) (P : ℂ[X]),
+          R = algebraMap ℂ[X] (RatFunc ℂ) P / algebraMap ℂ[X] (RatFunc ℂ) (X ^ N * D) := by
   obtain ⟨s₀, D, hD0, -, h⟩ := exists_zeta_rat hπ μ
   refine ⟨D, hD0, fun R hR => ?_⟩
   obtain ⟨Φ, v, ℓ, hΦ, hℓ, s₁, hZ⟩ := hR
@@ -270,10 +319,11 @@ theorem exists_zetaSet_eq [π.IsIrreducible] (hπ : IsAdmissible π) (μ : Measu
   obtain ⟨s, hs, rfl⟩ := hεs x hx hxε
   rw [← hZ s ((le_max_right _ _).trans_lt hs), hP s ((le_max_left _ _).trans_lt hs)]
 
-theorem exists_denominator_zetaIdeal [π.IsIrreducible] (hπ : IsAdmissible π)
-    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] :
-    ∃ D : ℂ[X], D.eval 0 = 1 ∧
-      ∀ R ∈ zetaIdeal π μ, algebraMap ℂ[X] (RatFunc ℂ) D * R ∈ laurentSubalgebra := by
+theorem exists_denominator_zetaIdeal
+    [π.IsIrreducible] (hπ : IsAdmissible π) (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    : ∃ D : ℂ[X],
+      D.eval 0 = 1
+        ∧ ∀ R ∈ zetaIdeal π μ, algebraMap ℂ[X] (RatFunc ℂ) D * R ∈ laurentSubalgebra := by
   obtain ⟨D, hD0, hD⟩ := exists_zetaSet_eq hπ μ
   have hDne : algebraMap ℂ[X] (RatFunc ℂ) D ≠ 0 := by
     rw [Ne, map_eq_zero_iff _ (IsFractionRing.injective ℂ[X] (RatFunc ℂ))]
@@ -282,7 +332,8 @@ theorem exists_denominator_zetaIdeal [π.IsIrreducible] (hπ : IsAdmissible π)
     exact zero_ne_one hD0
   refine ⟨D, hD0, fun R hR => ?_⟩
   refine Submodule.span_induction
-    (p := fun R _ => algebraMap ℂ[X] (RatFunc ℂ) D * R ∈ laurentSubalgebra) ?_ ?_ ?_ ?_ hR
+    (p := fun R _ => algebraMap ℂ[X] (RatFunc ℂ) D * R ∈ laurentSubalgebra)
+    ?_ ?_ ?_ ?_ hR
   · intro R hR
     obtain ⟨N, P, rfl⟩ := hD R hR
     refine mem_laurentSubalgebra_iff.2 ⟨P, N, ?_⟩
@@ -297,12 +348,13 @@ theorem exists_denominator_zetaIdeal [π.IsIrreducible] (hπ : IsAdmissible π)
     rw [mul_smul_comm]
     exact Subalgebra.smul_mem _ hx c
 
-theorem one_mem_zetaIdeal (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] (hπ : IsSmooth π)
-    [Nontrivial V] : (1 : RatFunc ℂ) ∈ zetaIdeal π μ := by
+theorem one_mem_zetaIdeal
+    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] (hπ : IsSmooth π) [Nontrivial V]
+    : (1 : RatFunc ℂ) ∈ zetaIdeal π μ := by
   classical
   obtain ⟨v, hv⟩ := exists_ne (0 : V)
-  obtain ⟨m, -, hm⟩ := (hasBasis_nhds_one F n).mem_iff.1
-    ((hπ v).mem_nhds (one_mem (stabilizerOf π v)))
+  obtain ⟨m, -, hm⟩ :=
+    (hasBasis_nhds_one F n).mem_iff.1 ((hπ v).mem_nhds (one_mem (stabilizerOf π v)))
   set K := congruenceSubgroup F n m with hKdef
   have hKc : IsCompact (K : Set (GL (Fin n) F)) := isCompact_congruenceSubgroup F n m
   have hKo : IsOpen (K : Set (GL (Fin n) F)) := isOpen_congruenceSubgroup F n m
@@ -320,7 +372,8 @@ theorem one_mem_zetaIdeal (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] (hπ 
   have hℓ : ℓ ∈ smoothVectors (Representation.dual π) :=
     mem_smoothVectors_of_mem_fixedVectors hKo (mem_fixedVectors_dual.2 hℓK)
   have hℓv : ℓ v = 1 := by
-    have : fixedProj π hπ hKc hKo v = ⟨v, hvK⟩ := Subtype.ext (fixedProj_apply_of_mem hπ hKc hKo hvK)
+    have : fixedProj π hπ hKc hKo v = ⟨v, hvK⟩ :=
+      Subtype.ext (fixedProj_apply_of_mem hπ hKc hKo hvK)
     simp only [ℓ, LinearMap.coe_comp, Function.comp_apply, this, hf0]
 
   set S : Set (Matrix (Fin n) (Fin n) F) := Units.val '' (K : Set (GL (Fin n) F)) with hSdef
@@ -333,10 +386,15 @@ theorem one_mem_zetaIdeal (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] (hπ 
     intro X
     by_cases hX : X ∈ S
     · exact ⟨S, hSo, hX, fun Y hY => by simp [Φ, Set.indicator_of_mem hY, Set.indicator_of_mem hX]⟩
-    · exact ⟨Sᶜ, hSc.isClosed.isOpen_compl, hX, fun Y hY => by
-        simp [Φ, Set.indicator_of_notMem hY, Set.indicator_of_notMem hX]⟩
-  have hΦg : ∀ g : GL (Fin n) F, Φ (g : Matrix (Fin n) (Fin n) F) =
-      (K : Set (GL (Fin n) F)).indicator 1 g := fun g => by
+    · exact ⟨
+        Sᶜ,
+        hSc.isClosed.isOpen_compl,
+        hX,
+        fun Y hY => by simp [Φ, Set.indicator_of_notMem hY, Set.indicator_of_notMem hX]
+      ⟩
+  have hΦg
+      : ∀ g : GL (Fin n) F,
+        Φ (g : Matrix (Fin n) (Fin n) F) = (K : Set (GL (Fin n) F)).indicator 1 g := fun g => by
     by_cases hg : g ∈ K
     · rw [Set.indicator_of_mem hg, hΦdef, Set.indicator_of_mem (Set.mem_image_of_mem _ hg)]
       rfl
@@ -344,11 +402,15 @@ theorem one_mem_zetaIdeal (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] (hπ 
       rintro ⟨g', hg', hgg'⟩
       exact hg (Units.val_injective hgg' ▸ hg')
 
-  have hZ : ∀ s, zetaIntegral μ Φ (matrixCoeff π v ℓ) s = (μ.real (K : Set (GL (Fin n) F)) : ℂ) := by
+  have hZ
+      : ∀ s, zetaIntegral μ Φ (matrixCoeff π v ℓ) s = (μ.real (K : Set (GL (Fin n) F)) : ℂ) := by
     intro s
     rw [zetaIntegral]
-    have hfun : (fun g : GL (Fin n) F => Φ (g : Matrix (Fin n) (Fin n) F) * matrixCoeff π v ℓ g *
-        detPow g (s + ((n : ℂ) - 1) / 2)) = (K : Set (GL (Fin n) F)).indicator fun _ => (1 : ℂ) := by
+    have hfun
+        : (fun g : GL (Fin n) F =>
+            Φ (g : Matrix (Fin n) (Fin n) F) * matrixCoeff π v ℓ g
+              * detPow g (s + ((n : ℂ) - 1) / 2))
+          = (K : Set (GL (Fin n) F)).indicator fun _ => (1 : ℂ) := by
       funext g
       rw [hΦg g]
       by_cases hg : g ∈ K
@@ -365,28 +427,34 @@ theorem one_mem_zetaIdeal (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] (hπ 
     have : 0 < μ.real (K : Set (GL (Fin n) F)) :=
       ENNReal.toReal_pos (hKo.measure_ne_zero μ ⟨1, K.one_mem⟩) hKc.measure_lt_top.ne
     exact_mod_cast this.ne'
-  have h1 : (1 : RatFunc ℂ) = ((μ.real (K : Set (GL (Fin n) F)) : ℂ))⁻¹ •
-      RatFunc.C (μ.real (K : Set (GL (Fin n) F)) : ℂ) := by
+  have h1
+      : (1 : RatFunc ℂ)
+        = ((μ.real (K : Set (GL (Fin n) F)) : ℂ))⁻¹
+          • RatFunc.C (μ.real (K : Set (GL (Fin n) F)) : ℂ) := by
     rw [Algebra.smul_def, RatFunc.algebraMap_eq_C, ← map_mul, inv_mul_cancel₀ hpos, map_one]
   rw [h1]
   exact Submodule.smul_mem _ _ (Submodule.subset_span hmem)
 
-theorem existsUnique_zetaIdeal_eq [NeZero n] [π.IsIrreducible] (hπ : IsAdmissible π)
-    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] :
-    ∃! P : ℂ[X], P.eval 0 = 1 ∧ ∀ R : RatFunc ℂ, R ∈ zetaIdeal π μ ↔
-      ∃ L ∈ laurentSubalgebra, R = L / algebraMap ℂ[X] (RatFunc ℂ) P := by
+theorem existsUnique_zetaIdeal_eq
+    [NeZero n] [π.IsIrreducible]
+    (hπ : IsAdmissible π)
+    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    : ∃! P : ℂ[X], P.eval 0 = 1 ∧ ∀ R : RatFunc ℂ, R ∈ zetaIdeal π μ ↔
+        ∃ L ∈ laurentSubalgebra, R = L / algebraMap ℂ[X] (RatFunc ℂ) P := by
   obtain ⟨v, hv⟩ := exists_ne_zero_of_isIrreducible (ρ := π)
   have : Nontrivial V := ⟨⟨v, 0, hv⟩⟩
   obtain ⟨D, hD0, hD⟩ := exists_denominator_zetaIdeal hπ μ
-  refine existsUnique_eq_laurent_div _ (fun R hR => X_mul_mem_zetaIdeal μ hR)
-    (fun R hR => X_inv_mul_mem_zetaIdeal μ hR) (one_mem_zetaIdeal μ hπ.1) ⟨D, ?_, hD⟩
+  refine existsUnique_eq_laurent_div _
+    (fun R hR => X_mul_mem_zetaIdeal μ hR)
+    (fun R hR => X_inv_mul_mem_zetaIdeal μ hR)
+    (one_mem_zetaIdeal μ hπ.1) ⟨D, ?_, hD⟩
   intro h
   rw [h, eval_zero] at hD0
   exact zero_ne_one hD0
 
 omit [BorelSpace (GL (Fin n) F)] in
-theorem zetaIdeal_le_smul (μ : Measure (GL (Fin n) F)) {c : NNReal} (hc : c ≠ 0) :
-    zetaIdeal π μ ≤ zetaIdeal π (c • μ) := by
+theorem zetaIdeal_le_smul (μ : Measure (GL (Fin n) F)) {c : NNReal} (hc : c ≠ 0)
+    : zetaIdeal π μ ≤ zetaIdeal π (c • μ) := by
   refine Submodule.span_le.2 fun R hR => ?_
   obtain ⟨Φ, v, ℓ, hΦ, hℓ, s₀, hZ⟩ := hR
   have hc' : ((c : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hc
@@ -404,32 +472,42 @@ theorem zetaIdeal_le_smul (μ : Measure (GL (Fin n) F)) {c : NNReal} (hc : c ≠
   rw [h]
   exact Submodule.smul_mem _ _ (Submodule.subset_span hmem)
 
-theorem zetaIdeal_eq_of_isHaarMeasure (μ ν : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
-    [ν.IsHaarMeasure] : zetaIdeal π μ = zetaIdeal π ν := by
-  have key : ∀ (μ ν : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] [ν.IsHaarMeasure],
-      zetaIdeal π μ ≤ zetaIdeal π ν := by
+theorem zetaIdeal_eq_of_isHaarMeasure
+    (μ ν : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] [ν.IsHaarMeasure]
+    : zetaIdeal π μ = zetaIdeal π ν := by
+  have key
+      : ∀ (μ ν : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] [ν.IsHaarMeasure],
+        zetaIdeal π μ ≤ zetaIdeal π ν := by
     intro μ ν _ _
     rw [Measure.isMulLeftInvariant_eq_smul ν μ]
     exact zetaIdeal_le_smul μ (Measure.haarScalarFactor_pos_of_isHaarMeasure ν μ).ne'
   exact le_antisymm (key μ ν) (key ν μ)
 
-
 variable (π) in
 def LPolynomial : ℂ[X] := by
   classical
-  exact if h : ∃ P : ℂ[X], P.eval 0 = 1 ∧ ∀ R : RatFunc ℂ,
-      R ∈ zetaIdeal π (Measure.haar : Measure (GL (Fin n) F)) ↔
-        ∃ L ∈ laurentSubalgebra, R = L / algebraMap ℂ[X] (RatFunc ℂ) P then h.choose else 1
-
+  exact
+    if h
+        : ∃ P : ℂ[X],
+          P.eval 0 = 1
+            ∧ ∀ R : RatFunc ℂ,
+              R ∈ zetaIdeal π (Measure.haar : Measure (GL (Fin n) F))
+                ↔ ∃ L ∈ laurentSubalgebra, R = L / algebraMap ℂ[X] (RatFunc ℂ) P then
+      h.choose
+    else
+      1
 
 variable (π) in
-def LFunction (s : ℂ) : ℂ :=
-  ((LPolynomial π).eval (qs F s))⁻¹
+def LFunction (s : ℂ) : ℂ := ((LPolynomial π).eval (qs F s))⁻¹
 
-theorem LPolynomial_spec [NeZero n] [π.IsIrreducible] (hπ : IsAdmissible π)
-    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] :
-    (LPolynomial π).eval 0 = 1 ∧ ∀ R : RatFunc ℂ, R ∈ zetaIdeal π μ ↔
-      ∃ L ∈ laurentSubalgebra, R = L / algebraMap ℂ[X] (RatFunc ℂ) (LPolynomial π) := by
+theorem LPolynomial_spec
+    [NeZero n] [π.IsIrreducible]
+    (hπ : IsAdmissible π)
+    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    : (LPolynomial π).eval 0 = 1
+      ∧ ∀ R : RatFunc ℂ,
+        R ∈ zetaIdeal π μ
+          ↔ ∃ L ∈ laurentSubalgebra, R = L / algebraMap ℂ[X] (RatFunc ℂ) (LPolynomial π) := by
   classical
   have h := (existsUnique_zetaIdeal_eq hπ (Measure.haar : Measure (GL (Fin n) F))).exists
   rw [LPolynomial, dite_eq_left h]

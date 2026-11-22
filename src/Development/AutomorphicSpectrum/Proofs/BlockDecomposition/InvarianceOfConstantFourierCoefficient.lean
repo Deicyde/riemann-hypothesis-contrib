@@ -7,39 +7,52 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FourierZ
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.ConstN
 
 open GlobalTheory.CompanionTheory.FourierN
 
-
 open Pointwise in
-theorem setIntegral_add_right {A : Type*} [AddCommGroup A] [MeasurableSpace A] [MeasurableAdd A] (L : AddSubgroup A)
-    [Countable L] (lam : Measure A) [lam.IsAddLeftInvariant] {𝓖 : Set A} (hFD : IsAddFundamentalDomain L 𝓖 lam)
-    (φ : A → ℂ) (hper : ∀ γ ∈ L, ∀ x, φ (γ + x) = φ x) (b : A) :
-    ∫ x in 𝓖, φ (x + b) ∂lam = ∫ x in 𝓖, φ x ∂lam := by
+theorem setIntegral_add_right
+    {A : Type*} [AddCommGroup A] [MeasurableSpace A] [MeasurableAdd A]
+    (L : AddSubgroup A) [Countable L]
+    (lam : Measure A) [lam.IsAddLeftInvariant]
+    {𝓖 : Set A} (hFD : IsAddFundamentalDomain L 𝓖 lam)
+    (φ : A → ℂ) (hper : ∀ γ ∈ L, ∀ x, φ (γ + x) = φ x)
+    (b : A)
+    : ∫ x in 𝓖, φ (x + b) ∂lam = ∫ x in 𝓖, φ x ∂lam := by
   have hFD' : IsAddFundamentalDomain L (b +ᵥ 𝓖) lam := hFD.vadd_of_comm b
   have hpre : (fun x : A => x + b) ⁻¹' (b +ᵥ 𝓖) = 𝓖 := by
     ext x
     rw [Set.mem_preimage, Set.mem_vadd_set_iff_neg_vadd_mem]
     simp [add_comm]
-  have h := (measurePreserving_add_right lam b).setIntegral_preimage_emb
-    (MeasurableEquiv.addRight b).measurableEmbedding φ (b +ᵥ 𝓖)
+  have h :=
+    (measurePreserving_add_right lam b).setIntegral_preimage_emb
+      (MeasurableEquiv.addRight b).measurableEmbedding φ (b +ᵥ 𝓖)
   rw [hpre] at h
   exact h.trans (hFD'.setIntegral_eq hFD fun γ x => hper γ.1 γ.2 x)
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
-theorem nb_inv_of_const (D : D7) (p : ℕ) (ψ : AddChar (AF D.host.F) ℂ) (nb : hermA D p → G D p)
-    (lam : Measure (hermA D p)) (𝓖 : Set (hermA D p)) (hC : CoefData (D := D) (n := p) nb lam 𝓖)
-    (F : G D p → ℂ) (_hF : Continuous F) (hinv : LeftInv (GF D p) F) (β : HermE D p) (hβ : β.1 = 0)
-    (hfc : ∀ g, fc ψ lam 𝓖 nb F β g = F g) (b : hermA D p) (g : G D p) : F (nb b * g) = F g := by
+theorem nb_inv_of_const
+    (D : D7)
+    (p : ℕ)
+    (ψ : AddChar (AF D.host.F) ℂ)
+    (nb : hermA D p → G D p) (lam : Measure (hermA D p)) (𝓖 : Set (hermA D p))
+    (hC : CoefData (D := D) (n := p) nb lam 𝓖)
+    (F : G D p → ℂ) (_hF : Continuous F) (hinv : LeftInv (GF D p) F)
+    (β : HermE D p) (hβ : β.1 = 0) (hfc : ∀ g, fc ψ lam 𝓖 nb F β g = F g)
+    (b : hermA D p) (g : G D p)
+    : F (nb b * g) = F g := by
   obtain ⟨hnb, hlam, hFD, -⟩ := hC
   obtain ⟨i1, i2, i3, i4, -, -⟩ := GlobalTheory.TowerResNonzero.lattice_ratMx D p p
   haveI : BorelSpace (Mx D p p) := ⟨rfl⟩

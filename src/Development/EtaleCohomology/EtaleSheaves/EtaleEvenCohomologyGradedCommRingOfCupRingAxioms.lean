@@ -12,30 +12,37 @@ namespace RingPf
 
 variable {q : ℕ} {E : Spc}
 
-theorem cast_heq {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x : Ht q E n i) : HEq (x.cast hn hi) x := by
+theorem cast_heq {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x : Ht q E n i)
+    : HEq (x.cast hn hi) x := by
   subst hn hi; rfl
 
-theorem cast_cast {n i n' i' n'' i'' : ℤ} (h1 : n = n') (h2 : i = i') (h3 : n' = n'') (h4 : i' = i'') (x : Ht q E n i) :
-    (x.cast h1 h2).cast h3 h4 = x.cast (h1.trans h3) (h2.trans h4) := by
+theorem cast_cast
+    {n i n' i' n'' i'' : ℤ}
+    (h1 : n = n') (h2 : i = i') (h3 : n' = n'') (h4 : i' = i'') (x : Ht q E n i)
+    : (x.cast h1 h2).cast h3 h4 = x.cast (h1.trans h3) (h2.trans h4) := by
   subst h1 h2 h3 h4; rfl
 
-theorem cast_zero {n i n' i' : ℤ} (hn : n = n') (hi : i = i') : (0 : Ht q E n i).cast hn hi = 0 := by
+theorem cast_zero {n i n' i' : ℤ} (hn : n = n') (hi : i = i')
+    : (0 : Ht q E n i).cast hn hi = 0 := by
   subst hn hi; rfl
 
-theorem cast_add {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x y : Ht q E n i) :
-    (x + y).cast hn hi = x.cast hn hi + y.cast hn hi := by
+theorem cast_add {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x y : Ht q E n i)
+    : (x + y).cast hn hi = x.cast hn hi + y.cast hn hi := by
   subst hn hi; rfl
 
-theorem cup_cast_left {n m i j n' i' : ℤ} (h1 : n = n') (h2 : i = i') (a : Ht q E n i) (b : Ht q E m j) :
-    cup q (a.cast h1 h2) b = (cup q a b).cast (by rw [h1]) (by rw [h2]) := by
+theorem cup_cast_left
+    {n m i j n' i' : ℤ} (h1 : n = n') (h2 : i = i') (a : Ht q E n i) (b : Ht q E m j)
+    : cup q (a.cast h1 h2) b = (cup q a b).cast (by rw [h1]) (by rw [h2]) := by
   subst h1 h2; rfl
 
-theorem cup_cast_right {n m i j m' j' : ℤ} (h1 : m = m') (h2 : j = j') (a : Ht q E n i) (b : Ht q E m j) :
-    cup q a (b.cast h1 h2) = (cup q a b).cast (by rw [h1]) (by rw [h2]) := by
+theorem cup_cast_right
+    {n m i j m' j' : ℤ} (h1 : m = m') (h2 : j = j') (a : Ht q E n i) (b : Ht q E m j)
+    : cup q a (b.cast h1 h2) = (cup q a b).cast (by rw [h1]) (by rw [h2]) := by
   subst h1 h2; rfl
 
-theorem pull_cast {E' : Spc} (f : E ⟶ E') {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x : Ht q E' n i) :
-    pull _ f _ _ (x.cast hn hi) = Ht.cast hn hi (pull _ f _ _ x) := by
+theorem pull_cast
+    {E' : Spc} (f : E ⟶ E') {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x : Ht q E' n i)
+    : pull _ f _ _ (x.cast hn hi) = Ht.cast hn hi (pull _ f _ _ x) := by
   subst hn hi; rfl
 
 abbrev A (q : ℕ) (E : Spc) (k : ℕ) : Type 1 := Ht q E (2 * (k : ℤ)) (k : ℤ)
@@ -54,15 +61,17 @@ section
 variable (hr : DivisorRingCompatibility) [NeZero q]
 include hr
 
-theorem one_cup (h : Inv q E) {n i : ℤ} (a : Ht q E n i) : cup q (one q E) a = a.cast (by ring) (by ring) :=
+theorem one_cup (h : Inv q E) {n i : ℤ} (a : Ht q E n i)
+    : cup q (one q E) a = a.cast (by ring) (by ring) :=
   (hr q E).1 h a
 
-theorem cup_one (h : Inv q E) {n i : ℤ} (a : Ht q E n i) : cup q a (one q E) = a.cast (by ring) (by ring) := by
+theorem cup_one (h : Inv q E) {n i : ℤ} (a : Ht q E n i)
+    : cup q a (one q E) = a.cast (by ring) (by ring) := by
   rw [(hr q E).2.2 a (one q E), (hr q E).1 h, cast_cast]
   simp
 
-theorem gmul_assoc {i j k : ℕ} (a : A q E i) (b : A q E j) (c : A q E k) :
-    HEq (gmul (gmul a b) c) (gmul a (gmul b c)) := by
+theorem gmul_assoc {i j k : ℕ} (a : A q E i) (b : A q E j) (c : A q E k)
+    : HEq (gmul (gmul a b) c) (gmul a (gmul b c)) := by
   simp only [gmul, cup_cast_left, cup_cast_right, cast_cast]
   rw [(hr q E).2.1 a b c, cast_cast]
   exact (cast_heq _ _ _).trans (cast_heq _ _ _).symm
@@ -117,7 +126,8 @@ end
 section
 variable (hn : DivisorNaturality) (hr : DivisorRingCompatibility) [NeZero q]
 
-abbrev ringOf (hr : DivisorRingCompatibility) (E : Spc) (h : Inv q E) : CommRing (DirectSum ℕ (A q E)) :=
+abbrev ringOf (hr : DivisorRingCompatibility) (E : Spc) (h : Inv q E)
+    : CommRing (DirectSum ℕ (A q E)) :=
   letI := gcr hr h; DirectSum.commRing (A q E)
 
 def projOf (E : Spc) (k : ℕ) : DirectSum ℕ (A q E) →+ A q E k where
@@ -125,12 +135,14 @@ def projOf (E : Spc) (k : ℕ) : DirectSum ℕ (A q E) →+ A q E k where
   map_zero' := rfl
   map_add' x y := DirectSum.add_apply x y k
 
-
 include hn in
-def mapOf {E E' : Spc} (f : E ⟶ E') (h : Inv q E) (h' : Inv q E') :
-    letI := ringOf hr E h; letI := ringOf hr E' h'; DirectSum ℕ (A q E') →+* DirectSum ℕ (A q E) :=
-  letI := gcr hr h; letI := gcr hr h'
-  DirectSum.toSemiring (fun k => (DirectSum.of (A q E) k).comp (pull (ZMod q) f (tw q k) (2 * (k : ℤ))))
+def mapOf {E E' : Spc} (f : E ⟶ E') (h : Inv q E) (h' : Inv q E')
+    : letI := ringOf hr E h
+      letI := ringOf hr E' h'; DirectSum ℕ (A q E') →+* DirectSum ℕ (A q E) :=
+  letI := gcr hr h
+  letI := gcr hr h'
+  DirectSum.toSemiring
+    (fun k => (DirectSum.of (A q E) k).comp (pull (ZMod q) f (tw q k) (2 * (k : ℤ))))
     (by
       show DirectSum.of (A q E) 0 (pull (ZMod q) f (tw q ((0 : ℕ) : ℤ)) (2 * ((0 : ℕ) : ℤ)) (gone q E')) = 1
       rw [gone, pull_cast, (hn q).2.1 f h']
@@ -144,9 +156,11 @@ def mapOf {E E' : Spc} (f : E ⟶ E') (h : Inv q E) (h' : Inv q E') :
       simp only [gmul, pull_cast, (hn q).1 f])
 
 include hn in
-theorem mapOf_of {E E' : Spc} (f : E ⟶ E') (h : Inv q E) (h' : Inv q E') (k : ℕ) (a : A q E' k) :
-    mapOf hn hr f h h' (DirectSum.of (A q E') k a) = DirectSum.of (A q E) k (pull (ZMod q) f (tw q k) (2 * (k : ℤ)) a) := by
-  letI := gcr hr h; letI := gcr hr h'
+theorem mapOf_of {E E' : Spc} (f : E ⟶ E') (h : Inv q E) (h' : Inv q E') (k : ℕ) (a : A q E' k)
+    : mapOf hn hr f h h' (DirectSum.of (A q E') k a)
+      = DirectSum.of (A q E) k (pull (ZMod q) f (tw q k) (2 * (k : ℤ)) a) := by
+  letI := gcr hr h
+  letI := gcr hr h'
   exact DirectSum.toSemiring_of _ _ _ k a
 
 end
@@ -154,7 +168,9 @@ end
 end RingPf
 
 open RingPf in
-theorem etale_even_cohomology_graded_commRing_of_cup_ring_axioms (hn : DivisorNaturality) (hr : DivisorRingCompatibility) : LeafRing := by
+theorem etale_even_cohomology_graded_commRing_of_cup_ring_axioms
+    (hn : DivisorNaturality) (hr : DivisorRingCompatibility)
+    : LeafRing := by
   intro q _
   exact ⟨{
     R := fun E _ => DirectSum ℕ (A q E)
@@ -178,10 +194,10 @@ theorem etale_even_cohomology_graded_commRing_of_cup_ring_axioms (hn : DivisorNa
         show _ = DirectSum.of (A q E) k _ * DirectSum.of (A q E) 1 _
         rw [DirectSum.of_mul_of]
         congr 1
-    map_ι := fun {E E'} f h h' k a => by
-      exact mapOf_of hn hr f h h' k a
+    map_ι := fun {E E'} f h h' k a => by exact mapOf_of hn hr f h h' k a
     π_map := fun {E E'} f h h' k r => by
-      letI := gcr hr h; letI := gcr hr h'
+      letI := gcr hr h
+      letI := gcr hr h'
       induction r using DirectSum.induction_on with
       | zero => simp only [map_zero]
       | of j a =>
@@ -190,9 +206,12 @@ theorem etale_even_cohomology_graded_commRing_of_cup_ring_axioms (hn : DivisorNa
         show (DirectSum.of (A q E) j (pull (ZMod q) f _ _ a)) k = pull (ZMod q) f _ _ ((DirectSum.of (A q E') j a) k)
         by_cases hjk : j = k
         · subst hjk; rw [DirectSum.of_eq_same, DirectSum.of_eq_same]
-        · rw [DirectSum.of_eq_of_ne _ _ _ (Ne.symm hjk), DirectSum.of_eq_of_ne _ _ _ (Ne.symm hjk), map_zero]
-      | add x y hx hy => simp only [map_add (f := _), hx, hy] }⟩
+        · rw [DirectSum.of_eq_of_ne _ _ _ (Ne.symm hjk), DirectSum.of_eq_of_ne _ _ _ (Ne.symm hjk),
+            map_zero]
+      | add x y hx hy => simp only [map_add (f := _), hx, hy]
+  }⟩
 
-theorem LeafRing_of (hn : LeafA6nat) (hr : LeafA6ring) : LeafRing := etale_even_cohomology_graded_commRing_of_cup_ring_axioms hn hr
+theorem LeafRing_of (hn : LeafA6nat) (hr : LeafA6ring) : LeafRing :=
+  etale_even_cohomology_graded_commRing_of_cup_ring_axioms hn hr
 
 end LateralTheory.E.D2

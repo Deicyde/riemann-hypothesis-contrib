@@ -7,7 +7,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArtinRee
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 set_option autoImplicit false
 set_option maxSynthPendingDepth 1
@@ -64,12 +65,15 @@ lemma supportedIn_badSet {P : X.Modules} [P.IsQuasicoherent] (S : Subobject P)
     rw [map_zero]
     exact eq_zero_of_le_affine _ i.1.2 (cokernel_sections_eq_zero S i.1.2 i.2) inf_le_right _
 
-theorem secs_eq_univ_of_disjoint_badSet {X : Scheme.{0}} {P : X.Modules} (hP : P.IsQuasicoherent)
-    (S : Subobject P) (hS : (S : X.Modules).IsQuasicoherent) (U : X.Opens) (hU : IsAffineOpen U)
-    (hd : Disjoint (U : Set X) (badSet S)) : secs S U = Set.univ := by
+theorem secs_eq_univ_of_disjoint_badSet
+    {X : Scheme.{0}} {P : X.Modules}
+    (hP : P.IsQuasicoherent) (S : Subobject P) (hS : (S : X.Modules).IsQuasicoherent) (U : X.Opens)
+    (hU : IsAffineOpen U) (hd : Disjoint (U : Set X) (badSet S))
+    : secs S U = Set.univ := by
   haveI : P.IsQuasicoherent := hP
   haveI : (S : X.Modules).IsQuasicoherent := hS
-  exact GlobalTheory.CompanionTheory.GE.Comb.secs_eq_univ_of_supportedIn hP hS (supportedIn_badSet S) hU hd
+  exact GlobalTheory.CompanionTheory.GE.Comb.secs_eq_univ_of_supportedIn hP hS
+    (supportedIn_badSet S) hU hd
 
 end
 

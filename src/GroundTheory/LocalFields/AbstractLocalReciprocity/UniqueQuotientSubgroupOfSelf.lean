@@ -36,8 +36,8 @@ section Pow
 
 variable {K L : Subgroup G} [(L.subgroupOf K).FiniteIndex]
 
-theorem coe_norm_of_mem (hLK : L ≤ K) {a : A} (ha : a ∈ fixedModule A K) :
-    (norm A K L ⟨a, fixedModule_anti hLK ha⟩ : A) = a ^ L.relIndex K := by
+theorem coe_norm_of_mem (hLK : L ≤ K) {a : A} (ha : a ∈ fixedModule A K)
+    : (norm A K L ⟨a, fixedModule_anti hLK ha⟩ : A) = a ^ L.relIndex K := by
   classical
   let _ := Fintype.ofFinite (K ⧸ L.subgroupOf K)
   rw [coe_norm, finprod_eq_prod_of_fintype]
@@ -56,18 +56,23 @@ section Transitivity
 variable {K L M : Subgroup G}
 
 def cosetShift (hLK : L ≤ K) (σ : K) : L ⧸ M.subgroupOf L → K ⧸ M.subgroupOf K :=
-  Quotient.map' (fun τ : L => σ * (⟨τ, hLK τ.2⟩ : K)) fun τ τ' h => by
-    rw [QuotientGroup.leftRel_apply] at h ⊢
-    simpa [Subgroup.mem_subgroupOf, mul_assoc] using h
+  Quotient.map'
+    (fun τ : L => σ * (⟨τ, hLK τ.2⟩ : K))
+    fun τ τ' h => by
+      rw [QuotientGroup.leftRel_apply] at h ⊢
+      simpa [Subgroup.mem_subgroupOf, mul_assoc] using h
 
-@[simp] theorem cosetShift_mk (hLK : L ≤ K) (σ : K) (τ : L) :
-    cosetShift (M := M) hLK σ (τ : L ⧸ M.subgroupOf L) =
-      ((σ * (⟨τ, hLK τ.2⟩ : K) : K) : K ⧸ M.subgroupOf K) :=
+@[simp]
+theorem cosetShift_mk (hLK : L ≤ K) (σ : K) (τ : L)
+    : cosetShift (M := M) hLK σ (τ : L ⧸ M.subgroupOf L)
+      = ((σ * (⟨τ, hLK τ.2⟩ : K) : K) : K ⧸ M.subgroupOf K) :=
   rfl
 
-theorem norm_norm (hML : M ≤ L) (hLK : L ≤ K) [(L.subgroupOf K).FiniteIndex]
-    [(M.subgroupOf L).FiniteIndex] [(M.subgroupOf K).FiniteIndex] (a : fixedModule A M) :
-    norm A K L (norm A L M a) = norm A K M a := by
+theorem norm_norm
+    (hML : M ≤ L) (hLK : L ≤ K)
+    [(L.subgroupOf K).FiniteIndex] [(M.subgroupOf L).FiniteIndex] [(M.subgroupOf K).FiniteIndex]
+    (a : fixedModule A M)
+    : norm A K L (norm A L M a) = norm A K M a := by
   classical
   let _ := Fintype.ofFinite (K ⧸ M.subgroupOf K)
   let _ := Fintype.ofFinite (K ⧸ L.subgroupOf K)
@@ -92,11 +97,11 @@ theorem norm_norm (hML : M ≤ L) (hLK : L ≤ K) [(L.subgroupOf K).FiniteIndex]
     · intro t _ t' _ h
       induction t using QuotientGroup.induction_on with
       | H τ =>
-      induction t' using QuotientGroup.induction_on with
-      | H τ' =>
-        rw [cosetShift_mk, cosetShift_mk, QuotientGroup.eq] at h
-        rw [QuotientGroup.eq]
-        simpa [Subgroup.mem_subgroupOf, mul_assoc] using h
+        induction t' using QuotientGroup.induction_on with
+        | H τ' =>
+          rw [cosetShift_mk, cosetShift_mk, QuotientGroup.eq] at h
+          rw [QuotientGroup.eq]
+          simpa [Subgroup.mem_subgroupOf, mul_assoc] using h
     · intro q hq
       rw [Finset.mem_filter] at hq
       induction q using QuotientGroup.induction_on with
@@ -117,9 +122,10 @@ theorem norm_norm (hML : M ≤ L) (hLK : L ≤ K) [(L.subgroupOf K).FiniteIndex]
         rw [cosetShift_mk, cosetSMul_mk, cosetSMul_mk, smul_smul]
         rfl
 
-theorem range_norm_le_range_norm (hML : M ≤ L) (hLK : L ≤ K) [(L.subgroupOf K).FiniteIndex]
-    [(M.subgroupOf L).FiniteIndex] [(M.subgroupOf K).FiniteIndex] :
-    (norm A K M).range ≤ (norm A K L).range := by
+theorem range_norm_le_range_norm
+    (hML : M ≤ L) (hLK : L ≤ K)
+    [(L.subgroupOf K).FiniteIndex] [(M.subgroupOf L).FiniteIndex] [(M.subgroupOf K).FiniteIndex]
+    : (norm A K M).range ≤ (norm A K L).range := by
   rintro _ ⟨a, rfl⟩
   exact ⟨norm A L M a, norm_norm hML hLK a⟩
 
@@ -129,11 +135,12 @@ section Conjugation
 
 variable {K L : Subgroup G}
 
-def cosetConj (σ : G) :
-    K ⧸ L.subgroupOf K →
-      K.map (MulAut.conj σ).toMonoidHom ⧸
-        (L.map (MulAut.conj σ).toMonoidHom).subgroupOf (K.map (MulAut.conj σ).toMonoidHom) :=
-  Quotient.map' (fun τ : K => (⟨σ * τ * σ⁻¹, τ, τ.2, rfl⟩ : K.map (MulAut.conj σ).toMonoidHom))
+def cosetConj (σ : G)
+    : K ⧸ L.subgroupOf K
+      → K.map (MulAut.conj σ).toMonoidHom ⧸
+          (L.map (MulAut.conj σ).toMonoidHom).subgroupOf (K.map (MulAut.conj σ).toMonoidHom) :=
+  Quotient.map'
+    (fun τ : K => (⟨σ * τ * σ⁻¹, τ, τ.2, rfl⟩ : K.map (MulAut.conj σ).toMonoidHom))
     fun τ τ' h => by
       rw [QuotientGroup.leftRel_apply] at h ⊢
       rw [Subgroup.mem_subgroupOf] at h ⊢
@@ -141,37 +148,43 @@ def cosetConj (σ : G) :
       simp only [Subgroup.coe_mul, InvMemClass.coe_inv, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
       group
 
-@[simp] theorem cosetConj_mk (σ : G) (τ : K) :
-    cosetConj (L := L) σ (τ : K ⧸ L.subgroupOf K) =
-      ((⟨σ * τ * σ⁻¹, τ, τ.2, rfl⟩ : K.map (MulAut.conj σ).toMonoidHom) : _ ⧸ _) :=
+@[simp]
+theorem cosetConj_mk (σ : G) (τ : K)
+    : cosetConj (L := L) σ (τ : K ⧸ L.subgroupOf K)
+      = ((⟨σ * τ * σ⁻¹, τ, τ.2, rfl⟩ : K.map (MulAut.conj σ).toMonoidHom) : _ ⧸ _) :=
   rfl
 
-theorem smul_norm (σ : G) [(L.subgroupOf K).FiniteIndex]
-    [((L.map (MulAut.conj σ).toMonoidHom).subgroupOf (K.map (MulAut.conj σ).toMonoidHom)).FiniteIndex]
-    (a : fixedModule A L) :
-    σ • (norm A K L a : A) =
-      norm A (K.map (MulAut.conj σ).toMonoidHom) (L.map (MulAut.conj σ).toMonoidHom)
+theorem smul_norm
+    (σ : G) [(L.subgroupOf K).FiniteIndex]
+    [((L.map (MulAut.conj σ).toMonoidHom).subgroupOf
+      (K.map (MulAut.conj σ).toMonoidHom)).FiniteIndex]
+    (a : fixedModule A L)
+    : σ • (norm A K L a : A)
+      = norm A (K.map (MulAut.conj σ).toMonoidHom) (L.map (MulAut.conj σ).toMonoidHom)
         ⟨σ • (a : A), smul_mem_fixedModule a.2 σ⟩ := by
   classical
   let _ := Fintype.ofFinite (K ⧸ L.subgroupOf K)
-  let _ := Fintype.ofFinite (K.map (MulAut.conj σ).toMonoidHom ⧸
-    (L.map (MulAut.conj σ).toMonoidHom).subgroupOf (K.map (MulAut.conj σ).toMonoidHom))
+  let _ :=
+    Fintype.ofFinite
+      (K.map (MulAut.conj σ).toMonoidHom ⧸
+        (L.map (MulAut.conj σ).toMonoidHom).subgroupOf (K.map (MulAut.conj σ).toMonoidHom))
   rw [coe_norm, coe_norm, finprod_eq_prod_of_fintype, finprod_eq_prod_of_fintype, Finset.smul_prod']
   refine Finset.prod_bij (fun t _ => cosetConj σ t) (fun _ _ => Finset.mem_univ _) ?_ ?_ ?_
   · intro t _ t' _ h
     induction t using QuotientGroup.induction_on with
     | H τ =>
-    induction t' using QuotientGroup.induction_on with
-    | H τ' =>
-      rw [cosetConj_mk, cosetConj_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf] at h
-      rw [QuotientGroup.eq, Subgroup.mem_subgroupOf]
-      obtain ⟨x, hx, hx'⟩ := h
-      have : x = (τ : G)⁻¹ * τ' := by
-        simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply, Subgroup.coe_mul,
-          InvMemClass.coe_inv, mul_inv_rev, inv_inv] at hx'
-        have := congrArg (fun y => σ⁻¹ * y * σ) hx'
-        simpa [mul_assoc] using this
-      simpa [this] using hx
+      induction t' using QuotientGroup.induction_on with
+      | H τ' =>
+        rw [cosetConj_mk, cosetConj_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf] at h
+        rw [QuotientGroup.eq, Subgroup.mem_subgroupOf]
+        obtain ⟨x, hx, hx'⟩ := h
+        have : x = (τ : G)⁻¹ * τ' := by
+          simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply, Subgroup.coe_mul,
+              InvMemClass.coe_inv, mul_inv_rev, inv_inv]
+            at hx'
+          have := congrArg (fun y => σ⁻¹ * y * σ) hx'
+          simpa [mul_assoc] using this
+        simpa [this] using hx
   · intro q _
     induction q using QuotientGroup.induction_on with
     | H ρ =>

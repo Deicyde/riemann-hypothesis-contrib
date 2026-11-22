@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DvdOfMemI
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.Ord2.GwIneq
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.Ord2.GwIneq
 open scoped Matrix
 
 namespace GlobalTheory.Ord2.SelPerp
@@ -25,8 +27,8 @@ theorem coef_free_pairSurj (l : ℕ) [Fact l.Prime] (c : Coef l) : Module.Free �
       exact Subtype.ext h'
   infer_instance
 
-theorem exists_eq_tbA_mul (l : ℕ) [Fact l.Prime] (c : Coef l) (n : ℕ) (φ : Qn c n →+ ZMod (l ^ n)) :
-    ∃ b : Qn c n, ∀ a : Qn c n, φ a = GlobalTheory.Ord2.SelPerp.tbA c n (a * b) := by
+theorem exists_eq_tbA_mul (l : ℕ) [Fact l.Prime] (c : Coef l) (n : ℕ) (φ : Qn c n →+ ZMod (l ^ n))
+    : ∃ b : Qn c n, ∀ a : Qn c n, φ a = GlobalTheory.Ord2.SelPerp.tbA c n (a * b) := by
   classical
   haveI := coef_free_pairSurj l c
   let e := Module.Free.chooseBasis ℤ_[l] c.O
@@ -39,10 +41,13 @@ theorem exists_eq_tbA_mul (l : ℕ) [Fact l.Prime] (c : Coef l) (n : ℕ) (φ : 
       obtain ⟨i, rfl⟩ := hx
       simp only [f, Module.Basis.constr_basis]
       rw [map_natCast, ZMod.natCast_zmod_val]
-    | zero => simp
-    | add x y _ _ hx hy => rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), hx, hy]
+    | zero =>
+      simp
+    | add x y _ _ hx hy =>
+      rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), hx, hy]
     | smul a x _ hx =>
-      rw [map_smul, smul_eq_mul, map_mul, hx, red_smul, map_nsmul, nsmul_eq_mul, ZMod.natCast_zmod_val]
+      rw [map_smul, smul_eq_mul, map_mul, hx, red_smul, map_nsmul, nsmul_eq_mul,
+        ZMod.natCast_zmod_val]
   obtain ⟨b, hb, -⟩ := tau_spec c f
   refine ⟨red c n b, fun a => ?_⟩
   obtain ⟨x, rfl⟩ := red_surjective c n a

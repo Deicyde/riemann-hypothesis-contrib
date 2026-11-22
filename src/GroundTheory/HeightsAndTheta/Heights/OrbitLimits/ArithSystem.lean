@@ -11,7 +11,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4
 
 namespace ArithIntersectionSystem
 
@@ -21,10 +22,12 @@ theorem multilin_of_isFamily {I : AllFam} (hI : I.IsFamily) : IsMultilinFam I :=
   | zero => exact j.elim0
   | succ m =>
     obtain ⟨hsym, hadd, -⟩ := hI K ι
-    have e : ∀ X : HermLine ι, IsSmoothHerm X →
-        I K ι P (m + 1) (Function.update L j X) =
-          I K ι P (m + 1)
-            (Fin.snoc (fun i : Fin m => L (Equiv.swap j (Fin.last m) i.castSucc)) X) := by
+    have e
+        : ∀ X : HermLine ι,
+          IsSmoothHerm X
+            → I K ι P (m + 1) (Function.update L j X)
+              = I K ι P (m + 1)
+                (Fin.snoc (fun i : Fin m => L (Equiv.swap j (Fin.last m) i.castSucc)) X) := by
       intro X hX
       rw [← GroundTheory.Heights₂.Heights.Inter.ThmIMultilin.update_comp_swap]
       exact (hsym P (m + 1) _ _ hP
@@ -32,8 +35,10 @@ theorem multilin_of_isFamily {I : AllFam} (hI : I.IsFamily) : IsMultilinFam I :=
     rw [e _ (isSmoothHerm_tensor hA hB), e A hA, e B hB]
     exact hadd P m _ A B hP (fun i => hL _) hA hB
 
-theorem of_found (hE : GroundTheory.Heights₂.Heights.Inter.ThmIExists.Statement) (hPF : PFCoordStatement)
-    (hCM : ContractMixedStatement) : ArithIntersectionSystemStatement := by
+theorem of_found
+    (hE : GroundTheory.Heights₂.Heights.Inter.ThmIExists.Statement) (hPF : PFCoordStatement)
+    (hCM : ContractMixedStatement)
+    : ArithIntersectionSystemStatement := by
   obtain ⟨I, hI⟩ := (hE : ExistsStatement)
   exact ⟨I, hI, multilin_of_isFamily hI, hPF I hI, hCM I hI⟩
 

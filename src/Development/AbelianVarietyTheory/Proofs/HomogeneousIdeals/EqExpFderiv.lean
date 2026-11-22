@@ -8,10 +8,12 @@ universe u_1
 
 namespace GlobalTheory.ExpOfFrechetDerivative
 
-theorem eq_exp_fderiv {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℂ E] {f : E → ℂ}
-    (hd : DifferentiableAt ℂ f (0 : E)) (h0 : f (0 : E) ≠ (0 : ℂ))
-    (hmul : ∀ x y : E, f (x + y) = f x * f y) (z : E) :
-    f z = Complex.exp ((fderiv ℂ f (0 : E) : E → ℂ) z) := by
+theorem eq_exp_fderiv
+    {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {f : E → ℂ} (hd : DifferentiableAt ℂ f (0 : E)) (h0 : f (0 : E) ≠ (0 : ℂ))
+    (hmul : ∀ x y : E, f (x + y) = f x * f y)
+    (z : E)
+    : f z = Complex.exp ((fderiv ℂ f (0 : E) : E → ℂ) z) := by
   set L := fderiv ℂ f (0 : E) with hL
 
   have hf0 : f 0 = 1 := by
@@ -35,9 +37,12 @@ theorem eq_exp_fderiv {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℂ E] 
     show f y = f x * f (y - x)
     rw [← hmul, add_sub_cancel]
 
-  have hE : ∀ y : E, HasFDerivAt (fun y => f y * Complex.exp (-(L y)))
-      (f y • (Complex.exp (-(L y)) • -L) + Complex.exp (-(L y)) • (f y • L)) y :=
-    fun y => (hD y).mul (L.hasFDerivAt.neg.cexp)
+  have hE
+      : ∀ y : E,
+        HasFDerivAt
+          (fun y => f y * Complex.exp (-(L y)))
+          (f y • (Complex.exp (-(L y)) • -L) + Complex.exp (-(L y)) • (f y • L)) y := fun y =>
+    (hD y).mul (L.hasFDerivAt.neg.cexp)
   have hzero : ∀ y, fderiv ℂ (fun y => f y * Complex.exp (-(L y))) y = 0 := by
     intro y
     rw [(hE y).fderiv]
@@ -46,8 +51,9 @@ theorem eq_exp_fderiv {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℂ E] 
     ring
   have hc := is_const_of_fderiv_eq_zero (fun y => (hE y).differentiableAt) hzero z 0
   simp only [map_zero, neg_zero, Complex.exp_zero, mul_one, hf0] at hc
-  calc f z = f z * Complex.exp (-(L z)) * Complex.exp (L z) := by
-        rw [mul_assoc, ← Complex.exp_add, neg_add_cancel, Complex.exp_zero, mul_one]
+  calc
+    f z = f z * Complex.exp (-(L z)) * Complex.exp (L z) := by
+      rw [mul_assoc, ← Complex.exp_add, neg_add_cancel, Complex.exp_zero, mul_one]
     _ = Complex.exp (L z) := by rw [hc, one_mul]
 
 end GlobalTheory.ExpOfFrechetDerivative

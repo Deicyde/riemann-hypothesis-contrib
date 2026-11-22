@@ -25,8 +25,7 @@ theorem dL_sub (u v w : Fin n → ℝ) : dot (u - v) w = dot u w - dot v w := by
 theorem dL_smul (c : ℝ) (u w : Fin n → ℝ) : dot (c • u) w = c * dot u w := by
   simp [dot, mul_sum, mul_assoc]
 
-theorem d_comm (u v : Fin n → ℝ) : dot u v = dot v u := by
-  simp [dot, mul_comm]
+theorem d_comm (u v : Fin n → ℝ) : dot u v = dot v u := by simp [dot, mul_comm]
 
 theorem dR_add (u v w : Fin n → ℝ) : dot u (v + w) = dot u v + dot u w := by
   simp [dot, mul_add, sum_add_distrib]
@@ -40,11 +39,9 @@ theorem dR_smul (c : ℝ) (u w : Fin n → ℝ) : dot u (c • w) = c * dot u w 
 theorem d_perm (u v : Fin n → ℝ) (w : Equiv.Perm (Fin n)) : dot (u ∘ w) (v ∘ w) = dot u v := by
   simpa [dot] using Equiv.sum_comp w (fun a => u a * v a)
 
-theorem d_self_nonneg (u : Fin n → ℝ) : 0 ≤ dot u u :=
-  sum_nonneg fun a _ => mul_self_nonneg _
+theorem d_self_nonneg (u : Fin n → ℝ) : 0 ≤ dot u u := sum_nonneg fun a _ => mul_self_nonneg _
 
-theorem rho_sub (a b : Fin n) : rhoV n a - rhoV n b = (b : ℕ) - (a : ℕ) := by
-  simp only [rhoV]; ring
+theorem rho_sub (a b : Fin n) : rhoV n a - rhoV n b = (b : ℕ) - (a : ℕ) := by simp only [rhoV]; ring
 
 theorem rho_anti : StrictAnti (rhoV n) := by
   intro a b h
@@ -52,24 +49,30 @@ theorem rho_anti : StrictAnti (rhoV n) := by
   have := rho_sub a b
   linarith
 
-theorem rearr (u : Fin n → ℝ) (hu : Antitone u) (σ : Equiv.Perm (Fin n)) :
-    dot u (rhoV n ∘ σ) ≤ dot u (rhoV n) :=
+theorem rearr (u : Fin n → ℝ) (hu : Antitone u) (σ : Equiv.Perm (Fin n))
+    : dot u (rhoV n ∘ σ) ≤ dot u (rhoV n) :=
   Monovary.sum_mul_comp_perm_le_sum_mul (hu.monovary rho_anti.antitone)
 
-def s0 (a b : Fin n) : ℝ := if a < b then 1 else if b < a then -1 else 0
+def s0 (a b : Fin n) : ℝ :=
+  if a < b then
+    1
+  else if b < a then
+    -1
+  else
+    0
 
 def mB (B : Finset (Fin n × Fin n)) (a b : Fin n) : ℝ := if (a, b) ∈ B then 1 else 0
 
 def sg (B : Finset (Fin n × Fin n)) (a b : Fin n) : ℝ := s0 a b - 2 * mB B a b + 2 * mB B b a
 
-theorem sign_antisymmetric_alt (a b : Fin n) : s0 b a = -s0 a b := by
+theorem sign_antisymmetric_alt (a b : Fin n) : s0 b a = - s0 a b := by
   unfold s0
   rcases lt_trichotomy a b with h | h | h
   · simp [h, asymm h]
   · simp [h]
   · simp [h, asymm h]
 
-theorem sg_anti (B : Finset (Fin n × Fin n)) (a b : Fin n) : sg B b a = -sg B a b := by
+theorem sg_anti (B : Finset (Fin n × Fin n)) (a b : Fin n) : sg B b a = - sg B a b := by
   unfold sg; rw [sign_antisymmetric_alt a b]; ring
 
 theorem sign_self_eq_zero (a : Fin n) : s0 a a = 0 := by simp [s0]
@@ -89,9 +92,10 @@ theorem sum_sign_eq_two_rho (a : Fin n) : ∑ b, s0 a b = 2 * rhoV n a := by
   simp [rhoV]
   ring
 
-theorem sum_row_count (B : Finset (Fin n × Fin n)) (a : Fin n) :
-    ∑ b, mB B a b = ((B.filter fun p => p.1 = a).card : ℝ) := by
-  have : B.filter (fun p => p.1 = a) = (univ.filter fun b => (a, b) ∈ B).image (fun b => (a, b)) := by
+theorem sum_row_count (B : Finset (Fin n × Fin n)) (a : Fin n)
+    : ∑ b, mB B a b = ((B.filter fun p => p.1 = a).card : ℝ) := by
+  have : B.filter (fun p => p.1 = a)
+      = (univ.filter fun b => (a, b) ∈ B).image (fun b => (a, b)) := by
     ext ⟨x, y⟩
     simp only [mem_filter, mem_image, mem_univ, true_and, Prod.mk.injEq]
     constructor
@@ -100,9 +104,10 @@ theorem sum_row_count (B : Finset (Fin n × Fin n)) (a : Fin n) :
   rw [this, card_image_of_injective _ (fun x y h => (Prod.mk.inj h).2)]
   simp [mB]
 
-theorem sum_column_count (B : Finset (Fin n × Fin n)) (a : Fin n) :
-    ∑ b, mB B b a = ((B.filter fun p => p.2 = a).card : ℝ) := by
-  have : B.filter (fun p => p.2 = a) = (univ.filter fun b => (b, a) ∈ B).image (fun b => (b, a)) := by
+theorem sum_column_count (B : Finset (Fin n × Fin n)) (a : Fin n)
+    : ∑ b, mB B b a = ((B.filter fun p => p.2 = a).card : ℝ) := by
+  have : B.filter (fun p => p.2 = a)
+      = (univ.filter fun b => (b, a) ∈ B).image (fun b => (b, a)) := by
     ext ⟨x, y⟩
     simp only [mem_filter, mem_image, mem_univ, true_and, Prod.mk.injEq]
     constructor
@@ -111,13 +116,14 @@ theorem sum_column_count (B : Finset (Fin n × Fin n)) (a : Fin n) :
   rw [this, card_image_of_injective _ (fun x y h => (Prod.mk.inj h).1)]
   simp [mB]
 
-theorem sum_sg (B : Finset (Fin n × Fin n)) (a : Fin n) :
-    ∑ b, sg B a b = 2 * (rhoV n a - wtB B a) := by
-  simp only [sg, sum_add_distrib, sum_sub_distrib, ← mul_sum, sum_sign_eq_two_rho, sum_row_count, sum_column_count, wtB]
+theorem sum_sg (B : Finset (Fin n × Fin n)) (a : Fin n)
+    : ∑ b, sg B a b = 2 * (rhoV n a - wtB B a) := by
+  simp only [sg, sum_add_distrib, sum_sub_distrib, ← mul_sum, sum_sign_eq_two_rho, sum_row_count,
+    sum_column_count, wtB]
   ring
 
-theorem sg_val (B : Finset (Fin n × Fin n)) (hB : ∀ p ∈ B, p.1 < p.2) {a b : Fin n} (hab : a ≠ b) :
-    sg B a b = 1 ∨ sg B a b = -1 := by
+theorem sg_val (B : Finset (Fin n × Fin n)) (hB : ∀ p ∈ B, p.1 < p.2) {a b : Fin n} (hab : a ≠ b)
+    : sg B a b = 1 ∨ sg B a b = -1 := by
   have key : ∀ a b : Fin n, a < b → sg B a b = 1 ∨ sg B a b = -1 := by
     intro a b h
     have h1 : (b, a) ∉ B := fun hm => asymm h (hB _ hm)

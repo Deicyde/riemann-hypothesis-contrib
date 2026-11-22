@@ -41,8 +41,12 @@ theorem intSpan' : IntSpan := by
   have : Module.Finite F E := Module.Finite.of_restrictScalars_finite ℚ F E
   let B := Module.finBasis F E
   obtain ⟨y, hy0, hy⟩ := exists_integral_multiples ℤ ℚ (Finset.univ.image (fun i => B i))
-  refine ⟨Module.finrank F E, fun i => y • B i,
-    fun i => hy _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)), fun e => ?_⟩
+  refine ⟨
+    Module.finrank F E,
+    fun i => y • B i,
+    fun i => hy _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)),
+    fun e => ?_
+  ⟩
   refine ⟨fun i => B.repr e i / (y : F), ?_⟩
   conv_lhs => rw [← B.sum_repr e]
   refine Finset.sum_congr rfl (fun i _ => ?_)

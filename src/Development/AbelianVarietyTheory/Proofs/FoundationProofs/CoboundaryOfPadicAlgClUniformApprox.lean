@@ -8,20 +8,20 @@ open scoped Matrix
 
 namespace GlobalTheory.UniformCoboundary
 
-theorem exists_finset_fixed {K : Type} [Field K] {Γ : Type} (S : Set Γ)
-    (M : Γ → Matrix (Fin 2) (Fin 2) K) :
-    ∃ T : Finset Γ, (↑T ⊆ S) ∧
-      ∀ v : Fin 2 → K, (∀ t ∈ T, M t *ᵥ v = v) → ∀ s ∈ S, M s *ᵥ v = v := by
+theorem exists_finset_fixed
+    {K : Type} [Field K] {Γ : Type} (S : Set Γ) (M : Γ → Matrix (Fin 2) (Fin 2) K)
+    : ∃ T : Finset Γ,
+      (↑T ⊆ S) ∧ ∀ v : Fin 2 → K, (∀ t ∈ T, M t *ᵥ v = v) → ∀ s ∈ S, M s *ᵥ v = v := by
   classical
-  let W : Finset Γ → Submodule K (Fin 2 → K) :=
-    fun T => ⨅ t ∈ T, LinearMap.ker (Matrix.toLin' (M t) - LinearMap.id)
+  let W : Finset Γ → Submodule K (Fin 2 → K) := fun T =>
+    ⨅ t ∈ T, LinearMap.ker (Matrix.toLin' (M t) - LinearMap.id)
   have hW : ∀ (T : Finset Γ) (v : Fin 2 → K), v ∈ W T ↔ ∀ t ∈ T, M t *ᵥ v = v := by
     intro T v
-    simp only [W, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
-      Matrix.toLin'_apply, LinearMap.id_apply, sub_eq_zero]
+    simp only [W, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, Matrix.toLin'_apply,
+      LinearMap.id_apply, sub_eq_zero]
   obtain ⟨_, ⟨T, hTS, rfl⟩, hmin⟩ :=
-    (wellFounded_lt (α := Submodule K (Fin 2 → K))).has_min
-      {P | ∃ T : Finset Γ, ↑T ⊆ S ∧ W T = P} ⟨_, ∅, by simp, rfl⟩
+    (wellFounded_lt (α := Submodule K (Fin 2 → K))).has_min {P | ∃ T : Finset Γ, ↑T ⊆ S ∧ W T = P}
+      ⟨_, ∅, by simp, rfl⟩
   refine ⟨T, hTS, fun v hv s hs => ?_⟩
   have hle : W (insert s T) ≤ W T := by
     intro w hw
@@ -33,9 +33,9 @@ theorem exists_finset_fixed {K : Type} [Field K] {Γ : Type} (S : Set Γ)
   have hv' : v ∈ W (insert s T) := by rw [heq, hW]; exact hv
   exact (hW _ _).1 hv' s (Finset.mem_insert_self s T)
 
-theorem exists_bound {K : Type} [NormedField K] {ι : Type} [Fintype ι]
-    (L : (ι → K) →ₗ[K] (Fin 2 → K)) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ (w : ι → K) (ε : ℝ), 0 ≤ ε → (∀ p, ‖w p‖ ≤ ε) → ∀ k, ‖L w k‖ ≤ C * ε := by
+theorem exists_bound
+    {K : Type} [NormedField K] {ι : Type} [Fintype ι] (L : (ι → K) →ₗ[K] (Fin 2 → K))
+    : ∃ C : ℝ, 0 ≤ C ∧ ∀ (w : ι → K) (ε : ℝ), 0 ≤ ε → (∀ p, ‖w p‖ ≤ ε) → ∀ k, ‖L w k‖ ≤ C * ε := by
   classical
   refine ⟨∑ k, ∑ p, ‖L (Pi.single p 1) k‖, by positivity, fun w ε hε hw k => ?_⟩
   have h1 : w = ∑ p, w p • (Pi.single p 1 : ι → K) := by
@@ -44,22 +44,26 @@ theorem exists_bound {K : Type} [NormedField K] {ι : Type} [Fintype ι]
   have h2 : L w k = ∑ p, w p * L (Pi.single p 1) k := by
     conv_lhs => rw [h1]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finset.sum_apply]
+    simp [map_sum, Finset.sum_apply]
   have h3 : ‖L w k‖ ≤ (∑ p, ‖L (Pi.single p 1) k‖) * ε := by
     rw [h2, Finset.sum_mul]
     refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun p _ => ?_)
     rw [norm_mul, mul_comm]
     exact mul_le_mul_of_nonneg_left (hw p) (norm_nonneg _)
   refine h3.trans (mul_le_mul_of_nonneg_right ?_ hε)
-  exact Finset.single_le_sum (f := fun k => ∑ p, ‖L (Pi.single p 1) k‖)
-    (fun k _ => by positivity) (Finset.mem_univ k)
+  exact Finset.single_le_sum
+    (f := fun k => ∑ p, ‖L (Pi.single p 1) k‖)
+    (fun k _ => by positivity)
+    (Finset.mem_univ k)
 
-theorem coboundary_of_approx {K : Type} [NormedField K] (q : K) (hq : ‖q‖ < 1) (Γ : Type)
-    (S : Set Γ) (M : Γ → Matrix (Fin 2) (Fin 2) K) (f : ℕ → Γ → Fin 2 → K) (y : Γ → Fin 2 → K)
-    (hM : ∀ s i j, ‖M s i j‖ ≤ 1)
-    (hf : ∀ r, ∃ v : Fin 2 → K, ∀ s ∈ S, f r s = M s *ᵥ v - v)
-    (hy : ∀ r s i, ‖y s i - f r s i‖ ≤ ‖q ^ r‖) :
-    ∃ v : Fin 2 → K, ∀ s ∈ S, y s = M s *ᵥ v - v := by
+theorem coboundary_of_approx
+    {K : Type} [NormedField K]
+    (q : K) (hq : ‖q‖ < 1)
+    (Γ : Type) (S : Set Γ) (M : Γ → Matrix (Fin 2) (Fin 2) K) (f : ℕ → Γ → Fin 2 → K)
+    (y : Γ → Fin 2 → K)
+    (hM : ∀ s i j, ‖M s i j‖ ≤ 1) (hf : ∀ r, ∃ v : Fin 2 → K, ∀ s ∈ S, f r s = M s *ᵥ v - v)
+    (hy : ∀ r s i, ‖y s i - f r s i‖ ≤ ‖q ^ r‖)
+    : ∃ v : Fin 2 → K, ∀ s ∈ S, y s = M s *ᵥ v - v := by
   classical
   obtain ⟨T, hTS, hT⟩ := exists_finset_fixed S M
   let e : (Fin 2 → K) →ₗ[K] (T × Fin 2 → K) :=
@@ -67,8 +71,8 @@ theorem coboundary_of_approx {K : Type} [NormedField K] (q : K) (hq : ‖q‖ < 
   have he : ∀ v (p : T × Fin 2), e v p = (M p.1 *ᵥ v - v) p.2 := by
     intro v p
     simp [e, Matrix.toLin'_apply]
-  obtain ⟨g, hg⟩ := LinearMap.exists_rightInverse_of_surjective e.rangeRestrict
-    (LinearMap.range_rangeRestrict e)
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_rightInverse_of_surjective e.rangeRestrict (LinearMap.range_rangeRestrict e)
   obtain ⟨L, hL⟩ := LinearMap.exists_extend g
   have heL : ∀ v, e (L (e v)) = e v := by
     intro v
@@ -133,7 +137,13 @@ theorem coboundary_of_approx {K : Type} [NormedField K] (q : K) (hq : ‖q‖ < 
     simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg q) hq).const_mul (1 + 3 * C)
   exact ge_of_tendsto' hlim key
 
-theorem coboundary_of_padic_approx : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) (S : Set Γ) (M : Γ → Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) (f : ℕ → Γ → Fin 2 → PadicAlgCl l) (y : Γ → Fin 2 → PadicAlgCl l), (∀ s i j, ‖M s i j‖ ≤ 1) → (∀ r, ∃ v : Fin 2 → PadicAlgCl l, ∀ s ∈ S, f r s = M s *ᵥ v - v) → (∀ r s i, ‖y s i - f r s i‖ ≤ ‖((l : ℕ) : PadicAlgCl l) ^ r‖) → ∃ v : Fin 2 → PadicAlgCl l, ∀ s ∈ S, y s = M s *ᵥ v - v := by
+theorem coboundary_of_padic_approx
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) (S : Set Γ)
+        (M : Γ → Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) (f : ℕ → Γ → Fin 2 → PadicAlgCl l)
+        (y : Γ → Fin 2 → PadicAlgCl l),
+      (∀ s i j, ‖M s i j‖ ≤ 1) → (∀ r, ∃ v : Fin 2 → PadicAlgCl l, ∀ s ∈ S, f r s = M s *ᵥ v - v)
+        → (∀ r s i, ‖y s i - f r s i‖ ≤ ‖((l : ℕ) : PadicAlgCl l) ^ r‖)
+        → ∃ v : Fin 2 → PadicAlgCl l, ∀ s ∈ S, y s = M s *ᵥ v - v := by
   intro l _ Γ S M f y hM hf hy
   refine coboundary_of_approx ((l : ℕ) : PadicAlgCl l) ?_ Γ S M f y hM hf hy
   have h : ((l : ℕ) : PadicAlgCl l) = algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by

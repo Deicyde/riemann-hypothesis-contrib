@@ -4,16 +4,27 @@ public import Development.WeilBound.CoreStatements.SesquilinearFractions.HermFor
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open Matrix GlobalTheory GlobalTheory.CM GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Matrix GlobalTheory GlobalTheory.CM GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexOrder
 
 namespace PositivityTheory.Xgf
 
 open GlobalTheory.CompanionTheory.Ar.Fl.lie_norm_square_of_family
 
-theorem lie_norm_square_of_family : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (R : Type) [CommRing R] (ω : R) (C : Ell H R ω) (T : PAT H (Sp R)) (h : D.La → D.La → OK H) (L : Submodule (𝓞 E) D.La) (ψ : L → (C.P.A ⟶ T.t.G)) (σ : R →+* ℂ) (κ : OK H →+* ℂ) (r : ℝ) (n : ℕ) (a : Fin n → L) (u : Fin n → (epsAt (spMap σ) ⟶ T.t.G)), IsFam C T h L ψ → κ (wK H) = σ ω → IsLieNormSq C.P C.v σ r → (∀ k, (u k).left = spMap (dualMap σ) ≫ C.v.left ≫ (ψ (a k)).left) → IsHodgeGram T.t.G T.t.PP.L (spMap σ) u (Matrix.of fun k k' => r * κ (h (a k) (a k'))) := by
+theorem lie_norm_square_of_family
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (R : Type)
+        [CommRing R] (ω : R) (C : Ell H R ω) (T : PAT H (Sp R)) (h : D.La → D.La → OK H)
+        (L : Submodule (𝓞 E) D.La) (ψ : L → (C.P.A ⟶ T.t.G)) (σ : R →+* ℂ) (κ : OK H →+* ℂ) (r : ℝ)
+        (n : ℕ) (a : Fin n → L) (u : Fin n → (epsAt (spMap σ) ⟶ T.t.G)),
+      IsFam C T h L ψ → κ (wK H) = σ ω → IsLieNormSq C.P C.v σ r
+        → (∀ k, (u k).left = spMap (dualMap σ) ≫ C.v.left ≫ (ψ (a k)).left)
+        → IsHodgeGram T.t.G T.t.PP.L (spMap σ) u
+          (Matrix.of fun k k' => r * κ (h (a k) (a k'))) := by
   intro E _ _ _ H D R _ ω C T h L ψ σ κ r n a u hF hκ hr hu
   obtain ⟨hlin, -, -, hlam⟩ := hF
   obtain ⟨P', φ, v', uC, Hm, χ, w, ⟨hg', hpb, hLB⟩, hvo, hAH, hdw, hrr⟩ := hr
@@ -36,43 +47,70 @@ theorem lie_norm_square_of_family : ∀ (E : Type) [Field E] [NumberField E] [Is
   have hd0 : u0.IsDiff (K w) v' := by
     simpa using HodgeUniq.isDiff_comp u0 uC d20 (𝟙 P'.A) K hK hv'T hdw
   have hKH : ∀ z z', hermForm Hm0 (K z) (K z') = hermForm Hm z z' :=
-    (_root_.GlobalTheory.T.weilEq_iff_hermForm_eq_complex thetaUnifAV_all laws P' P' P' P' uC uC u0 uC Hm0 Hm χ0 χ hAH0 hAH (𝟙 _) (𝟙 _) (𝟙 _) (𝟙 _)
-      K K LinearMap.id LinearMap.id hK hK (fun z => by simp) (fun z => by simp)).1 (fun _ _ _ _ _ _ _ => Iff.rfl)
-  have hkey : ∀ b b' : L, ∀ z z', hermForm HmT (F b z) (F b' z') = hermForm Hm0 (G (h b b') z) z' := by
+    (_root_.GlobalTheory.T.weilEq_iff_hermForm_eq_complex thetaUnifAV_all laws P' P' P' P' uC uC u0
+      uC Hm0 Hm χ0 χ hAH0 hAH (𝟙 _) (𝟙 _) (𝟙 _) (𝟙 _) K K LinearMap.id LinearMap.id hK hK
+      (fun z => by simp)
+      (fun z => by simp)).1 (fun _ _ _ _ _ _ _ => Iff.rfl)
+  have hkey
+      : ∀ b b' : L, ∀ z z', hermForm HmT (F b z) (F b' z') = hermForm Hm0 (G (h b b') z) z' := by
     intro b b' z z'
-    have W0 := (PairingFibre.lamEq_weilEq_over_ring laws R C.P C.P T.pol C.P (ψ b) (ψ b') (C.act.act (h b b'))
-      (𝟙 _) (hψm b) (hψm b') (C.act.hom _) inferInstance ℂ σ).1 (hlam b b')
-    have W1 := (PairingFibre.weilEq_iff hpb hpb hQpb hpb T.t.PP.isLB C.P.isLB Q.isLB P'.isLB (LBIso.symm hQLB)
-      (LBIso.symm hLB) (hfc b) (hfc b') (hec (h b b'))
-      (show (𝟙 P'.A : P'.A ⟶ P'.A).left ≫ φ = φ ≫ (𝟙 C.P.A : C.P.A ⟶ C.P.A).left by simp) (𝟙 (Sp ℂ))).2 (by rw [Category.id_comp]; exact W0)
-    have := (_root_.GlobalTheory.T.weilEq_iff_hermForm_eq_complex thetaUnifAV_all laws P' P' Q P' u0 u0 uT u0 HmT Hm0 χT χ0 hAHT hAH0 (f b) (f b')
-      (e (h b b')) (𝟙 _) (F b) (F b') (G (h b b')) LinearMap.id (hFl b) (hFl b') (hGl _) (fun z => by simp)).1 W1 z z'
+    have W0 :=
+      (PairingFibre.lamEq_weilEq_over_ring laws R C.P C.P T.pol C.P (ψ b) (ψ b')
+        (C.act.act (h b b')) (𝟙 _) (hψm b) (hψm b') (C.act.hom _) inferInstance ℂ σ).1 (hlam b b')
+    have W1 :=
+      (PairingFibre.weilEq_iff hpb hpb hQpb hpb T.t.PP.isLB C.P.isLB Q.isLB P'.isLB
+        (LBIso.symm hQLB) (LBIso.symm hLB) (hfc b) (hfc b') (hec (h b b'))
+        (show (𝟙 P'.A : P'.A ⟶ P'.A).left ≫ φ = φ ≫ (𝟙 C.P.A : C.P.A ⟶ C.P.A).left by simp)
+        (𝟙 (Sp ℂ))).2 (by rw [Category.id_comp]; exact W0)
+    have :=
+      (_root_.GlobalTheory.T.weilEq_iff_hermForm_eq_complex thetaUnifAV_all laws P' P' Q P' u0 u0 uT
+        u0 HmT Hm0 χT χ0 hAHT hAH0 (f b) (f b') (e (h b b')) (𝟙 _) (F b) (F b') (G (h b b'))
+        LinearMap.id (hFl b) (hFl b') (hGl _) (fun z => by simp)).1 W1 z z'
     simpa using this
   have hg1 : P'.g = 1 := hg'.trans C.dim
   choose c hc using fun x : OK H => CurveAdjoint.exists_scalar hg1 (G x)
-  have pa : ∀ (b : OK H) (p : 𝟙_ (Over (Sp ℂ)) ⟶ P'.A),
-      Geo.Tor.pushHom hpb _ (p ≫ e b) = Geo.Tor.pushHom hpb _ p ≫ C.act.act b := fun b p =>
+  have pa
+      : ∀ (b : OK H) (p : 𝟙_ (Over (Sp ℂ)) ⟶ P'.A),
+        Geo.Tor.pushHom hpb _ (p ≫ e b) = Geo.Tor.pushHom hpb _ p ≫ C.act.act b := fun b p =>
     Over.OverMorphism.ext (by
       show (p.left ≫ _) ≫ _ = (p.left ≫ _) ≫ _
       rw [Category.assoc, hec, Category.assoc])
-  have inj : ∀ p q : 𝟙_ (Over (Sp ℂ)) ⟶ P'.A, Geo.Tor.pushHom hpb _ p = Geo.Tor.pushHom hpb _ q → p = q :=
-    fun p q e' => SymBaseChange.pushPt_injective hpb e'
-  have sc : ∀ (b : OK H) (s : ℂ) (Gs : (Fin P'.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)), (∀ z, Gs z = s • z) →
-      (∀ z, u0.ex (G b z) = u0.ex (Gs z)) → c b = s := fun b s Gs hG hh => by
-    have e' := congrFun ((hc b 1).symm.trans ((LinearMap.congr_fun (CurveAdjoint.linear_eq_of_ex u0 _ _ hh) 1).trans
-      (hG 1))) ⟨0, by omega⟩
+  have inj
+      : ∀ p q : 𝟙_ (Over (Sp ℂ)) ⟶ P'.A,
+        Geo.Tor.pushHom hpb _ p = Geo.Tor.pushHom hpb _ q → p = q := fun p q e' =>
+    SymBaseChange.pushPt_injective hpb e'
+  have sc
+      : ∀ (b : OK H) (s : ℂ) (Gs : (Fin P'.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)),
+        (∀ z, Gs z = s • z) → (∀ z, u0.ex (G b z) = u0.ex (Gs z))
+          → c b = s := fun b s Gs hG hh => by
+    have e' :=
+      congrFun
+        ((hc b 1).symm.trans
+          ((LinearMap.congr_fun (CurveAdjoint.linear_eq_of_ex u0 _ _ hh) 1).trans (hG 1)))
+        ⟨0, by omega⟩
     simpa using e'
-  let j : OK H →+* ℂ := RingHom.mk'
-    { toFun := c
-      map_one' := sc 1 1 LinearMap.id (fun z => by simp) fun z => inj _ _ (by
-        rw [hGl, pa, C.act.one, Category.comp_id, LinearMap.id_apply])
-      map_mul' := fun b b' => sc _ _ (G b' ∘ₗ G b) (fun z => by
-        rw [LinearMap.comp_apply, hc, hc, smul_smul, mul_comm]) fun z => inj _ _ (by
-          rw [LinearMap.comp_apply, hGl, hGl, hGl, pa, pa, pa, C.act.mul, Category.assoc]) }
-    fun b b' => sc _ _ (G b + G b') (fun z => by
-      rw [LinearMap.add_apply, hc, hc, ← add_smul]; rfl) fun z => inj _ _ (by
-        rw [LinearMap.add_apply, u0.ex_add, map_mul, hGl, hGl, hGl, pa, pa, pa, C.act.add, Hom.mul_def, Hom.mul_def,
-          ← Category.assoc, comp_lift])
+  let j : OK H →+* ℂ :=
+    RingHom.mk'
+      {
+        toFun := c
+        map_one' :=
+          sc 1 1 LinearMap.id
+            (fun z => by simp)
+            fun z => inj _ _ (by rw [hGl, pa, C.act.one, Category.comp_id, LinearMap.id_apply])
+        map_mul' := fun b b' =>
+          sc _ _ (G b' ∘ₗ G b)
+            (fun z => by rw [LinearMap.comp_apply, hc, hc, smul_smul, mul_comm])
+            fun z =>
+              inj _ _
+                (by rw [LinearMap.comp_apply, hGl, hGl, hGl, pa, pa, pa, C.act.mul, Category.assoc])
+      }
+      fun b b' =>
+        sc _ _ (G b + G b')
+          (fun z => by rw [LinearMap.add_apply, hc, hc, ← add_smul]; rfl)
+          fun z =>
+            inj _ _ (by
+              rw [LinearMap.add_apply, u0.ex_add, map_mul, hGl, hGl, hGl, pa, pa, pa, C.act.add,
+                Hom.mul_def, Hom.mul_def, ← Category.assoc, comp_lift])
   have hj : ∀ x, j x = c x := fun _ => rfl
 
   have heig : C.v ≫ C.act.act (wK H) = CMCurveTest.scaleVec ω C.v := by
@@ -104,8 +142,20 @@ theorem lie_norm_square_of_family : ∀ (E : Type) [Field E] [NumberField E] [Is
     rw [j.map_add, κ.map_add, j.map_mul, κ.map_mul]
     simp only [map_intCast]
     rw [hj, hw, hκ]
-  refine ⟨Q, ψQ, fun k => v' ≫ f (a k), uT, HmT, χT, fun k => F (a k) (K w), hQpb, hQLB, hAHT,
-    fun k => ⟨?_, ?_⟩, fun k k' => ?_⟩
+  refine ⟨
+    Q,
+    ψQ,
+    fun k => v' ≫ f (a k),
+    uT,
+    HmT,
+    χT,
+    fun k => F (a k) (K w),
+    hQpb,
+    hQLB,
+    hAHT,
+    fun k => ⟨?_, ?_⟩,
+    fun k k' => ?_
+  ⟩
   · rw [Over.comp_left, Category.assoc, hfc, ← Category.assoc, hvo, hu k, Category.assoc]
     rfl
   · haveI := hfm (a k)

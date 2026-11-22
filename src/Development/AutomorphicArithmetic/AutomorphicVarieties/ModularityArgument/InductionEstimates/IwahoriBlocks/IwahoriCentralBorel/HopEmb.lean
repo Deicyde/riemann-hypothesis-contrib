@@ -8,14 +8,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
-private theorem cosets_finite {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] {W : Subgroup G}
-    (hW : CO W) (g : G) : {c : G ⧸ W | ∃ u ∈ W, c = QuotientGroup.mk (u * g)}.Finite := by
+private theorem cosets_finite
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    {W : Subgroup G} (hW : CO W)
+    (g : G)
+    : {c : G ⧸ W | ∃ u ∈ W, c = QuotientGroup.mk (u * g)}.Finite := by
   haveI : DiscreteTopology (G ⧸ W) := QuotientGroup.discreteTopology hW.2
   have hc : Continuous fun u : G => (QuotientGroup.mk (u * g) : G ⧸ W) :=
     QuotientGroup.continuous_mk.comp (continuous_id.mul continuous_const)
@@ -23,9 +30,17 @@ private theorem cosets_finite {G : Type} [Group G] [TopologicalSpace G] [IsTopol
   rintro c ⟨u, hu, rfl⟩
   exact ⟨u, hu, rfl⟩
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.hopEmb :
-    ∀ {K : Type} [Field K] [NumberField K] (n : ℕ) {r : ℕ} (w : Fin r → Pl K) (ι : GS n w →* FA K n), Function.Injective w → IsEmb w ι → ∀ U, Lev U → ∀ φ : G1 K n → ℂ, FixF (levOn (im w) U) φ →
-      ∀ g, hop (levOn (im w) U) (ι g) φ = hopR (rS ι) (Subgroup.pi Set.univ fun i => U (w i)) g φ := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.hopEmb
+    : ∀ {K : Type} [Field K] [NumberField K] (n : ℕ) {r : ℕ} (w : Fin r → Pl K)
+        (ι : GS n w →* FA K n),
+      Function.Injective w → IsEmb w ι
+        → ∀ U,
+          Lev U
+            → ∀ φ : G1 K n → ℂ,
+              FixF (levOn (im w) U) φ
+                → ∀ g,
+                  hop (levOn (im w) U) (ι g) φ
+                    = hopR (rS ι) (Subgroup.pi Set.univ fun i => U (w i)) g φ := by
   intro K _ _ n r w ι hw hι U hU φ hφ g
   obtain ⟨hcf, hoff, -, hcomm, hmem⟩ := ((embEx n w hw).2 ι hι).2
   have hcf' : ∀ (v : Pl K), GM.cf v (1 : FA K n) ∈ GLnLocal.integralGL (v.adicCompletion K) n := by
@@ -52,13 +67,16 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.hopEmb :
     intro x hx
     obtain ⟨a, h', e, ha, h1, -⟩ := (hmem U _).1 hx
     have e' : h' = ι (a⁻¹ * x) := by rw [map_mul, map_inv, e, inv_mul_cancel_left]
-    have e1 : a⁻¹ * x = 1 := funext fun i => by
-      rw [← hcf (a⁻¹ * x) i, ← e', h1]
-      rfl
+    have e1 : a⁻¹ * x = 1 :=
+      funext fun i => by
+        rw [← hcf (a⁻¹ * x) i, ← e', h1]
+        rfl
     rw [(inv_mul_eq_one.1 e1).symm]
     exact fun i _ => ha i
-  have hW : CO W :=
-    ⟨isCompact_univ_pi fun j => (hU (w j)).1.1, isOpen_set_pi Set.finite_univ fun j _ => (hU (w j)).1.2⟩
+  have hW : CO W := ⟨
+    isCompact_univ_pi fun j => (hU (w j)).1.1,
+    isOpen_set_pi Set.finite_univ fun j _ => (hU (w j)).1.2
+  ⟩
   let e : GS n w ⧸ W → FA K n ⧸ L := fun c => QuotientGroup.mk (ι c.out)
   have he : ∀ y, e (QuotientGroup.mk y) = QuotientGroup.mk (ι y) := by
     intro y
@@ -87,10 +105,14 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.hopEmb :
       rwa [this]
   have hfin := cosets_finite hW g
   funext x
-  have hR : hopR (rS ι) W g φ x = ∑ᶠ c ∈ {c : GS n w ⧸ W | ∃ u ∈ W, c = QuotientGroup.mk (u * g)}, φ (x * fin1 (ι c.out)) := by
-    unfold hopR
-    rw [finsum_mem_eq_finite_toFinset_sum _ hfin, finsum_mem_eq_finite_toFinset_sum _ hfin, Finset.sum_apply]
-    rfl
+  have hR
+      : hopR (rS ι) W g φ x
+        = ∑ᶠ c ∈ {c : GS n w ⧸ W | ∃ u ∈ W, c = QuotientGroup.mk (u * g)}, φ (x * fin1 (ι c.out)) :=
+    by
+      unfold hopR
+      rw [finsum_mem_eq_finite_toFinset_sum _ hfin, finsum_mem_eq_finite_toFinset_sum _ hfin,
+        Finset.sum_apply]
+      rfl
   rw [hR]
   unfold hop
   symm

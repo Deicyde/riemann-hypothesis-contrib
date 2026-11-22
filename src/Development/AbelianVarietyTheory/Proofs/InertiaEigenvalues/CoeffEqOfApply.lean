@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Complet
 
 noncomputable section
 
-open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.SenLines GlobalTheory.IndefiniteRowSideFullHecke.DiagonalQuotientEigen
+open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.BasicNotions.Loc GlobalTheory.SenLines
+  GlobalTheory.IndefiniteRowSideFullHecke.DiagonalQuotientEigen
 
 namespace GlobalTheory.SenLines.Coords
 
@@ -17,8 +19,7 @@ variable {F M : Type} [Field F] [AddCommGroup M] [Module F M]
 
 def zc (c : F⟦X⟧) (n : ℤ) : F := if 0 ≤ n then coeff n.toNat c else 0
 
-theorem zc_nat (c : F⟦X⟧) (n : ℕ) : zc c n = coeff n c := by
-  simp [zc]
+theorem zc_nat (c : F⟦X⟧) (n : ℕ) : zc c n = coeff n c := by simp [zc]
 
 theorem zc_neg (c : F⟦X⟧) {n : ℤ} (h : n < 0) : zc c n = 0 := by
   unfold zc
@@ -28,8 +29,8 @@ theorem zc_add (c c' : F⟦X⟧) (n : ℤ) : zc (c + c') n = zc c n + zc c' n :=
   unfold zc
   split_ifs <;> simp [map_add (f := _)]
 
-theorem zc_mul (f c : F⟦X⟧) (n : ℤ) (N : ℕ) (h : n < N) :
-    zc (f * c) n = ∑ j ∈ Finset.range N, coeff j f * zc c (n - j) := by
+theorem zc_mul (f c : F⟦X⟧) (n : ℤ) (N : ℕ) (h : n < N)
+    : zc (f * c) n = ∑ j ∈ Finset.range N, coeff j f * zc c (n - j) := by
   rcases lt_or_ge n 0 with hn | hn
   · rw [zc_neg _ hn]
     symm
@@ -51,21 +52,20 @@ theorem zc_mul (f c : F⟦X⟧) (n : ℤ) (N : ℕ) (h : n < N) :
 def lines {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) (c : Fin r → F⟦X⟧) : ℤ → M :=
   ∑ k, serLine (u k) (d k) (c k)
 
-theorem lines_apply {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) (c : Fin r → F⟦X⟧) (m : ℤ) :
-    lines u d c m = ∑ k, zc (c k) (m + u k) • d k := by
+theorem lines_apply {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) (c : Fin r → F⟦X⟧) (m : ℤ)
+    : lines u d c m = ∑ k, zc (c k) (m + u k) • d k := by
   unfold lines
   rw [Finset.sum_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
   simp only [serLine, zc]
   split_ifs <;> simp
 
-theorem lines_add {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) (c c' : Fin r → F⟦X⟧) :
-    lines u d (c + c') = lines u d c + lines u d c' := by
+theorem lines_add {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) (c c' : Fin r → F⟦X⟧)
+    : lines u d (c + c') = lines u d c + lines u d c' := by
   funext m
   simp only [lines_apply, Pi.add_apply, zc_add, add_smul, Finset.sum_add_distrib]
 
-theorem lines_zero {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) :
-    lines u d (0 : Fin r → F⟦X⟧) = 0 := by
+theorem lines_zero {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) : lines u d (0 : Fin r → F⟦X⟧) = 0 := by
   funext m
   rw [lines_apply, Pi.zero_apply]
   refine Finset.sum_eq_zero fun k _ => ?_
@@ -74,32 +74,36 @@ theorem lines_zero {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) :
     split_ifs <;> simp
   rw [Pi.zero_apply, this, zero_smul]
 
-theorem lines_sum {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) {ι : Type} (s : Finset ι)
-    (c : ι → Fin r → F⟦X⟧) : lines u d (∑ j ∈ s, c j) = ∑ j ∈ s, lines u d (c j) := by
+theorem lines_sum
+    {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) {ι : Type} (s : Finset ι) (c : ι → Fin r → F⟦X⟧)
+    : lines u d (∑ j ∈ s, c j) = ∑ j ∈ s, lines u d (c j) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp only [Finset.sum_empty, lines_zero]
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, lines_add, ih]
 
-theorem coeff_eq_of_apply {r : ℕ} (u : Fin r → ℤ) {d : Fin r → M} (hd : LinearIndependent F d)
-    (c c' : Fin r → F⟦X⟧) (a : F) (m : ℤ) (h : lines u d c m = a • lines u d c' m) (k : Fin r) :
-    zc (c k) (m + u k) = a * zc (c' k) (m + u k) := by
+theorem coeff_eq_of_apply
+    {r : ℕ} (u : Fin r → ℤ)
+    {d : Fin r → M} (hd : LinearIndependent F d)
+    (c c' : Fin r → F⟦X⟧) (a : F) (m : ℤ) (h : lines u d c m = a • lines u d c' m)
+    (k : Fin r)
+    : zc (c k) (m + u k) = a * zc (c' k) (m + u k) := by
   rw [lines_apply, lines_apply, Finset.smul_sum] at h
   have h2 : ∑ k, (zc (c k) (m + u k) - a * zc (c' k) (m + u k)) • d k = 0 := by
     simp only [sub_smul, Finset.sum_sub_distrib, mul_smul]
     rw [h, sub_self]
   exact sub_eq_zero.mp (Fintype.linearIndependent_iff.mp hd _ h2 k)
 
-theorem lines_injective {r : ℕ} (u : Fin r → ℤ) {d : Fin r → M} (hd : LinearIndependent F d) :
-    Function.Injective (lines (F := F) u d) := by
+theorem lines_injective {r : ℕ} (u : Fin r → ℤ) {d : Fin r → M} (hd : LinearIndependent F d)
+    : Function.Injective (lines (F := F) u d) := by
   intro c c' h
   funext k
   ext n
   have := coeff_eq_of_apply u hd c c' 1 ((n : ℤ) - u k) (by rw [h, one_smul]) k
   rwa [sub_add_cancel, one_mul, zc_nat, zc_nat] at this
 
-theorem serAct_lines {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) (f : F⟦X⟧) (c : Fin r → F⟦X⟧) :
-    serAct f (lines u d c) = lines u d (f • c) := by
+theorem serAct_lines {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) (f : F⟦X⟧) (c : Fin r → F⟦X⟧)
+    : serAct f (lines u d c) = lines u d (f • c) := by
   funext m
   obtain ⟨N, hN⟩ : ∃ N : ℕ, ∀ k, m + u k < N := by
     refine ⟨(Finset.univ.sup fun k => (m + u k).toNat) + 1, fun k => ?_⟩
@@ -108,7 +112,8 @@ theorem serAct_lines {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) (f : F⟦X�
     have h2 := Int.self_le_toNat (m + u k)
     push_cast
     omega
-  have hsupp : (Function.support fun j : ℕ => coeff j f • lines u d c (m - j)) ⊆ ↑(Finset.range N) := by
+  have hsupp
+      : (Function.support fun j : ℕ => coeff j f • lines u d c (m - j)) ⊆ ↑(Finset.range N) := by
     intro j hj
     rw [Function.mem_support] at hj
     rw [Finset.coe_range, Set.mem_Iio]
@@ -127,11 +132,20 @@ theorem serAct_lines {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M) (f : F⟦X�
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [show m - (j : ℤ) + u k = m + u k - j by ring]
 
-theorem exists_coords : ∀ {F M A N : Type} [Field F] [AddCommGroup M] [Module F M] [CommRing A] [AddCommGroup N] [Module A N] (lev : A → F⟦X⟧) (L : N →+ (ℤ → M)) {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M), LinearIndependent F d → (∀ a x, L (a • x) = serAct (lev a) (L x)) → SpanIsLines L u d F → ∃ e : N →+ (Fin r → F⟦X⟧), (∀ a x, e (a • x) = lev a • e x) ∧ Submodule.span F⟦X⟧ (Set.range e) = ⊤ ∧ ∀ (χ : F) (x y : N), χ ≠ 0 → (∀ k : ℤ, L y k = χ ^ k • L x k) → ∀ k, e y k = C (χ ^ (-u k)) * rescale χ (e x k) := by
+theorem exists_coords
+    : ∀ {F M A N : Type} [Field F] [AddCommGroup M] [Module F M] [CommRing A] [AddCommGroup N]
+        [Module A N] (lev : A → F⟦X⟧) (L : N →+ (ℤ → M)) {r : ℕ} (u : Fin r → ℤ) (d : Fin r → M),
+      LinearIndependent F d → (∀ a x, L (a • x) = serAct (lev a) (L x)) → SpanIsLines L u d F
+        → ∃ e : N →+ (Fin r → F⟦X⟧),
+          (∀ a x, e (a • x) = lev a • e x) ∧ Submodule.span F⟦X⟧ (Set.range e) = ⊤
+            ∧ ∀ (χ : F) (x y : N),
+              χ ≠ 0 → (∀ k : ℤ, L y k = χ ^ k • L x k)
+                → ∀ k, e y k = C (χ ^ (- u k)) * rescale χ (e x k) := by
   intro F M A N _ _ _ _ _ _ lev L r u d hd hL hS
   have hex : ∀ x, ∃ c : Fin r → F⟦X⟧, L x = lines u d c := by
     intro x
-    obtain ⟨c, hc⟩ := (hS (L x)).mp ⟨1, fun _ => x, fun _ => 1, by simp only [Fin.sum_univ_one, serAct_one]⟩
+    obtain ⟨c, hc⟩ :=
+      (hS (L x)).mp ⟨1, fun _ => x, fun _ => 1, by simp only [Fin.sum_univ_one, serAct_one]⟩
     exact ⟨c, hc⟩
   choose e he using hex
   have hinj := lines_injective (F := F) u hd
@@ -155,12 +169,15 @@ theorem exists_coords : ∀ {F M A N : Type} [Field F] [AddCommGroup M] [Module 
   · intro χ x y hχ hxy k
     show e y k = C (χ ^ (-u k)) * rescale χ (e x k)
     ext n
-    have h1 : lines u d (e y) ((n : ℤ) - u k) = χ ^ ((n : ℤ) - u k) • lines u d (e x) ((n : ℤ) - u k) := by
+    have h1
+        : lines u d (e y) ((n : ℤ) - u k)
+          = χ ^ ((n : ℤ) - u k) • lines u d (e x) ((n : ℤ) - u k) := by
       rw [← he, ← he]
       exact hxy _
     have h2 := coeff_eq_of_apply u hd (e y) (e x) _ _ h1 k
     rw [sub_add_cancel, zc_nat, zc_nat] at h2
-    rw [h2, PowerSeries.coeff_C_mul, PowerSeries.coeff_rescale, zpow_sub₀ hχ, zpow_neg, zpow_natCast]
+    rw [h2, PowerSeries.coeff_C_mul, PowerSeries.coeff_rescale, zpow_sub₀ hχ, zpow_neg,
+      zpow_natCast]
     ring
 
 end GlobalTheory.SenLines.Coords

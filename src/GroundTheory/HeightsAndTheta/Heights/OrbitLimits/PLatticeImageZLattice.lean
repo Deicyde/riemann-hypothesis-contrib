@@ -11,15 +11,18 @@ namespace GroundTheory.Heights₂.Heights.Targets
 
 open NumberField NumberField.mixedEmbedding
 
-theorem LatticeImageZLattice.exists_int_mul_integral {F : Type} [Field F] [NumberField F]
-    (L : AddSubgroup F) (hfg : L.FG) : ∃ N : ℤ, N ≠ 0 ∧ ∀ x ∈ L, IsIntegral ℤ (N • x) := by
+theorem LatticeImageZLattice.exists_int_mul_integral
+    {F : Type} [Field F] [NumberField F] (L : AddSubgroup F) (hfg : L.FG)
+    : ∃ N : ℤ, N ≠ 0 ∧ ∀ x ∈ L, IsIntegral ℤ (N • x) := by
   obtain ⟨S, hS⟩ := hfg
   have halg : ∀ s : F, ∃ y : ℤ, y ≠ 0 ∧ IsIntegral ℤ (y • s) := fun s =>
-    ((IsFractionRing.isAlgebraic_iff ℤ ℚ F).mpr (Algebra.IsAlgebraic.isAlgebraic s)).exists_integral_multiple
+    ((IsFractionRing.isAlgebraic_iff ℤ ℚ F).mpr
+      (Algebra.IsAlgebraic.isAlgebraic s)).exists_integral_multiple
   choose y hy0 hyint using halg
   refine ⟨∏ s ∈ S, y s, Finset.prod_ne_zero_iff.mpr fun s _ => hy0 s, ?_⟩
-  have h : ∀ z : L, z ∈ AddSubsemigroup.closure (↑S : Set L) →
-      IsIntegral ℤ ((∏ s ∈ S, y s) • (z : F)) := by
+  have h
+      : ∀ z : L,
+        z ∈ AddSubsemigroup.closure (↑S : Set L) → IsIntegral ℤ ((∏ s ∈ S, y s) • (z : F)) := by
     intro z hz
     induction hz using AddSubsemigroup.closure_induction with
     | mem s hs =>
@@ -29,8 +32,6 @@ theorem LatticeImageZLattice.exists_int_mul_integral {F : Type} [Field F] [Numbe
     | add a b _ _ ha hb => simpa [smul_add] using ha.add hb
   intro x hx
   exact h ⟨x, hx⟩ (hS ▸ AddSubsemigroup.mem_top _)
-
-
 
 open scoped Classical in
 theorem LatticeImageZLattice.proof : LatticeImageZLattice.Statement := by
@@ -43,8 +44,9 @@ theorem LatticeImageZLattice.proof : LatticeImageZLattice.Statement := by
     smul_right_injective (mixedSpace F) (Int.cast_ne_zero.mpr hN0 : (N : ℝ) ≠ 0) h
   have hdisc : DiscreteTopology (ZLattice.comap ℝ (mixedEmbedding.integerLattice F) e) :=
     ZLattice.comap_discreteTopology ℝ _ he₁ he₂
-  have hle : (latticeImage F L : Set (mixedSpace F)) ⊆
-      ZLattice.comap ℝ (mixedEmbedding.integerLattice F) e := by
+  have hle
+      : (latticeImage F L : Set (mixedSpace F))
+        ⊆ ZLattice.comap ℝ (mixedEmbedding.integerLattice F) e := by
     intro z hz
     obtain ⟨x, hx, rfl⟩ := (mem_latticeImage L z).mp hz
     show e (mixedEmbedding F x) ∈ mixedEmbedding.integerLattice F

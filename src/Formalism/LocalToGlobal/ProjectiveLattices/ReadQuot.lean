@@ -9,14 +9,16 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+open MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
 open scoped TensorProduct Pointwise
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem volPair_of_tie (hT : VolTieG D) (V : HSp D) (hs : V.SigOK) : ∃ p : Measure (GA D V) × Set (GA D V), IsVolPair D V p.1 p.2 := by
+theorem volPair_of_tie (hT : VolTieG D) (V : HSp D) (hs : V.SigOK)
+    : ∃ p : Measure (GA D V) × Set (GA D V), IsVolPair D V p.1 p.2 := by
   have h := hT V hs
   clear hT
   obtain ⟨⟨μ, hμ⟩, hb⟩ := h
@@ -24,8 +26,9 @@ theorem volPair_of_tie (hT : VolTieG D) (V : HSp D) (hs : V.SigOK) : ∃ p : Mea
   refine ⟨(μ, 𝓕), ?_⟩
   exact ⟨hμ, h𝓕⟩
 
-theorem quotSupp_of (V : HSp D) (hV : FinVol V) (hP : ∃ p : Measure (GA D V) × Set (GA D V), IsVolPair D V p.1 p.2) :
-    QuotSupp V := by
+theorem quotSupp_of
+    (V : HSp D) (hV : FinVol V) (hP : ∃ p : Measure (GA D V) × Set (GA D V), IsVolPair D V p.1 p.2)
+    : QuotSupp V := by
   intro φ hφc hφinv hae g0
   by_contra hg0
   haveI : Countable (GQ V) := by
@@ -75,15 +78,14 @@ theorem quotSupp_of (V : HSp D) (hV : FinVol V) (hP : ∃ p : Measure (GA D V) �
   have hS : muQ V S = 0 := by
     unfold muQ1 at h0
     rw [if_pos (show muQ V Set.univ ≠ 0 ∧ muQ V Set.univ ≠ ⊤ from hV), Measure.smul_apply,
-      smul_eq_mul] at h0
+        smul_eq_mul]
+      at h0
     rcases mul_eq_zero.mp h0 with h | h
     · exact absurd (ENNReal.inv_eq_zero.mp h) hV.2
     · exact h
   have hmeas : AEMeasurable (autMk V) ((volPair V).1.restrict (volPair V).2) := by
     have hm : Measurable (autMk V) := by
-      first
-      | exact measurable_quotient_mk'
-      | exact fun _ hs => hs
+      first | exact measurable_quotient_mk' | exact fun _ hs => hs
     exact hm.aemeasurable
   have hpre : autMk V ⁻¹' S = O := by
     ext g
@@ -103,22 +105,31 @@ theorem quotSupp_of (V : HSp D) (hV : FinVol V) (hP : ∃ p : Measure (GA D V) �
 
 section Dom
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
 
-theorem aeDom_of {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {σ : c.F →+* ℂ} {V : HSp D}
+theorem aeDom_of
+    {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {σ : c.F →+* ℂ} {V : HSp D}
     {dict : GA D V → Σ k, Frame ((U σ).X k).Ψ r} {mu : GA D V → ℂ} {Kf : Subgroup (GA D V)}
     {th : ∀ k, ((U σ).X k).Ψ → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)} {hr : V.rank = r}
-    (hA : AdelAut V dict mu) (hV : FinVol V) (hP : ∃ p : Measure (GA D V) × Set (GA D V), IsVolPair D V p.1 p.2)
-    (hmu : MuUnit V dict mu) (hd : DictIsUnif V dict Kf th hr) : AeDom U σ V dict mu := by
+    (hA : AdelAut V dict mu) (hV : FinVol V)
+    (hP : ∃ p : Measure (GA D V) × Set (GA D V), IsVolPair D V p.1 p.2) (hmu : MuUnit V dict mu)
+    (hd : DictIsUnif V dict Kf th hr)
+    : AeDom U σ V dict mu := by
   intro la P hPm hae k x hx
-  have key : ∀ Q ∈ holSub (U σ).X la,
-      ((∀ γ ∈ GQ V, ∀ g, adel V dict mu Q (γ * g) = adel V dict mu Q g) ∧
-        Continuous (adel V dict mu Q)) ∧
-      ∀ k, (∀ x ∈ ((U σ).X k).dom, ∀ b ∈ Bor ((U σ).X k).Ψ r, Q k (rmul x b) = bchar (la k) b * Q k x) ∧
-        ∀ γ ∈ ((U σ).X k).Γ, ∀ x ∈ ((U σ).X k).dom, Q k (lact γ x) = ((U σ).X k).χ (la k) γ * Q k x := by
+  have key
+      : ∀ Q ∈ holSub (U σ).X la,
+        ((∀ γ ∈ GQ V, ∀ g, adel V dict mu Q (γ * g) = adel V dict mu Q g)
+            ∧ Continuous (adel V dict mu Q))
+          ∧ ∀ k,
+            (∀ x ∈ ((U σ).X k).dom, ∀ b ∈ Bor ((U σ).X k).Ψ r,
+                Q k (rmul x b) = bchar (la k) b * Q k x)
+              ∧ ∀ γ ∈ ((U σ).X k).Γ, ∀ x ∈ ((U σ).X k).dom,
+                Q k (lact γ x) = ((U σ).X k).χ (la k) γ * Q k x := by
     intro Q hQ
     unfold holSub at hQ
     induction hQ using Submodule.span_induction with
@@ -127,8 +138,10 @@ theorem aeDom_of {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {σ : c.F →+* ℂ
       have hs := (hQ k).1.1
       exact ⟨hs.2.1, hs.2.2⟩
     | zero =>
-      refine ⟨⟨fun γ _ g => by simp, by rw [map_zero]; exact continuous_zero⟩,
-        fun k => ⟨fun x _ b _ => by simp, fun γ _ x _ => by simp⟩⟩
+      refine ⟨
+        ⟨fun γ _ g => by simp, by rw [map_zero]; exact continuous_zero⟩,
+        fun k => ⟨fun x _ b _ => by simp, fun γ _ x _ => by simp⟩
+      ⟩
     | add Q₁ Q₂ _ _ h1 h2 =>
       refine ⟨⟨fun γ hγ g => ?_, ?_⟩, fun k => ⟨fun x hx b hb => ?_, fun γ hγ x hx => ?_⟩⟩
       · rw [map_add (f := _), Pi.add_apply, Pi.add_apply, h1.1.1 γ hγ g, h2.1.1 γ hγ g]

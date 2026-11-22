@@ -20,7 +20,8 @@ theorem mulStableIntegral : MulStableIntegral := mul_stable_integral
 theorem isogenyP : IsogenyP := isogenyWeierstrassP_of_ellipticNoPole ellipticNoPole
 theorem pSecond : PSecond := weierstrass_p_second_derivative
 theorem isogenySigma : IsogenySigma :=
-  isogenySigma_of ellipticNoPole sigmaOrder sgStarAdd sgStarQuasi sgStarBasic kerRepsCard sigmaEntire
+  isogenySigma_of ellipticNoPole sigmaOrder sgStarAdd sgStarQuasi sgStarBasic kerRepsCard
+    sigmaEntire
 theorem translateProduct : TranslateProduct := translateProduct_of sgStarAdd
 theorem halfShift : HalfShift := halfShift_of sigmaAdd sigmaQuasi sigmaZero pInjective
 theorem cmThetaEq : CmThetaEq := cm_theta_eq

@@ -9,18 +9,22 @@ public import Development.WeilBound.CoreStatements.ProjectiveValuations.NV
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj GlobalTheory.CompanionTheory.Ar.OntoDef GlobalTheory.CompHS
+open CategoryTheory AlgebraicGeometry NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj GlobalTheory.CompanionTheory.Ar.OntoDef
+  GlobalTheory.CompHS
 open GlobalTheory.CompanionTheory.Ar.HolExt
 
 noncomputable section
 
 namespace DifferentiableLines
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l} {r : ℕ} {σ : c.F →+* ℂ}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {r : ℕ} {σ : c.F →+* ℂ}
 
 def chr (e : Ix D → ℤ) (t : Ix D → (CAt σ)ˣ) : ℂ := by
-  classical exact toC (∏ ix, t ix ^ e ix).val
+  classical
+  exact toC (∏ ix, t ix ^ e ix).val
 
 theorem chr_ne_zero (e : Ix D → ℤ) (t : Ix D → (CAt σ)ˣ) : chr e t ≠ 0 := by
   classical
@@ -45,17 +49,23 @@ theorem chr_zero (t : Ix D → (CAt σ)ˣ) : chr 0 t = 1 := by
   have : (∏ ix, t ix ^ (0 : Ix D → ℤ) ix) = 1 := Finset.prod_eq_one fun ix _ => zpow_zero _
   exact congrArg (fun u : (CAt σ)ˣ => toC u.val) this
 
-theorem ex_add_int (a a' : (E →+* ℂ) × ℕ → ℕ) (n n' : ℕ) : (fun i => (ex D (a + a') (n + n') i : ℤ)) =
-    (fun i => (ex D a n i : ℤ)) + fun i => (ex D a' n' i : ℤ) := by
+theorem ex_add_int (a a' : (E →+* ℂ) × ℕ → ℕ) (n n' : ℕ)
+    : (fun i => (ex D (a + a') (n + n') i : ℤ))
+      = (fun i => (ex D a n i : ℤ)) + fun i => (ex D a' n' i : ℤ) := by
   funext i
   rw [ex_add]
   simp
 
-theorem dom_add {a a' : (E →+* ℂ) × ℕ → ℕ} {n n' : ℕ} (h : Dom a n) (h' : Dom a' n') : Dom (a + a') (n + n') :=
+theorem dom_add {a a' : (E →+* ℂ) × ℕ → ℕ} {n n' : ℕ} (h : Dom a n) (h' : Dom a' n')
+    : Dom (a + a') (n + n') :=
   ⟨fun τ _ _ hij => Nat.add_le_add (h.1 τ hij) (h'.1 τ hij), h.2.add h'.2⟩
 
-theorem laU_add' (V : Unf Xo c σ r) (a a' : (E →+* ℂ) × ℕ → ℕ) {n n' : ℕ} (hn : Even n) (hn' : Even n') (k : V.Comp) :
-    laU V (a + a') (n + n') k = laU V a n k + laU V a' n' k := by
+theorem laU_add'
+    (V : Unf Xo c σ r)
+    (a a' : (E →+* ℂ) × ℕ → ℕ)
+    {n n' : ℕ} (hn : Even n) (hn' : Even n')
+    (k : V.Comp)
+    : laU V (a + a') (n + n') k = laU V a n k + laU V a' n' k := by
   obtain ⟨m, rfl⟩ := hn
   obtain ⟨m', rfl⟩ := hn'
   funext τ j
@@ -65,9 +75,10 @@ theorem laU_add' (V : Unf Xo c σ r) (a a' : (E →+* ℂ) × ℕ → ℕ) {n n'
   simp only [laU, Pi.add_apply, h1, h2, h3]
   split_ifs <;> push_cast <;> ring
 
-theorem evR_frBor {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} {f : Rul Xo c} (hf : f ∈ sec Xo c a n) {t : Ix D → (CAt σ)ˣ}
-    {y y' : FrPt Xo c (CAt σ)} (h : FrBor t y y') :
-    toC (evR Xo c f y') = chr (fun i => (ex D a n i : ℤ)) t * toC (evR Xo c f y) := by
+theorem evR_frBor
+    {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} {f : Rul Xo c} (hf : f ∈ sec Xo c a n)
+    {t : Ix D → (CAt σ)ˣ} {y y' : FrPt Xo c (CAt σ)} (h : FrBor t y y')
+    : toC (evR Xo c f y') = chr (fun i => (ex D a n i : ℤ)) t * toC (evR Xo c f y) := by
   classical
   have hL := (GlobalTheory.Reg.evLaws_genFr_atlas E H D l Xo c).1
   letI : Field (CAt σ) := inferInstanceAs (Field ℂ)
@@ -78,30 +89,39 @@ theorem evR_frBor {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} {f : Rul Xo c} (h
   rw [e, e']
   rfl
 
-theorem rdU_eq (V : Unf Xo c σ r) (f : Rul Xo c) (k : V.Comp) (x : (V.X k).dom) :
-    rdU V f k x.1 = toC (evR Xo c f (V.un k x)) := dif_pos x.2
+theorem rdU_eq (V : Unf Xo c σ r) (f : Rul Xo c) (k : V.Comp) (x : (V.X k).dom)
+    : rdU V f k x.1 = toC (evR Xo c f (V.un k x)) :=
+  dif_pos x.2
 
-theorem sec_frBor {V : Unf Xo c σ r} (hU : IsUnf V) {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} (hD : Dom a n)
-    (hN : NV Xo c σ a n) {k : V.Comp} {P : Frame (V.X k).Ψ r → ℂ} (hP : (V.X k).IsSec (laU V a n k) P)
-    {x x' : (V.X k).dom} {t : Ix D → (CAt σ)ˣ} (ht : FrBor t (V.un k x) (V.un k x')) :
-    P x'.1 = chr (fun i => (ex D a n i : ℤ)) t * P x.1 := by
+theorem sec_frBor
+    {V : Unf Xo c σ r} (hU : IsUnf V)
+    {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} (hD : Dom a n) (hN : NV Xo c σ a n)
+    {k : V.Comp} {P : Frame (V.X k).Ψ r → ℂ} (hP : (V.X k).IsSec (laU V a n k) P)
+    {x x' : (V.X k).dom} {t : Ix D → (CAt σ)ˣ} (ht : FrBor t (V.un k x) (V.un k x'))
+    : P x'.1 = chr (fun i => (ex D a n i : ℤ)) t * P x.1 := by
   obtain ⟨γ, hγ, b, hb, hx⟩ := (hU.2.2.2.1 k k x x').1 ⟨t, ht⟩
   have hx' : x'.1 = rmul (lact γ x.1) b := eq_of_heq (Sigma.mk.inj hx).2
   have hd := ReciprocityTheory.ChartRestriction.G.AR.Up.OntoS.dom_lact (V.X k) hγ x.2
-  have key : ∀ la Q, (V.X k).IsSec la Q → Q x'.1 = (bchar la b * (V.X k).χ la γ) * Q x.1 := fun la Q hQ => by
+  have key
+      : ∀ la Q,
+        (V.X k).IsSec la Q → Q x'.1 = (bchar la b * (V.X k).χ la γ) * Q x.1 := fun la Q hQ => by
     rw [hx', hQ.2.1 _ hd b hb, hQ.2.2 γ hγ _ x.2, mul_assoc]
   obtain ⟨a', n', hD', g, hg, f, hf, hg0, hf0⟩ := hN (V.un k x)
   have e₁ := key _ _ (hU.2.2.2.2.1 a' n' hD' g hg k)
   have e₂ := key _ _ (hU.2.2.2.2.1 _ _ (dom_add hD hD') f hf k)
   rw [rdU_eq, rdU_eq, evR_frBor hg ht] at e₁
-  rw [rdU_eq, rdU_eq, evR_frBor hf ht, ex_add_int, chr_add, laU_add' V a a' hD.2 hD'.2, (V.X k).χ_add _ _ γ hγ] at e₂
+  rw [rdU_eq, rdU_eq, evR_frBor hf ht, ex_add_int, chr_add, laU_add' V a a' hD.2 hD'.2,
+      (V.X k).χ_add _ _ γ hγ]
+    at e₂
   have a₁ := mul_right_cancel₀ (show toC (evR Xo c g (V.un k x)) ≠ 0 from hg0) e₁
   have a₂ := mul_right_cancel₀ (show toC (evR Xo c f (V.un k x)) ≠ 0 from hf0) e₂
   have hdiag : ∀ τ i, b τ i i ≠ 0 := fun τ i => by
     have hdet := (hb τ).1
     rw [Matrix.det_of_upperTriangular (M := mat b τ) (fun a c hac => (hb τ).2 a c hac)] at hdet
     exact Finset.prod_ne_zero_iff.1 hdet i (Finset.mem_univ _)
-  have hadd : bchar (laU V a n k + laU V a' n' k) b = bchar (laU V a n k) b * bchar (laU V a' n' k) b := by
+  have hadd
+      : bchar (laU V a n k + laU V a' n' k) b
+        = bchar (laU V a n k) b * bchar (laU V a' n' k) b := by
     simp only [bchar, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun τ _ => Finset.prod_congr rfl fun i _ => ?_
     rw [Pi.add_apply, Pi.add_apply, zpow_add₀ (hdiag τ i)]
@@ -111,9 +131,11 @@ theorem sec_frBor {V : Unf Xo c σ r} (hU : IsUnf V) {a : (E →+* ℂ) × ℕ �
   rw [a₂, hadd, a₁]
   ring
 
-theorem exists_chart_frBor (T : TorFlag Xo c) (y : FrPt Xo c (CAt σ)) (i : T.X.F.J) {z : Sp (CAt σ) ⟶ T.X.YY}
-    (e : T.X.ptY y = z) (hz : ⊤ ≤ z ⁻¹ᵁ T.X.F.U i) :
-    ∃ (Q : FrPt Xo c (CAt σ)) (t : Ix D → (CAt σ)ˣ), T.X.F.ChartFr i z hz Q ∧ FrBor t Q y := by
+theorem exists_chart_frBor
+    (T : TorFlag Xo c)
+    (y : FrPt Xo c (CAt σ)) (i : T.X.F.J)
+    {z : Sp (CAt σ) ⟶ T.X.YY} (e : T.X.ptY y = z) (hz : ⊤ ≤ z ⁻¹ᵁ T.X.F.U i)
+    : ∃ (Q : FrPt Xo c (CAt σ)) (t : Ix D → (CAt σ)ˣ), T.X.F.ChartFr i z hz Q ∧ FrBor t Q y := by
   subst e
   have hl := T.X.lies_ptY y
   obtain ⟨Q, hQ⟩ := T.X.top.exists_chartFr (GlobalTheory.FlagMod.frX_snd y) hl.1 i hz

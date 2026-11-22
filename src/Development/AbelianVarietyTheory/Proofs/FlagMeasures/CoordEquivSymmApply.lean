@@ -8,7 +8,9 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 @[expose] public section
 
 open scoped Classical ENNReal
-open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.SG.PoincareInHH.PoincareSetting GlobalTheory.CovDom
+open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.SG.PoincareInHH.PoincareSetting
+  GlobalTheory.CovDom
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -17,8 +19,8 @@ namespace GlobalTheory.CovDomGrp
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem vecOf_apply (c : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E) :
-    vecOf X c = ∑ i, c i • X.bas (ci X i) := by
+theorem vecOf_apply (c : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E)
+    : vecOf X c = ∑ i, c i • X.bas (ci X i) := by
   simp only [vecOf, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
     LinearEquiv.funCongrLeft_apply, Module.Basis.equivFun_symm_apply]
   rw [← (ci X).sum_comp]
@@ -36,24 +38,28 @@ theorem vecOf_crdH (y : (VS D).V) : vecOf X (crdH X y) = y := by
   congr 1
 
 variable {X} in
-theorem n_vecOf {n : (VS D).V ≃ₗ[D.host.E] (VS D).V}
+theorem n_vecOf
+    {n : (VS D).V ≃ₗ[D.host.E] (VS D).V}
     {γ : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) D.host.E}
-    (hγ : ∀ y, crdH X (n y) = γ *ᵥ crdH X y) (c : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E) :
-    n (vecOf X c) = vecOf X (γ *ᵥ c) := by
+    (hγ : ∀ y, crdH X (n y) = γ *ᵥ crdH X y)
+    (c : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E)
+    : n (vecOf X c) = vecOf X (γ *ᵥ c) := by
   conv_lhs => rw [← vecOf_crdH X (n (vecOf X c)), hγ, crdH_vecOf]
 
-theorem crdH_eq_crd (y : (VS D).V) (i : Fin (2 * D.R.rS + D.R.k + 1)) :
-    crdH X y i = X.ιE (X.crd y (ci X i)) := by
+theorem crdH_eq_crd (y : (VS D).V) (i : Fin (2 * D.R.rS + D.R.k + 1))
+    : crdH X y i = X.ιE (X.crd y (ci X i)) := by
   simp [crdH, HidaSetting.crd, crdOf]
 
 theorem sig_apply (a : D.host.E) : (D.sp.cm.sig : D.host.E →+* D.host.E) a = star a := rfl
 
-theorem hT_vecOf (a b : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E) :
-    (VS D).hT (vecOf X a) (vecOf X b) = GlobalTheory.SgAlg.form (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) b a := by
+theorem hT_vecOf (a b : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E)
+    : (VS D).hT (vecOf X a) (vecOf X b)
+      = GlobalTheory.SgAlg.form (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) b a := by
   rw [vecOf_apply, vecOf_apply]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-    GlobalTheory.SgAlg.form, dotProduct, Matrix.mulVec, sig_apply, Jc, Finset.mul_sum, RingHom.id_apply]
+      GlobalTheory.SgAlg.form, dotProduct, Matrix.mulVec, sig_apply, Jc, Finset.mul_sum,
+      RingHom.id_apply]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   rw [starRingEnd_apply]
@@ -73,20 +79,29 @@ theorem Jc_det_ne_zero : (Jc X).det ≠ 0 := by
 def coordEquiv : (Fin (2 * D.R.rS + D.R.k + 1) → D.host.E) ≃ₗ[D.host.E] (VS D).V :=
   (LinearEquiv.funCongrLeft D.host.E D.host.E (ci X).symm).trans X.bas.equivFun.symm
 
-theorem coordEquiv_apply (c : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E) : coordEquiv X c = vecOf X c := rfl
+theorem coordEquiv_apply (c : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E)
+    : coordEquiv X c = vecOf X c :=
+  rfl
 
 theorem coordEquiv_symm_apply (y : (VS D).V) : (coordEquiv X).symm y = crdH X y := by
   apply (coordEquiv X).injective
   rw [LinearEquiv.apply_symm_apply, coordEquiv_apply, vecOf_crdH]
 
-theorem exists_mat (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) :
-    ∃ γ : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) D.host.E, ∀ y, crdH X (n y) = γ *ᵥ crdH X y := by
-  refine ⟨LinearMap.toMatrix' (((coordEquiv X).symm.toLinearMap ∘ₗ n.toLinearMap) ∘ₗ (coordEquiv X).toLinearMap), fun y => ?_⟩
+theorem exists_mat (n : (VS D).V ≃ₗ[D.host.E] (VS D).V)
+    : ∃ γ : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) D.host.E, ∀ y,
+      crdH X (n y) = γ *ᵥ crdH X y := by
+  refine ⟨
+    LinearMap.toMatrix'
+      (((coordEquiv X).symm.toLinearMap ∘ₗ n.toLinearMap) ∘ₗ (coordEquiv X).toLinearMap),
+    fun y => ?_
+  ⟩
   rw [LinearMap.toMatrix'_mulVec]
   simp [coordEquiv_symm_apply, coordEquiv_apply, vecOf_crdH]
 
-theorem exists_equiv (γ : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) D.host.E) (hU : GlobalTheory.SgAlg.IsUn (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) γ) :
-    ∃ n : (VS D).V ≃ₗ[D.host.E] (VS D).V, ∀ y, crdH X (n y) = γ *ᵥ crdH X y := by
+theorem exists_equiv
+    (γ : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) D.host.E)
+    (hU : GlobalTheory.SgAlg.IsUn (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) γ)
+    : ∃ n : (VS D).V ≃ₗ[D.host.E] (VS D).V, ∀ y, crdH X (n y) = γ *ᵥ crdH X y := by
   have hdet : IsUnit γ.det := by
     rw [isUnit_iff_ne_zero]
     intro h0
@@ -97,8 +112,8 @@ theorem exists_equiv (γ : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.r
   have h1 : γ⁻¹ * γ = 1 := Matrix.nonsing_inv_mul γ hdet
   have h2 : γ * γ⁻¹ = 1 := Matrix.mul_nonsing_inv γ hdet
   refine ⟨(coordEquiv X).symm.trans ((Matrix.toLin'OfInv h1 h2).trans (coordEquiv X)), fun y => ?_⟩
-  simp only [LinearEquiv.trans_apply, coordEquiv_symm_apply, coordEquiv_apply, Matrix.toLin'OfInv_apply,
-    Matrix.toLin'_apply, crdH_vecOf]
+  simp only [LinearEquiv.trans_apply, coordEquiv_symm_apply, coordEquiv_apply,
+    Matrix.toLin'OfInv_apply, Matrix.toLin'_apply, crdH_vecOf]
   rfl
 
 end GlobalTheory.CovDomGrp

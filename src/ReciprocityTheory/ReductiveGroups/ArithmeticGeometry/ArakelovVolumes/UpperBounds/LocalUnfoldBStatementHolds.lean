@@ -16,8 +16,7 @@ open NumberField
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem localUnfoldBStatement_holds : LocalUnfoldBStatement (E := E) :=
-  LUB.localUnfoldB_of lu_holds
+theorem localUnfoldBStatement_holds : LocalUnfoldBStatement (E := E) := LUB.localUnfoldB_of lu_holds
 
 theorem ontoWeightStatement_holds : OntoWeightStatement (E := E) :=
   OW.ontoWeight_of localUnfoldBStatement_holds

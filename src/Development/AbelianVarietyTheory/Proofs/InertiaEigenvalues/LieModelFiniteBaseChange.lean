@@ -33,20 +33,23 @@ public import GroundTheory.GlobalFields.TateThesis.GlobalZetaFinite
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG GlobalTheory.LFun Formalism.L2.Host
+open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG
+  GlobalTheory.LFun Formalism.L2.Host
 open scoped ENNReal ComplexConjugate ContDiff
 
 namespace GlobalTheory.ThetaSqLow
 
 section Bound
 
-open Matrix GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.ThetaPoisson GroundTheory.Global GroundTheory.Global.IdeleGroup GroundTheory.Automorphic.GJMatrix
+open Matrix GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.ThetaPoisson GroundTheory.Global
+  GroundTheory.Global.IdeleGroup GroundTheory.Automorphic.GJMatrix
 open scoped nonZeroDivisors Classical
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem norm_mul_pow_le {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a)) (M : ℕ) :
-    ∃ K : ℝ, 0 ≤ K ∧ ∀ y, ‖G y‖ * (1 + ‖fun i => pInf E (y i)‖) ^ M ≤ K := by
+theorem norm_mul_pow_le
+    {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a)) (M : ℕ)
+    : ∃ K : ℝ, 0 ≤ K ∧ ∀ y, ‖G y‖ * (1 + ‖fun i => pInf E (y i)‖) ^ M ≤ K := by
   induction hG using Submodule.span_induction with
   | mem G hG =>
     obtain ⟨φ, g, hg, rfl⟩ := hG
@@ -55,16 +58,19 @@ theorem norm_mul_pow_le {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruha
     set K₀ : ℝ := 2 ^ M * (Finset.Iic (M, 0)).sup (fun m => SchwartzMap.seminorm ℝ m.1 m.2) ψ with hK₀
     have hK : 0 ≤ K₀ := by positivity
     refine ⟨K₀ * |B|, by positivity, fun y => ?_⟩
-    have h1 := SchwartzMap.one_add_le_sup_seminorm_apply (𝕜 := ℝ) (m := (M, 0)) (k := M) (n := 0) le_rfl le_rfl ψ
-      (fun i => pInf E (y i))
+    have h1 :=
+      SchwartzMap.one_add_le_sup_seminorm_apply (𝕜 := ℝ) (m := (M, 0)) (k := M) (n := 0) le_rfl
+        le_rfl ψ (fun i => pInf E (y i))
     rw [norm_iteratedFDeriv_zero] at h1
     have h2 : ψ (fun i => pInf E (y i)) = φ (infPartPi y) := by
       rw [hψ, SchwartzMap.compCLMOfContinuousLinearEquiv_apply, Function.comp_apply, toMixedPi_pInf]
     rw [h2] at h1
     simp only [schwartzBruhatTensorPi, norm_mul]
-    calc _ = ((1 + ‖fun i => pInf E (y i)‖) ^ M * ‖φ (infPartPi y)‖) * ‖g (finPartPi y)‖ := by ring
+    calc
+      _ = ((1 + ‖fun i => pInf E (y i)‖) ^ M * ‖φ (infPartPi y)‖) * ‖g (finPartPi y)‖ := by ring
       _ ≤ _ := mul_le_mul h1 ((hB _).trans (le_abs_self _)) (norm_nonneg _) hK
-  | zero => exact ⟨0, le_rfl, fun y => by simp⟩
+  | zero =>
+    exact ⟨0, le_rfl, fun y => by simp⟩
   | add G H _ _ hG hH =>
     obtain ⟨K₁, h₁, hG⟩ := hG
     obtain ⟨K₂, h₂, hH⟩ := hH
@@ -77,42 +83,55 @@ theorem norm_mul_pow_le {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruha
     rw [Pi.smul_apply, norm_smul, mul_assoc]
     exact mul_le_mul_of_nonneg_left (hG y) (norm_nonneg _)
 
-theorem exists_latt {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a)) :
-    ∃ J : (FractionalIdeal (𝓞 E)⁰ E)ˣ, ∀ y, (fun i => pFin E (y i)) ∉ latt a J → G y = 0 := by
-  obtain ⟨⟨L, hL, hs⟩, -⟩ := GlobalTheory.SchwartzBruhatMoments.compactSupport_and_integrable_moments E a G hG
-  obtain ⟨J, hJ⟩ := exists_subset_idealFiniteAdeles
-    (isCompact_iUnion fun i : Fin a => hL.image (continuous_apply i))
+theorem exists_latt {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a))
+    : ∃ J : (FractionalIdeal (𝓞 E)⁰ E)ˣ, ∀ y, (fun i => pFin E (y i)) ∉ latt a J → G y = 0 := by
+  obtain ⟨⟨L, hL, hs⟩, -⟩ :=
+    GlobalTheory.SchwartzBruhatMoments.compactSupport_and_integrable_moments E a G hG
+  obtain ⟨J, hJ⟩ :=
+    exists_subset_idealFiniteAdeles (isCompact_iUnion fun i : Fin a =>
+      hL.image (continuous_apply i))
   refine ⟨J, fun y hy => by_contra fun h => hy fun i => hJ (Set.mem_iUnion.2 ⟨i, _, hs y h, rfl⟩)⟩
 
-theorem exists_bound {π' : CuspSub E a} (hπ : π'.IsUnitary) {φ' : GA E a → ℂ} (hφ : φ' ∈ GlobalTheory.JSW.mspanR π')
-    {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a)) :
-    ∃ C : ℝ, ∀ g : GA E a, ‖φ' g‖ₑ ^ 2 * (∑' ξ : {ξ : Fin a → E // ξ ≠ 0},
-      ‖G (Matrix.vecMul (fun j => algebraMap E (Ad E) (ξ.1 j)) g.val)‖ₑ) ≤
-        ENNReal.ofReal (C * (GlobalTheory.RSnm.detAbs g)⁻¹) := by
+theorem exists_bound
+    {π' : CuspSub E a} (hπ : π'.IsUnitary)
+    {φ' : GA E a → ℂ} (hφ : φ' ∈ GlobalTheory.JSW.mspanR π')
+    {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a))
+    : ∃ C : ℝ, ∀ g : GA E a,
+      ‖φ' g‖ₑ ^ 2
+          * (∑' ξ : {ξ : Fin a → E // ξ ≠ 0},
+              ‖G (Matrix.vecMul (fun j => algebraMap E (Ad E) (ξ.1 j)) g.val)‖ₑ)
+        ≤ ENNReal.ofReal (C * (GlobalTheory.RSnm.detAbs g)⁻¹) := by
   obtain ⟨J, hJ⟩ := exists_latt hG
-  obtain ⟨M, C₁, h₁⟩ := GlobalTheory.RSTheta.summable_tsum_norm_le_of_le_shortest E a J (a * Module.finrank ℚ E)
-    GlobalTheory.RSTheta.finrank_pi_Cinf.le
+  obtain ⟨M, C₁, h₁⟩ :=
+    GlobalTheory.RSTheta.summable_tsum_norm_le_of_le_shortest E a J (a * Module.finrank ℚ E)
+      GlobalTheory.RSTheta.finrank_pi_Cinf.le
   obtain ⟨K, hK, hGK⟩ := norm_mul_pow_le hG M
-  obtain ⟨ψ, rfl, -, -, B, hB⟩ := GlobalTheory.T.cuspFormRapidKernelSmoothSpan_smooth_cuspidal_bounded E a GlobalTheory.CuspOrth.cuspFormsBounded π' hπ φ' hφ
-  obtain ⟨C₂, h₂⟩ := GlobalTheory.T.cuspFormSmoothSpan_norm_le_shortRationalVector E a π' hπ ψ (Or.inr hφ) [] (latt a J) (GlobalTheory.RSTheta.isCompact_latt J) {1}
-    isCompact_singleton 1
+  obtain ⟨ψ, rfl, -, -, B, hB⟩ :=
+    GlobalTheory.T.cuspFormRapidKernelSmoothSpan_smooth_cuspidal_bounded E a
+      GlobalTheory.CuspOrth.cuspFormsBounded π' hπ φ' hφ
+  obtain ⟨C₂, h₂⟩ :=
+    GlobalTheory.T.cuspFormSmoothSpan_norm_le_shortRationalVector E a π' hπ ψ (Or.inr hφ) []
+      (latt a J) (GlobalTheory.RSTheta.isCompact_latt J) {1} isCompact_singleton 1
   refine ⟨C₁ * (K * |B| * |C₂|), fun g => ?_⟩
   have hδ := GlobalTheory.RSnm.detAbs_pos g
-  obtain ⟨hs, hle⟩ := h₁ g (K * |B| * |C₂| * (GlobalTheory.RSnm.detAbs g)⁻¹)
-    (fun ξ => ψ.1 g ^ 2 * G (Matrix.vecMul (fun j => algebraMap E (Ad E) (ξ j)) g.val)) (by positivity)
-    (fun ξ hξ => mul_eq_zero_of_right _ (hJ _ hξ))
-    (fun ξ ξ' h0 hξ' => by
-      have h3 := h₂ g 1 rfl ξ' h0 hξ'
-      simp only [GlobalTheory.GLFin.word, mul_one, pow_one] at h3
-      set r := ‖fun i => pInf E (((fun j => algebraMap E (Ad E) (ξ' j)) ᵥ* g.val) i)‖ ^ (a * Module.finrank ℚ E)
-      have hr : 0 ≤ r := by positivity
-      have h4 : ‖ψ.1 g‖ ≤ |C₂| * (r / GlobalTheory.RSnm.detAbs g) :=
-        le_trans h3 (mul_le_mul_of_nonneg_right (le_abs_self _) (div_nonneg hr hδ.le))
-      rw [norm_mul, norm_pow, mul_assoc, sq]
-      calc _ ≤ (|B| * (|C₂| * (r / GlobalTheory.RSnm.detAbs g))) * K :=
-            mul_le_mul (mul_le_mul ((hB g).trans (le_abs_self _)) h4 (norm_nonneg _) (abs_nonneg _)) (hGK _)
-              (by positivity) (by positivity)
-        _ = _ := by ring)
+  obtain ⟨hs, hle⟩ :=
+    h₁ g (K * |B| * |C₂| * (GlobalTheory.RSnm.detAbs g)⁻¹)
+      (fun ξ => ψ.1 g ^ 2 * G (Matrix.vecMul (fun j => algebraMap E (Ad E) (ξ j)) g.val))
+      (by positivity)
+      (fun ξ hξ => mul_eq_zero_of_right _ (hJ _ hξ))
+      (fun ξ ξ' h0 hξ' => by
+        have h3 := h₂ g 1 rfl ξ' h0 hξ'
+        simp only [GlobalTheory.GLFin.word, mul_one, pow_one] at h3
+        set r := ‖fun i => pInf E (((fun j => algebraMap E (Ad E) (ξ' j)) ᵥ* g.val) i)‖ ^ (a * Module.finrank ℚ E)
+        have hr : 0 ≤ r := by positivity
+        have h4 : ‖ψ.1 g‖ ≤ |C₂| * (r / GlobalTheory.RSnm.detAbs g) :=
+          le_trans h3 (mul_le_mul_of_nonneg_right (le_abs_self _) (div_nonneg hr hδ.le))
+        rw [norm_mul, norm_pow, mul_assoc, sq]
+        calc
+          _ ≤ (|B| * (|C₂| * (r / GlobalTheory.RSnm.detAbs g))) * K :=
+            mul_le_mul (mul_le_mul ((hB g).trans (le_abs_self _)) h4 (norm_nonneg _) (abs_nonneg _))
+              (hGK _) (by positivity) (by positivity)
+          _ = _ := by ring)
   rw [← ENNReal.tsum_mul_left, mul_assoc C₁]
   refine le_trans (le_of_eq ?_) (ENNReal.ofReal_le_ofReal hle)
   rw [ENNReal.ofReal_tsum_of_nonneg (fun _ => norm_nonneg _) hs]

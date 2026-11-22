@@ -11,7 +11,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.DS.Mult1.SymC
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 ReciprocityTheory.ChartRestriction.DS.Mult1 ReciprocityTheory.ChartRestriction.DS.Mult1.SymA
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  ReciprocityTheory.ChartRestriction.DS.Mult1 ReciprocityTheory.ChartRestriction.DS.Mult1.SymA
   ReciprocityTheory.ChartRestriction.DS.Mult1.SymB
 
 variable {k r : ℕ}
@@ -65,9 +66,13 @@ lemma rho_scalF (D : RealPlaceData k r Wp Wp) (p : SS k r) (f : Mat k r → ℂ)
 def Phi (D : RealPlaceData k r Wp Wp) (f : Mat k r → ℂ) (g : Mat k r) (p : SS k r) : Wp →L[ℂ] Wp :=
   ph D p • (f (sgs p g) • (D.π (Matrix.of p.1.1)).comp (D.π (Matrix.of p.2.1)⁻¹))
 
-def Psi (D : RealPlaceData k r Wp Wp) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (f : Mat k r → ℂ) (g : Mat k r)
-    (p : SS k r) : Wp →L[ℂ] Wp :=
-  ph D p • (f (sgs p g) • (D.π (gbar k r γ (Matrix.of p.2.1))).comp (D.π (gbar k r γ (Matrix.of p.1.1))⁻¹))
+def Psi
+    (D : RealPlaceData k r Wp Wp) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (f : Mat k r → ℂ)
+    (g : Mat k r) (p : SS k r)
+    : Wp →L[ℂ] Wp :=
+  ph D p
+    • (f (sgs p g)
+      • (D.π (gbar k r γ (Matrix.of p.2.1))).comp (D.π (gbar k r γ (Matrix.of p.1.1))⁻¹))
 
 lemma J_phi (D : RealPlaceData k r Wp Wp) (hD : IsDiag D) (f : Mat k r → ℂ) (g : Mat k r) :
     JF D (scalF Wp f) g = ∫ p, Phi D f g p ∂D.μSS := by
@@ -105,7 +110,8 @@ section trace
 variable [FiniteDimensional ℂ Wp]
 
 def trL (Y : Wp →L[ℂ] Wp) : (Wp →L[ℂ] Wp) →ₗ[ℂ] ℂ where
-  toFun X := LinearMap.trace ℂ Wp (((ContinuousLinearMap.adjoint Y).comp X : Wp →L[ℂ] Wp) : Wp →ₗ[ℂ] Wp)
+  toFun X :=
+    LinearMap.trace ℂ Wp (((ContinuousLinearMap.adjoint Y).comp X : Wp →L[ℂ] Wp) : Wp →ₗ[ℂ] Wp)
   map_add' X X' := by simp [ContinuousLinearMap.comp_add]
   map_smul' c X := by simp
 
@@ -161,10 +167,12 @@ end ReciprocityTheory.ChartRestriction.DS.Mult1.SymC
 
 namespace ReciprocityTheory.ChartRestriction.DS.Mult1.SymD
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 ReciprocityTheory.ChartRestriction.DS.Mult1 ReciprocityTheory.ChartRestriction.DS.Mult1.SymA
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  ReciprocityTheory.ChartRestriction.DS.Mult1 ReciprocityTheory.ChartRestriction.DS.Mult1.SymA
   ReciprocityTheory.ChartRestriction.DS.Mult1.SymB ReciprocityTheory.ChartRestriction.DS.Mult1.SymC
 
-variable {k r : ℕ} {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+variable
+  {k r : ℕ} {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
 
 lemma pi_eq (D : RealPlaceData k r Wp Wp) {h : Mat k r} (hh : h ∈ UWset k r D.z) :
     D.π h = ((piLIE D.z D.π D.π_rep D.π_unitary h hh : Wp ≃ₗᵢ[ℂ] Wp) : Wp →L[ℂ] Wp) :=
@@ -207,13 +215,18 @@ lemma aesm_adj {α : Type*} [MeasurableSpace α] {μ : Measure α} {f : α → (
     (hf : AEStronglyMeasurable f μ) : AEStronglyMeasurable (fun a => ContinuousLinearMap.adjoint (f a)) μ :=
   (ContinuousLinearMap.adjoint (𝕜 := ℂ) (E := Wp) (F := Wp)).continuous.comp_aestronglyMeasurable hf
 
-def Cf (D : RealPlaceData k r Wp Wp) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (p : SS k r) : Wp →L[ℂ] Wp :=
-  (D.π (Matrix.of p.2.1)).comp ((ContinuousLinearMap.adjoint (D.π (Matrix.of p.1.1))).comp
-    ((D.π (gbar k r γ (Matrix.of p.2.1))).comp (ContinuousLinearMap.adjoint (D.π (gbar k r γ (Matrix.of p.1.1))))))
+def Cf (D : RealPlaceData k r Wp Wp) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (p : SS k r)
+    : Wp →L[ℂ] Wp :=
+  (D.π (Matrix.of p.2.1)).comp
+    ((ContinuousLinearMap.adjoint (D.π (Matrix.of p.1.1))).comp
+      ((D.π (gbar k r γ (Matrix.of p.2.1))).comp
+        (ContinuousLinearMap.adjoint (D.π (gbar k r γ (Matrix.of p.1.1))))))
 
-def Cb (D : RealPlaceData k r Wp Wp) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (p : SS k r) : Wp →L[ℂ] Wp :=
-  (D.π (gbar k r γ (Matrix.of p.1.1))).comp ((ContinuousLinearMap.adjoint (D.π (gbar k r γ (Matrix.of p.2.1)))).comp
-    ((D.π (Matrix.of p.1.1)).comp (ContinuousLinearMap.adjoint (D.π (Matrix.of p.2.1)))))
+def Cb (D : RealPlaceData k r Wp Wp) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (p : SS k r)
+    : Wp →L[ℂ] Wp :=
+  (D.π (gbar k r γ (Matrix.of p.1.1))).comp
+    ((ContinuousLinearMap.adjoint (D.π (gbar k r γ (Matrix.of p.2.1)))).comp
+      ((D.π (Matrix.of p.1.1)).comp (ContinuousLinearMap.adjoint (D.π (Matrix.of p.2.1)))))
 
 lemma norm_C_le (D : RealPlaceData k r Wp Wp) {a b c d : Mat k r} (ha : a ∈ UWset k r D.z) (hb : b ∈ UWset k r D.z)
     (hc : c ∈ UWset k r D.z) (hd : d ∈ UWset k r D.z) :
@@ -236,7 +249,9 @@ lemma aesm_pi (D : RealPlaceData k r Wp Wp) (hclW : IsClosed (UWset k r D.z)) :
     ae_iff.2 (measure_mono_null (fun x hx => hx) D.haarW.conc)
   rwa [Measure.restrict_eq_self_of_ae_mem hae] at h2
 
-variable (D : RealPlaceData k r Wp Wp) (hD : IsDiag D) (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+variable
+  (D : RealPlaceData k r Wp Wp) (hD : IsDiag D)
+  (γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
   (hWbar : ∀ h ∈ UWset k r D.z, gbar k r γ h ∈ UWset k r D.z)
 include hD hWbar
 

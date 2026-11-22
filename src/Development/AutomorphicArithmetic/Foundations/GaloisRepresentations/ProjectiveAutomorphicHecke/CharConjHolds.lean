@@ -34,10 +34,13 @@ end UpperTheory.Gal.CertificateRingHomMap
 
 namespace UpperTheory.Gal.Int.Geo.Pl
 
-theorem vecEx_holds : VecEx := vecEx_of CertificateRingHomMap.seedGU_holds CertificateRingHomMap.wtAt_holds
+theorem vecEx_holds : VecEx :=
+  vecEx_of CertificateRingHomMap.seedGU_holds CertificateRingHomMap.wtAt_holds
 
 theorem wtOf_holds : WtOf := wtOf_of CertificateRingHomMap.wtCore_holds
 
-theorem expOf_holds : ExpOf := expOf_of CertificateRingHomMap.expCore_holds CertificateRingHomMap.autEx_holds CertificateRingHomMap.wtAt_holds CertificateRingHomMap.epsIff_holds
+theorem expOf_holds : ExpOf :=
+  expOf_of CertificateRingHomMap.expCore_holds CertificateRingHomMap.autEx_holds
+    CertificateRingHomMap.wtAt_holds CertificateRingHomMap.epsIff_holds
 
 end UpperTheory.Gal.Int.Geo.Pl

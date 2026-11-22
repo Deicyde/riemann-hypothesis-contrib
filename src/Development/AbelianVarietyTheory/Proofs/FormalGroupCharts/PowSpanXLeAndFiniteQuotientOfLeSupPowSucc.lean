@@ -9,7 +9,12 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem pow_span_X_le_and_finite_quotient_of_le_sup_pow_succ : ∀ (k : Type) [Field k] (σ : Type) [Finite σ] (I : Ideal (MvPowerSeries σ k)) (M : ℕ), Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ k)) ^ M ≤ I ⊔ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ k)) ^ (M + 1) → Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ k)) ^ M ≤ I ∧ Module.Finite k (MvPowerSeries σ k ⧸ I) := by
+theorem pow_span_X_le_and_finite_quotient_of_le_sup_pow_succ
+    : ∀ (k : Type) [Field k] (σ : Type) [Finite σ] (I : Ideal (MvPowerSeries σ k)) (M : ℕ),
+      Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ k)) ^ M
+          ≤ I ⊔ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ k)) ^ (M + 1)
+        → Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ k)) ^ M ≤ I
+          ∧ Module.Finite k (MvPowerSeries σ k ⧸ I) := by
   intro k _ σ _ I M h
   set m : Ideal (MvPowerSeries σ k) := Ideal.span (Set.range MvPowerSeries.X) with hm
   have hfg : m.FG := Submodule.fg_span (Set.finite_range _)

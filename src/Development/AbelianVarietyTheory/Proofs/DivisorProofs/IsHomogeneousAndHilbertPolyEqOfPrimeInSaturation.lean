@@ -173,31 +173,34 @@ private lemma isHomogeneous_of_forall_homogeneousComponent_mem {K : Type} [Field
   rw [coe_decompose_homogeneousSubmodule_eq_homogeneousComponent]
   exact hI g hg n
 
-
 open MvPolynomial Filter in
 attribute [local instance] MvPolynomial.gradedAlgebra in
-theorem _root_.GlobalTheory.prime_saturation_homogeneous_and_hilbertPoly_eq (K : Type) [Field K] (N : ℕ)
-    (I Q : Ideal (MvPolynomial (Fin N) K))
+theorem _root_.GlobalTheory.prime_saturation_homogeneous_and_hilbertPoly_eq
+    (K : Type) [Field K]
+    (N : ℕ) (I Q : Ideal (MvPolynomial (Fin N) K))
     (hI : ∀ g ∈ I, ∀ n : ℕ, homogeneousComponent n g ∈ I) (hQ : Q.IsPrime) (hIQ : I ≤ Q)
-    (hs : ∀ g ∈ Q, ∀ j, ∃ m : ℕ, X j ^ m * g ∈ I) :
-    (∀ g ∈ Q, ∀ n : ℕ, homogeneousComponent n g ∈ Q) ∧
-      _root_.GlobalTheory.idealHilbertPoly Q = _root_.GlobalTheory.idealHilbertPoly I := by
+    (hs : ∀ g ∈ Q, ∀ j, ∃ m : ℕ, X j ^ m * g ∈ I)
+    : (∀ g ∈ Q, ∀ n : ℕ, homogeneousComponent n g ∈ Q)
+      ∧ _root_.GlobalTheory.idealHilbertPoly Q = _root_.GlobalTheory.idealHilbertPoly I := by
   have hQh := homogeneousComponent_mem_of_isPrime_of_X_pow_saturation hI hQ hIQ hs
   refine ⟨hQh, ?_⟩
   obtain ⟨L, hL⟩ := exists_homogeneous_mem_of_X_pow_mul_mem_of_homogeneous hI hs
   have hIh := isHomogeneous_of_forall_homogeneousComponent_mem hI
   have hQh' := isHomogeneous_of_forall_homogeneousComponent_mem hQh
-  obtain ⟨n0, hn0⟩ := eventually_atTop.mp
-    (((_root_.GlobalTheory.eventually_finrank_quotPiece hQh').and
+  obtain ⟨n0, hn0⟩ :=
+    eventually_atTop.mp (((_root_.GlobalTheory.eventually_finrank_quotPiece hQh').and
       (_root_.GlobalTheory.eventually_finrank_quotPiece hIh)).and (eventually_ge_atTop L))
   apply Polynomial.eq_of_infinite_eval_eq
-  refine Set.infinite_of_injective_forall_mem (f := fun n : ℕ => ((n0 + n : ℕ) : ℚ))
-    (fun a b hab => by simpa using hab) fun n => ?_
+  refine Set.infinite_of_injective_forall_mem
+    (f := fun n : ℕ => ((n0 + n : ℕ) : ℚ))
+    (fun a b hab => by simpa using hab)
+    fun n => ?_
   obtain ⟨⟨hq, hi⟩, hLn⟩ := hn0 (n0 + n) (by omega)
   show Polynomial.eval _ _ = Polynomial.eval _ _
   rw [← hq, ← hi]
-  have hint : Submodule.restrictScalars K Q ⊓ homogeneousSubmodule (Fin N) K (n0 + n) =
-      Submodule.restrictScalars K I ⊓ homogeneousSubmodule (Fin N) K (n0 + n) := by
+  have hint
+      : Submodule.restrictScalars K Q ⊓ homogeneousSubmodule (Fin N) K (n0 + n)
+        = Submodule.restrictScalars K I ⊓ homogeneousSubmodule (Fin N) K (n0 + n) := by
     apply le_antisymm
     · intro h hh
       rw [Submodule.mem_inf] at hh ⊢

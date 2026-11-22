@@ -6,10 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteRation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1 UpperTheory.Gal.Int.Geo GlobalTheory.CongL GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1 UpperTheory.Gal.Int.Geo
+  GlobalTheory.CongL GlobalTheory.UnitaryBC
 
-theorem UpperTheory.Gal.G1.pCjMem :
-    CjMem := by
+theorem UpperTheory.Gal.G1.pCjMem : CjMem := by
   intro E _ _ _ A w y
   have hb : ((A.bar y : 𝓞 E) : E) = IsCMField.complexConj E (y : E) := A.bar_eq y
   have hv := GlobalTheory.BCT.SuppFin.valuation_conj E w (y : E)

@@ -13,17 +13,17 @@ open GreenFunction
 
 noncomputable section
 
-theorem exists_R_of_compact {F : Type} [NormedAddCommGroup F] {u : F → ℝ}
-    (hc : HasCompactSupport u) : ∃ R > 0, ∀ q, q ∈ tsupport u → ‖q‖ ≤ R := by
+theorem exists_R_of_compact {F : Type} [NormedAddCommGroup F] {u : F → ℝ} (hc : HasCompactSupport u)
+    : ∃ R > 0, ∀ q, q ∈ tsupport u → ‖q‖ ≤ R := by
   obtain ⟨R0, hR0⟩ := (Metric.isBounded_iff_subset_closedBall (0 : F)).1 hc.isCompact.isBounded
   refine ⟨max R0 0 + 1, by positivity, fun q hq => ?_⟩
   have := hR0 hq
   rw [Metric.mem_closedBall, dist_zero_right] at this
   linarith [le_max_left R0 0]
 
-theorem leviOne (u : ℂ → ℝ) (z : ℂ) :
-    ReciprocityTheory.AnForm.levi (fun w : Fin 1 → ℂ => u (w 0)) (fun _ => z) (Pi.single 0 1) =
-      Δ u z / 4 := by
+theorem leviOne (u : ℂ → ℝ) (z : ℂ)
+    : ReciprocityTheory.AnForm.levi (fun w : Fin 1 → ℂ => u (w 0)) (fun _ => z) (Pi.single 0 1)
+      = Δ u z / 4 := by
   set e0 : (Fin 1 → ℂ) ≃L[ℝ] ℂ := ContinuousLinearEquiv.funUnique (Fin 1) ℝ ℂ with he0
   set Φ : (ℂ →L[ℝ] ℝ) ≃L[ℝ] ((Fin 1 → ℂ) →L[ℝ] ℝ) :=
     e0.symm.arrowCongr (ContinuousLinearEquiv.refl ℝ ℝ) with hΦ
@@ -33,9 +33,11 @@ theorem leviOne (u : ℂ → ℝ) (z : ℂ) :
     rw [e0.comp_right_fderiv]
     ext v
     simp [Φ]
-  have h3 : ∀ x, fderiv ℝ (Φ ∘ (fderiv ℝ u ∘ e0)) x =
-      (Φ : (ℂ →L[ℝ] ℝ) →L[ℝ] ((Fin 1 → ℂ) →L[ℝ] ℝ)).comp
-        ((fderiv ℝ (fderiv ℝ u) (e0 x)).comp (e0 : (Fin 1 → ℂ) →L[ℝ] ℂ)) := fun x => by
+  have h3
+      : ∀ x,
+        fderiv ℝ (Φ ∘ (fderiv ℝ u ∘ e0)) x
+          = (Φ : (ℂ →L[ℝ] ℝ) →L[ℝ] ((Fin 1 → ℂ) →L[ℝ] ℝ)).comp
+            ((fderiv ℝ (fderiv ℝ u) (e0 x)).comp (e0 : (Fin 1 → ℂ) →L[ℝ] ℂ)) := fun x => by
     rw [Φ.comp_fderiv, e0.comp_right_fderiv]
   simp only [ReciprocityTheory.AnForm.levi, h1, h2, h3, laplacian_eq_fderiv_fderiv]
   simp [Φ, e0]
@@ -44,18 +46,22 @@ theorem greenParamFiber_main : GreenParamFiberStatement := by
   intro E _ _ _ u hu hc p
   obtain ⟨R, hR0, hR⟩ := exists_R_of_compact hc
   have hv : ContDiff ℝ 2 (fun w : ℂ => u (w, p)) := hu.comp (contDiff_id.prodMk contDiff_const)
-  have h := green_at hv 0 (R := R + 1) (by linarith) (fun z hz =>
-    image_eq_zero_of_notMem_tsupport fun hm => by
-      have := hR _ hm
-      have := norm_fst_le (z, p)
-      simp only [sub_zero] at hz
-      linarith)
+  have h :=
+    green_at hv 0 (R := R + 1) (by linarith) (fun z hz =>
+      image_eq_zero_of_notMem_tsupport fun hm => by
+        have := hR _ hm
+        have := norm_fst_le (z, p)
+        simp only [sub_zero] at hz
+        linarith)
   simpa using h
 
-theorem lap_fiber {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {u : ℂ × E → ℝ}
-    (hu : ContDiff ℝ 2 u) (z : ℂ) (p : E) :
-    Δ (fun w : ℂ => u (w, p)) z = fderiv ℝ (fderiv ℝ u) (z, p) (1, 0) (1, 0)
-      + fderiv ℝ (fderiv ℝ u) (z, p) (Complex.I, 0) (Complex.I, 0) := by
+theorem lap_fiber
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {u : ℂ × E → ℝ} (hu : ContDiff ℝ 2 u)
+    (z : ℂ) (p : E)
+    : Δ (fun w : ℂ => u (w, p)) z
+      = fderiv ℝ (fderiv ℝ u) (z, p) (1, 0) (1, 0)
+        + fderiv ℝ (fderiv ℝ u) (z, p) (Complex.I, 0) (Complex.I, 0) := by
   have hd : Differentiable ℝ u := hu.differentiable (by norm_num)
   have hd2 : Differentiable ℝ (fderiv ℝ u) :=
     (hu.fderiv_right (m := 1) (by norm_num)).differentiable one_ne_zero
@@ -67,7 +73,8 @@ theorem lap_fiber {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {u : ℂ
   have h1 : fderiv ℝ (fun w : ℂ => u (w, p)) = fun w => Ψ (fderiv ℝ u (w, p)) := by
     funext w
     exact ((hd _).hasFDerivAt.comp w (hpath w)).fderiv
-  have h2 : HasFDerivAt (fun w : ℂ => Ψ (fderiv ℝ u (w, p)))
+  have h2 : HasFDerivAt
+      (fun w : ℂ => Ψ (fderiv ℝ u (w, p)))
       (Ψ.comp ((fderiv ℝ (fderiv ℝ u) (z, p)).comp L)) z :=
     Ψ.hasFDerivAt.comp z ((hd2 _).hasFDerivAt.comp z (hpath z))
   rw [laplacian_eq_fderiv_fderiv, h1, h2.fderiv]
@@ -81,27 +88,32 @@ theorem greenParam_main : GreenParamStatement := by
   set G : ℂ × E → ℝ := fun q => fderiv ℝ (fderiv ℝ u) q (1, 0) (1, 0)
       + fderiv ℝ (fderiv ℝ u) q (Complex.I, 0) (Complex.I, 0) with hG
   have hGc : Continuous G := by fun_prop
-  have hF : (fun q : ℂ × E => Real.log ‖q.1‖ * Δ (fun w : ℂ => u (w, q.2)) q.1) =
-      fun q => Real.log ‖q.1‖ * G q := by
+  have hF
+      : (fun q : ℂ × E => Real.log ‖q.1‖ * Δ (fun w : ℂ => u (w, q.2)) q.1)
+        = fun q => Real.log ‖q.1‖ * G q := by
     funext q; rw [lap_fiber hu]
   have hG0 : ∀ q, q ∉ tsupport u → G q = 0 := fun q hq => by
     have : fderiv ℝ (fderiv ℝ u) q = 0 := by
       by_contra h
-      exact hq (tsupport_fderiv_subset ℝ (tsupport_fderiv_subset ℝ
-        (subset_tsupport (fderiv ℝ (fderiv ℝ u)) h)))
+      exact hq (tsupport_fderiv_subset ℝ
+        (tsupport_fderiv_subset ℝ (subset_tsupport (fderiv ℝ (fderiv ℝ u)) h)))
     simp [G, this]
   obtain ⟨C, hC⟩ := hc.isCompact.exists_bound_of_continuousOn hGc.continuousOn
-  have hint : Integrable (fun q : ℂ × E => Real.log ‖q.1‖ * Δ (fun w : ℂ => u (w, q.2)) q.1)
+  have hint : Integrable
+      (fun q : ℂ × E => Real.log ‖q.1‖ * Δ (fun w : ℂ => u (w, q.2)) q.1)
       ((volume : Measure ℂ).prod μ) := by
     rw [hF]
     have hg1 : Integrable (fun z : ℂ => max C 0 * (Iic R).indicator (fun t => ‖Real.log t‖) ‖z‖) :=
       (integrable_log_norm_ball hR0).const_mul _
-    have hg2 : Integrable (fun p : E => (Metric.closedBall (0 : E) R).indicator (fun _ => (1 : ℝ)) p) μ :=
+    have hg2 : Integrable
+        (fun p : E => (Metric.closedBall (0 : E) R).indicator (fun _ => (1 : ℝ)) p)
+        μ :=
       (integrable_indicator_iff Metric.isClosed_closedBall.measurableSet).2
         (integrableOn_const (isCompact_closedBall 0 R).measure_lt_top.ne)
     refine (hg1.mul_prod hg2).mono'
       ((Real.measurable_log.comp (measurable_norm.comp measurable_fst)).aestronglyMeasurable.mul
-        hGc.aestronglyMeasurable) (Eventually.of_forall fun q => ?_)
+        hGc.aestronglyMeasurable)
+      (Eventually.of_forall fun q => ?_)
     by_cases hq : q ∈ tsupport u
     · have hn := hR q hq
       have h1 : ‖q.1‖ ∈ Iic R := by simp only [mem_Iic]; linarith [norm_fst_le q]
@@ -111,8 +123,8 @@ theorem greenParam_main : GreenParamStatement := by
       rw [mul_comm (max C 0)]
       exact mul_le_mul_of_nonneg_left ((hC q hq).trans (le_max_left _ _)) (norm_nonneg _)
     · rw [hG0 q hq, mul_zero, norm_zero]
-      exact mul_nonneg (mul_nonneg (le_max_right _ _)
-        (indicator_nonneg (fun _ _ => norm_nonneg _) _))
+      exact mul_nonneg
+        (mul_nonneg (le_max_right _ _) (indicator_nonneg (fun _ _ => norm_nonneg _) _))
         (indicator_nonneg (fun _ _ => zero_le_one) _)
   refine ⟨hint, ?_⟩
   rw [integral_prod_symm _ hint]

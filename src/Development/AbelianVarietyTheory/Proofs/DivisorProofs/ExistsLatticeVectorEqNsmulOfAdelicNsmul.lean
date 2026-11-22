@@ -5,9 +5,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.HasDivPlace
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -18,21 +21,26 @@ namespace GlobalTheory.LKGeo.LatDvd
 
 variable {p : ℕ} [Fact p.Prime]
 
-def adBasis {D : Datum p} {J : Type} (b : Module.Basis J ℤ D.La) : Module.Basis J (AfP p) (AfP p ⊗[ℚ] VQ D) :=
+def adBasis {D : Datum p} {J : Type} (b : Module.Basis J ℤ D.La)
+    : Module.Basis J (AfP p) (AfP p ⊗[ℚ] VQ D) :=
   (b.baseChange ℚ).baseChange (AfP p)
 
-theorem adBasis_repr_inAf {D : Datum p} {J : Type} (b : Module.Basis J ℤ D.La) (z : D.La) (i : J) :
-    (adBasis b).repr (inAf D z) i = algebraMap ℚ (AfP p) ((b.repr z i : ℤ) : ℚ) := by
+theorem adBasis_repr_inAf {D : Datum p} {J : Type} (b : Module.Basis J ℤ D.La) (z : D.La) (i : J)
+    : (adBasis b).repr (inAf D z) i = algebraMap ℚ (AfP p) ((b.repr z i : ℤ) : ℚ) := by
   simp only [adBasis, inAf, Module.Basis.baseChange_repr_tmul]
   rw [Algebra.algebraMap_eq_smul_one]
   simp
 
-theorem isIntAf_adBasis_repr {D : Datum p} {J : Type} (b : Module.Basis J ℤ D.La) (i : J) {w : AfP p ⊗[ℚ] VQ D}
-    (hw : w ∈ LaHat D) : IsIntAf ((adBasis b).repr w i) := by
+theorem isIntAf_adBasis_repr
+    {D : Datum p} {J : Type} (b : Module.Basis J ℤ D.La) (i : J)
+    {w : AfP p ⊗[ℚ] VQ D} (hw : w ∈ LaHat D)
+    : IsIntAf ((adBasis b).repr w i) := by
   induction hw using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨c, x, hc, rfl⟩ := hz
-    have e : (adBasis b).repr (c ⊗ₜ[ℚ] ((1 : ℚ) ⊗ₜ[ℤ] x : VQ D)) i = ((b.repr x i : ℤ) : AfP p) * c := by
+    have e
+        : (adBasis b).repr (c ⊗ₜ[ℚ] ((1 : ℚ) ⊗ₜ[ℤ] x : VQ D)) i
+          = ((b.repr x i : ℤ) : AfP p) * c := by
       simp [adBasis, Algebra.smul_def]
     rw [e]
     intro v
@@ -51,9 +59,14 @@ theorem isIntAf_adBasis_repr {D : Datum p} {J : Type} (b : Module.Basis J ℤ D.
     rw [map_neg, Finsupp.neg_apply, map_neg]
     exact neg_mem (hx v)
 
-theorem exists_eq_nsmul_of_inAf (p : ℕ) [Fact p.Prime] (D : Datum p) (n : ℕ) (_hn : 0 < n) (_hc : n.Coprime p)
-    (h : ∀ (c : ℤ) (a : AfP p), IsIntAf a → algebraMap ℚ (AfP p) (c : ℚ) = (n : AfP p) * a → (n : ℤ) ∣ c)
-    (z : D.La) (hz : ∃ w ∈ LaHat D, inAf D z = n • w) : ∃ u : D.La, z = n • u := by
+theorem exists_eq_nsmul_of_inAf
+    (p : ℕ) [Fact p.Prime]
+    (D : Datum p)
+    (n : ℕ) (_hn : 0 < n) (_hc : n.Coprime p)
+    (h : ∀ (c : ℤ) (a : AfP p),
+      IsIntAf a → algebraMap ℚ (AfP p) (c : ℚ) = (n : AfP p) * a → (n : ℤ) ∣ c)
+    (z : D.La) (hz : ∃ w ∈ LaHat D, inAf D z = n • w)
+    : ∃ u : D.La, z = n • u := by
   obtain ⟨w, hw, e⟩ := hz
   have := D.freeLa
   have := D.finLa

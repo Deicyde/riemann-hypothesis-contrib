@@ -12,25 +12,30 @@ noncomputable section
 
 namespace RootFieldNumerics.A1
 
-open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
 
 variable {Ψ : Type} [Fintype Ψ] {N : ℕ}
 
-theorem gap_eq (lam : Ψ × Fin N → ℝ) (p : Ψ × Fin N) :
-    PB.gap lam p = lam p - if h : (p.2 : ℕ) + 1 < N then lam (p.1, ⟨(p.2 : ℕ) + 1, h⟩) else 0 := by
+theorem gap_eq (lam : Ψ × Fin N → ℝ) (p : Ψ × Fin N)
+    : PB.gap lam p
+      = lam p - if h : (p.2 : ℕ) + 1 < N then lam (p.1, ⟨(p.2 : ℕ) + 1, h⟩) else 0 := by
   unfold PB.gap PB.gapX
   split_ifs <;> simp
 
 theorem abs_le_l1_norm (lam : Wt Ψ N) (τ : Ψ) (i : Fin N) : |lam τ i| ≤ l1 lam := by
   unfold l1
-  calc |lam τ i| ≤ ∑ j : Fin N, |lam τ j| :=
-        Finset.single_le_sum (f := fun j => |lam τ j|) (fun j _ => abs_nonneg _) (Finset.mem_univ i)
+  calc
+    |lam τ i| ≤ ∑ j : Fin N, |lam τ j| :=
+      Finset.single_le_sum (f := fun j => |lam τ j|) (fun j _ => abs_nonneg _) (Finset.mem_univ i)
     _ ≤ ∑ σ : Ψ, ∑ j : Fin N, |lam σ j| :=
-        Finset.single_le_sum (f := fun σ => ∑ j : Fin N, |lam σ j|)
-          (fun σ _ => Finset.sum_nonneg fun j _ => abs_nonneg _) (Finset.mem_univ τ)
+      Finset.single_le_sum
+        (f := fun σ => ∑ j : Fin N, |lam σ j|)
+        (fun σ _ => Finset.sum_nonneg fun j _ => abs_nonneg _)
+        (Finset.mem_univ τ)
 
-theorem abs_gap_le (mu : Wt Ψ N) (b : ℝ) (hb : ∀ τ i, |mu τ i| ≤ b) (p : Ψ × Fin N) :
-    |PB.gap (fun x => mu x.1 x.2) p| ≤ 2 * b := by
+theorem abs_gap_le (mu : Wt Ψ N) (b : ℝ) (hb : ∀ τ i, |mu τ i| ≤ b) (p : Ψ × Fin N)
+    : |PB.gap (fun x => mu x.1 x.2) p| ≤ 2 * b := by
   rw [gap_eq]
   have h0 : 0 ≤ b := le_trans (abs_nonneg _) (hb p.1 p.2)
   refine le_trans (abs_sub _ _) ?_
@@ -42,13 +47,22 @@ theorem abs_gap_le (mu : Wt Ψ N) (b : ℝ) (hb : ∀ τ i, |mu τ i| ≤ b) (p 
   · simp only [abs_zero] at h1 ⊢
     linarith
 
-theorem comp_psh {D : ℕ} (S : PB.AnSys D (Option (Ψ × Fin N))) (k : ℕ) (hk : 0 < k) (b : ℝ)
-    (h0 : ∀ t x, S.phT none t x = 0)
-    (hfl : ∀ τ (i : Fin N), (i : ℕ) + 1 = N → ∀ t, IsPsh S.A ((S.potT (some (τ, i)) t).rsmul (-1)) ∧
-      IsPsh S.A (S.potT (some (τ, i)) t))
-    (hpos : IsPosPot S.A (S.th none)) :
-    ∃ s₀ > (0 : ℝ), ∀ s, 0 < s → s ≤ s₀ → scale s ≤ S.t₀ ∧ ∀ mu : Wt Ψ N, (∀ τ i, |mu τ i| ≤ b) → Dominant mu →
-      IsPsh S.A (PB.sumPot (PB.gapS (fun x => mu x.1 x.2) (s / k)) fun a => S.potT a (scale s)) := by
+theorem comp_psh
+    {D : ℕ} (S : PB.AnSys D (Option (Ψ × Fin N)))
+    (k : ℕ) (hk : 0 < k)
+    (b : ℝ) (h0 : ∀ t x, S.phT none t x = 0)
+    (hfl : ∀ τ (i : Fin N),
+      (i : ℕ) + 1 = N
+        → ∀ t, IsPsh S.A ((S.potT (some (τ, i)) t).rsmul (-1)) ∧ IsPsh S.A (S.potT (some (τ, i)) t))
+    (hpos : IsPosPot S.A (S.th none))
+    : ∃ s₀ > (0 : ℝ), ∀ s,
+      0 < s → s ≤ s₀
+        → scale s ≤ S.t₀
+          ∧ ∀ mu : Wt Ψ N,
+            (∀ τ i, |mu τ i| ≤ b) → Dominant mu
+              → IsPsh S.A
+                (PB.sumPot (PB.gapS (fun x => mu x.1 x.2) (s / k)) fun a =>
+                  S.potT a (scale s)) := by
   have hth : IsPotential S.A (S.th none) := (S.sing none).1
   obtain ⟨c₀, hc₀, hcmp⟩ := compare_global hth hpos S.potΘ
   have hpotb : IsPotential S.A (S.th none + LocPot.rsmul (-c₀) S.Θ) :=
@@ -61,8 +75,10 @@ theorem comp_psh {D : ℕ} (S : PB.AnSys D (Option (Ψ × Fin N))) (k : ℕ) (hk
     linarith
   have ha' : ∀ t, IsPsh S.A (S.potT none t + LocPot.rsmul (-c₀) S.Θ) := by
     intro t x j y hy w
-    have hy' : y ∈ (S.A.chart j).target ∩ ↑(S.A.chart j).symm ⁻¹'
-        (S.th none + LocPot.rsmul (-c₀) S.Θ).U x := by
+    have hy'
+        : y
+          ∈ (S.A.chart j).target
+            ∩ ↑(S.A.chart j).symm ⁻¹' (S.th none + LocPot.rsmul (-c₀) S.Θ).U x := by
       refine ⟨hy.1, ?_⟩
       have h2 := hy.2
       simp only [Set.mem_preimage] at h2 ⊢
@@ -75,7 +91,8 @@ theorem comp_psh {D : ℕ} (S : PB.AnSys D (Option (Ψ × Fin N))) (k : ℕ) (hk
     rw [h0]
     ring
   let Fl : Set (Option (Ψ × Fin N)) := {a | ∃ p : Ψ × Fin N, a = some p ∧ (p.2 : ℕ) + 1 = N}
-  have hFl : ∀ a ∈ Fl, ∀ t, IsPsh S.A (LocPot.rsmul (-1) (S.potT a t)) ∧ IsPsh S.A (S.potT a t) := by
+  have hFl
+      : ∀ a ∈ Fl, ∀ t, IsPsh S.A (LocPot.rsmul (-1) (S.potT a t)) ∧ IsPsh S.A (S.potT a t) := by
     rintro a ⟨p, rfl, hp⟩ t
     exact hfl p.1 p.2 hp t
   have hnone : (none : Option (Ψ × Fin N)) ∉ Fl := by
@@ -83,13 +100,14 @@ theorem comp_psh {D : ℕ} (S : PB.AnSys D (Option (Ψ × Fin N))) (k : ℕ) (hk
     cases hp
   have hkR : (0 : ℝ) < k := by exact_mod_cast hk
   set abelian₂ : ℝ := 1 + ∑ _p : Ψ × Fin N, (k : ℝ) * (2 * b) with hLam
-  obtain ⟨s₁, hs₁, hall⟩ := psh_sum_potentials_small_parameter D _ S Fl none c₀ abelian₂ hc₀ hFl ha' hnone
+  obtain ⟨s₁, hs₁, hall⟩ :=
+    psh_sum_potentials_small_parameter D _ S Fl none c₀ abelian₂ hc₀ hFl ha' hnone
   refine ⟨min s₁ 1, lt_min hs₁ one_pos, fun s hs hss => ?_⟩
   obtain ⟨hsc, hmain⟩ := hall s hs (le_trans hss (min_le_left _ _))
   have hs1 : s ≤ 1 := le_trans hss (min_le_right _ _)
   refine ⟨hsc, fun mu hmu hdom => ?_⟩
-  have hpot : ∀ a, IsPotential S.A (S.potT a (scale s)) :=
-    fun a => potT_potential S a (Real.exp_pos _) hsc
+  have hpot : ∀ a, IsPotential S.A (S.potT a (scale s)) := fun a =>
+    potT_potential S a (Real.exp_pos _) hsc
   set c : Option (Ψ × Fin N) → ℝ := PB.gapS (fun x => mu x.1 x.2) (s / k) with hc
   have hcn : c none = s / k := rfl
   have hcs : ∀ p, c (some p) = PB.gap (fun x => mu x.1 x.2) p := fun p => rfl
@@ -120,21 +138,24 @@ theorem comp_psh {D : ℕ} (S : PB.AnSys D (Option (Ψ × Fin N))) (k : ℕ) (hk
         have := p.2.isLt
         omega
       rw [dite_eq_left hlt]
-      have := hdom p.1 p.2 ⟨(p.2 : ℕ) + 1, hlt⟩ (by
-        show (p.2 : ℕ) ≤ (p.2 : ℕ) + 1
-        omega)
+      have :=
+        hdom p.1 p.2 ⟨(p.2 : ℕ) + 1, hlt⟩ (by
+          show (p.2 : ℕ) ≤ (p.2 : ℕ) + 1
+          omega)
       simp only
       linarith
-  have hP : IsPsh S.A (PB.sumPot c' (fun a => S.potT a (scale s)) +
-      LocPot.rsmul (-(s * c₀ / 2)) S.Θ) := hmain c' h1 h2 h3
+  have hP
+      : IsPsh S.A (PB.sumPot c' (fun a => S.potT a (scale s)) + LocPot.rsmul (-(s * c₀ / 2)) S.Θ) :=
+    hmain c' h1 h2 h3
   rw [isPsh_iff (isPotential_sumPot c hpot)]
   intro j y hy w
   have hq := dl_nonneg hP j hy w
   rw [dl_add_rsmul (isPotential_sumPot c' hpot) S.potΘ _ j hy w, dl_sumPot c' hpot j hy w] at hq
   rw [dl_sumPot c hpot j hy w]
   have hΘ := dl_nonneg_of_pos S.posΘ j hy w
-  have hsum : ∑ a, c' a * dl S.A (S.potT a (scale s)) j y w =
-      (k : ℝ) * ∑ a, c a * dl S.A (S.potT a (scale s)) j y w := by
+  have hsum
+      : ∑ a, c' a * dl S.A (S.potT a (scale s)) j y w
+        = (k : ℝ) * ∑ a, c a * dl S.A (S.potT a (scale s)) j y w := by
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     show (k : ℝ) * c a * _ = _
@@ -146,24 +167,38 @@ theorem comp_psh {D : ℕ} (S : PB.AnSys D (Option (Ψ × Fin N))) (k : ℕ) (hk
 
 end RootFieldNumerics.A1
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
 
-theorem RootFieldNumerics.real_tower_mean_slope_condition : PB.Inputs → ∀ II : IntersectionSystem, IsFullIntersectionSystem II → ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (T : RootTower Ψ N) (R : RealTower T), R.Smooth → R.Flat → R.Pos → T.A1 := by
+theorem RootFieldNumerics.real_tower_mean_slope_condition
+    : PB.Inputs
+      → ∀ II : IntersectionSystem,
+        IsFullIntersectionSystem II
+          → ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (T : RootTower Ψ N) (R : RealTower T),
+            R.Smooth → R.Flat → R.Pos → T.A1 := by
   intro _hin II _hII Ψ _ _ N T R hSm hFl hPos
   haveI := T.finC
   haveI := T.neC
   intro abelian₂
   set b : ℝ := abelian₂ + l1 T.nu with hb
-  have hex : ∀ c : T.Comp, ∃ s₀ > (0 : ℝ), ∀ s, 0 < s → s ≤ s₀ → scale s ≤ (R.Sys c).t₀ ∧
-      ∀ mu : Wt Ψ N, (∀ τ i, |mu τ i| ≤ b) → Dominant mu →
-        ReciprocityTheory.AnForm.M.IsPsh (R.Sys c).A (PB.sumPot (PB.gapS (fun x => mu x.1 x.2)
-          (s / ((T.M 2 c).kA : ℕ))) fun a => (R.Sys c).potT a (scale s)) := by
+  have hex
+      : ∀ c : T.Comp, ∃ s₀ > (0 : ℝ), ∀ s,
+        0 < s → s ≤ s₀
+          → scale s ≤ (R.Sys c).t₀
+            ∧ ∀ mu : Wt Ψ N,
+              (∀ τ i, |mu τ i| ≤ b) → Dominant mu
+                → ReciprocityTheory.AnForm.M.IsPsh (R.Sys c).A
+                  (PB.sumPot (PB.gapS (fun x => mu x.1 x.2) (s / ((T.M 2 c).kA : ℕ))) fun a =>
+                    (R.Sys c).potT a (scale s)) := by
     intro c
-    exact RootFieldNumerics.A1.comp_psh (R.Sys c) (T.M 2 c).kA (T.M 2 c).kA_pos b ((R.tie 2 c).phT_none)
-      (hFl c) (hPos c)
+    exact RootFieldNumerics.A1.comp_psh (R.Sys c) (T.M 2 c).kA (T.M 2 c).kA_pos b
+      ((R.tie 2 c).phT_none) (hFl c) (hPos c)
   choose f hfpos hf using hex
-  refine ⟨min 1 (Finset.univ.inf' Finset.univ_nonempty f),
-    lt_min one_pos ((Finset.lt_inf'_iff _).2 fun c _ => hfpos c), ?_⟩
+  refine ⟨
+    min 1 (Finset.univ.inf' Finset.univ_nonempty f),
+    lt_min one_pos ((Finset.lt_inf'_iff _).2 fun c _ => hfpos c),
+    ?_
+  ⟩
   intro B _hB c lam s hlam hs hss hdom
   have hs1 : s ≤ 1 := le_trans hss (min_le_left _ _)
   have hsf : s ≤ f c :=
@@ -179,7 +214,9 @@ theorem RootFieldNumerics.real_tower_mean_slope_condition : PB.Inputs → ∀ II
     have e3 : |s * T.nu τ i| ≤ |T.nu τ i| := by
       rw [abs_mul, abs_of_pos hs]
       exact mul_le_of_le_one_left (abs_nonneg _) hs1
-    calc |lam τ i - s * T.nu τ i| ≤ |lam τ i| + |s * T.nu τ i| := abs_sub _ _
+    calc
+      |lam τ i - s * T.nu τ i|
+        ≤ |lam τ i| + |s * T.nu τ i| := abs_sub _ _
       _ ≤ b := by rw [hb]; linarith
   have hpsh := hmain mu hbd hdom
   have hk : ((T.M B c).kA : ℝ) = ((T.M 2 c).kA : ℕ) := by rw [R.kA_eq B 2 c]
@@ -187,9 +224,10 @@ theorem RootFieldNumerics.real_tower_mean_slope_condition : PB.Inputs → ∀ II
   letI := alg
   have ht0 : 0 < scale s := Real.exp_pos _
   intro z hz w hw
-  refine RootFieldNumerics.Levi.levi_nonneg (T.M B c).Ω (T.M B c).y (dimFl Ψ N) (T.M B c).arith hsmooth hJ
-    (R.tie B c).Re.R ((T.M B c).weight (scale s) mu s)
-    (fun k => ∑ j, (T.M B c).coef mu s j * (((T.M B c).line (scale s) j).a k : ℝ)) ?_ ?_ ?_ z hz w hw
+  refine RootFieldNumerics.Levi.levi_nonneg (T.M B c).Ω (T.M B c).y (dimFl Ψ N) (T.M B c).arith
+    hsmooth hJ (R.tie B c).Re.R ((T.M B c).weight (scale s) mu s)
+    (fun k => ∑ j, (T.M B c).coef mu s j * (((T.M B c).line (scale s) j).a k : ℝ))
+    ?_ ?_ ?_ z hz w hw
   · intro cc zz hcc hzz
     simp only [RootModel.weight, RootFieldNumerics.Levi.log_h_torus _ cc zz hcc hzz]
     simp only [mul_add, Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul]
@@ -208,25 +246,32 @@ theorem RootFieldNumerics.real_tower_mean_slope_condition : PB.Inputs → ∀ II
       contDiffAt_const.mul (RootFieldNumerics.Levi.contDiffAt_log_h (hsm j) zz hzz)
   · intro x j hx u
     refine RootFieldNumerics.Levi.levi_chart_nonneg (R.tie B c).Re (scale s) ht0 hsc _ hpsh x
-      (fun y => (T.M B c).weight (scale s) mu s ((R.tie B c).Re.R.lift x y)) ?_ j hx u
+      (fun y => (T.M B c).weight (scale s) mu s ((R.tie B c).Re.R.lift x y))
+      ?_ j hx u
     intro y hy
     have hzm : (R.tie B c).Re.R.lift x y ∈ mcPts (T.M B c).P := (R.tie B c).Re.R.mem x y hy
-    have hl : ∀ a, Real.log (((R.tie B c).Re.ref a).h ((R.tie B c).Re.R.lift x y)) +
-        (R.Sys c).phT a (scale s) ((R.tie B c).Re.π y) =
-        Real.log (((R.tie B c).Re.line a (scale s)).h ((R.tie B c).Re.R.lift x y)) :=
-      fun a => (RootFieldNumerics.Levi.log_line_lift (R.tie B c).Re a (scale s) ht0 hsc x y hy).symm
+    have hl
+        : ∀ a,
+          Real.log (((R.tie B c).Re.ref a).h ((R.tie B c).Re.R.lift x y))
+              + (R.Sys c).phT a (scale s) ((R.tie B c).Re.π y)
+            = Real.log (((R.tie B c).Re.line a (scale s)).h ((R.tie B c).Re.R.lift x y)) := fun a =>
+      (RootFieldNumerics.Levi.log_line_lift (R.tie B c).Re a (scale s) ht0 hsc x y hy).symm
     simp only [hl]
-    have hnone : Real.log (((R.tie B c).Re.line none (scale s)).h ((R.tie B c).Re.R.lift x y)) =
-        Real.log ((T.M B c).A.h ((R.tie B c).Re.R.lift x y)) := by
+    have hnone
+        : Real.log (((R.tie B c).Re.line none (scale s)).h ((R.tie B c).Re.R.lift x y))
+          = Real.log ((T.M B c).A.h ((R.tie B c).Re.R.lift x y)) := by
       rw [← hl none, (R.tie B c).phT_none, add_zero, (R.tie B c).ref_none.2 _ hzm]
-    have hsome : ∀ p : Ψ × Fin N,
-        Real.log (((R.tie B c).Re.line (some p) (scale s)).h ((R.tie B c).Re.R.lift x y)) =
-        -∑ k ≤ p.2, Real.log (((T.M B c).x (scale s) (p.1, k)).h ((R.tie B c).Re.R.lift x y)) :=
+    have hsome
+        : ∀ p : Ψ × Fin N,
+          Real.log (((R.tie B c).Re.line (some p) (scale s)).h ((R.tie B c).Re.R.lift x y))
+            = - ∑ k ≤ p.2, Real.log (((T.M B c).x (scale s) (p.1, k)).h ((R.tie B c).Re.R.lift x y)) :=
       fun p => (R.tie B c).fund_reg p.1 p.2 (scale s) ht0 hsc _ hzm
     rw [Fintype.sum_option, hnone]
     simp only [hsome]
-    have hsg := RootFieldNumerics.Levi.sum_gap_mul (fun x => mu x.1 x.2)
-      (fun r => Real.log (((T.M B c).x (scale s) r).h ((R.tie B c).Re.R.lift x y)))
+    have hsg :=
+      RootFieldNumerics.Levi.sum_gap_mul
+        (fun x => mu x.1 x.2)
+        (fun r => Real.log (((T.M B c).x (scale s) r).h ((R.tie B c).Re.R.lift x y)))
     simp only [RootModel.weight, Fintype.sum_option, RootModel.coef, RootModel.line, PB.gapS,
       Option.elim, mul_neg, Finset.sum_neg_distrib, neg_mul, hsg]
     rw [hk]

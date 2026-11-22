@@ -14,10 +14,10 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Filter
 
-theorem IrreducibleGermComplementConnected.proof (hdense : RegularLocusDense.Statement)
-    (hconn : IrreducibleGermRegularConnected.Statement)
-    (hzeros : ManifoldZerosComplementConnected.Statement) :
-    IrreducibleGermComplementConnected.Statement := by
+theorem IrreducibleGermComplementConnected.proof
+    (hdense : RegularLocusDense.Statement) (hconn : IrreducibleGermRegularConnected.Statement)
+    (hzeros : ManifoldZerosComplementConnected.Statement)
+    : IrreducibleGermComplementConnected.Statement := by
   intro σ _ X w h hX hirr hh hnot U hU
   obtain ⟨N, hNo, hwN, hN⟩ := hdense σ X w hX
   have hU' : U ∩ N ∩ {z | AnalyticAt ℂ h z} ∈ 𝓝 w :=
@@ -43,9 +43,16 @@ theorem IrreducibleGermComplementConnected.proof (hdense : RegularLocusDense.Sta
     obtain ⟨y, hyR, hyh⟩ := closure_nonempty_iff.1 ⟨z, hcl' ⟨⟨hzX, hzB⟩, hz0⟩⟩
     exact hyh (hcon y hyR)
   have hRc : IsPreconnected (regLocus (X ∩ B) \ {z | h z = 0}) :=
-    hzeros σ _ h hR (fun x hx => isRegularPointOf_regLocus hx)
-      (fun x hx => hBh x (regLocus_subset _ hx).2) hex
-  exact ⟨B, hBo, hwB, fun z hz => (hBU hz).1.1,
-    hRc.subset_closure (Set.sdiff_subset_sdiff_left (regLocus_subset _)) hcl'⟩
+    hzeros σ _ h hR
+      (fun x hx => isRegularPointOf_regLocus hx)
+      (fun x hx => hBh x (regLocus_subset _ hx).2)
+      hex
+  exact ⟨
+    B,
+    hBo,
+    hwB,
+    fun z hz => (hBU hz).1.1,
+    hRc.subset_closure (Set.sdiff_subset_sdiff_left (regLocus_subset _)) hcl'
+  ⟩
 
 end GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets

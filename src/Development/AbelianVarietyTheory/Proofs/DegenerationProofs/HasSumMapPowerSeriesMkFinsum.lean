@@ -8,16 +8,28 @@ open Module
 
 namespace GlobalTheory
 
-theorem hasSum_map_powerSeries_mk_finsum : ∀ (O K Z : Type) [CommRing O] [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K] (φ : PowerSeries O →+* K), (∀ f, ‖φ f‖ ≤ 1) → ‖φ PowerSeries.X‖ < 1 → ∀ (deg : Z → ℕ), (∀ n, {z | deg z = n}.Finite) → ∀ a : Z → O, HasSum (fun z => φ (PowerSeries.C (a z)) * φ PowerSeries.X ^ deg z) (φ (PowerSeries.mk fun n => ∑ᶠ (z : Z) (_ : deg z = n), a z)) := by
+theorem hasSum_map_powerSeries_mk_finsum
+    : ∀ (O K Z : Type) [CommRing O] [NontriviallyNormedField K] [IsUltrametricDist K]
+        [CompleteSpace K] (φ : PowerSeries O →+* K),
+      (∀ f, ‖φ f‖ ≤ 1) → ‖φ PowerSeries.X‖ < 1
+        → ∀ (deg : Z → ℕ),
+          (∀ n, {z | deg z = n}.Finite)
+            → ∀ a : Z → O,
+              HasSum
+                (fun z => φ (PowerSeries.C (a z)) * φ PowerSeries.X ^ deg z)
+                (φ (PowerSeries.mk fun n => ∑ᶠ (z : Z) (_ : deg z = n), a z)) := by
   intro O K Z _ _ _ _ φ h1 hX deg hfin a
   classical
   set F : PowerSeries O := PowerSeries.mk fun n => ∑ᶠ (z : Z) (_ : deg z = n), a z with hF
-  have key : ∀ (n : ℕ) (s : Finset Z), (∀ z, deg z < n → z ∈ s) →
-      ‖(∑ z ∈ s, φ (PowerSeries.C (a z)) * φ PowerSeries.X ^ deg z) - φ F‖
-        ≤ ‖φ PowerSeries.X‖ ^ n := by
+  have key
+      : ∀ (n : ℕ) (s : Finset Z),
+        (∀ z, deg z < n → z ∈ s)
+          → ‖(∑ z ∈ s, φ (PowerSeries.C (a z)) * φ PowerSeries.X ^ deg z) - φ F‖
+            ≤ ‖φ PowerSeries.X‖ ^ n := by
     intro n s hs
-    have hdvd : (PowerSeries.X : PowerSeries O) ^ n ∣
-        (∑ z ∈ s, PowerSeries.C (a z) * PowerSeries.X ^ deg z) - F := by
+    have hdvd
+        : (PowerSeries.X : PowerSeries O) ^ n
+          ∣ (∑ z ∈ s, PowerSeries.C (a z) * PowerSeries.X ^ deg z) - F := by
       rw [PowerSeries.X_pow_dvd_iff]
       intro m hm
       set_option synthInstance.maxHeartbeats 100000 in

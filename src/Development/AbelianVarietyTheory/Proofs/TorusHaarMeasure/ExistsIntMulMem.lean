@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.IntegralMultiples
 
-theorem exists_int_smul_mem {E : Type} [Field E] [NumberField E] {r : ℕ}
-    (Λ : Submodule (NumberField.RingOfIntegers E) (Fin r → E))
-    (hΛ : Submodule.span E (Λ : Set (Fin r → E)) = ⊤) (v : Fin r → E) :
-    ∃ k : ℤ, k ≠ 0 ∧ k • v ∈ Λ := by
+theorem exists_int_smul_mem
+    {E : Type} [Field E] [NumberField E]
+    {r : ℕ} (Λ : Submodule (NumberField.RingOfIntegers E) (Fin r → E))
+    (hΛ : Submodule.span E (Λ : Set (Fin r → E)) = ⊤) (v : Fin r → E)
+    : ∃ k : ℤ, k ≠ 0 ∧ k • v ∈ Λ := by
   classical
   have hv : v ∈ Submodule.span E (Λ : Set (Fin r → E)) := by
     rw [hΛ]
@@ -27,10 +28,11 @@ theorem exists_int_smul_mem {E : Type} [Field E] [NumberField E] {r : ℕ}
   rw [e]
   exact Λ.smul_mem o (g i).2
 
-theorem main : ∀ {E : Type} [inst : Field E] [NumberField E] {r : ℕ}
-    (Λ : Submodule (NumberField.RingOfIntegers E) (Fin r → E)),
-    Submodule.span E (↑Λ : Set (Fin r → E)) = ⊤ →
-      ∀ (v : Fin r → E), ∃ (k : ℤ), k ≠ (0 : ℤ) ∧ k • v ∈ Λ := by
+theorem main
+    : ∀ {E : Type} [inst : Field E] [NumberField E] {r : ℕ}
+        (Λ : Submodule (NumberField.RingOfIntegers E) (Fin r → E)),
+      Submodule.span E (↑Λ : Set (Fin r → E)) = ⊤
+        → ∀ (v : Fin r → E), ∃ (k : ℤ), k ≠ (0 : ℤ) ∧ k • v ∈ Λ := by
   intro E _ _ r Λ hΛ v
   exact exists_int_smul_mem Λ hΛ v
 

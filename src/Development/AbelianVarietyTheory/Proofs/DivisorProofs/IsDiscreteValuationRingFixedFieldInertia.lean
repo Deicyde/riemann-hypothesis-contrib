@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NotMemDivUni
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,18 +19,20 @@ set_option autoImplicit false
 
 namespace GlobalTheory.InertiaFixedDVR
 
-theorem isDiscreteValuationRing_fixedField_inertia : ∀ (R K Ω : Type) [CommRing R] [IsDomain R]
-    [IsDiscreteValuationRing R] [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K]
-    [Field Ω] [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω), IsAbove R K V.toSubring →
-    IsDiscreteValuationRing (V.comap (algebraMap (IntermediateField.fixedField (inertia K V)) Ω)) := by
+theorem isDiscreteValuationRing_fixedField_inertia
+    : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+        [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω]
+        [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω),
+      IsAbove R K V.toSubring
+        → IsDiscreteValuationRing (V.comap (algebraMap (IntermediateField.fixedField (inertia K V))
+          Ω)) := by
   intro R K Ω _ _ _ _ _ _ _ _ _ _ V hV
   classical
   set K' := IntermediateField.fixedField (inertia K V) with hK'
   set W := V.comap (algebraMap K' Ω) with hW
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible R
   set c : Ω := algebraMap K Ω (algebraMap R K π) with hc
-  have hπK : algebraMap R K π ≠ 0 := by
-    rw [Ne, IsFractionRing.to_map_eq_zero_iff]; exact hπ.ne_zero
+  have hπK : algebraMap R K π ≠ 0 := by rw [Ne, IsFractionRing.to_map_eq_zero_iff]; exact hπ.ne_zero
   have hc0 : c ≠ 0 := (map_ne_zero _).2 hπK
   have hcV : c ∈ V := by
     have h : algebraMap R K π ∈ V.toSubring.comap (algebraMap K Ω) := by rw [hV]; exact ⟨π, rfl⟩
@@ -38,7 +41,8 @@ theorem isDiscreteValuationRing_fixedField_inertia : ∀ (R K Ω : Type) [CommRi
     intro h
     have h' : (algebraMap R K π)⁻¹ ∈ V.toSubring.comap (algebraMap K Ω) := by
       change algebraMap K Ω (algebraMap R K π)⁻¹ ∈ V
-      rw [map_inv₀]; exact h
+      rw [map_inv₀]
+      exact h
     rw [hV] at h'
     obtain ⟨r, hr⟩ := h'
     apply hπ.not_isUnit
@@ -97,13 +101,15 @@ theorem isDiscreteValuationRing_fixedField_inertia : ∀ (R K Ω : Type) [CommRi
     apply hϖnu
     have e : ϖ * 1 = ϖ * (ϖ * (a' * b')) := by
       rw [_root_.mul_one]
-      calc ϖ = ϖ * a' * (ϖ * b') := hab
+      calc
+        ϖ = ϖ * a' * (ϖ * b') := hab
         _ = ϖ * (ϖ * (a' * b')) := by ring
     have h1 := mul_left_cancel₀ hϖ0 e
     exact isUnit_iff_exists_inv.2 ⟨a' * b', h1.symm⟩
   refine IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization ⟨ϖ, hirr, fun {x} hx => ?_⟩
   have hx0 : j x ≠ 0 := fun h => hx (hjinj (h.trans hj_zero.symm))
-  have hex : ∃ n : ℕ, j x / c ^ n ∉ V := GlobalTheory.not_mem_div_uniformizer_pow R K Ω V hV π hπ (j x) hx0
+  have hex : ∃ n : ℕ, j x / c ^ n ∉ V :=
+    GlobalTheory.not_mem_div_uniformizer_pow R K Ω V hV π hπ (j x) hx0
   obtain ⟨n, hn, hmin⟩ : ∃ n : ℕ, j x / c ^ n ∉ V ∧ ∀ k < n, j x / c ^ k ∈ V :=
     ⟨Nat.find hex, Nat.find_spec hex, fun k hk => by simpa using Nat.find_min hex hk⟩
   have hn0 : n ≠ 0 := by
@@ -117,8 +123,9 @@ theorem isDiscreteValuationRing_fixedField_inertia : ∀ (R K Ω : Type) [CommRi
   have hy0 : j x / c ^ m ≠ 0 := div_ne_zero hx0 (pow_ne_zero _ hc0)
   have hyinv : (j x / c ^ m)⁻¹ ∈ V := by
     by_contra hyi
-    have hq := GlobalTheory.FixInertUnram.div_uniformizer_mem R K Ω V hV π hπ (j x / c ^ m) hyK
-      ((GlobalTheory.FixInertUnram.mem_nonunits_iff' V _).2 (Or.inr hyi))
+    have hq :=
+      GlobalTheory.FixInertUnram.div_uniformizer_mem R K Ω V hV π hπ (j x / c ^ m) hyK
+        ((GlobalTheory.FixInertUnram.mem_nonunits_iff' V _).2 (Or.inr hyi))
     apply hn
     rw [pow_succ, ← div_div]
     exact hq

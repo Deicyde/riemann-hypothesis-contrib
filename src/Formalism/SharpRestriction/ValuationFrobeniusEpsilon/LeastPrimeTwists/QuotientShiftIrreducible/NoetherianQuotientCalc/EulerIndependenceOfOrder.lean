@@ -20,12 +20,11 @@ open LinearMap (lsmul)
 
 def Z1 : Submodule R (M × M) := LinearMap.ker ((lsmul R M s).coprod (lsmul R M t))
 
-theorem mem_Z1_iff_cocycle {z : M × M} : z ∈ Z1 s t ↔ s • z.1 + t • z.2 = 0 := by
-  simp [Z1]
+theorem mem_Z1_iff_cocycle {z : M × M} : z ∈ Z1 s t ↔ s • z.1 + t • z.2 = 0 := by simp [Z1]
 
 def bd : M →ₗ[R] Z1 (M := M) s t :=
-  ((lsmul R M t).prod (-(lsmul R M s))).codRestrict _ (fun x => by
-    rw [mem_Z1_iff_cocycle]; simp [smul_smul, mul_comm s t])
+  ((lsmul R M t).prod (-(lsmul R M s))).codRestrict _
+    (fun x => by rw [mem_Z1_iff_cocycle]; simp [smul_smul, mul_comm s t])
 
 theorem bd_coe (x : M) : ((bd s t x : Z1 (M := M) s t) : M × M) = (t • x, -(s • x)) := rfl
 
@@ -37,11 +36,13 @@ def iK : LinearMap.ker (lsmul R M s) →ₗ[R] Z1 (M := M) s t :=
     have ha : s • (a : M) = 0 := LinearMap.mem_ker.1 a.2
     simpa using ha)
 
-theorem iK_coe (a : LinearMap.ker (lsmul R M s)) :
-    ((iK s t a : Z1 (M := M) s t) : M × M) = ((a : M), 0) := rfl
+theorem iK_coe (a : LinearMap.ker (lsmul R M s))
+    : ((iK s t a : Z1 (M := M) s t) : M × M) = ((a : M), 0) :=
+  rfl
 
-def fK : (LinearMap.ker (lsmul R M s) ⧸ LinearMap.range (lsmul R (LinearMap.ker (lsmul R M s)) t))
-    →ₗ[R] (Z1 (M := M) s t ⧸ B1 (M := M) s t) :=
+def fK
+    : (LinearMap.ker (lsmul R M s) ⧸ LinearMap.range (lsmul R (LinearMap.ker (lsmul R M s)) t))
+      →ₗ[R] (Z1 (M := M) s t ⧸ B1 (M := M) s t) :=
   Submodule.mapQ _ _ (iK s t) (by
     rintro _ ⟨a, rfl⟩
     have ha : s • (a : M) = 0 := LinearMap.mem_ker.1 a.2
@@ -49,8 +50,9 @@ def fK : (LinearMap.ker (lsmul R M s) ⧸ LinearMap.range (lsmul R (LinearMap.ke
     rw [bd_coe, iK_coe, ha, neg_zero]
     rfl)
 
-def cK : Z1 (M := M) s t →ₗ[R]
-    LinearMap.ker (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t) :=
+def cK
+    : Z1 (M := M) s t →ₗ[R]
+      LinearMap.ker (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t) :=
   ((Submodule.mkQ _).comp ((LinearMap.snd R M M).comp (Submodule.subtype _))).codRestrict _
     (fun z => by
       rw [LinearMap.mem_ker]
@@ -61,12 +63,15 @@ def cK : Z1 (M := M) s t →ₗ[R]
       rw [LinearMap.lsmul_apply, smul_neg]
       exact neg_eq_iff_add_eq_zero.2 this)
 
-theorem cK_coe (z : Z1 (M := M) s t) :
-    ((cK s t z : LinearMap.ker (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t)) :
-      M ⧸ LinearMap.range (lsmul R M s)) = Submodule.Quotient.mk z.1.2 := rfl
+theorem cK_coe (z : Z1 (M := M) s t)
+    : ((cK s t z : LinearMap.ker (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t))
+        : M ⧸ LinearMap.range (lsmul R M s))
+      = Submodule.Quotient.mk z.1.2 :=
+  rfl
 
-def gK : (Z1 (M := M) s t ⧸ B1 (M := M) s t) →ₗ[R]
-    LinearMap.ker (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t) :=
+def gK
+    : (Z1 (M := M) s t ⧸ B1 (M := M) s t) →ₗ[R]
+      LinearMap.ker (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t) :=
   Submodule.liftQ _ (cK s t) (by
     rintro _ ⟨x, rfl⟩
     rw [LinearMap.mem_ker]
@@ -76,14 +81,15 @@ def gK : (Z1 (M := M) s t ⧸ B1 (M := M) s t) →ₗ[R]
     rw [Submodule.Quotient.mk_eq_zero]
     exact ⟨-x, by simp⟩)
 
-theorem fK_mk (a : LinearMap.ker (lsmul R M s)) :
-    fK s t (Submodule.Quotient.mk a) = Submodule.Quotient.mk (iK s t a) := rfl
+theorem fK_mk (a : LinearMap.ker (lsmul R M s))
+    : fK s t (Submodule.Quotient.mk a) = Submodule.Quotient.mk (iK s t a) :=
+  rfl
 
-theorem gK_mk (z : Z1 (M := M) s t) :
-    gK s t (Submodule.Quotient.mk z) = cK s t z := rfl
+theorem gK_mk (z : Z1 (M := M) s t) : gK s t (Submodule.Quotient.mk z) = cK s t z := rfl
 
 theorem fK_inj : Function.Injective (fK (M := M) s t) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   obtain ⟨a, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   rw [fK_mk, Submodule.Quotient.mk_eq_zero] at hx
@@ -118,8 +124,7 @@ theorem fgK_exact : Function.Exact (fK (M := M) s t) (gK (M := M) s t) := by
     obtain ⟨y0, hy0⟩ := h1
     have hy0' : s • y0 = z.1.2 := hy0
     have hz := (mem_Z1_iff_cocycle s t).1 z.2
-    have ha : s • (z.1.1 + t • y0) = 0 := by
-      rw [smul_add, smul_comm s t y0, hy0', hz]
+    have ha : s • (z.1.1 + t • y0) = 0 := by rw [smul_add, smul_comm s t y0, hy0', hz]
     refine ⟨Submodule.Quotient.mk ⟨z.1.1 + t • y0, by simpa using ha⟩, ?_⟩
     rw [fK_mk, Submodule.Quotient.eq]
     refine ⟨y0, Subtype.ext ?_⟩
@@ -143,8 +148,8 @@ def swZ : Z1 (M := M) s t ≃ₗ[R] Z1 (M := M) t s :=
     · intro hz
       exact ⟨(z.2, z.1), by simpa [add_comm] using hz, rfl⟩)
 
-theorem swZ_coe (z : Z1 (M := M) s t) :
-    ((swZ s t z : Z1 (M := M) t s) : M × M) = (z.1.2, z.1.1) := rfl
+theorem swZ_coe (z : Z1 (M := M) s t) : ((swZ s t z : Z1 (M := M) t s) : M × M) = (z.1.2, z.1.1) :=
+  rfl
 
 def swH : (Z1 (M := M) s t ⧸ B1 (M := M) s t) ≃ₗ[R] (Z1 (M := M) t s ⧸ B1 (M := M) t s) :=
   Submodule.Quotient.equiv _ _ (swZ s t) (by
@@ -162,43 +167,49 @@ def swH : (Z1 (M := M) s t ⧸ B1 (M := M) s t) ≃ₗ[R] (Z1 (M := M) t s ⧸ B
       rw [swZ_coe, bd_coe, bd_coe]
       simp)
 
-def qqHom : ((M ⧸ LinearMap.range (lsmul R M s)) ⧸
-      LinearMap.range (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t)) →ₗ[R]
-    ((M ⧸ LinearMap.range (lsmul R M t)) ⧸
-      LinearMap.range (lsmul R (M ⧸ LinearMap.range (lsmul R M t)) s)) :=
-  Submodule.liftQ _ (Submodule.liftQ _ ((Submodule.mkQ _).comp (Submodule.mkQ _)) (by
+def qqHom
+    : ((M ⧸ LinearMap.range (lsmul R M s)) ⧸
+        LinearMap.range (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t)) →ₗ[R]
+      ((M ⧸ LinearMap.range (lsmul R M t)) ⧸
+        LinearMap.range (lsmul R (M ⧸ LinearMap.range (lsmul R M t)) s)) :=
+  Submodule.liftQ _
+    (Submodule.liftQ _ ((Submodule.mkQ _).comp (Submodule.mkQ _)) (by
       rintro _ ⟨x, rfl⟩
       rw [LinearMap.mem_ker]
       show Submodule.Quotient.mk (Submodule.Quotient.mk (s • x)) = 0
       rw [Submodule.Quotient.mk_eq_zero]
-      exact ⟨Submodule.Quotient.mk x, rfl⟩)) (by
-    rintro _ ⟨y, rfl⟩
-    obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ y
-    rw [LinearMap.mem_ker]
-    show Submodule.Quotient.mk (Submodule.Quotient.mk (t • x)) = 0
-    have : (Submodule.Quotient.mk (t • x) : M ⧸ LinearMap.range (lsmul R M t)) = 0 := by
-      rw [Submodule.Quotient.mk_eq_zero]; exact ⟨x, rfl⟩
-    rw [this]; rfl)
+      exact ⟨Submodule.Quotient.mk x, rfl⟩))
+    (by
+      rintro _ ⟨y, rfl⟩
+      obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ y
+      rw [LinearMap.mem_ker]
+      show Submodule.Quotient.mk (Submodule.Quotient.mk (t • x)) = 0
+      have : (Submodule.Quotient.mk (t • x) : M ⧸ LinearMap.range (lsmul R M t)) = 0 := by
+        rw [Submodule.Quotient.mk_eq_zero]; exact ⟨x, rfl⟩
+      rw [this]
+      rfl)
 
-def qqEquiv : ((M ⧸ LinearMap.range (lsmul R M s)) ⧸
-      LinearMap.range (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t)) ≃ₗ[R]
-    ((M ⧸ LinearMap.range (lsmul R M t)) ⧸
-      LinearMap.range (lsmul R (M ⧸ LinearMap.range (lsmul R M t)) s)) :=
-  LinearEquiv.ofLinearMap (qqHom s t) (qqHom t s)
-    (by ext x; rfl)
-    (by ext x; rfl)
+def qqEquiv
+    : ((M ⧸ LinearMap.range (lsmul R M s)) ⧸
+        LinearMap.range (lsmul R (M ⧸ LinearMap.range (lsmul R M s)) t)) ≃ₗ[R]
+      ((M ⧸ LinearMap.range (lsmul R M t)) ⧸
+        LinearMap.range (lsmul R (M ⧸ LinearMap.range (lsmul R M t)) s)) :=
+  LinearEquiv.ofLinearMap (qqHom s t) (qqHom t s) (by ext x; rfl) (by ext x; rfl)
 
-def aaHom : LinearMap.ker (lsmul R (LinearMap.ker (lsmul R M s)) t) →ₗ[R]
-    LinearMap.ker (lsmul R (LinearMap.ker (lsmul R M t)) s) :=
+def aaHom
+    : LinearMap.ker (lsmul R (LinearMap.ker (lsmul R M s)) t) →ₗ[R]
+      LinearMap.ker (lsmul R (LinearMap.ker (lsmul R M t)) s) :=
   LinearMap.codRestrict _
     (LinearMap.codRestrict _ ((Submodule.subtype _).comp (Submodule.subtype _)) (fun x => by
       rw [LinearMap.mem_ker]
-      exact congrArg Subtype.val (LinearMap.mem_ker.1 x.2))) (fun x => by
-    rw [LinearMap.mem_ker]
-    exact Subtype.ext (LinearMap.mem_ker.1 x.1.2))
+      exact congrArg Subtype.val (LinearMap.mem_ker.1 x.2)))
+    (fun x => by
+      rw [LinearMap.mem_ker]
+      exact Subtype.ext (LinearMap.mem_ker.1 x.1.2))
 
-def aaEquiv : LinearMap.ker (lsmul R (LinearMap.ker (lsmul R M s)) t) ≃ₗ[R]
-    LinearMap.ker (lsmul R (LinearMap.ker (lsmul R M t)) s) :=
+def aaEquiv
+    : LinearMap.ker (lsmul R (LinearMap.ker (lsmul R M s)) t) ≃ₗ[R]
+      LinearMap.ker (lsmul R (LinearMap.ker (lsmul R M t)) s) :=
   LinearEquiv.ofLinearMap (aaHom s t) (aaHom t s) (by ext x; rfl) (by ext x; rfl)
 
 end Plain
@@ -239,11 +250,12 @@ theorem mem_of_cmp (S : AddSubmonoid F.M) {x : F.M} (hx : ∀ m, cmp h m x ∈ S
   rw [← DirectSum.sum_support_decompose F.gr x]
   exact sum_mem (fun m _ => hx m)
 
-theorem cmp_map (hG : DirectSum.IsInternal G.gr) (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ)
-    (m : Deg k) (x : F.M) : cmp hG m (φ x) = φ (cmp h m x) := by
+theorem cmp_map
+    (hG : DirectSum.IsInternal G.gr) (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ) (m : Deg k) (x : F.M)
+    : cmp hG m (φ x) = φ (cmp h m x) := by
   have hx : x ∈ ⨆ i, F.gr i := h.submodule_iSup_eq_top ▸ Submodule.mem_top
-  refine Submodule.iSup_induction F.gr (motive := fun x => cmp hG m (φ x) = φ (cmp h m x)) hx
-    ?_ ?_ ?_
+  refine
+    Submodule.iSup_induction F.gr (motive := fun x => cmp hG m (φ x) = φ (cmp h m x)) hx ?_ ?_ ?_
   · intro i x hx
     by_cases hi : i = m
     · subst hi
@@ -253,9 +265,11 @@ theorem cmp_map (hG : DirectSum.IsInternal G.gr) (φ : F.M →ₗ[R] G.M) (hφ :
   · intro x y hx hy
     rw [map_add (f := _), cmp_add, cmp_add, map_add (f := _), hx, hy]
 
-theorem comap_of_inj (hG : DirectSum.IsInternal G.gr) (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ)
-    (inj : Function.Injective φ) (m : Deg k) :
-    F.gr m = (G.gr m).comap (φ.restrictScalars B) := by
+theorem comap_of_inj
+    (hG : DirectSum.IsInternal G.gr)
+    (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ) (inj : Function.Injective φ)
+    (m : Deg k)
+    : F.gr m = (G.gr m).comap (φ.restrictScalars B) := by
   ext x
   constructor
   · exact hφ m x
@@ -265,9 +279,11 @@ theorem comap_of_inj (hG : DirectSum.IsInternal G.gr) (φ : F.M →ₗ[R] G.M) (
     rw [← this]
     exact cmp_mem h m x
 
-theorem map_of_surj (hG : DirectSum.IsInternal G.gr) (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ)
-    (surj : Function.Surjective φ) (m : Deg k) :
-    G.gr m = (F.gr m).map (φ.restrictScalars B) := by
+theorem map_of_surj
+    (hG : DirectSum.IsInternal G.gr)
+    (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ) (surj : Function.Surjective φ)
+    (m : Deg k)
+    : G.gr m = (F.gr m).map (φ.restrictScalars B) := by
   ext y
   constructor
   · intro hy
@@ -278,16 +294,15 @@ theorem map_of_surj (hG : DirectSum.IsInternal G.gr) (φ : F.M →ₗ[R] G.M) (h
   · rintro ⟨x, hx, rfl⟩
     exact hφ m x hx
 
-theorem isHomSub_ker (hG : DirectSum.IsInternal G.gr) (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ) :
-    F.IsHomSub (LinearMap.ker φ) := by
+theorem isHomSub_ker (hG : DirectSum.IsInternal G.gr) (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ)
+    : F.IsHomSub (LinearMap.ker φ) := by
   refine le_antisymm ?_ (Submodule.span_le.2 fun x hx => hx.1)
   intro x hx
   refine mem_of_cmp h (Submodule.span R _).toAddSubmonoid (fun m => Submodule.subset_span ?_)
   refine ⟨?_, m, cmp_mem h m x⟩
   rw [LinearMap.mem_ker, ← cmp_map h hG φ hφ, LinearMap.mem_ker.1 hx, cmp_zero]
 
-theorem isHomSub_range (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ) :
-    G.IsHomSub (LinearMap.range φ) := by
+theorem isHomSub_range (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ) : G.IsHomSub (LinearMap.range φ) := by
   refine le_antisymm ?_ (Submodule.span_le.2 fun x hx => hx.1)
   rintro _ ⟨x, rfl⟩
   refine mem_of_cmp h ((Submodule.span R _).comap φ).toAddSubmonoid
@@ -296,11 +311,12 @@ theorem isHomSub_range (φ : F.M →ₗ[R] G.M) (hφ : IsGrMap φ) :
 
 end
 
-def sesOfGr {F' F F'' : GMod B R k} (h' : DirectSum.IsInternal F'.gr)
-    (h : DirectSum.IsInternal F.gr) (h'' : DirectSum.IsInternal F''.gr)
-    (f : F'.M →ₗ[R] F.M) (g : F.M →ₗ[R] F''.M) (inj : Function.Injective f)
-    (surj : Function.Surjective g) (exact : Function.Exact f g)
-    (hf : IsGrMap f) (hg : IsGrMap g) : SES F' F F'' where
+def sesOfGr
+    {F' F F'' : GMod B R k} (h' : DirectSum.IsInternal F'.gr) (h : DirectSum.IsInternal F.gr)
+    (h'' : DirectSum.IsInternal F''.gr) (f : F'.M →ₗ[R] F.M) (g : F.M →ₗ[R] F''.M)
+    (inj : Function.Injective f) (surj : Function.Surjective g) (exact : Function.Exact f g)
+    (hf : IsGrMap f) (hg : IsGrMap g)
+    : SES F' F F'' where
   f := f
   g := g
   inj := inj
@@ -309,8 +325,10 @@ def sesOfGr {F' F F'' : GMod B R k} (h' : DirectSum.IsInternal F'.gr)
   f_gr := comap_of_inj h' h f hf inj
   g_gr := map_of_surj h h'' g hg surj
 
-def isoOfGr {F G : GMod B R k} (h : DirectSum.IsInternal F.gr) (hG : DirectSum.IsInternal G.gr)
-    (e : F.M ≃ₗ[R] G.M) (he : IsGrMap e.toLinearMap) : GIso F G where
+def isoOfGr
+    {F G : GMod B R k} (h : DirectSum.IsInternal F.gr) (hG : DirectSum.IsInternal G.gr)
+    (e : F.M ≃ₗ[R] G.M) (he : IsGrMap e.toLinearMap)
+    : GIso F G where
   e := e
   map_gr m := (map_of_surj h hG e.toLinearMap he e.surjective m).symm
 
@@ -318,27 +336,34 @@ def gprod (F G : GMod B R k) : GMod B R k where
   M := F.M × G.M
   gr m := (F.gr m).prod (G.gr m)
 
-theorem internal_prod' {ι A M M' : Type} [DecidableEq ι] [CommRing A] [AddCommGroup M]
-    [AddCommGroup M'] [Module A M] [Module A M'] (P : ι → Submodule A M) (P' : ι → Submodule A M')
-    (hP : DirectSum.IsInternal P) (hP' : DirectSum.IsInternal P') :
-    DirectSum.IsInternal (fun i => (P i).prod (P' i)) := by
+theorem internal_prod'
+    {ι A M M' : Type}
+    [DecidableEq ι] [CommRing A] [AddCommGroup M] [AddCommGroup M'] [Module A M] [Module A M']
+    (P : ι → Submodule A M) (P' : ι → Submodule A M')
+    (hP : DirectSum.IsInternal P) (hP' : DirectSum.IsInternal P')
+    : DirectSum.IsInternal (fun i => (P i).prod (P' i)) := by
   rw [DirectSum.isInternal_submodule_iff_iSupIndep_and_iSup_eq_top]
   constructor
   · rw [iSupIndep_iff_finsetSum_eq_zero_imp_eq_zero]
     intro s v hv h0 i hi
-    have h1 := (iSupIndep_iff_finsetSum_eq_zero_imp_eq_zero _).1 hP.submodule_iSupIndep s
-      (fun i => (v i).1) (fun i hi => (hv i hi).1)
-      (by rw [← Prod.fst_sum, h0]; rfl) i hi
-    have h2 := (iSupIndep_iff_finsetSum_eq_zero_imp_eq_zero _).1 hP'.submodule_iSupIndep s
-      (fun i => (v i).2) (fun i hi => (hv i hi).2)
-      (by rw [← Prod.snd_sum, h0]; rfl) i hi
+    have h1 :=
+      (iSupIndep_iff_finsetSum_eq_zero_imp_eq_zero _).1 hP.submodule_iSupIndep s
+        (fun i => (v i).1)
+        (fun i hi => (hv i hi).1)
+        (by rw [← Prod.fst_sum, h0]; rfl) i hi
+    have h2 :=
+      (iSupIndep_iff_finsetSum_eq_zero_imp_eq_zero _).1 hP'.submodule_iSupIndep s
+        (fun i => (v i).2)
+        (fun i hi => (hv i hi).2)
+        (by rw [← Prod.snd_sum, h0]; rfl) i hi
     exact Prod.ext h1 h2
   · rw [eq_top_iff]
     rintro ⟨a, b⟩ -
     have ha : ((a, 0) : M × M') ∈ ⨆ i, (P i).prod (P' i) := by
       have h : a ∈ ⨆ i, P i := hP.submodule_iSup_eq_top ▸ Submodule.mem_top
       refine Submodule.iSup_induction P
-        (motive := fun a => ((a, 0) : M × M') ∈ ⨆ i, (P i).prod (P' i)) h ?_ ?_ ?_
+        (motive := fun a => ((a, 0) : M × M') ∈ ⨆ i, (P i).prod (P' i))
+        h ?_ ?_ ?_
       · intro i x hx
         exact Submodule.mem_iSup_of_mem i ⟨hx, zero_mem _⟩
       · exact zero_mem _
@@ -348,7 +373,8 @@ theorem internal_prod' {ι A M M' : Type} [DecidableEq ι] [CommRing A] [AddComm
     have hb : ((0, b) : M × M') ∈ ⨆ i, (P i).prod (P' i) := by
       have h : b ∈ ⨆ i, P' i := hP'.submodule_iSup_eq_top ▸ Submodule.mem_top
       refine Submodule.iSup_induction P'
-        (motive := fun b => ((0, b) : M × M') ∈ ⨆ i, (P i).prod (P' i)) h ?_ ?_ ?_
+        (motive := fun b => ((0, b) : M × M') ∈ ⨆ i, (P i).prod (P' i))
+        h ?_ ?_ ?_
       · intro i x hx
         exact Submodule.mem_iSup_of_mem i ⟨zero_mem _, hx⟩
       · exact zero_mem _
@@ -358,14 +384,18 @@ theorem internal_prod' {ι A M M' : Type} [DecidableEq ι] [CommRing A] [AddComm
     have := add_mem ha hb
     simpa using this
 
-theorem internal_prod {F G : GMod B R k} (hF : DirectSum.IsInternal F.gr)
-    (hG : DirectSum.IsInternal G.gr) : DirectSum.IsInternal (gprod F G).gr :=
+theorem internal_prod
+    {F G : GMod B R k} (hF : DirectSum.IsInternal F.gr) (hG : DirectSum.IsInternal G.gr)
+    : DirectSum.IsInternal (gprod F G).gr :=
   internal_prod' F.gr G.gr hF hG
 
-theorem isGr_prod (𝒜 : Deg k → Submodule B R) {F G : GMod B R k} (hF : F.IsGr 𝒜) (hG : G.IsGr 𝒜) :
-    (gprod F G).IsGr 𝒜 := by
-  exact ⟨fun ha hx => ⟨hF.smul_mem ha hx.1, hG.smul_mem ha hx.2⟩,
-    internal_prod hF.internal hG.internal, Module.Finite.prod (hM := hF.fin) (hN := hG.fin)⟩
+theorem isGr_prod (𝒜 : Deg k → Submodule B R) {F G : GMod B R k} (hF : F.IsGr 𝒜) (hG : G.IsGr 𝒜)
+    : (gprod F G).IsGr 𝒜 := by
+  exact ⟨
+    fun ha hx => ⟨hF.smul_mem ha hx.1, hG.smul_mem ha hx.2⟩,
+    internal_prod hF.internal hG.internal,
+    Module.Finite.prod (hM := hF.fin) (hN := hG.fin)
+  ⟩
 
 theorem secs_perm {ts ts' : List (Deg k × R)} (hp : ts.Perm ts') : secs ts = secs ts' := by
   unfold secs
@@ -374,9 +404,12 @@ theorem secs_perm {ts ts' : List (Deg k × R)} (hp : ts.Perm ts') : secs ts = se
   show (∃ d, (d, s) ∈ ts) ↔ (∃ d, (d, s) ∈ ts')
   simp only [hp.mem_iff]
 
-theorem admissible_tail_of_cons_mem [IsLocalRing B] (𝒜 : Deg k → Submodule B R) {d : Deg k} {s : R}
-    {l : List (Deg k × R)} {J J' : Ideal R} (h : admitted 𝒜 ((d, s) :: l) J) (hJ : J ≤ J')
-    (hs : s ∈ J') : admitted 𝒜 l J' := by
+theorem admissible_tail_of_cons_mem
+    [IsLocalRing B]
+    (𝒜 : Deg k → Submodule B R)
+    {d : Deg k} {s : R} {l : List (Deg k × R)} {J J' : Ideal R}
+    (h : admitted 𝒜 ((d, s) :: l) J) (hJ : J ≤ J') (hs : s ∈ J')
+    : admitted 𝒜 l J' := by
   obtain ⟨N, hN⟩ := h
   refine ⟨N, hN.trans (sup_le (hJ.trans le_sup_left) ?_)⟩
   rw [secs, Ideal.span_le]
@@ -417,16 +450,18 @@ variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 
 def H1 (F : GMod B R k) (s t : R) (d d' : Deg k) : GMod B R k where
   M := Z1 (M := F.M) s t ⧸ B1 (M := F.M) s t
-  gr m := (((F.gr (m - d)).prod (F.gr (m - d'))).comap
-    ((Z1 (M := F.M) s t).subtype.restrictScalars B)).map
+  gr m :=
+    (((F.gr (m - d)).prod (F.gr (m - d'))).comap
+        ((Z1 (M := F.M) s t).subtype.restrictScalars B)).map
       ((B1 (M := F.M) s t).mkQ.restrictScalars B)
 
-theorem ann_le_koszul_ann (F : GMod B R k) (s t : R) (d d' : Deg k) : F.Ann ≤ (H1 F s t d d').Ann := by
+theorem ann_le_koszul_ann (F : GMod B R k) (s t : R) (d d' : Deg k)
+    : F.Ann ≤ (H1 F s t d d').Ann := by
   intro r hr
   refine Module.mem_annihilator.2 (fun y => ?_)
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ y
-  have hz : r • z = 0 := Subtype.ext (Prod.ext (Module.mem_annihilator.1 hr z.1.1)
-    (Module.mem_annihilator.1 hr z.1.2))
+  have hz : r • z = 0 :=
+    Subtype.ext (Prod.ext (Module.mem_annihilator.1 hr z.1.1) (Module.mem_annihilator.1 hr z.1.2))
   show Submodule.Quotient.mk (r • z) = 0
   rw [hz]
   rfl
@@ -439,11 +474,13 @@ theorem fst_mem_koszul_ann (F : GMod B R k) (s t : R) (d d' : Deg k) : s ∈ (H1
   rw [bd_coe]
   refine Prod.ext ?_ ?_
   · show t • (-z.1.2) = s • z.1.1
-    rw [smul_neg, neg_eq_iff_add_eq_zero, add_comm]; exact hz
+    rw [smul_neg, neg_eq_iff_add_eq_zero, add_comm]
+    exact hz
   · show -(s • (-z.1.2)) = s • z.1.2
     rw [smul_neg, neg_neg]
 
-theorem snd_mem_annihilator_H1 (F : GMod B R k) (s t : R) (d d' : Deg k) : t ∈ (H1 F s t d d').Ann := by
+theorem snd_mem_annihilator_H1 (F : GMod B R k) (s t : R) (d d' : Deg k)
+    : t ∈ (H1 F s t d d').Ann := by
   refine Module.mem_annihilator.2 (fun y => ?_)
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ y
   refine (Submodule.Quotient.mk_eq_zero _).2 ⟨z.1.1, Subtype.ext ?_⟩
@@ -451,7 +488,8 @@ theorem snd_mem_annihilator_H1 (F : GMod B R k) (s t : R) (d d' : Deg k) : t ∈
   rw [bd_coe]
   refine Prod.ext rfl ?_
   show -(s • z.1.1) = t • z.1.2
-  rw [neg_eq_iff_add_eq_zero]; exact hz
+  rw [neg_eq_iff_add_eq_zero]
+  exact hz
 
 end Koszul
 
@@ -459,24 +497,29 @@ section Main
 
 variable {k : ℕ}
 
-theorem koszul_homology_isGraded (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜) {s t : X.R}
-    {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d') : (H1 F s t d d').IsGr X.𝒜 := by
+theorem koszul_homology_isGraded
+    (hGr : RuleGr)
+    (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜)
+    {s t : X.R} {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d')
+    : (H1 F s t d d').IsGr X.𝒜 := by
   have hsh := (hGr k X F hF).2.1
   have hK : (gprod (F.shift d) (F.shift d')).IsGr X.𝒜 := isGr_prod X.𝒜 (hsh d) (hsh d')
   have hZ : (gprod (F.shift d) (F.shift d')).IsHomSub (Z1 (M := F.M) s t) :=
     isHomSub_ker (F := gprod (F.shift d) (F.shift d')) (G := F) hK.internal hF.internal
-      ((LinearMap.lsmul X.R F.M s).coprod (LinearMap.lsmul X.R F.M t)) (by
+      ((LinearMap.lsmul X.R F.M s).coprod (LinearMap.lsmul X.R F.M t))
+      (by
         rintro m ⟨a, b⟩ ⟨ha, hb⟩
         have h1 : s • a ∈ F.gr (d + (m - d)) := hF.smul_mem hs ha
         have h2 : t • b ∈ F.gr (d' + (m - d')) := hF.smul_mem ht hb
         rw [add_sub_cancel] at h1 h2
         exact add_mem h1 h2)
   have hKZ := ((hGr k X _ hK).1 _ hZ).1
-  have hB : ((gprod (F.shift d) (F.shift d')).sub (Z1 (M := F.M) s t)).IsHomSub
-      (B1 (M := F.M) s t) :=
+  have hB
+      : ((gprod (F.shift d) (F.shift d')).sub (Z1 (M := F.M) s t)).IsHomSub (B1 (M := F.M) s t) :=
     isHomSub_range (F := F.shift (d + d'))
       (G := (gprod (F.shift d) (F.shift d')).sub (Z1 (M := F.M) s t)) (hsh (d + d')).internal
-      (bd (M := F.M) s t) (by
+      (bd (M := F.M) s t)
+      (by
         intro m x hx
         have hx' : x ∈ F.gr (m - (d + d')) := hx
         have h1 : t • x ∈ F.gr (d' + (m - (d + d'))) := hF.smul_mem ht hx'
@@ -488,14 +531,15 @@ theorem koszul_homology_isGraded (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) 
         exact ⟨h1, neg_mem h2⟩)
   exact ((hGr k X _ hKZ).1 _ hB).2
 
-def sesK (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜) {s t : X.R}
-    {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d') :
-    SES ((F.ann s d).quot t) (H1 F s t d d') ((F.quot s).ann t d') :=
-  sesOfGr
-    ((hGr k X _ ((hGr k X F hF).2.2 d s hs).2).2.2 d' t ht).1.internal
+def sesK
+    (hGr : RuleGr)
+    (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜)
+    {s t : X.R} {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d')
+    : SES ((F.ann s d).quot t) (H1 F s t d d') ((F.quot s).ann t d') :=
+  sesOfGr ((hGr k X _ ((hGr k X F hF).2.2 d s hs).2).2.2 d' t ht).1.internal
     (koszul_homology_isGraded hGr X F hF hs ht).internal
-    ((hGr k X _ ((hGr k X F hF).2.2 d s hs).1).2.2 d' t ht).2.internal
-    (fK (M := F.M) s t) (gK (M := F.M) s t) (fK_inj s t) (gK_surj s t) (fgK_exact s t)
+    ((hGr k X _ ((hGr k X F hF).2.2 d s hs).1).2.2 d' t ht).2.internal (fK (M := F.M) s t)
+    (gK (M := F.M) s t) (fK_inj s t) (gK_surj s t) (fgK_exact s t)
     (by
       rintro m _ ⟨a, ha, rfl⟩
       exact ⟨iK s t a, ⟨ha, zero_mem _⟩, rfl⟩)
@@ -503,57 +547,65 @@ def sesK (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜) {s 
       rintro m _ ⟨z, hz, rfl⟩
       exact ⟨z.1.2, hz.2, rfl⟩)
 
-def isoH (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜) {s t : X.R}
-    {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d') :
-    GIso (H1 F s t d d') (H1 F t s d' d) :=
-  isoOfGr (koszul_homology_isGraded hGr X F hF hs ht).internal (koszul_homology_isGraded hGr X F hF ht hs).internal
-    (swH (M := F.M) s t) (by
+def isoH
+    (hGr : RuleGr)
+    (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜)
+    {s t : X.R} {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d')
+    : GIso (H1 F s t d d') (H1 F t s d' d) :=
+  isoOfGr (koszul_homology_isGraded hGr X F hF hs ht).internal
+    (koszul_homology_isGraded hGr X F hF ht hs).internal (swH (M := F.M) s t)
+    (by
       rintro m _ ⟨z, hz, rfl⟩
       exact ⟨swZ s t z, ⟨hz.2, hz.1⟩, rfl⟩)
 
-def isoQQ (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜) {s t : X.R}
-    {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d') :
-    GIso ((F.quot s).quot t) ((F.quot t).quot s) :=
-  isoOfGr
-    ((hGr k X _ ((hGr k X F hF).2.2 d s hs).1).2.2 d' t ht).1.internal
-    ((hGr k X _ ((hGr k X F hF).2.2 d' t ht).1).2.2 d s hs).1.internal
-    (qqEquiv (M := F.M) s t) (by
+def isoQQ
+    (hGr : RuleGr)
+    (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜)
+    {s t : X.R} {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d')
+    : GIso ((F.quot s).quot t) ((F.quot t).quot s) :=
+  isoOfGr ((hGr k X _ ((hGr k X F hF).2.2 d s hs).1).2.2 d' t ht).1.internal
+    ((hGr k X _ ((hGr k X F hF).2.2 d' t ht).1).2.2 d s hs).1.internal (qqEquiv (M := F.M) s t)
+    (by
       rintro m _ ⟨_, ⟨x, hx, rfl⟩, rfl⟩
       exact ⟨_, ⟨x, hx, rfl⟩, rfl⟩)
 
-def isoAA (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜) {s t : X.R}
-    {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d') :
-    GIso ((F.ann s d).ann t d') ((F.ann t d').ann s d) :=
-  isoOfGr
-    ((hGr k X _ ((hGr k X F hF).2.2 d s hs).2).2.2 d' t ht).2.internal
-    ((hGr k X _ ((hGr k X F hF).2.2 d' t ht).2).2.2 d s hs).2.internal
-    (aaEquiv (M := F.M) s t) (by
+def isoAA
+    (hGr : RuleGr)
+    (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜)
+    {s t : X.R} {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d')
+    : GIso ((F.ann s d).ann t d') ((F.ann t d').ann s d) :=
+  isoOfGr ((hGr k X _ ((hGr k X F hF).2.2 d s hs).2).2.2 d' t ht).2.internal
+    ((hGr k X _ ((hGr k X F hF).2.2 d' t ht).2).2.2 d s hs).2.internal (aaEquiv (M := F.M) s t)
+    (by
       intro m x hx
       have hx' : x.1.1 ∈ F.gr (m - d' - d) := hx
       rw [sub_right_comm] at hx'
       exact hx')
 
-theorem swap_eq (hGr : RuleGr) (hIso : RuleIso) (hE1 : EulerAdditivityExactSequence) (X : HidaSetting k)
-    (l : List (Deg k × X.R)) (F : X.Mod) (hF : F.IsGr X.𝒜) {s t : X.R} {d d' : Deg k}
-    (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d') (hl : Valid X.𝒜 l)
-    (hA : admitted X.𝒜 ((d, s) :: (d', t) :: l) F.Ann) :
-    ∀ᶠ m in atTop, chi ((d, s) :: (d', t) :: l) F m = chi ((d', t) :: (d, s) :: l) F m := by
+theorem swap_eq
+    (hGr : RuleGr) (hIso : RuleIso) (hE1 : EulerAdditivityExactSequence)
+    (X : HidaSetting k) (l : List (Deg k × X.R)) (F : X.Mod) (hF : F.IsGr X.𝒜)
+    {s t : X.R} {d d' : Deg k} (hs : s ∈ X.𝒜 d) (ht : t ∈ X.𝒜 d')
+    (hl : Valid X.𝒜 l) (hA : admitted X.𝒜 ((d, s) :: (d', t) :: l) F.Ann)
+    : ∀ᶠ m in atTop, chi ((d, s) :: (d', t) :: l) F m = chi ((d', t) :: (d, s) :: l) F m := by
   have hA1 : admitted X.𝒜 l (H1 F s t d d').Ann :=
-    admissible_tail_of_cons_mem X.𝒜 (admissible_tail_of_cons_mem X.𝒜 hA (ann_le_koszul_ann F s t d d') (fst_mem_koszul_ann F s t d d')) le_rfl
-      (snd_mem_annihilator_H1 F s t d d')
+    admissible_tail_of_cons_mem X.𝒜
+      (admissible_tail_of_cons_mem X.𝒜 hA (ann_le_koszul_ann F s t d d')
+        (fst_mem_koszul_ann F s t d d'))
+      le_rfl (snd_mem_annihilator_H1 F s t d d')
   have hA2 : admitted X.𝒜 l (H1 F t s d' d).Ann :=
-    admissible_tail_of_cons_mem X.𝒜 (admissible_tail_of_cons_mem X.𝒜 hA (ann_le_koszul_ann F t s d' d) (snd_mem_annihilator_H1 F t s d' d)) le_rfl
-      (fst_mem_koszul_ann F t s d' d)
-  have e1 := hE1 k X l _ _ _ hl
-    ((hGr k X _ ((hGr k X F hF).2.2 d s hs).2).2.2 d' t ht).1
-    (koszul_homology_isGraded hGr X F hF hs ht)
-    ((hGr k X _ ((hGr k X F hF).2.2 d s hs).1).2.2 d' t ht).2
-    (sesK hGr X F hF hs ht) hA1
-  have e2 := hE1 k X l _ _ _ hl
-    ((hGr k X _ ((hGr k X F hF).2.2 d' t ht).2).2.2 d s hs).1
-    (koszul_homology_isGraded hGr X F hF ht hs)
-    ((hGr k X _ ((hGr k X F hF).2.2 d' t ht).1).2.2 d s hs).2
-    (sesK hGr X F hF ht hs) hA2
+    admissible_tail_of_cons_mem X.𝒜
+      (admissible_tail_of_cons_mem X.𝒜 hA (ann_le_koszul_ann F t s d' d)
+        (snd_mem_annihilator_H1 F t s d' d))
+      le_rfl (fst_mem_koszul_ann F t s d' d)
+  have e1 :=
+    hE1 k X l _ _ _ hl ((hGr k X _ ((hGr k X F hF).2.2 d s hs).2).2.2 d' t ht).1
+      (koszul_homology_isGraded hGr X F hF hs ht)
+      ((hGr k X _ ((hGr k X F hF).2.2 d s hs).1).2.2 d' t ht).2 (sesK hGr X F hF hs ht) hA1
+  have e2 :=
+    hE1 k X l _ _ _ hl ((hGr k X _ ((hGr k X F hF).2.2 d' t ht).2).2.2 d s hs).1
+      (koszul_homology_isGraded hGr X F hF ht hs)
+      ((hGr k X _ ((hGr k X F hF).2.2 d' t ht).1).2.2 d s hs).2 (sesK hGr X F hF ht hs) hA2
   filter_upwards [e1, e2] with m h1 h2
   have i1 := hIso k X l _ _ (isoH hGr X F hF hs ht) m
   have i2 := hIso k X l _ _ (isoQQ hGr X F hF hs ht) m
@@ -569,7 +621,8 @@ section Main
 
 open E2
 
-theorem euler_rule_two_of_graded_finite_iso : RuleGr → RuleFin → RuleIso → EulerAdditivityExactSequence → EulerIndependenceOfOrder := by
+theorem euler_rule_two_of_graded_finite_iso
+    : RuleGr → RuleFin → RuleIso → EulerAdditivityExactSequence → EulerIndependenceOfOrder := by
   intro hGr _ hIso hE1 k X ts ts' F hV hp
   induction hp generalizing F with
   | nil => intro _ _; exact Eventually.of_forall (fun _ => rfl)
@@ -579,8 +632,12 @@ theorem euler_rule_two_of_graded_finite_iso : RuleGr → RuleFin → RuleIso →
     have hs : s ∈ X.𝒜 d := (hV (d, s) (List.mem_cons_self ..)).2
     have hl : Valid X.𝒜 _ := fun p hp' => hV p (List.mem_cons_of_mem _ hp')
     have hq := (hGr k X F hF).2.2 d s hs
-    have e1 := ih (F.quot s) hl hq.1 (admissible_tail_of_cons_mem X.𝒜 hA (ann_le_quot F s) (self_mem_quot F s))
-    have e2 := ih (F.ann s d) hl hq.2 (admissible_tail_of_cons_mem X.𝒜 hA (ann_le_ann F s d) (self_mem_ann F s d))
+    have e1 :=
+      ih (F.quot s) hl hq.1
+        (admissible_tail_of_cons_mem X.𝒜 hA (ann_le_quot F s) (self_mem_quot F s))
+    have e2 :=
+      ih (F.ann s d) hl hq.2
+        (admissible_tail_of_cons_mem X.𝒜 hA (ann_le_ann F s d) (self_mem_ann F s d))
     filter_upwards [e1, e2] with m h1 h2
     simp only [chi, h1, h2]
   | swap x y l =>
@@ -589,8 +646,7 @@ theorem euler_rule_two_of_graded_finite_iso : RuleGr → RuleFin → RuleIso →
     intro hF hA
     have hs : s ∈ X.𝒜 d := (hV (d, s) (List.mem_cons_self ..)).2
     have ht : t ∈ X.𝒜 d' := (hV (d', t) (List.mem_cons_of_mem _ (List.mem_cons_self ..))).2
-    have hl : Valid X.𝒜 l :=
-      fun p hp' => hV p (List.mem_cons_of_mem _ (List.mem_cons_of_mem _ hp'))
+    have hl : Valid X.𝒜 l := fun p hp' => hV p (List.mem_cons_of_mem _ (List.mem_cons_of_mem _ hp'))
     exact swap_eq hGr hIso hE1 X l F hF hs ht hl hA
   | @trans l₁ l₂ l₃ hp1 hp2 ih1 ih2 =>
     intro hF hA

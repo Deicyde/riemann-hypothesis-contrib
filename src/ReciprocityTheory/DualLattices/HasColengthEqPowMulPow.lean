@@ -13,15 +13,15 @@ namespace ReciprocityTheory.PGsh.L2
 variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C] {v : Valuation C NNReal}
 variable {N : Type} [AddCommGroup N] [Fintype N] [DecidableEq N]
 
-theorem quotient_out_add_coe (K : AddSubgroup N) (q : N ⧸ K) (k : K) :
-    ((q.out + k : N) : N ⧸ K) = q := by
+theorem quotient_out_add_coe (K : AddSubgroup N) (q : N ⧸ K) (k : K)
+    : ((q.out + k : N) : N ⧸ K) = q := by
   rw [QuotientAddGroup.mk_add, QuotientAddGroup.out_eq',
     (QuotientAddGroup.eq_zero_iff (k : N)).mpr k.2, add_zero]
 
 def quotientProdSubgroupEquiv (K : AddSubgroup N) : (N ⧸ K) × K ≃ N where
   toFun p := p.1.out + p.2
-  invFun x := ((x : N ⧸ K),
-    ⟨-((x : N ⧸ K).out) + x, QuotientAddGroup.eq.1 (QuotientAddGroup.out_eq' _)⟩)
+  invFun x :=
+    ((x : N ⧸ K), ⟨-((x : N ⧸ K).out) + x, QuotientAddGroup.eq.1 (QuotientAddGroup.out_eq' _)⟩)
   left_inv := by
     rintro ⟨q, k⟩
     refine Prod.ext (quotient_out_add_coe K q k) (Subtype.ext ?_)
@@ -33,8 +33,11 @@ def quotientProdSubgroupEquiv (K : AddSubgroup N) : (N ⧸ K) × K ≃ N where
     show (x : N ⧸ K).out + (-((x : N ⧸ K).out) + x) = x
     abel
 
-private theorem valuation_det_le_one_of_integral_entries (hv : v.Integers R) {X : Type} [Fintype X] [DecidableEq X]
-    (E : Matrix X X C) (hE : ∀ i j, ∃ r : R, algebraMap R C r = E i j) : v E.det ≤ 1 := by
+private theorem valuation_det_le_one_of_integral_entries
+    (hv : v.Integers R)
+    {X : Type} [Fintype X] [DecidableEq X]
+    (E : Matrix X X C) (hE : ∀ i j, ∃ r : R, algebraMap R C r = E i j)
+    : v E.det ≤ 1 := by
   choose M hM using hE
   have hEM : E = (Matrix.of M).map (algebraMap R C) := by
     ext i j
@@ -42,12 +45,13 @@ private theorem valuation_det_le_one_of_integral_entries (hv : v.Integers R) {X 
   rw [hEM, det_map_algebraMap]
   exact hv.map_le_one _
 
-theorem hasColength_eq_pow_mul_pow (hv : v.Integers R) (AA : HopfOrder (C := C) R N) (K : AddSubgroup N)
-    [DecidablePred (· ∈ K)] [DecidableEq (N ⧸ K)] [Fintype (N ⧸ K)] :
-    ∀ c cB cK, HasColen R v AA.carrier c →
-      HasColen R v (AA.carrier.comap (pullQ (R := R) K)) cB →
-      HasColen R v (AA.carrier.map (resK (R := R) K)) cK →
-      c = cB ^ Fintype.card K * cK ^ Fintype.card (N ⧸ K) := by
+theorem hasColength_eq_pow_mul_pow
+    (hv : v.Integers R) (AA : HopfOrder (C := C) R N)
+    (K : AddSubgroup N) [DecidablePred (· ∈ K)] [DecidableEq (N ⧸ K)] [Fintype (N ⧸ K)]
+    : ∀ c cB cK,
+      HasColen R v AA.carrier c → HasColen R v (AA.carrier.comap (pullQ (R := R) K)) cB
+        → HasColen R v (AA.carrier.map (resK (R := R) K)) cK
+        → c = cB ^ Fintype.card K * cK ^ Fintype.card (N ⧸ K) := by
   intro c cB cK hc hcB hcK
   obtain ⟨β, hβ, hAK⟩ := exists_basis_map_restrictToSubgroup hv AA K
   obtain ⟨f, hfA, hfu⟩ := exists_coset_basis hv AA K
@@ -56,14 +60,15 @@ theorem hasColength_eq_pow_mul_pow (hv : v.Integers R) (AA : HopfOrder (C := C) 
   obtain ⟨Q, hQ, rfl⟩ := hcB
   obtain ⟨β', hβ', rfl⟩ := hcK
   obtain ⟨P0, hP0, hAP0⟩ := AA.lat
-  have hint : ∀ {F : N → C}, F ∈ AA.carrier → ∀ x, ∃ r : R, algebraMap R C r = F x :=
-    fun hF x => AA.le_int hF x
+  have hint : ∀ {F : N → C}, F ∈ AA.carrier → ∀ x, ∃ r : R, algebraMap R C r = F x := fun hF x =>
+    AA.le_int hF x
   have hK : v β'.det = v β.det := valuation_det_eq_of_span_eq_alt hv hβ (hAK.symm.trans hβ')
   have hmm1 : ∀ x, v (h3mm K β f x).det = 1 := by
     intro x
-    have hdec : ∀ l, ∃ e : K → N ⧸ K → C,
-        (∀ j, e j ∈ AA.carrier.comap (pullQ (R := R) K)) ∧
-          g l = ∑ j, pullQ (R := R) K (e j) * f j := by
+    have hdec
+        : ∀ l, ∃ e : K → N ⧸ K → C,
+          (∀ j, e j ∈ AA.carrier.comap (pullQ (R := R) K))
+            ∧ g l = ∑ j, pullQ (R := R) K (e j) * f j := by
       intro l
       obtain ⟨b, ⟨hb, hgb⟩, -⟩ := hfu (g l) (hgA l)
       choose e he hbe using fun j => Submodule.mem_map.mp (hb j)
@@ -77,11 +82,13 @@ theorem hasColength_eq_pow_mul_pow (hv : v.Integers R) (AA : HopfOrder (C := C) 
       simp only [h3mm, Matrix.of_apply, Matrix.mul_apply, Bx]
       rw [hge l, cosetCoordinates_sum, Finset.sum_apply]
       simp only [cosetCoordinates_pullbackQuotient_mul, Pi.smul_apply, smul_eq_mul]
-    have hB1 : v Bx.det ≤ 1 := valuation_det_le_one_of_integral_entries hv Bx fun l j => by
-      obtain ⟨r, hr⟩ := hint (Submodule.mem_comap.mp (he l j)) x
-      exact ⟨r, hr⟩
-    have hF1 : v (h3mm K β f x).det ≤ 1 := valuation_det_le_one_of_integral_entries hv _ fun j m =>
-      hint (cosetCoordinates_mem AA K β hβ hAK (hfA j) m) x
+    have hB1 : v Bx.det ≤ 1 :=
+      valuation_det_le_one_of_integral_entries hv Bx fun l j => by
+        obtain ⟨r, hr⟩ := hint (Submodule.mem_comap.mp (he l j)) x
+        exact ⟨r, hr⟩
+    have hF1 : v (h3mm K β f x).det ≤ 1 :=
+      valuation_det_le_one_of_integral_entries hv _ fun j m =>
+        hint (cosetCoordinates_mem AA K β hβ hAK (hfA j) m) x
     have h := hgdet x
     rw [hmul, Matrix.det_mul, map_mul, mul_comm] at h
     exact eq_one_of_le_one_of_mul_eq_one hF1 hB1 h
@@ -113,16 +120,19 @@ theorem hasColength_eq_pow_mul_pow (hv : v.Integers R) (AA : HopfOrder (C := C) 
       exact AA.mul_mem _ _ h1 (hfA _)
   have hdetΦ : v Φ.det = v Q.det ^ Fintype.card K * v β.det ^ Fintype.card (N ⧸ K) := by
     rw [← Matrix.det_submatrix_equiv_self e Φ]
-    have hblk : Φ.submatrix e e = Matrix.blockDiagonal (fun q : N ⧸ K =>
-        β * (h3mm K β f q.out)ᵀ) * Matrix.kroneckerMap (· * ·) (1 : Matrix K K C) Q := by
+    have hblk
+        : Φ.submatrix e e
+          = Matrix.blockDiagonal (fun q : N ⧸ K => β * (h3mm K β f q.out)ᵀ)
+            * Matrix.kroneckerMap (· * ·) (1 : Matrix K K C) Q := by
       ext ⟨k, q⟩ ⟨j, s⟩
       show Q ((e (k, q) : N) : N ⧸ K) (e.symm (e (j, s))).2 * f (e.symm (e (j, s))).1 (e (k, q)) = _
       rw [Equiv.symm_apply_apply, he_apply]
       dsimp only
-      rw [quotient_out_add_coe K q k, cosetCoordinates_expand K β hβ (f j) q.out k, Matrix.mul_apply]
+      rw [quotient_out_add_coe K q k, cosetCoordinates_expand K β hβ (f j) q.out k,
+        Matrix.mul_apply]
       simp only [Fintype.sum_prod_type, Matrix.blockDiagonal_apply, Matrix.kroneckerMap_apply,
-        Matrix.one_apply, ite_mul, zero_mul, mul_ite, mul_one, mul_zero, one_mul,
-        Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true, Finset.sum_const_zero]
+        Matrix.one_apply, ite_mul, zero_mul, mul_ite, mul_one, mul_zero, one_mul, Finset.sum_ite_eq,
+        Finset.sum_ite_eq', Finset.mem_univ, if_true, Finset.sum_const_zero]
       conv_rhs => rw [Finset.sum_eq_single j (fun b _ hb => by simp [hb]) (by simp)]
       simp only [eq_self_iff_true, if_true, Finset.sum_ite_eq, Finset.mem_univ]
       rw [mul_comm]

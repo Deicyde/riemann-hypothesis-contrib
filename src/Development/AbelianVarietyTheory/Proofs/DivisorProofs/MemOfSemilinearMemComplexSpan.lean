@@ -6,12 +6,17 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem mem_of_semilinear_mem_complex_span : ∀ {K V W ι : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module ℂ W] [Finite ι] (σ : K →+* ℂ) (j : V →ₛₗ[σ] W) (b : Module.Basis ι K V), LinearIndependent ℂ (fun k => j (b k)) → ∀ (U : Submodule K V) (x : V), j x ∈ Submodule.span ℂ (j '' (U : Set V)) → x ∈ U := by
+theorem mem_of_semilinear_mem_complex_span
+    : ∀ {K V W ι : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module ℂ W]
+        [Finite ι] (σ : K →+* ℂ) (j : V →ₛₗ[σ] W) (b : Module.Basis ι K V),
+      LinearIndependent ℂ (fun k => j (b k))
+        → ∀ (U : Submodule K V) (x : V), j x ∈ Submodule.span ℂ (j '' (U : Set V)) → x ∈ U := by
   intro K V W ι _ _ _ _ _ _ σ j b hli U x hx
   by_contra hxU
   obtain ⟨f, hfx, hfU⟩ := U.exists_dual_map_eq_bot_of_notMem hxU inferInstance
-  obtain ⟨L, hL⟩ := (Finsupp.linearCombination ℂ (fun k => j (b k))).exists_leftInverse_of_injective
-    (LinearMap.ker_eq_bot.2 hli)
+  obtain ⟨L, hL⟩ :=
+    (Finsupp.linearCombination ℂ (fun k => j (b k))).exists_leftInverse_of_injective
+      (LinearMap.ker_eq_bot.2 hli)
   let g : W →ₗ[ℂ] ℂ := (Finsupp.linearCombination ℂ (fun k => σ (f (b k)))).comp L
   have hb : ∀ k, g (j (b k)) = σ (f (b k)) := by
     intro k

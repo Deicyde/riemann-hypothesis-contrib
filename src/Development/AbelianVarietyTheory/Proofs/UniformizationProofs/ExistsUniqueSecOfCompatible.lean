@@ -15,9 +15,12 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
-open ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Geo.Tor IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
+open ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  IsLocalRing
 open scoped CategoryTheory.Obj
 
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -28,9 +31,12 @@ section Alg
 
 variable {R : Type} [CommRing R] (I : Ideal R)
 
-theorem exists_lim [IsPrecomplete I R] (c : ∀ e : ℕ, R ⧸ I ^ (e + 1))
-    (hc : ∀ e, Ideal.Quotient.factor (Ideal.pow_le_pow_right (Nat.le_succ (e + 1))) (c (e + 1)) = c e) :
-    ∃ a : R, ∀ e, Ideal.Quotient.mk (I ^ (e + 1)) a = c e := by
+theorem exists_lim
+    [IsPrecomplete I R]
+    (c : ∀ e : ℕ, R ⧸ I ^ (e + 1))
+    (hc
+      : ∀ e, Ideal.Quotient.factor (Ideal.pow_le_pow_right (Nat.le_succ (e + 1))) (c (e + 1)) = c e)
+    : ∃ a : R, ∀ e, Ideal.Quotient.mk (I ^ (e + 1)) a = c e := by
   choose x hx using fun e => Ideal.Quotient.mk_surjective (c e)
   have h1 : ∀ e, x e - x (e + 1) ∈ I ^ (e + 1) := fun e => by
     rw [← Ideal.Quotient.eq, hx, ← hc e, ← hx, Ideal.Quotient.factor_mk]
@@ -40,8 +46,9 @@ theorem exists_lim [IsPrecomplete I R] (c : ∀ e : ℕ, R ⧸ I ^ (e + 1))
     | succ n hmn ih =>
       have := (I ^ m).add_mem ih (Ideal.pow_le_pow_right (hmn.trans (Nat.le_succ n)) (h1 n))
       simpa using this
-  obtain ⟨a, ha⟩ := IsPrecomplete.prec (I := I) (M := R) inferInstance (f := x) (fun {m n} h => by
-    rw [SModEq.sub_mem]; simpa using h2 m n h)
+  obtain ⟨a, ha⟩ :=
+    IsPrecomplete.prec (I := I) (M := R) inferInstance (f := x)
+      (fun {m n} h => by rw [SModEq.sub_mem]; simpa using h2 m n h)
   refine ⟨a, fun e => ?_⟩
   have h3 : x (e + 1) - a ∈ I ^ (e + 1) := by
     have := ha (e + 1)
@@ -50,8 +57,10 @@ theorem exists_lim [IsPrecomplete I R] (c : ∀ e : ℕ, R ⧸ I ^ (e + 1))
   rw [← hx, eq_comm, Ideal.Quotient.eq]
   simpa using (I ^ (e + 1)).add_mem (h1 e) h3
 
-theorem eq_of_mk_eq [IsHausdorff I R] {a b : R}
-    (h : ∀ e, Ideal.Quotient.mk (I ^ (e + 1)) a = Ideal.Quotient.mk (I ^ (e + 1)) b) : a = b := by
+theorem eq_of_mk_eq
+    [IsHausdorff I R]
+    {a b : R} (h : ∀ e, Ideal.Quotient.mk (I ^ (e + 1)) a = Ideal.Quotient.mk (I ^ (e + 1)) b)
+    : a = b := by
   rw [← sub_eq_zero]
   refine IsHausdorff.haus (I := I) (M := R) inferInstance _ fun n => ?_
   rw [SModEq.zero]
@@ -63,13 +72,21 @@ section Calc
 
 variable {X Y Y' : Scheme.{0}} {L : LB X}
 
-theorem exists_pull {K : Type} [Fintype K] {φ : K → (Y ⟶ X)} {ε : K → ℤ} (s : LB.Sec (LB.LinComb L φ ε))
-    (h : Y' ⟶ Y) (φ' : K → (Y' ⟶ X)) (e : ∀ k, h ≫ φ k = φ' k) : ∃ s' : LB.Sec (LB.LinComb L φ' ε),
+theorem exists_pull
+    {K : Type} [Fintype K]
+    {φ : K → (Y ⟶ X)} {ε : K → ℤ} (s : LB.Sec (LB.LinComb L φ ε))
+    (h : Y' ⟶ Y) (φ' : K → (Y' ⟶ X)) (e : ∀ k, h ≫ φ k = φ' k)
+    : ∃ s' : LB.Sec (LB.LinComb L φ' ε),
       (∀ j (le : LB.wchart L φ' j ≤ h ⁻¹ᵁ LB.wchart L φ j),
-        s'.f j = (Y'.presheaf.map (homOfLE le).op).hom ((h.app _).hom (s.f j))) ∧
-      ∀ (Z : Scheme.{0}) (r : Z ⟶ Y') (z : Z) (J), Good L z J → sval s' r z J = sval s (r ≫ h) z J := by
+          s'.f j = (Y'.presheaf.map (homOfLE le).op).hom ((h.app _).hom (s.f j)))
+        ∧ ∀ (Z : Scheme.{0}) (r : Z ⟶ Y') (z : Z) (J),
+          Good L z J → sval s' r z J = sval s (r ≫ h) z J := by
   obtain rfl : (fun k => h ≫ φ k) = φ' := funext e
-  exact ⟨pullSec L φ ε s h, fun _ _ => rfl, fun Z r z J hJ => SectionScalarValuation.sval_pullSec φ ε s h r z hJ⟩
+  exact ⟨
+    pullSec L φ ε s h,
+    fun _ _ => rfl,
+    fun Z r z J hJ => SectionScalarValuation.sval_pullSec φ ε s h r z hJ
+  ⟩
 
 def linSec {M : LB Y} {N : ℕ} (c : Fin N → Γ(Y, ⊤)) (t : Fin N → LB.Sec M) : LB.Sec M where
   f j := ∑ i, resTop _ (c i) * (t i).f j
@@ -80,14 +97,20 @@ def linSec {M : LB Y} {N : ℕ} (c : Fin N → Γ(Y, ⊤)) (t : Fin N → LB.Sec
 
 variable {C : Type} [CommRing C] {n N : ℕ}
 
-def Rep (π : Y ⟶ X) (f : Y ⟶ Sp C) (β : Fin N → H0 L n)
-    (s : LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => π) (fun _ => (n : ℤ)))) (c : Fin N → C) : Prop :=
-  ∀ (Z : Scheme.{0}) (r : Z ⟶ Y) (z : Z) (J : (Z ⟶ X) → L.ι), Good L z J →
-    sval s r z J = ∑ i, cst (r ≫ f) z (c i) * sval (β i) (r ≫ π) z J
+def Rep
+    (π : Y ⟶ X)
+    (f : Y ⟶ Sp C) (β : Fin N → H0 L n)
+    (s : LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => π) (fun _ => (n : ℤ)))) (c : Fin N → C)
+    : Prop :=
+  ∀ (Z : Scheme.{0}) (r : Z ⟶ Y) (z : Z) (J : (Z ⟶ X) → L.ι),
+    Good L z J → sval s r z J = ∑ i, cst (r ≫ f) z (c i) * sval (β i) (r ≫ π) z J
 
-theorem rep_transport {π : Y ⟶ X} {f : Y ⟶ Sp C} {β : Fin N → H0 L n} (e : Y' ≅ Y)
+theorem rep_transport
+    {π : Y ⟶ X} {f : Y ⟶ Sp C} {β : Fin N → H0 L n}
+    (e : Y' ≅ Y)
     {π' : Y' ⟶ X} {f' : Y' ⟶ Sp C} (hπ : e.hom ≫ π = π') (hf : e.hom ≫ f = f')
-    (H : ∀ s, ∃! c, Rep π f β s c) : ∀ s, ∃! c, Rep π' f' β s c := by
+    (H : ∀ s, ∃! c, Rep π f β s c)
+    : ∀ s, ∃! c, Rep π' f' β s c := by
   subst hπ hf
   intro s'
   obtain ⟨s, -, hs⟩ := exists_pull s' e.inv (fun _ : Fin 1 => π) (fun _ => e.inv_hom_id_assoc π)
@@ -103,19 +126,32 @@ theorem rep_transport {π : Y ⟶ X} {f : Y ⟶ Sp C} {β : Fin N → H0 L n} (e
   simp only [key]
   exact H s
 
-theorem sval_linSec {K : Type} [Fintype K] {φ : K → (Y ⟶ X)} {ε : K → ℤ} (f : Y ⟶ Sp C) (c : Fin N → C)
-    (t : Fin N → LB.Sec (LB.LinComb L φ ε)) {Z : Scheme.{0}} (r : Z ⟶ Y) (z : Z) {J : (Z ⟶ X) → L.ι}
-    (hJ : Good L z J) :
-    sval (linSec (fun i => scal f (c i)) t) r z J = ∑ i, cst (r ≫ f) z (c i) * sval (t i) r z J := by
-  rw [SectionScalarValuation.sval_lin (s := linSec (fun i => scal f (c i)) t) (fun i => scal f (c i)) t (fun _ => rfl) r z hJ]
+theorem sval_linSec
+    {K : Type} [Fintype K]
+    {φ : K → (Y ⟶ X)} {ε : K → ℤ}
+    (f : Y ⟶ Sp C) (c : Fin N → C) (t : Fin N → LB.Sec (LB.LinComb L φ ε))
+    {Z : Scheme.{0}} (r : Z ⟶ Y) (z : Z)
+    {J : (Z ⟶ X) → L.ι} (hJ : Good L z J)
+    : sval (linSec (fun i => scal f (c i)) t) r z J
+      = ∑ i, cst (r ≫ f) z (c i) * sval (t i) r z J := by
+  rw [SectionScalarValuation.sval_lin (s := linSec (fun i => scal f (c i)) t)
+    (fun i => scal f (c i))
+    t
+    (fun _ => rfl)
+    r z hJ]
   exact Finset.sum_congr rfl fun i _ => congrArg (· * _) (gs_pull r f z ⊤ trivial _)
 
 end Calc
 
-theorem exists_basis (hS : SecBaseChangeSt) (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    (P : PolAV (Spec (CommRingCat.of R))) (n : ℕ) (hn : 1 ≤ n) :
-    ∃ (N : ℕ) (β : Fin N → H0 P.L n), ∀ (C : Type) [CommRing C] (q : Sp C ⟶ Sp R) (Y : Scheme.{0})
-      (π : Y ⟶ P.A.left) (f : Y ⟶ Sp C), IsPullback f π q P.A.hom → ∀ s, ∃! c, Rep π f β s c := by
+theorem exists_basis
+    (hS : SecBaseChangeSt)
+    (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    (P : PolAV (Spec (CommRingCat.of R)))
+    (n : ℕ) (hn : 1 ≤ n)
+    : ∃ (N : ℕ) (β : Fin N → H0 P.L n),
+      ∀ (C : Type) [CommRing C] (q : Sp C ⟶ Sp R) (Y : Scheme.{0}) (π : Y ⟶ P.A.left)
+          (f : Y ⟶ Sp C),
+        IsPullback f π q P.A.hom → ∀ s, ∃! c, Rep π f β s c := by
   have hL := P.isLB
   obtain ⟨U, hU, b, hb⟩ := hS (Spec (CommRingCat.of R)) P n hn (closedPoint R)
   obtain rfl : U = ⊤ := eq_top_of_closedPoint_mem U hU
@@ -130,9 +166,11 @@ theorem exists_basis (hS : SecBaseChangeSt) (R : Type) [CommRing R] [IsLocalRing
     rw [Category.comp_id]
     exact (Spec (CommRingCat.of R)).topIso.hom_inv_id
   let u : P.A ⟶ V := Over.homMk (P.A.hom ≫ t₀) (by rw [Category.assoc, ht, Category.comp_id])
-  have hu : snd V P.A ≫ u = fst V P.A := Over.OverMorphism.ext (by
-    show (snd V P.A).left ≫ P.A.hom ≫ t₀ = (fst V P.A).left
-    rw [← Category.assoc, Over.w (snd V P.A), ← Over.w (fst V P.A), Category.assoc, ht', Category.comp_id])
+  have hu : snd V P.A ≫ u = fst V P.A :=
+    Over.OverMorphism.ext (by
+      show (snd V P.A).left ≫ P.A.hom ≫ t₀ = (fst V P.A).left
+      rw [← Category.assoc, Over.w (snd V P.A), ← Over.w (fst V P.A), Category.assoc, ht',
+        Category.comp_id])
   have e₁ : lift u (𝟙 P.A) ≫ snd V P.A = 𝟙 _ := lift_snd _ _
   have e₂ : snd V P.A ≫ lift u (𝟙 P.A) = 𝟙 _ := by
     rw [comp_lift, hu, Category.comp_id, lift_fst_snd]
@@ -153,21 +191,29 @@ theorem exists_basis (hS : SecBaseChangeSt) (R : Type) [CommRing R] [IsLocalRing
     congrArg CommaMorphism.left e₃
   have hp' : IsPullback f π (baseAt t).hom P.A.hom := hq ▸ hp
   refine rep_transport (Y := (baseAt t ⊗ P.A).left) (π := (snd (baseAt t) P.A).left)
-    (f := (fst (baseAt t) P.A).left) hp'.isoPullback hp'.isoPullback_hom_snd hp'.isoPullback_hom_fst fun s => ?_
+    (f := (fst (baseAt t) P.A).left) hp'.isoPullback hp'.isoPullback_hom_snd hp'.isoPullback_hom_fst
+    fun s => ?_
   have bij := ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of C)).inv
-  have hv : ∀ (c : Fin (n ^ P.g) → C) (Z : Scheme.{0}) (r : Z ⟶ (baseAt t ⊗ P.A).left) (z : Z) (J), Good P.L z J →
-      sval (linSec (fun i => scal (fst (baseAt t) P.A).left (c i)) b') r z J =
-        ∑ i, cst (r ≫ (fst (baseAt t) P.A).left) z (c i) * sval (β i) (r ≫ (snd (baseAt t) P.A).left) z J :=
+  have hv
+      : ∀ (c : Fin (n ^ P.g) → C) (Z : Scheme.{0}) (r : Z ⟶ (baseAt t ⊗ P.A).left) (z : Z) (J),
+        Good P.L z J
+          → sval (linSec (fun i => scal (fst (baseAt t) P.A).left (c i)) b') r z J
+            = ∑ i, cst (r ≫ (fst (baseAt t) P.A).left) z (c i) * sval (β i) (r ≫ (snd (baseAt t) P.A).left) z J :=
     fun c Z r z J hJ => by
       rw [sval_linSec _ _ _ _ _ hJ]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hb' i Z r z J hJ, hβ i Z _ z J hJ, Category.assoc, e₄]
-  have key : ∀ c : Fin (n ^ P.g) → C, Rep (snd (baseAt t) P.A).left (fst (baseAt t) P.A).left β s c ↔
-      ∑ i, (show Γ((baseAt t).left, ⊤) from (Scheme.ΓSpecIso (CommRingCat.of C)).inv.hom (c i)) •
-        (SecM.ofSec P.A (b' i) : SecM P.A P.L n (baseAt t)) = SecM.ofSec P.A s := fun c => by
-    have ev : ∀ j, (∑ i, (show Γ((baseAt t).left, ⊤) from (Scheme.ΓSpecIso (CommRingCat.of C)).inv.hom (c i)) •
-        (SecM.ofSec P.A (b' i) : SecM P.A P.L n (baseAt t))).1 j =
-        (linSec (fun i => scal (fst (baseAt t) P.A).left (c i)) b').f j := fun j => by
+  have key
+      : ∀ c : Fin (n ^ P.g) → C,
+        Rep (snd (baseAt t) P.A).left (fst (baseAt t) P.A).left β s c
+          ↔ ∑ i, (show Γ((baseAt t).left, ⊤) from (Scheme.ΓSpecIso (CommRingCat.of C)).inv.hom (c i)) •
+              (SecM.ofSec P.A (b' i) : SecM P.A P.L n (baseAt t))
+            = SecM.ofSec P.A s := fun c => by
+    have ev
+        : ∀ j,
+          (∑ i, (show Γ((baseAt t).left, ⊤) from (Scheme.ΓSpecIso (CommRingCat.of C)).inv.hom (c i)) •
+            (SecM.ofSec P.A (b' i) : SecM P.A P.L n (baseAt t))).1 j
+            = (linSec (fun i => scal (fst (baseAt t) P.A).left (c i)) b').f j := fun j => by
       rw [Submodule.coe_sum, Finset.sum_apply]
       rfl
     constructor
@@ -179,8 +225,9 @@ theorem exists_basis (hS : SecBaseChangeSt) (R : Type) [CommRing R] [IsLocalRing
         SecOps.sec_ext fun j => (congrFun (congrArg Subtype.val h) j).symm.trans (ev j)
       rw [this]
       exact hv c Z r z J hJ
-  obtain ⟨r, hr⟩ := (Submodule.mem_span_range_iff_exists_fun _).1
-    (hsp.ge (Submodule.mem_top : SecM.ofSec P.A s ∈ ⊤))
+  obtain ⟨r, hr⟩ :=
+    (Submodule.mem_span_range_iff_exists_fun _).1
+      (hsp.ge (Submodule.mem_top : SecM.ofSec P.A s ∈ ⊤))
   choose a ha using fun i => bij.2 (r i)
   obtain rfl : (fun i => (Scheme.ΓSpecIso (CommRingCat.of C)).inv.hom (a i)) = r := funext ha
   refine ⟨a, (key a).2 hr, fun a' ha' => funext fun i => bij.1 ?_⟩

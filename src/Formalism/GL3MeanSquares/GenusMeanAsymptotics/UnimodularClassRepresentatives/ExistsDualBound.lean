@@ -11,8 +11,9 @@ noncomputable section
 namespace Formalism.HermitianLattices.Ext.L3.D2
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 theorem nondegenerate {h : V →ₗ⋆[K] V →ₗ[K] K} (hd : IsTotPosDef h) : h.Nondegenerate := by
   have key : ∀ x : V, h x x = 0 → x = 0 := by
@@ -24,11 +25,13 @@ theorem nondegenerate {h : V →ₗ⋆[K] V →ₗ[K] K} (hd : IsTotPosDef h) : 
     exact lt_irrefl _ h1
   exact ⟨fun x hx => key x (hx x), fun y hy => key y (hy y)⟩
 
-theorem exists_dual_bound (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {A₀ : Submodule (𝓞 K) V}
-    (hA₀ : Submodule.IsFullLattice K A₀) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) :
-    ∃ e : ℕ, ∀ (k : ℕ) (x : V), (∀ y ∈ locF 𝔭 A₀, h y x ∈ pK K 𝔭 (k + e)) →
-      x ∈ extP K 𝔭 ^ k • locF 𝔭 A₀ := by
+theorem exists_dual_bound
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {A₀ : Submodule (𝓞 K) V} (hA₀ : Submodule.IsFullLattice K A₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : ∃ e : ℕ, ∀ (k : ℕ) (x : V),
+      (∀ y ∈ locF 𝔭 A₀, h y x ∈ pK K 𝔭 (k + e)) → x ∈ extP K 𝔭 ^ k • locF 𝔭 A₀ := by
   classical
   obtain ⟨π, hπ, hπ'⟩ := exists_unif h𝔭
   obtain ⟨b, hb, -⟩ := LocalSpans.exists_basis_locF hA₀ h𝔭
@@ -43,24 +46,32 @@ theorem exists_dual_bound (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (
   obtain ⟨c, hc, e⟩ := (mem_pK_iff_unif h𝔭 hπ hπ').1 (hx (b j) (LocF.le_locF 𝔭 A₀ (hb j)))
   rw [e]
   have hle : n j ≤ ∑ j, n j := Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ j)
-  refine (mem_smul_iff_unif h𝔭 hπ hπ' A₀).2
-    ⟨(c * algebraMap F K (π : F) ^ (∑ j, n j - n j)) • (algebraMap F K (π : F) ^ n j • bs j),
-      smul_mem_locF h𝔭 A₀ (by simpa using mul_mem_pK h𝔭 hc (unif_pow_mem_pK_zero hπ _)) (hn j), ?_⟩
+  refine (mem_smul_iff_unif h𝔭 hπ hπ' A₀).2 ⟨
+    (c * algebraMap F K (π : F) ^ (∑ j, n j - n j)) • (algebraMap F K (π : F) ^ n j • bs j),
+    smul_mem_locF h𝔭 A₀ (by simpa using mul_mem_pK h𝔭 hc (unif_pow_mem_pK_zero hπ _)) (hn j),
+    ?_
+  ⟩
   rw [smul_smul, smul_smul]
   congr 1
   have : k + ∑ j, n j = k + (∑ j, n j - n j) + n j := by omega
-  rw [this, pow_add, pow_add]; ring
+  rw [this, pow_add, pow_add]
+  ring
 
-theorem exists_endL_le {A₀ B₀ : Submodule (𝓞 K) V} (hA₀ : Submodule.IsFullLattice K A₀)
-    (hB₀ : Submodule.IsFullLattice K B₀) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) :
-    ∃ r : ℕ, ∀ d : ℕ, endL (locF 𝔭 A₀) (extP K 𝔭 ^ (d + r) • locF 𝔭 A₀) ≤
-      endL (locF 𝔭 B₀) (extP K 𝔭 ^ d • locF 𝔭 B₀) := by
+theorem exists_endL_le
+    {A₀ B₀ : Submodule (𝓞 K) V}
+    (hA₀ : Submodule.IsFullLattice K A₀) (hB₀ : Submodule.IsFullLattice K B₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : ∃ r : ℕ, ∀ d : ℕ,
+      endL (locF 𝔭 A₀) (extP K 𝔭 ^ (d + r) • locF 𝔭 A₀)
+        ≤ endL (locF 𝔭 B₀) (extP K 𝔭 ^ d • locF 𝔭 B₀) := by
   obtain ⟨r1, h1⟩ := (by
-    first | exact exists_smul_le hA₀.toIsLattice hB₀ h𝔭
-          | exact exists_smul_le hA₀.toIsLattice hB₀.toIsLattice h𝔭)
+    first
+    | exact exists_smul_le hA₀.toIsLattice hB₀ h𝔭
+    | exact exists_smul_le hA₀.toIsLattice hB₀.toIsLattice h𝔭)
   obtain ⟨r2, h2⟩ := (by
-    first | exact exists_smul_le hB₀.toIsLattice hA₀ h𝔭
-          | exact exists_smul_le hB₀.toIsLattice hA₀.toIsLattice h𝔭)
+    first
+    | exact exists_smul_le hB₀.toIsLattice hA₀ h𝔭
+    | exact exists_smul_le hB₀.toIsLattice hA₀.toIsLattice h𝔭)
   obtain ⟨π, hπ, hπ'⟩ := exists_unif h𝔭
   have hπ0 := unif_ne_zero (K := K) hπ'
   refine ⟨r1 + r2, fun d D hD y hy => ?_⟩
@@ -72,11 +83,16 @@ theorem exists_endL_le {A₀ B₀ : Submodule (𝓞 K) V} (hA₀ : Submodule.IsF
   show algebraMap F K (π : F) ^ r2 • D y = algebraMap F K (π : F) ^ r2 • _
   rw [← map_smul, e, smul_smul, smul_smul]
   congr 1
-  rw [pow_add, pow_add]; ring
+  rw [pow_add, pow_add]
+  ring
 
-theorem nSub_le_sSub (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K} {A₀ : Submodule (𝓞 K) V}
-    (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) :
-    nSub (locF 𝔭 A₀) 𝔭 k ≤ sSub h (locF 𝔭 A₀) 𝔭 k := by
+theorem nSub_le_sSub
+    (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {A₀ : Submodule (𝓞 K) V}
+    (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    (k : ℕ)
+    : nSub (locF 𝔭 A₀) 𝔭 k ≤ sSub h (locF 𝔭 A₀) 𝔭 k := by
   rintro X ⟨hX, hX'⟩
   refine ⟨hX, fun x hx y hy => ?_⟩
   have hx0 : x ∈ extP K 𝔭 ^ 0 • locF 𝔭 A₀ := by rwa [pow_zero_smul]
@@ -89,14 +105,17 @@ theorem nSub_le_sSub (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K} {A₀ 
   · simpa using form_mem_pK hF hA₀i h𝔭 hx0 (hX' y hy)
   · exact pK_anti 𝔭 (Nat.le_add_right k k) (form_mem_pK hF hA₀i h𝔭 (hX' x hx) (hX' y hy))
 
-theorem nSub_le_glSub {A₀ B₀ : Submodule (𝓞 K) V} (hA₀ : Submodule.IsFullLattice K A₀)
-    (hB₀ : Submodule.IsFullLattice K B₀) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) :
-    ∃ k₀ : ℕ, ∀ k ≥ k₀, nSub (locF 𝔭 A₀) 𝔭 k ≤ glSub (locF 𝔭 B₀) := by
+theorem nSub_le_glSub
+    {A₀ B₀ : Submodule (𝓞 K) V}
+    (hA₀ : Submodule.IsFullLattice K A₀) (hB₀ : Submodule.IsFullLattice K B₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : ∃ k₀ : ℕ, ∀ k ≥ k₀, nSub (locF 𝔭 A₀) 𝔭 k ≤ glSub (locF 𝔭 B₀) := by
   obtain ⟨r, hr⟩ := exists_endL_le hA₀ hB₀ h𝔭
   refine ⟨1 + r, fun k hk X hX => ?_⟩
   apply (by
-    first | exact mem_glSub_of_sub_mem (X := X) hB₀ h𝔭
-          | exact mem_glSub_of_sub_mem (X := X) hB₀.toIsLattice h𝔭)
+    first
+    | exact mem_glSub_of_sub_mem (X := X) hB₀ h𝔭
+    | exact mem_glSub_of_sub_mem (X := X) hB₀.toIsLattice h𝔭)
   intro y hy
   have h1 : ((X : V →ₗ[K] V) - LinearMap.id) ∈ endL (locF 𝔭 A₀) (extP K 𝔭 ^ (1 + r) • locF 𝔭 A₀) :=
     fun x hx => smul_anti 𝔭 _ hk (hX.2 x hx)

@@ -22,8 +22,9 @@ def bS {p m : ℕ} (x : Xp p m) (l : Fin (p + 1)) : ℂ :=
 lemma Lsq_ins {p m : ℕ} (y : Yp p m) (z : ℂ) (l : Fin (p + 2)) :
     Lsq (ins y z) l = Lsq (tailPt y) l := rfl
 
-private theorem ins_snd_fst_eq_tailPt_snd_fst_of_ne_zero {p m : ℕ} (y : Yp p m) (z : ℂ) {j : Fin (p + 1)} (hj : j ≠ 0) :
-    (ins y z).2.1 j = (ReciprocityTheory.ChartRestriction.DS.Xi.tailPt y).2.1 j := by
+private theorem ins_snd_fst_eq_tailPt_snd_fst_of_ne_zero
+    {p m : ℕ} (y : Yp p m) (z : ℂ) {j : Fin (p + 1)} (hj : j ≠ 0)
+    : (ins y z).2.1 j = (ReciprocityTheory.ChartRestriction.DS.Xi.tailPt y).2.1 j := by
   induction j using Fin.cases with
   | zero => exact absurd rfl hj
   | succ k => simp [ins, ReciprocityTheory.ChartRestriction.DS.Xi.tailPt]

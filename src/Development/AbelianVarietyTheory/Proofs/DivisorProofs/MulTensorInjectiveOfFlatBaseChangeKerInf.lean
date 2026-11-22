@@ -10,11 +10,12 @@ open TensorProduct
 
 namespace GlobalTheory.TorStep
 
-theorem mul_tensor_injective : ∀ (P R₂ B B₂ : Type) [CommRing P] [CommRing R₂] [CommRing B]
-    [CommRing B₂] [Algebra P B] (K₁ : Ideal P) (f₂ : P →+* R₂) (a₂ : R₂ →+* B₂) (c₂ : B →+* B₂),
-    Function.Surjective f₂ → Function.Surjective c₂ → c₂.comp (algebraMap P B) = a₂.comp f₂ →
-    RingHom.ker c₂ = (RingHom.ker f₂).map (algebraMap P B) → K₁ ⊓ RingHom.ker f₂ = ⊥ →
-    a₂.Flat → Function.Injective (TensorProduct.lift ((LinearMap.lsmul P B).comp K₁.subtype)) := by
+theorem mul_tensor_injective
+    : ∀ (P R₂ B B₂ : Type) [CommRing P] [CommRing R₂] [CommRing B] [CommRing B₂] [Algebra P B]
+        (K₁ : Ideal P) (f₂ : P →+* R₂) (a₂ : R₂ →+* B₂) (c₂ : B →+* B₂),
+      Function.Surjective f₂ → Function.Surjective c₂ → c₂.comp (algebraMap P B) = a₂.comp f₂
+        → RingHom.ker c₂ = (RingHom.ker f₂).map (algebraMap P B) → K₁ ⊓ RingHom.ker f₂ = ⊥ → a₂.Flat
+        → Function.Injective (TensorProduct.lift ((LinearMap.lsmul P B).comp K₁.subtype)) := by
   intro P R₂ B B₂ _ _ _ _ _ K₁ f₂ a₂ c₂ hf hc hcomp hker hK hflat
   letI := a₂.toAlgebra
   haveI : Module.Flat R₂ B₂ := hflat
@@ -31,8 +32,7 @@ theorem mul_tensor_injective : ∀ (P R₂ B B₂ : Type) [CommRing P] [CommRing
   have L0 : ∀ x : B, x ∈ RingHom.ker c₂ → ∀ k : K₁, (k ⊗ₜ[P] x : K₁ ⊗[P] B) = 0 := by
     intro x hx
     rw [hker, Ideal.map] at hx
-    suffices H : ∀ (k : K₁) (y : B), (k ⊗ₜ[P] (y * x) : K₁ ⊗[P] B) = 0 by
-      intro k; simpa using H k 1
+    suffices H : ∀ (k : K₁) (y : B), (k ⊗ₜ[P] (y * x) : K₁ ⊗[P] B) = 0 by intro k; simpa using H k 1
     induction hx using Submodule.span_induction with
     | mem z hz =>
       obtain ⟨κ, hκ, rfl⟩ := hz
@@ -70,34 +70,41 @@ theorem mul_tensor_injective : ∀ (P R₂ B B₂ : Type) [CommRing P] [CommRing
     · rw [map_sub, hE', h, sub_self]
 
   let ψ0 : K₁ →+ B →+ J₂ ⊗[R₂] B₂ :=
-    AddMonoidHom.mk' (fun k => AddMonoidHom.mk' (fun b => ej k ⊗ₜ[R₂] c₂ b)
-      (fun b b' => by rw [map_add (f := _), tmul_add]))
+    AddMonoidHom.mk'
+      (fun k =>
+        AddMonoidHom.mk'
+          (fun b => ej k ⊗ₜ[R₂] c₂ b)
+          (fun b b' => by rw [map_add (f := _), tmul_add]))
       (fun k k' => by
         ext b
         have : ej (k + k') = ej k + ej k' := Subtype.ext (by simp [ej])
         simp only [AddMonoidHom.mk'_apply, AddMonoidHom.add_apply, this, add_tmul])
-  let ψ : K₁ ⊗[P] B →+ J₂ ⊗[R₂] B₂ := liftAddHom ψ0 (by
-    intro p k b
-    simp only [ψ0, AddMonoidHom.mk'_apply]
-    have : ej (p • k) = f₂ p • ej k := Subtype.ext (by simp [ej])
-    rw [this, hsmulB, smul_tmul])
+  let ψ : K₁ ⊗[P] B →+ J₂ ⊗[R₂] B₂ :=
+    liftAddHom ψ0 (by
+      intro p k b
+      simp only [ψ0, AddMonoidHom.mk'_apply]
+      have : ej (p • k) = f₂ p • ej k := Subtype.ext (by simp [ej])
+      rw [this, hsmulB, smul_tmul])
 
   let χ0 : J₂ →+ B₂ →+ K₁ ⊗[P] B :=
-    AddMonoidHom.mk' (fun j => AddMonoidHom.mk' (fun β => einv j ⊗ₜ[P] s β)
-      (fun β β' => by rw [← tmul_add]; exact L1 _ _ _ (by rw [map_add (f := _), hs, hs, hs])))
+    AddMonoidHom.mk'
+      (fun j =>
+        AddMonoidHom.mk'
+          (fun β => einv j ⊗ₜ[P] s β)
+          (fun β β' => by rw [← tmul_add]; exact L1 _ _ _ (by rw [map_add (f := _), hs, hs, hs])))
       (fun j j' => by
         ext β
         have : einv (j + j') = einv j + einv j' :=
           hE _ _ (by rw [Submodule.coe_add, map_add (f := _), hE', hE', Submodule.coe_add])
         simp only [AddMonoidHom.mk'_apply, AddMonoidHom.add_apply, this, add_tmul])
-  let χ : J₂ ⊗[R₂] B₂ →+ K₁ ⊗[P] B := liftAddHom χ0 (by
-    intro r j β
-    simp only [χ0, AddMonoidHom.mk'_apply]
-    obtain ⟨p, rfl⟩ := hf r
-    have e1 : einv (f₂ p • j) = p • einv j :=
-      hE _ _ (by simp [hE'])
-    rw [e1, smul_tmul]
-    exact L1 _ _ _ (by rw [hsmulB, hs, hs]))
+  let χ : J₂ ⊗[R₂] B₂ →+ K₁ ⊗[P] B :=
+    liftAddHom χ0 (by
+      intro r j β
+      simp only [χ0, AddMonoidHom.mk'_apply]
+      obtain ⟨p, rfl⟩ := hf r
+      have e1 : einv (f₂ p • j) = p • einv j := hE _ _ (by simp [hE'])
+      rw [e1, smul_tmul]
+      exact L1 _ _ _ (by rw [hsmulB, hs, hs]))
   have hχψ : ∀ t, χ (ψ t) = t := by
     intro t
     induction t with
@@ -107,8 +114,7 @@ theorem mul_tensor_injective : ∀ (P R₂ B B₂ : Type) [CommRing P] [CommRing
       rw [hE k (ej k) rfl]
       exact L1 _ _ _ (hs _)
 
-  let ν : J₂ ⊗[R₂] B₂ →ₗ[R₂] B₂ :=
-    (TensorProduct.lid R₂ B₂).toLinearMap ∘ₗ J₂.subtype.rTensor B₂
+  let ν : J₂ ⊗[R₂] B₂ →ₗ[R₂] B₂ := (TensorProduct.lid R₂ B₂).toLinearMap ∘ₗ J₂.subtype.rTensor B₂
   have hν : Function.Injective ν :=
     (TensorProduct.lid R₂ B₂).injective.comp
       (Module.Flat.rTensor_preserves_injective_linearMap _ J₂.injective_subtype)
@@ -116,7 +122,8 @@ theorem mul_tensor_injective : ∀ (P R₂ B B₂ : Type) [CommRing P] [CommRing
   have key : ∀ t, ν (ψ t) = c₂ (μ t) := by
     intro t
     induction t with
-    | add u v hu hv => rw [map_add (f := _), map_add (f := _), hu, hv, map_add (f := _), map_add (f := _)]
+    | add u v hu hv =>
+      rw [map_add (f := _), map_add (f := _), hu, hv, map_add (f := _), map_add (f := _)]
     | tmul k b =>
       simp only [ψ, liftAddHom_tmul, ψ0, AddMonoidHom.mk'_apply, ν, LinearMap.coe_comp,
         Function.comp_apply, LinearMap.rTensor_tmul, Submodule.subtype_apply, LinearEquiv.coe_coe,

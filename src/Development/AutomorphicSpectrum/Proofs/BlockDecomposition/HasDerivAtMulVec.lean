@@ -32,21 +32,24 @@ theorem dw_w {lam : Fin n → ℤ} (h : Antitone lam) (a : Fin n) : (dw lam).w a
   unfold dw
   rw [dite_eq_left h]
 
-theorem Rm_mulVec (lam : Fin n → ℤ) {x : Mat n} (h : IsUnit x.det) (v : nablaSq ℂ n (dw lam)) :
-    Rm lam x *ᵥ ((wb lam).repr v : Jd n lam → ℂ) =
-      ((wb lam).repr (GlobalTheory.Branching.sqRep ℂ n (dw lam) (Matrix.nonsingInvUnit x h) v) : Jd n lam → ℂ) := by
+theorem Rm_mulVec (lam : Fin n → ℤ) {x : Mat n} (h : IsUnit x.det) (v : nablaSq ℂ n (dw lam))
+    : Rm lam x *ᵥ ((wb lam).repr v : Jd n lam → ℂ)
+      = ((wb lam).repr (GlobalTheory.Branching.sqRep ℂ n (dw lam) (Matrix.nonsingInvUnit x h) v)
+        : Jd n lam → ℂ) := by
   rw [Rm_of_unit lam h]
   exact LinearMap.toMatrix_mulVec_repr _ _ _ _
 
-theorem hasDerivAt_mulVec {lam : Fin n → ℤ} (hD : HolRm lam) (B : Mat n) (c : Jd n lam → ℂ)
-    (i : Jd n lam) :
-    HasDerivAt (fun t : ℂ => (Rm lam (1 + t • B) *ᵥ c) i) ((XA lam B *ᵥ c) i) 0 := by
+theorem hasDerivAt_mulVec
+    {lam : Fin n → ℤ} (hD : HolRm lam) (B : Mat n) (c : Jd n lam → ℂ) (i : Jd n lam)
+    : HasDerivAt (fun t : ℂ => (Rm lam (1 + t • B) *ᵥ c) i) ((XA lam B *ᵥ c) i) 0 := by
   simp only [Matrix.mulVec, dotProduct]
   exact HasDerivAt.fun_sum fun j _ => (hasDerivAt_line hD B i j).mul_const _
 
-theorem fix_upper (lam : Fin n → ℤ) {a b : Fin n} (hab : a < b) {t : ℂ}
-    (h : IsUnit ((1 : Mat n) + t • Matrix.single a b (1 : ℂ)).det) :
-    GlobalTheory.Branching.sqRep ℂ n (dw lam) (Matrix.nonsingInvUnit _ h) (hv lam) = hv lam := by
+theorem fix_upper
+    (lam : Fin n → ℤ)
+    {a b : Fin n} (hab : a < b)
+    {t : ℂ} (h : IsUnit ((1 : Mat n) + t • Matrix.single a b (1 : ℂ)).det)
+    : GlobalTheory.Branching.sqRep ℂ n (dw lam) (Matrix.nonsingInvUnit _ h) (hv lam) = hv lam := by
   apply Subtype.ext
   refine (factSqHighestWeight ℂ n (dw lam)).2 _ ?_ ?_
   · intro i j hij
@@ -68,10 +71,12 @@ theorem fix_upper (lam : Fin n → ℤ) {a b : Fin n} (hab : a < b) {t : ℂ}
     rw [Matrix.add_apply, Matrix.smul_apply, h2]
     simp
 
-theorem diag_act {lam : Fin n → ℤ} (hA : Antitone lam) (a : Fin n) {t : ℂ} (ht : 1 + t ≠ 0)
-    (h : IsUnit ((1 : Mat n) + t • Matrix.single a a (1 : ℂ)).det) :
-    GlobalTheory.Branching.sqRep ℂ n (dw lam) (Matrix.nonsingInvUnit _ h) (hv lam) =
-      ((1 + t) ^ (lam a)) • hv lam := by
+theorem diag_act
+    {lam : Fin n → ℤ} (hA : Antitone lam)
+    (a : Fin n)
+    {t : ℂ} (ht : 1 + t ≠ 0) (h : IsUnit ((1 : Mat n) + t • Matrix.single a a (1 : ℂ)).det)
+    : GlobalTheory.Branching.sqRep ℂ n (dw lam) (Matrix.nonsingInvUnit _ h) (hv lam)
+      = ((1 + t) ^ (lam a)) • hv lam := by
   classical
   let u : Fin n → ℂˣ := fun i => if i = a then Units.mk0 (1 + t) ht else 1
   have e : Matrix.nonsingInvUnit _ h = diagGL ℂ n u := by
@@ -92,7 +97,8 @@ theorem diag_act {lam : Fin n → ℤ} (hA : Antitone lam) (a : Fin n) {t : ℂ}
         rw [Matrix.single_apply_of_ne]
         rintro ⟨h, h'⟩
         exact hij (h.symm.trans h')
-      rw [Matrix.add_apply, Matrix.smul_apply, h2, Matrix.one_apply_ne hij, Matrix.diagonal_apply_ne _ hij]
+      rw [Matrix.add_apply, Matrix.smul_apply, h2, Matrix.one_apply_ne hij,
+        Matrix.diagonal_apply_ne _ hij]
       simp
   have hp : ((∏ i, (u i) ^ ((dw lam).w i) : ℂˣ) : ℂ) = (1 + t) ^ (lam a) := by
     rw [Finset.prod_eq_single a]
@@ -106,29 +112,34 @@ theorem diag_act {lam : Fin n → ℤ} (hA : Antitone lam) (a : Fin n) {t : ℂ}
   rw [hp] at hh
   exact hh
 
-theorem exists_hw (n : ℕ) (lam : Fin n → ℤ) (hD : HolRm lam) (hA : Antitone lam) :
-    ∃ v : Formalism.BasicNotions.nablaSq ℂ n (dw lam), v ≠ 0 ∧
-      (∀ a b : Fin n, a < b → Xu lam a b *ᵥ ((wb lam).repr v : Jd n lam → ℂ) = 0) ∧
-      ∀ a : Fin n, Xu lam a a *ᵥ ((wb lam).repr v : Jd n lam → ℂ) =
-        (lam a : ℂ) • ((wb lam).repr v : Jd n lam → ℂ) := by
+theorem exists_hw (n : ℕ) (lam : Fin n → ℤ) (hD : HolRm lam) (hA : Antitone lam)
+    : ∃ v : Formalism.BasicNotions.nablaSq ℂ n (dw lam),
+      v ≠ 0 ∧ (∀ a b : Fin n, a < b → Xu lam a b *ᵥ ((wb lam).repr v : Jd n lam → ℂ) = 0)
+        ∧ ∀ a : Fin n,
+          Xu lam a a *ᵥ ((wb lam).repr v : Jd n lam → ℂ)
+            = (lam a : ℂ) • ((wb lam).repr v : Jd n lam → ℂ) := by
   refine ⟨hv lam, hv_ne lam, fun a b hab => ?_, fun a => ?_⟩
   · ext i
     have h1 := hasDerivAt_mulVec hD (Matrix.single a b (1 : ℂ)) ((wb lam).repr (hv lam)) i
-    have hev : (fun t : ℂ => (Rm lam (1 + t • Matrix.single a b (1 : ℂ)) *ᵥ
-        ((wb lam).repr (hv lam) : Jd n lam → ℂ)) i) =ᶠ[𝓝 0]
-        fun _ => ((wb lam).repr (hv lam) : Jd n lam → ℂ) i := by
+    have hev
+        : (fun t : ℂ => (Rm lam (1 + t • Matrix.single a b (1 : ℂ)) *ᵥ
+          ((wb lam).repr (hv lam) : Jd n lam → ℂ)) i) =ᶠ[𝓝 0]
+          fun _ => ((wb lam).repr (hv lam) : Jd n lam → ℂ) i := by
       filter_upwards [eventually_line_unit (Matrix.single a b (1 : ℂ))] with t ht
       rw [Rm_mulVec lam ht, fix_upper lam hab ht]
-    have h2 := (hasDerivAt_const (0 : ℂ) (((wb lam).repr (hv lam) : Jd n lam → ℂ) i)).congr_of_eventuallyEq hev
+    have h2 :=
+      (hasDerivAt_const (0 : ℂ) (((wb lam).repr (hv lam) : Jd n lam → ℂ) i)).congr_of_eventuallyEq
+        hev
     simpa [Xu] using h1.unique h2
   · ext i
     have h1 := hasDerivAt_mulVec hD (Matrix.single a a (1 : ℂ)) ((wb lam).repr (hv lam)) i
     have hne : ∀ᶠ t : ℂ in 𝓝 0, 1 + t ≠ 0 := by
       have hc : ContinuousAt (fun t : ℂ => 1 + t) 0 := by fun_prop
       exact hc.eventually_ne (by simp)
-    have hev : (fun t : ℂ => (Rm lam (1 + t • Matrix.single a a (1 : ℂ)) *ᵥ
-        ((wb lam).repr (hv lam) : Jd n lam → ℂ)) i) =ᶠ[𝓝 0]
-        fun t => (1 + t) ^ (lam a) * ((wb lam).repr (hv lam) : Jd n lam → ℂ) i := by
+    have hev
+        : (fun t : ℂ => (Rm lam (1 + t • Matrix.single a a (1 : ℂ)) *ᵥ
+          ((wb lam).repr (hv lam) : Jd n lam → ℂ)) i) =ᶠ[𝓝 0]
+          fun t => (1 + t) ^ (lam a) * ((wb lam).repr (hv lam) : Jd n lam → ℂ) i := by
       filter_upwards [eventually_line_unit (Matrix.single a a (1 : ℂ)), hne] with t ht ht'
       rw [Rm_mulVec lam ht, diag_act hA a ht' ht]
       simp

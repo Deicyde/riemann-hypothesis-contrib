@@ -7,14 +7,16 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.F.Ex0 PositivityTheory.Rg.Bc.ArchbcB.B
+open NumberField IsDedekindDomain GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  PositivityTheory.Rg.BcB.F.Ex0 PositivityTheory.Rg.Bc.ArchbcB.B
 open scoped Classical
 
 namespace GlobalTheory.CompanionTheory.SecThrough
 
 theorem secEx : SecEx := by
   intro E _ _ _ S₀ hS₀
-  let f : Pl E → HeightOneSpectrum (𝓞 (maximalRealSubfield E)) := fun w => w.under (𝓞 (maximalRealSubfield E))
+  let f : Pl E → HeightOneSpectrum (𝓞 (maximalRealSubfield E)) := fun w =>
+    w.under (𝓞 (maximalRealSubfield E))
   have hex : ∀ y : Set.range f, ∃ u : Pl E, f u = y.1 ∧ ∀ w ∈ S₀, f w = y.1 → u = w := by
     rintro ⟨_, w₀, rfl⟩
     by_cases h : ∃ w ∈ S₀, f w = f w₀

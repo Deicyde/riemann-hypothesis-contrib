@@ -6,7 +6,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.GermLocalOfR
 
 namespace Formalism.FourierDecayAlt.P.GermRealisation
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P.PBK Finset Filter Topology MeasureTheory NumberField
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P.PBK Finset Filter Topology MeasureTheory
+  NumberField
 open scoped ComplexConjugate InnerProductSpace
 
 noncomputable section
@@ -15,12 +16,17 @@ open Classical
 
 def ptX (s : ℕ) (h : C.LPt) (x : ℂ) : C.LPt := h ++ [(s - 1, x⁻¹)]
 
-def utOf {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (s : ℕ) (V : C.LPt → ℂ → H) (h : C.LPt)
-    (x D : ℂ) : H :=
+def utOf
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (s : ℕ) (V : C.LPt → ℂ → H) (h : C.LPt) (x D : ℂ)
+    : H :=
   ((‖x‖ ^ (s - 1) : ℝ) : ℂ) • V (ptX s h x) (x ^ (s - 1) * D)
 
-theorem cvec_utOf {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (s : ℕ) (V : C.LPt → ℂ → H)
-    (h : C.LPt) (x : ℂ) (hx : x ≠ 0) : cvec s (utOf s V h) x = V (ptX s h x) := by
+theorem cvec_utOf
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (s : ℕ) (V : C.LPt → ℂ → H) (h : C.LPt)
+    (x : ℂ) (hx : x ≠ 0)
+    : cvec s (utOf s V h) x = V (ptX s h x) := by
   funext c
   have ha : x ^ (s - 1) ≠ 0 := pow_ne_zero _ hx
   have hr : ‖x‖ ^ (s - 1) ≠ 0 := pow_ne_zero _ (norm_ne_zero_iff.mpr hx)
@@ -38,12 +44,14 @@ theorem rd_pos (E : Type) [Field E] [NumberField E] : 0 < S6.rd E := by
 
 section loc
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Wp Wq : InfinitePlace E → Type}
-  [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)] [∀ x, NormedAddCommGroup (Wq x)]
-  [∀ x, InnerProductSpace ℂ (Wq x)]
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Wp Wq : InfinitePlace E → Type}
+  [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+  [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
 
-theorem dlB_ne_zero (S : C.HidaSetting E Wp Wq) (hg1 : 0 < S.G.g1) (hg2 : 0 < S.G.g2) (b s : ℕ) :
-    KB.dlB S b s ≠ 0 := by
+theorem dlB_ne_zero (S : C.HidaSetting E Wp Wq) (hg1 : 0 < S.G.g1) (hg2 : 0 < S.G.g2) (b s : ℕ)
+    : KB.dlB S b s ≠ 0 := by
   have hrd := rd_pos E
   have hg0 : 0 < S.g := Nat.mul_pos hg1 hg2
   have hg : (0 : ℝ) < (S.g : ℝ) := by exact_mod_cast hg0
@@ -52,7 +60,9 @@ theorem dlB_ne_zero (S : C.HidaSetting E Wp Wq) (hg1 : 0 < S.G.g1) (hg2 : 0 < S.
   apply div_ne_zero two_ne_zero
   exact mul_ne_zero hrd.ne' (pow_ne_zero _ hg.ne')
 
-structure FibreGerm (S : C.HidaSetting E Wp Wq) (v : Fin S.f) (ε : ℝ) (b s : ℕ) (a : List C.Letter) (Y : Finset C.LPt) where
+structure FibreGerm
+    (S : C.HidaSetting E Wp Wq) (v : Fin S.f)
+    (ε : ℝ) (b s : ℕ) (a : List C.Letter) (Y : Finset C.LPt) where
   H : Type
   [nag : NormedAddCommGroup H]
   [ips : InnerProductSpace ℂ H]
@@ -65,24 +75,41 @@ structure FibreGerm (S : C.HidaSetting E Wp Wq) (v : Fin S.f) (ε : ℝ) (b s : 
   hε' : ‖ε'‖ = 1
   hpsi : ∀ σ z : ℂ, G.psi β (σ * z) = KB.psiL S σ z
   measV : ∀ h ∈ Y, ∀ x : ℂ, x ≠ 0 → AEStronglyMeasurable (V (ptX s h x)) volume
-  fibre : ∀ h ∈ Y, ∀ h' ∈ Y, ∀ x x' : ℂ, x ≠ 0 → x' ≠ 0 → ∀ c : ℂ, c ≠ 0 →
-    KB.gN S v ε (b + s - 1) a (ptX s h x ++ [(1, c)]) (ptX s h' x' ++ [(1, c)]) =
-      (KB.dlB S (b + s - 1) 1 : ℂ) * ⟪V (ptX s h x) c, V (ptX s h' x') c⟫_ℂ
+  fibre
+    : ∀ h ∈ Y, ∀ h' ∈ Y, ∀ x x' : ℂ,
+      x ≠ 0 → x' ≠ 0
+        → ∀ c : ℂ,
+          c ≠ 0
+            → KB.gN S v ε (b + s - 1) a (ptX s h x ++ [(1, c)]) (ptX s h' x' ++ [(1, c)])
+              = (KB.dlB S (b + s - 1) 1 : ℂ) * ⟪V (ptX s h x) c, V (ptX s h' x') c⟫_ℂ
   meas : ∀ h ∈ Y, StronglyMeasurable (bt h)
-  loc : ∀ h ∈ Y, ∀ K : Set ℂ, IsCompact K → (0 : ℂ) ∉ K → IntegrableOn (fun z => ‖bz s (bt h) z‖ ^ 2) K
-  germ : ∀ h ∈ Y, ∀ K : Set ℂ, IsCompact K → (0 : ℂ) ∉ K → ∃ C : ℝ, ∀ x : ℂ, x ≠ 0 →
-    ∀ᵐ D, D ∈ K → ‖utOf s V h x D - mainD s β ε' (bt h) x D‖ ≤ C * ‖x‖⁻¹
-  dens : ∀ h ∈ Y, ∀ h' ∈ Y, ∀ z : ℂ, z ≠ 0 →
-    gDens S v ε b s a h h' z = (KB.dlB S b s : ℂ) * ⟪bz s (bt h) z, bz s (bt h') z⟫_ℂ
+  loc
+    : ∀ h ∈ Y, ∀ K : Set ℂ,
+      IsCompact K → (0 : ℂ) ∉ K → IntegrableOn (fun z => ‖bz s (bt h) z‖ ^ 2) K
+  germ
+    : ∀ h ∈ Y, ∀ K : Set ℂ,
+      IsCompact K → (0 : ℂ) ∉ K
+        → ∃ C : ℝ, ∀ x : ℂ,
+          x ≠ 0 → ∀ᵐ D, D ∈ K → ‖utOf s V h x D - mainD s β ε' (bt h) x D‖ ≤ C * ‖x‖⁻¹
+  dens
+    : ∀ h ∈ Y, ∀ h' ∈ Y, ∀ z : ℂ,
+      z ≠ 0 → gDens S v ε b s a h h' z = (KB.dlB S b s : ℂ) * ⟪bz s (bt h) z, bz s (bt h') z⟫_ℂ
 
 attribute [instance] FibreGerm.nag FibreGerm.ips FibreGerm.cs
 
 def GermFibres (S : C.HidaSetting E Wp Wq) (v : Fin S.f) : Prop :=
-  ∀ ε, 0 < ε → ∀ b s, 1 ≤ b → 2 ≤ s → b + s ≤ S.G.r + 2 → ∀ a, D.AdmAt S v a → ∀ Y : Finset C.LPt,
-    (∀ h ∈ Y, D.ptSize h = b - 1) → Nonempty (FibreGerm S v ε b s a Y)
+  ∀ ε,
+    0 < ε
+      → ∀ b s,
+        1 ≤ b → 2 ≤ s → b + s ≤ S.G.r + 2
+          → ∀ a,
+            D.AdmAt S v a
+              → ∀ Y : Finset C.LPt,
+                (∀ h ∈ Y, D.ptSize h = b - 1) → Nonempty (FibreGerm S v ε b s a Y)
 
-theorem integrable_of_decay {φ : ℂ → ℂ} (hφ : Continuous φ) {Cφ : ℝ}
-    (h : ∀ c : ℂ, ‖φ c‖ ≤ Cφ * ((1 + ‖c‖) ^ 3)⁻¹) : Integrable φ := by
+theorem integrable_of_decay
+    {φ : ℂ → ℂ} (hφ : Continuous φ) {Cφ : ℝ} (h : ∀ c : ℂ, ‖φ c‖ ≤ Cφ * ((1 + ‖c‖) ^ 3)⁻¹)
+    : Integrable φ := by
   have hg : Integrable (fun c : ℂ => (1 + ‖c‖) ^ (-(3 : ℝ))) := by
     apply integrable_one_add_norm
     rw [Complex.finrank_real_complex]
@@ -94,31 +121,40 @@ theorem integrable_of_decay {φ : ℂ → ℂ} (hφ : Continuous φ) {Cφ : ℝ}
   rw [e]
   exact h c
 
-def FibreGerm.toGermReal {S : C.HidaSetting E Wp Wq} {v : Fin S.f} {ε : ℝ} {b s : ℕ} {a : List C.Letter}
-    {Y : Finset C.LPt} (R : FibreGerm S v ε b s a Y) (hI : JC.ThmPIntPlace S v fun i => KB.dlB S i 1)
-    (hg1 : 0 < S.G.g1) (hg2 : 0 < S.G.g2) (hε : 0 < ε) (hb : 1 ≤ b) (hs : 2 ≤ s) (hbs : b + s ≤ S.G.r + 2)
-    (ha : D.AdmAt S v a) (hY : ∀ h ∈ Y, D.ptSize h = b - 1) : GermReal S v ε b s a Y := by
+def FibreGerm.toGermReal
+    {S : C.HidaSetting E Wp Wq} {v : Fin S.f} {ε : ℝ} {b s : ℕ} {a : List C.Letter}
+    {Y : Finset C.LPt}
+    (R : FibreGerm S v ε b s a Y) (hI : JC.ThmPIntPlace S v fun i => KB.dlB S i 1)
+    (hg1 : 0 < S.G.g1) (hg2 : 0 < S.G.g2) (hε : 0 < ε) (hb : 1 ≤ b) (hs : 2 ≤ s)
+    (hbs : b + s ≤ S.G.r + 2) (ha : D.AdmAt S v a) (hY : ∀ h ∈ Y, D.ptSize h = b - 1)
+    : GermReal S v ε b s a Y := by
   classical
-
-  have key : ∀ h ∈ Y, ∀ h' ∈ Y, ∀ x x' : ℂ, x ≠ 0 → x' ≠ 0 →
-      Integrable (fun c => ⟪R.V (ptX s h x) c, R.V (ptX s h' x') c⟫_ℂ) ∧
-      gK S v ε b s a (h, x) (h', x') = ∫ c, ⟪R.V (ptX s h x) c, R.V (ptX s h' x') c⟫_ℂ := by
+  have key
+      : ∀ h ∈ Y, ∀ h' ∈ Y, ∀ x x' : ℂ,
+        x ≠ 0 → x' ≠ 0
+          → Integrable (fun c => ⟪R.V (ptX s h x) c, R.V (ptX s h' x') c⟫_ℂ)
+            ∧ gK S v ε b s a (h, x) (h', x') = ∫ c, ⟪R.V (ptX s h x) c, R.V (ptX s h' x') c⟫_ℂ := by
     intro h hh h' hh' x x' hx hx'
     obtain ⟨w, hw⟩ := ha
     have hsz : D.ptSize (ptX s h x) = b + s - 1 - 1 := by rw [ptSize_ptX, hY h hh]; omega
     have hsz' : D.ptSize (ptX s h' x') = b + s - 1 - 1 := by rw [ptSize_ptX, hY h' hh']; omega
     obtain ⟨φ, hφc, hφeq, ⟨Cφ, hCφ⟩, hφint⟩ :=
       hI ε hε (b + s - 1) (by omega) (by omega) w (ptX s h x) (ptX s h' x') hsz hsz'
-    have hdl : (KB.dlB S (b + s - 1) 1 : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr (dlB_ne_zero S hg1 hg2 _ _)
-    have hpt : ∀ c : ℂ, c ≠ 0 → ⟪R.V (ptX s h x) c, R.V (ptX s h' x') c⟫_ℂ =
-        (KB.dlB S (b + s - 1) 1 : ℂ)⁻¹ * (φ c / (S.sizeAt v a : ℂ)) := by
+    have hdl : (KB.dlB S (b + s - 1) 1 : ℂ) ≠ 0 :=
+      Complex.ofReal_ne_zero.mpr (dlB_ne_zero S hg1 hg2 _ _)
+    have hpt
+        : ∀ c : ℂ,
+          c ≠ 0
+            → ⟪R.V (ptX s h x) c, R.V (ptX s h' x') c⟫_ℂ
+              = (KB.dlB S (b + s - 1) 1 : ℂ)⁻¹ * (φ c / (S.sizeAt v a : ℂ)) := by
       intro c hc
       have hf := R.fibre h hh h' hh' x x' hx hx' c hc
       rw [hφeq c hc, hw]
       unfold KB.gN at hf
       rw [hf, ← mul_assoc, inv_mul_cancel₀ hdl, one_mul]
-    have hae : (fun c => ⟪R.V (ptX s h x) c, R.V (ptX s h' x') c⟫_ℂ) =ᵐ[volume]
-        fun c => (KB.dlB S (b + s - 1) 1 : ℂ)⁻¹ * (φ c / (S.sizeAt v a : ℂ)) := by
+    have hae
+        : (fun c => ⟪R.V (ptX s h x) c, R.V (ptX s h' x') c⟫_ℂ) =ᵐ[volume]
+          fun c => (KB.dlB S (b + s - 1) 1 : ℂ)⁻¹ * (φ c / (S.sizeAt v a : ℂ)) := by
       filter_upwards [ae_ne_zero] with c hc using hpt c hc
     have hφI : Integrable φ := integrable_of_decay hφc hCφ
     refine ⟨((hφI.div_const _).const_mul _).congr hae.symm, ?_⟩
@@ -136,28 +172,32 @@ def FibreGerm.toGermReal {S : C.HidaSetting E Wp Wq} {v : Fin S.f} {ε : ℝ} {b
     simp only
     rw [inner_self_eq_norm_sq_to_K]
     norm_cast
-  exact
-    { H := R.H
-      ut := utOf s R.V
-      bt := R.bt
-      β := R.β
-      ε' := R.ε'
-      hβ := R.hβ
-      hε' := R.hε'
-      hdl := dlB_ne_zero S hg1 hg2 b s
-      hpsi := R.hpsi
-      memU := fun h hh x hx => (memLp_cvec s (utOf s R.V h) x hx).2 (by rw [cvec_utOf s R.V h x hx]; exact memV h hh x hx)
-      gram := fun h hh h' hh' x x' hx hx' => by
-        rw [(key h hh h' hh' x x' hx hx').2]
-        simp only [gramL, Uc]
-        rw [cvec_utOf s R.V h x hx, cvec_utOf s R.V h' x' hx']
-      meas := R.meas
-      loc := R.loc
-      germ := R.germ
-      dens := R.dens }
+  exact {
+    H := R.H
+    ut := utOf s R.V
+    bt := R.bt
+    β := R.β
+    ε' := R.ε'
+    hβ := R.hβ
+    hε' := R.hε'
+    hdl := dlB_ne_zero S hg1 hg2 b s
+    hpsi := R.hpsi
+    memU := fun h hh x hx =>
+      (memLp_cvec s (utOf s R.V h) x hx).2 (by rw [cvec_utOf s R.V h x hx]; exact memV h hh x hx)
+    gram := fun h hh h' hh' x x' hx hx' => by
+      rw [(key h hh h' hh' x x' hx hx').2]
+      simp only [gramL, Uc]
+      rw [cvec_utOf s R.V h x hx, cvec_utOf s R.V h' x' hx']
+    meas := R.meas
+    loc := R.loc
+    germ := R.germ
+    dens := R.dens
+  }
 
-theorem germLoc_of_fibres {S : C.HidaSetting E Wp Wq} {v : Fin S.f} (hI : JC.ThmPIntPlace S v fun i => KB.dlB S i 1)
-    (hg1 : 0 < S.G.g1) (hg2 : 0 < S.G.g2) (hF : GermFibres S v) (hC : GermCont S v) : KB.GermLoc S v := by
+theorem germLoc_of_fibres
+    {S : C.HidaSetting E Wp Wq} {v : Fin S.f} (hI : JC.ThmPIntPlace S v fun i => KB.dlB S i 1)
+    (hg1 : 0 < S.G.g1) (hg2 : 0 < S.G.g2) (hF : GermFibres S v) (hC : GermCont S v)
+    : KB.GermLoc S v := by
   apply germLoc_of_realised _ hC
   intro ε hε b s hb hs hbs a ha Y hY
   obtain ⟨R⟩ := hF ε hε b s hb hs hbs a ha Y hY

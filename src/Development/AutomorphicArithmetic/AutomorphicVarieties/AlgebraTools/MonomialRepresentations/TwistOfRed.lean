@@ -7,28 +7,35 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial Matrix
 
-private theorem exists_char {K G A : Type} [Field K] [IsAlgClosed K] [Group G] [AddCommGroup A] [Module K A]
-    [FiniteDimensional K A] (σ : Representation K G A) (n : ℕ) (hn : (n : K) ≠ 0)
-    (hpow : ∀ g, σ g ^ n = 1) (hc : ∀ g h, Commute (σ g) (σ h)) (hne : ¬ ∀ g x, σ g x = x) :
-    ∃ η : G →* Kˣ, η ≠ 1 ∧ ∃ x : A, x ≠ 0 ∧ ∀ g, σ g x = (η g : K) • x := by
+private theorem exists_char
+    {K G A : Type}
+    [Field K] [IsAlgClosed K] [Group G] [AddCommGroup A] [Module K A] [FiniteDimensional K A]
+    (σ : Representation K G A) (n : ℕ) (hn : (n : K) ≠ 0) (hpow : ∀ g, σ g ^ n = 1)
+    (hc : ∀ g h, Commute (σ g) (σ h)) (hne : ¬ ∀ g x, σ g x = x)
+    : ∃ η : G →* Kˣ, η ≠ 1 ∧ ∃ x : A, x ≠ 0 ∧ ∀ g, σ g x = (η g : K) • x := by
   classical
   have hss : ∀ g, Module.End.IsSemisimple (σ g) := by
     intro g
-    refine Module.End.isSemisimple_of_squarefree_aeval_eq_zero
-      (p := X ^ n - C 1) (Polynomial.separable_X_pow_sub_C 1 hn one_ne_zero).squarefree ?_
+    refine Module.End.isSemisimple_of_squarefree_aeval_eq_zero (p := X ^ n - C 1)
+      (Polynomial.separable_X_pow_sub_C 1 hn one_ne_zero).squarefree ?_
     simp [hpow g]
-  have hall := Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute
-    (fun g => σ g) (fun i j _ => hc i j) (fun i => Module.End.iSup_maxGenEigenspace_eq_top (σ i))
+  have hall :=
+    Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute
+      (fun g => σ g)
+      (fun i j _ => hc i j)
+      (fun i => Module.End.iSup_maxGenEigenspace_eq_top (σ i))
   by_contra hno
   apply hne
-  have hle : ∀ χ : G → K, (⨅ i, Module.End.maxGenEigenspace (σ i) (χ i)) ≤
-      ⨅ i, Module.End.eigenspace (σ i) 1 := by
+  have hle
+      : ∀ χ : G → K,
+        (⨅ i, Module.End.maxGenEigenspace (σ i) (χ i)) ≤ ⨅ i, Module.End.eigenspace (σ i) 1 := by
     intro χ
     have hW : ∀ x ∈ ⨅ i, Module.End.maxGenEigenspace (σ i) (χ i), ∀ g, σ g x = χ g • x := by
       intro x hx g
       have h1 := (Submodule.mem_iInf _).1 hx g
       rw [(hss g).isFinitelySemisimple.maxGenEigenspace_eq_eigenspace,
-        Module.End.mem_eigenspace_iff] at h1
+          Module.End.mem_eigenspace_iff]
+        at h1
       exact h1
     by_cases hχ : ∀ g, χ g = 1
     · intro x hx
@@ -63,10 +70,11 @@ private theorem exists_char {K G A : Type} [Field K] [IsAlgClosed K] [Group G] [
           rfl
         rw [hW x hx] at h1
         exact smul_left_injective K hx0 (h1.trans (one_smul K x).symm)
-      let η : G →* Kˣ :=
-        { toFun := fun g => Units.mk0 (χ g) (hχ0 g)
-          map_one' := Units.ext h1'
-          map_mul' := fun a b => Units.ext (hmul a b) }
+      let η : G →* Kˣ := {
+        toFun := fun g => Units.mk0 (χ g) (hχ0 g)
+        map_one' := Units.ext h1'
+        map_mul' := fun a b => Units.ext (hmul a b)
+      }
       apply hno
       refine ⟨η, ?_, x, hx0, fun g => hW x hx g⟩
       intro hη
@@ -82,23 +90,29 @@ private theorem exists_char {K G A : Type} [Field K] [IsAlgClosed K] [Group G] [
   rw [Module.End.mem_eigenspace_iff, one_smul] at h4
   exact h4
 
-private theorem ker_cases {K G V : Type} [Field K] [Group G] [AddCommGroup V] [Module K V]
-    (ρ : Representation K G V) (hirr : ρ.IsIrreducible) (f : V →ₗ[K] V) (η : G →* Kˣ)
-    (hf : ∀ g v, ρ g (f v) = (η g : K) • f (ρ g v)) :
-    LinearMap.ker f = ⊥ ∨ LinearMap.ker f = ⊤ := by
-  let S : Subrepresentation ρ := ⟨LinearMap.ker f, by
-    intro g v hv
-    have h := hf g v
-    rw [LinearMap.mem_ker] at hv ⊢
-    rw [hv, map_zero] at h
-    exact (smul_eq_zero.mp h.symm).resolve_left (η g).ne_zero⟩
+private theorem ker_cases
+    {K G V : Type} [Field K] [Group G] [AddCommGroup V] [Module K V]
+    (ρ : Representation K G V) (hirr : ρ.IsIrreducible)
+    (f : V →ₗ[K] V) (η : G →* Kˣ) (hf : ∀ g v, ρ g (f v) = (η g : K) • f (ρ g v))
+    : LinearMap.ker f = ⊥ ∨ LinearMap.ker f = ⊤ := by
+  let S : Subrepresentation ρ := ⟨
+    LinearMap.ker f,
+    by
+      intro g v hv
+      have h := hf g v
+      rw [LinearMap.mem_ker] at hv ⊢
+      rw [hv, map_zero] at h
+      exact (smul_eq_zero.mp h.symm).resolve_left (η g).ne_zero
+  ⟩
   rcases hirr.eq_bot_or_eq_top S with h | h
   · left; exact congrArg Subrepresentation.toSubmodule h
   · right; exact congrArg Subrepresentation.toSubmodule h
 
-private theorem exists_proj {K H V : Type} [Field K] [Group H] [AddCommGroup V] [Module K V] [Nontrivial V]
-    (τ : Representation K H V) (hs : τ.IsSemisimpleRepresentation) (hn : ¬ τ.IsIrreducible) :
-    ∃ p : V →ₗ[K] V, (∀ g v, τ g (p v) = p (τ g v)) ∧ LinearMap.ker p ≠ ⊥ ∧ LinearMap.ker p ≠ ⊤ := by
+private theorem exists_proj
+    {K H V : Type} [Field K] [Group H] [AddCommGroup V] [Module K V] [Nontrivial V]
+    (τ : Representation K H V) (hs : τ.IsSemisimpleRepresentation) (hn : ¬τ.IsIrreducible)
+    : ∃ p : V →ₗ[K] V,
+      (∀ g v, τ g (p v) = p (τ g v)) ∧ LinearMap.ker p ≠ ⊥ ∧ LinearMap.ker p ≠ ⊤ := by
   classical
   haveI : ComplementedLattice (Subrepresentation τ) := hs
   have hnt : (⊥ : Subrepresentation τ) ≠ ⊤ := by
@@ -110,8 +124,10 @@ private theorem exists_proj {K H V : Type} [Field K] [Group H] [AddCommGroup V] 
   obtain ⟨W, hW0, hW1⟩ : ∃ W : Subrepresentation τ, W ≠ ⊥ ∧ W ≠ ⊤ := by
     by_contra hW
     push_neg at hW
-    exact hn { exists_pair_ne := ⟨⊥, ⊤, hnt⟩
-               eq_bot_or_eq_top := fun W => (em (W = ⊥)).imp_right (hW W) }
+    exact hn {
+      exists_pair_ne := ⟨⊥, ⊤, hnt⟩
+      eq_bot_or_eq_top := fun W => (em (W = ⊥)).imp_right (hW W)
+    }
   obtain ⟨W', hWW'⟩ := exists_isCompl W
   have hc : IsCompl W'.toSubmodule W.toSubmodule := by
     constructor
@@ -144,11 +160,14 @@ private theorem exists_proj {K H V : Type} [Field K] [Group H] [AddCommGroup V] 
     intro h
     exact hW1 (Subrepresentation.toSubmodule_injective h)
 
-theorem UpperTheory.V.AlgebraTools.twistOfRed :
-    ∀ (K G V : Type) [Field K] [IsAlgClosed K] [Group G] [AddCommGroup V] [Module K V] [FiniteDimensional K V] (ρ : Representation K G V)
-      (N : Subgroup G) [N.Normal] [N.FiniteIndex], (N.index : K) ≠ 0 → commutator G ≤ N → ρ.IsIrreducible →
-      ¬ Representation.IsIrreducible (ρ.comp N.subtype) →
-      ∃ η : G →* Kˣ, η ≠ 1 ∧ N ≤ η.ker ∧ ∃ e : V ≃ₗ[K] V, ∀ g v, ρ g (e v) = (η g : K) • e (ρ g v) := by
+theorem UpperTheory.V.AlgebraTools.twistOfRed
+    : ∀ (K G V : Type) [Field K] [IsAlgClosed K] [Group G] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] (ρ : Representation K G V) (N : Subgroup G) [N.Normal]
+        [N.FiniteIndex],
+      (N.index : K) ≠ 0 → commutator G ≤ N → ρ.IsIrreducible
+        → ¬ Representation.IsIrreducible (ρ.comp N.subtype)
+        → ∃ η : G →* Kˣ,
+          η ≠ 1 ∧ N ≤ η.ker ∧ ∃ e : V ≃ₗ[K] V, ∀ g v, ρ g (e v) = (η g : K) • e (ρ g v) := by
   intro K G V _ _ _ _ _ _ ρ N _ _ hidx hcomm hirr hnot
   classical
   have hρ : ∀ a b w, ρ a (ρ b w) = ρ (a * b) w := by
@@ -171,27 +190,27 @@ theorem UpperTheory.V.AlgebraTools.twistOfRed :
       exact Submodule.zero_mem _
   obtain ⟨p, hp, hp0, hp1⟩ :=
     exists_proj (ρ.comp N.subtype) (UpperTheory.V.AlgebraTools.clifford K G V ρ N hirr) hnot
-  let A : Submodule K (Module.End K V) :=
-    { carrier := {f | ∀ m ∈ N, ∀ v, ρ m (f v) = f (ρ m v)}
-      add_mem' := by
-        intro f g hf hg m hm v
-        simp [hf m hm v, hg m hm v]
-      zero_mem' := by
-        intro m hm v
-        simp
-      smul_mem' := by
-        intro c f hf m hm v
-        simp [hf m hm v] }
+  let A : Submodule K (Module.End K V) := {
+    carrier := {f | ∀ m ∈ N, ∀ v, ρ m (f v) = f (ρ m v)}
+    add_mem' := by
+      intro f g hf hg m hm v
+      simp [hf m hm v, hg m hm v]
+    zero_mem' := by
+      intro m hm v
+      simp
+    smul_mem' := by
+      intro c f hf m hm v
+      simp [hf m hm v]
+  }
   have hA : ∀ f, f ∈ A → ∀ m ∈ N, ∀ v, ρ m (f v) = f (ρ m v) := fun f hf => hf
   have hpA : p ∈ A := fun m hm v => hp ⟨m, hm⟩ v
-  let c : G → Module.End K V →ₗ[K] Module.End K V :=
-    fun g => LinearMap.mulLeft K (ρ g) ∘ₗ LinearMap.mulRight K (ρ g⁻¹)
+  let c : G → Module.End K V →ₗ[K] Module.End K V := fun g =>
+    LinearMap.mulLeft K (ρ g) ∘ₗ LinearMap.mulRight K (ρ g⁻¹)
   have hc_apply : ∀ g f v, c g f v = ρ g (f (ρ g⁻¹ v)) := fun g f v => rfl
   have hconj : ∀ g, ∀ f ∈ A, c g f ∈ A := by
     intro g f hf m hm v
     rw [hc_apply, hc_apply]
-    have hn' : g⁻¹ * m * g ∈ N := by
-      simpa using Subgroup.Normal.conj_mem' ‹N.Normal› m hm g
+    have hn' : g⁻¹ * m * g ∈ N := by simpa using Subgroup.Normal.conj_mem' ‹N.Normal› m hm g
     have e1 : ∀ w, ρ m (ρ g w) = ρ g (ρ (g⁻¹ * m * g) w) := by
       intro w
       rw [hρ, hρ]
@@ -203,17 +222,18 @@ theorem UpperTheory.V.AlgebraTools.twistOfRed :
       congr 2
       group
     rw [e1, e2, hA f hf _ hn']
-  let σ : Representation K G A :=
-    { toFun := fun g => (c g).restrict (hconj g)
-      map_one' := by
-        refine LinearMap.ext fun f => Subtype.ext (LinearMap.ext fun v => ?_)
-        show ρ 1 (f.1 (ρ 1⁻¹ v)) = f.1 v
-        rw [inv_one, hρ1, hρ1]
-      map_mul' := by
-        intro a b
-        refine LinearMap.ext fun f => Subtype.ext (LinearMap.ext fun v => ?_)
-        show ρ (a * b) (f.1 (ρ (a * b)⁻¹ v)) = ρ a (ρ b (f.1 (ρ b⁻¹ (ρ a⁻¹ v))))
-        rw [hρ, hρ, _root_.mul_inv_rev] }
+  let σ : Representation K G A := {
+    toFun := fun g => (c g).restrict (hconj g)
+    map_one' := by
+      refine LinearMap.ext fun f => Subtype.ext (LinearMap.ext fun v => ?_)
+      show ρ 1 (f.1 (ρ 1⁻¹ v)) = f.1 v
+      rw [inv_one, hρ1, hρ1]
+    map_mul' := by
+      intro a b
+      refine LinearMap.ext fun f => Subtype.ext (LinearMap.ext fun v => ?_)
+      show ρ (a * b) (f.1 (ρ (a * b)⁻¹ v)) = ρ a (ρ b (f.1 (ρ b⁻¹ (ρ a⁻¹ v))))
+      rw [hρ, hρ, _root_.mul_inv_rev]
+  }
   have hσN : ∀ m ∈ N, σ m = 1 := by
     intro m hm
     refine LinearMap.ext fun f => Subtype.ext (LinearMap.ext fun v => ?_)
@@ -224,11 +244,11 @@ theorem UpperTheory.V.AlgebraTools.twistOfRed :
     rw [← map_pow, hσN _ (Subgroup.pow_index_mem N g)]
   have hcσ : ∀ g h, Commute (σ g) (σ h) := by
     intro g h
-    have hk : g⁻¹ * h⁻¹ * g⁻¹⁻¹ * h⁻¹⁻¹ ∈ N := hcomm (by
-      rw [commutator_def, ← commutatorElement_def]
-      exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _))
-    have e : g * h = h * g * (g⁻¹ * h⁻¹ * g⁻¹⁻¹ * h⁻¹⁻¹) := by
-      group
+    have hk : g⁻¹ * h⁻¹ * g⁻¹⁻¹ * h⁻¹⁻¹ ∈ N :=
+      hcomm (by
+        rw [commutator_def, ← commutatorElement_def]
+        exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _))
+    have e : g * h = h * g * (g⁻¹ * h⁻¹ * g⁻¹⁻¹ * h⁻¹⁻¹) := by group
     show σ g * σ h = σ h * σ g
     rw [← map_mul, ← map_mul, e, map_mul, hσN _ hk, mul_one]
   have hne : ¬ ∀ g x, σ g x = x := by
@@ -248,8 +268,7 @@ theorem UpperTheory.V.AlgebraTools.twistOfRed :
     rw [MonoidHom.mem_ker]
     have h1 := hx m
     rw [hσN m hm] at h1
-    have h2 : (η m : K) = 1 :=
-      smul_left_injective K hx0 (h1.symm.trans (one_smul K x).symm)
+    have h2 : (η m : K) = 1 := smul_left_injective K hx0 (h1.symm.trans (one_smul K x).symm)
     exact Units.ext h2
   have hfx : ∀ g v, ρ g (x.1 v) = (η g : K) • x.1 (ρ g v) := by
     intro g v

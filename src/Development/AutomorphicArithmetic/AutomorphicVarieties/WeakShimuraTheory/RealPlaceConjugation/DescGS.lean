@@ -5,12 +5,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Two
 open scoped Classical
 
-private theorem continuous_of_right_invariant_open_subgroup {Γ X : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
-    [TopologicalSpace X] (H : Subgroup Γ) (hH : IsOpen (H : Set Γ)) (f : Γ → X)
-    (hf : ∀ g, ∀ h ∈ H, f (g * h) = f g) : Continuous f := by
+private theorem continuous_of_right_invariant_open_subgroup
+    {Γ X : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [TopologicalSpace X]
+    (H : Subgroup Γ) (hH : IsOpen (H : Set Γ))
+    (f : Γ → X) (hf : ∀ g, ∀ h ∈ H, f (g * h) = f g)
+    : Continuous f := by
   refine continuous_iff_continuousAt.2 fun g => ?_
   have ht : Filter.Tendsto (fun x => g⁻¹ * x) (nhds g) (nhds 1) := by
     have := (continuous_const_mul g⁻¹).tendsto g
@@ -21,11 +25,21 @@ private theorem continuous_of_right_invariant_open_subgroup {Γ X : Type*} [Grou
     simpa using this
   exact tendsto_const_nhds.congr' (hev.mono fun x hx => hx.symm)
 
-theorem UpperTheory.V.Ws.exists_descent_to_galoisGroupUnramifiedOutside :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] (S : Finset (HeightOneSpectrum (𝓞 F))) (ρ : Representation R (G F Ω) M) (K : Subgroup (G F Ω)) (N : ℕ), (∀ v, v ∈ plDvd F N → v ∈ S) → (∀ σ ∈ ineOff F Ω N, ∀ m, ρ σ m = m) → IsOpen (K : Set (G F Ω)) → (∀ σ ∈ K, ∀ m, ρ σ m = m) → ∃ ρS : Representation R (GS Ω (S : Set (HeightOneSpectrum (𝓞 F)))) M, (∀ g m, ρS (toGS Ω _ g) m = ρ g m) ∧ ContAction ρS ∧ ∀ z ∈ cocOff ρ (ineOff F Ω N), ∃ y ∈ Z1 ρS, ∀ g, y (toGS Ω _ g) = z g := by
+theorem UpperTheory.V.Ws.exists_descent_to_galoisGroupUnramifiedOutside
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [Finite M] [TopologicalSpace M]
+        [DiscreteTopology M] (S : Finset (HeightOneSpectrum (𝓞 F))) (ρ : Representation R (G F Ω) M)
+        (K : Subgroup (G F Ω)) (N : ℕ),
+      (∀ v, v ∈ plDvd F N → v ∈ S) → (∀ σ ∈ ineOff F Ω N, ∀ m, ρ σ m = m) → IsOpen (K : Set (G F Ω))
+        → (∀ σ ∈ K, ∀ m, ρ σ m = m)
+        → ∃ ρS : Representation R (GS Ω (S : Set (HeightOneSpectrum (𝓞 F)))) M,
+          (∀ g m, ρS (toGS Ω _ g) m = ρ g m) ∧ ContAction ρS
+            ∧ ∀ z ∈ cocOff ρ (ineOff F Ω N), ∃ y ∈ Z1 ρS, ∀ g, y (toGS Ω _ g) = z g := by
   intro F Ω _ _ _ _ _ R M _ _ _ _ _ _ S ρ K N hS hine hK hKρ
-  have hN : ∀ v : HeightOneSpectrum (𝓞 F), v ∉ (S : Set (HeightOneSpectrum (𝓞 F))) →
-      ∀ A : ValuationSubring Ω, IsPlaceOver A v → ∀ σ ∈ Inertia A, σ ∈ ineOff F Ω N := by
+  have hN
+      : ∀ v : HeightOneSpectrum (𝓞 F),
+        v ∉ (S : Set (HeightOneSpectrum (𝓞 F)))
+          → ∀ A : ValuationSubring Ω, IsPlaceOver A v → ∀ σ ∈ Inertia A, σ ∈ ineOff F Ω N := by
     intro v hv A hA σ hσ
     refine ⟨A, ?_, hσ⟩
     intro hlt
@@ -76,19 +90,20 @@ theorem UpperTheory.V.Ws.exists_descent_to_galoisGroupUnramifiedOutside :
       have := hzc 1 1
       simp only [mul_one, map_one, Module.End.one_apply] at this
       simpa using this
-    let φ : G F Ω →* Function.End M :=
-      { toFun := fun g m => ρ g m + z g
-        map_one' := by
-          funext m
-          show ρ 1 m + z 1 = m
-          rw [hz1, map_one]
-          simp
-        map_mul' := by
-          intro g h
-          funext m
-          show ρ (g * h) m + z (g * h) = ρ g (ρ h m + z h) + z g
-          rw [hzc, map_mul, Module.End.mul_apply, map_add (f := _)]
-          abel }
+    let φ : G F Ω →* Function.End M := {
+      toFun := fun g m => ρ g m + z g
+      map_one' := by
+        funext m
+        show ρ 1 m + z 1 = m
+        rw [hz1, map_one]
+        simp
+      map_mul' := by
+        intro g h
+        funext m
+        show ρ (g * h) m + z (g * h) = ρ g (ρ h m + z h) + z g
+        rw [hzc, map_mul, Module.End.mul_apply, map_add (f := _)]
+        abel
+    }
     have hkerφ : ∀ g, g ∈ φ.ker ↔ z g = 0 ∧ ∀ m, ρ g m = m := by
       intro g
       rw [MonoidHom.mem_ker]
@@ -104,8 +119,7 @@ theorem UpperTheory.V.Ws.exists_descent_to_galoisGroupUnramifiedOutside :
         rw [h0, h1, add_zero]
     have hopen : IsOpen (φ.ker : Set (G F Ω)) := by
       apply Subgroup.isOpen_of_mem_nhds (g := 1)
-      have hU : z ⁻¹' {0} ∈ nhds (1 : G F Ω) :=
-        (hzlc.isOpen_fiber 0).mem_nhds (by simpa using hz1)
+      have hU : z ⁻¹' {0} ∈ nhds (1 : G F Ω) := (hzlc.isOpen_fiber 0).mem_nhds (by simpa using hz1)
       apply Filter.mem_of_superset (Filter.inter_mem (hK.mem_nhds K.one_mem) hU)
       rintro σ ⟨hσK, hσz⟩
       exact (hkerφ σ).2 ⟨hσz, hKρ σ hσK⟩

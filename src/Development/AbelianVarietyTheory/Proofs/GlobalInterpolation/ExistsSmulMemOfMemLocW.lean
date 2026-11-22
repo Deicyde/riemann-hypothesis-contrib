@@ -12,13 +12,18 @@ noncomputable section
 namespace GlobalTheory.LvT
 
 open Formalism.BasicNotions Classical NumberField
-open Formalism.MainNotions.product_first_zeroth_parts (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
+open Formalism.MainNotions.product_first_zeroth_parts
+  (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
 
-theorem exists_smul_mem_of_mem_locW (D : D7) (w : D.what₂.places.Pl) {V : Type} [AddCommGroup V] [Module D.what₂.LL V]
-    [Module (𝓞 D.what₂.LL) V] [IsScalarTower (𝓞 D.what₂.LL) D.what₂.LL V] (L : Submodule (𝓞 D.what₂.LL) V) {x : V}
-    (hx : x ∈ locW D.what₂.places w L) : ∃ d : 𝓞 D.what₂.LL, d ∉ (D.plEq w).asIdeal ∧ d • x ∈ L := by
-  have h1 : (1 : 𝓞 D.what₂.LL) ∉ (D.plEq w).asIdeal :=
-    fun h => (D.plEq w).isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h)
+theorem exists_smul_mem_of_mem_locW
+    (D : D7) (w : D.what₂.places.Pl)
+    {V : Type} [AddCommGroup V] [Module D.what₂.LL V] [Module (𝓞 D.what₂.LL) V]
+    [IsScalarTower (𝓞 D.what₂.LL) D.what₂.LL V]
+    (L : Submodule (𝓞 D.what₂.LL) V)
+    {x : V} (hx : x ∈ locW D.what₂.places w L)
+    : ∃ d : 𝓞 D.what₂.LL, d ∉ (D.plEq w).asIdeal ∧ d • x ∈ L := by
+  have h1 : (1 : 𝓞 D.what₂.LL) ∉ (D.plEq w).asIdeal := fun h =>
+    (D.plEq w).isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h)
   unfold locW at hx
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, h1, by simpa using hy⟩
@@ -37,14 +42,21 @@ theorem exists_smul_mem_of_mem_locW (D : D7) (w : D.what₂.places.Pl) {V : Type
     obtain ⟨n, e, hne⟩ := (D.plEq w).exists_primeCompl_mul_eq_of_integer (r : D.what₂.LL) hr
     refine ⟨d * e, fun h => ((D.plEq w).isPrime.mem_or_mem h).elim hd e.2, ?_⟩
     have : (d * (e : 𝓞 D.what₂.LL)) • r • y = n • d • y := by
-      rw [Subring.smul_def, ← algebraMap_smul D.what₂.LL (d * (e : 𝓞 D.what₂.LL)), ← algebraMap_smul D.what₂.LL n,
-        ← algebraMap_smul D.what₂.LL d y, smul_smul, smul_smul, ← hne, map_mul]
-      congr 1; ring
-    rw [this]; exact L.smul_mem _ hy
+      rw [Subring.smul_def, ← algebraMap_smul D.what₂.LL (d * (e : 𝓞 D.what₂.LL)),
+        ← algebraMap_smul D.what₂.LL n, ← algebraMap_smul D.what₂.LL d y, smul_smul, smul_smul,
+        ← hne, map_mul]
+      congr 1
+      ring
+    rw [this]
+    exact L.smul_mem _ hy
 
-theorem mem_of_forall_locW (D : D7) {V : Type} [AddCommGroup V] [Module D.what₂.LL V]
-    [Module (𝓞 D.what₂.LL) V] [IsScalarTower (𝓞 D.what₂.LL) D.what₂.LL V] (L : Submodule (𝓞 D.what₂.LL) V) {x : V}
-    (hx : ∀ w, x ∈ locW D.what₂.places w L) : x ∈ L := by
+theorem mem_of_forall_locW
+    (D : D7)
+    {V : Type} [AddCommGroup V] [Module D.what₂.LL V] [Module (𝓞 D.what₂.LL) V]
+    [IsScalarTower (𝓞 D.what₂.LL) D.what₂.LL V]
+    (L : Submodule (𝓞 D.what₂.LL) V)
+    {x : V} (hx : ∀ w, x ∈ locW D.what₂.places w L)
+    : x ∈ L := by
   let I : Ideal (𝓞 D.what₂.LL) := L.comap (LinearMap.toSpanSingleton (𝓞 D.what₂.LL) V x)
   have hI : I = ⊤ := by
     by_contra hne

@@ -10,7 +10,11 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.DIV GlobalTheory.ExpFrame Formalism.CohomologicalDescent.DepthNonnegative Formalism.CohomologicalDescent.LogSmallConstantBounds Formalism.CohomologicalDescent.ShortWeightBounds Formalism.CohomologicalDescent.LD Formalism.RankGapBounds.FormsTensorLocalization
+open NumberField IsDedekindDomain Formalism.L2.DIV GlobalTheory.ExpFrame
+  Formalism.CohomologicalDescent.DepthNonnegative
+  Formalism.CohomologicalDescent.LogSmallConstantBounds
+  Formalism.CohomologicalDescent.ShortWeightBounds Formalism.CohomologicalDescent.LD
+  Formalism.RankGapBounds.FormsTensorLocalization
 
 namespace GlobalTheory.OccBlock
 
@@ -22,11 +26,16 @@ variable {L V J : Type} [Field L] [DecidableEq L] [AddCommGroup V] [Module L V]
 
 def jointGen (T : J → End L V) (y : J → L) : Submodule L V := ⨅ j, (T j).maxGenEigenspace (y j)
 
-theorem mem_iSup_filter (T : J → End L V) (p : (J → L) → Submodule L V) (hp : ∀ y, p y ≤ jointGen T y) {θ : J → L} {f : V}
-    (hf : ∀ j, T j f = θ j • f) (Y : Finset (J → L)) (j : J) (hY : f ∈ ⨆ y ∈ Y, p y) :
-    f ∈ ⨆ y ∈ Y.filter (fun y => y j = θ j), p y := by
-  have hsplit : (⨆ y ∈ Y, p y) ≤ (⨆ y ∈ Y.filter (fun y => y j = θ j), p y) ⊔
-      (⨆ y ∈ Y.filter (fun y => y j ≠ θ j), p y) := by
+theorem mem_iSup_filter
+    (T : J → End L V) (p : (J → L) → Submodule L V) (hp : ∀ y, p y ≤ jointGen T y)
+    {θ : J → L} {f : V} (hf : ∀ j, T j f = θ j • f)
+    (Y : Finset (J → L))
+    (j : J) (hY : f ∈ ⨆ y ∈ Y, p y)
+    : f ∈ ⨆ y ∈ Y.filter (fun y => y j = θ j), p y := by
+  have hsplit
+      : (⨆ y ∈ Y, p y)
+        ≤ (⨆ y ∈ Y.filter (fun y => y j = θ j), p y)
+          ⊔ (⨆ y ∈ Y.filter (fun y => y j ≠ θ j), p y) := by
     refine iSup₂_le fun y hy => ?_
     by_cases h : y j = θ j
     · exact le_sup_of_le_left (le_biSup p (Finset.mem_filter.2 ⟨hy, h⟩))
@@ -35,14 +44,23 @@ theorem mem_iSup_filter (T : J → End L V) (p : (J → L) → Submodule L V) (h
   have hA : (⨆ y ∈ Y.filter (fun y => y j = θ j), p y) ≤ (T j).maxGenEigenspace (θ j) := by
     refine iSup₂_le fun y hy => ?_
     have hyj := (Finset.mem_filter.1 hy).2
-    calc p y ≤ jointGen T y := hp y
+    calc
+      p y
+        ≤ jointGen T y := hp y
       _ ≤ (T j).maxGenEigenspace (y j) := iInf_le (fun j => (T j).maxGenEigenspace (y j)) j
       _ = (T j).maxGenEigenspace (θ j) := by rw [hyj]
-  have hB : (⨆ y ∈ Y.filter (fun y => y j ≠ θ j), p y) ≤ ⨆ (μ : L) (_ : μ ≠ θ j), (T j).maxGenEigenspace μ := by
+  have hB
+      : (⨆ y ∈ Y.filter (fun y => y j ≠ θ j), p y)
+        ≤ ⨆ (μ : L) (_ : μ ≠ θ j), (T j).maxGenEigenspace μ := by
     refine iSup₂_le fun y hy => ?_
-    calc p y ≤ jointGen T y := hp y
+    calc
+      p y
+        ≤ jointGen T y := hp y
       _ ≤ (T j).maxGenEigenspace (y j) := iInf_le (fun j => (T j).maxGenEigenspace (y j)) j
-      _ ≤ _ := le_biSup (fun μ => (T j).maxGenEigenspace μ) (show y j ∈ {μ | μ ≠ θ j} from (Finset.mem_filter.1 hy).2)
+      _ ≤ _ :=
+        le_biSup
+          (fun μ => (T j).maxGenEigenspace μ)
+          (show y j ∈ {μ | μ ≠ θ j} from (Finset.mem_filter.1 hy).2)
   have hfθ : f ∈ (T j).maxGenEigenspace (θ j) := by
     rw [mem_maxGenEigenspace]
     exact ⟨1, by simp [hf j]⟩
@@ -51,12 +69,16 @@ theorem mem_iSup_filter (T : J → End L V) (p : (J → L) → Submodule L V) (h
       have hbe : b = f - a := by rw [← hab]; abel
       rw [hbe]
       exact Submodule.sub_mem _ hfθ (hA ha)
-    exact (Submodule.disjoint_def.1 ((Module.End.independent_maxGenEigenspace (T j)) (θ j))) b hb1 (hB hb)
+    exact (Submodule.disjoint_def.1 ((Module.End.independent_maxGenEigenspace (T j)) (θ j))) b hb1
+      (hB hb)
   rw [← hab, hb0, add_zero]
   exact ha
 
-theorem mem_of_mem_iSup_finset (T : J → End L V) (p : (J → L) → Submodule L V) (hp : ∀ y, p y ≤ jointGen T y)
-    {θ : J → L} {f : V} (hf : ∀ j, T j f = θ j • f) (Y : Finset (J → L)) (hY : f ∈ ⨆ y ∈ Y, p y) : f ∈ p θ := by
+theorem mem_of_mem_iSup_finset
+    (T : J → End L V) (p : (J → L) → Submodule L V) (hp : ∀ y, p y ≤ jointGen T y)
+    {θ : J → L} {f : V} (hf : ∀ j, T j f = θ j • f)
+    (Y : Finset (J → L)) (hY : f ∈ ⨆ y ∈ Y, p y)
+    : f ∈ p θ := by
   induction Y using Finset.strongInduction with
   | H Y ih =>
     by_cases h : ∃ y ∈ Y, y ≠ θ
@@ -70,7 +92,8 @@ end Gen
 
 section Read
 
-variable {l : ℕ} [Fact l.Prime] {ι : Type} [DecidableEq ι] {N : ℕ} (F : Frame l ι N) (lam : ι → ℕ → ℕ)
+variable
+  {l : ℕ} [Fact l.Prime] {ι : Type} [DecidableEq ι] {N : ℕ} (F : Frame l ι N) (lam : ι → ℕ → ℕ)
 
 def heckeQ (i : F.I) : End (PadicAlgCl l) (F.G → NablaT (PadicAlgCl l) N lam) where
   toFun h g := F.emb (F.cst i) • ∑ s ∈ F.tr i, h (g * s)
@@ -83,12 +106,16 @@ def heckeQ (i : F.I) : End (PadicAlgCl l) (F.G → NablaT (PadicAlgCl l) N lam) 
     refine Finset.sum_congr rfl fun s _ => ?_
     rw [smul_smul, smul_smul, mul_comm]
 
-variable {F lam} {K : Type} [Field K] [NumberField K] [StarRing K] {G0 : Type} [Group G0] [Fintype G0] {Pl0 : Type}
-  {B : BlockDat K G0 Pl0} {w : HeightOneSpectrum (𝓞 K)}
+variable
+  {F lam} {K : Type} [Field K] [NumberField K] [StarRing K]
+  {G0 : Type} [Group G0] [Fintype G0]
+  {Pl0 : Type} {B : BlockDat K G0 Pl0} {w : HeightOneSpectrum (𝓞 K)}
 
-theorem rd_pow (R : Reads F lam B w) (i : F.I) (a : K) (k : ℕ) (v : B.S.Forms) :
-    R.rd (((B.op (R.ix i) - a • (1 : End K B.S.Forms)) ^ k) v) =
-      ((heckeQ F lam i - R.e0 a • (1 : End (PadicAlgCl l) (F.G → NablaT (PadicAlgCl l) N lam))) ^ k) (R.rd v) := by
+theorem rd_pow (R : Reads F lam B w) (i : F.I) (a : K) (k : ℕ) (v : B.S.Forms)
+    : R.rd (((B.op (R.ix i) - a • (1 : End K B.S.Forms)) ^ k) v)
+      = ((heckeQ F lam i - R.e0 a • (1 : End (PadicAlgCl l) (F.G → NablaT (PadicAlgCl l) N lam)))
+          ^ k)
+        (R.rd v) := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -98,10 +125,12 @@ theorem rd_pow (R : Reads F lam B w) (i : F.I) (a : K) (k : ℕ) (v : B.S.Forms)
 
 end Read
 
-theorem hasBlock_of_occurs : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (G0 : Type) [Group G0] [Fintype G0] (Pl0 : Type)
-    (B : BlockDat K G0 Pl0) (w : HeightOneSpectrum (𝓞 K)) (l : ℕ) [Fact l.Prime] (ι : Type) [DecidableEq ι] (N : ℕ) (F : Frame l ι N)
-    (lam : ι → ℕ → ℕ) (R : Reads F lam B w) (Z : Submodule K B.S.Forms), (∀ P, B.op (P, 0) = 1) →
-    Z ≤ B.ZH → ∀ θ, R.Occurs Z θ → R.HasBlock θ ∧ F.IsEig lam θ := by
+theorem hasBlock_of_occurs
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (G0 : Type) [Group G0] [Fintype G0]
+        (Pl0 : Type) (B : BlockDat K G0 Pl0) (w : HeightOneSpectrum (𝓞 K)) (l : ℕ) [Fact l.Prime]
+        (ι : Type) [DecidableEq ι] (N : ℕ) (F : Frame l ι N) (lam : ι → ℕ → ℕ) (R : Reads F lam B w)
+        (Z : Submodule K B.S.Forms),
+      (∀ P, B.op (P, 0) = 1) → Z ≤ B.ZH → ∀ θ, R.Occurs Z θ → R.HasBlock θ ∧ F.IsEig lam θ := by
   intro K _ _ _ G0 _ _ Pl0 B w l _ ι _ N F lam R Z hop hZ θ hocc
   obtain ⟨f, hfspan, hfe⟩ := hocc
   refine ⟨?_, ⟨f, hfe⟩⟩
@@ -120,9 +149,11 @@ theorem hasBlock_of_occurs : ∀ (K : Type) [Field K] [NumberField K] [StarRing 
     · rw [hv0, map_zero]
       exact Submodule.zero_mem _
     have hx1 : ∀ P, x (P, 0) = 1 := fun P =>
-      GlobalTheory.ExpFrame.eq_one_of_occurs (op := B.op) ((Submodule.ne_bot_iff _).2 ⟨v, hv, hv0⟩) (hop P)
+      GlobalTheory.ExpFrame.eq_one_of_occurs (op := B.op) ((Submodule.ne_bot_iff _).2 ⟨v, hv, hv0⟩)
+        (hop P)
     refine Submodule.mem_iSup_of_mem (fun i => R.e0 (x (R.ix i))) ?_
-    refine Submodule.mem_iSup_of_mem (show (fun i => R.e0 (x (R.ix i))) ∈ S from ⟨x, hx1, hx, fun i => rfl⟩) ?_
+    refine Submodule.mem_iSup_of_mem
+      (show (fun i => R.e0 (x (R.ix i))) ∈ S from ⟨x, hx1, hx, fun i => rfl⟩) ?_
     rw [jointGen, Submodule.mem_iInf]
     intro i
     have hv' := Formalism.L2.Col.eigAt_le B.op x (R.ix i) hv

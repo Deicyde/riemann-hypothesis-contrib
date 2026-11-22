@@ -15,8 +15,9 @@ open scoped MatrixGroups ModularForm
 
 namespace UpperTheory.V.Sd
 
-private theorem sum_div_split (g : ℕ → ℂ) (hg : ∀ a b, g (a * b) = g a * g b) {p : ℕ} (hp : p.Prime) (n : ℕ) (hn : 1 ≤ n) :
-    ∑ j ∈ (p * n).divisors with p ∣ j, g j = g p * ∑ j ∈ n.divisors, g j := by
+private theorem sum_div_split
+    (g : ℕ → ℂ) (hg : ∀ a b, g (a * b) = g a * g b) {p : ℕ} (hp : p.Prime) (n : ℕ) (hn : 1 ≤ n)
+    : ∑ j ∈ (p * n).divisors with p ∣ j, g j = g p * ∑ j ∈ n.divisors, g j := by
   have hp0 : 0 < p := hp.pos
   rw [Finset.mul_sum]
   simp_rw [← hg]
@@ -31,11 +32,13 @@ private theorem sum_div_split (g : ℕ → ℂ) (hg : ∀ a b, g (a * b) = g a *
   · rintro ⟨⟨hj, hpn⟩, ⟨b, rfl⟩⟩
     exact ⟨b, ⟨Nat.dvd_of_mul_dvd_mul_left hp0 hj, by omega⟩, rfl⟩
 
-private theorem sum_div_hecke (g : ℕ → ℂ) (hg : ∀ a b, g (a * b) = g a * g b) {p : ℕ} (hp : p.Prime) (n : ℕ) (hn : 1 ≤ n) :
-    ∑ j ∈ (p * n).divisors, g j + g p * (if p ∣ n then ∑ j ∈ (n / p).divisors, g j else 0) =
-      (1 + g p) * ∑ j ∈ n.divisors, g j := by
+private theorem sum_div_hecke
+    (g : ℕ → ℂ) (hg : ∀ a b, g (a * b) = g a * g b) {p : ℕ} (hp : p.Prime) (n : ℕ) (hn : 1 ≤ n)
+    : ∑ j ∈ (p * n).divisors, g j + g p * (if p ∣ n then ∑ j ∈ (n / p).divisors, g j else 0)
+      = (1 + g p) * ∑ j ∈ n.divisors, g j := by
   have hn0 : n ≠ 0 := by omega
-  rw [← Finset.sum_filter_add_sum_filter_not (p * n).divisors (fun j => p ∣ j), sum_div_split g hg hp n hn]
+  rw [← Finset.sum_filter_add_sum_filter_not (p * n).divisors (fun j => p ∣ j),
+    sum_div_split g hg hp n hn]
   have hB : ∑ j ∈ (p * n).divisors with ¬p ∣ j, g j = ∑ j ∈ n.divisors with ¬p ∣ j, g j := by
     congr 1
     ext j
@@ -46,8 +49,10 @@ private theorem sum_div_hecke (g : ℕ → ℂ) (hg : ∀ a b, g (a * b) = g a *
       exact ⟨⟨hc.dvd_of_dvd_mul_left hj, hn0⟩, hpj⟩
     · rintro ⟨⟨hj, _⟩, hpj⟩
       exact ⟨⟨Dvd.dvd.mul_left hj p, Nat.mul_ne_zero hp.ne_zero hn0⟩, hpj⟩
-  have hC : ∑ j ∈ n.divisors, g j = ∑ j ∈ n.divisors with ¬p ∣ j, g j +
-      (if p ∣ n then g p * ∑ j ∈ (n / p).divisors, g j else 0) := by
+  have hC
+      : ∑ j ∈ n.divisors, g j
+        = ∑ j ∈ n.divisors with ¬p ∣ j, g j
+          + (if p ∣ n then g p * ∑ j ∈ (n / p).divisors, g j else 0) := by
     rw [← Finset.sum_filter_add_sum_filter_not n.divisors (fun j => p ∣ j), add_comm]
     congr 1
     split_ifs with h
@@ -67,58 +72,72 @@ private theorem sum_div_hecke (g : ℕ → ℂ) (hg : ∀ a b, g (a * b) = g a *
   · linear_combination (-1 : ℂ) * hC
   · linear_combination (-1 : ℂ) * hC
 
-private theorem sig_hecke (k : ℕ) {N : ℕ} (χ : DirichletCharacter ℂ N) {p : ℕ} (hp : p.Prime) (n : ℕ) (hn : 1 ≤ n) :
-    sigChi k χ (p * n) + χ (p : ZMod N) * (p : ℂ) ^ (k - 1) * (if p ∣ n then sigChi k χ (n / p) else 0) =
-      (1 + χ (p : ZMod N) * (p : ℂ) ^ (k - 1)) * sigChi k χ n := by
-  have h := sum_div_hecke (fun j => χ (j : ZMod N) * (j : ℂ) ^ (k - 1))
-    (by intro a b; push_cast; rw [map_mul, mul_pow]; ring) hp n hn
+private theorem sig_hecke
+    (k : ℕ) {N : ℕ} (χ : DirichletCharacter ℂ N) {p : ℕ} (hp : p.Prime) (n : ℕ) (hn : 1 ≤ n)
+    : sigChi k χ (p * n)
+        + χ (p : ZMod N) * (p : ℂ) ^ (k - 1) * (if p ∣ n then sigChi k χ (n / p) else 0)
+      = (1 + χ (p : ZMod N) * (p : ℂ) ^ (k - 1)) * sigChi k χ n := by
+  have h :=
+    sum_div_hecke
+      (fun j => χ (j : ZMod N) * (j : ℂ) ^ (k - 1))
+      (by intro a b; push_cast; rw [map_mul, mul_pow]; ring) hp n hn
   simpa only [sigChi] using h
 
 section Int
 
 variable {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ)
 
-private theorem int_add {x y : ℂ} (hx : ‖ι.symm x‖ ≤ 1) (hy : ‖ι.symm y‖ ≤ 1) : ‖ι.symm (x + y)‖ ≤ 1 := by
+private theorem int_add {x y : ℂ} (hx : ‖ι.symm x‖ ≤ 1) (hy : ‖ι.symm y‖ ≤ 1)
+    : ‖ι.symm (x + y)‖ ≤ 1 := by
   rw [map_add (f := _)]
   exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hx hy)
 
-private theorem int_sub {x y : ℂ} (hx : ‖ι.symm x‖ ≤ 1) (hy : ‖ι.symm y‖ ≤ 1) : ‖ι.symm (x - y)‖ ≤ 1 := by
+private theorem int_sub {x y : ℂ} (hx : ‖ι.symm x‖ ≤ 1) (hy : ‖ι.symm y‖ ≤ 1)
+    : ‖ι.symm (x - y)‖ ≤ 1 := by
   rw [sub_eq_add_neg]
   exact int_add ι hx (by rwa [map_neg, norm_neg])
 
-private theorem int_mul {x y : ℂ} (hx : ‖ι.symm x‖ ≤ 1) (hy : ‖ι.symm y‖ ≤ 1) : ‖ι.symm (x * y)‖ ≤ 1 := by
+private theorem int_mul {x y : ℂ} (hx : ‖ι.symm x‖ ≤ 1) (hy : ‖ι.symm y‖ ≤ 1)
+    : ‖ι.symm (x * y)‖ ≤ 1 := by
   rw [map_mul, norm_mul]
   exact mul_le_one₀ hx (norm_nonneg _) hy
 
-private theorem small_mul {x y : ℂ} (hx : ‖ι.symm x‖ < 1) (hy : ‖ι.symm y‖ ≤ 1) : ‖ι.symm (x * y)‖ < 1 := by
+private theorem small_mul {x y : ℂ} (hx : ‖ι.symm x‖ < 1) (hy : ‖ι.symm y‖ ≤ 1)
+    : ‖ι.symm (x * y)‖ < 1 := by
   rw [map_mul, norm_mul]
   exact (mul_le_of_le_one_right (norm_nonneg _) hy).trans_lt hx
 
-private theorem int_chi {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (a : ZMod N) : ‖ι.symm (χ a)‖ ≤ 1 := by
+private theorem int_chi {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (a : ZMod N)
+    : ‖ι.symm (χ a)‖ ≤ 1 := by
   by_cases ha : IsUnit a
   · have hm : χ a ^ Fintype.card (ZMod N)ˣ = 1 := by
-      rw [← ha.unit_spec, ← map_pow, ← Units.val_pow_eq_pow_val, pow_card_eq_one, Units.val_one, map_one]
+      rw [← ha.unit_spec, ← map_pow, ← Units.val_pow_eq_pow_val, pow_card_eq_one, Units.val_one,
+        map_one]
     have h1 : ‖ι.symm (χ a)‖ ^ Fintype.card (ZMod N)ˣ = 1 := by
       rw [← norm_pow, ← map_pow, hm, map_one, norm_one]
     exact ((pow_eq_one_iff_of_nonneg (norm_nonneg _) Fintype.card_ne_zero).1 h1).le
   · rw [MulChar.map_nonunit χ ha, map_zero, norm_zero]
     exact zero_le_one
 
-private theorem int_term (k : ℕ) {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (j : ℕ) :
-    ‖ι.symm (χ (j : ZMod N) * (j : ℂ) ^ (k - 1))‖ ≤ 1 := by
+private theorem int_term (k : ℕ) {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (j : ℕ)
+    : ‖ι.symm (χ (j : ZMod N) * (j : ℂ) ^ (k - 1))‖ ≤ 1 := by
   refine int_mul ι (int_chi ι χ _) ?_
   rw [map_pow, map_natCast, norm_pow]
   exact pow_le_one₀ (norm_nonneg _) (IsUltrametricDist.norm_natCast_le_one _ j)
 
-private theorem int_sig (k : ℕ) {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (n : ℕ) :
-    ‖ι.symm (sigChi k χ n)‖ ≤ 1 := by
+private theorem int_sig (k : ℕ) {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (n : ℕ)
+    : ‖ι.symm (sigChi k χ n)‖ ≤ 1 := by
   unfold sigChi
-  exact Finset.sum_induction _ (fun x => ‖ι.symm x‖ ≤ 1) (fun a b ha hb => int_add ι ha hb)
-    (by simp) (fun j _ => int_term ι k χ j)
+  exact Finset.sum_induction _
+    (fun x => ‖ι.symm x‖ ≤ 1)
+    (fun a b ha hb => int_add ι ha hb)
+    (by simp)
+    (fun j _ => int_term ι k χ j)
 
 end Int
 
-private theorem chi_neg_one {l M w : ℕ} (hl : l.Prime) {φ θ χ} (h : EDat l M w φ θ χ) : χ (-1) = φ (-1) := by
+private theorem chi_neg_one {l M w : ℕ} (hl : l.Prime) {φ θ χ} (h : EDat l M w φ θ χ)
+    : χ (-1) = φ (-1) := by
   have hM := h.one_lt
   have hw := h.prime.pos
   have h1 : 1 ≤ M * w := Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (by omega) (by omega))
@@ -131,8 +150,7 @@ private theorem chi_neg_one {l M w : ℕ} (hl : l.Prime) {φ θ χ} (h : EDat l 
     rw [Nat.cast_sub h1, Nat.cast_mul, ZMod.natCast_self]; simp
   rw [e1, e2, e3] at key
   have hθ : θ (-1) = 1 := by
-    have hsq : θ (-1) ^ 2 = 1 := by
-      rw [← map_pow]; simp
+    have hsq : θ (-1) ^ 2 = 1 := by rw [← map_pow]; simp
     have hθl : θ (-1) ^ l = 1 := by
       rw [← MulChar.pow_apply' θ hl.ne_zero, h.θpow, MulChar.one_apply isUnit_one.neg]
     obtain ⟨m, hm⟩ := Nat.Prime.odd_of_ne_two hl h.odd
@@ -140,22 +158,24 @@ private theorem chi_neg_one {l M w : ℕ} (hl : l.Prime) {φ θ χ} (h : EDat l 
     exact hθl
   rw [key, hθ, mul_one]
 
-private theorem coef_comb {N k : ℕ} [NeZero N] (E G : ModularForm (Gamma1 N) (k : ℤ)) (c : ℂ) (n : ℕ) :
-    coef (E - c • G : ModularForm (Gamma1 N) (k : ℤ)) n = coef E n - c * coef G n := by
-  have h1 : (1 : ℝ) ∈ ((Gamma1 N : Subgroup SL(2, ℤ)) : Subgroup (GL (Fin 2) ℝ)).strictPeriods := by simp
+private theorem coef_comb
+    {N k : ℕ} [NeZero N] (E G : ModularForm (Gamma1 N) (k : ℤ)) (c : ℂ) (n : ℕ)
+    : coef (E - c • G : ModularForm (Gamma1 N) (k : ℤ)) n = coef E n - c * coef G n := by
+  have h1 : (1 : ℝ) ∈ ((Gamma1 N : Subgroup SL(2, ℤ)) : Subgroup (GL (Fin 2) ℝ)).strictPeriods := by
+    simp
   unfold coef
   rw [ModularForm.coe_sub, ModularForm.qExpansion_sub one_pos h1 E (c • G), ModularForm.coe_smul,
     ModularForm.qExpansion_smul one_pos h1 c G]
   simp
 
-private theorem slash_comb (k : ℕ) (E G : ℍ → ℂ) (c : ℂ) (γ : SL(2, ℤ)) :
-    (E - c • G) ∣[(k : ℤ)] γ = E ∣[(k : ℤ)] γ - c • G ∣[(k : ℤ)] γ := by
-  rw [sub_eq_add_neg, SlashAction.add_slash, SlashAction.neg_slash, ModularForm.SL_smul_slash, ← sub_eq_add_neg]
+private theorem slash_comb (k : ℕ) (E G : ℍ → ℂ) (c : ℂ) (γ : SL(2, ℤ))
+    : (E - c • G) ∣[(k : ℤ)] γ = E ∣[(k : ℤ)] γ - c • G ∣[(k : ℤ)] γ := by
+  rw [sub_eq_add_neg, SlashAction.add_slash, SlashAction.neg_slash, ModularForm.SL_smul_slash,
+    ← sub_eq_add_neg]
 
 end UpperTheory.V.Sd
 
-theorem UpperTheory.V.Sd.propE :
-    UpperTheory.V.Sd.PropE := by
+theorem UpperTheory.V.Sd.propE : UpperTheory.V.Sd.PropE := by
   intro l _ ι M w φ θ χ h
   have hl : l.Prime := Fact.out
   have hM := h.one_lt
@@ -181,11 +201,11 @@ theorem UpperTheory.V.Sd.propE :
   obtain ⟨E, hEc, hEv, hEn, hE0⟩ := eisChi (M * w) k (by omega) hk3 χ (ePrim l M w φ θ χ h) hχ
   have hc : ‖ι.symm (coef E 0)‖ < 1 := constSmall l ι M w φ θ χ h k (by omega) _ hE0
   set c := coef (⇑E) 0 with hc_def
-  have hF0 : coef (⇑(E - c • G)) 0 = 0 := by
-    rw [coef_comb, hG0, mul_one, sub_self]
+  have hF0 : coef (⇑(E - c • G)) 0 = 0 := by rw [coef_comb, hG0, mul_one, sub_self]
   have hFc : HasChar k χ ⇑(E - c • G) := by
     intro γ hγ
-    rw [ModularForm.coe_sub, ModularForm.coe_smul, slash_comb, hEc γ hγ, hGc γ hγ, smul_sub, smul_comm c]
+    rw [ModularForm.coe_sub, ModularForm.coe_smul, slash_comb, hEc γ hγ, hGc γ hγ, smul_sub,
+      smul_comm c]
   have hFv : VanOff (M * w) k ⇑(E - c • G) := by
     intro γ hγ
     rw [ModularForm.coe_sub, ModularForm.coe_smul, slash_comb]
@@ -210,29 +230,37 @@ theorem UpperTheory.V.Sd.propE :
     have hs1 : sigChi k χ 1 = 1 := by simp [sigChi]
     rw [hcf 1 le_rfl, hs1]
     refine le_antisymm (int_sub ι (by simp) hy.le) ?_
-    have hmax := IsUltrametricDist.norm_add_le_max (ι.symm (1 - c * coef (⇑G) 1)) (ι.symm (c * coef (⇑G) 1))
+    have hmax :=
+      IsUltrametricDist.norm_add_le_max (ι.symm (1 - c * coef (⇑G) 1)) (ι.symm (c * coef (⇑G) 1))
     rw [← map_add (f := _), sub_add_cancel, map_one, norm_one] at hmax
     rcases le_max_iff.1 hmax with h' | h'
     · exact h'
     · exact absurd h' (not_le.2 hy)
-  have hA : ∀ p : ℕ, p.Prime →
-      ‖ι.symm (1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1))‖ ≤ 1 ∧
-      ∀ n : ℕ, 1 ≤ n →
-        ‖ι.symm ((coef (⇑f) (p * n) + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1) *
-            (if p ∣ n then coef (⇑f) (n / p) else 0)) -
-          (1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1)) * coef (⇑f) n)‖ < 1 := by
+  have hA
+      : ∀ p : ℕ,
+        p.Prime
+          → ‖ι.symm (1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1))‖ ≤ 1
+            ∧ ∀ n : ℕ,
+              1 ≤ n
+                → ‖ι.symm ((coef (⇑f) (p * n) + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1) *
+                      (if p ∣ n then coef (⇑f) (n / p) else 0)) -
+                    (1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1)) * coef (⇑f) n)‖
+                  < 1 := by
     intro p hp
     have ha : ‖ι.symm (1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1))‖ ≤ 1 :=
       int_add ι (by simp) (int_term ι k χ p)
     refine ⟨ha, fun n hn => ?_⟩
     have hs := sig_hecke k χ hp n hn
     have hpn : 1 ≤ p * n := Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero hp.ne_zero (by omega))
-    have key : (coef (⇑f) (p * n) + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1) *
-            (if p ∣ n then coef (⇑f) (n / p) else 0)) -
-          (1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1)) * coef (⇑f) n =
-        -(c * ((coef (⇑G) (p * n) + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1) *
-            (if p ∣ n then coef (⇑G) (n / p) else 0)) -
-          (1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1)) * coef (⇑G) n)) := by
+    have key
+        : (coef (⇑f) (p * n)
+              + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1) * (if p ∣ n then coef (⇑f) (n / p) else 0))
+            - (1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1)) * coef (⇑f) n
+          = -(c
+            * ((coef (⇑G) (p * n)
+                + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1)
+                  * (if p ∣ n then coef (⇑G) (n / p) else 0))
+              - (1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1)) * coef (⇑G) n)) := by
       split_ifs at hs ⊢ with hd
       · have hnp : 1 ≤ n / p := Nat.div_pos (Nat.le_of_dvd (by omega) hd) hp.pos
         rw [hcf _ hpn, hcf _ hnp, hcf _ hn]
@@ -240,10 +268,13 @@ theorem UpperTheory.V.Sd.propE :
       · rw [hcf _ hpn, hcf _ hn]
         linear_combination hs
     rw [key, map_neg, norm_neg]
-    refine small_mul ι hc (int_sub ι (int_add ι (hGi _) (int_mul ι (int_term ι k χ p) ?_)) (int_mul ι ha (hGi n)))
+    refine small_mul ι hc
+      (int_sub ι (int_add ι (hGi _) (int_mul ι (int_term ι k χ p) ?_)) (int_mul ι ha (hGi n)))
     split_ifs
     · exact hGi _
     · simp
-  obtain ⟨g, hg⟩ := eigLift l ι (M * w) k (by omega) χ f hfc hInt hOne
-    (fun p => 1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1)) hA
+  obtain ⟨g, hg⟩ :=
+    eigLift l ι (M * w) k (by omega) χ f hfc hInt hOne
+      (fun p => 1 + χ (p : ZMod (M * w)) * (p : ℂ) ^ (k - 1))
+      hA
   exact ⟨g, hg⟩

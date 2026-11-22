@@ -6,12 +6,19 @@ public import Mathlib
 
 open Polynomial
 
-theorem UpperTheory.exists_eigenvector_of_root :
-    ∀ {L C D W : Type} [Field L] [Field C] [AddCommGroup D] [Module L D] [FiniteDimensional L D] [AddCommGroup W] [Module C W] [FiniteDimensional C W] (s : L →+* C) (j : D →+ W) (S : Module.End L D) (T : Module.End C W), (∀ (a : L) (x : D), j (a • x) = s a • j x) → Submodule.span C (Set.range j) = ⊤ → (∀ x, T (j x) = j (S x)) → ∀ (q : L[X]) (b : C), b ∈ T.charpoly.roots → q.eval₂ s b = 0 → ∃ x : D, x ≠ 0 ∧ aeval S q x = 0 := by
+theorem UpperTheory.exists_eigenvector_of_root
+    : ∀ {L C D W : Type} [Field L] [Field C] [AddCommGroup D] [Module L D] [FiniteDimensional L D]
+        [AddCommGroup W] [Module C W] [FiniteDimensional C W] (s : L →+* C) (j : D →+ W)
+        (S : Module.End L D) (T : Module.End C W),
+      (∀ (a : L) (x : D), j (a • x) = s a • j x) → Submodule.span C (Set.range j) = ⊤
+        → (∀ x, T (j x) = j (S x))
+        → ∀ (q : L[X]) (b : C),
+          b ∈ T.charpoly.roots → q.eval₂ s b = 0 → ∃ x : D, x ≠ 0 ∧ aeval S q x = 0 := by
   intro L C D W _ _ _ _ _ _ _ _ s j S T hj hspan hT q b hb hq
   by_contra hcon
   have hinj : Function.Injective (aeval S q) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra h0
     exact hcon ⟨x, h0, hx⟩

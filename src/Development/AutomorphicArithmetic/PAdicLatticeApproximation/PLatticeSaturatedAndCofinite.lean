@@ -6,15 +6,19 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 @[expose] public section
 
 open NumberField
-open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
+open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes
+  GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
 open scoped TensorProduct
 
 private lemma exists_nsmul_mem_closure {V : Type*} [AddCommGroup V] [Module ℚ V] (s : Set V) (w : V)
     (hw : w ∈ Submodule.span ℚ s) : ∃ k : ℕ, 0 < k ∧ k • w ∈ AddSubgroup.closure s :=
   _root_.UpperTheory.Reformulated.B.ExistsNsmulMemClosure.exists_nsmul_mem_closure s w hw
 
-theorem UpperTheory.p_lattice_saturated_and_cofinite :
-    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (M : AddSubgroup (VQ D)), UpperTheory.Gal.W2.IsPLat D M → (∀ (m : ℕ) (w : VQ D), m.Coprime p → m • w ∈ M → w ∈ M) ∧ ∀ w : VQ D, ∃ r : ℕ, p ^ r • w ∈ M := by
+theorem UpperTheory.p_lattice_saturated_and_cofinite
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (M : AddSubgroup (VQ D)),
+      UpperTheory.Gal.W2.IsPLat D M
+        → (∀ (m : ℕ) (w : VQ D), m.Coprime p → m • w ∈ M → w ∈ M)
+          ∧ ∀ w : VQ D, ∃ r : ℕ, p ^ r • w ∈ M := by
   intro p hp D M hM
   obtain ⟨-, s, hs, hmem⟩ := hM
   have hprime : p.Prime := hp.out

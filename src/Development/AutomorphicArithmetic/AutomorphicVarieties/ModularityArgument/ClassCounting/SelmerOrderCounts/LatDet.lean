@@ -6,8 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.ZK.Ct
 
-theorem UpperTheory.V.ZK.Ct.latDet :
-    ∀ (E V : Type) [AddCommGroup E] [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V] (lam : E →ₗ[ℤ] V) (δ : Module.End ℤ E) (δV : V →ₗ[ℝ] V), (∀ x, lam (δ x) = δV (lam x)) → LinearMap.ker lam = Submodule.torsion ℤ E → DiscreteTopology (LinearMap.range lam) → Submodule.span ℝ (LinearMap.range lam : Set V) = ⊤ → LinearMap.det δV ≠ 0 → Finite (E ⧸ (LinearMap.range δ ⊔ Submodule.torsion ℤ E)) ∧ (Nat.card (E ⧸ (LinearMap.range δ ⊔ Submodule.torsion ℤ E)) : ℝ) = |LinearMap.det δV| := by
+theorem UpperTheory.V.ZK.Ct.latDet
+    : ∀ (E V : Type) [AddCommGroup E] [NormedAddCommGroup V] [NormedSpace ℝ V]
+        [FiniteDimensional ℝ V] (lam : E →ₗ[ℤ] V) (δ : Module.End ℤ E) (δV : V →ₗ[ℝ] V),
+      (∀ x, lam (δ x) = δV (lam x)) → LinearMap.ker lam = Submodule.torsion ℤ E
+        → DiscreteTopology (LinearMap.range lam)
+        → Submodule.span ℝ (LinearMap.range lam : Set V) = ⊤ → LinearMap.det δV ≠ 0
+        → Finite (E ⧸ (LinearMap.range δ ⊔ Submodule.torsion ℤ E))
+          ∧ (Nat.card (E ⧸ (LinearMap.range δ ⊔ Submodule.torsion ℤ E)) : ℝ)
+            = |LinearMap.det δV| := by
   intro E V _ _ _ _ lam δ δV hcomm hker hdisc hspan hdet
   classical
   set L := LinearMap.range lam with hL
@@ -30,8 +37,9 @@ theorem UpperTheory.V.ZK.Ct.latDet :
   have hdetf : ((LinearMap.det f : ℤ) : ℝ) = LinearMap.det δV := by
     let b := Module.Free.chooseBasis ℤ L
     let bV := b.ofZLatticeBasis ℝ L
-    have hM : (Int.castRingHom ℝ).mapMatrix (LinearMap.toMatrix b b f) =
-        LinearMap.toMatrix bV bV δV := by
+    have hM
+        : (Int.castRingHom ℝ).mapMatrix (LinearMap.toMatrix b b f)
+          = LinearMap.toMatrix bV bV δV := by
       ext i j
       simp only [RingHom.mapMatrix_apply, Matrix.map_apply, LinearMap.toMatrix_apply, eq_intCast]
       rw [show bV j = ((b j : L) : V) from b.ofZLatticeBasis_apply ℝ L j, ← hfv,
@@ -43,8 +51,7 @@ theorem UpperTheory.V.ZK.Ct.latDet :
     apply hdet
     rw [← hdetf, Int.natAbs_eq_zero.mp h, Int.cast_zero]
   let g : E →ₗ[ℤ] L ⧸ LinearMap.range f := (LinearMap.range f).mkQ ∘ₗ lam.rangeRestrict
-  have hgs : Function.Surjective g :=
-    (Submodule.mkQ_surjective _).comp lam.surjective_rangeRestrict
+  have hgs : Function.Surjective g := (Submodule.mkQ_surjective _).comp lam.surjective_rangeRestrict
   have hkerg : LinearMap.ker g = LinearMap.range δ ⊔ Submodule.torsion ℤ E := by
     ext x
     simp only [g, LinearMap.mem_ker, LinearMap.comp_apply, Submodule.mkQ_apply,

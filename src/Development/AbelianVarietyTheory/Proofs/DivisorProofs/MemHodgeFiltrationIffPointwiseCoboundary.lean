@@ -9,9 +9,11 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -19,8 +21,8 @@ namespace GlobalTheory.PtExt
 
 variable {R : Type} [CommRing R] {X : Over (Sp R)}
 
-theorem existsUnique_pt_of_triv (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (hT : T.J = ⊥) :
-    ∃! y : Pt X T.B, spMap T.π ≫ y.left = T.x := by
+theorem existsUnique_pt_of_triv (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (hT : T.J = ⊥)
+    : ∃! y : Pt X T.B, spMap T.π ≫ y.left = T.x := by
   have hb : Function.Bijective T.π :=
     ⟨(injective_iff_map_eq_zero _).2 fun b hb ↦ by simpa [hT] using (T.ker b).1 hb, T.surj⟩
   let e := RingEquiv.ofBijective T.π hb
@@ -43,15 +45,17 @@ theorem existsUnique_pt_of_triv (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (hT : T.J
     rw [← hy, ← Category.assoc, k1]
     exact (Category.id_comp _).symm
 
-def liftHom (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (y : Pt X T.B) (h : spMap T.π ≫ y.left = T.x) : trivAt y ⟶ T :=
+def liftHom (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (y : Pt X T.B) (h : spMap T.π ≫ y.left = T.x)
+    : trivAt y ⟶ T :=
   Thick.trivHom (AlgHom.id R T.B) h
 
-private def trivObject {D : Type} [CommRing D] [Algebra R D] (x : Pt X D) :
-    (IsTriv (X.hom ≫ 𝟙 _)).FullSubcategory :=
+private def trivObject {D : Type} [CommRing D] [Algebra R D] (x : Pt X D)
+    : (IsTriv (X.hom ≫ 𝟙 _)).FullSubcategory :=
   ⟨trivAt x, show (trivAt x).J = ⊥ from rfl⟩
 
-theorem mem_hodgeFiltration_iff_pointwiseCoboundary (R : Type) [CommRing R] (X : Over (Sp R)) (f : Z1 (O (dp0 R) (X.hom ≫ 𝟙 _))) :
-    CatCoh.H1.mk _ f ∈ F1 (X.hom ≫ 𝟙 _) ↔ ∃ k : Fn0 X, IsCob (whole X) (fv f) k := by
+theorem mem_hodgeFiltration_iff_pointwiseCoboundary
+    (R : Type) [CommRing R] (X : Over (Sp R)) (f : Z1 (O (dp0 R) (X.hom ≫ 𝟙 _)))
+    : CatCoh.H1.mk _ f ∈ F1 (X.hom ≫ 𝟙 _) ↔ ∃ k : Fn0 X, IsCob (whole X) (fv f) k := by
   rw [F1, LinearMap.mem_ker, toH1O, CoefMap.pullCohomologyOne_class, CatCoh.H1.mk_eq_zero]
   constructor
   · rintro ⟨g, hg⟩
@@ -61,18 +65,26 @@ theorem mem_hodgeFiltration_iff_pointwiseCoboundary (R : Type) [CommRing R] (X :
     exact (congrFun (congrFun (congrFun hg (trivObject x)) (trivObject (spOver φ ≫ x))) a).symm
   · rintro ⟨k, hk⟩
     choose y hy hu using existsUnique_pt_of_triv (R := R) (X := X)
-    refine ⟨fun T ↦ (k T.obj.B (y T.obj T.property) +
-      ev f (liftHom T.obj _ (hy T.obj T.property)) : T.obj.B), ?_⟩
+    refine ⟨
+      fun T ↦
+        (k T.obj.B (y T.obj T.property) + ev f (liftHom T.obj _ (hy T.obj T.property)) : T.obj.B),
+      ?_
+    ⟩
     funext ⟨T, hT⟩ ⟨T', hT'⟩ ⟨φ⟩
     have h' : spMap T'.π ≫ (spOver φ.φ ≫ y T hT).left = T'.x := by
       change spMap T'.π ≫ spMap (φ.φ : T.B →+* T'.B) ≫ (y T hT).left = T'.x
       have hπ : T'.π.comp (φ.φ : T.B →+* T'.B) = φ.φ₀.comp T.π :=
         RingHom.ext fun b ↦ (φ.comm b).symm
       rw [← Category.assoc, ← Cris.spMap_comp, hπ, Cris.spMap_comp, Category.assoc, hy T hT, φ.pt]
-    have key : ∀ (z : Pt X T'.B) (hz : spMap T'.π ≫ z.left = T'.x), spOver φ.φ ≫ y T hT = z →
-        k T'.B z + ev f (liftHom T' z hz) - φ.φ (k T.B (y T hT) + ev f (liftHom T _ (hy T hT))) = ev f φ := by
+    have key
+        : ∀ (z : Pt X T'.B) (hz : spMap T'.π ≫ z.left = T'.x),
+          spOver φ.φ ≫ y T hT = z
+            → k T'.B z + ev f (liftHom T' z hz)
+                - φ.φ (k T.B (y T hT) + ev f (liftHom T _ (hy T hT)))
+              = ev f φ := by
       rintro _ hz rfl
-      have e1 := ev_sq f (trivMap φ.φ (y T hT)) (liftHom T' _ hz) (liftHom T _ (hy T hT)) φ fun _ ↦ rfl
+      have e1 :=
+        ev_sq f (trivMap φ.φ (y T hT)) (liftHom T' _ hz) (liftHom T _ (hy T hT)) φ fun _ ↦ rfl
       have e2 := hk T.B T'.B φ.φ (y T hT) (sm_whole _)
       change fv f T.B T'.B φ.φ (y T hT) + _ = _ at e1
       rw [map_add φ.φ]

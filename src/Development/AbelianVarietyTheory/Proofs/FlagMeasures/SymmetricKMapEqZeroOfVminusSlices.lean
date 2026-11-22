@@ -10,7 +10,9 @@ public import Formalism.RealPlaceAnalysis.QuotientSettingHolds
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId GlobalTheory.Jet
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+  GlobalTheory.Jet
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -21,11 +23,11 @@ section
 variable {V : Type} [AddCommGroup V] [Module ℂ V] {n j : ℕ}
 
 def sliceIns (α' : Fin j → Fin n × Fin n) (m : Arr V n 1) : Arr V n (j + 1) :=
-  WithLp.toLp 2 (fun α : Fin (j + 1) → Fin n × Fin n =>
-    if Fin.tail α = α' then m (fun _ => α 0) else 0)
+  WithLp.toLp 2
+    (fun α : Fin (j + 1) → Fin n × Fin n => if Fin.tail α = α' then m (fun _ => α 0) else 0)
 
-theorem slice_sliceIns (α' β' : Fin j → Fin n × Fin n) (m : Arr V n 1) :
-    sliceLin V n β' (sliceIns α' m) = if β' = α' then m else 0 := by
+theorem slice_sliceIns (α' β' : Fin j → Fin n × Fin n) (m : Arr V n 1)
+    : sliceLin V n β' (sliceIns α' m) = if β' = α' then m else 0 := by
   apply indexArray_ext
   intro β
   rw [firstPositionSlice_apply]
@@ -37,9 +39,11 @@ theorem slice_sliceIns (α' β' : Fin j → Fin n × Fin n) (m : Arr V n 1) :
   · rw [hβ]
   · rfl
 
-theorem sliceIns_mem {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {u : V}
-    {α' : Fin j → Fin n × Fin n} (hα : ∀ i, ε (α' i).1 ≠ ε (α' i).2) {m : Arr V n 1}
-    (hm : m ∈ arrV0 ε E u 1) : sliceIns α' m ∈ arrV0 ε E u (j + 1) := by
+theorem sliceIns_mem
+    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {u : V} {α' : Fin j → Fin n × Fin n}
+    (hα : ∀ i, ε (α' i).1 ≠ ε (α' i).2)
+    {m : Arr V n 1} (hm : m ∈ arrV0 ε E u 1)
+    : sliceIns α' m ∈ arrV0 ε E u (j + 1) := by
   rw [mem_admissibleArrays]
   intro α
   by_cases ht : Fin.tail α = α'
@@ -62,28 +66,36 @@ theorem sliceIns_mem {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End �
     rw [hv]
     split_ifs <;> exact Submodule.zero_mem _
 
-theorem slice_mem_highest_jets {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {u : V}
-    {F : Arr V n (j + 1)} (hF : F ∈ arrV0 ε E u (j + 1)) (α' : Fin j → Fin n × Fin n) :
-    sliceLin V n α' F ∈ arrV0 ε E u 1 := by
+theorem slice_mem_highest_jets
+    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {u : V} {F : Arr V n (j + 1)}
+    (hF : F ∈ arrV0 ε E u (j + 1))
+    (α' : Fin j → Fin n × Fin n)
+    : sliceLin V n α' F ∈ arrV0 ε E u 1 := by
   rw [mem_admissibleArrays]
   intro β
   rw [firstPositionSlice_apply]
   split_ifs with h
   · exact admissibleArrays_apply_mem hF _
-  · rw [admissibleArrays_apply_eq_zero hF _ (fun h' => h (fun i => by rw [Fin.fin_one_eq_zero i]; simpa using h' 0))]
+  · rw [admissibleArrays_apply_eq_zero hF _
+      (fun h' => h (fun i => by rw [Fin.fin_one_eq_zero i]; simpa using h' 0))]
     exact Submodule.zero_mem _
 
-theorem slice_eq_zero_of_compact {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {u : V}
-    {F : Arr V n (j + 1)} (hF : F ∈ arrV0 ε E u (j + 1)) (α' : Fin j → Fin n × Fin n)
-    (hα : ¬ ∀ i, ε (α' i).1 ≠ ε (α' i).2) : sliceLin V n α' F = 0 := by
+theorem slice_eq_zero_of_compact
+    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {u : V} {F : Arr V n (j + 1)}
+    (hF : F ∈ arrV0 ε E u (j + 1))
+    (α' : Fin j → Fin n × Fin n) (hα : ¬ ∀ i, ε (α' i).1 ≠ ε (α' i).2)
+    : sliceLin V n α' F = 0 := by
   apply indexArray_ext
   intro β
-  rw [firstPositionSlice_apply, admissibleArrays_apply_eq_zero hF _ (fun h => hα (fun i => by simpa using h i.succ))]
+  rw [firstPositionSlice_apply,
+    admissibleArrays_apply_eq_zero hF _ (fun h => hα (fun i => by simpa using h i.succ))]
   rfl
 
-theorem permute_mem_highest_jets {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {u : V}
-    {F : Arr V n j} (hF : F ∈ arrV0 ε E u j) (s : Equiv.Perm (Fin j)) :
-    permArr V n s F ∈ arrV0 ε E u j := by
+theorem permute_mem_highest_jets
+    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {u : V} {F : Arr V n j}
+    (hF : F ∈ arrV0 ε E u j)
+    (s : Equiv.Perm (Fin j))
+    : permArr V n s F ∈ arrV0 ε E u j := by
   rw [mem_admissibleArrays]
   intro α
   rw [permutePositions_apply]
@@ -92,13 +104,15 @@ theorem permute_mem_highest_jets {ε : Fin n → Bool} {E : Fin n → Fin n → 
   · rw [admissibleArrays_apply_eq_zero hF _ (fun h' => h (fun i => by simpa using h' (s.symm i)))]
     exact Submodule.zero_mem _
 
-private theorem finiteDimensional_arrV0_of_finiteDimensional_kSpan (ε : Fin n → Bool)
-    (E : Fin n → Fin n → Module.End ℂ V) (u : V) (h : FiniteDimensional ℂ (kSpan ε E u)) :
-    FiniteDimensional ℂ (arrV0 ε E u j) := by
+private theorem finiteDimensional_arrV0_of_finiteDimensional_kSpan
+    (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (u : V)
+    (h : FiniteDimensional ℂ (kSpan ε E u))
+    : FiniteDimensional ℂ (arrV0 ε E u j) := by
   let ψ : arrV0 ε E u j →ₗ[ℂ] ((Fin j → Fin n × Fin n) → kSpan ε E u) :=
-    LinearMap.pi fun α => LinearMap.codRestrict (kSpan ε E u)
-      ((LinearMap.proj α ∘ₗ arrOf V n j) ∘ₗ (arrV0 ε E u j).subtype)
-      (fun F => by simpa [arrOf] using admissibleArrays_apply_mem F.2 α)
+    LinearMap.pi fun α =>
+      LinearMap.codRestrict (kSpan ε E u)
+        ((LinearMap.proj α ∘ₗ arrOf V n j) ∘ₗ (arrV0 ε E u j).subtype)
+        (fun F => by simpa [arrOf] using admissibleArrays_apply_mem F.2 α)
   refine Module.Finite.of_injective ψ ?_
   intro F G hFG
   apply Subtype.ext
@@ -107,7 +121,8 @@ private theorem finiteDimensional_arrV0_of_finiteDimensional_kSpan (ε : Fin n �
   have h1 := congrArg Subtype.val (congrFun hFG α)
   simpa [ψ, arrOf] using h1
 
-private theorem permArr_inv_permArr (s : Equiv.Perm (Fin j)) (F : Arr V n j) : permArr V n s⁻¹ (permArr V n s F) = F := by
+private theorem permArr_inv_permArr (s : Equiv.Perm (Fin j)) (F : Arr V n j)
+    : permArr V n s⁻¹ (permArr V n s F) = F := by
   apply indexArray_ext
   intro α
   rw [permutePositions_apply, permutePositions_apply]
@@ -115,7 +130,18 @@ private theorem permArr_inv_permArr (s : Equiv.Perm (Fin j)) (F : Arr V n j) : p
 
 end
 
-theorem jet_map_eq_zero : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (lam : Fin n → ℝ) (g : ℝ) (u : V) (j : ℕ), GlRel E → IsUnitary ε E → KHighest ε E (LamOf ε lam) u → FiniteDimensional ℂ (kSpan ε E u) → (∀ a b : Fin n, a < b → ε a ≠ ε b → g ≤ lam a - lam b) → 2 * (n : ℝ) < g → ∀ T : Arr V n (j + 1) →ₗ[ℂ] V, (∀ F ∈ arrV0 ε E u (j + 1), T F ∈ kSpan ε E u) → (∀ c d, ε c = ε d → ∀ F ∈ arrV0 ε E u (j + 1), T (arrE E (j + 1) c d F) = E c d (T F)) → (∀ F ∈ arrV0 ε E u (j + 1), ∀ s : Equiv.Perm (Fin (j + 1)), T (permArr V n s F) = T F) → (∀ F ∈ arrV0 ε E u (j + 1), (∀ α', sliceLin V n α' F ∈ Vminus ε E (LamOf ε lam) u) → T F = 0) → ∀ F ∈ arrV0 ε E u (j + 1), T F = 0 := by
+theorem jet_map_eq_zero
+    : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool)
+        (E : Fin n → Fin n → Module.End ℂ V) (lam : Fin n → ℝ) (g : ℝ) (u : V) (j : ℕ),
+      GlRel E → IsUnitary ε E → KHighest ε E (LamOf ε lam) u → FiniteDimensional ℂ (kSpan ε E u)
+        → (∀ a b : Fin n, a < b → ε a ≠ ε b → g ≤ lam a - lam b) → 2 * (n : ℝ) < g
+        → ∀ T : Arr V n (j + 1) →ₗ[ℂ] V,
+          (∀ F ∈ arrV0 ε E u (j + 1), T F ∈ kSpan ε E u)
+            → (∀ c d, ε c = ε d → ∀ F ∈ arrV0 ε E u (j + 1), T (arrE E (j + 1) c d F) = E c d (T F))
+            → (∀ F ∈ arrV0 ε E u (j + 1), ∀ s : Equiv.Perm (Fin (j + 1)), T (permArr V n s F) = T F)
+            → (∀ F ∈ arrV0 ε E u (j + 1),
+              (∀ α', sliceLin V n α' F ∈ Vminus ε E (LamOf ε lam) u) → T F = 0)
+            → ∀ F ∈ arrV0 ε E u (j + 1), T F = 0 := by
   intro V _ _ n ε E lam g u j hgl hun hhi hfd hgap hg T hT hE hS hM
   have hsplit := typesSplit V n ε E (LamOf ε lam) u hgl hun hhi hfd
   have hstab := admissibleArrays_invariant ε E u (j + 1)
@@ -128,7 +154,8 @@ theorem jet_map_eq_zero : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpa
     have hsym : f ∈ symSub V n (j + 1) := by
       rw [mem_symmetricArrays]
       intro s
-      have hGW : permArr V n s f - f ∈ arrV0 ε E u (j + 1) := sub_mem (permute_mem_highest_jets hf s) hf
+      have hGW : permArr V n s f - f ∈ arrV0 ε E u (j + 1) :=
+        sub_mem (permute_mem_highest_jets hf s) hf
       have hGT : T (permArr V n s f - f) = 0 := by rw [map_sub, hS f hf s, sub_self]
       have hGK : permArr V n s f - f ∈ K := memK _ hGW hGT
       have hG'K : permArr V n s⁻¹ (permArr V n s f - f) ∈ K :=
@@ -160,8 +187,10 @@ theorem jet_map_eq_zero : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpa
           · exact hm
           · exact Submodule.zero_mem _
         have hin : ⟪sliceIns α' m, f⟫_ℂ = 0 := horth _ (memK _ hGW hGT)
-        have hsum : ∑ β' : Fin j → Fin n × Fin n,
-            ⟪sliceLin V n β' (sliceIns α' m), sliceLin V n β' f⟫_ℂ = ⟪m, sliceLin V n α' f⟫_ℂ := by
+        have hsum
+            : ∑ β' : Fin j → Fin n × Fin n,
+                ⟪sliceLin V n β' (sliceIns α' m), sliceLin V n β' f⟫_ℂ
+              = ⟪m, sliceLin V n α' f⟫_ℂ := by
           rw [Finset.sum_eq_single α']
           · rw [slice_sliceIns, if_pos rfl]
           · intro b _ hb
@@ -169,8 +198,7 @@ theorem jet_map_eq_zero : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpa
           · intro h
             exact absurd (Finset.mem_univ _) h
         rw [inner_eq_sum_firstPositionSlice, hsum, ← hpm, inner_add_right] at hin
-        have hmp : ⟪m, p⟫_ℂ = 0 := by
-          rw [← inner_conj_symm, hsplit.1 p hp m hm, map_zero]
+        have hmp : ⟪m, p⟫_ℂ = 0 := by rw [← inner_conj_symm, hsplit.1 p hp m hm, map_zero]
         rw [hmp, zero_add] at hin
         have hm' : m = 0 := inner_self_eq_zero.mp hin
         rw [← hpm, hm', add_zero]

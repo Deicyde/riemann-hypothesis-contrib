@@ -24,14 +24,16 @@ theorem CodimOnePrimeAvoid.proof : CodimOnePrimeAvoid.Statement := by
   have : IsNoetherianRing Bh := Algebra.FiniteType.isNoetherianRing k Bh
   let K := FractionRing B
   have hu : ∀ y : Submonoid.powers h, IsUnit (algebraMap B K y) := fun y =>
-    IsUnit.mk0 _ ((map_ne_zero_iff _ (IsFractionRing.injective B K)).2
-      (nonZeroDivisors.ne_zero (hle y.2)))
+    IsUnit.mk0 _
+      ((map_ne_zero_iff _ (IsFractionRing.injective B K)).2 (nonZeroDivisors.ne_zero (hle y.2)))
   let _ : Algebra Bh K := (IsLocalization.lift (M := Submonoid.powers h) (S := Bh) hu).toAlgebra
-  have : IsScalarTower B Bh K := IsScalarTower.of_algebraMap_eq fun x =>
-    (IsLocalization.lift_eq (M := Submonoid.powers h) (S := Bh) hu x).symm
-  have : IsScalarTower k Bh K := IsScalarTower.of_algebraMap_eq fun x => by
-    rw [IsScalarTower.algebraMap_apply k B K, IsScalarTower.algebraMap_apply k B Bh,
-      ← IsScalarTower.algebraMap_apply B Bh K]
+  have : IsScalarTower B Bh K :=
+    IsScalarTower.of_algebraMap_eq fun x =>
+      (IsLocalization.lift_eq (M := Submonoid.powers h) (S := Bh) hu x).symm
+  have : IsScalarTower k Bh K :=
+    IsScalarTower.of_algebraMap_eq fun x => by
+      rw [IsScalarTower.algebraMap_apply k B K, IsScalarTower.algebraMap_apply k B Bh,
+        ← IsScalarTower.algebraMap_apply B Bh K]
   have : IsFractionRing Bh K :=
     IsFractionRing.isFractionRing_of_isDomain_of_isLocalization (Submonoid.powers h) Bh K
   have hdimh : ringKrullDim Bh = ringKrullDim B := by
@@ -55,7 +57,9 @@ theorem CodimOnePrimeAvoid.proof : CodimOnePrimeAvoid.Statement := by
   · exact Ideal.eq_top_of_isUnit_mem _ hhN (IsLocalization.Away.algebraMap_isUnit h)
   · have hN := IsLocalization.height_under (Submonoid.powers h) q
     rw [hq1] at hN
-    have := GroundTheory.Arith.Abelian.Jacobian.height_add_ringKrullDim_quotient k (q.comap (algebraMap B Bh))
+    have :=
+      GroundTheory.Arith.Abelian.Jacobian.height_add_ringKrullDim_quotient k
+        (q.comap (algebraMap B Bh))
     rw [Ideal.under] at hN
     rw [hN] at this
     rw [← this, add_comm]

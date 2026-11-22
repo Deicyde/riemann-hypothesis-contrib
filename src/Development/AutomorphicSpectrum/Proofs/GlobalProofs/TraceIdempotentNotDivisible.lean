@@ -6,42 +6,43 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.IdemTrace
 
-theorem exists_nat_trace_of_idem {O : Type} [CommRing O] [IsLocalRing O] {g : ℕ}
-    (P : Matrix (Fin g) (Fin g) O) (h : P * P = P) :
-    ∃ r : ℕ, r ≤ g ∧ Matrix.trace P = (r : O) ∧ (r = 0 → P = 0) := by
+theorem exists_nat_trace_of_idem
+    {O : Type} [CommRing O] [IsLocalRing O] {g : ℕ} (P : Matrix (Fin g) (Fin g) O) (h : P * P = P)
+    : ∃ r : ℕ, r ≤ g ∧ Matrix.trace P = (r : O) ∧ (r = 0 → P = 0) := by
   classical
   set f : (Fin g → O) →ₗ[O] (Fin g → O) := Matrix.toLin' P with hf
   have hidem : IsIdempotentElem f := by
     unfold IsIdempotentElem
     rw [hf, Module.End.mul_eq_comp, ← Matrix.toLin'_mul, h]
-  have hff : ∀ z, f (f z) = f z := fun z => by
-    rw [← Module.End.mul_apply, hidem.eq]
+  have hff : ∀ z, f (f z) = f z := fun z => by rw [← Module.End.mul_apply, hidem.eq]
   have hproj := (LinearMap.isProj_range_iff_isIdempotentElem f).mpr hidem
   have hPr : Module.Projective O (LinearMap.range f) :=
     Module.Projective.of_split (LinearMap.range f).subtype f.rangeRestrict
-      (LinearMap.ext fun y => Subtype.ext (by
-        obtain ⟨z, hz⟩ := y.2
-        simp only [LinearMap.comp_apply, Submodule.coe_subtype, LinearMap.id_apply]
-        rw [← hz]
-        exact hff z))
+      (LinearMap.ext fun y =>
+        Subtype.ext (by
+          obtain ⟨z, hz⟩ := y.2
+          simp only [LinearMap.comp_apply, Submodule.coe_subtype, LinearMap.id_apply]
+          rw [← hz]
+          exact hff z))
   let sK : (Fin g → O) →ₗ[O] LinearMap.ker f :=
     (LinearMap.id - f).codRestrict (LinearMap.ker f) (fun y => by
       rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, map_sub, hff, sub_self])
   have hsK : sK.comp (LinearMap.ker f).subtype = LinearMap.id :=
-    LinearMap.ext fun y => Subtype.ext (by
-      have hy : f y = 0 := y.2
-      simp [sK, hy])
+    LinearMap.ext fun y =>
+      Subtype.ext (by
+        have hy : f y = 0 := y.2
+        simp [sK, hy])
   have hPk : Module.Projective O (LinearMap.ker f) :=
     Module.Projective.of_split (LinearMap.ker f).subtype sK hsK
   have hFk : Module.Finite O (LinearMap.ker f) :=
-    Module.Finite.of_surjective sK (fun y => ⟨y, by
-      exact LinearMap.congr_fun hsK y⟩)
+    Module.Finite.of_surjective sK (fun y => ⟨y, by exact LinearMap.congr_fun hsK y⟩)
   have : Module.Free O (LinearMap.range f) := Module.free_of_flat_of_isLocalRing
   have : Module.Free O (LinearMap.ker f) := Module.free_of_flat_of_isLocalRing
   have htr := hproj.trace
   refine ⟨Module.finrank O (LinearMap.range f), ?_, ?_, ?_⟩
-  · calc Module.finrank O (LinearMap.range f) ≤ Module.finrank O (Fin g → O) :=
-          Submodule.finrank_le _
+  · calc
+      Module.finrank O (LinearMap.range f)
+        ≤ Module.finrank O (Fin g → O) := Submodule.finrank_le _
       _ = g := Module.finrank_fin_fun O
   · rw [← Matrix.trace_toLin'_eq, ← hf, htr]
   · intro h0
@@ -68,10 +69,11 @@ private lemma isLocalRing_zmod_prime_pow (p m : ℕ) [hp : Fact p.Prime] (hm : 0
   rw [map_add (f := _), key a hcon.1, key _ hcon.2, add_zero, map_one] at h1
   exact zero_ne_one h1
 
-theorem not_dvd_trace : ∀ (B : Type) [CommRing B] [Module.Free ℤ B] [Module.Finite ℤ B] (x : B)
-    (p m : ℕ), p.Prime → Module.finrank ℤ B < p ^ m →
-    x * x - x ∈ Ideal.span {((p : B)) ^ m} → x ∉ Ideal.span {((p : B)) ^ m} →
-    ¬ ((p : ℤ) ^ m ∣ Algebra.trace ℤ B x) := by
+theorem not_dvd_trace
+    : ∀ (B : Type) [CommRing B] [Module.Free ℤ B] [Module.Finite ℤ B] (x : B) (p m : ℕ),
+      p.Prime → Module.finrank ℤ B < p ^ m → x * x - x ∈ Ideal.span {((p : B)) ^ m}
+        → x ∉ Ideal.span {((p : B)) ^ m}
+        → ¬((p : ℤ) ^ m ∣ Algebra.trace ℤ B x) := by
   intro B _ _ _ x p m hp hrank hidem hnot hdvd
   rcases Nat.eq_zero_or_pos m with rfl | hm
   · apply hnot
@@ -101,8 +103,7 @@ theorem not_dvd_trace : ∀ (B : Type) [CommRing B] [Module.Free ℤ B] [Module.
     rw [Algebra.trace_eq_matrix_trace b x]
     simp [P, M, φ, Matrix.trace, Matrix.diag]
   obtain ⟨k, hk⟩ := hdvd
-  have hr_zero : (r : ZMod (p ^ m)) = 0 := by
-    rw [← htr, ← htrace, hk, Int.cast_mul, hpm, zero_mul]
+  have hr_zero : (r : ZMod (p ^ m)) = 0 := by rw [← htr, ← htrace, hk, Int.cast_mul, hpm, zero_mul]
   rw [ZMod.natCast_eq_zero_iff] at hr_zero
   have hr' : r = 0 := Nat.eq_zero_of_dvd_of_lt hr_zero (by omega)
   have hP0 := hr0 hr'

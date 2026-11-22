@@ -14,14 +14,18 @@ open ReciprocityTheory.PGsh.L2
 
 section F3c
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   {σ : O ≃ₐ[ℤ_[p]] O} {cp : R} {H : HodgeTateDatum p g v R O σ cp}
 
 def bvec (U : UnramData p g v R O σ cp H) (τ : Fin U.m) (s : Fin (U.r τ)) : Fin g → R :=
   ((U.rank τ).some.symm (Pi.single s 1)).1
 
-def thetaL (U : UnramData p g v R O σ cp H) (τ : Fin U.m) : (Fin g → R) →ₗ[R] (Fin (U.r τ) → R) where
+def thetaL (U : UnramData p g v R O σ cp H) (τ : Fin U.m)
+    : (Fin g → R) →ₗ[R] (Fin (U.r τ) → R) where
   toFun l s := l ⬝ᵥ bvec U τ s
   map_add' l l' := by funext s; simp [add_dotProduct]
   map_smul' r l := by funext s; simp [smul_dotProduct]
@@ -71,8 +75,8 @@ lemma redP_pP {n : ℕ} {w : Fin n → R}
   rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, Pi.smul_apply, smul_eq_mul]
   exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)
 
-def thetaQ (U : UnramData p g v R O σ cp H) (τ : Fin U.m) :
-    LieDualModP p R g →ₗ[R] (Fin (U.r τ) → R ⧸ Ideal.span {(p : R)}) :=
+def thetaQ (U : UnramData p g v R O σ cp H) (τ : Fin U.m)
+    : LieDualModP p R g →ₗ[R] (Fin (U.r τ) → R ⧸ Ideal.span {(p : R)}) :=
   (Ideal.span {(p : R)} • (⊤ : Submodule R (Fin g → R))).liftQ (redP (U.r τ) ∘ₗ thetaL U τ)
     (fun w hw => by
       rw [LinearMap.mem_ker, LinearMap.comp_apply]

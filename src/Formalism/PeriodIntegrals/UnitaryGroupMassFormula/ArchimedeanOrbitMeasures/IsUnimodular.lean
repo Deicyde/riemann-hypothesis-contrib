@@ -12,8 +12,9 @@ namespace HcS.HermitianLatticesTheory
 
 section Defs
 
-variable {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+  [Module R V] [IsScalarTower R K V]
 
 def isom (h : V →ₗ⋆[K] V →ₗ[K] K) : Subgroup (V ≃ₗ[K] V) where
   carrier := {g | ∀ x y, h (g x) (g y) = h x y}
@@ -28,11 +29,9 @@ def isom (h : V →ₗ⋆[K] V →ₗ[K] K) : Subgroup (V ≃ₗ[K] V) where
     change h (a.symm x) (a.symm y) = h x y
     simpa using this.symm
 
-def dual (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule R V) : Submodule R V :=
-  HcS.E.hdual h L
+def dual (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule R V) : Submodule R V := HcS.E.hdual h L
 
-def IsUnimodular (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule R V) : Prop :=
-  dual h L = L
+def IsUnimodular (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule R V) : Prop := dual h L = L
 
 end Defs
 

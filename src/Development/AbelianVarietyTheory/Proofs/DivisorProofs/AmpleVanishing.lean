@@ -16,20 +16,29 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 open GlobalTheory.AmpleGen
 
 namespace GlobalTheory.AmpleGen
 
-theorem stepTwo {K : Type} [Field K] [IsAlgClosed K] (A : Over (Sp K)) [GrpObj A] (hA : IsAbelianScheme A)
-    (h2 : (2 : K) ≠ 0) (L : LB A.left) (hL : L.IsLB) (a b j : ℕ) (h : NV A (mix A L a b) j) :
-    ∃ j₁ j₂ : ℕ, j₁ + j₂ = 2 * j ∧ NV A (mix A L (2 * a : ℕ) (2 * b : ℕ)) j₁ ∧
-      NV A (mix A L (a + b : ℕ) (a + b : ℕ)) j₂ := by
+theorem stepTwo
+    {K : Type} [Field K] [IsAlgClosed K]
+    (A : Over (Sp K)) [GrpObj A]
+    (hA : IsAbelianScheme A) (h2 : (2 : K) ≠ 0)
+    (L : LB A.left) (hL : L.IsLB)
+    (a b j : ℕ) (h : NV A (mix A L a b) j)
+    : ∃ j₁ j₂ : ℕ,
+      j₁ + j₂ = 2 * j ∧ NV A (mix A L (2 * a : ℕ) (2 * b : ℕ)) j₁
+        ∧ NV A (mix A L (a + b : ℕ) (a + b : ℕ)) j₂ := by
   have hd : (((1 : ℤ) * (-1) - 1 * 1 : ℤ) : K) ≠ 0 := by
     have : (((1 : ℤ) * (-1) - 1 * 1 : ℤ) : K) = -2 := by push_cast; ring
-    rw [this]; exact neg_ne_zero.2 h2
-  obtain ⟨j₁, j₂, e, h₁, h₂⟩ := GlobalTheory.T.cech_nonvanishing_invMix_pair_kunneth_isogeny K A hA 1 1 1 (-1) (by norm_num) hd L hL a b j h
+    rw [this]
+    exact neg_ne_zero.2 h2
+  obtain ⟨j₁, j₂, e, h₁, h₂⟩ :=
+    GlobalTheory.T.cech_nonvanishing_invMix_pair_kunneth_isogeny K A hA 1 1 1 (-1) (by norm_num) hd
+      L hL a b j h
   have t1 : tri 1 = 1 := by decide
   have t0 : tri (-1) = 0 := by decide
   simp only [t1, t0, neg_neg] at h₁ h₂
@@ -37,14 +46,22 @@ theorem stepTwo {K : Type} [Field K] [IsAlgClosed K] (A : Over (Sp K)) [GrpObj A
   · convert h₁ using 2 <;> push_cast <;> ring
   · convert h₂ using 2 <;> push_cast <;> ring
 
-theorem stepFive {K : Type} [Field K] [IsAlgClosed K] (A : Over (Sp K)) [GrpObj A] (hA : IsAbelianScheme A)
-    (h5 : (5 : K) ≠ 0) (L : LB A.left) (hL : L.IsLB) (a b j : ℕ) (h : NV A (mix A L a b) j) :
-    ∃ j₁ j₂ : ℕ, j₁ + j₂ = 2 * j ∧ NV A (mix A L (4 * a + b : ℕ) (a + 4 * b : ℕ)) j₁ ∧
-      NV A (mix A L (3 * a + 2 * b : ℕ) (2 * a + 3 * b : ℕ)) j₂ := by
+theorem stepFive
+    {K : Type} [Field K] [IsAlgClosed K]
+    (A : Over (Sp K)) [GrpObj A]
+    (hA : IsAbelianScheme A) (h5 : (5 : K) ≠ 0)
+    (L : LB A.left) (hL : L.IsLB)
+    (a b j : ℕ) (h : NV A (mix A L a b) j)
+    : ∃ j₁ j₂ : ℕ,
+      j₁ + j₂ = 2 * j ∧ NV A (mix A L (4 * a + b : ℕ) (a + 4 * b : ℕ)) j₁
+        ∧ NV A (mix A L (3 * a + 2 * b : ℕ) (2 * a + 3 * b : ℕ)) j₂ := by
   have hd : (((1 : ℤ) * (-1) - 2 * 2 : ℤ) : K) ≠ 0 := by
     have : (((1 : ℤ) * (-1) - 2 * 2 : ℤ) : K) = -5 := by push_cast; ring
-    rw [this]; exact neg_ne_zero.2 h5
-  obtain ⟨j₁, j₂, e, h₁, h₂⟩ := GlobalTheory.T.cech_nonvanishing_invMix_pair_kunneth_isogeny K A hA 1 2 2 (-1) (by norm_num) hd L hL a b j h
+    rw [this]
+    exact neg_ne_zero.2 h5
+  obtain ⟨j₁, j₂, e, h₁, h₂⟩ :=
+    GlobalTheory.T.cech_nonvanishing_invMix_pair_kunneth_isogeny K A hA 1 2 2 (-1) (by norm_num) hd
+      L hL a b j h
   have t1 : tri 1 = 1 := by decide
   have t0 : tri (-1) = 0 := by decide
   have t2 : tri 2 = 3 := by decide
@@ -54,14 +71,20 @@ theorem stepFive {K : Type} [Field K] [IsAlgClosed K] (A : Over (Sp K)) [GrpObj 
   · convert h₁ using 2 <;> push_cast <;> ring
   · convert h₂ using 2 <;> push_cast <;> ring
 
-theorem step {K : Type} [Field K] [IsAlgClosed K] (A : Over (Sp K)) [GrpObj A] (hA : IsAbelianScheme A)
-    (L : LB A.left) (hL : L.IsLB) (a b i : ℕ) (h : NV A (mix A L a b) i) :
-    ∃ (i₁ i₂ a₁ b₁ a₂ b₂ : ℕ), i₁ + i₂ = 2 * i ∧ NV A (mix A L a₁ b₁) i₁ ∧ NV A (mix A L a₂ b₂) i₂ ∧
-      a + b ≤ a₁ + b₁ ∧ 2 * (a + b) ≤ a₂ + b₂ ∧ ((a₂ : ℤ) - b₂ = (a : ℤ) - b ∨ (a₂ : ℤ) - b₂ = 0) := by
+theorem step
+    {K : Type} [Field K] [IsAlgClosed K]
+    (A : Over (Sp K)) [GrpObj A]
+    (hA : IsAbelianScheme A)
+    (L : LB A.left) (hL : L.IsLB)
+    (a b i : ℕ) (h : NV A (mix A L a b) i)
+    : ∃ (i₁ i₂ a₁ b₁ a₂ b₂ : ℕ),
+      i₁ + i₂ = 2 * i ∧ NV A (mix A L a₁ b₁) i₁ ∧ NV A (mix A L a₂ b₂) i₂ ∧ a + b ≤ a₁ + b₁
+        ∧ 2 * (a + b) ≤ a₂ + b₂ ∧ ((a₂ : ℤ) - b₂ = (a : ℤ) - b ∨ (a₂ : ℤ) - b₂ = 0) := by
   by_cases h2 : (2 : K) = 0
   · have h5 : (5 : K) ≠ 0 := by
       have : (5 : K) = 2 * 2 + 1 := by norm_num
-      rw [this, h2]; simp
+      rw [this, h2]
+      simp
     obtain ⟨i₁, i₂, e, h₁, h₂⟩ := stepFive A hA h5 L hL a b i h
     refine ⟨i₁, i₂, _, _, _, _, e, h₁, h₂, by omega, by omega, Or.inl (by push_cast; ring)⟩
   · obtain ⟨i₁, i₂, e, h₁, h₂⟩ := stepTwo A hA h2 L hL a b i h
@@ -84,9 +107,12 @@ theorem ampleVanishing : GlobalTheory.Published.AmpleVanishing := by
   have hmax : ∀ i, S i → i ≤ T := fun i hi => Nat.le_findGreatest (hS i hi) hi
   obtain ⟨hT1, a, b, hab, hTab⟩ := hT
 
-  have next : ∀ a' b' : ℕ, 1 ≤ a' + b' → NV A (mix A L a' b') T → ∃ a₂ b₂ : ℕ,
-      NV A (mix A L a₂ b₂) T ∧ 2 * (a' + b') ≤ a₂ + b₂ ∧
-        ((a₂ : ℤ) - b₂ = (a' : ℤ) - b' ∨ (a₂ : ℤ) - b₂ = 0) := by
+  have next
+      : ∀ a' b' : ℕ,
+        1 ≤ a' + b' → NV A (mix A L a' b') T
+          → ∃ a₂ b₂ : ℕ,
+            NV A (mix A L a₂ b₂) T ∧ 2 * (a' + b') ≤ a₂ + b₂
+              ∧ ((a₂ : ℤ) - b₂ = (a' : ℤ) - b' ∨ (a₂ : ℤ) - b₂ = 0) := by
     intro a' b' h1 h
     obtain ⟨i₁, i₂, a₁, b₁, a₂, b₂, e, h₁, h₂, l₁, l₂, hd⟩ := step A hA L hL a' b' T h
     have u₁ : i₁ ≤ T := by
@@ -98,8 +124,10 @@ theorem ampleVanishing : GlobalTheory.Published.AmpleVanishing := by
       · omega
       · exact hmax _ ⟨h0, a₂, b₂, by omega, h₂⟩
     exact ⟨a₂, b₂, by rwa [show i₂ = T by omega] at h₂, l₂, hd⟩
-  have grow : ∀ n : ℕ, ∃ a' b' : ℕ, 1 ≤ a' + b' ∧ n ≤ a' + b' ∧ NV A (mix A L a' b') T ∧
-      ((a' : ℤ) - b' = (a : ℤ) - b ∨ (a' : ℤ) - b' = 0) := by
+  have grow
+      : ∀ n : ℕ, ∃ a' b' : ℕ,
+        1 ≤ a' + b' ∧ n ≤ a' + b' ∧ NV A (mix A L a' b') T
+          ∧ ((a' : ℤ) - b' = (a : ℤ) - b ∨ (a' : ℤ) - b' = 0) := by
     intro n
     induction n with
     | zero => exact ⟨a, b, hab, by omega, hTab, Or.inl rfl⟩
@@ -110,8 +138,10 @@ theorem ampleVanishing : GlobalTheory.Published.AmpleVanishing := by
       rcases hd₂ with e | e
       · rw [e]; exact hd
       · exact Or.inr e
-  obtain ⟨N₁, hN₁⟩ := GlobalTheory.T.serre_vanishing_lineBundleInvMix_fixed_difference K A hA L hL hamp ((a : ℤ) - b)
-  obtain ⟨N₂, hN₂⟩ := GlobalTheory.T.serre_vanishing_lineBundleInvMix_fixed_difference K A hA L hL hamp 0
+  obtain ⟨N₁, hN₁⟩ :=
+    GlobalTheory.T.serre_vanishing_lineBundleInvMix_fixed_difference K A hA L hL hamp ((a : ℤ) - b)
+  obtain ⟨N₂, hN₂⟩ :=
+    GlobalTheory.T.serre_vanishing_lineBundleInvMix_fixed_difference K A hA L hL hamp 0
   obtain ⟨a', b', -, hn, h, hd⟩ := grow (N₁ + N₂)
   obtain ⟨t, ht⟩ : ∃ t, T = t + 1 := ⟨T - 1, by omega⟩
   rw [ht] at h

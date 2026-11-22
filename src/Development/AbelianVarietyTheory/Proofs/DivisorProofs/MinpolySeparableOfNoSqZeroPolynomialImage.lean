@@ -4,18 +4,22 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.PointsNonemp
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical ComplexOrder
 
 namespace GlobalTheory.LKCx
 
 theorem minpoly_separable_of_sq_zero_free
     (F C : Type) [Field F] [Ring C] [IsSimpleRing C] [Algebra F C] [FiniteDimensional F C]
-    (n : ℕ) (σ : F →+* ℂ) (ψ : C →+* Matrix (Fin n) (Fin n) ℂ) (hn : 0 < n)
-    (hψ : ∀ x : F, ψ (algebraMap F C x) = Matrix.scalar (Fin n) (σ x)) (c : C)
-    (hc : ∀ P : Polynomial ℂ, Polynomial.aeval (ψ c) P * Polynomial.aeval (ψ c) P = 0 →
-      Polynomial.aeval (ψ c) P = 0) :
-    (minpoly F c).Separable := by
+    (n : ℕ)
+    (σ : F →+* ℂ)
+    (ψ : C →+* Matrix (Fin n) (Fin n) ℂ)
+    (hn : 0 < n) (hψ : ∀ x : F, ψ (algebraMap F C x) = Matrix.scalar (Fin n) (σ x))
+    (c : C)
+    (hc : ∀ P : Polynomial ℂ,
+      Polynomial.aeval (ψ c) P * Polynomial.aeval (ψ c) P = 0 → Polynomial.aeval (ψ c) P = 0)
+    : (minpoly F c).Separable := by
   haveI : CharZero F := (RingHom.charZero_iff σ.injective).2 inferInstance
   haveI : Nonempty (Fin n) := ⟨⟨0, hn⟩⟩
   have hinj : Function.Injective ψ := ψ.injective

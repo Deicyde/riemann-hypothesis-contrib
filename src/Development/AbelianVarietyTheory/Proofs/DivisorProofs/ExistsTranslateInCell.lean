@@ -14,9 +14,11 @@ open GlobalTheory.SplitWeil (SB nabs)
 
 namespace GlobalTheory.KSp
 
-theorem finite_det_line_zero {F E : Type} [Field F] [Field E] [Algebra F E] {ν : Type} [Fintype ν] [DecidableEq ν]
-    (A B : Matrix ν ν E) (r₀ : F) (h : (A + algebraMap F E r₀ • B).det ≠ 0) :
-    {r : F | (A + algebraMap F E r • B).det = 0}.Finite := by
+theorem finite_det_line_zero
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    {ν : Type} [Fintype ν] [DecidableEq ν]
+    (A B : Matrix ν ν E) (r₀ : F) (h : (A + algebraMap F E r₀ • B).det ≠ 0)
+    : {r : F | (A + algebraMap F E r • B).det = 0}.Finite := by
   set M : Matrix ν ν (Polynomial E) := A.map Polynomial.C + (Polynomial.X : Polynomial E) • B.map Polynomial.C with hM
   have hev : ∀ x : E, M.det.eval x = (A + x • B).det := by
     intro x
@@ -38,17 +40,25 @@ theorem finite_det_line_zero {F E : Type} [Field F] [Field E] [Algebra F E] {ν 
   rw [hev]
   exact hr
 
-theorem exists_herm_transversal (F : Type) [Field F] [CharZero F] (E : Type) [Field E] [Algebra F E] (c : E →ₐ[F] E)
-    (δ : E) (hE : IsQuad c δ) (ν : Type) [Fintype ν] [DecidableEq ν] (s : Finset (UG c (stdJ ν E))) :
-    ∃ t : Matrix ν ν E, (t.map c)ᵀ = t ∧ ∀ g ∈ s, ((mat c g).toBlocks₂₁ + (mat c g).toBlocks₂₂ * t).det ≠ 0 := by
+theorem exists_herm_transversal
+    (F : Type) [Field F] [CharZero F]
+    (E : Type) [Field E] [Algebra F E]
+    (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ)
+    (ν : Type) [Fintype ν] [DecidableEq ν]
+    (s : Finset (UG c (stdJ ν E)))
+    : ∃ t : Matrix ν ν E,
+      (t.map c)ᵀ = t ∧ ∀ g ∈ s, ((mat c g).toBlocks₂₁ + (mat c g).toBlocks₂₂ * t).det ≠ 0 := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨0, by ext i j; simp, by simp⟩
   | insert g s _ ih =>
     obtain ⟨t₀, ht₀, h₀⟩ := ih
-    obtain ⟨t₁, ht₁, h₁⟩ := GlobalTheory.T.exists_hermitian_splitUnitary_lowerBlock_invertible F E c δ hE ν g
-    have key : ∀ k ∈ insert g s, {r : F | (((mat c k).toBlocks₂₁ + (mat c k).toBlocks₂₂ * t₀) +
-        algebraMap F E r • ((mat c k).toBlocks₂₂ * (t₁ - t₀))).det = 0}.Finite := by
+    obtain ⟨t₁, ht₁, h₁⟩ :=
+      GlobalTheory.T.exists_hermitian_splitUnitary_lowerBlock_invertible F E c δ hE ν g
+    have key
+        : ∀ k ∈ insert g s,
+          {r : F | (((mat c k).toBlocks₂₁ + (mat c k).toBlocks₂₂ * t₀) +
+            algebraMap F E r • ((mat c k).toBlocks₂₂ * (t₁ - t₀))).det = 0}.Finite := by
       intro k hk
       rcases Finset.mem_insert.mp hk with rfl | hk
       · refine finite_det_line_zero _ _ 1 ?_
@@ -70,20 +80,31 @@ theorem exists_herm_transversal (F : Type) [Field F] [CharZero F] (E : Type) [Fi
       rw [Matrix.mul_add, Matrix.mul_smul, ← add_assoc] at h0
       exact h0
 
-theorem exists_translate_inCell : ∀ (F : Type) [Field F] [CharZero F] (E : Type) [Field E] [Algebra F E]
-    (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ) (ν : Type) [Fintype ν] [DecidableEq ν] (s : Finset (UG c (stdJ ν E))),
-    ∃ u : UG c (stdJ ν E), ∀ g ∈ s, InCell c (g * u) := by
+theorem exists_translate_inCell
+    : ∀ (F : Type) [Field F] [CharZero F] (E : Type) [Field E] [Algebra F E] (c : E →ₐ[F] E) (δ : E)
+        (hE : IsQuad c δ) (ν : Type) [Fintype ν] [DecidableEq ν] (s : Finset (UG c (stdJ ν E))),
+      ∃ u : UG c (stdJ ν E), ∀ g ∈ s,
+        InCell c (g * u) := by
   intro F _ _ E _ _ c δ hE ν _ _ s
   obtain ⟨t, ht, h⟩ := exists_herm_transversal F E c δ hE ν s
-  let u : UG c (stdJ ν E) :=
-    ⟨⟨fromBlocks 1 0 t 1, fromBlocks 1 0 (-t) 1, by simp [fromBlocks_multiply], by simp [fromBlocks_multiply]⟩, by
+  let u : UG c (stdJ ν E) := ⟨
+    ⟨
+      fromBlocks 1 0 t 1,
+      fromBlocks 1 0 (-t) 1,
+      by simp [fromBlocks_multiply],
+      by simp [fromBlocks_multiply]
+    ⟩,
+    by
       rw [mem_UG_iff]
       have h0 : (0 : Matrix ν ν E).map c = 0 := Matrix.map_zero _ (map_zero c)
       have h1 : (1 : Matrix ν ν E).map c = 1 := Matrix.map_one _ (map_zero c) (map_one c)
-      simp [stdJ, fromBlocks_map, fromBlocks_transpose, fromBlocks_multiply, h0, h1, ht]⟩
-  refine ⟨u, fun g hg => (GlobalTheory.T.inCell_iff_det_lower_left_block_ne_zero F E c δ hE ν _).mpr ?_⟩
+      simp [stdJ, fromBlocks_map, fromBlocks_transpose, fromBlocks_multiply, h0, h1, ht]
+  ⟩
+  refine
+    ⟨u, fun g hg => (GlobalTheory.T.inCell_iff_det_lower_left_block_ne_zero F E c δ hE ν _).mpr ?_⟩
   have e : mat c (g * u) = mat c g * fromBlocks 1 0 t 1 := rfl
-  rw [e, ← fromBlocks_toBlocks (mat c g), fromBlocks_multiply, toBlocks_fromBlocks₂₁, Matrix.mul_one]
+  rw [e, ← fromBlocks_toBlocks (mat c g), fromBlocks_multiply, toBlocks_fromBlocks₂₁,
+    Matrix.mul_one]
   exact h g hg
 
 end GlobalTheory.KSp

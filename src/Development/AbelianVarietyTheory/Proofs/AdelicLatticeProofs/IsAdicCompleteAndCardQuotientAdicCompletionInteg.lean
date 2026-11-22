@@ -12,11 +12,13 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem mem_span_singleton_adicCompletionIntegers {F : Type} [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) {t : v.adicCompletionIntegers F}
-    (ht : Valued.v (t : v.adicCompletion F) ≠ 0) (x : v.adicCompletionIntegers F) :
-    x ∈ Ideal.span {t} ↔
-      Valued.v (x : v.adicCompletion F) ≤ Valued.v (t : v.adicCompletion F) := by
+theorem mem_span_singleton_adicCompletionIntegers
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F))
+    {t : v.adicCompletionIntegers F} (ht : Valued.v (t : v.adicCompletion F) ≠ 0)
+    (x : v.adicCompletionIntegers F)
+    : x ∈ Ideal.span {t}
+      ↔ Valued.v (x : v.adicCompletion F) ≤ Valued.v (t : v.adicCompletion F) := by
   rw [Ideal.mem_span_singleton']
   constructor
   · rintro ⟨a, rfl⟩
@@ -25,8 +27,7 @@ theorem mem_span_singleton_adicCompletionIntegers {F : Type} [Field F] [NumberFi
     rw [map_mul]
     exact mul_le_of_le_one_left' ha
   · intro hx
-    have ht1 : (t : v.adicCompletion F) ≠ 0 := by
-      intro h; rw [h] at ht; simp at ht
+    have ht1 : (t : v.adicCompletion F) ≠ 0 := by intro h; rw [h] at ht; simp at ht
     have hm : (x : v.adicCompletion F) / t ∈ v.adicCompletionIntegers F := by
       rw [HeightOneSpectrum.mem_adicCompletionIntegers, map_div₀, div_le_one₀ (zero_lt_iff.2 ht)]
       exact hx
@@ -34,8 +35,15 @@ theorem mem_span_singleton_adicCompletionIntegers {F : Type} [Field F] [NumberFi
     change (x : v.adicCompletion F) / t * t = x
     rw [div_mul_cancel₀ _ ht1]
 
-theorem isAdicComplete_and_card_quotient_adicCompletionIntegers :
-    ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)), (∀ t : v.adicCompletionIntegers F, Valued.v (t : v.adicCompletion F) < 1 → IsAdicComplete (Ideal.span {t}) (v.adicCompletionIntegers F)) ∧ ∀ (t : v.adicCompletionIntegers F) (e : ℕ), Valued.v (t : v.adicCompletion F) = WithZero.exp (-(e : ℤ)) → Nat.card (v.adicCompletionIntegers F ⧸ Ideal.span {t}) = Ideal.absNorm v.asIdeal ^ e := by
+theorem isAdicComplete_and_card_quotient_adicCompletionIntegers
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)),
+      (∀ t : v.adicCompletionIntegers F,
+          Valued.v (t : v.adicCompletion F) < 1
+            → IsAdicComplete (Ideal.span {t}) (v.adicCompletionIntegers F))
+        ∧ ∀ (t : v.adicCompletionIntegers F) (e : ℕ),
+          Valued.v (t : v.adicCompletion F) = WithZero.exp (-(e : ℤ))
+            → Nat.card (v.adicCompletionIntegers F ⧸ Ideal.span {t})
+              = Ideal.absNorm v.asIdeal ^ e := by
   intro F _ _ v
   refine ⟨fun t ht => ?_, fun t e ht => ?_⟩
   · refine NormIntegers.isAdicComplete_of_fg (C := v.adicCompletion F) ⟨?_, ?_, ?_⟩

@@ -32,10 +32,10 @@ def precompIso : (K₂ → ℤ) ≃o (K₁ → ℤ) where
     · intro h k
       exact h (e k)
 
-theorem eventualValue_comp (g : (K₁ → ℤ) → ℤ) :
-    eventualValue (fun m : K₂ → ℤ => g (m ∘ e)) = eventualValue g := by
-  have key : ∀ c, (∀ᶠ m in atTop, (fun m : K₂ → ℤ => g (m ∘ e)) m = c) ↔
-      ∀ᶠ m in atTop, g m = c := by
+theorem eventualValue_comp (g : (K₁ → ℤ) → ℤ)
+    : eventualValue (fun m : K₂ → ℤ => g (m ∘ e)) = eventualValue g := by
+  have key
+      : ∀ c, (∀ᶠ m in atTop, (fun m : K₂ → ℤ => g (m ∘ e)) m = c) ↔ ∀ᶠ m in atTop, g m = c := by
     intro c
     rw [← (precompIso e).map_atTop, Filter.eventually_map]
     rfl
@@ -46,12 +46,12 @@ theorem eventualValue_comp (g : (K₁ → ℤ) → ℤ) :
     rw [dite_eq_left hf, dite_eq_left hg]
     obtain ⟨m, h1, h2⟩ := (((key _).1 hf.choose_spec).and hg.choose_spec).exists
     exact h1.symm.trans h2
-  · have hf : ¬ ∃ c, ∀ᶠ m in atTop, (fun m : K₂ → ℤ => g (m ∘ e)) m = c :=
-      fun ⟨c, hc⟩ => hg ⟨c, (key c).1 hc⟩
+  · have hf : ¬ ∃ c, ∀ᶠ m in atTop, (fun m : K₂ → ℤ => g (m ∘ e)) m = c := fun ⟨c, hc⟩ =>
+      hg ⟨c, (key c).1 hc⟩
     rw [dite_eq_right hf, dite_eq_right hg]
 
-theorem mixedDiff_comp {n : ℕ} (bs : Fin n → K₂ → ℤ) (h : (K₁ → ℤ) → ℤ) :
-    mixedDiff bs (fun m => h (m ∘ e)) = fun m => mixedDiff (fun i => bs i ∘ e) h (m ∘ e) := by
+theorem mixedDiff_comp {n : ℕ} (bs : Fin n → K₂ → ℤ) (h : (K₁ → ℤ) → ℤ)
+    : mixedDiff bs (fun m => h (m ∘ e)) = fun m => mixedDiff (fun i => bs i ∘ e) h (m ∘ e) := by
   unfold mixedDiff
   have hl : List.ofFn (fun i => bs i ∘ e) = (List.ofFn bs).map (fun b => b ∘ e) := by
     rw [List.map_ofFn]

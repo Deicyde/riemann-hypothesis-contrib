@@ -6,7 +6,8 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.HasSncCoordsOf
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R ReciprocityTheory.ChartRestriction.G.Geo.ResK
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R ReciprocityTheory.ChartRestriction.G.Geo.ResK
 
 namespace GlobalTheory.CompanionTheory.Geo.SncCoordsSide
 

@@ -14,7 +14,8 @@ variable (R : Type) [CommRing R]
 
 def ee (q n : ℕ) : Fin n × Fin q ≃ Fin (q * n) := (Equiv.prodComm _ _).trans finProdFinEquiv
 
-def blkM (q n : ℕ) : (Fin q → Matrix (Fin n) (Fin n) R) →* Matrix (Fin (q * n)) (Fin (q * n)) R where
+def blkM (q n : ℕ)
+    : (Fin q → Matrix (Fin n) (Fin n) R) →* Matrix (Fin (q * n)) (Fin (q * n)) R where
   toFun a := Matrix.reindex (ee q n) (ee q n) (Matrix.blockDiagonal a)
   map_one' := by simp
   map_mul' a b := by

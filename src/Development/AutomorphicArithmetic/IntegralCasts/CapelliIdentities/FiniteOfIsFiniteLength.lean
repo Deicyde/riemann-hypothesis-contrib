@@ -21,14 +21,14 @@ private lemma finite_of_isFiniteLength {S : Type} [CommRing S] [IsLocalRing S]
     exact Finite.of_addSubgroup_quotient N.toAddSubgroup
 
 open IsLocalRing in
-theorem UpperTheory.monic_ideal_completion :
-    ∀ {O R : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-        [Finite (IsLocalRing.ResidueField O)] [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [Algebra O R]
-        [IsLocalHom (algebraMap O R)]
-        (hres : ∀ x : R, ∃ a : O, x - algebraMap O R a ∈ IsLocalRing.maximalIdeal R)
-        (J : Ideal R) (hJ : ∀ x : R, ∃ P : Polynomial O, P.Monic ∧ Polynomial.aeval x P ∈ J)
-        (ϖ : O) (hϖ : Irreducible ϖ),
-        Finite (R ⧸ (J ⊔ Ideal.span {algebraMap O R ϖ})) := by
+theorem UpperTheory.monic_ideal_completion
+    : ∀ {O R : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Finite (IsLocalRing.ResidueField O)] [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+        [Algebra O R] [IsLocalHom (algebraMap O R)]
+        (hres : ∀ x : R, ∃ a : O, x - algebraMap O R a ∈ IsLocalRing.maximalIdeal R) (J : Ideal R)
+        (hJ : ∀ x : R, ∃ P : Polynomial O, P.Monic ∧ Polynomial.aeval x P ∈ J) (ϖ : O)
+        (hϖ : Irreducible ϖ),
+      Finite (R ⧸ (J ⊔ Ideal.span {algebraMap O R ϖ})) := by
   intro O R _ _ _ _ _ _ _ _ _ hres J hJ ϖ hϖ
   obtain ⟨I, hIdef⟩ : ∃ I, I = J ⊔ Ideal.span {algebraMap O R ϖ} := ⟨_, rfl⟩
   rw [← hIdef]
@@ -99,4 +99,5 @@ theorem UpperTheory.monic_ideal_completion :
   haveI : Finite (ResidueField (R ⧸ I)) :=
     Finite.of_surjective (Ideal.Quotient.lift (maximalIdeal O) φ hφk)
       (Ideal.Quotient.lift_surjective_of_surjective _ _ hφs)
-  exact finite_of_isFiniteLength (S := R ⧸ I) (isFiniteLength_iff_isNoetherian_isArtinian.mpr ⟨inferInstance, inferInstance⟩)
+  exact finite_of_isFiniteLength (S := R ⧸ I)
+    (isFiniteLength_iff_isNoetherian_isArtinian.mpr ⟨inferInstance, inferInstance⟩)

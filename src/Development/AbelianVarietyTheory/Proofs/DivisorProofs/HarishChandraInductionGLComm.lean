@@ -18,7 +18,9 @@ variable {F : Type} [Field F]
 def aflip {n : ℕ} (M : Matrix (Fin n) (Fin n) F) : Matrix (Fin n) (Fin n) F :=
   (M.submatrix Fin.revPerm Fin.revPerm).transpose
 
-theorem aflip_apply {n : ℕ} (M : Matrix (Fin n) (Fin n) F) (i j : Fin n) : aflip M i j = M j.rev i.rev := rfl
+theorem aflip_apply {n : ℕ} (M : Matrix (Fin n) (Fin n) F) (i j : Fin n)
+    : aflip M i j = M j.rev i.rev :=
+  rfl
 
 theorem aflip_mul {n : ℕ} (M N : Matrix (Fin n) (Fin n) F) : aflip (M * N) = aflip N * aflip M := by
   unfold aflip
@@ -31,10 +33,12 @@ theorem aflip_one {n : ℕ} : aflip (1 : Matrix (Fin n) (Fin n) F) = 1 := by
 theorem aflip_aflip {n : ℕ} (M : Matrix (Fin n) (Fin n) F) : aflip (aflip M) = M := by
   ext i j; simp [aflip_apply]
 
-theorem aflip_similar {n : ℕ} (M : Matrix (Fin n) (Fin n) F) :
-    ∃ P : Matrix (Fin n) (Fin n) F, IsUnit P ∧ P * M = aflip M * P := by
-  obtain ⟨P, hP, h⟩ := GlobalTheory.SimilarTranspose.main F (Fin n) (M.submatrix Fin.revPerm Fin.revPerm)
-  let Q : Matrix (Fin n) (Fin n) F := (1 : Matrix (Fin n) (Fin n) F).submatrix Fin.revPerm (Equiv.refl _)
+theorem aflip_similar {n : ℕ} (M : Matrix (Fin n) (Fin n) F)
+    : ∃ P : Matrix (Fin n) (Fin n) F, IsUnit P ∧ P * M = aflip M * P := by
+  obtain ⟨P, hP, h⟩ :=
+    GlobalTheory.SimilarTranspose.main F (Fin n) (M.submatrix Fin.revPerm Fin.revPerm)
+  let Q : Matrix (Fin n) (Fin n) F :=
+    (1 : Matrix (Fin n) (Fin n) F).submatrix Fin.revPerm (Equiv.refl _)
   have hQ : IsUnit Q := by
     have : Q * (1 : Matrix (Fin n) (Fin n) F).submatrix (Equiv.refl _) Fin.revPerm = 1 := by
       simp only [Q]
@@ -55,15 +59,18 @@ def aflipG {n : ℕ} (x : GL (Fin n) F) : GL (Fin n) F where
   val_inv := by rw [← aflip_mul, Units.inv_mul, aflip_one]
   inv_val := by rw [← aflip_mul, Units.mul_inv, aflip_one]
 
-theorem aflipG_coe {n : ℕ} (x : GL (Fin n) F) :
-    ((aflipG x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = aflip (x : Matrix (Fin n) (Fin n) F) := rfl
+theorem aflipG_coe {n : ℕ} (x : GL (Fin n) F)
+    : ((aflipG x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)
+      = aflip (x : Matrix (Fin n) (Fin n) F) :=
+  rfl
 
 theorem aflipG_mul {n : ℕ} (x y : GL (Fin n) F) : aflipG (x * y) = aflipG y * aflipG x :=
   Units.ext (by simp only [aflipG_coe, Units.val_mul, aflip_mul])
 
 theorem aflipG_inv {n : ℕ} (x : GL (Fin n) F) : aflipG x⁻¹ = (aflipG x)⁻¹ := Units.ext rfl
 
-theorem aflipG_aflipG {n : ℕ} (x : GL (Fin n) F) : aflipG (aflipG x) = x := Units.ext (aflip_aflip _)
+theorem aflipG_aflipG {n : ℕ} (x : GL (Fin n) F) : aflipG (aflipG x) = x :=
+  Units.ext (aflip_aflip _)
 
 def aflipE (n : ℕ) : GL (Fin n) F ≃ GL (Fin n) F := ⟨aflipG, aflipG, aflipG_aflipG, aflipG_aflipG⟩
 
@@ -78,13 +85,13 @@ theorem toG_coe' {n : ℕ} (x : GL (Fin n) F) : toG (x : Matrix (Fin n) (Fin n) 
   rw [dite_eq_left x.isUnit]
   exact Units.ext (IsUnit.unit_spec _)
 
-theorem cl_conj {n : ℕ} {α : GL (Fin n) F → ℂ} (hα : IsCl α) (p x : GL (Fin n) F) :
-    α (p * x * p⁻¹) = α x := by
+theorem cl_conj {n : ℕ} {α : GL (Fin n) F → ℂ} (hα : IsCl α) (p x : GL (Fin n) F)
+    : α (p * x * p⁻¹) = α x := by
   have := hα x p⁻¹
   rwa [inv_inv] at this
 
-theorem class_aflip {n : ℕ} {α : GL (Fin n) F → ℂ} (hα : IsCl α) (M : Matrix (Fin n) (Fin n) F) :
-    α (toG (aflip M)) = α (toG M) := by
+theorem class_aflip {n : ℕ} {α : GL (Fin n) F → ℂ} (hα : IsCl α) (M : Matrix (Fin n) (Fin n) F)
+    : α (toG (aflip M)) = α (toG M) := by
   by_cases h : IsUnit M
   · obtain ⟨x, rfl⟩ := h
     obtain ⟨p, hp⟩ := aflipG_conj x
@@ -105,7 +112,8 @@ theorem inPar_aflip {a b : ℕ} (y : GL (Fin (a + b)) F) : InPar b (aflipG y) �
     rw [aflipG_coe, aflip_apply]
     exact h j.rev i.rev (by rw [Fin.val_rev]; omega) (by rw [Fin.val_rev]; omega)
 
-theorem tl_aflip {a b : ℕ} (M : Matrix (Fin (a + b)) (Fin (a + b)) F) : tl b (aflip M) = aflip (br a b M) := by
+theorem tl_aflip {a b : ℕ} (M : Matrix (Fin (a + b)) (Fin (a + b)) F)
+    : tl b (aflip M) = aflip (br a b M) := by
   ext i j
   have hi := i.2
   have hj := j.2
@@ -114,7 +122,8 @@ theorem tl_aflip {a b : ℕ} (M : Matrix (Fin (a + b)) (Fin (a + b)) F) : tl b (
   rw [dite_eq_left (by omega), dite_eq_left (by simp only [Fin.val_rev]; omega), aflip_apply]
   congr 1 <;> apply Fin.ext <;> simp only [Fin.val_rev] <;> omega
 
-theorem br_aflip {a b : ℕ} (M : Matrix (Fin (a + b)) (Fin (a + b)) F) : br b a (aflip M) = aflip (tl a M) := by
+theorem br_aflip {a b : ℕ} (M : Matrix (Fin (a + b)) (Fin (a + b)) F)
+    : br b a (aflip M) = aflip (tl a M) := by
   ext i j
   have hi := i.2
   have hj := j.2
@@ -123,7 +132,6 @@ theorem br_aflip {a b : ℕ} (M : Matrix (Fin (a + b)) (Fin (a + b)) F) : br b a
   rw [dite_eq_left (by omega), dite_eq_left (by simp only [Fin.val_rev]; omega), aflip_apply]
   congr 1 <;> apply Fin.ext <;> simp only [Fin.val_rev] <;> omega
 
-theorem gal_id (n : ℕ) (y : GL (Fin n) F) : gal (RingHom.id F) n y = y := by
-  ext i j; simp [gal]
+theorem gal_id (n : ℕ) (y : GL (Fin n) F) : gal (RingHom.id F) n y = y := by ext i j; simp [gal]
 
 end GlobalTheory.HCCommF

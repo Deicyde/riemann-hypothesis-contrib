@@ -7,7 +7,8 @@ public import Formalism.LatticeTheta.Statement
 
 @[expose] public section
 
-open NumberField nonZeroDivisors MeasureTheory GlobalTheory.LipschitzTR GlobalTheory.IndefiniteRowSideFullHecke.TraceDualDifferent
+open NumberField nonZeroDivisors MeasureTheory GlobalTheory.LipschitzTR
+  GlobalTheory.IndefiniteRowSideFullHecke.TraceDualDifferent
 open scoped FourierTransform RealInnerProductSpace
 
 noncomputable section
@@ -17,14 +18,14 @@ namespace GlobalTheory.LipschitzTR
 section
 variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
 
-theorem inner_remb_eq_trace (a b : F) :
-    ⟪remb F a, remb F b⟫ = ((Algebra.trace ℚ F (a * b) : ℚ) : ℝ) := by
+theorem inner_remb_eq_trace (a b : F)
+    : ⟪remb F a, remb F b⟫ = ((Algebra.trace ℚ F (a * b) : ℚ) : ℝ) := by
   rw [GlobalTheory.trace_eq_sum_realEmbeddings, PiLp.inner_apply]
   refine Finset.sum_congr rfl fun τ _ => ?_
   simp [map_mul, mul_comm]
 
-theorem remb_mem_dual_latOf_iff (N : FractionalIdeal (𝓞 F)⁰ F) (hN : N ≠ 0) (ν : F) :
-    remb F ν ∈ Formalism.H.dual (latOf N) ↔ ν ∈ FractionalIdeal.dual ℤ ℚ N := by
+theorem remb_mem_dual_latOf_iff (N : FractionalIdeal (𝓞 F)⁰ F) (hN : N ≠ 0) (ν : F)
+    : remb F ν ∈ Formalism.H.dual (latOf N) ↔ ν ∈ FractionalIdeal.dual ℤ ℚ N := by
   rw [Formalism.H.dual, LinearMap.BilinForm.mem_dualSubmodule, FractionalIdeal.mem_dual hN]
   constructor
   · intro h a ha
@@ -45,9 +46,11 @@ theorem remb_mem_dual_latOf_iff (N : FractionalIdeal (𝓞 F)⁰ F) (hN : N ≠ 
       inner_remb_eq_trace, ← hz]
     simp
 
-theorem exists_remb_eq_of_mem_dual {ι : Type} [Fintype ι] [DecidableEq ι] (b : Module.Basis ι ℚ F)
-    (N : FractionalIdeal (𝓞 F)⁰ F) (hbN : ∀ i, b i ∈ N) (μ : RSp F)
-    (hμ : μ ∈ Formalism.H.dual (latOf N)) : ∃ ν : F, remb F ν = μ := by
+theorem exists_remb_eq_of_mem_dual
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι ℚ F) (N : FractionalIdeal (𝓞 F)⁰ F) (hbN : ∀ i, b i ∈ N)
+    (μ : RSp F) (hμ : μ ∈ Formalism.H.dual (latOf N))
+    : ∃ ν : F, remb F ν = μ := by
   set B := Algebra.traceForm ℚ F
   have hB : B.Nondegenerate := traceForm_nondegenerate ℚ F
   set b' := B.dualBasis hB b
@@ -55,8 +58,9 @@ theorem exists_remb_eq_of_mem_dual {ι : Type} [Fintype ι] [DecidableEq ι] (b 
     have := LinearMap.BilinForm.apply_dualBasis_left hB b j i
     rwa [Algebra.traceForm_apply] at this
   have hc : ∀ i, ∃ z : ℤ, ⟪μ, remb F (b i)⟫ = z := fun i => by
-    have := (LinearMap.BilinForm.mem_dualSubmodule _).mp hμ (remb F (b i))
-      ((mem_latOf N _).mpr ⟨b i, hbN i, rfl⟩)
+    have :=
+      (LinearMap.BilinForm.mem_dualSubmodule _).mp hμ (remb F (b i))
+        ((mem_latOf N _).mpr ⟨b i, hbN i, rfl⟩)
     obtain ⟨z, hz⟩ := Submodule.mem_one.mp this
     exact ⟨z, by simpa using hz.symm⟩
   choose c hc using hc
@@ -65,9 +69,10 @@ theorem exists_remb_eq_of_mem_dual {ι : Type} [Fintype ι] [DecidableEq ι] (b 
     rw [inner_remb_eq_trace]
     have : Algebra.trace ℚ F (ν * b i) = c i := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [ν, Finset.sum_mul, smul_mul_assoc, map_sum, map_smul, hdel, smul_eq_mul,
-        mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
-    rw [this]; simp
+      simp only [ν, Finset.sum_mul, smul_mul_assoc, map_sum, map_smul, hdel, smul_eq_mul, mul_ite,
+        mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    rw [this]
+    simp
   have hind : LinearIndependent ℝ (fun i => remb F (b i)) := by
     rw [Fintype.linearIndependent_iff]
     intro g hg j
@@ -80,19 +85,18 @@ theorem exists_remb_eq_of_mem_dual {ι : Type} [Fintype ι] [DecidableEq ι] (b 
     rw [finrank_euclideanSpace, GlobalTheory.card_realEmbeddings, Module.finrank_eq_card_basis b]
   haveI : Nonempty ι := b.index_nonempty
   let E := basisOfLinearIndependentOfCardEqFinrank hind hcard
-  have hz : innerₛₗ ℝ (μ - remb F ν) = 0 := E.ext fun i => by
-    simp [E, inner_sub_left, hνb, hc]
+  have hz : innerₛₗ ℝ (μ - remb F ν) = 0 := E.ext fun i => by simp [E, inner_sub_left, hνb, hc]
   have h0 := LinearMap.congr_fun hz (μ - remb F ν)
-  have h1 : ⟪μ - remb F ν, μ - remb F ν⟫ = 0 := by
-    rw [LinearMap.zero_apply] at h0; exact h0
+  have h1 : ⟪μ - remb F ν, μ - remb F ν⟫ = 0 := by rw [LinearMap.zero_apply] at h0; exact h0
   rw [inner_self_eq_zero, sub_eq_zero] at h1
   exact ⟨ν, h1.symm⟩
 
 end
 
-theorem dual_latOf_eq_latOf_traceDual (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
-    (N : FractionalIdeal (𝓞 F)⁰ F) (hN : N ≠ 0) :
-    Formalism.H.dual (latOf N) = latOf (FractionalIdeal.dual ℤ ℚ N) := by
+theorem dual_latOf_eq_latOf_traceDual
+    (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
+    (N : FractionalIdeal (𝓞 F)⁰ F) (hN : N ≠ 0)
+    : Formalism.H.dual (latOf N) = latOf (FractionalIdeal.dual ℤ ℚ N) := by
   classical
   ext μ
   constructor
@@ -100,8 +104,9 @@ theorem dual_latOf_eq_latOf_traceDual (F : Type) [Field F] [NumberField F] [IsTo
     rw [mem_latOf]
     let I : (FractionalIdeal (𝓞 F)⁰ F)ˣ := Units.mk0 N hN
     have hbN : ∀ i, basisOfFractionalIdeal F I i ∈ N := fun i => by
-      have := (mem_span_basisOfFractionalIdeal F (I := I) (x := basisOfFractionalIdeal F I i)).mp
-        (Submodule.subset_span ⟨i, rfl⟩)
+      have :=
+        (mem_span_basisOfFractionalIdeal F (I := I) (x := basisOfFractionalIdeal F I i)).mp
+          (Submodule.subset_span ⟨i, rfl⟩)
       simpa [I] using this
     obtain ⟨ν, hν⟩ := exists_remb_eq_of_mem_dual (basisOfFractionalIdeal F I) N hbN μ hμ
     subst hν

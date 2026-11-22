@@ -6,16 +6,20 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Standard
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 
 namespace GlobalTheory.CompanionTheory.EtaleSections
 
-theorem exists_algHom_away_of_etale {S : Type} [CommRing S]
+theorem exists_algHom_away_of_etale
+    {S : Type} [CommRing S]
     (hA : Aic (S := S)) (hL : Loc (S := S))
-    (B : Type) [CommRing B] [Algebra S B] [Algebra.Etale S B] (Q : Ideal B) [hQ : Q.IsPrime]
-    (hm : (Q.comap (algebraMap S B)).IsMaximal) :
-    ∃ e : S, IsIdempotentElem e ∧ e ∉ Q.comap (algebraMap S B) ∧
-      Nonempty (B →ₐ[S] Localization.Away e) := by
+    (B : Type) [CommRing B] [Algebra S B] [Algebra.Etale S B]
+    (Q : Ideal B) [hQ : Q.IsPrime]
+    (hm : (Q.comap (algebraMap S B)).IsMaximal)
+    : ∃ e : S,
+      IsIdempotentElem e ∧ e ∉ Q.comap (algebraMap S B)
+        ∧ Nonempty (B →ₐ[S] Localization.Away e) := by
   obtain ⟨g, hg, hstd⟩ := Algebra.IsEtaleAt.exists_isStandardEtale (R := S) Q
   let Bg := Localization.Away g
   have hdisj : Disjoint (Submonoid.powers g : Set B) (Q : Set B) := by
@@ -30,8 +34,10 @@ theorem exists_algHom_away_of_etale {S : Type} [CommRing S]
     rw [IsScalarTower.algebraMap_eq S B Bg, ← Ideal.comap_comap, hcomap]
   let q := Q.map (algebraMap B Bg)
   have hqm : (q.comap (algebraMap S Bg)).IsMaximal := hc ▸ hm
-  have hsection : ∃ e : S, IsIdempotentElem e ∧ e ∉ q.comap (algebraMap S Bg) ∧
-      Nonempty (Bg →ₐ[S] Localization.Away e) := by
+  have hsection
+      : ∃ e : S,
+        IsIdempotentElem e ∧ e ∉ q.comap (algebraMap S Bg)
+          ∧ Nonempty (Bg →ₐ[S] Localization.Away e) := by
     obtain ⟨P⟩ := Algebra.IsStandardEtale.nonempty_standardEtalePresentation (R := S) (S := Bg)
     obtain ⟨s, hs⟩ := GlobalTheory.T.absolutely_closed_polynomial_splits hA P.f P.monic_f
 
@@ -58,11 +64,11 @@ theorem exists_algHom_away_of_etale {S : Type} [CommRing S]
     have hcm : c ∉ q.comap (algebraMap S Bg) := by
       intro hcQ
       have hcQ' : algebraMap S Bg c ∈ q := hcQ
-      have hd : P.x - algebraMap S Bg b ∣
-          Polynomial.aeval P.x P.g - algebraMap S Bg c := by
+      have hd : P.x - algebraMap S Bg b ∣ Polynomial.aeval P.x P.g - algebraMap S Bg c := by
         have := Polynomial.sub_dvd_eval_sub P.x (algebraMap S Bg b) (P.g.map (algebraMap S Bg))
         rwa [Polynomial.eval_map_algebraMap, Polynomial.eval_map_algebraMap,
-          Polynomial.aeval_algebraMap_apply_eq_algebraMap_eval] at this
+            Polynomial.aeval_algebraMap_apply_eq_algebraMap_eval]
+          at this
       have hgQ : Polynomial.aeval P.x P.g ∈ q := by
         have h1 := Ideal.mem_of_dvd q hd hbQ
         simpa using q.add_mem h1 hcQ'
@@ -76,8 +82,7 @@ theorem exists_algHom_away_of_etale {S : Type} [CommRing S]
       exact (Ideal.span_singleton_le_iff_mem _).2 hμ he1
     have hem : e ∉ q.comap (algebraMap S Bg) := by
       intro hem
-      have : (1 : S) ∈ q.comap (algebraMap S Bg) := by
-        simpa using Ideal.add_mem _ hem he1m
+      have : (1 : S) ∈ q.comap (algebraMap S Bg) := by simpa using Ideal.add_mem _ hem he1m
       exact hqm.ne_top ((Ideal.eq_top_iff_one _).2 this)
     refine ⟨e, he, hem, ?_⟩
 
@@ -85,8 +90,8 @@ theorem exists_algHom_away_of_etale {S : Type} [CommRing S]
     have heu : IsUnit (algebraMap S (Localization.Away e) e) :=
       IsLocalization.Away.algebraMap_isUnit e
     have hcu : IsUnit (algebraMap S (Localization.Away e) c) := by
-      have : algebraMap S (Localization.Away e) e =
-          algebraMap S (Localization.Away e) (r * a) * algebraMap S (Localization.Away e) c := by
+      have : algebraMap S (Localization.Away e) e
+          = algebraMap S (Localization.Away e) (r * a) * algebraMap S (Localization.Away e) c := by
         rw [← map_mul, ← hr]; ring_nf
       rw [this] at heu
       exact isUnit_of_mul_isUnit_right heu
@@ -99,10 +104,12 @@ theorem exists_algHom_away_of_etale {S : Type} [CommRing S]
   obtain ⟨e, he, hem, ⟨ψ⟩⟩ := hsection
   exact ⟨e, he, hc ▸ hem, ⟨ψ.comp (IsScalarTower.toAlgHom S B Bg)⟩⟩
 
-theorem exists_secOn_of_etale_surjective : ∀ {S : Type} [CommRing S],
-    Aic (S := S) → Loc (S := S) →
-    ∀ (Y : Scheme.{0}) (f : Y ⟶ Spec (CommRingCat.of S)), Etale f → Surjective f →
-    ∀ m : Ideal S, m.IsMaximal → ∃ e : S, IsIdempotentElem e ∧ e ∉ m ∧ SecOn f e := by
+theorem exists_secOn_of_etale_surjective
+    : ∀ {S : Type} [CommRing S],
+      Aic (S := S) → Loc (S := S)
+        → ∀ (Y : Scheme.{0}) (f : Y ⟶ Spec (CommRingCat.of S)),
+          Etale f → Surjective f
+            → ∀ m : Ideal S, m.IsMaximal → ∃ e : S, IsIdempotentElem e ∧ e ∉ m ∧ SecOn f e := by
   intro S _ hA hL Y f hE hS m hm
   let x : Spec (CommRingCat.of S) := ⟨m, hm.isPrime⟩
   obtain ⟨y, hy⟩ := hS.surj x
@@ -115,11 +122,11 @@ theorem exists_secOn_of_etale_surjective : ∀ {S : Type} [CommRing S],
   have hyr : y ∈ Set.range hV.fromSpec := by rw [hV.range_fromSpec]; exact hyV
   obtain ⟨z, hz⟩ := hyr
   have hcm : z.asIdeal.comap (algebraMap S Γ(Y, V)) = m := by
-    have h1 : (Spec.map φ) z = x := by
-      rw [hφ, Scheme.Hom.comp_apply, hz, hy]
+    have h1 : (Spec.map φ) z = x := by rw [hφ, Scheme.Hom.comp_apply, hz, hy]
     exact congrArg PrimeSpectrum.asIdeal h1
   have : z.asIdeal.IsPrime := z.2
-  obtain ⟨e, he, hem, ⟨ψ⟩⟩ := exists_algHom_away_of_etale hA hL Γ(Y, V) z.asIdeal (by rw [hcm]; exact hm)
+  obtain ⟨e, he, hem, ⟨ψ⟩⟩ :=
+    exists_algHom_away_of_etale hA hL Γ(Y, V) z.asIdeal (by rw [hcm]; exact hm)
   refine ⟨e, he, hcm ▸ hem, Spec.map (CommRingCat.ofHom ψ.toRingHom) ≫ hV.fromSpec, ?_⟩
   rw [Category.assoc, ← hφ, ← Spec.map_comp]
   congr 1

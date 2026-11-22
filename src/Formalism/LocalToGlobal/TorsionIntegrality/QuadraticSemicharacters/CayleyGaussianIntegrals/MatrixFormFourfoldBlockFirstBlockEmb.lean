@@ -21,8 +21,8 @@ def sliceL (a : Fin 4) : (Fin 4 × n → ℂ) →ₗ[ℂ] (n → ℂ) where
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem slice_analyticAt (a : Fin 4) (z : Fin 4 × n → ℂ) :
-    AnalyticAt ℂ (slice a : (Fin 4 × n → ℂ) → n → ℂ) z :=
+theorem slice_analyticAt (a : Fin 4) (z : Fin 4 × n → ℂ)
+    : AnalyticAt ℂ (slice a : (Fin 4 × n → ℂ) → n → ℂ) z :=
   (LinearMap.toContinuousLinearMap (sliceL (n := n) a)).analyticAt z
 
 def mk4 (u : Fin 4 → n → ℂ) : Fin 4 × n → ℂ := fun p => u p.1 p.2
@@ -40,19 +40,21 @@ def emb0 : (n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ) where
     funext p
     by_cases hp : p.1 = 0 <;> simp [hp]
 
-theorem blockSlice_firstBlockEmb (a : Fin 4) (v : n → ℂ) : slice a (emb0 v) = if a = 0 then v else 0 := by
+theorem blockSlice_firstBlockEmb (a : Fin 4) (v : n → ℂ)
+    : slice a (emb0 v) = if a = 0 then v else 0 := by
   funext i
   by_cases ha : a = 0 <;> simp [slice, emb0, ha]
 
-theorem firstBlockEmb_mem_fourfoldLattice (Λ : AddSubgroup (n → ℂ)) {x : n → ℂ} (hx : x ∈ Λ) : emb0 x ∈ pow4 Λ := by
+theorem firstBlockEmb_mem_fourfoldLattice (Λ : AddSubgroup (n → ℂ)) {x : n → ℂ} (hx : x ∈ Λ)
+    : emb0 x ∈ pow4 Λ := by
   intro a
   rw [blockSlice_firstBlockEmb]
   split_ifs
   · exact hx
   · exact Λ.zero_mem
 
-theorem prod_blockSlice_firstBlockEmb (α : (n → ℂ) → ℂ) (hα0 : α 0 = 1) (x : n → ℂ) :
-    ∏ a, α (slice a (emb0 x)) = α x := by
+theorem prod_blockSlice_firstBlockEmb (α : (n → ℂ) → ℂ) (hα0 : α 0 = 1) (x : n → ℂ)
+    : ∏ a, α (slice a (emb0 x)) = α x := by
   rw [Finset.prod_eq_single (0 : Fin 4)]
   · rw [blockSlice_firstBlockEmb, if_pos rfl]
   · intro a _ ha
@@ -60,8 +62,8 @@ theorem prod_blockSlice_firstBlockEmb (α : (n → ℂ) → ℂ) (hα0 : α 0 = 
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem matrixForm_fourfoldBlock_firstBlockEmb (h : Matrix n n ℂ) (z : Fin 4 × n → ℂ) (x : n → ℂ) :
-    matH (blk4 h) z (emb0 x) = matH h (slice 0 z) x := by
+theorem matrixForm_fourfoldBlock_firstBlockEmb (h : Matrix n n ℂ) (z : Fin 4 × n → ℂ) (x : n → ℂ)
+    : matH (blk4 h) z (emb0 x) = matH h (slice 0 z) x := by
   rw [matrixForm_fourfoldBlock, Finset.sum_eq_single (0 : Fin 4)]
   · rw [blockSlice_firstBlockEmb, if_pos rfl]
   · intro a _ ha
@@ -74,19 +76,24 @@ theorem fourfoldTensor_smul (c : ℂ) (θ : (n → ℂ) → ℂ) : tens4 (c • 
   simp only [tens4, Pi.smul_apply, smul_eq_mul, Finset.prod_mul_distrib, Finset.prod_const,
     Finset.card_univ, Fintype.card_fin]
 
-theorem restrict_mem (h : Matrix n n ℂ) (Λ : AddSubgroup (n → ℂ)) (α : (n → ℂ) → ℂ) (hα0 : α 0 = 1)
-    {P : (Fin 4 × n → ℂ) → ℂ}
-    (hP : P ∈ Th (matH (blk4 h)) (fun x => ∏ a, α (slice a x)) (pow4 Λ))
-    (z₁ : Fin 4 × n → ℂ) (hz₁ : slice 0 z₁ = 0) :
-    (fun v => P (z₁ + emb0 v)) ∈ Th (matH h) α Λ := by
+theorem restrict_mem
+    (h : Matrix n n ℂ) (Λ : AddSubgroup (n → ℂ))
+    (α : (n → ℂ) → ℂ) (hα0 : α 0 = 1)
+    {P : (Fin 4 × n → ℂ) → ℂ} (hP : P ∈ Th (matH (blk4 h)) (fun x => ∏ a, α (slice a x)) (pow4 Λ))
+    (z₁ : Fin 4 × n → ℂ) (hz₁ : slice 0 z₁ = 0)
+    : (fun v => P (z₁ + emb0 v)) ∈ Th (matH h) α Λ := by
   refine ⟨?_, ?_⟩
   · intro v _
     exact (hP.1 (z₁ + emb0 v) (Set.mem_univ _)).comp_of_eq
       (analyticAt_const.add ((LinearMap.toContinuousLinearMap (emb0 (n := n))).analyticAt v)) rfl
   · intro x hx v
     have h1 := hP.2 (emb0 x) (firstBlockEmb_mem_fourfoldLattice Λ hx) (z₁ + emb0 v)
-    simp only [opU, prod_blockSlice_firstBlockEmb α hα0, matrixForm_fourfoldBlock_firstBlockEmb, slice_add, hz₁, zero_add] at h1 ⊢
-    rw [blockSlice_firstBlockEmb, if_pos rfl, blockSlice_firstBlockEmb, if_pos rfl, add_assoc, ← map_add (f := _)] at h1
+    simp only [opU, prod_blockSlice_firstBlockEmb α hα0, matrixForm_fourfoldBlock_firstBlockEmb,
+        slice_add, hz₁, zero_add]
+      at h1 ⊢
+    rw [blockSlice_firstBlockEmb, if_pos rfl, blockSlice_firstBlockEmb, if_pos rfl, add_assoc,
+        ← map_add (f := _)]
+      at h1
     exact h1
 
 end Blocks
@@ -109,21 +116,23 @@ theorem FourthRoot_of (h4 : Tens4Mem) : FourthRoot := by
     by_contra hcon
     push Not at hcon
     exact hP0 (funext hcon)
-  have key_line : ∀ θ ∈ Th (matH h) α Λ, tens4 θ = P → ∀ F ∈ Th (matH h) α Λ, ∃ c : ℂ, F = c • θ := by
+  have key_line
+      : ∀ θ ∈ Th (matH h) α Λ, tens4 θ = P → ∀ F ∈ Th (matH h) α Λ, ∃ c : ℂ, F = c • θ := by
     intro θ hθ hθP F hF
     have hw : θ (slice 0 z) ≠ 0 := by
       intro h0
       apply hz
       rw [← hθP]
       exact Finset.prod_eq_zero (Finset.mem_univ (0 : Fin 4)) h0
-    obtain ⟨c, hc⟩ := hline _ (h4 n h Λ α (fun a => if a = 0 then F else θ)
-      (by intro a; split_ifs <;> assumption))
+    obtain ⟨c, hc⟩ :=
+      hline _ (h4 n h Λ α (fun a => if a = 0 then F else θ) (by intro a; split_ifs <;> assumption))
     refine ⟨c, funext fun v => ?_⟩
     have h1 := congrFun hc (mk4 (fun a => if a = 0 then v else slice 0 z))
     rw [← hθP] at h1
     simp only [Pi.smul_apply, smul_eq_mul, tens4, Fin.prod_univ_four, blockSlice_fourfoldMk] at h1
     simp only [if_true, Fin.isValue, one_ne_zero, if_false, Fin.reduceEq] at h1
-    have h3 : θ (slice 0 z) * θ (slice 0 z) * θ (slice 0 z) ≠ 0 := mul_ne_zero (mul_ne_zero hw hw) hw
+    have h3 : θ (slice 0 z) * θ (slice 0 z) * θ (slice 0 z) ≠ 0 :=
+      mul_ne_zero (mul_ne_zero hw hw) hw
     apply mul_right_cancel₀ h3
     simp only [Pi.smul_apply, smul_eq_mul]
     linear_combination h1
@@ -147,8 +156,9 @@ theorem FourthRoot_of (h4 : Tens4Mem) : FourthRoot := by
     have hc0 : c ≠ 0 := by
       rintro rfl
       have h1 := congrFun hc' (mk4 fun _ => slice 0 z)
-      simp only [tens4, blockSlice_fourfoldMk, Finset.prod_const, Finset.card_univ, Fintype.card_fin, zero_smul,
-        Pi.zero_apply, hθ₁def, hzz] at h1
+      simp only [tens4, blockSlice_fourfoldMk, Finset.prod_const, Finset.card_univ,
+          Fintype.card_fin, zero_smul, Pi.zero_apply, hθ₁def, hzz]
+        at h1
       exact hz (pow_eq_zero_iff (by norm_num) |>.1 h1)
     obtain ⟨r, hr⟩ := IsAlgClosed.exists_pow_nat_eq (c⁻¹) (n := 4) (by norm_num)
     refine ⟨r • θ₁, (Th (matH h) α Λ).smul_mem r hθ₁, ?_⟩
@@ -163,12 +173,13 @@ theorem FourthRoot_of (h4 : Tens4Mem) : FourthRoot := by
 
 theorem fourth_root : FourthRoot := FourthRoot_of fourfoldTensorMem
 
-theorem exp_pi_I_int (m : ℤ) :
-    Complex.exp ((Real.pi : ℂ) * Complex.I * (m : ℂ)) = 1 ∨
-      Complex.exp ((Real.pi : ℂ) * Complex.I * (m : ℂ)) = -1 := by
+theorem exp_pi_I_int (m : ℤ)
+    : Complex.exp ((Real.pi : ℂ) * Complex.I * (m : ℂ)) = 1
+      ∨ Complex.exp ((Real.pi : ℂ) * Complex.I * (m : ℂ)) = -1 := by
   rcases Int.even_or_odd' m with ⟨j, rfl | rfl⟩
   · left
-    have : (Real.pi : ℂ) * Complex.I * ((2 * j : ℤ) : ℂ) = (j : ℂ) * (2 * (Real.pi : ℂ) * Complex.I) := by
+    have : (Real.pi : ℂ) * Complex.I * ((2 * j : ℤ) : ℂ)
+        = (j : ℂ) * (2 * (Real.pi : ℂ) * Complex.I) := by
       push_cast
       ring
     rw [this, Complex.exp_int_mul_two_pi_mul_I]
@@ -181,8 +192,9 @@ theorem exp_pi_I_int (m : ℤ) :
 
 theorem quadMultiplierSemicharacter : AlphaQSemi := by
   intro V _ _ H hH b d hb Λ hdual hstab
-  have key : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ k e : ℤ, altE H x y = (e : ℝ) ∧
-      Real.sqrt d * (H x y).re = 2 * (k : ℝ) - (b : ℝ) * (e : ℝ) := by
+  have key
+      : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ k e : ℤ,
+        altE H x y = (e : ℝ) ∧ Real.sqrt d * (H x y).re = 2 * (k : ℝ) - (b : ℝ) * (e : ℝ) := by
     intro x hx y hy
     obtain ⟨e, he⟩ := hdual hx y hy
     obtain ⟨k, hk⟩ := hdual (hstab x hx) y hy
@@ -203,8 +215,11 @@ theorem quadMultiplierSemicharacter : AlphaQSemi := by
     rw [← he] at hk
     simp only [qOf]
     linarith
-  have hadd : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ m : ℤ, qOf (Real.sqrt d / 2) H (x + y) - qOf (Real.sqrt d / 2) H x
-        - qOf (Real.sqrt d / 2) H y - altE H x y = 2 * (m : ℝ) := by
+  have hadd
+      : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ m : ℤ,
+        qOf (Real.sqrt d / 2) H (x + y) - qOf (Real.sqrt d / 2) H x - qOf (Real.sqrt d / 2) H y
+            - altE H x y
+          = 2 * (m : ℝ) := by
     intro x hx y hy
     obtain ⟨k, e, he, hk⟩ := key x hx y hy
     obtain ⟨t, rfl⟩ := hb
@@ -221,16 +236,21 @@ theorem quadMultiplierSemicharacter : AlphaQSemi := by
     exact_mod_cast exp_pi_I_int m
   · intro x hx y hy
     obtain ⟨m, hm⟩ := hadd x hx y hy
-    have h1 : qOf (Real.sqrt d / 2) H (x + y)
-        = qOf (Real.sqrt d / 2) H x + qOf (Real.sqrt d / 2) H y + altE H x y + 2 * (m : ℝ) := by
+    have h1
+        : qOf (Real.sqrt d / 2) H (x + y)
+          = qOf (Real.sqrt d / 2) H x + qOf (Real.sqrt d / 2) H y + altE H x y + 2 * (m : ℝ) := by
       linarith
     simp only [alphaQ]
     rw [h1, ← Complex.exp_add, ← Complex.exp_add]
-    have h2 : (Real.pi : ℂ) * Complex.I * ((qOf (Real.sqrt d / 2) H x + qOf (Real.sqrt d / 2) H y
-          + altE H x y + 2 * (m : ℝ) : ℝ) : ℂ)
-        = ((Real.pi : ℂ) * Complex.I * (qOf (Real.sqrt d / 2) H x : ℂ)
-          + (Real.pi : ℂ) * Complex.I * (qOf (Real.sqrt d / 2) H y : ℂ)
-          + (Real.pi : ℂ) * Complex.I * (altE H x y : ℂ)) + (m : ℂ) * (2 * (Real.pi : ℂ) * Complex.I) := by
+    have h2
+        : (Real.pi : ℂ) * Complex.I
+            * ((qOf (Real.sqrt d / 2) H x + qOf (Real.sqrt d / 2) H y + altE H x y + 2 * (m : ℝ)
+                : ℝ)
+              : ℂ)
+          = ((Real.pi : ℂ) * Complex.I * (qOf (Real.sqrt d / 2) H x : ℂ)
+              + (Real.pi : ℂ) * Complex.I * (qOf (Real.sqrt d / 2) H y : ℂ)
+              + (Real.pi : ℂ) * Complex.I * (altE H x y : ℂ))
+            + (m : ℂ) * (2 * (Real.pi : ℂ) * Complex.I) := by
       push_cast
       ring
     rw [h2, Complex.exp_add _ ((m : ℂ) * _), Complex.exp_int_mul_two_pi_mul_I, mul_one]
@@ -245,14 +265,19 @@ theorem quadMultiplierRules : AlphaQRules := by
     congr 1
     rw [Complex.re_sum, Finset.mul_sum, Complex.ofReal_sum, Finset.mul_sum]
 
-theorem isSemiChar_congr {V : Type*} [AddCommGroup V] [Module ℂ V] (H : Sesq V) (Λ : AddSubgroup V)
-    (α β : V → ℂ) (hab : ∀ x ∈ Λ, α x = β x) (hβ : IsSemiChar H Λ β) : IsSemiChar H Λ α := by
+theorem isSemiChar_congr
+    {V : Type*} [AddCommGroup V] [Module ℂ V]
+    (H : Sesq V) (Λ : AddSubgroup V) (α β : V → ℂ)
+    (hab : ∀ x ∈ Λ, α x = β x) (hβ : IsSemiChar H Λ β)
+    : IsSemiChar H Λ α := by
   refine ⟨fun x hx => by rw [hab x hx]; exact hβ.1 x hx, fun x hx y hy => ?_⟩
   rw [hab x hx, hab y hy, hab _ (Λ.add_mem hx hy)]
   exact hβ.2 x hx y hy
 
-theorem ThetaVector_of (hLine : LineTransport) (hStd : ThStd) (hF0 : ProductThetaMem) (hSD : StdSelfDual)
-    (hSC : StdSemiChar) (hIso : ThIsom) (h4 : FourthRoot) : ThetaVector := by
+theorem ThetaVector_of
+    (hLine : LineTransport) (hStd : ThStd) (hF0 : ProductThetaMem) (hSD : StdSelfDual)
+    (hSC : StdSemiChar) (hIso : ThIsom) (h4 : FourthRoot)
+    : ThetaVector := by
   intro L ω₀ n _ _ h Λ α β g D κ hκ
   have hHerm : IsHerm (stdH L (Fin 4 × n)) := (standardFormBasic L (Fin 4 × n)).2.1
   have hβ1 : IsSemiChar (stdH L (Fin 4 × n)) (stdLat L (Fin 4 × n)) β :=
@@ -262,15 +287,18 @@ theorem ThetaVector_of (hLine : LineTransport) (hStd : ThStd) (hF0 : ProductThet
     intro h0
     rw [h0] at hF1
     simp at hF1
-  obtain ⟨hIne, hIline⟩ := hLine (Fin 4 × n → ℂ) (stdH L (Fin 4 × n)) hHerm (stdLat L (Fin 4 × n))
-    (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ)) β (hSD L _) D.selfDual hβ1 D.betaSemi
-    D.idx₁ D.idx₂ _ hFmem hFne (fun F hF => ⟨F 0, hStd L ω₀ _ D.per D.half β D.betaStd F hF⟩)
-  have hImem := InterTh_of semicharacterHom heisenbergAnalytic (Fin 4 × n → ℂ) (stdH L (Fin 4 × n)) hHerm
-    (stdLat L (Fin 4 × n)) (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ)) β D.betaSemi
-    D.idx₁ _ hFmem
+  obtain ⟨hIne, hIline⟩ :=
+    hLine (Fin 4 × n → ℂ) (stdH L (Fin 4 × n)) hHerm (stdLat L (Fin 4 × n))
+      (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ)) β (hSD L _) D.selfDual hβ1
+      D.betaSemi D.idx₁ D.idx₂ _ hFmem hFne
+      (fun F hF => ⟨F 0, hStd L ω₀ _ D.per D.half β D.betaStd F hF⟩)
+  have hImem :=
+    InterTh_of semicharacterHom heisenbergAnalytic (Fin 4 × n → ℂ) (stdH L (Fin 4 × n)) hHerm
+      (stdLat L (Fin 4 × n)) (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ)) β
+      D.betaSemi D.idx₁ _ hFmem
   have hβg : (fun v => β (g v)) = fun x => ∏ a, α (slice a x) := funext D.betaAlpha
-  have hiso := hIso (Fin 4 × n → ℂ) (Fin 4 × n → ℂ) (matH (blk4 h)) (stdH L (Fin 4 × n)) g D.isom
-    (pow4 Λ) β
+  have hiso :=
+    hIso (Fin 4 × n → ℂ) (Fin 4 × n → ℂ) (matH (blk4 h)) (stdH L (Fin 4 × n)) g D.isom (pow4 Λ) β
   rw [hβg] at hiso
   have hK : kernel4 L ω₀ Λ β g ∈ Th (matH (blk4 h)) (fun x => ∏ a, α (slice a x)) (pow4 Λ) :=
     (hiso _).1 hImem
@@ -283,11 +311,13 @@ theorem ThetaVector_of (hLine : LineTransport) (hStd : ThStd) (hF0 : ProductThet
   have hP : κ • kernel4 L ω₀ Λ β g ∈ Th (matH (blk4 h)) (fun x => ∏ a, α (slice a x)) (pow4 Λ) :=
     Submodule.smul_mem _ κ hK
   have hP0 : κ • kernel4 L ω₀ Λ β g ≠ 0 := smul_ne_zero hκ hK0
-  have hPline : ∀ G ∈ Th (matH (blk4 h)) (fun x => ∏ a, α (slice a x)) (pow4 Λ),
-      ∃ c : ℂ, G = c • (κ • kernel4 L ω₀ Λ β g) := by
+  have hPline
+      : ∀ G ∈ Th (matH (blk4 h)) (fun x => ∏ a, α (slice a x)) (pow4 Λ), ∃ c : ℂ,
+        G = c • (κ • kernel4 L ω₀ Λ β g) := by
     intro G hG
-    have hG' : (fun w => G (g.symm w)) ∈ Th (stdH L (Fin 4 × n)) β
-        (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ)) := by
+    have hG'
+        : (fun w => G (g.symm w)) ∈ Th (stdH L (Fin 4 × n)) β
+          (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ)) := by
       refine (hiso _).2 ?_
       simpa using hG
     obtain ⟨c, hc⟩ := hIline _ hG'

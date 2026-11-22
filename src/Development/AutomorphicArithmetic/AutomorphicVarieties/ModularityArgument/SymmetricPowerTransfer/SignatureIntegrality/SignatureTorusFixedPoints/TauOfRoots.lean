@@ -11,15 +11,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
-private theorem tau_of_roots {k : Type} [Field k] (h2 : (2 : k) ≠ 0) (a : kˣ) (τ : k)
-    (h : (X - C (a : k)) * (X - C 1) * (X - C ((a⁻¹ : kˣ) : k)) = ((X - 1) * (X ^ 2 - C τ * X + 1) : k[X])) :
-    τ = (a : k) + ((a⁻¹ : kˣ) : k) := by
-  have hu : C (a : k) * C ((a⁻¹ : kˣ) : k) = 1 := by
-    rw [← C_mul, Units.mul_inv, C_1]
-  have e1 : (X - C (a : k)) * (X - C 1) * (X - C ((a⁻¹ : kˣ) : k)) =
-      (X - 1) * (X ^ 2 - C ((a : k) + ((a⁻¹ : kˣ) : k)) * X + 1) := by
+private theorem tau_of_roots
+    {k : Type} [Field k]
+    (h2 : (2 : k) ≠ 0)
+    (a : kˣ) (τ : k)
+    (h : (X - C (a : k)) * (X - C 1) * (X - C ((a⁻¹ : kˣ) : k))
+      = ((X - 1) * (X ^ 2 - C τ * X + 1) : k[X]))
+    : τ = (a : k) + ((a⁻¹ : kˣ) : k) := by
+  have hu : C (a : k) * C ((a⁻¹ : kˣ) : k) = 1 := by rw [← C_mul, Units.mul_inv, C_1]
+  have e1
+      : (X - C (a : k)) * (X - C 1) * (X - C ((a⁻¹ : kˣ) : k))
+        = (X - 1) * (X ^ 2 - C ((a : k) + ((a⁻¹ : kˣ) : k)) * X + 1) := by
     rw [C_add, C_1]
     linear_combination (X - 1) * hu
   rw [e1] at h
@@ -31,21 +37,28 @@ private theorem tau_of_roots {k : Type} [Field k] (h2 : (2 : k) ≠ 0) (a : kˣ)
   rw [Units.val_inv_eq_inv_val]
   linear_combination hc
 
-private theorem charpoly_dg {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (a b c : kˣ) :
-    (((dg ![a, b, c] : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k)).charpoly = (X - C (a : k)) * (X - C (b : k)) * (X - C (c : k)) := by
+private theorem charpoly_dg
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (a b c : kˣ)
+    : (((dg ![a, b, c] : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k)).charpoly
+      = (X - C (a : k)) * (X - C (b : k)) * (X - C (c : k)) := by
   rw [dg.eq_1, val_diagT, charpoly_diagonal]
   simp [Fin.prod_univ_three]
 
-theorem UpperTheory.V.Z.Sym.Sig.okG :
-    UpperTheory.V.Z.Sym.Sig.OkG := by
+theorem UpperTheory.V.Z.Sym.Sig.okG : UpperTheory.V.Z.Sym.Sig.OkG := by
   intro k _ _ _ _ O _ _ hO h2 Δ s hs hs0 V Ry hRy χ hχ t ht
   simp only [Lev.data.eq_1, Set.mem_setOf_eq] at ht ⊢
   obtain ⟨hbij, htheta, -, htau⟩ := eU_facts k O hO h2 Δ s hs hs0
-  have hinv : ∀ (d : Fin 3 → kˣ) (u : GL (Fin 3) k), u ∈ V.J 3 →
-      ∀ u' ∈ V.J 3, ∀ g, V.unitaryDoubleCosetIndicator d (u * g * th k 3 u') = V.unitaryDoubleCosetIndicator d g :=
-    fun d u hu u' hu' g => ((eqG k V 1 ∅ ∅ 1 1 d).1 u hu u' hu' g).1
-  have hfin : ∀ d : Fin 3 → kˣ,
-      {y : GL (Fin 3) k ⧸ Subgroup.map (th k 3) (V.J 3) | V.unitaryDoubleCosetIndicator d (Quotient.out y) ≠ 0}.Finite :=
+  have hinv
+      : ∀ (d : Fin 3 → kˣ) (u : GL (Fin 3) k),
+        u ∈ V.J 3
+          → ∀ u' ∈ V.J 3, ∀ g,
+            V.unitaryDoubleCosetIndicator d (u * g * th k 3 u')
+              = V.unitaryDoubleCosetIndicator d g := fun d u hu u' hu' g =>
+    ((eqG k V 1 ∅ ∅ 1 1 d).1 u hu u' hu' g).1
+  have hfin
+      : ∀ d : Fin 3 → kˣ,
+        {y : GL (Fin 3) k ⧸ Subgroup.map (th k 3) (V.J 3) | V.unitaryDoubleCosetIndicator d (Quotient.out y) ≠ 0}.Finite :=
     fun d => (eqG k V 1 ∅ ∅ 1 1 d).2.1
   refine ⟨?_, ?_, ?_⟩
   · intro u hu y
@@ -80,14 +93,18 @@ theorem UpperTheory.V.Z.Sym.Sig.okG :
     obtain ⟨y, hy, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero hx'
     simp only [Set.mem_preimage, T, Set.mem_iUnion, Set.mem_setOf_eq]
     refine ⟨y, hy, ?_⟩
-    obtain ⟨m, hm⟩ := QuotientGroup.mk_out_eq_mul (Subgroup.map (th k 3) (V.J 3))
-      (th k 3 (eU hs (Quotient.out x)))
+    obtain ⟨m, hm⟩ :=
+      QuotientGroup.mk_out_eq_mul (Subgroup.map (th k 3) (V.J 3)) (th k 3 (eU hs (Quotient.out x)))
     obtain ⟨j, hj, hjm⟩ := Subgroup.mem_map.1 m.2
-    change V.unitaryDoubleCosetIndicator _ (Quotient.out (QuotientGroup.mk (th k 3 (eU hs (Quotient.out x))) :
-      GL (Fin 3) k ⧸ Subgroup.map (th k 3) (V.J 3))) ≠ 0
+    change V.unitaryDoubleCosetIndicator _
+        (Quotient.out
+          (QuotientGroup.mk (th k 3 (eU hs (Quotient.out x)))
+            : GL (Fin 3) k ⧸ Subgroup.map (th k 3) (V.J 3)))
+      ≠ 0
     rw [hm, ← hjm]
-    have e := hinv ![t * (unif k)⁻¹, y, (unif k)⁻¹] 1 (Subgroup.one_mem _) j hj
-      (th k 3 (eU hs (Quotient.out x)))
+    have e :=
+      hinv ![t * (unif k)⁻¹, y, (unif k)⁻¹] 1 (Subgroup.one_mem _) j hj
+        (th k 3 (eU hs (Quotient.out x)))
     rw [one_mul] at e
     rw [e]
     exact hne
@@ -104,7 +121,9 @@ theorem UpperTheory.V.Z.Sym.Sig.okG :
     have h01 : (valuation k) ((t * (unif k)⁻¹ : kˣ) : k) < (valuation k) (y : k) := by
       rw [Units.val_mul, map_mul, Units.val_inv_eq_inv_val, map_inv₀, ← div_eq_mul_inv,
         div_lt_iff₀ hv0]
-      calc (valuation k) (t : k) < (valuation k) ((unif k : kˣ) : k) ^ 2 := ht
+      calc
+        (valuation k) (t : k)
+          < (valuation k) ((unif k : kˣ) : k) ^ 2 := ht
         _ = (valuation k) ((unif k : kˣ) : k) * (valuation k) ((unif k : kˣ) : k) := sq _
         _ ≤ (valuation k) (y : k) * (valuation k) ((unif k : kˣ) : k) := by gcongr
     have h12 : (valuation k) (y : k) < (valuation k) (((unif k)⁻¹ : kˣ) : k) := by
@@ -114,18 +133,17 @@ theorem UpperTheory.V.Z.Sym.Sig.okG :
       rw [SDom.eq_1]
       intro i j hij
       fin_cases i <;> fin_cases j <;> simp at hij
-      all_goals first
-        | exact h01
-        | exact h12
-        | exact h01.trans h12
+      all_goals first | exact h01 | exact h12 | exact h01.trans h12
     obtain ⟨g₀, x, y', z, hδ, hH⟩ := supp0 k V _ hSD _ hne
-    have hd : (![t * (unif k)⁻¹, y, (unif k)⁻¹] 0 / ![t * (unif k)⁻¹, y, (unif k)⁻¹] 2 : kˣ) = t := by
+    have hd
+        : (![t * (unif k)⁻¹, y, (unif k)⁻¹] 0 / ![t * (unif k)⁻¹, y, (unif k)⁻¹] 2 : kˣ) = t := by
       simp
     rw [hd] at hH
     have hcp := (htau δ τ).1 hτ
     rw [hδ, (normalG k).1 g₀ x y' z] at hcp
-    have hc2 : ((g₀ * dg ![x / z, 1, z / x] * g₀⁻¹ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k).charpoly
-        = (X - C ((x / z : kˣ) : k)) * (X - C 1) * (X - C (((x / z)⁻¹ : kˣ) : k)) := by
+    have hc2
+        : ((g₀ * dg ![x / z, 1, z / x] * g₀⁻¹ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k).charpoly
+          = (X - C ((x / z : kˣ) : k)) * (X - C 1) * (X - C (((x / z)⁻¹ : kˣ) : k)) := by
       rw [Units.val_mul, Units.val_mul, Matrix.coe_units_inv, charpoly_units_conj, charpoly_dg,
         inv_div, Units.val_one]
     rw [hc2] at hcp

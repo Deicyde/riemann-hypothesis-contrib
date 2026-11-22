@@ -20,15 +20,16 @@ theorem floor_cast_of_int {x : ℚ} (h : ∃ z : ℤ, x = z) (h1 : 1 ≤ x) : ((
   obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le hz
   simp
 
-theorem one_le_aPlusQ (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau)
-    (i : Fin (D.R.sigW j).1) : 1 ≤ DV.aPlusQ D j τ i := by
+theorem one_le_aPlusQ
+    (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).1)
+    : 1 ≤ DV.aPlusQ D j τ i := by
   have hk := D.R.m_add_three_le_k
   have hi : i.1 < D.R.k + j - 1 := i.2
   exact (DV.aPlusQ_last D j h1 h2 τ).trans
     (aPlusQ_anti D j τ (show i.1 ≤ D.R.k + j - 1 - 1 by omega) (by omega))
 
-theorem one_le_aMinusQ (D : D7) (j : ℕ) (h1 : 1 ≤ j) (τ : D.what₂.Tau) (c : ℕ) (hc : j + c < D.R.m) :
-    1 ≤ DV.aMinusQ D j τ c :=
+theorem one_le_aMinusQ (D : D7) (j : ℕ) (h1 : 1 ≤ j) (τ : D.what₂.Tau) (c : ℕ) (hc : j + c < D.R.m)
+    : 1 ≤ DV.aMinusQ D j τ c :=
   (DV.aMinusQ_last D j h1 (by omega) τ).trans (aMinusQ_mono D j τ (Nat.zero_le c) hc)
 
 theorem one_le_b (s : Scale) : 1 ≤ s.b := by
@@ -36,8 +37,12 @@ theorem one_le_b (s : Scale) : 1 ≤ s.b := by
   have := s.one_lt_alt
   exact Real.one_le_exp (Real.rpow_nonneg (by linarith) _)
 
-theorem aPlus_le (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau) (L : SizeData₂ D)
-    (hL : WindowsLe L) (i : Fin (D.R.sigW j).1) : DV.aPlus D j τ i ≤ 3 * L.sc.b ^ 2 := by
+theorem aPlus_le
+    (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
+    (τ : D.what₂.Tau)
+    (L : SizeData₂ D) (hL : WindowsLe L)
+    (i : Fin (D.R.sigW j).1)
+    : DV.aPlus D j τ i ≤ 3 * L.sc.b ^ 2 := by
   have hk := D.R.m_add_three_le_k
   have hi : i.1 < D.R.k + j - 1 := i.2
   have h0 : 0 < D.R.k - 1 := by omega
@@ -52,7 +57,8 @@ theorem aPlus_le (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.wh
     have hj' : (0 : ℚ) ≤ j := Nat.cast_nonneg _
     push_cast
     linarith
-  have a3 : DV.aPlus D j τ i ≤ (((D.hc τ).v ⟨0, h0⟩ : ℚ) : ℝ) + (((D.hc τ).e ⟨j - 1, hj⟩ : ℚ) : ℝ) := by
+  have a3
+      : DV.aPlus D j τ i ≤ (((D.hc τ).v ⟨0, h0⟩ : ℚ) : ℝ) + (((D.hc τ).e ⟨j - 1, hj⟩ : ℚ) : ℝ) := by
     unfold DV.aPlus
     exact_mod_cast a1.trans a2
   have b1 := (L.cloud_v τ ⟨0, h0⟩).2
@@ -64,8 +70,13 @@ theorem aPlus_le (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.wh
   have := hL.2
   nlinarith
 
-theorem aMinus_le (D : D7) (j : ℕ) (h1 : 1 ≤ j) (τ : D.what₂.Tau) (L : SizeData₂ D)
-    (hL : WindowsLe L) (c : ℕ) (hc : j + c < D.R.m) : DV.aMinus D j τ c ≤ 3 * L.sc.b ^ 2 := by
+theorem aMinus_le
+    (D : D7)
+    (j : ℕ) (h1 : 1 ≤ j)
+    (τ : D.what₂.Tau)
+    (L : SizeData₂ D) (hL : WindowsLe L)
+    (c : ℕ) (hc : j + c < D.R.m)
+    : DV.aMinus D j τ c ≤ 3 * L.sc.b ^ 2 := by
   have hj : j - 1 < D.R.m := by omega
   have a2 : DV.aMinusQ D j τ c ≤ (D.hc τ).b ⟨j + c, hc⟩ - (D.hc τ).e ⟨j - 1, hj⟩ := by
     unfold DV.aMinusQ DV.eQ
@@ -81,7 +92,18 @@ theorem aMinus_le (D : D7) (j : ℕ) (h1 : 1 ≤ j) (τ : D.what₂.Tau) (L : Si
   have := hL.1
   nlinarith
 
-theorem rows_sizes : ∀ (D : D7) (j : ℕ), 1 ≤ j → j ≤ D.R.m → ∀ τ : D.what₂.Tau, (Antitone (rowsP D j τ) ∧ (∀ i, 1 ≤ rowsP D j τ i) ∧ ∀ i, (rowsP D j τ i : ℝ) = DV.aPlus D j τ i) ∧ (Antitone (rowsM D j τ) ∧ (∀ i, 1 ≤ rowsM D j τ i) ∧ ∀ i, (rowsM D j τ i : ℝ) = DV.aMinus D j τ ((D.R.sigW j).2 - 1 - i)) ∧ ∀ L : SizeData₂ D, WindowsLe L → (∀ i, (rowsP D j τ i : ℝ) ≤ 3 * L.sc.b ^ 2) ∧ ∀ i, (rowsM D j τ i : ℝ) ≤ 3 * L.sc.b ^ 2 := by
+theorem rows_sizes
+    : ∀ (D : D7) (j : ℕ),
+      1 ≤ j → j ≤ D.R.m
+        → ∀ τ : D.what₂.Tau,
+          (Antitone (rowsP D j τ) ∧ (∀ i, 1 ≤ rowsP D j τ i)
+              ∧ ∀ i, (rowsP D j τ i : ℝ) = DV.aPlus D j τ i)
+            ∧ (Antitone (rowsM D j τ) ∧ (∀ i, 1 ≤ rowsM D j τ i)
+              ∧ ∀ i, (rowsM D j τ i : ℝ) = DV.aMinus D j τ ((D.R.sigW j).2 - 1 - i))
+            ∧ ∀ L : SizeData₂ D,
+              WindowsLe L
+                → (∀ i, (rowsP D j τ i : ℝ) ≤ 3 * L.sc.b ^ 2)
+                  ∧ ∀ i, (rowsM D j τ i : ℝ) ≤ 3 * L.sc.b ^ 2 := by
   intro D j h1 h2 τ
   have hk := D.R.m_add_three_le_k
   have hq : (D.R.sigW j).2 = D.R.m - j := rfl

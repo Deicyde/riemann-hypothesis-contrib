@@ -14,11 +14,16 @@ namespace Formalism.L2.SG.NGCut.SplitEmbedding
 
 section Inv
 
-variable {K : Type} [Field K] [NumberField K] [IsEmpty {w : InfinitePlace K // w.IsReal}] {ι : Type} [Fintype ι]
-  (σ : ι ≃ {w : InfinitePlace K // w.IsComplex}) (cj : ι → Prop) [DecidablePred cj]
+variable
+  {K : Type} [Field K] [NumberField K] [IsEmpty {w : InfinitePlace K // w.IsReal}]
+  {ι : Type} [Fintype ι]
+  (σ : ι ≃ {w : InfinitePlace K // w.IsComplex})
+  (cj : ι → Prop) [DecidablePred cj]
 
-def phiInv (v : ι → ℂ) : mixedSpace K :=
-  (fun w => isEmptyElim w, fun w => if cj (σ.symm w) then (starRingEnd ℂ) (v (σ.symm w)) else v (σ.symm w))
+def phiInv (v : ι → ℂ) : mixedSpace K := (
+  fun w => isEmptyElim w,
+  fun w => if cj (σ.symm w) then (starRingEnd ℂ) (v (σ.symm w)) else v (σ.symm w)
+)
 
 theorem phiMap_phiInv (v : ι → ℂ) : phiMap σ cj (phiInv σ cj v) = v := by
   funext i
@@ -34,30 +39,35 @@ theorem phiInv_add (v w : ι → ℂ) : phiInv σ cj (v + w) = phiInv σ cj v + 
 
 theorem measurable_phiInv : Measurable (phiInv σ cj (K := K)) := by
   unfold phiInv
-  refine Measurable.prodMk (Measurable.of_eval fun w => isEmptyElim w) (Measurable.of_eval fun w => ?_)
+  refine Measurable.prodMk (Measurable.of_eval fun w => isEmptyElim w)
+    (Measurable.of_eval fun w => ?_)
   by_cases h : cj (σ.symm w)
-  · simp only [h, ↓reduceIte]
+  · simp only [h, ↓ reduceIte]
     exact Complex.continuous_conj.measurable.comp (measurable_pi_apply _)
-  · simp only [h, ↓reduceIte]
+  · simp only [h, ↓ reduceIte]
     exact measurable_pi_apply _
 
 end Inv
 
-private theorem mem_idealLattice_iff' (K : Type) [Field K] [NumberField K]
-    (I : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ) (x : mixedSpace K) :
-    x ∈ idealLattice K I ↔ ∃ a : K, a ∈ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ∧ mixedEmbedding K a = x := by
-  first
-  | (rw [mem_idealLattice]; rfl)
-  | exact mem_idealLattice K I
-  | simp [idealLattice]
+private theorem mem_idealLattice_iff'
+    (K : Type) [Field K] [NumberField K]
+    (I : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ) (x : mixedSpace K)
+    : x ∈ idealLattice K I
+      ↔ ∃ a : K, a ∈ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) ∧ mixedEmbedding K a = x := by
+  first | (rw [mem_idealLattice]; rfl) | exact mem_idealLattice K I | simp [idealLattice]
 
-theorem idealLattice_fd (K : Type) [Field K] [NumberField K] (I : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ) :
-    ∃ FL : Set (mixedSpace K), MeasurableSet FL ∧
-      (∀ x, ∃! l : (idealLattice K I).toAddSubgroup, (l : mixedSpace K) + x ∈ FL) := by
+theorem idealLattice_fd
+    (K : Type) [Field K] [NumberField K] (I : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ)
+    : ∃ FL : Set (mixedSpace K),
+      MeasurableSet FL
+        ∧ (∀ x, ∃! l : (idealLattice K I).toAddSubgroup, (l : mixedSpace K) + x ∈ FL) := by
   let b := fractionalIdealLatticeBasis K I
-  have hmem : ∀ y : mixedSpace K, y ∈ (idealLattice K I).toAddSubgroup ↔ y ∈ Submodule.span ℤ (Set.range b) := by
+  have hmem
+      : ∀ y : mixedSpace K,
+        y ∈ (idealLattice K I).toAddSubgroup ↔ y ∈ Submodule.span ℤ (Set.range b) := by
     intro y
-    rw [Submodule.mem_toAddSubgroup, mem_idealLattice_iff', mem_span_fractionalIdealLatticeBasis, Set.mem_image]
+    rw [Submodule.mem_toAddSubgroup, mem_idealLattice_iff', mem_span_fractionalIdealLatticeBasis,
+      Set.mem_image]
     rfl
   refine ⟨ZSpan.fundamentalDomain b, ZSpan.fundamentalDomain_measurableSet b, fun x => ?_⟩
   obtain ⟨l, hl, hu⟩ := ZSpan.exist_unique_vadd_mem_fundamentalDomain b x
@@ -67,11 +77,13 @@ theorem idealLattice_fd (K : Type) [Field K] [NumberField K] (I : (FractionalIde
   have h3 : m = (l : mixedSpace K) := congrArg Subtype.val h2
   exact Subtype.ext h3
 
-private theorem existsUnique_add_mem_preimage_of_additive_equiv {V W : Type} [AddCommGroup V] [AddCommGroup W]
-    (f : V → W) (g : W → V) (hgf : ∀ x, g (f x) = x) (hfg : ∀ y, f (g y) = y)
-    (hg : ∀ y z, g (y + z) = g y + g z) (L : AddSubgroup V) (M : AddSubgroup W)
-    (hLM : ∀ w, w ∈ M ↔ g w ∈ L) (F : Set V) (h : ∀ x, ∃! l : L, (l : V) + x ∈ F) :
-    ∀ y, ∃! m : M, (m : W) + y ∈ g ⁻¹' F := by
+private theorem existsUnique_add_mem_preimage_of_additive_equiv
+    {V W : Type} [AddCommGroup V] [AddCommGroup W]
+    (f : V → W) (g : W → V)
+    (hgf : ∀ x, g (f x) = x) (hfg : ∀ y, f (g y) = y) (hg : ∀ y z, g (y + z) = g y + g z)
+    (L : AddSubgroup V) (M : AddSubgroup W) (hLM : ∀ w, w ∈ M ↔ g w ∈ L)
+    (F : Set V) (h : ∀ x, ∃! l : L, (l : V) + x ∈ F)
+    : ∀ y, ∃! m : M, (m : W) + y ∈ g ⁻¹' F := by
   intro y
   obtain ⟨l, hl, hu⟩ := h (g y)
   have hfl : f l ∈ M := (hLM _).2 (by rw [hgf]; exact l.2)
@@ -89,46 +101,52 @@ private theorem existsUnique_add_mem_preimage_of_additive_equiv {V W : Type} [Ad
     show m = f l
     rw [← h2, hfg]
 
-private theorem phiMap_mixedEmbedding_eq {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+private theorem phiMap_mixedEmbedding_eq
+    {K : Type} [Field K] [NumberField K]
+    {ι : Type} [Fintype ι]
     (φ : ι → (K →+* ℂ)) (σ : ι ≃ {w : InfinitePlace K // w.IsComplex})
-    (hφ : ∀ i, φ i = (σ i).1.embedding ∨ φ i = ComplexEmbedding.conjugate (σ i).1.embedding) (a : K) :
-    phiMap σ (fun i => φ i ≠ (σ i).1.embedding) (mixedEmbedding K a) = fun i => φ i a := by
+    (hφ : ∀ i, φ i = (σ i).1.embedding ∨ φ i = ComplexEmbedding.conjugate (σ i).1.embedding)
+    (a : K)
+    : phiMap σ (fun i => φ i ≠ (σ i).1.embedding) (mixedEmbedding K a) = fun i => φ i a := by
   funext i
   simp only [phiMap]
   split_ifs with h
   · rw [(hφ i).resolve_left h, ComplexEmbedding.conjugate_coe_eq]
-    first
-    | rfl
-    | simp [mixedEmbedding]
+    first | rfl | simp [mixedEmbedding]
   · have h' : φ i = (σ i).1.embedding := by simpa using h
     rw [h']
-    first
-    | rfl
-    | simp [mixedEmbedding]
+    first | rfl | simp [mixedEmbedding]
 
-theorem exists_fd (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePlace K // w.IsReal}]
-    (ι : Type) [Fintype ι] (φ : ι → (K →+* ℂ)) (σ : ι ≃ {w : InfinitePlace K // w.IsComplex})
+theorem exists_fd
+    (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePlace K // w.IsReal}]
+    (ι : Type) [Fintype ι]
+    (φ : ι → (K →+* ℂ)) (σ : ι ≃ {w : InfinitePlace K // w.IsComplex})
     (hφ : ∀ i, φ i = (σ i).1.embedding ∨ φ i = ComplexEmbedding.conjugate (σ i).1.embedding)
     (I : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ) (Λ : AddSubgroup K)
     (hΛ : ∀ a ∈ Λ, a ∈ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K))
-    (hk0 : Λ.relIndex (((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup) ≠ 0)
-    (s : ℂ) (hs : s ≠ 0) :
-    ∃ F : Set (ι → ℂ), MeasurableSet F ∧ ∀ v, ∃! a : Λ, (fun i => s * φ i a) + v ∈ F := by
+    (hk0 : Λ.relIndex
+        (((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup)
+      ≠ 0)
+    (s : ℂ) (hs : s ≠ 0)
+    : ∃ F : Set (ι → ℂ), MeasurableSet F ∧ ∀ v, ∃! a : Λ, (fun i => s * φ i a) + v ∈ F := by
   have hne : Nonempty ι := by
     obtain ⟨w⟩ : Nonempty (InfinitePlace K) := inferInstance
-    have hw : w.IsComplex := (w.isReal_or_isComplex).resolve_left
-      (fun h => isEmptyElim (⟨w, h⟩ : {w : InfinitePlace K // w.IsReal}))
+    have hw : w.IsComplex :=
+      (w.isReal_or_isComplex).resolve_left
+        (fun h => isEmptyElim (⟨w, h⟩ : {w : InfinitePlace K // w.IsReal}))
     exact ⟨σ.symm ⟨w, hw⟩⟩
   let cj : ι → Prop := fun i => φ i ≠ (σ i).1.embedding
-  let IA : AddSubgroup K := ((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup
-  let E : K →+ (ι → ℂ) :=
-    { toFun := fun a i => s * φ i a
-      map_zero' := by
-        funext i
-        simp
-      map_add' := fun a b => by
-        funext i
-        simp [mul_add] }
+  let IA : AddSubgroup K :=
+    ((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup
+  let E : K →+ (ι → ℂ) := {
+    toFun := fun a i => s * φ i a
+    map_zero' := by
+      funext i
+      simp
+    map_add' := fun a b => by
+      funext i
+      simp [mul_add]
+  }
   have hE : Function.Injective E := by
     intro a b hab
     obtain ⟨i0⟩ := hne
@@ -169,7 +187,8 @@ theorem exists_fd (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePla
       rw [← hfE a, hae, hfg]
   obtain ⟨FL, hFLm, hFL⟩ := idealLattice_fd K I
   have hgm : Measurable g :=
-    (measurable_phiInv σ cj).comp (Measurable.of_eval fun i => measurable_const.mul (measurable_pi_apply i))
+    (measurable_phiInv σ cj).comp
+      (Measurable.of_eval fun i => measurable_const.mul (measurable_pi_apply i))
   have hdL : ∀ y, ∃! m : L, (m : ι → ℂ) + y ∈ g ⁻¹' FL :=
     existsUnique_add_mem_preimage_of_additive_equiv f g hgf hfg hg _ L hLM FL hFL
   let Λ' : AddSubgroup (ι → ℂ) := Λ.map E
@@ -188,36 +207,45 @@ theorem exists_fd (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePla
   have h3 := hu ⟨E b, AddSubgroup.mem_map_of_mem E hb⟩ hbG
   exact Subtype.ext (hE (congrArg Subtype.val h3))
 
-private theorem measurePreserving_mul_left_of_norm_eq_one (u : ℂ) (hu : ‖u‖ = 1) :
-    MeasurePreserving (fun z : ℂ => u * z) volume volume := by
+private theorem measurePreserving_mul_left_of_norm_eq_one (u : ℂ) (hu : ‖u‖ = 1)
+    : MeasurePreserving (fun z : ℂ => u * z) volume volume := by
   have hu0 : u ≠ 0 := by
     intro h0
     rw [h0, norm_zero] at hu
     exact zero_ne_one hu
-  let e : ℂ ≃ₗᵢ[ℝ] ℂ :=
-    { toFun := fun z => u * z
-      invFun := fun z => u⁻¹ * z
-      map_add' := fun z w => mul_add u z w
-      map_smul' := fun c z => by
-        simp only [RingHom.id_apply, Complex.real_smul]
-        ring
-      left_inv := fun z => inv_mul_cancel_left₀ hu0 z
-      right_inv := fun z => mul_inv_cancel_left₀ hu0 z
-      norm_map' := fun z => by
-        show ‖u * z‖ = ‖z‖
-        rw [norm_mul, hu, one_mul] }
+  let e : ℂ ≃ₗᵢ[ℝ] ℂ := {
+    toFun := fun z => u * z
+    invFun := fun z => u⁻¹ * z
+    map_add' := fun z w => mul_add u z w
+    map_smul' := fun c z => by
+      simp only [RingHom.id_apply, Complex.real_smul]
+      ring
+    left_inv := fun z => inv_mul_cancel_left₀ hu0 z
+    right_inv := fun z => mul_inv_cancel_left₀ hu0 z
+    norm_map' := fun z => by
+      show ‖u * z‖ = ‖z‖
+      rw [norm_mul, hu, one_mul]
+  }
   exact e.measurePreserving
 
-theorem idealCovolC (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePlace K // w.IsReal}]
-    (ι : Type) [Fintype ι] (φ : ι → (K →+* ℂ)) (σ : ι ≃ {w : InfinitePlace K // w.IsComplex})
+theorem idealCovolC
+    (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePlace K // w.IsReal}]
+    (ι : Type) [Fintype ι]
+    (φ : ι → (K →+* ℂ)) (σ : ι ≃ {w : InfinitePlace K // w.IsComplex})
     (hφ : ∀ i, φ i = (σ i).1.embedding ∨ φ i = ComplexEmbedding.conjugate (σ i).1.embedding)
     (I : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ) (Λ : AddSubgroup K)
-    (hΛ : ∀ a ∈ Λ, a ∈ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)) (k : ℕ)
-    (hk : Λ.relIndex (((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup) = k)
-    (hk0 : k ≠ 0) (s : ℂ) (hs : s ≠ 0) (F : Set (ι → ℂ)) (hF : MeasurableSet F)
-    (hFd : ∀ v, ∃! a : Λ, (fun i => s * φ i a) + v ∈ F) :
-    volume F = ENNReal.ofReal ((k : ℝ) * (FractionalIdeal.absNorm (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : ℝ) *
-      2⁻¹ ^ Fintype.card ι * √|(discr K : ℝ)| * ‖s‖ ^ (2 * Fintype.card ι)) := by
+    (hΛ : ∀ a ∈ Λ, a ∈ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K))
+    (k : ℕ)
+    (hk : Λ.relIndex
+        (((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup)
+      = k)
+    (hk0 : k ≠ 0)
+    (s : ℂ) (hs : s ≠ 0)
+    (F : Set (ι → ℂ)) (hF : MeasurableSet F) (hFd : ∀ v, ∃! a : Λ, (fun i => s * φ i a) + v ∈ F)
+    : volume F
+      = ENNReal.ofReal
+        ((k : ℝ) * (FractionalIdeal.absNorm (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : ℝ)
+          * 2⁻¹ ^ Fintype.card ι * √ |(discr K : ℝ)| * ‖s‖ ^ (2 * Fintype.card ι)) := by
   have hr0 : ‖s‖ ≠ 0 := norm_ne_zero_iff.2 hs
   have hrc : ((‖s‖ : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hr0
   let u : ℂ := s / ((‖s‖ : ℝ) : ℂ)
@@ -230,14 +258,19 @@ theorem idealCovolC (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfiniteP
   have hm : MeasurePreserving (fun v : ι → ℂ => fun i => u * v i) volume volume := by
     exact volume_preserving_pi (fun _ => h1)
   have hF' : MeasurableSet ((fun v : ι → ℂ => fun i => u * v i) ⁻¹' F) := hm.measurable hF
-  have hFd' : ∀ v, ∃! a : Λ, (fun i => ((‖s‖ : ℝ) : ℂ) * φ i a) + v ∈ (fun v : ι → ℂ => fun i => u * v i) ⁻¹' F := by
-    intro v
-    refine (existsUnique_congr fun a => ?_).2 (hFd (fun i => u * v i))
-    have h2 : (fun i => u * ((fun i => ((‖s‖ : ℝ) : ℂ) * φ i a) + v) i) = (fun i => s * φ i a) + fun i => u * v i := by
-      funext i
-      simp only [Pi.add_apply]
-      rw [mul_add, ← mul_assoc, hur]
-    rw [Set.mem_preimage, h2]
+  have hFd'
+      : ∀ v,
+        ∃! a : Λ, (fun i => ((‖s‖ : ℝ) : ℂ) * φ i a) + v ∈ (fun v : ι → ℂ => fun i => u * v i) ⁻¹' F :=
+    by
+      intro v
+      refine (existsUnique_congr fun a => ?_).2 (hFd (fun i => u * v i))
+      have h2
+          : (fun i => u * ((fun i => ((‖s‖ : ℝ) : ℂ) * φ i a) + v) i)
+            = (fun i => s * φ i a) + fun i => u * v i := by
+        funext i
+        simp only [Pi.add_apply]
+        rw [mul_add, ← mul_assoc, hur]
+      rw [Set.mem_preimage, h2]
   have h3 := idealCovol K ι φ σ hφ I Λ hΛ k hk hk0 ‖s‖ hr0 _ hF' hFd'
   rw [← hm.measure_preimage hF.nullMeasurableSet, h3, abs_norm]
 

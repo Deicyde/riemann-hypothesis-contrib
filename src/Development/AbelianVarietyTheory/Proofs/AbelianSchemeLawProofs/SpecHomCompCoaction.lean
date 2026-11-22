@@ -15,14 +15,14 @@ set_option backward.isDefEq.respectTransparency false
 
 variable {R : Type} [CommRing R]
 
-abbrev specOver (R S : Type) [CommRing R] [CommRing S] [Algebra R S] :
-    Over (Spec (CommRingCat.of R)) :=
+abbrev specOver (R S : Type) [CommRing R] [CommRing S] [Algebra R S]
+    : Over (Spec (CommRingCat.of R)) :=
   (Spec (.of S)).asOver (Spec (.of R))
 
 section
 
-variable {S T T' : Type} [CommRing S] [CommRing T] [CommRing T'] [Algebra R S] [Algebra R T]
-  [Algebra R T']
+variable
+  {S T T' : Type} [CommRing S] [CommRing T] [CommRing T'] [Algebra R S] [Algebra R T] [Algebra R T']
 
 def specHom (φ : S →ₐ[R] T) : specOver R T ⟶ specOver R S :=
   (Spec.map (CommRingCat.ofHom φ.toRingHom)).asOver _
@@ -66,7 +66,8 @@ lemma specHom_counit {T : Type} [CommRing T] [Algebra R T] :
   exact Spec.map_comp (CommRingCat.ofHom (Bialgebra.counitAlgHom R Λ).toRingHom)
     (CommRingCat.ofHom (algebraMap R T))
 
-variable {A : Over (Spec (CommRingCat.of R))} [GrpObj A]
+variable
+  {A : Over (Spec (CommRingCat.of R))} [GrpObj A]
   (i : specOver R Λ ⟶ A) (v : specOver R B ⟶ A) (ρ : B →ₐ[R] B ⊗[R] Λ)
   (hρ : specHom ρ ≫ v = (specHom includeRight ≫ i) * (specHom includeLeft ≫ v))
 
@@ -171,7 +172,6 @@ lemma coaction_free [Mono i] [Module.Finite R Λ] :
     simp [m]
   rw [this, RingHom.finite_algebraMap]
   infer_instance
-
 
 omit hρ in
 lemma isPushout_equalizer {T : Type} [CommRing T] [Algebra R T] (α β : B →ₐ[R] T)

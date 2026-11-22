@@ -20,15 +20,17 @@ namespace ModelGenericPoint
 
 variable {O : Type} [CommRing O] {K : Type} {ι : K → Type} (P : Ideal (NumbersDVR.MRing ι O))
 
-def genPt : (Σ k, ι k) → FractionRing (NumbersDVR.MRing ι O ⧸ P) :=
-  fun p => algebraMap (NumbersDVR.MRing ι O ⧸ P) _ (Ideal.Quotient.mk P (X p))
+def genPt : (Σ k, ι k) → FractionRing (NumbersDVR.MRing ι O ⧸ P) := fun p =>
+  algebraMap (NumbersDVR.MRing ι O ⧸ P) _ (Ideal.Quotient.mk P (X p))
 
-theorem aeval_genPt (g : NumbersDVR.MRing ι O) :
-    aeval (genPt P) g = algebraMap (NumbersDVR.MRing ι O ⧸ P)
-      (FractionRing (NumbersDVR.MRing ι O ⧸ P)) (Ideal.Quotient.mk P g) := by
-  have h : (aeval (genPt P) : NumbersDVR.MRing ι O →ₐ[O] FractionRing (NumbersDVR.MRing ι O ⧸ P)) =
-      (IsScalarTower.toAlgHom O (NumbersDVR.MRing ι O ⧸ P)
-        (FractionRing (NumbersDVR.MRing ι O ⧸ P))).comp (Ideal.Quotient.mkₐ O P) := by
+theorem aeval_genPt (g : NumbersDVR.MRing ι O)
+    : aeval (genPt P) g
+      = algebraMap (NumbersDVR.MRing ι O ⧸ P) (FractionRing (NumbersDVR.MRing ι O ⧸ P))
+        (Ideal.Quotient.mk P g) := by
+  have h
+      : (aeval (genPt P) : NumbersDVR.MRing ι O →ₐ[O] FractionRing (NumbersDVR.MRing ι O ⧸ P))
+        = (IsScalarTower.toAlgHom O (NumbersDVR.MRing ι O ⧸ P)
+          (FractionRing (NumbersDVR.MRing ι O ⧸ P))).comp (Ideal.Quotient.mkₐ O P) := by
     apply MvPolynomial.algHom_ext
     intro p
     simp [genPt]
@@ -41,14 +43,17 @@ theorem aeval_genPt_eq_zero (g : NumbersDVR.MRing ι O) : aeval (genPt P) g = 0 
 theorem genPt_ne_zero (p : Σ k, ι k) : genPt P p ≠ 0 ↔ (X p : NumbersDVR.MRing ι O) ∉ P := by
   rw [Ne, ← aeval_genPt_eq_zero, aeval_X]
 
-theorem mIdealOver_genPt [Fintype K] [DecidableEq K] [∀ k, Fintype (ι k)] [P.IsPrime]
-    (hP : NumbersDVR.IsMultiHomogIdeal P) : mIdealOver O (genPt P) = P := by
+theorem mIdealOver_genPt
+    [Fintype K] [DecidableEq K] [∀ k, Fintype (ι k)] [P.IsPrime]
+    (hP : NumbersDVR.IsMultiHomogIdeal P)
+    : mIdealOver O (genPt P) = P := by
   ext f
   constructor
   · intro hf
     have hc : ∀ b : K → ℕ, weightedHomogeneousComponent (NumbersDVR.blockWeight ι) b f ∈ P := by
       intro b
-      rw [← aeval_genPt_eq_zero, ← coeff_mConeMapOver, RingHom.mem_ker.mp hf, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
+      rw [← aeval_genPt_eq_zero, ← coeff_mConeMapOver, RingHom.mem_ker.mp hf,
+        AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
     rw [← sum_weightedHomogeneousComponent (NumbersDVR.blockWeight ι) f,
       finsum_eq_sum _ (weightedHomogeneousComponent_finsupp f)]
     exact Ideal.sum_mem _ fun b _ => hc b
@@ -62,7 +67,6 @@ theorem mIdealOver_genPt [Fintype K] [DecidableEq K] [∀ k, Fintype (ι k)] [P.
     exact hP f hf _
 
 end ModelGenericPoint
-
 
 end
 

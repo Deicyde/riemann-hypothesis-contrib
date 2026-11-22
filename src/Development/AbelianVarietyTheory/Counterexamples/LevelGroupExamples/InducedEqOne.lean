@@ -10,19 +10,28 @@ noncomputable section
 namespace GlobalTheory.DeltaPinTest
 
 open AlgebraicGeometry CategoryTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable {Xo : Moduli Dw l} {c : Coeff l} {n : ℕ}
 
-theorem noDelta_phiPin (nab : NabV Xo c) (m : SABMap Xo.univ.t Xo.univ.t (𝟙 Xo.X)) :
-    (noDelta Xo c nab m n).PhiPin (fun _ => 1) 1 (fun _ => 0) := by
+theorem noDelta_phiPin (nab : NabV Xo c) (m : SABMap Xo.univ.t Xo.univ.t (𝟙 Xo.X))
+    : (noDelta Xo c nab m n).PhiPin (fun _ => 1) 1 (fun _ => 0) := by
   haveI hs : Subsingleton (LaJ Xo c (noDelta Xo c nab m n)) := by
     apply Submodule.Quotient.subsingleton_iff.2
     show Ideal.map _ ⊤ • ⊤ = ⊤
     rw [Ideal.map_top, Submodule.top_smul]
-  refine ⟨fun _ _ _ => rfl, fun _ _ => Subsingleton.elim _ _, fun _ _ _ _ => by simp, rfl,
-    Subsingleton.elim _ _, fun q => ?_⟩
+  refine ⟨
+    fun _ _ _ => rfl,
+    fun _ _ => Subsingleton.elim _ _,
+    fun _ _ _ _ => by simp,
+    rfl,
+    Subsingleton.elim _ _,
+    fun q => ?_
+  ⟩
   haveI : Unique (Fin n → LaJ Xo c (noDelta Xo c nab m n)) := uniqueOfSubsingleton (fun _ => 0)
   rw [finsum_unique]
   have hz : ((⟨zeta l.M', c.zeta_mem⟩ : c.F) ^ (l.M' / 1)) = 1 := by

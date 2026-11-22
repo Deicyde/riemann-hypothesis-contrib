@@ -6,28 +6,32 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.IsTopological
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct ContDiff ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CartanTrace
 
-theorem star_trace_herm {m n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} {B : Matrix (Fin m) (Fin m) ℂ}
-    (hA : Aᴴ = A) (hB : Bᴴ = B) (x y : Matrix (Fin m) (Fin n) ℂ) :
-    star (A * yᴴ * B * x).trace = (A * xᴴ * B * y).trace := by
+theorem star_trace_herm
+    {m n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} {B : Matrix (Fin m) (Fin m) ℂ}
+    (hA : Aᴴ = A) (hB : Bᴴ = B) (x y : Matrix (Fin m) (Fin n) ℂ)
+    : star (A * yᴴ * B * x).trace = (A * xᴴ * B * y).trace := by
   rw [← Matrix.trace_conjTranspose]
   simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hA, hB]
   rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.trace_mul_comm]
   simp only [Matrix.mul_assoc]
 
 open scoped MatrixOrder in
-theorem trace_pos {m n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} {B : Matrix (Fin m) (Fin m) ℂ}
-    (hA : A.PosDef) (hB : B.PosDef) (x : Matrix (Fin m) (Fin n) ℂ) (hx : x ≠ 0) :
-    0 < (A * xᴴ * B * x).trace := by
-  obtain ⟨C, hC, rfl⟩ := CStarAlgebra.isStrictlyPositive_iff_eq_star_mul_self.mp
-    hA.isStrictlyPositive
-  obtain ⟨D, hD, rfl⟩ := CStarAlgebra.isStrictlyPositive_iff_eq_star_mul_self.mp
-    hB.isStrictlyPositive
+theorem trace_pos
+    {m n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} {B : Matrix (Fin m) (Fin m) ℂ}
+    (hA : A.PosDef) (hB : B.PosDef) (x : Matrix (Fin m) (Fin n) ℂ) (hx : x ≠ 0)
+    : 0 < (A * xᴴ * B * x).trace := by
+  obtain ⟨C, hC, rfl⟩ :=
+    CStarAlgebra.isStrictlyPositive_iff_eq_star_mul_self.mp hA.isStrictlyPositive
+  obtain ⟨D, hD, rfl⟩ :=
+    CStarAlgebra.isStrictlyPositive_iff_eq_star_mul_self.mp hB.isStrictlyPositive
   have e : (star C * C * xᴴ * (star D * D) * x).trace = ((D * x * Cᴴ)ᴴ * (D * x * Cᴴ)).trace := by
     simp only [Matrix.star_eq_conjTranspose, Matrix.conjTranspose_mul,
       Matrix.conjTranspose_conjTranspose, Matrix.mul_assoc]
@@ -44,7 +48,8 @@ theorem trace_pos {m n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} {B : Matrix (Fin 
   have : x = D⁻¹ * (D * x * Cᴴ) * Cᴴ⁻¹ := by
     rw [Matrix.mul_assoc D, Matrix.nonsing_inv_mul_cancel_left _ _ hD',
       Matrix.mul_nonsing_inv_cancel_right _ _ hC'']
-  rw [this, h0]; simp
+  rw [this, h0]
+  simp
 
 variable {k : ℕ} {G s : Matrix (Fin k) (Fin k) ℂ}
 
@@ -64,20 +69,30 @@ theorem herm (h : IsCartanInv G s) : Gᴴ = G := by
 theorem inv_mul_adj (h : IsCartanInv G s) : G⁻¹ * sᴴ = (G * s)⁻¹ := by
   rw [← adj_mul h, Matrix.mul_inv_rev, Matrix.inv_eq_left_inv (adj_sq h)]
 
-theorem form_cplxO {m n : ℕ} {GS sS : Matrix (Fin n) (Fin n) ℂ} {GT sT : Matrix (Fin m) (Fin m) ℂ}
-    {ξ : ℂ} (hξ : ξ.re = 0) (hS : IsCartanInv GS sS) (hT : IsCartanInv GT sT)
-    (x y : Matrix (Fin m) (Fin n) ℂ) :
-    (ξ * (GS⁻¹ * (cplxO sS sT y)ᴴ * GT * x).trace).re =
-      ξ.im * ((GS * sS)⁻¹ * yᴴ * (GT * sT) * x).trace.re := by
-  have e : GS⁻¹ * (cplxO sS sT y)ᴴ * GT * x =
-      (-Complex.I) • ((GS * sS)⁻¹ * yᴴ * (GT * sT) * x) := by
+theorem form_cplxO
+    {m n : ℕ} {GS sS : Matrix (Fin n) (Fin n) ℂ} {GT sT : Matrix (Fin m) (Fin m) ℂ} {ξ : ℂ}
+    (hξ : ξ.re = 0) (hS : IsCartanInv GS sS) (hT : IsCartanInv GT sT)
+    (x y : Matrix (Fin m) (Fin n) ℂ)
+    : (ξ * (GS⁻¹ * (cplxO sS sT y)ᴴ * GT * x).trace).re
+      = ξ.im * ((GS * sS)⁻¹ * yᴴ * (GT * sT) * x).trace.re := by
+  have e
+      : GS⁻¹ * (cplxO sS sT y)ᴴ * GT * x = (-Complex.I) • ((GS * sS)⁻¹ * yᴴ * (GT * sT) * x) := by
     rw [← inv_mul_adj hS, ← adj_mul hT]
     simp only [cplxO, Matrix.conjTranspose_smul, Matrix.conjTranspose_mul, Matrix.mul_smul,
       Matrix.smul_mul, Matrix.mul_assoc, Complex.star_def, Complex.conj_I]
   rw [e, Matrix.trace_smul]
   simp [hξ]
 
-theorem cplxO_pos : ∀ (m n : ℕ) (GS sS : Matrix (Fin n) (Fin n) ℂ) (GT sT : Matrix (Fin m) (Fin m) ℂ) (ξ : ℂ), ξ.re = 0 → 0 < ξ.im → IsCartanInv GS sS → IsCartanInv GT sT → (∀ x : Matrix (Fin m) (Fin n) ℂ, (ξ * (GS⁻¹ * xᴴ * GT * x).trace).re = 0) ∧ (∀ x : Matrix (Fin m) (Fin n) ℂ, cplxO sS sT (cplxO sS sT x) = -x) ∧ (∀ x y : Matrix (Fin m) (Fin n) ℂ, (ξ * (GS⁻¹ * (cplxO sS sT y)ᴴ * GT * x).trace).re = (ξ * (GS⁻¹ * (cplxO sS sT x)ᴴ * GT * y).trace).re) ∧ ∀ x : Matrix (Fin m) (Fin n) ℂ, x ≠ 0 → 0 < (ξ * (GS⁻¹ * (cplxO sS sT x)ᴴ * GT * x).trace).re := by
+theorem cplxO_pos
+    : ∀ (m n : ℕ) (GS sS : Matrix (Fin n) (Fin n) ℂ) (GT sT : Matrix (Fin m) (Fin m) ℂ) (ξ : ℂ),
+      ξ.re = 0 → 0 < ξ.im → IsCartanInv GS sS → IsCartanInv GT sT
+        → (∀ x : Matrix (Fin m) (Fin n) ℂ, (ξ * (GS⁻¹ * xᴴ * GT * x).trace).re = 0)
+          ∧ (∀ x : Matrix (Fin m) (Fin n) ℂ, cplxO sS sT (cplxO sS sT x) = -x)
+          ∧ (∀ x y : Matrix (Fin m) (Fin n) ℂ,
+            (ξ * (GS⁻¹ * (cplxO sS sT y)ᴴ * GT * x).trace).re
+              = (ξ * (GS⁻¹ * (cplxO sS sT x)ᴴ * GT * y).trace).re)
+          ∧ ∀ x : Matrix (Fin m) (Fin n) ℂ,
+            x ≠ 0 → 0 < (ξ * (GS⁻¹ * (cplxO sS sT x)ᴴ * GT * x).trace).re := by
   intro m n GS sS GT sT ξ h0 h1 hS hT
   refine ⟨fun x => ?_, fun x => ?_, fun x y => ?_, fun x hx => ?_⟩
   · have hi : GS⁻¹ᴴ = GS⁻¹ := by rw [Matrix.conjTranspose_nonsing_inv, herm hS]

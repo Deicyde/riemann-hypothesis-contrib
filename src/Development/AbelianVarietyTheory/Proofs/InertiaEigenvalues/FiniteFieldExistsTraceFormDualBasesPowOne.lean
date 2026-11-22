@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem finiteField_exists_traceForm_dualBases_pow_one :
-    ∀ (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Finite k] [CharP k l],
-      ∃ t : k →+ ZMod (l ^ 1), (∀ b, (∀ a, t (a * b) = 0) → b = 0) ∧
-        ∃ (n : ℕ) (a e : Fin n → k), ∀ z, z = ∑ j, ((t (a j * z)).val : k) * e j := by
+theorem finiteField_exists_traceForm_dualBases_pow_one
+    : ∀ (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Finite k] [CharP k l], ∃ t : k →+ ZMod (l ^ 1),
+      (∀ b, (∀ a, t (a * b) = 0) → b = 0)
+        ∧ ∃ (n : ℕ) (a e : Fin n → k), ∀ z, z = ∑ j, ((t (a j * z)).val : k) * e j := by
   intro l _ k _ _ _
   rw [pow_one]
   let _ : Algebra (ZMod l) k := ZMod.algebra k l

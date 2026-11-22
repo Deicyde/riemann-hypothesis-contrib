@@ -6,20 +6,26 @@ public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.SelmerC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction GlobalTheory.IndefiniteRowSideFullHecke.SelmerCrystallineCocycles
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  GlobalTheory.IndefiniteRowSideFullHecke.SelmerCrystallineCocycles
 
 namespace GlobalTheory.Proof.AbsoluteIrreducibilitySpan
 
-
 open Formalism.MainNotions.N in
-theorem absIrr_of_span {Γ k : Type} [Group Γ] [Field k] {a : ℕ} (ha : 0 < a) (ρ : Γ →* GL (Fin a) k)
-    (M : Γ → Matrix (Fin a) (Fin a) k) (c : Γ → k)
-    (hM : ∀ g, M g = c g • (ρ g : Matrix (Fin a) (Fin a) k))
-    (h : Submodule.span k (Set.range M) = ⊤) : AbsIrrSub ρ ⊤ := by
+theorem absIrr_of_span
+    {Γ k : Type} [Group Γ] [Field k]
+    {a : ℕ} (ha : 0 < a) (ρ : Γ →* GL (Fin a) k) (M : Γ → Matrix (Fin a) (Fin a) k)
+    (c : Γ → k) (hM : ∀ g, M g = c g • (ρ g : Matrix (Fin a) (Fin a) k))
+    (h : Submodule.span k (Set.range M) = ⊤)
+    : AbsIrrSub ρ ⊤ := by
   classical
   set K := AlgebraicClosure k
-  have htop : Submodule.span K ((fun v : Fin a → k => (algebraMap k K) ∘ v) ''
-      ((⊤ : Submodule k (Fin a → k)) : Set (Fin a → k))) = ⊤ := by
+  have htop
+      : Submodule.span K
+          ((fun v : Fin a → k => (algebraMap k K) ∘ v)
+            '' ((⊤ : Submodule k (Fin a → k)) : Set (Fin a → k)))
+        = ⊤ := by
     rw [eq_top_iff, ← (Pi.basisFun K (Fin a)).span_eq]
     apply Submodule.span_mono
     rintro _ ⟨j, rfl⟩
@@ -39,13 +45,16 @@ theorem absIrr_of_span {Γ k : Type} [Group Γ] [Field k] {a : ℕ} (ha : 0 < a)
     | mem x hx =>
       obtain ⟨g, rfl⟩ := hx
       intro v hv
-      have h1 : (M g).map (algebraMap k K) = algebraMap k K (c g) •
-          ((mapRep (algebraMap k K) ρ g : GL (Fin a) K) : Matrix (Fin a) (Fin a) K) := by
+      have h1
+          : (M g).map (algebraMap k K)
+            = algebraMap k K (c g)
+              • ((mapRep (algebraMap k K) ρ g : GL (Fin a) K) : Matrix (Fin a) (Fin a) K) := by
         ext p q
         simp [hM, mapRep]
       rw [h1, Matrix.smul_mulVec]
       exact W'.smul_mem _ (hW g v hv)
-    | zero => intro v hv; simp
+    | zero =>
+      intro v hv; simp
     | add x y _ _ hx hy =>
       intro v hv
       rw [Matrix.map_add _ (map_add _), Matrix.add_mulVec]
@@ -66,7 +75,9 @@ theorem absIrr_of_span {Γ k : Type} [Group Γ] [Field k] {a : ℕ} (ha : 0 < a)
   rintro _ ⟨j, rfl⟩
   have h2 := W'.smul_mem (v b)⁻¹ (key (Matrix.single j b 1) v hv)
   have hb2 : v b ≠ 0 := hb'
-  have h3 : (v b)⁻¹ • ((Matrix.single j b (1 : k)).map (algebraMap k K)).mulVec v = Pi.basisFun K (Fin a) j := by
+  have h3
+      : (v b)⁻¹ • ((Matrix.single j b (1 : k)).map (algebraMap k K)).mulVec v
+        = Pi.basisFun K (Fin a) j := by
     rw [Matrix.map_single, map_one, Matrix.single_mulVec]
     ext x
     by_cases hx : x = j

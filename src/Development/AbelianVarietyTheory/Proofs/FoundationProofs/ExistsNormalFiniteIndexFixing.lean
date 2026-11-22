@@ -9,10 +9,13 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem exists_normal_finiteIndex_fixing (L : Type) [Field L] (G : Type) [Group G]
-    [MulSemiringAction G L] (S : Finset L) (hS : ∀ s ∈ S, (MulAction.orbit G s).Finite) :
-    ∃ U : Subgroup G, U.Normal ∧ U.FiniteIndex ∧ (∀ s ∈ S, s ∈ Fix L U) ∧
-      ∀ h : G, h ∉ U → ∃ x ∈ Fix L U, h • x ≠ x := by
+theorem exists_normal_finiteIndex_fixing
+    (L : Type) [Field L]
+    (G : Type) [Group G] [MulSemiringAction G L]
+    (S : Finset L) (hS : ∀ s ∈ S, (MulAction.orbit G s).Finite)
+    : ∃ U : Subgroup G,
+      U.Normal ∧ U.FiniteIndex ∧ (∀ s ∈ S, s ∈ Fix L U)
+        ∧ ∀ h : G, h ∉ U → ∃ x ∈ Fix L U, h • x ≠ x := by
   classical
   set T : Set L := ⋃ s ∈ S, MulAction.orbit G s with hT
   have hTfin : T.Finite := Set.Finite.biUnion S.finite_toSet (fun s hs => hS s hs)

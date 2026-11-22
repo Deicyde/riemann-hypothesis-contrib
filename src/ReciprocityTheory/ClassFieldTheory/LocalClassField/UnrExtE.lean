@@ -10,9 +10,9 @@ open _root_.Neutral.B1
 
 variable (p : ℕ) [Fact p.Prime] (K : IntermediateField ℚ_[p] (PadicAlgCl p))
 
-theorem exists_closest {M : IntermediateField ℚ_[p] (PadicAlgCl p)}
-    (hM : FiniteDimensional ℚ_[p] M) (x : PadicAlgCl p) :
-    ∃ m0 ∈ M, ∀ m ∈ M, ‖x - m0‖ ≤ ‖x - m‖ := by
+theorem exists_closest
+    {M : IntermediateField ℚ_[p] (PadicAlgCl p)} (hM : FiniteDimensional ℚ_[p] M) (x : PadicAlgCl p)
+    : ∃ m0 ∈ M, ∀ m ∈ M, ‖x - m0‖ ≤ ‖x - m‖ := by
   have : ProperSpace M := FiniteDimensional.proper ℚ_[p] M
   have hc : IsCompact (Metric.closedBall (0 : M) ‖x‖) := isCompact_closedBall 0 ‖x‖
   have hcont : Continuous (fun m : M => ‖x - (m : PadicAlgCl p)‖) :=
@@ -20,8 +20,10 @@ theorem exists_closest {M : IntermediateField ℚ_[p] (PadicAlgCl p)}
   have hne : (Metric.closedBall (0 : M) ‖x‖).Nonempty :=
     ⟨0, Metric.mem_closedBall_self (norm_nonneg x)⟩
   obtain ⟨m0, hm0, hmin⟩ := hc.exists_isMinOn hne hcont.continuousOn
-  have hmin' : ∀ m : M, m ∈ Metric.closedBall (0 : M) ‖x‖ →
-      ‖x - (m0 : PadicAlgCl p)‖ ≤ ‖x - (m : PadicAlgCl p)‖ := fun m hm => hmin hm
+  have hmin'
+      : ∀ m : M,
+        m ∈ Metric.closedBall (0 : M) ‖x‖ → ‖x - (m0 : PadicAlgCl p)‖ ≤ ‖x - (m : PadicAlgCl p)‖ :=
+    fun m hm => hmin hm
   have hle0 : ‖x - (m0 : PadicAlgCl p)‖ ≤ ‖x‖ := by
     have h2 := hmin' 0 (Metric.mem_closedBall_self (norm_nonneg x))
     rwa [ZeroMemClass.coe_zero, sub_zero] at h2
@@ -38,9 +40,10 @@ theorem exists_closest {M : IntermediateField ℚ_[p] (PadicAlgCl p)}
       exact UnramifiedExtensions.norm_sub_le_max' _ _
     exact absurd (h3.trans (max_le le_rfl hlt.le)) (not_le.2 hmx)
 
-theorem le_of_resK_le_of_norm {M L : IntermediateField ℚ_[p] (PadicAlgCl p)}
-    (hM : FiniteDimensional ℚ_[p] M) (hML : M ≤ L) (hres : resK p L ≤ resK p M)
-    (h : ∀ x ∈ L, ∃ y ∈ M, ‖x‖ = ‖y‖) : L ≤ M := by
+theorem le_of_resK_le_of_norm
+    {M L : IntermediateField ℚ_[p] (PadicAlgCl p)} (hM : FiniteDimensional ℚ_[p] M) (hML : M ≤ L)
+    (hres : resK p L ≤ resK p M) (h : ∀ x ∈ L, ∃ y ∈ M, ‖x‖ = ‖y‖)
+    : L ≤ M := by
   intro x hx
   obtain ⟨m0, hm0, hmin⟩ := exists_closest p hM x
   by_contra hxM
@@ -63,15 +66,18 @@ theorem le_of_resK_le_of_norm {M L : IntermediateField ℚ_[p] (PadicAlgCl p)}
       rw [mul_sub, mul_div_cancel₀ _ hk0]
       ring
     rw [e, norm_neg, norm_mul, hyk]
-    calc ‖k‖ * ‖(z : PadicAlgCl p) - (x - m0) / k‖ < ‖k‖ * 1 :=
-          mul_lt_mul_of_pos_left hzr' hkn
+    calc
+      ‖k‖ * ‖(z : PadicAlgCl p) - (x - m0) / k‖
+        < ‖k‖ * 1 := mul_lt_mul_of_pos_left hzr' hkn
       _ = ‖k‖ := mul_one _
   exact absurd hlt (not_lt.2 (hmin _ (M.add_mem hm0 (M.mul_mem hk hz))))
 
-theorem eq_Kn_of_norm (hK : FiniteDimensional ℚ_[p] K) {L : IntermediateField ℚ_[p] (PadicAlgCl p)}
-    (hKL : K ≤ L) {n : ℕ} (hn : 0 < n)
-    (hdeg : Module.finrank ℚ_[p] L = n * Module.finrank ℚ_[p] K)
-    (h : ∀ x ∈ L, ∃ y ∈ K, ‖x‖ = ‖y‖) : L = Kn p K n := by
+theorem eq_Kn_of_norm
+    (hK : FiniteDimensional ℚ_[p] K)
+    {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (hKL : K ≤ L)
+    {n : ℕ} (hn : 0 < n) (hdeg : Module.finrank ℚ_[p] L = n * Module.finrank ℚ_[p] K)
+    (h : ∀ x ∈ L, ∃ y ∈ K, ‖x‖ = ‖y‖)
+    : L = Kn p K n := by
   have hd : 0 < Module.finrank ℚ_[p] K := Module.finrank_pos
   have hL : FiniteDimensional ℚ_[p] L :=
     Module.finite_of_finrank_pos (by rw [hdeg]; exact Nat.mul_pos hn hd)
@@ -91,10 +97,11 @@ theorem eq_Kn_of_norm (hK : FiniteDimensional ℚ_[p] K) {L : IntermediateField 
     have : c ∈ (resK p (Kn p K f) : Set (kbar p)) := by rw [heq]; exact hc
     exact this
   have hLM : L = Kn p K f :=
-    le_antisymm (le_of_resK_le_of_norm p hM hML hres
-      (fun x hx => by
+    le_antisymm
+      (le_of_resK_le_of_norm p hM hML hres (fun x hx => by
         obtain ⟨y, hy, hxy⟩ := h x hx
-        exact ⟨y, le_Kn p K f hy, hxy⟩)) hML
+        exact ⟨y, le_Kn p K f hy, hxy⟩))
+      hML
   have hfn : f = n := by
     have h1 := finrank_Kn p K hK hf
     rw [← hLM, hdeg] at h1

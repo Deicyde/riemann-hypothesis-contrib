@@ -18,14 +18,24 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MemRan
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2
+  GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory
 
-theorem brk_sum_reps_orth : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Formalism.L2.Th1.H.Sesq V) (α : V → ℂ) (A B Λ : AddSubgroup V), SplitHyp H α A B Λ → ∀ SB : Finset V, Formalism.L2.Th1.H.IsReps Λ B SB → ∀ w ∈ Λ ⊓ A, ∑ y ∈ SB, brk H y w = if w ∈ B then (SB.card : ℂ) else 0 := by
+theorem brk_sum_reps_orth
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Formalism.L2.Th1.H.Sesq V) (α : V → ℂ)
+        (A B Λ : AddSubgroup V),
+      SplitHyp H α A B Λ
+        → ∀ SB : Finset V,
+          Formalism.L2.Th1.H.IsReps Λ B SB
+            → ∀ w ∈ Λ ⊓ A, ∑ y ∈ SB, brk H y w = if w ∈ B then (SB.card : ℂ) else 0 := by
   intro V _ _ H α A B Λ hyp SB hSB w hw
   obtain ⟨hH, -, hB, -, sdB, hΛ, -, -, -, -⟩ := hyp
   have hBint := (Formalism.L2.Th1.H.semicharacterBasic V H hH B α hB).2.2
@@ -41,8 +51,11 @@ theorem brk_sum_reps_orth : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : 
       push_neg at hcon
       exact hnd (fun y hy => hcon y hy)
     obtain ⟨y₀, hy₀B, hy₀⟩ := hex
-    exact char_sum_zero hSB (fun y => brk H y w) (fun u v => brk_add_left H u v w)
-      (fun m _ hmΛ => brk_one_of_int H (hΛint hwΛ m hmΛ)) (x₀ := y₀) hy₀B
+    exact char_sum_zero hSB
+      (fun y => brk H y w)
+      (fun u v => brk_add_left H u v w)
+      (fun m _ hmΛ => brk_one_of_int H (hΛint hwΛ m hmΛ))
+      (x₀ := y₀) hy₀B
       (fun h => hy₀ (int_of_brk_one H h))
 
 end GlobalTheory

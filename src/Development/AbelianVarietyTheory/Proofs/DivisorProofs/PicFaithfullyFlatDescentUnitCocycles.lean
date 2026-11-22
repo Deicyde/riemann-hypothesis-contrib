@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnitDe
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 
 noncomputable section
 
@@ -18,17 +19,22 @@ namespace GlobalTheory.PicCech
 section
 variable {A B : Type} [CommRing A] [CommRing B] [Algebra A B]
 
-theorem descMod_mul_le (u v : (B ⊗[A] B)ˣ) : descMod A B u * descMod A B v ≤ descMod A B (u * v) := by
+theorem descMod_mul_le (u v : (B ⊗[A] B)ˣ)
+    : descMod A B u * descMod A B v ≤ descMod A B (u * v) := by
   refine Submodule.mul_le.2 fun x hx y hy => ?_
   simp only [descMod, LinearMap.mem_eqLocus, LinearMap.comp_apply, LinearMap.mulLeft_apply,
-    AlgHom.toLinearMap_apply] at hx hy ⊢
-  rw [map_mul, map_mul, Units.val_mul, ← hx, ← hy]; ring
+      AlgHom.toLinearMap_apply]
+    at hx hy ⊢
+  rw [map_mul, map_mul, Units.val_mul, ← hx, ← hy]
+  ring
 
 theorem descMod_one_le [Module.FaithfullyFlat A B] : descMod A B 1 ≤ 1 := by
   intro b hb
   simp only [descMod, LinearMap.mem_eqLocus, LinearMap.comp_apply, LinearMap.mulLeft_apply,
-    AlgHom.toLinearMap_apply, Units.val_one, one_mul] at hb
-  obtain ⟨a, ha⟩ := GlobalTheory.T.exists_algebraMap_eq_of_faithfullyFlat_includeLeft_eq_includeRight A B b hb.symm
+      AlgHom.toLinearMap_apply, Units.val_one, one_mul]
+    at hb
+  obtain ⟨a, ha⟩ :=
+    GlobalTheory.T.exists_algebraMap_eq_of_faithfullyFlat_includeLeft_eq_includeRight A B b hb.symm
   exact Submodule.mem_one.2 ⟨a, ha⟩
 
 theorem uCoc_mul {u v : (B ⊗[A] B)ˣ} (hu : UCoc A B u) (hv : UCoc A B v) : UCoc A B (u * v) := by
@@ -41,29 +47,34 @@ theorem uCoc_inv {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u) : UCoc A B u⁻¹ := by
   set f13 := (Algebra.TensorProduct.map (AlgHom.id A B) (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B))
   set f12 := (Algebra.TensorProduct.map (AlgHom.id A B) (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B))
   set f23 := (Algebra.TensorProduct.includeRight : B ⊗[A] B →ₐ[A] B ⊗[A] (B ⊗[A] B))
-  have key : Units.map f13.toMonoidHom u = Units.map f12.toMonoidHom u * Units.map f23.toMonoidHom u :=
+  have key
+      : Units.map f13.toMonoidHom u = Units.map f12.toMonoidHom u * Units.map f23.toMonoidHom u :=
     Units.ext hu
   have key' := congrArg (fun x => ((x⁻¹ : (B ⊗[A] (B ⊗[A] B))ˣ) : B ⊗[A] (B ⊗[A] B))) key
   simp only [mul_inv, ← map_inv] at key'
   simpa [mul_comm] using key'
 
-theorem descMod_mul_inv [Module.FaithfullyFlat A B] {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u) :
-    descMod A B u * descMod A B u⁻¹ = 1 := by
+theorem descMod_mul_inv [Module.FaithfullyFlat A B] {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u)
+    : descMod A B u * descMod A B u⁻¹ = 1 := by
   have hle : descMod A B u * descMod A B u⁻¹ ≤ 1 :=
     (descMod_mul_le u u⁻¹).trans (by rw [mul_inv_cancel]; exact descMod_one_le)
   refine le_antisymm hle ?_
   have htop : (⊤ : Submodule A B) * (descMod A B u * descMod A B u⁻¹) = ⊤ := by
-    rw [← mul_assoc, GlobalTheory.T.top_mul_descendedSubmoduleOfUnitCocycle_eq_top A B u hu, GlobalTheory.T.top_mul_descendedSubmoduleOfUnitCocycle_eq_top A B u⁻¹ (uCoc_inv hu)]
+    rw [← mul_assoc, GlobalTheory.T.top_mul_descendedSubmoduleOfUnitCocycle_eq_top A B u hu,
+      GlobalTheory.T.top_mul_descendedSubmoduleOfUnitCocycle_eq_top A B u⁻¹ (uCoc_inv hu)]
   set J : Ideal A := (descMod A B u * descMod A B u⁻¹).comap (Algebra.linearMap A B) with hJ
   have hJtop : J • (⊤ : Submodule A B) = ⊤ := by
     rw [eq_top_iff]
-    calc (⊤ : Submodule A B) = ⊤ * (descMod A B u * descMod A B u⁻¹) := htop.symm
+    calc
+      (⊤ : Submodule A B)
+        = ⊤ * (descMod A B u * descMod A B u⁻¹) := htop.symm
       _ ≤ J • (⊤ : Submodule A B) := Submodule.mul_le.2 fun b _ p hp => ?_
     obtain ⟨a, rfl⟩ := Submodule.mem_one.1 (hle hp)
     have ha : a ∈ J := hp
     rw [mul_comm, ← Algebra.smul_def]
     exact Submodule.smul_mem_smul ha Submodule.mem_top
-  have hJ1 : J = ⊤ := ((Module.FaithfullyFlat.iff_flat_and_ideal_smul_eq_top A B).1 inferInstance).2 J hJtop
+  have hJ1 : J = ⊤ :=
+    ((Module.FaithfullyFlat.iff_flat_and_ideal_smul_eq_top A B).1 inferInstance).2 J hJtop
   have h1 : (1 : A) ∈ J := hJ1 ▸ Submodule.mem_top
   rw [Submodule.one_le]
   simpa [hJ] using h1
@@ -106,90 +117,122 @@ theorem descMod_eq_span_iff [Module.FaithfullyFlat A B] {u : (B ⊗[A] B)ˣ} (hu
       refine Submodule.mem_span_singleton.2 ⟨a, ?_⟩
       rw [Algebra.smul_def, ha, mul_assoc, Units.inv_mul, mul_one]
 
-theorem isUnit_descMod [Module.FaithfullyFlat A B] {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u) :
-    IsUnit (descMod A B u) :=
+theorem isUnit_descMod [Module.FaithfullyFlat A B] {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u)
+    : IsUnit (descMod A B u) :=
   IsUnit.of_mul_eq_one _ (descMod_mul_inv hu)
 
-theorem descMod_mul [Module.FaithfullyFlat A B] {u v : (B ⊗[A] B)ˣ} (hu : UCoc A B u)
-    (hv : UCoc A B v) : descMod A B (u * v) = descMod A B u * descMod A B v := by
+theorem descMod_mul
+    [Module.FaithfullyFlat A B] {u v : (B ⊗[A] B)ˣ} (hu : UCoc A B u) (hv : UCoc A B v)
+    : descMod A B (u * v) = descMod A B u * descMod A B v := by
   refine le_antisymm ?_ (descMod_mul_le u v)
-  calc descMod A B (u * v) = descMod A B (u * v) * (descMod A B u * descMod A B u⁻¹) := by
-        rw [descMod_mul_inv hu, mul_one]
+  calc
+    descMod A B (u * v) = descMod A B (u * v) * (descMod A B u * descMod A B u⁻¹) := by
+      rw [descMod_mul_inv hu, mul_one]
     _ = descMod A B u * (descMod A B (u * v) * descMod A B u⁻¹) := by ring
-    _ ≤ descMod A B u * descMod A B (u * v * u⁻¹) := by
-        gcongr; exact descMod_mul_le _ _
+    _ ≤ descMod A B u * descMod A B (u * v * u⁻¹) := by gcongr; exact descMod_mul_le _ _
     _ = descMod A B u * descMod A B v := by
-        congr 2; rw [mul_comm u v, mul_assoc, mul_inv_cancel, mul_one]
+      congr 2; rw [mul_comm u v, mul_assoc, mul_inv_cancel, mul_one]
 
-theorem exists_descMod_eq [Module.FaithfullyFlat A B] (I : (Submodule A B)ˣ) :
-    ∃ u, UCoc A B u ∧ descMod A B u = I :=
+theorem exists_descMod_eq [Module.FaithfullyFlat A B] (I : (Submodule A B)ˣ)
+    : ∃ u, UCoc A B u ∧ descMod A B u = I :=
   GlobalTheory.T.exists_unitDescentCocycle_descendedSubmodule_eq A B descMod_one_le I
 
-theorem uCoc_map {B' : Type} [CommRing B'] [Algebra A B'] (φ : B →ₐ[A] B') {u : (B ⊗[A] B)ˣ}
-    (hu : UCoc A B u) : UCoc A B' (Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u) := by
+theorem uCoc_map
+    {B' : Type} [CommRing B'] [Algebra A B'] (φ : B →ₐ[A] B') {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u)
+    : UCoc A B' (Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u) := by
   unfold UCoc at *
-  have h13 : ∀ x, (Algebra.TensorProduct.map (AlgHom.id A B') (Algebra.TensorProduct.includeRight : B' →ₐ[A] B' ⊗[A] B'))
-      (Algebra.TensorProduct.map φ φ x) = Algebra.TensorProduct.map φ (Algebra.TensorProduct.map φ φ)
-        ((Algebra.TensorProduct.map (AlgHom.id A B) (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B)) x) := by
-    intro x; induction x using TensorProduct.induction_on with
+  have h13
+      : ∀ x,
+        (Algebra.TensorProduct.map (AlgHom.id A B')
+              (Algebra.TensorProduct.includeRight : B' →ₐ[A] B' ⊗[A] B'))
+            (Algebra.TensorProduct.map φ φ x)
+          = Algebra.TensorProduct.map φ (Algebra.TensorProduct.map φ φ)
+            ((Algebra.TensorProduct.map (AlgHom.id A B)
+                (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B))
+              x) := by
+    intro x
+    induction x using TensorProduct.induction_on with
     | zero => simp
     | tmul a b => simp
     | add x y hx hy => simp only [map_add (f := _), hx, hy]
-  have h12 : ∀ x, (Algebra.TensorProduct.map (AlgHom.id A B') (Algebra.TensorProduct.includeLeft : B' →ₐ[A] B' ⊗[A] B'))
-      (Algebra.TensorProduct.map φ φ x) = Algebra.TensorProduct.map φ (Algebra.TensorProduct.map φ φ)
-        ((Algebra.TensorProduct.map (AlgHom.id A B) (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B)) x) := by
-    intro x; induction x using TensorProduct.induction_on with
+  have h12
+      : ∀ x,
+        (Algebra.TensorProduct.map (AlgHom.id A B')
+              (Algebra.TensorProduct.includeLeft : B' →ₐ[A] B' ⊗[A] B'))
+            (Algebra.TensorProduct.map φ φ x)
+          = Algebra.TensorProduct.map φ (Algebra.TensorProduct.map φ φ)
+            ((Algebra.TensorProduct.map (AlgHom.id A B)
+                (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B))
+              x) := by
+    intro x
+    induction x using TensorProduct.induction_on with
     | zero => simp
     | tmul a b => simp
     | add x y hx hy => simp only [map_add (f := _), hx, hy]
-  have h23 : ∀ x, (Algebra.TensorProduct.includeRight : B' ⊗[A] B' →ₐ[A] B' ⊗[A] (B' ⊗[A] B'))
-      (Algebra.TensorProduct.map φ φ x) = Algebra.TensorProduct.map φ (Algebra.TensorProduct.map φ φ)
-        ((Algebra.TensorProduct.includeRight : B ⊗[A] B →ₐ[A] B ⊗[A] (B ⊗[A] B)) x) := by
+  have h23
+      : ∀ x,
+        (Algebra.TensorProduct.includeRight : B' ⊗[A] B' →ₐ[A] B' ⊗[A] (B' ⊗[A] B'))
+            (Algebra.TensorProduct.map φ φ x)
+          = Algebra.TensorProduct.map φ (Algebra.TensorProduct.map φ φ)
+            ((Algebra.TensorProduct.includeRight : B ⊗[A] B →ₐ[A] B ⊗[A] (B ⊗[A] B)) x) := by
     intro x; simp
-  have e : ((Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u : (B' ⊗[A] B')ˣ) : B' ⊗[A] B') =
-      Algebra.TensorProduct.map φ φ (u : B ⊗[A] B) := rfl
+  have e
+      : ((Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u : (B' ⊗[A] B')ˣ) : B' ⊗[A] B')
+        = Algebra.TensorProduct.map φ φ (u : B ⊗[A] B) :=
+    rfl
   rw [e, h13, h12, h23, hu, map_mul]
 
-theorem descMod_map_le {B' : Type} [CommRing B'] [Algebra A B'] (φ : B →ₐ[A] B') (u : (B ⊗[A] B)ˣ) :
-    (descMod A B u).map φ.toLinearMap ≤ descMod A B' (Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u) := by
+theorem descMod_map_le {B' : Type} [CommRing B'] [Algebra A B'] (φ : B →ₐ[A] B') (u : (B ⊗[A] B)ˣ)
+    : (descMod A B u).map φ.toLinearMap
+      ≤ descMod A B' (Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u) := by
   rintro _ ⟨b, hb, rfl⟩
   simp only [descMod, LinearMap.mem_eqLocus, LinearMap.comp_apply, LinearMap.mulLeft_apply,
-    AlgHom.toLinearMap_apply, Units.coe_map, MonoidHom.coe_coe] at hb ⊢
+      AlgHom.toLinearMap_apply, Units.coe_map, MonoidHom.coe_coe]
+    at hb ⊢
   have := congrArg (Algebra.TensorProduct.map φ φ) hb
   simpa using this
 
-theorem nonempty_descMod_equiv [Module.FaithfullyFlat A B] {B' : Type} [CommRing B'] [Algebra A B']
-    [Module.FaithfullyFlat A B'] (φ : B →ₐ[A] B') {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u) :
-    Nonempty (descMod A B u ≃ₗ[A] descMod A B' (Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u)) := by
-  set u' := Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u
-  have hu' : UCoc A B' u' := uCoc_map φ hu
-  haveI : Module.Invertible A (descMod A B u) :=
-    inferInstanceAs (Module.Invertible A ((isUnit_descMod hu).unit : Submodule A B))
-  haveI : Module.Invertible A (descMod A B' u') :=
-    inferInstanceAs (Module.Invertible A ((isUnit_descMod hu').unit : Submodule A B'))
-  have hmap := descMod_map_le φ u
-  let f : descMod A B u →ₗ[A] descMod A B' u' :=
-    (φ.toLinearMap.restrict (p := descMod A B u) (q := descMod A B' u')
-      fun b hb => hmap (Submodule.mem_map_of_mem hb))
-  have hinv : (descMod A B u⁻¹).map φ.toLinearMap ≤ descMod A B' u'⁻¹ := by
-    have := descMod_map_le φ u⁻¹
-    rwa [map_inv] at this
-  set P := (descMod A B u).map φ.toLinearMap
-  have h1 : (1 : Submodule A B') ≤ P * descMod A B' u'⁻¹ := by
-    calc (1 : Submodule A B') = (1 : Submodule A B).map φ.toLinearMap := (Submodule.map_one φ).symm
-      _ = P * (descMod A B u⁻¹).map φ.toLinearMap := by
+theorem nonempty_descMod_equiv
+    [Module.FaithfullyFlat A B]
+    {B' : Type} [CommRing B'] [Algebra A B'] [Module.FaithfullyFlat A B']
+    (φ : B →ₐ[A] B')
+    {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u)
+    : Nonempty
+      (descMod A B u ≃ₗ[A] descMod A B' (Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u)) :=
+  by
+    set u' := Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u
+    have hu' : UCoc A B' u' := uCoc_map φ hu
+    haveI : Module.Invertible A (descMod A B u) :=
+      inferInstanceAs (Module.Invertible A ((isUnit_descMod hu).unit : Submodule A B))
+    haveI : Module.Invertible A (descMod A B' u') :=
+      inferInstanceAs (Module.Invertible A ((isUnit_descMod hu').unit : Submodule A B'))
+    have hmap := descMod_map_le φ u
+    let f : descMod A B u →ₗ[A] descMod A B' u' :=
+      (φ.toLinearMap.restrict (p := descMod A B u) (q := descMod A B' u') fun b hb =>
+        hmap (Submodule.mem_map_of_mem hb))
+    have hinv : (descMod A B u⁻¹).map φ.toLinearMap ≤ descMod A B' u'⁻¹ := by
+      have := descMod_map_le φ u⁻¹
+      rwa [map_inv] at this
+    set P := (descMod A B u).map φ.toLinearMap
+    have h1 : (1 : Submodule A B') ≤ P * descMod A B' u'⁻¹ := by
+      calc
+        (1 : Submodule A B')
+          = (1 : Submodule A B).map φ.toLinearMap := (Submodule.map_one φ).symm
+        _ = P * (descMod A B u⁻¹).map φ.toLinearMap := by
           rw [← descMod_mul_inv hu, Submodule.map_mul]
-      _ ≤ P * descMod A B' u'⁻¹ := by gcongr
-  have hle : descMod A B' u' ≤ P := by
-    calc descMod A B' u' = descMod A B' u' * 1 := (mul_one _).symm
-      _ ≤ descMod A B' u' * (P * descMod A B' u'⁻¹) := by gcongr
-      _ = P * (descMod A B' u' * descMod A B' u'⁻¹) := by ring
-      _ = P := by rw [descMod_mul_inv hu', mul_one]
-  have hsurj : Function.Surjective f := by
-    rintro ⟨y, hy⟩
-    obtain ⟨b, hb, rfl⟩ := hle hy
-    exact ⟨⟨b, hb⟩, rfl⟩
-  exact ⟨LinearEquiv.ofBijective f (Module.Invertible.bijective_of_surjective hsurj)⟩
+        _ ≤ P * descMod A B' u'⁻¹ := by gcongr
+    have hle : descMod A B' u' ≤ P := by
+      calc
+        descMod A B' u'
+          = descMod A B' u' * 1 := (mul_one _).symm
+        _ ≤ descMod A B' u' * (P * descMod A B' u'⁻¹) := by gcongr
+        _ = P * (descMod A B' u' * descMod A B' u'⁻¹) := by ring
+        _ = P := by rw [descMod_mul_inv hu', mul_one]
+    have hsurj : Function.Surjective f := by
+      rintro ⟨y, hy⟩
+      obtain ⟨b, hb, rfl⟩ := hle hy
+      exact ⟨⟨b, hb⟩, rfl⟩
+    exact ⟨LinearEquiv.ofBijective f (Module.Invertible.bijective_of_surjective hsurj)⟩
 
 end
 
@@ -197,18 +240,39 @@ def δ (A B : Type) [CommRing A] [CommRing B] [Algebra A B] (u : (B ⊗[A] B)ˣ)
   classical
   exact if h : Module.Invertible A (descMod A B u) then CommRing.Pic.mk A (descMod A B u) else 1
 
-theorem δ_eq {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Module.FaithfullyFlat A B]
-    {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u) :
-    δ A B u = Submodule.unitsToPic A B (isUnit_descMod hu).unit := by
-  have : Module.Invertible A (descMod A B u) := inferInstanceAs (Module.Invertible A ((isUnit_descMod hu).unit : Submodule A B))
+theorem δ_eq
+    {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Module.FaithfullyFlat A B]
+    {u : (B ⊗[A] B)ˣ} (hu : UCoc A B u)
+    : δ A B u = Submodule.unitsToPic A B (isUnit_descMod hu).unit := by
+  have : Module.Invertible A (descMod A B u) :=
+    inferInstanceAs (Module.Invertible A ((isUnit_descMod hu).unit : Submodule A B))
   rw [δ, dite_eq_left this, Submodule.unitsToPic_apply]
   rfl
 
 end GlobalTheory.PicCech
 
-
 open GlobalTheory.PicCech in
-theorem GlobalTheory.pic_cech_descent : ∀ (A : Type) [CommRing A], ∃ δ : ∀ (B : Type) [CommRing B] [Algebra A B], (B ⊗[A] B)ˣ → CommRing.Pic A, ∀ (B : Type) [CommRing B] [Algebra A B] [Module.FaithfullyFlat A B], (∀ u v, UCoc A B u → UCoc A B v → δ B (u * v) = δ B u * δ B v) ∧ (∀ u, UCoc A B u → (δ B u = 1 ↔ ∃ w : Bˣ, (u : B ⊗[A] B) * (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B) w = (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B) w)) ∧ (∀ c : CommRing.Pic A, CommRing.Pic.mapAlgebra A B c = 1 → ∃ u, UCoc A B u ∧ δ B u = c) ∧ (∀ u, UCoc A B u → ∃ _ : Module.Invertible A (descMod A B u), CommRing.Pic.mk A (descMod A B u) = δ B u) ∧ ∀ (B' : Type) [CommRing B'] [Algebra A B'] [Module.FaithfullyFlat A B'] (φ : B →ₐ[A] B') (u : (B ⊗[A] B)ˣ) (u' : (B' ⊗[A] B')ˣ), UCoc A B u → (u' : B' ⊗[A] B') = Algebra.TensorProduct.map φ φ (u : B ⊗[A] B) → δ B' u' = δ B u := by
+theorem GlobalTheory.pic_cech_descent
+    : ∀ (A : Type) [CommRing A],
+      ∃ δ : ∀ (B : Type) [CommRing B] [Algebra A B], (B ⊗[A] B)ˣ → CommRing.Pic A,
+        ∀ (B : Type) [CommRing B] [Algebra A B] [Module.FaithfullyFlat A B],
+          (∀ u v, UCoc A B u → UCoc A B v → δ B (u * v) = δ B u * δ B v)
+            ∧ (∀ u,
+              UCoc A B u
+                → (δ B u = 1
+                  ↔ ∃ w : Bˣ,
+                    (u : B ⊗[A] B) * (Algebra.TensorProduct.includeRight : B →ₐ[A] B ⊗[A] B) w
+                      = (Algebra.TensorProduct.includeLeft : B →ₐ[A] B ⊗[A] B) w))
+            ∧ (∀ c : CommRing.Pic A,
+              CommRing.Pic.mapAlgebra A B c = 1 → ∃ u, UCoc A B u ∧ δ B u = c)
+            ∧ (∀ u,
+              UCoc A B u
+                → ∃ _ : Module.Invertible A (descMod A B u),
+                  CommRing.Pic.mk A (descMod A B u) = δ B u)
+            ∧ ∀ (B' : Type) [CommRing B'] [Algebra A B'] [Module.FaithfullyFlat A B']
+                (φ : B →ₐ[A] B') (u : (B ⊗[A] B)ˣ) (u' : (B' ⊗[A] B')ˣ),
+              UCoc A B u → (u' : B' ⊗[A] B') = Algebra.TensorProduct.map φ φ (u : B ⊗[A] B)
+                → δ B' u' = δ B u := by
   intro A _
   refine ⟨fun B _ _ u => δ A B u, fun B _ _ _ => ⟨?_, ?_, ?_, ?_, ?_⟩⟩
   · intro u v hu hv
@@ -229,11 +293,14 @@ theorem GlobalTheory.pic_cech_descent : ∀ (A : Type) [CommRing A], ∃ δ : �
     obtain ⟨u, hu, hI⟩ := exists_descMod_eq I
     refine ⟨u, hu, ?_⟩
     dsimp only
-    rw [δ_eq hu]; congr 1; exact Units.ext hI
+    rw [δ_eq hu]
+    congr 1
+    exact Units.ext hI
   · intro u hu
     refine ⟨inferInstanceAs (Module.Invertible A ((isUnit_descMod hu).unit : Submodule A B)), ?_⟩
     dsimp only
-    rw [δ_eq hu, Submodule.unitsToPic_apply]; rfl
+    rw [δ_eq hu, Submodule.unitsToPic_apply]
+    rfl
   · intro B' _ _ _ φ u u' hu hu'
     have hu'' : u' = Units.map (Algebra.TensorProduct.map φ φ).toMonoidHom u := Units.ext hu'
     subst hu''

@@ -10,20 +10,23 @@ noncomputable section
 
 namespace PI.VolStabS.DeterminantAdmissible
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField IsDedekindDomain MeasureTheory Topology Filter Set
-  PI.VolStabS.PositiveNearLattice MeasurableSpace PI.VolFromSW PI.VolStabS
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField IsDedekindDomain
+  MeasureTheory Topology Filter Set PI.VolStabS.PositiveNearLattice MeasurableSpace PI.VolFromSW
+  PI.VolStabS
 open scoped TensorProduct ENNReal RestrictedProduct CompactlySupported
 
-theorem detAdm_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
-    [FiniteDimensional F E] {a M : ℕ} (ν1 ν2 : Measure (Fin a → Fin M → AF F ⊗[F] E))
-    (h1 : ∀ K, IsCompact K → ν1 K < ⊤) (h2 : ∀ K, IsCompact K → ν2 K < ⊤)
-    (h : ∀ Φ, IsAdm F E Φ → ∫ X, Φ X ∂ν1 = ∫ X, Φ X ∂ν2) : ν1 = ν2 := by
+theorem detAdm_gen
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
+    {a M : ℕ} (ν1 ν2 : Measure (Fin a → Fin M → AF F ⊗[F] E)) (h1 : ∀ K, IsCompact K → ν1 K < ⊤)
+    (h2 : ∀ K, IsCompact K → ν2 K < ⊤) (h : ∀ Φ, IsAdm F E Φ → ∫ X, Φ X ∂ν1 = ∫ X, Φ X ∂ν2)
+    : ν1 = ν2 := by
   classical
   let ι := Fin a × Fin M × Fin (Module.finrank F E)
   let Ψ := psiH (F := F) (E := E) (a := a) (M := M)
   let Ψm := Ψ.toMeasurableEquiv
-  have hfin : ∀ ν : Measure (Fin a → Fin M → AF F ⊗[F] E), (∀ K, IsCompact K → ν K < ⊤) →
-      ∀ K, IsCompact K → ν.map Ψm K < ⊤ := by
+  have hfin
+      : ∀ ν : Measure (Fin a → Fin M → AF F ⊗[F] E),
+        (∀ K, IsCompact K → ν K < ⊤) → ∀ K, IsCompact K → ν.map Ψm K < ⊤ := by
     intro ν hν K hK
     rw [Ψm.map_apply]
     exact hν _ (Ψ.isCompact_preimage.2 hK)
@@ -32,8 +35,10 @@ theorem detAdm_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E
   set μ1 := ν1.map Ψm with hμ1
   set μ2 := ν2.map Ψm with hμ2
 
-  have hbox : ∀ D, IsBoxD D → ∀ U : Set (ι → Ainf F), MeasurableSet U →
-      μ1 (U ×ˢ boxS D) = μ2 (U ×ˢ boxS D) := by
+  have hbox
+      : ∀ D,
+        IsBoxD D
+          → ∀ U : Set (ι → Ainf F), MeasurableSet U → μ1 (U ×ˢ boxS D) = μ2 (U ×ˢ boxS D) := by
     intro D hD
     let ρ := fun μ : Measure ((ι → Ainf F) × (ι → Af F)) =>
       (μ.restrict (univ ×ˢ boxS D)).map Prod.fst
@@ -45,8 +50,9 @@ theorem detAdm_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E
       congr 1
       ext p
       simp
-    have hint : ∀ μ (f : C_c(ι → Ainf F, ℝ)), ∫ x, f x ∂(ρ μ) =
-        ∫ p, f p.1 * (boxS D).indicator (fun _ => (1 : ℝ)) p.2 ∂μ := by
+    have hint
+        : ∀ μ (f : C_c(ι → Ainf F, ℝ)),
+          ∫ x, f x ∂(ρ μ) = ∫ p, f p.1 * (boxS D).indicator (fun _ => (1 : ℝ)) p.2 ∂μ := by
       intro μ f
       simp only [ρ]
       rw [integral_map measurable_fst.aemeasurable (map_continuous f).aestronglyMeasurable,
@@ -56,26 +62,30 @@ theorem detAdm_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E
       by_cases hp : p.2 ∈ boxS D
       · rw [Set.indicator_of_mem (mk_mem_prod (mem_univ p.1) hp : p ∈ univ ×ˢ boxS D),
           Set.indicator_of_mem hp, mul_one]
-      · rw [Set.indicator_of_notMem (by exact fun h' => hp h'.2), Set.indicator_of_notMem hp, mul_zero]
-    have hfc : ∀ μ : Measure ((ι → Ainf F) × (ι → Af F)), (∀ K, IsCompact K → μ K < ⊤) →
-        IsFiniteMeasureOnCompacts (ρ μ) := fun μ hμ =>
+      · rw [Set.indicator_of_notMem (by exact fun h' => hp h'.2), Set.indicator_of_notMem hp,
+          mul_zero]
+    have hfc
+        : ∀ μ : Measure ((ι → Ainf F) × (ι → Af F)),
+          (∀ K, IsCompact K → μ K < ⊤) → IsFiniteMeasureOnCompacts (ρ μ) := fun μ hμ =>
       ⟨fun K hK => by
         rw [hρ μ K hK.measurableSet]
         exact hμ _ (hK.prod (isCompact_boxS hD))⟩
     have := hfc μ1 (hfin ν1 h1)
     have := hfc μ2 (hfin ν2 h2)
-    have hρeq : ρ μ1 = ρ μ2 := Measure.ext_of_integral_eq_on_compactlySupported fun f => by
-      rw [hint, hint, hμ1, hμ2, integral_map_equiv, integral_map_equiv]
-      exact key_int ν1 ν2 h hD f
+    have hρeq : ρ μ1 = ρ μ2 :=
+      Measure.ext_of_integral_eq_on_compactlySupported fun f => by
+        rw [hint, hint, hμ1, hμ2, integral_map_equiv, integral_map_equiv]
+        exact key_int ν1 ν2 h hD f
     intro U hU
     rw [← hρ μ1 U hU, ← hρ μ2 U hU, hρeq]
 
   obtain ⟨bs, hbs, hbU⟩ := boxes_seq (F := F) (ι := ι)
   refine Measure.ext_of_generateFrom_of_iUnion
     (image2 (· ×ˢ ·) {U : Set (ι → Ainf F) | MeasurableSet U} (boxes F ι))
-    (fun n => compactCovering (ι → Ainf F) n.unpair.1 ×ˢ bs n.unpair.2) ?_ ?_ ?_ ?_ ?_ ?_
-  · rw [← generateFrom_prod_eq isCountablySpanning_measurableSet ⟨bs, hbs, hbU⟩,
-      generateFrom_boxes, MeasurableSpace.generateFrom_measurableSet]
+    (fun n => compactCovering (ι → Ainf F) n.unpair.1 ×ˢ bs n.unpair.2)
+    ?_ ?_ ?_ ?_ ?_ ?_
+  · rw [← generateFrom_prod_eq isCountablySpanning_measurableSet ⟨bs, hbs, hbU⟩, generateFrom_boxes,
+      MeasurableSpace.generateFrom_measurableSet]
   · rintro _ ⟨U, hU, β, hβ, rfl⟩ _ ⟨U', hU', β', hβ', rfl⟩ _
     rw [prod_inter_prod]
     have hU2 : MeasurableSet U := hU
@@ -94,8 +104,10 @@ theorem detAdm_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E
     simp only [Nat.unpair_pair]
     exact ⟨hm, hn⟩
   · intro n
-    exact mem_image2_of_mem (show MeasurableSet (compactCovering (ι → Ainf F) n.unpair.1) from
-      (isCompact_compactCovering _ _).measurableSet) (hbs _)
+    exact mem_image2_of_mem
+      (show MeasurableSet (compactCovering (ι → Ainf F) n.unpair.1) from
+        (isCompact_compactCovering _ _).measurableSet)
+      (hbs _)
   · intro n
     obtain ⟨D, hD, e⟩ := hbs n.unpair.2
     rw [e]

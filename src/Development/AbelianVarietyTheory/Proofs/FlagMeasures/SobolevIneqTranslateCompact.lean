@@ -16,20 +16,24 @@ section Smooth
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem contDiff_mulLeft {n : ℕ} (a : Matrix (Fin n) (Fin n) ℂ) :
-    ContDiff ℝ ∞ (fun g : Matrix (Fin n) (Fin n) ℂ => a * g) :=
+theorem contDiff_mulLeft {n : ℕ} (a : Matrix (Fin n) (Fin n) ℂ)
+    : ContDiff ℝ ∞ (fun g : Matrix (Fin n) (Fin n) ℂ => a * g) :=
   (LinearMap.toContinuousLinearMap (LinearMap.mulLeft ℝ a)).contDiff
 
-theorem inUH_mul {n : ℕ} {H a g : Matrix (Fin n) (Fin n) ℂ} (ha : inUH H a) (hg : inUH H g) :
-    inUH H (a * g) := by
+theorem inUH_mul {n : ℕ} {H a g : Matrix (Fin n) (Fin n) ℂ} (ha : inUH H a) (hg : inUH H g)
+    : inUH H (a * g) := by
   unfold inUH at *
   rw [conjTranspose_mul]
-  calc gᴴ * aᴴ * H * (a * g) = gᴴ * (aᴴ * H * a) * g := by simp only [Matrix.mul_assoc]
+  calc
+    gᴴ * aᴴ * H * (a * g)
+      = gᴴ * (aᴴ * H * a) * g := by simp only [Matrix.mul_assoc]
     _ = H := by rw [ha, hg]
 
-theorem smoothOnH_translate {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    {H a : Matrix (Fin n) (Fin n) ℂ} (ha : inUH H a) {f : Matrix (Fin n) (Fin n) ℂ → E}
-    (hf : SmoothOnH H f) : SmoothOnH H (fun g => f (a * g)) := by
+theorem smoothOnH_translate
+    {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {H a : Matrix (Fin n) (Fin n) ℂ} (ha : inUH H a)
+    {f : Matrix (Fin n) (Fin n) ℂ → E} (hf : SmoothOnH H f)
+    : SmoothOnH H (fun g => f (a * g)) := by
   intro g₀ hg₀
   obtain ⟨U, F, hU, hgU, hF, hfF⟩ := hf (a * g₀) (inUH_mul ha hg₀)
   have hc := contDiff_mulLeft a
@@ -40,10 +44,11 @@ theorem smoothOnH_translate {n : ℕ} {E : Type*} [NormedAddCommGroup E] [Normed
 
 end Smooth
 
-theorem rdWord_translate {m : ℕ} {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+theorem rdWord_translate
+    {m : ℕ} {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
     (a : Matrix (Fin m) (Fin m) ℂ) (ws : List (Matrix (Fin m) (Fin m) ℂ))
-    (f : Matrix (Fin m) (Fin m) ℂ → V) :
-    rdWord ws (fun g => f (a * g)) = fun g => rdWord ws f (a * g) := by
+    (f : Matrix (Fin m) (Fin m) ℂ → V)
+    : rdWord ws (fun g => f (a * g)) = fun g => rdWord ws f (a * g) := by
   induction ws with
   | nil => rfl
   | cons X w ih =>
@@ -71,47 +76,51 @@ theorem continuous_lmul (a : Mat k r) : Continuous (lmulM a : Mt k r → Mt k r)
   simp only [lmulM, Matrix.mul_apply, Matrix.of_apply]
   fun_prop
 
-theorem measurableEmbedding_lmul {a b : Mat k r} (hab : a * b = 1) (hba : b * a = 1) :
-    MeasurableEmbedding (lmulM a : Mt k r → Mt k r) := by
-  let e : Mt k r ≃ₜ Mt k r :=
-    { toFun := lmulM a
-      invFun := lmulM b
-      left_inv := fun x => by
-        show b * (a * Matrix.of x) = x
-        rw [← Matrix.mul_assoc, hba, Matrix.one_mul]
-        rfl
-      right_inv := fun x => by
-        show a * (b * Matrix.of x) = x
-        rw [← Matrix.mul_assoc, hab, Matrix.one_mul]
-        rfl
-      continuous_toFun := continuous_lmul a
-      continuous_invFun := continuous_lmul b }
+theorem measurableEmbedding_lmul {a b : Mat k r} (hab : a * b = 1) (hba : b * a = 1)
+    : MeasurableEmbedding (lmulM a : Mt k r → Mt k r) := by
+  let e : Mt k r ≃ₜ Mt k r := {
+    toFun := lmulM a
+    invFun := lmulM b
+    left_inv := fun x => by
+      show b * (a * Matrix.of x) = x
+      rw [← Matrix.mul_assoc, hba, Matrix.one_mul]
+      rfl
+    right_inv := fun x => by
+      show a * (b * Matrix.of x) = x
+      rw [← Matrix.mul_assoc, hab, Matrix.one_mul]
+      rfl
+    continuous_toFun := continuous_lmul a
+    continuous_invFun := continuous_lmul b
+  }
   exact e.measurableEmbedding
 
-theorem lintegral_translate_le {μ : Measure (Mt k r)} (hμ : IsHaarOn (GG k r) μ) {a : Mat k r}
-    (ha : a ∈ GG k r) {K₀ K₂ : Set (Mt k r)} (hK : ∀ y ∈ K₀, lmulM a y ∈ K₂)
-    (φ : Mt k r → ENNReal) :
-    ∫⁻ y in K₀, φ (lmulM a y) ∂μ ≤ ∫⁻ y in K₂, φ y ∂μ := by
+theorem lintegral_translate_le
+    {μ : Measure (Mt k r)} (hμ : IsHaarOn (GG k r) μ)
+    {a : Mat k r} (ha : a ∈ GG k r)
+    {K₀ K₂ : Set (Mt k r)} (hK : ∀ y ∈ K₀, lmulM a y ∈ K₂)
+    (φ : Mt k r → ENNReal)
+    : ∫⁻ y in K₀, φ (lmulM a y) ∂μ ≤ ∫⁻ y in K₂, φ y ∂μ := by
   have hemb := measurableEmbedding_lmul (inv_of_mem ha).1 (inv_of_mem ha).2
   have hmap : μ.map (lmulM a) = μ := hμ.2.2.2 a ha
-  calc ∫⁻ y in K₀, φ (lmulM a y) ∂μ ≤ ∫⁻ y in lmulM a ⁻¹' K₂, φ (lmulM a y) ∂μ :=
-        lintegral_mono_set hK
-    _ = ∫⁻ y, φ y ∂((μ.restrict (lmulM a ⁻¹' K₂)).map (lmulM a)) :=
-        (hemb.lintegral_map _).symm
-    _ = ∫⁻ y in K₂, φ y ∂μ := by
-        rw [← hemb.restrict_map, hmap]
+  calc
+    ∫⁻ y in K₀, φ (lmulM a y) ∂μ
+      ≤ ∫⁻ y in lmulM a ⁻¹' K₂, φ (lmulM a y) ∂μ := lintegral_mono_set hK
+    _ = ∫⁻ y, φ y ∂((μ.restrict (lmulM a ⁻¹' K₂)).map (lmulM a)) := (hemb.lintegral_map _).symm
+    _ = ∫⁻ y in K₂, φ y ∂μ := by rw [← hemb.restrict_map, hmap]
 
-theorem ofReal_integral_le {α : Type*} [MeasurableSpace α] (ν : Measure α) (g : α → ℝ)
-    (hg : ∀ y, 0 ≤ g y) : ENNReal.ofReal (∫ y, g y ∂ν) ≤ ∫⁻ y, ENNReal.ofReal (g y) ∂ν := by
+theorem ofReal_integral_le
+    {α : Type*} [MeasurableSpace α] (ν : Measure α) (g : α → ℝ) (hg : ∀ y, 0 ≤ g y)
+    : ENNReal.ofReal (∫ y, g y ∂ν) ≤ ∫⁻ y, ENNReal.ofReal (g y) ∂ν := by
   by_cases h : AEStronglyMeasurable g ν
   · rw [integral_eq_lintegral_of_nonneg_ae (Filter.Eventually.of_forall hg) h]
     exact ENNReal.ofReal_toReal_le
   · rw [integral_non_aestronglyMeasurable h]
     simp
 
-theorem list_sum_ofReal {α : Type*} (l : List α) (u : α → ℝ) (v : α → ENNReal) (hu : ∀ a, 0 ≤ u a)
-    (h : ∀ a ∈ l, ENNReal.ofReal (u a) ≤ v a) :
-    0 ≤ (l.map u).sum ∧ ENNReal.ofReal (l.map u).sum ≤ (l.map v).sum := by
+theorem list_sum_ofReal
+    {α : Type*} (l : List α) (u : α → ℝ) (v : α → ENNReal) (hu : ∀ a, 0 ≤ u a)
+    (h : ∀ a ∈ l, ENNReal.ofReal (u a) ≤ v a)
+    : 0 ≤ (l.map u).sum ∧ ENNReal.ofReal (l.map u).sum ≤ (l.map v).sum := by
   induction l with
   | nil => simp
   | cons a l ih =>
@@ -121,7 +130,25 @@ theorem list_sum_ofReal {α : Type*} (l : List α) (u : α → ℝ) (v : α → 
     rw [ENNReal.ofReal_add (hu a) h0]
     exact add_le_add (h a List.mem_cons_self) h1
 
-theorem sobolev_translate : ∀ (k r : ℕ) (μ : Measure (Mt k r)) (C₀ : ℝ) (Ws : List (List (Mat k r))) (K₀ : Set (Mt k r)), IsHaarOn (GG k r) μ → IsCompact K₀ → (∀ (B : Type) [NormedAddCommGroup B] [NormedSpace ℂ B] [CompleteSpace B] (f : Mat k r → B), SmoothOnH (Hpk k r) f → ‖f 1‖ ^ 2 ≤ C₀ * (Ws.map fun ws => ∫ x in K₀, ‖rdWord ws f (Matrix.of x)‖ ^ 2 ∂μ).sum) → ∀ Q : Set (Mt k r), IsCompact Q → ∃ K₂ : Set (Mt k r), IsCompact K₂ ∧ ∀ (B : Type) [NormedAddCommGroup B] [NormedSpace ℂ B] [CompleteSpace B] (f : Mat k r → B), SmoothOnH (Hpk k r) f → (∀ ws ∈ Ws, ContinuousOn (rdWord ws f) (GG k r)) → ∀ x ∈ Q, Matrix.of x ∈ GG k r → ENNReal.ofReal (‖f (Matrix.of x)‖ ^ 2) ≤ ENNReal.ofReal |C₀| * (Ws.map fun ws => ∫⁻ y in K₂, (‖rdWord ws f (Matrix.of y)‖₊ : ENNReal) ^ 2 ∂μ).sum := by
+theorem sobolev_translate
+    : ∀ (k r : ℕ) (μ : Measure (Mt k r)) (C₀ : ℝ) (Ws : List (List (Mat k r))) (K₀ : Set (Mt k r)),
+      IsHaarOn (GG k r) μ → IsCompact K₀
+        → (∀ (B : Type) [NormedAddCommGroup B] [NormedSpace ℂ B] [CompleteSpace B]
+            (f : Mat k r → B),
+          SmoothOnH (Hpk k r) f
+            → ‖f 1‖ ^ 2 ≤ C₀ * (Ws.map fun ws => ∫ x in K₀, ‖rdWord ws f (Matrix.of x)‖ ^ 2 ∂μ).sum)
+        → ∀ Q : Set (Mt k r),
+          IsCompact Q
+            → ∃ K₂ : Set (Mt k r),
+              IsCompact K₂
+                ∧ ∀ (B : Type) [NormedAddCommGroup B] [NormedSpace ℂ B] [CompleteSpace B]
+                    (f : Mat k r → B),
+                  SmoothOnH (Hpk k r) f → (∀ ws ∈ Ws, ContinuousOn (rdWord ws f) (GG k r))
+                    → ∀ x ∈ Q,
+                      Matrix.of x ∈ GG k r
+                        → ENNReal.ofReal (‖f (Matrix.of x)‖ ^ 2)
+                          ≤ ENNReal.ofReal |C₀| * (Ws.map fun ws =>
+                            ∫⁻ y in K₂, (‖rdWord ws f (Matrix.of y)‖₊ : ENNReal) ^ 2 ∂μ).sum := by
   intro k r μ C₀ Ws K₀ hμ hK₀ hS Q hQ
   let pr : Mt k r × Mt k r → Mt k r := fun p => lmulM (Matrix.of p.1) p.2
   have hpr : Continuous pr := by
@@ -134,26 +161,30 @@ theorem sobolev_translate : ∀ (k r : ℕ) (μ : Measure (Mt k r)) (C₀ : ℝ)
     smoothOnH_translate (a := Matrix.of x) hxG hf
   have hkey := hS B (fun g => f (Matrix.of x * g)) hsm
   simp only [Matrix.mul_one, rdWord_translate] at hkey
-  obtain ⟨hS0, hSum⟩ := list_sum_ofReal Ws
-    (fun ws => ∫ y in K₀, ‖rdWord ws f (Matrix.of x * Matrix.of y)‖ ^ 2 ∂μ)
-    (fun ws => ∫⁻ y in pr '' (Q ×ˢ K₀), (‖rdWord ws f (Matrix.of y)‖₊ : ENNReal) ^ 2 ∂μ)
-    (fun _ => integral_nonneg fun _ => by positivity)
-    (fun ws _ => by
-      refine (ofReal_integral_le _ _ fun _ => by positivity).trans ?_
-      have hφ := lintegral_translate_le hμ (a := Matrix.of x) hxG (K₀ := K₀)
-        (K₂ := pr '' (Q ×ˢ K₀)) (fun y hy => ⟨(x, y), ⟨hxQ, hy⟩, rfl⟩)
-        (fun y => (‖rdWord ws f (Matrix.of y)‖₊ : ENNReal) ^ 2)
-      refine le_trans (le_of_eq ?_) hφ
-      refine lintegral_congr fun y => ?_
-      rw [ENNReal.ofReal_pow (norm_nonneg _), ofReal_norm_eq_enorm]
-      rfl)
-  calc ENNReal.ofReal (‖f (Matrix.of x)‖ ^ 2)
-      ≤ ENNReal.ofReal (|C₀| * (Ws.map fun ws =>
-          ∫ y in K₀, ‖rdWord ws f (Matrix.of x * Matrix.of y)‖ ^ 2 ∂μ).sum) :=
-        ENNReal.ofReal_le_ofReal (hkey.trans (mul_le_mul_of_nonneg_right (le_abs_self _) hS0))
+  obtain ⟨hS0, hSum⟩ :=
+    list_sum_ofReal Ws
+      (fun ws => ∫ y in K₀, ‖rdWord ws f (Matrix.of x * Matrix.of y)‖ ^ 2 ∂μ)
+      (fun ws => ∫⁻ y in pr '' (Q ×ˢ K₀), (‖rdWord ws f (Matrix.of y)‖₊ : ENNReal) ^ 2 ∂μ)
+      (fun _ => integral_nonneg fun _ => by positivity)
+      (fun ws _ => by
+        refine (ofReal_integral_le _ _ fun _ => by positivity).trans ?_
+        have hφ :=
+          lintegral_translate_le hμ (a := Matrix.of x) hxG (K₀ := K₀) (K₂ := pr '' (Q ×ˢ K₀))
+            (fun y hy => ⟨(x, y), ⟨hxQ, hy⟩, rfl⟩)
+            (fun y => (‖rdWord ws f (Matrix.of y)‖₊ : ENNReal) ^ 2)
+        refine le_trans (le_of_eq ?_) hφ
+        refine lintegral_congr fun y => ?_
+        rw [ENNReal.ofReal_pow (norm_nonneg _), ofReal_norm_eq_enorm]
+        rfl)
+  calc
+    ENNReal.ofReal (‖f (Matrix.of x)‖ ^ 2)
+        ≤ ENNReal.ofReal
+          (|C₀|
+            * (Ws.map fun ws => ∫ y in K₀, ‖rdWord ws f (Matrix.of x * Matrix.of y)‖ ^ 2 ∂μ).sum) :=
+      ENNReal.ofReal_le_ofReal (hkey.trans (mul_le_mul_of_nonneg_right (le_abs_self _) hS0))
     _ = ENNReal.ofReal |C₀| * ENNReal.ofReal (Ws.map fun ws =>
-          ∫ y in K₀, ‖rdWord ws f (Matrix.of x * Matrix.of y)‖ ^ 2 ∂μ).sum :=
-        ENNReal.ofReal_mul (abs_nonneg _)
+        ∫ y in K₀, ‖rdWord ws f (Matrix.of x * Matrix.of y)‖ ^ 2 ∂μ).sum :=
+      ENNReal.ofReal_mul (abs_nonneg _)
     _ ≤ _ := by gcongr
 
 end GlobalTheory.SgInf.SobTranslate

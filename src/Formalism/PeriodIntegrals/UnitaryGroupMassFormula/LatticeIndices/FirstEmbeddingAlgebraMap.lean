@@ -9,7 +9,8 @@ noncomputable section
 
 namespace MassDataIdxSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.TypedSets NumberField IsDedekindDomain Formalism.BasicNotions
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.TypedSets NumberField IsDedekindDomain Formalism.BasicNotions
   Formalism.L2.SG.HidaSetting
 open scoped TensorProduct Matrix
 
@@ -17,36 +18,42 @@ section Loc
 
 variable {D : D7} (X : HidaSetting D) (p : TypX X) (θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p)
 
-theorem hform_iota2 (hθ : IsSplitEquiv X p θ) (l l' : Fin X.B.I.n → X.B.I.E) :
-    iota2 X p θ (Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J l l') =
-      (fun j => iota2 X p θ (l' j)) ⬝ᵥ (J1 X p θ *ᵥ fun j => iota1 X p θ (l j)) := by
+theorem hform_iota2 (hθ : IsSplitEquiv X p θ) (l l' : Fin X.B.I.n → X.B.I.E)
+    : iota2 X p θ (Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J l l')
+      = (fun j => iota2 X p θ (l' j)) ⬝ᵥ (J1 X p θ *ᵥ fun j => iota1 X p θ (l j)) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [secondEmbedding_eq_star X p θ hθ, Formalism.UG.hform, star_sum, star_mul', starRingEnd_apply, star_star,
-    herm_entry, map_sum, map_mul, dotProduct, Matrix.mulVec, firstForm_apply, Finset.mul_sum]
+    simp only [secondEmbedding_eq_star X p θ hθ, Formalism.UG.hform, star_sum, star_mul',
+      starRingEnd_apply, star_star, herm_entry, map_sum, map_mul, dotProduct, Matrix.mulVec,
+      firstForm_apply, Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => by ring))
 
-theorem hform_iota1 (hθ : IsSplitEquiv X p θ) (l x : Fin X.B.I.n → X.B.I.E) :
-    iota1 X p θ (Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J l x) =
-      (fun j => iota2 X p θ (l j)) ⬝ᵥ (J1 X p θ *ᵥ fun j => iota1 X p θ (x j)) := by
+theorem hform_iota1 (hθ : IsSplitEquiv X p θ) (l x : Fin X.B.I.n → X.B.I.E)
+    : iota1 X p θ (Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J l x)
+      = (fun j => iota2 X p θ (l j)) ⬝ᵥ (J1 X p θ *ᵥ fun j => iota1 X p θ (x j)) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Formalism.UG.hform, map_sum, map_mul, dotProduct, Matrix.mulVec, firstForm_apply, starRingEnd_apply,
-    ← secondEmbedding_eq_star X p θ hθ, Finset.mul_sum]
+    simp only [Formalism.UG.hform, map_sum, map_mul, dotProduct, Matrix.mulVec, firstForm_apply,
+      starRingEnd_apply, ← secondEmbedding_eq_star X p θ hθ, Finset.mul_sum]
   exact Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => by ring))
 
-theorem firstEmbedding_algebraMap (f : X.B.I.F) : iota1 X p θ (algebraMap X.B.I.F X.B.I.E f) = algebraMap X.B.I.F (FpX X p) f := by
+theorem firstEmbedding_algebraMap (f : X.B.I.F)
+    : iota1 X p θ (algebraMap X.B.I.F X.B.I.E f) = algebraMap X.B.I.F (FpX X p) f := by
   show ((θ (Algebra.TensorProduct.includeRight (algebraMap X.B.I.F X.B.I.E f))).1) = _
-  rw [AlgHom.commutes, IsScalarTower.algebraMap_apply X.B.I.F (FpX X p) (TpX X p), AlgEquiv.commutes]
+  rw [AlgHom.commutes, IsScalarTower.algebraMap_apply X.B.I.F (FpX X p) (TpX X p),
+    AlgEquiv.commutes]
   simp
 
 def DenseF : Prop :=
   ∀ c ε : FpX X p, ε ≠ 0 → ∃ b : X.B.I.F, ∃ o ∈ OpX X p, algebraMap X.B.I.F (FpX X p) b - c = ε * o
 
 def EpsLat : Prop :=
-  ∃ ε : FpX X p, ε ≠ 0 ∧ ∀ u : Fin X.B.I.n → FpX X p, (∀ i, u i ∈ OpX X p) →
-    ε • u ∈ Mlat1 X p θ ∧ ε • u ∈ Mlat2 X p θ
+  ∃ ε : FpX X p,
+    ε ≠ 0
+      ∧ ∀ u : Fin X.B.I.n → FpX X p,
+        (∀ i, u i ∈ OpX X p) → ε • u ∈ Mlat1 X p θ ∧ ε • u ∈ Mlat2 X p θ
 
-theorem approx_of (hθ : IsSplitEquiv X p θ) (hD : DenseF X p) (hE : EpsLat X p θ) : ApproxP X p θ := by
+theorem approx_of (hθ : IsSplitEquiv X p θ) (hD : DenseF X p) (hE : EpsLat X p θ)
+    : ApproxP X p θ := by
   intro z hz
   obtain ⟨ε, hε0, hε⟩ := hE
   obtain ⟨a, w, hw, hwa⟩ := unitElt_holds X p θ hθ
@@ -81,12 +88,14 @@ theorem approx_of (hθ : IsSplitEquiv X p θ) (hD : DenseF X p) (hE : EpsLat X p
     add_mem (mul_mem (mul_mem hd1 hd2) (ho j)) (mul_mem (ho' j) hδ2)
   have e1 : (fun j => iota1 X p θ (x j)) = ε • u1 := by
     funext j
-    simp only [hx, hu1, map_add (f := _), map_mul, firstEmbedding_algebraMap, Pi.smul_apply, smul_eq_mul]
+    simp only [hx, hu1, map_add (f := _), map_mul, firstEmbedding_algebraMap, Pi.smul_apply,
+      smul_eq_mul]
     rw [← hα1]
     linear_combination hb j + α1 * hb' j
   have e2 : (fun j => iota2 X p θ (x j)) = z + ε • u2 := by
     funext j
-    simp only [hx, hu2, map_add (f := _), map_mul, secondEmbedding_algebraMap, Pi.smul_apply, Pi.add_apply, smul_eq_mul]
+    simp only [hx, hu2, map_add (f := _), map_mul, secondEmbedding_algebraMap, Pi.smul_apply,
+      Pi.add_apply, smul_eq_mul]
     rw [← hα2]
     linear_combination hb j + α2 * hb' j + z j * hwa
   have M1mem : ε • u1 ∈ Mlat1 X p θ := (hε u1 hu1m).1

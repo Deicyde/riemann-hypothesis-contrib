@@ -5,9 +5,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RedMFrMap
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
 open MeasureTheory IsDedekindDomain NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker GlobalTheory.AdSpan
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Ker GlobalTheory.AdSpan
 open GlobalTheory.SW hiding Level
 open scoped TensorProduct ComplexConjugate Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -16,17 +20,20 @@ noncomputable section
 
 namespace GlobalTheory.LiftLevel
 
-def vmvBil (E : Type) [Field E] [NumberField E] (n r : ℕ) :
-    (Fin n → E) →ₗ[𝓞 E] (Fin r → E) →ₗ[𝓞 E] Matrix (Fin n) (Fin r) E :=
-  LinearMap.mk₂ (𝓞 E) (fun v u => vecMulVec v u)
+def vmvBil (E : Type) [Field E] [NumberField E] (n r : ℕ)
+    : (Fin n → E) →ₗ[𝓞 E] (Fin r → E) →ₗ[𝓞 E] Matrix (Fin n) (Fin r) E :=
+  LinearMap.mk₂ (𝓞 E)
+    (fun v u => vecMulVec v u)
     (fun v v' u => by ext i j; simp [vecMulVec, add_mul])
     (fun a v u => by ext i j; simp [vecMulVec, smul_mul_assoc])
     (fun v u u' => by ext i j; simp [vecMulVec, mul_add])
     (fun a v u => by ext i j; simp [vecMulVec, mul_smul_comm])
 
-theorem tens_quot_finite {E : Type} [Field E] [NumberField E] {n r : ℕ} (Λ : Lt E n) (L : Lt E r)
-    (hΛ : Λ.FG) (hL : L.FG) (𝔞 𝔪 : Ideal (𝓞 E)) (hm : 𝔪 ≠ ⊥) :
-    Finite (tens Λ (𝔞 • L) ⧸ (tens Λ ((𝔞 * 𝔪) • L)).addSubgroupOf (tens Λ (𝔞 • L))) := by
+theorem tens_quot_finite
+    {E : Type} [Field E] [NumberField E]
+    {n r : ℕ} (Λ : Lt E n) (L : Lt E r) (hΛ : Λ.FG) (hL : L.FG)
+    (𝔞 𝔪 : Ideal (𝓞 E)) (hm : 𝔪 ≠ ⊥)
+    : Finite (tens Λ (𝔞 • L) ⧸ (tens Λ ((𝔞 * 𝔪) • L)).addSubgroupOf (tens Λ (𝔞 • L))) := by
   set A := tens Λ (𝔞 • L) with hA
   set B := tens Λ ((𝔞 * 𝔪) • L) with hB
   have hM : (Submodule.map₂ (vmvBil E n r) Λ L).FG := hΛ.map₂ _ hL
@@ -68,7 +75,9 @@ theorem tens_quot_finite {E : Type} [Field E] [NumberField E] {n r : ℕ} (Λ : 
     rw [← QuotientAddGroup.mk_nsmul, QuotientAddGroup.eq_zero_iff, AddSubgroup.mem_addSubgroupOf]
     simpa using hNA x x.2
 
-theorem lvCls_finite : ∀ (D : D7) (S T : HSp D) (C : Ctx S T) (Lv : GlobalTheory.SW.Level C.X), Finite (GlobalTheory.LiftLevel.LvCls C Lv) := by
+theorem lvCls_finite
+    : ∀ (D : D7) (S T : HSp D) (C : Ctx S T) (Lv : GlobalTheory.SW.Level C.X),
+      Finite (GlobalTheory.LiftLevel.LvCls C Lv) := by
   intro D S T C Lv
   exact tens_quot_finite _ _ (Submodule.fg_span (Set.finite_range _)) C.X.Λ_fg _ _ Lv.ne_bot
 

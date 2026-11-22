@@ -16,9 +16,12 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Filter Topology
 
-theorem HolomorphicOnSubset.continuousWithinAt {σ : Type*} [Fintype σ] {E : Type*}
-    [NormedAddCommGroup E] [NormedSpace ℂ E] {f : (σ → ℂ) → E} {S : Set (σ → ℂ)}
-    (hf : HolomorphicOnSubset f S) {z : σ → ℂ} (hz : z ∈ S) : ContinuousWithinAt f S z := by
+theorem HolomorphicOnSubset.continuousWithinAt
+    {σ : Type*} [Fintype σ]
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {f : (σ → ℂ) → E} {S : Set (σ → ℂ)} (hf : HolomorphicOnSubset f S)
+    {z : σ → ℂ} (hz : z ∈ S)
+    : ContinuousWithinAt f S z := by
   obtain ⟨U, hUo, hzU, F, hF, hFeq⟩ := hf z hz
   have hc : ContinuousWithinAt F S z :=
     (hF.differentiableAt (hUo.mem_nhds hzU)).continuousAt.continuousWithinAt
@@ -26,9 +29,10 @@ theorem HolomorphicOnSubset.continuousWithinAt {σ : Type*} [Fintype σ] {E : Ty
   filter_upwards [inter_mem_nhdsWithin S (hUo.mem_nhds hzU)] with y hy
   exact hFeq hy
 
-theorem BranchContainsNormalPoint.proof (hirr : NormalLocallyIrreducible.Statement)
-    (hinv : BranchInverseHolomorphic.Statement) (hext : NormalRiemannExtension.Statement)
-    (hmax : NormalMaximumPrinciple.Statement) : BranchContainsNormalPoint.Statement := by
+theorem BranchContainsNormalPoint.proof
+    (hirr : NormalLocallyIrreducible.Statement) (hinv : BranchInverseHolomorphic.Statement)
+    (hext : NormalRiemannExtension.Statement) (hmax : NormalMaximumPrinciple.Statement)
+    : BranchContainsNormalPoint.Statement := by
   intro σ _ I h w k r φ B hI hIc hh hw hφd hφi hφZ hB hfill
   obtain ⟨B', hB'o, hwB', hB'B, -, hdense⟩ := hirr σ I h w hI hIc hh hw B hB
   set P := (zeroSetIn I ∩ B') \ {z | eval z h = 0} with hP
@@ -44,14 +48,21 @@ theorem BranchContainsNormalPoint.proof (hirr : NormalLocallyIrreducible.Stateme
   have hPlt : ∀ z ∈ P, ∀ j, ‖ψ z j‖ < r := fun z hz j =>
     (norm_le_pi_norm (ψ z) j).trans_lt (mem_ball_zero_iff.mp (hPψ z hz).1)
 
-  have hcoord : ∀ j : Fin k, ∃ g : (σ → ℂ) → ℂ, HolomorphicOnSubset g (zeroSetIn I ∩ B') ∧
-      Set.EqOn g (fun z => ψ z j) P := by
+  have hcoord
+      : ∀ j : Fin k, ∃ g : (σ → ℂ) → ℂ,
+        HolomorphicOnSubset g (zeroSetIn I ∩ B') ∧ Set.EqOn g (fun z => ψ z j) P := by
     intro j
     refine hext σ I h B' (fun z => ψ z j) hI hIc hh hB'o ?_ ?_
     · intro z hz
       obtain ⟨U, hUo, hzU, F, hF, hFeq⟩ := hψ z (hPfill hz)
-      exact ⟨U, hUo, hzU, fun y => F y j, differentiableOn_pi.mp hF j,
-        fun y hy => congrFun (hFeq ⟨hPfill hy.1, hy.2⟩) j⟩
+      exact ⟨
+        U,
+        hUo,
+        hzU,
+        fun y => F y j,
+        differentiableOn_pi.mp hF j,
+        fun y hy => congrFun (hFeq ⟨hPfill hy.1, hy.2⟩) j
+      ⟩
     · refine (Metric.isBounded_closedBall (x := (0 : ℂ)) (r := r)).subset ?_
       rintro _ ⟨z, hz, rfl⟩
       rw [Metric.mem_closedBall, dist_zero_right]
@@ -72,8 +83,9 @@ theorem BranchContainsNormalPoint.proof (hirr : NormalLocallyIrreducible.Stateme
     intro j
     by_contra hlt
     have heq : ‖g j w‖ = r := le_antisymm (hgle j w ⟨hw, hwB'⟩) (not_lt.mp hlt)
-    have hev := hmax σ I w B' (g j) hI hIc hw (hB'o.mem_nhds hwB') (hg j)
-      (fun z hz => (hgle j z hz).trans heq.ge)
+    have hev :=
+      hmax σ I w B' (g j) hI hIc hw (hB'o.mem_nhds hwB') (hg j)
+        (fun z hz => (hgle j z hz).trans heq.ge)
     obtain ⟨z, hz, hzP⟩ := mem_closure_iff_nhds.mp hwcl _ hev
     have h1 : ‖g j z‖ < r := (congrArg norm (hgeq j hzP)).trans_lt (hPlt z hzP j)
     rw [hz hzP.1.1, heq] at h1
@@ -82,13 +94,15 @@ theorem BranchContainsNormalPoint.proof (hirr : NormalLocallyIrreducible.Stateme
     obtain ⟨z, -, hzP⟩ := mem_closure_iff_nhds.mp hwcl _ Filter.univ_mem
     exact (norm_nonneg _).trans_lt (mem_ball_zero_iff.mp (hPψ z hzP).1)
   set t₀ : Fin k → ℂ := fun j => g j w with ht₀
-  have ht₀Δ : t₀ ∈ Metric.ball (0 : Fin k → ℂ) r := mem_ball_zero_iff.mpr ((pi_norm_lt_iff hr).mpr hglt)
+  have ht₀Δ : t₀ ∈ Metric.ball (0 : Fin k → ℂ) r :=
+    mem_ball_zero_iff.mpr ((pi_norm_lt_iff hr).mpr hglt)
   refine ⟨t₀, ht₀Δ, ?_⟩
 
   have : (𝓝[P] w).NeBot := mem_closure_iff_nhdsWithin_neBot.mp hwcl
   have hG : Tendsto (fun z => fun j => g j z) (𝓝[P] w) (𝓝 t₀) :=
     tendsto_pi_nhds.mpr fun j => (((hg j).continuousWithinAt ⟨hw, hwB'⟩).mono hPsub).tendsto
-  have hφc : ContinuousAt φ t₀ := (hφd.differentiableAt (Metric.isOpen_ball.mem_nhds ht₀Δ)).continuousAt
+  have hφc : ContinuousAt φ t₀ :=
+    (hφd.differentiableAt (Metric.isOpen_ball.mem_nhds ht₀Δ)).continuousAt
   have h1 : Tendsto (fun z => φ (fun j => g j z)) (𝓝[P] w) (𝓝 (φ t₀)) := hφc.tendsto.comp hG
   have h2 : Tendsto (fun z => φ (fun j => g j z)) (𝓝[P] w) (𝓝 w) := by
     refine (tendsto_id.mono_left nhdsWithin_le_nhds).congr' ?_

@@ -12,7 +12,10 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 noncomputable section
@@ -31,8 +34,8 @@ theorem eventually_lt_two_pow (A B : ℕ) : ∃ n₀ : ℕ, ∀ n, n₀ ≤ n �
   have h4 : A * (m + k) + B < (m + 1) * (k + 1) := by nlinarith
   omega
 
-theorem dvd_pow_acris0 (ξ : Ainf l) (hξ : Per.θ l ξ = 0) :
-    ((l : ℕ) : Per.Acris0 l) ∣ algebraMap (Ainf l) (Per.Acris0 l) ξ ^ l := by
+theorem dvd_pow_acris0 (ξ : Ainf l) (hξ : Per.θ l ξ = 0)
+    : ((l : ℕ) : Per.Acris0 l) ∣ algebraMap (Ainf l) (Per.Acris0 l) ξ ^ l := by
   have hp : l.Prime := Fact.out
   have hlu : IsUnit ((l : ℕ) : Per.AinfP l) := by
     have := IsLocalization.Away.algebraMap_isUnit (S := Per.AinfP l) ((l : ℕ) : Per.Ainf l)
@@ -43,19 +46,24 @@ theorem dvd_pow_acris0 (ξ : Ainf l) (hξ : Per.θ l ξ = 0) :
     rw [map_mul, map_pow, map_natCast, map_natCast] at h2
     exact isUnit_of_mul_isUnit_left (h2 ▸ hlu.pow l)
   obtain ⟨v, hv⟩ := hf.exists_right_inv
-  have hx : ((l.factorial : ℕ) : Per.AinfP l) * (v * algebraMap (Per.Ainf l) (Per.AinfP l) ξ ^ l) =
-      algebraMap (Per.Ainf l) (Per.AinfP l) ξ ^ l := by rw [← mul_assoc, hv, one_mul]
+  have hx
+      : ((l.factorial : ℕ) : Per.AinfP l) * (v * algebraMap (Per.Ainf l) (Per.AinfP l) ξ ^ l)
+        = algebraMap (Per.Ainf l) (Per.AinfP l) ξ ^ l := by
+    rw [← mul_assoc, hv, one_mul]
   generalize v * algebraMap (Per.Ainf l) (Per.AinfP l) ξ ^ l = x at hx
   have hxD : x ∈ Per.Acris0 l := GlobalTheory.RingIface.dividedPower_mem_Acris0 l ξ l x hξ hx
-  have hfac : ((l.factorial : ℕ) : Per.AinfP l) =
-      ((l : ℕ) : Per.AinfP l) * (((l - 1).factorial : ℕ) : Per.AinfP l) := by
+  have hfac
+      : ((l.factorial : ℕ) : Per.AinfP l)
+        = ((l : ℕ) : Per.AinfP l) * (((l - 1).factorial : ℕ) : Per.AinfP l) := by
     rw [← Nat.cast_mul, Nat.mul_factorial_pred hp.ne_zero]
   refine ⟨(((l - 1).factorial : ℕ) : Per.Acris0 l) * ⟨x, hxD⟩, Subtype.ext ?_⟩
-  simp only [SubmonoidClass.coe_pow, Subalgebra.coe_algebraMap, Subalgebra.coe_mul, SubringClass.coe_natCast]
+  simp only [SubmonoidClass.coe_pow, Subalgebra.coe_algebraMap, Subalgebra.coe_mul,
+    SubringClass.coe_natCast]
   rw [← hx, hfac, mul_assoc]
 
-theorem dvd_X_pow {K : FinExt l} (bk : BK K) :
-    (l : Per.Acris l) ∣ ((algebraMap (Ainf l) (Per.Acris l)).comp bk.ev) X ^ (bk.Ep.natDegree * l) := by
+theorem dvd_X_pow {K : FinExt l} (bk : BK K)
+    : (l : Per.Acris l)
+      ∣ ((algebraMap (Ainf l) (Per.Acris l)).comp bk.ev) X ^ (bk.Ep.natDegree * l) := by
   set f := algebraMap (Ainf l) (Per.Acris l)
   have hξ : Per.θ l (bk.ev bk.E) = 0 := by
     rw [← RingHom.mem_ker, ← bk.span_ev]; exact Ideal.mem_span_singleton_self _
@@ -72,8 +80,11 @@ theorem dvd_X_pow {K : FinExt l} (bk : BK K) :
   rw [sub_sub_cancel, ← pow_mul] at h4
   simpa [RingHom.comp_apply] using h4
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (c M : ℕ), ∃ n₀ : ℕ, ∀ n, n₀ ≤ n →
-    (l : Per.Acris l) ^ (c * n + M) ∣ ((algebraMap (Ainf l) (Per.Acris l)).comp bk.ev) X ^ (l ^ n - 1) := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (c M : ℕ), ∃ n₀ : ℕ, ∀ n,
+      n₀ ≤ n
+        → (l : Per.Acris l) ^ (c * n + M)
+          ∣ ((algebraMap (Ainf l) (Per.Acris l)).comp bk.ev) X ^ (l ^ n - 1) := by
   intro l _ K bk c M
   set e := bk.Ep.natDegree
   obtain ⟨n₀, hn₀⟩ := eventually_lt_two_pow (e * l * c) (e * l * M)

@@ -6,11 +6,12 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-private theorem exists_injective_char (p : ℕ) [Fact p.Prime] :
-    ∃ lam0 : (ZMod p)ˣ →* ℂˣ, Function.Injective lam0 :=
+private theorem exists_injective_char (p : ℕ) [Fact p.Prime]
+    : ∃ lam0 : (ZMod p)ˣ →* ℂˣ, Function.Injective lam0 :=
   _root_.UpperTheory.Reformulated.B.ExistsInjectiveCharacter.exists_injective_char p
 
 theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.charOrd : CharOrd := by
@@ -41,7 +42,6 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.charOrd : CharOrd := by
     simp
   · have h1 : (lam0 ^ (2 * e)) a = (lam0 (a ^ 2)) ^ e := by
       rw [MonoidHom.pow_apply, pow_mul, ← map_pow]
-    have h2 : orderOf (lam0 (a ^ 2)) = ℓ ^ k * e := by
-      rw [orderOf_injective lam0 hinj, he]
+    have h2 : orderOf (lam0 (a ^ 2)) = ℓ ^ k * e := by rw [orderOf_injective lam0 hinj, he]
     rw [h1, orderOf_pow' _ hepos.ne', h2, Nat.gcd_eq_right (Dvd.intro_left _ rfl),
       Nat.mul_div_cancel _ hepos]

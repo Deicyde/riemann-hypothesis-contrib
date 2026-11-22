@@ -17,9 +17,10 @@ theorem mom_glMap (Y : Gl r k) (i : ℕ) : mom (glMap φ Y) i = φ (mom Y i) := 
     have := map_pow φ.mapMatrix Y.1 i
     simpa only [RingHom.mapMatrix_apply] using this.symm
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mom, glMap, hp, dotProduct, Matrix.mulVec, Matrix.map_apply, map_sum, map_mul]
+  simp only [mom, glMap, hp, dotProduct, Matrix.mulVec, Matrix.map_apply, map_sum, map_mul]
 
-theorem inv_glMap (Y : Gl r k) : GlobalTheory.JR.inv (glMap φ Y) = (GlobalTheory.JR.inv Y).map φ := by
+theorem inv_glMap (Y : Gl r k)
+    : GlobalTheory.JR.inv (glMap φ Y) = (GlobalTheory.JR.inv Y).map φ := by
   refine Prod.ext ?_ (Prod.ext ?_ rfl)
   · funext i
     simp only [GlobalTheory.JR.inv, Inv.map, glMap, Matrix.charpoly_map, Polynomial.coeff_map]
@@ -43,8 +44,9 @@ theorem Delta_map (a : Inv r k) : Delta (a.map φ) = φ (Delta a) := by
 
 open Matrix MeasureTheory Filter Topology in
 variable {k k' : Type} [CommRing k] [CommRing k'] (φ : k →+* k') {r : ℕ} in
-private theorem mom_glMap_eq_map_mom (ψ : k →+* k') (Y : _root_.GlobalTheory.JR.Gl r k) (n : ℕ) :
-    _root_.GlobalTheory.JR.mom (_root_.GlobalTheory.JR.Step.glMap ψ Y) n = ψ (_root_.GlobalTheory.JR.mom Y n) := by
+private theorem mom_glMap_eq_map_mom (ψ : k →+* k') (Y : _root_.GlobalTheory.JR.Gl r k) (n : ℕ)
+    : _root_.GlobalTheory.JR.mom (_root_.GlobalTheory.JR.Step.glMap ψ Y) n
+      = ψ (_root_.GlobalTheory.JR.mom Y n) := by
   unfold _root_.GlobalTheory.JR.mom _root_.GlobalTheory.JR.Step.glMap
   rw [RingHom.map_dotProduct]
   congr 1
@@ -54,19 +56,23 @@ private theorem mom_glMap_eq_map_mom (ψ : k →+* k') (Y : _root_.GlobalTheory.
 
 open Matrix MeasureTheory Filter Topology in
 variable {k k' : Type} [CommRing k] [CommRing k'] (φ : k →+* k') {r : ℕ} in
-private theorem sec_map_eq_glMap_sec (ψ : k →+* k') (a : _root_.GlobalTheory.JR.Inv r k) :
-    _root_.GlobalTheory.JR.sec (a.map ψ) = _root_.GlobalTheory.JR.Step.glMap ψ (_root_.GlobalTheory.JR.sec a) := by
+private theorem sec_map_eq_glMap_sec (ψ : k →+* k') (a : _root_.GlobalTheory.JR.Inv r k)
+    : _root_.GlobalTheory.JR.sec (a.map ψ)
+      = _root_.GlobalTheory.JR.Step.glMap ψ (_root_.GlobalTheory.JR.sec a) := by
   unfold _root_.GlobalTheory.JR.sec _root_.GlobalTheory.JR.Inv.map _root_.GlobalTheory.JR.Step.glMap
   simp only [_root_.GlobalTheory.JR.ImgSec.companion_map, Prod.mk.injEq, true_and, and_true]
   funext i
   split_ifs <;> simp
 
-
 open Matrix MeasureTheory Filter Topology in
 variable {k k' : Type} [CommRing k] [CommRing k'] (φ : k →+* k') {r : ℕ} in
-theorem _root_.GlobalTheory.JR.Step.InvMap.inv_and_Delta_map : ∀ (k k' : Type) [CommRing k] [CommRing k'] (φ : k →+* k') (r : ℕ),
-    (∀ Y : _root_.GlobalTheory.JR.Gl r k, _root_.GlobalTheory.JR.inv (_root_.GlobalTheory.JR.Step.glMap φ Y) = (_root_.GlobalTheory.JR.inv Y).map φ) ∧
-      (∀ a : _root_.GlobalTheory.JR.Inv r k, _root_.GlobalTheory.JR.Delta (a.map φ) = φ (_root_.GlobalTheory.JR.Delta a)) := by
+theorem _root_.GlobalTheory.JR.Step.InvMap.inv_and_Delta_map
+    : ∀ (k k' : Type) [CommRing k] [CommRing k'] (φ : k →+* k') (r : ℕ),
+      (∀ Y : _root_.GlobalTheory.JR.Gl r k,
+          _root_.GlobalTheory.JR.inv (_root_.GlobalTheory.JR.Step.glMap φ Y)
+            = (_root_.GlobalTheory.JR.inv Y).map φ)
+        ∧ (∀ a : _root_.GlobalTheory.JR.Inv r k,
+          _root_.GlobalTheory.JR.Delta (a.map φ) = φ (_root_.GlobalTheory.JR.Delta a)) := by
   intro k k' _ _ φ r
   refine ⟨fun Y => ?_, fun a => ?_⟩
   · unfold _root_.GlobalTheory.JR.inv _root_.GlobalTheory.JR.Inv.map

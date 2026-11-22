@@ -11,7 +11,9 @@ namespace Formalism.MainNotions.FormalGroupSystem.Pf
 
 open Formalism.MainNotions.G Formalism.BasicNotions Finset
 
-attribute [local instance] Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
+attribute [local instance]
+  Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO
+  Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
   Formalism.MainNotions.G.GAtP.algOK
 
 variable {p : ℕ} [Fact p.Prime] {X : Sys p} (Y : Pend X)
@@ -36,13 +38,14 @@ theorem geC_neg {x : Y.Kc} {g : ℝ} (h : Y.geC x g) : Y.geC (-x) g := by
   rw [neg_pow, mul_assoc]
   exact Y.Oc.mul_mem (Y.Oc.pow_mem (Y.Oc.neg_mem Y.Oc.one_mem) _) (h a b hb hab)
 
-theorem geC_mul_shift {x y : Y.Kc} {g : ℝ} (k : ℤ) (hx : Y.geC x g) (hy : y * (p : Y.Kc) ^ k ∈ Y.Oc) :
-    Y.geC (y * x) (g - k) := by
+theorem geC_mul_shift {x y : Y.Kc} {g : ℝ} (k : ℤ) (hx : Y.geC x g) (hy : y * (p : Y.Kc) ^ k ∈ Y.Oc)
+    : Y.geC (y * x) (g - k) := by
   intro a b hb hab
   have hp := pKc_ne Y
   have hx' := hx (a + k * b) b hb (by push_cast; nlinarith)
-  have e : (y * x) ^ b * (p : Y.Kc) ^ (-a) =
-      (y * (p : Y.Kc) ^ k) ^ b * (x ^ b * (p : Y.Kc) ^ (-(a + k * b))) := by
+  have e
+      : (y * x) ^ b * (p : Y.Kc) ^ (-a)
+        = (y * (p : Y.Kc) ^ k) ^ b * (x ^ b * (p : Y.Kc) ^ (-(a + k * b))) := by
     have h1 : (p : Y.Kc) ^ (-a) = ((p : Y.Kc) ^ k) ^ b * (p : Y.Kc) ^ (-(a + k * b)) := by
       rw [← zpow_natCast, ← zpow_mul, ← zpow_add₀ hp]
       congr 1
@@ -57,9 +60,9 @@ theorem geC_mul_Oc {x y : Y.Kc} {g : ℝ} (hx : Y.geC x g) (hy : y ∈ Y.Oc) : Y
   rw [mul_pow, mul_assoc]
   exact Y.Oc.mul_mem (Y.Oc.pow_mem hy _) (hx a b hb hab)
 
-theorem valuation_bound_add {x y : Y.Kc} {g : ℝ} (hy0 : y ≠ 0) (h : x / y ∈ Y.Oc) (hy : Y.geC y g) : Y.geC (x + y) g := by
-  have e : x + y = (x / y + 1) * y := by
-    field_simp
+theorem valuation_bound_add {x y : Y.Kc} {g : ℝ} (hy0 : y ≠ 0) (h : x / y ∈ Y.Oc) (hy : Y.geC y g)
+    : Y.geC (x + y) g := by
+  have e : x + y = (x / y + 1) * y := by field_simp
   rw [e]
   exact geC_mul_Oc Y hy (Y.Oc.add_mem h Y.Oc.one_mem)
 
@@ -119,9 +122,9 @@ theorem dvd_of_not_unit {o : X.G.O} (h : ¬ IsUnit o) : X.vp ∣ o := by
   have hm : o ∈ IsLocalRing.maximalIdeal X.G.O :=
     (IsLocalRing.mem_maximalIdeal o).mpr (mem_nonunits_iff.mpr h)
   rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer X.vp).mp X.unif,
-    Ideal.mem_span_singleton] at hm
+      Ideal.mem_span_singleton]
+    at hm
   exact hm
-
 
 include Y in
 theorem RK_or (x : X.G.Kf) : x ∈ RK X ∨ ∃ o : X.G.O, x⁻¹ = vpK X * algebraMap X.G.O X.G.Kf o := by
@@ -141,8 +144,13 @@ theorem RK_or (x : X.G.Kf) : x ∈ RK X ∨ ∃ o : X.G.O, x⁻¹ = vpK X * alge
 
 theorem p_eq : ∃ u : X.G.Kf, u ∈ RK X ∧ u⁻¹ ∈ RK X ∧ u ≠ 0 ∧ (p : X.G.Kf) * u = vpK X ^ X.eO := by
   obtain ⟨u, hu⟩ := X.eO_spec
-  refine ⟨algebraMap X.G.O X.G.Kf u, ⟨u, rfl⟩, ⟨↑u⁻¹, map_units_inv (algebraMap X.G.O X.G.Kf) u⟩,
-    (u.isUnit.map (algebraMap X.G.O X.G.Kf)).ne_zero, ?_⟩
+  refine ⟨
+    algebraMap X.G.O X.G.Kf u,
+    ⟨u, rfl⟩,
+    ⟨↑u⁻¹, map_units_inv (algebraMap X.G.O X.G.Kf) u⟩,
+    (u.isUnit.map (algebraMap X.G.O X.G.Kf)).ne_zero,
+    ?_
+  ⟩
   have h := congrArg (algebraMap X.G.O X.G.Kf) hu
   rw [map_mul, map_pow, map_natCast] at h
   exact h
@@ -162,11 +170,14 @@ theorem vsc_ne_zero (g : ℝ) : X.vsc g ≠ 0 := by
     simp
   · exact zpow_ne_zero _ h0
 
-theorem mem_scale_iff {M : Type*} [AddCommGroup M] [Module X.G.Kf M] [Module X.G.O M] [IsScalarTower X.G.O X.G.Kf M]
-    (c : X.G.Kf) (N : Submodule X.G.O M) (x : M) : x ∈ scale c N ↔ ∃ y ∈ N, c • y = x := by
+theorem mem_scale_iff
+    {M : Type*} [AddCommGroup M] [Module X.G.Kf M] [Module X.G.O M] [IsScalarTower X.G.O X.G.Kf M]
+    (c : X.G.Kf) (N : Submodule X.G.O M) (x : M)
+    : x ∈ scale c N ↔ ∃ y ∈ N, c • y = x := by
   simp only [scale, Submodule.mem_map, LinearMap.restrictScalars_apply, LinearMap.lsmul_apply]
 
-theorem exists_ab (e : ℕ) (g : ℝ) : ∃ (a : ℤ) (b : ℕ), 0 < b ∧ (a : ℝ) ≤ g * b ∧ (⌈g * (e : ℝ)⌉ - 1) * (b : ℤ) - e * a < 0 := by
+theorem exists_ab (e : ℕ) (g : ℝ)
+    : ∃ (a : ℤ) (b : ℕ), 0 < b ∧ (a : ℝ) ≤ g * b ∧ (⌈g * (e : ℝ)⌉ - 1) * (b : ℤ) - e * a < 0 := by
   rcases Nat.eq_zero_or_pos e with he | he
   · subst he
     refine ⟨⌊g⌋, 1, one_pos, by simpa using Int.floor_le g, ?_⟩
@@ -220,23 +231,26 @@ theorem vGeK_of_geC (c : X.G.Kf) (g : ℝ) (h : Y.geC (algebraMap X.G.Kf Y.Kc c)
   set Ok := algebraMap X.G.O X.G.Kf o with hOk
   have hc : c = (vpK X * Ok)⁻¹ * vpK X ^ m := by
     have h1 : c * (X.vsc g)⁻¹ = (vpK X * Ok)⁻¹ := by rw [← ho, inv_inv]
-    calc c = c * (X.vsc g)⁻¹ * X.vsc g := by rw [mul_assoc, inv_mul_cancel₀ hv, mul_one]
+    calc
+      c = c * (X.vsc g)⁻¹ * X.vsc g := by rw [mul_assoc, inv_mul_cancel₀ hv, mul_one]
       _ = (vpK X * Ok)⁻¹ * vpK X ^ m := by rw [h1, hvsc]
   have hp : (p : X.G.Kf) = vpK X ^ X.eO * u⁻¹ := by
     rw [← hpu, mul_assoc, mul_inv_cancel₀ hu0, mul_one]
-  have hid : c ^ b * (p : X.G.Kf) ^ (-a) * (Ok ^ b * u ^ (-a)) =
-      vpK X ^ ((m - 1) * (b : ℤ) - (X.eO : ℤ) * a) := by
+  have hid
+      : c ^ b * (p : X.G.Kf) ^ (-a) * (Ok ^ b * u ^ (-a))
+        = vpK X ^ ((m - 1) * (b : ℤ) - (X.eO : ℤ) * a) := by
     rw [hc, hp]
-    calc ((vpK X * Ok)⁻¹ * vpK X ^ m) ^ b * (vpK X ^ X.eO * u⁻¹) ^ (-a) * (Ok ^ b * u ^ (-a))
-        = (vpK X ^ (-(b : ℤ)) * vpK X ^ (m * b) * vpK X ^ ((X.eO : ℤ) * -a)) *
-            (Ok ^ (-(b : ℤ)) * Ok ^ (b : ℤ)) * (u ^ a * u ^ (-a)) := by
-          simp only [← zpow_natCast, mul_zpow, inv_zpow', ← zpow_mul, neg_neg]
-          ring
+    calc
+      ((vpK X * Ok)⁻¹ * vpK X ^ m) ^ b * (vpK X ^ X.eO * u⁻¹) ^ (-a) * (Ok ^ b * u ^ (-a))
+          = (vpK X ^ (-(b : ℤ)) * vpK X ^ (m * b) * vpK X ^ ((X.eO : ℤ) * -a))
+            * (Ok ^ (-(b : ℤ)) * Ok ^ (b : ℤ)) * (u ^ a * u ^ (-a)) := by
+        simp only [← zpow_natCast, mul_zpow, inv_zpow', ← zpow_mul, neg_neg]
+        ring
       _ = vpK X ^ ((m - 1) * (b : ℤ) - (X.eO : ℤ) * a) := by
-          rw [← zpow_add₀ hπ, ← zpow_add₀ hπ, ← zpow_add₀ hoK, ← zpow_add₀ hu0, neg_add_cancel,
-            add_neg_cancel, zpow_zero, zpow_zero, mul_one, mul_one]
-          congr 1
-          ring
+        rw [← zpow_add₀ hπ, ← zpow_add₀ hπ, ← zpow_add₀ hoK, ← zpow_add₀ hu0, neg_add_cancel,
+          add_neg_cancel, zpow_zero, zpow_zero, mul_one, mul_one]
+        congr 1
+        ring
   have hPN : vpK X ^ ((m - 1) * (b : ℤ) - (X.eO : ℤ) * a) ∈ RK X := by
     rw [← hid]
     exact (RK X).mul_mem hw ((RK X).mul_mem ((RK X).pow_mem ⟨o, rfl⟩ _) (zpow_mem_RK hu1 hu2 _))

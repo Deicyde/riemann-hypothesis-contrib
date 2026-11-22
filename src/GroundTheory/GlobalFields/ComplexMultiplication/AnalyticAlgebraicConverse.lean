@@ -6,7 +6,8 @@ public import GroundTheory.ArithmeticGeometry.AbelianVarieties.IsogenySeparable
 
 @[expose] public section
 
-open Filter Topology Set Polynomial WeierstrassCurve.Affine GroundTheory.Arith.Abelian KaehlerDifferential
+open Filter Topology Set Polynomial WeierstrassCurve.Affine GroundTheory.Arith.Abelian
+  KaehlerDifferential
 open scoped PeriodPair
 
 noncomputable section
@@ -16,8 +17,8 @@ namespace Elliptic
 
 variable {L₁ L₂ : PeriodPair}
 
-theorem homConst_ne_zero {Q : isogHom (weierstrassCurve L₁) (weierstrassCurve L₂)} (hQ : Q ≠ 0) :
-    homConst (weierstrassCurve L₁) (weierstrassCurve L₂) Q ≠ 0 := by
+theorem homConst_ne_zero {Q : isogHom (weierstrassCurve L₁) (weierstrassCurve L₂)} (hQ : Q ≠ 0)
+    : homConst (weierstrassCurve L₁) (weierstrassCurve L₂) Q ≠ 0 := by
   set φ := isogOfHom Q hQ
   have hsep : φ.IsSeparable := by
     have := φ.finiteDimensional
@@ -29,16 +30,18 @@ theorem homConst_ne_zero {Q : isogHom (weierstrassCurve L₁) (weierstrassCurve 
     rfl
   rwa [← h2]
 
-theorem homConst_injective :
-    Function.Injective (homConst (weierstrassCurve L₁) (weierstrassCurve L₂)) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem homConst_injective
+    : Function.Injective (homConst (weierstrassCurve L₁) (weierstrassCurve L₂)) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro Q h
   by_contra hQ
   exact homConst_ne_zero hQ h
 
-theorem exists_eq_constMap_of_omegaDeriv {W : WeierstrassCurve ℂ}
-    (P : (W.baseChange MeroField).toAffine.Point) (h : omegaDeriv (omegaAt W P) = 0) :
-    ∃ R : W.toAffine.Point, P = constMap W MeroField R := by
+theorem exists_eq_constMap_of_omegaDeriv
+    {W : WeierstrassCurve ℂ}
+    (P : (W.baseChange MeroField).toAffine.Point) (h : omegaDeriv (omegaAt W P) = 0)
+    : ∃ R : W.toAffine.Point, P = constMap W MeroField R := by
   rcases P with _ | ⟨u, v, hP⟩
   · exact ⟨0, (map_zero _).symm⟩
   obtain ⟨s₁, s₂⟩ := omegaAt_some_spec W hP
@@ -52,26 +55,31 @@ theorem exists_eq_constMap_of_omegaDeriv {W : WeierstrassCurve ℂ}
       (algebraMap ℂ MeroField).injective c d).1 hP
   exact ⟨.some c d hcd, rfl⟩
 
-theorem exists_map_ellEval_eq {Q : isogHom (weierstrassCurve L₁) (weierstrassCurve L₂)}
-    (hQ : Q ≠ 0) :
-    ∃ c : ℂ, Point.map (ellEval L₁) Q.1 =
-      affinePoint L₂ (homConst (weierstrassCurve L₁) (weierstrassCurve L₂) Q) c
-        (homConst_ne_zero hQ) := by
+theorem exists_map_ellEval_eq {Q : isogHom (weierstrassCurve L₁) (weierstrassCurve L₂)} (hQ : Q ≠ 0)
+    : ∃ c : ℂ,
+      Point.map (ellEval L₁) Q.1
+        = affinePoint L₂ (homConst (weierstrassCurve L₁) (weierstrassCurve L₂) Q) c
+          (homConst_ne_zero hQ) := by
   set α := homConst (weierstrassCurve L₁) (weierstrassCurve L₂) Q
   have h0 : α ≠ 0 := homConst_ne_zero hQ
   have e := omegaAt_eq_homConst_smul Q
   have e' := congrArg (kpush (ellEval L₁)) e
   rw [kpush_omegaAt, kpush_const_smul, invariantDifferential, kpush_omegaAt,
-    map_ellEval_genericPoint, basePoint_eq] at e'
-  have hω : omegaDeriv (omegaAt (weierstrassCurve L₂) (Point.map (ellEval L₁) Q.1)) =
-      algebraMap ℂ MeroField α := by
+      map_ellEval_genericPoint, basePoint_eq]
+    at e'
+  have hω
+      : omegaDeriv (omegaAt (weierstrassCurve L₂) (Point.map (ellEval L₁) Q.1))
+        = algebraMap ℂ MeroField α := by
     rw [e', ← algebraMap_smul MeroField, LinearMap.map_smul, omegaDeriv_affinePoint, smul_eq_mul,
       map_one, mul_one]
-  have hD : omegaDeriv (omegaAt (weierstrassCurve L₂)
-      (Point.map (ellEval L₁) Q.1 - affinePoint L₂ α 0 h0)) = 0 := by
-    have h1 : omegaAt (weierstrassCurve L₂) (Point.map (ellEval L₁) Q.1 - affinePoint L₂ α 0 h0) =
-        omegaAt (weierstrassCurve L₂) (Point.map (ellEval L₁) Q.1) -
-          omegaAt (weierstrassCurve L₂) (affinePoint L₂ α 0 h0) :=
+  have hD
+      : omegaDeriv (omegaAt (weierstrassCurve L₂)
+          (Point.map (ellEval L₁) Q.1 - affinePoint L₂ α 0 h0))
+        = 0 := by
+    have h1
+        : omegaAt (weierstrassCurve L₂) (Point.map (ellEval L₁) Q.1 - affinePoint L₂ α 0 h0)
+          = omegaAt (weierstrassCurve L₂) (Point.map (ellEval L₁) Q.1)
+            - omegaAt (weierstrassCurve L₂) (affinePoint L₂ α 0 h0) :=
       map_sub (omegaHom (weierstrassCurve L₂)) _ _
     rw [h1, map_sub, hω, omegaDeriv_affinePoint, sub_self]
   obtain ⟨R, hR⟩ := exists_eq_constMap_of_omegaDeriv _ hD
@@ -80,15 +88,16 @@ theorem exists_map_ellEval_eq {Q : isogHom (weierstrassCurve L₁) (weierstrassC
   rw [← affinePoint_add_constMap, ← hR]
   abel
 
-theorem homConst_mem_latticeHom (Q : isogHom (weierstrassCurve L₁) (weierstrassCurve L₂)) :
-    homConst (weierstrassCurve L₁) (weierstrassCurve L₂) Q ∈ latticeHom L₁ L₂ := by
+theorem homConst_mem_latticeHom (Q : isogHom (weierstrassCurve L₁) (weierstrassCurve L₂))
+    : homConst (weierstrassCurve L₁) (weierstrassCurve L₂) Q ∈ latticeHom L₁ L₂ := by
   by_cases hQ : Q = 0
   · rw [hQ, map_zero]
     exact zero_mem _
   set α := homConst (weierstrassCurve L₁) (weierstrassCurve L₂) Q
   have h0 : α ≠ 0 := homConst_ne_zero hQ
   obtain ⟨c, hc⟩ := exists_map_ellEval_eq hQ
-  have hg : IsGenPt (weierstrassCurve L₂) Q.1 := isGenPt_of_mem_isogHom Q.2 (fun h ↦ hQ (Subtype.ext h))
+  have hg : IsGenPt (weierstrassCurve L₂) Q.1 :=
+    isGenPt_of_mem_isogHom Q.2 (fun h ↦ hQ (Subtype.ext h))
   obtain ⟨hne, hQs⟩ := eq_some_xOf_yOf _ (isGenPt_ne_zero _ hg)
   rw [hQs, Point.map_some, affinePoint, Point.some.injEq] at hc
   obtain ⟨f, hf, hfe⟩ := exists_isEllipticFunction_ellEval_eq L₁ (xOf _ Q.1)
@@ -97,10 +106,11 @@ theorem homConst_mem_latticeHom (Q : isogHom (weierstrassCurve L₁) (weierstras
   rw [hge, germ_eq_germ_iff hg'.1 (meromorphic_derivWeierstrassP_half_affine L₂ α c)] at hc
   obtain ⟨hcx, hcy⟩ := hc
   intro l hl
-  obtain ⟨z, h1, h2, h3, h4, h5, h6⟩ := nonempty_of_mem_codiscrete (hcx.and (hcy.and
-    ((eventually_affine hcx one_ne_zero l).and ((eventually_affine hcy one_ne_zero l).and
-    ((eventually_affine (eventually_notMem_lattice L₂) h0 c).and
-    (eventually_affine (eventually_notMem_lattice L₂) h0 (α * l + c)))))))
+  obtain ⟨z, h1, h2, h3, h4, h5, h6⟩ :=
+    nonempty_of_mem_codiscrete (hcx.and (hcy.and ((eventually_affine hcx one_ne_zero l).and
+      ((eventually_affine hcy one_ne_zero l).and
+        ((eventually_affine (eventually_notMem_lattice L₂) h0 c).and
+          (eventually_affine (eventually_notMem_lattice L₂) h0 (α * l + c)))))))
   beta_reduce at h1 h2
   simp only [one_mul] at h3 h4
   rw [hf.2 z l hl] at h3
@@ -118,29 +128,30 @@ theorem homConst_mem_latticeHom (Q : isogHom (weierstrassCurve L₁) (weierstras
   rw [Torus.mk_eq_mk_iff] at this
   simpa using this
 
-theorem latticeToHom_homConst (Q : isogHom (weierstrassCurve L₁) (weierstrassCurve L₂)) :
-    latticeToHom ⟨_, homConst_mem_latticeHom Q⟩ = Q :=
+theorem latticeToHom_homConst (Q : isogHom (weierstrassCurve L₁) (weierstrassCurve L₂))
+    : latticeToHom ⟨_, homConst_mem_latticeHom Q⟩ = Q :=
   homConst_injective (by rw [homConst_latticeToHom])
 
-theorem latticeToHom_add (α β : latticeHom L₁ L₂) :
-    latticeToHom (α + β) = latticeToHom α + latticeToHom β :=
+theorem latticeToHom_add (α β : latticeHom L₁ L₂)
+    : latticeToHom (α + β) = latticeToHom α + latticeToHom β :=
   homConst_injective (by
     rw [map_add (f := _), homConst_latticeToHom, homConst_latticeToHom, homConst_latticeToHom]
     rfl)
 
-theorem ellEval_comp_translate (L : PeriodPair) (z : ℂ) :
-    (ellEval L).comp (translate (weierstrassCurve L) (toPoint L z)) =
-      (affineComp 1 z one_ne_zero).comp (ellEval L) := by
+theorem ellEval_comp_translate (L : PeriodPair) (z : ℂ)
+    : (ellEval L).comp (translate (weierstrassCurve L) (toPoint L z))
+      = (affineComp 1 z one_ne_zero).comp (ellEval L) := by
   apply algHom_eq_of_map_genericPoint' (E := weierstrassCurve L)
   rw [← Point.map_map, map_translate_genericPoint, map_add (f := _), map_ellEval_genericPoint,
-    show constPoint (weierstrassCurve L) (toPoint L z) =
-      constMap (weierstrassCurve L) _ (toPoint L z) from rfl, map_constMap, basePoint_eq,
-    affinePoint_add_constMap, ← Point.map_map, map_ellEval_genericPoint, basePoint_eq,
-    map_affineComp_affinePoint]
+    show constPoint (weierstrassCurve L) (toPoint L z)
+        = constMap (weierstrassCurve L) _ (toPoint L z) from
+      rfl,
+    map_constMap, basePoint_eq, affinePoint_add_constMap, ← Point.map_map, map_ellEval_genericPoint,
+    basePoint_eq, map_affineComp_affinePoint]
   exact affinePoint_congr L _ _ (by ring) (by ring)
 
-theorem homPt_latticeToHom (α : latticeHom L₁ L₂) (z : ℂ) :
-    homPt (latticeToHom α) (toPoint L₁ z) = toPoint L₂ (α * z) := by
+theorem homPt_latticeToHom (α : latticeHom L₁ L₂) (z : ℂ)
+    : homPt (latticeToHom α) (toPoint L₁ z) = toPoint L₂ (α * z) := by
   by_cases h0 : (α : ℂ) = 0
   · rw [latticeToHom_of_eq_zero α h0, homPt_zero, AddMonoidHom.zero_apply, h0, zero_mul,
       toPoint_zero]
@@ -155,8 +166,8 @@ section End
 
 variable {L : PeriodPair}
 
-theorem latticeToHom_mul (α β : latticeHom L L) (h : (α : ℂ) * β ∈ latticeHom L L) :
-    latticeToHom ⟨_, h⟩ = latticeToHom α * latticeToHom β := by
+theorem latticeToHom_mul (α β : latticeHom L L) (h : (α : ℂ) * β ∈ latticeHom L L)
+    : latticeToHom ⟨_, h⟩ = latticeToHom α * latticeToHom β := by
   by_cases hα : (α : ℂ) = 0
   · rw [latticeToHom_of_eq_zero α hα, zero_mul, latticeToHom_of_eq_zero _ (by simp [hα])]
   by_cases hβ : (β : ℂ) = 0

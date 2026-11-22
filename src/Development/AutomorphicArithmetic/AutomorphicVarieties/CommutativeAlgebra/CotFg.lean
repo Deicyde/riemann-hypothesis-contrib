@@ -50,8 +50,11 @@ private lemma sq_mem [Module.Free ℤ X] [Module.Finite ℤ X] (W : WPres O X R)
 
 end
 
-theorem UpperTheory.V.Alg.cot_fg :
-    ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R] [Algebra O R] (W : WPres O X R) (h : W.HasOrigin) [Module.Free ℤ X] [Module.Finite ℤ X] (j : X), cotLat (W.originA h) W.gr j = cotSpan (W.originA h) fun s : {s // W.wt s = j} => W.zA s := by
+theorem UpperTheory.V.Alg.cot_fg
+    : ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R]
+        [Algebra O R] (W : WPres O X R) (h : W.HasOrigin) [Module.Free ℤ X] [Module.Finite ℤ X]
+        (j : X),
+      cotLat (W.originA h) W.gr j = cotSpan (W.originA h) fun s : {s // W.wt s = j} => W.zA s := by
   intro O X R _ _ _ _ _ _ W h _ _ j
   classical
   refine le_antisymm ?_ ?_
@@ -60,10 +63,13 @@ theorem UpperTheory.V.Alg.cot_fg :
     have h0 : constantCoeff f = 0 := by
       rw [← W.origin_π h, hfx']
       exact hx
-    have key : x - ∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • W.zA s ∈
-        RingHom.ker (W.originA h) ^ 2 := by
-      refine sq_mem W h j (f - ∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • MvPowerSeries.X s.1)
-        (fun m hm => ?_) _ (by simp [hfx', WPres.zA, WPres.z])
+    have key
+        : x - ∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • W.zA s
+          ∈ RingHom.ker (W.originA h) ^ 2 := by
+      refine sq_mem W h j
+        (f - ∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • MvPowerSeries.X s.1)
+        (fun m hm => ?_)
+        _ (by simp [hfx', WPres.zA, WPres.z])
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sub, map_sum]
       simp only [map_smul, coeff_X, smul_eq_mul, mul_ite, mul_one, mul_zero]
@@ -83,8 +89,10 @@ theorem UpperTheory.V.Alg.cot_fg :
         rw [if_neg]
         rintro rfl
         exact hw (by simpa [Finsupp.weight_single] using s.2)
-    have h2 : (satSq (W.originA h)).mkQ x = (satSq (W.originA h)).mkQ
-        (∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • W.zA s) :=
+    have h2
+        : (satSq (W.originA h)).mkQ x
+          = (satSq (W.originA h)).mkQ
+            (∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • W.zA s) :=
       (Submodule.Quotient.eq _).2 ⟨1, one_ne_zero, by rwa [one_smul]⟩
     set_option synthInstance.maxHeartbeats 100000 in
       rw [h2, map_sum]

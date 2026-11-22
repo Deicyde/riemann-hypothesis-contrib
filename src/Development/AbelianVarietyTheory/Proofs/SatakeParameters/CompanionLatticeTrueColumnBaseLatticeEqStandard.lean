@@ -9,7 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix GlobalTheory.TwU GlobalTheory.TwU.AtTrue
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix GlobalTheory.TwU
+  GlobalTheory.TwU.AtTrue
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TwU.BaseComp
@@ -18,13 +21,17 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
 theorem star_int (r : 𝓞 E) : ∃ s : 𝓞 E, (s : E) = star (r : E) :=
   ⟨⟨star (r : E), r.2.map (starRingEnd E).toIntAlgHom⟩, rfl⟩
 
-theorem mem_dual_iff (L : Submodule (𝓞 E) (Fin n → E)) (y : Fin n → E) :
-    y ∈ Formalism.HermitianLatticesTheory.dual (hStd E n) L ↔ ∀ x ∈ L, (∑ k, star (x k) * y k) ∈ (algebraMap (𝓞 E) E).range := by
-  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.restrictScalars_apply, Submodule.mem_one]
+theorem mem_dual_iff (L : Submodule (𝓞 E) (Fin n → E)) (y : Fin n → E)
+    : y ∈ Formalism.HermitianLatticesTheory.dual (hStd E n) L
+      ↔ ∀ x ∈ L, (∑ k, star (x k) * y k) ∈ (algebraMap (𝓞 E) E).range := by
+  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+    Submodule.mem_comap, LinearMap.restrictScalars_apply, Submodule.mem_one]
   rfl
 
-theorem fg_of_int (L : Submodule (𝓞 E) (Fin n → E)) (h : ∀ x ∈ L, ∀ j, ∃ r : 𝓞 E, x j = (r : E)) : L.FG := by
-  let f : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin n → E) := LinearMap.pi fun j => (Algebra.linearMap (𝓞 E) E).comp (LinearMap.proj j)
+theorem fg_of_int (L : Submodule (𝓞 E) (Fin n → E)) (h : ∀ x ∈ L, ∀ j, ∃ r : 𝓞 E, x j = (r : E))
+    : L.FG := by
+  let f : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin n → E) :=
+    LinearMap.pi fun j => (Algebra.linearMap (𝓞 E) E).comp (LinearMap.proj j)
   have hle : L ≤ LinearMap.range f := by
     intro x hx
     choose r hr using h x hx
@@ -33,12 +40,13 @@ theorem fg_of_int (L : Submodule (𝓞 E) (Fin n → E)) (h : ∀ x ∈ L, ∀ j
   have := (isNoetherian_submodule.1 (inferInstance : IsNoetherian (𝓞 E) (LinearMap.range f))) L hle
   exact this
 
-theorem sup_dual_eq_std (t c : 𝓞 E) (ht : t ≠ 0) (hc : (c : E) = star (t : E))
+theorem sup_dual_eq_std
+    (t c : 𝓞 E) (ht : t ≠ 0) (hc : (c : E) = star (t : E))
     (Lb : Submodule (𝓞 E) (Fin n → E))
-    (hLb : ∀ x, x ∈ Lb ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = (r : E) ∧ (j.1 + 1 = n → t ∣ r)) :
-    Lb ⊔ Ideal.span {c} • Formalism.HermitianLatticesTheory.dual (hStd E n) Lb = Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 E) E) := by
-  have hst : star (t : E) ≠ 0 := by
-    rw [star_ne_zero]; exact_mod_cast ht
+    (hLb : ∀ x, x ∈ Lb ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = (r : E) ∧ (j.1 + 1 = n → t ∣ r))
+    : Lb ⊔ Ideal.span {c} • Formalism.HermitianLatticesTheory.dual (hStd E n) Lb
+      = Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 E) E) := by
+  have hst : star (t : E) ≠ 0 := by rw [star_ne_zero]; exact_mod_cast ht
   apply le_antisymm
   · refine sup_le ?_ ?_
     · intro x hx
@@ -109,17 +117,28 @@ open scoped TensorProduct
 
 namespace GlobalTheory.TwU.BaseComp
 
-theorem latCo_one_base {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] {n : ℕ}
-    (sp : Spaces R F E) (hσ : ∀ x, (sp.cm.sig : E →+* E) x = star x) (J : Matrix (Fin n) (Fin n) E) (hJ : J = 1)
-    (t c : 𝓞 E) (ht : t ≠ 0) (hc : (c : E) = star (t : E)) (Lb : Submodule (𝓞 E) (Fin n → E))
-    (hLb : ∀ x, x ∈ Lb ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = (r : E) ∧ (j.1 + 1 = n → t ∣ r)) :
-    GlobalTheory.TwU.latCo sp J 1 c 1 Lb = Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 E) E) := by
+theorem latCo_one_base
+    {R : Ranks} {F E : Type}
+    [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+    {n : ℕ}
+    (sp : Spaces R F E) (hσ : ∀ x, (sp.cm.sig : E →+* E) x = star x)
+    (J : Matrix (Fin n) (Fin n) E) (hJ : J = 1)
+    (t c : 𝓞 E) (ht : t ≠ 0) (hc : (c : E) = star (t : E))
+    (Lb : Submodule (𝓞 E) (Fin n → E))
+    (hLb : ∀ x, x ∈ Lb ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = (r : E) ∧ (j.1 + 1 = n → t ∣ r))
+    : GlobalTheory.TwU.latCo sp J 1 c 1 Lb
+      = Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 E) E) := by
   subst hJ
-  have hfg : Lb.FG := fg_of_int Lb fun x hx j => by
-    obtain ⟨r, hr, -⟩ := (hLb x).1 hx j
-    exact ⟨r, hr⟩
-  have hA : Formalism.L2.PairingIndexBounds.F.latAd (F := F) (1 : GL (Fin n) (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Lb = Lb :=
-    GlobalTheory.Mem.Col2.AdT.latAd_eq_of_latS _ Lb Lb (Module.Finite.iff_fg.2 hfg) (fun x => by simp)
+  have hfg : Lb.FG :=
+    fg_of_int Lb fun x hx j => by
+      obtain ⟨r, hr, -⟩ := (hLb x).1 hx j
+      exact ⟨r, hr⟩
+  have hA
+      : Formalism.L2.PairingIndexBounds.F.latAd (F := F)
+          (1 : GL (Fin n) (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Lb
+        = Lb :=
+    GlobalTheory.Mem.Col2.AdT.latAd_eq_of_latS _ Lb Lb (Module.Finite.iff_fg.2 hfg)
+      (fun x => by simp)
   unfold GlobalTheory.TwU.latCo
   rw [hA]
   unfold Formalism.L2.PairingIndexBounds.F.compan
@@ -131,10 +150,17 @@ theorem latCo_one_base {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field
 
 end GlobalTheory.TwU.BaseComp
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1600000 in
-theorem GlobalTheory.TwU.latCo_base_eq_stdL : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (u : B.Word) (i : ℕ) (hi : i ≤ B.R.m) (Lb : Submodule (𝓞 B.host.E) (Fin (B.R.N i) → B.host.E)), (∀ x, x ∈ Lb ↔ x ∈ baseL B (B.R.N i) (X.piT u)) → GlobalTheory.TwU.latCo (I.rec7 l Z).sp (gramN (I.rec7 l Z) i hi) 1 (B.fields.conjO (X.piT u)) 1 Lb = StandardLatticesGL3.stdL (I.rec7 l Z) (B.R.N i) := by
+theorem GlobalTheory.TwU.latCo_base_eq_stdL
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      I.Ok → TC.Pins B X
+        → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (u : B.Word) (i : ℕ) (hi : i ≤ B.R.m)
+            (Lb : Submodule (𝓞 B.host.E) (Fin (B.R.N i) → B.host.E)),
+          (∀ x, x ∈ Lb ↔ x ∈ baseL B (B.R.N i) (X.piT u))
+            → GlobalTheory.TwU.latCo (I.rec7 l Z).sp (gramN (I.rec7 l Z) i hi) 1
+                (B.fields.conjO (X.piT u)) 1 Lb
+              = StandardLatticesGL3.stdL (I.rec7 l Z) (B.R.N i) := by
   intro B X I hI hP l Z u i hi Lb hLb
   have hG : gramN (I.rec7 l Z) i hi = 1 := ((spaces_in_coordinates I hI hP l Z).2.2.2 i hi).1
   have ht : X.piT u ≠ 0 := by
@@ -143,4 +169,6 @@ theorem GlobalTheory.TwU.latCo_base_eq_stdL : ∀ {B : Base} {X : PreX B.toPre} 
     have h0' : (B.primes X).piT u = 0 := h0
     rw [h0', map_zero] at hc
     exact not_isCoprime_zero_zero hc
-  exact GlobalTheory.TwU.BaseComp.latCo_one_base _ (fun x => rfl) _ hG (X.piT u) (B.fields.conjO (X.piT u)) ht rfl Lb hLb
+  exact GlobalTheory.TwU.BaseComp.latCo_one_base _
+    (fun x => rfl)
+    _ hG (X.piT u) (B.fields.conjO (X.piT u)) ht rfl Lb hLb

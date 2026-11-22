@@ -12,17 +12,16 @@ open MvPolynomial
 
 variable {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} [∀ k, Fintype (ι k)]
 
-
 variable (ι) in
 def blkW : (Σ k, ι k) → (K → ℕ) := fun p => Pi.single p.1 1
 
-theorem weight_blkW (β : (Σ k, ι k) →₀ ℕ) (k : K) :
-    Finsupp.weight (blkW ι) β k = ∑ i, β ⟨k, i⟩ := by
+theorem weight_blkW (β : (Σ k, ι k) →₀ ℕ) (k : K)
+    : Finsupp.weight (blkW ι) β k = ∑ i, β ⟨k, i⟩ := by
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply, Fintype.sum_sigma]
   simp [blkW, Pi.single_apply]
 
-theorem isWeightedHomogeneous_map_of_isMultiHomog {s : MRing ι} {a : K → ℕ} (hs : IsMultiHomog s a) :
-    IsWeightedHomogeneous (blkW ι) (map (Int.castRingHom ℂ) s) a := by
+theorem isWeightedHomogeneous_map_of_isMultiHomog {s : MRing ι} {a : K → ℕ} (hs : IsMultiHomog s a)
+    : IsWeightedHomogeneous (blkW ι) (map (Int.castRingHom ℂ) s) a := by
   intro d hd
   rw [coeff_map] at hd
   have hs' : d ∈ s.support := by
@@ -34,9 +33,11 @@ theorem isWeightedHomogeneous_map_of_isMultiHomog {s : MRing ι} {a : K → ℕ}
   rw [weight_blkW]
   exact hs d hs' k
 
-theorem diag_prod (d : ℕ) : ∀ e : (Σ k, ι k) → ℕ, (∀ k, ∑ i, e ⟨k, i⟩ = d) →
-    ∃ G : MvPolynomial ((k : K) → ι k) ℂ, G.totalDegree ≤ d ∧
-      ∀ z : (Σ k, ι k) → ℂ, ∏ p, z p ^ e p = eval (segre z) G := by
+theorem diag_prod (d : ℕ)
+    : ∀ e : (Σ k, ι k) → ℕ,
+      (∀ k, ∑ i, e ⟨k, i⟩ = d)
+        → ∃ G : MvPolynomial ((k : K) → ι k) ℂ,
+          G.totalDegree ≤ d ∧ ∀ z : (Σ k, ι k) → ℂ, ∏ p, z p ^ e p = eval (segre z) G := by
   induction d with
   | zero =>
     intro e he
@@ -63,7 +64,9 @@ theorem diag_prod (d : ℕ) : ∀ e : (Σ k, ι k) → ℕ, (∀ k, ∑ i, e ⟨
       intro k
       have h1 := he k
       rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (i0 k))] at h1 ⊢
-      have h2 : ∑ i ∈ Finset.univ.erase (i0 k), e' ⟨k, i⟩ = ∑ i ∈ Finset.univ.erase (i0 k), e ⟨k, i⟩ := by
+      have h2
+          : ∑ i ∈ Finset.univ.erase (i0 k), e' ⟨k, i⟩
+            = ∑ i ∈ Finset.univ.erase (i0 k), e ⟨k, i⟩ := by
         refine Finset.sum_congr rfl fun i hi => ?_
         have hne : i ≠ i0 k := Finset.ne_of_mem_erase hi
         simp [e', hne]
@@ -74,16 +77,20 @@ theorem diag_prod (d : ℕ) : ∀ e : (Σ k, ι k) → ℕ, (∀ k, ∑ i, e ⟨
       omega
     obtain ⟨G', hG'deg, hG'⟩ := ih e' hblk
     refine ⟨X i0 * G', ?_, fun z => ?_⟩
-    · calc (X i0 * G').totalDegree ≤ (X i0 : MvPolynomial ((k : K) → ι k) ℂ).totalDegree + G'.totalDegree :=
-            totalDegree_mul _ _
+    · calc
+        (X i0 * G').totalDegree
+            ≤ (X i0 : MvPolynomial ((k : K) → ι k) ℂ).totalDegree + G'.totalDegree :=
+          totalDegree_mul _ _
         _ ≤ 1 + d := by rw [totalDegree_X]; omega
         _ = d + 1 := by ring
-    · rw [eval_mul, eval_X, ← hG', segre, Fintype.prod_sigma, Fintype.prod_sigma, ← Finset.prod_mul_distrib]
+    · rw [eval_mul, eval_X, ← hG', segre, Fintype.prod_sigma, Fintype.prod_sigma,
+        ← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun k _ => ?_
       rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ (i0 k)),
         ← Finset.mul_prod_erase _ _ (Finset.mem_univ (i0 k))]
-      have h2 : ∏ i ∈ Finset.univ.erase (i0 k), z ⟨k, i⟩ ^ e' ⟨k, i⟩ =
-          ∏ i ∈ Finset.univ.erase (i0 k), z ⟨k, i⟩ ^ e ⟨k, i⟩ := by
+      have h2
+          : ∏ i ∈ Finset.univ.erase (i0 k), z ⟨k, i⟩ ^ e' ⟨k, i⟩
+            = ∏ i ∈ Finset.univ.erase (i0 k), z ⟨k, i⟩ ^ e ⟨k, i⟩ := by
         refine Finset.prod_congr rfl fun i hi => ?_
         have hne : i ≠ i0 k := Finset.ne_of_mem_erase hi
         simp [e', hne]
@@ -94,19 +101,24 @@ theorem diag_prod (d : ℕ) : ∀ e : (Σ k, ι k) → ℕ, (∀ k, ∑ i, e ⟨
       conv_lhs => rw [h4, pow_succ]
       ring
 
-theorem diag_of_homog (d : ℕ) {f : MvPolynomial (Σ k, ι k) ℂ}
-    (hf : IsWeightedHomogeneous (blkW ι) f (fun _ => d)) :
-    ∃ G : MvPolynomial ((k : K) → ι k) ℂ, G.totalDegree ≤ d ∧
-      ∀ z : (Σ k, ι k) → ℂ, eval z f = eval (segre z) G := by
+theorem diag_of_homog
+    (d : ℕ) {f : MvPolynomial (Σ k, ι k) ℂ} (hf : IsWeightedHomogeneous (blkW ι) f (fun _ => d))
+    : ∃ G : MvPolynomial ((k : K) → ι k) ℂ,
+      G.totalDegree ≤ d ∧ ∀ z : (Σ k, ι k) → ℂ, eval z f = eval (segre z) G := by
   classical
-  have hG : ∀ m : (Σ k, ι k) →₀ ℕ, ∃ G : MvPolynomial ((k : K) → ι k) ℂ,
-      m ∈ f.support → G.totalDegree ≤ d ∧ ∀ z : (Σ k, ι k) → ℂ, ∏ p, z p ^ m p = eval (segre z) G := by
+  have hG
+      : ∀ m : (Σ k, ι k) →₀ ℕ, ∃ G : MvPolynomial ((k : K) → ι k) ℂ,
+        m ∈ f.support
+          → G.totalDegree ≤ d ∧ ∀ z : (Σ k, ι k) → ℂ, ∏ p, z p ^ m p = eval (segre z) G := by
     intro m
     by_cases hm : m ∈ f.support
     · have hw := hf (mem_support_iff.1 hm)
-      obtain ⟨G, h1, h2⟩ := diag_prod d (fun p => m p) (fun k => by
-        have := congrFun hw k
-        rwa [weight_blkW] at this)
+      obtain ⟨G, h1, h2⟩ :=
+        diag_prod d
+          (fun p => m p)
+          (fun k => by
+            have := congrFun hw k
+            rwa [weight_blkW] at this)
       exact ⟨G, fun _ => ⟨h1, h2⟩⟩
     · exact ⟨0, fun h => absurd h hm⟩
   choose Gf hGf using hG
@@ -121,9 +133,11 @@ theorem diag_of_homog (d : ℕ) {f : MvPolynomial (Σ k, ι k) ℂ}
 
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-theorem comp_mul_homog {σ : Type*} {M : Type*} [AddCancelCommMonoid M] [DecidableEq M] {w : σ → M}
-    {ψ : MvPolynomial σ ℂ} {δ : M} (hψ : IsWeightedHomogeneous w ψ δ) (g : MvPolynomial σ ℂ) (n : M) :
-    weightedHomogeneousComponent w (n + δ) (g * ψ) = weightedHomogeneousComponent w n g * ψ := by
+theorem comp_mul_homog
+    {σ : Type*} {M : Type*} [AddCancelCommMonoid M] [DecidableEq M]
+    {w : σ → M} {ψ : MvPolynomial σ ℂ} {δ : M} (hψ : IsWeightedHomogeneous w ψ δ)
+    (g : MvPolynomial σ ℂ) (n : M)
+    : weightedHomogeneousComponent w (n + δ) (g * ψ) = weightedHomogeneousComponent w n g * ψ := by
   classical
   ext x
   rw [coeff_weightedHomogeneousComponent, coeff_mul, coeff_mul]

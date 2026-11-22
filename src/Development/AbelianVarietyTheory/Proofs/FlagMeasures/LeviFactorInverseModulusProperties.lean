@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.GradedPieceSi
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.IwConst
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.IwConst
 
 noncomputable section
 
@@ -15,9 +16,9 @@ namespace GlobalTheory.IwDelta
 
 variable {n : ℕ}
 
-theorem exists_cont_detOn (V : Submodule ℂ (Fin n → ℂ)) :
-    ∃ D : Matrix (Fin n) (Fin n) ℂ → ℝ, Continuous D ∧
-      ∀ X, (∀ y ∈ V, X *ᵥ y ∈ V) → detOn X V = D X := by
+theorem exists_cont_detOn (V : Submodule ℂ (Fin n → ℂ))
+    : ∃ D : Matrix (Fin n) (Fin n) ℂ → ℝ,
+      Continuous D ∧ ∀ X, (∀ y ∈ V, X *ᵥ y ∈ V) → detOn X V = D X := by
   obtain ⟨U, hVU⟩ := Submodule.exists_isCompl V
   let p := Submodule.projectionOnto V U hVU
   let b := Module.finBasis ℂ V
@@ -45,20 +46,25 @@ theorem exists_cont_detOn (V : Submodule ℂ (Fin n → ℂ)) :
     rw [LinearMap.toMatrix_apply, Matrix.of_apply, e k]
 
 theorem detOn_one (V : Submodule ℂ (Fin n → ℂ)) : detOn (1 : Matrix (Fin n) (Fin n) ℂ) V = 1 := by
-  have h' : ∀ y ∈ V, Matrix.toLin' (1 : Matrix (Fin n) (Fin n) ℂ) y ∈ V := fun y hy => by simpa using hy
+  have h' : ∀ y ∈ V, Matrix.toLin' (1 : Matrix (Fin n) (Fin n) ℂ) y ∈ V := fun y hy => by
+    simpa using hy
   rw [detOn, dite_eq_left h']
   have hid : (Matrix.toLin' (1 : Matrix (Fin n) (Fin n) ℂ)).restrict h' = LinearMap.id :=
     LinearMap.ext fun y => Subtype.ext (by simp [LinearMap.restrict_apply])
   rw [hid, LinearMap.det_id, norm_one]
 
-private theorem detOn_le_one_of_unitary_of_invariant (U : Matrix (Fin n) (Fin n) ℂ) (V : Submodule ℂ (Fin n → ℂ))
-    (hU : Uᴴ * U = 1) (hV : ∀ y ∈ V, U *ᵥ y ∈ V) : detOn U V ≤ 1 := by
+private theorem detOn_le_one_of_unitary_of_invariant
+    (U : Matrix (Fin n) (Fin n) ℂ) (V : Submodule ℂ (Fin n → ℂ))
+    (hU : Uᴴ * U = 1) (hV : ∀ y ∈ V, U *ᵥ y ∈ V)
+    : detOn U V ≤ 1 := by
   obtain ⟨D, hDc, hD⟩ := exists_cont_detOn V
   have hKc : IsCompact {X : Matrix (Fin n) (Fin n) ℂ | Xᴴ * X = 1} := by
     have hcl : IsClosed {X : Matrix (Fin n) (Fin n) ℂ | Xᴴ * X = 1} :=
       isClosed_eq (continuous_id.matrix_conjTranspose.matrix_mul continuous_id) continuous_const
-    have hbox : IsCompact (Set.pi Set.univ fun _ : Fin n => Set.pi Set.univ fun _ : Fin n =>
-        Metric.closedBall (0 : ℂ) 1 : Set (Matrix (Fin n) (Fin n) ℂ)) :=
+    have hbox : IsCompact
+        (Set.pi Set.univ fun _ : Fin n =>
+            Set.pi Set.univ fun _ : Fin n => Metric.closedBall (0 : ℂ) 1
+          : Set (Matrix (Fin n) (Fin n) ℂ)) :=
       isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall 0 1
     refine hbox.of_isClosed_subset hcl ?_
     intro X hX
@@ -82,16 +88,21 @@ private theorem detOn_le_one_of_unitary_of_invariant (U : Matrix (Fin n) (Fin n)
   have hmem : (U ^ k)ᴴ * U ^ k = 1 := Matrix.mem_unitaryGroup_iff'.1 (pow_mem hUg k)
   have hb := hC (U ^ k) hmem
   rw [← hD _ (hpow k).1, (hpow k).2, Real.norm_eq_abs,
-    abs_of_nonneg (pow_nonneg (GlobalTheory.FlagMeas.SizeMove.detOn_nonneg U V) k)] at hb
+      abs_of_nonneg (pow_nonneg (GlobalTheory.FlagMeas.SizeMove.detOn_nonneg U V) k)]
+    at hb
   linarith
 
-theorem detOn_le_one {ε : Fin n → Bool} {a : ℕ} {W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)}
-    {l : Formalism.REAL.UJ ε} (hl : l ∈ maxK ε ∩ flagM ε W) (i : Fin (a + 1)) : detOn (uMat l) (W i) ≤ 1 := by
+theorem detOn_le_one
+    {ε : Fin n → Bool} {a : ℕ} {W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)} {l : Formalism.REAL.UJ ε}
+    (hl : l ∈ maxK ε ∩ flagM ε W) (i : Fin (a + 1))
+    : detOn (uMat l) (W i) ≤ 1 := by
   have hl2 : ∀ i, ∀ y ∈ W i, uMat l *ᵥ y ∈ W i ∧ (uMat l)ᴴ *ᵥ y ∈ W i := hl.2
   exact detOn_le_one_of_unitary_of_invariant _ _ hl.1 (fun y hy => (hl2 i y hy).1)
 
-theorem detOn_eq_one {ε : Fin n → Bool} {a : ℕ} {W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)}
-    {l : Formalism.REAL.UJ ε} (hl : l ∈ maxK ε ∩ flagM ε W) (i : Fin (a + 1)) : detOn (uMat l) (W i) = 1 := by
+theorem detOn_eq_one
+    {ε : Fin n → Bool} {a : ℕ} {W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)} {l : Formalism.REAL.UJ ε}
+    (hl : l ∈ maxK ε ∩ flagM ε W) (i : Fin (a + 1))
+    : detOn (uMat l) (W i) = 1 := by
   have hl2 : ∀ i, ∀ y ∈ W i, uMat l *ᵥ y ∈ W i ∧ (uMat l)ᴴ *ᵥ y ∈ W i := hl.2
   have hU : (uMat l)ᴴ * uMat l = 1 := hl.1
   have hU' : (uMat l)ᴴᴴ * (uMat l)ᴴ = 1 := by
@@ -100,19 +111,21 @@ theorem detOn_eq_one {ε : Fin n → Bool} {a : ℕ} {W : Fin (a + 1) → Submod
   have h1 := detOn_le_one hl i
   have h2 := detOn_le_one_of_unitary_of_invariant _ (W i) hU' (fun y hy => (hl2 i y hy).2)
   have hprod : detOn ((uMat l)ᴴ) (W i) * detOn (uMat l) (W i) = 1 := by
-    rw [← GlobalTheory.FlagMeas.SizeMove.detOn_mul _ _ _ (fun y hy => (hl2 i y hy).2) (fun y hy => (hl2 i y hy).1), hU,
-      detOn_one]
+    rw [← GlobalTheory.FlagMeas.SizeMove.detOn_mul _ _ _
+        (fun y hy => (hl2 i y hy).2)
+        (fun y hy => (hl2 i y hy).1),
+      hU, detOn_one]
   have h3 := GlobalTheory.FlagMeas.SizeMove.detOn_nonneg (uMat l) (W i)
   have h4 := GlobalTheory.FlagMeas.SizeMove.detOn_nonneg ((uMat l)ᴴ) (W i)
   exact le_antisymm h1 (by nlinarith)
 
-theorem measurable_layerProd {a : ℕ} (j : Fin a → ℕ) :
-    Measurable fun τ : Fin a → ℝ => layerProd n 1 j τ id := by
+theorem measurable_layerProd {a : ℕ} (j : Fin a → ℕ)
+    : Measurable fun τ : Fin a → ℝ => layerProd n 1 j τ id := by
   unfold layerProd
   fun_prop
 
-theorem continuousAt_layerProd {a : ℕ} (j : Fin a → ℕ) :
-    Filter.Tendsto (fun τ : Fin a → ℝ => layerProd n 1 j τ id) (nhds 1) (nhds 1) := by
+theorem continuousAt_layerProd {a : ℕ} (j : Fin a → ℕ)
+    : Filter.Tendsto (fun τ : Fin a → ℝ => layerProd n 1 j τ id) (nhds 1) (nhds 1) := by
   have hc : ContinuousAt (fun τ : Fin a → ℝ => layerProd n 1 j τ id) 1 := by
     unfold layerProd
     fun_prop (disch := simp)
@@ -120,14 +133,26 @@ theorem continuousAt_layerProd {a : ℕ} (j : Fin a → ℕ) :
   simpa [h1] using hc.tendsto
 
 open scoped Matrix.Norms.Frobenius in
-theorem exists_ball {s : Set (Matrix (Fin n) (Fin n) ℂ)} (hs : s ∈ nhds 1) :
-    ∃ t : ℝ, 0 < t ∧ ∀ X, nrm (X - 1) < t → X ∈ s := by
+theorem exists_ball {s : Set (Matrix (Fin n) (Fin n) ℂ)} (hs : s ∈ nhds 1)
+    : ∃ t : ℝ, 0 < t ∧ ∀ X, nrm (X - 1) < t → X ∈ s := by
   obtain ⟨t, ht, hsub⟩ := Metric.mem_nhds_iff.mp hs
   refine ⟨t, ht, fun X hX => hsub ?_⟩
   rw [Metric.mem_ball, dist_eq_norm, ← nrm_eq]
   exact hX
 
-theorem dlt_props : ∀ (n : ℕ) (ε : Fin n → Bool) (a : ℕ) (j : Fin a → ℕ) (W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)), Measurable (dlt (ε := ε) j W) ∧ (∀ l ∈ maxK ε ∩ flagM ε W, ∀ m ∈ flagM ε W, dlt j W (m * l) = dlt j W m) ∧ ∀ η : ℝ, 0 < η → ∃ t : ℝ, 0 < t ∧ ∀ m ∈ flagM ε W, nrm (uMat m - 1) < t → dlt j W m ≤ ENNReal.ofReal (1 + η) ∧ 1 ≤ ENNReal.ofReal (1 + η) * dlt j W m := by
+theorem dlt_props
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (a : ℕ) (j : Fin a → ℕ)
+        (W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)),
+      Measurable (dlt (ε := ε) j W)
+        ∧ (∀ l ∈ maxK ε ∩ flagM ε W, ∀ m ∈ flagM ε W, dlt j W (m * l) = dlt j W m)
+        ∧ ∀ η : ℝ,
+          0 < η
+            → ∃ t : ℝ,
+              0 < t
+                ∧ ∀ m ∈ flagM ε W,
+                  nrm (uMat m - 1) < t
+                    → dlt j W m ≤ ENNReal.ofReal (1 + η)
+                      ∧ 1 ≤ ENNReal.ofReal (1 + η) * dlt j W m := by
   intro n ε a j W
   refine ⟨?_, ?_, ?_⟩
   · unfold dlt
@@ -141,9 +166,11 @@ theorem dlt_props : ∀ (n : ℕ) (ε : Fin n → Bool) (a : ℕ) (j : Fin a →
       funext i
       simp only [locSize]
       rw [hmul,
-        GlobalTheory.FlagMeas.SizeMove.detOn_mul (uMat m) (uMat l) (W i.succ) (fun y hy => (hm2 i.succ y hy).1)
+        GlobalTheory.FlagMeas.SizeMove.detOn_mul (uMat m) (uMat l) (W i.succ)
+          (fun y hy => (hm2 i.succ y hy).1)
           (fun y hy => (hl2 i.succ y hy).1),
-        GlobalTheory.FlagMeas.SizeMove.detOn_mul (uMat m) (uMat l) (W i.castSucc) (fun y hy => (hm2 i.castSucc y hy).1)
+        GlobalTheory.FlagMeas.SizeMove.detOn_mul (uMat m) (uMat l) (W i.castSucc)
+          (fun y hy => (hm2 i.castSucc y hy).1)
           (fun y hy => (hl2 i.castSucc y hy).1),
         detOn_eq_one hl i.succ, detOn_eq_one hl i.castSucc, mul_one, mul_one]
     unfold dlt
@@ -174,7 +201,8 @@ theorem dlt_props : ∀ (n : ℕ) (ε : Fin n → Bool) (a : ℕ) (j : Fin a →
     have hGm : G (uMat m) = locSize j W (uMat m) := by
       funext i
       simp only [hGdef, locSize]
-      rw [hD i.succ _ (fun y hy => (hm2 i.succ y hy).1), hD i.castSucc _ (fun y hy => (hm2 i.castSucc y hy).1)]
+      rw [hD i.succ _ (fun y hy => (hm2 i.succ y hy).1),
+        hD i.castSucc _ (fun y hy => (hm2 i.castSucc y hy).1)]
     simp only [Set.mem_preimage, Function.comp_apply, hGm, Set.mem_Ioo] at hin
     obtain ⟨hlo, hhi⟩ := hin
     unfold dlt

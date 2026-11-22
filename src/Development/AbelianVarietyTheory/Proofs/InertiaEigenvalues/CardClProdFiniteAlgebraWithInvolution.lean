@@ -25,24 +25,38 @@ def u₁ (x : (B₁.prod B₂).Aˣ) : B₁.Aˣ := Units.map (RingHom.fst B₁.A 
 def u₂ (x : (B₁.prod B₂).Aˣ) : B₂.Aˣ := Units.map (RingHom.snd B₁.A B₂.A).toMonoidHom x
 
 def toPair : (B₁.prod B₂).Cl → B₁.Cl × B₂.Cl :=
-  Quot.lift (fun x => (Quot.mk _ ⟨u₁ B₁ B₂ x.1, congrArg Prod.fst x.2⟩,
-      Quot.mk _ ⟨u₂ B₁ B₂ x.1, congrArg Prod.snd x.2⟩)) (by
-    rintro x y ⟨u, hu⟩
-    refine Prod.ext (Quot.sound ⟨u₁ B₁ B₂ u, congrArg Prod.fst hu⟩)
-      (Quot.sound ⟨u₂ B₁ B₂ u, congrArg Prod.snd hu⟩))
+  Quot.lift
+    (fun x => (
+      Quot.mk _ ⟨u₁ B₁ B₂ x.1, congrArg Prod.fst x.2⟩,
+      Quot.mk _ ⟨u₂ B₁ B₂ x.1, congrArg Prod.snd x.2⟩
+    ))
+    (by
+      rintro x y ⟨u, hu⟩
+      refine Prod.ext (Quot.sound ⟨u₁ B₁ B₂ u, congrArg Prod.fst hu⟩)
+        (Quot.sound ⟨u₂ B₁ B₂ u, congrArg Prod.snd hu⟩))
 
 def ofPair : B₁.Cl × B₂.Cl → (B₁.prod B₂).Cl := fun p =>
-  Quot.lift₂ (r := _) (s := _) (fun (a : {x : B₁.Aˣ // B₁.σ (x : B₁.A) = x})
-      (b : {x : B₂.Aˣ // B₂.σ (x : B₂.A) = x}) =>
+  Quot.lift₂ (r := _) (s := _)
+    (fun (a : {x : B₁.Aˣ // B₁.σ (x : B₁.A) = x}) (b : {x : B₂.Aˣ // B₂.σ (x : B₂.A) = x}) =>
       (Quot.mk _ ⟨mkU B₁ B₂ a.1 b.1, Prod.ext a.2 b.2⟩ : (B₁.prod B₂).Cl))
     (by
       rintro a b c ⟨u, hu⟩
-      exact Quot.sound ⟨mkU B₁ B₂ 1 u, Prod.ext
-        (show ((a.1 : B₁.Aˣ) : B₁.A) = a.1 * (((1 : B₁.Aˣ) : B₁.A) * B₁.σ ((1 : B₁.Aˣ) : B₁.A)) by simp) hu⟩)
+      exact Quot.sound ⟨
+        mkU B₁ B₂ 1 u,
+        Prod.ext
+          (show ((a.1 : B₁.Aˣ) : B₁.A) = a.1 * (((1 : B₁.Aˣ) : B₁.A) * B₁.σ ((1 : B₁.Aˣ) : B₁.A)) by
+            simp)
+          hu
+      ⟩)
     (by
       rintro a b c ⟨u, hu⟩
-      exact Quot.sound ⟨mkU B₁ B₂ u 1, Prod.ext hu
-        (show ((c.1 : B₂.Aˣ) : B₂.A) = c.1 * (((1 : B₂.Aˣ) : B₂.A) * B₂.σ ((1 : B₂.Aˣ) : B₂.A)) by simp)⟩) p.1 p.2
+      exact Quot.sound ⟨
+        mkU B₁ B₂ u 1,
+        Prod.ext hu
+          (show ((c.1 : B₂.Aˣ) : B₂.A) = c.1 * (((1 : B₂.Aˣ) : B₂.A) * B₂.σ ((1 : B₂.Aˣ) : B₂.A)) by
+            simp)
+      ⟩)
+    p.1 p.2
 
 def clEquiv : (B₁.prod B₂).Cl ≃ B₁.Cl × B₂.Cl where
   toFun := toPair B₁ B₂
@@ -54,11 +68,12 @@ def clEquiv : (B₁.prod B₂).Cl ≃ B₁.Cl × B₂.Cl where
   right_inv := by
     rintro ⟨k₁, k₂⟩
     induction k₁ using Quot.ind with
-    | mk a => induction k₂ using Quot.ind with
+    | mk a =>
+      induction k₂ using Quot.ind with
       | mk b => rfl
 
-theorem card_cl_prod (K : UQ) (B₁ B₂ : InvAlg K) :
-    Nat.card (B₁.prod B₂).Cl = Nat.card B₁.Cl * Nat.card B₂.Cl := by
+theorem card_cl_prod (K : UQ) (B₁ B₂ : InvAlg K)
+    : Nat.card (B₁.prod B₂).Cl = Nat.card B₁.Cl * Nat.card B₂.Cl := by
   rw [Nat.card_congr (clEquiv B₁ B₂), Nat.card_prod]
 
 end GlobalTheory.UnitLemma.InvAlg.ClProd

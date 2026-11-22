@@ -13,15 +13,36 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOf
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
+  IsLocalRing
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPel.HT
 
 namespace GlobalTheory.LieCoordMult
 
-theorem lieMult_iff_finrank_eig : ∀ (W : Type) [CommRing W] (G : Over (Sp W)) [GrpObj G] [IsCommMonObj G] (O : Type) [CommRing O] (act : OAct O G) (n : ℕ) (k : Type) [Field k] (β : W →+* k) (T : (Fin n → k) → (epsPtR (spMap β) ⟶ G)) (A : O → Matrix (Fin n) (Fin n) k), Function.Injective T → (∀ v : epsPtR (spMap β) ⟶ G, spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ v.left = (1 : Over.mk (spMap β) ⟶ G).left ↔ v ∈ Set.range T) → (∀ c c', T (c + c') = T c * T c') → (∀ (s : k) c, (T (s • c)).left = spMap (ReciprocityTheory.ChartRestriction.G.Geo.Tor.epsScaleR s) ≫ (T c).left) → (∀ a c, T c ≫ act.act a = T ((A a).mulVec c)) → ∀ (τ : O →+* k) (N : ℕ), LieMult act (spMap β) τ N ↔ Module.finrank k (⨅ a, LinearMap.ker (Matrix.mulVecLin (A a) - τ a • LinearMap.id) : Submodule k (Fin n → k)) = N := by
+theorem lieMult_iff_finrank_eig
+    : ∀ (W : Type) [CommRing W] (G : Over (Sp W)) [GrpObj G] [IsCommMonObj G] (O : Type)
+        [CommRing O] (act : OAct O G) (n : ℕ) (k : Type) [Field k] (β : W →+* k)
+        (T : (Fin n → k) → (epsPtR (spMap β) ⟶ G)) (A : O → Matrix (Fin n) (Fin n) k),
+      Function.Injective T
+        → (∀ v : epsPtR (spMap β) ⟶ G,
+          spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ v.left = (1 : Over.mk (spMap β) ⟶ G).left
+            ↔ v ∈ Set.range T)
+        → (∀ c c', T (c + c') = T c * T c')
+        → (∀ (s : k) c,
+          (T (s • c)).left
+            = spMap (ReciprocityTheory.ChartRestriction.G.Geo.Tor.epsScaleR s) ≫ (T c).left)
+        → (∀ a c, T c ≫ act.act a = T ((A a).mulVec c))
+        → ∀ (τ : O →+* k) (N : ℕ),
+          LieMult act (spMap β) τ N
+            ↔ Module.finrank k
+                (⨅ a, LinearMap.ker (Matrix.mulVecLin (A a) - τ a • LinearMap.id)
+                  : Submodule k (Fin n → k))
+              = N := by
   intro W _ G _ _ O _ act n k _ β T A hinj htan hadd hsc hact τ N
   set E : Submodule k (Fin n → k) :=
     ⨅ a, LinearMap.ker (Matrix.mulVecLin (A a) - τ a • LinearMap.id) with hE
@@ -32,7 +53,9 @@ theorem lieMult_iff_finrank_eig : ∀ (W : Type) [CommRing W] (G : Over (Sp W)) 
     have h := hadd 0 0
     rw [add_zero] at h
     exact mul_eq_left.mp h.symm
-  have Tsum : ∀ (m : ℕ) (y : Fin m → (Fin n → k)), (List.ofFn (fun i => T (y i))).prod = T (∑ i, y i) := by
+  have Tsum
+      : ∀ (m : ℕ) (y : Fin m → (Fin n → k)),
+        (List.ofFn (fun i => T (y i))).prod = T (∑ i, y i) := by
     intro m
     induction m with
     | zero => intro y; simp [T0]
@@ -49,13 +72,16 @@ theorem lieMult_iff_finrank_eig : ∀ (W : Type) [CommRing W] (G : Over (Sp W)) 
       refine ⟨(htan _).2 ⟨x, rfl⟩, fun a => ?_⟩
       rw [hact, (memE x).1 hx a, hsc]
       rfl
-  have comb : ∀ (x : Fin N → (Fin n → k)) (y : Fin n → k) (c : Fin N → k),
-      (∃ u : Fin N → (epsPt (spMap β) ⟶ G), (∀ i, (u i).left = spMap (epsScale (c i)) ≫ (T (x i)).left) ∧
-        T y = (List.ofFn u).prod) ↔ y = ∑ i, c i • x i := by
+  have comb
+      : ∀ (x : Fin N → (Fin n → k)) (y : Fin n → k) (c : Fin N → k),
+        (∃ u : Fin N → (epsPt (spMap β) ⟶ G),
+            (∀ i, (u i).left = spMap (epsScale (c i)) ≫ (T (x i)).left) ∧ T y = (List.ofFn u).prod)
+          ↔ y = ∑ i, c i • x i := by
     intro x y c
     constructor
     · rintro ⟨u, hu, hy⟩
-      have hu' : u = fun i => T (c i • x i) := funext fun i => Over.OverMorphism.ext ((hu i).trans (hsc _ _).symm)
+      have hu' : u = fun i => T (c i • x i) :=
+        funext fun i => Over.OverMorphism.ext ((hu i).trans (hsc _ _).symm)
       rw [hu', Tsum] at hy
       exact hinj hy
     · intro hy

@@ -14,7 +14,9 @@ namespace GlobalTheory.RowLatAssembly
 
 open Formalism.MainNotions.S
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E} {r : ℕ} {T : E}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {S : Formalism.BasicNotions.HSpace E} {r : ℕ} {T : E}
 
 lemma Xa_le_X (F : FlagG S r T) (j : ℕ) : F.Xa j ≤ F.X := by
   unfold FlagG.Xa FlagG.X
@@ -118,7 +120,17 @@ lemma exists_section (F : FlagG S r T) (Λ : Submodule (𝓞 E) S.V)
     exact ⟨1, map_one _⟩
   exact key 1 h1
 
-theorem xLam_eq_span : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (S : Formalism.BasicNotions.HSpace E) (r : ℕ) (T : E) (G : Formalism.MainNotions.S.Lat.LFlag S r T) (Λ : Submodule (𝓞 E) S.V) (J : Fin r → FractionalIdeal (nonZeroDivisors (𝓞 E)) E), (∀ a, J a ≠ 0) → (∀ (a : Fin r) (x : S.V), x ∈ Λ → x ∈ G.fl.Xa (a.val + 1) → G.fl.coefX x a ∈ J a) → (∀ (a : Fin r) (t : E), t ∈ J a → ∃ x ∈ Λ, x ∈ G.fl.Xa (a.val + 1) ∧ G.fl.coefX x a = t) → ∃ e' : Fin r → S.V, (∀ a, e' a - G.fl.e a ∈ G.fl.Xa a.val) ∧ Formalism.MainNotions.S.Lat.XLam Λ G = Submodule.span (𝓞 E) {y | ∃ (a : Fin r) (x : E), x ∈ J a ∧ y = x • e' a} := by
+theorem xLam_eq_span
+    : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (S : Formalism.BasicNotions.HSpace E)
+        (r : ℕ) (T : E) (G : Formalism.MainNotions.S.Lat.LFlag S r T) (Λ : Submodule (𝓞 E) S.V)
+        (J : Fin r → FractionalIdeal (nonZeroDivisors (𝓞 E)) E),
+      (∀ a, J a ≠ 0)
+        → (∀ (a : Fin r) (x : S.V), x ∈ Λ → x ∈ G.fl.Xa (a.val + 1) → G.fl.coefX x a ∈ J a)
+        → (∀ (a : Fin r) (t : E), t ∈ J a → ∃ x ∈ Λ, x ∈ G.fl.Xa (a.val + 1) ∧ G.fl.coefX x a = t)
+        → ∃ e' : Fin r → S.V,
+          (∀ a, e' a - G.fl.e a ∈ G.fl.Xa a.val)
+            ∧ Formalism.MainNotions.S.Lat.XLam Λ G
+              = Submodule.span (𝓞 E) {y | ∃ (a : Fin r) (x : E), x ∈ J a ∧ y = x • e' a} := by
   intro E _ _ _ S r T G Λ J hJ h2 h3
   have hsec : ∀ a : Fin r, ∃ w ∈ G.fl.Xa (a.val + 1), G.fl.coefX w a = 1 ∧ ∀ t ∈ J a, t • w ∈ Λ :=
     fun a => exists_section G.fl Λ (J a) (hJ a) a (h3 a)
@@ -128,9 +140,13 @@ theorem xLam_eq_span : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (S 
     have h := sub_smul_mem G.fl a (he'X a) (e_mem G.fl a) hea
     rwa [he'c a, one_smul] at h
   · apply le_antisymm
-    ·
-      have step : ∀ j : ℕ, j ≤ r → ∀ v ∈ Λ, v ∈ G.fl.Xa j →
-          v ∈ Submodule.span (𝓞 E) {y | ∃ (a : Fin r) (x : E), x ∈ J a ∧ y = x • e' a} := by
+    · have step
+          : ∀ j : ℕ,
+            j ≤ r
+              → ∀ v ∈ Λ,
+                v ∈ G.fl.Xa j
+                  → v
+                    ∈ Submodule.span (𝓞 E) {y | ∃ (a : Fin r) (x : E), x ∈ J a ∧ y = x • e' a} := by
         intro j
         induction j with
         | zero =>
@@ -148,8 +164,9 @@ theorem xLam_eq_span : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (S 
             sub_smul_mem G.fl a hv (he'X a) (he'c a)
           have hrestΛ : v - G.fl.coefX v a • e' a ∈ Λ := Λ.sub_mem hvΛ (he'Λ a _ hc)
           have hlow := ih (Nat.le_of_succ_le hj) _ hrestΛ hrest
-          have htop : G.fl.coefX v a • e' a ∈
-              Submodule.span (𝓞 E) {y | ∃ (a : Fin r) (x : E), x ∈ J a ∧ y = x • e' a} :=
+          have htop
+              : G.fl.coefX v a • e' a
+                ∈ Submodule.span (𝓞 E) {y | ∃ (a : Fin r) (x : E), x ∈ J a ∧ y = x • e' a} :=
             Submodule.subset_span ⟨a, _, hc, rfl⟩
           have hsum := Submodule.add_mem _ hlow htop
           rwa [sub_add_cancel] at hsum

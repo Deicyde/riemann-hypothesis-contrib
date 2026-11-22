@@ -6,9 +6,11 @@ public import Development.AbelianVarietyTheory.Counterexamples.PlaceInjectivity.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
 open IsDedekindDomain NumberField MeasureTheory
-open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix ENNReal Classical
+open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix ENNReal
+  Classical
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Chr incM)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -19,28 +21,33 @@ namespace GlobalTheory.InfTraceNondeg
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem norm_algebraMap_apply (x : K) (v : InfinitePlace K) :
-    ‖(algebraMap K (InfiniteAdeleRing K) x) v‖ = v x := by
-  simp [InfiniteAdeleRing.algebraMap_apply, AbsoluteValue.Completion.norm_coe, InfinitePlace.coe_apply]
+theorem norm_algebraMap_apply (x : K) (v : InfinitePlace K)
+    : ‖(algebraMap K (InfiniteAdeleRing K) x) v‖ = v x := by
+  simp [InfiniteAdeleRing.algebraMap_apply, AbsoluteValue.Completion.norm_coe,
+    InfinitePlace.coe_apply]
 
-theorem norm_eq_of_cont (χ : InfiniteAdeleRing K →+* ℂ) (hχ : Continuous χ) (φ : K →+* ℂ)
-    (h : ∀ x, χ (algebraMap K _ x) = φ x) (a : InfiniteAdeleRing K) :
-    ‖χ a‖ = ‖a (InfinitePlace.mk φ)‖ := by
+theorem norm_eq_of_cont
+    (χ : InfiniteAdeleRing K →+* ℂ) (hχ : Continuous χ)
+    (φ : K →+* ℂ) (h : ∀ x, χ (algebraMap K _ x) = φ x)
+    (a : InfiniteAdeleRing K)
+    : ‖χ a‖ = ‖a (InfinitePlace.mk φ)‖ := by
   have hc1 : Continuous fun a => ‖χ a‖ := hχ.norm
   have hc2 : Continuous fun a : InfiniteAdeleRing K => ‖a (InfinitePlace.mk φ)‖ :=
     (continuous_apply (InfinitePlace.mk φ)).norm
-  refine congrFun ((InfiniteAdeleRing.denseRange_algebraMap K).equalizer hc1 hc2 (funext fun x => ?_)) a
+  refine congrFun
+    ((InfiniteAdeleRing.denseRange_algebraMap K).equalizer hc1 hc2 (funext fun x => ?_)) a
   simp only [Function.comp, h, norm_algebraMap_apply, InfinitePlace.apply]
 
 end GlobalTheory.InfTraceNondeg
 
 namespace GlobalTheory.InfTraceNondeg
 
-
 set_option synthInstance.maxHeartbeats 400000 in
-theorem realTrace_nondeg : ∀ (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)),
-    IsInfFam θ → ∀ a : Ainf D.host.F, a ≠ 0 →
-      ∃ b : Ainf D.host.F, (∑ ρ, θ ρ ((a * b) ⊗ₜ[D.host.F] (1 : D.host.E))).re ≠ 0 := by
+theorem realTrace_nondeg
+    : ∀ (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)),
+      IsInfFam θ
+        → ∀ a : Ainf D.host.F,
+          a ≠ 0 → ∃ b : Ainf D.host.F, (∑ ρ, θ ρ ((a * b) ⊗ₜ[D.host.F] (1 : D.host.E))).re ≠ 0 := by
   intro D θ hθ a ha
   obtain ⟨v, hv⟩ : ∃ v, a v ≠ 0 := by
     by_contra h
@@ -51,12 +58,16 @@ theorem realTrace_nondeg : ∀ (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F �
   let χ : D.what₂.Tau → (Ainf D.host.F →+* ℂ) := fun σ =>
     (θ σ).comp Algebra.TensorProduct.includeLeftRingHom
   have hχapp : ∀ σ c, χ σ c = θ σ (c ⊗ₜ[D.host.F] (1 : D.host.E)) := fun _ _ => rfl
-  have hχalg : ∀ σ (x : D.host.F), χ σ (algebraMap D.host.F (Ainf D.host.F) x) =
-      ((tauE D σ).comp (algebraMap D.host.F D.host.E)) x := by
+  have hχalg
+      : ∀ σ (x : D.host.F),
+        χ σ (algebraMap D.host.F (Ainf D.host.F) x)
+          = ((tauE D σ).comp (algebraMap D.host.F D.host.E)) x := by
     intro σ x
-    rw [hχapp, ← Algebra.TensorProduct.algebraMap_apply, Algebra.TensorProduct.algebraMap_apply', (hθ σ).1]
+    rw [hχapp, ← Algebra.TensorProduct.algebraMap_apply, Algebra.TensorProduct.algebraMap_apply',
+      (hθ σ).1]
     rfl
-  have hnorm : ∀ σ c, ‖χ σ c‖ = ‖c (InfinitePlace.mk ((tauE D σ).comp (algebraMap D.host.F D.host.E)))‖ :=
+  have hnorm
+      : ∀ σ c, ‖χ σ c‖ = ‖c (InfinitePlace.mk ((tauE D σ).comp (algebraMap D.host.F D.host.E)))‖ :=
     fun σ c => norm_eq_of_cont (χ σ) (hθ σ).2 _ (hχalg σ) c
   have hmul : ∀ x y : Ainf D.host.F, ∀ u, (x * y) u = x u * y u := fun _ _ _ => rfl
   set e : Ainf D.host.F := Pi.single v 1 with he
@@ -100,7 +111,8 @@ theorem realTrace_nondeg : ∀ (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F �
     intro σ
     rw [← hχapp]
     rcases hidem σ with h | h <;> simp [h]
-  have hge : (θ ρ (e ⊗ₜ[D.host.F] (1 : D.host.E))).re ≤ ∑ σ, (θ σ (e ⊗ₜ[D.host.F] (1 : D.host.E))).re :=
+  have hge
+      : (θ ρ (e ⊗ₜ[D.host.F] (1 : D.host.E))).re ≤ ∑ σ, (θ σ (e ⊗ₜ[D.host.F] (1 : D.host.E))).re :=
     Finset.single_le_sum (fun σ _ => hterm σ) (Finset.mem_univ ρ)
   rw [← hχapp, hρ1, Complex.one_re] at hge
   linarith

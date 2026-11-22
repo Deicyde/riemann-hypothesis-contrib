@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MaxVSp
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions GlobalTheory.CharVal GlobalTheory.IndefiniteRowSideFullHecke.CharacterValuation
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions GlobalTheory.CharVal
+  GlobalTheory.IndefiniteRowSideFullHecke.CharacterValuation
 open nonZeroDivisors
 noncomputable section
 namespace GlobalTheory.CharVal.Vp
@@ -20,8 +22,9 @@ theorem ne0 (P : HeightOneSpectrum (𝓞 E)) : (P.asIdeal : FractionalIdeal (�
   FractionalIdeal.coeIdeal_ne_zero.2 P.ne_bot
 
 omit [StarRing E] in
-theorem maxV_self (P : HeightOneSpectrum (𝓞 E)) :
-    MaxV P ((P.asIdeal : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) (WithZero.exp (-1 : ℤ)) := by
+theorem maxV_self (P : HeightOneSpectrum (𝓞 E))
+    : MaxV P ((P.asIdeal : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E)
+      (WithZero.exp (-1 : ℤ)) := by
   constructor
   · intro a ha
     obtain ⟨r, hr, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 ha
@@ -35,8 +38,8 @@ theorem maxV_self (P : HeightOneSpectrum (𝓞 E)) :
     · rw [HeightOneSpectrum.valuation_of_algebraMap, hr]
 
 omit [StarRing E] in
-theorem maxV_ne (Q P : HeightOneSpectrum (𝓞 E)) (h : Q ≠ P) :
-    MaxV Q ((P.asIdeal : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) 1 := by
+theorem maxV_ne (Q P : HeightOneSpectrum (𝓞 E)) (h : Q ≠ P)
+    : MaxV Q ((P.asIdeal : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) 1 := by
   constructor
   · intro a ha
     obtain ⟨r, hr, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 ha
@@ -44,17 +47,24 @@ theorem maxV_ne (Q P : HeightOneSpectrum (𝓞 E)) (h : Q ≠ P) :
   · have : ¬ P.asIdeal ≤ Q.asIdeal := fun hle =>
       h (HeightOneSpectrum.ext (P.isMaximal.eq_of_le Q.isPrime.ne_top hle).symm)
     obtain ⟨r, hr, hr'⟩ := SetLike.not_le_iff_exists.1 this
-    exact ⟨algebraMap _ _ r, (FractionalIdeal.mem_coeIdeal _).2 ⟨r, hr, rfl⟩,
-      (HeightOneSpectrum.valuation_eq_one_iff_notMem Q).2 hr'⟩
+    exact ⟨
+      algebraMap _ _ r,
+      (FractionalIdeal.mem_coeIdeal _).2 ⟨r, hr, rfl⟩,
+      (HeightOneSpectrum.valuation_eq_one_iff_notMem Q).2 hr'
+    ⟩
 
 omit [StarRing E] in
-theorem maxV_inv {Q P : HeightOneSpectrum (𝓞 E)} {γ : WithZero (Multiplicative ℤ)} (h0 : γ ≠ 0)
-    (h : MaxV Q ((P.asIdeal : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) γ) :
-    MaxV Q (((P.asIdeal : FractionalIdeal (𝓞 E)⁰ E)⁻¹ : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) γ⁻¹ :=
+theorem maxV_inv
+    {Q P : HeightOneSpectrum (𝓞 E)} {γ : WithZero (Multiplicative ℤ)}
+    (h0 : γ ≠ 0) (h : MaxV Q ((P.asIdeal : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) γ)
+    : MaxV Q
+      (((P.asIdeal : FractionalIdeal (𝓞 E)⁰ E)⁻¹ : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E)
+      γ⁻¹ :=
   h.inv h0 (by rw [← FractionalIdeal.coe_mul, mul_inv_cancel₀ (ne0 P), FractionalIdeal.coe_one])
 
-theorem mem_vp (P : HeightOneSpectrum (𝓞 E)) (x : E) :
-    x ∈ vpIdeal P ↔ ∀ r ∈ (conjPrime₂ P).asIdeal, ∃ s ∈ P.asIdeal, algebraMap _ E s = x * algebraMap _ E r := by
+theorem mem_vp (P : HeightOneSpectrum (𝓞 E)) (x : E)
+    : x ∈ vpIdeal P
+      ↔ ∀ r ∈ (conjPrime₂ P).asIdeal, ∃ s ∈ P.asIdeal, algebraMap _ E s = x * algebraMap _ E r := by
   unfold vpIdeal
   rw [← div_eq_mul_inv, FractionalIdeal.mem_coe, FractionalIdeal.mem_div_iff_of_ne_zero (ne0 _)]
   constructor
@@ -64,7 +74,8 @@ theorem mem_vp (P : HeightOneSpectrum (𝓞 E)) (x : E) :
     obtain ⟨r, hr, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hy
     exact (FractionalIdeal.mem_coeIdeal _).2 (h r hr)
 
-theorem star_mem_vp (P : HeightOneSpectrum (𝓞 E)) (x : E) (h : x ∈ vpIdeal P) : star x ∈ vpIdeal (conjPrime₂ P) := by
+theorem star_mem_vp (P : HeightOneSpectrum (𝓞 E)) (x : E) (h : x ∈ vpIdeal P)
+    : star x ∈ vpIdeal (conjPrime₂ P) := by
   rw [mem_vp] at h ⊢
   intro r hr
   rw [conjP_conjP'] at hr
@@ -93,15 +104,28 @@ theorem detLat_vp (P : HeightOneSpectrum (𝓞 E)) : detLat (vpLat P) = vpIdeal 
     rw [this]
     exact (vpIdeal P).smul_mem r hx
 
-theorem vp_main : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)), P ≠ conjPrime₂ P → (∃ J : Submodule (𝓞 E) E, (∀ x, x ∈ J ↔ star x ∈ vpIdeal P) ∧ vpIdeal P * J = 1) ∧ MaxV P (vpIdeal P) (WithZero.exp (-1 : ℤ)) ∧ MaxV (conjPrime₂ P) (vpIdeal P) (WithZero.exp (1 : ℤ)) ∧ (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → Q ≠ conjPrime₂ P → MaxV Q (vpIdeal P) 1) ∧ detLat (vpLat P) = vpIdeal P := by
+theorem vp_main
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)),
+      P ≠ conjPrime₂ P
+        → (∃ J : Submodule (𝓞 E) E, (∀ x, x ∈ J ↔ star x ∈ vpIdeal P) ∧ vpIdeal P * J = 1)
+          ∧ MaxV P (vpIdeal P) (WithZero.exp (-1 : ℤ))
+          ∧ MaxV (conjPrime₂ P) (vpIdeal P) (WithZero.exp (1 : ℤ))
+          ∧ (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → Q ≠ conjPrime₂ P → MaxV Q (vpIdeal P) 1)
+          ∧ detLat (vpLat P) = vpIdeal P := by
   intro E _ _ _ P hP
-  refine ⟨⟨vpIdeal (conjPrime₂ P), fun x => ⟨fun h => ?_, fun h => ?_⟩, ?_⟩, ?_, ?_, fun Q h1 h2 => ?_, detLat_vp P⟩
+  refine ⟨
+    ⟨vpIdeal (conjPrime₂ P), fun x => ⟨fun h => ?_, fun h => ?_⟩, ?_⟩,
+    ?_,
+    ?_,
+    fun Q h1 h2 => ?_,
+    detLat_vp P
+  ⟩
   · have := star_mem_vp _ _ h
     rwa [conjP_conjP'] at this
   · simpa using star_mem_vp _ _ h
   · unfold vpIdeal
-    rw [conjP_conjP', ← FractionalIdeal.coe_mul, mul_assoc, inv_mul_cancel_left₀ (ne0 _), mul_inv_cancel₀ (ne0 _),
-      FractionalIdeal.coe_one]
+    rw [conjP_conjP', ← FractionalIdeal.coe_mul, mul_assoc, inv_mul_cancel_left₀ (ne0 _),
+      mul_inv_cancel₀ (ne0 _), FractionalIdeal.coe_one]
   · have := (maxV_self P).mul (maxV_inv one_ne_zero (maxV_ne P _ hP))
     rw [inv_one, mul_one, ← FractionalIdeal.coe_mul] at this
     exact this

@@ -112,13 +112,17 @@ theorem zero_detection_first : Detect0 := by
   have hE := eta_partial_sums ρ hre0 hρ1 (pNd M T) hN1
   rw [hζ, mul_zero, zero_sub, norm_neg] at hE
 
-  have hP : ∀ K : ℕ, ∑ n ∈ Icc 1 K, (1 : DirichletCharacter ℂ 1) (n : ZMod 1) * (n : ℂ) ^ (-ρ) =
-      ∑ n ∈ Icc 1 K, (n : ℂ) ^ (-ρ) :=
-    fun K => sum_congr rfl (fun n _ => by rw [one_char_apply, one_mul])
-  have hMI1 := mollifier_identity 1 (1 : DirichletCharacter ℂ 1) ρ (pYd M T) (pNd M T) (pYd M T * pNd M T)
-    hY1 hYN le_rfl
-  have hMI2 := mollifier_identity 1 (1 : DirichletCharacter ℂ 1) ρ (pYd M T) (2 * pNd M T)
-    (pYd M T * (2 * pNd M T)) hY1 (by omega) le_rfl
+  have hP
+      : ∀ K : ℕ,
+        ∑ n ∈ Icc 1 K, (1 : DirichletCharacter ℂ 1) (n : ZMod 1) * (n : ℂ) ^ (-ρ)
+          = ∑ n ∈ Icc 1 K, (n : ℂ) ^ (-ρ) := fun K =>
+    sum_congr rfl (fun n _ => by rw [one_char_apply, one_mul])
+  have hMI1 :=
+    mollifier_identity 1 (1 : DirichletCharacter ℂ 1) ρ (pYd M T) (pNd M T) (pYd M T * pNd M T) hY1
+      hYN le_rfl
+  have hMI2 :=
+    mollifier_identity 1 (1 : DirichletCharacter ℂ 1) ρ (pYd M T) (2 * pNd M T)
+      (pYd M T * (2 * pNd M T)) hY1 (by omega) le_rfl
   rw [hP] at hMI1 hMI2
   have hMo := mollM_norm_le (1 : DirichletCharacter ℂ 1) ρ hre0.le (pYd M T)
   have hz2 := two_cpow_norm_le ρ hre0.le
@@ -137,11 +141,11 @@ theorem zero_detection_first : Detect0 := by
     have hrho : 1 + ‖ρ‖ / ρ.re ≤ 3 * T := by
       have h1 : ‖ρ‖ ≤ ρ.re + T := by
         refine (Complex.norm_le_abs_re_add_abs_im ρ).trans ?_
-        rw [abs_of_pos hre0]; linarith
+        rw [abs_of_pos hre0]
+        linarith
       have h2 : ‖ρ‖ / ρ.re ≤ 1 + T / ρ.re := by
         rw [div_le_iff₀ hre0, add_mul, one_mul, div_mul_cancel₀ _ hre0.ne']; linarith
-      have h3 : T / ρ.re ≤ 4 / 3 * T := by
-        rw [div_le_iff₀ hre0]; nlinarith
+      have h3 : T / ρ.re ≤ 4 / 3 * T := by rw [div_le_iff₀ hre0]; nlinarith
       linarith
     have hpow : ((pNd M T : ℕ) : ℝ) ^ (-ρ.re) ≤ ((pNd M T : ℕ) : ℝ) ^ (-(3 / 4 : ℝ)) :=
       Real.rpow_le_rpow_of_exponent_le (by exact_mod_cast hN1) (by linarith)
@@ -160,16 +164,18 @@ theorem zero_detection_first : Detect0 := by
     have hPle : ‖P2 - z * P1‖ ≤ 12 * X * (1 / (X : ℝ) ^ (6 : ℕ)) := by
       refine hE.trans ?_
       have a3 : ((pNd M T : ℕ) : ℝ) ^ (-ρ.re) ≤ 1 / (X : ℝ) ^ (6 : ℕ) := hpow.trans hinv
-      calc 4 * (1 + ‖ρ‖ / ρ.re) * ((pNd M T : ℕ) : ℝ) ^ (-ρ.re)
-          ≤ 12 * X * ((pNd M T : ℕ) : ℝ) ^ (-ρ.re) :=
-            mul_le_mul_of_nonneg_right hc (Real.rpow_nonneg (Nat.cast_nonneg _) _)
+      calc
+        4 * (1 + ‖ρ‖ / ρ.re) * ((pNd M T : ℕ) : ℝ) ^ (-ρ.re)
+            ≤ 12 * X * ((pNd M T : ℕ) : ℝ) ^ (-ρ.re) :=
+          mul_le_mul_of_nonneg_right hc (Real.rpow_nonneg (Nat.cast_nonneg _) _)
         _ ≤ 12 * X * (1 / (X : ℝ) ^ (6 : ℕ)) := mul_le_mul_of_nonneg_left a3 (by positivity)
     rw [hYr]
-    calc ‖P2 - z * P1‖ * (X : ℝ) ^ (3 : ℕ) ≤ 12 * X * (1 / (X : ℝ) ^ (6 : ℕ)) * (X : ℝ) ^ (3 : ℕ) :=
-          mul_le_mul_of_nonneg_right hPle (by positivity)
+    calc
+      ‖P2 - z * P1‖ * (X : ℝ) ^ (3 : ℕ) ≤ 12 * X * (1 / (X : ℝ) ^ (6 : ℕ)) * (X : ℝ) ^ (3 : ℕ) :=
+        mul_le_mul_of_nonneg_right hPle (by positivity)
       _ = 12 / (X : ℝ) ^ 2 := by
-          have hX0 : (X : ℝ) ≠ 0 := hXpos.ne'
-          field_simp
+        have hX0 : (X : ℝ) ≠ 0 := hXpos.ne'
+        field_simp
   have hsmall : 12 / (X : ℝ) ^ 2 ≤ c₀ / (8 * Real.log X) := by
     have h96 : 96 ≤ (X : ℝ) * c₀ := by
       have h := Nat.ceil_le.mp hq
@@ -181,16 +187,18 @@ theorem zero_detection_first : Detect0 := by
     linear_combination (-1 : ℂ) * hMI2 + z * hMI1
   have hnorm : ‖1 - z‖ ≤ 12 / (X : ℝ) ^ 2 + ‖D2‖ + 2 * ‖D1‖ := by
     rw [hkey]
-    calc ‖(P2 - z * P1) * Mo - D2 + z * D1‖ ≤ ‖(P2 - z * P1) * Mo - D2‖ + ‖z * D1‖ := norm_add_le _ _
+    calc
+      ‖(P2 - z * P1) * Mo - D2 + z * D1‖
+        ≤ ‖(P2 - z * P1) * Mo - D2‖ + ‖z * D1‖ := norm_add_le _ _
       _ ≤ ‖(P2 - z * P1) * Mo‖ + ‖D2‖ + ‖z * D1‖ := by
-          have := norm_sub_le ((P2 - z * P1) * Mo) D2
-          linarith
+        have := norm_sub_le ((P2 - z * P1) * Mo) D2
+        linarith
       _ ≤ 12 / (X : ℝ) ^ 2 + ‖D2‖ + 2 * ‖D1‖ := by
-          rw [norm_mul, norm_mul]
-          have a1 : ‖P2 - z * P1‖ * ‖Mo‖ ≤ ‖P2 - z * P1‖ * (pYd M T : ℝ) :=
-            mul_le_mul_of_nonneg_left hMo (norm_nonneg _)
-          have a2 : ‖z‖ * ‖D1‖ ≤ 2 * ‖D1‖ := mul_le_mul_of_nonneg_right hz2 (norm_nonneg _)
-          linarith
+        rw [norm_mul, norm_mul]
+        have a1 : ‖P2 - z * P1‖ * ‖Mo‖ ≤ ‖P2 - z * P1‖ * (pYd M T : ℝ) :=
+          mul_le_mul_of_nonneg_left hMo (norm_nonneg _)
+        have a2 : ‖z‖ * ‖D1‖ ≤ 2 * ‖D1‖ := mul_le_mul_of_nonneg_right hz2 (norm_nonneg _)
+        linarith
   set θ : ℝ := c₀ / (24 * Real.log X) with hθ
   have hθ0 : 0 < θ := by positivity
   have hsum : 3 * θ < ‖D2‖ + 2 * ‖D1‖ := by
@@ -203,9 +211,10 @@ theorem zero_detection_first : Detect0 := by
     rw [hθ]; field_simp
   rw [hgoal]
   by_cases hc2 : θ ≤ ‖D2‖
-  · obtain ⟨j, hj, hjb⟩ := block_pigeon (pYd M T) (pJd M T + 1) (2 * pNd M T)
-      (fun n => (1 : DirichletCharacter ℂ 1) (n : ZMod 1)) ρ
-      (by unfold pNd; rw [pow_succ]; ring) (by omega) θ hc2
+  · obtain ⟨j, hj, hjb⟩ :=
+      block_pigeon (pYd M T) (pJd M T + 1) (2 * pNd M T)
+        (fun n => (1 : DirichletCharacter ℂ 1) (n : ZMod 1))
+        ρ (by unfold pNd; rw [pow_succ]; ring) (by omega) θ hc2
     refine ⟨1, by simp, j, hj, ?_⟩
     rw [pow_one]
     push_cast at hjb
@@ -213,9 +222,10 @@ theorem zero_detection_first : Detect0 := by
   · have hc1 : θ ≤ ‖D1‖ := by
       push Not at hc2
       linarith
-    obtain ⟨j, hj, hjb⟩ := block_pigeon (pYd M T) (pJd M T) (pNd M T)
-      (fun n => (1 : DirichletCharacter ℂ 1) (n : ZMod 1)) ρ
-      (by unfold pNd; rfl) (by omega) θ hc1
+    obtain ⟨j, hj, hjb⟩ :=
+      block_pigeon (pYd M T) (pJd M T) (pNd M T)
+        (fun n => (1 : DirichletCharacter ℂ 1) (n : ZMod 1))
+        ρ (by unfold pNd; rfl) (by omega) θ hc1
     refine ⟨0, by simp, j, ?_, ?_⟩
     · rw [mem_range] at hj ⊢; omega
     rw [pow_zero, one_mul]

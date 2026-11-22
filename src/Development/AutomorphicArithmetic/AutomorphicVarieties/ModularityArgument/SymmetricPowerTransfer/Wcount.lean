@@ -16,7 +16,10 @@ def gcount (H : Type) {Y : Type} [Group H] [MulAction H Y] (k : Y → ℂ) : ℂ
 def wcount {T Y : Type} [Group T] [MulAction T Y] (C : Subgroup T) (k : Y → ℂ) : ℂ :=
   ∑ᶠ o : orbitRel.Quotient T Y, ((stabilizer T o.out).relIndex C : ℂ) * k o.out
 
-def orb {T G : Type} [Group T] [Group G] (ι : T →* G) (C : Subgroup T) (θ : G →* G) (U : Subgroup G) (f : G → ℂ) (δ : G) : ℂ :=
+def orb
+    {T G : Type} [Group T] [Group G]
+    (ι : T →* G) (C : Subgroup T) (θ : G →* G) (U : Subgroup G) (f : G → ℂ) (δ : G)
+    : ℂ :=
   letI : MulAction T (G ⧸ U) := MulAction.compHom _ ι
   wcount C fun y : G ⧸ U => f (y.out⁻¹ * δ * θ y.out)
 

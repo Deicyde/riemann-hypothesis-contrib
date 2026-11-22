@@ -13,7 +13,8 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.CompanionTheory.RgKeyTransfer
 
-open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7 ReciprocityTheory.ChartRestriction.DS.Lap.LemK PositivityTheory.RgDs.K
+open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7
+  ReciprocityTheory.ChartRestriction.DS.Lap.LemK PositivityTheory.RgDs.K
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -85,8 +86,8 @@ lemma lop_sum_left {ι : Type*} (s : Finset ι) (c : ι → ℂ) (Y : ι → Mat
       Matrix.smul_mul, map_smul, smul_neg, Finset.sum_neg_distrib]
   · simp [lop, if_neg hz]
 
-def lwM (D : List (Matrix (Fin n) (Fin n) ℂ)) (F : Matrix (Fin n) (Fin n) ℂ → ℂ) :
-    Matrix (Fin n) (Fin n) ℂ → ℂ :=
+def lwM (D : List (Matrix (Fin n) (Fin n) ℂ)) (F : Matrix (Fin n) (Fin n) ℂ → ℂ)
+    : Matrix (Fin n) (Fin n) ℂ → ℂ :=
   D.foldr lop F
 
 lemma lw_mem (w : List (Fin n × Fin n)) {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : F ∈ OmF n) :
@@ -260,20 +261,25 @@ theorem transfer : Transfer := by
   have : IsFiniteMeasureOnCompacts (muK ε) := by unfold muK; infer_instance
   have hz : g⁻¹ * toMK k₀ ∈ U := (hWU g hgW).2
   have hop := continuous_op T
-  have hint : ∀ x ∈ (univ : Finset (Wd n m)), Integrable (fun k : KG ε =>
-      lWord (adW ε k (((ofW x).map fun p => Matrix.single p.1 p.2 (1 : ℂ)).map Neg.neg)) (PhiM μ)
-          (toMK k⁻¹ * (g⁻¹ * toMK k₀) * toMK k) *
-        (inner ℂ T.w (T.op k⁻¹ (a x)) * inner ℂ T.w (T.op (k₀ * k) T.w))) (muK ε) := fun x _ => by
+  have hint
+      : ∀ x ∈ (univ : Finset (Wd n m)),
+        Integrable
+          (fun k : KG ε =>
+            lWord (adW ε k (((ofW x).map fun p => Matrix.single p.1 p.2 (1 : ℂ)).map Neg.neg))
+                (PhiM μ) (toMK k⁻¹ * (g⁻¹ * toMK k₀) * toMK k)
+              * (inner ℂ T.w (T.op k⁻¹ (a x)) * inner ℂ T.w (T.op (k₀ * k) T.w)))
+          (muK ε) := fun x _ => by
     have h1 : Continuous fun k : KG ε => inner ℂ T.w (T.op k⁻¹ (a x)) :=
       continuous_const.inner ((hop.comp continuous_inv).clm_apply continuous_const)
     have h2 : Continuous fun k : KG ε => inner ℂ T.w (T.op (k₀ * k) T.w) :=
-      continuous_const.inner ((hop.comp (continuous_const.mul continuous_id)).clm_apply continuous_const)
+      continuous_const.inner ((hop.comp (continuous_const.mul continuous_id)).clm_apply
+        continuous_const)
     exact integrableOn_univ.mp
       ((((hword _).2.1 _ hz).mul (h1.mul h2)).continuousOn.integrableOn_compact isCompact_univ)
   unfold actF
-  rw [Finset.sum_apply, Finset.sum_congr rfl fun x _ =>
-    word_formula T μ hU hW hword hWU hloc (a x) (ofW x) hgW hgU, ← Finset.mul_sum,
-    ← integral_finsetSum _ hint]
+  rw [Finset.sum_apply,
+    Finset.sum_congr rfl fun x _ => word_formula T μ hU hW hword hWU hloc (a x) (ofW x) hgW hgU,
+    ← Finset.mul_sum, ← integral_finsetSum _ hint]
   congr 1
   refine integral_congr_ae (Filter.Eventually.of_forall fun k => ?_)
   show ∑ x : Wd n m, _ = betaF T μ (rhoA T m k⁻¹ a) (toMK k⁻¹ * (g⁻¹ * toMK k₀) * toMK k) * inner ℂ T.w (T.op (k₀ * k) T.w)

@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FixedOfPo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 open Pointwise
 
@@ -16,8 +18,9 @@ namespace GlobalTheory.TameConjInv
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω]
 
-theorem wild_mem_Ine (B : ValuationSubring Ω) {σ : G ℚ Ω}
-    (hσ : ∀ y : Ω, y ≠ 0 → B.valuation (σ y / y - 1) < 1) : σ ∈ Ine (F := ℚ) B := by
+theorem wild_mem_Ine
+    (B : ValuationSubring Ω) {σ : G ℚ Ω} (hσ : ∀ y : Ω, y ≠ 0 → B.valuation (σ y / y - 1) < 1)
+    : σ ∈ Ine (F := ℚ) B := by
   have hv : ∀ y : Ω, B.valuation (σ y) = B.valuation y := by
     intro y
     rcases eq_or_ne y 0 with rfl | hy
@@ -38,28 +41,38 @@ theorem wild_mem_Ine (B : ValuationSubring Ω) {σ : G ℚ Ω}
       rw [e, map_mul]
       exact lt_of_le_of_lt (mul_le_of_le_one_left' hx) (hσ x hx0)
 
-theorem map_one_eq_zero (B : ValuationSubring Ω) {P : Type} [AddCommGroup P] (F : G ℚ Ω → P)
-    (hadd : ∀ s ∈ Ine (F := ℚ) B, ∀ t ∈ Ine (F := ℚ) B, F (s * t) = F s + F t) : F 1 = 0 := by
+theorem map_one_eq_zero
+    (B : ValuationSubring Ω)
+    {P : Type} [AddCommGroup P]
+    (F : G ℚ Ω → P) (hadd : ∀ s ∈ Ine (F := ℚ) B, ∀ t ∈ Ine (F := ℚ) B, F (s * t) = F s + F t)
+    : F 1 = 0 := by
   have h := hadd 1 (one_mem _) 1 (one_mem _)
   rw [mul_one] at h
   simpa using h
 
-theorem map_pow_eq (B : ValuationSubring Ω) {P : Type} [AddCommGroup P] (F : G ℚ Ω → P)
-    (hadd : ∀ s ∈ Ine (F := ℚ) B, ∀ t ∈ Ine (F := ℚ) B, F (s * t) = F s + F t)
-    {s : G ℚ Ω} (hs : s ∈ Ine (F := ℚ) B) (k : ℕ) : F (s ^ k) = k • F s := by
+theorem map_pow_eq
+    (B : ValuationSubring Ω)
+    {P : Type} [AddCommGroup P]
+    (F : G ℚ Ω → P) (hadd : ∀ s ∈ Ine (F := ℚ) B, ∀ t ∈ Ine (F := ℚ) B, F (s * t) = F s + F t)
+    {s : G ℚ Ω} (hs : s ∈ Ine (F := ℚ) B)
+    (k : ℕ)
+    : F (s ^ k) = k • F s := by
   induction k with
   | zero => simpa using map_one_eq_zero B F hadd
-  | succ k ih =>
-    rw [pow_succ, hadd _ (pow_mem hs k) _ hs, ih, succ_nsmul]
+  | succ k ih => rw [pow_succ, hadd _ (pow_mem hs k) _ hs, ih, succ_nsmul]
 
 variable [IsAlgClosure ℚ Ω]
 
-theorem eq_zero_of_wild (l : ℕ) [Fact l.Prime] (n : ℕ) (B : ValuationSubring Ω)
-    (hlB : ¬ B.valuation (l : Ω) < 1) {P : Type} [AddCommGroup P] (F : G ℚ Ω → P)
-    (htor : ∀ x : P, l ^ n • x = 0)
-    (hlc : IsLocallyConstant (fun s : Ine (F := ℚ) B => F s))
+theorem eq_zero_of_wild
+    (l : ℕ) [Fact l.Prime]
+    (n : ℕ)
+    (B : ValuationSubring Ω) (hlB : ¬ B.valuation (l : Ω) < 1)
+    {P : Type} [AddCommGroup P]
+    (F : G ℚ Ω → P)
+    (htor : ∀ x : P, l ^ n • x = 0) (hlc : IsLocallyConstant (fun s : Ine (F := ℚ) B => F s))
     (hadd : ∀ s ∈ Ine (F := ℚ) B, ∀ t ∈ Ine (F := ℚ) B, F (s * t) = F s + F t)
-    (σ : G ℚ Ω) (hσ : ∀ y : Ω, y ≠ 0 → B.valuation (σ y / y - 1) < 1) : F σ = 0 := by
+    (σ : G ℚ Ω) (hσ : ∀ y : Ω, y ≠ 0 → B.valuation (σ y / y - 1) < 1)
+    : F σ = 0 := by
   have hl : l.Prime := Fact.out
   have hvl1 : B.valuation (l : Ω) = 1 :=
     le_antisymm ((B.valuation_le_one_iff _).mpr (natCast_mem B l)) (not_lt.mp hlB)
@@ -69,7 +82,8 @@ theorem eq_zero_of_wild (l : ℕ) [Fact l.Prime] (n : ℕ) (B : ValuationSubring
   have h1t : (1 : G ℚ Ω) ∈ t := by
     have : ((⟨1, one_mem _⟩ : Ine (F := ℚ) B) : G ℚ Ω) ∈ t := by
       show (⟨1, one_mem _⟩ : Ine (F := ℚ) B) ∈ Subtype.val ⁻¹' t
-      rw [hte]; exact h0
+      rw [hte]
+      exact h0
     exact this
   obtain ⟨L, hL, hsub⟩ := (krullTopology_mem_nhds_one_iff ℚ Ω _).mp (ht.mem_nhds h1t)
   have : IsGalois ℚ Ω := IsAlgClosure.isGalois ℚ Ω
@@ -81,7 +95,8 @@ theorem eq_zero_of_wild (l : ℕ) [Fact l.Prime] (n : ℕ) (B : ValuationSubring
   have hτ : σ ^ m ∈ L.fixingSubgroup := by
     rw [IntermediateField.mem_fixingSubgroup_iff] at hmem ⊢
     intro x hx
-    refine GlobalTheory.WildInertiaChar.fixed_of_pow_fixed B (σ ^ m) (GlobalTheory.WildInertiaChar.wild_pow B σ hσ m) (l ^ a) ?_ x ?_
+    refine GlobalTheory.WildInertiaChar.fixed_of_pow_fixed B (σ ^ m)
+      (GlobalTheory.WildInertiaChar.wild_pow B σ hσ m) (l ^ a) ?_ x ?_
     · rw [Nat.cast_pow, map_pow, hvl1, one_pow]; exact lt_irrefl _
     · rw [← pow_mul, mul_comm]; exact hmem x hx
   have hm0 : m • F σ = 0 := by
@@ -102,27 +117,34 @@ namespace GlobalTheory.TameConjInv
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω]
 
-theorem exists_zsmul (B : ValuationSubring Ω) {γ : G ℚ Ω} (hγ : Formalism.BasicNotions.TameGenAt B γ) {P : Type}
-    [AddCommGroup P] (F : G ℚ Ω → P)
-    (hlc : IsLocallyConstant (fun s : Ine (F := ℚ) B => F s))
+theorem exists_zsmul
+    (B : ValuationSubring Ω)
+    {γ : G ℚ Ω} (hγ : Formalism.BasicNotions.TameGenAt B γ)
+    {P : Type} [AddCommGroup P]
+    (F : G ℚ Ω → P) (hlc : IsLocallyConstant (fun s : Ine (F := ℚ) B => F s))
     (hadd : ∀ s ∈ Ine (F := ℚ) B, ∀ t ∈ Ine (F := ℚ) B, F (s * t) = F s + F t)
     (hw : ∀ σ : G ℚ Ω, (∀ y : Ω, y ≠ 0 → B.valuation (σ y / y - 1) < 1) → F σ = 0)
-    (s : G ℚ Ω) (hs : s ∈ Ine (F := ℚ) B) : ∃ k : ℤ, F s = k • F γ := by
+    (s : G ℚ Ω) (hs : s ∈ Ine (F := ℚ) B)
+    : ∃ k : ℤ, F s = k • F γ := by
   have h0 := map_one_eq_zero B F hadd
   have hinv : ∀ x ∈ Ine (F := ℚ) B, F x⁻¹ = - F x := by
     intro x hx
     have := hadd x hx x⁻¹ (inv_mem hx)
     rw [mul_inv_cancel, h0] at this
     exact (neg_eq_of_add_eq_zero_right this.symm).symm
-  have key : ∀ h ∈ Subgroup.closure (insert γ {σ : G ℚ Ω | ∀ y : Ω, y ≠ 0 → B.valuation (σ y / y - 1) < 1}),
-      h ∈ Ine (F := ℚ) B ∧ ∃ k : ℤ, F h = k • F γ := by
+  have key
+      : ∀ h
+          ∈ Subgroup.closure (insert γ
+            {σ : G ℚ Ω | ∀ y : Ω, y ≠ 0 → B.valuation (σ y / y - 1) < 1}),
+        h ∈ Ine (F := ℚ) B ∧ ∃ k : ℤ, F h = k • F γ := by
     intro h hh
     induction hh using Subgroup.closure_induction with
     | mem x hx =>
       rcases hx with rfl | hx
       · exact ⟨hγ.1, 1, by simp⟩
       · exact ⟨wild_mem_Ine B hx, 0, by simp [hw x hx]⟩
-    | one => exact ⟨one_mem _, 0, by simp [h0]⟩
+    | one =>
+      exact ⟨one_mem _, 0, by simp [h0]⟩
     | mul x y _ _ ihx ihy =>
       obtain ⟨hx, k, hk⟩ := ihx
       obtain ⟨hy, k', hk'⟩ := ihy
@@ -133,7 +155,8 @@ theorem exists_zsmul (B : ValuationSubring Ω) {γ : G ℚ Ω} (hγ : Formalism.
   obtain ⟨t, ht, hte⟩ := isOpen_induced_iff.mp (hlc.isOpen_fiber (F s))
   have hst : s ∈ t := by
     show (⟨s, hs⟩ : Ine (F := ℚ) B) ∈ Subtype.val ⁻¹' t
-    rw [hte]; rfl
+    rw [hte]
+    rfl
   obtain ⟨h, hht, hhH⟩ := mem_closure_iff.mp (hγ.2 hs) t ht hst
   obtain ⟨hhI, k, hk⟩ := key h hhH
   refine ⟨k, ?_⟩
@@ -148,7 +171,8 @@ theorem prime_normV (v : Pl) : (normV v).Prime := by
   haveI : Finite (𝓞 ℚ ⧸ v.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ v.ne_bot
   have hp : (ringChar (𝓞 ℚ ⧸ v.asIdeal)).Prime := CharP.char_is_prime (𝓞 ℚ ⧸ v.asIdeal) _
   haveI : Fact (ringChar (𝓞 ℚ ⧸ v.asIdeal)).Prime := ⟨hp⟩
-  have hs : Function.Surjective (ZMod.castHom (dvd_refl (ringChar (𝓞 ℚ ⧸ v.asIdeal))) (𝓞 ℚ ⧸ v.asIdeal)) := by
+  have hs : Function.Surjective (ZMod.castHom (dvd_refl (ringChar (𝓞 ℚ ⧸ v.asIdeal)))
+      (𝓞 ℚ ⧸ v.asIdeal)) := by
     intro y
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective y
     obtain ⟨n, rfl⟩ := Rat.ringOfIntegersEquiv.symm.surjective x
@@ -157,8 +181,9 @@ theorem prime_normV (v : Pl) : (normV v).Prime := by
   rw [normV, ← hb, Nat.card_zmod]
   exact hp
 
-theorem not_mem_of_dvd (l : ℕ) [Fact l.Prime] {n : ℕ} {w : Pl} (hn : 1 ≤ n) (hdiv : l ^ n ∣ normV w - 1) :
-    ((l : ℕ) : 𝓞 ℚ) ∉ w.asIdeal := by
+theorem not_mem_of_dvd
+    (l : ℕ) [Fact l.Prime] {n : ℕ} {w : Pl} (hn : 1 ≤ n) (hdiv : l ^ n ∣ normV w - 1)
+    : ((l : ℕ) : 𝓞 ℚ) ∉ w.asIdeal := by
   intro hlw
   have hpos : 1 < normV w := (prime_normV w).one_lt
   obtain ⟨k, hk⟩ := (dvd_pow_self l (by omega : n ≠ 0)).trans hdiv
@@ -176,10 +201,10 @@ theorem not_mem_of_dvd (l : ℕ) [Fact l.Prime] {n : ℕ} {w : Pl} (hn : 1 ≤ n
     simpa using this
   exact w.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h1)
 
-theorem exists_residue_hom (B : ValuationSubring Ω) {g : G ℚ Ω} (hg : g ∈ Dec (F := ℚ) B) :
-    ∃ σ : IsLocalRing.ResidueField B →+* IsLocalRing.ResidueField B, ∀ (x : Ω) (hx : x ∈ B),
-      σ (IsLocalRing.residue B ⟨x, hx⟩) =
-        IsLocalRing.residue B ⟨g x, (apply_mem_iff_of_mem_Dec hg x).2 hx⟩ := by
+theorem exists_residue_hom (B : ValuationSubring Ω) {g : G ℚ Ω} (hg : g ∈ Dec (F := ℚ) B)
+    : ∃ σ : IsLocalRing.ResidueField B →+* IsLocalRing.ResidueField B, ∀ (x : Ω) (hx : x ∈ B),
+      σ (IsLocalRing.residue B ⟨x, hx⟩)
+        = IsLocalRing.residue B ⟨g x, (apply_mem_iff_of_mem_Dec hg x).2 hx⟩ := by
   let φ : B →+* B := (g : Ω →+* Ω).restrict B B fun x hx => (apply_mem_iff_of_mem_Dec hg x).2 hx
   haveI : IsLocalHom φ := ⟨fun a ha => by
     by_contra hn
@@ -188,14 +213,23 @@ theorem exists_residue_hom (B : ValuationSubring Ω) {g : G ℚ Ω} (hg : g ∈ 
     exact (B.valuation_lt_one_iff (φ a)).2 h2 ha⟩
   exact ⟨IsLocalRing.ResidueField.map φ, fun x hx => IsLocalRing.ResidueField.map_residue φ _⟩
 
-theorem exists_frob_pow (k : Type) [Field k] (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) k] (σ : k →+* k)
-    (x : k) (hx : IsAlgebraic (ZMod p) x) : ∃ i : ℕ, σ x = x ^ p ^ i := by
+theorem exists_frob_pow
+    (k : Type) [Field k]
+    (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) k]
+    (σ : k →+* k)
+    (x : k) (hx : IsAlgebraic (ZMod p) x)
+    : ∃ i : ℕ, σ x = x ^ p ^ i := by
   let L := IntermediateField.adjoin (ZMod p) {x}
   haveI : FiniteDimensional (ZMod p) L := IntermediateField.adjoin.finiteDimensional hx.isIntegral
   haveI : Finite L := Module.finite_of_finite (ZMod p)
-  let τ : k →ₐ[ZMod p] k :=
-    { σ with commutes' := fun r => RingHom.congr_fun (Subsingleton.elim (σ.comp (algebraMap (ZMod p) k)) (algebraMap (ZMod p) k)) r }
-  obtain ⟨⟨i, hi⟩, h⟩ := (FiniteField.bijective_frobeniusAlgHom_pow (ZMod p) L).2 (τ.restrictNormal L)
+  let τ : k →ₐ[ZMod p] k := {
+    σ with
+    commutes' := fun r =>
+      RingHom.congr_fun (Subsingleton.elim (σ.comp (algebraMap (ZMod p) k)) (algebraMap (ZMod p) k))
+        r
+  }
+  obtain ⟨⟨i, hi⟩, h⟩ :=
+    (FiniteField.bijective_frobeniusAlgHom_pow (ZMod p) L).2 (τ.restrictNormal L)
   refine ⟨i, ?_⟩
   have h1 := τ.restrictNormal_commutes L ⟨x, IntermediateField.mem_adjoin_simple_self _ x⟩
   rw [← h] at h1
@@ -204,10 +238,12 @@ theorem exists_frob_pow (k : Type) [Field k] (p : ℕ) [Fact p.Prime] [Algebra (
 
 variable [IsAlgClosure ℚ Ω]
 
-theorem cycZ_toZModPow_of_mem_Dec {l : ℕ} [Fact l.Prime] {n : ℕ} {w : Pl} {B : ValuationSubring Ω}
+theorem cycZ_toZModPow_of_mem_Dec
+    {l : ℕ} [Fact l.Prime]
+    {n : ℕ} {w : Pl} {B : ValuationSubring Ω}
     (hB : IsPlaceOver B w) (hl : ((l : ℕ) : 𝓞 ℚ) ∉ w.asIdeal) (hdiv : l ^ n ∣ normV w - 1)
-    {g : G ℚ Ω} (hg : g ∈ Dec (F := ℚ) B) :
-    PadicInt.toZModPow n ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l]) = 1 := by
+    {g : G ℚ Ω} (hg : g ∈ Dec (F := ℚ) B)
+    : PadicInt.toZModPow n ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l]) = 1 := by
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   have : NeZero ((l : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero⟩
@@ -215,8 +251,8 @@ theorem cycZ_toZModPow_of_mem_Dec {l : ℕ} [Fact l.Prime] {n : ℕ} {w : Pl} {B
   have hN0 : l ^ n ≠ 0 := pow_ne_zero _ (Fact.out : l.Prime).ne_zero
   set m := (((cyclotomicCharacter (Ω) l)
     (MulSemiringAction.toRingAut (G ℚ Ω) (Ω) g)) : ℤ_[l]).toZModPow n |>.val with hm
-  have hgζ : g ζ = ζ ^ m := cyclotomicCharacter.spec (L := Ω) l
-    (MulSemiringAction.toRingAut (G ℚ Ω) (Ω) g) ζ hζ.pow_eq_one
+  have hgζ : g ζ = ζ ^ m :=
+    cyclotomicCharacter.spec (L := Ω) l (MulSemiringAction.toRingAut (G ℚ Ω) (Ω) g) ζ hζ.pow_eq_one
   have hζB : ζ ∈ B :=
     (B.valuation_le_one_iff _).1 (valuation_eq_one_of_pow_eq_one B hN0 hζ.pow_eq_one).le
   have hp := prime_normV w
@@ -245,9 +281,11 @@ theorem cycZ_toZModPow_of_mem_Dec {l : ℕ} [Fact l.Prime] {n : ℕ} {w : Pl} {B
       rw [← map_pow]
       congr 1
       exact Subtype.ext (by simpa using hζp)
-    have ha : IsAlgebraic (ZMod (normV w)) (IsLocalRing.residue B ⟨ζ, hζB⟩) :=
-      ⟨Polynomial.X ^ normV w - Polynomial.X, Polynomial.X_pow_sub_X_ne_zero hp.one_lt,
-        by simp [hyp]⟩
+    have ha : IsAlgebraic (ZMod (normV w)) (IsLocalRing.residue B ⟨ζ, hζB⟩) := ⟨
+      Polynomial.X ^ normV w - Polynomial.X,
+      Polynomial.X_pow_sub_X_ne_zero hp.one_lt,
+      by simp [hyp]
+    ⟩
     obtain ⟨i, hi⟩ := exists_frob_pow _ (normV w) σ _ ha
     have hfix : σ (IsLocalRing.residue B ⟨ζ, hζB⟩) = IsLocalRing.residue B ⟨ζ, hζB⟩ := by
       rw [hi]
@@ -261,30 +299,40 @@ theorem cycZ_toZModPow_of_mem_Dec {l : ℕ} [Fact l.Prime] {n : ℕ} {w : Pl} {B
     exact this
   rw [hgζ] at hlt
   have heq : ζ ^ m = ζ ^ 1 := by
-    refine eq_of_pow_eq_one B (not_valuation_lt_one_of_isPlaceOver hl hB n) ?_ ?_ (by simpa using hlt)
+    refine eq_of_pow_eq_one B (not_valuation_lt_one_of_isPlaceOver hl hB n) ?_ ?_
+      (by simpa using hlt)
     · rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]
     · rw [pow_one, hζ.pow_eq_one]
   have heq' : (hζ.isUnit hN0).unit ^ m = (hζ.isUnit hN0).unit ^ 1 := Units.ext (by simpa using heq)
-  have hu : IsPrimitiveRoot (hζ.isUnit hN0).unit (l ^ n) := IsPrimitiveRoot.coe_units_iff.mp (by simpa using hζ)
+  have hu : IsPrimitiveRoot (hζ.isUnit hN0).unit (l ^ n) :=
+    IsPrimitiveRoot.coe_units_iff.mp (by simpa using hζ)
   rw [pow_eq_pow_iff_modEq, ← hu.eq_orderOf] at heq'
   show ((cyclotomicCharacter (Ω) l)
     (MulSemiringAction.toRingAut (G ℚ Ω) (Ω) g) : ℤ_[l]).toZModPow n = _
-  rw [← ZMod.natCast_zmod_val (((cyclotomicCharacter (Ω) l)
-    (MulSemiringAction.toRingAut (G ℚ Ω) (Ω) g) : ℤ_[l]).toZModPow n), ← hm]
+  rw [← ZMod.natCast_zmod_val
+      (((cyclotomicCharacter (Ω) l) (MulSemiringAction.toRingAut (G ℚ Ω) (Ω) g) : ℤ_[l]).toZModPow
+        n),
+    ← hm]
   have := (ZMod.natCast_eq_natCast_iff _ _ _).mpr heq'
   simpa using this
 
-theorem kummer_conj_dec {l : ℕ} [Fact l.Prime] {n : ℕ} {w : Pl} {B : ValuationSubring Ω}
-    (hB : IsPlaceOver B w) (hl : ((l : ℕ) : 𝓞 ℚ) ∉ w.asIdeal) (a : ℚˣ) {g s : G ℚ Ω}
-    (hg1 : PadicInt.toZModPow n ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l]) = 1) (hs : s ∈ Ine (F := ℚ) B) :
-    PadicInt.toZModPow n (GlobalTheory.WeilDeligne.kummer l a (g * s * g⁻¹)) =
-      PadicInt.toZModPow n (GlobalTheory.WeilDeligne.kummer l a s) := by
+theorem kummer_conj_dec
+    {l : ℕ} [Fact l.Prime]
+    {n : ℕ} {w : Pl} {B : ValuationSubring Ω}
+    (hB : IsPlaceOver B w) (hl : ((l : ℕ) : 𝓞 ℚ) ∉ w.asIdeal)
+    (a : ℚˣ)
+    {g s : G ℚ Ω}
+    (hg1 : PadicInt.toZModPow n ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l]) = 1) (hs : s ∈ Ine (F := ℚ) B)
+    : PadicInt.toZModPow n (GlobalTheory.WeilDeligne.kummer l a (g * s * g⁻¹))
+      = PadicInt.toZModPow n (GlobalTheory.WeilDeligne.kummer l a s) := by
   have h0 := GlobalTheory.WeilDeligne.kummer_mul l a g g⁻¹
   rw [mul_inv_cancel, GlobalTheory.WeilDeligne.kummer_one] at h0
   have hs1 := GlobalTheory.WeilDeligne.cycZ_of_mem_Ine hB hl hs
-  have e : GlobalTheory.WeilDeligne.kummer l a (g * s * g⁻¹) =
-      (cycZ ℚ Ω l g : ℤ_[l]) * GlobalTheory.WeilDeligne.kummer l a s := by
-    rw [mul_assoc, GlobalTheory.WeilDeligne.kummer_mul, GlobalTheory.WeilDeligne.kummer_mul, hs1, Units.val_one, one_mul]
+  have e
+      : GlobalTheory.WeilDeligne.kummer l a (g * s * g⁻¹)
+        = (cycZ ℚ Ω l g : ℤ_[l]) * GlobalTheory.WeilDeligne.kummer l a s := by
+    rw [mul_assoc, GlobalTheory.WeilDeligne.kummer_mul, GlobalTheory.WeilDeligne.kummer_mul, hs1,
+      Units.val_one, one_mul]
     linear_combination -h0
   rw [e, map_mul, hg1, one_mul]
 
@@ -292,24 +340,29 @@ end GlobalTheory.TameConjInv
 
 namespace GlobalTheory.TameConjInv
 
-theorem conj_invariant : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (n : ℕ) (w : Pl)
-    (B : ValuationSubring Ω) (M : Type) [AddCommGroup M] (u : G ℚ Ω → M), IsPlaceOver B w → l ^ n ∣ normV w - 1 →
-    1 ≤ n → (∀ x : M, l ^ n • x = 0) → IsLocallyConstant (fun s : Ine (F := ℚ) B => u s) →
-    (∀ s ∈ Ine (F := ℚ) B, ∀ t ∈ Ine (F := ℚ) B, u (s * t) = u s + u t) →
-    ∀ g ∈ Dec (F := ℚ) B, ∀ s ∈ Ine (F := ℚ) B, u (g * s * g⁻¹) = u s := by
+theorem conj_invariant
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (n : ℕ)
+        (w : Pl) (B : ValuationSubring Ω) (M : Type) [AddCommGroup M] (u : G ℚ Ω → M),
+      IsPlaceOver B w → l ^ n ∣ normV w - 1 → 1 ≤ n → (∀ x : M, l ^ n • x = 0)
+        → IsLocallyConstant (fun s : Ine (F := ℚ) B => u s)
+        → (∀ s ∈ Ine (F := ℚ) B, ∀ t ∈ Ine (F := ℚ) B, u (s * t) = u s + u t)
+        → ∀ g ∈ Dec (F := ℚ) B, ∀ s ∈ Ine (F := ℚ) B, u (g * s * g⁻¹) = u s := by
   intro l _ Ω _ _ _ n w B M _ u hB hdiv hn htor hlc hadd g hg s hs
   have hl := not_mem_of_dvd l hn hdiv
   have hlB : ¬ B.valuation (l : Ω) < 1 := by
     have := (hB (l : 𝓞 ℚ)).not.mpr hl
     simpa using this
   set a : ℚˣ := GlobalTheory.WeilDeligne.unifUnit w
-  let t : G ℚ Ω → ZMod (l ^ n) := fun x => PadicInt.toZModPow n (GlobalTheory.WeilDeligne.kummer l a x)
+  let t : G ℚ Ω → ZMod (l ^ n) := fun x =>
+    PadicInt.toZModPow n (GlobalTheory.WeilDeligne.kummer l a x)
   have htlc : IsLocallyConstant t := by
     refine (IsLocallyConstant.iff_isOpen_fiber).2 fun y => ?_
     by_cases hy : ∃ x₀, t x₀ = y
     · obtain ⟨x₀, rfl⟩ := hy
-      have e : t ⁻¹' {t x₀} = {τ : G ℚ Ω | τ (GlobalTheory.WeilDeligne.rootOf Ω l (a : ℚ) n) =
-          x₀ (GlobalTheory.WeilDeligne.rootOf Ω l (a : ℚ) n)} := by
+      have e
+          : t ⁻¹' {t x₀}
+            = {τ : G ℚ Ω | τ (GlobalTheory.WeilDeligne.rootOf Ω l (a : ℚ) n) =
+              x₀ (GlobalTheory.WeilDeligne.rootOf Ω l (a : ℚ) n)} := by
         ext τ
         simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq]
         exact GlobalTheory.WeilDeligne.toZModPow_kummer_eq_iff l a τ x₀ n
@@ -319,11 +372,13 @@ theorem conj_invariant : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Al
         ext τ
         simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_empty_iff_false, iff_false]
         exact fun h => hy ⟨τ, h⟩
-      rw [e]; exact isOpen_empty
+      rw [e]
+      exact isOpen_empty
   have htadd : ∀ s ∈ Ine (F := ℚ) B, ∀ s' ∈ Ine (F := ℚ) B, t (s * s') = t s + t s' := by
     intro s hs s' _
     simp only [t]
-    rw [GlobalTheory.WeilDeligne.kummer_mul, GlobalTheory.WeilDeligne.cycZ_of_mem_Ine hB hl hs, Units.val_one, one_mul, map_add (f := _)]
+    rw [GlobalTheory.WeilDeligne.kummer_mul, GlobalTheory.WeilDeligne.cycZ_of_mem_Ine hB hl hs,
+      Units.val_one, one_mul, map_add (f := _)]
   let F : G ℚ Ω → M × ZMod (l ^ n) := fun x => (u x, t x)
   have hFlc : IsLocallyConstant (fun s : Ine (F := ℚ) B => F s) :=
     IsLocallyConstant.prodMk hlc (htlc.comp_continuous continuous_subtype_val)
@@ -359,16 +414,14 @@ theorem conj_invariant : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Al
     have h2 := congrArg Prod.snd hk₂
     simp only [F, Prod.smul_snd, zsmul_eq_mul] at h1 h2
     rw [hteq, h1] at h2
-    have h3 : ((k₂ - k₁ : ℤ) : ZMod (l ^ n)) * t γ = 0 := by
-      push_cast; rw [sub_mul, h2, sub_self]
+    have h3 : ((k₂ - k₁ : ℤ) : ZMod (l ^ n)) * t γ = 0 := by push_cast; rw [sub_mul, h2, sub_self]
     exact (hunit.mul_left_eq_zero).1 h3
   obtain ⟨j, hj⟩ := (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).1 hk
   have h1 := congrArg Prod.fst hk₁
   have h2 := congrArg Prod.fst hk₂
   simp only [F, Prod.smul_fst] at h1 h2
   have hl0 : ((l ^ n : ℕ) : ℤ) • u γ = 0 := by rw [natCast_zsmul]; exact htor _
-  have hz : (k₂ - k₁) • u γ = 0 := by
-    rw [hj, mul_comm, ← smul_smul, hl0, smul_zero]
+  have hz : (k₂ - k₁) • u γ = 0 := by rw [hj, mul_comm, ← smul_smul, hl0, smul_zero]
   rw [h2, h1, ← sub_eq_zero, ← sub_smul, hz]
 
 end GlobalTheory.TameConjInv

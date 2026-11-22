@@ -12,11 +12,12 @@ open Formalism.G Formalism.ELL
 
 variable {K : Type*} [NormedField K] [CharZero K] {σ : Type} [DecidableEq σ]
 
-def eulFun (F : MvPowerSeries σ K) : MvPowerSeries σ K :=
-  fun d => (d.degree : K) * MvPowerSeries.coeff d F
+def eulFun (F : MvPowerSeries σ K) : MvPowerSeries σ K := fun d =>
+  (d.degree : K) * MvPowerSeries.coeff d F
 
-theorem coeff_eulFun (F : MvPowerSeries σ K) (d : σ →₀ ℕ) :
-    MvPowerSeries.coeff d (eulFun F) = (d.degree : K) * MvPowerSeries.coeff d F := rfl
+theorem coeff_eulFun (F : MvPowerSeries σ K) (d : σ →₀ ℕ)
+    : MvPowerSeries.coeff d (eulFun F) = (d.degree : K) * MvPowerSeries.coeff d F :=
+  rfl
 
 def eulLin : MvPowerSeries σ K →ₗ[K] MvPowerSeries σ K where
   toFun := eulFun
@@ -28,8 +29,7 @@ def eulLin : MvPowerSeries σ K →ₗ[K] MvPowerSeries σ K where
     simp only [coeff_eulFun, map_smul, smul_eq_mul, RingHom.id_apply]
     ring
 
-theorem eulFun_mul (F G : MvPowerSeries σ K) :
-    eulFun (F * G) = F • eulFun G + G • eulFun F := by
+theorem eulFun_mul (F G : MvPowerSeries σ K) : eulFun (F * G) = F • eulFun G + G • eulFun F := by
   ext d
   rw [smul_eq_mul, smul_eq_mul, mul_comm G, map_add (f := _), coeff_eulFun, MvPowerSeries.coeff_mul,
     MvPowerSeries.coeff_mul, MvPowerSeries.coeff_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
@@ -43,8 +43,9 @@ def eul : Derivation K (MvPowerSeries σ K) (MvPowerSeries σ K) :=
 
 theorem eul_apply (F : MvPowerSeries σ K) : eul F = eulFun F := rfl
 
-theorem eq_zero_of_eulFun (F : MvPowerSeries σ K) (h0 : MvPowerSeries.constantCoeff F = 0)
-    (h : eulFun F = 0) : F = 0 := by
+theorem eq_zero_of_eulFun
+    (F : MvPowerSeries σ K) (h0 : MvPowerSeries.constantCoeff F = 0) (h : eulFun F = 0)
+    : F = 0 := by
   ext d
   rw [map_zero]
   by_cases hd : d = 0
@@ -61,8 +62,8 @@ theorem eq_zero_of_eulFun (F : MvPowerSeries σ K) (h0 : MvPowerSeries.constantC
 def Agree (N : ℕ) (F G : MvPowerSeries σ K) : Prop :=
   ∀ d : σ →₀ ℕ, d.degree < N → MvPowerSeries.coeff d F = MvPowerSeries.coeff d G
 
-theorem Agree.mul_right {N : ℕ} {F G : MvPowerSeries σ K} (h : Agree N F G)
-    (H : MvPowerSeries σ K) : Agree N (F * H) (G * H) := by
+theorem Agree.mul_right {N : ℕ} {F G : MvPowerSeries σ K} (h : Agree N F G) (H : MvPowerSeries σ K)
+    : Agree N (F * H) (G * H) := by
   intro d hd
   rw [MvPowerSeries.coeff_mul, MvPowerSeries.coeff_mul]
   refine Finset.sum_congr rfl fun p hp => ?_
@@ -71,13 +72,13 @@ theorem Agree.mul_right {N : ℕ} {F G : MvPowerSeries σ K} (h : Agree N F G)
   rw [map_add (f := _)] at hdeg
   rw [h p.1 (by omega)]
 
-theorem Agree.eulFun {N : ℕ} {F G : MvPowerSeries σ K} (h : Agree N F G) :
-    Agree N (eulFun F) (eulFun G) := by
+theorem Agree.eulFun {N : ℕ} {F G : MvPowerSeries σ K} (h : Agree N F G)
+    : Agree N (eulFun F) (eulFun G) := by
   intro d hd
   rw [coeff_eulFun, coeff_eulFun, h d hd]
 
-theorem coeff_pow_eq_zero {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f = 0) :
-    ∀ (n : ℕ) (d : σ →₀ ℕ), d.degree < n → MvPowerSeries.coeff d (f ^ n) = 0
+theorem coeff_pow_eq_zero {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f = 0)
+    : ∀ (n : ℕ) (d : σ →₀ ℕ), d.degree < n → MvPowerSeries.coeff d (f ^ n) = 0
   | 0, d, hd => absurd hd (Nat.not_lt_zero _)
   | n + 1, d, hd => by
     rw [pow_succ', MvPowerSeries.coeff_mul]
@@ -94,12 +95,12 @@ theorem coeff_pow_eq_zero {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantC
 def truncLog (N : ℕ) (f : MvPowerSeries σ K) : MvPowerSeries σ K :=
   ∑ n ∈ Finset.range N, PowerSeries.coeff n (PowerSeries.log K) • f ^ n
 
-theorem agree_truncLog {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f = 0)
-    (N : ℕ) : Agree N (logOnePlus f) (truncLog N f) := by
+theorem agree_truncLog {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f = 0) (N : ℕ)
+    : Agree N (logOnePlus f) (truncLog N f) := by
   intro d hd
   set_option synthInstance.maxHeartbeats 100000 in
     rw [logOnePlus, PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero hf),
-    truncLog, map_sum]
+      truncLog, map_sum]
   rw [finsum_eq_sum_of_support_subset _ (s := Finset.range N) ?_]
   · refine Finset.sum_congr rfl fun n _ => ?_
     rw [map_smul]
@@ -110,37 +111,40 @@ theorem agree_truncLog {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoef
     apply hn
     rw [coeff_pow_eq_zero hf n d (by omega), smul_zero]
 
-theorem coeff_log_succ_mul (k : ℕ) :
-    PowerSeries.coeff (k + 1) (PowerSeries.log K) * ((k + 1 : ℕ) : K) = (-1) ^ k := by
+theorem coeff_log_succ_mul (k : ℕ)
+    : PowerSeries.coeff (k + 1) (PowerSeries.log K) * ((k + 1 : ℕ) : K) = (-1) ^ k := by
   rw [PowerSeries.coeff_log, if_neg (Nat.succ_ne_zero k)]
   simp only [map_div₀, map_pow, map_neg, map_one, map_natCast]
   have : ((k + 1 : ℕ) : K) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.succ_ne_zero k)
   field_simp
   ring
 
-theorem eul_truncLog (f : MvPowerSeries σ K) (M : ℕ) :
-    eulFun (truncLog (M + 1) f) = (∑ k ∈ Finset.range M, (-f) ^ k) * eulFun f := by
+theorem eul_truncLog (f : MvPowerSeries σ K) (M : ℕ)
+    : eulFun (truncLog (M + 1) f) = (∑ k ∈ Finset.range M, (-f) ^ k) * eulFun f := by
   have h0 : PowerSeries.coeff 0 (PowerSeries.log K) = 0 := by simp
   set_option synthInstance.maxHeartbeats 100000 in
-    rw [← eul_apply, truncLog, map_sum, Finset.sum_range_succ', h0, zero_smul, map_zero,
-    add_zero, Finset.sum_mul]
+    rw [← eul_apply, truncLog, map_sum, Finset.sum_range_succ', h0, zero_smul, map_zero, add_zero,
+      Finset.sum_mul]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Derivation.map_smul, Derivation.leibniz_pow, Nat.add_sub_cancel, Algebra.smul_def,
     nsmul_eq_mul, smul_eq_mul, eul_apply, neg_pow]
-  have h1 : algebraMap K (MvPowerSeries σ K) (PowerSeries.coeff (k + 1) (PowerSeries.log K)) *
-      ((k + 1 : ℕ) : MvPowerSeries σ K) = (-1) ^ k := by
-    rw [← map_natCast (algebraMap K (MvPowerSeries σ K)), ← map_mul, coeff_log_succ_mul,
-      map_pow, map_neg, map_one]
+  have h1
+      : algebraMap K (MvPowerSeries σ K) (PowerSeries.coeff (k + 1) (PowerSeries.log K))
+          * ((k + 1 : ℕ) : MvPowerSeries σ K)
+        = (-1) ^ k := by
+    rw [← map_natCast (algebraMap K (MvPowerSeries σ K)), ← map_mul, coeff_log_succ_mul, map_pow,
+      map_neg, map_one]
   linear_combination (f ^ k * eulFun f) * h1
 
-theorem eul_log_mul {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f = 0) :
-    eulFun (logOnePlus f) * (1 + f) = eulFun f := by
+theorem eul_log_mul {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f = 0)
+    : eulFun (logOnePlus f) * (1 + f) = eulFun f := by
   ext d
   have hA := ((agree_truncLog hf (d.degree + 2)).eulFun).mul_right (1 + f) d (by omega)
   rw [hA, show d.degree + 2 = (d.degree + 1) + 1 from rfl, eul_truncLog]
   have hg := geom_sum_mul (-f) (d.degree + 1)
-  have hE : (∑ k ∈ Finset.range (d.degree + 1), (-f) ^ k) * eulFun f * (1 + f) =
-      eulFun f - (-f) ^ (d.degree + 1) * eulFun f := by
+  have hE
+      : (∑ k ∈ Finset.range (d.degree + 1), (-f) ^ k) * eulFun f * (1 + f)
+        = eulFun f - (-f) ^ (d.degree + 1) * eulFun f := by
     linear_combination (-(eulFun f)) * hg
   rw [hE, map_sub]
   have hz : Agree (d.degree + 1) ((-f) ^ (d.degree + 1)) 0 := by
@@ -150,9 +154,8 @@ theorem eul_log_mul {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f
   have := hz.mul_right (eulFun f) d (by omega)
   rw [this, zero_mul, map_zero, sub_zero]
 
-theorem constantCoeff_logOnePlus {f : MvPowerSeries σ K}
-    (hf : MvPowerSeries.constantCoeff f = 0) :
-    MvPowerSeries.constantCoeff (logOnePlus f) = 0 :=
+theorem constantCoeff_logOnePlus {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f = 0)
+    : MvPowerSeries.constantCoeff (logOnePlus f) = 0 :=
   PowerSeries.constantCoeff_subst_eq_zero hf _ PowerSeries.constantCoeff_log
 
 theorem log_zero : logOnePlus (0 : MvPowerSeries σ K) = 0 := by
@@ -160,9 +163,10 @@ theorem log_zero : logOnePlus (0 : MvPowerSeries σ K) = 0 := by
   have := eul_log_mul (map_zero (MvPowerSeries.constantCoeff (σ := σ) (R := K)))
   rwa [add_zero, mul_one, ← eul_apply 0, map_zero] at this
 
-theorem log_add {f g : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f = 0)
-    (hg : MvPowerSeries.constantCoeff g = 0) :
-    logOnePlus f + logOnePlus g = logOnePlus (f + g + f * g) := by
+theorem log_add
+    {f g : MvPowerSeries σ K}
+    (hf : MvPowerSeries.constantCoeff f = 0) (hg : MvPowerSeries.constantCoeff g = 0)
+    : logOnePlus f + logOnePlus g = logOnePlus (f + g + f * g) := by
   have hh : MvPowerSeries.constantCoeff (f + g + f * g) = 0 := by
     simp only [map_add (f := _), map_mul, hf, hg, add_zero, mul_zero]
   have hu : IsUnit (1 + (f + g + f * g)) := by
@@ -179,30 +183,33 @@ theorem log_add {f g : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f =
     show eul (logOnePlus f + logOnePlus g - logOnePlus (f + g + f * g)) * _ = 0
     rw [map_sub, map_add (f := _), eul_apply, eul_apply, eul_apply]
     linear_combination (1 + g) * e1 + (1 + f) * e2 - e3 - hD
-  have := eq_zero_of_eulFun _ (by
-    rw [map_sub, map_add (f := _), constantCoeff_logOnePlus hf, constantCoeff_logOnePlus hg,
-      constantCoeff_logOnePlus hh, add_zero, sub_zero]) key
+  have :=
+    eq_zero_of_eulFun _
+      (by
+        rw [map_sub, map_add (f := _), constantCoeff_logOnePlus hf, constantCoeff_logOnePlus hg,
+          constantCoeff_logOnePlus hh, add_zero, sub_zero])
+      key
   exact sub_eq_zero.mp this
 
 variable [IsUltrametricDist K]
 
-theorem integral_map (F : MvPowerSeries σ (unitBall K)) :
-    IntegralMv (MvPowerSeries.map (unitBall K).subtype F) := fun d => by
+theorem integral_map (F : MvPowerSeries σ (unitBall K))
+    : IntegralMv (MvPowerSeries.map (unitBall K).subtype F) := fun d => by
   rw [MvPowerSeries.coeff_map]
   exact (MvPowerSeries.coeff d F).2
 
-theorem integral_add_mul {f g : MvPowerSeries σ K} (hf : IntegralMv f) (hg : IntegralMv g) :
-    IntegralMv (f + g + f * g) := by
+theorem integral_add_mul {f g : MvPowerSeries σ K} (hf : IntegralMv f) (hg : IntegralMv g)
+    : IntegralMv (f + g + f * g) := by
   have hf' : ∀ n, MvPowerSeries.coeff n f ∈ unitBall K := fun n => hf n
   have hg' : ∀ n, MvPowerSeries.coeff n g ∈ unitBall K := fun n => hg n
-  have := integral_map (f.toSubring _ hf' + g.toSubring _ hg' +
-    f.toSubring _ hf' * g.toSubring _ hg')
+  have :=
+    integral_map (f.toSubring _ hf' + g.toSubring _ hg' + f.toSubring _ hf' * g.toSubring _ hg')
   simpa only [map_add (f := _), map_mul, MvPowerSeries.map_toSubring] using this
 
-theorem exists_inv {f : MvPowerSeries σ K} (hf0 : MvPowerSeries.constantCoeff f = 0)
-    (hf : IntegralMv f) :
-    ∃ h : MvPowerSeries σ K, MvPowerSeries.constantCoeff h = 0 ∧ IntegralMv h ∧
-      f + h + f * h = 0 := by
+theorem exists_inv
+    {f : MvPowerSeries σ K} (hf0 : MvPowerSeries.constantCoeff f = 0) (hf : IntegralMv f)
+    : ∃ h : MvPowerSeries σ K,
+      MvPowerSeries.constantCoeff h = 0 ∧ IntegralMv h ∧ f + h + f * h = 0 := by
   have hf' : ∀ n, MvPowerSeries.coeff n f ∈ unitBall K := fun n => hf n
   set f' := f.toSubring _ hf' with hf'def
   have hc : MvPowerSeries.constantCoeff f' = 0 := by
@@ -233,8 +240,12 @@ theorem N_additive_subgroup : Formalism.ELL.NAddSubgroup := by
   classical
   refine ⟨⟨0, map_zero _, fun d => by simp, EulerSeries.log_zero.symm⟩, ?_, ?_⟩
   · rintro G H ⟨f, hf0, hfi, rfl⟩ ⟨g, hg0, hgi, rfl⟩
-    exact ⟨f + g + f * g, by simp only [map_add (f := _), map_mul, hf0, hg0, add_zero, mul_zero],
-      EulerSeries.integral_add_mul hfi hgi, EulerSeries.log_add hf0 hg0⟩
+    exact ⟨
+      f + g + f * g,
+      by simp only [map_add (f := _), map_mul, hf0, hg0, add_zero, mul_zero],
+      EulerSeries.integral_add_mul hfi hgi,
+      EulerSeries.log_add hf0 hg0
+    ⟩
   · rintro G ⟨f, hf0, hfi, rfl⟩
     obtain ⟨h, hh0, hhi, hfh⟩ := EulerSeries.exists_inv hf0 hfi
     refine ⟨h, hh0, hhi, ?_⟩

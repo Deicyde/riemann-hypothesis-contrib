@@ -8,16 +8,26 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.Eisenstein
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix Classical ComplexOrder
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 open GlobalTheory.Doubling (absE)
 
 namespace PositivityTheory.SiegelWeilFormula.AStep
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem dilV_off (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fin n) (τ : ℝ) (k : Fin n ⊕ Fin n)
-    (hk : k ∉ ({Sum.inl i₀, Sum.inr i₀} : Set (Fin n ⊕ Fin n))) : dilV h w i₀ τ k = 1 := by
+theorem dilV_off
+    (h : IsCMExt F E σ)
+    {n : ℕ}
+    (w : InfinitePlace F)
+    (i₀ : Fin n)
+    (τ : ℝ)
+    (k : Fin n ⊕ Fin n) (hk : k ∉ ({Sum.inl i₀, Sum.inr i₀} : Set (Fin n ⊕ Fin n)))
+    : dilV h w i₀ τ k = 1 := by
   haveI := h.1
   rcases k with j | j
   · have hj : j ≠ i₀ := fun hj => hk (by subst hj; simp)
@@ -68,8 +78,8 @@ theorem l_eq_T_zero (d : SD σ) (Ψ : d.Fn) (hΨ : Ψ ∈ d.sch) : d.l Ψ = d.T 
   convert hk.symm using 3
   exact (Matrix.zero_mul _).trans (Matrix.zero_mul _).symm
 
-theorem dilV_mul (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fin n) (τ : ℝ) (j : Fin n) :
-    dilV h w i₀ τ (Sum.inl j) * dilV h w i₀ τ (Sum.inr j) = 1 := by
+theorem dilV_mul (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fin n) (τ : ℝ) (j : Fin n)
+    : dilV h w i₀ τ (Sum.inl j) * dilV h w i₀ τ (Sum.inr j) = 1 := by
   haveI := h.1
   show (if j = i₀ then _ else (1 : AE F E)) * (if j = i₀ then _ else (1 : AE F E)) = 1
   by_cases hj : j = i₀
@@ -77,19 +87,31 @@ theorem dilV_mul (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fi
       adr_one, map_one]
   · rw [if_neg hj, if_neg hj, mul_one]
 
-theorem dilV_mul' (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fin n) (τ : ℝ) (j : Fin n) :
-    dilV h w i₀ τ (Sum.inr j) * dilV h w i₀ τ (Sum.inl j) = 1 := by
+theorem dilV_mul' (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fin n) (τ : ℝ) (j : Fin n)
+    : dilV h w i₀ τ (Sum.inr j) * dilV h w i₀ τ (Sum.inl j) = 1 := by
   rw [mul_comm]
   exact dilV_mul h w i₀ τ j
 
-def dilT (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fin n) (τ : ℝ) : GL (Fin n) (AE F E) :=
-  ⟨Matrix.diagonal fun j => dilV h w i₀ τ (Sum.inl j), Matrix.diagonal fun j => dilV h w i₀ τ (Sum.inr j), by
-    rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]; congr 1; funext j; exact dilV_mul h w i₀ τ j, by
-    rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]; congr 1; funext j; exact dilV_mul' h w i₀ τ j⟩
+def dilT (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fin n) (τ : ℝ)
+    : GL (Fin n) (AE F E) := ⟨
+  Matrix.diagonal fun j => dilV h w i₀ τ (Sum.inl j),
+  Matrix.diagonal fun j => dilV h w i₀ τ (Sum.inr j),
+  by
+    rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+    congr 1
+    funext j
+    exact dilV_mul h w i₀ τ j,
+  by
+    rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+    congr 1
+    funext j
+    exact dilV_mul' h w i₀ τ j
+⟩
 
-theorem det_dilT (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fin n) (τ : ℝ) :
-    haveI := h.1
-    Matrix.GeneralLinearGroup.det (dilT h w i₀ τ) = Units.map (algebraMap (AF F) (AE F E)).toMonoidHom (adrU w τ) := by
+theorem det_dilT (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fin n) (τ : ℝ)
+    : haveI := h.1
+      Matrix.GeneralLinearGroup.det (dilT h w i₀ τ)
+        = Units.map (algebraMap (AF F) (AE F E)).toMonoidHom (adrU w τ) := by
   haveI := h.1
   apply Units.ext
   show (Matrix.diagonal fun j => dilV h w i₀ τ (Sum.inl j)).det =
@@ -103,25 +125,35 @@ theorem det_dilT (h : IsCMExt F E σ) {n : ℕ} (w : InfinitePlace F) (i₀ : Fi
   · intro hi
     exact absurd (Finset.mem_univ i₀) hi
 
-theorem inFrame_dil' {d : SD σ} (R : RD d) (w : InfinitePlace F) (i₀ : Fin d.n) (τ : ℝ) (y : GR d.n)
-    (hy : IsDil (Pi.single i₀ 1) τ y) :
-    inFrame d.b (R.ι w y) = Matrix.fromBlocks (dilT d.cm w i₀ τ).1 0 0 (dilT d.cm w i₀ (-τ)).1 := by
+theorem inFrame_dil'
+    {d : SD σ} (R : RD d)
+    (w : InfinitePlace F)
+    (i₀ : Fin d.n) (τ : ℝ) (y : GR d.n) (hy : IsDil (Pi.single i₀ 1) τ y)
+    : inFrame d.b (R.ι w y)
+      = Matrix.fromBlocks (dilT d.cm w i₀ τ).1 0 0 (dilT d.cm w i₀ (-τ)).1 := by
   rw [inFrame_dil R w i₀ τ y hy]
   show _ = Matrix.fromBlocks (Matrix.diagonal fun j => dilV d.cm w i₀ τ (Sum.inl j)) 0 0
     (Matrix.diagonal fun j => dilV d.cm w i₀ (-τ) (Sum.inl j))
   rw [Matrix.fromBlocks_diagonal]
   congr 1
 
-theorem section_dilation_exp (H : Hyps) {d : SD σ} (R : RD d) (w : InfinitePlace F) (i₀ : Fin d.n) (τ : ℝ) (y : GR d.n)
-    (hy : IsDil (Pi.single i₀ 1) τ y) {Φ : d.Fn} (hΦ : Φ ∈ d.sch) (h : d.G) :
-    d.sec0 Φ (R.ι w y * h) = Complex.exp (τ * d.m) * d.sec0 Φ h := by
+theorem section_dilation_exp
+    (H : Hyps)
+    {d : SD σ} (R : RD d)
+    (w : InfinitePlace F)
+    (i₀ : Fin d.n) (τ : ℝ) (y : GR d.n) (hy : IsDil (Pi.single i₀ 1) τ y)
+    {Φ : d.Fn} (hΦ : Φ ∈ d.sch)
+    (h : d.G)
+    : d.sec0 Φ (R.ι w y * h) = Complex.exp (τ * d.m) * d.sec0 Φ h := by
   haveI := d.cm.1
   have hφ : d.om h Φ ∈ d.sch := d.ok.dbl.weil.2.1.toIsSplitting.pres h Φ hΦ
   have hφ' : d.om (R.ι w y) (d.om h Φ) ∈ d.sch := d.ok.dbl.weil.2.1.toIsSplitting.pres _ _ hφ
-  have hT := (H.tAll.2.1 F E σ d (d.om h Φ) hφ).2.1 (R.ι w y) (dilT d.cm w i₀ τ) (dilT d.cm w i₀ (-τ))
-    (inFrame_dil' R w i₀ τ y hy) 0
+  have hT :=
+    (H.tAll.2.1 F E σ d (d.om h Φ) hφ).2.1 (R.ι w y) (dilT d.cm w i₀ τ) (dilT d.cm w i₀ (-τ))
+      (inFrame_dil' R w i₀ τ y hy) 0
   show d.l (d.om (R.ι w y * h) Φ) = Complex.exp (↑τ * ↑d.m) * d.l (d.om h Φ)
-  rw [map_mul, Module.End.mul_apply, l_eq_T_zero d _ hφ', hT, Matrix.zero_mul, ← l_eq_T_zero d _ hφ, det_dilT]
+  rw [map_mul, Module.End.mul_apply, l_eq_T_zero d _ hφ', hT, Matrix.zero_mul, ← l_eq_T_zero d _ hφ,
+    det_dilT]
   erw [chi_adrU d w τ]
   erw [absE_adrU d.cm w τ]
   rw [one_mul, ← Real.exp_mul, Complex.ofReal_exp]

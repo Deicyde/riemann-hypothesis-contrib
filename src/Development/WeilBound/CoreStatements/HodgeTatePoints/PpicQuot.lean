@@ -16,16 +16,24 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsMonHo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 namespace PositivityTheory.HtPt.Ppic
 
-theorem exists_factor_torus {K : Type} [Field K] [IsAlgClosed K] {G B B' : Over (Sp K)} [GrpObj G] [GrpObj B] [GrpObj B']
-    (hB' : IsAbelianScheme B') {X : Type} [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
-    (i : splitTorus (Sp K) X ⟶ G) (q : G ⟶ B) [IsMonHom i] [IsMonHom q] [Flat q.left] [Surjective q.left]
-    [QuasiCompact q.left] (hk : IsPullback i (toUnit _) q (η : 𝟙_ _ ⟶ B)) (f : G ⟶ B') [IsMonHom f] :
-    ∃ a : B ⟶ B', q ≫ a = f := by
+theorem exists_factor_torus
+    {K : Type} [Field K] [IsAlgClosed K]
+    {G B B' : Over (Sp K)} [GrpObj G] [GrpObj B] [GrpObj B']
+    (hB' : IsAbelianScheme B')
+    {X : Type} [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (i : splitTorus (Sp K) X ⟶ G) (q : G ⟶ B)
+    [IsMonHom i] [IsMonHom q] [Flat q.left] [Surjective q.left] [QuasiCompact q.left]
+    (hk : IsPullback i (toUnit _) q (η : 𝟙_ _ ⟶ B))
+    (f : G ⟶ B') [IsMonHom f]
+    : ∃ a : B ⟶ B', q ≫ a = f := by
   haveI : IsProper B'.hom := hB'.proper
   have hif : i ≫ f = toUnit _ ≫ η :=
     GlobalTheory.splitTorus_hom_proper_trivial_field K X B' (i ≫ f) inferInstance
@@ -44,7 +52,10 @@ theorem exists_factor_torus {K : Type} [Field K] [IsAlgClosed K] {G B B' : Over 
   rw [e2] at h3
   exact div_eq_one.1 h3.symm
 
-theorem quot : ∀ (G : Over (Sp ℂ)) [GrpObj G] [IsCommMonObj G] (τ : TorusExtension G) (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (T : GlobalTheory.UU.TQ G X), letI := τ.grpB; ∃ e : τ.B ≅ T.B, IsMonHom e.hom ∧ τ.q ≫ e.hom = T.q := by
+theorem quot
+    : ∀ (G : Over (Sp ℂ)) [GrpObj G] [IsCommMonObj G] (τ : TorusExtension G) (X : Type)
+        [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (T : GlobalTheory.UU.TQ G X),
+      letI := τ.grpB; ∃ e : τ.B ≅ T.B, IsMonHom e.hom ∧ τ.q ≫ e.hom = T.q := by
   intro G _ _ τ X _ _ _ T
   letI := τ.grpB
   letI := τ.addCommGroup

@@ -21,38 +21,41 @@ section Differences
 
 variable {K : Type*}
 
-def gStep {G : Type*} [AddCommGroup G] (b : K → ℤ) (h : (K → ℤ) → G) : (K → ℤ) → G :=
-  fun m => h m - h (m - b)
+def gStep {G : Type*} [AddCommGroup G] (b : K → ℤ) (h : (K → ℤ) → G) : (K → ℤ) → G := fun m =>
+  h m - h (m - b)
 
-theorem gStep_comm {G : Type*} [AddCommGroup G] (a b : K → ℤ) (h : (K → ℤ) → G) :
-    gStep a (gStep b h) = gStep b (gStep a h) := by
+theorem gStep_comm {G : Type*} [AddCommGroup G] (a b : K → ℤ) (h : (K → ℤ) → G)
+    : gStep a (gStep b h) = gStep b (gStep a h) := by
   funext m
   simp only [gStep]
   rw [sub_right_comm m a b]
   abel
 
-instance {G : Type*} [AddCommGroup G] : LeftCommutative (gStep (K := K) (G := G)) :=
-  ⟨gStep_comm⟩
+instance {G : Type*} [AddCommGroup G] : LeftCommutative (gStep (K := K) (G := G)) := ⟨gStep_comm⟩
 
 variable [DecidableEq K]
 
 omit [DecidableEq K] in
-theorem mixedDiff_eq {n : ℕ} (bs : Fin n → K → ℤ) (h : (K → ℤ) → ℤ) :
-    mixedDiff bs h = (List.ofFn bs).foldr gStep h := rfl
+theorem mixedDiff_eq {n : ℕ} (bs : Fin n → K → ℤ) (h : (K → ℤ) → ℤ)
+    : mixedDiff bs h = (List.ofFn bs).foldr gStep h :=
+  rfl
 
 omit [DecidableEq K] in
-theorem mixedDiff_cons {n : ℕ} (v : K → ℤ) (t : Fin n → K → ℤ) (h : (K → ℤ) → ℤ) :
-    mixedDiff (Fin.cons v t : Fin (n + 1) → K → ℤ) h = gStep v (mixedDiff t h) := by
+theorem mixedDiff_cons {n : ℕ} (v : K → ℤ) (t : Fin n → K → ℤ) (h : (K → ℤ) → ℤ)
+    : mixedDiff (Fin.cons v t : Fin (n + 1) → K → ℤ) h = gStep v (mixedDiff t h) := by
   simp only [mixedDiff_eq, List.ofFn_succ, Fin.cons_zero, Fin.cons_succ, List.foldr_cons]
 
-theorem intNum_perm (F : Type*) [Field F] {ι : K → Type*} (q : Ideal (MRing ι F)) {d : ℕ}
-    (σ : Equiv.Perm (Fin d)) (bs : Fin d → K → ℤ) : intNum F q (bs ∘ σ) = intNum F q bs := by
+theorem intNum_perm
+    (F : Type*) [Field F]
+    {ι : K → Type*} (q : Ideal (MRing ι F))
+    {d : ℕ} (σ : Equiv.Perm (Fin d)) (bs : Fin d → K → ℤ)
+    : intNum F q (bs ∘ σ) = intNum F q bs := by
   unfold intNum
   rw [mixedDiff_eq, mixedDiff_eq, (σ.ofFn_comp_perm bs).foldr_eq]
 
 omit [DecidableEq K] in
-theorem eventualValue_of_eventually {f : (K → ℤ) → ℤ} {c : ℤ} (h : ∀ᶠ m in atTop, f m = c) :
-    eventualValue f = c := by
+theorem eventualValue_of_eventually {f : (K → ℤ) → ℤ} {c : ℤ} (h : ∀ᶠ m in atTop, f m = c)
+    : eventualValue f = c := by
   have hex : ∃ c, ∀ᶠ m in atTop, f m = c := ⟨c, h⟩
   unfold eventualValue
   rw [dite_eq_left hex]
@@ -60,15 +63,16 @@ theorem eventualValue_of_eventually {f : (K → ℤ) → ℤ} {c : ℤ} (h : ∀
   exact hm1.symm.trans hm2
 
 omit [DecidableEq K] in
-theorem eventually_sub {P : (K → ℤ) → Prop} (h : ∀ᶠ m in atTop, P m) (x : K → ℤ) :
-    ∀ᶠ m in atTop, P (m - x) := by
+theorem eventually_sub {P : (K → ℤ) → Prop} (h : ∀ᶠ m in atTop, P m) (x : K → ℤ)
+    : ∀ᶠ m in atTop, P (m - x) := by
   obtain ⟨a, ha⟩ := Filter.eventually_atTop.1 h
   exact Filter.eventually_atTop.2 ⟨a + x, fun m hm => ha _ (le_sub_iff_add_le.2 hm)⟩
 
 omit [DecidableEq K] in
-theorem eventualValue_step_add (G : (K → ℤ) → ℤ) (x y : K → ℤ)
-    (hx : ∃ c, ∀ᶠ m in atTop, gStep x G m = c) (hy : ∃ c, ∀ᶠ m in atTop, gStep y G m = c) :
-    eventualValue (gStep (x + y) G) = eventualValue (gStep x G) + eventualValue (gStep y G) := by
+theorem eventualValue_step_add
+    (G : (K → ℤ) → ℤ) (x y : K → ℤ)
+    (hx : ∃ c, ∀ᶠ m in atTop, gStep x G m = c) (hy : ∃ c, ∀ᶠ m in atTop, gStep y G m = c)
+    : eventualValue (gStep (x + y) G) = eventualValue (gStep x G) + eventualValue (gStep y G) := by
   obtain ⟨cx, hcx⟩ := hx
   obtain ⟨cy, hcy⟩ := hy
   rw [eventualValue_of_eventually hcx, eventualValue_of_eventually hcy]
@@ -79,18 +83,23 @@ theorem eventualValue_step_add (G : (K → ℤ) → ℤ) (x y : K → ℤ)
   rw [show m - x - y = m - (x + y) from sub_sub m x y]
   abel
 
-theorem intNum_update_add (F : Type*) [Field F] {ι : K → Type*} (q : Ideal (MRing ι F)) {d : ℕ}
-    (hex : ∀ bs : Fin d → K → ℤ, ∃ c, ∀ᶠ m in atTop, mixedDiff bs (hilbFn q) m = c)
-    (bs : Fin d → K → ℤ) (j : Fin d) (x y : K → ℤ) :
-    intNum F q (Function.update bs j (x + y)) =
-      intNum F q (Function.update bs j x) + intNum F q (Function.update bs j y) := by
+theorem intNum_update_add
+    (F : Type*) [Field F]
+    {ι : K → Type*} (q : Ideal (MRing ι F))
+    {d : ℕ} (hex : ∀ bs : Fin d → K → ℤ, ∃ c, ∀ᶠ m in atTop, mixedDiff bs (hilbFn q) m = c)
+    (bs : Fin d → K → ℤ) (j : Fin d)
+    (x y : K → ℤ)
+    : intNum F q (Function.update bs j (x + y))
+      = intNum F q (Function.update bs j x) + intNum F q (Function.update bs j y) := by
   cases d with
   | zero => exact j.elim0
   | succ n =>
     set σ : Equiv.Perm (Fin (n + 1)) := Equiv.swap 0 j with hσ
     set t : Fin n → K → ℤ := fun i => bs (σ i.succ) with ht
-    have key : ∀ v, intNum F q (Function.update bs j v) =
-        eventualValue (gStep v (mixedDiff t (hilbFn q))) := by
+    have key
+        : ∀ v,
+          intNum F q (Function.update bs j v)
+            = eventualValue (gStep v (mixedDiff t (hilbFn q))) := by
       intro v
       rw [← intNum_perm F q σ]
       have hc : Function.update bs j v ∘ σ = Fin.cons v t := by
@@ -120,21 +129,20 @@ variable {K : Type*}
 def dPoly (b : K → ℤ) (p : MvPolynomial K ℚ) : MvPolynomial K ℚ :=
   p - bind₁ (fun k => X k - C (b k : ℚ)) p
 
-theorem eval_dPoly (b : K → ℤ) (p : MvPolynomial K ℚ) (m : K → ℤ) :
-    eval (fun k => (m k : ℚ)) (dPoly b p) =
-      eval (fun k => (m k : ℚ)) p - eval (fun k => ((m - b) k : ℚ)) p := by
+theorem eval_dPoly (b : K → ℤ) (p : MvPolynomial K ℚ) (m : K → ℤ)
+    : eval (fun k => (m k : ℚ)) (dPoly b p)
+      = eval (fun k => (m k : ℚ)) p - eval (fun k => ((m - b) k : ℚ)) p := by
   show aeval (fun k => (m k : ℚ)) (dPoly b p) =
     aeval (fun k => (m k : ℚ)) p - aeval (fun k => ((m - b) k : ℚ)) p
-  have hx : (fun i => aeval (fun k => (m k : ℚ)) (X i - C (b i : ℚ))) =
-      fun k => ((m - b) k : ℚ) := by
+  have hx
+      : (fun i => aeval (fun k => (m k : ℚ)) (X i - C (b i : ℚ))) = fun k => ((m - b) k : ℚ) := by
     funext k
     simp
   rw [dPoly, map_sub, aeval_bind₁, hx]
 
 def Low (A : MvPolynomial K ℚ) (N : ℕ) : Prop := A = 0 ∨ A.totalDegree < N
 
-theorem low_add {A B : MvPolynomial K ℚ} {N : ℕ} (hA : Low A N) (hB : Low B N) :
-    Low (A + B) N := by
+theorem low_add {A B : MvPolynomial K ℚ} {N : ℕ} (hA : Low A N) (hB : Low B N) : Low (A + B) N := by
   rcases hA with hA | hA
   · simpa [hA] using hB
   rcases hB with hB | hB
@@ -145,39 +153,44 @@ theorem low_add {A B : MvPolynomial K ℚ} {N : ℕ} (hA : Low A N) (hB : Low B 
 theorem low_mono {A : MvPolynomial K ℚ} {N N' : ℕ} (hA : Low A N) (h : N ≤ N') : Low A N' :=
   hA.imp id (fun h' => h'.trans_le h)
 
-theorem low_mul_right {A B : MvPolynomial K ℚ} {N M : ℕ} (hA : Low A N) (hB : B.totalDegree ≤ M) :
-    Low (A * B) (N + M) := by
+theorem low_mul_right {A B : MvPolynomial K ℚ} {N M : ℕ} (hA : Low A N) (hB : B.totalDegree ≤ M)
+    : Low (A * B) (N + M) := by
   rcases hA with hA | hA
   · exact Or.inl (by simp [hA])
   exact Or.inr ((totalDegree_mul A B).trans_lt (by omega))
 
-theorem low_mul_left {A B : MvPolynomial K ℚ} {N M : ℕ} (hB : Low B N) (hA : A.totalDegree ≤ M) :
-    Low (A * B) (M + N) := by
+theorem low_mul_left {A B : MvPolynomial K ℚ} {N M : ℕ} (hB : Low B N) (hA : A.totalDegree ≤ M)
+    : Low (A * B) (M + N) := by
   rw [mul_comm, add_comm]
   exact low_mul_right hB hA
 
-theorem dPoly_mul (b : K → ℤ) (A B : MvPolynomial K ℚ) :
-    dPoly b (A * B) = dPoly b A * B + (A - dPoly b A) * dPoly b B := by
+theorem dPoly_mul (b : K → ℤ) (A B : MvPolynomial K ℚ)
+    : dPoly b (A * B) = dPoly b A * B + (A - dPoly b A) * dPoly b B := by
   simp only [dPoly, map_mul]
   ring
 
-theorem totalDegree_sub_dPoly_le {b : K → ℤ} {A : MvPolynomial K ℚ} {N : ℕ}
-    (hd : A.totalDegree ≤ N) (hl : Low (dPoly b A) N) : (A - dPoly b A).totalDegree ≤ N := by
+theorem totalDegree_sub_dPoly_le
+    {b : K → ℤ} {A : MvPolynomial K ℚ} {N : ℕ} (hd : A.totalDegree ≤ N) (hl : Low (dPoly b A) N)
+    : (A - dPoly b A).totalDegree ≤ N := by
   refine (totalDegree_sub _ _).trans (max_le hd ?_)
   rcases hl with hl | hl
   · simp [hl]
   · exact hl.le
 
-theorem low_dPoly_mul {b : K → ℤ} {A B : MvPolynomial K ℚ} {α β : ℕ}
-    (hA : Low (dPoly b A) α) (hB : Low (dPoly b B) β) (hdA : A.totalDegree ≤ α)
-    (hdB : B.totalDegree ≤ β) : Low (dPoly b (A * B)) (α + β) := by
+theorem low_dPoly_mul
+    {b : K → ℤ} {A B : MvPolynomial K ℚ} {α β : ℕ} (hA : Low (dPoly b A) α) (hB : Low (dPoly b B) β)
+    (hdA : A.totalDegree ≤ α) (hdB : B.totalDegree ≤ β)
+    : Low (dPoly b (A * B)) (α + β) := by
   rw [dPoly_mul]
   exact low_add (low_mul_right hA hdB) (low_mul_left hB (totalDegree_sub_dPoly_le hdA hA))
 
-theorem low_dPoly_monomial (b : K → ℤ) (s : K →₀ ℕ) (a : ℚ) :
-    Low (dPoly b (monomial s a)) (monomial s a).totalDegree := by
+theorem low_dPoly_monomial (b : K → ℤ) (s : K →₀ ℕ) (a : ℚ)
+    : Low (dPoly b (monomial s a)) (monomial s a).totalDegree := by
   refine MvPolynomial.induction_on_monomial
-    (motive := fun p => Low (dPoly b p) p.totalDegree) (fun a => ?_) (fun p n ih => ?_) s a
+    (motive := fun p => Low (dPoly b p) p.totalDegree)
+    (fun a => ?_)
+    (fun p n ih => ?_)
+    s a
   · exact Or.inl (by simp [dPoly])
   · by_cases hp : p = 0
     · exact Or.inl (by simp [hp, dPoly])
@@ -193,20 +206,23 @@ theorem low_dPoly (b : K → ℤ) (p : MvPolynomial K ℚ) : Low (dPoly b p) p.t
     simp only [dPoly]
     conv_lhs => rw [p.as_sum]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← Finset.sum_sub_distrib]
+    rw [map_sum, ← Finset.sum_sub_distrib]
   rw [hsum]
-  refine Finset.sum_induction _ (fun A => Low A p.totalDegree) (fun _ _ => low_add)
-    (Or.inl rfl) (fun s hs => low_mono (low_dPoly_monomial b s _) ?_)
+  refine Finset.sum_induction _
+    (fun A => Low A p.totalDegree)
+    (fun _ _ => low_add)
+    (Or.inl rfl)
+    (fun s hs => low_mono (low_dPoly_monomial b s _) ?_)
   exact (totalDegree_monomial_le s _).trans (le_totalDegree hs)
 
-theorem totalDegree_dPoly_le (b : K → ℤ) (p : MvPolynomial K ℚ) :
-    (dPoly b p).totalDegree ≤ p.totalDegree - 1 := by
+theorem totalDegree_dPoly_le (b : K → ℤ) (p : MvPolynomial K ℚ)
+    : (dPoly b p).totalDegree ≤ p.totalDegree - 1 := by
   rcases low_dPoly b p with h | h
   · simp [h]
   · omega
 
-theorem totalDegree_foldr_dPoly_le (l : List (K → ℤ)) (p : MvPolynomial K ℚ) :
-    (l.foldr dPoly p).totalDegree ≤ p.totalDegree - l.length := by
+theorem totalDegree_foldr_dPoly_le (l : List (K → ℤ)) (p : MvPolynomial K ℚ)
+    : (l.foldr dPoly p).totalDegree ≤ p.totalDegree - l.length := by
   induction l with
   | nil => simp
   | cons b l ih =>
@@ -214,16 +230,15 @@ theorem totalDegree_foldr_dPoly_le (l : List (K → ℤ)) (p : MvPolynomial K �
     have := totalDegree_dPoly_le b (l.foldr dPoly p)
     omega
 
-theorem foldr_gStep_eval (l : List (K → ℤ)) (p : MvPolynomial K ℚ) (m : K → ℤ) :
-    l.foldr gStep (fun m : K → ℤ => eval (fun k => (m k : ℚ)) p) m =
-      eval (fun k => (m k : ℚ)) (l.foldr dPoly p) := by
+theorem foldr_gStep_eval (l : List (K → ℤ)) (p : MvPolynomial K ℚ) (m : K → ℤ)
+    : l.foldr gStep (fun m : K → ℤ => eval (fun k => (m k : ℚ)) p) m
+      = eval (fun k => (m k : ℚ)) (l.foldr dPoly p) := by
   induction l generalizing m with
   | nil => rfl
-  | cons b l ih =>
-    simp only [List.foldr_cons, gStep, ih, eval_dPoly]
+  | cons b l ih => simp only [List.foldr_cons, gStep, ih, eval_dPoly]
 
-theorem foldr_gStep_cast (l : List (K → ℤ)) (h : (K → ℤ) → ℤ) (m : K → ℤ) :
-    ((l.foldr gStep h m : ℤ) : ℚ) = l.foldr gStep (fun m => (h m : ℚ)) m := by
+theorem foldr_gStep_cast (l : List (K → ℤ)) (h : (K → ℤ) → ℤ) (m : K → ℤ)
+    : ((l.foldr gStep h m : ℤ) : ℚ) = l.foldr gStep (fun m => (h m : ℚ)) m := by
   induction l generalizing m with
   | nil => rfl
   | cons b l ih =>
@@ -231,9 +246,11 @@ theorem foldr_gStep_cast (l : List (K → ℤ)) (h : (K → ℤ) → ℤ) (m : K
     push_cast
     rw [ih, ih]
 
-theorem foldr_gStep_congr {G : Type*} [AddCommGroup G] (l : List (K → ℤ)) {h h' : (K → ℤ) → G}
-    (hh : ∀ᶠ m in atTop, h m = h' m) :
-    ∀ᶠ m in atTop, l.foldr gStep h m = l.foldr gStep h' m := by
+theorem foldr_gStep_congr
+    {G : Type*} [AddCommGroup G]
+    (l : List (K → ℤ))
+    {h h' : (K → ℤ) → G} (hh : ∀ᶠ m in atTop, h m = h' m)
+    : ∀ᶠ m in atTop, l.foldr gStep h m = l.foldr gStep h' m := by
   induction l with
   | nil => simpa using hh
   | cons b l ih =>
@@ -242,11 +259,15 @@ theorem foldr_gStep_congr {G : Type*} [AddCommGroup G] (l : List (K → ℤ)) {h
 
 end Polynomials
 
-theorem exists_eventually_const (h : MultigradedHilbertPolynomial.Statement.{u}) (F : Type u)
-    [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
+theorem exists_eventually_const
+    (h : MultigradedHilbertPolynomial.Statement.{u})
+    (F : Type u) [Field F]
+    (K : Type) [Fintype K] [DecidableEq K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
     (q : Ideal (MRing ι F)) (d : ℕ) (hq : IsMultiProjPrime q)
     (hdim : ringKrullDim (MRing ι F ⧸ q) = ((d + Fintype.card K : ℕ) : WithBot ℕ∞))
-    (bs : Fin d → K → ℤ) : ∃ c, ∀ᶠ m in atTop, mixedDiff bs (hilbFn q) m = c := by
+    (bs : Fin d → K → ℤ)
+    : ∃ c, ∀ᶠ m in atTop, mixedDiff bs (hilbFn q) m = c := by
   obtain ⟨p, a₀, hdeg, hp⟩ := h F K ι q d hq hdim
   have hev : ∀ᶠ m in atTop, ((hilbFn q m : ℤ) : ℚ) = eval (fun k => (m k : ℚ)) p := by
     filter_upwards [eventually_ge_atTop (fun _ : K => (a₀ : ℤ))] with m hm
@@ -275,12 +296,15 @@ theorem exists_eventually_const (h : MultigradedHilbertPolynomial.Statement.{u})
 
 end MixedNumberPolynomial
 
-theorem MixedNumberPolynomial.proof (h : MultigradedHilbertPolynomial.Statement.{u}) :
-    MixedNumberPolynomial.Statement.{u} := by
+theorem MixedNumberPolynomial.proof (h : MultigradedHilbertPolynomial.Statement.{u})
+    : MixedNumberPolynomial.Statement.{u} := by
   intro F _ K _ _ ι _ q d hq hdim
-  exact ⟨fun σ bs => MixedNumberPolynomial.intNum_perm F q σ bs,
-    fun bs j x y => MixedNumberPolynomial.intNum_update_add F q
-      (MixedNumberPolynomial.exists_eventually_const h F K ι q d hq hdim) bs j x y⟩
+  exact ⟨
+    fun σ bs => MixedNumberPolynomial.intNum_perm F q σ bs,
+    fun bs j x y =>
+      MixedNumberPolynomial.intNum_update_add F q
+        (MixedNumberPolynomial.exists_eventually_const h F K ι q d hq hdim) bs j x y
+  ⟩
 
 end
 

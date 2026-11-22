@@ -4,19 +4,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
 open scoped Pointwise in
-private theorem val_lt {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) (t : G F Ω) (y : Ω) :
-    (t⁻¹ • A).valuation y < 1 ↔ A.valuation (t y) < 1 := by
+private theorem val_lt
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (A : ValuationSubring Ω) (t : G F Ω) (y : Ω)
+    : (t⁻¹ • A).valuation y < 1 ↔ A.valuation (t y) < 1 := by
   rw [valuation_lt_one_iff', valuation_lt_one_iff', ValuationSubring.mem_inv_pointwise_smul_iff,
     ValuationSubring.mem_inv_pointwise_smul_iff]
   simp only [AlgEquiv.smul_def, map_inv₀, map_eq_zero]
 
 open scoped Pointwise in
-private theorem conj_place {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] {A : ValuationSubring Ω}
-    {v : HeightOneSpectrum (𝓞 F)} (h : IsPlaceOver A v) (t : G F Ω) :
-    IsPlaceOver (t⁻¹ • A) v ∧ ∀ σ ∈ Ine (F := F) A, t⁻¹ * σ * t ∈ Ine (F := F) (t⁻¹ • A) := by
+private theorem conj_place
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (h : IsPlaceOver A v)
+    (t : G F Ω)
+    : IsPlaceOver (t⁻¹ • A) v ∧ ∀ σ ∈ Ine (F := F) A, t⁻¹ * σ * t ∈ Ine (F := F) (t⁻¹ • A) := by
   refine ⟨fun x => ?_, fun σ hσ => ?_⟩
   · rw [val_lt, AlgEquiv.commutes]
     exact h x
@@ -25,13 +30,21 @@ private theorem conj_place {F Ω : Type} [Field F] [NumberField F] [Field Ω] [A
     · rw [ValuationSubring.decompositionSubgroup, MulAction.mem_stabilizer_iff] at hd ⊢
       rw [mul_smul, mul_smul, smul_inv_smul, hd]
     · rw [ValuationSubring.valuation_le_one_iff, ValuationSubring.mem_inv_pointwise_smul_iff,
-        AlgEquiv.smul_def] at hx
+          AlgEquiv.smul_def]
+        at hx
       rw [val_lt, map_sub]
       have := hi (t x) ((ValuationSubring.valuation_le_one_iff A _).2 hx)
       simpa [AlgEquiv.mul_apply, mul_inv_apply] using this
 
-theorem UpperTheory.V.Ws.phiKer :
-    ∀ {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] {s : W.HidaSetting l L Ω} (V : s.Lev), Function.Surjective V.pr ∧ Topology.IsQuotientMap V.pr ∧ ∀ U : Subgroup (G L Ω), IsClosed (U : Set (G L Ω)) → (∀ (A : ValuationSubring Ω) (v : W.Plc (W.Lp L)), IsPlaceOver A v → v ∉ V.S' → Ine (F := L) A ≤ U) → V.pr.ker ≤ U := by
+theorem UpperTheory.V.Ws.phiKer
+    : ∀ {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω]
+        [Algebra L Ω] [IsAlgClosure L Ω] {s : W.HidaSetting l L Ω} (V : s.Lev),
+      Function.Surjective V.pr ∧ Topology.IsQuotientMap V.pr
+        ∧ ∀ U : Subgroup (G L Ω),
+          IsClosed (U : Set (G L Ω))
+            → (∀ (A : ValuationSubring Ω) (v : W.Plc (W.Lp L)),
+              IsPlaceOver A v → v ∉ V.S' → Ine (F := L) A ≤ U)
+            → V.pr.ker ≤ U := by
   intro l _ L Ω _ _ _ _ _ _ s V
   have hres : ∀ (g : G L Ω) (x : Ω), W.resP L Ω g x = g x := fun _ _ => rfl
   have hinj : Function.Injective (W.resP L Ω) := fun a b h =>

@@ -11,7 +11,8 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FibreDim
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
@@ -22,8 +23,8 @@ theorem graphStatement : GraphStatement := by
   intro G J hJ
   have hP' : IsArithVar (imageZ inlV (graphIdeal P g)) d := by rw [h2]; exact hP
   have hF : IsProjVarF (fibreIdeal Sum.inl G) 0 :=
-    GlobalTheory.CompanionTheory.Ar.Giv.fibreDim K ι (K ⊕ K₂) (Sum.elim ι ι₂) Sum.inl inlV (graphIdeal P g) d 0 G
-      isBlockMap_inl h1 hP'
+    GlobalTheory.CompanionTheory.Ar.Giv.fibreDim K ι (K ⊕ K₂) (Sum.elim ι ι₂) Sum.inl inlV
+      (graphIdeal P g) d 0 G isBlockMap_inl h1 hP'
   have hrel := hF.1.2.2
   let i : ∀ k, fibreIdx (Sum.elim ι ι₂) (Sum.inl : K → K ⊕ K₂) k := fun k => (hrel k).choose
   have hi : IsChart (fibreIdeal Sum.inl G) i := fun k => (hrel k).choose_spec

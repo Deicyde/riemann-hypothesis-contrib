@@ -9,10 +9,10 @@ open ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh
 
 namespace GlobalTheory
 
-theorem exists_linearIndependent_sumElim_of_finrank_eq {k V : Type*} [Field k] [AddCommGroup V]
-    [Module k V] [FiniteDimensional k V] {n₀ n' : ℕ} (hV : Module.finrank k V = n₀ + n')
-    (v : Fin n₀ → V) (hv : LinearIndependent k v) :
-    ∃ w : Fin n' → V, LinearIndependent k (Sum.elim v w) := by
+theorem exists_linearIndependent_sumElim_of_finrank_eq
+    {k V : Type*} [Field k] [AddCommGroup V] [Module k V] [FiniteDimensional k V]
+    {n₀ n' : ℕ} (hV : Module.finrank k V = n₀ + n') (v : Fin n₀ → V) (hv : LinearIndependent k v)
+    : ∃ w : Fin n' → V, LinearIndependent k (Sum.elim v w) := by
   obtain ⟨Q, hQ⟩ := Submodule.exists_isCompl (Submodule.span k (Set.range v))
   have h1 := Submodule.finrank_add_eq_of_isCompl hQ
   rw [finrank_span_eq_card hv, Fintype.card_fin, hV] at h1

@@ -24,8 +24,11 @@ theorem UpperTheory.V.Z.Sym.Loc.hsNE : UpperTheory.V.Z.Sym.Loc.HsNE := by
     have hz' : QuadraticAlgebra.norm (z : QuadraticAlgebra K (-1) τ) = (t : K) := by
       have h := congrArg Units.val hz
       rwa [Units.coe_map] at h
-    refine ⟨((z : QuadraticAlgebra K (-1) τ).re * 2 + τ * (z : QuadraticAlgebra K (-1) τ).im) / 2,
-      (z : QuadraticAlgebra K (-1) τ).im / 2, ?_⟩
+    refine ⟨
+      ((z : QuadraticAlgebra K (-1) τ).re * 2 + τ * (z : QuadraticAlgebra K (-1) τ).im) / 2,
+      (z : QuadraticAlgebra K (-1) τ).im / 2,
+      ?_
+    ⟩
     rw [← hz', norm_def]
     field_simp
     ring

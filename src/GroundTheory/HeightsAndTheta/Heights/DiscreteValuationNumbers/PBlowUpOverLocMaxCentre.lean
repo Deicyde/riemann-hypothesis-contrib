@@ -17,10 +17,10 @@ noncomputable section
 
 universe u
 
-theorem BlowUpOverLocMaxCentre.proof (h₁ : BlowUpOverLocCentreDom.Statement.{u})
-    (h₂ : BlowUpOverLocLocalization.Statement.{u}) (h₃ : BlowUpOverLocFinite.Statement.{u})
-    (h₄ : BlowUpLocRingIso.Statement.{u}) :
-    BlowUpOverLocMaxCentre.Statement.{u} := by
+theorem BlowUpOverLocMaxCentre.proof
+    (h₁ : BlowUpOverLocCentreDom.Statement.{u}) (h₂ : BlowUpOverLocLocalization.Statement.{u})
+    (h₃ : BlowUpOverLocFinite.Statement.{u}) (h₄ : BlowUpLocRingIso.Statement.{u})
+    : BlowUpOverLocMaxCentre.Statement.{u} := by
   intro O _ _ _ K _ _ ι _ J _ P n hP N u hu hu' c x hx hxP W hWmin hWrel
   have := hP.multiProj.isPrime
   intro 𝔫 h𝔫
@@ -42,46 +42,64 @@ theorem BlowUpOverLocMaxCentre.proof (h₁ : BlowUpOverLocCentreDom.Statement.{u
       (SupSpanMultiHomog.full O K ι P x c hP.multiProj.multiHomog hx) hWmin
   obtain ⟨hAloc, hAunit⟩ := HomLocRingIsLocal.proof HomLocRingMem.proof O K ι P W hWp hPW
   obtain ⟨hfin, -⟩ := h₃ O K ι J P n hP N u hu hu' c x hx hxP W hWmin hWrel
-  have : Algebra.IsIntegral (homLocRing P W) (blowUpOverLoc P W u) := Algebra.IsIntegral.of_finite _ _
+  have : Algebra.IsIntegral (homLocRing P W) (blowUpOverLoc P W u) :=
+    Algebra.IsIntegral.of_finite _ _
   have hmax : (𝔫.comap (algebraMap (homLocRing P W) (blowUpOverLoc P W u))).IsMaximal :=
     Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := homLocRing P W) 𝔫
-  have hcomap : 𝔫.comap (algebraMap (homLocRing P W) (blowUpOverLoc P W u)) =
-      IsLocalRing.maximalIdeal (homLocRing P W) := IsLocalRing.eq_maximalIdeal hmax
+  have hcomap
+      : 𝔫.comap (algebraMap (homLocRing P W) (blowUpOverLoc P W u))
+        = IsLocalRing.maximalIdeal (homLocRing P W) :=
+    IsLocalRing.eq_maximalIdeal hmax
   have : (blowUpOf P u).IsPrime := RingHom.ker_isPrime _
   obtain ⟨φ, hφ⟩ := h₄ O K ι J P u W' hW'le
-  obtain ⟨-, hBunit⟩ := HomLocRingIsLocal.proof HomLocRingMem.proof O (Option K) (extIdx ι J)
-    (blowUpOf P u) W' hW'p hW'le
-  have key : ∀ (b : K → ℕ) (w : MRing ι O), IsMultiHomog w b → w ∈ W →
-      liftForm (J := J) w ∈ W' := by
+  obtain ⟨-, hBunit⟩ :=
+    HomLocRingIsLocal.proof HomLocRingMem.proof O (Option K) (extIdx ι J) (blowUpOf P u) W' hW'p
+      hW'le
+  have key
+      : ∀ (b : K → ℕ) (w : MRing ι O), IsMultiHomog w b → w ∈ W → liftForm (J := J) w ∈ W' := by
     intro b w hw hwW
     by_contra hwW'
     obtain ⟨i, hi⟩ := powMonomial_not_mem hWp hWrel b
     have hg := isMultiHomog_powMonomial (R := O) b i
     have hgW' : liftForm (J := J) (powMonomial b i) ∉ W' := fun hg' => hi (hW'c hg')
-    have hzA := Subring.subset_closure (s := {z | ∃ (b : K → ℕ) (f g : MRing ι O), IsMultiHomog f b ∧
-      IsMultiHomog g b ∧ g ∉ W ∧
-      z = algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P f) /
-        algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P g)})
-      ⟨b, w, powMonomial b i, hw, hg, hi, rfl⟩
-    have hm : (⟨_, hzA⟩ : homLocRing P W) ∈
-        𝔫.comap (algebraMap (homLocRing P W) (blowUpOverLoc P W u)) := by
+    have hzA :=
+      Subring.subset_closure
+        (s :=
+          {z | ∃ (b : K → ℕ) (f g : MRing ι O), IsMultiHomog f b ∧
+            IsMultiHomog g b ∧ g ∉ W ∧
+            z = algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P f) /
+              algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (Ideal.Quotient.mk P g)})
+        ⟨b, w, powMonomial b i, hw, hg, hi, rfl⟩
+    have hm
+        : (⟨_, hzA⟩ : homLocRing P W)
+          ∈ 𝔫.comap (algebraMap (homLocRing P W) (blowUpOverLoc P W u)) := by
       rw [hcomap]
       exact fun hu => (hAunit b w _ hw hg hi hzA).1 hu hwW
-    have hzB : algebraMap (MRing (extIdx ι J) O ⧸ blowUpOf P u)
-          (FractionRing (MRing (extIdx ι J) O ⧸ blowUpOf P u))
-          (Ideal.Quotient.mk (blowUpOf P u) (liftForm w)) /
-        algebraMap (MRing (extIdx ι J) O ⧸ blowUpOf P u)
-          (FractionRing (MRing (extIdx ι J) O ⧸ blowUpOf P u))
-          (Ideal.Quotient.mk (blowUpOf P u) (liftForm (powMonomial b i))) ∈
-        homLocRing (blowUpOf P u) W' := by
+    have hzB
+        : algebraMap (MRing (extIdx ι J) O ⧸ blowUpOf P u)
+              (FractionRing (MRing (extIdx ι J) O ⧸ blowUpOf P u))
+              (Ideal.Quotient.mk (blowUpOf P u) (liftForm w))
+            / algebraMap (MRing (extIdx ι J) O ⧸ blowUpOf P u)
+              (FractionRing (MRing (extIdx ι J) O ⧸ blowUpOf P u))
+              (Ideal.Quotient.mk (blowUpOf P u) (liftForm (powMonomial b i)))
+          ∈ homLocRing (blowUpOf P u) W' := by
       unfold homLocRing
-      exact Subring.subset_closure ⟨liftMDeg b, liftForm w, liftForm (powMonomial b i),
-        isMultiHomog_liftForm hw, isMultiHomog_liftForm hg, hgW', rfl⟩
-    have hU := ((hBunit (liftMDeg b) (liftForm w) (liftForm (powMonomial b i))
-      (isMultiHomog_liftForm hw) (isMultiHomog_liftForm hg) hgW' hzB).2 hwW').map φ
-    have hval : φ ⟨_, hzB⟩ =
-        algebraMap (blowUpOverLoc P W u) (blowUpLocRing P u W')
-          (algebraMap (homLocRing P W) (blowUpOverLoc P W u) ⟨_, hzA⟩) := by
+      exact Subring.subset_closure ⟨
+        liftMDeg b,
+        liftForm w,
+        liftForm (powMonomial b i),
+        isMultiHomog_liftForm hw,
+        isMultiHomog_liftForm hg,
+        hgW',
+        rfl
+      ⟩
+    have hU :=
+      ((hBunit (liftMDeg b) (liftForm w) (liftForm (powMonomial b i)) (isMultiHomog_liftForm hw)
+        (isMultiHomog_liftForm hg) hgW' hzB).2 hwW').map φ
+    have hval
+        : φ ⟨_, hzB⟩
+          = algebraMap (blowUpOverLoc P W u) (blowUpLocRing P u W')
+            (algebraMap (homLocRing P W) (blowUpOverLoc P W u) ⟨_, hzA⟩) := by
       apply Subtype.ext
       rw [hφ (liftMDeg b) _ _ (isMultiHomog_liftForm hw) (isMultiHomog_liftForm hg) hgW',
         blowUpEval_liftForm, blowUpEval_liftForm]
@@ -91,7 +109,7 @@ theorem BlowUpOverLocMaxCentre.proof (h₁ : BlowUpOverLocCentreDom.Statement.{u
   intro w hwW
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Ideal.mem_comap, ← sum_weightedHomogeneousComponent (w := blockWeight ι) w,
-    finsum_eq_sum _ (weightedHomogeneousComponent_finsupp _), map_sum]
+      finsum_eq_sum _ (weightedHomogeneousComponent_finsupp _), map_sum]
   exact Ideal.sum_mem _ fun b _ =>
     key b _ (weightedHomogeneousComponent_isWeightedHomogeneous _ _) (hWmh w hwW b)
 

@@ -20,9 +20,10 @@ open IdeleGroup
 
 section LocalConductor
 
-variable {k M : Type*} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  [Field M] [ValuativeRel M] [TopologicalSpace M] [IsNonarchimedeanLocalField M]
-  [Algebra k M] [ValuativeExtension k M] [FiniteDimensional k M] [IsGalois k M]
+variable
+  {k M : Type*} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  [Field M] [ValuativeRel M] [TopologicalSpace M] [IsNonarchimedeanLocalField M] [Algebra k M]
+  [ValuativeExtension k M] [FiniteDimensional k M] [IsGalois k M]
 
 end LocalConductor
 
@@ -32,8 +33,8 @@ open ValuativeRel
 
 variable {K : Type*} [Field K] [NumberField K]
 
-theorem unitFiltrationUnits_eq_unitsLevel (v : HeightOneSpectrum (𝓞 K)) (n : ℕ) :
-    unitFiltrationUnits (v.adicCompletion K) n = unitsLevel v n := by
+theorem unitFiltrationUnits_eq_unitsLevel (v : HeightOneSpectrum (𝓞 K)) (n : ℕ)
+    : unitFiltrationUnits (v.adicCompletion K) n = unitsLevel v n := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · exact unitFiltrationUnits_zero_eq_unitsLevel_zero v
   ext x
@@ -47,8 +48,9 @@ end Units
 
 section OneDim
 
-variable {K L : Type*} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L] (χ : Gal(L/K) →* ℂˣ)
+variable
+  {K L : Type*} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+  (χ : Gal(L/K) →* ℂˣ)
 
 end OneDim
 

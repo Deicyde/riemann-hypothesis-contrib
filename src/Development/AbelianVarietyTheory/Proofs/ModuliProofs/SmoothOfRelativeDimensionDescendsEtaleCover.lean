@@ -17,18 +17,19 @@ section Rings
 
 open TensorProduct KaehlerDifferential
 
-theorem flat_of_formallySmooth_of_essFiniteType (R B : Type*) [CommRing R] [CommRing B] [Algebra R B]
-    [IsNoetherianRing R] [Algebra.EssFiniteType R B] [Algebra.FormallySmooth R B] :
-    Module.Flat R B := by
+theorem flat_of_formallySmooth_of_essFiniteType
+    (R B : Type*) [CommRing R] [CommRing B] [Algebra R B] [IsNoetherianRing R]
+    [Algebra.EssFiniteType R B] [Algebra.FormallySmooth R B]
+    : Module.Flat R B := by
   let P := Algebra.EssFiniteType.subalgebra R B
   let M : Submonoid P := Algebra.EssFiniteType.submonoid R B
-  obtain ⟨n, f₀, hf₀⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.mp
-    (inferInstance : Algebra.FiniteType R P)
+  obtain ⟨n, f₀, hf₀⟩ :=
+    Algebra.FiniteType.iff_quotient_mvPolynomial''.mp (inferInstance : Algebra.FiniteType R P)
   let M' := M.comap f₀
   let P' := Localization M'
-  let fP : P' →ₐ[R] B := IsLocalization.liftAlgHom (M := M')
-      (f := (IsScalarTower.toAlgHom R P B).comp f₀) fun x ↦
-    IsLocalization.map_units (M := M) B ⟨f₀ x.1, x.2⟩
+  let fP : P' →ₐ[R] B :=
+    IsLocalization.liftAlgHom (M := M') (f := (IsScalarTower.toAlgHom R P B).comp f₀) fun x ↦
+      IsLocalization.map_units (M := M) B ⟨f₀ x.1, x.2⟩
   have hf₁ : Function.Surjective fP := by
     intro x
     obtain ⟨x, ⟨s, hs⟩, rfl⟩ := IsLocalization.exists_mk'_eq M x
@@ -37,15 +38,16 @@ theorem flat_of_formallySmooth_of_essFiniteType (R B : Type*) [CommRing R] [Comm
     refine ⟨IsLocalization.mk' (M := M') _ x ⟨s, hs⟩, ?_⟩
     exact (IsLocalization.lift_mk'_spec (M := M') (S := P')
       (g := ((IsScalarTower.toAlgHom R P B).comp f₀).toRingHom)
-      (fun x ↦ IsLocalization.map_units (M := M) B ⟨f₀ x.1, x.2⟩) x _ ⟨s, hs⟩).mpr
-      (IsLocalization.mk'_spec' B (f₀ x) (⟨f₀ s, hs⟩ : M)).symm
+      (fun x ↦ IsLocalization.map_units (M := M) B ⟨f₀ x.1, x.2⟩)
+      x _ ⟨s, hs⟩).mpr (IsLocalization.mk'_spec' B (f₀ x) (⟨f₀ s, hs⟩ : M)).symm
   have : Module.Flat R P' := .trans R (MvPolynomial (Fin n) R) P'
   exact Algebra.FormallySmooth.flat_of_algHom_of_isNoetherianRing fP hf₁
 
-theorem formallySmooth_of_flat_of_formallyUnramified (R A : Type*) [CommRing R] [CommRing A] [Algebra R A]
-    [IsNoetherianRing R] [IsLocalRing R] [IsLocalRing A] [IsLocalHom (algebraMap R A)]
-    [Algebra.EssFiniteType R A] [Module.Flat R A] [Algebra.FormallyUnramified R A] :
-    Algebra.FormallySmooth R A := by
+theorem formallySmooth_of_flat_of_formallyUnramified
+    (R A : Type*) [CommRing R] [CommRing A] [Algebra R A] [IsNoetherianRing R] [IsLocalRing R]
+    [IsLocalRing A] [IsLocalHom (algebraMap R A)] [Algebra.EssFiniteType R A] [Module.Flat R A]
+    [Algebra.FormallyUnramified R A]
+    : Algebra.FormallySmooth R A := by
   have : Algebra.FormallyEtale (IsLocalRing.ResidueField R) (IsLocalRing.ResidueField R ⊗[R] A) :=
     Algebra.FormallyEtale.of_formallyUnramified_of_field _ _
   have : Algebra.FinitePresentation R (Algebra.EssFiniteType.subalgebra R A) :=
@@ -53,9 +55,11 @@ theorem formallySmooth_of_flat_of_formallyUnramified (R A : Type*) [CommRing R] 
   exact Algebra.FormallySmooth.of_formallySmooth_residueField_tensor
     (Algebra.EssFiniteType.submonoid R A)
 
-theorem formallyEtale_of_bijective_mapBaseChange (R P B : Type*) [CommRing R] [CommRing P] [CommRing B]
-    [Algebra R P] [Algebra R B] [Algebra P B] [IsScalarTower R P B] [Algebra.FormallySmooth R B]
-    (h : Function.Bijective (mapBaseChange R P B)) : Algebra.FormallyEtale P B := by
+theorem formallyEtale_of_bijective_mapBaseChange
+    (R P B : Type*) [CommRing R] [CommRing P] [CommRing B] [Algebra R P] [Algebra R B] [Algebra P B]
+    [IsScalarTower R P B] [Algebra.FormallySmooth R B]
+    (h : Function.Bijective (mapBaseChange R P B))
+    : Algebra.FormallyEtale P B := by
   have h1 : Subsingleton Ω[B⁄P] := by
     refine subsingleton_of_forall_eq 0 fun x => ?_
     obtain ⟨y, rfl⟩ := map_surjective R P B x
@@ -70,10 +74,12 @@ theorem formallyEtale_of_bijective_mapBaseChange (R P B : Type*) [CommRing R] [C
     rw [Subsingleton.elim y 0, map_zero]
   exact ⟨h1, h2⟩
 
-theorem formallySmooth_of_faithfullyFlat (R A B : Type*) [CommRing R] [CommRing A] [CommRing B]
-    [Algebra R A] [Algebra R B] [Algebra A B] [IsScalarTower R A B] [IsNoetherianRing R] [IsLocalRing A]
-    [Algebra.EssFiniteType R A] [Algebra.EssFiniteType A B] [Module.FaithfullyFlat A B]
-    [Algebra.FormallyEtale A B] [Algebra.FormallySmooth R B] : Algebra.FormallySmooth R A := by
+theorem formallySmooth_of_faithfullyFlat
+    (R A B : Type*) [CommRing R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B] [Algebra A B]
+    [IsScalarTower R A B] [IsNoetherianRing R] [IsLocalRing A] [Algebra.EssFiniteType R A]
+    [Algebra.EssFiniteType A B] [Module.FaithfullyFlat A B] [Algebra.FormallyEtale A B]
+    [Algebra.FormallySmooth R B]
+    : Algebra.FormallySmooth R A := by
   classical
   have : IsNoetherianRing A := Algebra.EssFiniteType.isNoetherianRing R A
   have : Algebra.EssFiniteType R B := .comp R A B
@@ -99,9 +105,10 @@ theorem formallySmooth_of_faithfullyFlat (R A B : Type*) [CommRing R] [CommRing 
   have : Algebra.FormallyEtale P B := formallyEtale_of_bijective_mapBaseChange R P B hbij
   let p : Ideal P := (IsLocalRing.maximalIdeal A).comap (algebraMap P A)
   let Q := Localization.AtPrime p
-  let ψ : Q →ₐ[P] A := IsLocalization.liftAlgHom (M := p.primeCompl) (f := Algebra.ofId P A) fun x => by
-    by_contra h
-    exact x.2 h
+  let ψ : Q →ₐ[P] A :=
+    IsLocalization.liftAlgHom (M := p.primeCompl) (f := Algebra.ofId P A) fun x => by
+      by_contra h
+      exact x.2 h
   algebraize [ψ.toRingHom, (algebraMap A B).comp ψ.toRingHom]
   have : IsScalarTower P Q B := .to₁₂₄ P Q A B
   have : IsScalarTower R Q A := .to₁₃₄ R P Q A
@@ -137,15 +144,19 @@ theorem formallySmooth_of_faithfullyFlat (R A B : Type*) [CommRing R] [CommRing 
 
 end Rings
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
-theorem smooth_of_comp_of_etale_of_surjective {X Y S : Scheme.{0}} (π : X ⟶ Y) (s : Y ⟶ S)
-    [IsLocallyNoetherian S] [Etale π] [Surjective π] [LocallyOfFiniteType s] [Smooth (π ≫ s)] :
-    Smooth s := by
-  have : LocallyOfFinitePresentation s := LocallyOfFinitePresentation.iff_locallyOfFiniteType.mpr ‹_›
+theorem smooth_of_comp_of_etale_of_surjective
+    {X Y S : Scheme.{0}} (π : X ⟶ Y) (s : Y ⟶ S)
+    [IsLocallyNoetherian S] [Etale π] [Surjective π] [LocallyOfFiniteType s] [Smooth (π ≫ s)]
+    : Smooth s := by
+  have : LocallyOfFinitePresentation s :=
+    LocallyOfFinitePresentation.iff_locallyOfFiniteType.mpr ‹_›
   have : Flat π := (Etale.iff_flat_and_formallyUnramified.mp ‹Etale π›).1
   rw [← Scheme.Hom.smoothLocus_eq_top_iff, ← top_le_iff]
   rintro y -
@@ -167,21 +178,26 @@ theorem smooth_of_comp_of_etale_of_surjective {X Y S : Scheme.{0}} (π : X ⟶ Y
   exact formallySmooth_of_faithfullyFlat (S.presheaf.stalk (s (π x))) (Y.presheaf.stalk (π x))
     (X.presheaf.stalk x)
 
-theorem smoothOfRelativeDimension_of_etale_cover :
-    ∀ (K : Type) [Field K] (X Y : Scheme.{0}) (π : X ⟶ Y) (s : Y ⟶ Sp K) (d : ℕ), Etale π → Surjective π → LocallyOfFiniteType s → SmoothOfRelativeDimension d (π ≫ s) → SmoothOfRelativeDimension d s := by
+theorem smoothOfRelativeDimension_of_etale_cover
+    : ∀ (K : Type) [Field K] (X Y : Scheme.{0}) (π : X ⟶ Y) (s : Y ⟶ Sp K) (d : ℕ),
+      Etale π → Surjective π → LocallyOfFiniteType s → SmoothOfRelativeDimension d (π ≫ s)
+        → SmoothOfRelativeDimension d s := by
   intro K _ X Y π s d _ _ _ hd
   have : Smooth (π ≫ s) := SmoothOfRelativeDimension.smooth d _
   have : Smooth s := smooth_of_comp_of_etale_of_surjective π s
-  have : IsZariskiLocalAtSource (@SmoothOfRelativeDimension d) := HasRingHomProperty.instIsZariskiLocalAtSource
+  have : IsZariskiLocalAtSource (@SmoothOfRelativeDimension d) :=
+    HasRingHomProperty.instIsZariskiLocalAtSource
   choose n W hW hn using H1.exists_dim s
   have key (y : Y) : n y = d := by
     obtain ⟨x, rfl⟩ := π.surjective y
     have := hn (π x)
-    have h₁ : SmoothOfRelativeDimension (0 + n (π x)) ((π ∣_ W (π x)) ≫ (W (π x)).ι ≫ s) := inferInstance
+    have h₁ : SmoothOfRelativeDimension (0 + n (π x)) ((π ∣_ W (π x)) ≫ (W (π x)).ι ≫ s) :=
+      inferInstance
     rw [← Category.assoc, morphismRestrict_ι, Category.assoc] at h₁
     have h₂ : SmoothOfRelativeDimension (0 + d) ((π ⁻¹ᵁ W (π x)).ι ≫ π ≫ s) := inferInstance
     simpa using H1.dim_unique _ h₁ h₂ ⟨x, hW (π x)⟩
-  refine IsZariskiLocalAtSource.of_iSup_eq_top (P := @SmoothOfRelativeDimension d) W ?_ fun y => key y ▸ hn y
+  refine IsZariskiLocalAtSource.of_iSup_eq_top (P := @SmoothOfRelativeDimension d) W ?_ fun y =>
+    key y ▸ hn y
   rw [← top_le_iff]
   rintro y -
   exact TopologicalSpace.Opens.mem_iSup.mpr ⟨y, hW y⟩

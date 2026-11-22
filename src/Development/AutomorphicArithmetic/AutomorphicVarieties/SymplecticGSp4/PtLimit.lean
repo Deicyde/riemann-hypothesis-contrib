@@ -6,18 +6,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem mem_gradedSub {O S X : Type} [CommRing O] [CommRing S] [Algebra O S] [AddCommGroup X]
-    (𝒜 : X → Submodule O S) [SetLike.GradedMonoid 𝒜] {j : X} {f : S} (hf : f ∈ 𝒜 j) : f ∈ gradedSub 𝒜 := by
+private theorem mem_gradedSub
+    {O S X : Type} [CommRing O] [CommRing S] [Algebra O S] [AddCommGroup X]
+    (𝒜 : X → Submodule O S) [SetLike.GradedMonoid 𝒜]
+    {j : X} {f : S} (hf : f ∈ 𝒜 j)
+    : f ∈ gradedSub 𝒜 := by
   show f ∈ ⨆ i, 𝒜 i
   exact Submodule.mem_iSup_of_mem j hf
 
-private theorem limit_graded {O S X K : Type} [CommRing O] [CommRing S] [Algebra O S] [AddCommGroup X]
-    [CommRing K] [Algebra O K] (𝒜 : X → Submodule O S) [SetLike.GradedMonoid 𝒜] (hI : iSupIndep 𝒜)
+private theorem limit_graded
+    {O S X K : Type}
+    [CommRing O] [CommRing S] [Algebra O S] [AddCommGroup X] [CommRing K] [Algebra O K]
+    (𝒜 : X → Submodule O S) [SetLike.GradedMonoid 𝒜]
+    (hI : iSupIndep 𝒜)
     (ξ : gradedSub 𝒜 →ₐ[O] K) (p : X →+ ℤ)
-    (h : ∀ j f (hf : f ∈ 𝒜 j), p j < 0 → ξ ⟨f, mem_gradedSub 𝒜 hf⟩ = 0) :
-    ∃ ξ₀ : gradedSub 𝒜 →ₐ[O] K, ∀ j f (hf : f ∈ 𝒜 j),
+    (h : ∀ j f (hf : f ∈ 𝒜 j), p j < 0 → ξ ⟨f, mem_gradedSub 𝒜 hf⟩ = 0)
+    : ∃ ξ₀ : gradedSub 𝒜 →ₐ[O] K, ∀ j f (hf : f ∈ 𝒜 j),
       ξ₀ ⟨f, mem_gradedSub 𝒜 hf⟩ = if p j = 0 then ξ ⟨f, mem_gradedSub 𝒜 hf⟩ else 0 := by
   classical
   let B := gradedSub 𝒜
@@ -43,8 +51,9 @@ private theorem limit_graded {O S X K : Type} [CommRing O] [CommRing S] [Algebra
       have hbB : b ∈ B := hsub Zᶜ hb
       exact Submodule.mem_sup.mpr ⟨⟨a, haB⟩, ha, ⟨b, hbB⟩, hb, Subtype.ext hab⟩
   let L : B →ₗ[O] K := ξ.toLinearMap ∘ₗ Submodule.projection P0 P1 hc
-  have hform : ∀ j f (hf : f ∈ 𝒜 j),
-      L ⟨f, mem_gradedSub 𝒜 hf⟩ = if p j = 0 then ξ ⟨f, mem_gradedSub 𝒜 hf⟩ else 0 := by
+  have hform
+      : ∀ j f (hf : f ∈ 𝒜 j),
+        L ⟨f, mem_gradedSub 𝒜 hf⟩ = if p j = 0 then ξ ⟨f, mem_gradedSub 𝒜 hf⟩ else 0 := by
     intro j f hf
     split_ifs with hj
     · have hm : (⟨f, mem_gradedSub 𝒜 hf⟩ : B) ∈ P0 := (le_biSup 𝒜 (show j ∈ Z from hj)) hf
@@ -54,13 +63,18 @@ private theorem limit_graded {O S X K : Type} [CommRing O] [CommRing S] [Algebra
       show ξ (Submodule.projection P0 P1 hc ⟨f, mem_gradedSub 𝒜 hf⟩) = _
       have h0 := Submodule.projection_apply_right hc ⟨_, hm⟩
       rw [h0, map_zero]
-  have hmul_h : ∀ j k f g (hf : f ∈ 𝒜 j) (hg : g ∈ 𝒜 k),
-      L (⟨f, mem_gradedSub 𝒜 hf⟩ * ⟨g, mem_gradedSub 𝒜 hg⟩) =
-        L ⟨f, mem_gradedSub 𝒜 hf⟩ * L ⟨g, mem_gradedSub 𝒜 hg⟩ := by
+  have hmul_h
+      : ∀ j k f g (hf : f ∈ 𝒜 j) (hg : g ∈ 𝒜 k),
+        L (⟨f, mem_gradedSub 𝒜 hf⟩ * ⟨g, mem_gradedSub 𝒜 hg⟩)
+          = L ⟨f, mem_gradedSub 𝒜 hf⟩ * L ⟨g, mem_gradedSub 𝒜 hg⟩ := by
     intro j k f g hf hg
     have hfg : f * g ∈ 𝒜 (j + k) := SetLike.GradedMul.mul_mem hf hg
-    have e : (⟨f, mem_gradedSub 𝒜 hf⟩ * ⟨g, mem_gradedSub 𝒜 hg⟩ : B) = ⟨f * g, mem_gradedSub 𝒜 hfg⟩ := rfl
-    have hm : ξ ⟨f * g, mem_gradedSub 𝒜 hfg⟩ = ξ ⟨f, mem_gradedSub 𝒜 hf⟩ * ξ ⟨g, mem_gradedSub 𝒜 hg⟩ := by
+    have e
+        : (⟨f, mem_gradedSub 𝒜 hf⟩ * ⟨g, mem_gradedSub 𝒜 hg⟩ : B) = ⟨f * g, mem_gradedSub 𝒜 hfg⟩ :=
+      rfl
+    have hm
+        : ξ ⟨f * g, mem_gradedSub 𝒜 hfg⟩
+          = ξ ⟨f, mem_gradedSub 𝒜 hf⟩ * ξ ⟨g, mem_gradedSub 𝒜 hg⟩ := by
       rw [← map_mul]
       rfl
     have h1 := h j f hf
@@ -78,8 +92,9 @@ private theorem limit_graded {O S X K : Type} [CommRing O] [CommRing S] [Algebra
         · rw [h1 hj', zero_mul]
         · rw [h2 (by omega), mul_zero]
       · simp [hs, hj, hk]
-  have hmul : ∀ (x : S) (hx : x ∈ ⨆ j, 𝒜 j) (y : S) (hy : y ∈ ⨆ j, 𝒜 j),
-      L ((⟨x, hx⟩ : B) * ⟨y, hy⟩) = L ⟨x, hx⟩ * L ⟨y, hy⟩ := by
+  have hmul
+      : ∀ (x : S) (hx : x ∈ ⨆ j, 𝒜 j) (y : S) (hy : y ∈ ⨆ j, 𝒜 j),
+        L ((⟨x, hx⟩ : B) * ⟨y, hy⟩) = L ⟨x, hx⟩ * L ⟨y, hy⟩ := by
     intro x hx y hy
     induction hx using Submodule.iSup_induction' with
     | mem j f hf =>
@@ -106,17 +121,21 @@ private theorem limit_graded {O S X K : Type} [CommRing O] [CommRing S] [Algebra
   intro j f hf
   exact hform j f hf
 
-private theorem vanish_mono {O S K H : Type} [CommRing O] [CommRing S] [Algebra O S] [CommRing K] [Algebra O K]
-    [Group H] (A : Subalgebra O S) (r : H →* M4 S) (hr : ∀ g i j, r g i j ∈ A) (ξ : A →ₐ[O] K)
-    (p : ℤ × ℤ →+ ℤ) (h : ∀ g i j, p (wt i j) < 0 → ξ ⟨r g i j, hr g i j⟩ = 0) (w : ℤ × ℤ) (hw : p w < 0)
-    (f : S) (hf : f ∈ Submodule.span O (mono r w)) (hA : f ∈ A) : ξ ⟨f, hA⟩ = 0 := by
+private theorem vanish_mono
+    {O S K H : Type} [CommRing O] [CommRing S] [Algebra O S] [CommRing K] [Algebra O K] [Group H]
+    (A : Subalgebra O S) (r : H →* M4 S) (hr : ∀ g i j, r g i j ∈ A)
+    (ξ : A →ₐ[O] K) (p : ℤ × ℤ →+ ℤ) (h : ∀ g i j, p (wt i j) < 0 → ξ ⟨r g i j, hr g i j⟩ = 0)
+    (w : ℤ × ℤ) (hw : p w < 0)
+    (f : S) (hf : f ∈ Submodule.span O (mono r w)) (hA : f ∈ A)
+    : ξ ⟨f, hA⟩ = 0 := by
   have hmemA : ∀ L : List (H × Fin 4 × Fin 4), (L.map (fun a => r a.1 a.2.1 a.2.2)).prod ∈ A := by
     intro L
     induction L with
     | nil => simpa using A.one_mem
     | cons a L ih => simpa using A.mul_mem (hr a.1 a.2.1 a.2.2) ih
-  have hξL : ∀ L : List (H × Fin 4 × Fin 4), ξ ⟨_, hmemA L⟩ =
-      (L.map (fun a => ξ ⟨r a.1 a.2.1 a.2.2, hr a.1 a.2.1 a.2.2⟩)).prod := by
+  have hξL
+      : ∀ L : List (H × Fin 4 × Fin 4),
+        ξ ⟨_, hmemA L⟩ = (L.map (fun a => ξ ⟨r a.1 a.2.1 a.2.2, hr a.1 a.2.1 a.2.2⟩)).prod := by
     intro L
     induction L with
     | nil =>
@@ -124,7 +143,8 @@ private theorem vanish_mono {O S K H : Type} [CommRing O] [CommRing S] [Algebra 
       rw [e, map_one]
       simp
     | cons a L ih =>
-      have e : ξ ⟨_, hmemA (a :: L)⟩ = ξ ⟨r a.1 a.2.1 a.2.2, hr a.1 a.2.1 a.2.2⟩ * ξ ⟨_, hmemA L⟩ := by
+      have e
+          : ξ ⟨_, hmemA (a :: L)⟩ = ξ ⟨r a.1 a.2.1 a.2.2, hr a.1 a.2.1 a.2.2⟩ * ξ ⟨_, hmemA L⟩ := by
         rw [← map_mul]
         apply congrArg ξ
         apply Subtype.ext
@@ -168,15 +188,27 @@ private theorem vanish_mono {O S K H : Type} [CommRing O] [CommRing S] [Algebra 
     have e : (⟨a • x, hA⟩ : A) = a • (⟨x, hspan hx⟩ : A) := rfl
     rw [e, map_smul, ih, smul_zero]
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLimit :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ M : Model D, D.Fin0 → ∀ ξ : M.SS →ₐ[c.O] PadicAlgCl l, ((∀ i j, lamW i < lamW j → ¬ Ge (M.rep ξ) i j) ∨ ∀ i j, lamW j < lamW i → ¬ Ge (M.rep ξ) i j) → ∃ ξ₀ : M.SS →ₐ[c.O] PadicAlgCl l, ∀ g i j, M.rep ξ₀ g i j = if lamW i = lamW j then M.rep ξ g i j else 0 := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLimit
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ M : Model D,
+          D.Fin0
+            → ∀ ξ : M.SS →ₐ[c.O] PadicAlgCl l,
+              ((∀ i j, lamW i < lamW j → ¬ Ge (M.rep ξ) i j)
+                  ∨ ∀ i j, lamW j < lamW i → ¬ Ge (M.rep ξ) i j)
+                → ∃ ξ₀ : M.SS →ₐ[c.O] PadicAlgCl l, ∀ g i j,
+                  M.rep ξ₀ g i j = if lamW i = lamW j then M.rep ξ g i j else 0 := by
   intro Ω _ _ _ l _ c D hD M hF ξ hcase
-  have hrep : ∀ (ζ : M.SS →ₐ[c.O] PadicAlgCl l) g i j,
-      M.rep ζ g i j = ζ ⟨M.ru.hom g i j, M.sPart_le (M.entry_mem g i j)⟩ := by
+  have hrep
+      : ∀ (ζ : M.SS →ₐ[c.O] PadicAlgCl l) g i j,
+        M.rep ζ g i j = ζ ⟨M.ru.hom g i j, M.sPart_le (M.entry_mem g i j)⟩ := by
     intro ζ g i j
     rfl
-  obtain ⟨p, hp, hp0⟩ : ∃ p : ℤ × ℤ →+ ℤ, (∀ g i j, p (wt i j) < 0 → M.rep ξ g i j = 0) ∧
-      ∀ i j, (p (wt i j) = 0 ↔ lamW i = lamW j) := by
+  obtain ⟨p, hp, hp0⟩
+      : ∃ p : ℤ × ℤ →+ ℤ,
+        (∀ g i j, p (wt i j) < 0 → M.rep ξ g i j = 0)
+          ∧ ∀ i j, (p (wt i j) = 0 ↔ lamW i = lamW j) := by
     rcases hcase with hc | hc
     · refine ⟨AddMonoidHom.fst ℤ ℤ, ?_, ?_⟩
       · intro g i j hlt
@@ -189,7 +221,7 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLimit :
       · intro i j
         simp only [wt, AddMonoidHom.coe_fst]
         constructor <;> intro h <;> omega
-    · refine ⟨-AddMonoidHom.fst ℤ ℤ, ?_, ?_⟩
+    · refine ⟨- AddMonoidHom.fst ℤ ℤ, ?_, ?_⟩
       · intro g i j hlt
         have h1 : lamW j < lamW i := by
           simp only [wt, AddMonoidHom.neg_apply, AddMonoidHom.coe_fst] at hlt
@@ -206,10 +238,14 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.ptLimit :
     have hf' : f ∈ Submodule.span c.O (mono M.ru.hom j) := by
       rw [← spanMono D hD M hF j]
       exact hf
-    exact vanish_mono M.SS M.ru.hom (fun g i j => M.sPart_le (M.entry_mem g i j)) ξ p
-      (fun g i j hlt => (hrep ξ g i j).symm.trans (hp g i j hlt)) j hj f hf' _
-  obtain ⟨ξ₀, hξ₀⟩ : ∃ ξ₀ : M.SS →ₐ[c.O] PadicAlgCl l, ∀ j f (hf : f ∈ M.sPart j),
-      ξ₀ ⟨f, M.sPart_le hf⟩ = if p j = 0 then ξ ⟨f, M.sPart_le hf⟩ else 0 :=
+    exact vanish_mono M.SS M.ru.hom
+      (fun g i j => M.sPart_le (M.entry_mem g i j))
+      ξ p
+      (fun g i j hlt => (hrep ξ g i j).symm.trans (hp g i j hlt))
+      j hj f hf' _
+  obtain ⟨ξ₀, hξ₀⟩
+      : ∃ ξ₀ : M.SS →ₐ[c.O] PadicAlgCl l, ∀ j f (hf : f ∈ M.sPart j),
+        ξ₀ ⟨f, M.sPart_le hf⟩ = if p j = 0 then ξ ⟨f, M.sPart_le hf⟩ else 0 :=
     limit_graded M.sPart hI ξ p hvan
   refine ⟨ξ₀, fun g i j => ?_⟩
   rw [hrep, hrep, hξ₀ (wt i j) _ (M.entry_mem g i j)]

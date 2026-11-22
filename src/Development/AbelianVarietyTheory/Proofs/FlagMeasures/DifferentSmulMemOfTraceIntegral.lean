@@ -7,26 +7,32 @@ public import Mathlib
 open NumberField
 namespace GlobalTheory.TraceDualHom
 
-theorem exists_linear_trace_eq (E : Type) [Field E] [NumberField E] (a : ℕ)
-    (φ : (Fin a → E) →ₗ[ℚ] ℚ) :
-    ∃ l : (Fin a → E) →ₗ[E] E, ∀ x, Algebra.trace ℚ E (l x) = φ x := by
+theorem exists_linear_trace_eq
+    (E : Type) [Field E] [NumberField E] (a : ℕ) (φ : (Fin a → E) →ₗ[ℚ] ℚ)
+    : ∃ l : (Fin a → E) →ₗ[E] E, ∀ x, Algebra.trace ℚ E (l x) = φ x := by
   classical
   have h : ∀ i : Fin a, ∃ t : E, ∀ c : E, Algebra.trace ℚ E (t * c) = φ (Pi.single i c) := by
     intro i
-    refine ⟨((Algebra.traceForm ℚ E).toDual (traceForm_nondegenerate ℚ E)).symm
-      (φ ∘ₗ LinearMap.single ℚ (fun _ => E) i), fun c => ?_⟩
-    have := LinearMap.BilinForm.apply_toDual_symm_apply (hB := traceForm_nondegenerate ℚ E)
-      (φ ∘ₗ LinearMap.single ℚ (fun _ => E) i) c
+    refine ⟨
+      ((Algebra.traceForm ℚ E).toDual (traceForm_nondegenerate ℚ E)).symm
+        (φ ∘ₗ LinearMap.single ℚ (fun _ => E) i),
+      fun c => ?_
+    ⟩
+    have :=
+      LinearMap.BilinForm.apply_toDual_symm_apply (hB := traceForm_nondegenerate ℚ E)
+        (φ ∘ₗ LinearMap.single ℚ (fun _ => E) i) c
     exact this
   choose t ht using h
   refine ⟨∑ i, t i • LinearMap.proj i, fun x => ?_⟩
   conv_rhs => rw [← Finset.univ_sum_single x]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [ht, map_sum]
+  simp [ht, map_sum]
 
-theorem different_mul_mem (E : Type) [Field E] [NumberField E] (x : E)
-    (hx : ∀ c : 𝓞 E, ∃ m : ℤ, Algebra.trace ℚ E (x * c) = m)
-    (δ : 𝓞 E) (hδ : δ ∈ differentIdeal ℤ (𝓞 E)) : ∃ o : 𝓞 E, (o : E) = δ * x := by
+theorem different_mul_mem
+    (E : Type) [Field E] [NumberField E]
+    (x : E) (hx : ∀ c : 𝓞 E, ∃ m : ℤ, Algebra.trace ℚ E (x * c) = m)
+    (δ : 𝓞 E) (hδ : δ ∈ differentIdeal ℤ (𝓞 E))
+    : ∃ o : 𝓞 E, (o : E) = δ * x := by
   have h1 : (δ : E) ∈ IsLocalization.coeSubmodule E (differentIdeal ℤ (𝓞 E)) :=
     (IsLocalization.mem_coeSubmodule _ _).2 ⟨δ, hδ, rfl⟩
   rw [coeSubmodule_differentIdeal ℤ ℚ, Submodule.mem_div_iff_forall_mul_mem] at h1
@@ -38,11 +44,13 @@ theorem different_mul_mem (E : Type) [Field E] [NumberField E] (x : E)
     exact ⟨m, by simpa using hm.symm⟩
   exact Submodule.mem_one.1 (h1 x h2)
 
-theorem rat_span_eq_top (E : Type) [Field E] [NumberField E] (a : ℕ)
-    (A : Submodule (𝓞 E) (Fin a → E)) (hA : Submodule.span E (A : Set (Fin a → E)) = ⊤) :
-    Submodule.span ℚ (A : Set (Fin a → E)) = ⊤ := by
-  have key : ∀ (e : E), ∀ x ∈ Submodule.span ℚ (A : Set (Fin a → E)),
-      e • x ∈ Submodule.span ℚ (A : Set (Fin a → E)) := by
+theorem rat_span_eq_top
+    (E : Type) [Field E] [NumberField E]
+    (a : ℕ) (A : Submodule (𝓞 E) (Fin a → E)) (hA : Submodule.span E (A : Set (Fin a → E)) = ⊤)
+    : Submodule.span ℚ (A : Set (Fin a → E)) = ⊤ := by
+  have key
+      : ∀ (e : E), ∀ x ∈ Submodule.span ℚ (A : Set (Fin a → E)),
+        e • x ∈ Submodule.span ℚ (A : Set (Fin a → E)) := by
     intro e x hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
@@ -64,11 +72,12 @@ theorem rat_span_eq_top (E : Type) [Field E] [NumberField E] (a : ℕ)
   | add x y _ _ hx hy => exact Submodule.add_mem _ (hx trivial) (hy trivial)
   | smul e x _ hx => exact key e x (hx trivial)
 
-theorem mem_of_forall_rat_functional (E : Type) [Field E] [NumberField E] (a : ℕ)
-    (A : Submodule (𝓞 E) (Fin a → E)) (hfg : A.FG)
+theorem mem_of_forall_rat_functional
+    (E : Type) [Field E] [NumberField E]
+    (a : ℕ) (A : Submodule (𝓞 E) (Fin a → E)) (hfg : A.FG)
     (hA : Submodule.span E (A : Set (Fin a → E)) = ⊤) (z : Fin a → E)
-    (hz : ∀ φ : (Fin a → E) →ₗ[ℚ] ℚ, (∀ x ∈ A, ∃ m : ℤ, φ x = m) → ∃ m : ℤ, φ z = m) :
-    z ∈ A := by
+    (hz : ∀ φ : (Fin a → E) →ₗ[ℚ] ℚ, (∀ x ∈ A, ∃ m : ℤ, φ x = m) → ∃ m : ℤ, φ z = m)
+    : z ∈ A := by
   haveI : Module.Finite (𝓞 E) A := Module.Finite.iff_fg.2 hfg
   haveI : Module.Finite ℤ A := Module.Finite.trans (𝓞 E) A
   haveI : Module.Free ℤ A := inferInstance
@@ -91,23 +100,36 @@ theorem mem_of_forall_rat_functional (E : Type) [Field E] [NumberField E] (a : �
   have hB : Set.range B = Set.range (f ∘ b) := by simp [B]
   rw [← hsp, ← hB, Module.Basis.mem_span_iff_repr_mem]
   intro i
-  obtain ⟨m, hm⟩ := hz (B.coord i) (fun x hx => by
-    rw [← hsp, ← hB, Module.Basis.mem_span_iff_repr_mem] at hx
-    obtain ⟨m, hm⟩ := hx i
-    exact ⟨m, by simpa using hm.symm⟩)
+  obtain ⟨m, hm⟩ :=
+    hz (B.coord i) (fun x hx => by
+      rw [← hsp, ← hB, Module.Basis.mem_span_iff_repr_mem] at hx
+      obtain ⟨m, hm⟩ := hx i
+      exact ⟨m, by simpa using hm.symm⟩)
   exact ⟨m, by simpa using hm.symm⟩
 
-theorem different_smul_mem_of_trace_integral : ∀ (E : Type) [Field E] [NumberField E] (a b : ℕ) (A : Submodule (𝓞 E) (Fin a → E)) (Bm : Submodule (𝓞 E) (Fin b → E)), A.FG → Bm.FG → Submodule.span E (A : Set (Fin a → E)) = ⊤ → Submodule.span E (Bm : Set (Fin b → E)) = ⊤ → ∀ ψ : (Fin b → E) →ₗ[E] (Fin a → E), (∀ T : (Fin a → E) →ₗ[E] (Fin b → E), (∀ x ∈ A, T x ∈ Bm) → ∃ m : ℤ, Algebra.trace ℚ E (LinearMap.trace E _ (T ∘ₗ ψ)) = m) → ∀ δ ∈ differentIdeal ℤ (𝓞 E), ∀ y ∈ Bm, δ • ψ y ∈ A := by
+theorem different_smul_mem_of_trace_integral
+    : ∀ (E : Type) [Field E] [NumberField E] (a b : ℕ) (A : Submodule (𝓞 E) (Fin a → E))
+        (Bm : Submodule (𝓞 E) (Fin b → E)),
+      A.FG → Bm.FG → Submodule.span E (A : Set (Fin a → E)) = ⊤
+        → Submodule.span E (Bm : Set (Fin b → E)) = ⊤
+        → ∀ ψ : (Fin b → E) →ₗ[E] (Fin a → E),
+          (∀ T : (Fin a → E) →ₗ[E] (Fin b → E),
+              (∀ x ∈ A, T x ∈ Bm) → ∃ m : ℤ, Algebra.trace ℚ E (LinearMap.trace E _ (T ∘ₗ ψ)) = m)
+            → ∀ δ ∈ differentIdeal ℤ (𝓞 E), ∀ y ∈ Bm, δ • ψ y ∈ A := by
   intro E _ _ a b A Bm hA _ hAs _ ψ hψ δ hδ y hy
   refine mem_of_forall_rat_functional E a A hA hAs _ fun φ hφ => ?_
   obtain ⟨l, hl⟩ := exists_linear_trace_eq E a φ
-  obtain ⟨m, hm⟩ := hψ (((δ : E) • l).smulRight y) (fun x hx => by
-    obtain ⟨o, ho⟩ := different_mul_mem E (l x) (fun c => by
-      obtain ⟨m, hm⟩ := hφ (c • x) (A.smul_mem c hx)
-      refine ⟨m, ?_⟩
-      rw [← hm, ← hl, ← algebraMap_smul E c x, map_smul, smul_eq_mul, mul_comm]) δ hδ
-    rw [LinearMap.smulRight_apply, LinearMap.smul_apply, smul_eq_mul, ← ho]
-    exact Bm.smul_mem o hy)
+  obtain ⟨m, hm⟩ :=
+    hψ (((δ : E) • l).smulRight y) (fun x hx => by
+      obtain ⟨o, ho⟩ :=
+        different_mul_mem E (l x)
+          (fun c => by
+            obtain ⟨m, hm⟩ := hφ (c • x) (A.smul_mem c hx)
+            refine ⟨m, ?_⟩
+            rw [← hm, ← hl, ← algebraMap_smul E c x, map_smul, smul_eq_mul, mul_comm])
+          δ hδ
+      rw [LinearMap.smulRight_apply, LinearMap.smul_apply, smul_eq_mul, ← ho]
+      exact Bm.smul_mem o hy)
   refine ⟨m, ?_⟩
   have e : (((δ : E) • l).smulRight y) ∘ₗ ψ = ((((δ : E) • l) ∘ₗ ψ).smulRight y) := rfl
   rw [e, LinearMap.trace_smulRight] at hm

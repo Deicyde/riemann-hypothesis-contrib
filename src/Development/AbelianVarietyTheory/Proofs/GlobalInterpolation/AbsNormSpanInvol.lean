@@ -12,17 +12,18 @@ namespace GlobalTheory.SplitUnram
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem absNorm_span_invol (s : 𝓞 E →+* 𝓞 E) (hs : ∀ x, s (s x) = x) (a : 𝓞 E) :
-    Ideal.absNorm (Ideal.span {s a}) = Ideal.absNorm (Ideal.span {a}) := by
+theorem absNorm_span_invol (s : 𝓞 E →+* 𝓞 E) (hs : ∀ x, s (s x) = x) (a : 𝓞 E)
+    : Ideal.absNorm (Ideal.span {s a}) = Ideal.absNorm (Ideal.span {a}) := by
   let e : 𝓞 E ≃+* 𝓞 E := RingEquiv.ofRingHom s s (RingHom.ext hs) (RingHom.ext hs)
   let e' : 𝓞 E ≃ₐ[ℤ] 𝓞 E := AlgEquiv.ofRingEquiv (f := e) (fun n => by simp)
   rw [Ideal.absNorm_span_singleton, Ideal.absNorm_span_singleton]
   exact congrArg Int.natAbs (Algebra.norm_eq_of_algEquiv e' a)
 
-theorem natCast_notMem_sq : ∀ (E : Type) [Field E] [NumberField E] (s : 𝓞 E →+* 𝓞 E) (a : 𝓞 E) (p : ℕ),
-    (∀ x, s (s x) = x) → p.Prime → a * s a = (p : 𝓞 E) → IsCoprime a (s a) →
-    2 * (divs a).card = Module.finrank ℚ E → (∀ P ∈ divs a, Ideal.absNorm P.asIdeal = p) →
-    ∀ P ∈ divs a, ((p : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2 := by
+theorem natCast_notMem_sq
+    : ∀ (E : Type) [Field E] [NumberField E] (s : 𝓞 E →+* 𝓞 E) (a : 𝓞 E) (p : ℕ),
+      (∀ x, s (s x) = x) → p.Prime → a * s a = (p : 𝓞 E) → IsCoprime a (s a)
+        → 2 * (divs a).card = Module.finrank ℚ E → (∀ P ∈ divs a, Ideal.absNorm P.asIdeal = p)
+        → ∀ P ∈ divs a, ((p : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2 := by
   intro E _ _ s a p hs hp ha hcop hcard hN P hP hmem
   classical
   have hp0 : (p : 𝓞 E) ≠ 0 := by exact_mod_cast hp.ne_zero
@@ -39,7 +40,8 @@ theorem natCast_notMem_sq : ∀ (E : Type) [Field E] [NumberField E] (s : 𝓞 E
       rw [← ha]
       linear_combination (-a) * huv
     rw [h1]
-    exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (Ideal.pow_mem_pow haP 2)) (Ideal.mul_mem_left _ _ hmem)
+    exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (Ideal.pow_mem_pow haP 2))
+      (Ideal.mul_mem_left _ _ hmem)
   have hd1 : P.asIdeal ^ 2 ∣ Ideal.span {a} := by
     rw [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
     exact ha2
@@ -55,8 +57,9 @@ theorem natCast_notMem_sq : ∀ (E : Type) [Field E] [NumberField E] (s : 𝓞 E
     exact HeightOneSpectrum.isCoprime_of_ne P Q (Finset.ne_of_mem_erase hQ).symm
   have hd := map_dvd Ideal.absNorm (hc.mul_dvd hd1 hd2)
   rw [hnorm, map_mul, map_pow, map_prod, hN P hP,
-    Finset.prod_congr rfl (fun Q hQ => hN Q (Finset.mem_of_mem_erase hQ)), Finset.prod_const, ← pow_add,
-    Nat.pow_dvd_pow_iff_le_right hp.one_lt] at hd
+      Finset.prod_congr rfl (fun Q hQ => hN Q (Finset.mem_of_mem_erase hQ)), Finset.prod_const,
+      ← pow_add, Nat.pow_dvd_pow_iff_le_right hp.one_lt]
+    at hd
   have h3 := Finset.card_erase_add_one hP
   omega
 

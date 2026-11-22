@@ -8,10 +8,11 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.CompanionTheory.Glob
 
-theorem finiteDimensional_of_compact_coercive :
-    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (A : H →L[ℂ] H),
-      IsCompactOperator A → ∀ (S : Submodule ℂ H) (c : ℝ), 0 < c →
-        (∀ u ∈ S, c * ‖u‖ ^ 2 ≤ (⟪u, A u⟫_ℂ).re) → FiniteDimensional ℂ S := by
+theorem finiteDimensional_of_compact_coercive
+    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (A : H →L[ℂ] H),
+      IsCompactOperator A
+        → ∀ (S : Submodule ℂ H) (c : ℝ),
+          0 < c → (∀ u ∈ S, c * ‖u‖ ^ 2 ≤ (⟪u, A u⟫_ℂ).re) → FiniteDimensional ℂ S := by
   intro H _ _ _ A hA S c hc hS
   have hS' : ∀ u ∈ S.topologicalClosure, c * ‖u‖ ^ 2 ≤ (⟪u, A u⟫_ℂ).re := by
     intro u hu
@@ -25,8 +26,7 @@ theorem finiteDimensional_of_compact_coercive :
   have hbd : ∀ u ∈ S.topologicalClosure, ‖u‖ ≤ c⁻¹ * ‖A u‖ := by
     intro u hu
     have h1 := hS' u hu
-    have h2 : (⟪u, A u⟫_ℂ).re ≤ ‖u‖ * ‖A u‖ :=
-      (Complex.re_le_norm _).trans (norm_inner_le_norm _ _)
+    have h2 : (⟪u, A u⟫_ℂ).re ≤ ‖u‖ * ‖A u‖ := (Complex.re_le_norm _).trans (norm_inner_le_norm _ _)
     have h3 : c * ‖u‖ ≤ ‖A u‖ := by
       rcases (norm_nonneg u).eq_or_lt with h0 | hpos
       · rw [← h0, mul_zero]
@@ -41,8 +41,9 @@ theorem finiteDimensional_of_compact_coercive :
     rw [Real.coe_toNNReal _ (inv_nonneg.mpr hc.le)]
     exact hbd x x.2
   have hemb : Topology.IsClosedEmbedding T := hanti.isClosedEmbedding T.uniformContinuous
-  have hK := IsCompactOperator.isCompact_closure_image_closedBall
-    (f := (T : S.topologicalClosure →ₗ[ℂ] H)) hT 1
+  have hK :=
+    IsCompactOperator.isCompact_closure_image_closedBall (f := (T : S.topologicalClosure →ₗ[ℂ] H))
+      hT 1
   have hball : IsCompact (Metric.closedBall (0 : S.topologicalClosure) 1) := by
     refine (hemb.isCompact_preimage hK).of_isClosed_subset Metric.isClosed_closedBall ?_
     intro x hx

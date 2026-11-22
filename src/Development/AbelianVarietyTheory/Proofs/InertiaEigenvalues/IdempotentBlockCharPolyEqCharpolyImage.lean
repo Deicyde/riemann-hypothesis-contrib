@@ -6,15 +6,16 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemSpan
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.SpanRing
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.SpanRing
 
 namespace GlobalTheory.BlockCharpoly
 
 open Polynomial
 
-theorem exists_factor_of_idempotent {K : Type} [Field K] {n t : ℕ} (e : Matrix (Fin n) (Fin n) K)
-    (he : e * e = e) (hr : e.rank = t) :
-    ∃ (a : Matrix (Fin n) (Fin t) K) (b : Matrix (Fin t) (Fin n) K), b * a = 1 ∧ a * b = e := by
+theorem exists_factor_of_idempotent
+    {K : Type} [Field K] {n t : ℕ} (e : Matrix (Fin n) (Fin n) K) (he : e * e = e) (hr : e.rank = t)
+    : ∃ (a : Matrix (Fin n) (Fin t) K) (b : Matrix (Fin t) (Fin n) K), b * a = 1 ∧ a * b = e := by
   classical
   set V := LinearMap.range e.mulVecLin with hV
   have hd : Module.finrank K V = t := hr
@@ -42,18 +43,25 @@ theorem exists_factor_of_idempotent {K : Type} [Field K] {n t : ℕ} (e : Matrix
       rfl
     rw [hc, LinearMap.toMatrix'_toLin']
 
-theorem blockPol_factor {K : Type} [Field K] {n t : ℕ} (a : Matrix (Fin n) (Fin t) K)
-    (b : Matrix (Fin t) (Fin n) K) (hba : b * a = 1) (M : Matrix (Fin n) (Fin n) K) :
-    blockPol (a * b) (a * b * M * (a * b)) = (b * M * a).charpoly := by
+theorem blockPol_factor
+    {K : Type} [Field K]
+    {n t : ℕ} (a : Matrix (Fin n) (Fin t) K) (b : Matrix (Fin t) (Fin n) K) (hba : b * a = 1)
+    (M : Matrix (Fin n) (Fin n) K)
+    : blockPol (a * b) (a * b * M * (a * b)) = (b * M * a).charpoly := by
   unfold blockPol
   set A := a.map (C : K →+* K[X]) with hA
   set B := b.map (C : K →+* K[X]) with hB
   have hBA : B * A = 1 := by
     rw [hA, hB, ← Matrix.map_mul, hba, Matrix.map_one _ C.map_zero C.map_one]
 
-  have hmat : (X : K[X]) • (a * b).map (C : K →+* K[X]) - (a * b * M * (a * b)).map (C : K →+* K[X])
-        + 1 - (a * b).map (C : K →+* K[X])
-      = 1 + (A * ((X : K[X]) • (1 : Matrix (Fin t) (Fin t) K[X]) - B * M.map (C : K →+* K[X]) * A - 1)) * B := by
+  have hmat
+      : (X : K[X]) • (a * b).map (C : K →+* K[X]) - (a * b * M * (a * b)).map (C : K →+* K[X]) + 1
+          - (a * b).map (C : K →+* K[X])
+        = 1
+          + (A
+              * ((X : K[X]) • (1 : Matrix (Fin t) (Fin t) K[X]) - B * M.map (C : K →+* K[X]) * A
+                - 1))
+            * B := by
     simp only [Matrix.map_mul, ← hA, ← hB, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_smul,
       Matrix.smul_mul, Matrix.mul_one, Matrix.one_mul, Matrix.mul_assoc]
     abel
@@ -67,10 +75,11 @@ theorem blockPol_factor {K : Type} [Field K] {n t : ℕ} (a : Matrix (Fin n) (Fi
     Matrix.diagonal_apply, Matrix.map_apply, smul_eq_mul]
   split_ifs <;> simp
 
-theorem blockPol_eq_charpoly {K : Type} [Field K] {n t : ℕ} (e : Matrix (Fin n) (Fin n) K)
-    (he : e * e = e) (hr : e.rank = t) :
-    ∃ (a : Matrix (Fin n) (Fin t) K) (b : Matrix (Fin t) (Fin n) K), b * a = 1 ∧ a * b = e ∧
-      ∀ M : Matrix (Fin n) (Fin n) K, blockPol e (e * M * e) = (b * M * a).charpoly := by
+theorem blockPol_eq_charpoly
+    {K : Type} [Field K] {n t : ℕ} (e : Matrix (Fin n) (Fin n) K) (he : e * e = e) (hr : e.rank = t)
+    : ∃ (a : Matrix (Fin n) (Fin t) K) (b : Matrix (Fin t) (Fin n) K),
+      b * a = 1 ∧ a * b = e
+        ∧ ∀ M : Matrix (Fin n) (Fin n) K, blockPol e (e * M * e) = (b * M * a).charpoly := by
   obtain ⟨a, b, hba, hab⟩ := exists_factor_of_idempotent e he hr
   refine ⟨a, b, hba, hab, fun M => ?_⟩
   subst hab

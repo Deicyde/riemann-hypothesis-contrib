@@ -172,8 +172,8 @@ lemma prod_neg_eq (n : ℕ) (w : Fin n → Fin d) (ξ : E d) :
 end Dec
 
 theorem frozenDecompositionOfParts : DecomposeOf := by
-  intro hPF hDw hFP hPL hWF d ι _ P U u hyp x0 ψ0 r hψ hψc hψ1 hψs hr hball χ χ' hχ hχc hχs
-    hχ' hχ'c hχ's hχχ' i
+  intro hPF hDw hFP hPL hWF d ι _ P U u hyp x0 ψ0 r hψ hψc hψ1 hψs hr hball χ χ' hχ hχc hχs hχ' hχ'c
+    hχ's hχχ' i
   obtain ⟨hUo, hA, -, hu, -⟩ := id hyp
   have hχU : tsupport χ ⊆ U := hχs.trans ((ball_subset_ball (by linarith)).trans hball)
   obtain ⟨c, hc, hcw⟩ := hWF d ι P U u hyp i χ χ' hχ hχc hχU hχ' hχ'c hχ's hχχ'
@@ -190,8 +190,10 @@ theorem frozenDecompositionOfParts : DecomposeOf := by
   have hb2 : ∀ n w, ContDiff ℝ ∞ (b2 n w) := fun n w => contDiff_const
   refine ⟨lo, c, hlo, hc, fun ξ => ?_⟩
   have hφ := Dec.contDiff_eF ξ
-  have hterm : ∀ n (w : Fin n → Fin d), ∫ y, cut χ' u y * c n w y * dw (List.ofFn w) (eF ξ) y =
-      (-1 : ℂ) ^ n * mono w ξ * conv (𝓕 (c n w)) (𝓕 (cut χ' u)) ξ := by
+  have hterm
+      : ∀ n (w : Fin n → Fin d),
+        ∫ y, cut χ' u y * c n w y * dw (List.ofFn w) (eF ξ) y
+          = (-1 : ℂ) ^ n * mono w ξ * conv (𝓕 (c n w)) (𝓕 (cut χ' u)) ξ := by
     intro n w
     have hpf := hPF d 0 (fun _ _ => c n w) (cut χ' u) (fun _ _ => hc n w) hg'c hg's ξ
     have htr0 : ∀ y, trOp 0 (fun _ _ => c n w) (eF ξ) y = c n w y * eF ξ y := by
@@ -201,28 +203,36 @@ theorem frozenDecompositionOfParts : DecomposeOf := by
       intro w' η
       simp [mono]
     simp only [htr0] at hpf
-    have e1 : (fun y => cut χ' u y * c n w y * dw (List.ofFn w) (eF ξ) y) =
-        fun y => ((-1 : ℂ) ^ n * mono w ξ) * (cut χ' u y * (c n w y * eF ξ y)) := by
+    have e1
+        : (fun y => cut χ' u y * c n w y * dw (List.ofFn w) (eF ξ) y)
+          = fun y => ((-1 : ℂ) ^ n * mono w ξ) * (cut χ' u y * (c n w y * eF ξ y)) := by
       funext y
       simp only [hDw d ξ (List.ofFn w), Dec.prod_neg_eq]
       ring
     rw [e1, integral_const_mul, hpf]
     simp [hmono0]
-  have hR : ∫ y, cut χ u y * P.tr i (eF ξ) y = ∑ n ∈ Finset.range m, ∑ w : Fin n → Fin d,
-      (-1 : ℂ) ^ n * mono w ξ * conv (𝓕 (c n w)) (𝓕 (cut χ' u)) ξ := by
+  have hR
+      : ∫ y, cut χ u y * P.tr i (eF ξ) y
+        = ∑ n ∈ Finset.range m, ∑ w : Fin n → Fin d,
+          (-1 : ℂ) ^ n * mono w ξ * conv (𝓕 (c n w)) (𝓕 (cut χ' u)) ξ := by
     rw [hcw ξ]
     exact Finset.sum_congr rfl fun n _ => Finset.sum_congr rfl fun w _ => hterm n w
-  have hloc := hPL d m (P.a i) (fun n w y => lo n w y + b2 n w y) (cut χ u) (eF ξ) (ball x0 r)
-    isOpen_ball ((Dec.tsupport_cut χ u).trans hχs) (by
-      intro n w x hx
-      have h1 := hψ1' x hx
-      simp only [lo, b2, h1]
-      split_ifs <;> ring)
-  have hsplit : ∀ y, trOp m (fun n w y => lo n w y + b2 n w y) (eF ξ) y =
-      trOp m lo (eF ξ) y + trOp m b2 (eF ξ) y :=
-    fun y => Dec.trOp_add m lo b2 (eF ξ) (fun n w => (hlo n w).1) hb2 hφ y
-  have hb2e : ∀ y, trOp m b2 (eF ξ) y =
-      (∑ w : Fin m → Fin d, P.a i m w x0 * mono w ξ) * eF ξ y := by
+  have hloc :=
+    hPL d m (P.a i)
+      (fun n w y => lo n w y + b2 n w y)
+      (cut χ u) (eF ξ) (ball x0 r) isOpen_ball ((Dec.tsupport_cut χ u).trans hχs)
+      (by
+        intro n w x hx
+        have h1 := hψ1' x hx
+        simp only [lo, b2, h1]
+        split_ifs <;> ring)
+  have hsplit
+      : ∀ y,
+        trOp m (fun n w y => lo n w y + b2 n w y) (eF ξ) y
+          = trOp m lo (eF ξ) y + trOp m b2 (eF ξ) y := fun y =>
+    Dec.trOp_add m lo b2 (eF ξ) (fun n w => (hlo n w).1) hb2 hφ y
+  have hb2e
+      : ∀ y, trOp m b2 (eF ξ) y = (∑ w : Fin m → Fin d, P.a i m w x0 * mono w ξ) * eF ξ y := by
     intro y
     simp only [trOp]
     rw [Finset.sum_range_succ, Finset.sum_eq_zero, zero_add, Finset.sum_mul]
@@ -241,33 +251,37 @@ theorem frozenDecompositionOfParts : DecomposeOf := by
       rw [Dec.dw_zero]
       simp
   have hint1 : Integrable (fun y => cut χ u y * trOp m lo (eF ξ) y) :=
-    (hgc.mul (Dec.continuous_trOp m lo (eF ξ) (fun n w => (hlo n w).1) hφ)).integrable_of_hasCompactSupport
-      hgs.mul_right
+    (hgc.mul (Dec.continuous_trOp m lo (eF ξ)
+      (fun n w => (hlo n w).1)
+      hφ)).integrable_of_hasCompactSupport hgs.mul_right
   have hint2 : Integrable (fun y => cut χ u y * trOp m b2 (eF ξ) y) :=
     (hgc.mul (Dec.continuous_trOp m b2 (eF ξ) hb2 hφ)).integrable_of_hasCompactSupport hgs.mul_right
-  have hconst : ∫ y, cut χ u y * trOp m b2 (eF ξ) y =
-      (∑ w : Fin m → Fin d, P.a i m w x0 * mono w ξ) * 𝓕 (cut χ u) ξ := by
+  have hconst
+      : ∫ y, cut χ u y * trOp m b2 (eF ξ) y
+        = (∑ w : Fin m → Fin d, P.a i m w x0 * mono w ξ) * 𝓕 (cut χ u) ξ := by
     simp_rw [hb2e]
     rw [← hFP d (cut χ u) hgc hgs ξ, ← integral_const_mul]
     congr 1
     funext y
     ring
-  have key : ∫ y, cut χ u y * P.tr i (eF ξ) y =
-      (∑ w : Fin m → Fin d, P.a i m w x0 * mono w ξ) * 𝓕 (cut χ u) ξ +
-        ∑ n ∈ Finset.range (m + 1), ∑ w : Fin n → Fin d,
-          conv (𝓕 (lo n w)) (fun η => mono w η * 𝓕 (cut χ u) η) ξ := by
-    calc ∫ y, cut χ u y * P.tr i (eF ξ) y
+  have key
+      : ∫ y, cut χ u y * P.tr i (eF ξ) y
+        = (∑ w : Fin m → Fin d, P.a i m w x0 * mono w ξ) * 𝓕 (cut χ u) ξ
+          + ∑ n ∈ Finset.range (m + 1), ∑ w : Fin n → Fin d,
+              conv (𝓕 (lo n w)) (fun η => mono w η * 𝓕 (cut χ u) η) ξ := by
+    calc
+      ∫ y, cut χ u y * P.tr i (eF ξ) y
         = ∫ y, cut χ u y * trOp m (fun n w y => lo n w y + b2 n w y) (eF ξ) y := hloc
       _ = ∫ y, (cut χ u y * trOp m lo (eF ξ) y + cut χ u y * trOp m b2 (eF ξ) y) := by
-          congr 1
-          funext y
-          rw [hsplit y, mul_add]
+        congr 1
+        funext y
+        rw [hsplit y, mul_add]
       _ = (∫ y, cut χ u y * trOp m lo (eF ξ) y) + ∫ y, cut χ u y * trOp m b2 (eF ξ) y :=
-          integral_add hint1 hint2
-      _ = _ := by
-          rw [hPF d m lo (cut χ u) hlo hgc hgs ξ, hconst, add_comm]
-  have hlom : ∀ w : Fin m → Fin d,
-      lo m w = fun x => ((ψ0 (r⁻¹ • (x - x0)) : ℝ) : ℂ) * (P.a i m w x - P.a i m w x0) := by
+        integral_add hint1 hint2
+      _ = _ := by rw [hPF d m lo (cut χ u) hlo hgc hgs ξ, hconst, add_comm]
+  have hlom
+      : ∀ w : Fin m → Fin d,
+        lo m w = fun x => ((ψ0 (r⁻¹ • (x - x0)) : ℝ) : ℂ) * (P.a i m w x - P.a i m w x0) := by
     intro w
     funext x
     simp only [lo, eq_self_iff_true, if_true]

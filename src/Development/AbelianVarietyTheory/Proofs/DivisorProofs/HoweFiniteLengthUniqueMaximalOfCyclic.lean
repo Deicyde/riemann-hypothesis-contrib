@@ -13,12 +13,27 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR
 
-theorem howe_finiteLength_uniqueMaximal_of_cyclic : ∀ (T : Type) [Fintype T] [DecidableEq T] (R S : T → ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (a : ∀ w, Mat (R w) (S w) →ₗ[ℂ] Module.End ℂ V), (∀ w, Good (a w)) → (∀ w w', w ≠ w' → ∀ Z Z' v, a w Z (a w' Z' v) = a w' Z' (a w Z v)) → ∀ (C : Submodule ℂ V) (α β α' β' : T → ℂ), (∀ w, QuadMod (a w) (α w) (β w) (α' w) (β' w) C ⊤) → (∀ B : ℚ, ∃ U : Submodule ℂ V, FiniteDimensional ℂ U ∧ ∀ μ : ∀ w, Ix (R w) (S w) → ℚ, (∀ w c, |μ w c| ≤ B) → (⨅ w, hwSub (a w) (μ w)) ≤ U ⊔ C) → (∃ (μ : ∀ w, Ix (R w) (S w) → ℚ) (v : V), (∀ w, v ∈ hwSub (a w) (μ w)) ∧ (∀ N : Submodule ℂ V, (∀ w, Stab (a w) N) → C ≤ N → v ∈ N → N = ⊤) ∧ (⨅ w, hwSub (a w) (μ w)) ≤ Submodule.span ℂ {v} ⊔ C) → HoweAlg a C := by
+theorem howe_finiteLength_uniqueMaximal_of_cyclic
+    : ∀ (T : Type) [Fintype T] [DecidableEq T] (R S : T → ℕ) (V : Type) [AddCommGroup V]
+        [Module ℂ V] (a : ∀ w, Mat (R w) (S w) →ₗ[ℂ] Module.End ℂ V),
+      (∀ w, Good (a w)) → (∀ w w', w ≠ w' → ∀ Z Z' v, a w Z (a w' Z' v) = a w' Z' (a w Z v))
+        → ∀ (C : Submodule ℂ V) (α β α' β' : T → ℂ),
+          (∀ w, QuadMod (a w) (α w) (β w) (α' w) (β' w) C ⊤)
+            → (∀ B : ℚ, ∃ U : Submodule ℂ V,
+              FiniteDimensional ℂ U
+                ∧ ∀ μ : ∀ w, Ix (R w) (S w) → ℚ,
+                  (∀ w c, |μ w c| ≤ B) → (⨅ w, hwSub (a w) (μ w)) ≤ U ⊔ C)
+            → (∃ (μ : ∀ w, Ix (R w) (S w) → ℚ) (v : V),
+              (∀ w, v ∈ hwSub (a w) (μ w))
+                ∧ (∀ N : Submodule ℂ V, (∀ w, Stab (a w) N) → C ≤ N → v ∈ N → N = ⊤)
+                ∧ (⨅ w, hwSub (a w) (μ w)) ≤ Submodule.span ℂ {v} ⊔ C)
+            → HoweAlg a C := by
   intro T _ _ R S V _ _ a hG hc C α β α' β' hQ hAdm hCyc
   refine ⟨?_, ?_⟩
   · obtain ⟨B, hB⟩ := Places.multi_place_step T R S α β α' β'
     obtain ⟨U, hU, hUC⟩ := hAdm B
-    let G : Submodule ℂ V := ⨆ (μ : ∀ w, Ix (R w) (S w) → ℚ) (_ : ∀ w c, |μ w c| ≤ B), ⨅ w, hwSub (a w) (μ w)
+    let G : Submodule ℂ V :=
+      ⨆ (μ : ∀ w, Ix (R w) (S w) → ℚ) (_ : ∀ w c, |μ w c| ≤ B), ⨅ w, hwSub (a w) (μ w)
     have hGUC : G ≤ U ⊔ C := iSup_le fun μ => iSup_le fun h => hUC μ h
     refine ⟨Module.finrank ℂ U + 1, fun m N hN hNk => ?_⟩
     refine chain_length_le_finrank_add_one V G U C hU hGUC m N hN (fun k => (hNk k).2) ?_
@@ -41,13 +56,13 @@ theorem howe_finiteLength_uniqueMaximal_of_cyclic : ∀ (T : Type) [Fintype T] [
     by_cases hx : x = 0
     · subst hx
       have hnC : n = c := by rw [← hyc]; simp
-      have hvN' : v ∈ N' := by
-        rw [← hnn]; exact N'.add_mem (hCN' (hnC ▸ hc')) hn'.1
+      have hvN' : v ∈ N' := by rw [← hnn]; exact N'.add_mem (hCN' (hnC ▸ hc')) hn'.1
       exact hN't (hgen N' hN' hCN' hvN')
     · have hvN : v ∈ N := by
         have h1 : x • v ∈ N := by
           have : x • v = n - c := by rw [← hyc]; simp
-          rw [this]; exact N.sub_mem hn.1 (hCN hc')
+          rw [this]
+          exact N.sub_mem hn.1 (hCN hc')
         have := N.smul_mem x⁻¹ h1
         rwa [smul_smul, inv_mul_cancel₀ hx, one_smul] at this
       exact hNt (hgen N hN hCN hvN)

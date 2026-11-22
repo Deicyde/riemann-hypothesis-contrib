@@ -11,10 +11,13 @@ open Classical
 
 namespace GlobalTheory
 
-theorem minpoly_coeff_le_inf (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (x : E) (w : InfinitePlace F) (j : ℕ) :
-    w ((minpoly F x).coeff j) ≤ 2 ^ Module.finrank F E *
-      ((max 1 (Finset.univ.sup fun τ : EmbOver E w => ‖τ.1 x‖₊) : ℝ≥0) : ℝ) ^ Module.finrank F E := by
+theorem minpoly_coeff_le_inf
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (x : E) (w : InfinitePlace F) (j : ℕ)
+    : w ((minpoly F x).coeff j)
+      ≤ 2 ^ Module.finrank F E
+        * ((max 1 (Finset.univ.sup fun τ : EmbOver E w => ‖τ.1 x‖₊) : ℝ≥0) : ℝ)
+          ^ Module.finrank F E := by
   letI : Algebra F ℂ := w.embedding.toAlgebra
   set M : ℝ≥0 := max 1 (Finset.univ.sup fun τ : EmbOver E w => ‖τ.1 x‖₊) with hM
   set p := minpoly F x
@@ -33,7 +36,8 @@ theorem minpoly_coeff_le_inf (F E : Type) [Field F] [NumberField F] [Field E] [N
     obtain ⟨ψ, rfl⟩ := hz'
     let τ : EmbOver E w := ⟨ψ.toRingHom, RingHom.ext fun a => ψ.commutes a⟩
     have : ‖ψ x‖₊ ≤ M :=
-      le_trans (Finset.le_sup (f := fun τ : EmbOver E w => ‖τ.1 x‖₊) (Finset.mem_univ τ)) (le_max_right _ _)
+      le_trans (Finset.le_sup (f := fun τ : EmbOver E w => ‖τ.1 x‖₊) (Finset.mem_univ τ))
+        (le_max_right _ _)
     exact_mod_cast this
   have key := Polynomial.coeff_le_of_roots_le (f := w.embedding) j h1 (IsAlgClosed.splits _) h3
   rw [Polynomial.coeff_map] at key

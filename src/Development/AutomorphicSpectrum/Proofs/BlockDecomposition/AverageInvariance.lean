@@ -12,12 +12,16 @@ namespace GlobalTheory.CompanionTheory.RgEisAvg
 
 section Abstract
 
-variable {G : Type} [Group G] [TopologicalSpace G] {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W]
 
-theorem pointwise_bound {K P : Subgroup G} {c : G → ℂ} {ρ : K →* (W →L[ℂ] W)} {φ : K → ℂ} {M : ℝ}
+theorem pointwise_bound
+    {K P : Subgroup G} {c : G → ℂ} {ρ : K →* (W →L[ℂ] W)} {φ : K → ℂ} {M : ℝ}
     (hM1 : 1 ≤ M) (hM : ∀ κ, ‖ρ κ‖ ≤ M) (hc : ∀ p ∈ P, ‖c p‖ = 1) (hL : Law K P c φ)
-    (hN : Near K P {v | ‖ρ v - 1‖ ≤ 1 / (4 * M)} φ) {w : W} (hw : w ∈ secSp K P c ρ) (κ : K) :
-    ‖φ κ • ρ κ w - ((‖φ κ‖ : ℝ) : ℂ) • w‖ ≤ ‖φ κ‖ * ‖w‖ / 2 := by
+    (hN : Near K P {v | ‖ρ v - 1‖ ≤ 1 / (4 * M)} φ)
+    {w : W} (hw : w ∈ secSp K P c ρ)
+    (κ : K)
+    : ‖φ κ • ρ κ w - ((‖φ κ‖ : ℝ) : ℂ) • w‖ ≤ ‖φ κ‖ * ‖w‖ / 2 := by
   by_cases h0 : φ κ = 0
   · simp [h0]
   obtain ⟨r, v, hr, hv, rfl, hn⟩ := hN κ h0
@@ -31,36 +35,45 @@ theorem pointwise_bound {K P : Subgroup G} {c : G → ℂ} {ρ : K →* (W →L[
     have h1 : u = (ρ v - 1) w := by simp [hu]
     have hv' : ‖ρ v - 1‖ ≤ 1 / (4 * M) := hv
     rw [h1]
-    calc ‖(ρ v - 1) w‖ ≤ ‖ρ v - 1‖ * ‖w‖ := ContinuousLinearMap.le_opNorm _ _
+    calc
+      ‖(ρ v - 1) w‖
+        ≤ ‖ρ v - 1‖ * ‖w‖ := ContinuousLinearMap.le_opNorm _ _
       _ ≤ 1 / (4 * M) * ‖w‖ := by gcongr
       _ = ‖w‖ / (4 * M) := by ring
   have hrb : ‖c r • ρ r u‖ ≤ ‖w‖ / 4 := by
     rw [norm_smul, hcr, one_mul]
-    calc ‖ρ r u‖ ≤ ‖ρ r‖ * ‖u‖ := ContinuousLinearMap.le_opNorm _ _
+    calc
+      ‖ρ r u‖
+        ≤ ‖ρ r‖ * ‖u‖ := ContinuousLinearMap.le_opNorm _ _
       _ ≤ M * (‖w‖ / (4 * M)) := by
-          gcongr
-          exact hM r
+        gcongr
+        exact hM r
       _ = ‖w‖ / 4 := by field_simp
-  have hexp : φ (r * v) • ρ (r * v) w - ((‖φ (r * v)‖ : ℝ) : ℂ) • w =
-      (φ v - ((‖φ v‖ : ℝ) : ℂ)) • w + φ v • (c r • ρ r u) := by
+  have hexp
+      : φ (r * v) • ρ (r * v) w - ((‖φ (r * v)‖ : ℝ) : ℂ) • w
+        = (φ v - ((‖φ v‖ : ℝ) : ℂ)) • w + φ v • (c r • ρ r u) := by
     have h2 : ρ v w = w + u := by simp [hu]
     have h3 : ρ (r * v) w = ρ r w + ρ r u := by
       rw [map_mul, ContinuousLinearMap.mul_apply, h2, map_add (f := _)]
     rw [hnorm, hφ, h3, smul_add, mul_comm, mul_smul, hwr, sub_smul, mul_smul]
     abel
   rw [hexp, hnorm]
-  calc ‖(φ v - ((‖φ v‖ : ℝ) : ℂ)) • w + φ v • (c r • ρ r u)‖
-      ≤ ‖φ v - ((‖φ v‖ : ℝ) : ℂ)‖ * ‖w‖ + ‖φ v‖ * ‖c r • ρ r u‖ := by
-        refine (norm_add_le _ _).trans ?_
-        rw [norm_smul, norm_smul]
+  calc
+    ‖(φ v - ((‖φ v‖ : ℝ) : ℂ)) • w + φ v • (c r • ρ r u)‖
+        ≤ ‖φ v - ((‖φ v‖ : ℝ) : ℂ)‖ * ‖w‖ + ‖φ v‖ * ‖c r • ρ r u‖ := by
+      refine (norm_add_le _ _).trans ?_
+      rw [norm_smul, norm_smul]
     _ ≤ ‖φ v‖ / 4 * ‖w‖ + ‖φ v‖ * (‖w‖ / 4) := by gcongr
     _ = ‖φ v‖ * ‖w‖ / 2 := by ring
 
-theorem avg_sub_bound [FiniteDimensional ℂ W] {K : Subgroup G} [MeasurableSpace K] [BorelSpace K]
-    [CompactSpace K] (μ : Measure K) [IsProbabilityMeasure μ] {ρ : K →* (W →L[ℂ] W)} (hρ : Continuous ρ)
-    {φ : K → ℂ} (hφ : Continuous φ) (w : W)
-    (h : ∀ κ, ‖φ κ • ρ κ w - ((‖φ κ‖ : ℝ) : ℂ) • w‖ ≤ ‖φ κ‖ * ‖w‖ / 2) :
-    ‖avg μ ρ φ w - ((∫ κ, ‖φ κ‖ ∂μ : ℝ) : ℂ) • w‖ ≤ (∫ κ, ‖φ κ‖ ∂μ) * ‖w‖ / 2 := by
+theorem avg_sub_bound
+    [FiniteDimensional ℂ W]
+    {K : Subgroup G} [MeasurableSpace K] [BorelSpace K] [CompactSpace K]
+    (μ : Measure K) [IsProbabilityMeasure μ]
+    {ρ : K →* (W →L[ℂ] W)} (hρ : Continuous ρ)
+    {φ : K → ℂ} (hφ : Continuous φ)
+    (w : W) (h : ∀ κ, ‖φ κ • ρ κ w - ((‖φ κ‖ : ℝ) : ℂ) • w‖ ≤ ‖φ κ‖ * ‖w‖ / 2)
+    : ‖avg μ ρ φ w - ((∫ κ, ‖φ κ‖ ∂μ : ℝ) : ℂ) • w‖ ≤ (∫ κ, ‖φ κ‖ ∂μ) * ‖w‖ / 2 := by
   haveI : CompleteSpace W := FiniteDimensional.complete ℂ W
   have hint : Integrable (fun κ => φ κ • ρ κ) μ :=
     (hφ.smul hρ).integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _)
@@ -69,8 +82,7 @@ theorem avg_sub_bound [FiniteDimensional ℂ W] {K : Subgroup G} [MeasurableSpac
   have hint3 : Integrable (fun κ => φ κ • ρ κ w) μ := by
     have := hint.apply_continuousLinearMap w
     exact this
-  have hint4 : Integrable (fun κ => ((‖φ κ‖ : ℝ) : ℂ) • w) μ :=
-    (hint2.ofReal (𝕜 := ℂ)).smul_const w
+  have hint4 : Integrable (fun κ => ((‖φ κ‖ : ℝ) : ℂ) • w) μ := (hint2.ofReal (𝕜 := ℂ)).smul_const w
   have e1 : avg μ ρ φ w = ∫ κ, φ κ • ρ κ w ∂μ := ContinuousLinearMap.integral_apply hint w
   have e2 : ((∫ κ, ‖φ κ‖ ∂μ : ℝ) : ℂ) • w = ∫ κ, ((‖φ κ‖ : ℝ) : ℂ) • w ∂μ := by
     rw [integral_smul_const, integral_complex_ofReal]
@@ -80,11 +92,15 @@ theorem avg_sub_bound [FiniteDimensional ℂ W] {K : Subgroup G} [MeasurableSpac
   rw [e3]
   exact norm_integral_le_of_norm_le ((hint2.mul_const _).div_const _) (Eventually.of_forall h)
 
-theorem mass_pos {K : Subgroup G} [MeasurableSpace K] [BorelSpace K] [CompactSpace K]
-    [IsTopologicalGroup K] (μ : Measure K) [IsProbabilityMeasure μ] [μ.IsOpenPosMeasure]
-    {φ : K → ℂ} (hφ : Continuous φ) (h1 : φ 1 = 1) : 0 < ∫ κ, ‖φ κ‖ ∂μ := by
+theorem mass_pos
+    {K : Subgroup G} [MeasurableSpace K] [BorelSpace K] [CompactSpace K] [IsTopologicalGroup K]
+    (μ : Measure K) [IsProbabilityMeasure μ] [μ.IsOpenPosMeasure]
+    {φ : K → ℂ} (hφ : Continuous φ) (h1 : φ 1 = 1)
+    : 0 < ∫ κ, ‖φ κ‖ ∂μ := by
   refine hφ.norm.integral_pos_of_hasCompactSupport_nonneg_nonzero
-    (HasCompactSupport.of_compactSpace _) (fun _ => norm_nonneg _) (x := 1) ?_
+    (HasCompactSupport.of_compactSpace _)
+    (fun _ => norm_nonneg _)
+    (x := 1) ?_
   simp [h1]
 
 end Abstract
@@ -108,8 +124,9 @@ theorem avgInv_of_avgMem : AvgMem → AvgInv := by
     simpa using hv
   · intro φ hφ h1 hL hN
     have hI : 0 < ∫ κ, ‖φ κ‖ ∂μ := mass_pos μ hφ h1
-    have hb : ∀ w ∈ secSp K P c ρ,
-        ‖avg μ ρ φ w - ((∫ κ, ‖φ κ‖ ∂μ : ℝ) : ℂ) • w‖ ≤ (∫ κ, ‖φ κ‖ ∂μ) * ‖w‖ / 2 := fun w hw =>
+    have hb
+        : ∀ w ∈ secSp K P c ρ,
+          ‖avg μ ρ φ w - ((∫ κ, ‖φ κ‖ ∂μ : ℝ) : ℂ) • w‖ ≤ (∫ κ, ‖φ κ‖ ∂μ) * ‖w‖ / 2 := fun w hw =>
       avg_sub_bound μ hρ hφ w (pointwise_bound hM1 hM hPar.ch.norm hL hN hw)
     have hmem : ∀ w : W, avg μ ρ φ w ∈ secSp K P c ρ := fun w =>
       hA G W K ρ hK hρ μ hH hP Γ P c hPar φ hφ hL w
@@ -125,7 +142,8 @@ theorem avgInv_of_avgMem : AvgMem → AvgInv := by
         nlinarith
       exact Subtype.ext (norm_eq_zero.mp h7)
     let e := LinearEquiv.ofInjectiveEndo T hinj
-    refine ⟨LinearMap.toContinuousLinearMap ((secSp K P c ρ).subtype ∘ₗ e.symm.toLinearMap), fun w => ?_⟩
+    refine
+      ⟨LinearMap.toContinuousLinearMap ((secSp K P c ρ).subtype ∘ₗ e.symm.toLinearMap), fun w => ?_⟩
     exact congrArg Subtype.val (e.apply_symm_apply w)
 
 end GlobalTheory.CompanionTheory.RgEisAvg

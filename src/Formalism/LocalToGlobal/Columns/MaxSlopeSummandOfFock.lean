@@ -15,22 +15,29 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open Formalism.BasicNotions Formalism.L2.DIV Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.HermitianLatticesTheory Formalism.HN Formalism.HermitianLattices.TraceIntegrality
+open Formalism.BasicNotions Formalism.L2.DIV Formalism.L2.GlobalTheoryTheory.HLatOps
+  Formalism.HermitianLatticesTheory Formalism.HN Formalism.HermitianLattices.TraceIntegrality
 
 section Places
 
-variable (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex E] [_root_.NumberField.IsTotallyComplex K]
+variable
+  (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K]
+  [_root_.NumberField.IsTotallyComplex E] [_root_.NumberField.IsTotallyComplex K]
 
-theorem mean_over_places_comap (φ : E →+* K) (G : InfinitePlace E → ℝ) :
-    (1 / (nPl K : ℝ)) * ∑ v : InfinitePlace K, G (v.comap φ) = (∑ w, G w) / (nPl E : ℝ) := by
+theorem mean_over_places_comap (φ : E →+* K) (G : InfinitePlace E → ℝ)
+    : (1 / (nPl K : ℝ)) * ∑ v : InfinitePlace K, G (v.comap φ) = (∑ w, G w) / (nPl E : ℝ) := by
   classical
   let _ : Algebra E K := φ.toAlgebra
   have hc := Formalism.L2.Geo.ExtensionFiltration.ExtInvMu.card_fiber E K
   have hn := Formalism.L2.Geo.ExtensionFiltration.ExtInvMu.nPl_ext E K
   have hs : ∑ v : InfinitePlace K, G (v.comap φ) = (Module.finrank E K : ℝ) * ∑ w, G w := by
-    rw [← Finset.sum_fiberwise Finset.univ (fun v : InfinitePlace K => v.comap φ) (fun v => G (v.comap φ)), Finset.mul_sum]
+    rw [← Finset.sum_fiberwise Finset.univ
+        (fun v : InfinitePlace K => v.comap φ)
+        (fun v => G (v.comap φ)),
+      Finset.mul_sum]
     refine Finset.sum_congr rfl fun w _ => ?_
-    rw [Finset.sum_congr rfl (fun v hv => congrArg G (Finset.mem_filter.1 hv).2), Finset.sum_const, nsmul_eq_mul]
+    rw [Finset.sum_congr rfl (fun v hv => congrArg G (Finset.mem_filter.1 hv).2), Finset.sum_const,
+      nsmul_eq_mul]
     congr 2
     convert hc w
   have hK : (0 : ℝ) < (nPl K : ℝ) := by

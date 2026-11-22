@@ -9,11 +9,11 @@ namespace ReciprocityTheory.ChartRestriction.G.FD.OrthonormalPerpBasis
 open Complex
 open scoped ComplexConjugate InnerProductSpace
 
-theorem onb_perp (n : ℕ) (hn : 1 ≤ n) (α : Fin n → ℂ) (hα : α ≠ 0) :
-    ∃ g : Fin (n - 1) → Fin n → ℂ,
-      (∀ k l, ∑ a, g k a * conj (g l a) = if k = l then 1 else 0) ∧
-      (∀ k, ∑ a, g k a * conj (α a) = 0) ∧
-      (∀ γ : Fin n → ℂ, ∑ a, γ a * conj (α a) = 0 → γ ∈ Submodule.span ℂ (Set.range g)) := by
+theorem onb_perp (n : ℕ) (hn : 1 ≤ n) (α : Fin n → ℂ) (hα : α ≠ 0)
+    : ∃ g : Fin (n - 1) → Fin n → ℂ,
+      (∀ k l, ∑ a, g k a * conj (g l a) = if k = l then 1 else 0)
+        ∧ (∀ k, ∑ a, g k a * conj (α a) = 0)
+        ∧ (∀ γ : Fin n → ℂ, ∑ a, γ a * conj (α a) = 0 → γ ∈ Submodule.span ℂ (Set.range g)) := by
   classical
   let v : EuclideanSpace ℂ (Fin n) := WithLp.toLp 2 α
   have hv : v ≠ 0 := by
@@ -39,11 +39,14 @@ theorem onb_perp (n : ℕ) (hn : 1 ≤ n) (α : Fin n → ℂ) (hα : α ≠ 0) 
     simpa [dotProduct, v] using h
   · intro γ hγ
     have hw : (WithLp.toLp 2 γ : EuclideanSpace ℂ (Fin n)) ∈ (ℂ ∙ v)ᗮ := by
-      rw [Submodule.mem_orthogonal_singleton_iff_inner_right, EuclideanSpace.inner_eq_star_dotProduct]
+      rw [Submodule.mem_orthogonal_singleton_iff_inner_right,
+        EuclideanSpace.inner_eq_star_dotProduct]
       simpa [dotProduct, v] using hγ
     have hsum := b.sum_repr' ⟨_, hw⟩
-    have hγeq : γ = ∑ i, inner ℂ (b i) (⟨_, hw⟩ : (ℂ ∙ v)ᗮ) •
-        (fun a => ((b i : (ℂ ∙ v)ᗮ) : EuclideanSpace ℂ (Fin n)).ofLp a) := by
+    have hγeq
+        : γ
+          = ∑ i, inner ℂ (b i) (⟨_, hw⟩ : (ℂ ∙ v)ᗮ) •
+            (fun a => ((b i : (ℂ ∙ v)ᗮ) : EuclideanSpace ℂ (Fin n)).ofLp a) := by
       funext a
       have h := congrArg (fun x : (ℂ ∙ v)ᗮ => ((x : EuclideanSpace ℂ (Fin n))).ofLp a) hsum
       simp only [Submodule.coe_sum, Submodule.coe_smul] at h

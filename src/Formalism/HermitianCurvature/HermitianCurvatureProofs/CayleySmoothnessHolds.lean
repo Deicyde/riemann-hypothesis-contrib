@@ -32,19 +32,22 @@ def cayMC {m : ℕ} (g₀ X : MC m) : MC m := g₀ * ((1 + X) * Ring.inverse (1 
 
 def cinvMC {m : ℕ} (a Y : MC m) : MC m := (a * Y - 1) * Ring.inverse (a * Y + 1)
 
-theorem cay_eq_MC {k r : ℕ} (g₀ : B.Mat k r) :
-    (fun X : B.Mat k r => g₀ * cay X) = fun X => (toMC _).symm (cayMC (toMC _ g₀) (toMC _ X)) := by
+theorem cay_eq_MC {k r : ℕ} (g₀ : B.Mat k r)
+    : (fun X : B.Mat k r => g₀ * cay X)
+      = fun X => (toMC _).symm (cayMC (toMC _ g₀) (toMC _ X)) := by
   funext X
   show g₀ * ((1 + X) * (1 - X)⁻¹) = g₀ * ((1 + X) * Ring.inverse (1 - X))
   rw [Matrix.nonsing_inv_eq_ringInverse]
 
-theorem cayInv_eq_MC {k r : ℕ} (g₀ : B.Mat k r) :
-    (fun m : B.Mat k r => cayInv (g₀⁻¹ * m)) = fun m => (toMC _).symm (cinvMC (toMC _ g₀⁻¹) (toMC _ m)) := by
+theorem cayInv_eq_MC {k r : ℕ} (g₀ : B.Mat k r)
+    : (fun m : B.Mat k r => cayInv (g₀⁻¹ * m))
+      = fun m => (toMC _).symm (cinvMC (toMC _ g₀⁻¹) (toMC _ m)) := by
   funext m
   show (g₀⁻¹ * m - 1) * (g₀⁻¹ * m + 1)⁻¹ = (g₀⁻¹ * m - 1) * Ring.inverse (g₀⁻¹ * m + 1)
   rw [Matrix.nonsing_inv_eq_ringInverse (g₀⁻¹ * m + 1)]
 
-theorem cayMC_contDiffAt {m : ℕ} (g₀ X : MC m) (hX : IsUnit (1 - X)) : ContDiffAt ℝ ∞ (cayMC g₀) X := by
+theorem cayMC_contDiffAt {m : ℕ} (g₀ X : MC m) (hX : IsUnit (1 - X))
+    : ContDiffAt ℝ ∞ (cayMC g₀) X := by
   obtain ⟨u, hu⟩ := hX
   have h1 : ContDiffAt ℝ ∞ (fun Y : MC m => Ring.inverse (1 - Y)) X := by
     have := contDiffAt_ringInverse (𝕜 := ℝ) (n := ∞) u
@@ -52,7 +55,8 @@ theorem cayMC_contDiffAt {m : ℕ} (g₀ X : MC m) (hX : IsUnit (1 - X)) : ContD
     exact this.comp X (contDiffAt_const.sub contDiffAt_id)
   exact contDiffAt_const.mul ((contDiffAt_const.add contDiffAt_id).mul h1)
 
-theorem cinvMC_contDiffAt {m : ℕ} (a Y : MC m) (hY : IsUnit (a * Y + 1)) : ContDiffAt ℝ ∞ (cinvMC a) Y := by
+theorem cinvMC_contDiffAt {m : ℕ} (a Y : MC m) (hY : IsUnit (a * Y + 1))
+    : ContDiffAt ℝ ∞ (cinvMC a) Y := by
   obtain ⟨u, hu⟩ := hY
   have h1 : ContDiffAt ℝ ∞ (fun Z : MC m => Ring.inverse (a * Z + 1)) Y := by
     have := contDiffAt_ringInverse (𝕜 := ℝ) (n := ∞) u
@@ -76,7 +80,8 @@ theorem cayley_smoothness_holds : CaySmooth := by
     intro m hm
     have hm' : IsUnit (toMC _ g₀⁻¹ * toMC _ m + 1) := hm
     exact ((toMC _).symm.contDiff.contDiffAt.comp m
-      ((cinvMC_contDiffAt (toMC _ g₀⁻¹) _ hm').comp m (toMC _).contDiff.contDiffAt)).contDiffWithinAt
+      ((cinvMC_contDiffAt (toMC _ g₀⁻¹) _ hm').comp m
+        (toMC _).contDiff.contDiffAt)).contDiffWithinAt
 
 end
 

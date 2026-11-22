@@ -14,15 +14,18 @@ open ValuativeRel IsDedekindDomain NumberField Formalism.MainNotions.S.Loc
 
 namespace PI.LocLatEq.W
 
-theorem core_fg_of_le {R M : Type*} [CommRing R] [IsNoetherianRing R] [AddCommGroup M]
-    [Module R M] {N P : Submodule R M} (hN : N.FG) (h : P ≤ N) : P.FG := by
+theorem core_fg_of_le
+    {R M : Type*} [CommRing R] [IsNoetherianRing R] [AddCommGroup M] [Module R M]
+    {N P : Submodule R M} (hN : N.FG) (h : P ≤ N)
+    : P.FG := by
   have : IsNoetherian R N := isNoetherian_of_fg_of_noetherian N hN
   have h1 : (P.comap N.subtype).FG := IsNoetherian.noetherian _
   have h2 := h1.map N.subtype
   rwa [Submodule.map_comap_subtype, inf_eq_right.2 h] at h2
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
 
 theorem core_int_mem (A : LocAt F E sig p) (r : 𝓞 E) : A.ιE (r : E) ∈ A.O := by
   rw [A.O_def]
@@ -35,47 +38,63 @@ theorem core_nontriv (A : LocAt F E sig p) : Nontrivial A.Ep := by
   rw [Module.finrank_zero_of_subsingleton] at h2
   omega
 
-theorem core_bc_sub (A : LocAt F E sig p) {n : ℕ} (x y : Fin n → E) :
-    bc A (x - y) = bc A x - bc A y := by
+theorem core_bc_sub (A : LocAt F E sig p) {n : ℕ} (x y : Fin n → E)
+    : bc A (x - y) = bc A x - bc A y := by
   funext i
   exact map_sub A.ιE (x i) (y i)
 
-theorem core_smem (A : LocAt F E sig p) {n : ℕ} (S : Submodule A.O (Fin n → A.Ep)) {o : A.Ep}
-    (ho : o ∈ A.O) {x : Fin n → A.Ep} (hx : x ∈ S) : o • x ∈ S :=
+theorem core_smem
+    (A : LocAt F E sig p)
+    {n : ℕ} (S : Submodule A.O (Fin n → A.Ep))
+    {o : A.Ep} (ho : o ∈ A.O)
+    {x : Fin n → A.Ep} (hx : x ∈ S)
+    : o • x ∈ S :=
   S.smul_mem (⟨o, ho⟩ : A.O) hx
 
 private theorem ringOfIntegers_smul_eq_coe_mul (r : 𝓞 E) (x : E) : r • x = (r : E) * x :=
   Algebra.smul_def r x
 
-private theorem locLatEq_bc_apply (A : Formalism.MainNotions.S.Loc.LocAt F E sig p) {n : ℕ} (x : Fin n → E)
-    (i : Fin n) : PI.LocLatEq.bc A x i = A.ιE (x i) := rfl
+private theorem locLatEq_bc_apply
+    (A : Formalism.MainNotions.S.Loc.LocAt F E sig p) {n : ℕ} (x : Fin n → E) (i : Fin n)
+    : PI.LocLatEq.bc A x i = A.ιE (x i) :=
+  rfl
 
-private theorem locLatEq_bc_mem_latL_of_mem (A : Formalism.MainNotions.S.Loc.LocAt F E sig p) {n : ℕ}
-    (Λ : Submodule (𝓞 E) (Fin n → E)) {x : Fin n → E} (hx : x ∈ Λ) :
-    PI.LocLatEq.bc A x ∈ PI.LocLatEq.latL A Λ := by
+private theorem locLatEq_bc_mem_latL_of_mem
+    (A : Formalism.MainNotions.S.Loc.LocAt F E sig p)
+    {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E))
+    {x : Fin n → E} (hx : x ∈ Λ)
+    : PI.LocLatEq.bc A x ∈ PI.LocLatEq.latL A Λ := by
   unfold PI.LocLatEq.latL
   exact Submodule.subset_span ⟨x, hx, rfl⟩
 
-private theorem mul_not_mem_asIdeal_of_not_mem {d d' : 𝓞 F} (hd : d ∉ p.asIdeal) (hd' : d' ∉ p.asIdeal) :
-    d * d' ∉ p.asIdeal := fun h => (p.isPrime.mem_or_mem h).elim hd hd'
+private theorem mul_not_mem_asIdeal_of_not_mem
+    {d d' : 𝓞 F} (hd : d ∉ p.asIdeal) (hd' : d' ∉ p.asIdeal)
+    : d * d' ∉ p.asIdeal := fun h =>
+  (p.isPrime.mem_or_mem h).elim hd hd'
 
-private theorem exists_linearMap_eq_cons_zero (R M : Type*) [Semiring R] [AddCommMonoid M] [Module R M]
-    (n : ℕ) : ∃ L : (Fin n → M) →ₗ[R] (Fin (n + 1) → M),
-      ∀ v, L v = (Fin.cons (0 : M) v : Fin (n + 1) → M) :=
-  ⟨{ toFun := fun v => (Fin.cons (0 : M) v : Fin (n + 1) → M)
-     map_add' := fun v w => by
-       funext i
-       cases i using Fin.cases <;> simp
-     map_smul' := fun c v => by
-       funext i
-       cases i using Fin.cases <;> simp }, fun _ => rfl⟩
-
+private theorem exists_linearMap_eq_cons_zero
+    (R M : Type*) [Semiring R] [AddCommMonoid M] [Module R M] (n : ℕ)
+    : ∃ L : (Fin n → M) →ₗ[R] (Fin (n + 1) → M), ∀ v,
+      L v = (Fin.cons (0 : M) v : Fin (n + 1) → M) := ⟨
+  {
+    toFun := fun v => (Fin.cons (0 : M) v : Fin (n + 1) → M)
+    map_add' := fun v w => by
+      funext i
+      cases i using Fin.cases <;> simp
+    map_smul' := fun c v => by
+      funext i
+      cases i using Fin.cases <;> simp
+  },
+  fun _ => rfl
+⟩
 
 set_option maxHeartbeats 800000 in
-theorem core_ind (hU : UnitP) (hA : AvoidP) (hI : IntP) (h2 : Module.finrank F E = 2)
-    (A : LocAt F E sig p) : ∀ (n : ℕ) (Λ : Submodule (𝓞 E) (Fin n → E)), Λ.FG →
-    ∀ y : Fin n → E, bc A y ∈ latL A Λ →
-    ∃ d : 𝓞 F, d ∉ p.asIdeal ∧ algebraMap (𝓞 F) (𝓞 E) d • y ∈ Λ := by
+theorem core_ind
+    (hU : UnitP) (hA : AvoidP) (hI : IntP) (h2 : Module.finrank F E = 2) (A : LocAt F E sig p)
+    : ∀ (n : ℕ) (Λ : Submodule (𝓞 E) (Fin n → E)),
+      Λ.FG
+        → ∀ y : Fin n → E,
+          bc A y ∈ latL A Λ → ∃ d : 𝓞 F, d ∉ p.asIdeal ∧ algebraMap (𝓞 F) (𝓞 E) d • y ∈ Λ := by
   have := core_nontriv A
   intro n
   induction n with
@@ -88,23 +107,22 @@ theorem core_ind (hU : UnitP) (hA : AvoidP) (hI : IntP) (h2 : Module.finrank F E
   | succ n ih =>
     intro Λ hΛ y hy
     obtain ⟨L, hL⟩ := exists_linearMap_eq_cons_zero (𝓞 E) E n
-    have hinj : Function.Injective L := fun v w h => funext fun j => by
-      simpa [hL] using congrFun h j.succ
-    have hmapFG : (Submodule.map L (Λ.comap L)).FG :=
-      core_fg_of_le hΛ (Submodule.map_comap_le L Λ)
+    have hinj : Function.Injective L := fun v w h =>
+      funext fun j => by simpa [hL] using congrFun h j.succ
+    have hmapFG : (Submodule.map L (Λ.comap L)).FG := core_fg_of_le hΛ (Submodule.map_comap_le L Λ)
     have hFG : (Λ.comap L).FG := Submodule.fg_of_fg_map_injective L hinj hmapFG
-    obtain ⟨a, haI, hgen⟩ := core_gen hA p
-      (Λ.map (LinearMap.proj (R := 𝓞 E) (φ := fun _ : Fin (n + 1) => E) 0)) (hΛ.map _)
-    have hx0 : ∀ x ∈ Λ,
-        x 0 ∈ Λ.map (LinearMap.proj (R := 𝓞 E) (φ := fun _ : Fin (n + 1) => E) 0) :=
+    obtain ⟨a, haI, hgen⟩ :=
+      core_gen hA p (Λ.map (LinearMap.proj (R := 𝓞 E) (φ := fun _ : Fin (n + 1) => E) 0)) (hΛ.map _)
+    have hx0 : ∀ x ∈ Λ, x 0 ∈ Λ.map (LinearMap.proj (R := 𝓞 E) (φ := fun _ : Fin (n + 1) => E) 0) :=
       fun x hx => Submodule.mem_map.2 ⟨x, hx, rfl⟩
     obtain ⟨l1, hl1, hl1a⟩ := Submodule.mem_map.1 haI
     obtain ⟨l0, hl0, hl0a, hl0z⟩ : ∃ l0 ∈ Λ, l0 0 = a ∧ (a = 0 → l0 = 0) := by
       by_cases ha0 : a = 0
       · exact ⟨0, Λ.zero_mem, by simp [ha0], fun _ => rfl⟩
       · exact ⟨l1, hl1, hl1a, fun h => absurd h ha0⟩
-    have hdec : ∀ v ∈ PI.LocLatEq.latL A Λ, ∃ c ∈ A.O, ∃ w ∈ PI.LocLatEq.latL A (Λ.comap L),
-        v = c • PI.LocLatEq.bc A l0 + (Fin.cons (0 : A.Ep) w : Fin (n + 1) → A.Ep) := by
+    have hdec
+        : ∀ v ∈ PI.LocLatEq.latL A Λ, ∃ c ∈ A.O, ∃ w ∈ PI.LocLatEq.latL A (Λ.comap L),
+          v = c • PI.LocLatEq.bc A l0 + (Fin.cons (0 : A.Ep) w : Fin (n + 1) → A.Ep) := by
       intro v hv
       unfold PI.LocLatEq.latL at hv
       induction hv using Submodule.span_induction with
@@ -123,10 +141,13 @@ theorem core_ind (hU : UnitP) (hA : AvoidP) (hI : IntP) (h2 : Module.finrank F E
           exact Λ.sub_mem (Λ.smul_mem _ hl) (Λ.smul_mem _ hl0)
         have hr' : ((algebraMap (𝓞 F) (𝓞 E) d : 𝓞 E) : E) * l 0 = (r : E) * a := by
           simpa only [ringOfIntegers_smul_eq_coe_mul] using hr
-        refine ⟨u * A.ιE (r : E), A.O.mul_mem hu (core_int_mem A r),
+        refine ⟨
+          u * A.ιE (r : E),
+          A.O.mul_mem hu (core_int_mem A r),
           u • PI.LocLatEq.bc A (Fin.tail m),
-          core_smem A (PI.LocLatEq.latL A (Λ.comap L)) hu
-            (locLatEq_bc_mem_latL_of_mem A _ hmt), ?_⟩
+          core_smem A (PI.LocLatEq.latL A (Λ.comap L)) hu (locLatEq_bc_mem_latL_of_mem A _ hmt),
+          ?_
+        ⟩
         funext i
         cases i using Fin.cases with
         | zero =>
@@ -148,24 +169,27 @@ theorem core_ind (hU : UnitP) (hA : AvoidP) (hI : IntP) (h2 : Module.finrank F E
         obtain ⟨c2, hc2, w2, hw2, rfl⟩ := hy
         refine ⟨c1 + c2, A.O.add_mem hc1 hc2, w1 + w2, Submodule.add_mem _ hw1 hw2, ?_⟩
         funext i
-        cases i using Fin.cases <;>
-          simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Fin.cons_zero, Fin.cons_succ,
-            add_zero] <;> ring
+        cases i using Fin.cases
+          <;> simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Fin.cons_zero, Fin.cons_succ,
+            add_zero]
+          <;> ring
       | smul o x _ hx =>
         obtain ⟨c, hc, w, hw, rfl⟩ := hx
         refine ⟨(o : A.Ep) * c, A.O.mul_mem o.2 hc, o • w, Submodule.smul_mem _ o hw, ?_⟩
         funext i
-        cases i using Fin.cases <;>
-          simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Subring.smul_def, Fin.cons_zero,
-            Fin.cons_succ, add_zero] <;> ring
-    have htail : ∀ v ∈ PI.LocLatEq.latL A Λ, v 0 = 0 →
-        Fin.tail v ∈ PI.LocLatEq.latL A (Λ.comap L) := by
+        cases i using Fin.cases
+          <;> simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Subring.smul_def, Fin.cons_zero,
+            Fin.cons_succ, add_zero]
+          <;> ring
+    have htail
+        : ∀ v ∈ PI.LocLatEq.latL A Λ, v 0 = 0 → Fin.tail v ∈ PI.LocLatEq.latL A (Λ.comap L) := by
       intro v hv hv0
       obtain ⟨c, hc, w, hw, rfl⟩ := hdec v hv
       have hca : c * A.ιE a = 0 := by
         have h0 := hv0
         simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Fin.cons_zero, add_zero,
-          locLatEq_bc_apply, hl0a] at h0
+            locLatEq_bc_apply, hl0a]
+          at h0
         exact h0
       have hzero : c • PI.LocLatEq.bc A l0 = 0 := by
         by_cases ha0 : a = 0
@@ -182,7 +206,8 @@ theorem core_ind (hU : UnitP) (hA : AvoidP) (hI : IntP) (h2 : Module.finrank F E
     have hy0 : A.ιE (y 0) = c * A.ιE a := by
       have h0 := congrFun hyd 0
       simp only [locLatEq_bc_apply, Pi.add_apply, Pi.smul_apply, smul_eq_mul, Fin.cons_zero,
-        add_zero, hl0a] at h0
+          add_zero, hl0a]
+        at h0
       exact h0
     obtain ⟨t, ht, hta⟩ : ∃ t : E, A.ιE t ∈ A.O ∧ y 0 = t * a := by
       by_cases ha0 : a = 0
@@ -194,16 +219,14 @@ theorem core_ind (hU : UnitP) (hA : AvoidP) (hI : IntP) (h2 : Module.finrank F E
         rw [map_mul, hy0, mul_assoc, ← map_mul, mul_inv_cancel₀ ha0, map_one, mul_one]
         exact hc
     obtain ⟨d1, hd1, b, hb⟩ := hI F E h2 sig p A t ht
-    obtain ⟨z, hz⟩ : ∃ z : Fin (n + 1) → E, z = algebraMap (𝓞 F) (𝓞 E) d1 • y - b • l0 :=
-      ⟨_, rfl⟩
+    obtain ⟨z, hz⟩ : ∃ z : Fin (n + 1) → E, z = algebraMap (𝓞 F) (𝓞 E) d1 • y - b • l0 := ⟨_, rfl⟩
     have hz0 : z 0 = 0 := by
-      rw [hz, Pi.sub_apply, Pi.smul_apply, Pi.smul_apply, ringOfIntegers_smul_eq_coe_mul, ringOfIntegers_smul_eq_coe_mul,
-        hl0a, hta]
+      rw [hz, Pi.sub_apply, Pi.smul_apply, Pi.smul_apply, ringOfIntegers_smul_eq_coe_mul,
+        ringOfIntegers_smul_eq_coe_mul, hl0a, hta]
       linear_combination a * hb
     have hzL : PI.LocLatEq.bc A z ∈ PI.LocLatEq.latL A Λ := by
       rw [hz, core_bc_sub, bc_smul, bc_smul]
-      exact Submodule.sub_mem _
-        (core_smem A (PI.LocLatEq.latL A Λ) (core_int_mem A _) hy)
+      exact Submodule.sub_mem _ (core_smem A (PI.LocLatEq.latL A Λ) (core_int_mem A _) hy)
         (core_smem A (PI.LocLatEq.latL A Λ) (core_int_mem A b)
           (locLatEq_bc_mem_latL_of_mem A Λ hl0))
     have ht' : PI.LocLatEq.bc A (Fin.tail z) ∈ PI.LocLatEq.latL A (Λ.comap L) :=
@@ -214,8 +237,7 @@ theorem core_ind (hU : UnitP) (hA : AvoidP) (hI : IntP) (h2 : Module.finrank F E
     have hz2 : algebraMap (𝓞 F) (𝓞 E) d2 • z ∈ Λ := by
       have h := Submodule.mem_comap.1 hd2z
       rwa [map_smul, hL, hzc] at h
-    have hy' : algebraMap (𝓞 F) (𝓞 E) d1 • y = z + b • l0 := by
-      rw [hz, sub_add_cancel]
+    have hy' : algebraMap (𝓞 F) (𝓞 E) d1 • y = z + b • l0 := by rw [hz, sub_add_cancel]
     refine ⟨d2 * d1, mul_not_mem_asIdeal_of_not_mem hd2 hd1, ?_⟩
     rw [map_mul, mul_smul, hy', smul_add, smul_smul]
     exact Λ.add_mem hz2 (Λ.smul_mem _ hl0)

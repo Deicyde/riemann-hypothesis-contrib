@@ -16,8 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CrystallineS
 
 namespace GlobalTheory
 
-theorem abelianDualCrystal_of_dualAbelianScheme :
-    GlobalTheory.Published.DualAbelianScheme → GlobalTheory.Published.AbelianDualCrystal :=
+theorem abelianDualCrystal_of_dualAbelianScheme
+    : GlobalTheory.Published.DualAbelianScheme → GlobalTheory.Published.AbelianDualCrystal :=
   fun h ↦ ⟨h, GlobalTheory.SmoothLift.crystallineSmoothLift_of_relations.toCrystallineDeRham⟩
 
 end GlobalTheory

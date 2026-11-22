@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Definitions.ShimuraVarieties.IsOp
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.VB GlobalTheory.LieVB GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.NeronCurve GlobalTheory.Nef
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.VB GlobalTheory.LieVB GlobalTheory.QCoh GlobalTheory.CechPic
+  GlobalTheory.NeronCurve GlobalTheory.Nef
 open GlobalTheory.Twist (resM)
 open scoped CategoryTheory.Obj RatFunc
 
@@ -20,8 +23,14 @@ noncomputable section
 
 namespace GlobalTheory.Nef
 
-theorem centre_place : ∀ (k K : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field K] [Algebra k K] (C : Scheme.{0}) [Algebra k Γ(C, ⊤)] (x : Sp K ⟶ C), IsGenOver k x →
-    ∀ c : C, c ≠ x (IsLocalRing.closedPoint K) → ∃ (v : Place k K) (b : Sp v.O ⟶ C), spMap v.O.subtype ≫ b = x ∧ b (IsLocalRing.closedPoint v.O) = c := by
+theorem centre_place
+    : ∀ (k K : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field K] [Algebra k K] (C : Scheme.{0})
+        [Algebra k Γ(C, ⊤)] (x : Sp K ⟶ C),
+      IsGenOver k x
+        → ∀ c : C,
+          c ≠ x (IsLocalRing.closedPoint K)
+            → ∃ (v : Place k K) (b : Sp v.O ⟶ C),
+              spMap v.O.subtype ≫ b = x ∧ b (IsLocalRing.closedPoint v.O) = c := by
   intro k K _ _ _ _ _ C _ x hx c hc
   obtain ⟨hC, hg, hstr⟩ := hx
   haveI : IsIntegral C := GlobalTheory.LieSemineg.isIntegral_curve hC.1 hC.2.2
@@ -49,7 +58,9 @@ theorem centre_place : ∀ (k K : Type) [Field k] [IsAlgClosed k] [CharZero k] [
     have hle : (Order.coheight c : WithBot ℕ∞) ≤ 1 := by
       haveI : Nonempty C := ⟨c⟩
       have hd := GlobalTheory.LieSemineg.dim_curve (k := k) (C := C) hC.1
-      have h1 := (Order.coheight_le_krullDim c).trans (Order.krullDim_eq_of_orderIso (irreducibleSetEquivPoints (α := C))).ge
+      have h1 :=
+        (Order.coheight_le_krullDim c).trans
+          (Order.krullDim_eq_of_orderIso (irreducibleSetEquivPoints (α := C))).ge
       rw [topologicalKrullDim] at hd
       rw [hd] at h1
       exact h1
@@ -68,20 +79,25 @@ theorem centre_place : ∀ (k K : Type) [Field k] [IsAlgClosed k] [CharZero k] [
     have h2 : Function.Surjective (Scheme.stalkClosedPointTo x).hom := by
       have h3 := x.stalkMap_surjective p
       have h4 : Function.Surjective (stalkClosedPointIso (CommRingCat.of K)).hom.hom :=
-        ((ConcreteCategory.isIso_iff_bijective (stalkClosedPointIso (CommRingCat.of K)).hom).1 inferInstance).2
+        ((ConcreteCategory.isIso_iff_bijective (stalkClosedPointIso (CommRingCat.of K)).hom).1
+          inferInstance).2
       exact h4.comp h3
     exact h2.comp h1
   let e : C.functionField ≃+* K := RingEquiv.ofBijective ψ hψ
   let φ : A →+* K := ψ.comp (algebraMap A C.functionField)
   have hφ : spMap φ ≫ C.fromSpecStalk c = x := by
-    have h1 : φ = (C.presheaf.stalkSpecializes (hη ▸ genericPoint_specializes c : x p ⤳ c) ≫ Scheme.stalkClosedPointTo x).hom := by
+    have h1
+        : φ
+          = (C.presheaf.stalkSpecializes (hη ▸ genericPoint_specializes c : x p ⤳ c)
+            ≫ Scheme.stalkClosedPointTo x).hom := by
       show ψ.comp (C.presheaf.stalkSpecializes ((genericPoint_spec C).specializes trivial)).hom = _
       change (C.presheaf.stalkSpecializes _ ≫ ic.hom ≫ Scheme.stalkClosedPointTo x).hom = _
       rw [TopCat.Presheaf.stalkCongr_hom, ← Category.assoc]
       erw [TopCat.Presheaf.stalkSpecializes_comp]
     rw [h1]
     change Spec.map (CommRingCat.ofHom _) ≫ _ = x
-    rw [CommRingCat.ofHom_hom, Spec.map_comp, Category.assoc, Scheme.SpecMap_stalkSpecializes_fromSpecStalk]
+    rw [CommRingCat.ofHom_hom, Spec.map_comp, Category.assoc,
+      Scheme.SpecMap_stalkSpecializes_fromSpecStalk]
     exact Scheme.Spec_stalkClosedPointTo_fromSpecStalk x
   have hval : ∀ a : A, (P.valuation C.functionField) (e.symm (φ a)) = P.intValuation a := by
     intro a
@@ -89,30 +105,44 @@ theorem centre_place : ∀ (k K : Type) [Field k] [IsAlgClosed k] [CharZero k] [
     rw [this]
     exact IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap P a
 
-  have hk : ∀ t : k, algebraMap k K t = φ (C.presheaf.germ ⊤ c trivial (algebraMap k Γ(C, ⊤) t)) := by
-    have h1 : x ≫ strHom k C = spMap ((φ.comp (C.presheaf.germ ⊤ c trivial).hom).comp (algebraMap k Γ(C, ⊤))) := by
-      rw [← hφ, Category.assoc, strHom, ← Category.assoc (C.fromSpecStalk c), Scheme.fromSpecStalk_toSpecΓ]
-      simp only [spMap, CommRingCat.ofHom_comp, Spec.map_comp, CommRingCat.ofHom_hom, Category.assoc]
+  have hk
+      : ∀ t : k, algebraMap k K t = φ (C.presheaf.germ ⊤ c trivial (algebraMap k Γ(C, ⊤) t)) := by
+    have h1
+        : x ≫ strHom k C
+          = spMap ((φ.comp (C.presheaf.germ ⊤ c trivial).hom).comp (algebraMap k Γ(C, ⊤))) := by
+      rw [← hφ, Category.assoc, strHom, ← Category.assoc (C.fromSpecStalk c),
+        Scheme.fromSpecStalk_toSpecΓ]
+      simp only [spMap, CommRingCat.ofHom_comp, Spec.map_comp, CommRingCat.ofHom_hom,
+        Category.assoc]
     have h2 := Spec.map_injective (hstr.symm.trans h1)
     intro t
     exact congrArg (fun f => f.hom t) h2
-  let vK : Valuation K (WithZero (Multiplicative ℤ)) := (P.valuation C.functionField).comap e.symm.toRingHom
+  let vK : Valuation K (WithZero (Multiplicative ℤ)) :=
+    (P.valuation C.functionField).comap e.symm.toRingHom
   have hvφ : ∀ a, vK (φ a) = P.intValuation a := fun a => hval a
   have hunit : ∀ a : A, IsUnit a → P.intValuation a = 1 := by
     intro a ha
     refine le_antisymm (P.intValuation_le_one a) (not_lt.1 fun h => ?_)
     exact P.isPrime.ne_top (Ideal.eq_top_of_isUnit_mem _ ((P.intValuation_lt_one_iff_mem a).1 h) ha)
-  let v : Place k K := ⟨vK, fun g => by
+  let v : Place k K := ⟨
+    vK,
+    fun g => by
       obtain ⟨y, hy⟩ := P.valuation_surjective C.functionField g
-      exact ⟨e y, by
-        change P.valuation C.functionField (e.symm (e y)) = g
-        rw [e.symm_apply_apply]; exact hy⟩,
+      exact ⟨
+        e y,
+        by
+          change P.valuation C.functionField (e.symm (e y)) = g
+          rw [e.symm_apply_apply]
+          exact hy
+      ⟩,
     fun t ht => by
       rw [hk, hvφ]
-      exact hunit _ (((Ne.isUnit ht).map (algebraMap k Γ(C, ⊤))).map _)⟩
+      exact hunit _ (((Ne.isUnit ht).map (algebraMap k Γ(C, ⊤))).map _)
+  ⟩
   have hle : ∀ a : A, φ a ∈ v.O := fun a => by
     show vK (φ a) ≤ 1
-    rw [hvφ]; exact P.intValuation_le_one a
+    rw [hvφ]
+    exact P.intValuation_le_one a
   let ψO : A →+* v.O := φ.codRestrict v.O hle
   have hPm : P.asIdeal = IsLocalRing.maximalIdeal A := rfl
   haveI : IsLocalHom ψO := ⟨fun a ha => by

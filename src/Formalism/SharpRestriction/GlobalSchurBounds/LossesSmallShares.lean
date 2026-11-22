@@ -10,28 +10,41 @@ noncomputable section
 
 namespace Formalism.MainNotions.Lnk
 
-open Formalism.BasicNotions Formalism.D5 Formalism.FrobeniusOrbits Formalism.LFunctionChainParameters.LHost Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds
-  Formalism.LFunctionChainParameters.LErr Formalism.LFunctionChainParameters.LChain
+open Formalism.BasicNotions Formalism.D5 Formalism.FrobeniusOrbits
+  Formalism.LFunctionChainParameters.LHost Formalism.RankGapBounds.WeightedMeanData
+  Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+  Formalism.LFunctionChainParameters.LChain
 
 variable {eps : ℝ}
 
 def LossFS (Fm : FamP eps) (eL : ℝ) : Prop :=
-  ∃ C x0 : ℝ, 0 ≤ C ∧ ∀ x ≥ x0, x ∈ Fm.Win → ∃ (i0 : Fm.Ix x) (av bv : ℕ → ℤ),
-    (∀ t ∈ Fm.TTn x, aWin (Fm.L x i0) (av t) ∧ (Fm.L x i0).sc.b' ≤ (bv t : ℝ) ∧ (bv t : ℝ) ≤ Fm.bTop x) ∧
-    (∃ i1 : Fm.Ix x, ∀ t : (Fm.D x i1).host.TT,
-        (Fm.L x i1).aT t = av (t : (Fm.D x i1).R.A).val ∧
-        (Fm.L x i1).bT t = bv (t : (Fm.D x i1).R.A).val) ∧
-    ∀ i : Fm.Ix x, (∀ t : (Fm.D x i).host.TT,
-        (Fm.L x i).aT t = av (t : (Fm.D x i).R.A).val ∧
-        (Fm.L x i).bT t = bv (t : (Fm.D x i).R.A).val) → Loss_at (Fm.L x i) C eL
-
+  ∃ C x0 : ℝ,
+    0 ≤ C
+      ∧ ∀ x ≥ x0,
+        x ∈ Fm.Win
+          → ∃ (i0 : Fm.Ix x) (av bv : ℕ → ℤ),
+            (∀ t ∈ Fm.TTn x,
+                aWin (Fm.L x i0) (av t) ∧ (Fm.L x i0).sc.b' ≤ (bv t : ℝ) ∧ (bv t : ℝ) ≤ Fm.bTop x)
+              ∧ (∃ i1 : Fm.Ix x, ∀ t : (Fm.D x i1).host.TT,
+                (Fm.L x i1).aT t = av (t : (Fm.D x i1).R.A).val
+                  ∧ (Fm.L x i1).bT t = bv (t : (Fm.D x i1).R.A).val)
+              ∧ ∀ i : Fm.Ix x,
+                (∀ t : (Fm.D x i).host.TT,
+                    (Fm.L x i).aT t = av (t : (Fm.D x i).R.A).val
+                      ∧ (Fm.L x i).bT t = bv (t : (Fm.D x i).R.A).val)
+                  → Loss_at (Fm.L x i) C eL
 
 set_option maxHeartbeats 1600000 in
-theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (hCH : 0 ≤ CH) (heL : 0 ≤ eL) (hc6 : 0 < c6)
-    (hCount : CountF Fm) (hSM : SlopesMF Fm) (hSN : SlopesNF Fm) (hLat : LatF Fm) (hNodes : NodesF Fm)
-    (hFr : FrameF Fm CH) (hLoss : LossFS Fm eL) (hChar : CharF Fm) (hWin : WinF Fm)
-    (cTT : ChosenTT Fm) (cQD : ChosenQD Fm C5) (cTh : ChosenThin Fm c6) (lI : LinkIRR Fm) (lD : LinkDIV Fm Cabs CH) :
-    ∃ K cHH eK CL x0 : ℝ, ∀ x ≥ x0, x ∈ Fm.Win → ChainTied Fm Cabs eL K cHH eK CL x := by
+theorem linkCore
+    (Fm : FamP eps)
+    (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (hCH : 0 ≤ CH) (heL : 0 ≤ eL) (hc6 : 0 < c6)
+    (hCount : CountF Fm) (hSM : SlopesMF Fm) (hSN : SlopesNF Fm) (hLat : LatF Fm)
+    (hNodes : NodesF Fm) (hFr : FrameF Fm CH) (hLoss : LossFS Fm eL) (hChar : CharF Fm)
+    (hWin : WinF Fm) (cTT : ChosenTT Fm) (cQD : ChosenQD Fm C5) (cTh : ChosenThin Fm c6)
+    (lI : LinkIRR Fm) (lD : LinkDIV Fm Cabs CH)
+    : ∃ K cHH eK CL x0 : ℝ, ∀ x ≥ x0, x ∈ Fm.Win → ChainTied Fm Cabs eL K cHH eK CL x := by
   obtain ⟨xQD, hQD⟩ := cQD
   obtain ⟨xTh, hTh⟩ := cTh
   obtain ⟨Cc, xC, hCc, hC⟩ := hCount
@@ -48,14 +61,34 @@ theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (
   obtain ⟨Cd, xD, hD⟩ := lD
   have hCd' : (0 : ℝ) ≤ max Cd 0 := le_max_right _ _
   have hCdle : Cd ≤ max Cd 0 := le_max_left _ _
-  refine ⟨max Cd 0 + Cc + Cs + C1 + Cl + 6, CH, eK, C5,
-    Fm.x1 + 1 + |xQD| + |xTh| + |xC| + |xS| + |xN| + |xL| + |xO| + |xF| + |xLo| + |xCh| + |xW| + |xTT| + |xI| + |xD|,
-    fun x hx hxw => ?_⟩
+  refine ⟨
+    max Cd 0 + Cc + Cs + C1 + Cl + 6,
+    CH,
+    eK,
+    C5,
+    Fm.x1 + 1 + |xQD| + |xTh| + |xC| + |xS| + |xN| + |xL| + |xO| + |xF| + |xLo| + |xCh| + |xW|
+      + |xTT| + |xI| + |xD|,
+    fun x hx hxw => ?_
+  ⟩
   have hpos := Fm.one_lt_family_threshold
-  have habs : 0 ≤ |xQD| ∧ 0 ≤ |xTh| ∧ 0 ≤ |xC| ∧ 0 ≤ |xS| ∧ 0 ≤ |xN| ∧ 0 ≤ |xL| ∧ 0 ≤ |xO| ∧ 0 ≤ |xF| ∧ 0 ≤ |xLo| ∧
-      0 ≤ |xCh| ∧ 0 ≤ |xW| ∧ 0 ≤ |xTT| ∧ 0 ≤ |xI| ∧ 0 ≤ |xD| :=
-    ⟨abs_nonneg _, abs_nonneg _, abs_nonneg _, abs_nonneg _, abs_nonneg _, abs_nonneg _, abs_nonneg _, abs_nonneg _,
-      abs_nonneg _, abs_nonneg _, abs_nonneg _, abs_nonneg _, abs_nonneg _, abs_nonneg _⟩
+  have habs
+      : 0 ≤ |xQD| ∧ 0 ≤ |xTh| ∧ 0 ≤ |xC| ∧ 0 ≤ |xS| ∧ 0 ≤ |xN| ∧ 0 ≤ |xL| ∧ 0 ≤ |xO| ∧ 0 ≤ |xF|
+        ∧ 0 ≤ |xLo| ∧ 0 ≤ |xCh| ∧ 0 ≤ |xW| ∧ 0 ≤ |xTT| ∧ 0 ≤ |xI| ∧ 0 ≤ |xD| := ⟨
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _,
+    abs_nonneg _
+  ⟩
   obtain ⟨a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14⟩ := habs
   have hx1 : Fm.x1 < x := by linarith
   have hxQD : x ≥ xQD := by linarith [le_abs_self xQD]
@@ -76,10 +109,13 @@ theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (
   have hx1' : 1 ≤ x := by linarith
 
   obtain ⟨i0, av, bv, hadm, ⟨i1, hc1⟩, hloss⟩ := hLo x hxLo hxw
-  have hcov : ∀ u0 : (Fm.D x i0).R.A, ∃ i : Fm.Ix x, (Fm.D x i).host.u0.val = hval _ u0 ∧
-      ∀ t : (Fm.D x i).host.TT, (Fm.L x i).aT t = av (t : (Fm.D x i).R.A).val ∧
-        (Fm.L x i).bT t = bv (t : (Fm.D x i).R.A).val :=
-    fun u0 => Fm.coverS_carry x hx1 i1 av bv hc1 (hval _ u0) (by rw [Fm.R_eq x i1 i0]; exact hval_lt _ u0)
+  have hcov
+      : ∀ u0 : (Fm.D x i0).R.A, ∃ i : Fm.Ix x,
+        (Fm.D x i).host.u0.val = hval _ u0
+          ∧ ∀ t : (Fm.D x i).host.TT,
+            (Fm.L x i).aT t = av (t : (Fm.D x i).R.A).val
+              ∧ (Fm.L x i).bT t = bv (t : (Fm.D x i).R.A).val := fun u0 =>
+    Fm.coverS_carry x hx1 i1 av bv hc1 (hval _ u0) (by rw [Fm.R_eq x i1 i0]; exact hval_lt _ u0)
   choose pt hpt1 hpt2 using hcov
   let M : Mod Fm x := ⟨i0, av, bv, pt, hpt1, hpt2⟩
   have iq : Fact M.q.Prime := ⟨(Fm.D x i0).host.hyp.1⟩
@@ -114,18 +150,24 @@ theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (
   have hxe : 1 ≤ x ^ eps := Real.one_le_rpow hx1' heps.le
   have hb1 : 1 ≤ (Fm.L x i0).sc.b := by
     show 1 ≤ Real.exp (Fm.L x i0).sc.L
-    rw [hLx]; exact Real.one_le_exp (by linarith)
+    rw [hLx]
+    exact Real.one_le_exp (by linarith)
   have hk5 := (Fm.D x i0).R.k_ge
   have hk1 : (1 : ℝ) ≤ ((Fm.D x i0).R.k : ℝ) := by exact_mod_cast (by omega : 1 ≤ (Fm.D x i0).R.k)
-  have hnod := fun u0 : M.e.A => hO x hxO (M.pt u0) M.e M.m M.T2 u0 (M.w u0) (M.he u0) (M.hm u0)
-    (fun h => by rw [M.mem_thick_set_model_iff, Fm.realisedChain_torus_eq x M.i0 (M.pt u0)]) (M.point_base_value u0) (M.w_tie u0) (M.w_off u0)
-  have hcut : ∀ (u0 : M.e.A) (j : Fin M.m) (t : M.e.A) (ρ : E0 × M.e.A), t ∈ M.TT → InPhi ρ →
-      M.a t / M.w u0 j ρ ≤ (⌈2 * (Fm.L x i0).sc.a⌉₊ : ℝ) := by
+  have hnod := fun u0 : M.e.A =>
+    hO x hxO (M.pt u0) M.e M.m M.T2 u0 (M.w u0) (M.he u0) (M.hm u0)
+      (fun h => by rw [M.mem_thick_set_model_iff, Fm.realisedChain_torus_eq x M.i0 (M.pt u0)])
+      (M.point_base_value u0) (M.w_tie u0) (M.w_off u0)
+  have hcut
+      : ∀ (u0 : M.e.A) (j : Fin M.m) (t : M.e.A) (ρ : E0 × M.e.A),
+        t ∈ M.TT → InPhi ρ → M.a t / M.w u0 j ρ ≤ (⌈2 * (Fm.L x i0).sc.a⌉₊ : ℝ) := by
     intro u0 j t ρ ht hρ
     obtain ⟨ha1, ha2, -⟩ := M.av_facts hx1 (hWu 0) ((M.mem_TT t).mp ht)
     have hw1 := (hnod u0).1 j ρ hρ
     have hat : 0 ≤ M.a t := le_trans ha0.le ha1
-    calc M.a t / M.w u0 j ρ ≤ M.a t := div_le_self hat hw1
+    calc
+      M.a t / M.w u0 j ρ
+        ≤ M.a t := div_le_self hat hw1
       _ ≤ 2 * (Fm.L x i0).sc.a := ha2
       _ ≤ _ := Nat.le_ceil _
   have hDu := fun u0 : M.e.A => hD x hxD (M.pt u0)
@@ -142,62 +184,93 @@ theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (
     exact_mod_cast Nat.succ_le_of_lt (Nat.cast_pos.mp h2)
   have hXpp0 : 0 ≤ (Fm.L x i0).sc.X'' (Fm.D x i0).R.n := by
     unfold Scale.X'' Scale.w''
-    exact div_nonneg ha0.le (div_nonneg hb'0.le (mul_nonneg (by rw [hsx]; exact hx0.le) (Nat.cast_nonneg _)))
+    exact div_nonneg ha0.le
+      (div_nonneg hb'0.le (mul_nonneg (by rw [hsx]; exact hx0.le) (Nat.cast_nonneg _)))
   have hX' : (Fm.L x i0).sc.X' = Real.exp (x ^ (eps / 3)) := by
     show Real.exp ((Fm.L x i0).sc.x ^ ((Fm.L x i0).sc.eps / 3)) = _
     rw [hsx, hse]
 
-  have L1 : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).HidaSetting (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) :=
-    ⟨hx0, hb0, ha0.le, hb'0.le, lt_of_lt_of_le one_pos hk1, w17, Nat.mul_pos two_pos (Fm.D x i0).R.toFrame.ord_pos,
-      fun τ => le_trans ha0.le (M.av_facts hx1 (hWu 0) τ.2).1,
-      fun u0 j ρ => lt_of_lt_of_le one_pos ((hnod u0).1 j _ (Finset.mem_filter.mp (M.eP ρ).2).2),
-      fun u0 u => Nat.cast_pos.mpr ((hL x hxL (M.pt u0)).1 u).1,
-      fun u0 u => Nat.cast_pos.mpr ((Fm.D x (M.pt u0)).mem u).A.T_prime.pos,
-      fun u0 u => ((hL x hxL (M.pt u0)).1 u).2, hC1,
-      (by
-        have h := Real.exp_lt_exp.mpr (show -(x ^ (Fm.ez / 7)) < 0 by
+  have L1 : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).HidaSetting
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) := ⟨
+    hx0,
+    hb0,
+    ha0.le,
+    hb'0.le,
+    lt_of_lt_of_le one_pos hk1,
+    w17,
+    Nat.mul_pos two_pos (Fm.D x i0).R.toFrame.ord_pos,
+    fun τ => le_trans ha0.le (M.av_facts hx1 (hWu 0) τ.2).1,
+    fun u0 j ρ => lt_of_lt_of_le one_pos ((hnod u0).1 j _ (Finset.mem_filter.mp (M.eP ρ).2).2),
+    fun u0 u => Nat.cast_pos.mpr ((hL x hxL (M.pt u0)).1 u).1,
+    fun u0 u => Nat.cast_pos.mpr ((Fm.D x (M.pt u0)).mem u).A.T_prime.pos,
+    fun u0 u => ((hL x hxL (M.pt u0)).1 u).2,
+    hC1,
+    (by
+      have h :=
+        Real.exp_lt_exp.mpr (show -(x ^ (Fm.ez / 7)) < 0 by
           have := Real.rpow_pos_of_pos hx0 (Fm.ez / 7); linarith)
-        rwa [Real.exp_zero] at h), hη0, he0, he4⟩
-  have L2 : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).DIV (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) := by
+      rwa [Real.exp_zero] at h),
+    hη0,
+    he0,
+    he4
+  ⟩
+  have L2 : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).DIV
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) := by
     apply M.data_DIV hx1
     intro u0 u
     have h := (hDu u0).2.2.2.2.2.2.1 u
-    have hX1 : 0 ≤ ((Fm.D x (M.pt u0)).host.TT.card : ℝ) * ((Fm.L x (M.pt u0)).sc.a * (Fm.L x (M.pt u0)).La) :=
+    have hX1
+        : 0
+          ≤ ((Fm.D x (M.pt u0)).host.TT.card : ℝ)
+            * ((Fm.L x (M.pt u0)).sc.a * (Fm.L x (M.pt u0)).La) :=
       mul_nonneg (Nat.cast_nonneg _) (mul_nonneg (sc_a_pos _).le (hLau u0))
-    have hX2 : 0 ≤ ((Fm.D x (M.pt u0)).R.m : ℝ) * (((Fm.L x (M.pt u0)).B0 + (Fm.L x (M.pt u0)).Nc) *
-        (Fm.L x (M.pt u0)).sc.x ^ (Cabs * (Fm.L x (M.pt u0)).sc.eps)) :=
-      mul_nonneg (Nat.cast_nonneg _) (mul_nonneg (add_nonneg (loss_bound_nonneg _) (Nc_nonneg _))
-        (Real.rpow_nonneg (lt_trans one_pos (Fm.L x (M.pt u0)).sc.one_lt_alt).le _))
+    have hX2
+        : 0
+          ≤ ((Fm.D x (M.pt u0)).R.m : ℝ)
+            * (((Fm.L x (M.pt u0)).B0 + (Fm.L x (M.pt u0)).Nc)
+              * (Fm.L x (M.pt u0)).sc.x ^ (Cabs * (Fm.L x (M.pt u0)).sc.eps)) :=
+      mul_nonneg (Nat.cast_nonneg _)
+        (mul_nonneg (add_nonneg (loss_bound_nonneg _) (Nc_nonneg _))
+          (Real.rpow_nonneg (lt_trans one_pos (Fm.L x (M.pt u0)).sc.one_lt_alt).le _))
     have e1 := up hCdle hX1
     have e2 := up hCdle hX2
     show _ ≤ _ + max Cd 0 * _ * _ * _ + max Cd 0 * _ * _ * _ ^ (Cabs * _)
     simp only [mul_assoc] at h e1 e2 ⊢
     linarith
-  have L3 : EComp5 (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev) (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) := by
+  have L3 : EComp5 (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev)
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) := by
     apply M.data_EComp5 hx1
     intro u0 u j hj
     exact le_trans ((hDu u0).2.2.2.2.2.2.2.1 u j hj) (up hCdle (loss_bound_nonneg _))
-  have L4 : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).HComp (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) := by
+  have L4 : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).HComp
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) := by
     apply M.data_HComp hx1
     intro u0 u u'
-    exact le_trans ((hDu u0).2.2.2.2.2.2.2.2 u u') (up hCdle (add_nonneg
-      (mul_nonneg (mul_nonneg (Nat.cast_nonneg _) (sc_a_pos _).le) (hLau u0))
-      (mul_nonneg (Nat.cast_nonneg _) (loss_bound_nonneg _))))
-  have L5 : Count5 (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev) (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) :=
+    exact le_trans ((hDu u0).2.2.2.2.2.2.2.2 u u')
+      (up hCdle
+        (add_nonneg (mul_nonneg (mul_nonneg (Nat.cast_nonneg _) (sc_a_pos _).le) (hLau u0))
+          (mul_nonneg (Nat.cast_nonneg _) (loss_bound_nonneg _))))
+  have L5 : Count5 (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev)
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) :=
     M.data_Count5 hx1 _ _ _ _ _ _ _ (fun u0 => hC x hxC (M.pt u0))
-  have L6 : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).Slopes (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) :=
+  have L6 : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).Slopes
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) :=
     M.data_Slopes hx1 _ _ _ _ _ _ _ (fun u0 => hS x hxS (M.pt u0))
-  have L7 : QuotientSlopeBoundsWith (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev) (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH)
-      ((Fm.L x i0).sc.X'' (Fm.D x i0).R.n) :=
+  have L7 : QuotientSlopeBoundsWith (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev)
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) ((Fm.L x i0).sc.X'' (Fm.D x i0).R.n) :=
     M.model_slopes_five hx1 _ _ _ _ _ _ _ (fun u0 => hN x hxN (M.pt u0))
-  have L8 : LossBounds (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev) (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) := by
+  have L8 : LossBounds (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev)
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) := by
     intro u0
     obtain ⟨hio, hask⟩ := hloss (M.pt u0) (M.pt_w u0)
-    have h1 := hask M.e M.m M.AD ⌈2 * (Fm.L x i0).sc.a⌉₊ M.TT M.a (M.w u0) (M.reads u0) (M.hAD u0) (hcut u0)
+    have h1 :=
+      hask M.e M.m M.AD ⌈2 * (Fm.L x i0).sc.a⌉₊ M.TT M.a (M.w u0) (M.reads u0) (M.hAD u0) (hcut u0)
     rw [M.s_card u0, M.s_m u0, M.s_sc hx1 u0, M.s_x hx1, M.s_eps] at h1 hio
     exact ⟨h1, hio⟩
-  have liftZP_newton : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).SlopeIneq := M.data_SlopeIneq _ _ _ _ _ _ hfr
-  have ParameterUpperBound : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).HHBound (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) :=
+  have liftZP_newton : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).SlopeIneq :=
+    M.data_SlopeIneq _ _ _ _ _ _ hfr
+  have ParameterUpperBound : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).HHBound
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) :=
     M.data_HHBound hx1 _ _ _ _ _ _ _ rfl (fun u0 => (hDu u0).2.1) (fun u0 => (hL x hxL (M.pt u0)).2)
   have liftZP_unit : (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev).FParams := fun u0 =>
     ⟨(hI x hxI (M.pt u0)).1, (hI x hxI (M.pt u0)).2, hηv0 u0, hηvB u0, hev0 u0, hevB u0⟩
@@ -208,20 +281,44 @@ theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (
   have k3 : Cs ≤ max Cd 0 + Cc + Cs + C1 + Cl + 6 := by linarith
   have k4 : C1 ≤ max Cd 0 + Cc + Cs + C1 + Cl + 6 := by linarith
   have k5 : Cl ≤ max Cd 0 + Cc + Cs + C1 + Cl + 6 := by linarith
-  have E0 : ErrWindows0 (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev) (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH)
-      ((Fm.L x i0).sc.X'' (Fm.D x i0).R.n) eK (max Cd 0 + Cc + Cs + C1 + Cl + 6) :=
-    ⟨hx1', heps, heps1, hb1, le_of_eq hab.symm, hnT, w1, w2, heK, hk1, w3, w4, (by show 0 ≤ (Fm.L x i0).sc.L; rw [hLx]; linarith),
-      (by show (Fm.L x i0).sc.L ≤ 2 * x ^ eps; rw [hLx]; linarith), w5, w6, hb'0.le, w7, hXpp0, w8,
-      fun τ => ⟨le_trans ha0.le (M.av_facts hx1 (hWu 0) τ.2).1, (M.av_facts hx1 (hWu 0) τ.2).2.1⟩,
-      loss_bound_nonneg _, Nc_nonneg _,
-      fun u0 => by
-        have h := (hWu u0).2.2.2.2.2.2.2.2.2.1
-        rw [M.s_k u0] at h
-        exact h,
-      exp_neg_le_half (Real.one_le_rpow hx1' (by positivity : 0 ≤ Fm.ez / 7)), hη0, he0,
-      ⟨hCd', k1, hCd', k1, hCd', k1, hCc, k2, hCs, k3, hC1, k4, hCl, k5, hCabs, heL, hCH⟩⟩
-  have E1 : ErrWindows (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev) (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH)
-      ((Fm.L x i0).sc.X'' (Fm.D x i0).R.n) eK (max Cd 0 + Cc + Cs + C1 + Cl + 6) := by
+  have E0 : ErrWindows0 (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev)
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) ((Fm.L x i0).sc.X'' (Fm.D x i0).R.n) eK
+      (max Cd 0 + Cc + Cs + C1 + Cl + 6) := ⟨
+    hx1',
+    heps,
+    heps1,
+    hb1,
+    le_of_eq hab.symm,
+    hnT,
+    w1,
+    w2,
+    heK,
+    hk1,
+    w3,
+    w4,
+    (by show 0 ≤ (Fm.L x i0).sc.L; rw [hLx]; linarith),
+    (by show (Fm.L x i0).sc.L ≤ 2 * x ^ eps; rw [hLx]; linarith),
+    w5,
+    w6,
+    hb'0.le,
+    w7,
+    hXpp0,
+    w8,
+    fun τ => ⟨le_trans ha0.le (M.av_facts hx1 (hWu 0) τ.2).1, (M.av_facts hx1 (hWu 0) τ.2).2.1⟩,
+    loss_bound_nonneg _,
+    Nc_nonneg _,
+    fun u0 => by
+      have h := (hWu u0).2.2.2.2.2.2.2.2.2.1
+      rw [M.s_k u0] at h
+      exact h,
+    exp_neg_le_half (Real.one_le_rpow hx1' (by positivity : 0 ≤ Fm.ez / 7)),
+    hη0,
+    he0,
+    ⟨hCd', k1, hCd', k1, hCd', k1, hCc, k2, hCs, k3, hC1, k4, hCl, k5, hCabs, heL, hCH⟩
+  ⟩
+  have E1 : ErrWindows (M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev)
+      (mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH) ((Fm.L x i0).sc.X'' (Fm.D x i0).R.n) eK
+      (max Cd 0 + Cc + Cs + C1 + Cl + 6) := by
     refine ⟨E0, ?_⟩
     show (etaB + 4 * Real.sqrt eB) * (x ^ CH * (Fm.L x i0).sc.b) ≤
       (max Cd 0 + Cc + Cs + C1 + Cl + 6) * x ^ eps * ((Fintype.card ↥(Fm.TTn x) : ℝ) * (Fm.L x i0).sc.a)
@@ -229,13 +326,18 @@ theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (
       rw [← mul_assoc]; exact mul_le_mul_of_nonneg_right h6 hb0.le
     have s2 : (Fm.L x i0).sc.b ≤ (Fintype.card ↥(Fm.TTn x) : ℝ) * (Fm.L x i0).sc.a := by
       rw [hab]
-      calc (Fm.L x i0).sc.b = 1 * (1 * (Fm.L x i0).sc.b) := by ring
+      calc
+        (Fm.L x i0).sc.b
+          = 1 * (1 * (Fm.L x i0).sc.b) := by ring
         _ ≤ (Fintype.card ↥(Fm.TTn x) : ℝ) * (x * (Fm.L x i0).sc.b) :=
           mul_le_mul hnT (mul_le_mul_of_nonneg_right hx1' hb0.le) (by linarith) (by linarith)
     have s3 : (6 : ℝ) ≤ (max Cd 0 + Cc + Cs + C1 + Cl + 6) * x ^ eps :=
-      calc (6 : ℝ) ≤ (max Cd 0 + Cc + Cs + C1 + Cl + 6) * 1 := by linarith
+      calc
+        (6 : ℝ)
+          ≤ (max Cd 0 + Cc + Cs + C1 + Cl + 6) * 1 := by linarith
         _ ≤ _ := mul_le_mul_of_nonneg_left hxe (by linarith)
-    calc _ ≤ 6 * (Fm.L x i0).sc.b := s1
+    calc
+      _ ≤ 6 * (Fm.L x i0).sc.b := s1
       _ ≤ 6 * ((Fintype.card ↥(Fm.TTn x) : ℝ) * (Fm.L x i0).sc.a) := by linarith
       _ ≤ _ := mul_le_mul_of_nonneg_right s3 (by positivity)
   have hcardH : (Fintype.card M.e.A : ℝ) = ((Fm.D x i0).R.n : ℝ) := by rw [card_HA]; rfl
@@ -245,19 +347,27 @@ theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (
       show (Fm.L x i0).B0 = (2 * (Fintype.card M.e.A : ℝ)) * (M.m : ℝ) * (Fm.L x i0).sc.b * x ^ eps
       rw [hcardH]
       unfold SizeData₂.B0 sizeBudget bSize Scale.b Scale.L Ranks.f
-      rw [hsx, hse]; push_cast; ring
+      rw [hsx, hse]
+      push_cast
+      ring
     · apply le_of_eq
       show (Fm.L x i0).Nc = (M.T2.card : ℝ) * ((Fm.D x i0).R.k : ℝ) * (Fm.L x i0).sc.b * x ^ eps /
         ((Fintype.card M.e.A : ℝ) * ((Fintype.card M.e.A : ℝ) * x ^ (-eps)))
       rw [hcardH, M.card_thick_set_model_eq]
       unfold SizeData₂.Nc budgetNc rankBudget bSize Scale.b Scale.L
       rw [hsx, hse]
-  have R1 : GrowthInequalityRemainingHyps M.AD ell ⌈2 * (Fm.L x i0).sc.a⌉₊ M.TT M.T2 M.a M.w x eps (Fm.L x i0).sc.b
-      (Fm.L x i0).sc.b' (Fm.L x i0).etaSz (Fm.L x i0).sc.X' (Real.exp (-(c6 * x ^ (eps / 8)))) C5 :=
-    ⟨⟨(Fm.L x i0).etaSz_pos.le, Real.exp_pos _, hb'0,
-      le_of_eq (by rw [← hab]; exact div_mul_cancel₀ _ (Real.exp_pos _).ne'), (Real.exp_pos _).le,
+  have R1 : GrowthInequalityRemainingHyps M.AD ell ⌈2 * (Fm.L x i0).sc.a⌉₊ M.TT M.T2 M.a M.w x eps
+      (Fm.L x i0).sc.b (Fm.L x i0).sc.b' (Fm.L x i0).etaSz (Fm.L x i0).sc.X'
+      (Real.exp (-(c6 * x ^ (eps / 8)))) C5 := ⟨
+    ⟨
+      (Fm.L x i0).etaSz_pos.le,
+      Real.exp_pos _,
+      hb'0,
+      le_of_eq (by rw [← hab]; exact div_mul_cancel₀ _ (Real.exp_pos _).ne'),
+      (Real.exp_pos _).le,
       fun t ht => (M.av_facts hx1 (hWu 0) ((M.mem_TT t).mp ht)).2.2,
-      ⟨fun u0 j ρ hρ => lt_of_lt_of_le one_pos ((hnod u0).1 j ρ hρ),
+      ⟨
+        fun u0 j ρ hρ => lt_of_lt_of_le one_pos ((hnod u0).1 j ρ hρ),
         fun u0 j ρ hρ => by
           have h := (hnod u0).2.1 j ρ hρ
           rw [M.s_sc hx1 u0, Fm.eta_eq x (M.pt u0) M.i0] at h
@@ -265,10 +375,15 @@ theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (
         fun u0 j ρ hρ hρ' => by
           have h := (hnod u0).2.2 j ρ hρ hρ'
           rw [M.s_sc hx1 u0] at h
-          exact h⟩,
-      fun u0 j t ρ ht hρ => hcut u0 j t ρ ht hρ⟩,
-      by rw [hX']; exact hell3 (hTh x hxTh i0), hell4 (hQD x hxQD i0)⟩
-  have W1 : CostWindows x (fPl M.e.A) (Fm.L x i0).sc.b (Fm.L x i0).etaSz (Real.exp (-(c6 * x ^ (eps / 8)))) := by
+          exact h
+      ⟩,
+      fun u0 j t ρ ht hρ => hcut u0 j t ρ ht hρ
+    ⟩,
+    by rw [hX']; exact hell3 (hTh x hxTh i0),
+    hell4 (hQD x hxQD i0)
+  ⟩
+  have W1 : CostWindows x (fPl M.e.A) (Fm.L x i0).sc.b (Fm.L x i0).etaSz
+      (Real.exp (-(c6 * x ^ (eps / 8)))) := by
     rw [M.fPl_eq]; exact ⟨w11, w12⟩
   have S1 : RestSize eps x (Fintype.card M.e.A) M.TT.card M.T2.card M.m (Fm.L x i0).sc.b
       ((Fm.D x i0).R.k : ℝ) (Fm.L x i0).sc.a := by
@@ -279,13 +394,46 @@ theorem linkCore (Fm : FamP eps) (Cabs CH eL C5 c6 : ℝ) (hCabs : 0 ≤ Cabs) (
     · rw [hcardH]; exact h1
     · rw [hcardH, M.card_thick_set_model_eq]; exact w15
     · rw [hcardH]; exact w14
-  exact ⟨i0, M.m, M.f, M.pt, av, bv, ↥(Fm.TTn x), inferInstance,
-    M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev, mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH,
-    (Fm.L x i0).sc.X'' (Fm.D x i0).R.n, ell, ⌈2 * (Fm.L x i0).sc.a⌉₊, M.TT, M.T2, M.a, M.w, M.eT, M.eP,
-    (Fm.L x i0).etaSz, (Fm.L x i0).sc.X', Real.exp (-(c6 * x ^ (eps / 8))),
-    M.tiePts, M.tieGlobal hx1 _ _ _ _ _ _, M.tieLocal _ _ _ _ _ _, M.tieArith ell hell1, rfl, rfl, le_refl _, le_refl _,
-    le_refl _, M.ident _ _ _ _ _ _ ell hell2,
-    ⟨L1, L2, L3, L4, L5, L6, L7, L8, liftZP_newton, ParameterUpperBound, liftZP_unit⟩, E1, B1, R1, W1, S1⟩
+  exact ⟨
+    i0,
+    M.m,
+    M.f,
+    M.pt,
+    av,
+    bv,
+    ↥(Fm.TTn x),
+    inferInstance,
+    M.data ⌈2 * (Fm.L x i0).sc.a⌉₊ CH etaB eB ηv ev,
+    mkC (max Cd 0) Cabs Cc Cs C1 Cl eL CH,
+    (Fm.L x i0).sc.X'' (Fm.D x i0).R.n,
+    ell,
+    ⌈2 * (Fm.L x i0).sc.a⌉₊,
+    M.TT,
+    M.T2,
+    M.a,
+    M.w,
+    M.eT,
+    M.eP,
+    (Fm.L x i0).etaSz,
+    (Fm.L x i0).sc.X',
+    Real.exp (-(c6 * x ^ (eps / 8))),
+    M.tiePts,
+    M.tieGlobal hx1 _ _ _ _ _ _,
+    M.tieLocal _ _ _ _ _ _,
+    M.tieArith ell hell1,
+    rfl,
+    rfl,
+    le_refl _,
+    le_refl _,
+    le_refl _,
+    M.ident _ _ _ _ _ _ ell hell2,
+    ⟨L1, L2, L3, L4, L5, L6, L7, L8, liftZP_newton, ParameterUpperBound, liftZP_unit⟩,
+    E1,
+    B1,
+    R1,
+    W1,
+    S1
+  ⟩
 
 def LossesSmallShares (Fm : FamP eps) : Prop :=
   ∃ C x0 : ℝ, 0 ≤ C ∧ ∀ x ≥ x0, ∀ i : Fm.Ix x, ChW_at (Fm.Gx x i) Fm.GK → Loss_at (Fm.L x i) C 0
@@ -297,7 +445,8 @@ theorem lossF_of_7 (Fm : FamP eps) (h : LossesSmallShares Fm) (hW : ChosenWS Fm)
   obtain ⟨i0, av, bv, h1, h2, h3⟩ := hW x (le_of_max_le_right hx) hwin
   exact ⟨i0, av, bv, h1, h2, fun i hi => hL x (le_of_max_le_left hx) i (h3 i hi)⟩
 
-theorem size_windows_of_thick_density (Fm : FamP eps) (hT2 : ThickSetDensityEventually Fm) : WinF Fm := by
+theorem size_windows_of_thick_density (Fm : FamP eps) (hT2 : ThickSetDensityEventually Fm)
+    : WinF Fm := by
   intro c6 hc6
   have h0 : 0 < eps := fam_eps_pos Fm
   obtain ⟨aT, hT2⟩ := hT2
@@ -335,12 +484,14 @@ theorem size_windows_of_thick_density (Fm : FamP eps) (hT2 : ThickSetDensityEven
   have hLa := winE sN sQD hX.1 hX.2.2.2.2.1 hX.2.2.2.2.2
   exact size_window_at_five (Fm.params x hx1 i) sN sM sK hLa (winP sQD) hNum.1 (hT2 x bT i) c6 hX
 
-theorem thick_density_of_construction (Fm : FamP eps) (hT2 : ThickSetEventually Fm) : ThickSetDensityEventually Fm := by
+theorem thick_density_of_construction (Fm : FamP eps) (hT2 : ThickSetEventually Fm)
+    : ThickSetDensityEventually Fm := by
   obtain ⟨eK, x0, -, h⟩ := size_windows_of_thick_set Fm hT2 1 one_pos
   exact ⟨x0, fun x hx i => (h x hx i).2.2.2.2.2.2.2.2.2.2.2.2.2.2.1⟩
 
-theorem chosenBadp_of_old (Fm : FamP eps) (Cb : ℝ) (hCb : 0 ≤ Cb) (cTT : ChosenTT Fm) (cBad : ChosenBad Fm Cb) :
-    ChosenBadp Fm := by
+theorem chosenBadp_of_old
+    (Fm : FamP eps) (Cb : ℝ) (hCb : 0 ≤ Cb) (cTT : ChosenTT Fm) (cBad : ChosenBad Fm Cb)
+    : ChosenBadp Fm := by
   have heps := fam_eps_pos Fm
   obtain ⟨a0, cTT⟩ := cTT
   obtain ⟨a1, cBad⟩ := cBad
@@ -368,8 +519,9 @@ theorem chosenBadp_of_old (Fm : FamP eps) (Cb : ℝ) (hCb : 0 ≤ Cb) (cTT : Cho
   have hXone : 1 ≤ (Fm.L x i).sc.X' := by
     rw [hX']; exact Real.one_le_exp (Real.rpow_nonneg hx0.le _)
   have hM := Formalism.L2.GlobalTheoryTheory.Places.mertens (Fm.L x i).sc.X' hXone
-  have hsub : ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p ≤
-      ∑ p ∈ (Finset.range ⌈(Fm.L x i).sc.X'⌉₊).filter Nat.Prime, Real.log p / p := by
+  have hsub
+      : ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p
+        ≤ ∑ p ∈ (Finset.range ⌈(Fm.L x i).sc.X'⌉₊).filter Nat.Prime, Real.log p / p := by
     apply Finset.sum_le_sum_of_subset_of_nonneg
     · intro p hp
       unfold largeOrderResiduePrimes at hp
@@ -383,29 +535,39 @@ theorem chosenBadp_of_old (Fm : FamP eps) (Cb : ℝ) (hCb : 0 ≤ Cb) (cTT : Cho
   rw [hsx] at hB
   rw [hsx, hse]
   have hx2 : 0 ≤ x ^ (-2 : ℝ) := Real.rpow_nonneg hx0.le _
-  have hdn : (Fm.L x i).sc.delta1 * (Fm.D x i).R.n ≤ 2 * ((Fm.D x i).host.TT.card : ℝ) := by linarith
+  have hdn : (Fm.L x i).sc.delta1 * (Fm.D x i).R.n ≤ 2 * ((Fm.D x i).host.TT.card : ℝ) := by
+    linarith
   have hdn0 : 0 ≤ (Fm.L x i).sc.delta1 * (Fm.D x i).R.n := by
-    have : 0 ≤ (Fm.L x i).sc.delta1 := by unfold Scale.delta1; exact Real.rpow_nonneg (by rw [hsx]; exact hx0.le) _
+    have : 0 ≤ (Fm.L x i).sc.delta1 := by
+      unfold Scale.delta1; exact Real.rpow_nonneg (by rw [hsx]; exact hx0.le) _
     exact mul_nonneg this (Nat.cast_nonneg _)
   have hc0 : (0 : ℝ) ≤ ((Fm.D x i).host.TT.card : ℝ) := Nat.cast_nonneg _
   have hx3 : 0 ≤ x ^ (eps / 3) := Real.rpow_nonneg hx0.le _
   have hS0 : 0 ≤ ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p :=
     Finset.sum_nonneg (fun p _ => div_nonneg (Real.log_natCast_nonneg p) (Nat.cast_nonneg p))
-  have step : 4 * (Cb * x ^ (-2 : ℝ)) * (Fm.L x i).sc.delta1 * (Fm.D x i).R.n *
-      ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p ≤
-      ((Fm.D x i).host.TT.card : ℝ) * (x ^ (-2 : ℝ) * ((16 * Cb) * x ^ (eps / 3))) := by
-    have e1 : 4 * (Cb * x ^ (-2 : ℝ)) * (Fm.L x i).sc.delta1 * (Fm.D x i).R.n *
-        ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p =
-        (4 * Cb * x ^ (-2 : ℝ)) * (((Fm.L x i).sc.delta1 * (Fm.D x i).R.n) *
-          ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p) := by ring
-    have e2 : ((Fm.L x i).sc.delta1 * (Fm.D x i).R.n) * ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p ≤
-        (2 * ((Fm.D x i).host.TT.card : ℝ)) * (2 * x ^ (eps / 3)) :=
+  have step
+      : 4 * (Cb * x ^ (-2 : ℝ)) * (Fm.L x i).sc.delta1 * (Fm.D x i).R.n
+          * ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p
+        ≤ ((Fm.D x i).host.TT.card : ℝ) * (x ^ (-2 : ℝ) * ((16 * Cb) * x ^ (eps / 3))) := by
+    have e1
+        : 4 * (Cb * x ^ (-2 : ℝ)) * (Fm.L x i).sc.delta1 * (Fm.D x i).R.n
+            * ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p
+          = (4 * Cb * x ^ (-2 : ℝ))
+            * (((Fm.L x i).sc.delta1 * (Fm.D x i).R.n)
+              * ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p) := by
+      ring
+    have e2
+        : ((Fm.L x i).sc.delta1 * (Fm.D x i).R.n)
+            * ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p
+          ≤ (2 * ((Fm.D x i).host.TT.card : ℝ)) * (2 * x ^ (eps / 3)) :=
       mul_le_mul hdn hS hS0 (by linarith)
     rw [e1]
-    calc (4 * Cb * x ^ (-2 : ℝ)) * (((Fm.L x i).sc.delta1 * (Fm.D x i).R.n) *
-          ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p)
-        ≤ (4 * Cb * x ^ (-2 : ℝ)) * ((2 * ((Fm.D x i).host.TT.card : ℝ)) * (2 * x ^ (eps / 3))) :=
-          mul_le_mul_of_nonneg_left e2 (by positivity)
+    calc
+      (4 * Cb * x ^ (-2 : ℝ))
+            * (((Fm.L x i).sc.delta1 * (Fm.D x i).R.n)
+              * ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p)
+          ≤ (4 * Cb * x ^ (-2 : ℝ)) * ((2 * ((Fm.D x i).host.TT.card : ℝ)) * (2 * x ^ (eps / 3))) :=
+        mul_le_mul_of_nonneg_left e2 (by positivity)
       _ = _ := by ring
   have hfin : x ^ (-2 : ℝ) * ((16 * Cb) * x ^ (eps / 3)) ≤ x ^ (-2 + eps) := by
     have h3 : (16 * Cb) * x ^ (eps / 3) ≤ x ^ (2 * eps / 3) * x ^ (eps / 3) :=
@@ -413,7 +575,9 @@ theorem chosenBadp_of_old (Fm : FamP eps) (Cb : ℝ) (hCb : 0 ≤ Cb) (cTT : Cho
     rw [← Real.rpow_add hx0] at h3
     have h4 : 2 * eps / 3 + eps / 3 = eps := by ring
     rw [h4] at h3
-    calc x ^ (-2 : ℝ) * ((16 * Cb) * x ^ (eps / 3)) ≤ x ^ (-2 : ℝ) * x ^ eps := mul_le_mul_of_nonneg_left h3 hx2
+    calc
+      x ^ (-2 : ℝ) * ((16 * Cb) * x ^ (eps / 3))
+        ≤ x ^ (-2 : ℝ) * x ^ eps := mul_le_mul_of_nonneg_left h3 hx2
       _ = x ^ (-2 + eps) := (Real.rpow_add hx0 _ _).symm
   exact le_trans hB (le_trans step (mul_le_mul_of_nonneg_left hfin hc0))
 
@@ -426,8 +590,8 @@ open Formalism.BasicNotions Formalism.MainNotions.Lnk Formalism.MainNotions.Glob
 variable {eps : ℝ}
 
 def LinkGLOBAL7 (Fm : FamP eps) (Cabs CH C0 eD eL : ℝ) : Prop :=
-  WeightVectorSmallSharesSeven Fm C0 CH → GlobalTheoremInputs Fm Cabs CH C0 →
-    ∃ K cHH eK CL x0 : ℝ, ∀ x ≥ x0, x ∈ Fm.Win → ChainTied Fm eD eL K cHH eK CL x
+  WeightVectorSmallSharesSeven Fm C0 CH → GlobalTheoremInputs Fm Cabs CH C0
+    → ∃ K cHH eK CL x0 : ℝ, ∀ x ≥ x0, x ∈ Fm.Win → ChainTied Fm eD eL K cHH eK CL x
 
 end Formalism.MainNotions
 

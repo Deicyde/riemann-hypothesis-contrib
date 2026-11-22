@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma lft_mono' {ι κ : Type} [LinearOrder ι] [LinearOrder κ] {s t : Finset (ι ⊕ₗ κ)} (h : s ⊆ t) :
@@ -42,8 +43,8 @@ private lemma cech_C' {ι E : Type} [LinearOrder ι] [AddCommGroup E] [Module �
     c ∈ (cech A).C n ↔ ∀ s, c s ∈ (if s.Nonempty ∧ (s.card : ℤ) = n + 1 then A s else ⊥ : Submodule ℂ E) :=
   ⟨fun h s => h s trivial, fun h s _ => h s⟩
 
-theorem UpperTheory.Gal.productCup_of_system.edgeB_of :
-    EdgeInj → RowEx → L1 → RYBasic → WdUni → WdBasic → EdgeB := by
+theorem UpperTheory.Gal.productCup_of_system.edgeB_of
+    : EdgeInj → RowEx → L1 → RYBasic → WdUni → WdBasic → EdgeB := by
   intro hEI hRow hL1 hRY hU hW
   intro F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 h0 y hy hB
   obtain ⟨hRI, hGood, hRmono, -, -⟩ := hRY F K K' d x j2 h0
@@ -53,7 +54,8 @@ theorem UpperTheory.Gal.productCup_of_system.edgeB_of :
     (hU _ _ (DR ℂ K') (fun _ => 1) (fun _ => 0) I J).2.2.1
   have cu : ∀ I J : Finset (Fin (d + 1)), (uni I J).card = I.card + J.card := fun I J =>
     (hU _ _ (DR ℂ K') (fun _ => 1) (fun _ => 0) I J).2.2.2.1
-  let G : Finset (Two d) → Submodule ℂ (DR ℂ K') := fun s => omB ℂ K' (RY (xv x) j2 (lft s) (rgt s)) d
+  let G : Finset (Two d) → Submodule ℂ (DR ℂ K') := fun s =>
+    omB ℂ K' (RY (xv x) j2 (lft s) (rgt s)) d
   have hGm : ∀ I J, G (uni I J) = omB ℂ K' (RY (xv x) j2 I J) d := by
     intro I J
     simp only [G, lu, ru]
@@ -63,11 +65,11 @@ theorem UpperTheory.Gal.productCup_of_system.edgeB_of :
   have hcech : (fun I => G (uni I ∅)) = fun I => omB ℂ K' (rB ℂ K' (xv x) I) d := funext hG0
   have hmix : (fun I J => G (uni I J)) = fun I J => omB ℂ K' (RY (xv x) j2 I J) d :=
     funext fun I => funext fun J => hGm I J
-  obtain ⟨γ, hγ, hγ0, hγI⟩ := hEI (Fin (d + 1)) (DR ℂ K') G d y
-    (by rw [hcech]; exact hy) (by rw [hmix]; exact hB)
+  obtain ⟨γ, hγ, hγ0, hγI⟩ :=
+    hEI (Fin (d + 1)) (DR ℂ K') G d y (by rw [hcech]; exact hy) (by rw [hmix]; exact hB)
   let A : Finset (Two d) → Submodule ℂ (DR ℂ K') := fun s => if (lft s).Nonempty then G s else ⊥
   have hAn : ∀ s, (lft s).Nonempty → A s = G s := fun s hs => if_pos hs
-  have hAe : ∀ s, ¬ (lft s).Nonempty → A s = ⊥ := fun s hs => if_neg hs
+  have hAe : ∀ s, ¬(lft s).Nonempty → A s = ⊥ := fun s hs => if_neg hs
   have hWOk : WOk A (fun _ => 1) := by
     refine ⟨fun _ _ => Commute.one_left _, ?_⟩
     intro s i _ m hm
@@ -102,9 +104,13 @@ theorem UpperTheory.Gal.productCup_of_system.edgeB_of :
         exact (Submodule.mem_bot ℂ).1 h2
       rw [hc0]
       exact Submodule.zero_mem _
-  have hdelta : ∀ c : Finset (Two d) → DR ℂ K', wd (fun _ => (1 : Module.End ℂ (DR ℂ K'))) c = deltaL ℂ _ _ c :=
+  have hdelta
+      : ∀ c : Finset (Two d) → DR ℂ K',
+        wd (fun _ => (1 : Module.End ℂ (DR ℂ K'))) c = deltaL ℂ _ _ c :=
     (hW (Two d) (DR ℂ K') A (fun _ => 1)).2.2.2.2.1
-  have hdelta' : ∀ c : Finset (Fin (d + 1)) → DR ℂ K', wd (fun _ => (1 : Module.End ℂ (DR ℂ K'))) c = deltaL ℂ _ _ c :=
+  have hdelta'
+      : ∀ c : Finset (Fin (d + 1)) → DR ℂ K',
+        wd (fun _ => (1 : Module.End ℂ (DR ℂ K'))) c = deltaL ℂ _ _ c :=
     (hW (Fin (d + 1)) (DR ℂ K') (fun _ => ⊥) (fun _ => 1)).2.2.2.2.1
   have hγZ : γ ∈ (acx A fun _ => 1).Z ((d : ℤ) + 1) := by
     refine ⟨?_, ?_⟩
@@ -130,7 +136,9 @@ theorem UpperTheory.Gal.productCup_of_system.edgeB_of :
       rw [hdelta]
       exact hγ.2
   have hBγ : γ ∈ (acx A fun _ => 1).B ((d : ℤ) + 1) := by
-    refine hL1 (Fin (d + 1)) (Fin (d + 1)) (DR ℂ K') A (fun _ => 1) ((d : ℤ) + 2) ((d : ℤ) + 1) hWOk hKE γ hγZ ?_ ?_
+    refine hL1 (Fin (d + 1)) (Fin (d + 1)) (DR ℂ K') A
+      (fun _ => 1)
+      ((d : ℤ) + 2) ((d : ℤ) + 1) hWOk hKE γ hγZ ?_ ?_
     · intro b L hL
       exfalso
       have : L.card ≤ d + 1 := by simpa using Finset.card_le_univ L
@@ -152,7 +160,7 @@ theorem UpperTheory.Gal.productCup_of_system.edgeB_of :
       exact h1
     · rw [if_neg hb]
       by_cases hc : (b.card : ℤ) = (d : ℤ) + 1 - 1
-      · have hne : ¬ b.Nonempty := fun h => hb ⟨h, by omega⟩
+      · have hne : ¬b.Nonempty := fun h => hb ⟨h, by omega⟩
         rw [if_pos hc, hAe _ (by rw [lu]; exact hne)] at h1
         exact h1
       · rw [if_neg hc] at h1

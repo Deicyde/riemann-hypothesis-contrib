@@ -18,11 +18,11 @@ namespace GroundTheory.Arith.SchemeCoh
 
 open GroundTheory.FunctionField
 
-variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (.of k))] [IsIntegral X]
-  [IsLocallyNoetherian X] [IsNormalScheme X]
+variable
+  {k : Type u} [Field k]
+  {X : Scheme.{u}} [X.Over (Spec (.of k))] [IsIntegral X] [IsLocallyNoetherian X] [IsNormalScheme X]
 
 namespace PrimeDivisor
-
 
 noncomputable def degree (Z : PrimeDivisor X) : ℕ :=
   finrank k (IsLocalRing.ResidueField (X.presheaf.stalk Z.point))
@@ -34,8 +34,8 @@ noncomputable def WeilDivisor.degree : WeilDivisor X →+ ℤ :=
 
 variable [IsProper (X ↘ Spec (.of k))]
 
-noncomputable def divisorEquiv (hX : topologicalKrullDim X ≤ 1) :
-    WeilDivisor X ≃+ Divisor k X.functionField :=
+noncomputable def divisorEquiv (hX : topologicalKrullDim X ≤ 1)
+    : WeilDivisor X ≃+ Divisor k X.functionField :=
   Finsupp.domCongr (placeEquiv hX)
 
 variable [IsFunctionField k X.functionField]

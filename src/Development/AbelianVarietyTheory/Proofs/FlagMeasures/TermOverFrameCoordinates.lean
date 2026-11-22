@@ -182,30 +182,48 @@ lemma mem_graphOf (hM : M.OK) (g : SplitG M.L) (hg : M.split = some g) (Λ : Sub
       have := Submodule.neg_mem _ h5
       simpa using this
 
-theorem isTermW_iff : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r), ∀ (S : Frames M.L r k) (c : Coord P S), ∀ (d : LocNG.Datum P) (n n' : V ≃ₗ[E] V) (Λ : Submodule M.L.O V), LocNG.IsTermOver P d ⟨Λ, fun b => n (P.A.f b), fun b => n' (P.B.f b), P.A.T, P.B.T⟩ ∧ n ∈ P.A.N ∧ n' ∈ P.B.N ∧ Λ = LocNG.img n (P.A.LamStd d.L) ∧ Λ = LocNG.img n' (P.B.LamStd d.L') ↔ S.IsTermW (c.dat d) (c.lat Λ) (c.grp n) (c.grp n') := by
+theorem isTermW_iff
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ)
+            (P : LocNG.FPair H r),
+          ∀ (S : Frames M.L r k) (c : Coord P S),
+            ∀ (d : LocNG.Datum P) (n n' : V ≃ₗ[E] V) (Λ : Submodule M.L.O V),
+              LocNG.IsTermOver P d ⟨Λ, fun b => n (P.A.f b), fun b => n' (P.B.f b), P.A.T, P.B.T⟩
+                  ∧ n ∈ P.A.N ∧ n' ∈ P.B.N ∧ Λ = LocNG.img n (P.A.LamStd d.L)
+                  ∧ Λ = LocNG.img n' (P.B.LamStd d.L')
+                ↔ S.IsTermW (c.dat d) (c.lat Λ) (c.grp n) (c.grp n') := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P S c d n n' Λ
   letI := hM.loc
   haveI := hM.char0
   obtain ⟨hth, hN, hN', -⟩ := GlobalTheory.HL.CoordUnip.transport M hM H r k P S c
-  obtain ⟨-, iA, -, sA⟩ := GlobalTheory.T.hermitianFrameCoordinates_transport_innerLattices M hM H r k P S c
-  obtain ⟨-, iB, -, sB⟩ := GlobalTheory.T.framePairCoordinates_transport_innerLattices M hM H r k P S c
+  obtain ⟨-, iA, -, sA⟩ :=
+    GlobalTheory.T.hermitianFrameCoordinates_transport_innerLattices M hM H r k P S c
+  obtain ⟨-, iB, -, sB⟩ :=
+    GlobalTheory.T.framePairCoordinates_transport_innerLattices M hM H r k P S c
   have hA := (iA d.L).1 d.hL
   have hB := (iB d.L').1 d.hL'
-  have eA : Λ = LocNG.img n (P.A.LamStd d.L) ↔
-      c.lat Λ = c.grp n • S.stdLat S.f S.es (c.inn P.A.f d.L) := by
+  have eA
+      : Λ = LocNG.img n (P.A.LamStd d.L)
+        ↔ c.lat Λ = c.grp n • S.stdLat S.f S.es (c.inn P.A.f d.L) := by
     rw [← sA, ← lat_img, lat_inj]
-  have eB : Λ = LocNG.img n' (P.B.LamStd d.L') ↔
-      c.lat Λ = c.grp n' • S.stdLat S.f' S.es' (c.inn P.B.f d.L') := by
+  have eB
+      : Λ = LocNG.img n' (P.B.LamStd d.L')
+        ↔ c.lat Λ = c.grp n' • S.stdLat S.f' S.es' (c.inn P.B.f d.L') := by
     rw [← sB, ← lat_img, lat_inj]
   have ed : ∀ b, c.grp n' (S.f' b) - c.grp n (S.f b) = c.e (n' (P.B.f b) - n (P.A.f b)) := by
     intro b; rw [c.f_eq, c.f'_eq, grp_e, grp_e, map_sub]
-  have key : n ∈ P.A.N → n' ∈ P.B.N → Λ = LocNG.img n (P.A.LamStd d.L) →
-      Λ = LocNG.img n' (P.B.LamStd d.L') →
-      ((∀ g, M.split = some g →
-        H.Admissible g (⟨Λ, fun b => n (P.A.f b), fun b => n' (P.B.f b), P.A.T, P.B.T⟩ : Term V M r) ∧
-        H.iotaGraph g ⟨Λ, P.A.f, P.B.f, P.A.T, P.B.T⟩ = d.io) ↔
-      ((∀ b, S.InTh (c.lat Λ) (c.grp n' (S.f' b) - c.grp n (S.f b))) ∧
-        (c.dat d).2.2 = S.graphOf (c.lat Λ))) := by
+  have key
+      : n ∈ P.A.N → n' ∈ P.B.N → Λ = LocNG.img n (P.A.LamStd d.L)
+        → Λ = LocNG.img n' (P.B.LamStd d.L')
+        → ((∀ g,
+            M.split = some g
+              → H.Admissible g
+                  (⟨Λ, fun b => n (P.A.f b), fun b => n' (P.B.f b), P.A.T, P.B.T⟩ : Term V M r)
+                ∧ H.iotaGraph g ⟨Λ, P.A.f, P.B.f, P.A.T, P.B.T⟩ = d.io)
+          ↔ ((∀ b, S.InTh (c.lat Λ) (c.grp n' (S.f' b) - c.grp n (S.f b)))
+            ∧ (c.dat d).2.2 = S.graphOf (c.lat Λ))) := by
     intro hn hn' h1 h2
     rw [hN] at hn
     rw [hN'] at hn'
@@ -214,10 +232,11 @@ theorem isTermW_iff : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpac
     cases hs : M.split with
     | none =>
       have h0 : S.th = 1 := by rw [← hth, LocNG.theta, hs]
-      have hI : ∀ x, S.InTh (c.lat Λ) x ↔ x ∈ c.lat Λ := by
-        intro x; simp [Frames.InTh, h0]
-      obtain ⟨-, a2, a3⟩ := GlobalTheory.HL.StdLat.stdLat_spec M.L r k S S.f S.es (Or.inl ⟨rfl, rfl⟩) _ hA
-      obtain ⟨-, b2, b3⟩ := GlobalTheory.HL.StdLat.stdLat_spec M.L r k S S.f' S.es' (Or.inr ⟨rfl, rfl⟩) _ hB
+      have hI : ∀ x, S.InTh (c.lat Λ) x ↔ x ∈ c.lat Λ := by intro x; simp [Frames.InTh, h0]
+      obtain ⟨-, a2, a3⟩ :=
+        GlobalTheory.HL.StdLat.stdLat_spec M.L r k S S.f S.es (Or.inl ⟨rfl, rfl⟩) _ hA
+      obtain ⟨-, b2, b3⟩ :=
+        GlobalTheory.HL.StdLat.stdLat_spec M.L r k S S.f' S.es' (Or.inr ⟨rfl, rfl⟩) _ hB
       refine iff_of_true (by simp) ⟨fun b => ?_, ?_⟩
       · rw [hI]
         refine Submodule.sub_mem _ ?_ ?_
@@ -244,8 +263,11 @@ theorem isTermW_iff : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpac
           exact ⟨x', x, Prod.ext e' e, Or.inl ⟨hs, u', u⟩⟩
     | some g =>
       have hq : S.th = (g.q : F) := by rw [← hth, LocNG.theta, hs]
-      have hd : ∀ p, p ∈ (c.dat d).2.2 ↔ ∃ (x' : ↥(H.perp (H.X P.B.f))) (x : ↥(H.perp (H.X P.A.f))),
-          p = (c.e x', c.e x) ∧ (H.mkW P.B.f x', H.mkW P.A.f x) ∈ d.io := by
+      have hd
+          : ∀ p,
+            p ∈ (c.dat d).2.2
+              ↔ ∃ (x' : ↥(H.perp (H.X P.B.f))) (x : ↥(H.perp (H.X P.A.f))),
+                p = (c.e x', c.e x) ∧ (H.mkW P.B.f x', H.mkW P.A.f x) ∈ d.io := by
         intro p; simp [Coord.dat, hs]
       simp only [Option.some.injEq, forall_eq']
       refine and_congr ?_ ?_
@@ -259,18 +281,21 @@ theorem isTermW_iff : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpac
           ext ⟨w', w⟩
           obtain ⟨x', rfl⟩ := mkW_surj P.B.f w'
           obtain ⟨x, rfl⟩ := mkW_surj P.A.f w
-          have hh : (c.e x', c.e x) ∈ (c.dat d).2.2 ↔ (c.e x', c.e x) ∈ S.graphOf (c.lat Λ) := by rw [h]
+          have hh : (c.e x', c.e x) ∈ (c.dat d).2.2 ↔ (c.e x', c.e x) ∈ S.graphOf (c.lat Λ) := by
+            rw [h]
           rw [hd, mem_graphOf c hM g hs Λ P.A.T P.B.T] at hh
-          have inj : ∀ (Z : Set (H.Wb P.B.f × H.Wb P.A.f)),
-              (∃ (y' : ↥(H.perp (H.X P.B.f))) (y : ↥(H.perp (H.X P.A.f))),
-                (c.e x', c.e x) = (c.e y', c.e y) ∧ (H.mkW P.B.f y', H.mkW P.A.f y) ∈ Z) ↔
-              (H.mkW P.B.f x', H.mkW P.A.f x) ∈ Z := by
+          have inj
+              : ∀ (Z : Set (H.Wb P.B.f × H.Wb P.A.f)),
+                (∃ (y' : ↥(H.perp (H.X P.B.f))) (y : ↥(H.perp (H.X P.A.f))),
+                    (c.e x', c.e x) = (c.e y', c.e y) ∧ (H.mkW P.B.f y', H.mkW P.A.f y) ∈ Z)
+                  ↔ (H.mkW P.B.f x', H.mkW P.A.f x) ∈ Z := by
             intro Z
             constructor
             · rintro ⟨y', y, e, u⟩
               have e1 : x' = y' := Subtype.ext (c.e.injective (congrArg Prod.fst e))
               have e2 : x = y := Subtype.ext (c.e.injective (congrArg Prod.snd e))
-              rw [e1, e2]; exact u
+              rw [e1, e2]
+              exact u
             · intro u; exact ⟨x', x, rfl, u⟩
           exact ((inj _).symm.trans (hh.symm.trans (inj _)))
   constructor
@@ -282,6 +307,12 @@ theorem isTermW_iff : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpac
     have hn' := (hN' n').2 hn'
     have h1 := eA.2 h1
     have h2 := eB.2 h2
-    exact ⟨⟨rfl, rfl, ⟨n, hn, rfl, h1⟩, ⟨n', hn', rfl, h2⟩, (key hn hn' h1 h2).2 ⟨k1, k2⟩⟩, hn, hn', h1, h2⟩
+    exact ⟨
+      ⟨rfl, rfl, ⟨n, hn, rfl, h1⟩, ⟨n', hn', rfl, h2⟩, (key hn hn' h1 h2).2 ⟨k1, k2⟩⟩,
+      hn,
+      hn',
+      h1,
+      h2
+    ⟩
 
 end GlobalTheory.HL.CoordTerm

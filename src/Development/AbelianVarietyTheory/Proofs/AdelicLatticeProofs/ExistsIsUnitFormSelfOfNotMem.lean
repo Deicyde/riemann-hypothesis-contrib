@@ -12,8 +12,9 @@ section Galois
 
 variable {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] (σ : S →+* S)
 
-theorem isIntegral_of_involution (hσ : ∀ x, σ (σ x) = x)
-    (hfix : ∀ x, σ x = x → x ∈ (algebraMap R S).range) : Algebra.IsIntegral R S := by
+theorem isIntegral_of_involution
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x → x ∈ (algebraMap R S).range)
+    : Algebra.IsIntegral R S := by
   refine ⟨fun x => ?_⟩
   obtain ⟨t, ht⟩ := hfix (x + σ x) (by rw [map_add (f := _), hσ, add_comm])
   obtain ⟨n, hn⟩ := hfix (x * σ x) (by rw [map_mul, hσ, mul_comm])
@@ -25,23 +26,26 @@ theorem isIntegral_of_involution (hσ : ∀ x, σ (σ x) = x)
 
 variable [IsLocalRing R]
 
-theorem algebraMap_mem_of_isMaximal [Algebra.IsIntegral R S] (n : Ideal S) [n.IsMaximal]
-    {r : R} (hr : r ∈ maximalIdeal R) : algebraMap R S r ∈ n := by
+theorem algebraMap_mem_of_isMaximal
+    [Algebra.IsIntegral R S] (n : Ideal S) [n.IsMaximal] {r : R} (hr : r ∈ maximalIdeal R)
+    : algebraMap R S r ∈ n := by
   have h := eq_maximalIdeal (Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := R) n)
   rw [← h] at hr
   exact hr
 
-theorem isUnit_or_mem_of_fixed (hfix : ∀ x, σ x = x → x ∈ (algebraMap R S).range)
-    {x : S} (hx : σ x = x) :
-    IsUnit x ∨ x ∈ (maximalIdeal R).map (algebraMap R S) := by
+theorem isUnit_or_mem_of_fixed
+    (hfix : ∀ x, σ x = x → x ∈ (algebraMap R S).range) {x : S} (hx : σ x = x)
+    : IsUnit x ∨ x ∈ (maximalIdeal R).map (algebraMap R S) := by
   obtain ⟨r, rfl⟩ := hfix x hx
   by_cases hr : IsUnit r
   · exact Or.inl (hr.map _)
   · exact Or.inr (Ideal.mem_map_of_mem _ hr)
 
-theorem exists_isUnit_add_mul (hσ : ∀ x, σ (σ x) = x)
-    (hfix : ∀ x, σ x = x → x ∈ (algebraMap R S).range) (hgal : ∃ ω, IsUnit (ω - σ ω))
-    {u : S} (hu : u * σ u = 1) : ∃ a, IsUnit (a + u * σ a) := by
+theorem exists_isUnit_add_mul
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x → x ∈ (algebraMap R S).range)
+    (hgal : ∃ ω, IsUnit (ω - σ ω))
+    {u : S} (hu : u * σ u = 1)
+    : ∃ a, IsUnit (a + u * σ a) := by
   haveI := isIntegral_of_involution σ hσ hfix
   rcases subsingleton_or_nontrivial S with hS | hS
   · exact ⟨0, isUnit_of_subsingleton _⟩
@@ -57,7 +61,8 @@ theorem exists_isUnit_add_mul (hσ : ∀ x, σ (σ x) = x)
     · exact absurd (isUnit_of_mul_isUnit_left h) (hcon a)
     · have h1 : (a + u * σ a) * σ (a + u * σ a) ∈ n :=
         (Ideal.map_le_iff_le_comap (I := maximalIdeal R)).2
-          (fun r hr => algebraMap_mem_of_isMaximal n hr) h
+          (fun r hr => algebraMap_mem_of_isMaximal n hr)
+          h
       have h2 : a + u * σ a = u * σ (a + u * σ a) := by
         rw [map_add (f := _), map_mul, hσ]
         linear_combination (-a) * hu
@@ -67,13 +72,13 @@ theorem exists_isUnit_add_mul (hσ : ∀ x, σ (σ x) = x)
   have : ω - σ ω ∈ n := by
     have := n.sub_mem (key ω) (n.mul_mem_left (σ ω) (key 1))
     convert this using 1
-    rw [map_one]; ring
+    rw [map_one]
+    ring
   exact hn.ne_top (n.eq_top_of_isUnit_mem this hω)
 
-
 omit [IsLocalRing R] [Algebra R S] [CommRing R] in
-theorem exists_add_eq_one (hσ : ∀ x, σ (σ x) = x) (hgal : ∃ ω, IsUnit (ω - σ ω)) :
-    ∃ t, t + σ t = 1 := by
+theorem exists_add_eq_one (hσ : ∀ x, σ (σ x) = x) (hgal : ∃ ω, IsUnit (ω - σ ω))
+    : ∃ t, t + σ t = 1 := by
   obtain ⟨ω, hω⟩ := hgal
   obtain ⟨v, hv⟩ := hω.exists_right_inv
   have h2 := congrArg σ hv
@@ -94,8 +99,8 @@ open TensorProduct Module
 
 variable {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
 
-theorem exists_basis_one [IsLocalRing R] [Module.Free R S] (hrank : finrank R S = 2) :
-    ∃ B : Basis (Fin 2) R S, B 0 = 1 := by
+theorem exists_basis_one [IsLocalRing R] [Module.Free R S] (hrank : finrank R S = 2)
+    : ∃ B : Basis (Fin 2) R S, B 0 = 1 := by
   haveI : Module.Finite R S := Module.finite_of_finrank_pos (by omega)
   haveI : Nontrivial S := Module.nontrivial_of_finrank_pos (R := R) (by omega)
   have aux : ∀ b : Basis (Fin 2) R S, IsUnit (b.repr 1 0) → ∃ B : Basis (Fin 2) R S, B 0 = 1 := by
@@ -116,8 +121,7 @@ theorem exists_basis_one [IsLocalRing R] [Module.Free R S] (hrank : finrank R S 
       rw [← b.span_eq, Submodule.span_le]
       have m1 : (1 : S) ∈ Submodule.span R (Set.range ![(1 : S), b 1]) :=
         Submodule.subset_span ⟨0, rfl⟩
-      have m2 : b 1 ∈ Submodule.span R (Set.range ![(1 : S), b 1]) :=
-        Submodule.subset_span ⟨1, rfl⟩
+      have m2 : b 1 ∈ Submodule.span R (Set.range ![(1 : S), b 1]) := Submodule.subset_span ⟨1, rfl⟩
       rintro _ ⟨i, rfl⟩
       fin_cases i
       · have : b 0 = w • (1 - b.repr 1 1 • b 1) := by
@@ -139,30 +143,35 @@ theorem exists_basis_one [IsLocalRing R] [Module.Free R S] (hrank : finrank R S 
   exact n.add_mem (n.mul_mem_right _ (algebraMap_mem_of_isMaximal n h0))
     (n.mul_mem_right _ (algebraMap_mem_of_isMaximal n h1))
 
-theorem eq_coord (B : Basis (Fin 2) R S) (hB : B 0 = 1) (x : S) :
-    x = algebraMap R S (B.repr x 0) + algebraMap R S (B.repr x 1) * B 1 := by
+theorem eq_coord (B : Basis (Fin 2) R S) (hB : B 0 = 1) (x : S)
+    : x = algebraMap R S (B.repr x 0) + algebraMap R S (B.repr x 1) * B 1 := by
   conv_lhs => rw [← B.sum_repr x]
   rw [Fin.sum_univ_two, hB, Algebra.smul_def, Algebra.smul_def, mul_one]
 
-theorem repr_coord_zero (B : Basis (Fin 2) R S) (hB : B 0 = 1) (r s : R) :
-    B.repr (algebraMap R S r + algebraMap R S s * B 1) 0 = r := by
+theorem repr_coord_zero (B : Basis (Fin 2) R S) (hB : B 0 = 1) (r s : R)
+    : B.repr (algebraMap R S r + algebraMap R S s * B 1) 0 = r := by
   rw [← mul_one (algebraMap R S r), ← hB, ← Algebra.smul_def, ← Algebra.smul_def]
   simp
 
-theorem repr_coord_one (B : Basis (Fin 2) R S) (hB : B 0 = 1) (r s : R) :
-    B.repr (algebraMap R S r + algebraMap R S s * B 1) 1 = s := by
+theorem repr_coord_one (B : Basis (Fin 2) R S) (hB : B 0 = 1) (r s : R)
+    : B.repr (algebraMap R S r + algebraMap R S s * B 1) 1 = s := by
   rw [← mul_one (algebraMap R S r), ← hB, ← Algebra.smul_def, ← Algebra.smul_def]
   simp
 
-theorem coord_inj (B : Basis (Fin 2) R S) (hB : B 0 = 1) {r s r' s' : R}
-    (h : algebraMap R S r + algebraMap R S s * B 1 = algebraMap R S r' + algebraMap R S s' * B 1) :
-    r = r' ∧ s = s' :=
-  ⟨by rw [← repr_coord_zero B hB r s, h, repr_coord_zero B hB],
-    by rw [← repr_coord_one B hB r s, h, repr_coord_one B hB]⟩
+theorem coord_inj
+    (B : Basis (Fin 2) R S) (hB : B 0 = 1)
+    {r s r' s' : R}
+    (h : algebraMap R S r + algebraMap R S s * B 1 = algebraMap R S r' + algebraMap R S s' * B 1)
+    : r = r' ∧ s = s' := ⟨
+  by rw [← repr_coord_zero B hB r s, h, repr_coord_zero B hB],
+  by rw [← repr_coord_one B hB r s, h, repr_coord_one B hB]
+⟩
 
-theorem trace_coord (B : Basis (Fin 2) R S) (hB : B 0 = 1) {a b : R}
-    (hab : B 1 * B 1 = algebraMap R S b + algebraMap R S a * B 1) (r s : R) :
-    Algebra.trace R S (algebraMap R S r + algebraMap R S s * B 1) = 2 * r + s * a := by
+theorem trace_coord
+    (B : Basis (Fin 2) R S) (hB : B 0 = 1)
+    {a b : R} (hab : B 1 * B 1 = algebraMap R S b + algebraMap R S a * B 1)
+    (r s : R)
+    : Algebra.trace R S (algebraMap R S r + algebraMap R S s * B 1) = 2 * r + s * a := by
   rw [Algebra.trace_eq_matrix_trace B, Matrix.trace_fin_two, Algebra.leftMulMatrix_eq_repr_mul,
     Algebra.leftMulMatrix_eq_repr_mul, hB, mul_one, repr_coord_zero B hB]
   have : (algebraMap R S r + algebraMap R S s * B 1) * B 1
@@ -172,9 +181,11 @@ theorem trace_coord (B : Basis (Fin 2) R S) (hB : B 0 = 1) {a b : R}
   rw [this, repr_coord_one B hB]
   ring
 
-theorem isUnit_different [Algebra.FormallyUnramified R S] (B : Basis (Fin 2) R S) (hB : B 0 = 1)
-    {a b : R} (hab : B 1 * B 1 = algebraMap R S b + algebraMap R S a * B 1) :
-    IsUnit (2 * B 1 - algebraMap R S a) := by
+theorem isUnit_different
+    [Algebra.FormallyUnramified R S]
+    (B : Basis (Fin 2) R S) (hB : B 0 = 1)
+    {a b : R} (hab : B 1 * B 1 = algebraMap R S b + algebraMap R S a * B 1)
+    : IsUnit (2 * B 1 - algebraMap R S a) := by
   haveI : Module.Finite R S := Module.Finite.of_basis B
   let L : S ⊗[R] S →ₗ[R] S :=
     LinearMap.mul' R S ∘ₗ LinearMap.lTensor S (Algebra.linearMap R S ∘ₗ B.coord 1)
@@ -185,8 +196,10 @@ theorem isUnit_different [Algebra.FormallyUnramified R S] (B : Basis (Fin 2) R S
     | zero => simp
     | tmul x y => rw [Algebra.TensorProduct.tmul_mul_tmul, hL, hL, one_mul, mul_assoc]
     | add x y hx hy => rw [mul_add, map_add (f := _), map_add (f := _), hx, hy, mul_add]
-  have h2 : ∀ z, Algebra.TensorProduct.lmul' R (S := S) z
-      = L ((1 ⊗ₜ B 1) * z) + (B 1 - algebraMap R S a) * L z := by
+  have h2
+      : ∀ z,
+        Algebra.TensorProduct.lmul' R (S := S) z
+          = L ((1 ⊗ₜ B 1) * z) + (B 1 - algebraMap R S a) * L z := by
     intro z
     induction z using TensorProduct.induction_on with
     | zero => simp
@@ -194,22 +207,26 @@ theorem isUnit_different [Algebra.FormallyUnramified R S] (B : Basis (Fin 2) R S
       rw [Algebra.TensorProduct.tmul_mul_tmul, hL, hL, one_mul,
         Algebra.TensorProduct.lmul'_apply_tmul]
       have hy := eq_coord B hB y
-      have : B 1 * y = algebraMap R S (B.repr y 1 * b)
-          + algebraMap R S (B.repr y 0 + B.repr y 1 * a) * B 1 := by
+      have : B 1 * y
+          = algebraMap R S (B.repr y 1 * b)
+            + algebraMap R S (B.repr y 0 + B.repr y 1 * a) * B 1 := by
         simp only [map_add (f := _), map_mul]
         linear_combination (algebraMap R S (B.repr y 1)) * hab + B 1 * hy
       rw [this, repr_coord_one B hB]
       simp only [map_add (f := _), map_mul]
       linear_combination x * hy
-    | add x y hx hy => rw [mul_add, map_add (f := _), map_add (f := _), map_add (f := _), hx, hy]; ring
+    | add x y hx hy =>
+      rw [mul_add, map_add (f := _), map_add (f := _), map_add (f := _), hx, hy]; ring
   have h3 := h2 (Algebra.FormallyUnramified.elem R S)
   rw [Algebra.FormallyUnramified.lmul_elem, Algebra.FormallyUnramified.one_tmul_mul_elem, h1] at h3
   exact IsUnit.of_mul_eq_one (L (Algebra.FormallyUnramified.elem R S)) (by linear_combination -h3)
 
-theorem apply_eq_of_ne_one [IsLocalRing R] [Algebra.FormallyUnramified R S]
+theorem apply_eq_of_ne_one
+    [IsLocalRing R] [Algebra.FormallyUnramified R S]
     (B : Basis (Fin 2) R S) (hB : B 0 = 1)
     {a b : R} (hab : B 1 * B 1 = algebraMap R S b + algebraMap R S a * B 1)
-    (σ : S ≃ₐ[R] S) (hσ : σ ≠ 1) : σ (B 1) = algebraMap R S a - B 1 := by
+    (σ : S ≃ₐ[R] S) (hσ : σ ≠ 1)
+    : σ (B 1) = algebraMap R S a - B 1 := by
   haveI : Module.Finite R S := Module.Finite.of_basis B
   haveI : Nontrivial S := ⟨⟨B 0, 0, B.ne_zero 0⟩⟩
   have hD : IsUnit (a ^ 2 + 4 * b) := by
@@ -228,22 +245,26 @@ theorem apply_eq_of_ne_one [IsLocalRing R] [Algebra.FormallyUnramified R S]
       ⟨_, _, eq_coord B hB _⟩
     have h1 := congrArg σ hrs
     rw [AlgEquiv.apply_symm_apply, map_add (f := _), map_mul, AlgEquiv.commutes, AlgEquiv.commutes,
-      hcd] at h1
-    have h2 := coord_inj B hB (r := r + s * c) (s := d * s) (r' := 0) (s' := 1) (by
-      simp only [map_add (f := _), map_mul, map_zero, map_one]; linear_combination -h1)
+        hcd]
+      at h1
+    have h2 :=
+      coord_inj B hB (r := r + s * c) (s := d * s) (r' := 0) (s' := 1)
+        (by simp only [map_add (f := _), map_mul, map_zero, map_one]; linear_combination -h1)
     exact IsUnit.of_mul_eq_one s h2.2
   have h1 := congrArg σ hab
   rw [map_add (f := _), map_mul, map_mul, AlgEquiv.commutes, AlgEquiv.commutes, hcd] at h1
-  obtain ⟨e1, e2⟩ := coord_inj B hB (r := c ^ 2 + d ^ 2 * b) (s := d * (2 * c + d * a))
-    (r' := b + a * c) (s' := d * a) (by
-      simp only [map_add (f := _), map_mul, map_pow, map_ofNat]
-      linear_combination h1 - (algebraMap R S d) ^ 2 * hab)
+  obtain ⟨e1, e2⟩ :=
+    coord_inj B hB (r := c ^ 2 + d ^ 2 * b) (s := d * (2 * c + d * a)) (r' := b + a * c)
+      (s' := d * a)
+      (by
+        simp only [map_add (f := _), map_mul, map_pow, map_ofNat]
+        linear_combination h1 - (algebraMap R S d) ^ 2 * hab)
   have e3 : 2 * c + d * a = a := hd.mul_left_cancel e2
   have e4 : (1 - d) * (1 + d) = 0 := by
     apply hD.mul_left_cancel
     linear_combination (-4) * e1 + (2 * c - a - d * a) * e3
   have e5 : c * (c - a) = 0 := by linear_combination e1 + b * e4
-  have hne : ¬ (c = 0 ∧ d = 1) := by
+  have hne : ¬(c = 0 ∧ d = 1) := by
     rintro ⟨rfl, rfl⟩
     apply hσ
     ext x
@@ -254,7 +275,8 @@ theorem apply_eq_of_ne_one [IsLocalRing R] [Algebra.FormallyUnramified R S]
     rcases isUnit_or_isUnit_of_isUnit_add hD with h | h
     · exact Or.inr (isUnit_pow_iff two_ne_zero |>.1 h)
     · refine Or.inl (isUnit_of_mul_isUnit_left (y := 2 * b) ?_)
-      convert h using 1; ring
+      convert h using 1
+      ring
   have main : c = a ∧ d = -1 := by
     by_cases hd1 : IsUnit (1 - d)
     · have hd' : d = -1 := by
@@ -294,11 +316,12 @@ section Unramified
 
 open Module
 
-variable {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] [IsLocalRing R]
-  [Module.Free R S] [Algebra.FormallyUnramified R S]
+variable
+  {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] [IsLocalRing R] [Module.Free R S]
+  [Algebra.FormallyUnramified R S]
 
-theorem add_apply_eq_trace (hrank : finrank R S = 2) (σ : S ≃ₐ[R] S) (hσ : σ ≠ 1) (x : S) :
-    x + σ x = algebraMap R S (Algebra.trace R S x) := by
+theorem add_apply_eq_trace (hrank : finrank R S = 2) (σ : S ≃ₐ[R] S) (hσ : σ ≠ 1) (x : S)
+    : x + σ x = algebraMap R S (Algebra.trace R S x) := by
   obtain ⟨B, hB⟩ := exists_basis_one hrank
   have hab := eq_coord B hB (B 1 * B 1)
   have h := apply_eq_of_ne_one B hB hab σ hσ
@@ -316,21 +339,24 @@ theorem existsUnique_ne_one (hrank : finrank R S = 2) : ∃! σ : S ≃ₐ[R] S,
   obtain ⟨a, b, hab⟩ : ∃ a b, B 1 * B 1 = algebraMap R S b + algebraMap R S a * B 1 :=
     ⟨_, _, eq_coord B hB _⟩
   let f : S →ₗ[R] S := Algebra.linearMap R S ∘ₗ Algebra.trace R S - LinearMap.id
-  have hf : ∀ r s, f (algebraMap R S r + algebraMap R S s * B 1)
-      = algebraMap R S (r + s * a) + algebraMap R S (-s) * B 1 := by
+  have hf
+      : ∀ r s,
+        f (algebraMap R S r + algebraMap R S s * B 1)
+          = algebraMap R S (r + s * a) + algebraMap R S (-s) * B 1 := by
     intro r s
     simp only [f, LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.id_apply,
       Algebra.linearMap_apply, trace_coord B hB hab]
     simp only [map_add (f := _), map_mul, map_neg, map_ofNat]
     ring
-  have hc : ∀ x, ∃ r s, x = algebraMap R S r + algebraMap R S s * B 1 :=
-    fun x => ⟨_, _, eq_coord B hB _⟩
+  have hc : ∀ x, ∃ r s, x = algebraMap R S r + algebraMap R S s * B 1 := fun x =>
+    ⟨_, _, eq_coord B hB _⟩
   have hone : f 1 = 1 := by simpa using hf 1 0
   have hmul : ∀ x y, f (x * y) = f x * f y := by
     intro x y
     obtain ⟨r, s, rfl⟩ := hc x
     obtain ⟨r', s', rfl⟩ := hc y
-    have : (algebraMap R S r + algebraMap R S s * B 1) * (algebraMap R S r' + algebraMap R S s' * B 1)
+    have : (algebraMap R S r + algebraMap R S s * B 1)
+          * (algebraMap R S r' + algebraMap R S s' * B 1)
         = algebraMap R S (r * r' + s * s' * b)
           + algebraMap R S (r * s' + s * r' + s * s' * a) * B 1 := by
       simp only [map_add (f := _), map_mul]

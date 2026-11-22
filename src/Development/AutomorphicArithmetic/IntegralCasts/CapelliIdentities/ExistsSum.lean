@@ -4,24 +4,21 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qg3.exists_sum.{u_1} :
-    ∀ {G : Type u_1} [inst : Group G]
-    [inst_1 : TopologicalSpace G] [IsTopologicalGroup G] [inst_3 : MeasurableSpace G] [BorelSpace G]
-    (μ : MeasureTheory.Measure G) [MeasureTheory.IsFiniteMeasureOnCompacts μ] (K : Subgroup G),
-    IsOpen (↑K : Set G) →
-      IsCompact (↑K : Set G) →
-        ∀ {S : Set G},
-          IsCompact S →
-            ∃ (T : Finset (G ⧸ K)) (r : G ⧸ K → G) (c : G ⧸ K → ℂ),
-              ∀ (F : G → ℂ),
-                (∀ (g k : G), k ∈ K → F (g * k) = F g) →
-                  (∀ g ∉ S, F g = (0 : ℂ)) → ∫ (g : G), F g ∂μ = ∑ x ∈ T, c x * F (r x) := by
+theorem UpperTheory.Reformulated.B.Qg3.exists_sum.{u_1}
+    : ∀ {G : Type u_1} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
+        [inst_3 : MeasurableSpace G] [BorelSpace G] (μ : MeasureTheory.Measure G)
+        [MeasureTheory.IsFiniteMeasureOnCompacts μ] (K : Subgroup G),
+      IsOpen (↑K : Set G) → IsCompact (↑K : Set G)
+        → ∀ {S : Set G},
+          IsCompact S
+            → ∃ (T : Finset (G ⧸ K)) (r : G ⧸ K → G) (c : G ⧸ K → ℂ), ∀ (F : G → ℂ),
+              (∀ (g k : G), k ∈ K → F (g * k) = F g) → (∀ g ∉ S, F g = (0 : ℂ))
+                → ∫ (g : G), F g ∂μ = ∑ x ∈ T, c x * F (r x) := by
   intro G _ _ _ _ _ μ _ K hKo hKc S hS
   classical
   haveI : DiscreteTopology (G ⧸ K) := QuotientGroup.discreteTopology hKo
   have hcont : Continuous (QuotientGroup.mk : G → G ⧸ K) := QuotientGroup.continuous_mk
-  have hfin : ((QuotientGroup.mk : G → G ⧸ K) '' S).Finite :=
-    (hS.image hcont).finite_of_discrete
+  have hfin : ((QuotientGroup.mk : G → G ⧸ K) '' S).Finite := (hS.image hcont).finite_of_discrete
   let C : G ⧸ K → Set G := fun x => (QuotientGroup.mk : G → G ⧸ K) ⁻¹' {x}
   have hmem : ∀ (x : G ⧸ K) (g : G), g ∈ C x ↔ (x.out)⁻¹ * g ∈ K := by
     intro x g

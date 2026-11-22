@@ -10,11 +10,15 @@ open Polynomial
 
 namespace PositivityTheory.Rg.Sw.LVs.TC
 
-theorem ml_expand {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] {k : ℕ}
-    (A : ContinuousMultilinearMap ℂ (fun _ : Fin k => V) ℂ) (Y : Fin k → Fin 3 → V) (z : ℂ) :
-    A (fun i => Y i 0 + z • Y i 1 + z ^ 2 • Y i 2) =
-      ∑ f : Fin k → Fin 3, z ^ (∑ i, (f i : ℕ)) * A (fun i => Y i (f i)) := by
-  have h : (fun i => Y i 0 + z • Y i 1 + z ^ 2 • Y i 2) = fun i => ∑ w : Fin 3, z ^ (w : ℕ) • Y i w := by
+theorem ml_expand
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {k : ℕ} (A : ContinuousMultilinearMap ℂ (fun _ : Fin k => V) ℂ) (Y : Fin k → Fin 3 → V)
+    (z : ℂ)
+    : A (fun i => Y i 0 + z • Y i 1 + z ^ 2 • Y i 2)
+      = ∑ f : Fin k → Fin 3, z ^ (∑ i, (f i : ℕ)) * A (fun i => Y i (f i)) := by
+  have h
+      : (fun i => Y i 0 + z • Y i 1 + z ^ 2 • Y i 2)
+        = fun i => ∑ w : Fin 3, z ^ (w : ℕ) • Y i w := by
     funext i; simp [Fin.sum_univ_three]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [h, ContinuousMultilinearMap.map_sum]
@@ -35,14 +39,17 @@ theorem sum_eq_top {k : ℕ} (f : Fin k → Fin 3) (h : ∑ i, (f i : ℕ) = 2 *
   simp at this
   omega
 
-theorem infinite_circle : Set.Infinite (Set.range fun θ : ℝ => Complex.exp (2 * θ * Complex.I)) := by
-  have hinj : Function.Injective fun m : ℕ => Complex.exp (2 * ((1 : ℝ) / (m + 2) : ℝ) * Complex.I) := by
+theorem infinite_circle
+    : Set.Infinite (Set.range fun θ : ℝ => Complex.exp (2 * θ * Complex.I)) := by
+  have hinj
+      : Function.Injective fun m : ℕ => Complex.exp (2 * ((1 : ℝ) / (m + 2) : ℝ) * Complex.I) := by
     intro a b hab
     have hre := congrArg Complex.re hab
     simp only at hre
     have e1 : ∀ x : ℝ, (Complex.exp (2 * (x : ℂ) * Complex.I)).re = Real.cos (2 * x) := by
       intro x
-      rw [show 2 * (x : ℂ) * Complex.I = ((2 * x : ℝ) : ℂ) * Complex.I by push_cast; ring, Complex.exp_ofReal_mul_I_re]
+      rw [show 2 * (x : ℂ) * Complex.I = ((2 * x : ℝ) : ℂ) * Complex.I by push_cast; ring,
+        Complex.exp_ofReal_mul_I_re]
     rw [e1, e1] at hre
     have ha : 2 * ((1 : ℝ) / (a + 2)) ∈ Set.Icc 0 Real.pi := by
       constructor
@@ -62,13 +69,18 @@ theorem infinite_circle : Set.Infinite (Set.range fun θ : ℝ => Complex.exp (2
     exact_mod_cast (by linarith : (a : ℝ) = b)
   refine Set.infinite_of_injective_forall_mem hinj fun m => ⟨_, rfl⟩
 
-theorem top_vanish {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] {k : ℕ} {ι : Type*} [Fintype ι]
+theorem top_vanish
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {k : ℕ} {ι : Type*} [Fintype ι]
     (A : ContinuousMultilinearMap ℂ (fun _ : Fin k => V) ℂ) (sg : ι → ℂ) (Y : ι → Fin k → Fin 3 → V)
-    (h : ∀ θ : ℝ, ∑ σ, sg σ * A (fun i => Y σ i 0 + Complex.exp (2 * θ * Complex.I) • Y σ i 1 +
-      Complex.exp (2 * θ * Complex.I) ^ 2 • Y σ i 2) = 0) :
-    ∑ σ, sg σ * A (fun i => Y σ i 2) = 0 := by
+    (h : ∀ θ : ℝ,
+      ∑ σ, sg σ * A (fun i => Y σ i 0 + Complex.exp (2 * θ * Complex.I) • Y σ i 1 +
+          Complex.exp (2 * θ * Complex.I) ^ 2 • Y σ i 2)
+        = 0)
+    : ∑ σ, sg σ * A (fun i => Y σ i 2) = 0 := by
   set Q : ℂ[X] := ∑ σ, C (sg σ) * ∑ f : Fin k → Fin 3, C (A (fun i => Y σ i (f i))) * X ^ (∑ i, (f i : ℕ)) with hQ
-  have heval : ∀ z : ℂ, Q.eval z = ∑ σ, sg σ * A (fun i => Y σ i 0 + z • Y σ i 1 + z ^ 2 • Y σ i 2) := by
+  have heval
+      : ∀ z : ℂ, Q.eval z = ∑ σ, sg σ * A (fun i => Y σ i 0 + z • Y σ i 1 + z ^ 2 • Y σ i 2) := by
     intro z
     simp only [hQ, eval_finsetSum, eval_mul, eval_C, eval_pow, eval_X]
     refine Finset.sum_congr rfl fun σ _ => ?_
@@ -87,7 +99,8 @@ theorem top_vanish {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] {k : �
   refine Finset.sum_congr rfl fun σ _ => ?_
   congr 1
   rw [Finset.sum_eq_single (fun _ => 2)]
-  · simp only [Fin.isValue, Fin.val_two, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul]
+  · simp only [Fin.isValue, Fin.val_two, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+      smul_eq_mul]
     rw [if_pos (by ring), mul_one]
   · intro f _ hf
     rw [if_neg, mul_zero]

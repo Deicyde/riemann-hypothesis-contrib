@@ -27,11 +27,15 @@ def ltIdeal : Ideal v.integer where
   smul_mem' := by
     intro c x hx
     simp only [Set.mem_setOf_eq, smul_eq_mul, Subring.coe_mul, map_mul] at *
-    calc v (c : K) * v (x : K) ≤ 1 * v (x : K) := by gcongr; exact c.2
+    calc
+      v (c : K) * v (x : K)
+        ≤ 1 * v (x : K) := by gcongr; exact c.2
       _ < 1 := by rwa [one_mul]
 
-theorem det_sub_lt {n : ℕ} (A B : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, v (A i j) ≤ 1)
-    (hB : ∀ i j, v (B i j) ≤ 1) (h : ∀ i j, v (A i j - B i j) < 1) : v (A.det - B.det) < 1 := by
+theorem det_sub_lt
+    {n : ℕ} (A B : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, v (A i j) ≤ 1) (hB : ∀ i j, v (B i j) ≤ 1)
+    (h : ∀ i j, v (A i j - B i j) < 1)
+    : v (A.det - B.det) < 1 := by
   let A0 : Matrix (Fin n) (Fin n) v.integer := fun i j => ⟨A i j, hA i j⟩
   let B0 : Matrix (Fin n) (Fin n) v.integer := fun i j => ⟨B i j, hB i j⟩
   have eA : A0.map v.integer.subtype = A := by ext i j; rfl
@@ -55,8 +59,8 @@ theorem det_sub_lt {n : ℕ} (A B : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, v (
   rw [← e1, ← e2, ← map_sub]
   exact this
 
-theorem adjugate_le_one {n : ℕ} (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, v (A i j) ≤ 1) :
-    ∀ i j, v (A.adjugate i j) ≤ 1 := by
+theorem adjugate_le_one {n : ℕ} (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, v (A i j) ≤ 1)
+    : ∀ i j, v (A.adjugate i j) ≤ 1 := by
   let A0 : Matrix (Fin n) (Fin n) v.integer := fun i j => ⟨A i j, hA i j⟩
   have eA : A0.map v.integer.subtype = A := by ext i j; rfl
   have e : A0.adjugate.map v.integer.subtype = (A0.map v.integer.subtype).adjugate :=
@@ -72,34 +76,52 @@ section Place
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
-theorem intCast_le_one (s : SplitPlace L) (m : ℤ) :
-    Valued.v ((m : s.v.adicCompletion (maximalRealSubfield L))) ≤ 1 := by
+theorem intCast_le_one (s : SplitPlace L) (m : ℤ)
+    : Valued.v ((m : s.v.adicCompletion (maximalRealSubfield L))) ≤ 1 := by
   have h := s.split_le_one (m : 𝓞 L)
   simpa using h
 
-theorem natCast_lt_one (s : SplitPlace L) (g : ℕ) (hg : ((g : 𝓞 L) ∈ s.w.asIdeal)) :
-    Valued.v ((g : s.v.adicCompletion (maximalRealSubfield L))) < 1 := by
+theorem natCast_lt_one (s : SplitPlace L) (g : ℕ) (hg : ((g : 𝓞 L) ∈ s.w.asIdeal))
+    : Valued.v ((g : s.v.adicCompletion (maximalRealSubfield L))) < 1 := by
   have h : Valued.v (s.i ((g : 𝓞 L) : L)) < 1 := hg
   simpa using h
 
-theorem intCast_eq_one (s : SplitPlace L) (g : ℕ) (hp : g.Prime) (hg : ((g : 𝓞 L) ∈ s.w.asIdeal)) (m : ℤ)
-    (hm : ¬ (g : ℤ) ∣ m) : Valued.v ((m : s.v.adicCompletion (maximalRealSubfield L))) = 1 := by
+theorem intCast_eq_one
+    (s : SplitPlace L) (g : ℕ) (hp : g.Prime) (hg : ((g : 𝓞 L) ∈ s.w.asIdeal))
+    (m : ℤ) (hm : ¬ (g : ℤ) ∣ m)
+    : Valued.v ((m : s.v.adicCompletion (maximalRealSubfield L))) = 1 := by
   have hcop : IsCoprime (g : ℤ) m := by
     rw [Int.isCoprime_iff_gcd_eq_one]
     have h1 : ¬ g ∣ m.natAbs := fun h => hm (Int.natCast_dvd.mpr h)
     exact (Nat.Prime.coprime_iff_not_dvd hp).2 h1
   obtain ⟨a, b, hab⟩ := hcop
   refine le_antisymm (intCast_le_one s m) (not_lt.mp fun hlt => ?_)
-  have e : ((a : s.v.adicCompletion (maximalRealSubfield L))) * (g : s.v.adicCompletion (maximalRealSubfield L)) +
-      (b : s.v.adicCompletion (maximalRealSubfield L)) * (m : s.v.adicCompletion (maximalRealSubfield L)) = 1 := by
+  have e
+      : ((a : s.v.adicCompletion (maximalRealSubfield L)))
+            * (g : s.v.adicCompletion (maximalRealSubfield L))
+          + (b : s.v.adicCompletion (maximalRealSubfield L))
+            * (m : s.v.adicCompletion (maximalRealSubfield L))
+        = 1 := by
     exact_mod_cast congrArg (fun z : ℤ => (z : s.v.adicCompletion (maximalRealSubfield L))) hab
-  have h1 : Valued.v ((a : s.v.adicCompletion (maximalRealSubfield L)) * (g : s.v.adicCompletion (maximalRealSubfield L))) < 1 := by
+  have h1
+      : Valued.v
+          ((a : s.v.adicCompletion (maximalRealSubfield L))
+            * (g : s.v.adicCompletion (maximalRealSubfield L)))
+        < 1 := by
     rw [map_mul]
-    calc _ ≤ 1 * Valued.v ((g : s.v.adicCompletion (maximalRealSubfield L))) := by gcongr; exact intCast_le_one s a
+    calc
+      _ ≤ 1 * Valued.v ((g : s.v.adicCompletion (maximalRealSubfield L))) := by
+        gcongr; exact intCast_le_one s a
       _ < 1 := by rw [one_mul]; exact natCast_lt_one s g hg
-  have h2 : Valued.v ((b : s.v.adicCompletion (maximalRealSubfield L)) * (m : s.v.adicCompletion (maximalRealSubfield L))) < 1 := by
+  have h2
+      : Valued.v
+          ((b : s.v.adicCompletion (maximalRealSubfield L))
+            * (m : s.v.adicCompletion (maximalRealSubfield L)))
+        < 1 := by
     rw [map_mul]
-    calc _ ≤ 1 * Valued.v ((m : s.v.adicCompletion (maximalRealSubfield L))) := by gcongr; exact intCast_le_one s b
+    calc
+      _ ≤ 1 * Valued.v ((m : s.v.adicCompletion (maximalRealSubfield L))) := by
+        gcongr; exact intCast_le_one s b
       _ < 1 := by rwa [one_mul]
   have h3 := lt_of_le_of_lt (Valuation.map_add _ _ _) (max_lt h1 h2)
   rw [e, map_one] at h3
@@ -107,22 +129,30 @@ theorem intCast_eq_one (s : SplitPlace L) (g : ℕ) (hp : g.Prime) (hg : ((g : �
 
 end Place
 
-theorem mem_Umax_of_isLift : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (s : ReciprocityTheory.Aut.SplitPlace L) (g : ℕ), g.Prime → ((g : 𝓞 L) ∈ s.w.asIdeal) → ∀ (x : Formalism.AUTREP.GAf L n) (γ : GL (Fin n) (ZMod g)), GlobalTheory.LabPin.IsLift s x γ → x ∈ ReciprocityTheory.Aut.Umax L n := by
+theorem mem_Umax_of_isLift
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
+        (s : ReciprocityTheory.Aut.SplitPlace L) (g : ℕ),
+      g.Prime → ((g : 𝓞 L) ∈ s.w.asIdeal)
+        → ∀ (x : Formalism.AUTREP.GAf L n) (γ : GL (Fin n) (ZMod g)),
+          GlobalTheory.LabPin.IsLift s x γ → x ∈ ReciprocityTheory.Aut.Umax L n := by
   intro L _ _ _ n s g hp hg x γ hx
   obtain ⟨htriv, hred⟩ := hx
   haveI : Fact g.Prime := ⟨hp⟩
   set A : Matrix (Fin n) (Fin n) (s.v.adicCompletion (maximalRealSubfield L)) :=
     ((s.loc n x : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) :
       Matrix (Fin n) (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) with hAdef
-  let M : Matrix (Fin n) (Fin n) ℤ := fun i j => (((γ : Matrix (Fin n) (Fin n) (ZMod g)) i j).val : ℤ)
+  let M : Matrix (Fin n) (Fin n) ℤ := fun i j =>
+    (((γ : Matrix (Fin n) (Fin n) (ZMod g)) i j).val : ℤ)
   let B : Matrix (Fin n) (Fin n) (s.v.adicCompletion (maximalRealSubfield L)) :=
     M.map (Int.castRingHom _)
   have hB : ∀ i j, Valued.v (B i j) ≤ 1 := fun i j => intCast_le_one s _
   have hAB : ∀ i j, Valued.v (A i j - B i j) < 1 := by
     intro i j
     have := hred i j
-    have e : B i j = ((((γ : Matrix (Fin n) (Fin n) (ZMod g)) i j).val : ℕ) :
-        s.v.adicCompletion (maximalRealSubfield L)) := by
+    have e
+        : B i j
+          = ((((γ : Matrix (Fin n) (Fin n) (ZMod g)) i j).val : ℕ)
+            : s.v.adicCompletion (maximalRealSubfield L)) := by
       change (((M i j : ℤ)) : s.v.adicCompletion (maximalRealSubfield L)) = _
       exact Int.cast_natCast _
     rw [e]
@@ -151,8 +181,8 @@ theorem mem_Umax_of_isLift : ∀ (L : Type) [Field L] [NumberField L] [IsCMField
     rw [e, Valuation.map_add_eq_of_lt_right _ (by rw [hvB]; exact hd), hvB]
   apply GlobalTheory.TSetFin.mem_Umax_of_loc s x htriv hA
   intro i j
-  rw [map_inv, Matrix.coe_units_inv, ← hAdef, Matrix.inv_def, Matrix.smul_apply, smul_eq_mul, map_mul,
-    Ring.inverse_eq_inv', map_inv₀, hvA, inv_one, one_mul]
+  rw [map_inv, Matrix.coe_units_inv, ← hAdef, Matrix.inv_def, Matrix.smul_apply, smul_eq_mul,
+    map_mul, Ring.inverse_eq_inv', map_inv₀, hvA, inv_one, one_mul]
   exact adjugate_le_one Valued.v A hA i j
 
 end GlobalTheory.LiftInt

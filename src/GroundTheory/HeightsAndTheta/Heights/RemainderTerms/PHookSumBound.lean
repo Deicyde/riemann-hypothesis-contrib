@@ -11,9 +11,10 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open Finset
 
-theorem exists_hookShape_of_isHook {r k : ℕ} (hk : 1 ≤ k) (nu : Fin r → ℕ) (hanti : Antitone nu)
-    (hsum : ∑ i, nu i = k) (hhook : ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1) :
-    ∃ l, l < r ∧ l < k ∧ nu = hookShape r k l := by
+theorem exists_hookShape_of_isHook
+    {r k : ℕ} (hk : 1 ≤ k) (nu : Fin r → ℕ) (hanti : Antitone nu) (hsum : ∑ i, nu i = k)
+    (hhook : ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1)
+    : ∃ l, l < r ∧ l < k ∧ nu = hookShape r k l := by
   set g : ℕ → ℕ := fun j => if h : j < r then nu ⟨j, h⟩ else 0 with hg
   have hgnu : ∀ i : Fin r, g i = nu i := fun i => by simp [hg, i.isLt]
   have hsumg : ∑ j ∈ range r, g j = k := by
@@ -51,8 +52,9 @@ theorem exists_hookShape_of_isHook {r k : ℕ} (hk : 1 ≤ k) (nu : Fin r → �
         omega
       have hti : t ≤ i - 1 := by
         rw [ht, ← Finset.sum_Ico_consecutive g hi1 hir.le, Finset.sum_eq_zero hz, add_zero]
-        calc ∑ j ∈ Ico 1 i, g j ≤ ∑ j ∈ Ico 1 i, 1 :=
-              Finset.sum_le_sum fun j hj => hle1 j (mem_Ico.mp hj).1
+        calc
+          ∑ j ∈ Ico 1 i, g j
+            ≤ ∑ j ∈ Ico 1 i, 1 := Finset.sum_le_sum fun j hj => hle1 j (mem_Ico.mp hj).1
           _ = i - 1 := by simp
       rw [h0, if_neg (by omega)]
     · have ho : ∀ j ∈ Ico 1 (i + 1), g j = 1 := fun j hj => by
@@ -60,13 +62,14 @@ theorem exists_hookShape_of_isHook {r k : ℕ} (hk : 1 ≤ k) (nu : Fin r → �
         have h3 := hle1 j (mem_Ico.mp hj).1
         omega
       have hit : i ≤ t := by
-        rw [ht, ← Finset.sum_Ico_consecutive g (show 1 ≤ i + 1 by omega)
-          (show i + 1 ≤ r by omega), Finset.sum_congr rfl ho]
+        rw [ht, ← Finset.sum_Ico_consecutive g (show 1 ≤ i + 1 by omega) (show i + 1 ≤ r by omega),
+          Finset.sum_congr rfl ho]
         simp
       rw [h1, if_pos hit]
   have htr : t < r := by
     have : t ≤ r - 1 := by
-      calc t ≤ ∑ j ∈ Ico 1 r, 1 := Finset.sum_le_sum fun j hj => hle1 j (mem_Ico.mp hj).1
+      calc
+        t ≤ ∑ j ∈ Ico 1 r, 1 := Finset.sum_le_sum fun j hj => hle1 j (mem_Ico.mp hj).1
         _ = r - 1 := by simp
     omega
   have hg0 : 1 ≤ g 0 := by
@@ -85,51 +88,62 @@ theorem exists_hookShape_of_isHook {r k : ℕ} (hk : 1 ≤ k) (nu : Fin r → �
     omega
   · rw [if_neg hi0, hrow i (by omega) i.isLt]
 
-theorem HookSumBound.proof (hC : LemmaC.Statement) (hH : HookTableauCount.Statement) :
-    HookSumBound.Statement := by
+theorem HookSumBound.proof (hC : LemmaC.Statement) (hH : HookTableauCount.Statement)
+    : HookSumBound.Statement := by
   intro r a k b hk hb
   have hB0 : (0 : ℚ) ≤ (Nat.choose (r * a + k) k : ℚ) * numStandardTable (rectangle r a) := by
     positivity
-  have hterm : ∀ nu ∈ (partitionsOf r k).filter (fun nu => ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1),
-      |b nu| ≤ ((Nat.choose (r * a + k) k : ℚ) * numStandardTable (rectangle r a)) *
-        (numStandardTable nu : ℚ) := by
+  have hterm
+      : ∀ nu ∈ (partitionsOf r k).filter (fun nu => ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1),
+        |b nu|
+          ≤ ((Nat.choose (r * a + k) k : ℚ) * numStandardTable (rectangle r a))
+            * (numStandardTable nu : ℚ) := by
     intro nu hnu
     have hmem := (Finset.mem_filter.mp hnu).1
     have h := Finset.mem_filter.mp hmem
     have hsum : ∑ i, nu i = k := Finset.Nat.mem_antidiagonalTuple.mp h.1
     have hc := hC r a nu (fun i j hij => h.2 i j hij)
     rw [hsum] at hc
-    calc |b nu| ≤ numStandardTable (fun i => a + nu i) := hb nu hmem
+    calc
+      |b nu|
+        ≤ numStandardTable (fun i => a + nu i) := hb nu hmem
       _ ≤ _ := by exact_mod_cast hc
-  have himg : (partitionsOf r k).filter (fun nu => ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1) ⊆
-      (range (min r k)).image (hookShape r k) := by
+  have himg
+      : (partitionsOf r k).filter (fun nu => ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1)
+        ⊆ (range (min r k)).image (hookShape r k) := by
     intro nu hnu
     obtain ⟨hmem, hhook⟩ := Finset.mem_filter.mp hnu
     have h := Finset.mem_filter.mp hmem
-    obtain ⟨l, hlr, hlk, rfl⟩ := exists_hookShape_of_isHook hk nu (fun i j hij => h.2 i j hij)
-      (Finset.Nat.mem_antidiagonalTuple.mp h.1) hhook
+    obtain ⟨l, hlr, hlk, rfl⟩ :=
+      exists_hookShape_of_isHook hk nu
+        (fun i j hij => h.2 i j hij)
+        (Finset.Nat.mem_antidiagonalTuple.mp h.1) hhook
     exact Finset.mem_image.mpr ⟨l, Finset.mem_range.mpr (lt_min hlr hlk), rfl⟩
   refine (Finset.sum_le_sum hterm).trans ?_
   rw [← Finset.mul_sum]
-  have hhooks : ∑ nu ∈ (partitionsOf r k).filter (fun nu => ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1),
-      (numStandardTable nu : ℚ) ≤ 2 ^ (k - 1) := by
-    calc _ ≤ ∑ nu ∈ (range (min r k)).image (hookShape r k), (numStandardTable nu : ℚ) :=
-          Finset.sum_le_sum_of_subset_of_nonneg himg fun _ _ _ => by positivity
+  have hhooks
+      : ∑ nu ∈ (partitionsOf r k).filter (fun nu => ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1),
+          (numStandardTable nu : ℚ)
+        ≤ 2 ^ (k - 1) := by
+    calc
+      _ ≤ ∑ nu ∈ (range (min r k)).image (hookShape r k), (numStandardTable nu : ℚ) :=
+        Finset.sum_le_sum_of_subset_of_nonneg himg fun _ _ _ => by positivity
       _ ≤ ∑ l ∈ range (min r k), (numStandardTable (hookShape r k l) : ℚ) :=
-          Finset.sum_image_le_of_nonneg fun _ _ => by positivity
+        Finset.sum_image_le_of_nonneg fun _ _ => by positivity
       _ = ∑ l ∈ range (min r k), ((k - 1).choose l : ℚ) := by
-          refine Finset.sum_congr rfl fun l hl => ?_
-          have hl' := lt_min_iff.mp (Finset.mem_range.mp hl)
-          rw [hH r k l hl'.2 hl'.1]
+        refine Finset.sum_congr rfl fun l hl => ?_
+        have hl' := lt_min_iff.mp (Finset.mem_range.mp hl)
+        rw [hH r k l hl'.2 hl'.1]
       _ ≤ ∑ l ∈ range k, ((k - 1).choose l : ℚ) :=
-          Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_mono (min_le_right _ _))
-            fun _ _ _ => by positivity
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_mono (min_le_right _ _)) fun _ _ _ => by
+          positivity
       _ = 2 ^ (k - 1) := by
-          obtain ⟨n, rfl⟩ : ∃ n, k = n + 1 := ⟨k - 1, by omega⟩
-          rw [Nat.add_sub_cancel]
-          exact_mod_cast Nat.sum_range_choose n
-  calc _ ≤ ((Nat.choose (r * a + k) k : ℚ) * numStandardTable (rectangle r a)) * 2 ^ (k - 1) :=
-        mul_le_mul_of_nonneg_left hhooks hB0
+        obtain ⟨n, rfl⟩ : ∃ n, k = n + 1 := ⟨k - 1, by omega⟩
+        rw [Nat.add_sub_cancel]
+        exact_mod_cast Nat.sum_range_choose n
+  calc
+    _ ≤ ((Nat.choose (r * a + k) k : ℚ) * numStandardTable (rectangle r a)) * 2 ^ (k - 1) :=
+      mul_le_mul_of_nonneg_left hhooks hB0
     _ = _ := by ring
 
 end GroundTheory.Heights₂.Heights.RestTerms

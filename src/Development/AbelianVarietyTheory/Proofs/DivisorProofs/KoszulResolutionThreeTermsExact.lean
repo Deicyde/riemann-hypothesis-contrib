@@ -10,24 +10,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeaklyRegula
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped TensorProduct CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.AbLaw GlobalTheory.CatCoh GlobalTheory.CechDR GlobalTheory.AbCoh
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.AbLaw GlobalTheory.CatCoh GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.Koszul
 
-noncomputable def pairEquiv (g : ℕ) : {z : Sym2 (Fin g) // ¬ z.IsDiag} ≃ Fin (g.choose 2) :=
+noncomputable def pairEquiv (g : ℕ) : {z : Sym2 (Fin g) // ¬z.IsDiag} ≃ Fin (g.choose 2) :=
   Fintype.equivFinOfCardEq (by rw [Sym2.card_subtype_not_diag, Fintype.card_fin])
 
 variable {O : Type} [CommRing O] {g : ℕ}
 
-noncomputable def upper (x : Fin (g.choose 2) → O) : Matrix (Fin g) (Fin g) O :=
-  fun i j => if h : i < j then
-    x (pairEquiv g ⟨s(i, j), by rw [Sym2.mk_isDiag_iff]; exact h.ne⟩) else 0
+noncomputable def upper (x : Fin (g.choose 2) → O) : Matrix (Fin g) (Fin g) O := fun i j =>
+  if h : i < j then
+    x (pairEquiv g ⟨s(i, j), by rw [Sym2.mk_isDiag_iff]; exact h.ne⟩)
+  else
+    0
 
-noncomputable def skew (x : Fin (g.choose 2) → O) : Matrix (Fin g) (Fin g) O :=
-  fun i j => upper x i j - upper x j i
+noncomputable def skew (x : Fin (g.choose 2) → O) : Matrix (Fin g) (Fin g) O := fun i j =>
+  upper x i j - upper x j i
 
 lemma upper_add (x x' : Fin (g.choose 2) → O) : upper (x + x') = upper x + upper x' := by
   ext i j; simp only [upper, Matrix.add_apply]; split_ifs <;> simp
@@ -45,8 +50,10 @@ noncomputable def d₂ (f : Fin g → O) : (Fin (g.choose 2) → O) →ₗ[O] (F
   toFun x := (skew x).mulVec f
   map_add' x x' := by rw [skew_add, Matrix.add_mulVec]
   map_smul' a x := by
-    rw [skew_smul]; ext i
-    simp only [Matrix.mulVec, dotProduct, Matrix.smul_apply, smul_eq_mul, Pi.smul_apply, RingHom.id_apply, Finset.mul_sum]
+    rw [skew_smul]
+    ext i
+    simp only [Matrix.mulVec, dotProduct, Matrix.smul_apply, smul_eq_mul, Pi.smul_apply,
+      RingHom.id_apply, Finset.mul_sum]
     exact Finset.sum_congr rfl fun _ _ => by ring
 
 lemma d₂_apply (f : Fin g → O) (x : Fin (g.choose 2) → O) : d₂ f x = (skew x).mulVec f := rfl
@@ -70,9 +77,14 @@ lemma exists_skew_eq (c : Matrix (Fin g) (Fin g) O) (hd : ∀ i, c i i = 0)
 
 end GlobalTheory.Koszul
 
-
 open GlobalTheory.Koszul in
-theorem GlobalTheory.koszul_resolution_three_terms : ∀ (O : Type) [CommRing O] (g : ℕ) (f : Fin g → O), RingTheory.Sequence.IsWeaklyRegular O (List.ofFn f) → ∃ (e₁ : (Fin g → O) →ₗ[O] O) (e₂ : (Fin (g.choose 2) → O) →ₗ[O] (Fin g → O)), Function.Exact e₁ (Ideal.span (Set.range f)).mkQ ∧ Function.Exact e₂ e₁ ∧ (∀ x, e₁ x ∈ Ideal.span (Set.range f)) ∧ ∀ x i, e₂ x i ∈ Ideal.span (Set.range f) := by
+theorem GlobalTheory.koszul_resolution_three_terms
+    : ∀ (O : Type) [CommRing O] (g : ℕ) (f : Fin g → O),
+      RingTheory.Sequence.IsWeaklyRegular O (List.ofFn f)
+        → ∃ (e₁ : (Fin g → O) →ₗ[O] O) (e₂ : (Fin (g.choose 2) → O) →ₗ[O] (Fin g → O)),
+          Function.Exact e₁ (Ideal.span (Set.range f)).mkQ ∧ Function.Exact e₂ e₁
+            ∧ (∀ x, e₁ x ∈ Ideal.span (Set.range f))
+            ∧ ∀ x i, e₂ x i ∈ Ideal.span (Set.range f) := by
   intro O _ g f hreg
   refine ⟨Fintype.linearCombination O f, d₂ f, ?_, ?_, ?_, ?_⟩
   · rw [LinearMap.exact_iff, Submodule.ker_mkQ, Fintype.range_linearCombination]
@@ -80,7 +92,9 @@ theorem GlobalTheory.koszul_resolution_three_terms : ∀ (O : Type) [CommRing O]
     constructor
     · intro hy
       rw [Fintype.linearCombination_apply] at hy
-      obtain ⟨c, hd, hs, rfl⟩ := GlobalTheory.T.weaklyRegular_relations_eq_koszulRelations O g f hreg y (by simpa [smul_eq_mul] using hy)
+      obtain ⟨c, hd, hs, rfl⟩ :=
+        GlobalTheory.T.weaklyRegular_relations_eq_koszulRelations O g f hreg y
+          (by simpa [smul_eq_mul] using hy)
       obtain ⟨x, hx⟩ := exists_skew_eq c hd hs
       exact ⟨x, by rw [d₂_apply, hx]⟩
     · rintro ⟨x, rfl⟩
@@ -93,4 +107,5 @@ theorem GlobalTheory.koszul_resolution_three_terms : ∀ (O : Type) [CommRing O]
   · intro x i
     rw [d₂_apply]
     simp only [Matrix.mulVec, dotProduct]
-    exact Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (Ideal.subset_span (Set.mem_range_self j))
+    exact Ideal.sum_mem _ fun j _ =>
+      Ideal.mul_mem_left _ _ (Ideal.subset_span (Set.mem_range_self j))

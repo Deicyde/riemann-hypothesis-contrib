@@ -6,16 +6,28 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-theorem UpperTheory.V.Fr.oddm :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (a g : ℕ) (G : MvPowerSeries (Fin a ⊕ Fin g) O), G ∈ wtPart O (Space.Loc.par a g) 1 → (∀ s, MvPowerSeries.coeff (Finsupp.single s 1) G ∈ maximalIdeal O) → ∃ M : Fin g → MvPowerSeries (Fin a ⊕ Fin g) O, (∀ j, MvPowerSeries.constantCoeff (M j) ∈ maximalIdeal O) ∧ G = ∑ j, M j * MvPowerSeries.X (.inr j) := by
+theorem UpperTheory.V.Fr.oddm
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (a g : ℕ) (G : MvPowerSeries (Fin a ⊕ Fin g) O),
+      G ∈ wtPart O (Space.Loc.par a g) 1
+        → (∀ s, MvPowerSeries.coeff (Finsupp.single s 1) G ∈ maximalIdeal O)
+        → ∃ M : Fin g → MvPowerSeries (Fin a ⊕ Fin g) O,
+          (∀ j, MvPowerSeries.constantCoeff (M j) ∈ maximalIdeal O)
+            ∧ G = ∑ j, M j * MvPowerSeries.X (.inr j) := by
   classical
   intro O _ _ a g G hG hlin
   let M : Fin g → MvPowerSeries (Fin a ⊕ Fin g) O := fun j m =>
     if ∀ k : Fin g, k < j → m (Sum.inr k) = 0 then
-      MvPowerSeries.coeff (m + Finsupp.single (Sum.inr j) 1) G else 0
-  have hM : ∀ j m, MvPowerSeries.coeff m (M j) =
-      if ∀ k : Fin g, k < j → m (Sum.inr k) = 0 then
-        MvPowerSeries.coeff (m + Finsupp.single (Sum.inr j) 1) G else 0 := fun _ _ => rfl
+      MvPowerSeries.coeff (m + Finsupp.single (Sum.inr j) 1) G
+    else
+      0
+  have hM
+      : ∀ j m,
+        MvPowerSeries.coeff m (M j)
+          = if ∀ k : Fin g, k < j → m (Sum.inr k) = 0 then
+              MvPowerSeries.coeff (m + Finsupp.single (Sum.inr j) 1) G
+            else
+              0 := fun _ _ =>
+    rfl
   refine ⟨M, ?_, ?_⟩
   · intro j
     rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hM]
@@ -34,7 +46,8 @@ theorem UpperTheory.V.Fr.oddm :
         simpa [S] using this
       have hmin : ∀ k : Fin g, n (Sum.inr k) ≠ 0 → S.min' hS ≤ k := fun k hk =>
         S.min'_le k (by simp [S, hk])
-      have hle : ∀ j : Fin g, n (Sum.inr j) ≠ 0 → Finsupp.single (Sum.inr j : Fin a ⊕ Fin g) 1 ≤ n := by
+      have hle
+          : ∀ j : Fin g, n (Sum.inr j) ≠ 0 → Finsupp.single (Sum.inr j : Fin a ⊕ Fin g) 1 ≤ n := by
         intro j hj
         rw [Finsupp.single_le_iff]
         omega

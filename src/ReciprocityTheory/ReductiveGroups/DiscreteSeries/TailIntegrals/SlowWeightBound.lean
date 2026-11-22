@@ -101,43 +101,51 @@ theorem slowWeightBound' : SLOW := by
     intro β hβ
     have hb : |β| ≤ R := abs_le.2 ⟨hβ.1, hβ.2⟩
     have key : f β * ENNReal.ofReal (2 * R) ≤ ENNReal.ofReal (3 ^ ∑ i, t i) * I := by
-      calc f β * ENNReal.ofReal (2 * R) = ∫⁻ _ in Icc (-R) R, f β := by
-            rw [setLIntegral_const, Real.volume_Icc]; congr 2; ring
+      calc
+        f β * ENNReal.ofReal (2 * R)
+          = ∫⁻ _ in Icc (-R) R, f β := by rw [setLIntegral_const, Real.volume_Icc]; congr 2; ring
         _ ≤ ∫⁻ β' in Icc (-R) R, ENNReal.ofReal (3 ^ ∑ i, t i) * f β' :=
-            setLIntegral_mono (measurable_const.mul hfm) fun β' hβ' =>
-              slowWeight_le hR ht hA hb (abs_le.2 ⟨hβ'.1, hβ'.2⟩)
+          setLIntegral_mono (measurable_const.mul hfm) fun β' hβ' =>
+            slowWeight_le hR ht hA hb (abs_le.2 ⟨hβ'.1, hβ'.2⟩)
         _ = ENNReal.ofReal (3 ^ ∑ i, t i) * ∫⁻ β' in Icc (-R) R, f β' := lintegral_const_mul _ hfm
         _ ≤ ENNReal.ofReal (3 ^ ∑ i, t i) * I := by gcongr; exact setLIntegral_le_lintegral _ _
     have hinv : ENNReal.ofReal (2 * R) * ENNReal.ofReal (1 / (2 * R)) = 1 := by
-      rw [← ENNReal.ofReal_mul (by positivity), mul_one_div_cancel (by positivity), ENNReal.ofReal_one]
-    calc f β = f β * ENNReal.ofReal (2 * R) * ENNReal.ofReal (1 / (2 * R)) := by
-          rw [mul_assoc, hinv, mul_one]
+      rw [← ENNReal.ofReal_mul (by positivity), mul_one_div_cancel (by positivity),
+        ENNReal.ofReal_one]
+    calc
+      f β = f β * ENNReal.ofReal (2 * R) * ENNReal.ofReal (1 / (2 * R)) := by
+        rw [mul_assoc, hinv, mul_one]
       _ ≤ ENNReal.ofReal (3 ^ ∑ i, t i) * I * ENNReal.ofReal (1 / (2 * R)) := by gcongr
       _ = ENNReal.ofReal c * I := by
-          rw [hc, div_eq_mul_one_div (3 ^ ∑ i, t i), ENNReal.ofReal_mul (by positivity)]; ring
+        rw [hc, div_eq_mul_one_div (3 ^ ∑ i, t i), ENNReal.ofReal_mul (by positivity)]; ring
 
-  have hA1 : ∫⁻ β in Icc (-R) R, f β * ENNReal.ofReal (|β| ^ (-κ)) ≤
-      ENNReal.ofReal (c * (2 * q)) * I := by
-    calc ∫⁻ β in Icc (-R) R, f β * ENNReal.ofReal (|β| ^ (-κ))
-        ≤ ∫⁻ β in Icc (-R) R, ENNReal.ofReal c * I * ENNReal.ofReal (|β| ^ (-κ)) :=
-          setLIntegral_mono (measurable_const.mul hw) fun β hβ => by gcongr; exact hcen β hβ
+  have hA1
+      : ∫⁻ β in Icc (-R) R, f β * ENNReal.ofReal (|β| ^ (-κ))
+        ≤ ENNReal.ofReal (c * (2 * q)) * I := by
+    calc
+      ∫⁻ β in Icc (-R) R, f β * ENNReal.ofReal (|β| ^ (-κ))
+          ≤ ∫⁻ β in Icc (-R) R, ENNReal.ofReal c * I * ENNReal.ofReal (|β| ^ (-κ)) :=
+        setLIntegral_mono (measurable_const.mul hw) fun β hβ => by gcongr; exact hcen β hβ
       _ = ENNReal.ofReal c * I * ∫⁻ β in Icc (-R) R, ENNReal.ofReal (|β| ^ (-κ)) :=
-          lintegral_const_mul _ hw
-      _ ≤ ENNReal.ofReal c * I * (2 * ENNReal.ofReal q) :=
-          by gcongr; exact int_abs_rpow hR hκ0 hκ1
+        lintegral_const_mul _ hw
+      _ ≤ ENNReal.ofReal c * I * (2 * ENNReal.ofReal q) := by gcongr; exact int_abs_rpow hR hκ0 hκ1
       _ = ENNReal.ofReal (c * (2 * q)) * I := by
-          rw [ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_mul (by norm_num), ENNReal.ofReal_ofNat]
-          try ring
+        rw [ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_mul (by norm_num),
+          ENNReal.ofReal_ofNat]
+        try ring
 
-  have hA2 : ∫⁻ β in (Icc (-R) R)ᶜ, f β * ENNReal.ofReal (|β| ^ (-κ)) ≤ ENNReal.ofReal (R ^ (-κ)) * I := by
-    calc ∫⁻ β in (Icc (-R) R)ᶜ, f β * ENNReal.ofReal (|β| ^ (-κ))
-        ≤ ∫⁻ β in (Icc (-R) R)ᶜ, f β * ENNReal.ofReal (R ^ (-κ)) := by
-          refine setLIntegral_mono (hfm.mul measurable_const) fun β hβ => ?_
-          have hb : R < |β| := by
-            by_contra h
-            exact hβ (abs_le.1 (not_lt.1 h))
-          gcongr f β * ?_
-          exact ENNReal.ofReal_le_ofReal (Real.rpow_le_rpow_of_nonpos hR hb.le (by linarith))
+  have hA2
+      : ∫⁻ β in (Icc (-R) R)ᶜ, f β * ENNReal.ofReal (|β| ^ (-κ))
+        ≤ ENNReal.ofReal (R ^ (-κ)) * I := by
+    calc
+      ∫⁻ β in (Icc (-R) R)ᶜ, f β * ENNReal.ofReal (|β| ^ (-κ))
+          ≤ ∫⁻ β in (Icc (-R) R)ᶜ, f β * ENNReal.ofReal (R ^ (-κ)) := by
+        refine setLIntegral_mono (hfm.mul measurable_const) fun β hβ => ?_
+        have hb : R < |β| := by
+          by_contra h
+          exact hβ (abs_le.1 (not_lt.1 h))
+        gcongr f β * ?_
+        exact ENNReal.ofReal_le_ofReal (Real.rpow_le_rpow_of_nonpos hR hb.le (by linarith))
       _ = (∫⁻ β in (Icc (-R) R)ᶜ, f β) * ENNReal.ofReal (R ^ (-κ)) := lintegral_mul_const _ hfm
       _ ≤ I * ENNReal.ofReal (R ^ (-κ)) := by gcongr; exact setLIntegral_le_lintegral _ _
       _ = ENNReal.ofReal (R ^ (-κ)) * I := mul_comm _ _
@@ -155,13 +163,13 @@ theorem slowWeightBound' : SLOW := by
     rw [hcq, add_mul, one_mul, div_mul_eq_mul_div]
     gcongr
     try linarith
-  calc ∫⁻ β, slowly t A b β * ENNReal.ofReal (|β| ^ (-κ))
-      = (∫⁻ β in Icc (-R) R, f β * ENNReal.ofReal (|β| ^ (-κ))) +
-          ∫⁻ β in (Icc (-R) R)ᶜ, f β * ENNReal.ofReal (|β| ^ (-κ)) :=
-        (lintegral_add_compl (fun β => f β * ENNReal.ofReal (|β| ^ (-κ))) measurableSet_Icc).symm
+  calc
+    ∫⁻ β, slowly t A b β * ENNReal.ofReal (|β| ^ (-κ))
+        = (∫⁻ β in Icc (-R) R, f β * ENNReal.ofReal (|β| ^ (-κ)))
+          + ∫⁻ β in (Icc (-R) R)ᶜ, f β * ENNReal.ofReal (|β| ^ (-κ)) :=
+      (lintegral_add_compl (fun β => f β * ENNReal.ofReal (|β| ^ (-κ))) measurableSet_Icc).symm
     _ ≤ ENNReal.ofReal (c * (2 * q)) * I + ENNReal.ofReal (R ^ (-κ)) * I := add_le_add hA1 hA2
     _ = ENNReal.ofReal (c * (2 * q) + R ^ (-κ)) * I := by
-        rw [ENNReal.ofReal_add (by positivity) hRp.le, add_mul]
-    _ ≤ ENNReal.ofReal ((3 ^ T / (1 - κ) + 1) * R ^ (-κ)) * I :=
-        by gcongr
+      rw [ENNReal.ofReal_add (by positivity) hRp.le, add_mul]
+    _ ≤ ENNReal.ofReal ((3 ^ T / (1 - κ) + 1) * R ^ (-κ)) * I := by gcongr
 end ReciprocityTheory.ChartRestriction.DS.Xi

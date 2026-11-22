@@ -6,7 +6,9 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CasimirVolumeRatios.Ad
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW GlobalTheory.CompanionTheory.Mass.MeanV PositivityTheory.Rg.Mass NumberField IsDedekindDomain MeasureTheory Topology Filter
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW
+  GlobalTheory.CompanionTheory.Mass.MeanV PositivityTheory.Rg.Mass NumberField IsDedekindDomain
+  MeasureTheory Topology Filter
 open scoped ENNReal NNReal Classical
 
 noncomputable section
@@ -30,8 +32,8 @@ theorem isClopen_ballV (v : HeightOneSpectrum (𝓞 F)) (n : ℕ) : IsClopen (ba
   rw [this]
   exact Valued.isClopen_closedBall _ (by simp [hc0])
 
-theorem ballV_subset (v : HeightOneSpectrum (𝓞 F)) (n : ℕ) :
-    ballV v n ⊆ (v.adicCompletionIntegers F : Set (Fv F v)) := by
+theorem ballV_subset (v : HeightOneSpectrum (𝓞 F)) (n : ℕ)
+    : ballV v n ⊆ (v.adicCompletionIntegers F : Set (Fv F v)) := by
   intro y hy
   have h1 : (WithZero.exp (-(n : ℤ)) : WithZero (Multiplicative ℤ)) ≤ 1 := by
     rw [← WithZero.exp_zero, WithZero.exp_le_exp]
@@ -67,20 +69,32 @@ theorem nhdsNE_Fv (v : HeightOneSpectrum (𝓞 F)) : (𝓝[≠] (0 : Fv F v)).Ne
     Valued.toNontriviallyNormedField (v.adicCompletion F) (WithZero (Multiplicative ℤ))
   exact NormedField.nhdsNE_neBot (0 : v.adicCompletion F)
 
-theorem tendsto_real_ballV {v : HeightOneSpectrum (𝓞 F)} {lam : Measure (Fv F v)} (hstd : IsStdV v lam) :
-    Tendsto (fun n => lam.real (ballV v n)) atTop (𝓝 0) := by
+theorem tendsto_real_ballV
+    {v : HeightOneSpectrum (𝓞 F)} {lam : Measure (Fv F v)} (hstd : IsStdV v lam)
+    : Tendsto (fun n => lam.real (ballV v n)) atTop (𝓝 0) := by
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
   haveI := hstd.1
   haveI := nhdsNE_Fv v
   have hfin : ∀ n, lam (ballV v n) ≠ ∞ := fun n =>
     ne_top_of_le_ne_top (by rw [hstd.2]; exact ENNReal.one_ne_top) (measure_mono (ballV_subset v n))
-  have h := tendsto_measure_iInter_atTop (μ := lam) (s := ballV v)
-    (fun n => (isClopen_ballV v n).isOpen.measurableSet.nullMeasurableSet) (antitone_ballV v) ⟨0, hfin 0⟩
+  have h :=
+    tendsto_measure_iInter_atTop (μ := lam) (s := ballV v)
+      (fun n => (isClopen_ballV v n).isOpen.measurableSet.nullMeasurableSet)
+      (antitone_ballV v) ⟨0, hfin 0⟩
   rw [iInter_ballV, measure_singleton] at h
   have h2 := (ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp h
   simpa [Measure.real, Function.comp_def] using h2
 
-theorem exists_sandwich : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)) (C : ℝ) (g : Fv F v → ℝ), IsStdV v lam → (∀ s, 0 ≤ g s) → GoodFac v lam C g → ∀ η : ℝ, 0 < η → ∃ ψm ψp : Fv F v → ℝ, Continuous ψm ∧ HasCompactSupport ψm ∧ Continuous ψp ∧ HasCompactSupport ψp ∧ (∀ s, 0 ≤ ψm s) ∧ (∀ s, s ≠ 0 → ψm s ≤ g s ∧ g s ≤ ψp s) ∧ 1 - η ≤ ∫ s, ψm s ∂lam ∧ ∫ s, ψp s ∂lam ≤ 1 + η := by
+theorem exists_sandwich
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v))
+        (C : ℝ) (g : Fv F v → ℝ),
+      IsStdV v lam → (∀ s, 0 ≤ g s) → GoodFac v lam C g
+        → ∀ η : ℝ,
+          0 < η
+            → ∃ ψm ψp : Fv F v → ℝ,
+              Continuous ψm ∧ HasCompactSupport ψm ∧ Continuous ψp ∧ HasCompactSupport ψp
+                ∧ (∀ s, 0 ≤ ψm s) ∧ (∀ s, s ≠ 0 → ψm s ≤ g s ∧ g s ≤ ψp s) ∧ 1 - η ≤ ∫ s, ψm s ∂lam
+                ∧ ∫ s, ψp s ∂lam ≤ 1 + η := by
   intro F _ _ v lam C g hstd hg0 hg η hη
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
   haveI := hstd.1
@@ -95,9 +109,11 @@ theorem exists_sandwich : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOn
     by_cases hO : s ∈ v.adicCompletionIntegers F
     · have h1 := hint s hO hs
       have h2 : C / (Ideal.absNorm v.asIdeal : ℝ) ≤ |C| :=
-        (div_le_self (abs_nonneg C) hq |>.trans' (div_le_div_of_nonneg_right (le_abs_self C) (by linarith)))
+        (div_le_self (abs_nonneg C) hq
+          |>.trans' (div_le_div_of_nonneg_right (le_abs_self C) (by linarith)))
       have h3 := (abs_le.1 h1).2
-      rw [hKdef]; linarith
+      rw [hKdef]
+      linarith
     · rw [hout s hO]; exact hK0.le
   have hgi : Integrable g lam := by
     by_contra h
@@ -128,8 +144,7 @@ theorem exists_sandwich : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOn
       refine hcont.mono ?_
       intro s hs h0
       exact hs (by rw [Set.mem_singleton_iff.1 h0]; exact h0B)
-  have hψb : Continuous (B.indicator fun _ => K) :=
-    by
+  have hψb : Continuous (B.indicator fun _ => K) := by
     refine continuous_indicator ?_ continuous_const.continuousOn
     intro a ha
     rw [hBc.frontier_eq] at ha
@@ -147,11 +162,22 @@ theorem exists_sandwich : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOn
   have hi1 : Integrable (Bᶜ.indicator g) lam := hgi.indicator hBm.compl
   have hi2 : Integrable (B.indicator fun _ => K) lam :=
     (integrable_indicator_iff hBm).2 (integrableOn_const hBfin)
-  have hIp : ∫ s, (Bᶜ.indicator g s + B.indicator (fun _ => K) s) ∂lam =
-      ∫ s in Bᶜ, g s ∂lam + K * lam.real B := by
+  have hIp
+      : ∫ s, (Bᶜ.indicator g s + B.indicator (fun _ => K) s) ∂lam
+        = ∫ s in Bᶜ, g s ∂lam + K * lam.real B := by
     rw [integral_add hi1 hi2, hIm, integral_indicator hBm, hconst]
-  refine ⟨Bᶜ.indicator g, fun s => Bᶜ.indicator g s + B.indicator (fun _ => K) s, hψm, ?_,
-    hψm.add hψb, ?_, fun s => Set.indicator_nonneg (fun s _ => hg0 s) s, ?_, ?_, ?_⟩
+  refine ⟨
+    Bᶜ.indicator g,
+    fun s => Bᶜ.indicator g s + B.indicator (fun _ => K) s,
+    hψm,
+    ?_,
+    hψm.add hψb,
+    ?_,
+    fun s => Set.indicator_nonneg (fun s _ => hg0 s) s,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · refine HasCompactSupport.intro hcomp fun s hs => ?_
     simp [Set.indicator, hout s hs]
   · refine HasCompactSupport.intro hcomp fun s hs => ?_
@@ -159,7 +185,8 @@ theorem exists_sandwich : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOn
     simp [hsB, hout s hs]
   · intro s hs
     by_cases hsB : s ∈ B
-    · simp only [Set.indicator, Set.mem_compl_iff, hsB, not_true_eq_false, if_false, if_true, zero_add]
+    · simp only [Set.indicator, Set.mem_compl_iff, hsB, not_true_eq_false, if_false, if_true,
+        zero_add]
       exact ⟨hg0 s, hgK s hs⟩
     · simp [Set.indicator, hsB]
   · rw [hIm]; linarith

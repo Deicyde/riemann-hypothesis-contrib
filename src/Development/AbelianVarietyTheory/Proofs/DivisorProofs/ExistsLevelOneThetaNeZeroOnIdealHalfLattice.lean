@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaFunctio
 @[expose] public section
 
 open NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Dict
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Dict
 open GlobalTheory.SW hiding Level
 open scoped ComplexConjugate Classical
 
@@ -18,16 +19,19 @@ namespace GlobalTheory.Dict.ThetaHalf
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem EF_inv_smul (X : Data E r) (M : ℕ) (u v : Fin r → E) :
-    EF X ((M : E)⁻¹ • u) v = (M : ℚ)⁻¹ * EF X u v := by
+theorem EF_inv_smul (X : Data E r) (M : ℕ) (u v : Fin r → E)
+    : EF X ((M : E)⁻¹ • u) v = (M : ℚ)⁻¹ * EF X u v := by
   have h : (M : E)⁻¹ • u = (M : ℚ)⁻¹ • u := by
     funext j
     simp [Rat.smul_def]
   rw [h, TensLat.EF_eq_bilin, TensLat.EF_eq_bilin, map_smul, LinearMap.smul_apply, smul_eq_mul]
 
-theorem mem_smul_iff (X : Data E r) {L : Lt E r} (hL : SelfD X L) {𝔪 : Ideal (𝓞 E)} {M : ℕ}
-    (hM : M ≠ 0) (h𝔪 : 𝔪 * conjI 𝔪 = Ideal.span {(M : 𝓞 E)}) (x : Fin r → E) :
-    x ∈ 𝔪 • L ↔ ∀ y ∈ 𝔪 • L, ∃ k : ℤ, (M : ℚ)⁻¹ * EF X x y = k := by
+theorem mem_smul_iff
+    (X : Data E r)
+    {L : Lt E r} (hL : SelfD X L)
+    {𝔪 : Ideal (𝓞 E)} {M : ℕ} (hM : M ≠ 0) (h𝔪 : 𝔪 * conjI 𝔪 = Ideal.span {(M : 𝓞 E)})
+    (x : Fin r → E)
+    : x ∈ 𝔪 • L ↔ ∀ y ∈ 𝔪 • L, ∃ k : ℤ, (M : ℚ)⁻¹ * EF X x y = k := by
   have hME : (M : E) ≠ 0 := Nat.cast_ne_zero.2 hM
   have hcc : ∀ a : E, cc (cc a) = a := fun a => IsCMField.complexConj_apply_apply E a
   constructor
@@ -85,9 +89,11 @@ theorem mem_smul_iff (X : Data E r) {L : Lt E r} (hL : SelfD X L) {𝔪 : Ideal 
         one_smul]
     rwa [h4] at h3
 
-theorem span_smul (X : Data E r) {L : Lt E r} (hL : SelfD X L) {𝔪 : Ideal (𝓞 E)} {M : ℕ}
-    (hM : M ≠ 0) (h𝔪 : 𝔪 * conjI 𝔪 = Ideal.span {(M : 𝓞 E)}) :
-    Submodule.span E ((𝔪 • L : Lt E r) : Set (Fin r → E)) = ⊤ := by
+theorem span_smul
+    (X : Data E r)
+    {L : Lt E r} (hL : SelfD X L)
+    {𝔪 : Ideal (𝓞 E)} {M : ℕ} (hM : M ≠ 0) (h𝔪 : 𝔪 * conjI 𝔪 = Ideal.span {(M : 𝓞 E)})
+    : Submodule.span E ((𝔪 • L : Lt E r) : Set (Fin r → E)) = ⊤ := by
   have hME : (M : E) ≠ 0 := Nat.cast_ne_zero.2 hM
   have hMm : (M : 𝓞 E) ∈ 𝔪 := by
     refine Ideal.mul_le_left (J := conjI 𝔪) ?_
@@ -103,26 +109,42 @@ theorem span_smul (X : Data E r) {L : Lt E r} (hL : SelfD X L) {𝔪 : Ideal (�
   rw [h1] at h3
   exact h3
 
-theorem exists_ne_zero_of_scaled {V : Type} [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V]
-    {g : ℕ} (B : LinearMap.BilinForm ℚ V) (p : V →ₗ[ℤ] (Fin g → ℂ)) (hp : Function.Injective p)
-    (L : Submodule ℤ V) (hfg : L.FG) {M : ℕ} (hM : 2 ≤ M)
-    (hL : ∀ x, x ∈ L ↔ ∀ y ∈ L, ∃ k : ℤ, (M : ℚ)⁻¹ * B x y = k)
-    (hsp : Submodule.span ℝ (p '' (L : Set V)) = ⊤) {Hm : Matrix (Fin g) (Fin g) ℂ}
+theorem exists_ne_zero_of_scaled
+    {V : Type} [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V]
+    {g : ℕ}
+    (B : LinearMap.BilinForm ℚ V)
+    (p : V →ₗ[ℤ] (Fin g → ℂ)) (hp : Function.Injective p)
+    (L : Submodule ℤ V) (hfg : L.FG)
+    {M : ℕ} (hM : 2 ≤ M) (hL : ∀ x, x ∈ L ↔ ∀ y ∈ L, ∃ k : ℤ, (M : ℚ)⁻¹ * B x y = k)
+    (hsp : Submodule.span ℝ (p '' (L : Set V)) = ⊤)
+    {Hm : Matrix (Fin g) (Fin g) ℂ}
     (hH : Hm.IsHermitian) (hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re)
-    (hB : ∀ u v, (p u ⬝ᵥ Hm.mulVec (star (p v))).im = (B u v : ℝ)) (c : V → ℂ)
-    (hc : ∀ v, ‖c v‖ = 1) {f : (Fin g → ℂ) → ℂ} (hd : Differentiable ℂ f) (h0 : f ≠ 0)
-    (hf : ∀ v ∈ L, ∀ z, f (z + p v) = (c v * cexp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (p v))) +
-      Real.pi / 2 * (p v ⬝ᵥ Hm.mulVec (star (p v))))) * f z) :
-    ∃ v ∈ L, f ((M : ℂ)⁻¹ • p v) ≠ 0 := by
+    (hB : ∀ u v, (p u ⬝ᵥ Hm.mulVec (star (p v))).im = (B u v : ℝ))
+    (c : V → ℂ) (hc : ∀ v, ‖c v‖ = 1)
+    {f : (Fin g → ℂ) → ℂ} (hd : Differentiable ℂ f) (h0 : f ≠ 0)
+    (hf : ∀ v ∈ L, ∀ z,
+      f (z + p v)
+        = (c v * cexp
+            (Real.pi * (z ⬝ᵥ Hm.mulVec (star (p v)))
+              + Real.pi / 2 * (p v ⬝ᵥ Hm.mulVec (star (p v)))))
+          * f z)
+    : ∃ v ∈ L, f ((M : ℂ)⁻¹ • p v) ≠ 0 := by
   have hM0 : M ≠ 0 := by omega
   have hMC : (M : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hM0
   have hMR : (0 : ℝ) < (M : ℝ)⁻¹ := by positivity
-  have hsc : ∀ z u : Fin g → ℂ, z ⬝ᵥ ((M : ℝ)⁻¹ • Hm).mulVec u = (M : ℝ)⁻¹ • (z ⬝ᵥ Hm.mulVec u) :=
-    fun z u => by rw [smul_mulVec, dotProduct_smul]
-  refine GlobalTheory.T.thetaFunction_ne_zero_at_divisionPoint_selfDual V g ((M : ℚ)⁻¹ • B) p hp L hfg hL hsp ((M : ℝ)⁻¹ • Hm) ?_ (fun z hz => ?_)
-    (fun u v => ?_) c hc M hM f hd h0 fun v hv z => ?_
+  have hsc
+      : ∀ z u : Fin g → ℂ,
+        z ⬝ᵥ ((M : ℝ)⁻¹ • Hm).mulVec u = (M : ℝ)⁻¹ • (z ⬝ᵥ Hm.mulVec u) := fun z u => by
+    rw [smul_mulVec, dotProduct_smul]
+  refine GlobalTheory.T.thetaFunction_ne_zero_at_divisionPoint_selfDual V g ((M : ℚ)⁻¹ • B) p hp L
+    hfg hL hsp ((M : ℝ)⁻¹ • Hm) ?_
+    (fun z hz => ?_)
+    (fun u v => ?_)
+    c hc M hM f hd h0
+    fun v hv z => ?_
   · ext i j
-    rw [conjTranspose_apply, Matrix.smul_apply, Matrix.smul_apply, star_smul, hH.apply, star_trivial]
+    rw [conjTranspose_apply, Matrix.smul_apply, Matrix.smul_apply, star_smul, hH.apply,
+      star_trivial]
   · rw [hsc, smul_re, smul_eq_mul]
     exact mul_pos hMR (hpos z hz)
   · rw [hsc, smul_im, LinearMap.smul_apply, LinearMap.smul_apply, hB]
@@ -133,7 +155,17 @@ theorem exists_ne_zero_of_scaled {V : Type} [AddCommGroup V] [Module ℚ V] [Fin
     push_cast
     field_simp
 
-theorem exists_ne_zero_on_half : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g : ℕ) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r), IsSympl X bas → ∀ (w : E) (L : Lt E r), SelfD X L → ∀ x ∈ X.dom, ∀ (𝔪 : Ideal (𝓞 E)) (M : ℕ), 2 ≤ M → 𝔪 * conjI 𝔪 = Ideal.span {(M : 𝓞 E)} → ∀ ϑ : (Fin g → ℂ) → ℂ, IsTheta1 X bas idx w x L ϑ → ϑ ≠ 0 → ∃ u ∈ 𝔪 • L, ϑ (pv X idx x ((M : E)⁻¹ • u)) ≠ 0 := by
+theorem exists_ne_zero_on_half
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g : ℕ)
+        (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r),
+      IsSympl X bas
+        → ∀ (w : E) (L : Lt E r),
+          SelfD X L
+            → ∀ x ∈ X.dom, ∀ (𝔪 : Ideal (𝓞 E)) (M : ℕ),
+              2 ≤ M → 𝔪 * conjI 𝔪 = Ideal.span {(M : 𝓞 E)}
+                → ∀ ϑ : (Fin g → ℂ) → ℂ,
+                  IsTheta1 X bas idx w x L ϑ → ϑ ≠ 0
+                    → ∃ u ∈ 𝔪 • L, ϑ (pv X idx x ((M : E)⁻¹ • u)) ≠ 0 := by
   intro E _ _ _ r X g bas idx hs w L hL x hx' 𝔪 M hM h𝔪 θ hθ h0
   have hM0 : M ≠ 0 := by omega
   obtain ⟨hconj, hpos, him, -, hsm, hinj, hspan, -⟩ :=
@@ -147,13 +179,17 @@ theorem exists_ne_zero_on_half : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     rw [hform, hform, SiegelNormalForm.form_single, SiegelNormalForm.form_single] at this
     exact this.symm
   clear_value Hm
-  let p : (Fin r → E) →ₗ[ℤ] (Fin g → ℂ) := (AddMonoidHom.mk' (pv X idx x) fun u v => by
-    unfold pv; rw [per_add]; rfl).toIntLinearMap
+  let p : (Fin r → E) →ₗ[ℤ] (Fin g → ℂ) :=
+    (AddMonoidHom.mk' (pv X idx x) fun u v => by unfold pv; rw [per_add]; rfl).toIntLinearMap
   have hp : ∀ v, p v = pv X idx x v := fun _ => rfl
   have hne : ∀ v, eps1 X w v ≠ 0 := fun v => Complex.exp_ne_zero _
-  have key : ∀ v ∈ L, ∀ z, θ (z + p v) =
-      ((eps1 X w v)⁻¹ * cexp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (p v))) +
-      Real.pi / 2 * (p v ⬝ᵥ Hm.mulVec (star (p v))))) * θ z := by
+  have key
+      : ∀ v ∈ L, ∀ z,
+        θ (z + p v)
+          = ((eps1 X w v)⁻¹ * cexp
+              (Real.pi * (z ⬝ᵥ Hm.mulVec (star (p v)))
+                + Real.pi / 2 * (p v ⬝ᵥ Hm.mulVec (star (p v)))))
+            * θ z := by
     intro v hv z
     have h1 := congrFun (hθ.2 v hv) z
     simp only [Pi.smul_apply, smul_eq_mul, fock, hform, add_dotProduct, smul_dotProduct] at h1
@@ -164,18 +200,20 @@ theorem exists_ne_zero_on_half : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     refine Complex.exp_zero.symm.trans (congrArg _ ?_)
     push_cast
     ring
-  obtain ⟨u, hu, hu0⟩ := exists_ne_zero_of_scaled (traceFormBilin (X.κ0 / 2) X.Gm) p hinj
-    ((𝔪 • L).restrictScalars ℤ)
-    (Submodule.FG.of_le hL.1 (Submodule.smul_le_right (I := 𝔪))).restrictScalars hM
-    (fun u => by simp only [← TensLat.EF_eq_bilin]; exact mem_smul_iff X hL hM0 h𝔪 u)
-    (hspan _ (span_smul X hL hM0 h𝔪)).1 hH (fun z hz => hform z z ▸ hpos z hz)
-    (fun u v => by rw [← TensLat.EF_eq_bilin, ← him, hform, hp, hp])
-    (fun v => (eps1 X w v)⁻¹)
-    (fun v => by
-      have : eps1 X w v = cexp ((Real.pi * (EF X v (w • v) : ℚ) : ℝ) * I) := by
-        unfold eps1; congr 1; push_cast; ring
-      rw [norm_inv, this, Complex.norm_exp_ofReal_mul_I, inv_one])
-    hθ.1 h0 (fun v hv => key v (Submodule.smul_le_right (I := 𝔪) hv))
+  obtain ⟨u, hu, hu0⟩ :=
+    exists_ne_zero_of_scaled (traceFormBilin (X.κ0 / 2) X.Gm) p hinj ((𝔪 • L).restrictScalars ℤ)
+      (Submodule.FG.of_le hL.1 (Submodule.smul_le_right (I := 𝔪))).restrictScalars hM
+      (fun u => by simp only [← TensLat.EF_eq_bilin]; exact mem_smul_iff X hL hM0 h𝔪 u)
+      (hspan _ (span_smul X hL hM0 h𝔪)).1 hH
+      (fun z hz => hform z z ▸ hpos z hz)
+      (fun u v => by rw [← TensLat.EF_eq_bilin, ← him, hform, hp, hp])
+      (fun v => (eps1 X w v)⁻¹)
+      (fun v => by
+        have : eps1 X w v = cexp ((Real.pi * (EF X v (w • v) : ℚ) : ℝ) * I) := by
+          unfold eps1; congr 1; push_cast; ring
+        rw [norm_inv, this, Complex.norm_exp_ofReal_mul_I, inv_one])
+      hθ.1 h0
+      (fun v hv => key v (Submodule.smul_le_right (I := 𝔪) hv))
   refine ⟨u, hu, ?_⟩
   have e : pv X idx x ((M : E)⁻¹ • u) = (M : ℂ)⁻¹ • p u := by
     rw [hsm]

@@ -12,18 +12,25 @@ open Formalism.BasicNotions Formalism.L2 NumberField IsDedekindDomain Module
 namespace GlobalTheory
 
 theorem projection_span_extend_scalars
-    (K : Type) [Field K] [NumberField K] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    (e : K →+* FractionRing O) (V V' : Type) [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V] [AddCommGroup V'] [Module (FractionRing O) V']
-    [Module O V'] [IsScalarTower O (FractionRing O) V'] (iV : V →ₛₗ[e] V') (ι : Type) (b : Basis ι K V) :
-    LinearIndependent (FractionRing O) (fun a => iV (b a)) →
-    (∀ a : 𝓞 K, e (a : K) ∈ (algebraMap O (FractionRing O)).range) →
-    ∀ (A : Submodule (𝓞 K) V) (U U' : Submodule K V), IsCompl U U' →
-    Submodule.span O (iV '' ((U.restrictScalars (𝓞 K) ⊓ (A ⊔ U'.restrictScalars (𝓞 K)) :
-        Submodule (𝓞 K) V) : Set V)) =
-      (Submodule.span (FractionRing O) (iV '' (U : Set V))).restrictScalars O ⊓
-        (Submodule.span O (iV '' (A : Set V)) ⊔
-          (Submodule.span (FractionRing O) (iV '' (U' : Set V))).restrictScalars O) := by
+    (K : Type) [Field K] [NumberField K]
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (e : K →+* FractionRing O)
+    (V V' : Type) [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+    [FiniteDimensional K V] [AddCommGroup V'] [Module (FractionRing O) V'] [Module O V']
+    [IsScalarTower O (FractionRing O) V']
+    (iV : V →ₛₗ[e] V')
+    (ι : Type) (b : Basis ι K V)
+    : LinearIndependent (FractionRing O) (fun a => iV (b a))
+      → (∀ a : 𝓞 K, e (a : K) ∈ (algebraMap O (FractionRing O)).range)
+      → ∀ (A : Submodule (𝓞 K) V) (U U' : Submodule K V),
+        IsCompl U U'
+          → Submodule.span O
+              (iV
+                '' ((U.restrictScalars (𝓞 K) ⊓ (A ⊔ U'.restrictScalars (𝓞 K)) : Submodule (𝓞 K) V)
+                  : Set V))
+            = (Submodule.span (FractionRing O) (iV '' (U : Set V))).restrictScalars O
+              ⊓ (Submodule.span O (iV '' (A : Set V))
+                ⊔ (Submodule.span (FractionRing O) (iV '' (U' : Set V))).restrictScalars O) := by
   intro hli _ A U U' hUU'
   set F := FractionRing O
 
@@ -35,7 +42,8 @@ theorem projection_span_extend_scalars
   have hpU' : ∀ u ∈ U', p u = 0 := fun u hu => by
     have h := Submodule.projectionOnto_apply_right hUU' ⟨u, hu⟩
     show ((U.projectionOnto U' hUU') ((⟨u, hu⟩ : U') : V) : V) = 0
-    rw [h]; rfl
+    rw [h]
+    rfl
   have hpmem : ∀ v, p v ∈ U := fun v => by simp [p]
   have hdec : ∀ v, ∃ u ∈ U, ∃ u' ∈ U', u + u' = v := fun v => by
     have : v ∈ U ⊔ U' := by rw [hUU'.sup_eq_top]; trivial
@@ -52,10 +60,8 @@ theorem projection_span_extend_scalars
     have : (q.comp iV : V →ₛₗ[e] V') = iV.comp p := by
       refine b.ext fun a => ?_
       have hmem : iV (b a) ∈ W := Submodule.subset_span ⟨a, rfl⟩
-      have h1 : q (iV (b a)) = f ⟨iV (b a), hmem⟩ := by
-        rw [← hq]; rfl
-      have h2 : (⟨iV (b a), hmem⟩ : W) = Basis.span hli a := by
-        rw [Basis.span_apply]
+      have h1 : q (iV (b a)) = f ⟨iV (b a), hmem⟩ := by rw [← hq]; rfl
+      have h2 : (⟨iV (b a), hmem⟩ : W) = Basis.span hli a := by rw [Basis.span_apply]
       simp only [LinearMap.comp_apply]
       rw [h1, h2, Basis.constr_basis]
     intro v

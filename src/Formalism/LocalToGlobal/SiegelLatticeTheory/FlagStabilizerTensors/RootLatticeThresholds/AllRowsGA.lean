@@ -12,12 +12,14 @@ namespace Formalism.L2.SG.Pf.AllRowsGA
 
 variable {G : Type} [Group G] [Fintype G]
 
-theorem coeff_mul_fin (a b : MonoidAlgebra ℂ G) (g : G) :
-    (a * b).coeff g = ∑ h : G, a.coeff h * b.coeff (h⁻¹ * g) := by
+theorem coeff_mul_fin (a b : MonoidAlgebra ℂ G) (g : G)
+    : (a * b).coeff g = ∑ h : G, a.coeff h * b.coeff (h⁻¹ * g) := by
   rw [MonoidAlgebra.coeff_mul_apply_left, Finsupp.sum_fintype _ _ (fun _ => zero_mul _)]
 
-theorem central_of_class (a : MonoidAlgebra ℂ G) (h : ∀ g P : G, a.coeff (P⁻¹ * g * P) = a.coeff g)
-    (y : MonoidAlgebra ℂ G) : a * y = y * a := by
+theorem central_of_class
+    (a : MonoidAlgebra ℂ G) (h : ∀ g P : G, a.coeff (P⁻¹ * g * P) = a.coeff g)
+    (y : MonoidAlgebra ℂ G)
+    : a * y = y * a := by
   refine MonoidAlgebra.ext (Finsupp.ext fun g => ?_)
   rw [coeff_mul_fin, coeff_mul_fin]
   refine Fintype.sum_equiv ((Equiv.inv G).trans (Equiv.mulRight g)) _ _ fun k => ?_
@@ -51,27 +53,29 @@ theorem conjA_sub (a b : MonoidAlgebra ℂ G) : conjA (a - b) = conjA a - conjA 
   refine MonoidAlgebra.ext (Finsupp.ext fun g => ?_)
   simp [conjA_coeff, MonoidAlgebra.coeff_sub, star_sub]
 
-private theorem eq_zero_of_conjA_mul_self_eq_zero (x : MonoidAlgebra ℂ G) (hx : conjA x * x = 0) :
-    x = 0 := by
+private theorem eq_zero_of_conjA_mul_self_eq_zero (x : MonoidAlgebra ℂ G) (hx : conjA x * x = 0)
+    : x = 0 := by
   have h1 := congrArg (fun z : MonoidAlgebra ℂ G => z.coeff 1) hx
-  simp only [coeff_mul_fin, conjA_coeff, mul_one, MonoidAlgebra.coeff_zero,
-    Finsupp.coe_zero, Pi.zero_apply] at h1
+  simp only [coeff_mul_fin, conjA_coeff, mul_one, MonoidAlgebra.coeff_zero, Finsupp.coe_zero,
+      Pi.zero_apply]
+    at h1
   have h2 : ∑ h : G, ((Complex.normSq (x.coeff h⁻¹) : ℝ) : ℂ) = 0 := by
     rw [← h1]
     refine Finset.sum_congr rfl fun h _ => ?_
     rw [Complex.normSq_eq_conj_mul_self]
     rfl
   rw [← Complex.ofReal_sum, Complex.ofReal_eq_zero] at h2
-  have h3 := (Finset.sum_eq_zero_iff_of_nonneg
-    (fun h _ => Complex.normSq_nonneg (x.coeff h⁻¹))).mp h2
+  have h3 :=
+    (Finset.sum_eq_zero_iff_of_nonneg (fun h _ => Complex.normSq_nonneg (x.coeff h⁻¹))).mp h2
   refine MonoidAlgebra.ext (Finsupp.ext fun g => ?_)
   have h4 := h3 g⁻¹ (Finset.mem_univ _)
   rw [inv_inv, Complex.normSq_eq_zero] at h4
   simpa using h4
 
-private theorem eq_mul_of_commuting_idempotents_conjA_swap (e f : MonoidAlgebra ℂ G) (hef : conjA e = f)
-    (hfe : conjA f = e) (he : e * e = e) (hf : f * f = f) (hc : f * e = e * f) :
-    e = e * f := by
+private theorem eq_mul_of_commuting_idempotents_conjA_swap
+    (e f : MonoidAlgebra ℂ G)
+    (hef : conjA e = f) (hfe : conjA f = e) (he : e * e = e) (hf : f * f = f) (hc : f * e = e * f)
+    : e = e * f := by
   have hx : conjA (e - e * f) * (e - e * f) = 0 := by
     rw [conjA_sub, conjA_mul, hef, hfe]
     have h1 : f * (e * f) = e * f := by rw [← mul_assoc, hc, mul_assoc, hf]
@@ -81,14 +85,18 @@ private theorem eq_mul_of_commuting_idempotents_conjA_swap (e f : MonoidAlgebra 
     simp
   exact sub_eq_zero.mp (eq_zero_of_conjA_mul_self_eq_zero _ hx)
 
-theorem selfadj_of_central_idem (e : MonoidAlgebra ℂ G) (hid : e * e = e) (hc : ∀ y, e * y = y * e) :
-    conjA e = e := by
+theorem selfadj_of_central_idem (e : MonoidAlgebra ℂ G) (hid : e * e = e) (hc : ∀ y, e * y = y * e)
+    : conjA e = e := by
   have hff : conjA e * conjA e = conjA e := by rw [← conjA_mul, hid]
-  have h1 := eq_mul_of_commuting_idempotents_conjA_swap e (conjA e) rfl (conjA_conjA e) hid hff
-    (hc (conjA e)).symm
-  have h2 := eq_mul_of_commuting_idempotents_conjA_swap (conjA e) e (conjA_conjA e) rfl hff hid
-    (hc (conjA e))
-  calc conjA e = conjA e * e := h2
+  have h1 :=
+    eq_mul_of_commuting_idempotents_conjA_swap e (conjA e) rfl (conjA_conjA e) hid hff
+      (hc (conjA e)).symm
+  have h2 :=
+    eq_mul_of_commuting_idempotents_conjA_swap (conjA e) e (conjA_conjA e) rfl hff hid
+      (hc (conjA e))
+  calc
+    conjA e
+      = conjA e * e := h2
     _ = e * conjA e := (hc _).symm
     _ = e := h1.symm
 

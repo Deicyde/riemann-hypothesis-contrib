@@ -13,9 +13,10 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Inter
 
 open MvPolynomial
 
-theorem pderiv_facts_charZero {F : Type*} [Field F] [CharZero F] {σ : Type*} (p : MvPolynomial σ F) (j : σ) (hj : 0 < degreeOf j p) :
-    pderiv j p ≠ 0 ∧ degreeOf j (pderiv j p) < degreeOf j p ∧
-      (pderiv j p).vars ⊆ p.vars := by
+theorem pderiv_facts_charZero
+    {F : Type*} [Field F] [CharZero F]
+    {σ : Type*} (p : MvPolynomial σ F) (j : σ) (hj : 0 < degreeOf j p)
+    : pderiv j p ≠ 0 ∧ degreeOf j (pderiv j p) < degreeOf j p ∧ (pderiv j p).vars ⊆ p.vars := by
   classical
   have hsupp : ∀ m ∈ (pderiv j p).support, m + Finsupp.single j 1 ∈ p.support := by
     intro m hm
@@ -46,11 +47,13 @@ theorem pderiv_facts_charZero {F : Type*} [Field F] [CharZero F] {σ : Type*} (p
     simp only [Finsupp.add_apply]
     omega
 
-theorem exists_jacobian_minor_not_mem_charZero {F : Type} [Field F] [CharZero F] {σ : Type} [Fintype σ]
-    (𝔭 : Ideal (MvPolynomial σ F)) [𝔭.IsPrime] {t : ℕ}
-    (G : Fin t → MvPolynomial σ F) (hG : Ideal.span (Set.range G) = 𝔭) (d : ℕ)
-    (hd : ringKrullDim (MvPolynomial σ F ⧸ 𝔭) = d) :
-    ∃ (a : Fin (Fintype.card σ - d) → Fin t) (b : Fin (Fintype.card σ - d) → σ),
+theorem exists_jacobian_minor_not_mem_charZero
+    {F : Type} [Field F] [CharZero F]
+    {σ : Type} [Fintype σ]
+    (𝔭 : Ideal (MvPolynomial σ F)) [𝔭.IsPrime]
+    {t : ℕ} (G : Fin t → MvPolynomial σ F) (hG : Ideal.span (Set.range G) = 𝔭)
+    (d : ℕ) (hd : ringKrullDim (MvPolynomial σ F ⧸ 𝔭) = d)
+    : ∃ (a : Fin (Fintype.card σ - d) → Fin t) (b : Fin (Fintype.card σ - d) → σ),
       Matrix.det (Matrix.of fun i j => pderiv (b j) (G (a i))) ∉ 𝔭 := by
   classical
   let A := MvPolynomial σ F ⧸ 𝔭
@@ -62,8 +65,8 @@ theorem exists_jacobian_minor_not_mem_charZero {F : Type} [Field F] [CharZero F]
     simp only [π, RingHom.comp_apply]
     rw [IsFractionRing.to_map_eq_zero_iff (R := A) (K := K), Ideal.Quotient.eq_zero_iff_mem]
   let xb : σ → A := fun s => Ideal.Quotient.mk 𝔭 (X s)
-  have hmk : Ideal.Quotient.mkₐ F 𝔭 = aeval xb := MvPolynomial.algHom_ext fun s => by
-    rw [aeval_X, Ideal.Quotient.mkₐ_eq_mk]
+  have hmk : Ideal.Quotient.mkₐ F 𝔭 = aeval xb :=
+    MvPolynomial.algHom_ext fun s => by rw [aeval_X, Ideal.Quotient.mkₐ_eq_mk]
   have hmk' : ∀ f, Ideal.Quotient.mk 𝔭 f = aeval xb f := fun f => by
     rw [← hmk, Ideal.Quotient.mkₐ_eq_mk]
 
@@ -111,8 +114,10 @@ theorem exists_jacobian_minor_not_mem_charZero {F : Type} [Field F] [CharZero F]
       exact hQp
     rw [hub.1.eq_zero_of_aeval_eq_zero q h0, map_zero]
 
-  have hrel : ∀ j, j ∉ Set.range g → ∃ Q : MvPolynomial σ F,
-      Q ∈ 𝔭 ∧ Q ≠ 0 ∧ (↑Q.vars : Set σ) ⊆ insert j (Set.range g) := by
+  have hrel
+      : ∀ j,
+        j ∉ Set.range g
+          → ∃ Q : MvPolynomial σ F, Q ∈ 𝔭 ∧ Q ≠ 0 ∧ (↑Q.vars : Set σ) ⊆ insert j (Set.range g) := by
     intro j hj
     let w : Option u → A := fun o => o.elim (xb j) ((↑) : u → A)
     have hw : ¬ AlgebraicIndependent F w := by
@@ -154,7 +159,8 @@ theorem exists_jacobian_minor_not_mem_charZero {F : Type} [Field F] [CharZero F]
   let b : Fin (Fintype.card σ - s0) → σ := fun k => (e.symm k).1
   have hb : ∀ k, b k ∉ Set.range g := fun k => (e.symm k).2
   have hbinj : Function.Injective b := fun k k' h => e.symm.injective (Subtype.ext h)
-  let M : Matrix (Fin t) (Fin (Fintype.card σ - s0)) K := Matrix.of fun i k => π (pderiv (b k) (G i))
+  let M : Matrix (Fin t) (Fin (Fintype.card σ - s0)) K :=
+    Matrix.of fun i k => π (pderiv (b k) (G i))
   have hM : ∀ c, M.mulVec c = 0 → c = 0 := by
     intro c hc
     let D : MvPolynomial σ F → K := fun f => ∑ k, π (pderiv (b k) f) * c k
@@ -168,7 +174,8 @@ theorem exists_jacobian_minor_not_mem_charZero {F : Type} [Field F] [CharZero F]
       | mem x hx =>
         obtain ⟨i, rfl⟩ := hx
         exact hDG i
-      | zero => simp [D]
+      | zero =>
+        simp [D]
       | add x y _ _ hx hy =>
         have : D (x + y) = D x + D y := by
           simp only [D, map_add (f := _), add_mul, Finset.sum_add_distrib]
@@ -182,13 +189,16 @@ theorem exists_jacobian_minor_not_mem_charZero {F : Type} [Field F] [CharZero F]
     funext k0
     let j := b k0
     have hj : j ∉ Set.range g := hb k0
-    have hex : ∃ n, ∃ Q : MvPolynomial σ F, Q ∈ 𝔭 ∧ Q ≠ 0 ∧
-        (↑Q.vars : Set σ) ⊆ insert j (Set.range g) ∧ degreeOf j Q = n := by
+    have hex
+        : ∃ n, ∃ Q : MvPolynomial σ F,
+          Q ∈ 𝔭 ∧ Q ≠ 0 ∧ (↑Q.vars : Set σ) ⊆ insert j (Set.range g) ∧ degreeOf j Q = n := by
       obtain ⟨Q, h1, h2, h3⟩ := hrel j hj
       exact ⟨_, Q, h1, h2, h3, rfl⟩
     obtain ⟨Q, hQp, hQ0, hQv, hQd⟩ := Nat.find_spec hex
-    have hmin : ∀ Q' : MvPolynomial σ F, Q' ∈ 𝔭 → Q' ≠ 0 →
-        (↑Q'.vars : Set σ) ⊆ insert j (Set.range g) → degreeOf j Q ≤ degreeOf j Q' := by
+    have hmin
+        : ∀ Q' : MvPolynomial σ F,
+          Q' ∈ 𝔭 → Q' ≠ 0 → (↑Q'.vars : Set σ) ⊆ insert j (Set.range g)
+            → degreeOf j Q ≤ degreeOf j Q' := by
       intro Q' h1 h2 h3
       rw [hQd]
       exact Nat.find_min' hex ⟨Q', h1, h2, h3, rfl⟩

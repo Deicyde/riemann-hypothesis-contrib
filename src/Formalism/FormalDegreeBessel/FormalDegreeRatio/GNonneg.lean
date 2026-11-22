@@ -18,8 +18,8 @@ lemma gn_card_le_of_ker {S : Type*} [Fintype S] {m : ℕ} (f : (S → ℂ) →�
   have h := LinearMap.finrank_le_finrank_of_injective hinj
   simpa [Module.finrank_fintype_fun_eq_card] using h
 
-def gnExt {ι : Type*} [DecidableEq ι] (p : ι → Prop) : Matrix ι {i // p i} ℂ :=
-  fun i j => if i = j.val then 1 else 0
+def gnExt {ι : Type*} [DecidableEq ι] (p : ι → Prop) : Matrix ι {i // p i} ℂ := fun i j =>
+  if i = j.val then 1 else 0
 
 lemma gnExt_mulVec {ι : Type*} [Fintype ι] [DecidableEq ι] (p : ι → Prop) [DecidablePred p]
     (v : {i // p i} → ℂ) (i : ι) :
@@ -139,9 +139,10 @@ lemma gn_herm_nonneg (k r : ℕ) (y : Fin (2 * r + k + 1) → ℂ)
   rw [gn_re_star_mul_self]
   exact Complex.normSq_nonneg _
 
-def gnB (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ)
-    (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
-    Matrix (Fin (2 * r + k + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ :=
+def gnB
+    (k r : ℕ)
+    (z z' : Fin (2 * r + k + 1) → ℂ) (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ :=
   Matrix.of fun i j => gramVec k r z z' g j i
 
 lemma gn_gramM_eq (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ)
@@ -292,8 +293,11 @@ lemma gn_sum_pos {ι : Type*} [Fintype ι] [DecidableEq ι] (lam : ι → ℝ)
           nlinarith
 
 def gnPi (k r : ℕ) : (Fin (2 * r + k + 1) → ℂ) →ₗ[ℂ] (Fin (r + 1) → ℂ) where
-  toFun y a := if h : a.val < r then y (eI k r ⟨a.val, h⟩) - y (esI k r ⟨a.val, h⟩)
-    else y ⟨r + k, by omega⟩
+  toFun y a :=
+    if h : a.val < r then
+      y (eI k r ⟨a.val, h⟩) - y (esI k r ⟨a.val, h⟩)
+    else
+      y ⟨r + k, by omega⟩
   map_add' x y := by
     ext a
     simp only [Pi.add_apply]
@@ -318,15 +322,29 @@ theorem gNonneg_of (h : GGram) : GNonneg := by
     rw [this]
   · push Not at h0
     have hneg : Fintype.card {i // hM.eigenvalues i < 0} ≤ r + 1 := by
-      refine gn_card_le_of_ker ((gnPi k r).comp
-        (gnB k r z z' g * (hM.eigenvectorUnitary : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ) *
-          gnExt (fun i => hM.eigenvalues i < 0)).mulVecLin) ?_
+      refine gn_card_le_of_ker
+        ((gnPi k r).comp
+          (gnB k r z z' g
+            * (hM.eigenvectorUnitary
+              : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ)
+            * gnExt (fun i => hM.eigenvalues i < 0)).mulVecLin)
+        ?_
       intro v hv
       by_contra hv0
-      obtain ⟨y, hy⟩ : ∃ y, y = gnB k r z z' g *ᵥ ((hM.eigenvectorUnitary : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ) *ᵥ
-          (gnExt (fun i => hM.eigenvalues i < 0) *ᵥ v)) := ⟨_, rfl⟩
-      have hyv : (gnB k r z z' g * (hM.eigenvectorUnitary : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ) *
-          gnExt (fun i => hM.eigenvalues i < 0)) *ᵥ v = y := by
+      obtain ⟨y, hy⟩
+          : ∃ y,
+            y = gnB k r z z' g
+              *ᵥ ((hM.eigenvectorUnitary
+                  : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ)
+                *ᵥ (gnExt (fun i => hM.eigenvalues i < 0) *ᵥ v)) :=
+        ⟨_, rfl⟩
+      have hyv
+          : (gnB k r z z' g
+                * (hM.eigenvectorUnitary
+                  : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ)
+                * gnExt (fun i => hM.eigenvalues i < 0))
+              *ᵥ v
+            = y := by
         rw [hy, mulVec_mulVec, mulVec_mulVec]
       simp only [LinearMap.comp_apply, Matrix.mulVecLin_apply, hyv] at hv
       have h1 : ∀ a : Fin r, y (eI k r a) = y (esI k r a) := by
@@ -342,12 +360,19 @@ theorem gNonneg_of (h : GGram) : GNonneg := by
       simp only [Complex.re_sum, Complex.ofReal_re] at hpos
       linarith
     have hposc : Fintype.card {i // 0 < hM.eigenvalues i} ≤ r + 1 := by
-      refine gn_card_le_of_ker ((((hM.eigenvectorUnitary : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ) *
-          gnExt (fun i => 0 < hM.eigenvalues i)).submatrix Sum.inr id).mulVecLin) ?_
+      refine gn_card_le_of_ker
+        ((((hM.eigenvectorUnitary
+            : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ)
+          * gnExt (fun i => 0 < hM.eigenvalues i)).submatrix Sum.inr id).mulVecLin)
+        ?_
       intro v hv
       by_contra hv0
-      obtain ⟨c, hc⟩ : ∃ c, c = (hM.eigenvectorUnitary : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ) *ᵥ
-          (gnExt (fun i => 0 < hM.eigenvalues i) *ᵥ v) := ⟨_, rfl⟩
+      obtain ⟨c, hc⟩
+          : ∃ c,
+            c = (hM.eigenvectorUnitary
+                : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ)
+              *ᵥ (gnExt (fun i => 0 < hM.eigenvalues i) *ᵥ v) :=
+        ⟨_, rfl⟩
       have hci : ∀ b, c (Sum.inr b) = 0 := by
         intro b
         have := congrFun hv b
@@ -358,11 +383,12 @@ theorem gNonneg_of (h : GGram) : GNonneg := by
       have := gn_sum_pos hM.eigenvalues v hv0
       simp only [Complex.re_sum, Complex.ofReal_re] at hq
       linarith
-    have hsum : Fintype.card {i // hM.eigenvalues i < 0} +
-        Fintype.card {i // 0 < hM.eigenvalues i} = 2 * r + 2 := by
+    have hsum
+        : Fintype.card {i // hM.eigenvalues i < 0} + Fintype.card {i // 0 < hM.eigenvalues i}
+          = 2 * r + 2 := by
       rw [Fintype.card_subtype, Fintype.card_subtype]
-      have : (Finset.univ.filter fun i => 0 < hM.eigenvalues i) =
-          Finset.univ.filter fun i => ¬ (hM.eigenvalues i < 0) := by
+      have : (Finset.univ.filter fun i => 0 < hM.eigenvalues i)
+          = Finset.univ.filter fun i => ¬(hM.eigenvalues i < 0) := by
         apply Finset.filter_congr
         intro i _
         constructor
@@ -381,8 +407,10 @@ theorem gNonneg_of (h : GGram) : GNonneg := by
       rw [hG]
       push_cast
       rfl
-    have e : ∀ j, hM.eigenvalues j =
-        (if hM.eigenvalues j < 0 then (-1 : ℝ) else 1) * |hM.eigenvalues j| := by
+    have e
+        : ∀ j,
+          hM.eigenvalues j
+            = (if hM.eigenvalues j < 0 then (-1 : ℝ) else 1) * |hM.eigenvalues j| := by
       intro j
       split_ifs with hj
       · rw [abs_of_neg hj]
@@ -390,12 +418,13 @@ theorem gNonneg_of (h : GGram) : GNonneg := by
       · rw [abs_of_nonneg (not_lt.mp hj)]
         ring
     have hprod : ∏ j, hM.eigenvalues j = (-1) ^ (r + 1) * ∏ j, |hM.eigenvalues j| := by
-      calc ∏ j, hM.eigenvalues j
-          = ∏ j, ((if hM.eigenvalues j < 0 then (-1 : ℝ) else 1) * |hM.eigenvalues j|) :=
-            Finset.prod_congr rfl (fun j _ => e j)
+      calc
+        ∏ j, hM.eigenvalues j
+            = ∏ j, ((if hM.eigenvalues j < 0 then (-1 : ℝ) else 1) * |hM.eigenvalues j|) :=
+          Finset.prod_congr rfl (fun j _ => e j)
         _ = (-1) ^ (r + 1) * ∏ j, |hM.eigenvalues j| := by
-            rw [Finset.prod_mul_distrib, Finset.prod_ite, Finset.prod_const, Finset.prod_const_one,
-              mul_one, hcard]
+          rw [Finset.prod_mul_distrib, Finset.prod_ite, Finset.prod_const, Finset.prod_const_one,
+            mul_one, hcard]
     rw [key, hprod, ← mul_assoc, ← pow_add, ← two_mul, pow_mul]
     norm_num
     positivity

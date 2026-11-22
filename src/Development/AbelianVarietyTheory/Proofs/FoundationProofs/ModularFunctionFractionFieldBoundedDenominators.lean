@@ -19,13 +19,19 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem frac_bdd_den : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Frac Ω ε) (f : T.K),
-    ∃ D : ℕ, 0 < D ∧ ∀ r : ℚ, ∃ k : ℕ, IsIntegral ℤ ((D : Ω) ^ k * (T.exp f).coeff r) := by
+theorem frac_bdd_den
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Frac Ω ε)
+        (f : T.K),
+      ∃ D : ℕ,
+        0 < D ∧ ∀ r : ℚ, ∃ k : ℕ, IsIntegral ℤ ((D : Ω) ^ k * (T.exp f).coeff r) := by
   intro Ω _ _ _ ε T f
   obtain ⟨a, b, hb, hab⟩ := T.io_surj f
-  have hexpS : ∀ c : ring ε.range, ∃ S : Finset Ω, ∀ r, (T.exp (T.io c)).coeff r ∈ Subring.closure (S : Set Ω) := by
+  have hexpS
+      : ∀ c : ring ε.range, ∃ S : Finset Ω, ∀ r,
+        (T.exp (T.io c)).coeff r ∈ Subring.closure (S : Set Ω) := by
     intro c
-    have hc : InR ε.range (c : ℍ → ℂ) := ((GlobalTheory.T.mem_modularFunctionRingOver_iff_hasSomeLevelOver ε.range).1 c).1 c.2
+    have hc : InR ε.range (c : ℍ → ℂ) :=
+      ((GlobalTheory.T.mem_modularFunctionRingOver_iff_hasSomeLevelOver ε.range).1 c).1 c.2
     exact GlobalTheory.T.cuspExpansion_coeff_mem_finitelyGenerated_subring Ω ε c _ hc (T.exp_io c)
   obtain ⟨Sa, hSa⟩ := hexpS a
   obtain ⟨Sb, hSb⟩ := hexpS b

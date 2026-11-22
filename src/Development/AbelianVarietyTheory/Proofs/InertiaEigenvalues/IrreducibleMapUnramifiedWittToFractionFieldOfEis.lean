@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvdSubO
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
@@ -20,9 +22,11 @@ open Polynomial
 
 attribute [local instance] algK isFractionRing
 
-theorem irreducible_map_iota_of_eisenstein : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (E : Polynomial (Wq l a)), E.Monic → 0 < E.natDegree →
-    (∀ i < E.natDegree, (l : Wq l a) ∣ E.coeff i) → (∃ w : (Wq l a)ˣ, E.coeff 0 = (l : Wq l a) * w) →
-    Irreducible (E.map (GlobalTheory.TameFrob.iota l a)) := by
+theorem irreducible_map_iota_of_eisenstein
+    : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (E : Polynomial (Wq l a)),
+      E.Monic → 0 < E.natDegree → (∀ i < E.natDegree, (l : Wq l a) ∣ E.coeff i)
+        → (∃ w : (Wq l a)ˣ, E.coeff 0 = (l : Wq l a) * w)
+        → Irreducible (E.map (GlobalTheory.TameFrob.iota l a)) := by
   intro l _ a _ E hmon hdeg hdiv ⟨w, hw⟩
   have hP : (Ideal.span {(l : Wq l a)}).IsPrime := by
     rw [← WittVector.ker_constantCoeff]; exact RingHom.ker_isPrime _

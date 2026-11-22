@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralMult
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls
+  GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
 open scoped ENNReal
 
 noncomputable section
@@ -20,8 +22,11 @@ namespace GlobalTheory.SUVolBound
 theorem countable_numberField (E : Type) [Field E] [NumberField E] : Countable E :=
   (Module.finBasis ℚ E).equivFun.injective.countable
 
-theorem countable_inReal {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (Ψ : Finset (E →+* ℂ))
-    (G : Matrix (Fin r) (Fin r) E) (Γ : Subgroup (GL (Fin r) E)) : Countable (inReal Ψ G Γ) := by
+theorem countable_inReal
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ}
+    (Ψ : Finset (E →+* ℂ)) (G : Matrix (Fin r) (Fin r) E) (Γ : Subgroup (GL (Fin r) E))
+    : Countable (inReal Ψ G Γ) := by
   haveI := countable_numberField E
   haveI : Countable (Matrix (Fin r) (Fin r) E) := inferInstanceAs (Countable (Fin r → Fin r → E))
   haveI : Countable (GL (Fin r) E) := Function.Injective.countable (f := fun u : GL (Fin r) E => (u : Matrix (Fin r) (Fin r) E)) (fun a b h => Units.ext h)
@@ -31,21 +36,29 @@ theorem countable_inReal {E : Type} [Field E] [NumberField E] [IsCMField E] {r :
     exact ⟨γ, hγ⟩
   choose f hf using hsub
   refine Function.Injective.countable (f := f) fun a b hab => ?_
-  apply Subtype.ext; apply Subtype.ext
+  apply Subtype.ext
+  apply Subtype.ext
   rw [← hf a, ← hf b, hab]
 
-theorem tangentHaar_smul {ι : Type} [Fintype ι] {r : ℕ} (H : Subgroup (ι → GL (Fin r) ℂ)) [LocallyCompactSpace H]
-    [MeasurableSpace H] [BorelSpace H] (c : ℝ≥0∞) (hc : c ≠ ⊤) (ν : Measure (ι → Fin r → Fin r → ℂ)) :
-    tangentHaar H (c • ν) = c • tangentHaar H ν := by
+theorem tangentHaar_smul
+    {ι : Type} [Fintype ι]
+    {r : ℕ} (H : Subgroup (ι → GL (Fin r) ℂ))
+    [LocallyCompactSpace H] [MeasurableSpace H] [BorelSpace H]
+    (c : ℝ≥0∞) (hc : c ≠ ⊤)
+    (ν : Measure (ι → Fin r → Fin r → ℂ))
+    : tangentHaar H (c • ν) = c • tangentHaar H ν := by
   unfold tangentHaar
   rw [smul_smul]
   congr 1
   simp only [Measure.smul_apply, smul_eq_mul, mul_div_assoc]
   exact ENNReal.limsup_const_mul_of_ne_top hc
 
-theorem covolume_smul {G α : Type*} [Group G] [MulAction G α] [MeasurableSpace α] [Countable G]
-    [MeasurableConstSMul G α] (ν : Measure α) [SMulInvariantMeasure G α ν] (c : ℝ≥0∞) (hc : c ≠ 0) :
-    covolume G α (c • ν) = c * covolume G α ν := by
+theorem covolume_smul
+    {G α : Type*}
+    [Group G] [MulAction G α] [MeasurableSpace α] [Countable G] [MeasurableConstSMul G α]
+    (ν : Measure α) [SMulInvariantMeasure G α ν]
+    (c : ℝ≥0∞) (hc : c ≠ 0)
+    : covolume G α (c • ν) = c * covolume G α ν := by
   by_cases h : HasFundamentalDomain G α ν
   · obtain ⟨s, hs⟩ := h.ExistsIsFundamentalDomain
     have hs' : IsFundamentalDomain G s (c • ν) := hs.mono (Measure.smul_absolutelyContinuous)
@@ -55,35 +68,37 @@ theorem covolume_smul {G α : Type*} [Group G] [MulAction G α] [MeasurableSpace
       exact h ⟨⟨s, hs.mono (Measure.absolutelyContinuous_smul hc)⟩⟩
     simp [covolume, h, h']
 
-theorem abs_discr_real_eq {E : Type} [Field E] [NumberField E] [IsCMField E] (hU : Unr E) :
-    |(discr (maximalRealSubfield E) : ℝ)| = rdE E ^ fdeg E := by
+theorem abs_discr_real_eq {E : Type} [Field E] [NumberField E] [IsCMField E] (hU : Unr E)
+    : |(discr (maximalRealSubfield E) : ℝ)| = rdE E ^ fdeg E := by
   have hdiff : differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E) = ⊤ :=
-    (GlobalTheory.formallyUnramified_ringOfIntegers_iff_differentIdeal_eq_top _ E).1 (by
-      haveI : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E) := hU; infer_instance)
-  have h := natAbs_discr_eq_absNorm_differentIdeal_mul_natAbs_discr_pow (maximalRealSubfield E)
-    (𝓞 (maximalRealSubfield E)) E (𝓞 E)
+    (GlobalTheory.formallyUnramified_ringOfIntegers_iff_differentIdeal_eq_top _ E).1
+      (by haveI : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E) := hU; infer_instance)
+  have h :=
+    natAbs_discr_eq_absNorm_differentIdeal_mul_natAbs_discr_pow (maximalRealSubfield E)
+      (𝓞 (maximalRealSubfield E)) E (𝓞 E)
   rw [hdiff, Algebra.IsQuadraticExtension.finrank_eq_two] at h
   simp only [Ideal.absNorm_top, one_mul] at h
   have hd : dE E = |(discr (maximalRealSubfield E) : ℝ)| ^ 2 := by
     unfold dE
     rw [← Int.cast_abs, ← Int.cast_abs, Int.abs_eq_natAbs, Int.abs_eq_natAbs, h]
-    push_cast; ring
+    push_cast
+    ring
   have hf : 1 ≤ (fdeg E : ℝ) := one_le_field_half_degree
-  rw [rootDiscriminant_eq_rpow, hd, ← Real.rpow_natCast, ← Real.rpow_natCast, ← Real.rpow_mul (abs_nonneg _),
-    ← Real.rpow_mul (abs_nonneg _)]
-  have : (((2 : ℕ) : ℝ) * (1 / (2 * (fdeg E : ℝ))) * (fdeg E : ℝ)) = 1 := by
-    field_simp; norm_num
+  rw [rootDiscriminant_eq_rpow, hd, ← Real.rpow_natCast, ← Real.rpow_natCast,
+    ← Real.rpow_mul (abs_nonneg _), ← Real.rpow_mul (abs_nonneg _)]
+  have : (((2 : ℕ) : ℝ) * (1 / (2 * (fdeg E : ℝ))) * (fdeg E : ℝ)) = 1 := by field_simp; norm_num
   rw [this, Real.rpow_one]
 
-theorem exists_lie_basis {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
-    (G : Matrix (Fin r) (Fin r) E) (Λ : Submodule (𝓞 E) (Fin r → E)) (hΛ : SelfDualLat G Λ) :
-    ∃ e : Fin (r ^ 2 - 1) → Matrix (Fin r) (Fin r) E,
+theorem exists_lie_basis
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (Λ : Submodule (𝓞 E) (Fin r → E)) (hΛ : SelfDualLat G Λ)
+    : ∃ e : Fin (r ^ 2 - 1) → Matrix (Fin r) (Fin r) E,
       (∀ i, e i ∈ lieLat G Λ) ∧ LinearIndependent (maximalRealSubfield E) e := by
   obtain ⟨e, he, hli⟩ := GlobalTheory.T.exists_unitary_lie_basis G hΛ.1 hΛ.2.1
   choose N hN hmem using fun i => GlobalTheory.T.integral_multiple_in_lie_lattice G Λ hΛ.2.2.1 hΛ.2.2.2.1 (e i) (he i).1 (he i).2
   refine ⟨fun i => (N i : E) • e i, hmem, ?_⟩
-  let w : Fin (r ^ 2 - 1) → (maximalRealSubfield E)ˣ :=
-    fun i => Units.mk0 (N i : maximalRealSubfield E) (by exact_mod_cast (hN i).ne')
+  let w : Fin (r ^ 2 - 1) → (maximalRealSubfield E)ˣ := fun i =>
+    Units.mk0 (N i : maximalRealSubfield E) (by exact_mod_cast (hN i).ne')
   have hw : (fun i => (N i : E) • e i) = w • e := by
     funext i
     ext a b
@@ -91,7 +106,18 @@ theorem exists_lie_basis {E : Type} [Field E] [NumberField E] [IsCMField E] {r :
   rw [hw]
   exact hli.units_smul w
 
-theorem sum_covolume_le : GlobalTheory.Published.TamagawaSpecialUnitary → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (Λ : Submodule (𝓞 E) (Fin r → E)) (x : Frame X.Ψ r) [MeasurableSpace (realSU X.Ψ X.Gm)] [BorelSpace (realSU X.Ψ X.Gm)] (J : Type) (s : J → Matrix (Fin r) (Fin r) (RA (maximalRealSubfield E) E)), 2 ≤ r → Unr E → SelfDualLat X.Gm Λ → IsOrth X x → IsSReps X.Gm (Λ : Set (Fin r → E)) 1 s → ∑' j, covolume (inReal X.Ψ X.Gm (ratStab X.Gm (Λ : Set (Fin r → E)) (s j))) (realSU X.Ψ X.Gm) (riemHaar X.Ψ X.Gm x) ≤ ENNReal.ofReal (rdE E ^ ((fdeg E : ℝ) * ((r : ℝ) ^ 2 - 1) / 2) * (Real.sqrt r * ∏ i ∈ Finset.Icc 2 r, ∑' n : ℕ, 1 / ((n : ℝ) + 1) ^ i) ^ fdeg E) := by
+theorem sum_covolume_le
+    : GlobalTheory.Published.TamagawaSpecialUnitary
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r)
+          (Λ : Submodule (𝓞 E) (Fin r → E)) (x : Frame X.Ψ r) [MeasurableSpace (realSU X.Ψ X.Gm)]
+          [BorelSpace (realSU X.Ψ X.Gm)] (J : Type)
+          (s : J → Matrix (Fin r) (Fin r) (RA (maximalRealSubfield E) E)),
+        2 ≤ r → Unr E → SelfDualLat X.Gm Λ → IsOrth X x → IsSReps X.Gm (Λ : Set (Fin r → E)) 1 s
+          → ∑' j, covolume (inReal X.Ψ X.Gm (ratStab X.Gm (Λ : Set (Fin r → E)) (s j))) (realSU X.Ψ X.Gm) (riemHaar X.Ψ X.Gm x)
+            ≤ ENNReal.ofReal
+              (rdE E ^ ((fdeg E : ℝ) * ((r : ℝ) ^ 2 - 1) / 2)
+                * (Real.sqrt r * ∏ i ∈ Finset.Icc 2 r, ∑' n : ℕ, 1 / ((n : ℝ) + 1) ^ i)
+                  ^ fdeg E) := by
   intro hP E _ _ _ r X Λ x _ _ J s hr hU hΛ hx hs
   obtain ⟨e, he, hli⟩ := exists_lie_basis X.Gm Λ hΛ
   obtain ⟨hmult, hP1⟩ := hP E r X.Gm Λ X.Ψ e J s hr hU hΛ X.cmType he hli hs
@@ -114,14 +140,16 @@ theorem sum_covolume_le : GlobalTheory.Published.TamagawaSpecialUnitary → ∀ 
       rw [← h, mul_zero, zero_mul, ENNReal.ofReal_zero, mul_zero] at hP1
       exact zero_ne_one hP1
   have hr0 : 0 < Real.sqrt r := Real.sqrt_pos.2 (by exact_mod_cast (by omega : 0 < r))
-  have hcpos : c ≠ 0 := by
-    rw [hc, ne_eq, ENNReal.ofReal_eq_zero, not_le]; positivity
+  have hcpos : c ≠ 0 := by rw [hc, ne_eq, ENNReal.ofReal_eq_zero, not_le]; positivity
   have hriem : riemHaar X.Ψ X.Gm x = c • μ := by
     unfold riemHaar
     rw [hlie, tangentHaar_smul _ _ ENNReal.ofReal_ne_top]
-  have hcov : ∀ j, covolume (inReal X.Ψ X.Gm (ratStab X.Gm (Λ : Set (Fin r → E)) (s j))) (realSU X.Ψ X.Gm)
-      (riemHaar X.Ψ X.Gm x) = c * covolume (inReal X.Ψ X.Gm (ratStab X.Gm (Λ : Set (Fin r → E)) (s j)))
-      (realSU X.Ψ X.Gm) μ := by
+  have hcov
+      : ∀ j,
+        covolume (inReal X.Ψ X.Gm (ratStab X.Gm (Λ : Set (Fin r → E)) (s j))) (realSU X.Ψ X.Gm)
+            (riemHaar X.Ψ X.Gm x)
+          = c * covolume (inReal X.Ψ X.Gm (ratStab X.Gm (Λ : Set (Fin r → E)) (s j)))
+            (realSU X.Ψ X.Gm) μ := by
     intro j
     haveI := countable_inReal X.Ψ X.Gm (ratStab X.Gm (Λ : Set (Fin r → E)) (s j))
     rw [hriem, covolume_smul _ _ hcpos]
@@ -136,11 +164,12 @@ theorem sum_covolume_le : GlobalTheory.Published.TamagawaSpecialUnitary → ∀ 
   rw [hS1, hc, ← ENNReal.ofReal_mul (by positivity)]
   apply ENNReal.ofReal_le_ofReal
   have hDr : D = rdE E ^ fdeg E := abs_discr_real_eq hU
-  have hrd0 : 0 ≤ rdE E := by
-    unfold rdE; exact Real.rpow_nonneg (abs_nonneg _) _
+  have hrd0 : 0 ≤ rdE E := by unfold rdE; exact Real.rpow_nonneg (abs_nonneg _) _
   have hDn : D ^ (n / 2) = rdE E ^ ((fdeg E : ℝ) * n / 2) := by
     rw [hDr, ← Real.rpow_natCast, ← Real.rpow_mul hrd0, mul_div_assoc]
-  have key : Real.sqrt r ^ fdeg E * m * (D ^ (-n / 2) * m * P)⁻¹ = D ^ (n / 2) * Real.sqrt r ^ fdeg E * P⁻¹ := by
+  have key
+      : Real.sqrt r ^ fdeg E * m * (D ^ (-n / 2) * m * P)⁻¹
+        = D ^ (n / 2) * Real.sqrt r ^ fdeg E * P⁻¹ := by
     rw [neg_div, Real.rpow_neg hDpos.le]
     have : D ^ (n / 2) ≠ 0 := (Real.rpow_pos_of_pos hDpos _).ne'
     field_simp

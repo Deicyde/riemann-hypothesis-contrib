@@ -5,9 +5,15 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Col
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Forms Formalism.L2.Ker
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.SeeSaw GlobalTheory.LatPair GlobalTheory.SplitWeil
-open GlobalTheory.Unf GlobalTheory.Grow GlobalTheory.FinPl ValuativeRel IsLocalRing GlobalTheory.AdForm
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.L2.Forms Formalism.L2.Ker
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2
+  GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.SeeSaw GlobalTheory.LatPair
+  GlobalTheory.SplitWeil
+open GlobalTheory.Unf GlobalTheory.Grow GlobalTheory.FinPl ValuativeRel IsLocalRing
+  GlobalTheory.AdForm
 open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.PhiOneVal
@@ -16,17 +22,25 @@ noncomputable section
 
 namespace GlobalTheory.PhiOneVal
 
-theorem mem_prime_iff_pr_inv_notMem {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (p : SplitPt D k) (P : HeightOneSpectrum (𝓞 D.host.E))
-    (h : Formalism.L2.NTheta.IsIdemAt p.e P) (x : 𝓞 D.host.E) (hx : x ≠ 0) :
-    x ∈ P.asIdeal ↔ p.pr (incA D ((x : D.host.E)⁻¹)) ∉ 𝒪[k] := by
+theorem mem_prime_iff_pr_inv_notMem
+    {D : D7} {k : Type}
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (p : SplitPt D k) (P : HeightOneSpectrum (𝓞 D.host.E)) (h : Formalism.L2.NTheta.IsIdemAt p.e P)
+    (x : 𝓞 D.host.E) (hx : x ≠ 0)
+    : x ∈ P.asIdeal ↔ p.pr (incA D ((x : D.host.E)⁻¹)) ∉ 𝒪[k] := by
   rw [p.int_iff, p.sec_pr]
   exact h.2 x hx
 
-theorem exists_denom_notMem_of_pr_int : ∀ {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (p : SplitPt D k)
-    (P : HeightOneSpectrum (𝓞 D.host.E)), Formalism.L2.NTheta.IsIdemAt p.e P → ∀ a : D.host.E, p.pr (incA D a) ∈ 𝒪[k] →
-    ∃ s : 𝓞 D.host.E, s ∉ P.asIdeal ∧ ∃ c : 𝓞 D.host.E,
-      algebraMap (𝓞 D.host.E) D.host.E c = algebraMap (𝓞 D.host.E) D.host.E s * a := by
+theorem exists_denom_notMem_of_pr_int
+    : ∀ {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
+        [IsNonarchimedeanLocalField k] (p : SplitPt D k) (P : HeightOneSpectrum (𝓞 D.host.E)),
+      Formalism.L2.NTheta.IsIdemAt p.e P
+        → ∀ a : D.host.E,
+          p.pr (incA D a) ∈ 𝒪[k]
+            → ∃ s : 𝓞 D.host.E,
+              s ∉ P.asIdeal
+                ∧ ∃ c : 𝓞 D.host.E,
+                  algebraMap (𝓞 D.host.E) D.host.E c = algebraMap (𝓞 D.host.E) D.host.E s * a := by
   intro D k _ _ _ _ p P h a ha
   obtain ⟨n, ⟨d, hd⟩, hnd | hnd⟩ := P.exists_primeCompl_mul_eq_or_mul_eq (K := D.host.E) a
   · exact ⟨d, hd, n, by rw [← hnd, mul_comm]⟩

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsLimDeg
 
 @[expose] public section
 
-open MvPolynomial Formalism.DegreeFormula Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.MainNotions.WeightThresholdDefs Filter Topology Classical
+open MvPolynomial Formalism.DegreeFormula Formalism.BasicNotions Formalism.BasicNotions.DV
+  Formalism.MainNotions Formalism.MainNotions.WeightThresholdDefs Filter Topology Classical
 
 noncomputable section
 
@@ -22,20 +23,14 @@ abbrev Wt : Type := D.what₂.Tau → Fin Y.N → ℝ
 abbrev Fn : Type := Pol D.what₂.Tau Y.N →ₗ[ℝ] ℝ
 
 structure SlopeTestRemainingChoices where
-
   dir : Wt Y
-
   w : Y.Comp → ℝ
-
   Ps : ℝ → Y.Comp → MvPolynomial (Option (D.what₂.Tau × Fin Y.N)) ℝ
-
   ht : Y.ALB → Y.Pt → ℝ
-
   dense : Y.Comp → Set Y.Pt → Prop
 
 def testI : ℝ := ∑ τ, degFl D.what₂.Tau Y.N (pLow Y.j τ 1 * curveCl D.what₂.Tau Y.N Y.j)
 
 variable {Y} (A : SlopeTestRemainingChoices Y) (Φ : ℝ → Fn Y) (hh : Fn Y)
-
 
 end GlobalTheory.Mean4

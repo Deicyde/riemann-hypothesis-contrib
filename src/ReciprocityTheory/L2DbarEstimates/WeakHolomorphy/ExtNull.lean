@@ -54,22 +54,23 @@ theorem extNull : ExtNullStatement := by
     intro z hz
     set L : ℂ → V n := fun t => z0 + t • (z - z0) with hLdef
     set S : Set ℂ := L ⁻¹' Ω with hSdef
-    have hLd : Differentiable ℂ L :=
-      (differentiable_const _).add (differentiable_id.smul_const _)
+    have hLd : Differentiable ℂ L := (differentiable_const _).add (differentiable_id.smul_const _)
     have hLc : Continuous L := hLd.continuous
     have hSo : IsOpen S := hΩ.preimage hLc
     have hSconv : Convex ℝ S := by
       intro t1 ht1 t2 ht2 a b ha hb hab
       have hm := (convex_ball c R) ht1 ht2 ha hb hab
       show z0 + (a • t1 + b • t2) • (z - z0) ∈ Ω
-      have e : z0 + (a • t1 + b • t2) • (z - z0) =
-          a • (z0 + t1 • (z - z0)) + b • (z0 + t2 • (z - z0)) := by
-        calc z0 + (a • t1 + b • t2) • (z - z0)
-            = (a + b) • z0 + (a • (t1 • (z - z0)) + b • (t2 • (z - z0))) := by
-              rw [hab, one_smul, add_smul, smul_assoc, smul_assoc]
+      have e
+          : z0 + (a • t1 + b • t2) • (z - z0)
+            = a • (z0 + t1 • (z - z0)) + b • (z0 + t2 • (z - z0)) := by
+        calc
+          z0 + (a • t1 + b • t2) • (z - z0)
+              = (a + b) • z0 + (a • (t1 • (z - z0)) + b • (t2 • (z - z0))) := by
+            rw [hab, one_smul, add_smul, smul_assoc, smul_assoc]
           _ = a • (z0 + t1 • (z - z0)) + b • (z0 + t2 • (z - z0)) := by
-              rw [add_smul, smul_add, smul_add]
-              abel
+            rw [add_smul, smul_add, smul_add]
+            abel
       rw [e]
       exact hm
     have hga : AnalyticOnNhd ℂ (U ∘ L) S :=
@@ -85,8 +86,8 @@ theorem extNull : ExtNullStatement := by
       have hpre : L ⁻¹' (Ω \ Z) ∈ 𝓝 (0 : ℂ) :=
         hLc.continuousAt.preimage_mem_nhds (by rw [hL0]; exact hW.mem_nhds hz0W)
       filter_upwards [hpre] with t ht using (hEq1 ht).symm
-    have h1 := hga.eqOn_of_preconnected_of_eventuallyEq analyticOnNhd_const hSconv.isPreconnected
-      h0S hev h1S
+    have h1 :=
+      hga.eqOn_of_preconnected_of_eventuallyEq analyticOnNhd_const hSconv.isPreconnected h0S hev h1S
     simpa [hLdef] using h1
 
   have hZ : ∀ᵐ z ∂volume.restrict (Ω ∩ Z), False := by

@@ -12,8 +12,9 @@ open ReciprocityTheory.Gal
 
 namespace GlobalTheory.ShapeNeg
 
-theorem ko_killed_by_pow_uniformizer : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O}, Irreducible ϖ →
-    ∀ x : Formalism.NG.KO O, ∃ n : ℕ, ϖ ^ n • x = 0 := by
+theorem ko_killed_by_pow_uniformizer
+    : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O},
+      Irreducible ϖ → ∀ x : Formalism.NG.KO O, ∃ n : ℕ, ϖ ^ n • x = 0 := by
   intro O _ _ _ ϖ hϖ x
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   obtain ⟨⟨a, b⟩, rfl⟩ := IsLocalization.mk'_surjective (nonZeroDivisors O) y
@@ -26,7 +27,9 @@ theorem ko_killed_by_pow_uniformizer : ∀ {O : Type} [CommRing O] [IsDomain O] 
     ← map_mul]
   congr 1
   rw [hu]
-  calc a * ((u⁻¹ : Oˣ) : O) * ((u : O) * ϖ ^ n) = a * ϖ ^ n * (((u⁻¹ : Oˣ) : O) * u) := by ring
+  calc
+    a * ((u⁻¹ : Oˣ) : O) * ((u : O) * ϖ ^ n)
+      = a * ϖ ^ n * (((u⁻¹ : Oˣ) : O) * u) := by ring
     _ = ϖ ^ n * a := by simp [mul_comm]
 
 end GlobalTheory.ShapeNeg

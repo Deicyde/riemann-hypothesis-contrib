@@ -12,8 +12,8 @@ noncomputable section
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW
-  Filter Topology Set LocPosW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.VolFromSW Filter Topology Set LocPosW
 open scoped TensorProduct ENNReal
 
 theorem lbInf_of (hC : CoordInf) (hS : SubmLB) : LBInf := by
@@ -25,16 +25,22 @@ theorem lbInf_of (hC : CoordInf) (hS : SubmLB) : LBInf := by
     (tensAll_holds F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet).1
   have : BorelSpace (Ainf F ⊗[F] E) := ⟨rfl⟩
   have : BorelSpace (HermR (Ainf F) σ a) := ⟨rfl⟩
-  have : ContinuousAdd (Fin a → Fin M → Ainf F ⊗[F] E) := ⟨by
-    have e : (fun p : (Fin a → Fin M → Ainf F ⊗[F] E) × (Fin a → Fin M → Ainf F ⊗[F] E) =>
-        p.1 + p.2) = fun p => eV.symm (eV p.1 + eV p.2) := by
-      funext p; rw [← hV, Homeomorph.symm_apply_apply]
-    rw [e]; fun_prop⟩
-  have : ContinuousAdd (HermR (Ainf F) σ a) := ⟨by
-    have e : (fun p : HermR (Ainf F) σ a × HermR (Ainf F) σ a => p.1 + p.2) =
-        fun p => eH.symm (eH p.1 + eH p.2) := by
-      funext p; rw [← hH, Homeomorph.symm_apply_apply]
-    rw [e]; fun_prop⟩
+  have : ContinuousAdd (Fin a → Fin M → Ainf F ⊗[F] E) :=
+    ⟨by
+      have e
+          : (fun p : (Fin a → Fin M → Ainf F ⊗[F] E) × (Fin a → Fin M → Ainf F ⊗[F] E) => p.1 + p.2)
+            = fun p => eV.symm (eV p.1 + eV p.2) := by
+        funext p; rw [← hV, Homeomorph.symm_apply_apply]
+      rw [e]
+      fun_prop⟩
+  have : ContinuousAdd (HermR (Ainf F) σ a) :=
+    ⟨by
+      have e
+          : (fun p : HermR (Ainf F) σ a × HermR (Ainf F) σ a => p.1 + p.2)
+            = fun p => eH.symm (eH p.1 + eH p.2) := by
+        funext p; rw [← hH, Homeomorph.symm_apply_apply]
+      rw [e]
+      fun_prop⟩
   have hμ' : (μinf.map eV).IsAddHaarMeasure :=
     Measure.isAddHaarMeasure_map μinf (AddMonoidHom.mk' eV hV) eV.continuous eV.surjective
       (eV.map_cocompact).le
@@ -64,13 +70,15 @@ theorem lbInf_of (hC : CoordInf) (hS : SubmLB) : LBInf := by
     rwa [mem_preimage, Homeomorph.apply_symm_apply] at this
   have h := hlb' _ hS'N hS'm
   rw [show (νinf.map eH) = νinf.map eH.toMeasurableEquiv from rfl,
-    show (μinf.map eV) = μinf.map eV.toMeasurableEquiv from rfl,
-    MeasurableEquiv.map_apply, MeasurableEquiv.map_apply] at h
+      show (μinf.map eV) = μinf.map eV.toMeasurableEquiv from rfl, MeasurableEquiv.map_apply,
+      MeasurableEquiv.map_apply]
+    at h
   have e1 : eH.toMeasurableEquiv ⁻¹' (eH.symm ⁻¹' S) = S := by
     ext z
     simp
-  have e2 : eV.toMeasurableEquiv ⁻¹' (f' ⁻¹' (eH.symm ⁻¹' S) ∩ eV.symm ⁻¹' W) =
-      (gramR (Ainf F) σ J) ⁻¹' (Subtype.val '' S) ∩ W := by
+  have e2
+      : eV.toMeasurableEquiv ⁻¹' (f' ⁻¹' (eH.symm ⁻¹' S) ∩ eV.symm ⁻¹' W)
+        = (gramR (Ainf F) σ J) ⁻¹' (Subtype.val '' S) ∩ W := by
     ext X
     simp only [mem_preimage, mem_inter_iff, Homeomorph.toMeasurableEquiv_coe,
       Homeomorph.symm_apply_apply, mem_image]
@@ -86,8 +94,7 @@ theorem lbInf_of (hC : CoordInf) (hS : SubmLB) : LBInf := by
   exact h
 
 theorem lbInf_holds : LBInf :=
-  lbInf_of (coordInf_of quadCoord_holds tensR_holds (freeSurj_of semisimpleTens_holds))
-    submLB_holds
+  lbInf_of (coordInf_of quadCoord_holds tensR_holds (freeSurj_of semisimpleTens_holds)) submLB_holds
 
 theorem archPos_holds : ArchPos := archPos_of_lb lbInf_holds
 

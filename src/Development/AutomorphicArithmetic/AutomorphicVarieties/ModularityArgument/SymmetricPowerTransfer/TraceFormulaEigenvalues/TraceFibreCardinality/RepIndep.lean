@@ -10,16 +10,19 @@ namespace UpperTheory.V.Z.Sym.Tf
 
 section
 
-variable {Γ G V : Type} [Group Γ] [Group G] [AddCommGroup V] [Module ℂ V] {B : Base Γ G V} {s : B.Tw} {f : G → ℂ}
+variable
+  {Γ G V : Type} [Group Γ] [Group G] [AddCommGroup V] [Module ℂ V]
+  {B : Base Γ G V} {s : B.Tw} {f : G → ℂ}
 
-private theorem rep_indep (hf : s.IsTest f) (φ : B.Forms) (h y : G) :
-    f (s.θ (y : G ⧸ B.U).out) • s.Θ (φ.1 (h * (y : G ⧸ B.U).out)) = f (s.θ y) • s.Θ (φ.1 (h * y)) := by
+private theorem rep_indep (hf : s.IsTest f) (φ : B.Forms) (h y : G)
+    : f (s.θ (y : G ⧸ B.U).out) • s.Θ (φ.1 (h * (y : G ⧸ B.U).out))
+      = f (s.θ y) • s.Θ (φ.1 (h * y)) := by
   obtain ⟨u, hu⟩ := QuotientGroup.mk_out_eq_mul B.U y
-  rw [hu, map_mul, hf.right, ← mul_assoc, φ.2.2, map_smul, smul_smul, mul_right_comm,
-    Units.inv_mul, one_mul]
+  rw [hu, map_mul, hf.right, ← mul_assoc, φ.2.2, map_smul, smul_smul, mul_right_comm, Units.inv_mul,
+    one_mul]
 
-private theorem fin_supp (hf : s.IsTest f) (k : G ⧸ B.U → V) :
-    (Function.support fun x : G ⧸ B.U => f (s.θ x.out) • k x).Finite := by
+private theorem fin_supp (hf : s.IsTest f) (k : G ⧸ B.U → V)
+    : (Function.support fun x : G ⧸ B.U => f (s.θ x.out) • k x).Finite := by
   refine hf.fin.subset fun x hx => ?_
   rw [Function.mem_support] at hx
   rw [Set.mem_setOf_eq]
@@ -31,8 +34,9 @@ private theorem opF_mem (hf : s.IsTest f) (φ : B.Forms) : s.opF f φ.1 ∈ B.Fo
   · unfold Base.Tw.opF
     have hθ : s.θ.symm (B.ι γ) = B.ι (s.θΓ.symm γ) := by
       rw [MulEquiv.symm_apply_eq, s.comm, MulEquiv.apply_symm_apply]
-    have key : B.W γ (∑ᶠ x : G ⧸ B.U, f (s.θ x.out) • s.Θ (φ.1 (s.θ.symm g * x.out)))
-        = ∑ᶠ x : G ⧸ B.U, B.W γ (f (s.θ x.out) • s.Θ (φ.1 (s.θ.symm g * x.out))) :=
+    have key
+        : B.W γ (∑ᶠ x : G ⧸ B.U, f (s.θ x.out) • s.Θ (φ.1 (s.θ.symm g * x.out)))
+          = ∑ᶠ x : G ⧸ B.U, B.W γ (f (s.θ x.out) • s.Θ (φ.1 (s.θ.symm g * x.out))) :=
       (B.W γ).toAddMonoidHom.map_finsum (fin_supp hf _)
     rw [key]
     refine finsum_congr fun x => ?_

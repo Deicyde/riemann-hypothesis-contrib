@@ -8,14 +8,21 @@ namespace GlobalTheory.CompanionTheory.Semistable
 
 open MvPolynomial
 
-theorem smooth_away_core (O : Type) [CommRing O] (ϖ : O) (σ : Type) [Finite σ] [DecidableEq σ]
-    (T : Finset σ) (i0 : σ) (hi0 : i0 ∈ T) (F : Type) [Field F] [Algebra O F]
-    [IsLocalization.Away ϖ F] :
-    (IsLocalization.Away.map F
-      (Localization.Away (algebraMap O (MvPolynomial σ O ⧸
-        Ideal.span {(∏ i ∈ T, MvPolynomial.X i) - MvPolynomial.C ϖ}) ϖ))
-      (algebraMap O (MvPolynomial σ O ⧸
-        Ideal.span {(∏ i ∈ T, MvPolynomial.X i) - MvPolynomial.C ϖ})) ϖ).Smooth := by
+theorem smooth_away_core
+    (O : Type) [CommRing O]
+    (ϖ : O)
+    (σ : Type) [Finite σ] [DecidableEq σ]
+    (T : Finset σ) (i0 : σ) (hi0 : i0 ∈ T)
+    (F : Type) [Field F] [Algebra O F] [IsLocalization.Away ϖ F]
+    : (IsLocalization.Away.map F
+      (Localization.Away (algebraMap O
+        (MvPolynomial σ O ⧸
+          Ideal.span {(∏ i ∈ T, MvPolynomial.X i) - MvPolynomial.C ϖ})
+        ϖ))
+      (algebraMap O
+        (MvPolynomial σ O ⧸
+          Ideal.span {(∏ i ∈ T, MvPolynomial.X i) - MvPolynomial.C ϖ}))
+      ϖ).Smooth := by
   classical
   let P := MvPolynomial σ O
   let I : Ideal P := Ideal.span {(∏ i ∈ T, MvPolynomial.X i) - MvPolynomial.C ϖ}
@@ -61,15 +68,17 @@ theorem smooth_away_core (O : Type) [CommRing O] (ϖ : O) (σ : Type) [Finite σ
     show IsUnit (ψA (algebraMap O A ϖ ^ n))
     rw [map_pow, AlgHom.commutes]
     exact hϖ'.pow n
-  let ψ : B →ₐ[O] C' := IsLocalization.liftAlgHom (M := Submonoid.powers a) (S := B) (f := ψA) hunit1
+  let ψ : B →ₐ[O] C' :=
+    IsLocalization.liftAlgHom (M := Submonoid.powers a) (S := B) (f := ψA) hunit1
   have hψ : ∀ x : A, ψ (algebraMap A B x) = ψA x := fun x => by
     first
     | exact IsLocalization.lift_eq (M := Submonoid.powers a) (S := B) _ x
     | simp [ψ, IsLocalization.liftAlgHom]
   let xB : σ → B := fun i => algebraMap A B (Ideal.Quotient.mk I (MvPolynomial.X i))
   have hxB : ∏ i ∈ T, xB i = algebraMap O B ϖ := by
-    have e : (Ideal.Quotient.mk I (∏ i ∈ T, MvPolynomial.X i)) =
-        Ideal.Quotient.mk I (MvPolynomial.C ϖ) :=
+    have e
+        : (Ideal.Quotient.mk I (∏ i ∈ T, MvPolynomial.X i))
+          = Ideal.Quotient.mk I (MvPolynomial.C ϖ) :=
       Ideal.Quotient.eq.mpr (Ideal.subset_span rfl)
     simp only [xB]
     rw [← map_prod, ← map_prod, e, IsScalarTower.algebraMap_apply O A B]
@@ -100,7 +109,8 @@ theorem smooth_away_core (O : Type) [CommRing O] (ϖ : O) (σ : Type) [Finite σ
     show IsUnit (χC (h ^ n))
     rw [map_pow, hχh]
     exact (hϖB.mul hpB).pow n
-  let χ : C' →ₐ[O] B := IsLocalization.liftAlgHom (M := Submonoid.powers h) (S := C') (f := χC) hunit2
+  let χ : C' →ₐ[O] B :=
+    IsLocalization.liftAlgHom (M := Submonoid.powers h) (S := C') (f := χC) hunit2
   have hχ : ∀ x : C, χ (algebraMap C C' x) = χC x := fun x => by
     first
     | exact IsLocalization.lift_eq (M := Submonoid.powers h) (S := C') _ x
@@ -159,9 +169,21 @@ theorem smooth_away_core (O : Type) [CommRing O] (ϖ : O) (σ : Type) [Finite σ
   have hs : Algebra.Smooth F B := ⟨inferInstance, inferInstance⟩
   exact hs
 
-theorem smooth_generic_fibre : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O), Irreducible ϖ → ∀ (m r : ℕ), 1 ≤ r → r ≤ m → ∀ (F : Type) [Field F] [Algebra O F] [IsLocalization.Away ϖ F], (IsLocalization.Away.map F (Localization.Away (algebraMap O (MvPolynomial (Fin m) O ⧸ Ideal.span {(∏ i ∈ Finset.univ.filter (fun i : Fin m => (i : ℕ) < r), MvPolynomial.X i) - MvPolynomial.C ϖ}) ϖ)) (algebraMap O (MvPolynomial (Fin m) O ⧸ Ideal.span {(∏ i ∈ Finset.univ.filter (fun i : Fin m => (i : ℕ) < r), MvPolynomial.X i) - MvPolynomial.C ϖ})) ϖ).Smooth := by
+theorem smooth_generic_fibre
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O),
+      Irreducible ϖ
+        → ∀ (m r : ℕ),
+          1 ≤ r → r ≤ m
+            → ∀ (F : Type) [Field F] [Algebra O F] [IsLocalization.Away ϖ F],
+              (IsLocalization.Away.map F
+                (Localization.Away (algebraMap O
+                  (MvPolynomial (Fin m) O ⧸ Ideal.span {(∏ i ∈ Finset.univ.filter (fun i : Fin m => (i : ℕ) < r), MvPolynomial.X i) - MvPolynomial.C ϖ})
+                  ϖ))
+                (algebraMap O
+                  (MvPolynomial (Fin m) O ⧸ Ideal.span {(∏ i ∈ Finset.univ.filter (fun i : Fin m => (i : ℕ) < r), MvPolynomial.X i) - MvPolynomial.C ϖ}))
+                ϖ).Smooth := by
   intro O _ _ _ ϖ _ m r hr1 hrm F _ _ _
-  exact smooth_away_core O ϖ (Fin m) (Finset.univ.filter (fun i : Fin m => (i : ℕ) < r)) ⟨0, by omega⟩
-    (Finset.mem_filter.mpr ⟨Finset.mem_univ _, show (0 : ℕ) < r by omega⟩) F
+  exact smooth_away_core O ϖ (Fin m) (Finset.univ.filter (fun i : Fin m => (i : ℕ) < r))
+    ⟨0, by omega⟩ (Finset.mem_filter.mpr ⟨Finset.mem_univ _, show (0 : ℕ) < r by omega⟩) F
 
 end GlobalTheory.CompanionTheory.Semistable

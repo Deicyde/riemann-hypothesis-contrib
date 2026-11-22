@@ -23,19 +23,23 @@ namespace PLC
 
 variable {e : ℕ} {X : Type} [TopologicalSpace X]
 
-theorem continuous_of_smooth (A : FinHolAtlas e X) {f : X → ℝ} (hf : A.Smooth f) :
-    Continuous f := by
+theorem continuous_of_smooth (A : FinHolAtlas e X) {f : X → ℝ} (hf : A.Smooth f)
+    : Continuous f := by
   exact st_smooth_continuous A hf
 
-theorem locDens_congr_phi (A : FinHolAtlas e X) (Φ Ψ : Fin e → LocPot X)
-    (h : ∀ i a b, (Φ i).φ a b = (Ψ i).φ a b) (j : Fin A.n) (y : Fin e → ℂ) :
-    locDens A Φ j y = locDens A Ψ j y := by
+theorem locDens_congr_phi
+    (A : FinHolAtlas e X)
+    (Φ Ψ : Fin e → LocPot X) (h : ∀ i a b, (Φ i).φ a b = (Ψ i).φ a b)
+    (j : Fin A.n) (y : Fin e → ℂ)
+    : locDens A Φ j y = locDens A Ψ j y := by
   simp only [locDens, h]
 
-theorem mInt_congr (A : FinHolAtlas e X) (Φ Ψ : Fin e → LocPot X) (g g' : X → ℝ)
-    (h : ∀ j, ∀ᵐ y ∂(volume.restrict (A.chart j).target),
-      g ((A.chart j).symm y) * locDens A Φ j y = g' ((A.chart j).symm y) * locDens A Ψ j y) :
-    mInt A Φ g = mInt A Ψ g' := by
+theorem mInt_congr
+    (A : FinHolAtlas e X) (Φ Ψ : Fin e → LocPot X) (g g' : X → ℝ)
+    (h : ∀ j,
+      ∀ᵐ y ∂(volume.restrict (A.chart j).target),
+        g ((A.chart j).symm y) * locDens A Φ j y = g' ((A.chart j).symm y) * locDens A Ψ j y)
+    : mInt A Φ g = mInt A Ψ g' := by
   unfold mInt
   split_ifs with hP
   · unfold integralWith
@@ -45,10 +49,13 @@ theorem mInt_congr (A : FinHolAtlas e X) (Φ Ψ : Fin e → LocPot X) (g g' : X 
     rw [mul_assoc, hy, ← mul_assoc]
   · rfl
 
-theorem mInt_congr_phi (A : FinHolAtlas e X) (Φ Ψ : Fin e → LocPot X)
-    (h : ∀ i a b, (Φ i).φ a b = (Ψ i).φ a b) (g : X → ℝ) : mInt A Φ g = mInt A Ψ g :=
-  mInt_congr A Φ Ψ g g (fun j => Filter.Eventually.of_forall (fun y => by
-    rw [locDens_congr_phi A Φ Ψ h j y]))
+theorem mInt_congr_phi
+    (A : FinHolAtlas e X)
+    (Φ Ψ : Fin e → LocPot X) (h : ∀ i a b, (Φ i).φ a b = (Ψ i).φ a b)
+    (g : X → ℝ)
+    : mInt A Φ g = mInt A Ψ g :=
+  mInt_congr A Φ Ψ g g
+    (fun j => Filter.Eventually.of_forall (fun y => by rw [locDens_congr_phi A Φ Ψ h j y]))
 
 end PLC
 

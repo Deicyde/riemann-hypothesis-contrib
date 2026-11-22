@@ -17,10 +17,14 @@ variable {k : Type*} [Field k] {n : Type*} [Fintype n] [DecidableEq n] {c : ℕ}
 theorem inN_tri {p : ℕ} {g : GL (n ⊕ Fin c) k} (hg : InN p g) : g.val.BlockTriangular (lev p) := by
   intro r s h
   rw [hg r s h.le, Matrix.one_apply_ne]
-  rintro rfl; exact lt_irrefl _ h
+  rintro rfl
+  exact lt_irrefl _ h
 
-theorem mul_entry {p : ℕ} {g : GL (n ⊕ Fin c) k} (hg : InN p g) {h : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k}
-    (hh : h.BlockTriangular (lev p)) (r s) (hrs : lev p s ≤ lev p r) : (g.val * h) r s = h r s := by
+theorem mul_entry
+    {p : ℕ} {g : GL (n ⊕ Fin c) k} (hg : InN p g)
+    {h : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k} (hh : h.BlockTriangular (lev p))
+    (r s) (hrs : lev p s ≤ lev p r)
+    : (g.val * h) r s = h r s := by
   have : (g.val * h) r s = ((1 : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k) * h) r s := by
     simp only [Matrix.mul_apply]
     refine Finset.sum_congr rfl fun t _ => ?_
@@ -29,7 +33,8 @@ theorem mul_entry {p : ℕ} {g : GL (n ⊕ Fin c) k} (hg : InN p g) {h : Matrix 
     · rw [hh (show lev p s < lev p t by omega)]; simp
   rw [this, Matrix.one_mul]
 
-def Nsub (k : Type*) [Field k] (n : Type*) [Fintype n] [DecidableEq n] (c p : ℕ) : Subgroup (GL (n ⊕ Fin c) k) where
+def Nsub (k : Type*) [Field k] (n : Type*) [Fintype n] [DecidableEq n] (c p : ℕ)
+    : Subgroup (GL (n ⊕ Fin c) k) where
   carrier := {g | InN p g}
   one_mem' := fun _ _ _ => rfl
   mul_mem' := fun {a b} ha hb r s hrs => by
@@ -43,18 +48,21 @@ def Nsub (k : Type*) [Field k] (n : Type*) [Fintype n] [DecidableEq n] (c p : �
 
 theorem mem_N_iff {p : ℕ} {g : GL (n ⊕ Fin c) k} : g ∈ N k n c p ↔ InN p g := by
   have : N k n c p = Nsub k n c p := Subgroup.closure_eq (Nsub k n c p)
-  rw [this]; rfl
+  rw [this]
+  rfl
 
-theorem conj_mem {p : ℕ} {u : GL (n ⊕ Fin c) k} (hu : u ∈ N k n c p) (g : GL n k) :
-    (embX c g)⁻¹ * u * embX c g ∈ N k n c p := by
+theorem conj_mem {p : ℕ} {u : GL (n ⊕ Fin c) k} (hu : u ∈ N k n c p) (g : GL n k)
+    : (embX c g)⁻¹ * u * embX c g ∈ N k n c p := by
   rw [mem_N_iff] at hu ⊢
   rw [← map_inv]
   have h11 : u.val.toBlocks₁₁ = 1 := by
     ext r s
     have := hu (Sum.inl r) (Sum.inl s) le_rfl
     simpa [Matrix.one_apply, toBlocks₁₁] using this
-  have hv : ((embX c g⁻¹) * u * embX c g).val = fromBlocks 1 ((g⁻¹).val * u.val.toBlocks₁₂)
-      (u.val.toBlocks₂₁ * g.val) u.val.toBlocks₂₂ := by
+  have hv
+      : ((embX c g⁻¹) * u * embX c g).val
+        = fromBlocks 1 ((g⁻¹).val * u.val.toBlocks₁₂) (u.val.toBlocks₂₁ * g.val)
+          u.val.toBlocks₂₂ := by
     rw [Units.val_mul, Units.val_mul, ← fromBlocks_toBlocks u.val, h11]
     simp [embX, fromBlocks_multiply]
   rintro (r | r) (s | s) h <;> rw [hv]
@@ -67,12 +75,12 @@ theorem conj_mem {p : ℕ} {u : GL (n ⊕ Fin c) k} (hu : u ∈ N k n c p) (g : 
     simp [Matrix.mul_apply, toBlocks₂₁, this]
   · simpa [toBlocks₂₂] using hu (Sum.inr r) (Sum.inr s) h
 
-def mkN (p : ℕ) (e : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2} → k) :
-    Matrix (n ⊕ Fin c) (n ⊕ Fin c) k :=
+def mkN (p : ℕ) (e : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2} → k)
+    : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k :=
   Matrix.of fun r s => if h : lev p r < lev p s then e ⟨(r, s), h⟩ else (1 : Matrix _ _ k) r s
 
-theorem det_mkN (p : ℕ) (e : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2} → k) :
-    (mkN p e).det = 1 := by
+theorem det_mkN (p : ℕ) (e : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2} → k)
+    : (mkN p e).det = 1 := by
   have ht : (mkN p e).BlockTriangular (lev p) := by
     intro r s h
     have : r ≠ s := by rintro rfl; exact lt_irrefl _ h
@@ -84,23 +92,28 @@ theorem det_mkN (p : ℕ) (e : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.
     simp [toSquareBlock_def, mkN, hr, hs, Matrix.one_apply]
   rw [this, det_one]
 
-def mkNel (p : ℕ) (e : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2} → k) : N k n c p :=
-  ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero (mkN p e) (by rw [det_mkN]; exact one_ne_zero), by
+def mkNel (p : ℕ) (e : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2} → k)
+    : N k n c p := ⟨
+  Matrix.GeneralLinearGroup.mkOfDetNeZero (mkN p e) (by rw [det_mkN]; exact one_ne_zero),
+  by
     rw [mem_N_iff]
     intro r s h
     show mkN p e r s = _
-    simp [mkN, not_lt.2 h]⟩
+    simp [mkN, not_lt.2 h]
+⟩
 
 section meas
 variable [MeasurableSpace k]
 
-theorem coord_embedding (p : ℕ) : MeasurableEmbedding
-    (fun (g : N k n c p) (rs : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2}) =>
-      (g : GL (n ⊕ Fin c) k).val rs.1.1 rs.1.2) ∧ Function.Surjective
-    (fun (g : N k n c p) (rs : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2}) =>
-      (g : GL (n ⊕ Fin c) k).val rs.1.1 rs.1.2) := by
-  have hs : Function.Surjective
-      (fun (g : N k n c p) (rs : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2}) =>
+theorem coord_embedding (p : ℕ)
+    : MeasurableEmbedding (fun (g : N k n c p)
+          (rs : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2}) =>
+        (g : GL (n ⊕ Fin c) k).val rs.1.1 rs.1.2)
+      ∧ Function.Surjective (fun (g : N k n c p)
+          (rs : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2}) =>
+        (g : GL (n ⊕ Fin c) k).val rs.1.1 rs.1.2) := by
+  have hs : Function.Surjective (fun (g : N k n c p)
+        (rs : {rs : (n ⊕ Fin c) × (n ⊕ Fin c) // lev p rs.1 < lev p rs.2}) =>
       (g : GL (n ⊕ Fin c) k).val rs.1.1 rs.1.2) := by
     intro e
     refine ⟨mkNel p e, ?_⟩
@@ -132,6 +145,5 @@ theorem coord_embedding (p : ℕ) : MeasurableEmbedding
 end meas
 
 variable [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-
 
 end GlobalTheory.RootEx.Model

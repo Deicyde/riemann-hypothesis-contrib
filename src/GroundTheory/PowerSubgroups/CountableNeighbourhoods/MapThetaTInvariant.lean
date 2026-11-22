@@ -50,8 +50,8 @@ end LocalField
 
 section GeneralLinear
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ}
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
 lemma secondCountableTopology_GL : SecondCountableTopology (GL (Fin n) F) := by
   have := secondCountableTopology F
@@ -61,7 +61,6 @@ lemma secondCountableTopology_GL : SecondCountableTopology (GL (Fin n) F) := by
     (MulOpposite.opHomeomorph (M := Matrix (Fin n) (Fin n) F)).symm.isEmbedding.isInducing.secondCountableTopology
   exact Units.isEmbedding_embedProduct.isInducing.secondCountableTopology
 
-
 open GroundTheory.Automorphic.ContragredientTranspose in
 lemma continuous_transposeGL {F : Type*} [Field F] [TopologicalSpace F] {n : ℕ} :
     Continuous (transposeGL : GL (Fin n) F → GL (Fin n) F) := by
@@ -69,13 +68,12 @@ lemma continuous_transposeGL {F : Type*} [Field F] [TopologicalSpace F] {n : ℕ
   · exact Units.continuous_val.matrix_transpose
   · exact Units.continuous_coe_inv.matrix_transpose
 
-
 open GroundTheory.Automorphic.ContragredientTranspose in
-noncomputable def thetaTContinuous : GL (Fin n) F ≃ₜ* GL (Fin n) F :=
-  { (thetaT : GL (Fin n) F ≃* GL (Fin n) F) with
-    continuous_toFun := continuous_transposeGL.inv
-    continuous_invFun := continuous_transposeGL.inv }
-
+noncomputable def thetaTContinuous : GL (Fin n) F ≃ₜ* GL (Fin n) F := {
+  (thetaT : GL (Fin n) F ≃* GL (Fin n) F) with
+  continuous_toFun := continuous_transposeGL.inv
+  continuous_invFun := continuous_transposeGL.inv
+}
 
 open GroundTheory.Automorphic.ContragredientTranspose in
 lemma thetaT_thetaT {F : Type*} [Field F] {n : ℕ} (g : GL (Fin n) F) :
@@ -88,12 +86,12 @@ end MapThetaTInvariant
 
 open MapThetaTInvariant
 
-
 open GroundTheory.Automorphic.ContragredientTranspose in
-theorem map_thetaT_eq_self {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] {n : ℕ} [MeasurableSpace (GL (Fin n) F)]
-    [BorelSpace (GL (Fin n) F)] (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] :
-    Measure.map (⇑thetaT) μ = μ := by
+theorem map_thetaT_eq_self
+    {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {n : ℕ} [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)]
+    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    : Measure.map (⇑thetaT) μ = μ := by
   have := secondCountableTopology_GL (F := F) (n := n)
   set θ : GL (Fin n) F ≃ₜ* GL (Fin n) F := thetaTContinuous
   have hθ : ⇑(thetaT : GL (Fin n) F ≃* GL (Fin n) F) = ⇑θ := rfl

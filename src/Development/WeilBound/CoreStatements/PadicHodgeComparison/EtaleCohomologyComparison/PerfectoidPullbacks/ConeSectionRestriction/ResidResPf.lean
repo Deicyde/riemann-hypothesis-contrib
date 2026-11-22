@@ -14,18 +14,18 @@ namespace CrystallineSemistableComparison.Pb
 
 variable {K : Type} [Field K] {R : Type} [CommRing R] [Algebra K R] {n : ℕ}
 
-theorem resRPf_tpow_add (t : Fin (n + 1) → Rˣ) (m m' : Fin (n + 1) → ℤ) :
-    tpow t (m + m') = tpow t m * tpow t m' := by
+theorem resRPf_tpow_add (t : Fin (n + 1) → Rˣ) (m m' : Fin (n + 1) → ℤ)
+    : tpow t (m + m') = tpow t m * tpow t m' := by
   simp only [tpow, Pi.add_apply, zpow_add, Finset.prod_mul_distrib, Units.val_mul]
 
-theorem resRPf_tpow_negOne (t : Fin (n + 1) → Rˣ) :
-    tpow t (fun _ => -1) = (((∏ k, t k)⁻¹ : Rˣ) : R) := by
+theorem resRPf_tpow_negOne (t : Fin (n + 1) → Rˣ)
+    : tpow t (fun _ => -1) = (((∏ k, t k)⁻¹ : Rˣ) : R) := by
   unfold tpow
   congr 1
   simp only [zpow_neg_one, Finset.prod_inv_distrib]
 
-theorem resRPf_tpow_single (t : Fin (n + 1) → Rˣ) (k : Fin (n + 1)) :
-    tpow t (-Pi.single k (1 : ℤ)) = (((t k)⁻¹ : Rˣ) : R) := by
+theorem resRPf_tpow_single (t : Fin (n + 1) → Rˣ) (k : Fin (n + 1))
+    : tpow t (- Pi.single k (1 : ℤ)) = (((t k)⁻¹ : Rˣ) : R) := by
   unfold tpow
   congr 1
   rw [Finset.prod_eq_single k]
@@ -35,8 +35,8 @@ theorem resRPf_tpow_single (t : Fin (n + 1) → Rˣ) (k : Fin (n + 1)) :
   · intro h
     exact absurd (Finset.mem_univ k) h
 
-theorem resRPf_linInd (t : Fin (n + 1) → Rˣ) (ht : AlgebraicIndependent K fun k => (t k : R)) :
-    LinearIndependent K (tpow t) := by
+theorem resRPf_linInd (t : Fin (n + 1) → Rˣ) (ht : AlgebraicIndependent K fun k => (t k : R))
+    : LinearIndependent K (tpow t) := by
   classical
   rw [linearIndependent_iff']
   intro s g hg m0 hm0
@@ -46,16 +46,21 @@ theorem resRPf_linInd (t : Fin (n + 1) → Rˣ) (ht : AlgebraicIndependent K fun
     have h1 : |m j| ≤ ∑ j, |m j| :=
       Finset.single_le_sum (f := fun j => |m j|) (fun j _ => abs_nonneg _) (Finset.mem_univ j)
     have h2 : ∑ j, |m j| ≤ N :=
-      Finset.single_le_sum (f := fun m : Fin (n + 1) → ℤ => ∑ j, |m j|)
-        (fun m _ => Finset.sum_nonneg (fun j _ => abs_nonneg _)) hm
+      Finset.single_le_sum
+        (f := fun m : Fin (n + 1) → ℤ => ∑ j, |m j|)
+        (fun m _ => Finset.sum_nonneg (fun j _ => abs_nonneg _))
+        hm
     have h3 := neg_abs_le (m j)
     linarith
-  let e : (Fin (n + 1) → ℤ) → (Fin (n + 1) →₀ ℕ) :=
-    fun m => Finsupp.equivFunOnFinite.symm (fun j => (m j + N).toNat)
-  have he : ∀ m ∈ s, tpow t (m + fun _ => N) =
-      MvPolynomial.aeval (fun k => (t k : R)) (MvPolynomial.monomial (e m) (1 : K)) := by
+  let e : (Fin (n + 1) → ℤ) → (Fin (n + 1) →₀ ℕ) := fun m =>
+    Finsupp.equivFunOnFinite.symm (fun j => (m j + N).toNat)
+  have he
+      : ∀ m ∈ s,
+        tpow t (m + fun _ => N)
+          = MvPolynomial.aeval (fun k => (t k : R)) (MvPolynomial.monomial (e m) (1 : K)) := by
     intro m hm
-    rw [MvPolynomial.aeval_monomial, map_one, one_mul, Finsupp.prod_fintype _ _ (fun i => pow_zero _)]
+    rw [MvPolynomial.aeval_monomial, map_one, one_mul,
+      Finsupp.prod_fintype _ _ (fun i => pow_zero _)]
     unfold tpow
     rw [Units.coe_prod]
     refine Finset.prod_congr rfl (fun j _ => ?_)
@@ -99,34 +104,41 @@ def resRPfLogD (D : Derivation K R R) : Rˣ →* Multiplicative R where
     simp only [mul_inv_rev, Units.val_mul, Derivation.leibniz, smul_eq_mul]
     linear_combination ((((v⁻¹ : Rˣ)) : R) * D (v : R)) * hu + ((((u⁻¹ : Rˣ)) : R) * D (u : R)) * hv
 
-theorem resRPfLogD_apply (D : Derivation K R R) (u : Rˣ) :
-    Multiplicative.toAdd (resRPfLogD D u) = (((u⁻¹ : Rˣ)) : R) * D (u : R) := rfl
+theorem resRPfLogD_apply (D : Derivation K R R) (u : Rˣ)
+    : Multiplicative.toAdd (resRPfLogD D u) = (((u⁻¹ : Rˣ)) : R) * D (u : R) :=
+  rfl
 
-theorem resRPf_logD (t : Fin (n + 1) → Rˣ) (D : Derivation K R R) (m : Fin (n + 1) → ℤ) :
-    (((∏ j, t j ^ m j)⁻¹ : Rˣ) : R) * D (tpow t m) =
-      ∑ j, m j • ((((t j)⁻¹ : Rˣ) : R) * D (t j : R)) := by
+theorem resRPf_logD (t : Fin (n + 1) → Rˣ) (D : Derivation K R R) (m : Fin (n + 1) → ℤ)
+    : (((∏ j, t j ^ m j)⁻¹ : Rˣ) : R) * D (tpow t m)
+      = ∑ j, m j • ((((t j)⁻¹ : Rˣ) : R) * D (t j : R)) := by
   have h := congrArg Multiplicative.toAdd (map_prod (resRPfLogD D) (fun j => t j ^ m j) Finset.univ)
   simp only [map_zpow, toAdd_prod, toAdd_zpow, resRPfLogD_apply] at h
   exact h
 
-theorem resRPf_Dk (t : Fin (n + 1) → Rˣ) (D : Fin (n + 1) → Derivation K R R)
-    (hD : ∀ k j, D k (t j) = if k = j then 1 else 0) (k : Fin (n + 1)) (m : Fin (n + 1) → ℤ) :
-    D k (tpow t m) = m k • tpow t (m - Pi.single k (1 : ℤ)) := by
+theorem resRPf_Dk
+    (t : Fin (n + 1) → Rˣ) (D : Fin (n + 1) → Derivation K R R)
+    (hD : ∀ k j, D k (t j) = if k = j then 1 else 0)
+    (k : Fin (n + 1)) (m : Fin (n + 1) → ℤ)
+    : D k (tpow t m) = m k • tpow t (m - Pi.single k (1 : ℤ)) := by
   have h := resRPf_logD t (D k) m
-  simp only [hD, mul_ite, mul_one, mul_zero, smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ,
-    if_true] at h
+  simp only [hD, mul_ite, mul_one, mul_zero, smul_ite, smul_zero, Finset.sum_ite_eq,
+      Finset.mem_univ, if_true]
+    at h
   have hU : tpow t m * (((∏ j, t j ^ m j)⁻¹ : Rˣ) : R) = 1 := Units.mul_inv _
-  calc D k (tpow t m) = tpow t m * ((((∏ j, t j ^ m j)⁻¹ : Rˣ) : R) * D k (tpow t m)) := by
-        rw [← mul_assoc, hU, one_mul]
+  calc
+    D k (tpow t m) = tpow t m * ((((∏ j, t j ^ m j)⁻¹ : Rˣ) : R) * D k (tpow t m)) := by
+      rw [← mul_assoc, hU, one_mul]
     _ = tpow t m * (m k • (((t k)⁻¹ : Rˣ) : R)) := by rw [h]
     _ = m k • tpow t (m - Pi.single k (1 : ℤ)) := by
-        rw [mul_smul_comm, sub_eq_add_neg, resRPf_tpow_add, resRPf_tpow_single]
+      rw [mul_smul_comm, sub_eq_add_neg, resRPf_tpow_add, resRPf_tpow_single]
 
-theorem res_R_pf (t : Fin (n + 1) → Rˣ) (ht : AlgebraicIndependent K fun k => (t k : R))
-    (D : Fin (n + 1) → Derivation K R R) (hD : ∀ k j, D k (t j) = if k = j then 1 else 0) :
-    ∃ res : R →ₗ[K] K, res (((∏ k, t k)⁻¹ : Rˣ) : R) = 1 ∧
-      (∀ x ∈ Submodule.span K (tpow t '' {m | m ≠ fun _ => -1}), res x = 0) ∧
-      ∀ k, ∀ x ∈ torusS K t Finset.univ, res (D k x) = 0 := by
+theorem res_R_pf
+    (t : Fin (n + 1) → Rˣ) (ht : AlgebraicIndependent K fun k => (t k : R))
+    (D : Fin (n + 1) → Derivation K R R) (hD : ∀ k j, D k (t j) = if k = j then 1 else 0)
+    : ∃ res : R →ₗ[K] K,
+      res (((∏ k, t k)⁻¹ : Rˣ) : R) = 1
+        ∧ (∀ x ∈ Submodule.span K (tpow t '' {m | m ≠ fun _ => -1}), res x = 0)
+        ∧ ∀ k, ∀ x ∈ torusS K t Finset.univ, res (D k x) = 0 := by
   classical
   have hli := resRPf_linInd (K := K) t ht
   obtain ⟨res, hres⟩ := LinearMap.exists_extend ((Module.Basis.span hli).coord (fun _ => -1))
@@ -151,14 +163,16 @@ theorem res_R_pf (t : Fin (n + 1) → Rˣ) (ht : AlgebraicIndependent K fun k =>
       rw [torusS, Algebra.adjoin_eq_span] at h1
       refine Submodule.span_mono ?_ h1
       intro y hy
-      let M : Submonoid R :=
-        { carrier := Set.range (tpow t)
-          mul_mem' := by
-            rintro _ _ ⟨a, rfl⟩ ⟨b, rfl⟩
-            exact ⟨a + b, resRPf_tpow_add t a b⟩
-          one_mem' := ⟨0, by simp [tpow]⟩ }
+      let M : Submonoid R := {
+        carrier := Set.range (tpow t)
+        mul_mem' := by
+          rintro _ _ ⟨a, rfl⟩ ⟨b, rfl⟩
+          exact ⟨a + b, resRPf_tpow_add t a b⟩
+        one_mem' := ⟨0, by simp [tpow]⟩
+      }
       exact (Submonoid.closure_le (S := M)).2 (Set.image_subset_range _ _) hy
-    have hker : Submodule.span K (Set.range (tpow t)) ≤ LinearMap.ker (res ∘ₗ (D k : R →ₗ[K] R)) := by
+    have hker
+        : Submodule.span K (Set.range (tpow t)) ≤ LinearMap.ker (res ∘ₗ (D k : R →ₗ[K] R)) := by
       rw [Submodule.span_le]
       rintro _ ⟨m, rfl⟩
       rw [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.comp_apply, Derivation.coeFn_coe,

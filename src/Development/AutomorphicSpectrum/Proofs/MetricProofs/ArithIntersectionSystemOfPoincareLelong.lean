@@ -43,12 +43,15 @@ theorem contractMixed_closed : ContractMixedStatement :=
       (by intros; exact Targets.ProjContract.full _ _ _ _ _))
     hIntZero hVert
 
-theorem arithIntersectionSystem_of_poincareLelong_resK :
-    GlobalTheory.CompanionTheory.Ar.Pub.PoincareLelong → ReciprocityTheory.ChartRestriction.G.Geo.ResK.ResKStatement →
-      ReciprocityTheory.ChartRestriction.G.Geo.ArithIntersectionSystemStatement := fun hPL hRK =>
+theorem arithIntersectionSystem_of_poincareLelong_resK
+    : GlobalTheory.CompanionTheory.Ar.Pub.PoincareLelong
+      → ReciprocityTheory.ChartRestriction.G.Geo.ResK.ResKStatement
+      → ReciprocityTheory.ChartRestriction.G.Geo.ArithIntersectionSystemStatement := fun hPL hRK =>
   Targets.ArithIntersectionSystem.of_found
-    (GlobalTheory.T.intersection_exists_of_poincare_lelong hPL (GlobalTheory.T.resolution_exists_of_resolution_statement hRK))
-    (GlobalTheory.T.degree_and_coordinates_of_resolution (GlobalTheory.T.resolution_exists_of_resolution_statement hRK)).2
+    (GlobalTheory.T.intersection_exists_of_poincare_lelong hPL
+      (GlobalTheory.T.resolution_exists_of_resolution_statement hRK))
+    (GlobalTheory.T.degree_and_coordinates_of_resolution
+      (GlobalTheory.T.resolution_exists_of_resolution_statement hRK)).2
     contractMixed_closed
 
 end GlobalTheory.CompanionTheory.Ar.Pub

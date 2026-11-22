@@ -15,21 +15,25 @@ variable {A Λ : Type*} [CommRing A] [Ring Λ] [Algebra A Λ] {ι : Type*} [Fint
 def structMat (b : Basis ι A Λ) : Matrix (ι × ι) (ι × ι) A :=
   LinearMap.toMatrix (b.tensorProduct b.mulOpposite) b.end (AlgHom.mulLeftRight A Λ).toLinearMap
 
-theorem stdBasis_repr_apply' (M : Matrix ι ι A) (k l : ι) :
-    (Matrix.stdBasis A ι ι).repr M (k, l) = M k l := rfl
+theorem stdBasis_repr_apply' (M : Matrix ι ι A) (k l : ι)
+    : (Matrix.stdBasis A ι ι).repr M (k, l) = M k l :=
+  rfl
 
-theorem repr_equiv_apply {M N : Type*} [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
-    {κ : Type*} (b₁ : Basis κ A M) (b₂ : Basis κ A N) (x : M) :
-    b₂.repr (b₁.equiv b₂ (Equiv.refl κ) x) = b₁.repr x := by
+theorem repr_equiv_apply
+    {M N : Type*} [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
+    {κ : Type*} (b₁ : Basis κ A M) (b₂ : Basis κ A N)
+    (x : M)
+    : b₂.repr (b₁.equiv b₂ (Equiv.refl κ) x) = b₁.repr x := by
   simp [Basis.equiv]
 
-theorem structMat_apply (b : Basis ι A Λ) (k l i j : ι) :
-    structMat b (k, l) (i, j) = b.repr (b i * b l * b j) k := by
+theorem structMat_apply (b : Basis ι A Λ) (k l i j : ι)
+    : structMat b (k, l) (i, j) = b.repr (b i * b l * b j) k := by
   rw [structMat, LinearMap.toMatrix_apply]
-  simp [Basis.end_repr_apply, Basis.tensorProduct_apply, LinearMap.toMatrix_apply, stdBasis_repr_apply']
+  simp [Basis.end_repr_apply, Basis.tensorProduct_apply, LinearMap.toMatrix_apply,
+    stdBasis_repr_apply']
 
-theorem bijective_iff_isUnit_det (b : Basis ι A Λ) :
-    Function.Bijective (AlgHom.mulLeftRight A Λ) ↔ IsUnit (structMat b).det := by
+theorem bijective_iff_isUnit_det (b : Basis ι A Λ)
+    : Function.Bijective (AlgHom.mulLeftRight A Λ) ↔ IsUnit (structMat b).det := by
   set c := b.tensorProduct b.mulOpposite
   set f := (AlgHom.mulLeftRight A Λ).toLinearMap
   haveI := Module.Free.of_basis c

@@ -5,18 +5,34 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne
 
 namespace GlobalTheory.WeilDeligne
 
-theorem exists_monic_base_root_near : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω), (∀ z : Ω, (∀ d ∈ Dec (F := E) A, d z = z) → ∀ r : Ω, r ≠ 0 → ∃ e : E, A.valuation (algebraMap E Ω e - z) < A.valuation r) → ∀ f : Polynomial Ω, f.Monic → (∀ d ∈ Dec (F := E) A, ∀ i, d (f.coeff i) = f.coeff i) → ∀ β : Ω, f.eval β = 0 → ∀ r : Ω, r ≠ 0 → ∃ g : Polynomial E, g.Monic ∧ g.natDegree = f.natDegree ∧ ∃ β' : Ω, aeval β' g = 0 ∧ A.valuation (β' - β) < A.valuation r := by
+theorem exists_monic_base_root_near
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω),
+      (∀ z : Ω,
+          (∀ d ∈ Dec (F := E) A, d z = z)
+            → ∀ r : Ω, r ≠ 0 → ∃ e : E, A.valuation (algebraMap E Ω e - z) < A.valuation r)
+        → ∀ f : Polynomial Ω,
+          f.Monic → (∀ d ∈ Dec (F := E) A, ∀ i, d (f.coeff i) = f.coeff i)
+            → ∀ β : Ω,
+              f.eval β = 0
+                → ∀ r : Ω,
+                  r ≠ 0
+                    → ∃ g : Polynomial E,
+                      g.Monic ∧ g.natDegree = f.natDegree
+                        ∧ ∃ β' : Ω, aeval β' g = 0 ∧ A.valuation (β' - β) < A.valuation r := by
   intro E Ω _ _ _ _ _ A hdense f hf hfix β hβ r hr
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   set n := f.natDegree with hn
   have hvr : A.valuation r ≠ 0 := (Valuation.ne_zero_iff _).mpr hr
   have hvrn : A.valuation r ^ n ≠ 0 := pow_ne_zero _ hvr
-  have happ : ∀ i, ∃ e : E,
-      A.valuation (algebraMap E Ω e - f.coeff i) * A.valuation β ^ i < A.valuation r ^ n := by
+  have happ
+      : ∀ i, ∃ e : E,
+        A.valuation (algebraMap E Ω e - f.coeff i) * A.valuation β ^ i < A.valuation r ^ n := by
     intro i
     by_cases hb : β = 0
     · rcases Nat.eq_zero_or_pos i with rfl | hi
@@ -26,15 +42,17 @@ theorem exists_monic_base_root_near : ∀ (E Ω : Type) [Field E] [NumberField E
         simp only [hb, map_zero, zero_pow hi.ne', mul_zero]
         exact zero_lt_iff.mpr hvrn
     · have hbi : β ^ i ≠ 0 := pow_ne_zero _ hb
-      obtain ⟨e, he⟩ := hdense (f.coeff i) (fun d hd => hfix d hd i) (r ^ n / β ^ i)
-        (div_ne_zero (pow_ne_zero _ hr) hbi)
+      obtain ⟨e, he⟩ :=
+        hdense (f.coeff i)
+          (fun d hd => hfix d hd i)
+          (r ^ n / β ^ i) (div_ne_zero (pow_ne_zero _ hr) hbi)
       refine ⟨e, ?_⟩
-      have hvb : A.valuation β ^ i ≠ 0 := by
-        rw [← map_pow]; exact (Valuation.ne_zero_iff _).mpr hbi
+      have hvb : A.valuation β ^ i ≠ 0 := by rw [← map_pow]; exact (Valuation.ne_zero_iff _).mpr hbi
       rw [map_div₀, map_pow, map_pow] at he
-      calc A.valuation (algebraMap E Ω e - f.coeff i) * A.valuation β ^ i
-          < A.valuation r ^ n / A.valuation β ^ i * A.valuation β ^ i :=
-            mul_lt_mul_of_pos_right he (zero_lt_iff.mpr hvb)
+      calc
+        A.valuation (algebraMap E Ω e - f.coeff i) * A.valuation β ^ i
+            < A.valuation r ^ n / A.valuation β ^ i * A.valuation β ^ i :=
+          mul_lt_mul_of_pos_right he (zero_lt_iff.mpr hvb)
         _ = A.valuation r ^ n := div_mul_cancel₀ _ hvb
   choose c hc using happ
   let p : E[X] := ∑ i : Fin n, C (c i) * X ^ (i : ℕ)
@@ -59,7 +77,8 @@ theorem exists_monic_base_root_near : ∀ (E Ω : Type) [Field E] [NumberField E
   have hvg : A.valuation (aeval β g) < A.valuation r ^ n := by
     rw [hgβ]
     refine Valuation.map_sum_lt _ hvrn fun i _ => ?_
-    rw [map_mul, map_pow]; exact hc i
+    rw [map_mul, map_pow]
+    exact hc i
   set G := g.map (algebraMap E Ω) with hG
   have hGm : G.Monic := hgm.map _
   have hGd : G.natDegree = n := by rw [hG, natDegree_map, hgd]
@@ -77,9 +96,11 @@ theorem exists_monic_base_root_near : ∀ (E Ω : Type) [Field E] [NumberField E
       rw [hev, map_multiset_prod, Multiset.map_map]
       have hcard : (G.roots.map (A.valuation ∘ fun a => β - a)).card = n := by
         rw [Multiset.card_map, IsAlgClosed.card_roots_eq_natDegree, hGd]
-      calc A.valuation r ^ n = A.valuation r ^ (G.roots.map (A.valuation ∘ fun a => β - a)).card := by
-            rw [hcard]
-        _ ≤ _ := Multiset.pow_card_le_prod (by
+      calc
+        A.valuation r ^ n
+          = A.valuation r ^ (G.roots.map (A.valuation ∘ fun a => β - a)).card := by rw [hcard]
+        _ ≤ _ :=
+          Multiset.pow_card_le_prod (by
             intro x hx
             obtain ⟨a, ha, rfl⟩ := Multiset.mem_map.mp hx
             exact hcon a ha)
@@ -87,7 +108,8 @@ theorem exists_monic_base_root_near : ∀ (E Ω : Type) [Field E] [NumberField E
   obtain ⟨a, ha, hva⟩ := hex
   refine ⟨g, hgm, hgd, a, ?_, ?_⟩
   · have := (mem_roots hGm.ne_zero).mp ha
-    rw [aeval_def, ← eval_map]; exact this
+    rw [aeval_def, ← eval_map]
+    exact this
   · rwa [Valuation.map_sub_swap]
 
 end GlobalTheory.WeilDeligne

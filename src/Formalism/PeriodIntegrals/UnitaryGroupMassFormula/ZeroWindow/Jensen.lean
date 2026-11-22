@@ -34,9 +34,12 @@ theorem jensenCount : JensenCount := by
   have hDnn : 0 ≤ MeromorphicOn.divisor f (closedBall c |(19 / 10 : ℝ)|) :=
     MeromorphicOn.AnalyticOnNhd.divisor_nonneg hf'
   have hfin : (MeromorphicOn.divisor f (closedBall c |(19 / 10 : ℝ)|)).support.Finite :=
-    (MeromorphicOn.divisor f (closedBall c |(19 / 10 : ℝ)|)).finiteSupport (isCompact_closedBall _ _)
-  have hSD : ∀ u ∈ S, MeromorphicOn.divisor f (closedBall c |(19 / 10 : ℝ)|) u =
-      (analyticOrderNatAt f u : ℤ) ∧ 1 ≤ analyticOrderNatAt f u ∧ 0 < ‖c - u‖ ∧ ‖c - u‖ ≤ 37 / 20 := by
+    (MeromorphicOn.divisor f (closedBall c |(19 / 10 : ℝ)|)).finiteSupport
+      (isCompact_closedBall _ _)
+  have hSD
+      : ∀ u ∈ S,
+        MeromorphicOn.divisor f (closedBall c |(19 / 10 : ℝ)|) u = (analyticOrderNatAt f u : ℤ)
+          ∧ 1 ≤ analyticOrderNatAt f u ∧ 0 < ‖c - u‖ ∧ ‖c - u‖ ≤ 37 / 20 := by
     intro u hu
     obtain ⟨hub, hfu⟩ := hS hu
     have hub' : u ∈ closedBall c (19 / 10) := closedBall_subset_closedBall (by norm_num) hub
@@ -63,7 +66,8 @@ theorem jensenCount : JensenCount := by
   have hJ := AnalyticOnNhd.circleAverage_log_norm (R := 19 / 10) hf' hfc
   have hup : Real.circleAverage (fun x => Real.log ‖f x‖) c (19 / 10) ≤ Real.log M := by
     apply Real.circleAverage_mono_on_of_le_circle
-    · exact MeromorphicOn.circleIntegrable_log_norm (hf'.mono sphere_subset_closedBall).meromorphicOn
+    · exact MeromorphicOn.circleIntegrable_log_norm (hf'.mono
+        sphere_subset_closedBall).meromorphicOn
     · intro x hx
       rw [hR] at hx
       by_cases h0 : f x = 0
@@ -78,12 +82,14 @@ theorem jensenCount : JensenCount := by
         exact_mod_cast hDnn u
       have hin := (MeromorphicOn.divisor f (closedBall c |(19 / 10 : ℝ)|)).supportWithinDomain hu
       rw [hR] at hin
-      have hcu : ‖c - u‖ ≤ 19 / 10 := by rw [norm_sub_rev, ← dist_eq_norm]; exact mem_closedBall.1 hin
+      have hcu : ‖c - u‖ ≤ 19 / 10 := by
+        rw [norm_sub_rev, ← dist_eq_norm]; exact mem_closedBall.1 hin
       apply mul_nonneg hdu
       rcases (norm_nonneg (c - u)).eq_or_lt with h0 | h0
       · rw [← h0, inv_zero, mul_zero, Real.log_zero]
       · apply Real.log_nonneg
-        rw [← div_eq_mul_inv, le_div_iff₀ h0]; linarith
+        rw [← div_eq_mul_inv, le_div_iff₀ h0]
+        linarith
     · simp only [Function.mem_support, not_not] at hu
       simp [hg, hu]
   have hgsupp : Function.support g ⊆ hfin.toFinset := by
@@ -100,7 +106,9 @@ theorem jensenCount : JensenCount := by
   have hlow : ∑ u ∈ hSfin.toFinset, g u ≤ ∑ u ∈ hfin.toFinset, g u :=
     Finset.sum_le_sum_of_subset_of_nonneg hsub2 fun u _ _ => hgnn u
   have hLpos : 0 < Real.log ((19 / 10) / (37 / 20)) := Real.log_pos (by norm_num)
-  have hterm : ∀ u ∈ hSfin.toFinset, (analyticOrderNatAt f u : ℝ) * Real.log ((19 / 10) / (37 / 20)) ≤ g u := by
+  have hterm
+      : ∀ u ∈ hSfin.toFinset,
+        (analyticOrderNatAt f u : ℝ) * Real.log ((19 / 10) / (37 / 20)) ≤ g u := by
     intro u hu
     rw [Set.Finite.mem_toFinset] at hu
     obtain ⟨h1, h2, h3, h4⟩ := hSD u hu
@@ -115,7 +123,8 @@ theorem jensenCount : JensenCount := by
   rw [finsum_mem_eq_finite_toFinset_sum _ hSfin, le_div_iff₀ hLpos, Finset.sum_mul,
     Real.log_div hM0.ne' hfc0.ne']
   have hsum := Finset.sum_le_sum hterm
-  have hJ' : ∑ᶠ u, g u = Real.circleAverage (fun x => Real.log ‖f x‖) c (19 / 10) - Real.log ‖f c‖ := by
+  have hJ'
+      : ∑ᶠ u, g u = Real.circleAverage (fun x => Real.log ‖f x‖) c (19 / 10) - Real.log ‖f c‖ := by
     rw [hJ]; simp only [hg]; ring
   linarith
 

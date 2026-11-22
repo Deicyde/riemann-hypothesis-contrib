@@ -18,13 +18,17 @@ theorem DimStrictDrop.proof : DimStrictDrop.Statement.{u} := by
   have : Nonempty (PrimeSpectrum.zeroLocus (R := A) (Q' : Set A)) :=
     ⟨⟨⟨Q', inferInstance⟩, (PrimeSpectrum.mem_zeroLocus _ _).mpr le_rfl⟩⟩
   have : Nonempty (PrimeSpectrum.zeroLocus (R := A) (Q : Set A)) := ⟨q⟩
-  let f : PrimeSpectrum.zeroLocus (R := A) (Q' : Set A) → PrimeSpectrum.zeroLocus (R := A) (Q : Set A) :=
-    fun x => ⟨x.1, (PrimeSpectrum.mem_zeroLocus _ _).mpr
-      (le_trans (show (Q : Set A) ⊆ Q' from hlt.le) ((PrimeSpectrum.mem_zeroLocus _ _).mp x.2))⟩
+  let f
+      : PrimeSpectrum.zeroLocus (R := A) (Q' : Set A)
+        → PrimeSpectrum.zeroLocus (R := A) (Q : Set A) := fun x => ⟨
+    x.1,
+    (PrimeSpectrum.mem_zeroLocus _ _).mpr
+      (le_trans (show (Q : Set A) ⊆ Q' from hlt.le) ((PrimeSpectrum.mem_zeroLocus _ _).mp x.2))
+  ⟩
   have hf : StrictMono f := fun a b h => h
   rw [ringKrullDim_quotient, ringKrullDim_quotient, Order.krullDim_eq_iSup_length,
-    Order.krullDim_eq_iSup_length, ← WithBot.coe_one, ← WithBot.coe_add,
-    ENat.iSup_add, WithBot.coe_le_coe, iSup_le_iff]
+    Order.krullDim_eq_iSup_length, ← WithBot.coe_one, ← WithBot.coe_add, ENat.iSup_add,
+    WithBot.coe_le_coe, iSup_le_iff]
   intro l
   have hq : q < f l.head := by
     show Q < (l.head.1.asIdeal)

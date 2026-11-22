@@ -16,9 +16,13 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 noncomputable section
 
-theorem PrimeZariskiDense.eval_eq_zero_of_mem_map {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    (P : Ideal (MRing ι)) {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P) {F : MvPolynomial (Σ k, ι k) ℂ}
-    (hF : F ∈ P.map (MvPolynomial.map (Int.castRingHom ℂ))) : eval z F = 0 := by
+theorem PrimeZariskiDense.eval_eq_zero_of_mem_map
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (P : Ideal (MRing ι))
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P)
+    {F : MvPolynomial (Σ k, ι k) ℂ} (hF : F ∈ P.map (MvPolynomial.map (Int.castRingHom ℂ)))
+    : eval z F = 0 := by
   have hle : P.map (MvPolynomial.map (Int.castRingHom ℂ)) ≤ RingHom.ker (eval z) := by
     rw [Ideal.map_le_iff_le_comap]
     intro f hf
@@ -26,8 +30,10 @@ theorem PrimeZariskiDense.eval_eq_zero_of_mem_map {K : Type} [Fintype K] {ι : K
     exact hz.2 f hf
   exact RingHom.mem_ker.mp (hle hF)
 
-theorem PrimeZariskiDense.proof (h1 : ComplexFormsOnPoints.Statement) (h2 : PrimeComplexRadical.Statement)
-    (h3 : ComplexMinimalPrimesContract.Statement) : PrimeZariskiDense.Statement := by
+theorem PrimeZariskiDense.proof
+    (h1 : ComplexFormsOnPoints.Statement) (h2 : PrimeComplexRadical.Statement)
+    (h3 : ComplexMinimalPrimesContract.Statement)
+    : PrimeZariskiDense.Statement := by
   intro K _ ι _ P j hP hj g hg z hz
   by_cases hrel : IsRelevant P
   · set Pc := P.map (MvPolynomial.map (Int.castRingHom ℂ)) with hPc

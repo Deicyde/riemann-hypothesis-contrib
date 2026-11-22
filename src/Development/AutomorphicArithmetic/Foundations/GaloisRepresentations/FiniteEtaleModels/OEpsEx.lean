@@ -4,8 +4,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-theorem UpperTheory.Gal.FiniteEtaleModels.O.epsEx :
-    UpperTheory.Gal.FiniteEtaleModels.O.EpsEx := by
+theorem UpperTheory.Gal.FiniteEtaleModels.O.epsEx : UpperTheory.Gal.FiniteEtaleModels.O.EpsEx := by
   intro A _ _ _ 𝔟₁ 𝔟₂ a₁ a₂ M₁ M₂ t hpos hM hle h₁ h₂
   unfold UpperTheory.Gal.Int.Geo.IsGen at h₁ h₂
   have hM1 : (M₁ : A) ≠ 0 := Nat.cast_ne_zero.mpr hpos.ne'
@@ -38,8 +37,9 @@ theorem UpperTheory.Gal.FiniteEtaleModels.O.epsEx :
   obtain ⟨ε, rfl⟩ := Ideal.mem_span_singleton'.mp hy
   obtain ⟨d, rfl⟩ := Ideal.mem_span_singleton'.mp hz
   refine ⟨ε, ⟨-d, by rw [← hyz]; ring⟩, ?_⟩
-  have hJK : I₁ * Ideal.span {ε} ⊔ Ideal.span {(M₁ : A)} =
-      Ideal.span {(t : A)} * (Ideal.span {a₂} ⊔ Ideal.span {(M₂ : A)}) := by
+  have hJK
+      : I₁ * Ideal.span {ε} ⊔ Ideal.span {(M₁ : A)}
+        = Ideal.span {(t : A)} * (Ideal.span {a₂} ⊔ Ideal.span {(M₂ : A)}) := by
     rw [Ideal.mul_sup, Ideal.span_singleton_mul_span_singleton,
       Ideal.span_singleton_mul_span_singleton, ← hMc, hI₁, Ideal.sup_mul,
       Ideal.span_singleton_mul_span_singleton, Ideal.span_singleton_mul_span_singleton]

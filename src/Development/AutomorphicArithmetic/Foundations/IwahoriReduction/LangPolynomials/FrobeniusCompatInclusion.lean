@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.HTLawAt
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col
 
 namespace UpperTheory.Kd.C7
 
@@ -17,7 +19,8 @@ def R0 (A : ValuationSubring Ω) : Subring Ω where
   carrier := {x | x ∈ A ∧ ∀ s ∈ Ine (F := ℚ) A, s x = x}
   mul_mem' ha hb := ⟨A.mul_mem _ _ ha.1 hb.1, fun s hs => by rw [map_mul, ha.2 s hs, hb.2 s hs]⟩
   one_mem' := ⟨A.one_mem, fun s _ => map_one s⟩
-  add_mem' ha hb := ⟨A.add_mem _ _ ha.1 hb.1, fun s hs => by rw [map_add (f := _), ha.2 s hs, hb.2 s hs]⟩
+  add_mem' ha hb :=
+    ⟨A.add_mem _ _ ha.1 hb.1, fun s hs => by rw [map_add (f := _), ha.2 s hs, hb.2 s hs]⟩
   zero_mem' := ⟨A.zero_mem, fun s _ => map_zero s⟩
   neg_mem' ha := ⟨A.neg_mem _ ha.1, fun s hs => by rw [map_neg, ha.2 s hs]⟩
 
@@ -44,7 +47,10 @@ structure Fr (A : ValuationSubring Ω) (j : Ω →+* Qbar l) : Type 1 where
   frobenius_compat_inclusion : ∀ y y' : R0 A, (y' : Ω) = fr y → σ (i0 y) = i0 y'
   jh : R →+* ℂ_[l]
   jh_comp_incl : ∀ y : R0 A, jh (i0 y) = algebraMap (PadicAlgCl l) ℂ_[l] (j y)
-  jh_alg : ∀ z : ℤ_[l], jh (algebraMap ℤ_[l] R z) = algebraMap (PadicAlgCl l) ℂ_[l] (algebraMap ℤ_[l] (PadicAlgCl l) z)
+  jh_alg
+    : ∀ z : ℤ_[l],
+      jh (algebraMap ℤ_[l] R z)
+        = algebraMap (PadicAlgCl l) ℂ_[l] (algebraMap ℤ_[l] (PadicAlgCl l) z)
   jh_le : ∀ x, ‖jh x‖ ≤ 1
 
 attribute [instance] Fr.cr Fr.al
@@ -57,35 +63,46 @@ structure Bas (c : Coef l) where
 
 def Bas.val {c : Coef l} (β : Bas c) (i : Fin β.d) : Qbar l := ((β.e i : c.O) : PadicAlgCl l)
 
-def Bas.mat {c : Coef l} (β : Bas c) (b : c.O) : Matrix (Fin β.d) (Fin β.d) ℤ_[l] := Algebra.leftMulMatrix β.e b
+def Bas.mat {c : Coef l} (β : Bas c) (b : c.O) : Matrix (Fin β.d) (Fin β.d) ℤ_[l] :=
+  Algebra.leftMulMatrix β.e b
 
-abbrev Sy (Ω : Type) [Field Ω] [Algebra ℚ Ω] (l : ℕ) [Fact l.Prime] : Type := ∀ r : ℕ, G ℚ Ω → (ZMod (l ^ r))ˣ → Qbar l
+abbrev Sy (Ω : Type) [Field Ω] [Algebra ℚ Ω] (l : ℕ) [Fact l.Prime] : Type :=
+  ∀ r : ℕ, G ℚ Ω → (ZMod (l ^ r))ˣ → Qbar l
 
 abbrev red (l r : ℕ) : (ZMod (l ^ (r + 1)))ˣ →* (ZMod (l ^ r))ˣ :=
   Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))).toMonoidHom
 
 structure IwI (c : Coef l) (A : ValuationSubring Ω) (Z : Sy Ω l) : Prop where
   int : ∀ r, ∀ s ∈ Ine (F := ℚ) A, ∀ x, Z r s x ∈ c.O
-  coc : ∀ r, ∀ s ∈ Ine (F := ℚ) A, ∀ t ∈ Ine (F := ℚ) A, ∀ x, Z r (s * t) x = Z r s x + Z r t (x * (cycMod ℚ Ω l r s)⁻¹)
-  nrm : ∀ r, ∀ s ∈ Ine (F := ℚ) A, ∀ x : (ZMod (l ^ r))ˣ,
-    Z r s x = ∑ x' ∈ (Finset.univ.filter fun x' : (ZMod (l ^ (r + 1)))ˣ => red l r x' = x), Z (r + 1) s x'
+  coc
+    : ∀ r, ∀ s ∈ Ine (F := ℚ) A, ∀ t ∈ Ine (F := ℚ) A, ∀ x,
+      Z r (s * t) x = Z r s x + Z r t (x * (cycMod ℚ Ω l r s)⁻¹)
+  nrm
+    : ∀ r, ∀ s ∈ Ine (F := ℚ) A, ∀ x : (ZMod (l ^ r))ˣ,
+      Z r s x
+        = ∑ x' ∈ (Finset.univ.filter fun x' : (ZMod (l ^ (r + 1)))ˣ => red l r x' = x), Z (r + 1) s x'
 
 def Cont (A : ValuationSubring Ω) (Z : Sy Ω l) : Prop :=
-  ∀ r n : ℕ, ∃ U : Subgroup (G ℚ Ω), IsOpen (U : Set (G ℚ Ω)) ∧ ∀ s ∈ U, s ∈ Ine (F := ℚ) A → ∀ x, Cg n (Z r s x) 0
+  ∀ r n : ℕ, ∃ U : Subgroup (G ℚ Ω),
+    IsOpen (U : Set (G ℚ Ω)) ∧ ∀ s ∈ U, s ∈ Ine (F := ℚ) A → ∀ x, Cg n (Z r s x) 0
 
 def un (b : ℕ) (hb : ¬ l ∣ b) (r : ℕ) : (ZMod (l ^ r))ˣ :=
   ZMod.unitOfCoprime b (((Nat.Prime.coprime_iff_not_dvd Fact.out).2 hb).symm.pow_right r)
 
 def tr (b : ℕ) (hb : ¬ l ∣ b) (Z : Sy Ω l) : Sy Ω l := fun r s x => Z r s (x * un b hb r)
 
-def sharp (b : ℕ) (hb : ¬ l ∣ b) (Z : Sy Ω l) : Sy Ω l := fun r s x => Z r s x - (b : Qbar l) * tr b hb Z r s x
+def sharp (b : ℕ) (hb : ¬ l ∣ b) (Z : Sy Ω l) : Sy Ω l := fun r s x =>
+  Z r s x - (b : Qbar l) * tr b hb Z r s x
 
 def Roots (l : ℕ) (ζ : ℕ → Ω) : Prop := ∀ m, IsPrimitiveRoot (ζ m) (l ^ m) ∧ ζ (m + 1) ^ l = ζ m
 
 def pv {A : ValuationSubring Ω} (P : Polynomial (R0 A)) (z : Ω) : Ω := P.eval₂ (R0 A).subtype z
 
-def BPres {c : Coef l} (β : Bas c) (A : ValuationSubring Ω) (ζ : ℕ → Ω) (Z : Sy Ω l) (m n : ℕ)
-    (P : Fin β.d → Polynomial (R0 A)) : Prop :=
+def BPres
+    {c : Coef l} (β : Bas c)
+    (A : ValuationSubring Ω)
+    (ζ : ℕ → Ω) (Z : Sy Ω l) (m n : ℕ) (P : Fin β.d → Polynomial (R0 A))
+    : Prop :=
   KumPres A n m (ζ n) (Z m) (fun i => pv (P i) (ζ m)) β.val
 
 def HasPres {c : Coef l} (β : Bas c) (A : ValuationSubring Ω) (ζ : ℕ → Ω) (Z : Sy Ω l) : Prop :=
@@ -95,14 +112,18 @@ section Frame
 
 variable {A : ValuationSubring Ω} {j : Ω →+* Qbar l} (Φ : Fr l A j)
 
-def Fr.ser (P : Polynomial (R0 A)) : PowerSeries Φ.R := (P.map Φ.i0).eval₂ PowerSeries.C (1 + PowerSeries.X)
+def Fr.ser (P : Polynomial (R0 A)) : PowerSeries Φ.R :=
+  (P.map Φ.i0).eval₂ PowerSeries.C (1 + PowerSeries.X)
 
-def Fr.tw (m : ℕ) (h : PowerSeries Φ.R) : PowerSeries Φ.R := PowerSeries.map (((Φ.σ.symm : Φ.R ≃+* Φ.R) : Φ.R →+* Φ.R) ^ m) h
+def Fr.tw (m : ℕ) (h : PowerSeries Φ.R) : PowerSeries Φ.R :=
+  PowerSeries.map (((Φ.σ.symm : Φ.R ≃+* Φ.R) : Φ.R →+* Φ.R) ^ m) h
 
-def Fr.act {d : ℕ} (M : Matrix (Fin d) (Fin d) ℤ_[l]) (D : Fin d → PowerSeries Φ.R) : Fin d → PowerSeries Φ.R :=
-  fun i => ∑ k, PowerSeries.C (algebraMap ℤ_[l] Φ.R (M i k)) * D k
+def Fr.act {d : ℕ} (M : Matrix (Fin d) (Fin d) ℤ_[l]) (D : Fin d → PowerSeries Φ.R)
+    : Fin d → PowerSeries Φ.R := fun i =>
+  ∑ k, PowerSeries.C (algebraMap ℤ_[l] Φ.R (M i k)) * D k
 
-def Fr.lam {c : Coef l} (β : Bas c) (x : Fin β.d → Φ.R) : ℂ_[l] := ∑ i, algebraMap (PadicAlgCl l) ℂ_[l] (β.val i) * Φ.jh (x i)
+def Fr.lam {c : Coef l} (β : Bas c) (x : Fin β.d → Φ.R) : ℂ_[l] :=
+  ∑ i, algebraMap (PadicAlgCl l) ℂ_[l] (β.val i) * Φ.jh (x i)
 
 end Frame
 
@@ -111,20 +132,30 @@ def LC {R : Type} [CommRing R] (l m n : ℕ) (f g : PowerSeries R) : Prop :=
 
 def dl {R : Type} [CommRing R] (f : PowerSeries R) : PowerSeries R := dd f * Ring.inverse f
 
-def Rep {A : ValuationSubring Ω} {j : Ω →+* Qbar l} (Φ : Fr l A j) {c : Coef l} (β : Bas c) (ζ : ℕ → Ω) (Z : Sy Ω l)
-    (D : Fin β.d → PowerSeries Φ.R) : Prop :=
-  ∃ c₁ m₁ : ℕ, ∀ m, m₁ ≤ m → ∃ P, BPres β A ζ Z m (m - c₁) P ∧ ∀ i, LC l m (m - c₁) (Φ.tw m (D i)) (dl (Φ.ser (P i)))
+def Rep
+    {A : ValuationSubring Ω} {j : Ω →+* Qbar l} (Φ : Fr l A j)
+    {c : Coef l} (β : Bas c)
+    (ζ : ℕ → Ω) (Z : Sy Ω l) (D : Fin β.d → PowerSeries Φ.R)
+    : Prop :=
+  ∃ c₁ m₁ : ℕ, ∀ m,
+    m₁ ≤ m
+      → ∃ P, BPres β A ζ Z m (m - c₁) P ∧ ∀ i, LC l m (m - c₁) (Φ.tw m (D i)) (dl (Φ.ser (P i)))
 
-abbrev eta (φ : DirichletCharacter (Qbar l) l) (k r : ℕ) : (ZMod (l ^ r))ˣ → Qbar l :=
-  fun x => (φ (x : ZMod (l ^ r)).val)⁻¹ * ((((x : ZMod (l ^ r)).val : ℕ) : Qbar l) ^ k)⁻¹
+abbrev eta (φ : DirichletCharacter (Qbar l) l) (k r : ℕ) : (ZMod (l ^ r))ˣ → Qbar l := fun x =>
+  (φ (x : ZMod (l ^ r)).val)⁻¹ * ((((x : ZMod (l ^ r)).val : ℕ) : Qbar l) ^ k)⁻¹
 
-def SpZero (A : ValuationSubring Ω) (φ : DirichletCharacter (Qbar l) l) (k : ℕ) (Z : Sy Ω l) : Prop :=
-  ∀ n : ℕ, ∃ r₀, ∀ r, r₀ ≤ r → ∀ s ∈ Ine (F := ℚ) A, cycBar ℚ Ω l s = 1 → Cg n (sp (eta φ k r) (Z r) s) 0
+def SpZero (A : ValuationSubring Ω) (φ : DirichletCharacter (Qbar l) l) (k : ℕ) (Z : Sy Ω l)
+    : Prop :=
+  ∀ n : ℕ, ∃ r₀, ∀ r,
+    r₀ ≤ r → ∀ s ∈ Ine (F := ℚ) A, cycBar ℚ Ω l s = 1 → Cg n (sp (eta φ k r) (Z r) s) 0
 
-abbrev intg (φ : DirichletCharacter (Qbar l) l) (k : ℕ) (L : PowerSeries (Qbar l)) (r : ℕ) (ξ : Qbar l) : Qbar l :=
+abbrev intg
+    (φ : DirichletCharacter (Qbar l) l) (k : ℕ) (L : PowerSeries (Qbar l)) (r : ℕ) (ξ : Qbar l)
+    : Qbar l :=
   ∑ x ∈ (Finset.range (l ^ r)).filter (fun x => ¬ l ∣ x), φ (x : ZMod l) * ((x : Qbar l) ^ k) * mass L r ξ x
 
 def IntZero (φ : DirichletCharacter (Qbar l) l) (k : ℕ) (L : PowerSeries (Qbar l)) : Prop :=
-  ∀ n : ℕ, ∃ r₁, ∀ r, r₁ ≤ r → ∀ ξ : Qbar l, IsPrimitiveRoot ξ (l ^ r) → Cg (n + r) (intg φ k L r ξ) 0
+  ∀ n : ℕ, ∃ r₁, ∀ r,
+    r₁ ≤ r → ∀ ξ : Qbar l, IsPrimitiveRoot ξ (l ^ r) → Cg (n + r) (intg φ k L r ξ) 0
 
 end UpperTheory.Kd.C7

@@ -18,8 +18,24 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.Int.Geo
 
-theorem steps_of (hC : CrysStep) (hJ : JumpStep) (hP : PhiStep) : Steps :=
-  ⟨repEx_holds, Mod.esStep_holds, hC, hJ, hP, cutStep_holds, twES, twCrys, twJ, twPhi, phiOf, satCard, jumpsOf, richOf,
-    TP.Sub.charEx, TP.Sub.sSLeft_holds, TP.Sub.contLeft_holds⟩
+theorem steps_of (hC : CrysStep) (hJ : JumpStep) (hP : PhiStep) : Steps := ⟨
+  repEx_holds,
+  Mod.esStep_holds,
+  hC,
+  hJ,
+  hP,
+  cutStep_holds,
+  twES,
+  twCrys,
+  twJ,
+  twPhi,
+  phiOf,
+  satCard,
+  jumpsOf,
+  richOf,
+  TP.Sub.charEx,
+  TP.Sub.sSLeft_holds,
+  TP.Sub.contLeft_holds
+⟩
 
 end UpperTheory.Gal.Int.Geo

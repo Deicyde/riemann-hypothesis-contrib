@@ -11,7 +11,8 @@ namespace PositivityTheory.Rg.BcB.E2.P
 
 theorem rowsex : KerBasic → VecEx → VecNorm → VecInner → RowsEx := by
   intro hK hE hN hI X ι _ Φ T hΦ hT
-  have hΨ : ∀ i j, Tst ((fun i j => adj (Φ j i)) i j : X.G → ℂ) := fun i j => (hK X (Φ j i) (hΦ j i)).2.2.2.1
+  have hΨ : ∀ i j, Tst ((fun i j => adj (Φ j i)) i j : X.G → ℂ) := fun i j =>
+    (hK X (Φ j i) (hΦ j i)).2.2.2.1
   obtain ⟨k', hc, hv⟩ := hE X ι (fun i j => adj (Φ j i)) hΨ
   obtain ⟨C, Ω, hC, hΩ, hb⟩ := hN X ι (fun i j => adj (Φ j i)) hΨ
   refine ⟨fun i x => k' x i, ⟨hc, ?_, ?_, ⟨C, Ω, hC, hΩ, fun i x => hb x i _ (hv x i)⟩⟩⟩

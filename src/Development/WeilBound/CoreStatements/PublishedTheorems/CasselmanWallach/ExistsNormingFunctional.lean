@@ -7,21 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SobBdSemi
 
 noncomputable section
 
-open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
+open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
 
 namespace PositivityTheory.CW
 
 namespace ZeroOnDense
 
-variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {σ : Mx n → (H →L[ℂ] H)} {E : Type} [AddCommGroup E] [Module ℂ E] [TopologicalSpace E] [T2Space E]
   {p : ℕ → Seminorm ℂ E}
 
-theorem zero_on (hp : WithSeminorms p) (hD : Dens ε σ) (Φ : H → E)
-    (hsub : ∀ x y, Sm ε σ x → Sm ε σ y → Φ (x - y) = Φ x - Φ y)
-    (hb : ∀ i, ∃ (S : List (List (Mx n))) (C : ℝ), Words (lieSet ε) S ∧
-      ∀ u, Sm ε σ u → p i (Φ u) ≤ C * sobNorm σ S u)
-    (h0 : ∀ v, IsKFin ε σ v → Φ v = 0) : ∀ w, Sm ε σ w → Φ w = 0 := by
+theorem zero_on
+    (hp : WithSeminorms p) (hD : Dens ε σ)
+    (Φ : H → E) (hsub : ∀ x y, Sm ε σ x → Sm ε σ y → Φ (x - y) = Φ x - Φ y)
+    (hb : ∀ i, ∃ (S : List (List (Mx n))) (C : ℝ),
+      Words (lieSet ε) S ∧ ∀ u, Sm ε σ u → p i (Φ u) ≤ C * sobNorm σ S u)
+    (h0 : ∀ v, IsKFin ε σ v → Φ v = 0)
+    : ∀ w, Sm ε σ w → Φ w = 0 := by
   intro w hw
   by_contra hne
   obtain ⟨i, hi⟩ := hp.separating_of_T1 _ hne
@@ -33,8 +37,11 @@ theorem zero_on (hp : WithSeminorms p) (hD : Dens ε σ) (Φ : H → E)
     have hwv : Sm ε σ (w - v) := sm_iff.2 ((smooth (Jm ε) σ).sub_mem (sm_iff.1 hw) (sm_iff.1 hvs))
     have e : Φ w = Φ (w - v) := by rw [hsub w v hw hvs, h0 v hv, sub_zero]
     rw [e]
-    calc p i (Φ (w - v)) ≤ C * sobNorm σ S (w - v) := hC _ hwv
-      _ ≤ |C| * sobNorm σ S (w - v) := mul_le_mul_of_nonneg_right (le_abs_self C) (sobNorm_nonneg _ _ _)
+    calc
+      p i (Φ (w - v))
+        ≤ C * sobNorm σ S (w - v) := hC _ hwv
+      _ ≤ |C| * sobNorm σ S (w - v) :=
+        mul_le_mul_of_nonneg_right (le_abs_self C) (sobNorm_nonneg _ _ _)
       _ ≤ |C| * δ := mul_le_mul_of_nonneg_left hd.le (abs_nonneg C)
   have hpos : 0 < p i (Φ w) := lt_of_le_of_ne (apply_nonneg _ _) (Ne.symm hi)
   set x := p i (Φ w) with hx

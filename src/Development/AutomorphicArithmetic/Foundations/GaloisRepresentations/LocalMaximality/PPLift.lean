@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KahlerFormsO
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma smul_omB' {K : Type} [Field K] [Algebra ℂ K] (B : Subalgebra ℂ K) (q : ℕ) {b : K} (hb : b ∈ B)
@@ -42,10 +43,13 @@ private lemma ratio_mem {F : Type} [Field F] [Algebra ℂ F] {d : ℕ} (x : Fin 
   apply Algebra.subset_adjoin
   exact ⟨l, hT hl, j, rfl⟩
 
-private theorem exteriorAlgebra_iota_mul_mem_omB_succ {K : Type} [Field K] [Algebra ℂ K] (B : Subalgebra ℂ K) (a : ℕ)
+private theorem exteriorAlgebra_iota_mul_mem_omB_succ
+    {K : Type} [Field K] [Algebra ℂ K]
+    (B : Subalgebra ℂ K)
+    (a : ℕ)
     {p : Ω[K⁄ℂ]} (hp : p ∈ Submodule.span ℂ {m : Ω[K⁄ℂ] | ∃ c ∈ B, ∃ u ∈ B, m = c • D ℂ K u})
-    {y : DR ℂ K} (hy : y ∈ omB ℂ K B a) :
-    ExteriorAlgebra.ι K p * y ∈ omB ℂ K B (a + 1) := by
+    {y : DR ℂ K} (hy : y ∈ omB ℂ K B a)
+    : ExteriorAlgebra.ι K p * y ∈ omB ℂ K B (a + 1) := by
   induction hp using Submodule.span_induction with
   | mem q hq =>
     obtain ⟨c, hc, u, hu, rfl⟩ := hq
@@ -63,14 +67,16 @@ private theorem exteriorAlgebra_iota_mul_mem_omB_succ {K : Type} [Field K] [Alge
         simp only [map_smul, smul_mul_assoc, mul_smul_comm, smul_smul, Matrix.vecTail,
           Function.comp_def, Fin.cons_succ, Fin.cons_zero]
         rw [mul_comm b c]
-    | zero => simp
+    | zero =>
+      simp
     | add z w _ _ hz hw =>
       rw [mul_add]
       exact Submodule.add_mem _ hz hw
     | smul r z _ hz =>
       rw [mul_smul_comm]
       exact Submodule.smul_mem _ r hz
-  | zero => simp
+  | zero =>
+    simp
   | add q q' _ _ hq hq' =>
     rw [map_add (f := _), add_mul]
     exact Submodule.add_mem _ hq hq'
@@ -78,10 +84,11 @@ private theorem exteriorAlgebra_iota_mul_mem_omB_succ {K : Type} [Field K] [Alge
     rw [LinearMap.map_smul_of_tower, smul_mul_assoc]
     exact Submodule.smul_mem _ r hq
 
-private theorem iotaMulti_mem_omB_of_mem_span {K : Type} [Field K] [Algebra ℂ K] (B : Subalgebra ℂ K) :
-    ∀ (a : ℕ) (m : Fin a → Ω[K⁄ℂ]),
-      (∀ i, m i ∈ Submodule.span ℂ {m : Ω[K⁄ℂ] | ∃ c ∈ B, ∃ u ∈ B, m = c • D ℂ K u}) →
-      ExteriorAlgebra.ιMulti K a m ∈ omB ℂ K B a := by
+private theorem iotaMulti_mem_omB_of_mem_span
+    {K : Type} [Field K] [Algebra ℂ K] (B : Subalgebra ℂ K)
+    : ∀ (a : ℕ) (m : Fin a → Ω[K⁄ℂ]),
+      (∀ i, m i ∈ Submodule.span ℂ {m : Ω[K⁄ℂ] | ∃ c ∈ B, ∃ u ∈ B, m = c • D ℂ K u})
+        → ExteriorAlgebra.ιMulti K a m ∈ omB ℂ K B a := by
   intro a
   induction a with
   | zero =>
@@ -95,11 +102,16 @@ private theorem iotaMulti_mem_omB_of_mem_span {K : Type} [Field K] [Algebra ℂ 
     rw [ExteriorAlgebra.ιMulti_succ_apply]
     exact exteriorAlgebra_iota_mul_mem_omB_succ B a (hm 0) (ih _ fun i => hm i.succ)
 
-private theorem pow_smul_D_mem_span_of_pow_mul_mem {K : Type} [Field K] [Algebra ℂ K] (B : Subalgebra ℂ K) {h v : K}
-    (hh : h ∈ B) (N : ℕ) (hv : h ^ (N + 1) * v ∈ B) :
-    h ^ (N + 2) • D ℂ K v ∈ Submodule.span ℂ {m : Ω[K⁄ℂ] | ∃ c ∈ B, ∃ u ∈ B, m = c • D ℂ K u} := by
-  have key : h ^ (N + 2) • D ℂ K v =
-      h • D ℂ K (h ^ (N + 1) * v) + (-((N + 1 : K) * (h ^ (N + 1) * v))) • D ℂ K h := by
+private theorem pow_smul_D_mem_span_of_pow_mul_mem
+    {K : Type} [Field K] [Algebra ℂ K]
+    (B : Subalgebra ℂ K)
+    {h v : K} (hh : h ∈ B)
+    (N : ℕ) (hv : h ^ (N + 1) * v ∈ B)
+    : h ^ (N + 2) • D ℂ K v
+      ∈ Submodule.span ℂ {m : Ω[K⁄ℂ] | ∃ c ∈ B, ∃ u ∈ B, m = c • D ℂ K u} := by
+  have key
+      : h ^ (N + 2) • D ℂ K v
+        = h • D ℂ K (h ^ (N + 1) * v) + (-((N + 1 : K) * (h ^ (N + 1) * v))) • D ℂ K h := by
     rw [Derivation.leibniz, Derivation.leibniz_pow, Nat.add_sub_cancel, ← Nat.cast_smul_eq_nsmul K]
     module
   rw [key]
@@ -107,9 +119,10 @@ private theorem pow_smul_D_mem_span_of_pow_mul_mem {K : Type} [Field K] [Algebra
     (Submodule.subset_span ⟨_, ?_, h, hh, rfl⟩)
   exact B.neg_mem (B.mul_mem (B.add_mem (B.natCast_mem N) B.one_mem) hv)
 
-private theorem exists_pow_prod_ratio_mul_mem_rA_of_mem_union {F : Type} [Field F] [Algebra ℂ F] {d : ℕ} (x : Fin (d + 1) → Fˣ)
-    (I J : Finset (Fin (d + 1))) (j : Fin (d + 1)) (hj : j ∈ J) :
-    ∀ y ∈ rA ℂ (xv x) (I ∪ J), ∃ N : ℕ, (∏ l ∈ I, xv x l / xv x j) ^ N * y ∈ rA ℂ (xv x) J := by
+private theorem exists_pow_prod_ratio_mul_mem_rA_of_mem_union
+    {F : Type} [Field F] [Algebra ℂ F]
+    {d : ℕ} (x : Fin (d + 1) → Fˣ) (I J : Finset (Fin (d + 1))) (j : Fin (d + 1)) (hj : j ∈ J)
+    : ∀ y ∈ rA ℂ (xv x) (I ∪ J), ∃ N : ℕ, (∏ l ∈ I, xv x l / xv x j) ^ N * y ∈ rA ℂ (xv x) J := by
   have hgen : ∀ l, xv x l / xv x j ∈ rA ℂ (xv x) J := fun l => Algebra.subset_adjoin ⟨j, hj, l, rfl⟩
   have hhA : (∏ l ∈ I, xv x l / xv x j) ∈ rA ℂ (xv x) J := Subalgebra.prod_mem _ fun l _ => hgen l
   intro y hy
@@ -122,20 +135,23 @@ private theorem exists_pow_prod_ratio_mul_mem_rA_of_mem_union {F : Type} [Field 
       rw [pow_one, ← Finset.mul_prod_erase I _ hiI]
       have h1 : xv x i ≠ 0 := (x i).ne_zero
       have h2 : xv x j ≠ 0 := (x j).ne_zero
-      have he : xv x i / xv x j * (∏ l ∈ I.erase i, xv x l / xv x j) * (xv x k / xv x i) =
-          (xv x k / xv x j) * ∏ l ∈ I.erase i, xv x l / xv x j := by
+      have he
+          : xv x i / xv x j * (∏ l ∈ I.erase i, xv x l / xv x j) * (xv x k / xv x i)
+            = (xv x k / xv x j) * ∏ l ∈ I.erase i, xv x l / xv x j := by
         field_simp
       rw [he]
       exact Subalgebra.mul_mem _ (hgen k) (Subalgebra.prod_mem _ fun l _ => hgen l)
     · exact ⟨0, by rw [pow_zero, one_mul]; exact Algebra.subset_adjoin ⟨i, hiJ, k, rfl⟩⟩
-  | algebraMap r => exact ⟨0, by rw [pow_zero, one_mul]; exact Subalgebra.algebraMap_mem _ r⟩
+  | algebraMap r =>
+    exact ⟨0, by rw [pow_zero, one_mul]; exact Subalgebra.algebraMap_mem _ r⟩
   | add y₁ y₂ _ _ h₁ h₂ =>
     obtain ⟨N₁, hN₁⟩ := h₁
     obtain ⟨N₂, hN₂⟩ := h₂
     refine ⟨N₁ + N₂, ?_⟩
-    have e : (∏ l ∈ I, xv x l / xv x j) ^ (N₁ + N₂) * (y₁ + y₂) =
-        (∏ l ∈ I, xv x l / xv x j) ^ N₂ * ((∏ l ∈ I, xv x l / xv x j) ^ N₁ * y₁) +
-          (∏ l ∈ I, xv x l / xv x j) ^ N₁ * ((∏ l ∈ I, xv x l / xv x j) ^ N₂ * y₂) := by
+    have e
+        : (∏ l ∈ I, xv x l / xv x j) ^ (N₁ + N₂) * (y₁ + y₂)
+          = (∏ l ∈ I, xv x l / xv x j) ^ N₂ * ((∏ l ∈ I, xv x l / xv x j) ^ N₁ * y₁)
+            + (∏ l ∈ I, xv x l / xv x j) ^ N₁ * ((∏ l ∈ I, xv x l / xv x j) ^ N₂ * y₂) := by
       ring
     rw [e]
     exact Subalgebra.add_mem _ (Subalgebra.mul_mem _ (Subalgebra.pow_mem _ hhA _) hN₁)
@@ -144,24 +160,29 @@ private theorem exists_pow_prod_ratio_mul_mem_rA_of_mem_union {F : Type} [Field 
     obtain ⟨N₁, hN₁⟩ := h₁
     obtain ⟨N₂, hN₂⟩ := h₂
     refine ⟨N₁ + N₂, ?_⟩
-    have e : (∏ l ∈ I, xv x l / xv x j) ^ (N₁ + N₂) * (y₁ * y₂) =
-        ((∏ l ∈ I, xv x l / xv x j) ^ N₁ * y₁) * ((∏ l ∈ I, xv x l / xv x j) ^ N₂ * y₂) := by
+    have e
+        : (∏ l ∈ I, xv x l / xv x j) ^ (N₁ + N₂) * (y₁ * y₂)
+          = ((∏ l ∈ I, xv x l / xv x j) ^ N₁ * y₁) * ((∏ l ∈ I, xv x l / xv x j) ^ N₂ * y₂) := by
       ring
     rw [e]
     exact Subalgebra.mul_mem _ hN₁ hN₂
 
-private theorem exists_isIntegral_pow_mul_of_isIntegral_of_denom {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra F K]
-    (A A' : Subalgebra ℂ F) (s : F) (hs : s ∈ A') (hsA : s ∈ A)
-    (hden : ∀ y ∈ A', ∃ N : ℕ, s ^ N * y ∈ A) {z : K} (hz : IsIntegral A' z) :
-    ∃ N : ℕ, IsIntegral A (algebraMap F K (s ^ N) * z) := by
+private theorem exists_isIntegral_pow_mul_of_isIntegral_of_denom
+    {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra F K]
+    (A A' : Subalgebra ℂ F) (s : F)
+    (hs : s ∈ A') (hsA : s ∈ A) (hden : ∀ y ∈ A', ∃ N : ℕ, s ^ N * y ∈ A)
+    {z : K} (hz : IsIntegral A' z)
+    : ∃ N : ℕ, IsIntegral A (algebraMap F K (s ^ N) * z) := by
   obtain ⟨p, hpm, hpz⟩ := hz
   choose! f hf using fun i => hden _ (p.coeff i).2
   set M := ∑ i ∈ Finset.range (p.natDegree + 1), f i with hM
   have hcoef : ∀ i, s ^ M * (p.coeff i : F) ∈ A := by
     intro i
     by_cases hi : i ≤ p.natDegree
-    · have hle : f i ≤ M := Finset.single_le_sum (fun _ _ => Nat.zero_le _)
-        (Finset.mem_range.mpr (Nat.lt_succ_of_le hi))
+    · have hle : f i ≤ M :=
+        Finset.single_le_sum
+          (fun _ _ => Nat.zero_le _)
+          (Finset.mem_range.mpr (Nat.lt_succ_of_le hi))
       have e : s ^ M * (p.coeff i : F) = s ^ (M - f i) * (s ^ f i * (p.coeff i : F)) := by
         rw [← mul_assoc, ← pow_add, Nat.sub_add_cancel hle]
       rw [e]
@@ -180,7 +201,8 @@ private theorem exists_isIntegral_pow_mul_of_isIntegral_of_denom {F K : Type} [F
       · obtain ⟨e, he⟩ : ∃ e, p.natDegree - n = e + 1 := ⟨p.natDegree - n - 1, by omega⟩
         rw [he]
         show (p.coeff n : F) * (s ^ M) ^ (e + 1) ∈ A
-        have e2 : (p.coeff n : F) * (s ^ M) ^ (e + 1) = (s ^ M) ^ e * (s ^ M * (p.coeff n : F)) := by
+        have e2
+            : (p.coeff n : F) * (s ^ M) ^ (e + 1) = (s ^ M) ^ e * (s ^ M * (p.coeff n : F)) := by
           ring
         rw [e2]
         exact Subalgebra.mul_mem _ (Subalgebra.pow_mem _ (Subalgebra.pow_mem _ hsA _) _) (hcoef n)
@@ -192,7 +214,8 @@ private theorem exists_isIntegral_pow_mul_of_isIntegral_of_denom {F K : Type} [F
           exact Subalgebra.zero_mem _
     exact ⟨⟨_, hmem⟩, rfl⟩
   obtain ⟨q, hqmap, -, hqm⟩ :=
-    Polynomial.lifts_and_natDegree_eq_and_monic hlift (((Polynomial.monic_scaleRoots_iff t).mpr hpm).map _)
+    Polynomial.lifts_and_natDegree_eq_and_monic hlift
+      (((Polynomial.monic_scaleRoots_iff t).mpr hpm).map _)
   refine ⟨M, q, hqm, ?_⟩
   rw [Polynomial.eval₂_eq_eval_map, hqmap, ← Polynomial.eval₂_eq_eval_map]
   exact hq
@@ -344,8 +367,8 @@ private lemma col_cycle (hMu : ThMu) (hMuLat : ThMuLat) (hWd : WdUni) {d : ℕ} 
     rw [h2, map_zero]
     rfl
 
-theorem UpperTheory.Gal.productCup_of_system.pLift_of :
-    ThMu → ThMuLat → KapInd → ActsLin → LatA → GoodZ → SysOk → WdUni → PLift := by
+theorem UpperTheory.Gal.productCup_of_system.pLift_of
+    : ThMu → ThMuLat → KapInd → ActsLin → LatA → GoodZ → SysOk → WdUni → PLift := by
   intro hMu hMuLat hKap hActs hLat hGood hSys hWd F K _ _ _ _ _ _ d x hcov a I J hI hJ w hw
   have hi : pk I ∈ I := by
     unfold pk
@@ -367,19 +390,26 @@ theorem UpperTheory.Gal.productCup_of_system.pLift_of :
     apply Submodule.apply_mem_map₂ _ ?_ hw'
     rw [hom, mul_div_cancel_left₀ _ hG]
     exact hg
-  have e : ∀ l, ((sysP K x a).X l : F ⊗[ℂ] K) = Algebra.TensorProduct.includeLeftRingHom (x l : F) :=
+  have e
+      : ∀ l, ((sysP K x a).X l : F ⊗[ℂ] K) = Algebra.TensorProduct.includeLeftRingHom (x l : F) :=
     fun l => rfl
-  have hc' : ((omG x (pk I))⁻¹ ⊗ₜ[ℂ] (1 : K)) * ∏ l ∈ ({pk I}ᶜ : Finset (Fin (d + 1))), ((sysP K x a).X l : F ⊗[ℂ] K)
-      = ((sysP K x a).X (pk I) : F ⊗[ℂ] K) ^ d := by
+  have hc'
+      : ((omG x (pk I))⁻¹ ⊗ₜ[ℂ] (1 : K))
+          * ∏ l ∈ ({pk I}ᶜ : Finset (Fin (d + 1))), ((sysP K x a).X l : F ⊗[ℂ] K)
+        = ((sysP K x a).X (pk I) : F ⊗[ℂ] K) ^ d := by
     simp only [e, ← map_prod, ← map_pow]
-    rw [show (omG x (pk I))⁻¹ ⊗ₜ[ℂ] (1 : K) = Algebra.TensorProduct.includeLeftRingHom (omG x (pk I))⁻¹ from rfl,
+    rw [show (omG x (pk I))⁻¹ ⊗ₜ[ℂ] (1 : K)
+          = Algebra.TensorProduct.includeLeftRingHom (omG x (pk I))⁻¹ from
+        rfl,
       ← map_mul, ← omG_mul x (pk I), ← mul_assoc, inv_mul_cancel₀ hG, one_mul]
   refine ⟨_, col_cycle hMu hMuLat hWd (sysP K x a) hPg I J hI hJ hi hj _ hm _ hc', ?_⟩
   intro L hL
   rw [hmulP, hmulP, mulP_tmul]
   rw [hKap F K d x hcov _ _ (sysP K x a)
     (Algebra.TensorProduct.productMap (IsScalarTower.toAlgHom ℂ F K) (AlgHom.id ℂ K))
-    (fun i => by simp [sysP]) (fun i => by simp [sysP]) (pk I) L hL]
-  simp only [Algebra.TensorProduct.productMap_apply_tmul, IsScalarTower.coe_toAlgHom', AlgHom.coe_id, id_eq,
-    mul_one, smul_smul, ← map_mul]
+    (fun i => by simp [sysP])
+    (fun i => by simp [sysP])
+    (pk I) L hL]
+  simp only [Algebra.TensorProduct.productMap_apply_tmul, IsScalarTower.coe_toAlgHom',
+    AlgHom.coe_id, id_eq, mul_one, smul_smul, ← map_mul]
   rw [← mul_assoc, inv_mul_cancel₀ hG, one_mul]

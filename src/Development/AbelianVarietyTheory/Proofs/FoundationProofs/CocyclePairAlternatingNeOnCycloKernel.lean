@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.FinalTheo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 noncomputable section
@@ -16,21 +18,24 @@ section Abstract
 
 variable {Γ k : Type} [Group Γ] [Field k]
 
-theorem alt_left_nondeg {v : Fin 2 → k} (hv : v ≠ 0) : ∃ a : Fin 2 → k, v 0 * a 1 - v 1 * a 0 ≠ 0 := by
+theorem alt_left_nondeg {v : Fin 2 → k} (hv : v ≠ 0)
+    : ∃ a : Fin 2 → k, v 0 * a 1 - v 1 * a 0 ≠ 0 := by
   by_cases h0 : v 0 = 0
-  · have h1 : v 1 ≠ 0 := by
-      intro h1; apply hv; funext i; fin_cases i <;> simp [h0, h1]
+  · have h1 : v 1 ≠ 0 := by intro h1; apply hv; funext i; fin_cases i <;> simp [h0, h1]
     exact ⟨![1, 0], by simp [h1]⟩
   · exact ⟨![0, 1], by simp [h0]⟩
 
-theorem stable_cases {W : Γ →* GL (Fin 2) k} {H : Subgroup Γ} (hirr : UpperTheory.V.Af.IsIrr (W.comp H.subtype))
-    (U : Submodule k (Fin 2 → k)) (hU : ∀ s ∈ H, ∀ v ∈ U, (W s : Matrix (Fin 2) (Fin 2) k) *ᵥ v ∈ U) :
-    U = ⊥ ∨ U = ⊤ :=
+theorem stable_cases
+    {W : Γ →* GL (Fin 2) k} {H : Subgroup Γ} (hirr : UpperTheory.V.Af.IsIrr (W.comp H.subtype))
+    (U : Submodule k (Fin 2 → k)) (hU : ∀ s ∈ H, ∀ v ∈ U, (W s : Matrix (Fin 2) (Fin 2) k) *ᵥ v ∈ U)
+    : U = ⊥ ∨ U = ⊤ :=
   hirr.2.2 U le_top (by intro g v hv; exact hU g g.2 v hv)
 
-theorem coc_conj {n : ℕ} (ρ : Γ →* GL (Fin n) k) (y : Γ → Fin n → k)
-    (hy : ∀ g h, y (g * h) = y g + (ρ g : Matrix (Fin n) (Fin n) k) *ᵥ y h) (s g : Γ) (hg : ρ g = 1) :
-    y (s * g * s⁻¹) = (ρ s : Matrix (Fin n) (Fin n) k) *ᵥ y g := by
+theorem coc_conj
+    {n : ℕ} (ρ : Γ →* GL (Fin n) k) (y : Γ → Fin n → k)
+    (hy : ∀ g h, y (g * h) = y g + (ρ g : Matrix (Fin n) (Fin n) k) *ᵥ y h)
+    (s g : Γ) (hg : ρ g = 1)
+    : y (s * g * s⁻¹) = (ρ s : Matrix (Fin n) (Fin n) k) *ᵥ y g := by
   have h1 : y 1 = 0 := by simpa using hy 1 1
   have h2 : y s + (ρ s : Matrix (Fin n) (Fin n) k) *ᵥ y s⁻¹ = 0 := by rw [← hy, mul_inv_cancel, h1]
   rw [hy, hy, map_mul, hg, mul_one, add_right_comm, h2, zero_add]
@@ -42,19 +47,23 @@ namespace GlobalTheory.Ord2.PairSpan
 
 variable {Γ k : Type} [Group Γ] [Field k]
 
-theorem exists_pair_ne [IsAlgClosed k] [CharZero k] {W : Γ →* GL (Fin 2) k} {H : Subgroup Γ}
-    (hirr : UpperTheory.V.Af.IsIrr (W.comp H.subtype)) {N : Set Γ}
-    (hN : ∀ s ∈ H, ∀ g ∈ N, s * g * s⁻¹ ∈ N) {y z : Γ → Fin 2 → k}
+theorem exists_pair_ne
+    [IsAlgClosed k] [CharZero k]
+    {W : Γ →* GL (Fin 2) k} {H : Subgroup Γ} (hirr : UpperTheory.V.Af.IsIrr (W.comp H.subtype))
+    {N : Set Γ} (hN : ∀ s ∈ H, ∀ g ∈ N, s * g * s⁻¹ ∈ N)
+    {y z : Γ → Fin 2 → k}
     (hy : ∀ s ∈ H, ∀ g ∈ N, y (s * g * s⁻¹) = (W s : Matrix (Fin 2) (Fin 2) k) *ᵥ y g)
     (hz : ∀ s ∈ H, ∀ g ∈ N, z (s * g * s⁻¹) = (W s : Matrix (Fin 2) (Fin 2) k) *ᵥ z g)
-    (hy0 : ∃ g ∈ N, y g ≠ 0) (hz0 : ∃ g ∈ N, z g ≠ 0) :
-    ∃ g ∈ N, ∃ h ∈ N, y h 0 * z g 1 - y h 1 * z g 0 ≠ y g 0 * z h 1 - y g 1 * z h 0 := by
+    (hy0 : ∃ g ∈ N, y g ≠ 0) (hz0 : ∃ g ∈ N, z g ≠ 0)
+    : ∃ g ∈ N, ∃ h ∈ N, y h 0 * z g 1 - y h 1 * z g 0 ≠ y g 0 * z h 1 - y g 1 * z h 0 := by
   by_contra hcon
   push_neg at hcon
   let Sig : Submodule k ((Fin 2 → k) × (Fin 2 → k)) := Submodule.span k ((fun g => (y g, z g)) '' N)
   have hgen : ∀ g ∈ N, (y g, z g) ∈ Sig := fun g hg => Submodule.subset_span ⟨g, hg, rfl⟩
-  have hinv : ∀ s ∈ H, ∀ σ ∈ Sig,
-      ((W s : Matrix (Fin 2) (Fin 2) k) *ᵥ σ.1, (W s : Matrix (Fin 2) (Fin 2) k) *ᵥ σ.2) ∈ Sig := by
+  have hinv
+      : ∀ s ∈ H, ∀ σ ∈ Sig,
+        ((W s : Matrix (Fin 2) (Fin 2) k) *ᵥ σ.1, (W s : Matrix (Fin 2) (Fin 2) k) *ᵥ σ.2)
+          ∈ Sig := by
     intro s hs σ hσ
     induction hσ using Submodule.span_induction with
     | mem x hx =>
@@ -72,7 +81,8 @@ theorem exists_pair_ne [IsAlgClosed k] [CharZero k] {W : Γ →* GL (Fin 2) k} {
     | mem x hx =>
       obtain ⟨h, hh, rfl⟩ := hx
       exact (hcon g hg h hh).symm
-    | zero => simp
+    | zero =>
+      simp
     | add x x' _ _ ihx ihx' =>
       simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply]
       linear_combination ihx + ihx'
@@ -82,9 +92,10 @@ theorem exists_pair_ne [IsAlgClosed k] [CharZero k] {W : Γ →* GL (Fin 2) k} {
   let K' : Submodule k (Fin 2 → k) := Sig.comap (LinearMap.inr k (Fin 2 → k) (Fin 2 → k))
   have hK' : K' = ⊥ := by
     rcases stable_cases hirr K' (by
-      intro s hs v hv
-      have := hinv s hs _ hv
-      simpa [K', Matrix.mulVec_zero] using this) with h | h
+        intro s hs v hv
+        have := hinv s hs _ hv
+        simpa [K', Matrix.mulVec_zero] using this)
+      with h | h
     · exact h
     · exfalso
       obtain ⟨g, hg, hyg⟩ := hy0
@@ -96,8 +107,9 @@ theorem exists_pair_ne [IsAlgClosed k] [CharZero k] {W : Γ →* GL (Fin 2) k} {
   let P : Submodule k (Fin 2 → k) := Sig.map (LinearMap.fst k (Fin 2 → k) (Fin 2 → k))
   have hP : P = ⊤ := by
     rcases stable_cases hirr P (by
-      rintro s hs v ⟨σ, hσ, rfl⟩
-      exact ⟨_, hinv s hs σ hσ, rfl⟩) with h | h
+        rintro s hs v ⟨σ, hσ, rfl⟩
+        exact ⟨_, hinv s hs σ hσ, rfl⟩)
+      with h | h
     · exfalso
       obtain ⟨g, hg, hyg⟩ := hy0
       have : y g ∈ P := ⟨_, hgen g hg, rfl⟩
@@ -112,7 +124,8 @@ theorem exists_pair_ne [IsAlgClosed k] [CharZero k] {W : Γ →* GL (Fin 2) k} {
       show LinearMap.inr k _ _ (σ : (Fin 2 → k) × (Fin 2 → k)).2 ∈ Sig
       have : LinearMap.inr k (Fin 2 → k) (Fin 2 → k) (σ : (Fin 2 → k) × (Fin 2 → k)).2 = σ := by
         ext1 <;> simp [h1]
-      rw [this]; exact σ.2
+      rw [this]
+      exact σ.2
     rw [hK', Submodule.mem_bot] at h2
     exact Subtype.ext (Prod.ext h1 h2)
   have hfs : Function.Surjective f := by
@@ -127,20 +140,24 @@ theorem exists_pair_ne [IsAlgClosed k] [CharZero k] {W : Γ →* GL (Fin 2) k} {
     intro a
     have h1 : ((e.symm a : Sig) : (Fin 2 → k) × (Fin 2 → k)).1 = a := e.apply_symm_apply a
     have : (a, φ a) = ((e.symm a : Sig) : (Fin 2 → k) × (Fin 2 → k)) := Prod.ext h1.symm rfl
-    rw [this]; exact (e.symm a).2
+    rw [this]
+    exact (e.symm a).2
   have hφ : ∀ σ ∈ Sig, φ σ.1 = σ.2 := by
     intro σ hσ
     have : e.symm σ.1 = ⟨σ, hσ⟩ := e.symm_apply_eq.2 rfl
     show ((e.symm σ.1 : Sig) : (Fin 2 → k) × (Fin 2 → k)).2 = σ.2
     rw [this]
-  have hφW : ∀ s ∈ H, ∀ a, φ ((W s : Matrix (Fin 2) (Fin 2) k) *ᵥ a) = (W s : Matrix (Fin 2) (Fin 2) k) *ᵥ φ a :=
+  have hφW
+      : ∀ s ∈ H, ∀ a,
+        φ ((W s : Matrix (Fin 2) (Fin 2) k) *ᵥ a) = (W s : Matrix (Fin 2) (Fin 2) k) *ᵥ φ a :=
     fun s hs a => hφ _ (hinv s hs _ (hφmem a))
   obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue φ
   have hE : Module.End.eigenspace φ c = ⊤ := by
     rcases stable_cases hirr (Module.End.eigenspace φ c) (by
-      intro s hs v hv
-      rw [Module.End.mem_eigenspace_iff] at hv ⊢
-      rw [hφW s hs, hv, Matrix.mulVec_smul]) with h | h
+        intro s hs v hv
+        rw [Module.End.mem_eigenspace_iff] at hv ⊢
+        rw [hφW s hs, hv, Matrix.mulVec_smul])
+      with h | h
     · exact absurd h (Module.End.hasEigenvalue_iff.1 hc)
     · exact h
   have hφc : ∀ a, φ a = c • a := fun a => Module.End.mem_eigenspace_iff.1 (hE ▸ Submodule.mem_top)
@@ -163,7 +180,8 @@ theorem exists_pair_ne [IsAlgClosed k] [CharZero k] {W : Γ →* GL (Fin 2) k} {
     | mem x hx =>
       obtain ⟨h, hh, rfl⟩ := hx
       exact horth h hh
-    | zero => simp
+    | zero =>
+      simp
     | add x x' _ _ ihx ihx' =>
       simp only [Prod.fst_add, Pi.add_apply]
       linear_combination ihx + ihx'
@@ -177,16 +195,21 @@ end GlobalTheory.Ord2.PairSpan
 
 namespace GlobalTheory.Ord2
 
-
 open PairSpan in
-theorem exists_om_ne_swap_on_N0g : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
-    (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l), Nf e S A W → ∀ y ∈ Z1 (Loc.colRep W),
-    ∀ z ∈ Z1 (Loc.colRep (dual1 W)), (∃ g ∈ N0g W, y g ≠ 0) → (∃ g ∈ N0g W, z g ≠ 0) →
-    ∃ g ∈ N0g W, ∃ h ∈ N0g W, om (y h) (z g) ≠ om (y g) (z h) := by
+theorem exists_om_ne_swap_on_N0g
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
+        (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l),
+      Nf e S A W
+        → ∀ y ∈ Z1 (Loc.colRep W), ∀ z ∈ Z1 (Loc.colRep (dual1 W)),
+          (∃ g ∈ N0g W, y g ≠ 0) → (∃ g ∈ N0g W, z g ≠ 0)
+            → ∃ g ∈ N0g W, ∃ h ∈ N0g W, om (y h) (z g) ≠ om (y g) (z h) := by
   intro l _ Ω _ _ _ e S A W hW y hyZ z hzZ hy0 hz0
-  have hy' : ∀ g h, y (g * h) = y g + (W g : Matrix (Fin 2) (Fin 2) (Qbar l)) *ᵥ y h := fun g h => by
+  have hy'
+      : ∀ g h, y (g * h) = y g + (W g : Matrix (Fin 2) (Fin 2) (Qbar l)) *ᵥ y h := fun g h => by
     rw [hyZ.2 g h]; rfl
-  have hz' : ∀ g h, z (g * h) = z g + (dual1 W g : Matrix (Fin 2) (Fin 2) (Qbar l)) *ᵥ z h := fun g h => by
+  have hz'
+      : ∀ g h,
+        z (g * h) = z g + (dual1 W g : Matrix (Fin 2) (Fin 2) (Qbar l)) *ᵥ z h := fun g h => by
     rw [hzZ.2 g h]; rfl
   have hnorm : (N0g W).Normal := by unfold N0g; infer_instance
   have hdual : ∀ s, cycBar ℚ Ω l s = 1 → dt W s = 1 → dual1 W s = W s := by
@@ -204,12 +227,13 @@ theorem exists_om_ne_swap_on_N0g : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Fie
     rw [hdual g h1 h2, hN1 g hg]
   have hH : ∀ s ∈ H0g W, dual1 W s = W s := fun s hs =>
     hdual s (Subgroup.mem_inf.1 hs).1 (Subgroup.mem_inf.1 hs).2
-  obtain ⟨g, hg, h, hh, hne⟩ := exists_pair_ne (k := Qbar l) (W := W) (H := H0g W) (N := (N0g W : Set (G ℚ Ω)))
-    hW.irr (fun s _ g hg => hnorm.conj_mem g hg s)
-    (y := y) (z := z)
-    (fun s _ g hg => coc_conj W y hy' s g (hN1 g hg))
-    (fun s hs g hg => by rw [coc_conj (dual1 W) z hz' s g (hNd g hg), hH s hs])
-    hy0 hz0
+  obtain ⟨g, hg, h, hh, hne⟩ :=
+    exists_pair_ne (k := Qbar l) (W := W) (H := H0g W) (N := (N0g W : Set (G ℚ Ω))) hW.irr
+      (fun s _ g hg => hnorm.conj_mem g hg s)
+      (y := y) (z := z)
+      (fun s _ g hg => coc_conj W y hy' s g (hN1 g hg))
+      (fun s hs g hg => by rw [coc_conj (dual1 W) z hz' s g (hNd g hg), hH s hs])
+      hy0 hz0
   exact ⟨g, hg, h, hh, hne⟩
 
 end GlobalTheory.Ord2

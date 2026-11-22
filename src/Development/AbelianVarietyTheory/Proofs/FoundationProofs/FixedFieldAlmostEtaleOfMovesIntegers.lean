@@ -36,9 +36,11 @@ lemma fix_smul {L : Type} [Field L] {G : Type} [Group G] [MulSemiringAction G L]
     (N : Subgroup G) {y : L} (hy : y ∈ Fix L N) {σ : G} (hσ : σ ∈ N) : σ • y = y :=
   hy ⟨σ, hσ⟩
 
-theorem almostSep_of_moves : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (G : Type) [Group G]
-    [MulSemiringAction G L], (∀ (g : G) (x : L), v (g • x) = v x) → ∀ N : Subgroup G, N.Normal →
-    N.FiniteIndex → (∀ σ : G, σ ∉ N → Moves v (Fix L N) σ) → AlmostSep v N := by
+theorem almostSep_of_moves
+    : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (G : Type) [Group G] [MulSemiringAction G L],
+      (∀ (g : G) (x : L), v (g • x) = v x)
+        → ∀ N : Subgroup G,
+          N.Normal → N.FiniteIndex → (∀ σ : G, σ ∉ N → Moves v (Fix L N) σ) → AlmostSep v N := by
   intro L _ v G _ _ hv N hN hfi hmov r hr
   classical
   haveI : Finite (G ⧸ N) := inferInstance
@@ -60,18 +62,20 @@ theorem almostSep_of_moves : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) 
   let x : G ⧸ N → L := fun q => q.out • y q
   have hxF : ∀ q, x q ∈ Fix L N := fun q => smul_mem_fix N _ (hyF q)
   have hxv : ∀ q, v (x q) ≤ 1 := fun q => by simp only [x, hv]; exact hyv q
-  obtain ⟨n, a, b, hab, hsum⟩ := GlobalTheory.T.separating_family_sum_closed_under_prod L v G (Fix L N) (G ⧸ N) s x y
-    (fun j _ => ⟨hxF j, hyF j, hxv j, hyv j⟩)
+  obtain ⟨n, a, b, hab, hsum⟩ :=
+    GlobalTheory.T.separating_family_sum_closed_under_prod L v G (Fix L N) (G ⧸ N) s x y
+      (fun j _ => ⟨hxF j, hyF j, hxv j, hyv j⟩)
   refine ⟨n, a, b, ∏ q ∈ s, (x q - y q), ?_, ?_⟩
-  · refine
-      { a_mem := fun i => (hab i).1
-        b_mem := fun i => (hab i).2.1
-        c_mem := ?_
-        a_le := fun i => (hab i).2.2.1
-        b_le := fun i => (hab i).2.2.2
-        c_le := ?_
-        sum_in := ?_
-        sum_out := ?_ }
+  · refine {
+      a_mem := fun i => (hab i).1
+      b_mem := fun i => (hab i).2.1
+      c_mem := ?_
+      a_le := fun i => (hab i).2.2.1
+      b_le := fun i => (hab i).2.2.2
+      c_le := ?_
+      sum_in := ?_
+      sum_out := ?_
+    }
     · exact prod_mem fun q _ => sub_mem (hxF q) (hyF q)
     · rw [map_prod]
       refine Finset.prod_le_one₀ (fun _ _ => zero_le) fun q _ => ?_
@@ -92,7 +96,8 @@ theorem almostSep_of_moves : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) 
       simp only [x]
       rw [hm, mul_smul, fix_smul N (hyF _) m.2, sub_self]
   · rw [map_prod]
-    calc r < t ^ s.card := hrt
+    calc
+      r < t ^ s.card := hrt
       _ = ∏ _q ∈ s, t := by rw [Finset.prod_const]
       _ ≤ ∏ q ∈ s, v (x q - y q) := by
         refine Finset.prod_le_prod₀ (fun _ _ => zero_le) fun q hq => ?_

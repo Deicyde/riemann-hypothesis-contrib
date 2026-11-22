@@ -10,9 +10,11 @@ noncomputable section
 
 namespace GlobalTheory.EtaleHeightOne
 
-theorem height_comap_le_one_of_goingDown {A B : Type} [CommRing A] [IsDomain A] [CommRing B]
-    [Algebra A B] [Algebra.HasGoingDown A B] (Q : Ideal B) [Q.IsPrime] (hQ : Q.height ≤ 1) :
-    (Q.comap (algebraMap A B)).height ≤ 1 := by
+theorem height_comap_le_one_of_goingDown
+    {A B : Type} [CommRing A] [IsDomain A] [CommRing B] [Algebra A B] [Algebra.HasGoingDown A B]
+    (Q : Ideal B) [Q.IsPrime]
+    (hQ : Q.height ≤ 1)
+    : (Q.comap (algebraMap A B)).height ≤ 1 := by
   set p : Ideal A := Q.comap (algebraMap A B) with hp
   haveI : p.IsPrime := Ideal.comap_isPrime _ Q
   haveI : Q.LiesOver p := ⟨rfl⟩
@@ -26,8 +28,8 @@ theorem height_comap_le_one_of_goingDown {A B : Type} [CommRing A] [IsDomain A] 
   obtain ⟨P₁, hP₁Q, hP₁, hP₁o⟩ := Ideal.exists_ideal_lt_liesOver_of_lt (p := r) (q := p) Q hrp
   haveI := hP₁
   haveI : (⊥ : Ideal A).IsPrime := Ideal.isPrime_bot
-  obtain ⟨P₀, hP₀P₁, hP₀, -⟩ := Ideal.exists_ideal_lt_liesOver_of_lt (p := ⊥) (q := r) P₁
-    (bot_lt_iff_ne_bot.mpr hr0)
+  obtain ⟨P₀, hP₀P₁, hP₀, -⟩ :=
+    Ideal.exists_ideal_lt_liesOver_of_lt (p := ⊥) (q := r) P₁ (bot_lt_iff_ne_bot.mpr hr0)
   haveI := hP₀
   have h1 := Ideal.height_add_one_le_of_lt_of_isPrime hP₀P₁
   have h2 := Ideal.height_add_one_le_of_lt_of_isPrime hP₁Q
@@ -35,13 +37,15 @@ theorem height_comap_le_one_of_goingDown {A B : Type} [CommRing A] [IsDomain A] 
   have h3 : (1 : ℕ∞) + 1 ≤ 1 := le_trans (by gcongr) (h2.trans hQ)
   exact absurd h3 (by decide)
 
-theorem height_one_and_comap_eq_map_C : ∀ (A : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
-    (E : Type) [CommRing E] [Algebra A[X] E] [Algebra A E] [IsScalarTower A A[X] E]
-    [Algebra.Etale A[X] E] (Q : Ideal E) [Q.IsPrime] (P : Ideal (Localization.AtPrime Q)) [P.IsPrime]
-    (a : A), a ≠ 0 → algebraMap A (Localization.AtPrime Q) a ∈ P → P.height ≤ 1 →
-    (P.comap (algebraMap A (Localization.AtPrime Q))).height = 1 ∧
-      P.comap (algebraMap A[X] (Localization.AtPrime Q)) =
-        (P.comap (algebraMap A (Localization.AtPrime Q))).map (Polynomial.C : A →+* A[X]) := by
+theorem height_one_and_comap_eq_map_C
+    : ∀ (A : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] (E : Type)
+        [CommRing E] [Algebra A[X] E] [Algebra A E] [IsScalarTower A A[X] E] [Algebra.Etale A[X] E]
+        (Q : Ideal E) [Q.IsPrime] (P : Ideal (Localization.AtPrime Q)) [P.IsPrime] (a : A),
+      a ≠ 0 → algebraMap A (Localization.AtPrime Q) a ∈ P → P.height ≤ 1
+        → (P.comap (algebraMap A (Localization.AtPrime Q))).height = 1
+          ∧ P.comap (algebraMap A[X] (Localization.AtPrime Q))
+            = (P.comap (algebraMap A (Localization.AtPrime Q))).map
+              (Polynomial.C : A →+* A[X]) := by
   intro A _ _ _ _ E _ _ _ _ _ Q _ P _ a ha haP hP
   set R := Localization.AtPrime Q
   haveI : Module.Flat A[X] E := inferInstance

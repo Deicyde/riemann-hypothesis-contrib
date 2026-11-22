@@ -9,13 +9,25 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TateIsoPullb
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.XR
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.XR
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.CompanionTheory.Ar.XR
 
-theorem isFullLevelAt_move : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H), ∀ (X X' : Scheme.{0}) (t : SAB H X) (t' : SAB H X') (f : X' ⟶ X) (m : SABMap t' t f) (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω') (ξ : Sp Ω ⟶ X) (ξ' : Sp Ω' ⟶ X'), ξ' ≫ f = spMap i ≫ ξ → ∀ (N : ℕ) (z : Ωˣ) (ev : D.La → (Over.mk ξ ⟶ t.G)), IsFullLevelAt D t ξ N z ev → ∃ ev' : D.La → (Over.mk ξ' ⟶ t'.G), IsFullLevelAt D t' ξ' N (Units.map i.toMonoidHom z) ev' ∧ ∀ a, (ev' a).left ≫ m.φ = spMap i ≫ (ev a).left := by
+theorem isFullLevelAt_move
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H),
+      ∀ (X X' : Scheme.{0}) (t : SAB H X) (t' : SAB H X') (f : X' ⟶ X) (m : SABMap t' t f)
+          (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω') (ξ : Sp Ω ⟶ X) (ξ' : Sp Ω' ⟶ X'),
+        ξ' ≫ f = spMap i ≫ ξ
+          → ∀ (N : ℕ) (z : Ωˣ) (ev : D.La → (Over.mk ξ ⟶ t.G)),
+            IsFullLevelAt D t ξ N z ev
+              → ∃ ev' : D.La → (Over.mk ξ' ⟶ t'.G),
+                IsFullLevelAt D t' ξ' N (Units.map i.toMonoidHom z) ev'
+                  ∧ ∀ a, (ev' a).left ≫ m.φ = spMap i ≫ (ev a).left := by
   intro E _ _ _ H D X X' t t' f m Ω Ω' _ _ i ξ ξ' hξ N z ev hfull
   have hpb : IsPullback m.φ t'.G.hom t.G.hom f := m.cart.1
   have hsq : ∀ a, (spMap i ≫ (ev a).left) ≫ t.G.hom = ξ' ≫ f := by
@@ -32,7 +44,8 @@ theorem isFullLevelAt_move : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
   obtain ⟨I, hIζ, hIev⟩ := hfull k (j.comp i)
   have hx : spMap (j.comp i) ≫ ξ = (spMap j ≫ ξ') ≫ f := by
     rw [spMap_comp, Category.assoc, Category.assoc, hξ]
-  obtain ⟨I', hζ, hev⟩ := (tateIsoAt_move E H D X X' t t' f m k (spMap j ≫ ξ') (spMap (j.comp i) ≫ ξ) hx).1 I
+  obtain ⟨I', hζ, hev⟩ :=
+    (tateIsoAt_move E H D X X' t t' f m k (spMap j ≫ ξ') (spMap (j.comp i) ≫ ξ) hx).1 I
   refine ⟨I', ?_, ?_⟩
   · rw [hζ, hIζ]
     simp

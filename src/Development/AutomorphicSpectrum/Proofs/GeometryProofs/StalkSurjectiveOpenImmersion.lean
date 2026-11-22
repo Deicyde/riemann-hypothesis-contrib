@@ -5,14 +5,16 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.LevelSe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Flat
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem stalkMap_comp_surjective_of_open_part :
-    ∀ (S X₀ Xg X' : Scheme.{0}) (e : Xg ⟶ X₀) (f : X' ⟶ Xg) (W' : X'.Opens)
-      (jW : W'.toScheme ⟶ S) (jQ : S ⟶ Xg), IsPreimmersion e → IsOpenImmersion jQ → IsIso jW →
-      jW ≫ jQ = W'.ι ≫ f → ∀ x ∈ W', Function.Surjective ((f ≫ e).stalkMap x).hom := by
+theorem stalkMap_comp_surjective_of_open_part
+    : ∀ (S X₀ Xg X' : Scheme.{0}) (e : Xg ⟶ X₀) (f : X' ⟶ Xg) (W' : X'.Opens) (jW : W'.toScheme ⟶ S)
+        (jQ : S ⟶ Xg),
+      IsPreimmersion e → IsOpenImmersion jQ → IsIso jW → jW ≫ jQ = W'.ι ≫ f
+        → ∀ x ∈ W', Function.Surjective ((f ≫ e).stalkMap x).hom := by
   intro S X₀ Xg X' e f W' jW jQ he hjQ hjW hcomm x hx
   have := he
   have hO : IsOpenImmersion (W'.ι ≫ f) := by

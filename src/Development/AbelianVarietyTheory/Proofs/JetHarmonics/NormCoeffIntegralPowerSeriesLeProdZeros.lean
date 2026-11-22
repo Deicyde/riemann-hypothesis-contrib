@@ -132,14 +132,18 @@ private lemma coeff_bounds_of_zeros [IsUltrametricDist K] [CompleteSpace K] (S :
           (max_lt (hlt (k + 1) (by omega)) (hsmall _))
       rw [Finset.prod_insert hxS, ih2 hd1 hdlt, h0, norm_neg, norm_mul]
 
-theorem _root_.GlobalTheory.ConvSer.norm_coeff_le_prod_zeros : ∀ (K : Type) [NormedField K]
-    [IsUltrametricDist K] [CompleteSpace K] (h : PowerSeries K) (S : Finset K),
-    _root_.GlobalTheory.ConvSer.Intg h → (∀ x ∈ S, ‖x‖ < 1 ∧ _root_.GlobalTheory.ConvSer.ev1 h x = 0) →
-    (∀ r : ℝ, 0 < r → r ≤ 1 → (∀ x ∈ S, r ≤ ‖x‖) → ∀ k, ‖PowerSeries.coeff k h‖ * r ^ k ≤
-      ∏ x ∈ S, ‖x‖) ∧ (‖PowerSeries.coeff S.card h‖ = 1 → (∀ k < S.card,
-      ‖PowerSeries.coeff k h‖ < 1) → ∏ x ∈ S, ‖x‖ = ‖PowerSeries.coeff 0 h‖) := by
+theorem _root_.GlobalTheory.ConvSer.norm_coeff_le_prod_zeros
+    : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CompleteSpace K] (h : PowerSeries K)
+        (S : Finset K),
+      _root_.GlobalTheory.ConvSer.Intg h
+        → (∀ x ∈ S, ‖x‖ < 1 ∧ _root_.GlobalTheory.ConvSer.ev1 h x = 0)
+        → (∀ r : ℝ,
+            0 < r → r ≤ 1 → (∀ x ∈ S, r ≤ ‖x‖)
+              → ∀ k, ‖PowerSeries.coeff k h‖ * r ^ k ≤ ∏ x ∈ S, ‖x‖)
+          ∧ (‖PowerSeries.coeff S.card h‖ = 1 → (∀ k < S.card, ‖PowerSeries.coeff k h‖ < 1)
+            → ∏ x ∈ S, ‖x‖ = ‖PowerSeries.coeff 0 h‖) := by
   intro K _ _ _ h S hI hS
-  exact coeff_bounds_of_zeros S (fun n => PowerSeries.coeff n h)
-    (fun n => hI (Finsupp.single () n)) hS
+  exact
+    coeff_bounds_of_zeros S (fun n => PowerSeries.coeff n h) (fun n => hI (Finsupp.single () n)) hS
 
 end GlobalTheory.ConvSer

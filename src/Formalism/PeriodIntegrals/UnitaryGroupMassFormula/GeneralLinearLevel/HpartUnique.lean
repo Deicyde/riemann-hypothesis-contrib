@@ -68,7 +68,8 @@ lemma lieL_rsmul {i : Fin (r + 1)} {X : Mx k r} (hX : X ∈ LieL k r i) (t : ℝ
     exact ⟨by rw [Matrix.smul_mulVec, e1, smul_zero],
       by rw [Matrix.smul_mulVec, e2, smul_zero]⟩
 
-theorem flow_of_lieL {i : Fin (r + 1)} {X : Mx k r} (hX : X ∈ LieL k r i) : Flow (Glev k r i) X := by
+theorem flow_of_lieL {i : Fin (r + 1)} {X : Mx k r} (hX : X ∈ LieL k r i)
+    : Flow (Glev k r i) X := by
   intro g hg t
   have hY : (t : ℂ) • X ∈ LieL k r i := lieL_rsmul hX t
   obtain ⟨hgU, hgv⟩ := hg
@@ -78,13 +79,17 @@ theorem flow_of_lieL {i : Fin (r + 1)} {X : Mx k r} (hX : X ∈ LieL k r i) : Fl
   refine ⟨?_, fun a ha => ?_⟩
   · show (g * NormedSpace.exp ((t : ℂ) • X))ᴴ * Hpk k r * (g * NormedSpace.exp ((t : ℂ) • X)) = Hpk k r
     rw [Matrix.conjTranspose_mul]
-    calc _ = (NormedSpace.exp ((t : ℂ) • X))ᴴ * (gᴴ * Hpk k r * g) * NormedSpace.exp ((t : ℂ) • X) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      _ = (NormedSpace.exp ((t : ℂ) • X))ᴴ * (gᴴ * Hpk k r * g)
+          * NormedSpace.exp ((t : ℂ) • X) := by
+        simp only [Matrix.mul_assoc]
       _ = Hpk k r := by rw [hgU', hE']
   · obtain ⟨e1, e2⟩ := hY.2 a ha
     obtain ⟨g1, g2⟩ := hgv a ha
-    exact ⟨by rw [← Matrix.mulVec_mulVec, exp_mulVec_fix _ _ e1, g1],
-      by rw [← Matrix.mulVec_mulVec, exp_mulVec_fix _ _ e2, g2]⟩
+    exact ⟨
+      by rw [← Matrix.mulVec_mulVec, exp_mulVec_fix _ _ e1, g1],
+      by rw [← Matrix.mulVec_mulVec, exp_mulVec_fix _ _ e2, g2]
+    ⟩
 
 lemma lieL_add {i : Fin (r + 1)} {X Y : Mx k r} (hX : X ∈ LieL k r i) (hY : Y ∈ LieL k r i) :
     X + Y ∈ LieL k r i := by
@@ -197,10 +202,11 @@ lemma out_esI {i : Fin (r + 1)} (a : Fin r) (ha : a.val < i.val) : Out k r i (es
   show 2 * r + k - i.val < 2 * r + k - a.val
   omega
 
-theorem hpart_mem {i : Fin (r + 1)} {Z : Mx k r} (hZ : InV k r i Z) :
-    hpart1 (Hpk k r) Z ∈ LieL k r i ∧ hpart2 (Hpk k r) Z ∈ LieL k r i :=
-  ⟨⟨skew_hpart1 Z, fun a ha => ⟨(hpart_kill hZ (out_eI a ha)).1, (hpart_kill hZ (out_esI a ha)).1⟩⟩,
-    ⟨skew_hpart2 Z, fun a ha => ⟨(hpart_kill hZ (out_eI a ha)).2, (hpart_kill hZ (out_esI a ha)).2⟩⟩⟩
+theorem hpart_mem {i : Fin (r + 1)} {Z : Mx k r} (hZ : InV k r i Z)
+    : hpart1 (Hpk k r) Z ∈ LieL k r i ∧ hpart2 (Hpk k r) Z ∈ LieL k r i := ⟨
+  ⟨skew_hpart1 Z, fun a ha => ⟨(hpart_kill hZ (out_eI a ha)).1, (hpart_kill hZ (out_esI a ha)).1⟩⟩,
+  ⟨skew_hpart2 Z, fun a ha => ⟨(hpart_kill hZ (out_eI a ha)).2, (hpart_kill hZ (out_esI a ha)).2⟩⟩
+⟩
 
 lemma hpart_decomp (Z : Mx k r) : Z = hpart1 (Hpk k r) Z + Complex.I • hpart2 (Hpk k r) Z := by
   have hI : Complex.I * (1 / (2 * Complex.I)) = 1 / 2 := by

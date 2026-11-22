@@ -10,12 +10,14 @@ open Formalism.HN Formalism.HermitianLatticesTheory Matrix NumberField Finset
 
 namespace GlobalTheory.QuotCoord
 
-theorem exists_quot_matrix {K : Type} [Field K] {n : ℕ} (U U' : Submodule K (Fin n → K))
-    (h : U ≤ U') : ∃ (m : ℕ) (q : Matrix (Fin m) (Fin n) K),
-      m + Module.finrank K U = Module.finrank K U' ∧ (∀ y ∈ U', q *ᵥ y = 0 ↔ y ∈ U) ∧
-      U'.map (Matrix.toLin' q) = ⊤ := by
+theorem exists_quot_matrix
+    {K : Type} [Field K] {n : ℕ} (U U' : Submodule K (Fin n → K)) (h : U ≤ U')
+    : ∃ (m : ℕ) (q : Matrix (Fin m) (Fin n) K),
+      m + Module.finrank K U = Module.finrank K U' ∧ (∀ y ∈ U', q *ᵥ y = 0 ↔ y ∈ U)
+        ∧ U'.map (Matrix.toLin' q) = ⊤ := by
   let W := U.comap U'.subtype
-  let e : (U' ⧸ W) ≃ₗ[K] (Fin (Module.finrank K (U' ⧸ W)) → K) := (Module.finBasis K (U' ⧸ W)).equivFun
+  let e : (U' ⧸ W) ≃ₗ[K] (Fin (Module.finrank K (U' ⧸ W)) → K) :=
+    (Module.finBasis K (U' ⧸ W)).equivFun
   obtain ⟨g, hg⟩ := LinearMap.exists_extend (e.toLinearMap ∘ₗ W.mkQ)
   have hg' : ∀ y : U', g y = e (W.mkQ y) := fun y => LinearMap.congr_fun hg y
   refine ⟨_, LinearMap.toMatrix' g, ?_, ?_, ?_⟩
@@ -30,29 +32,37 @@ theorem exists_quot_matrix {K : Type} [Field K] {n : ℕ} (U U' : Submodule K (F
     obtain ⟨y, hy⟩ := W.mkQ_surjective (e.symm z)
     exact ⟨y, y.2, by rw [hg', hy, LinearEquiv.apply_symm_apply]⟩
 
-theorem exists_coisometry {n m : ℕ} (P P' : Submodule ℂ (EuclideanSpace ℂ (Fin n))) (h : P ≤ P')
-    (hm : m + Module.finrank ℂ P = Module.finrank ℂ P') :
-    ∃ Q : Matrix (Fin m) (Fin n) ℂ, Q * Qᴴ = 1 ∧
-      (∀ z, (WithLp.toLp 2 (Qᴴ *ᵥ z) : EuclideanSpace ℂ (Fin n)) ∈ P') ∧
-      (∀ u ∈ P', u - WithLp.toLp 2 (Qᴴ *ᵥ (Q *ᵥ u.ofLp)) ∈ P) ∧
-      (∀ u ∈ P', ‖Pᗮ.starProjection u‖ = cnorm (Q *ᵥ u.ofLp)) := by
+theorem exists_coisometry
+    {n m : ℕ} (P P' : Submodule ℂ (EuclideanSpace ℂ (Fin n))) (h : P ≤ P')
+    (hm : m + Module.finrank ℂ P = Module.finrank ℂ P')
+    : ∃ Q : Matrix (Fin m) (Fin n) ℂ,
+      Q * Qᴴ = 1 ∧ (∀ z, (WithLp.toLp 2 (Qᴴ *ᵥ z) : EuclideanSpace ℂ (Fin n)) ∈ P')
+        ∧ (∀ u ∈ P', u - WithLp.toLp 2 (Qᴴ *ᵥ (Q *ᵥ u.ofLp)) ∈ P)
+        ∧ (∀ u ∈ P', ‖Pᗮ.starProjection u‖ = cnorm (Q *ᵥ u.ofLp)) := by
   let T : Submodule ℂ (EuclideanSpace ℂ (Fin n)) := Pᗮ ⊓ P'
   have hT : Module.finrank ℂ T = m := by
     have := Submodule.finrank_add_inf_finrank_orthogonal h
-    simp only [T]; omega
+    simp only [T]
+    omega
   let ob : OrthonormalBasis (Fin m) ℂ T := (stdOrthonormalBasis ℂ T).reindex (finCongr hT)
-  let Q : Matrix (Fin m) (Fin n) ℂ := Matrix.of fun i j => star ((ob i : EuclideanSpace ℂ (Fin n)) j)
-  have hQ : ∀ (u : EuclideanSpace ℂ (Fin n)) i, (Q *ᵥ u.ofLp) i =
-      inner ℂ (ob i : EuclideanSpace ℂ (Fin n)) u := by
+  let Q : Matrix (Fin m) (Fin n) ℂ :=
+    Matrix.of fun i j => star ((ob i : EuclideanSpace ℂ (Fin n)) j)
+  have hQ
+      : ∀ (u : EuclideanSpace ℂ (Fin n)) i,
+        (Q *ᵥ u.ofLp) i = inner ℂ (ob i : EuclideanSpace ℂ (Fin n)) u := by
     intro u i
     simp [Q, Matrix.mulVec, dotProduct, PiLp.inner_apply, mul_comm]
-  have hQh : ∀ z, (WithLp.toLp 2 (Qᴴ *ᵥ z) : EuclideanSpace ℂ (Fin n)) =
-      ((∑ i, z i • ob i : T) : EuclideanSpace ℂ (Fin n)) := by
+  have hQh
+      : ∀ z,
+        (WithLp.toLp 2 (Qᴴ *ᵥ z) : EuclideanSpace ℂ (Fin n))
+          = ((∑ i, z i • ob i : T) : EuclideanSpace ℂ (Fin n)) := by
     intro z
     ext j
     simp [Q, Matrix.mulVec, dotProduct, mul_comm]
-  have hproj : ∀ u ∈ P', ∃ t : T, (t : EuclideanSpace ℂ (Fin n)) = Pᗮ.starProjection u ∧
-      Q *ᵥ u.ofLp = (ob.repr t).ofLp ∧ u - t ∈ P := by
+  have hproj
+      : ∀ u ∈ P', ∃ t : T,
+        (t : EuclideanSpace ℂ (Fin n)) = Pᗮ.starProjection u ∧ Q *ᵥ u.ofLp = (ob.repr t).ofLp
+          ∧ u - t ∈ P := by
     intro u hu
     have h1 : u - Pᗮ.starProjection u ∈ P := by
       rw [Submodule.starProjection_orthogonal_val, sub_sub_cancel]
@@ -85,13 +95,16 @@ theorem exists_coisometry {n m : ℕ} (P P' : Submodule ℂ (EuclideanSpace ℂ 
 open QuotientRealization
 
 section
-variable {K : Type} [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K] {n m : ℕ}
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
+  {n m : ℕ}
 
-theorem toLp_mem_pv (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
-    (A : Submodule (𝓞 K) (Fin n → K)) (w : InfinitePlace K) (u : Fin n → ℂ)
-    (hu : u ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (A : Set (Fin n → K)))) :
-    (WithLp.toLp 2 u : EuclideanSpace ℂ (Fin n)) ∈
-      pv (Pi.basisFun K (Fin n)) X (Submodule.span K (A : Set (Fin n → K))) w := by
+theorem toLp_mem_pv
+    (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (A : Submodule (𝓞 K) (Fin n → K))
+    (w : InfinitePlace K) (u : Fin n → ℂ)
+    (hu : u ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (A : Set (Fin n → K))))
+    : (WithLp.toLp 2 u : EuclideanSpace ℂ (Fin n))
+      ∈ pv (Pi.basisFun K (Fin n)) X (Submodule.span K (A : Set (Fin n → K))) w := by
   induction hu using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨y, hy, rfl⟩ := hy
@@ -101,51 +114,63 @@ theorem toLp_mem_pv (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
   | smul a y _ h => rw [WithLp.toLp_smul]; exact Submodule.smul_mem _ _ h
 
 omit [StarRing K] [_root_.NumberField.IsTotallyComplex K] in
-theorem mul_fcoord (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (w : InfinitePlace K)
-    (hX : IsUnit (X w).det) (q : Matrix (Fin m) (Fin n) K) (y : Fin n → K) :
-    (q.map w.embedding * X w) *ᵥ fcoord (Pi.basisFun K (Fin n)) X w y =
-      vecAt (Pi.basisFun K (Fin m)) w (q *ᵥ y) := by
+theorem mul_fcoord
+    (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (w : InfinitePlace K) (hX : IsUnit (X w).det)
+    (q : Matrix (Fin m) (Fin n) K) (y : Fin n → K)
+    : (q.map w.embedding * X w) *ᵥ fcoord (Pi.basisFun K (Fin n)) X w y
+      = vecAt (Pi.basisFun K (Fin m)) w (q *ᵥ y) := by
   rw [fcoord, Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hX, Matrix.mul_one]
   funext i
   simp [vecAt, Matrix.mulVec, dotProduct]
 
-theorem exists_frame (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (w : InfinitePlace K)
-    (hX : IsUnit (X w).det) (q : Matrix (Fin m) (Fin n) K) (A S : Submodule (𝓞 K) (Fin n → K))
-    (hS : ∀ y ∈ S, q *ᵥ y = 0)
+theorem exists_frame
+    (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (w : InfinitePlace K) (hX : IsUnit (X w).det)
+    (q : Matrix (Fin m) (Fin n) K) (A S : Submodule (𝓞 K) (Fin n → K)) (hS : ∀ y ∈ S, q *ᵥ y = 0)
     (hA : Submodule.span K (A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) : Set (Fin m → K)) = ⊤)
     (Q : Matrix (Fin m) (Fin n) ℂ)
     (hQ : ∀ u ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (A : Set (Fin n → K))),
-      u - Qᴴ *ᵥ (Q *ᵥ u) ∈
-        Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (S : Set (Fin n → K)))) :
-    ∃ Y : Matrix (Fin m) (Fin m) ℂ, IsUnit Y.det ∧ ∀ y ∈ A,
-      Y⁻¹ *ᵥ vecAt (Pi.basisFun K (Fin m)) w (q *ᵥ y) =
-        Q *ᵥ fcoord (Pi.basisFun K (Fin n)) X w y := by
+      u - Qᴴ *ᵥ (Q *ᵥ u)
+        ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (S : Set (Fin n → K))))
+    : ∃ Y : Matrix (Fin m) (Fin m) ℂ,
+      IsUnit Y.det
+        ∧ ∀ y ∈ A,
+          Y⁻¹ *ᵥ vecAt (Pi.basisFun K (Fin m)) w (q *ᵥ y)
+            = Q *ᵥ fcoord (Pi.basisFun K (Fin n)) X w y := by
   set M := q.map w.embedding * X w with hM
-  have hker : Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (S : Set (Fin n → K))) ≤
-      LinearMap.ker (Matrix.toLin' M) := by
+  have hker
+      : Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (S : Set (Fin n → K)))
+        ≤ LinearMap.ker (Matrix.toLin' M) := by
     rw [Submodule.span_le]
     rintro _ ⟨y, hy, rfl⟩
     show Matrix.toLin' M _ = 0
     rw [Matrix.toLin'_apply, hM, mul_fcoord X w hX, hS y hy]
-    funext i; simp [vecAt]
-  have hkey : ∀ y ∈ A, vecAt (Pi.basisFun K (Fin m)) w (q *ᵥ y) =
-      (M * Qᴴ) *ᵥ (Q *ᵥ fcoord (Pi.basisFun K (Fin n)) X w y) := by
+    funext i
+    simp [vecAt]
+  have hkey
+      : ∀ y ∈ A,
+        vecAt (Pi.basisFun K (Fin m)) w (q *ᵥ y)
+          = (M * Qᴴ) *ᵥ (Q *ᵥ fcoord (Pi.basisFun K (Fin n)) X w y) := by
     intro y hy
     have h1 := hker (hQ _ (Submodule.subset_span ⟨y, hy, rfl⟩))
     rw [LinearMap.mem_ker, Matrix.toLin'_apply, Matrix.mulVec_sub, sub_eq_zero] at h1
     rw [← Matrix.mulVec_mulVec, ← h1, hM, mul_fcoord X w hX]
   have hu : IsUnit (M * Qᴴ).det := by
     rw [← Matrix.isUnit_iff_isUnit_det, ← Matrix.mulVec_surjective_iff_isUnit]
-    have hle : Submodule.span ℂ (fcoord (Pi.basisFun K (Fin m)) (fun _ => 1) w ''
-        (A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) : Set (Fin m → K))) ≤
-        LinearMap.range (Matrix.toLin' (M * Qᴴ)) := by
+    have hle
+        : Submodule.span ℂ
+            (fcoord (Pi.basisFun K (Fin m)) (fun _ => 1) w
+              '' (A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) : Set (Fin m → K)))
+          ≤ LinearMap.range (Matrix.toLin' (M * Qᴴ)) := by
       rw [Submodule.span_le]
       rintro _ ⟨_, ⟨y, hy, rfl⟩, rfl⟩
       refine ⟨Q *ᵥ fcoord (Pi.basisFun K (Fin n)) X w y, ?_⟩
       rw [Matrix.toLin'_apply, ← hkey y hy]
       simp [fcoord]
-    have htop : Submodule.span ℂ (fcoord (Pi.basisFun K (Fin m)) (fun _ => 1) w ''
-        (A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) : Set (Fin m → K))) = ⊤ := by
+    have htop
+        : Submodule.span ℂ
+            (fcoord (Pi.basisFun K (Fin m)) (fun _ => 1) w
+              '' (A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) : Set (Fin m → K)))
+          = ⊤ := by
       apply Submodule.eq_top_of_finrank_eq
       rw [PlaceDecomposition.finrank_span_complex _ _ (fun _ => by simp), rkK, hA]
       simp
@@ -155,17 +180,19 @@ theorem exists_frame (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (w : I
   refine ⟨M * Qᴴ, hu, fun y hy => ?_⟩
   rw [hkey y hy, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hu, Matrix.one_mulVec]
 
-theorem sizeQ_eq_size (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (hX : ∀ w, IsUnit (X w).det)
+theorem sizeQ_eq_size
+    (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (hX : ∀ w, IsUnit (X w).det)
     (X' : InfinitePlace K → Matrix (Fin m) (Fin m) ℂ) (hX' : ∀ w, IsUnit (X' w).det)
-    (q : Matrix (Fin m) (Fin n) K) (A S N : Submodule (𝓞 K) (Fin n → K)) (hA : A.FG)
-    (hSat : IsSat (realize (Pi.basisFun K (Fin n)) X) A S) (hSN : S ≤ N) (hNA : N ≤ A)
+    (q : Matrix (Fin m) (Fin n) K) (A S N : Submodule (𝓞 K) (Fin n → K))
+    (hA : A.FG) (hSat : IsSat (realize (Pi.basisFun K (Fin n)) X) A S) (hSN : S ≤ N) (hNA : N ≤ A)
     (hker : ∀ y ∈ Submodule.span K (A : Set (Fin n → K)),
       q *ᵥ y = 0 ↔ y ∈ Submodule.span K (S : Set (Fin n → K)))
-    (hnorm : ∀ w, ∀ y ∈ A, normAt (Pi.basisFun K (Fin m)) X' w (q *ᵥ y) =
-      ‖(pv (Pi.basisFun K (Fin n)) X (Submodule.span K (S : Set (Fin n → K))) w)ᗮ.starProjection
-        (WithLp.toLp 2 (fcoord (Pi.basisFun K (Fin n)) X w y))‖) :
-    sizeQ (Pi.basisFun K (Fin n)) X N S = size (Pi.basisFun K (Fin m)) X'
-      (N.map ((Matrix.toLin' q).restrictScalars (𝓞 K))) := by
+    (hnorm : ∀ w, ∀ y ∈ A,
+      normAt (Pi.basisFun K (Fin m)) X' w (q *ᵥ y)
+        = ‖(pv (Pi.basisFun K (Fin n)) X (Submodule.span K (S : Set (Fin n → K))) w)ᗮ.starProjection
+            (WithLp.toLp 2 (fcoord (Pi.basisFun K (Fin n)) X w y))‖)
+    : sizeQ (Pi.basisFun K (Fin n)) X N S
+      = size (Pi.basisFun K (Fin m)) X' (N.map ((Matrix.toLin' q).restrictScalars (𝓞 K))) := by
   classical
   set U := Submodule.span K (S : Set (Fin n → K)) with hU
   set b := Pi.basisFun K (Fin n)
@@ -174,8 +201,9 @@ theorem sizeQ_eq_size (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (hX :
   set N'' := N.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) with hN''
   have hUle : U ≤ Submodule.span K (N : Set (Fin n → K)) := Submodule.span_mono hSN
   have hrk : rkK N'' + rkK S = rkK N := by
-    have hspan : Submodule.span K (N'' : Set (Fin m → K)) =
-        (Submodule.span K (N : Set (Fin n → K))).map (Matrix.toLin' q) := by
+    have hspan
+        : Submodule.span K (N'' : Set (Fin m → K))
+          = (Submodule.span K (N : Set (Fin n → K))).map (Matrix.toLin' q) := by
       rw [hN'', Submodule.map_coe]
       exact Submodule.span_image (Matrix.toLin' q)
     let W := Submodule.span K (N : Set (Fin n → K))
@@ -190,8 +218,7 @@ theorem sizeQ_eq_size (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (hX :
     unfold rkK
     rw [hspan]
     exact h1
-  have hrkR : ((rkK N : ℝ) - rkK S) = rkK N'' := by
-    rw [← hrk]; push_cast; ring
+  have hrkR : ((rkK N : ℝ) - rkK S) = rkK N'' := by rw [← hrk]; push_cast; ring
   let ρ := realize b X
   let ρ'' := realize b'' X'
   have hNlat := plLat K _ _ b X hX N hNfg
@@ -238,7 +265,32 @@ theorem sizeQ_eq_size (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (hX :
 
 end
 
-theorem quot_realized : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K] (n : ℕ) (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (A S : Submodule (𝓞 K) (Fin n → K)), (∀ w, IsUnit (X w).det) → A.FG → IsSat (realize (Pi.basisFun K (Fin n)) X) A S → ∃ (m : ℕ) (q : Matrix (Fin m) (Fin n) K) (X' : InfinitePlace K → Matrix (Fin m) (Fin m) ℂ) (Q : InfinitePlace K → Matrix (Fin m) (Fin n) ℂ), m + rkK S = rkK A ∧ (∀ w, IsUnit (X' w).det) ∧ (∀ w, Q w * (Q w)ᴴ = 1) ∧ (∀ w, ∀ y ∈ A, fcoord (Pi.basisFun K (Fin m)) X' w (q *ᵥ y) = Q w *ᵥ fcoord (Pi.basisFun K (Fin n)) X w y) ∧ (∀ w z, (Q w)ᴴ *ᵥ z ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (A : Set (Fin n → K)))) ∧ (∀ w, ∀ u ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (A : Set (Fin n → K))), u - (Q w)ᴴ *ᵥ (Q w *ᵥ u) ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (S : Set (Fin n → K)))) ∧ (∀ y ∈ S, q *ᵥ y = 0) ∧ Submodule.span K (A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) : Set (Fin m → K)) = ⊤ ∧ ∀ N', N' ≤ A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) → N' ≠ ⊥ → ∃ N, S < N ∧ N ≤ A ∧ sizeQ (Pi.basisFun K (Fin n)) X N S = size (Pi.basisFun K (Fin m)) X' N' := by
+theorem quot_realized
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
+        (n : ℕ) (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
+        (A S : Submodule (𝓞 K) (Fin n → K)),
+      (∀ w, IsUnit (X w).det) → A.FG → IsSat (realize (Pi.basisFun K (Fin n)) X) A S
+        → ∃ (m : ℕ) (q : Matrix (Fin m) (Fin n) K) (X' : InfinitePlace K → Matrix (Fin m) (Fin m) ℂ)
+            (Q : InfinitePlace K → Matrix (Fin m) (Fin n) ℂ),
+          m + rkK S = rkK A ∧ (∀ w, IsUnit (X' w).det) ∧ (∀ w, Q w * (Q w)ᴴ = 1)
+            ∧ (∀ w, ∀ y ∈ A,
+              fcoord (Pi.basisFun K (Fin m)) X' w (q *ᵥ y)
+                = Q w *ᵥ fcoord (Pi.basisFun K (Fin n)) X w y)
+            ∧ (∀ w z,
+              (Q w)ᴴ *ᵥ z
+                ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (A : Set (Fin n → K))))
+            ∧ (∀ w,
+              ∀ u ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (A : Set (Fin n → K))),
+                u - (Q w)ᴴ *ᵥ (Q w *ᵥ u)
+                  ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (S : Set (Fin n → K))))
+            ∧ (∀ y ∈ S, q *ᵥ y = 0)
+            ∧ Submodule.span K (A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) : Set (Fin m → K))
+              = ⊤
+            ∧ ∀ N',
+              N' ≤ A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) → N' ≠ ⊥
+                → ∃ N,
+                  S < N ∧ N ≤ A
+                    ∧ sizeQ (Pi.basisFun K (Fin n)) X N S = size (Pi.basisFun K (Fin m)) X' N' := by
   intro K _ _ _ _ n X A S hX hA hSat
   have hSA : S ≤ A := hSat.1
   have hUU : Submodule.span K (S : Set (Fin n → K)) ≤ Submodule.span K (A : Set (Fin n → K)) :=
@@ -246,26 +298,31 @@ theorem quot_realized : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_
   obtain ⟨m, q, hm, hker, hsurj⟩ := exists_quot_matrix _ _ hUU
   have hS : ∀ y ∈ S, q *ᵥ y = 0 := fun y hy =>
     (hker y (Submodule.subset_span (hSA hy))).2 (Submodule.subset_span hy)
-  have htop : Submodule.span K
-      (A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) : Set (Fin m → K)) = ⊤ := by
+  have htop
+      : Submodule.span K (A.map ((Matrix.toLin' q).restrictScalars (𝓞 K)) : Set (Fin m → K))
+        = ⊤ := by
     rw [← hsurj, Submodule.map_coe]
     exact Submodule.span_image (Matrix.toLin' q)
-  have hQ := fun w => exists_coisometry (m := m)
-    (pv (Pi.basisFun K (Fin n)) X (Submodule.span K (S : Set (Fin n → K))) w)
-    (pv (Pi.basisFun K (Fin n)) X (Submodule.span K (A : Set (Fin n → K))) w)
-    (Submodule.span_mono (Set.image_mono hUU))
-    (by rw [finrank_pv _ _ hX, finrank_pv _ _ hX]; exact hm)
+  have hQ := fun w =>
+    exists_coisometry (m := m)
+      (pv (Pi.basisFun K (Fin n)) X (Submodule.span K (S : Set (Fin n → K))) w)
+      (pv (Pi.basisFun K (Fin n)) X (Submodule.span K (A : Set (Fin n → K))) w)
+      (Submodule.span_mono (Set.image_mono hUU))
+      (by rw [finrank_pv _ _ hX, finrank_pv _ _ hX]; exact hm)
   choose Q hQ1 hQ2 hQ3 hQ4 using hQ
-  have hQ3' : ∀ w, ∀ u ∈ Submodule.span ℂ
-      (fcoord (Pi.basisFun K (Fin n)) X w '' (A : Set (Fin n → K))), u - (Q w)ᴴ *ᵥ (Q w *ᵥ u) ∈
-      Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (S : Set (Fin n → K))) :=
+  have hQ3'
+      : ∀ w, ∀ u ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (A : Set (Fin n → K))),
+        u - (Q w)ᴴ *ᵥ (Q w *ᵥ u)
+          ∈ Submodule.span ℂ (fcoord (Pi.basisFun K (Fin n)) X w '' (S : Set (Fin n → K))) :=
     fun w u hu => pv_le _ X S w _ (hQ3 w _ (toLp_mem_pv X A w u hu))
   have hY := fun w => exists_frame X w (hX w) q A S hS htop (Q w) (hQ3' w)
   choose X' hX' hc using hY
   refine ⟨m, q, X', Q, hm, hX', hQ1, hc, fun w z => pv_le _ X A w _ (hQ2 w z), hQ3', hS, htop, ?_⟩
   intro N' hN' hne
-  have hmap : (A ⊓ N'.comap ((Matrix.toLin' q).restrictScalars (𝓞 K))).map
-      ((Matrix.toLin' q).restrictScalars (𝓞 K)) = N' := by
+  have hmap
+      : (A ⊓ N'.comap ((Matrix.toLin' q).restrictScalars (𝓞 K))).map
+          ((Matrix.toLin' q).restrictScalars (𝓞 K))
+        = N' := by
     apply le_antisymm
     · rintro _ ⟨y, hy, rfl⟩
       exact hy.2

@@ -17,9 +17,11 @@ theorem ramUnr_holds : RamUnr := by
   haveI : IsGalois F ↥Q.K := inferInstance
   obtain ⟨w, hw, hwu⟩ := CompanionTheory.FamInh.exists_place_between (K := F) (L := ↥Q.K) hA
   have hunder : w.under (𝓞 F) = u :=
-    ReciprocityTheory.Gal.eq_of_isPlaceOver (fun x => by
-      rw [IsScalarTower.algebraMap_apply F ↥Q.K Ω]
-      exact hw (algebraMap (𝓞 F) (𝓞 ↥Q.K) x)) hA
+    ReciprocityTheory.Gal.eq_of_isPlaceOver
+      (fun x => by
+        rw [IsScalarTower.algebraMap_apply F ↥Q.K Ω]
+        exact hw (algebraMap (𝓞 F) (𝓞 ↥Q.K) x))
+      hA
   refine ⟨w, fun hun => hfix fun x => ?_, hunder ▸ huT⟩
   have he : w.asIdeal.ramificationIdx (𝓞 F) = 1 := Ideal.ramificationIdx_eq_one_iff.2 hun
   have hs := CompanionTheory.FamInh.res_mem_inertia (L := ↥Q.K) hw hτ

@@ -20,8 +20,8 @@ theorem emb_surj (D : Formalism.BasicNotions.D7) : Function.Surjective D.host.em
 
   have key : ∃ σ : D.host.E ≃ₐ[ℚ] D.host.E, D.host.φ₀.comp (σ : D.host.E →+* D.host.E) = φ := by
     classical
-    let f : (D.host.E ≃ₐ[ℚ] D.host.E) → (D.host.E →ₐ[ℚ] ℂ) :=
-      fun σ => (D.host.φ₀.toRatAlgHom).comp (σ : D.host.E →ₐ[ℚ] D.host.E)
+    let f : (D.host.E ≃ₐ[ℚ] D.host.E) → (D.host.E →ₐ[ℚ] ℂ) := fun σ =>
+      (D.host.φ₀.toRatAlgHom).comp (σ : D.host.E →ₐ[ℚ] D.host.E)
     have hinj : Function.Injective f := by
       intro σ τ h
       ext x
@@ -29,7 +29,8 @@ theorem emb_surj (D : Formalism.BasicNotions.D7) : Function.Surjective D.host.em
       exact D.host.φ₀.injective h1
     have hcard : Fintype.card (D.host.E ≃ₐ[ℚ] D.host.E) = Fintype.card (D.host.E →ₐ[ℚ] ℂ) := by
       haveI : IsGalois ℚ D.host.E := inferInstance
-      rw [AlgHom.card ℚ D.host.E ℂ, ← IsGalois.card_aut_eq_finrank ℚ D.host.E, Fintype.card_eq_nat_card]
+      rw [AlgHom.card ℚ D.host.E ℂ, ← IsGalois.card_aut_eq_finrank ℚ D.host.E,
+        Fintype.card_eq_nat_card]
     obtain ⟨σ, hσ⟩ := ((Fintype.bijective_iff_injective_and_card f).2 ⟨hinj, hcard⟩).2 φ.toRatAlgHom
     refine ⟨σ, ?_⟩
     ext x
@@ -51,10 +52,10 @@ theorem totally_positive_all : TotPosAll := by
       have h2 : g.1.2 = -1 := (Int.units_eq_one_or _).resolve_left hg
       rw [Prod.fst_mul, Prod.snd_mul, h2]
       first
-        | rfl
-        | decide
-        | (simp [Formalism.HC.Frame.cc]; done)
-        | (simp [Formalism.HC.Frame.cc, Formalism.HC.c0])
+      | rfl
+      | decide
+      | (simp [Formalism.HC.Frame.cc]; done)
+      | (simp [Formalism.HC.Frame.cc, Formalism.HC.c0])
     have h1 := hpos (D.eTau.symm ⟨g * D.R.cc, hmem⟩)
     simp only [Equiv.apply_symm_apply] at h1
     have hc : D.host.conj x = x := (Formalism.MainNotions.S.Inh.tie_star D x).symm.trans hx
@@ -68,7 +69,6 @@ theorem totally_positive_all : TotPosAll := by
 end Formalism.L2.SG.Pf.Cnt.R1
 
 namespace Formalism.L2.SG.Pf.Cnt
-
 
 variable [Fact Formalism.HermitianLattices.Ext.L3.HermRepUnram] in
 theorem rational_pair_holds : RatPair := ratPair_of R1.totally_positive_all

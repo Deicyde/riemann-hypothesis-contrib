@@ -10,14 +10,16 @@ noncomputable section
 
 namespace GlobalTheory.DefPt
 
-open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.DualWeyl MvPolynomial
+open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj
+  GlobalTheory.DualWeyl MvPolynomial
 open scoped Matrix
 
 section Adelic
 
 variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι] [DecidableEq ι]
 
-def IntAt (w : HeightOneSpectrum (𝓞 K)) {κ : Type} (M : Matrix ι κ K) : Prop := ∀ i j, w.valuation K (M i j) ≤ 1
+def IntAt (w : HeightOneSpectrum (𝓞 K)) {κ : Type} (M : Matrix ι κ K) : Prop :=
+  ∀ i j, w.valuation K (M i j) ≤ 1
 
 def IsAdelic (A : HeightOneSpectrum (𝓞 K) → Matrix ι ι K) : Prop :=
   (∀ w, (A w).det ≠ 0) ∧ {w | ¬ (IntAt w (A w) ∧ IntAt w (A w)⁻¹)}.Finite
@@ -49,22 +51,33 @@ variable {T : Type} [Fintype T] [DecidableEq T] {N : T → ℕ} {n : ℕ}
 
 abbrev TIdx (la : ∀ t, Fin (N t) → ℕ) : Type := ∀ t, Idx (la t)
 
-def tval (la : ∀ t, Fin (N t) → ℕ) {S : Type} [CommRing S] (x : TIdx la → S) (y : ∀ t, Matrix (Fin (N t)) (Fin (N t)) S) : S :=
+def tval
+    (la : ∀ t, Fin (N t) → ℕ)
+    {S : Type} [CommRing S]
+    (x : TIdx la → S) (y : ∀ t, Matrix (Fin (N t)) (Fin (N t)) S)
+    : S :=
   ∑ I : TIdx la, x I * ∏ t, evalAt (y t) (map (Int.castRingHom S) (intVec (la t) (I t)))
 
-def rhoMat (la : Fin n → ℕ) {K : Type} [Field K] [CharZero K] (g : Matrix (Fin n) (Fin n) K) : Matrix (Idx la) (Idx la) K :=
+def rhoMat (la : Fin n → ℕ) {K : Type} [Field K] [CharZero K] (g : Matrix (Fin n) (Fin n) K)
+    : Matrix (Idx la) (Idx la) K :=
   LinearMap.toMatrix (basis la K) (basis la K) (rho la K gᵀ)
 
-def kron {J : T → Type} {R : Type} [CommRing R] (M : ∀ t, Matrix (J t) (J t) R) : Matrix (∀ t, J t) (∀ t, J t) R :=
+def kron {J : T → Type} {R : Type} [CommRing R] (M : ∀ t, Matrix (J t) (J t) R)
+    : Matrix (∀ t, J t) (∀ t, J t) R :=
   Matrix.of fun I I' => ∏ t, M t (I t) (I' t)
 
 def onMat (la : Fin n → ℕ) : Matrix (Idx la) (Idx la) ℂ :=
   Matrix.of fun i j => (onBasis la).repr (toSpace la (basis la ℂ j)) i
 
-def fibA (la : ∀ t, Fin (N t) → ℕ) {K : Type} [Field K] [CharZero K] (a : K) (B : ∀ t, Matrix (Fin (N t)) (Fin (N t)) K) :
-    Matrix (TIdx la) (TIdx la) K := a • kron fun t => rhoMat (la t) (B t)
+def fibA
+    (la : ∀ t, Fin (N t) → ℕ)
+    {K : Type} [Field K] [CharZero K]
+    (a : K) (B : ∀ t, Matrix (Fin (N t)) (Fin (N t)) K)
+    : Matrix (TIdx la) (TIdx la) K :=
+  a • kron fun t => rhoMat (la t) (B t)
 
-def fibY (la : ∀ t, Fin (N t) → ℕ) (s : ℝ) (X : ∀ t, Matrix (Fin (N t)) (Fin (N t)) ℂ) : Matrix (TIdx la) (TIdx la) ℂ :=
+def fibY (la : ∀ t, Fin (N t) → ℕ) (s : ℝ) (X : ∀ t, Matrix (Fin (N t)) (Fin (N t)) ℂ)
+    : Matrix (TIdx la) (TIdx la) ℂ :=
   (s : ℂ) • kron fun t => onMat (la t) * rhoMat (la t) (X t)
 
 end Tensor

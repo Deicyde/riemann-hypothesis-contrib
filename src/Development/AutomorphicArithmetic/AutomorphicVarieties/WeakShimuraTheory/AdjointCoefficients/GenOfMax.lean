@@ -5,19 +5,22 @@ public import Mathlib.Topology.Algebra.ClopenNhdofOne
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-private theorem gen_of_max {A : Type} [CommGroup A] (l : ℕ)
-    (hl : ∀ s t : A, s ^ l = 1 → t ^ l = 1 → s ≠ 1 → ∃ n : ℕ, t = s ^ n)
-    (a : ℕ) (z : A) (h1 : z ^ l ^ (a + 1) = 1) (h0 : z ^ l ^ a ≠ 1) :
-    ∀ b, b ≤ a + 1 → ∀ s : A, s ^ l ^ b = 1 → s ∈ Subgroup.zpowers z := by
+private theorem gen_of_max
+    {A : Type} [CommGroup A]
+    (l : ℕ) (hl : ∀ s t : A, s ^ l = 1 → t ^ l = 1 → s ≠ 1 → ∃ n : ℕ, t = s ^ n)
+    (a : ℕ) (z : A) (h1 : z ^ l ^ (a + 1) = 1) (h0 : z ^ l ^ a ≠ 1)
+    : ∀ b, b ≤ a + 1 → ∀ s : A, s ^ l ^ b = 1 → s ∈ Subgroup.zpowers z := by
   intro b
   induction b with
   | zero => intro _ s hs; simp at hs; simp [hs]
   | succ b ih =>
     intro hb s hs
-    obtain ⟨n, hn⟩ := hl (z ^ l ^ a) (s ^ l ^ b) (by rw [← pow_mul, ← pow_succ, h1])
-      (by rw [← pow_mul, ← pow_succ, hs]) h0
+    obtain ⟨n, hn⟩ :=
+      hl (z ^ l ^ a) (s ^ l ^ b) (by rw [← pow_mul, ← pow_succ, h1])
+        (by rw [← pow_mul, ← pow_succ, hs]) h0
     obtain ⟨c, rfl⟩ : ∃ c, a = c + b := ⟨a - b, by omega⟩
     have h2 : (s / z ^ (l ^ c * n)) ^ l ^ b = 1 := by
       rw [div_pow, hn, ← pow_mul, ← pow_mul, pow_add, mul_right_comm, div_self']
@@ -25,10 +28,12 @@ private theorem gen_of_max {A : Type} [CommGroup A] (l : ℕ)
     have h4 := mul_mem h3 (Subgroup.npow_mem_zpowers z (l ^ c * n))
     rwa [div_mul_cancel] at h4
 
-private theorem cyc_abs {A : Type} [CommGroup A] (l : ℕ) (hp : l.Prime)
+private theorem cyc_abs
+    {A : Type} [CommGroup A]
+    (l : ℕ) (hp : l.Prime)
     (hres : ∀ x : A, x ≠ 1 → ∃ U : Subgroup A, U.index ≠ 0 ∧ x ∉ U)
-    (hl : ∀ s t : A, s ^ l = 1 → t ^ l = 1 → s ≠ 1 → ∃ n : ℕ, t = s ^ n) :
-    ∃ z : A, (∃ a, z ^ l ^ a = 1) ∧ ∀ s : A, (∃ a, s ^ l ^ a = 1) → ∃ n : ℕ, s = z ^ n := by
+    (hl : ∀ s t : A, s ^ l = 1 → t ^ l = 1 → s ≠ 1 → ∃ n : ℕ, t = s ^ n)
+    : ∃ z : A, (∃ a, z ^ l ^ a = 1) ∧ ∀ s : A, (∃ a, s ^ l ^ a = 1) → ∃ n : ℕ, s = z ^ n := by
   classical
   by_cases hx : ∃ x : A, x ^ l = 1 ∧ x ≠ 1
   · obtain ⟨x, hx1, hx0⟩ := hx
@@ -66,8 +71,8 @@ private theorem cyc_abs {A : Type} [CommGroup A] (l : ℕ) (hp : l.Prime)
         · exact ih h'
         · have hPc : P c := ⟨s, h, h'⟩
           have := Nat.le_findGreatest (hbd c hPc) hPc
-          exact orderOf_dvd_iff_pow_eq_one.1
-            ((orderOf_dvd_of_pow_eq_one h).trans (pow_dvd_pow l (by omega)))
+          exact orderOf_dvd_iff_pow_eq_one.1 ((orderOf_dvd_of_pow_eq_one h).trans
+            (pow_dvd_pow l (by omega)))
     have hm := gen_of_max l hl _ z h1 h0 _ le_rfl s (key c hc)
     have hf : IsOfFinOrder z := isOfFinOrder_iff_pow_eq_one.2 ⟨_, pow_pos hp.pos _, h1⟩
     obtain ⟨n, hn⟩ := hf.mem_powers_iff_mem_zpowers.2 hm
@@ -83,8 +88,16 @@ private theorem cyc_abs {A : Type} [CommGroup A] (l : ℕ) (hp : l.Prime)
       by_contra h
       exact hx ⟨_, by rw [← pow_mul, ← pow_succ, hc], h⟩
 
-theorem UpperTheory.V.Ws.X1.muCyc :
-    ∀ {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [T2Space Γ] [TotallyDisconnectedSpace Γ] (l : ℕ) [Fact l.Prime] (H : Subgroup Γ), IsClosed (H : Set Γ) → (∀ s ∈ H, ∀ t ∈ H, s ^ l ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure → t ^ l ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure → s ∉ (⁅H, H⁆ : Subgroup Γ).topologicalClosure → ∃ n : ℕ, t * (s ^ n)⁻¹ ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure) → ∃ ζ, MuGen H (muOf l H) ζ := by
+theorem UpperTheory.V.Ws.X1.muCyc
+    : ∀ {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+        [T2Space Γ] [TotallyDisconnectedSpace Γ] (l : ℕ) [Fact l.Prime] (H : Subgroup Γ),
+      IsClosed (H : Set Γ)
+        → (∀ s ∈ H, ∀ t ∈ H,
+          s ^ l ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure
+            → t ^ l ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure
+            → s ∉ (⁅H, H⁆ : Subgroup Γ).topologicalClosure
+            → ∃ n : ℕ, t * (s ^ n)⁻¹ ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure)
+        → ∃ ζ, MuGen H (muOf l H) ζ := by
   intro Γ _ _ _ _ _ _ l hp H hH hl
   unfold MuGen muOf
   have hcl : IsClosed (((⁅H, H⁆ : Subgroup Γ).topologicalClosure : Subgroup Γ) : Set Γ) :=
@@ -123,8 +136,8 @@ theorem UpperTheory.V.Ws.X1.muCyc :
     obtain ⟨x, rfl⟩ := hπ x
     have ho : IsOpen {g : Γ | (x : Γ) * g ∉ C} :=
       hcl.isOpen_compl.preimage (continuous_const_mul (x : Γ))
-    obtain ⟨N, hN⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one ho
-      (by simpa [← h1] using hx)
+    obtain ⟨N, hN⟩ :=
+      ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one ho (by simpa [← h1] using hx)
     refine ⟨(N.toSubgroup.subgroupOf H).map π, ?_, ?_⟩
     · refine ne_zero_of_dvd_ne_zero ?_ (Subgroup.index_map_dvd _ hπ)
       haveI : Finite (Γ ⧸ N.toSubgroup) := Subgroup.quotient_finite_of_isOpen _ N.isOpen'

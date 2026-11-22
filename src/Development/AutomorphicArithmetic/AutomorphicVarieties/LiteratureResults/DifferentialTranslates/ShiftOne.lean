@@ -27,18 +27,22 @@ theorem shiftOne : ShiftOne := by
     change ι (φ i (g * h)) = ι ((ρM g) (φ i h) + φ i g)
     rw [map_add (f := _), hι, hφ, hφ, hφ, map_mul, Module.End.mul_apply, map_sub]
     abel
-  let v : Fin n → groupCohomology (Rep.of ρM) 1 :=
-    fun i => (groupCohomology.H1π (Rep.of ρM)).hom ⟨φ i, hcoc i⟩
+  let v : Fin n → groupCohomology (Rep.of ρM) 1 := fun i =>
+    (groupCohomology.H1π (Rep.of ρM)).hom ⟨φ i, hcoc i⟩
   have hli : LinearIndependent ℂ v := by
     rw [Fintype.linearIndependent_iff]
     intro g hg
-    have hsum : (∑ i, g i • v i) =
-        (groupCohomology.H1π (Rep.of ρM)).hom (∑ i, g i • (⟨φ i, hcoc i⟩ : groupCohomology.cocycles₁ (Rep.of ρM))) := by
+    have hsum
+        : (∑ i, g i • v i)
+          = (groupCohomology.H1π (Rep.of ρM)).hom
+            (∑ i, g i • (⟨φ i, hcoc i⟩ : groupCohomology.cocycles₁ (Rep.of ρM))) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, v]
+      simp only [map_sum, map_smul, v]
     rw [hsum, groupCohomology.H1π_eq_zero_iff] at hg
     obtain ⟨m, hm⟩ := hg
-    have key : Subtype.val (∑ i, g i • (⟨φ i, hcoc i⟩ : groupCohomology.cocycles₁ (Rep.of ρM))) = ∑ i, g i • φ i := by
+    have key
+        : Subtype.val (∑ i, g i • (⟨φ i, hcoc i⟩ : groupCohomology.cocycles₁ (Rep.of ρM)))
+          = ∑ i, g i • φ i := by
       rw [Submodule.coe_sum]
       rfl
     have hm' : ∀ γ, ρM γ m - m = ∑ i, g i • φ i γ := by
@@ -65,8 +69,8 @@ theorem shiftOne : ShiftOne := by
       rw [h1]
       abel
     set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_sub, hex.apply_apply_eq_zero, sub_zero, map_sum]
-        simp only [map_smul, hy]
+    · rw [map_sub, hex.apply_apply_eq_zero, sub_zero, map_sum]
+      simp only [map_smul, hy]
   have := hli.cardinal_le_rank
   simpa using this
 

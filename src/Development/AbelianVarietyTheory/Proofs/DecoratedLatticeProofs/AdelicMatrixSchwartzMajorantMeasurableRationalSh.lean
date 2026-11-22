@@ -16,7 +16,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.GinfCS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -31,26 +33,39 @@ namespace GlobalTheory.Unf.MajMeas
 
 variable {D : D7}
 
-theorem norm_compAt_le_realSize (θ : InfFam D) {m n : ℕ} (x : Mx D m n) (τ : D.what₂.Tau) (i : Fin m)
-    (j : Fin n) : ‖compAt θ τ x i j‖ ≤ realSize θ x := by
+theorem norm_compAt_le_realSize
+    (θ : InfFam D) {m n : ℕ} (x : Mx D m n) (τ : D.what₂.Tau) (i : Fin m) (j : Fin n)
+    : ‖compAt θ τ x i j‖ ≤ realSize θ x := by
   unfold realSize
-  calc ‖compAt θ τ x i j‖ ≤ ∑ j', ‖compAt θ τ x i j'‖ :=
-        Finset.single_le_sum (f := fun j' => ‖compAt θ τ x i j'‖) (fun _ _ => norm_nonneg _) (Finset.mem_univ j)
+  calc
+    ‖compAt θ τ x i j‖ ≤ ∑ j', ‖compAt θ τ x i j'‖ :=
+      Finset.single_le_sum
+        (f := fun j' => ‖compAt θ τ x i j'‖)
+        (fun _ _ => norm_nonneg _)
+        (Finset.mem_univ j)
     _ ≤ ∑ i', ∑ j', ‖compAt θ τ x i' j'‖ :=
-        Finset.single_le_sum (f := fun i' => ∑ j', ‖compAt θ τ x i' j'‖)
-          (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ i)
+      Finset.single_le_sum
+        (f := fun i' => ∑ j', ‖compAt θ τ x i' j'‖)
+        (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+        (Finset.mem_univ i)
     _ ≤ ∑ τ', ∑ i', ∑ j', ‖compAt θ τ' x i' j'‖ :=
-        Finset.single_le_sum (f := fun τ' => ∑ i', ∑ j', ‖compAt θ τ' x i' j'‖)
-          (fun _ _ => Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ τ)
+      Finset.single_le_sum
+        (f := fun τ' => ∑ i', ∑ j', ‖compAt θ τ' x i' j'‖)
+        (fun _ _ => Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+        (Finset.mem_univ τ)
 
-theorem continuous_realSize {θ : InfFam D} (hθ : IsInfFam θ) {m n : ℕ} :
-    Continuous (realSize θ : Mx D m n → ℝ) := by
+theorem continuous_realSize {θ : InfFam D} (hθ : IsInfFam θ) {m n : ℕ}
+    : Continuous (realSize θ : Mx D m n → ℝ) := by
   unfold realSize
-  refine continuous_finsetSum _ fun τ _ => continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ => ?_
-  exact continuous_norm.comp ((GlobalTheory.FockCompare.continuous_comp hθ τ).comp (continuous_id.matrix_elem i j))
+  refine continuous_finsetSum _ fun τ _ =>
+    continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ => ?_
+  exact continuous_norm.comp ((GlobalTheory.FockCompare.continuous_comp hθ τ).comp
+    (continuous_id.matrix_elem i j))
 
-theorem finPart_eq_zero_iff {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
-    (a : AE D) : finPart D a = 0 ↔ a = σ (fun τ => θ τ (infPart D a)) := by
+theorem finPart_eq_zero_iff
+    {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
+    (a : AE D)
+    : finPart D a = 0 ↔ a = σ (fun τ => θ τ (infPart D a)) := by
   constructor
   · intro ha
     refine sub_eq_zero.1 (h.ext _ ?_ fun τ => ?_)
@@ -60,11 +75,14 @@ theorem finPart_eq_zero_iff {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ A
     rw [ha]
     exact h.fin _
 
-theorem isClosed_finZero {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
-    (m n : ℕ) : IsClosed {z : Mx D m n | z.map (finPart D) = 0} := by
+theorem isClosed_finZero
+    {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
+    (m n : ℕ)
+    : IsClosed {z : Mx D m n | z.map (finPart D) = 0} := by
   haveI : T2Space (AE D) := (Formalism.IndefR.Eqv.ae_facts D).2.1
-  have e : {z : Mx D m n | z.map (finPart D) = 0} =
-      ⋂ i, ⋂ j, {z : Mx D m n | z i j = σ (fun τ => θ τ (infPart D (z i j)))} := by
+  have e
+      : {z : Mx D m n | z.map (finPart D) = 0}
+        = ⋂ i, ⋂ j, {z : Mx D m n | z i j = σ (fun τ => θ τ (infPart D (z i j)))} := by
     ext z
     simp only [Set.mem_ofPred_eq, Set.mem_iInter]
     constructor
@@ -77,12 +95,13 @@ theorem isClosed_finZero {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D
       rw [Matrix.map_apply, Matrix.zero_apply]
       exact (finPart_eq_zero_iff h _).2 (hz i j)
   rw [e]
-  refine isClosed_iInter fun i => isClosed_iInter fun j => isClosed_eq (continuous_id.matrix_elem i j) ?_
+  refine isClosed_iInter fun i =>
+    isClosed_iInter fun j => isClosed_eq (continuous_id.matrix_elem i j) ?_
   exact h.cont.comp (continuous_pi fun τ =>
     (GlobalTheory.FockCompare.continuous_comp h.inf τ).comp (continuous_id.matrix_elem i j))
 
-theorem setOf_inBox {m n : ℕ} (K : Set (Mx D m n)) :
-    {x | InBox K x} = K + {z : Mx D m n | z.map (finPart D) = 0} := by
+theorem setOf_inBox {m n : ℕ} (K : Set (Mx D m n))
+    : {x | InBox K x} = K + {z : Mx D m n | z.map (finPart D) = 0} := by
   ext x
   constructor
   · rintro ⟨k, hk, hx⟩
@@ -90,26 +109,34 @@ theorem setOf_inBox {m n : ℕ} (K : Set (Mx D m n)) :
   · rintro ⟨k, hk, z, hz, rfl⟩
     exact ⟨k, hk, by rwa [add_sub_cancel_left]⟩
 
-theorem isClosed_inBox {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
-    {m n : ℕ} (K : Set (Mx D m n)) (hK : IsCompact K) : IsClosed {x | InBox K x} := by
+theorem isClosed_inBox
+    {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
+    {m n : ℕ} (K : Set (Mx D m n)) (hK : IsCompact K)
+    : IsClosed {x | InBox K x} := by
   haveI : IsTopologicalRing (AE D) := (Formalism.IndefR.Eqv.ae_facts D).1
   rw [setOf_inBox]
   exact (isClosed_finZero h m n).add_left_of_isCompact hK
 
-theorem isCompact_box {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
-    {m n : ℕ} (K : Set (Mx D m n)) (hK : IsCompact K) (R : ℝ) :
-    IsCompact {x | InBox K x ∧ realSize θ x ≤ R} := by
+theorem isCompact_box
+    {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
+    {m n : ℕ} (K : Set (Mx D m n)) (hK : IsCompact K)
+    (R : ℝ)
+    : IsCompact {x | InBox K x ∧ realSize θ x ≤ R} := by
   haveI : IsTopologicalRing (AE D) := (Formalism.IndefR.Eqv.ae_facts D).1
   let B : Set (D.what₂.Tau → Fin m → Fin n → ℂ) :=
-    Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => Metric.closedBall (0 : ℂ) R
+    Set.pi Set.univ fun _ =>
+      Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => Metric.closedBall (0 : ℂ) R
   have hB : IsCompact B :=
-    isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
+    isCompact_univ_pi fun _ =>
+      isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
   let g : Mx D m n × (D.what₂.Tau → Fin m → Fin n → ℂ) → Mx D m n := fun p =>
     p.1 + Matrix.of fun i j => σ (fun τ => p.2 τ i j - θ τ (infPart D (p.1 i j)))
   have hg : Continuous g := by
     refine continuous_fst.add (continuous_matrix fun i j => h.cont.comp (continuous_pi fun τ => ?_))
-    have c1 : Continuous fun p : Mx D m n × (D.what₂.Tau → Fin m → Fin n → ℂ) => p.2 τ i j := by fun_prop
-    have c2 : Continuous fun p : Mx D m n × (D.what₂.Tau → Fin m → Fin n → ℂ) => θ τ (infPart D (p.1 i j)) :=
+    have c1 : Continuous fun p : Mx D m n × (D.what₂.Tau → Fin m → Fin n → ℂ) => p.2 τ i j := by
+      fun_prop
+    have c2 : Continuous fun p : Mx D m n × (D.what₂.Tau → Fin m → Fin n → ℂ) =>
+        θ τ (infPart D (p.1 i j)) :=
       (GlobalTheory.FockCompare.continuous_comp h.inf τ).comp (continuous_fst.matrix_elem i j)
     exact c1.sub c2
   refine ((hK.prod hB).image hg).of_isClosed_subset
@@ -126,50 +153,63 @@ theorem isCompact_box {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (
     show k i j + σ (fun τ => θ τ (infPart D (x i j)) - θ τ (infPart D (k i j))) = x i j
     rw [← e, add_sub_cancel]
 
-theorem measurable_maj {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
-    {m n : ℕ} (K : Set (Mx D m n)) (hK : IsCompact K) (N : ℕ) : Measurable (maj θ K N) := by
+theorem measurable_maj
+    {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (h : GlobalTheory.FockCompare.Chart θ σ)
+    {m n : ℕ} (K : Set (Mx D m n)) (hK : IsCompact K)
+    (N : ℕ)
+    : Measurable (maj θ K N) := by
   have : BorelSpace (Mx D m n) := ⟨rfl⟩
   unfold maj
   exact Measurable.ite (isClosed_inBox h K hK).measurableSet
     ((continuous_const.add (continuous_realSize h.inf)).pow N).measurable.inv measurable_const
 
-theorem exists_leftInv {m n : ℕ} (x : Matrix (Fin m) (Fin n) D.host.E)
-    (hx : LinearIndependent D.host.E x.transpose) : ∃ y : Matrix (Fin n) (Fin m) D.host.E, y * x = 1 := by
+theorem exists_leftInv
+    {m n : ℕ} (x : Matrix (Fin m) (Fin n) D.host.E) (hx : LinearIndependent D.host.E x.transpose)
+    : ∃ y : Matrix (Fin n) (Fin m) D.host.E, y * x = 1 := by
   have hinj : Function.Injective x.mulVecLin := Matrix.mulVec_injective_iff.2 hx
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective x.mulVecLin (LinearMap.ker_eq_bot.2 hinj)
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective x.mulVecLin (LinearMap.ker_eq_bot.2 hinj)
   refine ⟨LinearMap.toMatrix' g, ?_⟩
   have := congrArg LinearMap.toMatrix' hg
   rw [LinearMap.toMatrix'_comp, LinearMap.toMatrix'_id] at this
   rwa [← Matrix.toLin'_apply', LinearMap.toMatrix'_toLin'] at this
 
-theorem compAt_mul (θ : InfFam D) (τ : D.what₂.Tau) {m n k : ℕ} (A : Mx D m n) (B : Mx D n k) :
-    compAt θ τ (A * B) = compAt θ τ A * compAt θ τ B :=
+theorem compAt_mul (θ : InfFam D) (τ : D.what₂.Tau) {m n k : ℕ} (A : Mx D m n) (B : Mx D n k)
+    : compAt θ τ (A * B) = compAt θ τ A * compAt θ τ B :=
   Matrix.map_mul (f := (θ τ).comp (infPart D))
 
-theorem realSize_mul_le (θ : InfFam D) {m n k : ℕ} (Y : Mx D m n) :
-    ∃ c : ℝ, 0 ≤ c ∧ ∀ a : Mx D n k, realSize θ (Y * a) ≤ c * realSize θ a := by
+theorem realSize_mul_le (θ : InfFam D) {m n k : ℕ} (Y : Mx D m n)
+    : ∃ c : ℝ, 0 ≤ c ∧ ∀ a : Mx D n k, realSize θ (Y * a) ≤ c * realSize θ a := by
   refine ⟨∑ τ, ∑ i, ∑ _j : Fin k, ∑ l, ‖compAt θ τ Y i l‖, by positivity, fun a => ?_⟩
-  calc realSize θ (Y * a) = ∑ τ, ∑ i, ∑ j, ‖∑ l, compAt θ τ Y i l * compAt θ τ a l j‖ := by
-        simp only [realSize, compAt_mul, Matrix.mul_apply]
+  calc
+    realSize θ (Y * a) = ∑ τ, ∑ i, ∑ j, ‖∑ l, compAt θ τ Y i l * compAt θ τ a l j‖ := by
+      simp only [realSize, compAt_mul, Matrix.mul_apply]
     _ ≤ ∑ τ, ∑ i, ∑ _j : Fin k, ∑ l, ‖compAt θ τ Y i l‖ * realSize θ a := by
-        gcongr with τ _ i _ j _
-        refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun l _ => ?_)
-        rw [norm_mul]
-        exact mul_le_mul_of_nonneg_left (norm_compAt_le_realSize θ a τ l j) (norm_nonneg _)
+      gcongr with τ _ i _ j _
+      refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun l _ => ?_)
+      rw [norm_mul]
+      exact mul_le_mul_of_nonneg_left (norm_compAt_le_realSize θ a τ l j) (norm_nonneg _)
     _ = _ := by simp only [Finset.sum_mul]
 
-theorem maj_rat_le (θ : InfFam D) (m n k : ℕ) (x : Matrix (Fin m) (Fin n) D.host.E)
-    (hx : LinearIndependent D.host.E x.transpose) (K : Set (Mx D m k)) (hK : IsCompact K) :
-    ∃ K' : Set (Mx D n k), IsCompact K' ∧ ∀ N : ℕ, ∃ C : ℝ, ∀ u : Mx D n k,
-      maj θ K N ((rat x : Mx D m n) * u) ≤ C * maj θ K' N u := by
+theorem maj_rat_le
+    (θ : InfFam D)
+    (m n k : ℕ) (x : Matrix (Fin m) (Fin n) D.host.E) (hx : LinearIndependent D.host.E x.transpose)
+    (K : Set (Mx D m k)) (hK : IsCompact K)
+    : ∃ K' : Set (Mx D n k),
+      IsCompact K'
+        ∧ ∀ N : ℕ, ∃ C : ℝ, ∀ u : Mx D n k,
+          maj θ K N ((rat x : Mx D m n) * u) ≤ C * maj θ K' N u := by
   haveI : IsTopologicalRing (AE D) := (Formalism.IndefR.Eqv.ae_facts D).1
   obtain ⟨y, hy⟩ := exists_leftInv x hx
   have hyx : (rat y : Mx D n m) * rat x = 1 := by
     unfold rat
     rw [← Matrix.map_mul, hy, Matrix.map_one _ (map_zero _) (map_one _)]
   obtain ⟨c, hc0, hc⟩ := realSize_mul_le θ (k := k) (rat y : Mx D n m)
-  refine ⟨(fun a => (rat y : Mx D n m) * a) '' K, hK.image (continuous_const.matrix_mul continuous_id),
-    fun N => ⟨(1 + c) ^ N, fun u => ?_⟩⟩
+  refine ⟨
+    (fun a => (rat y : Mx D n m) * a) '' K,
+    hK.image (continuous_const.matrix_mul continuous_id),
+    fun N => ⟨(1 + c) ^ N, fun u => ?_⟩
+  ⟩
   by_cases hb : InBox K ((rat x : Mx D m n) * u)
   · obtain ⟨k0, hk0, hkx⟩ := hb
     have hb' : InBox ((fun a => (rat y : Mx D n m) * a) '' K) u := by
@@ -182,7 +222,8 @@ theorem maj_rat_le (θ : InfFam D) (m n k : ℕ) (x : Matrix (Fin m) (Fin n) D.h
     rw [← Matrix.mul_assoc, hyx, Matrix.one_mul] at hs
     have h0 := realSize_nonneg θ ((rat x : Mx D m n) * u)
     have h0' := realSize_nonneg θ u
-    have hle : 1 + realSize θ u ≤ (1 + c) * (1 + realSize θ ((rat x : Mx D m n) * u)) := by nlinarith
+    have hle : 1 + realSize θ u ≤ (1 + c) * (1 + realSize θ ((rat x : Mx D m n) * u)) := by
+      nlinarith
     have hA : 0 < (1 + realSize θ ((rat x : Mx D m n) * u)) ^ N := by positivity
     have hB : 0 < (1 + realSize θ u) ^ N := by positivity
     rw [inv_eq_one_div, ← div_eq_mul_inv, div_le_div_iff₀ hA hB, one_mul, ← mul_pow]
@@ -193,12 +234,33 @@ theorem maj_rat_le (θ : InfFam D) (m n k : ℕ) (x : Matrix (Fin m) (Fin n) D.h
 
 end GlobalTheory.Unf.MajMeas
 
-
 open GlobalTheory.Unf.MajMeas in
-theorem GlobalTheory.Unf.maj_measurable_rat : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → (∀ (m n : ℕ) (K : Set (Mx D m n)), IsCompact K → IsClosed {x | InBox K x} ∧ Continuous (realSize θ : Mx D m n → ℝ) ∧ (∀ N, Measurable (maj θ K N)) ∧ ∀ R : ℝ, IsCompact {x | InBox K x ∧ realSize θ x ≤ R}) ∧ ∀ (m n k : ℕ) (x : Matrix (Fin m) (Fin n) D.host.E), LinearIndependent D.host.E x.transpose → ∀ K : Set (Mx D m k), IsCompact K → ∃ K' : Set (Mx D n k), IsCompact K' ∧ ∀ N : ℕ, ∃ C : ℝ, ∀ u : Mx D n k, maj θ K N ((rat x : Mx D m n) ⬝ u) ≤ C * maj θ K' N u := by
+theorem GlobalTheory.Unf.maj_measurable_rat
+    : ∀ (D : D7) (θ : InfFam D),
+      IsInfFam θ
+        → (∀ (m n : ℕ) (K : Set (Mx D m n)),
+            IsCompact K
+              → IsClosed {x | InBox K x} ∧ Continuous (realSize θ : Mx D m n → ℝ)
+                ∧ (∀ N, Measurable (maj θ K N))
+                ∧ ∀ R : ℝ, IsCompact {x | InBox K x ∧ realSize θ x ≤ R})
+          ∧ ∀ (m n k : ℕ) (x : Matrix (Fin m) (Fin n) D.host.E),
+            LinearIndependent D.host.E x.transpose
+              → ∀ K : Set (Mx D m k),
+                IsCompact K
+                  → ∃ K' : Set (Mx D n k),
+                    IsCompact K'
+                      ∧ ∀ N : ℕ, ∃ C : ℝ, ∀ u : Mx D n k,
+                        maj θ K N ((rat x : Mx D m n) ⬝ u) ≤ C * maj θ K' N u := by
   intro D θ hθ
   obtain ⟨σ, hσ⟩ := GlobalTheory.RealLineAt.exists_inverse_chart hθ
-  exact ⟨fun m n K hK => ⟨isClosed_inBox hσ K hK, continuous_realSize hθ, fun N => measurable_maj hσ K hK N,
-    fun R => isCompact_box hσ K hK R⟩, fun m n k x hx K hK => maj_rat_le θ m n k x hx K hK⟩
+  exact ⟨
+    fun m n K hK => ⟨
+      isClosed_inBox hσ K hK,
+      continuous_realSize hθ,
+      fun N => measurable_maj hσ K hK N,
+      fun R => isCompact_box hσ K hK R
+    ⟩,
+    fun m n k x hx K hK => maj_rat_le θ m n k x hx K hK
+  ⟩
 
 end

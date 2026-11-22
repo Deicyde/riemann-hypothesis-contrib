@@ -9,13 +9,24 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
-open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx Formalism.IndefR.Lev
-open GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3
+open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Cx Formalism.IndefR.Lev
+open GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace GlobalTheory.Div.PgTie
 open Classical in
 set_option maxHeartbeats 4000000 in
-theorem pgEq_of_linked_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL), GlobalTheory.Fc.EvP fun _ K => ∀ (q : WPt p.s K) (c : ℝ) (b : _root_.GlobalTheory.Fc.BundleCondition (q.w.D q.Z) q.O c) (w : _root_.GlobalTheory.Mem.Top.Bl.BundleWitness q b), q.O.L.sc = K.s → (open Classical in w.x.R.Pg = b.R.T.ker.Pr.vGs.image (Formalism.L2.Host.CT.plMap b.R.T.ker.seam.iE)) := by
+theorem pgEq_of_linked_alt
+    : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists)
+        (p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL),
+      GlobalTheory.Fc.EvP fun _ K =>
+        ∀ (q : WPt p.s K) (c : ℝ) (b : _root_.GlobalTheory.Fc.BundleCondition (q.w.D q.Z) q.O c)
+            (w : _root_.GlobalTheory.Mem.Top.Bl.BundleWitness q b),
+          q.O.L.sc = K.s
+            → (open Classical in
+              w.x.R.Pg
+                = b.R.T.ker.Pr.vGs.image (Formalism.L2.Host.CT.plMap b.R.T.ker.seam.iE)) := by
   intro hL p
   refine GlobalTheory.Fc.EvP.of_all ?_
   intro _ K _ q c b w _

@@ -368,15 +368,21 @@ private lemma line_core {Y : Scheme.{0}} {I : Type} (U : I → Y.Opens) (s : ∀
 
 theorem lineEx : LineEx := by
   intro Y T j _ hc
-  let I := {p : (Σ V : Y.Opens, Γ(Y, V)) // IsAffineOpen p.1 ∧ p.2 ∈ nonZeroDivisors Γ(Y, p.1) ∧
-    RingHom.ker (j.app p.1).hom = Ideal.span {p.2}}
-  obtain ⟨D, f, hEt, h1, h2, h3, h4⟩ := line_core (I := I) (fun i => i.1.1) (fun i => i.1.2) (fun i => i.2.1)
-    (fun i => i.2.2.1)
-    (fun y => by
-      obtain ⟨V, s, hy, ha, hn, hk⟩ := hc y
-      exact ⟨⟨⟨V, s⟩, ha, hn, hk⟩, hy⟩)
-    (fun i i' y hy hy' => ker_div j i.2.1 i'.2.1 i.2.2.2 i'.2.2.2 y hy hy')
-  refine ⟨D, f, h1, h2, fun a ha => h3 a fun v i hv => off_image j i.2.1 i.2.2.2 _ hv (ha v), ?_, ?_⟩
+  let I :=
+    {p : (Σ V : Y.Opens, Γ(Y, V)) // IsAffineOpen p.1 ∧ p.2 ∈ nonZeroDivisors Γ(Y, p.1)
+      ∧ RingHom.ker (j.app p.1).hom = Ideal.span {p.2}}
+  obtain ⟨D, f, hEt, h1, h2, h3, h4⟩ :=
+    line_core (I := I)
+      (fun i => i.1.1)
+      (fun i => i.1.2)
+      (fun i => i.2.1)
+      (fun i => i.2.2.1)
+      (fun y => by
+        obtain ⟨V, s, hy, ha, hn, hk⟩ := hc y
+        exact ⟨⟨⟨V, s⟩, ha, hn, hk⟩, hy⟩)
+      (fun i i' y hy hy' => ker_div j i.2.1 i'.2.1 i.2.2.2 i'.2.2.2 y hy hy')
+  refine
+    ⟨D, f, h1, h2, fun a ha => h3 a fun v i hv => off_image j i.2.1 i.2.2.2 _ hv (ha v), ?_, ?_⟩
   · refine top_le_iff.1 fun y _ => ?_
     obtain ⟨V, s, hy, ha, hn, hk⟩ := hc y
     obtain ⟨σ, hσ, -⟩ := h4 ⟨⟨V, s⟩, ha, hn, hk⟩

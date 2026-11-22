@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsAdm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.Col Formalism.L2.DIV GlobalTheory.QNormal GlobalTheory.Mem.Col2.IdxEx
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.Col Formalism.L2.DIV GlobalTheory.QNormal GlobalTheory.Mem.Col2.IdxEx
 
 noncomputable section
 
@@ -14,22 +15,26 @@ namespace GlobalTheory.Mem.ZeroGrp
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {P : HeightOneSpectrum (𝓞 E)} {n : ℕ}
 
 def autOf (A : GL (Fin n) (𝓞 E)) : Sp E n ≃ₗ[E] Sp E n :=
-  LinearEquiv.ofLinear (Matrix.toLin' (A.1.map (algebraMap (𝓞 E) E))) (Matrix.toLin' ((A⁻¹).1.map (algebraMap (𝓞 E) E)))
-    (by rw [← Matrix.toLin'_mul, ← Matrix.map_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
-      Matrix.map_one _ (map_zero _) (map_one _), Matrix.toLin'_one])
-    (by rw [← Matrix.toLin'_mul, ← Matrix.map_mul, ← Units.val_mul, inv_mul_cancel, Units.val_one,
-      Matrix.map_one _ (map_zero _) (map_one _), Matrix.toLin'_one])
+  LinearEquiv.ofLinear (Matrix.toLin' (A.1.map (algebraMap (𝓞 E) E)))
+    (Matrix.toLin' ((A⁻¹).1.map (algebraMap (𝓞 E) E)))
+    (by
+      rw [← Matrix.toLin'_mul, ← Matrix.map_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.map_one _ (map_zero _) (map_one _), Matrix.toLin'_one])
+    (by
+      rw [← Matrix.toLin'_mul, ← Matrix.map_mul, ← Units.val_mul, inv_mul_cancel, Units.val_one,
+        Matrix.map_one _ (map_zero _) (map_one _), Matrix.toLin'_one])
 
 omit [StarRing E] in
-theorem autOf_apply (A : GL (Fin n) (𝓞 E)) (x : Sp E n) (i : Fin n) :
-    autOf A x i = ∑ j, algebraMap (𝓞 E) E (A.1 i j) * x j := rfl
+theorem autOf_apply (A : GL (Fin n) (𝓞 E)) (x : Sp E n) (i : Fin n)
+    : autOf A x i = ∑ j, algebraMap (𝓞 E) E (A.1 i j) * x j :=
+  rfl
 
 omit [StarRing E] in
 theorem autOf_inv (A : GL (Fin n) (𝓞 E)) : (autOf A)⁻¹ = autOf A⁻¹ := LinearEquiv.ext fun _ => rfl
 
 omit [StarRing E] in
-theorem extE_lt (c : ℕ) (g : Sp E n ≃ₗ[E] Sp E n) (v : Sp E (n + c)) (l : Fin (n + c)) :
-    CongLevel.extE c g v l = if h : l.1 < n then g (CongLevel.resX c v) ⟨l.1, h⟩ else v l := by
+theorem extE_lt (c : ℕ) (g : Sp E n ≃ₗ[E] Sp E n) (v : Sp E (n + c)) (l : Fin (n + c))
+    : CongLevel.extE c g v l = if h : l.1 < n then g (CongLevel.resX c v) ⟨l.1, h⟩ else v l := by
   rw [CongLevel.extE_apply, Pi.add_apply, CongLevel.inX_apply]
   split_ifs with h
   · have : CongLevel.resX c v ⟨l.1, h⟩ = v l := rfl
@@ -37,9 +42,12 @@ theorem extE_lt (c : ℕ) (g : Sp E n ≃ₗ[E] Sp E n) (v : Sp E (n + c)) (l : 
     ring
   · rw [add_zero]
 
-theorem extE_maps_scl {q c : ℕ} (hq : (q : E) ≠ 0) (e : ℕ → ℤ) (he : ∀ i j, i ≤ j → j < n → e i ≤ e j)
-    (A : GL (Fin n) (𝓞 E)) (hA : ∀ i j : Fin n, j.1 < i.1 → A.1 i j = 0) (v : Sp E (n + c))
-    (hv : v ∈ LocE.sclLat P q (n + c) e) : CongLevel.extE c (autOf A) v ∈ LocE.sclLat P q (n + c) e := by
+theorem extE_maps_scl
+    {q c : ℕ} (hq : (q : E) ≠ 0)
+    (e : ℕ → ℤ) (he : ∀ i j, i ≤ j → j < n → e i ≤ e j)
+    (A : GL (Fin n) (𝓞 E)) (hA : ∀ i j : Fin n, j.1 < i.1 → A.1 i j = 0)
+    (v : Sp E (n + c)) (hv : v ∈ LocE.sclLat P q (n + c) e)
+    : CongLevel.extE c (autOf A) v ∈ LocE.sclLat P q (n + c) e := by
   rw [CongLevel.mem_sclLat] at hv ⊢
   intro l
   rw [extE_lt]
@@ -50,8 +58,9 @@ theorem extE_maps_scl {q c : ℕ} (hq : (q : E) ≠ 0) (e : ℕ → ℤ) (he : �
     · rw [hA ⟨l.1, h⟩ j hj]
       simpa using TopStep.intAt_zero
     · obtain ⟨d, hd⟩ := Int.le.dest (he l.1 j.1 (by omega) j.2)
-      have h1 := ((IntAt.coe P (A.1 ⟨l.1, h⟩ j)).mul (TopStep.intAt_pow (TopStep.intAt_nat q) d)).mul
-        (hv (Fin.castAdd c j))
+      have h1 :=
+        ((IntAt.coe P (A.1 ⟨l.1, h⟩ j)).mul (TopStep.intAt_pow (TopStep.intAt_nat q) d)).mul
+          (hv (Fin.castAdd c j))
       convert h1 using 1
       have : CongLevel.resX c v j = v (Fin.castAdd c j) := rfl
       rw [this, Fin.val_castAdd, ← hd, zpow_add₀ hq, zpow_natCast]
@@ -59,28 +68,34 @@ theorem extE_maps_scl {q c : ℕ} (hq : (q : E) ≠ 0) (e : ℕ → ℤ) (he : �
       field_simp
   · exact hv l
 
-theorem uni_iff {κ : Type} [CommRing κ] {a : ℕ} (ha : n = a) {M : GL (Fin n) κ} :
-    M ∈ uniUT n κ a [] ↔ (∀ i j : Fin n, j.1 < i.1 → M.1 i j = 0) ∧ ∀ i, M.1 i i = 1 := by
+theorem uni_iff {κ : Type} [CommRing κ] {a : ℕ} (ha : n = a) {M : GL (Fin n) κ}
+    : M ∈ uniUT n κ a [] ↔ (∀ i j : Fin n, j.1 < i.1 → M.1 i j = 0) ∧ ∀ i, M.1 i i = 1 := by
   subst ha
   rw [mem_uniUT]
-  refine ⟨fun h => ⟨fun i j => h.2.1 i j i.2, fun i => h.2.2 i i.2⟩, fun h => ⟨fun i j hij => ?_, fun i j _ => h.1 i j,
-    fun i _ => h.2 i⟩⟩
+  refine ⟨
+    fun h => ⟨fun i j => h.2.1 i j i.2, fun i => h.2.2 i i.2⟩,
+    fun h => ⟨fun i j hij => ?_, fun i j _ => h.1 i j, fun i _ => h.2 i⟩
+  ⟩
   have : coarse n [] j.1 < coarse n [] i.1 := hij
   rw [coarse_of_lt i.2] at this
   omega
 
-theorem extE_stab_scl {q c : ℕ} (hq : (q : E) ≠ 0) (e : ℕ → ℤ) (he : ∀ i j, i ≤ j → j < n → e i ≤ e j)
-    (A : GL (Fin n) (𝓞 E)) (hA : A ∈ uniUT n (𝓞 E) n []) :
-    CongLevel.extE c (autOf A) ∈ stabL E (n + c) (LocE.sclLat P q (n + c) e) := by
+theorem extE_stab_scl
+    {q c : ℕ} (hq : (q : E) ≠ 0)
+    (e : ℕ → ℤ) (he : ∀ i j, i ≤ j → j < n → e i ≤ e j)
+    (A : GL (Fin n) (𝓞 E)) (hA : A ∈ uniUT n (𝓞 E) n [])
+    : CongLevel.extE c (autOf A) ∈ stabL E (n + c) (LocE.sclLat P q (n + c) e) := by
   intro v
   refine ⟨fun hv => ?_, extE_maps_scl hq e he A ((uni_iff rfl).1 hA).1 v⟩
   have h := extE_maps_scl hq e he A⁻¹ ((uni_iff rfl).1 (inv_mem hA)).1 _ hv
   rw [← autOf_inv, ← CongLevel.extE_inv] at h
-  rwa [show (CongLevel.extE c (autOf A))⁻¹ (CongLevel.extE c (autOf A) v) = v from LinearEquiv.symm_apply_apply _ v] at h
+  rwa [show (CongLevel.extE c (autOf A))⁻¹ (CongLevel.extE c (autOf A) v) = v from
+      LinearEquiv.symm_apply_apply _ v]
+    at h
 
 omit [NumberField E] [StarRing E] in
-theorem bvecS_eq (q rS c : ℕ) (f : Fin n) :
-    LocE.bvecS E q n rS n c (f.1 + rS) = Loc.inX E n c (Pi.single f 1) := by
+theorem bvecS_eq (q rS c : ℕ) (f : Fin n)
+    : LocE.bvecS E q n rS n c (f.1 + rS) = Loc.inX E n c (Pi.single f 1) := by
   have h1 : LocE.fIdx n c n (symIdxInv n rS (f.1 + rS)) = f.1 := by
     have := f.2
     unfold LocE.fIdx symIdxInv
@@ -98,13 +113,17 @@ theorem bvecS_eq (q rS c : ℕ) (f : Fin n) :
     simp [Fin.ext_iff]
   · rw [dite_eq_right h, if_neg (by omega)]
 
-theorem inX_mem_flagS (q rS c : ℕ) (f : Fin n) (x : Sp E n) :
-    Loc.inX E n c x ∈ LocE.flagS P q n rS n c (f.1 + rS) ↔
-      ∀ l : Fin n, IntAt P (((q : E) ^ (if f.1 ≤ l.1 then (1 : ℤ) else 0))⁻¹ * x l) := by
+theorem inX_mem_flagS (q rS c : ℕ) (f : Fin n) (x : Sp E n)
+    : Loc.inX E n c x ∈ LocE.flagS P q n rS n c (f.1 + rS)
+      ↔ ∀ l : Fin n, IntAt P (((q : E) ^ (if f.1 ≤ l.1 then (1 : ℤ) else 0))⁻¹ * x l) := by
   unfold LocE.flagS
   rw [CongLevel.mem_sclLat]
-  have key : ∀ l, l < n → (LocE.scE n (fun i => i + 1) l +
-      if LocE.bd5 n rS (f.1 + rS) ≤ symIdx n rS (LocE.fPos n c n l) then (1 : ℤ) else 0) = if f.1 ≤ l then 1 else 0 := by
+  have key
+      : ∀ l,
+        l < n
+          → (LocE.scE n (fun i => i + 1) l
+              + if LocE.bd5 n rS (f.1 + rS) ≤ symIdx n rS (LocE.fPos n c n l) then (1 : ℤ) else 0)
+            = if f.1 ≤ l then 1 else 0 := by
     intro l hl
     have := f.2
     unfold LocE.scE LocE.bd5 LocE.fPos symIdx
@@ -123,8 +142,9 @@ theorem inX_mem_flagS (q rS c : ℕ) (f : Fin n) (x : Sp E n) :
     · rw [dite_eq_right hl, mul_zero]
       exact TopStep.intAt_zero
 
-theorem extE_mem_JGsym {q : ℕ} (hq : (q : E) ≠ 0) (rS r t c : ℕ) (A : GL (Fin n) (𝓞 E)) (hA : A ∈ uniUT n (𝓞 E) n []) :
-    CongLevel.extE c (autOf A) ∈ LocE.JGsym P q n rS r t n c := by
+theorem extE_mem_JGsym
+    {q : ℕ} (hq : (q : E) ≠ 0) (rS r t c : ℕ) (A : GL (Fin n) (𝓞 E)) (hA : A ∈ uniUT n (𝓞 E) n [])
+    : CongLevel.extE c (autOf A) ∈ LocE.JGsym P q n rS r t n c := by
   have hs : ∀ s, CongLevel.extE c (autOf A) ∈ stabL E (n + c) (LocE.flagS P q n rS n c s) := by
     intro s
     refine extE_stab_scl hq _ (fun i j hij hj => ?_) A hA
@@ -140,8 +160,9 @@ theorem extE_mem_JGsym {q : ℕ} (hq : (q : E) ≠ 0) (rS r t c : ℕ) (A : GL (
       rw [bvecS_eq, CongLevel.extE_inX, ← map_sub, inX_mem_flagS]
       intro l
       obtain ⟨h1, h2⟩ := (uni_iff rfl).1 hA
-      have e : (autOf A (Pi.single f 1) - (Pi.single f 1 : Sp E n)) l =
-          algebraMap (𝓞 E) E (A.1 l f) - (Pi.single f 1 : Sp E n) l := by
+      have e
+          : (autOf A (Pi.single f 1) - (Pi.single f 1 : Sp E n)) l
+            = algebraMap (𝓞 E) E (A.1 l f) - (Pi.single f 1 : Sp E n) l := by
         rw [Pi.sub_apply, autOf_apply]
         simp [Pi.single_apply]
       rw [e]
@@ -160,16 +181,26 @@ theorem extE_mem_JGsym {q : ℕ} (hq : (q : E) ≠ 0) (rS r t c : ℕ) (A : GL (
       simp
 
 omit [StarRing E] in
-theorem exists_lift (M : GL (Fin n) (𝓞 E ⧸ P.asIdeal)) (hM : M ∈ uniUT n _ n []) :
-    ∃ A ∈ uniUT n (𝓞 E) n [], ∀ i j, Ideal.Quotient.mk P.asIdeal (A.1 i j) = M.1 i j := by
+theorem exists_lift (M : GL (Fin n) (𝓞 E ⧸ P.asIdeal)) (hM : M ∈ uniUT n _ n [])
+    : ∃ A ∈ uniUT n (𝓞 E) n [], ∀ i j, Ideal.Quotient.mk P.asIdeal (A.1 i j) = M.1 i j := by
   obtain ⟨h1, h2⟩ := (uni_iff rfl).1 hM
   choose a ha using fun i j => Ideal.Quotient.mk_surjective (M.1 i j)
-  let B : Matrix (Fin n) (Fin n) (𝓞 E) := Matrix.of fun i j => if j.1 < i.1 then 0 else if i = j then 1 else a i j
+  let B : Matrix (Fin n) (Fin n) (𝓞 E) :=
+    Matrix.of fun i j =>
+      if j.1 < i.1 then
+        0
+      else if i = j then
+        1
+      else
+        a i j
   have hB : B.det = 1 := by
     rw [Matrix.det_of_upperTriangular (M := B) (fun i j hij => if_pos (show j.1 < i.1 from hij))]
     simp [B]
-  refine ⟨Matrix.GeneralLinearGroup.mk'' B (by rw [hB]; exact isUnit_one), (uni_iff rfl).2 ⟨fun i j hij => ?_, fun i => ?_⟩,
-    fun i j => ?_⟩
+  refine ⟨
+    Matrix.GeneralLinearGroup.mk'' B (by rw [hB]; exact isUnit_one),
+    (uni_iff rfl).2 ⟨fun i j hij => ?_, fun i => ?_⟩,
+    fun i j => ?_
+  ⟩
   · exact if_pos hij
   · show B i i = 1
     simp [B]
@@ -179,20 +210,34 @@ theorem exists_lift (M : GL (Fin n) (𝓞 E ⧸ P.asIdeal)) (hM : M ∈ uniUT n 
     · rw [c2, h2, map_one]
     · exact ha i j
 
-theorem uni_iff_prX {k : ℕ} (hn : n = k) (rS r t c : ℕ) (hr : k + rS ≤ r) (M : GL (Fin n) (𝓞 E ⧸ P.asIdeal)) :
-    M ∈ uniUT n _ k [] ↔ ∃ g ∈ Loc.prX (Loc.Cbe (LocE.JGsym P (qOf P) k rS r t n c) 1),
-      ∀ x ∈ stdAt E n P, redV P (g x) = M.1.mulVec (redV P x) := by
+theorem uni_iff_prX
+    {k : ℕ} (hn : n = k) (rS r t c : ℕ) (hr : k + rS ≤ r) (M : GL (Fin n) (𝓞 E ⧸ P.asIdeal))
+    : M ∈ uniUT n _ k []
+      ↔ ∃ g ∈ Loc.prX (Loc.Cbe (LocE.JGsym P (qOf P) k rS r t n c) 1), ∀ x ∈ stdAt E n P,
+        redV P (g x) = M.1.mulVec (redV P x) := by
   subst hn
   have hq := TopStep.qOf_ne_zero (P := P)
-  have hc : ∀ ρ : Sp E (n + c) ≃ₗ[E] Sp E (n + c), ρ ∈ Loc.Cbe (LocE.JGsym P (qOf P) n rS r t n c) 1 ↔
-      ρ ∈ Loc.R1 E n c ∧ ρ ∈ LocE.JGsym P (qOf P) n rS r t n c := by
+  have hc
+      : ∀ ρ : Sp E (n + c) ≃ₗ[E] Sp E (n + c),
+        ρ ∈ Loc.Cbe (LocE.JGsym P (qOf P) n rS r t n c) 1
+          ↔ ρ ∈ Loc.R1 E n c ∧ ρ ∈ LocE.JGsym P (qOf P) n rS r t n c := by
     intro ρ
     simp [Loc.Cbe]
   constructor
   · intro hM
     obtain ⟨A, hA, hAM⟩ := exists_lift M hM
-    refine ⟨autOf A, ⟨CongLevel.extE c (autOf A), (hc _).2 ⟨CongLevel.extendByIdOnLastCoordsLinearEquiv_mem_firstRowGroup _ _, extE_mem_JGsym hq _ _ _ _ A hA⟩,
-      CongLevel.extE_inX _ _⟩, fun x hx => ?_⟩
+    refine ⟨
+      autOf A,
+      ⟨
+        CongLevel.extE c (autOf A),
+        (hc _).2 ⟨
+          CongLevel.extendByIdOnLastCoordsLinearEquiv_mem_firstRowGroup _ _,
+          extE_mem_JGsym hq _ _ _ _ A hA
+        ⟩,
+        CongLevel.extE_inX _ _
+      ⟩,
+      fun x hx => ?_
+    ⟩
     funext i
     have hx' := TopStep.mem_stdAt.1 hx
     show redP P (autOf A x i) = ∑ j, M.1 i j * redP P (x j)
@@ -200,7 +245,8 @@ theorem uni_iff_prX {k : ℕ} (hn : n = k) (rS r t c : ℕ) (hr : k + rS ≤ r) 
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [reduction_mul (IntAt.coe P _) (hx' j), reduction_coe, hAM]
   · rintro ⟨g, ⟨ρ, hρ, hg⟩, hM⟩
-    have key : ∀ f l : Fin n, f.1 ≤ l.1 → M.1 l f = (Pi.single f 1 : Fin n → 𝓞 E ⧸ P.asIdeal) l := by
+    have key
+        : ∀ f l : Fin n, f.1 ≤ l.1 → M.1 l f = (Pi.single f 1 : Fin n → 𝓞 E ⧸ P.asIdeal) l := by
       intro f l hl
       have h1 := (((hc ρ).1 hρ).2.2.2 (f.1 + rS) (by have := f.2; omega)).2
       rw [bvecS_eq, hg, ← map_sub, inX_mem_flagS] at h1
@@ -220,14 +266,23 @@ theorem uni_iff_prX {k : ℕ} (hn : n = k) (rS r t c : ℕ) (hr : k + rS ≤ r) 
     · rw [key j i hij.le, Pi.single_eq_of_ne fun h => by rw [h] at hij; omega]
     · rw [key i i le_rfl, Pi.single_eq_same]
 
-theorem grpG_zero : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu)) (P : rowSG Pr sel mu) (hP : P.1 ∈ Pr.vGs), cst.sharp = true → GlobalTheory.IndefiniteRowSideFullHecke.SourceLatticeInvariance.DegOneUnram P.1 → GrpG sel mu cst 0 P 1 (colLev Ch 0 ⟨P.1, hP⟩) := by
+theorem grpG_zero
+    : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m)
+        (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ}
+        (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu)) (P : rowSG Pr sel mu)
+        (hP : P.1 ∈ Pr.vGs),
+      cst.sharp = true
+        → GlobalTheory.IndefiniteRowSideFullHecke.SourceLatticeInvariance.DegOneUnram P.1
+        → GrpG sel mu cst 0 P 1 (colLev Ch 0 ⟨P.1, hP⟩) := by
   intro X Pr R Ch sel S mu cst P hP hs _ M
   have hm := R.two_le_m
   have e1 : (colLev Ch 0 ⟨P.1, hP⟩).H = uniUT (R.N 0) _ R.k [] := by
     unfold colLev
     rw [if_pos (by omega)]
     rfl
-  have e2 : Jat (Pr := Pr) cst.sharp 0 P.1 = LocE.JGsym P.1 (qOf P.1) R.k R.rS R.r R.t (R.N 0) (cOf R 0) := by
+  have e2
+      : Jat (Pr := Pr) cst.sharp 0 P.1
+        = LocE.JGsym P.1 (qOf P.1) R.k R.rS R.r R.t (R.N 0) (cOf R 0) := by
     unfold Jat
     rw [if_pos hP, if_pos hs]
   unfold prCat

@@ -20,40 +20,48 @@ def dM (k : ℕ) (A : Mt g m) : Mt g (m + k) :=
 theorem dM_mul (A B : Mt g m) : dM k A * dM k B = dM k (A * B) := by
   simp [dM, Matrix.submatrix_mul_equiv, Matrix.fromBlocks_multiply]
 
-theorem dM_one : dM k (1 : Mt g m) = 1 := by
-  simp [dM, Matrix.fromBlocks_one]
+theorem dM_one : dM k (1 : Mt g m) = 1 := by simp [dM, Matrix.fromBlocks_one]
 
 def dG (k : ℕ) (p : Gn g m) : Gn g (m + k) :=
   ⟨dM k p.val, dM k p.inv, by rw [dM_mul, p.val_inv, dM_one], by rw [dM_mul, p.inv_val, dM_one]⟩
 
-theorem conj_val (p : Gn g m) (x : Gn g (m + k)) :
-    ((dG k p * x * (dG k p)⁻¹ : Gn g (m + k)) : Mt g (m + k)) =
-      dM k (p : Mt g m) * (x : Mt g (m + k)) * dM k ((p⁻¹ : Gn g m) : Mt g m) := rfl
+theorem conj_val (p : Gn g m) (x : Gn g (m + k))
+    : ((dG k p * x * (dG k p)⁻¹ : Gn g (m + k)) : Mt g (m + k))
+      = dM k (p : Mt g m) * (x : Mt g (m + k)) * dM k ((p⁻¹ : Gn g m) : Mt g m) :=
+  rfl
 
-theorem tl_apply (X : Mt g (m + k)) (i j : Fin m) : tl m X i j = X (Fin.castAdd k i) (Fin.castAdd k j) := by
+theorem tl_apply (X : Mt g (m + k)) (i j : Fin m)
+    : tl m X i j = X (Fin.castAdd k i) (Fin.castAdd k j) := by
   have h : (i : ℕ) < m + k ∧ (j : ℕ) < m + k := ⟨by omega, by omega⟩
-  rw [tl, entN, dif_pos h]; rfl
+  rw [tl, entN, dif_pos h]
+  rfl
 
-theorem upperLeftBlock_blockDiagExtendByIdentity_conj (A B : Mt g m) (X : Mt g (m + k)) : tl m (dM k A * X * dM k B) = A * tl m X * B := by
+theorem upperLeftBlock_blockDiagExtendByIdentity_conj (A B : Mt g m) (X : Mt g (m + k))
+    : tl m (dM k A * X * dM k B) = A * tl m X * B := by
   ext i j
   simp [tl_apply, dM, Matrix.mul_apply, Fin.sum_univ_add]
 
-theorem blockDiagExtendByIdentity_conj_upperRight_apply (A B : Mt g m) (X : Mt g (m + k)) (i : Fin m) (j : Fin k) :
-    (dM k A * X * dM k B) (Fin.castAdd k i) (Fin.natAdd m j) =
-      ∑ l, A i l * X (Fin.castAdd k l) (Fin.natAdd m j) := by
+theorem blockDiagExtendByIdentity_conj_upperRight_apply
+    (A B : Mt g m) (X : Mt g (m + k)) (i : Fin m) (j : Fin k)
+    : (dM k A * X * dM k B) (Fin.castAdd k i) (Fin.natAdd m j)
+      = ∑ l, A i l * X (Fin.castAdd k l) (Fin.natAdd m j) := by
   simp [dM, Matrix.mul_apply, Fin.sum_univ_add, Matrix.one_apply]
 
-theorem blockDiagExtendByIdentity_conj_lowerLeft_apply (A B : Mt g m) (X : Mt g (m + k)) (i : Fin k) (j : Fin m) :
-    (dM k A * X * dM k B) (Fin.natAdd m i) (Fin.castAdd k j) =
-      ∑ l, X (Fin.natAdd m i) (Fin.castAdd k l) * B l j := by
+theorem blockDiagExtendByIdentity_conj_lowerLeft_apply
+    (A B : Mt g m) (X : Mt g (m + k)) (i : Fin k) (j : Fin m)
+    : (dM k A * X * dM k B) (Fin.natAdd m i) (Fin.castAdd k j)
+      = ∑ l, X (Fin.natAdd m i) (Fin.castAdd k l) * B l j := by
   simp [dM, Matrix.mul_apply, Fin.sum_univ_add, Matrix.one_apply]
 
-theorem blockDiagExtendByIdentity_conj_lowerRight_apply (A B : Mt g m) (X : Mt g (m + k)) (i j : Fin k) :
-    (dM k A * X * dM k B) (Fin.natAdd m i) (Fin.natAdd m j) = X (Fin.natAdd m i) (Fin.natAdd m j) := by
+theorem blockDiagExtendByIdentity_conj_lowerRight_apply
+    (A B : Mt g m) (X : Mt g (m + k)) (i j : Fin k)
+    : (dM k A * X * dM k B) (Fin.natAdd m i) (Fin.natAdd m j)
+      = X (Fin.natAdd m i) (Fin.natAdd m j) := by
   simp [dM, Matrix.mul_apply, Fin.sum_univ_add, Matrix.one_apply]
 
-theorem entN_blockDiagExtendByIdentity_conj_lowerRight (A B : Mt g m) (X : Mt g (m + k)) (i j : ℕ) (hi : m ≤ i) (hj : m ≤ j) :
-    entN (dM k A * X * dM k B) i j = entN X i j := by
+theorem entN_blockDiagExtendByIdentity_conj_lowerRight
+    (A B : Mt g m) (X : Mt g (m + k)) (i j : ℕ) (hi : m ≤ i) (hj : m ≤ j)
+    : entN (dM k A * X * dM k B) i j = entN X i j := by
   unfold entN
   split_ifs with h
   · have e1 : (⟨i, h.1⟩ : Fin (m + k)) = Fin.natAdd m ⟨i - m, by omega⟩ := by ext; simp; omega
@@ -71,10 +79,11 @@ theorem inR_conj (A B : Mt g m) (X : Mt g (m + k)) (h : InR m X) : InR m (dM k A
   · have : br m (m + k - m) (dM k A * X * dM k B) = br m (m + k - m) X := by
       ext i j
       exact entN_blockDiagExtendByIdentity_conj_lowerRight A B X _ _ (by omega) (by omega)
-    rw [this]; exact h.2
+    rw [this]
+    exact h.2
 
-theorem supFrom_conj (hm : 1 ≤ m) (A B : Mt g m) (hA : InMir A) (X : Mt g (m + k)) :
-    supFrom (m - 1) (dM k A * X * dM k B) = supFrom (m - 1) X := by
+theorem supFrom_conj (hm : 1 ≤ m) (A B : Mt g m) (hA : InMir A) (X : Mt g (m + k))
+    : supFrom (m - 1) (dM k A * X * dM k B) = supFrom (m - 1) X := by
   refine Finset.sum_congr rfl fun j hj => ?_
   rw [Finset.mem_Ico] at hj
   by_cases h : m ≤ j
@@ -98,7 +107,9 @@ theorem inMir_of (X : Mt g (m + k)) (h : InR m X) (h0 : InMir (tl m X)) : InMir 
     simp [Matrix.one_apply, Fin.ext_iff]
   · by_cases hj : (j : ℕ) < m
     · rw [h.1 i j hj (by omega), Matrix.one_apply_ne]
-      intro e; subst e; omega
+      intro e
+      subst e
+      omega
     · have h2 := h.2 ⟨i - m, by omega⟩ ⟨j - m, by omega⟩
       have h' : m + (i - m) < m + k ∧ m + (j - m) < m + k := ⟨by omega, by omega⟩
       have e1 : (⟨m + (i - m), h'.1⟩ : Fin (m + k)) = i := by ext; simp; omega
@@ -130,8 +141,11 @@ theorem inMir_dM (A : Mt g m) (hA : InMir A) : InMir (dM k A) := by
   rw [e, upperLeftBlock_blockDiagExtendByIdentity_conj, h2, mul_one, mul_one]
   exact hA
 
-theorem isMirClass_tail (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) (m n : ℕ) (F : Gn g n → ℂ)
-    (hm : 1 ≤ m) (hmn : m ≤ n) (hF : IsMirClass F) : IsMirClass (tail ψ m F) := by
+theorem isMirClass_tail
+    (g : ℕ) [Fact g.Prime]
+    (ψ : AddChar (ZMod g) ℂ)
+    (m n : ℕ) (F : Gn g n → ℂ) (hm : 1 ≤ m) (hmn : m ≤ n) (hF : IsMirClass F)
+    : IsMirClass (tail ψ m F) := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
   intro p x₀ hp hx₀
   unfold tail
@@ -140,14 +154,18 @@ theorem isMirClass_tail (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) (m 
   refine Fintype.sum_equiv (MulAut.conj (dG k p)).toEquiv _ _ fun x => ?_
   have e : (MulAut.conj (dG k p)).toEquiv x = dG k p * x * (dG k p)⁻¹ := rfl
   rw [e]
-  have hiff : (InR m (x : Mt g (m + k)) ∧ tl m (x : Mt g (m + k)) = (x₀ : Mt g m)) ↔
-      (InR m ((dG k p * x * (dG k p)⁻¹ : Gn g (m + k)) : Mt g (m + k)) ∧
-        tl m ((dG k p * x * (dG k p)⁻¹ : Gn g (m + k)) : Mt g (m + k)) = ((p * x₀ * p⁻¹ : Gn g m) : Mt g m)) := by
-    rw [conj_val, upperLeftBlock_blockDiagExtendByIdentity_conj, Units.val_mul, Units.val_mul, Units.mul_left_inj, Units.mul_right_inj]
+  have hiff
+      : (InR m (x : Mt g (m + k)) ∧ tl m (x : Mt g (m + k)) = (x₀ : Mt g m))
+        ↔ (InR m ((dG k p * x * (dG k p)⁻¹ : Gn g (m + k)) : Mt g (m + k))
+          ∧ tl m ((dG k p * x * (dG k p)⁻¹ : Gn g (m + k)) : Mt g (m + k))
+            = ((p * x₀ * p⁻¹ : Gn g m) : Mt g m)) := by
+    rw [conj_val, upperLeftBlock_blockDiagExtendByIdentity_conj, Units.val_mul, Units.val_mul,
+      Units.mul_left_inj, Units.mul_right_inj]
     refine and_congr_left fun _ => ⟨inR_conj _ _ _, fun h => ?_⟩
     have := inR_conj ((p⁻¹ : Gn g m) : Mt g m) (p : Mt g m) _ h
     rwa [← mul_assoc, ← mul_assoc, mul_assoc _ (dM k _) (dM k _), dM_mul, Units.inv_mul, dM_one,
-      one_mul, mul_one] at this
+        one_mul, mul_one]
+      at this
   by_cases h : InR m (x : Mt g (m + k)) ∧ tl m (x : Mt g (m + k)) = (x₀ : Mt g m)
   · rw [if_pos h, if_pos (hiff.1 h), hF _ _ (inMir_dM _ hp) (inMir_of _ h.1 (h.2 ▸ hx₀)), conj_val,
       supFrom_conj hm _ _ hp]

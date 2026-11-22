@@ -7,19 +7,29 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.Measurabl
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.Unfold
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem lintegral_fundSet_inter_le : MeasInvStatement (E := E) → ∀ (r : ℕ) (X : Data E r) (x0 x1 : Frame X.Ψ r), IsOrth X x0 → IsOrth X x1 →
-    ∀ FF, IsFundSet X x0 FF → ∀ φ : Frame X.Ψ r → ℝ≥0∞, Measurable φ →
-    (∀ γ ∈ X.Γ, ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (lact γ (rmul x b)) = φ x) →
-    ∀ N : Set (V (nd X)), MeasurableSet N → N ⊆ OmF X x1 →
-    ∫⁻ z in FF ∩ {z | ∃ y ∈ N, ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, cpt X x0 z = lact γ (rmul (cpt X x1 y) b)},
-      φ (cpt X x0 z) ∂muF X x0 ≤ ∫⁻ y in N, φ (cpt X x1 y) ∂muF X x1 := by
+theorem lintegral_fundSet_inter_le
+    : MeasInvStatement (E := E)
+      → ∀ (r : ℕ) (X : Data E r) (x0 x1 : Frame X.Ψ r),
+        IsOrth X x0 → IsOrth X x1
+          → ∀ FF,
+            IsFundSet X x0 FF
+              → ∀ φ : Frame X.Ψ r → ℝ≥0∞,
+                Measurable φ
+                  → (∀ γ ∈ X.Γ, ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (lact γ (rmul x b)) = φ x)
+                  → ∀ N : Set (V (nd X)),
+                    MeasurableSet N → N ⊆ OmF X x1
+                      → ∫⁻ z in FF ∩ {z | ∃ y ∈ N, ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, cpt X x0 z = lact γ (rmul (cpt X x1 y) b)},
+                          φ (cpt X x0 z) ∂muF X x0
+                        ≤ ∫⁻ y in N, φ (cpt X x1 y) ∂muF X x1 := by
   intro hM r X x0 x1 ho0 ho1 FF hF φ hφ hinv N hN hNO
   classical
   have := FundSetPf.countable_GL (E := E) (r := r)

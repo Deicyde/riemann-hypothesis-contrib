@@ -128,60 +128,65 @@ lemma exists_eventuallyEq_const_of_analyticAt_off_lattice {g : ℂ → ℂ} (hg 
     rwa [this]
   · exact (han z hz).meromorphicOrderAt_nonneg
 
-theorem exists_polynomial_of_even_of_analyticAt_off_lattice (n : ℕ) {g : ℂ → ℂ}
-    (hg : Meromorphic g) (hp : IsPeriodic L g) (he : ∀ z, g (-z) = g z)
+theorem exists_polynomial_of_even_of_analyticAt_off_lattice
+    (n : ℕ)
+    {g : ℂ → ℂ} (hg : Meromorphic g) (hp : IsPeriodic L g) (he : ∀ z, g (-z) = g z)
     (han : ∀ z ∉ L.lattice, AnalyticAt ℂ g z)
-    (hn : ((-(n : ℤ) : ℤ) : WithTop ℤ) ≤ meromorphicOrderAt g 0) :
-    ∃ P : ℂ[X], g =ᶠ[codiscrete ℂ] fun z ↦ P.eval (℘[L] z) := by
+    (hn : ((-(n : ℤ) : ℤ) : WithTop ℤ) ≤ meromorphicOrderAt g 0)
+    : ∃ P : ℂ[X], g =ᶠ[codiscrete ℂ] fun z ↦ P.eval (℘[L] z) := by
   induction n using Nat.strong_induction_on generalizing g with
   | _ n ih =>
-  by_cases h0 : 0 ≤ meromorphicOrderAt g 0
-  · obtain ⟨c, hc⟩ := exists_eventuallyEq_const_of_analyticAt_off_lattice hg hp han h0
-    exact ⟨C c, by simpa using hc⟩
-  push Not at h0
-  obtain ⟨o, ho⟩ : ∃ o : ℤ, meromorphicOrderAt g 0 = o := by
-    cases h : meromorphicOrderAt g 0 with
-    | top => rw [h] at h0; exact absurd h0 (not_lt.2 le_top)
-    | coe o => exact ⟨o, rfl⟩
-  rw [ho] at h0 hn
-  have ho0 : o < 0 := by exact_mod_cast h0
-  have hno : -(n : ℤ) ≤ o := by exact_mod_cast hn
-  obtain ⟨r, hr⟩ := even_of_meromorphicOrderAt_eq (hg 0) he ho
-  obtain ⟨k, hk⟩ : ∃ k : ℕ, o = -2 * k := ⟨(-r).toNat, by omega⟩
-  have hk1 : 1 ≤ k := by omega
-  obtain ⟨u, hu, hu0, hgu⟩ := (meromorphicOrderAt_eq_int_iff (hg 0)).1 ho
-  have hv := analyticAt_weierstrassP_laurent (L := L)
-  have hdiff : (fun z ↦ g z - u 0 * ℘[L] z ^ k) =ᶠ[𝓝[≠] 0] fun z ↦ (z - 0) ^ o *
-      (u z - u 0 * (z ^ 2 * L.weierstrassPExcept 0 z + 1) ^ k) := by
-    filter_upwards [hgu, self_mem_nhdsWithin] with z h1 h2
-    have h2' : z ≠ 0 := h2
-    rw [h1, weierstrassP_eq_zpow_mul h2', mul_pow, ← zpow_natCast (z ^ (-2 : ℤ)), ← zpow_mul,
-      hk, sub_zero, smul_eq_mul]
+    by_cases h0 : 0 ≤ meromorphicOrderAt g 0
+    · obtain ⟨c, hc⟩ := exists_eventuallyEq_const_of_analyticAt_off_lattice hg hp han h0
+      exact ⟨C c, by simpa using hc⟩
+    push Not at h0
+    obtain ⟨o, ho⟩ : ∃ o : ℤ, meromorphicOrderAt g 0 = o := by
+      cases h : meromorphicOrderAt g 0 with
+      | top => rw [h] at h0; exact absurd h0 (not_lt.2 le_top)
+      | coe o => exact ⟨o, rfl⟩
+    rw [ho] at h0 hn
+    have ho0 : o < 0 := by exact_mod_cast h0
+    have hno : -(n : ℤ) ≤ o := by exact_mod_cast hn
+    obtain ⟨r, hr⟩ := even_of_meromorphicOrderAt_eq (hg 0) he ho
+    obtain ⟨k, hk⟩ : ∃ k : ℕ, o = -2 * k := ⟨(-r).toNat, by omega⟩
+    have hk1 : 1 ≤ k := by omega
+    obtain ⟨u, hu, hu0, hgu⟩ := (meromorphicOrderAt_eq_int_iff (hg 0)).1 ho
+    have hv := analyticAt_weierstrassP_laurent (L := L)
+    have hdiff
+        : (fun z ↦ g z - u 0 * ℘[L] z ^ k) =ᶠ[𝓝[≠] 0] fun z ↦ (z - 0) ^ o *
+          (u z - u 0 * (z ^ 2 * L.weierstrassPExcept 0 z + 1) ^ k) := by
+      filter_upwards [hgu, self_mem_nhdsWithin] with z h1 h2
+      have h2' : z ≠ 0 := h2
+      rw [h1, weierstrassP_eq_zpow_mul h2', mul_pow, ← zpow_natCast (z ^ (-2 : ℤ)), ← zpow_mul, hk,
+        sub_zero, smul_eq_mul]
+      ring
+    have hlt :=
+      lt_meromorphicOrderAt_of_eventuallyEq (hu.sub (analyticAt_const.mul (hv.pow k))) (by simp)
+        hdiff
+    obtain ⟨P, hP⟩ :=
+      ih (2 * k - 1) (by omega)
+        (g := fun z ↦ g z - u 0 * ℘[L] z ^ k)
+        (fun z ↦ by have := hg z; have := L.meromorphic_weierstrassP z; fun_prop)
+        (fun z l hl ↦ by simp only [hp z l hl, isPeriodic_weierstrassP z l hl])
+        (fun z ↦ by simp only [he, L.weierstrassP_neg])
+        (fun z hz ↦ by
+          have := han z hz
+          have := L.analyticOnNhd_weierstrassP z hz
+          fun_prop)
+        (by
+          have e : ((-((2 * k - 1 : ℕ) : ℤ) : ℤ) : WithTop ℤ) = ((o + 1 : ℤ) : WithTop ℤ) := by
+            congr 1; omega
+          rw [e]
+          exact coe_add_one_le_of_lt hlt)
+    refine ⟨P + C (u 0) * X ^ k, ?_⟩
+    filter_upwards [hP] with z hz
+    simp only [eval_add, eval_mul, eval_C, eval_pow, eval_X]
+    rw [← hz]
     ring
-  have hlt := lt_meromorphicOrderAt_of_eventuallyEq
-    (hu.sub (analyticAt_const.mul (hv.pow k))) (by simp) hdiff
-  obtain ⟨P, hP⟩ := ih (2 * k - 1) (by omega) (g := fun z ↦ g z - u 0 * ℘[L] z ^ k)
-    (fun z ↦ by have := hg z; have := L.meromorphic_weierstrassP z; fun_prop)
-    (fun z l hl ↦ by simp only [hp z l hl, isPeriodic_weierstrassP z l hl])
-    (fun z ↦ by simp only [he, L.weierstrassP_neg])
-    (fun z hz ↦ by
-      have := han z hz
-      have := L.analyticOnNhd_weierstrassP z hz
-      fun_prop)
-    (by
-      have e : ((-((2 * k - 1 : ℕ) : ℤ) : ℤ) : WithTop ℤ) = ((o + 1 : ℤ) : WithTop ℤ) := by
-        congr 1; omega
-      rw [e]
-      exact coe_add_one_le_of_lt hlt)
-  refine ⟨P + C (u 0) * X ^ k, ?_⟩
-  filter_upwards [hP] with z hz
-  simp only [eval_add, eval_mul, eval_C, eval_pow, eval_X]
-  rw [← hz]
-  ring
 
-theorem exists_polynomial_mul_analyticAt_off_lattice {f : ℂ → ℂ} (hf : Meromorphic f)
-    (hp : IsPeriodic L f) :
-    ∃ Q : ℂ[X], Q ≠ 0 ∧ ∀ z ∉ L.lattice, AnalyticAt ℂ (fun w ↦ Q.eval (℘[L] w) * f w) z := by
+theorem exists_polynomial_mul_analyticAt_off_lattice
+    {f : ℂ → ℂ} (hf : Meromorphic f) (hp : IsPeriodic L f)
+    : ∃ Q : ℂ[X], Q ≠ 0 ∧ ∀ z ∉ L.lattice, AnalyticAt ℂ (fun w ↦ Q.eval (℘[L] w) * f w) z := by
   classical
   have hT := finite_image_singularSet L hf hp
   let rep : Torus L → ℂ := Function.surjInv (Torus.mk_surjective L)
@@ -197,8 +202,7 @@ theorem exists_polynomial_mul_analyticAt_off_lattice {f : ℂ → ℂ} (hf : Mer
   · exact (analyticAt_eval h℘ _).mul hfz
   have ht : Torus.mk L z ∈ hT.toFinset := hT.mem_toFinset.2 ⟨z, hfz, rfl⟩
   have hza : z - rep (Torus.mk L z) ∈ L.lattice := (Torus.mk_eq_mk_iff L).1 (hrep _).symm
-  have h℘a : ℘[L] (rep (Torus.mk L z)) = ℘[L] z :=
-    isPeriodic_weierstrassP.eq_of_mk_eq (hrep _)
+  have h℘a : ℘[L] (rep (Torus.mk L z)) = ℘[L] z := isPeriodic_weierstrassP.eq_of_mk_eq (hrep _)
   have hφ : AnalyticAt ℂ (fun w ↦ ℘[L] w - ℘[L] z) z := h℘.sub analyticAt_const
   have hdφ : AnalyticAt ℂ (dslope (fun w ↦ ℘[L] w - ℘[L] z) z) z := by
     obtain ⟨p, hp'⟩ := hφ
@@ -218,15 +222,16 @@ theorem exists_polynomial_mul_analyticAt_off_lattice {f : ℂ → ℂ} (hf : Mer
     simp only [Function.comp_apply, smul_eq_mul]
     rw [show w - (z - a) - a = w - z by ring, hp.sub w hza]
   have hfN : AnalyticAt ℂ (fun w ↦ (w - z) ^ N * f w) z := by
-    have e : (fun w ↦ (w - z) ^ N * f w) =
-        fun w ↦ (w - z) ^ (N - n (Torus.mk L z)) * ((w - z) ^ n (Torus.mk L z) * f w) := by
+    have e
+        : (fun w ↦ (w - z) ^ N * f w)
+          = fun w ↦ (w - z) ^ (N - n (Torus.mk L z)) * ((w - z) ^ n (Torus.mk L z) * f w) := by
       funext w; rw [← mul_assoc, ← pow_add, Nat.sub_add_cancel hnN]
     rw [e]
     fun_prop
   generalize dslope (fun w ↦ ℘[L] w - ℘[L] z) z = D at hdφ hφeq
-  refine (((hdφ.pow N).mul (analyticAt_eval h℘
-    (∏ s ∈ hT.toFinset.erase (Torus.mk L z), (X - C (℘[L] (rep s))) ^ N))).mul hfN).congr
-    (Eventually.of_forall fun w ↦ ?_)
+  refine (((hdφ.pow N).mul
+      (analyticAt_eval h℘ (∏ s ∈ hT.toFinset.erase (Torus.mk L z), (X - C (℘[L] (rep s))) ^ N))).mul
+    hfN).congr (Eventually.of_forall fun w ↦ ?_)
   simp only [Pi.mul_apply, Pi.pow_apply]
   rw [← Finset.mul_prod_erase hT.toFinset (fun s ↦ (X - C (℘[L] (rep s))) ^ N) ht]
   simp only [eval_mul, eval_pow, eval_sub, eval_X, eval_C, h℘a]
@@ -277,47 +282,59 @@ lemma eventually_codiscrete_derivWeierstrassP_ne_zero :
   simp only [eval_sub, eval_mul, eval_C, eval_pow, eval_X]
   linear_combination -this
 
-theorem exists_polynomial_div_of_even {f : ℂ → ℂ} (hf : IsEllipticFunction L f)
-    (he : ∀ z, f (-z) = f z) :
-    ∃ P Q : ℂ[X], Q ≠ 0 ∧ f =ᶠ[codiscrete ℂ] fun z ↦ P.eval (℘[L] z) / Q.eval (℘[L] z) := by
+theorem exists_polynomial_div_of_even
+    {f : ℂ → ℂ} (hf : IsEllipticFunction L f) (he : ∀ z, f (-z) = f z)
+    : ∃ P Q : ℂ[X], Q ≠ 0 ∧ f =ᶠ[codiscrete ℂ] fun z ↦ P.eval (℘[L] z) / Q.eval (℘[L] z) := by
   obtain ⟨Q, hQ, hQa⟩ := exists_polynomial_mul_analyticAt_off_lattice hf.1 hf.2
-  obtain ⟨n, hn⟩ : ∃ n : ℕ, ((-(n : ℤ) : ℤ) : WithTop ℤ) ≤
-      meromorphicOrderAt (fun w ↦ Q.eval (℘[L] w) * f w) 0 := by
+  obtain ⟨n, hn⟩
+      : ∃ n : ℕ,
+        ((-(n : ℤ) : ℤ) : WithTop ℤ) ≤ meromorphicOrderAt (fun w ↦ Q.eval (℘[L] w) * f w) 0 := by
     cases h : meromorphicOrderAt (fun w ↦ Q.eval (℘[L] w) * f w) 0 with
     | top => exact ⟨0, le_top⟩
     | coe o => exact ⟨o.natAbs, by exact_mod_cast (by omega : -(o.natAbs : ℤ) ≤ o)⟩
-  obtain ⟨P, hP⟩ := exists_polynomial_of_even_of_analyticAt_off_lattice n
-    (g := fun w ↦ Q.eval (℘[L] w) * f w)
-    (fun z ↦ by
-      have := hf.1 z
-      have := meromorphicAt_eval (L.meromorphic_weierstrassP z) Q
-      fun_prop)
-    (fun z l hl ↦ by simp only [hf.2 z l hl, isPeriodic_weierstrassP z l hl])
-    (fun z ↦ by simp only [he, L.weierstrassP_neg]) hQa hn
+  obtain ⟨P, hP⟩ :=
+    exists_polynomial_of_even_of_analyticAt_off_lattice n
+      (g := fun w ↦ Q.eval (℘[L] w) * f w)
+      (fun z ↦ by
+        have := hf.1 z
+        have := meromorphicAt_eval (L.meromorphic_weierstrassP z) Q
+        fun_prop)
+      (fun z l hl ↦ by simp only [hf.2 z l hl, isPeriodic_weierstrassP z l hl])
+      (fun z ↦ by simp only [he, L.weierstrassP_neg])
+      hQa hn
   refine ⟨P, Q, hQ, ?_⟩
   filter_upwards [hP, eventually_codiscrete_eval_weierstrassP_ne_zero hQ] with z hz hQz
   rw [← hz, mul_div_cancel_left₀ _ hQz]
 
-theorem exists_rational_weierstrassP {f : ℂ → ℂ} (hf : IsEllipticFunction L f) :
-    ∃ P Q R S : ℂ[X], Q ≠ 0 ∧ S ≠ 0 ∧ f =ᶠ[codiscrete ℂ] fun z ↦
-      P.eval (℘[L] z) / Q.eval (℘[L] z) + ℘'[L] z * (R.eval (℘[L] z) / S.eval (℘[L] z)) := by
+theorem exists_rational_weierstrassP {f : ℂ → ℂ} (hf : IsEllipticFunction L f)
+    : ∃ P Q R S : ℂ[X],
+      Q ≠ 0 ∧ S ≠ 0
+        ∧ f =ᶠ[codiscrete ℂ] fun z ↦
+          P.eval (℘[L] z) / Q.eval (℘[L] z) + ℘'[L] z * (R.eval (℘[L] z) / S.eval (℘[L] z)) := by
   have hneg : Meromorphic fun z ↦ f (-z) := fun z ↦ by
     have : MeromorphicAt f (-z) := hf.1 (-z)
     exact this.comp_analyticAt (g := fun z ↦ -z) (by fun_prop)
   have hpneg : IsPeriodic L fun z ↦ f (-z) := fun z l hl ↦ by
     simp only [neg_add, ← sub_eq_add_neg]
     exact hf.2.sub (-z) hl
-  obtain ⟨P, Q, hQ, h1⟩ := exists_polynomial_div_of_even (L := L)
-    (f := fun z ↦ (f z + f (-z)) / 2)
-    ⟨fun z ↦ ((hf.1 z).add (hneg z)).div analyticAt_const.meromorphicAt,
-      fun z l hl ↦ by simp only [hf.2 z l hl, hpneg z l hl]⟩
-    (fun z ↦ by simp only [neg_neg]; ring)
-  obtain ⟨R, S, hS, h2⟩ := exists_polynomial_div_of_even (L := L)
-    (f := fun z ↦ (f z - f (-z)) / 2 / ℘'[L] z)
-    ⟨fun z ↦ (((hf.1 z).sub (hneg z)).div analyticAt_const.meromorphicAt).div
-      (L.meromorphic_derivWeierstrassP z),
-      fun z l hl ↦ by simp only [hf.2 z l hl, hpneg z l hl, isPeriodic_derivWeierstrassP z l hl]⟩
-    (fun z ↦ by simp only [neg_neg, L.derivWeierstrassP_neg]; ring)
+  obtain ⟨P, Q, hQ, h1⟩ :=
+    exists_polynomial_div_of_even (L := L)
+      (f := fun z ↦ (f z + f (-z)) / 2)
+      ⟨
+        fun z ↦ ((hf.1 z).add (hneg z)).div analyticAt_const.meromorphicAt,
+        fun z l hl ↦ by simp only [hf.2 z l hl, hpneg z l hl]
+      ⟩
+      (fun z ↦ by simp only [neg_neg]; ring)
+  obtain ⟨R, S, hS, h2⟩ :=
+    exists_polynomial_div_of_even (L := L)
+      (f := fun z ↦ (f z - f (-z)) / 2 / ℘'[L] z)
+      ⟨
+        fun z ↦
+          (((hf.1 z).sub (hneg z)).div analyticAt_const.meromorphicAt).div
+            (L.meromorphic_derivWeierstrassP z),
+        fun z l hl ↦ by simp only [hf.2 z l hl, hpneg z l hl, isPeriodic_derivWeierstrassP z l hl]
+      ⟩
+      (fun z ↦ by simp only [neg_neg, L.derivWeierstrassP_neg]; ring)
   refine ⟨P, Q, R, S, hQ, hS, ?_⟩
   filter_upwards [h1, h2, eventually_codiscrete_derivWeierstrassP_ne_zero (L := L)]
     with z e1 e2 e3

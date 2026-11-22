@@ -10,9 +10,12 @@ open ReciprocityTheory.Gal
 
 namespace UpperTheory.V.Base
 
-private theorem len_le_of_ker_le {R P A B : Type} [CommRing R] [AddCommGroup P] [Module R P] [AddCommGroup A]
-    [Module R A] [AddCommGroup B] [Module R B] (f : P →ₗ[R] A) (g : P →ₗ[R] B) (hf : Function.Surjective f)
-    (hk : LinearMap.ker g ≤ LinearMap.ker f) : Module.length R A ≤ Module.length R B := by
+private theorem len_le_of_ker_le
+    {R P A B : Type} [CommRing R] [AddCommGroup P] [Module R P] [AddCommGroup A] [Module R A]
+    [AddCommGroup B] [Module R B]
+    (f : P →ₗ[R] A) (g : P →ₗ[R] B)
+    (hf : Function.Surjective f) (hk : LinearMap.ker g ≤ LinearMap.ker f)
+    : Module.length R A ≤ Module.length R B := by
   have h1 : Module.length R A ≤ Module.length R (P ⧸ LinearMap.ker g) := by
     refine Module.length_le_of_surjective ((LinearMap.ker g).liftQ f hk) ?_
     intro a
@@ -24,34 +27,41 @@ private theorem len_le_of_ker_le {R P A B : Type} [CommRing R] [AddCommGroup P] 
     Module.length_le_of_injective (LinearMap.range g).subtype Subtype.val_injective
   exact h1.trans (h2.le.trans h3)
 
-variable {R G M : Type} [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup M] [Module R M]
+variable
+  {R G M : Type}
+  [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup M] [Module R M]
   [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [DiscreteTopology M]
-
 
 omit [IsTopologicalAddGroup M] [DiscreteTopology M] in
 instance continuousConstSMul_sub (N : Submodule R M) : ContinuousConstSMul R N :=
   ⟨fun c => (continuous_subtype_val.const_smul c).subtype_mk _⟩
 
 omit [TopologicalSpace G] [IsTopologicalGroup G] in
-private theorem exists_mul_of_mk_eq {U' U : Subgroup G} (h : U' ≤ U) {a b : U}
-    (e : (QuotientGroup.mk a : U ⧸ U'.subgroupOf U) = QuotientGroup.mk b) :
-    ∃ u : U', b = a * Subgroup.inclusion h u := by
+private theorem exists_mul_of_mk_eq
+    {U' U : Subgroup G} (h : U' ≤ U)
+    {a b : U} (e : (QuotientGroup.mk a : U ⧸ U'.subgroupOf U) = QuotientGroup.mk b)
+    : ∃ u : U', b = a * Subgroup.inclusion h u := by
   have hm := QuotientGroup.eq.mp e
   refine ⟨⟨((a⁻¹ * b : U) : G), Subgroup.mem_subgroupOf.mp hm⟩, ?_⟩
   apply Subtype.ext
   simp [Subgroup.coe_inclusion]
 
-private theorem exists_inclusion_mul_eq_mul_inclusion_of_normal {K : Type} [Group K] {U' U : Subgroup K} [U'.Normal] (h : U' ≤ U) (u : U')
-    (g : U) : ∃ v : U', Subgroup.inclusion h u * g = g * Subgroup.inclusion h v := by
+private theorem exists_inclusion_mul_eq_mul_inclusion_of_normal
+    {K : Type} [Group K] {U' U : Subgroup K} [U'.Normal] (h : U' ≤ U) (u : U') (g : U)
+    : ∃ v : U', Subgroup.inclusion h u * g = g * Subgroup.inclusion h v := by
   refine ⟨⟨(g : K)⁻¹ * u * g, Subgroup.Normal.conj_mem' ‹_› _ u.2 _⟩, ?_⟩
   apply Subtype.ext
   simp [mul_assoc]
 
-private theorem exists_ext (ρ : Representation R G M) (hρ : ContAction ρ) {U' U : Subgroup G} [U'.Normal] (h : U' ≤ U)
-    (ho : IsOpen (U'.subgroupOf U : Set U)) (z : Z1U ρ U') (hz : Submodule.Quotient.mk z ∈ invariantsUnderSubgroupH1 ρ U U') :
-    ∃ y : U → M, Continuous y ∧ y 1 = 0 ∧
-      (∀ (u : U') (g : U), y (Subgroup.inclusion h u * g) = z.1 u + ρ u (y g)) ∧
-      ∀ (u : U') (g : U), y (g * Subgroup.inclusion h u) = y g + ρ g (z.1 u) := by
+private theorem exists_ext
+    (ρ : Representation R G M) (hρ : ContAction ρ)
+    {U' U : Subgroup G} [U'.Normal]
+    (h : U' ≤ U) (ho : IsOpen (U'.subgroupOf U : Set U))
+    (z : Z1U ρ U') (hz : Submodule.Quotient.mk z ∈ invariantsUnderSubgroupH1 ρ U U')
+    : ∃ y : U → M,
+      Continuous y ∧ y 1 = 0
+        ∧ (∀ (u : U') (g : U), y (Subgroup.inclusion h u * g) = z.1 u + ρ u (y g))
+        ∧ ∀ (u : U') (g : U), y (g * Subgroup.inclusion h u) = y g + ρ g (z.1 u) := by
   have hm : ∀ s : U, ∃ m : M, ∀ u : U', ρ s (z.1 (conjHom U' (s : G) u)) - z.1 u = ρ u m - m := by
     intro s
     obtain ⟨z', hz'e, hz'⟩ := conjU_mk ρ U' (s : G) z
@@ -61,15 +71,19 @@ private theorem exists_ext (ρ : Representation R G M) (hρ : ContAction ρ) {U'
     exact ⟨m, fun u => by rw [← hz' u]; exact hm u⟩
   choose mS hmS using hm
   have hcz : ∀ a b : U', z.1 (a * b) = z.1 a + ρ a (z.1 b) := fun a b => z.2.2 a b
-  have hsp : ∀ g : U, ∃ t : U',
-      g = (QuotientGroup.mk g : U ⧸ U'.subgroupOf U).out * Subgroup.inclusion h t :=
-    fun g => exists_mul_of_mk_eq h (QuotientGroup.out_eq' (QuotientGroup.mk g : U ⧸ U'.subgroupOf U))
+  have hsp
+      : ∀ g : U, ∃ t : U',
+        g = (QuotientGroup.mk g : U ⧸ U'.subgroupOf U).out * Subgroup.inclusion h t := fun g =>
+    exists_mul_of_mk_eq h (QuotientGroup.out_eq' (QuotientGroup.mk g : U ⧸ U'.subgroupOf U))
   choose v hv using hsp
-  let y0 : U → M := fun g => mS (QuotientGroup.mk g : U ⧸ U'.subgroupOf U).out +
-    ρ (QuotientGroup.mk g : U ⧸ U'.subgroupOf U).out (z.1 (v g))
+  let y0 : U → M := fun g =>
+    mS (QuotientGroup.mk g : U ⧸ U'.subgroupOf U).out
+      + ρ (QuotientGroup.mk g : U ⧸ U'.subgroupOf U).out (z.1 (v g))
   have hR0 : ∀ (u : U') (g : U), y0 (g * Subgroup.inclusion h u) = y0 g + ρ g (z.1 u) := by
     intro u g
-    have hmk : (QuotientGroup.mk (g * Subgroup.inclusion h u) : U ⧸ U'.subgroupOf U) = QuotientGroup.mk g := by
+    have hmk
+        : (QuotientGroup.mk (g * Subgroup.inclusion h u) : U ⧸ U'.subgroupOf U)
+          = QuotientGroup.mk g := by
       rw [QuotientGroup.eq]
       simp [Subgroup.mem_subgroupOf, mul_assoc]
     have e1 := hv (g * Subgroup.inclusion h u)
@@ -88,7 +102,9 @@ private theorem exists_ext (ρ : Representation R G M) (hρ : ContAction ρ) {U'
   have hL0 : ∀ (u : U') (g : U), y0 (Subgroup.inclusion h u * g) = z.1 u + ρ u (y0 g) := by
     intro u g
     obtain ⟨u', hu'⟩ := exists_inclusion_mul_eq_mul_inclusion_of_normal h u g
-    have hmk : (QuotientGroup.mk (Subgroup.inclusion h u * g) : U ⧸ U'.subgroupOf U) = QuotientGroup.mk g := by
+    have hmk
+        : (QuotientGroup.mk (Subgroup.inclusion h u * g) : U ⧸ U'.subgroupOf U)
+          = QuotientGroup.mk g := by
       rw [hu', QuotientGroup.eq]
       simp [Subgroup.mem_subgroupOf, mul_assoc]
     have e1 := hv (Subgroup.inclusion h u * g)
@@ -98,8 +114,7 @@ private theorem exists_ext (ρ : Representation R G M) (hρ : ContAction ρ) {U'
     rw [hmk] at e1 ⊢
     generalize (QuotientGroup.mk g : U ⧸ U'.subgroupOf U).out = s at e0 e1 ⊢
     have eg : (g : G) = s * (v g) := congrArg Subtype.val e0
-    have hsc : (s : G) * (conjHom U' (s : G) u : G) = u * s := by
-      simp [conjHom, mul_assoc]
+    have hsc : (s : G) * (conjHom U' (s : G) u : G) = u * s := by simp [conjHom, mul_assoc]
     have ht : t = conjHom U' (s : G) u * v g := by
       apply Subgroup.inclusion_injective h
       apply mul_left_cancel (a := s)
@@ -125,7 +140,9 @@ private theorem exists_ext (ρ : Representation R G M) (hρ : ContAction ρ) {U'
     have a3 := a1.symm.trans a2
     rw [add_comm] at a3
     exact add_right_cancel a3
-  have hR1 : ∀ (u : U') (g : U), y0 (g * Subgroup.inclusion h u) - y0 1 = (y0 g - y0 1) + ρ g (z.1 u) := by
+  have hR1
+      : ∀ (u : U') (g : U),
+        y0 (g * Subgroup.inclusion h u) - y0 1 = (y0 g - y0 1) + ρ g (z.1 u) := by
     intro u g
     rw [hR0]
     abel
@@ -138,8 +155,9 @@ private theorem exists_ext (ρ : Representation R G M) (hρ : ContAction ρ) {U'
       (Homeomorph.mulLeft g).isOpenEmbedding.comp hι
     have key : ContinuousAt (fun x => y0 x - y0 1) (g * Subgroup.inclusion h 1) := by
       rw [← hψ.continuousAt_iff]
-      have hfun : ((fun x => y0 x - y0 1) ∘ fun u : U' => g * Subgroup.inclusion h u) =
-          fun u => (y0 g - y0 1) + ρ g (z.1 u) := by
+      have hfun
+          : ((fun x => y0 x - y0 1) ∘ fun u : U' => g * Subgroup.inclusion h u)
+            = fun u => (y0 g - y0 1) + ρ g (z.1 u) := by
         funext u
         exact hR1 u g
       rw [hfun]
@@ -150,19 +168,23 @@ private theorem exists_ext (ρ : Representation R G M) (hρ : ContAction ρ) {U'
     rw [hL0, map_sub, hc1]
     abel
 
-private theorem exists_normal_conj_inclusion {K : Type} [Group K] {U' U : Subgroup K} [U'.Normal] (h : U' ≤ U) (u : U')
-    (g : U) : ∃ v : U', Subgroup.inclusion h u * g = g * Subgroup.inclusion h v := by
+private theorem exists_normal_conj_inclusion
+    {K : Type} [Group K] {U' U : Subgroup K} [U'.Normal] (h : U' ≤ U) (u : U') (g : U)
+    : ∃ v : U', Subgroup.inclusion h u * g = g * Subgroup.inclusion h v := by
   refine ⟨⟨(g : K)⁻¹ * u * g, Subgroup.Normal.conj_mem' ‹_› _ u.2 _⟩, ?_⟩
   apply Subtype.ext
   simp [mul_assoc]
 
-
 omit [IsTopologicalGroup G] [DiscreteTopology M] in
-private theorem exists_infl (ρ : Representation R G M) {U' U : Subgroup G} [U'.Normal] (h : U' ≤ U)
-    [DiscreteTopology (U ⧸ U'.subgroupOf U)] (z : U' → M) (y : U → M)
+private theorem exists_infl
+    (ρ : Representation R G M)
+    {U' U : Subgroup G} [U'.Normal]
+    (h : U' ≤ U)
+    [DiscreteTopology (U ⧸ U'.subgroupOf U)]
+    (z : U' → M) (y : U → M)
     (hL : ∀ (u : U') (g : U), y (Subgroup.inclusion h u * g) = z u + ρ u (y g))
-    (hR : ∀ (u : U') (g : U), y (g * Subgroup.inclusion h u) = y g + ρ g (z u)) :
-    ∃ w : Z2 (quotRep ρ U U'), ∀ a b : U,
+    (hR : ∀ (u : U') (g : U), y (g * Subgroup.inclusion h u) = y g + ρ g (z u))
+    : ∃ w : Z2 (quotRep ρ U U'), ∀ a b : U,
       (w.1 (QuotientGroup.mk a, QuotientGroup.mk b) : M) = ρ a (y b) - y (a * b) + y a := by
   set F : U → U → M := fun a b => ρ a (y b) - y (a * b) + y a with hF
   have hFr : ∀ (a b : U) (u : U'), F a (b * Subgroup.inclusion h u) = F a b := by
@@ -191,26 +213,33 @@ private theorem exists_infl (ρ : Representation R G M) {U' U : Subgroup G} [U'.
       intro g
       rw [hL]
       abel
-    calc ρ u (F a b) = F (Subgroup.inclusion h u * a) b := by
-          simp only [hF, map_add (f := _), map_sub, e1, mul_assoc]
-          simp only [Subgroup.coe_mul, Subgroup.coe_inclusion, map_mul, Module.End.mul_apply]
-          abel
+    calc
+      ρ u (F a b) = F (Subgroup.inclusion h u * a) b := by
+        simp only [hF, map_add (f := _), map_sub, e1, mul_assoc]
+        simp only [Subgroup.coe_mul, Subgroup.coe_inclusion, map_mul, Module.End.mul_apply]
+        abel
       _ = F (a * Subgroup.inclusion h v) b := by rw [hv]
       _ = F a b := hFl a b v
-  have hN : ∀ a b : U,
-      F a b ∈ Representation.invariants ((ρ.comp U.subtype).comp (U'.subgroupOf U).subtype) := by
+  have hN
+      : ∀ a b : U,
+        F a b ∈ Representation.invariants ((ρ.comp U.subtype).comp (U'.subgroupOf U).subtype) := by
     intro a b v
     exact hinv a b ⟨(v : U), Subgroup.mem_subgroupOf.mp v.2⟩
-  have hWF : ∀ a b : U,
-      F (QuotientGroup.mk a : U ⧸ U'.subgroupOf U).out (QuotientGroup.mk b : U ⧸ U'.subgroupOf U).out
-        = F a b := by
+  have hWF
+      : ∀ a b : U,
+        F (QuotientGroup.mk a : U ⧸ U'.subgroupOf U).out
+            (QuotientGroup.mk b : U ⧸ U'.subgroupOf U).out
+          = F a b := by
     intro a b
-    obtain ⟨u, hu⟩ := exists_mul_of_mk_eq h (QuotientGroup.out_eq' (QuotientGroup.mk a : U ⧸ U'.subgroupOf U)).symm
-    obtain ⟨v, hv⟩ := exists_mul_of_mk_eq h (QuotientGroup.out_eq' (QuotientGroup.mk b : U ⧸ U'.subgroupOf U)).symm
+    obtain ⟨u, hu⟩ :=
+      exists_mul_of_mk_eq h (QuotientGroup.out_eq' (QuotientGroup.mk a : U ⧸ U'.subgroupOf U)).symm
+    obtain ⟨v, hv⟩ :=
+      exists_mul_of_mk_eq h (QuotientGroup.out_eq' (QuotientGroup.mk b : U ⧸ U'.subgroupOf U)).symm
     rw [hu, hv, hFl, hFr]
-  let W : (U ⧸ U'.subgroupOf U) × (U ⧸ U'.subgroupOf U) →
-      Representation.invariants ((ρ.comp U.subtype).comp (U'.subgroupOf U).subtype) :=
-    fun p => ⟨F p.1.out p.2.out, hN _ _⟩
+  let W
+      : (U ⧸ U'.subgroupOf U) × (U ⧸ U'.subgroupOf U)
+        → Representation.invariants ((ρ.comp U.subtype).comp (U'.subgroupOf U).subtype) := fun p =>
+    ⟨F p.1.out p.2.out, hN _ _⟩
   have hW : ∀ a b : U, (W (QuotientGroup.mk a, QuotientGroup.mk b) : M) = F a b := hWF
   refine ⟨⟨W, continuous_of_discreteTopology, ?_⟩, fun a b => hW a b⟩
   intro p q r
@@ -222,14 +251,20 @@ private theorem exists_infl (ρ : Representation R G M) {U' U : Subgroup G} [U'.
   show ρ a (W (QuotientGroup.mk b, QuotientGroup.mk c) : M) - (W (QuotientGroup.mk (a * b), QuotientGroup.mk c) : M)
     + (W (QuotientGroup.mk a, QuotientGroup.mk (b * c)) : M) - (W (QuotientGroup.mk a, QuotientGroup.mk b) : M) = 0
   rw [hW, hW, hW, hW]
-  simp only [hF, map_add (f := _), map_sub, Subgroup.coe_mul, map_mul, Module.End.mul_apply, mul_assoc]
+  simp only [hF, map_add (f := _), map_sub, Subgroup.coe_mul, map_mul, Module.End.mul_apply,
+    mul_assoc]
   abel
 
 omit [IsTopologicalGroup G] [DiscreteTopology M] in
-private theorem exists_of_mk_eq_zero (ρ : Representation R G M) {U' U : Subgroup G} [U'.Normal] (h : U' ≤ U)
-    (w : Z2 (quotRep ρ U U')) (hw : (Submodule.Quotient.mk w : H2 (quotRep ρ U U')) = 0) :
-    ∃ c : U → M, Continuous c ∧ (∀ u : U', c (Subgroup.inclusion h u) = c 1) ∧ ∀ a b : U,
-      (w.1 (QuotientGroup.mk a, QuotientGroup.mk b) : M) = ρ a (c b) - c (a * b) + c a := by
+private theorem exists_of_mk_eq_zero
+    (ρ : Representation R G M)
+    {U' U : Subgroup G} [U'.Normal]
+    (h : U' ≤ U)
+    (w : Z2 (quotRep ρ U U')) (hw : (Submodule.Quotient.mk w : H2 (quotRep ρ U U')) = 0)
+    : ∃ c : U → M,
+      Continuous c ∧ (∀ u : U', c (Subgroup.inclusion h u) = c 1)
+        ∧ ∀ a b : U,
+          (w.1 (QuotientGroup.mk a, QuotientGroup.mk b) : M) = ρ a (c b) - c (a * b) + c a := by
   have hw0 : w ∈ Submodule.comap (Z2 (quotRep ρ U U')).subtype (B2 (quotRep ρ U U')) :=
     (Submodule.Quotient.mk_eq_zero _).mp hw
   have hw' : (w : _ → _) ∈ B2 (quotRep ρ U U') := hw0
@@ -237,7 +272,9 @@ private theorem exists_of_mk_eq_zero (ρ : Representation R G M) {U' U : Subgrou
   refine ⟨fun a => (cb (QuotientGroup.mk a) : M), ?_, ?_, ?_⟩
   · exact continuous_subtype_val.comp (hcb.comp continuous_coinduced_rng)
   · intro u
-    have h1 : (QuotientGroup.mk (Subgroup.inclusion h u) : U ⧸ U'.subgroupOf U) = QuotientGroup.mk 1 := by
+    have h1
+        : (QuotientGroup.mk (Subgroup.inclusion h u) : U ⧸ U'.subgroupOf U)
+          = QuotientGroup.mk 1 := by
       rw [QuotientGroup.mk_one, QuotientGroup.eq_one_iff]
       exact Subgroup.mem_subgroupOf.mpr u.2
     show ((cb _ : _) : M) = cb _
@@ -247,11 +284,13 @@ private theorem exists_of_mk_eq_zero (ρ : Representation R G M) {U' U : Subgrou
     rfl
 
 omit [IsTopologicalGroup G] [DiscreteTopology M] in
-private theorem mem_range_resU (ρ : Representation R G M) {U' U : Subgroup G} (h : U' ≤ U) (z : Z1U ρ U')
-    (y c : U → M) (hy : Continuous y) (hc : Continuous c) (hz : ∀ u : U', y (Subgroup.inclusion h u) = z.1 u)
+private theorem mem_range_resU
+    (ρ : Representation R G M)
+    {U' U : Subgroup G} (h : U' ≤ U) (z : Z1U ρ U') (y c : U → M) (hy : Continuous y)
+    (hc : Continuous c) (hz : ∀ u : U', y (Subgroup.inclusion h u) = z.1 u)
     (hc1 : ∀ u : U', c (Subgroup.inclusion h u) = c 1)
-    (e : ∀ a b : U, ρ a (c b) - c (a * b) + c a = ρ a (y b) - y (a * b) + y a) :
-    Submodule.Quotient.mk z ∈ LinearMap.range (resU ρ h) := by
+    (e : ∀ a b : U, ρ a (c b) - c (a * b) + c a = ρ a (y b) - y (a * b) + y a)
+    : Submodule.Quotient.mk z ∈ LinearMap.range (resU ρ h) := by
   have hz1 : (z : U' → M) 1 = 0 := by
     have h0 := z.2.2 1 1
     simpa using h0
@@ -281,44 +320,48 @@ private theorem mem_range_resU (ρ : Representation R G M) {U' U : Subgroup G} (
   show y (Subgroup.inclusion h u) - c (Subgroup.inclusion h u) = z.1 u
   rw [hz u, hc1 u, hc0, sub_zero]
 
-
 set_option maxHeartbeats 800000 in
-theorem length_restriction_coker_le_H2 (ρ : Representation R G M) (hρ : ContAction ρ) {U' U : Subgroup G} [U'.Normal]
-    (h : U' ≤ U) (ho : IsOpen (U'.subgroupOf U : Set U)) :
-    Module.length R (resCoker ρ h) ≤ Module.length R (H2 (quotRep ρ U U')) := by
+theorem length_restriction_coker_le_H2
+    (ρ : Representation R G M) (hρ : ContAction ρ)
+    {U' U : Subgroup G} [U'.Normal]
+    (h : U' ≤ U) (ho : IsOpen (U'.subgroupOf U : Set U))
+    : Module.length R (resCoker ρ h) ≤ Module.length R (H2 (quotRep ρ U U')) := by
   haveI : DiscreteTopology (U ⧸ U'.subgroupOf U) := QuotientGroup.discreteTopology ho
-  let P : Submodule R (↥(Z1U ρ U') × ((U → M) × ↥(Z2 (quotRep ρ U U')))) :=
-    { carrier := {x | (Submodule.Quotient.mk x.1 : H1U ρ U') ∈ invariantsUnderSubgroupH1 ρ U U' ∧ Continuous x.2.1 ∧
+  let P : Submodule R (↥(Z1U ρ U') × ((U → M) × ↥(Z2 (quotRep ρ U U')))) := {
+    carrier :=
+      {x | (Submodule.Quotient.mk x.1 : H1U ρ U') ∈ invariantsUnderSubgroupH1 ρ U U' ∧ Continuous x.2.1 ∧
         (∀ u : U', x.2.1 (Subgroup.inclusion h u) = x.1.1 u) ∧
         ∀ a b : U, (x.2.2.1 (QuotientGroup.mk a, QuotientGroup.mk b) : M) =
           ρ a (x.2.1 b) - x.2.1 (a * b) + x.2.1 a}
-      add_mem' := by
-        rintro x x' ⟨h1, h2, h3, h4⟩ ⟨h1', h2', h3', h4'⟩
-        refine ⟨?_, h2.add h2', fun u => ?_, fun a b => ?_⟩
-        · rw [Prod.fst_add, Submodule.Quotient.mk_add]
-          exact add_mem h1 h1'
-        · simp [h3 u, h3' u]
-        · simp [h4 a b, h4' a b]
-          abel
-      zero_mem' := by
-        refine ⟨?_, continuous_const, fun u => ?_, fun a b => ?_⟩
-        · simp
-        · simp
-        · simp
-      smul_mem' := by
-        rintro r x ⟨h1, h2, h3, h4⟩
-        refine ⟨?_, h2.const_smul r, fun u => ?_, fun a b => ?_⟩
-        · rw [Prod.smul_fst, Submodule.Quotient.mk_smul]
-          exact Submodule.smul_mem _ r h1
-        · simp [h3 u]
-        · simp [h4 a b, smul_sub, smul_add] }
+    add_mem' := by
+      rintro x x' ⟨h1, h2, h3, h4⟩ ⟨h1', h2', h3', h4'⟩
+      refine ⟨?_, h2.add h2', fun u => ?_, fun a b => ?_⟩
+      · rw [Prod.fst_add, Submodule.Quotient.mk_add]
+        exact add_mem h1 h1'
+      · simp [h3 u, h3' u]
+      · simp [h4 a b, h4' a b]
+        abel
+    zero_mem' := by
+      refine ⟨?_, continuous_const, fun u => ?_, fun a b => ?_⟩
+      · simp
+      · simp
+      · simp
+    smul_mem' := by
+      rintro r x ⟨h1, h2, h3, h4⟩
+      refine ⟨?_, h2.const_smul r, fun u => ?_, fun a b => ?_⟩
+      · rw [Prod.smul_fst, Submodule.Quotient.mk_smul]
+        exact Submodule.smul_mem _ r h1
+      · simp [h3 u]
+      · simp [h4 a b, smul_sub, smul_add]
+  }
   let q1 : ↥(Z1U ρ U') →ₗ[R] H1U ρ U' := Submodule.mkQ _
   let q2 : ↥(invariantsUnderSubgroupH1 ρ U U') →ₗ[R] resCoker ρ h := Submodule.mkQ _
   let q3 : ↥(Z2 (quotRep ρ U U')) →ₗ[R] H2 (quotRep ρ U U') := Submodule.mkQ _
   have hq1 : Function.Surjective q1 := Submodule.mkQ_surjective _
   have hq2 : Function.Surjective q2 := Submodule.mkQ_surjective _
   let f : P →ₗ[R] resCoker ρ h :=
-    q2 ∘ₗ LinearMap.codRestrict (invariantsUnderSubgroupH1 ρ U U') (q1 ∘ₗ LinearMap.fst R _ _ ∘ₗ P.subtype) (fun x => x.2.1)
+    q2 ∘ₗ LinearMap.codRestrict (invariantsUnderSubgroupH1 ρ U U')
+      (q1 ∘ₗ LinearMap.fst R _ _ ∘ₗ P.subtype) (fun x => x.2.1)
   let g : P →ₗ[R] H2 (quotRep ρ U U') :=
     q3 ∘ₗ (LinearMap.snd R _ _ ∘ₗ LinearMap.snd R _ _) ∘ₗ P.subtype
   have hfs : Function.Surjective f := by
@@ -343,18 +386,21 @@ theorem length_restriction_coker_le_H2 (ρ : Representation R G M) (hρ : ContAc
     have hw0 : (Submodule.Quotient.mk w : H2 (quotRep ρ U U')) = 0 := hx
     obtain ⟨c, hc, hc1, hcw⟩ := exists_of_mk_eq_zero ρ h w hw0
     have hm := mem_range_resU ρ h z y c h2 hc h3 hc1 (fun a b => (hcw a b).symm.trans (h4 a b))
-    exact (Submodule.Quotient.mk_eq_zero _ (x := (⟨_, h1⟩ : invariantsUnderSubgroupH1 ρ U U'))).mpr hm
+    exact (Submodule.Quotient.mk_eq_zero _ (x := (⟨_, h1⟩ : invariantsUnderSubgroupH1 ρ U U'))).mpr
+      hm
   exact len_le_of_ker_le f g hfs hker
-
 
 omit [TopologicalSpace G] [IsTopologicalGroup G] [TopologicalSpace M] [IsTopologicalAddGroup M]
   [ContinuousConstSMul R M] [DiscreteTopology M] in
-theorem length_H0_quotient_rep_le (ρ : Representation R G M) (U' U : Subgroup G) [(U'.subgroupOf U).Normal] :
-    Module.length R (H0 (quotRep ρ U U')) ≤ Module.length R (H0U ρ U) := by
+theorem length_H0_quotient_rep_le
+    (ρ : Representation R G M) (U' U : Subgroup G) [(U'.subgroupOf U).Normal]
+    : Module.length R (H0 (quotRep ρ U U')) ≤ Module.length R (H0U ρ U) := by
   refine Module.length_le_of_injective
     (LinearMap.codRestrict (H0U ρ U)
-      ((Representation.invariants ((ρ.comp U.subtype).comp (U'.subgroupOf U).subtype)).subtype ∘ₗ
-        (H0 (quotRep ρ U U')).subtype) ?_) ?_
+      ((Representation.invariants ((ρ.comp U.subtype).comp (U'.subgroupOf U).subtype)).subtype
+        ∘ₗ (H0 (quotRep ρ U U')).subtype)
+      ?_)
+    ?_
   · intro x g
     exact congrArg Subtype.val (x.2 (QuotientGroup.mk g))
   · intro x x' hxx

@@ -7,20 +7,21 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FourierTr
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.SplitWeil GlobalTheory.CompanionTheory.MirFourier ValuativeRel
+open Matrix GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.SplitWeil
+  GlobalTheory.CompanionTheory.MirFourier ValuativeRel
 open scoped Topology
 
 namespace GlobalTheory.CompanionTheory.MirFourier
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem polyBall_mono (n : ℕ) {s₁ s₂ : kˣ} (h : valuation k (s₁ : k) ≤ valuation k (s₂ : k)) :
-    polyBall n s₁ ≤ polyBall n s₂ :=
-  fun x hx i => show valuation k (x.toAdd i) ≤ valuation k (s₂ : k) from
+theorem polyBall_mono (n : ℕ) {s₁ s₂ : kˣ} (h : valuation k (s₁ : k) ≤ valuation k (s₂ : k))
+    : polyBall n s₁ ≤ polyBall n s₂ := fun x hx i =>
+  show valuation k (x.toAdd i) ≤ valuation k (s₂ : k) from
     le_trans (show valuation k (x.toAdd i) ≤ valuation k (s₁ : k) from hx i) h
 
-theorem exists_mem_polyBall {n : ℕ} (x : Multiplicative (Fin n → k)) :
-    ∃ s : kˣ, x ∈ polyBall n s := by
+theorem exists_mem_polyBall {n : ℕ} (x : Multiplicative (Fin n → k))
+    : ∃ s : kˣ, x ∈ polyBall n s := by
   obtain ⟨M, hM⟩ := Finite.exists_le (fun i : Fin n => valuation k (x.toAdd i))
   obtain ⟨y, hy⟩ := valuation_surjective (max M 1)
   have hy0 : y ≠ 0 := by
@@ -32,26 +33,31 @@ theorem exists_mem_polyBall {n : ℕ} (x : Multiplicative (Fin n → k)) :
   rw [hy]
   exact le_trans (hM i) (le_max_left _ _)
 
-theorem twKer_polyBall_mono (ψ : AddChar k Circle) {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ (Multiplicative (Fin n → k)) V) (a : Fin n → k) {s₁ s₂ : kˣ}
-    (h : valuation k (s₁ : k) ≤ valuation k (s₂ : k)) :
-    twKer ρ (polyBall n s₁) (resChr ψ a (polyBall n s₁)) ≤
-      twKer ρ (polyBall n s₂) (resChr ψ a (polyBall n s₂)) := by
+theorem twKer_polyBall_mono
+    (ψ : AddChar k Circle)
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (Multiplicative (Fin n → k)) V) (a : Fin n → k)
+    {s₁ s₂ : kˣ} (h : valuation k (s₁ : k) ≤ valuation k (s₂ : k))
+    : twKer ρ (polyBall n s₁) (resChr ψ a (polyBall n s₁))
+      ≤ twKer ρ (polyBall n s₂) (resChr ψ a (polyBall n s₂)) := by
   refine Submodule.span_le.2 ?_
   rintro w ⟨⟨x, hx⟩, v, rfl⟩
   exact Submodule.subset_span ⟨⟨x, polyBall_mono n h hx⟩, v, rfl⟩
 
-theorem exists_mem_twKer_polyBall (ψ : AddChar k Circle) {n : ℕ} {V : Type} [AddCommGroup V]
-    [Module ℂ V] (ρ : Representation ℂ (Multiplicative (Fin n → k)) V) (a : Fin n → k) (v : V)
-    (hv : v ∈ twKer ρ ⊤ (resChr ψ a ⊤)) :
-    ∃ s : kˣ, v ∈ twKer ρ (polyBall n s) (resChr ψ a (polyBall n s)) := by
+theorem exists_mem_twKer_polyBall
+    (ψ : AddChar k Circle)
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (Multiplicative (Fin n → k)) V) (a : Fin n → k) (v : V)
+    (hv : v ∈ twKer ρ ⊤ (resChr ψ a ⊤))
+    : ∃ s : kˣ, v ∈ twKer ρ (polyBall n s) (resChr ψ a (polyBall n s)) := by
   unfold twKer at hv
   induction hv using Submodule.span_induction with
   | mem w hw =>
     obtain ⟨⟨x, -⟩, u, rfl⟩ := hw
     obtain ⟨s, hs⟩ := exists_mem_polyBall x
     exact ⟨s, Submodule.subset_span ⟨⟨x, hs⟩, u, rfl⟩⟩
-  | zero => exact ⟨1, Submodule.zero_mem _⟩
+  | zero =>
+    exact ⟨1, Submodule.zero_mem _⟩
   | add x y _ _ hx hy =>
     obtain ⟨s₁, h₁⟩ := hx
     obtain ⟨s₂, h₂⟩ := hy

@@ -44,21 +44,26 @@ private lemma integrableOn_norm_sum_primesIoc_pow_div (a : ℕ → ℂ) (x y : �
   exact div_le_div₀ (by positivity)
     (pow_le_pow_left₀ (norm_nonneg _) (norm_sum_primesIoc_le_sum_range a x y t ht.2) k) hx ht.1
 
-
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
 open scoped Classical in
-theorem _root_.GlobalTheory.Lin.sq_integral_primeSum_div_le (a : ℕ → ℂ) (x y : ℝ) (hx : 1 ≤ x) (hxy : x ≤ y) :
-    (∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ / t) ^ 2 ≤
-      Real.log (y / x) * ∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ ^ 2 / t := by
+theorem _root_.GlobalTheory.Lin.sq_integral_primeSum_div_le
+    (a : ℕ → ℂ) (x y : ℝ) (hx : 1 ≤ x) (hxy : x ≤ y)
+    : (∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ / t) ^ 2
+      ≤ Real.log (y / x)
+        * ∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ ^ 2 / t := by
   have hx0 : 0 < x := by linarith
-  have hI : ∀ k : ℕ, IntervalIntegrable
-      (fun t : ℝ => ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ ^ k / t) volume x y := by
+  have hI
+      : ∀ k : ℕ,
+        IntervalIntegrable
+          (fun t : ℝ => ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ ^ k / t)
+          volume x y := by
     intro k
     refine IntegrableOn.intervalIntegrable ?_
     rw [Set.uIcc_of_le hxy]
     exact integrableOn_norm_sum_primesIoc_pow_div a x y hx0 k
   have hI1 : IntervalIntegrable
-      (fun t : ℝ => ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ / t) volume x y := by
+      (fun t : ℝ => ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ / t)
+      volume x y := by
     simpa only [pow_one] using hI 1
   have hI0 : IntervalIntegrable (fun t : ℝ => 1 / t) volume x y := by
     refine ContinuousOn.intervalIntegrable ?_
@@ -66,17 +71,20 @@ theorem _root_.GlobalTheory.Lin.sq_integral_primeSum_div_le (a : ℕ → ℂ) (x
     rw [Set.uIcc_of_le hxy] at ht
     exact (hx0.trans_le ht.1).ne'
   have hlog : ∫ t in x..y, 1 / t = Real.log (y / x) := integral_one_div_of_pos hx0 (by linarith)
-  have hquad : ∀ c : ℝ, 0 ≤ Real.log (y / x) * (c * c) +
-      (-2 * ∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ / t) * c +
-      ∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ ^ 2 / t := by
+  have hquad
+      : ∀ c : ℝ,
+        0 ≤ Real.log (y / x) * (c * c)
+          + (-2 * ∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ / t) * c
+          + ∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ ^ 2 / t := by
     intro c
     have h0 : 0 ≤ ∫ t in x..y, (c - ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖) ^ 2 / t :=
       intervalIntegral.integral_nonneg hxy
         (fun t ht => div_nonneg (sq_nonneg _) (hx0.trans_le ht.1).le)
-    have heq : ∫ t in x..y, (c - ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖) ^ 2 / t =
-        (c * c) * (∫ t in x..y, 1 / t) -
-          (2 * c) * (∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ / t) +
-          ∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ ^ 2 / t := by
+    have heq
+        : ∫ t in x..y, (c - ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖) ^ 2 / t
+          = (c * c) * (∫ t in x..y, 1 / t)
+            - (2 * c) * (∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ / t)
+            + ∫ t in x..y, ‖∑ p ∈ _root_.GlobalTheory.Lin.primesIoc x t, a p‖ ^ 2 / t := by
       rw [← intervalIntegral.integral_const_mul, ← intervalIntegral.integral_const_mul,
         ← intervalIntegral.integral_sub (hI0.const_mul _) (hI1.const_mul _),
         ← intervalIntegral.integral_add ((hI0.const_mul _).sub (hI1.const_mul _)) (hI 2)]

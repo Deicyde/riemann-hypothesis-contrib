@@ -8,33 +8,41 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 section Tan
 
-variable {X0 : Scheme.{0}} {S : Type} [CommRing S] (x0 : Sp S ⟶ X0) (G : Over X0) [GrpObj G] [IsCommMonObj G]
+variable
+  {X0 : Scheme.{0}} {S : Type} [CommRing S]
+  (x0 : Sp S ⟶ X0)
+  (G : Over X0) [GrpObj G] [IsCommMonObj G]
 
 def tanSub : Subgroup (overAt x0 (DualNumber S) ⟶ G) := (smHom (G := G) x0 0).ker
 
-theorem mem_tanSub {v : overAt x0 (DualNumber S) ⟶ G} : v ∈ tanSub x0 G ↔ smT x0 0 v = 1 := MonoidHom.mem_ker
+theorem mem_tanSub {v : overAt x0 (DualNumber S) ⟶ G} : v ∈ tanSub x0 G ↔ smT x0 0 v = 1 :=
+  MonoidHom.mem_ker
 
 abbrev TanM : Type := Additive (tanSub x0 G)
 
 variable {x0 G}
 
-def tv (v : TanM x0 G) : overAt x0 (DualNumber S) ⟶ G := ((Additive.toMul v : tanSub x0 G) : overAt x0 (DualNumber S) ⟶ G)
+def tv (v : TanM x0 G) : overAt x0 (DualNumber S) ⟶ G :=
+  ((Additive.toMul v : tanSub x0 G) : overAt x0 (DualNumber S) ⟶ G)
 
 theorem tv_mem (v : TanM x0 G) : smT x0 0 (tv v) = 1 := (mem_tanSub x0 G).1 (Additive.toMul v).2
 
-theorem tanM_ext {u v : TanM x0 G} (h : tv u = tv v) : u = v := Additive.toMul.injective (Subtype.ext h)
+theorem tanM_ext {u v : TanM x0 G} (h : tv u = tv v) : u = v :=
+  Additive.toMul.injective (Subtype.ext h)
 
 theorem tv_add (u v : TanM x0 G) : tv (u + v) = tv u * tv v := rfl
 theorem tv_zero : tv (0 : TanM x0 G) = 1 := rfl
 
-def mkT (v : overAt x0 (DualNumber S) ⟶ G) (h : smT x0 0 v = 1) : TanM x0 G := Additive.ofMul ⟨v, (mem_tanSub x0 G).2 h⟩
+def mkT (v : overAt x0 (DualNumber S) ⟶ G) (h : smT x0 0 v = 1) : TanM x0 G :=
+  Additive.ofMul ⟨v, (mem_tanSub x0 G).2 h⟩
 
 theorem tv_mkT (v : overAt x0 (DualNumber S) ⟶ G) (h : smT x0 0 v = 1) : tv (mkT v h) = v := rfl
 
@@ -65,21 +73,30 @@ theorem oact_zero {O : Type} [CommRing O] (A : OAct O G) : A.act 0 = 1 := by
 
 def actR {O : Type} [CommRing O] (A : OAct O G) : O →+* Module.End S (TanM x0 G) where
   toFun a := @actL _ _ _ x0 G _ _ (A.act a) (A.hom a)
-  map_one' := LinearMap.ext fun v => tanM_ext (by
-    show tv v ≫ A.act 1 = tv v
-    rw [A.one, Category.comp_id])
-  map_mul' a b := LinearMap.ext fun v => tanM_ext (by
-    show tv v ≫ A.act (a * b) = (tv v ≫ A.act b) ≫ A.act a
-    rw [mul_comm a b, A.mul, Category.assoc])
-  map_zero' := LinearMap.ext fun v => tanM_ext (by
-    show tv v ≫ A.act 0 = 1
-    rw [oact_zero A, MonObj.comp_one])
-  map_add' a b := LinearMap.ext fun v => tanM_ext (by
-    show tv v ≫ A.act (a + b) = (tv v ≫ A.act a) * (tv v ≫ A.act b)
-    rw [A.add, MonObj.comp_mul])
+  map_one' :=
+    LinearMap.ext fun v =>
+      tanM_ext (by
+        show tv v ≫ A.act 1 = tv v
+        rw [A.one, Category.comp_id])
+  map_mul' a b :=
+    LinearMap.ext fun v =>
+      tanM_ext (by
+        show tv v ≫ A.act (a * b) = (tv v ≫ A.act b) ≫ A.act a
+        rw [mul_comm a b, A.mul, Category.assoc])
+  map_zero' :=
+    LinearMap.ext fun v =>
+      tanM_ext (by
+        show tv v ≫ A.act 0 = 1
+        rw [oact_zero A, MonObj.comp_one])
+  map_add' a b :=
+    LinearMap.ext fun v =>
+      tanM_ext (by
+        show tv v ≫ A.act (a + b) = (tv v ≫ A.act a) * (tv v ≫ A.act b)
+        rw [A.add, MonObj.comp_mul])
 
-theorem tv_actR {O : Type} [CommRing O] (A : OAct O G) (a : O) (v : TanM x0 G) :
-    tv (actR A a v) = tv v ≫ A.act a := rfl
+theorem tv_actR {O : Type} [CommRing O] (A : OAct O G) (a : O) (v : TanM x0 G)
+    : tv (actR A a v) = tv v ≫ A.act a :=
+  rfl
 
 end Tan
 

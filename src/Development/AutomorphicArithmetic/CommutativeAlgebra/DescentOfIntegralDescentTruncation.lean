@@ -9,11 +9,16 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.CohomologyBas
 
 open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.E.DescIntPf
 
-theorem UpperTheory.descent_of_integral_descent_truncation :
-    LateralTheory.E.DescIntPf.EtaleRelativeIsoTruncationFromLevels → LateralTheory.E.t_E2Cut.Desc := by
+theorem UpperTheory.descent_of_integral_descent_truncation
+    : LateralTheory.E.DescIntPf.EtaleRelativeIsoTruncationFromLevels
+      → LateralTheory.E.t_E2Cut.Desc := by
   intro hT hH q i A _ _ hq P p hyp
-  have neg : ∀ n : ℤ, n < 0 → ∀ {X : Scheme} (g : X ⟶ Spec (CommRingCat.of A)),
-      RelZS (ZMod q) (tw q i) n (sch.map (pullback.fst g (LateralTheory.E.t_E2Cut.cpt A))) := by
+  have neg
+      : ∀ n : ℤ,
+        n < 0
+          → ∀ {X : Scheme} (g : X ⟶ Spec (CommRingCat.of A)),
+            RelZS (ZMod q) (tw q i) n
+              (sch.map (pullback.fst g (LateralTheory.E.t_E2Cut.cpt A))) := by
     intro n hn X g
     refine ⟨fun m hm => ?_, fun x y _ => ?_⟩
     · haveI := (hH.a9 (ZMod q) (tw q i)).1
@@ -21,9 +26,10 @@ theorem UpperTheory.descent_of_integral_descent_truncation :
       exact fun y => ⟨0, Subsingleton.elim _ _⟩
     · haveI := (hH.a9 (ZMod q) (tw q i)).1 (sch.obj X) n hn
       exact Subsingleton.elim _ _
-  let C : ℤ → Prop := fun n => ∀ {X : Scheme} (g : X ⟶ Spec (CommRingCat.of A)),
-      (∃ h : X ⟶ P, IsIntegralHom h ∧ g = h ≫ p) →
-      RelZS (ZMod q) (tw q i) n (sch.map (pullback.fst g (LateralTheory.E.t_E2Cut.cpt A)))
+  let C : ℤ → Prop := fun n =>
+    ∀ {X : Scheme} (g : X ⟶ Spec (CommRingCat.of A)),
+      (∃ h : X ⟶ P, IsIntegralHom h ∧ g = h ≫ p)
+        → RelZS (ZMod q) (tw q i) n (sch.map (pullback.fst g (LateralTheory.E.t_E2Cut.cpt A)))
   have step : ∀ n : ℤ, (∀ m, m < n → C m) → C n := by
     intro n ih X g hg
     obtain ⟨h, hh, rfl⟩ := hg
@@ -31,8 +37,8 @@ theorem UpperTheory.descent_of_integral_descent_truncation :
     haveI := hk
     haveI := hks
     obtain ⟨U, E, u, a', a, hcomm, ha, ha', hall, h0⟩ :=
-      UpperTheory.cohomology_base_change_integral_surjective_cech hH.b4 q i k (h ≫ p) (LateralTheory.E.t_E2Cut.cpt A)
-        (LateralTheory.E.t_E2Cut.unit_of hq (h ≫ p))
+      UpperTheory.cohomology_base_change_integral_surjective_cech hH.b4 q i k (h ≫ p)
+        (LateralTheory.E.t_E2Cut.cpt A) (LateralTheory.E.t_E2Cut.unit_of hq (h ≫ p))
     have hu : RelZS (ZMod q) (tw q i) n u := by
       refine hT (ZMod q) (tw q i) u n (fun p' m hm => ?_) ?_
       · obtain ⟨L, l, hl, hL⟩ := hall p'

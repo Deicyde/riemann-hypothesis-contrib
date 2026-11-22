@@ -123,8 +123,7 @@ private lemma eisFun_eq (N k : ℕ) (a : ZMod N) :
 end UpperTheory.V.Sd
 
 open UpperTheory.V.Sd in
-theorem UpperTheory.V.Sd.eisMF :
-    UpperTheory.V.Sd.EisMF := by
+theorem UpperTheory.V.Sd.eisMF : UpperTheory.V.Sd.EisMF := by
   intro N k _ hk a
   have hk' : (3 : ℤ) ≤ k := by exact_mod_cast hk
   refine ⟨{ toFun := eisFun N k a, slash_action_eq' := ?_, holo' := ?_, bdd_at_cusps' := ?_ }, rfl⟩

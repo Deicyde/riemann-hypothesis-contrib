@@ -9,12 +9,14 @@ open CategoryTheory Limits TensorProduct
 
 namespace GlobalTheory.TorsorColim
 
-theorem poly_eventually_solvable :
-    ∀ (J : Type) [SmallCategory J] [IsFiltered J] (F : J ⥤ CommRingCat.{0}) (c : Cocone F),
-    IsColimit c → ∀ (j : J) (σ ι : Type) [Finite σ] [Finite ι] (p : ι → MvPolynomial σ (F.obj j)) (x : σ → c.pt),
-    (∀ i, MvPolynomial.eval₂ (c.ι.app j).hom x (p i) = 0) →
-    ∃ (k₀ : J) (f₀ : j ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k), ∃ y : σ → F.obj k,
-      ∀ i, MvPolynomial.eval₂ (F.map (f₀ ≫ f)).hom y (p i) = 0 := by
+theorem poly_eventually_solvable
+    : ∀ (J : Type) [SmallCategory J] [IsFiltered J] (F : J ⥤ CommRingCat.{0}) (c : Cocone F),
+      IsColimit c
+        → ∀ (j : J) (σ ι : Type) [Finite σ] [Finite ι] (p : ι → MvPolynomial σ (F.obj j))
+            (x : σ → c.pt),
+          (∀ i, MvPolynomial.eval₂ (c.ι.app j).hom x (p i) = 0)
+            → ∃ (k₀ : J) (f₀ : j ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k), ∃ y : σ → F.obj k, ∀ i,
+              MvPolynomial.eval₂ (F.map (f₀ ≫ f)).hom y (p i) = 0 := by
   classical
   intro J _ _ F c hc j σ ι _ _ p x hx
   haveI := Fintype.ofFinite σ
@@ -40,10 +42,12 @@ theorem poly_eventually_solvable :
     have e1 : (c.ι.app K).hom.comp (F.map h).hom = (c.ι.app j).hom := by
       rw [← CommRingCat.hom_comp, c.w h]
     have e2 : ⇑(c.ι.app K).hom ∘ u = x := funext hu
-    rw [e1, e2]; exact hx i
+    rw [e1, e2]
+    exact hx i
 
-  have one : ∀ i, ∃ (k₀ : J) (f₀ : K ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k),
-      (F.map (f₀ ≫ f)).hom (MvPolynomial.eval₂ (F.map h).hom u (p i)) = 0 := by
+  have one
+      : ∀ i, ∃ (k₀ : J) (f₀ : K ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k),
+        (F.map (f₀ ≫ f)).hom (MvPolynomial.eval₂ (F.map h).hom u (p i)) = 0 := by
     intro i
     have h0 : (c.ι.app K).hom (MvPolynomial.eval₂ (F.map h).hom u (p i)) = (c.ι.app K).hom 0 := by
       rw [hz i, map_zero]
@@ -52,16 +56,19 @@ theorem poly_eventually_solvable :
     have e' : (F.map f₀).hom (MvPolynomial.eval₂ (F.map h).hom u (p i)) = 0 := by simpa using e
     rw [Functor.map_comp, CommRingCat.hom_comp, RingHom.comp_apply, e', map_zero]
 
-  have all : ∀ S : Finset ι, ∃ (k₀ : J) (f₀ : K ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k),
-      ∀ i ∈ S, (F.map (f₀ ≫ f)).hom (MvPolynomial.eval₂ (F.map h).hom u (p i)) = 0 := by
+  have all
+      : ∀ S : Finset ι, ∃ (k₀ : J) (f₀ : K ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k), ∀ i ∈ S,
+        (F.map (f₀ ≫ f)).hom (MvPolynomial.eval₂ (F.map h).hom u (p i)) = 0 := by
     intro S
     induction S using Finset.induction_on with
     | empty => exact ⟨K, 𝟙 K, fun _ _ i hi => absurd hi (Finset.notMem_empty i)⟩
     | insert a S _ ih =>
-      obtain ⟨k₀, f₀, hh⟩ := eventually_and
-        (fun k (g : K ⟶ k) => (F.map g).hom (MvPolynomial.eval₂ (F.map h).hom u (p a)) = 0)
-        (fun k (g : K ⟶ k) => ∀ i ∈ S, (F.map g).hom (MvPolynomial.eval₂ (F.map h).hom u (p i)) = 0)
-        (one a) ih
+      obtain ⟨k₀, f₀, hh⟩ :=
+        eventually_and
+          (fun k (g : K ⟶ k) => (F.map g).hom (MvPolynomial.eval₂ (F.map h).hom u (p a)) = 0)
+          (fun k (g : K ⟶ k) =>
+            ∀ i ∈ S, (F.map g).hom (MvPolynomial.eval₂ (F.map h).hom u (p i)) = 0)
+          (one a) ih
       refine ⟨k₀, f₀, fun k f i hi => ?_⟩
       rcases Finset.mem_insert.1 hi with rfl | hi
       · exact (hh k f).1

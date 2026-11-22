@@ -19,17 +19,20 @@ private lemma smulMV {κ μ : Type} [Fintype μ] (c : R) (M : Matrix κ μ R) (v
   simp only [Matrix.mulVec, dotProduct, Matrix.smul_apply, smul_eq_mul, Pi.smul_apply,
     Finset.mul_sum, mul_assoc]
 
-private theorem matrix_mul_comm_of_mul_eq_smul_one_of_ne_zero {n : Type} [Fintype n] [DecidableEq n] {S : Type} [CommRing S]
-    [IsDomain S] {A B : Matrix n n S} {c : S} (hc : c ≠ 0) (h : A * B = c • (1 : Matrix n n S)) :
-    B * A = c • (1 : Matrix n n S) := by
+private theorem matrix_mul_comm_of_mul_eq_smul_one_of_ne_zero
+    {n : Type} [Fintype n] [DecidableEq n]
+    {S : Type} [CommRing S] [IsDomain S]
+    {A B : Matrix n n S} {c : S} (hc : c ≠ 0) (h : A * B = c • (1 : Matrix n n S))
+    : B * A = c • (1 : Matrix n n S) := by
   have hdet : A.det ≠ 0 := by
     intro h0
     have h1 := congrArg Matrix.det h
     rw [Matrix.det_mul, h0, zero_mul, Matrix.det_smul, Matrix.det_one, mul_one] at h1
     exact pow_ne_zero _ hc h1.symm
   have key : A.det • (B * A) = A.det • (c • (1 : Matrix n n S)) := by
-    calc A.det • (B * A) = (A.adjugate * A) * (B * A) := by
-          rw [Matrix.adjugate_mul, Matrix.smul_mul, Matrix.one_mul]
+    calc
+      A.det • (B * A)
+        = (A.adjugate * A) * (B * A) := by rw [Matrix.adjugate_mul, Matrix.smul_mul, Matrix.one_mul]
       _ = A.adjugate * ((A * B) * A) := by simp only [Matrix.mul_assoc]
       _ = A.adjugate * (c • A) := by rw [h, Matrix.smul_mul, Matrix.one_mul]
       _ = c • (A.adjugate * A) := by rw [Matrix.mul_smul]
@@ -39,17 +42,20 @@ private theorem matrix_mul_comm_of_mul_eq_smul_one_of_ne_zero {n : Type} [Fintyp
   simp only [Matrix.smul_apply, smul_eq_mul] at h2
   simpa only [Matrix.smul_apply, smul_eq_mul] using mul_left_cancel₀ hdet h2
 
-private theorem block_products_of_transpose_form_eq_smul [IsDomain R] {Ht Bt : Matrix (Fin g) (Ix g) R}
-    {E : Matrix (Ix g) (Ix g) R} {cp : R} (hcp : cp ≠ 0) (hE : IsUnit E.det)
-    (hform : Btᵀ * Ht - Htᵀ * Bt = cp • E) :
-    Bt * (Eᵀ)⁻¹ * Htᵀ = cp • 1 ∧ Bt * (Eᵀ)⁻¹ * Btᵀ = 0 ∧ -(Ht * (Eᵀ)⁻¹) * Htᵀ = 0 ∧
-      -(Ht * (Eᵀ)⁻¹) * Btᵀ = cp • 1 := by
+private theorem block_products_of_transpose_form_eq_smul
+    [IsDomain R]
+    {Ht Bt : Matrix (Fin g) (Ix g) R} {E : Matrix (Ix g) (Ix g) R} {cp : R}
+    (hcp : cp ≠ 0) (hE : IsUnit E.det) (hform : Btᵀ * Ht - Htᵀ * Bt = cp • E)
+    : Bt * (Eᵀ)⁻¹ * Htᵀ = cp • 1 ∧ Bt * (Eᵀ)⁻¹ * Btᵀ = 0 ∧ -(Ht * (Eᵀ)⁻¹) * Htᵀ = 0
+      ∧ -(Ht * (Eᵀ)⁻¹) * Btᵀ = cp • 1 := by
   have hT1 : Htᵀ * Bt - Btᵀ * Ht = cp • Eᵀ := by
     simpa only [Matrix.transpose_sub, Matrix.transpose_mul, Matrix.transpose_transpose,
-      Matrix.transpose_smul] using congrArg Matrix.transpose hform
+        Matrix.transpose_smul]
+      using congrArg Matrix.transpose hform
   have hEF : Eᵀ * (Eᵀ)⁻¹ = 1 := Matrix.mul_nonsing_inv _ (by rwa [Matrix.det_transpose])
-  have hP : Matrix.fromCols Htᵀ Btᵀ * Matrix.fromRows (Bt * (Eᵀ)⁻¹) (-(Ht * (Eᵀ)⁻¹)) =
-      cp • (1 : Matrix (Ix g) (Ix g) R) := by
+  have hP
+      : Matrix.fromCols Htᵀ Btᵀ * Matrix.fromRows (Bt * (Eᵀ)⁻¹) (-(Ht * (Eᵀ)⁻¹))
+        = cp • (1 : Matrix (Ix g) (Ix g) R) := by
     rw [Matrix.fromCols_mul_fromRows, Matrix.mul_neg, ← sub_eq_add_neg, ← Matrix.mul_assoc,
       ← Matrix.mul_assoc, ← Matrix.sub_mul, hT1, Matrix.smul_mul, hEF]
   have hQ := matrix_mul_comm_of_mul_eq_smul_one_of_ne_zero hcp hP

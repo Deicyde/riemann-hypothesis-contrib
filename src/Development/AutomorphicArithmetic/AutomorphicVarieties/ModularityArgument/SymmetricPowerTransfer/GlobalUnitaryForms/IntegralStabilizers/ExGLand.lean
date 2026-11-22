@@ -30,8 +30,8 @@ theorem exG_ne {x : F} (h : TPos x) : x ≠ 0 := by
   have := h σ
   simp [hx] at this
 
-private theorem emb_star {Δ : F} (hΔ : ∀ σ : F →+* ℝ, σ Δ < 0) (φ : Lsq F Δ →+* ℂ) :
-    (∀ x, φ (star x) = starRingEnd ℂ (φ x)) ∧ (φ QuadraticAlgebra.omega).im ≠ 0 := by
+private theorem emb_star {Δ : F} (hΔ : ∀ σ : F →+* ℝ, σ Δ < 0) (φ : Lsq F Δ →+* ℂ)
+    : (∀ x, φ (star x) = starRingEnd ℂ (φ x)) ∧ (φ QuadraticAlgebra.omega).im ≠ 0 := by
   obtain ⟨σ, hσ⟩ := ex_real (φ.comp (algebraMap F (Lsq F Δ)))
   have hσ' : ∀ t : F, φ (algebraMap F _ t) = (σ t : ℂ) := hσ
   set w := φ QuadraticAlgebra.omega with hwdef
@@ -60,10 +60,12 @@ private theorem emb_star {Δ : F} (hΔ : ∀ σ : F →+* ℝ, σ Δ < 0) (φ : 
   rw [hd, hd]
   apply Complex.ext <;> simp [hwr]
 
-theorem exG_land {Δ : F} (hΔ : ∀ σ : F →+* ℝ, σ Δ < 0) (g : Fin 3 → F) (hg : ∀ i, TPos (g i)) (y : Lsq F Δ)
-    (hy : algebraMap F (Lsq F Δ) (∏ i, g i) = y * star y) :
-    ∃ P : Matrix (Fin 3) (Fin 3) (Lsq F Δ), IsUnit P.det ∧
-      diagonal (fun i => algebraMap F (Lsq F Δ) (g i)) = Pᵀ * P.map star := by
+theorem exG_land
+    {Δ : F} (hΔ : ∀ σ : F →+* ℝ, σ Δ < 0)
+    (g : Fin 3 → F) (hg : ∀ i, TPos (g i))
+    (y : Lsq F Δ) (hy : algebraMap F (Lsq F Δ) (∏ i, g i) = y * star y)
+    : ∃ P : Matrix (Fin 3) (Fin 3) (Lsq F Δ),
+      IsUnit P.det ∧ diagonal (fun i => algebraMap F (Lsq F Δ) (g i)) = Pᵀ * P.map star := by
   haveI : Fact (∀ r : F, r ^ 2 ≠ Δ + 0 * r) := ⟨exG_nonsq hΔ⟩
   haveI : Module.Finite ℚ (Lsq F Δ) := Module.Finite.trans F (Lsq F Δ)
   haveI : NumberField (Lsq F Δ) := ⟨⟩
@@ -81,54 +83,56 @@ theorem exG_land {Δ : F} (hΔ : ∀ σ : F →+* ℝ, σ Δ < 0) (g : Fin 3 →
     intro x
     obtain φ := (Classical.arbitrary (InfinitePlace (Lsq F Δ))).embedding
     apply φ.injective
-    simp only [ReciprocityTheory.ChartRestriction.G.FD.cc, IsCMField.complexEmbedding_complexConj, (emb_star hΔ φ).1]
+    simp only [ReciprocityTheory.ChartRestriction.G.FD.cc, IsCMField.complexEmbedding_complexConj,
+      (emb_star hΔ φ).1]
   have hstar : ∀ t : F, star (algebraMap F (Lsq F Δ) t) = algebraMap F (Lsq F Δ) t := by
     intro t
     ext <;> simp
   set G' : Matrix (Fin 3) (Fin 3) (Lsq F Δ) := diagonal (fun i => algebraMap F (Lsq F Δ) (g i)) with hG'
-  have hdet : G'.det = algebraMap F (Lsq F Δ) (∏ i, g i) := by
-    rw [hG', det_diagonal, map_prod]
+  have hdet : G'.det = algebraMap F (Lsq F Δ) (∏ i, g i) := by rw [hG', det_diagonal, map_prod]
   have hprod : (∏ i, g i) ≠ 0 := Finset.prod_ne_zero_iff.mpr (fun i _ => exG_ne (hg i))
-  obtain ⟨P, hP, hPe⟩ := GlobalTheory.QNorm.landherr_and_landherrSt.1 (Lsq F Δ) 3 1 G'
-    (by
-      intro a b
-      rw [hcc]
-      by_cases h : a = b
-      · subst h
-        simp
-      · simp [Matrix.one_apply, h, Ne.symm h])
-    (by
-      intro a b
-      rw [hcc]
-      by_cases h : a = b
-      · subst h
-        simp [hG', hstar]
-      · simp [hG', Matrix.diagonal_apply, h, Ne.symm h])
-    (by simp)
-    (by
-      rw [hdet]
-      exact (map_ne_zero_iff _ (algebraMap F (Lsq F Δ)).injective).mpr hprod)
-    (by
-      intro τ
-      obtain ⟨σ, hσ⟩ := ex_real (τ.comp (algebraMap F (Lsq F Δ)))
-      have hσ' : ∀ t : F, τ (algebraMap F _ t) = (σ t : ℂ) := hσ
-      refine ⟨diagonal (fun i => ((Real.sqrt (σ (g i)) : ℝ) : ℂ)), ?_, ?_⟩
-      · rw [det_diagonal]
-        refine Finset.prod_ne_zero_iff.mpr (fun i _ => ?_)
-        rw [Complex.ofReal_ne_zero]
-        exact (Real.sqrt_pos.mpr (hg i σ)).ne'
-      · ext a b
+  obtain ⟨P, hP, hPe⟩ :=
+    GlobalTheory.QNorm.landherr_and_landherrSt.1 (Lsq F Δ) 3 1 G'
+      (by
+        intro a b
+        rw [hcc]
         by_cases h : a = b
         · subst h
-          simp only [hG', Matrix.map_apply, Matrix.diagonal_apply_eq, Matrix.mul_apply, Matrix.transpose_apply,
-            Matrix.diagonal_apply, Matrix.one_apply]
-          simp [hσ']
-          rw [← Complex.ofReal_mul, Real.mul_self_sqrt (hg a σ).le]
-        · simp [hG', Matrix.diagonal_apply, h, Ne.symm h, Matrix.mul_apply, Matrix.one_apply])
-    (by
-      refine ⟨y⁻¹, ?_⟩
-      rw [hcc, det_one, hdet, hy, star_inv₀, one_div, mul_inv])
-  have hm : P.map ReciprocityTheory.ChartRestriction.G.FD.cc = P.map star := Matrix.ext fun a b => hcc (P a b)
+          simp
+        · simp [Matrix.one_apply, h, Ne.symm h])
+      (by
+        intro a b
+        rw [hcc]
+        by_cases h : a = b
+        · subst h
+          simp [hG', hstar]
+        · simp [hG', Matrix.diagonal_apply, h, Ne.symm h])
+      (by simp)
+      (by
+        rw [hdet]
+        exact (map_ne_zero_iff _ (algebraMap F (Lsq F Δ)).injective).mpr hprod)
+      (by
+        intro τ
+        obtain ⟨σ, hσ⟩ := ex_real (τ.comp (algebraMap F (Lsq F Δ)))
+        have hσ' : ∀ t : F, τ (algebraMap F _ t) = (σ t : ℂ) := hσ
+        refine ⟨diagonal (fun i => ((Real.sqrt (σ (g i)) : ℝ) : ℂ)), ?_, ?_⟩
+        · rw [det_diagonal]
+          refine Finset.prod_ne_zero_iff.mpr (fun i _ => ?_)
+          rw [Complex.ofReal_ne_zero]
+          exact (Real.sqrt_pos.mpr (hg i σ)).ne'
+        · ext a b
+          by_cases h : a = b
+          · subst h
+            simp only [hG', Matrix.map_apply, Matrix.diagonal_apply_eq, Matrix.mul_apply,
+              Matrix.transpose_apply, Matrix.diagonal_apply, Matrix.one_apply]
+            simp [hσ']
+            rw [← Complex.ofReal_mul, Real.mul_self_sqrt (hg a σ).le]
+          · simp [hG', Matrix.diagonal_apply, h, Ne.symm h, Matrix.mul_apply, Matrix.one_apply])
+      (by
+        refine ⟨y⁻¹, ?_⟩
+        rw [hcc, det_one, hdet, hy, star_inv₀, one_div, mul_inv])
+  have hm : P.map ReciprocityTheory.ChartRestriction.G.FD.cc = P.map star :=
+    Matrix.ext fun a b => hcc (P a b)
   refine ⟨P, isUnit_iff_ne_zero.mpr hP, ?_⟩
   rw [hPe, Matrix.mul_one, hm]
 

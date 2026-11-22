@@ -12,12 +12,15 @@ open scoped ENNReal Pointwise
 
 namespace PI.UnitaryGroupMassFormula.QuotNuSigma
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+  [MeasurableSpace G] [BorelSpace G]
 
-theorem pos_open_one (A : Set G) (μA : Measure G) (h0 : μA ≠ 0) (hc : μA Aᶜ = 0)
-    (hinv : ∀ s ∈ A, μA.map (fun x => s * x) = μA) (U : Set G) (hU : IsOpen U) (h1 : (1 : G) ∈ U) :
-    0 < μA U := by
+theorem pos_open_one
+    (A : Set G) (μA : Measure G)
+    (h0 : μA ≠ 0) (hc : μA Aᶜ = 0) (hinv : ∀ s ∈ A, μA.map (fun x => s * x) = μA)
+    (U : Set G) (hU : IsOpen U) (h1 : (1 : G) ∈ U)
+    : 0 < μA U := by
   by_contra hpos
   have hU0 : μA U = 0 := nonpos_iff_eq_zero.1 (not_lt.1 hpos)
   let F : A → Set G := fun s => (fun x => (s : G)⁻¹ * x) ⁻¹' U
@@ -43,28 +46,35 @@ theorem pos_open_one (A : Set G) (μA : Measure G) (h0 : μA ≠ 0) (hc : μA A�
     · exact Or.inr hx
   exact h0 (Measure.measure_univ_eq_zero.1 huniv)
 
-theorem pos_open_one_mul (A B : Set G) (μA μB : Measure G) [SigmaFinite μB]
-    (hA0 : μA ≠ 0) (hAc : μA Aᶜ = 0) (hAi : ∀ s ∈ A, μA.map (fun x => s * x) = μA)
-    (hB0 : μB ≠ 0) (hBc : μB Bᶜ = 0) (hBi : ∀ s ∈ B, μB.map (fun x => s * x) = μB)
-    (U : Set G) (hU : IsOpen U) (h1 : (1 : G) ∈ U) :
-    0 < ((μA.prod μB).map (fun p : G × G => p.1 * p.2)) U := by
+theorem pos_open_one_mul
+    (A B : Set G)
+    (μA μB : Measure G) [SigmaFinite μB]
+    (hA0 : μA ≠ 0) (hAc : μA Aᶜ = 0) (hAi : ∀ s ∈ A, μA.map (fun x => s * x) = μA) (hB0 : μB ≠ 0)
+    (hBc : μB Bᶜ = 0) (hBi : ∀ s ∈ B, μB.map (fun x => s * x) = μB)
+    (U : Set G) (hU : IsOpen U) (h1 : (1 : G) ∈ U)
+    : 0 < ((μA.prod μB).map (fun p : G × G => p.1 * p.2)) U := by
   obtain ⟨V, hVo, hV1, hVV⟩ := exists_open_nhds_one_mul_subset (hU.mem_nhds h1)
   have hApos := pos_open_one A μA hA0 hAc hAi V hVo hV1
   have hBpos := pos_open_one B μB hB0 hBc hBi V hVo hV1
   have hsub : V ×ˢ V ⊆ (fun p : G × G => p.1 * p.2) ⁻¹' U := fun p hp =>
     hVV (Set.mul_mem_mul hp.1 hp.2)
-  calc (0 : ℝ≥0∞) < μA V * μB V := ENNReal.mul_pos hApos.ne' hBpos.ne'
+  calc
+    (0 : ℝ≥0∞)
+      < μA V * μB V := ENNReal.mul_pos hApos.ne' hBpos.ne'
     _ = (μA.prod μB) (V ×ˢ V) := (Measure.prod_prod V V).symm
     _ ≤ (μA.prod μB) ((fun p : G × G => p.1 * p.2) ⁻¹' U) := measure_mono hsub
     _ ≤ _ := Measure.le_map_apply measurable_mul.aemeasurable U
 
-theorem sigmaFinite_of_weil [LocallyCompactSpace G] [T2Space G]
-    (μG : Measure G) [IsFiniteMeasureOnCompacts μG] (A B : Set G) (μA μB ν : Measure G)
+theorem sigmaFinite_of_weil
+    [LocallyCompactSpace G] [T2Space G]
+    (μG : Measure G) [IsFiniteMeasureOnCompacts μG]
+    (A B : Set G) (μA μB ν : Measure G)
     (hA : SigmaFinite μA ∧ μA ≠ 0 ∧ μA Aᶜ = 0 ∧ ∀ s ∈ A, μA.map (fun x => s * x) = μA)
     (hB : SigmaFinite μB ∧ μB ≠ 0 ∧ μB Bᶜ = 0 ∧ ∀ s ∈ B, μB.map (fun x => s * x) = μB)
-    (hW : ∀ f : G → ℝ≥0∞, Measurable f →
-      ∫⁻ x, f x ∂μG = ∫⁻ x, (∫⁻ s, f (s * x) ∂((μA.prod μB).map (fun p => p.1 * p.2))) ∂ν) :
-    SigmaFinite ν := by
+    (hW : ∀ f : G → ℝ≥0∞,
+      Measurable f
+        → ∫⁻ x, f x ∂μG = ∫⁻ x, (∫⁻ s, f (s * x) ∂((μA.prod μB).map (fun p => p.1 * p.2))) ∂ν)
+    : SigmaFinite ν := by
   obtain ⟨hAσ, hA0, hAc, hAi⟩ := hA
   obtain ⟨hBσ, hB0, hBc, hBi⟩ := hB
   have := hAσ
@@ -105,8 +115,9 @@ theorem sigmaFinite_of_weil [LocallyCompactSpace G] [T2Space G]
   · rintro _ ⟨⟨x, n⟩, rfl⟩
     have hne0 : ((n : ℝ≥0∞) + 1)⁻¹ ≠ 0 := ENNReal.inv_ne_zero.2 (by simp)
     have hneT : ((n : ℝ≥0∞) + 1)⁻¹ ≠ ⊤ := ENNReal.inv_ne_top.2 (by simp)
-    calc ν (E (x, n)) ≤ (∫⁻ y, h x y ∂ν) / ((n : ℝ≥0∞) + 1)⁻¹ :=
-          meas_ge_le_lintegral_div (hhm x).aemeasurable hne0 hneT
+    calc
+      ν (E (x, n)) ≤ (∫⁻ y, h x y ∂ν) / ((n : ℝ≥0∞) + 1)⁻¹ :=
+        meas_ge_le_lintegral_div (hhm x).aemeasurable hne0 hneT
       _ < ⊤ := by
         rw [hint]
         exact ENNReal.div_lt_top (hKc x).measure_lt_top.ne hne0

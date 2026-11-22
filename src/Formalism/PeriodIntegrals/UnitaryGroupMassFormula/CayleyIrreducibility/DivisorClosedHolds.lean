@@ -9,15 +9,17 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.ColDictValCPf
 
-open Formalism.BasicNotions Formalism.GradedWeylDivisibility Formalism.L2.SG.Pf.ColDictPf Matrix MvPolynomial
+open Formalism.BasicNotions Formalism.GradedWeylDivisibility Formalism.L2.SG.Pf.ColDictPf Matrix
+  MvPolynomial
 open scoped ComplexOrder
 
 section Div
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι] {n : ℕ}
 
-def genAct (τ : ι) : MvPolynomial (ι × Fin n × Fin n) ℂ →ₐ[ℂ]
-    MvPolynomial (ι × Fin n × Fin n) (MvPolynomial (Fin n × Fin n) ℂ) :=
+def genAct (τ : ι)
+    : MvPolynomial (ι × Fin n × Fin n) ℂ →ₐ[ℂ]
+      MvPolynomial (ι × Fin n × Fin n) (MvPolynomial (Fin n × Fin n) ℂ) :=
   aeval fun v => if v.1 = τ then ∑ c : Fin n, C (X (v.2.1, c)) * X (τ, c, v.2.2) else X v
 
 lemma map_genAct_X (τ : ι) (g : Matrix (Fin n) (Fin n) ℂ) (v : ι × Fin n × Fin n) :
@@ -39,9 +41,10 @@ lemma map_genAct (τ : ι) (g : Matrix (Fin n) (Fin n) ℂ) (P : MvPolynomial (�
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, map_add (f := _)]
   | mul_X p v hp => rw [map_mul, map_mul, hp, map_mul, map_genAct_X]
 
-def pushφ (φ : Module.Dual ℂ (MvPolynomial (ι × Fin n × Fin n) ℂ))
-    (Q : MvPolynomial (ι × Fin n × Fin n) (MvPolynomial (Fin n × Fin n) ℂ)) :
-    MvPolynomial (Fin n × Fin n) ℂ :=
+def pushφ
+    (φ : Module.Dual ℂ (MvPolynomial (ι × Fin n × Fin n) ℂ))
+    (Q : MvPolynomial (ι × Fin n × Fin n) (MvPolynomial (Fin n × Fin n) ℂ))
+    : MvPolynomial (Fin n × Fin n) ℂ :=
   ∑ m ∈ Q.support, φ (monomial m 1) • Q.coeff m
 
 lemma eval_pushφ (φ : Module.Dual ℂ (MvPolynomial (ι × Fin n × Fin n) ℂ)) (x : Fin n × Fin n → ℂ)
@@ -127,11 +130,13 @@ theorem divisor_closed_holds : DivClosedOf := by
     rw [hφM] at this
     exact (Submodule.mem_bot ℂ).mp this
   set p := pushφ φ (genAct τ P) with hp
-  have hval : ∀ g : Matrix (Fin n) (Fin n) ℂ,
-      eval (fun x => g x.1 x.2) p = φ (famAct (Function.update (fun _ => 1) τ g) P) := by
+  have hval
+      : ∀ g : Matrix (Fin n) (Fin n) ℂ,
+        eval (fun x => g x.1 x.2) p = φ (famAct (Function.update (fun _ => 1) τ g) P) := by
     intro g; rw [hp, eval_pushφ, map_genAct]
 
-  have hU : ∀ g : Matrix (Fin n) (Fin n) ℂ, gᴴ * G τ * g = G τ → eval (fun x => g x.1 x.2) p = 0 := by
+  have hU
+      : ∀ g : Matrix (Fin n) (Fin n) ℂ, gᴴ * G τ * g = G τ → eval (fun x => g x.1 x.2) p = 0 := by
     intro g hg
     rw [hval]
     apply hφ0
@@ -140,10 +145,11 @@ theorem divisor_closed_holds : DivClosedOf := by
     by_cases hσ : σ = τ
     · subst hσ; simpa using hg
     · simp [hσ]
-  have hall : ∀ g : Matrix (Fin n) (Fin n) ℂ, IsUnit (1 + g).det → eval (fun x => g x.1 x.2) p = 0 := by
+  have hall
+      : ∀ g : Matrix (Fin n) (Fin n) ℂ, IsUnit (1 + g).det → eval (fun x => g x.1 x.2) p = 0 := by
     rcases hGd τ with hpd | hpd
     · exact hDens n (G τ) hpd p hU
-    · refine hDens n (-G τ) hpd p fun g hg => hU g ?_
+    · refine hDens n (- G τ) hpd p fun g hg => hU g ?_
       have := congrArg Neg.neg hg
       simpa [Matrix.mul_neg, Matrix.neg_mul] using this
 
@@ -152,11 +158,11 @@ theorem divisor_closed_holds : DivClosedOf := by
   have hr_eval : ∀ t : ℂ, r.eval t = φ (q.eval (C t)) := by
     intro t
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [hr, Polynomial.sum_def, Polynomial.eval_finsetSum, Polynomial.eval_eq_sum (p := q), Polynomial.sum_def,
-      map_sum]
+      rw [hr, Polynomial.sum_def, Polynomial.eval_finsetSum, Polynomial.eval_eq_sum (p := q),
+        Polynomial.sum_def, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
-    rw [Polynomial.eval_monomial, ← map_pow, mul_comm (q.coeff j), MvPolynomial.C_mul', map_smul, smul_eq_mul,
-      mul_comm]
+    rw [Polynomial.eval_monomial, ← map_pow, mul_comm (q.coeff j), MvPolynomial.C_mul', map_smul,
+      smul_eq_mul, mul_comm]
   have hr0 : r = 0 := by
     apply Polynomial.eq_zero_of_infinite_isRoot
     apply Set.infinite_of_injective_forall_mem (f := fun m : ℕ => (m : ℂ)) Nat.cast_injective
@@ -167,8 +173,9 @@ theorem divisor_closed_holds : DivClosedOf := by
   have hcoeff : r.coeff k = φ (bigDiv τ a b k P) := by
     rw [hr, Polynomial.sum_def, Polynomial.finsetSum_coeff]
     simp only [Polynomial.coeff_monomial, Finsupp.single_apply]
-    rw [Finset.sum_eq_single k (fun j _ hj => if_neg hj) (fun hk => by
-      rw [if_pos rfl, Polynomial.notMem_support_iff.mp hk, map_zero])]
+    rw [Finset.sum_eq_single k
+      (fun j _ hj => if_neg hj)
+      (fun hk => by rw [if_pos rfl, Polynomial.notMem_support_iff.mp hk, map_zero])]
     rw [if_pos rfl]
     rfl
   apply hφP

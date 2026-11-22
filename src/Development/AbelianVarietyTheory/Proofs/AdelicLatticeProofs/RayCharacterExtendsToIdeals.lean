@@ -10,10 +10,13 @@ open scoped ContDiff nonZeroDivisors
 
 namespace GlobalTheory
 
-
 open UniqueFactorizationMonoid in
-theorem exists_multiplicative_ideal_extension :
-    ∀ (K : Type) [Field K] [NumberField K] (m : Ideal (𝓞 K)) (c : HeightOneSpectrum (𝓞 K) → ℂ), (∀ P, ¬ m ≤ P.asIdeal → ‖c P‖ = 1) → ∃ X : Ideal (𝓞 K) → ℂ, X ⊥ = 0 ∧ X ⊤ = 1 ∧ (∀ I J, X (I * J) = X I * X J) ∧ (∀ I, I ≠ ⊥ → I ⊔ m = ⊤ → ‖X I‖ = 1) ∧ (∀ I, I ⊔ m ≠ ⊤ → X I = 0) ∧ ∀ P, ¬ m ≤ P.asIdeal → X P.asIdeal = c P := by
+theorem exists_multiplicative_ideal_extension
+    : ∀ (K : Type) [Field K] [NumberField K] (m : Ideal (𝓞 K)) (c : HeightOneSpectrum (𝓞 K) → ℂ),
+      (∀ P, ¬ m ≤ P.asIdeal → ‖c P‖ = 1)
+        → ∃ X : Ideal (𝓞 K) → ℂ,
+          X ⊥ = 0 ∧ X ⊤ = 1 ∧ (∀ I J, X (I * J) = X I * X J) ∧ (∀ I, I ≠ ⊥ → I ⊔ m = ⊤ → ‖X I‖ = 1)
+            ∧ (∀ I, I ⊔ m ≠ ⊤ → X I = 0) ∧ ∀ P, ¬ m ≤ P.asIdeal → X P.asIdeal = c P := by
   intro K _ _ m c hc
   let d : Ideal (𝓞 K) → ℂ := fun Q =>
     if h : Q.IsPrime ∧ Q ≠ ⊥ then (if m ≤ Q then 0 else c ⟨Q, h.1, h.2⟩) else 0
@@ -25,7 +28,8 @@ theorem exists_multiplicative_ideal_extension :
     intro Q hQ
     simp only [d]
     split_ifs <;> rfl
-  refine ⟨fun I => if I = ⊥ then 0 else ((normalizedFactors I).map d).prod, by simp, ?_, ?_, ?_, ?_, ?_⟩
+  refine
+    ⟨fun I => if I = ⊥ then 0 else ((normalizedFactors I).map d).prod, by simp, ?_, ?_, ?_, ?_, ?_⟩
   · have : (⊤ : Ideal (𝓞 K)) ≠ ⊥ := top_ne_bot
     simp only [if_neg this]
     rw [← Ideal.one_eq_top, normalizedFactors_one]

@@ -16,24 +16,27 @@ section LU
 
 variable {K : Type} [CommRing K] {n : ℕ}
 
-theorem lu_entry (h u : Matrix (Fin n) (Fin n) K) (hh : IsLowUni h) (hu : IsUpUni u)
-    (i j : Fin n) :
-    (h * u) i j = (∑ k, if k < i ∧ k < j then h i k * u k j else 0) + (h + u - 1) i j := by
-  have hL : ∀ a b : Fin n, a < b → h a b = 0 := fun a b hab => hh.1 (OrderDual.toDual_lt_toDual.mpr hab)
+theorem lu_entry (h u : Matrix (Fin n) (Fin n) K) (hh : IsLowUni h) (hu : IsUpUni u) (i j : Fin n)
+    : (h * u) i j = (∑ k, if k < i ∧ k < j then h i k * u k j else 0) + (h + u - 1) i j := by
+  have hL : ∀ a b : Fin n, a < b → h a b = 0 := fun a b hab =>
+    hh.1 (OrderDual.toDual_lt_toDual.mpr hab)
   have hU : ∀ a b : Fin n, b < a → u a b = 0 := fun a b hab => hu.1 hab
-  have key : ∀ k, h i k * u k j = (if k < i ∧ k < j then h i k * u k j else 0) +
-      (if k = min i j then (h + u - 1) i j else 0) := by
+  have key
+      : ∀ k,
+        h i k * u k j
+          = (if k < i ∧ k < j then h i k * u k j else 0)
+            + (if k = min i j then (h + u - 1) i j else 0) := by
     intro k
     rcases lt_trichotomy k (min i j) with hk | hk | hk
     · rw [if_pos (lt_min_iff.mp hk), if_neg hk.ne, add_zero]
-    · have hn : ¬ (k < i ∧ k < j) := fun hk' => (lt_min hk'.1 hk'.2).ne hk
+    · have hn : ¬(k < i ∧ k < j) := fun hk' => (lt_min hk'.1 hk'.2).ne hk
       rw [if_neg hn, if_pos hk, zero_add, hk]
       simp only [Matrix.sub_apply, Matrix.add_apply]
       rcases lt_trichotomy i j with hij | rfl | hij
       · rw [min_eq_left hij.le, hh.2, hL i j hij, Matrix.one_apply_ne hij.ne]; ring
       · rw [min_self, hh.2, hu.2, Matrix.one_apply_eq]; ring
       · rw [min_eq_right hij.le, hu.2, hU i j hij, Matrix.one_apply_ne hij.ne']; ring
-    · have hn : ¬ (k < i ∧ k < j) := fun hk' => lt_asymm (lt_min hk'.1 hk'.2) hk
+    · have hn : ¬(k < i ∧ k < j) := fun hk' => lt_asymm (lt_min hk'.1 hk'.2) hk
       rw [if_neg hn, if_neg hk.ne', add_zero]
       rcases min_lt_iff.mp hk with hik | hjk
       · rw [hL i k hik, zero_mul]
@@ -43,15 +46,27 @@ theorem lu_entry (h u : Matrix (Fin n) (Fin n) K) (hh : IsLowUni h) (hu : IsUpUn
 
 variable [TopologicalSpace K] [IsTopologicalRing K]
 
-theorem exists_continuous_lowerUpper_entry (m : ℕ) : ∃ E : Fin n → Fin n → Matrix (Fin n) (Fin n) K → K,
-    (∀ i j, Continuous (E i j)) ∧ ∀ i j, (min i j).val < m → ∀ h u : Matrix (Fin n) (Fin n) K,
-      IsLowUni h → IsUpUni u → E i j (h * u) = (h + u - 1) i j := by
+theorem exists_continuous_lowerUpper_entry (m : ℕ)
+    : ∃ E : Fin n → Fin n → Matrix (Fin n) (Fin n) K → K,
+      (∀ i j, Continuous (E i j))
+        ∧ ∀ i j,
+          (min i j).val < m
+            → ∀ h u : Matrix (Fin n) (Fin n) K,
+              IsLowUni h → IsUpUni u → E i j (h * u) = (h + u - 1) i j := by
   induction m with
-  | zero => exact ⟨fun _ _ _ => 0, fun _ _ => continuous_const, fun i j h => absurd h (Nat.not_lt_zero _)⟩
+  | zero =>
+    exact ⟨fun _ _ _ => 0, fun _ _ => continuous_const, fun i j h => absurd h (Nat.not_lt_zero _)⟩
   | succ m ih =>
     obtain ⟨E, hEc, hE⟩ := ih
-    refine ⟨fun i j => if (min i j).val < m then E i j else
-      fun M => M i j - ∑ k, if k < i ∧ k < j then E i k M * E k j M else 0, ?_, ?_⟩
+    refine ⟨
+      fun i j =>
+        if (min i j).val < m then
+          E i j
+        else fun M =>
+          M i j - ∑ k, if k < i ∧ k < j then E i k M * E k j M else 0,
+      ?_,
+      ?_
+    ⟩
     · intro i j
       by_cases hm : (min i j).val < m
       · simp only [hm, if_true]; exact hEc i j
@@ -61,14 +76,17 @@ theorem exists_continuous_lowerUpper_entry (m : ℕ) : ∃ E : Fin n → Fin n �
         · simp only [hk, and_self, if_true]; exact (hEc i k).mul (hEc k j)
         · simp only [hk, if_false]; exact continuous_const
     · intro i j hij h u hh hu
-      have hL : ∀ a b : Fin n, a < b → h a b = 0 := fun a b hab => hh.1 (OrderDual.toDual_lt_toDual.mpr hab)
+      have hL : ∀ a b : Fin n, a < b → h a b = 0 := fun a b hab =>
+        hh.1 (OrderDual.toDual_lt_toDual.mpr hab)
       have hU : ∀ a b : Fin n, b < a → u a b = 0 := fun a b hab => hu.1 hab
       by_cases hm : (min i j).val < m
       · simp only [hm, if_true]; exact hE i j hm h u hh hu
       · simp only [hm, if_false]
         rw [lu_entry h u hh hu i j]
-        have hs : ∀ k, (if k < i ∧ k < j then E i k (h * u) * E k j (h * u) else 0) =
-            (if k < i ∧ k < j then h i k * u k j else 0) := by
+        have hs
+            : ∀ k,
+              (if k < i ∧ k < j then E i k (h * u) * E k j (h * u) else 0)
+                = (if k < i ∧ k < j then h i k * u k j else 0) := by
           intro k
           by_cases hk : k < i ∧ k < j
           · have hkm : k.val < m := by
@@ -85,12 +103,30 @@ theorem exists_continuous_lowerUpper_entry (m : ℕ) : ∃ E : Fin n → Fin n �
         rw [Finset.sum_congr rfl (fun k _ => hs k)]
         ring
 
-theorem lu_rec : ∃ Ph Pu : Matrix (Fin n) (Fin n) K → Matrix (Fin n) (Fin n) K,
-    Continuous Ph ∧ Continuous Pu ∧
-      ∀ h u, IsLowUni h → IsUpUni u → Ph (h * u) = h ∧ Pu (h * u) = u := by
+theorem lu_rec
+    : ∃ Ph Pu : Matrix (Fin n) (Fin n) K → Matrix (Fin n) (Fin n) K,
+      Continuous Ph ∧ Continuous Pu
+        ∧ ∀ h u, IsLowUni h → IsUpUni u → Ph (h * u) = h ∧ Pu (h * u) = u := by
   obtain ⟨E, hEc, hE⟩ := exists_continuous_lowerUpper_entry (K := K) (n := n) n
-  refine ⟨fun M i j => if j < i then E i j M else if i = j then 1 else 0,
-    fun M i j => if i < j then E i j M else if i = j then 1 else 0, ?_, ?_, ?_⟩
+  refine ⟨
+    fun M i j =>
+      if j < i then
+        E i j M
+      else if i = j then
+        1
+      else
+        0,
+    fun M i j =>
+      if i < j then
+        E i j M
+      else if i = j then
+        1
+      else
+        0,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · refine continuous_pi fun i => continuous_pi fun j => ?_
     by_cases h1 : j < i
     · simp only [h1, if_true]; exact hEc i j
@@ -100,7 +136,8 @@ theorem lu_rec : ∃ Ph Pu : Matrix (Fin n) (Fin n) K → Matrix (Fin n) (Fin n)
     · simp only [h1, if_true]; exact hEc i j
     · simp only [h1, if_false]; exact continuous_const
   · intro h u hh hu
-    have hL : ∀ a b : Fin n, a < b → h a b = 0 := fun a b hab => hh.1 (OrderDual.toDual_lt_toDual.mpr hab)
+    have hL : ∀ a b : Fin n, a < b → h a b = 0 := fun a b hab =>
+      hh.1 (OrderDual.toDual_lt_toDual.mpr hab)
     have hU : ∀ a b : Fin n, b < a → u a b = 0 := fun a b hab => hu.1 hab
     have hall : ∀ i j, E i j (h * u) = (h + u - 1) i j := fun i j => hE i j (min i j).isLt h u hh hu
     constructor
@@ -153,7 +190,7 @@ theorem revIn_revIn : ∀ (s : List ℕ) (j : ℕ), j < s.sum → revIn s (revIn
       rw [e, revIn, ite_eq_left h1]
       omega
     · have e : revIn (a :: s) j = a + revIn s (j - a) := by rw [revIn, ite_eq_right hj]
-      have h1 : ¬ (a + revIn s (j - a) < a) := by omega
+      have h1 : ¬(a + revIn s (j - a) < a) := by omega
       have htail : j - a < s.sum := by omega
       rw [e, revIn, ite_eq_right h1, Nat.add_sub_cancel_left, ih (j - a) htail]
       omega
@@ -174,12 +211,15 @@ theorem blk_revIn : ∀ (s : List ℕ) (j : ℕ), j < s.sum → blk s (revIn s j
       simp only [blk, ite_eq_left h1, ite_eq_left hj]
     · have e : revIn (a :: s) j = a + revIn s (j - a) := by rw [revIn, ite_eq_right hj]
       rw [e]
-      have h1 : ¬ (a + revIn s (j - a) < a) := by omega
+      have h1 : ¬(a + revIn s (j - a) < a) := by omega
       have htail : j - a < s.sum := by omega
       simp only [blk, ite_eq_right h1, ite_eq_right hj, Nat.add_sub_cancel_left, ih (j - a) htail]
 
-theorem pt_mul_pt {K : Type} [CommRing K] (s : List ℕ) (t t' : ℕ → Kˣ)
-    (htt : ∀ b, ((t b : Kˣ) : K) * ((t' b : Kˣ) : K) = 1) : pt s t * pt s t' = 1 := by
+theorem pt_mul_pt
+    {K : Type} [CommRing K]
+    (s : List ℕ)
+    (t t' : ℕ → Kˣ) (htt : ∀ b, ((t b : Kˣ) : K) * ((t' b : Kˣ) : K) = 1)
+    : pt s t * pt s t' = 1 := by
   ext a b
   rw [Matrix.mul_apply, Matrix.one_apply]
   have ha := revIn_lt s a a.isLt
@@ -203,34 +243,43 @@ section Closed
 variable {K : Type} [CommRing K] [TopologicalSpace K] [T2Space K] {n : ℕ}
 
 theorem isClosed_lowUni : IsClosed {x : Matrix (Fin n) (Fin n) K | IsLowUni x} := by
-  have hset : {x : Matrix (Fin n) (Fin n) K | IsLowUni x} =
-      (⋂ i : Fin n, ⋂ j : Fin n, ⋂ (_ : i < j), {x | x i j = 0}) ∩ ⋂ a : Fin n, {x | x a a = 1} := by
+  have hset
+      : {x : Matrix (Fin n) (Fin n) K | IsLowUni x}
+        = (⋂ i : Fin n, ⋂ j : Fin n, ⋂ (_ : i < j), {x | x i j = 0})
+          ∩ ⋂ a : Fin n, {x | x a a = 1} := by
     ext x
     simp only [IsLowUni, Matrix.IsLowerTriangular, Matrix.BlockTriangular, Set.mem_ofPred_eq,
       Set.mem_inter_iff, Set.mem_iInter, OrderDual.toDual_lt_toDual]
   rw [hset]
-  exact (isClosed_iInter fun i => isClosed_iInter fun j => isClosed_iInter fun _ =>
-    isClosed_eq (continuous_id.matrix_elem i j) continuous_const).inter
+  exact (isClosed_iInter fun i =>
+      isClosed_iInter fun j =>
+        isClosed_iInter fun _ => isClosed_eq (continuous_id.matrix_elem i j) continuous_const).inter
     (isClosed_iInter fun a => isClosed_eq (continuous_id.matrix_elem a a) continuous_const)
 
 theorem isClosed_upUni : IsClosed {x : Matrix (Fin n) (Fin n) K | IsUpUni x} := by
-  have hset : {x : Matrix (Fin n) (Fin n) K | IsUpUni x} =
-      (⋂ i : Fin n, ⋂ j : Fin n, ⋂ (_ : j < i), {x | x i j = 0}) ∩ ⋂ a : Fin n, {x | x a a = 1} := by
+  have hset
+      : {x : Matrix (Fin n) (Fin n) K | IsUpUni x}
+        = (⋂ i : Fin n, ⋂ j : Fin n, ⋂ (_ : j < i), {x | x i j = 0})
+          ∩ ⋂ a : Fin n, {x | x a a = 1} := by
     ext x
     simp only [IsUpUni, Matrix.IsUpperTriangular, Matrix.BlockTriangular, Set.mem_ofPred_eq,
       Set.mem_inter_iff, Set.mem_iInter, id]
   rw [hset]
-  exact (isClosed_iInter fun i => isClosed_iInter fun j => isClosed_iInter fun _ =>
-    isClosed_eq (continuous_id.matrix_elem i j) continuous_const).inter
+  exact (isClosed_iInter fun i =>
+      isClosed_iInter fun j =>
+        isClosed_iInter fun _ => isClosed_eq (continuous_id.matrix_elem i j) continuous_const).inter
     (isClosed_iInter fun a => isClosed_eq (continuous_id.matrix_elem a a) continuous_const)
 
 end Closed
 
-theorem mem_lowW_iff {K : Type} [CommRing K] (s : List ℕ) (t : ℕ → Kˣ)
-    (wi : Matrix (Fin s.sum) (Fin s.sum) K) (h1 : wi * pt s t = 1) (h2 : pt s t * wi = 1)
-    (g : GL (Fin s.sum) K) :
-    g ∈ lowW K s t ↔ IsLowUni (g : Matrix (Fin s.sum) (Fin s.sum) K) ∧
-      IsLowUni (wi * (g : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t) := by
+theorem mem_lowW_iff
+    {K : Type} [CommRing K]
+    (s : List ℕ) (t : ℕ → Kˣ) (wi : Matrix (Fin s.sum) (Fin s.sum) K)
+    (h1 : wi * pt s t = 1) (h2 : pt s t * wi = 1)
+    (g : GL (Fin s.sum) K)
+    : g ∈ lowW K s t
+      ↔ IsLowUni (g : Matrix (Fin s.sum) (Fin s.sum) K)
+        ∧ IsLowUni (wi * (g : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t) := by
   show (IsLowUni (g : Matrix (Fin s.sum) (Fin s.sum) K) ∧ ∃ h : Matrix (Fin s.sum) (Fin s.sum) K, IsLowUni h ∧
     (g : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t = pt s t * h) ↔ _
   constructor
@@ -238,39 +287,45 @@ theorem mem_lowW_iff {K : Type} [CommRing K] (s : List ℕ) (t : ℕ → Kˣ)
     refine ⟨hg, ?_⟩
     have hw : wi * (g : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t = h := by
       rw [Matrix.mul_assoc, he, ← Matrix.mul_assoc, h1, Matrix.one_mul]
-    rw [hw]; exact hh
+    rw [hw]
+    exact hh
   · rintro ⟨hg, hh⟩
     refine ⟨hg, _, hh, ?_⟩
     rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, h2, Matrix.one_mul]
 
-theorem isClosed_lowW {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K]
-    [T2Space K] (s : List ℕ) (t : ℕ → Kˣ) (wi : Matrix (Fin s.sum) (Fin s.sum) K)
-    (h1 : wi * pt s t = 1) (h2 : pt s t * wi = 1) :
-    IsClosed (lowW K s t : Set (GL (Fin s.sum) K)) := by
-  have hset : (lowW K s t : Set (GL (Fin s.sum) K)) =
-      (fun g : GL (Fin s.sum) K => (g : Matrix (Fin s.sum) (Fin s.sum) K)) ⁻¹' {x | IsLowUni x} ∩
-      (fun g : GL (Fin s.sum) K => wi * (g : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t) ⁻¹'
-        {x | IsLowUni x} := by
+theorem isClosed_lowW
+    {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [T2Space K]
+    (s : List ℕ) (t : ℕ → Kˣ) (wi : Matrix (Fin s.sum) (Fin s.sum) K)
+    (h1 : wi * pt s t = 1) (h2 : pt s t * wi = 1)
+    : IsClosed (lowW K s t : Set (GL (Fin s.sum) K)) := by
+  have hset
+      : (lowW K s t : Set (GL (Fin s.sum) K))
+        = (fun g : GL (Fin s.sum) K => (g : Matrix (Fin s.sum) (Fin s.sum) K)) ⁻¹' {x | IsLowUni x}
+          ∩ (fun g : GL (Fin s.sum) K => wi * (g : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t)
+            ⁻¹' {x | IsLowUni x} := by
     ext g; exact mem_lowW_iff s t wi h1 h2 g
   rw [hset]
-  exact (isClosed_lowUni.preimage Units.continuous_val).inter (isClosed_lowUni.preimage
-    ((continuous_const.matrix_mul Units.continuous_val).matrix_mul continuous_const))
+  exact (isClosed_lowUni.preimage Units.continuous_val).inter
+    (isClosed_lowUni.preimage ((continuous_const.matrix_mul Units.continuous_val).matrix_mul
+      continuous_const))
 
-theorem isClosed_upUniG {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K]
-    [T2Space K] (n : ℕ) : IsClosed (upUniG K n : Set (GL (Fin n) K)) := by
-  have hset : (upUniG K n : Set (GL (Fin n) K)) =
-      (fun g : GL (Fin n) K => (g : Matrix (Fin n) (Fin n) K)) ⁻¹' {x | IsUpUni x} := by
+theorem isClosed_upUniG
+    {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [T2Space K] (n : ℕ)
+    : IsClosed (upUniG K n : Set (GL (Fin n) K)) := by
+  have hset
+      : (upUniG K n : Set (GL (Fin n) K))
+        = (fun g : GL (Fin n) K => (g : Matrix (Fin n) (Fin n) K)) ⁻¹' {x | IsUpUni x} := by
     ext g; exact Iff.rfl
   rw [hset]
   exact isClosed_upUni.preimage Units.continuous_val
 
-theorem coe_inv_of_det {K : Type} [CommRing K] {n : ℕ} (g : GL (Fin n) K)
-    (hg : (g : Matrix (Fin n) (Fin n) K).det = 1) :
-    ((g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) = (g : Matrix (Fin n) (Fin n) K).adjugate := by
+theorem coe_inv_of_det
+    {K : Type} [CommRing K] {n : ℕ} (g : GL (Fin n) K) (hg : (g : Matrix (Fin n) (Fin n) K).det = 1)
+    : ((g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)
+      = (g : Matrix (Fin n) (Fin n) K).adjugate := by
   rw [Matrix.coe_units_inv, Matrix.inv_def, hg, Ring.inverse_one, one_smul]
 
 end Supp
-
 
 open Supp in
 theorem suppCompact : Formalism.DoubleCosetMeasures.SuppCompact := by
@@ -280,38 +335,48 @@ theorem suppCompact : Formalism.DoubleCosetMeasures.SuppCompact := by
   have hPP' : P * P' = 1 := Supp.pt_mul_pt s t _ (fun b => Units.mul_inv (t b))
   have hP'P : P' * P = 1 := Supp.pt_mul_pt s _ t (fun b => Units.inv_mul (t b))
   obtain ⟨Ph, Pu, hPhc, hPuc, hPhu⟩ := Supp.lu_rec (K := K) (n := s.sum)
-  let G : Matrix (Fin s.sum) (Fin s.sum) K → Matrix (Fin s.sum) (Fin s.sum) K :=
-    fun M => P * Ph (P' * M) * P'
-  let U : Matrix (Fin s.sum) (Fin s.sum) K → Matrix (Fin s.sum) (Fin s.sum) K :=
-    fun M => Pu (P' * M)
-  have hGc : Continuous G := (continuous_const.matrix_mul
-    (hPhc.comp (continuous_const.matrix_mul continuous_id))).matrix_mul continuous_const
+  let G : Matrix (Fin s.sum) (Fin s.sum) K → Matrix (Fin s.sum) (Fin s.sum) K := fun M =>
+    P * Ph (P' * M) * P'
+  let U : Matrix (Fin s.sum) (Fin s.sum) K → Matrix (Fin s.sum) (Fin s.sum) K := fun M =>
+    Pu (P' * M)
+  have hGc : Continuous G :=
+    (continuous_const.matrix_mul (hPhc.comp (continuous_const.matrix_mul continuous_id))).matrix_mul
+      continuous_const
   have hUc : Continuous U := hPuc.comp (continuous_const.matrix_mul continuous_id)
-  let D : Set (Matrix (Fin s.sum) (Fin s.sum) K) := {M | IsInt R M} ∩
-    ({M | IsLowUni (G M)} ∩ {M | IsLowUni (P' * G M * P)} ∩ {M | IsUpUni (U M)})
+  let D : Set (Matrix (Fin s.sum) (Fin s.sum) K) :=
+    {M | IsInt R M} ∩ ({M | IsLowUni (G M)} ∩ {M | IsLowUni (P' * G M * P)} ∩ {M | IsUpUni (U M)})
   have hIntc : IsCompact {M : Matrix (Fin s.sum) (Fin s.sum) K | IsInt R M} := by
-    have hset : {M : Matrix (Fin s.sum) (Fin s.sum) K | IsInt R M} =
-        Set.univ.pi fun _ => Set.univ.pi fun _ => (R : Set K) := by
+    have hset
+        : {M : Matrix (Fin s.sum) (Fin s.sum) K | IsInt R M}
+          = Set.univ.pi fun _ => Set.univ.pi fun _ => (R : Set K) := by
       ext M
       exact ⟨fun h a _ b _ => h a b, fun h a b => h a trivial b trivial⟩
     rw [hset]
     exact isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => hRc
-  have hDc : IsCompact D := hIntc.inter_right
-    (((Supp.isClosed_lowUni.preimage hGc).inter (Supp.isClosed_lowUni.preimage
-      ((continuous_const.matrix_mul hGc).matrix_mul continuous_const))).inter
-      (Supp.isClosed_upUni.preimage hUc))
+  have hDc : IsCompact D :=
+    hIntc.inter_right (((Supp.isClosed_lowUni.preimage hGc).inter
+      (Supp.isClosed_lowUni.preimage ((continuous_const.matrix_mul hGc).matrix_mul
+        continuous_const))).inter (Supp.isClosed_upUni.preimage hUc))
   have hGdet : ∀ M ∈ D, (G M).det = 1 := fun M hM => isLowUni_det K hM.2.1.1
   have hUdet : ∀ M ∈ D, (U M).det = 1 := fun M hM => isUpUni_det K hM.2.2
-  let gU : D → GL (Fin s.sum) K := fun M => ⟨G M.1, (G M.1).adjugate,
+  let gU : D → GL (Fin s.sum) K := fun M => ⟨
+    G M.1,
+    (G M.1).adjugate,
     by rw [Matrix.mul_adjugate, hGdet M.1 M.2, one_smul],
-    by rw [Matrix.adjugate_mul, hGdet M.1 M.2, one_smul]⟩
-  let uU : D → GL (Fin s.sum) K := fun M => ⟨U M.1, (U M.1).adjugate,
+    by rw [Matrix.adjugate_mul, hGdet M.1 M.2, one_smul]
+  ⟩
+  let uU : D → GL (Fin s.sum) K := fun M => ⟨
+    U M.1,
+    (U M.1).adjugate,
     by rw [Matrix.mul_adjugate, hUdet M.1 M.2, one_smul],
-    by rw [Matrix.adjugate_mul, hUdet M.1 M.2, one_smul]⟩
-  have hgU : Continuous gU := Units.continuous_iff.mpr
-    ⟨hGc.comp continuous_subtype_val, (hGc.comp continuous_subtype_val).matrix_adjugate⟩
-  have huU : Continuous uU := Units.continuous_iff.mpr
-    ⟨hUc.comp continuous_subtype_val, (hUc.comp continuous_subtype_val).matrix_adjugate⟩
+    by rw [Matrix.adjugate_mul, hUdet M.1 M.2, one_smul]
+  ⟩
+  have hgU : Continuous gU :=
+    Units.continuous_iff.mpr
+      ⟨hGc.comp continuous_subtype_val, (hGc.comp continuous_subtype_val).matrix_adjugate⟩
+  have huU : Continuous uU :=
+    Units.continuous_iff.mpr
+      ⟨hUc.comp continuous_subtype_val, (hUc.comp continuous_subtype_val).matrix_adjugate⟩
   have hgmem : ∀ M : D, gU M ∈ lowW K s t := fun M =>
     (Supp.mem_lowW_iff s t P' hP'P hPP' (gU M)).mpr ⟨M.2.2.1.1, M.2.2.1.2⟩
   have humem : ∀ M : D, uU M ∈ upUniG K s.sum := fun M => M.2.2.2
@@ -320,8 +385,9 @@ theorem suppCompact : Formalism.DoubleCosetMeasures.SuppCompact := by
   have : CompactSpace D := isCompact_iff_compactSpace.mp hDc
   refine HasCompactSupport.intro (isCompact_range hF) ?_
   intro p hp
-  have hnot : ¬ IsInt R (((p.1 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t *
-      ((p.2 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K)) := by
+  have hnot : ¬ IsInt R
+      (((p.1 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t
+        * ((p.2 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K)) := by
     intro hInt
     rcases p with ⟨⟨g, hg⟩, ⟨u, hu⟩⟩
     apply hp
@@ -329,8 +395,7 @@ theorem suppCompact : Formalism.DoubleCosetMeasures.SuppCompact := by
     let um : Matrix (Fin s.sum) (Fin s.sum) K := u
     obtain ⟨hgl, hhl⟩ := (Supp.mem_lowW_iff s t P' hP'P hPP' g).mp hg
     have hu' : IsUpUni um := hu
-    have hM : P' * (gm * P * um) = (P' * gm * P) * um := by
-      simp only [Matrix.mul_assoc]
+    have hM : P' * (gm * P * um) = (P' * gm * P) * um := by simp only [Matrix.mul_assoc]
     obtain ⟨hPh, hPu⟩ := hPhu _ _ hhl hu'
     have hGM : G (gm * P * um) = g := by
       show P * Ph (P' * (gm * P * um)) * P' = g
@@ -340,9 +405,13 @@ theorem suppCompact : Formalism.DoubleCosetMeasures.SuppCompact := by
     have hUM : U (gm * P * um) = u := by
       show Pu (P' * (gm * P * um)) = u
       rw [hM, hPu]
-    have hMD : gm * P * um ∈ D :=
-      ⟨hInt, ⟨⟨by rw [Set.mem_ofPred_eq, hGM]; exact hgl, by rw [Set.mem_ofPred_eq, hGM]; exact hhl⟩,
-        by rw [Set.mem_ofPred_eq, hUM]; exact hu'⟩⟩
+    have hMD : gm * P * um ∈ D := ⟨
+      hInt,
+      ⟨
+        ⟨by rw [Set.mem_ofPred_eq, hGM]; exact hgl, by rw [Set.mem_ofPred_eq, hGM]; exact hhl⟩,
+        by rw [Set.mem_ofPred_eq, hUM]; exact hu'
+      ⟩
+    ⟩
     exact ⟨⟨_, hMD⟩, Prod.ext (Subtype.ext (Units.ext hGM)) (Subtype.ext (Units.ext hUM))⟩
   rw [Formalism.DoubleCosetMeasures.phi, if_neg hnot, zero_mul]
 

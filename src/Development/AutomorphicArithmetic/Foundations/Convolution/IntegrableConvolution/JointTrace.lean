@@ -64,8 +64,8 @@ private lemma comm_prj {M : Submodule ℂ H} (hM : IsClosed (M : Set H)) (B B' :
   exact prj_orth hM x (h2 w hw)
 
 private def cmp (W : Submodule ℂ H) [FiniteDimensional ℂ W] (B : H →L[ℂ] H) : Module.End ℂ W :=
-  LinearMap.codRestrict W (((prj W ∘L B : H →L[ℂ] H) : H →ₗ[ℂ] H) ∘ₗ W.subtype)
-    fun w => prj_mem (Submodule.closed_of_finiteDimensional W) _
+  LinearMap.codRestrict W (((prj W ∘L B : H →L[ℂ] H) : H →ₗ[ℂ] H) ∘ₗ W.subtype) fun w =>
+    prj_mem (Submodule.closed_of_finiteDimensional W) _
 
 private lemma coe_cmp (W : Submodule ℂ H) [FiniteDimensional ℂ W] (B : H →L[ℂ] H) (w : W) :
     ((cmp W B w : W) : H) = prj W (B w) := rfl
@@ -118,8 +118,10 @@ private lemma trOn_eq (W : Submodule ℂ H) [FiniteDimensional ℂ W] (B : H →
 end Hilbert
 
 section Slots
-variable {Γ G H : Type} [Group Γ] [TopologicalSpace Γ] [Group G] [NormedAddCommGroup H]
-  [InnerProductSpace ℂ H] [CompleteSpace H] {π : UnitaryRep Γ H} {V : Submodule ℂ H} {m : ℕ}
+variable
+  {Γ G H : Type} [Group Γ] [TopologicalSpace Γ] [Group G] [NormedAddCommGroup H]
+  [InnerProductSpace ℂ H] [CompleteSpace H]
+  {π : UnitaryRep Γ H} {V : Submodule ℂ H} {m : ℕ}
   {ι : Fin (m + 1) → G →* Γ} {E : H →L[ℂ] H} {A : Fin (m + 1) → H →L[ℂ] H} {U : H ≃ₗᵢ[ℂ] H}
 
 private def eF (B : H →L[ℂ] H) (y : ℝ) : Submodule ℂ H :=
@@ -154,8 +156,10 @@ private lemma A_sym (h : Slots π V m ι E A U) (i : Fin (m + 1)) (x z : H) :
 private lemma E_sym (h : Slots π V m ι E A U) (x z : H) : ⟪E x, z⟫_ℂ = ⟪x, E z⟫_ℂ :=
   (ContinuousLinearMap.isSelfAdjoint_iff_isSymmetric.1 h.E_sa) x z
 
-private def Near (V : Submodule ℂ H) (E : H →L[ℂ] H) (A : Fin (m + 1) → H →L[ℂ] H) (y : ℝ)
-    (j : Fin (m + 1)) (x : H) : Prop :=
+private def Near
+    (V : Submodule ℂ H) (E : H →L[ℂ] H) (A : Fin (m + 1) → H →L[ℂ] H) (y : ℝ) (j : Fin (m + 1))
+    (x : H)
+    : Prop :=
   x ∈ eigIn V E 1 ∧ ∀ k, k ≠ j → x ∈ eF (A k) y
 
 private lemma Q_mem (h : Slots π V m ι E A U) {y : ℝ} {j : Fin (m + 1)} {x : H}
@@ -386,7 +390,7 @@ end Slots
 
 end UpperTheory.ConvolutionTheory.L1
 
-theorem UpperTheory.ConvolutionTheory.L1.jointTrace :
-    UpperTheory.ConvolutionTheory.L1.JointTrace := by
+theorem UpperTheory.ConvolutionTheory.L1.jointTrace
+    : UpperTheory.ConvolutionTheory.L1.JointTrace := by
   intro Γ G H _ _ _ _ _ _ π V m ι E A U h y hfd
   exact aux h y

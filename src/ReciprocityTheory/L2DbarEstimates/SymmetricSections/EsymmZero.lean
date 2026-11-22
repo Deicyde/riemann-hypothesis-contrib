@@ -13,8 +13,9 @@ universe u
 theorem esymmZero : esymmZeroStatement := by
   intro s hs a ha
   have h := Multiset.prod_X_add_C_eq_sum_esymm s
-  have hR : ∑ j ∈ Finset.range (s.card + 1), Polynomial.C (s.esymm j) * Polynomial.X ^ (s.card - j)
-      = Polynomial.X ^ s.card := by
+  have hR
+      : ∑ j ∈ Finset.range (s.card + 1), Polynomial.C (s.esymm j) * Polynomial.X ^ (s.card - j)
+        = Polynomial.X ^ s.card := by
     rw [Finset.sum_eq_single 0]
     · simp [Multiset.esymm, Multiset.powersetCard_zero_left]
     · intro j _ hj
@@ -25,8 +26,10 @@ theorem esymmZero : esymmZeroStatement := by
   rw [hR] at h
   have h2 := congrArg (Polynomial.eval (-a)) h
   rw [Polynomial.eval_multiset_prod, Polynomial.eval_pow, Polynomial.eval_X] at h2
-  have h3 : (Multiset.map (Polynomial.eval (-a))
-      (Multiset.map (fun r => Polynomial.X + Polynomial.C r) s)).prod = 0 := by
+  have h3
+      : (Multiset.map (Polynomial.eval (-a))
+          (Multiset.map (fun r => Polynomial.X + Polynomial.C r) s)).prod
+        = 0 := by
     apply Multiset.prod_eq_zero
     rw [Multiset.map_map]
     exact Multiset.mem_map.mpr ⟨a, ha, by simp⟩

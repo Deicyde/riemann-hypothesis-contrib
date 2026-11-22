@@ -13,8 +13,9 @@ theorem prime_quotient_unit : PI.PinHostLoc.Target := by
   refine ⟨?_, ?_⟩
   · rw [hres]
     exact PI.PinHostLoc.UnitaryGroupMassFormula.irr A (hg i).ne_zero hin hnot
-  · obtain ⟨j, hgij, hj⟩ : ∃ j : Fin 2, g i ≠ g j ∧
-        ((g 0 : ℕ) : F) * ((g 1 : ℕ) : F) / ((g i : ℕ) : F) = ((g j : ℕ) : F) := by
+  · obtain ⟨j, hgij, hj⟩
+        : ∃ j : Fin 2,
+          g i ≠ g j ∧ ((g 0 : ℕ) : F) * ((g 1 : ℕ) : F) / ((g i : ℕ) : F) = ((g j : ℕ) : F) := by
       rcases (show i = 0 ∨ i = 1 by fin_cases i <;> simp) with rfl | rfl
       · exact ⟨1, hne, mul_div_cancel_left₀ _ hi0⟩
       · exact ⟨0, hne.symm, mul_div_cancel_right₀ _ hi0⟩

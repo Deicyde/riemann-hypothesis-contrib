@@ -8,9 +8,9 @@ open NumberField NumberField.ComplexEmbedding
 
 namespace GlobalTheory.CMFieldCriterion
 
-theorem isTotallyReal_fixedField (K : Type) [Field K] [NumberField K] {σ : Gal(K/ℚ)}
-    (hσ : ∀ φ : K →+* ℂ, IsConj φ σ) :
-    IsTotallyReal (IntermediateField.fixedField (Subgroup.zpowers σ)) := by
+theorem isTotallyReal_fixedField
+    (K : Type) [Field K] [NumberField K] {σ : Gal(K/ℚ)} (hσ : ∀ φ : K →+* ℂ, IsConj φ σ)
+    : IsTotallyReal (IntermediateField.fixedField (Subgroup.zpowers σ)) := by
   refine ⟨fun w => ?_⟩
   obtain ⟨W, rfl⟩ := w.comap_surjective (K := K)
   dsimp only
@@ -24,8 +24,10 @@ theorem isTotallyReal_fixedField (K : Type) [Field K] [NumberField K] {σ : Gal(
   rw [conjugate_coe_eq]
   exact h.symm
 
-theorem isCMField_of_forall_isConj (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
-    {σ : Gal(K/ℚ)} (hσ : ∀ φ : K →+* ℂ, IsConj φ σ) : IsCMField K := by
+theorem isCMField_of_forall_isConj
+    (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    {σ : Gal(K/ℚ)} (hσ : ∀ φ : K →+* ℂ, IsConj φ σ)
+    : IsCMField K := by
   obtain ⟨φ⟩ : Nonempty (K →+* ℂ) := inferInstance
   have hne : σ ≠ 1 :=
     (isConj_ne_one_iff (hσ φ)).mpr (IsTotallyComplex.complexEmbedding_not_isReal φ)
@@ -36,9 +38,10 @@ theorem isCMField_of_forall_isConj (K : Type) [Field K] [NumberField K] [_root_.
     rw [pow_two, AlgEquiv.mul_apply, AlgEquiv.one_apply]
     exact isConj_apply_apply (hσ φ) x
   have hreal := isTotallyReal_fixedField K hσ
-  have hquad :
-      Algebra.IsQuadraticExtension (IntermediateField.fixedField (Subgroup.zpowers σ)) K :=
-    { finrank_eq_two' := by rw [IntermediateField.finrank_fixedField_eq_card, hcard] }
+  have hquad
+      : Algebra.IsQuadraticExtension (IntermediateField.fixedField (Subgroup.zpowers σ)) K := {
+    finrank_eq_two' := by rw [IntermediateField.finrank_fixedField_eq_card, hcard]
+  }
   exact IsCMField.ofCMExtension (IntermediateField.fixedField (Subgroup.zpowers σ)) K
 
 end GlobalTheory.CMFieldCriterion

@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem eq_of_nodup_sum_multiset_of_eq (ι : Type) [Fintype ι] [DecidableEq ι]
-    (B : ι → Multiset ℂ) (h : (∑ i, B i).Nodup) (i j : ι) (hi : B i ≠ 0) (hij : B i = B j) :
-    i = j := by
+theorem eq_of_nodup_sum_multiset_of_eq
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (B : ι → Multiset ℂ) (h : (∑ i, B i).Nodup)
+    (i j : ι) (hi : B i ≠ 0) (hij : B i = B j)
+    : i = j := by
   by_contra hne
   have hle : B i + B j ≤ ∑ k, B k := by
     rw [← Finset.sum_pair hne]

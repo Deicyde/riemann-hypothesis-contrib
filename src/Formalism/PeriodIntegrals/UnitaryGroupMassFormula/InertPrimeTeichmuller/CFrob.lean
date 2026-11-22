@@ -13,20 +13,25 @@ namespace PI.OkpW
 
 variable {K : Type} [Field K] [NumberField K] {p : ℕ} [hp : Fact p.Prime]
 
-theorem c_frob (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c x ≠ x) (hp2 : p ≠ 2)
-    (hP : (Ideal.span {(p : 𝓞 K)}).IsPrime) (a : 𝓞 K) :
-    (p : 𝓞 K) ∣ RingOfIntegers.mapRingHom c a - a ^ p := by
+theorem c_frob
+    (hK : Module.finrank ℚ K = 2)
+    (c : K →+* K) (hc : ∃ x, c x ≠ x)
+    (hp2 : p ≠ 2) (hP : (Ideal.span {(p : 𝓞 K)}).IsPrime) (a : 𝓞 K)
+    : (p : 𝓞 K) ∣ RingOfIntegers.mapRingHom c a - a ^ p := by
   classical
   haveI hmax := isMaximal_span_p (K := K) (p := p) hP
-  have hle : Ideal.span {(p : 𝓞 K)} ≤
-      (Ideal.span {(p : 𝓞 K)}).comap (RingOfIntegers.mapRingHom c) := by
+  have hle
+      : Ideal.span {(p : 𝓞 K)} ≤ (Ideal.span {(p : 𝓞 K)}).comap (RingOfIntegers.mapRingHom c) := by
     rw [Ideal.span_le, Set.singleton_subset_iff]
     show RingOfIntegers.mapRingHom c (p : 𝓞 K) ∈ Ideal.span {(p : 𝓞 K)}
     rw [map_natCast]
     exact Ideal.mem_span_singleton_self _
-  let σ : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}) →+* (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}) := Ideal.quotientMap _ (RingOfIntegers.mapRingHom c) hle
-  have hσ : ∀ y : 𝓞 K, σ (Ideal.Quotient.mk _ y) =
-      Ideal.Quotient.mk _ (RingOfIntegers.mapRingHom c y) := fun y => Ideal.quotientMap_mk
+  let σ : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}) →+* (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}) :=
+    Ideal.quotientMap _ (RingOfIntegers.mapRingHom c) hle
+  have hσ
+      : ∀ y : 𝓞 K,
+        σ (Ideal.Quotient.mk _ y) = Ideal.Quotient.mk _ (RingOfIntegers.mapRingHom c y) := fun y =>
+    Ideal.quotientMap_mk
   haveI : CharP (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}) p := CharP.quotient (𝓞 K) p
     (mem_nonunits_iff.mpr fun hu => hP.ne_top (Ideal.span_singleton_eq_top.mpr hu))
   haveI : ExpChar (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}) p := ExpChar.prime hp.out
@@ -37,23 +42,30 @@ theorem c_frob (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c x 
     have hp3 : p ≤ 2 := Nat.le_of_dvd (by norm_num) hd
     have := hp.out.two_le
     omega
-  have hfixZ : ∀ z : ℤ, ((z : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}))) ^ p = z := fun z => by rw [← frobenius_def, map_intCast]
+  have hfixZ : ∀ z : ℤ, ((z : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}))) ^ p = z := fun z => by
+    rw [← frobenius_def, map_intCast]
   have h2p : (2 : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) ^ p = 2 := by rw [← frobenius_def, map_ofNat]
   have hdich : ∀ x : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}), x ^ p = x ∨ x ^ p = σ x := by
     intro x
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
     obtain ⟨n, hn⟩ := add_c_int hK c hc a
     obtain ⟨n2, hn2⟩ := add_c_int hK c hc (a ^ 2)
-    have ht : Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)}) a +
-        σ (Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)}) a) = (n : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) := by
+    have ht
+        : Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)}) a
+            + σ (Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)}) a)
+          = (n : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) := by
       rw [hσ, ← map_add (f := _), hn, map_intCast]
-    have ht2 : Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)}) a ^ 2 +
-        σ (Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)}) a) ^ 2 = (n2 : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) := by
+    have ht2
+        : Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)}) a ^ 2
+            + σ (Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)}) a) ^ 2
+          = (n2 : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) := by
       have := congrArg (Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)})) hn2
       rw [map_add (f := _), map_intCast, map_pow, map_pow] at this
       rw [hσ, ← this, map_pow (Ideal.Quotient.mk _) ((RingOfIntegers.mapRingHom c) a)]
     generalize Ideal.Quotient.mk (Ideal.span {(p : 𝓞 K)}) a = x at ht ht2 ⊢
-    have hm : (2 : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) * (x * σ x) = (n : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) ^ 2 - n2 := by
+    have hm
+        : (2 : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) * (x * σ x)
+          = (n : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) ^ 2 - n2 := by
       rw [← ht, ← ht2]; ring
     have hmp : (x * σ x) ^ p = x * σ x := by
       have h1 : ((2 : (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) * (x * σ x)) ^ p = 2 * (x * σ x) := by
@@ -64,9 +76,9 @@ theorem c_frob (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c x 
       rw [← ht]; ring
     have hfr := congrArg (frobenius (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}) p) hzero
     rw [map_zero, map_add (f := _), map_sub, map_mul, map_pow, map_intCast, frobenius_def,
-      frobenius_def, hmp] at hfr
-    have hq : (x ^ p - x) * (x ^ p - σ x) = 0 := by
-      rw [← hfr, ← ht]; ring
+        frobenius_def, hmp]
+      at hfr
+    have hq : (x ^ p - x) * (x ^ p - σ x) = 0 := by rw [← hfr, ← ht]; ring
     rcases mul_eq_zero.mp hq with h | h
     · exact Or.inl (sub_eq_zero.mp h)
     · exact Or.inr (sub_eq_zero.mp h)
@@ -77,13 +89,19 @@ theorem c_frob (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c x 
     letI := Fintype.ofFinite (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})
     letI : Field (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}) := Ideal.Quotient.field _
     have hp1 : 1 < p := hp.out.one_lt
-    have hsub : (Finset.univ : Finset (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) ⊆ ((Polynomial.X ^ p - Polynomial.X : Polynomial (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})).roots.toFinset) := by
+    have hsub
+        : (Finset.univ : Finset (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}))
+          ⊆ ((Polynomial.X ^ p - Polynomial.X
+            : Polynomial (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})).roots.toFinset) := by
       intro y _
       rw [Multiset.mem_toFinset, Polynomial.mem_roots (Polynomial.X_pow_sub_X_ne_zero hp1)]
       simp [Polynomial.IsRoot, hcon y]
     have h1 := Finset.card_le_card hsub
     rw [Finset.card_univ] at h1
-    have h2 := (Multiset.toFinset_card_le _).trans (Polynomial.card_roots' (Polynomial.X ^ p - Polynomial.X : Polynomial (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})))
+    have h2 :=
+      (Multiset.toFinset_card_le _).trans
+        (Polynomial.card_roots'
+          (Polynomial.X ^ p - Polynomial.X : Polynomial (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})))
     rw [Polynomial.natDegree_X_pow_sub_X (R := (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)})) hp1] at h2
     have h3 : Fintype.card (𝓞 K ⧸ Ideal.span {(p : 𝓞 K)}) = p ^ 2 := by
       rw [← Nat.card_eq_fintype_card]; exact natCard_quot (K := K) (p := p) hK
@@ -105,7 +123,8 @@ theorem c_frob (hK : Module.finrank ℚ K = 2) (c : K →+* K) (hc : ∃ x, c x 
     · exact hx.symm
   have := hall (Ideal.Quotient.mk _ a)
   rw [hσ, ← map_pow, ← sub_eq_zero, ← map_sub, Ideal.Quotient.eq_zero_iff_mem,
-    Ideal.mem_span_singleton] at this
+      Ideal.mem_span_singleton]
+    at this
   exact this
 
 end PI.OkpW

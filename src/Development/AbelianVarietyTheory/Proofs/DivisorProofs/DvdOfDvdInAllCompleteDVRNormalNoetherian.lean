@@ -9,15 +9,24 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RangeAlge
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.DvrDiv
 
-theorem dvd_of_forall_cDvr : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsIntegrallyClosed R] [CharZero R] (a b : R), b ≠ 0 → (∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], GlobalTheory.LN.CDvr V → ∀ φ : R →+* V, Function.Injective φ → φ b ∣ φ a) → b ∣ a := by
+theorem dvd_of_forall_cDvr
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsIntegrallyClosed R]
+        [CharZero R] (a b : R),
+      b ≠ 0
+        → (∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V],
+          GlobalTheory.LN.CDvr V → ∀ φ : R →+* V, Function.Injective φ → φ b ∣ φ a)
+        → b ∣ a := by
   intro R _ _ _ _ _ a b hb h
   classical
   by_cases ha : a = 0
@@ -25,8 +34,9 @@ theorem dvd_of_forall_cDvr : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoether
   let K := FractionRing R
   obtain ⟨h1, h2, -⟩ := GlobalTheory.normal_domain_height_one.{0, 0, 0} R K
   have hbK : algebraMap R K b ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective R K)).mpr hb
-  suffices hmem : ∀ (p : Ideal R) [p.IsPrime], p.height = 1 →
-      algebraMap R K a / algebraMap R K b ∈ primeLocalSubalgebra K p by
+  suffices hmem
+      : ∀ (p : Ideal R) [p.IsPrime],
+        p.height = 1 → algebraMap R K a / algebraMap R K b ∈ primeLocalSubalgebra K p by
     obtain ⟨r, hr⟩ := (h2 (algebraMap R K a / algebraMap R K b)).2 hmem
     refine ⟨r, IsFractionRing.injective R K ?_⟩
     rw [map_mul, hr, mul_div_cancel₀ _ hbK]
@@ -49,8 +59,9 @@ theorem dvd_of_forall_cDvr : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoether
     have ha' : φ a ≠ 0 := (map_ne_zero_iff _ hφ).mpr ha
     have e : φ a * (iW c * t) = φ a * 1 := by
       rw [_root_.mul_one]
-      calc φ a * (iW c * t) = iW (algebraMap R D a * c) * t := by
-            rw [map_mul, _root_.mul_assoc]; rfl
+      calc
+        φ a * (iW c * t)
+          = iW (algebraMap R D a * c) * t := by rw [map_mul, _root_.mul_assoc]; rfl
         _ = φ a := by rw [← hc]; exact ht.symm
     have hu : IsUnit (iW c) := isUnit_iff_exists_inv.mpr ⟨t, mul_left_cancel₀ ha' e⟩
     obtain ⟨u, rfl⟩ := isUnit_of_map_unit iW c hu

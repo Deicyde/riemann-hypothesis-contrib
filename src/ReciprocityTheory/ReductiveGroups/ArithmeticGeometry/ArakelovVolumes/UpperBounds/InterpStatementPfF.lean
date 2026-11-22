@@ -32,8 +32,8 @@ theorem cut_zero (ε : ℝ) (hε : 0 < ε) {y : V n} (hy : 2 * ε ≤ ‖y‖) :
   rw [(bumpE ε hε).zero_of_le_dist (by rw [dist_zero_right]; exact hy)]
   simp
 
-theorem wdb_cut_zero (ε : ℝ) (hε : 0 < ε) (j : Fin n) {y : V n}
-    (hy : ‖y‖ < ε ∨ 2 * ε < ‖y‖) : wdb n j (cut ε hε) y = 0 := by
+theorem wdb_cut_zero (ε : ℝ) (hε : 0 < ε) (j : Fin n) {y : V n} (hy : ‖y‖ < ε ∨ 2 * ε < ‖y‖)
+    : wdb n j (cut ε hε) y = 0 := by
   have key : ∀ c : ℂ, (cut ε hε =ᶠ[𝓝 y] fun _ => c) → wdb n j (cut ε hε) y = 0 := by
     intro c hc
     unfold wdb
@@ -47,16 +47,15 @@ theorem wdb_cut_zero (ε : ℝ) (hε : 0 < ε) (j : Fin n) {y : V n}
     filter_upwards [(isOpen_lt continuous_const continuous_norm).mem_nhds hy] with z hz
     exact cut_zero ε hε (le_of_lt hz)
 
-theorem wdb_cut_continuous (ε : ℝ) (hε : 0 < ε) (j : Fin n) :
-    Continuous (wdb n j (cut ε hε)) := by
+theorem wdb_cut_continuous (ε : ℝ) (hε : 0 < ε) (j : Fin n) : Continuous (wdb n j (cut ε hε)) := by
   have hc : Continuous (fderiv ℝ (cut (n := n) ε hε)) :=
     (cut_contDiff ε hε).continuous_fderiv (by simp)
   unfold wdb
   exact ((hc.clm_apply continuous_const).add
     (continuous_const.mul (hc.clm_apply continuous_const))).div_const 2
 
-theorem wdb_cut_bdd (ε : ℝ) (hε : 0 < ε) :
-    ∃ M : ℝ, 0 ≤ M ∧ ∀ y : V n, ∑ j, ‖wdb n j (cut ε hε) y‖ ^ 2 ≤ M := by
+theorem wdb_cut_bdd (ε : ℝ) (hε : 0 < ε)
+    : ∃ M : ℝ, 0 ≤ M ∧ ∀ y : V n, ∑ j, ‖wdb n j (cut ε hε) y‖ ^ 2 ≤ M := by
   have hcont : Continuous (fun y : V n => ∑ j, ‖wdb n j (cut ε hε) y‖ ^ 2) :=
     continuous_finsetSum _ fun j _ => ((wdb_cut_continuous ε hε j).norm).pow 2
   obtain ⟨C, hC⟩ :=
@@ -70,13 +69,14 @@ theorem wdb_cut_bdd (ε : ℝ) (hε : 0 < ε) :
     have h0 : ∀ j, wdb n j (cut ε hε) y = 0 := fun j => wdb_cut_zero ε hε j (Or.inr hy)
     simp [h0]
 
-theorem norm_pair_sq_le (a ξ : Fin n → ℂ) :
-    ‖∑ j, a j * conj (ξ j)‖ ^ 2 ≤ (∑ j, ‖a j‖ ^ 2) * ∑ j, ‖ξ j‖ ^ 2 := by
+theorem norm_pair_sq_le (a ξ : Fin n → ℂ)
+    : ‖∑ j, a j * conj (ξ j)‖ ^ 2 ≤ (∑ j, ‖a j‖ ^ 2) * ∑ j, ‖ξ j‖ ^ 2 := by
   have h1 : ‖∑ j, a j * conj (ξ j)‖ ≤ ∑ j, ‖a j‖ * ‖ξ j‖ := by
     refine (norm_sum_le _ _).trans (le_of_eq (Finset.sum_congr rfl fun j _ => ?_))
     simp [norm_mul]
-  calc ‖∑ j, a j * conj (ξ j)‖ ^ 2 ≤ (∑ j, ‖a j‖ * ‖ξ j‖) ^ 2 :=
-        pow_le_pow_left₀ (norm_nonneg _) h1 2
+  calc
+    ‖∑ j, a j * conj (ξ j)‖ ^ 2
+      ≤ (∑ j, ‖a j‖ * ‖ξ j‖) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) h1 2
     _ ≤ _ := Finset.sum_mul_sq_le_sq_mul_sq _ _ _
 
 end

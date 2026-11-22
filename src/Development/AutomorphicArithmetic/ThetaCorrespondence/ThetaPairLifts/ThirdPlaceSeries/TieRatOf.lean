@@ -17,8 +17,13 @@ set_option synthInstance.maxHeartbeats 200000
 section
 open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp
 namespace GlobalTheory.BigOn.Exp
-theorem tieRat_of_alt (hA : _root_.GlobalTheory.BigOn.Exp.TwAdmAlt) (hR : _root_.GlobalTheory.BigOn.Exp.ConditionAtPlace) : _root_.GlobalTheory.BigOn.Exp.CompatibilityRational := by
-  unfold _root_.GlobalTheory.BigOn.Exp.CompatibilityRational _root_.GlobalTheory.BigOn.Exp.TwistConditions _root_.GlobalTheory.BigOn.AtPtsAlt at *
+theorem tieRat_of_alt
+    (hA : _root_.GlobalTheory.BigOn.Exp.TwAdmAlt)
+    (hR : _root_.GlobalTheory.BigOn.Exp.ConditionAtPlace)
+    : _root_.GlobalTheory.BigOn.Exp.CompatibilityRational := by
+  unfold _root_.GlobalTheory.BigOn.Exp.CompatibilityRational
+      _root_.GlobalTheory.BigOn.Exp.TwistConditions _root_.GlobalTheory.BigOn.AtPtsAlt
+    at *
   refine (Formalism.MainNotions.Closed.and hA hR).imp fun Fm CH _ h => ?_
   obtain ⟨x0, hx0⟩ := h.1.and h.2
   refine ⟨x0, fun x hx hle i p hp hm w hw j Z => ?_⟩

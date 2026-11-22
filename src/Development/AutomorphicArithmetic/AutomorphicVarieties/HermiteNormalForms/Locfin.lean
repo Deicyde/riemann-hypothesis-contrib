@@ -9,9 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.locfin :
-    ∀ (L : Type) [Field L] [NumberField L] (N : ℕ) (h : HS L N), h ∈ Pos L N → ∀ B : ℝ,
-    ∃ S : Set (Lat L N), S.Finite ∧ ∀ᶠ k in nhds h, ∀ y ∉ S, B < q k y := by
+theorem UpperTheory.V.KT.locfin
+    : ∀ (L : Type) [Field L] [NumberField L] (N : ℕ) (h : HS L N),
+      h ∈ Pos L N
+        → ∀ B : ℝ, ∃ S : Set (Lat L N), S.Finite ∧ ∀ᶠ k in nhds h, ∀ y ∉ S, B < q k y := by
   intro L _ _ N h hh B
   obtain ⟨c, hc, hev⟩ := lowbd L N h hh
   obtain ⟨R, hR⟩ := exists_nat_gt (max (B / c) 1)

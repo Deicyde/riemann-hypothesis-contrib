@@ -13,8 +13,9 @@ open ReciprocityTheory.PGsh.L2
 section Transport
 
 variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
-variable {X Y : Type} [AddCommGroup X] [Fintype X] [DecidableEq X]
-  [AddCommGroup Y] [Fintype Y] [DecidableEq Y]
+variable
+  {X Y : Type}
+  [AddCommGroup X] [Fintype X] [DecidableEq X] [AddCommGroup Y] [Fintype Y] [DecidableEq Y]
 
 abbrev pbE (e : X ≃+ Y) : (Y → C) ≃ₗ[R] (X → C) := LinearEquiv.funCongrLeft R C e.toEquiv
 
@@ -87,11 +88,18 @@ def hopfPull (e : X ≃+ Y) (A : HopfOrder (C := C) R Y) : HopfOrder (C := C) R 
       simp only [addPull, pb2, LinearMap.funLeft_apply, pbE_apply, map_add (f := _)]
     rw [h1]
     have h2 := A.comul g hf
-    have h3 : (tensorSpan R A.carrier).map pb2 ≤ tensorSpan R (A.carrier.map (pbE (C := C) (R := R) e : (Y → C) →ₗ[R] (X → C))) := by
+    have h3
+        : (tensorSpan R A.carrier).map pb2
+          ≤ tensorSpan R (A.carrier.map (pbE (C := C) (R := R) e : (Y → C) →ₗ[R] (X → C))) := by
       rw [tensorSpan, Submodule.map_span_le]
       rintro F ⟨g1, hg1, h1', hh1, rfl⟩
-      exact Submodule.subset_span ⟨pbE (C := C) (R := R) e g1, Submodule.mem_map_of_mem hg1,
-        pbE (C := C) (R := R) e h1', Submodule.mem_map_of_mem hh1, rfl⟩
+      exact Submodule.subset_span ⟨
+        pbE (C := C) (R := R) e g1,
+        Submodule.mem_map_of_mem hg1,
+        pbE (C := C) (R := R) e h1',
+        Submodule.mem_map_of_mem hh1,
+        rfl
+      ⟩
     exact h3 (Submodule.mem_map_of_mem h2)
   antipode := fun f hf => by
     rw [Submodule.mem_map_equiv] at hf ⊢
@@ -99,8 +107,8 @@ def hopfPull (e : X ≃+ Y) (A : HopfOrder (C := C) R Y) : HopfOrder (C := C) R 
     funext y
     simp only [pbE_symm_apply, map_neg]
 
-private theorem pbE_symm_pow (e : X ≃+ Y) (f : X → C) (n : ℕ) :
-    (pbE (C := C) (R := R) e).symm (f ^ n) = ((pbE (C := C) (R := R) e).symm f) ^ n := by
+private theorem pbE_symm_pow (e : X ≃+ Y) (f : X → C) (n : ℕ)
+    : (pbE (C := C) (R := R) e).symm (f ^ n) = ((pbE (C := C) (R := R) e).symm f) ^ n := by
   funext y
   simp only [pbE_symm_apply, Pi.pow_apply]
 
@@ -123,19 +131,25 @@ lemma pow_mem_aug {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C] {X 
   | zero => rw [zero_add, pow_one]; exact hx.1
   | succ k ih => rw [pow_succ]; exact A.mul_mem _ _ ih hx.1
 
-theorem primeHopfOrder_of_addEquiv (hU3 : PrimeHopfOrderStatement) (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C]
-    [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C]
-    (hv : v.Integers R) (hp : v (p : C) < 1) {K : Type} [AddCommGroup K] [Fintype K]
-    [DecidableEq K] (e : ZMod p ≃+ K) (AK : HopfOrder (C := C) R K) :
-    ∃ (xK : K → C) (δ : R) (x1 : C), xK ∈ augIdeal AK.carrier ∧
-      xK ^ p = (fun a => algebraMap R C δ * xK a) ∧ v (algebraMap R C δ) = v x1 ^ (p - 1) ∧
-      (∀ f ∈ augIdeal AK.carrier, ∃ r : R,
-        f - r • xK ∈ augIdeal AK.carrier * augIdeal AK.carrier) ∧
-      HasColen R v AK.carrier (v x1 ^ (p * (p - 1) / 2)) := by
-  obtain ⟨x, _, δ, hx, hx0, -, -, -, hxp, hδ, -, haug, -, hcol⟩ :=
-    hU3 p C v R hv hp (hopfPull e AK)
+theorem primeHopfOrder_of_addEquiv
+    (hU3 : PrimeHopfOrderStatement)
+    (p : ℕ) [Fact p.Prime]
+    (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R) (hp : v (p : C) < 1)
+    {K : Type} [AddCommGroup K] [Fintype K] [DecidableEq K]
+    (e : ZMod p ≃+ K) (AK : HopfOrder (C := C) R K)
+    : ∃ (xK : K → C) (δ : R) (x1 : C),
+      xK ∈ augIdeal AK.carrier ∧ xK ^ p = (fun a => algebraMap R C δ * xK a)
+        ∧ v (algebraMap R C δ) = v x1 ^ (p - 1)
+        ∧ (∀ f ∈ augIdeal AK.carrier, ∃ r : R,
+          f - r • xK ∈ augIdeal AK.carrier * augIdeal AK.carrier)
+        ∧ HasColen R v AK.carrier (v x1 ^ (p * (p - 1) / 2)) := by
+  obtain ⟨x, _, δ, hx, hx0, -, -, -, hxp, hδ, -, haug, -, hcol⟩ := hU3 p C v R hv hp (hopfPull e AK)
   have hxa : x ∈ ReciprocityTheory.PGsh.L2.augIdeal (hopfPull e AK).carrier := by
-    simp only [ReciprocityTheory.PGsh.L2.augIdeal, Submodule.mem_inf, LinearMap.mem_ker, LinearMap.proj_apply]
+    simp only [ReciprocityTheory.PGsh.L2.augIdeal, Submodule.mem_inf, LinearMap.mem_ker,
+      LinearMap.proj_apply]
     exact ⟨hx, hx0⟩
   have hxK := (mem_augIdeal_pull e AK x).1 hxa
   refine ⟨(pbE (C := C) (R := R) e).symm x, δ, x 1, hxK, ?_, hδ, ?_, ?_⟩
@@ -144,9 +158,11 @@ theorem primeHopfOrder_of_addEquiv (hU3 : PrimeHopfOrderStatement) (p : ℕ) [Fa
     simp only [Pi.pow_apply] at h ⊢
     rw [pbE_symm_apply]
     exact h
-  · have key : ∀ F ∈ Submodule.span R {y | ∃ j : ℕ, 1 ≤ j ∧ j < p ∧ y = x ^ j},
-        ∃ r : R, (pbE (C := C) (R := R) e).symm F - r • (pbE (C := C) (R := R) e).symm x ∈
-          ReciprocityTheory.PGsh.L2.augIdeal AK.carrier * ReciprocityTheory.PGsh.L2.augIdeal AK.carrier := by
+  · have key
+        : ∀ F ∈ Submodule.span R {y | ∃ j : ℕ, 1 ≤ j ∧ j < p ∧ y = x ^ j}, ∃ r : R,
+          (pbE (C := C) (R := R) e).symm F - r • (pbE (C := C) (R := R) e).symm x
+            ∈ ReciprocityTheory.PGsh.L2.augIdeal AK.carrier
+              * ReciprocityTheory.PGsh.L2.augIdeal AK.carrier := by
       intro F hF
       induction hF using Submodule.span_induction with
       | mem y hy =>
@@ -177,8 +193,9 @@ theorem primeHopfOrder_of_addEquiv (hU3 : PrimeHopfOrderStatement) (p : ℕ) [Fa
         convert Submodule.smul_mem _ c h1 using 1
         rw [map_smul, smul_sub, mul_smul]
     intro f hf
-    have hF : pbE (C := C) (R := R) e f ∈
-        ReciprocityTheory.PGsh.L2.augIdeal (hopfPull e AK).carrier := by
+    have hF
+        : pbE (C := C) (R := R) e f
+          ∈ ReciprocityTheory.PGsh.L2.augIdeal (hopfPull e AK).carrier := by
       rw [mem_augIdeal_pull, LinearEquiv.symm_apply_apply]
       exact hf
     rw [haug] at hF
@@ -186,8 +203,10 @@ theorem primeHopfOrder_of_addEquiv (hU3 : PrimeHopfOrderStatement) (p : ℕ) [Fa
     rw [LinearEquiv.symm_apply_apply] at hr
     exact ⟨r, hr⟩
   · have hc := hasColen_map v e.symm _ _ hcol
-    rwa [show (hopfPull e AK).carrier =
-        AK.carrier.map (pbE (C := C) (R := R) e : (K → C) →ₗ[R] (ZMod p → C)) from rfl,
-      map_pbE_symm] at hc
+    rwa [show (hopfPull e AK).carrier
+            = AK.carrier.map (pbE (C := C) (R := R) e : (K → C) →ₗ[R] (ZMod p → C)) from
+          rfl,
+        map_pbE_symm]
+      at hc
 
 end ReciprocityTheory.PGsh.Up

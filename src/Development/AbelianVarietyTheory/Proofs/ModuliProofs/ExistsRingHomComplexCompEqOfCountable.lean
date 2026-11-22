@@ -9,15 +9,18 @@ public import ReciprocityTheory.AnalyticForms.RegularLocalRings.IntToRatA
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
 
-theorem nonempty_algHom_complex_of_countable (R K : Type) [CommRing R] [IsDomain R] [Countable R]
-    [Field K] [Countable K] [Algebra R K] [Algebra R ℂ] [FaithfulSMul R K] [FaithfulSMul R ℂ] :
-    Nonempty (K →ₐ[R] ℂ) := by
+theorem nonempty_algHom_complex_of_countable
+    (R K : Type) [CommRing R] [IsDomain R] [Countable R] [Field K] [Countable K] [Algebra R K]
+    [Algebra R ℂ] [FaithfulSMul R K] [FaithfulSMul R ℂ]
+    : Nonempty (K →ₐ[R] ℂ) := by
   obtain ⟨J, v, hv⟩ := exists_isTranscendenceBasis' R K
   obtain ⟨Jc, w, hw⟩ := exists_isTranscendenceBasis' R ℂ
   haveI : Countable J := hv.1.injective.countable
@@ -28,8 +31,7 @@ theorem nonempty_algHom_complex_of_countable (R K : Type) [CommRing R] [IsDomain
     rw [Cardinal.mk_complex] at h1
     exact absurd (h1.trans (max_le (max_le Cardinal.mk_le_aleph0 hle) le_rfl))
       (not_le.2 Cardinal.aleph0_lt_continuum)
-  obtain ⟨e⟩ : Nonempty (J ↪ Jc) :=
-    (Cardinal.le_def J Jc).1 (Cardinal.mk_le_aleph0.trans hκ.le)
+  obtain ⟨e⟩ : Nonempty (J ↪ Jc) := (Cardinal.le_def J Jc).1 (Cardinal.mk_le_aleph0.trans hκ.le)
   let S := Algebra.adjoin R (Set.range v)
   let φ : S →ₐ[R] ℂ := (MvPolynomial.aeval (w ∘ e)).comp hv.1.aevalEquiv.symm.toAlgHom
   have hind : AlgebraicIndependent R (w ∘ e) := hw.1.comp e e.injective
@@ -44,8 +46,7 @@ theorem nonempty_algHom_complex_of_countable (R K : Type) [CommRing R] [IsDomain
   haveI : Algebra.IsAlgebraic S K := hv.isAlgebraic
   let g : K →ₐ[S] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨{ g.toRingHom with commutes' := fun r => ?_ }⟩
   show g (algebraMap R K r) = algebraMap R ℂ r
@@ -67,9 +68,11 @@ private theorem isJacobsonRing_int' : IsJacobsonRing ℤ := by
   · haveI := hP.isMaximal hbot
     exact Ideal.jacobson_eq_self_of_isMaximal
 
-theorem injective_of_finiteType_int_of_charZero {o K : Type} [CommRing o] [IsDomain o]
-    [Ring.DimensionLEOne o] [Algebra.FiniteType ℤ o] [Field K] [CharZero K] (β : o →+* K) :
-    Function.Injective β := by
+theorem injective_of_finiteType_int_of_charZero
+    {o K : Type} [CommRing o] [IsDomain o] [Ring.DimensionLEOne o] [Algebra.FiniteType ℤ o]
+    [Field K] [CharZero K]
+    (β : o →+* K)
+    : Function.Injective β := by
   haveI := isJacobsonRing_int'
   by_contra hβ
   have hker : RingHom.ker β ≠ ⊥ := fun h => hβ ((RingHom.injective_iff_ker_eq_bot β).2 h)
@@ -87,8 +90,11 @@ theorem injective_of_finiteType_int_of_charZero {o K : Type} [CommRing o] [IsDom
     exact Int.cast_injective hk
   exact Int.not_isField (isField_of_isIntegral_of_isField hinj (Field.toIsField _))
 
-theorem exists_ringHom_complex_comp_eq_of_countable :
-    ∀ (o : Type) [CommRing o] (em : o →+* ℂ) (K₀ : Type) [Field K₀] [CharZero K₀] [Countable K₀] (β : o →+* K₀), IsDedekindDomain o → Algebra.FiniteType ℤ o → Function.Injective em → Countable o ∧ ∃ j : K₀ →+* ℂ, j.comp β = em := by
+theorem exists_ringHom_complex_comp_eq_of_countable
+    : ∀ (o : Type) [CommRing o] (em : o →+* ℂ) (K₀ : Type) [Field K₀] [CharZero K₀] [Countable K₀]
+        (β : o →+* K₀),
+      IsDedekindDomain o → Algebra.FiniteType ℤ o → Function.Injective em
+        → Countable o ∧ ∃ j : K₀ →+* ℂ, j.comp β = em := by
   intro o _ em K₀ _ _ _ β hD hF hem
   haveI := hD
   haveI := hF
@@ -97,8 +103,8 @@ theorem exists_ringHom_complex_comp_eq_of_countable :
     obtain ⟨n, f, hf⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.1 hF
     have hc : Countable (MvPolynomial (Fin n) ℤ) := by
       rw [← Cardinal.mk_le_aleph0_iff]
-      exact MvPolynomial.cardinalMk_le_max.trans
-        (max_le (max_le Cardinal.mk_le_aleph0 Cardinal.mk_le_aleph0) le_rfl)
+      exact MvPolynomial.cardinalMk_le_max.trans (max_le
+        (max_le Cardinal.mk_le_aleph0 Cardinal.mk_le_aleph0) le_rfl)
     exact hf.countable
   refine ⟨hcount, ?_⟩
   haveI := hcount

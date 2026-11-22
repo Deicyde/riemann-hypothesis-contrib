@@ -5,15 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Hil
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
+open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
 open GlobalTheory.NormCompat
 
 namespace UpperTheory.V.Af.Tw
 
 variable {E : Type} [Field E] [NumberField E]
 
-private theorem mem_infConn_of (w : InfinitePlace E) (x : (w.Completion)ˣ) (S : Set w.Completion)
-    (hS : IsPreconnected S) (h0 : 0 ∉ S) (h1 : 1 ∈ S) (hx : (x : w.Completion) ∈ S) : infIdele E w x ∈ infConn E := by
+private theorem mem_infConn_of
+    (w : InfinitePlace E) (x : (w.Completion)ˣ) (S : Set w.Completion)
+    (hS : IsPreconnected S) (h0 : 0 ∉ S) (h1 : 1 ∈ S) (hx : (x : w.Completion) ∈ S)
+    : infIdele E w x ∈ infConn E := by
   classical
   let T : Set (w.Completion)ˣ := Units.val ⁻¹' S
   have hT : IsPreconnected T := by
@@ -36,12 +39,17 @@ private theorem mem_infConn_of (w : InfinitePlace E) (x : (w.Completion)ˣ) (S :
   refine ⟨φ x, hsub ⟨x, hx, rfl⟩, ?_⟩
   exact Units.ext rfl
 
-private theorem mem_of_sign (N : Subgroup (Ideles E)) (hN : infConn E ≤ N)
-    (hs : ∀ w : InfinitePlace E, w.IsReal → infIdele E w (-1) ∈ N) (w : InfinitePlace E) (x : (w.Completion)ˣ) :
-    infIdele E w x ∈ N := by
-  have key : ∀ (K : Type) [NormedField K] (e : w.Completion ≃ᵢ K), (∀ a, e a = 0 ↔ a = 0) → e 1 = 1 →
-      ∀ T : Set K, IsPreconnected T → (0 : K) ∉ T → (1 : K) ∈ T →
-      ∀ y : (w.Completion)ˣ, e y ∈ T → infIdele E w y ∈ N := by
+private theorem mem_of_sign
+    (N : Subgroup (Ideles E))
+    (hN : infConn E ≤ N) (hs : ∀ w : InfinitePlace E, w.IsReal → infIdele E w (-1) ∈ N)
+    (w : InfinitePlace E) (x : (w.Completion)ˣ)
+    : infIdele E w x ∈ N := by
+  have key
+      : ∀ (K : Type) [NormedField K] (e : w.Completion ≃ᵢ K),
+        (∀ a, e a = 0 ↔ a = 0) → e 1 = 1
+          → ∀ T : Set K,
+            IsPreconnected T → (0 : K) ∉ T → (1 : K) ∈ T
+              → ∀ y : (w.Completion)ˣ, e y ∈ T → infIdele E w y ∈ N := by
     intro K _ e he0 he1 T hT hT0 hT1 y hy
     apply hN
     refine mem_infConn_of w y (e.symm '' T) (hT.image _ e.symm.continuous.continuousOn) ?_ ?_ ?_
@@ -63,8 +71,8 @@ private theorem mem_of_sign (N : Subgroup (Ideles E)) (hN : infConn E ≤ N)
       map_neg (InfinitePlace.Completion.extensionEmbeddingOfIsReal hr) a
     have hx0 : e x ≠ 0 := fun h => x.ne_zero ((he0 _).1 h)
     rcases lt_or_gt_of_ne hx0 with hlt | hgt
-    · have hm : infIdele E w (-x) ∈ N := key ℝ e he0 he1 (Set.Ioi 0) isPreconnected_Ioi
-        (by simp) (by simp) (-x) (by
+    · have hm : infIdele E w (-x) ∈ N :=
+        key ℝ e he0 he1 (Set.Ioi 0) isPreconnected_Ioi (by simp) (by simp) (-x) (by
           show e (-(x : w.Completion)) ∈ Set.Ioi 0
           rw [hneg]
           exact neg_pos.2 hlt)
@@ -78,26 +86,37 @@ private theorem mem_of_sign (N : Subgroup (Ideles E)) (hN : infConn E ≤ N)
         (InfinitePlace.Completion.extensionEmbedding w).injective
     have he1 : e 1 = 1 := map_one (InfinitePlace.Completion.extensionEmbedding w)
     refine key ℂ e he0 he1 {0}ᶜ ?_ (by simp) (by simp) x ?_
-    · exact (isConnected_compl_singleton_of_one_lt_rank (by simp [Complex.rank_real_complex]) 0).isPreconnected
+    · exact (isConnected_compl_singleton_of_one_lt_rank (by simp [Complex.rank_real_complex])
+        0).isPreconnected
     · exact fun h => x.ne_zero ((he0 _).1 h)
 
-private theorem eq_prod_infIdele (z : Ideles E) (hz : z.val.2 = 1) :
-    ∃ y : ∀ w : InfinitePlace E, (w.Completion)ˣ, z = ∏ w, infIdele E w (y w) := by
+private theorem eq_prod_infIdele (z : Ideles E) (hz : z.val.2 = 1)
+    : ∃ y : ∀ w : InfinitePlace E, (w.Completion)ˣ, z = ∏ w, infIdele E w (y w) := by
   classical
-  let y : ∀ w : InfinitePlace E, (w.Completion)ˣ := fun w => ⟨z.val.1 w, z.inv.1 w,
-    congrFun (congrArg Prod.fst z.val_inv) w, congrFun (congrArg Prod.fst z.inv_val) w⟩
+  let y : ∀ w : InfinitePlace E, (w.Completion)ˣ := fun w => ⟨
+    z.val.1 w,
+    z.inv.1 w,
+    congrFun (congrArg Prod.fst z.val_inv) w,
+    congrFun (congrArg Prod.fst z.inv_val) w
+  ⟩
   refine ⟨y, ?_⟩
   ext1
   rw [Units.coe_prod]
-  have h1 := map_prod (MonoidHom.fst (InfiniteAdeleRing E) (FiniteAdeleRing (𝓞 E) E))
-    (fun i => ((infIdele E i (y i)).val : InfiniteAdeleRing E × FiniteAdeleRing (𝓞 E) E)) Finset.univ
-  have h2 := map_prod (MonoidHom.snd (InfiniteAdeleRing E) (FiniteAdeleRing (𝓞 E) E))
-    (fun i => ((infIdele E i (y i)).val : InfiniteAdeleRing E × FiniteAdeleRing (𝓞 E) E)) Finset.univ
+  have h1 :=
+    map_prod (MonoidHom.fst (InfiniteAdeleRing E) (FiniteAdeleRing (𝓞 E) E))
+      (fun i => ((infIdele E i (y i)).val : InfiniteAdeleRing E × FiniteAdeleRing (𝓞 E) E))
+      Finset.univ
+  have h2 :=
+    map_prod (MonoidHom.snd (InfiniteAdeleRing E) (FiniteAdeleRing (𝓞 E) E))
+      (fun i => ((infIdele E i (y i)).val : InfiniteAdeleRing E × FiniteAdeleRing (𝓞 E) E))
+      Finset.univ
   refine Prod.ext ?_ ?_
   · refine Eq.trans ?_ h1.symm
     funext v
-    have h3 := map_prod (Pi.evalMonoidHom (fun w : InfinitePlace E => w.Completion) v)
-      (fun i => (Pi.mulSingle i (z.val.1 i) : ∀ w : InfinitePlace E, w.Completion)) Finset.univ
+    have h3 :=
+      map_prod (Pi.evalMonoidHom (fun w : InfinitePlace E => w.Completion) v)
+        (fun i => (Pi.mulSingle i (z.val.1 i) : ∀ w : InfinitePlace E, w.Completion))
+        Finset.univ
     refine Eq.trans ?_ h3.symm
     rw [Finset.prod_eq_single v]
     · show z.val.1 v = Pi.mulSingle v (z.val.1 v) v
@@ -116,8 +135,7 @@ private theorem eq_prod_infIdele (z : Ideles E) (hz : z.val.2 = 1) :
 
 end UpperTheory.V.Af.Tw
 
-theorem UpperTheory.V.Af.Tw.infTriv :
-    UpperTheory.V.Af.Tw.InfTriv := by
+theorem UpperTheory.V.Af.Tw.infTriv : UpperTheory.V.Af.Tw.InfTriv := by
   intro F Ω B _ _ _ _ _ _ _ _ _ art ha ν hν hc z σ hz hσ
   let N : Subgroup (Ideles F) := ((liftAb ν hν).comp art).ker
   have hN : infConn F ≤ N := fun x hx => by

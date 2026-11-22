@@ -111,7 +111,6 @@ lemma slab_identity (μM : Measure G) [SFinite μM] {S : Set G} {a : ℝ → G} 
 
 end GlobalTheory.CompanionTheory.SlabLemma
 
-
 open GlobalTheory.CompanionTheory.SlabLemma in
 theorem GlobalTheory.CompanionTheory.SlabLemma.slab : CompanionTheory.RgExh.Dec.N.S.Slab := by
   intro G _ _ _ μN μM _ _ S a δ τ c hSm hSc ha hδ hτ hadd hS hinv hδa hτa hδ0 F hF hfin
@@ -124,8 +123,10 @@ theorem GlobalTheory.CompanionTheory.SlabLemma.slab : CompanionTheory.RgExh.Dec.
   have key : ∀ᵐ u ∂μN, ∀ᵐ m ∂μM, line F a c (u, m) < ⊤ := by
     refine hae1.mono fun u hu => ?_
     have hid : ∫⁻ m, unitInd (τ m) * δ m * line F a c (u, m) ∂μM = ∫⁻ m, δ m * F (u * m) ∂μM := by
-      have h := slab_identity μM hSc ha hδ hτ hinv hδa hτa (H := fun x => F (u * x))
-        (hF.comp (measurable_const.mul measurable_id))
+      have h :=
+        slab_identity μM hSc ha hδ hτ hinv hδa hτa
+          (H := fun x => F (u * x))
+          (hF.comp (measurable_const.mul measurable_id))
       refine Eq.trans (lintegral_congr fun m => ?_) h
       show unitInd (τ m) * δ m * ∫⁻ t, F (u * m * a t) * wt c t =
         unitInd (τ m) * δ m * ∫⁻ t, F (u * (m * a t)) * wt c t
@@ -134,24 +135,29 @@ theorem GlobalTheory.CompanionTheory.SlabLemma.slab : CompanionTheory.RgExh.Dec.
     have hmeas3 : Measurable fun m => unitInd (τ m) * δ m * line F a c (u, m) :=
       ((measurable_unitInd.comp hτ).mul hδ).mul (hline.comp (measurable_const.prodMk measurable_id))
     have hae2 := ae_lt_top hmeas3 hfin2.ne
-    have hshift : ∀ k : ℤ, ∀ᵐ m ∂μM,
-        unitInd (τ (m * a k)) * δ (m * a k) * line F a c (u, m * a k) < ⊤ := by
+    have hshift
+        : ∀ k : ℤ,
+          ∀ᵐ m ∂μM,
+            unitInd (τ (m * a k)) * δ (m * a k) * line F a c (u, m * a k) < ⊤ := by
       intro k
-      have hf : AEMeasurable (fun m : G => m * a k) μM := (measurable_id.mul measurable_const).aemeasurable
+      have hf : AEMeasurable (fun m : G => m * a k) μM :=
+        (measurable_id.mul measurable_const).aemeasurable
       rw [← hinv k] at hae2
       exact ae_of_ae_map hf hae2
-    have hall : ∀ᵐ m ∂μM, ∀ k : ℤ,
-        unitInd (τ (m * a k)) * δ (m * a k) * line F a c (u, m * a k) < ⊤ := ae_all_iff.mpr hshift
+    have hall
+        : ∀ᵐ m ∂μM, ∀ k : ℤ,
+          unitInd (τ (m * a k)) * δ (m * a k) * line F a c (u, m * a k) < ⊤ :=
+      ae_all_iff.mpr hshift
     filter_upwards [hall, hSae] with m hm hmS
-    have hmk : m * a ((-⌊τ m⌋ : ℤ) : ℝ) ∈ S := hS m hmS _
-    have hmem : τ m + ((-⌊τ m⌋ : ℤ) : ℝ) ∈ Ico (0 : ℝ) 1 := by
+    have hmk : m * a ((- ⌊τ m⌋ : ℤ) : ℝ) ∈ S := hS m hmS _
+    have hmem : τ m + ((- ⌊τ m⌋ : ℤ) : ℝ) ∈ Ico (0 : ℝ) 1 := by
       constructor <;> push_cast <;> linarith [Int.floor_le (τ m), Int.lt_floor_add_one (τ m)]
-    have hU1 : unitInd (τ (m * a ((-⌊τ m⌋ : ℤ) : ℝ))) = 1 := by
+    have hU1 : unitInd (τ (m * a ((- ⌊τ m⌋ : ℤ) : ℝ))) = 1 := by
       rw [hτa m hmS]
       exact (Set.indicator_of_mem hmem 1).trans rfl
-    have h1 := hm (-⌊τ m⌋)
+    have h1 := hm (- ⌊τ m⌋)
     rw [hU1, one_mul] at h1
-    have hL : line F a c (u, m * a ((-⌊τ m⌋ : ℤ) : ℝ)) < ⊤ := by
+    have hL : line F a c (u, m * a ((- ⌊τ m⌋ : ℤ) : ℝ)) < ⊤ := by
       rcases ENNReal.mul_lt_top_iff.mp h1 with h | h | h
       · exact h.2
       · exact absurd h (hδ0 _ hmk)
@@ -163,7 +169,8 @@ theorem GlobalTheory.CompanionTheory.SlabLemma.slab : CompanionTheory.RgExh.Dec.
     · exact absurd h (wt_ne_zero _ _)
     · rw [h]
       exact ENNReal.zero_lt_top
-  have hset : MeasurableSet {p : G × G | line F a c p < ⊤} := measurableSet_lt hline measurable_const
+  have hset : MeasurableSet {p : G × G | line F a c p < ⊤} :=
+    measurableSet_lt hline measurable_const
   have hprod : ∀ᵐ p ∂μN.prod μM, line F a c p < ⊤ := (Measure.ae_prod_iff_ae_ae hset).mpr key
   filter_upwards [hprod] with p hp
   exact lt_of_le_of_lt (setLIntegral_le_lintegral _ _) hp

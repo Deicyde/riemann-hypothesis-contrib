@@ -5,17 +5,20 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.LocRingPf
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
 open scoped TensorProduct
 
 namespace GlobalTheory.OrdVal
 
-variable {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A]
-
+variable
+  {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A]
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
-theorem nonneg_of_isIntegral (u : AddValuation A (WithTop ℤ))
-    (hu : ∀ r : O, 0 ≤ u (algebraMap O A r)) {x : A} (hx : IsIntegral O x) : 0 ≤ u x := by
+theorem nonneg_of_isIntegral
+    (u : AddValuation A (WithTop ℤ)) (hu : ∀ r : O, 0 ≤ u (algebraMap O A r))
+    {x : A} (hx : IsIntegral O x)
+    : 0 ≤ u x := by
   let v : Valuation A (Multiplicative (WithTop ℤ)ᵒᵈ) := u
   let f : O →+* v.integer := (algebraMap O A).codRestrict v.integer (fun r => hu r)
   have h1 : IsIntegral v.integer x := by
@@ -25,8 +28,8 @@ theorem nonneg_of_isIntegral (u : AddValuation A (WithTop ℤ))
     exact hz
   exact (Valuation.integer.integers v).mem_of_integral h1
 
-def centre (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A), 0 ≤ u (a : A)) :
-    Ideal ↥(As O A) where
+def centre (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A), 0 ≤ u (a : A))
+    : Ideal ↥(As O A) where
   carrier := {a | 0 < u (a : A)}
   zero_mem' := by simp
   add_mem' := fun {a b} ha hb => by
@@ -37,8 +40,8 @@ def centre (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A), 0 ≤ u
     rw [u.map_mul]
     exact lt_of_lt_of_le ha (le_add_of_nonneg_left (hu c))
 
-theorem centre_isPrime (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A), 0 ≤ u (a : A)) :
-    (centre u hu).IsPrime := by
+theorem centre_isPrime (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A), 0 ≤ u (a : A))
+    : (centre u hu).IsPrime := by
   refine ⟨fun h => ?_, fun {a b} h => ?_⟩
   · have : (1 : ↥(As O A)) ∈ centre u hu := h ▸ Submodule.mem_top
     change 0 < u (1 : A) at this
@@ -51,9 +54,10 @@ theorem centre_isPrime (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O
     rw [u.map_mul, ha, hb] at h
     simp at h
 
-theorem centre_isMaximal (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A), 0 ≤ u (a : A))
-    {ϖ : O} (hϖ : Irreducible ϖ) (hpos : 0 < u (algebraMap O A ϖ)) :
-    (centre u hu).IsMaximal := by
+theorem centre_isMaximal
+    (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A), 0 ≤ u (a : A))
+    {ϖ : O} (hϖ : Irreducible ϖ) (hpos : 0 < u (algebraMap O A ϖ))
+    : (centre u hu).IsMaximal := by
   haveI := centre_isPrime u hu
   refine Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := O) _ ?_
   have hle : IsLocalRing.maximalIdeal O ≤ (centre u hu).comap (algebraMap O ↥(As O A)) := by
@@ -64,9 +68,12 @@ theorem centre_isMaximal (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As
   rw [← this]
   infer_instance
 
-theorem le_of_vL_le (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A), 0 ≤ u (a : A))
-    (ζ : Pts O A) [IsDVRAt ζ] (hζ : ∀ a : ↥(As O A), a ∉ ζ.asIdeal → u (a : A) = 0)
-    {a b : ↥(As O A)} (hab : vL ζ a ≤ vL ζ b) : u (a : A) ≤ u (b : A) := by
+theorem le_of_vL_le
+    (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A), 0 ≤ u (a : A))
+    (ζ : Pts O A) [IsDVRAt ζ]
+    (hζ : ∀ a : ↥(As O A), a ∉ ζ.asIdeal → u (a : A) = 0)
+    {a b : ↥(As O A)} (hab : vL ζ a ≤ vL ζ b)
+    : u (a : A) ≤ u (b : A) := by
   rw [vL_eq_addVal, vL_eq_addVal, IsDiscreteValuationRing.addVal_le_iff_dvd] at hab
   obtain ⟨z, hz⟩ := hab
   obtain ⟨⟨x, s⟩, hs⟩ := IsLocalization.surj ζ.asIdeal.primeCompl z
@@ -74,11 +81,13 @@ theorem le_of_vL_le (u : AddValuation A (WithTop ℤ)) (hu : ∀ a : ↥(As O A)
     simp only at hs
     rw [map_mul, map_mul, hz, mul_assoc, hs]
   obtain ⟨c, hc⟩ := (IsLocalization.eq_iff_exists ζ.asIdeal.primeCompl (Loc ζ)).1 h1
-  have h2 : ((c : ↥(As O A)) : A) * ((b : A) * ((s : ↥(As O A)) : A))
-      = ((c : ↥(As O A)) : A) * ((a : A) * (x : A)) := congrArg Subtype.val hc
+  have h2
+      : ((c : ↥(As O A)) : A) * ((b : A) * ((s : ↥(As O A)) : A))
+        = ((c : ↥(As O A)) : A) * ((a : A) * (x : A)) :=
+    congrArg Subtype.val hc
   have h3 := congrArg u h2
-  rw [u.map_mul, u.map_mul, u.map_mul, u.map_mul, hζ _ c.2, hζ _ s.2, zero_add, zero_add,
-    add_zero] at h3
+  rw [u.map_mul, u.map_mul, u.map_mul, u.map_mul, hζ _ c.2, hζ _ s.2, zero_add, zero_add, add_zero]
+    at h3
   rw [h3]
   exact le_add_of_nonneg_right (hu x)
 
@@ -92,14 +101,16 @@ theorem exists_vL_eq_one (ζ : Pts O A) [IsDVRAt ζ] : ∃ a : ↥(As O A), vL �
   rw [vL_eq_addVal, ← hs, IsDiscreteValuationRing.addVal_mul, h0,
     IsDiscreteValuationRing.addVal_uniformizer hπ, add_zero]
 
-theorem exists_ord_eq [∀ ζ : Pts O A, IsDVRAt ζ] {ϖ : O} (h : IsUnif A ϖ)
-    (u : AddValuation A (WithTop ℤ)) (hO : ∀ r : O, 0 ≤ u (algebraMap O A r))
-    (hpos : 0 < u (algebraMap O A ϖ)) (hone : ∃ a, u a = 1) :
-    ∃ ζ : Pts O A, ∀ a : A, Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ a = u a := by
+theorem exists_ord_eq
+    [∀ ζ : Pts O A, IsDVRAt ζ]
+    {ϖ : O} (h : IsUnif A ϖ)
+    (u : AddValuation A (WithTop ℤ))
+    (hO : ∀ r : O, 0 ≤ u (algebraMap O A r)) (hpos : 0 < u (algebraMap O A ϖ)) (hone : ∃ a, u a = 1)
+    : ∃ ζ : Pts O A, ∀ a : A, Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ a = u a := by
   have hu : ∀ a : ↥(As O A), 0 ≤ u (a : A) := fun a => nonneg_of_isIntegral u hO a.2
   let ζ : Pts O A := ⟨centre u hu, centre_isMaximal u hu h.irreducible hpos⟩
-  have hζ : ∀ a : ↥(As O A), a ∉ ζ.asIdeal → u (a : A) = 0 :=
-    fun a ha => le_antisymm (not_lt.1 ha) (hu a)
+  have hζ : ∀ a : ↥(As O A), a ∉ ζ.asIdeal → u (a : A) = 0 := fun a ha =>
+    le_antisymm (not_lt.1 ha) (hu a)
   obtain ⟨a₀, ha₀⟩ := exists_vL_eq_one ζ
   have hfin : ∀ (b : ↥(As O A)) (m : ℕ), vL ζ b = m → u (b : A) = m • u (a₀ : A) := by
     intro b m hb
@@ -128,8 +139,12 @@ theorem exists_ord_eq [∀ ζ : Pts O A, IsDVRAt ζ] {ϖ : O} (h : IsUnif A ϖ)
     have := hu a₀
     rw [← hq] at this
     exact_mod_cast this
-  have key : ∀ x : A, (Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ x = ⊤ ∧ u x = ⊤) ∨
-      ∃ k : ℤ, Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ x = (k : WithTop ℤ) ∧ u x = ((k * q : ℤ) : WithTop ℤ) := by
+  have key
+      : ∀ x : A,
+        (Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ x = ⊤ ∧ u x = ⊤)
+          ∨ ∃ k : ℤ,
+            Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ x = (k : WithTop ℤ)
+              ∧ u x = ((k * q : ℤ) : WithTop ℤ) := by
     intro x
     obtain ⟨n, hn⟩ := h.denom x
     have e1 : u (ϖ ^ n • x) = ((n * (ep ϖ ζ * q) : ℤ) : WithTop ℤ) + u x := by
@@ -170,17 +185,21 @@ theorem exists_ord_eq [∀ ζ : Pts O A, IsDVRAt ζ] {ϖ : O} (h : IsUnif A ϖ)
   · rw [h1, h2]
   · rw [h1, h2, hq1, mul_one]
 
-theorem eq_zero_of_ord_eq_top [∀ ζ : Pts O A, IsDVRAt ζ] {ϖ : O} (h : IsUnif A ϖ) (a : A)
-    (ha : ∀ ζ : Pts O A, Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ a = ⊤) : a = 0 := by
+theorem eq_zero_of_ord_eq_top
+    [∀ ζ : Pts O A, IsDVRAt ζ]
+    {ϖ : O} (h : IsUnif A ϖ)
+    (a : A) (ha : ∀ ζ : Pts O A, Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ a = ⊤)
+    : a = 0 := by
   obtain ⟨n, hn⟩ := h.denom a
   have key : (⟨ϖ ^ n • a, hn⟩ : ↥(As O A)) ∈ (⊥ : Ideal ↥(As O A)) := by
-    have h0 : ∀ ζ : Pts O A, algebraMap ↥(As O A) (Loc ζ) ⟨ϖ ^ n • a, hn⟩ ∈
-        Ideal.map (algebraMap ↥(As O A) (Loc ζ)) ⊥ := by
+    have h0
+        : ∀ ζ : Pts O A,
+          algebraMap ↥(As O A) (Loc ζ) ⟨ϖ ^ n • a, hn⟩
+            ∈ Ideal.map (algebraMap ↥(As O A) (Loc ζ)) ⊥ := by
       intro ζ
       have h1 := ha ζ
       rw [ord_eq ζ h hn, ordAt, WithTop.add_eq_top] at h1
-      have h2 : vL ζ ⟨ϖ ^ n • a, hn⟩ = ⊤ := by
-        simpa using h1.resolve_right WithTop.coe_ne_top
+      have h2 : vL ζ ⟨ϖ ^ n • a, hn⟩ = ⊤ := by simpa using h1.resolve_right WithTop.coe_ne_top
       rw [(vL_eq_top_iff ζ _).1 h2]
       exact Submodule.zero_mem _
     exact Ideal.mem_of_localization_maximal (fun P hP => h0 ⟨P, hP⟩)
@@ -188,8 +207,15 @@ theorem eq_zero_of_ord_eq_top [∀ ζ : Pts O A, IsDVRAt ζ] {ϖ : O} (h : IsUni
   rw [Algebra.smul_def, map_pow] at h2
   exact ((h.isUnit.pow n).mul_right_eq_zero).1 h2
 
-theorem valuation_eq_ord_and_eq_zero :
-    ∀ (O A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A] [∀ ζ : Pts O A, IsDVRAt ζ] (ϖ : O), IsUnif A ϖ → (∀ u : AddValuation A (WithTop ℤ), (∀ r : O, 0 ≤ u (algebraMap O A r)) → 0 < u (algebraMap O A ϖ) → (∃ a, u a = 1) → ∃ ζ : Pts O A, ∀ a : A, Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ a = u a) ∧ ∀ a : A, (∀ ζ : Pts O A, Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ a = ⊤) → a = 0 :=
+theorem valuation_eq_ord_and_eq_zero
+    : ∀ (O A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A]
+        [Algebra O A] [∀ ζ : Pts O A, IsDVRAt ζ] (ϖ : O),
+      IsUnif A ϖ
+        → (∀ u : AddValuation A (WithTop ℤ),
+            (∀ r : O, 0 ≤ u (algebraMap O A r)) → 0 < u (algebraMap O A ϖ) → (∃ a, u a = 1)
+              → ∃ ζ : Pts O A, ∀ a : A, Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ a = u a)
+          ∧ ∀ a : A,
+            (∀ ζ : Pts O A, Formalism.MainNotions.Gaps.EtaleWeightGaps.ord ϖ ζ a = ⊤) → a = 0 :=
   fun _ _ _ _ _ _ _ _ _ h => ⟨exists_ord_eq h, eq_zero_of_ord_eq_top h⟩
 
 end GlobalTheory.OrdVal

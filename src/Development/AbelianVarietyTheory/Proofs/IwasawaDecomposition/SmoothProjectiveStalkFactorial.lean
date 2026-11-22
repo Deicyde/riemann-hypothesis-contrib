@@ -19,9 +19,12 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.SiegelTor
 namespace GlobalTheory.CycAwayReg
 open NumberField
 
-theorem isDedekindDomain_closure {Ω K : Type} [Field Ω] [CharZero Ω] [Field K] [CharZero K] {n : ℕ} [NeZero n]
-    [IsCyclotomicExtension {n} ℚ K] (φ : K →+* Ω) {ζ : K} (hζ : IsPrimitiveRoot ζ n) :
-    IsDedekindDomain (Subring.closure {φ ζ, (n : Ω)⁻¹}) := by
+theorem isDedekindDomain_closure
+    {Ω K : Type} [Field Ω] [CharZero Ω] [Field K] [CharZero K]
+    {n : ℕ} [NeZero n] [IsCyclotomicExtension {n} ℚ K]
+    (φ : K →+* Ω)
+    {ζ : K} (hζ : IsPrimitiveRoot ζ n)
+    : IsDedekindDomain (Subring.closure {φ ζ, (n : Ω)⁻¹}) := by
   haveI : NumberField K := IsCyclotomicExtension.numberField {n} ℚ _
   have h0 : (n : Ω) ≠ 0 := Nat.cast_ne_zero.mpr (NeZero.ne n)
   set T : Subring Ω := Subring.closure {φ ζ, (n : Ω)⁻¹} with hTdef
@@ -29,13 +32,17 @@ theorem isDedekindDomain_closure {Ω K : Type} [Field Ω] [CharZero Ω] [Field K
   have hio : Function.Injective io := φ.injective.comp RingOfIntegers.coe_injective
   have hmem : ∀ x, io x ∈ T := by
     intro x
-    obtain ⟨y, hy⟩ := (IsCyclotomicExtension.Rat.isIntegralClosure_adjoin_singleton hζ).isIntegral_iff.1
-      (RingOfIntegers.isIntegral_coe x)
+    obtain ⟨y, hy⟩ :=
+      (IsCyclotomicExtension.Rat.isIntegralClosure_adjoin_singleton hζ).isIntegral_iff.1
+        (RingOfIntegers.isIntegral_coe x)
     have h1 : (y : K) ∈ Subring.closure ({ζ} : Set K) := by
-      exact Algebra.mem_adjoin_iff.1 y.2 |> fun h => (Subring.closure_le.2 (by
-        rintro _ (⟨r, rfl⟩ | h)
-        · exact intCast_mem (Subring.closure ({ζ} : Set K)) r
-        · exact Subring.subset_closure h)) h
+      exact Algebra.mem_adjoin_iff.1 y.2
+        |> fun h =>
+          (Subring.closure_le.2 (by
+              rintro _ (⟨r, rfl⟩ | h)
+              · exact intCast_mem (Subring.closure ({ζ} : Set K)) r
+              · exact Subring.subset_closure h))
+            h
     have h2 : Subring.closure ({ζ} : Set K) ≤ T.comap φ := by
       rw [Subring.closure_le]
       rintro _ rfl
@@ -45,7 +52,8 @@ theorem isDedekindDomain_closure {Ω K : Type} [Field Ω] [CharZero Ω] [Field K
     exact h2 h1
   letI : Algebra (𝓞 K) T := (io.codRestrict _ hmem).toAlgebra
   have hL : IsLocalization (Submonoid.powers (n : 𝓞 K)) T := by
-    refine GlobalTheory.CycAway.isLocalization_of_le_closure h0 _ _ (fun x y h => hio (congrArg (fun z : T => (z : Ω)) h))
+    refine GlobalTheory.CycAway.isLocalization_of_le_closure h0 _ _
+      (fun x y h => hio (congrArg (fun z : T => (z : Ω)) h))
       (Subring.subset_closure (Or.inr rfl)) (Subring.closure_mono ?_)
     rintro x (rfl | h)
     · exact Or.inl ⟨hζ.toInteger, rfl⟩
@@ -53,12 +61,14 @@ theorem isDedekindDomain_closure {Ω K : Type} [Field Ω] [CharZero Ω] [Field K
   have hn' : (n : 𝓞 K) ≠ 0 := by exact_mod_cast NeZero.ne n
   exact IsLocalization.isDedekindDomain _ (powers_le_nonZeroDivisors_of_noZeroDivisors hn') _
 
-theorem isDedekindDomain_cycAway_of_ne_zero {n : ℕ} (hn : n ≠ 0) : IsDedekindDomain (cycAway n) := by
+theorem isDedekindDomain_cycAway_of_ne_zero {n : ℕ} (hn : n ≠ 0)
+    : IsDedekindDomain (cycAway n) := by
   haveI : NeZero n := ⟨hn⟩
   let K := CyclotomicField n ℚ
   let φ : K →+* ℂ := (IsAlgClosed.lift (R := ℚ) (S := K) (M := ℂ)).toRingHom
   have hζ := IsCyclotomicExtension.zeta_spec n ℚ K
-  have hz : IsPrimitiveRoot (φ (IsCyclotomicExtension.zeta n ℚ K)) n := hζ.map_of_injective φ.injective
+  have hz : IsPrimitiveRoot (φ (IsCyclotomicExtension.zeta n ℚ K)) n :=
+    hζ.map_of_injective φ.injective
   have he : IsPrimitiveRoot (zeta n) n := Complex.isPrimitiveRoot_exp n hn
   obtain ⟨k, hk, hkc⟩ := hz.eq_pow_of_pow_eq_one he.pow_eq_one
   have hζk := hζ.pow_of_coprime k (hz.pow_iff_coprime (Nat.pos_of_ne_zero hn) k |>.1 (hkc ▸ he))

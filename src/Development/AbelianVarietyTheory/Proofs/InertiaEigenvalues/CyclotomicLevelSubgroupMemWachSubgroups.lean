@@ -10,13 +10,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cycloto
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.Cyc.Decomp TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
+  GlobalTheory.Cyc.Decomp TensorProduct
 
 namespace GlobalTheory.Cyc.Decomp
 
-theorem le_v_of_norm_le {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l) (x : ℚ_[l]) (k : ℕ)
-    (hx : ‖x‖ ≤ (l : ℝ) ^ (-(k : ℤ))) :
-    ((k : ℚ) : WithTop ℚ) ≤ P.v LL (algebraMap ℚ_[l] ↥LL.1 x) := by
+theorem le_v_of_norm_le
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l) (LL : FinExt l)
+    (x : ℚ_[l]) (k : ℕ) (hx : ‖x‖ ≤ (l : ℝ) ^ (-(k : ℤ)))
+    : ((k : ℚ) : WithTop ℚ) ≤ P.v LL (algebraMap ℚ_[l] ↥LL.1 x) := by
   have hlpos : (0 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).pos
   have hl : (l : ℚ_[l]) ≠ 0 := by exact_mod_cast (Fact.out : l.Prime).ne_zero
   have hlk : (l : ℚ_[l]) ^ k ≠ 0 := pow_ne_zero k hl
@@ -37,7 +41,13 @@ theorem le_v_of_norm_le {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l
   rw [hxy, map_mul, map_pow, map_natCast, (P.v LL).map_mul, (P.v LL).map_pow, P.26 LL, hk]
   exact le_add_of_nonneg_right hv0
 
-theorem grp_GKs_H : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL) (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (Module.finrank ℚ_[l] ↥(K0 K))), W.s = s → ∀ g : ↥(GK K), ((g : GQ l) ∈ Gj K s → g ∈ W.GKs) ∧ ((g : GQ l) ∈ Hinf K → W.resΓ g = 1) := by
+theorem grp_GKs_H
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (s : ℕ)
+        (LL : FinExt l) (h : Good K s LL)
+        (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (Module.finrank ℚ_[l] ↥(K0 K))),
+      W.s = s
+        → ∀ g : ↥(GK K),
+          ((g : GQ l) ∈ Gj K s → g ∈ W.GKs) ∧ ((g : GQ l) ∈ Hinf K → W.resΓ g = 1) := by
   intro l _ P _ K s LL _ W hW g
   have hcyc : IsCyc P.χQ := P.20
   have hχ : ((P.PD K).χ g : ℚ_[l]) = (P.χQ (g : GQ l) : ℚ_[l]) := P.PD_χ K g
@@ -52,8 +62,9 @@ theorem grp_GKs_H : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf 
     have hn : ‖(P.χQ (g : GQ l) : ℚ_[l]) - 1‖ ≤ (l : ℝ) ^ (-(s : ℤ)) :=
       hcyc.norm_sub_one_le_of_prim (g : GQ l) s hζ hfix
     have hv := le_v_of_norm_le P LL ((P.χQ (g : GQ l) : ℚ_[l]) - 1) s hn
-    have e : algebraMap ℚ_[l] ↥LL.1 ((P.PD K).χ g : ℚ_[l]) - 1 =
-        algebraMap ℚ_[l] ↥LL.1 ((P.χQ (g : GQ l) : ℚ_[l]) - 1) := by
+    have e
+        : algebraMap ℚ_[l] ↥LL.1 ((P.PD K).χ g : ℚ_[l]) - 1
+          = algebraMap ℚ_[l] ↥LL.1 ((P.χQ (g : GQ l) : ℚ_[l]) - 1) := by
       rw [hχ, map_sub, map_one]
     rw [W.GKs_def g, hW, e]
     exact_mod_cast hv
@@ -63,7 +74,8 @@ theorem grp_GKs_H : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf 
       refine (hcyc.fix_iff (g : GQ l) m).1 (fun ζ hζ => ?_)
       have hmem : ζ ∈ Kinf K := by
         unfold Kinf
-        exact (le_sup_right : IntermediateField.adjoin ℚ_[l] {x : Om l | ∃ j : ℕ, x ^ l ^ j = 1} ≤ _)
+        exact (le_sup_right
+            : IntermediateField.adjoin ℚ_[l] {x : Om l | ∃ j : ℕ, x ^ l ^ j = 1} ≤ _)
           (IntermediateField.subset_adjoin ℚ_[l] _ ⟨m, hζ⟩)
       exact (IntermediateField.mem_fixingSubgroup_iff _ _).1 hg ζ hmem
     have h1 : (P.χQ (g : GQ l) : ℚ_[l]) = 1 := by

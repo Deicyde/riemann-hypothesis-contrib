@@ -21,7 +21,8 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.DegActCompare
 
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.IndefiniteRowSideFullHecke
 
 variable {R : Type} [CommRing R] [IsDomain R]
@@ -35,11 +36,14 @@ end Act
 
 section Ext
 
-variable {D : DegPre R} {F F' : Type} [Field F] [Algebra (FractionRing R) F] [Field F']
-  [Algebra (FractionRing R) F'] {k : ℕ}
+variable
+  {D : DegPre R} {F F' : Type}
+  [Field F] [Algebra (FractionRing R) F] [Field F'] [Algebra (FractionRing R) F']
+  {k : ℕ}
 
-theorem qkExt_unique {f : F →+* F'} {p : QkPt D F k} {q q' : QkPt D F' k} (h : QkExt f p q)
-    (h' : QkExt f p q') : q = q' := by
+theorem qkExt_unique
+    {f : F →+* F'} {p : QkPt D F k} {q q' : QkPt D F' k} (h : QkExt f p q) (h' : QkExt f p q')
+    : q = q' := by
   have hg : q.g = q'.g :=
     TorusExt.gt_ext_val (Over.OverMorphism.ext (h.2.1.trans h'.2.1.symm)) fun χ y J hJ =>
       (val_corr hJ (h.2.2 χ) _).trans (val_corr hJ (h'.2.2 χ) _).symm

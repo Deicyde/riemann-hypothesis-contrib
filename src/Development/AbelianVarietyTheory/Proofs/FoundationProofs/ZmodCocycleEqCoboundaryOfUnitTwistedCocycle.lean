@@ -15,16 +15,21 @@ open IntermediateField
 
 namespace GlobalTheory.Hilbert90CupCoboundary
 
-theorem isLocallyConstant_eval {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω]
-    (τ : Ω) : IsLocallyConstant (fun g : Ω ≃ₐ[K] Ω => g τ) := by
+theorem isLocallyConstant_eval
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω] (τ : Ω)
+    : IsLocallyConstant (fun g : Ω ≃ₐ[K] Ω => g τ) := by
   rw [IsLocallyConstant.iff_exists_open]
   intro g
   haveI : FiniteDimensional K K⟮τ⟯ :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral τ)
   have hopen : IsOpen ((K⟮τ⟯).fixingSubgroup : Set (Ω ≃ₐ[K] Ω)) :=
     IntermediateField.fixingSubgroup_isOpen _
-  refine ⟨(fun g' => g⁻¹ * g') ⁻¹' ((K⟮τ⟯).fixingSubgroup : Set (Ω ≃ₐ[K] Ω)),
-    hopen.preimage (continuous_const.mul continuous_id), ?_, ?_⟩
+  refine ⟨
+    (fun g' => g⁻¹ * g') ⁻¹' ((K⟮τ⟯).fixingSubgroup : Set (Ω ≃ₐ[K] Ω)),
+    hopen.preimage (continuous_const.mul continuous_id),
+    ?_,
+    ?_
+  ⟩
   · simp only [Set.mem_preimage, inv_mul_cancel, SetLike.mem_coe]
     exact Subgroup.one_mem _
   · intro g' hg'
@@ -35,11 +40,14 @@ theorem isLocallyConstant_eval {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
     show g' τ = g τ
     rw [e, AlgEquiv.mul_apply, hfτ]
 
-theorem zmod_cocycle_eq_coboundary_of_unit_twisted_cocycle : ∀ (K Ω : Type) [Field K] [CharZero K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (N : ℕ) (ζ : Ω), 0 < N →
-  IsPrimitiveRoot ζ N → (∀ g : Ω ≃ₐ[K] Ω, g ζ = ζ) →
-  ∀ (c : (Ω ≃ₐ[K] Ω) → (Ω ≃ₐ[K] Ω) → ZMod N) (v : (Ω ≃ₐ[K] Ω) → Ωˣ), IsLocallyConstant v →
-  (∀ g h, (v g : Ω) * g (v h) = ζ ^ (c g h).val * v (g * h)) →
-  ∃ η : (Ω ≃ₐ[K] Ω) → ZMod N, IsLocallyConstant η ∧ ∀ g h, c g h = η h - η (g * h) + η g := by
+theorem zmod_cocycle_eq_coboundary_of_unit_twisted_cocycle
+    : ∀ (K Ω : Type) [Field K] [CharZero K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (N : ℕ)
+        (ζ : Ω),
+      0 < N → IsPrimitiveRoot ζ N → (∀ g : Ω ≃ₐ[K] Ω, g ζ = ζ)
+        → ∀ (c : (Ω ≃ₐ[K] Ω) → (Ω ≃ₐ[K] Ω) → ZMod N) (v : (Ω ≃ₐ[K] Ω) → Ωˣ),
+          IsLocallyConstant v → (∀ g h, (v g : Ω) * g (v h) = ζ ^ (c g h).val * v (g * h))
+            → ∃ η : (Ω ≃ₐ[K] Ω) → ZMod N,
+              IsLocallyConstant η ∧ ∀ g h, c g h = η h - η (g * h) + η g := by
   intro K Ω _ _ _ _ _ N ζ hN0 hζ hfix c v hv hcoc
   classical
   haveI : NeZero N := ⟨by omega⟩
@@ -62,7 +70,8 @@ theorem zmod_cocycle_eq_coboundary_of_unit_twisted_cocycle : ∀ (K Ω : Type) [
   have hgτ0 : ∀ g : Ω ≃ₐ[K] Ω, g τ ≠ 0 := fun g => (map_ne_zero g).2 hτ0
   let w : (Ω ≃ₐ[K] Ω) → Ω := fun g => (v g : Ω) * τ / g τ
   have hw_lc : IsLocallyConstant w :=
-    (hv.comp (fun x : Ωˣ => (x : Ω))).comp₂ (isLocallyConstant_eval (K := K) τ) (fun a b => a * τ / b)
+    (hv.comp (fun x : Ωˣ => (x : Ω))).comp₂ (isLocallyConstant_eval (K := K) τ)
+      (fun a b => a * τ / b)
   have hw_pow : ∀ g, w g ^ N = 1 := by
     intro g
     have h1 : (v g : Ω) ^ N = g t / t := by rw [← Units.val_pow_eq_pow_val]; exact ht g

@@ -5,24 +5,28 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C
 
 section SlopeTestRemainingChoices
 
 variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
-private theorem isHS_prj (E : Submodule ℂ H) [FiniteDimensional ℂ E] : IsHilbertSchmidt (prj E) := by
+private theorem isHS_prj (E : Submodule ℂ H) [FiniteDimensional ℂ E]
+    : IsHilbertSchmidt (prj E) := by
   have hcl : E.topologicalClosure = E :=
     (Submodule.closed_of_finiteDimensional E).submodule_topologicalClosure_eq
   haveI : FiniteDimensional ℂ E.topologicalClosure := by rw [hcl]; infer_instance
   have h1 : IsHilbertSchmidt (E.topologicalClosure.subtypeL) := by
-    rw [isHilbertSchmidt_iff (stdOrthonormalBasis ℂ E.topologicalClosure).toHilbertBasis, tsum_fintype]
+    rw [isHilbertSchmidt_iff (stdOrthonormalBasis ℂ E.topologicalClosure).toHilbertBasis,
+      tsum_fintype]
     exact ENNReal.sum_lt_top.2 fun i _ => ENNReal.pow_lt_top enorm_lt_top
   exact h1.comp_right E.topologicalClosure.orthogonalProjection
 
-private theorem mem_eigIn {W : Submodule ℂ H} {A : H →L[ℂ] H} {x : ℝ} {v : H} :
-    v ∈ eigIn W A x ↔ v ∈ W ∧ A v = (x : ℂ) • v := by
+private theorem mem_eigIn {W : Submodule ℂ H} {A : H →L[ℂ] H} {x : ℝ} {v : H}
+    : v ∈ eigIn W A x ↔ v ∈ W ∧ A v = (x : ℂ) • v := by
   simp [eigIn, Submodule.mem_inf, Module.End.mem_eigenspace_iff]
 
 private theorem prj_mem {V : Submodule ℂ H} (hV : IsClosed (V : Set H)) (v : H) : prj V v ∈ V := by
@@ -39,8 +43,11 @@ private theorem sub_prj_mem (V : Submodule ℂ H) (v : H) : v - prj V v ∈ Vᗮ
   have h := Submodule.sub_starProjection_mem_orthogonal (K := V.topologicalClosure) v
   rwa [Submodule.orthogonal_closure] at h
 
-private theorem prj_comm {V : Submodule ℂ H} (hV : IsClosed (V : Set H)) {A : H →L[ℂ] H} (hA : IsSelfAdjoint A)
-    (hinv : ∀ v ∈ V, A v ∈ V) (v : H) : prj V (A v) = A (prj V v) := by
+private theorem prj_comm
+    {V : Submodule ℂ H} (hV : IsClosed (V : Set H))
+    {A : H →L[ℂ] H} (hA : IsSelfAdjoint A) (hinv : ∀ v ∈ V, A v ∈ V)
+    (v : H)
+    : prj V (A v) = A (prj V v) := by
   have hu := sub_prj_mem V v
   have hadj : ContinuousLinearMap.adjoint A = A := (ContinuousLinearMap.isSelfAdjoint_iff').1 hA
   have hAu : A (v - prj V v) ∈ Vᗮ := by
@@ -48,14 +55,13 @@ private theorem prj_comm {V : Submodule ℂ H} (hV : IsClosed (V : Set H)) {A : 
     intro w hw
     rw [← ContinuousLinearMap.adjoint_inner_left, hadj]
     exact hu _ (hinv w hw)
-  have h : A v = A (prj V v) + A (v - prj V v) := by
-    rw [← map_add (f := _)]; congr 1; abel
+  have h : A v = A (prj V v) + A (v - prj V v) := by rw [← map_add (f := _)]; congr 1; abel
   rw [h, map_add (f := _), prj_eq_zero hAu, add_zero, prj_self (hinv _ (prj_mem hV v))]
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.ConvolutionTheory.C.eigSummands :
-    UpperTheory.ConvolutionTheory.C.EigSummands := by
+theorem UpperTheory.ConvolutionTheory.C.eigSummands
+    : UpperTheory.ConvolutionTheory.C.EigSummands := by
   intro H ι _ _ _ V W A x hc ho hW hA hinv hfd
   classical
   let E : ι → Submodule ℂ H := fun i => eigIn (V i) A x
@@ -66,8 +72,9 @@ theorem UpperTheory.ConvolutionTheory.C.eigSummands :
   have hfin : {i | E i ≠ ⊥}.Finite := by
     have hex : ∀ i : {i | E i ≠ ⊥}, ∃ v ∈ E i, v ≠ 0 := fun i => (Submodule.ne_bot_iff _).1 i.2
     choose v hvE hv0 using hex
-    have hli : LinearIndependent ℂ v := linearIndependent_of_ne_zero_of_inner_eq_zero hv0 fun i j hij =>
-      (hEo fun e => hij (Subtype.ext e)).inner_eq (hvE i) (hvE j)
+    have hli : LinearIndependent ℂ v :=
+      linearIndependent_of_ne_zero_of_inner_eq_zero hv0 fun i j hij =>
+        (hEo fun e => hij (Subtype.ext e)).inner_eq (hvE i) (hvE j)
     let v' : {i | E i ≠ ⊥} → eigIn W A x := fun i => ⟨v i, hEW i (hvE i)⟩
     have hli' : LinearIndependent ℂ v' := LinearIndependent.of_comp (eigIn W A x).subtype hli
     exact Set.finite_coe_iff.1 hli'.finite_of_isNoetherian
@@ -91,7 +98,8 @@ theorem UpperTheory.ConvolutionTheory.C.eigSummands :
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sub, map_sum]
       by_cases hj : j ∈ s
-      · rw [Finset.sum_eq_single_of_mem j hj (fun i _ hij => hPP i j hij v), prj_self (prj_mem (hc j) v), sub_self]
+      · rw [Finset.sum_eq_single_of_mem j hj (fun i _ hij => hPP i j hij v),
+          prj_self (prj_mem (hc j) v), sub_self]
       · have h0 : prj (V j) v = 0 := by
           have hb : E j = ⊥ := by_contra fun h => hj ((hs j).2 h)
           have h1 := hPE j v hv
@@ -108,12 +116,16 @@ theorem UpperTheory.ConvolutionTheory.C.eigSummands :
     rw [sub_eq_zero.1 hz]
     exact hu
   refine ⟨s, hs, hsup, fun T => ?_⟩
-  have hS : (⨆ i : s, E i) = eigIn W A x := by
-    rw [hsup, iSup_subtype']
+  have hS : (⨆ i : s, E i) = eigIn W A x := by rw [hsup, iSup_subtype']
   have htc : IsTraceClass (prj (⨆ i : s, E i) ∘L T ∘L prj (⨆ i : s, E i)) := by
     rw [hS]
     exact isTraceClass_comp (isHS_prj _) ((isHS_prj _).comp_left T)
-  have h := UpperTheory.ConvolutionTheory.C.traceSum H s (fun i => E i) T (fun i j hij => hEo fun e => hij (Subtype.ext e)) htc
+  have h :=
+    UpperTheory.ConvolutionTheory.C.traceSum H s
+      (fun i => E i)
+      T
+      (fun i j hij => hEo fun e => hij (Subtype.ext e))
+      htc
   rw [hS] at h
   rw [h.unique (hasSum_fintype _)]
   exact Finset.sum_coe_sort s fun i => trOn (E i) T

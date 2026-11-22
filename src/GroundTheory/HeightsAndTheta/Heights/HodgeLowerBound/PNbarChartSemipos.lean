@@ -15,11 +15,13 @@ namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
 open ReciprocityTheory.AnForm (levi)
 
-theorem NbarChartSemipos.proof (hS : NbarSmooth.Statement) (hL : NbarLeviChart.Statement)
-    (hA : APrimeChartMargin.Statement) : NbarChartSemipos.Statement := by
+theorem NbarChartSemipos.proof
+    (hS : NbarSmooth.Statement) (hL : NbarLeviChart.Statement) (hA : APrimeChartMargin.Statement)
+    : NbarChartSemipos.Statement := by
   intro II Ψ _ _ K _ ι _ Ω _ _ E _ _ D O Lt _ _ _ X
   obtain ⟨c, hc, hAc⟩ := hA II Ψ K ι Ω E D O Lt X
-  refine ⟨c, hc, fun B p q t δ hs hl hqp => ⟨hS II Ψ K ι Ω E D O Lt X B p q t hs, fun z hz w hw => ?_⟩⟩
+  refine
+    ⟨c, hc, fun B p q t δ hs hl hqp => ⟨hS II Ψ K ι Ω E D O Lt X B p q t hs, fun z hz w hw => ?_⟩⟩
   obtain ⟨k, hk⟩ := X.S.R.cover (X.M.proj z)
   have hk' : X.M.proj z ∈ X.S.R.mid k := X.S.R.inner_subset_mid k hk
   obtain ⟨v, hv, heq⟩ := hL II Ψ K ι Ω E D O Lt X B p q t hs z hz w hw k hk'

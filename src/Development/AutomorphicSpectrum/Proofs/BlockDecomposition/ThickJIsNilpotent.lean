@@ -11,13 +11,18 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EtaleLif
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Site
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+  CrystallineSemistableComparison.Pb.Site
 
 namespace GlobalTheory.CompanionTheory.SiteNil
 
-theorem thick_J_isNilpotent : ∀ {O R : Type} [CommRing O] [CommRing R] {I : Ideal R}
-    {γ : DividedPowers I} {p : ℕ} {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)}
-    {κ : O →+* R ⧸ I} (T : Thick (nlFun γ p X q κ)), ∀ x ∈ T.J, IsNilpotent x := by
+theorem thick_J_isNilpotent
+    : ∀ {O R : Type} [CommRing O] [CommRing R] {I : Ideal R} {γ : DividedPowers I} {p : ℕ}
+        {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)} {κ : O →+* R ⧸ I}
+        (T : Thick (nlFun γ p X q κ)),
+      ∀ x ∈ T.J,
+        IsNilpotent x := by
   intro O R _ _ I γ p X q κ T x hx
   by_cases hp : p = 0
   · obtain ⟨n, hn⟩ := T.adm.2 hp

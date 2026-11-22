@@ -16,11 +16,14 @@ public import Formalism.GaloisCohomology.GaloisCohomologyProofs.LdataNonempty
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem kBound_le (K n n0 D : ℕ) (x : ℝ) (hx : 2 ≤ x) (hn : n ≤ n0) (hD : 0 < D)
-    (hl : Real.log (D : ℝ) ≤ (n : ℝ) * Real.log x) :
-    kBound (K : ℝ) 1 n D ≤ x ^ ((2 * n0) ^ K * (n0 + 1)) := by
+private theorem kBound_le
+    (K n n0 D : ℕ)
+    (x : ℝ) (hx : 2 ≤ x)
+    (hn : n ≤ n0) (hD : 0 < D) (hl : Real.log (D : ℝ) ≤ (n : ℝ) * Real.log x)
+    : kBound (K : ℝ) 1 n D ≤ x ^ ((2 * n0) ^ K * (n0 + 1)) := by
   have hx0 : 0 < x := by linarith
   have hn' : (n : ℝ) ≤ n0 := by exact_mod_cast hn
   have hD' : (1 : ℝ) ≤ D := by exact_mod_cast hD
@@ -38,8 +41,12 @@ private theorem kBound_le (K n n0 D : ℕ) (x : ℝ) (hx : 2 ≤ x) (hn : n ≤ 
   rw [mul_one]
   gcongr
 
-private theorem nrm_le (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [Algebra ℤ_[l] O] (hT : eO l O ≠ ⊤)
-    (a : ℕ∞) (m : ℕ) (h : a ≤ (m : ℕ∞) * eO l O) : a ≠ ⊤ ∧ Chr.nrm l O a ≤ m := by
+private theorem nrm_le
+    (l : ℕ) [Fact l.Prime]
+    (O : Type) [CommRing O] [Algebra ℤ_[l] O]
+    (hT : eO l O ≠ ⊤)
+    (a : ℕ∞) (m : ℕ) (h : a ≤ (m : ℕ∞) * eO l O)
+    : a ≠ ⊤ ∧ Chr.nrm l O a ≤ m := by
   obtain ⟨k, hk⟩ := ENat.ne_top_iff_exists.1 hT
   rw [← hk] at h
   have hmk : (m : ℕ∞) * (k : ℕ∞) = ((m * k : ℕ) : ℕ∞) := by push_cast; rfl
@@ -56,9 +63,10 @@ private theorem nrm_le (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [Algebra
   · rw [div_le_iff₀ (by exact_mod_cast hk0)]
     exact_mod_cast h'
 
-private theorem final_le (A n0 : ℕ) (x v y l N : ℝ) (hl : 1 ≤ l) (hN : 2 ≤ N) (hx : x = l * N)
-    (hy0 : 0 ≤ y) (hy : y ≤ l) (hv : v ≤ 2 * x ^ A + n0 * (2 * N)) :
-    v * y ≤ x ^ (A + n0 + 3) := by
+private theorem final_le
+    (A n0 : ℕ) (x v y l N : ℝ) (hl : 1 ≤ l) (hN : 2 ≤ N) (hx : x = l * N) (hy0 : 0 ≤ y) (hy : y ≤ l)
+    (hv : v ≤ 2 * x ^ A + n0 * (2 * N))
+    : v * y ≤ x ^ (A + n0 + 3) := by
   have h2n : ∀ m : ℕ, m + 1 ≤ 2 ^ m := by
     intro m
     induction m with
@@ -75,9 +83,10 @@ private theorem final_le (A n0 : ℕ) (x v y l N : ℝ) (hl : 1 ≤ l) (hN : 2 �
   have hpow : (2 : ℝ) ^ (n0 + 2) ≤ x ^ (n0 + 2) := pow_le_pow_left₀ (by norm_num) hx2 _
   have hA0 : 0 ≤ x ^ A := pow_nonneg hx0 A
   have hpos : 0 ≤ 2 * x ^ A + n0 * (2 * N) := by nlinarith
-  have e1 : x ^ A * l ≤ x ^ (A + 1) := by
-    rw [pow_succ]; exact mul_le_mul_of_nonneg_left hlx hA0
-  calc v * y ≤ (2 * x ^ A + n0 * (2 * N)) * y := mul_le_mul_of_nonneg_right hv hy0
+  have e1 : x ^ A * l ≤ x ^ (A + 1) := by rw [pow_succ]; exact mul_le_mul_of_nonneg_left hlx hA0
+  calc
+    v * y
+      ≤ (2 * x ^ A + n0 * (2 * N)) * y := mul_le_mul_of_nonneg_right hv hy0
     _ ≤ (2 * x ^ A + n0 * (2 * N)) * l := mul_le_mul_of_nonneg_left hy hpos
     _ = 2 * (x ^ A * l) + 2 * n0 * x := by rw [hx]; ring
     _ ≤ 2 * x ^ (A + 1) + 2 * n0 * x ^ (A + 1) := by nlinarith
@@ -87,11 +96,14 @@ private theorem final_le (A n0 : ℕ) (x v y l N : ℝ) (hl : 1 ≤ l) (hN : 2 �
     _ ≤ x ^ (A + 1) * x ^ (n0 + 2) := mul_le_mul_of_nonneg_left hpow hX0
     _ = x ^ (A + n0 + 3) := by rw [← pow_add]; congr 1; omega
 
-theorem UpperTheory.V.HV.countVs :
-    GlobalTheory.Published.PoitouTateDuality → LocalFinitenessK → LocalTateDualityK → ∀ CK : ℝ, LemmaK CK → CountVs := by
+theorem UpperTheory.V.HV.countVs
+    : GlobalTheory.Published.PoitouTateDuality → LocalFinitenessK → LocalTateDualityK
+      → ∀ CK : ℝ, LemmaK CK → CountVs := by
   intro hPT hLF hLT CK hK χ
   obtain ⟨M, hM⟩ : ∃ M : ℕ, M = (Bchi χ).sup id := ⟨_, rfl⟩
-  obtain ⟨n0, hn0⟩ : ∃ n0 : ℕ, n0 = 2 * ordC χ * (16 * ordC χ * (M * χ.N) ^ 2 * M ^ (2 * (4 * ordC χ).totient)) * M :=
+  obtain ⟨n0, hn0⟩
+      : ∃ n0 : ℕ,
+        n0 = 2 * ordC χ * (16 * ordC χ * (M * χ.N) ^ 2 * M ^ (2 * (4 * ordC χ).totient)) * M :=
     ⟨_, rfl⟩
   have hK' : LemmaK (⌈CK⌉₊ : ℝ) := Win.kmono CK _ (Nat.le_ceil CK) hK
   refine ⟨(2 * n0) ^ ⌈CK⌉₊ * (n0 + 1) + n0 + 3, ?_⟩
@@ -124,18 +136,28 @@ theorem UpperTheory.V.HV.countVs :
     intro σ hσ
     rw [MonoidHom.mem_ker] at hσ ⊢
     simp [Chr.dirG, hσ]
-  have hsha : shaLen D ((1 : ℕ) : ℤ) ≤ VLen D ((1 : ℕ) : ℤ) := PropA.shaLeV hPT hLF hLT L Ω l (Or.inl hl2) D _
+  have hsha : shaLen D ((1 : ℕ) : ℤ) ≤ VLen D ((1 : ℕ) : ℤ) :=
+    PropA.shaLeV hPT hLF hLT L Ω l (Or.inl hl2) D _
   have hkl := Win.klen _ hK' l L Ω D hMu 1 le_rfl
   obtain ⟨m1, hm1⟩ : ∃ m1 : ℕ, VLen D ((1 : ℕ) : ℤ) = m1 := ⟨_, (ENat.coe_toNat hkl.1).symm⟩
   have hup := Chr.upV ℚ Ω L l c.O D 1 (Chr.dirG ℚ Ω ψ) hgal Finset.univ hT
-  have hh0 := (Chr.H0_local_card_bounded_of_cls_ker_le_ker Ω l c.O h.N 1 (Chr.dirG ℚ Ω ψ) one_ne_zero hclsker).2
+  have hh0 :=
+    (Chr.H0_local_card_bounded_of_cls_ker_le_ker Ω l c.O h.N 1 (Chr.dirG ℚ Ω ψ) one_ne_zero
+      hclsker).2
   have heO : eO l c.O ≠ ⊤ := ne_top_of_le_ne_top (ENat.coe_ne_top _) (dvrFacts l c.O).2.2.2.2.2.2.1
-  have hV : Vlen Ω c 1 ψ ≤ ((m1 + (Finset.univ : Finset (L ≃ₐ[ℚ] L)).card *
-      LDataCardLeFinrank.nuBound l h.N 1 : ℕ) : ℕ∞) * eO l c.O := by
-    calc Vlen Ω c 1 ψ ≤ Chr.V l 1 (Chr.dirG ℚ Ω ψ) := Chr.V'_le_V (k := ℚ) (Ω := Ω) l h.N 1 (Chr.dirG ℚ Ω ψ)
+  have hV
+      : Vlen Ω c 1 ψ
+        ≤ ((m1 + (Finset.univ : Finset (L ≃ₐ[ℚ] L)).card * LDataCardLeFinrank.nuBound l h.N 1 : ℕ)
+            : ℕ∞)
+          * eO l c.O := by
+    calc
+      Vlen Ω c 1 ψ
+        ≤ Chr.V l 1 (Chr.dirG ℚ Ω ψ) := Chr.V'_le_V (k := ℚ) (Ω := Ω) l h.N 1 (Chr.dirG ℚ Ω ψ)
       _ ≤ _ := hup
-      _ ≤ VLen D ((1 : ℕ) : ℤ) * eO l c.O + ((Finset.univ : Finset (L ≃ₐ[ℚ] L)).card : ℕ∞) *
-            ((LDataCardLeFinrank.nuBound l h.N 1 : ℕ∞) * eO l c.O) := by gcongr
+      _ ≤ VLen D ((1 : ℕ) : ℤ) * eO l c.O
+          + ((Finset.univ : Finset (L ≃ₐ[ℚ] L)).card : ℕ∞)
+            * ((LDataCardLeFinrank.nuBound l h.N 1 : ℕ∞) * eO l c.O) := by
+        gcongr
       _ = _ := by rw [hm1]; push_cast; ring
   obtain ⟨hne, hnrm⟩ := nrm_le l c.O heO _ _ hV
   refine ⟨hne, ?_⟩
@@ -144,32 +166,45 @@ theorem UpperTheory.V.HV.countVs :
     have : (2 : ℝ) ≤ l := by exact_mod_cast hl2'
     have : (2 : ℝ) ≤ h.N := by exact_mod_cast hN2
     nlinarith
-  have hlogD : Real.log ((discr L).natAbs : ℝ) ≤ (Module.finrank ℚ L : ℝ) * Real.log ((l : ℝ) * h.N) := by
+  have hlogD
+      : Real.log ((discr L).natAbs : ℝ) ≤ (Module.finrank ℚ L : ℝ) * Real.log ((l : ℝ) * h.N) := by
     have := Win.disc L (l * h.N) (Nat.mul_pos (by omega) hNpos) hcyc
     push_cast at this
     exact this
-  have hkb := kBound_le ⌈CK⌉₊ (Module.finrank ℚ L) n0 (discr L).natAbs ((l : ℝ) * h.N) hx2 hdegn hD hlogD
-  have hnu : LDataCardLeFinrank.nuBound l h.N 1 ≤ 2 * h.N * 1 := (lossLe l h.N 0 1 hlp hl2 hN2 (Nat.zero_le _) le_rfl).2
-  have hv : Vn Ω c 1 ψ ≤ 2 * ((l : ℝ) * h.N) ^ ((2 * n0) ^ ⌈CK⌉₊ * (n0 + 1)) + n0 * (2 * (h.N : ℝ)) := by
+  have hkb :=
+    kBound_le ⌈CK⌉₊ (Module.finrank ℚ L) n0 (discr L).natAbs ((l : ℝ) * h.N) hx2 hdegn hD hlogD
+  have hnu : LDataCardLeFinrank.nuBound l h.N 1 ≤ 2 * h.N * 1 :=
+    (lossLe l h.N 0 1 hlp hl2 hN2 (Nat.zero_le _) le_rfl).2
+  have hv
+      : Vn Ω c 1 ψ
+        ≤ 2 * ((l : ℝ) * h.N) ^ ((2 * n0) ^ ⌈CK⌉₊ * (n0 + 1)) + n0 * (2 * (h.N : ℝ)) := by
     have hc1 : ((Finset.univ : Finset (L ≃ₐ[ℚ] L)).card : ℝ) ≤ n0 := by exact_mod_cast hcard
     have hc2 : (LDataCardLeFinrank.nuBound l h.N 1 : ℝ) ≤ 2 * h.N := by
-      have : (LDataCardLeFinrank.nuBound l h.N 1 : ℝ) ≤ ((2 * h.N * 1 : ℕ) : ℝ) := by exact_mod_cast hnu
+      have : (LDataCardLeFinrank.nuBound l h.N 1 : ℝ) ≤ ((2 * h.N * 1 : ℕ) : ℝ) := by
+        exact_mod_cast hnu
       push_cast at this
       linarith
     have hc3 : (m1 : ℝ) ≤ 2 * kBound (⌈CK⌉₊ : ℝ) 1 (Module.finrank ℚ L) (discr L).natAbs := by
       have := hkl.2
       rw [hm1, ENat.toNat_coe] at this
       exact this
-    calc Vn Ω c 1 ψ ≤ ((m1 + (Finset.univ : Finset (L ≃ₐ[ℚ] L)).card *
-          LDataCardLeFinrank.nuBound l h.N 1 : ℕ) : ℝ) := hnrm
-      _ = (m1 : ℝ) + ((Finset.univ : Finset (L ≃ₐ[ℚ] L)).card : ℝ) *
-          (LDataCardLeFinrank.nuBound l h.N 1 : ℝ) := by push_cast; ring
-      _ ≤ 2 * kBound (⌈CK⌉₊ : ℝ) 1 (Module.finrank ℚ L) (discr L).natAbs + n0 * (2 * (h.N : ℝ)) := by
-          gcongr
+    calc
+      Vn Ω c 1 ψ
+          ≤ ((m1 + (Finset.univ : Finset (L ≃ₐ[ℚ] L)).card * LDataCardLeFinrank.nuBound l h.N 1 : ℕ)
+            : ℝ) :=
+        hnrm
+      _ = (m1 : ℝ)
+          + ((Finset.univ : Finset (L ≃ₐ[ℚ] L)).card : ℝ)
+            * (LDataCardLeFinrank.nuBound l h.N 1 : ℝ) := by
+        push_cast; ring
+      _ ≤ 2 * kBound (⌈CK⌉₊ : ℝ) 1 (Module.finrank ℚ L) (discr L).natAbs
+          + n0 * (2 * (h.N : ℝ)) := by
+        gcongr
       _ ≤ _ := by linarith
   have hl1 : (1 : ℝ) ≤ l := by exact_mod_cast hlp.one_lt.le
   have hy0 : 0 ≤ Real.log (l : ℝ) := Real.log_nonneg hl1
   have hyl : Real.log (l : ℝ) ≤ l := (Real.log_le_sub_one_of_pos (by linarith)).trans (by linarith)
-  have hfin := final_le ((2 * n0) ^ ⌈CK⌉₊ * (n0 + 1)) n0 ((l : ℝ) * h.N) (Vn Ω c 1 ψ) (Real.log l) l h.N
-    hl1 (by exact_mod_cast hN2) rfl hy0 hyl hv
+  have hfin :=
+    final_le ((2 * n0) ^ ⌈CK⌉₊ * (n0 + 1)) n0 ((l : ℝ) * h.N) (Vn Ω c 1 ψ) (Real.log l) l h.N hl1
+      (by exact_mod_cast hN2) rfl hy0 hyl hv
   simpa using hfin

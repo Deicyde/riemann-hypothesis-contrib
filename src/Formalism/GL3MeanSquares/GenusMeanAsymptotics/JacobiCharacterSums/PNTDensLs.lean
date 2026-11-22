@@ -132,7 +132,8 @@ end Formalism.HermitianLattices.Ext.PrimesInProgressions.Dens.EtaPartialSums
 
 namespace Formalism.HermitianLattices.Ext.PrimesInProgressions.Dens
 
-open Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD Formalism.ZeroFreeDirichlet EtaPartialSums
+open Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD Formalism.ZeroFreeDirichlet
+  EtaPartialSums
 
 theorem eta_partial_sums : EtaPartial := by
   intro s hs hs1 N hN
@@ -149,12 +150,12 @@ theorem eta_partial_sums : EtaPartial := by
     have := div_nonneg (norm_nonneg s) hs.le
     linarith
   have h4 : 0 ≤ (N : ℝ) ^ (-s.re) := Real.rpow_nonneg hNpos.le _
-  calc 1 * (1 + ‖s‖ / s.re) * (((2 * N : ℕ) : ℝ) + 1) ^ (-s.re)
-      ≤ 1 * (1 + ‖s‖ / s.re) * (N : ℝ) ^ (-s.re) :=
-        mul_le_mul_of_nonneg_left h3 (by linarith)
+  calc
+    1 * (1 + ‖s‖ / s.re) * (((2 * N : ℕ) : ℝ) + 1) ^ (-s.re)
+      ≤ 1 * (1 + ‖s‖ / s.re) * (N : ℝ) ^ (-s.re) := mul_le_mul_of_nonneg_left h3 (by linarith)
     _ ≤ 4 * (1 + ‖s‖ / s.re) * (N : ℝ) ^ (-s.re) := by
-        have := mul_nonneg hq h4
-        nlinarith
+      have := mul_nonneg hq h4
+      nlinarith
 
 theorem principal_zeta_bound : PrincipalZeta := by
   intro M _ s hs hz
@@ -163,7 +164,9 @@ theorem principal_zeta_bound : PrincipalZeta := by
     · exact absurd rfl h
     · exact h
   have h := hz.2
-  rw [← DirichletCharacter.LFunctionTrivChar, DirichletCharacter.LFunctionTrivChar_eq_mul_riemannZeta hs1] at h
+  rw [← DirichletCharacter.LFunctionTrivChar,
+      DirichletCharacter.LFunctionTrivChar_eq_mul_riemannZeta hs1]
+    at h
   rcases mul_eq_zero.mp h with h | h
   · exfalso
     rw [Finset.prod_eq_zero_iff] at h

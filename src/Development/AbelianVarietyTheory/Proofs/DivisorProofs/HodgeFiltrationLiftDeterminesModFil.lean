@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianSchem
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.UPel.Sm GlobalTheory.Cris GlobalTheory.DeRham
 
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -25,15 +27,22 @@ theorem connectedSpace_sp_dualNumber (k : Type) [Field k] : ConnectedSpace (Sp (
     exact (IsLocalRing.specializes_closedPoint y).mem_closure
   exact ⟨inferInstance⟩
 
-theorem exists_dim {k : Type} [Field k] (A' : Over (Sp (DualNumber k))) [GrpObj A']
-    (hA' : IsAbelianScheme A') : ∃ g, SmoothOfRelativeDimension g A'.hom := by
+theorem exists_dim
+    {k : Type} [Field k] (A' : Over (Sp (DualNumber k))) [GrpObj A'] (hA' : IsAbelianScheme A')
+    : ∃ g, SmoothOfRelativeDimension g A'.hom := by
   have := hA'.smooth
   have := hA'.geomConnected
   have := connectedSpace_sp_dualNumber k
   have : ConnectedSpace A'.left := GeometricallyConnected.connectedSpace A'.hom A'.hom.isOpenMap
   exact exists_dim_of_preconnected A'.hom (Classical.arbitrary _)
 
-theorem isFilLift_iff_sub_mem : ∀ (k : Type) [Field k] (A₀ : Over (Sp k)) [GrpObj A₀] (A' : Over (Sp (DualNumber k))) [GrpObj A'] (i : A₀.left ⟶ A'.left) (h : IsGrpPullback A₀ A' (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) i), IsAbelianScheme A' → ∀ x ∈ Fil A₀, ∀ y y' : HdR A₀, IsFilLift h x y → (IsFilLift h x y' ↔ y' - y ∈ Fil A₀) := by
+theorem isFilLift_iff_sub_mem
+    : ∀ (k : Type) [Field k] (A₀ : Over (Sp k)) [GrpObj A₀] (A' : Over (Sp (DualNumber k)))
+        [GrpObj A'] (i : A₀.left ⟶ A'.left)
+        (h : IsGrpPullback A₀ A' (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) i),
+      IsAbelianScheme A'
+        → ∀ x ∈ Fil A₀, ∀ y y' : HdR A₀,
+          IsFilLift h x y → (IsFilLift h x y' ↔ y' - y ∈ Fil A₀) := by
   intro k _ A₀ _ A' _ i h hA' x hx y y' hy
   obtain ⟨g, hg⟩ := exists_dim A' hA'
   have P := GlobalTheory.abelianDeRham
@@ -45,9 +54,12 @@ theorem isFilLift_iff_sub_mem : ∀ (k : Type) [Field k] (A₀ : Over (Sp k)) [G
       refine ⟨⟨fun x y => Over.OverMorphism.ext (h.1.hom_ext ?_ (by rw [Over.w, Over.w]))⟩⟩
       rw [← h.2 T x y (pushPt h.1.w x) (pushPt h.1.w y) rfl rfl,
         ← h.2 T y x (pushPt h.1.w y) (pushPt h.1.w x) rfl rfl, _root_.mul_comm]
-    exact ⟨hc, MorphismProperty.of_isPullback (P := @Smooth) h.1 hA'.smooth,
+    exact ⟨
+      hc,
+      MorphismProperty.of_isPullback (P := @Smooth) h.1 hA'.smooth,
       MorphismProperty.of_isPullback (P := @IsProper) h.1 hA'.proper,
-      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hA'.geomConnected⟩
+      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hA'.geomConnected
+    ⟩
   have g₀ := (smoothOfRelativeDimension_isStableUnderBaseChange g).of_isPullback h.1 hg
   have hL := (P.2.1 k A₀ g hA₀ g₀).1
   have reg := ksRegular_of_isAbelianScheme P h hA' hg
@@ -62,7 +74,11 @@ theorem isFilLift_iff_sub_mem : ∀ (k : Type) [Field k] (A₀ : Over (Sp k)) [G
     obtain ⟨v, ⟨z, hz', -⟩, -⟩ := reg (y' - y) hz
     obtain ⟨d, hd, e⟩ := hy
     obtain ⟨d', hd', e'⟩ := hz'
-    refine ⟨d + (TrivSqZeroExt.inr 1 : DualNumber k) • d', add_mem hd (Submodule.smul_mem _ _ hd'), fun c ↦ ?_⟩
+    refine ⟨
+      d + (TrivSqZeroExt.inr 1 : DualNumber k) • d',
+      add_mem hd (Submodule.smul_mem _ _ hd'),
+      fun c ↦ ?_
+    ⟩
     rw [LinearMap.add_apply, LinearMap.smul_apply, e, e', smul_eq_mul]
     ext <;> simp
 

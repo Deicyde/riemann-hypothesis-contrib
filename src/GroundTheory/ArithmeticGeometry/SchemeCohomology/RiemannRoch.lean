@@ -21,7 +21,9 @@ namespace GroundTheory.Arith.SchemeCoh
 
 open GroundTheory.FunctionField
 
-variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (.of k))]
+variable
+  {k : Type u} [Field k]
+  {X : Scheme.{u}} [X.Over (Spec (.of k))]
   [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
 
 variable [IsIntegral X] [IsProper (X ↘ Spec (.of k))] [IsNormalScheme X]
@@ -30,11 +32,10 @@ section Instances
 
 variable (hX : topologicalKrullDim X = 1)
 
-
 omit [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})] in
 include hX in
-theorem curve_instances :
-    IsNoetherian X ∧ IsLocallyFactorial X ∧ IsFunctionField k X.functionField := by
+theorem curve_instances
+    : IsNoetherian X ∧ IsLocallyFactorial X ∧ IsFunctionField k X.functionField := by
   have : IsNoetherian X := isNoetherian_of_finiteType (k := k) X
   exact ⟨this, isLocallyFactorial_of_dim_le_one hX.le, isFunctionField X hX⟩
 
@@ -42,14 +43,13 @@ end Instances
 
 section Genus
 
-
-
 end Genus
 
 section Degree
 
-noncomputable def sheafDegree (hX : topologicalKrullDim X = 1) {L : X.Modules}
-    (hL : IsInvertibleSheaf L) : ℤ :=
+noncomputable def sheafDegree
+    (hX : topologicalKrullDim X = 1) {L : X.Modules} (hL : IsInvertibleSheaf L)
+    : ℤ :=
   haveI := (curve_instances (k := k) hX).1
   haveI := (curve_instances (k := k) hX).2.1
   invertibleDegree (k := k) hL

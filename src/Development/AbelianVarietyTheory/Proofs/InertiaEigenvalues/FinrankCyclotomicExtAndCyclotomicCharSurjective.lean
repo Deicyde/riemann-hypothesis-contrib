@@ -18,21 +18,22 @@ open scoped IntermediateField
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem aeval_ne_zero_of_norm_eq (K : FinExt l) (N : ℕ) (π : Om l)
-    (hπ : ‖π‖ = (l : ℝ) ^ (-(1 : ℝ) / (N : ℝ))) (p : (↥(K0 K))[X]) (hp : p ≠ 0)
-    (hd : p.natDegree < N) : aeval π p ≠ 0 := by
+theorem aeval_ne_zero_of_norm_eq
+    (K : FinExt l)
+    (N : ℕ) (π : Om l) (hπ : ‖π‖ = (l : ℝ) ^ (-(1 : ℝ) / (N : ℝ)))
+    (p : (↥(K0 K))[X]) (hp : p ≠ 0) (hd : p.natDegree < N)
+    : aeval π p ≠ 0 := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   have hl0 : (0 : ℝ) < l := by linarith
   have hN : (0 : ℝ) < N := by exact_mod_cast (Nat.zero_le _).trans_lt hd
-  have hπ0 : π ≠ 0 := by
-    rw [← norm_pos_iff, hπ]; positivity
-  have key : ∀ i ∈ p.support, ∃ n : ℤ,
-      ‖p.coeff i • π ^ i‖ = (l : ℝ) ^ ((n : ℝ) - (i : ℝ) / N) := by
+  have hπ0 : π ≠ 0 := by rw [← norm_pos_iff, hπ]; positivity
+  have key : ∀ i ∈ p.support, ∃ n : ℤ, ‖p.coeff i • π ^ i‖ = (l : ℝ) ^ ((n : ℝ) - (i : ℝ) / N) := by
     intro i hi
     have h0 : ((p.coeff i : ↥(K0 K)) : Om l) ≠ 0 := by
       have := mem_support_iff.1 hi
       exact fun h => this (Subtype.ext h)
-    obtain ⟨n, hn⟩ := GlobalTheory.T.norm_eq_zpow_of_mem_maxUnramifiedSubfield l K _ (p.coeff i).2 h0
+    obtain ⟨n, hn⟩ :=
+      GlobalTheory.T.norm_eq_zpow_of_mem_maxUnramifiedSubfield l K _ (p.coeff i).2 h0
     refine ⟨n, ?_⟩
     change ‖((p.coeff i : ↥(K0 K)) : Om l) * π ^ i‖ = _
     rw [norm_mul, norm_pow, hn, hπ, ← Real.rpow_natCast, ← Real.rpow_mul hl0.le,
@@ -55,7 +56,8 @@ theorem aeval_ne_zero_of_norm_eq (K : FinExt l) (N : ℕ) (π : Om l)
     have hk' : k < N := (le_natDegree_of_mem_supp k hk).trans_lt hd
     have h5 : (i : ℤ) - k = 0 := by
       apply Int.eq_zero_of_abs_lt_dvd (m := N) ⟨n - m, by rw [← h4]; ring⟩
-      rw [abs_lt]; constructor <;> omega
+      rw [abs_lt]
+      constructor <;> omega
     omega
   intro h
   rw [aeval_eq_sum_range' (Nat.lt_succ_self _)] at h
@@ -74,8 +76,9 @@ theorem aeval_ne_zero_of_norm_eq (K : FinExt l) (N : ℕ) (π : Om l)
   rw [hn] at h8
   exact absurd h8 (not_le.2 (by positivity))
 
-theorem minpoly_unramifiedSubfield_eq_cyclotomic (K : FinExt l) (j : ℕ) (hj : 1 ≤ j) (ζ : Om l)
-    (hζ : IsPrimitiveRoot ζ (l ^ j)) : minpoly ↥(K0 K) ζ = cyclotomic (l ^ j) ↥(K0 K) := by
+theorem minpoly_unramifiedSubfield_eq_cyclotomic
+    (K : FinExt l) (j : ℕ) (hj : 1 ≤ j) (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ j))
+    : minpoly ↥(K0 K) ζ = cyclotomic (l ^ j) ↥(K0 K) := by
   have hlp : l.Prime := Fact.out
   have hpos : 0 < l ^ j := pow_pos hlp.pos j
   have hint : IsIntegral ↥(K0 K) ζ := Algebra.IsIntegral.isIntegral ζ
@@ -83,8 +86,9 @@ theorem minpoly_unramifiedSubfield_eq_cyclotomic (K : FinExt l) (j : ℕ) (hj : 
     rw [aeval_def, eval₂_eq_eval_map, map_cyclotomic]
     exact hζ.isRoot_cyclotomic hpos
   have hnorm : ‖ζ - 1‖ = (l : ℝ) ^ (-(1 : ℝ) / ((Nat.totient (l ^ j) : ℕ) : ℝ)) := by
-    have h1 := GlobalTheory.T.norm_primitiveRoot_primePow_sub_one_padicComplex l j hj (ζ : PadicComplex l)
-      (hζ.map_of_injective (f := algebraMap (Om l) (PadicComplex l)) (RingHom.injective _))
+    have h1 :=
+      GlobalTheory.T.norm_primitiveRoot_primePow_sub_one_padicComplex l j hj (ζ : PadicComplex l)
+        (hζ.map_of_injective (f := algebraMap (Om l) (PadicComplex l)) (RingHom.injective _))
     rw [Nat.totient_prime_pow hlp hj]
     push_cast [Nat.cast_sub hlp.one_le]
     rw [← h1, ← PadicComplex.norm_extends]
@@ -109,9 +113,8 @@ theorem exists_primitiveRoot_Om (j : ℕ) : ∃ ζ : Om l, IsPrimitiveRoot ζ (l
   haveI : CharZero (Om l) := algebraRat.charZero _
   exact HasEnoughRootsOfUnity.exists_primitiveRoot (Om l) (l ^ j)
 
-theorem Ks_eq_restrictScalars (K : FinExt l) (j : ℕ) (ζ : Om l)
-    (hζ : IsPrimitiveRoot ζ (l ^ j)) :
-    Ks K j = ((↥(K0 K))⟮ζ⟯).restrictScalars ℚ_[l] := by
+theorem Ks_eq_restrictScalars (K : FinExt l) (j : ℕ) (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ j))
+    : Ks K j = ((↥(K0 K))⟮ζ⟯).restrictScalars ℚ_[l] := by
   have hlp : l.Prime := Fact.out
   haveI : NeZero (l ^ j) := ⟨(pow_pos hlp.pos j).ne'⟩
   rw [IntermediateField.restrictScalars_adjoin_eq_sup, Ks]
@@ -123,9 +126,8 @@ theorem Ks_eq_restrictScalars (K : FinExt l) (j : ℕ) (ζ : Om l)
     exact pow_mem (IntermediateField.mem_adjoin_simple_self _ ζ) i
   · exact IntermediateField.adjoin.mono _ _ _ (Set.singleton_subset_iff.2 hζ.pow_eq_one)
 
-theorem finrank_Ks (K : FinExt l) (j : ℕ) (hj : 1 ≤ j) :
-    Module.finrank ℚ_[l] ↥(Ks K j) =
-      Module.finrank ℚ_[l] ↥(K0 K) * ((l - 1) * l ^ (j - 1)) := by
+theorem finrank_Ks (K : FinExt l) (j : ℕ) (hj : 1 ≤ j)
+    : Module.finrank ℚ_[l] ↥(Ks K j) = Module.finrank ℚ_[l] ↥(K0 K) * ((l - 1) * l ^ (j - 1)) := by
   have hlp : l.Prime := Fact.out
   obtain ⟨ζ, hζ⟩ := exists_primitiveRoot_Om (l := l) j
   have hint : IsIntegral ↥(K0 K) ζ := Algebra.IsIntegral.isIntegral ζ
@@ -136,9 +138,12 @@ theorem finrank_Ks (K : FinExt l) (j : ℕ) (hj : 1 ≤ j) :
   rw [← h1]
   exact (Module.finrank_mul_finrank ℚ_[l] ↥(K0 K) ↥((↥(K0 K))⟮ζ⟯)).symm
 
-theorem exists_chi_approx (K : FinExt l) (χ : GQ l →* ℚ_[l]ˣ) (hχ : IsCyc χ) (u : ℚ_[l])
-    (hu : ‖u‖ = 1) (j : ℕ) (hj : 1 ≤ j) :
-    ∃ g ∈ (K0 K).fixingSubgroup, ‖(χ g : ℚ_[l]) - u‖ ≤ (l : ℝ) ^ (-(j : ℤ)) := by
+theorem exists_chi_approx
+    (K : FinExt l)
+    (χ : GQ l →* ℚ_[l]ˣ) (hχ : IsCyc χ)
+    (u : ℚ_[l]) (hu : ‖u‖ = 1)
+    (j : ℕ) (hj : 1 ≤ j)
+    : ∃ g ∈ (K0 K).fixingSubgroup, ‖(χ g : ℚ_[l]) - u‖ ≤ (l : ℝ) ^ (-(j : ℤ)) := by
   have hlp : l.Prime := Fact.out
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hlp.one_lt
   have hpos : 0 < l ^ j := pow_pos hlp.pos j
@@ -166,7 +171,8 @@ theorem exists_chi_approx (K : FinExt l) (χ : GQ l →* ℚ_[l]ˣ) (hχ : IsCyc
   have hζa := hζ.pow_of_coprime a hcop
   have hconj : IsConjRoot ↥(K0 K) (ζ ^ a) ζ := by
     unfold IsConjRoot
-    rw [minpoly_unramifiedSubfield_eq_cyclotomic K j hj ζ hζ, minpoly_unramifiedSubfield_eq_cyclotomic K j hj _ hζa]
+    rw [minpoly_unramifiedSubfield_eq_cyclotomic K j hj ζ hζ,
+      minpoly_unramifiedSubfield_eq_cyclotomic K j hj _ hζa]
   obtain ⟨σ, hσ⟩ := hconj.exists_algEquiv
   refine ⟨σ.restrictScalars ℚ_[l], fun x => σ.commutes x, ?_⟩
   obtain ⟨b, hb, hb'⟩ := hχ (σ.restrictScalars ℚ_[l]) j ζ hζ.pow_eq_one
@@ -175,18 +181,19 @@ theorem exists_chi_approx (K : FinExt l) (χ : GQ l →* ℚ_[l]ˣ) (hχ : IsCyc
     rw [hζ.eq_orderOf]
     exact (hζ.isOfFinOrder hpos.ne').pow_eq_pow_iff_modEq.1 hab
   have hba : ‖(b : ℚ_[l]) - a‖ ≤ (l : ℝ) ^ (-(j : ℤ)) := by
-    have := (Padic.norm_int_le_pow_iff_dvd ((b : ℤ) - a) j (p := l)).2
-      (by exact_mod_cast hmod.dvd)
+    have := (Padic.norm_int_le_pow_iff_dvd ((b : ℤ) - a) j (p := l)).2 (by exact_mod_cast hmod.dvd)
     simpa using this
-  have h1 : (χ (σ.restrictScalars ℚ_[l]) : ℚ_[l]) - u =
-      ((χ (σ.restrictScalars ℚ_[l]) : ℚ_[l]) - b) + (((b : ℚ_[l]) - a) + -(u - a)) := by ring
+  have h1
+      : (χ (σ.restrictScalars ℚ_[l]) : ℚ_[l]) - u
+        = ((χ (σ.restrictScalars ℚ_[l]) : ℚ_[l]) - b) + (((b : ℚ_[l]) - a) + -(u - a)) := by
+    ring
   rw [h1]
   refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hb ?_)
   refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hba ?_)
   rwa [norm_neg]
 
-theorem exists_chi_eq (K : FinExt l) (χ : GQ l →* ℚ_[l]ˣ) (hχ : IsCyc χ) (u : ℚ_[l])
-    (hu : ‖u‖ = 1) : ∃ g ∈ (K0 K).fixingSubgroup, (χ g : ℚ_[l]) = u := by
+theorem exists_chi_eq (K : FinExt l) (χ : GQ l →* ℚ_[l]ˣ) (hχ : IsCyc χ) (u : ℚ_[l]) (hu : ‖u‖ = 1)
+    : ∃ g ∈ (K0 K).fixingSubgroup, (χ g : ℚ_[l]) = u := by
   have hlp : l.Prime := Fact.out
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hlp.one_lt
   have hcont := (cyc_basic l χ hχ).2.1
@@ -210,11 +217,14 @@ theorem exists_chi_eq (K : FinExt l) (χ : GQ l →* ℚ_[l]ˣ) (hχ : IsCyc χ)
     exact zpow_le_zpow_right₀ hl1.le (by push_cast; omega)
   exact hmem
 
-theorem finrank_Ks_and_chi_surjective : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l),
-    (∀ j : ℕ, 1 ≤ j → Module.finrank ℚ_[l] ↥(Ks K j) =
-      Module.finrank ℚ_[l] ↥(K0 K) * ((l - 1) * l ^ (j - 1))) ∧
-    ∀ χ : GQ l →* ℚ_[l]ˣ, IsCyc χ → ∀ u : ℚ_[l], ‖u‖ = 1 →
-      ∃ g ∈ (K0 K).fixingSubgroup, (χ g : ℚ_[l]) = u :=
+theorem finrank_Ks_and_chi_surjective
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l),
+      (∀ j : ℕ,
+          1 ≤ j
+            → Module.finrank ℚ_[l] ↥(Ks K j)
+              = Module.finrank ℚ_[l] ↥(K0 K) * ((l - 1) * l ^ (j - 1)))
+        ∧ ∀ χ : GQ l →* ℚ_[l]ˣ,
+          IsCyc χ → ∀ u : ℚ_[l], ‖u‖ = 1 → ∃ g ∈ (K0 K).fixingSubgroup, (χ g : ℚ_[l]) = u :=
   fun _ _ K => ⟨finrank_Ks K, exists_chi_eq K⟩
 
 end GlobalTheory.Cyc

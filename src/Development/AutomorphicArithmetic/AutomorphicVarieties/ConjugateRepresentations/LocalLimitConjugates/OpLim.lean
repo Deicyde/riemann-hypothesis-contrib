@@ -7,13 +7,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
+open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
 open UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Lit.Dr
 open scoped TensorProduct GlobalTheory.CuspRep.CuspidalL2GL
 open UpperTheory.V.Cj UpperTheory.V.Cj.H
 
-theorem UpperTheory.V.Cj.H.opLim :
-    UpperTheory.V.Cj.H.OpLim := by
+theorem UpperTheory.V.Cj.H.opLim : UpperTheory.V.Cj.H.OpLim := by
   intro E _ _ _ a ha μ _ _ T P hT hP hlim T' P' hT' hP' φ hφ
   induction hφ using Submodule.span_induction with
   | mem φ h =>
@@ -26,7 +26,8 @@ theorem UpperTheory.V.Cj.H.opLim :
       liftCv E a ha μ (T k) (hT k) (T' k) (hT' k) ψ φ F hψ hF
     have h2 : (P' φ).1 = cv ψ.1 (P F) := liftCv E a ha μ P hP P' hP' ψ φ F hψ hF
     have h3 : Tendsto (fun k => B * ‖P F - T k F‖) atTop (𝓝 0) := by
-      have h4 : Tendsto (fun k => P F - T k F) atTop (𝓝 (P F - P F)) := tendsto_const_nhds.sub (hlim F)
+      have h4 : Tendsto (fun k => P F - T k F) atTop (𝓝 (P F - P F)) :=
+        tendsto_const_nhds.sub (hlim F)
       have h5 := h4.norm.const_mul B
       simpa using h5
     rw [Metric.tendstoUniformlyOn_iff]

@@ -12,22 +12,30 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory Filter Asymptotics
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory
+  Filter Asymptotics
 
 noncomputable section
 
-theorem top_sub_top_mixPot (I : AllFam) (hI : I.IsFamily) {D : ℕ} {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type}
-    [Fintype κ] {x : Ix κ → Ω} {m₀ m₁ : ConeMetric ℂ (Ix κ)}
+theorem top_sub_top_mixPot
+    (I : AllFam) (hI : I.IsFamily)
+    {D : ℕ} {Ω : Type} [Field Ω] [CharZero Ω]
+    {κ : Type} [Fintype κ]
+    {x : Ix κ → Ω} {m₀ m₁ : ConeMetric ℂ (Ix κ)}
     (hP : IsArithVar (ι := GlobalTheory κ) (coordIdeal ℤ x) (D + 1)) (hs₀ : IsSmoothMetric m₀)
-    (hs₁ : IsSmoothMetric m₁) :
-    top I x m₁ D - top I x m₀ D = ∑ i ∈ Finset.range (D + 1),
-      ptsIntegral (ι := GlobalTheory κ) (coordIdeal ℤ x) (mixPot m₀ m₁ D i) (logRatio m₀ m₁) := by
+    (hs₁ : IsSmoothMetric m₁)
+    : top I x m₁ D - top I x m₀ D
+      = ∑ i ∈ Finset.range (D + 1),
+        ptsIntegral (ι := GlobalTheory κ) (coordIdeal ℤ x) (mixPot m₀ m₁ D i) (logRatio m₀ m₁) := by
   classical
   have hB := tele_smooth_ratio hs₀ hs₁
   have hsymm := (hI Unit (GlobalTheory κ)).1
   have hadd := (hI Unit (GlobalTheory κ)).2.1
-  have htel := Finset.sum_range_sub
-    (fun i => I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1) (tele_fam m₀ m₁ (D + 1) i)) (D + 1)
+  have htel :=
+    Finset.sum_range_sub
+      (fun i => I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1) (tele_fam m₀ m₁ (D + 1) i))
+      (D + 1)
   have hT0 : tele_fam m₀ m₁ (D + 1) 0 = fun _ => HermLine.ofCone m₀ := by
     funext j
     simp [tele_fam]
@@ -39,20 +47,20 @@ theorem top_sub_top_mixPot (I : AllFam) (hI : I.IsFamily) {D : ℕ} {Ω : Type} 
   rw [← htel]
   refine Finset.sum_congr rfl fun i hi => ?_
   rw [Finset.mem_range] at hi
-  have e1 : I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1) (tele_fam m₀ m₁ (D + 1) (i + 1)) =
-      I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1)
-        (Fin.snoc (tele_fam m₀ m₁ D i) (HermLine.ofCone m₁)) := by
+  have e1
+      : I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1) (tele_fam m₀ m₁ (D + 1) (i + 1))
+        = I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1)
+          (Fin.snoc (tele_fam m₀ m₁ D i) (HermLine.ofCone m₁)) := by
     rw [← tele_fam_succAbove m₀ m₁ D i hi (i + 1) (Or.inr rfl)]
-    have : HermLine.ofCone m₁ = tele_fam m₀ m₁ (D + 1) (i + 1) ⟨i, hi⟩ := by
-      simp [tele_fam]
+    have : HermLine.ofCone m₁ = tele_fam m₀ m₁ (D + 1) (i + 1) ⟨i, hi⟩ := by simp [tele_fam]
     rw [this, ← tele_comp_perm]
     exact (hsymm _ _ _ _ hP (tele_fam_smooth hs₀ hs₁ _ _)).symm
-  have e0 : I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1) (tele_fam m₀ m₁ (D + 1) i) =
-      I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1)
-        (Fin.snoc (tele_fam m₀ m₁ D i) (HermLine.ofCone m₀)) := by
+  have e0
+      : I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1) (tele_fam m₀ m₁ (D + 1) i)
+        = I Unit (GlobalTheory κ) (coordIdeal ℤ x) (D + 1)
+          (Fin.snoc (tele_fam m₀ m₁ D i) (HermLine.ofCone m₀)) := by
     rw [← tele_fam_succAbove m₀ m₁ D i hi i (Or.inl rfl)]
-    have : HermLine.ofCone m₀ = tele_fam m₀ m₁ (D + 1) i ⟨i, hi⟩ := by
-      simp [tele_fam]
+    have : HermLine.ofCone m₀ = tele_fam m₀ m₁ (D + 1) i ⟨i, hi⟩ := by simp [tele_fam]
     rw [this, ← tele_comp_perm]
     exact (hsymm _ _ _ _ hP (tele_fam_smooth hs₀ hs₁ _ _)).symm
   rw [e1, e0, tele_ofCone_tensor m₀ m₁,
@@ -65,9 +73,10 @@ theorem top_sub_top_mixPot (I : AllFam) (hI : I.IsFamily) {D : ℕ} {Ω : Type} 
   rw [hpot]
   rfl
 
-theorem DefectMetricChange.proof (hR : RealGramComparison.Statement)
-    (hC : ComplexGramMetricChange.Statement) (hM : ResolutionMixedIntegral.Statement) :
-    DefectMetricChange.Statement := by
+theorem DefectMetricChange.proof
+    (hR : RealGramComparison.Statement) (hC : ComplexGramMetricChange.Statement)
+    (hM : ResolutionMixedIntegral.Statement)
+    : DefectMetricChange.Statement := by
   intro D Ω _ _ κ _ I d m₁ P0₁ hs hc hle hp e hI he
   have h₁ := hR D Ω κ (d.withMetric m₁ P0₁ hs hc hle hp) e he
   have h₀ := hR D Ω κ d e he

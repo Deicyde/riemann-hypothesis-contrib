@@ -10,16 +10,17 @@ namespace GroundTheory.Arith.Abelian
 open Polynomial WeierstrassCurve WeierstrassCurve.Affine
 open scoped Polynomial.Bivariate
 
-private theorem eq_of_mul_sub_eq_zero {R : Type*} [CommRing R] [IsDomain R] {M x y : R}
-    (hM : M ≠ 0) (h : M * (x - y) = 0) : x = y :=
+private theorem eq_of_mul_sub_eq_zero
+    {R : Type*} [CommRing R] [IsDomain R] {M x y : R} (hM : M ≠ 0) (h : M * (x - y) = 0)
+    : x = y :=
   sub_eq_zero.mp ((mul_eq_zero.mp h).resolve_left hM)
 
 section Sequence
 
 variable {R : Type*} [CommRing R] [IsDomain R]
 
-theorem normEDS_eq_zero_iff_of_three {b d : R} (hb : b ≠ 0) (hd : d ≠ 0) (n : ℤ) :
-    normEDS b 0 d n = 0 ↔ (3 : ℤ) ∣ n := by
+theorem normEDS_eq_zero_iff_of_three {b d : R} (hb : b ≠ 0) (hd : d ≠ 0) (n : ℤ)
+    : normEDS b 0 d n = 0 ↔ (3 : ℤ) ∣ n := by
   have nat : ∀ k : ℕ, normEDS b 0 d k = 0 ↔ (3 : ℤ) ∣ k := by
     intro k
     induction k using normEDSRec' with
@@ -38,12 +39,14 @@ theorem normEDS_eq_zero_iff_of_three {b d : R} (hb : b ≠ 0) (hd : d ≠ 0) (n 
       have z5 := ih (m + 5) (by omega)
       push_cast at z1 z2 z3 z4 z5 ⊢
       rw [show (m : ℤ) + 3 - 1 = m + 2 by ring, show (m : ℤ) + 3 + 2 = m + 5 by ring,
-        show (m : ℤ) + 3 - 2 = m + 1 by ring, show (m : ℤ) + 3 + 1 = m + 4 by ring] at key
+          show (m : ℤ) + 3 - 2 = m + 1 by ring, show (m : ℤ) + 3 + 1 = m + 4 by ring]
+        at key
       rcases (by omega : (m : ℤ) % 3 = 0 ∨ (m : ℤ) % 3 = 1 ∨ (m : ℤ) % 3 = 2) with hm | hm | hm
       · have e3 : normEDS b 0 d ((m : ℤ) + 3) = 0 := z3.mpr (by omega)
         rw [e3] at key
         simp only [mul_zero, zero_mul, sub_zero, mul_eq_zero, hb, or_false] at key
-        simp only [key, true_iff]; omega
+        simp only [key, true_iff]
+        omega
       · have e5 : normEDS b 0 d ((m : ℤ) + 5) = 0 := z5.mpr (by omega)
         have n1 : normEDS b 0 d ((m : ℤ) + 1) ≠ 0 := fun h => by have := z1.mp h; omega
         have n3 : normEDS b 0 d ((m : ℤ) + 3) ≠ 0 := fun h => by have := z3.mp h; omega
@@ -52,7 +55,8 @@ theorem normEDS_eq_zero_iff_of_three {b d : R} (hb : b ≠ 0) (hd : d ≠ 0) (n 
         constructor
         · intro h
           rw [h, zero_mul] at key
-          exact absurd key.symm (neg_ne_zero.mpr (mul_ne_zero (mul_ne_zero n1 n3) (pow_ne_zero _ n4)))
+          exact absurd key.symm
+            (neg_ne_zero.mpr (mul_ne_zero (mul_ne_zero n1 n3) (pow_ne_zero _ n4)))
         · intro h; omega
       · have e1 : normEDS b 0 d ((m : ℤ) + 1) = 0 := z1.mpr (by omega)
         have n2 : normEDS b 0 d ((m : ℤ) + 2) ≠ 0 := fun h => by have := z2.mp h; omega
@@ -72,7 +76,8 @@ theorem normEDS_eq_zero_iff_of_three {b d : R} (hb : b ≠ 0) (hd : d ≠ 0) (n 
       have z4 := ih (m + 4) (by omega)
       push_cast at z1 z2 z3 z4 ⊢
       rw [show (m : ℤ) + 2 + 2 = m + 4 by ring, show (m : ℤ) + 2 - 1 = m + 1 by ring,
-        show (m : ℤ) + 2 + 1 = m + 3 by ring] at key
+          show (m : ℤ) + 2 + 1 = m + 3 by ring]
+        at key
       rw [key]
       rcases (by omega : (m : ℤ) % 3 = 0 ∨ (m : ℤ) % 3 = 1 ∨ (m : ℤ) % 3 = 2) with hm | hm | hm
       · have e3 : normEDS b 0 d ((m : ℤ) + 3) = 0 := z3.mpr (by omega)
@@ -98,7 +103,6 @@ theorem normEDS_eq_zero_iff_of_three {b d : R} (hb : b ≠ 0) (hd : d ≠ 0) (n 
   · exact nat k
   · rw [normEDS_neg, neg_eq_zero, nat k, dvd_neg]
 
-
 omit [IsDomain R] in
 theorem normEDS_zero_left_of_even (c d : R) {n : ℤ} (hn : Even n) : normEDS 0 c d n = 0 := by
   simp [normEDS, hn]
@@ -109,28 +113,27 @@ section Values
 
 variable {R : Type*} [CommRing R] (W : WeierstrassCurve R)
 
-noncomputable def psiAt (x y : R) (n : ℤ) : R :=
-  (W.ψ n).evalEval x y
+noncomputable def psiAt (x y : R) (n : ℤ) : R := (W.ψ n).evalEval x y
 
-theorem psiAt_eq (x y : R) (n : ℤ) :
-    psiAt W x y n =
-      normEDS (2 * y + W.a₁ * x + W.a₃) (W.Ψ₃.eval x) (W.preΨ₄.eval x) n := by
+theorem psiAt_eq (x y : R) (n : ℤ)
+    : psiAt W x y n = normEDS (2 * y + W.a₁ * x + W.a₃) (W.Ψ₃.eval x) (W.preΨ₄.eval x) n := by
   rw [psiAt, WeierstrassCurve.ψ, ← coe_evalEvalRingHom, map_normEDS]
   simp only [coe_evalEvalRingHom, ψ₂, evalEval_polynomialY, evalEval_C]
 
-theorem psiAt_somos (x y : R) (n : ℤ) :
-    psiAt W x y (n + 2) * psiAt W x y (n - 2) =
-      (2 * y + W.a₁ * x + W.a₃) ^ 2 * psiAt W x y (n + 1) * psiAt W x y (n - 1) -
-        W.Ψ₃.eval x * psiAt W x y n ^ 2 := by
+theorem psiAt_somos (x y : R) (n : ℤ)
+    : psiAt W x y (n + 2) * psiAt W x y (n - 2)
+      = (2 * y + W.a₁ * x + W.a₃) ^ 2 * psiAt W x y (n + 1) * psiAt W x y (n - 1)
+        - W.Ψ₃.eval x * psiAt W x y n ^ 2 := by
   simp only [psiAt_eq]
   exact normEDS_somos ..
 
-theorem psiAt_invariant (x y : R) (n : ℤ) :
-    W.Ψ₃.eval x * (psiAt W x y (n + 2) * psiAt W x y (n - 1) ^ 2 +
-        psiAt W x y (n - 2) * psiAt W x y (n + 1) ^ 2) =
-      ((2 * y + W.a₁ * x + W.a₃) ^ 4 + W.preΨ₄.eval x) * psiAt W x y (n - 1) *
-          psiAt W x y n * psiAt W x y (n + 1) -
-        (2 * y + W.a₁ * x + W.a₃) ^ 2 * W.Ψ₃.eval x * psiAt W x y n ^ 3 := by
+theorem psiAt_invariant (x y : R) (n : ℤ)
+    : W.Ψ₃.eval x
+        * (psiAt W x y (n + 2) * psiAt W x y (n - 1) ^ 2
+          + psiAt W x y (n - 2) * psiAt W x y (n + 1) ^ 2)
+      = ((2 * y + W.a₁ * x + W.a₃) ^ 4 + W.preΨ₄.eval x) * psiAt W x y (n - 1) * psiAt W x y n
+          * psiAt W x y (n + 1)
+        - (2 * y + W.a₁ * x + W.a₃) ^ 2 * W.Ψ₃.eval x * psiAt W x y n ^ 3 := by
   simp only [psiAt_eq]
   exact normEDS_invariant ..
 
@@ -139,47 +142,49 @@ theorem psiAt_one (x y : R) : psiAt W x y 1 = 1 := by simp [psiAt_eq, normEDS_on
 theorem psiAt_two (x y : R) : psiAt W x y 2 = 2 * y + W.a₁ * x + W.a₃ := by
   simp [psiAt_eq, normEDS_two]
 theorem psiAt_three (x y : R) : psiAt W x y 3 = W.Ψ₃.eval x := by simp [psiAt_eq, normEDS_three]
-theorem psiAt_neg (x y : R) (n : ℤ) : psiAt W x y (-n) = -psiAt W x y n := by
+theorem psiAt_neg (x y : R) (n : ℤ) : psiAt W x y (-n) = - psiAt W x y n := by
   simp [psiAt_eq, normEDS_neg]
 
-private theorem evalEval_mkW {x y : R} (h : W.toAffine.Equation x y) (g : R[X][Y]) :
-    AdjoinRoot.evalEval (p := W.toAffine.polynomial) h (Affine.CoordinateRing.mk W g) =
-      g.evalEval x y :=
+private theorem evalEval_mkW {x y : R} (h : W.toAffine.Equation x y) (g : R[X][Y])
+    : AdjoinRoot.evalEval (p := W.toAffine.polynomial) h (Affine.CoordinateRing.mk W g)
+      = g.evalEval x y :=
   AdjoinRoot.evalEval_mk h g
 
-theorem psiAt_sq {x y : R} (h : W.toAffine.Equation x y) (n : ℤ) :
-    psiAt W x y n ^ 2 = (W.ΨSq n).eval x := by
-  have := congrArg (AdjoinRoot.evalEval (p := W.toAffine.polynomial) h)
-    (Affine.CoordinateRing.mk_Ψ_sq W n)
+theorem psiAt_sq {x y : R} (h : W.toAffine.Equation x y) (n : ℤ)
+    : psiAt W x y n ^ 2 = (W.ΨSq n).eval x := by
+  have :=
+    congrArg (AdjoinRoot.evalEval (p := W.toAffine.polynomial) h)
+      (Affine.CoordinateRing.mk_Ψ_sq W n)
   rw [← Affine.CoordinateRing.mk_ψ, map_pow, evalEval_mkW W h, evalEval_mkW W h, evalEval_C] at this
   exact this
 
-theorem Phi_eval {x y : R} (h : W.toAffine.Equation x y) (n : ℤ) :
-    (W.Φ n).eval x = x * psiAt W x y n ^ 2 - psiAt W x y (n + 1) * psiAt W x y (n - 1) := by
-  have := congrArg (AdjoinRoot.evalEval (p := W.toAffine.polynomial) h)
-    (Affine.CoordinateRing.mk_φ W n)
+theorem Phi_eval {x y : R} (h : W.toAffine.Equation x y) (n : ℤ)
+    : (W.Φ n).eval x = x * psiAt W x y n ^ 2 - psiAt W x y (n + 1) * psiAt W x y (n - 1) := by
+  have :=
+    congrArg (AdjoinRoot.evalEval (p := W.toAffine.polynomial) h) (Affine.CoordinateRing.mk_φ W n)
   rw [evalEval_mkW W h, evalEval_mkW W h, evalEval_C, WeierstrassCurve.φ] at this
   rw [← this, psiAt, psiAt, psiAt]
   simp only [evalEval_sub, evalEval_mul, evalEval_pow, evalEval_C, eval_X]
 
-theorem two_y_sq {x y : R} (h : W.toAffine.Equation x y) :
-    (2 * y + W.a₁ * x + W.a₃) ^ 2 = 4 * x ^ 3 + W.b₂ * x ^ 2 + 2 * W.b₄ * x + W.b₆ := by
+theorem two_y_sq {x y : R} (h : W.toAffine.Equation x y)
+    : (2 * y + W.a₁ * x + W.a₃) ^ 2 = 4 * x ^ 3 + W.b₂ * x ^ 2 + 2 * W.b₄ * x + W.b₆ := by
   rw [equation_iff] at h
   simp only [b₂, b₄, b₆]
   linear_combination 4 * h
 
-theorem Psi3_eval (x : R) :
-    W.Ψ₃.eval x = 3 * x ^ 4 + W.b₂ * x ^ 3 + 3 * W.b₄ * x ^ 2 + 3 * W.b₆ * x + W.b₈ := by
+theorem Psi3_eval (x : R)
+    : W.Ψ₃.eval x = 3 * x ^ 4 + W.b₂ * x ^ 3 + 3 * W.b₄ * x ^ 2 + 3 * W.b₆ * x + W.b₈ := by
   simp [Ψ₃]
 
-theorem prePsi4_eval (x : R) :
-    W.preΨ₄.eval x = 2 * x ^ 6 + W.b₂ * x ^ 5 + 5 * W.b₄ * x ^ 4 + 10 * W.b₆ * x ^ 3 +
-      10 * W.b₈ * x ^ 2 + (W.b₂ * W.b₈ - W.b₄ * W.b₆) * x + (W.b₄ * W.b₈ - W.b₆ ^ 2) := by
+theorem prePsi4_eval (x : R)
+    : W.preΨ₄.eval x
+      = 2 * x ^ 6 + W.b₂ * x ^ 5 + 5 * W.b₄ * x ^ 4 + 10 * W.b₆ * x ^ 3 + 10 * W.b₈ * x ^ 2
+        + (W.b₂ * W.b₈ - W.b₄ * W.b₆) * x + (W.b₄ * W.b₈ - W.b₆ ^ 2) := by
   simp [preΨ₄]
 
-theorem Psi3_eval_of_two_y {x y : R} (h : W.toAffine.Equation x y)
-    (hy : 2 * y + W.a₁ * x + W.a₃ = 0) :
-    W.Ψ₃.eval x = -(W.a₁ * y - (3 * x ^ 2 + 2 * W.a₂ * x + W.a₄)) ^ 2 := by
+theorem Psi3_eval_of_two_y
+    {x y : R} (h : W.toAffine.Equation x y) (hy : 2 * y + W.a₁ * x + W.a₃ = 0)
+    : W.Ψ₃.eval x = - (W.a₁ * y - (3 * x ^ 2 + 2 * W.a₂ * x + W.a₄)) ^ 2 := by
   rw [equation_iff] at h
   rw [Psi3_eval]
   simp only [b₂, b₄, b₆, b₈]
@@ -187,9 +192,9 @@ theorem Psi3_eval_of_two_y {x y : R} (h : W.toAffine.Equation x y)
     ((-W.a₁ * W.a₄ + W.a₂ * W.a₃) + (W.a₁ ^ 2 + 2 * W.a₂) * y + (-W.a₁ * W.a₂ + 3 * W.a₃) * x +
       6 * x * y) * hy
 
-theorem two_y_pow_four_add {x y : R} (h : W.toAffine.Equation x y) :
-    (2 * y + W.a₁ * x + W.a₃) ^ 4 + W.preΨ₄.eval x =
-      (6 * x ^ 2 + W.b₂ * x + W.b₄) * W.Ψ₃.eval x := by
+theorem two_y_pow_four_add {x y : R} (h : W.toAffine.Equation x y)
+    : (2 * y + W.a₁ * x + W.a₃) ^ 4 + W.preΨ₄.eval x
+      = (6 * x ^ 2 + W.b₂ * x + W.b₄) * W.Ψ₃.eval x := by
   rw [show (2 * y + W.a₁ * x + W.a₃) ^ 4 = ((2 * y + W.a₁ * x + W.a₃) ^ 2) ^ 2 by ring,
     two_y_sq W h, prePsi4_eval, Psi3_eval]
   linear_combination x ^ 2 * W.b_relation
@@ -219,11 +224,11 @@ private theorem step_alg {b2 b4 b6 b8 x0 be c0 d0 wm2 wm1 w0 w1 w2 xm1 xn X : F}
     simp [hc0, hw0, hwm1, this]
   · linear_combination (-b2*w0^4*w1^2*wm1^4*x0^3 + b2*w0^2*w1^3*wm1^5*x0^2 - 3*b4*w0^4*w1^2*wm1^4*x0^2 + 2*b4*w0^2*w1^3*wm1^5*x0 - 3*b6*w0^4*w1^2*wm1^4*x0 + b6*w0^2*w1^3*wm1^5 - b8*w0^4*w1^2*wm1^4 + be^2*w0^2*w1^3*wm1^5 - 3*w0^4*w1^2*wm1^4*x0^4 + 4*w0^2*w1^3*wm1^5*x0^3) * hbe + (b2*w0^4*w1^2*wm1^4*x0^2 - b2*w0^2*w1^3*wm1^5*x0 + 2*b4*w0^4*w1^2*wm1^4*x0 - b4*w0^2*w1^3*wm1^5 + b6*w0^4*w1^2*wm1^4 - be^2*w0^4*w1^2*wm1^4 + 4*w0^4*w1^2*wm1^4*x0^3 - 6*w0^2*w1^3*wm1^5*x0^2) * hc + (w0^2*w1^3*wm1^5) * hd + (w0^5*wm1^2*x0^2 - 2*w0^5*wm1^2*x0*xn + w0^5*wm1^2*xn^2) * hinv + (-c0*w0^4*w1^2*wm1^2*x0^2 + 2*c0*w0^4*w1^2*wm1^2*x0*xn - c0*w0^4*w1^2*wm1^2*xn^2) * hxm + (b2*c0*w0^2*w1^2*wm1^4*x0 + b4*c0*w0^2*w1^2*wm1^4 - be^4*w0^4*w1*wm1^3*x0 + be^4*w0^4*w1*wm1^3*xn - be^4*w0^2*w1^2*wm1^4 + be^2*c0*w0^6*wm1^2*x0 - be^2*c0*w0^6*wm1^2*xn + be^2*c0*w0^4*w1*wm1^3 + 6*c0*w0^2*w1^2*wm1^4*x0^2 - d0*w0^4*w1*wm1^3*x0 + d0*w0^4*w1*wm1^3*xn - d0*w0^2*w1^2*wm1^4) * hxn + (c0*w0^4*w1^2*wm1^4) * hS + (w0^2*w1^3*wm1^5*x0^2) * hb8
 
-private theorem step_alg_zero {b c wp2 wp1 w0 wm2 wm3 wm4 : F}
-    (s0 : wp2 * wm2 = -c * w0 ^ 2) (s1 : wp1 * wm3 = b ^ 2 * w0 * wm2)
-    (s2 : w0 * wm4 = -c * wm2 ^ 2) (s3 : 0 = b ^ 2 * wm2 * wm4 - c * wm3 ^ 2)
-    (hwm2 : wm2 ≠ 0) (hwm3 : wm3 ≠ 0) :
-    wp2 * w0 * b ^ 2 = c * wp1 ^ 2 := by
+private theorem step_alg_zero
+    {b c wp2 wp1 w0 wm2 wm3 wm4 : F} (s0 : wp2 * wm2 = -c * w0 ^ 2)
+    (s1 : wp1 * wm3 = b ^ 2 * w0 * wm2) (s2 : w0 * wm4 = -c * wm2 ^ 2)
+    (s3 : 0 = b ^ 2 * wm2 * wm4 - c * wm3 ^ 2) (hwm2 : wm2 ≠ 0) (hwm3 : wm3 ≠ 0)
+    : wp2 * w0 * b ^ 2 = c * wp1 ^ 2 := by
   refine eq_of_mul_sub_eq_zero (M := wm2 * wm3 ^ 2) (by simp [hwm2, hwm3]) ?_
   linear_combination (b ^ 2 * w0 * wm3 ^ 2) * s0 + (-c * wm2 * (b ^ 2 * w0 * wm2 + wm3 * wp1)) * s1 +
     (-b ^ 4 * w0 ^ 2 * wm2) * s2 + (-b ^ 2 * w0 ^ 3) * s3
@@ -241,8 +246,8 @@ def xOf : W.toAffine.Point → F
 @[simp]
 theorem xOf_some {x y : F} (h : W.toAffine.Nonsingular x y) : xOf W (.some x y h) = x := rfl
 
-theorem exists_eq_some_xOf {P : W.toAffine.Point} (hP : P ≠ 0) :
-    ∃ y h, P = .some (xOf W P) y h := by
+theorem exists_eq_some_xOf {P : W.toAffine.Point} (hP : P ≠ 0)
+    : ∃ y h, P = .some (xOf W P) y h := by
   cases P with
   | zero => exact absurd rfl hP
   | some x y h => exact ⟨y, h, rfl⟩
@@ -255,14 +260,16 @@ theorem xOf_neg (P : W.toAffine.Point) : xOf W (-P) = xOf W P := by
 
 variable [DecidableEq F]
 
-theorem xOf_add_add_xOf_sub {x₁ y₁ x₂ y₂ : F} (h₁ : W.toAffine.Nonsingular x₁ y₁)
-    (h₂ : W.toAffine.Nonsingular x₂ y₂) (hx : x₁ ≠ x₂) :
-    Point.some x₁ y₁ h₁ + .some x₂ y₂ h₂ ≠ 0 ∧ Point.some x₁ y₁ h₁ - .some x₂ y₂ h₂ ≠ 0 ∧
-      (xOf W (.some x₁ y₁ h₁ + .some x₂ y₂ h₂) + xOf W (.some x₁ y₁ h₁ - .some x₂ y₂ h₂)) *
-          (x₁ - x₂) ^ 2 =
-        2 * x₁ * x₂ * (x₁ + x₂) + W.b₂ * x₁ * x₂ + W.b₄ * (x₁ + x₂) + W.b₆ := by
-  have hs : Point.some x₁ y₁ h₁ - .some x₂ y₂ h₂ =
-      .some x₁ y₁ h₁ + .some x₂ (W.toAffine.negY x₂ y₂) ((nonsingular_neg ..).mpr h₂) := by
+theorem xOf_add_add_xOf_sub
+    {x₁ y₁ x₂ y₂ : F}
+    (h₁ : W.toAffine.Nonsingular x₁ y₁) (h₂ : W.toAffine.Nonsingular x₂ y₂) (hx : x₁ ≠ x₂)
+    : Point.some x₁ y₁ h₁ + .some x₂ y₂ h₂ ≠ 0 ∧ Point.some x₁ y₁ h₁ - .some x₂ y₂ h₂ ≠ 0
+      ∧ (xOf W (.some x₁ y₁ h₁ + .some x₂ y₂ h₂) + xOf W (.some x₁ y₁ h₁ - .some x₂ y₂ h₂))
+          * (x₁ - x₂) ^ 2
+        = 2 * x₁ * x₂ * (x₁ + x₂) + W.b₂ * x₁ * x₂ + W.b₄ * (x₁ + x₂) + W.b₆ := by
+  have hs
+      : Point.some x₁ y₁ h₁ - .some x₂ y₂ h₂
+        = .some x₁ y₁ h₁ + .some x₂ (W.toAffine.negY x₂ y₂) ((nonsingular_neg ..).mpr h₂) := by
     rw [sub_eq_add_neg, Point.neg_some]
   rw [hs, Point.add_of_X_ne hx, Point.add_of_X_ne hx]
   refine ⟨Point.some_ne_zero _, Point.some_ne_zero _, ?_⟩
@@ -270,8 +277,9 @@ theorem xOf_add_add_xOf_sub {x₁ y₁ x₂ y₂ : F} (h₁ : W.toAffine.Nonsing
   have hd : x₁ - x₂ ≠ 0 := sub_ne_zero.mpr hx
   have hl : W.toAffine.slope x₁ x₂ y₁ y₂ * (x₁ - x₂) = y₁ - y₂ := by
     rw [slope_of_X_ne hx, div_mul_cancel₀ _ hd]
-  have hlp : W.toAffine.slope x₁ x₂ y₁ (W.toAffine.negY x₂ y₂) * (x₁ - x₂) =
-      y₁ - (-y₂ - W.a₁ * x₂ - W.a₃) := by
+  have hlp
+      : W.toAffine.slope x₁ x₂ y₁ (W.toAffine.negY x₂ y₂) * (x₁ - x₂)
+        = y₁ - (-y₂ - W.a₁ * x₂ - W.a₃) := by
     rw [slope_of_X_ne hx, div_mul_cancel₀ _ hd, negY]
   set l := W.toAffine.slope x₁ x₂ y₁ y₂
   set lp := W.toAffine.slope x₁ x₂ y₁ (W.toAffine.negY x₂ y₂)
@@ -283,11 +291,11 @@ theorem xOf_add_add_xOf_sub {x₁ y₁ x₂ y₂ : F} (h₁ : W.toAffine.Nonsing
     ((x₁ - x₂) ^ 4 * (W.a₁ * x₁ + W.a₃ + lp * x₁ - lp * x₂ + y₁ + y₂)) * hlp +
     (2 * (x₁ - x₂) ^ 4) * e1 + (2 * (x₁ - x₂) ^ 4) * e2
 
-theorem two_smul_some {x y : F} (h : W.toAffine.Nonsingular x y) :
-    ((2 : ℤ) • Point.some x y h = 0 ↔ 2 * y + W.a₁ * x + W.a₃ = 0) ∧
-      (2 * y + W.a₁ * x + W.a₃ ≠ 0 →
-        xOf W ((2 : ℤ) • Point.some x y h) * (2 * y + W.a₁ * x + W.a₃) ^ 2 =
-          x * (2 * y + W.a₁ * x + W.a₃) ^ 2 - W.Ψ₃.eval x) := by
+theorem two_smul_some {x y : F} (h : W.toAffine.Nonsingular x y)
+    : ((2 : ℤ) • Point.some x y h = 0 ↔ 2 * y + W.a₁ * x + W.a₃ = 0)
+      ∧ (2 * y + W.a₁ * x + W.a₃ ≠ 0
+        → xOf W ((2 : ℤ) • Point.some x y h) * (2 * y + W.a₁ * x + W.a₃) ^ 2
+          = x * (2 * y + W.a₁ * x + W.a₃) ^ 2 - W.Ψ₃.eval x) := by
   have hiff : y = W.toAffine.negY x y ↔ 2 * y + W.a₁ * x + W.a₃ = 0 := by
     rw [negY]; constructor <;> intro h' <;> linear_combination h'
   rw [two_zsmul]
@@ -297,10 +305,12 @@ theorem two_smul_some {x y : F} (h : W.toAffine.Nonsingular x y) :
   rw [Point.add_self_of_Y_ne hy]
   refine ⟨iff_of_false (Point.some_ne_zero _) hb, fun _ => ?_⟩
   simp only [xOf_some]
-  have hl : W.toAffine.slope x x y y * (y - (-y - W.a₁ * x - W.a₃)) =
-      3 * x ^ 2 + 2 * W.a₂ * x + W.a₄ - W.a₁ * y := by
+  have hl
+      : W.toAffine.slope x x y y * (y - (-y - W.a₁ * x - W.a₃))
+        = 3 * x ^ 2 + 2 * W.a₂ * x + W.a₄ - W.a₁ * y := by
     rw [slope_of_Y_ne rfl hy, negY, div_mul_cancel₀]
-    rw [show y - (-y - W.a₁ * x - W.a₃) = 2 * y + W.a₁ * x + W.a₃ by ring]; exact hb
+    rw [show y - (-y - W.a₁ * x - W.a₃) = 2 * y + W.a₁ * x + W.a₃ by ring]
+    exact hb
   set l := W.toAffine.slope x x y y
   have e := (equation_iff _ _).mp h.1
   refine eq_of_mul_sub_eq_zero (M := (2 * y + W.a₁ * x + W.a₃) ^ 2) (pow_ne_zero _ hb) ?_
@@ -314,17 +324,23 @@ end Points
 
 section Main
 
-variable {F : Type*} [Field F] [DecidableEq F] (W : WeierstrassCurve F)
+variable
+  {F : Type*} [Field F] [DecidableEq F]
+  (W : WeierstrassCurve F)
   {x₀ y₀ : F} (h₀ : W.toAffine.Nonsingular x₀ y₀)
 
 private def Good (n : ℤ) : Prop :=
-  (n • Point.some x₀ y₀ h₀ = 0 ↔ psiAt W x₀ y₀ n = 0) ∧
-    (psiAt W x₀ y₀ n ≠ 0 → xOf W (n • Point.some x₀ y₀ h₀) =
-      x₀ - psiAt W x₀ y₀ (n + 1) * psiAt W x₀ y₀ (n - 1) / psiAt W x₀ y₀ n ^ 2)
+  (n • Point.some x₀ y₀ h₀ = 0 ↔ psiAt W x₀ y₀ n = 0)
+    ∧ (psiAt W x₀ y₀ n ≠ 0
+      → xOf W (n • Point.some x₀ y₀ h₀)
+        = x₀ - psiAt W x₀ y₀ (n + 1) * psiAt W x₀ y₀ (n - 1) / psiAt W x₀ y₀ n ^ 2)
 
 private theorem good_one : Good W h₀ 1 := by
-  refine ⟨iff_of_false (by rw [one_zsmul]; exact Point.some_ne_zero h₀)
-    (by rw [psiAt_one]; exact one_ne_zero), fun _ => ?_⟩
+  refine ⟨
+    iff_of_false (by rw [one_zsmul]; exact Point.some_ne_zero h₀)
+      (by rw [psiAt_one]; exact one_ne_zero),
+    fun _ => ?_
+  ⟩
   rw [one_zsmul, xOf_some, show (1 : ℤ) - 1 = 0 by norm_num, psiAt_zero]
   simp
 
@@ -337,11 +353,10 @@ private theorem good_two : Good W h₀ 2 := by
     mul_one, eq_sub_iff_add_eq, ← eq_sub_iff_add_eq', div_eq_iff (pow_ne_zero 2 hb)]
   linear_combination this
 
-
 omit [DecidableEq F] in
 include h₀ in
-private theorem ne_zero_of_Psi3_eq_zero (hc : W.Ψ₃.eval x₀ = 0) :
-    2 * y₀ + W.a₁ * x₀ + W.a₃ ≠ 0 ∧ W.preΨ₄.eval x₀ ≠ 0 := by
+private theorem ne_zero_of_Psi3_eq_zero (hc : W.Ψ₃.eval x₀ = 0)
+    : 2 * y₀ + W.a₁ * x₀ + W.a₃ ≠ 0 ∧ W.preΨ₄.eval x₀ ≠ 0 := by
   have hb : 2 * y₀ + W.a₁ * x₀ + W.a₃ ≠ 0 := by
     intro hb
     have := Psi3_eval_of_two_y W h₀.1 hb
@@ -354,8 +369,8 @@ private theorem ne_zero_of_Psi3_eq_zero (hc : W.Ψ₃.eval x₀ = 0) :
   rw [hc, hd, mul_zero, add_zero] at this
   exact pow_eq_zero_iff (by norm_num) |>.mp this
 
-private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j ≤ n → Good W h₀ j) :
-    Good W h₀ (n + 1) := by
+private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j ≤ n → Good W h₀ j)
+    : Good W h₀ (n + 1) := by
   have g_n := ih n (by omega) le_rfl
   have g_n1 := ih (n - 1) (by omega) (by omega)
   have g_n2 : 3 ≤ n → Good W h₀ (n - 2) := fun h => ih (n - 2) (by omega) (by omega)
@@ -374,11 +389,12 @@ private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j �
     rw [sub_zsmul, one_zsmul, sub_eq_add_neg]
   have z3 : W.Ψ₃.eval x₀ = 0 → ∀ k, psiAt W x₀ y₀ k = 0 ↔ (3 : ℤ) ∣ k := fun hc0 k => by
     obtain ⟨hb, hd⟩ := ne_zero_of_Psi3_eq_zero W h₀ hc0
-    rw [psiAt_eq, hc0]; exact normEDS_eq_zero_iff_of_three hb hd k
-  have zev : 2 * y₀ + W.a₁ * x₀ + W.a₃ = 0 → ∀ k, Even k → psiAt W x₀ y₀ k = 0 :=
-    fun hb k hk => by rw [psiAt_eq, hb]; exact normEDS_zero_left_of_even _ _ hk
-  have nz3 : W.Ψ₃.eval x₀ = 0 → 2 * y₀ + W.a₁ * x₀ + W.a₃ ≠ 0 :=
-    fun hc0 => (ne_zero_of_Psi3_eq_zero W h₀ hc0).1
+    rw [psiAt_eq, hc0]
+    exact normEDS_eq_zero_iff_of_three hb hd k
+  have zev : 2 * y₀ + W.a₁ * x₀ + W.a₃ = 0 → ∀ k, Even k → psiAt W x₀ y₀ k = 0 := fun hb k hk => by
+    rw [psiAt_eq, hb]; exact normEDS_zero_left_of_even _ _ hk
+  have nz3 : W.Ψ₃.eval x₀ = 0 → 2 * y₀ + W.a₁ * x₀ + W.a₃ ≠ 0 := fun hc0 =>
+    (ne_zero_of_Psi3_eq_zero W h₀ hc0).1
   obtain ⟨t1, t2⟩ := two_smul_some W h₀
   have psi1 := psiAt_one W x₀ y₀
   simp only [Good] at g_n g_n1 g_n2 g_n3 ⊢
@@ -388,8 +404,7 @@ private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j �
   generalize W.Ψ₃.eval x₀ = c₀ at *
   generalize 2 * y₀ + W.a₁ * x₀ + W.a₃ = β at *
   by_cases hwn : w n = 0
-  ·
-    have hQ : n • Point.some x₀ y₀ h₀ = 0 := g_n.1.mpr hwn
+  · have hQ : n • Point.some x₀ y₀ h₀ = 0 := g_n.1.mpr hwn
     have e1 : (n + 1) • Point.some x₀ y₀ h₀ = Point.some x₀ y₀ h₀ := by rw [e_succ, hQ, zero_add]
     have hwp : w (n + 1) ≠ 0 := by
       by_cases hc0 : c₀ = 0
@@ -403,7 +418,8 @@ private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j �
           exact hP this
         have s := somos (n - 1)
         rw [show n - 1 + 2 = n + 1 by ring, show n - 1 - 2 = n - 3 by ring,
-          show n - 1 + 1 = n by ring, show n - 1 - 1 = n - 2 by ring, hwn] at s
+            show n - 1 + 1 = n by ring, show n - 1 - 1 = n - 2 by ring, hwn]
+          at s
         intro h
         rw [h, zero_mul, mul_zero, zero_mul, zero_sub, zero_eq_neg] at s
         exact mul_ne_zero hc0 (pow_ne_zero 2 hwm) s
@@ -411,8 +427,7 @@ private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j �
     rw [e1, xP, hwn]
     simp
   by_cases hwn1 : w (n - 1) = 0
-  ·
-    have hQ1 : (n - 1) • Point.some x₀ y₀ h₀ = 0 := g_n1.1.mpr hwn1
+  · have hQ1 : (n - 1) • Point.some x₀ y₀ h₀ = 0 := g_n1.1.mpr hwn1
     have hQ : n • Point.some x₀ y₀ h₀ = Point.some x₀ y₀ h₀ := by
       rw [e_pred, sub_eq_zero] at hQ1; exact hQ1
     have e2 : (n + 1) • Point.some x₀ y₀ h₀ = (2 : ℤ) • Point.some x₀ y₀ h₀ := by
@@ -437,8 +452,7 @@ private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j �
       have hwm2 : w (n - 2) ≠ 0 := by
         intro h
         have g := ((g_n2 hn3).1).mpr h
-        rw [show n - 2 = n - 1 - 1 by ring, sub_zsmul, one_zsmul, hQ1, zero_add,
-          neg_eq_zero] at g
+        rw [show n - 2 = n - 1 - 1 by ring, sub_zsmul, one_zsmul, hQ1, zero_add, neg_eq_zero] at g
         exact hP g
       have hn4 : 4 ≤ n := by
         by_contra h
@@ -455,21 +469,24 @@ private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j �
       have s2 := somos (n - 2)
       have s3 := somos (n - 3)
       rw [show n - 1 + 2 = n + 1 by ring, show n - 1 - 2 = n - 3 by ring,
-        show n - 1 + 1 = n by ring, show n - 1 - 1 = n - 2 by ring] at s1
+          show n - 1 + 1 = n by ring, show n - 1 - 1 = n - 2 by ring]
+        at s1
       rw [show n - 2 + 2 = n by ring, show n - 2 - 2 = n - 4 by ring,
-        show n - 2 + 1 = n - 1 by ring, show n - 2 - 1 = n - 3 by ring] at s2
+          show n - 2 + 1 = n - 1 by ring, show n - 2 - 1 = n - 3 by ring]
+        at s2
       rw [show n - 3 + 2 = n - 1 by ring, show n - 3 - 2 = n - 5 by ring,
-        show n - 3 + 1 = n - 2 by ring, show n - 3 - 1 = n - 4 by ring] at s3
+          show n - 3 + 1 = n - 2 by ring, show n - 3 - 1 = n - 4 by ring]
+        at s3
       rw [hwn1] at s0 s1 s2 s3
       have hwp : w (n + 1) ≠ 0 := by
         intro h
         rw [h] at s1
         have : β ^ 2 * w n * w (n - 2) = 0 := by linear_combination -s1
         exact mul_ne_zero (mul_ne_zero (pow_ne_zero 2 hb) hwn) hwm2 this
-      have key := step_alg_zero (b := β) (c := c₀) (wp2 := w (n + 2)) (wp1 := w (n + 1))
-        (w0 := w n) (wm2 := w (n - 2)) (wm3 := w (n - 3)) (wm4 := w (n - 4))
-        (by linear_combination s0) (by linear_combination s1) (by linear_combination s2)
-        (by linear_combination s3) hwm2 hwm3
+      have key :=
+        step_alg_zero (b := β) (c := c₀) (wp2 := w (n + 2)) (wp1 := w (n + 1)) (w0 := w n)
+          (wm2 := w (n - 2)) (wm3 := w (n - 3)) (wm4 := w (n - 4)) (by linear_combination s0)
+          (by linear_combination s1) (by linear_combination s2) (by linear_combination s3) hwm2 hwm3
       refine ⟨iff_of_false (by rw [e2]; exact h2P) hwp, fun _ => ?_⟩
       have hx2 := t2 hb
       rw [e2, eq_sub_iff_add_eq, ← eq_sub_iff_add_eq', div_eq_iff (pow_ne_zero 2 hwp)]
@@ -482,8 +499,7 @@ private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j �
   have xm := g_n1.2 hwn1
   obtain ⟨yn, hn', hQeq⟩ := exists_eq_some_xOf W hQ
   by_cases hwp : w (n + 1) = 0
-  ·
-    have hx : xOf W (n • Point.some x₀ y₀ h₀) = x₀ := by rw [xn, hwp]; simp
+  · have hx : xOf W (n • Point.some x₀ y₀ h₀) = x₀ := by rw [xn, hwp]; simp
     have := (Point.X_eq_iff (h₁ := hn') (h₂ := h₀)).mp hx
     rw [← hQeq] at this
     rcases this with h | h
@@ -502,8 +518,9 @@ private theorem good_succ (n : ℤ) (hn : 2 ≤ n) (ih : ∀ j, 1 ≤ j → j �
   rw [← hQeq, ← e_succ, ← e_pred] at hsum
   rw [← hQeq, ← e_succ] at hne1
   refine ⟨iff_of_false hne1 hwp, fun _ => ?_⟩
-  have hxm : xOf W ((n - 1) • Point.some x₀ y₀ h₀) * w (n - 1) ^ 2 =
-      x₀ * w (n - 1) ^ 2 - w n * w (n - 2) := by
+  have hxm
+      : xOf W ((n - 1) • Point.some x₀ y₀ h₀) * w (n - 1) ^ 2
+        = x₀ * w (n - 1) ^ 2 - w n * w (n - 2) := by
     rw [xm, sub_mul, div_mul_cancel₀ _ (pow_ne_zero 2 hwn1)]
   have hxn : xOf W (n • Point.some x₀ y₀ h₀) * w n ^ 2 = x₀ * w n ^ 2 - w (n + 1) * w (n - 1) := by
     rw [xn, sub_mul, div_mul_cancel₀ _ (pow_ne_zero 2 hwn)]
@@ -515,7 +532,9 @@ end Main
 
 section Statements
 
-variable {F : Type*} [Field F] [DecidableEq F] (W : WeierstrassCurve F)
+variable
+  {F : Type*} [Field F] [DecidableEq F]
+  (W : WeierstrassCurve F)
   {x₀ y₀ : F} (h₀ : W.toAffine.Nonsingular x₀ y₀)
 
 private theorem good_nat (N : ℕ) : ∀ n : ℤ, 1 ≤ n → n ≤ N → Good W h₀ n := by
@@ -528,8 +547,8 @@ private theorem good_nat (N : ℕ) : ∀ n : ℤ, 1 ≤ n → n ≤ N → Good W
     · rcases (by omega : n = 1 ∨ n = 2 ∨ 3 ≤ n) with rfl | rfl | h3
       · exact good_one W h₀
       · exact good_two W h₀
-      · have := good_succ W h₀ (n - 1) (by omega)
-          (fun j hj1 hj2 => ih j hj1 (by push_cast at h; omega))
+      · have :=
+          good_succ W h₀ (n - 1) (by omega) (fun j hj1 hj2 => ih j hj1 (by push_cast at h; omega))
         rwa [sub_add_cancel] at this
 
 private theorem good (n : ℤ) : Good W h₀ n := by
@@ -539,24 +558,21 @@ private theorem good (n : ℤ) : Good W h₀ n := by
     refine ⟨g1, fun hw => ?_⟩
     have := g2 (neg_ne_zero.mpr hw)
     rw [xOf_neg] at this
-    rw [this, show -n + 1 = -(n - 1) by ring, show -n - 1 = -(n + 1) by ring, psiAt_neg,
-      psiAt_neg]
+    rw [this, show -n + 1 = -(n - 1) by ring, show -n - 1 = -(n + 1) by ring, psiAt_neg, psiAt_neg]
     ring
   · refine ⟨iff_of_true (zero_zsmul _) (psiAt_zero ..), fun h => absurd (psiAt_zero ..) h⟩
   · exact good_nat W h₀ n.toNat n hn (by omega)
-
 
 omit [DecidableEq F] in
 include h₀ in
 theorem psiAt_eq_zero_iff (n : ℤ) : psiAt W x₀ y₀ n = 0 ↔ (W.ΨSq n).eval x₀ = 0 := by
   rw [← psiAt_sq W h₀.1, pow_eq_zero_iff two_ne_zero]
 
-theorem zsmul_eq_zero_iff (n : ℤ) :
-    n • Point.some x₀ y₀ h₀ = 0 ↔ (W.ΨSq n).eval x₀ = 0 := by
+theorem zsmul_eq_zero_iff (n : ℤ) : n • Point.some x₀ y₀ h₀ = 0 ↔ (W.ΨSq n).eval x₀ = 0 := by
   rw [(good W h₀ n).1, psiAt_eq_zero_iff W h₀]
 
-theorem xOf_zsmul (n : ℤ) (hn : (W.ΨSq n).eval x₀ ≠ 0) :
-    xOf W (n • Point.some x₀ y₀ h₀) = (W.Φ n).eval x₀ / (W.ΨSq n).eval x₀ := by
+theorem xOf_zsmul (n : ℤ) (hn : (W.ΨSq n).eval x₀ ≠ 0)
+    : xOf W (n • Point.some x₀ y₀ h₀) = (W.Φ n).eval x₀ / (W.ΨSq n).eval x₀ := by
   have hw : psiAt W x₀ y₀ n ≠ 0 := fun h => hn ((psiAt_eq_zero_iff W h₀ n).mp h)
   rw [(good W h₀ n).2 hw, Phi_eval W h₀.1, ← psiAt_sq W h₀.1, sub_div,
     mul_div_cancel_right₀ _ (pow_ne_zero 2 hw)]

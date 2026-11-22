@@ -13,7 +13,8 @@ open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E]
 
-theorem isotropic_outside_line_of_covering (hD3 : IntegerApproximationCount (E := E)) : IsotropicOutsideLine (E := E) := by
+theorem isotropic_outside_line_of_covering (hD3 : IntegerApproximationCount (E := E))
+    : IsotropicOutsideLine (E := E) := by
   intro r X ξ hξ z0 hz0 x hxL hxξ _hxne hsmall
   obtain ⟨hξΛ, hξξ, -⟩ := hξ
   obtain ⟨hzdom, hzD⟩ := hz0
@@ -24,9 +25,14 @@ theorem isotropic_outside_line_of_covering (hD3 : IntegerApproximationCount (E :
   have hHne : ∀ τ : X.Ψ, X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) ≠ 0 := fun τ => by
     rw [X.Hf_self hzdom τ]
     exact_mod_cast hmaj_ne τ
-  have hu : ∀ (v : Fin r → E) (τ : X.Ψ), X.ucomp z0 ξ (X.embV v) τ = Data.emb τ.1 v -
-      (X.Hf z0 τ (Data.emb τ.1 v) (Data.emb τ.1 ξ) / X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) •
-        Data.emb τ.1 ξ := fun v τ => rfl
+  have hu
+      : ∀ (v : Fin r → E) (τ : X.Ψ),
+        X.ucomp z0 ξ (X.embV v) τ
+          = Data.emb τ.1 v
+            - (X.Hf z0 τ (Data.emb τ.1 v) (Data.emb τ.1 ξ)
+                / X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ))
+              • Data.emb τ.1 ξ := fun v τ =>
+    rfl
   have hxx : herm X.Gm x x = 0 := by
     apply UnipotentCoefficientShift.eq_zero_of_conj_lt_one (X.L'_int x hxL x hxL)
     have hΨ : ∀ τ : X.Ψ, ‖τ.1 (herm X.Gm x x)‖ < 1 := by
@@ -37,8 +43,9 @@ theorem isotropic_outside_line_of_covering (hD3 : IntegerApproximationCount (E :
         rw [← hermC_conj τ.1 X.Gm_herm, h1, map_zero]
       have h3 : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0 := by
         rw [hermC_emb, hξξ, map_zero]
-      have hww : hermC τ.1 X.Gm (X.ucomp z0 ξ (X.embV x) τ) (X.ucomp z0 ξ (X.embV x) τ) =
-          τ.1 (herm X.Gm x x) := by
+      have hww
+          : hermC τ.1 X.Gm (X.ucomp z0 ξ (X.embV x) τ) (X.ucomp z0 ξ (X.embV x) τ)
+            = τ.1 (herm X.Gm x x) := by
         rw [hu x τ]
         simp only [hermC_sub_left, hermC_sub_right, hermC_smul_left, hermC_smul_right]
         rw [h1, h2, h3, hermC_emb]
@@ -56,12 +63,14 @@ theorem isotropic_outside_line_of_covering (hD3 : IntegerApproximationCount (E :
       have h := hΨ ⟨_, hc⟩
       simpa [ComplexEmbedding.conjugate_coe_eq] using h
   refine ⟨hxx, ?_⟩
-  obtain ⟨α, hα⟩ := (hD3 r X.toData).1 (fun τ => -(X.Hf z0 τ (Data.emb τ.1 x) (Data.emb τ.1 ξ) /
-    X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) / (X.NA : ℂ))
+  obtain ⟨α, hα⟩ :=
+    (hD3 r X.toData).1 (fun τ =>
+      -(X.Hf z0 τ (Data.emb τ.1 x) (Data.emb τ.1 ξ) / X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ))
+        / (X.NA : ℂ))
   refine ⟨α, ?_⟩
   intro x'
-  have hemb : ∀ τ : X.Ψ, Data.emb τ.1 x' =
-      Data.emb τ.1 x + τ.1 ((X.NA : E) * α) • Data.emb τ.1 ξ := by
+  have hemb
+      : ∀ τ : X.Ψ, Data.emb τ.1 x' = Data.emb τ.1 x + τ.1 ((X.NA : E) * α) • Data.emb τ.1 ξ := by
     intro τ
     funext a
     simp [x', Data.emb]
@@ -76,12 +85,16 @@ theorem isotropic_outside_line_of_covering (hD3 : IntegerApproximationCount (E :
     rwa [h3] at h2
   have hx'ξ : herm X.Gm x' ξ = 0 := by
     simp only [x']
-    rw [HermitianTraceFormVanishing.herm_add_left, HermitianTraceFormVanishing.herm_smul_left, hxξ, hξξ, mul_zero, add_zero]
+    rw [HermitianTraceFormVanishing.herm_add_left, HermitianTraceFormVanishing.herm_smul_left, hxξ,
+      hξξ, mul_zero, add_zero]
   have hucomp : X.ucomp z0 ξ (X.embV x') = X.ucomp z0 ξ (X.embV x) := by
     funext τ
     rw [hu x' τ, hu x τ, hemb τ, UnipotentCoefficientShift.ucomp_shift _ _ _ _ _ (hHne τ)]
-  have hcoef : ∀ τ : X.Ψ, ‖X.Hf z0 τ (Data.emb τ.1 x') (Data.emb τ.1 ξ) /
-      X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)‖ ≤ 2 * (fdeg E : ℝ) ^ 2 * rdE E * X.NA := by
+  have hcoef
+      : ∀ τ : X.Ψ,
+        ‖X.Hf z0 τ (Data.emb τ.1 x') (Data.emb τ.1 ξ) /
+            X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)‖
+          ≤ 2 * (fdeg E : ℝ) ^ 2 * rdE E * X.NA := by
     intro τ
     rw [hemb τ, UnipotentCoefficientShift.coef_shift _ _ _ _ _ (hHne τ)]
     have hNA : (X.NA : ℂ) ≠ 0 := by exact_mod_cast X.NA_pos.ne'
@@ -93,18 +106,23 @@ theorem isotropic_outside_line_of_covering (hD3 : IntegerApproximationCount (E :
       linear_combination (-1 : ℂ) * hk
     rw [e, norm_mul, Complex.norm_natCast]
     have hb : ‖τ.1 (α : E) - -k / X.NA‖ ≤ 2 * (fdeg E : ℝ) ^ 2 * rdE E := hα τ
-    calc (X.NA : ℝ) * ‖τ.1 (α : E) - -k / X.NA‖ ≤ X.NA * (2 * (fdeg E : ℝ) ^ 2 * rdE E) :=
-          mul_le_mul_of_nonneg_left hb (Nat.cast_nonneg _)
+    calc
+      (X.NA : ℝ) * ‖τ.1 (α : E) - -k / X.NA‖
+        ≤ X.NA * (2 * (fdeg E : ℝ) ^ 2 * rdE E) := mul_le_mul_of_nonneg_left hb (Nat.cast_nonneg _)
       _ = 2 * (fdeg E : ℝ) ^ 2 * rdE E * X.NA := by ring
   refine ⟨hx'L, hx'ξ, hucomp, hcoef, ?_⟩
   intro τ
   have hembNC : Data.emb τ.1 ((X.NC : E) • x') = ((X.NC : ℝ) : ℂ) • Data.emb τ.1 x' := by
     funext a
     simp [Data.emb]
-  rw [hembNC, UnipotentCoefficientShift.maj_smul hzdom, UnipotentCoefficientShift.maj_decomp hzdom τ _ _ (hHne τ)]
-  have hw : Data.emb τ.1 x' - (X.Hf z0 τ (Data.emb τ.1 x') (Data.emb τ.1 ξ) /
-      X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) • Data.emb τ.1 ξ =
-        X.ucomp z0 ξ (X.embV x) τ := by
+  rw [hembNC, UnipotentCoefficientShift.maj_smul hzdom,
+    UnipotentCoefficientShift.maj_decomp hzdom τ _ _ (hHne τ)]
+  have hw
+      : Data.emb τ.1 x'
+          - (X.Hf z0 τ (Data.emb τ.1 x') (Data.emb τ.1 ξ)
+              / X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ))
+            • Data.emb τ.1 ξ
+        = X.ucomp z0 ξ (X.embV x) τ := by
     rw [← hucomp, hu x' τ]
   rw [hw]
   have hK := hcoef τ
@@ -126,14 +144,17 @@ theorem isotropic_outside_line_of_covering (hD3 : IntegerApproximationCount (E :
     nlinarith [mul_le_mul hK hK hK0 (le_trans hK0 hK)]
   have h3 : X.c τ * (m + K ^ 2 * X.maj z0 τ (Data.emb τ.1 ξ)) = X.c τ * m + K ^ 2 := by
     linear_combination K ^ 2 * hD
-  have h4 : X.c τ * (m + K ^ 2 * X.maj z0 τ (Data.emb τ.1 ξ)) ≤
-      2 + 4 * (fdeg E : ℝ) ^ 4 * rdE E ^ 2 * (X.NA : ℝ) ^ 2 := by
+  have h4
+      : X.c τ * (m + K ^ 2 * X.maj z0 τ (Data.emb τ.1 ξ))
+        ≤ 2 + 4 * (fdeg E : ℝ) ^ 4 * rdE E ^ 2 * (X.NA : ℝ) ^ 2 := by
     rw [h3]
     linarith
-  calc X.c τ * ((X.NC : ℝ) ^ 2 * (m + K ^ 2 * X.maj z0 τ (Data.emb τ.1 ξ)))
+  calc
+    X.c τ * ((X.NC : ℝ) ^ 2 * (m + K ^ 2 * X.maj z0 τ (Data.emb τ.1 ξ)))
       = (X.NC : ℝ) ^ 2 * (X.c τ * (m + K ^ 2 * X.maj z0 τ (Data.emb τ.1 ξ))) := by ring
     _ ≤ _ := mul_le_mul_of_nonneg_left h4 (by positivity)
 
-theorem isotropic_outside_line : IsotropicOutsideLine (E := E) := isotropic_outside_line_of_covering integerApproximationCount_holds
+theorem isotropic_outside_line : IsotropicOutsideLine (E := E) :=
+  isotropic_outside_line_of_covering integerApproximationCount_holds
 
 end ReciprocityTheory.ChartRestriction.G.FD

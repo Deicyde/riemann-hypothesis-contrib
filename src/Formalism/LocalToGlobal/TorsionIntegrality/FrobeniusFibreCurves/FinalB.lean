@@ -13,28 +13,17 @@ public import Formalism.LocalToGlobal.TorsionIntegrality.FrobeniusFibreCurves.Lo
 
 namespace Formalism.L2.Th1.B
 
-theorem halfExists : HalfExists := by
-  exact formal_halving_exists
-theorem cobRules : CobRules := by
-  exact coboundary_rules_hold
-theorem simeqInt : SimeqInt := by
-  exact Sim.simeq_integral_series
-theorem simeqLog : SimeqLog := by
-  exact Sim.simeq_formal_log
-theorem phODef : PhODef := by
-  exact Ph.logSigmaPullbackSpec
-theorem phEDef : PhEDef := by
-  exact Ph.logSigmaOnePullbackSpec
-theorem wIntegral : WIntegral := by
-  exact ParE.weierstrass_series_integral
-theorem parO : ParO := by
-  exact ParO.ParO_of addSgStar phODef simeqLog
-theorem diffPh : DiffPh := by
-  exact ParO.DiffPh_of sigma1Sq simeqLog
-theorem cube : Cube := by
-  exact Cube_of halfExists simeqInt
-theorem jetsThree : JetsThree := by
-  exact Jets.jets_three_variables_holds
+theorem halfExists : HalfExists := by exact formal_halving_exists
+theorem cobRules : CobRules := by exact coboundary_rules_hold
+theorem simeqInt : SimeqInt := by exact Sim.simeq_integral_series
+theorem simeqLog : SimeqLog := by exact Sim.simeq_formal_log
+theorem phODef : PhODef := by exact Ph.logSigmaPullbackSpec
+theorem phEDef : PhEDef := by exact Ph.logSigmaOnePullbackSpec
+theorem wIntegral : WIntegral := by exact ParE.weierstrass_series_integral
+theorem parO : ParO := by exact ParO.ParO_of addSgStar phODef simeqLog
+theorem diffPh : DiffPh := by exact ParO.DiffPh_of sigma1Sq simeqLog
+theorem cube : Cube := by exact Cube_of halfExists simeqInt
+theorem jetsThree : JetsThree := by exact Jets.jets_three_variables_holds
 
 theorem f1O : LogSigmaPullbackCocycle := by
   intro K _ _ _ g2 g3 s2 c0 P l i ep F hP hF hi hC h2

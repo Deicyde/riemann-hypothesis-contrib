@@ -20,7 +20,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianVarie
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.AV GlobalTheory.AV.AbVar
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.AV GlobalTheory.AV.AbVar
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] CategoryTheory.Over.cartesianMonoidalCategory
 
@@ -29,8 +30,9 @@ open scoped CategoryTheory.Obj CategoryTheory.MonObj
 
 namespace GlobalTheory.Dieu.AbsDet
 
-theorem exists_mul_eq_zero_of_not_isUnit {R : Type} [Ring R] [Algebra ℚ R] [Module.Finite ℚ R] (x : R)
-    (hx : ¬ IsUnit x) : ∃ y : R, y ≠ 0 ∧ y * x = 0 := by
+theorem exists_mul_eq_zero_of_not_isUnit
+    {R : Type} [Ring R] [Algebra ℚ R] [Module.Finite ℚ R] (x : R) (hx : ¬ IsUnit x)
+    : ∃ y : R, y ≠ 0 ∧ y * x = 0 := by
   by_contra h
   push Not at h
   have hr : Function.Injective (LinearMap.mulRight ℚ x) := by
@@ -49,19 +51,20 @@ theorem exists_mul_eq_zero_of_not_isUnit {R : Type} [Ring R] [Algebra ℚ R] [Mo
   obtain ⟨z, hz⟩ := (LinearMap.injective_iff_surjective.mp hl) 1
   have hxz : x * z = 1 := hz
   have hyz : y = z := by
-    calc y = y * (x * z) := by rw [hxz, mul_one]
+    calc
+      y = y * (x * z) := by rw [hxz, mul_one]
       _ = z := by rw [← mul_assoc, hyx, one_mul]
   exact hx ⟨⟨x, y, hyz ▸ hxz, hyx⟩, rfl⟩
 
-theorem norm_natCast_padicInt (p : ℕ) [Fact p.Prime] (n : ℕ) (hn : 0 < n) :
-    ‖((n : ℕ) : ℤ_[p])‖ = (p : ℝ) ^ (-(padicValNat p n : ℤ)) := by
-  have h1 : ‖((n : ℕ) : ℤ_[p])‖ = ‖((n : ℚ) : ℚ_[p])‖ := by
-    rw [PadicInt.norm_def]; push_cast; rfl
+theorem norm_natCast_padicInt (p : ℕ) [Fact p.Prime] (n : ℕ) (hn : 0 < n)
+    : ‖((n : ℕ) : ℤ_[p])‖ = (p : ℝ) ^ (-(padicValNat p n : ℤ)) := by
+  have h1 : ‖((n : ℕ) : ℤ_[p])‖ = ‖((n : ℚ) : ℚ_[p])‖ := by rw [PadicInt.norm_def]; push_cast; rfl
   rw [h1, Padic.eq_padicNorm, padicNorm.eq_zpow_of_ne_zero (by exact_mod_cast hn.ne'),
     padicValRat.of_nat, Rat.cast_zpow, Rat.cast_natCast, Nat.padicValNat_def]
 
-theorem exists_comp_eq_zero_of_not_isIsogeny {k : Type} [Field k] (A : AbVar k) (f : End A)
-    (hf : ¬ IsIsogeny f.asHom) : ∃ g : End A, g ≠ 0 ∧ f.asHom ≫ g.asHom = 0 := by
+theorem exists_comp_eq_zero_of_not_isIsogeny
+    {k : Type} [Field k] (A : AbVar k) (f : End A) (hf : ¬ IsIsogeny f.asHom)
+    : ∃ g : End A, g ≠ 0 ∧ f.asHom ≫ g.asHom = 0 := by
   have hfin := (GlobalTheory.T.end_isogeny_algebra_finite_finrank_le k A).1
   have hx : ¬ IsUnit (toEnd0 A f) := by
     rintro ⟨u, hu⟩
@@ -88,15 +91,20 @@ theorem exists_comp_eq_zero_of_not_isIsogeny {k : Type} [Field k] (A : AbVar k) 
       rw [map_mul, ← hg, smul_mul_assoc, hyx, smul_zero, map_zero]
     simpa only [End.addEquiv_apply, End.mul_asHom, map_zero] using congrArg End.addEquiv hz
 
-theorem norm_det_eq_norm_deg : ∀ (p : ℕ) [Fact p.Prime] (T : Theory p) (k : Type) [Field k] [CharP k p]
-    [PerfectRing k p] (A : AbVar k) (G : PDivGroup p k) (t : G.TorsionTower A.X)
-    [Module.Free (WittVector p k) (T.M G)] [Module.Finite (WittVector p k) (T.M G)]
-    (ψ : ℤ_[p] →+* (WittVector p k)) (f : End A) (d : ℤ_[p]),
-    LinearMap.det (T.map (t.map t f.asHom.hom)) = ψ d → ‖d‖ = ‖((deg f.asHom : ℕ) : ℤ_[p])‖ := by
+theorem norm_det_eq_norm_deg
+    : ∀ (p : ℕ) [Fact p.Prime] (T : Theory p) (k : Type) [Field k] [CharP k p] [PerfectRing k p]
+        (A : AbVar k) (G : PDivGroup p k) (t : G.TorsionTower A.X)
+        [Module.Free (WittVector p k) (T.M G)] [Module.Finite (WittVector p k) (T.M G)]
+        (ψ : ℤ_[p] →+* (WittVector p k)) (f : End A) (d : ℤ_[p]),
+      LinearMap.det (T.map (t.map t f.asHom.hom)) = ψ d → ‖d‖ = ‖((deg f.asHom : ℕ) : ℤ_[p])‖ := by
   intro p _ T k _ _ _ A G t _ _ ψ f d hd
-  have hlen := GlobalTheory.T.wittVector_colength_range_eq_det_valuation p k (T.M G) ψ (T.map (t.map t f.asHom.hom)) d hd
+  have hlen :=
+    GlobalTheory.T.wittVector_colength_range_eq_det_valuation p k (T.M G) ψ
+      (T.map (t.map t f.asHom.hom)) d hd
   by_cases hf : IsIsogeny f.asHom
-  · have hb := (GlobalTheory.T.abelianVariety_dieudonne_integrality_factorisation p T k A A G G t t f.asHom).2.1 hf
+  · have hb :=
+      (GlobalTheory.T.abelianVariety_dieudonne_integrality_factorisation p T k A A G G t t
+        f.asHom).2.1 hf
     have hpos := (isogeny_flat_finrank k A A f.asHom hf).2.2.1
     rw [hlen.1 _ hb.2, norm_natCast_padicInt p _ hpos]
   · have hdeg : deg f.asHom = 0 := by rw [deg, ite_eq_right hf]
@@ -104,10 +112,14 @@ theorem norm_det_eq_norm_deg : ∀ (p : ℕ) [Fact p.Prime] (T : Theory p) (k : 
     apply hlen.2.1
     intro hinj
     obtain ⟨g, hg0, hfg⟩ := exists_comp_eq_zero_of_not_isIsogeny A f hf
-    have hfun := GlobalTheory.T.dieudonneFunctorBase_functor_properties p (fun _ _ _ => True) T.base k G G G trivial trivial trivial
+    have hfun :=
+      GlobalTheory.T.dieudonneFunctorBase_functor_properties p
+        (fun _ _ _ => True)
+        T.base k G G G trivial trivial trivial
     have hcomp : t.map t f.asHom.hom ≫ t.map t g.asHom.hom = 0 := by
       have e1 : f.asHom.hom ≫ g.asHom.hom = (1 : A.X ⟶ A.X) := by rw [← comp_hom, hfg, zero_hom]
-      exact (TorsionTower.map_comp t t t _ _).symm.trans ((t.map_congr t e1).trans (TorsionTower.map_one t t))
+      exact (TorsionTower.map_comp t t t _ _).symm.trans
+        ((t.map_congr t e1).trans (TorsionTower.map_one t t))
     have hne : T.map (t.map t g.asHom.hom) ≠ 0 := by
       intro h0
       apply hg0

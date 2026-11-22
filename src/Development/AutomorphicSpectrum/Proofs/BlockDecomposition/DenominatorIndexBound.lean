@@ -9,17 +9,18 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.IdxGe
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
 open scoped Matrix
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem index_toAddSubgroup (a : Ideal (𝓞 K)) :
-    (Submodule.toAddSubgroup a).index = Ideal.absNorm a := (Ideal.absNorm_eq_index a).symm
+theorem index_toAddSubgroup (a : Ideal (𝓞 K))
+    : (Submodule.toAddSubgroup a).index = Ideal.absNorm a :=
+  (Ideal.absNorm_eq_index a).symm
 
-theorem relIndex_mul_ideal (𝔱 a : Ideal (𝓞 K)) (ha : a ≠ ⊥) :
-    (Submodule.toAddSubgroup (𝔱 * a)).relIndex (Submodule.toAddSubgroup a) =
-      Ideal.absNorm 𝔱 := by
+theorem relIndex_mul_ideal (𝔱 a : Ideal (𝓞 K)) (ha : a ≠ ⊥)
+    : (Submodule.toAddSubgroup (𝔱 * a)).relIndex (Submodule.toAddSubgroup a) = Ideal.absNorm 𝔱 := by
   have hle : Submodule.toAddSubgroup (𝔱 * a) ≤ Submodule.toAddSubgroup a :=
     (Submodule.toAddSubgroup_le _ _).2 Ideal.mul_le_right
   have h := AddSubgroup.relIndex_mul_index hle
@@ -27,8 +28,7 @@ theorem relIndex_mul_ideal (𝔱 a : Ideal (𝓞 K)) (ha : a ≠ ⊥) :
   have hne : Ideal.absNorm a ≠ 0 := fun h0 => ha (Ideal.absNorm_eq_zero_iff.1 h0)
   exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hne) h
 
-theorem mem_den_iff (x : K) (a : 𝓞 K) :
-    a ∈ den K x ↔ (a : K) * x ∈ (1 : Submodule (𝓞 K) K) := by
+theorem mem_den_iff (x : K) (a : 𝓞 K) : a ∈ den K x ↔ (a : K) * x ∈ (1 : Submodule (𝓞 K) K) := by
   rw [den, Ideal.mem_torsionOf_iff, ← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
   constructor
   · intro h
@@ -39,17 +39,19 @@ theorem mem_den_iff (x : K) (a : 𝓞 K) :
     intro i
     exact ⟨o, by simpa [Algebra.smul_def] using ho⟩
 
-theorem absNorm_den_le (x : K) (d e : 𝓞 K) (hd : d ≠ 0) (hex : (e : K) = (d : K) * x)
+theorem absNorm_den_le
+    (x : K) (d e : 𝓞 K) (hd : d ≠ 0) (hex : (e : K) = (d : K) * x)
     (B : Ideal (𝓞 K)) (hdB : Ideal.span {d} ≤ B) (heB : e ∈ B)
-    (hfin : (Submodule.toAddSubgroup (Ideal.span {d})).relIndex (Submodule.toAddSubgroup B) ≠ 0) :
-    Ideal.absNorm (den K x) ≤
-      (Submodule.toAddSubgroup (Ideal.span {d})).relIndex (Submodule.toAddSubgroup B) := by
+    (hfin : (Submodule.toAddSubgroup (Ideal.span {d})).relIndex (Submodule.toAddSubgroup B) ≠ 0)
+    : Ideal.absNorm (den K x)
+      ≤ (Submodule.toAddSubgroup (Ideal.span {d})).relIndex (Submodule.toAddSubgroup B) := by
   set H := (Submodule.toAddSubgroup (Ideal.span {d})).addSubgroupOf (Submodule.toAddSubgroup B)
     with hH
-  let g : 𝓞 K →+ Submodule.toAddSubgroup B :=
-    { toFun := fun r => ⟨r * e, B.mul_mem_left r heB⟩
-      map_zero' := by ext; simp
-      map_add' := fun r s => by ext; simp [add_mul] }
+  let g : 𝓞 K →+ Submodule.toAddSubgroup B := {
+    toFun := fun r => ⟨r * e, B.mul_mem_left r heB⟩
+    map_zero' := by ext; simp
+    map_add' := fun r s => by ext; simp [add_mul]
+  }
   let f : 𝓞 K →+ (Submodule.toAddSubgroup B) ⧸ H := (QuotientAddGroup.mk' H).comp g
   have hdK : (d : K) ≠ 0 := by simpa using hd
   have hker : f.ker = Submodule.toAddSubgroup (den K x) := by
@@ -76,15 +78,18 @@ theorem absNorm_den_le (x : K) (d e : 𝓞 K) (hd : d ≠ 0) (hex : (e : K) = (d
   have hidx : (den K x).toAddSubgroup.index = Nat.card f.range := by
     rw [← hker]; exact AddSubgroup.index_ker f
   have hfinite : Finite ((Submodule.toAddSubgroup B) ⧸ H) := Nat.finite_of_card_ne_zero hfin
-  calc Ideal.absNorm (den K x) = Nat.card f.range := by rw [Ideal.absNorm_eq_index]; exact hidx
+  calc
+    Ideal.absNorm (den K x)
+      = Nat.card f.range := by rw [Ideal.absNorm_eq_index]; exact hidx
     _ ≤ Nat.card ((Submodule.toAddSubgroup B) ⧸ H) :=
-        Nat.card_le_card_of_injective _ Subtype.val_injective
+      Nat.card_le_card_of_injective _ Subtype.val_injective
     _ = _ := rfl
 
-theorem span_le_mul (𝔱 a : Ideal (𝓞 K)) (h𝔱 : 𝔱 ≠ ⊥) (d : 𝓞 K) (hd : d ≠ 0)
-    (H : ∀ b : K, (∀ u ∈ 𝔱, (u : K) * b ∈ (1 : Submodule (𝓞 K) K)) →
-      ∃ y ∈ a, (y : K) = (d : K) * b) :
-    Ideal.span {d} ≤ 𝔱 * a := by
+theorem span_le_mul
+    (𝔱 a : Ideal (𝓞 K)) (h𝔱 : 𝔱 ≠ ⊥)
+    (d : 𝓞 K) (hd : d ≠ 0)
+    (H : ∀ b : K, (∀ u ∈ 𝔱, (u : K) * b ∈ (1 : Submodule (𝓞 K) K)) → ∃ y ∈ a, (y : K) = (d : K) * b)
+    : Ideal.span {d} ≤ 𝔱 * a := by
   obtain ⟨s, hs𝔱, hs⟩ := Submodule.exists_mem_ne_zero_of_ne_bot h𝔱
   obtain ⟨𝔰, h𝔰⟩ := Ideal.dvd_span_singleton.2 hs𝔱
   have hsK : (s : K) ≠ 0 := by simpa using hs
@@ -97,8 +102,7 @@ theorem span_le_mul (𝔱 a : Ideal (𝓞 K)) (h𝔱 : 𝔱 ≠ ⊥) (d : 𝓞 K
     intro u hu
     have hmem : ∀ v ∈ 𝔱, (v : K) * ((u : K) / s) ∈ (1 : Submodule (𝓞 K) K) := by
       intro v hv
-      have hvu : v * u ∈ Ideal.span {s} := by
-        rw [h𝔰]; exact Ideal.mul_mem_mul hv hu
+      have hvu : v * u ∈ Ideal.span {s} := by rw [h𝔰]; exact Ideal.mul_mem_mul hv hu
       obtain ⟨r, hr⟩ := Ideal.mem_span_singleton'.1 hvu
       refine Submodule.mem_one.2 ⟨r, ?_⟩
       have := congrArg (fun y : 𝓞 K => (y : K)) hr
@@ -112,16 +116,20 @@ theorem span_le_mul (𝔱 a : Ideal (𝓞 K)) (h𝔱 : 𝔱 ≠ ⊥) (d : 𝓞 K
       simp only [map_mul, hy]
       field_simp
     rw [heq, mul_right_comm 𝔱 a 𝔰, ← h𝔰, mul_comm s y]
-    exact Ideal.mul_mem_mul hya (Ideal.mem_span_singleton_self s) |> fun h => by
-      rwa [mul_comm a] at h
+    exact Ideal.mul_mem_mul hya (Ideal.mem_span_singleton_self s)
+      |> fun h => by rwa [mul_comm a] at h
   rw [← Ideal.dvd_iff_le] at hle ⊢
   exact (mul_dvd_mul_iff_right h𝔰0).1 hle
 
-theorem absNorm_mul_den_le_idx : ∀ (K : Type) [Field K] [NumberField K] (𝔱 : Ideal (𝓞 K)),
-    𝔱 ≠ ⊥ → ∀ c : Submodule (𝓞 K) K, c.FG → (1 : Submodule (𝓞 K) K) ≤ c →
-    (∀ b : K, (∀ a ∈ 𝔱, (a : K) * b ∈ (1 : Submodule (𝓞 K) K)) → b ∈ c) →
-    ∀ (t : 𝓞 K) (w x : K), t ∈ 𝔱 → w ∈ c → (t : K) * w - x ∈ (1 : Submodule (𝓞 K) K) →
-    Ideal.absNorm 𝔱 * Ideal.absNorm (den K x) ≤ idx K c := by
+theorem absNorm_mul_den_le_idx
+    : ∀ (K : Type) [Field K] [NumberField K] (𝔱 : Ideal (𝓞 K)),
+      𝔱 ≠ ⊥
+        → ∀ c : Submodule (𝓞 K) K,
+          c.FG → (1 : Submodule (𝓞 K) K) ≤ c
+            → (∀ b : K, (∀ a ∈ 𝔱, (a : K) * b ∈ (1 : Submodule (𝓞 K) K)) → b ∈ c)
+            → ∀ (t : 𝓞 K) (w x : K),
+              t ∈ 𝔱 → w ∈ c → (t : K) * w - x ∈ (1 : Submodule (𝓞 K) K)
+                → Ideal.absNorm 𝔱 * Ideal.absNorm (den K x) ≤ idx K c := by
   intro K _ _ 𝔱 h𝔱 c hfg h1 hinv t w x ht hw hx
   obtain ⟨d, hd0, hint⟩ := FractionalIdeal.isFractional_of_fg (S := nonZeroDivisors (𝓞 K)) hfg
   have hd : d ≠ 0 := nonZeroDivisors.ne_zero hd0
@@ -148,8 +156,7 @@ theorem absNorm_mul_den_le_idx : ∀ (K : Type) [Field K] [NumberField K] (𝔱 
     rw [hmema, mul_inv_cancel₀ hdK]
     exact h1 (Submodule.one_le.1 le_rfl)
   have ha0 : a ≠ ⊥ := fun h => hd (by simpa [h] using hda)
-  have hdle : Ideal.span {d} ≤ 𝔱 * a :=
-    span_le_mul 𝔱 a h𝔱 d hd fun b hb => hga b (hinv b hb)
+  have hdle : Ideal.span {d} ≤ 𝔱 * a := span_le_mul 𝔱 a h𝔱 d hd fun b hb => hga b (hinv b hb)
   have hBa : 𝔱 * a ≤ a := Ideal.mul_le_right
 
   have hinj : Function.Injective g.toAddMonoidHom := by
@@ -168,8 +175,9 @@ theorem absNorm_mul_den_le_idx : ∀ (K : Type) [Field K] [NumberField K] (𝔱 
       field_simp
     · rintro ⟨y, hya, rfl⟩
       exact hya
-  have hone : (1 : Submodule (𝓞 K) K).toAddSubgroup =
-      (Submodule.toAddSubgroup (Ideal.span {d})).map g.toAddMonoidHom := by
+  have hone
+      : (1 : Submodule (𝓞 K) K).toAddSubgroup
+        = (Submodule.toAddSubgroup (Ideal.span {d})).map g.toAddMonoidHom := by
     ext b
     constructor
     · intro hb
@@ -187,15 +195,17 @@ theorem absNorm_mul_den_le_idx : ∀ (K : Type) [Field K] [NumberField K] (𝔱 
       rw [hg]
       simp only [map_mul]
       field_simp
-  have hidx : idx K c = (Submodule.toAddSubgroup (Ideal.span {d})).relIndex
-      (Submodule.toAddSubgroup a) := by
+  have hidx
+      : idx K c
+        = (Submodule.toAddSubgroup (Ideal.span {d})).relIndex (Submodule.toAddSubgroup a) := by
     rw [idx, hc, hone, AddSubgroup.relIndex_map_map_of_injective _ _ hinj]
   have hdB : Submodule.toAddSubgroup (Ideal.span {d}) ≤ Submodule.toAddSubgroup (𝔱 * a) :=
     (Submodule.toAddSubgroup_le _ _).2 hdle
   have hBa' : Submodule.toAddSubgroup (𝔱 * a) ≤ Submodule.toAddSubgroup a :=
     (Submodule.toAddSubgroup_le _ _).2 hBa
-  have hfin : (Submodule.toAddSubgroup (Ideal.span {d})).relIndex
-      (Submodule.toAddSubgroup (𝔱 * a)) ≠ 0 := by
+  have hfin
+      : (Submodule.toAddSubgroup (Ideal.span {d})).relIndex (Submodule.toAddSubgroup (𝔱 * a))
+        ≠ 0 := by
     intro h0
     have h := AddSubgroup.relIndex_mul_index hdB
     rw [h0, zero_mul, index_toAddSubgroup] at h

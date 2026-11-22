@@ -87,9 +87,10 @@ lemma prod_eq_pfPoly (d : Fin (m + 1) → ℝ) (d' : Fin m → ℝ)
   simp only [eval_sub, eval_X, eval_C, sub_zero]
   exact Finset.prod_eq_zero (mem_univ i) (sub_self _)
 
-theorem pfDer : ∀ {m : ℕ} (d : Fin (m + 1) → ℝ) (d' : Fin m → ℝ),
-    Function.Injective (Sum.elim d d') →
-      ∀ i, 1 - ∑ j, pfR d d' j / (d i - d' j) ^ 2 = pfD d d' i := by
+theorem pfDer
+    : ∀ {m : ℕ} (d : Fin (m + 1) → ℝ) (d' : Fin m → ℝ),
+      Function.Injective (Sum.elim d d')
+        → ∀ i, 1 - ∑ j, pfR d d' j / (d i - d' j) ^ 2 = pfD d d' i := by
   intro m d d' h i
   have hdd' : ∀ j, d i - d' j ≠ 0 := by
     intro j hij
@@ -98,12 +99,12 @@ theorem pfDer : ∀ {m : ℕ} (d : Fin (m + 1) → ℝ) (d' : Fin m → ℝ),
     exact absurd (h this) (by simp)
   set Q : ℝ[X] := ∏ j, (X - C (d' j)) with hQdef
   have hQe : ∀ s, Q.eval s = ∏ j, (s - d' j) := fun s => by simp [hQdef, eval_prod]
-  have hQ0 : Q.eval (d i) ≠ 0 := by
-    rw [hQe]; exact Finset.prod_ne_zero_iff.2 fun j _ => hdd' j
+  have hQ0 : Q.eval (d i) ≠ 0 := by rw [hQe]; exact Finset.prod_ne_zero_iff.2 fun j _ => hdd' j
 
   let f : ℝ → ℝ := fun s => s - pfX d d' + ∑ j, pfR d d' j / (s - d' j)
-  have hterm : ∀ j ∈ (univ : Finset (Fin m)), HasDerivAt (fun s => pfR d d' j / (s - d' j))
-      (-(pfR d d' j / (d i - d' j) ^ 2)) (d i) := by
+  have hterm
+      : ∀ j ∈ (univ : Finset (Fin m)),
+        HasDerivAt (fun s => pfR d d' j / (s - d' j)) (-(pfR d d' j / (d i - d' j) ^ 2)) (d i) := by
     intro j _
     have h1 : HasDerivAt (fun s : ℝ => s - d' j) 1 (d i) := (hasDerivAt_id _).sub_const _
     have h2 := (hasDerivAt_const (d i) (pfR d d' j)).fun_div h1 (hdd' j)
@@ -113,7 +114,8 @@ theorem pfDer : ∀ {m : ℕ} (d : Fin (m + 1) → ℝ) (d' : Fin m → ℝ),
     have h4 := ((hasDerivAt_id (d i)).sub_const (pfX d d')).fun_add h3
     exact h4.congr_deriv (by simp [sub_eq_add_neg])
   have hf0 : f (d i) = 0 := GlobalTheory.T.partial_fraction_diagonal_identity d d' h i
-  have hprod : HasDerivAt (fun s => Q.eval s * f s)
+  have hprod : HasDerivAt
+      (fun s => Q.eval s * f s)
       (Q.eval (d i) * (1 - ∑ j, pfR d d' j / (d i - d' j) ^ 2)) (d i) := by
     have := (Q.hasDerivAt (d i)).fun_mul hf
     exact this.congr_deriv (by simp [hf0])

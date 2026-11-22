@@ -14,15 +14,15 @@ namespace GroundTheory.Heights₂.Heights.Inter
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem HorizNotMem.ringKrullDim_quotient_add_one_le {R : Type*} [CommRing R] {W₀ W : Ideal R}
-    [hW₀ : W₀.IsPrime] [hW : W.IsPrime] (hlt : W₀ < W) :
-    ringKrullDim (R ⧸ W) + 1 ≤ ringKrullDim (R ⧸ W₀) := by
+theorem HorizNotMem.ringKrullDim_quotient_add_one_le
+    {R : Type*} [CommRing R] {W₀ W : Ideal R} [hW₀ : W₀.IsPrime] [hW : W.IsPrime] (hlt : W₀ < W)
+    : ringKrullDim (R ⧸ W) + 1 ≤ ringKrullDim (R ⧸ W₀) := by
   rw [ringKrullDim_quotient, ringKrullDim_quotient]
-  have : Nonempty (PrimeSpectrum.zeroLocus (R := R) W) :=
-    ⟨⟨⟨W, hW⟩, fun _ h => h⟩⟩
+  have : Nonempty (PrimeSpectrum.zeroLocus (R := R) W) := ⟨⟨⟨W, hW⟩, fun _ h => h⟩⟩
   rw [← Order.krullDim_withBot]
   let f : WithBot (PrimeSpectrum.zeroLocus (R := R) W) → PrimeSpectrum.zeroLocus (R := R) W₀ :=
-    fun x => WithBot.recBotCoe ⟨⟨W₀, hW₀⟩, fun _ h => h⟩ (fun q => ⟨q.1, fun _ h => q.2 (hlt.le h)⟩) x
+    fun x =>
+      WithBot.recBotCoe ⟨⟨W₀, hW₀⟩, fun _ h => h⟩ (fun q => ⟨q.1, fun _ h => q.2 (hlt.le h)⟩) x
   refine Order.krullDim_le_of_strictMono f ?_
   intro a b hab
   induction a using WithBot.recBotCoe with
@@ -55,7 +55,9 @@ theorem HorizNotMem.proof : HorizNotMem.Statement := by
     have hstep := HorizNotMem.ringKrullDim_quotient_add_one_le (lt_of_le_of_ne hW₀W hne)
     have h3 := add_le_add hstep (le_refl (1 : WithBot ℕ∞))
     rw [h1, h2, hP.2.2.2] at h3
-    have h4 : ((d + Fintype.card K + 1 : ℕ) : WithBot ℕ∞) ≤ ((d + Fintype.card K : ℕ) : WithBot ℕ∞) := by
+    have h4
+        : ((d + Fintype.card K + 1 : ℕ) : WithBot ℕ∞)
+          ≤ ((d + Fintype.card K : ℕ) : WithBot ℕ∞) := by
       exact_mod_cast h3
     have h5 := WithBot.coe_le_coe.mp h4
     have h6 : d + Fintype.card K + 1 ≤ d + Fintype.card K := by exact_mod_cast h5

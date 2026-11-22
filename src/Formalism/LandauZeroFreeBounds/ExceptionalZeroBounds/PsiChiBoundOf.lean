@@ -260,7 +260,9 @@ theorem chebyshev_character_bound_of : PsiChiBoundOf := by
   · have hB0 : B = ∅ := Finset.eq_empty_of_forall_notMem fun β hβ => (hB.2.1 β hβ).1 hχ
     subst hχ hB0
     rw [if_pos rfl, Finset.sum_empty, add_zero]
-    have hG' : ∀ z : ℝ, x ≤ z → |Formalism.Gz z| ≤ Kg' * z * Real.exp (-cg * Real.sqrt (Real.log z)) := by
+    have hG'
+        : ∀ z : ℝ,
+          x ≤ z → |Formalism.Gz z| ≤ Kg' * z * Real.exp (-cg * Real.sqrt (Real.log z)) := by
       intro z hz
       refine (hGz z (by linarith)).trans ?_
       have : 0 ≤ z * Real.exp (-cg * Real.sqrt (Real.log z)) := by
@@ -270,9 +272,11 @@ theorem chebyshev_character_bound_of : PsiChiBoundOf := by
     have := chebyshev_principal_character_bound (q := q) hc0 hc01 hc0g hKg' hx hq hG'
     nlinarith
   · rw [if_neg hχ, sub_zero]
-    have hE : ∀ z : ℝ, x ≤ z →
-        ‖Schi χ z - negLD χ 1 * z + ∑ β ∈ B, (z : ℂ) ^ (β : ℂ) / ((β : ℂ) * ((β : ℂ) - 1))‖ ≤
-          Cs' * z * Real.exp (-cs * Real.sqrt (Real.log z)) := by
+    have hE
+        : ∀ z : ℝ,
+          x ≤ z
+            → ‖Schi χ z - negLD χ 1 * z + ∑ β ∈ B, (z : ℂ) ^ (β : ℂ) / ((β : ℂ) * ((β : ℂ) - 1))‖
+              ≤ Cs' * z * Real.exp (-cs * Real.sqrt (Real.log z)) := by
       intro z hz
       have hqz : (q : ℝ) ≤ Real.exp (cs * Real.sqrt (Real.log z)) := by
         refine hq.trans (Real.exp_le_exp.2 ?_)

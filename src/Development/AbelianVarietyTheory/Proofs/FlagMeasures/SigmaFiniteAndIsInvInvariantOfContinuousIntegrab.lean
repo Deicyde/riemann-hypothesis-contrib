@@ -9,10 +9,10 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem sigmaFinite_and_isInvInvariant_of_continuous_integrable :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-      [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G)
-      [μ.IsHaarMeasure] [μ.IsMulRightInvariant] (f : G → ℂ),
+theorem sigmaFinite_and_isInvInvariant_of_continuous_integrable
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+        [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] [μ.IsMulRightInvariant]
+        (f : G → ℂ),
       Continuous f → f 1 ≠ 0 → Integrable f μ → SigmaFinite μ ∧ μ.IsInvInvariant := by
   intro G _ _ _ _ _ _ μ _ _ f hfc hf1 hfi
 
@@ -21,20 +21,21 @@ theorem sigmaFinite_and_isInvInvariant_of_continuous_integrable :
   have hcT : ‖f 1‖ₑ / 2 ≠ ⊤ := (ENNReal.div_lt_top enorm_ne_top two_ne_zero).ne
 
   have hUo : IsOpen {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} := isOpen_lt continuous_const hfc.enorm
-  have h1U : (1 : G) ∈ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} :=
-    ENNReal.half_lt_self hf1' enorm_ne_top
+  have h1U : (1 : G) ∈ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} := ENNReal.half_lt_self hf1' enorm_ne_top
 
   have hUfin : μ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} < ⊤ := by
-    calc μ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ≤ μ {x : G | ‖f 1‖ₑ / 2 ≤ ‖f x‖ₑ} :=
-          measure_mono (Set.setOf_subset_setOf.2 fun _ hx => hx.le)
+    calc
+      μ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ≤ μ {x : G | ‖f 1‖ₑ / 2 ≤ ‖f x‖ₑ} :=
+        measure_mono (Set.setOf_subset_setOf.2 fun _ hx => hx.le)
       _ ≤ (∫⁻ x, ‖f x‖ₑ ∂μ) / (‖f 1‖ₑ / 2) :=
-          meas_ge_le_lintegral_div hfi.aestronglyMeasurable.enorm hc0 hcT
+        meas_ge_le_lintegral_div hfi.aestronglyMeasurable.enorm hc0 hcT
       _ < ⊤ := ENNReal.div_lt_top hfi.2.ne hc0
 
   have hσ : SigmaFinite μ := by
-    obtain ⟨T, hTc, hT⟩ := TopologicalSpace.isOpen_iUnion_countable
-      (fun g : G => (fun y => g⁻¹ * y) ⁻¹' {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ})
-      (fun g => hUo.preimage (continuous_const.mul continuous_id))
+    obtain ⟨T, hTc, hT⟩ :=
+      TopologicalSpace.isOpen_iUnion_countable
+        (fun g : G => (fun y => g⁻¹ * y) ⁻¹' {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ})
+        (fun g => hUo.preimage (continuous_const.mul continuous_id))
     refine Measure.sigmaFinite_of_countable
       (hTc.image fun g : G => (fun y => g⁻¹ * y) ⁻¹' {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ}) ?_ ?_
     · rintro _ ⟨g, -, rfl⟩
@@ -48,7 +49,8 @@ theorem sigmaFinite_and_isInvInvariant_of_continuous_integrable :
 
   have key : μ.inv = μ := by
     open Pointwise in
-    have hVo : IsOpen ({x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ∩ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ}⁻¹) := hUo.inter hUo.inv
+    have hVo : IsOpen ({x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ∩ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ}⁻¹) :=
+      hUo.inter hUo.inv
     open Pointwise in
     have hV0 : μ ({x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ∩ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ}⁻¹) ≠ 0 :=
       (hVo.measure_pos μ ⟨1, h1U, by simpa using h1U⟩).ne'
@@ -56,7 +58,9 @@ theorem sigmaFinite_and_isInvInvariant_of_continuous_integrable :
     have hVT : μ ({x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ∩ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ}⁻¹) ≠ ⊤ :=
       ((measure_mono Set.inter_subset_left).trans_lt hUfin).ne
     open Pointwise in
-    have hVinv : μ.inv ({x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ∩ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ}⁻¹) = μ ({x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ∩ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ}⁻¹) := by
+    have hVinv
+        : μ.inv ({x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ∩ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ}⁻¹)
+          = μ ({x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ} ∩ {x : G | ‖f 1‖ₑ / 2 < ‖f x‖ₑ}⁻¹) := by
       rw [Measure.inv_apply, Set.inter_inv, inv_inv, Set.inter_comm]
     rw [measure_eq_div_smul μ.inv μ hV0 hVT, hVinv, ENNReal.div_self hV0 hVT, one_smul]
   exact ⟨hσ, ⟨key⟩⟩

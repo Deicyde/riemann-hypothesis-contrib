@@ -5,15 +5,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-theorem UpperTheory.V.Af.Smo.schTw :
-    UpperTheory.V.Af.Smo.SchTensor → UpperTheory.V.Af.Smo.SchTw := by
+theorem UpperTheory.V.Af.Smo.schTw
+    : UpperTheory.V.Af.Smo.SchTensor → UpperTheory.V.Af.Smo.SchTw := by
   intro hT V M _ _ _ _ _ _ A e
   obtain ⟨δ, hδ, hAδ⟩ : ∃ δ : ℝ, 0 < δ ∧ ‖A‖ * δ ≤ 1 / 2 := by
     refine ⟨1 / (2 * (‖A‖ + 1)), by positivity, ?_⟩
@@ -22,7 +23,9 @@ theorem UpperTheory.V.Af.Smo.schTw :
     nlinarith
   have hball : ∀ ξ ∈ Metric.ball e δ, ‖A (ξ - e)‖ ≤ 1 / 2 := by
     intro ξ hξ
-    calc ‖A (ξ - e)‖ ≤ ‖A‖ * ‖ξ - e‖ := A.le_opNorm _
+    calc
+      ‖A (ξ - e)‖
+        ≤ ‖A‖ * ‖ξ - e‖ := A.le_opNorm _
       _ ≤ ‖A‖ * δ := by
         gcongr
         rw [← dist_eq_norm]
@@ -40,10 +43,11 @@ theorem UpperTheory.V.Af.Smo.schTw :
         rwa [χ.support_eq] at h1
       simp only [g]
       rw [norm_smul, Real.norm_of_nonneg χ.nonneg]
-      calc χ ξ * ‖A (ξ - e)‖ ≤ 1 * (1 / 2) := by
-            gcongr
-            · exact χ.le_one
-            · exact hball ξ hmem
+      calc
+        χ ξ * ‖A (ξ - e)‖ ≤ 1 * (1 / 2) := by
+          gcongr
+          · exact χ.le_one
+          · exact hball ξ hmem
         _ = 1 / 2 := by norm_num
   refine ⟨fun ξ => ((φ ξ : ℝ) : ℂ), ?_, ?_, ?_⟩
   · have h1 : φ e = 1 := φ.one_of_mem_closedBall (Metric.mem_closedBall_self φ.rIn_pos.le)
@@ -57,18 +61,18 @@ theorem UpperTheory.V.Af.Smo.schTw :
       have h1 : ξ ∈ Function.support φ := hφ
       rw [φ.support_eq] at h1
       exact Metric.ball_subset_ball (show δ / 2 ≤ δ by linarith) h1
-    have h2 : y = -(A (ξ - e)) y := eq_neg_of_add_eq_zero_left hy
+    have h2 : y = - (A (ξ - e)) y := eq_neg_of_add_eq_zero_left hy
     have h3 : ‖y‖ ≤ 1 / 2 * ‖y‖ := by
-      calc ‖y‖ = ‖(A (ξ - e)) y‖ := by
-            conv_lhs => rw [h2]
-            exact norm_neg _
+      calc
+        ‖y‖ = ‖(A (ξ - e)) y‖ := by
+          conv_lhs => rw [h2]
+          exact norm_neg _
         _ ≤ ‖A (ξ - e)‖ * ‖y‖ := (A (ξ - e)).le_opNorm y
         _ ≤ 1 / 2 * ‖y‖ := mul_le_mul_of_nonneg_right (hball ξ hmem) (norm_nonneg _)
     have h4 : ‖y‖ = 0 := le_antisymm (by linarith [norm_nonneg y]) (norm_nonneg y)
     exact norm_eq_zero.mp h4
   · intro α
-    have hh : ContDiff ℝ ∞ (fun ξ => ((φ ξ : ℝ) : ℂ)) :=
-      Complex.ofRealCLM.contDiff.comp φ.contDiff
+    have hh : ContDiff ℝ ∞ (fun ξ => ((φ ξ : ℝ) : ℂ)) := Complex.ofRealCLM.contDiff.comp φ.contDiff
     have hhc : HasCompactSupport (fun ξ => ((φ ξ : ℝ) : ℂ)) :=
       φ.hasCompactSupport.comp_left Complex.ofReal_zero
     obtain ⟨G0, hG0⟩ := hT V M (fun ξ => ((φ ξ : ℝ) : ℂ)) hh hhc α

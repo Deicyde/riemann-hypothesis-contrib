@@ -17,13 +17,14 @@ namespace Formalism.NormUnitaryCountingLemmas
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
 
-theorem exists_starProjection_ne_zero_norm_le_of_dualMinimum (M : Submodule ℤ E) [hMd : DiscreteTopology M]
-    (hspan : span ℝ (M : Set E) = ⊤) {l : ℝ} (hl : 0 < l)
-    (hdual : ∀ y : E, y ≠ 0 → (∀ x ∈ M, ∃ z : ℤ, inner ℝ x y = (z : ℝ)) → l ≤ ‖y‖)
+theorem exists_starProjection_ne_zero_norm_le_of_dualMinimum
+    (M : Submodule ℤ E) [hMd : DiscreteTopology M]
+    (hspan : span ℝ (M : Set E) = ⊤)
+    {l : ℝ}
+    (hl : 0 < l) (hdual : ∀ y : E, y ≠ 0 → (∀ x ∈ M, ∃ z : ℤ, inner ℝ x y = (z : ℝ)) → l ≤ ‖y‖)
     (W : Submodule ℝ E) (N : Submodule ℤ E) (hNM : N ≤ M) (hNW : span ℝ (N : Set E) = W)
-    (hW : W ≠ ⊤) :
-    ∃ m ∈ M, Wᗮ.starProjection m ≠ 0 ∧
-      ‖Wᗮ.starProjection m‖ ≤ (finrank ℝ E : ℝ) / l := by
+    (hW : W ≠ ⊤)
+    : ∃ m ∈ M, Wᗮ.starProjection m ≠ 0 ∧ ‖Wᗮ.starProjection m‖ ≤ (finrank ℝ E : ℝ) / l := by
   classical
   obtain ⟨hSat, hNS, -⟩ := Formalism.F.saturation_properties E M N hMd hNM
   obtain ⟨hQd, hrk, -⟩ := Formalism.F.degree_quotient E M (Formalism.F.satur M N) hMd hSat
@@ -35,7 +36,8 @@ theorem exists_starProjection_ne_zero_norm_le_of_dualMinimum (M : Submodule ℤ 
       exact (Submodule.mem_inf.mp hx).2
     · rw [← hNW]
       exact Submodule.span_mono (show (N : Set E) ⊆ Formalism.F.satur M N from hNS)
-  have hQeq : ∀ q, q ∈ Formalism.F.quot M (Formalism.F.satur M N) ↔ ∃ m ∈ M, Wᗮ.starProjection m = q := by
+  have hQeq
+      : ∀ q, q ∈ Formalism.F.quot M (Formalism.F.satur M N) ↔ ∃ m ∈ M, Wᗮ.starProjection m = q := by
     intro q
     simp [Formalism.F.quot, hSW, Submodule.mem_map]
   haveI := hQd
@@ -53,13 +55,16 @@ theorem exists_starProjection_ne_zero_norm_le_of_dualMinimum (M : Submodule ℤ 
     apply hW
     rw [eq_top_iff, ← hspan, Submodule.span_le]
     intro m hm
-    have hq : Wᗮ.starProjection m ∈ Formalism.F.quot M (Formalism.F.satur M N) := (hQeq _).mpr ⟨m, hm, rfl⟩
+    have hq : Wᗮ.starProjection m ∈ Formalism.F.quot M (Formalism.F.satur M N) :=
+      (hQeq _).mpr ⟨m, hm, rfl⟩
     rw [hQ0, Submodule.mem_bot] at hq
     have h1 := hsubW m
     rw [hq, sub_zero] at h1
     exact h1
-  have hdual' : ∀ y ∈ span ℝ ((Formalism.F.quot M (Formalism.F.satur M N) : Submodule ℤ E) : Set E), y ≠ 0 →
-      (∀ x ∈ Formalism.F.quot M (Formalism.F.satur M N), ∃ z : ℤ, inner ℝ x y = (z : ℝ)) → l ≤ ‖y‖ := by
+  have hdual'
+      : ∀ y ∈ span ℝ ((Formalism.F.quot M (Formalism.F.satur M N) : Submodule ℤ E) : Set E),
+        y ≠ 0 → (∀ x ∈ Formalism.F.quot M (Formalism.F.satur M N), ∃ z : ℤ, inner ℝ x y = (z : ℝ))
+          → l ≤ ‖y‖ := by
     intro y hy hy0 hint
     apply hdual y hy0
     intro x hx
@@ -70,8 +75,11 @@ theorem exists_starProjection_ne_zero_norm_le_of_dualMinimum (M : Submodule ℤ 
       intro q hq
       obtain ⟨m, -, rfl⟩ := (hQeq q).mp hq
       exact Submodule.starProjection_apply_mem _ _
-    rw [← hz, Submodule.inner_starProjection_left_eq_right, Submodule.starProjection_eq_self_iff.mpr hyW]
-  obtain ⟨q, hqQ, hq0, hqle⟩ := exists_ne_zero_norm_le_rank_div_of_dualMinimum (Formalism.F.quot M (Formalism.F.satur M N)) hQne hl hdual'
+    rw [← hz, Submodule.inner_starProjection_left_eq_right,
+      Submodule.starProjection_eq_self_iff.mpr hyW]
+  obtain ⟨q, hqQ, hq0, hqle⟩ :=
+    exists_ne_zero_norm_le_rank_div_of_dualMinimum (Formalism.F.quot M (Formalism.F.satur M N)) hQne
+      hl hdual'
   obtain ⟨m, hm, rfl⟩ := (hQeq q).mp hqQ
   refine ⟨m, hm, hq0, le_trans hqle ?_⟩
   have hMrk : Formalism.F.rk M = finrank ℝ E := by

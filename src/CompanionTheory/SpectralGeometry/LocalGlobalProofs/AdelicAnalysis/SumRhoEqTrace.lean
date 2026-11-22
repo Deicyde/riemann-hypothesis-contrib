@@ -15,13 +15,12 @@ variable {F : Type} [Field F] [NumberField F] {ι : Type} [Fintype ι] [Decidabl
 
 def toA (x : ι → F) : ι → A F := fun j => algebraMap F (A F) (x j)
 
-theorem oh_add {x y : A F} (hx : x ∈ Oh F) (hy : y ∈ Oh F) : x + y ∈ Oh F :=
-  fun v => add_mem (hx v) (hy v)
+theorem oh_add {x y : A F} (hx : x ∈ Oh F) (hy : y ∈ Oh F) : x + y ∈ Oh F := fun v =>
+  add_mem (hx v) (hy v)
 
 theorem oh_zero : (0 : A F) ∈ Oh F := fun _ => zero_mem _
 
 theorem oh_neg {x : A F} (hx : x ∈ Oh F) : -x ∈ Oh F := fun v => neg_mem (hx v)
-
 
 variable (ι F) in
 def latN (N : ℕ) : AddSubgroup (ι → A F) where
@@ -40,36 +39,39 @@ def latN (N : ℕ) : AddSubgroup (ι → A F) where
 def indC (N : ℕ) (a : ι → F) : (ι → A F) → ℂ :=
   Set.indicator {x | x - toA a ∈ latN F ι N} fun _ => 1
 
-def emb (ρ : InfinitePlace F → (F →+* ℝ)) (x : ι → F) : ι × InfinitePlace F → ℝ :=
-  fun p => ρ p.2 (x p.1)
+def emb (ρ : InfinitePlace F → (F →+* ℝ)) (x : ι → F) : ι × InfinitePlace F → ℝ := fun p =>
+  ρ p.2 (x p.1)
 
 def cur (x : ι × InfinitePlace F → ℝ) : InfinitePlace F → ι → ℝ := fun w i => x (i, w)
 
-def DM [DecidableEq (InfinitePlace F)] (B : Matrix ι ι F) (ρ : InfinitePlace F → (F →+* ℝ)) :
-    Matrix (ι × InfinitePlace F) (ι × InfinitePlace F) ℝ :=
+def DM [DecidableEq (InfinitePlace F)] (B : Matrix ι ι F) (ρ : InfinitePlace F → (F →+* ℝ))
+    : Matrix (ι × InfinitePlace F) (ι × InfinitePlace F) ℝ :=
   blockDiagonal fun w => B.map (ρ w)
 
-def ZM [DecidableEq (InfinitePlace F)] (B : Matrix ι ι F) (ρ : InfinitePlace F → (F →+* ℝ))
-    (P : InfinitePlace F → Matrix ι ι ℝ) (τ : InfinitePlace F → ℂ) :
-    Matrix (ι × InfinitePlace F) (ι × InfinitePlace F) ℂ :=
+def ZM
+    [DecidableEq (InfinitePlace F)]
+    (B : Matrix ι ι F) (ρ : InfinitePlace F → (F →+* ℝ)) (P : InfinitePlace F → Matrix ι ι ℝ)
+    (τ : InfinitePlace F → ℂ)
+    : Matrix (ι × InfinitePlace F) (ι × InfinitePlace F) ℂ :=
   blockDiagonal fun w => fun i j =>
     ((τ w).re : ℂ) * ((ρ w (B i j) : ℝ) : ℂ) + Complex.I * ((τ w).im : ℂ) * ((P w i j : ℝ) : ℂ)
 
-def EM (ρ : InfinitePlace F → (F →+* ℝ)) (b : InfinitePlace F → 𝓞 F) :
-    Matrix (InfinitePlace F) (InfinitePlace F) ℝ :=
-  fun w v => ρ w (b v : F)
+def EM (ρ : InfinitePlace F → (F →+* ℝ)) (b : InfinitePlace F → 𝓞 F)
+    : Matrix (InfinitePlace F) (InfinitePlace F) ℝ := fun w v =>
+  ρ w (b v : F)
 
-def gM [DecidableEq (InfinitePlace F)] (ρ : InfinitePlace F → (F →+* ℝ))
-    (b : InfinitePlace F → 𝓞 F) (N : ℕ) :
-    Matrix (ι × InfinitePlace F) (ι × InfinitePlace F) ℝ :=
+def gM
+    [DecidableEq (InfinitePlace F)]
+    (ρ : InfinitePlace F → (F →+* ℝ)) (b : InfinitePlace F → 𝓞 F) (N : ℕ)
+    : Matrix (ι × InfinitePlace F) (ι × InfinitePlace F) ℝ :=
   (N : ℝ) • ((1 : Matrix ι ι ℝ) ⊗ₖ EM ρ b)
 
-theorem sum_rho_eq_trace {ρ : InfinitePlace F → (F →+* ℝ)} (hT : IsTotallyReal F)
-    (hρ : ∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) (c : F) :
-    ∑ w, ρ w c = ((Algebra.trace ℚ F c : ℚ) : ℝ) := by
+theorem sum_rho_eq_trace
+    {ρ : InfinitePlace F → (F →+* ℝ)}
+    (hT : IsTotallyReal F) (hρ : ∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) (c : F)
+    : ∑ w, ρ w c = ((Algebra.trace ℚ F c : ℚ) : ℝ) := by
   have h1 := trace_eq_sum_embeddings (K := ℚ) (L := F) ℂ (x := c)
-  have hb : Function.Bijective
-      (fun w : InfinitePlace F => (w.embedding).toRatAlgHom) := by
+  have hb : Function.Bijective (fun w : InfinitePlace F => (w.embedding).toRatAlgHom) := by
     constructor
     · intro w v h
       have : w.embedding = v.embedding := by

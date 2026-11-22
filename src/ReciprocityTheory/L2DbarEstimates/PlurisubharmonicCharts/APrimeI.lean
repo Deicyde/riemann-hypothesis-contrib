@@ -12,27 +12,33 @@ open scoped ContDiff ENNReal
 
 noncomputable section
 
-variable {n : ℕ} {Y : Type*} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
-  [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La]
+variable
+  {n : ℕ} {Y : Type*}
+  [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+  {ι : Type*} {La : Type*} [AddCommGroup La]
 
-theorem ap_lintegral_chart (A : WeightedAtlas n Y ι La) (i : ι) (g : Y → ℝ≥0∞) (hg : Measurable g) :
-    ∫⁻ y in (A.chart i).source, g y ∂A.mu =
-      ∫⁻ v in (A.chart i).target, g ((A.chart i).symm v) *
-        ENNReal.ofReal (Real.exp (A.ph A.kap i ((A.chart i).symm v))) := by
+theorem ap_lintegral_chart (A : WeightedAtlas n Y ι La) (i : ι) (g : Y → ℝ≥0∞) (hg : Measurable g)
+    : ∫⁻ y in (A.chart i).source, g y ∂A.mu
+      = ∫⁻ v in (A.chart i).target, g ((A.chart i).symm v) *
+          ENNReal.ofReal (Real.exp (A.ph A.kap i ((A.chart i).symm v))) := by
   have htm : MeasurableSet (A.chart i).target := (A.chart i).open_target.measurableSet
   have hsm : MeasurableSet (A.chart i).source := (A.chart i).open_source.measurableSet
   have hsymm : AEMeasurable (A.chart i).symm (volume.restrict (A.chart i).target) :=
     (A.chart i).continuousOn_symm.aemeasurable htm
-  have hρm : AEMeasurable (fun v => ENNReal.ofReal (Real.exp (A.ph A.kap i ((A.chart i).symm v))))
+  have hρm : AEMeasurable
+      (fun v => ENNReal.ofReal (Real.exp (A.ph A.kap i ((A.chart i).symm v))))
       (volume.restrict (A.chart i).target) :=
-    (ENNReal.continuous_ofReal.comp_continuousOn
-      (Real.continuous_exp.comp_continuousOn (A.smooth_ph A.kap i).continuousOn)).aemeasurable htm
-  have hsymm' : AEMeasurable (A.chart i).symm ((volume.restrict (A.chart i).target).withDensity
-      (fun v => ENNReal.ofReal (Real.exp (A.ph A.kap i ((A.chart i).symm v))))) :=
-    hsymm.mono_ac (withDensity_absolutelyContinuous _ _)
-  have hmeas : A.mu.restrict (A.chart i).source = Measure.map (A.chart i).symm
+    (ENNReal.continuous_ofReal.comp_continuousOn (Real.continuous_exp.comp_continuousOn (A.smooth_ph
+      A.kap i).continuousOn)).aemeasurable htm
+  have hsymm' : AEMeasurable (A.chart i).symm
       ((volume.restrict (A.chart i).target).withDensity
-        (fun v => ENNReal.ofReal (Real.exp (A.ph A.kap i ((A.chart i).symm v))))) := by
+        (fun v => ENNReal.ofReal (Real.exp (A.ph A.kap i ((A.chart i).symm v))))) :=
+    hsymm.mono_ac (withDensity_absolutelyContinuous _ _)
+  have hmeas
+      : A.mu.restrict (A.chart i).source
+        = Measure.map (A.chart i).symm
+          ((volume.restrict (A.chart i).target).withDensity
+            (fun v => ENNReal.ofReal (Real.exp (A.ph A.kap i ((A.chart i).symm v))))) := by
     ext s hs
     rw [Measure.restrict_apply hs, Measure.map_apply_of_aemeasurable hsymm' hs,
       withDensity_apply' _ _, Measure.restrict_restrict' htm,
@@ -44,8 +50,7 @@ theorem ap_lintegral_chart (A : WeightedAtlas n Y ι La) (i : ι) (g : Y → ℝ
   simp only [Pi.mul_apply, Function.comp]
   ring
 
-theorem ap_mu_compact (A : WeightedAtlas n Y ι La) (K : Set Y) (hK : IsCompact K) :
-    A.mu K < ⊤ := by
+theorem ap_mu_compact (A : WeightedAtlas n Y ι La) (K : Set Y) (hK : IsCompact K) : A.mu K < ⊤ := by
   refine hK.measure_lt_top_of_nhdsWithin fun y _ => ?_
   set e := A.chart (A.pick y) with he
   have hys : y ∈ e.source := A.mem_pick y
@@ -55,34 +60,41 @@ theorem ap_mu_compact (A : WeightedAtlas n Y ι La) (K : Set Y) (hK : IsCompact 
     (Metric.closedBall_subset_ball (by linarith)).trans hball
   have hSo : IsOpen (e.source ∩ e ⁻¹' Metric.ball (e y) (ε / 2)) :=
     e.isOpen_inter_preimage Metric.isOpen_ball
-  have hyS : y ∈ e.source ∩ e ⁻¹' Metric.ball (e y) (ε / 2) := ⟨hys, Set.mem_preimage.mpr (Metric.mem_ball_self hδ)⟩
-  refine ⟨e.source ∩ e ⁻¹' Metric.ball (e y) (ε / 2),
-    mem_nhdsWithin_of_mem_nhds (hSo.mem_nhds hyS), ?_⟩
+  have hyS : y ∈ e.source ∩ e ⁻¹' Metric.ball (e y) (ε / 2) :=
+    ⟨hys, Set.mem_preimage.mpr (Metric.mem_ball_self hδ)⟩
+  refine
+    ⟨e.source ∩ e ⁻¹' Metric.ball (e y) (ε / 2), mem_nhdsWithin_of_mem_nhds (hSo.mem_nhds hyS), ?_⟩
   rw [A.mu_chart _ _ hSo.measurableSet Set.inter_subset_left]
-  have himg : e '' (e.source ∩ e ⁻¹' Metric.ball (e y) (ε / 2)) ⊆ Metric.closedBall (e y) (ε / 2) := by
+  have himg
+      : e '' (e.source ∩ e ⁻¹' Metric.ball (e y) (ε / 2)) ⊆ Metric.closedBall (e y) (ε / 2) := by
     rintro _ ⟨x, hx, rfl⟩
     exact Metric.ball_subset_closedBall hx.2
-  have hcont : ContinuousOn (fun v => Real.exp (A.ph A.kap (A.pick y) (e.symm v)))
+  have hcont : ContinuousOn
+      (fun v => Real.exp (A.ph A.kap (A.pick y) (e.symm v)))
       (Metric.closedBall (e y) (ε / 2)) :=
     (Real.continuous_exp.comp_continuousOn (A.smooth_ph A.kap (A.pick y)).continuousOn).mono hcb
   obtain ⟨M, hM⟩ := (isCompact_closedBall (e y) (ε / 2)).exists_bound_of_continuousOn hcont
-  calc _ ≤ ∫⁻ v in Metric.closedBall (e y) (ε / 2),
-          ENNReal.ofReal (Real.exp (A.ph A.kap (A.pick y) (e.symm v))) := lintegral_mono_set himg
+  calc
+    _ ≤ ∫⁻ v in Metric.closedBall (e y) (ε / 2),
+        ENNReal.ofReal (Real.exp (A.ph A.kap (A.pick y) (e.symm v))) :=
+      lintegral_mono_set himg
     _ ≤ ∫⁻ v in Metric.closedBall (e y) (ε / 2), ENNReal.ofReal M := by
-        apply setLIntegral_mono' Metric.isClosed_closedBall.measurableSet
-        intro v hv
-        apply ENNReal.ofReal_le_ofReal
-        have h1 := hM v hv
-        rw [Real.norm_eq_abs, abs_of_pos (Real.exp_pos _)] at h1
-        exact h1
+      apply setLIntegral_mono' Metric.isClosed_closedBall.measurableSet
+      intro v hv
+      apply ENNReal.ofReal_le_ofReal
+      have h1 := hM v hv
+      rw [Real.norm_eq_abs, abs_of_pos (Real.exp_pos _)] at h1
+      exact h1
     _ < ⊤ := by
-        rw [setLIntegral_const]
-        exact ENNReal.mul_lt_top ENNReal.ofReal_lt_top measure_closedBall_lt_top
+      rw [setLIntegral_const]
+      exact ENNReal.mul_lt_top ENNReal.ofReal_lt_top measure_closedBall_lt_top
 
-theorem api_contOn_chart {E : Type*} [TopologicalSpace E] (A : WeightedAtlas n Y ι La)
-    (φ : Y → E) {U : Set Y} (hU : IsOpen U)
-    (h : ∀ i, ContinuousOn (φ ∘ (A.chart i).symm) ((A.chart i).target ∩ (A.chart i).symm ⁻¹' U)) :
-    ContinuousOn φ U := by
+theorem api_contOn_chart
+    {E : Type*} [TopologicalSpace E]
+    (A : WeightedAtlas n Y ι La) (φ : Y → E)
+    {U : Set Y} (hU : IsOpen U)
+    (h : ∀ i, ContinuousOn (φ ∘ (A.chart i).symm) ((A.chart i).target ∩ (A.chart i).symm ⁻¹' U))
+    : ContinuousOn φ U := by
   intro x hx
   set e := A.chart (A.pick x) with he
   have hxs : x ∈ e.source := A.mem_pick x
@@ -93,18 +105,18 @@ theorem api_contOn_chart {E : Type*} [TopologicalSpace E] (A : WeightedAtlas n Y
     show e.symm (e x) ∈ U
     rw [e.left_inv hxs]
     exact hx
-  have h1 : ContinuousAt (φ ∘ e.symm) (e x) :=
-    (h (A.pick x)).continuousAt (hopen.mem_nhds hmem)
+  have h1 : ContinuousAt (φ ∘ e.symm) (e x) := (h (A.pick x)).continuousAt (hopen.mem_nhds hmem)
   have h2 : ContinuousAt ((φ ∘ e.symm) ∘ e) x := h1.comp (e.continuousAt hxs)
   have h3 : (φ ∘ e.symm) ∘ e =ᶠ[𝓝 x] φ := by
     filter_upwards [e.eventually_left_inverse hxs] with y hy
     simp [hy]
   exact (h2.congr h3).continuousWithinAt
 
-theorem api_nsq_eq (A : WeightedAtlas n Y ι La) {la : La} {U : Set Y} {F : ι → Y → ℂ}
-    (hFs : A.IsSecOn la U F) {i : ι} {x : Y}
-    (hxs : x ∈ (A.chart i).source) (hxU : x ∈ U) :
-    ‖F i x‖ ^ 2 * Real.exp (-A.ph la i x) = A.nsq la F x := by
+theorem api_nsq_eq
+    (A : WeightedAtlas n Y ι La)
+    {la : La} {U : Set Y} {F : ι → Y → ℂ} (hFs : A.IsSecOn la U F)
+    {i : ι} {x : Y} (hxs : x ∈ (A.chart i).source) (hxU : x ∈ U)
+    : ‖F i x‖ ^ 2 * Real.exp (- A.ph la i x) = A.nsq la F x := by
   unfold WeightedAtlas.nsq
   have hj : x ∈ (A.chart (A.pick x)).source := A.mem_pick x
   have hsec := hFs.2 i (A.pick x) x hxU hxs hj
@@ -112,20 +124,25 @@ theorem api_nsq_eq (A : WeightedAtlas n Y ι La) {la : La} {U : Set Y} {F : ι �
   have hg := A.g_ne la i (A.pick x) x hxs hj
   have hgpos : 0 < ‖A.g la i (A.pick x) x‖ ^ 2 := pow_pos (norm_pos_iff.mpr hg) 2
   rw [hsec, hph, norm_mul, mul_pow,
-    show -(A.ph la i x - Real.log (‖A.g la i (A.pick x) x‖ ^ 2)) =
-      Real.log (‖A.g la i (A.pick x) x‖ ^ 2) + -A.ph la i x by ring,
+    show -(A.ph la i x - Real.log (‖A.g la i (A.pick x) x‖ ^ 2))
+        = Real.log (‖A.g la i (A.pick x) x‖ ^ 2) + - A.ph la i x by
+      ring,
     Real.exp_add, Real.exp_log hgpos]
   ring
 
-theorem api_nsq_contOn (A : WeightedAtlas n Y ι La) {la : La} {U : Set Y} (hU : IsOpen U)
-    {F : ι → Y → ℂ} (hFs : A.IsSecOn la U F) : ContinuousOn (A.nsq la F) U := by
+theorem api_nsq_contOn
+    (A : WeightedAtlas n Y ι La)
+    {la : La} {U : Set Y} (hU : IsOpen U)
+    {F : ι → Y → ℂ} (hFs : A.IsSecOn la U F)
+    : ContinuousOn (A.nsq la F) U := by
   apply api_contOn_chart A _ hU
   intro i
   set e := A.chart i with he
   have hF : ContinuousOn (F i ∘ e.symm) (e.target ∩ e.symm ⁻¹' U) := (hFs.1 i).continuousOn
   have hph : ContinuousOn (A.ph la i ∘ e.symm) (e.target ∩ e.symm ⁻¹' U) :=
     (A.smooth_ph la i).continuousOn.mono Set.inter_subset_left
-  have hc : ContinuousOn (fun v => ‖F i (e.symm v)‖ ^ 2 * Real.exp (-A.ph la i (e.symm v)))
+  have hc : ContinuousOn
+      (fun v => ‖F i (e.symm v)‖ ^ 2 * Real.exp (- A.ph la i (e.symm v)))
       (e.target ∩ e.symm ⁻¹' U) :=
     (hF.norm.pow 2).mul (Real.continuous_exp.comp_continuousOn hph.neg)
   refine hc.congr ?_

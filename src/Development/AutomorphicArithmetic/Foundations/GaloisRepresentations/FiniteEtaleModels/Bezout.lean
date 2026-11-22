@@ -122,18 +122,19 @@ theorem adj : UpperTheory.Gal.FiniteEtaleModels.O.Adj := by
     obtain ⟨k, hk⟩ := second D.EF hc D.nondeg D.alt perf h.toAddMonoidHom
     refine ⟨k, hk, ?_⟩
     intro c y
-    obtain ⟨z, hz⟩ := fst (k (c • y) - c • k y) (by
-      intro x
-      obtain ⟨b', hb'⟩ : ∃ b', MulOpposite.unop (D.star b') = c := ⟨_, D.star_star c⟩
-      have e1 := hk x (c • y)
-      have e2 := hk (b' • x) y
-      have a1 : D.EF (h.toAddMonoidHom (b' • x)) y = D.EF (h.toAddMonoidHom x) (c • y) := by
-        rw [LinearMap.toAddMonoidHom_coe, map_smul, D.adj, hb']
-      have a2 : D.EF (b' • x) (k y) = D.EF x (c • k y) := by rw [D.adj, hb']
-      rw [a1, a2] at e2
-      rw [skew D.EF D.alt, map_sub, dvd_neg]
-      have h5 := dvd_sub e2 e1
-      rwa [sub_sub_sub_cancel_left] at h5)
+    obtain ⟨z, hz⟩ :=
+      fst (k (c • y) - c • k y) (by
+        intro x
+        obtain ⟨b', hb'⟩ : ∃ b', MulOpposite.unop (D.star b') = c := ⟨_, D.star_star c⟩
+        have e1 := hk x (c • y)
+        have e2 := hk (b' • x) y
+        have a1 : D.EF (h.toAddMonoidHom (b' • x)) y = D.EF (h.toAddMonoidHom x) (c • y) := by
+          rw [LinearMap.toAddMonoidHom_coe, map_smul, D.adj, hb']
+        have a2 : D.EF (b' • x) (k y) = D.EF x (c • k y) := by rw [D.adj, hb']
+        rw [a1, a2] at e2
+        rw [skew D.EF D.alt, map_sub, dvd_neg]
+        have h5 := dvd_sub e2 e1
+        rwa [sub_sub_sub_cancel_left] at h5)
     exact ⟨z, by rw [zero_add, sub_eq_iff_eq_add'] at hz; exact hz⟩
   · intro g hg
     have ginj : ∀ x z, g x = (q ^ e) • z → ∃ w, x = (q ^ e) • w := by

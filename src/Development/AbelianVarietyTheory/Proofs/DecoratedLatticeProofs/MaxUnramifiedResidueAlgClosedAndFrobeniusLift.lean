@@ -17,8 +17,8 @@ namespace GlobalTheory.Honda.KurUnr
 
 variable {K : Type} [NormedField K] [IsUltrametricDist K]
 
-theorem norm_pow_sub_pow_le {y z : K} (hy : ‖y‖ ≤ 1) (hz : ‖z‖ ≤ 1) (i : ℕ) :
-    ‖y ^ i - z ^ i‖ ≤ ‖y - z‖ := by
+theorem norm_pow_sub_pow_le {y z : K} (hy : ‖y‖ ≤ 1) (hz : ‖z‖ ≤ 1) (i : ℕ)
+    : ‖y ^ i - z ^ i‖ ≤ ‖y - z‖ := by
   induction i with
   | zero => simp
   | succ i ih =>
@@ -26,34 +26,40 @@ theorem norm_pow_sub_pow_le {y z : K} (hy : ‖y‖ ≤ 1) (hz : ‖z‖ ≤ 1) 
     rw [e]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
     · rw [norm_mul]
-      calc ‖y‖ * ‖y ^ i - z ^ i‖ ≤ 1 * ‖y - z‖ :=
-            mul_le_mul hy ih (norm_nonneg _) zero_le_one
+      calc
+        ‖y‖ * ‖y ^ i - z ^ i‖
+          ≤ 1 * ‖y - z‖ := mul_le_mul hy ih (norm_nonneg _) zero_le_one
         _ = ‖y - z‖ := one_mul _
     · rw [norm_mul, norm_pow]
-      calc ‖y - z‖ * ‖z‖ ^ i ≤ ‖y - z‖ * 1 :=
-            mul_le_mul_of_nonneg_left (pow_le_one₀ (norm_nonneg _) hz) (norm_nonneg _)
+      calc
+        ‖y - z‖ * ‖z‖ ^ i ≤ ‖y - z‖ * 1 :=
+          mul_le_mul_of_nonneg_left (pow_le_one₀ (norm_nonneg _) hz) (norm_nonneg _)
         _ = ‖y - z‖ := mul_one _
 
-theorem norm_eval_sub_eval_le (f : Polynomial K) (hf : ∀ n, ‖f.coeff n‖ ≤ 1) {y z : K}
-    (hy : ‖y‖ ≤ 1) (hz : ‖z‖ ≤ 1) : ‖f.eval y - f.eval z‖ ≤ ‖y - z‖ := by
+theorem norm_eval_sub_eval_le
+    (f : Polynomial K) (hf : ∀ n, ‖f.coeff n‖ ≤ 1) {y z : K} (hy : ‖y‖ ≤ 1) (hz : ‖z‖ ≤ 1)
+    : ‖f.eval y - f.eval z‖ ≤ ‖y - z‖ := by
   rw [Polynomial.eval_eq_sum_range y, Polynomial.eval_eq_sum_range z, ← Finset.sum_sub_distrib]
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _) fun i _ => ?_
   rw [← mul_sub, norm_mul]
-  calc ‖f.coeff i‖ * ‖y ^ i - z ^ i‖ ≤ 1 * ‖y - z‖ :=
-        mul_le_mul (hf i) (norm_pow_sub_pow_le hy hz i) (norm_nonneg _) zero_le_one
+  calc
+    ‖f.coeff i‖ * ‖y ^ i - z ^ i‖
+      ≤ 1 * ‖y - z‖ := mul_le_mul (hf i) (norm_pow_sub_pow_le hy hz i) (norm_nonneg _) zero_le_one
     _ = ‖y - z‖ := one_mul _
 
-theorem norm_root_le_one (f : Polynomial K) (hm : f.Monic) (hf : ∀ n, ‖f.coeff n‖ ≤ 1) {z : K}
-    (hz : f.eval z = 0) : ‖z‖ ≤ 1 := by
+theorem norm_root_le_one
+    (f : Polynomial K) (hm : f.Monic) (hf : ∀ n, ‖f.coeff n‖ ≤ 1) {z : K} (hz : f.eval z = 0)
+    : ‖z‖ ≤ 1 := by
   by_contra h
   push_neg at h
   set n := f.natDegree
   have e := hm.as_sum
-  have h0 : z ^ n = -∑ i ∈ Finset.range n, f.coeff i * z ^ i := by
+  have h0 : z ^ n = - ∑ i ∈ Finset.range n, f.coeff i * z ^ i := by
     have := congrArg (Polynomial.eval z) e
     rw [hz] at this
-    simp only [Polynomial.eval_add, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_finsetSum,
-      Polynomial.eval_mul, Polynomial.eval_C] at this
+    simp only [Polynomial.eval_add, Polynomial.eval_pow, Polynomial.eval_X,
+        Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_C]
+      at this
     linear_combination -this
   have hz0 : (0 : ℝ) ≤ ‖z‖ ^ (n - 1) := by positivity
   have hb : ‖∑ i ∈ Finset.range n, f.coeff i * z ^ i‖ ≤ ‖z‖ ^ (n - 1) := by
@@ -62,8 +68,9 @@ theorem norm_root_le_one (f : Polynomial K) (hm : f.Monic) (hf : ∀ n, ‖f.coe
     have hi' : i ≤ n - 1 := by
       have := Finset.mem_range.mp hi
       omega
-    calc ‖f.coeff i‖ * ‖z‖ ^ i ≤ 1 * ‖z‖ ^ (n - 1) :=
-          mul_le_mul (hf i) (pow_le_pow_right₀ h.le hi') (by positivity) zero_le_one
+    calc
+      ‖f.coeff i‖ * ‖z‖ ^ i ≤ 1 * ‖z‖ ^ (n - 1) :=
+        mul_le_mul (hf i) (pow_le_pow_right₀ h.le hi') (by positivity) zero_le_one
       _ = ‖z‖ ^ (n - 1) := one_mul _
   rw [← norm_neg, ← h0, norm_pow] at hb
   rcases Nat.eq_zero_or_pos n with hn | hn
@@ -71,7 +78,8 @@ theorem norm_root_le_one (f : Polynomial K) (hm : f.Monic) (hf : ∀ n, ‖f.coe
   · have : ‖z‖ ^ (n - 1) < ‖z‖ ^ n := pow_lt_pow_right₀ h (by omega)
     linarith
 
-theorem unr_of_unrOK (l : ℕ) (σ : K →+* K) (h : Formalism.InvariantFactorPaths.G7.UnrOK K l σ) : Unr K l σ := by
+theorem unr_of_unrOK (l : ℕ) (σ : K →+* K) (h : Formalism.InvariantFactorPaths.G7.UnrOK K l σ)
+    : Unr K l σ := by
   obtain ⟨hp, hl2, hnl, hval, hfr⟩ := h
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hp.one_lt
   have hl0 : (0 : ℝ) < l := by linarith
@@ -114,17 +122,23 @@ theorem unr_of_unrOK (l : ℕ) (σ : K →+* K) (h : Formalism.InvariantFactorPa
       have : (1 : ℝ) ≤ (l : ℝ) ^ k := one_le_zpow₀ hl1.le (by omega)
       rw [← hk] at this
       linarith
-    calc (l : ℝ) ^ k ≤ (l : ℝ) ^ (-1 : ℤ) := zpow_le_zpow_right₀ hl1.le hkneg
+    calc
+      (l : ℝ) ^ k
+        ≤ (l : ℝ) ^ (-1 : ℤ) := zpow_le_zpow_right₀ hl1.le hkneg
       _ = (l : ℝ)⁻¹ := zpow_neg_one _
   · intro x hx
     exact (hfr x hx).trans_lt hlinv
 
 end GlobalTheory.Honda.KurUnr
 
-
 open GlobalTheory.Honda.KurUnr in
-theorem GlobalTheory.Honda.kur_resAlg_unr : ∀ (l : ℕ) [Fact l.Prime], 2 < l →
-    ResAlg (MaximalUnramifiedExtension l) ∧ ∀ σ : MaximalUnramifiedExtension l →+* MaximalUnramifiedExtension l, Formalism.InvariantFactorPaths.G7.UnrOK (MaximalUnramifiedExtension l) l σ → Unr (MaximalUnramifiedExtension l) l σ := by
+theorem GlobalTheory.Honda.kur_resAlg_unr
+    : ∀ (l : ℕ) [Fact l.Prime],
+      2 < l
+        → ResAlg (MaximalUnramifiedExtension l)
+          ∧ ∀ σ : MaximalUnramifiedExtension l →+* MaximalUnramifiedExtension l,
+            Formalism.InvariantFactorPaths.G7.UnrOK (MaximalUnramifiedExtension l) l σ
+              → Unr (MaximalUnramifiedExtension l) l σ := by
   intro l _ _
   refine ⟨?_, fun σ hσ => unr_of_unrOK l σ hσ⟩
   intro f hm hdeg hf
@@ -146,6 +160,8 @@ theorem GlobalTheory.Honda.kur_resAlg_unr : ∀ (l : ℕ) [Fact l.Prime], 2 < l 
     exact (Polynomial.eval₂_hom (MaximalUnramifiedExtension l).subtype ⟨y, hyK⟩).symm
   change ‖((f.eval ⟨y, hyK⟩ : MaximalUnramifiedExtension l) : ℂ_[l])‖ < 1
   rw [hev, ← sub_zero (g.eval y), ← hz]
-  calc ‖g.eval y - g.eval z‖ ≤ ‖y - z‖ := norm_eval_sub_eval_le g hgc hy1 hz1
+  calc
+    ‖g.eval y - g.eval z‖
+      ≤ ‖y - z‖ := norm_eval_sub_eval_le g hgc hy1 hz1
     _ = ‖z - y‖ := norm_sub_rev _ _
     _ < 1 := hzy

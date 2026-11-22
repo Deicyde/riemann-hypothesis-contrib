@@ -5,9 +5,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IteratedL
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
 open IsDedekindDomain NumberField MeasureTheory
-open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix ENNReal Classical
+open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix ENNReal
+  Classical
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Chr incM)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -30,22 +32,28 @@ def sndH : AdeleRing (𝓞 F) F →+* FiniteAdeleRing (𝓞 F) F := RingHom.snd 
 theorem pt_ext {x y : AdeleRing (𝓞 F) F} (h1 : fstH x = fstH y) (h2 : sndH x = sndH y) : x = y :=
   Prod.ext h1 h2
 
-theorem dot_infE_infE {κ : Type} [Fintype κ] (z y : κ → mixedEmbedding.mixedSpace F) :
-    infE F z ⬝ᵥ infE F y = pt (∑ i, z i * y i) := by
+theorem dot_infE_infE {κ : Type} [Fintype κ] (z y : κ → mixedEmbedding.mixedSpace F)
+    : infE F z ⬝ᵥ infE F y = pt (∑ i, z i * y i) := by
   refine pt_ext ?_ ?_
   · simp only [dotProduct, map_sum, map_mul]
-    change ∑ i, (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (z i) *
-      (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (y i) =
-      (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (∑ i, z i * y i)
+    change
+      ∑ i, (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (z i) *
+          (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (y i)
+        = (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (∑ i, z i * y i)
     simp only [map_sum, map_mul]
   · simp only [dotProduct, map_sum, map_mul]
     change ∑ i, (0 : FiniteAdeleRing (𝓞 F) F) * 0 = 0
     simp
 
-theorem invOf_two_mul_pt (S : mixedEmbedding.mixedSpace F) :
-    ∃ t, ⅟(2 : AdeleRing (𝓞 F) F) * pt S = pt t ∧ t + t = S := by
+theorem invOf_two_mul_pt (S : mixedEmbedding.mixedSpace F)
+    : ∃ t, ⅟(2 : AdeleRing (𝓞 F) F) * pt S = pt t ∧ t + t = S := by
   set c : InfiniteAdeleRing F := fstH (⅟(2 : AdeleRing (𝓞 F) F))
-  refine ⟨InfiniteAdeleRing.ringEquiv_mixedSpace F (c * (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm S), ?_, ?_⟩
+  refine ⟨
+    InfiniteAdeleRing.ringEquiv_mixedSpace F
+      (c * (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm S),
+    ?_,
+    ?_
+  ⟩
   · refine pt_ext ?_ ?_
     · rw [map_mul]
       show c * (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm S = (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm _
@@ -58,13 +66,17 @@ theorem invOf_two_mul_pt (S : mixedEmbedding.mixedSpace F) :
       rwa [map_mul, map_ofNat, map_one] at h
     rw [← map_add (f := _), ← add_mul, ← mul_two, hc, one_mul, RingEquiv.apply_symm_apply]
 
-theorem schrInf_eq (ψ : AddChar (AdeleRing (𝓞 F) F) ℂ) (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ)
-    (hψ : ∀ a, ψ (((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm a, 0) : AdeleRing (𝓞 F) F) =
-      Complex.exp (2 * Real.pi * Complex.I * β a))
-    {κ : Type} [Fintype κ] (v : (κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F))
-    (φ : (κ → mixedEmbedding.mixedSpace F) → ℂ) (z : κ → mixedEmbedding.mixedSpace F) :
-    schrInf F ψ v φ z = Complex.exp (2 * Real.pi * Complex.I *
-      (β (∑ i, z i * v.2 i) + β (∑ i, v.1 i * v.2 i) / 2)) * φ (z + v.1) := by
+theorem schrInf_eq
+    (ψ : AddChar (AdeleRing (𝓞 F) F) ℂ) (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ)
+    (hψ : ∀ a,
+      ψ (((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm a, 0) : AdeleRing (𝓞 F) F)
+        = Complex.exp (2 * Real.pi * Complex.I * β a))
+    {κ : Type} [Fintype κ]
+    (v : (κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F))
+    (φ : (κ → mixedEmbedding.mixedSpace F) → ℂ) (z : κ → mixedEmbedding.mixedSpace F)
+    : schrInf F ψ v φ z
+      = Complex.exp (2 * Real.pi * Complex.I * (β (∑ i, z i * v.2 i) + β (∑ i, v.1 i * v.2 i) / 2))
+        * φ (z + v.1) := by
   have hψ' : ∀ a, ψ (pt a) = Complex.exp (2 * Real.pi * Complex.I * β a) := hψ
   obtain ⟨t, ht, htt⟩ := invOf_two_mul_pt (F := F) (∑ i, v.1 i * v.2 i)
   have hsum : ∀ a b : mixedEmbedding.mixedSpace F, pt (F := F) a + pt b = pt (a + b) := by
@@ -74,8 +86,7 @@ theorem schrInf_eq (ψ : AddChar (AdeleRing (𝓞 F) F) ℂ) (β : mixedEmbeddin
       exact (map_add (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm _ _).symm
     · rw [map_add (f := _)]
       exact add_zero (0 : FiniteAdeleRing (𝓞 F) F)
-  have hbt : β t = β (∑ i, v.1 i * v.2 i) / 2 := by
-    rw [← htt, map_add (f := _)]; ring
+  have hbt : β t = β (∑ i, v.1 i * v.2 i) / 2 := by rw [← htt, map_add (f := _)]; ring
   show ψ (infE F z ⬝ᵥ infE F v.2 + ⅟(2 : AdeleRing (𝓞 F) F) * (infE F v.1 ⬝ᵥ infE F v.2)) * φ (z + v.1) = _
   rw [dot_infE_infE, dot_infE_infE, ht, hsum, hψ', map_add (f := _), hbt]
   push_cast
@@ -87,22 +98,33 @@ namespace GlobalTheory.WeilAdm.RealModel
 
 variable {F : Type} [Field F] [NumberField F]
 
-def bil (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) (κ : Type) [Fintype κ] :
-    (κ → mixedEmbedding.mixedSpace F) →ₗ[ℝ] (κ → mixedEmbedding.mixedSpace F) →ₗ[ℝ] ℝ :=
-  LinearMap.mk₂ ℝ (fun z y => β (∑ i, z i * y i))
+def bil (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) (κ : Type) [Fintype κ]
+    : (κ → mixedEmbedding.mixedSpace F) →ₗ[ℝ] (κ → mixedEmbedding.mixedSpace F) →ₗ[ℝ] ℝ :=
+  LinearMap.mk₂ ℝ
+    (fun z y => β (∑ i, z i * y i))
     (fun z z' y => by simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib, map_add (f := _)])
-    (fun c z y => by simp only [Pi.smul_apply, smul_mul_assoc, ← Finset.smul_sum, map_smul, smul_eq_mul])
+    (fun c z y => by
+      simp only [Pi.smul_apply, smul_mul_assoc, ← Finset.smul_sum, map_smul, smul_eq_mul])
     (fun z y y' => by simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib, map_add (f := _)])
-    (fun c z y => by simp only [Pi.smul_apply, mul_smul_comm, ← Finset.smul_sum, map_smul, smul_eq_mul])
+    (fun c z y => by
+      simp only [Pi.smul_apply, mul_smul_comm, ← Finset.smul_sum, map_smul, smul_eq_mul])
 
-theorem bil_apply (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) {κ : Type} [Fintype κ]
-    (z y : κ → mixedEmbedding.mixedSpace F) : bil β κ z y = β (∑ i, z i * y i) := rfl
+theorem bil_apply
+    (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ)
+    {κ : Type} [Fintype κ]
+    (z y : κ → mixedEmbedding.mixedSpace F)
+    : bil β κ z y = β (∑ i, z i * y i) :=
+  rfl
 
-def qmap (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) {κ : Type} [Fintype κ] {n : ℕ}
-    (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F)) :
-    (κ → mixedEmbedding.mixedSpace F) →ₗ[ℝ] EuclideanSpace ℝ (Fin n) where
-  toFun y := (InnerProductSpace.toDual ℝ _).symm
-    (LinearMap.toContinuousLinearMap (((bil β κ).flip y).comp (Q : EuclideanSpace ℝ (Fin n) →L[ℝ] _).toLinearMap))
+def qmap
+    (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ)
+    {κ : Type} [Fintype κ]
+    {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F))
+    : (κ → mixedEmbedding.mixedSpace F) →ₗ[ℝ] EuclideanSpace ℝ (Fin n) where
+  toFun y :=
+    (InnerProductSpace.toDual ℝ _).symm
+      (LinearMap.toContinuousLinearMap (((bil β κ).flip y).comp
+        (Q : EuclideanSpace ℝ (Fin n) →L[ℝ] _).toLinearMap))
   map_add' y y' := by
     refine ext_inner_right ℝ fun x => ?_
     simp [InnerProductSpace.toDual_symm_apply, inner_add_left]
@@ -110,14 +132,19 @@ def qmap (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) {κ : Type} [Fintype
     refine ext_inner_right ℝ fun x => ?_
     simp [InnerProductSpace.toDual_symm_apply, real_inner_smul_left]
 
-theorem inner_qmap (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) {κ : Type} [Fintype κ] {n : ℕ}
-    (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F)) (y : κ → mixedEmbedding.mixedSpace F)
-    (x : EuclideanSpace ℝ (Fin n)) : ⟪qmap β Q y, x⟫ = bil β κ (Q x) y := by
+theorem inner_qmap
+    (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ)
+    {κ : Type} [Fintype κ]
+    {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F))
+    (y : κ → mixedEmbedding.mixedSpace F) (x : EuclideanSpace ℝ (Fin n))
+    : ⟪qmap β Q y, x⟫ = bil β κ (Q x) y := by
   simp [qmap, InnerProductSpace.toDual_symm_apply]
 
-theorem qmap_injective (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) (hβ : ∀ a, a ≠ 0 → ∃ b, β (a * b) ≠ 0)
-    {κ : Type} [Fintype κ] {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F)) :
-    Function.Injective (qmap β Q) := by
+theorem qmap_injective
+    (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) (hβ : ∀ a, a ≠ 0 → ∃ b, β (a * b) ≠ 0)
+    {κ : Type} [Fintype κ]
+    {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F))
+    : Function.Injective (qmap β Q) := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro y hy
   by_contra hne
@@ -131,18 +158,26 @@ theorem qmap_injective (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) (hβ :
   rw [hs] at h
   exact hb h.symm
 
-def qEquiv (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) (hβ : ∀ a, a ≠ 0 → ∃ b, β (a * b) ≠ 0)
-    {κ : Type} [Fintype κ] {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F)) :
-    (κ → mixedEmbedding.mixedSpace F) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin n) :=
-  LinearMap.linearEquivOfInjective (qmap β Q) (qmap_injective β hβ Q) Q.toLinearEquiv.finrank_eq.symm
+def qEquiv
+    (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) (hβ : ∀ a, a ≠ 0 → ∃ b, β (a * b) ≠ 0)
+    {κ : Type} [Fintype κ]
+    {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F))
+    : (κ → mixedEmbedding.mixedSpace F) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin n) :=
+  LinearMap.linearEquivOfInjective (qmap β Q) (qmap_injective β hβ Q)
+    Q.toLinearEquiv.finrank_eq.symm
 
-theorem qmap_qEquiv_symm (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) (hβ : ∀ a, a ≠ 0 → ∃ b, β (a * b) ≠ 0)
-    {κ : Type} [Fintype κ] {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F))
-    (q : EuclideanSpace ℝ (Fin n)) : qmap β Q ((qEquiv β hβ Q).symm q) = q := by
+theorem qmap_qEquiv_symm
+    (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ) (hβ : ∀ a, a ≠ 0 → ∃ b, β (a * b) ≠ 0)
+    {κ : Type} [Fintype κ]
+    {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F))
+    (q : EuclideanSpace ℝ (Fin n))
+    : qmap β Q ((qEquiv β hβ Q).symm q) = q := by
   exact (qEquiv β hβ Q).apply_symm_apply q
 
-def Peq {V : Type} [AddCommGroup V] [Module ℝ V] {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃ₗ[ℝ] V)
-    (Y : EuclideanSpace ℝ (Fin n) ≃ₗ[ℝ] V) : (Fin n ⊕ Fin n → ℝ) ≃ₗ[ℝ] V × V where
+def Peq
+    {V : Type} [AddCommGroup V] [Module ℝ V]
+    {n : ℕ} (Q : EuclideanSpace ℝ (Fin n) ≃ₗ[ℝ] V) (Y : EuclideanSpace ℝ (Fin n) ≃ₗ[ℝ] V)
+    : (Fin n ⊕ Fin n → ℝ) ≃ₗ[ℝ] V × V where
   toFun w := (Q (GlobalTheory.RealWeil.pPart w), Y (GlobalTheory.RealWeil.qPart w))
   invFun p := Sum.elim (WithLp.ofLp (Q.symm p.1)) (WithLp.ofLp (Y.symm p.2))
   map_add' w w' := by simp [GlobalTheory.RealWeil.pPart_add, GlobalTheory.RealWeil.qPart_add]
@@ -151,24 +186,36 @@ def Peq {V : Type} [AddCommGroup V] [Module ℝ V] {n : ℕ} (Q : EuclideanSpace
     funext j
     cases j <;> simp [GlobalTheory.RealWeil.pPart, GlobalTheory.RealWeil.qPart]
   right_inv p := by
-    have h1 : GlobalTheory.RealWeil.pPart (Sum.elim (WithLp.ofLp (Q.symm p.1)) (WithLp.ofLp (Y.symm p.2))) = Q.symm p.1 := by
+    have h1
+        : GlobalTheory.RealWeil.pPart (Sum.elim (WithLp.ofLp (Q.symm p.1))
+            (WithLp.ofLp (Y.symm p.2)))
+          = Q.symm p.1 := by
       simp [GlobalTheory.RealWeil.pPart]
-    have h2 : GlobalTheory.RealWeil.qPart (Sum.elim (WithLp.ofLp (Q.symm p.1)) (WithLp.ofLp (Y.symm p.2))) = Y.symm p.2 := by
+    have h2
+        : GlobalTheory.RealWeil.qPart (Sum.elim (WithLp.ofLp (Q.symm p.1))
+            (WithLp.ofLp (Y.symm p.2)))
+          = Y.symm p.2 := by
       simp [GlobalTheory.RealWeil.qPart]
     simp only [h1, h2, LinearEquiv.apply_symm_apply]
 
-theorem exists_model : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AdeleRing (𝓞 F) F) ℂ)
-    (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ),
-    (∀ a, ψ (((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm a, 0) : AdeleRing (𝓞 F) F) =
-      Complex.exp (2 * Real.pi * Complex.I * β a)) →
-    (∀ a, a ≠ 0 → ∃ b, β (a * b) ≠ 0) → ∀ (κ : Type) [Fintype κ],
-    ∃ (n : ℕ) (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F))
-      (P : (Fin n ⊕ Fin n → ℝ) ≃ₗ[ℝ] ((κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F))),
-      ∀ w (φ : (κ → mixedEmbedding.mixedSpace F) → ℂ),
-        GlobalTheory.WeilAdm.schrInf F ψ (P w) φ ∘ Q = GlobalTheory.RealWeil.rhoFun w (φ ∘ Q) := by
+theorem exists_model
+    : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AdeleRing (𝓞 F) F) ℂ)
+        (β : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ),
+      (∀ a,
+          ψ (((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm a, 0) : AdeleRing (𝓞 F) F)
+            = Complex.exp (2 * Real.pi * Complex.I * β a))
+        → (∀ a, a ≠ 0 → ∃ b, β (a * b) ≠ 0)
+        → ∀ (κ : Type) [Fintype κ],
+          ∃ (n : ℕ) (Q : EuclideanSpace ℝ (Fin n) ≃L[ℝ] (κ → mixedEmbedding.mixedSpace F))
+              (P
+                : (Fin n ⊕ Fin n → ℝ) ≃ₗ[ℝ] ((κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F))),
+            ∀ w (φ : (κ → mixedEmbedding.mixedSpace F) → ℂ),
+              GlobalTheory.WeilAdm.schrInf F ψ (P w) φ ∘ Q
+                = GlobalTheory.RealWeil.rhoFun w (φ ∘ Q) := by
   intro F _ _ ψ β hψ hβ κ _
-  let Q : EuclideanSpace ℝ (Fin (Module.finrank ℝ (κ → mixedEmbedding.mixedSpace F))) ≃L[ℝ]
-      (κ → mixedEmbedding.mixedSpace F) :=
+  let Q
+      : EuclideanSpace ℝ (Fin (Module.finrank ℝ (κ → mixedEmbedding.mixedSpace F))) ≃L[ℝ]
+        (κ → mixedEmbedding.mixedSpace F) :=
     (LinearEquiv.ofFinrankEq _ _ finrank_euclideanSpace_fin).toContinuousLinearEquiv
   let Y := (qEquiv β hβ Q).symm
   refine ⟨_, Q, Peq Q.toLinearEquiv Y, fun w φ => ?_⟩

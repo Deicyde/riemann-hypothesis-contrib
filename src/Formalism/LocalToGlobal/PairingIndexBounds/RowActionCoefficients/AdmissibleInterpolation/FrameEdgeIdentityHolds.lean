@@ -11,14 +11,18 @@ noncomputable section
 
 namespace Formalism.L2.PairingIndexBounds.Ent
 
-open Formalism.GradedWeylDivisibility Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend
+open Formalism.GradedWeylDivisibility Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend
 
-attribute [local instance] Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
+attribute [local instance]
+  Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO
+  Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
   Formalism.MainNotions.G.GAtP.algOK
 
 variable {p : ℕ} [Fact p.Prime] (X : Sys p)
 
-def dgQ (K : Type) [Field K] (p k r : ℕ) : Matrix (Fin k) (Fin k) K := Matrix.diagonal fun c => if c.val < r then (p : K)⁻¹ else 1
+def dgQ (K : Type) [Field K] (p k r : ℕ) : Matrix (Fin k) (Fin k) K :=
+  Matrix.diagonal fun c => if c.val < r then (p : K)⁻¹ else 1
 
 theorem dgQ_det_ne (K : Type) [Field K] (p k r : ℕ) (hp : (p : K) ≠ 0) : (dgQ K p k r).det ≠ 0 := by
   unfold dgQ
@@ -28,8 +32,8 @@ theorem dgQ_det_ne (K : Type) [Field K] (p k r : ℕ) (hp : (p : K) ≠ 0) : (dg
   · exact inv_ne_zero hp
   · exact one_ne_zero
 
-theorem mF_dgQ (j : ℕ) (b : BX X) (i0 : X.Pl → ℕ) :
-    mF X (j + 1) b (dgQ (X.G.P.Qq b.1) p _ (i0 b.1)) = DgX X X.G.Kf j i0 b.1 := by
+theorem mF_dgQ (j : ℕ) (b : BX X) (i0 : X.Pl → ℕ)
+    : mF X (j + 1) b (dgQ (X.G.P.Qq b.1) p _ (i0 b.1)) = DgX X X.G.Kf j i0 b.1 := by
   unfold mF dgQ DgX
   ext a c
   simp only [Matrix.submatrix_apply, Matrix.map_apply, Matrix.diagonal_apply]
@@ -41,16 +45,18 @@ theorem mF_dgQ (j : ℕ) (b : BX X) (i0 : X.Pl → ℕ) :
     split_ifs
     · rw [map_inv₀, map_inv₀, map_natCast, map_natCast]
     · rw [map_one, map_one]
-  · rw [if_neg hac, if_neg (fun h => hac ((finCongr (rank_eq X (j + 1)).symm).injective h)), map_zero, map_zero]
+  · rw [if_neg hac, if_neg (fun h => hac ((finCongr (rank_eq X (j + 1)).symm).injective h)),
+      map_zero, map_zero]
 
 theorem frame_edge_identity_holds : XEdge := by
   intro p _ X j L' L'' i0 h2 h4
-  have key : ∀ v : X.Pl, ∃ g' h' : GL (Fin ((X.Pj (j + 1)).m + 1)) (X.G.P.Qq v),
-      X.latAt v (j + 1) L'' = colSpan (X.G.P.W v) (g' : Matrix _ _ (X.G.P.Qq v)) ∧
-      X.latAt v (j + 1) L' = colSpan (X.G.P.W v) (h' : Matrix _ _ (X.G.P.Qq v)) ∧
-      (h' : Matrix (Fin ((X.Pj (j + 1)).m + 1)) (Fin ((X.Pj (j + 1)).m + 1)) (X.G.P.Qq v)) =
-        (g' : Matrix (Fin ((X.Pj (j + 1)).m + 1)) (Fin ((X.Pj (j + 1)).m + 1)) (X.G.P.Qq v)) *
-          dgQ (X.G.P.Qq v) p ((X.Pj (j + 1)).m + 1) (i0 v) := by
+  have key
+      : ∀ v : X.Pl, ∃ g' h' : GL (Fin ((X.Pj (j + 1)).m + 1)) (X.G.P.Qq v),
+        X.latAt v (j + 1) L'' = colSpan (X.G.P.W v) (g' : Matrix _ _ (X.G.P.Qq v))
+          ∧ X.latAt v (j + 1) L' = colSpan (X.G.P.W v) (h' : Matrix _ _ (X.G.P.Qq v))
+          ∧ (h' : Matrix (Fin ((X.Pj (j + 1)).m + 1)) (Fin ((X.Pj (j + 1)).m + 1)) (X.G.P.Qq v))
+            = (g' : Matrix (Fin ((X.Pj (j + 1)).m + 1)) (Fin ((X.Pj (j + 1)).m + 1)) (X.G.P.Qq v))
+              * dgQ (X.G.P.Qq v) p ((X.Pj (j + 1)).m + 1) (i0 v) := by
     intro v
     have hS := X.G.P.setting v
     have := hS.frac_alt
@@ -60,7 +66,8 @@ theorem frame_edge_identity_holds : XEdge := by
       have h0' : i0 v = 0 := h0
       refine ⟨Matrix.nonsingInvUnit g hg, Matrix.nonsingInvUnit g hg, ?_, hgL, ?_⟩
       · show L'' v = _
-        rw [hL]; exact hgL
+        rw [hL]
+        exact hgL
       · have : dgQ (X.G.P.Qq v) p ((X.Pj (j + 1)).m + 1) (i0 v) = 1 := by
           unfold dgQ
           rw [h0']
@@ -77,6 +84,7 @@ theorem frame_edge_identity_holds : XEdge := by
   unfold mF
   rw [Matrix.submatrix_mul_equiv]
   congr 1
-  exact Matrix.map_mul (f := (X.G.P.ι b.1).comp (X.G.P.σ b.1 ^ b.2.val : X.G.P.Qq b.1 ≃+* X.G.P.Qq b.1).toRingHom)
+  exact Matrix.map_mul
+    (f := (X.G.P.ι b.1).comp (X.G.P.σ b.1 ^ b.2.val : X.G.P.Qq b.1 ≃+* X.G.P.Qq b.1).toRingHom)
 
 end Formalism.L2.PairingIndexBounds.Ent

@@ -5,7 +5,10 @@ public import Development.EtaleCohomology.TateTwists.EtaleSimplicialChainsBasicP
 @[expose] public section
 
 namespace LateralTheory.Fin.EtaleSimplicialChainsFreeDescription
-theorem etale_cochain_complex_basic_properties_of_components : LateralTheory.EtaleFoundations.EtaleSimplicialChainsFreeDescription := by
+theorem etale_cochain_complex_basic_properties_of_components
+    : LateralTheory.EtaleFoundations.EtaleSimplicialChainsFreeDescription := by
   apply LateralTheory.EtaleFoundations.etale_simplicial_chains_basic_properties_hold
-theorem intersectionNumber_baseChange : LateralTheory.EtaleFoundations.EtaleSimplicialChainsFreeDescription := etale_cochain_complex_basic_properties_of_components
+theorem intersectionNumber_baseChange
+    : LateralTheory.EtaleFoundations.EtaleSimplicialChainsFreeDescription :=
+  etale_cochain_complex_basic_properties_of_components
 end LateralTheory.Fin.EtaleSimplicialChainsFreeDescription

@@ -18,8 +18,8 @@ namespace GlobalTheory.SgInf
 
 variable {k r : ℕ}
 
-theorem measurable_lmul_swap :
-    Measurable (fun p : Mt k r × Mt k r => lmulM (Matrix.of p.2) p.1) := by
+theorem measurable_lmul_swap
+    : Measurable (fun p : Mt k r × Mt k r => lmulM (Matrix.of p.2) p.1) := by
   have hc : Continuous (fun p : Mt k r × Mt k r => lmulM (Matrix.of p.2) p.1) := by
     refine continuous_pi fun i => continuous_pi fun j => ?_
     simp only [lmulM, Matrix.mul_apply, Matrix.of_apply]
@@ -27,33 +27,36 @@ theorem measurable_lmul_swap :
     fun_prop
   exact hc.measurable
 
-theorem quotientMeasure_hypotheses_closed_bessel_subgroup {S : Set (Mat k r)} {μG μS ν : Measure (Mt k r)}
-    (hS : IsClosedSub k r S) (hG : IsHaarOn (GG k r) μG) (hμS : IsHaarOn S μS)
-    (hU : IsUnimod S μS) (hq : IsQuotMeas μG μS ν) :
-    PI.QuotientSetting (GG k r) S μG μS ν := by
+theorem quotientMeasure_hypotheses_closed_bessel_subgroup
+    {S : Set (Mat k r)} {μG μS ν : Measure (Mt k r)} (hS : IsClosedSub k r S)
+    (hG : IsHaarOn (GG k r) μG) (hμS : IsHaarOn S μS) (hU : IsUnimod S μS) (hq : IsQuotMeas μG μS ν)
+    : PI.QuotientSetting (GG k r) S μG μS ν := by
   obtain ⟨hGm, hGu⟩ := GlobalTheory.unitaryGroup_matGroup_unimodular k r
   exact ⟨hGm, hS.isMatGroup, hS.1, hG, hμS, (hGu μG hG).2, hU.1, hq⟩
 
-theorem eq_map_prod_of_isQuotMeas {μG μS ν : Measure (Mt k r)} [SFinite ν] [SFinite μS]
-    (hq : IsQuotMeas μG μS ν) :
-    μG = (ν.prod μS).map (fun p : Mt k r × Mt k r => lmulM (Matrix.of p.2) p.1) := by
+theorem eq_map_prod_of_isQuotMeas
+    {μG μS ν : Measure (Mt k r)} [SFinite ν] [SFinite μS] (hq : IsQuotMeas μG μS ν)
+    : μG = (ν.prod μS).map (fun p : Mt k r × Mt k r => lmulM (Matrix.of p.2) p.1) := by
   ext A hA
   have hm := measurable_lmul_swap (k := k) (r := r)
-  rw [Measure.map_apply hm hA, ← lintegral_indicator_one hA,
-    hq _ (measurable_one.indicator hA), ← lintegral_indicator_one (hm hA),
+  rw [Measure.map_apply hm hA, ← lintegral_indicator_one hA, hq _ (measurable_one.indicator hA),
+    ← lintegral_indicator_one (hm hA),
     lintegral_prod _ ((measurable_one.indicator (hm hA)).aemeasurable)]
   rfl
 
-theorem weil_integrable :
-    ∀ (k r : ℕ) (S : Set (Mat k r)) (μG μS ν : Measure (Mt k r)), IsClosedSub k r S →
-      IsHaarOn (GG k r) μG → IsHaarOn S μS → IsUnimod S μS → IsQuotMeas μG μS ν →
-      SigmaFinite ν ∧ ν {x | Matrix.of x ∉ GG k r} = 0 ∧
-      μG = (ν.prod μS).map (fun p : Mt k r × Mt k r => lmulM (Matrix.of p.2) p.1) ∧
-      (∀ (B : Type) [NormedAddCommGroup B] [NormedSpace ℝ B] [CompleteSpace B] (f : Mt k r → B),
-        Integrable f μG → Integrable (fun x => ∫ s, f (lmulM (Matrix.of s) x) ∂μS) ν ∧
-          ∫ x, f x ∂μG = ∫ x, (∫ s, f (lmulM (Matrix.of s) x) ∂μS) ∂ν) ∧
-      (∀ F : Mt k r → ENNReal, Measurable F → (∀ s ∈ S, ∀ x, F (lmulM s x) = F x) →
-        ∀ y ∈ GG k r, ∫⁻ x, F (rmulM y x) ∂ν = ∫⁻ x, F x ∂ν) := by
+theorem weil_integrable
+    : ∀ (k r : ℕ) (S : Set (Mat k r)) (μG μS ν : Measure (Mt k r)),
+      IsClosedSub k r S → IsHaarOn (GG k r) μG → IsHaarOn S μS → IsUnimod S μS → IsQuotMeas μG μS ν
+        → SigmaFinite ν ∧ ν {x | Matrix.of x ∉ GG k r} = 0
+          ∧ μG = (ν.prod μS).map (fun p : Mt k r × Mt k r => lmulM (Matrix.of p.2) p.1)
+          ∧ (∀ (B : Type) [NormedAddCommGroup B] [NormedSpace ℝ B] [CompleteSpace B]
+              (f : Mt k r → B),
+            Integrable f μG
+              → Integrable (fun x => ∫ s, f (lmulM (Matrix.of s) x) ∂μS) ν
+                ∧ ∫ x, f x ∂μG = ∫ x, (∫ s, f (lmulM (Matrix.of s) x) ∂μS) ∂ν)
+          ∧ (∀ F : Mt k r → ENNReal,
+            Measurable F → (∀ s ∈ S, ∀ x, F (lmulM s x) = F x)
+              → ∀ y ∈ GG k r, ∫⁻ x, F (rmulM y x) ∂ν = ∫⁻ x, F x ∂ν) := by
   intro k r S μG μS ν hS hG hμS hU hq
   have hset := quotientMeasure_hypotheses_closed_bessel_subgroup hS hG hμS hU hq
   have : SigmaFinite μS := hμS.1
@@ -86,13 +89,14 @@ theorem weil_integrable :
     exact hf0int.trans ENNReal.one_lt_top
 
   have hsig : SigmaFinite ν := by
-    refine Measure.sigmaFinite_of_countable (S := Set.range fun n : ℕ => {x | ((n : ENNReal) + 1)⁻¹ ≤ g x})
-      (Set.countable_range _) ?_ ?_
+    refine Measure.sigmaFinite_of_countable
+      (S := Set.range fun n : ℕ => {x | ((n : ENNReal) + 1)⁻¹ ≤ g x}) (Set.countable_range _) ?_ ?_
     · rintro _ ⟨n, rfl⟩
       have hne : ((n : ENNReal) + 1)⁻¹ ≠ 0 := ENNReal.inv_ne_zero.mpr (by simp)
       have hnt : ((n : ENNReal) + 1)⁻¹ ≠ ⊤ := ENNReal.inv_ne_top.mpr (by simp)
-      calc ν {x | ((n : ENNReal) + 1)⁻¹ ≤ g x} ≤ (∫⁻ x, g x ∂ν) / ((n : ENNReal) + 1)⁻¹ :=
-            meas_ge_le_lintegral_div hgm.aemeasurable hne hnt
+      calc
+        ν {x | ((n : ENNReal) + 1)⁻¹ ≤ g x} ≤ (∫⁻ x, g x ∂ν) / ((n : ENNReal) + 1)⁻¹ :=
+          meas_ge_le_lintegral_div hgm.aemeasurable hne hnt
         _ < ⊤ := ENNReal.div_lt_top hgint.ne hne
     · rw [Set.sUnion_range, Set.eq_univ_iff_forall]
       intro x

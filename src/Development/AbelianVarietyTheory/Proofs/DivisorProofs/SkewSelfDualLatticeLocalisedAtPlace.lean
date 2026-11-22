@@ -11,31 +11,36 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousAt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix GlobalTheory.VacAny
 
 namespace GlobalTheory.SkewLocDual
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem form_smul_left (σ : E →ₐ[F] E) {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (c : E) (x y : Fin d → E) :
-    form σ J (c • x) y = c * form σ J x y := by
+theorem form_smul_left
+    (σ : E →ₐ[F] E) {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (c : E) (x y : Fin d → E)
+    : form σ J (c • x) y = c * form σ J x y := by
   simp [form, smul_dotProduct]
 
-theorem form_add_right (σ : E →ₐ[F] E) {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (x y z : Fin d → E) :
-    form σ J x (y + z) = form σ J x y + form σ J x z := by
-  have h : (fun i => σ ((y + z) i)) = (fun i => σ (y i)) + fun i => σ (z i) := funext fun i => by simp
+theorem form_add_right (σ : E →ₐ[F] E) {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (x y z : Fin d → E)
+    : form σ J x (y + z) = form σ J x y + form σ J x z := by
+  have h : (fun i => σ ((y + z) i)) = (fun i => σ (y i)) + fun i => σ (z i) :=
+    funext fun i => by simp
   simp only [form, h, Matrix.mulVec_add, dotProduct_add]
 
-theorem form_zero_right (σ : E →ₐ[F] E) {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (x : Fin d → E) :
-    form σ J x 0 = 0 := by
+theorem form_zero_right (σ : E →ₐ[F] E) {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (x : Fin d → E)
+    : form σ J x 0 = 0 := by
   have h : (fun i => σ ((0 : Fin d → E) i)) = 0 := funext fun i => by simp
   simp only [form, h, Matrix.mulVec_zero, dotProduct_zero]
 
-theorem form_smul_right (σ : E →ₐ[F] E) {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (o : 𝓞 E) (x y : Fin d → E) :
-    form σ J x (o • y) = σ (o : E) * form σ J x y := by
-  have h : (fun i => σ ((o • y) i)) = σ (o : E) • fun i => σ (y i) := funext fun i => by
-    simp [Algebra.smul_def]
+theorem form_smul_right
+    (σ : E →ₐ[F] E) {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (o : 𝓞 E) (x y : Fin d → E)
+    : form σ J x (o • y) = σ (o : E) * form σ J x y := by
+  have h : (fun i => σ ((o • y) i)) = σ (o : E) • fun i => σ (y i) :=
+    funext fun i => by simp [Algebra.smul_def]
   simp only [form, h, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
 
 theorem isIntegral_algebraMap_int (a : 𝓞 F) : IsIntegral ℤ (algebraMap F E (a : F)) :=
@@ -47,10 +52,14 @@ theorem isIntegral_conj (σ : E →ₐ[F] E) (o : 𝓞 E) : IsIntegral ℤ (σ (
 end GlobalTheory.SkewLocDual
 
 open GlobalTheory.SkewLocDual in
-theorem GlobalTheory.SkewLocDual.exists_smul_mem_of_integral : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
-    (B : Base F E) {d r s : ℕ} (Y : Spc F E d), Y.IsSkew σ B r s → ∀ (v : Pl (F := F)) (u : Fin d → E),
-    (∀ y ∈ Y.L, ∃ t : 𝓞 F, t ∉ v.asIdeal ∧ IsIntegral ℤ (algebraMap F E (t : F) * form σ Y.J u y)) →
-    ∃ t : 𝓞 F, t ∉ v.asIdeal ∧ algebraMap F E (t : F) • u ∈ Y.L := by
+theorem GlobalTheory.SkewLocDual.exists_smul_mem_of_integral
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E) {d r s : ℕ} (Y : Spc F E d),
+      Y.IsSkew σ B r s
+        → ∀ (v : Pl (F := F)) (u : Fin d → E),
+          (∀ y ∈ Y.L, ∃ t : 𝓞 F,
+              t ∉ v.asIdeal ∧ IsIntegral ℤ (algebraMap F E (t : F) * form σ Y.J u y))
+            → ∃ t : 𝓞 F, t ∉ v.asIdeal ∧ algebraMap F E (t : F) • u ∈ Y.L := by
   intro F E _ _ _ _ _ σ B d r s Y hY v u hu
   classical
   haveI := v.isPrime
@@ -61,14 +70,15 @@ theorem GlobalTheory.SkewLocDual.exists_smul_mem_of_integral : ∀ (F E : Type) 
     rw [Ideal.IsPrime.prod_mem_iff]
     push_neg
     exact fun y hy => (hT y hy).1
-  have key : ∀ y ∈ Y.L,
-      IsIntegral ℤ (algebraMap F E ((∏ y ∈ S, T y : 𝓞 F) : F) * form σ Y.J u y) := by
+  have key
+      : ∀ y ∈ Y.L, IsIntegral ℤ (algebraMap F E ((∏ y ∈ S, T y : 𝓞 F) : F) * form σ Y.J u y) := by
     rw [← hS]
     intro y hy
     induction hy using Submodule.span_induction with
     | mem x hx =>
-      have hsplit : algebraMap F E ((∏ y ∈ S, T y : 𝓞 F) : F) =
-          algebraMap F E ((∏ y ∈ S.erase x, T y : 𝓞 F) : F) * algebraMap F E (T x : F) := by
+      have hsplit
+          : algebraMap F E ((∏ y ∈ S, T y : 𝓞 F) : F)
+            = algebraMap F E ((∏ y ∈ S.erase x, T y : 𝓞 F) : F) * algebraMap F E (T x : F) := by
         rw [← map_mul, ← Finset.prod_erase_mul S T hx]; rfl
       rw [hsplit, mul_assoc]
       exact (isIntegral_algebraMap_int _).mul (hT x hx).2

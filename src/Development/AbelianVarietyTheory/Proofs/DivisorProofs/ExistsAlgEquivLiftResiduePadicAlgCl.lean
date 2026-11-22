@@ -9,10 +9,11 @@ open IsLocalRing
 
 namespace GlobalTheory.ZJ
 
-theorem exists_algEquiv_lift_residue (l : ℕ) [Fact l.Prime] (L : IntermediateField ℚ_[l] (PadicAlgCl l))
-    (φ : kb l ≃+* kb l)
-    (hφ : ∀ x : OO l, (x : PadicAlgCl l) ∈ L → φ (residue (OO l) x) = residue (OO l) x) :
-    ∃ g : PadicAlgCl l ≃ₐ[L] PadicAlgCl l, ∀ x y : OO l,
+theorem exists_algEquiv_lift_residue
+    (l : ℕ) [Fact l.Prime]
+    (L : IntermediateField ℚ_[l] (PadicAlgCl l)) (φ : kb l ≃+* kb l)
+    (hφ : ∀ x : OO l, (x : PadicAlgCl l) ∈ L → φ (residue (OO l) x) = residue (OO l) x)
+    : ∃ g : PadicAlgCl l ≃ₐ[L] PadicAlgCl l, ∀ x y : OO l,
       residue (OO l) y = φ (residue (OO l) x) → ‖g (x : PadicAlgCl l) - y‖ < 1 := by
   classical
   haveI : IsAlgClosure L (PadicAlgCl l) :=
@@ -28,8 +29,9 @@ theorem exists_algEquiv_lift_residue (l : ℕ) [Fact l.Prime] (L : IntermediateF
       smul_add := fun g _ _ => Subtype.ext (map_add g _ _)
       smul_one := fun g => Subtype.ext (map_one g)
       smul_mul := fun g _ _ => Subtype.ext (map_mul g _ _) }
-  have hsmul : ∀ (g : PadicAlgCl l ≃ₐ[L] PadicAlgCl l) (x : OO l),
-      ((g • x : OO l) : PadicAlgCl l) = g x := fun _ _ => rfl
+  have hsmul
+      : ∀ (g : PadicAlgCl l ≃ₐ[L] PadicAlgCl l) (x : OO l), ((g • x : OO l) : PadicAlgCl l) = g x :=
+    fun _ _ => rfl
   let A : Subring (OO l) := L.toSubalgebra.toSubring.comap (OO l).subtype
   have hA : ∀ a : A, (((a : OO l) : PadicAlgCl l)) ∈ L := fun a => a.2
   haveI : SMulCommClass (PadicAlgCl l ≃ₐ[L] PadicAlgCl l) A (OO l) := ⟨fun g a b => by
@@ -61,8 +63,9 @@ theorem exists_algEquiv_lift_residue (l : ℕ) [Fact l.Prime] (L : IntermediateF
       intro x
       obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
       exact hφ (a : OO l) (hA a))
-  obtain ⟨⟨σ, hσQ⟩, hσ⟩ := Ideal.Quotient.stabilizerHom_surjective_of_profinite
-    (G := PadicAlgCl l ≃ₐ[L] PadicAlgCl l) (Q.under A) Q φ'
+  obtain ⟨⟨σ, hσQ⟩, hσ⟩ :=
+    Ideal.Quotient.stabilizerHom_surjective_of_profinite (G := PadicAlgCl l ≃ₐ[L] PadicAlgCl l)
+      (Q.under A) Q φ'
   refine ⟨σ, fun x y hxy => ?_⟩
   have h1 : Ideal.Quotient.mk Q (σ • x) = φ (residue (OO l) x) :=
     DFunLike.congr_fun hσ (Ideal.Quotient.mk Q x)

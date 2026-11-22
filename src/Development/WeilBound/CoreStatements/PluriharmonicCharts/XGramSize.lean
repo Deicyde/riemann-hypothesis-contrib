@@ -11,8 +11,11 @@ open scoped ComplexOrder
 
 namespace PositivityTheory.Xgp.gram_size
 
-theorem one {k : ℕ} (A B : Matrix (Fin k) (Fin k) ℂ) (m : ℝ) (hm : 1 ≤ m) (hA : A.PosDef) (hB : B.PosDef)
-    (h : ((m : ℂ) • B - A).PosSemidef) : Real.log A.det.re - Real.log B.det.re ≤ k * Real.log m := by
+theorem one
+    {k : ℕ} (A B : Matrix (Fin k) (Fin k) ℂ)
+    (m : ℝ) (hm : 1 ≤ m)
+    (hA : A.PosDef) (hB : B.PosDef) (h : ((m : ℂ) • B - A).PosSemidef)
+    : Real.log A.det.re - Real.log B.det.re ≤ k * Real.log m := by
   have h1 : A.det.re ≤ ((m : ℂ) • B).det.re :=
     GroundTheory.Heights₂.Heights.FourB.HermitianDetMono.proof k ((m : ℂ) • B) A hA.posSemidef h
   have e : ((m : ℂ) • B).det.re = m ^ k * B.det.re := by
@@ -27,7 +30,11 @@ theorem one {k : ℕ} (A B : Matrix (Fin k) (Fin k) ℂ) (m : ℝ) (hm : 1 ≤ m
 
 end PositivityTheory.Xgp.gram_size
 
-theorem PositivityTheory.Xgp.t_gram_size : ∀ (n k : ℕ) (G G₀ : Matrix (Fin n) (Fin n) ℂ) (V : Matrix (Fin n) (Fin k) ℂ) (m : ℝ), 1 ≤ m → G₀.PosDef → G.PosDef → ((m : ℂ) • G₀ - G).PosSemidef → ((m : ℂ) • G - G₀).PosSemidef → LinearIndependent ℂ Vᵀ → |Real.log (Vᴴ * G * V).det.re - Real.log (Vᴴ * G₀ * V).det.re| ≤ k * Real.log m := by
+theorem PositivityTheory.Xgp.t_gram_size
+    : ∀ (n k : ℕ) (G G₀ : Matrix (Fin n) (Fin n) ℂ) (V : Matrix (Fin n) (Fin k) ℂ) (m : ℝ),
+      1 ≤ m → G₀.PosDef → G.PosDef → ((m : ℂ) • G₀ - G).PosSemidef → ((m : ℂ) • G - G₀).PosSemidef
+        → LinearIndependent ℂ Vᵀ
+        → |Real.log (Vᴴ * G * V).det.re - Real.log (Vᴴ * G₀ * V).det.re| ≤ k * Real.log m := by
   intro n k G G₀ V m hm hG₀ hG h1 h2 hV
   have hinj : Function.Injective V.mulVec := Matrix.mulVec_injective_iff.mpr hV
   have hA : (Vᴴ * G * V).PosDef := hG.conjTranspose_mul_mul_same hinj

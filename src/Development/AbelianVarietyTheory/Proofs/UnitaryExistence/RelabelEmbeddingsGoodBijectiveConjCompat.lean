@@ -13,13 +13,24 @@ public import Development.AbelianVarietyTheory.Statements.HyperbolicHypotheses.H
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Frames GlobalTheory.FrameUnif
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.Frames GlobalTheory.FrameUnif
 open scoped Matrix nonZeroDivisors
 
 namespace GlobalTheory.Relab
 
-theorem relab_good : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H) (c : Coeff l) (σ : c.F →+* ℂ), GoodEmb c σ → Function.Bijective (relab c σ) ∧ (∀ τ, relab c σ τ (H.rt : E) = H.rt0 ↔ τ (H.rt : E) = H.rt0) ∧ (∀ τ, relab c σ (conjEmb τ) = conjEmb (relab c σ τ)) ∧ ∀ (Dw : Datum H) (g : ℕ) (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ)), IsTypeFn H Dw.p Dw.q (fun j => relab c σ (e j).1) := by
+theorem relab_good
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H) (c : Coeff l)
+        (σ : c.F →+* ℂ),
+      GoodEmb c σ
+        → Function.Bijective (relab c σ)
+          ∧ (∀ τ, relab c σ τ (H.rt : E) = H.rt0 ↔ τ (H.rt : E) = H.rt0)
+          ∧ (∀ τ, relab c σ (conjEmb τ) = conjEmb (relab c σ τ))
+          ∧ ∀ (Dw : Datum H) (g : ℕ) (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ)),
+            IsTypeFn H Dw.p Dw.q (fun j => relab c σ (e j).1) := by
   intro E _ _ _ H l c σ hσ
   classical
   have hinj : Function.Injective (relab c σ) := by
@@ -48,7 +59,7 @@ theorem relab_good : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H :
       exact congrArg σ (Subtype.ext hx)
     · refine ⟨fun h => ?_, fun h => ?_⟩
       · exfalso
-        have h1 : σ ⟨τ' (H.rt : E), c.conj τ' _⟩ = -σ ⟨H.rt0, c.le (baseKA l).ρ.2⟩ := by
+        have h1 : σ ⟨τ' (H.rt : E), c.conj τ' _⟩ = - σ ⟨H.rt0, c.le (baseKA l).ρ.2⟩ := by
           rw [← map_neg]
           exact congrArg σ (Subtype.ext hx)
         rw [← hval, h, hσ0] at h1
@@ -70,7 +81,8 @@ theorem relab_good : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H :
         Equiv.subtypeEquivRight (fun i => hinj.eq_iff)
       have e2 : {i // (e i).1 = τ₀} ≃ {s : Σ τ : E →+* ℂ, Fin (Dw.mult τ) // s.1 = τ₀} :=
         e.subtypeEquiv (fun _ => Iff.rfl)
-      have e3 : {s : Σ τ : E →+* ℂ, Fin (Dw.mult τ) // s.1 = τ₀} ≃ Fin (Dw.mult τ₀) := Equiv.sigmaSubtype τ₀
+      have e3 : {s : Σ τ : E →+* ℂ, Fin (Dw.mult τ) // s.1 = τ₀} ≃ Fin (Dw.mult τ₀) :=
+        Equiv.sigmaSubtype τ₀
       rw [Nat.card_congr (e1.trans (e2.trans e3)), Nat.card_eq_fintype_card, Fintype.card_fin]
     refine ⟨fun h => ?_, fun h => ?_⟩
     · rw [hcard]

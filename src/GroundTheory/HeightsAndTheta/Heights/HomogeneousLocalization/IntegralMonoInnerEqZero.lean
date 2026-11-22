@@ -15,8 +15,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace NumberField GroundTheory.Arith.SchemeCoh
-  MeasureTheory MvPolynomial TensorProduct
+open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace NumberField
+  GroundTheory.Arith.SchemeCoh MeasureTheory MvPolynomial TensorProduct
 open scoped LinearAlgebra.Projectivization
 
 attribute [local instance] MvPolynomial.gradedAlgebra
@@ -32,8 +32,8 @@ namespace L2MonomialOrthogonality
 variable {N : ℕ}
 
 def monoInner (n : ℕ) (a b : Fin (N + 1) →₀ ℕ) (v : Fin (N + 1) → ℂ) : ℂ :=
-  starRingEnd ℂ (eval v (monomial a (1 : ℂ))) * eval v (monomial b (1 : ℂ)) /
-    ((norm2 v ^ (2 * n) : ℝ) : ℂ)
+  starRingEnd ℂ (eval v (monomial a (1 : ℂ))) * eval v (monomial b (1 : ℂ))
+    / ((norm2 v ^ (2 * n) : ℝ) : ℂ)
 
 lemma monoInner_smul {n : ℕ} {a b : Fin (N + 1) →₀ ℕ} (ha : a.degree = n) (hb : b.degree = n)
     (t : ℂ) (ht : t ≠ 0) (v : Fin (N + 1) → ℂ) :
@@ -94,10 +94,8 @@ lemma eval_chartVec_monomial (a : Fin (N + 1) →₀ ℕ) (w : Fin N → ℂ) :
     CP.chartVec_self, one_pow, one_mul]
   simp only [CP.chartVec_zero_succ]
 
-theorem integral_monoInner_eq_zero {a b : Fin (N + 1) →₀ ℕ} (hab : a ≠ b)
-    (hb : b.degree = a.degree) :
-    ∫ x, monoInner a.degree a b x.rep ∂CP.fsMeasure N = 0 := by
-
+theorem integral_monoInner_eq_zero {a b : Fin (N + 1) →₀ ℕ} (hab : a ≠ b) (hb : b.degree = a.degree)
+    : ∫ x, monoInner a.degree a b x.rep ∂CP.fsMeasure N = 0 := by
   obtain ⟨k, hk⟩ : ∃ k : Fin N, a k.succ ≠ b k.succ := by
     by_contra! h
     apply hab
@@ -122,8 +120,9 @@ theorem integral_monoInner_eq_zero {a b : Fin (N + 1) →₀ ℕ} (hab : a ≠ b
       rw [hθ]
       push_cast
       field_simp
-    have h2 : (p : ℂ) * (starRingEnd ℂ) (↑θ * Complex.I) + (q : ℂ) * (↑θ * Complex.I) =
-        Real.pi * Complex.I := by
+    have h2
+        : (p : ℂ) * (starRingEnd ℂ) (↑θ * Complex.I) + (q : ℂ) * (↑θ * Complex.I)
+          = Real.pi * Complex.I := by
       simp only [map_mul, Complex.conj_ofReal, Complex.conj_I]
       linear_combination Complex.I * h1
     rw [h2, Complex.exp_pi_mul_I]
@@ -135,20 +134,22 @@ theorem integral_monoInner_eq_zero {a b : Fin (N + 1) →₀ ℕ} (hab : a ≠ b
     Homeomorph.piCongrRight fun j => (rotation (c j)).toHomeomorph
   have hT : ∀ z j, T z j = c j * z j := fun z j => rfl
   have hTm : MeasurePreserving T volume volume :=
-    measurePreserving_pi (fun _ => volume) (fun _ => volume)
+    measurePreserving_pi
+      (fun _ => volume)
+      (fun _ => volume)
       fun j => (rotation (c j)).measurePreserving
-  have hnorm : ∀ z j, ‖T z j‖ = ‖z j‖ := fun z j => by
-    rw [hT, norm_mul, Circle.norm_coe, one_mul]
-  have hprod : ∀ (m : Fin (N + 1) →₀ ℕ) (z : Fin N → ℂ),
-      eval (CP.chartVec 0 (T z)) (monomial m (1 : ℂ)) =
-        (u : ℂ) ^ m k.succ * eval (CP.chartVec 0 z) (monomial m (1 : ℂ)) := fun m z => by
+  have hnorm : ∀ z j, ‖T z j‖ = ‖z j‖ := fun z j => by rw [hT, norm_mul, Circle.norm_coe, one_mul]
+  have hprod
+      : ∀ (m : Fin (N + 1) →₀ ℕ) (z : Fin N → ℂ),
+        eval (CP.chartVec 0 (T z)) (monomial m (1 : ℂ))
+          = (u : ℂ) ^ m k.succ * eval (CP.chartVec 0 z) (monomial m (1 : ℂ)) := fun m z => by
     rw [eval_chartVec_monomial, eval_chartVec_monomial]
     simp only [hT, mul_pow, Finset.prod_mul_distrib, hc, ite_pow, one_pow, Finset.prod_ite_eq',
       Finset.mem_univ, if_true]
 
   set G : (Fin N → ℂ) → ℂ := fun z =>
     (CP.fsVolumeDensity 0 z : ℂ) * monoInner a.degree a b (CP.chartVec 0 z) with hG
-  have hGT : ∀ z, G (T z) = -G z := fun z => by
+  have hGT : ∀ z, G (T z) = - G z := fun z => by
     have hdens : CP.fsVolumeDensity (N := N) 0 (T z) = CP.fsVolumeDensity 0 z := by
       rw [CP.fsVolumeDensity_eq, CP.fsVolumeDensity_eq, normSqSum, normSqSum]
       simp only [hnorm]
@@ -165,18 +166,22 @@ theorem integral_monoInner_eq_zero {a b : Fin (N + 1) →₀ ℕ} (hab : a ≠ b
     rw [integral_fsMeasure_eq _ (continuous_monoInner_rep rfl hb)]
     refine integral_congr_ae (Filter.Eventually.of_forall fun z => ?_)
     simp only [hG, CP.chartInv, monoInner_mk rfl hb]
-  have hinv : ∫ z, G z = -∫ z, G z := by
-    calc ∫ z, G z = ∫ z, G (T z) := (hTm.integral_comp T.measurableEmbedding G).symm
+  have hinv : ∫ z, G z = - ∫ z, G z := by
+    calc
+      ∫ z, G z
+        = ∫ z, G (T z) := (hTm.integral_comp T.measurableEmbedding G).symm
       _ = ∫ z, -G z := by simp only [hGT]
-      _ = -∫ z, G z := integral_neg _
+      _ = - ∫ z, G z := integral_neg _
   rw [hint]
   linear_combination hinv / 2
 
-theorem integral_monoInner_self (a : Fin (N + 1) →₀ ℕ) :
-    ∫ x, monoInner a.degree a a x.rep ∂CP.fsMeasure N =
-      (((∏ i, ((a i).factorial : ℝ)) * N.factorial / (a.degree + N).factorial : ℝ) : ℂ) := by
-  have hpt : ∀ v : CP N, monoInner a.degree a a v.rep =
-      ((CP.fsNormPoly a.degree (monomial a (1 : ℂ)) v ^ 2 : ℝ) : ℂ) := fun v => by
+theorem integral_monoInner_self (a : Fin (N + 1) →₀ ℕ)
+    : ∫ x, monoInner a.degree a a x.rep ∂CP.fsMeasure N
+      = (((∏ i, ((a i).factorial : ℝ)) * N.factorial / (a.degree + N).factorial : ℝ) : ℂ) := by
+  have hpt
+      : ∀ v : CP N,
+        monoInner a.degree a a v.rep
+          = ((CP.fsNormPoly a.degree (monomial a (1 : ℂ)) v ^ 2 : ℝ) : ℂ) := fun v => by
     have e := Complex.conj_mul' (eval v.rep (monomial a (1 : ℂ)))
     unfold monoInner CP.fsNormPoly
     push_cast

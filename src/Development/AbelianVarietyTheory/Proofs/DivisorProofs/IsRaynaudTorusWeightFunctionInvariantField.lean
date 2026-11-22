@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Tor
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -22,8 +25,11 @@ noncomputable section
 
 namespace GlobalTheory.Heat.InvWt
 
-theorem top_le_preimage_of_fst {S : Type} [CommRing S] {X : Scheme.{0}} (w : Sp (DualNumber S) ⟶ X) (a : Sp S ⟶ X) (U : X.Opens)
-    (h : spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ w = a) (ha : ⊤ ≤ a ⁻¹ᵁ U) : ⊤ ≤ w ⁻¹ᵁ U := by
+theorem top_le_preimage_of_fst
+    {S : Type} [CommRing S]
+    {X : Scheme.{0}} (w : Sp (DualNumber S) ⟶ X) (a : Sp S ⟶ X) (U : X.Opens)
+    (h : spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ w = a) (ha : ⊤ ≤ a ⁻¹ᵁ U)
+    : ⊤ ≤ w ⁻¹ᵁ U := by
   intro p _
   let p0 : PrimeSpectrum S := PrimeSpectrum.comap (algebraMap S (DualNumber S)) p
   have hp : (spMap (TrivSqZeroExt.fstHom S S S).toRingHom) p0 = p := by
@@ -40,7 +46,9 @@ theorem top_le_preimage_of_fst {S : Type} [CommRing S] {X : Scheme.{0}} (w : Sp 
       rw [← TrivSqZeroExt.inl_fst_add_inr_snd_eq z]
       exact p.asIdeal.add_mem h1 hz
     · intro h1
-      have e : TrivSqZeroExt.inl (TrivSqZeroExt.fst z) = z - TrivSqZeroExt.inr (TrivSqZeroExt.snd z) := by
+      have e
+          : TrivSqZeroExt.inl (TrivSqZeroExt.fst z)
+            = z - TrivSqZeroExt.inr (TrivSqZeroExt.snd z) := by
         rw [eq_sub_iff_add_eq, TrivSqZeroExt.inl_fst_add_inr_snd_eq]
       rw [e]
       exact p.asIdeal.sub_mem h1 hz
@@ -50,17 +58,23 @@ theorem top_le_preimage_of_fst {S : Type} [CommRing S] {X : Scheme.{0}} (w : Sp 
   rw [← hp]
   exact hm
 
-theorem map_unitOn {A B : Type} [CommRing A] [CommRing B] (f : A →+* B) (u : Aˣ) :
-    Units.map (spMap f).appTop.hom.toMonoidHom (unitOn u) = unitOn (Units.map f.toMonoidHom u) := by
+theorem map_unitOn {A B : Type} [CommRing A] [CommRing B] (f : A →+* B) (u : Aˣ)
+    : Units.map (spMap f).appTop.hom.toMonoidHom (unitOn u)
+      = unitOn (Units.map f.toMonoidHom u) := by
   ext
   have e := congrArg (fun g => g.hom (u : A)) (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom f))
   exact e.symm
 
-theorem exists_tan_over {R : Type} [CommRing R] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G] (v : TanM (𝟙 (Sp R)) G)
-    {S : Type} [CommRing S] (φ : R →+* S) :
-    ∃ v' : Over.mk (spMap ((algebraMap S (DualNumber S)).comp φ)) ⟶ G,
-      v'.left = spMap (dualMap φ) ≫ (tv v).left ∧
-      spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ v'.left = (1 : Over.mk (spMap φ) ⟶ G).left := by
+theorem exists_tan_over
+    {R : Type} [CommRing R]
+    (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G]
+    (v : TanM (𝟙 (Sp R)) G)
+    {S : Type} [CommRing S]
+    (φ : R →+* S)
+    : ∃ v' : Over.mk (spMap ((algebraMap S (DualNumber S)).comp φ)) ⟶ G,
+      v'.left = spMap (dualMap φ) ≫ (tv v).left
+        ∧ spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ v'.left
+          = (1 : Over.mk (spMap φ) ⟶ G).left := by
   refine ⟨Over.homMk (spMap (dualMap φ) ≫ (tv v).left) ?_, rfl, ?_⟩
   · rw [Category.assoc, Over.w (tv v)]
     simp only [overAt, Over.mk_hom, Category.comp_id, spMap, ← Spec.map_comp]
@@ -82,25 +96,36 @@ theorem exists_tan_over {R : Type} [CommRing R] (G : Over (Sp R)) [GrpObj G] [Is
       apply RingHom.ext
       intro z
       simp [dualMap, CommRingCat.hom_comp, tm]
-    have e := congrArg (·.left) (Formalism.L2.Pj.tan_pull (𝟙 (Sp R)) ψ hψ (tv v) (ReciprocityTheory.ChartRestriction.G.PullbackSections.tv_mem v))
+    have e :=
+      congrArg (·.left)
+        (Formalism.L2.Pj.tan_pull (𝟙 (Sp R)) ψ hψ (tv v)
+          (ReciprocityTheory.ChartRestriction.G.PullbackSections.tv_mem v))
     simpa [ψ] using e
 
-theorem cv_pull_of_unit {R : Type} [CommRing R] [IsDomain R] {Q : DegPre R} {O : Type} [CommRing O] [StarRing O] [Module O Q.X]
-    {oa : Q.OAct O} (Y : Ray oa) {T T' : Over (Sp R)} (k : T' ⟶ T) (x x' : T ⟶ Y.H) (u : Q.X → (Γ(T.left, ⊤))ˣ)
-    (h : ∀ χ y J, Good Q.P.L y J →
-      val ((Y.Φ _ x').s χ) (𝟙 _) y J = gm (𝟙 T.left) y ⊤ (u χ) * val ((Y.Φ _ x).s χ) (𝟙 _) y J) :
-    ∀ χ y J, Good Q.P.L y J →
-      val ((Y.Φ _ (k ≫ x')).s χ) (𝟙 _) y J =
-        gm (𝟙 T'.left) y ⊤ (Units.map k.left.appTop.hom.toMonoidHom (u χ)) * val ((Y.Φ _ (k ≫ x)).s χ) (𝟙 _) y J := by
+theorem cv_pull_of_unit
+    {R : Type} [CommRing R] [IsDomain R]
+    {Q : DegPre R} {O : Type} [CommRing O] [StarRing O] [Module O Q.X]
+    {oa : Q.OAct O} (Y : Ray oa)
+    {T T' : Over (Sp R)} (k : T' ⟶ T) (x x' : T ⟶ Y.H) (u : Q.X → (Γ(T.left, ⊤))ˣ)
+    (h : ∀ χ y J,
+      Good Q.P.L y J
+        → val ((Y.Φ _ x').s χ) (𝟙 _) y J = gm (𝟙 T.left) y ⊤ (u χ) * val ((Y.Φ _ x).s χ) (𝟙 _) y J)
+    : ∀ χ y J,
+      Good Q.P.L y J
+        → val ((Y.Φ _ (k ≫ x')).s χ) (𝟙 _) y J
+          = gm (𝟙 T'.left) y ⊤ (Units.map k.left.appTop.hom.toMonoidHom (u χ))
+            * val ((Y.Φ _ (k ≫ x)).s χ) (𝟙 _) y J := by
   intro χ y J hJ
   have p' := ((GlobalTheory.TorusModel.isPull_iff k _ _).1 (Y.rep.1 _ _ k x')).2 χ y J hJ
   have p := ((GlobalTheory.TorusModel.isPull_iff k _ _).1 (Y.rep.1 _ _ k x)).2 χ y J hJ
   let g : LB.Gen (LB.LinComb Q.P.L (Y := T.left) (K := PEmpty.{1}) PEmpty.elim PEmpty.elim) :=
     ⟨fun _ => res le_top (u χ)⟩
-  have hg : ∀ (Z : Scheme.{0}) (r : Z ⟶ T.left) z J', Good Q.P.L z J' → val g r z J' = gm r z ⊤ (u χ) :=
+  have hg
+      : ∀ (Z : Scheme.{0}) (r : Z ⟶ T.left) z J', Good Q.P.L z J' → val g r z J' = gm r z ⊤ (u χ) :=
     fun Z r z J' hJ' => gm_res r z le_top (hJ'.mem PEmpty.elim r) (u χ)
-  have hC := corr_of_val Q.P.isLB (t := (Y.Φ _ x').s χ) (t' := LB.mulGen Q.P.L _ _ _ _ g ((Y.Φ _ x).s χ))
-    (fun y' J' hJ' => by rw [val_mul hJ', hg _ _ _ _ hJ']; exact h χ y' J' hJ')
+  have hC :=
+    corr_of_val Q.P.isLB (t := (Y.Φ _ x').s χ) (t' := LB.mulGen Q.P.L _ _ _ _ g ((Y.Φ _ x).s χ))
+      (fun y' J' hJ' => by rw [val_mul hJ', hg _ _ _ _ hJ']; exact h χ y' J' hJ')
   have e := val_corr hJ hC k.left
   rw [val_mul hJ, hg _ _ _ _ hJ] at e
   show GlobalTheory.TorusModel.cv _ χ y J = _ * GlobalTheory.TorusModel.cv _ χ y J
@@ -111,13 +136,18 @@ theorem cv_pull_of_unit {R : Type} [CommRing R] [IsDomain R] {Q : DegPre R} {O :
   rw [← e2]
   rfl
 
-theorem cv_mul_of_unit {R : Type} [CommRing R] [IsDomain R] {Q : DegPre R} {O : Type} [CommRing O] [StarRing O] [Module O Q.X]
-    {oa : Q.OAct O} (Y : Ray oa) {T : Over (Sp R)} (X X' v : T ⟶ Y.H) (hq : X' ≫ Y.q = X ≫ Y.q)
-    (u : Q.X → (Γ(T.left, ⊤))ˣ)
-    (h : ∀ χ y J, Good Q.P.L y J →
-      val ((Y.Φ _ X').s χ) (𝟙 _) y J = gm (𝟙 T.left) y ⊤ (u χ) * val ((Y.Φ _ X).s χ) (𝟙 _) y J) :
-    ∀ χ y J, Good Q.P.L y J →
-      val ((Y.Φ _ (X' * v)).s χ) (𝟙 _) y J = gm (𝟙 T.left) y ⊤ (u χ) * val ((Y.Φ _ (X * v)).s χ) (𝟙 _) y J := by
+theorem cv_mul_of_unit
+    {R : Type} [CommRing R] [IsDomain R]
+    {Q : DegPre R} {O : Type} [CommRing O] [StarRing O] [Module O Q.X]
+    {oa : Q.OAct O} (Y : Ray oa)
+    {T : Over (Sp R)} (X X' v : T ⟶ Y.H) (hq : X' ≫ Y.q = X ≫ Y.q) (u : Q.X → (Γ(T.left, ⊤))ˣ)
+    (h : ∀ χ y J,
+      Good Q.P.L y J
+        → val ((Y.Φ _ X').s χ) (𝟙 _) y J = gm (𝟙 T.left) y ⊤ (u χ) * val ((Y.Φ _ X).s χ) (𝟙 _) y J)
+    : ∀ χ y J,
+      Good Q.P.L y J
+        → val ((Y.Φ _ (X' * v)).s χ) (𝟙 _) y J
+          = gm (𝟙 T.left) y ⊤ (u χ) * val ((Y.Φ _ (X * v)).s χ) (𝟙 _) y J := by
   intro χ y J hJ
   have h1 := ((GlobalTheory.TorusModel.isAdd_iff _ _ _).1 (Y.rep.2 _ X v)).2 χ y J hJ
   have h2 := ((GlobalTheory.TorusModel.isAdd_iff _ _ _).1 (Y.rep.2 _ X' v)).2 χ y J hJ
@@ -129,14 +159,20 @@ theorem cv_mul_of_unit {R : Type} [CommRing R] [IsDomain R] {Q : DegPre R} {O : 
   rw [h2, _root_.mul_assoc, h1, ← _root_.mul_assoc]
   congr 1
 
-theorem _root_.GlobalTheory.Heat.IsInv.isWt : ∀ {R : Type} [CommRing R] [IsDomain R] {Q : DegPre R} {O : Type} [CommRing O] [StarRing O] [Module O Q.X] {oa : Q.OAct O} (Y : Ray oa) (v : TanM (𝟙 (Sp R)) Y.H) (dd : Fld Y.H.left), IsInv Y.H v dd → ∀ (α : Q.X) (V : Y.H.left.Opens) (f : Γ(Y.H.left, V)), IsWt Y α V f → IsWt Y α V (dd V f) := by
+theorem _root_.GlobalTheory.Heat.IsInv.isWt
+    : ∀ {R : Type} [CommRing R] [IsDomain R] {Q : DegPre R} {O : Type} [CommRing O] [StarRing O]
+        [Module O Q.X] {oa : Q.OAct O} (Y : Ray oa) (v : TanM (𝟙 (Sp R)) Y.H) (dd : Fld Y.H.left),
+      IsInv Y.H v dd
+        → ∀ (α : Q.X) (V : Y.H.left.Opens) (f : Γ(Y.H.left, V)),
+          IsWt Y α V f → IsWt Y α V (dd V f) := by
   intro R _ _ Q O _ _ _ oa Y v dd hinv α V f hf
   intro S _ φ x x' c a a' ha ha' hV hV' hq hc
   let φε : R →+* DualNumber S := (algebraMap S (DualNumber S)).comp φ
   let π : Over.mk (spMap φε) ⟶ Over.mk (spMap φ) :=
     Over.homMk (spMap (algebraMap S (DualNumber S))) (by
       show spMap (algebraMap S (DualNumber S)) ≫ spMap φ = spMap φε
-      simp only [spMap, φε, ← Spec.map_comp]; rfl)
+      simp only [spMap, φε, ← Spec.map_comp]
+      rfl)
   let ie : Over.mk (spMap φ) ⟶ Over.mk (spMap φε) :=
     Over.homMk (spMap (TrivSqZeroExt.fstHom S S S).toRingHom) (by
       show spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ spMap φε = spMap φ
@@ -147,7 +183,8 @@ theorem _root_.GlobalTheory.Heat.IsInv.isWt : ∀ {R : Type} [CommRing R] [IsDom
     ext1
     show spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ spMap (algebraMap S (DualNumber S)) = 𝟙 _
     simp only [spMap, ← Spec.map_comp]
-    rw [← Spec.map_id]; congr 1
+    rw [← Spec.map_id]
+    congr 1
   have hiev : ie ≫ v'' = 1 := by
     ext1
     exact hv₂
@@ -161,11 +198,13 @@ theorem _root_.GlobalTheory.Heat.IsInv.isWt : ∀ {R : Type} [CommRing R] [IsDom
     rw [ha']; exact congrArg (·.left) (hW x')
   have htr : ∀ z : Over.mk (spMap φ) ⟶ Y.H, IsTr Y.H φ z.left v (π ≫ z * v'').left := by
     intro z
-    let e : tEpsG (z.left ≫ Y.H.hom) ⟶ Over.mk (spMap φε) := Over.homMk (𝟙 _) (by
-      show 𝟙 _ ≫ spMap φε = spMap (algebraMap S (DualNumber S)) ≫ z.left ≫ Y.H.hom
-      rw [Over.w z]
-      simp only [Over.mk_hom, Category.id_comp, spMap, φε]
-      rw [← Spec.map_comp]; rfl)
+    let e : tEpsG (z.left ≫ Y.H.hom) ⟶ Over.mk (spMap φε) :=
+      Over.homMk (𝟙 _) (by
+        show 𝟙 _ ≫ spMap φε = spMap (algebraMap S (DualNumber S)) ≫ z.left ≫ Y.H.hom
+        rw [Over.w z]
+        simp only [Over.mk_hom, Category.id_comp, spMap, φε]
+        rw [← Spec.map_comp]
+        rfl)
     refine ⟨e ≫ π ≫ z, e ≫ v'', ?_, ?_, ?_⟩
     · show 𝟙 _ ≫ spMap (algebraMap S (DualNumber S)) ≫ z.left = _
       rw [Category.id_comp]
@@ -174,16 +213,21 @@ theorem _root_.GlobalTheory.Heat.IsInv.isWt : ∀ {R : Type} [CommRing R] [IsDom
     · rw [← MonObj.comp_mul]
       show 𝟙 _ ≫ _ = _
       rw [Category.id_comp]
-  let c' : Q.X → (DualNumber S)ˣ := fun χ => Units.map (algebraMap S (DualNumber S)).toMonoidHom (c χ)
+  let c' : Q.X → (DualNumber S)ˣ := fun χ =>
+    Units.map (algebraMap S (DualNumber S)).toMonoidHom (c χ)
   have hqW : (π ≫ x' * v'') ≫ Y.q = (π ≫ x * v'') ≫ Y.q := by
     rw [MonObj.mul_comp, MonObj.mul_comp, Category.assoc, Category.assoc, hq]
-  have hcW := cv_mul_of_unit Y (π ≫ x) (π ≫ x') v'' (by rw [Category.assoc, Category.assoc, hq])
-    (fun χ => Units.map π.left.appTop.hom.toMonoidHom (unitOn (c χ))) (cv_pull_of_unit Y π x x' (fun χ => unitOn (c χ)) hc)
-  have key := hf (DualNumber S) φε (π ≫ x * v'') (π ≫ x' * v'') c' _ _ rfl rfl
-    (top_le_preimage_of_fst _ a V hWa hV) (top_le_preimage_of_fst _ a' V hWa' hV') hqW (fun χ y J hJ => by
-      rw [hcW χ y J hJ]
-      congr 2
-      exact map_unitOn _ _)
+  have hcW :=
+    cv_mul_of_unit Y (π ≫ x) (π ≫ x') v'' (by rw [Category.assoc, Category.assoc, hq])
+      (fun χ => Units.map π.left.appTop.hom.toMonoidHom (unitOn (c χ)))
+      (cv_pull_of_unit Y π x x' (fun χ => unitOn (c χ)) hc)
+  have key :=
+    hf (DualNumber S) φε (π ≫ x * v'') (π ≫ x' * v'') c' _ _ rfl rfl
+      (top_le_preimage_of_fst _ a V hWa hV) (top_le_preimage_of_fst _ a' V hWa' hV') hqW
+      (fun χ y J hJ => by
+        rw [hcW χ y J hJ]
+        congr 2
+        exact map_unitOn _ _)
   have e₁ := hinv.2 S φ a (π ≫ x * v'').left V f (by rw [ha]; exact Over.w x) hV (ha ▸ htr x)
   have e₂ := hinv.2 S φ a' (π ≫ x' * v'').left V f (by rw [ha']; exact Over.w x') hV' (ha' ▸ htr x')
   rw [← e₁, ← e₂, key]

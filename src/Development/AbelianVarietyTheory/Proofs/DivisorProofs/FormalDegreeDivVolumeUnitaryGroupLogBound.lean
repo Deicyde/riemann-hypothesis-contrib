@@ -6,16 +6,21 @@ public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.VolU
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues Formalism.L2.Pj
+  Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+  Formalism.IndefR.FWT
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.AdelicScalar GlobalTheory.LiftRows GlobalTheory.LowRow
+open GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.AdelicScalar
+  GlobalTheory.LiftRows GlobalTheory.LowRow
 
 namespace GlobalTheory.LowRow
 
-theorem volU_ge_inv_pow_of_formalDeg (r : ℕ) (hr : 1 ≤ r) :
-    (((r : ℝ) ^ r)⁻¹) ^ r ≤ ReciprocityTheory.ChartRestriction.DS.volU r := by
+theorem volU_ge_inv_pow_of_formalDeg (r : ℕ) (hr : 1 ≤ r)
+    : (((r : ℝ) ^ r)⁻¹) ^ r ≤ ReciprocityTheory.ChartRestriction.DS.volU r := by
   unfold ReciprocityTheory.ChartRestriction.DS.volU
   have hrpos : (0 : ℝ) < (r : ℝ) ^ r := by positivity
   rw [show (((r : ℝ) ^ r)⁻¹) ^ r = ∏ _i ∈ Finset.range r, ((r : ℝ) ^ r)⁻¹ by
@@ -32,11 +37,24 @@ theorem volU_ge_inv_pow_of_formalDeg (r : ℕ) (hr : 1 ≤ r) :
     have hpi : (1 : ℝ) ≤ 2 * Real.pi ^ (i + 1) := by
       have : (1 : ℝ) ≤ Real.pi ^ (i + 1) := one_le_pow₀ (by linarith [Real.pi_gt_three])
       linarith
-    calc ((r : ℝ) ^ r)⁻¹ ≤ (i.factorial : ℝ)⁻¹ := inv_anti₀ hfpos hfac
+    calc
+      ((r : ℝ) ^ r)⁻¹
+        ≤ (i.factorial : ℝ)⁻¹ := inv_anti₀ hfpos hfac
       _ = 1 / (i.factorial : ℝ) := by rw [one_div]
       _ ≤ 2 * Real.pi ^ (i + 1) / (i.factorial : ℝ) := by gcongr
 
-theorem formalDeg_div_volU_log_bound : ∀ (r n : ℕ) (d : ℝ) (lam : Fin r → ℝ), 1 ≤ r → 3 ≤ n → 0 ≤ d → StrictAnti lam → (∀ a b, |lam a - lam b| ≤ d + n + 3) → 0 < ReciprocityTheory.ChartRestriction.DS.volU r ∧ 0 < (∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), |lam a - lam b|) / (∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ))) ∧ Real.log ((∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), |lam a - lam b|) / (∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ))) / ReciprocityTheory.ChartRestriction.DS.volU r) ≤ 2 + (r : ℝ) ^ 2 * Real.log (2 * Real.sqrt 2 * (r : ℝ) ^ 2 * n * (d + 2)) := by
+theorem formalDeg_div_volU_log_bound
+    : ∀ (r n : ℕ) (d : ℝ) (lam : Fin r → ℝ),
+      1 ≤ r → 3 ≤ n → 0 ≤ d → StrictAnti lam → (∀ a b, |lam a - lam b| ≤ d + n + 3)
+        → 0 < ReciprocityTheory.ChartRestriction.DS.volU r
+          ∧ 0
+            < (∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), |lam a - lam b|)
+              / (∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)))
+          ∧ Real.log
+              ((∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), |lam a - lam b|)
+                / (∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)))
+                / ReciprocityTheory.ChartRestriction.DS.volU r)
+            ≤ 2 + (r : ℝ) ^ 2 * Real.log (2 * Real.sqrt 2 * (r : ℝ) ^ 2 * n * (d + 2)) := by
   intro r n d lam hr hn hd hlam hbd
   set P : ℝ := ∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), |lam a - lam b| with hPdef
   set D : ℝ := ∏ a : Fin r, ∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) with hDdef
@@ -73,16 +91,19 @@ theorem formalDeg_div_volU_log_bound : ∀ (r n : ℕ) (d : ℝ) (lam : Fin r �
       apply Finset.prod_le_prod₀
       · intro a _; exact Finset.prod_nonneg (fun b _ => abs_nonneg _)
       · intro a _
-        calc (∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), |lam a - lam b|)
-            ≤ ∏ _b ∈ Finset.univ.filter (fun b : Fin r => a < b), M :=
-              Finset.prod_le_prod₀ (fun b _ => abs_nonneg _) (fun b _ => hbd a b)
+        calc
+          (∏ b ∈ Finset.univ.filter (fun b : Fin r => a < b), |lam a - lam b|)
+              ≤ ∏ _b ∈ Finset.univ.filter (fun b : Fin r => a < b), M :=
+            Finset.prod_le_prod₀ (fun b _ => abs_nonneg _) (fun b _ => hbd a b)
           _ = M ^ (Finset.univ.filter (fun b : Fin r => a < b)).card := Finset.prod_const _
           _ ≤ M ^ r := by
-              apply pow_le_pow_right₀ hM1
-              calc (Finset.univ.filter (fun b : Fin r => a < b)).card ≤ (Finset.univ : Finset (Fin r)).card :=
-                    Finset.card_filter_le _ _
-                _ = r := by simp
-    calc P ≤ ∏ _a : Fin r, M ^ r := this
+            apply pow_le_pow_right₀ hM1
+            calc
+              (Finset.univ.filter (fun b : Fin r => a < b)).card
+                ≤ (Finset.univ : Finset (Fin r)).card := Finset.card_filter_le _ _
+              _ = r := by simp
+    calc
+      P ≤ ∏ _a : Fin r, M ^ r := this
       _ = M ^ (r * r) := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin, ← pow_mul]
   have hVinv : V⁻¹ ≤ (r : ℝ) ^ (r * r) := by
     have h := inv_anti₀ (by positivity) hVlow
@@ -90,29 +111,32 @@ theorem formalDeg_div_volU_log_bound : ∀ (r n : ℕ) (d : ℝ) (lam : Fin r �
     exact h
   have hQpos : 0 < P / D / V := by positivity
   have hQle : P / D / V ≤ (M * r) ^ (r * r) := by
-    calc P / D / V ≤ P / V := by
-          gcongr
-          exact div_le_self hPpos.le hD1
+    calc
+      P / D / V ≤ P / V := by
+        gcongr
+        exact div_le_self hPpos.le hD1
       _ = P * V⁻¹ := div_eq_mul_inv _ _
       _ ≤ M ^ (r * r) * (r : ℝ) ^ (r * r) := by
-          apply mul_le_mul hPle hVinv (by positivity) (by positivity)
+        apply mul_le_mul hPle hVinv (by positivity) (by positivity)
       _ = (M * r) ^ (r * r) := (mul_pow _ _ _).symm
   refine ⟨hVpos, div_pos hPpos hDpos, ?_⟩
   have hsq : (1 : ℝ) ≤ Real.sqrt 2 := by
-    rw [show (1:ℝ) = Real.sqrt 1 by simp]; exact Real.sqrt_le_sqrt (by norm_num)
+    rw [show (1 : ℝ) = Real.sqrt 1 by simp]; exact Real.sqrt_le_sqrt (by norm_num)
   have hMn : M ≤ n * (d + 2) := by
     rw [hMdef]; nlinarith [mul_nonneg (by linarith : (0:ℝ) ≤ n - 1) hd]
   have hr2 : (r : ℝ) ≤ 2 * Real.sqrt 2 * (r : ℝ) ^ 2 := by nlinarith
   have hX : M * r ≤ 2 * Real.sqrt 2 * (r : ℝ) ^ 2 * n * (d + 2) := by
-    calc M * r ≤ (n * (d + 2)) * (2 * Real.sqrt 2 * (r : ℝ) ^ 2) :=
-          mul_le_mul hMn hr2 (by positivity) (by positivity)
+    calc
+      M * r ≤ (n * (d + 2)) * (2 * Real.sqrt 2 * (r : ℝ) ^ 2) :=
+        mul_le_mul hMn hr2 (by positivity) (by positivity)
       _ = 2 * Real.sqrt 2 * (r : ℝ) ^ 2 * n * (d + 2) := by ring
   have hMr : 0 < M * r := by positivity
-  calc Real.log (P / D / V) ≤ Real.log ((M * r) ^ (r * r)) := Real.log_le_log hQpos hQle
+  calc
+    Real.log (P / D / V)
+      ≤ Real.log ((M * r) ^ (r * r)) := Real.log_le_log hQpos hQle
     _ = ((r * r : ℕ) : ℝ) * Real.log (M * r) := Real.log_pow _ _
     _ = (r : ℝ) ^ 2 * Real.log (M * r) := by push_cast; ring
-    _ ≤ (r : ℝ) ^ 2 * Real.log (2 * Real.sqrt 2 * (r : ℝ) ^ 2 * n * (d + 2)) := by
-        gcongr
+    _ ≤ (r : ℝ) ^ 2 * Real.log (2 * Real.sqrt 2 * (r : ℝ) ^ 2 * n * (d + 2)) := by gcongr
     _ ≤ 2 + (r : ℝ) ^ 2 * Real.log (2 * Real.sqrt 2 * (r : ℝ) ^ 2 * n * (d + 2)) := by linarith
 
 end GlobalTheory.LowRow

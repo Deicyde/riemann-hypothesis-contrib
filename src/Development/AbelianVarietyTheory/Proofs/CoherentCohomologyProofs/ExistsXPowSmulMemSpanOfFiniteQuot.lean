@@ -16,18 +16,26 @@ open GradedHilbert Pointwise
 
 section
 
-variable {ι : Type} {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [Module R M]
-  [Module (MvPolynomial ι R) M] [IsScalarTower R (MvPolynomial ι R) M]
-  (ℳ : ℤ → Submodule R M) [PolyGradedSMul ι ℳ] (i : ι)
+variable
+  {ι : Type} {R : Type} [CommRing R]
+  {M : Type}
+  [AddCommGroup M] [Module R M] [Module (MvPolynomial ι R) M] [IsScalarTower R (MvPolynomial ι R) M]
+  (ℳ : ℤ → Submodule R M) [PolyGradedSMul ι ℳ]
+  (i : ι)
 
 variable [Decomposition ℳ]
 
 end
 
-
 open CategoryTheory CategoryTheory.Limits DirectSum MvPolynomial TensorProduct in
 open Pointwise in
-theorem _root_.GlobalTheory.exists_X_pow_smul_mem_span_of_finite_quot : ∀ (ι : Type) [LinearOrder ι] [Fintype ι] (R : Type) [CommRing R] (M : Type) [AddCommGroup M] [Module R M] [Module (MvPolynomial ι R) M] [IsScalarTower R (MvPolynomial ι R) M] (ℳ : ℤ → Submodule R M) [_root_.GlobalTheory.PolyGradedSMul ι ℳ] [Decomposition ℳ] (i : ι), Module.Finite (MvPolynomial ι R) (QuotSMulTop (X i - 1 : MvPolynomial ι R) M) → ∃ T : Finset M, ∀ y : M, ∃ k : ℕ, (X i : MvPolynomial ι R) ^ k • y ∈ Submodule.span (MvPolynomial ι R) (T : Set M) := by
+theorem _root_.GlobalTheory.exists_X_pow_smul_mem_span_of_finite_quot
+    : ∀ (ι : Type) [LinearOrder ι] [Fintype ι] (R : Type) [CommRing R] (M : Type) [AddCommGroup M]
+        [Module R M] [Module (MvPolynomial ι R) M] [IsScalarTower R (MvPolynomial ι R) M]
+        (ℳ : ℤ → Submodule R M) [_root_.GlobalTheory.PolyGradedSMul ι ℳ] [Decomposition ℳ] (i : ι),
+      Module.Finite (MvPolynomial ι R) (QuotSMulTop (X i - 1 : MvPolynomial ι R) M)
+        → ∃ T : Finset M, ∀ y : M, ∃ k : ℕ,
+          (X i : MvPolynomial ι R) ^ k • y ∈ Submodule.span (MvPolynomial ι R) (T : Set M) := by
   intro ι _ _ R _ M _ _ _ _ ℳ _ _ i hfin
   classical
   set I : Submodule (MvPolynomial ι R) M :=
@@ -35,8 +43,12 @@ theorem _root_.GlobalTheory.exists_X_pow_smul_mem_span_of_finite_quot : ∀ (ι 
   have hI : ∀ w : M, (X i - 1 : MvPolynomial ι R) • w ∈ I := fun w =>
     Submodule.smul_mem_pointwise_smul w _ ⊤ Submodule.mem_top
 
-  have hpow : ∀ (e : ℤ) (h : M), h ∈ ℳ e → ∀ m : ℕ,
-      (X i : MvPolynomial ι R) ^ m • h ∈ ℳ (e + m) ∧ h - (X i : MvPolynomial ι R) ^ m • h ∈ I := by
+  have hpow
+      : ∀ (e : ℤ) (h : M),
+        h ∈ ℳ e
+          → ∀ m : ℕ,
+            (X i : MvPolynomial ι R) ^ m • h ∈ ℳ (e + m)
+              ∧ h - (X i : MvPolynomial ι R) ^ m • h ∈ I := by
     intro e h he m
     refine ⟨?_, ?_⟩
     · induction m with
@@ -44,15 +56,18 @@ theorem _root_.GlobalTheory.exists_X_pow_smul_mem_span_of_finite_quot : ∀ (ι 
       | succ m ih =>
         rw [pow_succ', mul_smul, Nat.cast_succ, ← add_assoc]
         exact _root_.GlobalTheory.X_smul_mem_gr ℳ i _ _ ih
-    · have h1 : (X i : MvPolynomial ι R) ^ m • h - h = (X i - 1 : MvPolynomial ι R) •
-          ((∑ j ∈ Finset.range m, (X i : MvPolynomial ι R) ^ j) • h) := by
+    · have h1
+          : (X i : MvPolynomial ι R) ^ m • h - h
+            = (X i - 1 : MvPolynomial ι R)
+              • ((∑ j ∈ Finset.range m, (X i : MvPolynomial ι R) ^ j) • h) := by
         rw [← mul_smul, mul_geom_sum, sub_smul, one_smul]
       rw [← neg_sub, h1]
       exact I.neg_mem (hI _)
 
   obtain ⟨G, hG⟩ := hfin.fg_top
-  have hlift : ∀ q : QuotSMulTop (X i - 1 : MvPolynomial ι R) M,
-      ∃ m : M, ∃ d : ℤ, m ∈ ℳ d ∧ Submodule.Quotient.mk m = q := by
+  have hlift
+      : ∀ q : QuotSMulTop (X i - 1 : MvPolynomial ι R) M, ∃ m : M, ∃ d : ℤ,
+        m ∈ ℳ d ∧ Submodule.Quotient.mk m = q := by
     intro q
     obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective _ q
     obtain ⟨n₀, hn₀⟩ := _root_.GlobalTheory.exists_homogeneous_add_X_sub_one_smul ℳ i m
@@ -76,10 +91,16 @@ theorem _root_.GlobalTheory.exists_X_pow_smul_mem_span_of_finite_quot : ∀ (ι 
     rw [← neg_sub]
     exact I.neg_mem hsy
 
-  have hPadd : ∀ s t : M,
-      (∃ N₀ : ℤ, ∀ n, N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ s - s' ∈ I) →
-      (∃ N₀ : ℤ, ∀ n, N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ t - s' ∈ I) →
-      ∃ N₀ : ℤ, ∀ n, N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ s + t - s' ∈ I := by
+  have hPadd
+      : ∀ s t : M,
+        (∃ N₀ : ℤ, ∀ n,
+            N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ s - s' ∈ I)
+          → (∃ N₀ : ℤ, ∀ n,
+            N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ t - s' ∈ I)
+          → ∃ N₀ : ℤ, ∀ n,
+            N₀ ≤ n
+              → ∃ s' ∈ ℳ n,
+                s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ s + t - s' ∈ I := by
     rintro s t ⟨N₁, h₁⟩ ⟨N₂, h₂⟩
     refine ⟨max N₁ N₂, fun n hn => ?_⟩
     obtain ⟨s', hs', hs'T, hsI⟩ := h₁ n (le_of_max_le_left hn)
@@ -87,9 +108,14 @@ theorem _root_.GlobalTheory.exists_X_pow_smul_mem_span_of_finite_quot : ∀ (ι 
     refine ⟨s' + t', add_mem hs' ht', add_mem hs'T ht'T, ?_⟩
     rw [add_sub_add_comm]
     exact add_mem hsI htI
-  have hPsmul : ∀ (p : MvPolynomial ι R) (s : M),
-      (∃ N₀ : ℤ, ∀ n, N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ s - s' ∈ I) →
-      ∃ N₀ : ℤ, ∀ n, N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ p • s - s' ∈ I := by
+  have hPsmul
+      : ∀ (p : MvPolynomial ι R) (s : M),
+        (∃ N₀ : ℤ, ∀ n,
+            N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ s - s' ∈ I)
+          → ∃ N₀ : ℤ, ∀ n,
+            N₀ ≤ n
+              → ∃ s' ∈ ℳ n,
+                s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ p • s - s' ∈ I := by
     intro p
     induction p using MvPolynomial.induction_on with
     | C a =>
@@ -115,8 +141,9 @@ theorem _root_.GlobalTheory.exists_X_pow_smul_mem_span_of_finite_quot : ∀ (ι 
         rwa [sub_add_cancel] at hmem
       · rw [← smul_sub]
         exact I.smul_mem _ hsI
-  have hPspan : ∀ s ∈ Submodule.span (MvPolynomial ι R) (T : Set M),
-      ∃ N₀ : ℤ, ∀ n, N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ s - s' ∈ I := by
+  have hPspan
+      : ∀ s ∈ Submodule.span (MvPolynomial ι R) (T : Set M), ∃ N₀ : ℤ, ∀ n,
+        N₀ ≤ n → ∃ s' ∈ ℳ n, s' ∈ Submodule.span (MvPolynomial ι R) (T : Set M) ∧ s - s' ∈ I := by
     intro s hs
     induction hs using Submodule.span_induction with
     | mem x hx =>
@@ -124,14 +151,21 @@ theorem _root_.GlobalTheory.exists_X_pow_smul_mem_span_of_finite_quot : ∀ (ι 
       refine ⟨d q, fun n hn => ?_⟩
       obtain ⟨m, hm⟩ : ∃ m : ℕ, n = d q + m := ⟨(n - d q).toNat, by omega⟩
       obtain ⟨h1, h2⟩ := hpow (d q) (f q) (hfd q) m
-      refine ⟨(X i : MvPolynomial ι R) ^ m • f q, by rw [hm]; exact h1,
-        Submodule.smul_mem _ _ (Submodule.subset_span hx), h2⟩
+      refine ⟨
+        (X i : MvPolynomial ι R) ^ m • f q,
+        by rw [hm]; exact h1,
+        Submodule.smul_mem _ _ (Submodule.subset_span hx),
+        h2
+      ⟩
     | zero => exact ⟨0, fun n _ => ⟨0, zero_mem _, zero_mem _, by rw [sub_zero]; exact zero_mem _⟩⟩
     | add x y _ _ hx hy => exact hPadd x y hx hy
     | smul a x _ hx => exact hPsmul a x hx
 
-  have hhom : ∀ (n : ℤ) (y : M), y ∈ ℳ n →
-      ∃ k : ℕ, (X i : MvPolynomial ι R) ^ k • y ∈ Submodule.span (MvPolynomial ι R) (T : Set M) := by
+  have hhom
+      : ∀ (n : ℤ) (y : M),
+        y ∈ ℳ n
+          → ∃ k : ℕ,
+            (X i : MvPolynomial ι R) ^ k • y ∈ Submodule.span (MvPolynomial ι R) (T : Set M) := by
     intro n y hy
     obtain ⟨s, hs, hys⟩ := hspanT y
     obtain ⟨N₀, hN₀⟩ := hPspan s hs
@@ -140,17 +174,21 @@ theorem _root_.GlobalTheory.exists_X_pow_smul_mem_span_of_finite_quot : ∀ (ι 
     obtain ⟨hy1, hy2⟩ := hpow n y hy m
     rw [← hm] at hy1
     have hdiffI : (X i : MvPolynomial ι R) ^ m • y - s' ∈ I := by
-      have hsplit : (X i : MvPolynomial ι R) ^ m • y - s' =
-          -(y - (X i : MvPolynomial ι R) ^ m • y) + (y - s) + (s - s') := by abel
+      have hsplit
+          : (X i : MvPolynomial ι R) ^ m • y - s'
+            = -(y - (X i : MvPolynomial ι R) ^ m • y) + (y - s) + (s - s') := by
+        abel
       rw [hsplit]
       exact add_mem (add_mem (I.neg_mem hy2) hys) hsI
     obtain ⟨w, -, hw⟩ := (Submodule.mem_smul_pointwise_iff_exists _ _ _).1 hdiffI
-    obtain ⟨k, hk⟩ := _root_.GlobalTheory.exists_X_pow_smul_eq_zero_of_eq_X_sub_one_smul ℳ i
-      (sub_mem hy1 hs') hw.symm
+    obtain ⟨k, hk⟩ :=
+      _root_.GlobalTheory.exists_X_pow_smul_eq_zero_of_eq_X_sub_one_smul ℳ i (sub_mem hy1 hs')
+        hw.symm
     refine ⟨k + m, ?_⟩
     rw [pow_add, mul_smul]
-    have hkm : (X i : MvPolynomial ι R) ^ k • ((X i : MvPolynomial ι R) ^ m • y) =
-        (X i : MvPolynomial ι R) ^ k • s' := by
+    have hkm
+        : (X i : MvPolynomial ι R) ^ k • ((X i : MvPolynomial ι R) ^ m • y)
+          = (X i : MvPolynomial ι R) ^ k • s' := by
       rw [← sub_eq_zero, ← smul_sub]
       exact hk
     rw [hkm]

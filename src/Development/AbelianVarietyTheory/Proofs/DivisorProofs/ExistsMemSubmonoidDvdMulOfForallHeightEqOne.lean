@@ -9,11 +9,16 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem exists_mem_submonoid_dvd_mul_of_forall_height_eq_one :
-    ∀ (B : Type) [CommRing B] [IsDomain B] [IsNoetherianRing B] [IsIntegrallyClosed B]
-    (S : Submonoid B), (0 : B) ∉ S → ∀ x y : B, y ≠ 0 →
-    (∀ Q : Ideal B, Q.IsPrime → Q.height = 1 → y ∈ Q → Disjoint (S : Set B) (Q : Set B) →
-      ∃ t ∉ Q, y ∣ t * x) → ∃ u ∈ S, y ∣ u * x := by
+theorem exists_mem_submonoid_dvd_mul_of_forall_height_eq_one
+    : ∀ (B : Type) [CommRing B] [IsDomain B] [IsNoetherianRing B] [IsIntegrallyClosed B]
+        (S : Submonoid B),
+      (0 : B) ∉ S
+        → ∀ x y : B,
+          y ≠ 0
+            → (∀ Q : Ideal B,
+              Q.IsPrime → Q.height = 1 → y ∈ Q → Disjoint (S : Set B) (Q : Set B)
+                → ∃ t ∉ Q, y ∣ t * x)
+            → ∃ u ∈ S, y ∣ u * x := by
   intro B _ _ _ _ S _ x y hy h
   by_contra! hS
   set M := B ⧸ Ideal.span {y}

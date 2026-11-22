@@ -86,10 +86,10 @@ private lemma eq_zero_of_cube_bound_of_doubling {E : Type} [NormedAddCommGroup E
     linarith
   exact norm_le_zero_iff.1 this
 
-theorem eventually_eq_zero_of_isBigO_cube_of_doubling :
-    (∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (F : E → ℂ),
-      F =O[𝓝 0] (fun z => ‖z‖ ^ 3) →
-      (∀ᶠ z in 𝓝 0, F ((2 : ℂ) • z) = 3 * F z + F (-z)) → ∀ᶠ z in 𝓝 0, F z = 0) := by
+theorem eventually_eq_zero_of_isBigO_cube_of_doubling
+    : (∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (F : E → ℂ),
+      F =O[𝓝 0] (fun z => ‖z‖ ^ 3) → (∀ᶠ z in 𝓝 0, F ((2 : ℂ) • z) = 3 * F z + F (-z))
+        → ∀ᶠ z in 𝓝 0, F z = 0) := by
   intro E _ _ F hO hrel
   obtain ⟨C, hC⟩ := hO.bound
   have hev : ∀ᶠ z in 𝓝 (0 : E), ‖F z‖ ≤ C * ‖z‖ ^ 3 ∧ F ((2 : ℂ) • z) = 3 * F z + F (-z) := by
@@ -97,7 +97,7 @@ theorem eventually_eq_zero_of_isBigO_cube_of_doubling :
     exact ⟨by simpa using h1, h2⟩
   obtain ⟨ε, hε, hP⟩ := Metric.eventually_nhds_iff.1 hev
   filter_upwards [Metric.ball_mem_nhds (0 : E) hε] with z hz
-  exact eq_zero_of_cube_bound_of_doubling F ε C (fun w hw => hP (by simpa using hw)) z
-    (by simpa using hz)
+  exact eq_zero_of_cube_bound_of_doubling F ε C (fun w hw => hP (by simpa using hw)) z (by
+    simpa using hz)
 
 end GlobalTheory

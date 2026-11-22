@@ -5,19 +5,23 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
 open scoped Classical
 
-private theorem parCont_infGL (F : Type) [Field F] [NumberField F] [IsTotallyReal F] :
-    Continuous (TR.infGL F 2) :=
-  Continuous.units_map _ (continuous_const.add (continuous_id.matrix_map
-    ((TR.continuous_infEq F).prodMk continuous_const :
-    Continuous fun x : TR.Rinf F => ((TR.infEq F x, 0) : InfiniteAdeleRing F × Af F))))
+private theorem parCont_infGL (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
+    : Continuous (TR.infGL F 2) :=
+  Continuous.units_map _
+    (continuous_const.add (continuous_id.matrix_map
+      ((TR.continuous_infEq F).prodMk continuous_const
+        : Continuous fun x : TR.Rinf F => ((TR.infEq F x, 0) : InfiniteAdeleRing F × Af F))))
 
-private theorem parCont_val {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
-    {c : ℝ → GL (Fin 2) (TR.Rinf F)} {Y : TR.Lie F 2} (h : Par c Y) :
-    Continuous fun t => (c t).val := by
+private theorem parCont_val
+    {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
+    {c : ℝ → GL (Fin 2) (TR.Rinf F)} {Y : TR.Lie F 2} (h : Par c Y)
+    : Continuous fun t => (c t).val := by
   have h0 : ContinuousAt (fun t => (c t).val) 0 := h.2.continuousAt
   refine continuous_iff_continuousAt.2 fun t => ?_
   have e : (fun s => (c s).val) = fun s => (c t).val * (c (s - t)).val := by
@@ -25,12 +29,11 @@ private theorem parCont_val {F : Type} [Field F] [NumberField F] [IsTotallyReal 
     rw [← Units.val_mul, ← h.1, add_sub_cancel]
   rw [e]
   have hs : ContinuousAt (fun s : ℝ => s - t) t := (continuous_id.sub continuous_const).continuousAt
-  have h0' : ContinuousAt (fun t => (c t).val) ((fun s : ℝ => s - t) t) := by
-    simpa using h0
+  have h0' : ContinuousAt (fun t => (c t).val) ((fun s : ℝ => s - t) t) := by simpa using h0
   exact continuousAt_const.mul (ContinuousAt.comp (f := fun s : ℝ => s - t) h0' hs)
 
-theorem UpperTheory.ConvolutionTheory.R2.Ff.parCont :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], ParCont F := by
+theorem UpperTheory.ConvolutionTheory.R2.Ff.parCont
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], ParCont F := by
   intro F _ _ _
   refine ⟨parCont_infGL F, fun c Y h => ?_⟩
   have h1 : c 0 = 1 := by

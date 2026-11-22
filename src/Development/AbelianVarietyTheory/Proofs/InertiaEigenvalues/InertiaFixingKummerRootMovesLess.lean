@@ -9,7 +9,9 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.ProdOneSubPrimitive
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 open GlobalTheory.TameInertiaCyclic GlobalTheory.MemLoc.FrobLaws
 
@@ -21,15 +23,15 @@ variable {l : ℕ} [hl : Fact l.Prime]
 theorem ratio_one (g : GQ l) : GlobalTheory.TameInertiaCyclic.ratio g 1 = 1 :=
   Subtype.ext (by show g 1 / 1 = 1; simp)
 
-theorem ratio_pow (g : GQ l) (x : Om l) (n : ℕ) :
-    GlobalTheory.TameInertiaCyclic.ratio g (x ^ n) = GlobalTheory.TameInertiaCyclic.ratio g x ^ n := by
+theorem ratio_pow (g : GQ l) (x : Om l) (n : ℕ)
+    : GlobalTheory.TameInertiaCyclic.ratio g (x ^ n)
+      = GlobalTheory.TameInertiaCyclic.ratio g x ^ n := by
   induction n with
   | zero => simpa using ratio_one g
   | succ n ih => rw [pow_succ, GlobalTheory.TameInertiaCyclic.ratio_mul, ih, pow_succ]
 
 theorem norm_natCast_lt_one : ‖(l : Om l)‖ < 1 := by
-  have h : ‖((l : ℚ_[l]) : Om l)‖ < 1 := by
-    rw [PadicAlgCl.norm_extends]; exact Padic.norm_p_lt_one
+  have h : ‖((l : ℚ_[l]) : Om l)‖ < 1 := by rw [PadicAlgCl.norm_extends]; exact Padic.norm_p_lt_one
   simpa using h
 
 theorem natCast_ne_zero : (l : Om l) ≠ 0 := by
@@ -38,9 +40,10 @@ theorem natCast_ne_zero : (l : Om l) ≠ 0 := by
     exact_mod_cast hl.out.ne_zero
   simpa using h
 
-theorem exists_unif (F : FinExt l) :
-    ∃ ϖ ∈ F.1, ϖ ≠ 0 ∧ (∀ x ∈ F.1, x ≠ 0 → ∃ k : ℤ, ‖x‖ = ‖ϖ ^ k‖) ∧
-      ∃ E : ℕ, 0 < E ∧ ‖ϖ‖ ^ E = ‖(l : Om l)‖ := by
+theorem exists_unif (F : FinExt l)
+    : ∃ ϖ ∈ F.1,
+      ϖ ≠ 0 ∧ (∀ x ∈ F.1, x ≠ 0 → ∃ k : ℤ, ‖x‖ = ‖ϖ ^ k‖)
+        ∧ ∃ E : ℕ, 0 < E ∧ ‖ϖ‖ ^ E = ‖(l : Om l)‖ := by
   obtain ⟨π, hπ, hπ0, hgen⟩ := GlobalTheory.TameInertiaCyclic.exists_gen F
   have hlF : (l : Om l) ∈ F.1 := natCast_mem _ l
   obtain ⟨k0, hk0⟩ := hgen _ hlF natCast_ne_zero
@@ -53,11 +56,19 @@ theorem exists_unif (F : FinExt l) :
   · refine ⟨π⁻¹, inv_mem hπ, inv_ne_zero hπ0, fun x hx hx0 => ?_, (-k0).toNat, by omega, ?_⟩
     · obtain ⟨k, hk⟩ := hgen x hx hx0
       exact ⟨-k, by rw [hk, _root_.inv_zpow', neg_neg]⟩
-    · rw [hk0, ← norm_pow, ← zpow_natCast, Int.toNat_of_nonneg (by omega), _root_.inv_zpow', neg_neg]
+    · rw [hk0, ← norm_pow, ← zpow_natCast, Int.toNat_of_nonneg (by omega), _root_.inv_zpow',
+        neg_neg]
   · refine ⟨π, hπ, hπ0, hgen, k0.toNat, by omega, ?_⟩
     rw [hk0, ← norm_pow, ← zpow_natCast, Int.toNat_of_nonneg (by omega)]
 
-theorem near_root : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l), ∃ M : ℕ, 0 < M ∧ ¬ l ∣ M ∧ ∀ ρ : Om l, ρ ^ M = -(l : Om l) → ∀ g : GQ l, (∀ y : Om l, ‖y‖ ≤ 1 → ‖g y - y‖ < 1) → g ρ = ρ → ∀ x ∈ F.1, x ≠ 0 → ‖g x - x‖ < ‖x‖ := by
+theorem near_root
+    : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l), ∃ M : ℕ,
+      0 < M ∧ ¬ l ∣ M
+        ∧ ∀ ρ : Om l,
+          ρ ^ M = -(l : Om l)
+            → ∀ g : GQ l,
+              (∀ y : Om l, ‖y‖ ≤ 1 → ‖g y - y‖ < 1) → g ρ = ρ
+                → ∀ x ∈ F.1, x ≠ 0 → ‖g x - x‖ < ‖x‖ := by
   intro l _ F
   obtain ⟨ϖ, hϖ, hϖ0, hgen, E, hE, hEn⟩ := exists_unif F
   obtain ⟨s, M, hlM, rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hE.ne' l (Fact.out : l.Prime).ne_one

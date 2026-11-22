@@ -86,15 +86,13 @@ lemma algAdjoin_eq_top (h : IsLayer n q d ζ a b) : Algebra.adjoin ℚ ({ζ, a, 
     (fun x _ => Algebra.IsAlgebraic.isAlgebraic x), h.2.2.2]
   rfl
 
-theorem conj_iff (hq : 0 < q) (hd : 0 < d) (h : IsLayer n q d ζ a b) (φ : L →+* ℂ)
-    (σ : Gal(L/ℚ)) :
-    (∀ x : L, φ (σ x) = starRingEnd ℂ (φ x)) ↔ galMap h.1 a b σ = JJ n := by
+theorem conj_iff (hq : 0 < q) (hd : 0 < d) (h : IsLayer n q d ζ a b) (φ : L →+* ℂ) (σ : Gal(L/ℚ))
+    : (∀ x : L, φ (σ x) = starRingEnd ℂ (φ x)) ↔ galMap h.1 a b σ = JJ n := by
   obtain ⟨hζ, ha, hb, _⟩ := h
   have hφζ : (φ ζ) ^ (2 ^ n) = 1 := by rw [← map_pow, hζ.pow_eq_one, map_one]
   have hconj : starRingEnd ℂ (φ ζ) = φ (ζ⁻¹) := by
     rw [map_inv₀, conj_eq_inv_of_pow_eq_one (pow_ne_zero n two_ne_zero) hφζ]
-  rw [galMap_eq_JJ_iff, autToPow_eq_neg_one_iff, sgn_eq_neg_one_iff hq ha,
-    sgn_eq_neg_one_iff hd hb]
+  rw [galMap_eq_JJ_iff, autToPow_eq_neg_one_iff, sgn_eq_neg_one_iff hq ha, sgn_eq_neg_one_iff hd hb]
   constructor
   · intro hx
     refine ⟨φ.injective ?_, φ.injective ?_, φ.injective ?_⟩
@@ -127,9 +125,10 @@ theorem layerConj_of (_hG : LayerGalois) : LayerConj := by
 theorem layerReal_of (hG : LayerGalois) (hC : LayerConj) : LayerReal := by
   intro n q d hn hqd L _ _ ζ a b h
   obtain ⟨hGal, hfin, _hmul, hbij⟩ := hG n q d hn hqd L ζ a b h
-  have h1 : ∀ (φ : L →+* ℂ) (σ : Gal(L/ℚ)),
-      (∀ x, φ (σ x) = starRingEnd ℂ (φ x)) ↔ galMap h.1 a b σ = JJ n :=
-    fun φ σ => hC n q d hn hqd L ζ a b h φ σ
+  have h1
+      : ∀ (φ : L →+* ℂ) (σ : Gal(L/ℚ)),
+        (∀ x, φ (σ x) = starRingEnd ℂ (φ x)) ↔ galMap h.1 a b σ = JJ n := fun φ σ =>
+    hC n q d hn hqd L ζ a b h φ σ
   have hq : 0 < q := hqd.1.pos
   obtain ⟨σc, hσc⟩ := hbij.2 (JJ n)
   have hTC : IsTotallyComplex L := by
@@ -147,8 +146,8 @@ theorem layerReal_of (hG : LayerGalois) (hC : LayerConj) : LayerReal := by
     ext x
     rw [ComplexEmbedding.conjugate_coe_eq]
     exact ((h1 φ σc).2 hσc x).symm
-  have h5 : ∀ x : L, x ∈ maximalRealSubfield L ↔
-      ∀ σ : Gal(L/ℚ), galMap h.1 a b σ = JJ n → σ x = x := by
+  have h5
+      : ∀ x : L, x ∈ maximalRealSubfield L ↔ ∀ σ : Gal(L/ℚ), galMap h.1 a b σ = JJ n → σ x = x := by
     intro x
     rw [mem_maximalRealSubfield_iff]
     constructor
@@ -162,9 +161,10 @@ theorem layerReal_of (hG : LayerGalois) (hC : LayerConj) : LayerReal := by
       rw [hx σc hσc] at this
       exact this.symm
   have h4 : Module.finrank ℚ (maximalRealSubfield L) = 2 ^ n := by
-    have h := (letI : Module.Free (maximalRealSubfield L) L := Module.Free.of_divisionRing _ _; Module.finrank_mul_finrank ℚ (maximalRealSubfield L) L)
-    rw [Algebra.IsQuadraticExtension.finrank_eq_two (maximalRealSubfield L) L, hfin,
-      pow_succ] at h
+    have h :=
+      (letI : Module.Free (maximalRealSubfield L) L := Module.Free.of_divisionRing _ _
+       Module.finrank_mul_finrank ℚ (maximalRealSubfield L) L)
+    rw [Algebra.IsQuadraticExtension.finrank_eq_two (maximalRealSubfield L) L, hfin, pow_succ] at h
     omega
   exact ⟨hCM, h5, h4⟩
 

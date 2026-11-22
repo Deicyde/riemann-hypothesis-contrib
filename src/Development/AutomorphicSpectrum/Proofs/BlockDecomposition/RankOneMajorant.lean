@@ -9,17 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Coe
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.ThTot
 
-theorem exists_eval_points {X : Type*} (W : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ W] :
-    ∃ (N : ℕ) (x : Fin N → X) (f : Fin N → X → ℂ), (∀ i, f i ∈ W) ∧
-      ∀ w ∈ W, ∀ y, w y = ∑ i, w (x i) * f i y := by
+theorem exists_eval_points {X : Type*} (W : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ W]
+    : ∃ (N : ℕ) (x : Fin N → X) (f : Fin N → X → ℂ),
+      (∀ i, f i ∈ W) ∧ ∀ w ∈ W, ∀ y, w y = ∑ i, w (x i) * f i y := by
   classical
   let ev : X → Module.Dual ℂ W := fun x => (LinearMap.proj x).comp W.subtype
   have hfg : (Submodule.span ℂ (Set.range ev)).FG := IsNoetherian.noetherian _
@@ -32,7 +36,9 @@ theorem exists_eval_points {X : Type*} (W : Submodule ℂ (X → ℂ)) [FiniteDi
   have hT : LinearMap.ker T = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro w hw
-    have hle : Submodule.span ℂ (s : Set (Module.Dual ℂ W)) ≤ LinearMap.ker (Module.Dual.eval ℂ W w) := by
+    have hle
+        : Submodule.span ℂ (s : Set (Module.Dual ℂ W))
+          ≤ LinearMap.ker (Module.Dual.eval ℂ W w) := by
       rw [Submodule.span_le]
       intro φ hφ
       have h1 : T w (e ⟨φ, hφ⟩) = 0 := by rw [hw]; rfl
@@ -59,11 +65,14 @@ theorem exists_eval_points {X : Type*} (W : Submodule ℂ (X → ℂ)) [FiniteDi
   simp only [map_smul] at h3
   simpa [Submodule.coe_sum, Finset.sum_apply] using h3.symm
 
-theorem rank_one_majorant_of_parts : WeilCont → WeilKFin → OrbitMaj → IwaCpt → FockTranslateSchwartzMajorant := by
+theorem rank_one_majorant_of_parts
+    : WeilCont → WeilKFin → OrbitMaj → IwaCpt → FockTranslateSchwartzMajorant := by
   intro hCont hFin hOrb hIwa D n ψ hψ χ hχ hRes θ hθ μ 𝓕 hμ ω hω l hl hl0 Φ hΦ C hC
-  have hcart : ∀ τ, IsCartanInv (gramAt D (V1 D) τ)
-      ((fun _ => 1 : D.what₂.Tau → Matrix (Fin (V1 D).rank) (Fin (V1 D).rank) ℂ) τ) :=
-    fun τ => GlobalTheory.AdForm.VacStd.cartan_of_gram (GlobalTheory.AdForm.VacStd.gram_of_eq _ _ 1 rfl) τ
+  have hcart
+      : ∀ τ,
+        IsCartanInv (gramAt D (V1 D) τ)
+          ((fun _ => 1 : D.what₂.Tau → Matrix (Fin (V1 D).rank) (Fin (V1 D).rank) ℂ) τ) := fun τ =>
+    GlobalTheory.AdForm.VacStd.cartan_of_gram (GlobalTheory.AdForm.VacStd.gram_of_eq _ _ 1 rfl) τ
   obtain ⟨W, hWfd, hWle, hWK⟩ :=
     hFin D n (V1 D) ψ hψ χ hχ hRes θ hθ μ 𝓕 hμ ω hω l hl (fun _ => 1) hcart Φ hΦ
   haveI := hWfd
@@ -80,15 +89,20 @@ theorem rank_one_majorant_of_parts : WeilCont → WeilKFin → OrbitMaj → IwaC
   have hM := fun i => hOrb D n θ hθ l hl0 (f i) (hWle (hfW i)) A₁ A₂ hA₁ hA₂
   choose M hMs hMpos hMle using hM
   have hc0 : 0 ≤ (max R 0) ^ ((1 : ℝ) / 2) := Real.rpow_nonneg (le_max_right _ _) _
-  refine ⟨(((max R 0) ^ ((1 : ℝ) / 2) : ℝ) : ℂ) • ∑ i, (B i : ℂ) • M i,
-    Submodule.smul_mem _ _ (Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hMs i)), ?_⟩
+  refine ⟨
+    (((max R 0) ^ ((1 : ℝ) / 2) : ℝ) : ℂ) • ∑ i, (B i : ℂ) • M i,
+    Submodule.smul_mem _ _ (Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hMs i)),
+    ?_
+  ⟩
   intro h hh y
   obtain ⟨m, t, k, a, b, hk, rfl, hm, ht, ha1, ha2, hR⟩ := hiwa h hh
   set c : ℝ := (max R 0) ^ ((1 : ℝ) / 2) with hc
-  have e1 : ‖(ω (m * t * k) Φ).1 y‖ =
-      (absA D (Matrix.GeneralLinearGroup.det a) : ℝ) ^ ((1 : ℝ) / 2) * ‖(ω k Φ).1 (HMul.hMul y a.1 : Mx D (V1 D).rank n)‖ := by
-    rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, hω.levi m a hm, hω.unip t b ht,
-      norm_mul, norm_mul, norm_mul, hψ.2.1, norm_npow (hom_pos _ _)]
+  have e1
+      : ‖(ω (m * t * k) Φ).1 y‖
+        = (absA D (Matrix.GeneralLinearGroup.det a) : ℝ) ^ ((1 : ℝ) / 2)
+          * ‖(ω k Φ).1 (HMul.hMul y a.1 : Mx D (V1 D).rank n)‖ := by
+    rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, hω.levi m a hm,
+      hω.unip t b ht, norm_mul, norm_mul, norm_mul, hψ.2.1, norm_npow (hom_pos _ _)]
     have hre : (((V1 D).rank : ℂ) / 2).re = (1 : ℝ) / 2 := by
       show ((((1 : ℕ) : ℂ)) / 2).re = (1 : ℝ) / 2
       norm_num
@@ -108,9 +122,12 @@ theorem rank_one_majorant_of_parts : WeilCont → WeilKFin → OrbitMaj → IwaC
       rw [show M i y = (((M i y).re : ℝ) : ℂ) from Complex.ext (by simp) (by simp [h1.2])]
       simp [abs_of_nonneg h1.1]
     · simp [h1.2]
-  have e5 : ‖((((c : ℝ) : ℂ) • ∑ i, (B i : ℂ) • M i) : Mx D (V1 D).rank n → ℂ) y‖ = c * ∑ i, B i * ‖M i y‖ := by
-    have h1 : ((((c : ℝ) : ℂ) • ∑ i, (B i : ℂ) • M i) : Mx D (V1 D).rank n → ℂ) y =
-        ((c * ∑ i, B i * ‖M i y‖ : ℝ) : ℂ) := by
+  have e5
+      : ‖((((c : ℝ) : ℂ) • ∑ i, (B i : ℂ) • M i) : Mx D (V1 D).rank n → ℂ) y‖
+        = c * ∑ i, B i * ‖M i y‖ := by
+    have h1
+        : ((((c : ℝ) : ℂ) • ∑ i, (B i : ℂ) • M i) : Mx D (V1 D).rank n → ℂ) y
+          = ((c * ∑ i, B i * ‖M i y‖ : ℝ) : ℂ) := by
       simp only [Pi.smul_apply, Finset.sum_apply, smul_eq_mul]
       push_cast
       congr 1

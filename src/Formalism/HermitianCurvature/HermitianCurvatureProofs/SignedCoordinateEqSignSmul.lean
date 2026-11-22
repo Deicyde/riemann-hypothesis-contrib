@@ -11,10 +11,11 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P5
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd
 
-theorem signed_coordinate_eq_sign_smul (P : M.Par) (l : ℕ) (Y : ℂ) :
-    (fun ρ => M.x0 P l ρ Y) = M.sgn P l • fun ρ => M.xC P ρ Y := by
+theorem signed_coordinate_eq_sign_smul (P : M.Par) (l : ℕ) (Y : ℂ)
+    : (fun ρ => M.x0 P l ρ Y) = M.sgn P l • fun ρ => M.xC P ρ Y := by
   funext ρ
   simp only [Pi.smul_apply, smul_eq_mul, M.x0, M.sgn, M.xC]
 
@@ -22,9 +23,10 @@ theorem xKappaOfNF : XKappaOfNF := by
   intro hNF hPos Wp Wq _ _ _ _ _ _ P z z' π π' X μ L st l0 hD
   obtain ⟨hPl, -, hL, hQQ, -, hinv, -, hLS⟩ := hD
   obtain ⟨d, hdL, hdS, hdR, hdQ⟩ := hNF Wp Wq P z z' π π' hPl X
-  have hfn : ∀ i j : Fin 6,
-      (∀ x ∈ DomR P.k P.r z z', fnVal P.k P.r z z' i x.2 * fnVal P.k P.r z z' j x.2 = 1) →
-      X.fn i * X.fn j = 1 := by
+  have hfn
+      : ∀ i j : Fin 6,
+        (∀ x ∈ DomR P.k P.r z z', fnVal P.k P.r z z' i x.2 * fnVal P.k P.r z z' j x.2 = 1)
+          → X.fn i * X.fn j = 1 := by
     intro i j hij
     refine LinearMap.ext fun Φ => Subtype.ext (funext fun c => funext fun g => ?_)
     rw [Module.End.mul_apply, Module.End.one_apply]
@@ -59,7 +61,9 @@ theorem xKappaOfNF : XKappaOfNF := by
     have h2 : d.QQ Y 1 1 = d.L.GG * d.x Y := by simp [NFData.QQ]
     rw [hQQ Y, hdQ Y, Matrix.smul_apply, h2, ← hGG, ← mul_smul_comm] at h1
     have h3 : st.x Y = M.sgn P l0 • d.x Y := by
-      calc st.x Y = L.GGi * (L.GG * st.x Y) := by rw [← mul_assoc, hGinv, one_mul]
+      calc
+        st.x Y
+          = L.GGi * (L.GG * st.x Y) := by rw [← mul_assoc, hGinv, one_mul]
         _ = L.GGi * (L.GG * (M.sgn P l0 • d.x Y)) := by rw [← h1]
         _ = _ := by rw [← mul_assoc, hGinv, one_mul]
     rw [h3, NFData.x, signed_coordinate_eq_sign_smul, map_smul]
@@ -78,9 +82,9 @@ theorem xKappaOfNF : XKappaOfNF := by
       congr 1
       funext ρ
       simp [hne ρ]
-    calc st.xi Y
-        = st.xi Y * ((d.κ fun ρ => M.x0 P l0 ρ Y) * (d.κ fun ρ => (M.x0 P l0 ρ Y)⁻¹)) := by
-          rw [hprod, mul_one]
+    calc
+      st.xi Y = st.xi Y * ((d.κ fun ρ => M.x0 P l0 ρ Y) * (d.κ fun ρ => (M.x0 P l0 ρ Y)⁻¹)) := by
+        rw [hprod, mul_one]
       _ = (st.xi Y * st.x Y) * (d.κ fun ρ => (M.x0 P l0 ρ Y)⁻¹) := by rw [hx Y, mul_assoc]
       _ = _ := by rw [(hLS.x_xi Y hY).2, one_mul]
   exact ⟨d.κ, hx, hxi, hPos Wp Wq P z z' π π' hPl X d hdL hdS hdR hdQ⟩

@@ -9,17 +9,17 @@ namespace GlobalTheory
 
 open IsDiscreteValuationRing
 
-theorem exists_toNat_addVal_algebraMap_eq_mul (O : Type) [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] (O' : Type) [CommRing O'] [IsDomain O'] [IsDiscreteValuationRing O']
-    [Algebra O O'] [IsLocalHom (algebraMap O O')] (hinj : Function.Injective (algebraMap O O')) :
-    ∃ e : ℕ, e ≠ 0 ∧ ∀ x : O,
-      (addVal O' (algebraMap O O' x)).toNat = e * (addVal O x).toNat := by
+theorem exists_toNat_addVal_algebraMap_eq_mul
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (O' : Type) [CommRing O'] [IsDomain O'] [IsDiscreteValuationRing O'] [Algebra O O']
+    [IsLocalHom (algebraMap O O')]
+    (hinj : Function.Injective (algebraMap O O'))
+    : ∃ e : ℕ, e ≠ 0 ∧ ∀ x : O, (addVal O' (algebraMap O O' x)).toNat = e * (addVal O x).toNat := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   have h0 : algebraMap O O' ϖ ≠ 0 := by
     intro h
     exact hϖ.ne_zero (hinj (by simpa using h))
-  have h1 : addVal O' (algebraMap O O' ϖ) ≠ ⊤ := by
-    rwa [Ne, addVal_eq_top_iff]
+  have h1 : addVal O' (algebraMap O O' ϖ) ≠ ⊤ := by rwa [Ne, addVal_eq_top_iff]
   have h2 : addVal O' (algebraMap O O' ϖ) ≠ 0 := by
     rw [Ne, addVal_eq_zero_iff]
     intro h
@@ -42,7 +42,13 @@ theorem exists_toNat_addVal_algebraMap_eq_mul (O : Type) [CommRing O] [IsDomain 
         ring
       rw [hv, hv', ENat.toNat_natCast, ENat.toNat_natCast]
 
-theorem nval_algebraMap_eq : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (O' : Type) [CommRing O'] [IsDomain O'] [IsDiscreteValuationRing O'] [Algebra O O'] [IsLocalHom (algebraMap O O')], Function.Injective (algebraMap O O') → ∀ (l : ℕ) (x : O), Formalism.MainNotions.BlochKatoReduction.Gen.nval O' l (algebraMap O O' x) = Formalism.MainNotions.BlochKatoReduction.Gen.nval O l x := by
+theorem nval_algebraMap_eq
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (O' : Type) [CommRing O']
+        [IsDomain O'] [IsDiscreteValuationRing O'] [Algebra O O'] [IsLocalHom (algebraMap O O')],
+      Function.Injective (algebraMap O O')
+        → ∀ (l : ℕ) (x : O),
+          Formalism.MainNotions.BlochKatoReduction.Gen.nval O' l (algebraMap O O' x)
+            = Formalism.MainNotions.BlochKatoReduction.Gen.nval O l x := by
   intro O _ _ _ O' _ _ _ _ _ hinj l x
   obtain ⟨e, he, h⟩ := exists_toNat_addVal_algebraMap_eq_mul O O' hinj
   have hl : (l : O') = algebraMap O O' (l : O) := (map_natCast _ l).symm

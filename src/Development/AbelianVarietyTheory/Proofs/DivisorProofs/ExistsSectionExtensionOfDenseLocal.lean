@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArcZeroZero
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits Filter Topology NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.ShFam.BdArc (IsHolPts)
@@ -17,18 +18,41 @@ noncomputable section
 
 namespace GlobalTheory.CompHS
 
-theorem eq_zero_of_ger_dense {Y : Scheme.{0}} [IsReduced Y] {O V : Y.Opens} (hd : Dense (O : Set Y))
-    (a : Γ(Y, V)) (h : ∀ z (hz : z ∈ V), z ∈ O → ger z hz a = 0) : a = 0 := by
+theorem eq_zero_of_ger_dense
+    {Y : Scheme.{0}} [IsReduced Y]
+    {O V : Y.Opens}
+    (hd : Dense (O : Set Y)) (a : Γ(Y, V)) (h : ∀ z (hz : z ∈ V), z ∈ O → ger z hz a = 0)
+    : a = 0 := by
   refine eq_zero_of_basicOpen_eq_bot a ?_
   by_contra hne
-  obtain ⟨y, hy', hy⟩ := hd.inter_open_nonempty _ (Y.basicOpen a).isOpen
-    (Set.nonempty_iff_ne_empty.2 fun e => hne (Opens.ext e))
+  obtain ⟨y, hy', hy⟩ :=
+    hd.inter_open_nonempty _ (Y.basicOpen a).isOpen
+      (Set.nonempty_iff_ne_empty.2 fun e => hne (Opens.ext e))
   have hm := Y.basicOpen_le _ hy'
   have hu : IsUnit (ger y hm a) := (Y.mem_basicOpen _ y hm).1 hy'
   rw [h y hm hy] at hu
   exact not_isUnit_zero hu
 
-theorem exists_ext_of_dense_local : ∀ {k : Type} [CommRing k] {Y : Scheme.{0}} [IsReduced Y] (p : Y ⟶ Sp k) (B : LB Y), B.IsLB → ∀ (O : Y.Opens), Dense (O : Set Y) → ∀ (m : H0 p B O), (∀ y : Y, y ∉ O → ∃ (W : Y.Opens) (i : B.ι) (hi : W ≤ B.U i) (b : Γ(Y, W)), y ∈ W ∧ (∀ y' (h : y' ∈ W) (h' : y' ∈ O), ger y' h b = H0.germ i y' h' (hi h) m) ∧ ∀ y' (h : y' ∈ W), y' ∉ O → ger y' h b ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y')) → ∃ s : H0 p B ⊤, H0.restr le_top s = m ∧ ∀ y : Y, y ∉ O → ∀ (i : B.ι) (hi : y ∈ B.U i), H0.germ i y (memTop y) hi s ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y) := by
+theorem exists_ext_of_dense_local
+    : ∀ {k : Type} [CommRing k] {Y : Scheme.{0}} [IsReduced Y] (p : Y ⟶ Sp k) (B : LB Y),
+      B.IsLB
+        → ∀ (O : Y.Opens),
+          Dense (O : Set Y)
+            → ∀ (m : H0 p B O),
+              (∀ y : Y,
+                  y ∉ O
+                    → ∃ (W : Y.Opens) (i : B.ι) (hi : W ≤ B.U i) (b : Γ(Y, W)),
+                      y ∈ W
+                        ∧ (∀ y' (h : y' ∈ W) (h' : y' ∈ O), ger y' h b = H0.germ i y' h' (hi h) m)
+                        ∧ ∀ y' (h : y' ∈ W),
+                          y' ∉ O → ger y' h b ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y'))
+                → ∃ s : H0 p B ⊤,
+                  H0.restr le_top s = m
+                    ∧ ∀ y : Y,
+                      y ∉ O
+                        → ∀ (i : B.ι) (hi : y ∈ B.U i),
+                          H0.germ i y (memTop y) hi s
+                            ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y) := by
   intro k _ Y _ p B hB O hd m hloc
   choose W i hi b hyW hagree hmax using hloc
   let τ := B.ι ⊕ {y : Y // y ∉ O}
@@ -38,7 +62,8 @@ theorem exists_ext_of_dense_local : ∀ {k : Type} [CommRing k] {Y : Scheme.{0}}
     rcases t with j | ⟨y, hy⟩
     · exact inf_le_right
     · exact hi y hy
-  let u : ∀ t, Γ(Y, V t) := fun t => match t with
+  let u : ∀ t, Γ(Y, V t) := fun t =>
+    match t with
     | Sum.inl j => m.loc j
     | Sum.inr y => b y.1 y.2
   have key : ∀ t z (h : z ∈ V t) (hz : z ∈ O), ger z h (u t) = H0.germ (c t) z hz (hc t h) m := by
@@ -51,20 +76,23 @@ theorem exists_ext_of_dense_local : ∀ {k : Type} [CommRing k] {Y : Scheme.{0}}
     · obtain ⟨j, hj⟩ := exists_chart hB y
       exact ⟨Sum.inl j, hy, hj⟩
     · exact ⟨Sum.inr ⟨y, hy⟩, hyW y hy⟩
-  have rule : ∀ y t t' (h : y ∈ V t) (h' : y ∈ V t'),
-      ger y h (u t) = tr B y (c t) (c t') * ger y h' (u t') := by
+  have rule
+      : ∀ y t t' (h : y ∈ V t) (h' : y ∈ V t'),
+        ger y h (u t) = tr B y (c t) (c t') * ger y h' (u t') := by
     intro y t t' h h'
     have l₁ : V t ⊓ V t' ≤ V t := inf_le_left
     have l₂ : V t ⊓ V t' ≤ V t' := inf_le_right
     have l₃ : V t ⊓ V t' ≤ B.U (c t) ⊓ B.U (c t') := inf_le_inf (hc t) (hc t')
-    have hz : ∀ z (hz : z ∈ V t ⊓ V t'), ger z hz (resG Y l₁ (u t) -
-        resG Y l₃ (B.g (c t) (c t')).val * resG Y l₂ (u t')) =
-        ger z (l₁ hz) (u t) - (tr B z (c t) (c t')).val * ger z (l₂ hz) (u t') := by
+    have hz
+        : ∀ z (hz : z ∈ V t ⊓ V t'),
+          ger z hz (resG Y l₁ (u t) - resG Y l₃ (B.g (c t) (c t')).val * resG Y l₂ (u t'))
+            = ger z (l₁ hz) (u t) - (tr B z (c t) (c t')).val * ger z (l₂ hz) (u t') := by
       intro z hz
       rw [map_sub, map_mul, ger_resG, ger_resG, ger_resG, val_tr B z (l₃ hz)]
-    have e := eq_zero_of_ger_dense hd _ fun z hzV hzO => by
-      rw [hz z hzV, key t z (l₁ hzV) hzO, key t' z (l₂ hzV) hzO, sub_eq_zero]
-      exact H0.germ_change _ _ z hzO _ _ m
+    have e :=
+      eq_zero_of_ger_dense hd _ fun z hzV hzO => by
+        rw [hz z hzV, key t z (l₁ hzV) hzO, key t' z (l₂ hzV) hzO, sub_eq_zero]
+        exact H0.germ_change _ _ z hzO _ _ m
     have e' := congrArg (ger y (memInf h h')) e
     rw [hz y (memInf h h'), map_zero, sub_eq_zero] at e'
     exact e'

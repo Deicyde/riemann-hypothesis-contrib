@@ -9,32 +9,36 @@ namespace ReciprocityTheory.MultiplicativeHeights
 open Matrix NumberField ComplexConjugate
 open scoped ComplexOrder
 
-private theorem normSq_smul_eq_norm_sq_mul {r : ℕ} (c : ℂ) (u : Fin r → ℂ) :
-    normSq (c • u) = ‖c‖ ^ 2 * normSq u := by
+private theorem normSq_smul_eq_norm_sq_mul {r : ℕ} (c : ℂ) (u : Fin r → ℂ)
+    : normSq (c • u) = ‖c‖ ^ 2 * normSq u := by
   unfold normSq
   rw [Finset.mul_sum]
   exact Finset.sum_congr rfl fun k _ => by rw [Pi.smul_apply, smul_eq_mul, norm_mul, mul_pow]
 
-private theorem le_approxR {r : ℕ} (hr : 0 < r) {μ ρ : ℝ} (hμ : 0 < μ) (hρ : 0 < ρ)
-    (hρ1 : ρ ≤ 1) : μ ≤ approxR r μ ρ := by
+private theorem le_approxR {r : ℕ} (hr : 0 < r) {μ ρ : ℝ} (hμ : 0 < μ) (hρ : 0 < ρ) (hρ1 : ρ ≤ 1)
+    : μ ≤ approxR r μ ρ := by
   unfold approxR
   have h1 : (1 : ℝ) ≤ Real.sqrt r := Real.one_le_sqrt.mpr (Nat.one_le_cast.mpr hr)
   rw [le_div_iff₀ hρ]
   nlinarith [mul_le_mul_of_nonneg_left hρ1 hμ.le, mul_le_mul_of_nonneg_left h1 hμ.le]
 
-private theorem normSq_le_of_normSq_sub_approxR_single_le {r : ℕ} {μ ρ : ℝ} (hμ : 0 < μ) (hρ : 0 < ρ) (hρ1 : ρ ≤ 1)
-    (j : Fin r) (x : Fin r → ℂ)
-    (hx : normSq (x - (approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ)) ≤ μ ^ 2) :
-    normSq x ≤ (2 * approxR r μ ρ) ^ 2 := by
+private theorem normSq_le_of_normSq_sub_approxR_single_le
+    {r : ℕ} {μ ρ : ℝ} (hμ : 0 < μ) (hρ : 0 < ρ) (hρ1 : ρ ≤ 1) (j : Fin r) (x : Fin r → ℂ)
+    (hx : normSq (x - (approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ)) ≤ μ ^ 2)
+    : normSq x ≤ (2 * approxR r μ ρ) ^ 2 := by
   have hR := le_approxR j.pos hμ hρ hρ1
-  have h := approxB_normSq_add_le (x - (approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ))
-    ((approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ))
+  have h :=
+    approxB_normSq_add_le (x - (approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ))
+      ((approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ))
   rw [sub_add_cancel, approxB_normSq_single] at h
   nlinarith [mul_le_mul hR hR hμ.le (le_trans hμ.le hR)]
 
-private theorem mulVec_embVec_sum_smul {K : Type} [Field K] [NumberField K] {r : ℕ} (σ : K →+* ℂ)
-    (Q : Matrix (Fin r) (Fin r) ℂ) {α : Type*} (s : Finset α) (g : α → K) (f : α → Fin r → K) :
-    Q *ᵥ embVec σ (∑ j ∈ s, g j • f j) = ∑ j ∈ s, σ (g j) • (Q *ᵥ embVec σ (f j)) := by
+private theorem mulVec_embVec_sum_smul
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ}
+    (σ : K →+* ℂ) (Q : Matrix (Fin r) (Fin r) ℂ)
+    {α : Type*} (s : Finset α) (g : α → K) (f : α → Fin r → K)
+    : Q *ᵥ embVec σ (∑ j ∈ s, g j • f j) = ∑ j ∈ s, σ (g j) • (Q *ᵥ embVec σ (f j)) := by
   rw [approxB_embVec_sum, Matrix.mulVec_sum]
   exact Finset.sum_congr rfl fun j _ => by rw [approxB_embVec_smul, Matrix.mulVec_smul]
 
@@ -44,25 +48,31 @@ theorem approxBasis_holds (hG : ApproxGraphStatement) : ApproxStatement := by
   intro K _ _ ι _ _ r p S σ Q L v μ ρ hp hμ hρ hρ1 hQ hS hInt hcov hvL hvi hvμ
   choose l0 hl0L hl0 using fun j : Fin r =>
     hcov (fun _ => (approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ))
-  obtain ⟨X, hX⟩ : ∃ X : ι → Fin r → Fin r → ℂ,
-      ∀ i j, X i j = Q i *ᵥ embVec (σ i) (l0 j) := ⟨_, fun _ _ => rfl⟩
-  have happ : ∀ i j, normSq (X i j - (approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ))
-      ≤ μ ^ 2 := by
+  obtain ⟨X, hX⟩ : ∃ X : ι → Fin r → Fin r → ℂ, ∀ i j, X i j = Q i *ᵥ embVec (σ i) (l0 j) :=
+    ⟨_, fun _ _ => rfl⟩
+  have happ
+      : ∀ i j, normSq (X i j - (approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ)) ≤ μ ^ 2 := by
     intro i j
     rw [hX]
     refine le_trans ?_ (hl0 j)
-    exact Finset.single_le_sum (f := fun i' => normSq (Q i' *ᵥ embVec (σ i') (l0 j) -
-      (approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ))) (fun i' _ => approxB_normSq_nonneg _)
+    exact Finset.single_le_sum
+      (f := fun i' =>
+        normSq (Q i' *ᵥ embVec (σ i') (l0 j) - (approxR r μ ρ : ℂ) • (Pi.single j 1 : Fin r → ℂ)))
+      (fun i' _ => approxB_normSq_nonneg _)
       (Finset.mem_univ i)
   have hGi := fun i => hG r p μ ρ (X i) hp hμ hρ hρ1 (fun j _ => happ i j)
-  have hdiag : ∀ i j, normSq (X i j) ≤ (2 * approxR r μ ρ) ^ 2 :=
-    fun i j => normSq_le_of_normSq_sub_approxR_single_le hμ hρ hρ1 j _ (happ i j)
-  have hinj : ∀ g : ApproxPosIdx r p → K,
-      (∀ k : ApproxPosIdx r p, S.h (l0 k.1) (∑ j : ApproxPosIdx r p, g j • l0 j.1) = 0) → g = 0 := by
+  have hdiag : ∀ i j, normSq (X i j) ≤ (2 * approxR r μ ρ) ^ 2 := fun i j =>
+    normSq_le_of_normSq_sub_approxR_single_le hμ hρ hρ1 j _ (happ i j)
+  have hinj
+      : ∀ g : ApproxPosIdx r p → K,
+        (∀ k : ApproxPosIdx r p, S.h (l0 k.1) (∑ j : ApproxPosIdx r p, g j • l0 j.1) = 0)
+          → g = 0 := by
     intro g hg
     by_contra hne
     obtain ⟨i⟩ := ‹Nonempty ι›
-    have hzz : S.h (∑ j : ApproxPosIdx r p, g j • l0 j.1) (∑ j : ApproxPosIdx r p, g j • l0 j.1) = 0 := by
+    have hzz
+        : S.h (∑ j : ApproxPosIdx r p, g j • l0 j.1) (∑ j : ApproxPosIdx r p, g j • l0 j.1)
+          = 0 := by
       rw [approxB_h_sum_left]
       exact Finset.sum_eq_zero fun j _ => by rw [approxB_h_smul_left, hg j, mul_zero]
     have h1 := hS i (∑ j : ApproxPosIdx r p, g j • l0 j.1) (∑ j : ApproxPosIdx r p, g j • l0 j.1)
@@ -76,18 +86,26 @@ theorem approxBasis_holds (hG : ApproxGraphStatement) : ApproxStatement := by
     simp only [hX] at h2
     rw [← h1] at h2
     simp at h2
-  obtain ⟨Δ, coef, a, hΔ0, hΔ, horth, hmem, hli⟩ :=
-    approxB_split hp S L hInt l0 v hl0L hvi hinj
-  obtain ⟨la, hla⟩ : ∃ la : Fin r → Fin r → K, la = fun j : Fin r => if h : (j : ℕ) < p then l0 j
-      else Δ • v (a ⟨j, h⟩) - ∑ k', coef (v (a ⟨j, h⟩)) k' • l0 k'.1 := ⟨_, rfl⟩
+  obtain ⟨Δ, coef, a, hΔ0, hΔ, horth, hmem, hli⟩ := approxB_split hp S L hInt l0 v hl0L hvi hinj
+  obtain ⟨la, hla⟩
+      : ∃ la : Fin r → Fin r → K,
+        la
+          = fun j : Fin r =>
+            if h : (j : ℕ) < p then
+              l0 j
+            else
+              Δ • v (a ⟨j, h⟩) - ∑ k', coef (v (a ⟨j, h⟩)) k' • l0 k'.1 :=
+    ⟨_, rfl⟩
   have hla_pos : ∀ (j : Fin r) (h : (j : ℕ) < p), la j = l0 j := fun j h => by
     rw [hla]; simp only [dif_pos h]
-  have hla_neg : ∀ (j : Fin r) (h : ¬ (j : ℕ) < p), la j =
-      Δ • v (a ⟨j, h⟩) - ∑ k', coef (v (a ⟨j, h⟩)) k' • l0 k'.1 := fun j h => by
+  have hla_neg
+      : ∀ (j : Fin r) (h : ¬ (j : ℕ) < p),
+        la j = Δ • v (a ⟨j, h⟩) - ∑ k', coef (v (a ⟨j, h⟩)) k' • l0 k'.1 := fun j h => by
     rw [hla]; simp only [dif_neg h]
   have hli' : LinearIndependent K la := by rw [hla]; exact hli
-  have horth' : ∀ (k : Fin r), (k : ℕ) < p → ∀ j : Fin r, ¬ (j : ℕ) < p →
-      S.h (l0 k) (la j) = 0 := fun k hk j hj => by
+  have horth'
+      : ∀ (k : Fin r),
+        (k : ℕ) < p → ∀ j : Fin r, ¬ (j : ℕ) < p → S.h (l0 k) (la j) = 0 := fun k hk j hj => by
     rw [hla_neg j hj]; exact horth _ ⟨k, hk⟩
   have hdet : ∀ i, ((Matrix.of la).map (σ i)).det ≠ 0 := by
     intro i
@@ -95,8 +113,9 @@ theorem approxBasis_holds (hG : ApproxGraphStatement) : ApproxStatement := by
     have hu : IsUnit (Matrix.of la) :=
       (Matrix.linearIndependent_rows_iff_isUnit (A := Matrix.of la)).mp hli'
     exact (map_ne_zero (σ i)).mpr ((Matrix.isUnit_iff_isUnit_det _).mp hu).ne_zero
-  have hcomb : ∀ i (w : Fin r → ℂ),
-      Q i *ᵥ ∑ j, w j • embVec (σ i) (la j) = ∑ j, w j • (Q i *ᵥ embVec (σ i) (la j)) := by
+  have hcomb
+      : ∀ i (w : Fin r → ℂ),
+        Q i *ᵥ ∑ j, w j • embVec (σ i) (la j) = ∑ j, w j • (Q i *ᵥ embVec (σ i) (la j)) := by
     intro i w
     rw [Matrix.mulVec_sum]
     exact Finset.sum_congr rfl fun j _ => Matrix.mulVec_smul _ _ _
@@ -144,40 +163,48 @@ theorem approxBasis_holds (hG : ApproxGraphStatement) : ApproxStatement := by
     have hj' : ¬ (j : ℕ) < p := not_lt.mpr hj
     obtain ⟨x, hx⟩ : ∃ x, x = v (a ⟨j, hj'⟩) := ⟨_, rfl⟩
     rw [hS i, hla_neg j hj', ← hx]
-    have hort : ∀ k : Fin r, (k : ℕ) < p → jForm p (X i k) (Q i *ᵥ embVec (σ i)
-        (Δ • x - ∑ k', coef x k' • l0 k'.1)) = 0 := by
+    have hort
+        : ∀ k : Fin r,
+          (k : ℕ) < p
+            → jForm p (X i k) (Q i *ᵥ embVec (σ i) (Δ • x - ∑ k', coef x k' • l0 k'.1)) = 0 := by
       intro k hk
       have h0 : S.h (l0 k) (Δ • x - ∑ k', coef x k' • l0 k'.1) = 0 := horth x ⟨k, hk⟩
       rw [hX, ← hS, h0, map_zero]
-    have hspan : Q i *ᵥ embVec (σ i) (Δ • x) -
-        Q i *ᵥ embVec (σ i) (Δ • x - ∑ k', coef x k' • l0 k'.1)
-        ∈ Submodule.span ℂ (X i '' {j | (j : ℕ) < p}) := by
+    have hspan
+        : Q i *ᵥ embVec (σ i) (Δ • x) - Q i *ᵥ embVec (σ i) (Δ • x - ∑ k', coef x k' • l0 k'.1)
+          ∈ Submodule.span ℂ (X i '' {j | (j : ℕ) < p}) := by
       rw [← Matrix.mulVec_sub, ← approxB_embVec_sub, sub_sub_cancel, mulVec_embVec_sum_smul]
       exact Submodule.sum_mem _ fun k _ =>
         Submodule.smul_mem _ _ (Submodule.subset_span ⟨k.1, k.2, hX i k.1⟩)
     have hb := (hGi i).2.2 _ _ hort hspan
     rw [approxB_embVec_smul, Matrix.mulVec_smul, normSq_smul_eq_norm_sq_mul] at hb
     have hxμ : normSq (Q i *ᵥ embVec (σ i) x) ≤ μ ^ 2 := by
-      refine le_trans (Finset.single_le_sum (f := fun i' => normSq (Q i' *ᵥ embVec (σ i') x))
-        (fun _ _ => approxB_normSq_nonneg _) (Finset.mem_univ i)) ?_
+      refine le_trans
+        (Finset.single_le_sum
+          (f := fun i' => normSq (Q i' *ᵥ embVec (σ i') x))
+          (fun _ _ => approxB_normSq_nonneg _)
+          (Finset.mem_univ i))
+        ?_
       rw [hx]
       exact hvμ _
-    have hgram : (σ i).mapMatrix (Matrix.of fun k j : ApproxPosIdx r p => S.h (l0 k.1) (l0 j.1)) =
-        Matrix.of fun k j : ApproxPosIdx r p => jForm p (X i k.1) (X i j.1) := by
+    have hgram
+        : (σ i).mapMatrix (Matrix.of fun k j : ApproxPosIdx r p => S.h (l0 k.1) (l0 j.1))
+          = Matrix.of fun k j : ApproxPosIdx r p => jForm p (X i k.1) (X i j.1) := by
       ext k j
       simp [RingHom.mapMatrix_apply, hS, hX]
     have hΔbd : ‖σ i Δ‖ ≤ ((2 * approxR r μ ρ) ^ 2) ^ p := by
       rw [hΔ, RingHom.map_det, hgram]
-      have h := approxB_det_le_of_posSemidef _ (approxB_gram_posSemidef hρ1 hρ (X i) (hGi i).1)
-        ((2 * approxR r μ ρ) ^ 2) fun k => by
-          simp only [Matrix.of_apply]
-          exact le_trans (Complex.re_le_norm _)
-            (le_trans (approxB_norm_jForm_self_le p _) (hdiag i k.1))
+      have h :=
+        approxB_det_le_of_posSemidef _ (approxB_gram_posSemidef hρ1 hρ (X i) (hGi i).1)
+          ((2 * approxR r μ ρ) ^ 2)
+          fun k => by
+            simp only [Matrix.of_apply]
+            exact le_trans (Complex.re_le_norm _)
+              (le_trans (approxB_norm_jForm_self_le p _) (hdiag i k.1))
       rwa [approxB_card_pos hp] at h
     have hsq : ‖σ i Δ‖ ^ 2 ≤ (((2 * approxR r μ ρ) ^ 2) ^ p) ^ 2 :=
       pow_le_pow_left₀ (norm_nonneg _) hΔbd 2
-    have hpow : (2 * approxR r μ ρ) ^ (4 * p) =
-        (((2 * approxR r μ ρ) ^ 2) ^ p) ^ 2 := by
+    have hpow : (2 * approxR r μ ρ) ^ (4 * p) = (((2 * approxR r μ ρ) ^ 2) ^ p) ^ 2 := by
       rw [← pow_mul, ← pow_mul]; congr 1; ring
     rw [hpow]
     refine le_trans hb ?_

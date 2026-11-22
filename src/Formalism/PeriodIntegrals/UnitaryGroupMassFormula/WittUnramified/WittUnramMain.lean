@@ -13,9 +13,11 @@ namespace PI.WittUnramWork
 
 open WittVector
 
-private theorem map_frobenius' {p : ℕ} [Fact p.Prime] {R S : Type*} [CommRing R] [CommRing S]
-    (g : R →+* S) (x : WittVector p R) :
-    WittVector.map g (WittVector.frobenius x) = WittVector.frobenius (WittVector.map g x) := by
+private theorem map_frobenius'
+    {p : ℕ} [Fact p.Prime]
+    {R S : Type*} [CommRing R] [CommRing S]
+    (g : R →+* S) (x : WittVector p R)
+    : WittVector.map g (WittVector.frobenius x) = WittVector.frobenius (WittVector.map g x) := by
   ext n
   simp only [WittVector.map_coeff, WittVector.coeff_frobenius, MvPolynomial.aeval_def,
     MvPolynomial.eval₂_comp_left]
@@ -52,9 +54,12 @@ theorem wittUnram_main : PI.WittUnram := by
   have hψi : Function.Injective ψ := psi_injective ψ hirr
   have hψs : Function.Surjective ψ :=
     psi_surjective ψ (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective h0 hcomp
-  let χ : W →+* WittVector p (GaloisField p f) := (WittVector.map (e : (W ⧸ I) →+* GaloisField p f)).comp ψ
-  have hχ : Function.Bijective χ :=
-    ⟨(WittVector.map_injective _ e.injective).comp hψi, (WittVector.map_surjective _ e.surjective).comp hψs⟩
+  let χ : W →+* WittVector p (GaloisField p f) :=
+    (WittVector.map (e : (W ⧸ I) →+* GaloisField p f)).comp ψ
+  have hχ : Function.Bijective χ := ⟨
+    (WittVector.map_injective _ e.injective).comp hψi,
+    (WittVector.map_surjective _ e.surjective).comp hψs
+  ⟩
   have hφ : ∀ w, (RingEquiv.ofBijective χ hχ).symm (χ w) = w := by
     intro w
     have h := (RingEquiv.ofBijective χ hχ).symm_apply_apply w

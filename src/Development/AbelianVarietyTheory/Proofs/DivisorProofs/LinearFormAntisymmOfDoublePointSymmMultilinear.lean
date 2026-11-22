@@ -6,16 +6,18 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsDominantOf
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZH GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.FlagPush
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZH GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.FlagPush
 open Classical
 
 namespace GlobalTheory.FlagPush.MultiLevel
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MvPolynomial in
 open Classical in
-private theorem exists_fin_sum_single_eq_of_degree_eq {κ : Type} :
-    ∀ (n : ℕ) (m : κ →₀ ℕ), m.degree = n → ∃ s : Fin n → κ, ∑ i, Finsupp.single (s i) 1 = m := by
+private theorem exists_fin_sum_single_eq_of_degree_eq {κ : Type}
+    : ∀ (n : ℕ) (m : κ →₀ ℕ), m.degree = n → ∃ s : Fin n → κ, ∑ i, Finsupp.single (s i) 1 = m := by
   intro n
   induction n with
   | zero =>
@@ -44,44 +46,63 @@ private theorem exists_fin_sum_single_eq_of_degree_eq {κ : Type} :
     simp only [Fin.cons_zero, Fin.cons_succ]
     rw [hs, add_comm, hsplit]
 
-
 open CategoryTheory AlgebraicGeometry TopologicalSpace MvPolynomial in
 open Classical in
-theorem _root_.GlobalTheory.FlagPush.MultiLevel.antisymm_of_multilinear : ∀ (κ : Type) (a b : κ), a ≠ b → ∀ (A : Type) [AddCommGroup A] (n : ℕ) (T : (Fin (n + 1) → A) →ₘₗ[ℤ] ℤ), (∀ (σ : Equiv.Perm (Fin (n + 1))) (y : Fin (n + 1) → A), T (y ∘ σ) = T y) → ∀ (u v : κ → A) (L : MvPolynomial κ ℝ →ₗ[ℝ] ℝ) (μ : ℤ), μ ≠ 0 → (∀ x, x ≠ a → x ≠ b → u x = v x) → u a + u b = v a + v b → (∀ s : Fin (n + 1) → κ, T (u ∘ s) = 0) → (∀ s : Fin (n + 1) → κ, T (v ∘ s) = 0) → (∀ (k : ℕ) (P : MvPolynomial κ ℝ), P.IsHomogeneous k → k ≠ n → L P = 0) → (∀ s : Fin n → κ ⊕ κ, ((T (Fin.cons (v b - u a) (Sum.elim u v ∘ s)) : ℤ) : ℝ) = μ * L (∏ i, X (Sum.elim id id (s i)))) → ∀ Q : MvPolynomial κ ℝ, L (rename (Equiv.swap a b) Q) = - L Q := by
+theorem _root_.GlobalTheory.FlagPush.MultiLevel.antisymm_of_multilinear
+    : ∀ (κ : Type) (a b : κ),
+      a ≠ b
+        → ∀ (A : Type) [AddCommGroup A] (n : ℕ) (T : (Fin (n + 1) → A) →ₘₗ[ℤ] ℤ),
+          (∀ (σ : Equiv.Perm (Fin (n + 1))) (y : Fin (n + 1) → A), T (y ∘ σ) = T y)
+            → ∀ (u v : κ → A) (L : MvPolynomial κ ℝ →ₗ[ℝ] ℝ) (μ : ℤ),
+              μ ≠ 0 → (∀ x, x ≠ a → x ≠ b → u x = v x) → u a + u b = v a + v b
+                → (∀ s : Fin (n + 1) → κ, T (u ∘ s) = 0) → (∀ s : Fin (n + 1) → κ, T (v ∘ s) = 0)
+                → (∀ (k : ℕ) (P : MvPolynomial κ ℝ), P.IsHomogeneous k → k ≠ n → L P = 0)
+                → (∀ s : Fin n → κ ⊕ κ,
+                  ((T (Fin.cons (v b - u a) (Sum.elim u v ∘ s)) : ℤ) : ℝ)
+                    = μ * L (∏ i, X (Sum.elim id id (s i))))
+                → ∀ Q : MvPolynomial κ ℝ, L (rename (Equiv.swap a b) Q) = - L Q := by
   intro κ a b hab A _ n T hT u v L μ hμ hoff hsum hu hv hL hmix
   set w := v b - u a with hw
   set d := u a - v a with hd
-  have hcons : ∀ (x y : A) (Z : Fin n → A),
-      T (Fin.cons (x - y) Z) = T (Fin.cons x Z) - T (Fin.cons y Z) := by
+  have hcons
+      : ∀ (x y : A) (Z : Fin n → A),
+        T (Fin.cons (x - y) Z) = T (Fin.cons x Z) - T (Fin.cons y Z) := by
     intro x y Z
     simp only [← MultilinearMap.curryLeft_apply, map_sub, MultilinearMap.sub_apply]
-  have hmixeq : ∀ t t' : Fin n → κ ⊕ κ, (∀ i, Sum.elim id id (t i) = Sum.elim id id (t' i)) →
-      T (Fin.cons w (Sum.elim u v ∘ t)) = T (Fin.cons w (Sum.elim u v ∘ t')) := by
+  have hmixeq
+      : ∀ t t' : Fin n → κ ⊕ κ,
+        (∀ i, Sum.elim id id (t i) = Sum.elim id id (t' i))
+          → T (Fin.cons w (Sum.elim u v ∘ t)) = T (Fin.cons w (Sum.elim u v ∘ t')) := by
     intro t t' htt
     have h1 := hmix t
     have h2 := hmix t'
-    have e : (∏ i, X (Sum.elim id id (t i)) : MvPolynomial κ ℝ) = ∏ i, X (Sum.elim id id (t' i)) := by
+    have e
+        : (∏ i, X (Sum.elim id id (t i)) : MvPolynomial κ ℝ) = ∏ i, X (Sum.elim id id (t' i)) := by
       simp only [htt]
     rw [e, ← h2] at h1
     exact_mod_cast h1
-  have hZ : ∀ (t : Fin n → κ ⊕ κ) (k : Fin n),
-      T (Fin.cons w (Function.update (Sum.elim u v ∘ t) k d)) = 0 := by
+  have hZ
+      : ∀ (t : Fin n → κ ⊕ κ) (k : Fin n),
+        T (Fin.cons w (Function.update (Sum.elim u v ∘ t) k d)) = 0 := by
     intro t k
     rw [Fin.cons_update, hd, T.map_update_sub, ← Fin.cons_update, ← Fin.cons_update]
-    have e1 : Function.update (Sum.elim u v ∘ t) k (u a) =
-        Sum.elim u v ∘ Function.update t k (Sum.inl a) := by
+    have e1
+        : Function.update (Sum.elim u v ∘ t) k (u a)
+          = Sum.elim u v ∘ Function.update t k (Sum.inl a) := by
       funext i
       by_cases h : i = k <;> simp [h, Function.update_apply]
-    have e2 : Function.update (Sum.elim u v ∘ t) k (v a) =
-        Sum.elim u v ∘ Function.update t k (Sum.inr a) := by
+    have e2
+        : Function.update (Sum.elim u v ∘ t) k (v a)
+          = Sum.elim u v ∘ Function.update t k (Sum.inr a) := by
       funext i
       by_cases h : i = k <;> simp [h, Function.update_apply]
     rw [e1, e2, sub_eq_zero]
     apply hmixeq
     intro i
     by_cases h : i = k <;> simp [h, Function.update_apply]
-  have hposition : ∀ (Y : Fin n → A) (k : Fin n),
-      T (Fin.cons d (Function.update Y k w)) = T (Fin.cons w (Function.update Y k d)) := by
+  have hposition
+      : ∀ (Y : Fin n → A) (k : Fin n),
+        T (Fin.cons d (Function.update Y k w)) = T (Fin.cons w (Function.update Y k d)) := by
     intro Y k
     rw [← hT (Equiv.swap 0 k.succ) (Fin.cons d (Function.update Y k w))]
     congr 1
@@ -128,7 +149,8 @@ theorem _root_.GlobalTheory.FlagPush.MultiLevel.antisymm_of_multilinear : ∀ (�
         abel
       · refine ⟨0, ?_⟩
         rw [Equiv.swap_apply_of_ne_of_ne hxa hxb, hoff x hxa hxb, sub_self, zero_smul]
-  have hchain : ∀ s : Fin n → κ, T (Fin.cons d (v ∘ s)) = T (Fin.cons d (u ∘ Equiv.swap a b ∘ s)) := by
+  have hchain
+      : ∀ s : Fin n → κ, T (Fin.cons d (v ∘ s)) = T (Fin.cons d (u ∘ Equiv.swap a b ∘ s)) := by
     intro s
     let Y : ℕ → Fin n → A := fun k i => if (i : ℕ) < k then u (Equiv.swap a b (s i)) else v (s i)
     have hY : ∀ k, ∃ t : Fin n → κ ⊕ κ, Y k = Sum.elim u v ∘ t := by
@@ -163,8 +185,8 @@ theorem _root_.GlobalTheory.FlagPush.MultiLevel.antisymm_of_multilinear : ∀ (�
           rw [← sub_eq_zero, e1]
           conv_lhs => rw [e0]
           rw [Function.update_idem, Fin.cons_update, Fin.cons_update, ← T.map_update_sub,
-            ← Fin.cons_update, hε, Fin.cons_update, T.map_update_smul, ← Fin.cons_update, hposition, ht,
-            hZ, smul_zero]
+            ← Fin.cons_update, hε, Fin.cons_update, T.map_update_smul, ← Fin.cons_update, hposition,
+            ht, hZ, smul_zero]
         · have e : Y (k + 1) = Y k := by
             funext i
             have h1 : (i : ℕ) < k := by omega
@@ -179,16 +201,15 @@ theorem _root_.GlobalTheory.FlagPush.MultiLevel.antisymm_of_multilinear : ∀ (�
       simp [Y, i.2]
     rw [← e0, ← en]
     exact (hstep n).symm
-  have hkey : ∀ s : Fin n → κ,
-      T (Fin.cons w (u ∘ Equiv.swap a b ∘ s)) = - T (Fin.cons w (u ∘ s)) := by
+  have hkey
+      : ∀ s : Fin n → κ, T (Fin.cons w (u ∘ Equiv.swap a b ∘ s)) = - T (Fin.cons w (u ∘ s)) := by
     intro s
     have hm := hmixeq (Sum.inl ∘ s) (Sum.inr ∘ s) (fun i => rfl)
     have el : Sum.elim u v ∘ (Sum.inl ∘ s) = u ∘ s := rfl
     have er : Sum.elim u v ∘ (Sum.inr ∘ s) = v ∘ s := rfl
     rw [el, er] at hm
     rw [hm, hv_side, hchain, ← hu_side (Equiv.swap a b ∘ s), neg_neg]
-  have hmono : ∀ s : Fin n → κ,
-      L (∏ i, X (Equiv.swap a b (s i))) = - L (∏ i, X (s i)) := by
+  have hmono : ∀ s : Fin n → κ, L (∏ i, X (Equiv.swap a b (s i))) = - L (∏ i, X (s i)) := by
     intro s
     have hμR : (μ : ℝ) ≠ 0 := by exact_mod_cast hμ
     have h1 := hmix (Sum.inl ∘ s)
@@ -202,9 +223,12 @@ theorem _root_.GlobalTheory.FlagPush.MultiLevel.antisymm_of_multilinear : ∀ (�
     rw [← h2, mul_neg, ← h1]
     push_cast
     ring
-  have hlin : L ∘ₗ (rename (Equiv.swap a b) : MvPolynomial κ ℝ →ₐ[ℝ] MvPolynomial κ ℝ).toLinearMap = -L := by
+  have hlin
+      : L ∘ₗ (rename (Equiv.swap a b) : MvPolynomial κ ℝ →ₐ[ℝ] MvPolynomial κ ℝ).toLinearMap
+        = -L := by
     refine (basisMonomials κ ℝ).ext fun m => ?_
-    simp only [coe_basisMonomials, LinearMap.comp_apply, AlgHom.toLinearMap_apply, LinearMap.neg_apply]
+    simp only [coe_basisMonomials, LinearMap.comp_apply, AlgHom.toLinearMap_apply,
+      LinearMap.neg_apply]
     by_cases hm : m.degree = n
     · obtain ⟨s, hs⟩ := exists_fin_sum_single_eq_of_degree_eq n m hm
       have e1 : monomial m (1 : ℝ) = ∏ i, X (s i) := by

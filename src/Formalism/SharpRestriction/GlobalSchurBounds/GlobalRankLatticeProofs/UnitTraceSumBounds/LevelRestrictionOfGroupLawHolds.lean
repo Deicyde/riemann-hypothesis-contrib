@@ -18,7 +18,8 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.JetsPhW
 
 namespace Formalism.MainNotions.Ext.CutA
 
-open Formalism.MainNotions.GL3Theta Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3r7
+open Formalism.MainNotions.GL3Theta Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.GL3r7
 
 theorem ph0 {p : ℕ} [Fact p.Prime] (g : G1 p) : PowerSeries.constantCoeff g.ph = 0 := by
   unfold G1.ph
@@ -43,19 +44,23 @@ theorem phGramG_holds : PhGramG := by
 theorem gramUnitEq_holds : GramUnitEq := by
   first
   | exact gramExpansion_orthonormal
-  | (intro p _ g; intros; apply gramExpansion_orthonormal <;> first | exact fglData g ‹_› | assumption)
+  | (
+      intro p _ g
+      intros
+      apply gramExpansion_orthonormal <;> first | exact fglData g ‹_› | assumption
+    )
   | (unfold GramUnitEq; done)
 
-theorem jetsHigh_holds : JetsHigh :=
-  fun p _ g hOk => jets_high p g.W g.wq g.ex g.ph hOk.1.1 hOk.1.2.1 hOk.1.2.2.1 hOk.1.2.2.2.1 hOk.1.2.2.2.2.1 hOk.2.1 hOk.2.2.1
-    hOk.2.2.2
-
-theorem jetsOne_holds : JetsOne :=
-  fun p _ g hOk => jets_one p g.W g.wq g.ex g.ph hOk.1.1 hOk.1.2.1 hOk.1.2.2.1 hOk.1.2.2.2.1 hOk.1.2.2.2.2.1 hOk.2.1 hOk.2.2.1
-    hOk.2.2.2
-
-theorem jetsTwo_holds : JetsTwo :=
-  fun p _ g a b hOk => jets_two p g.W g.wq g.ex g.ph a b hOk.1.1 hOk.1.2.1 hOk.1.2.2.1 hOk.1.2.2.2.1 hOk.1.2.2.2.2.1 hOk.2.1
+theorem jetsHigh_holds : JetsHigh := fun p _ g hOk =>
+  jets_high p g.W g.wq g.ex g.ph hOk.1.1 hOk.1.2.1 hOk.1.2.2.1 hOk.1.2.2.2.1 hOk.1.2.2.2.2.1 hOk.2.1
     hOk.2.2.1 hOk.2.2.2
+
+theorem jetsOne_holds : JetsOne := fun p _ g hOk =>
+  jets_one p g.W g.wq g.ex g.ph hOk.1.1 hOk.1.2.1 hOk.1.2.2.1 hOk.1.2.2.2.1 hOk.1.2.2.2.2.1 hOk.2.1
+    hOk.2.2.1 hOk.2.2.2
+
+theorem jetsTwo_holds : JetsTwo := fun p _ g a b hOk =>
+  jets_two p g.W g.wq g.ex g.ph a b hOk.1.1 hOk.1.2.1 hOk.1.2.2.1 hOk.1.2.2.2.1 hOk.1.2.2.2.2.1
+    hOk.2.1 hOk.2.2.1 hOk.2.2.2
 
 end Formalism.MainNotions.Ext.CutA

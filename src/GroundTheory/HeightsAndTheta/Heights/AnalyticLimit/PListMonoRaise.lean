@@ -23,8 +23,10 @@ theorem ListMonoRaise.proof : ListMonoRaise.Statement := by
   have hyYo : s y ∈ Yo := hy.2.1
   have hyOx : s y ∈ Om.U x := hy.2.2.1
 
-  have hadd : ∀ {f g : (Fin D → ℂ) → ℝ}, ContDiffAt ℝ 2 f y → ContDiffAt ℝ 2 g y →
-      levi (fun v => f v + g v) y w = levi f y w + levi g y w := by
+  have hadd
+      : ∀ {f g : (Fin D → ℂ) → ℝ},
+        ContDiffAt ℝ 2 f y → ContDiffAt ℝ 2 g y
+          → levi (fun v => f v + g v) y w = levi f y w + levi g y w := by
     intro f g hf hg
     simpa using levi_add_smul 1 hf hg w
 
@@ -40,8 +42,9 @@ theorem ListMonoRaise.proof : ListMonoRaise.Statement := by
     (Complex.reCLM.contDiff.contDiffAt.comp y (hGa.restrictScalars.contDiffAt (n := 2)))
   have hVo : IsOpen ((A.chart k).target ∩ s ⁻¹' (W ∩ Om.U (s y) ∩ Om.U x)) :=
     (A.chart k).isOpen_inter_preimage_symm ((hWo.inter (Om.isOpen_U _)).inter (Om.isOpen_U x))
-  have hgerm : (potForm Om u).φ x ∘ s =ᶠ[𝓝 y]
-      fun v => ((Om.φ (s y) ∘ s) v + (u ∘ s) v) + (-1) * ((G ∘ s) v).re := by
+  have hgerm
+      : (potForm Om u).φ x ∘ s =ᶠ[𝓝 y]
+        fun v => ((Om.φ (s y) ∘ s) v + (u ∘ s) v) + (-1) * ((G ∘ s) v).re := by
     filter_upwards [hVo.mem_nhds ⟨hyt, ⟨hpW, Om.mem_U _⟩, hyOx⟩] with v hv
     have := hGeq (s v) hv.2
     show Om.φ x (s v) + u (s v) = (Om.φ (s y) (s v) + u (s v)) + (-1) * (G (s v)).re

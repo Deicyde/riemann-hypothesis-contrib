@@ -12,9 +12,11 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees MvPolynomial
 
-theorem rat_int {O K : Type} [CommRing O] [IsLocalRing O] [Field K] [CharZero K] [Algebra O K] {p : ℕ} (hp : p.Prime)
-    (hpO : ¬ IsUnit (p : O)) (x : ℚ) (c : ℕ) (hx : PadicGe p x c) :
-    ∃ y : O, (x : K) = (p : K) ^ c * algebraMap O K y := by
+theorem rat_int
+    {O K : Type} [CommRing O] [IsLocalRing O] [Field K] [CharZero K] [Algebra O K]
+    {p : ℕ} (hp : p.Prime) (hpO : ¬ IsUnit (p : O))
+    (x : ℚ) (c : ℕ) (hx : PadicGe p x c)
+    : ∃ y : O, (x : K) = (p : K) ^ c * algebraMap O K y := by
   by_cases hx0 : x = 0
   · exact ⟨0, by simp [hx0]⟩
   rcases hx with hx | hv
@@ -63,28 +65,39 @@ def Rblk (C0 CE1 CE2 : ℝ) (X : Loc) (j : Fin (numSeg X.TT)) (b : SegBlock (seg
   open Classical in
   ∏ x ∈ Finset.univ \ (Finset.univ.image (symVar C0 CE1 CE2 X j)), (baseExp C0 CE1 CE2 X j b x).factorial
 
-theorem expFact_ioExp (C0 CE1 CE2 : ℝ) (X : Loc) (j : Fin (numSeg X.TT)) (b : SegBlock (segS X.TT j) X.m)
-    (μ : BV C0 CE1 CE2 X j →₀ ℕ) :
-    expFact (ioExp C0 CE1 CE2 X j b μ) = Rblk C0 CE1 CE2 X j b *
-      ∏ v : BV C0 CE1 CE2 X j, (baseExp C0 CE1 CE2 X j b (symVar C0 CE1 CE2 X j v) +
-        symLev X.p C0 CE1 CE2 X j v * μ v).factorial := by
+theorem expFact_ioExp
+    (C0 CE1 CE2 : ℝ) (X : Loc) (j : Fin (numSeg X.TT))
+    (b : SegBlock (segS X.TT j) X.m) (μ : BV C0 CE1 CE2 X j →₀ ℕ)
+    : expFact (ioExp C0 CE1 CE2 X j b μ)
+      = Rblk C0 CE1 CE2 X j b
+        * ∏ v : BV C0 CE1 CE2 X j, (baseExp C0 CE1 CE2 X j b (symVar C0 CE1 CE2 X j v) +
+            symLev X.p C0 CE1 CE2 X j v * μ v).factorial := by
   classical
   have hinj := symVar_inj C0 CE1 CE2 X j
-  have hsumv : ∀ x, (μ.sum fun v n => Finsupp.single (symVar C0 CE1 CE2 X j v) (symLev X.p C0 CE1 CE2 X j v * n)) x =
-      ∑ v ∈ μ.support, if symVar C0 CE1 CE2 X j v = x then symLev X.p C0 CE1 CE2 X j v * μ v else 0 := by
-    intro x
-    rw [Finsupp.sum_apply]
-    exact Finset.sum_congr rfl fun v _ => Finsupp.single_apply
-  have hout : ∀ x ∉ Finset.univ.image (symVar C0 CE1 CE2 X j),
-      ioExp C0 CE1 CE2 X j b μ x = baseExp C0 CE1 CE2 X j b x := by
+  have hsumv
+      : ∀ x,
+        (μ.sum fun v n =>
+              Finsupp.single (symVar C0 CE1 CE2 X j v) (symLev X.p C0 CE1 CE2 X j v * n))
+            x
+          = ∑ v ∈ μ.support, if symVar C0 CE1 CE2 X j v = x then symLev X.p C0 CE1 CE2 X j v * μ v else 0 :=
+    by
+      intro x
+      rw [Finsupp.sum_apply]
+      exact Finset.sum_congr rfl fun v _ => Finsupp.single_apply
+  have hout
+      : ∀ x ∉ Finset.univ.image (symVar C0 CE1 CE2 X j),
+        ioExp C0 CE1 CE2 X j b μ x = baseExp C0 CE1 CE2 X j b x := by
     intro x hx
     rw [ioExp, Finsupp.add_apply, hsumv, Finset.sum_eq_zero, add_zero]
     intro v _
     rw [if_neg]
     intro h
     exact hx (Finset.mem_image.2 ⟨v, Finset.mem_univ _, h⟩)
-  have hin : ∀ v, ioExp C0 CE1 CE2 X j b μ (symVar C0 CE1 CE2 X j v) =
-      baseExp C0 CE1 CE2 X j b (symVar C0 CE1 CE2 X j v) + symLev X.p C0 CE1 CE2 X j v * μ v := by
+  have hin
+      : ∀ v,
+        ioExp C0 CE1 CE2 X j b μ (symVar C0 CE1 CE2 X j v)
+          = baseExp C0 CE1 CE2 X j b (symVar C0 CE1 CE2 X j v)
+            + symLev X.p C0 CE1 CE2 X j v * μ v := by
     intro v
     rw [ioExp, Finsupp.add_apply, hsumv]
     congr 1
@@ -104,19 +117,27 @@ theorem expFact_ioExp (C0 CE1 CE2 : ℝ) (X : Loc) (j : Fin (numSeg X.TT)) (b : 
     exact Finset.prod_congr rfl fun x hx => by rw [hout x (Finset.mem_sdiff.1 hx).2]
   · exact Finset.prod_congr rfl fun v _ => by rw [hin v]
 
-theorem baseExp_odd (C0 CE1 CE2 : ℝ) (X : Loc) (j : Fin (numSeg X.TT)) (b : SegBlock (segS X.TT j) X.m)
-    (i0 : Fin (segS X.TT j)) (β0 : Bool) (c0 : Fin (X.m + 1)) :
-    baseExp C0 CE1 CE2 X j b ((topOdd X j i0, β0), c0) = (if β0 then b.rz i0 c0 else b.ry i0 c0) +
-      (if (i0 : ℕ) < (X.seg C0 CE1 CE2 j).sigma ∧ c0 = 0 then (X.seg C0 CE1 CE2 j).P X.p i0 *
-        (if β0 then coarseA X.p (X.seg C0 CE1 CE2 j) b i0 - b.w i0 else b.sg i0) else 0) := by
+theorem baseExp_odd
+    (C0 CE1 CE2 : ℝ)
+    (X : Loc) (j : Fin (numSeg X.TT)) (b : SegBlock (segS X.TT j) X.m) (i0 : Fin (segS X.TT j))
+    (β0 : Bool) (c0 : Fin (X.m + 1))
+    : baseExp C0 CE1 CE2 X j b ((topOdd X j i0, β0), c0)
+      = (if β0 then b.rz i0 c0 else b.ry i0 c0)
+        + (if (i0 : ℕ) < (X.seg C0 CE1 CE2 j).sigma ∧ c0 = 0 then
+             (X.seg C0 CE1 CE2 j).P X.p i0
+               * (if β0 then coarseA X.p (X.seg C0 CE1 CE2 j) b i0 - b.w i0 else b.sg i0)
+           else
+             0) := by
   classical
   have hinj := topOdd_inj X j
-  have hite : ∀ (Q : Prop) [Decidable Q] (f : ((X.TT × Bool) × Fin (X.m + 1)) →₀ ℕ) (y),
-      (if Q then f else 0) y = if Q then f y else 0 := by
+  have hite
+      : ∀ (Q : Prop) [Decidable Q] (f : ((X.TT × Bool) × Fin (X.m + 1)) →₀ ℕ) (y),
+        (if Q then f else 0) y = if Q then f y else 0 := by
     intro Q _ f y
     split_ifs <;> rfl
-  have hne : ∀ (i : Fin (segS X.TT j)) (β : Bool) (c : Fin (X.m + 1)), i ≠ i0 →
-      ((topOdd X j i, β), c) ≠ ((topOdd X j i0, β0), c0) := by
+  have hne
+      : ∀ (i : Fin (segS X.TT j)) (β : Bool) (c : Fin (X.m + 1)),
+        i ≠ i0 → ((topOdd X j i, β), c) ≠ ((topOdd X j i0, β0), c0) := by
     intro i β c hi h
     exact hi (hinj (congrArg (fun y => y.1.1) h))
   rw [baseExp, Finsupp.add_apply]
@@ -147,7 +168,8 @@ theorem baseExp_odd (C0 CE1 CE2 : ℝ) (X : Loc) (j : Fin (numSeg X.TT)) (b : Se
       by_cases h1 : (i0 : ℕ) < (X.seg C0 CE1 CE2 j).sigma
       · by_cases hc : c0 = 0
         · subst hc
-          rw [if_pos h1, if_pos ⟨h1, rfl⟩, Finsupp.add_apply, Finsupp.single_apply, Finsupp.single_apply]
+          rw [if_pos h1, if_pos ⟨h1, rfl⟩, Finsupp.add_apply, Finsupp.single_apply,
+            Finsupp.single_apply]
           cases β0 <;> simp
         · rw [if_pos h1, if_neg (fun h => hc h.2), Finsupp.add_apply, Finsupp.single_apply,
             Finsupp.single_apply, if_neg, if_neg]
@@ -167,11 +189,15 @@ theorem baseExp_odd (C0 CE1 CE2 : ℝ) (X : Loc) (j : Fin (numSeg X.TT)) (b : Se
     · intro h
       exact absurd (Finset.mem_univ i0) h
 
-theorem baseExp_end (C0 CE1 CE2 : ℝ) (X : Loc) (j : Fin (numSeg X.TT)) (b : SegBlock (segS X.TT j) X.m)
-    (β0 : Bool) (c0 : Fin (X.m + 1)) : baseExp C0 CE1 CE2 X j b ((topEnd X j, β0), c0) = 0 := by
+theorem baseExp_end
+    (C0 CE1 CE2 : ℝ)
+    (X : Loc) (j : Fin (numSeg X.TT)) (b : SegBlock (segS X.TT j) X.m)
+    (β0 : Bool) (c0 : Fin (X.m + 1))
+    : baseExp C0 CE1 CE2 X j b ((topEnd X j, β0), c0) = 0 := by
   classical
-  have hite : ∀ (Q : Prop) [Decidable Q] (f : ((X.TT × Bool) × Fin (X.m + 1)) →₀ ℕ) (y),
-      (if Q then f else 0) y = if Q then f y else 0 := by
+  have hite
+      : ∀ (Q : Prop) [Decidable Q] (f : ((X.TT × Bool) × Fin (X.m + 1)) →₀ ℕ) (y),
+        (if Q then f else 0) y = if Q then f y else 0 := by
     intro Q _ f y
     split_ifs <;> rfl
   simp [baseExp, Finsupp.finsetSum_apply, Finsupp.single_apply, topOdd_ne_end, hite]

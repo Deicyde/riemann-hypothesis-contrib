@@ -8,14 +8,15 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Ncard
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem.Chr
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1
+  ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem.Chr
 
 namespace GlobalTheory.Mem.Chr
 
-
 open Classical in
-theorem splitsC_of_modEq_one : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (p : ℕ), p.Prime →
-    p ≡ 1 [MOD H.QS * H.q * H.d] → SplitsC H.E p := by
+theorem splitsC_of_modEq_one
+    : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (p : ℕ),
+      p.Prime → p ≡ 1 [MOD H.QS * H.q * H.d] → SplitsC H.E p := by
   intro R H p hp h
   have hd16 : H.d % 16 = 7 := H.hyp.2.2.2.1
   have hpos : 0 < H.QS * H.q * H.d := Nat.pos_of_ne_zero H.condN_ne_zero

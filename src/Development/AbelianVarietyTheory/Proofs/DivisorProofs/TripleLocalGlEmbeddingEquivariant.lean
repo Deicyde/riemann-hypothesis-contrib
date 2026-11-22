@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.RankEqCardIf
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.LFun
 open scoped Matrix
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -17,18 +19,22 @@ namespace GlobalTheory.SiegelValGood
 
 open scoped TensorProduct
 
-theorem det_ne_zero_of_hasSig {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} {r s : ℕ} (h : HasSig M r s) : M.det ≠ 0 := by
+theorem det_ne_zero_of_hasSig {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} {r s : ℕ} (h : HasSig M r s)
+    : M.det ≠ 0 := by
   obtain ⟨hn, A, hA⟩ := h
   let e : Fin r ⊕ Fin s ≃ Fin n := finSumFinEquiv.trans (finCongr hn)
   let A' : Matrix (Fin n) (Fin n) ℂ := A.submatrix id e.symm
-  have key : A'ᵀ * M * A'.map star =
-      (Matrix.fromBlocks 1 0 0 (-1) : Matrix (Fin r ⊕ Fin s) (Fin r ⊕ Fin s) ℂ).submatrix e.symm e.symm := by
+  have key
+      : A'ᵀ * M * A'.map star
+        = (Matrix.fromBlocks 1 0 0 (-1) : Matrix (Fin r ⊕ Fin s) (Fin r ⊕ Fin s) ℂ).submatrix e.symm
+          e.symm := by
     rw [← hA]
     ext i j
     simp [A', Matrix.mul_apply]
   have h2 := congrArg Matrix.det key
-  rw [Matrix.det_submatrix_equiv_self, Matrix.det_mul, Matrix.det_mul, Matrix.det_fromBlocks_zero₂₁, Matrix.det_one,
-    Matrix.det_neg, Matrix.det_one] at h2
+  rw [Matrix.det_submatrix_equiv_self, Matrix.det_mul, Matrix.det_mul, Matrix.det_fromBlocks_zero₂₁,
+      Matrix.det_one, Matrix.det_neg, Matrix.det_one]
+    at h2
   intro h0
   rw [h0, mul_zero, zero_mul] at h2
   simp at h2
@@ -36,8 +42,9 @@ theorem det_ne_zero_of_hasSig {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} {r s : 
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem det_mul_cA {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (hJ : J.det ≠ 0) (h : UA σ J) :
-    (mat h).det * cA σ (mat h).det = 1 := by
+theorem det_mul_cA
+    {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (hJ : J.det ≠ 0) (h : UA σ J)
+    : (mat h).det * cA σ (mat h).det = 1 := by
   have hm : (mat h)ᵀ * incM F J * (mat h).map (cA σ) = incM F J := h.2
   have h2 := congrArg Matrix.det hm
   rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose] at h2
@@ -45,24 +52,29 @@ theorem det_mul_cA {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
   have e2 : (incM F J).det = inclR (F := F) (AF F) J.det := (RingHom.map_det _ J).symm
   rw [e1, e2] at h2
   have hu : IsUnit (inclR (F := F) (AF F) J.det) := (isUnit_iff_ne_zero.2 hJ).map _
-  have h3 : (mat h).det * cA σ (mat h).det * inclR (F := F) (AF F) J.det = 1 * inclR (F := F) (AF F) J.det := by
+  have h3
+      : (mat h).det * cA σ (mat h).det * inclR (F := F) (AF F) J.det
+        = 1 * inclR (F := F) (AF F) J.det := by
     linear_combination h2
   exact hu.mul_left_injective h3
 
-theorem piW_algebraMap {v : Pl (F := F)} (τ : E →ₐ[F] Fv F v) (a : AF F) :
-    piW τ (algebraMap (AF F) (AE F E) a) = evFin F v a := by
+theorem piW_algebraMap {v : Pl (F := F)} (τ : E →ₐ[F] Fv F v) (a : AF F)
+    : piW τ (algebraMap (AF F) (AE F E) a) = evFin F v a := by
   show splitProj τ (compFin F E v (a ⊗ₜ[F] (1 : E))) = _
   show splitProj τ (evFin F v a ⊗ₜ[F] (1 : E)) = _
   rw [splitProj_tmul, map_one, mul_one]
 
-theorem at_mul {v : Pl (F := F)} {x : AE F E} (hx : At (evFin F v) x) (y : AE F E) : At (evFin F v) (x * y) := fun u hu => by
+theorem at_mul {v : Pl (F := F)} {x : AE F E} (hx : At (evFin F v) x) (y : AE F E)
+    : At (evFin F v) (x * y) := fun u hu => by
   rw [← smul_mul_assoc, hx u hu, zero_mul]
 
-theorem at_add {v : Pl (F := F)} {x y : AE F E} (hx : At (evFin F v) x) (hy : At (evFin F v) y) : At (evFin F v) (x + y) :=
-  fun u hu => by rw [smul_add, hx u hu, hy u hu, add_zero]
+theorem at_add {v : Pl (F := F)} {x y : AE F E} (hx : At (evFin F v) x) (hy : At (evFin F v) y)
+    : At (evFin F v) (x + y) := fun u hu => by
+  rw [smul_add, hx u hu, hy u hu, add_zero]
 
-theorem at_det_sub_one {v : Pl (F := F)} {n : ℕ} {M : Matrix (Fin n) (Fin n) (AE F E)} (hM : At (evFin F v) (M - 1)) :
-    At (evFin F v) (M.det - 1) := by
+theorem at_det_sub_one
+    {v : Pl (F := F)} {n : ℕ} {M : Matrix (Fin n) (Fin n) (AE F E)} (hM : At (evFin F v) (M - 1))
+    : At (evFin F v) (M.det - 1) := by
   intro u hu
   let I : Ideal (AE F E) := Ideal.span (Set.range fun p : Fin n × Fin n => (M - 1) p.1 p.2)
   have hdet : M.det - 1 ∈ I := by
@@ -76,7 +88,8 @@ theorem at_det_sub_one {v : Pl (F := F)} {n : ℕ} {M : Matrix (Fin n) (Fin n) (
   have hle : I ≤ (Submodule.span (AE F E) {algebraMap (AF F) (AE F E) u}).annihilator := by
     rw [Ideal.span_le]
     rintro _ ⟨p, rfl⟩
-    rw [SetLike.mem_coe, Submodule.mem_annihilator_span_singleton, smul_eq_mul, mul_comm, ← Algebra.smul_def]
+    rw [SetLike.mem_coe, Submodule.mem_annihilator_span_singleton, smul_eq_mul, mul_comm,
+      ← Algebra.smul_def]
     have := congrFun (congrFun (hM u hu) p.1) p.2
     simpa using this
   have := (Submodule.mem_annihilator_span_singleton _ _).1 (hle hdet)
@@ -84,21 +97,27 @@ theorem at_det_sub_one {v : Pl (F := F)} {n : ℕ} {M : Matrix (Fin n) (Fin n) (
   rwa [smul_eq_mul] at this
 
 theorem algebraMap_injective_AE : Function.Injective (algebraMap (AF F) (AE F E)) :=
-  Algebra.TensorProduct.includeLeft_injective (R := F) (S := AF F) (A := AF F) (B := E) (algebraMap F E).injective
+  Algebra.TensorProduct.includeLeft_injective (R := F) (S := AF F) (A := AF F) (B := E)
+    (algebraMap F E).injective
 
-theorem norm_det_eq_one {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (hJ : J.det ≠ 0)
-    (h : UA σ J) :
-    Units.map (Algebra.norm (AF F) : AE F E →* AF F) (Matrix.GeneralLinearGroup.det (h : GL (Fin n) (AE F E))) = 1 := by
+theorem norm_det_eq_one
+    {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ)
+    {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (hJ : J.det ≠ 0) (h : UA σ J)
+    : Units.map (Algebra.norm (AF F) : AE F E →* AF F)
+        (Matrix.GeneralLinearGroup.det (h : GL (Fin n) (AE F E)))
+      = 1 := by
   apply Units.ext
   apply algebraMap_injective_AE (F := F) (E := E)
   show algebraMap (AF F) (AE F E) (Algebra.norm (AF F) (mat h).det) = algebraMap (AF F) (AE F E) 1
   rw [GlobalTheory.Doubling.algebraMap_norm_eq hσ, map_one]
   exact det_mul_cA hJ h
 
-theorem ratio_algebraMap_eq_one {X : Chars F E} {a a' : ℕ}
+theorem ratio_algebraMap_eq_one
+    {X : Chars F E} {a a' : ℕ}
     (hα : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range X.α a')
-    (hβ : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range X.β a) (he : Even (a + a')) (u : (AF F)ˣ) :
-    X.ν (Units.map (algebraMap (AF F) (AE F E) : AF F →* AE F E) u) = 1 := by
+    (hβ : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range X.β a) (he : Even (a + a'))
+    (u : (AF F)ˣ)
+    : X.ν (Units.map (algebraMap (AF F) (AE F E) : AF F →* AE F E) u) = 1 := by
   have h1 := hα u
   have h2 := hβ u
   show (X.α / X.β) _ = 1
@@ -110,10 +129,11 @@ theorem ratio_algebraMap_eq_one {X : Chars F E} {a a' : ℕ}
   · have key : Even a ↔ Even a' := Nat.even_add.1 he
     by_cases ha : Even a
     · rw [ha.neg_one_pow, (key.1 ha).neg_one_pow]
-    · rw [(Nat.not_even_iff_odd.1 ha).neg_one_pow, (Nat.not_even_iff_odd.1 (fun h => ha (key.2 h))).neg_one_pow]
+    · rw [(Nat.not_even_iff_odd.1 ha).neg_one_pow,
+        (Nat.not_even_iff_odd.1 (fun h => ha (key.2 h))).neg_one_pow]
 
-theorem at_localIdele (v : Pl (F := F)) (x : (Fv F v)ˣ) :
-    At (evFin F v) (algebraMap (AF F) (AE F E) (Neutral.B1.localIdele F v x : AF F) - 1) := by
+theorem at_localIdele (v : Pl (F := F)) (x : (Fv F v)ˣ)
+    : At (evFin F v) (algebraMap (AF F) (AE F E) (Neutral.B1.localIdele F v x : AF F) - 1) := by
   intro c hc
   have hs := Neutral.B1.localIdele_isSupportedAt F v x
   have key : c * ((Neutral.B1.localIdele F v x : AF F) - 1) = 0 := by
@@ -134,21 +154,43 @@ theorem at_localIdele (v : Pl (F := F)) (x : (Fv F v)ˣ) :
 end GlobalTheory.SiegelValGood
 
 open GlobalTheory.SiegelValGood in
-theorem GlobalTheory.SiegelValGood.siegel_factor_eq_sq : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E)
-    (a a' : ℕ) (G : Geo σ a a') (X : Chars F E) (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W), IsTriple B G X om om' →
-    ∀ v, X.Good v → ∀ (t : E →ₐ[F] Fv F v)
-    (K : GL (Fin a') (Fv F v) →* UA σ G.V'.J), (∀ g, K g ∈ UAt σ G.V' (evFin F v) ∧
-      (mat (K g)).map (piW t) = g.val ∧
-      (mat (K g)).map (piW (t.comp σ)) = (G.V'.J.map t)⁻¹ * ((g⁻¹ : GL _ _).val)ᵀ * G.V'.J.map t) →
-    ∀ g : GL (Fin a') (Fv F v),
-      ((X.α / X.β) (Matrix.GeneralLinearGroup.det ((K g : UA σ G.V'.J) : GL (Fin a') (AE F E))) : ℂ) *
-        ((((adeleClass F).modu (Units.map (Algebra.norm (AF F) : AE F E →* AF F)
-          (Matrix.GeneralLinearGroup.det ((K g : UA σ G.V'.J) : GL (Fin a') (AE F E)))) : ℝ) ^
-            ((Fintype.card (Fin (a + a')) : ℝ) / 2) : ℝ) : ℂ) = (chrW X.ν t (GlobalTheory.SplitFlip.gdet g) : ℂ) ^ 2 ∨
-      ((X.α / X.β) (Matrix.GeneralLinearGroup.det ((K g : UA σ G.V'.J) : GL (Fin a') (AE F E))) : ℂ) *
-        ((((adeleClass F).modu (Units.map (Algebra.norm (AF F) : AE F E →* AF F)
-          (Matrix.GeneralLinearGroup.det ((K g : UA σ G.V'.J) : GL (Fin a') (AE F E)))) : ℝ) ^
-            ((Fintype.card (Fin (a + a')) : ℝ) / 2) : ℝ) : ℂ) = (((chrW X.ν t (GlobalTheory.SplitFlip.gdet g))⁻¹ : ℂˣ) : ℂ) ^ 2 := by
+theorem GlobalTheory.SiegelValGood.siegel_factor_eq_sq
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E) (a a' : ℕ) (G : Geo σ a a') (X : Chars F E)
+        (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W),
+      IsTriple B G X om om'
+        → ∀ v,
+          X.Good v
+            → ∀ (t : E →ₐ[F] Fv F v) (K : GL (Fin a') (Fv F v) →* UA σ G.V'.J),
+              (∀ g,
+                  K g ∈ UAt σ G.V' (evFin F v) ∧ (mat (K g)).map (piW t) = g.val
+                    ∧ (mat (K g)).map (piW (t.comp σ))
+                      = (G.V'.J.map t)⁻¹ * ((g⁻¹ : GL _ _).val)ᵀ * G.V'.J.map t)
+                → ∀ g : GL (Fin a') (Fv F v),
+                  ((X.α / X.β) (Matrix.GeneralLinearGroup.det
+                            ((K g : UA σ G.V'.J) : GL (Fin a') (AE F E)))
+                          : ℂ)
+                        * ((((adeleClass F).modu
+                                  (Units.map (Algebra.norm (AF F) : AE F E →* AF F)
+                                    (Matrix.GeneralLinearGroup.det
+                                      ((K g : UA σ G.V'.J) : GL (Fin a') (AE F E))))
+                                : ℝ)
+                              ^ ((Fintype.card (Fin (a + a')) : ℝ) / 2)
+                            : ℝ)
+                          : ℂ)
+                      = (chrW X.ν t (GlobalTheory.SplitFlip.gdet g) : ℂ) ^ 2
+                    ∨ ((X.α / X.β) (Matrix.GeneralLinearGroup.det
+                            ((K g : UA σ G.V'.J) : GL (Fin a') (AE F E)))
+                          : ℂ)
+                        * ((((adeleClass F).modu
+                                  (Units.map (Algebra.norm (AF F) : AE F E →* AF F)
+                                    (Matrix.GeneralLinearGroup.det
+                                      ((K g : UA σ G.V'.J) : GL (Fin a') (AE F E))))
+                                : ℝ)
+                              ^ ((Fintype.card (Fin (a + a')) : ℝ) / 2)
+                            : ℝ)
+                          : ℂ)
+                      = (((chrW X.ν t (GlobalTheory.SplitFlip.gdet g))⁻¹ : ℂˣ) : ℂ) ^ 2 := by
   intro F E _ _ _ _ _ σ B a a' G X om om' hT v hv t K hK g
   left
   have hσ : IsCMExt F E σ := hT.base.cm
@@ -169,22 +211,31 @@ theorem GlobalTheory.SiegelValGood.siegel_factor_eq_sq : ∀ (F E : Type) [Field
     have : (G.V'.J.map t).det = t G.V'.J.det := (AlgHom.map_det t _).symm
     rw [this]
     exact (map_ne_zero _).2 hJ
-  have hgi : ((g⁻¹ : GL (Fin a') (Fv F v)) : Matrix (Fin a') (Fin a') (Fv F v)).det =
-      (((GlobalTheory.SplitFlip.gdet g)⁻¹ : (Fv F v)ˣ) : Fv F v) := by
-    rw [show (GlobalTheory.SplitFlip.gdet g)⁻¹ = Matrix.GeneralLinearGroup.det g⁻¹ from (map_inv _ _).symm]; rfl
-  have hps : piW (t.comp σ) (D : AE F E) = (((GlobalTheory.SplitFlip.gdet g)⁻¹ : (Fv F v)ˣ) : Fv F v) := by
-    rw [hDv, RingHom.map_det, RingHom.mapMatrix_apply, h2, Matrix.det_mul, Matrix.det_mul, Matrix.det_nonsing_inv,
-      Matrix.det_transpose, Ring.inverse_eq_inv, mul_right_comm, inv_mul_cancel₀ hJt, one_mul, hgi]
+  have hgi
+      : ((g⁻¹ : GL (Fin a') (Fv F v)) : Matrix (Fin a') (Fin a') (Fv F v)).det
+        = (((GlobalTheory.SplitFlip.gdet g)⁻¹ : (Fv F v)ˣ) : Fv F v) := by
+    rw [show (GlobalTheory.SplitFlip.gdet g)⁻¹ = Matrix.GeneralLinearGroup.det g⁻¹ from
+      (map_inv _ _).symm]
+    rfl
+  have hps
+      : piW (t.comp σ) (D : AE F E)
+        = (((GlobalTheory.SplitFlip.gdet g)⁻¹ : (Fv F v)ˣ) : Fv F v) := by
+    rw [hDv, RingHom.map_det, RingHom.mapMatrix_apply, h2, Matrix.det_mul, Matrix.det_mul,
+      Matrix.det_nonsing_inv, Matrix.det_transpose, Ring.inverse_eq_inv, mul_right_comm,
+      inv_mul_cancel₀ hJt, one_mul, hgi]
   set u := Neutral.B1.localIdele F v (GlobalTheory.SplitFlip.gdet g) with hu
   set zz : (AE F E)ˣ := Units.map (algebraMap (AF F) (AE F E) : AF F →* AE F E) u with hzz
-  have hzt : ∀ τ : E →ₐ[F] Fv F v, piW τ (zz : AE F E) = (GlobalTheory.SplitFlip.gdet g : Fv F v) := fun τ => by
+  have hzt
+      : ∀ τ : E →ₐ[F] Fv F v,
+        piW τ (zz : AE F E) = (GlobalTheory.SplitFlip.gdet g : Fv F v) := fun τ => by
     show piW τ (algebraMap (AF F) (AE F E) (u : AF F)) = _
     rw [piW_algebraMap]
     exact Neutral.B1.localIdele_snd_self F v _
   have hzat : At (evFin F v) ((zz : AE F E) - 1) := at_localIdele v _
   have hνz : X.ν zz = 1 := ratio_algebraMap_eq_one hT.chars.resα hT.chars.resβ hT.geo.even u
   have hyat : At (evFin F v) (((D * zz : (AE F E)ˣ) : AE F E) - 1) := by
-    have e : ((D * zz : (AE F E)ˣ) : AE F E) - 1 = ((D : AE F E) - 1) * zz + ((zz : AE F E) - 1) := by
+    have e
+        : ((D * zz : (AE F E)ˣ) : AE F E) - 1 = ((D : AE F E) - 1) * zz + ((zz : AE F E) - 1) := by
       rw [Units.val_mul]; ring
     rw [e]
     exact at_add (at_mul (at_det_sub_one hat) _) hzat

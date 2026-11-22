@@ -22,11 +22,9 @@ section Host
 
 variable {R : Ranks} (H : Host R)
 
-theorem galE_sigmaOf (g : R.GG) : H.galE (H.sigmaOf g) = g :=
-  (H.gal).apply_symm_apply g
+theorem galE_sigmaOf (g : R.GG) : H.galE (H.sigmaOf g) = g := (H.gal).apply_symm_apply g
 
-theorem sigmaOf_galE (σ : H.E ≃ₐ[ℚ] H.E) : H.sigmaOf (H.galE σ) = σ :=
-  (H.gal).symm_apply_apply σ
+theorem sigmaOf_galE (σ : H.E ≃ₐ[ℚ] H.E) : H.sigmaOf (H.galE σ) = σ := (H.gal).symm_apply_apply σ
 
 theorem gal_comm (s t : H.E ≃ₐ[ℚ] H.E) : s * t = t * s := by
   apply (H.gal).injective
@@ -62,8 +60,9 @@ theorem mem_K_iff (x : H.E) : x ∈ H.K ↔ ∀ τ : R.Psi, H.sigmaOf τ x = x :
     have := hx ⟨_, (key σ).1 hσ⟩
     rwa [sigmaOf_galE] at this
 
-theorem unram (P : HeightOneSpectrum (𝓞 H.E)) :
-    ¬ (P.asIdeal.comap (algebraMap (𝓞 H.F) (𝓞 H.E))).map (algebraMap (𝓞 H.F) (𝓞 H.E)) ≤ P.asIdeal ^ 2 := by
+theorem unram (P : HeightOneSpectrum (𝓞 H.E))
+    : ¬ (P.asIdeal.comap (algebraMap (𝓞 H.F) (𝓞 H.E))).map (algebraMap (𝓞 H.F) (𝓞 H.E))
+      ≤ P.asIdeal ^ 2 := by
   have hcm : IsCMField H.E := H.isCMField_hostE
   intro hle
   obtain ⟨π, hπ⟩ := (P.under (𝓞 H.F)).intValuation_exists_uniformizer
@@ -72,16 +71,22 @@ theorem unram (P : HeightOneSpectrum (𝓞 H.E)) :
     rwa [pow_one] at this
   have h2 : algebraMap (𝓞 H.F) (𝓞 H.E) π ∈ P.asIdeal ^ 2 := hle (Ideal.mem_map_of_mem _ hmem)
   have h3 := (P.intValuation_le_pow_iff_mem _ 2).2 h2
-  have h4 := HostCM.valuation_eq_of_unram H.E (fun P hP h0 h =>
-    H.der.unramEF P hP h0 fun x => by
-      have hx : H.conj • x = IsCMField.complexConj H.E • x :=
-        RingOfIntegers.ext (H.φ₀.injective ((H.conjE_apply H.φ₀ x).trans
-          (IsCMField.complexEmbedding_complexConj H.E H.φ₀ x).symm))
-      rw [hx]
-      exact h x) P (π : H.F)
-  have h5 : P.valuation H.E (algebraMap (𝓞 H.E) H.E (algebraMap (𝓞 H.F) (𝓞 H.E) π)) =
-      (P.under (𝓞 H.F)).valuation H.F (algebraMap (𝓞 H.F) H.F π) := h4
-  rw [HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.valuation_of_algebraMap, hπ] at h5
+  have h4 :=
+    HostCM.valuation_eq_of_unram H.E
+      (fun P hP h0 h =>
+        H.der.unramEF P hP h0 fun x => by
+          have hx : H.conj • x = IsCMField.complexConj H.E • x :=
+            RingOfIntegers.ext (H.φ₀.injective ((H.conjE_apply H.φ₀ x).trans
+              (IsCMField.complexEmbedding_complexConj H.E H.φ₀ x).symm))
+          rw [hx]
+          exact h x)
+      P (π : H.F)
+  have h5
+      : P.valuation H.E (algebraMap (𝓞 H.E) H.E (algebraMap (𝓞 H.F) (𝓞 H.E) π))
+        = (P.under (𝓞 H.F)).valuation H.F (algebraMap (𝓞 H.F) H.F π) :=
+    h4
+  rw [HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.valuation_of_algebraMap, hπ]
+    at h5
   rw [h5, WithZero.exp_le_exp] at h3
   omega
 
@@ -89,8 +94,8 @@ end Host
 
 variable (B : Base)
 
-theorem embLL_comp_embBar (τ : Tau B.R) :
-    B.embLL.comp (B.fields.embBar τ) = B.host.emb ((τ : B.R.GG) * B.R.cc) := by
+theorem embLL_comp_embBar (τ : Tau B.R)
+    : B.embLL.comp (B.fields.embBar τ) = B.host.emb ((τ : B.R.GG) * B.R.cc) := by
   rw [Formalism.L2.Geo.emb_mul_cc_comp, ← B.fields_embC]
   refine RingHom.ext fun x => ?_
   exact congrArg (fun y => B.embLL (B.tauLL τ y)) (B.fields_sig x)
@@ -116,25 +121,27 @@ theorem fields_ok : B.fields.Ok := by
   have cm := host_cmData B.R B.host
   have hinj : ∀ {φ ψ : B.host.E →+* B.LL}, B.embLL.comp φ = B.embLL.comp ψ → φ = ψ := fun h =>
     RingHom.ext fun x => B.embLL.injective (RingHom.congr_fun h x)
-  refine
-    { realF := cm.totReal
-      rankE := cm.deg2
-      star_F := fun x => (cm.fixed _).2 ⟨x, rfl⟩
-      conjE := fun φ x => ?_
-      cplxE := inferInstanceAs (IsTotallyComplex B.host.E)
-      emb_star := fun τ x => ?_
-      card_Tau := ?_
-      emb_inj := fun τ τ' h => ?_
-      emb_ne := fun τ τ' h => ?_
-      emb_all := fun φ => ?_
-      cplxK := ?_
-      normalK := inferInstanceAs (Normal ℚ B.LL)
-      conjK := ⟨B.embLL, B.starLL_cx⟩
-      quad := ?_ }
+  refine {
+    realF := cm.totReal
+    rankE := cm.deg2
+    star_F := fun x => (cm.fixed _).2 ⟨x, rfl⟩
+    conjE := fun φ x => ?_
+    cplxE := inferInstanceAs (IsTotallyComplex B.host.E)
+    emb_star := fun τ x => ?_
+    card_Tau := ?_
+    emb_inj := fun τ τ' h => ?_
+    emb_ne := fun τ τ' h => ?_
+    emb_all := fun φ => ?_
+    cplxK := ?_
+    normalK := inferInstanceAs (Normal ℚ B.LL)
+    conjK := ⟨B.embLL, B.starLL_cx⟩
+    quad := ?_
+  }
   · exact (congrArg φ (B.fields_star x)).trans (B.host.conjE_apply φ x)
   · apply B.embLL.injective
     rw [B.starLL_cx]
-    exact (congrArg (B.embLL.comp (B.tauLL τ)) (B.fields_star x)).trans (B.host.conjE_apply (B.embLL.comp (B.tauLL τ)) x)
+    exact (congrArg (B.embLL.comp (B.tauLL τ)) (B.fields_star x)).trans
+      (B.host.conjE_apply (B.embLL.comp (B.tauLL τ)) x)
   · refine (card_Tau B.host).trans (Eq.trans ?_ (B.host.finrank_hostF).symm)
     rfl
   · have h1 := congrArg B.embLL.comp h
@@ -161,9 +168,11 @@ theorem fields_ok : B.fields.Ok := by
       RingEquiv.subringCongr (s := B.fields.Kq.toSubring) (t := B.host.K.toSubfield.toSubring)
         (Subring.ext fun x => mem_Kq_iff B x)
     rw [← SplitK.finrank_K B.host.hyp.2.1.pos B.host.sqrtMinusD_sq]
-    exact (AlgEquiv.ofRingEquiv (R := ℚ) (f := e) (fun r => map_ratCast e r)).toLinearEquiv.finrank_eq
+    exact (AlgEquiv.ofRingEquiv (R := ℚ) (f := e)
+      (fun r => map_ratCast e r)).toLinearEquiv.finrank_eq
 
-theorem fields_satisfy_definite_laws : ∀ B : Base, B.fields.AbelianUnramifiedExtensionConditions ∧ B.fields.f = B.R.f := by
+theorem fields_satisfy_definite_laws
+    : ∀ B : Base, B.fields.AbelianUnramifiedExtensionConditions ∧ B.fields.f = B.R.f := by
   intro B
   refine ⟨⟨fields_ok B, ?_, B.host.hostE_isGalois, gal_comm B.host, unram B.host⟩, B.fields_f⟩
   rw [B.fields_f]

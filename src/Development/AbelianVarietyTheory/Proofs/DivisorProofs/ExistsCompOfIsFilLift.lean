@@ -24,11 +24,13 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-  TensorProduct NumberField
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj TensorProduct NumberField
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.RealMult GlobalTheory.AbDual GlobalTheory.AbLaw
-  GlobalTheory.CechPic GlobalTheory.Published
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham
+  GlobalTheory.RealMult GlobalTheory.AbDual GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.Published
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -40,7 +42,8 @@ section Crystal
 
 variable {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A] {g : ℕ}
 
-theorem fst_surj : Function.Surjective (fstHom R R R).toRingHom := fun r ↦ ⟨TrivSqZeroExt.inl r, rfl⟩
+theorem fst_surj : Function.Surjective (fstHom R R R).toRingHom := fun r ↦
+  ⟨TrivSqZeroExt.inl r, rfl⟩
 
 variable {d d' : Crys (epsDP R) (DeRham.epsRed R) A} {f f' k k' : HdR A}
 
@@ -50,7 +53,9 @@ variable (κ : Fil A →ₗ[R] Serre.Lie a)
 
 end Crystal
 
-variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F] {𝔠 : FracId F} {R : Type} [CommRing R]
+variable
+  {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
+  {𝔠 : FracId F} {R : Type} [CommRing R]
   {X : Obj F 𝔠 (Sp R)}
 
 end GlobalTheory.KSBijection

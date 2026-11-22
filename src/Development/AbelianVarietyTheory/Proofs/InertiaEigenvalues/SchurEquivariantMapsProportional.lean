@@ -8,15 +8,14 @@ namespace GlobalTheory
 
 theorem schur_proportional_of_range_le
     (H W X : Type) [Group H] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] [Nontrivial W]
-    [AddCommGroup X] [Module ℂ X] (ρ : H → Module.End ℂ W) (a : H → Module.End ℂ X)
-    (φ ξ : W →ₗ[ℂ] X)
-    (hirr : ∀ U : Submodule ℂ W, (∀ h, U.map (ρ h) ≤ U) → U = ⊥ ∨ U = ⊤)
-    (hξ : Function.Injective ξ) (hr : LinearMap.range φ ≤ LinearMap.range ξ)
-    (hφe : ∀ h w, φ (ρ h w) = a h (φ w)) (hξe : ∀ h w, ξ (ρ h w) = a h (ξ w)) :
-    ∃ c : ℂ, φ = c • ξ := by
+    [AddCommGroup X] [Module ℂ X]
+    (ρ : H → Module.End ℂ W) (a : H → Module.End ℂ X) (φ ξ : W →ₗ[ℂ] X)
+    (hirr : ∀ U : Submodule ℂ W, (∀ h, U.map (ρ h) ≤ U) → U = ⊥ ∨ U = ⊤) (hξ : Function.Injective ξ)
+    (hr : LinearMap.range φ ≤ LinearMap.range ξ) (hφe : ∀ h w, φ (ρ h w) = a h (φ w))
+    (hξe : ∀ h w, ξ (ρ h w) = a h (ξ w))
+    : ∃ c : ℂ, φ = c • ξ := by
   obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective ξ (LinearMap.ker_eq_bot.mpr hξ)
-  have hgx : ∀ v, g (ξ v) = v := fun v => by
-    simpa using LinearMap.congr_fun hg v
+  have hgx : ∀ v, g (ξ v) = v := fun v => by simpa using LinearMap.congr_fun hg v
   set A : Module.End ℂ W := g ∘ₗ φ with hA
   have hxA : ∀ w, ξ (A w) = φ w := by
     intro w
@@ -50,9 +49,14 @@ theorem schur_proportional_of_range_le
   rw [hmemU] at hw
   rw [LinearMap.smul_apply, ← hxA, hw, map_smul]
 
-theorem schur_proportional :
-    ∀ (H W X : Type) [Group H] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] [Nontrivial W] [AddCommGroup X] [Module ℂ X] (ρ : H → Module.End ℂ W) (a : H → Module.End ℂ X) (φ ξ : W →ₗ[ℂ] X), (∀ U : Submodule ℂ W, (∀ h, U.map (ρ h) ≤ U) → U = ⊥ ∨ U = ⊤) → Function.Injective ξ → LinearMap.range φ ≤ LinearMap.range ξ → (∀ h w, φ (ρ h w) = a h (φ w)) → (∀ h w, ξ (ρ h w) = a h (ξ w)) → ∃ c : ℂ, φ = c • ξ :=
-  fun H W X _ _ _ _ _ _ _ ρ a φ ξ hirr hξ hr hφe hξe =>
-    schur_proportional_of_range_le H W X ρ a φ ξ hirr hξ hr hφe hξe
+theorem schur_proportional
+    : ∀ (H W X : Type) [Group H] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+        [Nontrivial W] [AddCommGroup X] [Module ℂ X] (ρ : H → Module.End ℂ W)
+        (a : H → Module.End ℂ X) (φ ξ : W →ₗ[ℂ] X),
+      (∀ U : Submodule ℂ W, (∀ h, U.map (ρ h) ≤ U) → U = ⊥ ∨ U = ⊤) → Function.Injective ξ
+        → LinearMap.range φ ≤ LinearMap.range ξ → (∀ h w, φ (ρ h w) = a h (φ w))
+        → (∀ h w, ξ (ρ h w) = a h (ξ w))
+        → ∃ c : ℂ, φ = c • ξ := fun H W X _ _ _ _ _ _ _ ρ a φ ξ hirr hξ hr hφe hξe =>
+  schur_proportional_of_range_le H W X ρ a φ ξ hirr hξ hr hφe hξe
 
 end GlobalTheory

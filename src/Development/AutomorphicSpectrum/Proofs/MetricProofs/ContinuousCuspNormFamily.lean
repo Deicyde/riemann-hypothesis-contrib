@@ -6,7 +6,8 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannLattice
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp
 
 noncomputable section
 
@@ -46,23 +47,24 @@ theorem span_charVec : Submodule.span ℂ (Set.range (charVec (E := E))) = ⊤ :
   apply hf0
   have li := (linearIndependent_monoidHom (𝓞 E) ℂ).comp _ (toChar_injective (E := E))
   rw [Fintype.linearIndependent_iff] at li
-  have hl := li (fun s => f fun j => if s = j then 1 else 0) (by
-    funext a
-    have h1 : f (charVec a) = 0 := hf (Submodule.subset_span ⟨a, rfl⟩)
-    rw [LinearMap.pi_apply_eq_sum_univ] at h1
-    simp only [Finset.sum_apply, Pi.smul_apply, Function.comp, smul_eq_mul, Pi.zero_apply]
-    refine Eq.trans ?_ h1
-    refine Finset.sum_congr rfl fun s _ => ?_
-    rw [smul_eq_mul]
-    exact mul_comm (_ : ℂ) _)
+  have hl :=
+    li (fun s => f fun j => if s = j then 1 else 0) (by
+      funext a
+      have h1 : f (charVec a) = 0 := hf (Submodule.subset_span ⟨a, rfl⟩)
+      rw [LinearMap.pi_apply_eq_sum_univ] at h1
+      simp only [Finset.sum_apply, Pi.smul_apply, Function.comp, smul_eq_mul, Pi.zero_apply]
+      refine Eq.trans ?_ h1
+      refine Finset.sum_congr rfl fun s _ => ?_
+      rw [smul_eq_mul]
+      exact mul_comm (_ : ℂ) _)
   refine LinearMap.ext fun v => ?_
   rw [LinearMap.pi_apply_eq_sum_univ f v, LinearMap.zero_apply]
   exact Finset.sum_eq_zero fun s _ => (congrArg (v s • ·) (hl s)).trans (smul_zero _)
 
-
 open Classical in
-theorem exists_coeff (s : E →+* ℂ) : ∃ c : 𝓞 E →₀ ℂ, ∀ s' : E →+* ℂ,
-    ∑ a ∈ c.support, c a * s' (algebraMap (𝓞 E) E a) = if s' = s then 1 else 0 := by
+theorem exists_coeff (s : E →+* ℂ)
+    : ∃ c : 𝓞 E →₀ ℂ, ∀ s' : E →+* ℂ,
+      ∑ a ∈ c.support, c a * s' (algebraMap (𝓞 E) E a) = if s' = s then 1 else 0 := by
   have h : (Pi.single s 1 : (E →+* ℂ) → ℂ) ∈ Submodule.span ℂ (Set.range (charVec (E := E))) := by
     rw [span_charVec]
     trivial
@@ -73,21 +75,28 @@ theorem exists_coeff (s : E →+* ℂ) : ∃ c : 𝓞 E →₀ ℂ, ∀ s' : E �
 
 end Emb
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
 
-theorem mem_eigSp_iff (R : RiemLat E g Λ) {s : 𝓞 E →+* ℂ} {x : Fin g → ℂ} :
-    x ∈ eigSp R.B s ↔ ∀ a, R.B a x = s a • x := by
+theorem mem_eigSp_iff (R : RiemLat E g Λ) {s : 𝓞 E →+* ℂ} {x : Fin g → ℂ}
+    : x ∈ eigSp R.B s ↔ ∀ a, R.B a x = s a • x := by
   simp [eigSp, Submodule.mem_iInf, sub_eq_zero]
 
-
 open Classical in
-theorem eigComp_eq (R : RiemLat E g Λ) (s : E →+* ℂ) (c : 𝓞 E →₀ ℂ)
-    (hc : ∀ s' : E →+* ℂ, ∑ a ∈ c.support, c a * s' (algebraMap (𝓞 E) E a) = if s' = s then 1 else 0)
-    (u : Λ) :
-    eigComp R.B (s.comp (algebraMap (𝓞 E) E)) (R.P u) = ∑ a ∈ c.support, c a • R.P (a • u) := by
+theorem eigComp_eq
+    (R : RiemLat E g Λ)
+    (s : E →+* ℂ) (c : 𝓞 E →₀ ℂ)
+    (hc
+      : ∀ s' : E →+* ℂ, ∑ a ∈ c.support, c a * s' (algebraMap (𝓞 E) E a) = if s' = s then 1 else 0)
+    (u : Λ)
+    : eigComp R.B (s.comp (algebraMap (𝓞 E) E)) (R.P u) = ∑ a ∈ c.support, c a • R.P (a • u) := by
   obtain ⟨-, -, h3, h4, -⟩ := GlobalTheory.T.riemann_lattice_eigen_projection E g Λ Unit R
-  have hy : ∀ a : 𝓞 E, R.P (a • u) = ∑ s' : E →+* ℂ, s' (algebraMap (𝓞 E) E a) •
-      eigComp R.B (s'.comp (algebraMap (𝓞 E) E)) (R.P u) := by
+  have hy
+      : ∀ a : 𝓞 E,
+        R.P (a • u)
+          = ∑ s' : E →+* ℂ, s' (algebraMap (𝓞 E) E a) •
+            eigComp R.B (s'.comp (algebraMap (𝓞 E) E)) (R.P u) := by
     intro a
     rw [R.act]
     conv_lhs => rw [← h4 (R.P u)]
@@ -102,8 +111,9 @@ theorem eigComp_eq (R : RiemLat E g Λ) (s : E →+* ℂ) (c : 𝓞 E →₀ ℂ
 
 variable {X : Type} [TopologicalSpace X]
 
-theorem continuous_eigComp (R : X → RiemLat E g Λ) (hP : ∀ v, Continuous fun x => (R x).P v)
-    (s : 𝓞 E →+* ℂ) (u : Λ) : Continuous fun x => eigComp (R x).B s ((R x).P u) := by
+theorem continuous_eigComp
+    (R : X → RiemLat E g Λ) (hP : ∀ v, Continuous fun x => (R x).P v) (s : 𝓞 E →+* ℂ) (u : Λ)
+    : Continuous fun x => eigComp (R x).B s ((R x).P u) := by
   classical
   obtain ⟨c, hc⟩ := exists_coeff (extEmb s)
   have h : ∀ x, eigComp (R x).B s ((R x).P u) = ∑ a ∈ c.support, c a • (R x).P (a • u) := by
@@ -113,25 +123,32 @@ theorem continuous_eigComp (R : X → RiemLat E g Λ) (hP : ∀ v, Continuous fu
   simp_rw [h]
   exact continuous_finsetSum _ fun a _ => (hP (a • u)).const_smul (c a)
 
-theorem continuous_ip (R : X → RiemLat E g Λ) (hH : Continuous fun x => (R x).Hm) {p q : X → Fin g → ℂ}
-    (hp : Continuous p) (hq : Continuous q) : Continuous fun x => (R x).ip (p x) (q x) := by
+theorem continuous_ip
+    (R : X → RiemLat E g Λ) (hH : Continuous fun x => (R x).Hm)
+    {p q : X → Fin g → ℂ} (hp : Continuous p) (hq : Continuous q)
+    : Continuous fun x => (R x).ip (p x) (q x) := by
   unfold RiemLat.ip
   exact hq.dotProduct (hH.matrix_mulVec (continuous_star.comp hp))
 
-theorem continuous_nzOf {Ψ : Type} [Fintype Ψ] (R : X → RiemLat E g Λ)
+theorem continuous_nzOf
+    {Ψ : Type} [Fintype Ψ]
+    (R : X → RiemLat E g Λ)
     (hP : ∀ v, Continuous fun x => (R x).P v) (hH : Continuous fun x => (R x).Hm)
-    (σ : Ψ → (𝓞 E →+* ℂ)) (I : Submodule (𝓞 E) Λ) {r : ℕ} (v : Fin r → Λ) :
-    Continuous fun x => (R x).nzOf σ I v := by
+    (σ : Ψ → (𝓞 E →+* ℂ)) (I : Submodule (𝓞 E) Λ)
+    {r : ℕ} (v : Fin r → Λ)
+    : Continuous fun x => (R x).nzOf σ I v := by
   unfold RiemLat.nzOf
   refine Continuous.div_const (continuous_finsetProd _ fun τ _ => ?_) _
   refine Complex.continuous_re.comp (Continuous.matrix_det ?_)
   refine continuous_matrix fun a b => ?_
   exact continuous_ip R hH (continuous_eigComp R hP _ _) (continuous_eigComp R hP _ _)
 
-theorem continuous_nz : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (Λ : Type) [AddCommGroup Λ]
-    [Module (𝓞 E) Λ] (Ψ : Type) [Fintype Ψ] (X : Type) [TopologicalSpace X] (R : X → RiemLat E g Λ)
-    (σ : Ψ → (𝓞 E →+* ℂ)) (I : Submodule (𝓞 E) Λ), (∀ v, Continuous fun x => (R x).P v) →
-    (Continuous fun x => (R x).Hm) → Continuous fun x => (R x).nz σ I := by
+theorem continuous_nz
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (Λ : Type) [AddCommGroup Λ]
+        [Module (𝓞 E) Λ] (Ψ : Type) [Fintype Ψ] (X : Type) [TopologicalSpace X]
+        (R : X → RiemLat E g Λ) (σ : Ψ → (𝓞 E →+* ℂ)) (I : Submodule (𝓞 E) Λ),
+      (∀ v, Continuous fun x => (R x).P v) → (Continuous fun x => (R x).Hm)
+        → Continuous fun x => (R x).nz σ I := by
   intro E _ _ _ g Λ _ _ Ψ _ X _ R σ I hP hH
   by_cases h : ∃ r v, GroundTheory.Heights₂.Heights.LowerBoundFree.IsNzFamily I r v
   · have e : (fun x => (R x).nz σ I) = fun x => (R x).nzOf σ I h.choose_spec.choose := by

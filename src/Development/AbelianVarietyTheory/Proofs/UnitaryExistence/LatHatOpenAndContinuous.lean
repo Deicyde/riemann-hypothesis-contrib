@@ -14,7 +14,10 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.VolProofs
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
@@ -33,12 +36,20 @@ theorem continuous_infPart (D : D7) : Continuous (infPart D) := by
   rw [this]
   exact continuous_fst.comp hc
 
-theorem continuous_finHom_val (D : D7) (V : HSp D) : Continuous (fun k : GA D V => (finHom V k).1) := by
+theorem continuous_finHom_val (D : D7) (V : HSp D)
+    : Continuous (fun k : GA D V => (finHom V k).1) := by
   have h : Continuous (fun k : GA D V => (matHom V k).1) :=
     Units.continuous_val.comp continuous_subtype_val
   exact h.matrix_map (continuous_finPart D)
 
-theorem latHat_open_and_continuous : ∀ (D : D7) (V : HSp D), (∀ N : ℕ, 0 < N → IsOpen {z : Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E | ∃ y ∈ latHat V, z = N • y}) ∧ Continuous (fun k : GA D V => (finHom V k).1) ∧ Continuous (finPart D) ∧ Continuous (infPart D) := by
+theorem latHat_open_and_continuous
+    : ∀ (D : D7) (V : HSp D),
+      (∀ N : ℕ,
+          0 < N
+            → IsOpen
+              {z : Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E | ∃ y ∈ latHat V, z = N • y})
+        ∧ Continuous (fun k : GA D V => (finHom V k).1) ∧ Continuous (finPart D)
+        ∧ Continuous (infPart D) := by
   intro D V
   refine ⟨?_, continuous_finHom_val D V, continuous_finPart D, continuous_infPart D⟩
   obtain ⟨h1, -, -, h4, -⟩ := GlobalTheory.Member.latHat_eq_hat_and_gram D V

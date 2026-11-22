@@ -9,13 +9,22 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
 noncomputable section
 namespace GlobalTheory.RowCuspFromLift
-theorem exists_isCuspParam_of_liftAt_good_index : ∀ (D : D7) (Rw : RowSide D), _root_.GlobalTheory.HeightCounting.Up.ParityLaws D → ∀ j σ π μ Pa, LiftAt D Rw j σ π μ → RowLoc D Rw σ →
-    SphericalInertData.IsBC D.nd D.naut D.nbc j π Pa → (⟨1, D.naut.tw μ D.naut.etaTinv, D.R.t⟩ : Part D.naut.CG) ∈ Pa →
-    D.nd.goodRow σ → ∃ π', GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.IsCuspParam D Rw σ π' := by
+theorem exists_isCuspParam_of_liftAt_good_index
+    : ∀ (D : D7) (Rw : RowSide D),
+      _root_.GlobalTheory.HeightCounting.Up.ParityLaws D
+        → ∀ j σ π μ Pa,
+          LiftAt D Rw j σ π μ → RowLoc D Rw σ → SphericalInertData.IsBC D.nd D.naut D.nbc j π Pa
+            → (⟨1, D.naut.tw μ D.naut.etaTinv, D.R.t⟩ : Part D.naut.CG) ∈ Pa → D.nd.goodRow σ
+            → ∃ π',
+              GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.IsCuspParam D Rw σ π' := by
   intro D Rw hP j σ π μ Pa hL hR hB hm hg
   have hLP : SumRepresentations.At.TieLP D.nd D.naut := hP.tie0.1
   have hAut : SumRepresentations.At.TieAut D.nd D.naut := hP.tie0.2.1
@@ -44,20 +53,26 @@ theorem exists_isCuspParam_of_liftAt_good_index : ∀ (D : D7) (Rw : RowSide D),
       rw [← hB3]; unfold rankIso; exact ((hperm.map _).sum_eq).symm
     unfold rankIso at hr ⊢
     rw [List.map_append, List.sum_append] at hr
-    simp only [hmdef, List.map_cons, List.map_nil, List.sum_cons, List.sum_nil, one_mul, add_zero] at hr
+    simp only [hmdef, List.map_cons, List.map_nil, List.sum_cons, List.sum_nil, one_mul, add_zero]
+      at hr
     have : D.R.nV = D.R.r + D.R.t := rfl
     omega
-  have hloc : ∀ w, IsSplitPl D.host w →
-      isoLoc D.nd D.naut (twistIso D.nd D.naut L D.naut.etaT) w = Rw.locR σ w := by
+  have hloc
+      : ∀ w,
+        IsSplitPl D.host w
+          → isoLoc D.nd D.naut (twistIso D.nd D.naut L D.naut.etaT) w = Rw.locR σ w := by
     intro w hw
     have e1 := hB4 w hw
-    rw [hL.loc w hw, GlobalTheory.RowThetaParam.isoLoc_perm D.nd D.naut hperm, GlobalTheory.RowThetaParam.isoLoc_append,
-      (hLP w (Rw.locR σ w) (spehLoc D.nd D.naut ⟨1, μ, D.R.t⟩ w)
-        (D.naut.locG D.naut.etaTinv w) (D.naut.locG D.naut.etaTinv w) 0 (D.naut.locG_dim _ w)
-        (D.naut.locG_dim _ w)).1] at e1
-    have e2 : isoLoc D.nd D.naut [m] w =
-        D.naut.lpChar (spehLoc D.nd D.naut ⟨1, μ, D.R.t⟩ w) (D.naut.locG D.naut.etaTinv w) := by
-      rw [GlobalTheory.RowThetaParam.isoLoc_cons, GlobalTheory.RowThetaParam.isoLoc_nil, D.naut.lpSum_zero]
+    rw [hL.loc w hw, GlobalTheory.RowThetaParam.isoLoc_perm D.nd D.naut hperm,
+        GlobalTheory.RowThetaParam.isoLoc_append,
+        (hLP w (Rw.locR σ w) (spehLoc D.nd D.naut ⟨1, μ, D.R.t⟩ w) (D.naut.locG D.naut.etaTinv w)
+          (D.naut.locG D.naut.etaTinv w) 0 (D.naut.locG_dim _ w) (D.naut.locG_dim _ w)).1]
+      at e1
+    have e2
+        : isoLoc D.nd D.naut [m] w
+          = D.naut.lpChar (spehLoc D.nd D.naut ⟨1, μ, D.R.t⟩ w) (D.naut.locG D.naut.etaTinv w) := by
+      rw [GlobalTheory.RowThetaParam.isoLoc_cons, GlobalTheory.RowThetaParam.isoLoc_nil,
+        D.naut.lpSum_zero]
       exact GlobalTheory.RowThetaParam.spehLoc_tw D.nd D.naut hLP hC ⟨1, μ, D.R.t⟩ D.naut.etaTinv w
     rw [e2] at e1
     have e3 := hC w _ _ _ e1
@@ -70,16 +85,23 @@ theorem exists_isCuspParam_of_liftAt_good_index : ∀ (D : D7) (Rw : RowSide D),
   obtain ⟨rfl, h2, rfl⟩ := hq
   have h2' := eq_of_heq h2
   subst h2'
-  have hmemq : (⟨D.R.r, ρ, 1⟩ : Part D.naut.CG) ∈ l₁ ++ m :: l₂ := hLmem _ (by rw [hLq]; exact List.mem_singleton_self _)
-  have hsplit : ∀ w, IsSplitPl D.host w → D.naut.locG (D.naut.tw ρ D.naut.etaT) w = Rw.locR σ w := by
+  have hmemq : (⟨D.R.r, ρ, 1⟩ : Part D.naut.CG) ∈ l₁ ++ m :: l₂ :=
+    hLmem _ (by rw [hLq]; exact List.mem_singleton_self _)
+  have hsplit
+      : ∀ w, IsSplitPl D.host w → D.naut.locG (D.naut.tw ρ D.naut.etaT) w = Rw.locR σ w := by
     intro w hw
     have hs := hloc w hw
     rw [hπ', SphericalInertData.isoLoc_single] at hs
     exact hs
-  have hinf : ∀ τ : D.what₂.Tau, D.naut.infG (D.naut.tw ρ D.naut.etaT) (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D τ) =
-        GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.hcSigma (D.hc τ) ∧
-      D.naut.infG (D.naut.tw ρ D.naut.etaT) (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTauBar D τ) =
-        (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.hcSigma (D.hc τ)).map (fun z => -z) := by
+  have hinf
+      : ∀ τ : D.what₂.Tau,
+        D.naut.infG (D.naut.tw ρ D.naut.etaT)
+              (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D τ)
+            = GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.hcSigma (D.hc τ)
+          ∧ D.naut.infG (D.naut.tw ρ D.naut.etaT)
+              (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTauBar D τ)
+            = (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.hcSigma (D.hc τ)).map
+              (fun z => -z) := by
     intro τ
     have eA := hB6 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D τ)
     have eB := hB6 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTauBar D τ)
@@ -88,17 +110,32 @@ theorem exists_isCuspParam_of_liftAt_good_index : ∀ (D : D7) (Rw : RowSide D),
     have fA := add_right_cancel eA
     have fB := add_right_cancel eB
     rw [hLq, isoInf_one] at fA fB
-    have gA := (eta_emb _ (hAut.2.1 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D τ)).1).1
-      (((hAut.2.1 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D τ)).2).symm.trans (hL.eta τ).1)
-    have gB := (eta_emb _ (hAut.2.1 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTauBar D τ)).1).2
-      (((hAut.2.1 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTauBar D τ)).2).symm.trans (hL.eta τ).2)
+    have gA :=
+      (eta_emb _
+          (hAut.2.1 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D τ)).1).1
+        (((hAut.2.1 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D
+          τ)).2).symm.trans (hL.eta τ).1)
+    have gB :=
+      (eta_emb _
+          (hAut.2.1 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTauBar D τ)).1).2
+        (((hAut.2.1 (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTauBar D
+          τ)).2).symm.trans (hL.eta τ).2)
     rw [D.naut.infG_tw _ _ _ _ gA, D.naut.infG_tw _ _ _ _ gB, fA, fB]
     simp [Multiset.map_map, Function.comp_def]
-  refine ⟨D.naut.tw ρ D.naut.etaT, D.naut.csd_tw ρ D.naut.etaT hAut.1.1 (hB1 _ hmemq).2.2, GlobalTheory.RowRegAlg.ralg_of_infG D _ hinf, hsplit,
-    fun w hw => ?_, fun w hw hw' => ?_, hinf⟩
+  refine ⟨
+    D.naut.tw ρ D.naut.etaT,
+    D.naut.csd_tw ρ D.naut.etaT hAut.1.1 (hB1 _ hmemq).2.2,
+    GlobalTheory.RowRegAlg.ralg_of_infG D _ hinf,
+    hsplit,
+    fun w hw => ?_,
+    fun w hw hw' => ?_,
+    hinf
+  ⟩
   · have hu := (hB5 w hw).1
-    rw [GlobalTheory.RowThetaParam.isoLoc_perm D.nd D.naut hperm, GlobalTheory.RowThetaParam.isoLoc_append, D.naut.unr_sum, hLq,
-      SphericalInertData.isoLoc_single] at hu
+    rw [GlobalTheory.RowThetaParam.isoLoc_perm D.nd D.naut hperm,
+        GlobalTheory.RowThetaParam.isoLoc_append, D.naut.unr_sum, hLq,
+        SphericalInertData.isoLoc_single]
+      at hu
     rw [D.naut.locG_tw]
     exact D.naut.unr_char _ _ (D.naut.locG_dim _ w) hu.1 (D.naut.etaT_unr w)
   · rw [hsplit w hw]

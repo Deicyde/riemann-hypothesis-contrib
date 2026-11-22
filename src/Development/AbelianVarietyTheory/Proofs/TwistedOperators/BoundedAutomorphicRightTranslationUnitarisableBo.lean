@@ -12,8 +12,13 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Integrabl
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep GlobalTheory.FinZeta GlobalTheory.AdelicScalar GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep
+  GlobalTheory.FinZeta GlobalTheory.AdelicScalar
+  GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
 open Formalism.IndefR.Lev (levG levChi IsBaseFrame)
 open Formalism.UG (IsUnifV qV IsUnramInv GU KU IsInertAt Hecke dosetInd IsCommensurated)
 open Formalism.MainNotions.SchurIrreducible (IsSplit)
@@ -28,66 +33,86 @@ section
 
 variable {D : D7} {V : HSp D} {ν : Measure (GA D V)} {𝓕 : Set (GA D V)}
 
-private theorem zero_one_mem_gammaSet_one (f : bddAut V) : Continuous (f : GA D V → ℂ) ∧
-    (∀ γ ∈ GQ V, ∀ g, (f : GA D V → ℂ) (γ * g) = (f : GA D V → ℂ) g) ∧
-    ∃ C : ℝ, ∀ g, ‖(f : GA D V → ℂ) g‖ ≤ C := f.2
+private theorem zero_one_mem_gammaSet_one (f : bddAut V)
+    : Continuous (f : GA D V → ℂ) ∧ (∀ γ ∈ GQ V, ∀ g, (f : GA D V → ℂ) (γ * g) = (f : GA D V → ℂ) g)
+      ∧ ∃ C : ℝ, ∀ g, ‖(f : GA D V → ℂ) g‖ ≤ C :=
+  f.2
 
-private theorem integrableOn_fundamentalDomain_of_bounded {E : Type} [NormedAddCommGroup E] (hν : ν.IsHaarMeasure)
-    (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν) {φ : GA D V → E} (hφ : Continuous φ) (C : ℝ)
-    (hC : ∀ g, ‖φ g‖ ≤ C) : IntegrableOn φ 𝓕 ν := by
+private theorem integrableOn_fundamentalDomain_of_bounded
+    {E : Type} [NormedAddCommGroup E]
+    (hν : ν.IsHaarMeasure) (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν)
+    {φ : GA D V → E} (hφ : Continuous φ)
+    (C : ℝ) (hC : ∀ g, ‖φ g‖ ≤ C)
+    : IntegrableOn φ 𝓕 ν := by
   have hT := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V
   haveI := hT.2.1
   haveI := hT.2.2.2.1
   exact Measure.integrableOn_of_bounded
-    (GlobalTheory.CuspDecay.measure_lt_top GlobalTheory.Mem.VolFin.finVol V ν 𝓕 hν h𝓕).ne hφ.aestronglyMeasurable
-    (Filter.Eventually.of_forall hC)
+    (GlobalTheory.CuspDecay.measure_lt_top GlobalTheory.Mem.VolFin.finVol V ν 𝓕 hν h𝓕).ne
+    hφ.aestronglyMeasurable (Filter.Eventually.of_forall hC)
 
-theorem integrableOn_mul_conj_bddAut (hν : ν.IsHaarMeasure) (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν) (f f₂ : bddAut V) :
-    IntegrableOn (fun g => (f : GA D V → ℂ) g * starRingEnd ℂ ((f₂ : GA D V → ℂ) g)) 𝓕 ν := by
+theorem integrableOn_mul_conj_bddAut
+    (hν : ν.IsHaarMeasure) (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν) (f f₂ : bddAut V)
+    : IntegrableOn (fun g => (f : GA D V → ℂ) g * starRingEnd ℂ ((f₂ : GA D V → ℂ) g)) 𝓕 ν := by
   obtain ⟨hc, -, C, hC⟩ := zero_one_mem_gammaSet_one f
   obtain ⟨hc₂, -, C₂, hC₂⟩ := zero_one_mem_gammaSet_one f₂
-  refine integrableOn_fundamentalDomain_of_bounded hν h𝓕 (hc.mul (Complex.continuous_conj.comp hc₂)) (C * C₂) fun g => ?_
+  refine integrableOn_fundamentalDomain_of_bounded hν h𝓕 (hc.mul (Complex.continuous_conj.comp hc₂))
+    (C * C₂) fun g => ?_
   rw [norm_mul, Complex.norm_conj]
   exact mul_le_mul (hC g) (hC₂ g) (norm_nonneg _) ((norm_nonneg _).trans (hC 1))
 
-theorem exists_form_bddAut (hν : ν.IsHaarMeasure) (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν) :
-    ∃ B : bddAut V →ₗ[ℂ] bddAut V →ₛₗ[starRingEnd ℂ] ℂ, ∀ f f₂, B f f₂ = l2 ν 𝓕 (f : GA D V → ℂ) f₂ := by
-  refine ⟨LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
-    (fun f f₂ : bddAut V => l2 ν 𝓕 (f : GA D V → ℂ) f₂) ?_ ?_ ?_ ?_, fun f f₂ => rfl⟩
+theorem exists_form_bddAut (hν : ν.IsHaarMeasure) (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν)
+    : ∃ B : bddAut V →ₗ[ℂ] bddAut V →ₛₗ[starRingEnd ℂ] ℂ, ∀ f f₂,
+      B f f₂ = l2 ν 𝓕 (f : GA D V → ℂ) f₂ := by
+  refine ⟨
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun f f₂ : bddAut V => l2 ν 𝓕 (f : GA D V → ℂ) f₂)
+      ?_ ?_ ?_ ?_,
+    fun f f₂ => rfl
+  ⟩
   · intro a b c
-    simp only [GlobalTheory.AdelicScalar.l2, Formalism.IndefR.Lift.pet, Submodule.coe_add, Pi.add_apply, add_mul]
-    exact integral_add (integrableOn_mul_conj_bddAut hν h𝓕 a c) (integrableOn_mul_conj_bddAut hν h𝓕 b c)
+    simp only [GlobalTheory.AdelicScalar.l2, Formalism.IndefR.Lift.pet, Submodule.coe_add,
+      Pi.add_apply, add_mul]
+    exact integral_add (integrableOn_mul_conj_bddAut hν h𝓕 a c)
+      (integrableOn_mul_conj_bddAut hν h𝓕 b c)
   · intro c a b
-    simp only [GlobalTheory.AdelicScalar.l2, Formalism.IndefR.Lift.pet, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul,
-      RingHom.id_apply, mul_assoc]
+    simp only [GlobalTheory.AdelicScalar.l2, Formalism.IndefR.Lift.pet, Submodule.coe_smul,
+      Pi.smul_apply, smul_eq_mul, RingHom.id_apply, mul_assoc]
     exact integral_const_mul c _
   · intro a b c
-    simp only [GlobalTheory.AdelicScalar.l2, Formalism.IndefR.Lift.pet, Submodule.coe_add, Pi.add_apply, map_add (f := _), mul_add]
-    exact integral_add (integrableOn_mul_conj_bddAut hν h𝓕 a b) (integrableOn_mul_conj_bddAut hν h𝓕 a c)
+    simp only [GlobalTheory.AdelicScalar.l2, Formalism.IndefR.Lift.pet, Submodule.coe_add,
+      Pi.add_apply, map_add (f := _), mul_add]
+    exact integral_add (integrableOn_mul_conj_bddAut hν h𝓕 a b)
+      (integrableOn_mul_conj_bddAut hν h𝓕 a c)
   · intro c a b
-    simp only [GlobalTheory.AdelicScalar.l2, Formalism.IndefR.Lift.pet, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, map_mul]
+    simp only [GlobalTheory.AdelicScalar.l2, Formalism.IndefR.Lift.pet, Submodule.coe_smul,
+      Pi.smul_apply, smul_eq_mul, map_mul]
     rw [← integral_const_mul]
     congr 1
     funext x
     ring
 
-theorem petersson_self_re_pos_of_ne_zero (hν : ν.IsHaarMeasure) (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν) (f : bddAut V) (hf : f ≠ 0) :
-    0 < (l2 ν 𝓕 (f : GA D V → ℂ) f).re := by
+theorem petersson_self_re_pos_of_ne_zero
+    (hν : ν.IsHaarMeasure) (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν) (f : bddAut V) (hf : f ≠ 0)
+    : 0 < (l2 ν 𝓕 (f : GA D V → ℂ) f).re := by
   haveI := hν
   have hT := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V
   haveI := hT.2.2.2.1
   haveI := hT.2.2.2.2.1
   haveI := hT.2.2.2.2.2.2
   obtain ⟨hc, hi, C, hC⟩ := zero_one_mem_gammaSet_one f
-  have key : l2 ν 𝓕 (f : GA D V → ℂ) f =
-      ((∫ x in 𝓕, Complex.normSq ((f : GA D V → ℂ) x) ∂ν : ℝ) : ℂ) := by
+  have key
+      : l2 ν 𝓕 (f : GA D V → ℂ) f
+        = ((∫ x in 𝓕, Complex.normSq ((f : GA D V → ℂ) x) ∂ν : ℝ) : ℂ) := by
     simp only [GlobalTheory.AdelicScalar.l2, Formalism.IndefR.Lift.pet, Complex.mul_conj]
     exact integral_ofReal
   rw [key, Complex.ofReal_re]
   have hint : IntegrableOn (fun x => Complex.normSq ((f : GA D V → ℂ) x)) 𝓕 ν :=
-    integrableOn_fundamentalDomain_of_bounded hν h𝓕 (Complex.continuous_normSq.comp hc) (C * C) fun g => by
-      rw [Real.norm_eq_abs, abs_of_nonneg (Complex.normSq_nonneg _), Complex.normSq_eq_norm_sq, sq]
-      exact mul_le_mul (hC g) (hC g) (norm_nonneg _) ((norm_nonneg _).trans (hC 1))
+    integrableOn_fundamentalDomain_of_bounded hν h𝓕 (Complex.continuous_normSq.comp hc) (C * C)
+      fun g => by
+        rw [Real.norm_eq_abs, abs_of_nonneg (Complex.normSq_nonneg _), Complex.normSq_eq_norm_sq,
+          sq]
+        exact mul_le_mul (hC g) (hC g) (norm_nonneg _) ((norm_nonneg _).trans (hC 1))
   rw [setIntegral_pos_iff_support_of_nonneg_ae
     (Filter.Eventually.of_forall fun x => Complex.normSq_nonneg _) hint]
   set U : Set (GA D V) := {x | (f : GA D V → ℂ) x ≠ 0} with hUdef
@@ -107,8 +132,9 @@ theorem petersson_self_re_pos_of_ne_zero (hν : ν.IsHaarMeasure) (h𝓕 : IsFun
     rw [hE] at hx'
     exact hx'
   refine pos_iff_ne_zero.2 fun h0 => (hU.measure_pos ν hne).ne' ?_
-  have hsub : U ⊆ {x | ¬ ∃ γ : GQ V, γ • x ∈ 𝓕} ∪
-      ⋃ γ : GQ V, (fun x => (γ : GA D V) * x) ⁻¹' (U ∩ 𝓕) := by
+  have hsub
+      : U
+        ⊆ {x | ¬ ∃ γ : GQ V, γ • x ∈ 𝓕} ∪ ⋃ γ : GQ V, (fun x => (γ : GA D V) * x) ⁻¹' (U ∩ 𝓕) := by
     intro x hx
     by_cases hx' : ∃ γ : GQ V, γ • x ∈ 𝓕
     · obtain ⟨γ, hγ⟩ := hx'
@@ -122,8 +148,10 @@ theorem petersson_self_re_pos_of_ne_zero (hν : ν.IsHaarMeasure) (h𝓕 : IsFun
   rw [measure_preimage_mul]
   exact h0
 
-theorem petersson_bounded_automorphic_right_translation_invariant (hν : ν.IsHaarMeasure) (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν) (g : GA D V) (f f₂ : bddAut V) :
-    l2 ν 𝓕 (bddRep V g f : GA D V → ℂ) (bddRep V g f₂ : GA D V → ℂ) = l2 ν 𝓕 (f : GA D V → ℂ) f₂ := by
+theorem petersson_bounded_automorphic_right_translation_invariant
+    (hν : ν.IsHaarMeasure) (h𝓕 : IsFundamentalDomain (GQ V) 𝓕 ν) (g : GA D V) (f f₂ : bddAut V)
+    : l2 ν 𝓕 (bddRep V g f : GA D V → ℂ) (bddRep V g f₂ : GA D V → ℂ)
+      = l2 ν 𝓕 (f : GA D V → ℂ) f₂ := by
   haveI := hν
   have hT := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V
   haveI := hT.2.2.2.1
@@ -140,7 +168,14 @@ theorem petersson_bounded_automorphic_right_translation_invariant (hν : ν.IsHa
 
 end
 
-theorem bddRep_unitarisable_and_bounded : ∀ (D : D7) (V : HSp D), IsUnitarisable (bddRep V) ∧ ∀ (ν : Measure (GA D V)) (𝓕 : Set (GA D V)), ν.IsHaarMeasure → IsFundamentalDomain (GQ V) 𝓕 ν → ∀ f₂ : bddAut V, ∃ ℓ : bddAut V →ₗ[ℂ] ℂ, (∀ f : bddAut V, ℓ f = l2 ν 𝓕 (f : GA D V → ℂ) f₂) ∧ ∀ f : bddAut V, ∃ C : ℝ, ∀ g, ‖ℓ (bddRep V g f)‖ ≤ C := by
+theorem bddRep_unitarisable_and_bounded
+    : ∀ (D : D7) (V : HSp D),
+      IsUnitarisable (bddRep V)
+        ∧ ∀ (ν : Measure (GA D V)) (𝓕 : Set (GA D V)),
+          ν.IsHaarMeasure → IsFundamentalDomain (GQ V) 𝓕 ν
+            → ∀ f₂ : bddAut V, ∃ ℓ : bddAut V →ₗ[ℂ] ℂ,
+              (∀ f : bddAut V, ℓ f = l2 ν 𝓕 (f : GA D V → ℂ) f₂)
+                ∧ ∀ f : bddAut V, ∃ C : ℝ, ∀ g, ‖ℓ (bddRep V g f)‖ ≤ C := by
   intro D V
   have hT := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V
   haveI := hT.1
@@ -151,7 +186,8 @@ theorem bddRep_unitarisable_and_bounded : ∀ (D : D7) (V : HSp D), IsUnitarisab
   refine ⟨?_, fun ν 𝓕 hν h𝓕 f₂ => ?_⟩
   · have hH : (Measure.haar : Measure (GA D V)).IsHaarMeasure := inferInstance
     obtain ⟨𝓕, h𝓕⟩ :=
-      (GlobalTheory.Mem.AdelicGroupFund.rightInvariant_and_exists_fundamentalDomain D V Measure.haar hH).2
+      (GlobalTheory.Mem.AdelicGroupFund.rightInvariant_and_exists_fundamentalDomain D V Measure.haar
+        hH).2
     obtain ⟨B, hB⟩ := exists_form_bddAut hH h𝓕
     unfold IsUnitarisable
     refine ⟨B, fun v w => ?_, fun v hv => ?_, fun g v w => ?_⟩
@@ -166,8 +202,11 @@ theorem bddRep_unitarisable_and_bounded : ∀ (D : D7) (V : HSp D), IsUnitarisab
     · rw [hB, hB]
       exact petersson_bounded_automorphic_right_translation_invariant hH h𝓕 g v w
   · obtain ⟨B, hB⟩ := exists_form_bddAut hν h𝓕
-    refine ⟨{ toFun := fun f => B f f₂, map_add' := fun a b => by simp, map_smul' := fun c a => by simp },
-      fun f => hB f f₂, fun f => ?_⟩
+    refine ⟨
+      { toFun := fun f => B f f₂, map_add' := fun a b => by simp, map_smul' := fun c a => by simp },
+      fun f => hB f f₂,
+      fun f => ?_
+    ⟩
     obtain ⟨-, -, C, hC⟩ := zero_one_mem_gammaSet_one f
     obtain ⟨-, -, C₂, hC₂⟩ := zero_one_mem_gammaSet_one f₂
     have hfin := GlobalTheory.CuspDecay.measure_lt_top GlobalTheory.Mem.VolFin.finVol V ν 𝓕 hν h𝓕

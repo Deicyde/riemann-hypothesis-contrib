@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal.LocalSmoothExtension
 
-theorem UpperTheory.Gal.LocalSmoothExtension.rootW_of :
-    UpperTheory.Gal.W2.RootSumW → UpperTheory.Gal.W2.RootSumWOff → ListsEx → SchWEq → RootW := by
+theorem UpperTheory.Gal.LocalSmoothExtension.rootW_of
+    : UpperTheory.Gal.W2.RootSumW → UpperTheory.Gal.W2.RootSumWOff → ListsEx → SchWEq → RootW := by
   intro hW hOff hL hS F _ _ n t₀ ε lam h hconj hexp
   rcases hexp with ⟨m, hm, hh⟩ | ⟨m, hm, hh⟩
   · obtain ⟨k₀, hk⟩ := hW F n t₀ ε lam m hconj hm

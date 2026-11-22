@@ -11,12 +11,15 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.MinorPolynomials
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryGroupMassFormula.UsCompose
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryGroupMassFormula.UsCompose
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 lemma Rw_cons' {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (X : Mat k r) (w : List (Mat k r))
     (f : Mat k r → E) : Rw (X :: w) f = Dx (false, X) (Rw w f) := by
@@ -31,11 +34,16 @@ lemma ckOn_Rw_top {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {UU : S
     have h := ih (fun Y hY => hw Y (List.mem_cons_of_mem _ hY))
     exact CkOn_Dx (x := (false, X)) (hw X (by simp)) (by simpa using h)
 
-theorem hasDerivAt_epart (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
-    (hfib : ∀ j, CkOn ⊤ (GPos D) (fib j)) {X : Mat k r} (hX : inLie k r X) {g : Mat k r} (hg : g ∈ GPos D) :
-    ∀ es : List (Fin nf × List (Mat k r)), (∀ e ∈ es, ∀ Y ∈ e.2, inLie k r Y) →
-      HasDerivAt (fun s => C6.Epart fib es (crv (false, X) g s))
-        (∑ i : Fin es.length, C6.Epart fib (es.set i ((es.get i).1, X :: (es.get i).2)) g) 0 := by
+theorem hasDerivAt_epart
+    (D : RealPlaceData k r Wp Wq)
+    {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq) (hfib : ∀ j, CkOn ⊤ (GPos D) (fib j))
+    {X : Mat k r} (hX : inLie k r X)
+    {g : Mat k r} (hg : g ∈ GPos D)
+    : ∀ es : List (Fin nf × List (Mat k r)),
+      (∀ e ∈ es, ∀ Y ∈ e.2, inLie k r Y)
+        → HasDerivAt
+          (fun s => C6.Epart fib es (crv (false, X) g s))
+          (∑ i : Fin es.length, C6.Epart fib (es.set i ((es.get i).1, X :: (es.get i).2)) g) 0 := by
   intro es
   induction es with
   | nil =>
@@ -44,7 +52,9 @@ theorem hasDerivAt_epart (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf 
     exact hasDerivAt_const _ _
   | cons e es ih =>
     intro hes
-    have h1 : HasDerivAt (fun s => Rw e.2 (fib e.1) (crv (false, X) g s)) (Rw (X :: e.2) (fib e.1) g) 0 := by
+    have h1 : HasDerivAt
+        (fun s => Rw e.2 (fib e.1) (crv (false, X) g s))
+        (Rw (X :: e.2) (fib e.1) g) 0 := by
       rw [Rw_cons']
       exact CkOn_diff (x := (false, X)) hX
         (sCkOn_mono le_top (ckOn_Rw_top (hfib e.1) (hes e (by simp)))) hg hg.1
@@ -52,8 +62,10 @@ theorem hasDerivAt_epart (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf 
     have h3 := h1.mul h2
     show HasDerivAt (fun s => Rw e.2 (fib e.1) (crv (false, X) g s) * C6.Epart fib es (crv (false, X) g s)) _ 0
     refine h3.congr_deriv ?_
-    have key : ∀ f : Fin (e :: es).length → C6.EndH Wp Wq,
-        ∑ i, f i = f ⟨0, by simp⟩ + ∑ i : Fin es.length, f i.succ := fun f => Fin.sum_univ_succ f
+    have key
+        : ∀ f : Fin (e :: es).length → C6.EndH Wp Wq,
+          ∑ i, f i = f ⟨0, by simp⟩ + ∑ i : Fin es.length, f i.succ := fun f =>
+      Fin.sum_univ_succ f
     rw [key, crv_zero]
     simp [C6.Epart, Finset.mul_sum]
 
@@ -75,11 +87,16 @@ lemma dscal_es (D : RealPlaceData k r Wp Wq) {nf : ℕ} (X : Mat k r) (t : CT k 
   simp only [dscal, List.mem_append, List.mem_singleton, List.mem_ofFn, Set.mem_range] at ht'
   rcases ht' with ((h | ⟨m, h⟩) | ⟨m, h⟩) | h <;> subst h <;> (try split_ifs) <;> rfl
 
-theorem hasDerivAt_cv (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
-    (hfib : ∀ j, CkOn ⊤ (GPos D) (fib j)) {X : Mat k r} (hX : inLie k r X) {g : Mat k r} (hg : g ∈ GPos D)
+theorem hasDerivAt_cv
+    (D : RealPlaceData k r Wp Wq)
+    {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq) (hfib : ∀ j, CkOn ⊤ (GPos D) (fib j))
+    {X : Mat k r} (hX : inLie k r X)
+    {g : Mat k r} (hg : g ∈ GPos D)
     (t : CT k r nf) (hnz : ∀ l, (t.a l ≠ 0 ∨ t.b l ≠ 0) → Dmin k r D.z D.z' g l ≠ 0)
-    (hG : t.c ≠ 0 → ((Gf k r D.z D.z' g : ℝ) : ℂ) ≠ 0) (hes : ∀ e ∈ t.es, ∀ Y ∈ e.2, inLie k r Y) :
-    HasDerivAt (fun s => cv D fib t (crv (false, X) g s)) (((dco D X t).map fun t' => cv D fib t' g).sum) 0 := by
+    (hG : t.c ≠ 0 → ((Gf k r D.z D.z' g : ℝ) : ℂ) ≠ 0) (hes : ∀ e ∈ t.es, ∀ Y ∈ e.2, inLie k r Y)
+    : HasDerivAt
+      (fun s => cv D fib t (crv (false, X) g s))
+      (((dco D X t).map fun t' => cv D fib t' g).sum) 0 := by
   have h1 := hasDerivAt_cvs D X g t hnz hG
   have h2 := hasDerivAt_epart D fib hfib hX hg t.es hes
   have h3 := h1.smul h2
@@ -89,25 +106,32 @@ theorem hasDerivAt_cv (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf →
   symm
   congr 1
   · rw [← list_sum_smul]
-    exact congrArg List.sum (List.map_congr_left (fun t' ht' => by simp only [cv, dscal_es D X t t' ht']))
+    exact congrArg List.sum
+      (List.map_congr_left (fun t' ht' => by simp only [cv, dscal_es D X t t' ht']))
   · simp only [dfib, List.map_ofFn, List.sum_ofFn, Function.comp_def, cv, cvs, Finset.smul_sum]
 
 abbrev FS (k r nf : ℕ) : Type := List (CT k r nf × List (Mat k r))
 
-def shape (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
-    (F : Mat k r → (Wq →L[ℂ] Wp)) (L : FS k r nf) (g : Mat k r) : Wq →L[ℂ] Wp :=
+def shape
+    (D : RealPlaceData k r Wp Wq)
+    {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
+    (F : Mat k r → (Wq →L[ℂ] Wp)) (L : FS k r nf) (g : Mat k r)
+    : Wq →L[ℂ] Wp :=
   (L.map fun e => cv D fib e.1 g (Rw e.2 F g)).sum
 
-def stepOne (D : RealPlaceData k r Wp Wq) {nf : ℕ} (X : Mat k r) (e : CT k r nf × List (Mat k r)) : FS k r nf :=
+def stepOne (D : RealPlaceData k r Wp Wq) {nf : ℕ} (X : Mat k r) (e : CT k r nf × List (Mat k r))
+    : FS k r nf :=
   (dco D X e.1).map (fun t' => (t', e.2)) ++ [(e.1, X :: e.2)]
 
-def step (D : RealPlaceData k r Wp Wq) {nf : ℕ} (X : Mat k r) (L : FS k r nf) : FS k r nf := L.flatMap (stepOne D X)
+def step (D : RealPlaceData k r Wp Wq) {nf : ℕ} (X : Mat k r) (L : FS k r nf) : FS k r nf :=
+  L.flatMap (stepOne D X)
 
-def steps (D : RealPlaceData k r Wp Wq) {nf : ℕ} (w : List (Mat k r)) (L : FS k r nf) : FS k r nf := w.foldr (step D) L
+def steps (D : RealPlaceData k r Wp Wq) {nf : ℕ} (w : List (Mat k r)) (L : FS k r nf) : FS k r nf :=
+  w.foldr (step D) L
 
 def Good {nf : ℕ} (L : Finset (Fin (r + 2))) (e : CT k r nf × List (Mat k r)) : Prop :=
-  (∀ l, (e.1.a l ≠ 0 ∨ e.1.b l ≠ 0) → l ∈ L ∨ l = Fin.last (r + 1)) ∧
-  (∀ x ∈ e.1.es, ∀ Y ∈ x.2, inLie k r Y) ∧ (∀ Y ∈ e.2, inLie k r Y)
+  (∀ l, (e.1.a l ≠ 0 ∨ e.1.b l ≠ 0) → l ∈ L ∨ l = Fin.last (r + 1))
+    ∧ (∀ x ∈ e.1.es, ∀ Y ∈ x.2, inLie k r Y) ∧ (∀ Y ∈ e.2, inLie k r Y)
 
 private lemma dscal_support_prop_of_support_prop (D : RealPlaceData k r Wp Wq) {nf : ℕ} (X : Mat k r) (t : CT k r nf)
     (P : Fin (r + 2) → Prop) (hP : ∀ l, (t.a l ≠ 0 ∨ t.b l ≠ 0) → P l) :

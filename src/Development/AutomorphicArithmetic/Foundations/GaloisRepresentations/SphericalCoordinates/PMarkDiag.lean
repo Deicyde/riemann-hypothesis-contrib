@@ -4,21 +4,24 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
-private theorem mulVec_mulVec_of_mul_eq_mul_diagonal {g : ℕ} (Sb A : Matrix (Fin g) (Fin g) ℂ) (d : Fin g → ℂ)
-    (h : A * Sb = Sb * Matrix.diagonal d) (w : Fin g → ℂ) :
-    A *ᵥ (Sb *ᵥ w) = Sb *ᵥ (fun j => d j * w j) := by
+private theorem mulVec_mulVec_of_mul_eq_mul_diagonal
+    {g : ℕ} (Sb A : Matrix (Fin g) (Fin g) ℂ) (d : Fin g → ℂ) (h : A * Sb = Sb * Matrix.diagonal d)
+    (w : Fin g → ℂ)
+    : A *ᵥ (Sb *ᵥ w) = Sb *ᵥ (fun j => d j * w j) := by
   rw [Matrix.mulVec_mulVec, h, ← Matrix.mulVec_mulVec]
   congr 1
   funext j
   simp [Matrix.mulVec_diagonal]
 
-theorem UpperTheory.Gal.W2.markDiag_of :
-    UpperTheory.Gal.W2.TypeCount → UpperTheory.Gal.W2.MarkDiag := by
+theorem UpperTheory.Gal.W2.markDiag_of
+    : UpperTheory.Gal.W2.TypeCount → UpperTheory.Gal.W2.MarkDiag := by
   intro hTC F _ _ O _ bar g ρ a n t₀ ε hsig H Sb ty ev hD mu
   classical
   obtain ⟨hdet, hρ, hH⟩ := hD
@@ -51,8 +54,7 @@ theorem UpperTheory.Gal.W2.markDiag_of :
       simp only [Pi.smul_apply, smul_eq_mul] at h2
       simp only [RingHom.comp_apply]
       exact mul_right_cancel₀ hj h2
-    have hw0 : w ≠ 0 := by
-      intro h; apply hv0; rw [h, Matrix.mulVec_zero]
+    have hw0 : w ≠ 0 := by intro h; apply hv0; rw [h, Matrix.mulVec_zero]
     obtain ⟨j, hj⟩ := Function.ne_iff.1 hw0
     rw [hsupp j hj] at hj
     have h1 := hvH

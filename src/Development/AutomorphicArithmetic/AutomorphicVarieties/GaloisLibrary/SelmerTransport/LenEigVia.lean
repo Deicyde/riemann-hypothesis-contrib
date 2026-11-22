@@ -8,12 +8,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open ReciprocityTheory.Gal UpperTheory.V.Base
 
-theorem UpperTheory.V.Base.lenEigVia :
-    ∀ (O W Q N : Type) [CommRing O] [IsDomain O] [Group W] [CommGroup Q] [Finite Q] [HasEnoughRootsOfUnity O (Monoid.exponent Q)]
-      [Fintype (Q →* Oˣ)] [AddCommGroup N] [Module O N] (π : Representation O W N) (p : W →* Q), Function.Surjective p →
-      (∀ g, p g = 1 → ∀ x, π g x = x) →
-      Module.length O N ≤ ∑ ψ : Q →* Oˣ, Module.length O (eig π (ψ.comp p)) ∧
-      (IsUnit (Nat.card Q : O) → Module.length O N = ∑ ψ : Q →* Oˣ, Module.length O (eig π (ψ.comp p))) := by
+theorem UpperTheory.V.Base.lenEigVia
+    : ∀ (O W Q N : Type) [CommRing O] [IsDomain O] [Group W] [CommGroup Q] [Finite Q]
+        [HasEnoughRootsOfUnity O (Monoid.exponent Q)] [Fintype (Q →* Oˣ)] [AddCommGroup N]
+        [Module O N] (π : Representation O W N) (p : W →* Q),
+      Function.Surjective p → (∀ g, p g = 1 → ∀ x, π g x = x)
+        → Module.length O N ≤ ∑ ψ : Q →* Oˣ, Module.length O (eig π (ψ.comp p))
+          ∧ (IsUnit (Nat.card Q : O)
+            → Module.length O N = ∑ ψ : Q →* Oˣ, Module.length O (eig π (ψ.comp p))) := by
   intro O W Q N _ _ _ _ _ _ _ _ _ π p hp hfix
   have hker : p.ker ≤ MonoidHom.ker π := fun g hg =>
     (MonoidHom.mem_ker).mpr (LinearMap.ext (hfix g ((MonoidHom.mem_ker).mp hg)))
@@ -38,9 +40,9 @@ theorem UpperTheory.V.Base.lenEigVia :
     · intro h g
       rw [← hπ']
       exact h (p g)
-  have hsum : ∑ ψ : Q →* Oˣ, Module.length O (eig π (ψ.comp p))
-      = ∑ ψ : Q →* Oˣ, Module.length O (eig π' ψ) :=
-    Finset.sum_congr rfl fun ψ _ =>
-      congrArg (fun S : Submodule O N => Module.length O S) (heig ψ)
+  have hsum
+      : ∑ ψ : Q →* Oˣ, Module.length O (eig π (ψ.comp p))
+        = ∑ ψ : Q →* Oˣ, Module.length O (eig π' ψ) :=
+    Finset.sum_congr rfl fun ψ _ => congrArg (fun S : Submodule O N => Module.length O S) (heig ψ)
   rw [hsum]
   exact ⟨lenEigLe O Q N π', fun hu => (lenEigEq O Q N π' hu).1⟩

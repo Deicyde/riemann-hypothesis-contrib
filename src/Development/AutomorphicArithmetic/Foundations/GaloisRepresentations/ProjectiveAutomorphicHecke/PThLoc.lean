@@ -5,25 +5,26 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal
+  UpperTheory.Gal.CertificateRingHomMap
 open scoped Classical
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pThLoc_of :
-    UpperTheory.Gal.CertificateRingHomMap.LocComm → UpperTheory.Gal.CertificateRingHomMap.OfUBij → UpperTheory.Gal.CertificateRingHomMap.ThLoc := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pThLoc_of
+    : UpperTheory.Gal.CertificateRingHomMap.LocComm → UpperTheory.Gal.CertificateRingHomMap.OfUBij
+      → UpperTheory.Gal.CertificateRingHomMap.ThLoc := by
   intro _ hB E _ _ _ n
   obtain ⟨-, hsurj⟩ := hB E n
   refine ⟨fun w hw y => ?_, fun hn x w z hz => ?_⟩
-  · have hs : sim (th (loc hw y)) = 1 := by
-      rw [sim_th, sim_loc, inv_one]
+  · have hs : sim (th (loc hw y)) = 1 := by rw [sim_th, sim_loc, inv_one]
     obtain ⟨u, hu⟩ := hsurj _ hs
     have hmem : u.1 ∈ locU n w := by
-      refine Subgroup.mem_inf.2 ⟨u.2, Subgroup.mem_iInf.2 fun u' => Subgroup.mem_iInf.2 fun h => MonoidHom.mem_ker.2 ?_⟩
-      have h1 : comp u' (ofU u) = 1 := by
-        rw [hu, comp_th, comp_loc_of_apart hw h, map_one]
+      refine Subgroup.mem_inf.2
+        ⟨u.2, Subgroup.mem_iInf.2 fun u' => Subgroup.mem_iInf.2 fun h => MonoidHom.mem_ker.2 ?_⟩
+      have h1 : comp u' (ofU u) = 1 := by rw [hu, comp_th, comp_loc_of_apart hw h, map_one]
       exact h1
     have hw' : cLoc w u.1 = invT n _ y := by
-      have h1 : comp w (ofU u) = invT n _ y := by
-        rw [hu, comp_th, comp_loc]
+      have h1 : comp w (ofU u) = invT n _ y := by rw [hu, comp_th, comp_loc]
       exact h1
     have hu' : u = locF hw (invT n _ y) := by
       have h2 : (⟨u.1, hmem⟩ : locU n w) = (locE hw).symm (invT n _ y) := by

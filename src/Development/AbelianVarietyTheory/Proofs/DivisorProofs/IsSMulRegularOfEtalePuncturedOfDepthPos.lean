@@ -12,12 +12,14 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem isSMulRegular_of_etale_punctured_of_depth_pos :
-    ∀ (R A : Type) [CommRing R] [IsRegularLocalRing R] [CommRing A] [Algebra R A]
-      [Module.Finite R A], ReciprocityTheory.CA.ModDepthGE R A 1 →
-      (∀ (p : Ideal R) [p.IsPrime], p ≠ maximalIdeal R →
-        Algebra.Etale (Localization.AtPrime p) (TensorProduct R (Localization.AtPrime p) A)) →
-      ∀ f : R, f ≠ 0 → IsSMulRegular A f := by
+theorem isSMulRegular_of_etale_punctured_of_depth_pos
+    : ∀ (R A : Type) [CommRing R] [IsRegularLocalRing R] [CommRing A] [Algebra R A]
+        [Module.Finite R A],
+      ReciprocityTheory.CA.ModDepthGE R A 1
+        → (∀ (p : Ideal R) [p.IsPrime],
+          p ≠ maximalIdeal R
+            → Algebra.Etale (Localization.AtPrime p) (TensorProduct R (Localization.AtPrime p) A))
+        → ∀ f : R, f ≠ 0 → IsSMulRegular A f := by
   intro R A _ _ _ _ _ hdepth het f hf
 
   obtain ⟨rs, hlen, hmem, hreg⟩ := hdepth
@@ -25,7 +27,8 @@ theorem isSMulRegular_of_etale_punctured_of_depth_pos :
   subst hw
   have hwm : w ∈ maximalIdeal R := hmem w (by simp)
   have hwr : IsSMulRegular A w := ((RingTheory.Sequence.isRegular_cons_iff A w []).mp hreg).1
-  have hmax : maximalIdeal R ∉ associatedPrimes R A := ReciprocityTheory.CA.max_not_mem_ass_of_reg hwm hwr
+  have hmax : maximalIdeal R ∉ associatedPrimes R A :=
+    ReciprocityTheory.CA.max_not_mem_ass_of_reg hwm hwr
 
   refine IsSMulRegular.of_right_eq_zero_of_smul fun a ha => ?_
   by_contra ha0

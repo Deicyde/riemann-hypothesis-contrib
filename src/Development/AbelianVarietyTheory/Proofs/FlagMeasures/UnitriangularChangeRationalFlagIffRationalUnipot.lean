@@ -9,7 +9,9 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.TermDef GlobalTheory.LocOver
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.TermDef
+  GlobalTheory.LocOver
 open scoped Classical
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -32,17 +34,15 @@ theorem Xa_mono (F : FlagG S r T) {i j : ℕ} (h : i ≤ j) : F.Xa i ≤ F.Xa j 
 theorem fvec_castSucc (F : FlagG S r T) (a : Fin r) : F.fvec a.castSucc = F.e a := by
   simp [FlagG.fvec]
 
-theorem fvec_last (F : FlagG S r T) : F.fvec (Fin.last r) = F.z := by
-  simp [FlagG.fvec]
+theorem fvec_last (F : FlagG S r T) : F.fvec (Fin.last r) = F.z := by simp [FlagG.fvec]
 
 theorem e_mem_Xa (F : FlagG S r T) (a : Fin r) {j : ℕ} (h : a.1 < j) : F.e a ∈ F.Xa j :=
   Submodule.subset_span ⟨a, h, rfl⟩
 
-theorem e_mem_X (F : FlagG S r T) (a : Fin r) : F.e a ∈ F.X :=
-  Submodule.subset_span ⟨a, rfl⟩
+theorem e_mem_X (F : FlagG S r T) (a : Fin r) : F.e a ∈ F.X := Submodule.subset_span ⟨a, rfl⟩
 
-theorem X_orth_fvec (F : FlagG S r T) {x : S.V} (hx : x ∈ F.X) (b : Fin (r + 1)) :
-    S.hT x (F.fvec b) = 0 := by
+theorem X_orth_fvec (F : FlagG S r T) {x : S.V} (hx : x ∈ F.X) (b : Fin (r + 1))
+    : S.hT x (F.fvec b) = 0 := by
   induction hx using Submodule.span_induction with
   | mem x h =>
     obtain ⟨a, rfl⟩ := h
@@ -64,11 +64,13 @@ theorem X_iso (F : FlagG S r T) {x y : S.V} (hx : x ∈ F.X) (hy : y ∈ F.X) : 
   | add y y' _ _ h h' => simp [map_add (f := _), h, h']
   | smul c y _ h => simp [h]
 
-theorem isotropicSpan_orthogonal_anisotropicVector (F : FlagG S r T) {x : S.V} (hx : x ∈ F.X) : S.hT x F.z = 0 := by
+theorem isotropicSpan_orthogonal_anisotropicVector (F : FlagG S r T) {x : S.V} (hx : x ∈ F.X)
+    : S.hT x F.z = 0 := by
   rw [← fvec_last]; exact X_orth_fvec F hx _
 
 theorem z_orth_X (F : FlagG S r T) {x : S.V} (hx : x ∈ F.X) : S.hT F.z x = 0 := by
-  rw [Formalism.L2.SG.NGCut.NormalVectorPairings.hT_swap x F.z, isotropicSpan_orthogonal_anisotropicVector F hx, star_zero]
+  rw [Formalism.L2.SG.NGCut.NormalVectorPairings.hT_swap x F.z,
+    isotropicSpan_orthogonal_anisotropicVector F hx, star_zero]
 
 theorem fvec_indep (F : FlagG S r T) (hT : T ≠ 0) : LinearIndependent E F.fvec := by
   unfold FlagG.fvec
@@ -77,8 +79,12 @@ theorem fvec_indep (F : FlagG S r T) (hT : T ≠ 0) : LinearIndependent E F.fvec
   rw [F.z_norm] at h
   exact hT (neg_eq_zero.1 h)
 
-theorem chg_sub_mem (F : FlagG S r T) {A : Matrix (Fin (r + 1)) (Fin (r + 1)) E} (hA : Uni A)
-    {g : Fin (r + 1) → S.V} (hg : Chg F.fvec A g) (b : Fin (r + 1)) : g b - F.fvec b ∈ F.Xa b.1 := by
+theorem chg_sub_mem
+    (F : FlagG S r T)
+    {A : Matrix (Fin (r + 1)) (Fin (r + 1)) E} (hA : Uni A)
+    {g : Fin (r + 1) → S.V} (hg : Chg F.fvec A g)
+    (b : Fin (r + 1))
+    : g b - F.fvec b ∈ F.Xa b.1 := by
   have e : g b - F.fvec b = ∑ a ∈ Finset.univ.erase b, A a b • F.fvec a := by
     rw [hg b, ← Finset.add_sum_erase _ _ (Finset.mem_univ b), hA.2 b, one_smul, add_sub_cancel_left]
   rw [e]
@@ -93,8 +99,10 @@ theorem chg_sub_mem (F : FlagG S r T) {A : Matrix (Fin (r + 1)) (Fin (r + 1)) E}
   · rw [hA.1 a b h, zero_smul]
     exact Submodule.zero_mem _
 
-theorem chg_indep {n : ℕ} {f g : Fin n → S.V} (hf : LinearIndependent E f)
-    {A : Matrix (Fin n) (Fin n) E} (hA : Uni A) (hg : Chg f A g) : LinearIndependent E g := by
+theorem chg_indep
+    {n : ℕ} {f g : Fin n → S.V} (hf : LinearIndependent E f)
+    {A : Matrix (Fin n) (Fin n) E} (hA : Uni A) (hg : Chg f A g)
+    : LinearIndependent E g := by
   have hdet : A.det = 1 := by
     rw [Matrix.det_of_upperTriangular (fun a b h => hA.1 a b h)]
     simp [hA.2]
@@ -110,8 +118,9 @@ theorem chg_indep {n : ℕ} {f g : Fin n → S.V} (hf : LinearIndependent E f)
   have hc0 : c = 0 := Matrix.eq_zero_of_mulVec_eq_zero (by rw [hdet]; exact one_ne_zero) (funext h0)
   exact fun i => congrFun hc0 i
 
-theorem exists_chg (F : FlagG S r T) (hT : T ≠ 0) {A : Matrix (Fin (r + 1)) (Fin (r + 1)) E} (hA : Uni A) :
-    ∃ F₁ : FlagG S r T, Chg F.fvec A F₁.fvec := by
+theorem exists_chg
+    (F : FlagG S r T) (hT : T ≠ 0) {A : Matrix (Fin (r + 1)) (Fin (r + 1)) E} (hA : Uni A)
+    : ∃ F₁ : FlagG S r T, Chg F.fvec A F₁.fvec := by
   let g : Fin (r + 1) → S.V := fun b => ∑ a, A a b • F.fvec a
   have hg : Chg F.fvec A g := fun b => rfl
   have hli := chg_indep (fvec_indep F hT) hA hg
@@ -124,20 +133,23 @@ theorem exists_chg (F : FlagG S r T) (hT : T ≠ 0) {A : Matrix (Fin (r + 1)) (F
     have h1 := Xa_le_X F _ (hsub (Fin.last r))
     rwa [fvec_last] at h1
   have hz : g (Fin.last r) = F.z + (g (Fin.last r) - F.z) := by abel
-  let F₁ : FlagG S r T :=
-    { e := fun a => g a.castSucc
-      z := g (Fin.last r)
-      e_indep := hli.comp _ (Fin.castSucc_injective r)
-      e_iso := fun a b => X_iso F (heX a) (heX b)
-      z_orth := fun a => by
-        show S.hT (g a.castSucc) (g (Fin.last r)) = 0
-        rw [hz, map_add (f := _), isotropicSpan_orthogonal_anisotropicVector F (heX a), X_iso F (heX a) hzX, add_zero]
-      z_norm := by
-        show S.hT (g (Fin.last r)) (g (Fin.last r)) = -T
-        rw [hz]
-        simp only [map_add (f := _), LinearMap.add_apply]
-        rw [isotropicSpan_orthogonal_anisotropicVector F hzX, z_orth_X F hzX, X_iso F hzX hzX, F.z_norm]
-        simp }
+  let F₁ : FlagG S r T := {
+    e := fun a => g a.castSucc
+    z := g (Fin.last r)
+    e_indep := hli.comp _ (Fin.castSucc_injective r)
+    e_iso := fun a b => X_iso F (heX a) (heX b)
+    z_orth := fun a => by
+      show S.hT (g a.castSucc) (g (Fin.last r)) = 0
+      rw [hz, map_add (f := _), isotropicSpan_orthogonal_anisotropicVector F (heX a),
+        X_iso F (heX a) hzX, add_zero]
+    z_norm := by
+      show S.hT (g (Fin.last r)) (g (Fin.last r)) = -T
+      rw [hz]
+      simp only [map_add (f := _), LinearMap.add_apply]
+      rw [isotropicSpan_orthogonal_anisotropicVector F hzX, z_orth_X F hzX, X_iso F hzX hzX,
+        F.z_norm]
+      simp
+  }
   have hF : F₁.fvec = g := by
     funext b
     induction b using Fin.lastCases with
@@ -145,10 +157,13 @@ theorem exists_chg (F : FlagG S r T) (hT : T ≠ 0) {A : Matrix (Fin (r + 1)) (F
     | cast b => exact fvec_castSucc F₁ b
   exact ⟨F₁, by rw [hF]; exact hg⟩
 
-theorem exists_unip (F F₁ : FlagG S r T) (hT : T ≠ 0) {A : Matrix (Fin (r + 1)) (Fin (r + 1)) E} (hA : Uni A)
-    (hc : Chg F.fvec A F₁.fvec) :
-    ∃ n : S.V ≃ₗ[E] S.V, n ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ j, ∀ x ∈ F.Xa (j + 1), n x - x ∈ F.Xa j) ∧
-      (∀ x ∈ orth S F.X, n x - x ∈ F.X) ∧ ∀ a, F₁.fvec a = n (F.fvec a) := by
+theorem exists_unip
+    (F F₁ : FlagG S r T)
+    (hT : T ≠ 0)
+    {A : Matrix (Fin (r + 1)) (Fin (r + 1)) E} (hA : Uni A) (hc : Chg F.fvec A F₁.fvec)
+    : ∃ n : S.V ≃ₗ[E] S.V,
+      n ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ j, ∀ x ∈ F.Xa (j + 1), n x - x ∈ F.Xa j)
+        ∧ (∀ x ∈ orth S F.X, n x - x ∈ F.X) ∧ ∀ a, F₁.fvec a = n (F.fvec a) := by
   have hsub := chg_sub_mem F hA hc
   have hsubX : ∀ b, F₁.fvec b - F.fvec b ∈ F.X := fun b => Xa_le_X F _ (hsub b)
 
@@ -166,8 +181,7 @@ theorem exists_unip (F F₁ : FlagG S r T) (hT : T ≠ 0) {A : Matrix (Fin (r + 
   have hCU : C ≤ U := inf_le_right
   let bC := Module.finBasis E C
   let c : Fin (Module.finrank E C) → S.V := fun i => (bC i : S.V)
-  have hcI : LinearIndependent E c :=
-    bC.linearIndependent.map' C.subtype (Submodule.ker_subtype C)
+  have hcI : LinearIndependent E c := bC.linearIndependent.map' C.subtype (Submodule.ker_subtype C)
   have hcC : Submodule.span E (Set.range c) ≤ C :=
     Submodule.span_le.2 (by rintro _ ⟨i, rfl⟩; exact (bC i).2)
   have hf₁P : ∀ b, F₁.fvec b ∈ P := fun b => by
@@ -186,8 +200,10 @@ theorem exists_unip (F F₁ : FlagG S r T) (hT : T ≠ 0) {A : Matrix (Fin (r + 
     have h1 : S.hT (F₁.fvec a - F.fvec a) (c i) = 0 := mem_orth_X.1 (hCU (bC i).2) _ (hsubX a)
     rw [map_sub, LinearMap.sub_apply, sub_eq_zero] at h1
     exact h1.symm
-  have hG : ∀ i j, S.hT (Sum.elim F.fvec c i) (Sum.elim F.fvec c j) =
-      S.hT (Sum.elim F₁.fvec c i) (Sum.elim F₁.fvec c j) := by
+  have hG
+      : ∀ i j,
+        S.hT (Sum.elim F.fvec c i) (Sum.elim F.fvec c j)
+          = S.hT (Sum.elim F₁.fvec c i) (Sum.elim F₁.fvec c j) := by
     rintro (a | i) (b | j)
     · have h := Formalism.L2.SG.NGCut.NormalVectorPairings.brS_fvec F b a
       have h₁ := Formalism.L2.SG.NGCut.NormalVectorPairings.brS_fvec F₁ b a
@@ -205,23 +221,26 @@ theorem exists_unip (F F₁ : FlagG S r T) (hT : T ≠ 0) {A : Matrix (Fin (r + 
   let m : S.V →ₗ[E] S.V := (n : S.V →ₗ[E] S.V) - LinearMap.id
   have hm : ∀ x, m x = n x - x := fun x => rfl
   have hmC : C ≤ LinearMap.ker m := by
-    have hext : m ∘ₗ C.subtype = 0 := bC.ext fun i => by
-      show m (c i) = 0
-      rw [hm, hnc, sub_self]
+    have hext : m ∘ₗ C.subtype = 0 :=
+      bC.ext fun i => by
+        show m (c i) = 0
+        rw [hm, hnc, sub_self]
     intro x hx
     exact LinearMap.congr_fun hext ⟨x, hx⟩
-  have hmP : P ≤ F.X.comap m := Submodule.span_le.2 (by
-    rintro _ ⟨b, rfl⟩
-    show m (F.fvec b) ∈ F.X
-    rw [hm, hnF]
-    exact hsubX b)
+  have hmP : P ≤ F.X.comap m :=
+    Submodule.span_le.2 (by
+      rintro _ ⟨b, rfl⟩
+      show m (F.fvec b) ∈ F.X
+      rw [hm, hnF]
+      exact hsubX b)
   refine ⟨n, hn, fun j x hx => ?_, fun x hx => ?_, fun a => (hnF a).symm⟩
-  · have hle : F.Xa (j + 1) ≤ (F.Xa j).comap m := Submodule.span_le.2 (by
-      rintro _ ⟨a, ha, rfl⟩
-      have ha' : a.1 < j + 1 := ha
-      show m (F.e a) ∈ F.Xa j
-      rw [hm, ← fvec_castSucc, hnF]
-      exact Xa_mono F (by simpa using Nat.lt_succ_iff.1 ha') (hsub a.castSucc))
+  · have hle : F.Xa (j + 1) ≤ (F.Xa j).comap m :=
+      Submodule.span_le.2 (by
+        rintro _ ⟨a, ha, rfl⟩
+        have ha' : a.1 < j + 1 := ha
+        show m (F.e a) ∈ F.Xa j
+        rw [hm, ← fvec_castSucc, hnF]
+        exact Xa_mono F (by simpa using Nat.lt_succ_iff.1 ha') (hsub a.castSucc))
     exact hle hx
   · have hx' : x ∈ P ⊔ C := by rw [hsup]; exact hx
     obtain ⟨p, hp, w, hw, rfl⟩ := Submodule.mem_sup.1 hx'
@@ -230,8 +249,8 @@ theorem exists_unip (F F₁ : FlagG S r T) (hT : T ≠ 0) {A : Matrix (Fin (r + 
     have h3 : m (p + w) ∈ F.X := by rw [map_add (f := _), h2, add_zero]; exact h1
     exact h3
 
-theorem Xa_coords (F : FlagG S r T) {j : ℕ} {x : S.V} (hx : x ∈ F.Xa j) :
-    ∃ c : Fin r → E, (∀ i : Fin r, j ≤ i.1 → c i = 0) ∧ x = ∑ i, c i • F.e i := by
+theorem Xa_coords (F : FlagG S r T) {j : ℕ} {x : S.V} (hx : x ∈ F.Xa j)
+    : ∃ c : Fin r → E, (∀ i : Fin r, j ≤ i.1 → c i = 0) ∧ x = ∑ i, c i • F.e i := by
   induction hx using Submodule.span_induction with
   | mem x h =>
     obtain ⟨a, ha, rfl⟩ := h
@@ -240,7 +259,8 @@ theorem Xa_coords (F : FlagG S r T) {j : ℕ} {x : S.V} (hx : x ∈ F.Xa j) :
     · have : i ≠ a := fun e => by subst e; omega
       simp [this]
     · simp [Pi.single_apply]
-  | zero => exact ⟨0, fun _ _ => rfl, by simp⟩
+  | zero =>
+    exact ⟨0, fun _ _ => rfl, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨c, hc, rfl⟩ := hx
     obtain ⟨d, hd, rfl⟩ := hy
@@ -251,9 +271,10 @@ theorem Xa_coords (F : FlagG S r T) {j : ℕ} {x : S.V} (hx : x ∈ F.Xa j) :
     refine ⟨t • c, fun i hi => by simp [hc i hi], ?_⟩
     simp [Finset.smul_sum, smul_smul]
 
-theorem tri_of_unip (F F₁ : FlagG S r T) (n : S.V ≃ₗ[E] S.V)
-    (hf : ∀ j, ∀ x ∈ F.Xa (j + 1), n x - x ∈ F.Xa j) (hp : ∀ x ∈ orth S F.X, n x - x ∈ F.X)
-    (hn : ∀ a, F₁.fvec a = n (F.fvec a)) : Tri E F.fvec F₁.fvec := by
+theorem tri_of_unip
+    (F F₁ : FlagG S r T) (n : S.V ≃ₗ[E] S.V) (hf : ∀ j, ∀ x ∈ F.Xa (j + 1), n x - x ∈ F.Xa j)
+    (hp : ∀ x ∈ orth S F.X, n x - x ∈ F.X) (hn : ∀ a, F₁.fvec a = n (F.fvec a))
+    : Tri E F.fvec F₁.fvec := by
   have hX : F.X = F.Xa r := by
     unfold FlagG.X FlagG.Xa
     congr 1
@@ -295,11 +316,14 @@ theorem tri_of_unip (F F₁ : FlagG S r T) (n : S.V ≃ₗ[E] S.V)
 
 end Gen
 
-theorem flag_change : ∀ (D : D7) {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T), T ≠ 0 →
-    (∀ A : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E, Uni A →
-      ∃ F₁ : LFlag (D.sp.Y 0) D.R.rS T, Chg (frame F) A (frame F₁)) ∧
-    (∀ F₁ : LFlag (D.sp.Y 0) D.R.rS T, Tri D.host.E (frame F) (frame F₁) ↔
-      ∃ n ∈ Formalism.L2.SG.NGData.NRat F, ∀ a, frame F₁ a = n (frame F a)) := by
+theorem flag_change
+    : ∀ (D : D7) {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T),
+      T ≠ 0
+        → (∀ A : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E,
+            Uni A → ∃ F₁ : LFlag (D.sp.Y 0) D.R.rS T, Chg (frame F) A (frame F₁))
+          ∧ (∀ F₁ : LFlag (D.sp.Y 0) D.R.rS T,
+            Tri D.host.E (frame F) (frame F₁)
+              ↔ ∃ n ∈ Formalism.L2.SG.NGData.NRat F, ∀ a, frame F₁ a = n (frame F a)) := by
   intro D T F hT
   refine ⟨fun A hA => ?_, fun F₁ => ⟨?_, ?_⟩⟩
   · obtain ⟨G, hG⟩ := exists_chg F.fl hT hA

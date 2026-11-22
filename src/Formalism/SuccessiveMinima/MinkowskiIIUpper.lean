@@ -14,7 +14,7 @@ public import Formalism.SuccessiveMinima.DefsMink
 namespace Formalism.FN
 
 theorem minkowskiIIUpper : MinkowskiIIUpper :=
-  minkowskiIIUpper_of (minkCore_of partialBoxVolumeMonotoneStep partialBoxVolumeScaling) existsSuccessiveMinimaVectors
-    existsAdaptedBasis
+  minkowskiIIUpper_of (minkCore_of partialBoxVolumeMonotoneStep partialBoxVolumeScaling)
+    existsSuccessiveMinimaVectors existsAdaptedBasis
 
 end Formalism.FN

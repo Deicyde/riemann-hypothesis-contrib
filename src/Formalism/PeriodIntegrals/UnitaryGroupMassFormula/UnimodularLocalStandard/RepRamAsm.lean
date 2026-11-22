@@ -61,8 +61,8 @@ theorem keyStartRam_of_unit (hU : UnitVecRam) : KeyStartRam := by
     have := Int.eq_one_of_dvd_one (by positivity) h
     exact hdp.one_lt.ne' (by exact_mod_cast this)
   obtain ⟨y1, hy1S, hy1T, -, p1, q1, hp1, hq1, hy1H⟩ :=
-    hU a b c d ha hd lam hlam m Λ x y T i₀ hK 0 (rep_sat_zero d Λ hdp) (by simp) (Or.inl rfl)
-      g hgS hgT (by simp) hg0
+    hU a b c d ha hd lam hlam m Λ x y T i₀ hK 0 (rep_sat_zero d Λ hdp) (by simp) (Or.inl rfl) g hgS
+      hgT (by simp) hg0
   have hp1c : (p1 : ℂ) ≠ 0 := by
     have : p1 ≠ 0 := fun h => hp1 (h ▸ dvd_zero _)
     exact_mod_cast this
@@ -82,7 +82,9 @@ theorem keyStartRam_of_unit (hU : UnitVecRam) : KeyStartRam := by
   have hzS : SatMem d Λ z := by
     have h1 := rep_sat_zsmul d Λ hgS (p1 * s')
     have h2 := rep_sat_elt d Λ hdp hθ hy1S (q1 * n') (q1 * c₂) 1 hd1
-    have h3 : ((((q1 * n' : ℤ) : ℂ) - ((q1 * c₂ : ℤ) : ℂ) * conj (cmTheta b d)) / ((1 : ℤ) : ℂ)) = γ0 := by
+    have h3
+        : ((((q1 * n' : ℤ) : ℂ) - ((q1 * c₂ : ℤ) : ℂ) * conj (cmTheta b d)) / ((1 : ℤ) : ℂ))
+          = γ0 := by
       rw [hγ0]; push_cast; ring
     rw [h3] at h2
     exact rep_sat_sub d Λ hdp h1 h2
@@ -99,7 +101,8 @@ theorem keyStartRam_of_unit (hU : UnitVecRam) : KeyStartRam := by
   by_cases hz0 : z = 0
   · set r : ℂ := ((p1 * s' : ℤ) : ℂ) * M with hr
     have hr0 : r ≠ 0 := by
-      rw [hr]; push_cast
+      rw [hr]
+      push_cast
       exact mul_ne_zero (mul_ne_zero hp1c hs'c) hMc
     have hrc : conj r = r := by rw [hr]; simp
     have hrf : r • f = γ0 • y1 := by
@@ -140,8 +143,8 @@ theorem keyStartRam_of_unit (hU : UnitVecRam) : KeyStartRam := by
       field_simp
       linear_combination hk'
   · obtain ⟨y2, hy2S, hy2T, hy21, p2, q2, hp2, hq2, hy2H⟩ :=
-      hU a b c d ha hd lam hlam m Λ x y T i₀ hK y1 hy1S hy1T (Or.inr ⟨p1, q1, hp1, hq1, by
-        rw [hy1H]⟩) z hzS hzT hzy hz0
+      hU a b c d ha hd lam hlam m Λ x y T i₀ hK y1 hy1S hy1T
+        (Or.inr ⟨p1, q1, hp1, hq1, by rw [hy1H]⟩) z hzS hzT hzy hz0
     rw [← hL, ← hκdef] at hy2H
     rw [← hL] at hy21
     have hp2c : (p2 : ℂ) ≠ 0 := by
@@ -157,15 +160,26 @@ theorem keyStartRam_of_unit (hU : UnitVecRam) : KeyStartRam := by
     have hodd : d % 2 = 1 := by
       have := hOK.2.2.1
       omega
-    obtain ⟨s, t, hst⟩ := pigeon hdp hodd (p1 * q2) (p2 * q1) (Q * q1 * q2)
-      (not_dvd_mul' hdp hp1 hq2) (not_dvd_mul' hdp hp2 hq1)
+    obtain ⟨s, t, hst⟩ :=
+      pigeon hdp hodd (p1 * q2) (p2 * q1) (Q * q1 * q2) (not_dvd_mul' hdp hp1 hq2)
+        (not_dvd_mul' hdp hp2 hq1)
     obtain ⟨k, hk⟩ := hst
     have hQq : ¬ (d : ℤ) ∣ Q * (q1 * q2) := not_dvd_mul' hdp hQ (not_dvd_mul' hdp hq1 hq2)
-    refine ⟨(s : ℂ) • y1 + (t : ℂ) • y2,
-      ⟨rep_sat_add d Λ hdp (rep_sat_zsmul d Λ hy1S s) (rep_sat_zsmul d Λ hy2S t), ?_, k, Q * (q1 * q2), hQq, ?_⟩⟩
+    refine ⟨
+      (s : ℂ) • y1 + (t : ℂ) • y2,
+      ⟨
+        rep_sat_add d Λ hdp (rep_sat_zsmul d Λ hy1S s) (rep_sat_zsmul d Λ hy2S t),
+        ?_,
+        k,
+        Q * (q1 * q2),
+        hQq,
+        ?_
+      ⟩
+    ⟩
     · intro j hj; simp [hy1T j hj, hy2T j hj]
-    · have e : stdH L m ((s : ℂ) • y1 + (t : ℂ) • y2) ((s : ℂ) • y1 + (t : ℂ) • y2) =
-          (s : ℂ) ^ 2 * stdH L m y1 y1 + (t : ℂ) ^ 2 * stdH L m y2 y2 := by
+    · have e
+          : stdH L m ((s : ℂ) • y1 + (t : ℂ) • y2) ((s : ℂ) • y1 + (t : ℂ) • y2)
+            = (s : ℂ) ^ 2 * stdH L m y1 y1 + (t : ℂ) ^ 2 * stdH L m y2 y2 := by
         simp only [map_add (f := _), LinearMap.add_apply, hHs, hy12, hy21, map_intCast]
         ring
       rw [e, hy1H, hy2H, hHf]

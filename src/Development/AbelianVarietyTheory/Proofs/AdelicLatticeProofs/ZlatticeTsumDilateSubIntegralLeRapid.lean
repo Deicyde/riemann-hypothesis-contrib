@@ -11,27 +11,36 @@ open scoped FourierTransform RealInnerProductSpace SchwartzMap
 
 namespace GlobalTheory
 
-theorem fourier_comp_smul_of_pos {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
-    [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] (f : V → ℂ) {t : ℝ} (ht : 0 < t)
-    (w : V) :
-    (𝓕 (fun x => f (t • x)) : V → ℂ) w
+theorem fourier_comp_smul_of_pos
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+    [MeasurableSpace V] [BorelSpace V]
+    (f : V → ℂ)
+    {t : ℝ} (ht : 0 < t)
+    (w : V)
+    : (𝓕 (fun x => f (t • x)) : V → ℂ) w
       = (((t ^ Module.finrank ℝ V)⁻¹ : ℝ) : ℂ) * (𝓕 f : V → ℂ) (t⁻¹ • w) := by
   rw [Real.fourier_eq', Real.fourier_eq']
-  have h := Measure.integral_comp_smul (volume : Measure V)
-    (fun u : V => cexp (((-2 * Real.pi * ⟪u, t⁻¹ • w⟫ : ℝ) : ℂ) * I) • f u) t
+  have h :=
+    Measure.integral_comp_smul (volume : Measure V)
+      (fun u : V => cexp (((-2 * Real.pi * ⟪u, t⁻¹ • w⟫ : ℝ) : ℂ) * I) • f u)
+      t
   rw [abs_of_pos (by positivity), Complex.real_smul] at h
   rw [← h]
   congr 1
   ext v
   rw [real_inner_smul_left, real_inner_smul_right, ← mul_assoc t, mul_inv_cancel₀ ht.ne', one_mul]
 
-theorem latticeSum_dilate_sub_integral_le (V : Type) [NormedAddCommGroup V]
-    [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
-    (L : Submodule ℤ V) [DiscreteTopology L] [IsZLattice ℝ L] (f : V → ℂ)
-    (hf : ContDiff ℝ ∞ f) (hc : HasCompactSupport f) (A : ℕ) :
-    ∃ C : ℝ, ∀ (x₀ : V) (t : ℝ), 0 < t → t ≤ 1 →
-      ‖∑' l : L, f (t • ((l : V) + x₀)) - (∫ x, f x) /
-        ((ZLattice.covolume L * t ^ Module.finrank ℝ V : ℝ) : ℂ)‖ ≤ C * t ^ A := by
+theorem latticeSum_dilate_sub_integral_le
+    (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+    [MeasurableSpace V] [BorelSpace V]
+    (L : Submodule ℤ V) [DiscreteTopology L] [IsZLattice ℝ L]
+    (f : V → ℂ) (hf : ContDiff ℝ ∞ f) (hc : HasCompactSupport f)
+    (A : ℕ)
+    : ∃ C : ℝ, ∀ (x₀ : V) (t : ℝ),
+      0 < t → t ≤ 1
+        → ‖∑' l : L, f (t • ((l : V) + x₀)) - (∫ x, f x) /
+            ((ZLattice.covolume L * t ^ Module.finrank ℝ V : ℝ) : ℂ)‖
+          ≤ C * t ^ A := by
   obtain ⟨hD, -⟩ := Formalism.H.dualIsLattice V L
   set d := Module.finrank ℝ V with hd
   set k := A + d + Module.finrank ℤ (Formalism.H.dual L) + 1 with hk
@@ -50,14 +59,18 @@ theorem latticeSum_dilate_sub_integral_le (V : Type) [NormedAddCommGroup V]
   obtain ⟨h1, h2⟩ := Formalism.H.poissonSchwartz V L G x₀
   rw [hG] at h1 h2
   rw [h2.tsum_eq, h1.tsum_eq_add_tsum_ite 0]
-  have h0 : (𝓕 (fun x : V => f (t • x)) : V → ℂ) ((0 : Formalism.H.dual L) : V) *
-      Complex.exp (2 * Real.pi * Complex.I * (⟪((0 : Formalism.H.dual L) : V), x₀⟫ : ℝ))
-      = (((t ^ d)⁻¹ : ℝ) : ℂ) * ∫ x, f x := by
+  have h0
+      : (𝓕 (fun x : V => f (t • x)) : V → ℂ) ((0 : Formalism.H.dual L) : V)
+          * Complex.exp (2 * Real.pi * Complex.I * (⟪((0 : Formalism.H.dual L) : V), x₀⟫ : ℝ))
+        = (((t ^ d)⁻¹ : ℝ) : ℂ) * ∫ x, f x := by
     rw [fourier_comp_smul_of_pos f ht, Real.fourier_eq']
     simp [hd]
   rw [h0, mul_add]
-  have h3 : ∀ S : ℂ, (ZLattice.covolume L : ℂ)⁻¹ * ((((t ^ d)⁻¹ : ℝ) : ℂ) * ∫ x, f x) + S -
-      (∫ x, f x) / ((ZLattice.covolume L * t ^ d : ℝ) : ℂ) = S := by
+  have h3
+      : ∀ S : ℂ,
+        (ZLattice.covolume L : ℂ)⁻¹ * ((((t ^ d)⁻¹ : ℝ) : ℂ) * ∫ x, f x) + S
+            - (∫ x, f x) / ((ZLattice.covolume L * t ^ d : ℝ) : ℂ)
+          = S := by
     intro S
     push_cast
     rw [div_eq_mul_inv, mul_inv]
@@ -77,7 +90,8 @@ theorem latticeSum_dilate_sub_integral_le (V : Type) [NormedAddCommGroup V]
     Real.norm_of_nonneg (by positivity)]
   have h4 := hC (t⁻¹ • (y : V))
   rw [norm_iteratedFDeriv_zero, _root_.norm_smul, Real.norm_of_nonneg (by positivity),
-    SchwartzMap.fourier_coe, hFf] at h4
+      SchwartzMap.fourier_coe, hFf]
+    at h4
   change _ ≤ C * ‖(y : V)‖⁻¹ ^ k * t ^ A
   have h5 : ‖(𝓕 f : V → ℂ) (t⁻¹ • (y : V))‖ ≤ C * ‖(y : V)‖⁻¹ ^ k * t ^ k := by
     rw [mul_comm, ← le_div_iff₀ (by positivity)] at h4
@@ -85,10 +99,11 @@ theorem latticeSum_dilate_sub_integral_le (V : Type) [NormedAddCommGroup V]
     rw [mul_pow, inv_pow, inv_pow]
     field_simp
   have h6 : t ^ k ≤ t ^ (A + d) := pow_le_pow_of_le_one ht.le ht1 (by omega)
-  calc (t ^ d)⁻¹ * ‖(𝓕 f : V → ℂ) (t⁻¹ • (y : V))‖
-      ≤ (t ^ d)⁻¹ * (C * ‖(y : V)‖⁻¹ ^ k * t ^ (A + d)) := by
-        refine mul_le_mul_of_nonneg_left (h5.trans ?_) (by positivity)
-        exact mul_le_mul_of_nonneg_left h6 (by positivity)
+  calc
+    (t ^ d)⁻¹ * ‖(𝓕 f : V → ℂ) (t⁻¹ • (y : V))‖
+        ≤ (t ^ d)⁻¹ * (C * ‖(y : V)‖⁻¹ ^ k * t ^ (A + d)) := by
+      refine mul_le_mul_of_nonneg_left (h5.trans ?_) (by positivity)
+      exact mul_le_mul_of_nonneg_left h6 (by positivity)
     _ = _ := by rw [pow_add t A d]; field_simp
 
 end GlobalTheory

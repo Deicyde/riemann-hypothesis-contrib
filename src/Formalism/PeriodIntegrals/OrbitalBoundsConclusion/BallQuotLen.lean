@@ -6,4 +6,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.BallQuotientLeng
 
 @[expose] public section
 
-theorem ball_quotient_length : PI.BallQuotLen := PI.UnitaryGroupMassFormula.BallQuotLen.ballQuotLen_main
+theorem ball_quotient_length : PI.BallQuotLen :=
+  PI.UnitaryGroupMassFormula.BallQuotLen.ballQuotLen_main

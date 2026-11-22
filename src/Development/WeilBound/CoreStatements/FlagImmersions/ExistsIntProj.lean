@@ -13,19 +13,27 @@ set_option linter.style.haveILetI false
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+  GlobalTheory.CompanionTheory.Ar.Fl
 open MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar.LieTangent
 
 namespace RootFieldNumerics.RF.Fib
 
-theorem mem_eigSp {R W O : Type} [CommRing R] [AddCommGroup W] [Module R W] [CommRing O]
-    {ρ : O →+* Module.End R W} {σ : O →+* R} {w : W} : w ∈ eigSp ρ σ ↔ ∀ a, ρ a w = σ a • w := by
+theorem mem_eigSp
+    {R W O : Type} [CommRing R] [AddCommGroup W] [Module R W] [CommRing O]
+    {ρ : O →+* Module.End R W} {σ : O →+* R} {w : W}
+    : w ∈ eigSp ρ σ ↔ ∀ a, ρ a w = σ a • w := by
   simp [eigSp, Submodule.mem_iInf, LinearMap.mem_ker, sub_eq_zero]
 
-private theorem exists_trace_dual_integral_projector {E : Type} [Field E] [NumberField E] {Ix : Type} [Fintype Ix] [DecidableEq Ix]
-    (B : Module.Basis Ix ℤ (𝓞 E)) (A : Matrix Ix Ix ℤ) (d : ℤ) (hd : d ≠ 0)
-    (hA : A * Algebra.traceMatrix ℤ B = d • 1) :
-    ∃ z : Ix → 𝓞 E, (∀ a j, a * z j = ∑ k, B.repr (a * B k) j • z k) ∧ ∑ k, z k * B k = (d : 𝓞 E) := by
+private theorem exists_trace_dual_integral_projector
+    {E : Type} [Field E] [NumberField E]
+    {Ix : Type} [Fintype Ix] [DecidableEq Ix]
+    (B : Module.Basis Ix ℤ (𝓞 E)) (A : Matrix Ix Ix ℤ) (d : ℤ)
+    (hd : d ≠ 0) (hA : A * Algebra.traceMatrix ℤ B = d • 1)
+    : ∃ z : Ix → 𝓞 E,
+      (∀ a j, a * z j = ∑ k, B.repr (a * B k) j • z k) ∧ ∑ k, z k * B k = (d : 𝓞 E) := by
   obtain ⟨z, hz⟩ : ∃ z : Ix → 𝓞 E, ∀ j, z j = ∑ i, A j i • B i := ⟨_, fun _ => rfl⟩
   have hF0 : ∀ j l, Algebra.trace ℤ (𝓞 E) (z j * B l) = if j = l then d else 0 := by
     intro j l
@@ -41,10 +49,12 @@ private theorem exists_trace_dual_integral_projector {E : Type} [Field E] [Numbe
     intro j y
     conv_lhs => rw [← B.sum_repr y]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.mul_sum, mul_smul_comm, map_sum, map_zsmul, hF0, smul_eq_mul, mul_ite, mul_zero,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true]
+      simp only [Finset.mul_sum, mul_smul_comm, map_sum, map_zsmul, hF0, smul_eq_mul, mul_ite,
+        mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     ring
-  have hN : ∀ x x' : 𝓞 E, (∀ y, Algebra.trace ℤ (𝓞 E) (x * y) = Algebra.trace ℤ (𝓞 E) (x' * y)) → x = x' := by
+  have hN
+      : ∀ x x' : 𝓞 E,
+        (∀ y, Algebra.trace ℤ (𝓞 E) (x * y) = Algebra.trace ℤ (𝓞 E) (x' * y)) → x = x' := by
     intro x x' h
     apply B.ext_elem
     intro j
@@ -58,24 +68,28 @@ private theorem exists_trace_dual_integral_projector {E : Type} [Field E] [Numbe
     conv_lhs => rw [← B.sum_repr y]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Finset.mul_sum, mul_smul_comm, map_sum, map_zsmul, Finset.sum_apply',
-      Finsupp.smul_apply, smul_eq_mul]
+        Finsupp.smul_apply, smul_eq_mul]
     refine Finset.sum_congr rfl fun k _ => ?_
     ring
   · set_option synthInstance.maxHeartbeats 100000 in
       rw [Finset.sum_mul, map_sum]
     simp only [_root_.mul_assoc, hF]
-    rw [← zsmul_eq_mul, map_zsmul, smul_eq_mul, Algebra.trace_eq_matrix_trace B, Matrix.trace, Finset.mul_sum]
+    rw [← zsmul_eq_mul, map_zsmul, smul_eq_mul, Algebra.trace_eq_matrix_trace B, Matrix.trace,
+      Finset.mul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     simp [Algebra.leftMulMatrix_apply, LinearMap.toMatrix_apply, mul_comm]
 
-private theorem exists_eigSp_projector_sum_mem_and_discr_smul (E : Type) [Field E] [NumberField E] :
-    ∃ (I : Type) (_ : Fintype I) (z b : I → 𝓞 E), ∀ (K W : Type) [Field K] [AddCommGroup W] [Module K W]
-      (χ : 𝓞 E →+* K) (ρ : 𝓞 E →+* Module.End K W) (w : W),
-      (∑ k, χ (z k) • ρ (b k) w) ∈ eigSp ρ χ ∧ (w ∈ eigSp ρ χ → ∑ k, χ (z k) • ρ (b k) w = ((discr E : ℤ) : K) • w) := by
+private theorem exists_eigSp_projector_sum_mem_and_discr_smul (E : Type) [Field E] [NumberField E]
+    : ∃ (I : Type) (_ : Fintype I) (z b : I → 𝓞 E),
+      ∀ (K W : Type) [Field K] [AddCommGroup W] [Module K W] (χ : 𝓞 E →+* K)
+          (ρ : 𝓞 E →+* Module.End K W) (w : W),
+        (∑ k, χ (z k) • ρ (b k) w) ∈ eigSp ρ χ
+          ∧ (w ∈ eigSp ρ χ → ∑ k, χ (z k) • ρ (b k) w = ((discr E : ℤ) : K) • w) := by
   classical
-  obtain ⟨z, hza, hzd⟩ := exists_trace_dual_integral_projector (RingOfIntegers.basis E)
-    (Algebra.traceMatrix ℤ (RingOfIntegers.basis E)).adjugate (discr E) (discr_ne_zero E)
-    (by rw [Matrix.adjugate_mul]; rfl)
+  obtain ⟨z, hza, hzd⟩ :=
+    exists_trace_dual_integral_projector (RingOfIntegers.basis E)
+      (Algebra.traceMatrix ℤ (RingOfIntegers.basis E)).adjugate (discr E) (discr_ne_zero E)
+      (by rw [Matrix.adjugate_mul]; rfl)
   set B := RingOfIntegers.basis E
   refine ⟨_, inferInstance, z, B, ?_⟩
   intro K W _ _ _ χ ρ w
@@ -83,43 +97,53 @@ private theorem exists_eigSp_projector_sum_mem_and_discr_smul (E : Type) [Field 
   constructor
   · rw [mem_eigSp]
     intro a
-    calc ρ a (∑ k, χ (z k) • ρ (B k) w) = ∑ k, χ (z k) • ρ (a * B k) w := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp [map_sum, map_smul, map_mul, Module.End.mul_apply]
+    calc
+      ρ a (∑ k, χ (z k) • ρ (B k) w) = ∑ k, χ (z k) • ρ (a * B k) w := by
+        set_option synthInstance.maxHeartbeats 100000 in
+        simp [map_sum, map_smul, map_mul, Module.End.mul_apply]
       _ = ∑ k, χ (z k) • ∑ j, ((B.repr (a * B k) j : ℤ) : K) • ρ (B j) w := by
-          refine Finset.sum_congr rfl fun k _ => ?_
-          conv_lhs => rw [hB a k]
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp [map_sum, Int.cast_smul_eq_zsmul]
+        refine Finset.sum_congr rfl fun k _ => ?_
+        conv_lhs => rw [hB a k]
+        set_option synthInstance.maxHeartbeats 100000 in
+        simp [map_sum, Int.cast_smul_eq_zsmul]
       _ = ∑ j, ∑ k, (((B.repr (a * B k) j : ℤ) : K) * χ (z k)) • ρ (B j) w := by
-          simp only [Finset.smul_sum, smul_smul]
-          rw [Finset.sum_comm]
-          simp only [mul_comm]
+        simp only [Finset.smul_sum, smul_smul]
+        rw [Finset.sum_comm]
+        simp only [mul_comm]
       _ = ∑ j, χ (a * z j) • ρ (B j) w := by
-          refine Finset.sum_congr rfl fun j _ => ?_
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [hza a j, map_sum, Finset.sum_smul]
-          simp only [map_zsmul, zsmul_eq_mul, map_mul, map_intCast]
-      _ = χ a • ∑ k, χ (z k) • ρ (B k) w := by
-          simp [Finset.smul_sum, smul_smul, map_mul]
+        refine Finset.sum_congr rfl fun j _ => ?_
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [hza a j, map_sum, Finset.sum_smul]
+        simp only [map_zsmul, zsmul_eq_mul, map_mul, map_intCast]
+      _ = χ a • ∑ k, χ (z k) • ρ (B k) w := by simp [Finset.smul_sum, smul_smul, map_mul]
   · intro hw
     rw [mem_eigSp] at hw
     simp only [hw, smul_smul]
     rw [← Finset.sum_smul]
     simp only [← map_mul]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, hzd, map_intCast]
+    rw [← map_sum, hzd, map_intCast]
 
 section Val
 
-variable {X : Scheme.{0}} {G : Over X} [GrpObj G] {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
-  {E : Type} [AddCommGroup E] [Module Ω E] {M : LieModel G ξ E} {V L : Type} [CommRing V] [IsLocalRing V] [Field L]
-  [Algebra V L] {z : Spec (CommRingCat.of V) ⟶ X} {EC : Type} [AddCommGroup EC] [Module L EC] [Module V EC]
-  [IsScalarTower V L EC] {MC : LieModel G (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) EC}
+variable
+  {X : Scheme.{0}} {G : Over X} [GrpObj G]
+  {Ω : Type} [Field Ω]
+  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
+  {M : LieModel G ξ E} {V L : Type} [CommRing V] [IsLocalRing V] [Field L] [Algebra V L]
+  {z : Spec (CommRingCat.of V) ⟶ X} {EC : Type}
+  [AddCommGroup EC] [Module L EC] [Module V EC] [IsScalarTower V L EC]
+  {MC : LieModel G (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) EC}
 
-theorem lat_act (M : LieModel G ξ E) (f : G ⟶ G) [IsMonHom f] (T : E →ₗ[Ω] E) (hT : M.IsDiffOf f T) {p : Cpt ξ} {e : E}
-    (he : e ∈ M.lat p) : T e ∈ M.lat p := by
-  have key : ∀ (e : E) (v : epsAt (X.fromSpecStalk p.1) ⟶ G), M.Extends p e v → M.Extends p (T e) (v ≫ f) := by
+theorem lat_act
+    (M : LieModel G ξ E)
+    (f : G ⟶ G) [IsMonHom f]
+    (T : E →ₗ[Ω] E) (hT : M.IsDiffOf f T)
+    {p : Cpt ξ} {e : E} (he : e ∈ M.lat p)
+    : T e ∈ M.lat p := by
+  have key
+      : ∀ (e : E) (v : epsAt (X.fromSpecStalk p.1) ⟶ G),
+        M.Extends p e v → M.Extends p (T e) (v ≫ f) := by
     intro e v hv
     obtain ⟨h1, h2⟩ := hv
     refine ⟨?_, ?_⟩
@@ -132,7 +156,8 @@ theorem lat_act (M : LieModel G ξ E) (f : G ⟶ G) [IsMonHom f] (T : E →ₗ[�
   | mem x hx =>
     obtain ⟨v, hv⟩ := hx
     exact Submodule.subset_span ⟨v ≫ f, key _ _ hv⟩
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     rw [map_add (f := _)]
     exact add_mem hx hy
@@ -140,9 +165,11 @@ theorem lat_act (M : LieModel G ξ E) (f : G ⟶ G) [IsMonHom f] (T : E →ₗ[�
     rw [LinearMap.map_smul_of_tower]
     exact Submodule.smul_mem _ a hx
 
-theorem val_smul (hξ : IsCptGen ξ) {e : E} {w : EC} {a : Ω} {r : V} (ha : ValAt ξ z a r)
-    (h : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) e (MC.pt w)) :
-    M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (a • e) (MC.pt (r • w)) := by
+theorem val_smul
+    (hξ : IsCptGen ξ)
+    {e : E} {w : EC} {a : Ω} {r : V} (ha : ValAt ξ z a r)
+    (h : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) e (MC.pt w))
+    : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (a • e) (MC.pt (r • w)) := by
   obtain ⟨hc, -⟩ := id h
   obtain ⟨h1, s, hs1, hs2⟩ := ProjectiveLinePlaces.valAt_restrict (algebraMap V L) rfl hc ha
   have key := LieModel.ValAt.smul h h1 s
@@ -152,22 +179,25 @@ theorem val_smul (hξ : IsCptGen ξ) {e : E} {w : EC} {a : Ω} {r : V} (ha : Val
   rw [← algebraMap_smul L r w, MC.smul, Over.comp_left]
   rfl
 
-theorem val_add {e e' : E} {w w' : EC}
+theorem val_add
+    {e e' : E} {w w' : EC}
     (h : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) e (MC.pt w))
-    (h' : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) e' (MC.pt w')) :
-    M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (e + e') (MC.pt (w + w')) := by
+    (h' : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) e' (MC.pt w'))
+    : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (e + e') (MC.pt (w + w')) := by
   rw [MC.add]
   exact h.add h'
 
-theorem val_zero (h : genPt ξ ⤳ centre (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z)) :
-    M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) 0 (MC.pt 0) := by
+theorem val_zero (h : genPt ξ ⤳ centre (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z))
+    : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) 0 (MC.pt 0) := by
   rw [MC.pt_zero]
   exact M.valAt_zero h
 
-theorem val_sum (h : genPt ξ ⤳ centre (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z)) {I : Type} (s : Finset I)
-    (e : I → E) (w : I → EC)
-    (hw : ∀ k, M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (e k) (MC.pt (w k))) :
-    M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (∑ k ∈ s, e k) (MC.pt (∑ k ∈ s, w k)) := by
+theorem val_sum
+    (h : genPt ξ ⤳ centre (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z))
+    {I : Type} (s : Finset I) (e : I → E) (w : I → EC)
+    (hw : ∀ k, M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (e k) (MC.pt (w k)))
+    : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (∑ k ∈ s, e k)
+      (MC.pt (∑ k ∈ s, w k)) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -177,18 +207,23 @@ theorem val_sum (h : genPt ξ ⤳ centre (Spec.map (CommRingCat.ofHom (algebraMa
     rw [Finset.sum_insert hk, Finset.sum_insert hk]
     exact val_add (hw k) ih
 
-theorem val_mem_span (hξ : IsCptGen ξ) (h : genPt ξ ⤳ centre z)
-    (h' : genPt ξ ⤳ centre (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z)) {n : ℕ} {b : Fin n → E}
-    {x : Fin n → EC} (hx : ∀ k, M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (b k) (MC.pt (x k)))
-    {e : E} (he : e ∈ Submodule.span (regAt ξ ⟨centre z, h⟩) (Set.range b)) {w : EC}
-    (hw : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) e (MC.pt w)) :
-    w ∈ Submodule.span V (Set.range x) := by
+theorem val_mem_span
+    (hξ : IsCptGen ξ)
+    (h : genPt ξ ⤳ centre z)
+    (h' : genPt ξ ⤳ centre (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z))
+    {n : ℕ} {b : Fin n → E} {x : Fin n → EC}
+    (hx : ∀ k, M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (b k) (MC.pt (x k)))
+    {e : E} (he : e ∈ Submodule.span (regAt ξ ⟨centre z, h⟩) (Set.range b))
+    {w : EC} (hw : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) e (MC.pt w))
+    : w ∈ Submodule.span V (Set.range x) := by
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 he
   have hs : ∀ k, ∃ s, genMap ξ ⟨centre z, h⟩ s = (c k : Ω) := fun k => RingHom.mem_range.1 (c k).2
   choose s hs using hs
-  have hval : ∀ k, M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) ((c k : Ω) • b k)
-      (MC.pt ((CommRingCat.Hom.hom (Scheme.stalkClosedPointTo z)) (s k) • x k)) :=
-    fun k => val_smul hξ ⟨h, s k, hs k, rfl⟩ (hx k)
+  have hval
+      : ∀ k,
+        M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) ((c k : Ω) • b k)
+          (MC.pt ((CommRingCat.Hom.hom (Scheme.stalkClosedPointTo z)) (s k) • x k)) := fun k =>
+    val_smul hξ ⟨h, s k, hs k, rfl⟩ (hx k)
   have hsum := val_sum h' Finset.univ _ _ hval
   have he' : ∑ k, (c k : Ω) • b k = e := by
     rw [← hc]
@@ -198,14 +233,20 @@ theorem val_mem_span (hξ : IsCptGen ξ) (h : genPt ξ ⤳ centre z)
   rw [hweq]
   exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
 
-theorem val_eig (hξ : IsCptGen ξ) {O : Type} [CommRing O] {act : O → (G ⟶ G)} (hact : ∀ a, IsMonHom (act a))
-    {ρ : O →+* Module.End Ω E} {ρC : O →+* Module.End L EC} (h1 : M.IsActOf act ρ) (h2 : MC.IsActOf act ρC)
-    {χ : O →+* Ω} {σ : O →+* V} (hσ : ∀ a, ValAt ξ z (χ a) (σ a)) {e : E} (he : e ∈ eigSp ρ χ) {w : EC}
-    (hw : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) e (MC.pt w)) :
-    w ∈ eigSp ρC ((algebraMap V L).comp σ) := by
+theorem val_eig
+    (hξ : IsCptGen ξ)
+    {O : Type} [CommRing O]
+    {act : O → (G ⟶ G)} (hact : ∀ a, IsMonHom (act a))
+    {ρ : O →+* Module.End Ω E} {ρC : O →+* Module.End L EC}
+    (h1 : M.IsActOf act ρ) (h2 : MC.IsActOf act ρC)
+    {χ : O →+* Ω} {σ : O →+* V} (hσ : ∀ a, ValAt ξ z (χ a) (σ a))
+    {e : E} (he : e ∈ eigSp ρ χ)
+    {w : EC} (hw : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) e (MC.pt w))
+    : w ∈ eigSp ρC ((algebraMap V L).comp σ) := by
   rw [mem_eigSp] at he ⊢
   intro a
-  have hA : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (ρ a e) (MC.pt (ρC a w)) := by
+  have hA
+      : M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (ρ a e) (MC.pt (ρC a w)) := by
     obtain ⟨hc, v, ⟨hv1, hv2⟩, hv3⟩ := id hw
     haveI := hact a
     refine ⟨hc, v ≫ act a, ⟨?_, ?_⟩, ?_⟩
@@ -227,47 +268,64 @@ namespace RootFieldNumerics.RF
 
 open Fib PositivityTheory.HtPt.Gh
 
-private theorem mem_lat_of_specializes {X : Scheme.{0}} {G : Over X} [GrpObj G] {Ω : Type} [Field Ω]
-    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E] (M : LieModel G ξ E)
-    (q q' : Cpt ξ) (hs : q'.1 ⤳ q.1) {e : E} (he : e ∈ M.lat q) : e ∈ M.lat q' := by
+private theorem mem_lat_of_specializes
+    {X : Scheme.{0}} {G : Over X} [GrpObj G]
+    {Ω : Type} [Field Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
+    (M : LieModel G ξ E)
+    (q q' : Cpt ξ) (hs : q'.1 ⤳ q.1)
+    {e : E} (he : e ∈ M.lat q)
+    : e ∈ M.lat q' := by
   have hreg : ∀ a ∈ regAt ξ q, a ∈ regAt ξ q' := by
     rintro a ⟨s, rfl⟩
     exact ⟨_, ProjectiveLinePlaces.genMap_specializes hs q'.2 q.2 s⟩
-  have hψ : Spec.map (X.presheaf.stalkSpecializes hs) ≫ X.fromSpecStalk q.1 = X.fromSpecStalk q'.1 :=
+  have hψ
+      : Spec.map (X.presheaf.stalkSpecializes hs) ≫ X.fromSpecStalk q.1 = X.fromSpecStalk q'.1 :=
     Scheme.SpecMap_stalkSpecializes_fromSpecStalk hs
-  have hgen : ∀ (v : epsAt (X.fromSpecStalk q.1) ⟶ G) (x : E), M.Extends q x v →
-      ∃ v' : epsAt (X.fromSpecStalk q'.1) ⟶ G, M.Extends q' x v' := by
+  have hgen
+      : ∀ (v : epsAt (X.fromSpecStalk q.1) ⟶ G) (x : E),
+        M.Extends q x v → ∃ v' : epsAt (X.fromSpecStalk q'.1) ⟶ G, M.Extends q' x v' := by
     intro v x hv
     obtain ⟨hv1, hv2⟩ := hv
-    have hφ : Spec.map (CommRingCat.ofHom (GlobalTheory.CompanionTheory.Ar.dualMap (X.presheaf.stalkSpecializes hs).hom)) ≫
-        (epsAt (X.fromSpecStalk q.1)).hom = (epsAt (X.fromSpecStalk q'.1)).hom := by
+    have hφ
+        : Spec.map (CommRingCat.ofHom (GlobalTheory.CompanionTheory.Ar.dualMap
+              (X.presheaf.stalkSpecializes hs).hom))
+            ≫ (epsAt (X.fromSpecStalk q.1)).hom
+          = (epsAt (X.fromSpecStalk q'.1)).hom := by
       simp only [epsAt, Over.mk_hom]
       rw [← hψ, ← Category.assoc, ← Category.assoc, ← Spec.map_comp, ← Spec.map_comp]
       congr 2
       ext a <;> simp [GlobalTheory.CompanionTheory.Ar.dualMap] <;> first | rfl | exact map_zero _
     let φ : epsAt (X.fromSpecStalk q'.1) ⟶ epsAt (X.fromSpecStalk q.1) := Over.homMk _ hφ
-    have hφl : φ.left = Spec.map (CommRingCat.ofHom (GlobalTheory.CompanionTheory.Ar.dualMap (X.presheaf.stalkSpecializes hs).hom)) := rfl
+    have hφl
+        : φ.left
+          = Spec.map (CommRingCat.ofHom (GlobalTheory.CompanionTheory.Ar.dualMap
+            (X.presheaf.stalkSpecializes hs).hom)) :=
+      rfl
     refine ⟨φ ≫ v, ?_, ?_⟩
     · unfold IsTanAt at hv1 ⊢
-      have key : Spec.map (CommRingCat.ofHom (TrivSqZeroExt.fstHom (X.presheaf.stalk q'.1)
-          (X.presheaf.stalk q'.1) (X.presheaf.stalk q'.1)).toRingHom) ≫ φ.left =
-          Spec.map (X.presheaf.stalkSpecializes hs) ≫ Spec.map (CommRingCat.ofHom (TrivSqZeroExt.fstHom
-          (X.presheaf.stalk q.1) (X.presheaf.stalk q.1) (X.presheaf.stalk q.1)).toRingHom) := by
+      have key
+          : Spec.map (CommRingCat.ofHom (TrivSqZeroExt.fstHom (X.presheaf.stalk q'.1)
+                (X.presheaf.stalk q'.1) (X.presheaf.stalk q'.1)).toRingHom)
+              ≫ φ.left
+            = Spec.map (X.presheaf.stalkSpecializes hs)
+              ≫ Spec.map (CommRingCat.ofHom (TrivSqZeroExt.fstHom (X.presheaf.stalk q.1)
+                (X.presheaf.stalk q.1) (X.presheaf.stalk q.1)).toRingHom) := by
         rw [hφl, ← Spec.map_comp, ← Spec.map_comp]
         congr 1
         ext a <;> simp [GlobalTheory.CompanionTheory.Ar.dualMap] <;> first | rfl | exact map_zero _
       rw [Over.comp_left, ← Category.assoc, key, Category.assoc, hv1]
       let ψ : Over.mk (X.fromSpecStalk q'.1) ⟶ Over.mk (X.fromSpecStalk q.1) := Over.homMk _ hψ
-      have h1 : ψ ≫ (1 : Over.mk (X.fromSpecStalk q.1) ⟶ G) = 1 := by
-        exact MonObj.comp_one ψ
+      have h1 : ψ ≫ (1 : Over.mk (X.fromSpecStalk q.1) ⟶ G) = 1 := by exact MonObj.comp_one ψ
       have h2 := congrArg Over.Hom.left h1
       rw [Over.comp_left] at h2
       exact h2
     · rw [Over.comp_left, hφl, ← Category.assoc, ← Spec.map_comp, hv2]
       congr 2
-      have hg : ∀ s, genMap ξ q' ((X.presheaf.stalkSpecializes hs).hom s) = genMap ξ q s :=
-        fun s => ProjectiveLinePlaces.genMap_specializes hs q'.2 q.2 s
-      ext a <;> simp [GlobalTheory.CompanionTheory.Ar.dualMap, hg] <;> first | rfl | exact (hg _).symm
+      have hg : ∀ s, genMap ξ q' ((X.presheaf.stalkSpecializes hs).hom s) = genMap ξ q s := fun s =>
+        ProjectiveLinePlaces.genMap_specializes hs q'.2 q.2 s
+      ext a <;> simp [GlobalTheory.CompanionTheory.Ar.dualMap, hg]
+        <;> first | rfl | exact (hg _).symm
   unfold LieModel.lat at he ⊢
   induction he using Submodule.span_induction with
   | mem x hx =>
@@ -276,16 +334,20 @@ private theorem mem_lat_of_specializes {X : Scheme.{0}} {G : Over X} [GrpObj G] 
     exact Submodule.subset_span ⟨v', hv'⟩
   | zero => exact zero_mem _
   | add x y _ _ hx hy => exact add_mem hx hy
-  | smul a x _ hx =>
-    exact Submodule.smul_mem _ (⟨a, hreg a a.2⟩ : regAt ξ q') hx
+  | smul a x _ hx => exact Submodule.smul_mem _ (⟨a, hreg a a.2⟩ : regAt ξ q') hx
 
-private theorem fibAt_mono' {X : Scheme.{0}} {G : Over X} [GrpObj G] {Ω : Type} [Field Ω]
-    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E] (M : LieModel G ξ E)
-    {R : Type} [CommRing R] [IsLocalRing R] (z : Spec (CommRingCat.of R) ⟶ X) {C : Type} [Field C] [Algebra R C]
+private theorem fibAt_mono'
+    {X : Scheme.{0}} {G : Over X} [GrpObj G]
+    {Ω : Type} [Field Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
+    (M : LieModel G ξ E)
+    {R : Type} [CommRing R] [IsLocalRing R]
+    (z : Spec (CommRingCat.of R) ⟶ X)
+    {C : Type} [Field C] [Algebra R C]
     {EC : Type} [AddCommGroup EC] [Module C EC] [Module R EC]
-    (MC : LieModel G (Spec.map (CommRingCat.ofHom (algebraMap R C)) ≫ z) EC) (L1 L2 : Lat ξ E)
-    (hL : ∀ h : genPt ξ ⤳ centre z, ∀ e ∈ L1 ⟨centre z, h⟩, e ∈ L2 ⟨centre z, h⟩) :
-    M.fibAt L1 z MC ≤ M.fibAt L2 z MC := by
+    (MC : LieModel G (Spec.map (CommRingCat.ofHom (algebraMap R C)) ≫ z) EC)
+    (L1 L2 : Lat ξ E) (hL : ∀ h : genPt ξ ⤳ centre z, ∀ e ∈ L1 ⟨centre z, h⟩, e ∈ L2 ⟨centre z, h⟩)
+    : M.fibAt L1 z MC ≤ M.fibAt L2 z MC := by
   apply Submodule.span_mono
   rintro w ⟨h, e, he, hw⟩
   exact ⟨h, e, hL h e he, hw⟩
@@ -331,8 +393,10 @@ theorem fibSandwich : FibSandwich := by
   have honly : ∀ p' ∈ S, InFibre 𝔐.ξ p' ⟨centre z, hc⟩ → p' = (p : ℕ) := by
     intro p' hp' hf
     by_contra hne
-    exact Lat.not_inFibre_of_coprime _ ((Nat.coprime_primes p.2 (𝔐.S_prime p' hp')).2 (Ne.symm hne)) hfib hf
-  have hnot' : ∀ p' ∈ S, ¬ InFibre 𝔐.ξ p' ⟨_, hc'⟩ := fun p' hp' hf => hf (hunit' p' (𝔐.S_prime p' hp').ne_zero)
+    exact Lat.not_inFibre_of_coprime _ ((Nat.coprime_primes p.2 (𝔐.S_prime p' hp')).2 (Ne.symm hne))
+      hfib hf
+  have hnot' : ∀ p' ∈ S, ¬ InFibre 𝔐.ξ p' ⟨_, hc'⟩ := fun p' hp' hf =>
+    hf (hunit' p' (𝔐.S_prime p' hp').ne_zero)
   have hbq : 𝔐.V s ⟨centre z, hc⟩ = Submodule.span (regAt 𝔐.ξ ⟨centre z, hc⟩) (Set.range b) := hb.2
   have hbk : ∀ k, b k ∈ 𝔐.V s ⟨centre z, hc⟩ := fun k => by
     rw [hbq]
@@ -344,21 +408,30 @@ theorem fibSandwich : FibSandwich := by
     apply le_antisymm
     · exact iInf_le_of_le (p : ℕ) (iInf_le_of_le hpS (iInf_le _ hfib))
     · exact le_iInf fun p' => le_iInf fun hp' => le_iInf fun hf => by rw [honly p' hp' hf]
-  have hVnS : (p : ℕ) ∉ S → 𝔐.V s ⟨centre z, hc⟩ =
-      𝔐.M.lat ⟨centre z, hc⟩ ⊓ (eigSp 𝔐.ρ (𝔐.emb s)).restrictScalars (regAt 𝔐.ξ ⟨centre z, hc⟩) := by
+  have hVnS
+      : (p : ℕ) ∉ S
+        → 𝔐.V s ⟨centre z, hc⟩
+          = 𝔐.M.lat ⟨centre z, hc⟩
+            ⊓ (eigSp 𝔐.ρ (𝔐.emb s)).restrictScalars (regAt 𝔐.ξ ⟨centre z, hc⟩) := by
     intro hpS
     unfold HodgeCpt.V Lat.patch
     rw [if_neg]
     · rfl
     · rintro ⟨p', hp', hf⟩
       exact hpS (honly p' hp' hf ▸ hp')
-  have hdiff : ∃ N : ℕ, N ≠ 0 ∧ (N : 𝓞 E) ∈ differentIdeal ℤ (𝓞 E) :=
-    ⟨Ideal.absNorm (differentIdeal ℤ (𝓞 E)), by
+  have hdiff : ∃ N : ℕ, N ≠ 0 ∧ (N : 𝓞 E) ∈ differentIdeal ℤ (𝓞 E) := ⟨
+    Ideal.absNorm (differentIdeal ℤ (𝓞 E)),
+    by
       rw [Ne, Ideal.absNorm_eq_zero_iff]
-      exact differentIdeal_ne_bot, Ideal.absNorm_mem _⟩
-  have hD : (p : ℕ) ∈ S → ∀ e ∈ 𝔐.M.htDual 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb s) ⟨centre z, hc⟩,
-      e ∈ 𝔐.M.lat ⟨_, hc'⟩ := fun hpS =>
-    PositivityTheory.HtPt.Gh.htDual_le_lat 𝔐 hpS s ⟨centre z, hc⟩ ⟨_, hc'⟩ hspec hfib honly hnot' hemb
+      exact differentIdeal_ne_bot,
+    Ideal.absNorm_mem _
+  ⟩
+  have hD
+      : (p : ℕ) ∈ S
+        → ∀ e ∈ 𝔐.M.htDual 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb s) ⟨centre z, hc⟩,
+          e ∈ 𝔐.M.lat ⟨_, hc'⟩ := fun hpS =>
+    PositivityTheory.HtPt.Gh.htDual_le_lat 𝔐 hpS s ⟨centre z, hc⟩ ⟨_, hc'⟩ hspec hfib honly hnot'
+      hemb
   have hVlat : ∀ e ∈ 𝔐.V s ⟨centre z, hc⟩, e ∈ 𝔐.M.lat ⟨_, hc'⟩ := by
     intro e he
     by_cases hpS : (p : ℕ) ∈ S
@@ -383,8 +456,9 @@ theorem fibSandwich : FibSandwich := by
       · exact hD hpS e he
     · rw [hVnS hpS] at he
       exact mem_lat_of_specializes 𝔐.M ⟨centre z, hc⟩ ⟨_, hc'⟩ hspec he.1
-  have hx0 : ∀ k, ∃ x : Fin g → L,
-      𝔐.M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (b k) (MC.pt x) := by
+  have hx0
+      : ∀ k, ∃ x : Fin g → L,
+        𝔐.M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (b k) (MC.pt x) := by
     intro k
     obtain ⟨w, hw⟩ := (𝔐.M.exists_valAt_iff _ (b k)).2 ⟨hc', hVlat _ (hbk k)⟩
     obtain ⟨x, hx⟩ := MC.onto w hw.isTanAt
@@ -397,7 +471,8 @@ theorem fibSandwich : FibSandwich := by
       exact Submodule.subset_span ⟨hc, b k, hbk k, hx k⟩
     · apply Submodule.span_le.2
       rintro w ⟨h, e, he, hw⟩
-      have hbq' : 𝔐.V s ⟨centre z, h⟩ = Submodule.span (regAt 𝔐.ξ ⟨centre z, h⟩) (Set.range b) := hb.2
+      have hbq' : 𝔐.V s ⟨centre z, h⟩ = Submodule.span (regAt 𝔐.ξ ⟨centre z, h⟩) (Set.range b) :=
+        hb.2
       rw [hbq'] at he
       exact val_mem_span hξ h hc' hx he hw
   refine ⟨x, hx, ?_, ?_⟩
@@ -413,7 +488,9 @@ theorem fibSandwich : FibSandwich := by
         intro h0
         rw [h0, map_zero, norm_zero] at hn
         exact zero_ne_one hn
-      obtain ⟨u, hu⟩ := RingHom.mem_range.1 ((hj (((discr E : ℤ) : L)⁻¹)).1 (by rw [map_inv₀, norm_inv, hn, inv_one]))
+      obtain ⟨u, hu⟩ :=
+        RingHom.mem_range.1 ((hj (((discr E : ℤ) : L)⁻¹)).1
+          (by rw [map_inv₀, norm_inv, hn, inv_one]))
       have hmul : ((discr E : ℤ) : V) * u = 1 := by
         apply IsFractionRing.injective V L
         rw [map_mul, hu, map_intCast, map_one, mul_inv_cancel₀ hne]
@@ -423,26 +500,35 @@ theorem fibSandwich : FibSandwich := by
       rintro _ ⟨k, rfl⟩
       have hbk' := hbk k
       rw [hVq] at hbk'
-      refine Submodule.mem_inf.2 ⟨Submodule.subset_span ⟨hc, b k, (Submodule.mem_inf.1 hbk').1, hx k⟩, ?_⟩
+      refine Submodule.mem_inf.2
+        ⟨Submodule.subset_span ⟨hc, b k, (Submodule.mem_inf.1 hbk').1, hx k⟩, ?_⟩
       exact val_eig hξ 𝔐.t.act.hom 𝔐.act hact hσ (Submodule.mem_inf.1 hbk').2 (hx k)
     · intro w hw
       obtain ⟨hw1, hw2⟩ := Submodule.mem_inf.1 hw
-      have key : ∀ w ∈ 𝔐.M.fibAt 𝔐.M.lat z MC,
-          (∑ k, ((algebraMap V L).comp σ) (zz k) • ρC (bb k) w) ∈ Submodule.span V (Set.range x) := by
+      have key
+          : ∀ w ∈ 𝔐.M.fibAt 𝔐.M.lat z MC,
+            (∑ k, ((algebraMap V L).comp σ) (zz k) • ρC (bb k) w)
+              ∈ Submodule.span V (Set.range x) := by
         intro w hw
         induction hw using Submodule.span_induction with
         | mem w' hw' =>
           obtain ⟨h, e, he, hwe⟩ := hw'
-          have hact2 : ∀ k, 𝔐.M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (𝔐.ρ (bb k) e)
-              (MC.pt (ρC (bb k) w')) := by
+          have hact2
+              : ∀ k,
+                𝔐.M.ValAt (Spec.map (CommRingCat.ofHom (algebraMap V L)) ≫ z) (𝔐.ρ (bb k) e)
+                  (MC.pt (ρC (bb k) w')) := by
             intro k
             haveI := 𝔐.t.act.hom (bb k)
-            exact PositivityTheory.HtPt.Gh.valAt_act 𝔐.M MC (𝔐.t.act.act (bb k)) (𝔐.ρ (bb k)) (ρC (bb k)) (𝔐.act (bb k))
-              (hact (bb k)) hwe
-          have hsum := val_sum hc' Finset.univ (fun k => 𝔐.emb s (zz k) • 𝔐.ρ (bb k) e)
-            (fun k => σ (zz k) • ρC (bb k) w') (fun k => val_smul hξ (hσ (zz k)) (hact2 k))
-          have hmem : (∑ k, 𝔐.emb s (zz k) • 𝔐.ρ (bb k) e) ∈
-              Submodule.span (regAt 𝔐.ξ ⟨centre z, hc⟩) (Set.range b) := by
+            exact PositivityTheory.HtPt.Gh.valAt_act 𝔐.M MC (𝔐.t.act.act (bb k)) (𝔐.ρ (bb k))
+              (ρC (bb k)) (𝔐.act (bb k)) (hact (bb k)) hwe
+          have hsum :=
+            val_sum hc' Finset.univ
+              (fun k => 𝔐.emb s (zz k) • 𝔐.ρ (bb k) e)
+              (fun k => σ (zz k) • ρC (bb k) w')
+              (fun k => val_smul hξ (hσ (zz k)) (hact2 k))
+          have hmem
+              : (∑ k, 𝔐.emb s (zz k) • 𝔐.ρ (bb k) e)
+                ∈ Submodule.span (regAt 𝔐.ξ ⟨centre z, hc⟩) (Set.range b) := by
             rw [← hbq, hVq]
             refine Submodule.mem_inf.2 ⟨?_, (hP Ω 𝔐.Li (𝔐.emb s) 𝔐.ρ e).1⟩
             refine Submodule.sum_mem _ fun k _ => ?_
@@ -452,13 +538,16 @@ theorem fibSandwich : FibSandwich := by
             exact Submodule.smul_mem _ (⟨_, hemb (zz k)⟩ : regAt 𝔐.ξ ⟨centre z, hc⟩) h1
           have h5 := val_mem_span hξ hc hc' hx hmem hsum
           simpa [RingHom.comp_apply, algebraMap_smul] using h5
-        | zero => simp
+        | zero =>
+          simp
         | add w1 w2 _ _ h1 h2 =>
           simp only [map_add (f := _), smul_add, Finset.sum_add_distrib]
           exact add_mem h1 h2
         | smul a w _ h1 =>
-          have h3 : ∀ k, ((algebraMap V L).comp σ) (zz k) • ρC (bb k) (a • w) =
-              a • (((algebraMap V L).comp σ) (zz k) • ρC (bb k) w) := by
+          have h3
+              : ∀ k,
+                ((algebraMap V L).comp σ) (zz k) • ρC (bb k) (a • w)
+                  = a • (((algebraMap V L).comp σ) (zz k) • ρC (bb k) w) := by
             intro k
             rw [LinearMap.map_smul_of_tower, smul_comm]
           simp only [h3, ← Finset.smul_sum]
@@ -484,11 +573,14 @@ theorem fibSandwich : FibSandwich := by
       show ‖j ((p : ℕ) : L)‖₊ < 1
       rw [← NNReal.coe_lt_coe, coe_nnnorm, NNReal.coe_one]
       exact hpnorm
-    obtain ⟨t1, t2, -⟩ := PositivityTheory.HtPt.Gh.hodge_tate_free_sandwich E H D l Xo c _ _ Y S Ω K J y 𝔐 (p : ℕ) hpS κ hfree hsand
-      L v V hv hvp z (Fin g → L) MC ρC s σ κz hact hσ hκ
+    obtain ⟨t1, t2, -⟩ :=
+      PositivityTheory.HtPt.Gh.hodge_tate_free_sandwich E H D l Xo c _ _ Y S Ω K J y 𝔐 (p : ℕ) hpS κ
+        hfree hsand L v V hv hvp z (Fin g → L) MC ρC s σ κz hact hσ hκ
     have hVq := hVS hpS
-    have hDV : ∀ h : genPt 𝔐.ξ ⤳ centre z,
-        ∀ e ∈ 𝔐.M.htDual 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb s) ⟨centre z, h⟩, e ∈ 𝔐.V s ⟨centre z, h⟩ := by
+    have hDV
+        : ∀ h : genPt 𝔐.ξ ⤳ centre z,
+          ∀ e ∈ 𝔐.M.htDual 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb s) ⟨centre z, h⟩,
+            e ∈ 𝔐.V s ⟨centre z, h⟩ := by
       intro h e he
       change e ∈ 𝔐.V s ⟨centre z, hc⟩
       rw [hVq]
@@ -498,8 +590,12 @@ theorem fibSandwich : FibSandwich := by
         change e ∈ Submodule.span _ _ at he
         refine Submodule.span_le.2 ?_ he
         intro e0 he0
-        exact Submodule.subset_span ⟨he0.1, fun d _ =>
-          Submodule.smul_mem _ (⟨_, hemb d⟩ : regAt 𝔐.ξ ⟨centre z, hc⟩) (Submodule.subset_span he0)⟩
+        exact Submodule.subset_span ⟨
+          he0.1,
+          fun d _ =>
+            Submodule.smul_mem _ (⟨_, hemb d⟩ : regAt 𝔐.ξ ⟨centre z, hc⟩)
+              (Submodule.subset_span he0)
+        ⟩
       · exact he
     refine ⟨?_, fun d hd w hw => ?_⟩
     · rw [hspan]
@@ -508,9 +604,12 @@ theorem fibSandwich : FibSandwich := by
     have hsd : σ d • w ∈ 𝔐.M.fibAt (𝔐.M.htDual 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb s)) z MC := by
       rcases s with τ | τ
       · have hd' := hd rfl
-        have hW2 : ∀ e ∈ 𝔐.M.htW 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb (Sum.inl τ)) (differentIdeal ℤ (𝓞 E))
-            ⟨centre z, hc⟩, 𝔐.emb (Sum.inl τ) d • e ∈
-              𝔐.M.htDual 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb (Sum.inl τ)) ⟨centre z, hc⟩ := by
+        have hW2
+            : ∀ e
+                ∈ 𝔐.M.htW 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb (Sum.inl τ))
+                  (differentIdeal ℤ (𝓞 E)) ⟨centre z, hc⟩,
+              𝔐.emb (Sum.inl τ) d • e
+                ∈ 𝔐.M.htDual 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb (Sum.inl τ)) ⟨centre z, hc⟩ := by
           intro e he
           unfold LieModel.htW at he
           induction he using Submodule.span_induction with
@@ -530,14 +629,17 @@ theorem fibSandwich : FibSandwich := by
           change e ∈ 𝔐.M.htW _ _ _ _ (differentIdeal ℤ (𝓞 E)) _ at he
           have he2 := hW2 e he
           exact Submodule.subset_span ⟨hc, _, he2, val_smul hξ (hσ d) hwe⟩
-        | zero => simp
+        | zero =>
+          simp
         | add w1 w2 _ _ h1 h2 =>
           rw [smul_add]
           exact add_mem h1 h2
         | smul a w1 _ h1 =>
           rw [smul_comm]
           exact Submodule.smul_mem _ a h1
-      · have hw' : w ∈ 𝔐.M.fibAt (𝔐.M.htDual 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb (Sum.inr τ))) z MC := by
+      · have hw'
+            : w
+              ∈ 𝔐.M.fibAt (𝔐.M.htDual 𝔐.t.PP.L ((p : ℕ) ^ 𝔐.R p) 𝔐.ρ (𝔐.emb (Sum.inr τ))) z MC := by
           refine (fibAt_mono' 𝔐.M z MC _ _ (fun h e he => ?_)) hw
           change e ∈ 𝔐.V (Sum.inr τ) ⟨centre z, hc⟩ at he
           rw [hVq] at he

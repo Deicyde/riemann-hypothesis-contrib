@@ -13,8 +13,11 @@ namespace Formalism.MainNotions.SelectionLemmas.Pf.T
 open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
 open Formalism.InvariantFactorPaths
 
-theorem filter_ge_get_eq_take : ∀ (L : List ℕ), L.Pairwise (· > ·) → ∀ (e : ℕ) (he : e < L.length),
-    L.filter (fun y => decide (L[e] ≤ y)) = L.take (e + 1) := by
+theorem filter_ge_get_eq_take
+    : ∀ (L : List ℕ),
+      L.Pairwise (· > ·)
+        → ∀ (e : ℕ) (he : e < L.length),
+          L.filter (fun y => decide (L[e] ≤ y)) = L.take (e + 1) := by
   intro L
   induction L with
   | nil => intro _ e he; simp at he
@@ -39,7 +42,8 @@ theorem filter_ge_get_eq_take : ∀ (L : List ℕ), L.Pairwise (· > ·) → ∀
 
 def latestList (P : ℕ → Bool) (M : ℕ) : List ℕ := ((List.range' 1 M).filter P).reverse
 
-theorem mem_latest_list (P : ℕ → Bool) (M y : ℕ) : y ∈ latestList P M ↔ (1 ≤ y ∧ y ≤ M) ∧ P y = true := by
+theorem mem_latest_list (P : ℕ → Bool) (M y : ℕ)
+    : y ∈ latestList P M ↔ (1 ≤ y ∧ y ≤ M) ∧ P y = true := by
   simp only [latestList, List.mem_reverse, List.mem_filter, List.mem_range'_1]
   constructor
   · rintro ⟨h1, h2⟩
@@ -54,12 +58,14 @@ theorem latest_list_pairwise_gt (P : ℕ → Bool) (M : ℕ) : (latestList P M).
 theorem latest_list_nodup (P : ℕ → Bool) (M : ℕ) : (latestList P M).Nodup :=
   (latest_list_pairwise_gt P M).imp ne_of_gt
 
-def countFrom (P : ℕ → Bool) (M x : ℕ) : ℕ := ((Finset.Icc 1 M).filter fun y => P y = true ∧ x ≤ y).card
+def countFrom (P : ℕ → Bool) (M x : ℕ) : ℕ :=
+  ((Finset.Icc 1 M).filter fun y => P y = true ∧ x ≤ y).card
 
-theorem count_from_eq_filter_length (P : ℕ → Bool) (M x : ℕ) :
-    countFrom P M x = ((latestList P M).filter fun y => decide (x ≤ y)).length := by
+theorem count_from_eq_filter_length (P : ℕ → Bool) (M x : ℕ)
+    : countFrom P M x = ((latestList P M).filter fun y => decide (x ≤ y)).length := by
   unfold countFrom
-  have hnd : ((latestList P M).filter fun y => decide (x ≤ y)).Nodup := (latest_list_nodup P M).filter _
+  have hnd : ((latestList P M).filter fun y => decide (x ≤ y)).Nodup :=
+    (latest_list_nodup P M).filter _
   rw [← List.toFinset_card_of_nodup hnd]
   congr 1
   ext y
@@ -67,15 +73,17 @@ theorem count_from_eq_filter_length (P : ℕ → Bool) (M x : ℕ) :
     decide_eq_true_eq]
   tauto
 
-theorem latest_list_get_spec (P : ℕ → Bool) (M e : ℕ) (he : e < (latestList P M).length) :
-    ((1 ≤ (latestList P M)[e] ∧ (latestList P M)[e] ≤ M) ∧ P (latestList P M)[e] = true) ∧
-      countFrom P M (latestList P M)[e] = e + 1 := by
+theorem latest_list_get_spec (P : ℕ → Bool) (M e : ℕ) (he : e < (latestList P M).length)
+    : ((1 ≤ (latestList P M)[e] ∧ (latestList P M)[e] ≤ M) ∧ P (latestList P M)[e] = true)
+      ∧ countFrom P M (latestList P M)[e] = e + 1 := by
   refine ⟨(mem_latest_list P M _).1 (List.getElem_mem _), ?_⟩
-  rw [count_from_eq_filter_length, filter_ge_get_eq_take _ (latest_list_pairwise_gt P M) e he, List.length_take]
+  rw [count_from_eq_filter_length, filter_ge_get_eq_take _ (latest_list_pairwise_gt P M) e he,
+    List.length_take]
   omega
 
-theorem latest_list_get_of_count (P : ℕ → Bool) (M e x : ℕ) (hx : (1 ≤ x ∧ x ≤ M) ∧ P x = true) (hc : countFrom P M x = e + 1) :
-    ∃ he : e < (latestList P M).length, (latestList P M)[e] = x := by
+theorem latest_list_get_of_count
+    (P : ℕ → Bool) (M e x : ℕ) (hx : (1 ≤ x ∧ x ≤ M) ∧ P x = true) (hc : countFrom P M x = e + 1)
+    : ∃ he : e < (latestList P M).length, (latestList P M)[e] = x := by
   obtain ⟨i, hi, hix⟩ := List.mem_iff_getElem.1 ((mem_latest_list P M x).2 hx)
   have h1 := (latest_list_get_spec P M i hi).2
   rw [hix, hc] at h1
@@ -83,8 +91,8 @@ theorem latest_list_get_of_count (P : ℕ → Bool) (M e x : ℕ) (hx : (1 ≤ x
   subst hie
   exact ⟨hi, hix⟩
 
-theorem latest_list_succ_lt (P : ℕ → Bool) (M e : ℕ) (he : e + 1 < (latestList P M).length) :
-    (latestList P M)[e + 1] < (latestList P M)[e]'(by omega) := by
+theorem latest_list_succ_lt (P : ℕ → Bool) (M e : ℕ) (he : e + 1 < (latestList P M).length)
+    : (latestList P M)[e + 1] < (latestList P M)[e]'(by omega) := by
   exact List.pairwise_iff_getElem.1 (latest_list_pairwise_gt P M) e (e + 1) (by omega) he (by omega)
 
 variable {N r K : ℕ}
@@ -96,18 +104,20 @@ def toL (r K : ℕ) (LL : Letters (Fin N)) (B : Fin N → ℕ) : BranchingDimens
   vec := fun i => if h : 1 ≤ i ∧ i ≤ N then LL.vec ⟨i - 1, by omega⟩ else true
   B := fun i => if h : 1 ≤ i ∧ i ≤ N then B ⟨i - 1, by omega⟩ else 0
 
-theorem toL_vec (LL : Letters (Fin N)) (B : Fin N → ℕ) (i : ℕ) (h : 1 ≤ i ∧ i ≤ N) :
-    (toL r K LL B).vec i = LL.vec ⟨i - 1, by omega⟩ := by
+theorem toL_vec (LL : Letters (Fin N)) (B : Fin N → ℕ) (i : ℕ) (h : 1 ≤ i ∧ i ≤ N)
+    : (toL r K LL B).vec i = LL.vec ⟨i - 1, by omega⟩ := by
   simp only [toL]
   rw [dite_eq_left h]
 
-theorem toL_B (LL : Letters (Fin N)) (B : Fin N → ℕ) (i : ℕ) (h : 1 ≤ i ∧ i ≤ N) :
-    (toL r K LL B).B i = B ⟨i - 1, by omega⟩ := by
+theorem toL_B (LL : Letters (Fin N)) (B : Fin N → ℕ) (i : ℕ) (h : 1 ≤ i ∧ i ≤ N)
+    : (toL r K LL B).B i = B ⟨i - 1, by omega⟩ := by
   simp only [toL]
   rw [dite_eq_left h]
 
 section
-variable {n0 : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} {od : Fin N → Fin N} {bb : Fin N → ℝ} {a La : ℝ} {p : ℕ}
+variable
+  {n0 : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} {od : Fin N → Fin N} {bb : Fin N → ℝ} {a La : ℝ}
+  {p : ℕ}
 
 theorem letters_n0_eq (H : HypT N n0 r K LL B od bb a La p) : (toL r K LL B).n0 = n0 := by
   show N - r = n0
@@ -129,18 +139,23 @@ theorem toL_Wf [NeZero K] (H : HypT N n0 r K LL B od bb a La p) : (toL r K LL B)
     rw [toL_vec LL B i ⟨by omega, h2⟩]
     exact H.vec_true_of_late _ (by simp only; omega)
 
-theorem latest_thresholds_decay (H : HypT N n0 r K LL B od bb a La p) (P : ℕ → Bool) (v : Bool)
-    (hP : ∀ i (h : 1 ≤ i ∧ i ≤ N), P i = true → LL.vec ⟨i - 1, by omega⟩ = v) (l : ℕ)
-    (hl : l + 1 < ((latestList P n0).map (toL r K LL B).B).length) :
-    13 ^ 2 * ((latestList P n0).map (toL r K LL B).B).getD (l + 1) 0 ≤
-      5 * ((latestList P n0).map (toL r K LL B).B).getD l 0 := by
+theorem latest_thresholds_decay
+    (H : HypT N n0 r K LL B od bb a La p)
+    (P : ℕ → Bool) (v : Bool)
+    (hP : ∀ i (h : 1 ≤ i ∧ i ≤ N), P i = true → LL.vec ⟨i - 1, by omega⟩ = v)
+    (l : ℕ) (hl : l + 1 < ((latestList P n0).map (toL r K LL B).B).length)
+    : 13 ^ 2 * ((latestList P n0).map (toL r K LL B).B).getD (l + 1) 0
+      ≤ 5 * ((latestList P n0).map (toL r K LL B).B).getD l 0 := by
   have hlen : l + 1 < (latestList P n0).length := by simpa using hl
-  have e1 : ((latestList P n0).map (toL r K LL B).B).getD (l + 1) 0 =
-      (toL r K LL B).B ((latestList P n0)[l + 1]) := by
+  have e1
+      : ((latestList P n0).map (toL r K LL B).B).getD (l + 1) 0
+        = (toL r K LL B).B ((latestList P n0)[l + 1]) := by
     simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem, hlen]
-  have e2 : ((latestList P n0).map (toL r K LL B).B).getD l 0 =
-      (toL r K LL B).B ((latestList P n0)[l]'(by omega)) := by
-    simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem, show l < (latestList P n0).length by omega]
+  have e2
+      : ((latestList P n0).map (toL r K LL B).B).getD l 0
+        = (toL r K LL B).B ((latestList P n0)[l]'(by omega)) := by
+    simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem,
+      show l < (latestList P n0).length by omega]
   rw [e1, e2]
   have hxy := latest_list_succ_lt P n0 l hlen
   have hxs := (latest_list_get_spec P n0 (l + 1) hlen).1
@@ -151,8 +166,9 @@ theorem latest_thresholds_decay (H : HypT N n0 r K LL B od bb a La p) (P : ℕ �
   rw [toL_B LL B x ⟨hxs.1.1, by omega⟩, toL_B LL B y ⟨hys.1.1, by omega⟩]
   have hv : LL.vec ⟨x - 1, by omega⟩ = LL.vec ⟨y - 1, by omega⟩ := by
     rw [hP x ⟨hxs.1.1, by omega⟩ hxs.2, hP y ⟨hys.1.1, by omega⟩ hys.2]
-  have h2 := H.H2 ⟨x - 1, by omega⟩ ⟨y - 1, by omega⟩
-    (by rw [Fin.lt_iff_val_lt_val]; simp only; omega) (by simp only; omega) hv
+  have h2 :=
+    H.H2 ⟨x - 1, by omega⟩ ⟨y - 1, by omega⟩ (by rw [Fin.lt_iff_val_lt_val]; simp only; omega)
+      (by simp only; omega) hv
   have hp13 : (13 : ℝ) ≤ p := by exact_mod_cast H.p13
   have hB0 : (0 : ℝ) ≤ (B ⟨x - 1, by omega⟩ : ℝ) := Nat.cast_nonneg _
   have h3 : ((13 ^ 2 * B ⟨x - 1, by omega⟩ : ℕ) : ℝ) ≤ ((5 * B ⟨y - 1, by omega⟩ : ℕ) : ℝ) := by
@@ -169,14 +185,27 @@ theorem toL_Hyp [NeZero K] (H : HypT N n0 r K LL B od bb a La p) : (toL r K LL B
   have h3K := H.N_add_r_le_K
   have h4 := H.H4
   have h4a := H.N_le_a
-  have eV : (toL r K LL B).latestV (toL r K LL B).n0 =
-      (latestList (fun l => (toL r K LL B).vec l) n0).map (toL r K LL B).B := by
+  have eV
+      : (toL r K LL B).latestV (toL r K LL B).n0
+        = (latestList (fun l => (toL r K LL B).vec l) n0).map (toL r K LL B).B := by
     simp only [BranchingDimensions.Letters.latestV, latestList, hn0, min_self]
-  have eC : (toL r K LL B).latestC (toL r K LL B).n0 =
-      (latestList (fun l => !(toL r K LL B).vec l) n0).map (toL r K LL B).B := by
+  have eC
+      : (toL r K LL B).latestC (toL r K LL B).n0
+        = (latestList (fun l => ! (toL r K LL B).vec l) n0).map (toL r K LL B).B := by
     simp only [BranchingDimensions.Letters.latestC, latestList, hn0, min_self]
-  refine ⟨H.a3, by norm_num, le_rfl, fun i h1 h2 => ?_, fun l hl => ?_, fun l hl => ?_,
-    fun i h1 h2 => ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    H.a3,
+    by norm_num,
+    le_rfl,
+    fun i h1 h2 => ?_,
+    fun l hl => ?_,
+    fun l hl => ?_,
+    fun i h1 h2 => ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [hn0] at h2
     rw [toL_B LL B i ⟨h1, by omega⟩]
     have h5 := H.H1 ⟨i - 1, by omega⟩ (by simp only; omega)
@@ -184,11 +213,14 @@ theorem toL_Hyp [NeZero K] (H : HypT N n0 r K LL B od bb a La p) : (toL r K LL B
     show r + K ≤ B ⟨i - 1, by omega⟩
     exact_mod_cast h5.1
   · rw [eV] at hl ⊢
-    exact latest_thresholds_decay H _ true (fun i hi hPi => by rw [← toL_vec LL B i hi]; exact hPi) l hl
+    exact
+      latest_thresholds_decay H _ true (fun i hi hPi => by rw [← toL_vec LL B i hi]; exact hPi) l hl
   · rw [eC] at hl ⊢
-    exact latest_thresholds_decay H _ false (fun i hi hPi => by
-      rw [← toL_vec LL B i hi]
-      simpa using hPi) l hl
+    exact latest_thresholds_decay H _ false
+      (fun i hi hPi => by
+        rw [← toL_vec LL B i hi]
+        simpa using hPi)
+      l hl
   · rw [hn0] at h1 h2
     simp only [toL] at h1
     rw [toL_vec LL B i ⟨by omega, by omega⟩]
@@ -214,7 +246,8 @@ theorem toL_Hyp [NeZero K] (H : HypT N n0 r K LL B od bb a La p) : (toL r K LL B
 def toB (bb : Fin N → ℝ) (p : ℕ) : ℕ → ℝ := fun i =>
   if h : 1 ≤ i ∧ i ≤ N then 13 * bb ⟨i - 1, by omega⟩ / (p : ℝ) else 1
 
-theorem toL_TData (H : HypT N n0 r K LL B od bb a La p) : (toL r K LL B).TData 13 La (toB bb p) := by
+theorem toL_TData (H : HypT N n0 r K LL B od bb a La p)
+    : (toL r K LL B).TData 13 La (toB bb p) := by
   have hN := H.hN
   have hp : (0 : ℝ) < p := by
     have := H.p13
@@ -231,8 +264,9 @@ theorem toL_TData (H : HypT N n0 r K LL B od bb a La p) : (toL r K LL B).TData 1
     positivity
   · rw [letters_n0_eq H] at hl3
     rw [toL_B LL B l ⟨hl1, by omega⟩, hb]
-    have h5 := H.bb_le ⟨i - 1, by omega⟩ ⟨l - 1, by omega⟩ (by simp only; omega)
-      (by rw [Fin.lt_iff_val_lt_val]; simp only; omega) (by simp only; omega)
+    have h5 :=
+      H.bb_le ⟨i - 1, by omega⟩ ⟨l - 1, by omega⟩ (by simp only; omega)
+        (by rw [Fin.lt_iff_val_lt_val]; simp only; omega) (by simp only; omega)
     refine le_trans h5 (le_of_eq ?_)
     push_cast
     ring

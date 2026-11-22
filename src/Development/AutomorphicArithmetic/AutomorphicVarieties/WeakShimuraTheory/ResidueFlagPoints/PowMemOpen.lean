@@ -4,17 +4,35 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.CuspRep GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp
 
-private theorem pow_mem_open {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-    (U : Subgroup Γ) (hU : IsOpen (U : Set Γ)) : ∃ N : ℕ, 0 < N ∧ ∀ s : Γ, s ^ N ∈ U := by
+private theorem pow_mem_open
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (U : Subgroup Γ) (hU : IsOpen (U : Set Γ))
+    : ∃ N : ℕ, 0 < N ∧ ∀ s : Γ, s ^ N ∈ U := by
   haveI : Finite (Γ ⧸ U) := U.quotient_finite_of_isOpen hU
   haveI : U.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
   refine ⟨U.normalCore.index, Nat.pos_of_ne_zero Subgroup.FiniteIndex.index_ne_zero, fun s => ?_⟩
   exact U.normalCore_le (U.normalCore.pow_index_mem s)
 
-theorem UpperTheory.V.Ws.Pt.ptWts :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {D : Raw Ω c} {T : Tower D} {c' : Coef l} {h : c.O ≤ c'.O} (K : Link T c' h) (X : Space (T.fr ∅) (inc h)) (B : W.UniversalOrdinaryDeterminantRing K.r) (n : ℕ) (φ : B.B →ₐ[c'.O] X.B), K.IsPhi X n B φ → ∀ y : X.A →ₐ[c'.O] PadicAlgCl l, ∀ w : Fin 4 → ℤ, (∀ i, Even (w i + n)) → T.Wts w (X.P.map (y : X.A →+* PadicAlgCl l)) → ∃ m : W.Vl l T.L → Fin 4 → ℤ, (∀ v i j, 2 * (m v i - m v j) = w i - w j) ∧ ∃ k : ℕ, 0 < k ∧ ∀ (v : W.Vl l T.L) (i : Fin 4) (g : Dec (F := T.L) (K.s.A v)), (g : G T.L Ω) ∈ Ine (F := T.L) (K.s.A v) → ((Link.pt φ y).psi v i g * cycBar T.L Ω l g ^ (-m v i)) ^ k = 1 := by
+theorem UpperTheory.V.Ws.Pt.ptWts
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        {D : Raw Ω c} {T : Tower D} {c' : Coef l} {h : c.O ≤ c'.O} (K : Link T c' h)
+        (X : Space (T.fr ∅) (inc h)) (B : W.UniversalOrdinaryDeterminantRing K.r) (n : ℕ)
+        (φ : B.B →ₐ[c'.O] X.B),
+      K.IsPhi X n B φ
+        → ∀ y : X.A →ₐ[c'.O] PadicAlgCl l, ∀ w : Fin 4 → ℤ,
+          (∀ i, Even (w i + n)) → T.Wts w (X.P.map (y : X.A →+* PadicAlgCl l))
+            → ∃ m : W.Vl l T.L → Fin 4 → ℤ,
+              (∀ v i j, 2 * (m v i - m v j) = w i - w j)
+                ∧ ∃ k : ℕ,
+                  0 < k
+                    ∧ ∀ (v : W.Vl l T.L) (i : Fin 4) (g : Dec (F := T.L) (K.s.A v)),
+                      (g : G T.L Ω) ∈ Ine (F := T.L) (K.s.A v)
+                        → ((Link.pt φ y).psi v i g * cycBar T.L Ω l g ^ (- m v i)) ^ k = 1 := by
   intro Ω _ _ _ l _ c D T c' h K X B n φ hφ y w hw hW
   haveI := T.fin
   haveI : Finite (W.Vl l T.L) := Finite.of_equiv _ K.e.symm
@@ -51,9 +69,10 @@ theorem UpperTheory.V.Ws.Pt.ptWts :
     have hval := hφ.psi_val y v i (g ^ N) hdec
     have hsq := hUψ (K.e v) i _ hres
     rw [cycBar_resLe] at hsq
-    have hP : (Link.pt φ y).psi v i (g ^ N) ^ 2 =
-        K.twc n ((g ^ N : Dec (K.s.A v)) : G T.L Ω) ^ 2 *
-          cycBar T.L Ω l ((g ^ N : Dec (K.s.A v)) : G T.L Ω) ^ w i := by
+    have hP
+        : (Link.pt φ y).psi v i (g ^ N) ^ 2
+          = K.twc n ((g ^ N : Dec (K.s.A v)) : G T.L Ω) ^ 2
+            * cycBar T.L Ω l ((g ^ N : Dec (K.s.A v)) : G T.L Ω) ^ w i := by
       apply Units.ext
       rw [Units.val_pow_eq_pow_val, hval, Units.val_mul, ← hsq, Units.val_pow_eq_pow_val]
       exact mul_pow _ _ _
@@ -70,7 +89,7 @@ theorem UpperTheory.V.Ws.Pt.ptWts :
     set m := (w i + e v) / 2
     have h1 : (cg ^ (-m)) ^ N = (cg ^ N) ^ (-m) := by
       rw [← zpow_natCast, ← zpow_mul, ← zpow_natCast cg N, ← zpow_mul, mul_comm]
-    have hx : (p * cg ^ (-m)) ^ (2 * N) = t ^ 2 * (cg ^ N) ^ (-e v) := by
+    have hx : (p * cg ^ (-m)) ^ (2 * N) = t ^ 2 * (cg ^ N) ^ (- e v) := by
       rw [mul_comm 2 N, pow_mul, mul_pow, h1, mul_pow, hP, ← zpow_natCast ((cg ^ N) ^ (-m)) 2,
         ← zpow_mul, mul_assoc, ← zpow_add]
       congr 2

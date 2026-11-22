@@ -13,14 +13,15 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.CompanionTheory.FarReg
 
-theorem highest_preimage_inner {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] {ι : Type*}
+theorem highest_preimage_inner
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    {ι : Type*}
     (T : Submodule ℂ E) (a b : ι → Module.End ℂ E) (D : Module.End ℂ E) (y : E)
-    (hT : FiniteDimensional ℂ T)
-    (hadj : ∀ i x z, ⟪a i x, z⟫_ℂ = ⟪x, b i z⟫_ℂ)
+    (hT : FiniteDimensional ℂ T) (hadj : ∀ i x z, ⟪a i x, z⟫_ℂ = ⟪x, b i z⟫_ℂ)
     (haT : ∀ i, ∀ t ∈ T, a i t ∈ T) (hbT : ∀ i, ∀ t ∈ T, b i t ∈ T)
     (haD : ∀ i, ∀ t ∈ T, a i (D t) = D (a i t)) (hbD : ∀ i, ∀ t ∈ T, b i (D t) = D (b i t))
-    (hy : y ∈ T) (hDy : ∀ i, a i (D y) = 0) :
-    ∃ y' ∈ T, (∀ i, a i y' = 0) ∧ D y' = D y := by
+    (hy : y ∈ T) (hDy : ∀ i, a i (D y) = 0)
+    : ∃ y' ∈ T, (∀ i, a i y' = 0) ∧ D y' = D y := by
   classical
   let S : Submodule ℂ E := Submodule.span ℂ {z | ∃ i, ∃ t ∈ T, z = b i t}
   have hST : S ≤ T := by
@@ -59,20 +60,27 @@ theorem highest_preimage_inner {E : Type*} [NormedAddCommGroup E] [InnerProductS
   have hDu : D u = 0 := inner_self_eq_zero.1 (hperp u huS)
   exact ⟨w, hwT, haw, by rw [hyuw, map_add (f := _), hDu, zero_add]⟩
 
-theorem highest_preimage_of_stable : ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (ι : Type) (T : Submodule ℂ (Cn n V))
-    (a b : ι → Module.End ℂ (Cn n V)) (D : Module.End ℂ (Cn n V)) (y : Cn n V), FiniteDimensional ℂ T →
-    (∀ i x z, ∑ A, ⟪a i x A, z A⟫_ℂ = ∑ A, ⟪x A, b i z A⟫_ℂ) →
-    (∀ i, ∀ t ∈ T, a i t ∈ T) → (∀ i, ∀ t ∈ T, b i t ∈ T) →
-    (∀ i, ∀ t ∈ T, a i (D t) = D (a i t)) → (∀ i, ∀ t ∈ T, b i (D t) = D (b i t)) →
-    y ∈ T → (∀ i, a i (D y) = 0) → ∃ y' ∈ T, (∀ i, a i y' = 0) ∧ D y' = D y := by
+theorem highest_preimage_of_stable
+    : ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (ι : Type)
+        (T : Submodule ℂ (Cn n V)) (a b : ι → Module.End ℂ (Cn n V)) (D : Module.End ℂ (Cn n V))
+        (y : Cn n V),
+      FiniteDimensional ℂ T → (∀ i x z, ∑ A, ⟪a i x A, z A⟫_ℂ = ∑ A, ⟪x A, b i z A⟫_ℂ)
+        → (∀ i, ∀ t ∈ T, a i t ∈ T) → (∀ i, ∀ t ∈ T, b i t ∈ T)
+        → (∀ i, ∀ t ∈ T, a i (D t) = D (a i t)) → (∀ i, ∀ t ∈ T, b i (D t) = D (b i t)) → y ∈ T
+        → (∀ i, a i (D y) = 0)
+        → ∃ y' ∈ T, (∀ i, a i y' = 0) ∧ D y' = D y := by
   intro n V _ _ ι T a b D y hT hadj haT hbT haD hbD hy hDy
-  let e : Cn n V ≃ₗ[ℂ] PiLp 2 (fun _ : Finset (Pos n) => V) := (WithLp.linearEquiv 2 ℂ (Finset (Pos n) → V)).symm
+  let e : Cn n V ≃ₗ[ℂ] PiLp 2 (fun _ : Finset (Pos n) => V) :=
+    (WithLp.linearEquiv 2 ℂ (Finset (Pos n) → V)).symm
   let c : Module.End ℂ (Cn n V) → Module.End ℂ (PiLp 2 (fun _ : Finset (Pos n) => V)) := fun f =>
     (e : Cn n V →ₗ[ℂ] _) ∘ₗ f ∘ₗ (e.symm : _ →ₗ[ℂ] Cn n V)
   have hc : ∀ f x, c f (e x) = e (f x) := fun f x => by simp [c]
   haveI : FiniteDimensional ℂ (T.map e.toLinearMap) := Module.Finite.map T _
-  have key := highest_preimage_inner (T.map e.toLinearMap) (fun i => c (a i)) (fun i => c (b i)) (c D) (e y)
-    inferInstance ?_ ?_ ?_ ?_ ?_ ⟨y, hy, rfl⟩ ?_
+  have key :=
+    highest_preimage_inner (T.map e.toLinearMap)
+      (fun i => c (a i))
+      (fun i => c (b i))
+      (c D) (e y) inferInstance ?_ ?_ ?_ ?_ ?_ ⟨y, hy, rfl⟩ ?_
   · obtain ⟨_, ⟨y', hy', rfl⟩, h1, h2⟩ := key
     refine ⟨y', hy', fun i => e.injective ?_, e.injective ?_⟩
     · have := h1 i

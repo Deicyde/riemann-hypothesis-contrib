@@ -40,16 +40,19 @@ section Deriv
 
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
-theorem chartWR_strict :
-    HasStrictFDerivAt (chartWR (N := N))
-      ((lamE : (UCo N × TriCo N) ≃L[ℝ] (Fin N → Fin N → ℂ)) : (UCo N × TriCo N) →L[ℝ] (Fin N → Fin N → ℂ)) 0 := by
+theorem chartWR_strict
+    : HasStrictFDerivAt (chartWR (N := N))
+      ((lamE : (UCo N × TriCo N) ≃L[ℝ] (Fin N → Fin N → ℂ))
+        : (UCo N × TriCo N) →L[ℝ] (Fin N → Fin N → ℂ))
+      0 := by
   let skL : (UCo N × TriCo N) →L[ℝ] Matrix (Fin N) (Fin N) ℂ := LinearMap.toContinuousLinearMap skML
   let upL : (UCo N × TriCo N) →L[ℝ] Matrix (Fin N) (Fin N) ℂ := LinearMap.toContinuousLinearMap upML
   let ofL : Matrix (Fin N) (Fin N) ℂ →L[ℝ] (Fin N → Fin N → ℂ) :=
     LinearMap.toContinuousLinearMap (Matrix.ofLinearEquiv ℝ).symm.toLinearMap
   have hsk0 : skL 0 = 0 := map_zero _
   have hup0 : upL 0 = 0 := map_zero _
-  have h1 : HasStrictFDerivAt (fun p : UCo N × TriCo N => NormedSpace.exp (skL p))
+  have h1 : HasStrictFDerivAt
+      (fun p : UCo N × TriCo N => NormedSpace.exp (skL p))
       ((1 : Matrix (Fin N) (Fin N) ℂ →L[ℝ] Matrix (Fin N) (Fin N) ℂ).comp skL) 0 := by
     have he := hasStrictFDerivAt_exp_zero (𝕂 := ℝ) (𝔸 := Matrix (Fin N) (Fin N) ℂ)
     rw [← hsk0] at he
@@ -58,11 +61,16 @@ theorem chartWR_strict :
     upL.hasStrictFDerivAt.const_add 1
   have h3 := h1.mul' h2
   have h4 := ofL.hasStrictFDerivAt.comp 0 h3
-  have hF : (fun x => ofL (((fun p => NormedSpace.exp (skL p)) * fun p => 1 + upL p) x)) = chartWR := by
+  have hF
+      : (fun x => ofL (((fun p => NormedSpace.exp (skL p)) * fun p => 1 + upL p) x)) = chartWR := by
     funext p; rfl
-  have hD : ofL.comp (NormedSpace.exp (skL 0) • upL + MulOpposite.op (1 + upL 0) •
-      (1 : Matrix (Fin N) (Fin N) ℂ →L[ℝ] Matrix (Fin N) (Fin N) ℂ).comp skL) =
-      ((lamE : (UCo N × TriCo N) ≃L[ℝ] (Fin N → Fin N → ℂ)) : (UCo N × TriCo N) →L[ℝ] (Fin N → Fin N → ℂ)) := by
+  have hD
+      : ofL.comp
+          (NormedSpace.exp (skL 0) • upL
+            + MulOpposite.op (1 + upL 0)
+              • (1 : Matrix (Fin N) (Fin N) ℂ →L[ℝ] Matrix (Fin N) (Fin N) ℂ).comp skL)
+        = ((lamE : (UCo N × TriCo N) ≃L[ℝ] (Fin N → Fin N → ℂ))
+          : (UCo N × TriCo N) →L[ℝ] (Fin N → Fin N → ℂ)) := by
     refine ContinuousLinearMap.ext fun p => ?_
     rw [hsk0, hup0, NormedSpace.exp_zero]
     simp

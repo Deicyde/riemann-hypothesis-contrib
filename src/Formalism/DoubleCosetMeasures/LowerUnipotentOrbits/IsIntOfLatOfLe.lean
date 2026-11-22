@@ -16,19 +16,22 @@ open Formalism.DoubleCosetMeasures
 
 theorem uniGroup : Formalism.DoubleCosetMeasures.UniGroup := by
   intro K _ n x y
-  exact ⟨fun hx hy => isLowUni_mul K hx hy, fun hx hy => isUpUni_mul K hx hy,
+  exact ⟨
+    fun hx hy => isLowUni_mul K hx hy,
+    fun hx hy => isUpUni_mul K hx hy,
     fun hx => ⟨isLowUni_inv K hx, isLowUni_det K hx⟩,
-    fun hx => ⟨isUpUni_inv K hx, isUpUni_det K hx⟩⟩
+    fun hx => ⟨isUpUni_inv K hx, isUpUni_det K hx⟩
+  ⟩
 
 section Simple
 
 variable {K : Type} [CommRing K] {n : ℕ}
 
-theorem low_simple_entry {x y : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) (hy : IsLowUni y)
-    (j : Fin n) (h : j.val + 1 < n) :
-    (x * y) ⟨j.val + 1, h⟩ j = x ⟨j.val + 1, h⟩ j + y ⟨j.val + 1, h⟩ j := by
-  rw [Matrix.mul_apply, Fintype.sum_eq_add j ⟨j.val + 1, h⟩
-    (by intro e; simp [Fin.ext_iff] at e)]
+theorem low_simple_entry
+    {x y : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) (hy : IsLowUni y)
+    (j : Fin n) (h : j.val + 1 < n)
+    : (x * y) ⟨j.val + 1, h⟩ j = x ⟨j.val + 1, h⟩ j + y ⟨j.val + 1, h⟩ j := by
+  rw [Matrix.mul_apply, Fintype.sum_eq_add j ⟨j.val + 1, h⟩ (by intro e; simp [Fin.ext_iff] at e)]
   · rw [hy.2 j, hx.2 _]; ring
   · rintro k ⟨hk1, hk2⟩
     rcases lt_or_gt_of_ne hk1 with hlt | hgt
@@ -42,11 +45,11 @@ theorem low_simple_entry {x y : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) (hy 
       have : x ⟨j.val + 1, h⟩ k = 0 := hx.1 (by simpa using hlt)
       simp [this]
 
-theorem up_simple_entry {x y : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x) (hy : IsUpUni y)
-    (j : Fin n) (h : j.val + 1 < n) :
-    (x * y) j ⟨j.val + 1, h⟩ = x j ⟨j.val + 1, h⟩ + y j ⟨j.val + 1, h⟩ := by
-  rw [Matrix.mul_apply, Fintype.sum_eq_add j ⟨j.val + 1, h⟩
-    (by intro e; simp [Fin.ext_iff] at e)]
+theorem up_simple_entry
+    {x y : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x) (hy : IsUpUni y)
+    (j : Fin n) (h : j.val + 1 < n)
+    : (x * y) j ⟨j.val + 1, h⟩ = x j ⟨j.val + 1, h⟩ + y j ⟨j.val + 1, h⟩ := by
+  rw [Matrix.mul_apply, Fintype.sum_eq_add j ⟨j.val + 1, h⟩ (by intro e; simp [Fin.ext_iff] at e)]
   · rw [hx.2 j, hy.2 _]; ring
   · rintro k ⟨hk1, hk2⟩
     rcases lt_or_gt_of_ne hk1 with hlt | hgt
@@ -84,22 +87,21 @@ section Int
 
 variable {K : Type} [CommRing K] (R : Subring K) {n : ℕ}
 
-theorem isInt_mul {A B : Matrix (Fin n) (Fin n) K} (hA : IsInt R A) (hB : IsInt R B) :
-    IsInt R (A * B) := by
+theorem isInt_mul {A B : Matrix (Fin n) (Fin n) K} (hA : IsInt R A) (hB : IsInt R B)
+    : IsInt R (A * B) := by
   intro a b
   rw [Matrix.mul_apply]
   exact R.sum_mem fun k _ => R.mul_mem (hA a k) (hB k b)
 
-theorem isInt_adjugate {A : Matrix (Fin n) (Fin n) K} (hA : IsInt R A) :
-    IsInt R A.adjugate := by
+theorem isInt_adjugate {A : Matrix (Fin n) (Fin n) K} (hA : IsInt R A) : IsInt R A.adjugate := by
   let A' : Matrix (Fin n) (Fin n) R := fun a b => ⟨A a b, hA a b⟩
   have hmap : R.subtype.mapMatrix A' = A := by ext a b; rfl
   intro a b
   rw [← hmap, ← RingHom.map_adjugate]
   exact (A'.adjugate a b).2
 
-theorem isInt_inv {A : Matrix (Fin n) (Fin n) K} (hA : IsInt R A) (hd : A.det = 1) :
-    IsInt R A⁻¹ := by
+theorem isInt_inv {A : Matrix (Fin n) (Fin n) K} (hA : IsInt R A) (hd : A.det = 1)
+    : IsInt R A⁻¹ := by
   rw [Matrix.inv_def, hd, Ring.inverse_one, one_smul]
   exact isInt_adjugate R hA
 

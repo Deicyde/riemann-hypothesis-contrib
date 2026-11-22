@@ -9,23 +9,24 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ.Grp.P_KC
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-abbrev incl (n : ℕ) : GL (Fin n) 𝒪[k] →* GL (Fin n) k := Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k)
+abbrev incl (n : ℕ) : GL (Fin n) 𝒪[k] →* GL (Fin n) k :=
+  Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k)
 
 abbrev red (n r : ℕ) : GL (Fin n) 𝒪[k] →* GL (Fin n) (𝒪[k] ⧸ IsLocalRing.maximalIdeal 𝒪[k] ^ r) :=
   Matrix.GeneralLinearGroup.map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal 𝒪[k] ^ r))
 
-
 variable (k) in
 def H (n r : ℕ) : Subgroup (GL (Fin n) k) := (red (k := k) n r).ker.map (incl n)
 
-theorem inPow_algebraMap (r : ℕ) (y : 𝒪[k]) :
-    InPow r (algebraMap 𝒪[k] k y) ↔ y ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ r := by
+theorem inPow_algebraMap (r : ℕ) (y : 𝒪[k])
+    : InPow r (algebraMap 𝒪[k] k y) ↔ y ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ r := by
   constructor
   · rintro ⟨z, hz, e⟩
     have : z = y := Subtype.val_injective e
@@ -34,14 +35,16 @@ theorem inPow_algebraMap (r : ℕ) (y : 𝒪[k]) :
     exact ⟨y, h, rfl⟩
 
 omit [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem entry_sub (n : ℕ) (u : GL (Fin n) 𝒪[k]) (i j : Fin n) :
-    (((incl n u : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j - if i = j then 1 else 0) =
-      algebraMap 𝒪[k] k ((u : Matrix (Fin n) (Fin n) 𝒪[k]) i j - if i = j then 1 else 0) := by
+theorem entry_sub (n : ℕ) (u : GL (Fin n) 𝒪[k]) (i j : Fin n)
+    : (((incl n u : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j - if i = j then 1 else 0)
+      = algebraMap 𝒪[k] k ((u : Matrix (Fin n) (Fin n) 𝒪[k]) i j - if i = j then 1 else 0) := by
   split_ifs <;> simp [Matrix.GeneralLinearGroup.map]
 
-theorem red_eq_one_iff (n r : ℕ) (u : GL (Fin n) 𝒪[k]) :
-    red (k := k) n r u = 1 ↔ ∀ i j, ((u : Matrix (Fin n) (Fin n) 𝒪[k]) i j - if i = j then 1 else 0) ∈
-      IsLocalRing.maximalIdeal 𝒪[k] ^ r := by
+theorem red_eq_one_iff (n r : ℕ) (u : GL (Fin n) 𝒪[k])
+    : red (k := k) n r u = 1
+      ↔ ∀ i j,
+        ((u : Matrix (Fin n) (Fin n) 𝒪[k]) i j - if i = j then 1 else 0)
+          ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ r := by
   rw [Units.ext_iff]
   constructor
   · intro h i j
@@ -79,8 +82,8 @@ theorem isOpen_inPow (r : ℕ) : IsOpen {x : k | InPow r x} := by
     simp only [A, AddSubgroup.coe_map, Set.mem_image, SetLike.mem_coe, Set.mem_ofPred_eq, InPow]
     rfl
   rw [← hA]
-  obtain ⟨w, hw, hw0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot
-    (IsDiscreteValuationRing.not_a_field 𝒪[k])
+  obtain ⟨w, hw, hw0⟩ :=
+    Submodule.exists_mem_ne_zero_of_ne_bot (IsDiscreteValuationRing.not_a_field 𝒪[k])
   have hc : (algebraMap 𝒪[k] k w) ^ r ≠ 0 := by
     refine pow_ne_zero _ ?_
     intro h
@@ -98,14 +101,17 @@ theorem isOpen_inPow (r : ℕ) : IsOpen {x : k | InPow r x} := by
   · exact ⟨0, zero_mem _, mul_zero _⟩
 
 theorem isOpen_KC (n r : ℕ) : IsOpen (KC k n r) := by
-  have e : KC k n r = (KO k (Fin n) : Set (GL (Fin n) k)) ∩
-      ⋂ i, ⋂ j, (fun g : GL (Fin n) k => (g : Matrix (Fin n) (Fin n) k) i j - if i = j then 1 else 0) ⁻¹'
-        {x : k | InPow r x} := by
+  have e
+      : KC k n r
+        = (KO k (Fin n) : Set (GL (Fin n) k))
+          ∩ ⋂ i, ⋂ j, (fun g : GL (Fin n) k => (g : Matrix (Fin n) (Fin n) k) i j - if i = j then 1 else 0) ⁻¹'
+              {x : k | InPow r x} := by
     ext g
-    simp only [KC, Set.mem_ofPred_eq, Set.mem_inter_iff, SetLike.mem_coe, Set.mem_iInter, Set.mem_preimage]
+    simp only [KC, Set.mem_ofPred_eq, Set.mem_inter_iff, SetLike.mem_coe, Set.mem_iInter,
+      Set.mem_preimage]
   rw [e]
-  refine GlobalTheory.SplitFlip.isOpen_KO.inter (isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-    (isOpen_inPow r).preimage ?_)
+  refine GlobalTheory.SplitFlip.isOpen_KO.inter (isOpen_iInter_of_finite fun i =>
+    isOpen_iInter_of_finite fun j => (isOpen_inPow r).preimage ?_)
   have := Units.continuous_val (M := Matrix (Fin n) (Fin n) k)
   fun_prop
 

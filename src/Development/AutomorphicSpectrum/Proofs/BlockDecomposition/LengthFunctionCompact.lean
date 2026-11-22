@@ -24,7 +24,8 @@ theorem lgCpt : PositivityTheory.RgBcC.VC.LgCpt := by
   have hc1 : Continuous fun y : G n => y.val := Units.continuous_val
   have hc2 : Continuous fun y : G n => (y⁻¹).val := Units.continuous_val.comp continuous_inv
   have hfc : Continuous f := by
-    refine continuous_const.add (continuous_finsetSum _ fun a _ => continuous_finsetSum _ fun b _ => ?_)
+    refine continuous_const.add (continuous_finsetSum _ fun a _ =>
+      continuous_finsetSum _ fun b _ => ?_)
     exact ((hc1.matrix_elem a b).norm.pow 2).add ((hc2.matrix_elem a b).norm.pow 2)
   have hsum : ∀ y : G n, 0 ≤ ∑ a, ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2) := fun y =>
     Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b _ => by positivity
@@ -43,12 +44,19 @@ theorem lgCpt : PositivityTheory.RgBcC.VC.LgCpt := by
   have hr0 : 0 ≤ r + 1 := by positivity
   have hterm : ∀ y : G n, f y ≤ r → ∀ a b, ‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2 ≤ r := by
     intro y hy a b
-    have h1 : ‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2 ≤ ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2) :=
-      Finset.single_le_sum (f := fun b => ‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2)
-        (fun b _ => by positivity) (Finset.mem_univ b)
-    have h2 : ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2) ≤ ∑ a, ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2) :=
-      Finset.single_le_sum (f := fun a => ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2))
-        (fun a _ => Finset.sum_nonneg fun b _ => by positivity) (Finset.mem_univ a)
+    have h1
+        : ‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2 ≤ ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2) :=
+      Finset.single_le_sum
+        (f := fun b => ‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2)
+        (fun b _ => by positivity)
+        (Finset.mem_univ b)
+    have h2
+        : ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2)
+          ≤ ∑ a, ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2) :=
+      Finset.single_le_sum
+        (f := fun a => ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2))
+        (fun a _ => Finset.sum_nonneg fun b _ => by positivity)
+        (Finset.mem_univ a)
     have h3 : 1 + ∑ a, ∑ b, (‖y.val a b‖ ^ 2 + ‖(y⁻¹).val a b‖ ^ 2) ≤ r := hy
     linarith
   have hle : ∀ t : ℝ, 0 ≤ t → t ^ 2 ≤ r → t ≤ r + 1 := by
@@ -67,8 +75,9 @@ theorem lgCpt : PositivityTheory.RgBcC.VC.LgCpt := by
     have h2 : 0 ≤ ‖y.val a b‖ ^ 2 := by positivity
     linarith
   have hball : IsCompact (Metric.closedBall (0 : Mat n) (r + 1)) := isCompact_closedBall _ _
-  have hK : IsCompact ((fun p : Mat n × Mat n => (p.1, MulOpposite.op p.2)) ''
-      (Metric.closedBall (0 : Mat n) (r + 1) ×ˢ Metric.closedBall (0 : Mat n) (r + 1))) :=
+  have hK : IsCompact
+      ((fun p : Mat n × Mat n => (p.1, MulOpposite.op p.2))
+        '' (Metric.closedBall (0 : Mat n) (r + 1) ×ˢ Metric.closedBall (0 : Mat n) (r + 1))) :=
     (hball.prod hball).image (continuous_fst.prodMk (MulOpposite.continuous_op.comp continuous_snd))
   have hpre := (Units.isClosedEmbedding_embedProduct (α := Mat n)).isCompact_preimage hK
   refine hpre.of_isClosed_subset hclosed ?_

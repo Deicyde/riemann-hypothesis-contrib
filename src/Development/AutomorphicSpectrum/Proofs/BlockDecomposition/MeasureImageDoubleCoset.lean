@@ -12,12 +12,14 @@ open MeasureTheory GlobalTheory.LocGL
 
 namespace GlobalTheory.CompanionTheory.DoubleCosetVolume
 
-theorem measure_doubleCoset {Q : Type*} [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q]
-    [MeasurableSpace Q] [BorelSpace Q] (μ : Measure Q) [μ.IsMulLeftInvariant] (B : Subgroup Q)
-    (hB : IsOpen (B : Set Q)) (s : Q)
-    (hfin : (B.map (MulAut.conj s).toMonoidHom).relIndex B ≠ 0) :
-    μ {q : Q | ∃ x ∈ B, ∃ y ∈ B, q = x * s * y} =
-      ((B.map (MulAut.conj s).toMonoidHom).relIndex B : ENNReal) * μ (B : Set Q) := by
+theorem measure_doubleCoset
+    {Q : Type*}
+    [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q] [MeasurableSpace Q] [BorelSpace Q]
+    (μ : Measure Q) [μ.IsMulLeftInvariant]
+    (B : Subgroup Q) (hB : IsOpen (B : Set Q))
+    (s : Q) (hfin : (B.map (MulAut.conj s).toMonoidHom).relIndex B ≠ 0)
+    : μ {q : Q | ∃ x ∈ B, ∃ y ∈ B, q = x * s * y}
+      = ((B.map (MulAut.conj s).toMonoidHom).relIndex B : ENNReal) * μ (B : Set Q) := by
   classical
   set C : Subgroup B := (B.map (MulAut.conj s).toMonoidHom).subgroupOf B with hC
   have hidx : C.index ≠ 0 := hfin
@@ -36,11 +38,14 @@ theorem measure_doubleCoset {Q : Type*} [Group Q] [TopologicalSpace Q] [IsTopolo
     constructor
     · rintro ⟨x, hx, y, hy, rfl⟩
       refine ⟨QuotientGroup.mk (⟨x, hx⟩ : B), ?_⟩
-      have h1 : (QuotientGroup.mk (Quotient.out (QuotientGroup.mk (⟨x, hx⟩ : B) : B ⧸ C)) : B ⧸ C) =
-          QuotientGroup.mk (⟨x, hx⟩ : B) := QuotientGroup.out_eq' _
+      have h1
+          : (QuotientGroup.mk (Quotient.out (QuotientGroup.mk (⟨x, hx⟩ : B) : B ⧸ C)) : B ⧸ C)
+            = QuotientGroup.mk (⟨x, hx⟩ : B) :=
+        QuotientGroup.out_eq' _
       obtain ⟨b, hb, hbw⟩ := (hmemC _).1 (QuotientGroup.eq.1 h1)
-      have h2 : ((Quotient.out (QuotientGroup.mk (⟨x, hx⟩ : B) : B ⧸ C) : B) : Q)⁻¹ * x =
-          s * b * s⁻¹ := by
+      have h2
+          : ((Quotient.out (QuotientGroup.mk (⟨x, hx⟩ : B) : B ⧸ C) : B) : Q)⁻¹ * x
+            = s * b * s⁻¹ := by
         rw [hbw]; simp
       show (r _)⁻¹ * (x * s * y) ∈ B
       have h3 : (r (QuotientGroup.mk (⟨x, hx⟩ : B)))⁻¹ * (x * s * y) = b * y := by
@@ -77,11 +82,14 @@ theorem measure_doubleCoset {Q : Type*} [Group Q] [TopologicalSpace Q] [IsTopolo
   show _ = C.index
   rw [Subgroup.index, Nat.card_eq_fintype_card]
 
-theorem relIndex_map_mk {G : Type*} [Group G] (Z : Subgroup G) [Z.Normal] (H : Subgroup G) (t : G)
-    (hZ : ∀ g ∈ H, ∀ h ∈ H, (t * h * t⁻¹)⁻¹ * g ∈ Z → ∃ h₂ ∈ H, t * h₂ * t⁻¹ = g) :
-    ((H.map (QuotientGroup.mk' Z)).map (MulAut.conj (QuotientGroup.mk' Z t)).toMonoidHom).relIndex
-        (H.map (QuotientGroup.mk' Z)) =
-      (H.map (MulAut.conj t).toMonoidHom).relIndex H := by
+theorem relIndex_map_mk
+    {G : Type*} [Group G]
+    (Z : Subgroup G) [Z.Normal]
+    (H : Subgroup G) (t : G)
+    (hZ : ∀ g ∈ H, ∀ h ∈ H, (t * h * t⁻¹)⁻¹ * g ∈ Z → ∃ h₂ ∈ H, t * h₂ * t⁻¹ = g)
+    : ((H.map (QuotientGroup.mk' Z)).map (MulAut.conj (QuotientGroup.mk' Z t)).toMonoidHom).relIndex
+        (H.map (QuotientGroup.mk' Z))
+      = (H.map (MulAut.conj t).toMonoidHom).relIndex H := by
   rw [← Subgroup.relIndex_comap, ← Subgroup.inf_relIndex_right,
     ← Subgroup.inf_relIndex_right (H.map (MulAut.conj t).toMonoidHom)]
   congr 1
@@ -91,8 +99,7 @@ theorem relIndex_map_mk {G : Type*} [Group G] (Z : Subgroup G) [Z.Normal] (H : S
   simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply, exists_exists_and_eq_and]
   constructor
   · rintro ⟨h, hh, he⟩
-    have h1 : (QuotientGroup.mk' Z) (t * h * t⁻¹) = (QuotientGroup.mk' Z) g := by
-      simpa using he
+    have h1 : (QuotientGroup.mk' Z) (t * h * t⁻¹) = (QuotientGroup.mk' Z) g := by simpa using he
     exact hZ g hg h hh (QuotientGroup.eq.1 h1)
   · rintro ⟨h, hh, rfl⟩
     exact ⟨h, hh, by simp⟩
@@ -112,17 +119,22 @@ open ValuativeRel
 
 variable {k : Type} [Field k] [ValuativeRel k]
 
-theorem central_mem_cong {N : ℕ} {r : ValueGroupWithZero k} (hr : r < 1)
-    (t : GL (Fin N) k) (d : Fin N → k) (hd : ∀ i, d i ≠ 0)
-    (ht : (t : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d)
-    (g h z : GL (Fin N) k)
-    (hg : ∀ i j, valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ r)
-    (hh : ∀ i j, valuation k ((h : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ r)
-    (hz : z ∈ Subgroup.center (GL (Fin N) k)) (hgz : g = t * h * t⁻¹ * z) :
-    ∀ i j, valuation k ((z : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ r := by
+theorem central_mem_cong
+    {N : ℕ} {r : ValueGroupWithZero k}
+    (hr : r < 1) (t : GL (Fin N) k) (d : Fin N → k) (hd : ∀ i, d i ≠ 0)
+    (ht : (t : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d) (g h z : GL (Fin N) k)
+    (hg : ∀ i j,
+      valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ r)
+    (hh : ∀ i j,
+      valuation k ((h : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ r)
+    (hz : z ∈ Subgroup.center (GL (Fin N) k)) (hgz : g = t * h * t⁻¹ * z)
+    : ∀ i j,
+      valuation k ((z : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j)
+        ≤ r := by
   obtain ⟨c, hc⟩ := Matrix.GeneralLinearGroup.mem_center_iff_val_mem_range_scalar.1 hz
   have hzv : (z : Matrix (Fin N) (Fin N) k) = Matrix.scalar (Fin N) c := hc.symm
-  have htinv : ((t⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) = Matrix.diagonal fun i => (d i)⁻¹ := by
+  have htinv
+      : ((t⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) = Matrix.diagonal fun i => (d i)⁻¹ := by
     refine Units.inv_eq_of_mul_eq_one_right ?_
     rw [ht, Matrix.diagonal_mul_diagonal]
     simp [hd, Matrix.diagonal_one]
@@ -142,12 +154,15 @@ theorem central_mem_cong {N : ℕ} {r : ValueGroupWithZero k} (hr : r < 1)
     have h5 := hg i i
     have h6 := hh i i
     rw [Matrix.one_apply_eq] at h5 h6 ⊢
-    have h7 : (h : Matrix (Fin N) (Fin N) k) i i * (c - 1) =
-        ((g : Matrix (Fin N) (Fin N) k) i i - 1) - ((h : Matrix (Fin N) (Fin N) k) i i - 1) := by
+    have h7
+        : (h : Matrix (Fin N) (Fin N) k) i i * (c - 1)
+          = ((g : Matrix (Fin N) (Fin N) k) i i - 1)
+            - ((h : Matrix (Fin N) (Fin N) k) i i - 1) := by
       rw [h1]; ring
     have h8 : valuation k (c - 1) ≤ r := by
-      have h9 := Valuation.map_sub (valuation k) ((g : Matrix (Fin N) (Fin N) k) i i - 1)
-        ((h : Matrix (Fin N) (Fin N) k) i i - 1)
+      have h9 :=
+        Valuation.map_sub (valuation k) ((g : Matrix (Fin N) (Fin N) k) i i - 1)
+          ((h : Matrix (Fin N) (Fin N) k) i i - 1)
       rw [← h7, map_mul, h2, one_mul] at h9
       exact h9.trans (max_le h5 h6)
     rw [hzv]

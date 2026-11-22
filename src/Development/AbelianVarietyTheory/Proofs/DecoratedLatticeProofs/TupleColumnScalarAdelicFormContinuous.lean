@@ -11,9 +11,15 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.GEqBas
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Forms Formalism.L2.Ker
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.SeeSaw GlobalTheory.LatPair GlobalTheory.SplitWeil
-open GlobalTheory.Unf GlobalTheory.Grow GlobalTheory.FinPl ValuativeRel IsLocalRing GlobalTheory.AdForm
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.L2.Forms Formalism.L2.Ker
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2
+  GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.SeeSaw GlobalTheory.LatPair
+  GlobalTheory.SplitWeil
+open GlobalTheory.Unf GlobalTheory.Grow GlobalTheory.FinPl ValuativeRel IsLocalRing
+  GlobalTheory.AdForm
 open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -22,40 +28,54 @@ namespace GlobalTheory.AdForm.RamCont
 
 variable {D : D7}
 
-theorem infM_mul' (θ : InfFam D) (V : HSp D) {n : ℕ} (hn : V.rank = n) (g h : GA D V) (τ : D.what₂.Tau) :
-    infM θ V hn (g * h) τ = infM θ V hn g τ * infM θ V hn h τ := by
+theorem infM_mul'
+    (θ : InfFam D) (V : HSp D) {n : ℕ} (hn : V.rank = n) (g h : GA D V) (τ : D.what₂.Tau)
+    : infM θ V hn (g * h) τ = infM θ V hn g τ * infM θ V hn h τ := by
   subst hn; exact GlobalTheory.AdForm.RdLaw.infM_mul θ V g h τ
 
-theorem infM_fin' (θ : InfFam D) (V : HSp D) {n : ℕ} (hn : V.rank = n) (k : GA D V) (hk : k ∈ GfC V) (τ : D.what₂.Tau) :
-    infM θ V hn k τ = 1 := by
+theorem infM_fin'
+    (θ : InfFam D)
+    (V : HSp D)
+    {n : ℕ} (hn : V.rank = n)
+    (k : GA D V) (hk : k ∈ GfC V)
+    (τ : D.what₂.Tau)
+    : infM θ V hn k τ = 1 := by
   subst hn; exact GlobalTheory.AdForm.RdLaw.infM_fin θ V k hk τ
 
-theorem continuous_infM' (θ : InfFam D) (hθ : IsInfFam θ) (V : HSp D) {n : ℕ} (hn : V.rank = n) (τ : D.what₂.Tau) :
-    Continuous fun g : GA D V => infM θ V hn g τ := by
+theorem continuous_infM'
+    (θ : InfFam D) (hθ : IsInfFam θ) (V : HSp D) {n : ℕ} (hn : V.rank = n) (τ : D.what₂.Tau)
+    : Continuous fun g : GA D V => infM θ V hn g τ := by
   subst hn; exact GlobalTheory.AdForm.RdLaw.continuous_infM θ hθ V τ
 
-theorem pf_mul (V : HSp D) (g h : GA D V) :
-    GlobalTheory.AdForm.RdLaw.pf V (g * h) = GlobalTheory.AdForm.RdLaw.pf V g * GlobalTheory.AdForm.RdLaw.pf V h := by
+theorem pf_mul (V : HSp D) (g h : GA D V)
+    : GlobalTheory.AdForm.RdLaw.pf V (g * h)
+      = GlobalTheory.AdForm.RdLaw.pf V g * GlobalTheory.AdForm.RdLaw.pf V h := by
   apply Subtype.ext
   show GlobalTheory.AdForm.RdLaw.PGL D V.rank (matHom V (g * h)) =
     GlobalTheory.AdForm.RdLaw.PGL D V.rank (matHom V g) * GlobalTheory.AdForm.RdLaw.PGL D V.rank (matHom V h)
   rw [map_mul, map_mul]
 
-theorem pf_inv (V : HSp D) (g : GA D V) : GlobalTheory.AdForm.RdLaw.pf V g⁻¹ = (GlobalTheory.AdForm.RdLaw.pf V g)⁻¹ := by
+theorem pf_inv (V : HSp D) (g : GA D V)
+    : GlobalTheory.AdForm.RdLaw.pf V g⁻¹ = (GlobalTheory.AdForm.RdLaw.pf V g)⁻¹ := by
   apply eq_inv_of_mul_eq_one_left
   rw [← pf_mul, inv_mul_cancel, GlobalTheory.AdForm.RdLaw.pf_one]
 
-theorem pf_inv_mul_mem (V : HSp D) (g : GA D V) : (GlobalTheory.AdForm.RdLaw.pf V g)⁻¹ * g ∈ GinfC V := by
-  rw [GlobalTheory.CentreTarget.mem_GinfC, ← pf_inv, GlobalTheory.CentreTarget.mt_mul, Matrix.map_mul, GlobalTheory.AdForm.RdLaw.mt_pf,
-    GlobalTheory.AdForm.RdLaw.PM_map, GlobalTheory.AdForm.RdLaw.finPart_eps, RingHom.map_sub, RingHom.map_one,
-    GlobalTheory.AdForm.RdLaw.finPart_eps, sub_self, zero_smul, add_zero, one_smul, ← Matrix.map_mul,
-    ← GlobalTheory.CentreTarget.mt_mul, inv_mul_cancel]
+theorem pf_inv_mul_mem (V : HSp D) (g : GA D V)
+    : (GlobalTheory.AdForm.RdLaw.pf V g)⁻¹ * g ∈ GinfC V := by
+  rw [GlobalTheory.CentreTarget.mem_GinfC, ← pf_inv, GlobalTheory.CentreTarget.mt_mul,
+    Matrix.map_mul, GlobalTheory.AdForm.RdLaw.mt_pf, GlobalTheory.AdForm.RdLaw.PM_map,
+    GlobalTheory.AdForm.RdLaw.finPart_eps, RingHom.map_sub, RingHom.map_one,
+    GlobalTheory.AdForm.RdLaw.finPart_eps, sub_self, zero_smul, add_zero, one_smul,
+    ← Matrix.map_mul, ← GlobalTheory.CentreTarget.mt_mul, inv_mul_cancel]
   show (matHom V 1).1.map _ = 1
   rw [map_one, Units.val_one, Matrix.map_one _ (map_zero _) (map_one _)]
 
-theorem infM_mul_pf (θ : InfFam D) (V : HSp D) {n : ℕ} (hn : V.rank = n) (k d : GA D V) (τ : D.what₂.Tau) :
-    infM θ V hn (k * ((GlobalTheory.AdForm.RdLaw.pf V d)⁻¹ * d)) τ = infM θ V hn k τ * infM θ V hn d τ := by
-  rw [infM_mul' θ V hn k, infM_mul' θ V hn _ d, infM_fin' θ V hn _ (inv_mem (GlobalTheory.AdForm.RdLaw.pf_fin V d)), one_mul]
+theorem infM_mul_pf
+    (θ : InfFam D) (V : HSp D) {n : ℕ} (hn : V.rank = n) (k d : GA D V) (τ : D.what₂.Tau)
+    : infM θ V hn (k * ((GlobalTheory.AdForm.RdLaw.pf V d)⁻¹ * d)) τ
+      = infM θ V hn k τ * infM θ V hn d τ := by
+  rw [infM_mul' θ V hn k, infM_mul' θ V hn _ d,
+    infM_fin' θ V hn _ (inv_mem (GlobalTheory.AdForm.RdLaw.pf_fin V d)), one_mul]
 
 end GlobalTheory.AdForm.RamCont
 

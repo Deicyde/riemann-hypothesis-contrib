@@ -9,10 +9,13 @@ namespace GlobalTheory.ClearDenominatorsIntegral
 
 open GlobalTheory.UnitLemma
 
-theorem clear_denominators (K : UQ) {V : Type} [AddCommGroup V] [Module (UQ.E K) V] [Module (UQ.O K) V]
-    [IsScalarTower (UQ.O K) (UQ.E K) V] (M : Submodule (UQ.O K) V) {x : V}
-    (hx : x ∈ Submodule.span (UQ.E K) (↑M : Set V)) :
-    ∃ (d : UQ.O K), d ≠ (0 : UQ.O K) ∧ d • x ∈ M := by
+theorem clear_denominators
+    (K : UQ)
+    {V : Type}
+    [AddCommGroup V] [Module (UQ.E K) V] [Module (UQ.O K) V] [IsScalarTower (UQ.O K) (UQ.E K) V]
+    (M : Submodule (UQ.O K) V)
+    {x : V} (hx : x ∈ Submodule.span (UQ.E K) (↑M : Set V))
+    : ∃ (d : UQ.O K), d ≠ (0 : UQ.O K) ∧ d • x ∈ M := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -34,7 +37,15 @@ theorem clear_denominators (K : UQ) {V : Type} [AddCommGroup V] [Module (UQ.E K)
     rw [mul_comm, mul_smul, key, smul_smul, mul_comm, ← smul_smul]
     exact M.smul_mem _ h
 
-theorem main : ∀ (K : GlobalTheory.UnitLemma.UQ) {V : Type} [inst : AddCommGroup V] [inst_1 : Module (GlobalTheory.UnitLemma.UQ.E K) V] [inst_2 : Module (GlobalTheory.UnitLemma.UQ.O K) V] [IsScalarTower (GlobalTheory.UnitLemma.UQ.O K) (GlobalTheory.UnitLemma.UQ.E K) V] (M : Submodule (GlobalTheory.UnitLemma.UQ.O K) V) {x : V}, x ∈ Submodule.span (GlobalTheory.UnitLemma.UQ.E K) (↑M : Set V) → ∃ (d : GlobalTheory.UnitLemma.UQ.O K), d ≠ (0 : GlobalTheory.UnitLemma.UQ.O K) ∧ d • x ∈ M :=
-  fun K _ _ _ _ _ M _ hx => clear_denominators K M hx
+theorem main
+    : ∀ (K : GlobalTheory.UnitLemma.UQ) {V : Type} [inst : AddCommGroup V]
+        [inst_1 : Module (GlobalTheory.UnitLemma.UQ.E K) V]
+        [inst_2 : Module (GlobalTheory.UnitLemma.UQ.O K) V]
+        [IsScalarTower (GlobalTheory.UnitLemma.UQ.O K) (GlobalTheory.UnitLemma.UQ.E K) V]
+        (M : Submodule (GlobalTheory.UnitLemma.UQ.O K) V) {x : V},
+      x ∈ Submodule.span (GlobalTheory.UnitLemma.UQ.E K) (↑M : Set V)
+        → ∃ (d : GlobalTheory.UnitLemma.UQ.O K),
+          d ≠ (0 : GlobalTheory.UnitLemma.UQ.O K) ∧ d • x ∈ M := fun K _ _ _ _ _ M _ hx =>
+  clear_denominators K M hx
 
 end GlobalTheory.ClearDenominatorsIntegral

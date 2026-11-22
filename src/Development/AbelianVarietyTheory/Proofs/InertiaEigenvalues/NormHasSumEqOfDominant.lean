@@ -8,8 +8,9 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem norm_hasSum_eq_of_dominant : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] (ι : Type)
-    (f : ι → K) (s : K) (i₀ : ι), HasSum f s → (∀ i, i ≠ i₀ → ‖f i‖ < ‖f i₀‖) → ‖s‖ = ‖f i₀‖ := by
+theorem norm_hasSum_eq_of_dominant
+    : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] (ι : Type) (f : ι → K) (s : K) (i₀ : ι),
+      HasSum f s → (∀ i, i ≠ i₀ → ‖f i‖ < ‖f i₀‖) → ‖s‖ = ‖f i₀‖ := by
   intro K _ _ ι f s i₀ hsum h
   classical
   have hs : Summable f := hsum.summable
@@ -35,8 +36,8 @@ theorem norm_hasSum_eq_of_dominant : ∀ (K : Type) [NormedField K] [IsUltrametr
   have hfin : {i | ¬ ‖f i‖ < ‖f i₀‖ / 2}.Finite := by
     have := (NormedAddGroup.tendsto_nhds_zero.1 hf) (‖f i₀‖ / 2) (by positivity)
     exact Filter.eventually_cofinite.1 this
-  obtain ⟨j, -, hj⟩ := Set.exists_max_image _ (fun i => ‖g i‖) hfin
-    ⟨i₀, by simp only [Set.mem_setOf_eq]; linarith⟩
+  obtain ⟨j, -, hj⟩ :=
+    Set.exists_max_image _ (fun i => ‖g i‖) hfin ⟨i₀, by simp only [Set.mem_setOf_eq]; linarith⟩
   have hb : ‖∑' i, g i‖ ≤ max (‖f i₀‖ / 2) ‖g j‖ := by
     refine IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg (by positivity) fun i => ?_
     by_cases hi : ‖f i‖ < ‖f i₀‖ / 2

@@ -22,14 +22,16 @@ namespace PositivityTheory.Lit1.GEN.W_killed_b
 local notation "ℚ̄" => AlgebraicClosure ℚ
 
 set_option maxHeartbeats 1000000 in
-theorem ratio_shortExact_prime (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
-    (hS : S.Finite) (hSℓ : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
+theorem ratio_shortExact_prime
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1))) (hS : S.Finite)
+    (hSℓ : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
     (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
-    (T : ShortComplex (Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ̄ S)))
-    (hT : T.ShortExact) [IsDiscreteRep T.X₁] [IsDiscreteRep T.X₂] [IsDiscreteRep T.X₃] [Finite T.X₂]
-    (hℓ : ∃ r : ℕ, ∀ m : T.X₂, (ℓ ^ r) • m = 0) :
-    haveI : Finite S := hS
-    gsEulerRatio S T.X₂ ιr = gsEulerRatio S T.X₁ ιr * gsEulerRatio S T.X₃ ιr := by
+    (T : ShortComplex (Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ̄ S))) (hT : T.ShortExact)
+    [IsDiscreteRep T.X₁] [IsDiscreteRep T.X₂] [IsDiscreteRep T.X₃] [Finite T.X₂]
+    (hℓ : ∃ r : ℕ, ∀ m : T.X₂, (ℓ ^ r) • m = 0)
+    : haveI : Finite S := hS
+      gsEulerRatio S T.X₂ ιr = gsEulerRatio S T.X₁ ιr * gsEulerRatio S T.X₃ ιr := by
   haveI : Finite S := hS
   haveI : Fintype S := Fintype.ofFinite S
   have hp : ℓ.Prime := Fact.out
@@ -45,63 +47,85 @@ theorem ratio_shortExact_prime (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield)
     apply hSℓ v
     rw [Nat.cast_pow] at hv
     exact v.isPrime.mem_of_pow_mem r hv
-  let ιs : ∀ v : S, AlgebraicClosure ℚ →ₐ[K.1]
-      AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1) := fun v =>
-    (nonempty_algHom_of_isSepClosed : Nonempty (AlgebraicClosure ℚ →ₐ[K.1]
-      AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))).some
-  have h1 : ∀ m : T.X₁, (ℓ ^ r) • m = 0 := fun m => hinj (by
-    rw [map_nsmul, hr, map_zero])
-  have hA := bijective_gsRealRes (S := S) (ιr := ιr) (ιs := ιs) (hS := hSN) (M := T.X₁) (hM := h1)
-    (r := 3) le_rfl
-  have hB := bijective_gsRealRes (S := S) (ιr := ιr) (ιs := ιs) (hS := hSN) (M := T.X₂) (hM := hr)
-    (r := 3) le_rfl
-  have hpg : IsPGroup ℓ (Multiplicative T.X₂) := fun g => ⟨r, by
-    show Multiplicative.toAdd (g ^ (ℓ ^ r)) = Multiplicative.toAdd 1
-    rw [toAdd_pow]; exact hr _⟩
+  let ιs
+      : ∀ v : S,
+        AlgebraicClosure ℚ →ₐ[K.1]
+          AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1) := fun v =>
+    (nonempty_algHom_of_isSepClosed : Nonempty
+      (AlgebraicClosure ℚ →ₐ[K.1]
+        AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))).some
+  have h1 : ∀ m : T.X₁, (ℓ ^ r) • m = 0 := fun m => hinj (by rw [map_nsmul, hr, map_zero])
+  have hA :=
+    bijective_gsRealRes (S := S) (ιr := ιr) (ιs := ιs) (hS := hSN) (M := T.X₁) (hM := h1) (r := 3)
+      le_rfl
+  have hB :=
+    bijective_gsRealRes (S := S) (ιr := ιr) (ιs := ιs) (hS := hSN) (M := T.X₂) (hM := hr) (r := 3)
+      le_rfl
+  have hpg : IsPGroup ℓ (Multiplicative T.X₂) := fun g => ⟨
+    r,
+    by
+      show Multiplicative.toAdd (g ^ (ℓ ^ r)) = Multiplicative.toAdd 1
+      rw [toAdd_pow]
+      exact hr _
+  ⟩
   obtain ⟨n, hn⟩ := hpg.exists_card_eq
   have hn2 : Nat.card T.X₂ = ℓ ^ n := by rw [← hn]; rfl
-  have hn' : ∀ v : HeightOneSpectrum (𝓞 K.1), ((Nat.card T.X₂ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S := by
+  have hn'
+      : ∀ v : HeightOneSpectrum (𝓞 K.1), ((Nat.card T.X₂ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S := by
     intro v hv
     apply hSℓ v
     rw [hn2, Nat.cast_pow] at hv
     exact v.isPrime.mem_of_pow_mem n hv
   exact gsEulerRatio_shortExact_of_bijective S ιr hT hn' hA hB
 
-theorem ratio_shortExact_prime_card (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
-    (hS : S.Finite) (hSℓ : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
+theorem ratio_shortExact_prime_card
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1))) (hS : S.Finite)
+    (hSℓ : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
     (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
-    (T : ShortComplex (Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ̄ S)))
-    (hT : T.ShortExact) [IsDiscreteRep T.X₁] [IsDiscreteRep T.X₂] [IsDiscreteRep T.X₃] [Finite T.X₂]
-    (hc : ∃ n : ℕ, Nat.card T.X₂ = ℓ ^ n) :
-    haveI : Finite S := hS
-    gsEulerRatio S T.X₂ ιr = gsEulerRatio S T.X₁ ιr * gsEulerRatio S T.X₃ ιr := by
+    (T : ShortComplex (Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ̄ S))) (hT : T.ShortExact)
+    [IsDiscreteRep T.X₁] [IsDiscreteRep T.X₂] [IsDiscreteRep T.X₃] [Finite T.X₂]
+    (hc : ∃ n : ℕ, Nat.card T.X₂ = ℓ ^ n)
+    : haveI : Finite S := hS
+      gsEulerRatio S T.X₂ ιr = gsEulerRatio S T.X₁ ιr * gsEulerRatio S T.X₃ ιr := by
   obtain ⟨n, hn⟩ := hc
-  exact ratio_shortExact_prime ℓ K S hS hSℓ ιr T hT ⟨n, fun m => by rw [← hn]; exact card_nsmul_eq_zero'⟩
+  exact ratio_shortExact_prime ℓ K S hS hSℓ ιr T hT
+    ⟨n, fun m => by rw [← hn]; exact card_nsmul_eq_zero'⟩
 
-noncomputable def coindStagesEquiv {k G : Type} [CommRing k] [Group G] (U W : Subgroup G) (hUW : U ≤ W)
-    (A : Rep.{0} k G) :
-    (Rep.coind W.subtype (Rep.coind (U.subgroupOf W).subtype
-        (Rep.res (U.subgroupOf W).subtype (Rep.res W.subtype A)))).ρ.Equiv
+noncomputable def coindStagesEquiv
+    {k G : Type} [CommRing k] [Group G] (U W : Subgroup G) (hUW : U ≤ W) (A : Rep.{0} k G)
+    : (Rep.coind W.subtype
+        (Rep.coind (U.subgroupOf W).subtype
+          (Rep.res (U.subgroupOf W).subtype (Rep.res W.subtype A)))).ρ.Equiv
       (Rep.coind U.subtype (Rep.res U.subtype A)).ρ where
-  toFun F := ⟨fun g => (F.1 g).1 1, by
-    intro u g
-    have h3 : (F.1 (u.1 * g)).1 1 = (F.1 g).1 (1 * ⟨u.1, hUW u.2⟩) :=
-      congrArg (fun x => x.1 (1 : W)) (F.2 ⟨u.1, hUW u.2⟩ g)
-    have h2 := (F.1 g).2 ⟨⟨u.1, hUW u.2⟩, by simp [Subgroup.mem_subgroupOf]⟩ 1
-    rw [one_mul] at h3
-    rw [mul_one] at h2
-    exact h3.trans h2⟩
+  toFun F := ⟨
+    fun g => (F.1 g).1 1,
+    by
+      intro u g
+      have h3 : (F.1 (u.1 * g)).1 1 = (F.1 g).1 (1 * ⟨u.1, hUW u.2⟩) :=
+        congrArg (fun x => x.1 (1 : W)) (F.2 ⟨u.1, hUW u.2⟩ g)
+      have h2 := (F.1 g).2 ⟨⟨u.1, hUW u.2⟩, by simp [Subgroup.mem_subgroupOf]⟩ 1
+      rw [one_mul] at h3
+      rw [mul_one] at h2
+      exact h3.trans h2
+  ⟩
   map_add' F F' := Subtype.ext (funext fun g => rfl)
   map_smul' c F := Subtype.ext (funext fun g => rfl)
-  invFun f := ⟨fun g => ⟨fun w => f.1 (w.1 * g), by
-      intro u' w
-      have := f.2 ⟨u'.1.1, u'.2⟩ (w.1 * g)
-      simpa [mul_assoc] using this⟩, by
-    intro w g
-    apply Subtype.ext
-    funext x
-    change f.1 (x.1 * (w.1 * g)) = f.1 ((x * w).1 * g)
-    rw [Subgroup.coe_mul, mul_assoc]⟩
+  invFun f := ⟨
+    fun g => ⟨
+      fun w => f.1 (w.1 * g),
+      by
+        intro u' w
+        have := f.2 ⟨u'.1.1, u'.2⟩ (w.1 * g)
+        simpa [mul_assoc] using this
+    ⟩,
+    by
+      intro w g
+      apply Subtype.ext
+      funext x
+      change f.1 (x.1 * (w.1 * g)) = f.1 ((x * w).1 * g)
+      rw [Subgroup.coe_mul, mul_assoc]
+  ⟩
   left_inv F := by
     apply Subtype.ext
     funext g
@@ -118,43 +142,69 @@ noncomputable def coindStagesEquiv {k G : Type} [CommRing k] [Group G] (U W : Su
     rw [OneMemClass.coe_one, one_mul]
   isIntertwining' h := LinearMap.ext fun F => Subtype.ext (funext fun g => rfl)
 
-theorem coind_stages {k G : Type} [CommRing k] [Group G] (U W : Subgroup G) (hUW : U ≤ W) (A : Rep.{0} k G) :
-    Nonempty (Rep.coind W.subtype (Rep.coind (U.subgroupOf W).subtype
-        (Rep.res (U.subgroupOf W).subtype (Rep.res W.subtype A))) ≅
-      Rep.coind U.subtype (Rep.res U.subtype A)) :=
+theorem coind_stages
+    {k G : Type} [CommRing k] [Group G] (U W : Subgroup G) (hUW : U ≤ W) (A : Rep.{0} k G)
+    : Nonempty
+      (Rep.coind W.subtype
+          (Rep.coind (U.subgroupOf W).subtype
+            (Rep.res (U.subgroupOf W).subtype (Rep.res W.subtype A)))
+        ≅ Rep.coind U.subtype (Rep.res U.subtype A)) :=
   ⟨Rep.mkIso (coindStagesEquiv U W hUW A)⟩
 
-
 set_option maxHeartbeats 1000000 in
-theorem isMultiplicativeOn_ratio_coind (ℓ : ℕ) [Fact ℓ.Prime]
-    (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1))) (hS : S.Finite)
-    (hSℓ : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
+theorem isMultiplicativeOn_ratio_coind
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
+    (hS : S.Finite) (hSℓ : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
     (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
-    (L' : FiniteSubfield) [Fact (K ≤ L')] (hL' : ∀ x : L'.1, algebraMap L'.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S) :
-    IsMultiplicativeOn (fun n => ∃ k, n = ℓ ^ k)
-      (fun (X : Rep.{0} (ULift.{0} ℤ) (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S))) [IsDiscreteRep X] =>
-        gsEulerRatio S (Rep.coind (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype X) ιr) := by
+    (L' : FiniteSubfield) [Fact (K ≤ L')]
+    (hL' : ∀ x : L'.1, algebraMap L'.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
+    : IsMultiplicativeOn
+      (fun n => ∃ k, n = ℓ ^ k)
+      (fun (X
+          : Rep.{0} (ULift.{0} ℤ) (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)))
+          [IsDiscreteRep X] =>
+        gsEulerRatio S
+          (Rep.coind (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype X)
+          ιr) := by
   have hp : ℓ.Prime := Fact.out
-  exact
-  { iso := fun {A B} _ _ _ _ e =>
-      gsEulerRatio_eq_of_iso S _ ιr ((Rep.coindFunctor (ULift.{0} ℤ) (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype).mapIso e)
+  exact {
+    iso := fun {A B} _ _ _ _ e =>
+      gsEulerRatio_eq_of_iso S _ ιr
+        ((Rep.coindFunctor (ULift.{0} ℤ)
+          (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype).mapIso e)
     shortExact := fun {T} _ _ _ _ hT hP => by
-      have hT' := shortExact_coindShortComplexOf (G := (galUnramifiedOutside K.1 ℚ̄ S)) (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) hT
+      have hT' :=
+        shortExact_coindShortComplexOf (G := (galUnramifiedOutside K.1 ℚ̄ S))
+          (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) hT
       obtain ⟨k, hk⟩ := hP
       have hcc := card_coind_gsOpenSubgroup S hL' T.X₂
-      have hfin : Finite (Rep.coind (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype T.X₂) :=
+      have hfin : Finite (Rep.coind
+          (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype T.X₂) :=
         Nat.finite_of_card_ne_zero (by rw [hcc, hk]; exact pow_ne_zero _ (pow_ne_zero _ hp.ne_zero))
-      have i1 : IsDiscreteRep (coindShortComplexOf (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₁ :=
+      have i1 : IsDiscreteRep (coindShortComplexOf
+          (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₁ :=
         isDiscreteRep_coind (gsOpenSubgroup S hL') T.X₁
-      have i2 : IsDiscreteRep (coindShortComplexOf (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₂ :=
+      have i2 : IsDiscreteRep (coindShortComplexOf
+          (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₂ :=
         isDiscreteRep_coind (gsOpenSubgroup S hL') T.X₂
-      have i3 : IsDiscreteRep (coindShortComplexOf (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₃ :=
+      have i3 : IsDiscreteRep (coindShortComplexOf
+          (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₃ :=
         isDiscreteRep_coind (gsOpenSubgroup S hL') T.X₃
-      have hfin2 : Finite (coindShortComplexOf (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₂ := hfin
-      have hcc2 : Nat.card (coindShortComplexOf (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₂ = ℓ ^ (k * Module.finrank K.1 L'.1) := by
+      have hfin2 : Finite (coindShortComplexOf
+          (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₂ :=
+        hfin
+      have hcc2
+          : Nat.card (coindShortComplexOf
+              (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T).X₂
+            = ℓ ^ (k * Module.finrank K.1 L'.1) := by
         rw [pow_mul, ← hk]; exact hcc
-      have key := ratio_shortExact_prime_card ℓ K S hS hSℓ ιr (coindShortComplexOf (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T) hT' ⟨_, hcc2⟩
-      exact key }
+      have key :=
+        ratio_shortExact_prime_card ℓ K S hS hSℓ ιr
+          (coindShortComplexOf (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) T)
+          hT' ⟨_, hcc2⟩
+      exact key
+  }
 
 theorem ratio_coind_stage_pow (ℓ : ℕ) [Fact ℓ.Prime]
     (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1))) (hS : S.Finite)
@@ -226,15 +276,23 @@ theorem exists_prime_to_part (ℓ : ℕ) [Fact ℓ.Prime]
       ∃ a : ℕ, Nat.card ((gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)) ⧸ (gsOpenSubgroup S hK'' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subgroupOf (gsOpenSubgroup S hL' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S))) = ℓ ^ a :=
   GlobalEulerCharacteristicAlt.exists_prime_to_part ℓ K S L hL L' hL' hle hcyc
 
-theorem exists_ratio_coind_eq_resTo (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
+theorem exists_ratio_coind_eq_resTo
+    (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
     (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
-    (K' : FiniteSubfield) [Fact (K ≤ K')] (hK' : ∀ x : K'.1, algebraMap K'.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
-    (M : Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ̄ S)) [IsDiscreteRep M] [Finite M] :
-    ∃ ιr' : ∀ w : {w : InfinitePlace K'.1 // w.IsReal}, ℚ̄ →ₐ[K'.1] AlgebraicClosure w.1.Completion,
-      gsEulerRatio S (Rep.coind (gsOpenSubgroup S hK' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype (Rep.res (gsOpenSubgroup S hK' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype M)) ιr =
-        gsEulerRatio (placesOver S) (W_killed_a.resTo S K' hK' M) ιr' := by
+    (K' : FiniteSubfield) [Fact (K ≤ K')]
+    (hK' : ∀ x : K'.1, algebraMap K'.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
+    (M : Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ̄ S)) [IsDiscreteRep M] [Finite M]
+    : ∃ ιr'
+        : ∀ w : {w : InfinitePlace K'.1 // w.IsReal}, ℚ̄ →ₐ[K'.1] AlgebraicClosure w.1.Completion,
+      gsEulerRatio S
+          (Rep.coind (gsOpenSubgroup S hK' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype
+            (Rep.res (gsOpenSubgroup S hK' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype M))
+          ιr
+        = gsEulerRatio (placesOver S) (W_killed_a.resTo S K' hK' M) ιr' := by
   obtain ⟨ιr', hsh⟩ := exists_gsEulerRatio_coind_eq S hK' ιr
-  have : Finite (Rep.res (gsOpenSubgroup S hK' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype M) := inferInstanceAs (Finite M)
+  have : Finite (Rep.res (gsOpenSubgroup S hK' : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).subtype
+      M) :=
+    inferInstanceAs (Finite M)
   exact ⟨ιr', hsh _⟩
 
 theorem ratio_coind_cyclic (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1))) (hS : S.Finite)

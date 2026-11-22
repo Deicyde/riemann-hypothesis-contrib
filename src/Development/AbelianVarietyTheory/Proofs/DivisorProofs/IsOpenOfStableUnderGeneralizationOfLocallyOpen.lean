@@ -8,11 +8,11 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem isOpen_of_stableUnderGeneralization_of_locally_open_in_closure :
-    ∀ (B : Type) [CommRing B] [IsNoetherianRing B] (U : Set (PrimeSpectrum B)),
-      (∀ p q : PrimeSpectrum B, p ≤ q → q ∈ U → p ∈ U) →
-      (∀ p ∈ U, ∃ g, g ∉ p.asIdeal ∧ ∀ q : PrimeSpectrum B, p ≤ q → g ∉ q.asIdeal → q ∈ U) →
-      IsOpen U := by
+theorem isOpen_of_stableUnderGeneralization_of_locally_open_in_closure
+    : ∀ (B : Type) [CommRing B] [IsNoetherianRing B] (U : Set (PrimeSpectrum B)),
+      (∀ p q : PrimeSpectrum B, p ≤ q → q ∈ U → p ∈ U)
+        → (∀ p ∈ U, ∃ g, g ∉ p.asIdeal ∧ ∀ q : PrimeSpectrum B, p ≤ q → g ∉ q.asIdeal → q ∈ U)
+        → IsOpen U := by
   intro B _ _ U hgen hloc
   classical
   set I := PrimeSpectrum.vanishingIdeal (Uᶜ) with hI
@@ -27,7 +27,8 @@ theorem isOpen_of_stableUnderGeneralization_of_locally_open_in_closure :
     have hJ : ¬ S.inf id ≤ x.asIdeal := by
       intro h
       obtain ⟨P, hPS, hPx⟩ := (Ideal.IsPrime.inf_le' x.isPrime).1 h
-      have hPm : P ∈ I.minimalPrimes := (Set.Finite.mem_toFinset hfin).1 (Finset.mem_of_mem_erase hPS)
+      have hPm : P ∈ I.minimalPrimes :=
+        (Set.Finite.mem_toFinset hfin).1 (Finset.mem_of_mem_erase hPS)
       have hne : P ≠ x.asIdeal := Finset.ne_of_mem_erase hPS
       exact hne (le_antisymm hPx (hx.2 hPm.1 hPx))
     obtain ⟨c, hcJ, hcx⟩ := Set.not_subset.1 hJ

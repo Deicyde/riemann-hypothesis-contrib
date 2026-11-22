@@ -13,9 +13,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLattic
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open ReciprocityTheory.DiscreteGroups.LocalClassField
 open scoped TensorProduct
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -26,17 +29,23 @@ namespace GlobalTheory.LKGeo.ForgetHecke
 
 variable {p : ℕ} [Fact p.Prime] {D : Datum p}
 
-theorem lattice_dvd (n : ℕ) (hn : 0 < n) (hp : n.Coprime p) (z : D.La)
-    (h : ∃ w ∈ LaHat D, inAf D z = n • w) : ∃ u : D.La, z = n • u :=
-  GlobalTheory.T.exists_latticeVector_eq_nsmul_of_adelic_nsmul p D n hn hp (GlobalTheory.T.int_dvd_of_eq_nat_mul_integralAdeleAwayFromP p n hn hp) z h
+theorem lattice_dvd
+    (n : ℕ) (hn : 0 < n) (hp : n.Coprime p) (z : D.La) (h : ∃ w ∈ LaHat D, inAf D z = n • w)
+    : ∃ u : D.La, z = n • u :=
+  GlobalTheory.T.exists_latticeVector_eq_nsmul_of_adelic_nsmul p D n hn hp
+    (GlobalTheory.T.int_dvd_of_eq_nat_mul_integralAdeleAwayFromP p n hn hp) z h
 
 def inAfHom (D : Datum p) : D.La →+ AfP p ⊗[ℚ] VQ D where
   toFun := inAf D
   map_zero' := by simp [inAf]
   map_add' x y := by simp [inAf, TensorProduct.tmul_add]
 
-theorem acts_one_iff {G : HTGroup p} (L : GlobalTheory.LKGeo.Link D G) (n : ℕ) (hn : 0 < n) (hp : n.Coprime p) (x y : D.La) :
-    (∃ w ∈ LaHat D, ((1 : ℕ) : ℤ) • L.actG 1 (inAf D x) = inAf D y + n • w) ↔ ∃ u : D.La, x - y = n • u := by
+theorem acts_one_iff
+    {G : HTGroup p} (L : GlobalTheory.LKGeo.Link D G)
+    (n : ℕ) (hn : 0 < n) (hp : n.Coprime p)
+    (x y : D.La)
+    : (∃ w ∈ LaHat D, ((1 : ℕ) : ℤ) • L.actG 1 (inAf D x) = inAf D y + n • w)
+      ↔ ∃ u : D.La, x - y = n • u := by
   simp only [map_one, Nat.cast_one, one_smul, one_apply_eq_self]
   constructor
   · rintro ⟨w, hw, e⟩
@@ -44,7 +53,8 @@ theorem acts_one_iff {G : HTGroup p} (L : GlobalTheory.LKGeo.Link D G) (n : ℕ)
     change inAfHom D (x - y) = _
     rw [map_sub]
     change inAf D x - inAf D y = _
-    rw [e]; abel
+    rw [e]
+    abel
   · rintro ⟨u, hu⟩
     refine ⟨inAf D u, AddSubgroup.subset_closure ⟨1, u, fun v => ?_, ?_⟩, ?_⟩
     · rw [map_one]; exact (v.1.adicCompletionIntegers ℚ).one_mem

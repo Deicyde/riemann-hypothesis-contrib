@@ -11,20 +11,22 @@ open scoped TensorProduct
 
 namespace Formalism.IndefR.Eqv
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Sobolev₂
 
-variable {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {Lie : Set (Matrix (Fin n) (Fin n) ℂ)} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-theorem sobCont_zero : Sobolev₂ Lie σ 0 :=
-  ⟨[], 0, by simp, fun w _ => by simp⟩
+theorem sobCont_zero : Sobolev₂ Lie σ 0 := ⟨[], 0, by simp, fun w _ => by simp⟩
 
-theorem sobCont_add {ℓ₁ ℓ₂ : H →ₗ[ℂ] ℂ} (h₁ : Sobolev₂ Lie σ ℓ₁) (h₂ : Sobolev₂ Lie σ ℓ₂) :
-    Sobolev₂ Lie σ (ℓ₁ + ℓ₂) := by
+theorem sobCont_add {ℓ₁ ℓ₂ : H →ₗ[ℂ] ℂ} (h₁ : Sobolev₂ Lie σ ℓ₁) (h₂ : Sobolev₂ Lie σ ℓ₂)
+    : Sobolev₂ Lie σ (ℓ₁ + ℓ₂) := by
   obtain ⟨S₁, C₁, hS₁, hb₁⟩ := h₁
   obtain ⟨S₂, C₂, hS₂, hb₂⟩ := h₂
   refine ⟨S₁ ++ S₂, max C₁ 0 + max C₂ 0, fun l hl X hX => ?_, fun w hw => ?_⟩
@@ -39,22 +41,30 @@ theorem sobCont_add {ℓ₁ ℓ₂ : H →ₗ[ℂ] ℂ} (h₁ : Sobolev₂ Lie �
       List.sum_nonneg fun x hx => by
         obtain ⟨l, -, rfl⟩ := List.mem_map.1 hx
         exact norm_nonneg _
-    have e₁ : C₁ * (S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum ≤
-        max C₁ 0 * (S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum :=
+    have e₁
+        : C₁ * (S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum
+          ≤ max C₁ 0 * (S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum :=
       mul_le_mul_of_nonneg_right (le_max_left _ _) n₁
-    have e₂ : C₂ * (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum ≤
-        max C₂ 0 * (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum :=
+    have e₂
+        : C₂ * (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum
+          ≤ max C₂ 0 * (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum :=
       mul_le_mul_of_nonneg_right (le_max_left _ _) n₂
     have m₁ : 0 ≤ max C₁ 0 := le_max_right _ _
     have m₂ : 0 ≤ max C₂ 0 := le_max_right _ _
     rw [List.map_append, List.sum_append, LinearMap.add_apply]
-    calc ‖ℓ₁ w + ℓ₂ w‖ ≤ ‖ℓ₁ w‖ + ‖ℓ₂ w‖ := norm_add_le _ _
-      _ ≤ C₁ * (S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum + C₂ * (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum :=
+    calc
+      ‖ℓ₁ w + ℓ₂ w‖
+        ≤ ‖ℓ₁ w‖ + ‖ℓ₂ w‖ := norm_add_le _ _
+      _ ≤ C₁ * (S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum
+          + C₂ * (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum :=
         add_le_add (hb₁ w hw) (hb₂ w hw)
-      _ ≤ max C₁ 0 * (S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum +
-          max C₂ 0 * (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum := add_le_add e₁ e₂
-      _ ≤ (max C₁ 0 + max C₂ 0) * ((S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum +
-          (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum) := by nlinarith
+      _ ≤ max C₁ 0 * (S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum
+          + max C₂ 0 * (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum :=
+        add_le_add e₁ e₂
+      _ ≤ (max C₁ 0 + max C₂ 0)
+          * ((S₁.map fun l => ‖l.foldr (dRep σ) w‖).sum
+            + (S₂.map fun l => ‖l.foldr (dRep σ) w‖).sum) := by
+        nlinarith
 
 theorem sobCont_smul {ℓ : H →ₗ[ℂ] ℂ} (c : ℂ) (h : Sobolev₂ Lie σ ℓ) : Sobolev₂ Lie σ (c • ℓ) := by
   obtain ⟨S, C, hS, hb⟩ := h
@@ -66,16 +76,17 @@ end Sobolev₂
 
 variable {D : D7}
 
-
 open Classical in
 def ContAt {V : HSp D} {S : D.what₂.Tau → SPar} (M : Mult.DSModel V S) (T : Mult.MMap M) : Prop :=
-  ∀ τ (v : M.Vec) (x : GA D V), ∃ ℓ : M.H τ →ₗ[ℂ] ℂ, Sobolev₂ (lieAt V τ) (M.rep τ) ℓ ∧
-    ∀ w : M.sm τ, ℓ w = T (Function.update v τ w) x
+  ∀ τ (v : M.Vec) (x : GA D V), ∃ ℓ : M.H τ →ₗ[ℂ] ℂ,
+    Sobolev₂ (lieAt V τ) (M.rep τ) ℓ ∧ ∀ w : M.sm τ, ℓ w = T (Function.update v τ w) x
 
 open Classical in
-theorem contAt_of_mem {V : HSp D} {S : D.what₂.Tau → SPar} {M : Mult.DSModel V S}
-    {θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)} {J : Set (GA D V)} {χ : GA D V → ℂ}
-    {T : Mult.MMap M} (hT : T ∈ Mult.Mult θ M J χ) : ContAt M T := by
+theorem contAt_of_mem
+    {V : HSp D} {S : D.what₂.Tau → SPar} {M : Mult.DSModel V S}
+    {θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)} {J : Set (GA D V)}
+    {χ : GA D V → ℂ} {T : Mult.MMap M} (hT : T ∈ Mult.Mult θ M J χ)
+    : ContAt M T := by
   induction hT using Submodule.span_induction with
   | mem T hT => exact hT.cont
   | zero =>
@@ -100,11 +111,12 @@ theorem ioUniqueAt_holds (D : D7) : IoUniqueAt D := by
     rw [Submodule.span_le]
     rintro x ⟨φ, w, rfl⟩
     exact hvan φ w
-  have hvK : ∀ v : ∀ τ, M.sm τ, (∀ τ, v τ ∈ Kf τ) → u (PiTensorProduct.tprod ℂ v) = 0 :=
-    fun v hv => hsub (hspan v hv)
+  have hvK : ∀ v : ∀ τ, M.sm τ, (∀ τ, v τ ∈ Kf τ) → u (PiTensorProduct.tprod ℂ v) = 0 := fun v hv =>
+    hsub (hspan v hv)
   have hTe : ∀ v, PiTensorProduct.lift.symm u v = u (PiTensorProduct.tprod ℂ v) := fun v => by simp
-  have main : ∀ s : Finset D.what₂.Tau, ∀ v : ∀ τ, M.sm τ, (∀ τ ∉ s, v τ ∈ Kf τ) →
-      PiTensorProduct.lift.symm u v = 0 := by
+  have main
+      : ∀ s : Finset D.what₂.Tau, ∀ v : ∀ τ, M.sm τ,
+        (∀ τ ∉ s, v τ ∈ Kf τ) → PiTensorProduct.lift.symm u v = 0 := by
     intro s
     induction s using Finset.induction_on with
     | empty =>

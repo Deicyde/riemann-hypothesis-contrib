@@ -20,22 +20,25 @@ section Group
 
 variable {G : Type} [Group G] [Finite G]
 
-private theorem sum_eq_pair {χ : G → ℂ} (ψ : G → ℂ) (hχ : IsChar ℂ ℂ χ) :
-    (∑ᶠ g, star (χ g) * ψ g) = (Nat.card G : ℂ) * pair ψ χ := by
+private theorem sum_eq_pair {χ : G → ℂ} (ψ : G → ℂ) (hχ : IsChar ℂ ℂ χ)
+    : (∑ᶠ g, star (χ g) * ψ g) = (Nat.card G : ℂ) * pair ψ χ := by
   have h := GlobalTheory.T.star_virtualCharacter_eq_apply_inv G χ (AddSubgroup.subset_closure hχ)
   have hG : (Nat.card G : ℂ) ≠ 0 := Nat.cast_ne_zero.2 Nat.card_pos.ne'
   unfold pair
   rw [← mul_assoc, mul_inv_cancel₀ hG, one_mul]
   exact finsum_congr fun g => by rw [h, mul_comm]
 
-private theorem pairs_iff {χ : G → ℂ} (ψ : G → ℂ) (hχ : IsChar ℂ ℂ χ) : Pairs χ ψ ↔ pair ψ χ ≠ 0 := by
+private theorem pairs_iff {χ : G → ℂ} (ψ : G → ℂ) (hχ : IsChar ℂ ℂ χ)
+    : Pairs χ ψ ↔ pair ψ χ ≠ 0 := by
   have hc : (Nat.card G : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
   unfold Pairs
   rw [sum_eq_pair ψ hχ, mul_ne_zero_iff]
   tauto
 
-private theorem pair_add_ne {a u b v : G → ℂ} (ha : IsChar ℂ ℂ a) (hu : IsChar ℂ ℂ u) (hb : IsChar ℂ ℂ b)
-    (hv : IsChar ℂ ℂ v) (h : pair a b ≠ 0) : pair (a + u) (b + v) ≠ 0 := by
+private theorem pair_add_ne
+    {a u b v : G → ℂ} (ha : IsChar ℂ ℂ a) (hu : IsChar ℂ ℂ u) (hb : IsChar ℂ ℂ b)
+    (hv : IsChar ℂ ℂ v) (h : pair a b ≠ 0)
+    : pair (a + u) (b + v) ≠ 0 := by
   obtain ⟨hadd, hnat, -, hsymm⟩ := GlobalTheory.T.finiteGroupFunctionPairing_add_nat_pos_symm ℂ ℂ G
   obtain ⟨n1, h1⟩ := hnat b a hb ha
   obtain ⟨n2, h2⟩ := hnat v a hv ha
@@ -53,8 +56,10 @@ private theorem isChar_of_irr {φ : G → ℂ} (h : IsIrrChar ℂ ℂ φ) : IsCh
   obtain ⟨n, ρ, -, e⟩ := h
   exact ⟨n, ρ, e⟩
 
-private theorem common {A : G → ℂ} (hA : IsChar ℂ ℂ A) {α : G → ℂ} (hα : IsChar ℂ ℂ α) (h : pair A α ≠ 0) :
-    ∃ φ R R' : G → ℂ, IsIrrChar ℂ ℂ φ ∧ IsChar ℂ ℂ R ∧ IsChar ℂ ℂ R' ∧ A = φ + R ∧ α = φ + R' := by
+private theorem common
+    {A : G → ℂ} (hA : IsChar ℂ ℂ A) {α : G → ℂ} (hα : IsChar ℂ ℂ α) (h : pair A α ≠ 0)
+    : ∃ φ R R' : G → ℂ,
+      IsIrrChar ℂ ℂ φ ∧ IsChar ℂ ℂ R ∧ IsChar ℂ ℂ R' ∧ A = φ + R ∧ α = φ + R' := by
   obtain ⟨hadd, -, -, hsymm⟩ := GlobalTheory.T.finiteGroupFunctionPairing_add_nat_pos_symm ℂ ℂ G
   obtain ⟨-, hcadd⟩ := GlobalTheory.T.isCharacterOverSubfield_zero_and_add ℂ ℂ G
   have hzero : ∀ c : G → ℂ, pair 0 c = 0 := by
@@ -63,8 +68,11 @@ private theorem common {A : G → ℂ} (hA : IsChar ℂ ℂ A) {α : G → ℂ} 
     rw [add_zero] at this
     linear_combination -this
   revert h
-  refine GlobalTheory.T.isCharacterOverSubfield_induction_irreducible ℂ ℂ G (fun α => pair A α ≠ 0 → ∃ φ R R' : G → ℂ, IsIrrChar ℂ ℂ φ ∧ IsChar ℂ ℂ R ∧
-    IsChar ℂ ℂ R' ∧ A = φ + R ∧ α = φ + R') ?_ ?_ α hα
+  refine GlobalTheory.T.isCharacterOverSubfield_induction_irreducible ℂ ℂ G
+    (fun α =>
+      pair A α ≠ 0
+        → ∃ φ R R' : G → ℂ, IsIrrChar ℂ ℂ φ ∧ IsChar ℂ ℂ R ∧ IsChar ℂ ℂ R' ∧ A = φ + R ∧ α = φ + R')
+    ?_ ?_ α hα
   · intro h0
     exact absurd (by rw [hsymm, hzero] : pair A 0 = 0) h0
   · intro φ c hφ hc ih hne
@@ -82,7 +90,8 @@ private theorem common {A : G → ℂ} (hA : IsChar ℂ ℂ A) {α : G → ℂ} 
 private theorem irr_one_ne {φ : G → ℂ} (h : IsIrrChar ℂ ℂ φ) : φ 1 ≠ 0 := by
   obtain ⟨n, ρ, hirr, hφ⟩ := h
   rw [hφ, Representation.char_one]
-  simp only [Module.finrank_fin_fun, Algebra.algebraMap_self, RingHom.id_apply, ne_eq, Nat.cast_eq_zero]
+  simp only [Module.finrank_fin_fun, Algebra.algebraMap_self, RingHom.id_apply, ne_eq,
+    Nat.cast_eq_zero]
   rintro rfl
   apply hirr.bot_ne_top
   ext v
@@ -104,8 +113,8 @@ section Hc
 
 variable {F : Type} [Field F] [Finite F]
 
-private theorem hc_add_left (a b n : ℕ) (α α' : GL (Fin a) F → ℂ) (β : GL (Fin b) F → ℂ) :
-    hc a b (α + α') β n = hc a b α β n + hc a b α' β n := by
+private theorem hc_add_left (a b n : ℕ) (α α' : GL (Fin a) F → ℂ) (β : GL (Fin b) F → ℂ)
+    : hc a b (α + α') β n = hc a b α β n + hc a b α' β n := by
   funext x
   simp only [hc, hcTw, Pi.add_apply]
   rw [← mul_add, ← finsum_add_distrib (Set.toFinite _) (Set.toFinite _)]
@@ -113,8 +122,8 @@ private theorem hc_add_left (a b n : ℕ) (α α' : GL (Fin a) F → ℂ) (β : 
   refine finsum_congr fun y => ?_
   split_ifs <;> simp [add_mul]
 
-private theorem hc_add_right (a b n : ℕ) (α : GL (Fin a) F → ℂ) (β β' : GL (Fin b) F → ℂ) :
-    hc a b α (β + β') n = hc a b α β n + hc a b α β' n := by
+private theorem hc_add_right (a b n : ℕ) (α : GL (Fin a) F → ℂ) (β β' : GL (Fin b) F → ℂ)
+    : hc a b α (β + β') n = hc a b α β n + hc a b α β' n := by
   funext x
   simp only [hc, hcTw, Pi.add_apply]
   rw [← mul_add, ← finsum_add_distrib (Set.toFinite _) (Set.toFinite _)]
@@ -126,9 +135,10 @@ end Hc
 
 theorem hcPair : HcChar → HcOne → HcPair := by
   intro hC hO F _ _ a b n hn α A β B hα hA hβ hB hAα hBβ
-  have hcC : ∀ (x : GL (Fin a) F → ℂ) (y : GL (Fin b) F → ℂ), IsChar ℂ ℂ x → IsChar ℂ ℂ y →
-      IsChar ℂ ℂ (hc a b x y n) :=
-    fun x y hx hy => hC F a b n hn x y hx hy
+  have hcC
+      : ∀ (x : GL (Fin a) F → ℂ) (y : GL (Fin b) F → ℂ),
+        IsChar ℂ ℂ x → IsChar ℂ ℂ y → IsChar ℂ ℂ (hc a b x y n) := fun x y hx hy =>
+    hC F a b n hn x y hx hy
   obtain ⟨-, hcadd⟩ := GlobalTheory.T.isCharacterOverSubfield_zero_and_add ℂ ℂ (GL (Fin n) F)
   rw [pairs_iff _ (hcC A B hA hB)]
   rw [pairs_iff _ hA] at hAα
@@ -137,18 +147,19 @@ theorem hcPair : HcChar → HcOne → HcPair := by
   obtain ⟨ψ, S, S', hψ, hS, hS', rfl, rfl⟩ := common hβ hB hBβ
   have hφ' := isChar_of_irr hφ
   have hψ' := isChar_of_irr hψ
-  have e1 : hc a b (φ + R) (ψ + S) n =
-      hc a b φ ψ n + (hc a b φ S n + (hc a b R ψ n + hc a b R S n)) := by
+  have e1
+      : hc a b (φ + R) (ψ + S) n
+        = hc a b φ ψ n + (hc a b φ S n + (hc a b R ψ n + hc a b R S n)) := by
     rw [hc_add_left, hc_add_right, hc_add_right]
     abel
-  have e2 : hc a b (φ + R') (ψ + S') n =
-      hc a b φ ψ n + (hc a b φ S' n + (hc a b R' ψ n + hc a b R' S' n)) := by
+  have e2
+      : hc a b (φ + R') (ψ + S') n
+        = hc a b φ ψ n + (hc a b φ S' n + (hc a b R' ψ n + hc a b R' S' n)) := by
     rw [hc_add_left, hc_add_right, hc_add_right]
     abel
   rw [e1, e2]
   refine pair_add_ne (hcC _ _ hφ' hψ')
-    (hcadd _ _ (hcC _ _ hφ' hS) (hcadd _ _ (hcC _ _ hR hψ') (hcC _ _ hR hS)))
-    (hcC _ _ hφ' hψ')
+    (hcadd _ _ (hcC _ _ hφ' hS) (hcadd _ _ (hcC _ _ hR hψ') (hcC _ _ hR hS))) (hcC _ _ hφ' hψ')
     (hcadd _ _ (hcC _ _ hφ' hS') (hcadd _ _ (hcC _ _ hR' hψ') (hcC _ _ hR' hS'))) ?_
   exact pair_self_ne (hcC _ _ hφ' hψ') (hO F a b n hn φ ψ (irr_one_ne hφ) (irr_one_ne hψ))
 

@@ -17,17 +17,24 @@ set_option maxHeartbeats 1000000 in
 theorem splitPts : StatSplitPts := by
   intro O _ _ Xs T t P hPc hPr
   rcases isEmpty_or_nonempty Xs with hX | hX
-  · exact ⟨fun _ _ => 0, fun _ => (splitT T t P).zero_mem, fun f' _ => ⟨fun _ _ => 0, fun _ => T.zero_mem,
-      funext fun y => (hX.elim y.1.1)⟩, fun x => hX.elim x⟩
+  · exact ⟨
+      fun _ _ => 0,
+      fun _ => (splitT T t P).zero_mem,
+      fun f' _ => ⟨fun _ _ => 0, fun _ => T.zero_mem, funext fun y => (hX.elim y.1.1)⟩,
+      fun x => hX.elim x
+    ⟩
   have hnt : Nontrivial T := inferInstance
   let evT : Xs → (T →+* O) := fun x => (Pi.evalRingHom (fun _ : Xs => O) x).comp T.val.toRingHom
   have hmonP : ∀ x, (P x).Monic := fun x => by
     obtain ⟨α, -, h⟩ := hPr x
-    rw [h]; exact Polynomial.monic_prod_of_monic _ _ fun i _ => Polynomial.monic_X_sub_C _
+    rw [h]
+    exact Polynomial.monic_prod_of_monic _ _ fun i _ => Polynomial.monic_X_sub_C _
   have hdegP : ∀ x, (P x).natDegree = t := fun x => by
     obtain ⟨α, -, h⟩ := hPr x
-    rw [h, Polynomial.natDegree_finsetProd_X_sub_C_eq_card]; simp
-  let PT : Polynomial T := ∑ k ∈ range (t + 1), Polynomial.monomial k ⟨fun x => (P x).coeff k, hPc k⟩
+    rw [h, Polynomial.natDegree_finsetProd_X_sub_C_eq_card]
+    simp
+  let PT : Polynomial T :=
+    ∑ k ∈ range (t + 1), Polynomial.monomial k ⟨fun x => (P x).coeff k, hPc k⟩
   have hcoef : ∀ k, PT.coeff k = if k ≤ t then ⟨fun x => (P x).coeff k, hPc k⟩ else 0 := by
     intro k
     simp only [PT, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply, Finset.sum_ite_eq',
@@ -55,19 +62,22 @@ theorem splitPts : StatSplitPts := by
   have key := splitAlg T PT hmon
   rw [hdeg] at key
   obtain ⟨T', _, _, rr, hfree, hfin, hrank, hfac, hadj, huniv⟩ := key
-  have hψ : ∀ y : SplitPts t P, ∃ ψ : T' →+* O, ψ.comp (algebraMap T T') = evT y.1.1 ∧
-      ∀ i, ψ (rr i) = y.1.2 i := by
+  have hψ
+      : ∀ y : SplitPts t P, ∃ ψ : T' →+* O,
+        ψ.comp (algebraMap T T') = evT y.1.1 ∧ ∀ i, ψ (rr i) = y.1.2 i := by
     intro y
     letI : Algebra T O := (evT y.1.1).toAlgebra
-    obtain ⟨φ, hφ, -⟩ := huniv O y.1.2 (by
-      show PT.map (evT y.1.1) = _
-      rw [hmap]; exact y.2)
+    obtain ⟨φ, hφ, -⟩ :=
+      huniv O y.1.2 (by
+        show PT.map (evT y.1.1) = _
+        rw [hmap]
+        exact y.2)
     exact ⟨φ.toRingHom, RingHom.ext fun τ => φ.commutes τ, hφ⟩
   choose ψ hψ1 hψ2 using hψ
   let Ψ : T' →+* (SplitPts t P → O) := Pi.ringHom ψ
   let bas : Module.Basis (Fin t.factorial) T T' := Module.finBasisOfFinrankEq T T' hrank
-  have hΨa : ∀ τ : T, Ψ (algebraMap T T' τ) = fun y => τ.1 y.1.1 :=
-    fun τ => funext fun y => RingHom.congr_fun (hψ1 y) τ
+  have hΨa : ∀ τ : T, Ψ (algebraMap T T' τ) = fun y => τ.1 y.1.1 := fun τ =>
+    funext fun y => RingHom.congr_fun (hψ1 y) τ
   have hrange : ∀ f' ∈ splitT T t P, ∃ z, Ψ z = f' := by
     intro f' hf'
     induction hf' using Algebra.adjoin_induction with
@@ -75,7 +85,8 @@ theorem splitPts : StatSplitPts := by
       rcases hx with ⟨f, hf, rfl⟩ | ⟨i, rfl⟩
       · exact ⟨algebraMap T T' ⟨f, hf⟩, hΨa _⟩
       · exact ⟨rr i, funext fun y => hψ2 y i⟩
-    | algebraMap c => exact ⟨algebraMap T T' (algebraMap O T c), hΨa _⟩
+    | algebraMap c =>
+      exact ⟨algebraMap T T' (algebraMap O T c), hΨa _⟩
     | add x y _ _ hx hy =>
       obtain ⟨a, rfl⟩ := hx
       obtain ⟨b, rfl⟩ := hy
@@ -116,52 +127,60 @@ theorem splitPts : StatSplitPts := by
       rw [← Polynomial.map_map, hmap, hPα, Polynomial.map_prod]; simp
     have sf := splitFibre T T' K PT hmon
     rw [hdeg] at sf
-    have hz := sf rr hfac hadj bas (ι.comp (evT x)) (fun i => ι (α i)) (hι.comp hα) hmapK
-      (fun k => ι (a k)) (by
-      intro φ hφ
-      have h1 : ∏ i, (Polynomial.X - Polynomial.C (φ (rr i))) =
-          ∏ i, (Polynomial.X - Polynomial.C (ι (α i))) := by
-        rw [← hmapK, ← hφ, ← Polynomial.map_map, hfac, Polynomial.map_prod]; simp
-      have h2 : ∀ i, ∃ j, φ (rr i) = ι (α j) := by
-        intro i
-        have h3 : (∏ j, (Polynomial.X - Polynomial.C (ι (α j)))).eval (φ (rr i)) = 0 := by
-          rw [← h1, Polynomial.eval_prod]
-          exact Finset.prod_eq_zero (mem_univ i) (by simp)
-        rw [Polynomial.eval_prod, Finset.prod_eq_zero_iff] at h3
-        obtain ⟨j, -, hj⟩ := h3
-        exact ⟨j, by simpa [sub_eq_zero] using hj⟩
-      choose σ hσ using h2
-      have hy : P x = ∏ i, (Polynomial.X - Polynomial.C (α (σ i))) := by
-        apply Polynomial.map_injective ι hι
-        rw [hPα, Polynomial.map_prod, Polynomial.map_prod]
-        simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C]
-        rw [← h1]
-        exact Finset.prod_congr rfl fun i _ => by rw [hσ]
-      let y : SplitPts t P := ⟨(x, fun i => α (σ i)), hy⟩
-      have hφy : ∀ z, φ z = ι (ψ y z) := by
-        letI : Algebra T K := (ι.comp (evT x)).toAlgebra
-        let φ1 : T' →ₐ[T] K := { φ with commutes' := fun τ => RingHom.congr_fun hφ τ }
-        let φ2 : T' →ₐ[T] K :=
-          { (ι.comp (ψ y)) with
-            commutes' := fun τ => by
-              show ι (ψ y (algebraMap T T' τ)) = _
-              rw [show ψ y (algebraMap T T' τ) = evT x τ from RingHom.congr_fun (hψ1 y) τ]
-              rfl }
-        have h12 : φ1 = φ2 := AlgHom.ext_of_adjoin_eq_top hadj (by
-          rintro _ ⟨i, rfl⟩
-          show φ (rr i) = ι (ψ y (rr i))
-          rw [hψ2, hσ])
-        exact fun z => DFunLike.congr_fun h12 z
-      have h4 := congrArg ι (ha y rfl)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_zero] at h4
-      rw [← h4]
-      refine Finset.sum_congr rfl fun k _ => ?_
-      rw [hφy, map_mul]
-      rfl)
+    have hz :=
+      sf rr hfac hadj bas (ι.comp (evT x))
+        (fun i => ι (α i))
+        (hι.comp hα) hmapK
+        (fun k => ι (a k))
+        (by
+          intro φ hφ
+          have h1
+              : ∏ i, (Polynomial.X - Polynomial.C (φ (rr i)))
+                = ∏ i, (Polynomial.X - Polynomial.C (ι (α i))) := by
+            rw [← hmapK, ← hφ, ← Polynomial.map_map, hfac, Polynomial.map_prod]; simp
+          have h2 : ∀ i, ∃ j, φ (rr i) = ι (α j) := by
+            intro i
+            have h3 : (∏ j, (Polynomial.X - Polynomial.C (ι (α j)))).eval (φ (rr i)) = 0 := by
+              rw [← h1, Polynomial.eval_prod]
+              exact Finset.prod_eq_zero (mem_univ i) (by simp)
+            rw [Polynomial.eval_prod, Finset.prod_eq_zero_iff] at h3
+            obtain ⟨j, -, hj⟩ := h3
+            exact ⟨j, by simpa [sub_eq_zero] using hj⟩
+          choose σ hσ using h2
+          have hy : P x = ∏ i, (Polynomial.X - Polynomial.C (α (σ i))) := by
+            apply Polynomial.map_injective ι hι
+            rw [hPα, Polynomial.map_prod, Polynomial.map_prod]
+            simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C]
+            rw [← h1]
+            exact Finset.prod_congr rfl fun i _ => by rw [hσ]
+          let y : SplitPts t P := ⟨(x, fun i => α (σ i)), hy⟩
+          have hφy : ∀ z, φ z = ι (ψ y z) := by
+            letI : Algebra T K := (ι.comp (evT x)).toAlgebra
+            let φ1 : T' →ₐ[T] K := { φ with commutes' := fun τ => RingHom.congr_fun hφ τ }
+            let φ2 : T' →ₐ[T] K := {
+              (ι.comp (ψ y)) with
+              commutes' := fun τ => by
+                show ι (ψ y (algebraMap T T' τ)) = _
+                rw [show ψ y (algebraMap T T' τ) = evT x τ from RingHom.congr_fun (hψ1 y) τ]
+                rfl
+            }
+            have h12 : φ1 = φ2 :=
+              AlgHom.ext_of_adjoin_eq_top hadj (by
+                rintro _ ⟨i, rfl⟩
+                show φ (rr i) = ι (ψ y (rr i))
+                rw [hψ2, hσ])
+            exact fun z => DFunLike.congr_fun h12 z
+          have h4 := congrArg ι (ha y rfl)
+          set_option synthInstance.maxHeartbeats 100000 in
+            rw [map_sum, map_zero] at h4
+          rw [← h4]
+          refine Finset.sum_congr rfl fun k _ => ?_
+          rw [hφy, map_mul]
+          rfl)
     funext k
     exact hι (by
       show ι (a k) = ι 0
-      rw [map_zero]; exact congrFun hz k)
+      rw [map_zero]
+      exact congrFun hz k)
 
 end Formalism.RepresentationBoundsCohomology.ringDataObjects

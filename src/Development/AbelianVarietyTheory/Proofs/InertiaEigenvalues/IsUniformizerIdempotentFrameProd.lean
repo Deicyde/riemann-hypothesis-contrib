@@ -12,26 +12,35 @@ open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Desc Polynomial Filter Topolo
 noncomputable section
 namespace GlobalTheory.UnitLemma.Desc
 
-theorem norm_prod_one {F R₁ R₂ : Type} [Field F] [CommRing R₁] [CommRing R₂] [Algebra F R₁] [Algebra F R₂]
-    [Module.Finite F R₁] [Module.Finite F R₂] (x : R₁) :
-    Algebra.norm F ((x, 1) : R₁ × R₂) = Algebra.norm F x := by
+theorem norm_prod_one
+    {F R₁ R₂ : Type} [Field F] [CommRing R₁] [CommRing R₂] [Algebra F R₁] [Algebra F R₂]
+    [Module.Finite F R₁] [Module.Finite F R₂]
+    (x : R₁)
+    : Algebra.norm F ((x, 1) : R₁ × R₂) = Algebra.norm F x := by
   rw [Algebra.norm_apply, Algebra.norm_apply]
-  have h : Algebra.lmul F (R₁ × R₂) (x, 1) = (Algebra.lmul F R₁ x).prodMap (Algebra.lmul F R₂ 1) := by
+  have h
+      : Algebra.lmul F (R₁ × R₂) (x, 1) = (Algebra.lmul F R₁ x).prodMap (Algebra.lmul F R₂ 1) := by
     refine LinearMap.ext fun p => Prod.ext ?_ ?_ <;> simp
   rw [h, LinearMap.det_prodMap, map_one (Algebra.lmul F R₂), map_one LinearMap.det, mul_one]
 
-theorem norm_one_prod {F R₁ R₂ : Type} [Field F] [CommRing R₁] [CommRing R₂] [Algebra F R₁] [Algebra F R₂]
-    [Module.Finite F R₁] [Module.Finite F R₂] (x : R₂) :
-    Algebra.norm F ((1, x) : R₁ × R₂) = Algebra.norm F x := by
+theorem norm_one_prod
+    {F R₁ R₂ : Type} [Field F] [CommRing R₁] [CommRing R₂] [Algebra F R₁] [Algebra F R₂]
+    [Module.Finite F R₁] [Module.Finite F R₂]
+    (x : R₂)
+    : Algebra.norm F ((1, x) : R₁ × R₂) = Algebra.norm F x := by
   rw [Algebra.norm_apply, Algebra.norm_apply]
-  have h : Algebra.lmul F (R₁ × R₂) (1, x) = (Algebra.lmul F R₁ 1).prodMap (Algebra.lmul F R₂ x) := by
+  have h
+      : Algebra.lmul F (R₁ × R₂) (1, x) = (Algebra.lmul F R₁ 1).prodMap (Algebra.lmul F R₂ x) := by
     refine LinearMap.ext fun p => Prod.ext ?_ ?_ <;> simp
   rw [h, LinearMap.det_prodMap, map_one (Algebra.lmul F R₁), map_one LinearMap.det, one_mul]
 
-theorem coi_prod {R₁ R₂ : Type} [Ring R₁] [Ring R₂] {ι₁ ι₂ : Type} [Fintype ι₁] [Fintype ι₂]
-    {e₁ : ι₁ → R₁} {e₂ : ι₂ → R₂} (h₁ : CompleteOrthogonalIdempotents e₁)
-    (h₂ : CompleteOrthogonalIdempotents e₂) :
-    CompleteOrthogonalIdempotents (Sum.elim (fun i => ((e₁ i, 0) : R₁ × R₂)) (fun j => ((0, e₂ j) : R₁ × R₂))) := by
+theorem coi_prod
+    {R₁ R₂ : Type} [Ring R₁] [Ring R₂]
+    {ι₁ ι₂ : Type} [Fintype ι₁] [Fintype ι₂]
+    {e₁ : ι₁ → R₁} {e₂ : ι₂ → R₂}
+    (h₁ : CompleteOrthogonalIdempotents e₁) (h₂ : CompleteOrthogonalIdempotents e₂)
+    : CompleteOrthogonalIdempotents
+      (Sum.elim (fun i => ((e₁ i, 0) : R₁ × R₂)) (fun j => ((0, e₂ j) : R₁ × R₂))) := by
   refine ⟨⟨?_, ?_⟩, ?_⟩
   · rintro (i | j)
     · exact Prod.ext (h₁.idem i).eq (mul_zero 0)
@@ -48,13 +57,19 @@ theorem coi_prod {R₁ R₂ : Type} [Ring R₁] [Ring R₂] {ι₁ ι₂ : Type}
     · simp [Prod.fst_sum, h₁.complete]
     · simp [Prod.snd_sum, h₂.complete]
 
-theorem factor_inl {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂] (σ₁ : R₁ ≃+* R₁) (σ₂ : R₂ ≃+* R₂)
+theorem factor_inl
+    {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂]
+    (σ₁ : R₁ ≃+* R₁)
+    (σ₂ : R₂ ≃+* R₂)
     (e : R₁) (P Q : Prop) (hPQ : P ↔ Q)
-    (h : ∃ f : R₁, IsIdempotentElem f ∧ f ≠ 0 ∧ (∀ y, f * y ≠ 0 → ∃ z, f * y * z = f) ∧
-      (Q → e = f ∧ σ₁ f = f) ∧ (¬Q → f * σ₁ f = 0 ∧ e = f + σ₁ f)) :
-    ∃ f : R₁ × R₂, IsIdempotentElem f ∧ f ≠ 0 ∧ (∀ y, f * y ≠ 0 → ∃ z, f * y * z = f) ∧
-      (P → (e, 0) = f ∧ RingEquiv.prodCongr σ₁ σ₂ f = f) ∧
-      (¬P → f * RingEquiv.prodCongr σ₁ σ₂ f = 0 ∧ (e, 0) = f + RingEquiv.prodCongr σ₁ σ₂ f) := by
+    (h : ∃ f : R₁,
+      IsIdempotentElem f ∧ f ≠ 0 ∧ (∀ y, f * y ≠ 0 → ∃ z, f * y * z = f) ∧ (Q → e = f ∧ σ₁ f = f)
+        ∧ (¬Q → f * σ₁ f = 0 ∧ e = f + σ₁ f))
+    : ∃ f : R₁ × R₂,
+      IsIdempotentElem f ∧ f ≠ 0 ∧ (∀ y, f * y ≠ 0 → ∃ z, f * y * z = f)
+        ∧ (P → (e, 0) = f ∧ RingEquiv.prodCongr σ₁ σ₂ f = f)
+        ∧ (¬P
+          → f * RingEquiv.prodCongr σ₁ σ₂ f = 0 ∧ (e, 0) = f + RingEquiv.prodCongr σ₁ σ₂ f) := by
   obtain ⟨f, hf, hf0, hfy, hQ, hnQ⟩ := h
   refine ⟨(f, 0), Prod.ext hf.eq (mul_zero 0), fun h0 => hf0 (congrArg Prod.fst h0), ?_, ?_, ?_⟩
   · rintro ⟨y₁, y₂⟩ hy
@@ -72,13 +87,18 @@ theorem factor_inl {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂] (σ₁ : R
     rw [map_zero]
     exact ⟨Prod.ext h1 (mul_zero 0), Prod.ext h2 (add_zero 0).symm⟩
 
-theorem factor_inr {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂] (σ₁ : R₁ ≃+* R₁) (σ₂ : R₂ ≃+* R₂)
-    (e : R₂) (P Q : Prop) (hPQ : P ↔ Q)
-    (h : ∃ f : R₂, IsIdempotentElem f ∧ f ≠ 0 ∧ (∀ y, f * y ≠ 0 → ∃ z, f * y * z = f) ∧
-      (Q → e = f ∧ σ₂ f = f) ∧ (¬Q → f * σ₂ f = 0 ∧ e = f + σ₂ f)) :
-    ∃ f : R₁ × R₂, IsIdempotentElem f ∧ f ≠ 0 ∧ (∀ y, f * y ≠ 0 → ∃ z, f * y * z = f) ∧
-      (P → (0, e) = f ∧ RingEquiv.prodCongr σ₁ σ₂ f = f) ∧
-      (¬P → f * RingEquiv.prodCongr σ₁ σ₂ f = 0 ∧ (0, e) = f + RingEquiv.prodCongr σ₁ σ₂ f) := by
+theorem factor_inr
+    {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂]
+    (σ₁ : R₁ ≃+* R₁)
+    (σ₂ : R₂ ≃+* R₂) (e : R₂) (P Q : Prop) (hPQ : P ↔ Q)
+    (h : ∃ f : R₂,
+      IsIdempotentElem f ∧ f ≠ 0 ∧ (∀ y, f * y ≠ 0 → ∃ z, f * y * z = f) ∧ (Q → e = f ∧ σ₂ f = f)
+        ∧ (¬Q → f * σ₂ f = 0 ∧ e = f + σ₂ f))
+    : ∃ f : R₁ × R₂,
+      IsIdempotentElem f ∧ f ≠ 0 ∧ (∀ y, f * y ≠ 0 → ∃ z, f * y * z = f)
+        ∧ (P → (0, e) = f ∧ RingEquiv.prodCongr σ₁ σ₂ f = f)
+        ∧ (¬P
+          → f * RingEquiv.prodCongr σ₁ σ₂ f = 0 ∧ (0, e) = f + RingEquiv.prodCongr σ₁ σ₂ f) := by
   obtain ⟨f, hf, hf0, hfy, hQ, hnQ⟩ := h
   refine ⟨(0, f), Prod.ext (mul_zero 0) hf.eq, fun h0 => hf0 (congrArg Prod.snd h0), ?_, ?_, ?_⟩
   · rintro ⟨y₁, y₂⟩ hy
@@ -96,25 +116,37 @@ theorem factor_inr {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂] (σ₁ : R
     rw [map_zero]
     exact ⟨Prod.ext (mul_zero 0) h1, Prod.ext (add_zero 0).symm h2⟩
 
-theorem unit_inl {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂] (σ₁ : R₁ ≃+* R₁) (σ₂ : R₂ ≃+* R₂)
-    (x e : R₁) (hu : IsUnit x) (hσ : σ₁ x = x) (h1 : x * (1 - e) = 1 - e) :
-    (IsUnit ((x, 1) : R₁ × R₂) ∧ RingEquiv.prodCongr σ₁ σ₂ (x, 1) = (x, 1)) ∧
-      ((x, 1) : R₁ × R₂) * (1 - (e, 0)) = 1 - (e, 0) := by
+theorem unit_inl
+    {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂]
+    (σ₁ : R₁ ≃+* R₁)
+    (σ₂ : R₂ ≃+* R₂)
+    (x e : R₁) (hu : IsUnit x) (hσ : σ₁ x = x) (h1 : x * (1 - e) = 1 - e)
+    : (IsUnit ((x, 1) : R₁ × R₂) ∧ RingEquiv.prodCongr σ₁ σ₂ (x, 1) = (x, 1))
+      ∧ ((x, 1) : R₁ × R₂) * (1 - (e, 0)) = 1 - (e, 0) := by
   refine ⟨⟨Prod.isUnit_iff.2 ⟨hu, isUnit_one⟩, ?_⟩, ?_⟩
   · show (σ₁ x, σ₂ 1) = (x, 1)
     rw [hσ, map_one]
   · exact Prod.ext (by simpa using h1) (by simp)
 
-theorem unit_inr {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂] (σ₁ : R₁ ≃+* R₁) (σ₂ : R₂ ≃+* R₂)
-    (x e : R₂) (hu : IsUnit x) (hσ : σ₂ x = x) (h1 : x * (1 - e) = 1 - e) :
-    (IsUnit ((1, x) : R₁ × R₂) ∧ RingEquiv.prodCongr σ₁ σ₂ (1, x) = (1, x)) ∧
-      ((1, x) : R₁ × R₂) * (1 - (0, e)) = 1 - (0, e) := by
+theorem unit_inr
+    {R₁ R₂ : Type} [CommRing R₁] [CommRing R₂]
+    (σ₁ : R₁ ≃+* R₁)
+    (σ₂ : R₂ ≃+* R₂) (x e : R₂) (hu : IsUnit x) (hσ : σ₂ x = x) (h1 : x * (1 - e) = 1 - e)
+    : (IsUnit ((1, x) : R₁ × R₂) ∧ RingEquiv.prodCongr σ₁ σ₂ (1, x) = (1, x))
+      ∧ ((1, x) : R₁ × R₂) * (1 - (0, e)) = 1 - (0, e) := by
   refine ⟨⟨Prod.isUnit_iff.2 ⟨isUnit_one, hu⟩, ?_⟩, ?_⟩
   · show (σ₁ 1, σ₂ x) = (1, x)
     rw [hσ, map_one]
   · exact Prod.ext (by simp) (by simpa using h1)
 
-theorem isFrame_prod : ∀ (K : UQ) (B₁ B₂ : InvAlg K) (ι₁ ι₂ : Type) [Fintype ι₁] [Fintype ι₂] (e₁ π₁ : ι₁ → B₁.A) (e₂ π₂ : ι₂ → B₂.A) (S₁ : Finset ι₁) (S₂ : Finset ι₂), IsFrame B₁ e₁ π₁ S₁ → IsFrame B₂ e₂ π₂ S₂ → IsFrame (B₁.prod B₂) (Sum.elim (fun i => ((e₁ i, 0) : B₁.A × B₂.A)) (fun j => ((0, e₂ j) : B₁.A × B₂.A))) (Sum.elim (fun i => ((π₁ i, 1) : B₁.A × B₂.A)) (fun j => ((1, π₂ j) : B₁.A × B₂.A))) (S₁.disjSum S₂) := by
+theorem isFrame_prod
+    : ∀ (K : UQ) (B₁ B₂ : InvAlg K) (ι₁ ι₂ : Type) [Fintype ι₁] [Fintype ι₂] (e₁ π₁ : ι₁ → B₁.A)
+        (e₂ π₂ : ι₂ → B₂.A) (S₁ : Finset ι₁) (S₂ : Finset ι₂),
+      IsFrame B₁ e₁ π₁ S₁ → IsFrame B₂ e₂ π₂ S₂
+        → IsFrame (B₁.prod B₂)
+          (Sum.elim (fun i => ((e₁ i, 0) : B₁.A × B₂.A)) (fun j => ((0, e₂ j) : B₁.A × B₂.A)))
+          (Sum.elim (fun i => ((π₁ i, 1) : B₁.A × B₂.A)) (fun j => ((1, π₂ j) : B₁.A × B₂.A)))
+          (S₁.disjSum S₂) := by
   intro K B₁ B₂ ι₁ ι₂ _ _ e₁ π₁ e₂ π₂ S₁ S₂ h₁ h₂
   obtain ⟨⟨hc₁, hf₁⟩, hπ₁⟩ := h₁
   obtain ⟨⟨hc₂, hf₂⟩, hπ₂⟩ := h₂

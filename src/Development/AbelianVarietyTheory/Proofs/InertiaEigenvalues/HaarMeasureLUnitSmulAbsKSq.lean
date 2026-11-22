@@ -13,9 +13,17 @@ open scoped Pointwise
 
 namespace GlobalTheory.JR.ScaleHaarL
 
-theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (μ : Measure A.L), μ.IsAddHaarMeasure → ∀ (c : A.Kˣ) (S : Set A.L), μ {y : A.L | ∃ z ∈ S, y = algebraMap A.K A.L (c : A.K) * z} = ENNReal.ofReal (A.absK (c : A.K) ^ 2) * μ S := by
+theorem main
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (μ : Measure A.L),
+      μ.IsAddHaarMeasure
+        → ∀ (c : A.Kˣ) (S : Set A.L),
+          μ {y : A.L | ∃ z ∈ S, y = algebraMap A.K A.L (c : A.K) * z}
+            = ENNReal.ofReal (A.absK (c : A.K) ^ 2) * μ S := by
   intro F E _ _ _ _ U A μ hμ c S
-  have := U.charZero; have := U.ultraF; have := U.lcF
+  have := U.charZero
+  have := U.ultraF
+  have := U.lcF
   have := GlobalTheory.JR.EtMeas.finite_L A
   obtain ⟨_, _, _, _, -⟩ := GlobalTheory.JR.EtMeas.top_facts F A.L
   obtain ⟨_, _, _, _, -⟩ := GlobalTheory.JR.EtMeas.top_facts F A.K
@@ -31,10 +39,11 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
     IsModuleTopology.continuous_of_linearMap (b.equivFun.symm.toLinearMap.restrictScalars F)
   have hc2 : Continuous (b.equivFun : A.L → (Fin 2 → A.K)) :=
     IsModuleTopology.continuous_of_linearMap (b.equivFun.toLinearMap.restrictScalars F)
-  let e : (Fin 2 → A.K) ≃ₜ+ A.L :=
-    { b.equivFun.symm.toAddEquiv with
-      continuous_toFun := hc1
-      continuous_invFun := hc2 }
+  let e : (Fin 2 → A.K) ≃ₜ+ A.L := {
+    b.equivFun.symm.toAddEquiv with
+    continuous_toFun := hc1
+    continuous_invFun := hc2
+  }
   have key : distribHaarChar A.L u = distribHaarChar A.K c ^ 2 := by
     rw [GlobalTheory.JR.ModuleNorm.distribHaarChar_transport e c u (fun x => ?_),
       GlobalTheory.JR.ModuleNorm.distribHaarChar_pi_two]

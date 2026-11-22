@@ -13,11 +13,20 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.TwGood
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Fc NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Fc
+  NumberField IsDedekindDomain
 
 namespace GlobalTheory.Fc
 
-theorem recExP_of_recAtG : StandardLattice.SiegelMassRatioCM → ∀ (Q' : V4.Slot) (QO : Par → ∀ D : D7, Obj D → Prop), RecAtG (fun K D Y => GroupRetwisting.FromCoreAt Q' K D Y ∧ DQ.TupUsedAt D ∧ DQ.TwAllAt D Y.nch Y.xd ∧ DQ.MtStableAt D) → (EvP fun κ K => ∀ β : BPt K, β.Is Q' → QO κ β.D β.O) → RecExP (fun κ => DQ.withQD (fun D O => κ.Pos → QO κ D O)) := by
+theorem recExP_of_recAtG
+    : StandardLattice.SiegelMassRatioCM
+      → ∀ (Q' : V4.Slot) (QO : Par → ∀ D : D7, Obj D → Prop),
+        RecAtG (fun K D Y =>
+            GroupRetwisting.FromCoreAt Q' K D Y ∧ DQ.TupUsedAt D ∧ DQ.TwAllAt D Y.nch Y.xd
+              ∧ DQ.MtStableAt D)
+          → (EvP fun κ K => ∀ β : BPt K, β.Is Q' → QO κ β.D β.O)
+          → RecExP (fun κ => DQ.withQD (fun D O => κ.Pos → QO κ D O)) := by
   intro hconds Q' QO h hq
   obtain ⟨ε0, hε0, h⟩ := h
   obtain ⟨ε1, hε1, hq⟩ := hq
@@ -30,14 +39,20 @@ theorem recExP_of_recAtG : StandardLattice.SiegelMassRatioCM → ∀ (Q' : V4.Sl
   refine ⟨max (max c1 c1') 0, fun cD hcD => ?_⟩
   obtain ⟨c2, h⟩ := h cD (le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hcD)
   obtain ⟨c2q, hq⟩ := hq cD (le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hcD)
-  obtain ⟨c2', hlow⟩ := GlobalTheory.EX.WinLow.window_lower hconds eps C he he52 hstd cD (le_trans (le_max_right _ _) hcD)
+  obtain ⟨c2', hlow⟩ :=
+    GlobalTheory.EX.WinLow.window_lower hconds eps C he he52 hstd cD
+      (le_trans (le_max_right _ _) hcD)
   refine ⟨max (max c2 c2q) c2', fun ch hch => ?_⟩
   obtain ⟨x0, h⟩ := h ch (le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hch)
   have hq := hq ch (le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hch)
   obtain ⟨x1, hlow⟩ := hlow ch (le_trans (le_max_right _ _) hch)
   obtain ⟨x2, hint⟩ := exists_du_nat eps he he52
-  have hq' : ∃ x3 : ℝ, Par.Pos ⟨eps, C, cD, ch, C5, c6, Cb⟩ → ∀ K : Ctx, Par.Of ⟨eps, C, cD, ch, C5, c6, Cb⟩ K → x3 ≤ K.s.x →
-      ∀ β : BPt K, β.Is Q' → QO ⟨eps, C, cD, ch, C5, c6, Cb⟩ β.D β.O := by
+  have hq'
+      : ∃ x3 : ℝ,
+        Par.Pos ⟨eps, C, cD, ch, C5, c6, Cb⟩
+          → ∀ K : Ctx,
+            Par.Of ⟨eps, C, cD, ch, C5, c6, Cb⟩ K → x3 ≤ K.s.x
+              → ∀ β : BPt K, β.Is Q' → QO ⟨eps, C, cD, ch, C5, c6, Cb⟩ β.D β.O := by
     by_cases hp : Par.Pos ⟨eps, C, cD, ch, C5, c6, Cb⟩
     · obtain ⟨x3, h3⟩ := hq hp
       exact ⟨x3, fun _ => h3⟩
@@ -54,7 +69,8 @@ theorem recExP_of_recAtG : StandardLattice.SiegelMassRatioCM → ∀ (Q' : V4.Sl
   refine ⟨du, DsP P, hpos, hD, fun u => ?_, fun Lv h1 h2 h3 => ?_⟩
   · rw [one_mul]
     exact hlow s P _ a b c du (DsP P) hs hx1 hok hdu hDle u
-  · let K : Ctx := ⟨s, C, cD, ch, P, _, a, b, c, hstd, hok, Lv, fun u => by rw [h1]; exact hdu u, h2, h3⟩
+  · let K : Ctx :=
+      ⟨s, C, cD, ch, P, _, a, b, c, hstd, hok, Lv, fun u => by rw [h1]; exact hdu u, h2, h3⟩
     obtain ⟨D, Y, g1, g2, g3, g4, ⟨X, f, T, co, hQ, he⟩, u1, u2, u3⟩ := h K rfl rfl rfl hs hx0 d3
     refine ⟨D, Y, g1, g2, g3, g4, fun p p1 p2 p3 p4 => ⟨fun hp => ?_, ?_⟩⟩
     · obtain ⟨rfl, he⟩ := Sigma.mk.inj he

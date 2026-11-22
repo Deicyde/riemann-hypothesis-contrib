@@ -14,10 +14,13 @@ noncomputable section
 
 namespace GlobalTheory.ClassScalarCompare
 
-open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor NumberField IsDedekindDomain GlobalTheory.IndefiniteRowSideFullHecke.AdelicNormWeight GlobalTheory.IndefiniteRowSideFullHecke.DeterminantCharacterIdentity MvPolynomial
+open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor NumberField IsDedekindDomain
+  GlobalTheory.IndefiniteRowSideFullHecke.AdelicNormWeight
+  GlobalTheory.IndefiniteRowSideFullHecke.DeterminantCharacterIdentity MvPolynomial
 open scoped nonZeroDivisors Classical TensorProduct
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
 section Poly
 
@@ -33,18 +36,23 @@ theorem star_diagE (x : E) : star (diagE E x) = diagE E (IsCMField.complexConj E
   show adConj E (1 ⊗ₜ x) = 1 ⊗ₜ _
   simp [adConj]
 
-theorem map_conjTranspose (g : Matrix (Fin n) (Fin n) E) :
-    g.conjTranspose.map (diagE E) = star (g.map (diagE E)) := by
+theorem map_conjTranspose (g : Matrix (Fin n) (Fin n) E)
+    : g.conjTranspose.map (diagE E) = star (g.map (diagE E)) := by
   ext a b; exact (star_diagE _).symm
 
-def toRat (g : Matrix (Fin n) (Fin n) E) (hg : g.conjTranspose * g = 1) : ratPts E n :=
-  ⟨⟨g.map (diagE E), Matrix.mem_unitaryGroup_iff'.2 (by
-      rw [← map_conjTranspose, ← Matrix.map_mul, hg, Matrix.map_one _ (map_zero _) (map_one _)])⟩,
-    fun a b => ⟨g a b, rfl⟩, fun a b => ⟨_, (star_diagE (g b a)).symm⟩⟩
+def toRat (g : Matrix (Fin n) (Fin n) E) (hg : g.conjTranspose * g = 1) : ratPts E n := ⟨
+  ⟨
+    g.map (diagE E),
+    Matrix.mem_unitaryGroup_iff'.2 (by
+      rw [← map_conjTranspose, ← Matrix.map_mul, hg, Matrix.map_one _ (map_zero _) (map_one _)])
+  ⟩,
+  fun a b => ⟨g a b, rfl⟩,
+  fun a b => ⟨_, (star_diagE (g b a)).symm⟩
+⟩
 
 def adTrace : AdE E →+ AdF E :=
-  ((TensorProduct.rid (maximalRealSubfield E) (AdF E)).toLinearMap ∘ₗ
-    LinearMap.lTensor (AdF E) (Algebra.trace (maximalRealSubfield E) E)).toAddMonoidHom
+  ((TensorProduct.rid (maximalRealSubfield E) (AdF E)).toLinearMap
+    ∘ₗ LinearMap.lTensor (AdF E) (Algebra.trace (maximalRealSubfield E) E)).toAddMonoidHom
 
 end Adelic
 
@@ -52,10 +60,12 @@ section Conj
 
 variable {n : ℕ}
 
-theorem conj_smul (o : 𝓞 E) (x : E) :
-    IsCMField.complexConj E (o • x) = IsCMField.ringOfIntegersComplexConj E o • IsCMField.complexConj E x := by
+theorem conj_smul (o : 𝓞 E) (x : E)
+    : IsCMField.complexConj E (o • x)
+      = IsCMField.ringOfIntegersComplexConj E o • IsCMField.complexConj E x := by
   show IsCMField.complexConj E ((o : E) * x) = _
-  rw [map_mul]; rfl
+  rw [map_mul]
+  rfl
 
 def conjMod (M : Submodule (𝓞 E) E) : Submodule (𝓞 E) E where
   carrier := {x | IsCMField.complexConj E x ∈ M}
@@ -66,9 +76,12 @@ def conjMod (M : Submodule (𝓞 E) E) : Submodule (𝓞 E) E where
     exact M.add_mem ha hb
   smul_mem' := fun o x hx => by
     show IsCMField.complexConj E (o • x) ∈ M
-    rw [conj_smul]; exact M.smul_mem _ hx
+    rw [conj_smul]
+    exact M.smul_mem _ hx
 
-theorem mem_conjMod {M : Submodule (𝓞 E) E} {x : E} : x ∈ conjMod M ↔ IsCMField.complexConj E x ∈ M := Iff.rfl
+theorem mem_conjMod {M : Submodule (𝓞 E) E} {x : E}
+    : x ∈ conjMod M ↔ IsCMField.complexConj E x ∈ M :=
+  Iff.rfl
 
 theorem bar_bar (H : Host E) (o : 𝓞 E) : H.bar (H.bar o) = o := by
   ext; rw [H.bar_eq, H.bar_eq, IsCMField.complexConj_apply_apply]
@@ -98,27 +111,34 @@ theorem smul_eq_idlE_mul (I : Ideal (𝓞 E)) (M : Submodule (𝓞 E) E) : I •
     exact Submodule.smul_mem_smul ha hx
 
 def conjLat (L : Submodule (𝓞 E) (Fin n → E)) : GenLat E n where
-  La :=
-  { carrier := {v | (fun j => IsCMField.complexConj E (v j)) ∈ L}
+  La := {
+    carrier := {v | (fun j => IsCMField.complexConj E (v j)) ∈ L}
     zero_mem' := by
       show (fun j => IsCMField.complexConj E 0) ∈ L
-      rw [map_zero]; exact L.zero_mem
+      rw [map_zero]
+      exact L.zero_mem
     add_mem' := fun {a b} ha hb => by
       show (fun j => IsCMField.complexConj E (a j + b j)) ∈ L
-      simp only [map_add (f := _)]; exact add_mem ha hb
+      simp only [map_add (f := _)]
+      exact add_mem ha hb
     smul_mem' := fun o x hx => by
       show (fun j => IsCMField.complexConj E (o • x j)) ∈ L
-      simp only [conj_smul]; exact L.smul_mem _ hx }
+      simp only [conj_smul]
+      exact L.smul_mem _ hx
+  }
 
-theorem mem_conjLat {L : Submodule (𝓞 E) (Fin n → E)} {v : Fin n → E} :
-    v ∈ (conjLat L).La ↔ (fun j => IsCMField.complexConj E (v j)) ∈ L := Iff.rfl
+theorem mem_conjLat {L : Submodule (𝓞 E) (Fin n → E)} {v : Fin n → E}
+    : v ∈ (conjLat L).La ↔ (fun j => IsCMField.complexConj E (v j)) ∈ L :=
+  Iff.rfl
 
 theorem conjLat_conjLat (L : Submodule (𝓞 E) (Fin n → E)) : (conjLat (conjLat L).La).La = L := by
   ext v; simp [mem_conjLat]
 
-theorem latPin_iff_conjLat {Cl : Type} (Lh : Cl → Submodule (𝓞 E) (Fin n → E)) (La : Cl → GenLat E n) :
-    LatPin Lh La ↔ ∀ k, La k = conjLat (Lh k) :=
-  forall_congr' fun k => ⟨fun h => congrArg GenLat.mk (Submodule.ext h), fun h v => by rw [h, mem_conjLat]⟩
+theorem latPin_iff_conjLat
+    {Cl : Type} (Lh : Cl → Submodule (𝓞 E) (Fin n → E)) (La : Cl → GenLat E n)
+    : LatPin Lh La ↔ ∀ k, La k = conjLat (Lh k) :=
+  forall_congr' fun k =>
+    ⟨fun h => congrArg GenLat.mk (Submodule.ext h), fun h v => by rw [h, mem_conjLat]⟩
 
 theorem conjLat_std : conjLat (stdLat E n) = ⟨stdLat E n⟩ := by
   have hc (x : E) (hx : IsIntegral ℤ x) : IsIntegral ℤ (IsCMField.complexConj E x) :=
@@ -130,7 +150,8 @@ theorem conjLat_std : conjLat (stdLat E n) = ⟨stdLat E n⟩ := by
 
 def stdIndex (Λ : GenLat E n) : ℕ := (Λ.Ln.toAddSubgroup.addSubgroupOf Λ.La.toAddSubgroup).index
 
-theorem stdIndex_conjLat (L : Submodule (𝓞 E) (Fin n → E)) : stdIndex (conjLat L) = stdIndex ⟨L⟩ := by
+theorem stdIndex_conjLat (L : Submodule (𝓞 E) (Fin n → E))
+    : stdIndex (conjLat L) = stdIndex ⟨L⟩ := by
   let f : (Fin n → E) →+ (Fin n → E) := (IsCMField.complexConj E : E →+ E).compLeft (Fin n)
   have h1 : (conjLat L).Ln.toAddSubgroup = (L ⊓ stdLat E n).toAddSubgroup.comap f := by
     ext v
@@ -166,15 +187,19 @@ end Scalar
 
 section Comparison₂
 
-variable (c : Coeff l) {n : ℕ} {T : Type} [AddCommGroup T] [Module c.F T] [Module (𝓞 c.F) T]
-  [IsScalarTower (𝓞 c.F) c.F T]
+variable
+  (c : Coeff l)
+  {n : ℕ} {T : Type}
+  [AddCommGroup T] [Module c.F T] [Module (𝓞 c.F) T] [IsScalarTower (𝓞 c.F) c.F T]
 
 end Comparison₂
 
 section Twist
 
-variable (c : Coeff l) {n : ℕ} {T : Type} [AddCommGroup T] [Module c.F T] [Module (𝓞 c.F) T]
-  [IsScalarTower (𝓞 c.F) c.F T]
+variable
+  (c : Coeff l)
+  {n : ℕ} {T : Type}
+  [AddCommGroup T] [Module c.F T] [Module (𝓞 c.F) T] [IsScalarTower (𝓞 c.F) c.F T]
 
 end Twist
 
@@ -182,9 +207,10 @@ section Indep
 
 variable (Xo : Moduli Dw l) (c : Coeff l) {n : ℕ}
 
-theorem smul_conjLat_le {m m' : 𝓞 E} (e : (m' : E) = IsCMField.complexConj E (m : E))
-    {M M' : Submodule (𝓞 E) (Fin n → E)} (hM : Ideal.span {m} • M ≤ M') :
-    Ideal.span {m'} • (conjLat M).La ≤ (conjLat M').La := by
+theorem smul_conjLat_le
+    {m m' : 𝓞 E} (e : (m' : E) = IsCMField.complexConj E (m : E))
+    {M M' : Submodule (𝓞 E) (Fin n → E)} (hM : Ideal.span {m} • M ≤ M')
+    : Ideal.span {m'} • (conjLat M).La ≤ (conjLat M').La := by
   rw [Submodule.ideal_span_singleton_smul] at hM ⊢
   rintro _ ⟨v, hv, rfl⟩
   have := hM ⟨_, hv, rfl⟩
@@ -194,12 +220,17 @@ theorem smul_conjLat_le {m m' : 𝓞 E} (e : (m' : E) = IsCMField.complexConj E 
   show IsCMField.complexConj E ((m' : E) * v j) = (m : E) * _
   rw [map_mul, e, IsCMField.complexConj_apply_apply]
 
-theorem guard_conjLat {bad : ℕ} {L : Submodule (𝓞 E) (Fin n → E)} (g : Guard H bad L) :
-    Guard H bad (conjLat L).La := by
+theorem guard_conjLat {bad : ℕ} {L : Submodule (𝓞 E) (Fin n → E)} (g : Guard H bad L)
+    : Guard H bad (conjLat L).La := by
   obtain ⟨g1, ⟨k, k0, k1, k2⟩, m, m0, m1, m2, m3⟩ := g
   have hs : (conjLat (stdLat E n)).La = stdLat E n := by rw [conjLat_std]
-  have hc : ∀ x : E, IsCMField.complexConj E x ∈ (algebraMap (𝓞 E) E).range ↔ x ∈ (algebraMap (𝓞 E) E).range := by
-    have : ∀ x : E, x ∈ (algebraMap (𝓞 E) E).range → IsCMField.complexConj E x ∈ (algebraMap (𝓞 E) E).range := by
+  have hc
+      : ∀ x : E,
+        IsCMField.complexConj E x ∈ (algebraMap (𝓞 E) E).range
+          ↔ x ∈ (algebraMap (𝓞 E) E).range := by
+    have : ∀ x : E,
+        x ∈ (algebraMap (𝓞 E) E).range
+          → IsCMField.complexConj E x ∈ (algebraMap (𝓞 E) E).range := by
       rintro _ ⟨o, rfl⟩; exact ⟨H.bar o, H.bar_eq o⟩
     exact fun x => ⟨fun h => by simpa using this _ h, this x⟩
   refine ⟨fun v => ?_, ⟨k, k0, ?_, ?_⟩, H.bar m, by simpa using m0, ?_, ?_, fun P hP hm hfix => ?_⟩

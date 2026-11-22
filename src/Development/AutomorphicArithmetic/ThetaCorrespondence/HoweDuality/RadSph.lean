@@ -17,11 +17,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilRepresen
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open UpperTheory.Lit.HoweDuality GlobalTheory.HoweGlobalPair
 
-theorem UpperTheory.Lit.HoweDuality.radSph :
-    ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} {n d : ℕ} {X : Spc F E n} {W : Spc F E d} {M : Model σ X W} {ψ : AddChar (AF F) ℂ} {om : Rep σ X W} {v : Pl (F := F)} {ω : UA σ X.J × UA σ W.J → Module.End ℂ (PositivityTheory.ThK.Fn F n d v)} {ρ : Matrix (Fin n) (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) → Module.End ℂ (PositivityTheory.ThK.Fn F n d v)}, PositivityTheory.ThK.IsLocRep M ψ om v ω ρ → PositivityTheory.Sph.SphAt M ψ om v → ∀ K : Submodule ℂ ↥(SB (Fin n × Fin d → Fv F v)), relFin om v ≤ K → Stable (opFin om v) K → K ≠ ⊤ → Rad (opFin om v) (relFin om v) K := by
+theorem UpperTheory.Lit.HoweDuality.radSph
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {σ : E →ₐ[F] E} {n d : ℕ} {X : Spc F E n} {W : Spc F E d} {M : Model σ X W}
+        {ψ : AddChar (AF F) ℂ} {om : Rep σ X W} {v : Pl (F := F)}
+        {ω : UA σ X.J × UA σ W.J → Module.End ℂ (PositivityTheory.ThK.Fn F n d v)}
+        {ρ : Matrix (Fin n) (Fin d)
+            (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+          → Module.End ℂ (PositivityTheory.ThK.Fn F n d v)},
+      PositivityTheory.ThK.IsLocRep M ψ om v ω ρ → PositivityTheory.Sph.SphAt M ψ om v
+        → ∀ K : Submodule ℂ ↥(SB (Fin n × Fin d → Fv F v)),
+          relFin om v ≤ K → Stable (opFin om v) K → K ≠ ⊤ → Rad (opFin om v) (relFin om v) K := by
   intro F E _ _ _ _ _ σ n d X W M ψ om v ω ρ hL hS K hrel hst hne
   have one_mem : (1 : UA σ X.J) ∈ UAt σ X (evFin F v) := by
     show At _ (mat 1 - 1)
@@ -33,20 +44,28 @@ theorem UpperTheory.Lit.HoweDuality.radSph :
     refine Submodule.span_le.mpr ?_
     rintro z ⟨g, -, φ, hφ, φ₁, hφ₁, -, rfl⟩
     exact Submodule.sub_mem _ hφ₁ hφ
-  have hG : ∀ h ∈ UAt σ W (evFin F v), ∃ g ∈ opFin om v,
-      ∀ x : ↥(SB (Fin n × Fin d → Fv F v)), (g x : (Fin n × Fin d → Fv F v) → ℂ) = ω (1, h) x := by
+  have hG
+      : ∀ h ∈ UAt σ W (evFin F v), ∃ g ∈ opFin om v, ∀ x : ↥(SB (Fin n × Fin d → Fv F v)),
+        (g x : (Fin n × Fin d → Fv F v) → ℂ) = ω (1, h) x := by
     intro h hh
-    refine ⟨{ toFun := fun x => ⟨ω (1, h) x, hL.pres 1 one_mem h hh x x.2⟩
-              map_add' := fun x y => by ext1; simp
-              map_smul' := fun c x => by ext1; simp }, ⟨h, hh, fun φ => ?_⟩, fun x => rfl⟩
+    refine ⟨
+      {
+        toFun := fun x => ⟨ω (1, h) x, hL.pres 1 one_mem h hh x x.2⟩
+        map_add' := fun x y => by ext1; simp
+        map_smul' := fun c x => by ext1; simp
+      },
+      ⟨h, hh, fun φ => ?_⟩,
+      fun x => rfl
+    ⟩
     exact (hL.acts 1 one_mem h hh φ φ.2 _).mpr rfl
   choose g hgOp hgapp using hG
   obtain ⟨s, hs⟩ := hS ω ρ hL
   let s' : ↥(SB (Fin n × Fin d → Fv F v)) := ⟨s, hs.mem⟩
   have hgen : Gen (opFin om v) (relFin om v) s' := by
     intro P hP hPs hsP
-    have hle : augAt om v ⊔ Submodule.span ℂ {z | ∃ h ∈ UAt σ W (evFin F v), z = ω (1, h) s} ≤
-        P.map (SB (Fin n × Fin d → Fv F v)).subtype := by
+    have hle
+        : augAt om v ⊔ Submodule.span ℂ {z | ∃ h ∈ UAt σ W (evFin F v), z = ω (1, h) s}
+          ≤ P.map (SB (Fin n × Fin d → Fv F v)).subtype := by
       refine sup_le ?_ ?_
       · intro z hz
         exact ⟨⟨z, aug_le hz⟩, hP hz, rfl⟩
@@ -64,12 +83,12 @@ theorem UpperTheory.Lit.HoweDuality.radSph :
   obtain ⟨m, kk, w, c, hkw, hsum⟩ := hs.line k k.2
   let e : Module.End ℂ ↥(SB (Fin n × Fin d → Fv F v)) :=
     ((m + 1 : ℂ))⁻¹ • ∑ i, w i • g (kk i) (hkw i).1
-  have he_app : ∀ x : ↥(SB (Fin n × Fin d → Fv F v)),
-      (e x : (Fin n × Fin d → Fv F v) → ℂ) = ((m + 1 : ℂ))⁻¹ • ∑ i, w i • ω (1, kk i) x := by
+  have he_app
+      : ∀ x : ↥(SB (Fin n × Fin d → Fv F v)),
+        (e x : (Fin n × Fin d → Fv F v) → ℂ) = ((m + 1 : ℂ))⁻¹ • ∑ i, w i • ω (1, kk i) x := by
     intro x
     simp [e, hgapp]
-  have hm : (m + 1 : ℂ) ≠ 0 := by
-    norm_cast
+  have hm : (m + 1 : ℂ) ≠ 0 := by norm_cast
   have hes : e s' = s' := by
     ext1
     rw [he_app]
@@ -95,8 +114,9 @@ theorem UpperTheory.Lit.HoweDuality.radSph :
     exact hh
   by_cases hc : ((m + 1 : ℂ))⁻¹ * c = 0
   · refine ⟨e, ?_, hes, ?_⟩
-    · exact Subalgebra.smul_mem _ (Subalgebra.sum_mem _ fun i _ =>
-        Subalgebra.smul_mem _ (Algebra.subset_adjoin (hgOp _ _)) _) _
+    · exact Subalgebra.smul_mem _
+        (Subalgebra.sum_mem _ fun i _ => Subalgebra.smul_mem _ (Algebra.subset_adjoin (hgOp _ _)) _)
+        _
     · rw [hc, zero_smul, sub_zero] at hrelv
       exact hrelv
   · exfalso

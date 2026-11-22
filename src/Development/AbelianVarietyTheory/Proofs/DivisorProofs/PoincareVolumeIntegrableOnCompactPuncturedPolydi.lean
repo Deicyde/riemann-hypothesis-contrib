@@ -7,25 +7,31 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IntegrableM
 
 @[expose] public section
 
-open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.GoodTop
+open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame
+  GlobalTheory.GoodMetric GlobalTheory.GoodTop
 open ReciprocityTheory.L2DbarEstimates (V)
 open scoped ContDiff Matrix
 
 namespace GlobalTheory.GoodTop
 
-theorem integrableOn_poinVol {n : ℕ} (S : Finset (Fin n)) (K : Set (V n)) (hK : IsCompact K)
-    (hS : ∀ v ∈ K, ∀ a ∈ S, ‖v a‖ ≤ 1 / 2) :
-    IntegrableOn (fun v => ∏ a, (poinWt S v a)⁻¹ ^ 2) K := by
+theorem integrableOn_poinVol
+    {n : ℕ}
+    (S : Finset (Fin n)) (K : Set (V n)) (hK : IsCompact K) (hS : ∀ v ∈ K, ∀ a ∈ S, ‖v a‖ ≤ 1 / 2)
+    : IntegrableOn (fun v => ∏ a, (poinWt S v a)⁻¹ ^ 2) K := by
   classical
   obtain ⟨R, hR⟩ := hK.isBounded.exists_norm_le
   let g : Fin n → ℂ → ℝ := fun a =>
-    if a ∈ S then (Metric.closedBall (0 : ℂ) (1 / 2)).indicator (fun z : ℂ => (‖z‖ * |Real.log ‖z‖|)⁻¹ ^ 2)
-    else (Metric.closedBall (0 : ℂ) R).indicator (fun _ => 1)
+    if a ∈ S then
+      (Metric.closedBall (0 : ℂ) (1 / 2)).indicator (fun z : ℂ => (‖z‖ * |Real.log ‖z‖|)⁻¹ ^ 2)
+    else
+      (Metric.closedBall (0 : ℂ) R).indicator (fun _ => 1)
   have hg : ∀ a, Integrable (g a) := by
     intro a
     by_cases h : a ∈ S
     · simp only [g, h, if_true]
-      exact (integrable_indicator_iff measurableSet_closedBall).2 GlobalTheory.T.integrableOn_poincareAreaDensity_punctured_disc
+      exact (integrable_indicator_iff measurableSet_closedBall).2
+        GlobalTheory.T.integrableOn_poincareAreaDensity_punctured_disc
     · simp only [g, h, if_false]
       exact (integrable_indicator_iff measurableSet_closedBall).2
         (continuousOn_const.integrableOn_compact (isCompact_closedBall _ _))
@@ -36,8 +42,7 @@ theorem integrableOn_poinVol {n : ℕ} (S : Finset (Fin n)) (K : Set (V n)) (hK 
   simp only [Function.comp]
   refine Finset.prod_congr rfl fun a _ => ?_
   by_cases h : a ∈ S
-  · have : v.ofLp a ∈ Metric.closedBall (0 : ℂ) (1 / 2) := by
-      simpa using hS v hv a h
+  · have : v.ofLp a ∈ Metric.closedBall (0 : ℂ) (1 / 2) := by simpa using hS v hv a h
     simp only [g, h, if_true, poinWt]
     exact Set.indicator_of_mem this _
   · have : v.ofLp a ∈ Metric.closedBall (0 : ℂ) R := by

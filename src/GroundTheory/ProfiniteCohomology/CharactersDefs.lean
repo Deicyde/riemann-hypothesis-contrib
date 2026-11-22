@@ -25,21 +25,25 @@ def locallyConstantHom : AddSubgroup (Additive G →+ M) where
     change IsLocallyConstant fun g : G => (-χ) (Additive.ofMul g)
     exact IsLocallyConstant.neg hχ
 
-def locallyConstantHomQZEquiv : locallyConstantHom G (AddCircle (1 : ℚ)) ≃+ (Additive G →ₜ+ QZ) where
-  toFun χ :=
-    { toAddMonoidHom := QZ.toAddCircle.symm.toAddMonoidHom.comp χ.1
-      continuous_toFun := (IsLocallyConstant.iff_continuous _).1 χ.2 }
-  invFun χ := ⟨QZ.toAddCircle.toAddMonoidHom.comp χ.toAddMonoidHom,
-    (IsLocallyConstant.iff_continuous (fun x : Additive G => χ x)).2 χ.continuous⟩
+def locallyConstantHomQZEquiv
+    : locallyConstantHom G (AddCircle (1 : ℚ)) ≃+ (Additive G →ₜ+ QZ) where
+  toFun χ := {
+    toAddMonoidHom := QZ.toAddCircle.symm.toAddMonoidHom.comp χ.1
+    continuous_toFun := (IsLocallyConstant.iff_continuous _).1 χ.2
+  }
+  invFun χ := ⟨
+    QZ.toAddCircle.toAddMonoidHom.comp χ.toAddMonoidHom,
+    (IsLocallyConstant.iff_continuous (fun x : Additive G => χ x)).2 χ.continuous
+  ⟩
   left_inv _ := rfl
   right_inv _ := rfl
   map_add' _ _ := rfl
 
 variable {G} in
 @[simp]
-theorem locallyConstantHomQZEquiv_apply (χ : locallyConstantHom G (AddCircle (1 : ℚ)))
-    (g : Additive G) :
-    locallyConstantHomQZEquiv G χ g = QZ.toAddCircle.symm (χ.1 g) :=
+theorem locallyConstantHomQZEquiv_apply
+    (χ : locallyConstantHom G (AddCircle (1 : ℚ))) (g : Additive G)
+    : locallyConstantHomQZEquiv G χ g = QZ.toAddCircle.symm (χ.1 g) :=
   rfl
 
 end LocallyConstantHom

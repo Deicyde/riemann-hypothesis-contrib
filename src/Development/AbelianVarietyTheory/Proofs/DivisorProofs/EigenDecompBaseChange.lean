@@ -8,8 +8,22 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem eigen_decomp_base_change :
-  ∀ (K C : Type) [CommRing K] [CommRing C] (n a : ℕ) (ω : K) (tr nm : ℤ), ω ^ 2 - (tr : K) * ω + (nm : K) = 0 → ∀ (f : K →+* Matrix (Fin n) (Fin n) C) (ρ : C), ρ ^ 2 - (tr : C) * ρ + (nm : C) = 0 → IsUnit (2 * ρ - (tr : C)) → ∀ (t : Fin a → (K →+* C)), (∀ i, t i ω = ρ) → (∀ v : Fin n → C, Matrix.mulVec (f ω) v = ρ • v → ∃ w : Fin a → Fin n → C, (∀ i (c : K), Matrix.mulVec (f c) (w i) = t i c • w i) ∧ v = ∑ i, w i) → ∀ (R' : Type) [CommRing R'] (g : C →+* R') (v : Fin n → R'), Matrix.mulVec ((f ω).map g) v = g ρ • v → ∃ w : Fin a → Fin n → R', (∀ i (c : K), Matrix.mulVec ((f c).map g) (w i) = g (t i c) • w i) ∧ v = ∑ i, w i := by
+theorem eigen_decomp_base_change
+    : ∀ (K C : Type) [CommRing K] [CommRing C] (n a : ℕ) (ω : K) (tr nm : ℤ),
+      ω ^ 2 - (tr : K) * ω + (nm : K) = 0
+        → ∀ (f : K →+* Matrix (Fin n) (Fin n) C) (ρ : C),
+          ρ ^ 2 - (tr : C) * ρ + (nm : C) = 0 → IsUnit (2 * ρ - (tr : C))
+            → ∀ (t : Fin a → (K →+* C)),
+              (∀ i, t i ω = ρ)
+                → (∀ v : Fin n → C,
+                  Matrix.mulVec (f ω) v = ρ • v
+                    → ∃ w : Fin a → Fin n → C,
+                      (∀ i (c : K), Matrix.mulVec (f c) (w i) = t i c • w i) ∧ v = ∑ i, w i)
+                → ∀ (R' : Type) [CommRing R'] (g : C →+* R') (v : Fin n → R'),
+                  Matrix.mulVec ((f ω).map g) v = g ρ • v
+                    → ∃ w : Fin a → Fin n → R',
+                      (∀ i (c : K), Matrix.mulVec ((f c).map g) (w i) = g (t i c) • w i)
+                        ∧ v = ∑ i, w i := by
   intro K C _ _ n a ω tr nm hω f ρ hρ hu t ht H R' _ g v hv
   obtain ⟨uinv, huinv⟩ : ∃ uinv : C, uinv * (2 * ρ - (tr : C)) = 1 := by
     obtain ⟨u, hu'⟩ := hu
@@ -23,7 +37,9 @@ theorem eigen_decomp_base_change :
   have key : ∀ x : Fin n → C, Ω *ᵥ (Ω *ᵥ x) = (tr : C) • (Ω *ᵥ x) - (nm : C) • x := by
     intro x
     rw [mulVec_mulVec, hΩΩ, sub_mulVec, ← mulVec_mulVec, intCast_mulVec, intCast_mulVec]
-  have eig : ∀ x : Fin n → C, Ω *ᵥ (Ω *ᵥ x - ((tr : C) - ρ) • x) = ρ • (Ω *ᵥ x - ((tr : C) - ρ) • x) := by
+  have eig
+      : ∀ x : Fin n → C,
+        Ω *ᵥ (Ω *ᵥ x - ((tr : C) - ρ) • x) = ρ • (Ω *ᵥ x - ((tr : C) - ρ) • x) := by
     intro x
     rw [mulVec_sub, mulVec_smul, key]
     ext k
@@ -36,7 +52,8 @@ theorem eigen_decomp_base_change :
     rw [smul_comm]
   choose W hW hWsum using fun j => H (e j) (he j)
 
-  have hmap : ∀ (M : Matrix (Fin n) (Fin n) C) (x : Fin n → C), M.map g *ᵥ (g ∘ x) = g ∘ (M *ᵥ x) := by
+  have hmap
+      : ∀ (M : Matrix (Fin n) (Fin n) C) (x : Fin n → C), M.map g *ᵥ (g ∘ x) = g ∘ (M *ᵥ x) := by
     intro M x
     funext k
     simp only [Function.comp_apply]
@@ -48,8 +65,11 @@ theorem eigen_decomp_base_change :
     simp only [e, Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul, Pi.sub_apply,
       mulVec_single_one, col_apply, Pi.single_apply, map_mul, map_sub, mul_ite, mul_one, mul_zero,
       map_zero]
-    have hterm : ∀ x, v x * (g uinv * (g (Ω k x) - g (if k = x then (tr : C) - ρ else 0))) =
-        g uinv * (g (Ω k x) * v x) - (if k = x then g uinv * g ((tr : C) - ρ) * v k else 0) := by
+    have hterm
+        : ∀ x,
+          v x * (g uinv * (g (Ω k x) - g (if k = x then (tr : C) - ρ else 0)))
+            = g uinv * (g (Ω k x) * v x)
+              - (if k = x then g uinv * g ((tr : C) - ρ) * v k else 0) := by
       intro x
       split_ifs with h
       · subst h; ring
@@ -78,6 +98,6 @@ theorem eigen_decomp_base_change :
     rw [hWsum j]
     funext k
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Finset.sum_apply, map_sum]
+    simp [Finset.sum_apply, map_sum]
 
 end GlobalTheory

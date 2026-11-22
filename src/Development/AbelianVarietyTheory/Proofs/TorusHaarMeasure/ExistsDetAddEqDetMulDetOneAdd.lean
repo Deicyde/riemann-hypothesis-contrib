@@ -10,11 +10,11 @@ open scoped ComplexOrder ENNReal MatrixOrder Pointwise
 
 namespace GlobalTheory
 
-
 open scoped MatrixOrder in
-theorem exists_det_add_eq_det_mul_det_one_add {n : Type} [Fintype n] [DecidableEq n]
-    {P Q : Matrix n n ℂ} (hP : P.PosSemidef) (hQ : Q.PosSemidef) (hd : P.det ≠ 0) :
-    ∃ R : Matrix n n ℂ, R.PosSemidef ∧ (R = 0 → Q = 0) ∧ (P + Q).det = P.det * (1 + R).det := by
+theorem exists_det_add_eq_det_mul_det_one_add
+    {n : Type} [Fintype n] [DecidableEq n]
+    {P Q : Matrix n n ℂ} (hP : P.PosSemidef) (hQ : Q.PosSemidef) (hd : P.det ≠ 0)
+    : ∃ R : Matrix n n ℂ, R.PosSemidef ∧ (R = 0 → Q = 0) ∧ (P + Q).det = P.det * (1 + R).det := by
   have hP0 : (0 : Matrix n n ℂ) ≤ P := nonneg_iff_posSemidef.mpr hP
   set S := CFC.sqrt P with hSdef
   have hS0 : (0 : Matrix n n ℂ) ≤ S := CFC.sqrt_nonneg P
@@ -28,8 +28,9 @@ theorem exists_det_add_eq_det_mul_det_one_add {n : Type} [Fintype n] [DecidableE
   have hl : S * S⁻¹ = 1 := mul_nonsing_inv S hSu
   have hr : S⁻¹ * S = 1 := nonsing_inv_mul S hSu
   have hback : S * (S⁻¹ * Q * S⁻¹) * S = Q := by
-    calc S * (S⁻¹ * Q * S⁻¹) * S = (S * S⁻¹) * Q * (S⁻¹ * S) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      S * (S⁻¹ * Q * S⁻¹) * S
+        = (S * S⁻¹) * Q * (S⁻¹ * S) := by simp only [Matrix.mul_assoc]
       _ = Q := by rw [hl, hr, Matrix.one_mul, Matrix.mul_one]
   refine ⟨S⁻¹ * Q * S⁻¹, ?_, ?_, ?_⟩
   · have h := hQ.conjTranspose_mul_mul_same S⁻¹
@@ -76,10 +77,11 @@ private lemma exists_one_le_det_one_add_of_posSemidef {n : Type} [Fintype n] [De
     simp only [Pi.zero_apply]
     linarith
 
-theorem det_re_mono_of_posSemidef :
-    ∀ (n : Type) [Fintype n] [DecidableEq n] (P Q : Matrix n n ℂ), P.PosSemidef → Q.PosSemidef →
-      0 ≤ P.det.re ∧ P.det.re ≤ (P + Q).det.re ∧
-        (P.det ≠ 0 → (P + Q).det.re ≤ P.det.re → Q = 0) := by
+theorem det_re_mono_of_posSemidef
+    : ∀ (n : Type) [Fintype n] [DecidableEq n] (P Q : Matrix n n ℂ),
+      P.PosSemidef → Q.PosSemidef
+        → 0 ≤ P.det.re ∧ P.det.re ≤ (P + Q).det.re
+          ∧ (P.det ≠ 0 → (P + Q).det.re ≤ P.det.re → Q = 0) := by
   intro n _ _ P Q hP hQ
   obtain ⟨hPre, hPim⟩ := Complex.nonneg_iff.mp hP.det_nonneg
   obtain ⟨hSre, -⟩ := Complex.nonneg_iff.mp (hP.add hQ).det_nonneg
@@ -94,7 +96,8 @@ theorem det_re_mono_of_posSemidef :
     have hpos : 0 < P.det.re := by
       rcases hPre.lt_or_eq with h | h
       · exact h
-      · exact absurd (Complex.ext (by rw [← h, Complex.zero_re]) (by rw [← hPim, Complex.zero_im])) hd
+      · exact absurd (Complex.ext (by rw [← h, Complex.zero_re]) (by rw [← hPim, Complex.zero_im]))
+          hd
     refine ⟨hPre, ?_, fun _ hle => hR0 (hcR ?_)⟩
     · rw [hre]
       exact le_mul_of_one_le_right hPre hc1

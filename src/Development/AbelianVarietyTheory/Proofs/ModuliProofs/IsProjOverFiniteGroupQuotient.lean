@@ -14,15 +14,21 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem isProjOver_of_isProper_of_affine_cover {R : Type} [CommRing R] {X : Scheme.{0}} (s : X ⟶ Sp R) [IsProper s]
-    {L : LB X} (hL : L.IsLB) {n : ℕ} (σ : Fin n → LB.Sec L) (ha : ∀ i, IsAffineOpen (Out.nonzeroLocus (σ i)))
-    (hc : ⨆ i, Out.nonzeroLocus (σ i) = ⊤) : IsProjOver s := by
+theorem isProjOver_of_isProper_of_affine_cover
+    {R : Type} [CommRing R]
+    {X : Scheme.{0}} (s : X ⟶ Sp R) [IsProper s]
+    {L : LB X} (hL : L.IsLB)
+    {n : ℕ} (σ : Fin n → LB.Sec L) (ha : ∀ i, IsAffineOpen (Out.nonzeroLocus (σ i)))
+    (hc : ⨆ i, Out.nonzeroLocus (σ i) = ⊤)
+    : IsProjOver s := by
   have hA : IsAmpleLB L := by
     refine ⟨hL, ⟨?_⟩, ?_⟩
     · have hu : (Set.univ : Set X) = ⋃ i, (Out.nonzeroLocus (σ i) : Set X) := by
@@ -41,12 +47,27 @@ theorem isProjOver_of_isProper_of_affine_cover {R : Type} [CommRing R] {X : Sche
         exact ha i
   exact hA.isProjOver s
 
-theorem isProjOver_quotient : ∀ (Γ : Type) [Group Γ] [Finite Γ] (X X' : Scheme.{0}) (ρ : Γ →* Aut X) (π : X ⟶ X'), (IsAffineHom π ∧ (∀ g, (ρ g).asIso.hom ≫ π = π) ∧ ∀ V : X'.Opens, Function.Injective (π.app V).hom ∧ ∀ f : Γ(X, π ⁻¹ᵁ V), (∀ g (h : π ⁻¹ᵁ V ≤ (ρ g).asIso.hom ⁻¹ᵁ (π ⁻¹ᵁ V)), ((ρ g).asIso.hom.appLE _ _ h).hom f = f) → f ∈ Set.range (π.app V).hom) → ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (s' : X' ⟶ Sp R), IsProjOver (π ≫ s') → IsProjOver s' := by
+theorem isProjOver_quotient
+    : ∀ (Γ : Type) [Group Γ] [Finite Γ] (X X' : Scheme.{0}) (ρ : Γ →* Aut X) (π : X ⟶ X'),
+      (IsAffineHom π ∧ (∀ g, (ρ g).asIso.hom ≫ π = π)
+          ∧ ∀ V : X'.Opens,
+            Function.Injective (π.app V).hom
+              ∧ ∀ f : Γ(X, π ⁻¹ᵁ V),
+                (∀ g (h : π ⁻¹ᵁ V ≤ (ρ g).asIso.hom ⁻¹ᵁ (π ⁻¹ᵁ V)),
+                    ((ρ g).asIso.hom.appLE _ _ h).hom f = f)
+                  → f ∈ Set.range (π.app V).hom)
+        → ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (s' : X' ⟶ Sp R),
+          IsProjOver (π ≫ s') → IsProjOver s' := by
   intro Γ _ _ X X' ρ π hq R _ _ s' hX
-  have hQ : IsAffineQuotient ρ π :=
-    ⟨hq.2.1, hq.1, fun W => (hq.2.2 W).1, fun W f hf => (hq.2.2 W).2 f (by
-      unfold IsInvariantSection at hf
-      exact fun g _ => (hf g).2)⟩
+  have hQ : IsAffineQuotient ρ π := ⟨
+    hq.2.1,
+    hq.1,
+    fun W => (hq.2.2 W).1,
+    fun W f hf =>
+      (hq.2.2 W).2 f (by
+        unfold IsInvariantSection at hf
+        exact fun g _ => (hf g).2)
+  ⟩
   have hP : IsProper (π ≫ s') := ((isProjOver_iff_isProper_and_exists_isAmpleLB _).1 hX).1
   have hs' : IsProper s' := hQ.isProper s'
   have hXs : X.IsSeparated := by

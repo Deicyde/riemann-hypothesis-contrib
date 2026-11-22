@@ -43,11 +43,14 @@ theorem closureModel : GenericProjClosureModel.Statement :=
 theorem flagClosureModel : SegreFlagClosureModel.Statement :=
   SegreFlagClosureModel.proof (SegreFlagClosureTrdeg.proof SegreFlagConeAlg.proof)
 
-theorem of_items (hC2 : VerticalDivisorsCommute.Statement.{0}) (hPull : PairNumberPullback.Statement)
-    (hCut : SegreFlagClosureCut.Statement) : FlagIndependence.Statement := by
+theorem of_items
+    (hC2 : VerticalDivisorsCommute.Statement.{0}) (hPull : PairNumberPullback.Statement)
+    (hCut : SegreFlagClosureCut.Statement)
+    : FlagIndependence.Statement := by
   have hPE := PairNumberExpansionIndependence.proof hC2
-  have hSP := SegreFlagClosurePullback.proof hPull hPE flagClosureModel PairNumberRelabel.proof
-    VerticalDivisorJoinPullback.proof SegreFlagClosureBirational.proof
+  have hSP :=
+    SegreFlagClosurePullback.proof hPull hPE flagClosureModel PairNumberRelabel.proof
+      VerticalDivisorJoinPullback.proof SegreFlagClosureBirational.proof
   have hSCN := SegreClosureNumber.proof hPE flagClosureModel hCut hSP
   exact FlagIndependence.proof hPE (HsymmPairFlagIndependence.proof hPE closureModel hSCN)
     SymmetricSpanHsymm.proof

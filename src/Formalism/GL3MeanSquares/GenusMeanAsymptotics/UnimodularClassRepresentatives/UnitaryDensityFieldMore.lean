@@ -51,16 +51,21 @@ private lemma conjO_algebraMap_of_fixed_field (hF : IsFixF K F) (x : 𝓞 F) :
   rw [h1]
   exact (hF _).mpr ⟨_, rfl⟩
 
-private theorem cnt_unit_local (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) {M k : ℕ} (hM : 1 ≤ M) (hk : 1 ≤ k) {n : 𝓞 F} (hn : n ∉ 𝔭) :
-    (cnt hF 𝔭 k M (ι n) : ℝ) = (Ideal.absNorm 𝔭 : ℝ) ^ ((2 * M - 1) * k) *
-      (1 - etaF K F 𝔭 ^ M * (Ideal.absNorm 𝔭 : ℝ) ^ (-(M : ℤ))) := by
+private theorem cnt_unit_local
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {M k : ℕ} (hM : 1 ≤ M) (hk : 1 ≤ k)
+    {n : 𝓞 F} (hn : n ∉ 𝔭)
+    : (cnt hF 𝔭 k M (ι n) : ℝ)
+      = (Ideal.absNorm 𝔭 : ℝ) ^ ((2 * M - 1) * k)
+        * (1 - etaF K F 𝔭 ^ M * (Ideal.absNorm 𝔭 : ℝ) ^ (-(M : ℤ))) := by
   classical
   have hinj : RingHom.ker (algebraMap (𝓞 F) (𝓞 K)) ≤ 𝔭 := by
     intro x hx
     rw [RingHom.mem_ker] at hx
     have h2 : algebraMap F K (algebraMap (𝓞 F) F x) = 0 := by
-      rw [← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K, hx, map_zero]
+      rw [← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K, hx,
+        map_zero]
     rw [map_eq_zero_iff _ (algebraMap F K).injective] at h2
     have : x = 0 := RingOfIntegers.ext (h2.trans (map_zero (algebraMap (𝓞 F) F)).symm)
     rw [this]
@@ -91,28 +96,35 @@ private theorem cnt_unit_local (hK : Formalism.HermitianLatticesTheory.IsCMUnram
   · have hsplit := extP_split hK hF hP hc
     rw [hsplit, normRepCount_eq_eulerFac_split hK hP hc M k hM hk _ hfix hnP]
     have hN := absNorm_comap_split hK hF hP hc
-    have hcc : Formalism.HermitianLatticesTheory.conjIdeal (K := K) (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P) = P := by
+    have hcc
+        : Formalism.HermitianLatticesTheory.conjIdeal (K := K)
+            (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P)
+          = P := by
       ext r
       rw [mem_conjIdeal_iff', mem_conjIdeal_iff', conjO_conjO_unimodular_class_representatives]
-    have hc2 : Formalism.HermitianLatticesTheory.conjIdeal (K := K) (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P) ≠
-        Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
+    have hc2
+        : Formalism.HermitianLatticesTheory.conjIdeal (K := K)
+            (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P)
+          ≠ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := by
       rw [hcc]
       exact Ne.symm hc
     have hNc := absNorm_conjIdeal hK P
-    have hpr : ¬ ((P.comap ι).map ι).IsPrime := by
+    have hpr : ¬((P.comap ι).map ι).IsPrime := by
       intro hpr
       have h3 := hsplit
       unfold extP at h3
       rw [h3] at hpr
       rcases (hpr.mul_le).mp le_rfl with h | h
-      · have h1 : P ≤ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P := h.trans Ideal.mul_le_right
+      · have h1 : P ≤ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P :=
+          h.trans Ideal.mul_le_right
         apply hc
         refine le_antisymm ?_ h1
         intro r hr
         rw [mem_conjIdeal_iff'] at hr
         have h4 := h1 hr
         rwa [mem_conjIdeal_iff', conjO_conjO_unimodular_class_representatives] at h4
-      · have h1 : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P ≤ P := h.trans Ideal.mul_le_left
+      · have h1 : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P ≤ P :=
+          h.trans Ideal.mul_le_left
         apply hc
         refine le_antisymm h1 ?_
         intro r hr
@@ -133,8 +145,8 @@ private theorem cnt_unit_local (hK : Formalism.HermitianLatticesTheory.IsCMUnram
     rw [if_neg hc, if_neg hc2, hNc, ← hN, heta, ← Real.rpow_add hx, hh, Real.rpow_neg_one, inv_inv,
       one_pow, one_mul]
 
-theorem mem_pow_iff_le_vF {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0) (e : ℕ) :
-    n ∈ 𝔭 ^ e ↔ e ≤ vF 𝔭 n := by
+theorem mem_pow_iff_le_vF {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0) (e : ℕ)
+    : n ∈ 𝔭 ^ e ↔ e ≤ vF 𝔭 n := by
   have hbdd : BddAbove {e : ℕ | n ∈ 𝔭 ^ e} := by
     by_contra hnb
     rw [not_bddAbove_iff] at hnb
@@ -153,42 +165,56 @@ theorem mem_pow_iff_le_vF {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {n : 
     have hmem : sSup {e : ℕ | n ∈ 𝔭 ^ e} ∈ {e : ℕ | n ∈ 𝔭 ^ e} := Nat.sSup_mem hne hbdd
     exact Ideal.pow_le_pow_right he hmem
 
-theorem cnt_congr (hF : IsFixF K F) (𝔭 : Ideal (𝓞 F)) (k M : ℕ) {n n' : 𝓞 K}
-    (h : n - n' ∈ extP K 𝔭 ^ k) : cnt hF 𝔭 k M n = cnt hF 𝔭 k M n' := by
+theorem cnt_congr
+    (hF : IsFixF K F) (𝔭 : Ideal (𝓞 F)) (k M : ℕ) {n n' : 𝓞 K} (h : n - n' ∈ extP K 𝔭 ^ k)
+    : cnt hF 𝔭 k M n = cnt hF 𝔭 k M n' := by
   unfold cnt
   rw [Ideal.Quotient.eq.mpr h]
 
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem cnt_one_of_mem (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {L : Submodule (𝓞 K) V}
-    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) (hv : vd h L 𝔭 = 0) (hm : 1 ≤ finrank K V) {n : 𝓞 F} (hn : n ∈ 𝔭) :
-    (cnt hF 𝔭 1 (finrank K V) (ι n) : ℝ) = (Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V) -
-      ((Ideal.absNorm 𝔭 : ℝ) - 1) * ((Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V - 1) *
-        (1 - etaF K F 𝔭 ^ finrank K V * (Ideal.absNorm 𝔭 : ℝ) ^ (-(finrank K V : ℤ)))) := by
+theorem cnt_one_of_mem
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {L : Submodule (𝓞 K) V}
+    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (hv : vd h L 𝔭 = 0)
+    (hm : 1 ≤ finrank K V)
+    {n : 𝓞 F} (hn : n ∈ 𝔭)
+    : (cnt hF 𝔭 1 (finrank K V) (ι n) : ℝ)
+      = (Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V)
+        - ((Ideal.absNorm 𝔭 : ℝ) - 1)
+          * ((Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V - 1)
+            * (1 - etaF K F 𝔭 ^ finrank K V * (Ideal.absNorm 𝔭 : ℝ) ^ (-(finrank K V : ℤ)))) := by
   classical
   have h0 := sum_nkCount hK hF hs hd hL hLi h𝔭 1
   have := MeanC.finite_quot_pow h𝔭 1
   have := Fintype.ofFinite (𝓞 F ⧸ 𝔭 ^ 1)
   rw [finsum_eq_sum_of_fintype,
-    Finset.sum_congr rfl fun n' _ => nkCount_eq_cnt hK hF hs hd (by first | exact hL | exact hL.toIsLattice) hLi h𝔭 hv le_rfl _,
-    ← Finset.add_sum_erase Finset.univ _ (Finset.mem_univ (0 : 𝓞 F ⧸ 𝔭 ^ 1))] at h0
-  have h1 : (cnt hF 𝔭 1 (finrank K V) (ι (Quotient.out (0 : 𝓞 F ⧸ 𝔭 ^ 1))) : ℝ) +
-      ∑ n' ∈ Finset.univ.erase (0 : 𝓞 F ⧸ 𝔭 ^ 1),
-        (cnt hF 𝔭 1 (finrank K V) (ι (Quotient.out n')) : ℝ) =
-      (Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V * 1) := by exact_mod_cast h0
-  have h2 : cnt hF 𝔭 1 (finrank K V) (ι (Quotient.out (0 : 𝓞 F ⧸ 𝔭 ^ 1))) =
-      cnt hF 𝔭 1 (finrank K V) (ι n) := by
+      Finset.sum_congr rfl fun n' _ =>
+        nkCount_eq_cnt hK hF hs hd (by first | exact hL | exact hL.toIsLattice) hLi h𝔭 hv le_rfl _,
+      ← Finset.add_sum_erase Finset.univ _ (Finset.mem_univ (0 : 𝓞 F ⧸ 𝔭 ^ 1))]
+    at h0
+  have h1
+      : (cnt hF 𝔭 1 (finrank K V) (ι (Quotient.out (0 : 𝓞 F ⧸ 𝔭 ^ 1))) : ℝ)
+          + ∑ n' ∈ Finset.univ.erase (0 : 𝓞 F ⧸ 𝔭 ^ 1),
+              (cnt hF 𝔭 1 (finrank K V) (ι (Quotient.out n')) : ℝ)
+        = (Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V * 1) := by
+    exact_mod_cast h0
+  have h2
+      : cnt hF 𝔭 1 (finrank K V) (ι (Quotient.out (0 : 𝓞 F ⧸ 𝔭 ^ 1)))
+        = cnt hF 𝔭 1 (finrank K V) (ι n) := by
     apply cnt_congr
     rw [← map_sub, idealPowerSpanBounds.mem_pow_iff]
     refine sub_mem ?_ (by rwa [pow_one])
     rw [← Ideal.Quotient.eq_zero_iff_mem, Ideal.Quotient.mk_out]
-  have h3 : ∀ n' ∈ Finset.univ.erase (0 : 𝓞 F ⧸ 𝔭 ^ 1),
-      (cnt hF 𝔭 1 (finrank K V) (ι (Quotient.out n')) : ℝ) =
-      (Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V - 1) *
-        (1 - etaF K F 𝔭 ^ finrank K V * (Ideal.absNorm 𝔭 : ℝ) ^ (-(finrank K V : ℤ))) := by
+  have h3
+      : ∀ n' ∈ Finset.univ.erase (0 : 𝓞 F ⧸ 𝔭 ^ 1),
+        (cnt hF 𝔭 1 (finrank K V) (ι (Quotient.out n')) : ℝ)
+          = (Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V - 1)
+            * (1 - etaF K F 𝔭 ^ finrank K V * (Ideal.absNorm 𝔭 : ℝ) ^ (-(finrank K V : ℤ))) := by
     intro n' hn'
     have hne : Quotient.out n' ∉ 𝔭 := by
       intro hmem
@@ -202,11 +228,13 @@ theorem cnt_one_of_mem (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF 
   rw [h2, Finset.sum_congr rfl h3, Finset.sum_const, nsmul_eq_mul, hcard, mul_one] at h1
   linarith
 
-theorem real_step (q T ε β c1 cI : ℝ) (j t : ℕ) (hq : 0 < q) (hT : T = q ^ t) (hε : ε ^ 2 = 1)
-    (hβ : β = 1 - ε * (q ^ (t + 1))⁻¹)
-    (hc1 : c1 = q ^ (2 * (t + 1)) - (q - 1) * (q ^ (2 * (t + 1) - 1) * β)) :
-    (q ^ ((2 * (t + 1) - 1) * (j + 1)) * (c1 - 1) + cI) / q ^ ((j + 2) * (2 * (t + 1) - 1)) =
-      β * (1 + ε * T⁻¹) + cI / q ^ ((j + 2) * (2 * (t + 1) - 1)) := by
+theorem real_step
+    (q T ε β c1 cI : ℝ)
+    (j t : ℕ)
+    (hq : 0 < q) (hT : T = q ^ t) (hε : ε ^ 2 = 1) (hβ : β = 1 - ε * (q ^ (t + 1))⁻¹)
+    (hc1 : c1 = q ^ (2 * (t + 1)) - (q - 1) * (q ^ (2 * (t + 1) - 1) * β))
+    : (q ^ ((2 * (t + 1) - 1) * (j + 1)) * (c1 - 1) + cI) / q ^ ((j + 2) * (2 * (t + 1) - 1))
+      = β * (1 + ε * T⁻¹) + cI / q ^ ((j + 2) * (2 * (t + 1) - 1)) := by
   subst hT hβ hc1
   have e : 2 * (t + 1) - 1 = 2 * t + 1 := by omega
   have hq' : q ≠ 0 := hq.ne'

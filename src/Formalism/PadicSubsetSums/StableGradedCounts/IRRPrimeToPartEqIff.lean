@@ -6,13 +6,16 @@ public import Formalism.PadicSubsetSums.StableGradedCounts.IRRPrimeToPartSpec
 
 namespace Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
 
-theorem pow_lpow_add {M : Type*} [Monoid M] {l a : ℕ} {x z : M} (h : x ^ (l ^ a) = z ^ (l ^ a))
-    (b : ℕ) : x ^ (l ^ (a + b)) = z ^ (l ^ (a + b)) := by
+theorem pow_lpow_add
+    {M : Type*} [Monoid M] {l a : ℕ} {x z : M} (h : x ^ (l ^ a) = z ^ (l ^ a)) (b : ℕ)
+    : x ^ (l ^ (a + b)) = z ^ (l ^ (a + b)) := by
   rw [pow_add, pow_mul, pow_mul, h]
 
-theorem eq_of_pow_eq_of_coprime_order {M : Type*} [Monoid M] {r : ℕ} {u w : M}
-    (hu : 0 < orderOf u) (hw : 0 < orderOf w) (hcu : Nat.Coprime r (orderOf u))
-    (hcw : Nat.Coprime r (orderOf w)) (h : u ^ r = w ^ r) : u = w := by
+theorem eq_of_pow_eq_of_coprime_order
+    {M : Type*} [Monoid M]
+    {r : ℕ} {u w : M} (hu : 0 < orderOf u) (hw : 0 < orderOf w) (hcu : Nat.Coprime r (orderOf u))
+    (hcw : Nat.Coprime r (orderOf w)) (h : u ^ r = w ^ r)
+    : u = w := by
   by_cases h1 : orderOf u * orderOf w = 1
   · have hu1 : orderOf u = 1 := Nat.eq_one_of_mul_eq_one_right h1
     have hw1 : orderOf w = 1 := Nat.eq_one_of_mul_eq_one_left h1

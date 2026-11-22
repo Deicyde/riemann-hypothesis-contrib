@@ -8,9 +8,9 @@ open scoped Matrix ComplexOrder
 
 namespace GlobalTheory
 
-theorem posDef_exists_frame :
-    ∀ (d : ℕ) (G : Matrix (Fin d) (Fin d) ℂ), G.PosDef →
-      ∃ X : Matrix (Fin d) (Fin d) ℂ, IsUnit X.det ∧ (X⁻¹)ᴴ * X⁻¹ = G := by
+theorem posDef_exists_frame
+    : ∀ (d : ℕ) (G : Matrix (Fin d) (Fin d) ℂ),
+      G.PosDef → ∃ X : Matrix (Fin d) (Fin d) ℂ, IsUnit X.det ∧ (X⁻¹)ᴴ * X⁻¹ = G := by
   intro d G hG
   open scoped MatrixOrder in
   obtain ⟨B, hB⟩ := CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hG.posSemidef.nonneg

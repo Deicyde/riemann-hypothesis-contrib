@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.DefiniteLiftE
 
 @[expose] public section
 
-open NumberField Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat GlobalTheory.DegCnt GlobalTheory.DegAsm
+open NumberField Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat GlobalTheory.DegCnt
+  GlobalTheory.DegAsm
 open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.DegAsm.DatEmb
@@ -20,12 +21,14 @@ namespace GlobalTheory.DegAsm.DatEmb
 open GlobalTheory.Mass
 
 section Lin
-variable {K V W C : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+variable
+  {K V W C : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
   [AddCommGroup C] [Module K C]
 
-theorem exists_equiv (X : Submodule K V) (e : W →ₗ[K] V) (c : C →ₗ[K] V) (he : ∀ w, e w ∈ X → w = 0)
-    (hc : ∀ y, c y ∈ X → y = 0) (h1 : ∀ w, ∃ y, e w - c y ∈ X) (h2 : ∀ y, ∃ w, e w - c y ∈ X) :
-    ∃ φ : W ≃ₗ[K] C, ∀ w, e w - c (φ w) ∈ X := by
+theorem exists_equiv
+    (X : Submodule K V) (e : W →ₗ[K] V) (c : C →ₗ[K] V) (he : ∀ w, e w ∈ X → w = 0)
+    (hc : ∀ y, c y ∈ X → y = 0) (h1 : ∀ w, ∃ y, e w - c y ∈ X) (h2 : ∀ y, ∃ w, e w - c y ∈ X)
+    : ∃ φ : W ≃ₗ[K] C, ∀ w, e w - c (φ w) ∈ X := by
   let q := X.mkQ
   have ie : Function.Injective (q ∘ₗ e) := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -43,25 +46,31 @@ theorem exists_equiv (X : Submodule K V) (e : W →ₗ[K] V) (c : C →ₗ[K] V)
     · rintro _ ⟨y, rfl⟩
       obtain ⟨w, hw⟩ := h2 y
       exact ⟨w, (Submodule.Quotient.eq X).2 hw⟩
-  refine ⟨(LinearEquiv.ofInjective _ ie).trans
-    ((LinearEquiv.ofEq _ _ hr).trans (LinearEquiv.ofInjective _ ic).symm), fun w => ?_⟩
-  have key := congrArg Subtype.val ((LinearEquiv.ofInjective _ ic).apply_symm_apply
-    (LinearEquiv.ofEq _ _ hr (LinearEquiv.ofInjective _ ie w)))
+  refine ⟨
+    (LinearEquiv.ofInjective _ ie).trans
+      ((LinearEquiv.ofEq _ _ hr).trans (LinearEquiv.ofInjective _ ic).symm),
+    fun w => ?_
+  ⟩
+  have key :=
+    congrArg Subtype.val
+      ((LinearEquiv.ofInjective _ ic).apply_symm_apply
+        (LinearEquiv.ofEq _ _ hr (LinearEquiv.ofInjective _ ie w)))
   simp only [LinearEquiv.ofInjective_apply, LinearEquiv.coe_ofEq_apply] at key
   exact (Submodule.Quotient.eq X).1 key.symm
 
 end Lin
 
-variable {K W C : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup W] [Module K W]
-  [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W] [AddCommGroup C] [Module K C]
-  [Module (𝓞 K) C] [IsScalarTower (𝓞 K) K C]
+variable
+  {K W C : Type}
+  [Field K] [NumberField K] [StarRing K] [AddCommGroup W] [Module K W] [Module (𝓞 K) W]
+  [IsScalarTower (𝓞 K) K W] [AddCommGroup C] [Module K C] [Module (𝓞 K) C] [IsScalarTower (𝓞 K) K C]
 
 abbrev pre (φ : W ≃ₗ[K] C) (M : Submodule (𝓞 K) C) : Submodule (𝓞 K) W :=
   M.comap ((φ : W →ₗ[K] C).restrictScalars (𝓞 K))
 
 omit [NumberField K] [StarRing K] in
-theorem pre_eq_map (φ : W ≃ₗ[K] C) (M : Submodule (𝓞 K) C) :
-    pre φ M = M.map ((φ.symm : C →ₗ[K] W).restrictScalars (𝓞 K)) := by
+theorem pre_eq_map (φ : W ≃ₗ[K] C) (M : Submodule (𝓞 K) C)
+    : pre φ M = M.map ((φ.symm : C →ₗ[K] W).restrictScalars (𝓞 K)) := by
   ext y
   simp only [pre, Submodule.mem_comap, Submodule.mem_map, LinearMap.restrictScalars_apply,
     LinearEquiv.coe_coe]
@@ -72,19 +81,21 @@ theorem pre_eq_map (φ : W ≃ₗ[K] C) (M : Submodule (𝓞 K) C) :
     simpa using hm
 
 omit [NumberField K] [StarRing K] in
-theorem idxN_pre (φ : W ≃ₗ[K] C) (A B : Submodule (𝓞 K) C) : idxN (pre φ A) (pre φ B) = idxN A B := by
+theorem idxN_pre (φ : W ≃ₗ[K] C) (A B : Submodule (𝓞 K) C)
+    : idxN (pre φ A) (pre φ B) = idxN A B := by
   rw [pre_eq_map, pre_eq_map]
   unfold idxN
   rw [Submodule.map_toAddSubgroup, Submodule.map_toAddSubgroup]
   exact AddSubgroup.relIndex_map_map_of_injective _ _ (fun a b h => φ.symm.injective h)
 
 omit [NumberField K] [StarRing K] in
-theorem isLattice_pre (φ : W ≃ₗ[K] C) {M : Submodule (𝓞 K) C} (h : Submodule.IsLattice K M) :
-    Submodule.IsLattice K (pre φ M) := by
+theorem isLattice_pre (φ : W ≃ₗ[K] C) {M : Submodule (𝓞 K) C} (h : Submodule.IsLattice K M)
+    : Submodule.IsLattice K (pre φ M) := by
   rw [pre_eq_map]
   refine ⟨h.fg.map _, ?_⟩
-  have hs : ((M.map ((φ.symm : C →ₗ[K] W).restrictScalars (𝓞 K)) : Submodule (𝓞 K) W) : Set W) =
-      (φ.symm : C →ₗ[K] W) '' (M : Set C) := by
+  have hs
+      : ((M.map ((φ.symm : C →ₗ[K] W).restrictScalars (𝓞 K)) : Submodule (𝓞 K) W) : Set W)
+        = (φ.symm : C →ₗ[K] W) '' (M : Set C) := by
     simp [Submodule.map_coe]
   rw [hs]
   intro s hsM hli
@@ -93,27 +104,29 @@ theorem isLattice_pre (φ : W ≃ₗ[K] C) {M : Submodule (𝓞 K) C} (h : Submo
     obtain ⟨y, hy, hxy⟩ := hsM hx
     simpa [← hxy] using hy
   have hli' : LinearIndepOn (𝓞 K) id ((φ : W →ₗ[K] C) '' s) :=
-    (linearIndepOn_id_imageₛ_iff (f := (φ : W →ₗ[K] C).restrictScalars (𝓞 K))
-      φ.injective.injOn).2 hli
+    (linearIndepOn_id_imageₛ_iff (f := (φ : W →ₗ[K] C).restrictScalars (𝓞 K)) φ.injective.injOn).2
+      hli
   have hK := h.linearIndepOn _ hsub hli'
-  exact (linearIndepOn_id_imageₛ_iff (f := (φ : W →ₗ[K] C))
-    φ.injective.injOn).1 hK
+  exact (linearIndepOn_id_imageₛ_iff (f := (φ : W →ₗ[K] C)) φ.injective.injOn).1 hK
 
 omit [NumberField K] [StarRing K] in
-theorem isFullLattice_pre (φ : W ≃ₗ[K] C) {M : Submodule (𝓞 K) C}
-    (h : Submodule.IsFullLattice K M) : Submodule.IsFullLattice K (pre φ M) := by
+theorem isFullLattice_pre (φ : W ≃ₗ[K] C) {M : Submodule (𝓞 K) C} (h : Submodule.IsFullLattice K M)
+    : Submodule.IsFullLattice K (pre φ M) := by
   refine { toIsLattice := isLattice_pre φ h.toIsLattice, span_eq_top := ?_ }
   rw [pre_eq_map]
   change Submodule.span K (φ.symm.toLinearMap '' (M : Set C)) = ⊤
   rw [← Submodule.map_span, h.span_eq_top, Submodule.map_top, LinearEquiv.range]
 
 omit [NumberField K] in
-theorem dual_pre (φ : W ≃ₗ[K] C) {HW : HermSpace K W} {H' : HermSpace K C}
-    (hφ : ∀ x y, H'.B (φ x) (φ y) = HW.B x y) (M : Submodule (𝓞 K) C) :
-    Formalism.HermitianLatticesTheory.dual HW.B.flip (pre φ M) = pre φ (Formalism.HermitianLatticesTheory.dual H'.B.flip M) := by
+theorem dual_pre
+    (φ : W ≃ₗ[K] C)
+    {HW : HermSpace K W} {H' : HermSpace K C} (hφ : ∀ x y, H'.B (φ x) (φ y) = HW.B x y)
+    (M : Submodule (𝓞 K) C)
+    : Formalism.HermitianLatticesTheory.dual HW.B.flip (pre φ M)
+      = pre φ (Formalism.HermitianLatticesTheory.dual H'.B.flip M) := by
   ext x
-  simp only [pre, Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_comap, Submodule.mem_iInf,
-    LinearMap.restrictScalars_apply, LinearEquiv.coe_coe, LinearMap.flip_apply]
+  simp only [pre, Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_comap,
+    Submodule.mem_iInf, LinearMap.restrictScalars_apply, LinearEquiv.coe_coe, LinearMap.flip_apply]
   constructor
   · intro hx m hm
     have hm' := hx (φ.symm m) (by simpa using hm)
@@ -123,8 +136,8 @@ theorem dual_pre (φ : W ≃ₗ[K] C) {HW : HermSpace K W} {H' : HermSpace K C}
     exact hx _ hy
 
 omit [NumberField K] [StarRing K] in
-theorem mem_smulLat_pre (φ : W ≃ₗ[K] C) (g : 𝓞 K) (M : Submodule (𝓞 K) C) (y : W) :
-    y ∈ smulLat g (pre φ M) ↔ φ y ∈ smulLat g M := by
+theorem mem_smulLat_pre (φ : W ≃ₗ[K] C) (g : 𝓞 K) (M : Submodule (𝓞 K) C) (y : W)
+    : y ∈ smulLat g (pre φ M) ↔ φ y ∈ smulLat g M := by
   have hs : ∀ z : W, φ (g • z) = g • φ z := fun z => (φ : W →ₗ[K] C).map_smul_of_tower g z
   simp only [smulLat, Submodule.mem_map, pre, Submodule.mem_comap, LinearMap.smul_apply,
     LinearMap.id_apply, LinearMap.restrictScalars_apply, LinearEquiv.coe_coe]
@@ -135,20 +148,25 @@ theorem mem_smulLat_pre (φ : W ≃ₗ[K] C) (g : 𝓞 K) (M : Submodule (𝓞 K
     refine ⟨φ.symm m, by simpa using hm, φ.injective ?_⟩
     rw [hs, φ.apply_symm_apply, hmy]
 
-private theorem discN_pre_of_isometry (φ : W ≃ₗ[K] C) {HW : HermSpace K W} {H' : HermSpace K C}
-    (hφ : ∀ x y, H'.B (φ x) (φ y) = HW.B x y) (M : Submodule (𝓞 K) C) :
-    GlobalTheory.Mass.discN HW.B.flip (pre φ M) = GlobalTheory.Mass.discN H'.B.flip M := by
+private theorem discN_pre_of_isometry
+    (φ : W ≃ₗ[K] C)
+    {HW : HermSpace K W} {H' : HermSpace K C} (hφ : ∀ x y, H'.B (φ x) (φ y) = HW.B x y)
+    (M : Submodule (𝓞 K) C)
+    : GlobalTheory.Mass.discN HW.B.flip (pre φ M) = GlobalTheory.Mass.discN H'.B.flip M := by
   unfold GlobalTheory.Mass.discN
   rw [dual_pre φ hφ, idxN_pre]
 
-theorem isDat_pre (φ : W ≃ₗ[K] C) {HW : HermSpace K W} {H' : HermSpace K C}
-    (hφ : ∀ x y, H'.B (φ x) (φ y) = HW.B x y) {g j r x : ℕ} (hj : j ≤ r) {L L' : Submodule (𝓞 K) C}
-    {Γ : Submodule (𝓞 K) (C × C)} (h : IsDat H' g L j x (L', Γ)) :
-    IsDat HW g (pre φ L) r x (pre φ L',
-      Γ.comap (((φ : W →ₗ[K] C).prodMap (φ : W →ₗ[K] C)).restrictScalars (𝓞 K))) := by
+theorem isDat_pre
+    (φ : W ≃ₗ[K] C)
+    {HW : HermSpace K W} {H' : HermSpace K C} (hφ : ∀ x y, H'.B (φ x) (φ y) = HW.B x y)
+    {g j r x : ℕ} (hj : j ≤ r)
+    {L L' : Submodule (𝓞 K) C} {Γ : Submodule (𝓞 K) (C × C)} (h : IsDat H' g L j x (L', Γ))
+    : IsDat HW g (pre φ L) r x
+      (pre φ L', Γ.comap (((φ : W →ₗ[K] C).prodMap (φ : W →ₗ[K] C)).restrictScalars (𝓞 K))) := by
   obtain ⟨⟨hlat, hint⟩, hdisc, ⟨m1, m2, m3, m4, m5, m6, m7⟩, hidx, t, ht, hgen⟩ := h
-  have hfix : fixLat (Γ.comap (((φ : W →ₗ[K] C).prodMap (φ : W →ₗ[K] C)).restrictScalars (𝓞 K))) =
-      pre φ (fixLat Γ) := by
+  have hfix
+      : fixLat (Γ.comap (((φ : W →ₗ[K] C).prodMap (φ : W →ₗ[K] C)).restrictScalars (𝓞 K)))
+        = pre φ (fixLat Γ) := by
     ext y
     simp [fixLat, pre, Submodule.mem_comap]
   refine ⟨⟨isFullLattice_pre φ hlat, ?_⟩, ?_, ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩, ?_, ?_⟩
@@ -192,8 +210,11 @@ theorem isDat_pre (φ : W ≃ₗ[K] C) {HW : HermSpace K W} {H' : HermSpace K C}
     simp [Finset.coe_image]
 
 omit [NumberField K] [StarRing K] in
-theorem mem_sup_iff {A : Type} [AddCommGroup A] [Module (𝓞 K) A] {M X S : Submodule (𝓞 K) A}
-    (h1 : M ≤ S) (h2 : X ⊓ S ≤ M) {u v : A} (hv : v ∈ S) (huv : u - v ∈ X) : u ∈ M ⊔ X ↔ v ∈ M := by
+theorem mem_sup_iff
+    {A : Type} [AddCommGroup A] [Module (𝓞 K) A]
+    {M X S : Submodule (𝓞 K) A} (h1 : M ≤ S) (h2 : X ⊓ S ≤ M)
+    {u v : A} (hv : v ∈ S) (huv : u - v ∈ X)
+    : u ∈ M ⊔ X ↔ v ∈ M := by
   constructor
   · intro hu
     obtain ⟨m, hm, x, hx, rfl⟩ := Submodule.mem_sup.1 hu
@@ -213,9 +234,13 @@ end GlobalTheory.DegAsm.DatEmb
 namespace GlobalTheory.DegAsm
 open DatEmb GlobalTheory.Mass Formalism.HermitianLatticeCounting.P
 
-private theorem span_gs_Iio_le_orthogonal {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-    {H : HermSpace K V} {r : ℕ} (F : FlagD H r) (n : ℕ) {v : V}
-    (hv : ∀ a : Fin (r + 1), H.B (F.e a) v = 0) {x : V} (hx : x ∈ F.Xa n) : H.B x v = 0 := by
+private theorem span_gs_Iio_le_orthogonal
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {H : HermSpace K V} {r : ℕ} (F : FlagD H r)
+    (n : ℕ)
+    {v : V} (hv : ∀ a : Fin (r + 1), H.B (F.e a) v = 0)
+    {x : V} (hx : x ∈ F.Xa n)
+    : H.B x v = 0 := by
   unfold FlagD.Xa at hx
   induction hx using Submodule.span_induction with
   | mem y hy =>
@@ -225,13 +250,27 @@ private theorem span_gs_Iio_le_orthogonal {K V : Type} [Field K] [StarRing K] [A
   | add y z _ _ hy hz => simp [hy, hz]
   | smul c y _ hy => simp [hy]
 
-private theorem flag_e_mem_V0 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-    {H : HermSpace K V} {r : ℕ} (F F' : FlagD H r) (a : Fin (r + 1)) : F.e a ∈ V0 F F' := by
+private theorem flag_e_mem_V0
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {H : HermSpace K V} {r : ℕ} (F F' : FlagD H r) (a : Fin (r + 1))
+    : F.e a ∈ V0 F F' := by
   induction a using Fin.lastCases with
   | last => exact Submodule.mem_sup_right (Submodule.subset_span (Set.mem_insert _ _))
-  | cast b => exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.subset_span ⟨b, b.2, rfl⟩))
+  | cast b =>
+    exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.subset_span ⟨b, b.2, rfl⟩))
 
-theorem isDat_datOf : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [AddCommGroup W] [Module K W] [FiniteDimensional K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W] (H : HermSpace K V) (HW : HermSpace K W) (e : W →ₗ[K] V), Formalism.HermitianLatticesTheory.IsCMUnram K → ∀ (r : ℕ), ∀ (F G : FlagD H r) (𝔡 : Ideal (𝓞 K)) (N : NF H r) (g : ℕ) (Λ : Submodule (𝓞 K) V), 1 ≤ g → IsEmb F HW e → Adapt F G 𝔡 N → N.IsTerm g Λ → IsDat HW g (lat0 F e Λ) r (N.gI g Λ) (datOf F G e g Λ) ∧ 1 ≤ N.gI g Λ ∧ (N.gI g Λ : ℝ) ≤ N.Del ∧ GlobalTheory.Mass.PD HW.B.flip ∧ Module.finrank K W + 2 * r + 1 = Module.finrank K V := by
+theorem isDat_datOf
+    : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [AddCommGroup W]
+        [Module K W] [FiniteDimensional K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
+        (H : HermSpace K V) (HW : HermSpace K W) (e : W →ₗ[K] V),
+      Formalism.HermitianLatticesTheory.IsCMUnram K
+        → ∀ (r : ℕ),
+          ∀ (F G : FlagD H r) (𝔡 : Ideal (𝓞 K)) (N : NF H r) (g : ℕ) (Λ : Submodule (𝓞 K) V),
+            1 ≤ g → IsEmb F HW e → Adapt F G 𝔡 N → N.IsTerm g Λ
+              → IsDat HW g (lat0 F e Λ) r (N.gI g Λ) (datOf F G e g Λ) ∧ 1 ≤ N.gI g Λ
+                ∧ (N.gI g Λ : ℝ) ≤ N.Del ∧ GlobalTheory.Mass.PD HW.B.flip
+                ∧ Module.finrank K W + 2 * r + 1 = Module.finrank K V := by
   intro K V W _ _ _ _ _ _ _ _ _ _ _ _ _ H HW e hK r F G 𝔡 N g Λ hg hE hA hT
   obtain ⟨-, hX, -, -, -, -, -, -, hlat⟩ := adapt_invariants K V H hK r F G 𝔡 N hA
   obtain ⟨-, -, -, -, hL0', hio⟩ := hlat g Λ
@@ -240,7 +279,8 @@ theorem isDat_datOf : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] 
   obtain ⟨hfull, ⟨hW1, hW2, hW3⟩, -, hrank, hWn, huP, hwSp, hwSp', -, -, -, -⟩ :=
     NF.geometry K V H hK r N
   obtain ⟨-, -, -, -, -, hFX, -, hlF, -⟩ := hfull
-  obtain ⟨H', hH', hH'PD, -, -, -, hDat⟩ := GlobalTheory.T.definiteLift_embedded_datum_of_term K V H hK r N g Λ hg hT
+  obtain ⟨H', hH', hH'PD, -, -, -, hDat⟩ :=
+    GlobalTheory.T.definiteLift_embedded_datum_of_term K V H hK r N g Λ hg hT
   obtain ⟨-, hgI, hiI, -, hle, -⟩ := GlobalTheory.DegCnt.FixIdx.main K V H hK r N g Λ hg hT
   have frame : ∀ v : V, (∀ a, H.B (F.e a) v = 0) ↔ (∀ a, H.B (N.F.e a) v = 0) := by
     intro v
@@ -274,10 +314,16 @@ theorem isDat_datOf : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] 
   have huS : uPerp N.F' N.F = uPerp N.F N.F' := by
     unfold uPerp
     rw [sup_comm]
-  have hIIL : ∀ x, x ∈ II N.F N.F' → x ∈ flagPairDefinitePartLattice N.F N.F' Λ ∧ x ∈ flagPairDefinitePartLattice N.F' N.F Λ := by
+  have hIIL
+      : ∀ x,
+        x ∈ II N.F N.F'
+          → x ∈ flagPairDefinitePartLattice N.F N.F' Λ
+            ∧ x ∈ flagPairDefinitePartLattice N.F' N.F Λ := by
     intro x hx
-    refine ⟨⟨⟨NFGeom.II_le_uPerp N hx, Submodule.mem_sup_right hx.1⟩, NFGeom.II_le_wSp N hx⟩,
-      ⟨⟨?_, Submodule.mem_sup_right hx.2⟩, ?_⟩⟩
+    refine ⟨
+      ⟨⟨NFGeom.II_le_uPerp N hx, Submodule.mem_sup_right hx.1⟩, NFGeom.II_le_wSp N hx⟩,
+      ⟨⟨?_, Submodule.mem_sup_right hx.2⟩, ?_⟩
+    ⟩
     · show x ∈ uPerp N.F' N.F
       rw [huS]
       exact NFGeom.II_le_uPerp N hx
@@ -302,7 +348,9 @@ theorem isDat_datOf : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] 
     obtain ⟨y, hy, i, hi, hyi⟩ := Submodule.mem_sup.1 (hW3 _ hxo)
     refine ⟨⟨y, hy⟩, ?_⟩
     have hd : e w - y = x + i := by
-      calc e w - y = (e w - x) - y + x := by abel
+      calc
+        e w - y
+          = (e w - x) - y + x := by abel
         _ = (y + i) - y + x := by rw [hyi]
         _ = x + i := by abel
     simp only [Submodule.subtype_apply]
@@ -335,10 +383,12 @@ theorem isDat_datOf : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] 
   have hdat : datOf F G e g Λ = datOf N.F N.F' e g Λ := by
     unfold datOf
     rw [hX, hL0', hio]
-  have q1 : lat0 N.F e Λ = DatEmb.pre φ (GlobalTheory.Mass.latIn N.Wt (flagPairDefinitePartLattice N.F N.F' Λ)) := by
+  have q1
+      : lat0 N.F e Λ
+        = DatEmb.pre φ (GlobalTheory.Mass.latIn N.Wt (flagPairDefinitePartLattice N.F N.F' Λ)) := by
     ext w
-    simp only [lat0, DatEmb.pre, GlobalTheory.Mass.latIn, Submodule.mem_comap, LinearMap.restrictScalars_apply,
-      LinearEquiv.coe_coe, Submodule.subtype_apply]
+    simp only [lat0, DatEmb.pre, GlobalTheory.Mass.latIn, Submodule.mem_comap,
+      LinearMap.restrictScalars_apply, LinearEquiv.coe_coe, Submodule.subtype_apply]
     have hsub : e w - (φ w : V) ∈ Λ ⊔ rs (𝓞 K) N.F.X := Submodule.mem_sup_right (hφX w)
     show _ ↔ (φ w : V) ∈ (rs (𝓞 K) (uPerp N.F N.F') ⊓ (Λ ⊔ rs (𝓞 K) N.F.X)) ⊓ rs (𝓞 K) (wSp N.F N.F')
     simp only [Submodule.mem_inf]
@@ -352,20 +402,25 @@ theorem isDat_datOf : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] 
     rw [← hwSp']
     exact inf_le_right
   have hS2 : flagPairDefinitePartLattice N.F N.F' Λ ≤ rs (𝓞 K) (wSp N.F N.F') := inf_le_right
-  have q2 : datOf N.F N.F' e g Λ = (DatEmb.pre φ (GlobalTheory.Mass.latIn N.Wt (flagPairDefinitePartLattice N.F' N.F Λ)),
-      ((iotaGraph N.F N.F' Λ (g : 𝓞 K)).comap ((N.Wt.subtype.prodMap N.Wt.subtype).restrictScalars (𝓞 K))).comap
-        (((φ : W →ₗ[K] N.Wt).prodMap (φ : W →ₗ[K] N.Wt)).restrictScalars (𝓞 K))) := by
+  have q2
+      : datOf N.F N.F' e g Λ
+        = (
+          DatEmb.pre φ (GlobalTheory.Mass.latIn N.Wt (flagPairDefinitePartLattice N.F' N.F Λ)),
+          ((iotaGraph N.F N.F' Λ (g : 𝓞 K)).comap
+              ((N.Wt.subtype.prodMap N.Wt.subtype).restrictScalars (𝓞 K))).comap
+            (((φ : W →ₗ[K] N.Wt).prodMap (φ : W →ₗ[K] N.Wt)).restrictScalars (𝓞 K))
+        ) := by
     refine Prod.ext ?_ ?_
     · ext w
-      simp only [datOf, DatEmb.pre, GlobalTheory.Mass.latIn, Submodule.mem_comap, LinearMap.restrictScalars_apply,
-        LinearEquiv.coe_coe, Submodule.subtype_apply]
+      simp only [datOf, DatEmb.pre, GlobalTheory.Mass.latIn, Submodule.mem_comap,
+        LinearMap.restrictScalars_apply, LinearEquiv.coe_coe, Submodule.subtype_apply]
       refine DatEmb.mem_sup_iff hS1 ?_ (hWw (φ w)) (hφX w)
       intro x hx
       obtain ⟨hx1, hx2⟩ := Submodule.mem_inf.1 hx
       exact (hIIL x (hXII x hx1 hx2)).2
     · ext p
-      simp only [datOf, Submodule.mem_comap, LinearMap.restrictScalars_apply, LinearMap.prodMap_apply,
-        LinearEquiv.coe_coe, Submodule.subtype_apply]
+      simp only [datOf, Submodule.mem_comap, LinearMap.restrictScalars_apply,
+        LinearMap.prodMap_apply, LinearEquiv.coe_coe, Submodule.subtype_apply]
       refine DatEmb.mem_sup_iff (S := (rs (𝓞 K) (wSp N.F N.F')).prod (rs (𝓞 K) (wSp N.F N.F')))
         (inf_le_left.trans (Submodule.prod_mono hS1 hS2)) ?_
         (Submodule.mem_prod.2 ⟨hWw (φ p.1), hWw (φ p.2)⟩)

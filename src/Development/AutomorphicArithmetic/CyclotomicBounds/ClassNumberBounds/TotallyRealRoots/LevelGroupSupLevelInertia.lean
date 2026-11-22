@@ -9,8 +9,8 @@ namespace KStar.TotallyRealRoots
 
 variable {l : ℕ} [Fact l.Prime]
 
-private theorem lv_princ_le (N : ℕ) (H : Subgroup (ZMod N)ˣ) :
-    princ l (N.factorization l) ≤ levelGroup l N H := by
+private theorem lv_princ_le (N : ℕ) (H : Subgroup (ZMod N)ˣ)
+    : princ l (N.factorization l) ≤ levelGroup l N H := by
   intro u hu
   refine mem_levelGroup.mpr ⟨1, H.one_mem, ?_⟩
   rw [map_one]
@@ -19,8 +19,7 @@ private theorem lv_princ_le (N : ℕ) (H : Subgroup (ZMod N)ˣ) :
 private theorem lv_red_surjective : Function.Surjective (red l) := by
   intro v
   obtain ⟨k, hk⟩ := ZMod.natCast_zmod_surjective (v : ZMod l)
-  have hx : PadicInt.toZMod (k : ℤ_[l]) = (v : ZMod l) := by
-    rw [map_natCast, hk]
+  have hx : PadicInt.toZMod (k : ℤ_[l]) = (v : ZMod l) := by rw [map_natCast, hk]
   have hu : IsUnit (k : ℤ_[l]) := by
     by_contra hne
     have hm : (k : ℤ_[l]) ∈ IsLocalRing.maximalIdeal ℤ_[l] := hne
@@ -29,12 +28,12 @@ private theorem lv_red_surjective : Function.Surjective (red l) := by
   refine ⟨hu.unit, Units.ext ?_⟩
   simp [red, hx]
 
-theorem princ_le_levelGroup (N : ℕ) (H : Subgroup (ZMod N)ˣ) :
-    princ l (N.factorization l) ≤ levelGroup l N H ∧ IsOpen (levelGroup l N H : Set ℤ_[l]ˣ) :=
+theorem princ_le_levelGroup (N : ℕ) (H : Subgroup (ZMod N)ˣ)
+    : princ l (N.factorization l) ≤ levelGroup l N H ∧ IsOpen (levelGroup l N H : Set ℤ_[l]ˣ) :=
   ⟨lv_princ_le N H, Subgroup.isOpen_mono (lv_princ_le N H) (isOpen_princ _)⟩
 
-theorem levelGroup_eq_top {N : ℕ} (hN : ¬ l ∣ N) (H : Subgroup (ZMod N)ˣ) :
-    levelGroup l N H = ⊤ ∧ resOrder l (levelGroup l N H) = l - 1 := by
+theorem levelGroup_eq_top {N : ℕ} (hN : ¬ l ∣ N) (H : Subgroup (ZMod N)ˣ)
+    : levelGroup l N H = ⊤ ∧ resOrder l (levelGroup l N H) = l - 1 := by
   have h : levelGroup l N H = ⊤ := by
     rw [eq_top_iff]
     intro u _

@@ -15,23 +15,26 @@ open scoped Pointwise
 
 namespace GlobalTheory.Bauer
 
-theorem one_le_absNorm {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) :
-    (1 : ℝ) ≤ ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by
-  have : Ideal.absNorm v.asIdeal ≠ 0 := by
-    rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
+theorem one_le_absNorm {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
+    : (1 : ℝ) ≤ ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by
+  have : Ideal.absNorm v.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
   exact_mod_cast Nat.one_le_iff_ne_zero.mpr this
 
-theorem not_forall_two_liesOver (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M]
-    [Algebra K M] (S : Set (HeightOneSpectrum (𝓞 K)))
-    (hS : Summable fun v : S => ((Ideal.absNorm v.1.asIdeal : ℕ) : ℝ)⁻¹) :
-    ¬ ∀ v : HeightOneSpectrum (𝓞 K), v ∉ S → ∃ P P' : HeightOneSpectrum (𝓞 M), P ≠ P' ∧
-      P.asIdeal.LiesOver v.asIdeal ∧ P'.asIdeal.LiesOver v.asIdeal ∧
-      Ideal.absNorm P.asIdeal = Ideal.absNorm v.asIdeal ∧
-      Ideal.absNorm P'.asIdeal = Ideal.absNorm v.asIdeal := by
+theorem not_forall_two_liesOver
+    (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
+    (S : Set (HeightOneSpectrum (𝓞 K)))
+    (hS : Summable fun v : S => ((Ideal.absNorm v.1.asIdeal : ℕ) : ℝ)⁻¹)
+    : ¬ ∀ v : HeightOneSpectrum (𝓞 K),
+      v ∉ S
+        → ∃ P P' : HeightOneSpectrum (𝓞 M),
+          P ≠ P' ∧ P.asIdeal.LiesOver v.asIdeal ∧ P'.asIdeal.LiesOver v.asIdeal
+            ∧ Ideal.absNorm P.asIdeal = Ideal.absNorm v.asIdeal
+            ∧ Ideal.absNorm P'.asIdeal = Ideal.absNorm v.asIdeal := by
   intro h
   choose P P' hne hP hP' hN hN' using h
-  have huniq : ∀ (Q : HeightOneSpectrum (𝓞 M)) (v w : HeightOneSpectrum (𝓞 K)),
-      Q.asIdeal.LiesOver v.asIdeal → Q.asIdeal.LiesOver w.asIdeal → v = w := by
+  have huniq
+      : ∀ (Q : HeightOneSpectrum (𝓞 M)) (v w : HeightOneSpectrum (𝓞 K)),
+        Q.asIdeal.LiesOver v.asIdeal → Q.asIdeal.LiesOver w.asIdeal → v = w := by
     intro Q v w hv hw
     exact HeightOneSpectrum.ext (hv.over.trans hw.over.symm)
   let i : (Sᶜ : Set _) ⊕ (Sᶜ : Set _) → HeightOneSpectrum (𝓞 M) :=
@@ -40,20 +43,26 @@ theorem not_forall_two_liesOver (K M : Type) [Field K] [NumberField K] [Field M]
     rintro (⟨v, hv⟩ | ⟨v, hv⟩) (⟨w, hw⟩ | ⟨w, hw⟩) e
     · have e' : P v hv = P w hw := e
       have := huniq _ v w (hP v hv) (e' ▸ hP w hw)
-      subst this; rfl
+      subst this
+      rfl
     · have e' : P v hv = P' w hw := e
       have := huniq _ v w (hP v hv) (e' ▸ hP' w hw)
-      subst this; exact absurd e' (hne v hv)
+      subst this
+      exact absurd e' (hne v hv)
     · have e' : P' v hv = P w hw := e
       have := huniq _ v w (hP' v hv) (e' ▸ hP w hw)
-      subst this; exact absurd e'.symm (hne v hv)
+      subst this
+      exact absurd e'.symm (hne v hv)
     · have e' : P' v hv = P' w hw := e
       have := huniq _ v w (hP' v hv) (e' ▸ hP' w hw)
-      subst this; rfl
+      subst this
+      rfl
   set c : ℝ := ∑' v : S, ((Ideal.absNorm v.1.asIdeal : ℕ) : ℝ)⁻¹ with hc
-  have key : ∀ s : ℝ, 1 < s →
-      2 * ((∑' v : HeightOneSpectrum (𝓞 K), ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (-s)) - c) ≤
-        ∑' Q : HeightOneSpectrum (𝓞 M), ((Ideal.absNorm Q.asIdeal : ℕ) : ℝ) ^ (-s) := by
+  have key
+      : ∀ s : ℝ,
+        1 < s
+          → 2 * ((∑' v : HeightOneSpectrum (𝓞 K), ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (-s)) - c)
+            ≤ ∑' Q : HeightOneSpectrum (𝓞 M), ((Ideal.absNorm Q.asIdeal : ℕ) : ℝ) ^ (-s) := by
     intro s hs
     have hf := ((GlobalTheory.countable_ideal_and_summable_absNorm_rpow K).2 s hs).2
     have hg := ((GlobalTheory.countable_ideal_and_summable_absNorm_rpow M).2 s hs).2
@@ -63,19 +72,21 @@ theorem not_forall_two_liesOver (K M : Type) [Field K] [NumberField K] [Field M]
       rw [← Real.rpow_neg_one]
       exact Real.rpow_le_rpow_of_exponent_le (one_le_absNorm _) (by linarith)
     have hT := (hf.subtype (fun v => v ∈ Sᶜ)).hasSum
-    have hsum : HasSum ((fun Q : HeightOneSpectrum (𝓞 M) =>
-        ((Ideal.absNorm Q.asIdeal : ℕ) : ℝ) ^ (-s)) ∘ i)
-        ((∑' v : (Sᶜ : Set _), ((Ideal.absNorm v.1.asIdeal : ℕ) : ℝ) ^ (-s)) +
-          ∑' v : (Sᶜ : Set _), ((Ideal.absNorm v.1.asIdeal : ℕ) : ℝ) ^ (-s)) := by
+    have hsum : HasSum
+        ((fun Q : HeightOneSpectrum (𝓞 M) => ((Ideal.absNorm Q.asIdeal : ℕ) : ℝ) ^ (-s)) ∘ i)
+        ((∑' v : (Sᶜ : Set _), ((Ideal.absNorm v.1.asIdeal : ℕ) : ℝ) ^ (-s))
+          + ∑' v : (Sᶜ : Set _), ((Ideal.absNorm v.1.asIdeal : ℕ) : ℝ) ^ (-s)) := by
       apply HasSum.sum
       · refine hT.congr_fun ?_
         rintro ⟨v, hv⟩
         show ((Ideal.absNorm (P v hv).asIdeal : ℕ) : ℝ) ^ (-s) = _
-        rw [hN v hv]; rfl
+        rw [hN v hv]
+        rfl
       · refine hT.congr_fun ?_
         rintro ⟨v, hv⟩
         show ((Ideal.absNorm (P' v hv).asIdeal : ℕ) : ℝ) ^ (-s) = _
-        rw [hN' v hv]; rfl
+        rw [hN' v hv]
+        rfl
     have hle := tsum_comp_le_tsum_of_inj hg (fun _ => by positivity) hi
     rw [hsum.tsum_eq] at hle
     linarith
@@ -98,9 +109,9 @@ theorem not_forall_two_liesOver (K M : Type) [Field K] [NumberField K] [Field M]
     linarith [h1.1, h2.2]
   exact this.exists.elim fun _ h => h
 
-theorem summable_finite_union_not_prime (K : Type) [Field K] [NumberField K]
-    (S : Set (HeightOneSpectrum (𝓞 K))) (hS : S.Finite) :
-    Summable fun v : (S ∪ {v | ¬ (Ideal.absNorm v.asIdeal).Prime} : Set _) =>
+theorem summable_finite_union_not_prime
+    (K : Type) [Field K] [NumberField K] (S : Set (HeightOneSpectrum (𝓞 K))) (hS : S.Finite)
+    : Summable fun v : (S ∪ {v | ¬ (Ideal.absNorm v.asIdeal).Prime} : Set _) =>
       ((Ideal.absNorm v.1.asIdeal : ℕ) : ℝ)⁻¹ := by
   set f : HeightOneSpectrum (𝓞 K) → ℝ := fun v => ((Ideal.absNorm v.asIdeal : ℕ) : ℝ)⁻¹
   have f0 : ∀ v, 0 ≤ f v := fun v => by positivity
@@ -108,32 +119,39 @@ theorem summable_finite_union_not_prime (K : Type) [Field K] [NumberField K]
   have h2 : Summable (Set.indicator {v | ¬ (Ideal.absNorm v.asIdeal).Prime} f) :=
     summable_subtype_iff_indicator.1 (GlobalTheory.summable_inv_absNorm_of_not_prime K)
   refine (summable_subtype_iff_indicator (f := f)).2 ?_
-  refine Summable.of_nonneg_of_le (fun v => Set.indicator_nonneg (fun v _ => f0 v) v)
-    (fun v => ?_) (h1.add h2)
+  refine Summable.of_nonneg_of_le
+    (fun v => Set.indicator_nonneg (fun v _ => f0 v) v)
+    (fun v => ?_)
+    (h1.add h2)
   have := f0 v
-  by_cases a : v ∈ S <;> by_cases b : (Ideal.absNorm v.asIdeal).Prime <;>
-    simp [Set.indicator, a, b, this]
+  by_cases a : v ∈ S <;> by_cases b : (Ideal.absNorm v.asIdeal).Prime
+    <;> simp [Set.indicator, a, b, this]
 
-theorem stabilizer_fixes_iff (K M N : Type) [Field K] [NumberField K] [Field M] [NumberField M]
-    [Field N] [NumberField N] [Algebra K M] [Algebra M N] [Algebra K N] [IsScalarTower K M N]
-    [IsGalois K N] (P : Ideal (𝓞 N)) [P.IsPrime] (hP : P ≠ ⊥) :
-    (∀ σ : N ≃ₐ[K] N, σ • P = P → ∀ x : M, σ (algebraMap M N x) = algebraMap M N x) ↔
-      (P.under (𝓞 M)).ramificationIdx (𝓞 K) * (P.under (𝓞 M)).inertiaDeg (𝓞 K) = 1 := by
+theorem stabilizer_fixes_iff
+    (K M N : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Field N] [NumberField N]
+    [Algebra K M] [Algebra M N] [Algebra K N] [IsScalarTower K M N] [IsGalois K N]
+    (P : Ideal (𝓞 N)) [P.IsPrime]
+    (hP : P ≠ ⊥)
+    : (∀ σ : N ≃ₐ[K] N, σ • P = P → ∀ x : M, σ (algebraMap M N x) = algebraMap M N x)
+      ↔ (P.under (𝓞 M)).ramificationIdx (𝓞 K) * (P.under (𝓞 M)).inertiaDeg (𝓞 K) = 1 := by
   haveI : IsGalois M N := IsGalois.tower_top_of_isGalois K M N
   haveI : P.IsMaximal := Ideal.IsPrime.isMaximal inferInstance hP
   have h1 := Ideal.card_stabilizer_eq (G := N ≃ₐ[K] N) (P.under (𝓞 K)) P
   have h2 := Ideal.card_stabilizer_eq (G := N ≃ₐ[M] N) (P.under (𝓞 M)) P
   rw [Ideal.ramificationIdxIn_eq_ramificationIdx _ P (N ≃ₐ[K] N),
-    Ideal.inertiaDegIn_eq_inertiaDeg _ P (N ≃ₐ[K] N),
-    Ideal.ramificationIdx_tower (P.under (𝓞 M)) P, Ideal.inertiaDeg_tower (P.under (𝓞 M)) P] at h1
+      Ideal.inertiaDegIn_eq_inertiaDeg _ P (N ≃ₐ[K] N),
+      Ideal.ramificationIdx_tower (P.under (𝓞 M)) P, Ideal.inertiaDeg_tower (P.under (𝓞 M)) P]
+    at h1
   rw [Ideal.ramificationIdxIn_eq_ramificationIdx _ P (N ≃ₐ[M] N),
-    Ideal.inertiaDegIn_eq_inertiaDeg _ P (N ≃ₐ[M] N)] at h2
-  have h3 : Nat.card (MulAction.stabilizer (N ≃ₐ[K] N) P) =
-      ((P.under (𝓞 M)).ramificationIdx (𝓞 K) * (P.under (𝓞 M)).inertiaDeg (𝓞 K)) *
-        Nat.card (MulAction.stabilizer (N ≃ₐ[M] N) P) := by
+      Ideal.inertiaDegIn_eq_inertiaDeg _ P (N ≃ₐ[M] N)]
+    at h2
+  have h3
+      : Nat.card (MulAction.stabilizer (N ≃ₐ[K] N) P)
+        = ((P.under (𝓞 M)).ramificationIdx (𝓞 K) * (P.under (𝓞 M)).inertiaDeg (𝓞 K))
+          * Nat.card (MulAction.stabilizer (N ≃ₐ[M] N) P) := by
     rw [h1, h2]; ring
-  let j : MulAction.stabilizer (N ≃ₐ[M] N) P → MulAction.stabilizer (N ≃ₐ[K] N) P :=
-    fun σ => ⟨σ.1.restrictScalars K, σ.2⟩
+  let j : MulAction.stabilizer (N ≃ₐ[M] N) P → MulAction.stabilizer (N ≃ₐ[K] N) P := fun σ =>
+    ⟨σ.1.restrictScalars K, σ.2⟩
   have hj : Function.Injective j := by
     intro a b e
     apply Subtype.ext
@@ -155,10 +173,11 @@ theorem stabilizer_fixes_iff (K M N : Type) [Field K] [NumberField K] [Field M] 
     rw [this]
     exact τ.1.commutes x
 
-theorem ncard_eq_ncard_primesOver (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M]
-    [Algebra K M] (v : HeightOneSpectrum (𝓞 K)) :
-    {Q : HeightOneSpectrum (𝓞 M) | Q.asIdeal.comap (algebraMap (𝓞 K) (𝓞 M)) = v.asIdeal}.ncard =
-      (v.asIdeal.primesOver (𝓞 M)).ncard := by
+theorem ncard_eq_ncard_primesOver
+    (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
+    (v : HeightOneSpectrum (𝓞 K))
+    : {Q : HeightOneSpectrum (𝓞 M) | Q.asIdeal.comap (algebraMap (𝓞 K) (𝓞 M)) = v.asIdeal}.ncard
+      = (v.asIdeal.primesOver (𝓞 M)).ncard := by
   rw [← Set.ncard_image_of_injective _ (f := HeightOneSpectrum.asIdeal)
     (fun _ _ h => HeightOneSpectrum.ext h)]
   congr 1
@@ -169,10 +188,11 @@ theorem ncard_eq_ncard_primesOver (K M : Type) [Field K] [NumberField K] [Field 
   · rintro ⟨h1, h2⟩
     exact ⟨⟨Q, h1, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩, h2.over.symm, rfl⟩
 
-theorem ncard_eq_finrank_iff (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M]
-    [Algebra K M] (v : HeightOneSpectrum (𝓞 K)) :
-    (v.asIdeal.primesOver (𝓞 M)).ncard = Module.finrank K M ↔
-      ∀ Q ∈ v.asIdeal.primesOver (𝓞 M), Q.ramificationIdx (𝓞 K) * Q.inertiaDeg (𝓞 K) = 1 := by
+theorem ncard_eq_finrank_iff
+    (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
+    (v : HeightOneSpectrum (𝓞 K))
+    : (v.asIdeal.primesOver (𝓞 M)).ncard = Module.finrank K M
+      ↔ ∀ Q ∈ v.asIdeal.primesOver (𝓞 M), Q.ramificationIdx (𝓞 K) * Q.inertiaDeg (𝓞 K) = 1 := by
   haveI := v.isPrime
   haveI := v.isMaximal
   haveI : Fintype (v.asIdeal.primesOver (𝓞 M)) :=
@@ -189,16 +209,18 @@ theorem ncard_eq_finrank_iff (K M : Type) [Field K] [NumberField K] [Field M] [N
   · rintro ⟨Q, hQ, _⟩ -
     exact Nat.mul_pos (Ideal.ramificationIdx_pos (R := _) Q) (Ideal.inertiaDeg_pos Q _)
 
-theorem ef_eq_one_of_generate (K R M T : Type) [Field K] [NumberField K] [Field R] [NumberField R]
-    [Field M] [NumberField M] [Field T] [NumberField T] [Algebra K R] [Algebra K M] [Algebra K T]
-    [Algebra R T] [Algebra M T] [IsScalarTower K R T] [IsScalarTower K M T]
+theorem ef_eq_one_of_generate
+    (K R M T : Type) [Field K] [NumberField K] [Field R] [NumberField R] [Field M] [NumberField M]
+    [Field T] [NumberField T] [Algebra K R] [Algebra K M] [Algebra K T] [Algebra R T] [Algebra M T]
+    [IsScalarTower K R T] [IsScalarTower K M T]
     (hgen : ∀ (N : Type) [Field N] [Algebra K N] (φ ψ : T →ₐ[K] N),
-      (∀ x : R, φ (algebraMap R T x) = ψ (algebraMap R T x)) →
-      (∀ x : M, φ (algebraMap M T x) = ψ (algebraMap M T x)) → φ = ψ)
-    (Q : Ideal (𝓞 T)) [Q.IsPrime] (hQ : Q ≠ ⊥)
-    (hR : (Q.under (𝓞 R)).ramificationIdx (𝓞 K) * (Q.under (𝓞 R)).inertiaDeg (𝓞 K) = 1)
-    (hM : (Q.under (𝓞 M)).ramificationIdx (𝓞 K) * (Q.under (𝓞 M)).inertiaDeg (𝓞 K) = 1) :
-    Q.ramificationIdx (𝓞 K) * Q.inertiaDeg (𝓞 K) = 1 := by
+      (∀ x : R, φ (algebraMap R T x) = ψ (algebraMap R T x))
+        → (∀ x : M, φ (algebraMap M T x) = ψ (algebraMap M T x))
+        → φ = ψ)
+    (Q : Ideal (𝓞 T)) [Q.IsPrime]
+    (hQ : Q ≠ ⊥) (hR : (Q.under (𝓞 R)).ramificationIdx (𝓞 K) * (Q.under (𝓞 R)).inertiaDeg (𝓞 K) = 1)
+    (hM : (Q.under (𝓞 M)).ramificationIdx (𝓞 K) * (Q.under (𝓞 M)).inertiaDeg (𝓞 K) = 1)
+    : Q.ramificationIdx (𝓞 K) * Q.inertiaDeg (𝓞 K) = 1 := by
   let N := IntermediateField.normalClosure K T (AlgebraicClosure T)
   haveI : NumberField N := NumberField.of_module_finite K N
   haveI : IsGalois K N := IsGalois.normalClosure K T (AlgebraicClosure T)
@@ -220,22 +242,25 @@ theorem ef_eq_one_of_generate (K R M T : Type) [Field K] [NumberField K] [Field 
   rw [← stabilizer_fixes_iff K R N P hP0] at hR
   rw [← stabilizer_fixes_iff K M N P hP0] at hM
   intro σ hσ x
-  have := hgen N ((σ : N →ₐ[K] N).comp (IsScalarTower.toAlgHom K T N))
-    (IsScalarTower.toAlgHom K T N) (hR σ hσ) (hM σ hσ)
+  have :=
+    hgen N ((σ : N →ₐ[K] N).comp (IsScalarTower.toAlgHom K T N)) (IsScalarTower.toAlgHom K T N)
+      (hR σ hσ) (hM σ hσ)
   exact DFunLike.congr_fun this x
 
-theorem finrank_le_one_of_generate (K R M T : Type) [Field K] [NumberField K] [Field R]
-    [NumberField R] [Field M] [NumberField M] [Field T] [NumberField T] [Algebra K R] [Algebra K M]
-    [Algebra K T] [Algebra R T] [Algebra M T] [IsScalarTower K R T] [IsScalarTower K M T]
-    [IsGalois K R]
+theorem finrank_le_one_of_generate
+    (K R M T : Type) [Field K] [NumberField K] [Field R] [NumberField R] [Field M] [NumberField M]
+    [Field T] [NumberField T] [Algebra K R] [Algebra K M] [Algebra K T] [Algebra R T] [Algebra M T]
+    [IsScalarTower K R T] [IsScalarTower K M T] [IsGalois K R]
     (hgen : ∀ (N : Type) [Field N] [Algebra K N] (φ ψ : T →ₐ[K] N),
-      (∀ x : R, φ (algebraMap R T x) = ψ (algebraMap R T x)) →
-      (∀ x : M, φ (algebraMap M T x) = ψ (algebraMap M T x)) → φ = ψ)
+      (∀ x : R, φ (algebraMap R T x) = ψ (algebraMap R T x))
+        → (∀ x : M, φ (algebraMap M T x) = ψ (algebraMap M T x))
+        → φ = ψ)
     (F : Set (HeightOneSpectrum (𝓞 K))) (hF : F.Finite)
-    (h : ∀ p : HeightOneSpectrum (𝓞 K), p ∉ F → (Ideal.absNorm p.asIdeal).Prime →
-      (p.asIdeal.primesOver (𝓞 R)).ncard = Module.finrank K R →
-      (p.asIdeal.primesOver (𝓞 M)).ncard = Module.finrank K M) :
-    Module.finrank R T ≤ 1 := by
+    (h : ∀ p : HeightOneSpectrum (𝓞 K),
+      p ∉ F → (Ideal.absNorm p.asIdeal).Prime
+        → (p.asIdeal.primesOver (𝓞 R)).ncard = Module.finrank K R
+        → (p.asIdeal.primesOver (𝓞 M)).ncard = Module.finrank K M)
+    : Module.finrank R T ≤ 1 := by
   by_contra hlt
   rw [not_le] at hlt
   have hS1 : ((fun v : HeightOneSpectrum (𝓞 R) => v.under (𝓞 K)) ⁻¹' F).Finite := by
@@ -262,21 +287,22 @@ theorem finrank_le_one_of_generate (K R M T : Type) [Field K] [NumberField K] [F
   have hf : v.asIdeal.inertiaDeg (𝓞 K) = 1 := (hn ▸ hvp).eq_one_of_pow
   rw [hf, pow_one] at hn
   have hR : (p.asIdeal.primesOver (𝓞 R)).ncard = Module.finrank K R := by
-    have := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn p.asIdeal (𝓞 R)
-      (R ≃ₐ[K] R)
+    have :=
+      Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn p.asIdeal (𝓞 R) (R ≃ₐ[K] R)
     rwa [Ideal.ramificationIdxIn_eq_ramificationIdx _ v.asIdeal (R ≃ₐ[K] R),
-      Ideal.inertiaDegIn_eq_inertiaDeg _ v.asIdeal (R ≃ₐ[K] R), he, hf, mul_one, mul_one,
-      IsGalois.card_aut_eq_finrank] at this
+        Ideal.inertiaDegIn_eq_inertiaDeg _ v.asIdeal (R ≃ₐ[K] R), he, hf, mul_one, mul_one,
+        IsGalois.card_aut_eq_finrank]
+      at this
   have hM := (ncard_eq_finrank_iff K M p).1 (h p hvF (hn ▸ hvp) hR)
-  have hT : ∀ Q ∈ v.asIdeal.primesOver (𝓞 T),
-      Q.ramificationIdx (𝓞 R) * Q.inertiaDeg (𝓞 R) = 1 := by
+  have hT : ∀ Q ∈ v.asIdeal.primesOver (𝓞 T), Q.ramificationIdx (𝓞 R) * Q.inertiaDeg (𝓞 R) = 1 := by
     rintro Q ⟨hQ, hQv⟩
     haveI : Q.LiesOver p.asIdeal := Ideal.LiesOver.trans Q v.asIdeal p.asIdeal
-    have h1 := ef_eq_one_of_generate K R M T hgen Q
-      (Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q) (by rw [← hQv.over, he, hf])
-      (hM _ ⟨inferInstance, inferInstance⟩)
+    have h1 :=
+      ef_eq_one_of_generate K R M T hgen Q (Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q)
+        (by rw [← hQv.over, he, hf]) (hM _ ⟨inferInstance, inferInstance⟩)
     rwa [Ideal.ramificationIdx_tower v.asIdeal Q, Ideal.inertiaDeg_tower v.asIdeal Q, he, hf,
-      one_mul, one_mul] at h1
+        one_mul, one_mul]
+      at h1
   have hN : ∀ Q ∈ v.asIdeal.primesOver (𝓞 T), Ideal.absNorm Q = Ideal.absNorm v.asIdeal := by
     rintro Q hQ
     have h1 := Nat.eq_one_of_mul_eq_one_left (hT Q hQ)
@@ -286,9 +312,15 @@ theorem finrank_le_one_of_generate (K R M T : Type) [Field K] [NumberField K] [F
   obtain ⟨⟨Q, hQ, Q', hQ', hne⟩, -⟩ := hlt
   haveI := hQ.2
   haveI := hQ'.2
-  exact ⟨⟨Q, hQ.1, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩,
+  exact ⟨
+    ⟨Q, hQ.1, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩,
     ⟨Q', hQ'.1, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q'⟩,
-    fun e => hne (congrArg HeightOneSpectrum.asIdeal e), hQ.2, hQ'.2, hN Q hQ, hN Q' hQ'⟩
+    fun e => hne (congrArg HeightOneSpectrum.asIdeal e),
+    hQ.2,
+    hQ'.2,
+    hN Q hQ,
+    hN Q' hQ'
+  ⟩
 
 theorem le_of_finite_split_not_split :
     ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] (R M : IntermediateField K Ω) [NumberField R] [NumberField M] [IsGalois K R], {𝔭 : HeightOneSpectrum (𝓞 K) | (Ideal.absNorm 𝔭.asIdeal).Prime ∧ {Q : HeightOneSpectrum (𝓞 R) | Q.asIdeal.comap (algebraMap (𝓞 K) (𝓞 R)) = 𝔭.asIdeal}.ncard = Module.finrank K R ∧ ¬ {Q : HeightOneSpectrum (𝓞 M) | Q.asIdeal.comap (algebraMap (𝓞 K) (𝓞 M)) = 𝔭.asIdeal}.ncard = Module.finrank K M}.Finite → M ≤ R := by

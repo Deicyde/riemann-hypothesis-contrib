@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqOneOfTorus
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Mum
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Mum
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.MumFam GlobalTheory.MumProd GlobalTheory.ProdUnif
@@ -22,13 +25,15 @@ section Torus
 
 variable {S : Scheme.{0}} {X X' X'' : Type} [AddCommGroup X] [AddCommGroup X'] [AddCommGroup X'']
 
-theorem torusMap_comp' (a : X →+ X') (b : X'' →+ X) :
-    GlobalTheory.SplitTorusPow.torusMap S a ≫ GlobalTheory.SplitTorusPow.torusMap S b = GlobalTheory.SplitTorusPow.torusMap S (a.comp b) := by
+theorem torusMap_comp' (a : X →+ X') (b : X'' →+ X)
+    : GlobalTheory.SplitTorusPow.torusMap S a ≫ GlobalTheory.SplitTorusPow.torusMap S b
+      = GlobalTheory.SplitTorusPow.torusMap S (a.comp b) := by
   apply (GlobalTheory.splitTorusPointsEquiv S X'' _).injective
   conv_rhs => rw [← Category.id_comp (GlobalTheory.SplitTorusPow.torusMap S (a.comp b))]
   conv_lhs => rw [← Category.id_comp (GlobalTheory.SplitTorusPow.torusMap S a)]
   rw [Category.assoc, ← Category.assoc (𝟙 _), GlobalTheory.SplitTorusPow.points_comp_torusMap,
-    GlobalTheory.SplitTorusPow.points_comp_torusMap, GlobalTheory.SplitTorusPow.points_comp_torusMap]
+    GlobalTheory.SplitTorusPow.points_comp_torusMap,
+    GlobalTheory.SplitTorusPow.points_comp_torusMap]
   rfl
 
 theorem torusMap_id' : GlobalTheory.SplitTorusPow.torusMap S (AddMonoidHom.id X) = 𝟙 _ := by
@@ -37,15 +42,21 @@ theorem torusMap_id' : GlobalTheory.SplitTorusPow.torusMap S (AddMonoidHom.id X)
   rw [GlobalTheory.SplitTorusPow.points_comp_torusMap]
   rfl
 
-theorem isIso_lift_torusMap {X₁ X₂ : Type} [AddCommGroup X₁] [AddCommGroup X₂] (E : X ≃+ X₁ × X₂) :
-    IsIso (lift (GlobalTheory.SplitTorusPow.torusMap S (E.symm.toAddMonoidHom.comp (AddMonoidHom.inl X₁ X₂)))
-      (GlobalTheory.SplitTorusPow.torusMap S (E.symm.toAddMonoidHom.comp (AddMonoidHom.inr X₁ X₂)))) := by
+theorem isIso_lift_torusMap {X₁ X₂ : Type} [AddCommGroup X₁] [AddCommGroup X₂] (E : X ≃+ X₁ × X₂)
+    : IsIso (lift
+      (GlobalTheory.SplitTorusPow.torusMap S (E.symm.toAddMonoidHom.comp (AddMonoidHom.inl X₁ X₂)))
+      (GlobalTheory.SplitTorusPow.torusMap S
+        (E.symm.toAddMonoidHom.comp (AddMonoidHom.inr X₁ X₂)))) := by
   haveI := GlobalTheory.SemiProd.torus_prod_iso S X₁ X₂
-  have e : lift (GlobalTheory.SplitTorusPow.torusMap S (E.symm.toAddMonoidHom.comp (AddMonoidHom.inl X₁ X₂)))
-      (GlobalTheory.SplitTorusPow.torusMap S (E.symm.toAddMonoidHom.comp (AddMonoidHom.inr X₁ X₂))) =
-      GlobalTheory.SplitTorusPow.torusMap S E.symm.toAddMonoidHom ≫
-        lift (GlobalTheory.SplitTorusPow.torusMap S (AddMonoidHom.inl X₁ X₂))
-          (GlobalTheory.SplitTorusPow.torusMap S (AddMonoidHom.inr X₁ X₂)) := by
+  have e
+      : lift
+          (GlobalTheory.SplitTorusPow.torusMap S
+            (E.symm.toAddMonoidHom.comp (AddMonoidHom.inl X₁ X₂)))
+          (GlobalTheory.SplitTorusPow.torusMap S
+            (E.symm.toAddMonoidHom.comp (AddMonoidHom.inr X₁ X₂)))
+        = GlobalTheory.SplitTorusPow.torusMap S E.symm.toAddMonoidHom
+          ≫ lift (GlobalTheory.SplitTorusPow.torusMap S (AddMonoidHom.inl X₁ X₂))
+            (GlobalTheory.SplitTorusPow.torusMap S (AddMonoidHom.inr X₁ X₂)) := by
     rw [comp_lift, torusMap_comp', torusMap_comp']
   haveI : IsIso (GlobalTheory.SplitTorusPow.torusMap S E.symm.toAddMonoidHom) :=
     ⟨GlobalTheory.SplitTorusPow.torusMap S E.toAddMonoidHom, by
@@ -62,7 +73,31 @@ end GlobalTheory.ProdTorusExt
 
 namespace GlobalTheory.ProdTorusExt
 
-theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (e : ℕ) (D D₁ D₂ : DegPre R) (p₁ : D.P.A ⟶ D₁.P.A) (p₂ : D.P.A ⟶ D₂.P.A) (q₁ : D.X →+ D₁.X) (q₂ : D.X →+ D₂.X) (G₁ G₂ : Over (Sp R)) [GrpObj G₁] [IsCommMonObj G₁] [GrpObj G₂] [IsCommMonObj G₂] (g₁ : GtCoord I D₁ e G₁) (g₂ : GtCoord I D₂ e G₂), IsSumDeg D D₁ D₂ p₁ p₂ q₁ q₂ → ∃ (q : thickObj R I e (G₁ ⊗ G₂) ⟶ thickObj R I e D.P.A) (i : splitTorus (Sp (R ⧸ I ^ (e + 1))) D.X ⟶ thickObj R I e (G₁ ⊗ G₂)), IsMonHom q ∧ Flat q.left ∧ Surjective q.left ∧ IsAffineHom q.left ∧ IsMonHom i ∧ IsPullback i (toUnit _) q (η[thickObj R I e D.P.A]) ∧ q ≫ (Over.pullback (thick R I e)).map p₁ = ((Over.pullback (thick R I e)).map (fst G₁ G₂)) ≫ g₁.q ∧ q ≫ (Over.pullback (thick R I e)).map p₂ = ((Over.pullback (thick R I e)).map (snd G₁ G₂)) ≫ g₂.q ∧ (∀ h : D₁.X → D.X, (∀ y, q₁ (h y) = y) → (∀ y, q₂ (h y) = 0) → ∃ τ : splitTorus (Sp (R ⧸ I ^ (e + 1))) D.X ⟶ splitTorus (Sp (R ⧸ I ^ (e + 1))) D₁.X, TorusHomOf h τ ∧ i ≫ ((Over.pullback (thick R I e)).map (fst G₁ G₂)) = τ ≫ g₁.i) ∧ (∀ h : D₂.X → D.X, (∀ y, q₁ (h y) = 0) → (∀ y, q₂ (h y) = y) → ∃ τ : splitTorus (Sp (R ⧸ I ^ (e + 1))) D.X ⟶ splitTorus (Sp (R ⧸ I ^ (e + 1))) D₂.X, TorusHomOf h τ ∧ i ≫ ((Over.pullback (thick R I e)).map (snd G₁ G₂)) = τ ≫ g₂.i) := by
+theorem main
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (e : ℕ) (D D₁ D₂ : DegPre R)
+        (p₁ : D.P.A ⟶ D₁.P.A) (p₂ : D.P.A ⟶ D₂.P.A) (q₁ : D.X →+ D₁.X) (q₂ : D.X →+ D₂.X)
+        (G₁ G₂ : Over (Sp R)) [GrpObj G₁] [IsCommMonObj G₁] [GrpObj G₂] [IsCommMonObj G₂]
+        (g₁ : GtCoord I D₁ e G₁) (g₂ : GtCoord I D₂ e G₂),
+      IsSumDeg D D₁ D₂ p₁ p₂ q₁ q₂
+        → ∃ (q : thickObj R I e (G₁ ⊗ G₂) ⟶ thickObj R I e D.P.A)
+            (i : splitTorus (Sp (R ⧸ I ^ (e + 1))) D.X ⟶ thickObj R I e (G₁ ⊗ G₂)),
+          IsMonHom q ∧ Flat q.left ∧ Surjective q.left ∧ IsAffineHom q.left ∧ IsMonHom i
+            ∧ IsPullback i (toUnit _) q (η[thickObj R I e D.P.A])
+            ∧ q ≫ (Over.pullback (thick R I e)).map p₁
+              = ((Over.pullback (thick R I e)).map (fst G₁ G₂)) ≫ g₁.q
+            ∧ q ≫ (Over.pullback (thick R I e)).map p₂
+              = ((Over.pullback (thick R I e)).map (snd G₁ G₂)) ≫ g₂.q
+            ∧ (∀ h : D₁.X → D.X,
+              (∀ y, q₁ (h y) = y) → (∀ y, q₂ (h y) = 0)
+                → ∃ τ : splitTorus (Sp (R ⧸ I ^ (e + 1))) D.X
+                    ⟶ splitTorus (Sp (R ⧸ I ^ (e + 1))) D₁.X,
+                  TorusHomOf h τ ∧ i ≫ ((Over.pullback (thick R I e)).map (fst G₁ G₂)) = τ ≫ g₁.i)
+            ∧ (∀ h : D₂.X → D.X,
+              (∀ y, q₁ (h y) = 0) → (∀ y, q₂ (h y) = y)
+                → ∃ τ : splitTorus (Sp (R ⧸ I ^ (e + 1))) D.X
+                    ⟶ splitTorus (Sp (R ⧸ I ^ (e + 1))) D₂.X,
+                  TorusHomOf h τ
+                    ∧ i ≫ ((Over.pullback (thick R I e)).map (snd G₁ G₂)) = τ ≫ g₂.i) := by
   intro R _ _ I e D D₁ D₂ p₁ p₂ q₁ q₂ G₁ G₂ _ _ _ _ g₁ g₂ hD
   let F := Over.pullback (thick R I e)
   let S₀ := Sp (R ⧸ I ^ (e + 1))
@@ -77,18 +112,19 @@ theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (e : ℕ) 
   let j₂ : D₂.X →+ D.X := E.symm.toAddMonoidHom.comp (AddMonoidHom.inr D₁.X D₂.X)
   let τ₁ := GlobalTheory.SplitTorusPow.torusMap S₀ j₁
   let τ₂ := GlobalTheory.SplitTorusPow.torusMap S₀ j₂
-  have hτmon {X X' : Type} [AddCommGroup X] [AddCommGroup X'] (φ : X →+ X') :
-      IsMonHom (GlobalTheory.SplitTorusPow.torusMap S₀ φ) := by
+  have hτmon {X X' : Type} [AddCommGroup X] [AddCommGroup X'] (φ : X →+ X')
+      : IsMonHom (GlobalTheory.SplitTorusPow.torusMap S₀ φ) := by
     refine ⟨?_, ?_⟩
-    · have h : (1 : 𝟙_ (Over S₀) ⟶ splitTorus S₀ X') ≫
-          GlobalTheory.SplitTorusPow.torusMap S₀ φ = 1 := by
+    · have h
+          : (1 : 𝟙_ (Over S₀) ⟶ splitTorus S₀ X') ≫ GlobalTheory.SplitTorusPow.torusMap S₀ φ
+            = 1 := by
         apply (GlobalTheory.splitTorusPointsEquiv S₀ X _).injective
         rw [GlobalTheory.SplitTorusPow.points_comp_torusMap, map_one, map_one, MonoidHom.one_comp]
       simpa [Hom.one_def] using h
-    · have h {Z : Over S₀} (a b : Z ⟶ splitTorus S₀ X') :
-          (a * b) ≫ GlobalTheory.SplitTorusPow.torusMap S₀ φ =
-            (a ≫ GlobalTheory.SplitTorusPow.torusMap S₀ φ) *
-              (b ≫ GlobalTheory.SplitTorusPow.torusMap S₀ φ) := by
+    · have h {Z : Over S₀} (a b : Z ⟶ splitTorus S₀ X')
+          : (a * b) ≫ GlobalTheory.SplitTorusPow.torusMap S₀ φ
+            = (a ≫ GlobalTheory.SplitTorusPow.torusMap S₀ φ)
+              * (b ≫ GlobalTheory.SplitTorusPow.torusMap S₀ φ) := by
         apply (GlobalTheory.splitTorusPointsEquiv S₀ X Z).injective
         rw [map_mul, GlobalTheory.SplitTorusPow.points_comp_torusMap,
           GlobalTheory.SplitTorusPow.points_comp_torusMap,
@@ -102,17 +138,20 @@ theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (e : ℕ) 
   haveI hG : IsIso (lift (F.map (fst G₁ G₂)) (F.map (snd G₁ G₂))) :=
     isIso_prodComparison_of_preservesLimit_pair F G₁ G₂
   haveI := hD.lim
-  have eB : lift (F.map p₁) (F.map p₂) = F.map (lift p₁ p₂) ≫ Functor.OplaxMonoidal.δ F D₁.P.A D₂.P.A :=
+  have eB
+      : lift (F.map p₁) (F.map p₂) = F.map (lift p₁ p₂) ≫ Functor.OplaxMonoidal.δ F D₁.P.A D₂.P.A :=
     (Functor.OplaxMonoidal.lift_δ F p₁ p₂).symm
   haveI hB : IsIso (lift (F.map p₁) (F.map p₂)) := by rw [eB]; infer_instance
   haveI : IsMonHom (inv (lift (F.map (fst G₁ G₂)) (F.map (snd G₁ G₂)))) :=
     inferInstanceAs (IsMonHom (asIso (lift (F.map (fst G₁ G₂)) (F.map (snd G₁ G₂)))).inv)
   haveI : IsMonHom (inv (lift (F.map p₁) (F.map p₂))) :=
     inferInstanceAs (IsMonHom (asIso (lift (F.map p₁) (F.map p₂))).inv)
-  let q := lift (F.map (fst G₁ G₂)) (F.map (snd G₁ G₂)) ≫ (g₁.q ⊗ₘ g₂.q) ≫ inv (lift (F.map p₁) (F.map p₂))
+  let q :=
+    lift (F.map (fst G₁ G₂)) (F.map (snd G₁ G₂)) ≫ (g₁.q ⊗ₘ g₂.q) ≫ inv (lift (F.map p₁) (F.map p₂))
   let i := lift τ₁ τ₂ ≫ (g₁.i ⊗ₘ g₂.i) ≫ inv (lift (F.map (fst G₁ G₂)) (F.map (snd G₁ G₂)))
-  have hP : ∀ (P : MorphismProperty Scheme.{0}) [P.IsMultiplicative] [P.IsStableUnderBaseChange],
-      P g₁.q.left → P g₂.q.left → P q.left := by
+  have hP
+      : ∀ (P : MorphismProperty Scheme.{0}) [P.IsMultiplicative] [P.IsStableUnderBaseChange],
+        P g₁.q.left → P g₂.q.left → P q.left := by
     intro P _ _ h₁ h₂
     haveI : IsIso (lift (F.map (fst G₁ G₂)) (F.map (snd G₁ G₂))).left :=
       inferInstanceAs (IsIso ((Over.forget _).map (lift (F.map (fst G₁ G₂)) (F.map (snd G₁ G₂)))))
@@ -138,7 +177,8 @@ theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (e : ℕ) 
       rw [IsIso.inv_comp_eq, lift_snd]
     rw [Category.assoc, Category.assoc, this, tensorHom_snd, lift_snd_assoc]
 
-  have key := GlobalTheory.SemiProd.kernel_tensor _ _ _ _ _ _ _ g₁.i g₂.i g₁.q g₂.q g₁.isKernel g₂.isKernel
+  have key :=
+    GlobalTheory.SemiProd.kernel_tensor _ _ _ _ _ _ _ g₁.i g₂.i g₁.q g₂.q g₁.isKernel g₂.isKernel
   have hK : IsPullback i (toUnit _) q (η[thickObj R I e D.P.A]) := by
     refine IsPullback.of_iso key (asIso (lift τ₁ τ₂)).symm
       (asIso (lift (F.map (fst G₁ G₂)) (F.map (snd G₁ G₂)))).symm (Iso.refl _)
@@ -163,8 +203,20 @@ theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (e : ℕ) 
     change (q₁.prod q₂) (h y) = E (E.symm (0, y))
     rw [AddEquiv.apply_symm_apply]
     exact Prod.ext (h₁ y) (h₂ y)
-  refine ⟨q, i, inferInstance, hP @Flat g₁.q_flat g₂.q_flat, hP @Surjective g₁.q_surj g₂.q_surj,
-    hP @IsAffineHom g₁.q_affine g₂.q_affine, inferInstance, hK, hq₁, hq₂, fun h h₁ h₂ => ?_, fun h h₁ h₂ => ?_⟩
+  refine ⟨
+    q,
+    i,
+    inferInstance,
+    hP @Flat g₁.q_flat g₂.q_flat,
+    hP @Surjective g₁.q_surj g₂.q_surj,
+    hP @IsAffineHom g₁.q_affine g₂.q_affine,
+    inferInstance,
+    hK,
+    hq₁,
+    hq₂,
+    fun h h₁ h₂ => ?_,
+    fun h h₁ h₂ => ?_
+  ⟩
   · refine ⟨τ₁, ?_, hi₁⟩
     rw [hE₁ h h₁ h₂]
     exact GlobalTheory.MumProd.torusHomOf_torusMap j₁

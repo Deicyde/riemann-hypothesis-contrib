@@ -6,9 +6,13 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TraceSpl
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Global GroundTheory.Global.SemiLocal
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 Formalism.BasicNotions GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 Formalism.BasicNotions
+  GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 open Formalism.L2.Host UpperTheory.V.Published UpperTheory.CBC
 open scoped Classical
 open UpperTheory.Gal.InertialTypesAlt.G
@@ -19,53 +23,72 @@ namespace UpperTheory.Gal.InertialTypesAlt.G.WP
 
 variable {K : Type} [Field K] [NumberField K]
 
-private theorem module_local (v : HeightOneSpectrum (𝓞 K)) (x : (v.adicCompletion K)ˣ) :
-    ((GroundTheory.Global.IdeleGroup.ideleModule K (Neutral.B1.localIdele K v x)).1 : ℝ) = ‖(x : v.adicCompletion K)‖ := by
+private theorem module_local (v : HeightOneSpectrum (𝓞 K)) (x : (v.adicCompletion K)ˣ)
+    : ((GroundTheory.Global.IdeleGroup.ideleModule K (Neutral.B1.localIdele K v x)).1 : ℝ)
+      = ‖(x : v.adicCompletion K)‖ := by
   have : Neutral.B1.localIdele K v x = GroundTheory.Global.IdeleGroup.finiteEmbedding v x := by
     apply Units.ext
     rfl
   rw [this]
   exact GroundTheory.Global.IdeleGroup.ideleModule_finiteEmbedding v x
 
-private theorem norm_of_val (v : HeightOneSpectrum (𝓞 K)) (x : v.adicCompletion K) (n : ℤ)
-    (h : Valued.v x = WithZero.exp n) : ‖x‖ = (Ideal.absNorm v.asIdeal : ℝ) ^ n := by
+private theorem norm_of_val
+    (v : HeightOneSpectrum (𝓞 K)) (x : v.adicCompletion K) (n : ℤ) (h : Valued.v x = WithZero.exp n)
+    : ‖x‖ = (Ideal.absNorm v.asIdeal : ℝ) ^ n := by
   rw [FinitePlace.norm_def, h, WithZeroMulInt.toNNReal_neg_apply _ WithZero.exp_ne_zero]
   simp [WithZero.log_exp]
 
-private theorem pow_loc {χ : HChar K} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s) (v : HeightOneSpectrum (𝓞 K)) (x : (v.adicCompletion K)ˣ) :
-    ((χ.loc v x : ℂˣ) : ℂ) = ((‖(x : v.adicCompletion K)‖ : ℝ) : ℂ) ^ s := by
+private theorem pow_loc
+    {χ : HChar K} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s)
+    (v : HeightOneSpectrum (𝓞 K)) (x : (v.adicCompletion K)ˣ)
+    : ((χ.loc v x : ℂˣ) : ℂ) = ((‖(x : v.adicCompletion K)‖ : ℝ) : ℂ) ^ s := by
   rw [← module_local]
   exact h _
 
-private theorem pow_unr {χ : HChar K} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s) (v : HeightOneSpectrum (𝓞 K)) : χ.UnrAt v := fun x hx => by
+private theorem pow_unr
+    {χ : HChar K} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s)
+    (v : HeightOneSpectrum (𝓞 K))
+    : χ.UnrAt v := fun x hx => by
   apply Units.ext
   rw [pow_loc h, norm_of_val v _ 0 (by simpa [Formalism.L2.Host.IsUnitAt] using hx)]
   simp
 
-private theorem pow_val {χ : HChar K} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s) (v : HeightOneSpectrum (𝓞 K)) :
-    ((χ.val v : ℂˣ) : ℂ) = ((Formalism.ConjugateSelfDual.normV v : ℕ) : ℂ) ^ (-s) := by
+private theorem pow_val
+    {χ : HChar K} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s)
+    (v : HeightOneSpectrum (𝓞 K))
+    : ((χ.val v : ℂˣ) : ℂ) = ((Formalism.ConjugateSelfDual.normV v : ℕ) : ℂ) ^ (-s) := by
   have e : χ.val v = χ.loc v (Formalism.L2.Host.atFin v (Formalism.L2.Host.unif v)) := rfl
   have e2 : (Formalism.ConjugateSelfDual.normV v : ℕ) = Ideal.absNorm v.asIdeal := by
     rw [Formalism.ConjugateSelfDual.normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]
-  rw [e, pow_loc h, norm_of_val v _ (-1) (Formalism.L2.Host.unif_spec v), e2, zpow_neg_one, Complex.ofReal_inv,
+  rw [e, pow_loc h, norm_of_val v _ (-1) (Formalism.L2.Host.unif_spec v), e2, zpow_neg_one,
+    Complex.ofReal_inv,
     Complex.inv_cpow _ _ (by
       rw [Complex.arg_ofReal_of_nonneg (by positivity)]
-      exact Real.pi_pos.ne), Complex.cpow_neg]
+      exact Real.pi_pos.ne),
+    Complex.cpow_neg]
   simp
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  [_root_.NumberField.IsTotallyComplex F] [_root_.NumberField.IsTotallyComplex E] {n : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  [_root_.NumberField.IsTotallyComplex F] [_root_.NumberField.IsTotallyComplex E]
+  {n : ℕ}
 
-private theorem val_pow {χ : HChar F} {χ' : HChar E} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s) (h' : UpperTheory.ConvolutionTheory.T.IsPow χ' s)
-    (w : HeightOneSpectrum (𝓞 E)) (f : ℕ) (hf : Formalism.ConjugateSelfDual.normV w = Formalism.ConjugateSelfDual.normV (w.under (𝓞 F)) ^ f) :
-    χ'.val w = χ.val (w.under (𝓞 F)) ^ f := by
+private theorem val_pow
+    {χ : HChar F} {χ' : HChar E} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s)
+    (h' : UpperTheory.ConvolutionTheory.T.IsPow χ' s)
+    (w : HeightOneSpectrum (𝓞 E)) (f : ℕ)
+    (hf
+      : Formalism.ConjugateSelfDual.normV w = Formalism.ConjugateSelfDual.normV (w.under (𝓞 F)) ^ f)
+    : χ'.val w = χ.val (w.under (𝓞 F)) ^ f := by
   apply Units.ext
   rw [Units.val_pow_eq_pow_val, pow_val h, pow_val h', hf, Nat.cast_pow, ← Complex.cpow_nat_mul,
     Complex.natCast_cpow_natCast_mul]
 
-private theorem weak_twist {χ : HChar F} {χ' : HChar E} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s) (h' : UpperTheory.ConvolutionTheory.T.IsPow χ' s)
-    (π : CuspSub F n) (P : CuspSub E n) (H : WeakBC (Cusp.cx π).sat (Cusp.cx P).sat) :
-    WeakBC (Cusp.cx (π.twist χ)).sat (Cusp.cx (P.twist χ')).sat := by
+private theorem weak_twist
+    {χ : HChar F} {χ' : HChar E} {s : ℂ} (h : UpperTheory.ConvolutionTheory.T.IsPow χ s)
+    (h' : UpperTheory.ConvolutionTheory.T.IsPow χ' s)
+    (π : CuspSub F n) (P : CuspSub E n) (H : WeakBC (Cusp.cx π).sat (Cusp.cx P).sat)
+    : WeakBC (Cusp.cx (π.twist χ)).sat (Cusp.cx (P.twist χ')).sat := by
   refine Filter.Eventually.mono H fun w hw f hf => ?_
   obtain ⟨B, hB, hB'⟩ := hw f hf
   refine ⟨B.map (· * χ.val (w.under (𝓞 F))), ?_, ?_⟩
@@ -80,7 +103,7 @@ private theorem weak_twist {χ : HChar F} {χ' : HChar E} {s : ℂ} (h : UpperTh
 end UpperTheory.Gal.InertialTypesAlt.G.WP
 
 open UpperTheory.Gal.InertialTypesAlt.G.WP in
-theorem UpperTheory.Gal.InertialTypesAlt.G.weakPow :
-    UpperTheory.Gal.InertialTypesAlt.G.WeakPow := by
+theorem UpperTheory.Gal.InertialTypesAlt.G.weakPow
+    : UpperTheory.Gal.InertialTypesAlt.G.WeakPow := by
   intro F E _ _ _ _ _ _ _ _ σ _ _ n _ z χ χ' h h' π P H
   exact weak_twist h h' π P H

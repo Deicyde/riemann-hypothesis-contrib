@@ -11,15 +11,20 @@ noncomputable section
 
 open CategoryTheory Limits AlgebraicGeometry NumberField
 open scoped TensorProduct NNReal
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Pdiv ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.EigenSplit GlobalTheory.HTLat GlobalTheory.ShFam Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Pdiv
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.EigenSplit GlobalTheory.HTLat GlobalTheory.ShFam Formalism.L2.Pj
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts
 open Formalism.MainNotions.DIV.Cons (SCF intO)
 
 namespace GlobalTheory.LocM
 
 section Generic
 
-variable {p : ℕ} [Fact p.Prime] {C : SCF p} {Λ : Type} [CommRing Λ] [StarRing Λ]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {C : SCF p} {Λ : Type} [CommRing Λ] [StarRing Λ]
   (P : Point p (fldVal C) ↥(intO ↥C.S) Λ)
 
 def tateIncl : P.T →+ P.V := (TensorProduct.mk ℤ_[p] ↥C.S P.T 1).toAddMonoidHom
@@ -47,17 +52,18 @@ namespace At
 
 variable (ct : At S κ p)
 
-def htPt {Z : ct.Mdl} (y : ct.Pt Z) :
-    letI : Fact p.Prime := ⟨ct.hp⟩; letI := A.H.starRing; Point p (fldVal y.C) ↥(intO ↥y.C.S) (𝓞 D.host.E) :=
+def htPt {Z : ct.Mdl} (y : ct.Pt Z)
+    : letI : Fact p.Prime := ⟨ct.hp⟩
+      letI := A.H.starRing; Point p (fldVal y.C) ↥(intO ↥y.C.S) (𝓞 D.host.E) :=
   letI : Fact p.Prime := ⟨ct.hp⟩
   htPoint (ct.dat y)
 
 def psiEmb (D : D7) (τ : PsiT D) : D.host.E →+* ℂ := DV.tauEmb D (D.eTau.symm τ)
 
-
 open Classical in
-def eigProj {Z : ct.Mdl} (y : ct.Pt Z) (σ : D.host.E →+* ℂ) :
-    letI : Fact p.Prime := ⟨ct.hp⟩; letI := A.H.starRing; (ct.htPt y).V →ₗ[↥y.C.S] (ct.htPt y).V :=
+def eigProj {Z : ct.Mdl} (y : ct.Pt Z) (σ : D.host.E →+* ℂ)
+    : letI : Fact p.Prime := ⟨ct.hp⟩
+      letI := A.H.starRing; (ct.htPt y).V →ₗ[↥y.C.S] (ct.htPt y).V :=
   letI : Fact p.Prime := ⟨ct.hp⟩
   letI := A.H.starRing
   proj (isSplitting_embInt y.P) (ct.htPt y).actV σ
@@ -67,7 +73,8 @@ end At
 def htpTrue (ct : At S κ p) : HTpSt ct :=
   letI : Fact p.Prime := ⟨ct.hp⟩
   letI := A.H.starRing
-  { Tp := fun y => (ct.htPt y).T
+  {
+    Tp := fun y => (ct.htPt y).T
     tpAdd := fun _ => inferInstance
     OmV := fun y => (ct.htPt y).OmC
     omAdd := fun _ => inferInstance
@@ -84,7 +91,8 @@ def htpTrue (ct : At S κ p) : HTpSt ct :=
     htC_iT := fun y => alC_tateIncl (ct.htPt y)
     psiC := fun y => (ct.htPt y).pairV
     lieGt1 := fun y => lieSpan (ct.htPt y)
-    eT := fun y τ => ct.eigProj y (At.psiEmb D τ) }
+    eT := fun y τ => ct.eigProj y (At.psiEmb D τ)
+  }
 
 namespace HTp
 

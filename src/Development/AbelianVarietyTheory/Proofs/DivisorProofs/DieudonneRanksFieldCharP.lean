@@ -21,11 +21,13 @@ open PDiv
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
-theorem finrank_eq_of_semilinear_surjective {W k M V : Type} [CommRing W] [Nontrivial W] [Field k]
-    [AddCommGroup M] [Module W M] [Module.Free W M] [Module.Finite W M] [AddCommGroup V] [Module k V]
-    {σ : W →+* k} (hσ : Function.Surjective σ) {q : ℕ} (hq : (q : k) = 0) (r : M →ₛₗ[σ] V)
-    (hr : Function.Surjective r) (hk : ∀ m, r m = 0 → ∃ n, m = q • n) :
-    Module.Finite k V ∧ Module.finrank k V = Module.finrank W M := by
+theorem finrank_eq_of_semilinear_surjective
+    {W k M V : Type} [CommRing W] [Nontrivial W] [Field k] [AddCommGroup M] [Module W M]
+    [Module.Free W M] [Module.Finite W M] [AddCommGroup V] [Module k V]
+    {σ : W →+* k} (hσ : Function.Surjective σ)
+    {q : ℕ} (hq : (q : k) = 0)
+    (r : M →ₛₗ[σ] V) (hr : Function.Surjective r) (hk : ∀ m, r m = 0 → ∃ n, m = q • n)
+    : Module.Finite k V ∧ Module.finrank k V = Module.finrank W M := by
   let b := Module.finBasis W M
   have h1 : LinearIndependent k fun i => r (b i) := by
     refine Fintype.linearIndependent_iff.2 fun c hc i => ?_
@@ -51,19 +53,20 @@ end BaseChange
 variable (hW : Published.BarsottiTateDieudonne.WittModule) {K : Type} [Field K] (h : (p : K) = 0)
 include hW h
 
-
 omit hW in
-theorem range_rigExtMap_relFrob (G : PDivGroup p K) :
-    LinearMap.range (rigExtMap (relFrob h G)) =
-      Submodule.span K (Set.range ⇑(SemiHom.rig (absFrob h G))) := by
+theorem range_rigExtMap_relFrob (G : PDivGroup p K)
+    : LinearMap.range (rigExtMap (relFrob h G))
+      = Submodule.span K (Set.range ⇑(SemiHom.rig (absFrob h G))) := by
   refine le_antisymm ?_ (Submodule.span_le.2 ?_)
   · rintro _ ⟨x, rfl⟩
-    have induct (P : (frobTwist h G).RigExt → Prop)
-        (htmul : ∀ (r : K) y, P (r • (frobProj h G).rig y))
-        (hadd : ∀ x y, P x → P y → P (x + y)) : P x := by
+    have induct
+        (P : (frobTwist h G).RigExt → Prop)
+        (htmul : ∀ (r : K) y, P (r • (frobProj h G).rig y)) (hadd : ∀ x y, P x → P y → P (x + y))
+        : P x := by
       letI := (frobRing h).toAlgebra
-      obtain ⟨y, rfl⟩ := (liftSemi_rig_bijective (R := K) K G h
-        (.inl (@Module.Flat.of_free K K _ _ (_) (@Module.Free.of_divisionRing K K _ _ (_))))).2 x
+      obtain ⟨y, rfl⟩ :=
+        (liftSemi_rig_bijective (R := K) K G h
+          (.inl (@Module.Flat.of_free K K _ _ (_) (@Module.Free.of_divisionRing K K _ _ (_))))).2 x
       induction y using TensorProduct.inductionOn with
       | tmul r y => exact htmul r y
       | add x y hx hy => exact (congrArg P (map_add _ _ _)).mpr (hadd _ _ hx hy)
@@ -74,7 +77,6 @@ theorem range_rigExtMap_relFrob (G : PDivGroup p K) :
       exact add_mem hx hy
   · rintro _ ⟨y, rfl⟩
     exact ⟨_, rigExtMap_relFrob_rig h G y⟩
-
 
 end PDivGroup
 

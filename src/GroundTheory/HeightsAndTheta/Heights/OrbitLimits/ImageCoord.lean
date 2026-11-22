@@ -11,15 +11,19 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
-theorem ImageCoord.mConeMap_rename {K : Type} {ι : K → Type} {K' : Type} {ι' : K' → Type}
+theorem ImageCoord.mConeMap_rename
+    {K : Type} {ι : K → Type} {K' : Type} {ι' : K' → Type}
     (κ : K → K') (v : (Σ k, ι k) → (Σ k', ι' k')) (hv : ∀ p, (v p).1 = κ p.1)
-    {Ω : Type} [Field Ω] (y : (Σ k', ι' k') → Ω) (f : MRing ι) :
-    mConeMap y (rename v f) = rename κ (mConeMap (y ∘ v) f) := by
-  have h : ((mConeMap y).comp (rename v : MRing ι →ₐ[ℤ] MRing ι')) =
-      ((rename κ : MvPolynomial K Ω →ₐ[Ω] MvPolynomial K' Ω).restrictScalars ℤ).comp
-        (mConeMap (y ∘ v)) := by
+    {Ω : Type} [Field Ω]
+    (y : (Σ k', ι' k') → Ω) (f : MRing ι)
+    : mConeMap y (rename v f) = rename κ (mConeMap (y ∘ v) f) := by
+  have h
+      : ((mConeMap y).comp (rename v : MRing ι →ₐ[ℤ] MRing ι'))
+        = ((rename κ : MvPolynomial K Ω →ₐ[Ω] MvPolynomial K' Ω).restrictScalars ℤ).comp
+          (mConeMap (y ∘ v)) := by
     apply MvPolynomial.algHom_ext
     intro p
     simp [mConeMap, hv p]

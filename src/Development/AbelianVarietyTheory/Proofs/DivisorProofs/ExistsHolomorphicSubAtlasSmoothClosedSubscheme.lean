@@ -37,16 +37,30 @@ public import ReciprocityTheory.AnalyticForms.PotentialTheory.ProjectiveLinePart
 set_option autoImplicit false
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic GlobalTheory.ChartGlue GlobalTheory.Mix
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic
+  GlobalTheory.ChartGlue GlobalTheory.Mix
 
 namespace GlobalTheory.Mix
 
-
 open GlobalTheory.Mean4O.CombForm in
-theorem exists_subAtlas : ∀ (k : Type) [CommRing k] (X Y : Scheme.{0}) (p : X ⟶ Sp k) (q : Y ⟶ Sp k) (σ : k →+* ℂ), IsProjOver p → ∀ (π : Y ⟶ X) [IsClosedImmersion π] (hπ : π ≫ p = q) (e : ℕ) (A : FinHolAtlas (e + 1) (CxPts p σ)), IsAlgAtlas A → SmoothOfRelativeDimension e q → ∃ B : FinHolAtlas e (Set.range (ptMap π hπ σ)), HoloMap B A Subtype.val ∧ ∀ (L : Fin e → MLine p σ) (v : CxPts p σ → ℝ), Continuous v → mInt B (fun i => (L i).φ.locPot.pullback Subtype.val continuous_subtype_val) (v ∘ Subtype.val) = Mix.int (fun i => (L i).pull π hπ) (fun y => v (ptMap π hπ σ y)) := by
+theorem exists_subAtlas
+    : ∀ (k : Type) [CommRing k] (X Y : Scheme.{0}) (p : X ⟶ Sp k) (q : Y ⟶ Sp k) (σ : k →+* ℂ),
+      IsProjOver p
+        → ∀ (π : Y ⟶ X) [IsClosedImmersion π] (hπ : π ≫ p = q) (e : ℕ)
+            (A : FinHolAtlas (e + 1) (CxPts p σ)),
+          IsAlgAtlas A → SmoothOfRelativeDimension e q
+            → ∃ B : FinHolAtlas e (Set.range (ptMap π hπ σ)),
+              HoloMap B A Subtype.val
+                ∧ ∀ (L : Fin e → MLine p σ) (v : CxPts p σ → ℝ),
+                  Continuous v
+                    → mInt B
+                        (fun i => (L i).φ.locPot.pullback Subtype.val continuous_subtype_val)
+                        (v ∘ Subtype.val)
+                      = Mix.int (fun i => (L i).pull π hπ) (fun y => v (ptMap π hπ σ y)) := by
   intro k _ X Y p q σ hp π _ hπ e A hA hs
   have hq : IsProjOver q := by
     obtain ⟨N, i, hi, h⟩ := hp
@@ -70,7 +84,10 @@ theorem exists_subAtlas : ∀ (k : Type) [CommRing k] (X Y : Scheme.{0}) (p : X 
   have hv' : Continuous fun y => v (ptMap π hπ σ y) := hv.comp hc
   have hP (i : Fin e) : IsPotential A' ((L i).pull π hπ).φ.locPot :=
     Weight.isPotential_locPot ((Weight.isCInf_iff_isSmooth _).1 ((L i).pull π hπ).cInf)
-  obtain ⟨h₁, h₂⟩ := GlobalTheory.T.mixedChernIntegral_eq_mongeAmpereIntegral_compact k Y q σ e A' hA' (fun i => (L i).pull π hπ) _ hv'.measurable
+  obtain ⟨h₁, h₂⟩ :=
+    GlobalTheory.T.mixedChernIntegral_eq_mongeAmpereIntegral_compact k Y q σ e A' hA'
+      (fun i => (L i).pull π hπ)
+      _ hv'.measurable
   rw [h₂ (h₁.2 (mIntegrableCont _ _ hP _ hv')),
     GlobalTheory.Adopt.mongeAmpereIntegral_invariant_homeomorph_transport e _ _ A' h _ _
       (fun i => isPotentialPullback A _ _ hB _ ((hsm i).isPotential hA))

@@ -15,15 +15,23 @@ open PI PI.QuotSetU PI.QuotSetU.UnitaryGroupMassFormula.SW Formalism.REAL
 
 variable {k r : ℕ}
 
-def fcol (k r : ℕ) (e f : Fin r → Fin (2 * r + k + 1) → ℂ) (wf : Fin k → Fin (2 * r + k + 1) → ℂ)
-    (z0 : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1)) : Fin (2 * r + k + 1) → ℂ :=
-  if h1 : i.val < r then e ⟨i.val, h1⟩
-  else if h2 : i.val < r + k then wf ⟨i.val - r, by omega⟩
-  else if h3 : i.val = r + k then z0
-  else f ⟨2 * r + k - i.val, by have := i.isLt; omega⟩
+def fcol
+    (k r : ℕ) (e f : Fin r → Fin (2 * r + k + 1) → ℂ) (wf : Fin k → Fin (2 * r + k + 1) → ℂ)
+    (z0 : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1))
+    : Fin (2 * r + k + 1) → ℂ :=
+  if h1 : i.val < r then
+    e ⟨i.val, h1⟩
+  else if h2 : i.val < r + k then
+    wf ⟨i.val - r, by omega⟩
+  else if h3 : i.val = r + k then
+    z0
+  else
+    f ⟨2 * r + k - i.val, by have := i.isLt; omega⟩
 
-def Pm (k r : ℕ) (e f : Fin r → Fin (2 * r + k + 1) → ℂ) (wf : Fin k → Fin (2 * r + k + 1) → ℂ)
-    (z0 : Fin (2 * r + k + 1) → ℂ) : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ :=
+def Pm
+    (k r : ℕ) (e f : Fin r → Fin (2 * r + k + 1) → ℂ) (wf : Fin k → Fin (2 * r + k + 1) → ℂ)
+    (z0 : Fin (2 * r + k + 1) → ℂ)
+    : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ :=
   Matrix.of fun a j => fcol k r e f wf z0 j a
 
 lemma hJ_swap {n : ℕ} (ε : Fin n → Bool) (x y : Fin n → ℂ) : hJ ε y x = star (hJ ε x y) := by
@@ -33,7 +41,8 @@ lemma hJ_swap {n : ℕ} (ε : Fin n → Bool) (x y : Fin n → ℂ) : hJ ε y x 
 
 section Frame
 
-variable {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
+variable
+  {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
   {wf : Fin k → Fin (2 * r + k + 1) → ℂ} {z0 : Fin (2 * r + k + 1) → ℂ}
 
 lemma pm_mulVec_single (j : Fin (2 * r + k + 1)) :
@@ -79,9 +88,10 @@ lemma gram_eq_Hpk : (Pm k r e f wf z0)ᴴ * Jm ε * Pm k r e f wf z0 = Hpk k r :
       wz, Fin.mk.injEq] <;>
     (try split_ifs) <;> first | rfl | (exfalso; omega)
 
-def Qm (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (e f : Fin r → Fin (2 * r + k + 1) → ℂ)
-    (wf : Fin k → Fin (2 * r + k + 1) → ℂ) (z0 : Fin (2 * r + k + 1) → ℂ) :
-    Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ :=
+def Qm
+    (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (e f : Fin r → Fin (2 * r + k + 1) → ℂ)
+    (wf : Fin k → Fin (2 * r + k + 1) → ℂ) (z0 : Fin (2 * r + k + 1) → ℂ)
+    : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ :=
   Hpk k r * (Pm k r e f wf z0)ᴴ * Jm ε
 
 lemma qm_mul_pm : Qm k r ε e f wf z0 * Pm k r e f wf z0 = 1 := by
@@ -197,21 +207,28 @@ lemma inUJ_iff_UH (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
   · intro h
     rw [← back (gᴴ * Jm ε * g), h, back]
 
-theorem frame_conj_iff {z : Fin (2 * r + k + 1) → ℂ} {c : ℂ} (hc : c ≠ 0) (hz : z0 = c • z)
-    (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
-    (inUJ ε g ∧ InN ε e z g) ↔ Qm k r ε e f wf z0 * g * Pm k r e f wf z0 ∈ Nset k r := by
+theorem frame_conj_iff
+    {z : Fin (2 * r + k + 1) → ℂ} {c : ℂ} (hc : c ≠ 0) (hz : z0 = c • z)
+    (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : (inUJ ε g ∧ InN ε e z g) ↔ Qm k r ε e f wf z0 * g * Pm k r e f wf z0 ∈ Nset k r := by
   have hPQ := pm_mul_qm hF
-  have hE : (∀ a : Fin r, (g - 1) *ᵥ e a ∈ spanLt e a.1) ↔
-      (∀ (a : Fin r) (i : Fin (2 * r + k + 1)), a.val ≤ i.val →
-        (Qm k r ε e f wf z0 * g * Pm k r e f wf z0) i (eI k r a) = if i = eI k r a then 1 else 0) := by
+  have hE
+      : (∀ a : Fin r, (g - 1) *ᵥ e a ∈ spanLt e a.1)
+        ↔ (∀ (a : Fin r) (i : Fin (2 * r + k + 1)),
+          a.val ≤ i.val
+            → (Qm k r ε e f wf z0 * g * Pm k r e f wf z0) i (eI k r a)
+              = if i = eI k r a then 1 else 0) := by
     refine forall_congr' fun a => ?_
     rw [mem_spanLt_iff hF a.isLt.le]
     refine forall_congr' fun i => imp_congr_right fun _ => ?_
-    rw [← fcol_eI (k := k) (e := e) (f := f) (wf := wf) (z0 := z0) a, colm hF, sub_eq_zero, Matrix.one_apply]
-  have hM : (∀ j : Fin (2 * r + k + 1), r ≤ j.val → j.val ≤ r + k →
-        (g - 1) *ᵥ fcol k r e f wf z0 j ∈ spanLt e r) ↔
-      (∀ i j : Fin (2 * r + k + 1), r ≤ j.val → j.val ≤ r + k → r ≤ i.val →
-        (Qm k r ε e f wf z0 * g * Pm k r e f wf z0) i j = if i = j then 1 else 0) := by
+    rw [← fcol_eI (k := k) (e := e) (f := f) (wf := wf) (z0 := z0) a, colm hF, sub_eq_zero,
+      Matrix.one_apply]
+  have hM
+      : (∀ j : Fin (2 * r + k + 1),
+          r ≤ j.val → j.val ≤ r + k → (g - 1) *ᵥ fcol k r e f wf z0 j ∈ spanLt e r)
+        ↔ (∀ i j : Fin (2 * r + k + 1),
+          r ≤ j.val → j.val ≤ r + k → r ≤ i.val
+            → (Qm k r ε e f wf z0 * g * Pm k r e f wf z0) i j = if i = j then 1 else 0) := by
     constructor
     · intro h i j hj1 hj2 hi
       have := (mem_spanLt_iff hF le_rfl _).1 (h j hj1 hj2) i hi
@@ -259,6 +276,12 @@ end Frame
 
 theorem frame_conjugation_unimodular : FrameConj := by
   intro k r ε e f wf z0 z c hF hc hz
-  exact ⟨Pm k r e f wf z0, Qm k r ε e f wf z0, qm_mul_pm hF, pm_mul_qm hF, fun g => frame_conj_iff hF hc hz g⟩
+  exact ⟨
+    Pm k r e f wf z0,
+    Qm k r ε e f wf z0,
+    qm_mul_pm hF,
+    pm_mul_qm hF,
+    fun g => frame_conj_iff hF hc hz g
+  ⟩
 
 end PI.NUnimodLoc.UnitaryGroupMassFormula.FC

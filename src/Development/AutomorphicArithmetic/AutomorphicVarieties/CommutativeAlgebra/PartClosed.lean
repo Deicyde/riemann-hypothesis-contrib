@@ -7,9 +7,12 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem wcomp_mul_homog {O σ X : Type} [CommRing O] [AddCommGroup X] (wt : σ → X) {c : X}
-    {a : MvPowerSeries σ O} (ha : a ∈ wtPart O wt c) (j : X) (b : MvPowerSeries σ O) :
-    wcomp O wt j (b * a) = wcomp O wt (j - c) b * a := by
+private theorem wcomp_mul_homog
+    {O σ X : Type} [CommRing O] [AddCommGroup X]
+    (wt : σ → X)
+    {c : X} {a : MvPowerSeries σ O} (ha : a ∈ wtPart O wt c)
+    (j : X) (b : MvPowerSeries σ O)
+    : wcomp O wt j (b * a) = wcomp O wt (j - c) b * a := by
   classical
   ext n
   rw [coeff_wcomp, coeff_mul, coeff_mul]
@@ -28,9 +31,10 @@ private theorem wcomp_mul_homog {O σ X : Type} [CommRing O] [AddCommGroup X] (w
       exact h (by rw [← hp', map_add (f := _), h1, h2, sub_add_cancel])
     · rw [ha _ h2, mul_zero]
 
-private theorem homog_of_span {O σ X : Type} [CommRing O] [AddCommGroup X] (wt : σ → X)
-    (S : Set (MvPowerSeries σ O)) (hS : ∀ a ∈ S, ∃ c, a ∈ wtPart O wt c) :
-    IsHomog O wt (Ideal.span S) := by
+private theorem homog_of_span
+    {O σ X : Type} [CommRing O] [AddCommGroup X]
+    (wt : σ → X) (S : Set (MvPowerSeries σ O)) (hS : ∀ a ∈ S, ∃ c, a ∈ wtPart O wt c)
+    : IsHomog O wt (Ideal.span S) := by
   intro f hf j
   have key : ∀ b : MvPowerSeries σ O, ∀ j, wcomp O wt j (b * f) ∈ Ideal.span S := by
     induction hf using Submodule.span_induction with
@@ -39,7 +43,8 @@ private theorem homog_of_span {O σ X : Type} [CommRing O] [AddCommGroup X] (wt 
       obtain ⟨c, hc⟩ := hS a ha
       rw [wcomp_mul_homog wt hc]
       exact Ideal.mul_mem_left _ _ (Ideal.subset_span ha)
-    | zero => intro b j; simp
+    | zero =>
+      intro b j; simp
     | add x y _ _ hx hy =>
       intro b j
       rw [mul_add, map_add (f := _)]
@@ -50,11 +55,14 @@ private theorem homog_of_span {O σ X : Type} [CommRing O] [AddCommGroup X] (wt 
       exact hx _ j
   simpa using key 1 j
 
-private theorem homog_span_pow {O σ X : Type} [CommRing O] [AddCommGroup X] (wt : σ → X)
-    (S : Set (MvPowerSeries σ O)) (hS : ∀ a ∈ S, ∃ c, a ∈ wtPart O wt c) (N : ℕ) :
-    IsHomog O wt (Ideal.span S ^ N) := by
-  have key : ∃ T : Set (MvPowerSeries σ O), (∀ a ∈ T, ∃ c, a ∈ wtPart O wt c) ∧
-      Ideal.span S ^ N = Ideal.span T := by
+private theorem homog_span_pow
+    {O σ X : Type} [CommRing O] [AddCommGroup X]
+    (wt : σ → X) (S : Set (MvPowerSeries σ O)) (hS : ∀ a ∈ S, ∃ c, a ∈ wtPart O wt c)
+    (N : ℕ)
+    : IsHomog O wt (Ideal.span S ^ N) := by
+  have key
+      : ∃ T : Set (MvPowerSeries σ O),
+        (∀ a ∈ T, ∃ c, a ∈ wtPart O wt c) ∧ Ideal.span S ^ N = Ideal.span T := by
     induction N with
     | zero =>
       refine ⟨{1}, ?_, by simp⟩
@@ -71,12 +79,19 @@ private theorem homog_span_pow {O σ X : Type} [CommRing O] [AddCommGroup X] (wt
   rw [hT']
   exact homog_of_span wt T hT
 
-private theorem mem_span_X {O σ : Type} [CommRing O] [Fintype σ] (f : MvPowerSeries σ O)
-    (hf : constantCoeff f = 0) : f ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) :=
+private theorem mem_span_X
+    {O σ : Type} [CommRing O] [Fintype σ] (f : MvPowerSeries σ O) (hf : constantCoeff f = 0)
+    : f ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) :=
   _root_.UpperTheory.Reformulated.B.MemSpanVariable.mem_span_X f hf
 
-theorem UpperTheory.V.Alg.part_closed :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (W : WPres O X R), (∀ s, W.z s ∈ maximalIdeal R) → ∀ (j : X) (x : R), (∀ N : ℕ, ∃ y ∈ W.part j, x - y ∈ maximalIdeal R ^ N) → x ∈ W.part j := by
+theorem UpperTheory.V.Alg.part_closed
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X]
+        [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
+        (W : WPres O X R),
+      (∀ s, W.z s ∈ maximalIdeal R)
+        → ∀ (j : X) (x : R),
+          (∀ N : ℕ, ∃ y ∈ W.part j, x - y ∈ maximalIdeal R ^ N) → x ∈ W.part j := by
   intro O _ _ _ _ X _ _ _ _ R _ _ hR W hz j x hx
   classical
   have hl : IsLocalHom (algebraMap O R) := IsCO.isLocalHom
@@ -125,8 +140,9 @@ theorem UpperTheory.V.Alg.part_closed :
       · exact (hy n h).symm
     have h4 : g - wcomp O W.wt j g ∈ Ideal.span S ^ N :=
       sub_mem hg (homog_span_pow W.wt S hS N g hg j)
-    have h5 : f - wcomp O W.wt j f =
-        (f - y - g) - wcomp O W.wt j (f - y - g) + (g - wcomp O W.wt j g) := by
+    have h5
+        : f - wcomp O W.wt j f
+          = (f - y - g) - wcomp O W.wt j (f - y - g) + (g - wcomp O W.wt j g) := by
       rw [map_sub, map_sub, h3]; ring
     rw [h5, map_add (f := _), (RingHom.mem_ker).1 (sub_mem h1 h2), zero_add]
     exact Ideal.mem_map_of_mem _ h4

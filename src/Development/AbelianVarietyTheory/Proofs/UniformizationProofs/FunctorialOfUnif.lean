@@ -21,18 +21,19 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Rosat
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
 
 namespace GlobalTheory.UT
 
-
 set_option maxHeartbeats 1000000 in
-theorem functorial_of_unif :
-    AllU fun {_} _ _ {_} {_} {_} {_} _ _ U => Cl.Functorial U := by
+theorem functorial_of_unif : AllU fun {_} _ _ {_} {_} {_} {_} _ _ U => Cl.Functorial U := by
   have hL := GlobalTheory.firstFiveLaws
   obtain ⟨-, h1, h2, h3, h4⟩ := GlobalTheory.twistBaseChange_and_valuation_statements
   have hex := @GlobalTheory.EndData.exists_endU hL

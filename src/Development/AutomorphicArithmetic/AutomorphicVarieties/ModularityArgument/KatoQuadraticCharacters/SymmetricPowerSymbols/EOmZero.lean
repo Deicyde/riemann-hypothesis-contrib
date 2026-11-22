@@ -11,18 +11,19 @@ open GlobalTheory.KZ GlobalTheory.K4
 
 namespace UpperTheory.V.Z.Kato.Sym
 
-private theorem dg_mat (k : ℕ) (hk : 0 < k) :
-    (((dg k : GQ) : GL (Fin 2) ℚ) : Matrix (Fin 2) (Fin 2) ℚ) =
-      (!![(k : ℤ), 0; 0, 1] : Matrix (Fin 2) (Fin 2) ℤ).map (Int.castRingHom ℚ) := by
+private theorem dg_mat (k : ℕ) (hk : 0 < k)
+    : (((dg k : GQ) : GL (Fin 2) ℚ) : Matrix (Fin 2) (Fin 2) ℚ)
+      = (!![(k : ℤ), 0; 0, 1] : Matrix (Fin 2) (Fin 2) ℤ).map (Int.castRingHom ℚ) := by
   have hdet : 0 < (!![(k : ℤ), 0; 0, 1] : Matrix (Fin 2) (Fin 2) ℤ).det := by
     simp [Matrix.det_fin_two_of]
     exact_mod_cast hk
   simp only [dg, toGQ, dif_pos hdet]
   rfl
 
-private theorem ofSL_mat (γ : SL(2, ℤ)) :
-    (((ofSL γ : GQ) : GL (Fin 2) ℚ) : Matrix (Fin 2) (Fin 2) ℚ) =
-      (γ : Matrix (Fin 2) (Fin 2) ℤ).map (Int.castRingHom ℚ) := rfl
+private theorem ofSL_mat (γ : SL(2, ℤ))
+    : (((ofSL γ : GQ) : GL (Fin 2) ℚ) : Matrix (Fin 2) (Fin 2) ℚ)
+      = (γ : Matrix (Fin 2) (Fin 2) ℤ).map (Int.castRingHom ℚ) :=
+  rfl
 
 private theorem eOm_zero' {Ω : Type} [Field Ω] (ε : Ω →+* ℂ) : eOm ε 0 = 1 := by
   have h : Complex.exp (2 * Real.pi * Complex.I * ((0 : ℚ) : ℂ)) = ε 1 := by simp
@@ -62,8 +63,10 @@ theorem galDg : GalDg := by
     change ((d : ℤ) : ZMod (k * M)) = 1 at h11
     have hb := (ZMod.intCast_zmod_eq_zero_iff_dvd b _).mp h01
     have hc := (ZMod.intCast_zmod_eq_zero_iff_dvd c _).mp h10
-    have ha := (ZMod.intCast_eq_intCast_iff_dvd_sub 1 a (k * M)).mp (by rw [Int.cast_one]; exact h00.symm)
-    have hd := (ZMod.intCast_eq_intCast_iff_dvd_sub 1 d (k * M)).mp (by rw [Int.cast_one]; exact h11.symm)
+    have ha :=
+      (ZMod.intCast_eq_intCast_iff_dvd_sub 1 a (k * M)).mp (by rw [Int.cast_one]; exact h00.symm)
+    have hd :=
+      (ZMod.intCast_eq_intCast_iff_dvd_sub 1 d (k * M)).mp (by rw [Int.cast_one]; exact h11.symm)
     push_cast at ha hb hc hd
     have hkz : (k : ℤ) ≠ 0 := by exact_mod_cast hk.ne'
     obtain ⟨c', rfl⟩ : (k : ℤ) ∣ c := dvd_trans (dvd_mul_right _ _) hc

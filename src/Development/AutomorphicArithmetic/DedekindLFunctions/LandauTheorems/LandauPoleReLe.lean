@@ -10,13 +10,13 @@ noncomputable section
 
 namespace Deduction
 
-theorem landau_pole_re_le_bound {g : ℝ → ℝ} {Φ : ℂ → ℂ} {Z : Set ℂ} (hP : PoleData g Φ Z) {σ : ℝ}
-    (hσ : 2 < σ) : ∃ M : ℝ, ∀ s : ℂ, σ ≤ s.re → ‖Φ s‖ ≤ M := by
+theorem landau_pole_re_le_bound
+    {g : ℝ → ℝ} {Φ : ℂ → ℂ} {Z : Set ℂ} (hP : PoleData g Φ Z) {σ : ℝ} (hσ : 2 < σ)
+    : ∃ M : ℝ, ∀ s : ℂ, σ ≤ s.re → ‖Φ s‖ ≤ M := by
   obtain ⟨C, hC⟩ := hP.growth
   refine ⟨∫ u in Ioi (0 : ℝ), C * Real.exp (-(σ - 2) * u), fun s hs => ?_⟩
   rw [hP.laplace s (lt_of_lt_of_le hσ hs)]
-  refine norm_integral_le_of_norm_le
-    ((exp_neg_integrableOn_Ioi 0 (sub_pos.mpr hσ)).const_mul C) ?_
+  refine norm_integral_le_of_norm_le ((exp_neg_integrableOn_Ioi 0 (sub_pos.mpr hσ)).const_mul C) ?_
   filter_upwards [ae_restrict_mem measurableSet_Ioi] with u hu
   have hu0 : 0 ≤ u := le_of_lt hu
   have h1 := hC u hu0
@@ -25,12 +25,13 @@ theorem landau_pole_re_le_bound {g : ℝ → ℝ} {Φ : ℂ → ℂ} {Z : Set �
   have h2 : Real.exp (-s.re * u) ≤ Real.exp (-σ * u) := by
     apply Real.exp_le_exp.mpr
     nlinarith
-  calc |g u| * Real.exp (-s.re * u) ≤ (C * Real.exp (2 * u)) * Real.exp (-σ * u) :=
-        mul_le_mul h1 h2 (Real.exp_pos _).le ((abs_nonneg _).trans h1)
-    _ = C * Real.exp (-(σ - 2) * u) := by
-        rw [mul_assoc, ← Real.exp_add]; congr 2; ring
+  calc
+    |g u| * Real.exp (-s.re * u) ≤ (C * Real.exp (2 * u)) * Real.exp (-σ * u) :=
+      mul_le_mul h1 h2 (Real.exp_pos _).le ((abs_nonneg _).trans h1)
+    _ = C * Real.exp (-(σ - 2) * u) := by rw [mul_assoc, ← Real.exp_add]; congr 2; ring
 
-theorem landau_pole_re_le {g : ℝ → ℝ} {Φ : ℂ → ℂ} {Z : Set ℂ} (hP : PoleData g Φ Z) : ∀ ρ ∈ Z, ρ.re ≤ 2 := by
+theorem landau_pole_re_le {g : ℝ → ℝ} {Φ : ℂ → ℂ} {Z : Set ℂ} (hP : PoleData g Φ Z)
+    : ∀ ρ ∈ Z, ρ.re ≤ 2 := by
   intro ρ hρ
   by_contra hlt
   have hlt : 2 < ρ.re := not_le.mp hlt
@@ -51,7 +52,8 @@ theorem landau_pole_re_le {g : ℝ → ℝ} {Φ : ℂ → ℂ} {Z : Set ℂ} (hP
   have h3 : (fun s : ℂ => (s - ρ) * Φ s) =ᶠ[𝓝[≠] ρ] fun s : ℂ => c + (s - ρ) * h s := by
     filter_upwards [hev, self_mem_nhdsWithin] with s hs hne
     have : s - ρ ≠ 0 := sub_ne_zero.mpr hne
-    rw [hs]; field_simp
+    rw [hs]
+    field_simp
   have := tendsto_nhds_unique (h1.congr' h3) h2
   apply hc
   simpa using this.symm

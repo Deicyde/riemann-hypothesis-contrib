@@ -6,13 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory.NatSmulMem
 
-theorem exists_nat_smul_mem {R : Type} [inst : CommRing R] {O : Subring R} {n : ℕ}
-    (Λ : Submodule (↥O) (Fin n → R))
-    (h : ∀ (y : R), ∃ (m : ℕ), m ≠ (0 : ℕ) ∧ (↑m : R) * y ∈ O) {x : Fin n → R}
-    (hx : x ∈ Submodule.span R (↑Λ : Set (Fin n → R))) :
-    ∃ (m : ℕ), m ≠ (0 : ℕ) ∧ (↑m : R) • x ∈ Λ := by
-  have key : ∀ (c : R), c ∈ O → ∀ v : Fin n → R, v ∈ Λ → c • v ∈ Λ :=
-    fun c hc v hv => Λ.smul_mem (⟨c, hc⟩ : O) hv
+theorem exists_nat_smul_mem
+    {R : Type} [inst : CommRing R]
+    {O : Subring R} {n : ℕ}
+    (Λ : Submodule (↥O) (Fin n → R)) (h : ∀ (y : R), ∃ (m : ℕ), m ≠ (0 : ℕ) ∧ (↑m : R) * y ∈ O)
+    {x : Fin n → R} (hx : x ∈ Submodule.span R (↑Λ : Set (Fin n → R)))
+    : ∃ (m : ℕ), m ≠ (0 : ℕ) ∧ (↑m : R) • x ∈ Λ := by
+  have key : ∀ (c : R), c ∈ O → ∀ v : Fin n → R, v ∈ Λ → c • v ∈ Λ := fun c hc v hv =>
+    Λ.smul_mem (⟨c, hc⟩ : O) hv
   induction hx using Submodule.span_induction with
   | mem v hv => exact ⟨1, one_ne_zero, by simpa using hv⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩

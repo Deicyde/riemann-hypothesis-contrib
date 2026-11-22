@@ -9,36 +9,42 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsU
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
 namespace GlobalTheory.CM.GenFib
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain in
 open scoped CategoryTheory.Obj in
-theorem _root_.GlobalTheory.CM.GenFib.exists_lieRep_eigLat (K : Type) [Field K]
-    [NumberField K] (P : _root_.ReciprocityTheory.ChartRestriction.G.Out.PolAV (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (𝓞 K))) (F : _root_.GlobalTheory.CM.GenFib P) (O : Type)
-    [CommRing O] (act : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.OAct O P.A) :
-    ∃ r : O →+* Module.End K (Fin F.P₀.g → K),
-      (∀ a, F.IsDiffOf F (act.act a) (r a)) ∧
-      ∀ (τ : O →+* 𝓞 K) c, (c ∈ F.eigLat act τ ↔
-          c ∈ F.lieLat ∧ ∀ a, r a c = τ a • c) ∧
-        (c ∈ Submodule.span K (F.eigLat act τ :
-            Set (Fin F.P₀.g → K)) ↔ ∀ a, r a c = τ a • c) := by
+theorem _root_.GlobalTheory.CM.GenFib.exists_lieRep_eigLat
+    (K : Type) [Field K] [NumberField K]
+    (P : _root_.ReciprocityTheory.ChartRestriction.G.Out.PolAV
+      (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (𝓞 K)))
+    (F : _root_.GlobalTheory.CM.GenFib P)
+    (O : Type) [CommRing O]
+    (act : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.OAct O P.A)
+    : ∃ r : O →+* Module.End K (Fin F.P₀.g → K),
+      (∀ a, F.IsDiffOf F (act.act a) (r a))
+        ∧ ∀ (τ : O →+* 𝓞 K) c,
+          (c ∈ F.eigLat act τ ↔ c ∈ F.lieLat ∧ ∀ a, r a c = τ a • c)
+            ∧ (c ∈ Submodule.span K (F.eigLat act τ : Set (Fin F.P₀.g → K))
+              ↔ ∀ a, r a c = τ a • c) := by
   obtain ⟨hex, hinj, -, -, hlie, heig⟩ := _root_.GlobalTheory.CM.integral_tangent_coordinates K P F
   have hcoord : ∀ {u c c'}, F.IsCoord u c → F.IsCoord u c' → c = c' := fun h h' =>
     (hex _ h.1).unique h h'
   have hdiff : ∀ a, ∃! M, F.IsDiffOf F (act.act a) M := fun a =>
     (_root_.GlobalTheory.CM.DiffCoord.existsUnique_isDiffOf K P F P F (act.act a) (act.hom a)).1
   choose R hR using fun a => (hdiff a).exists
-  have huniq : ∀ a M, F.IsDiffOf F (act.act a) M → R a = M :=
-    fun a M h => (hdiff a).unique (hR a) h
-  have hone : R 1 = 1 := huniq 1 1 (by
-    intro u c h
-    simpa [act.one] using h)
+  have huniq : ∀ a M, F.IsDiffOf F (act.act a) M → R a = M := fun a M h => (hdiff a).unique (hR a) h
+  have hone : R 1 = 1 :=
+    huniq 1 1 (by
+      intro u c h
+      simpa [act.one] using h)
   have hmul : ∀ a b, R (a * b) = R a * R b := fun a b => by
     rw [mul_comm a b]
     refine huniq _ _ ?_
@@ -51,8 +57,7 @@ theorem _root_.GlobalTheory.CM.GenFib.exists_lieRep_eigLat (K : Type) [Field K]
     rw [act.add, comp_mul]
     exact _root_.GlobalTheory.CM.IntCoord.isCoord_mul F (hR a u c h) (hR b u c h)
 
-  have hspan : Submodule.span K (F.lieLat :
-      Set (Fin F.P₀.g → K)) = ⊤ := by
+  have hspan : Submodule.span K (F.lieLat : Set (Fin F.P₀.g → K)) = ⊤ := by
     by_contra hne
     obtain ⟨φ, hφ0, hle⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
     obtain ⟨x, hx⟩ : ∃ x, φ x ≠ 0 := by
@@ -68,20 +73,23 @@ theorem _root_.GlobalTheory.CM.GenFib.exists_lieRep_eigLat (K : Type) [Field K]
     rcases h1 with h1 | h1
     · exact hx h1
     · exact hx (by simp [h1])
-  have hlat : ∀ τ : O →+* 𝓞 K, ∀ c, c ∈ F.eigLat act τ ↔
-      c ∈ F.lieLat ∧ ∀ a, R a c = τ a • c := by
+  have hlat : ∀ τ : O →+* 𝓞 K, ∀ c, c ∈ F.eigLat act τ ↔ c ∈ F.lieLat ∧ ∀ a, R a c = τ a • c := by
     intro τ c
     rw [heig O act τ c, hlie c]
     constructor
     · rintro ⟨u, hu, hcomb⟩
-      exact ⟨⟨u, hu⟩, fun a =>
-        hcoord (hR a u c hu) (_root_.GlobalTheory.CM.IntCoord.isCoord_smul F hu (hcomb a))⟩
+      exact ⟨
+        ⟨u, hu⟩,
+        fun a => hcoord (hR a u c hu) (_root_.GlobalTheory.CM.IntCoord.isCoord_smul F hu (hcomb a))
+      ⟩
     · rintro ⟨⟨u, hu⟩, hc⟩
       refine ⟨u, hu, fun a => ?_⟩
-      have hs : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsLieComb ![τ a] ![u] (_root_.GlobalTheory.CM.IntCoord.sc (τ a) ≫ u) :=
+      have hs : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsLieComb ![τ a] ![u]
+          (_root_.GlobalTheory.CM.IntCoord.sc (τ a) ≫ u) :=
         (_root_.GlobalTheory.CM.IntCoord.isLieComb_one_iff _ _ _).2 rfl
-      have he := hinj _ _ _ (hR a u c hu)
-        (by rw [hc a]; exact _root_.GlobalTheory.CM.IntCoord.isCoord_smul F hu hs)
+      have he :=
+        hinj _ _ _ (hR a u c hu)
+          (by rw [hc a]; exact _root_.GlobalTheory.CM.IntCoord.isCoord_smul F hu hs)
       rw [he]
       exact hs
   refine ⟨RingHom.mk' ⟨⟨R, hone⟩, hmul⟩ hadd, fun a => hR a, fun τ c => ⟨hlat τ c, ?_⟩⟩
@@ -97,8 +105,7 @@ theorem _root_.GlobalTheory.CM.GenFib.exists_lieRep_eigLat (K : Type) [Field K]
     · intro k x _ hx a
       rw [map_smul, hx, smul_comm]
   · intro hc
-    have hcspan : c ∈ Submodule.span K (F.lieLat :
-        Set (Fin F.P₀.g → K)) := by
+    have hcspan : c ∈ Submodule.span K (F.lieLat : Set (Fin F.P₀.g → K)) := by
       rw [hspan]
       exact Submodule.mem_top
     obtain ⟨y, hy, z, rfl⟩ := (IsLocalization.mem_span_iff (nonZeroDivisors (𝓞 K))).1 hcspan

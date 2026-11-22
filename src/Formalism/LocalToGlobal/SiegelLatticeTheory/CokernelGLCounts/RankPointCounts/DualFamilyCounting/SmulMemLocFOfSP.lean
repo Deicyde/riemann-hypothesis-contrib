@@ -12,12 +12,13 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.UnitPairSolutions
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt Formalism.HermitianLattices.Ext.L3.HU Formalism.L2.SG.Pf.GluingBases
+open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt Formalism.HermitianLattices.Ext.L3.HU
+  Formalism.L2.SG.Pf.GluingBases
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
-private theorem mem_pow_vF_of_ne_zero {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : 𝓞 F} (ha : a ≠ 0) :
-    a ∈ 𝔭 ^ vF 𝔭 a ∧ a ∉ 𝔭 ^ (vF 𝔭 a + 1) := by
+private theorem mem_pow_vF_of_ne_zero {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : 𝓞 F} (ha : a ≠ 0)
+    : a ∈ 𝔭 ^ vF 𝔭 a ∧ a ∉ 𝔭 ^ (vF 𝔭 a + 1) := by
   have hex : ∃ j, a ∉ 𝔭 ^ j := by
     by_contra h
     push_neg at h
@@ -35,9 +36,12 @@ private theorem mem_pow_vF_of_ne_zero {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMa
   change vF 𝔭 a + 1 ≤ vF 𝔭 a at hc
   omega
 
-theorem unit_part (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
-    {π s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π s₀) {a : 𝓞 F} (ha : a ≠ 0) :
-    (algebraMap F K (a : F))⁻¹ * algebraMap F K (π : F) ^ vF 𝔭 a ∈ SP K 𝔭 := by
+theorem unit_part
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {π s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π s₀)
+    {a : 𝓞 F} (ha : a ≠ 0)
+    : (algebraMap F K (a : F))⁻¹ * algebraMap F K (π : F) ^ vF 𝔭 a ∈ SP K 𝔭 := by
   haveI := h𝔭.isPrime
   obtain ⟨hmem, hnot⟩ := mem_pow_vF_of_ne_zero h𝔭 ha
   have hle : Ideal.span {s₀ ^ vF 𝔭 a} * 𝔭 ^ vF 𝔭 a ≤ Ideal.span {π ^ vF 𝔭 a} := by
@@ -55,8 +59,9 @@ theorem unit_part (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsF
     refine idealPowerSpanBounds.mul_notMem h𝔭.isPrime hne ?_ hnot h1
     rw [zero_add, pow_one]
     exact fun h => hu.s_notMem (h𝔭.isPrime.mem_of_pow_mem _ h)
-  have hbK : algebraMap F K (b : F) * algebraMap F K (π : F) ^ vF 𝔭 a =
-      algebraMap F K (s₀ : F) ^ vF 𝔭 a * algebraMap F K (a : F) := by
+  have hbK
+      : algebraMap F K (b : F) * algebraMap F K (π : F) ^ vF 𝔭 a
+        = algebraMap F K (s₀ : F) ^ vF 𝔭 a * algebraMap F K (a : F) := by
     have := congrArg (fun x : 𝓞 F => algebraMap F K (x : F)) hb
     simpa [map_mul, map_pow] using this
   have haK : algebraMap F K (a : F) ≠ 0 := by simpa using ha
@@ -67,14 +72,16 @@ theorem unit_part (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsF
   rw [hc, map_pow, ← mul_assoc, mul_comm (algebraMap F K (b : F)), mul_assoc, hbK]
   field_simp
 
-private theorem exists_unit_mul_pow_eq_pow_mul_of_isUnif0 {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {π s₀ : 𝓞 F}
-    (hu : IsUnif0 𝔭 π s₀) {n : ℕ} {C : 𝓞 F} (hC : C ∈ 𝔭 ^ n) (hC' : C ∉ 𝔭 ^ (n + 1)) :
-    ∃ b ∉ 𝔭, b * π ^ n = s₀ ^ n * C := by
+private theorem exists_unit_mul_pow_eq_pow_mul_of_isUnif0
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {π s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π s₀)
+    {n : ℕ} {C : 𝓞 F} (hC : C ∈ 𝔭 ^ n) (hC' : C ∉ 𝔭 ^ (n + 1))
+    : ∃ b ∉ 𝔭, b * π ^ n = s₀ ^ n * C := by
   have hle : Ideal.span {s₀ ^ n} * 𝔭 ^ n ≤ Ideal.span {π ^ n} := by
     rw [← Ideal.span_singleton_pow, ← Ideal.span_singleton_pow, ← mul_pow]
     exact Ideal.pow_right_mono hu.le _
-  obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.mp
-    (hle (Ideal.mul_mem_mul (Ideal.mem_span_singleton_self _) hC))
+  obtain ⟨b, hb⟩ :=
+    Ideal.mem_span_singleton'.mp (hle (Ideal.mul_mem_mul (Ideal.mem_span_singleton_self _) hC))
   refine ⟨b, fun hb𝔭 => ?_, hb⟩
   have hne : 𝔭 ≠ ⊥ := (Submodule.ne_bot_iff _).mpr ⟨π, hu.mem, hu.ne_zero⟩
   have h1 : s₀ ^ n * C ∈ 𝔭 ^ (0 + n + 1) := by
@@ -84,10 +91,13 @@ private theorem exists_unit_mul_pow_eq_pow_mul_of_isUnif0 {𝔭 : Ideal (𝓞 F)
   rw [zero_add, pow_one]
   exact fun h => hu.s_notMem (h𝔭.isPrime.mem_of_pow_mem _ h)
 
-theorem unit_part_c (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
-    {π s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π s₀) {a : 𝓞 F} (ha : a ≠ 0) (he : vF 𝔭 a ≠ 0) {c : F}
-    (hac : InP 𝔭 (2 * vF 𝔭 a) (algebraMap F K ((a : F) + c))) :
-    algebraMap F K c ≠ 0 ∧ (algebraMap F K c)⁻¹ * algebraMap F K (π : F) ^ vF 𝔭 a ∈ SP K 𝔭 := by
+theorem unit_part_c
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {π s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π s₀)
+    {a : 𝓞 F} (ha : a ≠ 0) (he : vF 𝔭 a ≠ 0)
+    {c : F} (hac : InP 𝔭 (2 * vF 𝔭 a) (algebraMap F K ((a : F) + c)))
+    : algebraMap F K c ≠ 0 ∧ (algebraMap F K c)⁻¹ * algebraMap F K (π : F) ^ vF 𝔭 a ∈ SP K 𝔭 := by
   haveI := h𝔭.isPrime
   obtain ⟨hmem, hnot⟩ := mem_pow_vF_of_ne_zero h𝔭 ha
   have hne : 𝔭 ≠ ⊥ := (Submodule.ne_bot_iff _).mpr ⟨π, hu.mem, hu.ne_zero⟩
@@ -142,20 +152,22 @@ theorem unit_part_c (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : I
   have h3 : (b : F) * (π : F) ^ vF 𝔭 a = (s₀ : F) ^ vF 𝔭 a * ((t : F) * c) := by
     rw [← hCF]
     exact_mod_cast h2
-  have hbK : algebraMap F K (b : F) * algebraMap F K (π : F) ^ vF 𝔭 a =
-      algebraMap F K (s₀ : F) ^ vF 𝔭 a * (algebraMap F K (t : F) * algebraMap F K c) := by
+  have hbK
+      : algebraMap F K (b : F) * algebraMap F K (π : F) ^ vF 𝔭 a
+        = algebraMap F K (s₀ : F) ^ vF 𝔭 a * (algebraMap F K (t : F) * algebraMap F K c) := by
     have h4 := congrArg (algebraMap F K) h3
     simpa [map_mul, map_pow] using h4
   have hc : ((t * s₀ ^ vF 𝔭 a : 𝓞 F) : F) = (t : F) * (s₀ : F) ^ vF 𝔭 a := by simp
   rw [hc, map_mul, map_pow, ← mul_assoc, mul_comm (algebraMap F K (b : F)), mul_assoc, hbK]
   field_simp
 
-theorem pair_solve {q a c r X Y : K} (hq : q ≠ 0) (ha : a ≠ 0) (hc : c ≠ 0)
-    (hr : a + c = q ^ 2 * r) :
-    (X * q * (a⁻¹ * q) - Y * (a⁻¹ * q)) * (q⁻¹ ^ 2 * (a + c)) +
-        (Y * r * (a⁻¹ * q) * (c⁻¹ * q) - X * (a⁻¹ * q)) * (q⁻¹ * c) = X ∧
-      (X * q * (a⁻¹ * q) - Y * (a⁻¹ * q)) * (q⁻¹ * c) +
-        (Y * r * (a⁻¹ * q) * (c⁻¹ * q) - X * (a⁻¹ * q)) * c = Y := by
+theorem pair_solve {q a c r X Y : K} (hq : q ≠ 0) (ha : a ≠ 0) (hc : c ≠ 0) (hr : a + c = q ^ 2 * r)
+    : (X * q * (a⁻¹ * q) - Y * (a⁻¹ * q)) * (q⁻¹ ^ 2 * (a + c))
+          + (Y * r * (a⁻¹ * q) * (c⁻¹ * q) - X * (a⁻¹ * q)) * (q⁻¹ * c)
+        = X
+      ∧ (X * q * (a⁻¹ * q) - Y * (a⁻¹ * q)) * (q⁻¹ * c)
+          + (Y * r * (a⁻¹ * q) * (c⁻¹ * q) - X * (a⁻¹ * q)) * c
+        = Y := by
   obtain rfl : c = q ^ 2 * r - a := by rw [← hr]; ring
   constructor
   · field_simp
@@ -163,21 +175,27 @@ theorem pair_solve {q a c r X Y : K} (hq : q ≠ 0) (ha : a ≠ 0) (hc : c ≠ 0
   · field_simp
     ring
 
-theorem pair_coeffs_mem {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] {q a c r X Y : K}
-    (hp : q ∈ SP K 𝔭) (hua : a⁻¹ * q ∈ SP K 𝔭) (huc : c⁻¹ * q ∈ SP K 𝔭) (hr : r ∈ SP K 𝔭)
-    (hX : X ∈ SP K 𝔭) (hY : Y ∈ SP K 𝔭) :
-    X * q * (a⁻¹ * q) - Y * (a⁻¹ * q) ∈ SP K 𝔭 ∧
-      Y * r * (a⁻¹ * q) * (c⁻¹ * q) - X * (a⁻¹ * q) ∈ SP K 𝔭 := by
-  exact ⟨(SP K 𝔭).sub_mem ((SP K 𝔭).mul_mem ((SP K 𝔭).mul_mem hX hp) hua) ((SP K 𝔭).mul_mem hY hua),
+theorem pair_coeffs_mem
+    {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime]
+    {q a c r X Y : K} (hp : q ∈ SP K 𝔭) (hua : a⁻¹ * q ∈ SP K 𝔭) (huc : c⁻¹ * q ∈ SP K 𝔭)
+    (hr : r ∈ SP K 𝔭) (hX : X ∈ SP K 𝔭) (hY : Y ∈ SP K 𝔭)
+    : X * q * (a⁻¹ * q) - Y * (a⁻¹ * q) ∈ SP K 𝔭
+      ∧ Y * r * (a⁻¹ * q) * (c⁻¹ * q) - X * (a⁻¹ * q) ∈ SP K 𝔭 := by
+  exact ⟨
+    (SP K 𝔭).sub_mem ((SP K 𝔭).mul_mem ((SP K 𝔭).mul_mem hX hp) hua) ((SP K 𝔭).mul_mem hY hua),
     (SP K 𝔭).sub_mem ((SP K 𝔭).mul_mem ((SP K 𝔭).mul_mem ((SP K 𝔭).mul_mem hY hr) hua) huc)
-      ((SP K 𝔭).mul_mem hX hua)⟩
+      ((SP K 𝔭).mul_mem hX hua)
+  ⟩
 
 section Vec
 
 variable {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem smul_mem_locF_of_SP {𝔭 : Ideal (𝓞 F)} [hp : 𝔭.IsPrime] {L : Submodule (𝓞 K) V} {r : K}
-    (hr : r ∈ SP K 𝔭) {v : V} (hv : v ∈ L) : r • v ∈ locF 𝔭 L := by
+theorem smul_mem_locF_of_SP
+    {𝔭 : Ideal (𝓞 F)} [hp : 𝔭.IsPrime]
+    {L : Submodule (𝓞 K) V} {r : K} (hr : r ∈ SP K 𝔭)
+    {v : V} (hv : v ∈ L)
+    : r • v ∈ locF 𝔭 L := by
   obtain ⟨t, ht, z, hz⟩ := mem_SP.mp hr
   refine ⟨algebraMap (𝓞 F) (𝓞 K) t, Submonoid.subset_closure ⟨t, ht, rfl⟩, ?_⟩
   have he : algebraMap (𝓞 F) (𝓞 K) t • r • v = z • v := by
@@ -185,9 +203,11 @@ theorem smul_mem_locF_of_SP {𝔭 : Ideal (𝓞 F)} [hp : 𝔭.IsPrime] {L : Sub
   rw [he]
   exact L.smul_mem z hv
 
-theorem eq_zero_of_orth {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hnd : Nondeg h) {ι' : Type}
-    (G : ι' → V) (hG : Submodule.span K (Set.range G) = ⊤) {z : V} (hz : ∀ s, h (G s) z = 0) :
-    z = 0 := by
+theorem eq_zero_of_orth
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hnd : Nondeg h)
+    {ι' : Type} (G : ι' → V) (hG : Submodule.span K (Set.range G) = ⊤)
+    {z : V} (hz : ∀ s, h (G s) z = 0)
+    : z = 0 := by
   apply hnd
   intro y
   have hy : y ∈ Submodule.span K (Set.range G) := hG ▸ Submodule.mem_top

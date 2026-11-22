@@ -83,8 +83,8 @@ theorem gram_block_form : C2.GramBlocks := by
   have hpres : ∀ v w, herm (Hpk k r) (g *ᵥ v) (g *ᵥ w) = herm (Hpk k r) v w := by
     intro v w
     simp only [herm]
-    rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
-      Matrix.mulVec_mulVec, show gᴴ * Hpk k r * g = Hpk k r from hg]
+    rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
+      show gᴴ * Hpk k r * g = Hpk k r from hg]
   ext i j
   rcases i with a | a <;> rcases j with b | b
   · simp only [gramM, gramVec, Matrix.fromBlocks_apply₁₁]
@@ -114,7 +114,8 @@ theorem majorant_estimate : C2.Majorant := by
     have h1 : ‖herm (Hpk k r) v v‖ ^ 2 ≤ S ^ 2 := by
       rw [← Complex.normSq_eq_norm_sq, sq]
       exact hcs
-    have h2 : ‖herm (Hpk k r) v v‖ ≤ S := (pow_le_pow_iff_left₀ (norm_nonneg _) hS two_ne_zero).mp h1
+    have h2 : ‖herm (Hpk k r) v v‖ ≤ S :=
+      (pow_le_pow_iff_left₀ (norm_nonneg _) hS two_ne_zero).mp h1
     exact (Complex.re_le_norm _).trans h2
 
 theorem norm_of_inverse : C2.NormInv := by
@@ -128,19 +129,17 @@ theorem norm_of_inverse : C2.NormInv := by
   have hinv : g⁻¹ = Hpk k r * gᴴ * Hpk k r := Matrix.inv_eq_left_inv hleft
   have hright : g * g⁻¹ = 1 := by
     rw [hinv]
-    first
-    | exact Matrix.mul_eq_one_comm.mp hleft
-    | exact mul_eq_one_comm.mp hleft
+    first | exact Matrix.mul_eq_one_comm.mp hleft | exact mul_eq_one_comm.mp hleft
   have hsum : ∑ i, ∑ j, Complex.normSq (g⁻¹ i j) = ∑ i, ∑ j, Complex.normSq (g i j) := by
-    have he : ∀ i j, Complex.normSq (g⁻¹ i j) =
-        Complex.normSq (g (GBasic.sig k r j) (GBasic.sig k r i)) := by
+    have he
+        : ∀ i j,
+          Complex.normSq (g⁻¹ i j) = Complex.normSq (g (GBasic.sig k r j) (GBasic.sig k r i)) := by
       intro i j
       rw [hinv, mul_Hpk_apply, Hpk_mul_apply, Matrix.conjTranspose_apply, Complex.normSq_mul,
         Complex.normSq_mul, normSq_sgn, normSq_sgn, Complex.star_def, Complex.normSq_conj]
       ring
     simp only [he]
-    let σ : Equiv.Perm (Fin (2 * r + k + 1)) :=
-      Function.Involutive.toPerm _ (GBasic.sig_sig k r)
+    let σ : Equiv.Perm (Fin (2 * r + k + 1)) := Function.Involutive.toPerm _ (GBasic.sig_sig k r)
     rw [Finset.sum_comm]
     refine Fintype.sum_equiv σ _ _ fun j => ?_
     exact Fintype.sum_equiv σ _ _ fun i => rfl
@@ -157,13 +156,17 @@ theorem norm_of_inverse : C2.NormInv := by
     Real.sq_sqrt (Finset.sum_nonneg fun i _ => Finset.sum_nonneg fun j _ => Complex.normSq_nonneg _)
   have hA : ∑ l, Complex.normSq (g⁻¹ l i0) ≤ B.gN g⁻¹ ^ 2 := by
     rw [hgN, Finset.sum_comm]
-    exact Finset.single_le_sum (f := fun j => ∑ l, Complex.normSq (g⁻¹ l j))
-      (fun j _ => Finset.sum_nonneg fun l _ => Complex.normSq_nonneg _) (Finset.mem_univ i0)
+    exact Finset.single_le_sum
+      (f := fun j => ∑ l, Complex.normSq (g⁻¹ l j))
+      (fun j _ => Finset.sum_nonneg fun l _ => Complex.normSq_nonneg _)
+      (Finset.mem_univ i0)
   have hB : ∑ l, Complex.normSq (star (g i0 l)) ≤ B.gN g ^ 2 := by
     rw [hgN]
     simp only [Complex.star_def, Complex.normSq_conj]
-    exact Finset.single_le_sum (f := fun i => ∑ l, Complex.normSq (g i l))
-      (fun i _ => Finset.sum_nonneg fun l _ => Complex.normSq_nonneg _) (Finset.mem_univ i0)
+    exact Finset.single_le_sum
+      (f := fun i => ∑ l, Complex.normSq (g i l))
+      (fun i _ => Finset.sum_nonneg fun l _ => Complex.normSq_nonneg _)
+      (Finset.mem_univ i0)
   have hN0 : 0 ≤ B.gN g := Real.sqrt_nonneg _
   have hEq : B.gN g⁻¹ = B.gN g := by simp only [B.gN, hsum]
   rw [hEq] at hA

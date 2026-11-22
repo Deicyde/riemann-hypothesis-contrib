@@ -5,15 +5,19 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsC
 
 @[expose] public section
 
-open Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SiegelSet GlobalTheory.StdPar
+open Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SiegelSet
+  GlobalTheory.StdPar
 open scoped TensorProduct
 
 namespace GlobalTheory.ColumnSpanCoefficients
 
-theorem exists_coeff_of_mem_colSpan {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+theorem exists_coeff_of_mem_colSpan
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     {n r s : ℕ} (hs : s ≤ r) (X : Matrix (Fin n) (Fin r) E) (I : Set (Fin r)) (P : Fin s → Prop)
-    (hI : ∀ i ∈ I, ∃ j : Fin s, Fin.castLE hs j = i ∧ P j) {y : Fin n → AF F ⊗[F] E} (hy : y ∈ colSpan F X I) :
-    ∃ a : Fin s → AF F ⊗[F] E, (∀ j, ¬ P j → a j = 0) ∧ adMat F (X.submatrix id (Fin.castLE hs)) *ᵥ a = y := by
+    (hI : ∀ i ∈ I, ∃ j : Fin s, Fin.castLE hs j = i ∧ P j)
+    {y : Fin n → AF F ⊗[F] E} (hy : y ∈ colSpan F X I)
+    : ∃ a : Fin s → AF F ⊗[F] E,
+      (∀ j, ¬ P j → a j = 0) ∧ adMat F (X.submatrix id (Fin.castLE hs)) *ᵥ a = y := by
   classical
   rw [colSpan] at hy
   induction hy using Submodule.span_induction with
@@ -27,7 +31,8 @@ theorem exists_coeff_of_mem_colSpan {F E : Type} [Field F] [NumberField F] [Fiel
     · rw [Matrix.mulVec_single_one]
       ext r
       rfl
-  | zero => exact ⟨0, fun _ _ => rfl, Matrix.mulVec_zero _⟩
+  | zero =>
+    exact ⟨0, fun _ _ => rfl, Matrix.mulVec_zero _⟩
   | add x z _ _ hx hz =>
     obtain ⟨a, ha, rfl⟩ := hx
     obtain ⟨b, hb, rfl⟩ := hz

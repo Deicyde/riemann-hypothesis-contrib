@@ -30,10 +30,12 @@ lemma eval_lift (PO : MvPolynomial ι (unitBallRing K)) (σ : ι → unitBallRin
   | add p q hp hq => simp [hp, hq]
   | mul_X p i hp => simp [hp]
 
-theorem exists_unit_point (K₀ : Subfield K) (hK₀ : ResidueFieldInfiniteOn (K₀ : Set K))
-    (P δ : MvPolynomial ι K) (hP : ∀ μ, ‖AddMonoidAlgebra.coeff P μ‖ ≤ 1) (hP1 : ∃ μ, ‖AddMonoidAlgebra.coeff P μ‖ = 1)
-    (hδ : ∀ μ, ‖AddMonoidAlgebra.coeff δ μ‖ ≤ 1) (hδ1 : ∃ μ, ‖AddMonoidAlgebra.coeff δ μ‖ = 1) :
-    ∃ x : ι → K, (∀ i, x i ∈ K₀ ∧ ‖x i‖ = 1) ∧ ‖eval x P‖ = 1 ∧ ‖eval x δ‖ = 1 := by
+theorem exists_unit_point
+    (K₀ : Subfield K) (hK₀ : ResidueFieldInfiniteOn (K₀ : Set K))
+    (P δ : MvPolynomial ι K)
+    (hP : ∀ μ, ‖AddMonoidAlgebra.coeff P μ‖ ≤ 1) (hP1 : ∃ μ, ‖AddMonoidAlgebra.coeff P μ‖ = 1)
+    (hδ : ∀ μ, ‖AddMonoidAlgebra.coeff δ μ‖ ≤ 1) (hδ1 : ∃ μ, ‖AddMonoidAlgebra.coeff δ μ‖ = 1)
+    : ∃ x : ι → K, (∀ i, x i ∈ K₀ ∧ ‖x i‖ = 1) ∧ ‖eval x P‖ = 1 ∧ ‖eval x δ‖ = 1 := by
   classical
   obtain ⟨PO, hPO⟩ := lift_ball P hP
   obtain ⟨δO, hδO⟩ := lift_ball δ hδ
@@ -53,9 +55,9 @@ theorem exists_unit_point (K₀ : Subfield K) (hK₀ : ResidueFieldInfiniteOn (K
       exact_mod_cast h1.le
     have hm : a * ⟨_, hinv⟩ = 1 := Subtype.ext (by simp [ha0])
     first
-      | exact IsUnit.of_mul_eq_one _ hm
-      | exact IsUnit.of_mul_eq_one hm
-      | exact ⟨⟨a, ⟨_, hinv⟩, hm, by rw [mul_comm]; exact hm⟩, rfl⟩
+    | exact IsUnit.of_mul_eq_one _ hm
+    | exact IsUnit.of_mul_eq_one hm
+    | exact ⟨⟨a, ⟨_, hinv⟩, hm, by rw [mul_comm]; exact hm⟩, rfl⟩
   have norm_of_unit : ∀ a : unitBallRing K, IsUnit a → ‖(a : K)‖ = 1 := by
     intro a ha
     obtain ⟨b, hb⟩ := ha.exists_right_inv
@@ -67,45 +69,63 @@ theorem exists_unit_point (K₀ : Subfield K) (hK₀ : ResidueFieldInfiniteOn (K
     have hb1 := mem_le b
     refine le_antisymm ha1 ?_
     nlinarith [norm_nonneg (a : K), norm_nonneg (b : K)]
-  have hcoeff : ∀ (Q : MvPolynomial ι (unitBallRing K)) (R : MvPolynomial ι K),
-      MvPolynomial.map (unitBallRing K).subtype Q = R → ∀ μ, ((AddMonoidAlgebra.coeff Q μ : unitBallRing K) : K) = AddMonoidAlgebra.coeff R μ := by
+  have hcoeff
+      : ∀ (Q : MvPolynomial ι (unitBallRing K)) (R : MvPolynomial ι K),
+        MvPolynomial.map (unitBallRing K).subtype Q = R
+          → ∀ μ,
+            ((AddMonoidAlgebra.coeff Q μ : unitBallRing K) : K) = AddMonoidAlgebra.coeff R μ := by
     intro Q R hQR μ
     rw [← hQR, MvPolynomial.coeff_map]
     rfl
-  have hres_eval : ∀ (Q : MvPolynomial ι (unitBallRing K)) (u : ι → unitBallRing K),
-      IsLocalRing.residue (unitBallRing K) (eval u Q) =
-        eval (fun i => IsLocalRing.residue (unitBallRing K) (u i))
-          (MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) Q) := by
+  have hres_eval
+      : ∀ (Q : MvPolynomial ι (unitBallRing K)) (u : ι → unitBallRing K),
+        IsLocalRing.residue (unitBallRing K) (eval u Q)
+          = eval
+            (fun i => IsLocalRing.residue (unitBallRing K) (u i))
+            (MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) Q) := by
     intro Q u
     induction Q using MvPolynomial.induction_on with
     | C a => simp
     | add p q hp hq => simp [hp, hq]
     | mul_X p i hp => simp [hp]
-  have hbar : ∀ (Q : MvPolynomial ι (unitBallRing K)) (R : MvPolynomial ι K),
-      MvPolynomial.map (unitBallRing K).subtype Q = R → (∃ μ, ‖AddMonoidAlgebra.coeff R μ‖ = 1) →
-        MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) Q ≠ 0 := by
+  have hbar
+      : ∀ (Q : MvPolynomial ι (unitBallRing K)) (R : MvPolynomial ι K),
+        MvPolynomial.map (unitBallRing K).subtype Q = R → (∃ μ, ‖AddMonoidAlgebra.coeff R μ‖ = 1)
+          → MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) Q ≠ 0 := by
     intro Q R hQR hR h0
     obtain ⟨μ, hμ⟩ := hR
     have h := congrArg (AddMonoidAlgebra.coeff · μ) h0
     rw [MvPolynomial.coeff_map, MvPolynomial.coeff_zero] at h
     exact (IsLocalRing.residue_ne_zero_iff_isUnit _).2
       (unit_of_norm _ (by rw [hcoeff Q R hQR μ]; exact hμ)) h
-  have hQ : MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) PO *
-      MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) δO ≠ 0 :=
+  have hQ
+      : MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) PO
+          * MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) δO
+        ≠ 0 :=
     mul_ne_zero (hbar PO P hPO hP1) (hbar δO δ hδO hδ1)
-  obtain ⟨S0, hS0T, hS0c⟩ := (infinite_residues K₀ hK₀).exists_subset_card_eq
-    ((MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) PO *
-      MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) δO).totalDegree + 1)
-  have hex : ∃ y : ι → IsLocalRing.ResidueField (unitBallRing K), (∀ i, y i ∈ S0) ∧
-      eval y (MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) PO *
-        MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) δO) ≠ 0 := by
+  obtain ⟨S0, hS0T, hS0c⟩ :=
+    (infinite_residues K₀ hK₀).exists_subset_card_eq
+      ((MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) PO
+          * MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) δO).totalDegree
+        + 1)
+  have hex
+      : ∃ y : ι → IsLocalRing.ResidueField (unitBallRing K),
+        (∀ i, y i ∈ S0)
+          ∧ eval y
+              (MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) PO
+                * MvPolynomial.map (IsLocalRing.residue (unitBallRing K)) δO)
+            ≠ 0 := by
     by_contra hcon
     push_neg at hcon
-    exact hQ (MvPolynomial.eq_zero_of_eval_zero_at_prod_finset _ (fun _ => S0)
-      (fun i => lt_of_le_of_lt (MvPolynomial.degreeOf_le_totalDegree _ i) (by rw [hS0c]; omega)) hcon)
+    exact hQ (MvPolynomial.eq_zero_of_eval_zero_at_prod_finset _
+      (fun _ => S0)
+      (fun i => lt_of_le_of_lt (MvPolynomial.degreeOf_le_totalDegree _ i) (by rw [hS0c]; omega))
+      hcon)
   obtain ⟨y, hyS, hyQ⟩ := hex
-  have hlift : ∀ i, ∃ x : unitBallRing K, (x : K) ∈ K₀ ∧ ‖(x : K)‖ = 1 ∧
-      IsLocalRing.residue (unitBallRing K) x = y i := fun i => hS0T (Finset.mem_coe.2 (hyS i))
+  have hlift
+      : ∀ i, ∃ x : unitBallRing K,
+        (x : K) ∈ K₀ ∧ ‖(x : K)‖ = 1 ∧ IsLocalRing.residue (unitBallRing K) x = y i := fun i =>
+    hS0T (Finset.mem_coe.2 (hyS i))
   choose u hu0 hu1 hu2 using hlift
   have hy : (fun i => IsLocalRing.residue (unitBallRing K) (u i)) = y := funext hu2
   rw [map_mul] at hyQ

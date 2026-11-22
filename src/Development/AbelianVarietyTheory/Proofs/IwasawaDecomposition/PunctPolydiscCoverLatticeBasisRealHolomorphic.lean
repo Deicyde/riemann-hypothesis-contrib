@@ -14,7 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Pullb
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+  GlobalTheory.LieBase
 open Classical
 open Matrix
 open scoped ComplexOrder Topology
@@ -26,7 +29,14 @@ set_option autoImplicit false
 
 namespace GlobalTheory.ShFam.Hor.LogCh
 
-theorem latBasis_logCover_real_holo : ∀ (n a g r : ℕ) (K : (Fin n → ℂ) → Set (Fin g → ℂ)) (lam : (Fin n → ℂ) → Fin r → Fin g → ℂ), IsLatFam (Metric.ball 0 1) K → ContinuousOn lam (logDom n a) → (∀ s ∈ logDom n a, LinearIndependent ℤ (lam s) ∧ Submodule.span ℝ (Set.range (lam s)) = ⊤ ∧ ∀ w, w ∈ K (logExp a s) ↔ ∃ m : Fin r → ℤ, w = ∑ j, m j • lam s j) → r = 2 * g ∧ (∀ s ∈ logDom n a, LinearIndependent ℝ (lam s)) ∧ ∀ (j : Fin r) (k : Fin g), DifferentiableOn ℂ (fun s => lam s j k) (logDom n a) := by
+theorem latBasis_logCover_real_holo
+    : ∀ (n a g r : ℕ) (K : (Fin n → ℂ) → Set (Fin g → ℂ)) (lam : (Fin n → ℂ) → Fin r → Fin g → ℂ),
+      IsLatFam (Metric.ball 0 1) K → ContinuousOn lam (logDom n a)
+        → (∀ s ∈ logDom n a,
+          LinearIndependent ℤ (lam s) ∧ Submodule.span ℝ (Set.range (lam s)) = ⊤
+            ∧ ∀ w, w ∈ K (logExp a s) ↔ ∃ m : Fin r → ℤ, w = ∑ j, m j • lam s j)
+        → r = 2 * g ∧ (∀ s ∈ logDom n a, LinearIndependent ℝ (lam s))
+          ∧ ∀ (j : Fin r) (k : Fin g), DifferentiableOn ℂ (fun s => lam s j k) (logDom n a) := by
   intro n a g r K lam hK hlam hB
 
   have hne : (fun k : Fin n => if (k : ℕ) < a then (-1 : ℂ) else 0) ∈ logDom n a := by
@@ -44,8 +54,8 @@ theorem latBasis_logCover_real_holo : ∀ (n a g r : ℕ) (K : (Fin n → ℂ) �
     have hspanK : Submodule.span ℝ (K (logExp a s)) = ⊤ := by
       rw [eq_top_iff, ← hsp]
       exact Submodule.span_mono (by rintro _ ⟨j, rfl⟩; exact hmem s hs j)
-    exact (GlobalTheory.LatReal.isRealBasis_of_isLatFam n g r (Metric.ball 0 1) K (logExp a s) (lam s) hK
-      (hMaps hs) hspanK hli hK').1
+    exact (GlobalTheory.LatReal.isRealBasis_of_isLatFam n g r (Metric.ball 0 1) K (logExp a s)
+      (lam s) hK (hMaps hs) hspanK hli hK').1
   refine ⟨?_, hreal, ?_⟩
   · set s₀ := (fun k : Fin n => if (k : ℕ) < a then (-1 : ℂ) else 0)
     have hli := hreal s₀ hne
@@ -55,8 +65,10 @@ theorem latBasis_logCover_real_holo : ∀ (n a g r : ℕ) (K : (Fin n → ℂ) �
     rw [h1, Module.finrank_pi_fintype]
     simp [Complex.finrank_real_complex, mul_comm]
   · intro j k
-    have hF := IsLatFam.pullback_analytic n n g (Metric.ball 0 1) (logDom n a) K (logExp a) hK hOpen
-      (fun s _ => hAn s) hMaps
+    have hF :=
+      IsLatFam.pullback_analytic n n g (Metric.ball 0 1) (logDom n a) K (logExp a) hK hOpen
+        (fun s _ => hAn s)
+        hMaps
     intro s₀ hs₀
     have hnhds : logDom n a ∈ 𝓝 s₀ := hOpen.mem_nhds hs₀
     obtain ⟨ζ, hζ0, hζa, hev⟩ := hF.2.2.2 s₀ hs₀ (lam s₀ j) (hmem s₀ hs₀ j)

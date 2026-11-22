@@ -12,7 +12,7 @@ namespace GroundTheory.Heights₂.Heights
 open MvPolynomial ComplexSets
 
 def CurveNormalisationFinite.Statement : Prop :=
-  ∀ (n : ℕ) (I : Ideal (MvPolynomial (Fin n) ℂ)) (q : Fin n → ℂ), IsRadicalAt I q →
-    Module.Finite (curveLocalRing I q) (curveNormalisation I q)
+  ∀ (n : ℕ) (I : Ideal (MvPolynomial (Fin n) ℂ)) (q : Fin n → ℂ),
+    IsRadicalAt I q → Module.Finite (curveLocalRing I q) (curveNormalisation I q)
 
 end GroundTheory.Heights₂.Heights

@@ -10,9 +10,12 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SubsingletonS
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -22,7 +25,8 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.DualUnitGerm
 
-theorem primeSpectrum_subsingleton (k : Type) [Field k] : Subsingleton (PrimeSpectrum (DualNumber k)) := by
+theorem primeSpectrum_subsingleton (k : Type) [Field k]
+    : Subsingleton (PrimeSpectrum (DualNumber k)) := by
   have key : ∀ p : PrimeSpectrum (DualNumber k), p.asIdeal = maximalIdeal (DualNumber k) := by
     intro p
     refine le_antisymm (le_maximalIdeal p.isPrime.ne_top) ?_
@@ -34,7 +38,10 @@ theorem primeSpectrum_subsingleton (k : Type) [Field k] : Subsingleton (PrimeSpe
     exact (nilpotent_iff_mem_prime.1 hn) p.asIdeal p.isPrime
   exact ⟨fun p q => PrimeSpectrum.ext ((key p).trans (key q).symm)⟩
 
-theorem unit_eq_of_germ_eq : ∀ (k : Type) [Field k] (z : Sp (DualNumber k)) (u v : (DualNumber k)ˣ), gm (𝟙 (Sp (DualNumber k))) z ⊤ (unitOn u) = gm (𝟙 (Sp (DualNumber k))) z ⊤ (unitOn v) → u = v := by
+theorem unit_eq_of_germ_eq
+    : ∀ (k : Type) [Field k] (z : Sp (DualNumber k)) (u v : (DualNumber k)ˣ),
+      gm (𝟙 (Sp (DualNumber k))) z ⊤ (unitOn u) = gm (𝟙 (Sp (DualNumber k))) z ⊤ (unitOn v)
+        → u = v := by
   intro k _ z u v h
   have hs : Subsingleton (Sp (DualNumber k)) := primeSpectrum_subsingleton k
   have h1 : (unitOn u).val = (unitOn v).val := by
@@ -44,6 +51,7 @@ theorem unit_eq_of_germ_eq : ∀ (k : Type) [Field k] (z : Sp (DualNumber k)) (u
     rw [gm_val _ x ⊤ hx, gm_val _ x ⊤ hx] at this
     exact this
   exact Units.ext
-    ((ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of (DualNumber k))).inv).1 h1)
+    ((ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of (DualNumber k))).inv).1
+      h1)
 
 end GlobalTheory.DualUnitGerm

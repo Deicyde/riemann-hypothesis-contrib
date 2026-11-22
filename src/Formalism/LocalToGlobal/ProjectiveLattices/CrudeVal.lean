@@ -13,9 +13,12 @@ namespace Formalism.L2.Pj.Crude
 open NumberField IsDedekindDomain Formalism.L2.Pj
 open scoped WithZero
 
-variable {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K))
+variable
+  {K : Type} [Field K] [NumberField K]
+  (la : HeightOneSpectrum (𝓞 K))
   {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
-  [IsFractionRing V K'] {ι : K →+* K'} {e : ℕ}
+  [IsFractionRing V K']
+  {ι : K →+* K'} {e : ℕ}
 
 lemma crv_finite : Finite (𝓞 K ⧸ la.asIdeal) :=
   Ideal.finiteQuotientOfFreeOfNeBot la.asIdeal la.ne_bot
@@ -151,9 +154,9 @@ lemma crv_legendre {σ : Type} (p : ℕ) [Fact p.Prime] (α : σ →₀ ℕ) :
         (Fact.out : p.Prime).sub_one_mul_multiplicity_factorial
       _ ≤ α s := Nat.sub_le _ _
 
-theorem nval_factProd_le (ho : OverLa la V ι e) {σ : Type} (α : σ →₀ ℕ) :
-    nval V e (((α.prod fun _ t => t.factorial : ℕ) : K')) ≤
-      (((ramOverZ la : ℝ) * (α.degree : ℝ) / ((resCharOf la : ℝ) - 1) : ℝ) : EReal) := by
+theorem nval_factProd_le (ho : OverLa la V ι e) {σ : Type} (α : σ →₀ ℕ)
+    : nval V e (((α.prod fun _ t => t.factorial : ℕ) : K'))
+      ≤ (((ramOverZ la : ℝ) * (α.degree : ℝ) / ((resCharOf la : ℝ) - 1) : ℝ) : EReal) := by
   have hp := resCharOf_prime la
   haveI : Fact (resCharOf la).Prime := ⟨hp⟩
   have hne : (α.prod fun _ t => t.factorial) ≠ 0 := by
@@ -164,8 +167,9 @@ theorem nval_factProd_le (ho : OverLa la V ι e) {σ : Type} (α : σ →₀ ℕ
   have hp1 : (1 : ℝ) < resCharOf la := by exact_mod_cast hp.one_lt
   have hsub : ((resCharOf la - 1 : ℕ) : ℝ) = (resCharOf la : ℝ) - 1 := by
     rw [Nat.cast_sub hp.one_le, Nat.cast_one]
-  have hleg' : ((resCharOf la : ℝ) - 1) *
-      (padicValNat (resCharOf la) (α.prod fun _ t => t.factorial) : ℝ) ≤ α.degree := by
+  have hleg'
+      : ((resCharOf la : ℝ) - 1) * (padicValNat (resCharOf la) (α.prod fun _ t => t.factorial) : ℝ)
+        ≤ α.degree := by
     rw [← hsub]
     exact_mod_cast hleg
   rw [le_div_iff₀ (by linarith)]
@@ -173,8 +177,9 @@ theorem nval_factProd_le (ho : OverLa la V ι e) {σ : Type} (α : σ →₀ ℕ
   have hr : (0 : ℝ) ≤ ramOverZ la := Nat.cast_nonneg _
   nlinarith [mul_le_mul_of_nonneg_left hleg' hr]
 
-theorem nval_factProd_le_zero (ho : OverLa la V ι e) {σ : Type} (α : σ →₀ ℕ) (hα : ∀ s, α s < resCharOf la) :
-    nval V e (((α.prod fun _ t => t.factorial : ℕ) : K')) ≤ 0 := by
+theorem nval_factProd_le_zero
+    (ho : OverLa la V ι e) {σ : Type} (α : σ →₀ ℕ) (hα : ∀ s, α s < resCharOf la)
+    : nval V e (((α.prod fun _ t => t.factorial : ℕ) : K')) ≤ 0 := by
   have hp := resCharOf_prime la
   haveI : Fact (resCharOf la).Prime := ⟨hp⟩
   have hne : (α.prod fun _ t => t.factorial) ≠ 0 := by

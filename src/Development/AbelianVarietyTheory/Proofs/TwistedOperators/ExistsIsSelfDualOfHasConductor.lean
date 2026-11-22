@@ -13,11 +13,13 @@ open scoped NNReal ENNReal
 noncomputable section
 namespace GlobalTheory.SplitWeil
 
-variable {k : Type*} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  [MeasurableSpace k] [BorelSpace k] {ψ : AddChar k Circle} {c : kˣ}
+variable
+  {k : Type*} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  [MeasurableSpace k] [BorelSpace k]
+  {ψ : AddChar k Circle} {c : kˣ}
 
-theorem isSelfDual_iff_vol (h : HasConductor ψ c) (ν : Measure k) [ν.IsAddHaarMeasure] :
-    IsSelfDual ψ ν ↔ (ν (𝒪[k] : Set k)).toReal ^ 2 * nabs k c = 1 := by
+theorem isSelfDual_iff_vol (h : HasConductor ψ c) (ν : Measure k) [ν.IsAddHaarMeasure]
+    : IsSelfDual ψ ν ↔ (ν (𝒪[k] : Set k)).toReal ^ 2 * nabs k c = 1 := by
   have := t2Space k
   have hcl : IsClosed (𝒪[k] : Set k) := (isCompact_int k).isClosed
   have hclo : IsClopen (𝒪[k] : Set k) := ⟨hcl, isOpen_int k⟩
@@ -40,7 +42,8 @@ theorem isSelfDual_iff_vol (h : HasConductor ψ c) (ν : Measure k) [ν.IsAddHaa
     rw [fourier_inversion ν h hg, hvol, hC]
     simp
 
-theorem exists_isSelfDual_of_hasConductor (h : HasConductor ψ c) : ∃ ν : Measure k, IsSelfDual ψ ν := by
+theorem exists_isSelfDual_of_hasConductor (h : HasConductor ψ c)
+    : ∃ ν : Measure k, IsSelfDual ψ ν := by
   obtain ⟨ν₀, hH, h1⟩ := exists_isUnitVol k
   have hn : 0 < nabs k c := nabs_pos k c
   set a : ℝ≥0 := ⟨(Real.sqrt (nabs k c))⁻¹, by positivity⟩ with ha
@@ -56,7 +59,8 @@ theorem exists_isSelfDual_of_hasConductor (h : HasConductor ψ c) : ∃ ν : Mea
     rfl
   rw [hval, inv_pow, Real.sq_sqrt hn.le, inv_mul_cancel₀ hn.ne']
 
-theorem isUnitVol_iff_isSelfDual (h : HasConductor ψ 1) (ν : Measure k) : IsUnitVol ν ↔ IsSelfDual ψ ν := by
+theorem isUnitVol_iff_isSelfDual (h : HasConductor ψ 1) (ν : Measure k)
+    : IsUnitVol ν ↔ IsSelfDual ψ ν := by
   constructor
   · intro hν
     haveI := hν.1
@@ -69,7 +73,14 @@ theorem isUnitVol_iff_isSelfDual (h : HasConductor ψ 1) (ν : Measure k) : IsUn
     have e1 : (ν (𝒪[k] : Set k)).toReal = 1 := by nlinarith
     exact ⟨hsd.1, (ENNReal.toReal_eq_one_iff _).1 e1⟩
 
-theorem selfDual_measure : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) (_ : Continuous ψ) (_ : ψ ≠ 1), (∃ ν : Measure k, IsSelfDual ψ ν) ∧ (HasConductor ψ 1 → ∀ ν : Measure k, IsUnitVol ν ↔ IsSelfDual ψ ν) ∧ ∀ (c : kˣ) (ν : Measure k), HasConductor ψ c → ν.IsAddHaarMeasure → (IsSelfDual ψ ν ↔ (ν (𝒪[k] : Set k)).toReal ^ 2 * nabs k c = 1) := by
+theorem selfDual_measure
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) (_ : Continuous ψ) (_ : ψ ≠ 1),
+      (∃ ν : Measure k, IsSelfDual ψ ν)
+        ∧ (HasConductor ψ 1 → ∀ ν : Measure k, IsUnitVol ν ↔ IsSelfDual ψ ν)
+        ∧ ∀ (c : kˣ) (ν : Measure k),
+          HasConductor ψ c → ν.IsAddHaarMeasure
+            → (IsSelfDual ψ ν ↔ (ν (𝒪[k] : Set k)).toReal ^ 2 * nabs k c = 1) := by
   intro k _ _ _ _ _ _ ψ hψ h1
   refine ⟨?_, fun h ν => isUnitVol_iff_isSelfDual h ν, fun c ν hc hν => ?_⟩
   · obtain ⟨c, hc⟩ := exists_hasConductor_of_continuous ψ hψ h1

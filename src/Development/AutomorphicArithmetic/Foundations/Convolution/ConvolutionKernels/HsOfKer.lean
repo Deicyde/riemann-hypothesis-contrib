@@ -7,11 +7,15 @@ public import GroundTheory.AutomorphicForms.TraceClass
 open MeasureTheory GroundTheory.Automorphic
 open scoped InnerProductSpace
 
-private theorem UpperTheory.ConvolutionTheory.K.hsOfKer_countable {H : Type*} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [TopologicalSpace.SeparableSpace H] {ι : Type*} {b : ι → H}
-    (hb : Orthonormal ℂ b) : Countable ι := by
-  refine Pairwise.countable_of_isOpen_disjoint (s := fun i => Metric.ball (b i) (1 / 2)) ?_
-    (fun _ => Metric.isOpen_ball) (fun _ => Metric.nonempty_ball.2 (by norm_num))
+private theorem UpperTheory.ConvolutionTheory.K.hsOfKer_countable
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [TopologicalSpace.SeparableSpace H]
+    {ι : Type*} {b : ι → H} (hb : Orthonormal ℂ b)
+    : Countable ι := by
+  refine Pairwise.countable_of_isOpen_disjoint
+    (s := fun i => Metric.ball (b i) (1 / 2))
+    ?_
+    (fun _ => Metric.isOpen_ball)
+    (fun _ => Metric.nonempty_ball.2 (by norm_num))
   intro i j hij
   refine Metric.ball_disjoint_ball ?_
   have h0 : ⟪b i, b j⟫_ℂ = 0 := hb.2 hij
@@ -21,18 +25,22 @@ private theorem UpperTheory.ConvolutionTheory.K.hsOfKer_countable {H : Type*} [N
   rw [dist_eq_norm]
   nlinarith [norm_nonneg (b i - b j)]
 
-private theorem UpperTheory.ConvolutionTheory.K.hsOfKer_sq {X : Type*} [MeasurableSpace X] (ν : Measure X)
-    {E : Type*} [NormedAddCommGroup E] (f : X → E) (hf : AEStronglyMeasurable f ν) :
-    eLpNorm f 2 ν ^ 2 = ∫⁻ x, ‖f x‖ₑ ^ 2 ∂ν := by
+private theorem UpperTheory.ConvolutionTheory.K.hsOfKer_sq
+    {X : Type*} [MeasurableSpace X]
+    (ν : Measure X)
+    {E : Type*} [NormedAddCommGroup E]
+    (f : X → E) (hf : AEStronglyMeasurable f ν)
+    : eLpNorm f 2 ν ^ 2 = ∫⁻ x, ‖f x‖ₑ ^ 2 ∂ν := by
   rw [eLpNorm_eq_lintegral_rpow_enorm_toReal (by norm_num) (by norm_num) hf]
   simp only [ENNReal.toReal_ofNat, ENNReal.rpow_ofNat]
   rw [← ENNReal.rpow_natCast, ← ENNReal.rpow_mul]
   norm_num
 
-theorem UpperTheory.ConvolutionTheory.K.hsOfKer :
-    ∀ {X : Type} [MeasurableSpace X] (ν : Measure X) [SFinite ν] [TopologicalSpace.SeparableSpace (Lp ℂ 2 ν)]
-      (A : Lp ℂ 2 ν →L[ℂ] Lp ℂ 2 ν) (k : X → Lp ℂ 2 ν), MemLp k 2 ν →
-      (∀ φ, (A φ : X → ℂ) =ᵐ[ν] fun x => ⟪k x, φ⟫_ℂ) → IsHilbertSchmidt A := by
+theorem UpperTheory.ConvolutionTheory.K.hsOfKer
+    : ∀ {X : Type} [MeasurableSpace X] (ν : Measure X) [SFinite ν]
+        [TopologicalSpace.SeparableSpace (Lp ℂ 2 ν)] (A : Lp ℂ 2 ν →L[ℂ] Lp ℂ 2 ν)
+        (k : X → Lp ℂ 2 ν),
+      MemLp k 2 ν → (∀ φ, (A φ : X → ℂ) =ᵐ[ν] fun x => ⟪k x, φ⟫_ℂ) → IsHilbertSchmidt A := by
   intro X _ ν _ _ A k hk hA
   let b := stdHilbertBasis ℂ (Lp ℂ 2 ν)
   haveI := UpperTheory.ConvolutionTheory.K.hsOfKer_countable b.orthonormal
@@ -40,7 +48,8 @@ theorem UpperTheory.ConvolutionTheory.K.hsOfKer :
   have h1 : ∀ i, ‖A (b i)‖ₑ ^ 2 = ∫⁻ x, ‖⟪b i, k x⟫_ℂ‖ₑ ^ 2 ∂ν := by
     intro i
     rw [Lp.enorm_def, eLpNorm_congr_ae (hA (b i)),
-      UpperTheory.ConvolutionTheory.K.hsOfKer_sq _ _ (hk.aestronglyMeasurable.inner aestronglyMeasurable_const)]
+      UpperTheory.ConvolutionTheory.K.hsOfKer_sq _ _
+        (hk.aestronglyMeasurable.inner aestronglyMeasurable_const)]
     simp only [enorm_inner_comm (k _)]
   simp only [h1]
   rw [← lintegral_tsum]

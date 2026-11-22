@@ -8,14 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AeZeroOfS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.ThetaPairingLaws
 
-theorem ipO_self {D : D7} {m n : ℕ} (μ : Measure (Mx D m n)) (𝓕 : Set (Mx D m n)) (f : Mx D m n → ℂ) :
-    ipO μ 𝓕 f f = (nrm2 μ 𝓕 f : ℂ) := by
+theorem ipO_self {D : D7} {m n : ℕ} (μ : Measure (Mx D m n)) (𝓕 : Set (Mx D m n)) (f : Mx D m n → ℂ)
+    : ipO μ 𝓕 f f = (nrm2 μ 𝓕 f : ℂ) := by
   unfold ipO nrm2
   rw [← integral_complex_ofReal]
   congr 1
@@ -31,7 +34,26 @@ private theorem countable_ratL' {D : D7} (S T : HSp D) : Countable ↥(ratL T S)
     exact Set.countable_range _
   exact h.to_subtype
 
-theorem ipO_laws : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (μ : Measure (WO S T)) (𝓕 : Set (WO S T)), IsStdChar D ψ (-1) → IsCovolOne (ratL T S) μ 𝓕 → ∀ f g : WO S T → ℂ, IsThetaFunO ψ S T f → IsThetaFunO ψ S T g → IntegrableOn (fun w => f w * (starRingEnd ℂ) (g w)) 𝓕 μ ∧ ipO μ 𝓕 g f = (starRingEnd ℂ) (ipO μ 𝓕 f g) ∧ (∀ c : ℂ, ipO μ 𝓕 (c • f) g = c * ipO μ 𝓕 f g ∧ ipO μ 𝓕 f (c • g) = (starRingEnd ℂ) c * ipO μ 𝓕 f g) ∧ (∀ f', IsThetaFunO ψ S T f' → ipO μ 𝓕 (f + f') g = ipO μ 𝓕 f g + ipO μ 𝓕 f' g ∧ ipO μ 𝓕 g (f + f') = ipO μ 𝓕 g f + ipO μ 𝓕 g f') ∧ ipO μ 𝓕 f f = (nrm2 μ 𝓕 f : ℂ) ∧ (nrm2 μ 𝓕 f = 0 → f = 0) ∧ (∀ w, ipO μ 𝓕 (heisO ψ S T w f) (heisO ψ S T w g) = ipO μ 𝓕 f g ∧ ipO μ 𝓕 (heisO ψ S T w f) g = ipO μ 𝓕 f (heisO ψ S T (-w) g)) ∧ ∀ μ' 𝓕', IsCovolOne (ratL T S) μ' 𝓕' → ipO μ' 𝓕' f g = ipO μ 𝓕 f g := by
+theorem ipO_laws
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (μ : Measure (WO S T))
+        (𝓕 : Set (WO S T)),
+      IsStdChar D ψ (-1) → IsCovolOne (ratL T S) μ 𝓕
+        → ∀ f g : WO S T → ℂ,
+          IsThetaFunO ψ S T f → IsThetaFunO ψ S T g
+            → IntegrableOn (fun w => f w * (starRingEnd ℂ) (g w)) 𝓕 μ
+              ∧ ipO μ 𝓕 g f = (starRingEnd ℂ) (ipO μ 𝓕 f g)
+              ∧ (∀ c : ℂ,
+                ipO μ 𝓕 (c • f) g = c * ipO μ 𝓕 f g
+                  ∧ ipO μ 𝓕 f (c • g) = (starRingEnd ℂ) c * ipO μ 𝓕 f g)
+              ∧ (∀ f',
+                IsThetaFunO ψ S T f'
+                  → ipO μ 𝓕 (f + f') g = ipO μ 𝓕 f g + ipO μ 𝓕 f' g
+                    ∧ ipO μ 𝓕 g (f + f') = ipO μ 𝓕 g f + ipO μ 𝓕 g f')
+              ∧ ipO μ 𝓕 f f = (nrm2 μ 𝓕 f : ℂ) ∧ (nrm2 μ 𝓕 f = 0 → f = 0)
+              ∧ (∀ w,
+                ipO μ 𝓕 (heisO ψ S T w f) (heisO ψ S T w g) = ipO μ 𝓕 f g
+                  ∧ ipO μ 𝓕 (heisO ψ S T w f) g = ipO μ 𝓕 f (heisO ψ S T (-w) g))
+              ∧ ∀ μ' 𝓕', IsCovolOne (ratL T S) μ' 𝓕' → ipO μ' 𝓕' f g = ipO μ 𝓕 f g := by
   intro D ψ S T μ 𝓕 hψ hμ f g hf hg
   have hμ₀ := hμ
   unfold IsCovolOne at hμ₀
@@ -42,12 +64,13 @@ theorem ipO_laws : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (
   obtain ⟨-, hInvol, hPres, hUnit, -⟩ := hHeis
   obtain ⟨-, -, ⟨-, hHL⟩, -⟩ := (GlobalTheory.ThetaAllChar.thetaFacts D).std hψ S T
 
-  have hInt : ∀ a b : WO S T → ℂ, IsThetaFunO ψ S T a → IsThetaFunO ψ S T b →
-      IntegrableOn (fun w => a w * (starRingEnd ℂ) (b w)) 𝓕 μ :=
-    fun a b ha hb => (hHL μ μ 𝓕 𝓕 hμ hμ a b ha hb).2.1
+  have hInt
+      : ∀ a b : WO S T → ℂ,
+        IsThetaFunO ψ S T a → IsThetaFunO ψ S T b
+          → IntegrableOn (fun w => a w * (starRingEnd ℂ) (b w)) 𝓕 μ := fun a b ha hb =>
+    (hHL μ μ 𝓕 𝓕 hμ hμ a b ha hb).2.1
   refine ⟨hInt f g hf hg, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-  ·
-    unfold ipO
+  · unfold ipO
     rw [← integral_conj]
     congr 1
     funext w
@@ -81,9 +104,7 @@ theorem ipO_laws : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (
       simp only [Pi.smul_apply, Pi.add_apply, smul_eq_mul, map_mul, map_add]
       ring
   · exact ipO_self μ 𝓕 f
-  ·
-
-    intro h0
+  · intro h0
     haveI := countable_ratL' S T
     haveI : BorelSpace (WO S T) := ⟨rfl⟩
     haveI : MeasurableConstVAdd ↥(ratL T S) (WO S T) := ⟨fun γ => measurable_const_add (γ : WO S T)⟩
@@ -95,8 +116,7 @@ theorem ipO_laws : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (
       simp only [norm_mul, Complex.norm_conj, sq]
     have hae : (fun w => ‖f w‖ ^ 2) =ᵐ[μ.restrict 𝓕] 0 :=
       (integral_eq_zero_iff_of_nonneg (fun w => sq_nonneg ‖f w‖) hI).1 h0
-    have hae' : ∀ᵐ w ∂μ.restrict 𝓕, f w = 0 :=
-      hae.mono fun w hw => by simpa using hw
+    have hae' : ∀ᵐ w ∂μ.restrict 𝓕, f w = 0 := hae.mono fun w hw => by simpa using hw
     have htopen : IsOpen {x : WO S T | f x ≠ 0} := isOpen_ne_fun hf.cont continuous_const
     have hts : μ ({x : WO S T | f x ≠ 0} ∩ 𝓕) = 0 := by
       rw [← Measure.restrict_apply₀' hFD.nullMeasurableSet]
@@ -118,14 +138,15 @@ theorem ipO_laws : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (
     have hg' : IsThetaFunO ψ S T (heisO ψ S T (-w) g) := hPres (-w) g hg
     have e := hInvol (-w) g
     rw [neg_neg] at e
-    calc ipO μ 𝓕 (heisO ψ S T w f) g
+    calc
+      ipO μ 𝓕 (heisO ψ S T w f) g
         = ipO μ 𝓕 (heisO ψ S T w f) (heisO ψ S T w (heisO ψ S T (-w) g)) := by rw [e]
       _ = ipO μ 𝓕 f (heisO ψ S T (-w) g) := hUnit μ 𝓕 hHaar hFD w f _ hf hg'
-  ·
-    intro μ' 𝓕' h'
+  · intro μ' 𝓕' h'
     have a := (hHL μ' μ 𝓕' 𝓕 h' hμ f g hf hg).2.2
     have b := (hHL μ μ 𝓕 𝓕 hμ hμ f g hf hg).2.2
-    simp only [GlobalTheory.IndefiniteRowSideFullHecke.RealDirectionThetaNonzero.heisO_apply_zero] at a b
+    simp only [GlobalTheory.IndefiniteRowSideFullHecke.RealDirectionThetaNonzero.heisO_apply_zero]
+      at a b
     unfold ipO
     rw [a, b]
 

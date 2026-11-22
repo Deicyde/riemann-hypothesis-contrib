@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.trPushQ_of :
-    TrPush → TrHl → WtPush → TrPushQ := by
+theorem UpperTheory.Gal.TranscendenceTraces.trPushQ_of : TrPush → TrHl → WtPush → TrPushQ := by
   intro hP hH hW l _ n i Z Z' S h p _ _ w hw hl
   have key : trHl l (h ≫ p) w n i ∘ₗ pullHl l (sch.map h) n i = trHl l p (Wt.push h w) n i := by
     apply LinearMap.ext

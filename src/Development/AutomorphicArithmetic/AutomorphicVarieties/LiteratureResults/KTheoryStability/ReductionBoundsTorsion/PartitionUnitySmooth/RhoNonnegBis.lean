@@ -22,9 +22,11 @@ private theorem rho_nonneg' (x : ℝ) : 0 ≤ rho x := by
 private theorem rho_le_one' (x : ℝ) : rho x ≤ 1 := by
   unfold rho; exact Real.smoothTransition.le_one _
 
-private theorem exists_lipschitz_const_rho : ∃ K : ℝ, 0 ≤ K ∧ ∀ x y : ℝ, |rho x - rho y| ≤ K * |x - y| := by
-  obtain ⟨K, hK⟩ := (Real.smoothTransition.contDiff (n := 1)).contDiffOn.exists_lipschitzOnWith
-    (s := Set.Icc (0 : ℝ) 1) one_ne_zero (convex_Icc 0 1) isCompact_Icc
+private theorem exists_lipschitz_const_rho
+    : ∃ K : ℝ, 0 ≤ K ∧ ∀ x y : ℝ, |rho x - rho y| ≤ K * |x - y| := by
+  obtain ⟨K, hK⟩ :=
+    (Real.smoothTransition.contDiff (n := 1)).contDiffOn.exists_lipschitzOnWith
+      (s := Set.Icc (0 : ℝ) 1) one_ne_zero (convex_Icc 0 1) isCompact_Icc
   have hc : ∀ x : ℝ, Real.smoothTransition x = Real.smoothTransition (max 0 (min 1 x)) := by
     intro x
     rcases le_total x 0 with hx | hx
@@ -48,16 +50,17 @@ private theorem exists_lipschitz_const_rho : ∃ K : ℝ, 0 ≤ K ∧ ∀ x y : 
     ⟨le_max_left _ _, max_le zero_le_one (min_le_left _ _)⟩
   have := hK.dist_le_mul _ (hm ((4 - x) / 3)) _ (hm ((4 - y) / 3))
   rw [Real.dist_eq, Real.dist_eq] at this
-  calc _ ≤ (K : ℝ) * |max 0 (min 1 ((4 - x) / 3)) - max 0 (min 1 ((4 - y) / 3))| := this
+  calc
+    _ ≤ (K : ℝ) * |max 0 (min 1 ((4 - x) / 3)) - max 0 (min 1 ((4 - y) / 3))| := this
     _ ≤ K * |(4 - x) / 3 - (4 - y) / 3| := mul_le_mul_of_nonneg_left (hcl _ _) K.2
     _ = K / 3 * |x - y| := by
       rw [show (4 - x) / 3 - (4 - y) / 3 = -(x - y) / 3 by ring, abs_div, abs_neg]
       norm_num
       ring
 
-private theorem norm_inner_sq_le_of_posSemidef {n : Type} [Fintype n] (M : Matrix n n ℂ) (hM : M.PosSemidef)
-    (u v : n → ℂ) :
-    ‖star u ⬝ᵥ M *ᵥ v‖ ^ 2 ≤ (star u ⬝ᵥ M *ᵥ u).re * (star v ⬝ᵥ M *ᵥ v).re := by
+private theorem norm_inner_sq_le_of_posSemidef
+    {n : Type} [Fintype n] (M : Matrix n n ℂ) (hM : M.PosSemidef) (u v : n → ℂ)
+    : ‖star u ⬝ᵥ M *ᵥ v‖ ^ 2 ≤ (star u ⬝ᵥ M *ᵥ u).re * (star v ⬝ᵥ M *ᵥ v).re := by
   letI := M.toSeminormedAddCommGroup hM
   letI := M.toInnerProductSpace hM
   have h1 := inner_mul_inner_self_le (𝕜 := ℂ) u v
@@ -74,32 +77,34 @@ private theorem qR_smul_left (h : HS L N) (z : VR L N) (c : ℝ) : qR (c • h) 
 private theorem qR_add_left (h k : HS L N) (z : VR L N) : qR (h + k) z = qR h z + qR k z := by
   simp [qR, mat_add, Matrix.add_mulVec, dotProduct_add, Finset.sum_add_distrib]
 
-private theorem qR_zero_left (z : VR L N) : qR (0 : HS L N) z = 0 := by
-  simp [qR, mat_zero]
+private theorem qR_zero_left (z : VR L N) : qR (0 : HS L N) z = 0 := by simp [qR, mat_zero]
 
-private theorem qR_finset_sum_left {ι : Type} (S : Finset ι) (f : ι → HS L N) (z : VR L N) :
-    qR (∑ i ∈ S, f i) z = ∑ i ∈ S, qR (f i) z := by
+private theorem qR_finset_sum_left {ι : Type} (S : Finset ι) (f : ι → HS L N) (z : VR L N)
+    : qR (∑ i ∈ S, f i) z = ∑ i ∈ S, qR (f i) z := by
   classical
   induction S using Finset.induction_on with
   | empty => simp [qR_zero_left]
   | insert a S ha ih => rw [Finset.sum_insert ha, qR_add_left, ih, Finset.sum_insert ha]
 
-private theorem qR_rk_eq_sum_norm_sq_inner (p : HS L N) (v : UpperTheory.V.KT.Lat L N) (z : VR L N) :
-    qR (rk p v) z = ∑ w, ‖star (z w) ⬝ᵥ mat p w *ᵥ toR v w‖ ^ 2 := by
+private theorem qR_rk_eq_sum_norm_sq_inner (p : HS L N) (v : UpperTheory.V.KT.Lat L N) (z : VR L N)
+    : qR (rk p v) z = ∑ w, ‖star (z w) ⬝ᵥ mat p w *ᵥ toR v w‖ ^ 2 := by
   unfold qR
   refine Finset.sum_congr rfl fun w _ => ?_
   have : mat (rk p v) w = vecMulVec (mat p w *ᵥ toR v w) (star (mat p w *ᵥ toR v w)) := rfl
   rw [this, Matrix.vecMulVec_mulVec, op_smul_eq_smul, dotProduct_smul, smul_eq_mul]
-  have hd : star (mat p w *ᵥ toR v w) ⬝ᵥ z w =
-      (starRingEnd ℂ) (star (z w) ⬝ᵥ mat p w *ᵥ toR v w) := by
+  have hd
+      : star (mat p w *ᵥ toR v w) ⬝ᵥ z w = (starRingEnd ℂ) (star (z w) ⬝ᵥ mat p w *ᵥ toR v w) := by
     rw [starRingEnd_apply, Matrix.star_dotProduct]
   rw [hd, Complex.conj_mul']
   norm_cast
 
-private theorem qR_term_eq_normalized_weighted_sum (s : ℝ) (p : HS L N) (z : VR L N) (S : Finset (UpperTheory.V.KT.Lat L N))
-    (hS : ∀ v, v ∉ S → rho (q p v / s) = 0) :
-    qR (term s p) z = (s ^ 2 * ∑ v ∈ S, rho (q p v / s))⁻¹ *
-      ∑ v ∈ S, rho (q p v / s) * ∑ w, ‖star (z w) ⬝ᵥ mat p w *ᵥ toR v w‖ ^ 2 := by
+private theorem qR_term_eq_normalized_weighted_sum
+    (s : ℝ) (p : HS L N)
+    (z : VR L N)
+    (S : Finset (UpperTheory.V.KT.Lat L N)) (hS : ∀ v, v ∉ S → rho (q p v / s) = 0)
+    : qR (term s p) z
+      = (s ^ 2 * ∑ v ∈ S, rho (q p v / s))⁻¹
+        * ∑ v ∈ S, rho (q p v / s) * ∑ w, ‖star (z w) ⬝ᵥ mat p w *ᵥ toR v w‖ ^ 2 := by
   have h1 : zed s p = ∑ v ∈ S, rho (q p v / s) := by
     show (∑ᶠ v, rho (q p v / s)) = _
     apply finsum_eq_sum_of_support_subset
@@ -117,13 +122,14 @@ private theorem qR_term_eq_normalized_weighted_sum (s : ℝ) (p : HS L N) (z : V
   refine Finset.sum_congr rfl fun v _ => ?_
   rw [qR_smul_left, qR_rk_eq_sum_norm_sq_inner]
 
-private theorem qR_nonneg_VR_of_mem_Pos (p : HS L N) (hp : p ∈ Pos L N) (y : VR L N) : 0 ≤ qR p y := by
+private theorem qR_nonneg_VR_of_mem_Pos (p : HS L N) (hp : p ∈ Pos L N) (y : VR L N)
+    : 0 ≤ qR p y := by
   have hp' : ∀ w, (mat p w).PosDef := hp
   exact Finset.sum_nonneg fun w _ => (hp' w).posSemidef.re_dotProduct_nonneg (y w)
 
-private theorem sum_norm_sq_inner_mat_toR_le_qR_mul_q (p : HS L N) (hp : p ∈ Pos L N) (z : VR L N)
-    (v : UpperTheory.V.KT.Lat L N) :
-    ∑ w, ‖star (z w) ⬝ᵥ mat p w *ᵥ toR v w‖ ^ 2 ≤ qR p z * q p v := by
+private theorem sum_norm_sq_inner_mat_toR_le_qR_mul_q
+    (p : HS L N) (hp : p ∈ Pos L N) (z : VR L N) (v : UpperTheory.V.KT.Lat L N)
+    : ∑ w, ‖star (z w) ⬝ᵥ mat p w *ᵥ toR v w‖ ^ 2 ≤ qR p z * q p v := by
   have hp' : ∀ w, (mat p w).PosDef := hp
   have hX : ∀ w, 0 ≤ (star (z w) ⬝ᵥ mat p w *ᵥ z w).re := fun w =>
     (hp' w).posSemidef.re_dotProduct_nonneg (z w)
@@ -135,25 +141,31 @@ private theorem sum_norm_sq_inner_mat_toR_le_qR_mul_q (p : HS L N) (hp : p ∈ P
   refine Finset.sum_le_sum fun w _ => ?_
   refine (norm_inner_sq_le_of_posSemidef _ (hp' w).posSemidef _ _).trans ?_
   exact mul_le_mul_of_nonneg_left
-    (Finset.single_le_sum (f := fun w => (star (toR v w) ⬝ᵥ mat p w *ᵥ toR v w).re)
-      (fun w _ => hY w) (Finset.mem_univ w)) (hX w)
+    (Finset.single_le_sum
+      (f := fun w => (star (toR v w) ⬝ᵥ mat p w *ᵥ toR v w).re)
+      (fun w _ => hY w)
+      (Finset.mem_univ w))
+    (hX w)
 
-private theorem place_form_perturbation_bound_of_sq_le (h k : HS L N) (hp : h ∈ Pos L N) (δ : ℝ) (hδ0 : 0 ≤ δ)
-    (hδ : δ ≤ 1 / 4)
+private theorem place_form_perturbation_bound_of_sq_le
+    (h k : HS L N) (hp : h ∈ Pos L N)
+    (δ : ℝ) (hδ0 : 0 ≤ δ) (hδ : δ ≤ 1 / 4)
     (h5 : ∀ (w : InfinitePlace L) (u v : Fin N → ℂ),
-      ‖star u ⬝ᵥ mat k w *ᵥ v - star u ⬝ᵥ mat h w *ᵥ v‖ ^ 2 ≤
-        4 * δ ^ 2 * (star u ⬝ᵥ mat h w *ᵥ u).re * (star v ⬝ᵥ mat h w *ᵥ v).re)
-    (z : VR L N) (v : UpperTheory.V.KT.Lat L N) :
-    |∑ w, ‖star (z w) ⬝ᵥ mat k w *ᵥ toR v w‖ ^ 2 - ∑ w, ‖star (z w) ⬝ᵥ mat h w *ᵥ toR v w‖ ^ 2|
+      ‖star u ⬝ᵥ mat k w *ᵥ v - star u ⬝ᵥ mat h w *ᵥ v‖ ^ 2
+        ≤ 4 * δ ^ 2 * (star u ⬝ᵥ mat h w *ᵥ u).re * (star v ⬝ᵥ mat h w *ᵥ v).re)
+    (z : VR L N) (v : UpperTheory.V.KT.Lat L N)
+    : |∑ w, ‖star (z w) ⬝ᵥ mat k w *ᵥ toR v w‖ ^ 2 - ∑ w, ‖star (z w) ⬝ᵥ mat h w *ᵥ toR v w‖ ^ 2|
       ≤ 5 * δ * (qR h z * q h v) := by
   have hp' : ∀ w, (mat h w).PosDef := hp
   have hX : ∀ w, 0 ≤ (star (z w) ⬝ᵥ mat h w *ᵥ z w).re := fun w =>
     (hp' w).posSemidef.re_dotProduct_nonneg (z w)
   have hY : ∀ w, 0 ≤ (star (toR v w) ⬝ᵥ mat h w *ᵥ toR v w).re := fun w =>
     (hp' w).posSemidef.re_dotProduct_nonneg (toR v w)
-  have hw : ∀ w, |‖star (z w) ⬝ᵥ mat k w *ᵥ toR v w‖ ^ 2 - ‖star (z w) ⬝ᵥ mat h w *ᵥ toR v w‖ ^ 2|
-      ≤ 5 * δ * ((star (z w) ⬝ᵥ mat h w *ᵥ z w).re *
-        (star (toR v w) ⬝ᵥ mat h w *ᵥ toR v w).re) := by
+  have hw
+      : ∀ w,
+        |‖star (z w) ⬝ᵥ mat k w *ᵥ toR v w‖ ^ 2 - ‖star (z w) ⬝ᵥ mat h w *ᵥ toR v w‖ ^ 2|
+          ≤ 5 * δ
+            * ((star (z w) ⬝ᵥ mat h w *ᵥ z w).re * (star (toR v w) ⬝ᵥ mat h w *ᵥ toR v w).re) := by
     intro w
     set xk := star (z w) ⬝ᵥ mat k w *ᵥ toR v w
     set xh := star (z w) ⬝ᵥ mat h w *ᵥ toR v w
@@ -199,8 +211,11 @@ private theorem place_form_perturbation_bound_of_sq_le (h k : HS L N) (hp : h �
   rw [Finset.sum_mul]
   refine Finset.sum_le_sum fun w _ => ?_
   exact mul_le_mul_of_nonneg_left
-    (Finset.single_le_sum (f := fun w => (star (toR v w) ⬝ᵥ mat h w *ᵥ toR v w).re)
-      (fun w _ => hY w) (Finset.mem_univ w)) (hX w)
+    (Finset.single_le_sum
+      (f := fun w => (star (toR v w) ⬝ᵥ mat h w *ᵥ toR v w).re)
+      (fun w _ => hY w)
+      (Finset.mem_univ w))
+    (hX w)
 
 private theorem rk_zero_right_of_hs (p : HS L N) : rk p 0 = 0 := by
   have h0 : toR (0 : UpperTheory.V.KT.Lat L N) = 0 := by
@@ -214,28 +229,28 @@ private theorem rk_zero_right_of_hs (p : HS L N) : rk p 0 = 0 := by
   unfold mat at this
   exact this
 
-private theorem abs_ratio_perturbation_bound_of_estimates (s Zh FinalFormK Ah Ak Q δ M C1 K : ℝ) (hs : 0 < s) (hZh : 0 < Zh)
-    (hZk : 0 < FinalFormK) (hAh0 : 0 ≤ Ah) (hAh : Ah ≤ 4 * s * Q * Zh)
+private theorem abs_ratio_perturbation_bound_of_estimates
+    (s Zh FinalFormK Ah Ak Q δ M C1 K : ℝ)
+    (hs : 0 < s) (hZh : 0 < Zh) (hZk : 0 < FinalFormK) (hAh0 : 0 ≤ Ah) (hAh : Ah ≤ 4 * s * Q * Zh)
     (hA : |Ak - Ah| ≤ (128 * K + 40) * δ * s * Q * M) (hZ : |FinalFormK - Zh| ≤ 8 * K * δ * M)
-    (hM : M ≤ C1 * FinalFormK) (hδ : 0 ≤ δ) (hQ : 0 ≤ Q) (hK : 0 ≤ K) (hM0 : 0 ≤ M) :
-    |(s ^ 2 * FinalFormK)⁻¹ * Ak - (s ^ 2 * Zh)⁻¹ * Ah| ≤ (160 * K + 40) * C1 * δ / s * Q := by
-  have e : (s ^ 2 * FinalFormK)⁻¹ * Ak - (s ^ 2 * Zh)⁻¹ * Ah =
-      ((Ak - Ah) * Zh + Ah * (Zh - FinalFormK)) / (s ^ 2 * FinalFormK * Zh) := by
+    (hM : M ≤ C1 * FinalFormK) (hδ : 0 ≤ δ) (hQ : 0 ≤ Q) (hK : 0 ≤ K) (hM0 : 0 ≤ M)
+    : |(s ^ 2 * FinalFormK)⁻¹ * Ak - (s ^ 2 * Zh)⁻¹ * Ah| ≤ (160 * K + 40) * C1 * δ / s * Q := by
+  have e
+      : (s ^ 2 * FinalFormK)⁻¹ * Ak - (s ^ 2 * Zh)⁻¹ * Ah
+        = ((Ak - Ah) * Zh + Ah * (Zh - FinalFormK)) / (s ^ 2 * FinalFormK * Zh) := by
     field_simp
     ring
   have hden : (0 : ℝ) < s ^ 2 * FinalFormK * Zh := by positivity
   rw [e, abs_div, abs_of_pos hden, div_le_iff₀ hden]
   have hZ' : |Zh - FinalFormK| ≤ 8 * K * δ * M := by rwa [abs_sub_comm]
-  calc |(Ak - Ah) * Zh + Ah * (Zh - FinalFormK)|
-      ≤ |Ak - Ah| * Zh + Ah * |Zh - FinalFormK| := by
-        refine (abs_add_le _ _).trans ?_
-        rw [abs_mul, abs_mul, abs_of_pos hZh, abs_of_nonneg hAh0]
-    _ ≤ (128 * K + 40) * δ * s * Q * M * Zh + (4 * s * Q * Zh) * (8 * K * δ * M) := by
-        gcongr
+  calc
+    |(Ak - Ah) * Zh + Ah * (Zh - FinalFormK)| ≤ |Ak - Ah| * Zh + Ah * |Zh - FinalFormK| := by
+      refine (abs_add_le _ _).trans ?_
+      rw [abs_mul, abs_mul, abs_of_pos hZh, abs_of_nonneg hAh0]
+    _ ≤ (128 * K + 40) * δ * s * Q * M * Zh + (4 * s * Q * Zh) * (8 * K * δ * M) := by gcongr
     _ = (160 * K + 40) * δ * s * Q * Zh * M := by ring
     _ ≤ (160 * K + 40) * δ * s * Q * Zh * (C1 * FinalFormK) := by gcongr
-    _ = (160 * K + 40) * C1 * δ / s * Q * (s ^ 2 * FinalFormK * Zh) := by
-        field_simp
+    _ = (160 * K + 40) * C1 * δ / s * Q * (s ^ 2 * FinalFormK * Zh) := by field_simp
 
 set_option maxHeartbeats 1600000 in
 theorem pf_GTLip : GTLip := by
@@ -284,9 +299,10 @@ theorem pf_GTLip : GTLip := by
     have e1 : ∀ v ∈ T, rho (q h v / s) = 1 := fun v hv => by
       rw [hmemT] at hv
       exact hr1 _ (by rw [div_le_one hs]; linarith)
-    calc (T.card : ℝ) = ∑ v ∈ T, rho (q h v / s) := by
-          rw [Finset.sum_congr rfl e1]
-          simp
+    calc
+      (T.card : ℝ) = ∑ v ∈ T, rho (q h v / s) := by
+        rw [Finset.sum_congr rfl e1]
+        simp
       _ ≤ ∑ v ∈ S, rho (q h v / s) := Finset.sum_le_sum_of_subset_of_nonneg hTS fun _ _ _ => hrn _
   have hZhpos : 0 < ∑ v ∈ S, rho (q h v / s) := by linarith
   have hAh0 : 0 ≤ ∑ v ∈ S, rho (q h v / s) * ah v :=
@@ -306,9 +322,9 @@ theorem pf_GTLip : GTLip := by
   · rw [hTh]
     exact mul_nonneg (inv_nonneg.2 (by positivity)) hAh0
   · rw [hTh, inv_mul_le_iff₀ (by positivity)]
-    calc _ ≤ 4 * s * qR h z * ∑ v ∈ S, rho (q h v / s) := hAh
-      _ = s ^ 2 * (∑ v ∈ S, rho (q h v / s)) * (4 / s * qR h z) := by
-        field_simp
+    calc
+      _ ≤ 4 * s * qR h z * ∑ v ∈ S, rho (q h v / s) := hAh
+      _ = s ^ 2 * (∑ v ∈ S, rho (q h v / s)) * (4 / s * qR h z) := by field_simp
   · intro hl
     show (s ^ 2 * zed s h)⁻¹ • ∑ᶠ v, rho (q h v / s) • rk h v = 0
     have e : ∀ v, rho (q h v / s) • rk h v = 0 := by
@@ -343,16 +359,19 @@ theorem pf_GTLip : GTLip := by
         have := (hqk v).2
         have := hqh0 v
         exact hr1 _ (by rw [div_le_one hs]; nlinarith)
-      calc (T.card : ℝ) = ∑ v ∈ T, rho (q k v / s) := by
-            rw [Finset.sum_congr rfl e1]
-            simp
+      calc
+        (T.card : ℝ) = ∑ v ∈ T, rho (q k v / s) := by
+          rw [Finset.sum_congr rfl e1]
+          simp
         _ ≤ ∑ v ∈ S, rho (q k v / s) := Finset.sum_le_sum_of_subset_of_nonneg hTS fun _ _ _ => hrn _
     have hZkpos : 0 < ∑ v ∈ S, rho (q k v / s) := by linarith
     have hM : (S.card : ℝ) ≤ C1 * ∑ v ∈ S, rho (q k v / s) := by
       have := hC1 h hh (4 / 5 * s) (by positivity)
       rw [show (10 : ℝ) * (4 / 5 * s) = 8 * s by ring] at this
       rw [Set.ncard_eq_toFinset_card _ (hfin _), Set.ncard_eq_toFinset_card _ (hfin _)] at this
-      calc (S.card : ℝ) ≤ C1 * T.card := this
+      calc
+        (S.card : ℝ)
+          ≤ C1 * T.card := this
         _ ≤ C1 * ∑ v ∈ S, rho (q k v / s) := mul_le_mul_of_nonneg_left hZk hC1pos.le
     have hρd : ∀ v ∈ S, |rho (q k v / s) - rho (q h v / s)| ≤ 8 * K * δ := fun v hv => by
       rw [hmemS] at hv
@@ -360,10 +379,13 @@ theorem pf_GTLip : GTLip := by
       have h2 : |q k v / s - q h v / s| ≤ 8 * δ := by
         rw [← sub_div, abs_div, abs_of_pos hs, div_le_iff₀ hs]
         have := hClz (toR v)
-        calc |q k v - q h v| ≤ δ * q h v := this
+        calc
+          |q k v - q h v|
+            ≤ δ * q h v := this
           _ ≤ δ * (8 * s) := mul_le_mul_of_nonneg_left hv hδ0
           _ = 8 * δ * s := by ring
-      calc _ ≤ K * |q k v / s - q h v / s| := h1
+      calc
+        _ ≤ K * |q k v / s - q h v / s| := h1
         _ ≤ K * (8 * δ) := mul_le_mul_of_nonneg_left h2 hK0
         _ = 8 * K * δ := by ring
     have hZ : |∑ v ∈ S, rho (q k v / s) - ∑ v ∈ S, rho (q h v / s)| ≤ 8 * K * δ * S.card := by
@@ -373,12 +395,15 @@ theorem pf_GTLip : GTLip := by
       rw [Finset.sum_const, nsmul_eq_mul]
       ring_nf
       rfl
-    have hA : |∑ v ∈ S, rho (q k v / s) * ak v - ∑ v ∈ S, rho (q h v / s) * ah v| ≤
-        (128 * K + 40) * δ * s * qR h z * S.card := by
+    have hA
+        : |∑ v ∈ S, rho (q k v / s) * ak v - ∑ v ∈ S, rho (q h v / s) * ah v|
+          ≤ (128 * K + 40) * δ * s * qR h z * S.card := by
       rw [← Finset.sum_sub_distrib]
       refine (Finset.abs_sum_le_sum_abs _ _).trans ?_
-      have hv' : ∀ v ∈ S, |rho (q k v / s) * ak v - rho (q h v / s) * ah v| ≤
-          (128 * K + 40) * δ * s * qR h z := fun v hv => by
+      have hv'
+          : ∀ v ∈ S,
+            |rho (q k v / s) * ak v - rho (q h v / s) * ah v|
+              ≤ (128 * K + 40) * δ * s * qR h z := fun v hv => by
         have hvS := (hmemS v).1 hv
         have hd := hρd v hv
         have hakle : ak v ≤ 16 * s * qR h z := by
@@ -389,9 +414,12 @@ theorem pf_GTLip : GTLip := by
             linarith
           have h4 := qR_nonneg_VR_of_mem_Pos k hkP z
           have h5 := hqh0 v
-          have h6 : q k v ≤ (1 + δ) * (8 * s) := h2.trans (mul_le_mul_of_nonneg_left hvS (by linarith))
+          have h6 : q k v ≤ (1 + δ) * (8 * s) :=
+            h2.trans (mul_le_mul_of_nonneg_left hvS (by linarith))
           have h7 : 0 ≤ q k v := qR_nonneg_VR_of_mem_Pos k hkP _
-          calc ak v ≤ qR k z * q k v := h1
+          calc
+            ak v
+              ≤ qR k z * q k v := h1
             _ ≤ ((1 + δ) * qR h z) * ((1 + δ) * (8 * s)) := mul_le_mul h3 h6 h7 (by positivity)
             _ = ((1 + δ) * (1 + δ)) * (8 * s * qR h z) := by ring
             _ ≤ 2 * (8 * s * qR h z) := by
@@ -404,8 +432,10 @@ theorem pf_GTLip : GTLip := by
           have h1 := mul_le_mul_of_nonneg_left hvS hQ
           have h2 := mul_le_mul_of_nonneg_left h1 (by positivity : (0 : ℝ) ≤ 5 * δ)
           linarith
-        have e : rho (q k v / s) * ak v - rho (q h v / s) * ah v =
-            (rho (q k v / s) - rho (q h v / s)) * ak v + rho (q h v / s) * (ak v - ah v) := by ring
+        have e
+            : rho (q k v / s) * ak v - rho (q h v / s) * ah v
+              = (rho (q k v / s) - rho (q h v / s)) * ak v + rho (q h v / s) * (ak v - ah v) := by
+          ring
         rw [e]
         refine (abs_add_le _ _).trans ?_
         rw [abs_mul, abs_mul, abs_of_nonneg (hak0 v), abs_of_nonneg (hrn _)]
@@ -419,8 +449,8 @@ theorem pf_GTLip : GTLip := by
       ring_nf
       rfl
     rw [hTk, hTh]
-    exact abs_ratio_perturbation_bound_of_estimates s _ _ _ _ (qR h z) δ S.card C1 K hs hZhpos hZkpos hAh0 hAh hA hZ hM hδ0
-      hQ hK0 (Nat.cast_nonneg _)
+    exact abs_ratio_perturbation_bound_of_estimates s _ _ _ _ (qR h z) δ S.card C1 K hs hZhpos
+      hZkpos hAh0 hAh hA hZ hM hδ0 hQ hK0 (Nat.cast_nonneg _)
 
 end GTLipPf
 

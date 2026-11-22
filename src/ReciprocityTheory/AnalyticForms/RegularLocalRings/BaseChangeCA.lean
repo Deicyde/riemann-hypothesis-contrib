@@ -10,15 +10,16 @@ open MvPolynomial TensorProduct
 
 section FracTensor
 
-variable (ι : Type) (F : Type) [Field F] [Algebra ℚ F] [Algebra (MvPolynomial ι ℚ) F]
+variable
+  (ι : Type) (F : Type) [Field F] [Algebra ℚ F] [Algebra (MvPolynomial ι ℚ) F]
   [IsScalarTower ℚ (MvPolynomial ι ℚ) F] [IsFractionRing (MvPolynomial ι ℚ) F]
   (C : Type) [Field C] [Algebra ℚ C]
 
-theorem fracTensor_exists_den (z : F ⊗[ℚ] C) :
-    ∃ s ∈ nonZeroDivisors (MvPolynomial ι ℚ), ∃ w : MvPolynomial ι ℚ ⊗[ℚ] C,
-      (algebraMap (MvPolynomial ι ℚ) F s ⊗ₜ[ℚ] (1 : C)) * z =
-        Algebra.TensorProduct.map (IsScalarTower.toAlgHom ℚ (MvPolynomial ι ℚ) F)
-          (AlgHom.id ℚ C) w := by
+theorem fracTensor_exists_den (z : F ⊗[ℚ] C)
+    : ∃ s ∈ nonZeroDivisors (MvPolynomial ι ℚ), ∃ w : MvPolynomial ι ℚ ⊗[ℚ] C,
+      (algebraMap (MvPolynomial ι ℚ) F s ⊗ₜ[ℚ] (1 : C)) * z
+        = Algebra.TensorProduct.map (IsScalarTower.toAlgHom ℚ (MvPolynomial ι ℚ) F) (AlgHom.id ℚ C)
+          w := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨1, one_mem _, 0, by simp⟩
   | tmul a c =>
@@ -29,15 +30,17 @@ theorem fracTensor_exists_den (z : F ⊗[ℚ] C) :
   | add z₁ z₂ h₁ h₂ =>
     obtain ⟨s₁, hs₁, w₁, e₁⟩ := h₁
     obtain ⟨s₂, hs₂, w₂, e₂⟩ := h₂
-    refine ⟨s₁ * s₂, mul_mem hs₁ hs₂,
-      (s₂ ⊗ₜ[ℚ] (1 : C)) * w₁ + (s₁ ⊗ₜ[ℚ] (1 : C)) * w₂, ?_⟩
-    have hΦ : ∀ t : MvPolynomial ι ℚ,
-        Algebra.TensorProduct.map (IsScalarTower.toAlgHom ℚ (MvPolynomial ι ℚ) F) (AlgHom.id ℚ C)
-          (t ⊗ₜ[ℚ] (1 : C)) = algebraMap (MvPolynomial ι ℚ) F t ⊗ₜ[ℚ] (1 : C) := fun t => by
+    refine ⟨s₁ * s₂, mul_mem hs₁ hs₂, (s₂ ⊗ₜ[ℚ] (1 : C)) * w₁ + (s₁ ⊗ₜ[ℚ] (1 : C)) * w₂, ?_⟩
+    have hΦ
+        : ∀ t : MvPolynomial ι ℚ,
+          Algebra.TensorProduct.map (IsScalarTower.toAlgHom ℚ (MvPolynomial ι ℚ) F) (AlgHom.id ℚ C)
+              (t ⊗ₜ[ℚ] (1 : C))
+            = algebraMap (MvPolynomial ι ℚ) F t ⊗ₜ[ℚ] (1 : C) := fun t => by
       rw [Algebra.TensorProduct.map_tmul]; rfl
-    have hsplit : (algebraMap (MvPolynomial ι ℚ) F s₁ * algebraMap (MvPolynomial ι ℚ) F s₂) ⊗ₜ[ℚ] (1 : C) =
-        (algebraMap (MvPolynomial ι ℚ) F s₁ ⊗ₜ[ℚ] (1 : C)) *
-          (algebraMap (MvPolynomial ι ℚ) F s₂ ⊗ₜ[ℚ] (1 : C)) := by
+    have hsplit
+        : (algebraMap (MvPolynomial ι ℚ) F s₁ * algebraMap (MvPolynomial ι ℚ) F s₂) ⊗ₜ[ℚ] (1 : C)
+          = (algebraMap (MvPolynomial ι ℚ) F s₁ ⊗ₜ[ℚ] (1 : C))
+            * (algebraMap (MvPolynomial ι ℚ) F s₂ ⊗ₜ[ℚ] (1 : C)) := by
       rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one]
     simp only [map_add (f := _), map_mul, hΦ]
     rw [← e₁, ← e₂, hsplit]
@@ -47,8 +50,8 @@ include ι in
 theorem isDomain_tensor_of_isFractionRing : IsDomain (F ⊗[ℚ] C) := by
   have h1 : Function.Injective (IsScalarTower.toAlgHom ℚ (MvPolynomial ι ℚ) F) :=
     IsFractionRing.injective (MvPolynomial ι ℚ) F
-  have hinj : Function.Injective
-      (Algebra.TensorProduct.map (IsScalarTower.toAlgHom ℚ (MvPolynomial ι ℚ) F) (AlgHom.id ℚ C)) :=
+  have hinj : Function.Injective (Algebra.TensorProduct.map
+      (IsScalarTower.toAlgHom ℚ (MvPolynomial ι ℚ) F) (AlgHom.id ℚ C)) :=
     Module.Flat.rTensor_preserves_injective_linearMap (M := C)
       (IsScalarTower.toAlgHom ℚ (MvPolynomial ι ℚ) F).toLinearMap h1
   let e : MvPolynomial ι ℚ ⊗[ℚ] C ≃+* MvPolynomial ι C :=
@@ -56,8 +59,9 @@ theorem isDomain_tensor_of_isFractionRing : IsDomain (F ⊗[ℚ] C) := by
       (MvPolynomial.algebraTensorAlgEquiv (σ := ι) ℚ C).toRingEquiv
   haveI hD : IsDomain (MvPolynomial ι ℚ ⊗[ℚ] C) := Function.Injective.isDomain e e.injective
   haveI : Nontrivial (F ⊗[ℚ] C) := hinj.nontrivial
-  have hu : ∀ s ∈ nonZeroDivisors (MvPolynomial ι ℚ),
-      IsUnit (algebraMap (MvPolynomial ι ℚ) F s ⊗ₜ[ℚ] (1 : C)) := by
+  have hu
+      : ∀ s ∈ nonZeroDivisors (MvPolynomial ι ℚ),
+        IsUnit (algebraMap (MvPolynomial ι ℚ) F s ⊗ₜ[ℚ] (1 : C)) := by
     intro s hs
     have h0 : algebraMap (MvPolynomial ι ℚ) F s ≠ 0 :=
       IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hs
@@ -92,9 +96,10 @@ section Red
 
 attribute [-instance] DivisionRing.toRatAlgebra
 
-theorem isReduced_tensor_domain (F K D : Type) [Field F] [Field K] [Algebra F K]
-    [Algebra.FormallyUnramified F K] [Algebra.EssFiniteType F K] [CommRing D] [IsDomain D]
-    [Algebra F D] : IsReduced (K ⊗[F] D) := by
+theorem isReduced_tensor_domain
+    (F K D : Type) [Field F] [Field K] [Algebra F K] [Algebra.FormallyUnramified F K]
+    [Algebra.EssFiniteType F K] [CommRing D] [IsDomain D] [Algebra F D]
+    : IsReduced (K ⊗[F] D) := by
   let M := FractionRing D
   have hinj : Function.Injective (Algebra.TensorProduct.map (AlgHom.id F K)
       (IsScalarTower.toAlgHom F D M)) :=
@@ -103,11 +108,13 @@ theorem isReduced_tensor_domain (F K D : Type) [Field F] [Field K] [Algebra F K]
     have := Algebra.FormallyUnramified.isReduced_of_field M (M ⊗[F] K)
     exact isReduced_of_injective (Algebra.TensorProduct.comm F K M).toRingEquiv.toRingHom
       (Algebra.TensorProduct.comm F K M).injective
-  exact isReduced_of_injective (Algebra.TensorProduct.map (AlgHom.id F K)
-      (IsScalarTower.toAlgHom F D M)).toRingHom hinj
+  exact isReduced_of_injective
+    (Algebra.TensorProduct.map (AlgHom.id F K) (IsScalarTower.toAlgHom F D M)).toRingHom hinj
 
-theorem isReduced_tensor_of_essFiniteType (K : Type) [Field K] [Algebra ℚ K]
-    [Algebra.EssFiniteType ℚ K] (C : Type) [Field C] [Algebra ℚ C] : IsReduced (K ⊗[ℚ] C) := by
+theorem isReduced_tensor_of_essFiniteType
+    (K : Type) [Field K] [Algebra ℚ K] [Algebra.EssFiniteType ℚ K]
+    (C : Type) [Field C] [Algebra ℚ C]
+    : IsReduced (K ⊗[ℚ] C) := by
   obtain ⟨s, hs⟩ := exists_isTranscendenceBasis ℚ K
   set F0 := IntermediateField.adjoin ℚ (Set.range ((↑) : s → K))
   have : Algebra.IsAlgebraic F0 K := hs.isAlgebraic_field
@@ -119,10 +126,13 @@ theorem isReduced_tensor_of_essFiniteType (K : Type) [Field K] [Algebra ℚ K]
   let e := hs.1.aevalEquivField
   letI : Algebra (MvPolynomial s ℚ) F0 :=
     (e.toRingEquiv.toRingHom.comp (algebraMap (MvPolynomial s ℚ) (FractionRing (MvPolynomial s ℚ)))).toAlgebra
-  have := IsScalarTower.of_algebraMap_eq' (R := ℚ) (S := MvPolynomial s ℚ) (A := F0)
-    (Subsingleton.elim _ _)
-  let e' : FractionRing (MvPolynomial s ℚ) ≃ₐ[MvPolynomial s ℚ] F0 :=
-    { e.toRingEquiv with commutes' := fun _ => rfl }
+  have :=
+    IsScalarTower.of_algebraMap_eq' (R := ℚ) (S := MvPolynomial s ℚ) (A := F0)
+      (Subsingleton.elim _ _)
+  let e' : FractionRing (MvPolynomial s ℚ) ≃ₐ[MvPolynomial s ℚ] F0 := {
+    e.toRingEquiv with
+    commutes' := fun _ => rfl
+  }
   have : IsFractionRing (MvPolynomial s ℚ) F0 :=
     IsLocalization.isLocalization_of_algEquiv (nonZeroDivisors (MvPolynomial s ℚ)) e'
   have : IsDomain (F0 ⊗[ℚ] C) := isDomain_tensor_of_isFractionRing s F0 C

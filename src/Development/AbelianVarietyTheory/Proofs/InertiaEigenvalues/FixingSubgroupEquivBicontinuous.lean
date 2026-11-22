@@ -8,16 +8,18 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpS
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
 
 namespace GlobalTheory
 
 open scoped Topology
 
-theorem fixingSubgroupEquiv_bicontinuous (k Ω : Type) [Field k] [Field Ω] [Algebra k Ω]
-    (K : IntermediateField k Ω) [FiniteDimensional k ↥K] :
-    Continuous (IntermediateField.fixingSubgroupEquiv K) ∧
-      Continuous (IntermediateField.fixingSubgroupEquiv K).symm := by
+theorem fixingSubgroupEquiv_bicontinuous
+    (k Ω : Type) [Field k] [Field Ω] [Algebra k Ω]
+    (K : IntermediateField k Ω) [FiniteDimensional k ↥K]
+    : Continuous (IntermediateField.fixingSubgroupEquiv K)
+      ∧ Continuous (IntermediateField.fixingSubgroupEquiv K).symm := by
   refine ⟨continuous_of_continuousAt_one _ ?_, continuous_of_continuousAt_one _ ?_⟩
   · rw [ContinuousAt, map_one, Filter.tendsto_def]
     intro s hs
@@ -26,8 +28,11 @@ theorem fixingSubgroupEquiv_bicontinuous (k Ω : Type) [Field k] [Field Ω] [Alg
     have hE' : Module.Finite k E := Module.Finite.trans K E
     have hfin : FiniteDimensional k (E.restrictScalars k) := hE'
     rw [mem_nhds_subtype]
-    refine ⟨(E.restrictScalars k).fixingSubgroup,
-      (krullTopology_mem_nhds_one_iff k Ω _).2 ⟨E.restrictScalars k, hfin, subset_rfl⟩, ?_⟩
+    refine ⟨
+      (E.restrictScalars k).fixingSubgroup,
+      (krullTopology_mem_nhds_one_iff k Ω _).2 ⟨E.restrictScalars k, hfin, subset_rfl⟩,
+      ?_
+    ⟩
     intro σ hσ
     apply hEs
     rw [SetLike.mem_coe, IntermediateField.mem_fixingSubgroup_iff]

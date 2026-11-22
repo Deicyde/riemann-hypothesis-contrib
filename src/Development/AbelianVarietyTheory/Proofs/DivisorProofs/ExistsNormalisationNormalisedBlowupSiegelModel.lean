@@ -15,9 +15,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIsoMorphis
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -26,8 +29,10 @@ noncomputable section
 
 namespace GlobalTheory.PoincCov
 
-theorem isProper_of_blowup {n : ℕ} {Z : Scheme.{0}} (z : Z ⟶ Sp (cycAway n)) (hz : IsProjOver z)
-    {J : Z.IdealSheafData} {S₀ : Scheme.{0}} {π₀ : S₀ ⟶ Z} (hB : FinalTheorems.Blowup π₀ J) : IsProper π₀ := by
+theorem isProper_of_blowup
+    {n : ℕ} {Z : Scheme.{0}} (z : Z ⟶ Sp (cycAway n)) (hz : IsProjOver z)
+    {J : Z.IdealSheafData} {S₀ : Scheme.{0}} {π₀ : S₀ ⟶ Z} (hB : FinalTheorems.Blowup π₀ J)
+    : IsProper π₀ := by
   haveI : Algebra.FiniteType ℤ (cycAway n) := finiteType_cycAway n
   haveI : IsNoetherianRing (cycAway n) := Algebra.FiniteType.isNoetherianRing ℤ _
   obtain ⟨X', b, hb, hbs, -⟩ := GlobalTheory.ProjBlowup.exists_blowup z hz J
@@ -49,15 +54,20 @@ theorem isProper_of_blowup {n : ℕ} {Z : Scheme.{0}} (z : Z ⟶ Sp (cycAway n))
   rw [← hf]
   infer_instance
 
-theorem isProper_of_isNormBl {n : ℕ} {Z : Scheme.{0}} (z : Z ⟶ Sp (cycAway n)) (hz : IsProjOver z)
-    {J : Z.IdealSheafData} {S : Scheme.{0}} {π : S ⟶ Z} (h : IsNormBl π J) : IsProper π := by
+theorem isProper_of_isNormBl
+    {n : ℕ} {Z : Scheme.{0}} (z : Z ⟶ Sp (cycAway n)) (hz : IsProjOver z)
+    {J : Z.IdealSheafData} {S : Scheme.{0}} {π : S ⟶ Z} (h : IsNormBl π J)
+    : IsProper π := by
   obtain ⟨-, S₀, π₀, ν, U, hB, rfl, hfin, -, -, -⟩ := h
   haveI := isProper_of_blowup z hz hB
   infer_instance
 
-theorem isIso_restrict_of_isNormBl {n : ℕ} {Z : Scheme.{0}} (z : Z ⟶ Sp (cycAway n)) (hz : IsProjOver z)
-    (hZ : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z) {J : Z.IdealSheafData} {S : Scheme.{0}} {π : S ⟶ Z} (h : IsNormBl π J)
-    (V : Z.Opens) (hV : ∀ x ∈ V, x ∉ J.support) : IsIso (π ∣_ V) := by
+theorem isIso_restrict_of_isNormBl
+    {n : ℕ} {Z : Scheme.{0}} (z : Z ⟶ Sp (cycAway n)) (hz : IsProjOver z)
+    (hZ : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z)
+    {J : Z.IdealSheafData} {S : Scheme.{0}} {π : S ⟶ Z} (h : IsNormBl π J)
+    (V : Z.Opens) (hV : ∀ x ∈ V, x ∉ J.support)
+    : IsIso (π ∣_ V) := by
   haveI : Algebra.FiniteType ℤ (cycAway n) := finiteType_cycAway n
   haveI : IsNoetherianRing (cycAway n) := Algebra.FiniteType.isNoetherianRing ℤ _
   obtain ⟨hS, S₀, π₀, ν, U, hB, rfl, hfin, hUd, hνd, hνU⟩ := h
@@ -81,7 +91,28 @@ end GlobalTheory.PoincCov
 
 namespace GlobalTheory.PoincCov
 
-theorem exists_normalisation_cover : ∀ g : ℕ, 1 ≤ g → ∀ n : ℕ, 3 ≤ n → Odd n → ∀ (F : SFam g n (zetaAway n)) (Z : Scheme.{0}) (z : Z ⟶ Sp (cycAway n)) (i : F.X ⟶ Z) [IsOpenImmersion i], IsProjOver z → ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z → i ≫ z = F.s → Dense (Set.range i) → ∀ W : Matrix (Fin 8) (Fin 8) ℤ, ∀ (J : Z.IdealSheafData) (S : Scheme.{0}) (π : S ⟶ Z), (∀ x ∈ J.support, x ∉ Set.range i) → IsNormBl π J → ∀ X₁ : Setup F W i, ∃ (S₁ : Scheme.{0}) (_ : IsIntegral S₁) (p₁ : S₁ ⟶ X₁.M.Z) (ν : S₁ ⟶ S), ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme S₁ ∧ IsProper p₁ ∧ IsDominant p₁ ∧ IsFinite ν ∧ ν ≫ π = p₁ ≫ X₁.π ∧ IsIso (p₁ ∣_ (X₁.π ⁻¹ᵁ i.opensRange)) ∧ FinalTheorems.EffCartier (J.comap (p₁ ≫ X₁.π)) ∧ ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsIntegrallyClosed R] (a : Sp R ⟶ S) (b : Sp R ⟶ X₁.M.Z), a ≫ π = b ≫ X₁.π → Set.range (jK R ≫ b ≫ X₁.π) ⊆ Set.range i → ∃ ξ₁ : Sp R ⟶ S₁, ξ₁ ≫ ν = a ∧ ξ₁ ≫ p₁ = b := by
+theorem exists_normalisation_cover
+    : ∀ g : ℕ,
+      1 ≤ g
+        → ∀ n : ℕ,
+          3 ≤ n → Odd n
+            → ∀ (F : SFam g n (zetaAway n)) (Z : Scheme.{0}) (z : Z ⟶ Sp (cycAway n)) (i : F.X ⟶ Z)
+                [IsOpenImmersion i],
+              IsProjOver z → ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z
+                → i ≫ z = F.s → Dense (Set.range i)
+                → ∀ W : Matrix (Fin 8) (Fin 8) ℤ,
+                  ∀ (J : Z.IdealSheafData) (S : Scheme.{0}) (π : S ⟶ Z),
+                    (∀ x ∈ J.support, x ∉ Set.range i) → IsNormBl π J
+                      → ∀ X₁ : Setup F W i,
+                        ∃ (S₁ : Scheme.{0}) (_ : IsIntegral S₁) (p₁ : S₁ ⟶ X₁.M.Z) (ν : S₁ ⟶ S),
+                          ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme S₁
+                            ∧ IsProper p₁ ∧ IsDominant p₁ ∧ IsFinite ν ∧ ν ≫ π = p₁ ≫ X₁.π
+                            ∧ IsIso (p₁ ∣_ (X₁.π ⁻¹ᵁ i.opensRange))
+                            ∧ FinalTheorems.EffCartier (J.comap (p₁ ≫ X₁.π))
+                            ∧ ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
+                                [IsIntegrallyClosed R] (a : Sp R ⟶ S) (b : Sp R ⟶ X₁.M.Z),
+                              a ≫ π = b ≫ X₁.π → Set.range (jK R ≫ b ≫ X₁.π) ⊆ Set.range i
+                                → ∃ ξ₁ : Sp R ⟶ S₁, ξ₁ ≫ ν = a ∧ ξ₁ ≫ p₁ = b := by
   intro g _ n _ _ F Z z i _ hz hZ hiz hdense W J S π hJi hNB X₁
   haveI : Algebra.FiniteType ℤ (cycAway n) := finiteType_cycAway n
   haveI : Algebra.FiniteType ℤ (CommRingCat.of (cycAway n)) := ‹Algebra.FiniteType ℤ (cycAway n)›
@@ -94,7 +125,9 @@ theorem exists_normalisation_cover : ∀ g : ℕ, 1 ≤ g → ∀ n : ℕ, 3 ≤
   haveI hπP : IsProper π := isProper_of_isNormBl z hz hNB
   let Vi : Z.Opens := i.opensRange
   haveI hπV : IsIso (π ∣_ Vi) := isIso_restrict_of_isNormBl z hz hZ hNB Vi (fun x hx hJ => hJi x hJ hx)
-  have monoV : ∀ {T : Scheme.{0}} (u v : T ⟶ S), u ≫ π = v ≫ π → Set.range (u ≫ π) ⊆ (Vi : Set Z) → u = v := by
+  have monoV
+      : ∀ {T : Scheme.{0}} (u v : T ⟶ S),
+        u ≫ π = v ≫ π → Set.range (u ≫ π) ⊆ (Vi : Set Z) → u = v := by
     intro T u v huv hr
     have hu : Set.range u ⊆ ((π ⁻¹ᵁ Vi : S.Opens) : Set S) := by
       rintro _ ⟨w, rfl⟩
@@ -104,8 +137,7 @@ theorem exists_normalisation_cover : ∀ g : ℕ, 1 ≤ g → ∀ n : ℕ, 3 ≤
       have := hr ⟨w, rfl⟩
       rw [huv] at this
       exact this
-    have hm : Mono ((π ⁻¹ᵁ Vi).ι ≫ π) := by
-      rw [← morphismRestrict_ι]; infer_instance
+    have hm : Mono ((π ⁻¹ᵁ Vi).ι ≫ π) := by rw [← morphismRestrict_ι]; infer_instance
     rw [← Scheme.Opens.range_ι] at hu hv
     rw [← IsOpenImmersion.lift_fac _ u hu, ← IsOpenImmersion.lift_fac _ v hv]
     congr 1
@@ -147,7 +179,20 @@ theorem exists_normalisation_cover : ∀ g : ℕ, 1 ≤ g → ∀ n : ℕ, 3 ≤
     show j.toNormalization ≫ j.fromNormalization ≫ pullback.snd π X₁.π = U.ι
     rw [Scheme.Hom.toNormalization_fromNormalization_assoc, pullback.lift_snd]
   have hcomm : ν ≫ π = p₁ ≫ X₁.π := by simp [ν, p₁, pullback.condition]
-  refine ⟨j.normalization, inferInstance, p₁, ν, GlobalTheory.IsNormalScheme.pred _, ?_, ?_, ?_, hcomm, ?_, ?_, ?_⟩
+  refine ⟨
+    j.normalization,
+    inferInstance,
+    p₁,
+    ν,
+    GlobalTheory.IsNormalScheme.pred _,
+    ?_,
+    ?_,
+    ?_,
+    hcomm,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · show IsProper (j.fromNormalization ≫ pullback.snd π X₁.π)
     infer_instance
   · constructor
@@ -177,7 +222,8 @@ theorem exists_normalisation_cover : ∀ g : ℕ, 1 ≤ g → ∀ n : ℕ, 3 ≤
       apply pullback.hom_ext
       · rw [Category.assoc, pullback.lift_fst]
         apply monoV
-        · rw [Category.assoc, hc, ← Category.assoc, hs', Category.assoc, Category.assoc, pullback.condition]
+        · rw [Category.assoc, hc, ← Category.assoc, hs', Category.assoc, Category.assoc,
+            pullback.condition]
         · rw [Category.assoc, hc, ← Category.assoc]
           rintro _ ⟨w, rfl⟩
           rw [Scheme.Hom.comp_apply]
@@ -186,7 +232,9 @@ theorem exists_normalisation_cover : ∀ g : ℕ, 1 ≤ g → ∀ n : ℕ, 3 ≤
     haveI : IsIso s' := ⟨f0, e2, e1⟩
     haveI : IsIso f0 := ⟨s', e1, e2⟩
     have H := GlobalTheory.isPullback_toNormalization_of_mono f0 O.ι j (H := hf0.symm)
-    have e := IsPullback.isoIsPullback_hom_fst _ _ (isPullback_morphismRestrict j.fromNormalization O) H.flip
+    have e :=
+      IsPullback.isoIsPullback_hom_fst _ _ (isPullback_morphismRestrict j.fromNormalization O)
+        H.flip
     haveI : IsIso (j.fromNormalization ∣_ O) := by rw [← e]; infer_instance
     show IsIso ((j.fromNormalization ≫ pullback.snd π X₁.π) ∣_ U)
     rw [morphismRestrict_comp]
@@ -195,7 +243,8 @@ theorem exists_normalisation_cover : ∀ g : ℕ, 1 ≤ g → ∀ n : ℕ, 3 ≤
     obtain ⟨D, hD⟩ := GlobalTheory.EffCartierData.exists_idealSheaf_eq hB.1
     have hpe : p₁ ≫ X₁.π = (ν ≫ ν₀) ≫ π₀ := by rw [← hcomm, Category.assoc ν ν₀ π₀, hνπ]
     have hK : D.KeepsRegular (ν ≫ ν₀) := by
-      refine D.keepsRegular_of_dense _ (fun y => inferInstance) ((j.toNormalization.denseRange).mono ?_)
+      refine
+        D.keepsRegular_of_dense _ (fun y => inferInstance) ((j.toNormalization.denseRange).mono ?_)
       rintro _ ⟨x, rfl⟩
       show (ν ≫ ν₀) (j.toNormalization x) ∉ D.idealSheaf.support
       rw [hD, GlobalTheory.ProjBlowup.mem_support_comap]
@@ -226,9 +275,10 @@ theorem exists_normalisation_cover : ∀ g : ℕ, 1 ≤ g → ∀ n : ℕ, 3 ≤
         · rw [Category.assoc, hc, ← Category.assoc, hy, Category.assoc]
           exact hgen
       · rw [Category.assoc, pullback.lift_snd, Category.assoc, pullback.lift_snd, hy]
-    obtain ⟨ξ, ⟨-, hξ⟩, -⟩ := GlobalTheory.existsUnique_lift_spec_of_isLocalization (R := R) (R' := FractionRing R)
-      (nonZeroDivisors R) le_rfl j.fromNormalization (y ≫ j.toNormalization) d
-      (by rw [Category.assoc, Scheme.Hom.toNormalization_fromNormalization, hyj])
+    obtain ⟨ξ, ⟨-, hξ⟩, -⟩ :=
+      GlobalTheory.existsUnique_lift_spec_of_isLocalization (R := R) (R' := FractionRing R)
+        (nonZeroDivisors R) le_rfl j.fromNormalization (y ≫ j.toNormalization) d
+        (by rw [Category.assoc, Scheme.Hom.toNormalization_fromNormalization, hyj])
     refine ⟨ξ, ?_, ?_⟩
     · show ξ ≫ j.fromNormalization ≫ pullback.fst π X₁.π = a
       rw [← Category.assoc, hξ, pullback.lift_fst]

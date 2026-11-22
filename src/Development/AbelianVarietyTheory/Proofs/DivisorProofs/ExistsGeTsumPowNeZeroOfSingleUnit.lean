@@ -5,15 +5,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.QSPow
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst GlobalTheory.ScalarPoin MeasureTheory
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.ChartRestriction.G.AR.Inst GlobalTheory.ScalarPoin MeasureTheory
 
 namespace GlobalTheory
 
-theorem tsum_pow_eventually_ne_zero : ∀ {ι : Type} (a : ι → ℂ) (i0 : ι) (k0 : ℕ), a i0 = 1 → (∀ i, ‖a i‖ ≤ 1) → (∀ i, i ≠ i0 → ‖a i‖ < 1) → Summable (fun i => ‖a i‖ ^ k0) → ∀ N : ℕ, ∃ k : ℕ, N ≤ k ∧ ∑' i, a i ^ k ≠ 0 := by
+theorem tsum_pow_eventually_ne_zero
+    : ∀ {ι : Type} (a : ι → ℂ) (i0 : ι) (k0 : ℕ),
+      a i0 = 1 → (∀ i, ‖a i‖ ≤ 1) → (∀ i, i ≠ i0 → ‖a i‖ < 1) → Summable (fun i => ‖a i‖ ^ k0)
+        → ∀ N : ℕ, ∃ k : ℕ, N ≤ k ∧ ∑' i, a i ^ k ≠ 0 := by
   intro ι a i0 k0 h0 h1 hlt hs N
   classical
-  have hlim : Filter.Tendsto (fun k : ℕ => ∑' i, a i ^ k) Filter.atTop
-      (nhds (∑' i, (if i = i0 then (1:ℂ) else 0))) := by
+  have hlim : Filter.Tendsto
+      (fun k : ℕ => ∑' i, a i ^ k)
+      Filter.atTop (nhds (∑' i, (if i = i0 then (1:ℂ) else 0))) := by
     apply tendsto_tsum_of_dominated_convergence (bound := fun i => ‖a i‖ ^ k0) hs
     · intro i
       by_cases hi : i = i0

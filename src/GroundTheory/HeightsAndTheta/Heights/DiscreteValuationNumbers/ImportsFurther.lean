@@ -14,14 +14,17 @@ open MvPolynomial
 
 universe u
 
-theorem ResidualComparison.proof (hpieces : BlowUpDecomposition.Statement.{u})
-    (hdisj : ResidualDisjoint.Statement.{u}) (hcontr : ResidualContraction.Statement.{u}) :
-    ResidualComparison.Statement.{u} := by
+theorem ResidualComparison.proof
+    (hpieces : BlowUpDecomposition.Statement.{u}) (hdisj : ResidualDisjoint.Statement.{u})
+    (hcontr : ResidualContraction.Statement.{u})
+    : ResidualComparison.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G' hϖG' hsG' hresG'
   obtain ⟨hP', -, hsP', -, hres, hexc, -, -⟩ :=
     hpieces O ϖ hϖ K ι P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH
-  have hY₀G' := hdisj O ϖ hϖ K ι P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G' hϖG' hsG' hresG'
-  have hcmp := hcontr O ϖ hϖ K ι P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G' hϖG' hsG' hresG'
+  have hY₀G' :=
+    hdisj O ϖ hϖ K ι P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G' hϖG' hsG' hresG'
+  have hcmp :=
+    hcontr O ϖ hϖ K ι P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G' hϖG' hsG' hresG'
   set P' := blowUpOf P (blowUpGens s g f m e) with hP'def
   set G := G'.comap (liftForm (J := BlowUpIdx ι) (ι := ι) (R := O)) with hGdef
   have hP'prime : P'.IsPrime := hP'.multiProj.isPrime
@@ -48,8 +51,7 @@ theorem ResidualComparison.proof (hpieces : BlowUpDecomposition.Statement.{u})
   have hGrel : IsRelevant G := fun k => by
     obtain ⟨i, hi⟩ := hG'supp.2 (some k)
     exact ⟨i, fun h => hi (by simpa [hGdef, liftForm] using h)⟩
-  have hϖG : (C ϖ : MRing ι O) ∈ G := by
-    rw [hGdef, Ideal.mem_comap, liftForm_const]; exact hϖG'
+  have hϖG : (C ϖ : MRing ι O) ∈ G := by rw [hGdef, Ideal.mem_comap, liftForm_const]; exact hϖG'
 
   obtain ⟨u, v, huG, huv⟩ := hD.2 G hGprime hPG hGrel
   have hfP := hD.1.num_not_mem
@@ -63,21 +65,23 @@ theorem ResidualComparison.proof (hpieces : BlowUpDecomposition.Statement.{u})
   have hdown : ratDiv P f g G = divCycle P v G := by
     have h1 := congrFun (divCycle_congr_of_sub_mem huv) G
     rw [hmul₀ u f hPprime huP hfP, hmul₀ v g hPprime hvP hgP] at h1
-    have hu0 : divCycle P u G = 0 := by
-      by_contra h; exact huG (form_mem_of_divCycle_ne_zero h)
+    have hu0 : divCycle P u G = 0 := by by_contra h; exact huG (form_mem_of_divCycle_ne_zero h)
     simp only [Pi.add_apply] at h1
-    unfold ratDiv; omega
+    unfold ratDiv
+    omega
 
   have hluP' : liftForm (J := BlowUpIdx ι) u ∉ P' := fun h => huG (hP'G' h)
   have hlfP' : liftForm (J := BlowUpIdx ι) f ∉ P' := fun h =>
     hexc.1.num_not_mem (by rw [map_mul]; exact P'.mul_mem_right _ h)
-  have hlgP' : liftForm (J := BlowUpIdx ι) g ∉ P' := fun h => hexc.1.den_not_mem (P'.mul_mem_right _ h)
+  have hlgP' : liftForm (J := BlowUpIdx ι) g ∉ P' := fun h =>
+    hexc.1.den_not_mem (P'.mul_mem_right _ h)
   have hluv : liftForm u * liftForm f - liftForm v * liftForm g ∈ P' := by
     rw [← map_mul, ← map_mul, ← map_sub]; exact hlift _ huv
   have hlvP' : liftForm (J := BlowUpIdx ι) v ∉ P' := fun hv => by
     have h : liftForm u * liftForm f ∈ P' := by
-      rw [show liftForm u * liftForm f = (liftForm u * liftForm f - liftForm v * liftForm g) +
-        liftForm v * liftForm g by ring]
+      rw [show liftForm u * liftForm f
+          = (liftForm u * liftForm f - liftForm v * liftForm g) + liftForm v * liftForm g by
+        ring]
       exact P'.add_mem hluv (P'.mul_mem_right _ hv)
     exact nm _ _ hluP' hlfP' h
   have hup : ratDiv P' (liftForm f) (liftForm g) G' = divCycle P' (liftForm v) G' := by
@@ -85,15 +89,17 @@ theorem ResidualComparison.proof (hpieces : BlowUpDecomposition.Statement.{u})
     rw [hmul _ _ hP'prime hluP' hlfP', hmul _ _ hP'prime hlvP' hlgP'] at h1
     have hu0 := hzero _ huG
     simp only [Pi.add_apply] at h1
-    unfold ratDiv; omega
+    unfold ratDiv
+    omega
 
   have hY₁P' : (newVar (some none) : MRing (extIdx ι (BlowUpIdx ι)) O) ∉ P' := hres.1.num_not_mem
   have hlmP' : liftForm (J := BlowUpIdx ι) m ∉ P' := hres.1.den_not_mem
   have hY₀P' : (newVar none : MRing (extIdx ι (BlowUpIdx ι)) O) ∉ P' := fun h => hY₀G' (hP'G' h)
   have hrel := congrFun (divCycle_congr_of_sub_mem (blowUp_relation P s g f m e)) G'
   rw [map_mul, map_mul, hmul _ _ hP'prime (nm _ _ hsP' hlgP') hY₁P',
-    hmul _ _ hP'prime (nm _ _ hlfP' hlmP') hY₀P', hmul _ _ hP'prime hsP' hlgP',
-    hmul _ _ hP'prime hlfP' hlmP'] at hrel
+      hmul _ _ hP'prime (nm _ _ hlfP' hlmP') hY₀P', hmul _ _ hP'prime hsP' hlgP',
+      hmul _ _ hP'prime hlfP' hlmP']
+    at hrel
   have hY₀0 := hzero _ hY₀G'
   simp only [Pi.add_apply] at hrel
   have hv := hcmp v hvP

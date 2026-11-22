@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 open scoped Classical
 
-open NumberField GlobalTheory.CuspRep Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.SpectralAccumulation
+open NumberField GlobalTheory.CuspRep Formalism.BasicNotions GlobalTheory.UnitaryBC
+  Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.SpectralAccumulation
 
 noncomputable section
 
@@ -39,8 +40,9 @@ theorem main : PositivityTheory.Rg.BcB.F.RS.WeightJoin := by
     have hcc' : (starRingEnd ℂ).comp (InfinitePlace.mk τ).embedding = τ := hcc
     rw [hcc'] at hs₁ hs₂
     rw [hcc] at hv hev
-    rw [GlobalTheory.DefU.hasWeightAt_unique U τ hτ hv, GlobalTheory.DefiniteBC.infOfWeight_dual, ← hinfv, hev, hs₁, hs₂,
-      Multiset.map_add, Multiset.map_map, Multiset.map_map, Multiset.map_map, Multiset.map_map]
+    rw [GlobalTheory.DefU.hasWeightAt_unique U τ hτ hv, GlobalTheory.DefiniteBC.infOfWeight_dual,
+      ← hinfv, hev, hs₁, hs₂, Multiset.map_add, Multiset.map_map, Multiset.map_map,
+      Multiset.map_map, Multiset.map_map]
     congr 1 <;> exact Multiset.map_congr rfl fun x _ => by simp only [Function.comp_apply]; ring
 
 end GlobalTheory.CompanionTheory.WeightJoin

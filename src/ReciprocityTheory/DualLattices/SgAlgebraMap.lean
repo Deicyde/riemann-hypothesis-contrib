@@ -13,42 +13,60 @@ namespace ReciprocityTheory.PGsh.Up.FrobeniusGroupField
 
 variable {C : Type} [Field C] {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
 
-theorem sg_algebraMap (hv : v.Integers R) {p : ℕ} [Fact p.Prime]
-    [Algebra ℤ_[p] R] {n : Type} [Fintype n] [DecidableEq n] {ι : Type}
-    {O : Type} [CommRing O] [Algebra ℤ_[p] O] (ρ : O →ₐ[ℤ_[p]] Matrix n n ℤ_[p])
-    (εT : ι → Matrix n n R) (sg : ι → O →+* R)
-    (heig : ∀ a j, (ρ a).map (algebraMap ℤ_[p] R) * εT j = sg j a • εT j) (j : ι) (hj : εT j ≠ 0)
-    (z : ℤ_[p]) : sg j (algebraMap ℤ_[p] O z) = algebraMap ℤ_[p] R z := by
+theorem sg_algebraMap
+    (hv : v.Integers R)
+    {p : ℕ} [Fact p.Prime] [Algebra ℤ_[p] R]
+    {n : Type} [Fintype n] [DecidableEq n]
+    {ι : Type} {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+    (ρ : O →ₐ[ℤ_[p]] Matrix n n ℤ_[p]) (εT : ι → Matrix n n R) (sg : ι → O →+* R)
+    (heig : ∀ a j, (ρ a).map (algebraMap ℤ_[p] R) * εT j = sg j a • εT j)
+    (j : ι) (hj : εT j ≠ 0)
+    (z : ℤ_[p])
+    : sg j (algebraMap ℤ_[p] O z) = algebraMap ℤ_[p] R z := by
   haveI : IsDomain R := hv.hom_inj.isDomain (algebraMap R C)
-  have hm : (ρ (algebraMap ℤ_[p] O z)).map (algebraMap ℤ_[p] R) = algebraMap ℤ_[p] (Matrix n n R) z := by
+  have hm
+      : (ρ (algebraMap ℤ_[p] O z)).map (algebraMap ℤ_[p] R)
+        = algebraMap ℤ_[p] (Matrix n n R) z := by
     ext i k
-    rw [AlgHom.commutes, Matrix.map_apply, Matrix.algebraMap_matrix_apply, Matrix.algebraMap_matrix_apply]
+    rw [AlgHom.commutes, Matrix.map_apply, Matrix.algebraMap_matrix_apply,
+      Matrix.algebraMap_matrix_apply]
     split_ifs <;> simp
   have h := heig (algebraMap ℤ_[p] O z) j
-  rw [hm, Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul, ← algebraMap_smul R z (εT j)] at h
+  rw [hm, Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul, ← algebraMap_smul R z (εT j)]
+    at h
   have h2 : (algebraMap ℤ_[p] R z - sg j (algebraMap ℤ_[p] O z)) • εT j = 0 := by
     rw [sub_smul, h, sub_self]
   rcases smul_eq_zero.mp h2 with h3 | h3
   · exact (sub_eq_zero.mp h3).symm
   · exact absurd h3 hj
 
-theorem sg_aeval (hv : v.Integers R) {p : ℕ} [Fact p.Prime]
-    [Algebra ℤ_[p] R] {n : Type} [Fintype n] [DecidableEq n] {ι : Type}
-    {O : Type} [CommRing O] [Algebra ℤ_[p] O] (ρ : O →ₐ[ℤ_[p]] Matrix n n ℤ_[p])
-    (εT : ι → Matrix n n R) (sg : ι → O →+* R)
-    (heig : ∀ a j, (ρ a).map (algebraMap ℤ_[p] R) * εT j = sg j a • εT j) (j : ι) (hj : εT j ≠ 0)
-    (a : O) (Q : ℤ_[p][X]) : sg j (aeval a Q) = aeval (sg j a) Q := by
+theorem sg_aeval
+    (hv : v.Integers R)
+    {p : ℕ} [Fact p.Prime] [Algebra ℤ_[p] R]
+    {n : Type} [Fintype n] [DecidableEq n]
+    {ι : Type} {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+    (ρ : O →ₐ[ℤ_[p]] Matrix n n ℤ_[p]) (εT : ι → Matrix n n R) (sg : ι → O →+* R)
+    (heig : ∀ a j, (ρ a).map (algebraMap ℤ_[p] R) * εT j = sg j a • εT j)
+    (j : ι) (hj : εT j ≠ 0)
+    (a : O) (Q : ℤ_[p][X])
+    : sg j (aeval a Q) = aeval (sg j a) Q := by
   have hc : (sg j).comp (algebraMap ℤ_[p] O) = algebraMap ℤ_[p] R :=
     RingHom.ext fun z => sg_algebraMap hv ρ εT sg heig j hj z
   rw [Polynomial.aeval_def, Polynomial.aeval_def, Polynomial.hom_eval₂, hc]
 
-theorem seed (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hpv : v (algebraMap R C (p : R)) < 1)
-    [Algebra ℤ_[p] R] {n : Type} [Fintype n] [DecidableEq n] {ι : Type}
-    {O : Type} [CommRing O] [Algebra ℤ_[p] O] (ρ : O →ₐ[ℤ_[p]] Matrix n n ℤ_[p])
-    (εT : ι → Matrix n n R) (sg : ι → O →+* R)
-    (heig : ∀ a j, (ρ a).map (algebraMap ℤ_[p] R) * εT j = sg j a • εT j) (a : O) (c : ℤ) :
-    ∃ (b : O) (m s : ℕ), 0 < m ∧ ¬ p ∣ m ∧ ρ b ^ m = 1 ∧
-      ∀ j, εT j ≠ 0 → res hv (sg j a + c) ≠ 0 → res hv (sg j b) = res hv (sg j a + c) ^ p ^ s := by
+theorem seed
+    (p : ℕ) [Fact p.Prime]
+    (hv : v.Integers R) (hpv : v (algebraMap R C (p : R)) < 1)
+    [Algebra ℤ_[p] R]
+    {n : Type} [Fintype n] [DecidableEq n]
+    {ι : Type} {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+    (ρ : O →ₐ[ℤ_[p]] Matrix n n ℤ_[p]) (εT : ι → Matrix n n R) (sg : ι → O →+* R)
+    (heig : ∀ a j, (ρ a).map (algebraMap ℤ_[p] R) * εT j = sg j a • εT j)
+    (a : O) (c : ℤ)
+    : ∃ (b : O) (m s : ℕ),
+      0 < m ∧ ¬ p ∣ m ∧ ρ b ^ m = 1
+        ∧ ∀ j,
+          εT j ≠ 0 → res hv (sg j a + c) ≠ 0 → res hv (sg j b) = res hv (sg j a + c) ^ p ^ s := by
   classical
   have hpr : p.Prime := Fact.out
   have := isDomain hv
@@ -81,12 +99,14 @@ theorem seed (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hpv : v (algebraMap R
     have := congrArg (fun u : (S ⧸ J)ˣ => (u : S ⧸ J)) h1
     simpa using this
 
-  let Q0 : ℤ_[p][X] := ((X + (c : ℤ_[p][X])) ^ (N + 1 + 1) + 1 - (X + (c : ℤ_[p][X])) ^ (N + 1)) ^ p ^ s
-  have hQ0 : AdjoinRoot.mk f Q0 = (r ^ (N + 1 + 1) + 1 - r ^ (N + 1)) ^ p ^ s := by
-    simp [Q0, r]
+  let Q0 : ℤ_[p][X] :=
+    ((X + (c : ℤ_[p][X])) ^ (N + 1 + 1) + 1 - (X + (c : ℤ_[p][X])) ^ (N + 1)) ^ p ^ s
+  have hQ0 : AdjoinRoot.mk f Q0 = (r ^ (N + 1 + 1) + 1 - r ^ (N + 1)) ^ p ^ s := by simp [Q0, r]
   have hH0 : ∃ K : ℤ_[p][X], AdjoinRoot.mk f (Q0 ^ m0 - 1) = (p : S) * AdjoinRoot.mk f K := by
     have hmem : AdjoinRoot.mk f (Q0 ^ m0 - 1) ∈ J := by
-      have e1 : AdjoinRoot.mk f (Q0 ^ m0 - 1) = ((r ^ (N + 1 + 1) + 1 - r ^ (N + 1)) ^ p ^ s) ^ m0 - 1 := by
+      have e1
+          : AdjoinRoot.mk f (Q0 ^ m0 - 1)
+            = ((r ^ (N + 1 + 1) + 1 - r ^ (N + 1)) ^ p ^ s) ^ m0 - 1 := by
         rw [map_sub, map_pow, hQ0, map_one]
       rw [e1, ← Ideal.Quotient.eq_zero_iff_mem]
       simp only [map_pow, map_add (f := _), map_sub, map_one]
@@ -106,7 +126,8 @@ theorem seed (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hpv : v (algebraMap R
     have hfj : f.eval₂ (algebraMap ℤ_[p] R) (sg j a) = 0 := by
       have h1 := heig (aeval a f) j
       rw [← aeval_algHom_apply, hfa, Matrix.map_zero _ (map_zero _), Matrix.zero_mul,
-        sg_aeval hv ρ εT sg heig j hj] at h1
+          sg_aeval hv ρ εT sg heig j hj]
+        at h1
       have := smul_cancel hv hj (h1.symm.trans (zero_smul R (εT j)).symm)
       rwa [aeval_def] at this
     let ev : S →+* R := AdjoinRoot.lift (algebraMap ℤ_[p] R) (sg j a) hfj
@@ -114,8 +135,7 @@ theorem seed (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hpv : v (algebraMap R
       intro t ht
       obtain ⟨w, rfl⟩ := Ideal.mem_span_singleton'.1 ht
       rw [map_mul, map_natCast, map_mul, map_natCast]
-      have : (p : R ⧸ mI hv) = 0 := by
-        rw [← map_natCast (res hv)]; exact (res_eq_zero hv _).2 hpv
+      have : (p : R ⧸ mI hv) = 0 := by rw [← map_natCast (res hv)]; exact (res_eq_zero hv _).2 hpv
       rw [this, mul_zero]
     have hevr : ev r = sg j a + c := by
       show ev (AdjoinRoot.root f + (c : S)) = _
@@ -131,7 +151,8 @@ theorem seed (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hpv : v (algebraMap R
         exact hM
       have h0 := hevJ _ hmem
       rw [map_sub, map_pow, map_pow, hevr, map_sub, map_pow, map_pow, ← hxdef, sub_eq_zero,
-        pow_mul', sq] at h0
+          pow_mul', sq]
+        at h0
       have hx0 : x ^ (N + 1) ≠ 0 := pow_ne_zero _ hres
       exact mul_left_cancel₀ hx0 (h0.trans (mul_one _).symm)
     have hdiff : AdjoinRoot.mk f Q - AdjoinRoot.mk f Q0 ∈ J := by
@@ -139,21 +160,27 @@ theorem seed (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hpv : v (algebraMap R
       exact Ideal.mul_mem_right _ _ (Ideal.subset_span rfl)
     have h2 := hevJ _ hdiff
     rw [map_sub, map_sub, sub_eq_zero, hQ0] at h2
-    have hT : ∀ {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (z : A),
-        φ ((z ^ (N + 1 + 1) + 1 - z ^ (N + 1)) ^ p ^ s) =
-          (φ z ^ (N + 1 + 1) + 1 - φ z ^ (N + 1)) ^ p ^ s := by
+    have hT
+        : ∀ {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (z : A),
+          φ ((z ^ (N + 1 + 1) + 1 - z ^ (N + 1)) ^ p ^ s)
+            = (φ z ^ (N + 1 + 1) + 1 - φ z ^ (N + 1)) ^ p ^ s := by
       intros; simp
     rw [hb, h2, hT, hT, hevr, ← hxdef, pow_succ x (N + 1), hxM, one_mul, add_sub_cancel_right]
 
-theorem pair (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) (hv : v.Integers R)
+theorem pair
+    (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2)
+    (hv : v.Integers R)
     (hpv : v (algebraMap R C (p : R)) < 1)
-    [Algebra ℤ_[p] R] {n : Type} [Fintype n] [DecidableEq n] {ι : Type}
-    {O : Type} [CommRing O] [Algebra ℤ_[p] O] (ρ : O →ₐ[ℤ_[p]] Matrix n n ℤ_[p])
-    (εT : ι → Matrix n n R) (sg : ι → O →+* R)
-    (heig : ∀ a j, (ρ a).map (algebraMap ℤ_[p] R) * εT j = sg j a • εT j) (a : O) (t : ℕ)
-    (i j : ι) (hi : εT i ≠ 0) (hj : εT j ≠ 0) (h : res hv (sg j a) ≠ res hv (sg i a) ^ p ^ t) :
-    ∃ (b : O) (m : ℕ), 0 < m ∧ ¬ p ∣ m ∧ ρ b ^ m = 1 ∧
-      res hv (sg j b) ≠ res hv (sg i b) ^ p ^ t := by
+    [Algebra ℤ_[p] R]
+    {n : Type} [Fintype n] [DecidableEq n]
+    {ι : Type} {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+    (ρ : O →ₐ[ℤ_[p]] Matrix n n ℤ_[p]) (εT : ι → Matrix n n R) (sg : ι → O →+* R)
+    (heig : ∀ a j, (ρ a).map (algebraMap ℤ_[p] R) * εT j = sg j a • εT j)
+    (a : O) (t : ℕ) (i j : ι)
+    (hi : εT i ≠ 0) (hj : εT j ≠ 0) (h : res hv (sg j a) ≠ res hv (sg i a) ^ p ^ t)
+    : ∃ (b : O) (m : ℕ),
+      0 < m ∧ ¬ p ∣ m ∧ ρ b ^ m = 1 ∧ res hv (sg j b) ≠ res hv (sg i b) ^ p ^ t := by
   have hpr : p.Prime := Fact.out
   let _ : Field (R ⧸ mI hv) := instField hv
   have hch : CharP (R ⧸ mI hv) p := charP p hv hpv
@@ -186,8 +213,8 @@ theorem pair (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) (hv : v.Integers R)
   refine ⟨b, m, hm0, hmp, hbm, fun heq => h ?_⟩
   have hri : res hv (sg i a + c) = yi + c := by rw [map_add (f := _), map_intCast]
   have hrj : res hv (sg j a + c) = yj + c := by rw [map_add (f := _), map_intCast]
-  rw [hbres j hj (by rwa [hrj]), hbres i hi (by rwa [hri]), hri, hrj, ← pow_mul, mul_comm,
-    pow_mul] at heq
+  rw [hbres j hj (by rwa [hrj]), hbres i hi (by rwa [hri]), hri, hrj, ← pow_mul, mul_comm, pow_mul]
+    at heq
   have hcfix : ∀ k : ℕ, ((c : R ⧸ mI hv)) ^ p ^ k = c := by
     intro k
     induction k with
@@ -198,8 +225,7 @@ theorem pair (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2) (hv : v.Integers R)
       rwa [frobenius_def] at this
   have hrhs : (yi + c) ^ p ^ t = yi ^ p ^ t + c := by rw [add_pow_char_pow, hcfix]
   rw [hrhs] at heq
-  have hsub : (yj + c - (yi ^ p ^ t + c)) ^ p ^ s = 0 := by
-    rw [sub_pow_char_pow, heq, sub_self]
+  have hsub : (yj + c - (yi ^ p ^ t + c)) ^ p ^ s = 0 := by rw [sub_pow_char_pow, heq, sub_self]
   have := pow_eq_zero_iff (pow_ne_zero s hpr.ne_zero) |>.1 hsub
   linear_combination this
 

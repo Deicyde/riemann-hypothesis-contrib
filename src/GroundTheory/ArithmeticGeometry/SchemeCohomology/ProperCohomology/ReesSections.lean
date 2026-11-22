@@ -16,19 +16,20 @@ universe u
 
 noncomputable section
 
-variable {A : Type u} [CommRing A] {I : Ideal A} {X : Scheme.{u}} [X.Over (Spec (.of A))]
+variable
+  {A : Type u} [CommRing A]
+  {I : Ideal A} {X : Scheme.{u}} [X.Over (Spec (.of A))]
   {F : X.Modules} {V : X.Opens}
-
 
 variable (I F V) in
 abbrev unitPr : Γ(F, V) →+ Γ((Scheme.Modules.pullback (reesPr I X)).obj F, reesPr I X ⁻¹ᵁ V) :=
   Etale.pullbackUnitApp (reesPr I X) F V
 
-
 variable (I F V) in
-abbrev unitB : Γ((Scheme.Modules.pullback (reesPr I X)).obj F, reesPr I X ⁻¹ᵁ V) →+
-    Γ((Scheme.Modules.pullback (reesPolyMap I X)).obj
-      ((Scheme.Modules.pullback (reesPr I X)).obj F), reesPolyMap I X ⁻¹ᵁ (reesPr I X ⁻¹ᵁ V)) :=
+abbrev unitB
+    : Γ((Scheme.Modules.pullback (reesPr I X)).obj F, reesPr I X ⁻¹ᵁ V)
+      →+ Γ((Scheme.Modules.pullback (reesPolyMap I X)).obj
+           ((Scheme.Modules.pullback (reesPr I X)).obj F), reesPolyMap I X ⁻¹ᵁ (reesPr I X ⁻¹ᵁ V)) :=
   Etale.pullbackUnitApp (reesPolyMap I X) ((Scheme.Modules.pullback (reesPr I X)).obj F)
     (reesPr I X ⁻¹ᵁ V)
 
@@ -64,8 +65,9 @@ lemma exists_theta₁ : ∃ θ : Γ((Scheme.Modules.pullback (reesPr I X)).obj F
     (fun a m => single_zero_smul_compat hV a m)
   exact ⟨θ.toAddMonoidHom, hθ, fun s y => θ.map_smul s y⟩
 
-def theta₁ : Γ((Scheme.Modules.pullback (reesPr I X)).obj F, reesPr I X ⁻¹ᵁ V) →+
-    PolynomialModule Γ(X, V) Γ(F, V) :=
+def theta₁
+    : Γ((Scheme.Modules.pullback (reesPr I X)).obj F, reesPr I X ⁻¹ᵁ V)
+      →+ PolynomialModule Γ(X, V) Γ(F, V) :=
   (exists_theta₁ hF hV).choose
 
 lemma theta₁_unitPr (m : Γ(F, V)) :
@@ -89,9 +91,10 @@ lemma exists_theta : ∃ θ : Γ((Scheme.Modules.pullback (reesPolyMap I X)).obj
     (fun s y => theta₁_smul hF hV s y)
   exact ⟨θ.toAddMonoidHom, hθ, fun s x => θ.map_smul s x⟩
 
-def thetaMap : Γ((Scheme.Modules.pullback (reesPolyMap I X)).obj
-      ((Scheme.Modules.pullback (reesPr I X)).obj F), reesPolyMap I X ⁻¹ᵁ (reesPr I X ⁻¹ᵁ V)) →+
-    PolynomialModule Γ(X, V) Γ(F, V) :=
+def thetaMap
+    : Γ((Scheme.Modules.pullback (reesPolyMap I X)).obj
+        ((Scheme.Modules.pullback (reesPr I X)).obj F), reesPolyMap I X ⁻¹ᵁ (reesPr I X ⁻¹ᵁ V))
+      →+ PolynomialModule Γ(X, V) Γ(F, V) :=
   (exists_theta hF hV).choose
 
 lemma thetaMap_unitB (y : Γ((Scheme.Modules.pullback (reesPr I X)).obj F, reesPr I X ⁻¹ᵁ V)) :
@@ -107,16 +110,16 @@ lemma thetaMap_smul (s : polyRing I V) (x : Γ((Scheme.Modules.pullback (reesPol
     thetaMap hF hV (s • x) = polyRingHom (I := I) hV s • thetaMap hF hV x :=
   (exists_theta hF hV).choose_spec.2 s x
 
-
 variable (I F V) in
-abbrev polySec := Γ((Scheme.Modules.pullback (reesPolyMap I X)).obj
-      ((Scheme.Modules.pullback (reesPr I X)).obj F), reesPolyMap I X ⁻¹ᵁ (reesPr I X ⁻¹ᵁ V))
-
+abbrev polySec :=
+  Γ((Scheme.Modules.pullback (reesPolyMap I X)).obj
+    ((Scheme.Modules.pullback (reesPr I X)).obj F), reesPolyMap I X ⁻¹ᵁ (reesPr I X ⁻¹ᵁ V))
 
 variable (I F V) in
 def lambdaMap : PolynomialModule Γ(X, V) Γ(F, V) →+ polySec I F V where
-  toFun q := q.coeff.sum fun n m =>
-    (polyRingInv (I := I) (V := V) (Polynomial.X ^ n)) • unitB I F V (unitPr I F V m)
+  toFun q :=
+    q.coeff.sum fun n m =>
+      (polyRingInv (I := I) (V := V) (Polynomial.X ^ n)) • unitB I F V (unitPr I F V m)
   map_zero' := by simp
   map_add' q q' := by
     simp only [PolynomialModule.coeff_add]
@@ -180,20 +183,22 @@ lemma lambdaMap_theta₁ (y : Γ((Scheme.Modules.pullback (reesPr I X)).obj F, r
   exact congrArg (fun L : _ →ₗ[Γ(reesScheme I X, reesPr I X ⁻¹ᵁ V)] polySec I F V => L y)
     (e1.trans e2.symm)
 
-
 include hF hV in
 theorem lambdaMap_thetaMap (x : polySec I F V) : lambdaMap I F V (thetaMap hF hV x) = x := by
-  let L3 : polySec I F V →ₗ[polyRing I V] polySec I F V :=
-    { toFun := fun x => lambdaMap I F V (thetaMap hF hV x)
-      map_add' := fun x x' => by rw [map_add (f := _), map_add (f := _)]
-      map_smul' := fun s x => by
-        rw [thetaMap_smul, lambdaMap_smul, polyRingInv_polyRingHom]
-        rfl }
-  obtain ⟨ψ, -, huniq⟩ := isBaseChangeAt_reesPolyMap (I := I) hF hV (polySec I F V)
-    (unitB I F V) (fun s y => pullbackUnitApp_smul_at _ _ _ s y)
-  have e1 := huniq L3 (fun y => by
-    change lambdaMap I F V (thetaMap hF hV (unitB I F V y)) = _
-    rw [thetaMap_unitB, lambdaMap_theta₁])
+  let L3 : polySec I F V →ₗ[polyRing I V] polySec I F V := {
+    toFun := fun x => lambdaMap I F V (thetaMap hF hV x)
+    map_add' := fun x x' => by rw [map_add (f := _), map_add (f := _)]
+    map_smul' := fun s x => by
+      rw [thetaMap_smul, lambdaMap_smul, polyRingInv_polyRingHom]
+      rfl
+  }
+  obtain ⟨ψ, -, huniq⟩ :=
+    isBaseChangeAt_reesPolyMap (I := I) hF hV (polySec I F V) (unitB I F V)
+      (fun s y => pullbackUnitApp_smul_at _ _ _ s y)
+  have e1 :=
+    huniq L3 (fun y => by
+      change lambdaMap I F V (thetaMap hF hV (unitB I F V y)) = _
+      rw [thetaMap_unitB, lambdaMap_theta₁])
   have e2 := huniq LinearMap.id (fun y => rfl)
   exact congrArg (fun L : polySec I F V →ₗ[polyRing I V] polySec I F V => L x) (e1.trans e2.symm)
 

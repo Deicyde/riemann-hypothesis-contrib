@@ -10,19 +10,26 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsWei
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.AboveL
 
 namespace GlobalTheory.AboveL.WeilUp
 
-variable {K L Ω : Type} [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [Field L] [NumberField L] [Algebra L Ω]
-  [Algebra K L] [IsScalarTower K L Ω] {A : ValuationSubring Ω}
+variable
+  {K L Ω : Type} [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [Field L] [NumberField L]
+  [Algebra L Ω] [Algebra K L] [IsScalarTower K L Ω]
+  {A : ValuationSubring Ω}
 
-theorem modEq_of_cong {v' : HeightOneSpectrum (𝓞 L)} (h' : IsPlaceOver A v') {Q a b : ℕ}
-    (hc : ∀ ζ : 𝓞 L, A.valuation ((algebraMap L Ω (ζ : L)) ^ (Q ^ b) - (algebraMap L Ω (ζ : L)) ^ (Q ^ a)) < 1) :
-    Q ^ a ≡ Q ^ b [MOD normV v' - 1] := by
+theorem modEq_of_cong
+    {v' : HeightOneSpectrum (𝓞 L)} (h' : IsPlaceOver A v')
+    {Q a b : ℕ}
+    (hc : ∀ ζ : 𝓞 L,
+      A.valuation ((algebraMap L Ω (ζ : L)) ^ (Q ^ b) - (algebraMap L Ω (ζ : L)) ^ (Q ^ a)) < 1)
+    : Q ^ a ≡ Q ^ b [MOD normV v' - 1] := by
   haveI := v'.isMaximal
   letI : Field (𝓞 L ⧸ v'.asIdeal) := Ideal.Quotient.field _
   haveI : Finite (𝓞 L ⧸ v'.asIdeal) := v'.asIdeal.finiteQuotientOfFreeOfNeBot v'.ne_bot
@@ -33,10 +40,12 @@ theorem modEq_of_cong {v' : HeightOneSpectrum (𝓞 L)} (h' : IsPlaceOver A v') 
   obtain ⟨ζ, hζ⟩ := Ideal.Quotient.mk_surjective (u : 𝓞 L ⧸ v'.asIdeal)
   have hmem : ζ ^ (Q ^ b) - ζ ^ (Q ^ a) ∈ v'.asIdeal := by
     rw [← h']
-    have e : algebraMap L Ω (((ζ ^ (Q ^ b) - ζ ^ (Q ^ a) : 𝓞 L)) : L) =
-        (algebraMap L Ω (ζ : L)) ^ (Q ^ b) - (algebraMap L Ω (ζ : L)) ^ (Q ^ a) := by
+    have e
+        : algebraMap L Ω (((ζ ^ (Q ^ b) - ζ ^ (Q ^ a) : 𝓞 L)) : L)
+          = (algebraMap L Ω (ζ : L)) ^ (Q ^ b) - (algebraMap L Ω (ζ : L)) ^ (Q ^ a) := by
       push_cast; simp [map_sub, map_pow]
-    rw [e]; exact hc ζ
+    rw [e]
+    exact hc ζ
   have h0 := (Ideal.Quotient.eq_zero_iff_mem).mpr hmem
   rw [map_sub, map_pow, map_pow, hζ, sub_eq_zero] at h0
   apply Units.ext
@@ -52,10 +61,13 @@ theorem dvd_of_modEq {q f n : ℕ} (hq : 1 < q) (h : q ^ n ≡ 1 [MOD q ^ f - 1]
   have h3 : 1 ≤ q ^ (f.gcd n) := Nat.one_le_pow _ _ (by omega)
   have h4 : q ^ f = q ^ (f.gcd n) := by omega
   have h5 := Nat.pow_right_injective (Nat.succ_le_of_lt hq) h4
-  rw [h5]; exact Nat.gcd_dvd_right f n
+  rw [h5]
+  exact Nat.gcd_dvd_right f n
 
-theorem actsAs_of_agree {q f a b : ℕ} {σ : G K Ω} {g : G L Ω} (hg : ∀ z : Ω, σ z = g z)
-    (hσ : ActsAs A q σ (f * a) (f * b)) : ActsAs A (q ^ f) g a b := by
+theorem actsAs_of_agree
+    {q f a b : ℕ} {σ : G K Ω} {g : G L Ω}
+    (hg : ∀ z : Ω, σ z = g z) (hσ : ActsAs A q σ (f * a) (f * b))
+    : ActsAs A (q ^ f) g a b := by
   have e : σ = (g.restrictScalars K : G K Ω) := AlgEquiv.ext hg
   subst e
   refine ⟨hσ.1, fun x hx => ?_⟩
@@ -67,15 +79,21 @@ end GlobalTheory.AboveL.WeilUp
 
 namespace GlobalTheory.AboveL
 
-
 open GlobalTheory.AboveL.WeilUp in
-theorem mem_weil_of_fix : ∀ (K L Ω : Type) [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω] [Field L] [NumberField L] [Algebra L Ω] [IsAlgClosure L Ω] [Algebra K L] [IsScalarTower K L Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)) (v' : HeightOneSpectrum (𝓞 L)) (h : IsPlaceOver A v) (h' : IsPlaceOver A v') (σ : Weil h) (g : G L Ω), (∀ z : Ω, (σ : G K Ω) z = g z) → g ∈ Weil h' := by
+theorem mem_weil_of_fix
+    : ∀ (K L Ω : Type) [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
+        [Field L] [NumberField L] [Algebra L Ω] [IsAlgClosure L Ω] [Algebra K L]
+        [IsScalarTower K L Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K))
+        (v' : HeightOneSpectrum (𝓞 L)) (h : IsPlaceOver A v) (h' : IsPlaceOver A v') (σ : Weil h)
+        (g : G L Ω),
+      (∀ z : Ω, (σ : G K Ω) z = g z) → g ∈ Weil h' := by
   intro K L Ω _ _ _ _ _ _ _ _ _ _ _ A v v' h h' σ g hg
   obtain ⟨f, hf⟩ := normV_eq_pow v v' (comap_eq_of_placeOver h h')
   have hq : 1 < normV v := one_lt_normV v
 
-  have hcong : ∀ a b : ℕ, ActsAs A (normV v) (σ : G K Ω) a b →
-      normV v ^ a ≡ normV v ^ b [MOD normV v ^ f - 1] := by
+  have hcong
+      : ∀ a b : ℕ,
+        ActsAs A (normV v) (σ : G K Ω) a b → normV v ^ a ≡ normV v ^ b [MOD normV v ^ f - 1] := by
     intro a b hab
     rw [← hf]
     refine modEq_of_cong h' fun ζ => ?_

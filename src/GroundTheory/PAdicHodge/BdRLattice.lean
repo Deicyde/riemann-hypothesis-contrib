@@ -17,9 +17,9 @@ section Binomial
 
 variable {A : Type*} [CommRing A]
 
-theorem one_add_pow_prime_pow_sub_one_mem {p : ℕ} (hp : p.Prime) (y : A) (N r k : ℕ)
-    (hk : k ≤ p ^ r) :
-    (1 + y) ^ (p ^ N) - 1 ∈ span {(p : A) ^ (N - r)} ⊔ span {y ^ k} := by
+theorem one_add_pow_prime_pow_sub_one_mem
+    {p : ℕ} (hp : p.Prime) (y : A) (N r k : ℕ) (hk : k ≤ p ^ r)
+    : (1 + y) ^ (p ^ N) - 1 ∈ span {(p : A) ^ (N - r)} ⊔ span {y ^ k} := by
   rw [add_comm, add_pow, Finset.sum_range_succ']
   simp only [one_pow, mul_one, pow_zero, Nat.choose_zero_right, Nat.cast_one, add_sub_cancel_right]
   refine Ideal.sum_mem _ fun j hj => ?_
@@ -59,7 +59,6 @@ theorem eq_zero_of_forall_mem_span_p_pow {b : 𝒪} (h : ∀ M : ℕ, b ∈ span
   rw [SModEq.zero, smul_eq_mul, mul_top, span_singleton_pow]
   exact h n
 
-
 omit [IsPerfectoidField K p] in
 theorem natCast_p_ne_zero : (p : 𝒪) ≠ 0 := by
   intro h
@@ -69,8 +68,9 @@ theorem natCast_p_ne_zero : (p : 𝒪) ≠ 0 := by
 
 variable {ξ : WittVector p (PreTilt (normInteger K) p)}
 
-theorem mem_span_xi_pow_of_p_pow_mul_mem (hξ : RingHom.ker θ = span {ξ}) {x : 𝕎𝒪♭} {s k : ℕ}
-    (h : (p : 𝕎𝒪♭) ^ s * x ∈ span {ξ ^ k}) : x ∈ span {ξ ^ k} := by
+theorem mem_span_xi_pow_of_p_pow_mul_mem
+    (hξ : RingHom.ker θ = span {ξ}) {x : 𝕎𝒪♭} {s k : ℕ} (h : (p : 𝕎𝒪♭) ^ s * x ∈ span {ξ ^ k})
+    : x ∈ span {ξ ^ k} := by
   have hnz := mem_nonZeroDivisors_of_ker_eq_span hξ
   induction k generalizing x with
   | zero => simp
@@ -94,8 +94,10 @@ theorem mem_span_xi_pow_of_p_pow_mul_mem (hξ : RingHom.ker θ = span {ξ}) {x :
     obtain ⟨d, hd⟩ := mem_span_singleton.1 h5
     exact mem_span_singleton.2 ⟨d, by rw [hd, pow_succ]; ring⟩
 
-theorem mem_span_xi_pow_of_forall_mem_sup (hξ : RingHom.ker θ = span {ξ}) {x : 𝕎𝒪♭} {k : ℕ}
-    (h : ∀ M : ℕ, x ∈ span {(p : 𝕎𝒪♭) ^ M} ⊔ span {ξ ^ k}) : x ∈ span {ξ ^ k} := by
+theorem mem_span_xi_pow_of_forall_mem_sup
+    (hξ : RingHom.ker θ = span {ξ})
+    {x : 𝕎𝒪♭} {k : ℕ} (h : ∀ M : ℕ, x ∈ span {(p : 𝕎𝒪♭) ^ M} ⊔ span {ξ ^ k})
+    : x ∈ span {ξ ^ k} := by
   have hnz := mem_nonZeroDivisors_of_ker_eq_span hξ
   induction k generalizing x with
   | zero => simp
@@ -105,8 +107,7 @@ theorem mem_span_xi_pow_of_forall_mem_sup (hξ : RingHom.ker θ = span {ξ}) {x 
       obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.1 (h M)
       obtain ⟨a', rfl⟩ := mem_span_singleton.1 ha
       obtain ⟨b', rfl⟩ := mem_span_singleton.1 hb
-      have hξ0 : θ ξ = 0 := by
-        rw [← RingHom.mem_ker, hξ]; exact mem_span_singleton_self ξ
+      have hξ0 : θ ξ = 0 := by rw [← RingHom.mem_ker, hξ]; exact mem_span_singleton_self ξ
       rw [← hab, map_add (f := _), map_mul, map_mul, map_pow, map_pow, map_natCast, hξ0,
         zero_pow (Nat.succ_ne_zero k), zero_mul, add_zero]
       exact mem_span_singleton.2 ⟨_, rfl⟩
@@ -126,15 +127,16 @@ theorem mem_span_xi_pow_of_forall_mem_sup (hξ : RingHom.ker θ = span {ξ}) {x 
         rw [ha'', pow_succ] at hab
         linear_combination -hab
       have h5 := sub_eq_zero.1 ((mem_nonZeroDivisors_iff.1 hnz).1 _ h4)
-      refine Submodule.mem_sup.2 ⟨_, mem_span_singleton.2 ⟨a'', rfl⟩, _,
-        mem_span_singleton.2 ⟨b', rfl⟩, ?_⟩
-      rw [← h5]; ring
+      refine Submodule.mem_sup.2
+        ⟨_, mem_span_singleton.2 ⟨a'', rfl⟩, _, mem_span_singleton.2 ⟨b', rfl⟩, ?_⟩
+      rw [← h5]
+      ring
     obtain ⟨d, hd⟩ := mem_span_singleton.1 (ih h')
     exact mem_span_singleton.2 ⟨d, by rw [hd, pow_succ]; ring⟩
 
-theorem exists_p_pow_mul_mem_of_dvd {z : 𝕎𝒪♭} {k : ℕ}
-    (h : algebraMap 𝕎𝒪♭ 𝔸 (ξ ^ k) ∣ algebraMap 𝕎𝒪♭ 𝔸 z) :
-    ∃ s : ℕ, (p : 𝕎𝒪♭) ^ s * z ∈ span {ξ ^ k} := by
+theorem exists_p_pow_mul_mem_of_dvd
+    {z : 𝕎𝒪♭} {k : ℕ} (h : algebraMap 𝕎𝒪♭ 𝔸 (ξ ^ k) ∣ algebraMap 𝕎𝒪♭ 𝔸 z)
+    : ∃ s : ℕ, (p : 𝕎𝒪♭) ^ s * z ∈ span {ξ ^ k} := by
   obtain ⟨c, hc⟩ := h
   obtain ⟨⟨c', m⟩, hcm⟩ := IsLocalization.mk'_surjective (Submonoid.powers (p : 𝕎𝒪♭)) c
   obtain ⟨s, hs⟩ := Submonoid.mem_powers_iff _ _ |>.1 m.2
@@ -147,19 +149,19 @@ theorem exists_p_pow_mul_mem_of_dvd {z : 𝕎𝒪♭} {k : ℕ}
   rw [pow_add]
   linear_combination hr
 
-theorem mem_maximalIdeal_pow_of_forall_sub_mem {y : 𝔹} {k : ℕ} :
-    haveI := isLocalRing_bDeRhamPlus (ker_fontaineTheta_eq_span_kerThetaGenerator K p)
-      (surjective_frobenius p) (isField_away p)
-    (h : ∀ M : ℕ, ∃ a : 𝕎𝒪♭, y - (p : 𝔹) ^ M * wittToBDeRhamPlus 𝒪 p a ∈ maximalIdeal 𝔹 ^ k) →
-      y ∈ maximalIdeal 𝔹 ^ k := by
+theorem mem_maximalIdeal_pow_of_forall_sub_mem {y : 𝔹} {k : ℕ}
+    : haveI :=
+        isLocalRing_bDeRhamPlus (ker_fontaineTheta_eq_span_kerThetaGenerator K p)
+          (surjective_frobenius p) (isField_away p)
+      (h : ∀ M : ℕ, ∃ a : 𝕎𝒪♭, y - (p : 𝔹) ^ M * wittToBDeRhamPlus 𝒪 p a ∈ maximalIdeal 𝔹 ^ k)
+        → y ∈ maximalIdeal 𝔹 ^ k := by
   intro h
   set ξ₀ := kerThetaGenerator K p
   have hξ := ker_fontaineTheta_eq_span_kerThetaGenerator K p
   have := isLocalRing_bDeRhamPlus hξ (surjective_frobenius p) (isField_away p)
   have hmax : maximalIdeal 𝔹 = span {wittToBDeRhamPlus 𝒪 p ξ₀} :=
-    (IsLocalRing.eq_maximalIdeal
-      (isMaximal_ker_thetaBDeRhamPlus (surjective_frobenius p) (isField_away p))).symm.trans
-      (ker_thetaBDeRhamPlus hξ)
+    (IsLocalRing.eq_maximalIdeal (isMaximal_ker_thetaBDeRhamPlus (surjective_frobenius p)
+      (isField_away p))).symm.trans (ker_thetaBDeRhamPlus hξ)
   have hm : maximalIdeal 𝔹 ^ k = span {wittToBDeRhamPlus 𝒪 p (ξ₀ ^ k)} := by
     rw [hmax, span_singleton_pow, map_pow]
   obtain ⟨a₀, ha₀⟩ := h 0
@@ -180,8 +182,9 @@ theorem mem_maximalIdeal_pow_of_forall_sub_mem {y : 𝔹} {k : ℕ} :
     convert this using 1
     ring
   rw [hm] at h2
-  have h3 : toBDeRhamPlus 𝒪 p (algebraMap 𝕎𝒪♭ 𝔸 (a₀ - (p : 𝕎𝒪♭) ^ M * a)) ∈
-      span {wittToBDeRhamPlus 𝒪 p ξ₀ ^ k} := by
+  have h3
+      : toBDeRhamPlus 𝒪 p (algebraMap 𝕎𝒪♭ 𝔸 (a₀ - (p : 𝕎𝒪♭) ^ M * a))
+        ∈ span {wittToBDeRhamPlus 𝒪 p ξ₀ ^ k} := by
     rw [← map_pow]; exact h2
   rw [toBDeRhamPlus_mem_span_pow_iff hξ, ← map_pow] at h3
   obtain ⟨s, hs⟩ := exists_p_pow_mul_mem_of_dvd h3

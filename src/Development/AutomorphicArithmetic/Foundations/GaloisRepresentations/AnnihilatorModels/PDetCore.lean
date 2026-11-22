@@ -5,14 +5,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations
 open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.GalOfCusp TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.detCore_of :
-    UnitOfSpan → BasisIn → DetCore := by
-  intro hU hB C R S W W' X X' _ _ _ _ _ _ _ _ _ _ _ a π mk mk' c c' j j' M M' w w' A s ha h1
-    hspanC hj hj' hMw hM'w hcw hc'w hex hspanS
+theorem UpperTheory.Gal.crystallineComparison.detCore_of : UnitOfSpan → BasisIn → DetCore := by
+  intro hU hB C R S W W' X X' _ _ _ _ _ _ _ _ _ _ _ a π mk mk' c c' j j' M M' w w' A s ha h1 hspanC
+    hj hj' hMw hM'w hcw hc'w hex hspanS
   obtain ⟨x, b, hb⟩ := hB C W X a mk hspanC ha
   set P0 : Matrix (Fin a) (Fin a) R := Matrix.of fun i k => c (x k) i with hP0
   let v : Fin a → Fin a → S := fun k i => π (c (x k) i)
@@ -42,7 +43,7 @@ theorem UpperTheory.Gal.crystallineComparison.detCore_of :
     have e1 : (A.map π * (P0.map s).map π) i k = π (c (w (x k)) i) := by
       rw [hcw (x k)]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, map_sum, hP0]
+      simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, map_sum, hP0]
     have e2 : π (c (w (x k)) i) = (P0.map π * mb.map (algebraMap C S)) i k := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [← hj, ← hMw, ← hb k, hM k, map_sum, Finset.sum_apply, Matrix.mul_apply]
@@ -60,8 +61,7 @@ theorem UpperTheory.Gal.crystallineComparison.detCore_of :
     rw [hd, LinearMap.det_smul, LinearMap.det_id, h1, pow_one, mul_one]
   have e3 : j' (M' (mk' x')) = algebraMap C S d * π P0.det := by
     rw [hd, LinearMap.smul_apply, LinearMap.id_apply, map_smul, Algebra.smul_def, hj', hx']
-  have e4 : j' (M' (mk' x')) = π A.det * π (s P0.det) := by
-    rw [hM'w, hj', hc'w, hx', map_mul]
+  have e4 : j' (M' (mk' x')) = π A.det * π (s P0.det) := by rw [hM'w, hj', hc'w, hx', map_mul]
   have e5 : algebraMap C S d = algebraMap C S mb.det := by
     have e6 : algebraMap C S d * π P0.det = algebraMap C S mb.det * π P0.det := by
       rw [← e3, e4, hdet, mul_comm]

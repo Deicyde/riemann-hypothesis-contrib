@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HasModera
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM.PetPos
@@ -30,8 +31,10 @@ theorem volume_isOpenPosMeasure : (volume : Measure ℍ).IsOpenPosMeasure := by
       (((1 / NNReal.mk z.im z.im_pos.le : NNReal) ^ 2 : NNReal) : ENNReal) :=
     (ENNReal.continuous_coe.comp hc).measurable
   rw [setLIntegral_pos_iff hmeas]
-  have hsupp : Function.support (fun z : ℍ =>
-      (((1 / NNReal.mk z.im z.im_pos.le : NNReal) ^ 2 : NNReal) : ENNReal)) = Set.univ := by
+  have hsupp
+      : Function.support (fun z : ℍ =>
+          (((1 / NNReal.mk z.im z.im_pos.le : NNReal) ^ 2 : NNReal) : ENNReal))
+        = Set.univ := by
     ext z
     simp [z.im_ne_zero]
     intro h
@@ -40,8 +43,9 @@ theorem volume_isOpenPosMeasure : (volume : Measure ℍ).IsOpenPosMeasure := by
   rw [hsupp, Set.univ_inter]
   exact hU.measure_pos _ hne
 
-theorem norm_ch_eq_one {L N : ℕ} (ε : DirichletCharacter ℂ N) (hNL : N ∣ L) (γ : SL(2, ℤ))
-    (hγ : (L : ℤ) ∣ γ 1 0) : ‖ch ε (γ 1 1)‖ = 1 := by
+theorem norm_ch_eq_one
+    {L N : ℕ} (ε : DirichletCharacter ℂ N) (hNL : N ∣ L) (γ : SL(2, ℤ)) (hγ : (L : ℤ) ∣ γ 1 0)
+    : ‖ch ε (γ 1 1)‖ = 1 := by
   have hdet : (γ 0 0 : ℤ) * γ 1 1 - γ 0 1 * γ 1 0 = 1 := by
     have h := Matrix.SpecialLinearGroup.det_coe γ
     rwa [Matrix.det_fin_two] at h
@@ -59,9 +63,12 @@ theorem norm_ch_eq_one {L N : ℕ} (ε : DirichletCharacter ℂ N) (hNL : N ∣ 
   rw [← hu]
   exact DirichletCharacter.unit_norm_eq_one ε u
 
-theorem norm_sq_mul_im_pow_smul {k L N : ℕ} (ε : DirichletCharacter ℂ N) (hNL : N ∣ L) {f : ℍ → ℂ}
-    (hf : Inv k L (ch ε) f) (γ : SL(2, ℤ)) (hγ : (L : ℤ) ∣ γ 1 0) (τ : ℍ) :
-    ‖f (γ • τ)‖ ^ 2 * (γ • τ).im ^ k = ‖f τ‖ ^ 2 * τ.im ^ k := by
+theorem norm_sq_mul_im_pow_smul
+    {k L N : ℕ} (ε : DirichletCharacter ℂ N) (hNL : N ∣ L)
+    {f : ℍ → ℂ} (hf : Inv k L (ch ε) f)
+    (γ : SL(2, ℤ)) (hγ : (L : ℤ) ∣ γ 1 0)
+    (τ : ℍ)
+    : ‖f (γ • τ)‖ ^ 2 * (γ • τ).im ^ k = ‖f τ‖ ^ 2 * τ.im ^ k := by
   have hD : ((γ 1 0 : ℤ) : ℂ) * (τ : ℂ) + ((γ 1 1 : ℤ) : ℂ) ≠ 0 := by
     rw [← ModularGroup.denom_apply]
     exact UpperHalfPlane.denom_ne_zero _ _
@@ -71,8 +78,9 @@ theorem norm_sq_mul_im_pow_smul {k L N : ℕ} (ε : DirichletCharacter ℂ N) (h
   field_simp
   ring
 
-theorem pet_self_ne_zero : ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N) (ρ : ℍ → ℝ) (h : ℕ → ℂ), 1 ≤ k → 0 < L → N ∣ L →
-    Wt L ρ → CF k L (ch ε) h → h ≠ 0 → pet k ρ (qs h) (qs h) ≠ 0 := by
+theorem pet_self_ne_zero
+    : ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N) (ρ : ℍ → ℝ) (h : ℕ → ℂ),
+      1 ≤ k → 0 < L → N ∣ L → Wt L ρ → CF k L (ch ε) h → h ≠ 0 → pet k ρ (qs h) (qs h) ≠ 0 := by
   intro k L N ε ρ h hk hL hN hW hCF hh
   haveI : (volume : Measure ℍ).IsOpenPosMeasure := volume_isOpenPosMeasure
   haveI : Countable (Matrix (Fin 2) (Fin 2) ℤ) := inferInstanceAs (Countable (Fin 2 → Fin 2 → ℤ))
@@ -85,15 +93,18 @@ theorem pet_self_ne_zero : ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N) (ρ
   set G : ℍ → ℝ := fun τ => ρ τ * Φ τ with hG
   have hΦc : Continuous Φ := (hqc.norm.pow 2).mul (UpperHalfPlane.continuous_im.pow k)
   have hGnn : 0 ≤ G := fun τ => mul_nonneg (hW.nonneg τ) (by positivity)
-  have heq : (fun τ : ℍ => (ρ τ : ℂ) * (conj (qs h τ) * qs h τ * (τ.im : ℂ) ^ k)) =
-      fun τ => ((G τ : ℝ) : ℂ) := by
+  have heq
+      : (fun τ : ℍ => (ρ τ : ℂ) * (conj (qs h τ) * qs h τ * (τ.im : ℂ) ^ k))
+        = fun τ => ((G τ : ℝ) : ℂ) := by
     funext τ
     rw [Complex.conj_mul']
     simp only [hG, hΦ]
     push_cast
     ring
-  have hint := GlobalTheory.T.integrable_petersson_integrand_moderateGrowth k L L N ε h ρ (qs h) hk hL hN hW hCF hqc.aestronglyMeasurable
-    (GlobalTheory.T.hasModerateGrowth_qExpansion_of_coeffPolynomialGrowth h hP)
+  have hint :=
+    GlobalTheory.T.integrable_petersson_integrand_moderateGrowth k L L N ε h ρ (qs h) hk hL hN hW
+      hCF hqc.aestronglyMeasurable
+      (GlobalTheory.T.hasModerateGrowth_qExpansion_of_coeffPolynomialGrowth h hP)
   rw [heq] at hint
   have hGi : Integrable G := by
     have := hint.re
@@ -141,6 +152,7 @@ theorem pet_self_ne_zero : ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N) (ρ
     have h5 : qs h τ = 0 := by simpa using h4
     rw [h5]
     simp [qs]
-  exact GlobalTheory.T.qExpansionFunction_injective_of_polynomialGrowth h 0 hP ⟨0, 0, fun n => by simp⟩ hq0
+  exact GlobalTheory.T.qExpansionFunction_injective_of_polynomialGrowth h 0 hP
+    ⟨0, 0, fun n => by simp⟩ hq0
 
 end GlobalTheory.EisM.PetPos

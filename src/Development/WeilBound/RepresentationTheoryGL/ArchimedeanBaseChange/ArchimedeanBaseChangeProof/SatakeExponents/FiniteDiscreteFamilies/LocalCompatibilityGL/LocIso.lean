@@ -7,7 +7,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -32,15 +33,16 @@ theorem LocIso_holds : LocIso := by
     refine LinearMap.ext fun v => ?_
     have h1 := LinearMap.congr_fun h0 v
     simp only [LinearMap.comp_apply, LinearMap.zero_apply, Submodule.coe_subtype,
-      ZeroMemClass.coe_eq_zero, LinearEquiv.coe_coe] at h1
-    have h2 : f.codRestrict V hfV v = 0 := by
-      simpa using (T.map_eq_zero_iff).1 h1
+        ZeroMemClass.coe_eq_zero, LinearEquiv.coe_coe]
+      at h1
+    have h2 : f.codRestrict V hfV v = 0 := by simpa using (T.map_eq_zero_iff).1 h1
     simpa [LinearMap.codRestrict] using congrArg Subtype.val h2
   · intro v
     exact (T _).2
   · intro g v
-    have key := hT (.fin (locGL E N w g)) (f.codRestrict V hfV v) (f.codRestrict V hfV (σ.ρ g v))
-      (by simp only [LinearMap.codRestrict_apply]; rw [hfeq, LocalIsomorphism.finRep_eq_act])
+    have key :=
+      hT (.fin (locGL E N w g)) (f.codRestrict V hfV v) (f.codRestrict V hfV (σ.ρ g v))
+        (by simp only [LinearMap.codRestrict_apply]; rw [hfeq, LocalIsomorphism.finRep_eq_act])
     simp only [LinearMap.comp_apply, Submodule.coe_subtype, LinearEquiv.coe_coe]
     rw [key, LocalIsomorphism.finRep_eq_act]
 

@@ -19,23 +19,26 @@ theorem X_le_orth (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT 
 theorem orth_X {X : Submodule E S.V} {u x : S.V} (hu : u ∈ orth S X) (hx : x ∈ X) : S.hT x u = 0 :=
   (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).1 hu x hx
 
-theorem orth_X' {X : Submodule E S.V} {u x : S.V} (hu : u ∈ orth S X) (hx : x ∈ X) : S.hT u x = 0 := by
+theorem orth_X' {X : Submodule E S.V} {u x : S.V} (hu : u ∈ orth S X) (hx : x ∈ X)
+    : S.hT u x = 0 := by
   rw [hsw S x u, orth_X S hu hx, star_zero]
 
-theorem stepB (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0) (z : S.V) (hzX : z ∈ orth S X)
+theorem stepB
+    (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0)
+    (z : S.V) (hzX : z ∈ orth S X)
     (Λ Λ₂ : Submodule (𝓞 E) S.V) (hΛ₂ : Submodule.IsLattice E Λ₂) (hSD₂ : SD S Λ₂)
     (hX : ∀ x ∈ X, x ∈ Λ₂ → x ∈ Λ) (hz : z ∈ Λ) (hz₂ : z ∈ Λ₂)
-    (hL : ∀ x ∈ Λ₂, x ∈ orth S X → ∃ y ∈ Λ, y - x ∈ X)
-    (hy : ∃ y ∈ Λ₂, y ∈ orth S X ∧ S.hT y z = 1) :
-    ∃ A : orth S X →ₗ[E] S.V, (∀ u, A u ∈ X) ∧ (∀ u : orth S X, (u : S.V) ∈ X → A u = 0) ∧
-      A ⟨z, hzX⟩ = 0 ∧ ∀ (x : S.V) (hx : x ∈ orth S X), x ∈ Λ₂ → x + A ⟨x, hx⟩ ∈ Λ := by
+    (hL : ∀ x ∈ Λ₂, x ∈ orth S X → ∃ y ∈ Λ, y - x ∈ X) (hy : ∃ y ∈ Λ₂, y ∈ orth S X ∧ S.hT y z = 1)
+    : ∃ A : orth S X →ₗ[E] S.V,
+      (∀ u, A u ∈ X) ∧ (∀ u : orth S X, (u : S.V) ∈ X → A u = 0) ∧ A ⟨z, hzX⟩ = 0
+        ∧ ∀ (x : S.V) (hx : x ∈ orth S X), x ∈ Λ₂ → x + A ⟨x, hx⟩ ∈ Λ := by
   classical
   obtain ⟨y, hyΛ, hyX, hyz⟩ := hy
   let M₂ : Submodule (𝓞 E) S.V := Λ₂ ⊓ (orth S X).restrictScalars (𝓞 E)
   have hM₂fg : M₂.FG := Submodule.FG.of_le hΛ₂.fg inf_le_left
   have hXo := X_le_orth S X hXiso
-  obtain ⟨δ, hδX, hδ0, hδΛ⟩ := glift S M₂ Λ hM₂fg X X (fun x hx hxX => hX x hxX hx.1)
-    (fun x hx => hL x hx.1 hx.2)
+  obtain ⟨δ, hδX, hδ0, hδΛ⟩ :=
+    glift S M₂ Λ hM₂fg X X (fun x hx hxX => hX x hxX hx.1) (fun x hx => hL x hx.1 hx.2)
   let z₂ : M₂ := ⟨z, hz₂, hzX⟩
   let κ : M₂ →ₗ[𝓞 E] E := ((S.hT y).restrictScalars (𝓞 E)) ∘ₗ M₂.subtype
   let δ' : M₂ →ₗ[𝓞 E] S.V := δ - κ.smulRight (δ z₂)
@@ -56,7 +59,8 @@ theorem stepB (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y 
   have hden : ∀ u : S.V, ∃ d : 𝓞 E, d ≠ 0 ∧ d • u ∈ Λ₂ := by
     intro u
     obtain ⟨s, hs⟩ := hΛ₂.fg
-    obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 E)) s (fun x => S.hT x u)
+    obtain ⟨d, hd⟩ :=
+      IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 E)) s (fun x => S.hT x u)
     let P : Submodule (𝓞 E) S.V := {
       carrier := {x | IsIntegral ℤ ((d : 𝓞 E) • S.hT x u)}
       zero_mem' := by simpa using (isIntegral_zero : IsIntegral ℤ (0 : E))
@@ -69,7 +73,8 @@ theorem stepB (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y 
         change IsIntegral ℤ ((d : 𝓞 E) • S.hT (a • x) u)
         rw [oSmul S a x, hT_smulL S, oSmulW, smul_eq_mul]
         have ha : IsIntegral ℤ (star (a : E)) := isInt_star a.2
-        convert ha.mul hx using 1 <;> rw [oSmulW, smul_eq_mul] <;> ring }
+        convert ha.mul hx using 1 <;> rw [oSmulW, smul_eq_mul] <;> ring
+    }
     have hsP : (s : Set S.V) ⊆ P := by
       intro x hx
       obtain ⟨b, hb⟩ := hd x hx
@@ -88,8 +93,9 @@ theorem stepB (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y 
     obtain ⟨d, hd, hdu⟩ := hden u
     exact ⟨d, hd, hdu, by show d • u ∈ orth S X; rw [oSmul]; exact (orth S X).smul_mem _ hu⟩
   obtain ⟨A, hA⟩ := ext_lat S (W := S.V) (orth S X) M₂ (fun x hx => hx.2) hfull δ'
-  have hscale : ∀ u : orth S X, ∃ d : 𝓞 E, d ≠ 0 ∧ ∃ hm : ((d : E) • (u : S.V)) ∈ M₂,
-      (d : E) • A u = δ' ⟨_, hm⟩ := fun u => by
+  have hscale
+      : ∀ u : orth S X, ∃ d : 𝓞 E,
+        d ≠ 0 ∧ ∃ hm : ((d : E) • (u : S.V)) ∈ M₂, (d : E) • A u = δ' ⟨_, hm⟩ := fun u => by
     obtain ⟨d, hd, hdu⟩ := hfull u u.2
     rw [oSmul] at hdu
     refine ⟨d, hd, hdu, ?_⟩
@@ -106,26 +112,31 @@ theorem stepB (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y 
   · rw [hA z ⟨hz₂, hzX⟩]; exact hδ'z
   · rw [hA x ⟨hxΛ, hx⟩]; exact hδ'Λ ⟨x, hxΛ, hx⟩
 
-theorem stepW (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0) (A : orth S X →ₗ[E] S.V)
-    (hA : ∀ u, A u ∈ X) (hA0 : ∀ u : orth S X, (u : S.V) ∈ X → A u = 0) :
-    ∃ g : S.V ≃ₗ[E] S.V, (∀ a b, S.hT (g a) (g b) = S.hT a b) ∧ ∀ u : orth S X, g u = u + A u := by
+theorem stepW
+    (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0) (A : orth S X →ₗ[E] S.V)
+    (hA : ∀ u, A u ∈ X) (hA0 : ∀ u : orth S X, (u : S.V) ∈ X → A u = 0)
+    : ∃ g : S.V ≃ₗ[E] S.V,
+      (∀ a b, S.hT (g a) (g b) = S.hT a b) ∧ ∀ u : orth S X, g u = u + A u := by
   let f : orth S X →ₗ[E] S.V := (orth S X).subtype + A
   have hinj : Function.Injective f := by
     rw [← LinearMap.ker_eq_bot, eq_bot_iff]
     intro u hu
     rw [LinearMap.mem_ker] at hu
-    have h1 : (u : S.V) = -A u := eq_neg_of_add_eq_zero_left hu
+    have h1 : (u : S.V) = - A u := eq_neg_of_add_eq_zero_left hu
     have h2 : (u : S.V) ∈ X := by rw [h1]; exact X.neg_mem (hA u)
     have h3 := hA0 u h2
     rw [h3, neg_zero] at h1
     exact (Submodule.mem_bot E).2 (Subtype.ext h1)
   have hiso : ∀ u v : orth S X, S.hT (f u) (f v) = S.hT u v := fun u v => by
     show S.hT ((u : S.V) + A u) ((v : S.V) + A v) = S.hT u v
-    rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, orth_X' S u.2 (hA v), orth_X S v.2 (hA u),
-      hXiso _ (hA u) _ (hA v)]
+    rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply,
+      orth_X' S u.2 (hA v), orth_X S v.2 (hA u), hXiso _ (hA u) _ (hA v)]
     ring
-  obtain ⟨g, hg, hgf⟩ := witt_extension_theorem E S.V S.hT (fun x y => by rw [hsw S x y])
-    (fun x hx => S.nondeg.1 x hx) (orth S X) f hinj hiso
+  obtain ⟨g, hg, hgf⟩ :=
+    witt_extension_theorem E S.V S.hT
+      (fun x y => by rw [hsw S x y])
+      (fun x hx => S.nondeg.1 x hx)
+      (orth S X) f hinj hiso
   exact ⟨g, hg, fun u => hgf u⟩
 
 end Formalism.L2.SG.Pf.FrameGlobalPatching.FStar.BwdNA

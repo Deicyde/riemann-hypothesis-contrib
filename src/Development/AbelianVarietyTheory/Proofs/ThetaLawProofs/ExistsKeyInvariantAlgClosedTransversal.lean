@@ -13,17 +13,20 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SymplecticGen
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyKa
 
 namespace GlobalTheory.KeyKa
 
-theorem exists_enum_torsion (hL : Out.Laws) {K : Type} [Field K] [IsAlgClosed K] (x : KeyIn K) (N : ℕ)
-    (hN : (N : K) ≠ 0) : ∃ ξ : Fin (N ^ (2 * x.P.g)) → Pt x, (∀ a, ξ a ^ N = 1) ∧
-      ∀ a a', a ≠ a' → ∀ p : Sp K, (ξ a).left p ≠ (ξ a').left p := by
+theorem exists_enum_torsion
+    (hL : Out.Laws) {K : Type} [Field K] [IsAlgClosed K] (x : KeyIn K) (N : ℕ) (hN : (N : K) ≠ 0)
+    : ∃ ξ : Fin (N ^ (2 * x.P.g)) → Pt x,
+      (∀ a, ξ a ^ N = 1) ∧ ∀ a a', a ≠ a' → ∀ p : Sp K, (ξ a).left p ≠ (ξ a').left p := by
   have hN0 : N ≠ 0 := by
     rintro rfl
     exact hN Nat.cast_zero
@@ -36,9 +39,16 @@ theorem exists_enum_torsion (hL : Out.Laws) {K : Type} [Field K] [IsAlgClosed K]
   obtain rfl : p = IsLocalRing.closedPoint K := Subsingleton.elim (α := PrimeSpectrum K) _ _
   exact Over.OverMorphism.ext (ext_of_apply_closedPoint_eq x.P.A.hom (Over.w _) (Over.w _) hp)
 
-theorem exists_kaVal_of_isAlgClosed : Out.Laws → ∀ (K : Type) [Field K] [IsAlgClosed K] (x : KeyIn K) (n l l' : ℕ) (al : ℕ → Matrix (Fin 4) (Fin 4) ℤ) (d : ℕ) (s : Fin x.P.g → RR x n) (z : Fin d → Pt x) (ch : Fin d → x.P.L.ι), admitted x.P.g n l l' al → ((degProd x.P.g n l l' : ℕ) : K) ≠ 0 → EtZ x s z ch → ∃ κ, KaVal x n l l' al s κ := by
+theorem exists_kaVal_of_isAlgClosed
+    : Out.Laws
+      → ∀ (K : Type) [Field K] [IsAlgClosed K] (x : KeyIn K) (n l l' : ℕ)
+          (al : ℕ → Matrix (Fin 4) (Fin 4) ℤ) (d : ℕ) (s : Fin x.P.g → RR x n) (z : Fin d → Pt x)
+          (ch : Fin d → x.P.L.ι),
+        admitted x.P.g n l l' al → ((degProd x.P.g n l l' : ℕ) : K) ≠ 0 → EtZ x s z ch
+          → ∃ κ, KaVal x n l l' al s κ := by
   intro hL K _ _ x n l l' al d s z ch hA hN hZ
   obtain ⟨ξ, h₁, h₂⟩ := exists_enum_torsion hL x _ hN
-  exact GlobalTheory.T.exists_invariant_of_split_zeros_torsion hL K x n l l' al d s z ch ξ hA (Ne.isUnit hN) hZ h₁ h₂
+  exact GlobalTheory.T.exists_invariant_of_split_zeros_torsion hL K x n l l' al d s z ch ξ hA
+    (Ne.isUnit hN) hZ h₁ h₂
 
 end GlobalTheory.KeyKa

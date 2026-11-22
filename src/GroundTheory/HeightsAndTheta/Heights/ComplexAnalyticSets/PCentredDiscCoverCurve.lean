@@ -14,12 +14,14 @@ open Topology Filter Metric Matrix
 
 noncomputable section
 
-theorem centredDiscCover_punctured_branch (hPCC : PuncturedCoverCycles.Statement)
-    {σ : Type} [Fintype σ] {Y : Set (σ → ℂ)} {w : σ → ℂ} {p : (σ → ℂ) →L[ℂ] ℂ} {ρ : ℝ} {N : ℕ}
-    (hY : IsCentredDiscCover Y w p ρ N) :
-    ∃ (δ : ℝ) (k : ℕ) (φ : ℂ → σ → ℂ), 0 < δ ∧ δ ≤ 1 ∧ 1 ≤ k ∧
-      DifferentiableOn ℂ φ (ball 0 δ \ {0}) ∧ Set.InjOn φ (ball 0 δ \ {0}) ∧
-      ∀ s ∈ ball (0 : ℂ) δ \ {0}, φ s ∈ Y ∧ p (φ s) = p w + s ^ k := by
+theorem centredDiscCover_punctured_branch
+    (hPCC : PuncturedCoverCycles.Statement)
+    {σ : Type} [Fintype σ]
+    {Y : Set (σ → ℂ)} {w : σ → ℂ} {p : (σ → ℂ) →L[ℂ] ℂ} {ρ : ℝ} {N : ℕ}
+    (hY : IsCentredDiscCover Y w p ρ N)
+    : ∃ (δ : ℝ) (k : ℕ) (φ : ℂ → σ → ℂ),
+      0 < δ ∧ δ ≤ 1 ∧ 1 ≤ k ∧ DifferentiableOn ℂ φ (ball 0 δ \ {0}) ∧ Set.InjOn φ (ball 0 δ \ {0})
+        ∧ ∀ s ∈ ball (0 : ℂ) δ \ {0}, φ s ∈ Y ∧ p (φ s) = p w + s ^ k := by
   obtain ⟨hwY, hN, hmaps, huniq, hcard, -, hsec⟩ := hY
   have hρ : 0 < ρ := dist_nonneg.trans_lt (hmaps hwY)
   let e : σ ≃ Fin (Fintype.card σ) := Fintype.equivFin σ
@@ -49,7 +51,8 @@ theorem centredDiscCover_punctured_branch (hPCC : PuncturedCoverCycles.Statement
         have hyρ : p w + y 0 ∈ ball (p w) ρ := by
           rw [mem_ball, dist_eq_norm, add_sub_cancel_left]
           exact (norm_le_pi_norm y 0).trans_lt (by rwa [dist_zero_right] at hy)
-        rw [← hcard _ hyρ (by simpa using hy0), ← ((add_right_injective w).comp Φ.injective).injOn.encard_image]
+        rw [← hcard _ hyρ (by simpa using hy0),
+          ← ((add_right_injective w).comp Φ.injective).injOn.encard_image]
         congr 1
         ext x
         constructor
@@ -72,17 +75,24 @@ theorem centredDiscCover_punctured_branch (hPCC : PuncturedCoverCycles.Statement
           subst this
           exact ⟨ht, hgt⟩
         obtain ⟨hxO, hgx⟩ := hsec' x ⟨hx.1, hxV₀⟩
-        refine ⟨{y | p w + y 0 ∈ O₀ ∧ y 0 ≠ 0}, {z | w + Φ z ∈ V₀ ∧ p (Φ z) ≠ 0},
+        refine ⟨
+          {y | p w + y 0 ∈ O₀ ∧ y 0 ≠ 0},
+          {z | w + Φ z ∈ V₀ ∧ p (Φ z) ≠ 0},
           fun y => Φ.symm (g₀ (p w + y 0) - w),
           (hO₀.preimage (continuous_const.add (continuous_apply 0))).inter
             (isOpen_ne_fun (continuous_apply 0) continuous_const),
           by rw [hA]; exact ⟨hxO, hx.2⟩,
           (hV₀.preimage (continuous_const.add Φ.continuous)).inter
             (isOpen_ne_fun (p.continuous.comp Φ.continuous) continuous_const),
-          ⟨hxV₀, hx.2⟩, ?_, by rw [hA]; simp [hgx], fun y hy => ?_, ?_⟩
-        · refine Φ.symm.differentiable.comp_differentiableOn
-            ((hg₀.comp ((differentiableOn_const _).add (differentiable_apply 0).differentiableOn)
-              ?_).sub_const w)
+          ⟨hxV₀, hx.2⟩,
+          ?_,
+          by rw [hA]; simp [hgx],
+          fun y hy => ?_,
+          ?_
+        ⟩
+        · refine Φ.symm.differentiable.comp_differentiableOn ((hg₀.comp
+            ((differentiableOn_const _).add (differentiable_apply 0).differentiableOn)
+            ?_).sub_const w)
           intro y hy
           exact hy.1
         · rw [hA]
@@ -106,12 +116,14 @@ theorem centredDiscCover_punctured_branch (hPCC : PuncturedCoverCycles.Statement
     · simp at hsum
       omega
     · exact ⟨0⟩
-  have hpunct : ∀ s ∈ ball (0 : ℂ) δ \ {0},
-      (fun _ => s) ∈ ball (0 : Fin (0 + 1) → ℂ) δ ∩ {t | t 0 ≠ 0} := fun s hs =>
+  have hpunct
+      : ∀ s ∈ ball (0 : ℂ) δ \ {0},
+        (fun _ => s) ∈ ball (0 : Fin (0 + 1) → ℂ) δ ∩ {t | t 0 ≠ 0} := fun s hs =>
     ⟨by rw [mem_ball, dist_zero_right, pi_norm_const]; exact mem_ball_zero_iff.1 hs.1, hs.2⟩
   refine ⟨δ, ord b, fun s => w + Φ (ψ b fun _ => s), hδ, hδ1, hord b, ?_, ?_, fun s hs => ?_⟩
-  · exact (differentiableOn_const w).add (Φ.differentiable.comp_differentiableOn
-      ((hdiff b).comp (differentiable_pi.2 fun _ => differentiable_id).differentiableOn hpunct))
+  · exact (differentiableOn_const w).add
+      (Φ.differentiable.comp_differentiableOn ((hdiff b).comp
+        (differentiable_pi.2 fun _ => differentiable_id).differentiableOn hpunct))
   · intro s hs s' hs' hss'
     have := hinj b (hpunct s hs) (hpunct s' hs') (Φ.injective (add_left_cancel hss'))
     exact congrFun this 0
@@ -123,12 +135,17 @@ theorem centredDiscCover_punctured_branch (hPCC : PuncturedCoverCycles.Statement
     rw [this]
 
 theorem centredDiscCover_extend_across_centre
-    {σ : Type} [Fintype σ] {Y : Set (σ → ℂ)} {w : σ → ℂ} {p : (σ → ℂ) →L[ℂ] ℂ} {ρ : ℝ} {N : ℕ}
-    (hY : IsCentredDiscCover Y w p ρ N) {δ : ℝ} {k : ℕ} {φ : ℂ → σ → ℂ} (hδ : 0 < δ) (hδ1 : δ ≤ 1)
-    (hk : 1 ≤ k) (hφd : DifferentiableOn ℂ φ (ball 0 δ \ {0})) (hφi : Set.InjOn φ (ball 0 δ \ {0}))
-    (hφY : ∀ s ∈ ball (0 : ℂ) δ \ {0}, φ s ∈ Y ∧ p (φ s) = p w + s ^ k) :
-    ∃ r : ℝ, 0 < r ∧ ∃ γ : ℂ → σ → ℂ,
-      DifferentiableOn ℂ γ (ball 0 r) ∧ Set.InjOn γ (ball 0 r) ∧ γ 0 = w ∧ Set.MapsTo γ (ball 0 r) Y := by
+    {σ : Type} [Fintype σ]
+    {Y : Set (σ → ℂ)} {w : σ → ℂ} {p : (σ → ℂ) →L[ℂ] ℂ} {ρ : ℝ} {N : ℕ}
+    (hY : IsCentredDiscCover Y w p ρ N)
+    {δ : ℝ} {k : ℕ} {φ : ℂ → σ → ℂ} (hδ : 0 < δ) (hδ1 : δ ≤ 1) (hk : 1 ≤ k)
+    (hφd : DifferentiableOn ℂ φ (ball 0 δ \ {0})) (hφi : Set.InjOn φ (ball 0 δ \ {0}))
+    (hφY : ∀ s ∈ ball (0 : ℂ) δ \ {0}, φ s ∈ Y ∧ p (φ s) = p w + s ^ k)
+    : ∃ r : ℝ,
+      0 < r
+        ∧ ∃ γ : ℂ → σ → ℂ,
+          DifferentiableOn ℂ γ (ball 0 r) ∧ Set.InjOn γ (ball 0 r) ∧ γ 0 = w
+            ∧ Set.MapsTo γ (ball 0 r) Y := by
   obtain ⟨hwY, -, hmaps, huniq, -, hprop, -⟩ := hY
   have hρ : 0 < ρ := dist_nonneg.trans_lt (hmaps hwY)
   set r := min δ (ρ / 2) with hr
@@ -143,21 +160,24 @@ theorem centredDiscCover_extend_across_centre
     refine ⟨hY', ?_⟩
     rw [mem_closedBall, hp, dist_eq_norm, add_sub_cancel_left, norm_pow]
     have h1 : ‖s‖ < r := mem_ball_zero_iff.1 hs.1
-    calc ‖s‖ ^ k ≤ ‖s‖ :=
-          pow_le_of_le_one (norm_nonneg _) (h1.le.trans ((min_le_left _ _).trans hδ1)) (by omega)
+    calc
+      ‖s‖ ^ k ≤ ‖s‖ :=
+        pow_le_of_le_one (norm_nonneg _) (h1.le.trans ((min_le_left _ _).trans hδ1)) (by omega)
       _ ≤ ρ / 2 := h1.le.trans (min_le_right _ _)
   have hbdd : BddAbove (norm ∘ φ '' (ball 0 r \ {0})) := by
     refine (hK.image continuous_norm).bddAbove.mono ?_
     rintro _ ⟨s, hs, rfl⟩
     exact ⟨φ s, hφK s hs, rfl⟩
-  have hF := Complex.differentiableOn_update_limUnder_of_bddAbove (ball_mem_nhds 0 hr0) (hφd.mono hrδ) hbdd
+  have hF :=
+    Complex.differentiableOn_update_limUnder_of_bddAbove (ball_mem_nhds 0 hr0) (hφd.mono hrδ) hbdd
   set ℓ := limUnder (𝓝[≠] (0 : ℂ)) φ with hℓdef
   have hev : ∀ᶠ s in 𝓝[≠] (0 : ℂ), s ∈ ball (0 : ℂ) r \ {0} := by
     filter_upwards [self_mem_nhdsWithin, nhdsWithin_le_nhds (ball_mem_nhds 0 hr0)] with s h1 h2
     exact ⟨h2, h1⟩
   have hlim : Tendsto φ (𝓝[≠] 0) (𝓝 ℓ) := by
-    have hc := (hF.continuousOn.continuousAt (ball_mem_nhds 0 hr0)).tendsto.mono_left
-      (nhdsWithin_le_nhds (s := {0}ᶜ))
+    have hc :=
+      (hF.continuousOn.continuousAt (ball_mem_nhds 0 hr0)).tendsto.mono_left
+        (nhdsWithin_le_nhds (s := {0}ᶜ))
     rw [Function.update_self] at hc
     refine hc.congr' ?_
     filter_upwards [self_mem_nhdsWithin] with s hs
@@ -203,8 +223,8 @@ theorem centredDiscCover_extend_across_centre
     · rw [Function.update_of_ne h0]
       exact (hφY s (hrδ ⟨hs, h0⟩)).1
 
-theorem CentredDiscCoverCurve.proof (hPCC : PuncturedCoverCycles.Statement) :
-    CentredDiscCoverCurve.Statement := by
+theorem CentredDiscCoverCurve.proof (hPCC : PuncturedCoverCycles.Statement)
+    : CentredDiscCoverCurve.Statement := by
   intro σ _ Y w p ρ N hY
   obtain ⟨δ, k, φ, hδ, hδ1, hk, hφd, hφi, hφY⟩ := centredDiscCover_punctured_branch hPCC hY
   exact centredDiscCover_extend_across_centre hY hδ hδ1 hk hφd hφi hφY

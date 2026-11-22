@@ -26,20 +26,26 @@ public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.CmHostRa
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp
 open ReciprocityTheory.AnForm (levi)
 open ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
-open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.Cmp SheetDecomposition
+open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.Cmp
+  SheetDecomposition
 
 noncomputable section
 
 namespace LevelTowerAlt.Comparison₂
 
-theorem pull_cst' {K K' : Type} [Fintype K] [Fintype K'] {J : K → Type} {J' : K' → Type} [∀ k, Fintype (J k)]
-    [∀ k, Fintype (J' k)] {κ : K → K'} {v : (Σ k, J k) → Σ k, J' k} (hv : IsBlockMap κ v) :
-    IsPullHerm κ v (PF.cst J) (PF.cst J') := by
+theorem pull_cst'
+    {K K' : Type} [Fintype K] [Fintype K']
+    {J : K → Type} {J' : K' → Type} [∀ k, Fintype (J k)] [∀ k, Fintype (J' k)]
+    {κ : K → K'} {v : (Σ k, J k) → Σ k, J' k} (hv : IsBlockMap κ v)
+    : IsPullHerm κ v (PF.cst J) (PF.cst J') := by
   refine ⟨?_, fun z => rfl⟩
   show (0 : K' → ℤ) = pullDeg κ 0
   funext k
@@ -48,15 +54,21 @@ theorem pull_cst' {K K' : Type} [Fintype K] [Fintype K'] {J : K → Type} {J' : 
     exact (hv.1.extend_apply (0 : K → ℤ) (0 : K' → ℤ) a).symm
   · exact (Function.extend_apply' (0 : K → ℤ) (0 : K' → ℤ) _ hk).symm
 
-theorem root_eq {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N n : ℕ} {M : Top.RootModel Ψ N}
-    {S : PB.AnSys (Top.dimFl Ψ N) (Option (Ψ × Fin N))} (R : Top.RealTie M S n) {t : ℝ} (h0 : 0 < t) (h1 : t ≤ S.t₀)
-    (c : Option (Ψ × Fin N) → ℤ) :
-    (Top.combLine (fun o : Option (Ψ × Fin N) => o.elim (PF.cst M.ι) (M.x t)) c).a =
-      (Top.combLine (fun o : Option (Ψ × Fin N) => o.elim (PF.cst M.ι) fun r => R.Re.line (some r) t)
-        fun o => o.elim (c none) (gapc (c ∘ some))).a ∧ ∀ z ∈ mcPts M.P,
-    (Top.combLine (fun o : Option (Ψ × Fin N) => o.elim (PF.cst M.ι) (M.x t)) c).h z =
-      (Top.combLine (fun o : Option (Ψ × Fin N) => o.elim (PF.cst M.ι) fun r => R.Re.line (some r) t)
-        fun o => o.elim (c none) (gapc (c ∘ some))).h z := by
+theorem root_eq
+    {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ]
+    {N n : ℕ} {M : Top.RootModel Ψ N} {S : PB.AnSys (Top.dimFl Ψ N) (Option (Ψ × Fin N))}
+    (R : Top.RealTie M S n)
+    {t : ℝ} (h0 : 0 < t) (h1 : t ≤ S.t₀)
+    (c : Option (Ψ × Fin N) → ℤ)
+    : (Top.combLine (fun o : Option (Ψ × Fin N) => o.elim (PF.cst M.ι) (M.x t)) c).a
+        = (Top.combLine
+          (fun o : Option (Ψ × Fin N) => o.elim (PF.cst M.ι) fun r => R.Re.line (some r) t)
+          fun o => o.elim (c none) (gapc (c ∘ some))).a
+      ∧ ∀ z ∈ mcPts M.P,
+        (Top.combLine (fun o : Option (Ψ × Fin N) => o.elim (PF.cst M.ι) (M.x t)) c).h z
+          = (Top.combLine
+            (fun o : Option (Ψ × Fin N) => o.elim (PF.cst M.ι) fun r => R.Re.line (some r) t)
+            fun o => o.elim (c none) (gapc (c ∘ some))).h z := by
   refine ⟨?_, fun z hz => ?_⟩
   · simp only [Top.combLine, Fintype.sum_option, Option.elim, R.Re.line_deg, M.x_deg]
     congr 1
@@ -66,7 +78,8 @@ theorem root_eq {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N n : ℕ} {M : Top.R
     rw [log_comb _ _ hz.1, log_comb _ _ hz.1]
     simp only [Fintype.sum_option, Option.elim, ← zsmul_eq_mul]
     congr 1
-    refine (sum_gapc (c ∘ some) fun r => Real.log ((M.x t r).h z)).symm.trans (Finset.sum_congr rfl fun r _ => ?_)
+    refine (sum_gapc (c ∘ some) fun r => Real.log ((M.x t r).h z)).symm.trans
+      (Finset.sum_congr rfl fun r _ => ?_)
     rw [R.fund_reg r.1 r.2 t h0 h1 z hz]
 
 set_option maxHeartbeats 1000000 in

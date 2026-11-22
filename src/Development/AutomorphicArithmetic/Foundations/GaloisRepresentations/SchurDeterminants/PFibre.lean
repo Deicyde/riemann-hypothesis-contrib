@@ -31,9 +31,11 @@ theorem fibre_of : SchurY → SchurHomog → SchurDet → Fibre := by
     rw [hl, e]
   have h10 : t₁ ≠ t₀ := fun h => h01 h.symm
   have h1mem : t₁ ∈ univ.erase t₀ := mem_erase.mpr ⟨h10, mem_univ _⟩
-  have hrest : ∀ i, ∏ t ∈ (univ.erase t₀).erase t₁, sch (lam t) (twist t₀ t₁ ε y i g t) =
-      y ^ (∑ t ∈ (univ.erase t₀).erase t₁, ε t * ∑ k, lam t k) *
-        ∏ t ∈ (univ.erase t₀).erase t₁, sch (lam t) (g t) := by
+  have hrest
+      : ∀ i,
+        ∏ t ∈ (univ.erase t₀).erase t₁, sch (lam t) (twist t₀ t₁ ε y i g t)
+          = y ^ (∑ t ∈ (univ.erase t₀).erase t₁, ε t * ∑ k, lam t k)
+            * ∏ t ∈ (univ.erase t₀).erase t₁, sch (lam t) (g t) := by
     intro i
     rw [← prod_pow_eq_pow_sum, ← prod_mul_distrib]
     apply prod_congr rfl
@@ -42,29 +44,33 @@ theorem fibre_of : SchurY → SchurHomog → SchurDet → Fibre := by
     have ht0 : t ≠ t₀ := (mem_erase.mp (mem_erase.mp ht).2).1
     simp only [twist, if_neg ht0, if_neg ht1]
     rw [hH R n (lam t) (g t) (y ^ ε t), ← pow_mul]
-  have hi : ∀ i, ∏ t, sch (lam t) (twist t₀ t₁ ε y i g t) =
-      sch (lam t₀) (scaleAt y i (g t₀)) *
-        (y ^ ((n - 1) * m + ∑ t ∈ (univ.erase t₀).erase t₁, ε t * ∑ k, lam t k) *
-          ∏ t ∈ univ.erase t₀, sch (lam t) (g t)) := by
+  have hi
+      : ∀ i,
+        ∏ t, sch (lam t) (twist t₀ t₁ ε y i g t)
+          = sch (lam t₀) (scaleAt y i (g t₀))
+            * (y ^ ((n - 1) * m + ∑ t ∈ (univ.erase t₀).erase t₁, ε t * ∑ k, lam t k)
+              * ∏ t ∈ univ.erase t₀, sch (lam t) (g t)) := by
     intro i
     rw [← mul_prod_erase univ _ (mem_univ t₀), ← mul_prod_erase (univ.erase t₀) _ h1mem,
       ← mul_prod_erase (univ.erase t₀) (fun t => sch (lam t) (g t)) h1mem, hrest i]
-    simp only [twist, eq_self_iff_true, ↓reduceIte, h10]
+    simp only [twist, eq_self_iff_true, ↓ reduceIte, h10]
     rw [hconst, hconst, prod_scaleOff, mul_pow, ← pow_mul, pow_add]
     ring
-  calc ∑ i, (∏ t, sch (lam t) (twist t₀ t₁ ε y i g t)) *
-        ∏ k ∈ univ.erase i, (g t₀ k - y * g t₀ i) * Ring.inverse (g t₀ k - g t₀ i)
-      = (y ^ ((n - 1) * m + ∑ t ∈ (univ.erase t₀).erase t₁, ε t * ∑ k, lam t k) *
-          ∏ t ∈ univ.erase t₀, sch (lam t) (g t)) *
-        ∑ i, sch (lam t₀) (scaleAt y i (g t₀)) *
-          ∏ k ∈ univ.erase i, (g t₀ k - y * g t₀ i) * Ring.inverse (g t₀ k - g t₀ i) := by
-        rw [mul_sum]
-        apply sum_congr rfl
-        intro i _
-        rw [hi i]
-        ring
+  calc
+    ∑ i, (∏ t, sch (lam t) (twist t₀ t₁ ε y i g t)) *
+     ∏ k ∈ univ.erase i, (g t₀ k - y * g t₀ i) * Ring.inverse (g t₀ k - g t₀ i)
+        = (y ^ ((n - 1) * m + ∑ t ∈ (univ.erase t₀).erase t₁, ε t * ∑ k, lam t k)
+            * ∏ t ∈ univ.erase t₀, sch (lam t) (g t))
+          * ∑ i, sch (lam t₀) (scaleAt y i (g t₀)) *
+              ∏ k ∈ univ.erase i, (g t₀ k - y * g t₀ i) * Ring.inverse (g t₀ k - g t₀ i) := by
+      rw [mul_sum]
+      apply sum_congr rfl
+      intro i _
+      rw [hi i]
+      ring
     _ = _ := by
-        rw [hY R n (lam t₀) (g t₀) y hu, ← mul_prod_erase univ (fun t => sch (lam t) (g t)) (mem_univ t₀)]
-        ring
+      rw [hY R n (lam t₀) (g t₀) y hu,
+        ← mul_prod_erase univ (fun t => sch (lam t) (g t)) (mem_univ t₀)]
+      ring
 
 end UpperTheory.Gal.Schur

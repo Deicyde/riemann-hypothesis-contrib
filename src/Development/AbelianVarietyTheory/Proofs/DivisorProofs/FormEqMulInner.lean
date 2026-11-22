@@ -25,10 +25,12 @@ private lemma exists_linearMap_sesqForm_eq_inner {E : Type} [NormedAddCommGroup 
     intro y
     simp [hf, inner_smul_left]
 
-theorem form_eq_mul_inner {E I : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+theorem form_eq_mul_inner
+    {E I : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
     (g : I → E →ₗ[ℂ] E) (hu : ∀ k x y, ⟪g k x, g k y⟫_ℂ = ⟪x, y⟫_ℂ)
     (hirr : ∀ U : Submodule ℂ E, (∀ k, ∀ x ∈ U, g k x ∈ U) → U = ⊥ ∨ U = ⊤)
-    (b : E →ₗ⋆[ℂ] E →ₗ[ℂ] ℂ) (hb : ∀ k x y, b (g k x) (g k y) = b x y) : ∃ c : ℂ, ∀ x y, b x y = c * ⟪x, y⟫_ℂ := by
+    (b : E →ₗ⋆[ℂ] E →ₗ[ℂ] ℂ) (hb : ∀ k x y, b (g k x) (g k y) = b x y)
+    : ∃ c : ℂ, ∀ x y, b x y = c * ⟪x, y⟫_ℂ := by
   obtain ⟨A, hA⟩ := exists_linearMap_sesqForm_eq_inner b
   have hinj : ∀ k, Function.Injective (g k) := by
     intro k
@@ -36,7 +38,8 @@ theorem form_eq_mul_inner {E I : Type} [NormedAddCommGroup E] [InnerProductSpace
     intro x hx
     have h0 : ⟪x, x⟫_ℂ = 0 := by rw [← hu k x x, LinearMap.mem_ker.mp hx, inner_zero_left]
     exact inner_self_eq_zero.mp h0
-  have hsurj : ∀ k, Function.Surjective (g k) := fun k => LinearMap.injective_iff_surjective.mp (hinj k)
+  have hsurj : ∀ k, Function.Surjective (g k) := fun k =>
+    LinearMap.injective_iff_surjective.mp (hinj k)
   have hcomm : ∀ k x, A (g k x) = g k (A x) := by
     intro k x
     apply ext_inner_right ℂ
@@ -61,14 +64,18 @@ private lemma inner_self_eq_one_of_norm_eq_one' {F : Type} [NormedAddCommGroup F
     (hu : ‖u‖ = 1) : ⟪u, u⟫_ℂ = 1 := by
   rw [inner_self_eq_norm_sq_to_K, hu]; simp
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι] {E : ι → Type} [∀ i, NormedAddCommGroup (E i)]
-  [∀ i, InnerProductSpace ℂ (E i)] {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {E : ι → Type} [∀ i, NormedAddCommGroup (E i)] [∀ i, InnerProductSpace ℂ (E i)]
+  {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W]
 
-theorem exists_const (B : (∀ i, E i) → W → (∀ i, E i) → W → ℂ) (w₀ : W) (h₀ : ‖w₀‖ = 1)
+theorem exists_const
+    (B : (∀ i, E i) → W → (∀ i, E i) → W → ℂ)
+    (w₀ : W) (h₀ : ‖w₀‖ = 1)
     (h1 : ∀ w w' i v v', ∃ c : ℂ, ∀ a a' : E i,
       B (Function.update v i a) w (Function.update v' i a') w' = c * ⟪a, a'⟫_ℂ)
-    (h2 : ∀ v v', ∃ c : ℂ, ∀ w w', B v w v' w' = c * ⟪w, w'⟫_ℂ) :
-    ∃ c : ℂ, ∀ v w v' w', B v w v' w' = c * ((∏ i, ⟪v i, v' i⟫_ℂ) * ⟪w, w'⟫_ℂ) := by
+    (h2 : ∀ v v', ∃ c : ℂ, ∀ w w', B v w v' w' = c * ⟪w, w'⟫_ℂ)
+    : ∃ c : ℂ, ∀ v w v' w', B v w v' w' = c * ((∏ i, ⟪v i, v' i⟫_ℂ) * ⟪w, w'⟫_ℂ) := by
   by_cases hall : ∀ i, Nontrivial (E i)
   · have he : ∀ i, ∃ e : E i, ‖e‖ = 1 := fun i => by
       haveI := hall i
@@ -79,8 +86,10 @@ theorem exists_const (B : (∀ i, E i) → W → (∀ i, E i) → W → ℂ) (w�
       intro v v' w w'
       obtain ⟨c, hc⟩ := h2 v v'
       rw [hc, hc w₀ w₀, inner_self_eq_one_of_norm_eq_one' h₀, mul_one]
-    have hs : ∀ s : Finset ι, ∀ v v' : ∀ i, E i, (∀ i ∉ s, v i = e i) → (∀ i ∉ s, v' i = e i) →
-        B v w₀ v' w₀ = B e w₀ e w₀ * ∏ i ∈ s, ⟪v i, v' i⟫_ℂ := by
+    have hs
+        : ∀ s : Finset ι, ∀ v v' : ∀ i, E i,
+          (∀ i ∉ s, v i = e i) → (∀ i ∉ s, v' i = e i)
+            → B v w₀ v' w₀ = B e w₀ e w₀ * ∏ i ∈ s, ⟪v i, v' i⟫_ℂ := by
       intro s
       induction s using Finset.induction_on with
       | empty =>
@@ -98,7 +107,9 @@ theorem exists_const (B : (∀ i, E i) → W → (∀ i, E i) → W → ℂ) (w�
         rw [hee, mul_one] at k2
         have ih' := ih (Function.update v j (e j)) (Function.update v' j (e j)) ?_ ?_
         · rw [k1, ← k2, ih', Finset.prod_insert hj]
-          have hcg : ∀ i ∈ s, ⟪Function.update v j (e j) i, Function.update v' j (e j) i⟫_ℂ = ⟪v i, v' i⟫_ℂ := by
+          have hcg
+              : ∀ i ∈ s,
+                ⟪Function.update v j (e j) i, Function.update v' j (e j) i⟫_ℂ = ⟪v i, v' i⟫_ℂ := by
             intro i hi
             have hij : i ≠ j := fun h => hj (h ▸ hi)
             rw [Function.update_of_ne hij, Function.update_of_ne hij]
@@ -124,8 +135,9 @@ theorem exists_const (B : (∀ i, E i) → W → (∀ i, E i) → W → ℂ) (w�
     refine ⟨0, fun v w v' w' => ?_⟩
     obtain ⟨c, hc⟩ := h1 w w' i v v'
     have k := hc (v i) (v' i)
-    rw [Function.update_eq_self, Function.update_eq_self, Subsingleton.elim (v i) 0, inner_zero_left,
-      mul_zero] at k
+    rw [Function.update_eq_self, Function.update_eq_self, Subsingleton.elim (v i) 0,
+        inner_zero_left, mul_zero]
+      at k
     rw [k, zero_mul]
 
 private lemma inner_self_eq_one_of_unit_norm {F : Type} [NormedAddCommGroup F] [InnerProductSpace ℂ F] {u : F}
@@ -143,19 +155,24 @@ private lemma eq_smul_of_form_eq_of_unit_modulus {Y : Type} [AddCommGroup Y] [Mo
   simp only [map_sub, LinearMap.map_smulₛₗ, LinearMap.sub_apply, LinearMap.smul_apply, map_smul, smul_eq_mul]
   linear_combination hyy - κ * hyx - conj κ * hxy - b x x * hk
 
-theorem exists_phase {Y : Type} [AddCommGroup Y] [Module ℂ Y] (b : Y →ₗ⋆[ℂ] Y →ₗ[ℂ] ℂ)
+theorem exists_phase
+    {Y : Type} [AddCommGroup Y] [Module ℂ Y]
+    (b : Y →ₗ⋆[ℂ] Y →ₗ[ℂ] ℂ)
     (hs : ∀ x y, b y x = conj (b x y)) (hp : ∀ x, 0 ≤ (b x x).re) (hd : ∀ x, b x x = 0 → x = 0)
-    (F F' : (∀ i, E i) → W → Y) {c₁ c₂ c₃ : ℂ}
-    (h1 : ∀ v w v' w', b (F v w) (F v' w') = c₁ * ((∏ i, ⟪v i, v' i⟫_ℂ) * ⟪w, w'⟫_ℂ))
+    (F F' : (∀ i, E i) → W → Y)
+    {c₁ c₂ c₃ : ℂ} (h1 : ∀ v w v' w', b (F v w) (F v' w') = c₁ * ((∏ i, ⟪v i, v' i⟫_ℂ) * ⟪w, w'⟫_ℂ))
     (h2 : ∀ v w v' w', b (F' v w) (F' v' w') = c₂ * ((∏ i, ⟪v i, v' i⟫_ℂ) * ⟪w, w'⟫_ℂ))
     (h3 : ∀ v w v' w', b (F v w) (F' v' w') = c₃ * ((∏ i, ⟪v i, v' i⟫_ℂ) * ⟪w, w'⟫_ℂ))
-    {v₀ v₀' : ∀ i, E i} {w₀ w₀' : W} (n1 : ∀ i, ‖v₀ i‖ = 1) (n2 : ∀ i, ‖v₀' i‖ = 1) (n3 : ‖w₀‖ = 1) (n4 : ‖w₀'‖ = 1)
-    {l : ℂ} (hl : ‖l‖ = 1) (hm : F v₀ w₀ = l • F' v₀' w₀') :
-    ∃ κ : ℂ, ‖κ‖ = 1 ∧ ∀ v w, F' v w = κ • F v w := by
+    {v₀ v₀' : ∀ i, E i} {w₀ w₀' : W}
+    (n1 : ∀ i, ‖v₀ i‖ = 1) (n2 : ∀ i, ‖v₀' i‖ = 1) (n3 : ‖w₀‖ = 1) (n4 : ‖w₀'‖ = 1)
+    {l : ℂ} (hl : ‖l‖ = 1) (hm : F v₀ w₀ = l • F' v₀' w₀')
+    : ∃ κ : ℂ, ‖κ‖ = 1 ∧ ∀ v w, F' v w = κ • F v w := by
   have P1 : (∏ i, ⟪v₀ i, v₀ i⟫_ℂ) * ⟪w₀, w₀⟫_ℂ = 1 := by
-    rw [Finset.prod_eq_one (fun i _ => inner_self_eq_one_of_unit_norm (n1 i)), inner_self_eq_one_of_unit_norm n3, one_mul]
+    rw [Finset.prod_eq_one (fun i _ => inner_self_eq_one_of_unit_norm (n1 i)),
+      inner_self_eq_one_of_unit_norm n3, one_mul]
   have P2 : (∏ i, ⟪v₀' i, v₀' i⟫_ℂ) * ⟪w₀', w₀'⟫_ℂ = 1 := by
-    rw [Finset.prod_eq_one (fun i _ => inner_self_eq_one_of_unit_norm (n2 i)), inner_self_eq_one_of_unit_norm n4, one_mul]
+    rw [Finset.prod_eq_one (fun i _ => inner_self_eq_one_of_unit_norm (n2 i)),
+      inner_self_eq_one_of_unit_norm n4, one_mul]
   have hl1 : conj l * l = 1 := by
     rw [Complex.conj_mul', hl]
     simp

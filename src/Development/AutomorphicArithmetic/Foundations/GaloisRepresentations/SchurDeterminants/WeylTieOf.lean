@@ -11,8 +11,8 @@ open Finset MvPolynomial
 
 namespace UpperTheory.Gal.Schur
 
-private theorem vdm_ne {K : Type} [Field K] {n : ℕ} (g : Fin n → K)
-    (hg : Function.Injective g) : vdm g ≠ 0 := by
+private theorem vdm_ne {K : Type} [Field K] {n : ℕ} (g : Fin n → K) (hg : Function.Injective g)
+    : vdm g ≠ 0 := by
   unfold vdm
   refine Finset.prod_ne_zero_iff.2 fun i _ => Finset.prod_ne_zero_iff.2 fun j hj => ?_
   refine sub_ne_zero.2 fun h => ?_
@@ -20,9 +20,11 @@ private theorem vdm_ne {K : Type} [Field K] {n : ℕ} (g : Fin n → K)
   subst this
   simp at hj
 
-private theorem num_eq {K : Type} [Field K] {n : ℕ} (l : Fin n → ℤ) (m : ℕ) (lam : Fin n → ℕ)
-    (g : Fin n → K) (hl : ∀ i, l i + m = lam i) (h0 : ∀ i, g i ≠ 0) :
-    (∏ k, g k) ^ m * altnZ (fun i => l i + n - 1 - (i : ℕ)) g = altn (shift lam) g := by
+private theorem num_eq
+    {K : Type} [Field K]
+    {n : ℕ} (l : Fin n → ℤ)
+    (m : ℕ) (lam : Fin n → ℕ) (g : Fin n → K) (hl : ∀ i, l i + m = lam i) (h0 : ∀ i, g i ≠ 0)
+    : (∏ k, g k) ^ m * altnZ (fun i => l i + n - 1 - (i : ℕ)) g = altn (shift lam) g := by
   unfold altnZ altn shift
   rw [← Finset.prod_pow, ← Matrix.det_mul_row (fun k => g k ^ m)]
   congr 1

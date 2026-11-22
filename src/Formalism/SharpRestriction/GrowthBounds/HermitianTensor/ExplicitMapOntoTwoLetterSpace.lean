@@ -8,10 +8,11 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames Formalism.CountingSumsFrames.Har4 Formalism.GradedWeylDivisibility MvPolynomial
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames
+  Formalism.CountingSumsFrames.Har4 Formalism.GradedWeylDivisibility MvPolynomial
 
-theorem ta_sumToIter_rename_inr {R S₁ S₂ : Type} [CommRing R] (q : MvPolynomial S₂ R) :
-    sumRingEquiv R S₁ S₂ (rename Sum.inr q) = C q := by
+theorem ta_sumToIter_rename_inr {R S₁ S₂ : Type} [CommRing R] (q : MvPolynomial S₂ R)
+    : sumRingEquiv R S₁ S₂ (rename Sum.inr q) = C q := by
   induction q using MvPolynomial.induction_on with
   | C a => rw [rename_C, MvPolynomial.sumRingEquiv_C]
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, map_add (f := _)]
@@ -21,14 +22,15 @@ section A
 
 variable (K : Type) [Field K] (m : ℕ)
 
-theorem Psi_xs (f : MvPolynomial (Fin (m + 1)) K) :
-    PsiXY K m (rename Sum.inl f) = blockEmb K true (rename (fun i => (i, (0 : Fin (m + 1)))) f) := by
+theorem Psi_xs (f : MvPolynomial (Fin (m + 1)) K)
+    : PsiXY K m (rename Sum.inl f)
+      = blockEmb K true (rename (fun i => (i, (0 : Fin (m + 1)))) f) := by
   simp only [PsiXY, blockEmb, aeval_rename, rename_rename]
   conv_rhs => rw [← aeval_X_left_apply ((rename _) f), aeval_rename]
   rfl
 
-theorem Psi_ys (f : MvPolynomial (Fin (m + 1)) K) :
-    PsiXY K m (rename Sum.inr f) = blockEmb K false (aeval (covY K m) f) := by
+theorem Psi_ys (f : MvPolynomial (Fin (m + 1)) K)
+    : PsiXY K m (rename Sum.inr f) = blockEmb K false (aeval (covY K m) f) := by
   simp only [PsiXY, blockEmb, aeval_rename]
   rw [← AlgHom.comp_apply, MvPolynomial.comp_aeval]
   rfl
@@ -57,9 +59,10 @@ theorem explicit_map_injective : ExplicitMapInjective := by
       rfl
   have hφ : Function.Injective (aeval (covY K m) : MvPolynomial (Fin (m + 1)) K →ₐ[K] _) :=
     ShapeCovering.signed_minors_alg_independent K m hm
-  have hcomm : (sumRingEquiv K (Fin (m + 1)) (Fin (m + 1) × Fin (m + 1))).toRingHom.comp Φ1.toRingHom =
-      (map (aeval (covY K m) : MvPolynomial (Fin (m + 1)) K →ₐ[K] _).toRingHom).comp
-        (sumRingEquiv K (Fin (m + 1)) (Fin (m + 1))).toRingHom := by
+  have hcomm
+      : (sumRingEquiv K (Fin (m + 1)) (Fin (m + 1) × Fin (m + 1))).toRingHom.comp Φ1.toRingHom
+        = (map (aeval (covY K m) : MvPolynomial (Fin (m + 1)) K →ₐ[K] _).toRingHom).comp
+          (sumRingEquiv K (Fin (m + 1)) (Fin (m + 1))).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro a
       simp [Φ1, sumRingEquiv_C]
@@ -70,26 +73,32 @@ theorem explicit_map_injective : ExplicitMapInjective := by
     intro f1 f2 h
     have h2 := DFunLike.congr_fun hcomm f1
     have h3 := DFunLike.congr_fun hcomm f2
-    simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, RingEquiv.toRingHom_eq_coe] at h2 h3
+    simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+        RingEquiv.toRingHom_eq_coe]
+      at h2 h3
     rw [h, h3] at h2
     have h4 := map_injective _ hφ h2
     exact ((sumRingEquiv K (Fin (m + 1)) (Fin (m + 1))).injective h4).symm
   rw [hfac]
   exact (rename_injective e he).comp h1
 
-theorem ta_isHom_prodX {A : Type} [CommRing A] {k : ℕ} (a : Fin k → ℕ) :
-    (∏ i, X i ^ a i : MvPolynomial (Fin k) A).IsHomogeneous (∑ i, a i) := by
-  exact IsHomogeneous.prod Finset.univ (fun i => X i ^ a i) a (fun i _ => isHomogeneous_X_pow i (a i))
+theorem ta_isHom_prodX {A : Type} [CommRing A] {k : ℕ} (a : Fin k → ℕ)
+    : (∏ i, X i ^ a i : MvPolynomial (Fin k) A).IsHomogeneous (∑ i, a i) := by
+  exact
+    IsHomogeneous.prod Finset.univ (fun i => X i ^ a i) a (fun i _ => isHomogeneous_X_pow i (a i))
 
-theorem ta_monomial_split {K : Type} [Field K] {k : ℕ} (v : XY k →₀ ℕ) (c : K) :
-    (monomial v c : PolXY K k) = c • (rename Sum.inl (∏ i : Fin k, X i ^ v (Sum.inl i)) *
-      rename Sum.inr (∏ i : Fin k, X i ^ v (Sum.inr i))) := by
-  rw [monomial_eq, Finsupp.prod_fintype _ _ (fun _ => pow_zero _), Fintype.prod_sum_type, map_prod, map_prod,
-    smul_eq_C_mul]
+theorem ta_monomial_split {K : Type} [Field K] {k : ℕ} (v : XY k →₀ ℕ) (c : K)
+    : (monomial v c : PolXY K k)
+      = c
+        • (rename Sum.inl (∏ i : Fin k, X i ^ v (Sum.inl i))
+          * rename Sum.inr (∏ i : Fin k, X i ^ v (Sum.inr i))) := by
+  rw [monomial_eq, Finsupp.prod_fintype _ _ (fun _ => pow_zero _), Fintype.prod_sum_type, map_prod,
+    map_prod, smul_eq_C_mul]
   simp only [map_pow, rename_X]
 
-theorem ta_rename_inl_hom {K : Type} [Field K] {k P : ℕ} (f : MvPolynomial (Fin k) K) (h : f.IsHomogeneous P) :
-    IsWeightedHomogeneous (wXY k) (rename Sum.inl f : PolXY K k) (P, 0) := by
+theorem ta_rename_inl_hom
+    {K : Type} [Field K] {k P : ℕ} (f : MvPolynomial (Fin k) K) (h : f.IsHomogeneous P)
+    : IsWeightedHomogeneous (wXY k) (rename Sum.inl f : PolXY K k) (P, 0) := by
   classical
   intro d hd
   have hmem : d ∈ (rename Sum.inl f : PolXY K k).support := mem_support_iff.2 hd
@@ -104,8 +113,9 @@ theorem ta_rename_inl_hom {K : Type} [Field K] {k P : ℕ} (f : MvPolynomial (Fi
   · simp [Finsupp.sum, Prod.fst_sum]
   · simp [Finsupp.sum, Prod.snd_sum]
 
-theorem ta_rename_inr_hom {K : Type} [Field K] {k Q : ℕ} (f : MvPolynomial (Fin k) K) (h : f.IsHomogeneous Q) :
-    IsWeightedHomogeneous (wXY k) (rename Sum.inr f : PolXY K k) (0, Q) := by
+theorem ta_rename_inr_hom
+    {K : Type} [Field K] {k Q : ℕ} (f : MvPolynomial (Fin k) K) (h : f.IsHomogeneous Q)
+    : IsWeightedHomogeneous (wXY k) (rename Sum.inr f : PolXY K k) (0, Q) := by
   classical
   intro d hd
   have hmem : d ∈ (rename Sum.inr f : PolXY K k).support := mem_support_iff.2 hd
@@ -120,14 +130,16 @@ theorem ta_rename_inr_hom {K : Type} [Field K] {k Q : ℕ} (f : MvPolynomial (Fi
   · simp [Finsupp.sum, Prod.fst_sum]
   · simp [Finsupp.sum, Prod.snd_sum]
 
-theorem ta_mul_mem_PolAB {K : Type} [Field K] {k P Q : ℕ} (f1 f2 : MvPolynomial (Fin k) K)
-    (h1 : f1.IsHomogeneous P) (h2 : f2.IsHomogeneous Q) :
-    rename Sum.inl f1 * rename Sum.inr f2 ∈ PolAB K k P Q := by
+theorem ta_mul_mem_PolAB
+    {K : Type} [Field K]
+    {k P Q : ℕ} (f1 f2 : MvPolynomial (Fin k) K) (h1 : f1.IsHomogeneous P) (h2 : f2.IsHomogeneous Q)
+    : rename Sum.inl f1 * rename Sum.inr f2 ∈ PolAB K k P Q := by
   rw [Formalism.CountingSumsFrames.Har4.mem_PolAB_iff]
   have := (ta_rename_inl_hom f1 h1).mul (ta_rename_inr_hom f2 h2)
   simpa using this
 
-theorem ta_nuOf_vec (m P : ℕ) (hm : 1 ≤ m) : nuOf (letterWt m P true) = fun t => if t = 0 then P else 0 := by
+theorem ta_nuOf_vec (m P : ℕ) (hm : 1 ≤ m)
+    : nuOf (letterWt m P true) = fun t => if t = 0 then P else 0 := by
   funext t
   unfold nuOf letterWt
   simp only [if_true]
@@ -139,7 +151,8 @@ theorem ta_nuOf_vec (m P : ℕ) (hm : 1 ≤ m) : nuOf (letterWt m P true) = fun 
   rw [if_neg hl]
   split_ifs <;> simp
 
-theorem ta_nuOf_cov (m Q : ℕ) : nuOf (letterWt m Q false) = fun t => if t = Fin.last m then 0 else Q := by
+theorem ta_nuOf_cov (m Q : ℕ)
+    : nuOf (letterWt m Q false) = fun t => if t = Fin.last m then 0 else Q := by
   funext t
   unfold nuOf letterWt
   simp only [Bool.false_eq_true, if_false, if_true]
@@ -150,16 +163,19 @@ theorem explicit_map_onto_two_letter_space : ExplicitMapOntoTwoLetters := by
   constructor
   · intro hx
     unfold twoSp tensorLat at hx
-    refine Submodule.span_induction (p := fun x _ => ∃ f ∈ PolAB K (m + 1) P Q, PsiXY K m f = x) ?_
-      ⟨0, Submodule.zero_mem _, map_zero _⟩ ?_ ?_ hx
+    refine Submodule.span_induction
+      (p := fun x _ => ∃ f ∈ PolAB K (m + 1) P Q, PsiXY K m f = x)
+      ?_ ⟨0, Submodule.zero_mem _, map_zero _⟩ ?_ ?_ hx
     · rintro y ⟨F, hF, rfl⟩
       have ht := hF true
       have hf := hF false
       simp only [if_true, Bool.false_eq_true, if_false] at ht hf
       rw [ta_nuOf_vec m P hm] at ht
       rw [ta_nuOf_cov m Q] at hf
-      obtain ⟨f1, h1, e1⟩ := (ShapeCovering.first_column_polynomials_characterize K m P (F true) hm).1 ht
-      obtain ⟨f2, h2, e2⟩ := (ShapeCovering.signed_minor_polynomials_characterize K m Q (F false) hm).1 hf
+      obtain ⟨f1, h1, e1⟩ :=
+        (ShapeCovering.first_column_polynomials_characterize K m P (F true) hm).1 ht
+      obtain ⟨f2, h2, e2⟩ :=
+        (ShapeCovering.signed_minor_polynomials_characterize K m Q (F false) hm).1 hf
       refine ⟨rename Sum.inl f1 * rename Sum.inr f2, ta_mul_mem_PolAB f1 f2 h1 h2, ?_⟩
       rw [covY_eq] at e2
       rw [map_mul, Psi_xs, Psi_ys, e1, e2, Fintype.prod_bool]
@@ -173,10 +189,18 @@ theorem explicit_map_onto_two_letter_space : ExplicitMapOntoTwoLetters := by
     refine Submodule.sum_mem _ fun v hv => ?_
     rw [ta_monomial_split, map_smul, map_mul, Psi_xs, Psi_ys]
     refine Submodule.smul_mem _ _ (Submodule.subset_span ?_)
-    refine ⟨fun b : Bool => (cond b (rename (fun i : Fin (m + 1) => (i, (0 : Fin (m + 1))))
-        (∏ i : Fin (m + 1), (X i : MvPolynomial (Fin (m + 1)) K) ^ v (Sum.inl i)))
-      (aeval (covY K m) (∏ i : Fin (m + 1), (X i : MvPolynomial (Fin (m + 1)) K) ^ v (Sum.inr i))) :
-        MvPolynomial (Fin (m + 1) × Fin (m + 1)) K), ?_, ?_⟩
+    refine ⟨
+      fun b : Bool =>
+        (cond b
+            (rename
+              (fun i : Fin (m + 1) => (i, (0 : Fin (m + 1))))
+              (∏ i : Fin (m + 1), (X i : MvPolynomial (Fin (m + 1)) K) ^ v (Sum.inl i)))
+            (aeval (covY K m)
+              (∏ i : Fin (m + 1), (X i : MvPolynomial (Fin (m + 1)) K) ^ v (Sum.inr i)))
+          : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K),
+      ?_,
+      ?_
+    ⟩
     · intro b
       cases b
       · simp only [Bool.false_eq_true, if_false, cond_false]

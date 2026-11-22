@@ -17,9 +17,11 @@ noncomputable section
 
 universe u w
 
-theorem eulerChar_eq_finrank_H0 {k : Type u} [Field k] {Ω : Type w} [Field Ω] [Algebra k Ω] {N : ℕ}
-    {x : Fin (N + 1) → Ω} (F : SubSystem k x Ω) (hF : ∀ i, 1 ≤ i → Subsingleton (F.H i)) :
-    eulerChar k F = Module.finrank k (F.H 0) := by
+theorem eulerChar_eq_finrank_H0
+    {k : Type u} [Field k]
+    {Ω : Type w} [Field Ω] [Algebra k Ω]
+    {N : ℕ} {x : Fin (N + 1) → Ω} (F : SubSystem k x Ω) (hF : ∀ i, 1 ≤ i → Subsingleton (F.H i))
+    : eulerChar k F = Module.finrank k (F.H 0) := by
   unfold eulerChar
   rw [Finset.sum_range_succ', Finset.sum_eq_zero]
   · simp
@@ -27,9 +29,10 @@ theorem eulerChar_eq_finrank_H0 {k : Type u} [Field k] {Ω : Type w} [Field Ω] 
     have := hF (i + 1) (by omega)
     simp [Module.finrank_zero_of_subsingleton]
 
-theorem VeryAmpleSnapper.proof (hF : SnapperFinite.Statement.{u, w, w}) (hS : Snapper.Statement.{u, w, w})
-    (hV : TwistVanishAll.Statement.{u, w}) (hA : AmpleVanish.Statement.{u, w, w}) :
-    VeryAmpleSnapper.Statement.{u, w} := by
+theorem VeryAmpleSnapper.proof
+    (hF : SnapperFinite.Statement.{u, w, w}) (hS : Snapper.Statement.{u, w, w})
+    (hV : TwistVanishAll.Statement.{u, w}) (hA : AmpleVanish.Statement.{u, w, w})
+    : VeryAmpleSnapper.Statement.{u, w} := by
   intro k _ Ω _ _ N x e Nb hZ hNb
   obtain ⟨r, h, hh⟩ := hNb
   have hx : x ≠ 0 := by
@@ -37,13 +40,17 @@ theorem VeryAmpleSnapper.proof (hF : SnapperFinite.Statement.{u, w, w}) (hS : Sn
     rw [mem_primeOf_of_isHomogeneous x (isHomogeneous_X k i), aeval_X] at hi
     exact fun h0 => hi (congrFun h0 i)
   set O := twistBundle k x 0
-  have hsys : ∀ (a : ℕ) (c : ℤ), (O.toSubSystem.twistPows 1 (fun j => (![Nb] j).toSubSystem)
-      (fun _ => a)).twist (twistSys k x c) = twistMul Nb.toSubSystem a c := by
+  have hsys
+      : ∀ (a : ℕ) (c : ℤ),
+        (O.toSubSystem.twistPows 1 (fun j => (![Nb] j).toSubSystem) (fun _ => a)).twist
+            (twistSys k x c)
+          = twistMul Nb.toSubSystem a c := by
     intro a c
     change ((twistSys k x 0).twist (Nb.toSubSystem.pow a)).twist _ = _
     rw [twistSys_zero_twist]
     rfl
-  have hpt : ∀ a c : ℚ, (Fin.snoc (α := fun _ => ℚ) (fun _ : Fin 1 => a) c : Fin 2 → ℚ) = ![a, c] := by
+  have hpt
+      : ∀ a c : ℚ, (Fin.snoc (α := fun _ => ℚ) (fun _ : Fin 1 => a) c : Fin 2 → ℚ) = ![a, c] := by
     intro a c; funext i; fin_cases i <;> rfl
   have h0 : ∀ F : SubSystem k x Ω, Module.finrank k (F.H 0) = Module.finrank k F.secs := fun F =>
     (CechZerothCohomologySections.proof k Ω N x Ω F hx).some.finrank_eq
@@ -69,7 +76,8 @@ theorem VeryAmpleSnapper.proof (hF : SnapperFinite.Statement.{u, w, w}) (hS : Sn
       change Subsingleton (((twistSys k x 0).twist (Nb.toSubSystem.pow a)).H i) at this
       rwa [twistSys_zero_twist] at this
     have := hχ (fun _ => a) 0
-    rw [hsys, hpt, twistMul, SubSystem.twist_twistSys_zero, eulerChar_eq_finrank_H0 _ hv, h0] at this
+    rw [hsys, hpt, twistMul, SubSystem.twist_twistSys_zero, eulerChar_eq_finrank_H0 _ hv, h0]
+      at this
     exact_mod_cast this
 
 end

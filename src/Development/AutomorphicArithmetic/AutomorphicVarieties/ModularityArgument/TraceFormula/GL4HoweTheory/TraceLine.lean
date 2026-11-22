@@ -4,12 +4,16 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
+open MeasureTheory ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
 
-theorem UpperTheory.V.Z.Tf.L4.traceLine :
-    ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (W : Submodule ℂ V), Module.finrank ℂ W = 1 → ∀ (B : V →ₗ[ℂ] V) (m : ℂ), m ≠ 0 →
-      (∀ v, B v ∈ W) → (∀ v ∈ W, B v = m • v) → ∀ A : V ≃ₗ[ℂ] V, (∀ v ∈ W, A v ∈ W) →
-        ∃ c : ℂ, c ≠ 0 ∧ HasFinTrace (B ∘ₗ (A : V →ₗ[ℂ] V)) c := by
+theorem UpperTheory.V.Z.Tf.L4.traceLine
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (W : Submodule ℂ V),
+      Module.finrank ℂ W = 1
+        → ∀ (B : V →ₗ[ℂ] V) (m : ℂ),
+          m ≠ 0 → (∀ v, B v ∈ W) → (∀ v ∈ W, B v = m • v)
+            → ∀ A : V ≃ₗ[ℂ] V,
+              (∀ v ∈ W, A v ∈ W) → ∃ c : ℂ, c ≠ 0 ∧ HasFinTrace (B ∘ₗ (A : V →ₗ[ℂ] V)) c := by
   intro V _ _ W hW B m hm hB hBW A hA
   have hR : LinearMap.range (B ∘ₗ (A : V →ₗ[ℂ] V)) = W := by
     apply le_antisymm
@@ -34,8 +38,7 @@ theorem UpperTheory.V.Z.Tf.L4.traceLine :
     rw [map_smul, ← hc, LinearMap.smul_apply, LinearMap.id_apply, smul_comm]
   have hc0 : c ≠ 0 := by
     rintro rfl
-    have h2 : ((f v : LinearMap.range (B ∘ₗ (A : V →ₗ[ℂ] V))) : V) = 0 := by
-      rw [← hc]; simp
+    have h2 : ((f v : LinearMap.range (B ∘ₗ (A : V →ₗ[ℂ] V))) : V) = 0 := by rw [← hc]; simp
     have h3 : B (A (v : V)) = 0 := h2
     have hvW : (v : V) ∈ W := hR ▸ v.2
     rw [hBW _ (hA _ hvW), smul_eq_zero] at h3

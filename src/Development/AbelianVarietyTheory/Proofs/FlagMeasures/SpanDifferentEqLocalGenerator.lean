@@ -17,24 +17,28 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc ValuativeRel
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc ValuativeRel
 
 namespace GlobalTheory.LocDiffGen
 
 variable {D : D7}
 
-theorem iF_int (p : PlF D) (a : 𝓞 D.host.F) :
-    (D.s.atP p).ιF (a : D.host.F) ∈ 𝒪[(D.s.atP p).Fp] := by
+theorem iF_int (p : PlF D) (a : 𝓞 D.host.F)
+    : (D.s.atP p).ιF (a : D.host.F) ∈ 𝒪[(D.s.atP p).Fp] := by
   have h1 : (D.s.atP p).ιF (a : D.host.F) ≤ᵥ (D.s.atP p).ιF 1 := by
     rw [(D.s.atP p).val, map_one]
     exact p.valuation_le_one (K := D.host.F) a
   rw [map_one, Valuation.Compatible.vle_iff_le (v := valuation (D.s.atP p).Fp), map_one] at h1
   exact (Valuation.mem_integer_iff _ _).2 h1
 
-theorem dual_sub (Z : LocDat D) (p : PlF D) (z : (D.s.atP p).Fp)
-    (hz : haveI := (D.s.atP p).ellPrime; ∀ c ∈ 𝒪[(D.s.atP p).Fp],
-      ‖Algebra.trace ℚ_[Loc.resChar p] (D.s.atP p).Fp (c * z)‖ ≤ 1) :
-    Z.δ p * z ∈ 𝒪[(D.s.atP p).Fp] := by
+theorem dual_sub
+    (Z : LocDat D)
+    (p : PlF D) (z : (D.s.atP p).Fp)
+    (hz
+      : haveI := (D.s.atP p).ellPrime
+        ∀ c ∈ 𝒪[(D.s.atP p).Fp], ‖Algebra.trace ℚ_[Loc.resChar p] (D.s.atP p).Fp (c * z)‖ ≤ 1)
+    : Z.δ p * z ∈ 𝒪[(D.s.atP p).Fp] := by
   haveI : Fact (Loc.resChar p).Prime := (D.s.atP p).ellPrime
   obtain ⟨-, hδ, -, hO, hpsi, -⟩ := Z.agree p
   have hx : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p * z) ∈ (Z.M p).L.O := by
@@ -42,8 +46,10 @@ theorem dual_sub (Z : LocDat D) (p : PlF D) (z : (D.s.atP p).Fp)
     intro y hy
     rw [hO] at hy
     rw [hpsi]
-    have e : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p * z) * y *
-        algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹ = y * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep z := by
+    have e
+        : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p * z) * y
+            * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹
+          = y * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep z := by
       have e2 : Z.δ p * z * (Z.δ p)⁻¹ = z := by field_simp
       rw [← e2, map_mul (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep) (Z.δ p * z) (Z.δ p)⁻¹, e2]
       ring
@@ -57,11 +63,14 @@ theorem dual_sub (Z : LocDat D) (p : PlF D) (z : (D.s.atP p).Fp)
       (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep).injective).1 hx
   exact PI.UnitaryGroupMassFormula.CntFormula.DeltaC.mem_of_isIntegral_fp (D.s.atP p) hi
 
-theorem diff_sub (Z : LocDat D) (p : PlF D) (x : 𝓞 D.host.F) (hx : x ∈ differentIdeal ℤ (𝓞 D.host.F)) :
-    (Z.δ p)⁻¹ * (D.s.atP p).ιF (x : D.host.F) ∈ 𝒪[(D.s.atP p).Fp] := by
-  obtain ⟨t, ht, hne, -, hinv⟩ := PI.CntNotIntW.locDiff_of PI.CntNotIntW.trace_dual_lattice
-    (PI.CntNotIntW.dualApprox_of PI.CntNotIntW.small_powers_bound PI.CntNotIntW.tensorLiftSurjective)
-    PI.CntNotIntW.small_powers_bound D Z.δ Z.M Z.agree p
+theorem diff_sub
+    (Z : LocDat D) (p : PlF D) (x : 𝓞 D.host.F) (hx : x ∈ differentIdeal ℤ (𝓞 D.host.F))
+    : (Z.δ p)⁻¹ * (D.s.atP p).ιF (x : D.host.F) ∈ 𝒪[(D.s.atP p).Fp] := by
+  obtain ⟨t, ht, hne, -, hinv⟩ :=
+    PI.CntNotIntW.locDiff_of PI.CntNotIntW.trace_dual_lattice
+      (PI.CntNotIntW.dualApprox_of PI.CntNotIntW.small_powers_bound
+        PI.CntNotIntW.tensorLiftSurjective)
+      PI.CntNotIntW.small_powers_bound D Z.δ Z.M Z.agree p
   have hB := PI.CntNotIntW.dual_mul_different_integral D t ht x hx
   let w : 𝓞 D.host.F := ⟨_, (mem_integralClosure_iff ℤ D.host.F).2 hB⟩
   have hw : (D.s.atP p).ιF (w : D.host.F) ∈ 𝒪[(D.s.atP p).Fp] := iF_int p w
@@ -69,28 +78,39 @@ theorem diff_sub (Z : LocDat D) (p : PlF D) (x : 𝓞 D.host.F) (hx : x ∈ diff
     rw [← map_mul]; rfl
   have ht0 : (D.s.atP p).ιF t ≠ 0 := right_ne_zero_of_mul hne
   have hδ0 : Z.δ p ≠ 0 := left_ne_zero_of_mul hne
-  have e : (Z.δ p)⁻¹ * (D.s.atP p).ιF (x : D.host.F) =
-      (D.s.atP p).ιF (w : D.host.F) * (Z.δ p * (D.s.atP p).ιF t)⁻¹ := by
+  have e
+      : (Z.δ p)⁻¹ * (D.s.atP p).ιF (x : D.host.F)
+        = (D.s.atP p).ιF (w : D.host.F) * (Z.δ p * (D.s.atP p).ιF t)⁻¹ := by
     rw [hw']; field_simp
   rw [e]
   exact mul_mem hw hinv
 
-theorem dual_glob (Z : LocDat D) (p : PlF D) (t : D.host.F)
-    (ht : ∀ a : 𝓞 D.host.F, ∃ n : ℤ, Algebra.trace ℚ D.host.F (t * a) = n) :
-    Z.δ p * (D.s.atP p).ιF t ∈ 𝒪[(D.s.atP p).Fp] := by
+theorem dual_glob
+    (Z : LocDat D) (p : PlF D)
+    (t : D.host.F) (ht : ∀ a : 𝓞 D.host.F, ∃ n : ℤ, Algebra.trace ℚ D.host.F (t * a) = n)
+    : Z.δ p * (D.s.atP p).ιF t ∈ 𝒪[(D.s.atP p).Fp] := by
   haveI : Fact (Loc.resChar p).Prime := (D.s.atP p).ellPrime
   haveI := (D.s.atP p).lf
-  exact dual_sub Z p _ (fun c hc => trace_dual_local D.host.F p (D.s.atP p).Fp (D.s.atP p).qlCont
-    (D.s.atP p).qlFin (D.s.atP p).ιF (D.s.atP p).dense (D.s.atP p).val t ht c hc)
+  exact dual_sub Z p _ (fun c hc =>
+    trace_dual_local D.host.F p (D.s.atP p).Fp (D.s.atP p).qlCont (D.s.atP p).qlFin (D.s.atP p).ιF
+      (D.s.atP p).dense (D.s.atP p).val t ht c hc)
 
-theorem span_different_eq : ∀ (D : D7) (Z : LocDat D) (p : PlF D), Submodule.span (Z.M p).L.O ((fun x : 𝓞 D.host.F => (D.s.atP p).ιE (algebraMap D.host.F D.host.E x)) '' (differentIdeal ℤ (𝓞 D.host.F) : Set (𝓞 D.host.F))) = Submodule.span (Z.M p).L.O {algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)} := by
+theorem span_different_eq
+    : ∀ (D : D7) (Z : LocDat D) (p : PlF D),
+      Submodule.span (Z.M p).L.O
+          ((fun x : 𝓞 D.host.F => (D.s.atP p).ιE (algebraMap D.host.F D.host.E x))
+            '' (differentIdeal ℤ (𝓞 D.host.F) : Set (𝓞 D.host.F)))
+        = Submodule.span (Z.M p).L.O {algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)} := by
   intro D Z p
   obtain ⟨-, hδ, -, hO, -, -⟩ := Z.agree p
-  have hmem : ∀ c ∈ 𝒪[(D.s.atP p).Fp], algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c ∈ (Z.M p).L.O := by
+  have hmem
+      : ∀ c ∈ 𝒪[(D.s.atP p).Fp], algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c ∈ (Z.M p).L.O := by
     intro c hc; rw [hO]; exact PI.CntNotIntW.algMap_mem_O D p c hc
-  have hf : ∀ x : 𝓞 D.host.F, (D.s.atP p).ιE (algebraMap D.host.F D.host.E x) =
-      algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (x : D.host.F)) :=
-    fun x => (D.s.atP p).compat _
+  have hf
+      : ∀ x : 𝓞 D.host.F,
+        (D.s.atP p).ιE (algebraMap D.host.F D.host.E x)
+          = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (x : D.host.F)) := fun x =>
+    (D.s.atP p).compat _
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩
@@ -106,13 +126,20 @@ theorem span_different_eq : ∀ (D : D7) (Z : LocDat D) (p : PlF D), Submodule.s
   · rw [Submodule.span_le, Set.singleton_subset_iff, SetLike.mem_coe]
     set N := Submodule.span (Z.M p).L.O ((fun x : 𝓞 D.host.F => (D.s.atP p).ιE (algebraMap D.host.F D.host.E x)) '' (differentIdeal ℤ (𝓞 D.host.F) : Set (𝓞 D.host.F))) with hN
     have h10 : (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)) D.host.F) ≠ 0 := one_ne_zero
-    have hIJ : ((differentIdeal ℤ (𝓞 D.host.F) : Ideal (𝓞 D.host.F)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)) D.host.F) *
-        FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)) D.host.F) = 1 := by
+    have hIJ
+        : ((differentIdeal ℤ (𝓞 D.host.F) : Ideal (𝓞 D.host.F))
+              : FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)) D.host.F)
+            * FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)) D.host.F)
+          = 1 := by
       rw [coeIdeal_differentIdeal (A := ℤ) (K := ℚ) (L := D.host.F) (B := 𝓞 D.host.F)]
       exact inv_mul_cancel₀ (FractionalIdeal.dual_ne_zero ℤ ℚ h10)
-    have key : ∀ y : D.host.F, y ∈ (((differentIdeal ℤ (𝓞 D.host.F) : Ideal (𝓞 D.host.F)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)) D.host.F) *
-        FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)) D.host.F)) →
-        algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p * (D.s.atP p).ιF y) ∈ N := by
+    have key
+        : ∀ y : D.host.F,
+          y ∈ (((differentIdeal ℤ (𝓞 D.host.F) : Ideal (𝓞 D.host.F))
+                : FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)) D.host.F)
+              * FractionalIdeal.dual ℤ ℚ
+                (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.F)) D.host.F))
+            → algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p * (D.s.atP p).ιF y) ∈ N := by
       intro y hy
       rw [← FractionalIdeal.mem_coe, FractionalIdeal.coe_mul] at hy
       refine Submodule.mul_induction_on hy ?_ ?_
@@ -124,8 +151,11 @@ theorem span_different_eq : ∀ (D : D7) (Z : LocDat D) (p : PlF D), Submodule.s
           obtain ⟨k, hk⟩ := hn' _ ((FractionalIdeal.mem_one_iff _).2 ⟨a, rfl⟩)
           exact ⟨k, by rw [← Algebra.traceForm_apply, ← hk]; simp⟩
         have hc := dual_glob Z p n ht
-        have e : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p * (D.s.atP p).ιF (algebraMap (𝓞 D.host.F) D.host.F x * n)) =
-            (⟨_, hmem _ hc⟩ : (Z.M p).L.O) • (D.s.atP p).ιE (algebraMap D.host.F D.host.E (x : D.host.F)) := by
+        have e
+            : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep
+                (Z.δ p * (D.s.atP p).ιF (algebraMap (𝓞 D.host.F) D.host.F x * n))
+              = (⟨_, hmem _ hc⟩ : (Z.M p).L.O)
+                • (D.s.atP p).ιE (algebraMap D.host.F D.host.E (x : D.host.F)) := by
           rw [hf, Subring.smul_def]
           show _ = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p * (D.s.atP p).ιF n) * _
           rw [← map_mul, map_mul (D.s.atP p).ιF]

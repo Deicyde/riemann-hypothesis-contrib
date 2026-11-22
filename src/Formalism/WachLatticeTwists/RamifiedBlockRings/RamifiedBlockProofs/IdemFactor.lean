@@ -13,13 +13,15 @@ namespace Formalism.RepresentationBoundsCohomology.ringDataObjects
 
 open Formalism.NG Formalism.TruncatedSeriesCounting.TruncatedSeriesCountingIdentities
 
-theorem eCore {K : Type} [Field K] {S : Type} [Fintype S] [DecidableEq S] (A : Matrix S S K) (t : ℕ)
-    (α : ℕ → K) (ht : 1 ≤ t)
-    (hA : A.charpoly = ∏ i ∈ Finset.range t, (Polynomial.X - Polynomial.C (α i)))
-    (hα : ∀ i j, i < t → j < t → α i = α j → i = j) :
-    (let EA := ((List.range t).tail.map fun i => A - α i • (1 : Matrix S S K)).prod
-     let δ := ∏ i ∈ Finset.Ioo 0 t, (α 0 - α i)
-     EA * EA = δ • EA ∧ EA.rank = 1 ∧ A * EA = α 0 • EA ∧ δ ≠ 0) := by
+theorem eCore
+    {K : Type} [Field K]
+    {S : Type} [Fintype S] [DecidableEq S]
+    (A : Matrix S S K) (t : ℕ) (α : ℕ → K)
+    (ht : 1 ≤ t) (hA : A.charpoly = ∏ i ∈ Finset.range t, (Polynomial.X - Polynomial.C (α i)))
+    (hα : ∀ i j, i < t → j < t → α i = α j → i = j)
+    : (let EA := ((List.range t).tail.map fun i => A - α i • (1 : Matrix S S K)).prod
+       let δ := ∏ i ∈ Finset.Ioo 0 t, (α 0 - α i)
+       EA * EA = δ • EA ∧ EA.rank = 1 ∧ A * EA = α 0 • EA ∧ δ ≠ 0) := by
   intro EA δ
   let q : Polynomial K := ∏ i ∈ Finset.Ioo 0 t, (Polynomial.X - Polynomial.C (α i))
   have hEA : EA = Polynomial.aeval A q := by
@@ -30,8 +32,7 @@ theorem eCore {K : Type} [Field K] {S : Type} [Fintype S] [DecidableEq S] (A : M
   have hp : A.charpoly = (Polynomial.X - Polynomial.C (α 0)) * q := by
     rw [hA, Finset.range_eq_Ico, Finset.prod_eq_prod_Ico_succ_bot (by omega)]
     congr 1
-  have hδq : q.eval (α 0) = δ := by
-    simp [q, δ, Polynomial.eval_prod]
+  have hδq : q.eval (α 0) = δ := by simp [q, δ, Polynomial.eval_prod]
   have hδ : δ ≠ 0 := by
     refine Finset.prod_ne_zero_iff.mpr fun i hi => ?_
     rw [Finset.mem_Ioo] at hi
@@ -46,13 +47,16 @@ theorem eCore {K : Type} [Field K] {S : Type} [Fintype S] [DecidableEq S] (A : M
     have h2 : Polynomial.aeval A (Polynomial.X - Polynomial.C (α 0)) = A - α 0 • 1 := by
       simp [Algebra.algebraMap_eq_smul_one]
     rw [h2, sub_mul, sub_eq_zero] at h1
-    rw [h1]; simp
+    rw [h1]
+    simp
   have hsq : EA * EA = δ • EA := by
     obtain ⟨h, hh⟩ := Polynomial.X_sub_C_dvd_sub_C_eval (a := α 0) (p := q)
     rw [hδq] at hh
     have h3 : q * q = Polynomial.C δ * q + h * ((Polynomial.X - Polynomial.C (α 0)) * q) := by
       have : q = Polynomial.C δ + (Polynomial.X - Polynomial.C (α 0)) * h := by rw [← hh]; ring
-      calc q * q = (Polynomial.C δ + (Polynomial.X - Polynomial.C (α 0)) * h) * q := by rw [← this]
+      calc
+        q * q
+          = (Polynomial.C δ + (Polynomial.X - Polynomial.C (α 0)) * h) * q := by rw [← this]
         _ = _ := by ring
     rw [hEA, ← map_mul, h3, map_add (f := _), map_mul, map_mul _ h, hCH, mul_zero, add_zero,
       Polynomial.aeval_C, Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul]
@@ -70,12 +74,15 @@ theorem eCore {K : Type} [Field K] {S : Type} [Fintype S] [DecidableEq S] (A : M
       rw [hφc, hp, Polynomial.rootMultiplicity_mul (mul_ne_zero (Polynomial.X_sub_C_ne_zero _) hq0),
         Polynomial.rootMultiplicity_X_sub_C_self,
         Polynomial.rootMultiplicity_eq_zero (by rw [Polynomial.IsRoot, hδq]; exact hδ)]
-    calc EA.rank = Module.finrank K (LinearMap.range EA.mulVecLin) := rfl
+    calc
+      EA.rank
+        = Module.finrank K (LinearMap.range EA.mulVecLin) := rfl
       _ ≤ Module.finrank K (φ.eigenspace (α 0)) := Submodule.finrank_mono h1
       _ ≤ 1 := h2 ▸ LinearMap.finrank_eigenspace_le φ (α 0)
   · have hroot : φ.charpoly.IsRoot (α 0) := by
       rw [hφc, hp, Polynomial.IsRoot, Polynomial.eval_mul]; simp
-    obtain ⟨v, hv⟩ := ((Module.End.hasEigenvalue_iff_isRoot_charpoly φ (α 0)).mpr hroot).exists_hasEigenvector
+    obtain ⟨v, hv⟩ :=
+      ((Module.End.hasEigenvalue_iff_isRoot_charpoly φ (α 0)).mpr hroot).exists_hasEigenvector
     have h1 := Module.End.aeval_apply_of_hasEigenvector (p := q) hv
     have h2 : Polynomial.aeval φ q = Matrix.toLin' EA := by
       rw [hEA]
@@ -89,9 +96,10 @@ theorem eCore {K : Type} [Field K] {S : Type} [Fintype S] [DecidableEq S] (A : M
     have h5 : δ • v = 0 := by rw [← h1]; exact h4
     exact hv.2 ((smul_eq_zero.mp h5).resolve_left hδ)
 
-theorem idem_factor {K : Type} [Field K] {d : Type} [Fintype d] [DecidableEq d] (e : Matrix d d K)
-    (he : e * e = e) : ∃ (S : Type) (_ : Fintype S) (_ : DecidableEq S) (U : Matrix d S K)
-      (W : Matrix S d K), U * W = e ∧ W * U = 1 := by
+theorem idem_factor
+    {K : Type} [Field K] {d : Type} [Fintype d] [DecidableEq d] (e : Matrix d d K) (he : e * e = e)
+    : ∃ (S : Type) (_ : Fintype S) (_ : DecidableEq S) (U : Matrix d S K) (W : Matrix S d K),
+      U * W = e ∧ W * U = 1 := by
   obtain ⟨P, Q, dd, hdd, hPQ, hQP, rfl⟩ := idem_normal_form e he
   let J : Matrix d {a // dd a = 1} K := Matrix.of fun a i => if a = i.1 then 1 else 0
   have hJJ : J.transpose * J = 1 := by
@@ -135,20 +143,24 @@ theorem eMat : StatEMat := by
   have hsand : ∀ B B' : Matrix S S K, (U * B * W) * (U * B' * W) = U * (B * B') * W := by
     intro B B'
     have : (U * B * W) * (U * B' * W) = U * B * (W * U) * B' * W := by simp only [Matrix.mul_assoc]
-    rw [this, hWU, Matrix.mul_one]; simp only [Matrix.mul_assoc]
+    rw [this, hWU, Matrix.mul_one]
+    simp only [Matrix.mul_assoc]
   have he1 : e = U * (1 : Matrix S S K) * W := by rw [Matrix.mul_one, hUW]
   have hf : ∀ i, x - α i • e = U * (A - α i • 1) * W := by
     intro i
     rw [Matrix.mul_sub, Matrix.sub_mul, ← hx, Matrix.mul_smul, Matrix.smul_mul, ← he1]
-  have hlist : ∀ l : List ℕ, e * (l.map fun i => x - α i • e).prod =
-      U * (l.map fun i => A - α i • (1 : Matrix S S K)).prod * W := by
+  have hlist
+      : ∀ l : List ℕ,
+        e * (l.map fun i => x - α i • e).prod
+          = U * (l.map fun i => A - α i • (1 : Matrix S S K)).prod * W := by
     intro l
     induction l with
     | nil => simp [hUW]
     | cons i l ih =>
       simp only [List.map_cons, List.prod_cons]
-      have h1 : e * ((x - α i • e) * (l.map fun i => x - α i • e).prod) =
-          (x - α i • e) * (e * (l.map fun i => x - α i • e).prod) := by
+      have h1
+          : e * ((x - α i • e) * (l.map fun i => x - α i • e).prod)
+            = (x - α i • e) * (e * (l.map fun i => x - α i • e).prod) := by
         have h2 : e * (x - α i • e) = (x - α i • e) * e := by
           rw [mul_sub, sub_mul, hex, hxe, Matrix.mul_smul, Matrix.smul_mul]
         rw [← mul_assoc, h2, mul_assoc]
@@ -162,8 +174,9 @@ theorem eMat : StatEMat := by
       rw [← Matrix.map_mul, hWU, Matrix.map_one _ C'.map_zero C'.map_one]
     have hx' : x.map C' = U.map C' * A.map C' * W.map C' := by
       rw [← Matrix.map_mul, ← Matrix.map_mul, ← hx]
-    have h1 : (Polynomial.X : Polynomial K) • e.map C' - x.map C' + (1 - e).map C' =
-        1 + U.map C' * (((Polynomial.X : Polynomial K) • 1 - A.map C' - 1) * W.map C') := by
+    have h1
+        : (Polynomial.X : Polynomial K) • e.map C' - x.map C' + (1 - e).map C'
+          = 1 + U.map C' * (((Polynomial.X : Polynomial K) • 1 - A.map C' - 1) * W.map C') := by
       have h2 : (1 - e).map C' = 1 - e.map C' := by
         ext i j
         by_cases hij : i = j <;> simp [hij, Matrix.one_apply]
@@ -188,7 +201,9 @@ theorem eMat : StatEMat := by
     · rw [← h2, hE]
       exact (Matrix.rank_mul_le_left _ _).trans (Matrix.rank_mul_le_right _ _)
     · rw [← h2]
-      calc EA.rank = (W * E * U).rank := congrArg Matrix.rank hEA
+      calc
+        EA.rank
+          = (W * E * U).rank := congrArg Matrix.rank hEA
         _ ≤ E.rank := (Matrix.rank_mul_le_left _ _).trans (Matrix.rank_mul_le_right _ _)
   · rw [hE, hx, hsand, h3, Matrix.mul_smul, Matrix.smul_mul]
   · rw [hE, he1, hsand, Matrix.one_mul]

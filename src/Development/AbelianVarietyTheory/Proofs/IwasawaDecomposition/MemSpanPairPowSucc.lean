@@ -6,9 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory.SpanPairPowSucc
 
-theorem mem_span_pair_pow_succ {R : Type} [inst : CommRing R] (p w : R) (k : ℕ) :
-    ∀ x ∈ Ideal.span {p, w} ^ (k + (1 : ℕ)),
-      ∃ (c : R), ∃ G ∈ Ideal.span {p, w} ^ k, x = w ^ (k + (1 : ℕ)) * c + p * G := by
+theorem mem_span_pair_pow_succ {R : Type} [inst : CommRing R] (p w : R) (k : ℕ)
+    : ∀ x ∈ Ideal.span {p, w} ^ (k + (1 : ℕ)), ∃ (c : R), ∃ G ∈ Ideal.span {p, w} ^ k,
+      x = w ^ (k + (1 : ℕ)) * c + p * G := by
   induction k with
   | zero =>
     intro x hx

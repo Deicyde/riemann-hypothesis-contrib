@@ -11,27 +11,30 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EtaleLif
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Site
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+  CrystallineSemistableComparison.Pb.Site
 
 namespace GlobalTheory.CompanionTheory.SiteTrCrit
 
 variable {B : Type} [CommRing B] {J : Ideal B}
 
-theorem sum_eq (δ : DividedPowers J) (b : ℕ →₀ B) :
-    (b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1)) =
-      Finsupp.linearCombination B (pq B).e b := by
+theorem sum_eq (δ : DividedPowers J) (b : ℕ →₀ B)
+    : (b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1))
+      = Finsupp.linearCombination B (pq B).e b := by
   rw [Finsupp.linearCombination_apply]
   refine Finsupp.sum_congr fun k _ => ?_
   rw [(eta_std δ).var k, Algebra.smul_def]
 
-theorem repr_sum (δ : DividedPowers J) (b : ℕ →₀ B) :
-    (pq B).e.repr (b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1)) = b := by
+theorem repr_sum (δ : DividedPowers J) (b : ℕ →₀ B)
+    : (pq B).e.repr (b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1))
+      = b := by
   rw [sum_eq]
   exact (pq B).e.repr_linearCombination b
 
-theorem crit_sup (δ : DividedPowers J) (r : ℕ) (z : (pq B).P) (c : B) :
-    z ∈ fil (eta δ) r ⊔ Ideal.span {algebraMap B (pq B).P c} ↔
-      ∀ k, (pq B).e.repr z k ∈ fil δ (r - k) ⊔ Ideal.span {c} := by
+theorem crit_sup (δ : DividedPowers J) (r : ℕ) (z : (pq B).P) (c : B)
+    : z ∈ fil (eta δ) r ⊔ Ideal.span {algebraMap B (pq B).P c}
+      ↔ ∀ k, (pq B).e.repr z k ∈ fil δ (r - k) ⊔ Ideal.span {c} := by
   have crit := (GlobalTheory.CompanionTheory.PDFil.fil_pdPoly δ (pq B) (eta δ) (eta_std δ)).2.2.2 r
   constructor
   · intro hz k
@@ -50,7 +53,8 @@ theorem crit_sup (δ : DividedPowers J) (r : ℕ) (z : (pq B).P) (c : B) :
     beta_reduce
     rw [add_smul]
     refine Ideal.add_mem _ (Ideal.mem_sup_left ((crit _).2 fun j => ?_)) (Ideal.mem_sup_right ?_)
-    · rw [map_smul, (pq B).e.repr_self, Finsupp.smul_single, smul_eq_mul, mul_one, Finsupp.single_apply]
+    · rw [map_smul, (pq B).e.repr_self, Finsupp.smul_single, smul_eq_mul, mul_one,
+        Finsupp.single_apply]
       split_ifs with hj
       · rw [← hj]; exact hf
       · exact Ideal.zero_mem _
@@ -59,20 +63,37 @@ theorem crit_sup (δ : DividedPowers J) (r : ℕ) (z : (pq B).P) (c : B) :
 
 end GlobalTheory.CompanionTheory.SiteTrCrit
 
-
 open GlobalTheory.CompanionTheory.SiteTrCrit in
-theorem GlobalTheory.CompanionTheory.SiteTrCrit.tr_crit : ∀ {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (s : ℕ) (δ' : DividedPowers (((pq B).ext J).map (Ideal.Quotient.mk (fil (eta δ) (max s 1))))), IsDPMorphism (eta δ) δ' (Ideal.Quotient.mk (fil (eta δ) (max s 1))) → ∀ (b : ℕ →₀ B) (r : ℕ), r ≤ s → ∀ c : B, (Ideal.Quotient.mk (fil (eta δ) (max s 1)) (b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1)) ∈ fil δ' r ↔ ∀ k, b k ∈ fil δ (r - k)) ∧ (Ideal.Quotient.mk (fil (eta δ) (max s 1)) (b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1)) ∈ fil δ' r ⊔ Ideal.span {Ideal.Quotient.mk (fil (eta δ) (max s 1)) (algebraMap B (pq B).P c)} ↔ ∀ k, b k ∈ fil δ (r - k) ⊔ Ideal.span {c}) := by
+theorem GlobalTheory.CompanionTheory.SiteTrCrit.tr_crit
+    : ∀ {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (s : ℕ)
+        (δ' : DividedPowers (((pq B).ext J).map (Ideal.Quotient.mk (fil (eta δ) (max s 1))))),
+      IsDPMorphism (eta δ) δ' (Ideal.Quotient.mk (fil (eta δ) (max s 1)))
+        → ∀ (b : ℕ →₀ B) (r : ℕ),
+          r ≤ s
+            → ∀ c : B,
+              (Ideal.Quotient.mk (fil (eta δ) (max s 1))
+                      (b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1))
+                    ∈ fil δ' r
+                  ↔ ∀ k, b k ∈ fil δ (r - k))
+                ∧ (Ideal.Quotient.mk (fil (eta δ) (max s 1))
+                      (b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1))
+                    ∈ fil δ' r ⊔ Ideal.span
+                      {Ideal.Quotient.mk (fil (eta δ) (max s 1)) (algebraMap B (pq B).P c)}
+                  ↔ ∀ k, b k ∈ fil δ (r - k) ⊔ Ideal.span {c}) := by
   intro B _ J δ s δ' hδ' b r hr c
   have hK : fil (eta δ) (max s 1) ≤ fil (eta δ) r :=
     GlobalTheory.Cris.ExpBij.dpFil_anti (eta δ) (le_max_of_le_left hr)
   have hfil : fil δ' r = (fil (eta δ) r).map (Ideal.Quotient.mk (fil (eta δ) (max s 1))) :=
-    le_antisymm (FubiniStudyChowHeightFormula₂.Adr.Fil.fil_le_map_fil _ _ (eta δ) _ _ δ' _ hδ' rfl r)
+    le_antisymm
+      (FubiniStudyChowHeightFormula₂.Adr.Fil.fil_le_map_fil _ _ (eta δ) _ _ δ' _ hδ' rfl r)
       (FubiniStudyChowHeightFormula₂.Adr.Fil.map_fil_le (eta δ) δ' _ hδ' r)
-  have hsup : (fil (eta δ) r).map (Ideal.Quotient.mk (fil (eta δ) (max s 1))) ⊔
-      Ideal.span {Ideal.Quotient.mk (fil (eta δ) (max s 1)) (algebraMap B (pq B).P c)} =
-      (fil (eta δ) r ⊔ Ideal.span {algebraMap B (pq B).P c}).map
-        (Ideal.Quotient.mk (fil (eta δ) (max s 1))) := by
+  have hsup
+      : (fil (eta δ) r).map (Ideal.Quotient.mk (fil (eta δ) (max s 1)))
+          ⊔ Ideal.span {Ideal.Quotient.mk (fil (eta δ) (max s 1)) (algebraMap B (pq B).P c)}
+        = (fil (eta δ) r ⊔ Ideal.span {algebraMap B (pq B).P c}).map
+          (Ideal.Quotient.mk (fil (eta δ) (max s 1))) := by
     rw [Ideal.map_sup, Ideal.map_span, Set.image_singleton]
   rw [hfil, hsup, Ideal.mem_quotient_iff_mem hK, Ideal.mem_quotient_iff_mem (hK.trans le_sup_left),
-    crit_sup, (GlobalTheory.CompanionTheory.PDFil.fil_pdPoly δ (pq B) (eta δ) (eta_std δ)).2.2.2, repr_sum]
+    crit_sup, (GlobalTheory.CompanionTheory.PDFil.fil_pdPoly δ (pq B) (eta δ) (eta_std δ)).2.2.2,
+    repr_sum]
   exact ⟨Iff.rfl, Iff.rfl⟩

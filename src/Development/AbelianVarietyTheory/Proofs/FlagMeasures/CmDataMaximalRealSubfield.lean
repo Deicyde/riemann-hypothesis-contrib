@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ExistsPositiv
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 noncomputable section
 
@@ -15,8 +16,10 @@ namespace GlobalTheory.StdDefinite
 
 open GlobalTheory.AutInhab
 
-theorem cmData_maximalRealSubfield {K : Type} [Field K] [NumberField K] [StarRing K]
-    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) : Formalism.BasicNotions.CMData (maximalRealSubfield K) K := by
+theorem cmData_maximalRealSubfield
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K)
+    : Formalism.BasicNotions.CMData (maximalRealSubfield K) K := by
   obtain ⟨σ⟩ : Nonempty (K →+* ℂ) := inferInstance
   have hne : ∃ z : K, star z ≠ z := by
     by_contra hcon
@@ -27,7 +30,8 @@ theorem cmData_maximalRealSubfield {K : Type} [Field K] [NumberField K] [StarRin
     ext z
     rw [ComplexEmbedding.conjugate_coe_eq, ← hK.2.1, hcon]
   haveI : IsCMField K := GlobalTheory.LeastExponentCompare.isCMField_of_conj K star hK.2.1 hne
-  refine ⟨hK, inferInstance, Algebra.IsQuadraticExtension.finrank_eq_two _ _, fun a => ⟨fun h => ?_, ?_⟩⟩
+  refine
+    ⟨hK, inferInstance, Algebra.IsQuadraticExtension.finrank_eq_two _ _, fun a => ⟨fun h => ?_, ?_⟩⟩
   · refine ⟨⟨a, fun φ => ?_⟩, rfl⟩
     have := hK.2.1 φ a
     rw [h] at this

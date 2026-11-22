@@ -10,12 +10,20 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions NumberField Formalism.L2.Indef Formalism.L2.Indef.Tree GlobalTheory.BigTop GlobalTheory.BigTop.Fun
+open Formalism.BasicNotions Formalism.MainNotions NumberField Formalism.L2.Indef
+  Formalism.L2.Indef.Tree GlobalTheory.BigTop GlobalTheory.BigTop.Fun
 noncomputable section
 namespace GlobalTheory.BigTop.Fun.Close
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 theorem desHLeaf_alt : _root_.GlobalTheory.BigTop.Fun.DescentHeightCondition := by
-  refine ⟨0, fun CF _ => ⟨1, one_pos, fun eps heps _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm CH hF _ => ?_⟩⟩⟩
+  refine ⟨
+    0,
+    fun CF _ => ⟨
+      1,
+      one_pos,
+      fun eps heps _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm CH hF _ => ?_⟩
+    ⟩
+  ⟩
   intro _
   refine ⟨0, fun C _ => ?_⟩
   have hW : PageWin Fm := hF.2.1
@@ -52,11 +60,19 @@ theorem desHLeaf_alt : _root_.GlobalTheory.BigTop.Fun.DescentHeightCondition := 
     rw [hf]
     have hx2 : 0 ≤ x ^ 2 := by positivity
     nlinarith
-  refine ⟨⟨(Fm.D x i).R.two_le_m, (Fm.D x i).R.m_add_three_le_k, by exact_mod_cast hm4,
-    (Fm.D x i).R.f_le_k⟩, ?_⟩
+  refine ⟨
+    ⟨
+      (Fm.D x i).R.two_le_m,
+      (Fm.D x i).R.m_add_three_le_k,
+      by exact_mod_cast hm4,
+      (Fm.D x i).R.f_le_k
+    ⟩,
+    ?_
+  ⟩
   show (FunData.Lc d.O : ℝ) ≤ (Fm.L x i).sc.b
-  exact (lcLeOfCloud d.O (Fm.L x i).Sc (Fm.L x i).Sc_pos.le
-    (fun τ j => cloudIcc (Fm.L x i) τ j)).trans (scLeB (Fm.params x hx i))
+  exact
+    (lcLeOfCloud d.O (Fm.L x i).Sc (Fm.L x i).Sc_pos.le (fun τ j => cloudIcc (Fm.L x i) τ j)).trans
+      (scLeB (Fm.params x hx i))
 end GlobalTheory.BigTop.Fun.Close
 end
 end

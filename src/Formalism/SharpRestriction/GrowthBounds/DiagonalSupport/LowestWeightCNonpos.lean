@@ -34,8 +34,8 @@ private lemma eq_zero_of_mem_sDegs_C (LL : Letters ι) (S : Set ι) (c : R) (j :
     exact Finset.mem_singleton.mp (h1 hdm)
   · simp at hdm
 
-theorem valS_C_nnR (LL : Letters ι) (S : Set ι) (c : R) :
-    0 ≤ valS LL S (C c : MvPolynomial (ι × Fin n) R) := by
+theorem valS_C_nnR (LL : Letters ι) (S : Set ι) (c : R)
+    : 0 ≤ valS LL S (C c : MvPolynomial (ι × Fin n) R) := by
   unfold valS
   refine Finset.le_inf fun d hd => ?_
   rw [eq_zero_of_mem_sDegs_C LL S c _ d hd]
@@ -65,20 +65,22 @@ private lemma sDegs_smul_subset_sDegs (LL : Letters ι) (S : Set ι) (c : R) (F 
   rw [h0] at hq
   exact hq rfl
 
-theorem valS_smul_geR (LL : Letters ι) (S : Set ι) (c : R) (F : MvPolynomial (ι × Fin n) R) :
-    valS LL S F ≤ valS LL S (c • F) := by
+theorem valS_smul_geR (LL : Letters ι) (S : Set ι) (c : R) (F : MvPolynomial (ι × Fin n) R)
+    : valS LL S F ≤ valS LL S (c • F) := by
   unfold valS
   exact Finset.inf_mono (sDegs_smul_subset_sDegs LL S c F _)
 
-theorem lowest_weight_smul_le (LL : Letters ι) (S : Set ι) (c : R) (F : MvPolynomial (ι × Fin n) R) :
-    lam1S LL S (c • F) ≤ lam1S LL S F := by
+theorem lowest_weight_smul_le (LL : Letters ι) (S : Set ι) (c : R) (F : MvPolynomial (ι × Fin n) R)
+    : lam1S LL S (c • F) ≤ lam1S LL S F := by
   unfold lam1S
   exact Finset.sup_mono (sDegs_smul_subset_sDegs LL S c F _)
 
-theorem valS_zeroR (LL : Letters ι) (S : Set ι) : valS LL S (0 : MvPolynomial (ι × Fin n) R) = ⊤ := by
+theorem valS_zeroR (LL : Letters ι) (S : Set ι)
+    : valS LL S (0 : MvPolynomial (ι × Fin n) R) = ⊤ := by
   simp [valS, sDegs]
 
-theorem lowest_weight_zero_eq_bot (LL : Letters ι) (S : Set ι) : lam1S LL S (0 : MvPolynomial (ι × Fin n) R) = ⊥ := by
+theorem lowest_weight_zero_eq_bot (LL : Letters ι) (S : Set ι)
+    : lam1S LL S (0 : MvPolynomial (ι × Fin n) R) = ⊥ := by
   simp [lam1S, sDegs]
 
 end Sm
@@ -127,13 +129,14 @@ private lemma sDegs_subset_sDegs_smul_of_ne_zero (LL : Letters ι) (S : Set ι) 
   · rw [h1, MvPolynomial.coeff_C_mul]
     exact hq
 
-theorem valS_sat (LL : Letters ι) (S : Set ι) (c : O) (hc : c ≠ 0) (x : MvPolynomial (ι × Fin n) O) :
-    valS LL S (c • x) ≤ valS LL S x := by
+theorem valS_sat (LL : Letters ι) (S : Set ι) (c : O) (hc : c ≠ 0) (x : MvPolynomial (ι × Fin n) O)
+    : valS LL S (c • x) ≤ valS LL S x := by
   unfold valS
   exact Finset.inf_mono (sDegs_subset_sDegs_smul_of_ne_zero LL S c hc x _)
 
-theorem lowest_weight_le_smul_nonzero (LL : Letters ι) (S : Set ι) (c : O) (hc : c ≠ 0) (x : MvPolynomial (ι × Fin n) O) :
-    lam1S LL S x ≤ lam1S LL S (c • x) := by
+theorem lowest_weight_le_smul_nonzero
+    (LL : Letters ι) (S : Set ι) (c : O) (hc : c ≠ 0) (x : MvPolynomial (ι × Fin n) O)
+    : lam1S LL S x ≤ lam1S LL S (c • x) := by
   unfold lam1S
   exact Finset.sup_mono (sDegs_subset_sDegs_smul_of_ne_zero LL S c hc x _)
 
@@ -141,14 +144,18 @@ end Sat
 
 section Dec
 
-variable {O : Type} [CommRing O] [IsDomain O] {ι G : Type} (π : ι → G) {n : ℕ} [NeZero n] (LL : Letters ι)
-  (Cv Cl : G → Set (Set ι × ℤ)) (F : MvPolynomial (ι × Fin n) O)
+variable
+  {O : Type} [CommRing O] [IsDomain O]
+  {ι G : Type} (π : ι → G)
+  {n : ℕ} [NeZero n]
+  (LL : Letters ι) (Cv Cl : G → Set (Set ι × ℤ)) (F : MvPolynomial (ι × Fin n) O)
 
 def partOf (j : G) (mo : ι × Fin n →₀ ℕ) : ι × Fin n →₀ ℕ := mo.filter fun v => π v.1 = j
 
 def XG (j : G) : Submodule O (MvPolynomial (ι × Fin n) O) where
-  carrier := {A | (∀ mo ∈ A.support, mo ∈ F.support.image (partOf π j)) ∧
-    (∀ q ∈ Cv j, ((q.2 : ℤ) : WithTop ℤ) ≤ valS LL q.1 A) ∧ ∀ q ∈ Cl j, lam1S LL q.1 A ≤ ((q.2 : ℤ) : WithBot ℤ)}
+  carrier :=
+    {A | (∀ mo ∈ A.support, mo ∈ F.support.image (partOf π j)) ∧
+      (∀ q ∈ Cv j, ((q.2 : ℤ) : WithTop ℤ) ≤ valS LL q.1 A) ∧ ∀ q ∈ Cl j, lam1S LL q.1 A ≤ ((q.2 : ℤ) : WithBot ℤ)}
   add_mem' := by
     rintro A B ⟨a1, a2, a3⟩ ⟨b1, b2, b3⟩
     refine ⟨fun mo hmo => ?_, fun q hq => ?_, fun q hq => ?_⟩
@@ -167,9 +174,11 @@ def XG (j : G) : Submodule O (MvPolynomial (ι × Fin n) O) where
     · exact le_trans (a2 q hq) (valS_smul_geR LL q.1 c A)
     · exact le_trans (lowest_weight_smul_le LL q.1 c A) (a3 q hq)
 
-theorem sum_of_span [Fintype G] [Nonempty G] {σ : Type} (X : G → Submodule O (MvPolynomial σ O)) (P : MvPolynomial σ O)
-    (h : P ∈ Submodule.span O {y | ∃ x : G → MvPolynomial σ O, (∀ j, x j ∈ X j) ∧ y = ∏ j, x j}) :
-    ∃ (N : ℕ) (A : Fin N → G → MvPolynomial σ O), (∀ i j, A i j ∈ X j) ∧ P = ∑ i, ∏ j, A i j := by
+theorem sum_of_span
+    [Fintype G] [Nonempty G]
+    {σ : Type} (X : G → Submodule O (MvPolynomial σ O)) (P : MvPolynomial σ O)
+    (h : P ∈ Submodule.span O {y | ∃ x : G → MvPolynomial σ O, (∀ j, x j ∈ X j) ∧ y = ∏ j, x j})
+    : ∃ (N : ℕ) (A : Fin N → G → MvPolynomial σ O), (∀ i j, A i j ∈ X j) ∧ P = ∑ i, ∏ j, A i j := by
   induction h using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨x, hx, rfl⟩ := hy
@@ -200,19 +209,25 @@ theorem sum_of_span [Fintype G] [Nonempty G] {σ : Type} (X : G → Submodule O 
       refine Finset.sum_congr rfl fun i _ => ?_
       show c • ∏ j, A i j = ∏ j, (if j = j0 then c • A i j else A i j)
       rw [← Finset.mul_prod_erase _ (fun j => A i j) (Finset.mem_univ j0),
-        ← Finset.mul_prod_erase _ (fun j => if j = j0 then c • A i j else A i j) (Finset.mem_univ j0)]
+        ← Finset.mul_prod_erase _
+          (fun j => if j = j0 then c • A i j else A i j)
+          (Finset.mem_univ j0)]
       simp only [if_pos rfl, eq_self_iff_true, if_true]
       rw [Finset.prod_congr rfl (fun j hj => if_neg (Finset.ne_of_mem_erase hj)), smul_mul_assoc]
 
-theorem decGen (hA : ATL) (hS : ValSlice) [IsPrincipalIdealRing O] [Fintype G] [Nonempty G]
+theorem decGen
+    (hA : ATL) (hS : ValSlice)
+    [IsPrincipalIdealRing O] [Fintype G] [Nonempty G]
     (hCv : ∀ j, ∀ q ∈ Cv j, q.1 ⊆ {i | π i = j}) (hCl : ∀ j, ∀ q ∈ Cl j, q.1 ⊆ {i | π i = j})
     (hv : ∀ j, ∀ q ∈ Cv j, ((q.2 : ℤ) : WithTop ℤ) ≤ valS LL q.1 F)
-    (hl : ∀ j, ∀ q ∈ Cl j, lam1S LL q.1 F ≤ ((q.2 : ℤ) : WithBot ℤ)) :
-    ∃ (N : ℕ) (A : Fin N → G → MvPolynomial (ι × Fin n) O),
+    (hl : ∀ j, ∀ q ∈ Cl j, lam1S LL q.1 F ≤ ((q.2 : ℤ) : WithBot ℤ))
+    : ∃ (N : ℕ) (A : Fin N → G → MvPolynomial (ι × Fin n) O),
       (∀ i j, A i j ∈ XG π LL Cv Cl F j) ∧ F = ∑ i, ∏ j, A i j := by
   classical
-  have hpart : ∀ j (mo M : ι × Fin n →₀ ℕ), (∀ v ∈ mo.support, π v.1 = j) → (∀ v ∈ M.support, π v.1 ≠ j) →
-      partOf π j (mo + M) = mo := by
+  have hpart
+      : ∀ j (mo M : ι × Fin n →₀ ℕ),
+        (∀ v ∈ mo.support, π v.1 = j) → (∀ v ∈ M.support, π v.1 ≠ j)
+          → partOf π j (mo + M) = mo := by
     intro j mo M hmo hM
     ext v
     simp only [partOf, Finsupp.filter_apply, Finsupp.add_apply]
@@ -240,26 +255,35 @@ theorem decGen (hA : ATL) (hS : ValSlice) [IsPrincipalIdealRing O] [Fintype G] [
     exact ⟨F.support.image (partOf π j), fun x hx mo hmo => hx.1 mo hmo⟩
   · intro j c x hc hcx
     obtain ⟨a1, a2, a3⟩ := hcx
-    refine ⟨fun mo hmo => a1 mo ?_, fun q hq => (a2 q hq).trans (valS_sat LL q.1 c hc x),
-      fun q hq => (lowest_weight_le_smul_nonzero LL q.1 c hc x).trans (a3 q hq)⟩
+    refine ⟨
+      fun mo hmo => a1 mo ?_,
+      fun q hq => (a2 q hq).trans (valS_sat LL q.1 c hc x),
+      fun q hq => (lowest_weight_le_smul_nonzero LL q.1 c hc x).trans (a3 q hq)
+    ⟩
     rw [MvPolynomial.mem_support_iff, MvPolynomial.coeff_smul, smul_eq_mul]
     exact mul_ne_zero hc (MvPolynomial.mem_support_iff.mp hmo)
   · intro j
     obtain ⟨s, cM, hMs, hcM, hF, hsupp, hvals⟩ := hS O ι n LL {i | π i = j} F
-    have hmem : ∑ M ∈ s, cM M * monomial M 1 ∈ Submodule.span O
-        {y | ∃ x ∈ XG π LL Cv Cl F j, ∃ M ∈ supported O {v : ι × Fin n | π v.1 ≠ j}, y = x * M} := by
-      refine Submodule.sum_mem _ fun M hM => Submodule.subset_span ⟨cM M, ?_, monomial M 1, ?_, rfl⟩
-      · refine ⟨fun mo hmo => Finset.mem_image.mpr ⟨mo + M, hsupp M hM mo hmo, hpart j mo M ?_ ?_⟩,
-          fun q hq => (hv j q hq).trans (hvals M hM q.1 (hCv j q hq)).1,
-          fun q hq => (hvals M hM q.1 (hCl j q hq)).2.trans (hl j q hq)⟩
-        · intro v hv
-          have hvars : v ∈ (cM M).vars := (MvPolynomial.mem_vars_iff_mem_support v).mpr ⟨mo, hmo, hv⟩
-          exact (MvPolynomial.mem_supported.mp (hcM M hM)) hvars
-        · intro v hv
+    have hmem
+        : ∑ M ∈ s, cM M * monomial M 1 ∈ Submodule.span O
+          {y | ∃ x ∈ XG π LL Cv Cl F j, ∃ M ∈ supported O {v : ι × Fin n | π v.1 ≠ j}, y = x * M} :=
+      by
+        refine Submodule.sum_mem _ fun M hM =>
+          Submodule.subset_span ⟨cM M, ?_, monomial M 1, ?_, rfl⟩
+        · refine ⟨
+            fun mo hmo => Finset.mem_image.mpr ⟨mo + M, hsupp M hM mo hmo, hpart j mo M ?_ ?_⟩,
+            fun q hq => (hv j q hq).trans (hvals M hM q.1 (hCv j q hq)).1,
+            fun q hq => (hvals M hM q.1 (hCl j q hq)).2.trans (hl j q hq)
+          ⟩
+          · intro v hv
+            have hvars : v ∈ (cM M).vars :=
+              (MvPolynomial.mem_vars_iff_mem_support v).mpr ⟨mo, hmo, hv⟩
+            exact (MvPolynomial.mem_supported.mp (hcM M hM)) hvars
+          · intro v hv
+            exact hMs M hM v hv
+        · rw [MvPolynomial.mem_supported, MvPolynomial.vars_monomial one_ne_zero]
+          intro v hv
           exact hMs M hM v hv
-      · rw [MvPolynomial.mem_supported, MvPolynomial.vars_monomial one_ne_zero]
-        intro v hv
-        exact hMs M hM v hv
     rwa [← hF] at hmem
 
 end Dec

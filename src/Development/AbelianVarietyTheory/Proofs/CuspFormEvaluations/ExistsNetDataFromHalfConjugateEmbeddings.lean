@@ -10,19 +10,31 @@ open scoped ComplexConjugate
 
 namespace GlobalTheory
 
-theorem linearIndependent_conj_coords {ι κ : Type*} [Fintype ι] (v : ι → κ → ℂ)
-    (h : LinearIndependent ℂ v) : LinearIndependent ℂ (fun i y => conj (v i y)) := by
+theorem linearIndependent_conj_coords
+    {ι κ : Type*} [Fintype ι] (v : ι → κ → ℂ) (h : LinearIndependent ℂ v)
+    : LinearIndependent ℂ (fun i y => conj (v i y)) := by
   rw [Fintype.linearIndependent_iff] at h ⊢
   intro c hc i
   have h1 : ∑ i, conj (c i) • v i = 0 := by
     funext y
     have := congrArg conj (congrFun hc y)
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [Finset.sum_apply, map_sum] using this
+    simpa [Finset.sum_apply, map_sum] using this
   simpa using h (fun i => conj (c i)) h1 i
 
-theorem exists_netData_of_readings_on_half :
-    ∀ (D : D7) (B : WeightFamilies.Prov D) (j : ℕ) (ka : WeightFamilies.Wt D j) (good : (B.KO →+* ℂ) → Prop), (∀ σ, good σ ↔ ¬ good (ComplexEmbedding.conjugate σ)) → (∀ σ F, B.supN j ka (ComplexEmbedding.conjugate σ) F = B.supN j ka σ F) → ∀ (n : (B.KO →+* ℂ) → ℕ) (ev : ∀ σ, Fin (n σ) → (B.Cusp j ka →ₛₗ[σ] ℂ)) (C : ℝ), (∀ σ, good σ → (∀ F, ∃ y, B.supN j ka σ F / 4 ≤ ‖ev σ y F‖) ∧ (∀ y F, ‖ev σ y F‖ ≤ B.supN j ka σ F) ∧ Real.log (16 * (n σ : ℝ)) ≤ C ∧ ∀ (m : ℕ) (F : Fin m → B.Cusp j ka), LinearIndependent B.KO F → LinearIndependent ℂ (fun i => fun y => ev σ y (F i))) → ∃ Nt : NetData B j ka, NetMax Nt ∧ NetLeSup Nt ∧ NetSize Nt C ∧ ∀ σ, NetInj Nt σ := by
+theorem exists_netData_of_readings_on_half
+    : ∀ (D : D7) (B : WeightFamilies.Prov D) (j : ℕ) (ka : WeightFamilies.Wt D j)
+        (good : (B.KO →+* ℂ) → Prop),
+      (∀ σ, good σ ↔ ¬ good (ComplexEmbedding.conjugate σ))
+        → (∀ σ F, B.supN j ka (ComplexEmbedding.conjugate σ) F = B.supN j ka σ F)
+        → ∀ (n : (B.KO →+* ℂ) → ℕ) (ev : ∀ σ, Fin (n σ) → (B.Cusp j ka →ₛₗ[σ] ℂ)) (C : ℝ),
+          (∀ σ,
+              good σ
+                → (∀ F, ∃ y, B.supN j ka σ F / 4 ≤ ‖ev σ y F‖)
+                  ∧ (∀ y F, ‖ev σ y F‖ ≤ B.supN j ka σ F) ∧ Real.log (16 * (n σ : ℝ)) ≤ C
+                  ∧ ∀ (m : ℕ) (F : Fin m → B.Cusp j ka),
+                    LinearIndependent B.KO F → LinearIndependent ℂ (fun i => fun y => ev σ y (F i)))
+            → ∃ Nt : NetData B j ka, NetMax Nt ∧ NetLeSup Nt ∧ NetSize Nt C ∧ ∀ σ, NetInj Nt σ := by
   classical
   intro D B j ka good hgood hsup n ev C H
   have cc : ∀ σ : B.KO →+* ℂ, ComplexEmbedding.conjugate (ComplexEmbedding.conjugate σ) = σ := by
@@ -51,23 +63,25 @@ theorem exists_netData_of_readings_on_half :
     by_cases h : good σ
     · rw [g1 σ h]
     · rw [g2 σ h, hsup]
-  have hcast : ∀ (a b : B.KO →+* ℂ) (h : a = b) (y : Fin (n a)) (F : B.Cusp j ka),
-      ev b (finCongr (congrArg n h) y) F = ev a y F := by
+  have hcast
+      : ∀ (a b : B.KO →+* ℂ) (h : a = b) (y : Fin (n a)) (F : B.Cusp j ka),
+        ev b (finCongr (congrArg n h) y) F = ev a y F := by
     intro a b h y F
     subst h
     rfl
-  let ev' : ∀ σ, Fin (n (g σ)) → (B.Cusp j ka →ₛₗ[σ] ℂ) := fun σ y =>
-    { toFun := fun F => if good σ then ev (g σ) y F else conj (ev (g σ) y F)
-      map_add' := by
-        intro F G
-        split_ifs <;> simp
-      map_smul' := by
-        intro a F
-        by_cases h : good σ
-        · have e : g σ a = σ a := by rw [g1 σ h]
-          simp only [if_pos h, map_smulₛₗ, e]
-        · have e : g σ a = conj (σ a) := by rw [g2 σ h]; rfl
-          simp [if_neg h, map_smulₛₗ, e] }
+  let ev' : ∀ σ, Fin (n (g σ)) → (B.Cusp j ka →ₛₗ[σ] ℂ) := fun σ y => {
+    toFun := fun F => if good σ then ev (g σ) y F else conj (ev (g σ) y F)
+    map_add' := by
+      intro F G
+      split_ifs <;> simp
+    map_smul' := by
+      intro a F
+      by_cases h : good σ
+      · have e : g σ a = σ a := by rw [g1 σ h]
+        simp only [if_pos h, map_smulₛₗ, e]
+      · have e : g σ a = conj (σ a) := by rw [g2 σ h]; rfl
+        simp [if_neg h, map_smulₛₗ, e]
+  }
   have e1 : ∀ σ y F, good σ → ev' σ y F = ev (g σ) y F := fun σ y F h => if_pos h
   have e2 : ∀ σ y F, ¬ good σ → ev' σ y F = conj (ev (g σ) y F) := fun σ y F h => if_neg h
   have en : ∀ σ y F, ‖ev' σ y F‖ = ‖ev (g σ) y F‖ := by
@@ -75,10 +89,18 @@ theorem exists_netData_of_readings_on_half :
     by_cases h : good σ
     · rw [e1 σ y F h]
     · rw [e2 σ y F h, Complex.norm_conj]
-  refine ⟨{ NN := fun σ => Fin (n (g σ))
-            ev := ev'
-            cj := fun σ => finCongr (congrArg n (gc σ))
-            ev_conj := ?_ }, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    {
+      NN := fun σ => Fin (n (g σ))
+      ev := ev'
+      cj := fun σ => finCongr (congrArg n (gc σ))
+      ev_conj := ?_
+    },
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro σ y F
     by_cases h : good σ
     · rw [e2 _ _ _ ((hgood σ).1 h), e1 _ _ _ h, hcast _ _ (gc σ)]

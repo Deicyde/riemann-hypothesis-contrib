@@ -38,8 +38,8 @@ def lcoeffMod (q f : F[X]) : F := (f %ₘ monicAssoc q).coeff (q.natDegree - 1)
 theorem lcoeffMod_add (q f g : F[X]) : lcoeffMod q (f + g) = lcoeffMod q f + lcoeffMod q g := by
   simp [lcoeffMod, add_modByMonic]
 
-theorem lcoeffMod_C_mul (q : F[X]) (c : F) (f : F[X]) :
-    lcoeffMod q (C c * f) = c * lcoeffMod q f := by
+theorem lcoeffMod_C_mul (q : F[X]) (c : F) (f : F[X])
+    : lcoeffMod q (C c * f) = c * lcoeffMod q f := by
   simp [lcoeffMod, ← smul_eq_C_mul, smul_modByMonic]
 
 theorem lcoeffMod_of_dvd {q f : F[X]} (hq : q ≠ 0) (h : q ∣ f) : lcoeffMod q f = 0 := by
@@ -47,18 +47,17 @@ theorem lcoeffMod_of_dvd {q f : F[X]} (hq : q ≠ 0) (h : q ∣ f) : lcoeffMod q
     (modByMonic_eq_zero_iff_dvd (monicAssoc_monic hq)).2 ((monicAssoc_dvd q).trans h)
   simp [lcoeffMod, this]
 
-theorem lcoeffMod_eq_of_dvd_sub {q f g : F[X]} (hq : q ≠ 0) (h : q ∣ f - g) :
-    lcoeffMod q f = lcoeffMod q g := by
+theorem lcoeffMod_eq_of_dvd_sub {q f g : F[X]} (hq : q ≠ 0) (h : q ∣ f - g)
+    : lcoeffMod q f = lcoeffMod q g := by
   have e : f = (f - g) + g := by ring
   rw [e, lcoeffMod_add, lcoeffMod_of_dvd hq h, zero_add]
 
-theorem exists_lcoeffMod_mul_ne_zero {q f : F[X]} (hq : q ≠ 0) (hf : ¬ q ∣ f) :
-    ∃ g, lcoeffMod q (f * g) ≠ 0 := by
+theorem exists_lcoeffMod_mul_ne_zero {q f : F[X]} (hq : q ≠ 0) (hf : ¬ q ∣ f)
+    : ∃ g, lcoeffMod q (f * g) ≠ 0 := by
   set q' := monicAssoc q with hq'
   have hm : q'.Monic := monicAssoc_monic hq
   set r := f %ₘ q' with hr
-  have hr0 : r ≠ 0 := fun h =>
-    hf ((dvd_monicAssoc q).trans ((modByMonic_eq_zero_iff_dvd hm).1 h))
+  have hr0 : r ≠ 0 := fun h => hf ((dvd_monicAssoc q).trans ((modByMonic_eq_zero_iff_dvd hm).1 h))
   have hdeg : r.natDegree < q.natDegree := by
     rw [← natDegree_monicAssoc hq]
     exact natDegree_lt_natDegree hr0 (degree_modByMonic_lt f hm)
@@ -93,13 +92,13 @@ variable {q : F[X]} (hq : q ≠ 0)
 theorem ellQ_mk (f : F[X]) : ellQ q hq (Submodule.Quotient.mk f) = lcoeffMod q f := rfl
 
 omit hq in
-theorem mk_mul_mk (f g : F[X]) :
-    (Submodule.Quotient.mk f : F[X] ⧸ F[X] ∙ q) * Submodule.Quotient.mk g =
-      Submodule.Quotient.mk (f * g) := rfl
+theorem mk_mul_mk (f g : F[X])
+    : (Submodule.Quotient.mk f : F[X] ⧸ F[X] ∙ q) * Submodule.Quotient.mk g
+      = Submodule.Quotient.mk (f * g) :=
+  rfl
 
 omit hq in
-theorem smul_eq_mk_mul (r : F[X]) (a : F[X] ⧸ F[X] ∙ q) :
-    r • a = Submodule.Quotient.mk r * a := by
+theorem smul_eq_mk_mul (r : F[X]) (a : F[X] ⧸ F[X] ∙ q) : r • a = Submodule.Quotient.mk r * a := by
   obtain ⟨f, rfl⟩ := Submodule.Quotient.mk_surjective _ a
   rw [← Submodule.Quotient.mk_smul, smul_eq_mul, mk_mul_mk]
 
@@ -117,8 +116,8 @@ theorem ellQ_C_smul (c : F) (a : F[X] ⧸ F[X] ∙ q) : ellQ q hq (C c • a) = 
   obtain ⟨f, rfl⟩ := Submodule.Quotient.mk_surjective _ a
   rw [← Submodule.Quotient.mk_smul, smul_eq_mul, ellQ_mk, ellQ_mk, lcoeffMod_C_mul]
 
-theorem exists_ellQ_mul_ne_zero {a : F[X] ⧸ F[X] ∙ q} (ha : a ≠ 0) :
-    ∃ b, ellQ q hq (b * a) ≠ 0 := by
+theorem exists_ellQ_mul_ne_zero {a : F[X] ⧸ F[X] ∙ q} (ha : a ≠ 0)
+    : ∃ b, ellQ q hq (b * a) ≠ 0 := by
   obtain ⟨f, rfl⟩ := Submodule.Quotient.mk_surjective _ a
   have hf : ¬ q ∣ f := by
     rintro ⟨c, rfl⟩
@@ -139,13 +138,13 @@ def ContCoeff {α : Type*} [TopologicalSpace α] (P : α → F[X]) : Prop :=
 
 variable {α : Type*} [TopologicalSpace α]
 
-theorem ContCoeff.add {P Q : α → F[X]} (hP : ContCoeff P) (hQ : ContCoeff Q) :
-    ContCoeff fun a => P a + Q a := fun k => by
+theorem ContCoeff.add {P Q : α → F[X]} (hP : ContCoeff P) (hQ : ContCoeff Q)
+    : ContCoeff fun a => P a + Q a := fun k => by
   simp only [coeff_add]
   exact (hP k).add (hQ k)
 
-theorem ContCoeff.mul {P Q : α → F[X]} (hP : ContCoeff P) (hQ : ContCoeff Q) :
-    ContCoeff fun a => P a * Q a := fun k => by
+theorem ContCoeff.mul {P Q : α → F[X]} (hP : ContCoeff P) (hQ : ContCoeff Q)
+    : ContCoeff fun a => P a * Q a := fun k => by
   simp only [coeff_mul]
   exact continuous_finsetSum _ fun x _ => (hP x.1).mul (hQ x.2)
 
@@ -153,27 +152,27 @@ omit [IsTopologicalRing F] in
 theorem ContCoeff.const (p : F[X]) : ContCoeff fun _ : α => p := fun _ => continuous_const
 
 omit [IsTopologicalRing F] in
-theorem ContCoeff.C {f : α → F} (hf : Continuous f) : ContCoeff fun a => Polynomial.C (f a) :=
-  fun k => by
-    simp only [coeff_C]
-    split_ifs
-    · exact hf
-    · exact continuous_const
+theorem ContCoeff.C {f : α → F} (hf : Continuous f)
+    : ContCoeff fun a => Polynomial.C (f a) := fun k => by
+  simp only [coeff_C]
+  split_ifs
+  · exact hf
+  · exact continuous_const
 
-theorem ContCoeff.zsmul {P : α → F[X]} (hP : ContCoeff P) (z : ℤ) :
-    ContCoeff fun a => z • P a := fun k => by
+theorem ContCoeff.zsmul {P : α → F[X]} (hP : ContCoeff P) (z : ℤ)
+    : ContCoeff fun a => z • P a := fun k => by
   have e : ∀ a, (z • P a).coeff k = (z : F) * (P a).coeff k := fun a => by
     rw [zsmul_eq_mul, ← C_eq_intCast, coeff_C_mul]
   simp only [e]
   exact continuous_const.mul (hP k)
 
-theorem ContCoeff.sum {ι : Type*} (s : Finset ι) {P : ι → α → F[X]}
-    (hP : ∀ i ∈ s, ContCoeff (P i)) : ContCoeff fun a => ∑ i ∈ s, P i a := fun k => by
+theorem ContCoeff.sum {ι : Type*} (s : Finset ι) {P : ι → α → F[X]} (hP : ∀ i ∈ s, ContCoeff (P i))
+    : ContCoeff fun a => ∑ i ∈ s, P i a := fun k => by
   simp only [finsetSum_coeff]
   exact continuous_finsetSum _ fun i hi => hP i hi k
 
-theorem ContCoeff.prod {ι : Type*} (s : Finset ι) {P : ι → α → F[X]}
-    (hP : ∀ i ∈ s, ContCoeff (P i)) : ContCoeff fun a => ∏ i ∈ s, P i a := by
+theorem ContCoeff.prod {ι : Type*} (s : Finset ι) {P : ι → α → F[X]} (hP : ∀ i ∈ s, ContCoeff (P i))
+    : ContCoeff fun a => ∏ i ∈ s, P i a := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using ContCoeff.const (α := α) (1 : F[X])
@@ -184,14 +183,16 @@ theorem ContCoeff.prod {ι : Type*} (s : Finset ι) {P : ι → α → F[X]}
 
 variable {m : Type*} [Fintype m] [DecidableEq m]
 
-theorem continuous_charpoly_coeff_of_fintype (k : ℕ) :
-    Continuous fun A : Matrix m m F => A.charpoly.coeff k := by
+theorem continuous_charpoly_coeff_of_fintype (k : ℕ)
+    : Continuous fun A : Matrix m m F => A.charpoly.coeff k := by
   have hentry : ∀ i j : m, ContCoeff fun A : Matrix m m F => A.charmatrix i j := by
     intro i j
     simp only [Matrix.charmatrix_apply]
-    have hconst : ContCoeff (fun _ : Matrix m m F => (Matrix.diagonal fun _ : m => (X : F[X])) i j) := ContCoeff.const _
+    have hconst
+        : ContCoeff (fun _ : Matrix m m F => (Matrix.diagonal fun _ : m => (X : F[X])) i j) :=
+      ContCoeff.const _
     have hc : Continuous fun A : Matrix m m F => A i j := continuous_id.matrix_elem i j
-    have := ContCoeff.C (α := Matrix m m F) (f := fun A => -A i j) hc.neg
+    have := ContCoeff.C (α := Matrix m m F) (f := fun A => - A i j) hc.neg
     simpa [sub_eq_add_neg] using hconst.add this
   have : ContCoeff fun A : Matrix m m F => A.charpoly := by
     simp only [Matrix.charpoly, Matrix.det_apply]
@@ -201,8 +202,8 @@ theorem continuous_charpoly_coeff_of_fintype (k : ℕ) :
     simpa only [Units.smul_def] using this
   exact this k
 
-theorem continuous_charpoly_coeff {n : ℕ} (k : ℕ) :
-    Continuous fun A : Matrix (Fin n) (Fin n) F => A.charpoly.coeff k :=
+theorem continuous_charpoly_coeff {n : ℕ} (k : ℕ)
+    : Continuous fun A : Matrix (Fin n) (Fin n) F => A.charpoly.coeff k :=
   continuous_charpoly_coeff_of_fintype k
 
 end Continuity
@@ -213,17 +214,19 @@ universe u
 
 variable {F : Type u} [Field F] {n : ℕ}
 
-theorem charpoly_smul_eq_zero (A : Matrix (Fin n) (Fin n) F)
-    (m : Module.AEval' (Matrix.toLin' A)) : A.charpoly • m = 0 := by
+theorem charpoly_smul_eq_zero (A : Matrix (Fin n) (Fin n) F) (m : Module.AEval' (Matrix.toLin' A))
+    : A.charpoly • m = 0 := by
   have h : aeval (Matrix.toLin' A) A.charpoly = 0 := by
     rw [← Matrix.charpoly_toLin']
     exact LinearMap.aeval_self_charpoly _
   obtain ⟨v, rfl⟩ := (Module.AEval'.of (Matrix.toLin' A)).surjective m
   rw [← Module.AEval.of_aeval_smul, h, zero_smul, map_zero]
 
-theorem exists_cyclic_decomposition (A : Matrix (Fin n) (Fin n) F) :
-    ∃ (ι : Type u) (_ : Fintype ι) (q : ι → F[X]), (∀ i, q i ≠ 0) ∧ (∀ i, q i ∣ A.charpoly) ∧
-      Nonempty (Module.AEval' (Matrix.toLin' A) ≃ₗ[F[X]] DirectSum ι fun i => F[X] ⧸ F[X] ∙ q i) := by
+theorem exists_cyclic_decomposition (A : Matrix (Fin n) (Fin n) F)
+    : ∃ (ι : Type u) (_ : Fintype ι) (q : ι → F[X]),
+      (∀ i, q i ≠ 0) ∧ (∀ i, q i ∣ A.charpoly)
+        ∧ Nonempty
+          (Module.AEval' (Matrix.toLin' A) ≃ₗ[F[X]] DirectSum ι fun i => F[X] ⧸ F[X] ∙ q i) := by
   classical
   have htors : Module.IsTorsion F[X] (Module.AEval' (Matrix.toLin' A)) :=
     Module.AEval.isTorsion_of_finiteDimensional F (Fin n → F) (Matrix.toLin' A)
@@ -235,8 +238,8 @@ theorem exists_cyclic_decomposition (A : Matrix (Fin n) (Fin n) F) :
     have := charpoly_smul_eq_zero A (E.symm x)
     rwa [← map_smul, LinearEquiv.map_eq_zero_iff] at this
   rw [← DirectSum.of_smul, ← Submodule.Quotient.mk_smul, smul_eq_mul, mul_one] at h0
-  have h1 := DirectSum.of_injective (β := fun i => F[X] ⧸ F[X] ∙ p i ^ e i) i
-    (h0.trans (map_zero _).symm)
+  have h1 :=
+    DirectSum.of_injective (β := fun i => F[X] ⧸ F[X] ∙ p i ^ e i) i (h0.trans (map_zero _).symm)
   obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.1 ((Submodule.Quotient.mk_eq_zero _).1 h1)
   exact ⟨c, by rw [← hc, smul_eq_mul, mul_comm]⟩
 
@@ -244,8 +247,8 @@ end Decomposition
 
 section SumForm
 
-variable {F : Type*} [Field F] {ι : Type*} [Fintype ι] [DecidableEq ι] (q : ι → F[X])
-  (hq : ∀ i, q i ≠ 0)
+variable
+  {F : Type*} [Field F] {ι : Type*} [Fintype ι] [DecidableEq ι] (q : ι → F[X]) (hq : ∀ i, q i ≠ 0)
 
 abbrev CycSum := DirectSum ι fun i => F[X] ⧸ F[X] ∙ q i
 
@@ -258,32 +261,33 @@ theorem sumForm_comm (x y : CycSum q) : sumForm q hq x y = sumForm q hq y x := b
   rw [mul_comm]
 
 omit [DecidableEq ι] in
-theorem sumForm_add_left (x x' y : CycSum q) :
-    sumForm q hq (x + x') y = sumForm q hq x y + sumForm q hq x' y := by
+theorem sumForm_add_left (x x' y : CycSum q)
+    : sumForm q hq (x + x') y = sumForm q hq x y + sumForm q hq x' y := by
   unfold sumForm
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [DirectSum.add_apply, add_mul, ellQ_add]
 
 omit [DecidableEq ι] in
-theorem sumForm_C_smul_left (c : F) (x y : CycSum q) :
-    sumForm q hq (C c • x) y = c * sumForm q hq x y := by
+theorem sumForm_C_smul_left (c : F) (x y : CycSum q)
+    : sumForm q hq (C c • x) y = c * sumForm q hq x y := by
   unfold sumForm
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [DirectSum.smul_apply, smul_mul_assoc, ellQ_C_smul]
 
 omit [DecidableEq ι] in
-theorem sumForm_X_smul (x y : CycSum q) :
-    sumForm q hq ((X : F[X]) • x) y = sumForm q hq x ((X : F[X]) • y) := by
+theorem sumForm_X_smul (x y : CycSum q)
+    : sumForm q hq ((X : F[X]) • x) y = sumForm q hq x ((X : F[X]) • y) := by
   unfold sumForm
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [DirectSum.smul_apply, DirectSum.smul_apply, smul_eq_mk_mul, smul_eq_mk_mul]
   congr 1
   ring
 
-theorem sumForm_of_left (i : ι) (b : F[X] ⧸ F[X] ∙ q i) (y : CycSum q) :
-    sumForm q hq (DirectSum.of (fun i => F[X] ⧸ F[X] ∙ q i) i b) y = ellQ (q i) (hq i) (b * y i) := by
+theorem sumForm_of_left (i : ι) (b : F[X] ⧸ F[X] ∙ q i) (y : CycSum q)
+    : sumForm q hq (DirectSum.of (fun i => F[X] ⧸ F[X] ∙ q i) i b) y
+      = ellQ (q i) (hq i) (b * y i) := by
   unfold sumForm
   rw [Finset.sum_eq_single i]
   · rw [DirectSum.of_eq_same]
@@ -309,13 +313,13 @@ open scoped Matrix
 
 variable {F : Type u} [Field F] {n : ℕ}
 
-theorem exists_isSymm_of_form (A : Matrix (Fin n) (Fin n) F) (B : (Fin n → F) → (Fin n → F) → F)
+theorem exists_isSymm_of_form
+    (A : Matrix (Fin n) (Fin n) F) (B : (Fin n → F) → (Fin n → F) → F)
     (hBsymm : ∀ v w, B v w = B w v) (hBaddl : ∀ v v' w, B (v + v') w = B v w + B v' w)
     (hBsmull : ∀ (c : F) v w, B (c • v) w = c * B v w)
-    (hBA : ∀ v w, B (A.mulVec v) w = B v (A.mulVec w))
-    (hBnd : ∀ w, (∀ v, B v w = 0) → w = 0) :
-    ∃ S : GL (Fin n) F, (S : Matrix (Fin n) (Fin n) F).IsSymm ∧
-      (S : Matrix (Fin n) (Fin n) F) * A = Aᵀ * S := by
+    (hBA : ∀ v w, B (A.mulVec v) w = B v (A.mulVec w)) (hBnd : ∀ w, (∀ v, B v w = 0) → w = 0)
+    : ∃ S : GL (Fin n) F,
+      (S : Matrix (Fin n) (Fin n) F).IsSymm ∧ (S : Matrix (Fin n) (Fin n) F) * A = Aᵀ * S := by
   classical
   have hBaddr : ∀ v w w', B v (w + w') = B v w + B v w' := fun v w w' => by
     rw [hBsymm, hBaddl, hBsymm w, hBsymm w']
@@ -323,16 +327,16 @@ theorem exists_isSymm_of_form (A : Matrix (Fin n) (Fin n) F) (B : (Fin n → F) 
     rw [hBsymm, hBsmull, hBsymm]
   have hexp : ∀ v w, B v w = ∑ l, w l * B v (Pi.single l 1) := by
     intro v w
-    have hsum : ∀ s : Finset (Fin n), B v (∑ l ∈ s, w l • Pi.single l (1 : F)) =
-        ∑ l ∈ s, w l * B v (Pi.single l 1) := by
+    have hsum
+        : ∀ s : Finset (Fin n),
+          B v (∑ l ∈ s, w l • Pi.single l (1 : F)) = ∑ l ∈ s, w l * B v (Pi.single l 1) := by
       intro s
       induction s using Finset.induction_on with
       | empty =>
         simp only [Finset.sum_empty]
         have := hBsmulr 0 v 0
         simpa using this
-      | insert a s ha ih =>
-        rw [Finset.sum_insert ha, Finset.sum_insert ha, hBaddr, ih, hBsmulr]
+      | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, hBaddr, ih, hBsmulr]
     have hw : ∑ l, w l • Pi.single l (1 : F) = w := by
       have := (Pi.basisFun F (Fin n)).sum_repr w
       simpa using this
@@ -373,9 +377,9 @@ theorem exists_isSymm_of_form (A : Matrix (Fin n) (Fin n) F) (B : (Fin n → F) 
       exact Finset.sum_congr rfl fun l _ => by rw [hS]
     rw [h1, h2, hBA]
 
-theorem exists_isSymm_mul_eq_transpose_mul (A : Matrix (Fin n) (Fin n) F) :
-    ∃ S : GL (Fin n) F, (S : Matrix (Fin n) (Fin n) F).IsSymm ∧
-      (S : Matrix (Fin n) (Fin n) F) * A = Aᵀ * S := by
+theorem exists_isSymm_mul_eq_transpose_mul (A : Matrix (Fin n) (Fin n) F)
+    : ∃ S : GL (Fin n) F,
+      (S : Matrix (Fin n) (Fin n) F).IsSymm ∧ (S : Matrix (Fin n) (Fin n) F) * A = Aᵀ * S := by
   classical
   obtain ⟨ι, hι, q, hq0, -, ⟨e⟩⟩ := exists_cyclic_decomposition A
   set φ := Matrix.toLin' A
@@ -392,9 +396,9 @@ theorem exists_isSymm_mul_eq_transpose_mul (A : Matrix (Fin n) (Fin n) F) :
       rw [← e.map_eq_zero_iff]
       exact h
     simpa using this
-  have hEsurj : ∀ x, ∃ v, E v = x := fun x =>
-    ⟨(Module.AEval'.of φ).symm (e.symm x), by simp [E]⟩
-  refine exists_isSymm_of_form A (fun v w => sumForm q hq0 (E v) (E w))
+  have hEsurj : ∀ x, ∃ v, E v = x := fun x => ⟨(Module.AEval'.of φ).symm (e.symm x), by simp [E]⟩
+  refine exists_isSymm_of_form A
+    (fun v w => sumForm q hq0 (E v) (E w))
     (fun v w => sumForm_comm q hq0 _ _)
     (fun v v' w => by simp only [hEadd, sumForm_add_left])
     (fun c v w => by simp only [hEsmul, sumForm_C_smul_left])
@@ -413,19 +417,21 @@ universe u
 
 variable {F : Type u} [Field F] {n : ℕ}
 
-theorem exists_conj_of_equiv {x y : GL (Fin n) F}
-    (E : Module.AEval' (Matrix.toLin' (x : Matrix (Fin n) (Fin n) F)) ≃ₗ[F[X]]
-      Module.AEval' (Matrix.toLin' (y : Matrix (Fin n) (Fin n) F))) :
-    ∃ g : GL (Fin n) F, x = g * y * g⁻¹ := by
+theorem exists_conj_of_equiv
+    {x y : GL (Fin n) F}
+    (E
+      : Module.AEval' (Matrix.toLin' (x : Matrix (Fin n) (Fin n) F)) ≃ₗ[F[X]]
+        Module.AEval' (Matrix.toLin' (y : Matrix (Fin n) (Fin n) F)))
+    : ∃ g : GL (Fin n) F, x = g * y * g⁻¹ := by
   classical
   set φx := Matrix.toLin' (x : Matrix (Fin n) (Fin n) F) with hφx
   set φy := Matrix.toLin' (y : Matrix (Fin n) (Fin n) F) with hφy
   let L : (Fin n → F) →ₗ[F] (Fin n → F) :=
-    (Module.AEval'.of φy).symm.toLinearMap ∘ₗ (E.restrictScalars F).toLinearMap ∘ₗ
-      (Module.AEval'.of φx).toLinearMap
+    (Module.AEval'.of φy).symm.toLinearMap ∘ₗ (E.restrictScalars F).toLinearMap
+      ∘ₗ (Module.AEval'.of φx).toLinearMap
   let L' : (Fin n → F) →ₗ[F] (Fin n → F) :=
-    (Module.AEval'.of φx).symm.toLinearMap ∘ₗ (E.symm.restrictScalars F).toLinearMap ∘ₗ
-      (Module.AEval'.of φy).toLinearMap
+    (Module.AEval'.of φx).symm.toLinearMap ∘ₗ (E.symm.restrictScalars F).toLinearMap
+      ∘ₗ (Module.AEval'.of φy).toLinearMap
   have hLL' : L ∘ₗ L' = LinearMap.id := by
     apply LinearMap.ext
     intro v
@@ -441,10 +447,8 @@ theorem exists_conj_of_equiv {x y : GL (Fin n) F}
     rw [← Module.AEval'.X_smul_of, map_smul, Module.AEval'.of_symm_X_smul]
   set P := LinearMap.toMatrix' L
   set Q := LinearMap.toMatrix' L'
-  have hPQ : P * Q = 1 := by
-    rw [← LinearMap.toMatrix'_comp, hLL', LinearMap.toMatrix'_id]
-  have hQP : Q * P = 1 := by
-    rw [← LinearMap.toMatrix'_comp, hL'L, LinearMap.toMatrix'_id]
+  have hPQ : P * Q = 1 := by rw [← LinearMap.toMatrix'_comp, hLL', LinearMap.toMatrix'_id]
+  have hQP : Q * P = 1 := by rw [← LinearMap.toMatrix'_comp, hL'L, LinearMap.toMatrix'_id]
   have hPx : P * (x : Matrix (Fin n) (Fin n) F) = y * P := by
     have h1 : P * (x : Matrix (Fin n) (Fin n) F) = LinearMap.toMatrix' (L ∘ₗ φx) := by
       rw [LinearMap.toMatrix'_comp, hφx, LinearMap.toMatrix'_toLin']
@@ -455,7 +459,9 @@ theorem exists_conj_of_equiv {x y : GL (Fin n) F}
   refine ⟨g, Units.ext ?_⟩
   simp only [Units.val_mul]
   show (x : Matrix (Fin n) (Fin n) F) = Q * y * P
-  calc (x : Matrix (Fin n) (Fin n) F) = (Q * P) * x := by rw [hQP, one_mul]
+  calc
+    (x : Matrix (Fin n) (Fin n) F)
+      = (Q * P) * x := by rw [hQP, one_mul]
     _ = Q * (P * x) := Matrix.mul_assoc _ _ _
     _ = Q * (y * P) := by rw [hPx]
     _ = Q * y * P := (Matrix.mul_assoc _ _ _).symm
@@ -466,8 +472,9 @@ theorem finite_monic_dvd {f : F[X]} (hf : f ≠ 0) : {g : F[X] | g.Monic ∧ g �
   · refine (UniqueFactorizationMonoid.normalizedFactors f).powerset.toFinset.finite_toSet.subset ?_
     rintro _ ⟨g, ⟨hgm, hgf⟩, rfl⟩
     rw [Finset.mem_coe, Multiset.mem_toFinset, Multiset.mem_powerset]
-    exact (UniqueFactorizationMonoid.dvd_iff_normalizedFactors_le_normalizedFactors
-      hgm.ne_zero hf).1 hgf
+    exact
+      (UniqueFactorizationMonoid.dvd_iff_normalizedFactors_le_normalizedFactors hgm.ne_zero hf).1
+        hgf
   · rintro g₁ ⟨hg₁, -⟩ g₂ ⟨hg₂, -⟩ h
     refine eq_of_monic_of_associated hg₁ hg₂ ?_
     have a₁ := UniqueFactorizationMonoid.prod_normalizedFactors hg₁.ne_zero
@@ -475,10 +482,12 @@ theorem finite_monic_dvd {f : F[X]} (hf : f ≠ 0) : {g : F[X] | g.Monic ∧ g �
     rw [h] at a₁
     exact a₁.symm.trans a₂
 
-theorem exists_countable_conj_charpoly (f : F[X]) :
-    ∃ s : Set (GL (Fin n) F), s.Countable ∧ ∀ x : GL (Fin n) F,
-      (x : Matrix (Fin n) (Fin n) F).charpoly = f → ∃ y ∈ s, ∃ g : GL (Fin n) F,
-        x = g * y * g⁻¹ := by
+theorem exists_countable_conj_charpoly (f : F[X])
+    : ∃ s : Set (GL (Fin n) F),
+      s.Countable
+        ∧ ∀ x : GL (Fin n) F,
+          (x : Matrix (Fin n) (Fin n) F).charpoly = f
+            → ∃ y ∈ s, ∃ g : GL (Fin n) F, x = g * y * g⁻¹ := by
   classical
   by_cases hf : f = 0
   · refine ⟨∅, Set.countable_empty, fun x hx => ?_⟩
@@ -487,16 +496,19 @@ theorem exists_countable_conj_charpoly (f : F[X]) :
   have : Finite D := (finite_monic_dvd hf).to_subtype
   let N : (Σ k : ℕ, Fin k → D) → Type u := fun t =>
     DirectSum (Fin t.1) fun j => F[X] ⧸ F[X] ∙ (t.2 j).1
-  let R : (Σ k : ℕ, Fin k → D) → Prop := fun t => ∃ y : GL (Fin n) F,
-    Nonempty (Module.AEval' (Matrix.toLin' (y : Matrix (Fin n) (Fin n) F)) ≃ₗ[F[X]] N t)
+  let R : (Σ k : ℕ, Fin k → D) → Prop := fun t =>
+    ∃ y : GL (Fin n) F,
+      Nonempty (Module.AEval' (Matrix.toLin' (y : Matrix (Fin n) (Fin n) F)) ≃ₗ[F[X]] N t)
   let rep : (Σ k : ℕ, Fin k → D) → GL (Fin n) F := fun t => if h : R t then h.choose else 1
   refine ⟨Set.range rep, Set.countable_range rep, fun x hx => ?_⟩
   obtain ⟨ι, hι, q, hq0, hqd, ⟨e⟩⟩ := exists_cyclic_decomposition (x : Matrix (Fin n) (Fin n) F)
   let σ := Fintype.equivFin ι
-  let t : Σ k : ℕ, Fin k → D := ⟨Fintype.card ι, fun j =>
-    ⟨monicAssoc (q (σ.symm j)), monicAssoc_monic (hq0 _), (monicAssoc_dvd _).trans (hx ▸ hqd _)⟩⟩
-  have hspan : ∀ j : Fin (Fintype.card ι),
-      (F[X] ∙ q (σ.symm j)) = (F[X] ∙ (t.2 j).1) := fun j =>
+  let t : Σ k : ℕ, Fin k → D := ⟨
+    Fintype.card ι,
+    fun j =>
+      ⟨monicAssoc (q (σ.symm j)), monicAssoc_monic (hq0 _), (monicAssoc_dvd _).trans (hx ▸ hqd _)⟩
+  ⟩
+  have hspan : ∀ j : Fin (Fintype.card ι), (F[X] ∙ q (σ.symm j)) = (F[X] ∙ (t.2 j).1) := fun j =>
     Ideal.span_singleton_eq_span_singleton.2 (associated_monicAssoc (hq0 _))
   let e' : Module.AEval' (Matrix.toLin' (x : Matrix (Fin n) (Fin n) F)) ≃ₗ[F[X]] N t :=
     e.trans ((DirectSum.lequivCongrLeft F[X] σ).trans

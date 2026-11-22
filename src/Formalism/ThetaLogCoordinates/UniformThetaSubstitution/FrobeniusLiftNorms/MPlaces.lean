@@ -21,9 +21,11 @@ open Formalism.DworkPowerSeriesWeights (Integral mvExp jetPair mfact)
 open Formalism.FG.IntegralSubstitution (integral_mul integralSubstV)
 open TwoS
 
-theorem norm_unif_pow {K : Type} [NormedField K] {p : ℕ} (hp : p.Prime)
-    (hn : ‖(p : K)‖ = (p : ℝ)⁻¹) {ϖ : K} (hϖ : ϖ ^ (p ^ 2 - 1) = (p : K)) :
-    ‖ϖ ^ (p + 1)‖ = (p : ℝ) ^ (-(1 / ((p : ℝ) - 1))) := by
+theorem norm_unif_pow
+    {K : Type} [NormedField K]
+    {p : ℕ} (hp : p.Prime) (hn : ‖(p : K)‖ = (p : ℝ)⁻¹)
+    {ϖ : K} (hϖ : ϖ ^ (p ^ 2 - 1) = (p : K))
+    : ‖ϖ ^ (p + 1)‖ = (p : ℝ) ^ (-(1 / ((p : ℝ) - 1))) := by
   have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast hp.two_le
   have hp0 : (0 : ℝ) ≤ (p : ℝ) := by linarith
   have h1 : (p : ℝ) - 1 ≠ 0 := by intro h; linarith

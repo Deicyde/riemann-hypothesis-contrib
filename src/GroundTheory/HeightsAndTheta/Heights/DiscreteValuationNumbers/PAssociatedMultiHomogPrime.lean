@@ -13,11 +13,11 @@ open MvPolynomial
 
 universe u
 
-theorem AssociatedMultiHomogPrime.proof (h1 : MultiHomogPrimeCriterion.Statement.{u})
-    (h2 : ColonMultiHomog.Statement.{u}) : AssociatedMultiHomogPrime.Statement.{u} := by
+theorem AssociatedMultiHomogPrime.proof
+    (h1 : MultiHomogPrimeCriterion.Statement.{u}) (h2 : ColonMultiHomog.Statement.{u})
+    : AssociatedMultiHomogPrime.Statement.{u} := by
   intro F _ K _ _ ι _ J hJ hJtop
   classical
-
   let A : Set (Ideal (MRing ι F)) :=
     {Q | ∃ (f : MRing ι F) (s : K → ℕ), IsMultiHomog f s ∧ f ∉ J ∧ Q = J.colon {f}}
   have hne : A.Nonempty := by

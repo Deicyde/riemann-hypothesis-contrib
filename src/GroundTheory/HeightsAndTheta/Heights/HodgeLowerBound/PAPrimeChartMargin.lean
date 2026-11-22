@@ -15,22 +15,25 @@ namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
 open ReciprocityTheory.AnForm (levi)
 
-theorem levi_real_smul {κ : Type*} [Fintype κ] (φ : (κ → ℂ) → ℝ) (z w : κ → ℂ) (r : ℝ) :
-    levi φ z (r • w) = r ^ 2 * levi φ z w := by
+theorem levi_real_smul {κ : Type*} [Fintype κ] (φ : (κ → ℂ) → ℝ) (z w : κ → ℂ) (r : ℝ)
+    : levi φ z (r • w) = r ^ 2 * levi φ z w := by
   unfold levi
   have h : Complex.I • (r • w) = r • (Complex.I • w) := smul_comm _ _ _
   rw [h]
   simp only [map_smul, ContinuousLinearMap.smul_apply, smul_eq_mul]
   ring
 
-theorem IsChartVel.real_smul {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {P : Ideal (MRing ι)}
-    {d : ℕ} {M : CxModel P d} {e : OpenPartialHomeomorph M.Xc (Fin d → ℂ)} {z w : (Σ k, ι k) → ℂ}
-    {v : Fin d → ℂ} (h : IsChartVel M e z w v) (r : ℝ) : IsChartVel M e z (r • w) (r • v) := by
+theorem IsChartVel.real_smul
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {P : Ideal (MRing ι)} {d : ℕ} {M : CxModel P d} {e : OpenPartialHomeomorph M.Xc (Fin d → ℂ)}
+    {z w : (Σ k, ι k) → ℂ} {v : Fin d → ℂ} (h : IsChartVel M e z w v)
+    (r : ℝ)
+    : IsChartVel M e z (r • w) (r • v) := by
   obtain ⟨γ, h0, hd, hev, hv⟩ := h
   have hm : HasDerivAt (fun s : ℂ => (r : ℂ) * s) (r : ℂ) 0 := by
     simpa using (hasDerivAt_id (0 : ℂ)).const_mul (r : ℂ)
-  have ht : Tendsto (fun s : ℂ => (r : ℂ) * s) (𝓝 0) (𝓝 0) := by
-    simpa using hm.continuousAt.tendsto
+  have ht : Tendsto (fun s : ℂ => (r : ℂ) * s) (𝓝 0) (𝓝 0) := by simpa using hm.continuousAt.tendsto
   have hsw : ∀ {κ : Type} (u : κ → ℂ), (r : ℂ) • u = r • u := fun u => by
     funext p
     simp [Complex.real_smul]
@@ -46,12 +49,17 @@ theorem IsChartVel.real_smul {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fi
     rw [hsw] at h'
     exact h'
 
-theorem APrimeChartMargin.proof (hQ : APrimeChartLevi.Statement) (hL : ChartVelLift.Statement) :
-    APrimeChartMargin.Statement := by
+theorem APrimeChartMargin.proof (hQ : APrimeChartLevi.Statement) (hL : ChartVelLift.Statement)
+    : APrimeChartMargin.Statement := by
   intro II Ψ _ _ K _ ι _ Ω _ _ E _ _ D O Lt _ _ _ X
-  have hk : ∀ k : Fin X.S.R.N, ∃ c : ℝ, 0 < c ∧ ∀ z ∈ mcPts (mCoordIdeal D.y), ∀ w, X.M.proj z ∈ X.S.R.mid k →
-      ∀ v : Fin D.n → ℂ, IsChartVel X.M (X.S.R.chart k) z w v →
-        c * ‖v‖ ^ 2 ≤ levi (fun y => Real.log (D.A'.h y)) z w := by
+  have hk
+      : ∀ k : Fin X.S.R.N, ∃ c : ℝ,
+        0 < c
+          ∧ ∀ z ∈ mcPts (mCoordIdeal D.y), ∀ w,
+            X.M.proj z ∈ X.S.R.mid k
+              → ∀ v : Fin D.n → ℂ,
+                IsChartVel X.M (X.S.R.chart k) z w v
+                  → c * ‖v‖ ^ 2 ≤ levi (fun y => Real.log (D.A'.h y)) z w := by
     intro k
     obtain ⟨Q, hcont, hrep⟩ := hQ II Ψ K ι Ω E D O Lt X k
     set e := X.S.R.chart k with he
@@ -65,8 +73,8 @@ theorem APrimeChartMargin.proof (hQ : APrimeChartLevi.Statement) (hL : ChartVelL
       exact D.A'_pos.2 z hz w hcone hnt
     set S := (e '' closure (X.S.R.mid k)) ×ˢ Metric.sphere (0 : Fin D.n → ℂ) 1 with hS
     have hcpt : IsCompact S :=
-      (isClosed_closure.isCompact.image_of_continuousOn
-        (e.continuousOn.mono (X.S.R.closure_mid k))).prod (isCompact_sphere 0 1)
+      (isClosed_closure.isCompact.image_of_continuousOn (e.continuousOn.mono (X.S.R.closure_mid
+        k))).prod (isCompact_sphere 0 1)
     have hsub : S ⊆ e.target ×ˢ Set.univ := by
       rintro ⟨y, u⟩ ⟨⟨x, hx, rfl⟩, -⟩
       exact ⟨e.map_source (X.S.R.closure_mid k hx), Set.mem_univ _⟩
@@ -97,10 +105,10 @@ theorem APrimeChartMargin.proof (hQ : APrimeChartLevi.Statement) (hL : ChartVelL
           inv_mul_cancel₀ hn.ne']
       have h3 := hcle _ hu
       rw [← h2] at h3
-      calc c * ‖v‖ ^ 2 ≤ (‖v‖⁻¹ ^ 2 * levi (fun y => Real.log (D.A'.h y)) z w) * ‖v‖ ^ 2 :=
-            mul_le_mul_of_nonneg_right h3 (by positivity)
-        _ = levi (fun y => Real.log (D.A'.h y)) z w := by
-          field_simp
+      calc
+        c * ‖v‖ ^ 2 ≤ (‖v‖⁻¹ ^ 2 * levi (fun y => Real.log (D.A'.h y)) z w) * ‖v‖ ^ 2 :=
+          mul_le_mul_of_nonneg_right h3 (by positivity)
+        _ = levi (fun y => Real.log (D.A'.h y)) z w := by field_simp
   choose ck hck hmk using hk
   have hne : (insert 1 (Finset.univ.image ck)).Nonempty := Finset.insert_nonempty _ _
   refine ⟨(insert 1 (Finset.univ.image ck)).min' hne, ?_, ?_⟩
@@ -111,7 +119,11 @@ theorem APrimeChartMargin.proof (hQ : APrimeChartLevi.Statement) (hL : ChartVelL
       rw [← hk]
       exact hck k
   · intro z hz w k hm v hv
-    exact le_trans (mul_le_mul_of_nonneg_right (Finset.min'_le _ _ (Finset.mem_insert_of_mem
-      (Finset.mem_image_of_mem _ (Finset.mem_univ k)))) (by positivity)) (hmk k z hz w hm v hv)
+    exact le_trans
+      (mul_le_mul_of_nonneg_right
+        (Finset.min'_le _ _
+          (Finset.mem_insert_of_mem (Finset.mem_image_of_mem _ (Finset.mem_univ k))))
+        (by positivity))
+      (hmk k z hz w hm v hv)
 
 end GroundTheory.Heights₂.Heights.LowerBoundFree

@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet
+open NumberField MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU
+  GlobalTheory.SiegelSet
 open GlobalTheory.Doubling (absE)
 
 noncomputable section
@@ -35,11 +37,13 @@ section Transfer
 
 open Formalism.UG (cT bc UJ)
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} {n : ℕ}
-  {J : Matrix (Fin n) (Fin n) E} {ν : InfinitePlace F}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {ν : InfinitePlace F}
 
-theorem archMat_unitary (hcm : IsCMExt F E σ) (τ : EmbOver E ν) (g : HA ν.Completion σ J) :
-    (GlobalTheory.Orb.archMat σ J τ g)ᴴ * J.map τ.1 * GlobalTheory.Orb.archMat σ J τ g = J.map τ.1 :=
+theorem archMat_unitary (hcm : IsCMExt F E σ) (τ : EmbOver E ν) (g : HA ν.Completion σ J)
+    : (GlobalTheory.Orb.archMat σ J τ g)ᴴ * J.map τ.1 * GlobalTheory.Orb.archMat σ J τ g
+      = J.map τ.1 :=
   (archEquiv J hcm τ g).2
 
 end Transfer

@@ -13,25 +13,44 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 namespace PositivityTheory.SiegelWeilFormula.Avac
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 open GlobalTheory.Doubling (absE)
-theorem par_frame_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) (p : d.G) (h21 : (inFrame d.b p).toBlocks₂₁ = 0) :
-    ∃ (n0 m0 : d.G) (A D : GL (Fin d.n) (AE F E)),
-      inFrame d.b n0 = Matrix.fromBlocks 1 ((inFrame d.b p).toBlocks₁₂ * (inFrame d.b p).toBlocks₂₂⁻¹) 0 1 ∧
-      inFrame d.b m0 = Matrix.fromBlocks A.1 0 0 D.1 ∧ A.1 = (inFrame d.b p).toBlocks₁₁ ∧
-      D.1 = (inFrame d.b p).toBlocks₂₂ ∧ p = n0 * m0 := by
+theorem par_frame_k
+    (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) (p : d.G)
+    (h21 : (inFrame d.b p).toBlocks₂₁ = 0)
+    : ∃ (n0 m0 : d.G) (A D : GL (Fin d.n) (AE F E)),
+      inFrame d.b n0
+          = Matrix.fromBlocks 1 ((inFrame d.b p).toBlocks₁₂ * (inFrame d.b p).toBlocks₂₂⁻¹) 0 1
+        ∧ inFrame d.b m0 = Matrix.fromBlocks A.1 0 0 D.1 ∧ A.1 = (inFrame d.b p).toBlocks₁₁
+        ∧ D.1 = (inFrame d.b p).toBlocks₂₂ ∧ p = n0 * m0 := by
   set g := inFrame d.b p with hg
   set A := g.toBlocks₁₁
   set B := g.toBlocks₁₂
   set D := g.toBlocks₂₂
   have hgb : g = Matrix.fromBlocks A B 0 D := by rw [← h21, Matrix.fromBlocks_toBlocks]
-  have hBm : IsUnit (incM F d.b.1) := (Matrix.isUnit_iff_isUnit_det _).2
-    (isUnit_iff_exists_inv.2 ⟨_, by rw [← Matrix.det_mul, _root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_mul_inv_k d, Matrix.det_one]⟩)
-  have hBi : IsUnit (incM F (d.b⁻¹).1) := (Matrix.isUnit_iff_isUnit_det _).2
-    (isUnit_iff_exists_inv.2 ⟨_, by rw [← Matrix.det_mul, _root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_inv_mul_k d, Matrix.det_one]⟩)
+  have hBm : IsUnit (incM F d.b.1) :=
+    (Matrix.isUnit_iff_isUnit_det _).2
+      (isUnit_iff_exists_inv.2 ⟨
+        _,
+        by
+          rw [← Matrix.det_mul, _root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_mul_inv_k d,
+            Matrix.det_one]
+      ⟩)
+  have hBi : IsUnit (incM F (d.b⁻¹).1) :=
+    (Matrix.isUnit_iff_isUnit_det _).2
+      (isUnit_iff_exists_inv.2 ⟨
+        _,
+        by
+          rw [← Matrix.det_mul, _root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_inv_mul_k d,
+            Matrix.det_one]
+      ⟩)
   have hug : IsUnit g := (hBi.mul (Units.isUnit p.1)).mul hBm
   have hdet : IsUnit (A.det * D.det) := by
     rw [← Matrix.det_fromBlocks_zero₂₁ A B D, ← hgb]
@@ -39,22 +58,35 @@ theorem par_frame_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) (p :
   have hA : IsUnit A.det := isUnit_of_mul_isUnit_left hdet
   have hD : IsUnit D.det := isUnit_of_mul_isUnit_right hdet
   set Md : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E) := Matrix.fromBlocks A 0 0 D with hMd_def
-  have hMd : IsUnit Md := (Matrix.isUnit_iff_isUnit_det _).2 (by rw [hMd_def, Matrix.det_fromBlocks_zero₂₁]; exact hA.mul hD)
+  have hMd : IsUnit Md :=
+    (Matrix.isUnit_iff_isUnit_det _).2
+      (by rw [hMd_def, Matrix.det_fromBlocks_zero₂₁]; exact hA.mul hD)
   obtain ⟨C', hC'⟩ := _root_.PositivityTheory.SiegelWeilFormula.KWhit.frame_form_k d
-  have hP : (mat2 p)ᵀ * dbl (incM F d.Y.J) * (mat2 p).map (cA σ).toRingHom = dbl (incM F d.Y.J) := p.2
-  have hgf := KWhit.form_conj_in (cA σ).toRingHom (_root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_mul_inv_k d) hP
-  have hC'' : (incM F d.b.1)ᵀ * dbl (incM F d.Y.J) * (incM F d.b.1).map (cA σ).toRingHom =
-      Matrix.fromBlocks 0 1 C' 0 := hC'
+  have hP : (mat2 p)ᵀ * dbl (incM F d.Y.J) * (mat2 p).map (cA σ).toRingHom = dbl (incM F d.Y.J) :=
+    p.2
+  have hgf :=
+    KWhit.form_conj_in (cA σ).toRingHom
+      (_root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_mul_inv_k d) hP
+  have hC''
+      : (incM F d.b.1)ᵀ * dbl (incM F d.Y.J) * (incM F d.b.1).map (cA σ).toRingHom
+        = Matrix.fromBlocks 0 1 C' 0 :=
+    hC'
   rw [hC''] at hgf
-  have hgf' : gᵀ * Matrix.fromBlocks 0 1 C' 0 * g.map (cA σ).toRingHom = Matrix.fromBlocks 0 1 C' 0 := hgf
+  have hgf'
+      : gᵀ * Matrix.fromBlocks 0 1 C' 0 * g.map (cA σ).toRingHom = Matrix.fromBlocks 0 1 C' 0 :=
+    hgf
   rw [hgb] at hgf'
   have hMdf := KWhit.block_diag_form (cA σ).toRingHom A B D C' hgf'
   rw [← hC''] at hMdf
-  have hM0mem := KWhit.form_conj_out (cA σ).toRingHom (_root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_mul_inv_k d) hMdf
+  have hM0mem :=
+    KWhit.form_conj_out (cA σ).toRingHom
+      (_root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_mul_inv_k d) hMdf
   have hM0u : IsUnit (incM F d.b.1 * Md * incM F (d.b⁻¹).1) := (hBm.mul hMd).mul hBi
   let u : GL (Fin d.n ⊕ Fin d.n) (AE F E) := hM0u.unit
-  have hu : (u : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E)) =
-      incM F d.b.1 * Md * incM F (d.b⁻¹).1 := IsUnit.unit_spec hM0u
+  have hu
+      : (u : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E))
+        = incM F d.b.1 * Md * incM F (d.b⁻¹).1 :=
+    IsUnit.unit_spec hM0u
   have hmem : u ∈ UG (cA σ) (dbl (incM F d.Y.J)) := by
     show (u : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E))ᵀ * dbl (incM F d.Y.J) *
       (u : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E)).map (cA σ) = dbl (incM F d.Y.J)
@@ -64,24 +96,43 @@ theorem par_frame_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) (p :
   have hm0 : inFrame d.b m0 = Md := by
     show incM F (d.b⁻¹).1 * (u : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E)) * incM F d.b.1 = Md
     rw [hu]
-    simp only [← Matrix.mul_assoc, _root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_inv_mul_k d, Matrix.one_mul]
-    rw [Matrix.mul_assoc, _root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_inv_mul_k d, Matrix.mul_one]
+    simp only [← Matrix.mul_assoc, _root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_inv_mul_k d,
+      Matrix.one_mul]
+    rw [Matrix.mul_assoc, _root_.PositivityTheory.SiegelWeilFormula.KWhit.incM_inv_mul_k d,
+      Matrix.mul_one]
   have hAu := (Matrix.isUnit_iff_isUnit_det A).2 hA
   have hDu := (Matrix.isUnit_iff_isUnit_det D).2 hD
-  refine ⟨p * m0⁻¹, m0, hAu.unit, hDu.unit, ?_, ?_, IsUnit.unit_spec hAu, IsUnit.unit_spec hDu,
-    (inv_mul_cancel_right p m0).symm⟩
+  refine ⟨
+    p * m0⁻¹,
+    m0,
+    hAu.unit,
+    hDu.unit,
+    ?_,
+    ?_,
+    IsUnit.unit_spec hAu,
+    IsUnit.unit_spec hDu,
+    (inv_mul_cancel_right p m0).symm
+  ⟩
   · have e := _root_.PositivityTheory.SiegelWeilFormula.KWhit.inFrame_mul_k d (p * m0⁻¹) m0
     rw [inv_mul_cancel_right, hm0] at e
     apply (hMd.mul_left_inj).1
     rw [← e, ← hg, hgb, hMd_def, Matrix.fromBlocks_multiply]
     simp [Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hD]
   · rw [hm0, IsUnit.unit_spec, IsUnit.unit_spec]
-theorem q_T'_k (hT : _root_.PositivityTheory.SiegelWeilFormula.TAll_k) {d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ} (i₀ : Fin d.n) {q : d.G} {lam : (AE F E)ˣ} (hq : IsQ F E i₀ (inFrame d.b q) lam) :
-    ∃ c : ℂ, ∀ Φ ∈ d.sch, ∀ X : Mx F E d.m d.n, (∀ a, X a i₀ = 0) → d.T (d.om q Φ) X = c * d.T Φ X := by
+theorem q_T'_k
+    (hT : _root_.PositivityTheory.SiegelWeilFormula.TAll_k)
+    {d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ} (i₀ : Fin d.n)
+    {q : d.G} {lam : (AE F E)ˣ} (hq : IsQ F E i₀ (inFrame d.b q) lam)
+    : ∃ c : ℂ, ∀ Φ ∈ d.sch, ∀ X : Mx F E d.m d.n,
+      (∀ a, X a i₀ = 0) → d.T (d.om q Φ) X = c * d.T Φ X := by
   set M := inFrame d.b q with hM
-  obtain ⟨n0, m0, A, D, hn, hm, hA, hD, hp⟩ := _root_.PositivityTheory.SiegelWeilFormula.Avac.par_frame_k d q (isQ_21 hq)
-  refine ⟨(d.χ (Matrix.GeneralLinearGroup.det A) : ℂ) *
-    (((absE F E (Matrix.GeneralLinearGroup.det A) : ℝ) ^ ((d.m : ℝ) / 2) : ℝ) : ℂ), fun Φ hΦ X hX => ?_⟩
+  obtain ⟨n0, m0, A, D, hn, hm, hA, hD, hp⟩ :=
+    _root_.PositivityTheory.SiegelWeilFormula.Avac.par_frame_k d q (isQ_21 hq)
+  refine ⟨
+    (d.χ (Matrix.GeneralLinearGroup.det A) : ℂ)
+      * (((absE F E (Matrix.GeneralLinearGroup.det A) : ℝ) ^ ((d.m : ℝ) / 2) : ℝ) : ℂ),
+    fun Φ hΦ X hX => ?_
+  ⟩
   have hD1 : ∀ j k, k ≠ i₀ → D.1 j k = (1 : Matrix (Fin d.n) (Fin d.n) (AE F E)) j k := by
     rw [hD]; exact isQ_22 hq
   have hDu : IsUnit M.toBlocks₂₂.det := by
@@ -97,7 +148,8 @@ theorem q_T'_k (hT : _root_.PositivityTheory.SiegelWeilFormula.TAll_k) {d : _roo
     · rw [isQ_12 hq i k hi hk, zero_mul]
   have hG : ∀ i j, (i = i₀ ∨ j = i₀) → d.gram X X i j = 0 := by
     intro i j hij
-    simp only [_root_.PositivityTheory.SiegelWeilFormula.SD_k.gram, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply]
+    simp only [_root_.PositivityTheory.SiegelWeilFormula.SD_k.gram, Matrix.mul_apply,
+      Matrix.transpose_apply, Matrix.map_apply]
     refine Finset.sum_eq_zero fun b _ => ?_
     rcases hij with rfl | rfl
     · rw [Finset.sum_mul]
@@ -130,12 +182,16 @@ theorem q_T'_k (hT : _root_.PositivityTheory.SiegelWeilFormula.TAll_k) {d : _roo
         · subst hk0; rw [hX a, zero_mul]
         · rw [hD1 j k hk0, Matrix.one_apply_ne (Ne.symm hk), mul_zero]
       · simp
-    calc X * (D⁻¹).1ᵀ = X * D.1ᵀ * (D⁻¹).1ᵀ := by rw [h1]
+    calc
+      X * (D⁻¹).1ᵀ
+        = X * D.1ᵀ * (D⁻¹).1ᵀ := by rw [h1]
       _ = X * ((D⁻¹).1 * D.1)ᵀ := by rw [Matrix.transpose_mul, Matrix.mul_assoc]
-      _ = X := by rw [← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.transpose_one, Matrix.mul_one]
-  have hm0s : d.om m0 Φ ∈ d.sch := _root_.PositivityTheory.SiegelWeilFormula.KWhit.om_mem_sch_k d m0 hΦ
-  rw [hp, map_mul, Module.End.mul_apply, (hT.2.1 F E σ d _ hm0s).1 n0 _ hn X, htt, mul_zero, neg_zero,
-    AddChar.map_zero_eq_one, one_mul, (hT.2.1 F E σ d Φ hΦ).2.1 m0 A D hm X, hXD]
+      _ = X := by
+        rw [← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.transpose_one, Matrix.mul_one]
+  have hm0s : d.om m0 Φ ∈ d.sch :=
+    _root_.PositivityTheory.SiegelWeilFormula.KWhit.om_mem_sch_k d m0 hΦ
+  rw [hp, map_mul, Module.End.mul_apply, (hT.2.1 F E σ d _ hm0s).1 n0 _ hn X, htt, mul_zero,
+    neg_zero, AddChar.map_zero_eq_one, one_mul, (hT.2.1 F E σ d Φ hΦ).2.1 m0 A D hm X, hXD]
 end PositivityTheory.SiegelWeilFormula.Avac
 end
 end

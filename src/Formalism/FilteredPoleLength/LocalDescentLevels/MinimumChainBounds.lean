@@ -8,8 +8,9 @@ namespace Formalism.LatticeBaseChangeAlt
 
 open Real
 
-private theorem pow_sub_pow_le_mul_sub_mul_pow {x y M : ℝ} (hy : 0 ≤ y) (hyx : y ≤ x) (hxM : x ≤ M) (hM : 1 ≤ M) :
-    ∀ n : ℕ, x ^ n - y ^ n ≤ n * (x - y) * M ^ n := by
+private theorem pow_sub_pow_le_mul_sub_mul_pow
+    {x y M : ℝ} (hy : 0 ≤ y) (hyx : y ≤ x) (hxM : x ≤ M) (hM : 1 ≤ M)
+    : ∀ n : ℕ, x ^ n - y ^ n ≤ n * (x - y) * M ^ n := by
   intro n
   induction n with
   | zero => simp
@@ -39,8 +40,9 @@ theorem detProductRest : DetProductRest := by
   intro i c ε hε hε1
   have h2 : (0 : ℝ) ≤ 2 ^ c := by positivity
   have hM : (1 : ℝ) ≤ 2 ^ c + 1 := by linarith
-  have key := pow_sub_pow_le_mul_sub_mul_pow h2 (by linarith : (2 : ℝ) ^ c ≤ 2 ^ c + ε)
-    (by linarith : (2 : ℝ) ^ c + ε ≤ 2 ^ c + 1) hM i
+  have key :=
+    pow_sub_pow_le_mul_sub_mul_pow h2 (by linarith : (2 : ℝ) ^ c ≤ 2 ^ c + ε)
+      (by linarith : (2 : ℝ) ^ c + ε ≤ 2 ^ c + 1) hM i
   have e : (2 : ℝ) ^ c + ε - 2 ^ c = ε := by ring
   rw [e] at key
   rw [pow_mul]

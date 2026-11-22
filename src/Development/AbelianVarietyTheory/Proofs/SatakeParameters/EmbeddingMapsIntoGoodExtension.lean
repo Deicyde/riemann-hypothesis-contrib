@@ -7,13 +7,15 @@ public import Formalism.FrobeniusOrbits.HostCorollaries
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits
+  Formalism.MainNotions.N
 open scoped Pointwise
 
 namespace GlobalTheory
 
-theorem good_conjugates_mem : ∀ (l : ℕ) [Fact l.Prime] (K LL : Loc.FinExt l) (s : ℕ),
-    Loc.Good K s LL → ∀ (τ : ↥K.1 →ₐ[ℚ_[l]] Loc.Om l) (x : ↥K.1), τ x ∈ LL.1 := by
+theorem good_conjugates_mem
+    : ∀ (l : ℕ) [Fact l.Prime] (K LL : Loc.FinExt l) (s : ℕ),
+      Loc.Good K s LL → ∀ (τ : ↥K.1 →ₐ[ℚ_[l]] Loc.Om l) (x : ↥K.1), τ x ∈ LL.1 := by
   intro l _ K LL s h τ x
   unfold Loc.Good at h
   obtain ⟨-, -, hle, hall⟩ := h

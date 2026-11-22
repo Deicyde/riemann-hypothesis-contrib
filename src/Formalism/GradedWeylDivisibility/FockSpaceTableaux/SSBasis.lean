@@ -13,9 +13,10 @@ open scoped MonomialOrder
 
 theorem semistandard_basis : SSBasis := by
   intro R _ _ k n ν
-  have hex : ∀ m : ssIdx k n ν, ∃ (K : ℕ) (sz : Fin K → ℕ) (hsz : ∀ i, sz i ≤ n)
-      (I : ∀ i, Fin (sz i) → Fin k),
-      shapeDeg sz = ν ∧ (∀ i, StrictMono (I i)) ∧ bidetExp sz hsz I = m.1 := fun m =>
+  have hex
+      : ∀ m : ssIdx k n ν,
+        ∃ (K : ℕ) (sz : Fin K → ℕ) (hsz : ∀ i, sz i ≤ n) (I : ∀ i, Fin (sz i) → Fin k),
+          shapeDeg sz = ν ∧ (∀ i, StrictMono (I i)) ∧ bidetExp sz hsz I = m.1 := fun m =>
     sSYTExists k n ν m.1 m.2.2 m.2.1
   choose K sz hsz I hshape hmono hexp using hex
   set b : ssIdx k n ν → MvPolynomial (Fin k × Fin n) R := fun m => bideterminant R (sz m) (hsz m) (I m) with hb
@@ -28,17 +29,16 @@ theorem semistandard_basis : SSBasis := by
     rw [hshape m] at this
     exact this
   refine ⟨b, ⟨?_, ?_, ?_⟩, fun m => ⟨hdeg m, hlc m, K m, sz m, hsz m, I m, hshape m, hmono m, rfl⟩⟩
-  ·
-    refine ldbasis_linearIndependent (colLex k n) b ?_ hlc
+  · refine ldbasis_linearIndependent (colLex k n) b ?_ hlc
     intro m m' h
     exact Subtype.ext ((hdeg m).symm.trans (h.trans (hdeg m')))
-  ·
-    apply le_antisymm
+  · apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨m, rfl⟩
       exact hmem m
-    · suffices key : ∀ d : (colLex k n).syn, ∀ f ∈ dualWeyl R k n ν,
-          (colLex k n).toSyn ((colLex k n).degree f) = d → f ∈ Submodule.span R (Set.range b) by
+    · suffices key
+          : ∀ d : (colLex k n).syn, ∀ f ∈ dualWeyl R k n ν,
+            (colLex k n).toSyn ((colLex k n).degree f) = d → f ∈ Submodule.span R (Set.range b) by
         intro f hf
         exact key _ f hf rfl
       intro d
@@ -56,16 +56,14 @@ theorem semistandard_basis : SSBasis := by
         set f' := f - (colLex k n).leadingCoeff f • b mi with hf'
         have hf'mem : f' ∈ dualWeyl R k n ν :=
           Submodule.sub_mem _ hf (Submodule.smul_mem _ _ (hmem mi))
-        have hdecomp : f = f' + (colLex k n).leadingCoeff f • b mi := by
-          rw [hf']; abel
+        have hdecomp : f = f' + (colLex k n).leadingCoeff f • b mi := by rw [hf']; abel
         rw [hdecomp]
         refine Submodule.add_mem _ ?_ (Submodule.smul_mem _ _ hbS)
         by_cases h0 : f' = 0
         · rw [h0]; exact Submodule.zero_mem _
         have hlt := lcassem_sub_lt (colLex k n) (f := f) (g := b mi) (hdeg mi) (hlc mi) h0
         exact ih _ (hd ▸ hlt) f' hf'mem rfl
-  ·
-    intro m
+  · intro m
     show IsWeightedHomogeneous (rowW k n) (bideterminant R (sz m) (hsz m) (I m)) (rowWt m.1)
     rw [← hexp m, ldbasis_rowWt_bidetExp]
     exact ldbasis_bidet_rowHom R (sz m) (hsz m) (I m)

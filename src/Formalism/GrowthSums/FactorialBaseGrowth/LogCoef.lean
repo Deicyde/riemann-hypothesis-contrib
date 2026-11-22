@@ -20,11 +20,13 @@ theorem four_mul_add_two_le_three_mul_five_pow (v : ℕ) : 4 * v + 2 ≤ 3 * 5 ^
     rw [pow_succ]
     omega
 
-theorem four_padicValNat_le (p s : ℕ) (hp : p.Prime) (hp5 : 5 ≤ p) (hs : 1 ≤ s) :
-    4 * padicValNat p s + 2 ≤ 3 * s := by
+theorem four_padicValNat_le (p s : ℕ) (hp : p.Prime) (hp5 : 5 ≤ p) (hs : 1 ≤ s)
+    : 4 * padicValNat p s + 2 ≤ 3 * s := by
   have hv := four_mul_add_two_le_three_mul_five_pow (padicValNat p s)
   have h1 : 5 ^ padicValNat p s ≤ p ^ padicValNat p s := Nat.pow_le_pow_left hp5 _
-  have h2 : p ^ padicValNat p s ≤ s := Nat.le_of_dvd (by omega) (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
+  have h2 : p ^ padicValNat p s ≤ s :=
+    Nat.le_of_dvd (by omega)
+      (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
   omega
 
 theorem padicValHarmonicPowerSumDivLowerBound : LogCoefVal := by

@@ -18,9 +18,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsKHwMa
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift
@@ -30,7 +33,8 @@ noncomputable section
 namespace GlobalTheory.NHwExist
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.LowestKType GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators MvPolynomial
+open GlobalTheory.LowestKType GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators
+  MvPolynomial
 
 variable {D : D7} {n m : ℕ}
 
@@ -75,7 +79,9 @@ lemma mono2 (u v : FVar D m n) (α : FVar D m n →₀ ℕ) (c : ℂ) :
   classical
   rw [X, monomial_mul, one_mul, pderiv_monomial]
 
-def lamM (w : GlobalTheory.ExportSeries.Weight D n) (τ : D.what₂.Tau) (a : Fin n) (α : FVar D m n →₀ ℕ) : ℂ :=
+def lamM
+    (w : GlobalTheory.ExportSeries.Weight D n) (τ : D.what₂.Tau) (a : Fin n) (α : FVar D m n →₀ ℕ)
+    : ℂ :=
   ∑ i : Fin m, ((if (i : ℕ) < w.p τ then (α (τ, i, a) : ℂ) else -((α (τ, i, a) : ℂ) + 1)) + 1 / 2)
 
 lemma diag_X (v : FVar D m n) (α : FVar D m n →₀ ℕ) (c : ℂ) :
@@ -123,7 +129,8 @@ lemma coeff_sop_diag (w : GlobalTheory.ExportSeries.Weight D n) (τ : D.what₂.
 def gV (w : GlobalTheory.ExportSeries.Weight D n) (v : FVar D m n) : ℤ :=
   (if (v.2.1 : ℕ) < w.p v.1 then 1 else -1) * ((n : ℤ) - (v.2.2 : ℕ))
 
-def ht (w : GlobalTheory.ExportSeries.Weight D n) (α : FVar D m n →₀ ℕ) : ℤ := ∑ v, gV w v * (α v : ℤ)
+def ht (w : GlobalTheory.ExportSeries.Weight D n) (α : FVar D m n →₀ ℕ) : ℤ :=
+  ∑ v, gV w v * (α v : ℤ)
 
 lemma ht_add (w : GlobalTheory.ExportSeries.Weight D n) (α β : FVar D m n →₀ ℕ) : ht w (α + β) = ht w α + ht w β := by
   unfold ht; simp [mul_add, Finset.sum_add_distrib]
@@ -192,7 +199,9 @@ lemma sop_off (w : GlobalTheory.ExportSeries.Weight D n) (τ : D.what₂.Tau) (a
 def Pure (w : GlobalTheory.ExportSeries.Weight D n) (Q : PolF D m n) : Prop :=
   ∀ (τ : D.what₂.Tau) (a : Fin n), ∀ α ∈ Q.support, ∀ β ∈ Q.support, lamM w τ a α = lamM w τ a β
 
-def wtZ (w : GlobalTheory.ExportSeries.Weight D n) (τ : D.what₂.Tau) (a : Fin n) (α : FVar D m n →₀ ℕ) : ℤ :=
+def wtZ
+    (w : GlobalTheory.ExportSeries.Weight D n) (τ : D.what₂.Tau) (a : Fin n) (α : FVar D m n →₀ ℕ)
+    : ℤ :=
   ∑ i : Fin m, (if (i : ℕ) < w.p τ then (1 : ℤ) else -1) * (α (τ, i, a) : ℤ)
 
 lemma ht_eq (w : GlobalTheory.ExportSeries.Weight D n) (α : FVar D m n →₀ ℕ) :
@@ -285,22 +294,35 @@ lemma pure_eigen (w : GlobalTheory.ExportSeries.Weight D n) (Q : PolF D m n) (hQ
 
 end GlobalTheory.NHwExist
 
-
 open GlobalTheory.NHwExist in
-theorem GlobalTheory.exists_nHw_of_fockS_stable : ∀ (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.Weight D n) (V : Submodule ℂ (PolF D m n)), FiniteDimensional ℂ V → V ≠ ⊥ → (∀ P ∈ V, ∀ (τ : D.what₂.Tau) (a b : Fin n), GlobalTheory.LowestKType.sop w τ a b P ∈ V) → ∃ P ∈ V, P ≠ 0 ∧ ∃ lam : D.what₂.Tau → Fin n → ℂ, GlobalTheory.LowestKType.IsNHw w lam P := by
+theorem GlobalTheory.exists_nHw_of_fockS_stable
+    : ∀ (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.Weight D n)
+        (V : Submodule ℂ (PolF D m n)),
+      FiniteDimensional ℂ V → V ≠ ⊥
+        → (∀ P ∈ V, ∀ (τ : D.what₂.Tau) (a b : Fin n), GlobalTheory.LowestKType.sop w τ a b P ∈ V)
+        → ∃ P ∈ V,
+          P ≠ 0 ∧ ∃ lam : D.what₂.Tau → Fin n → ℂ, GlobalTheory.LowestKType.IsNHw w lam P := by
   classical
   intro D n m w V hfin hne hst
   obtain ⟨F, hF⟩ := exists_F V
-  obtain ⟨B, hB⟩ : ∃ B : ℤ, ∀ α ∈ F, ht w α ≤ B :=
-    ⟨∑ α ∈ F, |ht w α|, fun α hα =>
-      (le_abs_self _).trans (Finset.single_le_sum (fun x _ => abs_nonneg (ht w x)) hα)⟩
-  have key : ∀ k : ℕ, ∀ Q ∈ V, Pure w Q → ∀ α ∈ Q.support, B - ht w α ≤ k →
-      ∃ P ∈ V, P ≠ 0 ∧ ∃ lam : D.what₂.Tau → Fin n → ℂ, GlobalTheory.LowestKType.IsNHw w lam P := by
+  obtain ⟨B, hB⟩ : ∃ B : ℤ, ∀ α ∈ F, ht w α ≤ B := ⟨
+    ∑ α ∈ F, |ht w α|,
+    fun α hα => (le_abs_self _).trans (Finset.single_le_sum (fun x _ => abs_nonneg (ht w x)) hα)
+  ⟩
+  have key
+      : ∀ k : ℕ, ∀ Q ∈ V,
+        Pure w Q
+          → ∀ α ∈ Q.support,
+            B - ht w α ≤ k
+              → ∃ P ∈ V,
+                P ≠ 0
+                  ∧ ∃ lam : D.what₂.Tau → Fin n → ℂ, GlobalTheory.LowestKType.IsNHw w lam P := by
     intro k
     induction k using Nat.strong_induction_on with
     | _ k ih =>
       intro Q hQ hpure α hα hk
-      by_cases hr : ∀ (τ : D.what₂.Tau) (a b : Fin n), a < b → GlobalTheory.LowestKType.sop w τ a b Q = 0
+      by_cases hr
+        : ∀ (τ : D.what₂.Tau) (a b : Fin n), a < b → GlobalTheory.LowestKType.sop w τ a b Q = 0
       · refine ⟨Q, hQ, fun h => by simp [h] at hα, fun τ a => lamM w τ a α, hr, fun τ a => ?_⟩
         exact pure_eigen w Q hpure α hα τ a
       · simp only [not_forall] at hr
@@ -309,8 +331,7 @@ theorem GlobalTheory.exists_nHw_of_fockS_stable : ∀ (D : D7) (n m : ℕ) (w : 
           rw [Finset.nonempty_iff_ne_empty, Ne, MvPolynomial.support_eq_empty]; exact hne
         obtain ⟨α', hα', hht⟩ := sop_off w τ a b (ne_of_lt hab) Q β hβ
         have heq : ht w α' = ht w α := ht_of_lam w α' α (fun τ a => hpure τ a α' hα' α hα)
-        obtain ⟨Q', hQ'V, hβQ', hpure'⟩ :=
-          purify w V hst _ _ le_rfl (hst Q hQ τ a b) β hβ
+        obtain ⟨Q', hQ'V, hβQ', hpure'⟩ := purify w V hst _ _ le_rfl (hst Q hQ τ a b) β hβ
         have hβB : ht w β ≤ B := hB β (hF Q' hQ'V hβQ')
         have hab' : (a : ℕ) < (b : ℕ) := hab
         exact ih (B - ht w β).toNat (by omega) Q' hQ'V hpure' β hβQ' (Int.self_le_toNat _)

@@ -20,16 +20,16 @@ namespace ReciprocityTheory.ChartRestriction.L1
 theorem zetaRoot_mem_cyclotomicSubring_self (m : ℕ) : zetaC m ∈ Rm m := by
   exact Subring.subset_closure (Set.mem_singleton _)
 
-theorem zetaRoot_ne_zero (e : ℕ) : zetaC e ≠ 0 := by
-  exact Complex.exp_ne_zero _
+theorem zetaRoot_ne_zero (e : ℕ) : zetaC e ≠ 0 := by exact Complex.exp_ne_zero _
 
-private theorem dvd_and_eq_div_of_mem_Tm {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) :
-    t.1 ∣ m ∧ 0 < t.1 ∧ t.2.2 = m / t.1 ∧ t.1 * t.2.2 = m := by
+private theorem dvd_and_eq_div_of_mem_Tm {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m)
+    : t.1 ∣ m ∧ 0 < t.1 ∧ t.2.2 = m / t.1 ∧ t.1 * t.2.2 = m := by
   simp only [Tm, Finset.mem_image, Finset.mem_sigma, Nat.mem_divisors, Finset.mem_range] at ht
   obtain ⟨⟨a, b⟩, ⟨⟨hdvd, _⟩, _⟩, rfl⟩ := ht
   exact ⟨hdvd, Nat.pos_of_dvd_of_pos hdvd hm, rfl, Nat.mul_div_cancel' hdvd⟩
 
-private theorem zetaC_div_eq_pow_of_dvd {m a : ℕ} (hm : 0 < m) (ha : a ∣ m) : zetaC (m / a) = zetaC m ^ a := by
+private theorem zetaC_div_eq_pow_of_dvd {m a : ℕ} (hm : 0 < m) (ha : a ∣ m)
+    : zetaC (m / a) = zetaC m ^ a := by
   have ha0 : a ≠ 0 := by
     rintro rfl
     rw [zero_dvd_iff] at ha
@@ -41,8 +41,8 @@ private theorem zetaC_div_eq_pow_of_dvd {m a : ℕ} (hm : 0 < m) (ha : a ∣ m) 
   congr 1
   field_simp
 
-theorem zetaRoot_pow_mem_of_mem_hermiteTriples {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) :
-    zetaC t.2.2 ^ t.2.1 ∈ Rm m ∧ (zetaC t.2.2 ^ t.2.1)⁻¹ ∈ Rm m := by
+theorem zetaRoot_pow_mem_of_mem_hermiteTriples {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m)
+    : zetaC t.2.2 ^ t.2.1 ∈ Rm m ∧ (zetaC t.2.2 ^ t.2.1)⁻¹ ∈ Rm m := by
   obtain ⟨hdvd, _, he, _⟩ := dvd_and_eq_div_of_mem_Tm hm ht
   have hz : zetaC t.2.2 ^ t.2.1 = zetaC m ^ (t.1 * t.2.1) := by
     rw [he, zetaC_div_eq_pow_of_dvd hm hdvd, pow_mul]
@@ -61,8 +61,8 @@ theorem zetaRoot_pow_mem_of_mem_hermiteTriples {m : ℕ} (hm : 0 < m) {t : ℕ �
   · rw [← inv_pow, hinv, ← pow_mul]
     exact pow_mem (zetaRoot_mem_cyclotomicSubring_self m) _
 
-theorem norm_zetaRoot_pow_of_mem_hermiteTriples {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) :
-    ‖zetaC t.2.2 ^ t.2.1‖ = 1 := by
+theorem norm_zetaRoot_pow_of_mem_hermiteTriples {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m)
+    : ‖zetaC t.2.2 ^ t.2.1‖ = 1 := by
   rw [norm_pow, zetaC, Complex.norm_exp]
   simp
 
@@ -94,8 +94,8 @@ theorem discriminantSeries_coeff_one : PowerSeries.coeff 1 dC = 1 := by
   rw [dC, PowerSeries.coeff_map, dZ_coeff_one]
   simp
 
-theorem facSer_coeffIn {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) :
-    CoeffIn (Rm m) (facSer m t) := by
+theorem facSer_coeffIn {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m)
+    : CoeffIn (Rm m) (facSer m t) := by
   obtain ⟨hc, _⟩ := zetaRoot_pow_mem_of_mem_hermiteTriples hm ht
   have hA : CoeffIn (Rm m) aC := CoeffIn.map_int _ _
   have hD : CoeffIn (Rm m) dC := CoeffIn.map_int _ _
@@ -106,11 +106,13 @@ theorem facSer_conv {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ T
   have hc : ‖zetaC t.2.2 ^ t.2.1‖ ≤ 1 := (norm_zetaRoot_pow_of_mem_hermiteTriples hm ht).le
   have hk : t.1 ^ 2 ≠ 0 := pow_ne_zero _ (dvd_and_eq_div_of_mem_Tm hm ht).2.1.ne'
   unfold facSer
-  exact ((convergesOnDisk_eisensteinFourCubeSeries.xp hm.ne').mul (convergesOnDisk_discriminantSeries.sub1 hc hk)).sub
-    ((convergesOnDisk_eisensteinFourCubeSeries.sub1 hc hk).mul (convergesOnDisk_discriminantSeries.xp hm.ne'))
+  exact ((convergesOnDisk_eisensteinFourCubeSeries.xp hm.ne').mul
+      (convergesOnDisk_discriminantSeries.sub1 hc hk)).sub
+    ((convergesOnDisk_eisensteinFourCubeSeries.sub1 hc hk).mul
+      (convergesOnDisk_discriminantSeries.xp hm.ne'))
 
-theorem facSer_ev {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) (τ : ℍ) :
-    ev (facSer m t) (qm m τ) = fac t τ := by
+theorem facSer_ev {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) (τ : ℍ)
+    : ev (facSer m t) (qm m τ) = fac t τ := by
   obtain ⟨hdvd, ha0, he, hae⟩ := dvd_and_eq_div_of_mem_Tm hm ht
   have he0 : 0 < t.2.2 := by
     rw [he]
@@ -125,34 +127,46 @@ theorem facSer_ev {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm 
   unfold facSer fac
   rw [ev_sub ((hA.xp hm.ne').mul (hD.sub1 hc hk)) ((hA.sub1 hc hk).mul (hD.xp hm.ne')) hq,
     ev_mul (hA.xp hm.ne') (hD.sub1 hc hk) hq, ev_mul (hA.sub1 hc hk) (hD.xp hm.ne') hq,
-    ev_xp _ hm.ne', ev_xp _ hm.ne', evalSeries_rescaleExpand _ _ hk, evalSeries_rescaleExpand _ _ hk, qm_pow hm, hpt]
+    ev_xp _ hm.ne', ev_xp _ hm.ne', evalSeries_rescaleExpand _ _ hk,
+    evalSeries_rescaleExpand _ _ hk, qm_pow hm, hpt]
   simp only [evalSeries_eisensteinFourCubeSeries, evalSeries_discriminantSeries]
 
-theorem LowUnit.facSub_left {R : Subring ℂ} {f g : PowerSeries ℂ} {n n' : ℕ} {u u' : ℂ}
-    (hf : LowUnit R f n u) (hg : LowUnit R g n' u') (h : n < n') : LowUnit R (f - g) n u := by
+theorem LowUnit.facSub_left
+    {R : Subring ℂ} {f g : PowerSeries ℂ} {n n' : ℕ} {u u' : ℂ}
+    (hf : LowUnit R f n u) (hg : LowUnit R g n' u') (h : n < n')
+    : LowUnit R (f - g) n u := by
   obtain ⟨hu, hui, hu0, hlow, hval⟩ := hf
   obtain ⟨_, _, _, hglow, _⟩ := hg
   refine ⟨hu, hui, hu0, fun k hk => ?_, ?_⟩
   · rw [map_sub, hlow k hk, hglow k (hk.trans h), sub_zero]
   · rw [map_sub, hval, hglow n h, sub_zero]
 
-theorem LowUnit.facSub_right {R : Subring ℂ} {f g : PowerSeries ℂ} {n n' : ℕ} {u u' : ℂ}
-    (hf : LowUnit R f n u) (hg : LowUnit R g n' u') (h : n' < n) : LowUnit R (f - g) n' (-u') := by
+theorem LowUnit.facSub_right
+    {R : Subring ℂ} {f g : PowerSeries ℂ} {n n' : ℕ} {u u' : ℂ}
+    (hf : LowUnit R f n u) (hg : LowUnit R g n' u') (h : n' < n)
+    : LowUnit R (f - g) n' (-u') := by
   obtain ⟨_, _, _, hflow, _⟩ := hf
   obtain ⟨hu, hui, hu0, hglow, hval⟩ := hg
   refine ⟨neg_mem hu, by rw [inv_neg]; exact neg_mem hui, neg_ne_zero.2 hu0, fun k hk => ?_, ?_⟩
   · rw [map_sub, hflow k (hk.trans h), hglow k hk, sub_zero]
   · rw [map_sub, hflow n' h, hval, zero_sub]
 
-theorem hasUnitLeadingCoeff_rescaleExpand_eisensteinFourCubeSeries (R : Subring ℂ) (c : ℂ) {k : ℕ} (hk : k ≠ 0) :
-    LowUnit R (sub1 c k aC) 0 1 := by
-  refine ⟨one_mem R, by rw [inv_one]; exact one_mem R, one_ne_zero,
-    fun n hn => absurd hn (Nat.not_lt_zero n), ?_⟩
-  rw [sub1, coeff_xp, if_pos (dvd_zero k), Nat.zero_div, PowerSeries.coeff_rescale, pow_zero, one_mul,
-    eisensteinFourCubeSeries_coeff_zero]
+theorem hasUnitLeadingCoeff_rescaleExpand_eisensteinFourCubeSeries
+    (R : Subring ℂ) (c : ℂ) {k : ℕ} (hk : k ≠ 0)
+    : LowUnit R (sub1 c k aC) 0 1 := by
+  refine ⟨
+    one_mem R,
+    by rw [inv_one]; exact one_mem R,
+    one_ne_zero,
+    fun n hn => absurd hn (Nat.not_lt_zero n),
+    ?_
+  ⟩
+  rw [sub1, coeff_xp, if_pos (dvd_zero k), Nat.zero_div, PowerSeries.coeff_rescale, pow_zero,
+    one_mul, eisensteinFourCubeSeries_coeff_zero]
 
-theorem hasUnitLeadingCoeff_rescaleExpand_discriminantSeries {R : Subring ℂ} {c : ℂ} (hc : c ∈ R) (hc' : c⁻¹ ∈ R) (hc0 : c ≠ 0) {k : ℕ}
-    (hk : k ≠ 0) : LowUnit R (sub1 c k dC) k c := by
+theorem hasUnitLeadingCoeff_rescaleExpand_discriminantSeries
+    {R : Subring ℂ} {c : ℂ} (hc : c ∈ R) (hc' : c⁻¹ ∈ R) (hc0 : c ≠ 0) {k : ℕ} (hk : k ≠ 0)
+    : LowUnit R (sub1 c k dC) k c := by
   refine ⟨hc, hc', hc0, fun n hn => ?_, ?_⟩
   · rw [sub1, coeff_xp]
     split_ifs with hd
@@ -160,14 +174,14 @@ theorem hasUnitLeadingCoeff_rescaleExpand_discriminantSeries {R : Subring ℂ} {
       subst h0
       rw [Nat.zero_div, PowerSeries.coeff_rescale, discriminantSeries_coeff_zero, mul_zero]
     · rfl
-  · rw [sub1, coeff_xp, if_pos dvd_rfl, Nat.div_self (Nat.pos_of_ne_zero hk), PowerSeries.coeff_rescale,
-      pow_one, discriminantSeries_coeff_one, mul_one]
+  · rw [sub1, coeff_xp, if_pos dvd_rfl, Nat.div_self (Nat.pos_of_ne_zero hk),
+      PowerSeries.coeff_rescale, pow_one, discriminantSeries_coeff_one, mul_one]
 
 theorem rescaleExpand_one (k : ℕ) (f : PowerSeries ℂ) : sub1 1 k f = xp k f := by
   simp [sub1, PowerSeries.rescale_one]
 
-theorem facSer_low {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) (hne : t.1 ≠ t.2.2) :
-    ∃ n0 u, LowUnit (Rm m) (facSer m t) n0 u := by
+theorem facSer_low {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) (hne : t.1 ≠ t.2.2)
+    : ∃ n0 u, LowUnit (Rm m) (facSer m t) n0 u := by
   obtain ⟨hdvd, ha0, he, hae⟩ := dvd_and_eq_div_of_mem_Tm hm ht
   obtain ⟨hc, hci⟩ := zetaRoot_pow_mem_of_mem_hermiteTriples hm ht
   have hc0 : zetaC t.2.2 ^ t.2.1 ≠ 0 := pow_ne_zero _ (zetaRoot_ne_zero _)
@@ -177,9 +191,12 @@ theorem facSer_low {m : ℕ} (hm : 0 < m) {t : ℕ × ℕ × ℕ} (ht : t ∈ Tm
     exact hasUnitLeadingCoeff_rescaleExpand_eisensteinFourCubeSeries _ 1 hm.ne'
   have hxd : LowUnit (Rm m) (xp m dC) m 1 := by
     rw [← rescaleExpand_one]
-    exact hasUnitLeadingCoeff_rescaleExpand_discriminantSeries (one_mem _) (by rw [inv_one]; exact one_mem _) one_ne_zero hm.ne'
+    exact hasUnitLeadingCoeff_rescaleExpand_discriminantSeries (one_mem _)
+      (by rw [inv_one]; exact one_mem _) one_ne_zero hm.ne'
   have h1 := hxa.mul (hasUnitLeadingCoeff_rescaleExpand_discriminantSeries hc hci hc0 hk)
-  have h2 := (hasUnitLeadingCoeff_rescaleExpand_eisensteinFourCubeSeries (Rm m) (zetaC t.2.2 ^ t.2.1) hk).mul hxd
+  have h2 :=
+    (hasUnitLeadingCoeff_rescaleExpand_eisensteinFourCubeSeries (Rm m) (zetaC t.2.2 ^ t.2.1) hk).mul
+      hxd
   simp only [zero_add, one_mul] at h1 h2
   unfold facSer
   rcases lt_or_gt_of_ne hne with hlt | hgt

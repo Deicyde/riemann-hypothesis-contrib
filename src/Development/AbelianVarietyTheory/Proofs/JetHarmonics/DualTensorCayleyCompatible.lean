@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.DualTensorCap
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 noncomputable section
@@ -21,15 +22,17 @@ def lm {k r : ℕ} {R R' : Rep k r} {T : R.H → R'.H} (h : SmMap R R' T) : R.sm
   map_add' v w := Subtype.ext (h.add v v.2 w w.2)
   map_smul' a v := Subtype.ext (h.smul a v v.2)
 
-@[simp] theorem lm_coe {k r : ℕ} {R R' : Rep k r} {T : R.H → R'.H} (h : SmMap R R' T) (v : R.smSub) :
-    ((lm h v : R'.smSub) : R'.H) = T v := rfl
+@[simp]
+theorem lm_coe {k r : ℕ} {R R' : Rep k r} {T : R.H → R'.H} (h : SmMap R R' T) (v : R.smSub)
+    : ((lm h v : R'.smSub) : R'.H) = T v :=
+  rfl
 
 section alg
 
 variable {n : ℕ} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
 
-theorem change_inv (A B : Matrix (Fin n) (Fin n) ℂ) (h : A * B = 1) (x : Fin n → M) (c : Fin n) :
-    ∑ d, B d c • ∑ e, A e d • x e = x c := by
+theorem change_inv (A B : Matrix (Fin n) (Fin n) ℂ) (h : A * B = 1) (x : Fin n → M) (c : Fin n)
+    : ∑ d, B d c • ∑ e, A e d • x e = x c := by
   simp_rw [Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
   simp_rw [← Finset.sum_smul]
@@ -40,36 +43,37 @@ theorem change_inv (A B : Matrix (Fin n) (Fin n) ℂ) (h : A * B = 1) (x : Fin n
   simp_rw [this]
   simp [Matrix.one_apply]
 
-theorem dualTens_sum {ι : Type} (S : Finset ι) (E : Fin n → Fin n → Module.End ℂ M) (a b : Fin n)
-    (x : ι → Fin n → M) : dualTens E a b (∑ i ∈ S, x i) = ∑ i ∈ S, dualTens E a b (x i) := by
+theorem dualTens_sum
+    {ι : Type} (S : Finset ι) (E : Fin n → Fin n → Module.End ℂ M) (a b : Fin n) (x : ι → Fin n → M)
+    : dualTens E a b (∑ i ∈ S, x i) = ∑ i ∈ S, dualTens E a b (x i) := by
   funext i
   by_cases h : i = b <;> simp [dualTens, Finset.sum_apply, h, map_sum, Finset.sum_sub_distrib]
 
-theorem alg {N : Fin n → Type} [∀ s, AddCommGroup (N s)] [∀ s, Module ℂ (N s)]
-    (I : ∀ s, Fin n → N s →ₗ[ℂ] M) (P : ∀ s, Fin n → M →ₗ[ℂ] N s)
+theorem alg
+    {N : Fin n → Type} [∀ s, AddCommGroup (N s)] [∀ s, Module ℂ (N s)]
+    (I : ∀ s, Fin n → N s →ₗ[ℂ] M)
+    (P : ∀ s, Fin n → M →ₗ[ℂ] N s)
     (A B : Matrix (Fin n) (Fin n) ℂ) (hAB : A * B = 1) (hBA : B * A = 1)
     (E : Fin n → Fin n → Module.End ℂ M) (F : ∀ s, Fin n → Fin n → Module.End ℂ (N s))
-    (hI : ∀ s a b y c, I s c (F s a b y) =
-      E a b (I s c y) - ∑ j, (B * Matrix.single a b (1 : ℂ) * A) j c • I s j y)
+    (hI : ∀ s a b y c,
+      I s c (F s a b y) = E a b (I s c y) - ∑ j, (B * Matrix.single a b (1 : ℂ) * A) j c • I s j y)
     (h1 : ∀ (x : Fin n → M) c, ∑ s, I s c (∑ d, P s d (x d)) = x c)
-    (h2 : ∀ s y, ∑ c, P s c (I s c y) = y)
-    (h3 : ∀ s t, s ≠ t → ∀ y, ∑ c, P s c (I t c y) = 0) :
-    ∃ (io' : ∀ s, N s →ₗ[ℂ] (Fin n → M)) (pr' : ∀ s, (Fin n → M) →ₗ[ℂ] N s),
-      (∀ s a b y, io' s (F s a b y) = dualTens E a b (io' s y)) ∧
-      (∀ s a b x, pr' s (dualTens E a b x) = F s a b (pr' s x)) ∧
-      (∀ x, ∑ s, io' s (pr' s x) = x) ∧ (∀ s y, pr' s (io' s y) = y) ∧
-      (∀ s t, s ≠ t → ∀ y, pr' s (io' t y) = 0) ∧
-      (∀ s y d, io' s y d = ∑ c, B c d • I s c y) ∧
-      ∀ s x, pr' s x = ∑ c, P s c (∑ d, A d c • x d) := by
+    (h2 : ∀ s y, ∑ c, P s c (I s c y) = y) (h3 : ∀ s t, s ≠ t → ∀ y, ∑ c, P s c (I t c y) = 0)
+    : ∃ (io' : ∀ s, N s →ₗ[ℂ] (Fin n → M)) (pr' : ∀ s, (Fin n → M) →ₗ[ℂ] N s),
+      (∀ s a b y, io' s (F s a b y) = dualTens E a b (io' s y))
+        ∧ (∀ s a b x, pr' s (dualTens E a b x) = F s a b (pr' s x))
+        ∧ (∀ x, ∑ s, io' s (pr' s x) = x) ∧ (∀ s y, pr' s (io' s y) = y)
+        ∧ (∀ s t, s ≠ t → ∀ y, pr' s (io' t y) = 0) ∧ (∀ s y d, io' s y d = ∑ c, B c d • I s c y)
+        ∧ ∀ s x, pr' s x = ∑ c, P s c (∑ d, A d c • x d) := by
   let io' : ∀ s, N s →ₗ[ℂ] (Fin n → M) := fun s => LinearMap.pi fun d => ∑ c, B c d • I s c
-  let pr' : ∀ s, (Fin n → M) →ₗ[ℂ] N s := fun s =>
-    ∑ c, (P s c).comp (∑ d, A d c • LinearMap.proj d)
+  let pr' : ∀ s, (Fin n → M) →ₗ[ℂ] N s := fun s => ∑ c, (P s c).comp (∑ d, A d c • LinearMap.proj d)
   have e1 : ∀ s y d, io' s y d = ∑ c, B c d • I s c y := by
     intro s y d
     simp [io', LinearMap.sum_apply]
   have e2 : ∀ s x, pr' s x = ∑ c, P s c (∑ d, A d c • x d) := by
     intro s x
-    simp only [pr', LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.smul_apply, LinearMap.proj_apply]
+    simp only [pr', LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.smul_apply,
+      LinearMap.proj_apply]
   have c1 : ∀ s a b y, io' s (F s a b y) = dualTens E a b (io' s y) := by
     intro s a b y
     funext d
@@ -125,16 +129,41 @@ theorem alg {N : Fin n → Type} [∀ s, AddCommGroup (N s)] [∀ s, Module ℂ 
 
 end alg
 
-theorem rawTens : PI.KFinSmooth → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (R : Rep k r), R.IsDS ε mu → ∀ (RI : Fin (2 * r + k + 1) → Rep k r) (muI : Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → ℝ) (io : ∀ s, Fin (2 * r + k + 1) → (RI s).H → R.H) (pr : ∀ s, Fin (2 * r + k + 1) → R.H → (RI s).H) (Q : Mx k r) (E : (Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → Module.End ℂ R.smSub)) (F : ∀ s, Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → Module.End ℂ (RI s).smSub), (∀ s, (RI s).IsDS ε (muI s)) → TensRaw dualM R RI io pr → IsUnit Q → R.IsE Q E → (∀ s, (RI s).IsE Q (F s)) → ∃ (io' : ∀ s, (RI s).smSub →ₗ[ℂ] (Fin (2 * r + k + 1) → R.smSub)) (pr' : ∀ s, (Fin (2 * r + k + 1) → R.smSub) →ₗ[ℂ] (RI s).smSub), (∀ s a b y, io' s (F s a b y) = dualTens E a b (io' s y)) ∧ (∀ s a b x, pr' s (dualTens E a b x) = F s a b (pr' s x)) ∧ (∀ x, ∑ s, io' s (pr' s x) = x) ∧ (∀ s y, pr' s (io' s y) = y) ∧ (∀ s t, s ≠ t → ∀ y, pr' s (io' t y) = 0) ∧ (∀ s y d, ((io' s y d : R.smSub) : R.H) = ∑ c, Q⁻¹ c d • io s c (y : (RI s).H)) ∧ ∀ s x, ((pr' s x : (RI s).smSub) : (RI s).H) = ∑ c, pr s c (∑ d, Q d c • ((x d : R.smSub) : R.H)) := by
+theorem rawTens
+    : PI.KFinSmooth
+      → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (mu : Fin (2 * r + k + 1) → ℝ) (R : Rep k r),
+        R.IsDS ε mu
+          → ∀ (RI : Fin (2 * r + k + 1) → Rep k r)
+              (muI : Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → ℝ)
+              (io : ∀ s, Fin (2 * r + k + 1) → (RI s).H → R.H)
+              (pr : ∀ s, Fin (2 * r + k + 1) → R.H → (RI s).H) (Q : Mx k r)
+              (E : (Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → Module.End ℂ R.smSub))
+              (F : ∀ s, Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → Module.End ℂ (RI s).smSub),
+            (∀ s, (RI s).IsDS ε (muI s)) → TensRaw dualM R RI io pr → IsUnit Q → R.IsE Q E
+              → (∀ s, (RI s).IsE Q (F s))
+              → ∃ (io' : ∀ s, (RI s).smSub →ₗ[ℂ] (Fin (2 * r + k + 1) → R.smSub))
+                  (pr' : ∀ s, (Fin (2 * r + k + 1) → R.smSub) →ₗ[ℂ] (RI s).smSub),
+                (∀ s a b y, io' s (F s a b y) = dualTens E a b (io' s y))
+                  ∧ (∀ s a b x, pr' s (dualTens E a b x) = F s a b (pr' s x))
+                  ∧ (∀ x, ∑ s, io' s (pr' s x) = x) ∧ (∀ s y, pr' s (io' s y) = y)
+                  ∧ (∀ s t, s ≠ t → ∀ y, pr' s (io' t y) = 0)
+                  ∧ (∀ s y d, ((io' s y d : R.smSub) : R.H) = ∑ c, Q⁻¹ c d • io s c (y : (RI s).H))
+                  ∧ ∀ s x,
+                    ((pr' s x : (RI s).smSub) : (RI s).H)
+                      = ∑ c, pr s c (∑ d, Q d c • ((x d : R.smSub) : R.H)) := by
   intro hK k r ε mu R hR RI muI io pr Q E F hRI hT hQ hE hF
   have hdet : IsUnit Q.det := (Matrix.isUnit_iff_isUnit_det Q).1 hQ
   obtain ⟨io', pr', c1, c2, c3, c4, c5, e1, e2⟩ :=
-    alg (N := fun s => (RI s).smSub) (fun s c => lm (hT.io_sm s c)) (fun s c => lm (hT.pr_sm s c)) Q Q⁻¹
-      (Matrix.mul_nonsing_inv Q hdet) (Matrix.nonsing_inv_mul Q hdet) E F
+    alg
+      (N := fun s => (RI s).smSub)
+      (fun s c => lm (hT.io_sm s c))
+      (fun s c => lm (hT.pr_sm s c))
+      Q Q⁻¹ (Matrix.mul_nonsing_inv Q hdet) (Matrix.nonsing_inv_mul Q hdet) E F
       (by
         intro s a b y c
         apply Subtype.ext
-        rw [lm_coe, hF s a b y, GlobalTheory.dualTens_io_dC hK k r ε mu R hR RI muI io pr hRI hT s _ y y.2 c,
+        rw [lm_coe, hF s a b y,
+          GlobalTheory.dualTens_io_dC hK k r ε mu R hR RI muI io pr hRI hT s _ y y.2 c,
           Submodule.coe_sub, hE a b, Submodule.coe_sum]
         rfl)
       (by

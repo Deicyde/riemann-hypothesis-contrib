@@ -16,29 +16,48 @@ namespace UpperTheory.G2
 
 section Blocks
 
-variable {C : Type} [Field C] {V : VF C} {d : ℕ} [NeZero d] {Orb : Type} [Fintype Orb] {I J : Orb → Fin 2 → Type}
-  [∀ o g, Fintype (I o g)] [∀ o g, Fintype (J o g)]
+variable
+  {C : Type} [Field C]
+  {V : VF C} {d : ℕ} [NeZero d]
+  {Orb : Type} [Fintype Orb]
+  {I J : Orb → Fin 2 → Type} [∀ o g, Fintype (I o g)] [∀ o g, Fintype (J o g)]
 
 def OneType (L : Orb → List (RF.GlobalTheory d × ℝ)) : Prop :=
   ∀ o, ∀ q ∈ L o, ∀ g e N, q.1 = RF.GlobalTheory.mon g e N → ∃ s : ZMod d, ∀ a k, a ≠ s → e a k = 0
 
-def WtSum (hd : ZMod d) (X : ∀ o, RowData C V d (I o) (J o)) (ga : Orb → ZMod d → ℕ → ℕ) (L : Orb → List (RF.GlobalTheory d × ℝ)) : Prop :=
+def WtSum
+    (hd : ZMod d) (X : ∀ o, RowData C V d (I o) (J o)) (ga : Orb → ZMod d → ℕ → ℕ)
+    (L : Orb → List (RF.GlobalTheory d × ℝ))
+    : Prop :=
   ∀ o s k, ((L o).map fun q => q.1.wt (X o) 0 s k + q.1.wt (X o) 1 (s + hd) k).sum = ga o s k
 
-def ValBlocksS (hd : ZMod d) (X : ∀ o, RowData C V d (I o) (J o)) (F : ∀ o, RF.Flag (X o)) (nW : ℕ)
-    (ga : Orb → ZMod d → ℕ → ℕ) (ν : ℝ) : Prop :=
-  ∀ L : Orb → List (RF.GlobalTheory d × ℝ), (∀ o, ∀ q ∈ L o, q.1.Attains (X o) (F o) q.2) → OneType L →
-    2 * (∑ o, ((L o).map fun q => q.1.what₂ (X o).n).sum) ≤ nW → WtSum hd X ga L → ν ≤ ∑ o, ((L o).map Prod.snd).sum
+def ValBlocksS
+    (hd : ZMod d)
+    (X : ∀ o, RowData C V d (I o) (J o)) (F : ∀ o, RF.Flag (X o))
+    (nW : ℕ) (ga : Orb → ZMod d → ℕ → ℕ) (ν : ℝ)
+    : Prop :=
+  ∀ L : Orb → List (RF.GlobalTheory d × ℝ),
+    (∀ o, ∀ q ∈ L o, q.1.Attains (X o) (F o) q.2) → OneType L
+      → 2 * (∑ o, ((L o).map fun q => q.1.what₂ (X o).n).sum) ≤ nW → WtSum hd X ga L
+      → ν ≤ ∑ o, ((L o).map Prod.snd).sum
 
-def PlaneBlockProductsMemFamily (hd : ZMod d) (X : ∀ o, RowData C V d (I o) (J o)) (n : ℕ) (F : ∀ o, RF.Flag (X o))
-    (FFimg : Set (∀ o, MvPolynomial (Fin n × WV (I o)) C)) (ga : Orb → ZMod d → ℕ → ℕ) : Prop :=
+def PlaneBlockProductsMemFamily
+    (hd : ZMod d)
+    (X : ∀ o, RowData C V d (I o) (J o)) (n : ℕ)
+    (F : ∀ o, RF.Flag (X o)) (FFimg : Set (∀ o, MvPolynomial (Fin n × WV (I o)) C))
+    (ga : Orb → ZMod d → ℕ → ℕ)
+    : Prop :=
   ∀ L : Orb → List (RF.GlobalTheory d × ℝ), OneType L → WtSum hd X ga L → RF.ProdMem X n F FFimg L
 
 end Blocks
 
-def WtTieS {T Orb : Type} {d : ℕ} (r : T → ℕ) (tau : Orb → ZMod d → T) (ga : Orb → ZMod d → ℕ → ℕ) (a : T → ℕ → ℕ) : Prop :=
-  (∀ o s (i : ℕ), i < r (tau o s) → a (tau o s) i = ∑ k ∈ Finset.Icc (i + 1) (r (tau o s)), ga o s k) ∧
-  ∀ σ, (∀ o s, tau o s ≠ σ) → ∀ i, i < r σ → a σ i = 0
+def WtTieS
+    {T Orb : Type} {d : ℕ}
+    (r : T → ℕ) (tau : Orb → ZMod d → T) (ga : Orb → ZMod d → ℕ → ℕ) (a : T → ℕ → ℕ)
+    : Prop :=
+  (∀ o s (i : ℕ),
+      i < r (tau o s) → a (tau o s) i = ∑ k ∈ Finset.Icc (i + 1) (r (tau o s)), ga o s k)
+    ∧ ∀ σ, (∀ o s, tau o s ≠ σ) → ∀ i, i < r σ → a σ i = 0
 
 structure RowFamS (P : RF.Par) (l : ℕ) (Z : Finset P.Pl) : Type 1 where
   C : Type
@@ -70,8 +89,10 @@ structure PkgCs (P : RF.Par) (l : ℕ) (C1 : ℝ) : Type 1 where
   ν : ℝ
   supp : ∀ o s k, ga o s k ≠ 0 → 1 ≤ k ∧ k ≤ (R.X o).rkF 0 s
   main : ∀ o (s : ZMod (2 * P.d)), Even s.val → ga o s (P.k - 1) = W (P.pos o.1 (s.val % P.d))
-  rest_eq : rest = ∑ o, ∑ s : ZMod (2 * P.d), ∑ k ∈ Finset.Icc 1 P.r,
-    (if Even s.val ∧ k = P.k - 1 then (0 : ℝ) else (k : ℝ) * ga o s k)
+  rest_eq
+    : rest
+      = ∑ o, ∑ s : ZMod (2 * P.d), ∑ k ∈ Finset.Icc 1 P.r,
+        (if Even s.val ∧ k = P.k - 1 then (0 : ℝ) else (k : ℝ) * ga o s k)
   what₂ : P.f * ((RF.i0 P.k l + 1) * (P.k - 1) + 4 * P.r) ≤ nW
   deg : RF.DegHyp2 P W T θ0 rest C1
   val : ValBlocksS (P.d : ZMod (2 * P.d)) R.X R.F nW ga ν

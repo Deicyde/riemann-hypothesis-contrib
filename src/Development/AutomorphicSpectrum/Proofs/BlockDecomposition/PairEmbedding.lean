@@ -22,8 +22,9 @@ theorem pairEmb_of_steps : PairSlices → PairStep₁ → PairStep₂ → PairEm
     have h := congrFun hval x.1
     rw [h0] at h
     simpa using h.symm
-  obtain ⟨n₁, p₁, t₁, c₁⟩ := h₁ E a b ι K₁ K₂ W₁ W₂ X₁ Y₁ X₂ e₁ G hW₁ hW₂ hX₁ he₁q he₁Y hGp hGt
-    ⟨i, x.2, sl₁ (G i) x.2, hval, fun h0 => hφ (he₁i _ hmem h0)⟩
+  obtain ⟨n₁, p₁, t₁, c₁⟩ :=
+    h₁ E a b ι K₁ K₂ W₁ W₂ X₁ Y₁ X₂ e₁ G hW₁ hW₂ hX₁ he₁q he₁Y hGp hGt
+      ⟨i, x.2, sl₁ (G i) x.2, hval, fun h0 => hφ (he₁i _ hmem h0)⟩
   obtain ⟨j, hj⟩ := Function.ne_iff.mp n₁
   obtain ⟨y, hy⟩ := Function.ne_iff.mp hj
   obtain ⟨hmem₂, hval₂⟩ := (hS E a b Y₁ X₂ (ap₁ e₁ (G j)) (p₁ j)).2 y.1
@@ -33,8 +34,11 @@ theorem pairEmb_of_steps : PairSlices → PairStep₁ → PairStep₂ → PairEm
     have h := congrFun hval₂ y.2
     rw [h0] at h
     simpa using h.symm
-  obtain ⟨n₂, p₂, t₂, c₂⟩ := h₂ E a b ι K₁ K₂ W₁ W₂ Y₁ X₂ Y₂ e₂ (fun i => ap₁ e₁ (G i)) hW₁ hW₂ hX₂ he₂q he₂Y p₁ t₁
-    ⟨j, y.1, sl₂ (ap₁ e₁ (G j)) y.1, hval₂, fun h0 => hψ (he₂i _ hmem₂ h0)⟩
+  obtain ⟨n₂, p₂, t₂, c₂⟩ :=
+    h₂ E a b ι K₁ K₂ W₁ W₂ Y₁ X₂ Y₂ e₂
+      (fun i => ap₁ e₁ (G i))
+      hW₁ hW₂ hX₂ he₂q he₂Y p₁ t₁
+      ⟨j, y.1, sl₂ (ap₁ e₁ (G j)) y.1, hval₂, fun h0 => hψ (he₂i _ hmem₂ h0)⟩
   exact ⟨fun i => ap₂ e₂ (ap₁ e₁ (G i)), n₂, p₂, t₂, fun h c hc => c₂ h c (c₁ h c hc)⟩
 
 end GlobalTheory.CompanionTheory.EGlue

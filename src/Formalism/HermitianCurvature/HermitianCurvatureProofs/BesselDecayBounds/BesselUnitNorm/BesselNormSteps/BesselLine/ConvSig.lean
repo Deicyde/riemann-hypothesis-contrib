@@ -11,7 +11,8 @@ noncomputable section
 
 namespace PI.WBL.Cv
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions PI.BesselLine PI.WBL
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+  Formalism.BasicNotions PI.BesselLine PI.WBL
 
 theorem sigAll : SigAll := by
   intro k r ε lam H _ _ σ hσ
@@ -38,14 +39,17 @@ theorem sigAll : SigAll := by
     intro a ha
     have ha' : aᴴ * Hpk k r * a = Hpk k r := ha
     show (P * a * Pᴴ)ᴴ * Formalism.REAL.Jm ε * (P * a * Pᴴ) = Formalism.REAL.Jm ε
-    calc (P * a * Pᴴ)ᴴ * Formalism.REAL.Jm ε * (P * a * Pᴴ)
-        = P * (aᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * a) * Pᴴ := by
-          simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, mul_assoc]
+    calc
+      (P * a * Pᴴ)ᴴ * Formalism.REAL.Jm ε * (P * a * Pᴴ)
+          = P * (aᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * a) * Pᴴ := by
+        simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, mul_assoc]
       _ = P * (Pᴴ * Formalism.REAL.Jm ε * P) * Pᴴ := by rw [hPJ, ha']
       _ = Formalism.REAL.Jm ε := by simp only [mul_assoc, hQ2, mul_one, hQ2']
   have h1' : σ (P⁻¹ * 1 * P) = 1 := h1
-  have hmul' : ∀ x ∈ UJset ε, ∀ y ∈ UJset ε,
-      σ (P⁻¹ * (x * y) * P) = (σ (P⁻¹ * x * P)).comp (σ (P⁻¹ * y * P)) := hmul
+  have hmul'
+      : ∀ x ∈ UJset ε, ∀ y ∈ UJset ε,
+        σ (P⁻¹ * (x * y) * P) = (σ (P⁻¹ * x * P)).comp (σ (P⁻¹ * y * P)) :=
+    hmul
   have hnorm' : ∀ g ∈ UJset ε, ∀ v : H, ‖σ (P⁻¹ * g * P) v‖ = ‖v‖ := hnorm
   refine ⟨?_, fun a ha b hb => ?_, fun a ha x => ?_⟩
   · rwa [mul_one, hinv, hQ1] at h1'

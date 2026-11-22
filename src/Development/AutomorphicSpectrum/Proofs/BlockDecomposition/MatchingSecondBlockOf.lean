@@ -30,8 +30,8 @@ open PositivityTheory.Rg.BcB.F.U (lpow lone)
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem mconv_mul_mul {a b : ℕ} {w : Pl E} (r s : ℂ) (u v : GLw a w × GLw b w → ℂ) :
-    mconv (fun y => r * u y) (fun y => s * v y) = fun y => (r * s) * mconv u v y := by
+theorem mconv_mul_mul {a b : ℕ} {w : Pl E} (r s : ℂ) (u v : GLw a w × GLw b w → ℂ)
+    : mconv (fun y => r * u y) (fun y => s * v y) = fun y => (r * s) * mconv u v y := by
   funext y
   unfold mconv
   rw [← GlobalTheory.CompanionTheory.TailLocPow.hint_smul]
@@ -39,8 +39,8 @@ theorem mconv_mul_mul {a b : ℕ} {w : Pl E} (r s : ℂ) (u v : GLw a w × GLw b
   funext z
   ring
 
-theorem lconv_mul_mul {w : Pl E} (r s : ℂ) (u v : UL n w → ℂ) :
-    lconv (fun y => r * u y) (fun y => s * v y) = fun y => (r * s) * lconv u v y := by
+theorem lconv_mul_mul {w : Pl E} (r s : ℂ) (u v : UL n w → ℂ)
+    : lconv (fun y => r * u y) (fun y => s * v y) = fun y => (r * s) * lconv u v y := by
   funext y
   unfold lconv
   rw [← GlobalTheory.CompanionTheory.TailLocPow.hint_smul]
@@ -62,22 +62,25 @@ abbrev cc (d : LocData E n) (w : Pl E) : ↥(d.c w).support → ℂ := fun j => 
 
 abbrev xx (d : LocData E n) (w : Pl E) : ↥(d.c w).support → Fin n → ℤ := fun j => j.1
 
-theorem qT_eq (s : Finset (Fin (n / 2))) :
-    d.qT a w s = fun y => (((Tail.I2 a (n - a) w).relIndex (K2 a (n - a) w) : ℕ) : ℂ) *
-      MT.entT n w (d.ϖ w) a (cc d w) (xx d w) s y := by
+theorem qT_eq (s : Finset (Fin (n / 2)))
+    : d.qT a w s
+      = fun y =>
+        (((Tail.I2 a (n - a) w).relIndex (K2 a (n - a) w) : ℕ) : ℂ)
+          * MT.entT n w (d.ϖ w) a (cc d w) (xx d w) s y := by
   funext y
   unfold LocData.qT MT.entT
   by_cases h : LocData.admitted n a s
   · have h' : MT.admitted n a s := ⟨h.1.1, h.1.2.1, h.1.2.2, h.2.1, h.2.2⟩
-    rw [dite_eq_left h, dite_eq_left h', Finsupp.sum, Finset.mul_sum, ← Finset.sum_coe_sort (d.c w).support]
+    rw [dite_eq_left h, dite_eq_left h', Finsupp.sum, Finset.mul_sum,
+      ← Finset.sum_coe_sort (d.c w).support]
     refine Finset.sum_congr rfl fun j _ => ?_
     unfold Tail.dc2
     ring
   · have h' : ¬ MT.admitted n a s := fun h' => h ⟨⟨h'.1, h'.2.1, h'.2.2.1⟩, h'.2.2.2.1, h'.2.2.2.2⟩
     rw [dite_eq_right h, dite_eq_right h', mul_zero]
 
-theorem mpow_scale {b : ℕ} (r : ℂ) (u : GLw a w × GLw b w → ℂ) (k : ℕ) :
-    MT.mpow w (fun y => r * u y) k = fun y => r ^ k * MT.mpow w u k y := by
+theorem mpow_scale {b : ℕ} (r : ℂ) (u : GLw a w × GLw b w → ℂ) (k : ℕ)
+    : MT.mpow w (fun y => r * u y) k = fun y => r ^ k * MT.mpow w u k y := by
   induction k with
   | zero =>
     funext y
@@ -89,8 +92,8 @@ theorem mpow_scale {b : ℕ} (r : ℂ) (u : GLw a w × GLw b w → ℂ) (k : ℕ
     show _ = r ^ (k + 1) * mconv u (MT.mpow w u k) y
     ring
 
-theorem lpow_scale (K : Subgroup (UL n w)) (r : ℂ) (g : UL n w → ℂ) (k : ℕ) :
-    lpow K (fun y => r * g y) k = fun y => r ^ k * lpow K g k y := by
+theorem lpow_scale (K : Subgroup (UL n w)) (r : ℂ) (g : UL n w → ℂ) (k : ℕ)
+    : lpow K (fun y => r * g y) k = fun y => r ^ k * lpow K g k y := by
   induction k with
   | zero =>
     funext y
@@ -102,10 +105,17 @@ theorem lpow_scale (K : Subgroup (UL n w)) (r : ℂ) (g : UL n w → ℂ) (k : �
     show _ = r ^ (k + 1) * lconv g (lpow K g k) y
     ring
 
-theorem unitary_function_at_T (hT : w ∈ d.T) : d.g₀ w = fun y => (((iwU n w (d.b w)).relIndex (KL n w) : ℕ) : ℂ) *
-    ∑ j, cc d w j * fU n w (d.b w) (d.ϖ w) (lOf (xx d w j)) y := by
-  have h : d.g₀ w = fun y => (d.c w).sum fun x t =>
-      t * (((iwU n w (d.b w)).relIndex (KL n w) : ℕ) : ℂ) * fU n w (d.b w) (d.ϖ w) (lOf x) y := by
+theorem unitary_function_at_T (hT : w ∈ d.T)
+    : d.g₀ w
+      = fun y =>
+        (((iwU n w (d.b w)).relIndex (KL n w) : ℕ) : ℂ)
+          * ∑ j, cc d w j * fU n w (d.b w) (d.ϖ w) (lOf (xx d w j)) y := by
+  have h
+      : d.g₀ w
+        = fun y =>
+          (d.c w).sum fun x t =>
+            t * (((iwU n w (d.b w)).relIndex (KL n w) : ℕ) : ℂ)
+              * fU n w (d.b w) (d.ϖ w) (lOf x) y := by
     unfold LocData.g₀
     rw [if_pos hT]
   rw [h]

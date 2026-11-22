@@ -7,16 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TrPairApply
 @[expose] public section
 
 open scoped TensorProduct Matrix GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Classical
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift GlobalTheory.VacLn
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.FockAlg
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift GlobalTheory.VacLn
 
 namespace GlobalTheory.VacCore
 
-theorem ray_formula {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
-    (k : V → ℂ) (hk : Differentiable ℝ k) (w : V) (ℓ : V →ₗ[ℝ] ℂ)
-    (h : ∀ z, fderiv ℝ k z w = ℓ z * k z) : k w = k 0 * Complex.exp (ℓ w / 2) := by
+theorem ray_formula
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    (k : V → ℂ) (hk : Differentiable ℝ k)
+    (w : V) (ℓ : V →ₗ[ℝ] ℂ) (h : ∀ z, fderiv ℝ k z w = ℓ z * k z)
+    : k w = k 0 * Complex.exp (ℓ w / 2) := by
   set c := ℓ w
   let E : ℝ → ℂ := fun s => Complex.exp (((-(s ^ 2) / 2 : ℝ) : ℂ) * c)
-  have hE : ∀ s : ℝ, HasDerivAt E (Complex.exp (((-(s ^ 2) / 2 : ℝ) : ℂ) * c) * (((-(2 * s) / 2 : ℝ) : ℂ) * c)) s := by
+  have hE
+      : ∀ s : ℝ,
+        HasDerivAt E (Complex.exp (((-(s ^ 2) / 2 : ℝ) : ℂ) * c) * (((-(2 * s) / 2 : ℝ) : ℂ) * c))
+          s := by
     intro s
     have h1 : HasDerivAt (fun s : ℝ => (-(s ^ 2) / 2 : ℝ)) (-(2 * s) / 2) s := by
       have := ((hasDerivAt_pow 2 s).neg).div_const 2
@@ -35,18 +42,25 @@ theorem ray_formula {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
     simp only [Complex.real_smul, E]
     push_cast
     ring
-  have hc := is_const_of_deriv_eq_zero (f := fun s : ℝ => k (s • w) * E s)
-    (fun s => (hφ s).differentiableAt) (fun s => (hφ s).deriv) 1 0
+  have hc :=
+    is_const_of_deriv_eq_zero
+      (f := fun s : ℝ => k (s • w) * E s)
+      (fun s => (hφ s).differentiableAt)
+      (fun s => (hφ s).deriv)
+      1 0
   simp only [E, one_smul, zero_smul] at hc
-  have : Complex.exp (((-((1:ℝ) ^ 2) / 2 : ℝ) : ℂ) * c) * Complex.exp (c / 2) = 1 := by
+  have : Complex.exp (((-((1 : ℝ) ^ 2) / 2 : ℝ) : ℂ) * c) * Complex.exp (c / 2) = 1 := by
     rw [← Complex.exp_add]; push_cast; ring_nf; simp
-  calc k w = k w * (Complex.exp (((-((1:ℝ) ^ 2) / 2 : ℝ) : ℂ) * c) * Complex.exp (c / 2)) := by rw [this, mul_one]
+  calc
+    k w = k w * (Complex.exp (((-((1 : ℝ) ^ 2) / 2 : ℝ) : ℂ) * c) * Complex.exp (c / 2)) := by
+      rw [this, mul_one]
     _ = _ := by rw [← mul_assoc, hc]; simp
 
-theorem conj_mul_eq_zero_of_line {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+theorem conj_mul_eq_zero_of_line
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
     (f g : SchwartzMap V ℂ) (y₀ : V) (hy : y₀ ≠ 0)
-    (h : ∀ z, fderiv ℝ f z y₀ * (starRingEnd ℂ) (g z) + f z * (starRingEnd ℂ) (fderiv ℝ g z y₀) = 0) :
-    ∀ z, f z * (starRingEnd ℂ) (g z) = 0 := by
+    (h : ∀ z, fderiv ℝ f z y₀ * (starRingEnd ℂ) (g z) + f z * (starRingEnd ℂ) (fderiv ℝ g z y₀) = 0)
+    : ∀ z, f z * (starRingEnd ℂ) (g z) = 0 := by
   intro z
   let φ : ℝ → ℂ := fun t => f (z + t • y₀) * (starRingEnd ℂ) (g (z + t • y₀))
   have hL : ∀ t : ℝ, HasDerivAt (fun t : ℝ => z + t • y₀) y₀ t := by
@@ -64,20 +78,24 @@ theorem conj_mul_eq_zero_of_line {V : Type} [NormedAddCommGroup V] [NormedSpace 
     simpa [Complex.star_def] using this
   have hc : ∀ t, φ t = φ 0 := fun t =>
     is_const_of_deriv_eq_zero (fun s => (hφ s).differentiableAt) (fun s => (hφ s).deriv) t 0
-  have hlin : Filter.Tendsto (fun t : ℝ => z + t • y₀) (Filter.cocompact ℝ) (Filter.cocompact V) := by
+  have hlin
+      : Filter.Tendsto (fun t : ℝ => z + t • y₀) (Filter.cocompact ℝ) (Filter.cocompact V) := by
     apply Filter.tendsto_cocompact_cocompact_of_norm
     intro ε
     have hy' : 0 < ‖y₀‖ := norm_pos_iff.mpr hy
     refine ⟨(ε + ‖z‖) / ‖y₀‖, fun t ht => ?_⟩
     have h1 : ‖t • y₀‖ ≤ ‖z + t • y₀‖ + ‖z‖ := by
-      calc ‖t • y₀‖ = ‖(z + t • y₀) - z‖ := by simp
+      calc
+        ‖t • y₀‖
+          = ‖(z + t • y₀) - z‖ := by simp
         _ ≤ _ := norm_sub_le _ _
     rw [norm_smul] at h1
     rw [div_lt_iff₀ hy'] at ht
     linarith
   have hf0 : Filter.Tendsto (fun t : ℝ => f (z + t • y₀)) (Filter.cocompact ℝ) (nhds 0) :=
     (f.tendsto_cocompact).comp hlin
-  obtain ⟨C, hC⟩ : ∃ C, ∀ x, ‖g x‖ ≤ C := ⟨_, fun x => (g.toBoundedContinuousFunction).norm_coe_le_norm x⟩
+  obtain ⟨C, hC⟩ : ∃ C, ∀ x, ‖g x‖ ≤ C :=
+    ⟨_, fun x => (g.toBoundedContinuousFunction).norm_coe_le_norm x⟩
   have hφ0 : Filter.Tendsto φ (Filter.cocompact ℝ) (nhds 0) := by
     rw [tendsto_zero_iff_norm_tendsto_zero] at hf0 ⊢
     have hC0 : 0 ≤ C := le_trans (norm_nonneg _) (hC 0)
@@ -88,12 +106,14 @@ theorem conj_mul_eq_zero_of_line {V : Type} [NormedAddCommGroup V] [NormedSpace 
     exact mul_le_mul_of_nonneg_left (hC _) (norm_nonneg _)
   have hconst : Filter.Tendsto φ (Filter.cocompact ℝ) (nhds (φ 0)) := by
     have : φ = fun _ => φ 0 := funext hc
-    rw [this]; exact tendsto_const_nhds
+    rw [this]
+    exact tendsto_const_nhds
   have := tendsto_nhds_unique hconst hφ0
   simpa [φ] using this
 
-noncomputable def lin {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
-    (B : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (a b : V) : V →ₗ[ℝ] ℂ where
+noncomputable def lin
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (B : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (a b : V)
+    : V →ₗ[ℝ] ℂ where
   toFun z := 2 * Real.pi * Complex.I * (B z a : ℂ) + 2 * Real.pi * (B z b : ℂ)
   map_add' x y := by simp only [map_add (f := _), LinearMap.add_apply, Complex.ofReal_add]; ring
   map_smul' c x := by
@@ -101,20 +121,30 @@ noncomputable def lin {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
       Complex.real_smul]
     ring
 
-theorem lin_apply {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
-    (B : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (a b z : V) :
-    lin B a b z = 2 * Real.pi * Complex.I * (B z a : ℂ) + 2 * Real.pi * (B z b : ℂ) := rfl
+theorem lin_apply
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (B : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (a b z : V)
+    : lin B a b z = 2 * Real.pi * Complex.I * (B z a : ℂ) + 2 * Real.pi * (B z b : ℂ) :=
+  rfl
 
-theorem schwartz_vacuum_eq_smul : ∀ {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
-    (B : V →ₗ[ℝ] V →ₗ[ℝ] ℝ), (∀ y, (∀ x, B x y = 0) → y = 0) →
-    ∀ (J e : (V × V) →ₗ[ℝ] (V × V)) (e' : V →ₗ[ℝ] V), (∀ y, J (J y) = -y) → (∀ y, e (e y) = e y) →
-    (∀ y, J (e y) = e (J y)) → (∀ y, (e y).1 = e' y.1) → (∀ y x, B x (e y).2 = B (e' x) y.2) →
-    ∀ (f g : SchwartzMap V ℂ), g ≠ 0 →
-    (∀ y x, fderiv ℝ g x (J y).1 - 2 * Real.pi * Complex.I * (B x (J y).2 : ℝ) * g x =
-      Complex.I * (fderiv ℝ g x y.1 - 2 * Real.pi * Complex.I * (B x y.2 : ℝ) * g x)) →
-    (∀ y x, fderiv ℝ f x (J (y - (2 : ℝ) • e y)).1 - 2 * Real.pi * Complex.I * (B x (J (y - (2 : ℝ) • e y)).2 : ℝ) * f x =
-      Complex.I * (fderiv ℝ f x y.1 - 2 * Real.pi * Complex.I * (B x y.2 : ℝ) * f x)) →
-    ∃ z : ℂ, f = z • g := by
+theorem schwartz_vacuum_eq_smul
+    : ∀ {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+        (B : V →ₗ[ℝ] V →ₗ[ℝ] ℝ),
+      (∀ y, (∀ x, B x y = 0) → y = 0)
+        → ∀ (J e : (V × V) →ₗ[ℝ] (V × V)) (e' : V →ₗ[ℝ] V),
+          (∀ y, J (J y) = -y) → (∀ y, e (e y) = e y) → (∀ y, J (e y) = e (J y))
+            → (∀ y, (e y).1 = e' y.1) → (∀ y x, B x (e y).2 = B (e' x) y.2)
+            → ∀ (f g : SchwartzMap V ℂ),
+              g ≠ 0
+                → (∀ y x,
+                  fderiv ℝ g x (J y).1 - 2 * Real.pi * Complex.I * (B x (J y).2 : ℝ) * g x
+                    = Complex.I
+                      * (fderiv ℝ g x y.1 - 2 * Real.pi * Complex.I * (B x y.2 : ℝ) * g x))
+                → (∀ y x,
+                  fderiv ℝ f x (J (y - (2 : ℝ) • e y)).1
+                      - 2 * Real.pi * Complex.I * (B x (J (y - (2 : ℝ) • e y)).2 : ℝ) * f x
+                    = Complex.I
+                      * (fderiv ℝ f x y.1 - 2 * Real.pi * Complex.I * (B x y.2 : ℝ) * f x))
+                → ∃ z : ℂ, f = z • g := by
   intro V _ _ _ B hB J e e' hJ he hJe he1 he2 f g hg0 hg hf
 
   have hinj : ∀ y, (J y).1 = 0 → y.1 = 0 → y = 0 := by
@@ -123,7 +153,9 @@ theorem schwartz_vacuum_eq_smul : ∀ {V : Type} [NormedAddCommGroup V] [NormedS
       intro x hx
       have h := hg y x
       simp only [hJy, hy1, map_zero] at h
-      have h2 : g x * (2 * Real.pi * (B x y.2 : ℂ) + 2 * Real.pi * Complex.I * (B x (J y).2 : ℂ)) = 0 := by
+      have h2
+          : g x * (2 * Real.pi * (B x y.2 : ℂ) + 2 * Real.pi * Complex.I * (B x (J y).2 : ℂ))
+            = 0 := by
         linear_combination (-1 : ℂ) * h + (2 * Real.pi * (B x y.2 : ℂ) * g x) * Complex.I_sq
       have h3 := (mul_eq_zero.mp h2).resolve_left hx
       have h4 := congrArg Complex.re h3
@@ -146,7 +178,8 @@ theorem schwartz_vacuum_eq_smul : ∀ {V : Type} [NormedAddCommGroup V] [NormedS
         simp only [Set.mem_setOf_eq]
         by_contra hgt
         have := key _ hgt
-        rw [map_add (f := _), map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul] at this
+        rw [map_add (f := _), map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul]
+          at this
         apply ht
         simp only [t₀]
         field_simp
@@ -166,10 +199,12 @@ theorem schwartz_vacuum_eq_smul : ∀ {V : Type} [NormedAddCommGroup V] [NormedS
   choose yx hyx using fun x : V => hTs (x, 0)
   have hyx1 : ∀ x, (J (yx x)).1 = x := fun x => by simpa [T] using congrArg Prod.fst (hyx x)
   have hyx2 : ∀ x, (yx x).1 = 0 := fun x => by simpa [T] using congrArg Prod.snd (hyx x)
-  have hray : ∀ k : SchwartzMap V ℂ, (∀ (y : V × V) (z : V), fderiv ℝ k z (J y).1 -
-      2 * Real.pi * Complex.I * (B z (J y).2 : ℝ) * k z =
-      Complex.I * (fderiv ℝ k z y.1 - 2 * Real.pi * Complex.I * (B z y.2 : ℝ) * k z)) →
-      ∀ x, k x = k 0 * Complex.exp (lin B (J (yx x)).2 (yx x).2 x / 2) := by
+  have hray
+      : ∀ k : SchwartzMap V ℂ,
+        (∀ (y : V × V) (z : V),
+            fderiv ℝ k z (J y).1 - 2 * Real.pi * Complex.I * (B z (J y).2 : ℝ) * k z
+              = Complex.I * (fderiv ℝ k z y.1 - 2 * Real.pi * Complex.I * (B z y.2 : ℝ) * k z))
+          → ∀ x, k x = k 0 * Complex.exp (lin B (J (yx x)).2 (yx x).2 x / 2) := by
     intro k hk x
     apply ray_formula k k.differentiable x (lin B (J (yx x)).2 (yx x).2)
     intro z
@@ -178,8 +213,7 @@ theorem schwartz_vacuum_eq_smul : ∀ {V : Type} [NormedAddCommGroup V] [NormedS
     rw [lin_apply]
     linear_combination h - (2 * Real.pi * (B z (yx x).2 : ℂ) * k z) * Complex.I_sq
   have hg_ray := hray g hg
-  have hg00 : g 0 ≠ 0 := by
-    intro h0; apply hg0; ext x; rw [hg_ray x, h0]; simp
+  have hg00 : g 0 ≠ 0 := by intro h0; apply hg0; ext x; rw [hg_ray x, h0]; simp
   have hgne : ∀ x, g x ≠ 0 := fun x => by
     rw [hg_ray x]; exact mul_ne_zero hg00 (Complex.exp_ne_zero _)
   have he'2 : ∀ v, e' (e' v) = e' v := by
@@ -189,12 +223,14 @@ theorem schwartz_vacuum_eq_smul : ∀ {V : Type} [NormedAddCommGroup V] [NormedS
     simpa using this
   by_cases hz : ∀ v, e' v = 0
   · have he0 : ∀ y, e y = 0 := by
-      intro y; apply Prod.ext
+      intro y
+      apply Prod.ext
       · rw [he1, hz]; rfl
       · apply hB; intro x; rw [he2, hz, map_zero, LinearMap.zero_apply]
-    have hf' : ∀ (y : V × V) (z : V), fderiv ℝ f z (J y).1 -
-        2 * Real.pi * Complex.I * (B z (J y).2 : ℝ) * f z =
-        Complex.I * (fderiv ℝ f z y.1 - 2 * Real.pi * Complex.I * (B z y.2 : ℝ) * f z) := by
+    have hf'
+        : ∀ (y : V × V) (z : V),
+          fderiv ℝ f z (J y).1 - 2 * Real.pi * Complex.I * (B z (J y).2 : ℝ) * f z
+            = Complex.I * (fderiv ℝ f z y.1 - 2 * Real.pi * Complex.I * (B z y.2 : ℝ) * f z) := by
       intro y z; have := hf y z; rwa [he0, smul_zero, sub_zero] at this
     have hf_ray := hray f hf'
     refine ⟨f 0 / g 0, ?_⟩
@@ -209,27 +245,35 @@ theorem schwartz_vacuum_eq_smul : ∀ {V : Type} [NormedAddCommGroup V] [NormedS
     have hu1 : (J u).1 = y₀ := by simpa [T] using congrArg Prod.fst hu
     have hu2 : u.1 = 0 := by simpa [T] using congrArg Prod.snd hu
     have heu : e u = u := by
-      have : e u - u = 0 := hinj _
-        (by rw [map_sub, Prod.fst_sub, hJe, he1, hu1, hy₀, sub_self])
-        (by rw [Prod.fst_sub, he1, hu2, map_zero, sub_self])
+      have : e u - u = 0 :=
+        hinj _ (by rw [map_sub, Prod.fst_sub, hJe, he1, hu1, hy₀, sub_self])
+          (by rw [Prod.fst_sub, he1, hu2, map_zero, sub_self])
       exact sub_eq_zero.mp this
-    have hfu : ∀ z, fderiv ℝ f z y₀ = (2 * Real.pi * Complex.I * (B z (J u).2 : ℂ)
-        - 2 * Real.pi * (B z u.2 : ℂ)) * f z := by
+    have hfu
+        : ∀ z,
+          fderiv ℝ f z y₀
+            = (2 * Real.pi * Complex.I * (B z (J u).2 : ℂ) - 2 * Real.pi * (B z u.2 : ℂ))
+              * f z := by
       intro z
       have h := hf u z
-      rw [heu, two_smul, sub_add_cancel_left, map_neg, Prod.fst_neg, Prod.snd_neg, map_neg,
-        map_neg, hu1, hu2, map_zero, Complex.ofReal_neg] at h
+      rw [heu, two_smul, sub_add_cancel_left, map_neg, Prod.fst_neg, Prod.snd_neg, map_neg, map_neg,
+          hu1, hu2, map_zero, Complex.ofReal_neg]
+        at h
       linear_combination (-1 : ℂ) * h + (2 * Real.pi * (B z u.2 : ℂ) * f z) * Complex.I_sq
-    have hgu : ∀ z, fderiv ℝ g z y₀ = (2 * Real.pi * Complex.I * (B z (J u).2 : ℂ)
-        + 2 * Real.pi * (B z u.2 : ℂ)) * g z := by
+    have hgu
+        : ∀ z,
+          fderiv ℝ g z y₀
+            = (2 * Real.pi * Complex.I * (B z (J u).2 : ℂ) + 2 * Real.pi * (B z u.2 : ℂ))
+              * g z := by
       intro z
       have h := hg u z
       rw [hu1, hu2, map_zero] at h
       linear_combination h - (2 * Real.pi * (B z u.2 : ℂ) * g z) * Complex.I_sq
-    have hk := conj_mul_eq_zero_of_line f g y₀ hv (fun z => by
-      rw [hfu z, hgu z]
-      simp only [map_add (f := _), map_mul, map_ofNat, Complex.conj_ofReal, Complex.conj_I]
-      ring)
+    have hk :=
+      conj_mul_eq_zero_of_line f g y₀ hv (fun z => by
+        rw [hfu z, hgu z]
+        simp only [map_add (f := _), map_mul, map_ofNat, Complex.conj_ofReal, Complex.conj_I]
+        ring)
     refine ⟨0, ?_⟩
     ext z
     rw [zero_smul, SchwartzMap.zero_apply]

@@ -13,11 +13,13 @@ namespace Formalism.L2.G.Model
 open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.G.LatticeSystems
 
 section Scale
-variable {O Kf X Y : Type} [CommRing O] [Field Kf] [Algebra O Kf] [AddCommGroup X] [Module Kf X] [Module O X]
+variable
+  {O Kf X Y : Type}
+  [CommRing O] [Field Kf] [Algebra O Kf] [AddCommGroup X] [Module Kf X] [Module O X]
   [IsScalarTower O Kf X] [AddCommGroup Y] [Module Kf Y] [Module O Y] [IsScalarTower O Kf Y]
 
-theorem scale_map (a : Kf) (A : Submodule O X) (Ψ : X →ₗ[Kf] Y) :
-    (scale a A).map (Ψ.restrictScalars O) = scale a (A.map (Ψ.restrictScalars O)) := by
+theorem scale_map (a : Kf) (A : Submodule O X) (Ψ : X →ₗ[Kf] Y)
+    : (scale a A).map (Ψ.restrictScalars O) = scale a (A.map (Ψ.restrictScalars O)) := by
   unfold scale
   rw [← Submodule.map_comp, ← Submodule.map_comp]
   congr 1
@@ -48,8 +50,9 @@ theorem testSide_of_core (hC : FormCore) : TestSide := by
     obtain ⟨B, ha, hb, hc, hdd⟩ := hC p n' W Qq O Kf ι σ j w h m (lamAt lam0 s) (hanti s)
     exact posCore_of_form hinj p m (lamAt lam0 s) _ B ha hb hc hdd
   choose β hβ using hpos
-  have hV : Vsp Kf lam0 = tensorLat Kf Kf
-      (fun s => dualWeyl Kf (m + 1) (m + 1) (nuOf (lamAt lam0 s))) := by
+  have hV
+      : Vsp Kf lam0
+        = tensorLat Kf Kf (fun s => dualWeyl Kf (m + 1) (m + 1) (nuOf (lamAt lam0 s))) := by
     unfold Vsp
     congr 1
     funext s
@@ -63,13 +66,16 @@ theorem testSide_of_core (hC : FormCore) : TestSide := by
   · intro L hL
     obtain ⟨g, hg, rfl⟩ := hL
     have h1 := hΨ (fun s => la_tw ι σ s.val g) (fun s => la_tw_det _ _ _ g hg)
-    have e1 : HL (O := O) ι σ lam0 (colSpan W g) =
-        (Hten O lam0 fun s => colSpan O (la_tw ι σ s.val g)).comap ((Vsp Kf lam0).subtype.restrictScalars O) := by
+    have e1
+        : HL (O := O) ι σ lam0 (colSpan W g)
+          = (Hten O lam0 fun s => colSpan O (la_tw ι σ s.val g)).comap
+            ((Vsp Kf lam0).subtype.restrictScalars O) := by
       unfold HL toV
       simp only [extO_colSpan h]
-    have e2 : HL (O := O) ι σ lam0 (latDual (colSpan W g)) =
-        (Hten O lam0 fun s => colSpan O ((la_tw ι σ s.val g)⁻¹).transpose).comap
-          ((Vsp Kf lam0).subtype.restrictScalars O) := by
+    have e2
+        : HL (O := O) ι σ lam0 (latDual (colSpan W g))
+          = (Hten O lam0 fun s => colSpan O ((la_tw ι σ s.val g)⁻¹).transpose).comap
+            ((Vsp Kf lam0).subtype.restrictScalars O) := by
       unfold HL toV
       rw [latDual_colSpan g hg]
       simp only [extO_colSpan h, tw_invT ι σ _ g hg]
@@ -86,17 +92,21 @@ theorem testSide_of_core (hC : FormCore) : TestSide := by
       rw [Matrix.det_mul]
       exact (la_tw_det _ _ _ g hg).mul (lb_D_det _ _ _ hw)
     have h1 := hΨ (fun s => la_tw ι σ s.val g * lb_D (m + 1) r c) hN
-    have e1 : HLe (O := O) p ι σ w lam0 e =
-        (Hten O lam0 fun s => colSpan O (la_tw ι σ s.val g * lb_D (m + 1) r c)).comap
-          ((Vsp Kf lam0).subtype.restrictScalars O) := by
+    have e1
+        : HLe (O := O) p ι σ w lam0 e
+          = (Hten O lam0 fun s => colSpan O (la_tw ι σ s.val g * lb_D (m + 1) r c)).comap
+            ((Vsp Kf lam0).subtype.restrictScalars O) := by
       unfold HLe toV
       simp only [leAt_of_basis h m r e g hgb, ← hc]
-    have e2 : HLe (O := O) p ι σ w lam0 e.dual =
-        (Hten O lam0 fun s => colSpan O ((la_tw ι σ s.val g * lb_D (m + 1) r c)⁻¹).transpose).comap
-          ((Vsp Kf lam0).subtype.restrictScalars O) := by
+    have e2
+        : HLe (O := O) p ι σ w lam0 e.dual
+          = (Hten O lam0 fun s =>
+              colSpan O ((la_tw ι σ s.val g * lb_D (m + 1) r c)⁻¹).transpose).comap
+            ((Vsp Kf lam0).subtype.restrictScalars O) := by
       unfold HLe toV
-      simp only [leAt_of_basis h m r e.dual _ (dual_edgeBasis p r (pQ_ne h) e g hgb), tw_mul, tw_invT ι σ _ g hg,
-        tw_dE, invT_mul_D _ (la_tw_det ι σ _ g hg) r c hw, Matrix.mul_assoc, hp, ← hc, dE_sq_D r c hw]
+      simp only [leAt_of_basis h m r e.dual _ (dual_edgeBasis p r (pQ_ne h) e g hgb), tw_mul,
+        tw_invT ι σ _ g hg, tw_dE, invT_mul_D _ (la_tw_det ι σ _ g hg) r c hw, Matrix.mul_assoc, hp,
+        ← hc, dE_sq_D r c hw]
     unfold Re Re'
     rw [e1, e2, scale_map, scale_comm]
     exact ⟨scale_mono _ h1.1, scale_mono _ h1.2⟩

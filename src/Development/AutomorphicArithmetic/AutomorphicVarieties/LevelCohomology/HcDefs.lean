@@ -15,12 +15,14 @@ namespace UpperTheory.V.X
 
 section Frame
 
-variable {k Γ M : Type} [CommRing k] [Group Γ] [TopologicalSpace Γ] [AddCommGroup M] [Module k M] [TopologicalSpace M]
-  [DiscreteTopology M] (F : Alg.Frame Γ) (ρ : Representation k Γ M)
+variable
+  {k Γ M : Type} [CommRing k] [Group Γ] [TopologicalSpace Γ] [AddCommGroup M] [Module k M]
+  [TopologicalSpace M] [DiscreteTopology M]
+  (F : Alg.Frame Γ) (ρ : Representation k Γ M)
 
 def selF : Submodule k (H1 ρ) :=
-  (⨅ v, LinearMap.ker (resH1 ρ (F.φ v) (F.hφ v))) ⊓
-    ⨅ q, (H1ur (ρ.comp (F.ψ q)) (F.N q)).comap (resH1 ρ (F.ψ q) (F.hψ q))
+  (⨅ v, LinearMap.ker (resH1 ρ (F.φ v) (F.hφ v)))
+    ⊓ ⨅ q, (H1ur (ρ.comp (F.ψ q)) (F.N q)).comap (resH1 ρ (F.ψ q) (F.hψ q))
 
 def shaF : Submodule k (H2 ρ) :=
   (⨅ v, LinearMap.ker (resH2 ρ (F.φ v) (F.hφ v))) ⊓ ⨅ q, LinearMap.ker (resH2 ρ (F.ψ q) (F.hψ q))
@@ -44,8 +46,11 @@ def cycK (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [CharP k l] : G ℚ Ω �
 
 variable {Ω}
 
-def galFrame (SP : Set (HeightOneSpectrum (𝓞 ℚ))) (T Q : Finset ℕ) (v0 : T) (pl : ℕ → ValuationSubring Ω)
-    (K : Subgroup (G ℚ Ω)) : Alg.Frame (GS Ω SP) where
+def galFrame
+    (SP : Set (HeightOneSpectrum (𝓞 ℚ)))
+    (T Q : Finset ℕ) (v0 : T)
+    (pl : ℕ → ValuationSubring Ω) (K : Subgroup (G ℚ Ω))
+    : Alg.Frame (GS Ω SP) where
   T := T
   v0 := v0
   Gv v := Dec (F := ℚ) (pl v)
@@ -57,8 +62,10 @@ def galFrame (SP : Set (HeightOneSpectrum (𝓞 ℚ))) (T Q : Finset ℕ) (v0 : 
   hψ q := continuous_locHom SP (pl q)
   N q := (Ine (F := ℚ) (pl q) ⊓ K).subgroupOf (Dec (F := ℚ) (pl q))
 
-structure GalData (l : ℕ) (SP : Set (HeightOneSpectrum (𝓞 ℚ))) (T Q : Finset ℕ) (pl : ℕ → ValuationSubring Ω)
-    (K : Subgroup (G ℚ Ω)) : Prop where
+structure GalData
+    (l : ℕ) (SP : Set (HeightOneSpectrum (𝓞 ℚ))) (T Q : Finset ℕ) (pl : ℕ → ValuationSubring Ω)
+    (K : Subgroup (G ℚ Ω))
+    : Prop where
   l_odd : l ≠ 2
   prime : ∀ p, p ∈ T ∨ p ∈ Q → p.Prime
   disj : Disjoint T Q
@@ -67,10 +74,16 @@ structure GalData (l : ℕ) (SP : Set (HeightOneSpectrum (𝓞 ℚ))) (T Q : Fin
   isOver : ∀ p, p ∈ T ∨ p ∈ Q → (pl p).valuation (p : Ω) < 1
   idx : ∀ q ∈ Q, ¬ l ∣ K.relIndex (Ine (F := ℚ) (pl q))
 
-def Van {k : Type} [Field k] (T : Finset ℕ) (pl : ℕ → ValuationSubring Ω) (K : Subgroup (G ℚ Ω)) (γ : G ℚ Ω →* kˣ) : Prop :=
-  ∀ z : G ℚ Ω → k, IsLocallyConstant z → (∀ g h, z (g * h) = z g + (γ g : k) * z h) →
-    (∀ A : ValuationSubring Ω, (∀ p ∈ T, ¬ A.valuation (p : Ω) < 1) → ∀ g ∈ Ine (F := ℚ) A, g ∈ K → z g = 0) →
-    (∀ v ∈ T, ∃ m, ∀ g ∈ Dec (F := ℚ) (pl v), z g = (γ g : k) * m - m) → ∃ m, ∀ g, z g = (γ g : k) * m - m
+def Van
+    {k : Type} [Field k]
+    (T : Finset ℕ) (pl : ℕ → ValuationSubring Ω) (K : Subgroup (G ℚ Ω)) (γ : G ℚ Ω →* kˣ)
+    : Prop :=
+  ∀ z : G ℚ Ω → k,
+    IsLocallyConstant z → (∀ g h, z (g * h) = z g + (γ g : k) * z h)
+      → (∀ A : ValuationSubring Ω,
+        (∀ p ∈ T, ¬ A.valuation (p : Ω) < 1) → ∀ g ∈ Ine (F := ℚ) A, g ∈ K → z g = 0)
+      → (∀ v ∈ T, ∃ m, ∀ g ∈ Dec (F := ℚ) (pl v), z g = (γ g : k) * m - m)
+      → ∃ m, ∀ g, z g = (γ g : k) * m - m
 
 end Gal
 

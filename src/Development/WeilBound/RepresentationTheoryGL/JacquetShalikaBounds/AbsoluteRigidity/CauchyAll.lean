@@ -8,6 +8,7 @@ public import Development.WeilBound.RepresentationTheoryGL.JacquetShalikaBounds.
 
 namespace PositivityTheory.RgJS
 
-theorem cauchyAll : CAUCHY := cauchy_of_local_prime cauchy_local_inequality prime_sum_converges_and_diverges
+theorem cauchyAll : CAUCHY :=
+  cauchy_of_local_prime cauchy_local_inequality prime_sum_converges_and_diverges
 
 end PositivityTheory.RgJS

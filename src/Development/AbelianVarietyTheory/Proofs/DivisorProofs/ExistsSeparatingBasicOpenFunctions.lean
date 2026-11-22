@@ -8,11 +8,21 @@ open AlgebraicGeometry CategoryTheory
 
 namespace GlobalTheory
 
-theorem exists_separating_basicOpen_functions : ∀ (X : Scheme.{0}) (U : X.Opens), IsAffineOpen U → ∀ (F : Finset X), (∀ a ∈ F, a ∈ U) → (∀ a ∈ F, ∀ b ∈ F, a ⤳ b → a = b) → ∀ W : X → X.Opens, (∀ a ∈ F, a ∈ W a) → ∃ f : X → Γ(X, U), ∀ a ∈ F, a ∈ X.basicOpen (f a) ∧ X.basicOpen (f a) ≤ W a ∧ ∀ b ∈ F, b ≠ a → b ∉ X.basicOpen (f a) := by
+theorem exists_separating_basicOpen_functions
+    : ∀ (X : Scheme.{0}) (U : X.Opens),
+      IsAffineOpen U
+        → ∀ (F : Finset X),
+          (∀ a ∈ F, a ∈ U) → (∀ a ∈ F, ∀ b ∈ F, a ⤳ b → a = b)
+            → ∀ W : X → X.Opens,
+              (∀ a ∈ F, a ∈ W a)
+                → ∃ f : X → Γ(X, U), ∀ a ∈ F,
+                  a ∈ X.basicOpen (f a) ∧ X.basicOpen (f a) ≤ W a
+                    ∧ ∀ b ∈ F, b ≠ a → b ∉ X.basicOpen (f a) := by
   intro X U hU F hFU hsp W hW
   classical
-  have key : ∀ a ∈ F, ∃ g : Γ(X, U), a ∈ X.basicOpen g ∧ X.basicOpen g ≤ W a ∧
-      ∀ b ∈ F, b ≠ a → b ∉ X.basicOpen g := by
+  have key
+      : ∀ a ∈ F, ∃ g : Γ(X, U),
+        a ∈ X.basicOpen g ∧ X.basicOpen g ≤ W a ∧ ∀ b ∈ F, b ≠ a → b ∉ X.basicOpen g := by
     intro a ha
     let C : Set X := ⋃ b ∈ F.erase a, closure {b}
     have hC : IsClosed C := isClosed_biUnion_finset (fun b _ => isClosed_closure)

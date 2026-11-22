@@ -16,8 +16,9 @@ theorem act_S (x : Fin 2 → ℚ) : act x ModularGroup.S = ![x 1, -x 0] := by
   funext i
   fin_cases i <;> simp [act, ModularGroup.S, Fin.sum_univ_two]
 
-theorem sg_S : ∀ (c : ℕ) (x : Fin 2 → ℚ) (τ : ℍ), admitted c x →
-    sg c x (ModularGroup.S • τ) = sg c (act x ModularGroup.S) τ := by
+theorem sg_S
+    : ∀ (c : ℕ) (x : Fin 2 → ℚ) (τ : ℍ),
+      admitted c x → sg c x (ModularGroup.S • τ) = sg c (act x ModularGroup.S) τ := by
   intro c x τ h
   obtain ⟨hc, hc6, hx⟩ := h
   set z : ℂ := (x 1 : ℂ) * (τ : ℂ) - (x 0 : ℂ) with hz

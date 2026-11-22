@@ -15,34 +15,50 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SeesawReduced
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory.PrimDense
 
-theorem exists_gen_cube_eSec {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A] {L : LB A.left} (hL : L.IsLB)
-    (u : A ⟶ A) [IsMonHom u] : ∃ c : ((cubeLB A ![𝟙 A, u] L).pull (eSec A)).Gen, c.IsGen := by
+theorem exists_gen_cube_eSec
+    {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A]
+    {L : LB A.left} (hL : L.IsLB)
+    (u : A ⟶ A) [IsMonHom u]
+    : ∃ c : ((cubeLB A ![𝟙 A, u] L).pull (eSec A)).Gen, c.IsGen := by
   have e₁ : (1 : 𝟙_ (Over S) ⟶ A) = η[A] := by rw [Hom.one_def]; simp
   have key : ∀ I, η[A] ≫ psum A ![𝟙 A, u] I = η[A] := fun I => by
     refine (psum_hom (preHom (G := A) η[A]) _ I).trans ?_
-    have : (fun i => preHom (G := A) η[A] (![𝟙 A, u] i)) = fun i => (1 : (A ⟶ A) →* (𝟙_ (Over S) ⟶ A)) (![𝟙 A, u] i) := by
+    have : (fun i => preHom (G := A) η[A] (![𝟙 A, u] i))
+        = fun i => (1 : (A ⟶ A) →* (𝟙_ (Over S) ⟶ A)) (![𝟙 A, u] i) := by
       funext i
       fin_cases i
       · exact (Category.comp_id _).trans e₁.symm
       · exact (IsMonHom.one_hom u).trans e₁.symm
     rw [this, ← psum_hom]
     exact e₁
-  obtain ⟨t, ht, -⟩ := exists_gen hL (φ' := fun _ : ULift.{0} (Finset (Fin 2)) => eSec A)
-    (ε' := fun I => (-1) ^ (2 - I.down.card))
-    (fun U _ k => (Fintype.prod_empty _).trans (by
-      have : ∑ I : ULift.{0} (Finset (Fin 2)), (-1 : ℤ) ^ (2 - I.down.card) = 0 := by decide
-      have e := congrArg Additive.toMul (map_sum (zmultiplesHom (Additive U) (Additive.ofMul (k (eSec A))))
-        (fun I : ULift.{0} (Finset (Fin 2)) => (-1 : ℤ) ^ (2 - I.down.card)) Finset.univ)
-      rw [this, map_zero, toMul_sum] at e
-      exact e)) (LB.oneGen L (Y := (𝟙_ (Over S)).left))
-    (fun i j => (map_one _).trans ((congrArg₂ (· * ·) (Fintype.prod_empty _) (map_one _)).trans (_root_.mul_one _)).symm)
-  exact gen_chartPull (chartPullOut L _ _ (eSec A) _ fun I => congrArg (fun z => z.left) (key I.down).symm) t ht
+  obtain ⟨t, ht, -⟩ :=
+    exists_gen hL
+      (φ' := fun _ : ULift.{0} (Finset (Fin 2)) => eSec A)
+      (ε' := fun I => (-1) ^ (2 - I.down.card))
+      (fun U _ k =>
+        (Fintype.prod_empty _).trans (by
+          have : ∑ I : ULift.{0} (Finset (Fin 2)), (-1 : ℤ) ^ (2 - I.down.card) = 0 := by decide
+          have e :=
+            congrArg Additive.toMul
+              (map_sum (zmultiplesHom (Additive U) (Additive.ofMul (k (eSec A))))
+                (fun I : ULift.{0} (Finset (Fin 2)) => (-1 : ℤ) ^ (2 - I.down.card))
+                Finset.univ)
+          rw [this, map_zero, toMul_sum] at e
+          exact e))
+      (LB.oneGen L (Y := (𝟙_ (Over S)).left))
+      (fun i j =>
+        (map_one _).trans
+          ((congrArg₂ (· * ·) (Fintype.prod_empty _) (map_one _)).trans (_root_.mul_one _)).symm)
+  exact gen_chartPull
+    (chartPullOut L _ _ (eSec A) _ fun I => congrArg (fun z => z.left) (key I.down).symm) t ht
 
 end GlobalTheory.PrimDense
 

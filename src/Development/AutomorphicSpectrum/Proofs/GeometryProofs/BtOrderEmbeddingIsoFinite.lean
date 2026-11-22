@@ -11,7 +11,8 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SectionEqZer
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
 namespace GlobalTheory.CompanionTheory.Ar.BT.FiniteIso
@@ -27,30 +28,41 @@ theorem isFinOpenSub_top (Γ : QFGroup R T) (hfin : IsFinite Γ.G.hom) : Γ.IsFi
     infer_instance
   all_goals simp
 
-noncomputable def secMap {X : Scheme.{0}} {A : Type} [CommRing A] (j : X ⟶ Spec (CommRingCat.of A)) : A →+* Γ(X, ⊤) :=
+noncomputable def secMap {X : Scheme.{0}} {A : Type} [CommRing A] (j : X ⟶ Spec (CommRingCat.of A))
+    : A →+* Γ(X, ⊤) :=
   ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ j.appTop).hom
 
-theorem val_secMap (Γ : QFGroup R T) {A : Subalgebra R (T → R)} {j : Γ.G.left ⟶ Spec (CommRingCat.of A)}
-    (hj : Γ.IsEmb A j) (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ (⊤ : Γ.G.left.Opens)) (a : A) :
-    valAt (Γ.pt t).left ⊤ h (secMap j a) = algebraMap R (FractionRing R) ((a : T → R) t) := by
+theorem val_secMap
+    (Γ : QFGroup R T)
+    {A : Subalgebra R (T → R)} {j : Γ.G.left ⟶ Spec (CommRingCat.of A)} (hj : Γ.IsEmb A j)
+    (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ (⊤ : Γ.G.left.Opens))
+    (a : A)
+    : valAt (Γ.pt t).left ⊤ h (secMap j a) = algebraMap R (FractionRing R) ((a : T → R) t) := by
   have e0 : j.appLE ⊤ ⊤ (by simp) = j.appTop := Scheme.Hom.appLE_eq_app _
   have h2 : ⊤ ≤ ((Γ.pt t).left ≫ j) ⁻¹ᵁ (⊤ : (Spec (CommRingCat.of A)).Opens) := by simp
-  have h3 : ⊤ ≤ (Spec.map (CommRingCat.ofHom
-    ((algebraMap R (FractionRing R)).comp ((Pi.evalRingHom (fun _ : T => R) t).comp A.val.toRingHom)))) ⁻¹ᵁ
-      (⊤ : (Spec (CommRingCat.of A)).Opens) := by simp
-  have e1 := valHom_appLE (Γ.pt t).left j (V := ⊤) (W := ⊤) (by simp) h h2
-    ((Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom a)
+  have h3
+      : ⊤
+        ≤ (Spec.map (CommRingCat.ofHom ((algebraMap R (FractionRing R)).comp
+            ((Pi.evalRingHom (fun _ : T => R) t).comp A.val.toRingHom))))
+          ⁻¹ᵁ (⊤ : (Spec (CommRingCat.of A)).Opens) := by
+    simp
+  have e1 :=
+    valHom_appLE (Γ.pt t).left j (V := ⊤) (W := ⊤) (by simp) h h2
+      ((Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom a)
   rw [e0, valHom_congr (hj.pt t) _ h2 h3, valHom_spec_top] at e1
   exact e1
 
-theorem isIso_of_secMap_bijective {X : Scheme.{0}} [IsAffine X] {A : Type} [CommRing A]
-    (j : X ⟶ Spec (CommRingCat.of A)) (hb : Function.Bijective (secMap j)) : IsIso j := by
+theorem isIso_of_secMap_bijective
+    {X : Scheme.{0}} [IsAffine X]
+    {A : Type} [CommRing A]
+    (j : X ⟶ Spec (CommRingCat.of A)) (hb : Function.Bijective (secMap j))
+    : IsIso j := by
   have h1 : IsIso ((Scheme.ΓSpecIso (CommRingCat.of A)).inv ≫ j.appTop) :=
     (ConcreteCategory.isIso_iff_bijective _).2 hb
-  have h2 : IsIso j.appTop := IsIso.of_isIso_comp_left (Scheme.ΓSpecIso (CommRingCat.of A)).inv j.appTop
+  have h2 : IsIso j.appTop :=
+    IsIso.of_isIso_comp_left (Scheme.ΓSpecIso (CommRingCat.of A)).inv j.appTop
   have e := Scheme.isoSpec_hom_naturality j
-  have h3 : IsIso (j ≫ (Spec (CommRingCat.of A)).isoSpec.hom) := by
-    rw [← e]; infer_instance
+  have h3 : IsIso (j ≫ (Spec (CommRingCat.of A)).isoSpec.hom) := by rw [← e]; infer_instance
   exact IsIso.of_isIso_comp_right j (Spec (CommRingCat.of A)).isoSpec.hom
 
 end GlobalTheory.CompanionTheory.Ar.BT.FiniteIso
@@ -59,7 +71,10 @@ namespace GlobalTheory.CompanionTheory.Ar.BT.FiniteIso
 
 open GlobalTheory.CompanionTheory.Ar.BT.SubOrder
 
-theorem isIso_of_finite : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤))), Γ.IsEmb (Γ.btOrder ⊤) j → IsFinite Γ.G.hom → IsIso j := by
+theorem isIso_of_finite
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T]
+        [Finite T] (Γ : QFGroup R T) (j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤))),
+      Γ.IsEmb (Γ.btOrder ⊤) j → IsFinite Γ.G.hom → IsIso j := by
   intro R _ _ _ T _ _ Γ j hj hfin
   have hF := isFinOpenSub_top Γ hfin
   have hU := isAffineOpen_of_fin Γ hF
@@ -74,8 +89,9 @@ theorem isIso_of_finite : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrally
   have hρ : hU.fromSpec ≫ Γ.G.hom = Spec.map (CommRingCat.ofHom (algebraMap R Γ(Γ.G.left, ⊤))) :=
     fromSpec_hom Γ hU
   have hfinite := sec_finite hρ hF
-  have hval : ∀ (s : Γ(Γ.G.left, ⊤)) (t : T),
-      ∃ r : R, algebraMap R (FractionRing R) r = valAt (Γ.pt t).left ⊤ (htop t) s := by
+  have hval
+      : ∀ (s : Γ(Γ.G.left, ⊤)) (t : T), ∃ r : R,
+        algebraMap R (FractionRing R) r = valAt (Γ.pt t).left ⊤ (htop t) s := by
     intro s t
     have h1 : IsIntegral R s := Algebra.IsIntegral.isIntegral s
     exact IsIntegrallyClosed.isIntegral_iff.1 (h1.map (valAlg hρ t (htop t)))

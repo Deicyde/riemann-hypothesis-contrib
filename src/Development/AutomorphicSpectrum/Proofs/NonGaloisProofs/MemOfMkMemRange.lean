@@ -13,7 +13,9 @@ public import Development.AutomorphicSpectrum.Proofs.NonGaloisProofs.CupFlipCont
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
 
 namespace GlobalTheory.CompanionTheory.LocDual.ExactAnn
 
@@ -21,12 +23,15 @@ section Lin
 
 variable {k : Type*} [Field k]
 
-theorem mem_of_orth {X Y : Type*} [AddCommGroup X] [Module k X] [AddCommGroup Y] [Module k Y]
-    [FiniteDimensional k X] [FiniteDimensional k Y] (Φ : X →ₗ[k] Y →ₗ[k] k)
+theorem mem_of_orth
+    {X Y : Type*} [AddCommGroup X] [Module k X] [AddCommGroup Y] [Module k Y]
+    [FiniteDimensional k X] [FiniteDimensional k Y]
+    (Φ : X →ₗ[k] Y →ₗ[k] k)
     (hL : ∀ x, (∀ y, Φ x y = 0) → x = 0) (hR : ∀ y, (∀ x, Φ x y = 0) → y = 0)
-    (Sx : Submodule k X) (Sy : Submodule k Y) (horth : ∀ x ∈ Sx, ∀ y ∈ Sy, Φ x y = 0)
-    (hdim : finrank k X ≤ finrank k Sx + finrank k Sy) (x : X) (hx : ∀ y ∈ Sy, Φ x y = 0) :
-    x ∈ Sx := by
+    (Sx : Submodule k X) (Sy : Submodule k Y)
+    (horth : ∀ x ∈ Sx, ∀ y ∈ Sy, Φ x y = 0) (hdim : finrank k X ≤ finrank k Sx + finrank k Sy)
+    (x : X) (hx : ∀ y ∈ Sy, Φ x y = 0)
+    : x ∈ Sx := by
   have hinj' : Function.Injective Φ.flip := by
     intro a b hab
     refine sub_eq_zero.1 (hR (a - b) fun z => ?_)
@@ -34,8 +39,8 @@ theorem mem_of_orth {X Y : Type*} [AddCommGroup X] [Module k X] [AddCommGroup Y]
     simp only [LinearMap.flip_apply] at e
     rw [map_sub, e, sub_self]
   have hYX : finrank k Y ≤ finrank k X := by
-    have := LinearMap.finrank_le_finrank_of_injective
-      (f := (Φ.flip : Y →ₗ[k] Module.Dual k X)) hinj'
+    have :=
+      LinearMap.finrank_le_finrank_of_injective (f := (Φ.flip : Y →ₗ[k] Module.Dual k X)) hinj'
     rwa [Subspace.dual_finrank_eq] at this
   have hinj : Function.Injective (Φ : X →ₗ[k] Module.Dual k Y) := by
     intro a b hab
@@ -43,8 +48,9 @@ theorem mem_of_orth {X Y : Type*} [AddCommGroup X] [Module k X] [AddCommGroup Y]
     rw [map_sub, LinearMap.sub_apply, hab, sub_self]
   have hW : finrank k Sy + finrank k Sy.dualAnnihilator = finrank k Y :=
     Subspace.finrank_add_finrank_dualAnnihilator_eq Sy
-  have hT : finrank k (Sy.dualAnnihilator.comap (Φ : X →ₗ[k] Module.Dual k Y)) ≤
-      finrank k Sy.dualAnnihilator := by
+  have hT
+      : finrank k (Sy.dualAnnihilator.comap (Φ : X →ₗ[k] Module.Dual k Y))
+        ≤ finrank k Sy.dualAnnihilator := by
     rw [LinearEquiv.finrank_eq (Submodule.equivMapOfInjective _ hinj _)]
     exact Submodule.finrank_mono (Submodule.map_comap_le _ _)
   have hle : Sx ≤ Sy.dualAnnihilator.comap (Φ : X →ₗ[k] Module.Dual k Y) := by
@@ -57,16 +63,17 @@ theorem mem_of_orth {X Y : Type*} [AddCommGroup X] [Module k X] [AddCommGroup Y]
 
 variable {E : Type*} [AddCommGroup E] [Module k E]
 
-def qIncl (B : Submodule k E) {S Z : Submodule k E} (h : S ≤ Z) :
-    (↥S ⧸ B.comap S.subtype) →ₗ[k] (↥Z ⧸ B.comap Z.subtype) :=
+def qIncl (B : Submodule k E) {S Z : Submodule k E} (h : S ≤ Z)
+    : (↥S ⧸ B.comap S.subtype) →ₗ[k] (↥Z ⧸ B.comap Z.subtype) :=
   Submodule.mapQ _ _ (Submodule.inclusion h) (fun _ hx => hx)
 
-private theorem qIncl_quotient_mk_eq_mk_inclusion (B : Submodule k E) {S Z : Submodule k E} (h : S ≤ Z) (a : ↥S) :
-    qIncl B h (Submodule.Quotient.mk a) = Submodule.Quotient.mk (Submodule.inclusion h a) := by
+private theorem qIncl_quotient_mk_eq_mk_inclusion
+    (B : Submodule k E) {S Z : Submodule k E} (h : S ≤ Z) (a : ↥S)
+    : qIncl B h (Submodule.Quotient.mk a) = Submodule.Quotient.mk (Submodule.inclusion h a) := by
   rfl
 
-theorem qIncl_injective (B : Submodule k E) {S Z : Submodule k E} (h : S ≤ Z) :
-    Function.Injective (qIncl B h) := by
+theorem qIncl_injective (B : Submodule k E) {S Z : Submodule k E} (h : S ≤ Z)
+    : Function.Injective (qIncl B h) := by
   intro a b hab
   obtain ⟨a, rfl⟩ := Submodule.Quotient.mk_surjective _ a
   obtain ⟨b, rfl⟩ := Submodule.Quotient.mk_surjective _ b
@@ -75,9 +82,10 @@ theorem qIncl_injective (B : Submodule k E) {S Z : Submodule k E} (h : S ≤ Z) 
   rw [Submodule.mem_comap] at hab ⊢
   simpa using hab
 
-theorem mem_of_mk_mem_range {B S Z : Submodule k E} (hBS : B ≤ S) (h : S ≤ Z) (a : ↥Z)
-    (ha : (Submodule.Quotient.mk a : ↥Z ⧸ B.comap Z.subtype) ∈ LinearMap.range (qIncl B h)) :
-    (a : E) ∈ S := by
+theorem mem_of_mk_mem_range
+    {B S Z : Submodule k E} (hBS : B ≤ S) (h : S ≤ Z) (a : ↥Z)
+    (ha : (Submodule.Quotient.mk a : ↥Z ⧸ B.comap Z.subtype) ∈ LinearMap.range (qIncl B h))
+    : (a : E) ∈ S := by
   obtain ⟨q, hq⟩ := LinearMap.mem_range.1 ha
   obtain ⟨s, rfl⟩ := Submodule.Quotient.mk_surjective _ q
   simp only [qIncl_quotient_mk_eq_mk_inclusion] at hq
@@ -88,17 +96,18 @@ theorem mem_of_mk_mem_range {B S Z : Submodule k E} (hBS : B ≤ S) (h : S ≤ Z
 
 variable {E' : Type*} [AddCommGroup E'] [Module k E']
 
-theorem ann_of_pairing (Z B S : Submodule k E) (Z' B' S' : Submodule k E')
-    (Φ : ↥Z →ₗ[k] ↥Z' →ₗ[k] k)
+theorem ann_of_pairing
+    (Z B S : Submodule k E) (Z' B' S' : Submodule k E') (Φ : ↥Z →ₗ[k] ↥Z' →ₗ[k] k)
     (hBl : ∀ a : ↥Z, (a : E) ∈ B → ∀ b, Φ a b = 0) (hBr : ∀ b : ↥Z', (b : E') ∈ B' → ∀ a, Φ a b = 0)
-    (hL : ∀ a : ↥Z, (∀ b, Φ a b = 0) → (a : E) ∈ B) (hR : ∀ b : ↥Z', (∀ a, Φ a b = 0) → (b : E') ∈ B')
+    (hL : ∀ a : ↥Z, (∀ b, Φ a b = 0) → (a : E) ∈ B)
+    (hR : ∀ b : ↥Z', (∀ a, Φ a b = 0) → (b : E') ∈ B')
     [FiniteDimensional k (↥Z ⧸ B.comap Z.subtype)] [FiniteDimensional k (↥Z' ⧸ B'.comap Z'.subtype)]
     (hBS : B ≤ S) (hSZ : S ≤ Z) (hBS' : B' ≤ S') (hSZ' : S' ≤ Z')
     (horth : ∀ (a : ↥Z) (b : ↥Z'), (a : E) ∈ S → (b : E') ∈ S' → Φ a b = 0)
-    (hdim : finrank k (↥Z ⧸ B.comap Z.subtype) ≤ finrank k (↥S ⧸ B.comap S.subtype) +
-      finrank k (↥S' ⧸ B'.comap S'.subtype)) :
-    (∀ a : ↥Z, (∀ b : ↥Z', (b : E') ∈ S' → Φ a b = 0) → (a : E) ∈ S) ∧
-    (∀ b : ↥Z', (∀ a : ↥Z, (a : E) ∈ S → Φ a b = 0) → (b : E') ∈ S') := by
+    (hdim : finrank k (↥Z ⧸ B.comap Z.subtype)
+      ≤ finrank k (↥S ⧸ B.comap S.subtype) + finrank k (↥S' ⧸ B'.comap S'.subtype))
+    : (∀ a : ↥Z, (∀ b : ↥Z', (b : E') ∈ S' → Φ a b = 0) → (a : E) ∈ S)
+      ∧ (∀ b : ↥Z', (∀ a : ↥Z, (a : E) ∈ S → Φ a b = 0) → (b : E') ∈ S') := by
   classical
   let Ψ1 : (↥Z' ⧸ B'.comap Z'.subtype) →ₗ[k] ↥Z →ₗ[k] k :=
     (B'.comap Z'.subtype).liftQ Φ.flip (fun b hb => by
@@ -125,11 +134,10 @@ theorem ann_of_pairing (Z B S : Submodule k E) (Z' B' S' : Submodule k E')
     exact hR b fun a => by simpa [hΦb] using hy (Submodule.Quotient.mk a)
   have hSx : finrank k (LinearMap.range (qIncl B hSZ)) = finrank k (↥S ⧸ B.comap S.subtype) :=
     LinearMap.finrank_range_of_inj (qIncl_injective B hSZ)
-  have hSy : finrank k (LinearMap.range (qIncl B' hSZ')) =
-      finrank k (↥S' ⧸ B'.comap S'.subtype) :=
+  have hSy : finrank k (LinearMap.range (qIncl B' hSZ')) = finrank k (↥S' ⧸ B'.comap S'.subtype) :=
     LinearMap.finrank_range_of_inj (qIncl_injective B' hSZ')
-  have horthb : ∀ x ∈ LinearMap.range (qIncl B hSZ), ∀ y ∈ LinearMap.range (qIncl B' hSZ'),
-      Φb x y = 0 := by
+  have horthb
+      : ∀ x ∈ LinearMap.range (qIncl B hSZ), ∀ y ∈ LinearMap.range (qIncl B' hSZ'), Φb x y = 0 := by
     intro x hx y hy
     obtain ⟨p, rfl⟩ := LinearMap.mem_range.1 hx
     obtain ⟨q, rfl⟩ := LinearMap.mem_range.1 hy
@@ -137,8 +145,10 @@ theorem ann_of_pairing (Z B S : Submodule k E) (Z' B' S' : Submodule k E')
     obtain ⟨s', rfl⟩ := Submodule.Quotient.mk_surjective _ q
     simp only [qIncl_quotient_mk_eq_mk_inclusion, hΦb]
     exact horth _ _ s.2 s'.2
-  have hdimb : finrank k (↥Z ⧸ B.comap Z.subtype) ≤
-      finrank k (LinearMap.range (qIncl B hSZ)) + finrank k (LinearMap.range (qIncl B' hSZ')) := by
+  have hdimb
+      : finrank k (↥Z ⧸ B.comap Z.subtype)
+        ≤ finrank k (LinearMap.range (qIncl B hSZ))
+          + finrank k (LinearMap.range (qIncl B' hSZ')) := by
     rw [hSx, hSy]
     exact hdim
   have hYX : finrank k (↥Z' ⧸ B'.comap Z'.subtype) ≤ finrank k (↥Z ⧸ B.comap Z.subtype) := by
@@ -152,35 +162,43 @@ theorem ann_of_pairing (Z B S : Submodule k E) (Z' B' S' : Submodule k E')
     have := LinearMap.finrank_le_finrank_of_injective hinj
     rwa [Subspace.dual_finrank_eq] at this
   refine ⟨fun a ha => ?_, fun b hb => ?_⟩
-  · have hmem := mem_of_orth Φb hLb hRb _ _ horthb hdimb (Submodule.Quotient.mk a) (by
-      intro y hy
-      obtain ⟨q, rfl⟩ := LinearMap.mem_range.1 hy
-      obtain ⟨s', rfl⟩ := Submodule.Quotient.mk_surjective _ q
-      simp only [qIncl_quotient_mk_eq_mk_inclusion, hΦb]
-      exact ha _ s'.2)
+  · have hmem :=
+      mem_of_orth Φb hLb hRb _ _ horthb hdimb (Submodule.Quotient.mk a) (by
+        intro y hy
+        obtain ⟨q, rfl⟩ := LinearMap.mem_range.1 hy
+        obtain ⟨s', rfl⟩ := Submodule.Quotient.mk_surjective _ q
+        simp only [qIncl_quotient_mk_eq_mk_inclusion, hΦb]
+        exact ha _ s'.2)
     exact mem_of_mk_mem_range hBS hSZ a hmem
-  · have hmem := mem_of_orth Φb.flip (fun y h => hRb y fun x => by simpa using h x)
-      (fun x h => hLb x fun y => by simpa using h y) _ _
-      (fun y hy x hx => by rw [LinearMap.flip_apply]; exact horthb x hx y hy)
-      (by rw [add_comm]; exact hYX.trans hdimb) (Submodule.Quotient.mk b) (by
-        intro x hx
-        obtain ⟨p, rfl⟩ := LinearMap.mem_range.1 hx
-        obtain ⟨s, rfl⟩ := Submodule.Quotient.mk_surjective _ p
-        simp only [qIncl_quotient_mk_eq_mk_inclusion, LinearMap.flip_apply, hΦb]
-        exact hb _ s.2)
+  · have hmem :=
+      mem_of_orth Φb.flip
+        (fun y h => hRb y fun x => by simpa using h x)
+        (fun x h => hLb x fun y => by simpa using h y)
+        _ _
+        (fun y hy x hx => by rw [LinearMap.flip_apply]; exact horthb x hx y hy)
+        (by rw [add_comm]; exact hYX.trans hdimb) (Submodule.Quotient.mk b)
+        (by
+          intro x hx
+          obtain ⟨p, rfl⟩ := LinearMap.mem_range.1 hx
+          obtain ⟨s, rfl⟩ := Submodule.Quotient.mk_surjective _ p
+          simp only [qIncl_quotient_mk_eq_mk_inclusion, LinearMap.flip_apply, hΦb]
+          exact hb _ s.2)
     exact mem_of_mk_mem_range hBS' hSZ' b hmem
 
 end Lin
 
 section Functional
 
-variable {k : Type*} [Field k] {E E' F : Type*} [AddCommGroup E] [Module k E] [AddCommGroup E']
-  [Module k E'] [AddCommGroup F] [Module k F]
+variable
+  {k : Type*} [Field k]
+  {E E' F : Type*}
+  [AddCommGroup E] [Module k E] [AddCommGroup E'] [Module k E'] [AddCommGroup F] [Module k F]
 
-theorem exists_pairing (Z : Submodule k E) (Z' : Submodule k E') (M C : Submodule k F)
-    (cup : E →ₗ[k] E' →ₗ[k] F) (hM : ∀ a ∈ Z, ∀ b ∈ Z', cup a b ∈ M) (z0 : F)
-    (hz0C : z0 ∉ C) (hline : ∀ z ∈ M, ∃ a : k, z - a • z0 ∈ C) :
-    ∃ Φ : ↥Z →ₗ[k] ↥Z' →ₗ[k] k, ∀ (a : ↥Z) (b : ↥Z'), Φ a b = 0 ↔ cup a b ∈ C := by
+theorem exists_pairing
+    (Z : Submodule k E) (Z' : Submodule k E') (M C : Submodule k F) (cup : E →ₗ[k] E' →ₗ[k] F)
+    (hM : ∀ a ∈ Z, ∀ b ∈ Z', cup a b ∈ M)
+    (z0 : F) (hz0C : z0 ∉ C) (hline : ∀ z ∈ M, ∃ a : k, z - a • z0 ∈ C)
+    : ∃ Φ : ↥Z →ₗ[k] ↥Z' →ₗ[k] k, ∀ (a : ↥Z) (b : ↥Z'), Φ a b = 0 ↔ cup a b ∈ C := by
   classical
   have huniq : ∀ z : F, ∀ a a' : k, z - a • z0 ∈ C → z - a' • z0 ∈ C → a = a' := by
     intro z a a' h h'
@@ -194,17 +212,19 @@ theorem exists_pairing (Z : Submodule k E) (Z' : Submodule k E') (M C : Submodul
     rwa [smul_smul, inv_mul_cancel₀ hne', one_smul] at this
   let g : ↥M → k := fun z => (hline z z.2).choose
   have hg : ∀ z : ↥M, (z : F) - g z • z0 ∈ C := fun z => (hline z z.2).choose_spec
-  let f : ↥M →ₗ[k] k :=
-    { toFun := g
-      map_add' := fun z w => huniq _ _ _ (hg (z + w)) (by
+  let f : ↥M →ₗ[k] k := {
+    toFun := g
+    map_add' := fun z w =>
+      huniq _ _ _ (hg (z + w)) (by
         convert C.add_mem (hg z) (hg w) using 1
         rw [Submodule.coe_add, add_smul]
         abel)
-      map_smul' := fun c z => by
-        simp only [RingHom.id_apply, smul_eq_mul]
-        refine huniq _ _ _ (hg (c • z)) ?_
-        convert C.smul_mem c (hg z) using 1
-        rw [Submodule.coe_smul, smul_sub, mul_smul] }
+    map_smul' := fun c z => by
+      simp only [RingHom.id_apply, smul_eq_mul]
+      refine huniq _ _ _ (hg (c • z)) ?_
+      convert C.smul_mem c (hg z) using 1
+      rw [Submodule.coe_smul, smul_sub, mul_smul]
+  }
   refine ⟨LinearMap.mk₂ k (fun a b => f ⟨cup a b, hM a a.2 b b.2⟩) ?_ ?_ ?_ ?_, ?_⟩
   · intro a a' b
     rw [← map_add (f := _)]
@@ -240,13 +260,15 @@ end Functional
 
 section Cup
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    (LL : Type) [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [IsTopologicalRing LL]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  (LL : Type) [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [IsTopologicalRing LL]
 
 def cocSub : Submodule LL (G × G → LL) where
   carrier := {z | Continuous z ∧ ReciprocityTheory.Def.d2 (charRep (cycLL PD LL)) z = 0}
@@ -266,8 +288,8 @@ def cobSub : Submodule LL (G × G → LL) where
 
 variable {LL} {V V' : Type} [AddCommGroup V] [Module LL V] [AddCommGroup V'] [Module LL V']
 
-def cupBil (ρ' : Representation LL G V') (P : V →ₗ[LL] V' →ₗ[LL] LL) :
-    (G → V) →ₗ[LL] (G → V') →ₗ[LL] (G × G → LL) :=
+def cupBil (ρ' : Representation LL G V') (P : V →ₗ[LL] V' →ₗ[LL] LL)
+    : (G → V) →ₗ[LL] (G → V') →ₗ[LL] (G × G → LL) :=
   LinearMap.mk₂ LL (cupL ρ' P)
     (fun a a' b => by ext x; simp [cupL])
     (fun r a b => by ext x; simp [cupL])

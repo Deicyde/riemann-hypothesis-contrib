@@ -12,16 +12,18 @@ noncomputable section
 
 namespace GlobalTheory.WigSh
 
-theorem prod_other_neighbour_raise {n : ℕ} (d : Fin (n + 1) → ℝ) (l : Fin (n + 1))
-    (hd : ∀ i, 0 < d i) (hl : d l = 1) :
-    (∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc)) * (d 0 * d (Fin.last n))
+theorem prod_other_neighbour_raise
+    {n : ℕ} (d : Fin (n + 1) → ℝ) (l : Fin (n + 1)) (hd : ∀ i, 0 < d i) (hl : d l = 1)
+    : (∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc)) * (d 0 * d (Fin.last n))
       = ∏ j : Fin n, d (l.succAbove j) := by
   have hP : ∏ i, d i = ∏ j : Fin n, d (l.succAbove j) := by
     rw [Fin.prod_univ_succAbove d l, hl, one_mul]
   have h1 := Fin.prod_univ_succ d
   have h2 := Fin.prod_univ_castSucc d
-  have h3 : (∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc))
-      * ∏ j : Fin n, d (l.succAbove j) = (∏ j : Fin n, d j.succ) * ∏ j : Fin n, d j.castSucc := by
+  have h3
+      : (∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc))
+          * ∏ j : Fin n, d (l.succAbove j)
+        = (∏ j : Fin n, d j.succ) * ∏ j : Fin n, d j.castSucc := by
     rw [← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun j _ => ?_
     unfold Fin.succAbove
@@ -30,21 +32,28 @@ theorem prod_other_neighbour_raise {n : ℕ} (d : Fin (n + 1) → ℝ) (l : Fin 
     · exact mul_comm _ _
   have hpos : 0 < ∏ j : Fin n, d (l.succAbove j) := Finset.prod_pos fun j _ => hd _
   apply mul_right_cancel₀ hpos.ne'
-  calc _ = ((∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc))
-      * ∏ j : Fin n, d (l.succAbove j)) * (d 0 * d (Fin.last n)) := by ring
+  calc
+    _ = ((∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc))
+          * ∏ j : Fin n, d (l.succAbove j))
+        * (d 0 * d (Fin.last n)) := by
+      ring
     _ = (d 0 * ∏ j : Fin n, d j.succ) * ((∏ j : Fin n, d j.castSucc) * d (Fin.last n)) := by
       rw [h3]; ring
     _ = _ := by rw [← h1, ← h2, hP]
 
-theorem inv_sq_le_wP (n : ℕ) (L : Fin (n+1) → ℤ) (M : Fin n → ℤ) (l : Fin (n+1)) (D : ℝ)
+theorem inv_sq_le_wP
+    (n : ℕ) (L : Fin (n + 1) → ℤ) (M : Fin n → ℤ) (l : Fin (n + 1))
+    (D : ℝ)
     (hL : StrictAnti L) (hM : ∀ j : Fin n, L j.succ < M j ∧ M j ≤ L j.castSucc)
     (hne : ∀ j, M j ≠ L l + 1) (hD : 1 ≤ D) (h0 : (L 0 : ℝ) - L l ≤ D)
-    (hn : (L l : ℝ) - L (Fin.last n) ≤ D) : (D ^ 2)⁻¹ ≤ wP L M l := by
+    (hn : (L l : ℝ) - L (Fin.last n) ≤ D)
+    : (D ^ 2)⁻¹ ≤ wP L M l := by
   set e : Fin (n + 1) → ℤ := fun i => max |L i - L l| 1 with he
   set d : Fin (n + 1) → ℝ := fun i => (e i : ℝ) with hd
   have hdpos : ∀ i, 0 < d i := fun i => by
     have : 0 < e i := lt_of_lt_of_le one_pos (le_max_right _ _)
-    simp only [hd]; exact_mod_cast this
+    simp only [hd]
+    exact_mod_cast this
   have hdl : d l = 1 := by simp [hd, he]
   have key := prod_other_neighbour_raise d l hdpos hdl
   have hd0 : d 0 ≤ D := by
@@ -66,8 +75,9 @@ theorem inv_sq_le_wP (n : ℕ) (L : Fin (n+1) → ℤ) (M : Fin n → ℤ) (l : 
     simp only [hd, he, max_eq_left b]
     push_cast
     rfl
-  have hnum : (∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc))
-      ≤ ∏ j : Fin n, |(M j : ℝ) - 1 - L l| := by
+  have hnum
+      : (∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc))
+        ≤ ∏ j : Fin n, |(M j : ℝ) - 1 - L l| := by
     refine Finset.prod_le_prod₀ (fun j _ => (hdpos _).le) fun j _ => ?_
     obtain ⟨h1, h2⟩ := hM j
     have h3 := hne j
@@ -91,9 +101,11 @@ theorem inv_sq_le_wP (n : ℕ) (L : Fin (n+1) → ℤ) (M : Fin n → ℤ) (l : 
   have hm : d 0 * d (Fin.last n) ≤ D ^ 2 := by
     rw [sq]; exact mul_le_mul hd0 hdn (hdpos _).le (by linarith)
   have hmpos : 0 < d 0 * d (Fin.last n) := mul_pos (hdpos _) (hdpos _)
-  calc (D ^ 2)⁻¹ ≤ (d 0 * d (Fin.last n))⁻¹ := inv_anti₀ hmpos hm
-    _ = (∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc)) /
-        ((∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc))
+  calc
+    (D ^ 2)⁻¹
+      ≤ (d 0 * d (Fin.last n))⁻¹ := inv_anti₀ hmpos hm
+    _ = (∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc))
+        / ((∏ j : Fin n, d (if j.castSucc < l then j.succ else j.castSucc))
           * (d 0 * d (Fin.last n))) := by
       rw [div_mul_eq_div_div, div_self hQ.ne', one_div]
     _ ≤ _ := div_le_div_of_nonneg_right hnum (mul_pos hQ hmpos).le

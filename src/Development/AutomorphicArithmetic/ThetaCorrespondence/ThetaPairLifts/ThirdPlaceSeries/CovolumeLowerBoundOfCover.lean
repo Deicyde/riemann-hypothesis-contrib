@@ -20,18 +20,27 @@ section
 section
 set_option synthInstance.maxHeartbeats 400000
 noncomputable section
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop GlobalTheory.CovTop.MeasRd
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
+  GlobalTheory.CovTop.MeasRd
 open Formalism.MainNotions
 namespace GlobalTheory.CovTop.MeasLow
 end GlobalTheory.CovTop.MeasLow
 namespace GlobalTheory.CovTop.MeasLow
 end GlobalTheory.CovTop.MeasLow
 namespace GlobalTheory.CovTop.MeasLow
-theorem nef_share_lower_bound_alt (hP : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems) :
-    Closed FamHyp fun Fm _ => ∃ K : ℝ, 0 ≤ K ∧ _root_.GlobalTheory.CovTop.EventuallyAtAllPoints Fm fun _ _ _ p => ∀ i, -(K * unitE p) ≤ Real.log (ratAt p i) := by
+theorem nef_share_lower_bound_alt (hP : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems)
+    : Closed FamHyp fun Fm _ =>
+      ∃ K : ℝ,
+        0 ≤ K ∧ _root_.GlobalTheory.CovTop.EventuallyAtAllPoints Fm fun _ _ _ p =>
+          ∀ i, -(K * unitE p) ≤ Real.log (ratAt p i) := by
   obtain ⟨C, hC0, hC⟩ := _root_.MainStatements.Tam.Plug.tamagawa_pairs_product hP
-  refine Closed.imp (Closed.and (_root_.GlobalTheory.CovTop.Sizes.hostN_alt 1) _root_.GlobalTheory.CovTop.WtShape.wtN_z) ?_
+  refine Closed.imp
+    (Closed.and (_root_.GlobalTheory.CovTop.Sizes.hostN_alt 1)
+      _root_.GlobalTheory.CovTop.WtShape.wtN_z)
+    ?_
   rintro eps Fm CH - ⟨⟨C1, -, hE1⟩, ⟨C2, -, hE2⟩⟩
   refine ⟨6 * C + 3, by positivity, ?_⟩
   obtain ⟨x0, hx⟩ := hE1.and hE2
@@ -50,12 +59,18 @@ theorem nef_share_lower_bound_alt (hP : _root_.GlobalTheory.CovTop.PublishedHodg
   · rw [hV0, zero_mul, Real.log_zero]; exact hK0
   by_cases hQ0 : Q = 0
   · rw [hQ0, mul_zero, Real.log_zero]; exact hK0
-  have hQl : -((Fm.D x ι).R.f * (((Fm.D x ι).R.r : ℝ) ^ 2 * Real.log (((Fm.D x ι).R.r : ℝ) + 1))) ≤ Real.log Q :=
+  have hQl
+      : -((Fm.D x ι).R.f * (((Fm.D x ι).R.r : ℝ) ^ 2 * Real.log (((Fm.D x ι).R.r : ℝ) + 1)))
+        ≤ Real.log Q :=
     hdim.resolve_left hQ0
   have htop : (p.R.toRealDat.νW i) (p.R.toRealDat.fdW i) ≠ ⊤ := by
     intro h; apply hV0; rw [hV, h]; rfl
-  have hVe : Real.exp (-(C * (((Fm.D x ι).R.f : ℝ) * ((Fm.D x ι).R.r : ℝ) ^ 2 *
-      (Real.log (((Fm.D x ι).R.f : ℝ) * (Fm.D x ι).R.r + 3) + 1) + Real.log |(discr (Fm.D x ι).host.E : ℝ)|))) ≤ V :=
+  have hVe
+      : Real.exp (-(C
+          * (((Fm.D x ι).R.f : ℝ) * ((Fm.D x ι).R.r : ℝ) ^ 2
+              * (Real.log (((Fm.D x ι).R.f : ℝ) * (Fm.D x ι).R.r + 3) + 1)
+            + Real.log |(discr (Fm.D x ι).host.E : ℝ)|)))
+        ≤ V :=
     (ENNReal.ofReal_le_iff_le_toReal htop).1 hm
   have hVpos : 0 < V := lt_of_le_of_ne ENNReal.toReal_nonneg (Ne.symm hV0)
   have hlV := Real.log_le_log (Real.exp_pos _) hVe
@@ -66,11 +81,22 @@ end GlobalTheory.CovTop.MeasLow
 end
 end
 section
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop GlobalTheory.CovTop.MeasRd
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
+  GlobalTheory.CovTop.MeasRd
 open Formalism.MainNotions
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_neg_unitE_le_log_ratAt : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems → Closed FamHyp fun Fm _ => ∃ K : ℝ, 0 ≤ K ∧ _root_.GlobalTheory.CovTop.EventuallyAtAllPoints Fm fun _ _ _ p => ∀ i, -(K * unitE p) ≤ Real.log (ratAt p i) := by
-  first | exact @_root_.GlobalTheory.CovTop.MeasLow.nef_share_lower_bound_alt | exact _root_.GlobalTheory.CovTop.MeasLow.nef_share_lower_bound_alt | (intros; apply _root_.GlobalTheory.CovTop.MeasLow.nef_share_lower_bound_alt <;> assumption)
+theorem _root_.GlobalTheory.T.exists_neg_unitE_le_log_ratAt
+    : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems
+      → Closed FamHyp fun Fm _ =>
+        ∃ K : ℝ,
+          0 ≤ K ∧ _root_.GlobalTheory.CovTop.EventuallyAtAllPoints Fm fun _ _ _ p =>
+            ∀ i, -(K * unitE p) ≤ Real.log (ratAt p i) := by
+  first
+  | exact @_root_.GlobalTheory.CovTop.MeasLow.nef_share_lower_bound_alt
+  | exact _root_.GlobalTheory.CovTop.MeasLow.nef_share_lower_bound_alt
+  | (intros; apply _root_.GlobalTheory.CovTop.MeasLow.nef_share_lower_bound_alt <;> assumption)
 end
 end

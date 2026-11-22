@@ -9,20 +9,27 @@ open GlobalTheory.Pst.StLat
 
 namespace GlobalTheory.Pst.StLat
 
-theorem clos_eq_zero_of_mul_mem {R : Type} [CommRing R] [IsDomain R] (p : ℕ) (hp : p.Prime)
-    (hpu : IsUnit ((p : ℕ) : R)) (π : R) (hπ : π ≠ 0)
-    (hsep : ∀ x : R, (∀ n : ℕ, π ^ n ∣ x) → x = 0) (S : Subring R)
-    (hdiv : ∀ s ∈ S, ∀ i : ℕ, π ^ i ∣ s → ∃ s' ∈ S, s = π ^ i * s')
+theorem clos_eq_zero_of_mul_mem
+    {R : Type} [CommRing R] [IsDomain R]
+    (p : ℕ) (hp : p.Prime) (hpu : IsUnit ((p : ℕ) : R))
+    (π : R) (hπ : π ≠ 0) (hsep : ∀ x : R, (∀ n : ℕ, π ^ n ∣ x) → x = 0)
+    (S : Subring R) (hdiv : ∀ s ∈ S, ∀ i : ℕ, π ^ i ∣ s → ∃ s' ∈ S, s = π ^ i * s')
     (hres : ∀ y : R, (∀ k : ℕ, ∃ s ∈ S, π ∣ y - ((p : ℕ) : R) ^ k * s) → π ∣ y)
-    (u : R) (hlog : ∀ m : ℕ, 1 ≤ m → ∃ s ∈ S, ∃ e : R, (e = 1 ∨ e = -1) ∧
-      π ^ (2 * p ^ m) ∣ ((p : ℕ) : R) * (((p : ℕ) : R) ^ (m - 1) * u - s) - e * π ^ (p ^ m))
-    (a : R) (r : ℕ) (ha : a ∈ Clos S π) (hau : ((p : ℕ) : R) ^ r * a * u ∈ Clos S π) : a = 0 := by
+    (u : R)
+    (hlog : ∀ m : ℕ,
+      1 ≤ m
+        → ∃ s ∈ S, ∃ e : R,
+          (e = 1 ∨ e = -1)
+            ∧ π ^ (2 * p ^ m) ∣ ((p : ℕ) : R) * (((p : ℕ) : R) ^ (m - 1) * u - s) - e * π ^ (p ^ m))
+    (a : R) (r : ℕ) (ha : a ∈ Clos S π) (hau : ((p : ℕ) : R) ^ r * a * u ∈ Clos S π)
+    : a = 0 := by
   obtain ⟨q, hPq⟩ : ∃ q : R, ((p : ℕ) : R) * q = 1 := ⟨((hpu.unit⁻¹ : Rˣ) : R), hpu.mul_val_inv⟩
   have hSC : ∀ s ∈ S, s ∈ Clos S π := fun s hs n => ⟨s, hs, by simp⟩
   have hPC : ((p : ℕ) : R) ∈ Clos S π := natCast_mem _ _
 
-  have stepD : ∀ b ∈ Clos S π, ∀ r' : ℕ, ((p : ℕ) : R) ^ r' * b * u ∈ Clos S π →
-      ∃ b' ∈ Clos S π, ((p : ℕ) : R) * b' = b := by
+  have stepD
+      : ∀ b ∈ Clos S π, ∀ r' : ℕ,
+        ((p : ℕ) : R) ^ r' * b * u ∈ Clos S π → ∃ b' ∈ Clos S π, ((p : ℕ) : R) * b' = b := by
     intro b hb r' hbu
     refine ⟨q * b, ?_, by rw [← mul_assoc, hPq, one_mul]⟩
     intro n
@@ -36,8 +43,9 @@ theorem clos_eq_zero_of_mul_mem {R : Type} [CommRing R] [IsDomain R] (p : ℕ) (
     have h2M : π ^ (2 * M) = π ^ M * π ^ M := by rw [two_mul, pow_add]
     rw [h2M] at hw
     have hx : b * (((p : ℕ) : R) ^ (r' + n) * u - s) ∈ Clos S π := by
-      have : b * (((p : ℕ) : R) ^ (r' + n) * u - s) =
-          ((p : ℕ) : R) ^ n * (((p : ℕ) : R) ^ r' * b * u) - b * s := by ring
+      have : b * (((p : ℕ) : R) ^ (r' + n) * u - s)
+          = ((p : ℕ) : R) ^ n * (((p : ℕ) : R) ^ r' * b * u) - b * s := by
+        ring
       rw [this]
       exact sub_mem (mul_mem (pow_mem hPC _) hbu) (mul_mem hb (hSC s hs))
     obtain ⟨s₁, hs₁, c, hc⟩ := hx (2 * M)
@@ -56,8 +64,9 @@ theorem clos_eq_zero_of_mul_mem {R : Type} [CommRing R] [IsDomain R] (p : ℕ) (
     refine ⟨e * s₂, heS, dvd_trans (pow_dvd_pow π hnM) ⟨e * (c - q * b * w), ?_⟩⟩
     linear_combination e * hcan - (q * b) * he2
 
-  have iter : ∀ k : ℕ, ∃ b ∈ Clos S π, ((p : ℕ) : R) ^ k * b = a ∧
-      ((p : ℕ) : R) ^ (r + k) * b * u ∈ Clos S π := by
+  have iter
+      : ∀ k : ℕ, ∃ b ∈ Clos S π,
+        ((p : ℕ) : R) ^ k * b = a ∧ ((p : ℕ) : R) ^ (r + k) * b * u ∈ Clos S π := by
     intro k
     induction k with
     | zero => exact ⟨a, ha, by simp, by simpa using hau⟩
@@ -66,8 +75,9 @@ theorem clos_eq_zero_of_mul_mem {R : Type} [CommRing R] [IsDomain R] (p : ℕ) (
       obtain ⟨b', hb', hPb'⟩ := stepD b hb (r + k) hbu
       refine ⟨b', hb', ?_, ?_⟩
       · rw [pow_succ, mul_assoc, hPb', hbk]
-      · have : ((p : ℕ) : R) ^ (r + (k + 1)) * b' * u =
-            ((p : ℕ) : R) ^ (r + k) * (((p : ℕ) : R) * b') * u := by ring
+      · have : ((p : ℕ) : R) ^ (r + (k + 1)) * b' * u
+            = ((p : ℕ) : R) ^ (r + k) * (((p : ℕ) : R) * b') * u := by
+          ring
         rw [this, hPb']
         exact hbu
 
@@ -98,10 +108,14 @@ theorem clos_eq_zero_of_mul_mem {R : Type} [CommRing R] [IsDomain R] (p : ℕ) (
   intro k
   obtain ⟨b, hb, hbk, -⟩ := iter k
   obtain ⟨s, hs, hbs⟩ := hb (i + 1)
-  have hib : π ^ i ∣ b := ⟨q ^ k * a₁, by
-    have : b = q ^ k * (((p : ℕ) : R) ^ k * b) := by
-      rw [← mul_assoc, ← mul_pow, mul_comm q, hPq, one_pow, one_mul]
-    rw [this, hbk, ha₁]; ring⟩
+  have hib : π ^ i ∣ b := ⟨
+    q ^ k * a₁,
+    by
+      have : b = q ^ k * (((p : ℕ) : R) ^ k * b) := by
+        rw [← mul_assoc, ← mul_pow, mul_comm q, hPq, one_pow, one_mul]
+      rw [this, hbk, ha₁]
+      ring
+  ⟩
   have his : π ^ i ∣ s := by
     have h1 : π ^ i ∣ b - s := dvd_trans (pow_dvd_pow π (Nat.le_succ i)) hbs
     have := dvd_sub hib h1

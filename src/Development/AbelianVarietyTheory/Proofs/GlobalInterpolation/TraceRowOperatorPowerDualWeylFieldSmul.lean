@@ -14,8 +14,9 @@ open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BasicNotions Global
 noncomputable section
 namespace GlobalTheory.Alc
 
-theorem hcVal_map {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {N : ℕ} (μ : Fin N → R) (k : ℕ) :
-    hcVal S (fun i => φ (μ i)) k = φ (hcVal R μ k) := by
+theorem hcVal_map
+    {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {N : ℕ} (μ : Fin N → R) (k : ℕ)
+    : hcVal S (fun i => φ (μ i)) k = φ (hcVal R μ k) := by
   have hM : hcMat S (fun i => φ (μ i)) = (hcMat R μ).map φ := by
     ext i l
     simp only [hcMat, shift, Matrix.map_apply, Matrix.of_apply]
@@ -24,20 +25,27 @@ theorem hcVal_map {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {N : �
     rw [hM]
     exact (map_pow (RingHom.mapMatrix φ) (hcMat R μ) k).symm
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hcVal, hP, Matrix.map_apply, map_sum]
+  simp only [hcVal, hP, Matrix.map_apply, map_sum]
 
-theorem gel_dualWeyl_int (N : ℕ) (ν : Fin N → ℕ) (hν : Antitone ν) (j : ℕ) (f : MvPolynomial (Fin N × Fin N) ℤ)
-    (hf : f ∈ dualWeyl ℤ N N ν) : gel ℤ N N j f = hcVal ℤ (fun i => (ν i : ℤ)) j • f := by
+theorem gel_dualWeyl_int
+    (N : ℕ) (ν : Fin N → ℕ) (hν : Antitone ν)
+    (j : ℕ)
+    (f : MvPolynomial (Fin N × Fin N) ℤ) (hf : f ∈ dualWeyl ℤ N N ν)
+    : gel ℤ N N j f = hcVal ℤ (fun i => (ν i : ℤ)) j • f := by
   apply MvPolynomial.map_injective (Int.castRingHom ℚ) (RingHom.injective_int _)
-  rw [(GlobalTheory.T.rowPolarizationOperators_relations_divPow_baseChange ℤ N N).2.2 ℚ (Int.castRingHom ℚ) j f,
-    GlobalTheory.T.traceRowOperatorPower_dualWeyl_highestWeight N ν hν j _ (dualWeylMap ℤ ℚ (Int.castRingHom ℚ) N N ν f hf),
+  rw [(GlobalTheory.T.rowPolarizationOperators_relations_divPow_baseChange ℤ N N).2.2 ℚ
+      (Int.castRingHom ℚ) j f,
+    GlobalTheory.T.traceRowOperatorPower_dualWeyl_highestWeight N ν hν j _
+      (dualWeylMap ℤ ℚ (Int.castRingHom ℚ) N N ν f hf),
     smul_eq_C_mul, smul_eq_C_mul, map_mul, map_C]
   congr 2
   rw [← hcVal_map]
   simp
 
-theorem gel_dualWeyl_field : ∀ (k : Type) [Field k] (N : ℕ) (ν : Fin N → ℕ), Antitone ν → ∀ j : ℕ,
-    ∀ f ∈ dualWeyl k N N ν, gel k N N j f = hcVal k (fun i => (ν i : k)) j • f := by
+theorem gel_dualWeyl_field
+    : ∀ (k : Type) [Field k] (N : ℕ) (ν : Fin N → ℕ),
+      Antitone ν
+        → ∀ j : ℕ, ∀ f ∈ dualWeyl k N N ν, gel k N N j f = hcVal k (fun i => (ν i : k)) j • f := by
   intro k _ N ν hν j f hf
   rw [standardMonomialSpanDomain k N N ν] at hf
   induction hf using Submodule.span_induction with
@@ -51,8 +59,10 @@ theorem gel_dualWeyl_field : ∀ (k : Type) [Field k] (N : ℕ) (ν : Fin N → 
       ext p q
       simp
     have hmem : bideterminant ℤ sz hsz I ∈ dualWeyl ℤ N N ν := hsh ▸ bidetMem ℤ N N K sz hsz I
-    rw [hb, ← (GlobalTheory.T.rowPolarizationOperators_relations_divPow_baseChange ℤ N N).2.2 k (Int.castRingHom k) j, gel_dualWeyl_int N ν hν j _ hmem,
-      smul_eq_C_mul, smul_eq_C_mul, map_mul, map_C]
+    rw [hb,
+      ← (GlobalTheory.T.rowPolarizationOperators_relations_divPow_baseChange ℤ N N).2.2 k
+        (Int.castRingHom k) j,
+      gel_dualWeyl_int N ν hν j _ hmem, smul_eq_C_mul, smul_eq_C_mul, map_mul, map_C]
     congr 2
     rw [← hcVal_map]
     simp

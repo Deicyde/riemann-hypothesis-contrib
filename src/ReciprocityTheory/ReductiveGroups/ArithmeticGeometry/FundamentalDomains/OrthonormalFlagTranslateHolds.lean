@@ -28,18 +28,19 @@ lemma bdiag_ne {b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r) (τ : X.Ψ) (j : Fin r
   rw [Matrix.det_of_upperTriangular (upper_of_bor X hb τ)] at h1
   exact (Finset.prod_ne_zero_iff.1 h1) j (Finset.mem_univ _)
 
-private theorem sum_eq_sum_castLE_of_eq_zero {n m : ℕ} (h : m ≤ n) (f : Fin n → ℂ)
-    (hf : ∀ j : Fin n, m ≤ j.val → f j = 0) :
-    ∑ j, f j = ∑ j : Fin m, f (Fin.castLE h j) := by
-  refine Eq.trans ?_ (Finset.sum_map (Finset.univ : Finset (Fin m)) ⟨Fin.castLE h, Fin.castLE_injective h⟩ f)
+private theorem sum_eq_sum_castLE_of_eq_zero
+    {n m : ℕ} (h : m ≤ n) (f : Fin n → ℂ) (hf : ∀ j : Fin n, m ≤ j.val → f j = 0)
+    : ∑ j, f j = ∑ j : Fin m, f (Fin.castLE h j) := by
+  refine Eq.trans ?_
+    (Finset.sum_map (Finset.univ : Finset (Fin m)) ⟨Fin.castLE h, Fin.castLE_injective h⟩ f)
   refine (Finset.sum_subset (Finset.subset_univ _) fun j _ hj => hf j ?_).symm
   by_contra hlt
   push_neg at hlt
   exact hj (Finset.mem_map.2 ⟨⟨j.val, hlt⟩, Finset.mem_univ _, Fin.ext rfl⟩)
 
-private theorem gram_eq_lemma {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
-    (M : Matrix (Fin r) (Fin r) ℂ) :
-    gram τ G M = Mᵀ * G.map τ * M.map (starRingEnd ℂ) := by
+private theorem gram_eq_lemma
+    {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (M : Matrix (Fin r) (Fin r) ℂ)
+    : gram τ G M = Mᵀ * G.map τ * M.map (starRingEnd ℂ) := by
   ext a c
   simp only [gram, Matrix.of_apply, hermC, col, Matrix.mul_apply, Matrix.transpose_apply,
     Matrix.map_apply, Finset.sum_mul]
@@ -140,13 +141,16 @@ lemma pnorm_rmul (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ)
   simp only [Finset.prod_mul_distrib]
   ring
 
-private theorem hermC_sub_left_of_natDim {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
-    (u v w : Fin r → ℂ) : hermC τ G (u - v) w = hermC τ G u w - hermC τ G v w := by
+private theorem hermC_sub_left_of_natDim
+    {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (u v w : Fin r → ℂ)
+    : hermC τ G (u - v) w = hermC τ G u w - hermC τ G v w := by
   simp only [hermC, Pi.sub_apply, sub_mul, Finset.sum_sub_distrib]
 
-private theorem hermC_eq_zero_of_mem_span' {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (w : Fin r → ℂ)
-    (S : Set (Fin r → ℂ)) (h : ∀ s ∈ S, hermC τ G w s = 0) {v : Fin r → ℂ}
-    (hv : v ∈ Submodule.span ℂ S) : hermC τ G w v = 0 := by
+private theorem hermC_eq_zero_of_mem_span'
+    {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (w : Fin r → ℂ) (S : Set (Fin r → ℂ))
+    (h : ∀ s ∈ S, hermC τ G w s = 0)
+    {v : Fin r → ℂ} (hv : v ∈ Submodule.span ℂ S)
+    : hermC τ G w v = 0 := by
   induction hv using Submodule.span_induction with
   | mem x hx => exact h x hx
   | zero => simp [hermC]
@@ -208,8 +212,12 @@ end FrameDegreeData
 
 theorem orthonormalFlagTranslate_holds : OrthonormalFlagTranslate (E := E) := by
   intro r X
-  refine ⟨fun x hx => ⟨FrameDegreeData.bOf X x, FrameDegreeData.bOf_mem X hx, FrameDegreeData.ortho_bOf X hx⟩,
-    fun la P hP x hx b hb => FrameDegreeData.pnorm_rmul X la P hP x hx b hb, fun x hx x' hx' h => ?_⟩
+  refine ⟨
+    fun x hx =>
+      ⟨FrameDegreeData.bOf X x, FrameDegreeData.bOf_mem X hx, FrameDegreeData.ortho_bOf X hx⟩,
+    fun la P hP x hx b hb => FrameDegreeData.pnorm_rmul X la P hP x hx b hb,
+    fun x hx x' hx' h => ?_
+  ⟩
   have hpp := FrameDegreeData.ppos_sameFlag X hx hx' h
   have hJ : X.Jz x = X.Jz x' := by
     funext u τ

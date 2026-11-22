@@ -11,35 +11,48 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module UpperTheory.V UpperTheory.V.Fr UpperTheory.V.GC
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module
+  UpperTheory.V UpperTheory.V.Fr UpperTheory.V.GC
 
 section SlopeTestRemainingChoices
 
 open Formalism.GaloisCohomology UpperTheory.V.Base
 
-private theorem dz_locConst {Γ A : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group A] (ψ : Γ →* A)
-    (h : IsOpen (ψ.ker : Set Γ)) : IsLocallyConstant ψ :=
+private theorem dz_locConst
+    {Γ A : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group A]
+    (ψ : Γ →* A) (h : IsOpen (ψ.ker : Set Γ))
+    : IsLocallyConstant ψ :=
   _root_.UpperTheory.Reformulated.B.LocallyConstantOfKernel.lc_of_ker ψ h
 
-private theorem dz_exists_prime {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (n : ℕ) (hn : n ≠ 0) (h : (n : 𝓞 F) ∈ v.asIdeal) :
-    ∃ p : ℕ, p.Prime ∧ p ∣ n ∧ (p : 𝓞 F) ∈ v.asIdeal :=
+private theorem dz_exists_prime
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (n : ℕ) (hn : n ≠ 0) (h : (n : 𝓞 F) ∈ v.asIdeal)
+    : ∃ p : ℕ, p.Prime ∧ p ∣ n ∧ (p : 𝓞 F) ∈ v.asIdeal :=
   _root_.UpperTheory.Reformulated.B.Qk5.dz_exists_prime v n hn h
 
-private theorem dz_not_both {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) {a b : ℕ} (hab : a.Coprime b) (ha : (a : 𝓞 F) ∈ v.asIdeal)
-    (hb : (b : 𝓞 F) ∈ v.asIdeal) : False := by
+private theorem dz_not_both
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F))
+    {a b : ℕ} (hab : a.Coprime b) (ha : (a : 𝓞 F) ∈ v.asIdeal) (hb : (b : 𝓞 F) ∈ v.asIdeal)
+    : False := by
   obtain ⟨x, y, h⟩ : IsCoprime (a : 𝓞 F) (b : 𝓞 F) := hab.cast
   exact v.isPrime.ne_top ((Ideal.eq_top_iff_one _).2
     (h ▸ v.asIdeal.add_mem (v.asIdeal.mul_mem_left _ ha) (v.asIdeal.mul_mem_left _ hb)))
 
-private theorem dz_val {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (hv : IsPlaceOver A v) (n : ℕ) :
-    A.valuation (n : Ω) < 1 ↔ ((n : ℕ) : 𝓞 F) ∈ v.asIdeal := by
+private theorem dz_val
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (hv : IsPlaceOver A v)
+    (n : ℕ)
+    : A.valuation (n : Ω) < 1 ↔ ((n : ℕ) : 𝓞 F) ∈ v.asIdeal := by
   have h := hv ((n : ℕ) : 𝓞 F)
   have e : algebraMap F Ω (((n : ℕ) : 𝓞 F) : F) = (n : Ω) := by simp
   rw [e] at h
   exact h
 
-private theorem dz_order {q n m : ℕ} (hq : 1 < q) (hn : 0 < n) (hm : m + 1 = q ^ n) (u : (ZMod m)ˣ)
-    (hu : (u : ZMod m) = q) : orderOf u = n := by
+private theorem dz_order
+    {q n m : ℕ}
+    (hq : 1 < q) (hn : 0 < n) (hm : m + 1 = q ^ n) (u : (ZMod m)ˣ) (hu : (u : ZMod m) = q)
+    : orderOf u = n := by
   rw [orderOf_eq_iff hn]
   refine ⟨Units.ext ?_, fun k hk hk0 h => ?_⟩
   · rw [Units.val_pow_eq_pow_val, hu, ← Nat.cast_pow, ← hm]
@@ -53,28 +66,39 @@ private theorem dz_order {q n m : ℕ} (hq : 1 < q) (hn : 0 < n) (hm : m + 1 = q
     have h5 := Nat.le_of_dvd (by omega) h4
     omega
 
-private theorem dz_frob (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F))
-    (hv : IsPlaceOver A v) (D I : Subgroup (G F Ω)) (hD : D = Dec (F := F) A) (hI : I = Ine (F := F) A) :
-    ∃ φ : D, IsFrob (F := F) A (normV v) φ.1 ∧ (I.subgroupOf D ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤ ∧
-      ∀ n : ℕ, 0 < n → ∃ d : D →* Multiplicative (ZMod n), IsLocallyConstant d ∧ (∀ s ∈ I.subgroupOf D, d s = 1) ∧
-        d φ = Multiplicative.ofAdd 1 := by
+private theorem dz_frob
+    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)) (hv : IsPlaceOver A v)
+    (D I : Subgroup (G F Ω)) (hD : D = Dec (F := F) A) (hI : I = Ine (F := F) A)
+    : ∃ φ : D,
+      IsFrob (F := F) A (normV v) φ.1 ∧ (I.subgroupOf D ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤
+        ∧ ∀ n : ℕ,
+          0 < n
+            → ∃ d : D →* Multiplicative (ZMod n),
+              IsLocallyConstant d ∧ (∀ s ∈ I.subgroupOf D, d s = 1)
+                ∧ d φ = Multiplicative.ofAdd 1 := by
   subst hD hI
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   haveI : IsGalois F Ω := {}
   obtain ⟨γ, hγ⟩ := exists_isFrob hv
   refine ⟨⟨γ, hγ.1⟩, hγ, ?_, fun n hn => ?_⟩
-  · have key := ProfiniteGrp.closedSubgroup_eq_sInf_open (G := G F Ω)
-      ⟨(Ine (F := F) A ⊔ Subgroup.zpowers γ).topologicalClosure, Subgroup.isClosed_topologicalClosure _⟩
+  · have key :=
+      ProfiniteGrp.closedSubgroup_eq_sInf_open (G := G F Ω) ⟨
+        (Ine (F := F) A ⊔ Subgroup.zpowers γ).topologicalClosure,
+        Subgroup.isClosed_topologicalClosure _
+      ⟩
     have h1 : Dec (F := F) A ≤ (Ine (F := F) A ⊔ Subgroup.zpowers γ).topologicalClosure := by
       refine le_trans (le_sInf ?_) key.ge
       rintro N ⟨hNo, hN⟩
       have h := (Subgroup.le_topologicalClosure _).trans hN
       exact Kum.decGen F Ω A _ γ N hv hγ hNo (le_sup_left.trans h)
         (h (Subgroup.mem_sup_right (Subgroup.mem_zpowers γ)))
-    have h2 : ((Ine (F := F) A).subgroupOf (Dec (F := F) A) ⊔
-        Subgroup.zpowers (⟨γ, hγ.1⟩ : Dec (F := F) A)).map (Dec (F := F) A).subtype =
-        Ine (F := F) A ⊔ Subgroup.zpowers γ := by
-      rw [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, MonoidHom.map_zpowers, inf_eq_left.2 (Ine_le_Dec A)]
+    have h2
+        : ((Ine (F := F) A).subgroupOf (Dec (F := F) A)
+            ⊔ Subgroup.zpowers (⟨γ, hγ.1⟩ : Dec (F := F) A)).map (Dec (F := F) A).subtype
+          = Ine (F := F) A ⊔ Subgroup.zpowers γ := by
+      rw [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, MonoidHom.map_zpowers,
+        inf_eq_left.2 (Ine_le_Dec A)]
       rfl
     rw [eq_top_iff]
     intro x _
@@ -86,7 +110,8 @@ private theorem dz_frob (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Alge
     have hq1 : 1 < normV v := by
       rw [hq]
       have h0 : Ideal.absNorm v.asIdeal ≠ 0 := fun h => v.ne_bot (Ideal.absNorm_eq_zero_iff.1 h)
-      have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h => v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h)
+      have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h =>
+        v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h)
       omega
     have hqv : ((normV v : ℕ) : 𝓞 F) ∈ v.asIdeal := hq ▸ Ideal.absNorm_mem _
     obtain ⟨p, hp, hpq, hpv⟩ := dz_exists_prime v _ (by omega) hqv
@@ -108,7 +133,8 @@ private theorem dz_frob (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Alge
         have h1 : A.valuation ζ ^ m = 1 := by rw [← map_pow, hζ.pow_eq_one, map_one]
         exact ((pow_eq_one_iff_left (NeZero.ne m)).1 h1).le
       have h2 : γ ζ = ζ ^ normV v := by
-        refine (LDataCardLeFinrank.ineFixRoots F Ω p A hA m hmp (ζ ^ normV v) ?_).1 (γ ζ) ?_ (hγ.2 ζ hv1)
+        refine (LDataCardLeFinrank.ineFixRoots F Ω p A hA m hmp (ζ ^ normV v) ?_).1 (γ ζ) ?_
+          (hγ.2 ζ hv1)
         · rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]
         · rw [← map_pow, hζ.pow_eq_one, map_one]
       rw [Chr.cls_spec m γ ζ hζ.pow_eq_one, pow_eq_pow_mod (normV v) hζ.pow_eq_one] at h2
@@ -118,7 +144,8 @@ private theorem dz_frob (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Alge
     have hle : Dec (F := F) A ≤ (Subgroup.zpowers (Chr.cls F Ω m γ)).comap (Chr.cls F Ω m) := by
       have hk : (Chr.cls F Ω m).ker ≤ (Subgroup.zpowers (Chr.cls F Ω m γ)).comap (Chr.cls F Ω m) :=
         Subgroup.ker_le_comap _ _
-      exact Kum.decGen F Ω A _ γ _ hv hγ (Subgroup.isOpen_mono hk hopen) (hI.trans hk) (Subgroup.mem_zpowers _)
+      exact Kum.decGen F Ω A _ γ _ hv hγ (Subgroup.isOpen_mono hk hopen) (hI.trans hk)
+        (Subgroup.mem_zpowers _)
     let f : Dec (F := F) A →* Subgroup.zpowers (Chr.cls F Ω m γ) :=
       ((Chr.cls F Ω m).comp (Dec (F := F) A).subtype).codRestrict _ fun x => hle x.2
     have hg : ∀ x : Subgroup.zpowers (Chr.cls F Ω m γ), x ∈ Subgroup.zpowers (f ⟨γ, hγ.1⟩) := by
@@ -126,8 +153,14 @@ private theorem dz_frob (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Alge
       exact ⟨k, rfl⟩
     have hc : Nat.card (Subgroup.zpowers (Chr.cls F Ω m γ)) = n := by rw [Nat.card_zpowers, hord]
     have hf1 : ∀ s : Dec (F := F) A, Chr.cls F Ω m s = 1 → f s = 1 := fun s hs => Subtype.ext hs
-    refine ⟨(zmodMulEquivOfGenerator hg hc).symm.toMonoidHom.comp f, dz_locConst _ ?_, fun s hs => ?_, ?_⟩
-    · refine Subgroup.isOpen_mono (H₁ := (Chr.cls F Ω m).ker.subgroupOf _) (fun s hs => ?_)
+    refine ⟨
+      (zmodMulEquivOfGenerator hg hc).symm.toMonoidHom.comp f,
+      dz_locConst _ ?_,
+      fun s hs => ?_,
+      ?_
+    ⟩
+    · refine Subgroup.isOpen_mono (H₁ := (Chr.cls F Ω m).ker.subgroupOf _)
+        (fun s hs => ?_)
         (hopen.preimage continuous_subtype_val)
       rw [MonoidHom.mem_ker, MonoidHom.comp_apply, hf1 s hs, map_one]
     · rw [MonoidHom.comp_apply, hf1 s (hI hs), map_one]
@@ -135,9 +168,19 @@ private theorem dz_frob (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Alge
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.GC.decZhat :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (v : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω), IsPlaceOver A v →
-    ∃ φ : Dec (F := F) A, IsFrob (F := F) A (normV v) φ.1 ∧ ((Ine (F := F) A).subgroupOf (Dec (F := F) A) ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤ ∧
-    ∀ n : ℕ, 0 < n → ∃ d : Dec (F := F) A →* Multiplicative (ZMod n), IsLocallyConstant d ∧ (∀ s ∈ (Ine (F := F) A).subgroupOf (Dec (F := F) A), d s = 1) ∧ d φ = Multiplicative.ofAdd 1 := by
+theorem UpperTheory.V.GC.decZhat
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (v : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω),
+      IsPlaceOver A v
+        → ∃ φ : Dec (F := F) A,
+          IsFrob (F := F) A (normV v) φ.1
+            ∧ ((Ine (F := F) A).subgroupOf (Dec (F := F) A) ⊔ Subgroup.zpowers φ).topologicalClosure
+              = ⊤
+            ∧ ∀ n : ℕ,
+              0 < n
+                → ∃ d : Dec (F := F) A →* Multiplicative (ZMod n),
+                  IsLocallyConstant d
+                    ∧ (∀ s ∈ (Ine (F := F) A).subgroupOf (Dec (F := F) A), d s = 1)
+                    ∧ d φ = Multiplicative.ofAdd 1 := by
   intro F Ω _ _ _ _ _ v A hv
   exact dz_frob F Ω A v hv _ _ rfl rfl

@@ -21,20 +21,20 @@ theorem herm_isHermitian (y : E n) : (herm y).IsHermitian := by
   push_cast
   ring
 
-theorem normSq_herm (y : E n) (i j : Fin n) :
-    Complex.normSq (herm y i j) = (y i j ^ 2 + y j i ^ 2) / 2 := by
+theorem normSq_herm (y : E n) (i j : Fin n)
+    : Complex.normSq (herm y i j) = (y i j ^ 2 + y j i ^ 2) / 2 := by
   simp only [herm, Complex.normSq_apply]
   simp
   ring
 
-theorem sum_normSq_herm (y : E n) :
-    ∑ i, ∑ j, Complex.normSq (herm y i j) = ∑ a, ∑ b, y a b ^ 2 := by
+theorem sum_normSq_herm (y : E n)
+    : ∑ i, ∑ j, Complex.normSq (herm y i j) = ∑ a, ∑ b, y a b ^ 2 := by
   simp_rw [normSq_herm, ← Finset.sum_div, Finset.sum_add_distrib]
   rw [Finset.sum_comm (f := fun i j => y j i ^ 2)]
   ring
 
-theorem one_add_sum_le_prod (s : Finset (Fin n)) (a : Fin n → ℝ) (ha : ∀ i, 0 ≤ a i) :
-    1 + ∑ i ∈ s, a i ≤ ∏ i ∈ s, (1 + a i) := by
+theorem one_add_sum_le_prod (s : Finset (Fin n)) (a : Fin n → ℝ) (ha : ∀ i, 0 ≤ a i)
+    : 1 + ∑ i ∈ s, a i ≤ ∏ i ∈ s, (1 + a i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -43,9 +43,9 @@ theorem one_add_sum_le_prod (s : Finset (Fin n)) (a : Fin n → ℝ) (ha : ∀ i
     have h0 : 0 ≤ ∑ i ∈ s, a i := Finset.sum_nonneg fun i _ => ha i
     nlinarith [ha j]
 
-theorem dP_eq_prod (y : E n) :
-    dP y = ∏ i, (1 + (herm_isHermitian y).eigenvalues i ^ 2) ∧
-      ∑ a, ∑ b, y a b ^ 2 = ∑ i, (herm_isHermitian y).eigenvalues i ^ 2 := by
+theorem dP_eq_prod (y : E n)
+    : dP y = ∏ i, (1 + (herm_isHermitian y).eigenvalues i ^ 2)
+      ∧ ∑ a, ∑ b, y a b ^ 2 = ∑ i, (herm_isHermitian y).eigenvalues i ^ 2 := by
   set hA := herm_isHermitian y
   set U : Matrix (Fin n) (Fin n) ℂ := (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hU
   set D : Matrix (Fin n) (Fin n) ℂ := diagonal (RCLike.ofReal ∘ hA.eigenvalues) with hD
@@ -76,7 +76,8 @@ theorem dP_eq_prod (y : E n) :
       simp only [Matrix.mul_assoc]
       rw [← Matrix.mul_assoc (star U) U, hUs, Matrix.one_mul]
     have htr : (herm y * herm y).trace = ∑ i, ((hA.eigenvalues i ^ 2 : ℝ) : ℂ) := by
-      rw [hsq2, trace_mul_comm, ← Matrix.mul_assoc, hUs, Matrix.one_mul, hD, diagonal_mul_diagonal, trace_diagonal]
+      rw [hsq2, trace_mul_comm, ← Matrix.mul_assoc, hUs, Matrix.one_mul, hD, diagonal_mul_diagonal,
+        trace_diagonal]
       simp [pow_two]
     have hre : (herm y * herm y).trace.re = ∑ i, ∑ j, Complex.normSq (herm y i j) := by
       rw [trace]
@@ -96,7 +97,8 @@ theorem dP_ge (y : E n) : 1 + ∑ a, ∑ b, y a b ^ 2 ≤ dP y := by
   exact one_add_sum_le_prod _ _ fun i => sq_nonneg _
 
 theorem dP_pos (y : E n) : 0 < dP y := by
-  have h0 : 0 ≤ ∑ a, ∑ b, y a b ^ 2 := Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b _ => sq_nonneg _
+  have h0 : 0 ≤ ∑ a, ∑ b, y a b ^ 2 :=
+    Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b _ => sq_nonneg _
   linarith [dP_ge y]
 
 theorem continuous_herm : Continuous (herm : E n → Matrix (Fin n) (Fin n) ℂ) := by
@@ -106,21 +108,29 @@ theorem continuous_herm : Continuous (herm : E n → Matrix (Fin n) (Fin n) ℂ)
 
 theorem continuous_dP : Continuous (dP : E n → ℝ) := by
   unfold dP
-  have : Continuous fun y : E n => 1 + herm y * herm y := continuous_const.add (continuous_herm.matrix_mul continuous_herm)
+  have : Continuous fun y : E n => 1 + herm y * herm y :=
+    continuous_const.add (continuous_herm.matrix_mul continuous_herm)
   exact Complex.continuous_re.comp this.matrix_det
 
 theorem norm_sq_le_sum (y : E n) : ‖y‖ ^ 2 ≤ ∑ a, ∑ b, y a b ^ 2 := by
-  have h0 : 0 ≤ ∑ a, ∑ b, y a b ^ 2 := Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b _ => sq_nonneg _
+  have h0 : 0 ≤ ∑ a, ∑ b, y a b ^ 2 :=
+    Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b _ => sq_nonneg _
   have hle : ‖y‖ ≤ Real.sqrt (∑ a, ∑ b, y a b ^ 2) := by
     refine (pi_norm_le_iff_of_nonneg (Real.sqrt_nonneg _)).2 fun a => ?_
     refine (pi_norm_le_iff_of_nonneg (Real.sqrt_nonneg _)).2 fun b => ?_
     rw [Real.norm_eq_abs]
     refine Real.abs_le_sqrt ?_
-    calc y a b ^ 2 ≤ ∑ b', y a b' ^ 2 := Finset.single_le_sum (fun b' _ => sq_nonneg (y a b')) (Finset.mem_univ b)
+    calc
+      y a b ^ 2 ≤ ∑ b', y a b' ^ 2 :=
+        Finset.single_le_sum (fun b' _ => sq_nonneg (y a b')) (Finset.mem_univ b)
       _ ≤ ∑ a', ∑ b', y a' b' ^ 2 :=
-        Finset.single_le_sum (f := fun a' => ∑ b', y a' b' ^ 2) (fun a' _ => Finset.sum_nonneg fun b' _ => sq_nonneg _)
+        Finset.single_le_sum
+          (f := fun a' => ∑ b', y a' b' ^ 2)
+          (fun a' _ => Finset.sum_nonneg fun b' _ => sq_nonneg _)
           (Finset.mem_univ a)
-  calc ‖y‖ ^ 2 ≤ Real.sqrt (∑ a, ∑ b, y a b ^ 2) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) hle 2
+  calc
+    ‖y‖ ^ 2
+      ≤ Real.sqrt (∑ a, ∑ b, y a b ^ 2) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) hle 2
     _ = _ := Real.sq_sqrt h0
 
 theorem integr : Integr := by

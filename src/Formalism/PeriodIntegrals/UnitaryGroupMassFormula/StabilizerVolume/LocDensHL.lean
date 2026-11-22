@@ -12,15 +12,22 @@ namespace PI.VolStabS
 namespace LatFactsW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
-  {d : ℕ} (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  {d : ℕ} (b : Module.Basis (Fin d) F E)
+  (v : HeightOneSpectrum (𝓞 F))
 
-theorem smul_mem_latSub {a M : ℕ} {s : Fv F v} (hs : s ∈ v.adicCompletionIntegers F)
-    {x : Fin a → Fin M → Fv F v ⊗[F] E} (hx : x ∈ latSub b v a M) : s • x ∈ latSub b v a M := by
-  have hx' : ∀ i j k, (Algebra.TensorProduct.basis (Fv F v) b).repr (x i j) k ∈
-      v.adicCompletionIntegers F := hx
+theorem smul_mem_latSub
+    {a M : ℕ} {s : Fv F v} (hs : s ∈ v.adicCompletionIntegers F)
+    {x : Fin a → Fin M → Fv F v ⊗[F] E} (hx : x ∈ latSub b v a M)
+    : s • x ∈ latSub b v a M := by
+  have hx'
+      : ∀ i j k,
+        (Algebra.TensorProduct.basis (Fv F v) b).repr (x i j) k ∈ v.adicCompletionIntegers F :=
+    hx
   show ∀ i j k, (Algebra.TensorProduct.basis (Fv F v) b).repr ((s • x) i j) k ∈
       v.adicCompletionIntegers F
   intro i j k
@@ -30,8 +37,8 @@ theorem smul_mem_latSub {a M : ℕ} {s : Fv F v} (hs : s ∈ v.adicCompletionInt
 theorem isOpen_hermO (σ : E →ₐ[F] E) (a : ℕ) : IsOpen (hermO b v σ a : Set (HermR (Fv F v) σ a)) :=
   continuous_subtype_val.isOpen_preimage _ (PositiveNearLattice.isClopen_latV b v a a).isOpen
 
-theorem isCompact_hermO (σ : E →ₐ[F] E) (a : ℕ) :
-    IsCompact (hermO b v σ a : Set (HermR (Fv F v) σ a)) := by
+theorem isCompact_hermO (σ : E →ₐ[F] E) (a : ℕ)
+    : IsCompact (hermO b v σ a : Set (HermR (Fv F v) σ a)) := by
   have := locallyCompact_Fv F v
   exact (isClosed_HermR (Fv F v) σ a).isClosedEmbedding_subtypeVal.isCompact_preimage
     (PositiveNearLattice.isCompact_latV b v a a)
@@ -45,7 +52,8 @@ instance contSMul_herm (σ : E →ₐ[F] E) (a : ℕ) : ContinuousSMul (Fv F v) 
 end LatFactsW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW LatFactsW
+open NumberField IsDedekindDomain Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW LatFactsW
 
 theorem latFacts_holds : LatFacts := by
   intro F E _ _ _ _ _ σ d b a M v
@@ -67,8 +75,10 @@ theorem latFacts_holds : LatFacts := by
   · exact isOpen_smulSub _ (pow_ne_zero _ h0) _ (isOpen_hermO b v σ a)
   · exact isCompact_smulSub _ _ (isCompact_hermO b v σ a)
   · intro N hN
-    obtain ⟨k, hk⟩ := eventually_smul_sub (hermO b v σ a : Set (HermR (Fv F v) σ a))
-      (isCompact_hermO b v σ a) (fun k => unifV v ^ (k + 1)) (hπ.comp (tendsto_add_atTop_nat 1)) N hN
+    obtain ⟨k, hk⟩ :=
+      eventually_smul_sub (hermO b v σ a : Set (HermR (Fv F v) σ a)) (isCompact_hermO b v σ a)
+        (fun k => unifV v ^ (k + 1))
+        (hπ.comp (tendsto_add_atTop_nat 1)) N hN
     refine ⟨k, ?_⟩
     simp only [hF, coe_smulSub]
     rintro _ ⟨p, hp, rfl⟩

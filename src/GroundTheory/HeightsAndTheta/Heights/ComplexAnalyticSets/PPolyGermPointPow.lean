@@ -18,23 +18,28 @@ noncomputable section
 
 namespace PolyGermPointPow
 
-theorem coeff_eq_zero_of_isBigO {P : Polynomial ℂ} {k : ℕ}
-    (h : (fun t => P.eval t) =O[𝓝 0] fun t : ℂ => ‖t‖ ^ k) : ∀ d < k, P.coeff d = 0 := by
+theorem coeff_eq_zero_of_isBigO
+    {P : Polynomial ℂ} {k : ℕ} (h : (fun t => P.eval t) =O[𝓝 0] fun t : ℂ => ‖t‖ ^ k)
+    : ∀ d < k, P.coeff d = 0 := by
   induction k with
   | zero => intro d hd; exact absurd hd (Nat.not_lt_zero _)
   | succ k ih =>
-    have hn : (fun t : ℂ => ‖t‖) =O[𝓝 0] fun _ => (1 : ℝ) := (continuous_norm.tendsto (0 : ℂ)).isBigO_one ℝ
-    have hk := ih (h.trans (by simpa [pow_succ] using (isBigO_refl (fun t : ℂ => ‖t‖ ^ k) _).mul hn))
+    have hn : (fun t : ℂ => ‖t‖) =O[𝓝 0] fun _ => (1 : ℝ) :=
+      (continuous_norm.tendsto (0 : ℂ)).isBigO_one ℝ
+    have hk :=
+      ih (h.trans (by simpa [pow_succ] using (isBigO_refl (fun t : ℂ => ‖t‖ ^ k) _).mul hn))
     obtain ⟨Q, hQ⟩ := Polynomial.X_pow_dvd_iff.mpr hk
     intro d hd
     rcases Nat.lt_succ_iff_lt_or_eq.mp hd with hd | hd
     · exact hk d hd
-    rw [hd, hQ, Polynomial.coeff_X_pow_mul', if_pos le_rfl, Nat.sub_self, Polynomial.coeff_zero_eq_eval_zero]
+    rw [hd, hQ, Polynomial.coeff_X_pow_mul', if_pos le_rfl, Nat.sub_self,
+      Polynomial.coeff_zero_eq_eval_zero]
     obtain ⟨c, hc⟩ := h.bound
     have h1 : ∀ᶠ t in 𝓝[≠] (0 : ℂ), ‖Q.eval t‖ ≤ c * ‖t‖ := by
       filter_upwards [nhdsWithin_le_nhds hc, self_mem_nhdsWithin] with t ht ht0
-      rw [hQ, Polynomial.eval_mul, Polynomial.eval_pow, Polynomial.eval_X, norm_mul, norm_pow, norm_pow,
-        norm_norm, pow_succ] at ht
+      rw [hQ, Polynomial.eval_mul, Polynomial.eval_pow, Polynomial.eval_X, norm_mul, norm_pow,
+          norm_pow, norm_norm, pow_succ]
+        at ht
       have hp : 0 < ‖t‖ ^ k := pow_pos (norm_pos_iff.mpr ht0) k
       exact le_of_mul_le_mul_left (by linarith) hp
     have h2 : Tendsto (fun t => ‖Q.eval t‖) (𝓝[≠] 0) (𝓝 ‖Q.eval 0‖) :=
@@ -43,15 +48,19 @@ theorem coeff_eq_zero_of_isBigO {P : Polynomial ℂ} {k : ℕ}
       simpa using ((continuous_norm.tendsto (0 : ℂ)).const_mul c).mono_left nhdsWithin_le_nhds
     exact norm_le_zero_iff.mp (le_of_tendsto_of_tendsto h2 h3 h1)
 
-theorem eval_smul_of_isHomogeneous {σ : Type} [Fintype σ] {h : MvPolynomial σ ℂ} {d : ℕ}
-    (hh : h.IsHomogeneous d) (t : ℂ) (v : σ → ℂ) : eval (t • v) h = t ^ d * eval v h :=
+theorem eval_smul_of_isHomogeneous
+    {σ : Type} [Fintype σ]
+    {h : MvPolynomial σ ℂ} {d : ℕ} (hh : h.IsHomogeneous d)
+    (t : ℂ) (v : σ → ℂ)
+    : eval (t • v) h = t ^ d * eval v h :=
   _root_.UpperTheory.Reformulated.B.HomogeneousEvalSmul.eval_smul_of_isHomogeneous hh t v
 
 variable {σ : Type} [Fintype σ] (w : σ → ℂ)
 
 def bigOIdeal (k : ℕ) : Ideal (holGerms w) where
-  carrier := {φ | ∃ f : (σ → ℂ) → ℂ, (f : Germ (𝓝 w) ℂ) = (φ : Germ (𝓝 w) ℂ) ∧
-    f =O[𝓝 w] fun z => ‖z - w‖ ^ k}
+  carrier :=
+    {φ | ∃ f : (σ → ℂ) → ℂ, (f : Germ (𝓝 w) ℂ) = (φ : Germ (𝓝 w) ℂ) ∧
+      f =O[𝓝 w] fun z => ‖z - w‖ ^ k}
   add_mem' := by
     rintro φ ψ ⟨f, hf, hfO⟩ ⟨g, hg, hgO⟩
     exact ⟨f + g, by rw [Subring.coe_add, ← hf, ← hg]; rfl, hfO.add hgO⟩
@@ -95,13 +104,14 @@ theorem pointIdeal_pow_le (k : ℕ) : holGermPointIdeal w ^ k ≤ bigOIdeal w k 
     rw [pow_succ]
     exact (Ideal.mul_mono ih (pointIdeal_le_bigOIdeal_one w)).trans (bigOIdeal_mul_le w k 1)
 
-theorem mem_pow_ker_of_isBigO {k : ℕ} {q : MvPolynomial σ ℂ}
-    (hq : (fun z => eval z q) =O[𝓝 w] fun z => ‖z - w‖ ^ k) :
-    q ∈ RingHom.ker (MvPolynomial.eval w) ^ k := by
+theorem mem_pow_ker_of_isBigO
+    {k : ℕ} {q : MvPolynomial σ ℂ} (hq : (fun z => eval z q) =O[𝓝 w] fun z => ‖z - w‖ ^ k)
+    : q ∈ RingHom.ker (MvPolynomial.eval w) ^ k := by
   set q' := bind₁ (fun i => X i + C (w i)) q with hq'def
   have hev : ∀ y, eval y q' = eval (y + w) q := by
     intro y
-    rw [hq'def, show (eval y : MvPolynomial σ ℂ →+* ℂ) = eval₂Hom (RingHom.id ℂ) y from rfl, eval₂Hom_bind₁]
+    rw [hq'def, show (eval y : MvPolynomial σ ℂ →+* ℂ) = eval₂Hom (RingHom.id ℂ) y from rfl,
+      eval₂Hom_bind₁]
     have hfun : (fun i => eval₂Hom (RingHom.id ℂ) y (X i + C (w i))) = y + w := by
       ext i
       simp only [map_add (f := _), eval₂Hom_X', eval₂Hom_C, RingHom.id_apply, Pi.add_apply]
@@ -114,8 +124,9 @@ theorem mem_pow_ker_of_isBigO {k : ℕ} {q : MvPolynomial σ ℂ}
     swap
     · exact homogeneousComponent_eq_zero _ _ (by simpa [Nat.lt_succ_iff] using hdT)
     refine MvPolynomial.funext fun v => ?_
-    let P : Polynomial ℂ := ∑ e ∈ Finset.range (q'.totalDegree + 1),
-      Polynomial.monomial e (eval v (homogeneousComponent e q'))
+    let P : Polynomial ℂ :=
+      ∑ e ∈ Finset.range (q'.totalDegree + 1),
+        Polynomial.monomial e (eval v (homogeneousComponent e q'))
     have hP : ∀ t, P.eval t = eval (t • v + w) q := by
       intro t
       rw [← hev]
@@ -125,15 +136,18 @@ theorem mem_pow_ker_of_isBigO {k : ℕ} {q : MvPolynomial σ ℂ}
       refine Finset.sum_congr rfl fun e _ => ?_
       rw [eval_smul_of_isHomogeneous (homogeneousComponent_isHomogeneous e q'), mul_comm]
     have hT : Tendsto (fun t : ℂ => t • v + w) (𝓝 0) (𝓝 w) := by
-      simpa using ((continuous_id.smul continuous_const).add continuous_const).tendsto (0 : ℂ)
-        (f := fun t : ℂ => t • v + w)
+      simpa using
+        ((continuous_id.smul continuous_const).add continuous_const).tendsto (0 : ℂ)
+          (f := fun t : ℂ => t • v + w)
     have hPO : (fun t => P.eval t) =O[𝓝 0] fun t : ℂ => ‖t‖ ^ k := by
       simp_rw [hP]
-      refine (hq.comp_tendsto hT).trans (IsBigO.of_bound (‖v‖ ^ k) (Eventually.of_forall fun t => ?_))
+      refine (hq.comp_tendsto hT).trans
+        (IsBigO.of_bound (‖v‖ ^ k) (Eventually.of_forall fun t => ?_))
       simp [norm_smul, mul_pow, mul_comm]
     have hc := coeff_eq_zero_of_isBigO hPO d hd
-    simp only [P, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial,
-      Finsupp.single_apply, Finset.sum_ite_eq', if_pos hdT] at hc
+    simp only [P, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial, Finsupp.single_apply,
+        Finset.sum_ite_eq', if_pos hdT]
+      at hc
     simpa using hc
   have hmem : q' ∈ idealOfVars σ ℂ ^ k := by
     refine (mem_pow_idealOfVars_iff' k q').mpr fun x hx => ?_

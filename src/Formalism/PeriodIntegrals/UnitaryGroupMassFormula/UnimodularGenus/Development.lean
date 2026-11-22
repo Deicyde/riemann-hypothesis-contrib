@@ -13,8 +13,9 @@ namespace PI.UG.W
 
 section Defs
 
-variable {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+  [Module R V] [IsScalarTower R K V]
 
 def locR (p : Ideal R) : Submodule R K := loc (K := K) p (1 : Submodule R K)
 
@@ -27,15 +28,18 @@ def IsUnimodularAt (h : V →ₗ⋆[K] V →ₗ[K] K) (p : Ideal R) (L : Submodu
 end Defs
 
 def UnimodLocal : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ),
-    ∀ N : Submodule (𝓞 E) (Sp E n), Submodule.IsLattice E N → IsUnimodular (hStd E n) N →
-      ∀ p : Ideal (𝓞 E), p.IsMaximal → IsUnimodularAt (hStd E n) p N
+  ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ), ∀ N : Submodule (𝓞 E) (Sp E n),
+    Submodule.IsLattice E N → IsUnimodular (hStd E n) N
+      → ∀ p : Ideal (𝓞 E), p.IsMaximal → IsUnimodularAt (hStd E n) p N
 
 def IsomLocStd : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ), IsCMUnram E →
-    ∀ N : Submodule (𝓞 E) (Sp E n), Submodule.IsLattice E N →
-      ∀ p : Ideal (𝓞 E), p.IsMaximal → IsUnimodularAt (hStd E n) p N →
-        ∃ g ∈ isom (hStd E n), gmap g (loc (K := E) p (stdLat E n)) = loc (K := E) p N
+  ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ),
+    IsCMUnram E
+      → ∀ N : Submodule (𝓞 E) (Sp E n),
+        Submodule.IsLattice E N
+          → ∀ p : Ideal (𝓞 E),
+            p.IsMaximal → IsUnimodularAt (hStd E n) p N
+              → ∃ g ∈ isom (hStd E n), gmap g (loc (K := E) p (stdLat E n)) = loc (K := E) p N
 
 theorem unimodGenus_of (h1 : UnimodLocal) (h2 : IsomLocStd) : PI.UnimodGenus := by
   intro E _ _ _ n hE N hN hU p hp

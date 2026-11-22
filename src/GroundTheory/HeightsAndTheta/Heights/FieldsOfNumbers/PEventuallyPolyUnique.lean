@@ -16,9 +16,8 @@ theorem EventuallyPolyUnique.proof : EventuallyPolyUnique.Statement := by
   classical
   obtain ⟨M, hM⟩ := Filter.eventually_atTop.1 (hp.and hq)
   have hpq : p - q = 0 := by
-    apply MvPolynomial.eq_zero_of_eval_zero_at_prod_finset (p - q)
-      (fun k => (Finset.range ((p - q).degreeOf k + 1)).image
-        (fun i : ℕ => ((M k + (i : ℤ) : ℤ) : ℚ)))
+    apply MvPolynomial.eq_zero_of_eval_zero_at_prod_finset (p - q) (fun k =>
+      (Finset.range ((p - q).degreeOf k + 1)).image (fun i : ℕ => ((M k + (i : ℤ) : ℤ) : ℚ)))
     · intro k
       rw [Finset.card_image_of_injective]
       · simp

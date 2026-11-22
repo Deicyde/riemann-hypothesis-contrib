@@ -11,15 +11,19 @@ open GlobalTheory.UnitLemma Matrix MeasureTheory
 
 namespace GlobalTheory.GaloisDescentLattice
 
-theorem sigma_smul {K : UQ} (B : InvAlg K) {a b : K.O}
-    (hab : K.c (algebraMap K.O K.E a) = algebraMap K.O K.E b) (y : B.A) :
-    B.σ (a • y) = b • B.σ y := by
-  rw [← algebraMap_smul K.E a y, ← algebraMap_smul K.E b (B.σ y), Algebra.smul_def, Algebra.smul_def,
-    map_mul, B.σ_alg, hab]
+theorem sigma_smul
+    {K : UQ} (B : InvAlg K)
+    {a b : K.O} (hab : K.c (algebraMap K.O K.E a) = algebraMap K.O K.E b)
+    (y : B.A)
+    : B.σ (a • y) = b • B.σ y := by
+  rw [← algebraMap_smul K.E a y, ← algebraMap_smul K.E b (B.σ y), Algebra.smul_def,
+    Algebra.smul_def, map_mul, B.σ_alg, hab]
 
-theorem exists_fixed_basis : ∀ (K : UQ) (B : InvAlg K) (M : Submodule K.O B.A), IsLat K.O K.E M →
-    (∀ y ∈ M, B.σ y ∈ M) → ∃ e : Module.Basis (Fin (Module.finrank K.E B.A)) K.E B.A,
-      Submodule.span K.O (Set.range e) = M ∧ ∀ i, B.σ (e i) = e i := by
+theorem exists_fixed_basis
+    : ∀ (K : UQ) (B : InvAlg K) (M : Submodule K.O B.A),
+      IsLat K.O K.E M → (∀ y ∈ M, B.σ y ∈ M)
+        → ∃ e : Module.Basis (Fin (Module.finrank K.E B.A)) K.E B.A,
+          Submodule.span K.O (Set.range e) = M ∧ ∀ i, B.σ (e i) = e i := by
   intro K B M hM hσ
   obtain ⟨d, d', hdd', hunit⟩ := K.c_res
   have hd'd : K.c (algebraMap K.O K.E d') = algebraMap K.O K.E d := by rw [← hdd', K.c_c]
@@ -40,7 +44,8 @@ theorem exists_fixed_basis : ∀ (K : UQ) (B : InvAlg K) (M : Submodule K.O B.A)
       Submodule.subset_span ⟨⟨_, h1m, h1f⟩, rfl⟩
     have hmem2 : (⟨d • y + d' • B.σ y, h2m⟩ : M) ∈ Submodule.span K.O (Set.range v) :=
       Submodule.subset_span ⟨⟨_, h2m, h2f⟩, rfl⟩
-    have hy_eq : (⟨y, hy⟩ : M) = u • ((⟨d • y + d' • B.σ y, h2m⟩ : M) - d' • (⟨y + B.σ y, h1m⟩ : M)) := by
+    have hy_eq
+        : (⟨y, hy⟩ : M) = u • ((⟨d • y + d' • B.σ y, h2m⟩ : M) - d' • (⟨y + B.σ y, h1m⟩ : M)) := by
       apply Subtype.ext
       simp only [Submodule.coe_smul, Submodule.coe_sub, smul_add]
       have : d • y + d' • B.σ y - (d' • y + d' • B.σ y) = (d - d') • y := by rw [sub_smul]; abel
@@ -64,12 +69,10 @@ theorem exists_fixed_basis : ∀ (K : UQ) (B : InvAlg K) (M : Submodule K.O B.A)
   obtain ⟨κ, a, b, hb⟩ := Module.exists_basis_of_span_of_flat v hspan
   haveI : Finite κ := Module.Finite.finite_basis b
   let w : κ → B.A := fun i => (b i : B.A)
-  have hwO : LinearIndependent K.O w :=
-    b.linearIndependent.map' M.subtype M.ker_subtype
+  have hwO : LinearIndependent K.O w := b.linearIndependent.map' M.subtype M.ker_subtype
   have hwE : LinearIndependent K.E w := (LinearIndependent.iff_fractionRing K.O K.E).mp hwO
   have hspanO : Submodule.span K.O (Set.range w) = M := by
-    have : Set.range w = M.subtype '' Set.range b := by
-      rw [← Set.range_comp]; rfl
+    have : Set.range w = M.subtype '' Set.range b := by rw [← Set.range_comp]; rfl
     rw [this, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
   have hspanE : ⊤ ≤ Submodule.span K.E (Set.range w) := by
     rw [← hM.2, Submodule.span_le]

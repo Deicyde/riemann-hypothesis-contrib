@@ -9,12 +9,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleCohomol
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
-theorem bc_cechAug_eqv : ∀ (R : Type) [CommRing R] (F : Shv R) (S W V : Scheme.{0}) (r : W ⟶ S) (f : V ⟶ W),
-    Etale f → Surjective f → ∀ U : Over S, Eqv R ((bcMap (cechAug f) (sch.map r)).app U) F := by
+theorem bc_cechAug_eqv
+    : ∀ (R : Type) [CommRing R] (F : Shv R) (S W V : Scheme.{0}) (r : W ⟶ S) (f : V ⟶ W),
+      Etale f → Surjective f → ∀ U : Over S, Eqv R ((bcMap (cechAug f) (sch.map r)).app U) F := by
   intro R _ F S W V r f hE hS U
   obtain ⟨e₁, e₂, he⟩ := bc_cechAug_iso S W V r f U
   have hE' : Etale (pullback.snd f (pullback.fst r U.hom)) := inferInstance

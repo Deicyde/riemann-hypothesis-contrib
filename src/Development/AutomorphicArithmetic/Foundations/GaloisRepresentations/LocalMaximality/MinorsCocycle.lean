@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -194,10 +195,12 @@ private lemma core (hK2E : KoszulCocycleExistsWithPrescribedComponent) (hK2I : K
 
 end UpperTheory.Gal.productCup_of_system
 
-theorem UpperTheory.Gal.productCup_of_system.zCol_of :
-    IdIJ → ColZ → KoszulCocycleExistsWithPrescribedComponent → KoszulBoundaryOfComponentMemIdeal → KSub → RS → ThMu → ThMuLat → MuSpan → KapInd → ActsLin → SysOk → GoodZ → WdBasic → WdUni → ZCol := by
-  intro hId hCol hK2E hK2I hKS hRS hM hML _ hKap hAL _ hGood hB hU F K _ _ _ _ _ _ d x hc τ hτ a ha κ _ _ n z hz
-    i j
+theorem UpperTheory.Gal.productCup_of_system.zCol_of
+    : IdIJ → ColZ → KoszulCocycleExistsWithPrescribedComponent → KoszulBoundaryOfComponentMemIdeal
+      → KSub → RS → ThMu → ThMuLat → MuSpan → KapInd → ActsLin → SysOk → GoodZ → WdBasic → WdUni
+      → ZCol := by
+  intro hId hCol hK2E hK2I hKS hRS hM hML _ hKap hAL _ hGood hB hU F K _ _ _ _ _ _ d x hc τ hτ a ha
+    κ _ _ n z hz i j
   obtain ⟨m, hmM, hm⟩ := hId F K d x hc τ hτ a ha i j
   obtain ⟨hAL1, hAL2, -, hAL4, -, -⟩ := hAL F K d x hc τ hτ a
   obtain ⟨hKE, hCZ⟩ := hCol F K d x hc τ hτ a ha {i} {j} i (by simp) j (by simp)
@@ -213,10 +216,16 @@ theorem UpperTheory.Gal.productCup_of_system.zCol_of :
     intro l
     simp only [Sys.mu, map_sub, map_mul, hπX, hπY]
     ring
-  have hv : (π : K ⊗[ℂ] K →+* K) (((sysZ K x a).X i : K ⊗[ℂ] K) ^ d *
-      (((∏ b ∈ ({i} : Finset (Fin (d + 1)))ᶜ, (sysZ K x a).X b)⁻¹ : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K)) *
-      algebraMap F K (omG x i) = 1 := by
-    obtain ⟨P, hPdef⟩ : ∃ P : (K ⊗[ℂ] K)ˣ, P = ∏ b ∈ ({i} : Finset (Fin (d + 1)))ᶜ, (sysZ K x a).X b := ⟨_, rfl⟩
+  have hv
+      : (π : K ⊗[ℂ] K →+* K)
+            (((sysZ K x a).X i : K ⊗[ℂ] K) ^ d
+              * (((∏ b ∈ ({i} : Finset (Fin (d + 1)))ᶜ, (sysZ K x a).X b)⁻¹ : (K ⊗[ℂ] K)ˣ)
+                : K ⊗[ℂ] K))
+          * algebraMap F K (omG x i)
+        = 1 := by
+    obtain ⟨P, hPdef⟩
+        : ∃ P : (K ⊗[ℂ] K)ˣ, P = ∏ b ∈ ({i} : Finset (Fin (d + 1)))ᶜ, (sysZ K x a).X b :=
+      ⟨_, rfl⟩
     rw [← hPdef]
     show π (((sysZ K x a).X i : K ⊗[ℂ] K) ^ d * ((P⁻¹ : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K)) * _ = 1
     have hP1 : π (P : K ⊗[ℂ] K) * π ((P⁻¹ : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) = 1 := by
@@ -224,21 +233,26 @@ theorem UpperTheory.Gal.productCup_of_system.zCol_of :
     have hP2 : π (P : K ⊗[ℂ] K) = ∏ b ∈ ({i} : Finset (Fin (d + 1)))ᶜ, algebraMap F K (x b) := by
       rw [hPdef, Units.coe_prod, map_prod]
       exact Finset.prod_congr rfl fun b _ => hπX b
-    have hxi : algebraMap F K (x i) ≠ 0 := by
-      simp
-    have hom : algebraMap F K (omG x i) =
-        algebraMap F K (x i) * (∏ b ∈ ({i} : Finset (Fin (d + 1)))ᶜ, algebraMap F K (x b)) /
-          algebraMap F K (x i) ^ (d + 1) := by
-      simp only [omG, map_prod, map_div₀, Finset.prod_div_distrib, Finset.prod_const, Finset.card_univ,
-        Fintype.card_fin]
+    have hxi : algebraMap F K (x i) ≠ 0 := by simp
+    have hom
+        : algebraMap F K (omG x i)
+          = algebraMap F K (x i) * (∏ b ∈ ({i} : Finset (Fin (d + 1)))ᶜ, algebraMap F K (x b))
+            / algebraMap F K (x i) ^ (d + 1) := by
+      simp only [omG, map_prod, map_div₀, Finset.prod_div_distrib, Finset.prod_const,
+        Finset.card_univ, Fintype.card_fin]
       rw [Fintype.prod_eq_mul_prod_compl i, map_pow]
     rw [hom, ← hP2, map_mul, map_pow, hπX]
-    have e1 : algebraMap F K (x i) * π (P : K ⊗[ℂ] K) / algebraMap F K (x i) ^ (d + 1) *
-        algebraMap F K (x i) ^ d = π (P : K ⊗[ℂ] K) := by
+    have e1
+        : algebraMap F K (x i) * π (P : K ⊗[ℂ] K) / algebraMap F K (x i) ^ (d + 1)
+            * algebraMap F K (x i) ^ d
+          = π (P : K ⊗[ℂ] K) := by
       rw [pow_succ]
       field_simp
-    calc _ = π ((P⁻¹ : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) * (algebraMap F K (x i) * π (P : K ⊗[ℂ] K) /
-          algebraMap F K (x i) ^ (d + 1) * algebraMap F K (x i) ^ d) := by ring
+    calc
+      _ = π ((P⁻¹ : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K)
+          * (algebraMap F K (x i) * π (P : K ⊗[ℂ] K) / algebraMap F K (x i) ^ (d + 1)
+            * algebraMap F K (x i) ^ d) := by
+        ring
       _ = 1 := by rw [e1, mul_comm, hP1]
   have hAdm : (sysZ K x a).admitted n z := by
     have hX : (sysZ K x a).X = (sysZ K x 0).X := rfl
@@ -249,9 +263,14 @@ theorem UpperTheory.Gal.productCup_of_system.zCol_of :
     simp only [Sys.r, Sys.u] at h ⊢
     rw [hX, hY, hR]
     exact h
-  obtain ⟨c, hc1, hc2⟩ := core hK2E hK2I hKS hRS hM hML hB hU (sysZ K x a) hG n z hAdm
-    (π : K ⊗[ℂ] K →+* K) (Acts (F := F) K τ a) (fun _ _ _ _ h h' => (hAL1 _ _ _ _ h h').1)
-    (fun _ _ s h => hAL2 _ _ s h) i j (fun w _ h => hAL4 w _ _ i j h) hKE hCZ hz.diag hmu m hmM _ hm hv
+  obtain ⟨c, hc1, hc2⟩ :=
+    core hK2E hK2I hKS hRS hM hML hB hU (sysZ K x a) hG n z hAdm (π : K ⊗[ℂ] K →+* K)
+      (Acts (F := F) K τ a)
+      (fun _ _ _ _ h h' => (hAL1 _ _ _ _ h h').1)
+      (fun _ _ s h => hAL2 _ _ s h)
+      i j
+      (fun w _ h => hAL4 w _ _ i j h)
+      hKE hCZ hz.diag hmu m hmM _ hm hv
   refine ⟨c, hc1, fun L hL => ?_⟩
   have hk := hKap F K d x hc _ _ (sysZ K x a) π hπX hπY i L hL
   have h := hc2 L hL

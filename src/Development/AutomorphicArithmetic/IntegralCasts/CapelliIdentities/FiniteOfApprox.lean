@@ -193,13 +193,14 @@ private lemma finite_of_approx {O R : Type} [CommRing O] [IsLocalRing O]
 end UpperTheory.Reformulated.B.Ra2
 
 open UpperTheory.Reformulated.B.Ra2 in
-theorem UpperTheory.Reformulated.B.Ra2.finite_of_alg :
-    ∀ {O R : Type} [inst : CommRing O] [inst_1 : IsDomain O] [inst_2 : IsDiscreteValuationRing O]
-      [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [inst_4 : CommRing R] [IsDomain R] [inst_6 : Algebra O R]
-      [UpperTheory.V.Alg.IsCO O R],
-      Function.Injective (⇑(Algebra.algebraMap O R) : O → R) →
-        (∀ (a : R), ∃ (P : Polynomial O), P ≠ (0 : Polynomial O) ∧ (Polynomial.aeval a : Polynomial O → R) P = (0 : R)) →
-          Module.Finite O R := by
+theorem UpperTheory.Reformulated.B.Ra2.finite_of_alg
+    : ∀ {O R : Type} [inst : CommRing O] [inst_1 : IsDomain O] [inst_2 : IsDiscreteValuationRing O]
+        [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [inst_4 : CommRing R] [IsDomain R]
+        [inst_6 : Algebra O R] [UpperTheory.V.Alg.IsCO O R],
+      Function.Injective (⇑(Algebra.algebraMap O R) : O → R)
+        → (∀ (a : R), ∃ (P : Polynomial O),
+          P ≠ (0 : Polynomial O) ∧ (Polynomial.aeval a : Polynomial O → R) P = (0 : R))
+        → Module.Finite O R := by
   intro O R _ _ _ _ _ _ _ _ hinj halg
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hrad : maximalIdeal R ≤ (Ideal.span {algebraMap O R ϖ}).radical := fun x hx => by

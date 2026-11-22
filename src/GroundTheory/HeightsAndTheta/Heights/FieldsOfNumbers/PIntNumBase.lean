@@ -18,36 +18,36 @@ universe u
 
 section Point
 
-variable {F : Type u} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-  [∀ k, Fintype (ι k)]
+variable
+  {F : Type u} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-def blockMonomial (i : ∀ k, ι k) (m : K → ℕ) : MRing ι F :=
-  ∏ k, X ⟨k, i k⟩ ^ m k
-
+def blockMonomial (i : ∀ k, ι k) (m : K → ℕ) : MRing ι F := ∏ k, X ⟨k, i k⟩ ^ m k
 
 omit [∀ k, Fintype (ι k)] in
-theorem blockMonomial_isMultiHomog (i : ∀ k, ι k) (m : K → ℕ) :
-    IsMultiHomog (blockMonomial (F := F) i m) m := by
-  have h := IsWeightedHomogeneous.prod (R := F) (w := blockWeight ι) Finset.univ
-    (fun k => (X ⟨k, i k⟩ : MRing ι F) ^ m k) (fun k => m k • blockWeight ι ⟨k, i k⟩)
-    (fun k _ => (isWeightedHomogeneous_X F (blockWeight ι) ⟨k, i k⟩).pow (m k))
+theorem blockMonomial_isMultiHomog (i : ∀ k, ι k) (m : K → ℕ)
+    : IsMultiHomog (blockMonomial (F := F) i m) m := by
+  have h :=
+    IsWeightedHomogeneous.prod (R := F) (w := blockWeight ι) Finset.univ
+      (fun k => (X ⟨k, i k⟩ : MRing ι F) ^ m k)
+      (fun k => m k • blockWeight ι ⟨k, i k⟩)
+      (fun k _ => (isWeightedHomogeneous_X F (blockWeight ι) ⟨k, i k⟩).pow (m k))
   have hm : (∑ k, m k • blockWeight ι ⟨k, i k⟩) = m := by
     funext k'
     simp [blockWeight, Finset.sum_apply, Pi.single_apply]
   rw [hm] at h
   exact h
 
-
 omit [DecidableEq K] [∀ k, Fintype (ι k)] in
-theorem blockMonomial_add (i : ∀ k, ι k) (m n : K → ℕ) :
-    blockMonomial (F := F) i (m + n) = blockMonomial i m * blockMonomial i n := by
+theorem blockMonomial_add (i : ∀ k, ι k) (m n : K → ℕ)
+    : blockMonomial (F := F) i (m + n) = blockMonomial i m * blockMonomial i n := by
   simp [blockMonomial, pow_add, Finset.prod_mul_distrib]
 
-
 omit [DecidableEq K] [∀ k, Fintype (ι k)] in
-theorem blockMonomial_mk_ne_zero (P : Ideal (MRing ι F)) [P.IsPrime] (i : ∀ k, ι k)
-    (hi : ∀ k, (X ⟨k, i k⟩ : MRing ι F) ∉ P) (m : K → ℕ) :
-    Ideal.Quotient.mk P (blockMonomial i m) ≠ 0 := by
+theorem blockMonomial_mk_ne_zero
+    (P : Ideal (MRing ι F)) [P.IsPrime]
+    (i : ∀ k, ι k) (hi : ∀ k, (X ⟨k, i k⟩ : MRing ι F) ∉ P)
+    (m : K → ℕ)
+    : Ideal.Quotient.mk P (blockMonomial i m) ≠ 0 := by
   unfold blockMonomial
   rw [map_prod, Finset.prod_ne_zero_iff]
   intro k _
@@ -80,14 +80,16 @@ theorem IntNumBase.proof (h1 : MixedDiffConst.Statement.{u}) : IntNumBase.Statem
 
   let φ : (K → ℕ) → A →ₗ[F] L := fun m =>
     (LinearMap.mulRight F (xm m)⁻¹).comp (IsScalarTower.toAlgHom F A L).toLinearMap
-  have hφ : ∀ m a, φ m a = algebraMap A L a / xm m := fun m a => by
-    simp [φ, div_eq_mul_inv]
+  have hφ : ∀ m a, φ m a = algebraMap A L a / xm m := fun m a => by simp [φ, div_eq_mul_inv]
   have hφinj : ∀ m, Function.Injective (φ m) := fun m a b hab => by
     rw [hφ, hφ, div_left_inj' (hxm m)] at hab
     exact IsFractionRing.injective A L hab
   let U : (K → ℕ) → Submodule F L := fun m => (gradedPiece P m).map (φ m)
-  have memU : ∀ m y, y ∈ U m ↔ ∃ f : MRing ι F, IsMultiHomog f m ∧
-      y = algebraMap A L (Ideal.Quotient.mk P f) / xm m := fun m y => by
+  have memU
+      : ∀ m y,
+        y ∈ U m
+          ↔ ∃ f : MRing ι F,
+            IsMultiHomog f m ∧ y = algebraMap A L (Ideal.Quotient.mk P f) / xm m := fun m y => by
     simp only [U, gradedPiece, Submodule.mem_map, hφ]
     constructor
     · rintro ⟨a, ⟨f, hf, rfl⟩, rfl⟩
@@ -135,8 +137,10 @@ theorem IntNumBase.proof (h1 : MixedDiffConst.Statement.{u}) : IntNumBase.Statem
     rw [this, map_one, map_one, div_one]
   let S : Subalgebra F L := (U N).toSubalgebra hone fun y z hy hz => hstab _ (hmul _ _ _ _ hy hz)
   have : FiniteDimensional F S := hfinU N
-  let E : IntermediateField F L := S.toIntermediateField fun y hy =>
-    S.inv_mem_of_algebraic (x := ⟨y, hy⟩) ((IsIntegral.of_finite F (⟨y, hy⟩ : S)).map S.val).isAlgebraic
+  let E : IntermediateField F L :=
+    S.toIntermediateField fun y hy =>
+      S.inv_mem_of_algebraic (x := ⟨y, hy⟩)
+        ((IsIntegral.of_finite F (⟨y, hy⟩ : S)).map S.val).isAlgebraic
   have hEq : homFracDegZero P = E := by
     apply le_antisymm
     · refine IntermediateField.adjoin_le_iff.mpr ?_
@@ -148,17 +152,24 @@ theorem IntNumBase.proof (h1 : MixedDiffConst.Statement.{u}) : IntNumBase.Statem
       have hg0 : algebraMap A L (Ideal.Quotient.mk P g) ≠ 0 := by
         rw [Ne, FaithfulSMul.algebraMap_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem]
         exact hgP
-      have heq : algebraMap A L (Ideal.Quotient.mk P f) / algebraMap A L (Ideal.Quotient.mk P g) =
-          algebraMap A L (Ideal.Quotient.mk P f) / xm b *
-            (algebraMap A L (Ideal.Quotient.mk P g) / xm b)⁻¹ := by
+      have heq
+          : algebraMap A L (Ideal.Quotient.mk P f) / algebraMap A L (Ideal.Quotient.mk P g)
+            = algebraMap A L (Ideal.Quotient.mk P f) / xm b
+              * (algebraMap A L (Ideal.Quotient.mk P g) / xm b)⁻¹ := by
         rw [inv_div, div_mul_div_comm, mul_comm (xm b), mul_div_mul_right _ _ (hxm b)]
       rw [SetLike.mem_coe, heq]
       exact E.mul_mem hfU (E.inv_mem hgU)
     · intro y hy
       obtain ⟨f, hf, rfl⟩ := (memU N y).mp hy
-      exact IntermediateField.subset_adjoin _ _
-        ⟨N, f, blockMonomial i N, hf, blockMonomial_isMultiHomog i N,
-          fun h => blockMonomial_mk_ne_zero P i hi N (Ideal.Quotient.eq_zero_iff_mem.mpr h), rfl⟩
+      exact IntermediateField.subset_adjoin _ _ ⟨
+        N,
+        f,
+        blockMonomial i N,
+        hf,
+        blockMonomial_isMultiHomog i N,
+        fun h => blockMonomial_mk_ne_zero P i hi N (Ideal.Quotient.eq_zero_iff_mem.mpr h),
+        rfl
+      ⟩
   have hES : Subalgebra.toSubmodule E.toSubalgebra = U N := rfl
   let e : E ≃ₗ[F] U N := LinearEquiv.ofEq _ _ hES
   rw [hEq]

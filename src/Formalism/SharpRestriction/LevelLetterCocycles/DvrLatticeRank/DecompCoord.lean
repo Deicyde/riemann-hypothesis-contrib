@@ -10,16 +10,19 @@ namespace Formalism.MainNotions.N.Ln34.UniversalLiftFrames
 
 open Module
 
-theorem decomp_coord {O LL : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field LL]
-    [Algebra O LL] [IsFractionRing O LL] {L : Type*} [AddCommGroup L] [Module O L] {r m : ℕ}
-    (bL : Basis (Fin r) O L) {ι₁ ι₂ : Type*} [Fintype ι₁] [Fintype ι₂]
+theorem decomp_coord
+    {O LL : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field LL] [Algebra O LL]
+    [IsFractionRing O LL]
+    {L : Type*} [AddCommGroup L] [Module O L]
+    {r m : ℕ} (bL : Basis (Fin r) O L)
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [Fintype ι₂]
     (C : ι₁ → Submodule LL (Fin r → LL)) (hC : ∀ τ, r ≤ finrank LL (C τ) + m)
-    (Fs : ι₂ → Submodule LL (Fin r → LL)) (hF : ∀ τ, finrank LL (Fs τ) ≤ m) :
-    ∃ (k : ℕ) (ell : Fin k → L) (Lr : Submodule O L) (P : Fin k → Fin r → O),
-      finrank O Lr ≤ (Fintype.card ι₁ + Fintype.card ι₂) * m ∧
-      (∀ j τ, (fun i => algebraMap O LL (bL.repr (ell j) i)) ∈ C τ) ∧
-      (∀ i, bL i - ∑ j, P j i • ell j ∈ Lr) ∧
-      (∀ τ, ∀ d ∈ Fs τ, ∀ j, ∑ i, algebraMap O LL (P j i) * d i = 0) := by
+    (Fs : ι₂ → Submodule LL (Fin r → LL)) (hF : ∀ τ, finrank LL (Fs τ) ≤ m)
+    : ∃ (k : ℕ) (ell : Fin k → L) (Lr : Submodule O L) (P : Fin k → Fin r → O),
+      finrank O Lr ≤ (Fintype.card ι₁ + Fintype.card ι₂) * m
+        ∧ (∀ j τ, (fun i => algebraMap O LL (bL.repr (ell j) i)) ∈ C τ)
+        ∧ (∀ i, bL i - ∑ j, P j i • ell j ∈ Lr)
+        ∧ (∀ τ, ∀ d ∈ Fs τ, ∀ j, ∑ i, algebraMap O LL (P j i) * d i = 0) := by
   obtain ⟨L₁, L₂, hc, hrk, hCL, hFL⟩ := DualFramesAlt.SatDVR.decomp (O := O) (K := LL) C hC Fs hF
   obtain ⟨k, bu⟩ := Submodule.basisOfPid (Pi.basisFun O (Fin r)) L₁
   set pr := L₁.projectionOnto L₂ hc with hpr
@@ -27,8 +30,10 @@ theorem decomp_coord {O LL : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuati
   have hrepr : ∀ (u : Fin r → O) (i : Fin r), bL.repr (bL.equivFun.symm u) i = u i := by
     intro u i
     rw [← Basis.equivFun_apply, LinearEquiv.apply_symm_apply]
-  have hsum : ∀ (i : Fin r), ∑ j, P j i • ((bu j : L₁) : Fin r → O) =
-      ((pr (fun i' => if i = i' then 1 else 0) : L₁) : Fin r → O) := by
+  have hsum
+      : ∀ (i : Fin r),
+        ∑ j, P j i • ((bu j : L₁) : Fin r → O)
+          = ((pr (fun i' => if i = i' then 1 else 0) : L₁) : Fin r → O) := by
     intro i
     have h := congrArg Subtype.val (bu.sum_repr (pr (fun i' => if i = i' then 1 else 0)))
     rw [Submodule.coe_sum] at h
@@ -38,7 +43,16 @@ theorem decomp_coord {O LL : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuati
     rw [← LinearMap.comp_apply, LinearMap.pi_apply_eq_sum_univ ((bu.coord j).comp pr) y]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [hP, smul_eq_mul, mul_comm]
-  refine ⟨k, fun j => bL.equivFun.symm (bu j), L₂.map (bL.equivFun.symm : (Fin r → O) →ₗ[O] L), P, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    k,
+    fun j => bL.equivFun.symm (bu j),
+    L₂.map (bL.equivFun.symm : (Fin r → O) →ₗ[O] L),
+    P,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [LinearEquiv.finrank_map_eq]
     exact hrk
   · intro j τ
@@ -59,8 +73,9 @@ theorem decomp_coord {O LL : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuati
     have hψ : ∀ x : Fin r → LL, ψ x = ∑ i, algebraMap O LL (P j i) * x i := by
       intro x
       simp [ψ, LinearMap.sum_apply, Algebra.smul_def]
-    have hker : Submodule.span LL (DualFramesAlt.SatDVR.toK O LL r '' (L₂ : Set (Fin r → O))) ≤
-        LinearMap.ker ψ := by
+    have hker
+        : Submodule.span LL (DualFramesAlt.SatDVR.toK O LL r '' (L₂ : Set (Fin r → O)))
+          ≤ LinearMap.ker ψ := by
       rw [Submodule.span_le]
       rintro _ ⟨y, hy, rfl⟩
       rw [SetLike.mem_coe, LinearMap.mem_ker, hψ]

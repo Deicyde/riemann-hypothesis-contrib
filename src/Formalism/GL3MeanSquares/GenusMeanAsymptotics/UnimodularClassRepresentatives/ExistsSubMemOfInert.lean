@@ -8,9 +8,12 @@ namespace Formalism.HermitianLattices.Ext.L3.SplitPrimeIdeals
 
 variable {A B : Type*} [CommRing A] [CommRing B] {ι : A →+* B} {σ : B →+* B}
 
-private theorem exists_sub_iota_mem_of_sub_involution_mem (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
-    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ = P) {θ : B} (hθ : θ - σ θ ∉ P)
-    (x : B) (hx : x - σ x ∈ P) : ∃ a : A, x - ι a ∈ P := by
+private theorem exists_sub_iota_mem_of_sub_involution_mem
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
+    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ = P)
+    {θ : B} (hθ : θ - σ θ ∉ P)
+    (x : B) (hx : x - σ x ∈ P)
+    : ∃ a : A, x - ι a ∈ P := by
   have hσP : ∀ p ∈ P, σ p ∈ P := fun p hp => Ideal.mem_comap.1 (hc.symm ▸ hp)
   have hσδ : σ (θ - σ θ) = -(θ - σ θ) := by
     rw [map_sub, hσ]
@@ -30,31 +33,36 @@ private theorem exists_sub_iota_mem_of_sub_involution_mem (hσ : ∀ x, σ (σ x
   obtain ⟨a, ha⟩ := (hfix y).1 hy
   refine ⟨a, ?_⟩
   rw [ha]
-  have e : x - y = x * i + x * σ i - x * i * σ i -
-      (x - σ x) * (σ θ * (θ - σ θ) * u * σ u * ((θ - σ θ) * (θ - σ θ))) := by
+  have e
+      : x - y
+        = x * i + x * σ i - x * i * σ i
+          - (x - σ x) * (σ θ * (θ - σ θ) * u * σ u * ((θ - σ θ) * (θ - σ θ))) := by
     rw [hy_def]
     linear_combination (-x * σ u * ((θ - σ θ) * (θ - σ θ))) * hui + (-x * (1 - i)) * h2
   rw [e]
-  exact P.sub_mem (P.sub_mem (P.add_mem (P.mul_mem_left _ hi) (P.mul_mem_left _ hσi))
-    (P.mul_mem_left _ hσi)) (P.mul_mem_right _ hx)
+  exact P.sub_mem
+    (P.sub_mem (P.add_mem (P.mul_mem_left _ hi) (P.mul_mem_left _ hσi)) (P.mul_mem_left _ hσi))
+    (P.mul_mem_right _ hx)
 
-private theorem card_quotient_comap_sq_eq_card_quotient_of_involution (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
-    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ = P) {θ : B} (hθ : θ - σ θ ∉ P) :
-    Nat.card (A ⧸ P.comap ι) ^ 2 = Nat.card (B ⧸ P) := by
+private theorem card_quotient_comap_sq_eq_card_quotient_of_involution
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
+    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ = P)
+    {θ : B} (hθ : θ - σ θ ∉ P)
+    : Nat.card (A ⧸ P.comap ι) ^ 2 = Nat.card (B ⧸ P) := by
   classical
   haveI := hP
   letI : Field (B ⧸ P) := Ideal.Quotient.field P
   have hle : P ≤ P.comap σ := le_of_eq hc.symm
   set sb : B ⧸ P →+* B ⧸ P := Ideal.quotientMap P σ hle with hsb
   set φ : A ⧸ P.comap ι →+* B ⧸ P := Ideal.quotientMap P ι le_rfl with hφ
-  have hsbmk : ∀ x, sb (Ideal.Quotient.mk P x) = Ideal.Quotient.mk P (σ x) :=
-    fun x => Ideal.quotientMap_mk
+  have hsbmk : ∀ x, sb (Ideal.Quotient.mk P x) = Ideal.Quotient.mk P (σ x) := fun x =>
+    Ideal.quotientMap_mk
   have hsb2 : ∀ c, sb (sb c) = c := by
     intro c
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective c
     rw [hsbmk, hsbmk, hσ]
-  have hφmk : ∀ a, φ (Ideal.Quotient.mk _ a) = Ideal.Quotient.mk P (ι a) :=
-    fun a => Ideal.quotientMap_mk
+  have hφmk : ∀ a, φ (Ideal.Quotient.mk _ a) = Ideal.Quotient.mk P (ι a) := fun a =>
+    Ideal.quotientMap_mk
   have hsbφ : ∀ c, sb (φ c) = φ c := by
     intro c
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective c
@@ -91,9 +99,8 @@ private theorem card_quotient_comap_sq_eq_card_quotient_of_involution (hσ : ∀
     · intro y
       set bb := (y - sb y) / (th - sb th) with hbb_def
       have hbb : sb bb = bb := by
-        rw [hbb_def, map_div₀, map_sub, map_sub, hsb2, hsb2,
-          show sb y - y = -(y - sb y) by ring, show sb th - th = -(th - sb th) by ring,
-          neg_div_neg_eq]
+        rw [hbb_def, map_div₀, map_sub, map_sub, hsb2, hsb2, show sb y - y = -(y - sb y) by ring,
+          show sb th - th = -(th - sb th) by ring, neg_div_neg_eq]
       have hmul : bb * (th - sb th) = y - sb y := div_mul_cancel₀ _ hδ
       set aa := y - bb * th with haa_def
       have haa : sb aa = aa := by
@@ -106,8 +113,11 @@ private theorem card_quotient_comap_sq_eq_card_quotient_of_involution (hσ : ∀
       ring
   rw [sq, ← Nat.card_prod, Nat.card_congr (Equiv.ofBijective f hf)]
 
-theorem exists_sq_card_quot (hσ : ∀ x, σ (σ x) = x) {P : Ideal B} (hP : P.IsMaximal)
-    (hc : P.comap σ = P) {θ : B} (hθ : θ - σ θ ∉ P) : ∃ q : ℕ, Nat.card (B ⧸ P) = q ^ 2 := by
+theorem exists_sq_card_quot
+    (hσ : ∀ x, σ (σ x) = x)
+    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ = P)
+    {θ : B} (hθ : θ - σ θ ∉ P)
+    : ∃ q : ℕ, Nat.card (B ⧸ P) = q ^ 2 := by
   classical
   set S : Subring B := RingHom.eqLocus σ (RingHom.id B) with hS
   have hfix' : ∀ x, σ x = x ↔ x ∈ Set.range (S.subtype) := by
@@ -117,16 +127,23 @@ theorem exists_sq_card_quot (hσ : ∀ x, σ (σ x) = x) {P : Ideal B} (hP : P.I
       exact ⟨⟨x, hx⟩, rfl⟩
     · rintro ⟨a, rfl⟩
       exact a.2
-  exact ⟨Nat.card (S ⧸ P.comap S.subtype), (card_quotient_comap_sq_eq_card_quotient_of_involution (ι := S.subtype) hσ hfix' hP hc hθ).symm⟩
+  exact ⟨
+    Nat.card (S ⧸ P.comap S.subtype),
+    (card_quotient_comap_sq_eq_card_quotient_of_involution (ι := S.subtype) hσ hfix' hP hc hθ).symm
+  ⟩
 
-theorem card_quot_inert (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
-    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ = P) {θ : B} (hθ : θ - σ θ ∉ P) :
-    Nat.card (A ⧸ P.comap ι) ^ 2 = Nat.card (B ⧸ P) := by
+theorem card_quot_inert
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
+    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ = P)
+    {θ : B} (hθ : θ - σ θ ∉ P)
+    : Nat.card (A ⧸ P.comap ι) ^ 2 = Nat.card (B ⧸ P) := by
   exact card_quotient_comap_sq_eq_card_quotient_of_involution hσ hfix hP hc hθ
 
-theorem map_comap_of_inert (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
-    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ = P) {θ : B} (hθ : θ - σ θ ∉ P) :
-    (P.comap ι).map ι = P := by
+theorem map_comap_of_inert
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
+    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ = P)
+    {θ : B} (hθ : θ - σ θ ∉ P)
+    : (P.comap ι).map ι = P := by
   have hσP : ∀ p ∈ P, σ p ∈ P := fun p hp => Ideal.mem_comap.1 (hc.symm ▸ hp)
 
   have hmem : ∀ z, σ z = z → z ∈ P → z ∈ (P.comap ι).map ι := by
@@ -161,7 +178,7 @@ theorem map_comap_of_inert (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x 
     ring
   rw [e]
   exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (hmem j hjfix hjP))
-    (Ideal.mul_mem_right _ _ (Ideal.sub_mem _ (hT _ (P.mul_mem_right _ hy))
-      (Ideal.mul_mem_left _ _ (hT y hy))))
+    (Ideal.mul_mem_right _ _
+      (Ideal.sub_mem _ (hT _ (P.mul_mem_right _ hy)) (Ideal.mul_mem_left _ _ (hT y hy))))
 
 end Formalism.HermitianLattices.Ext.L3.SplitPrimeIdeals

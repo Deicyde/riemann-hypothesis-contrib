@@ -5,18 +5,31 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Cp UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.Fb
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
+  UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Cp
+  UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.Fb
 open scoped Classical ENNReal NNReal
 
-theorem UpperTheory.exists_haar_restrict_range_eq_smul_map_of_invariant :
-    ∀ (G X : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X] (e : X → G) (ν : Measure X) [IsFiniteMeasureOnCompacts ν], IsOpenEmbedding e → (1 : G) ∈ Set.range e → (∀ a ∈ Set.range e, ∀ b ∈ Set.range e, a * b ∈ Set.range e) → (∀ a ∈ Set.range e, a⁻¹ ∈ Set.range e) → ν ≠ 0 → (∀ x, ∃ T : X → X, MeasurePreserving T ν ν ∧ ∀ y, e x * e y = e (T y)) → ∃ c : ℝ≥0, μ.restrict (Set.range e) = c • ν.map e := by
+theorem UpperTheory.exists_haar_restrict_range_eq_smul_map_of_invariant
+    : ∀ (G X : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G)
+        [μ.IsHaarMeasure] [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X] (e : X → G)
+        (ν : Measure X) [IsFiniteMeasureOnCompacts ν],
+      IsOpenEmbedding e → (1 : G) ∈ Set.range e
+        → (∀ a ∈ Set.range e, ∀ b ∈ Set.range e, a * b ∈ Set.range e)
+        → (∀ a ∈ Set.range e, a⁻¹ ∈ Set.range e) → ν ≠ 0
+        → (∀ x, ∃ T : X → X, MeasurePreserving T ν ν ∧ ∀ y, e x * e y = e (T y))
+        → ∃ c : ℝ≥0, μ.restrict (Set.range e) = c • ν.map e := by
   intro G X _ _ _ _ _ _ _ _ μ _ _ _ _ e ν _ he h1 hmul hinv hν hT
-  let H : Subgroup G :=
-    { carrier := Set.range e
-      mul_mem' := fun ha hb => hmul _ ha _ hb
-      one_mem' := h1
-      inv_mem' := fun ha => hinv _ ha }
+  let H : Subgroup G := {
+    carrier := Set.range e
+    mul_mem' := fun ha hb => hmul _ ha _ hb
+    one_mem' := h1
+    inv_mem' := fun ha => hinv _ ha
+  }
   have hHo : IsOpen (H : Set G) := he.isOpen_range
   have hemb : IsOpenEmbedding (H.subtype) := hHo.isOpenEmbedding_subtypeVal
   haveI : LocallyCompactSpace H := hemb.locallyCompactSpace

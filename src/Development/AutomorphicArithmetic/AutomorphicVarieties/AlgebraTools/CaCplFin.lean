@@ -9,11 +9,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-private theorem pullback_fin_relation {k C : Type} [Field k] [CommRing C] [Algebra k C] (S : Subalgebra k C)
-    [Module.Finite k S] (T : Set C) (hT : T ⊆ S) (hfg : (Ideal.span T).FG)
-    (hI : ∀ x ∈ Ideal.span T, IsUnit (1 - x))
-    (hd : ∀ (n : ℕ) (c : C), ∃ a ∈ S, ∃ s ∈ S, IsUnit s ∧ s * c - a ∈ Ideal.span T ^ n) :
-    Module.Finite k C := by
+private theorem pullback_fin_relation
+    {k C : Type} [Field k] [CommRing C] [Algebra k C]
+    (S : Subalgebra k C) [Module.Finite k S]
+    (T : Set C) (hT : T ⊆ S) (hfg : (Ideal.span T).FG) (hI : ∀ x ∈ Ideal.span T, IsUnit (1 - x))
+    (hd : ∀ (n : ℕ) (c : C), ∃ a ∈ S, ∃ s ∈ S, IsUnit s ∧ s * c - a ∈ Ideal.span T ^ n)
+    : Module.Finite k C := by
   set J := Ideal.span T with hJ
   have hinv : ∀ s ∈ S, IsUnit s → ∃ t ∈ S, t * s = 1 := by
     intro s hsS hs
@@ -33,7 +34,9 @@ private theorem pullback_fin_relation {k C : Type} [Field k] [CommRing C] [Algeb
     obtain ⟨t, htS, hts⟩ := hinv s hsS hs
     refine ⟨t * a, S.mul_mem htS haS, ?_⟩
     have e : c - t * a = t * (s * c - a) := by
-      calc c - t * a = (t * s) * c - t * a := by rw [hts, one_mul]
+      calc
+        c - t * a
+          = (t * s) * c - t * a := by rw [hts, one_mul]
         _ = t * (s * c - a) := by ring
     rw [e]
     exact Ideal.mul_mem_left _ t hmem

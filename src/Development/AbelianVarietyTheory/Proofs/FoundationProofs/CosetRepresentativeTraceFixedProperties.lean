@@ -9,7 +9,12 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem cosetTrace_fixed_props : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (G : Type) [Group G] [MulSemiringAction G L], (∀ (g : G) (x : L), v (g • x) = v x) → ∀ (N : Subgroup G) [Fintype (G ⧸ N)], ∀ z ∈ Fix L N, (∀ g : G, g • cosetTrace N z = cosetTrace N z) ∧ (v z ≤ 1 → v (cosetTrace N z) ≤ 1) ∧ ∀ e : L, (∀ g : G, g • e = e) → cosetTrace N (e * z) = e * cosetTrace N z := by
+theorem cosetTrace_fixed_props
+    : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (G : Type) [Group G] [MulSemiringAction G L],
+      (∀ (g : G) (x : L), v (g • x) = v x)
+        → ∀ (N : Subgroup G) [Fintype (G ⧸ N)], ∀ z ∈ Fix L N,
+          (∀ g : G, g • cosetTrace N z = cosetTrace N z) ∧ (v z ≤ 1 → v (cosetTrace N z) ≤ 1)
+            ∧ ∀ e : L, (∀ g : G, g • e = e) → cosetTrace N (e * z) = e * cosetTrace N z := by
   intro L _ v G _ _ hv N _ z hz
   have hfix : ∀ n : G, n ∈ N → n • z = z := fun n hn => hz ⟨n, hn⟩
   refine ⟨?_, ?_, ?_⟩
@@ -31,7 +36,8 @@ theorem cosetTrace_fixed_props : ∀ (L : Type) [Field L] (v : Valuation L ℝ�
     unfold cosetTrace
     apply Valuation.map_sum_le
     intro q _
-    rw [hv]; exact hz1
+    rw [hv]
+    exact hz1
   · intro e he
     unfold cosetTrace
     rw [Finset.mul_sum]

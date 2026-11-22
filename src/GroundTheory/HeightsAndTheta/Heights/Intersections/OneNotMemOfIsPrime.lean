@@ -31,15 +31,15 @@ theorem homog_one : IsMultiHomog (1 : MRing ι) 0 := by
   subst hm
   simp
 
-theorem homog_mul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b) :
-    IsMultiHomog (f * g) (a + b) := by
+theorem homog_mul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
+    : IsMultiHomog (f * g) (a + b) := by
   classical
   intro m hm k
   obtain ⟨m1, hm1, m2, hm2, rfl⟩ := Finset.mem_add.mp (support_mul f g hm)
   simp only [Finsupp.add_apply, Finset.sum_add_distrib, Pi.add_apply, hf m1 hm1 k, hg m2 hm2 k]
 
-theorem homog_add {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a) :
-    IsMultiHomog (f + g) a := by
+theorem homog_add {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f + g) a := by
   classical
   intro m hm k
   rcases Finset.mem_union.mp (support_add hm) with h | h
@@ -51,8 +51,8 @@ theorem homog_neg {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) : IsMul
   rw [support_neg] at hm
   exact hf m hm k
 
-theorem homog_X [DecidableEq K] (k : K) (i : ι k) :
-    IsMultiHomog (X ⟨k, i⟩ : MRing ι) (Pi.single k 1) := by
+theorem homog_X [DecidableEq K] (k : K) (i : ι k)
+    : IsMultiHomog (X ⟨k, i⟩ : MRing ι) (Pi.single k 1) := by
   classical
   intro m hm k'
   rw [support_X, Finset.mem_singleton] at hm
@@ -69,17 +69,19 @@ theorem homog_X [DecidableEq K] (k : K) (i : ι k) :
   · have : ∀ j : ι k', (⟨k, i⟩ : Σ k, ι k) ≠ ⟨k', j⟩ := fun j e => h (congrArg Sigma.fst e).symm
     simp [Finsupp.single_apply, this, h, Pi.single_apply]
 
-theorem homog_pow {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (n : ℕ) :
-    IsMultiHomog (f ^ n) (n • a) := by
+theorem homog_pow {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (n : ℕ)
+    : IsMultiHomog (f ^ n) (n • a) := by
   induction n with
   | zero => simpa using (homog_one (ι := ι))
   | succ n ih =>
     rw [pow_succ, succ_nsmul]
     exact homog_mul ih hf
 
-theorem mem_of_sum_mem {I : Ideal (MRing ι)} (hI : IsMultiHomogIdeal I) {β : Type*} (s : Finset β)
-    (h : β → MRing ι) (d : β → K → ℕ) (hd : Set.InjOn d s) (hh : ∀ b ∈ s, IsMultiHomog (h b) (d b))
-    (hsum : ∑ b ∈ s, h b ∈ I) : ∀ b ∈ s, h b ∈ I := by
+theorem mem_of_sum_mem
+    {I : Ideal (MRing ι)} (hI : IsMultiHomogIdeal I)
+    {β : Type*} (s : Finset β) (h : β → MRing ι) (d : β → K → ℕ) (hd : Set.InjOn d s)
+    (hh : ∀ b ∈ s, IsMultiHomog (h b) (d b)) (hsum : ∑ b ∈ s, h b ∈ I)
+    : ∀ b ∈ s, h b ∈ I := by
   classical
   intro b hb
   obtain ⟨g, hgI, hg⟩ :=
@@ -93,14 +95,16 @@ theorem mem_of_sum_mem {I : Ideal (MRing ι)} (hI : IsMultiHomogIdeal I) {β : T
     · refine (Finset.sum_eq_zero fun b' hb' => ?_).symm
       by_contra hne
       have h1 := hh b' hb' m (mem_support_iff.mpr hne)
-      have hbb : b' = b := hd hb' hb (funext fun k => (h1 k).symm.trans (hdeg k (Finset.mem_univ k)))
+      have hbb : b' = b :=
+        hd hb' hb (funext fun k => (h1 k).symm.trans (hdeg k (Finset.mem_univ k)))
       exact hne (hbb ▸ hm)
     · rfl
   · have hdeg := hh b hb m (mem_support_iff.mpr hm)
     rw [if_pos (fun k _ => hdeg k), Finset.sum_eq_single b]
     · intro b' hb' hne
       by_contra h'
-      exact hne (hd hb' hb (funext fun k => (hh b' hb' m (mem_support_iff.mpr h') k).symm.trans (hdeg k)))
+      exact hne (hd hb' hb
+        (funext fun k => (hh b' hb' m (mem_support_iff.mpr h') k).symm.trans (hdeg k)))
     · intro h'
       exact absurd hb h'
 
@@ -113,8 +117,8 @@ variable (P W : Ideal (MRing ι)) [P.IsPrime] [W.IsPrime]
 def fracHom : MRing ι →+* FractionRing (MRing ι ⧸ P) :=
   (algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P))).comp (Ideal.Quotient.mk P)
 
-theorem fracHom_apply (u : MRing ι) :
-    fracHom P u = algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P u) :=
+theorem fracHom_apply (u : MRing ι)
+    : fracHom P u = algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P u) :=
   rfl
 
 variable {P} in
@@ -124,23 +128,26 @@ theorem fracHom_eq_zero_iff {u : MRing ι} : fracHom P u = 0 ↔ u ∈ P := by
 theorem one_notMem_of_isPrime : (1 : MRing ι) ∉ W :=
   (Ideal.ne_top_iff_one W).mp (Ideal.IsPrime.ne_top ‹_›)
 
-
 variable {P W} in
-theorem mem_locRing_iff (hPW : P ≤ W) {x : FractionRing (MRing ι ⧸ P)} :
-    x ∈ locRing P W ↔ ∃ (u v : MRing ι) (a : K → ℕ), IsMultiHomog u a ∧ IsMultiHomog v a ∧ v ∉ W ∧
-      x * fracHom P v = fracHom P u := by
+theorem mem_locRing_iff (hPW : P ≤ W) {x : FractionRing (MRing ι ⧸ P)}
+    : x ∈ locRing P W
+      ↔ ∃ (u v : MRing ι) (a : K → ℕ),
+        IsMultiHomog u a ∧ IsMultiHomog v a ∧ v ∉ W ∧ x * fracHom P v = fracHom P u := by
   constructor
   · intro hx
     induction hx using Subring.closure_induction with
     | mem x hx =>
       obtain ⟨u, v, a, hv, hvW, hu, hva, rfl⟩ := hx
       exact ⟨u, v, a, hu, hva, hvW, IsLocalization.mk'_spec _ _ _⟩
-    | zero => exact ⟨0, 1, 0, homog_zero 0, homog_one, one_notMem_of_isPrime W, by simp⟩
-    | one => exact ⟨1, 1, 0, homog_one, homog_one, one_notMem_of_isPrime W, by simp⟩
+    | zero =>
+      exact ⟨0, 1, 0, homog_zero 0, homog_one, one_notMem_of_isPrime W, by simp⟩
+    | one =>
+      exact ⟨1, 1, 0, homog_one, homog_one, one_notMem_of_isPrime W, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨u, v, a, hu, hv, hvW, hx⟩ := hx
       obtain ⟨u', v', a', hu', hv', hvW', hy⟩ := hy
-      refine ⟨u * v' + u' * v, v * v', a + a', homog_add (homog_mul hu hv') ?_, homog_mul hv hv', ?_, ?_⟩
+      refine
+        ⟨u * v' + u' * v, v * v', a + a', homog_add (homog_mul hu hv') ?_, homog_mul hv hv', ?_, ?_⟩
       · rw [add_comm a a']
         exact homog_mul hu' hv
       · exact fun h => (Ideal.IsPrime.mem_or_mem ‹_› h).elim hvW hvW'
@@ -167,19 +174,22 @@ theorem mem_locRing_iff (hPW : P ≤ W) {x : FractionRing (MRing ι ⧸ P)} :
     rw [IsLocalization.eq_mk'_iff_mul_eq]
     exact hx
 
-
 variable {P W} in
-theorem div_mem_locRing (hPW : P ≤ W) {u v : MRing ι} {a : K → ℕ} (hu : IsMultiHomog u a)
-    (hv : IsMultiHomog v a) (hvW : v ∉ W) : fracHom P u / fracHom P v ∈ locRing P W := by
+theorem div_mem_locRing
+    (hPW : P ≤ W)
+    {u v : MRing ι} {a : K → ℕ} (hu : IsMultiHomog u a) (hv : IsMultiHomog v a) (hvW : v ∉ W)
+    : fracHom P u / fracHom P v ∈ locRing P W := by
   refine (mem_locRing_iff hPW).mpr ⟨u, v, a, hu, hv, hvW, div_mul_cancel₀ _ ?_⟩
   rw [Ne, fracHom_eq_zero_iff]
   exact fun h => hvW (hPW h)
 
-
 variable {P W} in
-theorem isUnit_iff (hPW : P ≤ W) (x : locRing P W) {u v : MRing ι} {a : K → ℕ} (hu : IsMultiHomog u a)
-    (hv : IsMultiHomog v a) (hvW : v ∉ W)
-    (hx : (x : FractionRing (MRing ι ⧸ P)) * fracHom P v = fracHom P u) : IsUnit x ↔ u ∉ W := by
+theorem isUnit_iff
+    (hPW : P ≤ W)
+    (x : locRing P W)
+    {u v : MRing ι} {a : K → ℕ} (hu : IsMultiHomog u a) (hv : IsMultiHomog v a) (hvW : v ∉ W)
+    (hx : (x : FractionRing (MRing ι ⧸ P)) * fracHom P v = fracHom P u)
+    : IsUnit x ↔ u ∉ W := by
   constructor
   · intro hunit huW
     obtain ⟨y, hxy⟩ := hunit.exists_right_inv
@@ -206,7 +216,6 @@ theorem isUnit_iff (hPW : P ≤ W) (x : locRing P W) {u v : MRing ι} {a : K →
     rw [eq_div_of_mul_eq hv0 hx]
     field_simp
 
-
 variable {P W} in
 theorem isLocalRing (hPW : P ≤ W) : IsLocalRing (locRing P W) := by
   refine IsLocalRing.of_nonunits_add fun x y hx hy hxy => ?_
@@ -223,8 +232,9 @@ theorem isLocalRing (hPW : P ≤ W) : IsLocalRing (locRing P W) := by
     rw [add_comm a a']
     exact homog_mul hu' hv
   have hden : v * v' ∉ W := fun h => (Ideal.IsPrime.mem_or_mem ‹_› h).elim hvW hvW'
-  have heq : ((x + y : locRing P W) : FractionRing (MRing ι ⧸ P)) * fracHom P (v * v') =
-      fracHom P (u * v' + u' * v) := by
+  have heq
+      : ((x + y : locRing P W) : FractionRing (MRing ι ⧸ P)) * fracHom P (v * v')
+        = fracHom P (u * v' + u' * v) := by
     change ((x : FractionRing (MRing ι ⧸ P)) + y) * _ = _
     simp only [map_add (f := _), map_mul]
     rw [← hx', ← hy']
@@ -232,13 +242,14 @@ theorem isLocalRing (hPW : P ≤ W) : IsLocalRing (locRing P W) := by
   exact (isUnit_iff hPW (x + y) hnum (homog_mul hv hv') hden heq).mp hxy
     (W.add_mem (W.mul_mem_right _ huW) (W.mul_mem_right _ hu'W))
 
-
 variable {P W} in
-theorem mem_maximalIdeal_iff (hPW : P ≤ W) (x : locRing P W) {u v : MRing ι} {a : K → ℕ}
-    (hu : IsMultiHomog u a) (hv : IsMultiHomog v a) (hvW : v ∉ W)
-    (hx : (x : FractionRing (MRing ι ⧸ P)) * fracHom P v = fracHom P u) :
-    haveI := isLocalRing hPW
-    x ∈ maximalIdeal (locRing P W) ↔ u ∈ W := by
+theorem mem_maximalIdeal_iff
+    (hPW : P ≤ W)
+    (x : locRing P W)
+    {u v : MRing ι} {a : K → ℕ} (hu : IsMultiHomog u a) (hv : IsMultiHomog v a) (hvW : v ∉ W)
+    (hx : (x : FractionRing (MRing ι ⧸ P)) * fracHom P v = fracHom P u)
+    : haveI := isLocalRing hPW
+      x ∈ maximalIdeal (locRing P W) ↔ u ∈ W := by
   have := isLocalRing hPW
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_iff hPW x hu hv hvW hx, not_not]
 

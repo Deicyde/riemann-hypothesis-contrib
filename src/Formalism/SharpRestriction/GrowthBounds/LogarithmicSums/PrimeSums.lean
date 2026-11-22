@@ -12,8 +12,8 @@ open scoped BigOperators
 
 namespace Formalism.MainNotions.AuxBlock8.Pf.G5
 
-theorem sum_ite_mem_le {S R : Finset ℕ} (f : ℕ → ℝ) (hf : ∀ p ∈ R, 0 ≤ f p) :
-    ∑ p ∈ S, (if p ∈ R then f p else 0) ≤ ∑ p ∈ R, f p := by
+theorem sum_ite_mem_le {S R : Finset ℕ} (f : ℕ → ℝ) (hf : ∀ p ∈ R, 0 ≤ f p)
+    : ∑ p ∈ S, (if p ∈ R then f p else 0) ≤ ∑ p ∈ R, f p := by
   rw [← Finset.sum_filter]
   apply Finset.sum_le_sum_of_subset_of_nonneg
   · intro p hp; exact (Finset.mem_filter.1 hp).2
@@ -42,8 +42,8 @@ theorem sum_log_prB (y : ℝ) (hy : 0 ≤ y) : ∑ p ∈ prB y, Real.log p ≤ R
   · intro p hp _
     exact Real.log_nonneg (by exact_mod_cast (Finset.mem_filter.1 hp).2.one_lt.le)
 
-theorem sum_logdiv_prB (y : ℝ) (hy : 1 ≤ y) :
-    ∑ p ∈ prB y, Real.log p / p ≤ Real.log y * (1 + Real.log y) := by
+theorem sum_logdiv_prB (y : ℝ) (hy : 1 ≤ y)
+    : ∑ p ∈ prB y, Real.log p / p ≤ Real.log y * (1 + Real.log y) := by
   have hly : 0 ≤ Real.log y := Real.log_nonneg hy
   have h1 : ∑ p ∈ prB y, Real.log p / p ≤ ∑ p ∈ prB y, Real.log y * ((p : ℝ))⁻¹ := by
     apply Finset.sum_le_sum
@@ -68,7 +68,8 @@ theorem sum_logdiv_prB (y : ℝ) (hy : 1 ≤ y) :
   push_cast at h3
   refine le_trans h3 ?_
   have h4 : (1 : ℝ) ≤ (⌊y⌋₊ : ℝ) := by exact_mod_cast Nat.le_floor (by simpa using hy)
-  have h5 : Real.log (⌊y⌋₊ : ℝ) ≤ Real.log y := Real.log_le_log (by linarith) (Nat.floor_le (by linarith))
+  have h5 : Real.log (⌊y⌋₊ : ℝ) ≤ Real.log y :=
+    Real.log_le_log (by linarith) (Nat.floor_le (by linarith))
   linarith
 
 end Formalism.MainNotions.AuxBlock8.Pf.G5

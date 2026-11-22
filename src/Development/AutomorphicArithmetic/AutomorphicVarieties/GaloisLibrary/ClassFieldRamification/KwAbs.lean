@@ -5,11 +5,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain IntermediateField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Kum UpperTheory.V.CF
+open NumberField IsDedekindDomain IntermediateField Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.kwAbs :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (V : Subgroup (G ℚ Ω)), IsOpen (V : Set (G ℚ Ω)) → commutator (G ℚ Ω) ≤ V → ∃ N : ℕ, 0 < N ∧ ∀ g : G ℚ Ω, (∀ ζ : Ω, ζ ^ N = 1 → g ζ = ζ) → g ∈ V := by
+theorem UpperTheory.V.CF.kwAbs
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (V : Subgroup (G ℚ Ω)),
+      IsOpen (V : Set (G ℚ Ω)) → commutator (G ℚ Ω) ≤ V
+        → ∃ N : ℕ, 0 < N ∧ ∀ g : G ℚ Ω, (∀ ζ : Ω, ζ ^ N = 1 → g ζ = ζ) → g ∈ V := by
   intro Ω _ alg hc V hV hcomm
   haveI : CharZero Ω := algebraRat.charZero Ω
   obtain rfl : alg = DivisionRing.toRatAlgebra := Subsingleton.elim _ _
@@ -19,11 +22,12 @@ theorem UpperTheory.V.CF.kwAbs :
   have hcl : IsClosed (V : Set (Ω ≃ₐ[ℚ] Ω)) := Subgroup.isClosed_of_isOpen V hV
   set L : IntermediateField ℚ Ω := IntermediateField.fixedField (V : Subgroup (Ω ≃ₐ[ℚ] Ω)) with hL
   have hfix : L.fixingSubgroup = V := InfiniteGalois.fixingSubgroup_fixedField ⟨V, hcl⟩
-  have hnorm : V.Normal := ⟨fun n hn g => by
-    have h : g * n * g⁻¹ * n⁻¹ ∈ V :=
-      hcomm (Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _))
-    have := mul_mem h hn
-    rwa [inv_mul_cancel_right] at this⟩
+  have hnorm : V.Normal :=
+    ⟨fun n hn g => by
+      have h : g * n * g⁻¹ * n⁻¹ ∈ V :=
+        hcomm (Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _))
+      have := mul_mem h hn
+      rwa [inv_mul_cancel_right] at this⟩
   haveI hfin : FiniteDimensional ℚ L := (InfiniteGalois.isOpen_iff_finite L).1 (by rw [hfix]; exact hV)
   haveI hgal : IsGalois ℚ L := (InfiniteGalois.normal_iff_isGalois L).1 (by rw [hfix]; exact hnorm)
   have hsurj : Function.Surjective (AlgEquiv.restrictNormalHom (F := ℚ) (K₁ := Ω) L) :=

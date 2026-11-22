@@ -12,11 +12,12 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open Finset Comb
 
-theorem Comb.pcnt_succ_self {m n : ℕ} (w : Fin n → Fin m) (t : Fin n) :
-    pcnt w ((t : ℕ) + 1) (w t) = pcnt w t (w t) + 1 := by
+theorem Comb.pcnt_succ_self {m n : ℕ} (w : Fin n → Fin m) (t : Fin n)
+    : pcnt w ((t : ℕ) + 1) (w t) = pcnt w t (w t) + 1 := by
   unfold pcnt
-  have hins : (univ.filter (fun s : Fin n => (s : ℕ) < (t : ℕ) + 1 ∧ w s = w t)) =
-      insert t (univ.filter (fun s : Fin n => (s : ℕ) < t ∧ w s = w t)) := by
+  have hins
+      : (univ.filter (fun s : Fin n => (s : ℕ) < (t : ℕ) + 1 ∧ w s = w t))
+        = insert t (univ.filter (fun s : Fin n => (s : ℕ) < t ∧ w s = w t)) := by
     ext s
     simp only [mem_filter, mem_univ, true_and, mem_insert]
     constructor

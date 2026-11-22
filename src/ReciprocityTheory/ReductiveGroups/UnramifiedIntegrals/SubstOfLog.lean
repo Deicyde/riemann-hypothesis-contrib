@@ -16,8 +16,10 @@ variable {K : Type} [NormedField K] [IsUltrametricDist K] [CharZero K] {l : ℕ}
 
 variable {lam : PowerSeries K} {Φ : MvPowerSeries (Fin 2) K} {A : PowerSeries K} {a : K}
 
-theorem LawD.subst_of_log (h : LawD lam Φ) {e : PowerSeries K} {c : K} (he0 : constantCoeff e = 0)
-    (hlog : lam.subst e = C c * lam) : e.subst Φ = Φ.subst ![atX e, atY e] := by
+theorem LawD.subst_of_log
+    (h : LawD lam Φ)
+    {e : PowerSeries K} {c : K} (he0 : constantCoeff e = 0) (hlog : lam.subst e = C c * lam)
+    : e.subst Φ = Φ.subst ![atX e, atY e] := by
   have hes : PowerSeries.HasSubst e := PowerSeries.HasSubst.of_constantCoeff_zero' he0
   have hΦs : PowerSeries.HasSubst Φ := PowerSeries.HasSubst.of_constantCoeff_zero h.Φ0
   have hlog' : lam.subst e = c • lam := by rw [hlog, smul_eq_C_mul]
@@ -40,13 +42,15 @@ theorem LawD.subst_of_log (h : LawD lam Φ) {e : PowerSeries K} {c : K} (he0 : c
     MvPowerSeries.subst_X hb, MvPowerSeries.subst_X hb]
   show _ = lam.subst (e.subst (MvPowerSeries.X (0 : Fin 2) : MvPowerSeries (Fin 2) K))
     + lam.subst (e.subst (MvPowerSeries.X (1 : Fin 2) : MvPowerSeries (Fin 2) K))
-  rw [← PowerSeries.subst_comp_subst_apply hes (hX 0), ← PowerSeries.subst_comp_subst_apply hes (hX 1),
-    hlog', PowerSeries.subst_smul (hX 0), PowerSeries.subst_smul (hX 1), smul_add]
+  rw [← PowerSeries.subst_comp_subst_apply hes (hX 0),
+    ← PowerSeries.subst_comp_subst_apply hes (hX 1), hlog', PowerSeries.subst_smul (hX 0),
+    PowerSeries.subst_smul (hX 1), smul_add]
 
-theorem LawD.comm_of_log (h : LawD lam Φ) {e f : PowerSeries K} {c d : K}
-    (he0 : constantCoeff e = 0) (hf0 : constantCoeff f = 0)
-    (hlog : lam.subst e = C c * lam) (hlogf : lam.subst f = C d * lam) :
-    e.subst f = f.subst e := by
+theorem LawD.comm_of_log
+    (h : LawD lam Φ)
+    {e f : PowerSeries K} {c d : K} (he0 : constantCoeff e = 0) (hf0 : constantCoeff f = 0)
+    (hlog : lam.subst e = C c * lam) (hlogf : lam.subst f = C d * lam)
+    : e.subst f = f.subst e := by
   have hes : PowerSeries.HasSubst e := PowerSeries.HasSubst.of_constantCoeff_zero' he0
   have hfs : PowerSeries.HasSubst f := PowerSeries.HasSubst.of_constantCoeff_zero' hf0
   have hlog' : lam.subst e = c • lam := by rw [hlog, smul_eq_C_mul]
@@ -55,11 +59,14 @@ theorem LawD.comm_of_log (h : LawD lam Φ) {e f : PowerSeries K} {c d : K}
     (PowerSeries.constantCoeff_subst_eq_zero hf0 _ he0)
     (PowerSeries.constantCoeff_subst_eq_zero he0 _ hf0) ?_
   rw [← PowerSeries.subst_comp_subst_apply hes hfs, ← PowerSeries.subst_comp_subst_apply hfs hes,
-    hlog', hlogf', PowerSeries.subst_smul hfs, PowerSeries.subst_smul hes, hlog', hlogf',
-    smul_smul, smul_smul, mul_comm]
+    hlog', hlogf', PowerSeries.subst_smul hfs, PowerSeries.subst_smul hes, hlog', hlogf', smul_smul,
+    smul_smul, mul_comm]
 
-theorem mulL_homCls (h : HD σ lam Φ A a) {e : PowerSeries K} (he0 : constantCoeff e = 0)
-    (he : IntegralPS e) (hlog : lam.subst e = C (l : K) * lam) : HomCls l Φ A Φ A e := by
+theorem mulL_homCls
+    (h : HD σ lam Φ A a)
+    {e : PowerSeries K}
+    (he0 : constantCoeff e = 0) (he : IntegralPS e) (hlog : lam.subst e = C (l : K) * lam)
+    : HomCls l Φ A Φ A e := by
   refine ⟨he0, he, ?_, ?_⟩
   · rw [h.toLawD.subst_of_log he0 hlog, sub_self]
     exact divByMv_zero _
@@ -67,9 +74,11 @@ theorem mulL_homCls (h : HD σ lam Φ A a) {e : PowerSeries K} (he0 : constantCo
     intro n
     simp
 
-theorem mulL_deriv (h : LawD lam Φ) {e : PowerSeries K} (he0 : constantCoeff e = 0)
-    (he : IntegralPS e) (hlog : lam.subst e = C (l : K) * lam) :
-    DivBy (l : K) (derivative e) := by
+theorem mulL_deriv
+    (h : LawD lam Φ)
+    {e : PowerSeries K}
+    (he0 : constantCoeff e = 0) (he : IntegralPS e) (hlog : lam.subst e = C (l : K) * lam)
+    : DivBy (l : K) (derivative e) := by
   have hconst : constantCoeff (derivative lam) = 1 := by
     rw [← coeff_zero_eq_constantCoeff_apply, coeff_derivative]
     simp [h.lam1]
@@ -78,8 +87,9 @@ theorem mulL_deriv (h : LawD lam Φ) {e : PowerSeries K} (he0 : constantCoeff e 
       rw [partialYAtZero_eq, Formalism.G.LogCR.pderiv_psubst h.Φ0, evalYZero_mul,
         evalYZero_subst _ h.Φ0, h.evalYZero_eq, PowerSeries.X_subst, ← partialYAtZero_eq]
     have hlogD := congrArg d2 h.log
-    rwa [hchain, partialYAtZero_add, partialYAtZero_atX, partialYAtZero_atY,
-      h.lam1, zero_add, map_one] at hlogD
+    rwa [hchain, partialYAtZero_add, partialYAtZero_atX, partialYAtZero_atY, h.lam1, zero_add,
+        map_one]
+      at hlogD
   have hunit : constantCoeff (d2 Φ) = 1 := by
     have hcoeff := congrArg constantCoeff hmul
     rwa [map_mul, hconst, one_mul, map_one] at hcoeff
@@ -103,20 +113,22 @@ theorem mulL_deriv (h : LawD lam Φ) {e : PowerSeries K} (he0 : constantCoeff e 
   rw [coeff_C_mul, norm_mul]
   exact mul_le_of_le_one_right (norm_nonneg _) (hIntegral n)
 
-theorem hon_shape (hF : FrobField K l σ) (h : HD σ lam Φ A a) {e : PowerSeries K}
-    (he0 : constantCoeff e = 0) (he : IntegralPS e) (hlog : lam.subst e = C (l : K) * lam) :
-    ∃ hh : PowerSeries K,
-      HomCls l (MvPowerSeries.map (σ.comp σ) Φ) (PowerSeries.map (σ.comp σ) A) Φ A hh ∧
-      DivBy (l : K) (e - hh.subst ((X : PowerSeries K) ^ (l ^ 2))) ∧
-      coeff 1 hh = coeff (l ^ 2) e := by
+theorem hon_shape
+    (hF : FrobField K l σ) (h : HD σ lam Φ A a)
+    {e : PowerSeries K}
+    (he0 : constantCoeff e = 0) (he : IntegralPS e) (hlog : lam.subst e = C (l : K) * lam)
+    : ∃ hh : PowerSeries K,
+      HomCls l (MvPowerSeries.map (σ.comp σ) Φ) (PowerSeries.map (σ.comp σ) A) Φ A hh
+        ∧ DivBy (l : K) (e - hh.subst ((X : PowerSeries K) ^ (l ^ 2)))
+        ∧ coeff 1 hh = coeff (l ^ 2) e := by
   have hl0 : l ≠ 0 := hF.prime.ne_zero
-  have descend {Φ₁ Φ₂ : MvPowerSeries (Fin 2) K} {A₁ A₂ g : PowerSeries K}
-      (hΦ₁0 : MvPowerSeries.constantCoeff Φ₁ = 0) (hΦ₁ : IntegralMv Φ₁)
-      (hΦ₂ : IntegralMv Φ₂) (hA₁0 : constantCoeff A₁ = 0)
-      (hA₁ : IntegralPS A₁) (hA₂ : IntegralPS A₂) (hg : HomCls l Φ₁ A₁ Φ₂ A₂ g)
-      (hg' : DivBy (l : K) (derivative g)) :
-      DivBy (l : K) (g - (desc l g).subst ((X : PowerSeries K) ^ l)) ∧
-        HomCls l (MvPowerSeries.map σ Φ₁) (PowerSeries.map σ A₁) Φ₂ A₂ (desc l g) := by
+  have descend
+      {Φ₁ Φ₂ : MvPowerSeries (Fin 2) K} {A₁ A₂ g : PowerSeries K}
+      (hΦ₁0 : MvPowerSeries.constantCoeff Φ₁ = 0) (hΦ₁ : IntegralMv Φ₁) (hΦ₂ : IntegralMv Φ₂)
+      (hA₁0 : constantCoeff A₁ = 0) (hA₁ : IntegralPS A₁) (hA₂ : IntegralPS A₂)
+      (hg : HomCls l Φ₁ A₁ Φ₂ A₂ g) (hg' : DivBy (l : K) (derivative g))
+      : DivBy (l : K) (g - (desc l g).subst ((X : PowerSeries K) ^ l))
+        ∧ HomCls l (MvPowerSeries.map σ Φ₁) (PowerSeries.map σ A₁) Φ₂ A₂ (desc l g) := by
     have hc : DivBy (l : K) (g - (desc l g).subst ((X : PowerSeries K) ^ l)) := by
       intro m
       rw [map_sub, PowerSeries.coeff_subst_X_pow hl0, Algebra.algebraMap_self, RingHom.id_apply]
@@ -129,7 +141,8 @@ theorem hon_shape (hF : FrobField K l σ) (h : HD σ lam Φ A a) {e : PowerSerie
         obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hm0
         have h := hg' n
         rwa [coeff_derivative, norm_mul, ← Nat.cast_add_one,
-          norm_natCast_of_coprime hF.prime hF.norm_l _ hm, mul_one] at h
+            norm_natCast_of_coprime hF.prime hF.norm_l _ hm, mul_one]
+          at h
     refine ⟨hc, ?_⟩
     have hg₁0 : constantCoeff (desc l g) = 0 := by rw [desc_const, hg.g0]
     have hg₁ : IntegralPS (desc l g) := desc_integral hg.gInt
@@ -142,16 +155,16 @@ theorem hon_shape (hF : FrobField K l σ) (h : HD σ lam Φ A a) {e : PowerSerie
       exact (congrArg (· ^ l) (constantCoeff_X (R := K))).trans (zero_pow hl0)
     have hEint : IntegralPS E := by
       rw [hE]
-      exact (integralPS_iff_divBy_one _).2 ((divBy_expand_iff 1 l hl0 g₁).2
-        ((integralPS_iff_divBy_one _).1 hg₁))
+      exact (integralPS_iff_divBy_one _).2
+        ((divBy_expand_iff 1 l hl0 g₁).2 ((integralPS_iff_divBy_one _).1 hg₁))
     have hc' : DivBy (l : K) (g - E) := by rw [hE]; exact hc
     refine ⟨hg₁0, hg₁, ?_, ?_⟩
     · rw [← divByMv_expand_iff (l : K) l hl0, map_sub]
       have T := homE_expand_subst_map_congr hF hg₁ hc Φ₁ hΦ₁0 hΦ₁
       have hv : MvPowerSeries.HasSubst ![atX g₁, atY g₁] :=
         MvPowerSeries.hasSubst_of_constantCoeff_zero (homE_vec_const hg₁0)
-      have hex : MvPowerSeries.expand l hl0 (Φ₂.subst ![atX g₁, atY g₁]) =
-          Φ₂.subst ![atX E, atY E] := by
+      have hex
+          : MvPowerSeries.expand l hl0 (Φ₂.subst ![atX g₁, atY g₁]) = Φ₂.subst ![atX E, atY E] := by
         rw [MvPowerSeries.expand_subst l hl0 hv]
         congr 1
         funext i
@@ -167,7 +180,8 @@ theorem hon_shape (hF : FrobField K l σ) (h : HD σ lam Φ A a) {e : PowerSerie
       have := divByMv_add (divByMv_add T hg.add) T5
       rwa [sub_add_sub_cancel, sub_add_sub_cancel] at this
     · rw [divBy_iff_mv, ← divByMv_expand_iff (l : K) l hl0, map_sub]
-      have T := homE_expand_subst_map_congr (ι := Unit) hF hg₁ hc A₁ hA₁0 ((integralPS_iff_mv _).1 hA₁)
+      have T :=
+        homE_expand_subst_map_congr (ι := Unit) hF hg₁ hc A₁ hA₁0 ((integralPS_iff_mv _).1 hA₁)
       have hex : MvPowerSeries.expand l hl0 (A₂.subst g₁) = A₂.subst E := by
         rw [PowerSeries.expand_subst l hl0 (PowerSeries.HasSubst.of_constantCoeff_zero' hg₁0), hE]
         congr 1
@@ -179,8 +193,9 @@ theorem hon_shape (hF : FrobField K l σ) (h : HD σ lam Φ A a) {e : PowerSerie
       have := divByMv_add (divByMv_add T ((divBy_iff_mv _ _).1 hg.eig)) T5
       rwa [sub_add_sub_cancel, sub_add_sub_cancel] at this
   have hσ := h.map hF
-  obtain ⟨hc1, hH1⟩ := descend h.Φ0 h.Φint h.Φint h.A0 h.Aint h.Aint
-    (mulL_homCls h he0 he hlog) (mulL_deriv h.toLawD he0 he hlog)
+  obtain ⟨hc1, hH1⟩ :=
+    descend h.Φ0 h.Φint h.Φint h.A0 h.Aint h.Aint (mulL_homCls h he0 he hlog)
+      (mulL_deriv h.toLawD he0 he hlog)
   have hsmall : ‖coeff 1 (desc l e)‖ ≤ ‖(l : K)‖ := by
     refine hom_eigen hσ.A0 h.A0 hH1 ?_
     rw [hσ.coeff_one_A, h.coeff_one_A]
@@ -197,8 +212,9 @@ theorem hon_shape (hF : FrobField K l σ) (h : HD σ lam Φ A a) {e : PowerSerie
       simpa only [sub_add_cancel] using divBy_add hadd hsubst
     have hmul : derivative (PowerSeries.map σ lam) * d2 Φσ = 1 := by
       have hlogD := congrArg d2 hσ.log
-      rwa [hchain, partialYAtZero_add, partialYAtZero_atX, partialYAtZero_atY,
-        hσ.lam1, zero_add, map_one] at hlogD
+      rwa [hchain, partialYAtZero_add, partialYAtZero_atX, partialYAtZero_atY, hσ.lam1, zero_add,
+          map_one]
+        at hlogD
     have hconst : constantCoeff (derivative (PowerSeries.map σ lam)) = 1 := by
       rw [← coeff_zero_eq_constantCoeff_apply, coeff_derivative]
       simp [hσ.lam1]
@@ -219,14 +235,17 @@ theorem hon_shape (hF : FrobField K l σ) (h : HD σ lam Φ A a) {e : PowerSerie
       PowerSeries.HasSubst.of_constantCoeff_zero' (by simp [hl0])
     have h3 := (divBy_expand_iff (l : K) l hl0 _).2 hc2
     rw [PowerSeries.subst_sub hXs, PowerSeries.subst_comp_subst_apply hXs hXs,
-      PowerSeries.subst_pow hXs, PowerSeries.subst_X hXs, ← pow_mul, ← sq] at h3
+        PowerSeries.subst_pow hXs, PowerSeries.subst_X hXs, ← pow_mul, ← sq]
+      at h3
     have h4 := divBy_add hc1 h3
     rwa [sub_add_sub_cancel] at h4
   · rw [coeff_one_desc, desc, coeff_mk, sq]
 
-theorem hon_level (hF : FrobField K l σ) (h : HD σ lam Φ A a) {e : PowerSeries K}
-    (he0 : constantCoeff e = 0) (he : IntegralPS e) (hlog : lam.subst e = C (l : K) * lam)
-    (hlev : ∃ i, i ≤ l ^ 2 ∧ ‖coeff i e‖ = 1) : ‖coeff (l ^ 2) e‖ = 1 := by
+theorem hon_level
+    (hF : FrobField K l σ) (h : HD σ lam Φ A a)
+    {e : PowerSeries K} (he0 : constantCoeff e = 0) (he : IntegralPS e)
+    (hlog : lam.subst e = C (l : K) * lam) (hlev : ∃ i, i ≤ l ^ 2 ∧ ‖coeff i e‖ = 1)
+    : ‖coeff (l ^ 2) e‖ = 1 := by
   obtain ⟨hh, -, hc, -⟩ := hon_shape hF h he0 he hlog
   obtain ⟨i, hi, hi1⟩ := hlev
   have hq0 : l ^ 2 ≠ 0 := pow_ne_zero _ hF.prime.ne_zero

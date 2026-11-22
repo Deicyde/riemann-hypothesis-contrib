@@ -4,13 +4,17 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qk54.tensor_hom_ext :
-    ∀ {A A' C Ω : Type}
-    [inst : CommRing A] [inst_1 : CommRing A'] [inst_2 : CommRing C] [inst_3 : Algebra A A'] [inst_4 : Algebra A C]
-    [inst_5 : CommRing Ω] {u v : TensorProduct A C A' →+* Ω},
-    (∀ (c : C), (u : TensorProduct A C A' → Ω) (c ⊗ₜ[A] (1 : A')) = (v : TensorProduct A C A' → Ω) (c ⊗ₜ[A] (1 : A'))) →
-      (∀ (b : A'), (u : TensorProduct A C A' → Ω) ((1 : C) ⊗ₜ[A] b) = (v : TensorProduct A C A' → Ω) ((1 : C) ⊗ₜ[A] b)) →
-        u = v := by
+theorem UpperTheory.Reformulated.B.Qk54.tensor_hom_ext
+    : ∀ {A A' C Ω : Type} [inst : CommRing A] [inst_1 : CommRing A'] [inst_2 : CommRing C]
+        [inst_3 : Algebra A A'] [inst_4 : Algebra A C] [inst_5 : CommRing Ω]
+        {u v : TensorProduct A C A' →+* Ω},
+      (∀ (c : C),
+          (u : TensorProduct A C A' → Ω) (c ⊗ₜ[A] (1 : A'))
+            = (v : TensorProduct A C A' → Ω) (c ⊗ₜ[A] (1 : A')))
+        → (∀ (b : A'),
+          (u : TensorProduct A C A' → Ω) ((1 : C) ⊗ₜ[A] b)
+            = (v : TensorProduct A C A' → Ω) ((1 : C) ⊗ₜ[A] b))
+        → u = v := by
   intro A A' C Ω _ _ _ _ _ _ u v h₁ h₂
   refine RingHom.ext fun x => ?_
   induction x using TensorProduct.induction_on with

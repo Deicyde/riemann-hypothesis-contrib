@@ -11,9 +11,9 @@ open scoped ContDiff FourierTransform ENNReal
 
 noncomputable section
 
-private theorem symb_smul_covector_eq_pow_ord_mul {d : ℕ} {ι : Type} (P : Sys d ι) (i : ι)
-    (x ξ : E d) (t : ℝ) :
-    P.symb i x (t • ξ) = (t : ℂ) ^ (P.ord i) * P.symb i x ξ := by
+private theorem symb_smul_covector_eq_pow_ord_mul
+    {d : ℕ} {ι : Type} (P : Sys d ι) (i : ι) (x ξ : E d) (t : ℝ)
+    : P.symb i x (t • ξ) = (t : ℂ) ^ (P.ord i) * P.symb i x ξ := by
   unfold ZetaZeros.D.EllReg.Sys.symb
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun w _ => ?_
@@ -21,29 +21,27 @@ private theorem symb_smul_covector_eq_pow_ord_mul {d : ℕ} {ι : Type} (P : Sys
   simp only [hc, Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
   ring
 
-private theorem continuous_symb_covector {d : ℕ} {ι : Type} (P : Sys d ι) (i : ι)
-    (x : E d) : Continuous fun ξ : E d => P.symb i x ξ := by
+private theorem continuous_symb_covector {d : ℕ} {ι : Type} (P : Sys d ι) (i : ι) (x : E d)
+    : Continuous fun ξ : E d => P.symb i x ξ := by
   unfold ZetaZeros.D.EllReg.Sys.symb
   fun_prop
 
 theorem symbolLowerBound : SymbLower := by
   intro d ι _ P x0 k hk hell
-  obtain ⟨f, hf⟩ : ∃ f : E d → ℝ,
-      f = fun ξ => ∑ i, ‖ξ‖ ^ (2 * (k - P.ord i)) * ‖P.symb i x0 ξ‖ ^ 2 := ⟨_, rfl⟩
-  have hfξ : ∀ ξ, f ξ = ∑ i, ‖ξ‖ ^ (2 * (k - P.ord i)) * ‖P.symb i x0 ξ‖ ^ 2 := by
-    intro ξ; rw [hf]
+  obtain ⟨f, hf⟩
+      : ∃ f : E d → ℝ, f = fun ξ => ∑ i, ‖ξ‖ ^ (2 * (k - P.ord i)) * ‖P.symb i x0 ξ‖ ^ 2 :=
+    ⟨_, rfl⟩
+  have hfξ : ∀ ξ, f ξ = ∑ i, ‖ξ‖ ^ (2 * (k - P.ord i)) * ‖P.symb i x0 ξ‖ ^ 2 := by intro ξ; rw [hf]
   have hcont : Continuous f := by
     rw [hf]
     refine continuous_finsetSum _ fun i _ => ?_
-    exact (continuous_norm.pow _).mul
-      ((continuous_symb_covector P i x0).norm.pow 2)
+    exact (continuous_norm.pow _).mul ((continuous_symb_covector P i x0).norm.pow 2)
   have hhom : ∀ t : ℝ, 0 ≤ t → ∀ ξ : E d, f (t • ξ) = t ^ (2 * k) * f ξ := by
     intro t ht ξ
     rw [hfξ, hfξ, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     have h1 : ‖t • ξ‖ = t * ‖ξ‖ := by rw [norm_smul, Real.norm_of_nonneg ht]
-    have h2 : ‖(t : ℂ) ^ (P.ord i) * P.symb i x0 ξ‖
-        = t ^ (P.ord i) * ‖P.symb i x0 ξ‖ := by
+    have h2 : ‖(t : ℂ) ^ (P.ord i) * P.symb i x0 ξ‖ = t ^ (P.ord i) * ‖P.symb i x0 ξ‖ := by
       rw [norm_mul, norm_pow, Complex.norm_of_nonneg ht]
     rw [symb_smul_covector_eq_pow_ord_mul, h1, h2]
     have hk' : 2 * k = 2 * (k - P.ord i) + 2 * P.ord i := by have := hk i; omega
@@ -69,7 +67,8 @@ theorem symbolLowerBound : SymbLower := by
         rw [hfξ]
         exact Finset.single_le_sum
           (f := fun j => ‖η0‖ ^ (2 * (k - P.ord j)) * ‖P.symb j x0 η0‖ ^ 2)
-          (fun j _ => by positivity) (Finset.mem_univ i)
+          (fun j _ => by positivity)
+          (Finset.mem_univ i)
       have hlt : 0 < ‖η0‖ ^ (2 * (k - P.ord i)) * ‖P.symb i x0 η0‖ ^ 2 := by
         rw [hη0n, one_pow, one_mul]
         exact pow_pos (norm_pos_iff.mpr hi) 2
@@ -78,8 +77,7 @@ theorem symbolLowerBound : SymbLower := by
     have ht : 0 < ‖ξ‖ := norm_pos_iff.mpr hξ
     have hηS : ‖ξ‖⁻¹ • ξ ∈ sphere (0 : E d) 1 := by
       rw [mem_sphere_zero_iff_norm, norm_smul, norm_inv, norm_norm, inv_mul_cancel₀ ht.ne']
-    have hξη : ξ = ‖ξ‖ • (‖ξ‖⁻¹ • ξ) := by
-      rw [smul_smul, mul_inv_cancel₀ ht.ne', one_smul]
+    have hξη : ξ = ‖ξ‖ • (‖ξ‖⁻¹ • ξ) := by rw [smul_smul, mul_inv_cancel₀ ht.ne', one_smul]
     have hle : f η0 ≤ f (‖ξ‖⁻¹ • ξ) := hmin hηS
     have hfx : f ξ = ‖ξ‖ ^ (2 * k) * f (‖ξ‖⁻¹ • ξ) := by
       conv_lhs => rw [hξη]

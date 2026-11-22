@@ -20,20 +20,23 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.SemistableReduc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models GlobalTheory.ZM
 
 namespace GlobalTheory.ValuativeGeneric
 
-theorem exists_lift_of_surjectiveOnStalks {X Z : Scheme.{0}} (j : X ⟶ Z) [SurjectiveOnStalks j]
-    (K : Type) [Field K] (t : Spec (.of K) ⟶ Z) (x : X)
-    (hx : t (IsLocalRing.closedPoint K) = j x) :
-    ∃ u : Spec (.of K) ⟶ X, u ≫ j = t ∧ ∀ p, u p = x := by
+theorem exists_lift_of_surjectiveOnStalks
+    {X Z : Scheme.{0}} (j : X ⟶ Z) [SurjectiveOnStalks j]
+    (K : Type) [Field K]
+    (t : Spec (.of K) ⟶ Z) (x : X) (hx : t (IsLocalRing.closedPoint K) = j x)
+    : ∃ u : Spec (.of K) ⟶ X, u ≫ j = t ∧ ∀ p, u p = x := by
   obtain ⟨⟨z, φ⟩, rfl⟩ := (Scheme.SpecToEquivOfField K Z).symm.surjective t
-  obtain rfl : z = j x := (Scheme.fromSpecResidueField_apply z
-    (Spec.map φ (IsLocalRing.closedPoint K))).symm.trans hx
+  obtain rfl : z = j x :=
+    (Scheme.fromSpecResidueField_apply z (Spec.map φ (IsLocalRing.closedPoint K))).symm.trans hx
   have : IsIso (j.residueFieldMap x) := by
     refine (ConcreteCategory.isIso_iff_bijective _).mpr ⟨(j.residueFieldMap x).hom.injective, ?_⟩
     intro a
@@ -47,13 +50,15 @@ theorem exists_lift_of_surjectiveOnStalks {X Z : Scheme.{0}} (j : X ⟶ Z) [Surj
     ← Spec.map_comp_assoc, IsIso.hom_inv_id_assoc]
   rfl
 
-theorem isClosedImmersion_of_lift {X Z : Scheme.{0}} [IsLocallyNoetherian Z] [Z.IsSeparated]
+theorem isClosedImmersion_of_lift
+    {X Z : Scheme.{0}} [IsLocallyNoetherian Z] [Z.IsSeparated]
     (j : X ⟶ Z) [IsPreimmersion j] [QuasiCompact j]
     (h : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-      [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [Field K] [Algebra V K] [IsFractionRing V K]
-      (x : Sp K ⟶ X) (y : Sp V ⟶ Z), Set.range x ⊆ genericPoints X →
-      x ≫ j = spMap (algebraMap V K) ≫ y → ∃ x' : Sp V ⟶ X, spMap (algebraMap V K) ≫ x' = x) :
-    IsClosedImmersion j := by
+        [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [Field K] [Algebra V K] [IsFractionRing V K]
+        (x : Sp K ⟶ X) (y : Sp V ⟶ Z),
+      Set.range x ⊆ genericPoints X → x ≫ j = spMap (algebraMap V K) ≫ y
+        → ∃ x' : Sp V ⟶ X, spMap (algebraMap V K) ≫ x' = x)
+    : IsClosedImmersion j := by
   refine .of_isPreimmersion j (IsClosedMap.isClosed_range ?_)
   rw [isClosedMap_iff_specializingMap]
   refine j.isEmbedding.isInducing.specializingMap ?_
@@ -64,8 +69,9 @@ theorem isClosedImmersion_of_lift {X Z : Scheme.{0}} [IsLocallyNoetherian Z] [Z.
   · exact ⟨x₀, hne⟩
   obtain ⟨O, _, _, _, g, hg₀, hg₁⟩ := exists_complete_discreteValuationRing_of_specializes hs' hne
   have hinj : Function.Injective (algebraMap O (FractionRing O)) := IsFractionRing.injective _ _
-  have hpt : (spMap (algebraMap O (FractionRing O)) ≫ g)
-      (IsLocalRing.closedPoint (FractionRing O)) = j x₀ := by
+  have hpt
+      : (spMap (algebraMap O (FractionRing O)) ≫ g) (IsLocalRing.closedPoint (FractionRing O))
+        = j x₀ := by
     refine Eq.trans (congrArg g (PrimeSpectrum.ext ?_)) hg₀
     change Ideal.comap (algebraMap O (FractionRing O)) (IsLocalRing.maximalIdeal _) = ⊥
     rw [IsLocalRing.maximalIdeal_eq_bot]
@@ -80,7 +86,16 @@ theorem isClosedImmersion_of_lift {X Z : Scheme.{0}} [IsLocallyNoetherian Z] [Z.
     ext_of_isDominant (spMap (algebraMap O (FractionRing O))) (by rw [← Category.assoc, hx', hu])
   exact ⟨x' (IsLocalRing.closedPoint O), by rw [← hg₁, ← e]; rfl⟩
 
-theorem isProper_of_lift_generic : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (X Y : Scheme.{0}) [IsLocallyNoetherian Y] (f : X ⟶ Y) (s : Y ⟶ Sp R), IsSeparated s → IsQProjOver (f ≫ s) → (∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [Field K] [Algebra V K] [IsFractionRing V K] (x : Sp K ⟶ X) (y : Sp V ⟶ Y), Set.range x ⊆ genericPoints X → x ≫ f = spMap (algebraMap V K) ≫ y → ∃ x' : Sp V ⟶ X, spMap (algebraMap V K) ≫ x' = x) → IsProper f := by
+theorem isProper_of_lift_generic
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (X Y : Scheme.{0}) [IsLocallyNoetherian Y]
+        (f : X ⟶ Y) (s : Y ⟶ Sp R),
+      IsSeparated s → IsQProjOver (f ≫ s)
+        → (∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+            [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [Field K] [Algebra V K]
+            [IsFractionRing V K] (x : Sp K ⟶ X) (y : Sp V ⟶ Y),
+          Set.range x ⊆ genericPoints X → x ≫ f = spMap (algebraMap V K) ≫ y
+            → ∃ x' : Sp V ⟶ X, spMap (algebraMap V K) ≫ x' = x)
+        → IsProper f := by
   intro R _ _ X Y _ f s hs ⟨N, i, hi, hq, e⟩ h
   have := isProper_str R N
   let j : X ⟶ pullback s (PSpace.str R N) := pullback.lift f i e.symm
@@ -96,8 +111,9 @@ theorem isProper_of_lift_generic : ∀ (R : Type) [CommRing R] [IsNoetherianRing
     refine ⟨?_⟩
     rw [← terminal.comp_from (pullback.fst s (PSpace.str R N) ≫ s)]
     infer_instance
-  have : IsClosedImmersion j := isClosedImmersion_of_lift j fun V K _ _ _ _ _ _ _ x y hx hy =>
-    h V K x (y ≫ pullback.fst _ _) hx (by rw [← hj₁, ← Category.assoc, hy, Category.assoc])
+  have : IsClosedImmersion j :=
+    isClosedImmersion_of_lift j fun V K _ _ _ _ _ _ _ x y hx hy =>
+      h V K x (y ≫ pullback.fst _ _) hx (by rw [← hj₁, ← Category.assoc, hy, Category.assoc])
   rw [← hj₁]
   infer_instance
 

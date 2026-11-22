@@ -10,18 +10,26 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR
+open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.L2.Pj
+  Formalism.IndefR.FWT Formalism.IndefR
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory
 
-
 set_option maxHeartbeats 1000000 in
-theorem lastPos_wtA_of_pins : ∀ (D : D7) (Q : Par D), Q.Pins → ∀ j, InR D j → ∀ w : WeightFamilies.Wt D j,
-    w.LastPos → Formalism.L2.Pj.LastPos (Q.Dw j) (wtA w) := by
+theorem lastPos_wtA_of_pins
+    : ∀ (D : D7) (Q : Par D),
+      Q.Pins
+        → ∀ j,
+          InR D j
+            → ∀ w : WeightFamilies.Wt D j,
+              w.LastPos → Formalism.L2.Pj.LastPos (Q.Dw j) (wtA w) := by
   intro D Q h j hj w hw τ hτ hm
-  obtain ⟨t, rfl⟩ := ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf.exists_tau_of_inPsi Q h.1 τ hτ
+  obtain ⟨t, rfl⟩ :=
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf.exists_tau_of_inPsi Q h.1 τ hτ
   have hmult : (Q.Dw j).mult (DV.tauEmb D t) = (D.R.sigW j).1 := by
     unfold ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum.mult
     have hτ' : (DV.tauEmb D t) (Q.H.rt : D.host.E) = Q.H.rt0 := hτ

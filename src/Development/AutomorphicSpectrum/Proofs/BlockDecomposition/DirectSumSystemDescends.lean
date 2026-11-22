@@ -14,7 +14,10 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct DirectSum GlobalTheory.LogCris CrystallineSemistableComparison CrystallineSemistableComparison.Onto CrystallineSemistableComparison.Pb CrystallineSemistableComparison.HT GlobalTheory.CompanionTheory.KunGlue
+open CategoryTheory AlgebraicGeometry TensorProduct DirectSum GlobalTheory.LogCris
+  CrystallineSemistableComparison CrystallineSemistableComparison.Onto
+  CrystallineSemistableComparison.Pb CrystallineSemistableComparison.HT
+  GlobalTheory.CompanionTheory.KunGlue
 
 namespace GlobalTheory.CompanionTheory.KunGlue.SumDesc
 
@@ -46,9 +49,9 @@ def pr (i : I) (m : ℕ) : (sumPM P).cech.X m →ₗ[K] (P i).cech.X m :=
 def inc (i : I) (m : ℕ) : (P i).cech.X m →ₗ[K] (sumPM P).cech.X m :=
   LinearMap.pi fun t => (DirectSum.lof K I (fun j => (P j).M (ent t)) i) ∘ₗ LinearMap.proj t
 
-theorem component_res {S T : Finset ι} (h : S ⊆ T) (i : I) (x : (sumPM P).M S) :
-    DirectSum.component K I (fun j => (P j).M T) i ((sumPM P).res h x) =
-      (P i).res h (DirectSum.component K I (fun j => (P j).M S) i x) := by
+theorem component_res {S T : Finset ι} (h : S ⊆ T) (i : I) (x : (sumPM P).M S)
+    : DirectSum.component K I (fun j => (P j).M T) i ((sumPM P).res h x)
+      = (P i).res h (DirectSum.component K I (fun j => (P j).M S) i x) := by
   induction x using DirectSum.induction_on with
   | zero => simp
   | of j x =>
@@ -60,20 +63,21 @@ theorem component_res {S T : Finset ι} (h : S ⊆ T) (i : I) (x : (sumPM P).M S
     · simp [DirectSum.component.of, e]
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-theorem res_lof {S T : Finset ι} (h : S ⊆ T) (i : I) (x : (P i).M S) :
-    (sumPM P).res h (DirectSum.lof K I (fun j => (P j).M S) i x) =
-      DirectSum.lof K I (fun j => (P j).M T) i ((P i).res h x) := DirectSum.lmap_lof _ _ _
+theorem res_lof {S T : Finset ι} (h : S ⊆ T) (i : I) (x : (P i).M S)
+    : (sumPM P).res h (DirectSum.lof K I (fun j => (P j).M S) i x)
+      = DirectSum.lof K I (fun j => (P j).M T) i ((P i).res h x) :=
+  DirectSum.lmap_lof _ _ _
 
-theorem pr_d (i : I) (m : ℕ) (z : (sumPM P).cech.X m) :
-    pr P i (m + 1) ((sumPM P).cech.d m z) = (P i).cech.d m (pr P i m z) := by
+theorem pr_d (i : I) (m : ℕ) (z : (sumPM P).cech.X m)
+    : pr P i (m + 1) ((sumPM P).cech.d m z) = (P i).cech.d m (pr P i m z) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Cos.d_apply, Cos.d_apply, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_zsmul]
   congr 1
 
-theorem inc_d (i : I) (m : ℕ) (y : (P i).cech.X m) :
-    inc P i (m + 1) ((P i).cech.d m y) = (sumPM P).cech.d m (inc P i m y) := by
+theorem inc_d (i : I) (m : ℕ) (y : (P i).cech.X m)
+    : inc P i (m + 1) ((P i).cech.d m y) = (sumPM P).cech.d m (inc P i m y) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Cos.d_apply, Cos.d_apply, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
@@ -87,13 +91,14 @@ theorem cochain_ext {m : ℕ} {z : (sumPM P).cech.X m} (h : ∀ i, pr P i m z = 
   refine DFinsupp.ext fun i => ?_
   exact congrFun (h i) t
 
-theorem pr_aug (i : I) (x : (sumPM P).M ∅) :
-    pr P i 0 ((sumPM P).aug x) = (P i).aug (DirectSum.component K I (fun j => (P j).M ∅) i x) := by
+theorem pr_aug (i : I) (x : (sumPM P).M ∅)
+    : pr P i 0 ((sumPM P).aug x)
+      = (P i).aug (DirectSum.component K I (fun j => (P j).M ∅) i x) := by
   funext t
   exact component_res P _ i _
 
-theorem aug_lof (i : I) (x : (P i).M ∅) :
-    (sumPM P).aug (DirectSum.lof K I (fun j => (P j).M ∅) i x) = inc P i 0 ((P i).aug x) := by
+theorem aug_lof (i : I) (x : (P i).M ∅)
+    : (sumPM P).aug (DirectSum.lof K I (fun j => (P j).M ∅) i x) = inc P i 0 ((P i).aug x) := by
   funext t
   exact res_lof P _ i _
 
@@ -101,15 +106,20 @@ theorem pr_inc_self (i : I) (m : ℕ) (y : (P i).cech.X m) : pr P i m (inc P i m
   funext t
   exact DirectSum.component.lof_self (M := fun j => (P j).M (ent t)) K i (y t)
 
-theorem pr_inc_ne {i j : I} (e : j ≠ i) (m : ℕ) (y : (P j).cech.X m) : pr P i m (inc P j m y) = 0 := by
+theorem pr_inc_ne {i j : I} (e : j ≠ i) (m : ℕ) (y : (P j).cech.X m)
+    : pr P i m (inc P j m y) = 0 := by
   funext t
-  change DirectSum.component K I (fun j => (P j).M (ent t)) i (DirectSum.lof K I (fun j => (P j).M (ent t)) j (y t)) = 0
+  change DirectSum.component K I
+      (fun j => (P j).M (ent t))
+      i (DirectSum.lof K I (fun j => (P j).M (ent t)) j (y t))
+    = 0
   rw [DirectSum.component.of, dite_eq_right e]
 
 open Classical in
-theorem decomp [Fintype ι] {m : ℕ} (z : (sumPM P).cech.X m) :
-    ∃ F : Finset I, z = ∑ i ∈ F, inc P i m (pr P i m z) := by
-  refine ⟨Finset.univ.biUnion fun t => DFinsupp.support (z t), sub_eq_zero.1 (cochain_ext P fun i => ?_)⟩
+theorem decomp [Fintype ι] {m : ℕ} (z : (sumPM P).cech.X m)
+    : ∃ F : Finset I, z = ∑ i ∈ F, inc P i m (pr P i m z) := by
+  refine
+    ⟨Finset.univ.biUnion fun t => DFinsupp.support (z t), sub_eq_zero.1 (cochain_ext P fun i => ?_)⟩
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sub, map_sum]
   by_cases hi : i ∈ Finset.univ.biUnion fun t => DFinsupp.support (z t)
@@ -159,8 +169,12 @@ theorem sum_ex [Fintype ι] (h : ∀ i, (P i).Ex) : (sumPM P).Ex := by
     rw [one_smul] at h2
     exact congrArg (inc P i (m + 1)) h2
 
-theorem sum_desc {K : Type} [Field K] {ι : Type} [DecidableEq ι] [Fintype ι] {I : Type 1} [DecidableEq I]
-    (A : I → Sy.{1} K ι) (h : ∀ i, (A i).Desc) : (sumSy A).Desc :=
-  fun n => sum_ex (fun i => (A i).term n) fun i => h i n
+theorem sum_desc
+    {K : Type} [Field K]
+    {ι : Type} [DecidableEq ι] [Fintype ι]
+    {I : Type 1} [DecidableEq I]
+    (A : I → Sy.{1} K ι) (h : ∀ i, (A i).Desc)
+    : (sumSy A).Desc := fun n =>
+  sum_ex (fun i => (A i).term n) fun i => h i n
 
 end GlobalTheory.CompanionTheory.KunGlue.SumDesc

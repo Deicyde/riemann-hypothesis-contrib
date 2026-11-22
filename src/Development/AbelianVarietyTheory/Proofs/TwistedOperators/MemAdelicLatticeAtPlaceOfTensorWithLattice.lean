@@ -14,15 +14,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InertSpheric
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm GlobalTheory.SquareAgree
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicU GlobalTheory.FinDecomp
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicU
+  GlobalTheory.FinDecomp
 noncomputable section
 
 namespace GlobalTheory.LatExtract
@@ -31,7 +35,10 @@ open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Spc latAtV incM A
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def mulL {d : ℕ} (c : E) : (Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) →+ (Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) where
+def mulL {d : ℕ} (c : E)
+    : (Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+      →+ (Fin d
+        → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) where
   toFun z := fun j => inclR (F := F) (AF F) c * z j
   map_zero' := by ext j; simp
   map_add' z z' := by ext j; simp [mul_add]
@@ -61,8 +68,11 @@ open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Spc latAtV incM A
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def rowL {n d : ℕ} (i₀ : Fin n) (c : E) :
-    Matrix (Fin n) (Fin d) (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) →+ (Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) where
+def rowL {n d : ℕ} (i₀ : Fin n) (c : E)
+    : Matrix (Fin n) (Fin d)
+        (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+      →+ (Fin d
+        → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) where
   toFun Γ := fun j => inclR (F := F) (AF F) c * Γ i₀ j
   map_zero' := by ext j; simp
   map_add' z z' := by ext j; simp [mul_add]
@@ -99,28 +109,37 @@ open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Spc latAtV incM A
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def coefSub {d : ℕ} (W : Spc F E d) (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F)) (q : Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) :
-    Submodule (𝓞 E) E where
+def coefSub
+    {d : ℕ} (W : Spc F E d)
+    (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
+    (q : Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    : Submodule (𝓞 E) E where
   carrier := {c | mulL (F := F) c q ∈ GlobalTheory.InertSph.latAt W v}
   zero_mem' := by
     change mulL (F := F) (0 : E) q ∈ GlobalTheory.InertSph.latAt W v
     have : mulL (F := F) (0 : E) q = 0 := by ext j; simp [mulL_apply]
-    rw [this]; exact (GlobalTheory.InertSph.latAt W v).zero_mem
+    rw [this]
+    exact (GlobalTheory.InertSph.latAt W v).zero_mem
   add_mem' {a b} ha hb := by
     change mulL (F := F) (a + b) q ∈ GlobalTheory.InertSph.latAt W v
     have : mulL (F := F) (a + b) q = mulL (F := F) a q + mulL (F := F) b q := by
       ext j; simp [mulL_apply, add_mul]
-    rw [this]; exact (GlobalTheory.InertSph.latAt W v).add_mem ha hb
+    rw [this]
+    exact (GlobalTheory.InertSph.latAt W v).add_mem ha hb
   smul_mem' o c hc := by
     change mulL (F := F) (o • c) q ∈ GlobalTheory.InertSph.latAt W v
     have : mulL (F := F) (o • c) q = mulL (F := F) (o : E) (mulL (F := F) c q) := by
       ext j; simp only [mulL_apply, Algebra.smul_def, map_mul, mul_assoc]
-    rw [this]; exact mulL_int_mem W v o hc
+    rw [this]
+    exact mulL_int_mem W v o hc
 
-theorem extract (n d : ℕ) (X : Spc F E n) (W : Spc F E d) (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
-    (q : Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) (hn : 0 < n) (hL : X.L.IsFullLattice E)
-    (h : ∀ x ∈ X.L, Matrix.vecMulVec (fun i => inclR (F := F) (AF F) (x i)) q ∈ latAtV X W v) :
-    q ∈ GlobalTheory.InertSph.latAt W v := by
+theorem extract
+    (n d : ℕ) (X : Spc F E n) (W : Spc F E d)
+    (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
+    (q : Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    (hn : 0 < n) (hL : X.L.IsFullLattice E)
+    (h : ∀ x ∈ X.L, Matrix.vecMulVec (fun i => inclR (F := F) (AF F) (x i)) q ∈ latAtV X W v)
+    : q ∈ GlobalTheory.InertSph.latAt W v := by
   set i₀ : Fin n := ⟨0, hn⟩
   let b₀ : Submodule (𝓞 E) E := X.L.map (LinearMap.proj (R := 𝓞 E) (φ := fun _ : Fin n => E) i₀)
   have hfg : b₀.FG := hL.fg.map _
@@ -129,7 +148,9 @@ theorem extract (n d : ℕ) (X : Spc F E n) (W : Spc F E d) (v : GlobalTheory.In
     rw [← FractionalIdeal.mem_coe]; exact Submodule.mem_map
   have hne : 𝔟 ≠ 0 := by
     intro h0
-    have hle : Submodule.span E (X.L : Set (Fin n → E)) ≤ LinearMap.ker (LinearMap.proj (R := E) (φ := fun _ : Fin n => E) i₀) := by
+    have hle
+        : Submodule.span E (X.L : Set (Fin n → E))
+          ≤ LinearMap.ker (LinearMap.proj (R := E) (φ := fun _ : Fin n => E) i₀) := by
       rw [Submodule.span_le]
       intro x hx
       have : x i₀ ∈ 𝔟 := (hmem _).2 ⟨x, hx, rfl⟩
@@ -138,9 +159,12 @@ theorem extract (n d : ℕ) (X : Spc F E n) (W : Spc F E d) (v : GlobalTheory.In
     rw [Submodule.IsFullLattice.span_eq_top (self := hL)] at hle
     have := hle (Submodule.mem_top (x := Pi.single i₀ (1 : E)))
     simp at this
-  have hone : (1 : E) ∈ ((𝔟⁻¹ * 𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E) := by
+  have hone
+      : (1 : E) ∈ ((𝔟⁻¹ * 𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E) := by
     rw [inv_mul_cancel₀ hne, FractionalIdeal.mem_coe]; exact FractionalIdeal.one_mem_one _
-  have hle : ((𝔟⁻¹ * 𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E) ≤ coefSub W v q := by
+  have hle
+      : ((𝔟⁻¹ * 𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E)
+        ≤ coefSub W v q := by
     rw [FractionalIdeal.coe_mul, Submodule.mul_le]
     intro c hc b hb
     rw [FractionalIdeal.mem_coe, FractionalIdeal.mem_inv_iff hne] at hc
@@ -159,9 +183,19 @@ theorem extract (n d : ℕ) (X : Spc F E n) (W : Spc F E d) (v : GlobalTheory.In
 
 end GlobalTheory.LatExtract
 
-theorem GlobalTheory.LatExtract.main : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n d : ℕ)
-    (X : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E n) (W : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E d) (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
-    (q : Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)), 0 < n → X.L.IsFullLattice E →
-    (∀ x ∈ X.L, Matrix.vecMulVec (fun i => Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F) (x i)) q ∈ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.latAtV X W v) →
-    q ∈ GlobalTheory.InertSph.latAt W v := fun F E _ _ _ _ _ n d X W v q hn hL h =>
+theorem GlobalTheory.LatExtract.main
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n d : ℕ)
+        (X : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E n)
+        (W : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc F E d)
+        (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
+        (q : Fin d → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)),
+      0 < n → X.L.IsFullLattice E
+        → (∀ x ∈ X.L,
+          Matrix.vecMulVec
+              (fun i =>
+                Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F)
+                  (x i))
+              q
+            ∈ GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.latAtV X W v)
+        → q ∈ GlobalTheory.InertSph.latAt W v := fun F E _ _ _ _ _ n d X W v q hn hL h =>
   GlobalTheory.LatExtract.extract n d X W v q hn hL h

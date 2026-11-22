@@ -4,10 +4,11 @@ public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.Lan
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
 
-theorem UpperTheory.Kd.C7.pKumTriv :
-    UpperTheory.Kd.C7.SKumTriv := by
+theorem UpperTheory.Kd.C7.pKumTriv : UpperTheory.Kd.C7.SKumTriv := by
   intro l _ _ Ω _ _ _ A _ ζ hζ m n hnm u hu h
   have hp : l.Prime := Fact.out
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
@@ -27,6 +28,8 @@ theorem UpperTheory.Kd.C7.pKumTriv :
   have hc : cycMod ℚ Ω l m s = 1 := (Subgroup.mem_inf.1 hs).2
   have h2 : s (v / w) = v / w := fix_of_cycMod hnm hc h1
   have e : v = v / w * w := by field_simp
-  calc s v = s (v / w * w) := by rw [← e]
+  calc
+    s v
+      = s (v / w * w) := by rw [← e]
     _ = v / w * w := by rw [map_mul, h2, hsw]
     _ = v := e.symm

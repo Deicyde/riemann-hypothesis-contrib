@@ -16,12 +16,14 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CompanionTheory.AbFibre
 
-theorem isPullback_baseChange {S T : Scheme.{0}} (s : T ⟶ S) {X Y : Over S} (f : X ⟶ Y) :
-    IsPullback ((Over.pullback s).map f).left (pullback.fst X.hom s) (pullback.fst Y.hom s) f.left := by
+theorem isPullback_baseChange {S T : Scheme.{0}} (s : T ⟶ S) {X Y : Over S} (f : X ⟶ Y)
+    : IsPullback ((Over.pullback s).map f).left (pullback.fst X.hom s) (pullback.fst Y.hom s)
+      f.left := by
   have h1 : ((Over.pullback s).map f).left ≫ pullback.snd Y.hom s = pullback.snd X.hom s := by
     simp only [Over.pullback_map_left]
     exact pullback.lift_snd _ _ _
-  have h2 : ((Over.pullback s).map f).left ≫ pullback.fst Y.hom s = pullback.fst X.hom s ≫ f.left := by
+  have h2
+      : ((Over.pullback s).map f).left ≫ pullback.fst Y.hom s = pullback.fst X.hom s ≫ f.left := by
     simp only [Over.pullback_map_left]
     exact pullback.lift_fst _ _ _
   have hX : f.left ≫ Y.hom = X.hom := Over.w f
@@ -29,12 +31,14 @@ theorem isPullback_baseChange {S T : Scheme.{0}} (s : T ⟶ S) {X Y : Over S} (f
   rw [h1, hX]
   exact (IsPullback.of_hasPullback X.hom s).flip
 
-theorem exists_geometric_point {S : Scheme.{0}} (Y : Over S) (y : Y.left) :
-    ∃ (Ω : Type) (_ : Field Ω) (_ : IsAlgClosed Ω) (s : Spec (.of Ω) ⟶ S) (w : ↥(pullback Y.hom s)),
+theorem exists_geometric_point {S : Scheme.{0}} (Y : Over S) (y : Y.left)
+    : ∃ (Ω : Type) (_ : Field Ω) (_ : IsAlgClosed Ω) (s : Spec (.of Ω) ⟶ S)
+        (w : ↥(pullback Y.hom s)),
       pullback.fst Y.hom s w = y := by
   let Ω := AlgebraicClosure (Y.left.residueField y)
   let g : Spec (.of Ω) ⟶ Y.left :=
-    Spec.map (CommRingCat.ofHom (algebraMap (Y.left.residueField y) Ω)) ≫ Y.left.fromSpecResidueField y
+    Spec.map (CommRingCat.ofHom (algebraMap (Y.left.residueField y) Ω))
+      ≫ Y.left.fromSpecResidueField y
   let L : Spec (.of Ω) ⟶ pullback Y.hom (g ≫ Y.hom) := pullback.lift g (𝟙 _) (by simp)
   let pt : ↥(Spec (.of Ω)) := IsLocalRing.closedPoint Ω
   refine ⟨Ω, inferInstance, inferInstance, g ≫ Y.hom, L pt, ?_⟩
@@ -51,9 +55,11 @@ theorem finiteOfFibres : PositivityTheory.Tls2.Zar3.Ch1.FiniteOfFibres := by
   haveI : IsProper B.hom := IsAbelianScheme.proper (A := B)
   haveI : IsProper (l.left ≫ B.hom) := by rw [hcomp]; infer_instance
   haveI : IsProper l.left := IsProper.of_comp l.left B.hom
-  have lift : ∀ {T : Scheme.{0}} (s : T ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R) (x : ↥A.left)
-      (w : ↥(pullback B.hom s)), pullback.fst B.hom s w = l.left x →
-      ∃ v, ((Over.pullback s).map l).left v = w ∧ pullback.fst A.hom s v = x := by
+  have lift
+      : ∀ {T : Scheme.{0}} (s : T ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R) (x : ↥A.left)
+          (w : ↥(pullback B.hom s)),
+        pullback.fst B.hom s w = l.left x
+          → ∃ v, ((Over.pullback s).map l).left v = w ∧ pullback.fst A.hom s v = x := by
     intro T s x w hxw
     have h := isPullback_baseChange s l
     obtain ⟨z, hz1, hz2⟩ :=

@@ -18,19 +18,22 @@ namespace InertPlacesInfinite
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-abbrev inertSet (E : Type) [Field E] [NumberField E] [IsCMField E] :
-    Set (HeightOneSpectrum (𝓞 (maximalRealSubfield E))) :=
+abbrev inertSet (E : Type) [Field E] [NumberField E] [IsCMField E]
+    : Set (HeightOneSpectrum (𝓞 (maximalRealSubfield E))) :=
   GroundTheory.Global.chebotarevSet (K := maximalRealSubfield E) (L := E) {IsCMField.complexConj E}
 
-private theorem infinite_of_hasDirichletDensity_pos {K : Type} [Field K] [NumberField K]
+private theorem infinite_of_hasDirichletDensity_pos
+    {K : Type} [Field K] [NumberField K]
     {S : Set (HeightOneSpectrum (𝓞 K))} {δ : ℝ}
-    (h : NumberField.Set.HasDirichletDensity S δ) (hδ : 0 < δ) : S.Infinite := by
+    (h : NumberField.Set.HasDirichletDensity S δ) (hδ : 0 < δ)
+    : S.Infinite := by
   intro hfin
   have h0 := GroundTheory.Global.hasDirichletDensity_zero_of_finite hfin
   exact hδ.ne' (h.dirichletDensity_eq.symm.trans h0.dirichletDensity_eq)
 
-private theorem eq_one_or_eq_complexConj_of_maximalRealSubfield (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (σ : Gal(E/↥(maximalRealSubfield E))) : σ = 1 ∨ σ = IsCMField.complexConj E := by
+private theorem eq_one_or_eq_complexConj_of_maximalRealSubfield
+    (E : Type) [Field E] [NumberField E] [IsCMField E] (σ : Gal(E/↥(maximalRealSubfield E)))
+    : σ = 1 ∨ σ = IsCMField.complexConj E := by
   have hσ : σ ∈ Subgroup.zpowers (IsCMField.complexConj E) := by
     rw [IsCMField.zpowers_complexConj_eq_top]
     trivial
@@ -40,15 +43,17 @@ private theorem eq_one_or_eq_complexConj_of_maximalRealSubfield (E : Type) [Fiel
   rcases Int.emod_two_eq_zero_or_one k with hk | hk <;> simp [hk]
 
 theorem inertSet_infinite : (inertSet E).Infinite := by
-  have hcl : ∀ σ ∈ ({IsCMField.complexConj E} : Set Gal(E/↥(maximalRealSubfield E))),
-      ∀ τ : Gal(E/↥(maximalRealSubfield E)), τ * σ * τ⁻¹ ∈
-        ({IsCMField.complexConj E} : Set Gal(E/↥(maximalRealSubfield E))) := by
+  have hcl
+      : ∀ σ ∈ ({IsCMField.complexConj E} : Set Gal(E/↥(maximalRealSubfield E))),
+        ∀ τ : Gal(E/↥(maximalRealSubfield E)),
+          τ * σ * τ⁻¹ ∈ ({IsCMField.complexConj E} : Set Gal(E/↥(maximalRealSubfield E))) := by
     intro σ hσ τ
     rw [Set.mem_singleton_iff] at hσ ⊢
     subst hσ
     rcases eq_one_or_eq_complexConj_of_maximalRealSubfield E τ with h | h <;> subst h <;> group
-  have hd := GroundTheory.Global.hasDirichletDensity_chebotarevSet
-    (K := ↥(maximalRealSubfield E)) (L := E) _ hcl
+  have hd :=
+    GroundTheory.Global.hasDirichletDensity_chebotarevSet (K := ↥(maximalRealSubfield E)) (L := E) _
+      hcl
   apply infinite_of_hasDirichletDensity_pos hd
   have h2 : Nat.card Gal(E/↥(maximalRealSubfield E)) = 2 := by
     rw [IsGalois.card_aut_eq_finrank]
@@ -57,21 +62,25 @@ theorem inertSet_infinite : (inertSet E).Infinite := by
   rw [h2]
   simp
 
-theorem eq_of_liesOver {v : HeightOneSpectrum (𝓞 (maximalRealSubfield E))} (hv : v ∈ inertSet E)
-    {w u : HeightOneSpectrum (𝓞 E)} (hw : w.asIdeal.LiesOver v.asIdeal) (hu : u.asIdeal.LiesOver v.asIdeal) :
-    u = w := by
+theorem eq_of_liesOver
+    {v : HeightOneSpectrum (𝓞 (maximalRealSubfield E))} (hv : v ∈ inertSet E)
+    {w u : HeightOneSpectrum (𝓞 E)}
+    (hw : w.asIdeal.LiesOver v.asIdeal) (hu : u.asIdeal.LiesOver v.asIdeal)
+    : u = w := by
   haveI := hw
   haveI := hu
-  obtain ⟨σ, hσ⟩ := Ideal.exists_smul_eq_of_isGaloisGroup v.asIdeal w.asIdeal u.asIdeal
-    Gal(E/↥(maximalRealSubfield E))
+  obtain ⟨σ, hσ⟩ :=
+    Ideal.exists_smul_eq_of_isGaloisGroup v.asIdeal w.asIdeal u.asIdeal
+      Gal(E/↥(maximalRealSubfield E))
   apply IsDedekindDomain.HeightOneSpectrum.ext
   rw [← hσ]
   rcases eq_one_or_eq_complexConj_of_maximalRealSubfield E σ with h | h
   · rw [h, one_smul]
   · have hfrob := (hv w hw).2
     rw [Set.mem_singleton_iff] at hfrob
-    have hst := (IsArithFrobAt.arithFrobAt (𝓞 ↥(maximalRealSubfield E))
-      Gal(E/↥(maximalRealSubfield E)) w.asIdeal).mem_stabilizer
+    have hst :=
+      (IsArithFrobAt.arithFrobAt (𝓞 ↥(maximalRealSubfield E)) Gal(E/↥(maximalRealSubfield E))
+        w.asIdeal).mem_stabilizer
     rw [hfrob, ← h] at hst
     exact MulAction.mem_stabilizer_iff.mp hst
 
@@ -102,8 +111,7 @@ theorem inertPlaceEx : InertPlaceEx := by
     exact hvT ⟨u, Or.inl huX, huv⟩
   · rintro ⟨u', hne, hu'⟩
     apply hne
-    have h1 : u.asIdeal.LiesOver v.asIdeal :=
-      ⟨(congrArg HeightOneSpectrum.asIdeal huv).symm⟩
+    have h1 : u.asIdeal.LiesOver v.asIdeal := ⟨(congrArg HeightOneSpectrum.asIdeal huv).symm⟩
     have h2 : u'.asIdeal.LiesOver v.asIdeal :=
       ⟨(congrArg HeightOneSpectrum.asIdeal (hu'.trans huv)).symm⟩
     exact InertPlacesInfinite.eq_of_liesOver hv h1 h2

@@ -23,14 +23,15 @@ def wPl (D : D7) (j : ℕ) (z : Bool × HH D) : ℝ := wj D j (tauPl D z)
 def posPl (D : D7) (p : ℕ) (z : Bool × HH D) (e : ℕ) : Bool × HH D :=
   (xor z.1 (partner D p z.2 e).1, (partner D p z.2 e).2)
 
-theorem positionPlace_conjugate_partner (D : D7) (p : ℕ) (t : HH D) (e : ℕ) : posPl D p (false, t) e = partner D p t e := by
+theorem positionPlace_conjugate_partner (D : D7) (p : ℕ) (t : HH D) (e : ℕ)
+    : posPl D p (false, t) e = partner D p t e := by
   simp [posPl]
 
 theorem posPl_zero (D : D7) (p : ℕ) (z : Bool × HH D) : posPl D p z 0 = z := by
   simp [posPl, partner]
 
-theorem posPl_add (D : D7) (p : ℕ) (z : Bool × HH D) (a b : ℕ) :
-    posPl D p (posPl D p z a) b = posPl D p z (a + b) := by
+theorem posPl_add (D : D7) (p : ℕ) (z : Bool × HH D) (a b : ℕ)
+    : posPl D p (posPl D p z a) b = posPl D p z (a + b) := by
   unfold posPl partner
   refine Prod.ext ?_ ?_
   · show xor (xor z.1 (decide (IsSg D p ∧ Odd a))) (decide (IsSg D p ∧ Odd b)) =
@@ -38,11 +39,13 @@ theorem posPl_add (D : D7) (p : ℕ) (z : Bool × HH D) (a b : ℕ) :
     rw [Bool.xor_assoc]
     congr 1
     by_cases hs : IsSg D p
-    · have h : ∀ e : ℕ, decide (IsSg D p ∧ Odd e) = decide (Odd e) :=
-        fun e => decide_eq_decide.2 ⟨fun h => h.2, fun h => ⟨hs, h⟩⟩
+    · have h : ∀ e : ℕ, decide (IsSg D p ∧ Odd e) = decide (Odd e) := fun e =>
+        decide_eq_decide.2 ⟨fun h => h.2, fun h => ⟨hs, h⟩⟩
       simp only [h]
-      by_cases ha : Odd a <;> by_cases hb : Odd b <;> simp [ha, hb, Nat.odd_add, ← Nat.not_odd_iff_even]
-    · have h : ∀ e : ℕ, decide (IsSg D p ∧ Odd e) = false := fun e => decide_eq_false (fun h => hs h.1)
+      by_cases ha : Odd a <;> by_cases hb : Odd b
+        <;> simp [ha, hb, Nat.odd_add, ← Nat.not_odd_iff_even]
+    · have h : ∀ e : ℕ, decide (IsSg D p ∧ Odd e) = false := fun e =>
+        decide_eq_false (fun h => hs h.1)
       simp only [h, Bool.xor_false]
   · show z.2 + a • hP D p + b • hP D p = z.2 + (a + b) • hP D p
     rw [add_smul, add_assoc]
@@ -55,7 +58,7 @@ instance nP_neZero (D : D7) (p : ℕ) : NeZero (nP D p) := by
   · exact (addOrderOf_pos _).ne'
 
 theorem posPl_period (D : D7) (p : ℕ) (z : Bool × HH D) : posPl D p z (nP D p) = z := by
-  have key : ¬ (IsSg D p ∧ Odd (nP D p)) ∧ nP D p • hP D p = 0 := by
+  have key : ¬(IsSg D p ∧ Odd (nP D p)) ∧ nP D p • hP D p = 0 := by
     by_cases hs : IsSg D p
     · have hn : nP D p = 2 * addOrderOf (2 • hP D p) := if_pos hs
       rw [hn]
@@ -71,16 +74,18 @@ theorem posPl_period (D : D7) (p : ℕ) (z : Bool × HH D) : posPl D p z (nP D p
   · show z.2 + nP D p • hP D p = z.2
     rw [key.2, add_zero]
 
-theorem posPl_mul_period (D : D7) (p : ℕ) (z : Bool × HH D) (c : ℕ) : posPl D p z (nP D p * c) = z := by
+theorem posPl_mul_period (D : D7) (p : ℕ) (z : Bool × HH D) (c : ℕ)
+    : posPl D p z (nP D p * c) = z := by
   induction c with
   | zero => simpa using posPl_zero D p z
   | succ c ih => rw [Nat.mul_succ, ← posPl_add, ih, posPl_period]
 
-theorem posPl_mod (D : D7) (p : ℕ) (z : Bool × HH D) (e : ℕ) : posPl D p z (e % nP D p) = posPl D p z e := by
+theorem posPl_mod (D : D7) (p : ℕ) (z : Bool × HH D) (e : ℕ)
+    : posPl D p z (e % nP D p) = posPl D p z e := by
   conv_rhs => rw [← Nat.div_add_mod e (nP D p), ← posPl_add, posPl_mul_period]
 
-theorem lpFeasible_shift_sub (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (c : ZMod d) :
-    lpFeasible l d (fun s => Ds (s + c)) ⊆ lpFeasible l d Ds := by
+theorem lpFeasible_shift_sub (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (c : ZMod d)
+    : lpFeasible l d (fun s => Ds (s + c)) ⊆ lpFeasible l d Ds := by
   rintro y ⟨xs, h0, hs, hc, rfl⟩
   refine ⟨fun s i => xs (s - c) i, fun s i => h0 _ _, fun s i h => hs _ _ h, fun s => ?_, ?_⟩
   · have h := hc (s - c)
@@ -90,8 +95,8 @@ theorem lpFeasible_shift_sub (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (c : Z
     exact h
   · exact (Equiv.sum_comp (Equiv.subRight c) (fun s => ∑ i ∈ Finset.range d, xs s i)).symm
 
-theorem lpF_shift (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (c : ZMod d) :
-    lpF l d (fun s => Ds (s + c)) = lpF l d Ds := by
+theorem lpF_shift (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (c : ZMod d)
+    : lpF l d (fun s => Ds (s + c)) = lpF l d Ds := by
   have hset : lpFeasible l d (fun s => Ds (s + c)) = lpFeasible l d Ds := by
     refine Set.Subset.antisymm (lpFeasible_shift_sub l d Ds c) ?_
     have h := lpFeasible_shift_sub l d (fun s => Ds (s + c)) (-c)
@@ -103,19 +108,23 @@ theorem lpF_shift (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (c : ZMod d) :
 def FOrb (D : D7) (j p : ℕ) (z : Bool × HH D) : ℝ :=
   lpF p (nP D p) (fun s => ((D.R.k : ℝ) - 1) * wPl D j (posPl D p z s.val))
 
-theorem FOrb_step (D : D7) (j p : ℕ) (z : Bool × HH D) (e : ℕ) : FOrb D j p (posPl D p z e) = FOrb D j p z := by
+theorem FOrb_step (D : D7) (j p : ℕ) (z : Bool × HH D) (e : ℕ)
+    : FOrb D j p (posPl D p z e) = FOrb D j p z := by
   unfold FOrb
-  rw [← lpF_shift p (nP D p) (fun s => ((D.R.k : ℝ) - 1) * wPl D j (posPl D p z s.val)) (e : ZMod (nP D p))]
+  rw [← lpF_shift p (nP D p)
+    (fun s => ((D.R.k : ℝ) - 1) * wPl D j (posPl D p z s.val))
+    (e : ZMod (nP D p))]
   congr 1
   funext s
-  rw [posPl_add, ZMod.val_add, ZMod.val_natCast, posPl_mod, ← posPl_add D p z s.val, posPl_mod, posPl_add,
-    add_comm]
-
+  rw [posPl_add, ZMod.val_add, ZMod.val_natCast, posPl_mod, ← posPl_add D p z s.val, posPl_mod,
+    posPl_add, add_comm]
 
 open Classical in
 def FInert (D : D7) (j p : ℕ) : ℝ :=
-  if IsResidueClassZero D p ∧ hP D p = 0 then ∑ τ : D.what₂.Tau, ((D.R.k : ℝ) - 1) * wj D j τ / ((p : ℝ) ^ 2 - 1)
-  else (∑ z : Bool × HH D, FOrb D j p z) / (nP D p : ℝ)
+  if IsResidueClassZero D p ∧ hP D p = 0 then
+    ∑ τ : D.what₂.Tau, ((D.R.k : ℝ) - 1) * wj D j τ / ((p : ℝ) ^ 2 - 1)
+  else
+    (∑ z : Bool × HH D, FOrb D j p z) / (nP D p : ℝ)
 
 def FRamD (D : D7) (j : ℕ) : ℝ :=
   -(((D.R.k : ℝ) - 1) / 2) * ∑ t : HH D, min (wPl D j (false, t)) (wPl D j (true, t))
@@ -125,24 +134,29 @@ def fockDeg (D : D7) (j : ℕ) : ℤ :=
 
 def FTypeG (D : D7) (j : ℕ) : ℝ := -((fockDeg D j : ℝ)) / 2
 
-
 open Classical in
 def FvalP {D : D7} (L : SizeData₂ D) (j p : ℕ) : ℝ :=
-  if p ∈ L.gTypes then FTypeG D j
-  else if D.host.cls p = PrimeClass.ramD then FRamD D j
-  else if (IsResidueClassZero D p ∨ IsSg D p) ∧ (p : ℝ) ≤ L.sc.X'' D.R.n then FInert D j p
-  else 0
+  if p ∈ L.gTypes then
+    FTypeG D j
+  else if D.host.cls p = PrimeClass.ramD then
+    FRamD D j
+  else if (IsResidueClassZero D p ∨ IsSg D p) ∧ (p : ℝ) ≤ L.sc.X'' D.R.n then
+    FInert D j p
+  else
+    0
 
-def Fval {D : D7} (L : SizeData₂ D) (j : ℕ) (w : D.what₂.places.Pl) : ℝ := FvalP L j (D.what₂.places.resChar w)
+def Fval {D : D7} (L : SizeData₂ D) (j : ℕ) (w : D.what₂.places.Pl) : ℝ :=
+  FvalP L j (D.what₂.places.resChar w)
 
 def SizeData₂.FDef {D : D7} (L : SizeData₂ D) : Prop :=
   ∀ j ∈ SizeData₂.lifts D, ∀ w, L.F j w = Fval L j w
 
-theorem posPl_fix (D : D7) (p : ℕ) (y : Bool × HH D) (c : ℕ) (h : posPl D p y c = y) : nP D p ∣ c := by
+theorem posPl_fix (D : D7) (p : ℕ) (y : Bool × HH D) (c : ℕ) (h : posPl D p y c = y)
+    : nP D p ∣ c := by
   have h1 : xor y.1 (decide (IsSg D p ∧ Odd c)) = y.1 := congrArg Prod.fst h
   have h2 : y.2 + c • hP D p = y.2 := congrArg Prod.snd h
   have h2' : c • hP D p = 0 := by simpa using h2
-  have h1' : ¬ (IsSg D p ∧ Odd c) := by
+  have h1' : ¬(IsSg D p ∧ Odd c) := by
     intro hc
     rw [decide_eq_true hc] at h1
     cases hy : y.1 <;> simp [hy] at h1
@@ -150,16 +164,17 @@ theorem posPl_fix (D : D7) (p : ℕ) (y : Bool × HH D) (c : ℕ) (h : posPl D p
   · have hn : nP D p = 2 * addOrderOf (2 • hP D p) := if_pos hs
     have hev : Even c := Nat.not_odd_iff_even.1 (fun ho => h1' ⟨hs, ho⟩)
     obtain ⟨a, rfl⟩ := hev
-    have h3 : a • (2 • hP D p) = 0 := by
-      rw [← mul_smul, mul_two]; exact h2'
+    have h3 : a • (2 • hP D p) = 0 := by rw [← mul_smul, mul_two]; exact h2'
     rw [hn, ← two_mul]
     exact Nat.mul_dvd_mul_left 2 (addOrderOf_dvd_of_nsmul_eq_zero h3)
   · have hn : nP D p = addOrderOf (hP D p) := if_neg hs
     rw [hn]
     exact addOrderOf_dvd_of_nsmul_eq_zero h2'
 
-theorem posPl_inj (D : D7) (p : ℕ) (z : Bool × HH D) (a b : ℕ) (ha : a < nP D p) (hb : b < nP D p)
-    (h : posPl D p z a = posPl D p z b) : a = b := by
+theorem posPl_inj
+    (D : D7) (p : ℕ) (z : Bool × HH D) (a b : ℕ)
+    (ha : a < nP D p) (hb : b < nP D p) (h : posPl D p z a = posPl D p z b)
+    : a = b := by
   have key : ∀ a b : ℕ, a ≤ b → b < nP D p → posPl D p z a = posPl D p z b → a = b := by
     intro a b hab hb h
     obtain ⟨c, rfl⟩ := Nat.exists_eq_add_of_le hab
@@ -171,14 +186,20 @@ theorem posPl_inj (D : D7) (p : ℕ) (z : Bool × HH D) (a b : ℕ) (ha : a < nP
   · exact key a b hab hb h
   · exact (key b a hab ha h.symm).symm
 
-theorem sum_orbits (D : D7) (j p : ℕ) (T : Finset (Bool × HH D))
-    (hT : ∀ z, ∃! r, r ∈ T ∧ ∃ e : ℕ, posPl D p r e = z) :
-    (∑ z : Bool × HH D, FOrb D j p z) / (nP D p : ℝ) = ∑ r ∈ T, FOrb D j p r := by
+theorem sum_orbits
+    (D : D7) (j p : ℕ)
+    (T : Finset (Bool × HH D)) (hT : ∀ z, ∃! r, r ∈ T ∧ ∃ e : ℕ, posPl D p r e = z)
+    : (∑ z : Bool × HH D, FOrb D j p z) / (nP D p : ℝ) = ∑ r ∈ T, FOrb D j p r := by
   have hn : (nP D p : ℝ) ≠ 0 := Nat.cast_ne_zero.2 (NeZero.ne _)
   have hpos : 0 < nP D p := Nat.pos_of_ne_zero (NeZero.ne _)
-  have h1 : ∑ x ∈ T ×ˢ Finset.range (nP D p), FOrb D j p (posPl D p x.1 x.2) =
-      ∑ z : Bool × HH D, FOrb D j p z := by
-    refine Finset.sum_bij (fun x _ => posPl D p x.1 x.2) (fun _ _ => Finset.mem_univ _) ?_ ?_ (fun _ _ => rfl)
+  have h1
+      : ∑ x ∈ T ×ˢ Finset.range (nP D p), FOrb D j p (posPl D p x.1 x.2)
+        = ∑ z : Bool × HH D, FOrb D j p z := by
+    refine Finset.sum_bij
+      (fun x _ => posPl D p x.1 x.2)
+      (fun _ _ => Finset.mem_univ _)
+      ?_ ?_
+      (fun _ _ => rfl)
     · rintro ⟨r, a⟩ hx ⟨r', b⟩ hx' h
       rw [Finset.mem_product, Finset.mem_range] at hx hx'
       have hr : r = r' := (hT (posPl D p r a)).unique ⟨hx.1, a, rfl⟩ ⟨hx'.1, b, h.symm⟩
@@ -186,8 +207,11 @@ theorem sum_orbits (D : D7) (j p : ℕ) (T : Finset (Bool × HH D))
       rw [posPl_inj D p r a b hx.2 hx'.2 h]
     · intro z _
       obtain ⟨r, ⟨hr, e, he⟩, -⟩ := hT z
-      exact ⟨(r, e % nP D p), Finset.mem_product.2 ⟨hr, Finset.mem_range.2 (Nat.mod_lt _ hpos)⟩,
-        by rw [posPl_mod, he]⟩
+      exact ⟨
+        (r, e % nP D p),
+        Finset.mem_product.2 ⟨hr, Finset.mem_range.2 (Nat.mod_lt _ hpos)⟩,
+        by rw [posPl_mod, he]
+      ⟩
   rw [← h1, Finset.sum_product]
   simp only [FOrb_step, Finset.sum_const, Finset.card_range, nsmul_eq_mul]
   rw [← Finset.mul_sum, mul_div_cancel_left₀ _ hn]
@@ -200,21 +224,23 @@ section Cases
 
 variable {D : D7} (L : SizeData₂ D) (j : ℕ) {p : ℕ}
 
-theorem FvalP_above (hX : L.sc.X'' D.R.n < (p : ℝ)) (hg : p ∉ L.gTypes) (hd : p ≠ D.host.d) : FvalP L j p = 0 := by
+theorem FvalP_above (hX : L.sc.X'' D.R.n < (p : ℝ)) (hg : p ∉ L.gTypes) (hd : p ≠ D.host.d)
+    : FvalP L j p = 0 := by
   unfold FvalP
   rw [if_neg hg, if_neg (fun h => hd (cls_ramD h)), if_neg (fun h => absurd h.2 (not_le.2 hX))]
 
 end Cases
 
-theorem addVal_natCast_nonneg {K : Type*} [Field K] (v : AddValuation K (WithTop ℤ)) (n : ℕ) : 0 ≤ v (n : K) := by
+theorem addVal_natCast_nonneg {K : Type*} [Field K] (v : AddValuation K (WithTop ℤ)) (n : ℕ)
+    : 0 ≤ v (n : K) := by
   induction n with
   | zero => simp
   | succ n ih =>
     rw [Nat.cast_succ]
     exact le_trans (le_min ih (by rw [v.map_one])) (v.map_add _ _)
 
-theorem resChar_conj (D : D7) (w : D.what₂.places.Pl) :
-    D.what₂.places.resChar (D.what₂.places.conj w) = D.what₂.places.resChar w := by
+theorem resChar_conj (D : D7) (w : D.what₂.places.Pl)
+    : D.what₂.places.resChar (D.what₂.places.conj w) = D.what₂.places.resChar w := by
   by_contra hne
   set v := D.what₂.places.val (D.what₂.places.conj w) with hv
   set q := D.what₂.places.resChar (D.what₂.places.conj w) with hq
@@ -227,7 +253,9 @@ theorem resChar_conj (D : D7) (w : D.what₂.places.Pl) :
   have hvp : 0 < v (p : D.what₂.LL) := by
     rw [hv, D.conj_val, star_natCast, hp, D.what₂.places.val_resChar]
     exact_mod_cast D.what₂.places.ramIdx_pos _
-  obtain ⟨c, -, hc⟩ := Nat.exists_mul_mod_eq_one_of_coprime ((Nat.coprime_primes hppr hqpr).2 (fun h => hne h.symm)) hqpr.one_lt
+  obtain ⟨c, -, hc⟩ :=
+    Nat.exists_mul_mod_eq_one_of_coprime ((Nat.coprime_primes hppr hqpr).2 (fun h => hne h.symm))
+      hqpr.one_lt
   have h1 : ((p * c : ℕ) : D.what₂.LL) - ((q * (p * c / q) : ℕ) : D.what₂.LL) = 1 := by
     have := Nat.div_add_mod (p * c) q
     rw [hc] at this
@@ -243,14 +271,15 @@ theorem resChar_conj (D : D7) (w : D.what₂.places.Pl) :
   rw [h1, v.map_one] at h4
   exact absurd (lt_of_lt_of_le (lt_min h2 h3) h4) (lt_irrefl _)
 
-theorem Fval_conj {D : D7} (L : SizeData₂ D) (j : ℕ) (w : D.what₂.places.Pl) :
-    Fval L j (D.what₂.places.conj w) = Fval L j w := by
+theorem Fval_conj {D : D7} (L : SizeData₂ D) (j : ℕ) (w : D.what₂.places.Pl)
+    : Fval L j (D.what₂.places.conj w) = Fval L j w := by
   unfold Fval
   rw [resChar_conj]
 
 def FInertGe (D : D7) : Prop :=
-  ∀ j ∈ SizeData₂.lifts D, ∀ p : ℕ, p.Prime → (IsResidueClassZero D p ∨ IsSg D p) → (∀ τ : D.what₂.Tau, 0 ≤ wj D j τ) →
-    ∑ τ : D.what₂.Tau, ((D.R.k : ℝ) - 1) * wj D j τ / ((p : ℝ) ^ 2 - 1) ≤ FInert D j p
+  ∀ j ∈ SizeData₂.lifts D, ∀ p : ℕ,
+    p.Prime → (IsResidueClassZero D p ∨ IsSg D p) → (∀ τ : D.what₂.Tau, 0 ≤ wj D j τ)
+      → ∑ τ : D.what₂.Tau, ((D.R.k : ℝ) - 1) * wj D j τ / ((p : ℝ) ^ 2 - 1) ≤ FInert D j p
 
 end Formalism.BasicNotions
 

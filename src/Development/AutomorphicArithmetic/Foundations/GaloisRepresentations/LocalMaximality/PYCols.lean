@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma pk_mem' {d : ℕ} {I : Finset (Fin (d + 1))} (h : I.Nonempty) : pk I ∈ I := by
@@ -54,9 +55,12 @@ private lemma admissible_append {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ
     simpa [Sys.r, Sys.u, app, hl] using this
 
 section
-variable {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K'] [Algebra F K]
-  [IsScalarTower ℂ F K] [Algebra K K'] [IsScalarTower ℂ K K'] [Algebra F K'] [IsScalarTower F K K'] [IsScalarTower ℂ F K'] {d : ℕ}
-  (x : Fin (d + 1) → Fˣ) (j2 : K →ₐ[ℂ] K')
+variable
+  {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K']
+  [Algebra F K] [IsScalarTower ℂ F K] [Algebra K K'] [IsScalarTower ℂ K K'] [Algebra F K']
+  [IsScalarTower F K K'] [IsScalarTower ℂ F K']
+  {d : ℕ} (x : Fin (d + 1) → Fˣ)
+  (j2 : K →ₐ[ℂ] K')
 
 private lemma gS_X (i : Fin (d + 1)) :
     Units.map ((gS j2 : K ⊗[ℂ] K →ₐ[ℂ] K') : K ⊗[ℂ] K →* K') ((sysZ K x 0).X i) = (sysY x j2 d).X i := by
@@ -100,9 +104,10 @@ private lemma cols_gen (hKE : YKE) (hOk : SysOk) (hRS : RS) (h0 : Y0 x j2) (hG :
 
 end
 
-theorem UpperTheory.Gal.productCup_of_system.yCols_of :
-    YKE → PtG → PtT → FixLoc → GMap → ThMuLat → SysOk → RS → RYBasic → YCols := by
-  intro hKE hPtG hPtT hFix hGM hTh hOk hRS hRY F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 Fx A hY κ _ _ n z hZ
+theorem UpperTheory.Gal.productCup_of_system.yCols_of
+    : YKE → PtG → PtT → FixLoc → GMap → ThMuLat → SysOk → RS → RYBasic → YCols := by
+  intro hKE hPtG hPtT hFix hGM hTh hOk hRS hRY F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 Fx A hY κ _ _
+    n z hZ
   have h0 : Y0 x j2 := hY.toY0
   have hG : (sysY x j2 d).Good := (hRY F K K' d x j2 h0).2.1 d
   have hA0 : (sysY x j2 d).admitted n11 (sysY x j2 d).mu := (hTh d K' (DR ℂ K') (sysY x j2 d) hG).1
@@ -114,28 +119,33 @@ theorem UpperTheory.Gal.productCup_of_system.yCols_of :
   have hA2 : (sysY x j2 d).admitted n10 (gT x j2) := fun i j l => by
     have := hG.memX {i} {j} (Finset.singleton_nonempty j) i (Finset.mem_singleton_self i) l.succ
     simpa [Sys.r, Sys.u, n10, gT] using this
-  have hA3 : (sysY x j2 d).admitted (app (app n11 n) n10) (app (gG x j2 z) (gT x j2)) := admissible_append _ _ _ _ _ hA1 hA2
+  have hA3 : (sysY x j2 d).admitted (app (app n11 n) n10) (app (gG x j2 z) (gT x j2)) :=
+    admissible_append _ _ _ _ _ hA1 hA2
   refine ⟨hA1, hA2, hA3, fun I J hI hJ => ?_⟩
   have c1 := cols_gen x j2 hKE hOk hRS h0 hG _ _ hA1 I J hI hJ
   have c2 := cols_gen x j2 hKE hOk hRS h0 hG _ _ hA2 I J hI hJ
   have c3 := cols_gen x j2 hKE hOk hRS h0 hG _ _ hA3 I J hI hJ
   have hi := pk_mem' hI
   have hj := pk_mem' hJ
-  have pG : ∀ e : RY (xv x) j2 I J →ₐ[ℂ] ℂ,
-      (∀ l, Val (RY (xv x) j2 I J) e ((sysY x j2 d).r (app n11 n) (gG x j2 z) (pk I) (pk J) l) 0) →
-      J = {0} ∧ ∃ e0 ∈ Fx, Over x j2 e e0 :=
-    fun e he => hPtG F K K' d x j2 Fx A hY κ n z hZ I J _ hi _ hj e he
-  have pT : ∀ e : RY (xv x) j2 I J →ₐ[ℂ] ℂ,
-      (∀ l, Val (RY (xv x) j2 I J) e ((sysY x j2 d).r n10 (gT x j2) (pk I) (pk J) l) 0) →
-      ∃ e0, Over x j2 e e0 :=
-    fun e he => hPtT F K K' d x j2 h0 I J _ hi _ hj e he
+  have pG
+      : ∀ e : RY (xv x) j2 I J →ₐ[ℂ] ℂ,
+        (∀ l, Val (RY (xv x) j2 I J) e ((sysY x j2 d).r (app n11 n) (gG x j2 z) (pk I) (pk J) l) 0)
+          → J = {0} ∧ ∃ e0 ∈ Fx, Over x j2 e e0 := fun e he =>
+    hPtG F K K' d x j2 Fx A hY κ n z hZ I J _ hi _ hj e he
+  have pT
+      : ∀ e : RY (xv x) j2 I J →ₐ[ℂ] ℂ,
+        (∀ l, Val (RY (xv x) j2 I J) e ((sysY x j2 d).r n10 (gT x j2) (pk I) (pk J) l) 0)
+          → ∃ e0, Over x j2 e e0 := fun e he =>
+    hPtT F K K' d x j2 h0 I J _ hi _ hj e he
   refine ⟨c1.1 ?_, c2.1 ?_, c3.1 ?_, fun hne m => ⟨c1.2 ?_ m, c3.2 ?_ m⟩⟩
   · intro e he
     obtain ⟨hJ0, e0, he0, hO⟩ := pG e he
     refine ⟨e0, hO, fun l => ?_⟩
     rw [hO.1, hJ0, pk_zero']
     obtain ⟨N, -, -, -, hN⟩ := hFix F K K' d x j2 Fx A hY e0 he0
-    exact inSp_sub _ ((sysY x j2 d).r (app n11 n) (gG x j2 z) 0 0) (fun a => toLex (Sum.inl (dj 0 a))) (hN l)
+    exact inSp_sub _ ((sysY x j2 d).r (app n11 n) (gG x j2 z) 0 0)
+      (fun a => toLex (Sum.inl (dj 0 a)))
+      (hN l)
   · intro e he
     obtain ⟨e0, hO⟩ := pT e he
     refine ⟨e0, hO, fun l => ?_⟩
@@ -145,8 +155,10 @@ theorem UpperTheory.Gal.productCup_of_system.yCols_of :
     obtain ⟨e0, hO⟩ := pT e fun l => he (toLex (Sum.inr l))
     refine ⟨e0, hO, fun l => ?_⟩
     rw [← rT x j2 (pk I) (pk J) l (by rw [hO.1, pk_zero'])]
-    exact inSp_sub _ ((sysY x j2 d).r (app (app n11 n) n10) (app (gG x j2 z) (gT x j2)) (pk I) (pk J))
-      (fun a => toLex (Sum.inr a)) (inSp_self _ ((sysY x j2 d).r n10 (gT x j2) (pk I) (pk J)) l)
+    exact inSp_sub _
+      ((sysY x j2 d).r (app (app n11 n) n10) (app (gG x j2 z) (gT x j2)) (pk I) (pk J))
+      (fun a => toLex (Sum.inr a))
+      (inSp_self _ ((sysY x j2 d).r n10 (gT x j2) (pk I) (pk J)) l)
   · intro e he
     obtain ⟨hJ0, e0, -, hO⟩ := pG e he
     exact hne.elim (fun h => h hO.1) (fun h => h hJ0)

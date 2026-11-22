@@ -12,8 +12,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.Cyc
 
 namespace GlobalTheory.CycInvariants
 
-theorem exists_reps {G : Type} [Group G] (H N : Subgroup G) [(N.subgroupOf H).FiniteIndex] :
-    ∃ S : Finset G, (∀ s ∈ S, s ∈ H) ∧ ∀ h ∈ H, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ N := by
+theorem exists_reps {G : Type} [Group G] (H N : Subgroup G) [(N.subgroupOf H).FiniteIndex]
+    : ∃ S : Finset G, (∀ s ∈ S, s ∈ H) ∧ ∀ h ∈ H, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ N := by
   classical
   have : Fintype (H ⧸ N.subgroupOf H) := Fintype.ofFinite _
   refine ⟨Finset.univ.image (fun q : H ⧸ N.subgroupOf H => ((q.out : H) : G)), ?_, ?_⟩
@@ -21,8 +21,11 @@ theorem exists_reps {G : Type} [Group G] (H N : Subgroup G) [(N.subgroupOf H).Fi
     obtain ⟨q, -, rfl⟩ := Finset.mem_image.1 hs
     exact q.out.2
   · intro h hh
-    refine ⟨((QuotientGroup.mk (⟨h, hh⟩ : H) : H ⧸ N.subgroupOf H).out : H),
-      ⟨Finset.mem_image.2 ⟨_, Finset.mem_univ _, rfl⟩, ?_⟩, ?_⟩
+    refine ⟨
+      ((QuotientGroup.mk (⟨h, hh⟩ : H) : H ⧸ N.subgroupOf H).out : H),
+      ⟨Finset.mem_image.2 ⟨_, Finset.mem_univ _, rfl⟩, ?_⟩,
+      ?_
+    ⟩
     · have h1 := QuotientGroup.out_eq' (QuotientGroup.mk (⟨h, hh⟩ : H) : H ⧸ N.subgroupOf H)
       have h2 := QuotientGroup.eq.1 h1
       simpa [Subgroup.mem_subgroupOf] using h2
@@ -33,16 +36,23 @@ theorem exists_reps {G : Type} [Group G] (H N : Subgroup G) [(N.subgroupOf H).Fi
       rw [QuotientGroup.out_eq'] at this
       rw [this]
 
-theorem sum_reps_invariant {G M : Type} [Group G] [AddCommMonoid M] (H N : Subgroup G)
-    (S : Finset G) (hS : ∀ s ∈ S, s ∈ H) (hu : ∀ h ∈ H, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ N)
-    (f : G → M) (hf : ∀ g, ∀ n ∈ N, f (g * n) = f g) (h : G) (hh : h ∈ H) :
-    ∑ s ∈ S, f (h * s) = ∑ s ∈ S, f s := by
+theorem sum_reps_invariant
+    {G M : Type} [Group G] [AddCommMonoid M]
+    (H N : Subgroup G) (S : Finset G)
+    (hS : ∀ s ∈ S, s ∈ H) (hu : ∀ h ∈ H, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ N)
+    (f : G → M) (hf : ∀ g, ∀ n ∈ N, f (g * n) = f g)
+    (h : G) (hh : h ∈ H)
+    : ∑ s ∈ S, f (h * s) = ∑ s ∈ S, f s := by
   first
   | exact @_root_.GlobalTheory.LeftTransversalSum.sum_mul_left_transversal
   | exact _root_.GlobalTheory.LeftTransversalSum.sum_mul_left_transversal
   | (apply _root_.GlobalTheory.LeftTransversalSum.sum_mul_left_transversal <;> assumption)
   | (intros; apply _root_.GlobalTheory.LeftTransversalSum.sum_mul_left_transversal <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.LeftTransversalSum.sum_mul_left_transversal <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.LeftTransversalSum.sum_mul_left_transversal
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.LeftTransversalSum.sum_mul_left_transversal ..)
 
 variable {l : ℕ} [Fact l.Prime]
@@ -61,15 +71,14 @@ theorem stabilizer_finiteIndex (x : Om l) : (MulAction.stabilizer (GQ l) x).Fini
     simp
   exact ((Set.ncard_pos hfin).2 ⟨x, MulAction.mem_orbit_self x⟩).ne'
 
-theorem exists_field (F : IntermediateField ℚ_[l] (Om l)) (x : Om l) :
-    ∃ (L : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l)), x ∈ L ∧ F ≤ L ∧
-      (∀ h ∈ F.fixingSubgroup, ∀ x ∈ L, h x ∈ L) ∧ (∀ s ∈ S, s ∈ F.fixingSubgroup) ∧
-      (∀ h ∈ F.fixingSubgroup, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ L.fixingSubgroup) := by
+theorem exists_field (F : IntermediateField ℚ_[l] (Om l)) (x : Om l)
+    : ∃ (L : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l)),
+      x ∈ L ∧ F ≤ L ∧ (∀ h ∈ F.fixingSubgroup, ∀ x ∈ L, h x ∈ L) ∧ (∀ s ∈ S, s ∈ F.fixingSubgroup)
+        ∧ (∀ h ∈ F.fixingSubgroup, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ L.fixingSubgroup) := by
   have := stabilizer_finiteIndex x
   set N := (MulAction.stabilizer (GQ l) x).normalCore with hN
   set L := IntermediateField.fixedField (F.fixingSubgroup ⊓ N) with hL
-  have hle : F.fixingSubgroup ⊓ N ≤ L.fixingSubgroup :=
-    (IntermediateField.le_iff_le _ _).1 le_rfl
+  have hle : F.fixingSubgroup ⊓ N ≤ L.fixingSubgroup := (IntermediateField.le_iff_le _ _).1 le_rfl
   have hfi : (L.fixingSubgroup.subgroupOf F.fixingSubgroup).FiniteIndex := by
     refine Subgroup.finiteIndex_of_le (H := N.subgroupOf F.fixingSubgroup) ?_
     intro g hg
@@ -83,16 +92,18 @@ theorem exists_field (F : IntermediateField ℚ_[l] (Om l)) (x : Om l) :
   · intro h hh y hy
     rw [hL, IntermediateField.mem_fixedField_iff] at hy ⊢
     intro g hg
-    have h1 : h⁻¹ * g * h ∈ F.fixingSubgroup ⊓ N :=
-      ⟨Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.inv_mem _ hh) hg.1) hh,
-        by simpa using (Subgroup.normalCore_normal _).conj_mem g hg.2 h⁻¹⟩
+    have h1 : h⁻¹ * g * h ∈ F.fixingSubgroup ⊓ N := ⟨
+      Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.inv_mem _ hh) hg.1) hh,
+      by simpa using (Subgroup.normalCore_normal _).conj_mem g hg.2 h⁻¹
+    ⟩
     have h2 := congrArg h (hy _ h1)
     simpa using h2
 
-theorem fixed_iff_mem_Ohat : ∀ (l : ℕ) [Fact l.Prime]
-    (act : GQ l →* (PadicComplex l ≃+* PadicComplex l)), IsActC act →
-    ∀ (K : FinExt l) (y : PadicComplex l), ‖y‖ ≤ 1 →
-      ((∀ h ∈ Hinf K, act h y = y) ↔ y ∈ Ohat K) := by
+theorem fixed_iff_mem_Ohat
+    : ∀ (l : ℕ) [Fact l.Prime] (act : GQ l →* (PadicComplex l ≃+* PadicComplex l)),
+      IsActC act
+        → ∀ (K : FinExt l) (y : PadicComplex l),
+          ‖y‖ ≤ 1 → ((∀ h ∈ Hinf K, act h y = y) ↔ y ∈ Ohat K) := by
   intro l _ act hact K y hy
   have hl0 : (0 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).pos
   have hl1 : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
@@ -102,16 +113,17 @@ theorem fixed_iff_mem_Ohat : ∀ (l : ℕ) [Fact l.Prime]
     intro ε hε
     set δ : ℝ := min (ε / 2) 1 with hδ
     have hδ0 : 0 < δ := lt_min (by linarith) one_pos
-    obtain ⟨x, hx⟩ := (UniformSpace.Completion.denseRange_coe (α := Om l)).exists_dist_lt y
-      (div_pos hδ0 hl0)
+    obtain ⟨x, hx⟩ :=
+      (UniformSpace.Completion.denseRange_coe (α := Om l)).exists_dist_lt y (div_pos hδ0 hl0)
     rw [dist_eq_norm] at hx
     obtain ⟨L, S, hxL, hKL, hst, hS, hu⟩ := exists_field (Kinf K) x
     have hnl : ‖(l : Om l)‖ = (l : ℝ)⁻¹ := by
       rw [← map_natCast (algebraMap ℚ_[l] (Om l))]
       exact (PadicAlgCl.norm_extends l _).trans Padic.norm_p
     have hlne : (l : Om l) ≠ 0 := by exact_mod_cast (Fact.out : l.Prime).ne_zero
-    obtain ⟨b, hbL, hb1, hb⟩ := GlobalTheory.T.cyclotomicTower_trace_almost_surjective l K L S hKL hst hS hu (l : Om l)
-      (natCast_mem _ _) (by rw [hnl]; exact inv_lt_one_of_one_lt₀ hl1)
+    obtain ⟨b, hbL, hb1, hb⟩ :=
+      GlobalTheory.T.cyclotomicTower_trace_almost_surjective l K L S hKL hst hS hu (l : Om l)
+        (natCast_mem _ _) (by rw [hnl]; exact inv_lt_one_of_one_lt₀ hl1)
     set w : Om l := ∑ s ∈ S, s (b * x) with hw
     have hwK : w ∈ Kinf K := by
       rw [← InfiniteGalois.fixedField_fixingSubgroup (Kinf K), IntermediateField.mem_fixedField_iff]
@@ -135,7 +147,9 @@ theorem fixed_iff_mem_Ohat : ∀ (l : ℕ) [Fact l.Prime]
       refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (div_pos hδ0 hl0).le ?_
       intro s _
       rw [hact.2, norm_mul, hιn]
-      calc ‖b‖ * ‖y - ι x‖ ≤ 1 * (δ / l) := mul_le_mul hb1 hx.le (norm_nonneg _) one_pos.le
+      calc
+        ‖b‖ * ‖y - ι x‖
+          ≤ 1 * (δ / l) := mul_le_mul hb1 hx.le (norm_nonneg _) one_pos.le
         _ = δ / l := one_mul _
     have hle' : ‖y - ι (w / l)‖ ≤ δ := by
       have h1 : ι l * y - ι w = ι l * (y - ι (w / l)) := by

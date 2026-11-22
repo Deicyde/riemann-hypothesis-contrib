@@ -13,11 +13,15 @@ open GlobalTheory GlobalTheory.VolBr
 
 namespace GlobalTheory.VolBr
 
-theorem log_ncard_unit_ball_le_of_indep_bound :
-    ∀ (G : Type) [AddCommGroup G] [IsAddTorsionFree G] (Λ : AddSubgroup G) (B : ℝ → Set G), IsBallFam Λ B →
-      (B 1).Finite → ∀ (q : ℕ) (T : ℝ), 3 ≤ q → 0 ≤ T →
-      (∀ (r : ℕ) (e : Fin r → G) (n : Fin r → ℕ), LinearIndependent ℤ e → (∀ j, e j ∈ B ((2 / q : ℝ) ^ n j)) →
-        ((∑ j, (n j + 1) : ℕ) : ℝ) ≤ T) → Real.log ((B 1).ncard : ℝ) ≤ Real.log q * T := by
+theorem log_ncard_unit_ball_le_of_indep_bound
+    : ∀ (G : Type) [AddCommGroup G] [IsAddTorsionFree G] (Λ : AddSubgroup G) (B : ℝ → Set G),
+      IsBallFam Λ B → (B 1).Finite
+        → ∀ (q : ℕ) (T : ℝ),
+          3 ≤ q → 0 ≤ T
+            → (∀ (r : ℕ) (e : Fin r → G) (n : Fin r → ℕ),
+              LinearIndependent ℤ e → (∀ j, e j ∈ B ((2 / q : ℝ) ^ n j))
+                → ((∑ j, (n j + 1) : ℕ) : ℝ) ≤ T)
+            → Real.log ((B 1).ncard : ℝ) ≤ Real.log q * T := by
   classical
   intro G _ _ Λ B hB hfin q T hq hT hbound
   set S : ℕ → Set G := fun i => B ((2 / q : ℝ) ^ i) with hS
@@ -27,8 +31,7 @@ theorem log_ncard_unit_ball_le_of_indep_bound :
     intro i
     apply hmono
     have h0 : (0 : ℝ) ≤ 2 / q := by positivity
-    have h1 : (2 / q : ℝ) ≤ 1 := by
-      rw [div_le_one hqpos]; exact_mod_cast (by omega : 2 ≤ q)
+    have h1 : (2 / q : ℝ) ≤ 1 := by rw [div_le_one hqpos]; exact_mod_cast (by omega : 2 ≤ q)
     exact pow_le_pow_of_le_one h0 h1 (Nat.le_succ i)
   set K : ℕ := ⌊T⌋₊ with hK
 
@@ -53,10 +56,10 @@ theorem log_ncard_unit_ball_le_of_indep_bound :
 
   have hstep : ∀ i, (S i).encard ≤ ((q ^ r i : ℕ) : ℕ∞) * (S (i + 1)).encard := by
     intro i
-    have h := GlobalTheory.T.encard_seminormBall_le_pow_mul_smaller G Λ B hB ((2 / q : ℝ) ^ i) q (r i) (by omega)
-      (fun n e he hmem => hrmax i n e he hmem)
-    have heq : 2 * (2 / q : ℝ) ^ i / q = (2 / q : ℝ) ^ (i + 1) := by
-      rw [pow_succ]; ring
+    have h :=
+      GlobalTheory.T.encard_seminormBall_le_pow_mul_smaller G Λ B hB ((2 / q : ℝ) ^ i) q (r i)
+        (by omega) (fun n e he hmem => hrmax i n e he hmem)
+    have heq : 2 * (2 / q : ℝ) ^ i / q = (2 / q : ℝ) ^ (i + 1) := by rw [pow_succ]; ring
     simpa [hS, heq] using h
   have hiter : ∀ k, (S 0).encard ≤ ((q ^ (∑ i ∈ Finset.range k, r i) : ℕ) : ℕ∞) * (S k).encard := by
     intro k
@@ -75,16 +78,20 @@ theorem log_ncard_unit_ball_le_of_indep_bound :
       letI : HasUniqueDiv G := ⟨by
         intro n hn a b h
         exact eq_of_nsmul_eq_nsmul_of_addCommute hn (AddCommute.all _ _) h⟩
-      rw [linearIndependent_unique_iff]; exact hx0
+      rw [linearIndependent_unique_iff]
+      exact hx0
     have h := hbound 1 (fun _ => x) (fun _ => K) hli (fun _ => hx)
     have hlt : T < (K : ℝ) + 1 := Nat.lt_floor_add_one T
     simp at h
     linarith
   have hSK1 : (S K).encard ≤ 1 := by
-    calc (S K).encard ≤ ({0} : Set G).encard := Set.encard_le_encard hSK
+    calc
+      (S K).encard
+        ≤ ({0} : Set G).encard := Set.encard_le_encard hSK
       _ = 1 := Set.encard_singleton 0
 
-  obtain ⟨e, n, he, hmem, hsum⟩ := GlobalTheory.T.exists_linearIndependent_adapted_to_decreasing_chain' G S hSdec K r hrspec hrdec
+  obtain ⟨e, n, he, hmem, hsum⟩ :=
+    GlobalTheory.T.exists_linearIndependent_adapted_to_decreasing_chain' G S hSdec K r hrspec hrdec
   have hM : ((∑ i ∈ Finset.range K, r i : ℕ) : ℝ) ≤ T := by
     have h1 := hbound (r 0) e n he hmem
     have h2 : ∑ i ∈ Finset.range K, r i ≤ ∑ i ∈ Finset.range (K + 1), r i :=
@@ -96,7 +103,9 @@ theorem log_ncard_unit_ball_le_of_indep_bound :
   have hS0 : S 0 = B 1 := by simp [hS]
   have hcard : (B 1).encard ≤ ((q ^ M : ℕ) : ℕ∞) := by
     rw [← hS0]
-    calc (S 0).encard ≤ ((q ^ M : ℕ) : ℕ∞) * (S K).encard := hiter K
+    calc
+      (S 0).encard
+        ≤ ((q ^ M : ℕ) : ℕ∞) * (S K).encard := hiter K
       _ ≤ ((q ^ M : ℕ) : ℕ∞) * 1 := by gcongr
       _ = _ := mul_one _
   have hncard : (B 1).ncard ≤ q ^ M := by
@@ -106,8 +115,9 @@ theorem log_ncard_unit_ball_le_of_indep_bound :
   rcases Nat.eq_zero_or_pos (B 1).ncard with h0 | hpos
   · rw [h0]; simp; positivity
   · have hpos' : (0 : ℝ) < (B 1).ncard := by exact_mod_cast hpos
-    calc Real.log ((B 1).ncard : ℝ) ≤ Real.log ((q ^ M : ℕ) : ℝ) :=
-          Real.log_le_log hpos' (by exact_mod_cast hncard)
+    calc
+      Real.log ((B 1).ncard : ℝ)
+        ≤ Real.log ((q ^ M : ℕ) : ℝ) := Real.log_le_log hpos' (by exact_mod_cast hncard)
       _ = M * Real.log q := by rw [Nat.cast_pow, Real.log_pow]
       _ ≤ T * Real.log q := by gcongr
       _ = Real.log q * T := mul_comm _ _

@@ -8,13 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.DimAddCa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
 
 namespace GlobalTheory.PinNum
 
-theorem goodAt_of_two_primes {E : Type} [Field E] [NumberField E] [IsCMField E]
-    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (l : Level H) {a b : ℕ} (ha : a.Prime) (hb : b.Prime) (hab : a ≠ b)
-    (hM : l.M = a * b) (p : ℕ) : l.GoodAt p := by
+theorem goodAt_of_two_primes
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (l : Level H)
+    {a b : ℕ} (ha : a.Prime) (hb : b.Prime) (hab : a ≠ b) (hM : l.M = a * b)
+    (p : ℕ)
+    : l.GoodAt p := by
   have hodd := l.odd
   rw [hM, Nat.odd_mul] at hodd
   have ha3 : 3 ≤ a := by
@@ -57,7 +61,8 @@ theorem xiR_pos_le_one (D : D7) (Q : Par D) (h : Q.PinHost) : 0 < xiR D ∧ xiR 
     push Not at hc
     nlinarith [norm_nonneg (D.host.φ₀ D.host.sqrtMinusD)]
   have hN : (1 : ℝ) ≤ (Ideal.absNorm D.host.ccK : ℝ) := by
-    have : Ideal.absNorm D.host.ccK ≠ 0 := fun h0 => D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 h0)
+    have : Ideal.absNorm D.host.ccK ≠ 0 := fun h0 =>
+      D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 h0)
     exact_mod_cast Nat.one_le_iff_ne_zero.2 this
   have hx : xiR D = 1 / ((Ideal.absNorm D.host.ccK : ℝ) * ‖D.host.φ₀ D.host.sqrtMinusD‖) := by
     unfold xiR Formalism.BasicNotions.Host.xi0
@@ -68,11 +73,26 @@ theorem xiR_pos_le_one (D : D7) (Q : Par D) (h : Q.PinHost) : 0 < xiR D ∧ xiR 
   rw [hx]
   exact ⟨by positivity, (div_le_one (by positivity)).2 h2⟩
 
-theorem numerics_of_pins : ∀ (D : D7) (Q : Par D), Q.Pins → (∀ p : ℕ, p.Prime → Q.l.GoodAt p) ∧ Q.l.A = 1 ∧ Q.l.M' = Q.l.M ∧ 0 < xiR D ∧ xiR D ≤ 1 ∧ Module.finrank ℚ D.host.E = 2 * D.R.f ∧ ∀ j, InR D j → (Q.Dw j).p + (Q.Dw j).q = D.R.r ∧ 1 ≤ D.R.r ∧ (Q.Dw j).dim + Nat.card (FlagVar (Q.Dw j)) = WeightFamilies.dimY D j := by
+theorem numerics_of_pins
+    : ∀ (D : D7) (Q : Par D),
+      Q.Pins
+        → (∀ p : ℕ, p.Prime → Q.l.GoodAt p) ∧ Q.l.A = 1 ∧ Q.l.M' = Q.l.M ∧ 0 < xiR D ∧ xiR D ≤ 1
+          ∧ Module.finrank ℚ D.host.E = 2 * D.R.f
+          ∧ ∀ j,
+            InR D j
+              → (Q.Dw j).p + (Q.Dw j).q = D.R.r ∧ 1 ≤ D.R.r
+                ∧ (Q.Dw j).dim + Nat.card (FlagVar (Q.Dw j)) = WeightFamilies.dimY D j := by
   intro D Q ⟨hH, ⟨hM, hA⟩, _, hD⟩
   have hx := xiR_pos_le_one D Q hH
-  refine ⟨fun p _ => goodAt_of_two_primes Q.l (D.host.g_prime 0) (D.host.g_prime 1) D.host.g_ne hM p, hA, ?_,
-    hx.1, hx.2, finrank_host D, fun j hj => ?_⟩
+  refine ⟨
+    fun p _ => goodAt_of_two_primes Q.l (D.host.g_prime 0) (D.host.g_prime 1) D.host.g_ne hM p,
+    hA,
+    ?_,
+    hx.1,
+    hx.2,
+    finrank_host D,
+    fun j hj => ?_
+  ⟩
   · rw [Level.M', hA, Nat.lcm_one_right]
   · obtain ⟨hp, hq, -⟩ := hD j hj
     have hk := D.R.m_add_three_le_k
@@ -83,7 +103,8 @@ theorem numerics_of_pins : ∀ (D : D7) (Q : Par D), Q.Pins → (∀ p : ℕ, p.
       omega
     · unfold Ranks.r
       omega
-    · rw [GlobalTheory.FlagDim.dim_add_card_flagVar, finrank_host, Nat.mul_div_cancel_left _ two_pos, hp, hq]
+    · rw [GlobalTheory.FlagDim.dim_add_card_flagVar, finrank_host,
+        Nat.mul_div_cancel_left _ two_pos, hp, hq]
       rfl
 
 end GlobalTheory.PinNum

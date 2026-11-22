@@ -9,8 +9,9 @@ open Polynomial
 namespace GlobalTheory
 namespace DedekindCodimG
 
-variable {k A : Type} [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
-  [Algebra.FiniteType k A]
+variable
+  {k A : Type}
+  [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A]
 
 end DedekindCodimG
 end GlobalTheory
@@ -18,11 +19,13 @@ end GlobalTheory
 namespace GlobalTheory
 namespace DedekindCodimG
 
-variable {k A : Type} [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
-  [Algebra.FiniteType k A]
+variable
+  {k A : Type}
+  [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A]
 
-private theorem isArtinianRing_quotient_of_ne_bot_of_isDedekindDomain (A : Type) [CommRing A] [IsDedekindDomain A]
-    (I : Ideal A) (hI : I ≠ ⊥) : IsArtinianRing (A ⧸ I) := by
+private theorem isArtinianRing_quotient_of_ne_bot_of_isDedekindDomain
+    (A : Type) [CommRing A] [IsDedekindDomain A] (I : Ideal A) (hI : I ≠ ⊥)
+    : IsArtinianRing (A ⧸ I) := by
   have : Ring.KrullDimLE 0 (A ⧸ I) := by
     refine Ring.KrullDimLE.mk₀ fun Q hQ => ?_
     have hle : I ≤ Q.comap (Ideal.Quotient.mk I) := fun a ha => by
@@ -33,22 +36,26 @@ private theorem isArtinianRing_quotient_of_ne_bot_of_isDedekindDomain (A : Type)
     rwa [Ideal.map_comap_of_surjective _ Ideal.Quotient.mk_surjective] at this
   exact IsNoetherianRing.isArtinianRing_of_krullDimLE_zero
 
-private theorem module_finite_quotient_of_ne_bot_of_isDedekindDomain (k A : Type) [Field k] [CommRing A] [IsDedekindDomain A]
-    [Algebra k A] [Algebra.FiniteType k A] (I : Ideal A) (hI : I ≠ ⊥) :
-    Module.Finite k (A ⧸ I) := by
+private theorem module_finite_quotient_of_ne_bot_of_isDedekindDomain
+    (k A : Type) [Field k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A]
+    (I : Ideal A) (hI : I ≠ ⊥)
+    : Module.Finite k (A ⧸ I) := by
   haveI := isArtinianRing_quotient_of_ne_bot_of_isDedekindDomain A I hI
   exact Module.finite_of_isArtinianRing k (A ⧸ I)
 
-private theorem algebraMap_quotient_bijective_of_isMaximal_of_isAlgClosed (k A : Type) [Field k] [IsAlgClosed k]
-    [CommRing A] [Algebra k A] [Algebra.FiniteType k A] (P : Ideal A) [P.IsMaximal] :
-    Function.Bijective (algebraMap k (A ⧸ P)) := by
+private theorem algebraMap_quotient_bijective_of_isMaximal_of_isAlgClosed
+    (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [Algebra k A] [Algebra.FiniteType k A]
+    (P : Ideal A) [P.IsMaximal]
+    : Function.Bijective (algebraMap k (A ⧸ P)) := by
   letI := Ideal.Quotient.field P
   haveI : Module.Finite k (A ⧸ P) := finite_of_finite_type_of_isJacobsonRing k (A ⧸ P)
   exact ⟨(algebraMap k (A ⧸ P)).injective, IsSepClosed.algebraMap_surjective k (A ⧸ P)⟩
 
-private theorem mul_sup_span_singleton_eq_of_mem_of_not_mem_mul (A : Type) [CommRing A] [IsDedekindDomain A]
-    (I P : Ideal A) (hI : I ≠ ⊥) (hP : P.IsMaximal) (hP0 : P ≠ ⊥) {x : A} (hxI : x ∈ I)
-    (hxIP : x ∉ I * P) : I * P ⊔ Ideal.span {x} = I := by
+private theorem mul_sup_span_singleton_eq_of_mem_of_not_mem_mul
+    (A : Type) [CommRing A] [IsDedekindDomain A]
+    (I P : Ideal A) (hI : I ≠ ⊥) (hP : P.IsMaximal) (hP0 : P ≠ ⊥)
+    {x : A} (hxI : x ∈ I) (hxIP : x ∉ I * P)
+    : I * P ⊔ Ideal.span {x} = I := by
   have hle : I * P ⊔ Ideal.span {x} ≤ I :=
     sup_le (Ideal.mul_le_inf.trans inf_le_left) ((Ideal.span_singleton_le_iff_mem I).mpr hxI)
   obtain ⟨M, hM⟩ := Ideal.dvd_iff_le.mpr hle
@@ -64,17 +71,21 @@ private theorem mul_sup_span_singleton_eq_of_mem_of_not_mem_mul (A : Type) [Comm
     rw [← hM]
     exact Ideal.mem_sup_right (Ideal.mem_span_singleton_self x)
 
-private theorem exists_sub_algebraMap_mem_of_isMaximal_of_isAlgClosed (k A : Type) [Field k] [IsAlgClosed k]
-    [CommRing A] [Algebra k A] [Algebra.FiniteType k A] (P : Ideal A) [P.IsMaximal] (r : A) :
-    ∃ c : k, r - algebraMap k A c ∈ P := by
-  obtain ⟨c, hc⟩ := (algebraMap_quotient_bijective_of_isMaximal_of_isAlgClosed k A P).2 (Ideal.Quotient.mk P r)
+private theorem exists_sub_algebraMap_mem_of_isMaximal_of_isAlgClosed
+    (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [Algebra k A] [Algebra.FiniteType k A]
+    (P : Ideal A) [P.IsMaximal]
+    (r : A)
+    : ∃ c : k, r - algebraMap k A c ∈ P := by
+  obtain ⟨c, hc⟩ :=
+    (algebraMap_quotient_bijective_of_isMaximal_of_isAlgClosed k A P).2 (Ideal.Quotient.mk P r)
   refine ⟨c, Ideal.Quotient.eq.mp ?_⟩
   rw [Ideal.Quotient.mk_algebraMap, hc]
 
-private theorem finrank_quotient_mul_maximal_eq_finrank_add_one (k A : Type) [Field k] [IsAlgClosed k]
-    [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A] (I P : Ideal A)
-    (hI : I ≠ ⊥) (hP : P.IsMaximal) (hP0 : P ≠ ⊥) :
-    Module.finrank k (A ⧸ I * P) = Module.finrank k (A ⧸ I) + 1 := by
+private theorem finrank_quotient_mul_maximal_eq_finrank_add_one
+    (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
+    [Algebra.FiniteType k A]
+    (I P : Ideal A) (hI : I ≠ ⊥) (hP : P.IsMaximal) (hP0 : P ≠ ⊥)
+    : Module.finrank k (A ⧸ I * P) = Module.finrank k (A ⧸ I) + 1 := by
   haveI := hP
   haveI := module_finite_quotient_of_ne_bot_of_isDedekindDomain k A (I * P) (mul_ne_zero hI hP0)
   haveI := module_finite_quotient_of_ne_bot_of_isDedekindDomain k A I hI
@@ -113,22 +124,30 @@ private theorem finrank_quotient_mul_maximal_eq_finrank_add_one (k A : Type) [Fi
   rw [LinearMap.range_eq_top.mpr hsurj, finrank_top, hker, finrank_span_singleton hx0] at h
   exact h.symm
 
-theorem _root_.GlobalTheory.DedekindCodimG.dedekind_finiteType_codim (k A : Type) [Field k]
-    [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A] :
-    (∀ (I : Ideal A), I ≠ ⊥ → Module.Finite k (A ⧸ I)) ∧
-    (∀ (P : Ideal A), P.IsMaximal →
-      Module.finrank k (A ⧸ P) = (1 : ℕ) ∧ ∃ (φ : A →ₐ[k] k), ∀ (u : A), u ∈ P ↔ (φ : A → k) u = (0 : k)) ∧
-    (∀ (I J : Ideal A), I ≠ ⊥ → J ≠ ⊥ →
-      Module.finrank k (A ⧸ I * J) = Module.finrank k (A ⧸ I) + Module.finrank k (A ⧸ J)) ∧
-    ∀ (I J : Ideal A), I ≠ ⊥ → I ≤ J → Module.finrank k (A ⧸ I) ≤ Module.finrank k (A ⧸ J) →
-      I = J := by
+theorem _root_.GlobalTheory.DedekindCodimG.dedekind_finiteType_codim
+    (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
+    [Algebra.FiniteType k A]
+    : (∀ (I : Ideal A), I ≠ ⊥ → Module.Finite k (A ⧸ I))
+      ∧ (∀ (P : Ideal A),
+        P.IsMaximal
+          → Module.finrank k (A ⧸ P) = (1 : ℕ)
+            ∧ ∃ (φ : A →ₐ[k] k), ∀ (u : A), u ∈ P ↔ (φ : A → k) u = (0 : k))
+      ∧ (∀ (I J : Ideal A),
+        I ≠ ⊥ → J ≠ ⊥
+          → Module.finrank k (A ⧸ I * J) = Module.finrank k (A ⧸ I) + Module.finrank k (A ⧸ J))
+      ∧ ∀ (I J : Ideal A),
+        I ≠ ⊥ → I ≤ J → Module.finrank k (A ⧸ I) ≤ Module.finrank k (A ⧸ J) → I = J := by
   refine ⟨fun I hI => module_finite_quotient_of_ne_bot_of_isDedekindDomain k A I hI, ?_, ?_, ?_⟩
   · intro P hP
     haveI := hP
     let e : k ≃ₐ[k] A ⧸ P :=
-      AlgEquiv.ofBijective (Algebra.ofId k (A ⧸ P)) (algebraMap_quotient_bijective_of_isMaximal_of_isAlgClosed k A P)
-    refine ⟨by rw [← e.toLinearEquiv.finrank_eq, Module.finrank_self],
-      e.symm.toAlgHom.comp (Ideal.Quotient.mkₐ k P), fun u => ?_⟩
+      AlgEquiv.ofBijective (Algebra.ofId k (A ⧸ P))
+        (algebraMap_quotient_bijective_of_isMaximal_of_isAlgClosed k A P)
+    refine ⟨
+      by rw [← e.toLinearEquiv.finrank_eq, Module.finrank_self],
+      e.symm.toAlgHom.comp (Ideal.Quotient.mkₐ k P),
+      fun u => ?_
+    ⟩
     change u ∈ P ↔ e.symm (Ideal.Quotient.mk P u) = 0
     rw [map_eq_zero_iff _ e.symm.injective, Ideal.Quotient.eq_zero_iff_mem]
   · intro I J hI hJ
@@ -143,7 +162,8 @@ theorem _root_.GlobalTheory.DedekindCodimG.dedekind_finiteType_codim (k A : Type
       have hpmax : p.IsMaximal := (Ideal.isPrime_of_prime hp).isMaximal hp0
       have ha' : a ≠ ⊥ := ha
       rw [show I * (p * a) = I * a * p by ring, mul_comm p a,
-        finrank_quotient_mul_maximal_eq_finrank_add_one k A (I * a) p (mul_ne_zero hI ha') hpmax hp0,
+        finrank_quotient_mul_maximal_eq_finrank_add_one k A (I * a) p (mul_ne_zero hI ha') hpmax
+          hp0,
         finrank_quotient_mul_maximal_eq_finrank_add_one k A a p ha' hpmax hp0, ih I hI ha']
       ring
   · intro I J hI hIJ hle

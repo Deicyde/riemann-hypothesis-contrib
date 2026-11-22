@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsLocally
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ PowerSeries
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ PowerSeries
 
 namespace GlobalTheory.CoefCoord
 
@@ -33,7 +35,9 @@ theorem norm_unit (c : Coef l) (u : c.Oˣ) : ‖((u : c.O) : PadicAlgCl l)‖ = 
     rw [← Subalgebra.coe_mul, Units.mul_inv]; rfl
   have h4 := congrArg norm h3
   rw [norm_mul, norm_one] at h4
-  have h5 : ‖((u : c.O) : PadicAlgCl l)‖ * ‖((↑u⁻¹ : c.O) : PadicAlgCl l)‖ ≤ ‖((u : c.O) : PadicAlgCl l)‖ :=
+  have h5
+      : ‖((u : c.O) : PadicAlgCl l)‖ * ‖((↑u⁻¹ : c.O) : PadicAlgCl l)‖
+        ≤ ‖((u : c.O) : PadicAlgCl l)‖ :=
     mul_le_of_le_one_right (norm_nonneg _) h2
   linarith
 
@@ -43,10 +47,12 @@ theorem norm_natCast_lt_one : ‖((l : ℕ) : PadicAlgCl l)‖ < 1 := by
 
 theorem norm_algebraMap_padicInt (a : ℤ_[l]) : ‖algebraMap ℤ_[l] (PadicAlgCl l) a‖ = ‖a‖ := by
   show ‖algebraMap ℚ_[l] (PadicAlgCl l) (a : ℚ_[l])‖ = ‖a‖
-  rw [PadicAlgCl.norm_extends]; rfl
+  rw [PadicAlgCl.norm_extends]
+  rfl
 
-theorem exists_eq_pow_mul (c : Coef l) (m : ℕ) (x : c.O)
-    (hx : ‖(x : PadicAlgCl l)‖ ≤ ‖((l : ℕ) : PadicAlgCl l) ^ m‖) : ∃ z : c.O, x = (l : c.O) ^ m * z := by
+theorem exists_eq_pow_mul
+    (c : Coef l) (m : ℕ) (x : c.O) (hx : ‖(x : PadicAlgCl l)‖ ≤ ‖((l : ℕ) : PadicAlgCl l) ^ m‖)
+    : ∃ z : c.O, x = (l : c.O) ^ m * z := by
   by_cases h0 : x = 0
   · exact ⟨0, by simp [h0]⟩
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible c.O
@@ -60,8 +66,9 @@ theorem exists_eq_pow_mul (c : Coef l) (m : ℕ) (x : c.O)
   set q := ‖(π : PadicAlgCl l)‖ with hqdef
   have hlq : ‖((l : ℕ) : PadicAlgCl l)‖ = q ^ e := by
     have h' := congrArg (fun y : c.O => ‖(y : PadicAlgCl l)‖) hw
-    simp only [SubringClass.coe_natCast, Subalgebra.coe_mul, SubmonoidClass.coe_pow, norm_mul, norm_pow,
-      norm_unit, one_mul] at h'
+    simp only [SubringClass.coe_natCast, Subalgebra.coe_mul, SubmonoidClass.coe_pow, norm_mul,
+        norm_pow, norm_unit, one_mul]
+      at h'
     exact h'
   have hq0 : 0 < q := by
     rw [hqdef, norm_pos_iff]
@@ -85,33 +92,39 @@ theorem exists_eq_pow_mul (c : Coef l) (m : ℕ) (x : c.O)
   have h2 : ((w : c.O) * (↑w⁻¹ : c.O)) ^ m = 1 := by rw [Units.mul_inv, one_pow]
   linear_combination (-((u : c.O) * π ^ (e * m + r))) * h2
 
-theorem norm_sub_val_le (m : ℕ) (a : ℤ_[l]) :
-    ‖algebraMap ℤ_[l] (PadicAlgCl l) a - (((PadicInt.toZModPow m a).val : ℕ) : PadicAlgCl l)‖
+theorem norm_sub_val_le (m : ℕ) (a : ℤ_[l])
+    : ‖algebraMap ℤ_[l] (PadicAlgCl l) a - (((PadicInt.toZModPow m a).val : ℕ) : PadicAlgCl l)‖
       ≤ ‖((l : ℕ) : PadicAlgCl l) ^ m‖ := by
-  have hk : a - (((PadicInt.toZModPow m a).val : ℕ) : ℤ_[l]) ∈ RingHom.ker (PadicInt.toZModPow (p := l) m) := by
+  have hk
+      : a - (((PadicInt.toZModPow m a).val : ℕ) : ℤ_[l])
+        ∈ RingHom.ker (PadicInt.toZModPow (p := l) m) := by
     rw [RingHom.mem_ker, map_sub, map_natCast, ZMod.natCast_zmod_val, sub_self]
   rw [PadicInt.ker_toZModPow, Ideal.mem_span_singleton'] at hk
   obtain ⟨t, ht⟩ := hk
-  have e : algebraMap ℤ_[l] (PadicAlgCl l) a - (((PadicInt.toZModPow m a).val : ℕ) : PadicAlgCl l)
-      = algebraMap ℤ_[l] (PadicAlgCl l) t * ((l : ℕ) : PadicAlgCl l) ^ m := by
+  have e
+      : algebraMap ℤ_[l] (PadicAlgCl l) a - (((PadicInt.toZModPow m a).val : ℕ) : PadicAlgCl l)
+        = algebraMap ℤ_[l] (PadicAlgCl l) t * ((l : ℕ) : PadicAlgCl l) ^ m := by
     have := congrArg (algebraMap ℤ_[l] (PadicAlgCl l)) ht
     simp only [map_mul, map_pow, map_natCast, map_sub] at this
     rw [this]
   rw [e, norm_mul, norm_algebraMap_padicInt]
   exact mul_le_of_le_one_left (norm_nonneg _) (PadicInt.norm_le_one t)
 
-theorem coe_eq_sum {ι : Type} [Fintype ι] (c : Coef l) (b : Module.Basis ι ℤ_[l] c.O) (y : c.O) :
-    (y : PadicAlgCl l) = ∑ i, ((b i : c.O) : PadicAlgCl l) * algebraMap ℤ_[l] (PadicAlgCl l) (b.repr y i) := by
+theorem coe_eq_sum {ι : Type} [Fintype ι] (c : Coef l) (b : Module.Basis ι ℤ_[l] c.O) (y : c.O)
+    : (y : PadicAlgCl l)
+      = ∑ i, ((b i : c.O) : PadicAlgCl l) * algebraMap ℤ_[l] (PadicAlgCl l) (b.repr y i) := by
   conv_lhs => rw [← b.sum_repr y]
   rw [AddSubmonoidClass.coe_finsetSum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Subalgebra.coe_smul, Algebra.smul_def, mul_comm]
 
-theorem coord_mod_pow : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (m : ℕ), ∃ (ι : Type) (_ : Fintype ι) (o : ι → Qbar l)
-    (crd : Qbar l → ι → ZMod (l ^ m)), (∀ i, o i ∈ c.O ∧ ‖o i‖ ≤ 1) ∧
-    (∀ x ∈ c.O, ∀ y ∈ c.O, crd (x + y) = crd x + crd y) ∧ (∀ x ∈ c.O, Cg m x 0 → crd x = 0) ∧
-    (∀ x ∈ c.O, Cg m x (∑ i, o i * ((crd x i).val : Qbar l))) ∧
-    (∀ n : ι → ZMod (l ^ m), Cg m (∑ i, o i * ((n i).val : Qbar l)) 0 → n = 0) := by
+theorem coord_mod_pow
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (m : ℕ),
+      ∃ (ι : Type) (_ : Fintype ι) (o : ι → Qbar l) (crd : Qbar l → ι → ZMod (l ^ m)),
+        (∀ i, o i ∈ c.O ∧ ‖o i‖ ≤ 1) ∧ (∀ x ∈ c.O, ∀ y ∈ c.O, crd (x + y) = crd x + crd y)
+          ∧ (∀ x ∈ c.O, Cg m x 0 → crd x = 0)
+          ∧ (∀ x ∈ c.O, Cg m x (∑ i, o i * ((crd x i).val : Qbar l)))
+          ∧ (∀ n : ι → ZMod (l ^ m), Cg m (∑ i, o i * ((n i).val : Qbar l)) 0 → n = 0) := by
   intro l _ c m
   classical
   let b := Module.Free.chooseBasis ℤ_[l] c.O
@@ -131,12 +144,22 @@ theorem coord_mod_pow : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (m : ℕ), ∃
     rw [e, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul, map_pow, map_natCast, ← Nat.cast_pow,
       ZMod.natCast_self, zero_mul]
     rfl
-  refine ⟨Module.Free.ChooseBasisIndex ℤ_[l] c.O, inferInstance, fun i => ((b i : c.O) : PadicAlgCl l), crd,
-    fun i => ⟨(b i).2, norm_le_one c (b i)⟩, ?_, hkill, ?_, ?_⟩
+  refine ⟨
+    Module.Free.ChooseBasisIndex ℤ_[l] c.O,
+    inferInstance,
+    fun i => ((b i : c.O) : PadicAlgCl l),
+    crd,
+    fun i => ⟨(b i).2, norm_le_one c (b i)⟩,
+    ?_,
+    hkill,
+    ?_,
+    ?_
+  ⟩
   · intro x hx y hy
     funext i
     rw [hcrd _ (add_mem hx hy), Pi.add_apply, hcrd x hx, hcrd y hy,
-      show (⟨x + y, add_mem hx hy⟩ : c.O) = ⟨x, hx⟩ + ⟨y, hy⟩ from rfl, map_add, Finsupp.add_apply, map_add]
+      show (⟨x + y, add_mem hx hy⟩ : c.O) = ⟨x, hx⟩ + ⟨y, hy⟩ from rfl, map_add, Finsupp.add_apply,
+      map_add]
   · intro x hx
     unfold Cg
     have hx' := coe_eq_sum c b ⟨x, hx⟩
@@ -145,10 +168,12 @@ theorem coord_mod_pow : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (m : ℕ), ∃
     rw [congrArg (fun t => t - _) hx', ← Finset.sum_sub_distrib]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _) fun i _ => ?_
     rw [← mul_sub, norm_mul]
-    exact (mul_le_mul (norm_le_one c (b i)) (norm_sub_val_le m _) (norm_nonneg _) zero_le_one).trans (by rw [one_mul])
+    exact (mul_le_mul (norm_le_one c (b i)) (norm_sub_val_le m _) (norm_nonneg _) zero_le_one).trans
+      (by rw [one_mul])
   · intro n hn
     set y : Qbar l := ∑ i, ((b i : c.O) : PadicAlgCl l) * (((n i).val : ℕ) : Qbar l) with hydef
-    have hy : y ∈ c.O := Subalgebra.sum_mem _ fun i _ => Subalgebra.mul_mem _ (b i).2 (Subalgebra.natCast_mem _ _)
+    have hy : y ∈ c.O :=
+      Subalgebra.sum_mem _ fun i _ => Subalgebra.mul_mem _ (b i).2 (Subalgebra.natCast_mem _ _)
     have hyb : (⟨y, hy⟩ : c.O) = ∑ i, (((n i).val : ℕ) : ℤ_[l]) • b i := by
       apply Subtype.ext
       rw [AddSubmonoidClass.coe_finsetSum]

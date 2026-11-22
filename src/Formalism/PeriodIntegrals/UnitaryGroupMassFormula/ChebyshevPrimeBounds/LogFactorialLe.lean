@@ -12,8 +12,8 @@ namespace PI.PC
 open Finset Real
 open scoped Nat
 
-theorem g_diff {a b : ℝ} (ha : 0 < a) (hab : a ≤ b) :
-    (b - a) * log a ≤ (b * log b - b) - (a * log a - a) := by
+theorem g_diff {a b : ℝ} (ha : 0 < a) (hab : a ≤ b)
+    : (b - a) * log a ≤ (b * log b - b) - (a * log a - a) := by
   have hb : 0 < b := lt_of_lt_of_le ha hab
   have h := Real.one_sub_inv_le_log_of_pos (div_pos hb ha)
   rw [Real.log_div hb.ne' ha.ne', inv_div] at h
@@ -31,11 +31,13 @@ theorem g_mono {a b : ℝ} (ha : 1 ≤ a) (hab : a ≤ b) : a * log a - a ≤ b 
 
 theorem third_le_log : (1 : ℝ) / 3 ≤ log (3 / 2) := by
   have h := Real.one_sub_inv_le_log_of_pos (by norm_num : (0 : ℝ) < 3 / 2)
-  calc (1 : ℝ) / 3 = 1 - (3 / 2)⁻¹ := by norm_num
+  calc
+    (1 : ℝ) / 3
+      = 1 - (3 / 2)⁻¹ := by norm_num
     _ ≤ log (3 / 2) := h
 
-theorem h_mono {a b : ℝ} (ha : 3 / 2 ≤ a) (hab : a ≤ b) :
-    a * log a - a - log a / 2 ≤ b * log b - b - log b / 2 := by
+theorem h_mono {a b : ℝ} (ha : 3 / 2 ≤ a) (hab : a ≤ b)
+    : a * log a - a - log a / 2 ≤ b * log b - b - log b / 2 := by
   have ha0 : (0 : ℝ) < a := by linarith
   have hb0 : (0 : ℝ) < b := by linarith
   have hg := g_diff ha0 hab
@@ -50,8 +52,8 @@ theorem h_mono {a b : ℝ} (ha : 3 / 2 ≤ a) (hab : a ≤ b) :
   have h4 : (b - a) * (1 / 3) ≤ (b - a) * log a := mul_le_mul_of_nonneg_left hla (by linarith)
   linarith
 
-theorem h_le {a b : ℝ} (ha : 1 ≤ a) (hab : a ≤ b) (hb : 2 ≤ b) :
-    a * log a - a - log a / 2 ≤ b * log b - b - log b / 2 := by
+theorem h_le {a b : ℝ} (ha : 1 ≤ a) (hab : a ≤ b) (hb : 2 ≤ b)
+    : a * log a - a - log a / 2 ≤ b * log b - b - log b / 2 := by
   by_cases ha' : 3 / 2 ≤ a
   · exact h_mono ha' hab
   push_neg at ha'
@@ -66,19 +68,19 @@ theorem h_le {a b : ℝ} (ha : 1 ≤ a) (hab : a ≤ b) (hb : 2 ≤ b) :
   have e : (a - 1 / 2) * log a = a * log a - log a / 2 := by ring
   linarith
 
-theorem log_factorial_le {n : ℕ} (hn : n ≠ 0) :
-    log ((n ! : ℕ) : ℝ) ≤ n * log n - n + log n / 2 + 1 := by
+theorem log_factorial_le {n : ℕ} (hn : n ≠ 0)
+    : log ((n ! : ℕ) : ℝ) ≤ n * log n - n + log n / 2 + 1 := by
   obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hn
   have h1 : Stirling.stirlingSeq (m + 1) ≤ Stirling.stirlingSeq 1 :=
     Stirling.stirlingSeq'_antitone (Nat.zero_le m)
   have hpos := Stirling.stirlingSeq'_pos m
   have h2 := Real.log_le_log hpos h1
   rw [Stirling.log_stirlingSeq_formula, Stirling.stirlingSeq_one,
-    Real.log_div (Real.exp_pos 1).ne' (by positivity), Real.log_exp,
-    Real.log_sqrt (by norm_num)] at h2
+      Real.log_div (Real.exp_pos 1).ne' (by positivity), Real.log_exp, Real.log_sqrt (by norm_num)]
+    at h2
   have hm : (0 : ℝ) < ((m + 1 : ℕ) : ℝ) := by positivity
-  rw [Real.log_mul (by norm_num) hm.ne', Real.log_div hm.ne' (Real.exp_pos 1).ne',
-    Real.log_exp] at h2
+  rw [Real.log_mul (by norm_num) hm.ne', Real.log_div hm.ne' (Real.exp_pos 1).ne', Real.log_exp]
+    at h2
   push_cast at h2 ⊢
   nlinarith [h2]
 
@@ -119,8 +121,9 @@ theorem log_thirty_ge : (33 : ℝ) / 10 ≤ log 30 := by
   have he3 : Real.exp 1 * Real.exp 1 * Real.exp 1 < 2.7182818286 * 2.7182818286 * 2.7182818286 :=
     mul_lt_mul'' he2 he (by positivity) (Real.exp_pos 1).le
   rw [hsplit]
-  have h4 : Real.exp 1 * Real.exp 1 * Real.exp 1 * Real.exp (3 / 10) ≤
-      (2.7182818286 * 2.7182818286 * 2.7182818286) * (10 / 7) :=
+  have h4
+      : Real.exp 1 * Real.exp 1 * Real.exp 1 * Real.exp (3 / 10)
+        ≤ (2.7182818286 * 2.7182818286 * 2.7182818286) * (10 / 7) :=
     mul_le_mul he3.le h310 (Real.exp_pos _).le (by norm_num)
   linarith
 
@@ -142,8 +145,9 @@ theorem lfLower : LfLower := by
   have hn1' : (1 : ℝ) ≤ ⌊y⌋₊ := by exact_mod_cast hn1
   have hy' : y ≤ (⌊y⌋₊ : ℝ) + 1 := (Nat.lt_floor_add_one y).le
   have hS := Stirling.le_log_factorial_stirling (n := ⌊y⌋₊ + 1) (Nat.succ_ne_zero _)
-  have hfac : Real.log (((⌊y⌋₊ + 1) ! : ℕ) : ℝ) =
-      Real.log ((⌊y⌋₊ : ℝ) + 1) + Real.log ((⌊y⌋₊ ! : ℕ) : ℝ) := by
+  have hfac
+      : Real.log (((⌊y⌋₊ + 1) ! : ℕ) : ℝ)
+        = Real.log ((⌊y⌋₊ : ℝ) + 1) + Real.log ((⌊y⌋₊ ! : ℕ) : ℝ) := by
     rw [Nat.factorial_succ, Nat.cast_mul, Real.log_mul (by positivity) (by positivity)]
     push_cast
     ring
@@ -152,9 +156,10 @@ theorem lfLower : LfLower := by
   push_cast at hS hfac
   linarith
 
-theorem main_term {x : ℝ} (hx : 0 < x) :
-    (x * log x - x) - (x / 2 * log (x / 2) - x / 2) - (x / 3 * log (x / 3) - x / 3)
-      - (x / 5 * log (x / 5) - x / 5) + (x / 30 * log (x / 30) - x / 30) = chA * x := by
+theorem main_term {x : ℝ} (hx : 0 < x)
+    : (x * log x - x) - (x / 2 * log (x / 2) - x / 2) - (x / 3 * log (x / 3) - x / 3)
+        - (x / 5 * log (x / 5) - x / 5) + (x / 30 * log (x / 30) - x / 30)
+      = chA * x := by
   have h2 : log (x / 2) = log x - log 2 := Real.log_div hx.ne' (by norm_num)
   have h3 : log (x / 3) = log x - log 3 := Real.log_div hx.ne' (by norm_num)
   have h5 : log (x / 5) = log x - log 5 := Real.log_div hx.ne' (by norm_num)

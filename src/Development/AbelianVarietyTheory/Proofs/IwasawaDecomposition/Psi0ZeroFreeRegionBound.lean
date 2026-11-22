@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Diric
 
 @[expose] public section
 
-open Finset ArithmeticFunction NumberField IsDedekindDomain Filter Topology GlobalTheory.Mem.An Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+open Finset ArithmeticFunction NumberField IsDedekindDomain Filter Topology GlobalTheory.Mem.An
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
 open scoped nonZeroDivisors
 
 namespace GlobalTheory.Mem.An.PsiFix

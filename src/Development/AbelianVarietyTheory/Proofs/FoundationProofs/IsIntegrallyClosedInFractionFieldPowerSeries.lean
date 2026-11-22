@@ -15,9 +15,11 @@ section Algebra
 
 variable {K : Type u} [Field K]
 
-theorem exists_algHom_of_isIntegrallyClosedIn {L : Type w} [Field L] [Algebra K L]
-    [IsIntegrallyClosedIn K L] {A : Type v} [CommRing A] [Algebra K A] [Algebra.IsIntegral K A]
-    (φ : A →ₐ[K] L) : ∃ ψ : A →ₐ[K] K, (Algebra.ofId K L).comp ψ = φ := by
+theorem exists_algHom_of_isIntegrallyClosedIn
+    {L : Type w} [Field L] [Algebra K L] [IsIntegrallyClosedIn K L]
+    {A : Type v} [CommRing A] [Algebra K A] [Algebra.IsIntegral K A]
+    (φ : A →ₐ[K] L)
+    : ∃ ψ : A →ₐ[K] K, (Algebra.ofId K L).comp ψ = φ := by
   have hmem : ∀ a : A, φ a ∈ (Algebra.ofId K L).range := fun a ↦
     (isIntegrallyClosedIn_iff.mp ‹_›).2 ((Algebra.IsIntegral.isIntegral (R := K) a).map φ)
   let e := AlgEquiv.ofInjective (Algebra.ofId K L) (algebraMap K L).injective
@@ -35,23 +37,30 @@ theorem epi_of_nonempty {T : Scheme.{u}} [Nonempty T] (g : T ⟶ Spec (.of K)) :
   have : Surjective g := ⟨Function.surjective_to_subsingleton _⟩
   Flat.epi_of_flat_of_surjective g
 
-theorem point_ext {X T : Scheme.{u}} [Nonempty T] (g : T ⟶ Spec (.of K))
-    {s s' : Spec (.of K) ⟶ X} (h : g ≫ s = g ≫ s') : s = s' :=
+theorem point_ext
+    {X T : Scheme.{u}} [Nonempty T]
+    (g : T ⟶ Spec (.of K))
+    {s s' : Spec (.of K) ⟶ X} (h : g ≫ s = g ≫ s')
+    : s = s' :=
   have := epi_of_nonempty g
   (cancel_epi g).mp h
 
-theorem exists_section_of_locallyQuasiFinite {F : Scheme.{u}} (f : F ⟶ Spec (.of K))
-    [LocallyQuasiFinite f] (L : Type u) [Field L] [Algebra K L] [IsIntegrallyClosedIn K L]
-    (x : Spec (.of L) ⟶ F) (hx : x ≫ f = Spec.map (CommRingCat.ofHom (algebraMap K L))) :
-    ∃ x₀ : Spec (.of K) ⟶ F, Spec.map (CommRingCat.ofHom (algebraMap K L)) ≫ x₀ = x ∧
-      x₀ ≫ f = 𝟙 _ ∧
-      ∀ x₁ : Spec (.of K) ⟶ F, Spec.map (CommRingCat.ofHom (algebraMap K L)) ≫ x₁ = x →
-        x₁ = x₀ := by
-  suffices H : ∃ x₀ : Spec (.of K) ⟶ F,
-      Spec.map (CommRingCat.ofHom (algebraMap K L)) ≫ x₀ = x by
+theorem exists_section_of_locallyQuasiFinite
+    {F : Scheme.{u}} (f : F ⟶ Spec (.of K)) [LocallyQuasiFinite f]
+    (L : Type u) [Field L] [Algebra K L] [IsIntegrallyClosedIn K L]
+    (x : Spec (.of L) ⟶ F) (hx : x ≫ f = Spec.map (CommRingCat.ofHom (algebraMap K L)))
+    : ∃ x₀ : Spec (.of K) ⟶ F,
+      Spec.map (CommRingCat.ofHom (algebraMap K L)) ≫ x₀ = x ∧ x₀ ≫ f = 𝟙 _
+        ∧ ∀ x₁ : Spec (.of K) ⟶ F,
+          Spec.map (CommRingCat.ofHom (algebraMap K L)) ≫ x₁ = x → x₁ = x₀ := by
+  suffices H : ∃ x₀ : Spec (.of K) ⟶ F, Spec.map (CommRingCat.ofHom (algebraMap K L)) ≫ x₀ = x by
     obtain ⟨x₀, h₀⟩ := H
-    refine ⟨x₀, h₀, point_ext (Spec.map (CommRingCat.ofHom (algebraMap K L))) ?_,
-      fun x₁ h₁ ↦ point_ext _ (h₁.trans h₀.symm)⟩
+    refine ⟨
+      x₀,
+      h₀,
+      point_ext (Spec.map (CommRingCat.ofHom (algebraMap K L))) ?_,
+      fun x₁ h₁ ↦ point_ext _ (h₁.trans h₀.symm)
+    ⟩
     rw [reassoc_of% h₀, hx, Category.comp_id]
   obtain ⟨A, i, _, q, hq⟩ := Scheme.exists_Spec_apply_eq (x (Classical.arbitrary _))
   have hle : Set.range x ⊆ Set.range i := by

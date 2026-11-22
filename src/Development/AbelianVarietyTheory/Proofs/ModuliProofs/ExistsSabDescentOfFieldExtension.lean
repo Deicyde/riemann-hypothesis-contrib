@@ -40,17 +40,24 @@ noncomputable section
 
 namespace GlobalTheory.ModelRelCompare
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ModelCompare GlobalTheory.Models
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F}
 
 section Dominates
 
-variable {O' : Type} [CommRing O'] {β' : O' →+* c.F} (Y : Model Xo c β) (Y' : Model Xo c β') (b : O →+* O')
-  (hb : β'.comp b = β)
+variable
+  {O' : Type} [CommRing O']
+  {β' : O' →+* c.F}
+  (Y : Model Xo c β) (Y' : Model Xo c β')
+  (b : O →+* O') (hb : β'.comp b = β)
 
 end Dominates
 
@@ -58,8 +65,9 @@ section Dense
 
 variable (Y : Model Xo c β)
 
-theorem densePart (h : IsDedFrac β) : IsLocallyNoetherian Y.X ∧ IsReduced Y.X ∧ Y.X.IsSeparated ∧
-    IsPreimmersion Y.j ∧ Flat Y.j ∧ IsDominant Y.j ∧ QuasiCompact Y.j := by
+theorem densePart (h : IsDedFrac β)
+    : IsLocallyNoetherian Y.X ∧ IsReduced Y.X ∧ Y.X.IsSeparated ∧ IsPreimmersion Y.j ∧ Flat Y.j
+      ∧ IsDominant Y.j ∧ QuasiCompact Y.j := by
   obtain ⟨⟨_, _⟩, -, hfr⟩ := h
   letI := β.toAlgebra
   obtain ⟨h₁, -, h₂, h₃⟩ :=
@@ -73,9 +81,14 @@ end Dense
 
 section Transition
 
-variable {l₂ : Level H} {Xo₂ : Moduli D l₂} {c₂ : Coeff l₂} {O₂ : Type} [CommRing O₂] {β₂ : O₂ →+* c₂.F}
-  (Y : Model Xo c β) (Y₂ : Model Xo₂ c₂ β₂) (hl : l.Dvd l₂) (hF : c.F ≤ c₂.F) (b : O →+* O₂)
-  (hb : β₂.comp b = (IntermediateField.inclusion hF).toRingHom.comp β) (π : Y₂.X ⟶ Y.X)
+variable
+  {l₂ : Level H} {Xo₂ : Moduli D l₂} {c₂ : Coeff l₂} {O₂ : Type} [CommRing O₂]
+  {β₂ : O₂ →+* c₂.F}
+  (Y : Model Xo c β) (Y₂ : Model Xo₂ c₂ β₂)
+  (hl : l.Dvd l₂)
+  (hF : c.F ≤ c₂.F) (b : O →+* O₂)
+  (hb : β₂.comp b = (IntermediateField.inclusion hF).toRingHom.comp β)
+  (π : Y₂.X ⟶ Y.X)
 
 end Transition
 

@@ -31,8 +31,10 @@ theorem isAddHaar_lie : (volume : Measure (Lie E a)).IsAddHaarMeasure := by
   haveI := isAddHaar_row (E := E) (a := a)
   exact Measure.pi.isAddHaarMeasure (fun _ : Fin a => (volume : Measure (Fin a → Cinf E)))
 
-theorem det_eq_one_of_sq {W : Type} [AddCommGroup W] [Module ℝ W] [Module.Finite ℝ W]
-    {L : W →ₗ[ℝ] W} (hK : (L - 1) * (L - 1) = 0) : LinearMap.det L = 1 := by
+theorem det_eq_one_of_sq
+    {W : Type} [AddCommGroup W] [Module ℝ W] [Module.Finite ℝ W]
+    {L : W →ₗ[ℝ] W} (hK : (L - 1) * (L - 1) = 0)
+    : LinearMap.det L = 1 := by
   have hN : IsNilpotent (L - 1) := ⟨2, by rw [pow_two, hK]⟩
   have h := (hN.neg).charpoly_eq_X_pow_finrank
   have h2 := LinearMap.eval_charpoly (-(L - 1)) 1
@@ -43,10 +45,12 @@ def mulL (P : Mat E a) : Lie E a →ₗ[ℝ] Lie E a where
   toFun w := toL (P * Matrix.of w)
   map_add' x y := by
     show toL (P * (Matrix.of x + Matrix.of y)) = _
-    rw [Matrix.mul_add]; rfl
+    rw [Matrix.mul_add]
+    rfl
   map_smul' c x := by
     show toL (P * (c • Matrix.of x)) = _
-    rw [Matrix.mul_smul]; rfl
+    rw [Matrix.mul_smul]
+    rfl
 
 theorem mulL_mul (P P' : Mat E a) : mulL P * mulL P' = mulL (P * P') := by
   refine LinearMap.ext fun w => ?_
@@ -56,97 +60,114 @@ theorem mulL_mul (P P' : Mat E a) : mulL P * mulL P' = mulL (P * P') := by
 theorem mulL_zero : mulL (0 : Mat E a) = 0 := by
   refine LinearMap.ext fun w => ?_
   show toL ((0 : Mat E a) * Matrix.of w) = 0
-  rw [Matrix.zero_mul]; rfl
+  rw [Matrix.zero_mul]
+  rfl
 
-theorem one_add_mulL_apply (P : Mat E a) (w : Lie E a) :
-    (1 + mulL P) w = toL ((1 + P) * Matrix.of w) := by
+theorem one_add_mulL_apply (P : Mat E a) (w : Lie E a)
+    : (1 + mulL P) w = toL ((1 + P) * Matrix.of w) := by
   show w + toL (P * Matrix.of w) = _
-  rw [Matrix.add_mul, Matrix.one_mul]; rfl
+  rw [Matrix.add_mul, Matrix.one_mul]
+  rfl
 
-theorem one_sub_mulL_apply (P : Mat E a) (w : Lie E a) :
-    (1 - mulL P) w = toL ((1 - P) * Matrix.of w) := by
+theorem one_sub_mulL_apply (P : Mat E a) (w : Lie E a)
+    : (1 - mulL P) w = toL ((1 - P) * Matrix.of w) := by
   show w - toL (P * Matrix.of w) = _
-  rw [Matrix.sub_mul, Matrix.one_mul]; rfl
+  rw [Matrix.sub_mul, Matrix.one_mul]
+  rfl
 
 def shear (P : Mat E a) (hP : P * P = 0) : Lie E a ≃ₗ[ℝ] Lie E a :=
   LinearEquiv.ofLinear (1 + mulL P) (1 - mulL P)
     (by
       show (1 + mulL P) * (1 - mulL P) = 1
-      calc (1 + mulL P) * (1 - mulL P) = 1 - mulL P * mulL P := by noncomm_ring
+      calc
+        (1 + mulL P) * (1 - mulL P)
+          = 1 - mulL P * mulL P := by noncomm_ring
         _ = 1 := by rw [mulL_mul, hP, mulL_zero, sub_zero])
     (by
       show (1 - mulL P) * (1 + mulL P) = 1
-      calc (1 - mulL P) * (1 + mulL P) = 1 - mulL P * mulL P := by noncomm_ring
+      calc
+        (1 - mulL P) * (1 + mulL P)
+          = 1 - mulL P * mulL P := by noncomm_ring
         _ = 1 := by rw [mulL_mul, hP, mulL_zero, sub_zero])
 
-theorem shear_apply (P : Mat E a) (hP : P * P = 0) (w : Lie E a) :
-    shear P hP w = toL ((1 + P) * Matrix.of w) := one_add_mulL_apply P w
+theorem shear_apply (P : Mat E a) (hP : P * P = 0) (w : Lie E a)
+    : shear P hP w = toL ((1 + P) * Matrix.of w) :=
+  one_add_mulL_apply P w
 
-theorem shear_symm_apply (P : Mat E a) (hP : P * P = 0) (w : Lie E a) :
-    (shear P hP).symm w = toL ((1 - P) * Matrix.of w) := one_sub_mulL_apply P w
+theorem shear_symm_apply (P : Mat E a) (hP : P * P = 0) (w : Lie E a)
+    : (shear P hP).symm w = toL ((1 - P) * Matrix.of w) :=
+  one_sub_mulL_apply P w
 
-theorem measurePreserving_shear (P : Mat E a) (hP : P * P = 0) :
-    MeasurePreserving (shear P hP).toContinuousLinearEquiv.toHomeomorph.toMeasurableEquiv volume volume := by
+theorem measurePreserving_shear (P : Mat E a) (hP : P * P = 0)
+    : MeasurePreserving (shear P hP).toContinuousLinearEquiv.toHomeomorph.toMeasurableEquiv volume
+      volume := by
   haveI := isAddHaar_lie (E := E) (a := a)
   refine ⟨(shear P hP).toContinuousLinearEquiv.continuous.measurable, ?_⟩
   have hdet : LinearMap.det (1 + mulL P : Lie E a →ₗ[ℝ] Lie E a) = 1 :=
     det_eq_one_of_sq (by rw [add_sub_cancel_left, mulL_mul, hP, mulL_zero])
-  have h := Measure.map_linearMap_addHaar_eq_smul_addHaar (μ := (volume : Measure (Lie E a)))
-    (f := 1 + mulL P) (by rw [hdet]; norm_num)
+  have h :=
+    Measure.map_linearMap_addHaar_eq_smul_addHaar (μ := (volume : Measure (Lie E a)))
+      (f := 1 + mulL P) (by rw [hdet]; norm_num)
   rw [hdet] at h
   simp only [inv_one, abs_one, ENNReal.ofReal_one, one_smul] at h
   exact h
 
-theorem altPoint_sq {m : ℕ} {Y : Fin m → Mat E a} (hY : ∀ i j, Y i * Y j = 0) (ε : Fin m → Bool) :
-    altPoint Y ε * altPoint Y ε = 0 := by
+theorem altPoint_sq {m : ℕ} {Y : Fin m → Mat E a} (hY : ∀ i j, Y i * Y j = 0) (ε : Fin m → Bool)
+    : altPoint Y ε * altPoint Y ε = 0 := by
   unfold altPoint
   rw [Finset.sum_mul_sum]
   refine Finset.sum_eq_zero fun i _ => Finset.sum_eq_zero fun j _ => ?_
   split_ifs <;> simp [hY]
 
-theorem toL_altPoint {m : ℕ} (Y : Fin m → Mat E a) (ε : Fin m → Bool) :
-    toL (altPoint Y ε) = altPoint (fun i => toL (Y i)) ε := by
+theorem toL_altPoint {m : ℕ} (Y : Fin m → Mat E a) (ε : Fin m → Bool)
+    : toL (altPoint Y ε) = altPoint (fun i => toL (Y i)) ε := by
   unfold altPoint
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← toLA_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   split_ifs <;> simp [← toLA_apply]
 
-theorem norm_toL_altPoint_le {m : ℕ} {Y : Fin m → Mat E a} {R : ℝ} (hR : ∀ i, ‖toL (Y i)‖ ≤ R)
-    (ε : Fin m → Bool) : ‖toL (altPoint Y ε)‖ ≤ m * R := by
+theorem norm_toL_altPoint_le
+    {m : ℕ} {Y : Fin m → Mat E a} {R : ℝ} (hR : ∀ i, ‖toL (Y i)‖ ≤ R) (ε : Fin m → Bool)
+    : ‖toL (altPoint Y ε)‖ ≤ m * R := by
   rw [toL_altPoint]
   unfold altPoint
-  calc ‖∑ i, if ε i then toL (Y i) else 0‖ ≤ ∑ i : Fin m, ‖if ε i then toL (Y i) else 0‖ :=
-        norm_sum_le _ _
+  calc
+    ‖∑ i, if ε i then toL (Y i) else 0‖
+      ≤ ∑ i : Fin m, ‖if ε i then toL (Y i) else 0‖ := norm_sum_le _ _
     _ ≤ ∑ _i : Fin m, R := by
-        refine Finset.sum_le_sum fun i _ => ?_
-        split_ifs
-        · exact hR i
-        · rw [norm_zero]; exact (norm_nonneg _).trans (hR i)
+      refine Finset.sum_le_sum fun i _ => ?_
+      split_ifs
+      · exact hR i
+      · rw [norm_zero]; exact (norm_nonneg _).trans (hR i)
     _ = m * R := by simp
 
-theorem add_altPoint_eq {m : ℕ} (Y : Fin m → Mat E a) (ε : Fin m → Bool) (v : Lie E a) :
-    v + altPoint (fun i => toL (-(Y i * Matrix.of v))) ε = toL ((1 - altPoint Y ε) * Matrix.of v) := by
+theorem add_altPoint_eq {m : ℕ} (Y : Fin m → Mat E a) (ε : Fin m → Bool) (v : Lie E a)
+    : v + altPoint (fun i => toL (-(Y i * Matrix.of v))) ε
+      = toL ((1 - altPoint Y ε) * Matrix.of v) := by
   have h1 : altPoint (fun i => -(Y i * Matrix.of v)) ε = -(altPoint Y ε * Matrix.of v) := by
     unfold altPoint
     rw [Finset.sum_mul, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     split_ifs <;> simp
-  rw [← toL_altPoint (fun i => -(Y i * Matrix.of v)), h1, Matrix.sub_mul, Matrix.one_mul, sub_eq_add_neg,
-    ← toLA_apply, ← toLA_apply, map_add]
+  rw [← toL_altPoint (fun i => -(Y i * Matrix.of v)), h1, Matrix.sub_mul, Matrix.one_mul,
+    sub_eq_add_neg, ← toLA_apply, ← toLA_apply, map_add]
   rfl
 
 theorem norm_toL_mul_le (Y X : Mat E a) : ‖toL (Y * X)‖ ≤ a * ‖toL Y‖ * ‖toL X‖ := by
   have h0 : 0 ≤ (a : ℝ) * ‖toL Y‖ * ‖toL X‖ := by positivity
   refine (pi_norm_le_iff_of_nonneg h0).2 fun i => (pi_norm_le_iff_of_nonneg h0).2 fun j => ?_
-  have hY : ∀ l, ‖Y i l‖ ≤ ‖toL Y‖ := fun l => (norm_le_pi_norm (toL Y i) l).trans (norm_le_pi_norm (toL Y) i)
-  have hX : ∀ l, ‖X l j‖ ≤ ‖toL X‖ := fun l => (norm_le_pi_norm (toL X l) j).trans (norm_le_pi_norm (toL X) l)
+  have hY : ∀ l, ‖Y i l‖ ≤ ‖toL Y‖ := fun l =>
+    (norm_le_pi_norm (toL Y i) l).trans (norm_le_pi_norm (toL Y) i)
+  have hX : ∀ l, ‖X l j‖ ≤ ‖toL X‖ := fun l =>
+    (norm_le_pi_norm (toL X l) j).trans (norm_le_pi_norm (toL X) l)
   show ‖(Y * X) i j‖ ≤ _
   rw [Matrix.mul_apply]
-  calc ‖∑ l, Y i l * X l j‖ ≤ ∑ l : Fin a, ‖Y i l‖ * ‖X l j‖ :=
-        (norm_sum_le _ _).trans (Finset.sum_le_sum fun l _ => norm_mul_le _ _)
+  calc
+    ‖∑ l, Y i l * X l j‖ ≤ ∑ l : Fin a, ‖Y i l‖ * ‖X l j‖ :=
+      (norm_sum_le _ _).trans (Finset.sum_le_sum fun l _ => norm_mul_le _ _)
     _ ≤ ∑ _l : Fin a, ‖toL Y‖ * ‖toL X‖ :=
-        Finset.sum_le_sum fun l _ => mul_le_mul (hY l) (hX l) (norm_nonneg _) (norm_nonneg _)
+      Finset.sum_le_sum fun l _ => mul_le_mul (hY l) (hX l) (norm_nonneg _) (norm_nonneg _)
     _ = a * ‖toL Y‖ * ‖toL X‖ := by simp [mul_assoc]
 
 theorem continuous_of_lie : Continuous (fun y : Lie E a => (Matrix.of y : Mat E a)) := continuous_id
@@ -169,18 +190,29 @@ theorem continuous_act : Continuous (act (E := E) (a := a)) :=
 
 theorem isUnit_one_add_of_sq {P : Mat E a} (hP : P * P = 0) : IsUnit (1 + P) := by
   refine ⟨⟨1 + P, 1 - P, ?_, ?_⟩, rfl⟩
-  · calc (1 + P) * (1 - P) = 1 - P * P := by noncomm_ring
+  · calc
+      (1 + P) * (1 - P)
+        = 1 - P * P := by noncomm_ring
       _ = 1 := by rw [hP, sub_zero]
-  · calc (1 - P) * (1 + P) = 1 - P * P := by noncomm_ring
+  · calc
+      (1 - P) * (1 + P)
+        = 1 - P * P := by noncomm_ring
       _ = 1 := by rw [hP, sub_zero]
 
-theorem norm_sum_altSign_integral_le : ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (β : Lie E a → ℂ), ContDiff ℝ ∞ β →
-    HasCompactSupport β → tsupport β ⊆ invSet E a → ∀ (m : ℕ) (R : ℝ), ∃ (c : ℝ) (Q : Set (Lie E a)),
-    0 ≤ c ∧ IsCompact Q ∧ Q ⊆ invSet E a ∧ ∀ f : Lie E a → ℂ, ContinuousOn f (invSet E a) →
-    ∀ F : ℝ, 0 ≤ F → (∀ w ∈ Q, ‖f w‖ ≤ F) →
-    ∀ Y : Fin m → Matrix (Fin a) (Fin a) (Cinf E), (∀ i j, Y i * Y j = 0) → (∀ i, ‖toL (Y i)‖ ≤ R) →
-    ‖∑ ε : Fin m → Bool, (GroundTheory.Automorphic.altSign ε : ℂ) *
-        ∫ w, f (toL ((1 + GroundTheory.Automorphic.altPoint Y ε) * Matrix.of w)) * β w‖ ≤ c * F * ∏ i, ‖toL (Y i)‖ := by
+theorem norm_sum_altSign_integral_le
+    : ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (β : Lie E a → ℂ),
+      ContDiff ℝ ∞ β → HasCompactSupport β → tsupport β ⊆ invSet E a
+        → ∀ (m : ℕ) (R : ℝ), ∃ (c : ℝ) (Q : Set (Lie E a)),
+          0 ≤ c ∧ IsCompact Q ∧ Q ⊆ invSet E a
+            ∧ ∀ f : Lie E a → ℂ,
+              ContinuousOn f (invSet E a)
+                → ∀ F : ℝ,
+                  0 ≤ F → (∀ w ∈ Q, ‖f w‖ ≤ F)
+                    → ∀ Y : Fin m → Matrix (Fin a) (Fin a) (Cinf E),
+                      (∀ i j, Y i * Y j = 0) → (∀ i, ‖toL (Y i)‖ ≤ R)
+                        → ‖∑ ε : Fin m → Bool, (GroundTheory.Automorphic.altSign ε : ℂ) *
+                              ∫ w, f (toL ((1 + GroundTheory.Automorphic.altPoint Y ε) * Matrix.of w)) * β w‖
+                          ≤ c * F * ∏ i, ‖toL (Y i)‖ := by
   intro E _ _ a β hβ hβc hβu m R
   haveI := isAddHaar_lie (E := E) (a := a)
   obtain ⟨Bm, hBm⟩ := exists_norm_altSum_le (E := Lie E a) (F := ℂ) hβ hβc m
@@ -200,22 +232,31 @@ theorem norm_sum_altSign_integral_le : ∀ (E : Type) [Field E] [NumberField E] 
   have hP : ∀ ε, altPoint Y ε * altPoint Y ε = 0 := altPoint_sq hY
   have hmemQ : ∀ ε v, toL ((1 - altPoint Y ε) * Matrix.of v) ∈ tsupport β → v ∈ Q := by
     intro ε v hv
-    refine ⟨(toL (altPoint Y ε), toL ((1 - altPoint Y ε) * Matrix.of v)),
-      ⟨⟨norm_toL_altPoint_le hR ε, hP ε⟩, hv⟩, ?_⟩
+    refine ⟨
+      (toL (altPoint Y ε), toL ((1 - altPoint Y ε) * Matrix.of v)),
+      ⟨⟨norm_toL_altPoint_le hR ε, hP ε⟩, hv⟩,
+      ?_
+    ⟩
     show toL ((1 + altPoint Y ε) * ((1 - altPoint Y ε) * Matrix.of v)) = v
     have h1 : (1 + altPoint Y ε) * (1 - altPoint Y ε) = 1 := by
-      calc (1 + altPoint Y ε) * (1 - altPoint Y ε) = 1 - altPoint Y ε * altPoint Y ε := by noncomm_ring
+      calc
+        (1 + altPoint Y ε) * (1 - altPoint Y ε)
+          = 1 - altPoint Y ε * altPoint Y ε := by noncomm_ring
         _ = 1 := by rw [hP ε, sub_zero]
     rw [← Matrix.mul_assoc, h1, Matrix.one_mul]
     rfl
-  have hstep : ∀ ε, ∫ w, f (toL ((1 + altPoint Y ε) * Matrix.of w)) * β w =
-      ∫ v, f v * β (toL ((1 - altPoint Y ε) * Matrix.of v)) := by
+  have hstep
+      : ∀ ε,
+        ∫ w, f (toL ((1 + altPoint Y ε) * Matrix.of w)) * β w
+          = ∫ v, f v * β (toL ((1 - altPoint Y ε) * Matrix.of v)) := by
     intro ε
     have hmp := measurePreserving_shear (altPoint Y ε) (hP ε)
     rw [← hmp.integral_comp' (g := fun v => f v * β (toL ((1 - altPoint Y ε) * Matrix.of v)))]
     refine integral_congr_ae (Filter.Eventually.of_forall fun w => ?_)
-    have e1 : (shear _ (hP ε)).toContinuousLinearEquiv.toHomeomorph.toMeasurableEquiv w =
-        shear _ (hP ε) w := rfl
+    have e1
+        : (shear _ (hP ε)).toContinuousLinearEquiv.toHomeomorph.toMeasurableEquiv w
+          = shear _ (hP ε) w :=
+      rfl
     simp only [e1]
     rw [← shear_symm_apply _ (hP ε), LinearEquiv.symm_apply_apply, shear_apply]
   have hint : ∀ ε, Integrable (fun v => f v * β (toL ((1 - altPoint Y ε) * Matrix.of v))) := by
@@ -229,8 +270,10 @@ theorem norm_sum_altSign_integral_le : ∀ (E : Type) [Field E] [NumberField E] 
       ((hf.mul (hβ.continuous.comp hg).continuousOn).continuous_of_tsupport_subset isOpen_invSet
         (hsub.trans hQu))
       (hQc.of_isClosed_subset (isClosed_tsupport _) hsub)
-  have hA : ∀ v, ∑ ε : Fin m → Bool, (altSign ε : ℂ) * (f v * β (toL ((1 - altPoint Y ε) * Matrix.of v))) =
-      f v * altSum m β (fun i => toL (-(Y i * Matrix.of v))) v := by
+  have hA
+      : ∀ v,
+        ∑ ε : Fin m → Bool, (altSign ε : ℂ) * (f v * β (toL ((1 - altPoint Y ε) * Matrix.of v)))
+          = f v * altSum m β (fun i => toL (-(Y i * Matrix.of v))) v := by
     intro v
     rw [altSum_eq_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun ε _ => ?_
@@ -239,8 +282,10 @@ theorem norm_sum_altSign_integral_le : ∀ (E : Type) [Field E] [NumberField E] 
   simp_rw [hstep, ← integral_const_mul]
   rw [← integral_finsetSum _ (fun ε _ => (hint ε).const_mul _)]
   simp_rw [hA]
-  have hpt : ∀ v, ‖f v * altSum m β (fun i => toL (-(Y i * Matrix.of v))) v‖ ≤
-      Q.indicator (fun _ => F * (Bm' * (((a : ℝ) * Rq') ^ m * ∏ i, ‖toL (Y i)‖))) v := by
+  have hpt
+      : ∀ v,
+        ‖f v * altSum m β (fun i => toL (-(Y i * Matrix.of v))) v‖
+          ≤ Q.indicator (fun _ => F * (Bm' * (((a : ℝ) * Rq') ^ m * ∏ i, ‖toL (Y i)‖))) v := by
     intro v
     by_cases hv : v ∈ Q
     · rw [Set.indicator_of_mem hv, norm_mul]
@@ -255,13 +300,16 @@ theorem norm_sum_altSign_integral_le : ∀ (E : Type) [Field E] [NumberField E] 
           exact norm_neg _
         rw [hn]
         have hnv : ‖toL (Matrix.of v : Mat E a)‖ = ‖v‖ := rfl
-        calc ‖toL (Y i * Matrix.of v)‖ ≤ a * ‖toL (Y i)‖ * ‖toL (Matrix.of v : Mat E a)‖ := norm_toL_mul_le _ _
+        calc
+          ‖toL (Y i * Matrix.of v)‖
+            ≤ a * ‖toL (Y i)‖ * ‖toL (Matrix.of v : Mat E a)‖ := norm_toL_mul_le _ _
           _ = a * ‖toL (Y i)‖ * ‖v‖ := by rw [hnv]
           _ ≤ a * ‖toL (Y i)‖ * Rq' :=
-              mul_le_mul_of_nonneg_left hv' (mul_nonneg (Nat.cast_nonneg _) (norm_nonneg _))
+            mul_le_mul_of_nonneg_left hv' (mul_nonneg (Nat.cast_nonneg _) (norm_nonneg _))
           _ = a * Rq' * ‖toL (Y i)‖ := by ring
-      calc Bm * ∏ i, ‖toL (-(Y i * Matrix.of v))‖ ≤ Bm' * ∏ i, ‖toL (-(Y i * Matrix.of v))‖ :=
-            mul_le_mul_of_nonneg_right (le_max_left _ _) (Finset.prod_nonneg fun i _ => norm_nonneg _)
+      calc
+        Bm * ∏ i, ‖toL (-(Y i * Matrix.of v))‖ ≤ Bm' * ∏ i, ‖toL (-(Y i * Matrix.of v))‖ :=
+          mul_le_mul_of_nonneg_right (le_max_left _ _) (Finset.prod_nonneg fun i _ => norm_nonneg _)
         _ ≤ Bm' * (((a : ℝ) * Rq') ^ m * ∏ i, ‖toL (Y i)‖) := mul_le_mul_of_nonneg_left hprod hBm0
     · rw [Set.indicator_of_notMem hv]
       have hz : altSum m β (fun i => toL (-(Y i * Matrix.of v))) v = 0 := by
@@ -272,12 +320,14 @@ theorem norm_sum_altSign_integral_le : ∀ (E : Type) [Field E] [NumberField E] 
         · exact absurd (hmemQ ε v hs) hv
         · rw [image_eq_zero_of_notMem_tsupport hs, smul_zero]
       rw [hz, mul_zero, norm_zero]
-  calc ‖∫ v, f v * altSum m β (fun i => toL (-(Y i * Matrix.of v))) v‖
-      ≤ ∫ v, Q.indicator (fun _ => F * (Bm' * (((a : ℝ) * Rq') ^ m * ∏ i, ‖toL (Y i)‖))) v :=
-        norm_integral_le_of_norm_le ((integrableOn_const hQc.measure_lt_top.ne).integrable_indicator
-          hQc.measurableSet) (Filter.Eventually.of_forall hpt)
+  calc
+    ‖∫ v, f v * altSum m β (fun i => toL (-(Y i * Matrix.of v))) v‖
+        ≤ ∫ v, Q.indicator (fun _ => F * (Bm' * (((a : ℝ) * Rq') ^ m * ∏ i, ‖toL (Y i)‖))) v :=
+      norm_integral_le_of_norm_le
+        ((integrableOn_const hQc.measure_lt_top.ne).integrable_indicator hQc.measurableSet)
+        (Filter.Eventually.of_forall hpt)
     _ = F * (Bm' * (((a : ℝ) * Rq') ^ m * ∏ i, ‖toL (Y i)‖)) * volume.real Q := by
-        rw [integral_indicator hQc.measurableSet, setIntegral_const, smul_eq_mul, mul_comm]
+      rw [integral_indicator hQc.measurableSet, setIntegral_const, smul_eq_mul, mul_comm]
     _ = Bm' * ((a : ℝ) * Rq') ^ m * volume.real Q * F * ∏ i, ‖toL (Y i)‖ := by ring
 
 end GlobalTheory.AltConv

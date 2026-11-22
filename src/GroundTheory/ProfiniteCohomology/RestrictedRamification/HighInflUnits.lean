@@ -22,32 +22,39 @@ section Primary
 
 variable {X Y : Type*} [AddCommGroup X] [AddCommGroup Y] {ℓ : ℕ} {f : X →+ Y}
 
-theorem IsIsoModCoprime.eq_zero_of_pow_nsmul (h : IsIsoModCoprime ℓ f) {x : X} (hx : f x = 0) {k : ℕ}
-    (hk : ℓ ^ k • x = 0) : x = 0 := by
+theorem IsIsoModCoprime.eq_zero_of_pow_nsmul
+    (h : IsIsoModCoprime ℓ f) {x : X} (hx : f x = 0) {k : ℕ} (hk : ℓ ^ k • x = 0)
+    : x = 0 := by
   obtain ⟨m, hm, hmx⟩ := h.1 x hx
   exact eq_zero_of_coprime_nsmul_eq_zero hm hmx hk
 
-theorem IsIsoModCoprime.exists_pow_nsmul (h : IsIsoModCoprime ℓ f) (hℓ : ℓ.Prime) (hX : IsAddTorsion X)
-    {y : Y} {k : ℕ} (hk : ℓ ^ k • y = 0) : ∃ x, (∃ j : ℕ, ℓ ^ j • x = 0) ∧ f x = y := by
+theorem IsIsoModCoprime.exists_pow_nsmul
+    (h : IsIsoModCoprime ℓ f) (hℓ : ℓ.Prime) (hX : IsAddTorsion X)
+    {y : Y} {k : ℕ} (hk : ℓ ^ k • y = 0)
+    : ∃ x, (∃ j : ℕ, ℓ ^ j • x = 0) ∧ f x = y := by
   obtain ⟨m, hm, x, hx⟩ := h.2 y
-  obtain ⟨u, w, huw⟩ : IsCoprime (m : ℤ) ((ℓ ^ k : ℕ) : ℤ) := Nat.isCoprime_iff_coprime.2 (hm.pow_right k)
+  obtain ⟨u, w, huw⟩ : IsCoprime (m : ℤ) ((ℓ ^ k : ℕ) : ℤ) :=
+    Nat.isCoprime_iff_coprime.2 (hm.pow_right k)
   have hy : f (u • x) = y := by
     rw [map_zsmul, hx]
-    calc u • (m • y) = (u * m) • y := by rw [mul_smul, natCast_zsmul]
+    calc
+      u • (m • y)
+        = (u * m) • y := by rw [mul_smul, natCast_zsmul]
       _ = (u * m + w * ((ℓ ^ k : ℕ) : ℤ)) • y := by
         rw [add_smul, mul_smul w, natCast_zsmul, hk, smul_zero, add_zero]
       _ = y := by rw [huw, one_smul]
   obtain ⟨x', hx', hfx'⟩ := exists_primary_map_eq f hℓ (hX (u • x)) (k := k) (by rw [hy]; exact hk)
   exact ⟨x', hx', hfx'.trans hy⟩
 
-def primaryComponentMap (ℓ : ℕ) (f : X →+ Y) :
-    AddCommGroup.primaryComponent X ℓ →+ AddCommGroup.primaryComponent Y ℓ :=
+def primaryComponentMap (ℓ : ℕ) (f : X →+ Y)
+    : AddCommGroup.primaryComponent X ℓ →+ AddCommGroup.primaryComponent Y ℓ :=
   (f.comp (AddCommGroup.primaryComponent X ℓ).subtype).codRestrict _ fun x => by
     obtain ⟨k, hk⟩ := x.2
     exact ⟨k, (map_nsmul f _ _).symm.trans ((congrArg f hk).trans (map_zero f))⟩
 
-theorem IsIsoModCoprime.bijective_primaryComponentMap (h : IsIsoModCoprime ℓ f) (hℓ : ℓ.Prime)
-    (hX : IsAddTorsion X) : Function.Bijective (primaryComponentMap ℓ f) := by
+theorem IsIsoModCoprime.bijective_primaryComponentMap
+    (h : IsIsoModCoprime ℓ f) (hℓ : ℓ.Prime) (hX : IsAddTorsion X)
+    : Function.Bijective (primaryComponentMap ℓ f) := by
   refine ⟨(injective_iff_map_eq_zero _).2 fun x hx => ?_, fun y => ?_⟩
   · obtain ⟨k, hk⟩ := x.2
     exact Subtype.ext (h.eq_zero_of_pow_nsmul (congrArg Subtype.val hx) hk)
@@ -61,12 +68,14 @@ variable (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
 
 section Kernel
 
-variable {ℓ : ℕ} (hℓ : ℓ.Prime) (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
-
+variable
+  {ℓ : ℕ}
+  (hℓ : ℓ.Prime) (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
 
 include hℓ hS in
-theorem eq_zero_cohomology_gsKernel_of_three_le {r : ℕ} (hr : 3 ≤ r)
-    (y : cohomology (Rep.res (gsKernel K S).subtype (unitsLimitRep K)) r) : y = 0 := by
+theorem eq_zero_cohomology_gsKernel_of_three_le
+    {r : ℕ} (hr : 3 ≤ r) (y : cohomology (Rep.res (gsKernel K S).subtype (unitsLimitRep K)) r)
+    : y = 0 := by
   obtain ⟨U, hU, hNU, y', rfl⟩ :=
     exists_isOpen_cohomologyResLE_eq (unitsLimitRep K) (gsKernel K S) (isClosed_gsKernel K S) r y
   obtain ⟨L, hL, hLS, rfl⟩ := exists_finiteSubfield_of_isOpen K S U hU hNU
@@ -97,53 +106,67 @@ theorem eq_zero_cohomology_gsKernel_of_three_le {r : ℕ} (hr : 3 ≤ r)
     exact Subsingleton.elim _ _
   rw [← cohomologyResLE_comp (unitsLimitRep K) hEL hNE r, ConcreteCategory.comp_apply, hz, map_zero]
 
-
 include hℓ hS in
-theorem exists_coprime_nsmul_cohomology_gsKernel {i : ℕ} (hi : 1 ≤ i)
-    (y : cohomology (Rep.res (gsKernel K S).subtype (unitsLimitRep K)) i) :
-    ∃ m : ℕ, m.Coprime ℓ ∧ m • y = 0 := by
+theorem exists_coprime_nsmul_cohomology_gsKernel
+    {i : ℕ} (hi : 1 ≤ i) (y : cohomology (Rep.res (gsKernel K S).subtype (unitsLimitRep K)) i)
+    : ∃ m : ℕ, m.Coprime ℓ ∧ m • y = 0 := by
   rcases (show i = 1 ∨ i = 2 ∨ 3 ≤ i by omega) with rfl | rfl | h3
   · have := ModuleCat.subsingleton_of_isZero (isZero_cohomology_one_gsKernel K S)
     exact ⟨1, Nat.coprime_one_left ℓ, Subsingleton.elim _ _⟩
   · exact exists_coprime_smul_cohomology_two_gsKernel K S hℓ hS y
-  · exact ⟨1, Nat.coprime_one_left ℓ, by rw [eq_zero_cohomology_gsKernel_of_three_le K S hℓ hS h3 y, smul_zero]⟩
+  · exact ⟨
+      1,
+      Nat.coprime_one_left ℓ,
+      by rw [eq_zero_cohomology_gsKernel_of_three_le K S hℓ hS h3 y, smul_zero]
+    ⟩
 
 end Kernel
 
-def gsUnitsInfl (r : ℕ) :
-    cohomology (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) r →+ cohomology (unitsLimitRep K) r :=
+def gsUnitsInfl (r : ℕ)
+    : cohomology (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) r
+      →+ cohomology (unitsLimitRep K) r :=
   (gsBrauerInfl K S r).hom.toAddMonoidHom.comp
     (cohomologyULiftIntAddEquiv (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) r).toAddMonoidHom
 
-theorem gsUnitsInfl_apply (r : ℕ) (x : cohomology (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) r) :
-    gsUnitsInfl K S r x =
-      (gsBrauerInfl K S r).hom (cohomologyULiftIntAddEquiv (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) r x) :=
+theorem gsUnitsInfl_apply (r : ℕ) (x : cohomology (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) r)
+    : gsUnitsInfl K S r x
+      = (gsBrauerInfl K S r).hom
+        (cohomologyULiftIntAddEquiv (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) r x) :=
   rfl
 
-variable {ℓ : ℕ} (hℓ : ℓ.Prime) (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
-
+variable
+  {ℓ : ℕ}
+  (hℓ : ℓ.Prime) (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
 
 include hℓ hS in
-theorem isIsoModCoprime_gsUnitsInfl {r : ℕ} (hr : 1 ≤ r) : IsIsoModCoprime ℓ (gsUnitsInfl K S r) := by
-  have h := isIsoModCoprime_cohomologyInfl (isClosed_gsKernel K S) ℓ hr
-    (fun i hi y => exists_coprime_nsmul_cohomology_gsKernel K S hℓ hS hi y)
+theorem isIsoModCoprime_gsUnitsInfl {r : ℕ} (hr : 1 ≤ r)
+    : IsIsoModCoprime ℓ (gsUnitsInfl K S r) := by
+  have h :=
+    isIsoModCoprime_cohomologyInfl (isClosed_gsKernel K S) ℓ hr
+      (fun i hi y => exists_coprime_nsmul_cohomology_gsKernel K S hℓ hS hi y)
   have hsurj : Function.Surjective (cohomologyMapAlong (gsQuotientEquiv K S).toMonoidHom
       (continuous_gsQuotientEquiv K S) (invariantsGsKernelMor K S) r).hom :=
     (ModuleCat.epi_iff_surjective _).1 inferInstance
   have hinj : Function.Injective (cohomologyMapAlong (gsQuotientEquiv K S).toMonoidHom
       (continuous_gsQuotientEquiv K S) (invariantsGsKernelMor K S) r).hom :=
     (ModuleCat.mono_iff_injective _).1 inferInstance
-  have he : ∀ x, (cohomologyInfl (unitsLimitRep K) (gsKernel K S) r).hom x =
-      (gsBrauerInfl K S r).hom ((cohomologyMapAlong (gsQuotientEquiv K S).toMonoidHom
-        (continuous_gsQuotientEquiv K S) (invariantsGsKernelMor K S) r).hom x) := fun x =>
-    (congrArg (fun φ => φ.hom x) (cohomologyMapAlong_invariantsGsKernelMor_comp_gsBrauerInfl K S r)).symm
+  have he
+      : ∀ x,
+        (cohomologyInfl (unitsLimitRep K) (gsKernel K S) r).hom x
+          = (gsBrauerInfl K S r).hom
+            ((cohomologyMapAlong (gsQuotientEquiv K S).toMonoidHom (continuous_gsQuotientEquiv K S)
+              (invariantsGsKernelMor K S) r).hom x) := fun x =>
+    (congrArg
+      (fun φ => φ.hom x)
+      (cohomologyMapAlong_invariantsGsKernelMor_comp_gsBrauerInfl K S r)).symm
   have h' : IsIsoModCoprime ℓ (gsBrauerInfl K S r).hom.toAddMonoidHom :=
-    IsIsoModCoprime.of_comp_surjective (e := (cohomologyMapAlong (gsQuotientEquiv K S).toMonoidHom
-      (continuous_gsQuotientEquiv K S) (invariantsGsKernelMor K S) r).hom.toAddMonoidHom) (h.congr he) hsurj
-  exact h'.comp (IsIsoModCoprime.of_bijective
-    (cohomologyULiftIntAddEquiv (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) r).bijective)
-
-
+    IsIsoModCoprime.of_comp_surjective
+      (e :=
+        (cohomologyMapAlong (gsQuotientEquiv K S).toMonoidHom (continuous_gsQuotientEquiv K S)
+          (invariantsGsKernelMor K S) r).hom.toAddMonoidHom)
+      (h.congr he) hsurj
+  exact h'.comp (IsIsoModCoprime.of_bijective (cohomologyULiftIntAddEquiv
+    (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) r).bijective)
 
 end
 

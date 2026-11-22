@@ -7,15 +7,21 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PoissonSummat
 
 @[expose] public section
 
-open Matrix NumberField MeasureTheory Formalism.DegreeFormula Formalism.MJ Formalism.UG Formalism.L2.Geo
-open ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates GlobalTheory.HodgeDomain GlobalTheory.TrueCx GlobalTheory.FlagFibre
+open Matrix NumberField MeasureTheory Formalism.DegreeFormula Formalism.MJ Formalism.UG
+  Formalism.L2.Geo
+open ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+  GlobalTheory.HodgeDomain GlobalTheory.TrueCx GlobalTheory.FlagFibre
 open scoped ComplexOrder ENNReal
 
 namespace GlobalTheory.FlagFibre
 
-theorem measurePreserving_coords_sorted (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
-    (X : Data E r) (Tau : Type) [Fintype Tau] (κ : Tau ≃ X.Ψ) :
-    MeasurePreserving (coords X κ) volume volume := by
+theorem measurePreserving_coords_sorted
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (r : ℕ) (X : Data E r)
+    (Tau : Type) [Fintype Tau]
+    (κ : Tau ≃ X.Ψ)
+    : MeasurePreserving (coords X κ) volume volume := by
   let e : Fin (nd X) ≃ Tau × Low r :=
     ((Equiv.prodCongr κ (Equiv.refl (Low r))).trans (Fintype.equivFin (Ent X))).symm
   have h1 := GlobalTheory.volume_preserving_ofLp_complex (Fin (nd X))

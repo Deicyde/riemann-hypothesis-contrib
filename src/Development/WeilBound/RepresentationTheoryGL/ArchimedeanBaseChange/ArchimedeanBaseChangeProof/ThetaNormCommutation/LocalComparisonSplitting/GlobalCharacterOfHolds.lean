@@ -7,7 +7,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host
 open GlobalTheory.BCT
 open scoped Classical
 
@@ -34,17 +35,22 @@ theorem global_character_of_holds : GlobalCharacterOfInputs := by
   simp only [Equiv.prodCongr_apply, Prod.map_fst, Prod.map_snd]
   obtain ⟨g₁, hg₁, hr₁⟩ := he₁ x₁
   obtain ⟨g₂, hg₂, hr₂⟩ := he₂ x₂
-  have hiff : (IsRegEll (Quot.out (e₁ x₁)) ∧ IsRegEll (Quot.out (e₂ x₂))) ↔ (pol x₁ ∈ Ell E a ∧ pol x₂ ∈ Ell E b) := by
-    rw [hr₁, hr₂, (hP E a u₁ hu₁ _).1, (hP E b u₂ hu₂ _).1, mul_inv_cancel_right, mul_inv_cancel_right]
+  have hiff
+      : (IsRegEll (Quot.out (e₁ x₁)) ∧ IsRegEll (Quot.out (e₂ x₂)))
+        ↔ (pol x₁ ∈ Ell E a ∧ pol x₂ ∈ Ell E b) := by
+    rw [hr₁, hr₂, (hP E a u₁ hu₁ _).1, (hP E b u₂ hu₂ _).1, mul_inv_cancel_right,
+      mul_inv_cancel_right]
     exact Iff.rfl
-  have horb : orbTerm2 μ₁ μ₂ (adel S u₁ u₂ ψ φ₁ φ₂) (Quot.out (e₁ x₁)) (Quot.out (e₂ x₂)) =
-      orbTerm2 μ₁ μ₂ (adel S u₁ u₂ ψ φ₁ φ₂) (x₁.rep * u₁) (x₂.rep * u₂) := by
+  have horb
+      : orbTerm2 μ₁ μ₂ (adel S u₁ u₂ ψ φ₁ φ₂) (Quot.out (e₁ x₁)) (Quot.out (e₂ x₂))
+        = orbTerm2 μ₁ μ₂ (adel S u₁ u₂ ψ φ₁ φ₂) (x₁.rep * u₁) (x₂.rep * u₂) := by
     rw [hg₁, hg₂, hO E a b μ₁ μ₂ _ _ g₁ _ g₂ (hA E hU a b S u₁ u₂ hu₁ hu₂ ψ φ₁ φ₂ hψ hφ₁ hφ₂ _ _)]
   rw [finsum_eq_if]
   by_cases h : pol x₁ ∈ Ell E a ∧ pol x₂ ∈ Ell E b
   · rw [if_pos (hiff.2 h), if_pos h, horb]
-    have ht := hc S hS u₁ u₂ hu₁ hu₂ l₁ l₂ val ψ φ₁ φ₂ hL hφ₁ hφ₂ (x₁.rep * u₁) (x₂.rep * u₂)
-      (hr₁.1 (hiff.2 h).1) (hr₂.1 (hiff.2 h).2)
+    have ht :=
+      hc S hS u₁ u₂ hu₁ hu₂ l₁ l₂ val ψ φ₁ φ₂ hL hφ₁ hφ₂ (x₁.rep * u₁) (x₂.rep * u₂)
+        (hr₁.1 (hiff.2 h).1) (hr₂.1 (hiff.2 h).2)
     simp only [mul_inv_cancel_right] at ht
     exact ht
   · rw [if_neg (mt hiff.1 h), if_neg h, mul_zero]

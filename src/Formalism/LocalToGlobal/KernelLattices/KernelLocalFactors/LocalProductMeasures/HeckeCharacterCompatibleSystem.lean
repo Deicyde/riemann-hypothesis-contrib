@@ -32,32 +32,44 @@ theorem hk_val_one {P : HeightOneSpectrum (𝓞 E)} {a : E} (h : OneAt P a) : P.
   have h1 : P.valuation E (a - 1) < P.valuation E (1 : E) := by rw [map_one]; exact h
   rw [Valuation.map_add_eq_of_lt_left _ h1, map_one]
 
-theorem hk_valued (P : HeightOneSpectrum (𝓞 E)) (a : Eˣ) :
-    Valued.v ((atFin P a : (P.adicCompletion E)ˣ) : P.adicCompletion E) = P.valuation E (a : E) :=
+theorem hk_valued (P : HeightOneSpectrum (𝓞 E)) (a : Eˣ)
+    : Valued.v ((atFin P a : (P.adicCompletion E)ˣ) : P.adicCompletion E) = P.valuation E (a : E) :=
   HeightOneSpectrum.valuedAdicCompletion_eq_valuation' P (a : E)
 
-theorem hk_valued_sub (P : HeightOneSpectrum (𝓞 E)) (a : Eˣ) :
-    Valued.v (((atFin P a : (P.adicCompletion E)ˣ) : P.adicCompletion E) - 1) = P.valuation E ((a : E) - 1) := by
-  have e : ((atFin P a : (P.adicCompletion E)ˣ) : P.adicCompletion E) - 1 = (((a : E) - 1 : E) : P.adicCompletion E) := by
+theorem hk_valued_sub (P : HeightOneSpectrum (𝓞 E)) (a : Eˣ)
+    : Valued.v (((atFin P a : (P.adicCompletion E)ˣ) : P.adicCompletion E) - 1)
+      = P.valuation E ((a : E) - 1) := by
+  have e
+      : ((atFin P a : (P.adicCompletion E)ˣ) : P.adicCompletion E) - 1
+        = (((a : E) - 1 : E) : P.adicCompletion E) := by
     show algebraMap E (P.adicCompletion E) (a : E) - 1 = algebraMap E (P.adicCompletion E) ((a : E) - 1)
     rw [map_sub, map_one]
   rw [e]
   exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' P ((a : E) - 1)
 
-theorem hk_tame (χ : HChar E) {P : HeightOneSpectrum (𝓞 E)} (h : χ.TameAt P) (a : Eˣ) (ha : OneAt P (a : E)) : χ.locK P a = 1 := by
+theorem hk_tame
+    (χ : HChar E) {P : HeightOneSpectrum (𝓞 E)} (h : χ.TameAt P) (a : Eˣ) (ha : OneAt P (a : E))
+    : χ.locK P a = 1 := by
   refine h (atFin P a) ?_ ?_
   · show Valued.v _ = 1
     rw [hk_valued, hk_val_one ha]
   · rw [hk_valued_sub]
     exact hk_le_exp ha
 
-theorem hk_unr (χ : HChar E) {P : HeightOneSpectrum (𝓞 E)} (h : χ.UnrAt P) (a : Eˣ) (ha : P.valuation E (a : E) = 1) : χ.locK P a = 1 := by
+theorem hk_unr
+    (χ : HChar E)
+    {P : HeightOneSpectrum (𝓞 E)} (h : χ.UnrAt P)
+    (a : Eˣ) (ha : P.valuation E (a : E) = 1)
+    : χ.locK P a = 1 := by
   refine h (atFin P a) ?_
   show Valued.v _ = 1
   rw [hk_valued, ha]
 
-theorem hk_unif (χ : HChar E) {P : HeightOneSpectrum (𝓞 E)} (h : χ.UnrAt P) (a : Eˣ) (ha : P.valuation E (a : E) = WithZero.exp (-1 : ℤ)) :
-    χ.locK P a = χ.val P := by
+theorem hk_unif
+    (χ : HChar E)
+    {P : HeightOneSpectrum (𝓞 E)} (h : χ.UnrAt P)
+    (a : Eˣ) (ha : P.valuation E (a : E) = WithZero.exp (-1 : ℤ))
+    : χ.locK P a = χ.val P := by
   refine χ.val_eq h (atFin P a) ?_
   show Valued.v _ = _
   rw [hk_valued, ha]
@@ -71,16 +83,16 @@ section Sys
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem hk_mem_above (v : HeightOneSpectrum (𝓞 F)) (P : HeightOneSpectrum (𝓞 E)) :
-    P ∈ aboveF (L := E) F v ↔ P.asIdeal.under (𝓞 F) = v.asIdeal := by
+theorem hk_mem_above (v : HeightOneSpectrum (𝓞 F)) (P : HeightOneSpectrum (𝓞 E))
+    : P ∈ aboveF (L := E) F v ↔ P.asIdeal.under (𝓞 F) = v.asIdeal := by
   unfold aboveF
   rw [Set.Finite.mem_toFinset, Set.mem_ofPred_eq]
   constructor
   · intro h; rw [← h]; rfl
   · intro h; exact HeightOneSpectrum.ext h
 
-theorem hk_lamH (χ : HChar E) (v : HeightOneSpectrum (𝓞 F)) (a : Eˣ) :
-    lamH (F := F) χ v a = ∏ P ∈ aboveF (L := E) F v, χ.locK P a := by
+theorem hk_lamH (χ : HChar E) (v : HeightOneSpectrum (𝓞 F)) (a : Eˣ)
+    : lamH (F := F) χ v a = ∏ P ∈ aboveF (L := E) F v, χ.locK P a := by
   unfold lamH
   rw [MonoidHom.finsetProd_apply]
 
@@ -149,14 +161,17 @@ theorem hecke_character_product_formula : HProd := by
     refine Finset.prod_eq_one fun P hP => hone P fun hPT => hv ?_
     rw [hT, Finset.mem_image]
     exact ⟨P, hPT, HeightOneSpectrum.ext ((hk_mem_above v P).1 hP)⟩
-  have hsub : Function.mulSupport (fun v : HeightOneSpectrum (𝓞 F) => lamH (F := F) χ v x) ⊆ ↑T := by
+  have hsub
+      : Function.mulSupport (fun v : HeightOneSpectrum (𝓞 F) => lamH (F := F) χ v x) ⊆ ↑T := by
     intro v hv
     by_contra h
     exact hv (hsupp v h)
   refine ⟨T.finite_toSet.subset hsub, ?_⟩
   rw [finprod_eq_prod_of_mulSupport_subset _ hsub]
   have e : ∏ v ∈ T, lamH (F := F) χ v x = ∏ P ∈ T0, χ.locK P x := by
-    rw [← Finset.prod_fiberwise_of_maps_to (s := T0) (t := T) (g := fun P => P.under (𝓞 F)) (fun P hP => Finset.mem_image_of_mem _ hP)]
+    rw [← Finset.prod_fiberwise_of_maps_to (s := T0) (t := T)
+      (g := fun P => P.under (𝓞 F))
+      (fun P hP => Finset.mem_image_of_mem _ hP)]
     refine Finset.prod_congr rfl fun v _ => ?_
     rw [hk_lamH]
     symm
@@ -192,7 +207,8 @@ theorem hecke_character_infinity_type : HInf := by
   rw [hn x]
   refine Finset.prod_congr rfl fun τ _ => ?_
   have hw : X.embC σ₀ τ (x : X.E) ≠ 0 := (map_ne_zero _).2 x.ne_zero
-  rw [hne τ, zpow_mul, show (2 : ℤ) = ((2 : ℕ) : ℤ) from rfl, zpow_natCast, hk_sq _ hw, ← hX.conjE (X.embC σ₀ τ) (x : X.E)]
+  rw [hne τ, zpow_mul, show (2 : ℤ) = ((2 : ℕ) : ℤ) from rfl, zpow_natCast, hk_sq _ hw,
+    ← hX.conjE (X.embC σ₀ τ) (x : X.E)]
   congr 1
   rw [map_div₀, map_div₀]
   rfl

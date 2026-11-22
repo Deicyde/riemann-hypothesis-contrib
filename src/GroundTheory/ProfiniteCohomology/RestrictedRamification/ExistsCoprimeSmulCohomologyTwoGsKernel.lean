@@ -25,15 +25,19 @@ theorem isClosed_gsKernel : IsClosed (gsKernel K S : Set K.1.fixingSubgroup) := 
   have ht2 : T2Space (galUnramifiedOutside K.1 ℚ̄ S) :=
     galois_t2Space K.1 (maxUnramifiedOutside K.1 ℚ̄ S)
   have : T1Space (galUnramifiedOutside K.1 ℚ̄ S) := @T2Space.t1Space _ _ ht2
-  exact (isClosed_singleton (x := (1 : galUnramifiedOutside K.1 ℚ̄ S))).preimage (continuous_gsRestrict K S)
+  exact (isClosed_singleton (x := (1 : galUnramifiedOutside K.1 ℚ̄ S))).preimage
+    (continuous_gsRestrict K S)
 
-theorem mem_gsKernel_iff (σ : K.1.fixingSubgroup) :
-    σ ∈ gsKernel K S ↔ ∀ x ∈ maxUnramifiedOutside K.1 ℚ̄ S, (σ : ℚ̄ ≃ₐ[ℚ] ℚ̄) x = x := by
+theorem mem_gsKernel_iff (σ : K.1.fixingSubgroup)
+    : σ ∈ gsKernel K S ↔ ∀ x ∈ maxUnramifiedOutside K.1 ℚ̄ S, (σ : ℚ̄ ≃ₐ[ℚ] ℚ̄) x = x := by
   rw [MonoidHom.mem_ker]
   constructor
   · intro h x hx
-    have := congrArg (fun τ : galUnramifiedOutside K.1 ℚ̄ S =>
-      ((τ ⟨x, hx⟩ : maxUnramifiedOutside K.1 ℚ̄ S) : ℚ̄)) h
+    have :=
+      congrArg
+        (fun τ : galUnramifiedOutside K.1 ℚ̄ S =>
+          ((τ ⟨x, hx⟩ : maxUnramifiedOutside K.1 ℚ̄ S) : ℚ̄))
+        h
     rw [gsRestrict_apply] at this
     exact this
   · intro h
@@ -41,10 +45,12 @@ theorem mem_gsKernel_iff (σ : K.1.fixingSubgroup) :
     rw [gsRestrict_apply]
     exact h x x.2
 
-theorem exists_finiteSubfield_of_isOpen (U : Subgroup K.1.fixingSubgroup)
-    (hU : IsOpen (U : Set K.1.fixingSubgroup)) (hNU : gsKernel K S ≤ U) :
-    ∃ (L : FiniteSubfield) (_ : Fact (K ≤ L)), (∀ x ∈ L.1, x ∈ maxUnramifiedOutside K.1 ℚ̄ S) ∧
-      U = L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup := by
+theorem exists_finiteSubfield_of_isOpen
+    (U : Subgroup K.1.fixingSubgroup)
+    (hU : IsOpen (U : Set K.1.fixingSubgroup)) (hNU : gsKernel K S ≤ U)
+    : ∃ (L : FiniteSubfield) (_ : Fact (K ≤ L)),
+      (∀ x ∈ L.1, x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
+        ∧ U = L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup := by
   have : IsGalois ℚ ℚ̄ := IsAlgClosure.isGalois ℚ ℚ̄
   let U' : Subgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄) := U.map K.1.fixingSubgroup.subtype
   have hKo : IsOpen (K.1.fixingSubgroup : Set (ℚ̄ ≃ₐ[ℚ] ℚ̄)) := K.1.fixingSubgroup_isOpen
@@ -87,8 +93,8 @@ theorem exists_finiteSubfield_of_isOpen (U : Subgroup K.1.fixingSubgroup)
   · ext τ
     rw [Subgroup.mem_subgroupOf, ← hmemU', ← hfix]
 
-theorem isZero_cohomology_one_gsKernel :
-    IsZero (cohomology (Rep.res (gsKernel K S).subtype (unitsLimitRep K)) 1) := by
+theorem isZero_cohomology_one_gsKernel
+    : IsZero (cohomology (Rep.res (gsKernel K S).subtype (unitsLimitRep K)) 1) := by
   refine @ModuleCat.isZero_of_subsingleton _ _ _ ⟨fun a b => ?_⟩
   suffices h : ∀ y : cohomology (Rep.res (gsKernel K S).subtype (unitsLimitRep K)) 1, y = 0 by
     rw [h a, h b]
@@ -96,14 +102,16 @@ theorem isZero_cohomology_one_gsKernel :
   obtain ⟨U, hU, hNU, y', rfl⟩ :=
     exists_isOpen_cohomologyResLE_eq (unitsLimitRep K) (gsKernel K S) (isClosed_gsKernel K S) 1 y
   obtain ⟨L, hL, -, rfl⟩ := exists_finiteSubfield_of_isOpen K S U hU hNU
-  have hz : Subsingleton (cohomology (Rep.res (L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup).subtype
-      (unitsLimitRep K)) 1) :=
+  have hz : Subsingleton (cohomology
+      (Rep.res (L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup).subtype (unitsLimitRep K)) 1) :=
     ModuleCat.subsingleton_of_isZero (isZero_cohomology_one_res_subgroupOf (K := K) (E := L))
   rw [Subsingleton.elim y' 0, map_zero]
 
-theorem exists_unitsResField_eq_zero_of_pow_nsmul (L : FiniteSubfield) {ℓ : ℕ} (hℓ : ℓ.Prime)
-    (x : cohomology (unitsLimitRep L) 2) (k : ℕ) (hx : ℓ ^ k • x = 0) :
-    ∃ (E : FiniteSubfield) (_ : Fact (L ≤ E)) (b : ℕ),
+theorem exists_unitsResField_eq_zero_of_pow_nsmul
+    (L : FiniteSubfield)
+    {ℓ : ℕ} (hℓ : ℓ.Prime)
+    (x : cohomology (unitsLimitRep L) 2) (k : ℕ) (hx : ℓ ^ k • x = 0)
+    : ∃ (E : FiniteSubfield) (_ : Fact (L ≤ E)) (b : ℕ),
       E.1 = L.1 ⊔ Cyclotomic.rootsOfUnityField (ℓ ^ b) ∧ (unitsResField L E 2).hom x = 0 := by
   classical
   have hℓ2 : 2 < ℓ ^ 2 := by nlinarith [hℓ.two_le]
@@ -128,7 +136,8 @@ theorem exists_unitsResField_eq_zero_of_pow_nsmul (L : FiniteSubfield) {ℓ : �
   have hsplit : (unitsResField K' E' 2).hom x' = 0 := by
     refine unitsResField_eq_zero_of_dvd_finrank ι' x' (ℓ ^ k) hm (fun v => ?_) fun v hv w => ?_
     · have := subsingleton_cohomology_two_of_isComplex v (IsTotallyComplex.isComplex v)
-      exact Subsingleton.elim (α := cohomology (galUnitsZ v.Completion (AlgebraicClosure v.Completion)) 2) _ _
+      exact Subsingleton.elim
+        (α := cohomology (galUnitsZ v.Completion (AlgebraicClosure v.Completion)) 2) _ _
     · exact hdeg v (by rw [Finset.mem_preimage, DFinsupp.mem_support_iff]; exact hv) w
 
   let a := k * (N + 1)
@@ -161,34 +170,40 @@ section SubgroupOf
 
 variable {K}
 
-abbrev unitsSubgroupOfMap (L : FiniteSubfield) [Fact (K ≤ L)] (n : ℕ) :
-    cohomology (Rep.res (L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup).subtype (unitsLimitRep K)) n ⟶
-      cohomology (unitsLimitRep L) n :=
-  cohomologyMapAlong (Subgroup.subgroupOfEquivOfLe
-      (IntermediateField.fixingSubgroup_le (Fact.out : K ≤ L))).symm.toMonoidHom
+abbrev unitsSubgroupOfMap (L : FiniteSubfield) [Fact (K ≤ L)] (n : ℕ)
+    : cohomology
+        (Rep.res (L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup).subtype (unitsLimitRep K)) n
+      ⟶ cohomology (unitsLimitRep L) n :=
+  cohomologyMapAlong
+    (Subgroup.subgroupOfEquivOfLe (IntermediateField.fixingSubgroup_le
+      (Fact.out : K ≤ L))).symm.toMonoidHom
     (continuous_subgroupOfEquivOfLe_symm _) (resSubgroupOfHom _ unitsRep) n
 
-theorem unitsSubgroupOfMap_injective (L : FiniteSubfield) [Fact (K ≤ L)] (n : ℕ) :
-    Function.Injective (unitsSubgroupOfMap (K := K) L n).hom :=
+theorem unitsSubgroupOfMap_injective (L : FiniteSubfield) [Fact (K ≤ L)] (n : ℕ)
+    : Function.Injective (unitsSubgroupOfMap (K := K) L n).hom :=
   (ModuleCat.mono_iff_injective _).1 inferInstance
 
-theorem fixingSubgroup_subgroupOf_mono {L E : FiniteSubfield} (h : L ≤ E) :
-    E.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup ≤ L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup :=
-  fun _ hσ => IntermediateField.fixingSubgroup_le h hσ
+theorem fixingSubgroup_subgroupOf_mono {L E : FiniteSubfield} (h : L ≤ E)
+    : E.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup
+      ≤ L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup := fun _ hσ =>
+  IntermediateField.fixingSubgroup_le h hσ
 
-theorem cohomologyResLE_comp_unitsSubgroupOfMap {L E : FiniteSubfield} [Fact (K ≤ L)] [Fact (K ≤ E)]
-    [Fact (L ≤ E)] (n : ℕ) :
-    cohomologyResLE (unitsLimitRep K) (fixingSubgroup_subgroupOf_mono (K := K) (Fact.out : L ≤ E)) n ≫
-      unitsSubgroupOfMap E n = unitsSubgroupOfMap L n ≫ unitsResField L E n := by
+theorem cohomologyResLE_comp_unitsSubgroupOfMap
+    {L E : FiniteSubfield} [Fact (K ≤ L)] [Fact (K ≤ E)] [Fact (L ≤ E)] (n : ℕ)
+    : cohomologyResLE (unitsLimitRep K) (fixingSubgroup_subgroupOf_mono (K := K) (Fact.out : L ≤ E))
+          n
+        ≫ unitsSubgroupOfMap E n
+      = unitsSubgroupOfMap L n ≫ unitsResField L E n := by
   rw [cohomologyResLE_eq, ← cohomologyMapAlong_comp, unitsResField, ← cohomologyMapAlong_comp]
   exact cohomologyMapAlong_congr _ _ _ _ (by ext; rfl) (fun _ => rfl) n
 
 end SubgroupOf
 
-theorem exists_coprime_smul_cohomology_two_gsKernel {ℓ : ℕ} (hℓ : ℓ.Prime)
-    (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
-    (y : cohomology (Rep.res (gsKernel K S).subtype (unitsLimitRep K)) 2) :
-    ∃ m : ℕ, m.Coprime ℓ ∧ m • y = 0 := by
+theorem exists_coprime_smul_cohomology_two_gsKernel
+    {ℓ : ℕ}
+    (hℓ : ℓ.Prime) (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
+    (y : cohomology (Rep.res (gsKernel K S).subtype (unitsLimitRep K)) 2)
+    : ∃ m : ℕ, m.Coprime ℓ ∧ m • y = 0 := by
   obtain ⟨U, hU, hNU, y', rfl⟩ :=
     exists_isOpen_cohomologyResLE_eq (unitsLimitRep K) (gsKernel K S) (isClosed_gsKernel K S) 2 y
   obtain ⟨L, hL, hLS, rfl⟩ := exists_finiteSubfield_of_isOpen K S U hU hNU
@@ -218,14 +233,16 @@ theorem exists_coprime_smul_cohomology_two_gsKernel {ℓ : ℕ} (hℓ : ℓ.Prim
 
   have hr : (cohomologyResLE (unitsLimitRep K) hEL 2).hom (M' • y') = 0 := by
     apply unitsSubgroupOfMap_injective E 2
-    have e := congrArg (fun φ => ModuleCat.Hom.hom φ (M' • y'))
-      (cohomologyResLE_comp_unitsSubgroupOfMap (K := K) (L := L) (E := E) 2)
+    have e :=
+      congrArg
+        (fun φ => ModuleCat.Hom.hom φ (M' • y'))
+        (cohomologyResLE_comp_unitsSubgroupOfMap (K := K) (L := L) (E := E) 2)
     refine e.trans ?_
     change (unitsResField L E 2).hom ((unitsSubgroupOfMap L 2).hom (M' • y')) = _
     rw [map_nsmul, hres, map_zero]
   refine ⟨M', hcop, ?_⟩
-  rw [← map_nsmul, ← cohomologyResLE_comp (unitsLimitRep K) hEL hNE 2, ConcreteCategory.comp_apply, hr,
-    map_zero]
+  rw [← map_nsmul, ← cohomologyResLE_comp (unitsLimitRep K) hEL hNE 2, ConcreteCategory.comp_apply,
+    hr, map_zero]
 
 end
 

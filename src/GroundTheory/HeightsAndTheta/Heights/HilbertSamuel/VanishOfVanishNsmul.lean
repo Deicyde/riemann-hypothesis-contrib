@@ -12,16 +12,22 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
-theorem vanish_of_vanish_nsmul {S : Type} [CommRing S] {K : Type} [Fintype K] [LinearOrder K] {ι : K → Type}
-    [∀ k, Fintype (ι k)] [∀ k, LinearOrder (ι k)] {M : Type} [AddCommGroup M] [Module (MRingOver S ι) M]
-    [Module S M] [IsScalarTower S (MRingOver S ι) M] (𝓜 : (K → ℤ) → Submodule S M) (N : K → ℤ) {q : ℕ}
-    (hq : 1 ≤ q)
+theorem vanish_of_vanish_nsmul
+    {S : Type} [CommRing S]
+    {K : Type} [Fintype K] [LinearOrder K]
+    {ι : K → Type} [∀ k, Fintype (ι k)] [∀ k, LinearOrder (ι k)]
+    {M : Type}
+    [AddCommGroup M] [Module (MRingOver S ι) M] [Module S M] [IsScalarTower S (MRingOver S ι) M]
+    (𝓜 : (K → ℤ) → Submodule S M) (N : K → ℤ)
+    {q : ℕ} (hq : 1 ≤ q)
     (h : ∀ e : K → ℤ, ∃ c₁ : ℕ, ∀ c : ℕ, c₁ ≤ c → Subsingleton (KH.cechHc ι 𝓜 (e + (c * q) • N) 1))
-    (e : K → ℤ) : ∃ c₁ : ℕ, ∀ c : ℕ, c₁ ≤ c → Subsingleton (KH.cechHc ι 𝓜 (e + c • N) 1) := by
+    (e : K → ℤ)
+    : ∃ c₁ : ℕ, ∀ c : ℕ, c₁ ≤ c → Subsingleton (KH.cechHc ι 𝓜 (e + c • N) 1) := by
   choose c₀ hc₀ using fun r : ℕ => h (e + r • N)
   refine ⟨((Finset.range q).sup c₀ + 1) * q, fun c hc => ?_⟩
   have hr : c % q ∈ Finset.range q := Finset.mem_range.mpr (Nat.mod_lt _ (by omega))
@@ -32,8 +38,10 @@ theorem vanish_of_vanish_nsmul {S : Type} [CommRing S] {K : Type} [Fintype K] [L
     rw [add_assoc, ← add_smul, Nat.mod_add_div' c q]
   rwa [e'] at h3
 
-theorem KleimanVarietyH1Generation.proof (hK : KH.KAmpStatement) (hDev : H1VanishingDevissage.Statement)
-    (hGen : GenerationOfH1Vanishing.Statement) : KleimanVarietyH1Generation.Statement := by
+theorem KleimanVarietyH1Generation.proof
+    (hK : KH.KAmpStatement) (hDev : H1VanishingDevissage.Statement)
+    (hGen : GenerationOfH1Vanishing.Statement)
+    : KleimanVarietyH1Generation.Statement := by
   intro F _ K _ _ ι _ _ I Q α b a hI hQ hN hb ha
   refine hGen F K ι Q _ inferInstance (hDev F K ι Q _ inferInstance fun P hP hQP e => ?_)
 

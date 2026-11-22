@@ -12,8 +12,8 @@ open _root_.Neutral.B1 ReciprocityTheory.Coh Function
 
 variable {p : ℕ} [Fact p.Prime] {K L : IntermediateField ℚ_[p] (PadicAlgCl p)}
 
-theorem nsmul_mk_one_div (n : ℕ) [NeZero n] (m : ℤ) :
-    m • (QuotientAddGroup.mk (1 / (n : ℚ)) : QZ) = QuotientAddGroup.mk ((m : ℚ) / n) := by
+theorem nsmul_mk_one_div (n : ℕ) [NeZero n] (m : ℤ)
+    : m • (QuotientAddGroup.mk (1 / (n : ℚ)) : QZ) = QuotientAddGroup.mk ((m : ℚ) / n) := by
   rw [← QuotientAddGroup.mk_zsmul]
   congr 1
   rw [zsmul_eq_mul, mul_one_div]
@@ -23,20 +23,24 @@ theorem mk_eq_zero_QZ (q : ℚ) : (QuotientAddGroup.mk q : QZ) = 0 ↔ ∃ k : �
   exact Iff.rfl
 
 noncomputable def zmodToQZ (n : ℕ) [NeZero n] : ZMod n →+ QZ :=
-  ZMod.lift n ⟨zmultiplesHom QZ (QuotientAddGroup.mk (1 / (n : ℚ))), by
-    have hn : (n : ℚ) ≠ 0 := Nat.cast_ne_zero.2 (NeZero.ne n)
-    rw [zmultiplesHom_apply, nsmul_mk_one_div, mk_eq_zero_QZ]
-    exact ⟨1, by rw [Int.cast_natCast, div_self hn, Int.cast_one]⟩⟩
+  ZMod.lift n ⟨
+    zmultiplesHom QZ (QuotientAddGroup.mk (1 / (n : ℚ))),
+    by
+      have hn : (n : ℚ) ≠ 0 := Nat.cast_ne_zero.2 (NeZero.ne n)
+      rw [zmultiplesHom_apply, nsmul_mk_one_div, mk_eq_zero_QZ]
+      exact ⟨1, by rw [Int.cast_natCast, div_self hn, Int.cast_one]⟩
+  ⟩
 
-theorem zmodToQZ_intCast (n : ℕ) [NeZero n] (m : ℤ) :
-    zmodToQZ n (m : ZMod n) = QuotientAddGroup.mk ((m : ℚ) / n) := by
+theorem zmodToQZ_intCast (n : ℕ) [NeZero n] (m : ℤ)
+    : zmodToQZ n (m : ZMod n) = QuotientAddGroup.mk ((m : ℚ) / n) := by
   rw [zmodToQZ, ZMod.lift_coe]
   show zmultiplesHom QZ (QuotientAddGroup.mk (1 / (n : ℚ))) m = _
   rw [zmultiplesHom_apply, nsmul_mk_one_div]
 
 theorem zmodToQZ_injective (n : ℕ) [NeZero n] : Injective (zmodToQZ n) := by
   have hn : (n : ℚ) ≠ 0 := Nat.cast_ne_zero.2 (NeZero.ne n)
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro a ha
   obtain ⟨m, rfl⟩ := ZMod.intCast_surjective a
   rw [zmodToQZ_intCast, mk_eq_zero_QZ] at ha
@@ -48,7 +52,8 @@ theorem zmodToQZ_injective (n : ℕ) [NeZero n] : Injective (zmodToQZ n) := by
   rw [mul_comm]
   exact_mod_cast this.symm
 
-theorem exists_zmodToQZ_eq (n : ℕ) [NeZero n] (x : QZ) (hx : n • x = 0) : ∃ a, zmodToQZ n a = x := by
+theorem exists_zmodToQZ_eq (n : ℕ) [NeZero n] (x : QZ) (hx : n • x = 0)
+    : ∃ a, zmodToQZ n a = x := by
   have hn : (n : ℚ) ≠ 0 := Nat.cast_ne_zero.2 (NeZero.ne n)
   obtain ⟨q, rfl⟩ := QuotientAddGroup.mk_surjective x
   rw [← QuotientAddGroup.mk_nsmul, mk_eq_zero_QZ] at hx
@@ -56,8 +61,8 @@ theorem exists_zmodToQZ_eq (n : ℕ) [NeZero n] (x : QZ) (hx : n • x = 0) : �
   refine ⟨(k : ZMod n), ?_⟩
   rw [zmodToQZ_intCast, hk, nsmul_eq_mul, mul_div_cancel_left₀ _ hn]
 
-theorem cycK_eq_one {n : ℕ} [NeZero n] (hμ : ∀ ζ : PadicAlgCl p, ζ ^ n = 1 → ζ ∈ K) (g : GK p K) :
-    cycK p K n g = 1 := by
+theorem cycK_eq_one {n : ℕ} [NeZero n] (hμ : ∀ ζ : PadicAlgCl p, ζ ^ n = 1 → ζ ∈ K) (g : GK p K)
+    : cycK p K n g = 1 := by
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot (PadicAlgCl p) n
   have h1 : g ζ = ζ := g.commutes ⟨ζ, hμ ζ hζ.pow_eq_one⟩
   rw [cycN_spec (K := K) (L := PadicAlgCl p) (n := n) g ζ hζ.pow_eq_one] at h1
@@ -68,8 +73,8 @@ theorem cycK_eq_one {n : ℕ} [NeZero n] (hμ : ∀ ζ : PadicAlgCl p, ζ ^ n = 
   rw [← ZMod.val_one_eq_one_mod] at h3
   exact Units.ext (ZMod.val_injective n h3)
 
-theorem card_character_n_torsion {n : ℕ} (hn : 0 < n) (hμ : ∀ ζ : PadicAlgCl p, ζ ^ n = 1 → ζ ∈ K) :
-    Nat.card {χ : charGrp (GK p K) // n • χ = 0} = (powMonoidHom n : Kˣ →* Kˣ).range.index := by
+theorem card_character_n_torsion {n : ℕ} (hn : 0 < n) (hμ : ∀ ζ : PadicAlgCl p, ζ ^ n = 1 → ζ ∈ K)
+    : Nat.card {χ : charGrp (GK p K) // n • χ = 0} = (powMonoidHom n : Kˣ →* Kˣ).range.index := by
   have : NeZero n := ⟨hn.ne'⟩
   have hrho : ∀ g x, charRep (cycK p K n) g x = x := fun g x => by
     rw [charRep_apply, cycK_eq_one hμ, Units.val_one, one_mul]
@@ -83,14 +88,19 @@ theorem card_character_n_torsion {n : ℕ} (hn : 0 < n) (hμ : ∀ ζ : PadicAlg
     have := hm g
     rw [hrho, sub_self] at this
     exact this
-  let Φ : Z1 (charRep (cycK p K n)) → {χ : charGrp (GK p K) // n • χ = 0} := fun f =>
-    ⟨⟨AddMonoidHom.mk' (fun a : Additive (GK p K) => zmodToQZ n (f.1 a.toMul)) fun a b => by
-        show zmodToQZ n (f.1 (a.toMul * b.toMul)) = _
-        rw [f.2.2, hrho, map_add (f := _)],
-      ((IsLocallyConstant.iff_continuous _).2 f.2.1).comp (zmodToQZ n)⟩,
-     Subtype.ext (AddMonoidHom.ext fun a => by
-        show n • zmodToQZ n (f.1 a.toMul) = 0
-        rw [← map_nsmul, nsmul_eq_mul, ZMod.natCast_self, zero_mul, map_zero])⟩
+  let Φ : Z1 (charRep (cycK p K n)) → {χ : charGrp (GK p K) // n • χ = 0} := fun f => ⟨
+    ⟨
+      AddMonoidHom.mk'
+        (fun a : Additive (GK p K) => zmodToQZ n (f.1 a.toMul))
+        fun a b => by
+          show zmodToQZ n (f.1 (a.toMul * b.toMul)) = _
+          rw [f.2.2, hrho, map_add (f := _)],
+      ((IsLocallyConstant.iff_continuous _).2 f.2.1).comp (zmodToQZ n)
+    ⟩,
+    Subtype.ext (AddMonoidHom.ext fun a => by
+      show n • zmodToQZ n (f.1 a.toMul) = 0
+      rw [← map_nsmul, nsmul_eq_mul, ZMod.natCast_self, zero_mul, map_zero])
+  ⟩
   have hΦ : Bijective Φ := by
     constructor
     · intro f f' h
@@ -109,8 +119,8 @@ theorem card_character_n_torsion {n : ℕ} (hn : 0 < n) (hμ : ∀ ζ : PadicAlg
       · rw [hrho, map_add (f := _), hf, hf, hf]
         exact map_add χ.1 (Additive.ofMul g) (Additive.ofMul h)
       · exact Subtype.ext (Subtype.ext (AddMonoidHom.ext fun a => hf a.toMul))
-  rw [← Nat.card_congr (Equiv.ofBijective Φ hΦ), ← Nat.card_congr (Submodule.quotEquivOfEqBot _ hbot).toEquiv,
-    Nat.card_congr e.toEquiv]
+  rw [← Nat.card_congr (Equiv.ofBijective Φ hΦ),
+    ← Nat.card_congr (Submodule.quotEquivOfEqBot _ hbot).toEquiv, Nat.card_congr e.toEquiv]
   rfl
 
 end ReciprocityTheory.DiscreteGroups.LocalClassField

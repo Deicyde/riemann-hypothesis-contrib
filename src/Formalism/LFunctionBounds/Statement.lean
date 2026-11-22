@@ -36,20 +36,19 @@ def saw (y : ℝ) : ℝ := if Int.fract y = 0 then 0 else Int.fract y - 1 / 2
 def gam (s : ℝ) : ℝ := Real.Gamma s / Real.Gamma (1 - s)
 
 def logOm1 (l : ℕ) (S : ℕ × ℕ × ℕ) : ℝ :=
-  -Real.log l + (Real.log (gam ((S.1 : ℝ) / (l : ℝ))) + Real.log (gam ((S.2.1 : ℝ) / (l : ℝ))) +
-    Real.log (gam ((S.2.2 : ℝ) / (l : ℝ))))
+  - Real.log l
+    + (Real.log (gam ((S.1 : ℝ) / (l : ℝ))) + Real.log (gam ((S.2.1 : ℝ) / (l : ℝ)))
+      + Real.log (gam ((S.2.2 : ℝ) / (l : ℝ))))
 
 def inCM (l : ℕ) (S : ℕ × ℕ × ℕ) (n : ℕ) : Prop :=
   Int.fract ((n * S.1 : ℝ) / l) + Int.fract ((n * S.2.1 : ℝ) / l) < 1
-
 
 open ArithmeticFunction in
 def AS (l : ℕ) (S : ℕ × ℕ × ℕ) (y : ℝ) : ℝ :=
   2 * ∑ n ∈ Finset.Icc 1 ⌊y⌋₊,
     if ¬ l ∣ n ∧ ¬ inCM l S n then Λ n * max 0 (y / (n : ℝ) - 1) else 0
 
-def Al (l : ℕ) (y : ℝ) : ℝ :=
-  ∑ i ∈ Finset.Icc 1 ⌊y⌋₊, Real.log l * max 0 (y / (l : ℝ) ^ i - 1)
+def Al (l : ℕ) (y : ℝ) : ℝ := ∑ i ∈ Finset.Icc 1 ⌊y⌋₊, Real.log l * max 0 (y / (l : ℝ) ^ i - 1)
 
 def logPiV (l : ℕ) : ℝ := Real.log (2 * Real.pi / l) + Real.log l / ((l : ℝ) - 1)
 

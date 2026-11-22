@@ -63,12 +63,20 @@ lemma reindex_unitary {m n : Type} [Fintype m] [Fintype n] [DecidableEq m] [Deci
   exact hm.symm
 
 def iso (N : ℕ) : Formalism.BasicNotions.UpqT N 0 ≃* UNgrp N where
-  toFun g := ⟨psi N (g : Formalism.UG.Upq N 0).1, by
-    rw [mem_un_iff, psi_val]
-    exact reindex_unitary _ _ ((mem_upq_iff N _).1 (g : Formalism.UG.Upq N 0).2)⟩
-  invFun k := (⟨(psi N).symm k.1, by
-    rw [mem_upq_iff, psi_symm_val]
-    exact reindex_unitary _ _ ((mem_un_iff N _).1 k.2)⟩ : Formalism.UG.Upq N 0)
+  toFun g := ⟨
+    psi N (g : Formalism.UG.Upq N 0).1,
+    by
+      rw [mem_un_iff, psi_val]
+      exact reindex_unitary _ _ ((mem_upq_iff N _).1 (g : Formalism.UG.Upq N 0).2)
+  ⟩
+  invFun k :=
+    (⟨
+       (psi N).symm k.1,
+       by
+         rw [mem_upq_iff, psi_symm_val]
+         exact reindex_unitary _ _ ((mem_un_iff N _).1 k.2)
+     ⟩
+      : Formalism.UG.Upq N 0)
   left_inv g := Subtype.ext ((psi N).symm_apply_apply _)
   right_inv k := Subtype.ext ((psi N).apply_symm_apply _)
   map_mul' g h := Subtype.ext (map_mul (psi N) _ _)
@@ -271,9 +279,12 @@ lemma zero_mem_B (r : ℝ) (hr : 0 < r) : (0 : UCo N) ∈ uToLie ⁻¹' Formalis
 theorem cOmega_pos' (N : ℕ) : 0 < 1 / (2 ^ (N * (N - 1) / 2) * volU N) :=
   div_pos one_pos (mul_pos (by positivity) (volU_pos N))
 
-theorem omegaDensity_main (μ : Measure (Formalism.BasicNotions.UpqT N 0)) [μ.IsHaarMeasure] [IsProbabilityMeasure μ] :
-    Formalism.BasicNotions.OmegaDensity μ (ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N))) := by
-  have hH : (μ.map (iso N)).IsHaarMeasure := (iso N).isHaarMeasure_map μ (continuous_iso N) (continuous_iso_symm N)
+theorem omegaDensity_main
+    (μ : Measure (Formalism.BasicNotions.UpqT N 0)) [μ.IsHaarMeasure] [IsProbabilityMeasure μ]
+    : Formalism.BasicNotions.OmegaDensity μ
+      (ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N))) := by
+  have hH : (μ.map (iso N)).IsHaarMeasure :=
+    (iso N).isHaarMeasure_map μ (continuous_iso N) (continuous_iso_symm N)
   refine ⟨_, isOmegaLeb_uToLie, ?_⟩
   have hκ : (0 : ℝ) < 2 ^ (N * (N - 1) / 2) := by positivity
   have hV : 0 < volU N := volU_pos N
@@ -282,33 +293,45 @@ theorem omegaDensity_main (μ : Measure (Formalism.BasicNotions.UpqT N 0)) [μ.I
   intro ε hε
   obtain ⟨e, he0, he1, he2⟩ := ENNReal.lt_iff_exists_real_btwn.1 hε
   have he : 0 < e := ENNReal.ofReal_pos.1 he1
-  obtain ⟨δ, hδ, hB⟩ := volU_density (μ.map (iso N)) (e / (1 / (2 ^ (N * (N - 1) / 2) * volU N)))
-    (div_pos he hcpos)
+  obtain ⟨δ, hδ, hB⟩ :=
+    volU_density (μ.map (iso N)) (e / (1 / (2 ^ (N * (N - 1) / 2) * volU N))) (div_pos he hcpos)
   filter_upwards [Ioo_mem_nhdsGT hδ] with r hr
-  have hBo : IsOpen (uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r) := (isOpen_ballU N r).preimage (continuous_uToLie N)
-  have hBn : ∀ x ∈ uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r, ‖x‖ < δ :=
-    fun x hx => (norm_lt_of_mem x r hr.1 hx).trans hr.2
+  have hBo : IsOpen (uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r) :=
+    (isOpen_ballU N r).preimage (continuous_uToLie N)
+  have hBn : ∀ x ∈ uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r, ‖x‖ < δ := fun x hx =>
+    (norm_lt_of_mem x r hr.1 hx).trans hr.2
   have hB0 : volume (uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r) ≠ 0 :=
     (hBo.measure_pos volume ⟨0, zero_mem_B r hr.1⟩).ne'
   have hBt : volume (uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r) ≠ ⊤ :=
-    ne_of_lt (lt_of_le_of_lt (measure_mono fun x hx => mem_ball_zero_iff.2 (norm_lt_of_mem x r hr.1 hx))
+    ne_of_lt (lt_of_le_of_lt
+      (measure_mono fun x hx => mem_ball_zero_iff.2 (norm_lt_of_mem x r hr.1 hx))
       measure_ball_lt_top)
-  have hnum : μ {g | ∃ X ∈ Formalism.BasicNotions.ballU N 0 r, Formalism.BasicNotions.UpqT.mat g =
-        NormedSpace.exp (X : Matrix (Fin N ⊕ Fin 0) (Fin N ⊕ Fin 0) ℂ)} =
-      μ.map (iso N) {k : UNgrp N | ∃ x ∈ uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r, toM k = NormedSpace.exp (skMat x)} := by
-    rw [map_iso_apply, toM_preimage_exp_ball_eq_upqT_exp_ball]
-  have hden : (ENNReal.ofReal (2 ^ (N * (N - 1) / 2)) • Measure.map (uToLie (N := N)) volume)
-      (Formalism.BasicNotions.ballU N 0 r) = ENNReal.ofReal (2 ^ (N * (N - 1) / 2)) * volume (uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r) := by
-    rw [smul_apply, Measure.map_apply (continuous_uToLie N).measurable (isOpen_ballU N r).measurableSet,
+  have hnum
+      : μ
+          {g | ∃ X ∈ Formalism.BasicNotions.ballU N 0 r, Formalism.BasicNotions.UpqT.mat g =
+            NormedSpace.exp (X : Matrix (Fin N ⊕ Fin 0) (Fin N ⊕ Fin 0) ℂ)}
+        = μ.map (iso N)
+          {k : UNgrp N | ∃ x ∈ uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r, toM k = NormedSpace.exp (skMat x)} :=
+    by rw [map_iso_apply, toM_preimage_exp_ball_eq_upqT_exp_ball]
+  have hden
+      : (ENNReal.ofReal (2 ^ (N * (N - 1) / 2)) • Measure.map (uToLie (N := N)) volume)
+          (Formalism.BasicNotions.ballU N 0 r)
+        = ENNReal.ofReal (2 ^ (N * (N - 1) / 2))
+          * volume (uToLie ⁻¹' Formalism.BasicNotions.ballU N 0 r) := by
+    rw [smul_apply,
+      Measure.map_apply (continuous_uToLie N).measurable (isOpen_ballU N r).measurableSet,
       smul_eq_mul]
   obtain ⟨hup, hlo⟩ := hB _ hBo.measurableSet hBn
   simp only [Set.mem_Icc]
   rw [hnum, hden]
   have hκ0 : ENNReal.ofReal (2 ^ (N * (N - 1) / 2)) ≠ 0 := (ENNReal.ofReal_pos.2 hκ).ne'
   constructor
-  · calc ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N)) - ε
-        ≤ ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N)) - ENNReal.ofReal e := tsub_le_tsub_left he2.le _
-      _ = ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N) - e) := (ENNReal.ofReal_sub _ he.le).symm
+  · calc
+      ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N)) - ε
+          ≤ ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N)) - ENNReal.ofReal e :=
+        tsub_le_tsub_left he2.le _
+      _ = ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N) - e) :=
+        (ENNReal.ofReal_sub _ he.le).symm
       _ ≤ _ := by
         rw [ENNReal.le_div_iff_mul_le (Or.inl (mul_ne_zero hκ0 hB0))
           (Or.inl (ENNReal.mul_ne_top ENNReal.ofReal_ne_top hBt))]
@@ -316,13 +339,14 @@ theorem omegaDensity_main (μ : Measure (Formalism.BasicNotions.UpqT N 0)) [μ.I
         rw [← mul_assoc, ← ENNReal.ofReal_mul' hκ.le]
         congr 2
         field_simp
-  · calc _ ≤ ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N) + e) := by
-          refine ENNReal.div_le_of_le_mul (le_trans hup (le_of_eq ?_))
-          rw [← mul_assoc, ← ENNReal.ofReal_mul (by positivity)]
-          congr 2
-          field_simp
+  · calc
+      _ ≤ ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N) + e) := by
+        refine ENNReal.div_le_of_le_mul (le_trans hup (le_of_eq ?_))
+        rw [← mul_assoc, ← ENNReal.ofReal_mul (by positivity)]
+        congr 2
+        field_simp
       _ = ENNReal.ofReal (1 / (2 ^ (N * (N - 1) / 2) * volU N)) + ENNReal.ofReal e :=
-          ENNReal.ofReal_add hcpos.le he.le
+        ENNReal.ofReal_add hcpos.le he.le
       _ ≤ _ := by gcongr
 
 end PolarCoordinateComparison

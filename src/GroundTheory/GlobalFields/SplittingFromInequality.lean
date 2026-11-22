@@ -18,42 +18,46 @@ section Approximation
 
 variable {K : Type*} [Field K] [NumberField K] {L : Type*} [Field L] [NumberField L] [Algebra K L]
 
-theorem IdeleGroup.finiteProj_diagonal (v : HeightOneSpectrum (𝓞 K)) (a : Kˣ) :
-    IdeleGroup.finiteProj v (IdeleGroup.diagonal K a) =
-      Units.map (algebraMap K (v.adicCompletion K)).toMonoidHom a :=
+theorem IdeleGroup.finiteProj_diagonal (v : HeightOneSpectrum (𝓞 K)) (a : Kˣ)
+    : IdeleGroup.finiteProj v (IdeleGroup.diagonal K a)
+      = Units.map (algebraMap K (v.adicCompletion K)).toMonoidHom a :=
   Units.ext (IdeleGroup.coe_finiteProj_diagonal v a)
 
-theorem IdeleGroup.infiniteProj_diagonal (w : InfinitePlace K) (a : Kˣ) :
-    IdeleGroup.infiniteProj w (IdeleGroup.diagonal K a) =
-      Units.map (algebraMap K w.Completion).toMonoidHom a :=
-  by
-    apply Units.ext
-    simpa [AbsoluteValue.Completion.algebraMap_def, WithAbs.algebraMap_right_apply] using
-      IdeleGroup.coe_infiniteProj_diagonal w a
-
+theorem IdeleGroup.infiniteProj_diagonal (w : InfinitePlace K) (a : Kˣ)
+    : IdeleGroup.infiniteProj w (IdeleGroup.diagonal K a)
+      = Units.map (algebraMap K w.Completion).toMonoidHom a := by
+  apply Units.ext
+  simpa [AbsoluteValue.Completion.algebraMap_def, WithAbs.algebraMap_right_apply] using
+    IdeleGroup.coe_infiniteProj_diagonal w a
 
 variable (L) in
-theorem exists_diagonal_mul_mem_localNorms (S : Finset (HeightOneSpectrum (𝓞 K)))
-    (x : IdeleGroup K) :
-    ∃ a : Kˣ, (∀ v ∈ S, IdeleGroup.finiteProj v (IdeleGroup.diagonal K a * x) ∈
-        (finiteLocalNorm L v).range) ∧
-      ∀ w, IdeleGroup.infiniteProj w (IdeleGroup.diagonal K a * x) ∈
-        (infiniteLocalNorm L w).range := by
+theorem exists_diagonal_mul_mem_localNorms (S : Finset (HeightOneSpectrum (𝓞 K))) (x : IdeleGroup K)
+    : ∃ a : Kˣ,
+      (∀ v ∈ S, IdeleGroup.finiteProj v (IdeleGroup.diagonal K a * x) ∈ (finiteLocalNorm L v).range)
+        ∧ ∀ w,
+          IdeleGroup.infiniteProj w (IdeleGroup.diagonal K a * x)
+            ∈ (infiniteLocalNorm L w).range := by
   classical
-  let U : Set (((v : S) → (v.1.adicCompletion K)ˣ) ×
-      ((w : (Finset.univ : Finset (InfinitePlace K))) → (w.1.Completion)ˣ)) :=
+  let U : Set
+      (((v : S) → (v.1.adicCompletion K)ˣ)
+        × ((w : (Finset.univ : Finset (InfinitePlace K))) → (w.1.Completion)ˣ)) :=
     {p | (∀ v : S, p.1 v * IdeleGroup.finiteProj v.1 x ∈ (finiteLocalNorm L v.1).range) ∧
       ∀ w : (Finset.univ : Finset (InfinitePlace K)),
         p.2 w * IdeleGroup.infiniteProj w.1 x ∈ (infiniteLocalNorm L w.1).range}
   have hU : IsOpen U := by
     simp only [U, Set.ofPred_and, Set.ofPred_forall]
-    exact (isOpen_iInter_of_finite fun v : S ↦ (isOpen_range_finiteLocalNorm v.1).preimage
-        (((continuous_apply v).comp continuous_fst).mul continuous_const)).inter
-      (isOpen_iInter_of_finite fun w ↦ (isOpen_range_infiniteLocalNorm w.1).preimage
-        (((continuous_apply w).comp continuous_snd).mul continuous_const))
+    exact (isOpen_iInter_of_finite fun v : S ↦
+        (isOpen_range_finiteLocalNorm v.1).preimage
+          (((continuous_apply v).comp continuous_fst).mul continuous_const)).inter
+      (isOpen_iInter_of_finite fun w ↦
+        (isOpen_range_infiniteLocalNorm w.1).preimage
+          (((continuous_apply w).comp continuous_snd).mul continuous_const))
   have hne : U.Nonempty := by
-    refine ⟨(fun v ↦ (IdeleGroup.finiteProj v.1 x)⁻¹, fun w ↦ (IdeleGroup.infiniteProj w.1 x)⁻¹),
-      fun v ↦ ?_, fun w ↦ ?_⟩
+    refine ⟨
+      (fun v ↦ (IdeleGroup.finiteProj v.1 x)⁻¹, fun w ↦ (IdeleGroup.infiniteProj w.1 x)⁻¹),
+      fun v ↦ ?_,
+      fun w ↦ ?_
+    ⟩
     · rw [inv_mul_cancel]
       exact one_mem _
     · rw [inv_mul_cancel]
@@ -66,8 +70,8 @@ theorem exists_diagonal_mul_mem_localNorms (S : Finset (HeightOneSpectrum (𝓞 
     exact ha.2 ⟨w, Finset.mem_univ w⟩
 
 theorem ideleNorm_range_sup_eq_top_of_eventually_splitsCompletely
-    (h : ∀ᶠ v : HeightOneSpectrum (𝓞 K) in cofinite, SplitsCompletely L v) :
-    (ideleNorm K L).range ⊔ (IdeleGroup.diagonal K).range = ⊤ := by
+    (h : ∀ᶠ v : HeightOneSpectrum (𝓞 K) in cofinite, SplitsCompletely L v)
+    : (ideleNorm K L).range ⊔ (IdeleGroup.diagonal K).range = ⊤ := by
   classical
   refine eq_top_iff.2 fun x _ ↦ ?_
   set S := (eventually_cofinite.1 h).toFinset
@@ -91,12 +95,14 @@ section Cyclic
 
 universe u
 
-variable {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L] [IsCyclic Gal(L/K)]
+variable
+  {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+  [IsCyclic Gal(L/K)]
 
-theorem FirstInequality.finrank_eq_one_of_eventually_splitsCompletely (hFI : FirstInequality.{u})
-    (h : ∀ᶠ v : HeightOneSpectrum (𝓞 K) in cofinite, SplitsCompletely L v) :
-    Module.finrank K L = 1 :=
+theorem FirstInequality.finrank_eq_one_of_eventually_splitsCompletely
+    (hFI : FirstInequality.{u})
+    (h : ∀ᶠ v : HeightOneSpectrum (𝓞 K) in cofinite, SplitsCompletely L v)
+    : Module.finrank K L = 1 :=
   hFI.finrank_eq_one_of_sup_eq_top (ideleNorm_range_sup_eq_top_of_eventually_splitsCompletely h)
 
 end Cyclic

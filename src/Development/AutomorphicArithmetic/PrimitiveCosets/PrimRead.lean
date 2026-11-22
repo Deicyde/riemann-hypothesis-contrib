@@ -4,17 +4,24 @@ public import Development.AutomorphicArithmetic.PrimitiveCosets.CoreAtH
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
-private theorem UpperTheory.Comparison₂.prim_read_dir (φ : Frame) (H : HostRaw φ) (ψ : AddChar (E0 × φ.A) ℂ) :
-    H.dir (chr φ ψ) = dirChar (recH H) ψ := by
+private theorem UpperTheory.Comparison₂.prim_read_dir
+    (φ : Frame) (H : HostRaw φ) (ψ : AddChar (E0 × φ.A) ℂ)
+    : H.dir (chr φ ψ) = dirChar (recH H) ψ := by
   refine MulChar.ext fun u => ?_
   rw [H.dir_unit, dirChar_unit]
   rfl
 
-private theorem UpperTheory.Comparison₂.prim_read_surj (φ : Frame) : Function.Surjective (toE φ) := by
-  have key : ∀ a : ZMod 2, ∃ s : ℤˣ, Multiplicative.toAdd (LFunctionChainParameters.LHost.sgn2 s) = a := by
+private theorem UpperTheory.Comparison₂.prim_read_surj (φ : Frame)
+    : Function.Surjective (toE φ) := by
+  have key
+      : ∀ a : ZMod 2, ∃ s : ℤˣ,
+        Multiplicative.toAdd (LFunctionChainParameters.LHost.sgn2 s) = a := by
     intro a
     fin_cases a
     · exact ⟨1, by simp [LFunctionChainParameters.LHost.sgn2] <;> rfl⟩
@@ -26,8 +33,8 @@ private theorem UpperTheory.Comparison₂.prim_read_surj (φ : Frame) : Function
   simp only [toE, MonoidHom.coe_mk, OneHom.coe_mk, hs1, hs2]
   rfl
 
-private theorem UpperTheory.Comparison₂.prim_read_max (y : ℝ) (n : ℕ) (hn : n ∈ Finset.Icc 1 ⌊y⌋₊) :
-    max (y / n - 1) 0 = y / n - 1 := by
+private theorem UpperTheory.Comparison₂.prim_read_max (y : ℝ) (n : ℕ) (hn : n ∈ Finset.Icc 1 ⌊y⌋₊)
+    : max (y / n - 1) 0 = y / n - 1 := by
   obtain ⟨h1, h2⟩ := Finset.mem_Icc.mp hn
   have hpos : (0 : ℝ) < n := by exact_mod_cast h1
   have hfl : 0 < ⌊y⌋₊ := by omega
@@ -38,21 +45,25 @@ private theorem UpperTheory.Comparison₂.prim_read_max (y : ℝ) (n : ℕ) (hn 
 
 private theorem UpperTheory.Comparison₂.prim_read_Gz (y : ℝ) : Gz y = An.G y := by
   unfold Gz Sz An.G
-  rw [Finset.sum_congr rfl fun n hn => congrArg (fun t => An.abelian₂ n * t) (UpperTheory.Comparison₂.prim_read_max y n hn)]
+  rw [Finset.sum_congr rfl fun n hn =>
+    congrArg (fun t => An.abelian₂ n * t) (UpperTheory.Comparison₂.prim_read_max y n hn)]
   ring
 
-private theorem UpperTheory.Comparison₂.prim_read_one {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) :
-    χ.primitiveCharacter = 1 ↔ χ = 1 := by
+private theorem UpperTheory.Comparison₂.prim_read_one
+    {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N)
+    : χ.primitiveCharacter = 1 ↔ χ = 1 := by
   constructor
   · intro h
     rw [← DirichletCharacter.changeLevel_primitiveCharacter χ, h, map_one]
   · rintro rfl
     exact DirichletCharacter.primitiveCharacter_one
 
-theorem UpperTheory.Comparison₂.prim_read :
-    ∀ (φ : Frame) (H : HostAx φ) (ell : AddChar (E0 × φ.A) ℂ → ℂ), HostAddCharCompatible H.toHostRaw ell → ∀ ψ : AddChar (E0 × φ.A) ℂ,
-      (ψ ≠ 0 → ell ψ = An.logDerivativeAtOne (H.toHostRaw.prim (chr φ ψ)).χ) ∧
-        ∀ y, GPsi (arith H.toHostRaw) ell ψ y = An.gChi (H.toHostRaw.prim (chr φ ψ)).χ y := by
+theorem UpperTheory.Comparison₂.prim_read
+    : ∀ (φ : Frame) (H : HostAx φ) (ell : AddChar (E0 × φ.A) ℂ → ℂ),
+      HostAddCharCompatible H.toHostRaw ell
+        → ∀ ψ : AddChar (E0 × φ.A) ℂ,
+          (ψ ≠ 0 → ell ψ = An.logDerivativeAtOne (H.toHostRaw.prim (chr φ ψ)).χ)
+            ∧ ∀ y, GPsi (arith H.toHostRaw) ell ψ y = An.gChi (H.toHostRaw.prim (chr φ ψ)).χ y := by
   intro φ H ell hell ψ
   unfold HostAddCharCompatible at hell
   set R := H.toHostRaw with hR

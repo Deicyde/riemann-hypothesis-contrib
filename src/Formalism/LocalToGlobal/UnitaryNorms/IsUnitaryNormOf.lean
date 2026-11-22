@@ -16,8 +16,8 @@ variable (L : Type) [Field L] [NumberField L]
 def hcharSub : Subgroup (Ideles L →* ℂˣ) where
   carrier := {χ | Continuous χ ∧ ∀ k : Lˣ, χ (diagUnits L k) = 1}
   one_mem' := ⟨continuous_const, fun _ => rfl⟩
-  mul_mem' := fun {a b} ha hb => ⟨ha.1.mul hb.1, fun k => by
-    rw [MonoidHom.mul_apply, ha.2 k, hb.2 k, one_mul]⟩
+  mul_mem' := fun {a b} ha hb =>
+    ⟨ha.1.mul hb.1, fun k => by rw [MonoidHom.mul_apply, ha.2 k, hb.2 k, one_mul]⟩
   inv_mem' := fun {a} ha => ⟨ha.1.inv, fun k => by rw [MonoidHom.inv_apply, ha.2 k, inv_one]⟩
 
 abbrev HChar : Type := ↥(hcharSub L)
@@ -36,7 +36,7 @@ def IsUnitAt (v : HeightOneSpectrum (𝓞 L)) (x : (v.adicCompletion L)ˣ) : Pro
 def IsUnifAt (v : HeightOneSpectrum (𝓞 L)) (x : (v.adicCompletion L)ˣ) : Prop :=
   Valued.v (x : v.adicCompletion L) = WithZero.exp (-1 : ℤ)
 
-def ordF (v : HeightOneSpectrum (𝓞 L)) (k : Lˣ) : ℤ := -WithZero.log (v.valuation L (k : L))
+def ordF (v : HeightOneSpectrum (𝓞 L)) (k : Lˣ) : ℤ := - WithZero.log (v.valuation L (k : L))
 
 def infDiag : Lˣ →* Ideles L := ∏ w : InfinitePlace L, (infIdele L w).comp (atInf w)
 
@@ -69,10 +69,11 @@ def locK (v : HeightOneSpectrum (𝓞 L)) : Lˣ →* ℂˣ := (χ.loc v).comp (a
 def inf : Lˣ →* ℂˣ := χ.1.comp infDiag
 
 def LevelLe (v : HeightOneSpectrum (𝓞 L)) (n : ℕ) : Prop :=
-  ∀ x : (v.adicCompletion L)ˣ, IsUnitAt v x →
-    Valued.v ((x : v.adicCompletion L) - 1) ≤ WithZero.exp (-(n : ℤ)) → χ.loc v x = 1
+  ∀ x : (v.adicCompletion L)ˣ,
+    IsUnitAt v x → Valued.v ((x : v.adicCompletion L) - 1) ≤ WithZero.exp (-(n : ℤ)) → χ.loc v x = 1
 
-def UnrAt (v : HeightOneSpectrum (𝓞 L)) : Prop := ∀ x : (v.adicCompletion L)ˣ, IsUnitAt v x → χ.loc v x = 1
+def UnrAt (v : HeightOneSpectrum (𝓞 L)) : Prop :=
+  ∀ x : (v.adicCompletion L)ˣ, IsUnitAt v x → χ.loc v x = 1
 
 def TameAt (v : HeightOneSpectrum (𝓞 L)) : Prop := χ.LevelLe v 1
 
@@ -101,15 +102,19 @@ def IsAlg (n : (L →+* ℂ) → ℤ) : Prop :=
   ∀ k : Lˣ, ((χ.inf k : ℂˣ) : ℂ) = ∏ φ : L →+* ℂ, φ (k : L) ^ n φ
 
 def IsAbsPow (s : ℝ) : Prop :=
-  (∀ v, χ.UnrAt v) ∧ (∀ v, ((χ.val v : ℂˣ) : ℂ) = ((Ideal.absNorm v.asIdeal : ℕ) : ℂ) ^ (-(s : ℂ))) ∧
-    ∀ k : Lˣ, ((χ.inf k : ℂˣ) : ℂ) = ∏ φ : L →+* ℂ, ((‖φ (k : L)‖ : ℝ) : ℂ) ^ (s : ℂ)
+  (∀ v, χ.UnrAt v) ∧ (∀ v, ((χ.val v : ℂˣ) : ℂ) = ((Ideal.absNorm v.asIdeal : ℕ) : ℂ) ^ (-(s : ℂ)))
+    ∧ ∀ k : Lˣ, ((χ.inf k : ℂˣ) : ℂ) = ∏ φ : L →+* ℂ, ((‖φ (k : L)‖ : ℝ) : ℂ) ^ (s : ℂ)
 
 def ValuesIn (s : ℝ) {C : Type} [Field C] (e : C →+* ℂ) : Prop :=
   ∀ v, χ.UnrAt v → ∃ y : C, e y = χ.valTw s v
 
 def ProductRule : Prop :=
-  ∀ S : Finset (HeightOneSpectrum (𝓞 L)), (∀ v, v ∉ S → χ.UnrAt v) → ∀ k : Lˣ,
-    χ.inf k * (∏ v ∈ S, χ.locK v k) * (∏ᶠ (v : HeightOneSpectrum (𝓞 L)) (_ : v ∉ S), χ.val v ^ ordF v k) = 1
+  ∀ S : Finset (HeightOneSpectrum (𝓞 L)),
+    (∀ v, v ∉ S → χ.UnrAt v)
+      → ∀ k : Lˣ,
+        χ.inf k * (∏ v ∈ S, χ.locK v k)
+            * (∏ᶠ (v : HeightOneSpectrum (𝓞 L)) (_ : v ∉ S), χ.val v ^ ordF v k)
+          = 1
 
 theorem unrAt_iff (v : HeightOneSpectrum (𝓞 L)) : χ.UnrAt v ↔ χ.LevelLe v 0 := by
   constructor
@@ -118,14 +123,16 @@ theorem unrAt_iff (v : HeightOneSpectrum (𝓞 L)) : χ.UnrAt v ↔ χ.LevelLe v
   · intro h x hx
     apply h x hx
     have hx' : Valued.v (x : v.adicCompletion L) = 1 := hx
-    have h1 : Valued.v ((x : v.adicCompletion L) - 1) ≤
-        max (Valued.v (x : v.adicCompletion L)) (Valued.v (1 : v.adicCompletion L)) :=
+    have h1
+        : Valued.v ((x : v.adicCompletion L) - 1)
+          ≤ max (Valued.v (x : v.adicCompletion L)) (Valued.v (1 : v.adicCompletion L)) :=
       Valued.v.map_sub _ _
     rw [hx', map_one, max_self] at h1
     simpa using h1
 
-theorem val_eq {v : HeightOneSpectrum (𝓞 L)} (h : χ.UnrAt v) (x : (v.adicCompletion L)ˣ) (hx : IsUnifAt v x) :
-    χ.loc v x = χ.val v := by
+theorem val_eq
+    {v : HeightOneSpectrum (𝓞 L)} (h : χ.UnrAt v) (x : (v.adicCompletion L)ˣ) (hx : IsUnifAt v x)
+    : χ.loc v x = χ.val v := by
   have hu : IsUnifAt v (atFin v (unif v)) := unif_spec v
   have hunit : IsUnitAt v (x * (atFin v (unif v))⁻¹) := by
     unfold IsUnitAt
@@ -134,14 +141,21 @@ theorem val_eq {v : HeightOneSpectrum (𝓞 L)} (h : χ.UnrAt v) (x : (v.adicCom
       mul_inv_cancel₀ WithZero.exp_ne_zero]
   have h1 := h _ hunit
   show χ.loc v x = χ.loc v (atFin v (unif v))
-  calc χ.loc v x = χ.loc v (x * (atFin v (unif v))⁻¹) * χ.loc v (atFin v (unif v)) := by
-        rw [← map_mul, inv_mul_cancel_right]
+  calc
+    χ.loc v x = χ.loc v (x * (atFin v (unif v))⁻¹) * χ.loc v (atFin v (unif v)) := by
+      rw [← map_mul, inv_mul_cancel_right]
     _ = χ.loc v (atFin v (unif v)) := by rw [h1, one_mul]
 
-@[simp] theorem val_mul (χ χ' : HChar L) (v : HeightOneSpectrum (𝓞 L)) : (χ * χ').val v = χ.val v * χ'.val v := rfl
-@[simp] theorem val_inv (χ : HChar L) (v : HeightOneSpectrum (𝓞 L)) : (χ⁻¹).val v = (χ.val v)⁻¹ := rfl
-@[simp] theorem inf_mul (χ χ' : HChar L) (k : Lˣ) : (χ * χ').inf k = χ.inf k * χ'.inf k := rfl
-@[simp] theorem inf_inv (χ : HChar L) (k : Lˣ) : (χ⁻¹).inf k = (χ.inf k)⁻¹ := rfl
+@[simp]
+theorem val_mul (χ χ' : HChar L) (v : HeightOneSpectrum (𝓞 L))
+    : (χ * χ').val v = χ.val v * χ'.val v :=
+  rfl
+@[simp]
+theorem val_inv (χ : HChar L) (v : HeightOneSpectrum (𝓞 L)) : (χ⁻¹).val v = (χ.val v)⁻¹ := rfl
+@[simp]
+theorem inf_mul (χ χ' : HChar L) (k : Lˣ) : (χ * χ').inf k = χ.inf k * χ'.inf k := rfl
+@[simp]
+theorem inf_inv (χ : HChar L) (k : Lˣ) : (χ⁻¹).inf k = (χ.inf k)⁻¹ := rfl
 
 end HChar
 
@@ -149,8 +163,8 @@ section Res
 
 variable (F : Type) [Field F] [NumberField F] [Algebra F L]
 
-theorem finite_aboveF (v : HeightOneSpectrum (𝓞 F)) :
-    {P : HeightOneSpectrum (𝓞 L) | P.under (𝓞 F) = v}.Finite := by
+theorem finite_aboveF (v : HeightOneSpectrum (𝓞 F))
+    : {P : HeightOneSpectrum (𝓞 L) | P.under (𝓞 F) = v}.Finite := by
   have hne : Ideal.map (algebraMap (𝓞 F) (𝓞 L)) v.asIdeal ≠ 0 := by
     rw [Ideal.zero_eq_bot, Ne,
       Ideal.map_eq_bot_iff_of_injective (FaithfulSMul.algebraMap_injective (𝓞 F) (𝓞 L))]
@@ -161,8 +175,8 @@ theorem finite_aboveF (v : HeightOneSpectrum (𝓞 F)) :
   rw [Ideal.dvd_iff_le, Ideal.map_le_iff_le_comap, ← hP,
     IsDedekindDomain.HeightOneSpectrum.under_asIdeal]
 
-def aboveF (v : HeightOneSpectrum (𝓞 F)) : Finset (HeightOneSpectrum (𝓞 L)) := (finite_aboveF F v).toFinset
-
+def aboveF (v : HeightOneSpectrum (𝓞 F)) : Finset (HeightOneSpectrum (𝓞 L)) :=
+  (finite_aboveF F v).toFinset
 
 open Classical in
 def aboveInf (w : InfinitePlace F) : Finset (InfinitePlace L) := by
@@ -182,7 +196,8 @@ def HChar.resInf (χ : HChar L) (w : InfinitePlace F) : Fˣ →* ℂˣ :=
 variable (F)
 
 def HChar.TrivOn (χ : HChar L) : Prop :=
-  (∀ (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ), χ.resFin v k = 1) ∧ ∀ (w : InfinitePlace F) (k : Fˣ), χ.resInf w k = 1
+  (∀ (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ), χ.resFin v k = 1)
+    ∧ ∀ (w : InfinitePlace F) (k : Fˣ), χ.resInf w k = 1
 
 def etaFin (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ) : ℂˣ :=
   if (aboveF (L := L) F v).card = 1 then (-1) ^ ordF v k else 1
@@ -190,8 +205,8 @@ def etaFin (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ) : ℂˣ :=
 def etaInf (w : InfinitePlace F) (k : Fˣ) : ℂˣ := if (w.embedding (k : F)).re < 0 then -1 else 1
 
 def HChar.ResEta (χ : HChar L) : Prop :=
-  (∀ (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ), χ.resFin v k = etaFin (L := L) F v k) ∧
-    ∀ (w : InfinitePlace F) (k : Fˣ), χ.resInf w k = etaInf F w k
+  (∀ (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ), χ.resFin v k = etaFin (L := L) F v k)
+    ∧ ∀ (w : InfinitePlace F) (k : Fˣ), χ.resInf w k = etaInf F w k
 
 end Res
 

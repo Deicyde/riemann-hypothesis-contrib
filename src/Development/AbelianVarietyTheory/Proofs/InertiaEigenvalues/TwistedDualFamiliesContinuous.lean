@@ -8,14 +8,19 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Cent
 
 noncomputable section
 
-open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Module TensorProduct GlobalTheory.Pass
+open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Module TensorProduct
+  GlobalTheory.Pass
 
 namespace GlobalTheory.Pass.FamCont
 
-theorem epsU_cont {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (i : N.Loc) :
-    Continuous fun g => ((epsU N i g : (N.O i)ˣ) : N.O i) := by
-  have h : ∀ g, ((epsU N i g : (N.O i)ˣ) : N.O i) =
-      ((N.chi i 1 g : (N.O i)ˣ) : N.O i) * ((N.chi i 2 g⁻¹ : (N.O i)ˣ) : N.O i) := by
+theorem epsU_cont {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (i : N.Loc)
+    : Continuous fun g => ((epsU N i g : (N.O i)ˣ) : N.O i) := by
+  have h
+      : ∀ g,
+        ((epsU N i g : (N.O i)ˣ) : N.O i)
+          = ((N.chi i 1 g : (N.O i)ˣ) : N.O i) * ((N.chi i 2 g⁻¹ : (N.O i)ˣ) : N.O i) := by
     intro g
     have := R.rank_add_five_le
     rw [← Units.val_mul, N.chi_def i 2 (by omega) (by omega)]

@@ -10,14 +10,14 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem deep_smod_iff {O : Type} [CommRing O] (π a b : O) (n : ℕ) :
-    a ≡ b [SMOD (Ideal.span {π} ^ n • ⊤ : Submodule O O)] ↔ π ^ n ∣ a - b := by
+theorem deep_smod_iff {O : Type} [CommRing O] (π a b : O) (n : ℕ)
+    : a ≡ b [SMOD (Ideal.span {π} ^ n • ⊤ : Submodule O O)] ↔ π ^ n ∣ a - b := by
   rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
     Ideal.mem_span_singleton]
 
-theorem deep_exists_solution {O : Type} [CommRing O] (π : O)
-    [IsAdicComplete (Ideal.span {π}) O] (h : O[X]) (y : O) :
-    ∃ x : O, x + π * h.eval x = y := by
+theorem deep_exists_solution
+    {O : Type} [CommRing O] (π : O) [IsAdicComplete (Ideal.span {π}) O] (h : O[X]) (y : O)
+    : ∃ x : O, x + π * h.eval x = y := by
   let T : O → O := fun x => y - π * h.eval x
   have hT : ∀ (n : ℕ) (a b : O), π ^ n ∣ a - b → π ^ (n + 1) ∣ T a - T b := by
     intro n a b hab
@@ -42,8 +42,9 @@ theorem deep_exists_solution {O : Type} [CommRing O] (π : O)
     | succ n hmn ih =>
       have := dvd_add ih ((pow_dvd_pow π hmn).trans (h1 n))
       simpa using this
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec (I := Ideal.span {π}) (M := O) inferInstance (f := s)
-    (fun {m n} hmn => (deep_smod_iff π _ _ m).2 (h2 m n hmn))
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec (I := Ideal.span {π}) (M := O) inferInstance (f := s)
+      (fun {m n} hmn => (deep_smod_iff π _ _ m).2 (h2 m n hmn))
   have hL' : ∀ n, π ^ n ∣ s n - L := fun n => (deep_smod_iff π _ _ n).1 (hL n)
   have h0 : L - T L = 0 := by
     refine IsHausdorff.haus (I := Ideal.span {π}) (M := O) inferInstance _ (fun n => ?_)
@@ -58,8 +59,8 @@ theorem deep_exists_solution {O : Type} [CommRing O] (π : O)
   simp only [T] at h0
   linear_combination h0
 
-theorem deep_binomial {O : Type} [CommRing O] (t : O) (n : ℕ) :
-    ∃ g : O[X], ∀ x : O, (1 + t * x) ^ n = 1 + n * t * x + t ^ 2 * x ^ 2 * g.eval x := by
+theorem deep_binomial {O : Type} [CommRing O] (t : O) (n : ℕ)
+    : ∃ g : O[X], ∀ x : O, (1 + t * x) ^ n = 1 + n * t * x + t ^ 2 * x ^ 2 * g.eval x := by
   induction n with
   | zero => exact ⟨0, by simp⟩
   | succ n ih =>
@@ -69,11 +70,12 @@ theorem deep_binomial {O : Type} [CommRing O] (t : O) (n : ℕ) :
     simp only [eval_add, eval_mul, eval_one, eval_C, eval_X, Nat.cast_succ]
     ring
 
-theorem deep_mem_oneUnits {O : Type} [CommRing O] (t : O) (u : Oˣ) :
-    u ∈ oneUnits t ↔ ∃ x : O, (u : O) = 1 + t * x := by
+theorem deep_mem_oneUnits {O : Type} [CommRing O] (t : O) (u : Oˣ)
+    : u ∈ oneUnits t ↔ ∃ x : O, (u : O) = 1 + t * x := by
   rw [oneUnits, MonoidHom.mem_ker, Units.ext_iff, Units.coe_map, Units.val_one]
-  have : ((Ideal.Quotient.mk (Ideal.span {t}) : O →* O ⧸ Ideal.span {t}) (u : O) = 1) ↔
-      Ideal.Quotient.mk (Ideal.span {t}) (u : O) = Ideal.Quotient.mk (Ideal.span {t}) 1 := Iff.rfl
+  have : ((Ideal.Quotient.mk (Ideal.span {t}) : O →* O ⧸ Ideal.span {t}) (u : O) = 1)
+      ↔ Ideal.Quotient.mk (Ideal.span {t}) (u : O) = Ideal.Quotient.mk (Ideal.span {t}) 1 :=
+    Iff.rfl
   rw [this, Ideal.Quotient.eq, Ideal.mem_span_singleton]
   constructor
   · rintro ⟨x, hx⟩
@@ -81,22 +83,23 @@ theorem deep_mem_oneUnits {O : Type} [CommRing O] (t : O) (u : Oˣ) :
   · rintro ⟨x, hx⟩
     exact ⟨x, by linear_combination hx⟩
 
-theorem deep_isUnit {O : Type} [CommRing O] (π : O)
-    [IsAdicComplete (Ideal.span {π}) O] (x : O) : IsUnit (1 + π * x) := by
+theorem deep_isUnit {O : Type} [CommRing O] (π : O) [IsAdicComplete (Ideal.span {π}) O] (x : O)
+    : IsUnit (1 + π * x) := by
   have h : π ∈ (⊥ : Ideal O).jacobson :=
     IsAdicComplete.le_jacobson_bot (Ideal.span {π}) (Ideal.mem_span_singleton_self π)
   have := Ideal.mem_jacobson_bot.1 h x
   rwa [add_comm] at this
 
-theorem deep_units_pows :
-    ∀ (p : ℕ) (O : Type) [CommRing O] [IsDomain O] [CharZero O] (π : O), 0 < p → π ≠ 0 →
-      IsAdicComplete (Ideal.span {π}) O →
-      pows p (oneUnits ((p : O) * π)) = oneUnits ((p : O) ^ 2 * π) ∧
-        pTor p (oneUnits ((p : O) * π)) = 1 := by
+theorem deep_units_pows
+    : ∀ (p : ℕ) (O : Type) [CommRing O] [IsDomain O] [CharZero O] (π : O),
+      0 < p → π ≠ 0 → IsAdicComplete (Ideal.span {π}) O
+        → pows p (oneUnits ((p : O) * π)) = oneUnits ((p : O) ^ 2 * π)
+          ∧ pTor p (oneUnits ((p : O) * π)) = 1 := by
   intro p O _ _ _ π hp hπ hc
   obtain ⟨g, hg⟩ := deep_binomial ((p : O) * π) p
-  have key : ∀ x : O, (1 + (p : O) * π * x) ^ p =
-      1 + (p : O) ^ 2 * π * (x + π * (X ^ 2 * g).eval x) := by
+  have key
+      : ∀ x : O,
+        (1 + (p : O) * π * x) ^ p = 1 + (p : O) ^ 2 * π * (x + π * (X ^ 2 * g).eval x) := by
     intro x
     rw [hg]
     simp only [eval_mul, eval_pow, eval_X]

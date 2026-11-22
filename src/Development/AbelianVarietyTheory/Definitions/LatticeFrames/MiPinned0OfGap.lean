@@ -11,13 +11,16 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiPinne
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.SG.PackageTie2 Formalism.L2.SG.SpectralTiesReal Formalism.L2.SG.ConcreteSettingExists
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.SG.PackageTie2
+  Formalism.L2.SG.SpectralTiesReal Formalism.L2.SG.ConcreteSettingExists
 
 namespace GlobalTheory.Core.Rk
 
 theorem finX_of_gap : Formalism.L2.SG.PoincareAmplitudeLowerBounds.FinXC :=
-  haveI : Fact Formalism.L2.SG.SplitPrimeNormLemmas.CoefWeightedLoc := ⟨ReciprocityTheory.ChartRestriction.DS.coefWeightedLoc⟩
-  Formalism.L2.SG.Pf.finXC_of GlobalTheory.wuDecayOfGap CompanionTheory.D.gk.RF.automorphic_forms_finite_dimensional
+  haveI : Fact Formalism.L2.SG.SplitPrimeNormLemmas.CoefWeightedLoc :=
+    ⟨ReciprocityTheory.ChartRestriction.DS.coefWeightedLoc⟩
+  Formalism.L2.SG.Pf.finXC_of GlobalTheory.wuDecayOfGap
+    CompanionTheory.D.gk.RF.automorphic_forms_finite_dimensional
 
 section Worlds
 

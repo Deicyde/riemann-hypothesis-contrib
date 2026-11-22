@@ -14,23 +14,26 @@ open Cardinal
 
 noncomputable section
 
-theorem ChartFreeParAlgIndep.proof (h : ChartParAlgebraic.Statement) : ChartFreeParAlgIndep.Statement := by
+theorem ChartFreeParAlgIndep.proof (h : ChartParAlgebraic.Statement)
+    : ChartFreeParAlgIndep.Statement := by
   intro F _ n e K L _ _ _ _ _ _ u t η hu hK hL hrel hchart j₀ hj₀ htr
   have halg := h F n e K L u t η hK hL hrel hchart j₀ hj₀
   set A₀ := Algebra.adjoin F (Set.range fun m => η m * (η j₀)⁻¹) with hA₀
   set w : Fin e × {j : Fin n // j ≠ j₀} → L := fun p => algebraMap K L (u (p.1, p.2.1)) with hw
 
-  have hinj : Function.Injective (Sum.elim (fun i : Fin e => ((i, j₀) : Fin e × Fin n))
+  have hinj : Function.Injective (Sum.elim
+      (fun i : Fin e => ((i, j₀) : Fin e × Fin n))
       (fun p : Fin e × {j : Fin n // j ≠ j₀} => ((p.1, p.2.1) : Fin e × Fin n))) := by
-    rintro (i | ⟨i, j, hj⟩) (i' | ⟨i', j', hj'⟩) hij <;>
-      simp only [Sum.elim_inl, Sum.elim_inr, Prod.mk.injEq, Sum.inl.injEq, Sum.inr.injEq,
-        reduceCtorEq, Subtype.mk.injEq] at hij ⊢
+    rintro (i | ⟨i, j, hj⟩) (i' | ⟨i', j', hj'⟩) hij <;> simp only [Sum.elim_inl, Sum.elim_inr,
+        Prod.mk.injEq, Sum.inl.injEq, Sum.inr.injEq, reduceCtorEq, Subtype.mk.injEq]
+      at hij ⊢
     · exact hij.1
     · exact absurd hij.2.symm hj'
     · exact absurd hij.2 hj
     · exact hij
   have hcount : (e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀}) ≤ #(Fin e × Fin n) := by
-    calc (e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀})
+    calc
+      (e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀})
         = #(Fin e ⊕ (Fin e × {j : Fin n // j ≠ j₀})) := by simp
       _ ≤ #(Fin e × Fin n) := Cardinal.mk_le_of_injective hinj
   have huL : AlgebraicIndependent F (fun q => algebraMap K L (u q)) :=
@@ -46,8 +49,7 @@ theorem ChartFreeParAlgIndep.proof (h : ChartParAlgebraic.Statement) : ChartFree
   have hbasis : IsTranscendenceBasis A₀ w := hind.isTranscendenceBasis_iff_isAlgebraic.2 halg
   have : FaithfulSMul F A₀ :=
     (faithfulSMul_iff_algebraMap_injective F A₀).2 (algebraMap F A₀).injective
-  have : FaithfulSMul A₀ L :=
-    (faithfulSMul_iff_algebraMap_injective A₀ L).2 Subtype.val_injective
+  have : FaithfulSMul A₀ L := (faithfulSMul_iff_algebraMap_injective A₀ L).2 Subtype.val_injective
   have : FaithfulSMul F K :=
     (faithfulSMul_iff_algebraMap_injective F K).2 (algebraMap F K).injective
   have : FaithfulSMul K L :=
@@ -61,10 +63,12 @@ theorem ChartFreeParAlgIndep.proof (h : ChartParAlgebraic.Statement) : ChartFree
     gcongr
   have hfin : (e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀}) < ℵ₀ :=
     Cardinal.add_lt_aleph0 (Cardinal.natCast_lt_aleph0) (Cardinal.lt_aleph0_of_finite _)
-  have h0 : Algebra.trdeg K L + ((e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀})) ≤
-      0 + ((e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀})) := by
+  have h0
+      : Algebra.trdeg K L + ((e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀}))
+        ≤ 0 + ((e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀})) := by
     rw [zero_add, add_comm]
-    calc (e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀}) + Algebra.trdeg K L
+    calc
+      (e : Cardinal) + #(Fin e × {j : Fin n // j ≠ j₀}) + Algebra.trdeg K L
         ≤ Algebra.trdeg F K + Algebra.trdeg K L := by gcongr
       _ = Algebra.trdeg F L := hKL
       _ ≤ _ := hup

@@ -13,37 +13,44 @@ open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formali
 
 section
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
 
-theorem finrank_lat [IsDomain O] [IsFractionRing O LL] (T : LocLat G Qp LL O) :
-    finrank O ↥T.L.T = finrank LL T.V := by
+theorem finrank_lat [IsDomain O] [IsFractionRing O LL] (T : LocLat G Qp LL O)
+    : finrank O ↥T.L.T = finrank LL T.V := by
   have := T.L.free
   have hfg : Module.Finite O ↥T.L.T := ⟨(Submodule.fg_top _).mpr T.L.fg⟩
   let e := Module.Free.chooseBasis O ↥T.L.T
   let w : Module.Free.ChooseBasisIndex O ↥T.L.T → T.V := fun j => (e j : T.V)
-  have hli : LinearIndependent O w := e.linearIndependent.map' T.L.T.subtype (Submodule.ker_subtype _)
+  have hli : LinearIndependent O w :=
+    e.linearIndependent.map' T.L.T.subtype (Submodule.ker_subtype _)
   have hli' : LinearIndependent LL w := (LinearIndependent.iff_fractionRing O LL).mp hli
   have hspO : Submodule.span O (Set.range w) = T.L.T := by
-    have : Set.range w = T.L.T.subtype '' Set.range e := by
-      rw [← Set.range_comp]; rfl
+    have : Set.range w = T.L.T.subtype '' Set.range e := by rw [← Set.range_comp]; rfl
     rw [this, ← Submodule.map_span, e.span_eq, Submodule.map_top, Submodule.range_subtype]
   have hsp : ⊤ ≤ Submodule.span LL (Set.range w) := by
     rw [← T.L.span, Submodule.span_le]
     intro x hx
     rw [← hspO] at hx
     exact Submodule.span_le_restrictScalars O LL _ hx
-  rw [Module.finrank_eq_card_basis (Module.Basis.mk hli' hsp), Module.finrank_eq_card_chooseBasisIndex]
+  rw [Module.finrank_eq_card_basis (Module.Basis.mk hli' hsp),
+    Module.finrank_eq_card_chooseBasisIndex]
 
-theorem card_basis_eq [Nontrivial O] [NeZero n] (W : LocWach PD LL O v n) (T : LocLat G Qp LL O)
-    (hT : IsCrys PD T.ρ) {r : ℕ} (b : Fin r → W.DD T) (hb : ∀ j, b j ∈ W.N T)
-    (huniq : ∀ x ∈ W.N T, ∃! a : Fin r → LetA O n, x = ∑ j, a j • b j) :
-    r = finrank O ↥T.L.T := by
+theorem card_basis_eq
+    [Nontrivial O] [NeZero n]
+    (W : LocWach PD LL O v n)
+    (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ)
+    {r : ℕ} (b : Fin r → W.DD T) (hb : ∀ j, b j ∈ W.N T)
+    (huniq : ∀ x ∈ W.N T, ∃! a : Fin r → LetA O n, x = ∑ j, a j • b j)
+    : r = finrank O ↥T.L.T := by
   classical
   let w : Fin r → ↥(W.N T) := fun j => ⟨b j, hb j⟩
   have hli : LinearIndependent (LetA O n) w := by
@@ -57,7 +64,8 @@ theorem card_basis_eq [Nontrivial O] [NeZero n] (W : LocWach PD LL O v n) (T : L
     have e1 := ha g h0
     have e2 := ha 0 h1
     intro j
-    rw [e1, ← e2]; rfl
+    rw [e1, ← e2]
+    rfl
   have hsp : ⊤ ≤ Submodule.span (LetA O n) (Set.range w) := by
     rintro ⟨x, hx⟩ -
     obtain ⟨a, ha, -⟩ := huniq x hx

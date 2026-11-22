@@ -8,8 +8,8 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory
 
 namespace GlobalTheory
 
-theorem inv_Gammaℝ_eq_mul_inv_add_two (s : ℂ) :
-    (Gammaℝ s)⁻¹ = s / (2 * Real.pi) * (Gammaℝ (s + 2))⁻¹ := by
+theorem inv_Gammaℝ_eq_mul_inv_add_two (s : ℂ)
+    : (Gammaℝ s)⁻¹ = s / (2 * Real.pi) * (Gammaℝ (s + 2))⁻¹ := by
   rcases eq_or_ne s 0 with rfl | hs
   · simp [Gammaℝ_def]
   · have hπ : (Real.pi : ℂ) ≠ 0 := ofReal_ne_zero.mpr Real.pi_ne_zero
@@ -32,10 +32,8 @@ private lemma deriv_inv_Gammaℝ_eq_shift (x : ℂ) :
   conv_lhs => rw [hF]
   exact (h1.mul h2).deriv
 
-theorem deriv_inv_Gammaℝ_ne_zero (n : ℕ) :
-    deriv (fun s : ℂ => (Gammaℝ s)⁻¹) (-(2 * n)) ≠ 0 := by
-  have hπ : (2 * (Real.pi : ℂ)) ≠ 0 :=
-    mul_ne_zero two_ne_zero (ofReal_ne_zero.mpr Real.pi_ne_zero)
+theorem deriv_inv_Gammaℝ_ne_zero (n : ℕ) : deriv (fun s : ℂ => (Gammaℝ s)⁻¹) (-(2 * n)) ≠ 0 := by
+  have hπ : (2 * (Real.pi : ℂ)) ≠ 0 := mul_ne_zero two_ne_zero (ofReal_ne_zero.mpr Real.pi_ne_zero)
   induction n with
   | zero =>
     rw [deriv_inv_Gammaℝ_eq_shift]
@@ -50,8 +48,9 @@ theorem deriv_inv_Gammaℝ_ne_zero (n : ℕ) :
     push_cast
     exact neg_ne_zero.mpr (mul_ne_zero two_ne_zero this)
 
-theorem rootNumber_ne_zero_of_isPrimitive {q : ℕ} [NeZero q] {χ : DirichletCharacter ℂ q}
-    (hχ : χ.IsPrimitive) : rootNumber χ ≠ 0 := by
+theorem rootNumber_ne_zero_of_isPrimitive
+    {q : ℕ} [NeZero q] {χ : DirichletCharacter ℂ q} (hχ : χ.IsPrimitive)
+    : rootNumber χ ≠ 0 := by
   have hG : gaussSum χ ZMod.stdAddChar ≠ 0 := by
     intro h
     have h1 : ZMod.dft (χ : ZMod q → ℂ) = 0 := by
@@ -67,9 +66,11 @@ theorem rootNumber_ne_zero_of_isPrimitive {q : ℕ} [NeZero q] {χ : DirichletCh
   rw [Ne, cpow_eq_zero_iff]
   exact fun h => NeZero.ne q (Nat.cast_eq_zero.mp h.1)
 
-theorem completedLFunction_ne_zero_of_re_nonpos {q : ℕ} [NeZero q] {χ : DirichletCharacter ℂ q}
-    (hχ : χ.IsPrimitive) {s : ℂ} (hs : s.re ≤ 0) (h0 : s ≠ 0 ∨ χ ≠ 1) :
-    completedLFunction χ s ≠ 0 := by
+theorem completedLFunction_ne_zero_of_re_nonpos
+    {q : ℕ} [NeZero q]
+    {χ : DirichletCharacter ℂ q} (hχ : χ.IsPrimitive)
+    {s : ℂ} (hs : s.re ≤ 0) (h0 : s ≠ 0 ∨ χ ≠ 1)
+    : completedLFunction χ s ≠ 0 := by
   have hFE := hχ.completedLFunction_one_sub (1 - s)
   rw [sub_sub_cancel] at hFE
   rw [hFE]
@@ -83,11 +84,16 @@ theorem completedLFunction_ne_zero_of_re_nonpos {q : ℕ} [NeZero q] {χ : Diric
       · exact Or.inr (by intro h'; apply h; linear_combination -h')
       · exact Or.inl (inv_ne_one.mpr h)
     apply LFunction_ne_zero_of_one_le_re χ⁻¹ hne hw
-    have h1s : 1 - s ≠ 0 := by
-      intro h'; rw [h'] at hw; norm_num at hw
+    have h1s : 1 - s ≠ 0 := by intro h'; rw [h'] at hw; norm_num at hw
     rw [LFunction_eq_completed_div_gammaFactor χ⁻¹ (1 - s) (Or.inl h1s), hC, zero_div]
 
-theorem LFunction_zero_of_re_nonpos : ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q), χ.IsPrimitive → ∀ s : ℂ, s.re ≤ 0 → LFunction χ s = 0 → (∃ n : ℕ, s = -n) ∧ analyticOrderNatAt (LFunction χ) s = 1 ∧ (s = 0 → χ.Even ∧ χ ≠ 1) ∧ (s = -1 → χ.Odd) := by
+theorem LFunction_zero_of_re_nonpos
+    : ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q),
+      χ.IsPrimitive
+        → ∀ s : ℂ,
+          s.re ≤ 0 → LFunction χ s = 0
+            → (∃ n : ℕ, s = -n) ∧ analyticOrderNatAt (LFunction χ) s = 1 ∧ (s = 0 → χ.Even ∧ χ ≠ 1)
+              ∧ (s = -1 → χ.Odd) := by
   intro q _ χ hχ s hs hL
   have h0 : s ≠ 0 ∨ χ ≠ 1 := by
     by_contra! h
@@ -101,8 +107,8 @@ theorem LFunction_zero_of_re_nonpos : ∀ (q : ℕ) [NeZero q] (χ : DirichletCh
   have hC : completedLFunction χ s ≠ 0 := completedLFunction_ne_zero_of_re_nonpos hχ hs h0
   have hCd : DifferentiableAt ℂ (completedLFunction χ) s :=
     differentiableAt_completedLFunction χ s h0' (Or.inl hs1)
-  obtain ⟨a, ha, hpar⟩ : ∃ a : ℕ, (∀ w, gammaFactor χ w = Gammaℝ (w + a)) ∧
-      (a = 0 ∧ χ.Even ∨ a = 1 ∧ χ.Odd) := by
+  obtain ⟨a, ha, hpar⟩
+      : ∃ a : ℕ, (∀ w, gammaFactor χ w = Gammaℝ (w + a)) ∧ (a = 0 ∧ χ.Even ∨ a = 1 ∧ χ.Odd) := by
     rcases χ.even_or_odd with h | h
     · exact ⟨0, fun w => by simp [h.gammaFactor_def], Or.inl ⟨rfl, h⟩⟩
     · exact ⟨1, fun w => by simp [h.gammaFactor_def], Or.inr ⟨rfl, h⟩⟩
@@ -120,7 +126,8 @@ theorem LFunction_zero_of_re_nonpos : ∀ (q : ℕ) [NeZero q] (χ : DirichletCh
     · exact absurd h hC
     · exact inv_eq_zero.mp h
   obtain ⟨n, hn⟩ := Gammaℝ_eq_zero_iff.mp hG
-  have hh : HasDerivAt (fun w : ℂ => (Gammaℝ (w + a))⁻¹)
+  have hh : HasDerivAt
+      (fun w : ℂ => (Gammaℝ (w + a))⁻¹)
       (deriv (fun w : ℂ => (Gammaℝ w)⁻¹) (s + a)) s :=
     HasDerivAt.comp_add_const s (a : ℂ) (differentiable_Gammaℝ_inv (s + a)).hasDerivAt
   have hder : deriv (LFunction χ) s ≠ 0 := by
@@ -129,8 +136,8 @@ theorem LFunction_zero_of_re_nonpos : ∀ (q : ℕ) [NeZero q] (χ : DirichletCh
     rw [hn]
     exact deriv_inv_Gammaℝ_ne_zero n
   have hAn : AnalyticAt ℂ (LFunction χ) s :=
-    analyticAt_iff_eventually_differentiableAt.mpr
-      ((eventually_ne_nhds hs1).mono fun w hw => differentiableAt_LFunction χ w (Or.inl hw))
+    analyticAt_iff_eventually_differentiableAt.mpr ((eventually_ne_nhds hs1).mono fun w hw =>
+      differentiableAt_LFunction χ w (Or.inl hw))
   have hord : analyticOrderAt (LFunction χ) s = 1 :=
     hAn.analyticOrderAt_eq_one_of_zero_deriv_ne_zero hL hder
   have hs_eq : s = -((2 * n + a : ℕ) : ℂ) := by push_cast; linear_combination hn

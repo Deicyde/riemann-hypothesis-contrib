@@ -17,21 +17,25 @@ noncomputable section
 
 namespace GlobalTheory.StdFrameObj
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.IndefR Formalism.IndefR.FWT GlobalTheory.Mem
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.IndefR Formalism.IndefR.FWT
+  GlobalTheory.Mem
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem star_piT_mul {P : PreCh} (L : LevCh P) :
-    (star (L.piT P.u₀ : L.host.E) : L.host.E) * (L.piT P.u₀ : L.host.E) = (L.T P.u₀ : L.host.E) := by
+theorem star_piT_mul {P : PreCh} (L : LevCh P)
+    : (star (L.piT P.u₀ : L.host.E) : L.host.E) * (L.piT P.u₀ : L.host.E)
+      = (L.T P.u₀ : L.host.E) := by
   have h : (star (L.piT P.u₀ : L.host.E) : L.host.E) = L.host.conj (L.piT P.u₀ : L.host.E) :=
     bridge_star_holds P.R L.host _
   rw [h, mul_comm]
   exact L.piT_norm _
 
 def coordPre (P : PreCh) (L : LevCh P) : Pre :=
-  Pre.ofCh P L (DiagSp.spacesNorm P.R (host_cmData P.R L.host) (L.T P.u₀) (L.T_prime _) _ (star_piT_mul L)) rfl
+  Pre.ofCh P L
+    (DiagSp.spacesNorm P.R (host_cmData P.R L.host) (L.T P.u₀) (L.T_prime _) _ (star_piT_mul L)) rfl
     (fun j _ τ => DiagSp.spacesNorm_Y_sig _ _ _ _ _ _ j τ)
-    (fun j _ hj => DiagSp.spacesNorm_hasFrame _ _ _ _ _ _ j hj) (fun _ _ _ => rfl)
+    (fun j _ hj => DiagSp.spacesNorm_hasFrame _ _ _ _ _ _ j hj)
+    (fun _ _ _ => rfl)
     (DiagSp.spacesNorm_z_norm _ _ _ _ _ _)
 
 theorem diagSpaces_coordPre (P : PreCh) (L : LevCh P) : DiagSpaces (coordPre P L).sp :=

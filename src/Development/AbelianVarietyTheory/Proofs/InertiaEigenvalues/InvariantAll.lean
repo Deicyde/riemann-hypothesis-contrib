@@ -8,11 +8,12 @@ namespace GlobalTheory.InvariantBotOrTop
 
 open Matrix
 
-theorem invariant_all {Γ k K : Type} [Field k] [Field K] [Algebra k K] {r : ℕ}
-    (M : Γ → Matrix (Fin r) (Fin r) k) (hM : Submodule.span k (Set.range M) = ⊤)
-    (W : Submodule K (Fin r → K))
-    (hW : ∀ g, ∀ x ∈ W, (M g).map (algebraMap k K) *ᵥ x ∈ W) (A : Matrix (Fin r) (Fin r) k) :
-    ∀ x ∈ W, A.map (algebraMap k K) *ᵥ x ∈ W := by
+theorem invariant_all
+    {Γ k K : Type} [Field k] [Field K] [Algebra k K]
+    {r : ℕ} (M : Γ → Matrix (Fin r) (Fin r) k) (hM : Submodule.span k (Set.range M) = ⊤)
+    (W : Submodule K (Fin r → K)) (hW : ∀ g, ∀ x ∈ W, (M g).map (algebraMap k K) *ᵥ x ∈ W)
+    (A : Matrix (Fin r) (Fin r) k)
+    : ∀ x ∈ W, A.map (algebraMap k K) *ᵥ x ∈ W := by
   have hA : A ∈ Submodule.span k (Set.range M) := by
     rw [hM]
     exact Submodule.mem_top
@@ -31,15 +32,14 @@ theorem invariant_all {Γ k K : Type} [Field k] [Field K] [Algebra k K] {r : ℕ
   | smul c A _ hA =>
     intro x hx
     rw [Matrix.map_smul _ c (fun a => by rw [smul_eq_mul, map_mul, Algebra.smul_def])]
-    first
-      | rw [Matrix.smul_mulVec]
-      | rw [Matrix.smul_mulVec_assoc]
+    first | rw [Matrix.smul_mulVec] | rw [Matrix.smul_mulVec_assoc]
     exact W.smul_of_tower_mem c (hA x hx)
 
-theorem bot_or_top {Γ k K : Type} [Field k] [Field K] [Algebra k K] {r : ℕ}
-    (M : Γ → Matrix (Fin r) (Fin r) k) (hM : Submodule.span k (Set.range M) = ⊤)
-    (W : Submodule K (Fin r → K))
-    (hW : ∀ g, ∀ x ∈ W, (M g).map (algebraMap k K) *ᵥ x ∈ W) : W = ⊥ ∨ W = ⊤ := by
+theorem bot_or_top
+    {Γ k K : Type} [Field k] [Field K] [Algebra k K]
+    {r : ℕ} (M : Γ → Matrix (Fin r) (Fin r) k) (hM : Submodule.span k (Set.range M) = ⊤)
+    (W : Submodule K (Fin r → K)) (hW : ∀ g, ∀ x ∈ W, (M g).map (algebraMap k K) *ᵥ x ∈ W)
+    : W = ⊥ ∨ W = ⊤ := by
   classical
   by_cases hbot : W = ⊥
   · exact Or.inl hbot
@@ -58,7 +58,8 @@ theorem bot_or_top {Γ k K : Type} [Field k] [Field K] [Algebra k K] {r : ℕ}
       rw [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul]
       by_cases hai : a = i
       · subst hai
-        rw [Finset.sum_eq_single j (fun b _ hb => by simp [Matrix.single_apply, hb, Ne.symm hb]) (by simp)]
+        rw [Finset.sum_eq_single j (fun b _ hb => by simp [Matrix.single_apply, hb, Ne.symm hb]) (by
+          simp)]
         simp [Matrix.single_apply]
       · rw [Finset.sum_eq_zero (fun b _ => by simp [Matrix.single_apply, hai, Ne.symm hai])]
         simp [Pi.single_apply, hai]
@@ -73,7 +74,14 @@ theorem bot_or_top {Γ k K : Type} [Field k] [Field K] [Algebra k K] {r : ℕ}
   rw [hy]
   exact W.sum_mem fun i _ => W.smul_mem _ (he i)
 
-theorem main : ∀ {Γ k K : Type} [inst : Field k] [inst_1 : Field K] [inst_2 : Algebra k K] {r : ℕ} (M : Γ → Matrix (Fin r) (Fin r) k), Submodule.span k (Set.range M) = ⊤ → ∀ (W : Submodule K (Fin r → K)), (∀ (g : Γ), ∀ x ∈ W, Matrix.mulVec (Matrix.map (M g) (⇑(Algebra.algebraMap k K) : k → K)) x ∈ W) → W = ⊥ ∨ W = ⊤ := by
+theorem main
+    : ∀ {Γ k K : Type} [inst : Field k] [inst_1 : Field K] [inst_2 : Algebra k K] {r : ℕ}
+        (M : Γ → Matrix (Fin r) (Fin r) k),
+      Submodule.span k (Set.range M) = ⊤
+        → ∀ (W : Submodule K (Fin r → K)),
+          (∀ (g : Γ), ∀ x ∈ W,
+              Matrix.mulVec (Matrix.map (M g) (⇑(Algebra.algebraMap k K) : k → K)) x ∈ W)
+            → W = ⊥ ∨ W = ⊤ := by
   intro Γ k K _ _ _ r M hM W hW
   exact bot_or_top M hM W hW
 

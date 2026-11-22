@@ -4,15 +4,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
-private theorem span_joint (g : ℕ) (I : Type) (M : I → Matrix (Fin g) (Fin g) ℂ)
-    (hc : ∀ i j, M i * M j = M j * M i)
-    (hp : ∀ i, ∃ p : ℂ[X], p.Separable ∧ aeval (M i) p = 0) :
-    Submodule.span ℂ {v : Fin g → ℂ | ∃ c : I → ℂ, ∀ i, (M i).mulVec v = c i • v} = ⊤ := by
+private theorem span_joint
+    (g : ℕ) (I : Type) (M : I → Matrix (Fin g) (Fin g) ℂ)
+    (hc : ∀ i j, M i * M j = M j * M i) (hp : ∀ i, ∃ p : ℂ[X], p.Separable ∧ aeval (M i) p = 0)
+    : Submodule.span ℂ {v : Fin g → ℂ | ∃ c : I → ℂ, ∀ i, (M i).mulVec v = c i • v} = ⊤ := by
   classical
   let f : I → Module.End ℂ (Fin g → ℂ) := fun i => Matrix.toLinAlgEquiv' (M i)
   have hss : ∀ i, (f i).IsFinitelySemisimple := by
@@ -28,10 +30,11 @@ private theorem span_joint (g : ℕ) (I : Type) (M : I → Matrix (Fin g) (Fin g
     show Matrix.toLinAlgEquiv' (M i) * Matrix.toLinAlgEquiv' (M j) =
       Matrix.toLinAlgEquiv' (M j) * Matrix.toLinAlgEquiv' (M i)
     rw [← map_mul, ← map_mul, hc]
-  have htop : ∀ i, iSup (fun t => (f i).maxGenEigenspace t) = ⊤ :=
-    fun i => Module.End.iSup_maxGenEigenspace_eq_top (f i)
-  have hall := Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute
-    f hcomm htop
+  have htop : ∀ i, iSup (fun t => (f i).maxGenEigenspace t) = ⊤ := fun i =>
+    Module.End.iSup_maxGenEigenspace_eq_top (f i)
+  have hall :=
+    Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute f hcomm
+      htop
   rw [eq_top_iff, ← hall]
   refine iSup_le fun χ => ?_
   intro v hv
@@ -41,8 +44,7 @@ private theorem span_joint (g : ℕ) (I : Type) (M : I → Matrix (Fin g) (Fin g
   rw [(hss i).maxGenEigenspace_eq_eigenspace, Module.End.mem_eigenspace_iff] at hvi
   simpa [f] using hvi
 
-theorem UpperTheory.Gal.W2.simDiag_of :
-    UpperTheory.Gal.W2.SimDiag := by
+theorem UpperTheory.Gal.W2.simDiag_of : UpperTheory.Gal.W2.SimDiag := by
   intro g I M hc hp
   classical
   have hspan := span_joint g I M hc hp

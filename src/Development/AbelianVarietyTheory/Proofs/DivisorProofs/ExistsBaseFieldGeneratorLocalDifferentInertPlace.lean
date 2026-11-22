@@ -10,9 +10,11 @@ open scoped nonZeroDivisors
 
 namespace GlobalTheory.InertDifferentGen
 
-theorem exists_mul_valuation_eq_one {E : Type} [Field E] [NumberField E]
-    (w : HeightOneSpectrum (𝓞 E)) (J : FractionalIdeal (𝓞 E)⁰ E) (hJ : J ≠ 0) :
-    ∃ δ ∈ J⁻¹, ∃ z ∈ J, w.valuation E (δ * z) = 1 := by
+theorem exists_mul_valuation_eq_one
+    {E : Type} [Field E] [NumberField E]
+    (w : HeightOneSpectrum (𝓞 E))
+    (J : FractionalIdeal (𝓞 E)⁰ E) (hJ : J ≠ 0)
+    : ∃ δ ∈ J⁻¹, ∃ z ∈ J, w.valuation E (δ * z) = 1 := by
   by_contra h
   push Not at h
   have h1 : J⁻¹ * J = 1 := inv_mul_cancel₀ hJ
@@ -30,9 +32,9 @@ theorem exists_mul_valuation_eq_one {E : Type} [Field E] [NumberField E]
       exact Valuation.map_add_lt _ hx hy
   simp at key
 
-theorem mem_dual_one_iff {E : Type} [Field E] [NumberField E] (e : E) :
-    e ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E) ↔
-      ∀ o : 𝓞 E, IsIntegral ℤ (Algebra.trace ℚ E ((o : E) * e)) := by
+theorem mem_dual_one_iff {E : Type} [Field E] [NumberField E] (e : E)
+    : e ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E)
+      ↔ ∀ o : 𝓞 E, IsIntegral ℤ (Algebra.trace ℚ E ((o : E) * e)) := by
   rw [FractionalIdeal.mem_dual (one_ne_zero' (FractionalIdeal (𝓞 E)⁰ E))]
   constructor
   · intro h o
@@ -47,13 +49,19 @@ theorem mem_dual_one_iff {E : Type} [Field E] [NumberField E] (e : E) :
     rw [Algebra.traceForm_apply, mul_comm]
     exact hk
 
-theorem exists_generator_different_of_isInertAt :
-    ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {v : HeightOneSpectrum (𝓞 F)} {w : HeightOneSpectrum (𝓞 E)}, Formalism.UG.IsInertAt F E v w →
-  ∃ t : F, t ≠ 0 ∧ ∃ s₁ s₂ : E, w.valuation E s₁ = 1 ∧ w.valuation E s₂ = 1 ∧
-    (∀ e : E, (∀ o : 𝓞 E, IsIntegral ℤ (Algebra.trace ℚ E ((o : E) * e))) →
-      s₁ * algebraMap F E t * e ∈ (algebraMap (𝓞 E) E).range) ∧
-    (∀ o : 𝓞 E, IsIntegral ℤ (Algebra.trace ℚ E ((o : E) * (s₂ * (algebraMap F E t)⁻¹)))) := by
+theorem exists_generator_different_of_isInertAt
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {v : HeightOneSpectrum (𝓞 F)} {w : HeightOneSpectrum (𝓞 E)},
+      Formalism.UG.IsInertAt F E v w
+        → ∃ t : F,
+          t ≠ 0
+            ∧ ∃ s₁ s₂ : E,
+              w.valuation E s₁ = 1 ∧ w.valuation E s₂ = 1
+                ∧ (∀ e : E,
+                  (∀ o : 𝓞 E, IsIntegral ℤ (Algebra.trace ℚ E ((o : E) * e)))
+                    → s₁ * algebraMap F E t * e ∈ (algebraMap (𝓞 E) E).range)
+                ∧ (∀ o : 𝓞 E,
+                  IsIntegral ℤ (Algebra.trace ℚ E ((o : E) * (s₂ * (algebraMap F E t)⁻¹)))) := by
   intro F E _ _ _ _ _ v w hin
   have hJ : FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 :=
     FractionalIdeal.dual_ne_zero ℤ ℚ one_ne_zero

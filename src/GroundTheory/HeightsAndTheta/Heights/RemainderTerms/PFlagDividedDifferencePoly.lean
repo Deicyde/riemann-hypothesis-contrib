@@ -13,8 +13,8 @@ namespace RestTerms
 
 open MvPolynomial
 
-theorem FlagDividedDifferencePoly.proof (h1 : FlagVandermondeDvd.Statement) :
-    FlagDividedDifferencePoly.Statement := by
+theorem FlagDividedDifferencePoly.proof (h1 : FlagVandermondeDvd.Statement)
+    : FlagDividedDifferencePoly.Statement := by
   intro f N H
   obtain ⟨R, hR⟩ := h1 f N _ (isBlockAlternating_antisymmetrize f N H)
   refine ⟨R, hR, fun w => ?_⟩

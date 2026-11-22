@@ -18,19 +18,27 @@ namespace CrystallineSemistableComparison.TwSeq
 
 open GlobalTheory.EtC
 
-theorem sec_nsmul {R : Type} [CommRing R] {X Y : Shv R} (f : X ⟶ Y) (k : ℕ) {U : Scheme.{0}} (x : Sec X U) :
-    Sec.map (k • f) x = k • Sec.map f x := map_nsmul (CupSpec.mapHom X Y x) k f
+theorem sec_nsmul
+    {R : Type} [CommRing R] {X Y : Shv R} (f : X ⟶ Y) (k : ℕ) {U : Scheme.{0}} (x : Sec X U)
+    : Sec.map (k • f) x = k • Sec.map f x :=
+  map_nsmul (CupSpec.mapHom X Y x) k f
 
-theorem sec_map_nsmul {R : Type} [CommRing R] {X Y : Shv R} (f : X ⟶ Y) (k : ℕ) {U : Scheme.{0}} (x : Sec X U) :
-    Sec.map f (k • x) = k • Sec.map f x := map_nsmul (f.hom.app (op U)).hom k x
+theorem sec_map_nsmul
+    {R : Type} [CommRing R] {X Y : Shv R} (f : X ⟶ Y) (k : ℕ) {U : Scheme.{0}} (x : Sec X U)
+    : Sec.map f (k • x) = k • Sec.map f x :=
+  map_nsmul (f.hom.app (op U)).hom k x
 
-theorem res_nsmul {R : Type} [CommRing R] {X : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) (k : ℕ) (x : Sec X U) :
-    Sec.res g (k • x) = k • Sec.res g x := map_nsmul (X.obj.map g.op).hom k x
+theorem res_nsmul
+    {R : Type} [CommRing R] {X : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) (k : ℕ) (x : Sec X U)
+    : Sec.res g (k • x) = k • Sec.res g x :=
+  map_nsmul (X.obj.map g.op).hom k x
 
-theorem res_zero {R : Type} [CommRing R] {X : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) : Sec.res g (0 : Sec X U) = 0 :=
+theorem res_zero {R : Type} [CommRing R] {X : Shv R} {V U : Scheme.{0}} (g : V ⟶ U)
+    : Sec.res g (0 : Sec X U) = 0 :=
   map_zero (X.obj.map g.op).hom
 
-theorem sec_map_zero' {R : Type} [CommRing R] {X Y : Shv R} (f : X ⟶ Y) {U : Scheme.{0}} : Sec.map f (0 : Sec X U) = 0 :=
+theorem sec_map_zero' {R : Type} [CommRing R] {X Y : Shv R} (f : X ⟶ Y) {U : Scheme.{0}}
+    : Sec.map f (0 : Sec X U) = 0 :=
   map_zero (f.hom.app (op U)).hom
 
 theorem sec_char {q : ℕ} {F : Shv (ZMod q)} {U : Scheme.{0}} (x : Sec F U) : q • x = 0 := by
@@ -41,16 +49,21 @@ theorem sec_char {q : ℕ} {F : Shv (ZMod q)} {U : Scheme.{0}} (x : Sec F U) : q
     rfl
   rw [this, zero_smul]
 
-theorem morph_zero_of_sec {R : Type} [CommRing R] {X Y : Shv R} (f : X ⟶ Y)
-    (h : ∀ (U : Scheme.{0}) (x : Sec X U), Sec.map f x = 0) : f = 0 := by
+theorem morph_zero_of_sec
+    {R : Type} [CommRing R]
+    {X Y : Shv R} (f : X ⟶ Y) (h : ∀ (U : Scheme.{0}) (x : Sec X U), Sec.map f x = 0)
+    : f = 0 := by
   apply Sheaf.hom_ext
   ext U x
   exact h U.unop x
 
-theorem loc_of_img {R : Type} [CommRing R] {X Y : Shv R} (f : X ⟶ Y) {U V : Scheme.{0}} (g : V ⟶ U) (y : Sec Y U)
-    (x : Sec X V) (hx : Sec.map f x = Sec.res g y) :
-    Loc V fun W k => ∃ x' : Sec X W, Sec.map f x' = Sec.res (k ≫ g) y :=
-  SheafSectionLemmas.loc_mono (SheafSectionLemmas.loc_true V) fun W k _ => ⟨Sec.res k x, by rw [← CupSpec.map_res, hx, TwSec.res_comp]⟩
+theorem loc_of_img
+    {R : Type} [CommRing R]
+    {X Y : Shv R} (f : X ⟶ Y)
+    {U V : Scheme.{0}} (g : V ⟶ U) (y : Sec Y U) (x : Sec X V) (hx : Sec.map f x = Sec.res g y)
+    : Loc V fun W k => ∃ x' : Sec X W, Sec.map f x' = Sec.res (k ≫ g) y :=
+  SheafSectionLemmas.loc_mono (SheafSectionLemmas.loc_true V) fun W k _ =>
+    ⟨Sec.res k x, by rw [← CupSpec.map_res, hx, TwSec.res_comp]⟩
 
 theorem twSeq (hG : E.InGen) : InTwSeq := by
   intro p a b _ i
@@ -61,12 +74,15 @@ theorem twSeq (hG : E.InGen) : InTwSeq := by
   obtain ⟨π, hπ, hπg⟩ := redSheaf hG (dvdB p a b) i
   obtain ⟨π', hπ', hπ'g⟩ := redSheaf hG (dvdA p a b) i
   obtain ⟨m, hmdef⟩ : ∃ m : tw (p ^ (a + b)) i ⟶ tw (p ^ (a + b)) i, m = p ^ b • 𝟙 _ := ⟨_, rfl⟩
-  have hm : ∀ (U : Scheme.{0}) (x : Sec (tw (p ^ (a + b)) i) U), Sec.map m x = p ^ b • x := fun U x => by
+  have hm
+      : ∀ (U : Scheme.{0}) (x : Sec (tw (p ^ (a + b)) i) U),
+        Sec.map m x = p ^ b • x := fun U x => by
     rw [hmdef]; exact sec_nsmul _ _ x
-  have hw : m ≫ π = 0 := morph_zero_of_sec _ fun U x => by
-    change Sec.map π (Sec.map m x) = 0
-    rw [hm, sec_map_nsmul]
-    exact sec_char (q := p ^ b) (F := tw (p ^ b) i) (Sec.map π x)
+  have hw : m ≫ π = 0 :=
+    morph_zero_of_sec _ fun U x => by
+      change Sec.map π (Sec.map m x) = 0
+      rw [hm, sec_map_nsmul]
+      exact sec_char (q := p ^ b) (F := tw (p ^ b) i) (Sec.map π x)
   have hQ : p ^ a • m = 0 := by
     rw [hmdef, smul_smul, ← pow_add]
     exact morph_zero_of_sec _ fun U x => by rw [sec_nsmul]; exact sec_char x
@@ -78,11 +94,13 @@ theorem twSeq (hG : E.InGen) : InTwSeq := by
         have h0 := sec_char (q := p ^ b) (F := tw (p ^ b) i) y
         have h1 : p ^ b = 1 := by rw [hb, pow_zero]
         exact (one_nsmul y).symm.trans ((congrArg (fun n : ℕ => n • y) h1.symm).trans h0)
-      exact SheafSectionLemmas.loc_mono (SheafSectionLemmas.loc_true U) fun V g _ => ⟨0, by rw [sec_map_zero', hy]; exact (res_zero g).symm⟩
+      exact SheafSectionLemmas.loc_mono (SheafSectionLemmas.loc_true U) fun V g _ =>
+        ⟨0, by rw [sec_map_zero', hy]; exact (res_zero g).symm⟩
     · refine SheafSectionLemmas.loc_bind (TwSec.tw_loc hG (p ^ b) i U y) fun V g hy => ?_
       rcases hy with hy | ⟨ξ, c, hy⟩
       · exact loc_of_img π g y 0 (by rw [sec_map_zero']; exact hy.symm)
-      · refine SheafSectionLemmas.loc_mono (KummerTwistLemmas.rootLoc p a b hb V ξ) fun W k ⟨ζ, hζ⟩ => ⟨c • twGen i ζ, ?_⟩
+      · refine SheafSectionLemmas.loc_mono (KummerTwistLemmas.rootLoc p a b hb V ξ)
+          fun W k ⟨ζ, hζ⟩ => ⟨c • twGen i ζ, ?_⟩
         rw [sec_map_nsmul, hπg]
         change c • twGen i (pw (dvdB p a b) ζ) = Sec.res (k ≫ g) (show Sec (tw (p ^ b) i) U from y)
         rw [TwSec.res_comp, hy, res_nsmul, twGen_res]
@@ -107,7 +125,8 @@ theorem twSeq (hG : E.InGen) : InTwSeq := by
 
   have hker : kernel.ι m ≫ π' = 0 := by
     refine SheafSectionLemmas.ker_comp_zero m π' fun U y hy => ?_
-    refine SheafSectionLemmas.sec_eq_of_loc _ _ (SheafSectionLemmas.loc_mono (TwSec.tw_loc hG (p ^ (a + b)) i U y) fun V g hy' => ?_)
+    refine SheafSectionLemmas.sec_eq_of_loc _ _
+      (SheafSectionLemmas.loc_mono (TwSec.tw_loc hG (p ^ (a + b)) i U y) fun V g hy' => ?_)
     rw [res_zero, CupSpec.map_res]
     rcases hy' with hy' | ⟨ζ, c, hy'⟩
     · rw [hy', sec_map_zero']

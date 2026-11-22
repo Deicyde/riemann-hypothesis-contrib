@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleLocalPr
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
@@ -62,10 +63,12 @@ end GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
-theorem quasiIso_chains_cech_of_locSurj (R : Type) [CommRing R] {P Q : PSh} (φ : P ⟶ Q)
-    (hφ : ∀ U (y : Q.obj (op U)), Loc U fun V g => ∃ x, φ.app (op V) x = Q.map g.op y) :
-    QuasiIso ((chains R).map (show (Arrow.mk φ).cechNerve ⟶ disc.obj Q from
-      (Arrow.mk φ).augmentedCechNerve.hom)) := by
+theorem quasiIso_chains_cech_of_locSurj
+    (R : Type) [CommRing R]
+    {P Q : PSh}
+    (φ : P ⟶ Q) (hφ : ∀ U (y : Q.obj (op U)), Loc U fun V g => ∃ x, φ.app (op V) x = Q.map g.op y)
+    : QuasiIso ((chains R).map
+      (show (Arrow.mk φ).cechNerve ⟶ disc.obj Q from (Arrow.mk φ).augmentedCechNerve.hom)) := by
   let aφ : (Arrow.mk φ).cechNerve ⟶ disc.obj Q := (Arrow.mk φ).augmentedCechNerve.hom
   change QuasiIso ((chains R).map aφ)
   have hπι : Subfunctor.toRange φ ≫ (Subfunctor.range φ).ι = φ := Subfunctor.toRange_ι φ
@@ -80,7 +83,8 @@ theorem quasiIso_chains_cech_of_locSurj (R : Type) [CommRing R] {P Q : PSh} (φ 
     rfl
   have hsurj : ∀ U, Function.Surjective (π.app U) := fun U =>
     (epi_iff_surjective _).1 ((NatTrans.epi_iff_epi_app _).1 (inferInstance : Epi π) U)
-  have h1 : QuasiIso ((chains R).map aπ) := GlobalTheory.T.quasiIso_chains_cechNerve_of_surjective R π hsurj
+  have h1 : QuasiIso ((chains R).map aπ) :=
+    GlobalTheory.T.quasiIso_chains_cechNerve_of_surjective R π hsurj
   have hιfree : IsIso ((free R).map ι) := by
     refine (GlobalTheory.T.freeEtaleModuleSheaf_map_mono_epi_iso R ι).2.2 ?_ ?_
     · intro U y
@@ -95,8 +99,9 @@ theorem quasiIso_chains_cech_of_locSurj (R : Type) [CommRing R] {P Q : PSh} (φ 
     isIso_chains_map_of_isIso_free R _ fun n => by
       have := isIso_mapCechNerve_app_of_mono π ι φ hπι n
       exact Functor.map_isIso _ _
-  have key : (chains R).map (Arrow.mapCechNerve F) ≫ (chains R).map aφ =
-      (chains R).map aπ ≫ (chains R).map (disc.map ι) := by
+  have key
+      : (chains R).map (Arrow.mapCechNerve F) ≫ (chains R).map aφ
+        = (chains R).map aπ ≫ (chains R).map (disc.map ι) := by
     rw [← Functor.map_comp, ← Functor.map_comp, sq]
   rw [← quasiIso_iff_comp_left ((chains R).map (Arrow.mapCechNerve F)), key]
   haveI := h1

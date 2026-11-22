@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsNilpote
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 noncomputable section
 
@@ -16,10 +17,12 @@ section Real
 
 variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
 
-theorem exists_orthonormal_on {d : ℕ} (p : Fin d → Prop) [DecidablePred p] (G : Submodule ℝ V)
-    (hG : Module.finrank ℝ G = Fintype.card {i // p i}) :
-    ∃ f : Fin d → V, (∀ i k, p i → p k → inner ℝ (f i) (f k) = if i = k then 1 else 0) ∧
-      G = Submodule.span ℝ (f '' {i | p i}) := by
+theorem exists_orthonormal_on
+    {d : ℕ} (p : Fin d → Prop) [DecidablePred p]
+    (G : Submodule ℝ V) (hG : Module.finrank ℝ G = Fintype.card {i // p i})
+    : ∃ f : Fin d → V,
+      (∀ i k, p i → p k → inner ℝ (f i) (f k) = if i = k then 1 else 0)
+        ∧ G = Submodule.span ℝ (f '' {i | p i}) := by
   classical
   obtain ⟨e⟩ : Nonempty ({i // p i} ≃ Fin (Module.finrank ℝ G)) :=
     ⟨Fintype.equivFinOfCardEq hG.symm⟩
@@ -34,8 +37,9 @@ theorem exists_orthonormal_on {d : ℕ} (p : Fin d → Prop) [DecidablePred p] (
     · rw [if_neg hik, if_neg]
       intro h
       exact hik (congrArg Subtype.val (e.injective h))
-  · have hset : (fun i => if h : p i then ((b (e ⟨i, h⟩) : G) : V) else 0) '' {i | p i} =
-        G.subtype '' Set.range b := by
+  · have hset
+        : (fun i => if h : p i then ((b (e ⟨i, h⟩) : G) : V) else 0) '' {i | p i}
+          = G.subtype '' Set.range b := by
       ext x
       constructor
       · rintro ⟨i, hi, rfl⟩
@@ -48,20 +52,24 @@ theorem exists_orthonormal_on {d : ℕ} (p : Fin d → Prop) [DecidablePred p] (
       exact b.toBasis.span_eq
     rw [hset, ← Submodule.map_span, hspan, Submodule.map_subtype_top]
 
-theorem exists_orthonormal_adapted {d m : ℕ} (P : ℕ → Submodule ℝ V) (deg : Fin d → ℕ)
-    (hP : ∀ c, P (c + 1) ≤ P c) (hm : P m = ⊥)
-    (hd : ∀ c, Module.finrank ℝ (P c) =
-      Module.finrank ℝ (P (c + 1)) + Fintype.card {i : Fin d // deg i = c}) :
-    ∃ b : Fin d → V, (∀ i k, inner ℝ (b i) (b k) = if i = k then 1 else 0) ∧
-      ∀ c, P c = Submodule.span ℝ (b '' {i | c ≤ deg i}) := by
+theorem exists_orthonormal_adapted
+    {d m : ℕ}
+    (P : ℕ → Submodule ℝ V) (deg : Fin d → ℕ) (hP : ∀ c, P (c + 1) ≤ P c) (hm : P m = ⊥)
+    (hd : ∀ c,
+      Module.finrank ℝ (P c) = Module.finrank ℝ (P (c + 1)) + Fintype.card {i : Fin d // deg i = c})
+    : ∃ b : Fin d → V,
+      (∀ i k, inner ℝ (b i) (b k) = if i = k then 1 else 0)
+        ∧ ∀ c, P c = Submodule.span ℝ (b '' {i | c ≤ deg i}) := by
   classical
-
-  have hQ : ∀ c, Module.finrank ℝ ((P (c + 1))ᗮ ⊓ P c : Submodule ℝ V) =
-      Fintype.card {i : Fin d // deg i = c} := fun c =>
+  have hQ
+      : ∀ c,
+        Module.finrank ℝ ((P (c + 1))ᗮ ⊓ P c : Submodule ℝ V)
+          = Fintype.card {i : Fin d // deg i = c} := fun c =>
     Submodule.finrank_add_inf_finrank_orthogonal' (hP c) (hd c).symm
-  have hf : ∀ c, ∃ f : Fin d → V,
-      (∀ i k, deg i = c → deg k = c → inner ℝ (f i) (f k) = if i = k then 1 else 0) ∧
-      ((P (c + 1))ᗮ ⊓ P c : Submodule ℝ V) = Submodule.span ℝ (f '' {i | deg i = c}) :=
+  have hf
+      : ∀ c, ∃ f : Fin d → V,
+        (∀ i k, deg i = c → deg k = c → inner ℝ (f i) (f k) = if i = k then 1 else 0)
+          ∧ ((P (c + 1))ᗮ ⊓ P c : Submodule ℝ V) = Submodule.span ℝ (f '' {i | deg i = c}) :=
     fun c => exists_orthonormal_on (fun i => deg i = c) _ (hQ c)
   choose f hfo hfs using hf
   have hanti : Antitone P := antitone_nat_of_succ_le hP
@@ -70,8 +78,12 @@ theorem exists_orthonormal_adapted {d m : ℕ} (P : ℕ → Submodule ℝ V) (de
     rw [hfs (deg i)]
     exact Submodule.subset_span ⟨i, (rfl : deg i = deg i), rfl⟩
 
-  have horth : ∀ c c', c < c' → ∀ x ∈ ((P (c + 1))ᗮ ⊓ P c : Submodule ℝ V),
-      ∀ y ∈ ((P (c' + 1))ᗮ ⊓ P c' : Submodule ℝ V), inner ℝ x y = 0 := by
+  have horth
+      : ∀ c c',
+        c < c'
+          → ∀ x ∈ ((P (c + 1))ᗮ ⊓ P c : Submodule ℝ V),
+            ∀ y ∈ ((P (c' + 1))ᗮ ⊓ P c' : Submodule ℝ V),
+              inner ℝ x y = 0 := by
     intro c c' hcc x hx y hy
     have hy' : y ∈ P (c + 1) := hanti (Nat.succ_le_of_lt hcc) hy.2
     exact Submodule.inner_left_of_mem_orthogonal hy' hx.1
@@ -96,8 +108,9 @@ theorem exists_orthonormal_adapted {d m : ℕ} (P : ℕ → Submodule ℝ V) (de
     · have hik : i ≠ k := fun e => by subst e; exact lt_irrefl _ h
       rw [if_neg hik, real_inner_comm]
       exact horth _ _ h _ (hbQ k) _ (hbQ i)
-  ·
-    have key : ∀ j c, m ≤ c + j → P c = Submodule.span ℝ ((fun i => f (deg i) i) '' {i | c ≤ deg i}) := by
+  · have key
+        : ∀ j c,
+          m ≤ c + j → P c = Submodule.span ℝ ((fun i => f (deg i) i) '' {i | c ≤ deg i}) := by
       intro j
       induction j with
       | zero =>
@@ -127,20 +140,20 @@ theorem exists_orthonormal_adapted {d m : ℕ} (P : ℕ → Submodule ℝ V) (de
 
 end Real
 
-theorem exists_re_orthonormal_adapted {n d m : ℕ} (P : ℕ → Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
-    (deg : Fin d → ℕ) (hP : ∀ c, P (c + 1) ≤ P c) (hm : P m = ⊥)
-    (hd : ∀ c, Module.finrank ℝ (P c) =
-      Module.finrank ℝ (P (c + 1)) + Fintype.card {i : Fin d // deg i = c}) :
-    ∃ b : Fin d → Matrix (Fin n) (Fin n) ℂ,
-      (∀ i k, ((b i * (b k)ᴴ).trace).re = if i = k then 1 else 0) ∧
-      ∀ c, P c = Submodule.span ℝ (b '' {i | c ≤ deg i}) := by
+theorem exists_re_orthonormal_adapted
+    {n d m : ℕ} (P : ℕ → Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (deg : Fin d → ℕ)
+    (hP : ∀ c, P (c + 1) ≤ P c) (hm : P m = ⊥)
+    (hd : ∀ c,
+      Module.finrank ℝ (P c) = Module.finrank ℝ (P (c + 1)) + Fintype.card {i : Fin d // deg i = c})
+    : ∃ b : Fin d → Matrix (Fin n) (Fin n) ℂ,
+      (∀ i k, ((b i * (b k)ᴴ).trace).re = if i = k then 1 else 0)
+        ∧ ∀ c, P c = Submodule.span ℝ (b '' {i | c ≤ deg i}) := by
   classical
-
   let e : Matrix (Fin n) (Fin n) ℂ ≃ₗ[ℝ] PiLp 2 (fun _ : Fin n × Fin n => ℂ) :=
     ((Matrix.ofLinearEquiv ℝ).symm.trans (LinearEquiv.curry ℝ ℂ (Fin n) (Fin n)).symm).trans
       (WithLp.linearEquiv 2 ℝ (Fin n × Fin n → ℂ)).symm
-  have hev : ∀ (Z : Matrix (Fin n) (Fin n) ℂ) (p : Fin n × Fin n), (e Z) p = Z p.1 p.2 :=
-    fun Z p => rfl
+  have hev : ∀ (Z : Matrix (Fin n) (Fin n) ℂ) (p : Fin n × Fin n), (e Z) p = Z p.1 p.2 := fun Z p =>
+    rfl
   have hinner : ∀ X Y : Matrix (Fin n) (Fin n) ℂ, inner ℝ (e X) (e Y) = ((X * Yᴴ).trace).re := by
     intro X Y
     rw [PiLp.inner_apply, Fintype.sum_prod_type]
@@ -149,15 +162,18 @@ theorem exists_re_orthonormal_adapted {n d m : ℕ} (P : ℕ → Submodule ℝ (
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     simp only [Complex.mul_re, Complex.star_def, Complex.conj_re, Complex.conj_im]
     ring
-  obtain ⟨Q, hQdef⟩ : ∃ Q : ℕ → Submodule ℝ (PiLp 2 (fun _ : Fin n × Fin n => ℂ)),
-      ∀ c, Q c = (P c).map (e : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] PiLp 2 (fun _ : Fin n × Fin n => ℂ)) :=
+  obtain ⟨Q, hQdef⟩
+      : ∃ Q : ℕ → Submodule ℝ (PiLp 2 (fun _ : Fin n × Fin n => ℂ)), ∀ c,
+        Q c = (P c).map (e : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] PiLp 2 (fun _ : Fin n × Fin n => ℂ)) :=
     ⟨_, fun c => rfl⟩
   have hQ1 : ∀ c, Q (c + 1) ≤ Q c := fun c => by
     rw [hQdef, hQdef]
     exact Submodule.map_mono (hP c)
   have hQ2 : Q m = ⊥ := by rw [hQdef, hm, Submodule.map_bot]
-  have hQ3 : ∀ c, Module.finrank ℝ (Q c) =
-      Module.finrank ℝ (Q (c + 1)) + Fintype.card {i : Fin d // deg i = c} := fun c => by
+  have hQ3
+      : ∀ c,
+        Module.finrank ℝ (Q c)
+          = Module.finrank ℝ (Q (c + 1)) + Fintype.card {i : Fin d // deg i = c} := fun c => by
     rw [hQdef, hQdef, LinearEquiv.finrank_map_eq, LinearEquiv.finrank_map_eq]
     exact hd c
   obtain ⟨b', hb'o, hb's⟩ := exists_orthonormal_adapted Q deg hQ1 hQ2 hQ3
@@ -168,29 +184,38 @@ theorem exists_re_orthonormal_adapted {n d m : ℕ} (P : ℕ → Submodule ℝ (
   · intro c
     have h1 := hb's c
     rw [hQdef] at h1
-    have h2 := congrArg
-      (Submodule.map (e.symm : PiLp 2 (fun _ : Fin n × Fin n => ℂ) →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ)) h1
+    have h2 :=
+      congrArg
+        (Submodule.map
+          (e.symm : PiLp 2 (fun _ : Fin n × Fin n => ℂ) →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ))
+        h1
     rw [Submodule.map_span, ← Set.image_comp] at h2
-    have h3 : Submodule.map (e.symm : PiLp 2 (fun _ : Fin n × Fin n => ℂ) →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ)
-        (Submodule.map (e : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] PiLp 2 (fun _ : Fin n × Fin n => ℂ)) (P c)) =
-        P c := by
+    have h3
+        : Submodule.map
+            (e.symm : PiLp 2 (fun _ : Fin n × Fin n => ℂ) →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ)
+            (Submodule.map (e : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] PiLp 2 (fun _ : Fin n × Fin n => ℂ))
+              (P c))
+          = P c := by
       ext X
       simp
     rw [h3] at h2
     exact h2
 
-
 open GlobalTheory.RadicalAlg Formalism.REAL in
-theorem trace_im_eq_zero {n : ℕ} (ε : Fin n → Bool) {X Y : Matrix (Fin n) (Fin n) ℂ}
-    (hX : negAdj ε X = X) (hY : negAdj ε Y = Y) : ((X * Yᴴ).trace).im = 0 := by
+theorem trace_im_eq_zero
+    {n : ℕ} (ε : Fin n → Bool)
+    {X Y : Matrix (Fin n) (Fin n) ℂ} (hX : negAdj ε X = X) (hY : negAdj ε Y = Y)
+    : ((X * Yᴴ).trace).im = 0 := by
   have hJ : Jm ε * Jm ε = 1 := Jm_mul_self ε
 
   have key : ∀ Z : Matrix (Fin n) (Fin n) ℂ, negAdj ε Z = Z → Zᴴ = -(Jm ε * Z * Jm ε) := by
     intro Z hZ
     rw [negAdj_apply] at hZ
-    calc Zᴴ = Jm ε * Jm ε * Zᴴ * (Jm ε * Jm ε) := by rw [hJ, one_mul, mul_one]
+    calc
+      Zᴴ
+        = Jm ε * Jm ε * Zᴴ * (Jm ε * Jm ε) := by rw [hJ, one_mul, mul_one]
       _ = -(Jm ε * (-(Jm ε * Zᴴ * Jm ε)) * Jm ε) := by
-          simp only [mul_neg, neg_mul, neg_neg, mul_assoc]
+        simp only [mul_neg, neg_mul, neg_neg, mul_assoc]
       _ = -(Jm ε * Z * Jm ε) := by rw [hZ]
   have h1 : (X * Yᴴ).trace = -((X * Jm ε) * (Y * Jm ε)).trace := by
     rw [key Y hY, mul_neg, Matrix.trace_neg]
@@ -199,13 +224,21 @@ theorem trace_im_eq_zero {n : ℕ} (ε : Fin n → Bool) {X Y : Matrix (Fin n) (
     rw [← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
       key X hX, mul_neg, Matrix.trace_neg]
     simp only [mul_assoc]
-  have h3 : star (X * Yᴴ).trace = (X * Yᴴ).trace := by
-    rw [h2, h1, Matrix.trace_mul_comm]
+  have h3 : star (X * Yᴴ).trace = (X * Yᴴ).trace := by rw [h2, h1, Matrix.trace_mul_comm]
   exact Complex.conj_eq_iff_im.mp h3
 
-
 open GlobalTheory.RadicalAlg in
-theorem exists_skew_basis : ∀ (n d m : ℕ) (ε : Fin n → Bool) (A : ℕ → Submodule ℂ (Matrix (Fin n) (Fin n) ℂ)) (deg : Fin d → ℕ), (∀ c, A (c + 1) ≤ A c) → A m = ⊥ → (∀ c, ∀ X ∈ A c, Formalism.REAL.Jm ε * Xᴴ * Formalism.REAL.Jm ε ∈ A c) → (∀ c, Module.finrank ℂ (A c) = Module.finrank ℂ (A (c + 1)) + Fintype.card {i : Fin d // deg i = c}) → ∃ B : Fin d → Matrix (Fin n) (Fin n) ℂ, (∀ i k, (B i * (B k)ᴴ).trace = if i = k then 1 else 0) ∧ (∀ i, Formalism.REAL.inG ε (B i)) ∧ ∀ c, A c = Submodule.span ℂ (B '' {i | c ≤ deg i}) := by
+theorem exists_skew_basis
+    : ∀ (n d m : ℕ) (ε : Fin n → Bool) (A : ℕ → Submodule ℂ (Matrix (Fin n) (Fin n) ℂ))
+        (deg : Fin d → ℕ),
+      (∀ c, A (c + 1) ≤ A c) → A m = ⊥
+        → (∀ c, ∀ X ∈ A c, Formalism.REAL.Jm ε * Xᴴ * Formalism.REAL.Jm ε ∈ A c)
+        → (∀ c,
+          Module.finrank ℂ (A c)
+            = Module.finrank ℂ (A (c + 1)) + Fintype.card {i : Fin d // deg i = c})
+        → ∃ B : Fin d → Matrix (Fin n) (Fin n) ℂ,
+          (∀ i k, (B i * (B k)ᴴ).trace = if i = k then 1 else 0) ∧ (∀ i, Formalism.REAL.inG ε (B i))
+            ∧ ∀ c, A c = Submodule.span ℂ (B '' {i | c ≤ deg i}) := by
   intro n d m ε A deg hA hm hstab hd
   classical
   have hσA : ∀ c, ∀ X ∈ A c, negAdj ε X ∈ A c := fun c X hX => by
@@ -219,14 +252,17 @@ theorem exists_skew_basis : ∀ (n d m : ℕ) (ε : Fin n → Bool) (A : ℕ →
     have e2 : star (r : ℂ) = r := Complex.conj_ofReal r
     rw [← e1, ← e1, negAdj_smul, e2]
 
-  obtain ⟨P, hPmem⟩ : ∃ P : ℕ → Submodule ℝ (Matrix (Fin n) (Fin n) ℂ),
-      ∀ c X, X ∈ P c ↔ X ∈ A c ∧ negAdj ε X = X :=
-    ⟨fun c =>
-      { carrier := {X | X ∈ A c ∧ negAdj ε X = X}
-        add_mem' := fun {X Y} hX hY => ⟨(A c).add_mem hX.1 hY.1, by rw [map_add (f := _), hX.2, hY.2]⟩
-        zero_mem' := ⟨(A c).zero_mem, map_zero _⟩
-        smul_mem' := fun r X hX => ⟨(A c).smul_of_tower_mem r hX.1, by rw [hreal, hX.2]⟩ },
-      fun c X => Iff.rfl⟩
+  obtain ⟨P, hPmem⟩
+      : ∃ P : ℕ → Submodule ℝ (Matrix (Fin n) (Fin n) ℂ), ∀ c X,
+        X ∈ P c ↔ X ∈ A c ∧ negAdj ε X = X := ⟨
+    fun c => {
+      carrier := {X | X ∈ A c ∧ negAdj ε X = X}
+      add_mem' := fun {X Y} hX hY => ⟨(A c).add_mem hX.1 hY.1, by rw [map_add (f := _), hX.2, hY.2]⟩
+      zero_mem' := ⟨(A c).zero_mem, map_zero _⟩
+      smul_mem' := fun r X hX => ⟨(A c).smul_of_tower_mem r hX.1, by rw [hreal, hX.2]⟩
+    },
+    fun c X => Iff.rfl
+  ⟩
   have hPdim : ∀ c, Module.finrank ℝ (P c) = Module.finrank ℂ (A c) := fun c =>
     finrank_fixed (negAdj ε) (negAdj_negAdj ε) (negAdj_smul ε) (A c) (hσA c) (P c) (hPmem c)
   have hPle : ∀ c, P (c + 1) ≤ P c := fun c X hX => by
@@ -238,8 +274,10 @@ theorem exists_skew_basis : ∀ (n d m : ℕ) (ε : Fin n → Bool) (A : ℕ →
     rw [hPmem, hm] at hX
     rw [Submodule.mem_bot]
     exact (Submodule.mem_bot ℂ).mp hX.1
-  have hPd : ∀ c, Module.finrank ℝ (P c) =
-      Module.finrank ℝ (P (c + 1)) + Fintype.card {i : Fin d // deg i = c} := fun c => by
+  have hPd
+      : ∀ c,
+        Module.finrank ℝ (P c)
+          = Module.finrank ℝ (P (c + 1)) + Fintype.card {i : Fin d // deg i = c} := fun c => by
     rw [hPdim, hPdim]
     exact hd c
   obtain ⟨B, hBo, hBs⟩ := exists_re_orthonormal_adapted P deg hPle hPm hPd
@@ -273,11 +311,15 @@ theorem exists_skew_basis : ∀ (n d m : ℕ) (ε : Fin n → Bool) (A : ℕ →
         rw [negAdj_smul, map_sub, negAdj_negAdj, eI, neg_smul, ← smul_neg, neg_sub]
       have hc : -(Complex.I / 2) * Complex.I = (1 / 2 : ℂ) := by
         linear_combination (-1 / 2 : ℂ) * Complex.I_mul_I
-      have hdec : X = (1 / 2 : ℂ) • (X + negAdj ε X) + (-(Complex.I / 2)) • (Complex.I • (X - negAdj ε X)) := by
+      have hdec
+          : X
+            = (1 / 2 : ℂ) • (X + negAdj ε X)
+              + (-(Complex.I / 2)) • (Complex.I • (X - negAdj ε X)) := by
         rw [smul_smul, hc]
         module
       rw [hdec]
-      exact Submodule.add_mem _ (Submodule.smul_mem _ _ (hmem _ hX1)) (Submodule.smul_mem _ _ (hmem _ hX2))
+      exact Submodule.add_mem _ (Submodule.smul_mem _ _ (hmem _ hX1))
+        (Submodule.smul_mem _ _ (hmem _ hX2))
     · rw [Submodule.span_le]
       rintro _ ⟨i, hi, rfl⟩
       exact ((hPmem _ _).mp (hBP c i hi)).1

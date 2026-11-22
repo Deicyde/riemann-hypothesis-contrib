@@ -6,9 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory.NatCastUpperBound
 
-theorem le_natCast_of_add_one_le {a : WithBot ℕ∞} {n : ℕ}
-    (h : a + (1 : WithBot ℕ∞) ≤ (↑(n + (1 : ℕ)) : WithBot ℕ∞)) :
-    a ≤ (↑n : WithBot ℕ∞) := by
+theorem le_natCast_of_add_one_le
+    {a : WithBot ℕ∞} {n : ℕ} (h : a + (1 : WithBot ℕ∞) ≤ (↑(n + (1 : ℕ)) : WithBot ℕ∞))
+    : a ≤ (↑n : WithBot ℕ∞) := by
   induction a using WithBot.recBotCoe with
   | bot => exact bot_le
   | coe b =>

@@ -14,8 +14,9 @@ namespace Formalism.HermitianLattices.Ext.PrimesInProgressions.Dens
 
 open Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD Formalism.ZeroFreeDirichlet
 
-theorem re_lt_one_of_isLZero {M : ℕ} [NeZero M] {χ : DirichletCharacter ℂ M} {s : ℂ}
-    (h : IsLZero χ s) : s.re < 1 := by
+theorem re_lt_one_of_isLZero
+    {M : ℕ} [NeZero M] {χ : DirichletCharacter ℂ M} {s : ℂ} (h : IsLZero χ s)
+    : s.re < 1 := by
   by_contra hc
   push Not at hc
   exact DirichletCharacter.LFunction_ne_zero_of_one_le_re χ h.1 hc h.2
@@ -26,8 +27,10 @@ theorem log_density_bound : Formalism.HermitianLattices.Ext.PrimesInProgressions
   obtain ⟨C1, q1, h1⟩ := zero_count_second
   refine ⟨24, 10, |C0| + |C1| + 3 + 3 * ((max q0 q1 : ℕ) : ℝ), ?_⟩
   intro M _ T σ S hM hT hσ hS hsp
-  suffices key : (S.card : ℝ) ≤ (|C0| + |C1| + 3 + 3 * ((max q0 q1 : ℕ) : ℝ)) *
-      ((M * T : ℝ) ^ (24 * (1 - σ)) * Real.log (M * T) ^ (10 : ℕ)) by
+  suffices key
+      : (S.card : ℝ)
+        ≤ (|C0| + |C1| + 3 + 3 * ((max q0 q1 : ℕ) : ℝ))
+          * ((M * T : ℝ) ^ (24 * (1 - σ)) * Real.log (M * T) ^ (10 : ℕ)) by
     have hpow : Real.log (M * T) ^ (10 : ℝ) = Real.log (M * T) ^ (10 : ℕ) := by
       rw [← Real.rpow_natCast]
       norm_num
@@ -59,7 +62,9 @@ theorem log_density_bound : Formalism.HermitianLattices.Ext.PrimesInProgressions
   have hXP : σ < 3 / 4 → (M * T : ℝ) ≤ (M * T) ^ (24 * (1 - σ)) * Real.log (M * T) ^ 10 := by
     intro hs
     have hXe : (M * T : ℝ) ≤ (M * T) ^ (24 * (1 - σ)) := by
-      calc (M * T : ℝ) = (M * T) ^ (1 : ℝ) := (Real.rpow_one _).symm
+      calc
+        (M * T : ℝ)
+          = (M * T) ^ (1 : ℝ) := (Real.rpow_one _).symm
         _ ≤ _ := Real.rpow_le_rpow_of_exponent_le (by linarith) (by linarith)
     nlinarith
   have h0' := fun S hσ' hq => h0 M T σ S hM hT hσ' hq
@@ -77,28 +82,32 @@ theorem log_density_bound : Formalism.HermitianLattices.Ext.PrimesInProgressions
   have aq : q ≤ q * P := by nlinarith
   by_cases hq : max q0 q1 ≤ qd M T
   · by_cases hσ34 : 3 / 4 ≤ σ
-    · have hA0 := h0' (S.filter (fun p => p.1 = 1)) hσ34 (le_trans (le_max_left _ _) hq)
-        (by
-          intro p hp
-          rw [Finset.mem_filter] at hp
-          have hs := hS p hp.1
-          exact ⟨hp.2, hs.1, re_lt_one_of_isLZero hs.2.2, hs.2.1, hs.2.2⟩)
-        (by
-          intro p hp p' hp' hne
-          rw [Finset.mem_filter] at hp hp'
-          exact hsp p hp.1 p' hp'.1 hne (hp.2.trans hp'.2.symm))
-      have hA1 := h1' (S.filter (fun p => ¬ p.1 = 1)) hσ34 (le_trans (le_max_right _ _) hq)
-        (by
-          intro p hp
-          rw [Finset.mem_filter] at hp
-          have hs := hS p hp.1
-          exact ⟨hp.2, hs.1, re_lt_one_of_isLZero hs.2.2, hs.2.1, hs.2.2.2⟩)
-        (by
-          intro p hp p' hp' hne heq
-          rw [Finset.mem_filter] at hp hp'
-          exact hsp p hp.1 p' hp'.1 hne heq)
-      have hcast : (S.card : ℝ) = ((S.filter (fun p => p.1 = 1)).card : ℝ) +
-          ((S.filter (fun p => ¬ p.1 = 1)).card : ℝ) := by
+    · have hA0 :=
+        h0' (S.filter (fun p => p.1 = 1)) hσ34 (le_trans (le_max_left _ _) hq)
+          (by
+            intro p hp
+            rw [Finset.mem_filter] at hp
+            have hs := hS p hp.1
+            exact ⟨hp.2, hs.1, re_lt_one_of_isLZero hs.2.2, hs.2.1, hs.2.2⟩)
+          (by
+            intro p hp p' hp' hne
+            rw [Finset.mem_filter] at hp hp'
+            exact hsp p hp.1 p' hp'.1 hne (hp.2.trans hp'.2.symm))
+      have hA1 :=
+        h1' (S.filter (fun p => ¬ p.1 = 1)) hσ34 (le_trans (le_max_right _ _) hq)
+          (by
+            intro p hp
+            rw [Finset.mem_filter] at hp
+            have hs := hS p hp.1
+            exact ⟨hp.2, hs.1, re_lt_one_of_isLZero hs.2.2, hs.2.1, hs.2.2.2⟩)
+          (by
+            intro p hp p' hp' hne heq
+            rw [Finset.mem_filter] at hp hp'
+            exact hsp p hp.1 p' hp'.1 hne heq)
+      have hcast
+          : (S.card : ℝ)
+            = ((S.filter (fun p => p.1 = 1)).card : ℝ)
+              + ((S.filter (fun p => ¬ p.1 = 1)).card : ℝ) := by
         rw [← Nat.cast_add, Finset.card_filter_add_card_filter_not]
       linarith
     · push_neg at hσ34

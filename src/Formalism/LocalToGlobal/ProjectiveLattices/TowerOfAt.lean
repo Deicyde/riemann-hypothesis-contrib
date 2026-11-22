@@ -24,7 +24,9 @@ inductive MdlC : Type
 
 section PtC
 
-variable {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
+variable
+  {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F}
 
 structure PtC {p : ℕ} (Y : Model Xo c β) (C : SCF p) where
   alg : O →+* intO ↥C.S
@@ -55,14 +57,16 @@ def IsEig (τ : E →+* ℂ) (v : P.epsB ⟶ Y.t.G) : Prop :=
   ∀ a : 𝓞 E, (v ≫ Y.t.act.act a).left = spMap (epsMul (P.emb τ a)) ≫ v.left
 
 def IsComb {m : ℕ} (v : Fin m → (P.epsB ⟶ Y.t.G)) (a : Fin m → ↥C.S) (w : P.epsB ⟶ Y.t.G) : Prop :=
-  ∃ u : Fin m → (P.epsB ⟶ Y.t.G), (∀ i, (u i).left = spMap (epsMul (a i)) ≫ (v i).left) ∧ w = (List.ofFn u).prod
+  ∃ u : Fin m → (P.epsB ⟶ Y.t.G),
+    (∀ i, (u i).left = spMap (epsMul (a i)) ≫ (v i).left) ∧ w = (List.ofFn u).prod
 
 structure Flag where
   u : ∀ τ : E →+* ℂ, Fin (D.mult τ) → (P.epsB ⟶ Y.t.G)
   tan : ∀ τ i, P.IsTan (u τ i)
   eig : ∀ τ i, P.IsEig τ (u τ i)
-  basis : ∀ τ (w : P.epsB ⟶ Y.t.G), P.IsTan w → P.IsEig τ w →
-    ∃! a : Fin (D.mult τ) → ↥C.S, P.IsComb (u τ) a w
+  basis
+    : ∀ τ (w : P.epsB ⟶ Y.t.G),
+      P.IsTan w → P.IsEig τ w → ∃! a : Fin (D.mult τ) → ↥C.S, P.IsComb (u τ) a w
 
 end PtC
 
@@ -75,8 +79,11 @@ variable {D : Datum H} {l : Level H}
 abbrev abelian₂ (p : ℕ) (c : Coeff l) : Type :=
   {v : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F) // (p : 𝓞 c.F) ∈ v.asIdeal}
 
-def BaseAt {c : Coeff l} (v : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F)) {O : Type} [CommRing O] (β : O →+* c.F) :
-    Prop :=
+def BaseAt
+    {c : Coeff l} (v : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F))
+    {O : Type} [CommRing O]
+    (β : O →+* c.F)
+    : Prop :=
   Function.Injective β ∧ ∀ x : c.F, x ∈ Set.range β ↔ v.valuation c.F x ≤ 1
 
 structure Tower (p : ℕ) (Xo : Moduli D l) (c : Coeff l) where
@@ -95,10 +102,13 @@ structure Tower (p : ℕ) (Xo : Moduli D l) (c : Coeff l) where
 attribute [instance] Tower.ring Tower.ringN
 
 def TowerAt {p : ℕ} {Xo : Moduli D l} {c : Coeff l} (T : Tower p Xo c) : Prop :=
-  (∀ v, BaseAt v.1 (T.β v) ∧ Nonempty (T.Y v).X) ∧
-  ∀ n, l.Dvd (T.lvN n) ∧ p ^ n * l.A ∣ (T.lvN n).A ∧
-    ∀ w, (BaseAt w.1 (T.βN n w) ∧ Nonempty (T.YN n w).X) ∧
-      ∃ (v : abelian₂ p c) (bm : T.O v →+* T.ON n w) (π : (T.YN n w).X ⟶ (T.Y v).X), IsTransition (T.Y v) (T.YN n w) bm π
+  (∀ v, BaseAt v.1 (T.β v) ∧ Nonempty (T.Y v).X)
+    ∧ ∀ n,
+      l.Dvd (T.lvN n) ∧ p ^ n * l.A ∣ (T.lvN n).A
+        ∧ ∀ w,
+          (BaseAt w.1 (T.βN n w) ∧ Nonempty (T.YN n w).X)
+            ∧ ∃ (v : abelian₂ p c) (bm : T.O v →+* T.ON n w) (π : (T.YN n w).X ⟶ (T.Y v).X),
+              IsTransition (T.Y v) (T.YN n w) bm π
 
 end Tower
 
@@ -109,7 +119,8 @@ def Pt {p : ℕ} (T : Tower p Xo c) : MdlC → Type
   | .yy => Σ v : abelian₂ p c, Σ C : SCF p, Σ P : PtC (T.Y v) C, P.Flag
   | .xn n => Σ w : abelian₂ p (T.cN n), Σ C : SCF p, PtC (T.YN n w) C
 
-def fld {p : ℕ} {T : Tower p Xo c} : ∀ {Z : MdlC}, Pt T Z → Formalism.MainNotions.ModuliIntegralCharts.CF p
+def fld {p : ℕ} {T : Tower p Xo c}
+    : ∀ {Z : MdlC}, Pt T Z → Formalism.MainNotions.ModuliIntegralCharts.CF p
   | .xm, y => y.2.1.toCF
   | .yy, y => y.2.1.toCF
   | .xn _, y => y.2.1.toCF

@@ -14,28 +14,34 @@ noncomputable section
 
 namespace UpperTheory.V.Sd
 
-private theorem one_mem_per (N : ℕ) :
-    (1 : ℝ) ∈ (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 N)).strictPeriods := by
+private theorem one_mem_per (N : ℕ)
+    : (1 : ℝ) ∈ (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 N)).strictPeriods := by
   rw [Subgroup.mem_strictPeriods_iff]
   refine ⟨ModularGroup.T, ?_, ?_⟩
   · rw [SetLike.mem_coe, Gamma1_mem]
     simp [ModularGroup.T]
   · ext i j
-    change ((ModularGroup.T : SL(2, ℤ)) : Matrix (Fin 2) (Fin 2) ℤ).map (fun x : ℤ => (x : ℝ)) i j = _
+    change ((ModularGroup.T : SL(2, ℤ)) : Matrix (Fin 2) (Fin 2) ℤ).map (fun x : ℤ => (x : ℝ)) i j
+      = _
     fin_cases i <;> fin_cases j <;> simp [ModularGroup.T, Matrix.GeneralLinearGroup.upperRightHom]
 
-private theorem coef_smul {N : ℕ} {k : ℤ} (c : ℂ) (f : CuspForm (Gamma1 N) k) (n : ℕ) :
-    coef (c • f : CuspForm (Gamma1 N) k) n = c * coef f n := by
+private theorem coef_smul {N : ℕ} {k : ℤ} (c : ℂ) (f : CuspForm (Gamma1 N) k) (n : ℕ)
+    : coef (c • f : CuspForm (Gamma1 N) k) n = c * coef f n := by
   unfold coef
-  rw [CuspForm.coe_smul, ModularForm.qExpansion_smul one_pos (one_mem_per N) c f, map_smul, smul_eq_mul]
+  rw [CuspForm.coe_smul, ModularForm.qExpansion_smul one_pos (one_mem_per N) c f, map_smul,
+    smul_eq_mul]
 
-private theorem coef_add {N : ℕ} {k : ℤ} (f g : CuspForm (Gamma1 N) k) (n : ℕ) :
-    coef (f + g : CuspForm (Gamma1 N) k) n = coef f n + coef g n := by
+private theorem coef_add {N : ℕ} {k : ℤ} (f g : CuspForm (Gamma1 N) k) (n : ℕ)
+    : coef (f + g : CuspForm (Gamma1 N) k) n = coef f n + coef g n := by
   unfold coef
   rw [CuspForm.coe_add, ModularForm.qExpansion_add one_pos (one_mem_per N) f g, map_add (f := _)]
 
-private theorem norm_chi {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N)
-    (a : ZMod N) : ‖ι.symm (χ a)‖ ≤ 1 := by
+private theorem norm_chi
+    {l : ℕ} [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ)
+    {N : ℕ} [NeZero N]
+    (χ : DirichletCharacter ℂ N) (a : ZMod N)
+    : ‖ι.symm (χ a)‖ ≤ 1 := by
   by_cases ha : IsUnit a
   · obtain ⟨u, rfl⟩ := ha
     have hn : 0 < Fintype.card (ZMod N)ˣ := Fintype.card_pos
@@ -57,11 +63,15 @@ private def fT {K : Type} [Field K] (p : ℕ) (e : K) : Module.End K (ℕ → K)
     funext n
     by_cases h : p ∣ n <;> simp [h] <;> ring
 
-private theorem fT_apply {K : Type} [Field K] (p : ℕ) (e : K) (c : ℕ → K) (n : ℕ) :
-    fT p e c n = c (p * n) + e * (if p ∣ n then c (n / p) else 0) := rfl
+private theorem fT_apply {K : Type} [Field K] (p : ℕ) (e : K) (c : ℕ → K) (n : ℕ)
+    : fT p e c n = c (p * n) + e * (if p ∣ n then c (n / p) else 0) :=
+  rfl
 
-private theorem fT_comm {K : Type} [Field K] {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q) (e e' : K)
-    (c : ℕ → K) : fT p e (fT q e' c) = fT q e' (fT p e c) := by
+private theorem fT_comm
+    {K : Type} [Field K]
+    {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q)
+    (e e' : K) (c : ℕ → K)
+    : fT p e (fT q e' c) = fT q e' (fT p e c) := by
   have hcop : Nat.Coprime p q := (Nat.coprime_primes hp hq).2 hpq
   have hqp : ∀ n, q ∣ p * n ↔ q ∣ n := fun n =>
     ⟨fun h => hcop.symm.dvd_of_dvd_mul_left h, fun h => h.mul_left p⟩
@@ -78,8 +88,8 @@ private theorem fT_comm {K : Type} [Field K] {p q : ℕ} (hp : p.Prime) (hq : q.
   rw [show q * (p * n) = p * (q * n) by ring]
   by_cases hp' : p ∣ n <;> by_cases hq' : q ∣ n
   · simp only [hp', hq', (hdiv1 n hp').2 hq', (hdiv2 n hq').2 hp', if_true]
-    rw [Nat.mul_div_assoc p hq', Nat.mul_div_assoc q hp', Nat.div_div_eq_div_mul, Nat.div_div_eq_div_mul,
-      mul_comm q p]
+    rw [Nat.mul_div_assoc p hq', Nat.mul_div_assoc q hp', Nat.div_div_eq_div_mul,
+      Nat.div_div_eq_div_mul, mul_comm q p]
     ring
   · have : ¬ q ∣ n / p := fun h => hq' ((hdiv1 n hp').1 h)
     simp only [hp', hq', this, if_true, if_false, mul_zero, add_zero]
@@ -89,8 +99,11 @@ private theorem fT_comm {K : Type} [Field K] {p q : ℕ} (hp : p.Prime) (hq : q.
     rw [Nat.mul_div_assoc p hq']
   · simp only [hp', hq', if_false, mul_zero, add_zero]
 
-private theorem eq_zero_of_eig {K : Type} [Field K] (e b : Nat.Primes → K) (c : ℕ → K) (h0 : c 0 = 0) (h1 : c 1 = 0)
-    (h : ∀ p : Nat.Primes, fT p.1 (e p) c = b p • c) : c = 0 := by
+private theorem eq_zero_of_eig
+    {K : Type} [Field K]
+    (e b : Nat.Primes → K) (c : ℕ → K)
+    (h0 : c 0 = 0) (h1 : c 1 = 0) (h : ∀ p : Nat.Primes, fT p.1 (e p) c = b p • c)
+    : c = 0 := by
   funext n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -120,37 +133,49 @@ private theorem eq_zero_of_eig {K : Type} [Field K] (e b : Nat.Primes → K) (c 
       rw [hm]
       exact key
 
-private def Phi {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (N : ℕ) (k : ℤ) :
-    CuspForm (Gamma1 N) k →ₛₗ[(ι.symm : ℂ →+* Qbar l)] (ℕ → Qbar l) where
+private def Phi {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (N : ℕ) (k : ℤ)
+    : CuspForm (Gamma1 N) k →ₛₗ[(ι.symm : ℂ →+* Qbar l)] (ℕ → Qbar l) where
   toFun g n := if n = 0 then 0 else ι.symm (coef g n)
   map_add' f g := by
     funext n
-    by_cases h : n = 0 <;> simp only [h, if_true, if_false, coef_add, Pi.add_apply, map_add (f := _), add_zero]
+    by_cases h : n = 0
+      <;> simp only [h, if_true, if_false, coef_add, Pi.add_apply, map_add (f := _), add_zero]
   map_smul' a f := by
     funext n
-    by_cases h : n = 0 <;> simp only [h, if_true, if_false, coef_smul, Pi.smul_apply, map_mul, smul_eq_mul, mul_zero]
+    by_cases h : n = 0
+      <;> simp only [h, if_true, if_false, coef_smul, Pi.smul_apply, map_mul, smul_eq_mul, mul_zero]
     rfl
 
-private theorem Phi_apply {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (N : ℕ) (k : ℤ) (g : CuspForm (Gamma1 N) k) (n : ℕ) :
-    Phi ι N k g n = if n = 0 then 0 else ι.symm (coef g n) := rfl
+private theorem Phi_apply
+    {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (N : ℕ) (k : ℤ) (g : CuspForm (Gamma1 N) k) (n : ℕ)
+    : Phi ι N k g n = if n = 0 then 0 else ι.symm (coef g n) :=
+  rfl
 
-private def chSub (N k : ℕ) (χ : DirichletCharacter ℂ N) : Submodule ℂ (CuspForm (Gamma1 N) (k : ℤ)) where
+private def chSub (N k : ℕ) (χ : DirichletCharacter ℂ N)
+    : Submodule ℂ (CuspForm (Gamma1 N) (k : ℤ)) where
   carrier := {g | HasChar k χ g}
   add_mem' := by
     intro f g hf hg γ hγ
-    rw [show ((f + g : CuspForm (Gamma1 N) (k : ℤ)) : ℍ → ℂ) = (f : ℍ → ℂ) + g from rfl, SlashAction.add_slash,
-      hf γ hγ, hg γ hγ, smul_add]
+    rw [show ((f + g : CuspForm (Gamma1 N) (k : ℤ)) : ℍ → ℂ) = (f : ℍ → ℂ) + g from rfl,
+      SlashAction.add_slash, hf γ hγ, hg γ hγ, smul_add]
   zero_mem' := by
     intro γ _
-    rw [show ((0 : CuspForm (Gamma1 N) (k : ℤ)) : ℍ → ℂ) = 0 from rfl, SlashAction.zero_slash, smul_zero]
+    rw [show ((0 : CuspForm (Gamma1 N) (k : ℤ)) : ℍ → ℂ) = 0 from rfl, SlashAction.zero_slash,
+      smul_zero]
   smul_mem' := by
     intro c f hf γ hγ
-    rw [show ((c • f : CuspForm (Gamma1 N) (k : ℤ)) : ℍ → ℂ) = c • (f : ℍ → ℂ) from rfl, ModularForm.SL_smul_slash,
-      hf γ hγ, smul_comm]
+    rw [show ((c • f : CuspForm (Gamma1 N) (k : ℤ)) : ℍ → ℂ) = c • (f : ℍ → ℂ) from rfl,
+      ModularForm.SL_smul_slash, hf γ hγ, smul_comm]
 
-private theorem fT_Phi {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (N : ℕ) (k : ℤ) (g : CuspForm (Gamma1 N) k)
-    {p : ℕ} (hp : p.Prime) (e : ℂ) {n : ℕ} (hn : 1 ≤ n) :
-    fT p (ι.symm e) (Phi ι N k g) n = ι.symm (coef g (p * n) + e * (if p ∣ n then coef g (n / p) else 0)) := by
+private theorem fT_Phi
+    {l : ℕ} [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ)
+    (N : ℕ) (k : ℤ) (g : CuspForm (Gamma1 N) k)
+    {p : ℕ} (hp : p.Prime)
+    (e : ℂ)
+    {n : ℕ} (hn : 1 ≤ n)
+    : fT p (ι.symm e) (Phi ι N k g) n
+      = ι.symm (coef g (p * n) + e * (if p ∣ n then coef g (n / p) else 0)) := by
   rw [fT_apply, Phi_apply, if_neg (Nat.mul_ne_zero hp.ne_zero (by omega))]
   split_ifs with h
   · rw [Phi_apply, if_neg (Nat.div_pos (Nat.le_of_dvd hn h) hp.pos).ne', map_add (f := _), map_mul]
@@ -159,8 +184,7 @@ private theorem fT_Phi {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (N : ℕ
 end UpperTheory.V.Sd
 
 open UpperTheory.V.Sd in
-theorem UpperTheory.V.Sd.eigLift :
-    UpperTheory.V.Sd.EigLift := by
+theorem UpperTheory.V.Sd.eigLift : UpperTheory.V.Sd.EigLift := by
   unfold EigLift
   intro l _ ι N k _ hk χ f hchar hint hone a hA
   haveI : FiniteDimensional ℂ (CuspForm (Gamma1 N) (k : ℤ)) := (finDim N k).1
@@ -179,8 +203,9 @@ theorem UpperTheory.V.Sd.eigLift :
     · rw [fT_Phi ι N k g p.2 _ hn, Phi_apply, if_neg hn.ne', hg' n hn]
   let T : Nat.Primes → Module.End (Qbar l) V := fun p =>
     (fT p.1 (ι.symm (χ p.1 * (p.1 : ℂ) ^ (k - 1)))).restrict (hstab p)
-  have hT : ∀ p (v : V), ((T p v : V) : ℕ → Qbar l) =
-      fT p.1 (ι.symm (χ p.1 * (p.1 : ℂ) ^ (k - 1))) v := fun p v => rfl
+  have hT
+      : ∀ p (v : V), ((T p v : V) : ℕ → Qbar l) = fT p.1 (ι.symm (χ p.1 * (p.1 : ℂ) ^ (k - 1))) v :=
+    fun p v => rfl
   have hep : ∀ p : Nat.Primes, ‖ι.symm (χ p.1 * (p.1 : ℂ) ^ (k - 1))‖ ≤ 1 := by
     intro p
     have h1 : ‖ι.symm (χ (p.1 : ZMod N))‖ ≤ 1 := norm_chi ι χ _
@@ -196,7 +221,8 @@ theorem UpperTheory.V.Sd.eigLift :
     · refine LinearMap.ext fun v => Subtype.ext ?_
       show fT i.1 _ (fT j.1 _ (v : ℕ → Qbar l)) = fT j.1 _ (fT i.1 _ (v : ℕ → Qbar l))
       exact fT_comm i.2 j.2 (fun h => hij (Subtype.ext h)) _ _ _
-  have hbd : ∀ j (v : V), (∀ n, ‖(v : ℕ → Qbar l) n‖ ≤ 1) → ∀ n, ‖((T j v : V) : ℕ → Qbar l) n‖ ≤ 1 := by
+  have hbd
+      : ∀ j (v : V), (∀ n, ‖(v : ℕ → Qbar l) n‖ ≤ 1) → ∀ n, ‖((T j v : V) : ℕ → Qbar l) n‖ ≤ 1 := by
     intro j v hv n
     rw [hT, fT_apply]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (hv _) ?_)
@@ -205,7 +231,8 @@ theorem UpperTheory.V.Sd.eigLift :
     split_ifs
     · exact hv _
     · simp
-  have hbd' : ∀ j (v : V), (∀ n, ‖(v : ℕ → Qbar l) n‖ < 1) → ∀ n, ‖((T j v : V) : ℕ → Qbar l) n‖ < 1 := by
+  have hbd'
+      : ∀ j (v : V), (∀ n, ‖(v : ℕ → Qbar l) n‖ < 1) → ∀ n, ‖((T j v : V) : ℕ → Qbar l) n‖ < 1 := by
     intro j v hv n
     rw [hT, fT_apply]
     refine lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt (hv _) ?_)
@@ -222,19 +249,27 @@ theorem UpperTheory.V.Sd.eigLift :
     split_ifs
     · simp
     · exact hint n
-  have hf2 : ∃ n, ‖((F : V) : ℕ → Qbar l) n‖ = 1 := ⟨1, by rw [hF, Phi_apply, if_neg one_ne_zero]; exact hone⟩
-  have hcong : ∀ (j : Nat.Primes) n, ‖((T j F : V) : ℕ → Qbar l) n - ι.symm (a j.1) * ((F : V) : ℕ → Qbar l) n‖ < 1 := by
+  have hf2 : ∃ n, ‖((F : V) : ℕ → Qbar l) n‖ = 1 :=
+    ⟨1, by rw [hF, Phi_apply, if_neg one_ne_zero]; exact hone⟩
+  have hcong
+      : ∀ (j : Nat.Primes) n,
+        ‖((T j F : V) : ℕ → Qbar l) n - ι.symm (a j.1) * ((F : V) : ℕ → Qbar l) n‖ < 1 := by
     intro j n
     rw [hT, hF]
     rcases Nat.eq_zero_or_pos n with rfl | hn
     · simp [Phi_apply, fT_apply]
     · rw [fT_Phi ι N k f j.2 _ hn, Phi_apply, if_neg hn.ne', ← map_mul, ← map_sub]
       exact (hA j.1 j.2).2 n hn
-  obtain ⟨h, b, hne, -, heig, hclose⟩ := delSerre l ℕ Nat.Primes V hV T hcomm hbd hbd' F
-    (fun p => ι.symm (a p.1)) hf1 hf2 (fun p => (hA p.1 p.2).1) hcong
+  obtain ⟨h, b, hne, -, heig, hclose⟩ :=
+    delSerre l ℕ Nat.Primes V hV T hcomm hbd hbd' F
+      (fun p => ι.symm (a p.1))
+      hf1 hf2
+      (fun p => (hA p.1 p.2).1)
+      hcong
   obtain ⟨g0, hg0, hPg⟩ := Submodule.mem_map.mp h.2
-  have heig' : ∀ p : Nat.Primes,
-      fT p.1 (ι.symm (χ p.1 * (p.1 : ℂ) ^ (k - 1))) (Phi ι N k g0) = b p • Phi ι N k g0 := by
+  have heig'
+      : ∀ p : Nat.Primes,
+        fT p.1 (ι.symm (χ p.1 * (p.1 : ℂ) ^ (k - 1))) (Phi ι N k g0) = b p • Phi ι N k g0 := by
     intro p
     have := congr_arg Subtype.val (heig p)
     rw [hT, Submodule.coe_smul] at this
@@ -244,17 +279,22 @@ theorem UpperTheory.V.Sd.eigLift :
     intro hz
     apply hne
     have hzero : Phi ι N k g0 = 0 :=
-      eq_zero_of_eig (fun p => ι.symm (χ p.1 * (p.1 : ℂ) ^ (k - 1))) b _
-        (by rw [Phi_apply, if_pos rfl])
-        (by rw [Phi_apply, if_neg one_ne_zero, hz, map_zero]) heig'
+      eq_zero_of_eig
+        (fun p => ι.symm (χ p.1 * (p.1 : ℂ) ^ (k - 1)))
+        b _ (by rw [Phi_apply, if_pos rfl]) (by rw [Phi_apply, if_neg one_ne_zero, hz, map_zero])
+        heig'
     exact Subtype.ext (by rw [Submodule.coe_zero, ← hPg, hzero])
-  have hrel : ∀ p (hp : p.Prime) n, 1 ≤ n →
-      coef g0 (p * n) + χ p * (p : ℂ) ^ (k - 1) * (if p ∣ n then coef g0 (n / p) else 0)
-        = ι (b ⟨p, hp⟩) * coef g0 n := by
+  have hrel
+      : ∀ p (hp : p.Prime) n,
+        1 ≤ n
+          → coef g0 (p * n) + χ p * (p : ℂ) ^ (k - 1) * (if p ∣ n then coef g0 (n / p) else 0)
+            = ι (b ⟨p, hp⟩) * coef g0 n := by
     intro p hp n hn
     have := congr_fun (heig' ⟨p, hp⟩) n
     dsimp only at this
-    rw [fT_Phi ι N k g0 hp _ hn, Pi.smul_apply, Phi_apply, if_neg (show n ≠ 0 by omega), smul_eq_mul] at this
+    rw [fT_Phi ι N k g0 hp _ hn, Pi.smul_apply, Phi_apply, if_neg (show n ≠ 0 by omega),
+        smul_eq_mul]
+      at this
     apply ι.symm.injective
     rw [this, map_mul, RingEquiv.symm_apply_apply]
   set c := coef g0 1 with hcdef

@@ -8,6 +8,7 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.AbelianDeR
 
 namespace MainStatements.Hodge.Free
 
-theorem abelianDeRhamPage : FubiniStudyChowHeightFormula₂.Hdr.AbelianDeRhamPage := page_of_hodge abelianHodgeDeRham
+theorem abelianDeRhamPage : FubiniStudyChowHeightFormula₂.Hdr.AbelianDeRhamPage :=
+  page_of_hodge abelianHodgeDeRham
 
 end MainStatements.Hodge.Free

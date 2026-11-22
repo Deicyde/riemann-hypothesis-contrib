@@ -20,17 +20,18 @@ private lemma exists_integer_eq_star {K : Type} [Field K] [NumberField K] [StarR
   rw [starRingEnd_apply] at hint
   exact ⟨⟨star (a : K), (mem_integralClosure_iff ℤ K).2 hint⟩, rfl⟩
 
-
 open NumberField Module Matrix in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.exists_integer_add_star_eq_one_of_isCMUnram :
-    ∀ (K : Type) [Field K] [NumberField K] [StarRing K], _root_.Formalism.HermitianLatticesTheory.IsCMUnram K →
-      ∃ t : 𝓞 K, (t : K) + star (t : K) = 1 := by
+theorem _root_.GlobalTheory.exists_integer_add_star_eq_one_of_isCMUnram
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K],
+      _root_.Formalism.HermitianLatticesTheory.IsCMUnram K
+        → ∃ t : 𝓞 K, (t : K) + star (t : K) = 1 := by
   intro K _ _ _ h
   unfold _root_.Formalism.HermitianLatticesTheory.IsCMUnram at h
   obtain ⟨-, -, hP⟩ := h
-  let S : Set (𝓞 K) := {x | ∃ θ τ : 𝓞 K,
-    algebraMap (𝓞 K) K τ = star (algebraMap (𝓞 K) K θ) ∧ x = θ - τ}
+  let S : Set (𝓞 K) :=
+    {x | ∃ θ τ : 𝓞 K,
+      algebraMap (𝓞 K) K τ = star (algebraMap (𝓞 K) K θ) ∧ x = θ - τ}
   let I : Ideal (𝓞 K) := Ideal.span S
   have hI : I = ⊤ := by
     by_contra hne
@@ -48,7 +49,8 @@ theorem _root_.GlobalTheory.exists_integer_add_star_eq_one_of_isCMUnram :
       push_cast
       rw [star_sub, star_mul', star_sub, h2, ← hτ]
       ring
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨s, hs⟩ := hx
       obtain ⟨u, hu⟩ := hy

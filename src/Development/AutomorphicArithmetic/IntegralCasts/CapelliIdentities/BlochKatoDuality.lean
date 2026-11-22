@@ -8,9 +8,10 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open MeasureTheory Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 in
-theorem UpperTheory.Reformulated.B.BlochKatoDuality.haarInvFromUnique :
-    Formalism.FourierDecayAlt.B2.HaarInvFromUnique := by
+open MeasureTheory Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2 in
+theorem UpperTheory.Reformulated.B.BlochKatoDuality.haarInvFromUnique
+    : Formalism.FourierDecayAlt.B2.HaarInvFromUnique := by
   intro huniq k r U μ hU hμ
   have hm : Measurable (invM : Mt k r → Mt k r) := UpperTheory.measurable_matrix_inv _
   have hUc : IsClosed (X := Mt k r) U := hU.closed
@@ -26,7 +27,9 @@ theorem UpperTheory.Reformulated.B.BlochKatoDuality.haarInvFromUnique :
       rw [hu] at h2
       exact h2
     exact (continuousAt_matrix_inv (Matrix.of x : Mat k r) h1).continuousWithinAt
-  have hfin := UpperTheory.involution_map_compact_finite (Mt k r) μ U invM hm hUc hcont hmem hinv hμ.conc hμ.finite_compact
+  have hfin :=
+    UpperTheory.involution_map_compact_finite (Mt k r) μ U invM hm hUc hcont hmem hinv hμ.conc
+      hμ.finite_compact
   have hconc : (μ.map invM) (Uᶜ : Set (Mat k r)) = 0 := by
     have h : ∀ᵐ x ∂(μ.map invM), (x : Mt k r) ∈ U :=
       (ae_map_iff hm.aemeasurable hUc.measurableSet).2 (hae.mono hmem)

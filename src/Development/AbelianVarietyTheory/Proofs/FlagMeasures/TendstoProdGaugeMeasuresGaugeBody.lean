@@ -8,32 +8,43 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TendstoRescal
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.IwConst
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.IwConst
 
 namespace GlobalTheory.IwConstBox
 
-theorem local_vag {n d : ℕ} {ε : Fin n → Bool} {S : Set (Formalism.REAL.UJ ε)} {E : Fin d → Matrix (Fin n) (Fin n) ℂ}
-    (h : IsCut ε S E) (μ : Measure (Formalism.REAL.UJ ε)) (hμ : IsGaugeSub S d μ) :
-    SigmaFinite μ ∧ ∃ t₀ : ℝ, 0 < t₀ ∧ ∀ t : ℝ, 0 < t → t ≤ t₀ →
-      IsFiniteMeasure (μ.restrict {g | nrm (uMat g - 1) < t}) ∧
-      Vag (μ.restrict {g | nrm (uMat g - 1) < t}) (fun g => crd E (uMat g - 1)) volume d := by
+theorem local_vag
+    {n d : ℕ} {ε : Fin n → Bool} {S : Set (Formalism.REAL.UJ ε)}
+    {E : Fin d → Matrix (Fin n) (Fin n) ℂ}
+    (h : IsCut ε S E) (μ : Measure (Formalism.REAL.UJ ε)) (hμ : IsGaugeSub S d μ)
+    : SigmaFinite μ
+      ∧ ∃ t₀ : ℝ,
+        0 < t₀
+          ∧ ∀ t : ℝ,
+            0 < t → t ≤ t₀
+              → IsFiniteMeasure (μ.restrict {g | nrm (uMat g - 1) < t})
+                ∧ Vag (μ.restrict {g | nrm (uMat g - 1) < t})
+                  (fun g => crd E (uMat g - 1))
+                  volume d := by
   obtain ⟨A, hA, hON, hspan, rfl⟩ := h
-  obtain ⟨hσ, hcpt, -, r₀, hr₀, hlim⟩ := GlobalTheory.T.gaugeMeasure_matrixAlgebraSubgroup_local_asymptotics n ε A d E hA hON hspan μ hμ
+  obtain ⟨hσ, hcpt, -, r₀, hr₀, hlim⟩ :=
+    GlobalTheory.T.gaugeMeasure_matrixAlgebraSubgroup_local_asymptotics n ε A d E hA hON hspan μ hμ
   refine ⟨hσ, Real.sqrt r₀, Real.sqrt_pos.2 hr₀, fun t ht htt => ⟨?_, ?_⟩⟩
-  ·
-    refine isFiniteMeasure_restrict.2 (ne_of_lt ?_)
+  · refine isFiniteMeasure_restrict.2 (ne_of_lt ?_)
     refine lt_of_le_of_lt (measure_mono ?_) (isCompact_hsBall ε t).measure_lt_top
     intro g hg
     exact (show nrm (uMat g - 1) < t from hg).le
-  ·
-    intro φ hφ hsupp
-    have hset : {g : Formalism.REAL.UJ ε | nrm (uMat g - 1) < t} =
-        {g | Formalism.REAL.hs (uMat g - 1) < t ^ 2} := by
+  · intro φ hφ hsupp
+    have hset
+        : {g : Formalism.REAL.UJ ε | nrm (uMat g - 1) < t}
+          = {g | Formalism.REAL.hs (uMat g - 1) < t ^ 2} := by
       ext g
       exact Real.sqrt_lt' ht
     have h1 : 0 < t ^ 2 := by positivity
     have h2 : t ^ 2 ≤ r₀ := by
-      calc t ^ 2 ≤ Real.sqrt r₀ ^ 2 := pow_le_pow_left₀ ht.le htt 2
+      calc
+        t ^ 2
+          ≤ Real.sqrt r₀ ^ 2 := pow_le_pow_left₀ ht.le htt 2
         _ = r₀ := Real.sq_sqrt hr₀.le
     rw [hset]
     refine (hlim (t ^ 2) h1 h2 φ hφ hsupp).congr (fun r => ?_)

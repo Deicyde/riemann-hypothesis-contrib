@@ -7,11 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia.Abs
 
-private theorem span_of_ann {O : Type} [CommRing O] [IsDomain O] {σ : Type} [Fintype σ] (p : σ → Prop)
-    {κ : Type} [Fintype κ] (v : κ → σ → O) (hv : ∀ k i, ¬ p i → v k i = 0)
+private theorem span_of_ann
+    {O : Type} [CommRing O] [IsDomain O]
+    {σ : Type} [Fintype σ]
+    (p : σ → Prop)
+    {κ : Type} [Fintype κ]
+    (v : κ → σ → O) (hv : ∀ k i, ¬ p i → v k i = 0)
     (h : ∀ d : σ → O, (∀ i, ¬ p i → d i = 0) → (∀ k, ∑ i, v k i * d i = 0) → d = 0)
-    (w : σ → O) (hw : ∀ i, ¬ p i → w i = 0) :
-    ∃ c : O, c ≠ 0 ∧ ∃ a : κ → O, ∀ i, c * w i = ∑ k, a k * v k i := by
+    (w : σ → O) (hw : ∀ i, ¬ p i → w i = 0)
+    : ∃ c : O, c ≠ 0 ∧ ∃ a : κ → O, ∀ i, c * w i = ∑ k, a k * v k i := by
   classical
   let ι : O →+* FractionRing O := algebraMap O (FractionRing O)
   have hinj : Function.Injective ι := IsFractionRing.injective O (FractionRing O)
@@ -39,16 +43,17 @@ private theorem span_of_ann {O : Type} [CommRing O] [IsDomain O] {σ : Type} [Fi
         rw [LinearMap.pi_apply_eq_sum_univ] at hvk
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_zero, map_sum]
-        calc ∑ i, ι (v k i * d i) = ∑ i, (b : O) • (ι (v k i) * e i) := by
-              refine Finset.sum_congr rfl fun i _ => ?_
-              rw [map_mul, hd i, mul_smul_comm]
+        calc
+          ∑ i, ι (v k i * d i) = ∑ i, (b : O) • (ι (v k i) * e i) := by
+            refine Finset.sum_congr rfl fun i _ => ?_
+            rw [map_mul, hd i, mul_smul_comm]
           _ = (b : O) • ∑ i, ι (v k i) • f (fun j => if i = j then 1 else 0) := by
-              rw [← Finset.smul_sum]
-              congr 1
-              refine Finset.sum_congr rfl fun i _ => ?_
-              by_cases hi : p i
-              · simp [e, hi, smul_eq_mul]
-              · simp [e, hi, hv k i hi]
+            rw [← Finset.smul_sum]
+            congr 1
+            refine Finset.sum_congr rfl fun i _ => ?_
+            by_cases hi : p i
+            · simp [e, hi, smul_eq_mul]
+            · simp [e, hi, hv k i hi]
           _ = 0 := by rw [hvk, smul_zero]
     have he : ∀ i, e i = 0 := by
       intro i
@@ -81,19 +86,22 @@ private theorem span_of_ann {O : Type} [CommRing O] [IsDomain O] {σ : Type} [Fi
   rw [map_mul, ha k, Algebra.smul_def]
   ring
 
-private theorem weight_single_one {σ : Type} (wt : σ → ℤ) (i : σ) :
-    Finsupp.weight wt (Finsupp.single i 1) = wt i := by
+private theorem weight_single_one {σ : Type} (wt : σ → ℤ) (i : σ)
+    : Finsupp.weight wt (Finsupp.single i 1) = wt i := by
   rw [Finsupp.weight_apply, Finsupp.sum_single_index] <;> simp
 
-theorem UpperTheory.spansCot_of_linear_terms_nondegenerate :
-    ∀ (O : Type) [CommRing O] [IsDomain O] (σ : Type) [Fintype σ] (wt : σ → ℤ) (j : ℤ) (κ : Type) [Finite κ] (F : κ → FA O wt),
-        (∀ k, F k ∈ Fgr O wt j) → (∀ k, x0 O wt (F k) = 0) →
-        (∀ d : σ → O, (∀ i, wt i ≠ j → d i = 0) → (∀ k, ∑ i, coeff (Finsupp.single i 1) (ser (F k)) * d i = 0) → d = 0) →
-        SpansCot (x0 O wt) (Fgr O wt) j F := by
+theorem UpperTheory.spansCot_of_linear_terms_nondegenerate
+    : ∀ (O : Type) [CommRing O] [IsDomain O] (σ : Type) [Fintype σ] (wt : σ → ℤ) (j : ℤ) (κ : Type)
+        [Finite κ] (F : κ → FA O wt),
+      (∀ k, F k ∈ Fgr O wt j) → (∀ k, x0 O wt (F k) = 0)
+        → (∀ d : σ → O,
+          (∀ i, wt i ≠ j → d i = 0) → (∀ k, ∑ i, coeff (Finsupp.single i 1) (ser (F k)) * d i = 0)
+            → d = 0)
+        → SpansCot (x0 O wt) (Fgr O wt) j F := by
   intro O _ _ σ _ wt j κ _ F hF hx hd
   classical
   haveI := Fintype.ofFinite κ
-  have hco : ∀ f ∈ Fgr O wt j, ∀ i, ¬ (wt i = j) → coeff (Finsupp.single i 1) (ser f) = 0 := by
+  have hco : ∀ f ∈ Fgr O wt j, ∀ i, ¬(wt i = j) → coeff (Finsupp.single i 1) (ser f) = 0 := by
     intro f hf i hi
     rw [mem_Fgr] at hf
     exact hf (Finsupp.single i 1) (by rw [weight_single_one]; exact hi)
@@ -102,19 +110,23 @@ theorem UpperTheory.spansCot_of_linear_terms_nondegenerate :
   unfold cotLat at hq
   obtain ⟨g, ⟨hgj, hg0⟩, rfl⟩ := Submodule.mem_map.mp hq
   have hg0' : x0 O wt g = 0 := hg0
-  obtain ⟨c, hc, a, ha⟩ := span_of_ann (fun i => wt i = j)
-    (fun k i => coeff (Finsupp.single i 1) (ser (F k))) (fun k i hi => hco _ (hF k) i hi) hd
-    (fun i => coeff (Finsupp.single i 1) (ser g)) (fun i hi => hco _ hgj i hi)
+  obtain ⟨c, hc, a, ha⟩ :=
+    span_of_ann
+      (fun i => wt i = j)
+      (fun k i => coeff (Finsupp.single i 1) (ser (F k)))
+      (fun k i hi => hco _ (hF k) i hi)
+      hd
+      (fun i => coeff (Finsupp.single i 1) (ser g))
+      (fun i hi => hco _ hgj i hi)
   refine ⟨c, hc, ?_⟩
   have hsat : c • g - ∑ k, a k • F k ∈ satSq (x0 O wt) := by
     rw [mem_satSq_iff_constantCoeff_and_linearCoeff_eq_zero]
     constructor
     · rw [← weightedSeriesOrigin_apply]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sub, map_sum, map_smul, hg0', hx]
+      simp [map_sub, map_sum, map_smul, hg0', hx]
     · intro i
-      have hser : ser (c • g - ∑ k, a k • F k) = c • ser g - ∑ k, a k • ser (F k) := by
-        simp [ser]
+      have hser : ser (c • g - ∑ k, a k • F k) = c • ser g - ∑ k, a k • ser (F k) := by simp [ser]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [hser, map_sub, map_sum]
       simp only [map_smul, smul_eq_mul]

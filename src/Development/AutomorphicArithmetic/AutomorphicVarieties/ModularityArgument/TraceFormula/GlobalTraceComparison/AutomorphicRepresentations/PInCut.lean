@@ -10,22 +10,28 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.PiSee
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi DiscreteGroups.T1.G
 
-open NumberField PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E GlobalTheory.CuspRep GlobalTheory.UnitaryBC in
-private theorem deg_finrank_zero {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (x : GA E n)
-    (W : Submodule E (Fin n → E)) (hW : Module.finrank E W = 0) : deg x W = 0 := by
+open NumberField PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E GlobalTheory.CuspRep
+  GlobalTheory.UnitaryBC in
+private theorem deg_finrank_zero
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {n : ℕ} (x : GA E n) (W : Submodule E (Fin n → E)) (hW : Module.finrank E W = 0)
+    : deg x W = 0 := by
   have key : ∀ (k : ℕ) (M : Matrix (Fin n) (Fin k) E), k = 0 → degM x M = 0 := by
     rintro k M rfl
     exact degM_zero x M
   exact key _ _ hW
 
-open NumberField PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E GlobalTheory.CuspRep GlobalTheory.UnitaryBC in
-private theorem logSize_inv' {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (h : GA E n) :
-    logSize (h⁻¹ : GA E n) = logSize h := by
+open NumberField PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E GlobalTheory.CuspRep
+  GlobalTheory.UnitaryBC in
+private theorem logSize_inv' {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (h : GA E n)
+    : logSize (h⁻¹ : GA E n) = logSize h := by
   simp only [logSize, inv_inv]
   exact add_comm _ _
 
-open NumberField PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E GlobalTheory.CuspRep GlobalTheory.UnitaryBC in
-private theorem tau_le_prof {n k : ℕ} {τ : ℝ} (hτ : 0 ≤ τ) (h1 : 1 ≤ k) (hk : k ≤ n) : τ ≤ prof n τ k := by
+open NumberField PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E GlobalTheory.CuspRep
+  GlobalTheory.UnitaryBC in
+private theorem tau_le_prof {n k : ℕ} {τ : ℝ} (hτ : 0 ≤ τ) (h1 : 1 ≤ k) (hk : k ≤ n)
+    : τ ≤ prof n τ k := by
   have a : (1 : ℝ) ≤ k := by exact_mod_cast h1
   have b : (k : ℝ) ≤ n := by exact_mod_cast hk
   have c : (1 : ℝ) ≤ 2 * n + 1 - k := by linarith
@@ -34,9 +40,9 @@ private theorem tau_le_prof {n k : ℕ} {τ : ℝ} (hτ : 0 ≤ τ) (h1 : 1 ≤ 
   simp only [prof]
   nlinarith
 
-open NumberField PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E GlobalTheory.CuspRep GlobalTheory.UnitaryBC in
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.inCut_pf :
-    InCut := by
+open NumberField PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E GlobalTheory.CuspRep
+  GlobalTheory.UnitaryBC in
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.inCut_pf : InCut := by
   intro E _ _ _ n
   obtain ⟨C, hC0, hC⟩ := E1.degRight E n
   obtain ⟨B, hB⟩ := (D1.degBdd E n).1 (1 : GA E n)
@@ -49,8 +55,10 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.inCut_pf :
     have := abs_nonneg B
     have := abs_nonneg A
     linarith
-  have hexp : (|B| + |A| + 2 * C + 1) * (1 + redSize g) =
-      (|B| + |A| + 2 * C + 1) + (|B| + |A| + 2 * C + 1) * redSize g := by ring
+  have hexp
+      : (|B| + |A| + 2 * C + 1) * (1 + redSize g)
+        = (|B| + |A| + 2 * C + 1) + (|B| + |A| + 2 * C + 1) * redSize g := by
+    ring
   have hBa := le_abs_self B
   have hAa := neg_abs_le A
   have hBn := abs_nonneg B

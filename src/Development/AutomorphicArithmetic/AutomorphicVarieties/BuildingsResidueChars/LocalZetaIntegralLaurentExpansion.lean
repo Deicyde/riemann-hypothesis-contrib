@@ -6,14 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open MeasureTheory Polynomial GroundTheory.Automorphic GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Parabolic
+open MeasureTheory Polynomial GroundTheory.Automorphic GroundTheory.Automorphic.GLnLocal
+  GroundTheory.Automorphic.Parabolic
 open GroundTheory.Automorphic.GodementJacquet
 open scoped NNReal Classical ValuativeRel
 
 attribute [-instance] Formalism.DoubleCosetMeasures.instMeasGL
 
-theorem UpperTheory.local_zeta_integral_laurent_expansion :
-    UpperTheory.V.Z.Gam.LdLaurent := by
+theorem UpperTheory.local_zeta_integral_laurent_expansion : UpperTheory.V.Z.Gam.LdLaurent := by
   intro F _ _ _ _ m _ _ _ μ _ α c hc hzero Φ hΦ
   obtain ⟨A, hA⟩ := hΦ.exists_ordDet_ge
   obtain ⟨K, hK, hKc⟩ := hc.exists_compact_tile
@@ -34,7 +34,8 @@ theorem UpperTheory.local_zeta_integral_laurent_expansion :
   have hsplit := integral_iUnion hmeas hdisj hint.integrableOn
   rw [huniv, setIntegral_univ] at hsplit
   rw [hsplit]
-  have hshell : ∀ k, ∫ g in sh k, Φ g * detPow g s * c g ∂μ = (∫ g in sh k, Φ g * c g ∂μ) * qs F s ^ k := by
+  have hshell
+      : ∀ k, ∫ g in sh k, Φ g * detPow g s * c g ∂μ = (∫ g in sh k, Φ g * c g ∂μ) * qs F s ^ k := by
     intro k
     rw [← integral_mul_const]
     refine setIntegral_congr_fun (hmeas k) fun g hg => ?_
@@ -61,7 +62,8 @@ theorem UpperTheory.local_zeta_integral_laurent_expansion :
         by_cases hcg : c g = 0
         · simp [hcg]
         · congr 1
-          have hgh : centralUnif F m ^ (k / (m : ℤ)) * (centralUnif F m ^ (-(k / (m : ℤ))) * g) = g := by
+          have hgh
+              : centralUnif F m ^ (k / (m : ℤ)) * (centralUnif F m ^ (-(k / (m : ℤ))) * g) = g := by
             rw [← mul_assoc, ← zpow_add, add_neg_cancel, zpow_zero, one_mul]
           have hordh : ordDet (centralUnif F m ^ (-(k / (m : ℤ))) * g) = k % m := by
             rw [ordDet_centralUnif_zpow_mul, hg', Int.emod_def]

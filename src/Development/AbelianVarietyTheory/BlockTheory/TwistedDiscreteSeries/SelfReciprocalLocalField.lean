@@ -15,8 +15,7 @@ namespace GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField
 variable (E : Type) [Field E] [NumberField E] [IsCMField E]
 
 def sharp (r : ℕ) (P : E[X]) : E[X] :=
-  C (IsCMField.complexConj E (P.coeff 0))⁻¹ *
-    reflect r (P.map (IsCMField.complexConj E : E →+* E))
+  C (IsCMField.complexConj E (P.coeff 0))⁻¹ * reflect r (P.map (IsCMField.complexConj E : E →+* E))
 
 def IsSelfRecip (r : ℕ) (P : E[X]) : Prop :=
   P.Monic ∧ Irreducible P ∧ P.natDegree = r ∧ P.coeff 0 ≠ 0 ∧ P = sharp E r P
@@ -44,8 +43,7 @@ instance : Algebra (maximalRealSubfield E) (Fld P) where
 instance : IsScalarTower (maximalRealSubfield E) E (Fld P) :=
   IsScalarTower.of_algebraMap_eq fun _ => rfl
 
-instance : FiniteDimensional E (Fld P) :=
-  (AdjoinRoot.powerBasis (f := P.1) P.2.1.ne_zero).finite
+instance : FiniteDimensional E (Fld P) := (AdjoinRoot.powerBasis (f := P.1) P.2.1.ne_zero).finite
 
 theorem finrank_fld : Module.finrank E (Fld P) = r :=
   (AdjoinRoot.powerBasis (f := P.1) P.2.1.ne_zero).finrank.trans P.2.2.2.1
@@ -58,14 +56,16 @@ theorem root_ne_zero : AdjoinRoot.root P.1 ≠ 0 := by
   rw [h, eval₂_at_zero] at h1
   exact P.2.2.2.2.1 ((map_eq_zero _).1 h1)
 
-theorem eval₂_conj_inv_root :
-    P.1.eval₂ ((AdjoinRoot.of P.1).comp (IsCMField.complexConj E : E →+* E))
-      (AdjoinRoot.root P.1)⁻¹ = 0 := by
+theorem eval₂_conj_inv_root
+    : P.1.eval₂ ((AdjoinRoot.of P.1).comp (IsCMField.complexConj E : E →+* E))
+        (AdjoinRoot.root P.1)⁻¹
+      = 0 := by
   obtain ⟨-, -, hdeg, h0, hs⟩ := P.2
   have h1 := AdjoinRoot.eval₂_root P.1
   letI : Invertible (AdjoinRoot.root P.1)⁻¹ := invertibleOfNonzero (inv_ne_zero (root_ne_zero P))
-  have h2 := eval₂_reflect_mul_pow (AdjoinRoot.of P.1) (AdjoinRoot.root P.1)⁻¹ r
-    (P.1.map (IsCMField.complexConj E : E →+* E)) (natDegree_map_le.trans hdeg.le)
+  have h2 :=
+    eval₂_reflect_mul_pow (AdjoinRoot.of P.1) (AdjoinRoot.root P.1)⁻¹ r
+      (P.1.map (IsCMField.complexConj E : E →+* E)) (natDegree_map_le.trans hdeg.le)
   rw [invOf_eq_inv, inv_inv, eval₂_map] at h2
   have h3 : eval₂ (AdjoinRoot.of P.1) (AdjoinRoot.root P.1) (sharp E r P.1) = 0 := by
     rw [← hs]; exact h1
@@ -75,15 +75,16 @@ theorem eval₂_conj_inv_root :
   · rw [← h2, h3, zero_mul]
 
 def invol : Fld P →ₐ[maximalRealSubfield E] Fld P where
-  toRingHom := AdjoinRoot.lift ((AdjoinRoot.of P.1).comp (IsCMField.complexConj E : E →+* E))
-    (AdjoinRoot.root P.1)⁻¹ (eval₂_conj_inv_root P)
+  toRingHom :=
+    AdjoinRoot.lift ((AdjoinRoot.of P.1).comp (IsCMField.complexConj E : E →+* E))
+      (AdjoinRoot.root P.1)⁻¹ (eval₂_conj_inv_root P)
   commutes' s := by
-    change AdjoinRoot.lift _ _ (eval₂_conj_inv_root P)
-      (AdjoinRoot.of P.1 (algebraMap _ E s)) = AdjoinRoot.of P.1 (algebraMap _ E s)
+    change AdjoinRoot.lift _ _ (eval₂_conj_inv_root P) (AdjoinRoot.of P.1 (algebraMap _ E s))
+      = AdjoinRoot.of P.1 (algebraMap _ E s)
     rw [AdjoinRoot.lift_of, RingHom.comp_apply, RingHom.coe_coe, AlgEquiv.commutes]
 
-theorem invol_algebraMap (e : E) :
-    invol P (algebraMap E (Fld P) e) = algebraMap E (Fld P) (IsCMField.complexConj E e) :=
+theorem invol_algebraMap (e : E)
+    : invol P (algebraMap E (Fld P) e) = algebraMap E (Fld P) (IsCMField.complexConj E e) :=
   AdjoinRoot.lift_of (eval₂_conj_inv_root P)
 
 theorem invol_alpha : invol P (alpha P) = (alpha P)⁻¹ :=
@@ -98,8 +99,7 @@ theorem invol_invol (y : Fld P) : invol P (invol P y) = y := by
       simp [invol_alpha]
   exact DFunLike.congr_fun this y
 
-def plus : Subalgebra (maximalRealSubfield E) (Fld P) :=
-  AlgHom.equalizer (invol P) (AlgHom.id _ _)
+def plus : Subalgebra (maximalRealSubfield E) (Fld P) := AlgHom.equalizer (invol P) (AlgHom.id _ _)
 
 section Local
 
@@ -109,7 +109,8 @@ def inclPlus : k ⊗[maximalRealSubfield E] plus P →ₐ[k] k ⊗[maximalRealSu
   Algebra.TensorProduct.map (AlgHom.id k k) (plus P).val
 
 def inclBase : k ⊗[maximalRealSubfield E] E →ₐ[k] k ⊗[maximalRealSubfield E] Fld P :=
-  Algebra.TensorProduct.map (AlgHom.id k k) (IsScalarTower.toAlgHom (maximalRealSubfield E) E (Fld P))
+  Algebra.TensorProduct.map (AlgHom.id k k)
+    (IsScalarTower.toAlgHom (maximalRealSubfield E) E (Fld P))
 
 def involBase : k ⊗[maximalRealSubfield E] Fld P →ₐ[k] k ⊗[maximalRealSubfield E] Fld P :=
   Algebra.TensorProduct.map (AlgHom.id k k) (invol P)
@@ -117,8 +118,8 @@ def involBase : k ⊗[maximalRealSubfield E] Fld P →ₐ[k] k ⊗[maximalRealSu
 def traceBase : k ⊗[maximalRealSubfield E] Fld P →ₗ[k] k ⊗[maximalRealSubfield E] E :=
   ((Algebra.trace E (Fld P)).restrictScalars (maximalRealSubfield E)).baseChange k
 
-def traceForm (x : k ⊗[maximalRealSubfield E] plus P) (y y' : k ⊗[maximalRealSubfield E] Fld P) :
-    k ⊗[maximalRealSubfield E] E :=
+def traceForm (x : k ⊗[maximalRealSubfield E] plus P) (y y' : k ⊗[maximalRealSubfield E] Fld P)
+    : k ⊗[maximalRealSubfield E] E :=
   traceBase P k (inclPlus P k x * y * involBase P k y')
 
 def normHom : (k ⊗[maximalRealSubfield E] Fld P)ˣ →* (k ⊗[maximalRealSubfield E] Fld P)ˣ :=
@@ -129,18 +130,19 @@ def norms : Subgroup (k ⊗[maximalRealSubfield E] plus P)ˣ :=
 
 abbrev NormClass : Type := (k ⊗[maximalRealSubfield E] plus P)ˣ ⧸ norms P k
 
-def gramForm (G : Matrix (Fin r) (Fin r) E) (u u' : Fin r → k ⊗[maximalRealSubfield E] E) :
-    k ⊗[maximalRealSubfield E] E :=
+def gramForm (G : Matrix (Fin r) (Fin r) E) (u u' : Fin r → k ⊗[maximalRealSubfield E] E)
+    : k ⊗[maximalRealSubfield E] E :=
   ∑ i, ∑ j, u i * ((1 : k) ⊗ₜ[maximalRealSubfield E] G i j) * GlobalTheory.HermLocal.ccBase E k (u' j)
 
 def Isometric (G : Matrix (Fin r) (Fin r) E) (x : k ⊗[maximalRealSubfield E] plus P) : Prop :=
   ∃ φ : (k ⊗[maximalRealSubfield E] Fld P) ≃+ (Fin r → k ⊗[maximalRealSubfield E] E),
-    (∀ (e : k ⊗[maximalRealSubfield E] E) y, φ (inclBase P k e * y) = e • φ y) ∧
-    ∀ y y', gramForm k G (φ y) (φ y') = traceForm P k x y y'
+    (∀ (e : k ⊗[maximalRealSubfield E] E) y, φ (inclBase P k e * y) = e • φ y)
+      ∧ ∀ y y', gramForm k G (φ y) (φ y') = traceForm P k x y y'
 
-theorem Isometric.of_norm {G : Matrix (Fin r) (Fin r) E}
-    {x n : (k ⊗[maximalRealSubfield E] plus P)ˣ} (hn : n ∈ norms P k)
-    (h : Isometric P k G x) : Isometric P k G (x * n : (k ⊗[maximalRealSubfield E] plus P)ˣ) := by
+theorem Isometric.of_norm
+    {G : Matrix (Fin r) (Fin r) E} {x n : (k ⊗[maximalRealSubfield E] plus P)ˣ}
+    (hn : n ∈ norms P k) (h : Isometric P k G x)
+    : Isometric P k G (x * n : (k ⊗[maximalRealSubfield E] plus P)ˣ) := by
   obtain ⟨c, hc⟩ := hn
   have hc' : (c : k ⊗[maximalRealSubfield E] Fld P) * involBase P k c = inclPlus P k n :=
     congrArg Units.val hc
@@ -149,26 +151,32 @@ theorem Isometric.of_norm {G : Matrix (Fin r) (Fin r) E}
   · change φ (c * (inclBase P k e * y)) = e • φ (c * y)
     rw [← h1, mul_left_comm]
   · change gramForm k G (φ (c * y)) (φ (c * y')) = _
-    rw [h2, traceForm, traceForm, Units.val_mul, map_mul (inclPlus P k), map_mul (involBase P k), ← hc']
+    rw [h2, traceForm, traceForm, Units.val_mul, map_mul (inclPlus P k), map_mul (involBase P k),
+      ← hc']
     congr 1
     ring
 
 def classes (G : Matrix (Fin r) (Fin r) E) : Set (NormClass P k) :=
   {q | ∃ x : (k ⊗[maximalRealSubfield E] plus P)ˣ, (x : NormClass P k) = q ∧ Isometric P k G x}
 
-def toLocalPlus : maximalRealSubfield E ⊗[maximalRealSubfield E] plus P →ₐ[maximalRealSubfield E]
-    k ⊗[maximalRealSubfield E] plus P :=
+def toLocalPlus
+    : maximalRealSubfield E ⊗[maximalRealSubfield E] plus P →ₐ[maximalRealSubfield E]
+      k ⊗[maximalRealSubfield E] plus P :=
   Algebra.TensorProduct.map (Algebra.ofId _ k) (AlgHom.id _ _)
 
-def toLocalFld : maximalRealSubfield E ⊗[maximalRealSubfield E] Fld P →ₐ[maximalRealSubfield E]
-    k ⊗[maximalRealSubfield E] Fld P :=
+def toLocalFld
+    : maximalRealSubfield E ⊗[maximalRealSubfield E] Fld P →ₐ[maximalRealSubfield E]
+      k ⊗[maximalRealSubfield E] Fld P :=
   Algebra.TensorProduct.map (Algebra.ofId _ k) (AlgHom.id _ _)
 
-theorem norms_le : norms P (maximalRealSubfield E) ≤
-    (norms P k).comap (Units.map (toLocalPlus P k).toMonoidHom) := by
+theorem norms_le
+    : norms P (maximalRealSubfield E)
+      ≤ (norms P k).comap (Units.map (toLocalPlus P k).toMonoidHom) := by
   rintro n ⟨c, hc⟩
-  have hc' : (c : maximalRealSubfield E ⊗[maximalRealSubfield E] Fld P) * involBase P _ c =
-      inclPlus P _ n := congrArg Units.val hc
+  have hc'
+      : (c : maximalRealSubfield E ⊗[maximalRealSubfield E] Fld P) * involBase P _ c
+        = inclPlus P _ n :=
+    congrArg Units.val hc
   have e1 : ∀ y, toLocalFld P k (involBase P _ y) = involBase P k (toLocalFld P k y) := fun y => by
     induction y using TensorProduct.induction_on with
     | zero => simp
@@ -188,22 +196,26 @@ def toLocal : NormClass P (maximalRealSubfield E) →* NormClass P k :=
 
 end Local
 
-def IsLocalInteger (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)))
-    (z : v.adicCompletion (maximalRealSubfield E) ⊗[maximalRealSubfield E] plus P) : Prop :=
+def IsLocalInteger
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)))
+    (z : v.adicCompletion (maximalRealSubfield E) ⊗[maximalRealSubfield E] plus P)
+    : Prop :=
   ((algebraMap (v.adicCompletion (maximalRealSubfield E))
       (v.adicCompletion (maximalRealSubfield E) ⊗[maximalRealSubfield E] plus P)).comp
     (v.adicCompletionIntegers (maximalRealSubfield E)).subtype).IsIntegralElem z
 
-def IsUnitClass (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)))
-    (q : NormClass P (v.adicCompletion (maximalRealSubfield E))) : Prop :=
+def IsUnitClass
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)))
+    (q : NormClass P (v.adicCompletion (maximalRealSubfield E)))
+    : Prop :=
   ∃ u : (v.adicCompletion (maximalRealSubfield E) ⊗[maximalRealSubfield E] plus P)ˣ,
-    IsLocalInteger P v u ∧ IsLocalInteger P v (u⁻¹ : _ˣ) ∧
-      (u : NormClass P (v.adicCompletion (maximalRealSubfield E))) = q
+    IsLocalInteger P v u ∧ IsLocalInteger P v (u⁻¹ : _ˣ)
+      ∧ (u : NormClass P (v.adicCompletion (maximalRealSubfield E))) = q
 
 abbrev LocalFamily : Type :=
   (∀ v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)),
-      NormClass P (v.adicCompletion (maximalRealSubfield E))) ×
-    ∀ w : InfinitePlace (maximalRealSubfield E), NormClass P w.Completion
+      NormClass P (v.adicCompletion (maximalRealSubfield E)))
+    × ∀ w : InfinitePlace (maximalRealSubfield E), NormClass P w.Completion
 
 def adelicClasses (G : Matrix (Fin r) (Fin r) E) : Set (LocalFamily P) :=
   {x | (∀ v, x.1 v ∈ classes P _ G) ∧ (∀ w, x.2 w ∈ classes P _ G) ∧
@@ -214,11 +226,11 @@ def diagonal (q : NormClass P (maximalRealSubfield E)) : LocalFamily P :=
 
 def RationalEqAdelic : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
-    Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E) →
-    ∀ (r : ℕ) (G : Matrix (Fin r) (Fin r) E),
-      (∀ a b, IsCMField.complexConj E (G a b) = G b a) → G.det ≠ 0 →
-      ∀ P : SelfRecip E r,
-        Set.BijOn (diagonal P) (classes P (maximalRealSubfield E) G) (adelicClasses P G)
+    Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E)
+      → ∀ (r : ℕ) (G : Matrix (Fin r) (Fin r) E),
+        (∀ a b, IsCMField.complexConj E (G a b) = G b a) → G.det ≠ 0
+          → ∀ P : SelfRecip E r,
+            Set.BijOn (diagonal P) (classes P (maximalRealSubfield E) G) (adelicClasses P G)
 
 end GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField
 

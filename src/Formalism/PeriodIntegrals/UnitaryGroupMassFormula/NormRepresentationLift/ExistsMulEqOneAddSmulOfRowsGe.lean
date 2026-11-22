@@ -16,13 +16,18 @@ def UniUp (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) R) : Prop :=
 def rowMat (a : Fin (r + 1)) (w : Fin (r + 1) → R) : Matrix (Fin (r + 1)) (Fin (r + 1)) R :=
   fun d c => if d = a then w c else 0
 
-theorem exists_mul_eq_one_add_smul_of_rows_ge (g : R) (P : Matrix (Fin (r + 1)) (Fin (r + 1)) R → Prop)
+theorem exists_mul_eq_one_add_smul_of_rows_ge
+    (g : R) (P : Matrix (Fin (r + 1)) (Fin (r + 1)) R → Prop)
     (h1 : P 1) (hmul : ∀ M N, P M → P N → P (M * N))
-    (hrow : ∀ a : Fin (r + 1), a.val < r → ∀ t : Fin (r + 1) → R, ∃ w : Fin (r + 1) → R,
-      (∀ c, c ≤ a → w c = 0) ∧ (∀ c, a < c → ∃ q, w c = t c + g * q) ∧ P (1 + rowMat a w)) :
-    ∀ k : ℕ, k ≤ r → ∀ ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) R, UniUp ξ →
-      (∀ d c : Fin (r + 1), k ≤ d.val → ξ d c = if d = c then 1 else 0) →
-      ∃ M, P M ∧ ∃ Q, M * ξ = 1 + g • Q := by
+    (hrow : ∀ a : Fin (r + 1),
+      a.val < r
+        → ∀ t : Fin (r + 1) → R, ∃ w : Fin (r + 1) → R,
+          (∀ c, c ≤ a → w c = 0) ∧ (∀ c, a < c → ∃ q, w c = t c + g * q) ∧ P (1 + rowMat a w))
+    : ∀ k : ℕ,
+      k ≤ r
+        → ∀ ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) R,
+          UniUp ξ → (∀ d c : Fin (r + 1), k ≤ d.val → ξ d c = if d = c then 1 else 0)
+            → ∃ M, P M ∧ ∃ Q, M * ξ = 1 + g • Q := by
   intro k
   induction k with
   | zero =>
@@ -35,12 +40,12 @@ theorem exists_mul_eq_one_add_smul_of_rows_ge (g : R) (P : Matrix (Fin (r + 1)) 
     intro hk ξ hξ hid
     let a : Fin (r + 1) := ⟨k, by omega⟩
     have hak : a.val < r := by show k < r; omega
-    obtain ⟨w, hw0, hw1, hP⟩ := hrow a hak (fun c => -ξ a c)
+    obtain ⟨w, hw0, hw1, hP⟩ := hrow a hak (fun c => - ξ a c)
     choose! q hq using hw1
-    let ξ₀ : Matrix (Fin (r + 1)) (Fin (r + 1)) R :=
-      fun d c => if d = a then (if d = c then 1 else 0) else ξ d c
-    let Q₁ : Matrix (Fin (r + 1)) (Fin (r + 1)) R :=
-      fun d c => if d = a then (if a < c then q c else 0) else 0
+    let ξ₀ : Matrix (Fin (r + 1)) (Fin (r + 1)) R := fun d c =>
+      if d = a then (if d = c then 1 else 0) else ξ d c
+    let Q₁ : Matrix (Fin (r + 1)) (Fin (r + 1)) R := fun d c =>
+      if d = a then (if a < c then q c else 0) else 0
     have hsum : ∀ c, ∑ e, w e * ξ e c = w c := by
       intro c
       have he' : ∀ e, w e * ξ e c = w e * (if e = c then 1 else 0) := by
@@ -96,12 +101,15 @@ theorem exists_mul_eq_one_add_smul_of_rows_ge (g : R) (P : Matrix (Fin (r + 1)) 
     refine ⟨M * (1 + rowMat a w), hmul _ _ hM hP, Q + M * Q₁, ?_⟩
     rw [Matrix.mul_assoc, hE, Matrix.mul_add, hMQ, Matrix.mul_smul, smul_add, add_assoc]
 
-theorem row_elim (g : R) (P : Matrix (Fin (r + 1)) (Fin (r + 1)) R → Prop)
+theorem row_elim
+    (g : R) (P : Matrix (Fin (r + 1)) (Fin (r + 1)) R → Prop)
     (h1 : P 1) (hmul : ∀ M N, P M → P N → P (M * N))
-    (hrow : ∀ a : Fin (r + 1), a.val < r → ∀ t : Fin (r + 1) → R, ∃ w : Fin (r + 1) → R,
-      (∀ c, c ≤ a → w c = 0) ∧ (∀ c, a < c → ∃ q, w c = t c + g * q) ∧ P (1 + rowMat a w))
-    (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) R) (hξ : UniUp ξ) :
-    ∃ M, P M ∧ ∃ Q, M * ξ = 1 + g • Q := by
+    (hrow : ∀ a : Fin (r + 1),
+      a.val < r
+        → ∀ t : Fin (r + 1) → R, ∃ w : Fin (r + 1) → R,
+          (∀ c, c ≤ a → w c = 0) ∧ (∀ c, a < c → ∃ q, w c = t c + g * q) ∧ P (1 + rowMat a w))
+    (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) R) (hξ : UniUp ξ)
+    : ∃ M, P M ∧ ∃ Q, M * ξ = 1 + g • Q := by
   refine exists_mul_eq_one_add_smul_of_rows_ge g P h1 hmul hrow r le_rfl ξ hξ fun d c hd => ?_
   have hdl : d = Fin.last r := Fin.ext (by have := d.isLt; simp only [Fin.val_last]; omega)
   subst hdl

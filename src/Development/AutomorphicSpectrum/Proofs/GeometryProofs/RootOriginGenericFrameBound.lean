@@ -73,7 +73,10 @@ public import Development.WeilBound.CoreStatements.AdicCompleteSpans.MinorC
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Filter Topology
-open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
+  Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec
 open scoped Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -83,14 +86,19 @@ namespace GlobalTheory.CompanionTheory.Ar.Rec.FinRd.Pt
 
 section Val
 
-variable {V K : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-  [IsFractionRing V K] {N : Type} [NormedField N]
+variable
+  {V K : Type}
+  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
+  {N : Type} [NormedField N]
 
-theorem norm_eq_zpow (j : K →+* N) (hj : ∀ x : V, ‖j (algebraMap V K x)‖ ≤ 1) {π : K} (hπ : vV V π = 1)
-    {x : K} (hx : x ≠ 0) : ‖j x‖ = ‖j π‖ ^ vV V x := by
+theorem norm_eq_zpow
+    (j : K →+* N) (hj : ∀ x : V, ‖j (algebraMap V K x)‖ ≤ 1)
+    {π : K} (hπ : vV V π = 1)
+    {x : K} (hx : x ≠ 0)
+    : ‖j x‖ = ‖j π‖ ^ vV V x := by
   have hπ0 : π ≠ 0 := fun h => by simp [h, vV] at hπ
-  have hu0 : x * π ^ (-vV V x) ≠ 0 := mul_ne_zero hx (zpow_ne_zero _ hπ0)
-  have hv : vV V (x * π ^ (-vV V x)) = 0 := by
+  have hu0 : x * π ^ (- vV V x) ≠ 0 := mul_ne_zero hx (zpow_ne_zero _ hπ0)
+  have hv : vV V (x * π ^ (- vV V x)) = 0 := by
     rw [vV_mul hx (zpow_ne_zero _ hπ0), GlobalTheory.ThetaValueIdentityCompare.vV_zpow, hπ]
     ring
   obtain ⟨u, hu, hue⟩ := GlobalTheory.ThetaValueIdentityCompare.exists_unit hu0 hv
@@ -119,8 +127,8 @@ theorem norm_natCast_p : ‖((p : ℕ) : PadicAlgCl p)‖ = (p : ℝ)⁻¹ := by
   have h : ((p : ℕ) : PadicAlgCl p) = algebraMap ℚ_[p] (PadicAlgCl p) ((p : ℕ) : ℚ_[p]) := by simp
   rw [h, norm_algebraMap', Padic.norm_p]
 
-theorem zpow_eq_rpow {b : ℝ} (hb : 0 < b) {n m : ℤ} (h : b ^ n = (p : ℝ)⁻¹) :
-    b ^ m = (p : ℝ) ^ (-((m : ℝ) / (n : ℝ))) := by
+theorem zpow_eq_rpow {b : ℝ} (hb : 0 < b) {n m : ℤ} (h : b ^ n = (p : ℝ)⁻¹)
+    : b ^ m = (p : ℝ) ^ (-((m : ℝ) / (n : ℝ))) := by
   have hp1 : (1 : ℝ) < p := by exact_mod_cast hp.out.one_lt
   have hp0 : (0 : ℝ) < p := by linarith
   have hn : n ≠ 0 := by
@@ -153,22 +161,27 @@ theorem dvr_fin [FiniteDimensional ℚ_[p] L] : IsDiscreteValuationRing 𝒪[L] 
       ext x
       simp [Valued.integer.mem_iff]
     exact isCompact_iff_compactSpace.1 (this ▸ isCompact_closedBall 0 1)
-  have : (Valued.v : Valuation L NNReal).RankOne := inferInstanceAs (Valuation.RankOne (NormedField.valuation (K := L)))
+  have : (Valued.v : Valuation L NNReal).RankOne :=
+    inferInstanceAs (Valuation.RankOne (NormedField.valuation (K := L)))
   obtain ⟨-, h1, h2⟩ :=
-    Valued.integer.compactSpace_iff_completeSpace_and_isDiscreteValuationRing_and_finite_residueField.1 hc
+    Valued.integer.compactSpace_iff_completeSpace_and_isDiscreteValuationRing_and_finite_residueField.1
+      hc
   exact ⟨h1, h2⟩
 
-theorem exists_cdvr [FiniteDimensional ℚ_[p] L] :
-    ∃ (T : CDVR) (j : T.Fr →+* PadicAlgCl p), T.FinRes ∧ ((p : ℕ) : T.V) ∈ IsLocalRing.maximalIdeal T.V ∧
-      (∀ x ∈ L, x ∈ Set.range j) ∧
-      ∀ x : T.Fr, x ≠ 0 → ‖j x‖ = (p : ℝ) ^ (-((vV T.V x : ℝ) / (vV T.V ((p : ℕ) : T.Fr) : ℝ))) := by
+theorem exists_cdvr [FiniteDimensional ℚ_[p] L]
+    : ∃ (T : CDVR) (j : T.Fr →+* PadicAlgCl p),
+      T.FinRes ∧ ((p : ℕ) : T.V) ∈ IsLocalRing.maximalIdeal T.V ∧ (∀ x ∈ L, x ∈ Set.range j)
+        ∧ ∀ x : T.Fr,
+          x ≠ 0 → ‖j x‖ = (p : ℝ) ^ (-((vV T.V x : ℝ) / (vV T.V ((p : ℕ) : T.Fr) : ℝ))) := by
   obtain ⟨hd, hf⟩ := dvr_fin L
   have : CompleteSpace L := FiniteDimensional.complete ℚ_[p] L
   have hc : IsAdicComplete (IsLocalRing.maximalIdeal 𝒪[L]) 𝒪[L] :=
     PositivityTheory.CompleteLocalMinorRing.Minor.isAdicComplete_max (K := L) p
-  have h0 : CharZero 𝒪[L] := ⟨fun a b h => Nat.cast_injective (R := L) (by
-    have := congrArg (algebraMap 𝒪[L] L) h
-    simpa using this)⟩
+  have h0 : CharZero 𝒪[L] :=
+    ⟨fun a b h =>
+      Nat.cast_injective (R := L) (by
+        have := congrArg (algebraMap 𝒪[L] L) h
+        simpa using this)⟩
   let T : CDVR := { V := 𝒪[L], dvr := hd, cpl := hc, ch0 := h0 }
   let e : T.Fr ≃+* L := (FractionRing.algEquiv 𝒪[L] L).toRingEquiv
   let j : T.Fr →+* PadicAlgCl p := (algebraMap L (PadicAlgCl p)).comp e.toRingHom
@@ -202,8 +215,10 @@ section Main
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
-theorem aeval_mem {σ : Type} {z : σ → PadicAlgCl p} {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (hz : ∀ i, z i ∈ L)
-    (g : MvPolynomial σ ℤ) : MvPolynomial.aeval z g ∈ L := by
+theorem aeval_mem
+    {σ : Type} {z : σ → PadicAlgCl p} {L : IntermediateField ℚ_[p] (PadicAlgCl p)}
+    (hz : ∀ i, z i ∈ L) (g : MvPolynomial σ ℤ)
+    : MvPolynomial.aeval z g ∈ L := by
   induction g using MvPolynomial.induction_on with
   | C a =>
     rw [MvPolynomial.aeval_C]
@@ -215,9 +230,13 @@ theorem aeval_mem {σ : Type} {z : σ → PadicAlgCl p} {L : IntermediateField �
     rw [map_mul, MvPolynomial.aeval_X]
     exact L.mul_mem hf (hz i)
 
-theorem hasVal_mem {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
+theorem hasVal_mem
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Ω : Type} [Field Ω]
     {y : (Σ k, ι k) → Ω} {a : K → ℤ} {s : Ω} {z : (Σ k, ι k) → PadicAlgCl p} {w : PadicAlgCl p}
-    {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (hz : ∀ i, z i ∈ L) (h : Small.HasVal y a s z w) : w ∈ L := by
+    {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (hz : ∀ i, z i ∈ L) (h : Small.HasVal y a s z w)
+    : w ∈ L := by
   obtain ⟨dg, dh, g, f, -, -, -, -, h0, e⟩ := h
   rw [eq_div_of_mul_eq h0 e.symm]
   exact L.div_mem (aeval_mem hz g) (aeval_mem hz f)

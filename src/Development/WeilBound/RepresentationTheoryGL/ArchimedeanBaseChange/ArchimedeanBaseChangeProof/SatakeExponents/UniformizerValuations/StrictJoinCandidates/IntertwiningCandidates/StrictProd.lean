@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.None
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.SpectralAccumulation
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.F.F5
+  PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.SpectralAccumulation
 open scoped Classical
 
 set_option synthInstance.maxHeartbeats 200000
@@ -37,8 +39,10 @@ theorem StrictProd_holds : StrictProd := by
   have hσ : ∀ i, Nonempty ((σ i w).ρ.Equiv (σ' i w).ρ) := by
     intro i
     obtain ⟨hNi, hiso⟩ := key i
-    have hl : IsLocCompGL (V' i) w (σ i w) := Bo.LocIso_holds E (N i) (V i) (V' i) hiso w (σ i w) (loc i w)
-    exact GlobalTheory.LocGL.IrrGL.of_eq_of.1 (Bo.LocUniq_holds E (N i) (V' i) (disc' i) w _ _ hl (loc' i w))
+    have hl : IsLocCompGL (V' i) w (σ i w) :=
+      Bo.LocIso_holds E (N i) (V i) (V' i) hiso w (σ i w) (loc i w)
+    exact GlobalTheory.LocGL.IrrGL.of_eq_of.1 (Bo.LocUniq_holds E (N i) (V' i) (disc' i) w _ _ hl
+      (loc' i w))
   exact ⟨GlobalTheory.LocGL.multiProdEquiv _ fun i => (hσ i).some⟩
 
 end PositivityTheory.Rg.BcB.F.FX.Bo

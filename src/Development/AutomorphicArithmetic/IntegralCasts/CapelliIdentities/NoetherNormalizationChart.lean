@@ -12,8 +12,8 @@ open MvPolynomial
 
 variable {A : Type u} [CommRing A] {n : ℕ}
 
-private noncomputable def shear (b : ℕ) (c : A) :
-    MvPolynomial (Fin (n + 1)) A →ₐ[A] MvPolynomial (Fin (n + 1)) A :=
+private noncomputable def shear (b : ℕ) (c : A)
+    : MvPolynomial (Fin (n + 1)) A →ₐ[A] MvPolynomial (Fin (n + 1)) A :=
   aeval (Fin.cases (X 0) (fun i : Fin n => X i.succ + C c * X 0 ^ (b ^ (i.succ : ℕ))))
 
 private lemma shear_zero (b : ℕ) (c : A) : shear (n := n) b c (X 0) = X 0 := by
@@ -33,8 +33,8 @@ private lemma shear_comp (b : ℕ) (c d : A) (h : c + d = 0) :
       algHom_C, algebraMap_eq, add_assoc, ← add_mul, ← C_add, h]
     simp
 
-private noncomputable def chart (A : Type u) [CommRing A] (n b : ℕ) :
-    MvPolynomial (Fin (n + 1)) A ≃ₐ[A] Polynomial (MvPolynomial (Fin n) A) :=
+private noncomputable def chart (A : Type u) [CommRing A] (n b : ℕ)
+    : MvPolynomial (Fin (n + 1)) A ≃ₐ[A] Polynomial (MvPolynomial (Fin n) A) :=
   (AlgEquiv.ofAlgHom (shear b 1) (shear b (-1)) (shear_comp b 1 (-1) (by simp))
     (shear_comp b (-1) 1 (by simp))).trans (finSuccEquiv A n)
 
@@ -82,8 +82,11 @@ private lemma weight_inj {m b : ℕ} (v w : Fin m → ℕ) (hv : ∀ i, v i < b)
 end UpperTheory.NoetherNormalizationChart
 
 open UpperTheory.NoetherNormalizationChart in
-theorem UpperTheory.exists_monic_change_of_variables :
-    ∀ (A : Type u) [CommRing A] [IsDomain A] (n : ℕ) (f : MvPolynomial (Fin (n + 1)) A), f ≠ 0 → ∃ (e : MvPolynomial (Fin (n + 1)) A ≃ₐ[A] Polynomial (MvPolynomial (Fin n) A)) (a : A), a ≠ 0 ∧ (e f).leadingCoeff = MvPolynomial.C a := by
+theorem UpperTheory.exists_monic_change_of_variables
+    : ∀ (A : Type u) [CommRing A] [IsDomain A] (n : ℕ) (f : MvPolynomial (Fin (n + 1)) A),
+      f ≠ 0
+        → ∃ (e : MvPolynomial (Fin (n + 1)) A ≃ₐ[A] Polynomial (MvPolynomial (Fin n) A)) (a : A),
+          a ≠ 0 ∧ (e f).leadingCoeff = MvPolynomial.C a := by
   intro A _ _ n f hf
   classical
   set b := f.totalDegree + 1 with hbdef
@@ -92,10 +95,13 @@ theorem UpperTheory.exists_monic_change_of_variables :
   have hlt : ∀ v ∈ f.support, ∀ i, v i < b := fun v hv i =>
     Nat.lt_succ_of_le ((MvPolynomial.monomial_le_degreeOf i hv).trans
       (MvPolynomial.degreeOf_le_totalDegree f i))
-  obtain ⟨v, hv, hmax⟩ := Finset.exists_max_image f.support wt (MvPolynomial.support_nonempty.mpr hf)
+  obtain ⟨v, hv, hmax⟩ :=
+    Finset.exists_max_image f.support wt (MvPolynomial.support_nonempty.mpr hf)
   have ha : f.coeff v ≠ 0 := MvPolynomial.mem_support_iff.mp hv
-  have hsum : chart A n b f = ∑ w ∈ f.support,
-      Polynomial.C (MvPolynomial.C (f.coeff w)) * chart A n b (MvPolynomial.monomial w 1) := by
+  have hsum
+      : chart A n b f
+        = ∑ w ∈ f.support,
+          Polynomial.C (MvPolynomial.C (f.coeff w)) * chart A n b (MvPolynomial.monomial w 1) := by
     set_option synthInstance.maxHeartbeats 100000 in
       conv_lhs => rw [← f.support_sum_monomial_coeff, map_sum]
     refine Finset.sum_congr rfl fun w _ => ?_

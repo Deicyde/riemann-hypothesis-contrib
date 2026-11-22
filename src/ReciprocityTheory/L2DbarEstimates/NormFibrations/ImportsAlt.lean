@@ -29,6 +29,7 @@ theorem norm (n : ℕ) (M : Type u) [TopologicalSpace M] : NORMStatement n M := 
     exact hΔ
   funext x
   exact Norm.normVanish.{u} n M z Δ δ m C u hΔ0 hcov himg hδ hu hgr
-    (fun x hx => normOrd.{u} n M z u x m hz hu (hvan x hx)) x
+    (fun x hx => normOrd.{u} n M z u x m hz hu (hvan x hx))
+    x
 
 end ReciprocityTheory.L2DbarEstimates

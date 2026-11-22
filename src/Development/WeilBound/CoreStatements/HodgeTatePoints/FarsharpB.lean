@@ -8,14 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvEqOneOfF
 
 noncomputable section
 
-open TensorProduct Coalgebra Bialgebra WithConv GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open TensorProduct Coalgebra Bialgebra WithConv GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace PositivityTheory.HtPt.Farsharp
 
-theorem mem_of_forall_dvd {O A : Type} [CommRing O] [IsDomain O] [ValuationRing O] [AddCommGroup A]
-    [Module O A] [Module.IsTorsionFree O A] (N : Submodule O A) (hN : N.FG) {q : O} (hq : q ≠ 0)
-    (hqN : ∀ a, q • a ∈ N) (x : A)
-    (h : ∀ φ : A →ₗ[O] O, (∀ y ∈ N, q ∣ φ y) → q ∣ φ x) : x ∈ N := by
+theorem mem_of_forall_dvd
+    {O A : Type} [CommRing O] [IsDomain O] [ValuationRing O] [AddCommGroup A] [Module O A]
+    [Module.IsTorsionFree O A]
+    (N : Submodule O A) (hN : N.FG)
+    {q : O} (hq : q ≠ 0) (hqN : ∀ a, q • a ∈ N)
+    (x : A) (h : ∀ φ : A →ₗ[O] O, (∀ y ∈ N, q ∣ φ y) → q ∣ φ x)
+    : x ∈ N := by
   classical
   haveI : Module.Finite O N := Module.Finite.iff_fg.mpr hN
   haveI : Module.Flat O N := Module.Flat.flat_iff_torsion_eq_bot_of_isBezout.2
@@ -40,23 +44,25 @@ theorem mem_of_forall_dvd {O A : Type} [CommRing O] [IsDomain O] [ValuationRing 
     simp only [Module.Basis.coord_apply] at this
     simp [z, this, Finset.smul_sum, smul_smul, Finsupp.single_apply]
   have hxz : x = (z : A) := by
-    have h1 : q • x = q • (z : A) := by
-      rw [← hψ, hz]; rfl
+    have h1 : q • x = q • (z : A) := by rw [← hψ, hz]; rfl
     exact Module.IsTorsionFree.isSMulRegular (IsRegular.of_ne_zero hq) h1
   rw [hxz]
   exact z.2
 
 variable {p : ℕ} {O : Type} [CommRing O]
 
-theorem dUnit_mulBy {A : Type} [CommRing A] [Bialgebra O A] [IsCocomm O A] (k : ℕ) (a : A) :
-    dUnit (R := O) (mulBy O A k a) = (k : O) • dUnit (R := O) a := by
+theorem dUnit_mulBy {A : Type} [CommRing A] [Bialgebra O A] [IsCocomm O A] (k : ℕ) (a : A)
+    : dUnit (R := O) (mulBy O A k a) = (k : O) • dUnit (R := O) a := by
   rw [← cotMap_d]
   show cotMap ((toConv (BialgHom.id O A) ^ k).ofConv) (dUnit (R := O) a) = _
   rw [cotMap_pow, LinearMap.smul_apply, Nat.cast_smul_eq_nsmul]
   simp [cotMap_id]
 
-theorem dUnit_of_mem_torsionIdeal {A : Type} [CommRing A] [Bialgebra O A] [IsCocomm O A] (k : ℕ)
-    {t : A} (ht : t ∈ torsionIdeal (R := O) (A := A) k) : ∃ y, dUnit (R := O) t = (k : O) • y := by
+theorem dUnit_of_mem_torsionIdeal
+    {A : Type} [CommRing A] [Bialgebra O A] [IsCocomm O A]
+    (k : ℕ)
+    {t : A} (ht : t ∈ torsionIdeal (R := O) (A := A) k)
+    : ∃ y, dUnit (R := O) t = (k : O) • y := by
   suffices H : counitAlgHom O A t = 0 ∧ ∃ y, dUnit (R := O) t = (k : O) • y from H.2
   change t ∈ Ideal.span _ at ht
   induction ht using Submodule.span_induction with
@@ -65,7 +71,8 @@ theorem dUnit_of_mem_torsionIdeal {A : Type} [CommRing A] [Bialgebra O A] [IsCoc
     refine ⟨?_, dUnit (R := O) a, dUnit_mulBy k a⟩
     have ha' : counitAlgHom O A a = 0 := ha
     simpa using ha'
-  | zero => exact ⟨by simp, 0, by simp⟩
+  | zero =>
+    exact ⟨by simp, 0, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨hx0, u, hu⟩ := hx
     obtain ⟨hy0, v, hv⟩ := hy
@@ -78,8 +85,9 @@ theorem dUnit_of_mem_torsionIdeal {A : Type} [CommRing A] [Bialgebra O A] [IsCoc
     change _ • dUnit (R := O) x = _
     rw [hu, smul_comm]
 
-theorem exists_of_cotMap_res_eq_zero (G : PDivGroup p O) (n : ℕ) (y : Cot O (G.A (n + 1)))
-    (hy : cotMap (G.res n) y = 0) : ∃ y', y = (p : O) ^ n • y' := by
+theorem exists_of_cotMap_res_eq_zero
+    (G : PDivGroup p O) (n : ℕ) (y : Cot O (G.A (n + 1))) (hy : cotMap (G.res n) y = 0)
+    : ∃ y', y = (p : O) ^ n • y' := by
   unfold cotMap at hy
   obtain ⟨x, hx⟩ := (AugCot.exact_kerMap_map _ _ (G.res_surjective n) y).1 hy
   have hx' : dUnit (R := O) (x : G.A (n + 1)) = y := by
@@ -98,8 +106,8 @@ def lev (G : PDivGroup p O) (n : ℕ) : G.omega →ₗ[O] Cot O (G.A n) :=
 
 theorem lev_apply (G : PDivGroup p O) (n : ℕ) (w : G.omega) : lev G n w = w.1 n := rfl
 
-private theorem prime_pow_smul_cot_eq_zero (G : PDivGroup p O) (n : ℕ) (y : Cot O (G.A n)) :
-    (p : O) ^ n • y = 0 := by
+private theorem prime_pow_smul_cot_eq_zero (G : PDivGroup p O) (n : ℕ) (y : Cot O (G.A n))
+    : (p : O) ^ n • y = 0 := by
   obtain ⟨b, rfl⟩ := AugCot.d_surjective _ y
   obtain ⟨a, rfl⟩ := G.res_surjective n b
   set r := counitAlgHom O (G.A (n + 1)) a
@@ -119,10 +127,12 @@ private theorem prime_pow_smul_cot_eq_zero (G : PDivGroup p O) (n : ℕ) (y : Co
   rw [← dUnit_mulBy, ← map_mulBy, h2]
   exact AugCot.d_algebraMap _ _
 
-theorem smul_mem_of_levels [IsAdicComplete (Ideal.span {(p : O)}) O] (G : PDivGroup p O)
-    (L : Submodule O G.omega) (hL : L.FG) (κ : O)
-    (hκ : ∀ n (y : Cot O (G.A n)), κ • y ∈ L.map (lev G n))
-    (hp : ∀ n (y : Cot O (G.A n)), (p : O) • y ∈ L.map (lev G n)) (w : G.omega) : κ • w ∈ L := by
+theorem smul_mem_of_levels
+    [IsAdicComplete (Ideal.span {(p : O)}) O]
+    (G : PDivGroup p O) (L : Submodule O G.omega) (hL : L.FG)
+    (κ : O) (hκ : ∀ n (y : Cot O (G.A n)), κ • y ∈ L.map (lev G n))
+    (hp : ∀ n (y : Cot O (G.A n)), (p : O) • y ∈ L.map (lev G n)) (w : G.omega)
+    : κ • w ∈ L := by
   classical
   obtain ⟨m, s, hs⟩ := Submodule.fg_iff_exists_fin_generating_family.1 hL
   let g : (Fin m → O) →ₗ[O] G.omega := Fintype.linearCombination O s
@@ -143,13 +153,13 @@ theorem smul_mem_of_levels [IsAdicComplete (Ideal.span {(p : O)}) O] (G : PDivGr
   have hWc : ∀ k, cotMap (G.res k) (κ • W (k + 1)) = κ • W k := by
     intro k
     rw [map_smul, compat]
-  have step : ∀ n (c : {c : Fin m → O // Φ (n + 1) c = κ • W (n + 1)}),
-      ∃ c' : {c : Fin m → O // Φ (n + 2) c = κ • W (n + 2)},
-        ∃ f : Fin m → O, c'.1 = c.1 + (p : O) ^ n • f := by
+  have step
+      : ∀ n (c : {c : Fin m → O // Φ (n + 1) c = κ • W (n + 1)}),
+        ∃ c' : {c : Fin m → O // Φ (n + 2) c = κ • W (n + 2)}, ∃ f : Fin m → O,
+          c'.1 = c.1 + (p : O) ^ n • f := by
     intro n c
     obtain ⟨d, hd⟩ := lift (n + 2) _ (hκ (n + 2) (W (n + 2)))
-    have hd1 : Φ (n + 1) d = κ • W (n + 1) := by
-      rw [← compatΦ, hd, hWc]
+    have hd1 : Φ (n + 1) d = κ • W (n + 1) := by rw [← compatΦ, hd, hWc]
     have he : cotMap (G.res (n + 1)) (Φ (n + 2) (d - c.1)) = 0 := by
       rw [compatΦ, map_sub, hd1, c.2, sub_self]
     obtain ⟨y', hy'⟩ := exists_of_cotMap_res_eq_zero G (n + 1) _ he
@@ -162,9 +172,12 @@ theorem smul_mem_of_levels [IsAdicComplete (Ideal.span {(p : O)}) O] (G : PDivGr
     abel
   choose nxt hnxt using step
   obtain ⟨c0, hc0⟩ := lift 1 _ (hκ 1 (W 1))
-  let seq : (n : ℕ) → {c : Fin m → O // Φ (n + 1) c = κ • W (n + 1)} :=
-    fun n => @Nat.rec (fun n => {c : Fin m → O // Φ (n + 1) c = κ • W (n + 1)}) ⟨c0, hc0⟩
-      (fun k ck => nxt k ck) n
+  let seq : (n : ℕ) → {c : Fin m → O // Φ (n + 1) c = κ • W (n + 1)} := fun n =>
+    @Nat.rec
+      (fun n => {c : Fin m → O // Φ (n + 1) c = κ • W (n + 1)})
+      ⟨c0, hc0⟩
+      (fun k ck => nxt k ck)
+      n
   have seq_succ : ∀ n, seq (n + 1) = nxt n (seq n) := fun n => rfl
   have diff : ∀ a b, a ≤ b → ∃ t : Fin m → O, (seq b).1 = (seq a).1 + (p : O) ^ a • t := by
     intro a b hab
@@ -175,14 +188,17 @@ theorem smul_mem_of_levels [IsAdicComplete (Ideal.span {(p : O)}) O] (G : PDivGr
       obtain ⟨f, hf⟩ := hnxt b (seq b)
       refine ⟨t + (p : O) ^ (b - a) • f, ?_⟩
       rw [seq_succ, hf, ht, smul_add, smul_smul, ← pow_add, Nat.add_sub_cancel' hab, add_assoc]
-  have hpre : ∀ j, ∃ l : O, ∀ n, (seq n).1 j ≡ l [SMOD ((Ideal.span {(p : O)}) ^ n • ⊤ : Submodule O O)] := by
+  have hpre
+      : ∀ j, ∃ l : O, ∀ n,
+        (seq n).1 j ≡ l [SMOD ((Ideal.span {(p : O)}) ^ n • ⊤ : Submodule O O)] := by
     intro j
     apply IsPrecomplete.prec inferInstance
     intro a b hab
     obtain ⟨t, ht⟩ := diff a b hab
     rw [SModEq.sub_mem, ht]
     simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, sub_add_cancel_left, Ideal.mul_top]
-    exact (Ideal.neg_mem_iff _).2 (Ideal.mul_mem_right _ _ (Ideal.pow_mem_pow (Ideal.mem_span_singleton_self _) a))
+    exact (Ideal.neg_mem_iff _).2
+      (Ideal.mul_mem_right _ _ (Ideal.pow_mem_pow (Ideal.mem_span_singleton_self _) a))
   choose l hl using hpre
   have close : ∀ N, ∃ t : Fin m → O, l = (seq N).1 + (p : O) ^ N • t := by
     intro N
@@ -199,8 +215,7 @@ theorem smul_mem_of_levels [IsAdicComplete (Ideal.span {(p : O)}) O] (G : PDivGr
   have good : ∀ n, Φ (n + 1) l = κ • W (n + 1) := by
     intro n
     obtain ⟨t, ht⟩ := close (n + 1)
-    have h1 : Φ (n + 1) (seq (n + 1)).1 = κ • W (n + 1) := by
-      rw [← compatΦ, (seq (n + 1)).2, hWc]
+    have h1 : Φ (n + 1) (seq (n + 1)).1 = κ • W (n + 1) := by rw [← compatΦ, (seq (n + 1)).2, hWc]
     rw [ht, map_add (f := _), h1, map_smul, prime_pow_smul_cot_eq_zero, add_zero]
   have good' : ∀ n, Φ n l = κ • W n := by
     intro n

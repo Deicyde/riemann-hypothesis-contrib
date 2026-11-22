@@ -7,26 +7,34 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagonalM
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.UnitComb
 
-theorem coe_minorIJ {L : Type} [Field L] (V : ValuationSubring L) {N : ℕ}
-    (h : Matrix (Fin N) (Fin N) V) (I J : Finset (Fin N)) :
-    ((minorIJ h I J : V) : L) = minorIJ (h.map V.subtype) I J := by
+theorem coe_minorIJ
+    {L : Type} [Field L]
+    (V : ValuationSubring L)
+    {N : ℕ} (h : Matrix (Fin N) (Fin N) V) (I J : Finset (Fin N))
+    : ((minorIJ h I J : V) : L) = minorIJ (h.map V.subtype) I J := by
   unfold minorIJ
   split_ifs with e
   · exact RingHom.map_det V.subtype _
   · rfl
 
-theorem minorIJ_one_diag {R : Type} [CommRing R] {N : ℕ} (J : Finset (Fin N)) :
-    minorIJ (1 : Matrix (Fin N) (Fin N) R) J J = 1 := by
+theorem minorIJ_one_diag {R : Type} [CommRing R] {N : ℕ} (J : Finset (Fin N))
+    : minorIJ (1 : Matrix (Fin N) (Fin N) R) J J = 1 := by
   unfold minorIJ
   rw [dite_eq_left rfl, Matrix.submatrix_one _ (J.orderEmbOfFin rfl).injective, Matrix.det_one]
 
-theorem exists_isUnit_of_sum {R : Type} [CommRing R] [IsLocalRing R] {ι : Type} (s : Finset ι)
-    (f : ι → R) (h : IsUnit (∑ a ∈ s, f a)) : ∃ a ∈ s, IsUnit (f a) := by
+theorem exists_isUnit_of_sum
+    {R : Type} [CommRing R] [IsLocalRing R]
+    {ι : Type} (s : Finset ι) (f : ι → R) (h : IsUnit (∑ a ∈ s, f a))
+    : ∃ a ∈ s, IsUnit (f a) := by
   by_contra hc
   push_neg at hc
   have : ∑ a ∈ s, f a ∈ IsLocalRing.maximalIdeal R :=
@@ -43,7 +51,17 @@ theorem stepCols_ne_empty {N j : ℕ} (i : Fin N) (hj : j ≤ N) : stepCols N j 
     simp only [stepCols, Finset.mem_filter, Finset.mem_univ, true_and, if_neg c]
     omega
 
-theorem unit_comb : ∀ (L : Type) [Field L] (V : ValuationSubring L) (N j : ℕ) (i : Fin N) (H : Matrix (Fin N) (Fin N) L) (κ : Type) [Fintype κ] (u : κ → Finset (Fin N) → L) (u' : Finset (Fin N) → κ → L), j ≤ N → IsBlockDiag j H → (∀ a b, H a b ∈ V) → H.det ≠ 0 → (H.det)⁻¹ ∈ V → (∀ I m, u' I m ∈ V) → (∀ m I, u m I ∈ V) → (∀ I I', IsStepRows N j i I → IsStepRows N j i I' → ∑ m, u' I m * u m I' = if I = I' then 1 else 0) → ∃ m, (∑ I, u m I * minorIJ H I (stepCols N j i)) ≠ 0 ∧ (∑ I, u m I * minorIJ H I (stepCols N j i))⁻¹ ∈ V := by
+theorem unit_comb
+    : ∀ (L : Type) [Field L] (V : ValuationSubring L) (N j : ℕ) (i : Fin N)
+        (H : Matrix (Fin N) (Fin N) L) (κ : Type) [Fintype κ] (u : κ → Finset (Fin N) → L)
+        (u' : Finset (Fin N) → κ → L),
+      j ≤ N → IsBlockDiag j H → (∀ a b, H a b ∈ V) → H.det ≠ 0 → (H.det)⁻¹ ∈ V → (∀ I m, u' I m ∈ V)
+        → (∀ m I, u m I ∈ V)
+        → (∀ I I',
+          IsStepRows N j i I → IsStepRows N j i I' → ∑ m, u' I m * u m I' = if I = I' then 1 else 0)
+        → ∃ m,
+          (∑ I, u m I * minorIJ H I (stepCols N j i)) ≠ 0
+            ∧ (∑ I, u m I * minorIJ H I (stepCols N j i))⁻¹ ∈ V := by
   intro L _ V N j i H κ _ u u' hj hB hH hdet hinv hu' hu horth
   let Hv : Matrix (Fin N) (Fin N) V := Matrix.of fun a b => ⟨H a b, hH a b⟩
   have hHv : Hv.map V.subtype = H := by ext a b; rfl
@@ -63,7 +81,8 @@ theorem unit_comb : ∀ (L : Type) [Field L] (V : ValuationSubring L) (N j : ℕ
   have hBv : IsBlockDiag j Hv := fun a b hab => Subtype.ext (hB a b hab)
   have hstep : ∀ I, ¬ IsStepRows N j i I → minorIJ Hv I (stepCols N j i) = 0 := fun I hI =>
     (main.2.1 Hv I hBv hI).resolve_right hJ
-  have hsum1 : IsUnit (∑ I', minorIJ Hv⁻¹ (stepCols N j i) I' * minorIJ Hv I' (stepCols N j i)) := by
+  have hsum1
+      : IsUnit (∑ I', minorIJ Hv⁻¹ (stepCols N j i) I' * minorIJ Hv I' (stepCols N j i)) := by
     rw [← main.1, Matrix.nonsing_inv_mul _ hunit, minorIJ_one_diag]
     exact isUnit_one
   obtain ⟨I₀, -, hI₀⟩ := exists_isUnit_of_sum _ _ hsum1
@@ -81,8 +100,8 @@ theorem unit_comb : ∀ (L : Type) [Field L] (V : ValuationSubring L) (N j : ℕ
     · simpa [uv, uv'] using this
   let w : κ → V := fun m => ∑ I, uv m I * minorIJ Hv I (stepCols N j i)
   have hw : ∑ m, uv' I₀ m * w m = minorIJ Hv I₀ (stepCols N j i) := by
-    have e1 : ∑ m, uv' I₀ m * w m =
-        ∑ I, (∑ m, uv' I₀ m * uv m I) * minorIJ Hv I (stepCols N j i) := by
+    have e1
+        : ∑ m, uv' I₀ m * w m = ∑ I, (∑ m, uv' I₀ m * uv m I) * minorIJ Hv I (stepCols N j i) := by
       simp only [w, Finset.mul_sum, Finset.sum_mul]
       rw [Finset.sum_comm]
       simp only [mul_assoc]

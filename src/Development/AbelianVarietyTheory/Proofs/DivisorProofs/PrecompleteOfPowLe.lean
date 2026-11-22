@@ -14,9 +14,12 @@ open IsLocalRing
 
 namespace GlobalTheory.FiniteCompletionLocalHom
 
-theorem isLocalHom_of_finite {R R₂ V : Type*} [CommRing R] [IsLocalRing R] [CommRing R₂] [IsLocalRing R₂]
-    [CommRing V] [IsLocalRing V] (ρ : R →+* R₂) (hρ : ρ.Finite) (ψ : R₂ →+* V)
-    (h : IsLocalHom (ψ.comp ρ)) : IsLocalHom ψ := by
+theorem isLocalHom_of_finite
+    {R R₂ V : Type*}
+    [CommRing R] [IsLocalRing R] [CommRing R₂] [IsLocalRing R₂] [CommRing V] [IsLocalRing V]
+    (ρ : R →+* R₂) (hρ : ρ.Finite)
+    (ψ : R₂ →+* V) (h : IsLocalHom (ψ.comp ρ))
+    : IsLocalHom ψ := by
   letI := ρ.toAlgebra
   haveI : Module.Finite R R₂ := hρ
   haveI : Algebra.IsIntegral R R₂ := Algebra.IsIntegral.of_finite R R₂
@@ -31,15 +34,25 @@ theorem isLocalHom_of_finite {R R₂ V : Type*} [CommRing R] [IsLocalRing R] [Co
     infer_instance
   exact ((IsLocalRing.local_hom_tfae ψ).out 1 5).mpr (IsLocalRing.eq_maximalIdeal hP)
 
-theorem exists_extension : ∀ (R R₂ W : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [CommRing R₂] [IsDomain R₂]
-    [IsLocalRing R₂] [CommRing W] [IsDomain W] [IsLocalRing W], GlobalTheory.LN.CDvr W → ∀ (φ : R →+* W), IsLocalHom φ →
-    ∀ (ρ : R →+* R₂), RingHom.Finite ρ → ∀ (Ω : Type) [Field Ω] (j : FractionRing W →+* Ω) (m : R₂ →+* Ω),
-    Function.Injective m → (∀ r : R, m (ρ r) = j (algebraMap W (FractionRing W) (φ r))) →
-    ∃ (W₂ : Type) (_ : CommRing W₂) (_ : IsDomain W₂) (_ : IsLocalRing W₂) (σ : W →+* W₂) (φ₂ : R₂ →+* W₂)
-      (j₂ : FractionRing W₂ →+* Ω), GlobalTheory.LN.CDvr W₂ ∧ GlobalTheory.Mum.FinExt σ ∧ IsLocalHom σ ∧ Function.Injective φ₂ ∧
-      IsLocalHom φ₂ ∧ φ₂.comp ρ = σ.comp φ ∧
-      (∀ w : W, j₂ (algebraMap W₂ (FractionRing W₂) (σ w)) = j (algebraMap W (FractionRing W) w)) ∧
-      ∀ r : R₂, j₂ (algebraMap W₂ (FractionRing W₂) (φ₂ r)) = m r := by
+theorem exists_extension
+    : ∀ (R R₂ W : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [CommRing R₂] [IsDomain R₂]
+        [IsLocalRing R₂] [CommRing W] [IsDomain W] [IsLocalRing W],
+      GlobalTheory.LN.CDvr W
+        → ∀ (φ : R →+* W),
+          IsLocalHom φ
+            → ∀ (ρ : R →+* R₂),
+              RingHom.Finite ρ
+                → ∀ (Ω : Type) [Field Ω] (j : FractionRing W →+* Ω) (m : R₂ →+* Ω),
+                  Function.Injective m
+                    → (∀ r : R, m (ρ r) = j (algebraMap W (FractionRing W) (φ r)))
+                    → ∃ (W₂ : Type) (_ : CommRing W₂) (_ : IsDomain W₂) (_ : IsLocalRing W₂)
+                        (σ : W →+* W₂) (φ₂ : R₂ →+* W₂) (j₂ : FractionRing W₂ →+* Ω),
+                      GlobalTheory.LN.CDvr W₂ ∧ GlobalTheory.Mum.FinExt σ ∧ IsLocalHom σ
+                        ∧ Function.Injective φ₂ ∧ IsLocalHom φ₂ ∧ φ₂.comp ρ = σ.comp φ
+                        ∧ (∀ w : W,
+                          j₂ (algebraMap W₂ (FractionRing W₂) (σ w))
+                            = j (algebraMap W (FractionRing W) w))
+                        ∧ ∀ r : R₂, j₂ (algebraMap W₂ (FractionRing W₂) (φ₂ r)) = m r := by
   intro R R₂ W _ _ _ _ _ _ _ _ _ hW φ hφ ρ hρ Ω _ j m hm hcomp
   obtain ⟨hdvr, hcompl, hchar⟩ := (GlobalTheory.LN.cDvr_iff W).mp hW
   haveI := hdvr
@@ -54,17 +67,18 @@ theorem exists_extension : ∀ (R R₂ W : Type) [CommRing R] [IsDomain R] [IsLo
     hs₀ (integralClosure W Ω) (fun x hx => hs₀int x hx) r
 
   let F : IntermediateField (FractionRing W) Ω := algebraicClosure (FractionRing W) Ω
-  have hmF : ∀ r, m r ∈ F := fun r =>
-    ((hmint r).tower_top : IsIntegral (FractionRing W) (m r))
+  have hmF : ∀ r, m r ∈ F := fun r => ((hmint r).tower_top : IsIntegral (FractionRing W) (m r))
   letI : Algebra W F := ((algebraMap (FractionRing W) F).comp (algebraMap W (FractionRing W))).toAlgebra
   haveI : IsScalarTower W (FractionRing W) F := IsScalarTower.of_algebraMap_eq fun _ => rfl
   haveI : Algebra.IsAlgebraic W F := (IsFractionRing.comap_isAlgebraic_iff (K := FractionRing W)).mpr inferInstance
   haveI : FaithfulSMul W F := (faithfulSMul_iff_algebraMap_injective W F).mpr
     ((algebraMap (FractionRing W) F).injective.comp (IsFractionRing.injective W (FractionRing W)))
   let mF : R₂ →+* F := m.codRestrict F hmF
-  obtain ⟨s, hsint, hs⟩ := GlobalTheory.ArcPointDescent.exists_finset ρ hρ φ mF (fun r => Subtype.ext (hcomp r))
+  obtain ⟨s, hsint, hs⟩ :=
+    GlobalTheory.ArcPointDescent.exists_finset ρ hρ φ mF (fun r => Subtype.ext (hcomp r))
 
-  obtain ⟨W', hdvr', hc₁, -, hfin, -, hloc, -, hmem⟩ := GlobalTheory.exists_complete_dvr_finite_subalgebra W F s
+  obtain ⟨W', hdvr', hc₁, -, hfin, -, hloc, -, hmem⟩ :=
+    GlobalTheory.exists_complete_dvr_finite_subalgebra W F s
   haveI := hdvr'
   have hWs : ∀ a, mF a ∈ W' := hs W' fun x hx => hmem x hx (hsint x hx)
   let φ₂ : R₂ →+* W' := mF.codRestrict W' hWs
@@ -81,10 +95,27 @@ theorem exists_extension : ∀ (R R₂ W : Type) [CommRing R] [IsDomain R] [IsLo
   have hloc₂ : IsLocalHom (φ₂.comp ρ) := by
     rw [hcomm]
     exact RingHom.isLocalHom_comp σ φ
-  refine ⟨W', inferInstance, inferInstance, inferInstance, σ, φ₂, j₂, hC,
-    (⟨GlobalTheory.ArcPointDescent.admissibleBase_maximalIdeal_completeDVR hC, hσinj, RingHom.finite_algebraMap.mpr hfin⟩ : _ ∧ _ ∧ _),
-    hloc, fun a b hab => hm (congrArg (fun x : W' => ((x : F) : Ω)) hab),
-    isLocalHom_of_finite ρ hρ φ₂ hloc₂, hcomm, fun w => IsFractionRing.lift_algebraMap hιinj (σ w),
-    fun r => IsFractionRing.lift_algebraMap hιinj (φ₂ r)⟩
+  refine ⟨
+    W',
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    σ,
+    φ₂,
+    j₂,
+    hC,
+    (⟨
+       GlobalTheory.ArcPointDescent.admissibleBase_maximalIdeal_completeDVR hC,
+       hσinj,
+       RingHom.finite_algebraMap.mpr hfin
+     ⟩
+      : _ ∧ _ ∧ _),
+    hloc,
+    fun a b hab => hm (congrArg (fun x : W' => ((x : F) : Ω)) hab),
+    isLocalHom_of_finite ρ hρ φ₂ hloc₂,
+    hcomm,
+    fun w => IsFractionRing.lift_algebraMap hιinj (σ w),
+    fun r => IsFractionRing.lift_algebraMap hιinj (φ₂ r)
+  ⟩
 
 end GlobalTheory.FiniteCompletionLocalHom

@@ -10,7 +10,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.FiniteZeroOrbits
@@ -28,9 +30,10 @@ theorem cpt_origin {r : ℕ} (X : Data E r) (x : Frame X.Ψ r) : cpt X x 0 = x :
     · rfl
   rw [cpt, this, ExtFPf.rmul_oneF]
 
-theorem eventually_split {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : x ∈ X.dom) {δ : ℝ} (hδ : 0 < δ) :
-    ∀ᶠ y in 𝓝 x, y ∈ X.dom ∧ ∃ z ∈ Metric.closedBall (0 : V (nd X)) δ, ∃ b ∈ Bor X.Ψ r,
-      y = rmul (cpt X x z) b := by
+theorem eventually_split
+    {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : x ∈ X.dom) {δ : ℝ} (hδ : 0 < δ)
+    : ∀ᶠ y in 𝓝 x, y ∈ X.dom ∧ ∃ z ∈ Metric.closedBall (0 : V (nd X)) δ, ∃ b ∈ Bor X.Ψ r,
+        y = rmul (cpt X x z) b := by
   have hu : ∀ τ, IsUnit (mat x τ).det := fun τ => isUnit_iff_ne_zero.mpr (hx τ).1
   have hM : ∀ τ, LUPf.Mx X x x τ = 1 := fun τ => Matrix.nonsing_inv_mul _ (hu τ)
   have hΔ : LUPf.DeltaF X x x ≠ 0 := by
@@ -39,11 +42,16 @@ theorem eventually_split {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : x ∈
       refine Finset.prod_eq_one fun τ _ => Finset.prod_eq_one fun k _ => ?_
       rw [hM]
       exact LUPf.lminor_one k
-    rw [this]; exact one_ne_zero
+    rw [this]
+    exact one_ne_zero
   have hL : LUPf.Lm (1 : Matrix (Fin r) (Fin r) ℂ) = 1 := by
-    refine (LUPf.Lm_unique 1 1 (fun k => by rw [LUPf.lminor_one]; exact one_ne_zero)
-      (fun i k h => Matrix.one_apply_ne (ne_of_lt h)) (fun i => Matrix.one_apply_eq i) fun i j h => ?_).symm
-    rw [Matrix.one_mul]; exact Matrix.one_apply_ne (ne_of_gt h)
+    refine (LUPf.Lm_unique 1 1
+      (fun k => by rw [LUPf.lminor_one]; exact one_ne_zero)
+      (fun i k h => Matrix.one_apply_ne (ne_of_lt h))
+      (fun i => Matrix.one_apply_eq i)
+      fun i j h => ?_).symm
+    rw [Matrix.one_mul]
+    exact Matrix.one_apply_ne (ne_of_gt h)
   have hz0 : LUPf.zF X x x = 0 := by
     ext k
     set p := (Fintype.equivFin (Ent X)).symm k with hp
@@ -51,7 +59,8 @@ theorem eventually_split {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : x ∈
     rw [hM, hL, inv_one]
     exact Matrix.one_apply_ne (ne_of_gt p.2.2)
   have hopen : IsOpen {y | y ∈ X.dom ∧ LUPf.DeltaF X x y ≠ 0} :=
-    (FourierCoefficientDomain.isOpen_dom X).inter (isOpen_ne_fun (LUPf.Delta_diff (X := X) (x0 := x)).continuous continuous_const)
+    (FourierCoefficientDomain.isOpen_dom X).inter
+      (isOpen_ne_fun (LUPf.Delta_diff (X := X) (x0 := x)).continuous continuous_const)
   have hn := hopen.mem_nhds (show x ∈ {y | y ∈ X.dom ∧ LUPf.DeltaF X x y ≠ 0} from ⟨hx, hΔ⟩)
   have hc : ContinuousAt (LUPf.zF X x) x :=
     (LUPf.zF_diffOn (X := X) (x0 := x)).continuousOn.continuousAt hn
@@ -66,12 +75,13 @@ theorem eventually_split {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : x ∈
   show y τ = (mat x τ * (LUPf.Lm (LUPf.Mx X x y τ))⁻¹ * (LUPf.Lm (LUPf.Mx X x y τ) * ((mat x τ)⁻¹ * mat y τ)) :
     Matrix (Fin r) (Fin r) ℂ)
   have hL' : IsUnit (LUPf.Lm (LUPf.Mx X x y τ)).det := by rw [LUPf.Lm_det]; exact isUnit_one
-  rw [Matrix.mul_assoc, ← Matrix.mul_assoc (LUPf.Lm (LUPf.Mx X x y τ))⁻¹, Matrix.nonsing_inv_mul _ hL',
-    Matrix.one_mul, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ (hu τ), Matrix.one_mul]
+  rw [Matrix.mul_assoc, ← Matrix.mul_assoc (LUPf.Lm (LUPf.Mx X x y τ))⁻¹,
+    Matrix.nonsing_inv_mul _ hL', Matrix.one_mul, ← Matrix.mul_assoc,
+    Matrix.mul_nonsing_inv _ (hu τ), Matrix.one_mul]
   rfl
 
-theorem isolated_of_det {n : ℕ} {f : V n → V n} (hdet : (fderiv ℂ f 0).det ≠ 0) (h0 : f 0 = 0) :
-    ∃ δ > 0, ∀ y ∈ Metric.closedBall (0 : V n) δ, f y = 0 → y = 0 := by
+theorem isolated_of_det {n : ℕ} {f : V n → V n} (hdet : (fderiv ℂ f 0).det ≠ 0) (h0 : f 0 = 0)
+    : ∃ δ > 0, ∀ y ∈ Metric.closedBall (0 : V n) δ, f y = 0 → y = 0 := by
   by_cases hd : DifferentiableAt ℂ f 0
   · exact HE.iso_zero hd.hasFDerivAt hdet h0
   · refine ⟨1, one_pos, fun y _ _ => ?_⟩
@@ -94,15 +104,26 @@ def orbitSetoid {r : ℕ} (X : Data E r) : Setoid (Frame X.Ψ r) where
       refine ⟨γ' * γ, X.Γ.mul_mem hγ' hγ, rmul b b', ExtFPf.mul_mem X hb hb', ?_⟩
       rw [FundSetPf.lact_mul, ← FundSetPf.lact_rmul, ExtFPf.rmul_assoc]
 
-theorem finite_orbits : ∀ (r : ℕ) (X : Data E r) (L : Wt X.Ψ r) (w0 : Frame X.Ψ r → ℂ) (s : Fin (nd X) → Frame X.Ψ r → ℂ),
-    X.IsSec L w0 → (∀ k, X.IsSec L (s k)) →
-    (∀ x ∈ X.dom, (∀ k, s k x = 0) → w0 x ≠ 0 ∧ (fderiv ℂ (fun z : V (nd X) => (WithLp.toLp 2 fun k =>
-      s k (cpt X x z) / w0 (cpt X x z) : V (nd X))) 0).det ≠ 0) →
-    ∀ C : Set (Frame X.Ψ r), IsCompact C → C ⊆ X.dom →
-    (∀ x ∈ X.dom, (∀ k, s k x = 0) → ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, lact γ (rmul x b) ∈ C) →
-    ∃ (δ : ℕ) (xs : Fin δ → Frame X.Ψ r), (∀ j, xs j ∈ X.dom) ∧
-      (∀ x ∈ X.dom, (∀ k, s k x = 0) ↔ ∃ j, ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, x = lact γ (rmul (xs j) b)) ∧
-      ∀ j j', ∀ γ ∈ X.Γ, ∀ b ∈ Bor X.Ψ r, xs j' = lact γ (rmul (xs j) b) → j = j' := by
+theorem finite_orbits
+    : ∀ (r : ℕ) (X : Data E r) (L : Wt X.Ψ r) (w0 : Frame X.Ψ r → ℂ)
+        (s : Fin (nd X) → Frame X.Ψ r → ℂ),
+      X.IsSec L w0 → (∀ k, X.IsSec L (s k))
+        → (∀ x ∈ X.dom,
+          (∀ k, s k x = 0)
+            → w0 x ≠ 0
+              ∧ (fderiv ℂ
+                  (fun z : V (nd X) =>
+                    (WithLp.toLp 2 fun k => s k (cpt X x z) / w0 (cpt X x z) : V (nd X)))
+                  0).det
+                ≠ 0)
+        → ∀ C : Set (Frame X.Ψ r),
+          IsCompact C → C ⊆ X.dom
+            → (∀ x ∈ X.dom, (∀ k, s k x = 0) → ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, lact γ (rmul x b) ∈ C)
+            → ∃ (δ : ℕ) (xs : Fin δ → Frame X.Ψ r),
+              (∀ j, xs j ∈ X.dom)
+                ∧ (∀ x ∈ X.dom,
+                  (∀ k, s k x = 0) ↔ ∃ j, ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, x = lact γ (rmul (xs j) b))
+                ∧ ∀ j j', ∀ γ ∈ X.Γ, ∀ b ∈ Bor X.Ψ r, xs j' = lact γ (rmul (xs j) b) → j = j' := by
   classical
   intro r X L w0 s _ hs hsimp C hC hCd hmeet
   set S := orbitSetoid X with hS
@@ -115,15 +136,17 @@ theorem finite_orbits : ∀ (r : ℕ) (X : Data E r) (L : Wt X.Ψ r) (w0 : Frame
 
   have hloc : ∀ x ∈ X.dom, (∀ k, s k x = 0) → ∀ᶠ y in 𝓝 x, (∀ k, s k y = 0) → S.r x y := by
     intro x hx h0
-    obtain ⟨δ, hδ, hiso⟩ := isolated_of_det (hsimp x hx h0).2 (by
-      ext k
-      simp [cpt_origin, h0 k])
+    obtain ⟨δ, hδ, hiso⟩ :=
+      isolated_of_det (hsimp x hx h0).2 (by
+        ext k
+        simp [cpt_origin, h0 k])
     filter_upwards [eventually_split X hx hδ] with y ⟨hy, z, hz, b, hb, he⟩ hy0
     have hR : S.r (cpt X x z) y := ⟨1, X.Γ.one_mem, b, hb, by rw [FundSetPf.lact_one]; exact he⟩
     have h1 := (hstab _ _ (S.iseqv.symm hR) ⟨hy, hy0⟩).2
-    have hz0 : z = 0 := hiso z hz (by
-      ext k
-      simp [h1 k])
+    have hz0 : z = 0 :=
+      hiso z hz (by
+        ext k
+        simp [h1 k])
     rwa [hz0, cpt_origin] at hR
   have hK : IsCompact (C ∩ {x | ∀ k, s k x = 0}) := by
     have hcont : ContinuousOn (fun x k => s k x) C :=
@@ -133,15 +156,22 @@ theorem finite_orbits : ∀ (r : ℕ) (X : Data E r) (L : Wt X.Ψ r) (w0 : Frame
       ext x; simp [funext_iff]
     rw [he]
     exact hC.of_isClosed_subset hcl Set.inter_subset_left
-  obtain ⟨t, htK, hcov⟩ := hK.elim_nhds_subcover (fun x => {y | (∀ k, s k y = 0) → S.r x y})
-    (fun x hx => hloc x (hCd hx.1) hx.2)
+  obtain ⟨t, htK, hcov⟩ :=
+    hK.elim_nhds_subcover
+      (fun x => {y | (∀ k, s k y = 0) → S.r x y})
+      (fun x hx => hloc x (hCd hx.1) hx.2)
   set T : Finset (Quotient S) := t.image (Quotient.mk S) with hT
   have hout : ∀ q ∈ T, q.out ∈ X.dom ∧ ∀ k, s k q.out = 0 := by
     intro q hq
     obtain ⟨x, hx, rfl⟩ := Finset.mem_image.1 hq
     exact hstab x _ (S.iseqv.symm (Quotient.mk_out x)) ⟨hCd (htK x hx).1, (htK x hx).2⟩
-  refine ⟨T.card, fun j => (T.equivFin.symm j).1.out, fun j => (hout _ (T.equivFin.symm j).2).1,
-    fun x hx => ⟨fun h0 => ?_, ?_⟩, ?_⟩
+  refine ⟨
+    T.card,
+    fun j => (T.equivFin.symm j).1.out,
+    fun j => (hout _ (T.equivFin.symm j).2).1,
+    fun x hx => ⟨fun h0 => ?_, ?_⟩,
+    ?_
+  ⟩
   · obtain ⟨γ, hγ, b, hb, hc⟩ := hmeet x hx h0
     have hR : S.r x (lact γ (rmul x b)) := ⟨γ, hγ, b, hb, rfl⟩
     have h1 := (hstab _ _ hR ⟨hx, h0⟩).2

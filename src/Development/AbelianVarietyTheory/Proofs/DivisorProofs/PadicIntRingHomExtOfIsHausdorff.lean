@@ -8,8 +8,10 @@ open Matrix Polynomial
 
 namespace GlobalTheory
 
-theorem padicInt_ringHom_ext_of_isHausdorff : ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [IsHausdorff (Ideal.span {(p : O)}) O]
-  (f g : ℤ_[p] →+* O), f = g := by
+theorem padicInt_ringHom_ext_of_isHausdorff
+    : ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [IsHausdorff (Ideal.span {(p : O)}) O]
+        (f g : ℤ_[p] →+* O),
+      f = g := by
   intro p _ O _ hH f g
   ext z
   rw [← sub_eq_zero]

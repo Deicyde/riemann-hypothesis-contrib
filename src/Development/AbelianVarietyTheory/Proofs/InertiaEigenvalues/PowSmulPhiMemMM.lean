@@ -9,11 +9,12 @@ open GlobalTheory.BK PowerSeries
 
 namespace GlobalTheory.BK
 
-theorem PhiMod.pow_smul_phi_mem_MM (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K]
-    [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime]
-    [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] (P : PhiMod O K l e a ι) (η : ℕ)
-    (h : ∀ m ∈ P.L, E K l e ^ η • m ∈ P.M) :
-    ∀ m ∈ P.MM, (l : K) ^ η • P.phi m ∈ P.MM := by
+theorem PhiMod.pow_smul_phi_mem_MM
+    (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+    (l e a : ℕ) (ι : Type)
+    [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
+    (P : PhiMod O K l e a ι) (η : ℕ) (h : ∀ m ∈ P.L, E K l e ^ η • m ∈ P.M)
+    : ∀ m ∈ P.MM, (l : K) ^ η • P.phi m ∈ P.MM := by
   intro m hm
   have h1 : E K l e ^ η • m ∈ P.Mext (S O K e) :=
     P.smul_mem_Mext_of_basis (fun i => h _ (P.phi_mem_L (P.bas_mem_M i))) (A_le_S l e) hm

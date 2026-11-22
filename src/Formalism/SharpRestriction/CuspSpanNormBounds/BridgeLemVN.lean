@@ -8,13 +8,14 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemVN
 
-open NumberField Formalism.HermitianLatticesTheory Formalism.ThetaLiftIndependence Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.RankOne Formalism.MainNotions.BridgeLemVR
-  Formalism.MainNotions.BridgeLemVC
+open NumberField Formalism.HermitianLatticesTheory Formalism.ThetaLiftIndependence
+  Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.RankOne
+  Formalism.MainNotions.BridgeLemVR Formalism.MainNotions.BridgeLemVC
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem fixF (K : Type) [Field K] [NumberField K] [StarRing K] :
-    ∀ a : K, star a = a ↔ a ∈ Set.range (algebraMap (cmF K) K) := by
+theorem fixF (K : Type) [Field K] [NumberField K] [StarRing K]
+    : ∀ a : K, star a = a ↔ a ∈ Set.range (algebraMap (cmF K) K) := by
   intro a
   constructor
   · intro h
@@ -22,13 +23,15 @@ theorem fixF (K : Type) [Field K] [NumberField K] [StarRing K] :
   · rintro ⟨x, rfl⟩
     exact star_coe_cmF K x
 
-theorem card_quot (hK : IsCMUnram K) :
-    Nat.card ((𝓞 (cmF K))ˣ ⧸ (powMonoidHom 2 : (𝓞 (cmF K))ˣ →* (𝓞 (cmF K))ˣ).range) = 2 ^ fDeg K := by
-  rw [Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure.unitsSquareIndex (cmF K) (isReal_cmF hK),
+theorem card_quot (hK : IsCMUnram K)
+    : Nat.card ((𝓞 (cmF K))ˣ ⧸ (powMonoidHom 2 : (𝓞 (cmF K))ˣ →* (𝓞 (cmF K))ˣ).range)
+      = 2 ^ fDeg K := by
+  rw [Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure.unitsSquareIndex (cmF K)
+      (isReal_cmF hK),
     (discrTower K (cmF K) hK (fixF K)).2.1]
 
-theorem span_mul_span1 (x y : K) :
-    Submodule.span (𝓞 K) {x} * Submodule.span (𝓞 K) {y} = Submodule.span (𝓞 K) {x * y} := by
+theorem span_mul_span1 (x y : K)
+    : Submodule.span (𝓞 K) {x} * Submodule.span (𝓞 K) {y} = Submodule.span (𝓞 K) {x * y} := by
   rw [Submodule.span_mul_span, Set.singleton_mul_singleton]
 
 theorem iota_inv (x : (𝓞 (cmF K))ˣ) : iota K x⁻¹ = (iota K x)⁻¹ :=
@@ -42,9 +45,11 @@ theorem iota_ne_zero (x : (𝓞 (cmF K))ˣ) : iota K x ≠ 0 := by
 
 theorem star_iota (x : (𝓞 (cmF K))ˣ) : star (iota K x) = iota K x := star_coe_cmF K _
 
-theorem card_classReps_le (hK : IsCMUnram K) (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0)
-    (s : Finset (Submodule (𝓞 K) K)) (hs : IsClassReps h (1 : Submodule (𝓞 K) K) s) :
-    s.card ≤ classNumber K * 2 ^ fDeg K := by
+theorem card_classReps_le
+    (hK : IsCMUnram K)
+    (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0)
+    (s : Finset (Submodule (𝓞 K) K)) (hs : IsClassReps h (1 : Submodule (𝓞 K) K) s)
+    : s.card ≤ classNumber K * 2 ^ fDeg K := by
   classical
   have hlat : ∀ M : s, Submodule.IsFullLattice K (M : Submodule (𝓞 K) K) := by
     intro M
@@ -67,15 +72,19 @@ theorem card_classReps_le (hK : IsCMUnram K) (h : K →ₗ⋆[K] K →ₗ[K] K) 
   let base : s → s := fun M => Classical.choose (⟨M, rfl⟩ : ∃ B : s, cl B = cl M)
   have hbase : ∀ M, cl (base M) = cl M := fun M =>
     Classical.choose_spec (⟨M, rfl⟩ : ∃ B : s, cl B = cl M)
-  have gen : ∀ (γ γ' : ClassGroup (𝓞 K)) (hγ : ∃ B : s, cl B = γ) (hγ' : ∃ B : s, cl B = γ'),
-      γ = γ' → Classical.choose hγ = Classical.choose hγ' := by
+  have gen
+      : ∀ (γ γ' : ClassGroup (𝓞 K)) (hγ : ∃ B : s, cl B = γ) (hγ' : ∃ B : s, cl B = γ'),
+        γ = γ' → Classical.choose hγ = Classical.choose hγ' := by
     intro γ γ' hγ hγ' e
     subst e
     rfl
   have hbase_eq : ∀ M M', cl M = cl M' → base M = base M' := fun M M' e => gen _ _ _ _ e
-  have hex : ∀ M : s, ∃ a : K, a ≠ 0 ∧
-      (M : Submodule (𝓞 K) K) = Submodule.span (𝓞 K) {a} * ((base M : s) : Submodule (𝓞 K) K) :=
-    fun M => exists_eq_span_mul (hlat M) (hlat (base M)) (hbase M).symm
+  have hex
+      : ∀ M : s, ∃ a : K,
+        a ≠ 0
+          ∧ (M : Submodule (𝓞 K) K)
+            = Submodule.span (𝓞 K) {a} * ((base M : s) : Submodule (𝓞 K) K) := fun M =>
+    exists_eq_span_mul (hlat M) (hlat (base M)) (hbase M).symm
   choose a ha0 haM using hex
   have hu : ∀ M : s, ∃ t : (𝓞 (cmF K))ˣ, iota K t = a M * star (a M) := by
     intro M
@@ -131,53 +140,55 @@ theorem card_classReps_le (hK : IsCMUnram K) (h : K →ₗ⋆[K] K →ₗ[K] K) 
   have : Finite Q := Nat.finite_of_card_ne_zero (by rw [hQ]; positivity)
   have hc := Nat.card_le_card_of_injective Ψ hinj
   rw [Nat.card_prod, hQ, Nat.card_eq_fintype_card (α := ClassGroup (𝓞 K)), Nat.card_eq_fintype_card,
-    Fintype.card_coe] at hc
+      Fintype.card_coe]
+    at hc
   exact hc
 
-theorem mass_le (hK : IsCMUnram K) (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0) :
-    mass h (1 : Submodule (𝓞 K) K) ≤ ((classNumber K * 2 ^ fDeg K : ℕ) : ℝ) := by
+theorem mass_le (hK : IsCMUnram K) (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0)
+    : mass h (1 : Submodule (𝓞 K) K) ≤ ((classNumber K * 2 ^ fDeg K : ℕ) : ℝ) := by
   unfold mass
   split_ifs with hex
   · refine le_trans ?_ (Nat.cast_le.2 (card_classReps_le hK h h1 _ hex.choose_spec))
-    calc ∑ M ∈ hex.choose, ((Nat.card (autL h M) : ℕ) : ℝ)⁻¹ ≤ ∑ _M ∈ hex.choose, (1 : ℝ) := by
-          refine Finset.sum_le_sum fun M _ => ?_
-          rcases Nat.eq_zero_or_pos (Nat.card (autL h M)) with h0 | hpos
-          · rw [h0]; simp
-          · exact inv_le_one_of_one_le₀ (by exact_mod_cast hpos)
+    calc
+      ∑ M ∈ hex.choose, ((Nat.card (autL h M) : ℕ) : ℝ)⁻¹ ≤ ∑ _M ∈ hex.choose, (1 : ℝ) := by
+        refine Finset.sum_le_sum fun M _ => ?_
+        rcases Nat.eq_zero_or_pos (Nat.card (autL h M)) with h0 | hpos
+        · rw [h0]; simp
+        · exact inv_le_one_of_one_le₀ (by exact_mod_cast hpos)
       _ = (hex.choose.card : ℝ) := by simp
   · positivity
 
 theorem isLattice_one : Submodule.IsFullLattice K (1 : Submodule (𝓞 K) K) := by
-  have : Submodule.IsLattice K (1 : Submodule (𝓞 K) K) := Submodule.IsLattice.of_fg K (by
-    rw [Submodule.one_eq_span]
-    exact Submodule.fg_span_singleton 1)
+  have : Submodule.IsLattice K (1 : Submodule (𝓞 K) K) :=
+    Submodule.IsLattice.of_fg K (by
+      rw [Submodule.one_eq_span]
+      exact Submodule.fg_span_singleton 1)
   exact ⟨span_eq_top_of_ne_zero (Submodule.mem_one.2 ⟨1, map_one _⟩) one_ne_zero⟩
 
-theorem mass_std_one_le (hK : IsCMUnram K) :
-    mass (stdForm K 1) (stdLat K 1) ≤ ((classNumber K * 2 ^ fDeg K : ℕ) : ℝ) := by
+theorem mass_std_one_le (hK : IsCMUnram K)
+    : mass (stdForm K 1) (stdLat K 1) ≤ ((classNumber K * 2 ^ fDeg K : ℕ) : ℝ) := by
   have hs := stdForm_isSymm K 1
   have ho := stdLat_isOrtho K 1
   have := finiteDimensional_of_ortho ho
   let φ := LinearEquiv.funUnique (Fin 1) K K
-  let h' : K →ₗ⋆[K] K →ₗ[K] K :=
-    ((stdForm K 1).comp φ.symm.toLinearMap).compl₂ φ.symm.toLinearMap
-  have hφ (x y : Fin 1 → K) : h' (φ x) (φ y) = stdForm K 1 x y := by
-    simp [h']
-  have hn : h' 1 1 ≠ 0 := by
-    simp [h', φ, stdForm_apply]
+  let h' : K →ₗ⋆[K] K →ₗ[K] K := ((stdForm K 1).comp φ.symm.toLinearMap).compl₂ φ.symm.toLinearMap
+  have hφ (x y : Fin 1 → K) : h' (φ x) (φ y) = stdForm K 1 x y := by simp [h']
+  have hn : h' 1 1 ≠ 0 := by simp [h', φ, stdForm_apply]
   have hmap : mapE φ (stdLat K 1) = (1 : Submodule (𝓞 K) K) := by
     change (stdLat K 1).map (φ.restrictScalars (𝓞 K)).toLinearMap = 1
     rw [stdLat, Submodule.map_span, Submodule.one_eq_span, ← Set.range_comp]
-    have he : (φ.restrictScalars (𝓞 K)).toLinearMap ∘
-        (fun i : Fin 1 => (Pi.single i 1 : Fin 1 → K)) = fun _ => (1 : K) := by
+    have he
+        : (φ.restrictScalars (𝓞 K)).toLinearMap ∘ (fun i : Fin 1 => (Pi.single i 1 : Fin 1 → K))
+          = fun _ => (1 : K) := by
       funext i
       have hi : i = (0 : Fin 1) := Subsingleton.elim _ _
       subst i
       change (Pi.single (0 : Fin 1) 1 : Fin 1 → K) 0 = 1
       exact Pi.single_eq_same _ _
     rw [he, Set.range_const]
-  obtain ⟨hex, -, -⟩ := massBasic K (Fin 1 → K) (stdForm K 1) hs
-    (trace_pos (isTotPosDef_of_ortho hK hs ho)) (stdLat K 1) (isFullLattice_of_ortho ho)
+  obtain ⟨hex, -, -⟩ :=
+    massBasic K (Fin 1 → K) (stdForm K 1) hs (trace_pos (isTotPosDef_of_ortho hK hs ho))
+      (stdLat K 1) (isFullLattice_of_ortho ho)
   have e := (mass_mapE φ hφ hex).2
   rw [hmap] at e
   rw [← e]

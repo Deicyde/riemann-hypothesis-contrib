@@ -24,23 +24,28 @@ noncomputable section
 
 namespace GlobalTheory.ThetaSchurUnitF
 
-
 open scoped TensorProduct Matrix in
 open NumberField IsDedekindDomain in
 open MeasureTheory in
-theorem _root_.GlobalTheory.ThetaSchurUnitF.exists_fd_pos_fin {F E : Type} [Field F] [NumberField F]
-    [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} {nS nT : ℕ} {JS : Matrix (Fin nS) (Fin nS) E} {JT : Matrix (Fin nT) (Fin nT) E} {ξ₀ : E}
-    {ψ : AddChar (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F) ℂ} (hψ : ∀ a, ‖ψ a‖ = 1) {f : _root_.Formalism.IndefR.DatumF.WOF F E nS nT → ℂ}
+theorem _root_.GlobalTheory.ThetaSchurUnitF.exists_fd_pos_fin
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} {nS nT : ℕ} {JS : Matrix (Fin nS) (Fin nS) E} {JT : Matrix (Fin nT) (Fin nT) E}
+    {ξ₀ : E} {ψ : AddChar (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F) ℂ}
+    (hψ : ∀ a, ‖ψ a‖ = 1)
+    {f : _root_.Formalism.IndefR.DatumF.WOF F E nS nT → ℂ}
     (hf : _root_.Formalism.IndefR.DatumF.IsThetaFunOF σ JS JT ξ₀ ψ f)
-    {y : _root_.Formalism.IndefR.DatumF.WOF F E nS nT} (hy : f y ≠ 0) :
-    ∃ (μ : Measure (_root_.Formalism.IndefR.DatumF.WOF F E nS nT)) (𝓕 : Set (_root_.Formalism.IndefR.DatumF.WOF F E nS nT)), μ.IsAddHaarMeasure ∧
-      IsAddFundamentalDomain (_root_.Formalism.IndefR.DatumF.ratLF F E nS nT) 𝓕 μ ∧
-      (∫⁻ w in 𝓕, ‖f w‖ₑ ^ 2 ∂μ) ≠ 0 ∧ (∫⁻ w in 𝓕, ‖f w‖ₑ ^ 2 ∂μ) ≠ ⊤ := by
-  obtain ⟨h1, h2, h3, h4, h5, K, hK, hcov⟩ := _root_.GlobalTheory.AdelicMatrixLatticeF.lattice F E nS nT
+    {y : _root_.Formalism.IndefR.DatumF.WOF F E nS nT} (hy : f y ≠ 0)
+    : ∃ (μ : Measure (_root_.Formalism.IndefR.DatumF.WOF F E nS nT))
+        (𝓕 : Set (_root_.Formalism.IndefR.DatumF.WOF F E nS nT)),
+      μ.IsAddHaarMeasure
+        ∧ IsAddFundamentalDomain (_root_.Formalism.IndefR.DatumF.ratLF F E nS nT) 𝓕 μ
+        ∧ (∫⁻ w in 𝓕, ‖f w‖ₑ ^ 2 ∂μ) ≠ 0 ∧ (∫⁻ w in 𝓕, ‖f w‖ₑ ^ 2 ∂μ) ≠ ⊤ := by
+  obtain ⟨h1, h2, h3, h4, h5, K, hK, hcov⟩ :=
+    _root_.GlobalTheory.AdelicMatrixLatticeF.lattice F E nS nT
   haveI : BorelSpace (_root_.Formalism.IndefR.DatumF.WOF F E nS nT) := ⟨rfl⟩
   obtain ⟨⟨μ, 𝓕, hμ, h𝓕, -⟩, hN⟩ :=
-    _root_.GlobalTheory.meanSquare_addFundamentalDomain_of_cocompact _ (_root_.Formalism.IndefR.DatumF.ratLF F E nS nT) K hK hcov
+    _root_.GlobalTheory.meanSquare_addFundamentalDomain_of_cocompact _
+      (_root_.Formalism.IndefR.DatumF.ratLF F E nS nT) K hK hcov
   have hper : ∀ γ ∈ _root_.Formalism.IndefR.DatumF.ratLF F E nS nT, ∀ w, ‖f (γ + w)‖ = ‖f w‖ := by
     intro γ hγ w
     have h := _root_.GlobalTheory.ThetaSchurF.prod_periodic hψ hf hf hγ w

@@ -208,18 +208,23 @@ private lemma corner_eq (hD : D.IsCH) (he : IsIdempotentElem e) (h1 : D.D A[X] (
 
 end aux2
 
-theorem UpperTheory.V.CA.d_corner :
-    ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (e : E), D.IsCH → IsIdempotentElem e → D.D A[X] (1 + X ⊗ₜ e) = 1 + X → 1 ≤ n → (∀ x, e * x * e = D.tr (e * x) • e) ∧ D.tr e = 1 ∧ (∀ a : A, a • e = 0 → a = 0) ∧ ∀ a : A, D.D A[X] (1 + X ⊗ₜ (a • e)) = 1 + C a * X := by
+theorem UpperTheory.V.CA.d_corner
+    : ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (e : E),
+      D.IsCH → IsIdempotentElem e → D.D A[X] (1 + X ⊗ₜ e) = 1 + X → 1 ≤ n
+        → (∀ x, e * x * e = D.tr (e * x) • e) ∧ D.tr e = 1 ∧ (∀ a : A, a • e = 0 → a = 0)
+          ∧ ∀ a : A, D.D A[X] (1 + X ⊗ₜ (a • e)) = 1 + C a * X := by
   intro n A E _ _ _ D e hD he h1 hn
   have h4 : ∀ a : A, D.D A[X] (1 + X ⊗ₜ (a • e)) = 1 + C a * X := by
     intro a
     rw [← smul_tmul, one_add_e h1, Polynomial.smul_eq_C_mul]
   refine ⟨fun x => ?_, ?_, fun a ha => ?_, h4⟩
-  · have h := corner_eq hD he h1 hn (e * x * e) (by
-      rw [← mul_assoc, ← mul_assoc, he.eq, mul_assoc _ e e, he.eq])
+  · have h :=
+      corner_eq hD he h1 hn (e * x * e)
+        (by rw [← mul_assoc, ← mul_assoc, he.eq, mul_assoc _ e e, he.eq])
     have h2 : D.tr (e * x * e) = D.tr (e * x) := by
       rw [Det.tr, (d_tr D).2.1 1 (e * x) e, ← mul_assoc, he.eq, Det.tr]
-    rw [← h2]; exact h
+    rw [← h2]
+    exact h
   · rw [cornerF_tr he h1 hn e (by rw [he.eq, he.eq]), cornerF_e he h1]
   · have h := h4 a
     rw [ha, tmul_zero, add_zero, map_one] at h

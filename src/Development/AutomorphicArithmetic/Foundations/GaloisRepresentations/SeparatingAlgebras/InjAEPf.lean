@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical UpperTheory.Gal.Gen
 
-theorem UpperTheory.Gal.Gen.injAE_pf :
-    UpperTheory.Gal.Gen.NullZero → UpperTheory.Gal.Gen.InjAE := by
+theorem UpperTheory.Gal.Gen.injAE_pf
+    : UpperTheory.Gal.Gen.NullZero → UpperTheory.Gal.Gen.InjAE := by
   intro hN n
   have h : ∀ i j : Fin n, ∀ᵐ θ : Fin n → UnitAddCircle, i ≠ j → pt θ i ≠ pt θ j := by
     intro i j

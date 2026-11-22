@@ -6,18 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TorsionBoun
 
 open CategoryTheory UpperTheory.V.KH
 
-theorem UpperTheory.V.KH.subquot :
-    ∀ (ι Z H : Type) [Finite ι] [AddCommGroup Z] [AddCommGroup H] (i : Z →+ (ι →₀ ℤ)) (q : Z →+ H)
-      (n : ℕ), 1 ≤ n → Function.Injective i → Function.Surjective q → (∀ h : H, n • h = 0) →
-      CardLe H (n ^ Nat.card ι) := by
+theorem UpperTheory.V.KH.subquot
+    : ∀ (ι Z H : Type) [Finite ι] [AddCommGroup Z] [AddCommGroup H] (i : Z →+ (ι →₀ ℤ)) (q : Z →+ H)
+        (n : ℕ),
+      1 ≤ n → Function.Injective i → Function.Surjective q → (∀ h : H, n • h = 0)
+        → CardLe H (n ^ Nat.card ι) := by
   intro ι Z H _ _ _ i q n hn hi hq hk
   classical
   have := Fintype.ofFinite ι
   let i' : Z →ₗ[ℤ] (ι →₀ ℤ) := i.toIntLinearMap
   have hi' : Function.Injective i' := hi
   have : Module.Finite ℤ Z := Module.Finite.of_injective i' hi'
-  have : Module.Free ℤ Z :=
-    Module.Free.of_equiv (LinearEquiv.ofInjective i' hi').symm
+  have : Module.Free ℤ Z := Module.Free.of_equiv (LinearEquiv.ofInjective i' hi').symm
   have hr : Module.finrank ℤ Z ≤ Nat.card ι := by
     have h := LinearMap.finrank_le_finrank_of_injective hi'
     rwa [Module.finrank_finsupp_self, ← Nat.card_eq_fintype_card] at h

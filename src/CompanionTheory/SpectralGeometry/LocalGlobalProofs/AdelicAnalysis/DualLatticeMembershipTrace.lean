@@ -13,33 +13,47 @@ namespace GlobalTheory.CompanionTheory.SW.ThW
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core
 open scoped ENNReal NNReal MatrixGroups Kronecker
 
-theorem Bf_mulVec_toA {F : Type} [Field F] [NumberField F] {ι : Type} [Fintype ι] [DecidableEq ι]
-    (B : Matrix ι ι F) (y : ι → F) : Bf B *ᵥ toA y = toA (B *ᵥ y) := by
+theorem Bf_mulVec_toA
+    {F : Type} [Field F] [NumberField F]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (B : Matrix ι ι F) (y : ι → F)
+    : Bf B *ᵥ toA y = toA (B *ᵥ y) := by
   funext i
   exact (RingHom.map_mulVec (algebraMap F (A F)) B y i).symm
 
-theorem trace_int_of_basis {F : Type} [Field F] [NumberField F]
+theorem trace_int_of_basis
+    {F : Type} [Field F] [NumberField F]
     (b : Module.Basis (InfinitePlace F) ℤ (𝓞 F)) (N : ℕ) (c : F)
-    (h : ∀ v, ∃ m : ℤ, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * c) = m) (r : 𝓞 F) :
-    ∃ n : ℤ, Algebra.trace ℚ F ((N : F) * c * (r : F)) = n := by
+    (h : ∀ v, ∃ m : ℤ, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * c) = m)
+    (r : 𝓞 F)
+    : ∃ n : ℤ, Algebra.trace ℚ F ((N : F) * c * (r : F)) = n := by
   choose m hm using h
   have hr : (r : F) = ∑ v, ((b.repr r v : ℤ) : F) * (b v : F) := by
     conv_lhs => rw [← b.sum_repr r]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum]
+    simp [map_sum]
   refine ⟨∑ v, b.repr r v * m v, ?_⟩
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hr, Finset.mul_sum, map_sum]
   push_cast
   refine Finset.sum_congr rfl fun v _ => ?_
-  have e : (N : F) * c * (((b.repr r v : ℤ) : F) * (b v : F)) =
-      (((b.repr r v : ℤ) : ℚ) * (N : ℚ)) • ((b v : F) * c) := by
+  have e
+      : (N : F) * c * (((b.repr r v : ℤ) : F) * (b v : F))
+        = (((b.repr r v : ℤ) : ℚ) * (N : ℚ)) • ((b v : F) * c) := by
     rw [Algebra.smul_def]
     simp only [eq_ratCast, Rat.cast_mul, Rat.cast_intCast, Rat.cast_natCast]
     ring
   rw [e, map_smul, smul_eq_mul, mul_assoc, hm v]
 
-theorem toA_mem_perp_latN_iff : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (A F) ℂ), IsStdChar F ψ → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι F) (b : Module.Basis (InfinitePlace F) ℤ (𝓞 F)) (N : ℕ), 0 < N → ∀ y : ι → F, toA y ∈ perp (chiB ψ (Bf B)) (latN F ι N : Set (ι → A F)) ↔ ∀ i v, ∃ m : ℤ, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ y) i) = m := by
+theorem toA_mem_perp_latN_iff
+    : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (A F) ℂ),
+      IsStdChar F ψ
+        → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι F)
+            (b : Module.Basis (InfinitePlace F) ℤ (𝓞 F)) (N : ℕ),
+          0 < N
+            → ∀ y : ι → F,
+              toA y ∈ perp (chiB ψ (Bf B)) (latN F ι N : Set (ι → A F))
+                ↔ ∀ i v, ∃ m : ℤ, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ y) i) = m := by
   intro F _ _ ψ hψ ι _ _ B b N _ y
   obtain ⟨-, hall⟩ := GlobalTheory.T.standard_adelic_character F
   obtain ⟨-, -, hchar⟩ := hall ψ hψ
@@ -69,8 +83,8 @@ theorem toA_mem_perp_latN_iff : ∀ (F : Type) [Field F] [NumberField F] (ψ : A
       ring
     rw [e, map_smul, smul_eq_mul]
   · intro h x hx
-    have h1 : ∀ i, ∀ x ∈ Oh F, ψ (algebraMap F (A F) ((N : F) * (B *ᵥ y) i) * x) = 1 :=
-      fun i => (hchar _).mpr (trace_int_of_basis b N _ (h i))
+    have h1 : ∀ i, ∀ x ∈ Oh F, ψ (algebraMap F (A F) ((N : F) * (B *ᵥ y) i) * x) = 1 := fun i =>
+      (hchar _).mpr (trace_int_of_basis b N _ (h i))
     show ψ (x ⬝ᵥ (Bf B *ᵥ toA y)) = 1
     rw [hBy, dotProduct]
     have h2 : ∀ s : Finset ι, ψ (∑ i ∈ s, x i * toA (B *ᵥ y) i) = 1 := by

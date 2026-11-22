@@ -13,20 +13,24 @@ open Formalism.DoubleCosetMeasures (IsUpUni)
 
 variable {K : Type} [Field K] {r k : ℕ}
 
-def pf (b : Fin (r + 1)) : Idx r k := if h : (b : ℕ) < r then Sum.inr (Sum.inr (Fin.rev ⟨b, h⟩)) else zI
+def pf (b : Fin (r + 1)) : Idx r k :=
+  if h : (b : ℕ) < r then Sum.inr (Sum.inr (Fin.rev ⟨b, h⟩)) else zI
 
 def RowFlag (m : Matrix (Idx r k) (Idx r k) K) : Prop :=
-  ∀ b : Fin (r + 1), mᵀ *ᵥ Pi.single (pf b) 1 - Pi.single (pf b) 1 ∈
-    Submodule.span K ((fun a => Pi.single (pf (k := k) a) (1 : K)) '' {a | a < b})
+  ∀ b : Fin (r + 1),
+    mᵀ *ᵥ Pi.single (pf b) 1 - Pi.single (pf b) 1
+      ∈ Submodule.span K ((fun a => Pi.single (pf (k := k) a) (1 : K)) '' {a | a < b})
 
-theorem rowFlag_iff' (m : Matrix (Idx r k) (Idx r k) K) :
-    RowFlag m ↔ ∀ b : Fin (r + 1), ∀ i, (∀ a, a < b → i ≠ pf a) →
-      m (pf b) i = if i = pf b then 1 else 0 := by
+theorem rowFlag_iff' (m : Matrix (Idx r k) (Idx r k) K)
+    : RowFlag m
+      ↔ ∀ b : Fin (r + 1), ∀ i,
+        (∀ a, a < b → i ≠ pf a) → m (pf b) i = if i = pf b then 1 else 0 := by
   classical
   unfold RowFlag
   refine forall_congr' fun b => ?_
-  have himg : (fun a => Pi.single (pf (k := k) a) (1 : K)) '' {a | a < b} =
-      (fun j => Pi.single j (1 : K)) '' (pf '' {a | a < b}) := by
+  have himg
+      : (fun a => Pi.single (pf (k := k) a) (1 : K)) '' {a | a < b}
+        = (fun j => Pi.single j (1 : K)) '' (pf '' {a | a < b}) := by
     rw [Set.image_image]
   rw [himg, mem_span_single]
   refine forall_congr' fun i => ?_
@@ -47,8 +51,8 @@ theorem pf_last : pf (r := r) (k := k) (Fin.last r) = zI := by
   unfold pf
   rw [dite_eq_right (by simp)]
 
-theorem pf_of_lt {a b : Fin (r + 1)} (h : a < b) :
-    pf (k := k) a = Sum.inr (Sum.inr (Fin.rev ⟨a, by have := b.isLt; omega⟩)) := by
+theorem pf_of_lt {a b : Fin (r + 1)} (h : a < b)
+    : pf (k := k) a = Sum.inr (Sum.inr (Fin.rev ⟨a, by have := b.isLt; omega⟩)) := by
   unfold pf
   rw [dite_eq_left (by omega)]
 
@@ -57,42 +61,53 @@ theorem rowFlag_iff (m : Matrix (Idx r k) (Idx r k) K) : RowFlag m ↔ RowC m :=
   rw [rowFlag_iff']
   constructor
   · intro H
-    have Hr : ∀ (j : Fin r) (i : Idx r k), (∀ a : Fin r, a < j → i ≠ Sum.inr (Sum.inr (Fin.rev a))) →
-        m (Sum.inr (Sum.inr (Fin.rev j))) i = if i = Sum.inr (Sum.inr (Fin.rev j)) then 1 else 0 := by
+    have Hr
+        : ∀ (j : Fin r) (i : Idx r k),
+          (∀ a : Fin r, a < j → i ≠ Sum.inr (Sum.inr (Fin.rev a)))
+            → m (Sum.inr (Sum.inr (Fin.rev j))) i
+              = if i = Sum.inr (Sum.inr (Fin.rev j)) then 1 else 0 := by
       intro j i hi
-      have := H (Fin.castSucc j) i (fun a ha => by
-        rw [pf_of_lt ha]
-        exact hi _ (by rw [Fin.lt_def] at ha ⊢; simpa using ha))
+      have :=
+        H (Fin.castSucc j) i (fun a ha => by
+          rw [pf_of_lt ha]
+          exact hi _ (by rw [Fin.lt_def] at ha ⊢; simpa using ha))
       rwa [pf_castSucc] at this
-    have Hz : ∀ i : Idx r k, (∀ a : Fin r, i ≠ Sum.inr (Sum.inr (Fin.rev a))) →
-        m zI i = if i = zI then 1 else 0 := by
+    have Hz
+        : ∀ i : Idx r k,
+          (∀ a : Fin r, i ≠ Sum.inr (Sum.inr (Fin.rev a))) → m zI i = if i = zI then 1 else 0 := by
       intro i hi
-      have := H (Fin.last r) i (fun a ha => by
-        rw [pf_of_lt ha]
-        exact hi _)
+      have :=
+        H (Fin.last r) i (fun a ha => by
+          rw [pf_of_lt ha]
+          exact hi _)
       rwa [pf_last] at this
-    have Hf : ∀ (a : Fin r) (i : Idx r k), (∀ b : Fin r, i = Sum.inr (Sum.inr b) → b ≤ a) →
-        m (Sum.inr (Sum.inr a)) i = if i = Sum.inr (Sum.inr a) then 1 else 0 := by
+    have Hf
+        : ∀ (a : Fin r) (i : Idx r k),
+          (∀ b : Fin r, i = Sum.inr (Sum.inr b) → b ≤ a)
+            → m (Sum.inr (Sum.inr a)) i = if i = Sum.inr (Sum.inr a) then 1 else 0 := by
       intro a i hi
-      have := Hr (Fin.rev a) i (fun c hc h => by
-        have hle := hi _ h
-        rw [Fin.le_def, Fin.val_rev] at hle
-        rw [Fin.lt_def, Fin.val_rev] at hc
-        have := a.isLt
-        have := c.isLt
-        omega)
+      have :=
+        Hr (Fin.rev a) i (fun c hc h => by
+          have hle := hi _ h
+          rw [Fin.le_def, Fin.val_rev] at hle
+          rw [Fin.lt_def, Fin.val_rev] at hc
+          have := a.isLt
+          have := c.isLt
+          omega)
       simpa only [Fin.rev_rev] using this
     unfold RowC IsUpUni
     refine ⟨⟨?_, fun a => ?_⟩, ?_, ?_, fun w => ?_, ?_, fun j => ?_⟩
     · intro a b hab
       have hab' : b < a := hab
-      have := Hf a (Sum.inr (Sum.inr b)) (fun c h => by
-        cases h
-        exact hab'.le)
+      have :=
+        Hf a (Sum.inr (Sum.inr b)) (fun c h => by
+          cases h
+          exact hab'.le)
       simpa [b33, hab'.ne] using this
-    · have := Hf a (Sum.inr (Sum.inr a)) (fun c h => by
-        cases h
-        exact le_rfl)
+    · have :=
+        Hf a (Sum.inr (Sum.inr a)) (fun c h => by
+          cases h
+          exact le_rfl)
       simpa [b33] using this
     · ext a b
       simpa [b31] using Hf a (Sum.inl b) (fun c h => absurd h Sum.inl_ne_inr)

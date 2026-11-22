@@ -15,8 +15,8 @@ variable {R₀ : Type u} [CommRing R₀]
 lemma LHom.ext' {R S : LAlg R₀} {f g : LHom R S} (h : ∀ x, f.1 x = g.1 x) : f = g :=
   Subtype.ext (AlgHom.ext h)
 
-def mkLHom {R S : LAlg R₀} (f : (R : Type u) →ₐ[R₀] (S : Type u))
-    (h : ∀ a, IsUnit (f a) → IsUnit a) : LHom R S :=
+def mkLHom {R S : LAlg R₀} (f : (R : Type u) →ₐ[R₀] (S : Type u)) (h : ∀ a, IsUnit (f a) → IsUnit a)
+    : LHom R S :=
   ⟨f, ⟨fun a ha => h a ha⟩⟩
 
 namespace DualPair
@@ -94,8 +94,12 @@ lemma fp_isUnit (q : Dp.fpS) (h : IsUnit (Dp.π.1 q.1.1)) : IsUnit q := by
   exact isUnit_iff_exists_inv.mpr ⟨e * (2 - q * e), by linear_combination -hkk⟩
 
 instance fpS_local : IsLocalRing Dp.fpS := by
-  have : Nontrivial Dp.fpS := ⟨⟨0, 1, fun h => zero_ne_one (α := (Dp.D : Type u))
-    (by simpa using congrArg (fun q : Dp.fpS => q.1.1) h)⟩⟩
+  have : Nontrivial Dp.fpS := ⟨⟨
+    0,
+    1,
+    fun h =>
+      zero_ne_one (α := (Dp.D : Type u)) (by simpa using congrArg (fun q : Dp.fpS => q.1.1) h)
+  ⟩⟩
   refine IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun q => ?_
   rcases IsLocalRing.isUnit_or_isUnit_one_sub_self (Dp.π.1 q.1.1) with h | h
   · exact Or.inl (Dp.fp_isUnit q h)

@@ -9,8 +9,9 @@ open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut LateralTheo
 
 namespace LateralTheory.E.LZProperCut
 
-def LZHensFinite : Prop := ∀ (A : Type) [CommRing A] [IsLocalRing A] [HenselianLocalRing A]
-  (B : Type) [CommRing B] [Algebra A B] [Module.Finite A B],
-  ConnectedSpace ↑(Spec (CommRingCat.of B)) → IsLocalRing B
+def LZHensFinite : Prop :=
+  ∀ (A : Type) [CommRing A] [IsLocalRing A] [HenselianLocalRing A] (B : Type) [CommRing B]
+      [Algebra A B] [Module.Finite A B],
+    ConnectedSpace ↑(Spec (CommRingCat.of B)) → IsLocalRing B
 
 end LateralTheory.E.LZProperCut

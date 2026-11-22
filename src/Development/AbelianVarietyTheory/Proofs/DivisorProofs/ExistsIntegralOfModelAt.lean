@@ -8,25 +8,26 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.AddMonoi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published GlobalTheory.CMModel Formalism.L2.Th1.F
+open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published
+  GlobalTheory.CMModel Formalism.L2.Th1.F
 open scoped IntermediateField BigOperators Topology
 
 namespace GlobalTheory.CMModel
 
-theorem exists_integral_of_modelAt (F : IntermediateField ℚ ℂ) [NumberField F] (w : HeightOneSpectrum (𝓞 F))
-    (V : ValuationSubring ℂ) (A : WeierstrassCurve F) (D : F)
+theorem exists_integral_of_modelAt
+    (F : IntermediateField ℚ ℂ) [NumberField F]
+    (w : HeightOneSpectrum (𝓞 F)) (V : ValuationSubring ℂ) (A : WeierstrassCurve F) (D : F)
     (hV : ∀ x : F, (x : ℂ) ∈ V ↔ x ∈ w.valuationSubringAtPrime F) (hD : D ≠ 0)
-    (h : ModelAt V F (A.map (algebraMap F ℂ)) (D : ℂ)) :
-    ∃ (C : VariableChange F) (u : (w.valuationSubringAtPrime F)ˣ),
-      (C • A).IsIntegral (w.valuationSubringAtPrime F) ∧
-        (C • A).Δ = ((u : w.valuationSubringAtPrime F) : F) * D := by
+    (h : ModelAt V F (A.map (algebraMap F ℂ)) (D : ℂ))
+    : ∃ (C : VariableChange F) (u : (w.valuationSubringAtPrime F)ˣ),
+      (C • A).IsIntegral (w.valuationSubringAtPrime F)
+        ∧ (C • A).Δ = ((u : w.valuationSubringAtPrime F) : F) * D := by
   obtain ⟨C, hu, hr, hs, ht, ⟨h1, h2, h3, h4, h6⟩, hΔ⟩ := h
   have hu0 : (⟨(C.u : ℂ), hu⟩ : F) ≠ 0 := by
     intro h0
     exact C.u.ne_zero (congrArg (fun x : F => (x : ℂ)) h0)
   let C' : VariableChange F := ⟨Units.mk0 _ hu0, ⟨C.r, hr⟩, ⟨C.s, hs⟩, ⟨C.t, ht⟩⟩
-  have hC : C'.map (algebraMap F ℂ) = C := by
-    ext <;> rfl
+  have hC : C'.map (algebraMap F ℂ) = C := by ext <;> rfl
   have hmap : (C' • A).map (algebraMap F ℂ) = C • A.map (algebraMap F ℂ) := by
     rw [← hC, map_variableChange]
   rw [← hmap] at h1 h2 h3 h4 h6 hΔ
@@ -54,8 +55,16 @@ theorem exists_integral_of_modelAt (F : IntermediateField ℚ ℂ) [NumberField 
   · apply Subtype.ext
     show D / W.Δ * (W.Δ / D) = 1
     field_simp
-  · refine ⟨⟨⟨⟨W.a₁, (hV _).1 h1⟩, ⟨W.a₂, (hV _).1 h2⟩, ⟨W.a₃, (hV _).1 h3⟩, ⟨W.a₄, (hV _).1 h4⟩,
-      ⟨W.a₆, (hV _).1 h6⟩⟩, ?_⟩⟩
+  · refine ⟨⟨
+      ⟨
+        ⟨W.a₁, (hV _).1 h1⟩,
+        ⟨W.a₂, (hV _).1 h2⟩,
+        ⟨W.a₃, (hV _).1 h3⟩,
+        ⟨W.a₄, (hV _).1 h4⟩,
+        ⟨W.a₆, (hV _).1 h6⟩
+      ⟩,
+      ?_
+    ⟩⟩
     ext <;> rfl
   · show W.Δ = W.Δ / D * D
     field_simp

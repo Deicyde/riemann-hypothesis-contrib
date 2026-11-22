@@ -8,11 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsAutomor
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU Formalism.BasicNotions UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU Formalism.BasicNotions UpperTheory.Gal.CertificateRingHomMap
 open scoped Classical
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pWtAt_of :
-    UpperTheory.Gal.CertificateRingHomMap.WtAt := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pWtAt_of
+    : UpperTheory.Gal.CertificateRingHomMap.WtAt := by
   intro E _ _ _ n _ π
   refine ⟨⟨(AU.mk π).wt, AutSub.finPart_wt_ne_bot E n π⟩, fun W hW τ lam hlam => ?_⟩
   obtain ⟨f, hf, hf0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hW

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.FnFGFnTr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 
 namespace GlobalTheory.FlagDim
 
@@ -20,13 +21,19 @@ theorem finrank_host_div_two (D : D7) : Module.finrank ℚ D.host.E / 2 = D.R.f 
   have h' : Module.finrank ℚ D.host.E = 2 * D.R.f := by exact_mod_cast h
   omega
 
-theorem fnFG_fnTrdeg_record : ∀ (D : D7) (Q : Par D), Q.PinDat → ∀ j, InR D j → FnFG (Q.Xo j) Q.c ∧ FnTrdeg (Q.Xo j) Q.c (WeightFamilies.dimY D j) := by
+theorem fnFG_fnTrdeg_record
+    : ∀ (D : D7) (Q : Par D),
+      Q.PinDat
+        → ∀ j, InR D j → FnFG (Q.Xo j) Q.c ∧ FnTrdeg (Q.Xo j) Q.c (WeightFamilies.dimY D j) := by
   intro D Q hP j hj
   obtain ⟨hp, hq, -⟩ := hP j hj
   have h := fnFG_fnTrdeg D.host.E Q.H (Q.Dw j) Q.l (Q.Xo j) Q.c
   rw [finrank_host_div_two] at h
-  have e : WeightFamilies.dimY D j = D.R.f * ((Q.Dw j).p * (Q.Dw j).q + (Q.Dw j).p * ((Q.Dw j).p - 1) / 2 +
-      (Q.Dw j).q * ((Q.Dw j).q - 1) / 2) := by
+  have e
+      : WeightFamilies.dimY D j
+        = D.R.f
+          * ((Q.Dw j).p * (Q.Dw j).q + (Q.Dw j).p * ((Q.Dw j).p - 1) / 2
+            + (Q.Dw j).q * ((Q.Dw j).q - 1) / 2) := by
     rw [hp, hq]; rfl
   rw [e]
   exact h

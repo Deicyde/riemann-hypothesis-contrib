@@ -14,7 +14,8 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
   CartesianMonoidalCategory MonObj TensorProduct NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
 
 open scoped nonZeroDivisors
 
@@ -27,9 +28,15 @@ lemma comp_pow_overScheme_grpObj {A T : Over (Sp ℂ)} [GrpObj A] (f : T ⟶ A) 
   | 0 => by simp [MonObj.comp_one]
   | n + 1 => by rw [pow_succ, pow_succ, MonObj.comp_mul, comp_pow_overScheme_grpObj f g n]
 
-theorem locally_eq_const_of_pow_eq_one : ∀ (A : Over (Sp ℂ)) [GrpObj A], IsAbelianScheme A → ∀ (N : ℕ), 1 ≤ N →
-    ∀ (T : Over (Sp ℂ)) (x : T ⟶ A), x ^ N = 1 →
-    ∀ t : T.left, ∃ (U : T.left.Opens) (y : 𝟙_ (Over (Sp ℂ)) ⟶ A), t ∈ U ∧ U.ι ≫ x.left = U.ι ≫ T.hom ≫ y.left := by
+theorem locally_eq_const_of_pow_eq_one
+    : ∀ (A : Over (Sp ℂ)) [GrpObj A],
+      IsAbelianScheme A
+        → ∀ (N : ℕ),
+          1 ≤ N
+            → ∀ (T : Over (Sp ℂ)) (x : T ⟶ A),
+              x ^ N = 1
+                → ∀ t : T.left, ∃ (U : T.left.Opens) (y : 𝟙_ (Over (Sp ℂ)) ⟶ A),
+                  t ∈ U ∧ U.ι ≫ x.left = U.ι ≫ T.hom ≫ y.left := by
   intro A _ hA N hN T x hx t
   have hunit : IsUnit ((N : ℕ) : Γ(Sp ℂ, ⊤)) := by
     have h : IsUnit ((N : ℂ)) := (Nat.cast_ne_zero.mpr (by omega)).isUnit
@@ -72,8 +79,7 @@ theorem locally_eq_const_of_pow_eq_one : ∀ (A : Over (Sp ℂ)) [GrpObj A], IsA
     · rw [Category.assoc, hfw, hy0]
     · show f.left (pointOfClosedPoint A.hom a ha (IsLocalRing.closedPoint ℂ)) = _
       exact (congrArg f.left (pointOfClosedPoint_apply A.hom a ha _)).trans hfa
-  have hg : x.left ≫ f.left = (T.hom ≫ y0) ≫ f.left := by
-    rw [hxf, Category.assoc, hy0f]
+  have hg : x.left ≫ f.left = (T.hom ≫ y0) ≫ f.left := by rw [hxf, Category.assoc, hy0f]
   have hψ := Spec.map_preimage (T.left.fromSpecResidueField t ≫ T.hom)
   set ψ := Spec.preimage (T.left.fromSpecResidueField t ≫ T.hom)
   have hr : (residueFieldIsoBase A.hom a ha).inv ≫ x.left.residueFieldMap t = ψ := by
@@ -86,16 +92,22 @@ theorem locally_eq_const_of_pow_eq_one : ∀ (A : Over (Sp ℂ)) [GrpObj A], IsA
     simp only [y0, pointOfClosedPoint, ← Category.assoc, ← Spec.map_comp]
     rw [← hr, ← Category.assoc, Iso.hom_inv_id, Category.id_comp]
   let g : T.left ⟶ pullback f.left f.left := pullback.lift x.left (T.hom ≫ y0) hg
-  have kg : T.left.fromSpecResidueField t ≫ g =
-      (T.left.fromSpecResidueField t ≫ x.left) ≫ pullback.diagonal f.left := by
+  have kg
+      : T.left.fromSpecResidueField t ≫ g
+        = (T.left.fromSpecResidueField t ≫ x.left) ≫ pullback.diagonal f.left := by
     apply pullback.hom_ext
-    · rw [Category.assoc, Category.assoc, pullback.lift_fst, pullback.diagonal_fst, Category.comp_id]
-    · rw [Category.assoc, Category.assoc, pullback.lift_snd, pullback.diagonal_snd, Category.comp_id, k]
+    · rw [Category.assoc, Category.assoc, pullback.lift_fst, pullback.diagonal_fst,
+        Category.comp_id]
+    · rw [Category.assoc, Category.assoc, pullback.lift_snd, pullback.diagonal_snd,
+        Category.comp_id, k]
   refine ⟨g ⁻¹ᵁ (pullback.diagonal f.left).opensRange, y, ?_, ?_⟩
   · show g t ∈ Set.range (pullback.diagonal f.left)
     have hk := congrArg (fun h => h (IsLocalRing.closedPoint (T.left.residueField t))) kg
-    refine ⟨_, ((Scheme.Hom.comp_apply _ _ _).symm.trans hk.symm).trans
-      ((Scheme.Hom.comp_apply _ _ _).trans ?_)⟩
+    refine ⟨
+      _,
+      ((Scheme.Hom.comp_apply _ _ _).symm.trans hk.symm).trans
+        ((Scheme.Hom.comp_apply _ _ _).trans ?_)
+    ⟩
     exact congrArg g (Scheme.fromSpecResidueField_apply t _)
   · set U := g ⁻¹ᵁ (pullback.diagonal f.left).opensRange
     have hle : Set.range (U.ι ≫ g) ⊆ Set.range (pullback.diagonal f.left) := by
@@ -106,7 +118,8 @@ theorem locally_eq_const_of_pow_eq_one : ∀ (A : Over (Sp ℂ)) [GrpObj A], IsA
     have h1 := congrArg (· ≫ pullback.fst f.left f.left) hl
     have h2 := congrArg (· ≫ pullback.snd f.left f.left) hl
     simp only [Category.assoc, pullback.diagonal_fst, pullback.diagonal_snd, Category.comp_id, g,
-      pullback.lift_fst, pullback.lift_snd] at h1 h2
+        pullback.lift_fst, pullback.lift_snd]
+      at h1 h2
     show U.ι ≫ x.left = U.ι ≫ T.hom ≫ y0
     rw [← h1, h2]
 

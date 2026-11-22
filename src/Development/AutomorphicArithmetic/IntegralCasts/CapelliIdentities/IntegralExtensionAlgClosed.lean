@@ -4,15 +4,15 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.IntegralExtensionAlgClosed.exists_ringHom_extension_of_integral :
-    ∀ (R S K : Type) [inst : CommRing R] [inst_1 : CommRing S]
-    [inst_2 : Algebra R S] [Algebra.IsIntegral R S] [inst_4 : Field K] [IsAlgClosed K],
-    Function.Injective (⇑(Algebra.algebraMap R S) : R → S) →
-      ∀ (b : R →+* K), ∃ (Φ : S →+* K), Φ.comp (Algebra.algebraMap R S) = b := by
+theorem UpperTheory.Reformulated.B.IntegralExtensionAlgClosed.exists_ringHom_extension_of_integral
+    : ∀ (R S K : Type) [inst : CommRing R] [inst_1 : CommRing S] [inst_2 : Algebra R S]
+        [Algebra.IsIntegral R S] [inst_4 : Field K] [IsAlgClosed K],
+      Function.Injective (⇑(Algebra.algebraMap R S) : R → S)
+        → ∀ (b : R →+* K), ∃ (Φ : S →+* K), Φ.comp (Algebra.algebraMap R S) = b := by
   intro R S K _ _ _ _ _ _ hinj b
   haveI hp : (RingHom.ker b).IsPrime := RingHom.ker_isPrime b
-  obtain ⟨Q, -, hQ, hQp⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := S)
-    (RingHom.ker b) ⊥ (by
+  obtain ⟨Q, -, hQ, hQp⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (S := S) (RingHom.ker b) ⊥ (by
       intro x hx
       have hx0 : algebraMap R S x = 0 := by simpa using hx
       have : x = 0 := hinj (by simpa using hx0)
@@ -30,8 +30,7 @@ theorem UpperTheory.Reformulated.B.IntegralExtensionAlgClosed.exists_ringHom_ext
   haveI : Algebra.IsAlgebraic (R ⧸ RingHom.ker b) (S ⧸ Q) := Algebra.IsIntegral.isAlgebraic
   let ψ : (S ⧸ Q) →ₐ[R ⧸ RingHom.ker b] K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨ψ.toRingHom.comp (Ideal.Quotient.mk Q), ?_⟩
   ext x

@@ -39,7 +39,8 @@ local instance : SecondCountableTopology (G n) :=
   Units.isEmbedding_embedProduct.secondCountableTopology
 local instance : LocallyCompactSpace (G n) := inferInstanceAs (LocallyCompactSpace (Mat n)ˣ)
 local instance : SecondCountableTopology (UK n) :=
-  (Topology.IsEmbedding.subtypeVal (p := fun x => x ∈ unitaryGroup (Fin n) ℂ)).secondCountableTopology
+  (Topology.IsEmbedding.subtypeVal
+    (p := fun x => x ∈ unitaryGroup (Fin n) ℂ)).secondCountableTopology
 
 def emb : UK n →* G n := Unitary.toUnits
 
@@ -51,22 +52,24 @@ theorem continuous_emb : Continuous (emb : UK n → G n) := by
   show Continuous fun κ : UK n => star κ.1
   exact continuous_subtype_val.star
 
-theorem map_mul_emb {_ : MeasurableSpace (G n)} [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
-    (κ : UK n) : Measure.map (· * emb κ) μ = μ :=
+theorem map_mul_emb
+    {_ : MeasurableSpace (G n)} [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (κ : UK n)
+    : Measure.map (· * emb κ) μ = μ :=
   GlobalTheory.CompactRight.map_mul_right_eq_of_mem_compact μ emb.range
     (by rw [MonoidHom.coe_range]; exact isCompact_range continuous_emb) _ ⟨κ, rfl⟩
 
-theorem integral_mul_emb {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {_ : MeasurableSpace (G n)}
-    [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (H : G n → V) (κ : UK n) :
-    ∫ y, H (y * emb κ) ∂μ = ∫ y, H y ∂μ := by
+theorem integral_mul_emb
+    {V : Type}
+    [NormedAddCommGroup V] [NormedSpace ℝ V] {_ : MeasurableSpace (G n)} [BorelSpace (G n)]
+    (μ : Measure (G n)) [μ.IsHaarMeasure]
+    (H : G n → V) (κ : UK n)
+    : ∫ y, H (y * emb κ) ∂μ = ∫ y, H y ∂μ := by
   conv_rhs => rw [← map_mul_emb μ κ]
   exact ((MeasurableEquiv.mulRight (emb κ)).measurableEmbedding.integral_map H).symm
 
-theorem val_mem (y : G n) : y.val ∈ GLs n :=
-  ((Matrix.isUnit_iff_isUnit_det _).1 y.isUnit).ne_zero
+theorem val_mem (y : G n) : y.val ∈ GLs n := ((Matrix.isUnit_iff_isUnit_det _).1 y.isUnit).ne_zero
 
-theorem isOpen_GLs : IsOpen (GLs n) :=
-  isOpen_ne.preimage (continuous_id.matrix_det)
+theorem isOpen_GLs : IsOpen (GLs n) := isOpen_ne.preimage (continuous_id.matrix_det)
 
 theorem continuousOn_inv : ContinuousOn (fun y : Mat n => y⁻¹) (GLs n) := by
   have : (fun y : Mat n => y⁻¹) = fun y => (y.det)⁻¹ • y.adjugate := by
@@ -77,7 +80,8 @@ theorem continuousOn_inv : ContinuousOn (fun y : Mat n => y⁻¹) (GLs n) := by
 
 theorem continuousOn_lg : ContinuousOn (lg : Mat n → ℝ) (GLs n) := by
   have h : ContinuousOn (fun y : Mat n => 1 + ∑ a, ∑ b, (‖y a b‖ ^ 2 + ‖y⁻¹ a b‖ ^ 2)) (GLs n) := by
-    refine continuousOn_const.add (continuousOn_finsetSum _ fun a _ => continuousOn_finsetSum _ fun b _ => ?_)
+    refine continuousOn_const.add (continuousOn_finsetSum _ fun a _ =>
+      continuousOn_finsetSum _ fun b _ => ?_)
     refine ContinuousOn.add ?_ ?_
     · exact ((continuous_id.matrix_elem a b).norm.pow 2).continuousOn
     · exact (((continuous_id.matrix_elem a b).comp_continuousOn continuousOn_inv).norm).pow 2
@@ -86,14 +90,17 @@ theorem continuousOn_lg : ContinuousOn (lg : Mat n → ℝ) (GLs n) := by
     Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b _ => by positivity
   positivity
 
-theorem cpt_of {V : Type} [Zero V] {S : Set (Mat n)} (hS : IsCompact S) (hG : S ⊆ GLs n) {f : Mat n → V}
-    (hf : ∀ y ∈ GLs n, y ∉ S → f y = 0) : Cpt f := by
+theorem cpt_of
+    {V : Type} [Zero V]
+    {S : Set (Mat n)} (hS : IsCompact S) (hG : S ⊆ GLs n)
+    {f : Mat n → V} (hf : ∀ y ∈ GLs n, y ∉ S → f y = 0)
+    : Cpt f := by
   obtain ⟨R, hR⟩ := hS.bddAbove_image (continuousOn_lg.mono hG)
   refine ⟨R, fun y hy hlt => hf y hy fun hyS => ?_⟩
   exact absurd (hR (Set.mem_image_of_mem _ hyS)) (not_le.2 hlt)
 
-theorem isCompact_preimage_val {C : Set (Mat n)} (hC : IsCompact C) (hs : C ⊆ GLs n) :
-    IsCompact {y : G n | y.val ∈ C} := by
+theorem isCompact_preimage_val {C : Set (Mat n)} (hC : IsCompact C) (hs : C ⊆ GLs n)
+    : IsCompact {y : G n | y.val ∈ C} := by
   haveI : CompactSpace C := isCompact_iff_compactSpace.1 hC
   let φ : C → G n := fun c => Matrix.GeneralLinearGroup.mkOfDetNeZero c.1 (hs c.2)
   have hφ : Continuous φ := by
@@ -137,24 +144,27 @@ theorem contDiff_mul : ContDiff ℝ ∞ fun p : Mat n × Mat n => p.1 * p.2 := b
   refine contDiff_pi.2 fun i => contDiff_pi.2 fun j => ?_
   simp only [Matrix.mul_apply]
   exact ContDiff.sum fun l _ =>
-    (contDiff_pi.1 (contDiff_pi.1 contDiff_fst i) l).mul (contDiff_pi.1 (contDiff_pi.1 contDiff_snd l) j)
+    (contDiff_pi.1 (contDiff_pi.1 contDiff_fst i) l).mul
+      (contDiff_pi.1 (contDiff_pi.1 contDiff_snd l) j)
 
 theorem contDiff_sec (hβ : ContDiff ℝ ∞ β) : ContDiff ℝ ∞ (sec E β v) := by
   have hΨ : ContDiff ℝ ∞ (fun z : Mat n × (Mat n × E.V) => β (z.1 * z.2.1) • z.2.2) :=
     (hβ.comp (contDiff_mul.comp (contDiff_fst.prodMk contDiff_snd.fst))).smul contDiff_snd.snd
-  exact GlobalTheory.CompanionTheory.ParSmooth.contDiff_integral_comp_compact (nu n) _ hΨ (fun κ : UK n => (κ.1, E.ρ κ v))
+  exact GlobalTheory.CompanionTheory.ParSmooth.contDiff_integral_comp_compact (nu n) _ hΨ
+    (fun κ : UK n => (κ.1, E.ρ κ v))
     (continuous_subtype_val.prodMk (continuous_orbit E v))
 
-theorem integrable_avg (hβ : Continuous β) (y : Mat n) (a : UK n → E.V) (ha : Continuous a) :
-    Integrable (fun κ : UK n => β (y * κ.1) • a κ) (nu n) :=
-  ((hβ.comp (continuous_const.matrix_mul continuous_subtype_val)).smul ha).integrable_of_hasCompactSupport
-    (HasCompactSupport.of_compactSpace _)
+theorem integrable_avg (hβ : Continuous β) (y : Mat n) (a : UK n → E.V) (ha : Continuous a)
+    : Integrable (fun κ : UK n => β (y * κ.1) • a κ) (nu n) :=
+  ((hβ.comp (continuous_const.matrix_mul continuous_subtype_val)).smul
+    ha).integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _)
 
-theorem sec_mul (hβ : Continuous β) (y : Mat n) (k' : UK n) :
-    sec E β v (y * k'.1) = E.ρ k'⁻¹ (sec E β v y) := by
+theorem sec_mul (hβ : Continuous β) (y : Mat n) (k' : UK n)
+    : sec E β v (y * k'.1) = E.ρ k'⁻¹ (sec E β v y) := by
   unfold sec
-  have h1 : ∫ κ : UK n, β (y * k'.1 * κ.1) • E.ρ κ v ∂nu n =
-      ∫ κ : UK n, (fun κ' : UK n => β (y * κ'.1) • E.ρ (k'⁻¹ * κ') v) (k' * κ) ∂nu n := by
+  have h1
+      : ∫ κ : UK n, β (y * k'.1 * κ.1) • E.ρ κ v ∂nu n
+        = ∫ κ : UK n, (fun κ' : UK n => β (y * κ'.1) • E.ρ (k'⁻¹ * κ') v) (k' * κ) ∂nu n := by
     refine integral_congr_ae (Eventually.of_forall fun κ => ?_)
     simp [mul_assoc]
   rw [h1, integral_mul_left_eq_self (fun κ' : UK n => β (y * κ'.1) • E.ρ (k'⁻¹ * κ') v) k',
@@ -162,8 +172,10 @@ theorem sec_mul (hβ : Continuous β) (y : Mat n) (k' : UK n) :
   refine integral_congr_ae (Eventually.of_forall fun κ => ?_)
   simp [map_mul, ContinuousLinearMap.map_smul_of_tower]
 
-theorem sec_eq_zero {U : Set (Mat n)} (hU : ∀ y ∈ U, ∀ k₂ : UK n, y * k₂.1 ∈ U) (hs : tsupport β ⊆ U)
-    {y : Mat n} (hy : y ∉ U) : sec E β v y = 0 := by
+theorem sec_eq_zero
+    {U : Set (Mat n)} (hU : ∀ y ∈ U, ∀ k₂ : UK n, y * k₂.1 ∈ U) (hs : tsupport β ⊆ U)
+    {y : Mat n} (hy : y ∉ U)
+    : sec E β v y = 0 := by
   unfold sec
   have : ∀ κ : UK n, β (y * κ.1) = 0 := fun κ => by
     by_contra h
@@ -172,9 +184,12 @@ theorem sec_eq_zero {U : Set (Mat n)} (hU : ∀ y ∈ U, ∀ k₂ : UK n, y * k�
     rwa [mul_assoc, mul_inv_val, mul_one] at h2
   simp [this]
 
-theorem cpt_sec {U : Set (Mat n)} (hU : ∀ y ∈ U, ∀ k₂ : UK n, y * k₂.1 ∈ U) (hUG : U ⊆ GLs n)
-    (hc : HasCompactSupport β) (hs : tsupport β ⊆ U) : Cpt (sec E β v) := by
-  let S : Set (Mat n) := (fun p : Mat n × UK n => p.1 * (p.2⁻¹ : UK n).1) '' (tsupport β ×ˢ Set.univ)
+theorem cpt_sec
+    {U : Set (Mat n)} (hU : ∀ y ∈ U, ∀ k₂ : UK n, y * k₂.1 ∈ U) (hUG : U ⊆ GLs n)
+    (hc : HasCompactSupport β) (hs : tsupport β ⊆ U)
+    : Cpt (sec E β v) := by
+  let S : Set (Mat n) :=
+    (fun p : Mat n × UK n => p.1 * (p.2⁻¹ : UK n).1) '' (tsupport β ×ˢ Set.univ)
   have hcont : Continuous fun p : Mat n × UK n => p.1 * (p.2⁻¹ : UK n).1 :=
     continuous_fst.matrix_mul (continuous_subtype_val.comp (continuous_inv.comp continuous_snd))
   have hS : IsCompact S := (hc.isCompact.prod isCompact_univ).image hcont
@@ -195,31 +210,35 @@ section Main
 
 variable {E : KMod n} {β : Mat n → ℝ} {v : E.V} {k : Mat n → (E.V →L[ℂ] E.V)}
 
-def hf (β : Mat n → ℝ) (k : Mat n → (E.V →L[ℂ] E.V)) (v : E.V) : G n → E.V :=
-  fun y => β y.val • k y.val v
+def hf (β : Mat n → ℝ) (k : Mat n → (E.V →L[ℂ] E.V)) (v : E.V) : G n → E.V := fun y =>
+  β y.val • k y.val v
 
 theorem continuous_hf (hβ : Continuous β) (hk : ContinuousOn k (GLs n)) : Continuous (hf β k v) :=
   (hβ.comp Units.continuous_val).smul
     ((hk.comp_continuous Units.continuous_val val_mem).clm_apply continuous_const)
 
-theorem compact_hf (hc : HasCompactSupport β) (hs : tsupport β ⊆ GLs n) : HasCompactSupport (hf β k v) := by
+theorem compact_hf (hc : HasCompactSupport β) (hs : tsupport β ⊆ GLs n)
+    : HasCompactSupport (hf β k v) := by
   refine HasCompactSupport.intro (isCompact_preimage_val hc.isCompact hs) fun y hy => ?_
   have : β y.val = 0 := image_eq_zero_of_notMem_tsupport hy
   simp [hf, this]
 
-theorem apply_sec (hβ : Continuous β)
-    (hr : ∀ y ∈ GLs n, ∀ k₂ : UK n, k (y * k₂.1) = k y * E.ρ k₂) (y : G n) :
-    k y.val (sec E β v (1 * y.val)) = ∫ κ : UK n, hf β k v (y * emb κ) ∂nu n := by
+theorem apply_sec
+    (hβ : Continuous β) (hr : ∀ y ∈ GLs n, ∀ k₂ : UK n, k (y * k₂.1) = k y * E.ρ k₂) (y : G n)
+    : k y.val (sec E β v (1 * y.val)) = ∫ κ : UK n, hf β k v (y * emb κ) ∂nu n := by
   unfold sec
-  rw [one_mul, ← ContinuousLinearMap.integral_comp_comm _ (integrable_avg hβ y.val _ (continuous_orbit E v))]
+  rw [one_mul,
+    ← ContinuousLinearMap.integral_comp_comm _ (integrable_avg hβ y.val _ (continuous_orbit E v))]
   refine integral_congr_ae (Eventually.of_forall fun κ => ?_)
   simp only [hf, Units.val_mul, emb_val]
   rw [hr _ (val_mem y), ContinuousLinearMap.map_smul_of_tower]
   rfl
 
-theorem integrable_prod {_ : MeasurableSpace (G n)} [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
-    {H : G n → E.V} (hH : Continuous H) (hc : HasCompactSupport H) :
-    Integrable (Function.uncurry fun (y : G n) (κ : UK n) => H (y * emb κ)) (μ.prod (nu n)) := by
+theorem integrable_prod
+    {_ : MeasurableSpace (G n)} [BorelSpace (G n)]
+    (μ : Measure (G n)) [μ.IsHaarMeasure]
+    {H : G n → E.V} (hH : Continuous H) (hc : HasCompactSupport H)
+    : Integrable (Function.uncurry fun (y : G n) (κ : UK n) => H (y * emb κ)) (μ.prod (nu n)) := by
   have hcont : Continuous (Function.uncurry fun (y : G n) (κ : UK n) => H (y * emb κ)) :=
     hH.comp (continuous_fst.mul (continuous_emb.comp continuous_snd))
   refine hcont.integrable_of_hasCompactSupport ?_
@@ -230,10 +249,12 @@ theorem integrable_prod {_ : MeasurableSpace (G n)} [BorelSpace (G n)] (μ : Mea
   refine hp ⟨(p.1 * emb p.2, p.2), ⟨subset_tsupport _ h, Set.mem_univ _⟩, ?_⟩
   simp
 
-theorem act_sec {_ : MeasurableSpace (G n)} [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
+theorem act_sec
+    {_ : MeasurableSpace (G n)} [BorelSpace (G n)]
+    (μ : Measure (G n)) [μ.IsHaarMeasure]
     (hβ : Continuous β) (hc : HasCompactSupport β) (hs : tsupport β ⊆ GLs n)
-    (hk : ContinuousOn k (GLs n)) (hr : ∀ y ∈ GLs n, ∀ k₂ : UK n, k (y * k₂.1) = k y * E.ρ k₂) :
-    act μ E k (sec E β v) 1 = (nu n).real Set.univ • ∫ y, hf β k v y ∂μ := by
+    (hk : ContinuousOn k (GLs n)) (hr : ∀ y ∈ GLs n, ∀ k₂ : UK n, k (y * k₂.1) = k y * E.ρ k₂)
+    : act μ E k (sec E β v) 1 = (nu n).real Set.univ • ∫ y, hf β k v y ∂μ := by
   have hH := continuous_hf (v := v) hβ hk
   have hC := compact_hf (k := k) (v := v) hc hs
   unfold act
@@ -264,8 +285,7 @@ theorem main : PositivityTheory.RgBcC.KerUniq := by
   have hβ : Continuous β := hsm'.continuous
   have hsU : tsupport β ⊆ U := hts.trans Set.inter_subset_left
   have hsG := hsU.trans hUG
-  have hmem : sec E β v ∈ CE E :=
-    ⟨(contDiff_sec hsm').contDiffOn, fun g _ κ => sec_mul hβ g κ⟩
+  have hmem : sec E β v ∈ CE E := ⟨(contDiff_sec hsm').contDiffOn, fun g _ κ => sec_mul hβ g κ⟩
   have h0 := hact _ hmem (cpt_sec hUK hUG hcs hsU) fun y _ hy => sec_eq_zero hUK hsU hy
   rw [act_sec μ hβ hcs hsG hk hr] at h0
   have hνpos : (nu n).real Set.univ ≠ 0 := by
@@ -275,11 +295,14 @@ theorem main : PositivityTheory.RgBcC.KerUniq := by
   have hH := continuous_hf (v := v) hβ hk
   have hC := compact_hf (k := k) (v := v) hcs hsG
   have hzero : ∫ y, ℓ (hf β k v y) ∂μ = 0 := by
-    rw [ContinuousLinearMap.integral_comp_comm _ (hH.integrable_of_hasCompactSupport hC), hI, map_zero]
+    rw [ContinuousLinearMap.integral_comp_comm _ (hH.integrable_of_hasCompactSupport hC), hI,
+      map_zero]
   have hpos : 0 < ∫ y, ℓ (hf β k v y) ∂μ := by
     refine Continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero
       (x := Matrix.GeneralLinearGroup.mkOfDetNeZero y₀ (hUG hy₀)) (ℓ.continuous.comp hH)
-      (hC.comp_left (map_zero ℓ)) (fun y => ?_) ?_
+      (hC.comp_left (map_zero ℓ))
+      (fun y => ?_)
+      ?_
     · have e : ℓ (hf β k v y) = β y.val * ℓ (k y.val v) := by
         simp only [hf]
         rw [map_smul, smul_eq_mul]

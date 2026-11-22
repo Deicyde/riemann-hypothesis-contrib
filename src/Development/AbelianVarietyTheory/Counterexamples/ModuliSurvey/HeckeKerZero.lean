@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsTateIso
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.HeckeKerModel
 
@@ -15,18 +17,19 @@ open GlobalTheory.HeckeTate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {S : Scheme.{0}}
 
-theorem comp_act_natCast (t : SAB H S) {T : Over S} (x : T ⟶ t.G) (n : ℕ) :
-    x ≫ t.act.act (n : 𝓞 E) = x ^ n := by
+theorem comp_act_natCast (t : SAB H S) {T : Over S} (x : T ⟶ t.G) (n : ℕ)
+    : x ≫ t.act.act (n : 𝓞 E) = x ^ n := by
   induction n with
   | zero =>
     have h := t.act.add 0 0
     rw [add_zero] at h
     have h1 : t.act.act 0 = 1 := by simpa using h
     simp [h1]
-  | succ n ih => rw [Nat.cast_succ, t.act.add, MonObj.comp_mul, ih, t.act.one, Category.comp_id, pow_succ]
+  | succ n ih =>
+    rw [Nat.cast_succ, t.act.add, MonObj.comp_mul, ih, t.act.one, Category.comp_id, pow_succ]
 
-theorem mem_tors_span (t : SAB H S) {T : Over S} (x : T ⟶ t.G) (n : ℕ) :
-    x ∈ t.tors T (Ideal.span {(n : 𝓞 E)}) ↔ x ^ n = 1 := by
+theorem mem_tors_span (t : SAB H S) {T : Over S} (x : T ⟶ t.G) (n : ℕ)
+    : x ∈ t.tors T (Ideal.span {(n : 𝓞 E)}) ↔ x ^ n = 1 := by
   constructor
   · intro h
     rw [← comp_act_natCast]
@@ -37,18 +40,24 @@ theorem mem_tors_span (t : SAB H S) {T : Over S} (x : T ⟶ t.G) (n : ℕ) :
     rw [t.act.mul, ← Category.assoc, comp_act_natCast, h]
     simp
 
-noncomputable def torsSub (t : SAB H S) (T : Over S) (n : ℕ) : Subgroup (T ⟶ t.G) :=
-  { carrier := t.tors T (Ideal.span {(n : 𝓞 E)})
-    one_mem' := (mem_tors_span t 1 n).2 (one_pow _)
-    mul_mem' := fun {x y} hx hy a ha => by
-      have := t.act.hom a
-      rw [MonObj.mul_comp, hx a ha, hy a ha, _root_.one_mul]
-    inv_mem' := fun {x} hx => (mem_tors_span t _ n).2 (by rw [inv_pow, (mem_tors_span t x n).1 hx, inv_one]) }
+noncomputable def torsSub (t : SAB H S) (T : Over S) (n : ℕ) : Subgroup (T ⟶ t.G) := {
+  carrier := t.tors T (Ideal.span {(n : 𝓞 E)})
+  one_mem' := (mem_tors_span t 1 n).2 (one_pow _)
+  mul_mem' := fun {x y} hx hy a ha => by
+    have := t.act.hom a
+    rw [MonObj.mul_comp, hx a ha, hy a ha, _root_.one_mul]
+  inv_mem' := fun {x} hx =>
+    (mem_tors_span t _ n).2 (by rw [inv_pow, (mem_tors_span t x n).1 hx, inv_one])
+}
 
-theorem heckeKer_zero {D : Datum H} {l : Level H} {B : Type} [CommRing B] {b : Base l B} {s : S ⟶ Sp B}
-    (o : Obj D l b s) (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ S) (β : B →+* k) (hx : x ≫ s = spMap β)
-    (P : Ideal (𝓞 E)) (p : ℕ) (hp : 0 < p) :
-    o.t.HeckeKer (Over.mk x) D P p 0 (torsSub o.t (Over.mk x) p) := by
+theorem heckeKer_zero
+    {D : Datum H} {l : Level H} {B : Type} [CommRing B]
+    {b : Base l B} {s : S ⟶ Sp B} (o : Obj D l b s)
+    (k : Type) [Field k] [IsAlgClosed k]
+    (x : Sp k ⟶ S) (β : B →+* k) (hx : x ≫ s = spMap β)
+    (P : Ideal (𝓞 E))
+    (p : ℕ) (hp : 0 < p)
+    : o.t.HeckeKer (Over.mk x) D P p 0 (torsSub o.t (Over.mk x) p) := by
   obtain ⟨-, I, -⟩ := o.geom k x β hx
   have hmem : ∀ z, z ∈ torsSub o.t (Over.mk x) p ↔ z ^ p = 1 := fun z => mem_tors_span o.t z p
   have hset : (torsSub o.t (Over.mk x) p : Set _) = o.t.tors (Over.mk x) (Ideal.span {(p : 𝓞 E)}) :=
@@ -57,8 +66,8 @@ theorem heckeKer_zero {D : Datum H} {l : Level H} {B : Type} [CommRing B] {b : B
   refine ⟨fun z hz a => ?_, fun J hJ z hz => ?_, fun z hz a ha => ?_, fun z hz w hw => ?_, ?_, ?_⟩
   · have := o.t.act.hom a
     rw [hmem] at hz ⊢
-    rw [← comp_act_natCast, Category.assoc, ← o.t.act.mul, _root_.mul_comm, o.t.act.mul, ← Category.assoc,
-      comp_act_natCast, hz]
+    rw [← comp_act_natCast, Category.assoc, ← o.t.act.mul, _root_.mul_comm, o.t.act.mul,
+      ← Category.assoc, comp_act_natCast, hz]
     simp
   · rw [hset]
     exact fun a ha => hz a (Ideal.mul_le_left (I := J) (J := P) (by rw [hJ]; exact ha))
@@ -88,7 +97,8 @@ theorem heckeKer_zero {D : Datum H} {l : Level H} {B : Type} [CommRing B] {b : B
       ext a
       exact (I.ker p hp a).trans ⟨fun ⟨c, hc⟩ => ⟨c, hc.symm⟩, fun ⟨c, hc⟩ => ⟨c, hc.symm⟩⟩
     rw [← hker, AddSubgroup.index_ker]
-    refine Nat.card_congr ⟨fun z => ⟨Additive.ofMul z.1, ?_⟩, fun z => ⟨z.1.toMul, ?_⟩, fun _ => rfl, fun _ => rfl⟩
+    refine Nat.card_congr
+      ⟨fun z => ⟨Additive.ofMul z.1, ?_⟩, fun z => ⟨z.1.toMul, ?_⟩, fun _ => rfl, fun _ => rfl⟩
     · obtain ⟨a, ha⟩ := (I.onto p hp z.1).1 ((hmem _).1 z.2)
       exact ⟨a, congrArg Additive.ofMul ha⟩
     · obtain ⟨a, ha⟩ := z.2

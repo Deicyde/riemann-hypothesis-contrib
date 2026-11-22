@@ -300,5 +300,7 @@ public import GroundTheory.HeightsAndTheta.Heights.VerticalDivisors.PSpecResidue
 
 set_option maxSynthPendingDepth 1
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_LiftGraphMetric : GroundTheory.Heights₂.Heights.Targets.LiftGraphMetric.Statement :=
-  @GroundTheory.Heights₂.Heights.Targets.LiftGraphMetric.proof GroundTheory.Heights₂.Heights.Targets.LiftGraphFactor.closed
+theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_LiftGraphMetric
+    : GroundTheory.Heights₂.Heights.Targets.LiftGraphMetric.Statement :=
+  @GroundTheory.Heights₂.Heights.Targets.LiftGraphMetric.proof
+    GroundTheory.Heights₂.Heights.Targets.LiftGraphFactor.closed

@@ -14,15 +14,17 @@ open ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem weylK_eq_zero_of_eq (ε : Fin n → Bool) (μ : Fin n → ℝ) {a b : Fin n} (hab : a < b) (hε : ε a = ε b)
-    (h : (μ + rhoC ε) a = (μ + rhoC ε) b) : weylK ε μ = 0 := by
+theorem weylK_eq_zero_of_eq
+    (ε : Fin n → Bool) (μ : Fin n → ℝ)
+    {a b : Fin n} (hab : a < b) (hε : ε a = ε b) (h : (μ + rhoC ε) a = (μ + rhoC ε) b)
+    : weylK ε μ = 0 := by
   unfold weylK
   refine Finset.prod_eq_zero (Finset.mem_univ a) ?_
   refine Finset.prod_eq_zero (i := b) (Finset.mem_filter.2 ⟨Finset.mem_univ b, hab, hε⟩) ?_
   rw [h, sub_self, zero_div]
 
-theorem exists_consec_pred (ε : Fin n → Bool) {a s : Fin n} (has : a < s) (hε : ε a = ε s) :
-    ∃ a', a ≤ a' ∧ a' < s ∧ ε a' = ε s ∧ ∀ c, a' < c → c < s → ε c ≠ ε a' := by
+theorem exists_consec_pred (ε : Fin n → Bool) {a s : Fin n} (has : a < s) (hε : ε a = ε s)
+    : ∃ a', a ≤ a' ∧ a' < s ∧ ε a' = ε s ∧ ∀ c, a' < c → c < s → ε c ≠ ε a' := by
   set S := univ.filter fun c => c < s ∧ ε c = ε s with hS
   have hne : S.Nonempty := ⟨a, by simp [hS, has, hε]⟩
   have hm := S.max'_mem hne
@@ -31,8 +33,8 @@ theorem exists_consec_pred (ε : Fin n → Bool) {a s : Fin n} (has : a < s) (h�
   have : c ∈ S := by simp [hS, h2, he.trans hm.2]
   exact absurd (S.le_max' c this) (not_le.2 h1)
 
-theorem exists_consec_succ (ε : Fin n → Bool) {s b : Fin n} (hsb : s < b) (hε : ε s = ε b) :
-    ∃ b', s < b' ∧ b' ≤ b ∧ ε s = ε b' ∧ ∀ c, s < c → c < b' → ε c ≠ ε s := by
+theorem exists_consec_succ (ε : Fin n → Bool) {s b : Fin n} (hsb : s < b) (hε : ε s = ε b)
+    : ∃ b', s < b' ∧ b' ≤ b ∧ ε s = ε b' ∧ ∀ c, s < c → c < b' → ε c ≠ ε s := by
   set S := univ.filter fun c => s < c ∧ ε c = ε s with hS
   have hne : S.Nonempty := ⟨b, by simp [hS, hsb, hε]⟩
   have hm := S.min'_mem hne
@@ -41,8 +43,9 @@ theorem exists_consec_succ (ε : Fin n → Bool) {s b : Fin n} (hsb : s < b) (h�
   have : c ∈ S := by simp [hS, h1, he]
   exact absurd (S.min'_le c this) (not_le.2 h2)
 
-private theorem int_eq_of_le_lt {x y : ℝ} (hx : ∃ m : ℤ, x = m) (hy : ∃ m : ℤ, y = m) (h1 : x ≤ y)
-    (h2 : y < x + 1) : y = x := by
+private theorem int_eq_of_le_lt
+    {x y : ℝ} (hx : ∃ m : ℤ, x = m) (hy : ∃ m : ℤ, y = m) (h1 : x ≤ y) (h2 : y < x + 1)
+    : y = x := by
   obtain ⟨m, rfl⟩ := hx
   obtain ⟨k, rfl⟩ := hy
   have e1 : m ≤ k := by exact_mod_cast h1
@@ -50,9 +53,14 @@ private theorem int_eq_of_le_lt {x y : ℝ} (hx : ∃ m : ℤ, x = m) (hy : ∃ 
   have : k = m := by omega
   rw [this]
 
-theorem weylK_eq_zero_of_up (ε : Fin n → Bool) (Λ μ : Fin n → ℝ) (s : Fin n) (hint : ∀ a, ∃ m : ℤ, Λ a = m)
-    (hdom : KDom ε Λ) (hμ : ∀ c, ε c = ε s → μ c = Λ c + if c = s then 1 else 0)
-    {a b : Fin n} (hab : a < b) (hε : ε a = ε b) (has : ε a = ε s) (hlt : μ a < μ b) : weylK ε μ = 0 := by
+theorem weylK_eq_zero_of_up
+    (ε : Fin n → Bool)
+    (Λ μ : Fin n → ℝ)
+    (s : Fin n)
+    (hint : ∀ a, ∃ m : ℤ, Λ a = m) (hdom : KDom ε Λ)
+    (hμ : ∀ c, ε c = ε s → μ c = Λ c + if c = s then 1 else 0)
+    {a b : Fin n} (hab : a < b) (hε : ε a = ε b) (has : ε a = ε s) (hlt : μ a < μ b)
+    : weylK ε μ = 0 := by
   have hbs' : ε b = ε s := hε.symm.trans has
   have hma := hμ a has
   have hmb := hμ b hbs'
@@ -82,9 +90,14 @@ theorem weylK_eq_zero_of_up (ε : Fin n → Bool) (Λ μ : Fin n → ℝ) (s : F
   simp only [Pi.add_apply]
   linarith
 
-theorem weylK_eq_zero_of_down (ε : Fin n → Bool) (Λ μ : Fin n → ℝ) (s : Fin n) (hint : ∀ a, ∃ m : ℤ, Λ a = m)
-    (hdom : KDom ε Λ) (hμ : ∀ c, ε c = ε s → μ c = Λ c - if c = s then 1 else 0)
-    {a b : Fin n} (hab : a < b) (hε : ε a = ε b) (has : ε a = ε s) (hlt : μ a < μ b) : weylK ε μ = 0 := by
+theorem weylK_eq_zero_of_down
+    (ε : Fin n → Bool)
+    (Λ μ : Fin n → ℝ)
+    (s : Fin n)
+    (hint : ∀ a, ∃ m : ℤ, Λ a = m) (hdom : KDom ε Λ)
+    (hμ : ∀ c, ε c = ε s → μ c = Λ c - if c = s then 1 else 0)
+    {a b : Fin n} (hab : a < b) (hε : ε a = ε b) (has : ε a = ε s) (hlt : μ a < μ b)
+    : weylK ε μ = 0 := by
   have hbs' : ε b = ε s := hε.symm.trans has
   have hma := hμ a has
   have hmb := hμ b hbs'
@@ -113,15 +126,17 @@ theorem weylK_eq_zero_of_down (ε : Fin n → Bool) (Λ μ : Fin n → ℝ) (s :
   simp only [Pi.add_apply]
   linarith
 
-theorem exists_viol_of_not_kDom (ε : Fin n → Bool) (μ : Fin n → ℝ) (h : ¬ KDom ε μ) :
-    ∃ a b, a < b ∧ ε a = ε b ∧ μ a < μ b := by
+theorem exists_viol_of_not_kDom (ε : Fin n → Bool) (μ : Fin n → ℝ) (h : ¬ KDom ε μ)
+    : ∃ a b, a < b ∧ ε a = ε b ∧ μ a < μ b := by
   unfold KDom at h
   push Not at h
   obtain ⟨a, b, hab, hε, hlt⟩ := h
   exact ⟨a, b, hab, hε, hlt⟩
 
-theorem weylK_std_vanish (ε : Fin n → Bool) (Λ : Fin n → ℝ) (hint : ∀ a, ∃ m : ℤ, Λ a = m)
-    (hdom : KDom ε Λ) (s : Fin n) (h : ¬ KDom ε (Λ + stdWt n s)) : weylK ε (Λ + stdWt n s) = 0 := by
+theorem weylK_std_vanish
+    (ε : Fin n → Bool) (Λ : Fin n → ℝ) (hint : ∀ a, ∃ m : ℤ, Λ a = m) (hdom : KDom ε Λ)
+    (s : Fin n) (h : ¬ KDom ε (Λ + stdWt n s))
+    : weylK ε (Λ + stdWt n s) = 0 := by
   obtain ⟨a, b, hab, hε, hlt⟩ := exists_viol_of_not_kDom ε _ h
   have hμ : ∀ c, (Λ + stdWt n s) c = Λ c + if c = s then 1 else 0 := by
     intro c
@@ -134,8 +149,10 @@ theorem weylK_std_vanish (ε : Fin n → Bool) (Λ : Fin n → ℝ) (hint : ∀ 
     rw [hμ, hμ, if_neg ha, if_neg hb] at hlt
     linarith [hdom a b hab hε]
 
-theorem weylK_dual_vanish (ε : Fin n → Bool) (Λ : Fin n → ℝ) (hint : ∀ a, ∃ m : ℤ, Λ a = m)
-    (hdom : KDom ε Λ) (s : Fin n) (h : ¬ KDom ε (Λ + dualWt n s)) : weylK ε (Λ + dualWt n s) = 0 := by
+theorem weylK_dual_vanish
+    (ε : Fin n → Bool) (Λ : Fin n → ℝ) (hint : ∀ a, ∃ m : ℤ, Λ a = m) (hdom : KDom ε Λ)
+    (s : Fin n) (h : ¬ KDom ε (Λ + dualWt n s))
+    : weylK ε (Λ + dualWt n s) = 0 := by
   obtain ⟨a, b, hab, hε, hlt⟩ := exists_viol_of_not_kDom ε _ h
   have hμ : ∀ c, (Λ + dualWt n s) c = Λ c - if c = s then 1 else 0 := by
     intro c

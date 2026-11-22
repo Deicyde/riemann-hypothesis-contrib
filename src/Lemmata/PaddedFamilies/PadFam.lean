@@ -33,14 +33,14 @@ private lemma pad_fam {E : Type} [Field E] [NumberField E] {n : ℕ}
       (Submodule.span_mono hsub (hc z hz))
     exact ⟨a, ha.symm⟩
 
-theorem goal1 :
-  PI.SelfDualLoc.W.LocBasis := by
+theorem goal1 : PI.SelfDualLoc.W.LocBasis := by
   intro F E _ _ _ _ _ n v Lb hfin hspan
   classical
   obtain ⟨S, hS⟩ := (Module.Finite.iff_fg.mp hfin)
   set M := Algebra.algebraMapSubmonoid (𝓞 E) v.asIdeal.primeCompl with hMdef
-  have hM : M ≤ nonZeroDivisors (𝓞 E) := map_le_nonZeroDivisors_of_injective _
-    (FaithfulSMul.algebraMap_injective _ _) v.asIdeal.primeCompl_le_nonZeroDivisors
+  have hM : M ≤ nonZeroDivisors (𝓞 E) :=
+    map_le_nonZeroDivisors_of_injective _ (FaithfulSMul.algebraMap_injective _ _)
+      v.asIdeal.primeCompl_le_nonZeroDivisors
   let A : Subalgebra (𝓞 E) E := Localization.subalgebra.ofField E M hM
   have : IsLocalization M A := inferInstance
   have : IsDedekindDomain A := IsLocalization.isDedekindDomain (𝓞 E) hM A
@@ -56,8 +56,7 @@ theorem goal1 :
   let N : Submodule A (Fin n → E) := Submodule.span A (S : Set (Fin n → E))
   have : Module.Free A N := Module.free_of_finite_type_torsion_free'
   let b := Module.Free.chooseBasis A N
-  have hb : ∀ j, ∃ t : 𝓞 F, t ∉ v.asIdeal ∧
-      (algebraMap F E (t : F)) • (b j : Fin n → E) ∈ Lb := by
+  have hb : ∀ j, ∃ t : 𝓞 F, t ∉ v.asIdeal ∧ (algebraMap F E (t : F)) • (b j : Fin n → E) ∈ Lb := by
     intro j
     obtain ⟨y, hy, z, hz⟩ := (IsLocalization.mem_span_iff M).mp (b j).2
     obtain ⟨t, ht, hzt⟩ := z.2
@@ -72,8 +71,8 @@ theorem goal1 :
     exact hy
   choose t ht hX using hb
   have hlin : LinearIndependent E (fun j => (b j : Fin n → E)) :=
-    (b.linearIndependent.map' N.subtype (Submodule.ker_subtype N)).localization
-      (Rₛ := E) (S := nonZeroDivisors A)
+    (b.linearIndependent.map' N.subtype (Submodule.ker_subtype N)).localization (Rₛ := E)
+      (S := nonZeroDivisors A)
   have hcard : Fintype.card (Module.Free.ChooseBasisIndex A N) ≤ n := by
     have := hlin.fintype_card_le_finrank
     rwa [Module.finrank_fin_fun] at this
@@ -98,16 +97,21 @@ theorem goal1 :
       rw [← hsum, Finset.smul_sum]
       refine Submodule.sum_mem _ fun j _ => ?_
       obtain ⟨r, hr⟩ := hm (⟨g, hg⟩, j)
-      have hrE : (r : E) = ((m : 𝓞 E) : E) *
-          (((b.repr ⟨g, Submodule.subset_span hg⟩ j : A) : E) *
-            ((IsLocalization.mk' A (1 : 𝓞 E) (zt j) : A) : E)) := congrArg Subtype.val hr
+      have hrE
+          : (r : E)
+            = ((m : 𝓞 E) : E)
+              * (((b.repr ⟨g, Submodule.subset_span hg⟩ j : A) : E)
+                * ((IsLocalization.mk' A (1 : 𝓞 E) (zt j) : A) : E)) :=
+        congrArg Subtype.val hr
       have htE : ((IsLocalization.mk' A (1 : 𝓞 E) (zt j) : A) : E) * algebraMap F E (t j : F) = 1 :=
         h1 (zt j)
-      have heq : algebraMap F E (u : F) •
-          ((b.repr ⟨g, Submodule.subset_span hg⟩ j : A) • (b j : Fin n → E)) = r • X j := by
-        change algebraMap F E (u : F) •
-          (((b.repr ⟨g, Submodule.subset_span hg⟩ j : A) : E) • (b j : Fin n → E)) =
-            (r : E) • (algebraMap F E (t j : F) • (b j : Fin n → E))
+      have heq
+          : algebraMap F E (u : F)
+              • ((b.repr ⟨g, Submodule.subset_span hg⟩ j : A) • (b j : Fin n → E))
+            = r • X j := by
+        change algebraMap F E (u : F)
+            • (((b.repr ⟨g, Submodule.subset_span hg⟩ j : A) : E) • (b j : Fin n → E))
+          = (r : E) • (algebraMap F E (t j : F) • (b j : Fin n → E))
         rw [smul_smul, smul_smul, hrE, hmE, mul_assoc, mul_assoc, htE, mul_one]
       rw [heq]
       exact Submodule.smul_mem _ r (Submodule.subset_span ⟨j, rfl⟩)

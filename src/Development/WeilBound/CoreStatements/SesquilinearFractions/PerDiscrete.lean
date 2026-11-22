@@ -4,8 +4,10 @@ public import Development.WeilBound.CoreStatements.SesquilinearFractions.Princip
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Matrix GlobalTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexConjugate
 
@@ -23,14 +25,20 @@ theorem blk_isLeft (k : Fin g) : (blk hty k).isLeft = true ↔ ty k (H.rt : E) =
   split_ifs with h <;> simp [h]
 
 theorem blk_inj {k k' : Fin g} (ht : ty k = ty k') (hb : blk hty k = blk hty k') : k = k' := by
-  have key : ∀ (τ τ' : E →+* ℂ), τ = τ' → ∀ (h : τ (H.rt : E) = H.rt0) (h' : τ' (H.rt : E) = H.rt0)
-      (a : {j : Fin g // ty j = τ}) (b : {j : Fin g // ty j = τ'}),
-      eP hty τ h a = eP hty τ' h' b → (a : Fin g) = b := by
+  have key
+      : ∀ (τ τ' : E →+* ℂ),
+        τ = τ'
+          → ∀ (h : τ (H.rt : E) = H.rt0) (h' : τ' (H.rt : E) = H.rt0) (a : {j : Fin g // ty j = τ})
+              (b : {j : Fin g // ty j = τ'}),
+            eP hty τ h a = eP hty τ' h' b → (a : Fin g) = b := by
     rintro τ τ' rfl h h' a b hab
     exact congrArg Subtype.val ((eP hty τ h).injective hab)
-  have key' : ∀ (τ τ' : E →+* ℂ), τ = τ' → ∀ (h : τ (H.rt : E) ≠ H.rt0) (h' : τ' (H.rt : E) ≠ H.rt0)
-      (a : {j : Fin g // ty j = τ}) (b : {j : Fin g // ty j = τ'}),
-      eQ hty τ h a = eQ hty τ' h' b → (a : Fin g) = b := by
+  have key'
+      : ∀ (τ τ' : E →+* ℂ),
+        τ = τ'
+          → ∀ (h : τ (H.rt : E) ≠ H.rt0) (h' : τ' (H.rt : E) ≠ H.rt0) (a : {j : Fin g // ty j = τ})
+              (b : {j : Fin g // ty j = τ'}),
+            eQ hty τ h a = eQ hty τ' h' b → (a : Fin g) = b := by
     rintro τ τ' rfl h h' a b hab
     exact congrArg Subtype.val ((eQ hty τ h).injective hab)
   unfold blk at hb
@@ -44,10 +52,13 @@ theorem blk_inj {k k' : Fin g} (ht : ty k = ty k') (hb : blk hty k = blk hty k')
 
 variable {D : Datum H} (x : Fin p ⊕ Fin q → D.La) (c : D.La →ₗ[𝓞 E] (Fin p ⊕ Fin q →₀ 𝓞 E)) (n : ℕ)
 
-theorem per_bx (hn0 : 0 < n) (hcx : ∀ m, c (x m) = Finsupp.single m (n : 𝓞 E)) (b : 𝓞 E) (m : Fin p ⊕ Fin q)
-    (k : Fin g) : per hty c n (b • x m) k = if blk hty k = m then ty k (b : E) else 0 := by
+theorem per_bx
+    (hn0 : 0 < n) (hcx : ∀ m, c (x m) = Finsupp.single m (n : 𝓞 E)) (b : 𝓞 E) (m : Fin p ⊕ Fin q)
+    (k : Fin g)
+    : per hty c n (b • x m) k = if blk hty k = m then ty k (b : E) else 0 := by
   have hn : (n : ℂ) ≠ 0 := by exact_mod_cast hn0.ne'
-  simp only [per, AddMonoidHom.coe_mk, ZeroHom.coe_mk, map_smul, hcx, Finsupp.smul_single, smul_eq_mul]
+  simp only [per, AddMonoidHom.coe_mk, ZeroHom.coe_mk, map_smul, hcx, Finsupp.smul_single,
+    smul_eq_mul]
   rw [Finsupp.single_apply]
   by_cases h : blk hty k = m
   · rw [if_pos h.symm, if_pos h]
@@ -57,10 +68,11 @@ theorem per_bx (hn0 : 0 < n) (hcx : ∀ m, c (x m) = Finsupp.single m (n : 𝓞 
   · rw [if_neg (Ne.symm h), if_neg h]
     simp
 
-theorem per_span (hn0 : 0 < n) (hcx : ∀ m, c (x m) = Finsupp.single m (n : 𝓞 E)) :
-    Submodule.span ℝ (Set.range (per hty c n)) = ⊤ := by
+theorem per_span (hn0 : 0 < n) (hcx : ∀ m, c (x m) = Finsupp.single m (n : 𝓞 E))
+    : Submodule.span ℝ (Set.range (per hty c n)) = ⊤ := by
   classical
-  have side : ∀ k k' : Fin g, blk hty k = blk hty k' → ComplexEmbedding.conjugate (ty k) ≠ ty k' := by
+  have side
+      : ∀ k k' : Fin g, blk hty k = blk hty k' → ComplexEmbedding.conjugate (ty k) ≠ ty k' := by
     intro k k' hkk he
     have h1 := blk_isLeft hty k
     have h2 := blk_isLeft hty k'
@@ -74,8 +86,10 @@ theorem per_span (hn0 : 0 < n) (hcx : ∀ m, c (x m) = Finsupp.single m (n : �
     Complex.I * ((f (Pi.single k Complex.I) : ℝ) : ℂ) with hl
   have hsingle : ∀ (k : Fin g) (z : ℂ), f (Pi.single k z) = (l k * z).re := by
     intro k z
-    have hz : (Pi.single k z : Fin g → ℂ) =
-        z.re • (Pi.single k (1 : ℂ) : Fin g → ℂ) + z.im • (Pi.single k Complex.I : Fin g → ℂ) := by
+    have hz
+        : (Pi.single k z : Fin g → ℂ)
+          = z.re • (Pi.single k (1 : ℂ) : Fin g → ℂ)
+            + z.im • (Pi.single k Complex.I : Fin g → ℂ) := by
       ext j
       rcases eq_or_ne j k with rfl | hj
       · simp [Complex.ext_iff]
@@ -104,8 +118,10 @@ theorem per_span (hn0 : 0 < n) (hcx : ∀ m, c (x m) = Finsupp.single m (n : �
     have hL0 : L = 0 := by
       apply emb_indep
       intro b
-      have hterm : ∀ k, l k * ty k (b : E) + conj (l k) * conj (ty k (b : E)) =
-          ((2 * (l k * ty k (b : E)).re : ℝ) : ℂ) := by
+      have hterm
+          : ∀ k,
+            l k * ty k (b : E) + conj (l k) * conj (ty k (b : E))
+              = ((2 * (l k * ty k (b : E)).re : ℝ) : ℂ) := by
         intro k
         rw [← map_mul, Complex.add_conj]
       simp only [hL, Finset.sum_mul, add_mul, ite_mul, zero_mul]
@@ -130,11 +146,14 @@ theorem per_span (hn0 : 0 < n) (hcx : ∀ m, c (x m) = Finsupp.single m (n : �
   rw [hf v]
   simp [hl0]
 
-private theorem exists_blk_inl_of_rt_eq_rt0 (σ : E →+* ℂ) (h : σ (H.rt : E) = H.rt0) (i : Fin p) :
-    ∃ k, ty k = σ ∧ blk hty k = Sum.inl i := by
+private theorem exists_blk_inl_of_rt_eq_rt0 (σ : E →+* ℂ) (h : σ (H.rt : E) = H.rt0) (i : Fin p)
+    : ∃ k, ty k = σ ∧ blk hty k = Sum.inl i := by
   refine ⟨((eP hty σ h).symm i).1, ((eP hty σ h).symm i).2, ?_⟩
-  have key : ∀ (τ : E →+* ℂ), τ = σ → ∀ (h1 : τ (H.rt : E) = H.rt0) (a : {j : Fin g // ty j = τ}),
-      (a : Fin g) = ((eP hty σ h).symm i).1 → eP hty τ h1 a = i := by
+  have key
+      : ∀ (τ : E →+* ℂ),
+        τ = σ
+          → ∀ (h1 : τ (H.rt : E) = H.rt0) (a : {j : Fin g // ty j = τ}),
+            (a : Fin g) = ((eP hty σ h).symm i).1 → eP hty τ h1 a = i := by
     rintro τ rfl h1 a ha
     have ha' : a = (eP hty τ h).symm i := Subtype.ext ha
     rw [ha']
@@ -144,11 +163,14 @@ private theorem exists_blk_inl_of_rt_eq_rt0 (σ : E →+* ℂ) (h : σ (H.rt : E
   rw [dite_eq_left (by rw [hk]; exact h)]
   exact congrArg Sum.inl (key _ hk _ ⟨_, rfl⟩ rfl)
 
-private theorem exists_blk_inr_of_rt_ne_rt0 (σ : E →+* ℂ) (h : σ (H.rt : E) ≠ H.rt0) (j : Fin q) :
-    ∃ k, ty k = σ ∧ blk hty k = Sum.inr j := by
+private theorem exists_blk_inr_of_rt_ne_rt0 (σ : E →+* ℂ) (h : σ (H.rt : E) ≠ H.rt0) (j : Fin q)
+    : ∃ k, ty k = σ ∧ blk hty k = Sum.inr j := by
   refine ⟨((eQ hty σ h).symm j).1, ((eQ hty σ h).symm j).2, ?_⟩
-  have key : ∀ (τ : E →+* ℂ), τ = σ → ∀ (h1 : τ (H.rt : E) ≠ H.rt0) (a : {i : Fin g // ty i = τ}),
-      (a : Fin g) = ((eQ hty σ h).symm j).1 → eQ hty τ h1 a = j := by
+  have key
+      : ∀ (τ : E →+* ℂ),
+        τ = σ
+          → ∀ (h1 : τ (H.rt : E) ≠ H.rt0) (a : {i : Fin g // ty i = τ}),
+            (a : Fin g) = ((eQ hty σ h).symm j).1 → eQ hty τ h1 a = j := by
     rintro τ rfl h1 a ha
     have ha' : a = (eQ hty τ h).symm j := Subtype.ext ha
     rw [ha']
@@ -158,7 +180,8 @@ private theorem exists_blk_inr_of_rt_ne_rt0 (σ : E →+* ℂ) (h : σ (H.rt : E
   rw [dite_eq_right (by rw [hk]; exact h)]
   exact congrArg Sum.inr (key _ hk _ ⟨_, rfl⟩ rfl)
 
-theorem per_discrete (hn0 : 0 < n) (hc : ∀ y, c y = 0 → y = 0) : DiscreteTopology (per hty c n).range := by
+theorem per_discrete (hn0 : 0 < n) (hc : ∀ y, c y = 0 → y = 0)
+    : DiscreteTopology (per hty c n).range := by
   have hrt0 : H.rt0 ≠ 0 := by
     intro h0
     have h := H.sqrt_neg_disc_sq
@@ -189,7 +212,9 @@ theorem per_discrete (hn0 : 0 < n) (hc : ∀ y, c y = 0 → y = 0) : DiscreteTop
         exact ⟨k, hk2, by rw [hk1]; exact hb⟩
     obtain ⟨k, hk1, hk2⟩ := hk
     have hn : (0 : ℝ) < n := by exact_mod_cast hn0
-    calc 1 / (n : ℝ) ≤ ‖ty k (c y m : E)‖ / n := by gcongr
+    calc
+      1 / (n : ℝ)
+        ≤ ‖ty k (c y m : E)‖ / n := by gcongr
       _ = ‖per hty c n y k‖ := by rw [per_apply, hk1, norm_div]; simp
       _ ≤ ‖per hty c n y‖ := norm_le_pi_norm _ k
   rw [discreteTopology_iff_isOpen_singleton_zero, Metric.isOpen_singleton_iff]
@@ -200,8 +225,7 @@ theorem per_discrete (hn0 : 0 < n) (hc : ∀ y, c y = 0 → y = 0) : DiscreteTop
   by_contra hne
   have hne' : per hty c n y ≠ 0 := fun h => hne (Subtype.ext h)
   have hb := big y hne'
-  have hz' : ‖per hty c n y‖ < 1 / (n : ℝ) := by
-    simpa [Subtype.dist_eq, dist_zero_right] using hz
+  have hz' : ‖per hty c n y‖ < 1 / (n : ℝ) := by simpa [Subtype.dist_eq, dist_zero_right] using hz
   linarith
 
 end PositivityTheory.Xgf.DPer

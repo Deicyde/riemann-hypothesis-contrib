@@ -22,12 +22,12 @@ variable {V : Type} [AddCommGroup V] [Module ℂ V]
 def NV (E : Fin n → Fin n → Module.End ℂ V) : Submodule ℂ V :=
   ⨆ i : Pos n, LinearMap.range (E i.1.1 i.1.2)
 
-theorem mem_NV (E : Fin n → Fin n → Module.End ℂ V) {a b : Fin n} (h : a < b) (w : V) :
-    E a b w ∈ NV E :=
+theorem mem_NV (E : Fin n → Fin n → Module.End ℂ V) {a b : Fin n} (h : a < b) (w : V)
+    : E a b w ∈ NV E :=
   Submodule.mem_iSup_of_mem (⟨(a, b), h⟩ : Pos n) ⟨w, rfl⟩
 
-theorem inN_of_mem (E : Fin n → Fin n → Module.End ℂ V) {y : V} (hy : y ∈ NV E) :
-    InN (allT n) E y := by
+theorem inN_of_mem (E : Fin n → Fin n → Module.End ℂ V) {y : V} (hy : y ∈ NV E)
+    : InN (allT n) E y := by
   classical
   refine Submodule.iSup_induction _ (motive := fun y => InN (allT n) E y) hy ?_ ?_ ?_
   · rintro i _ ⟨w, rfl⟩
@@ -48,15 +48,20 @@ def JJ (E : Fin n → Fin n → Module.End ℂ V) : Submodule ℂ (Module.End �
   zero_mem' _ := (NV E).zero_mem
   smul_mem' c _ h x := (NV E).smul_mem c (h x)
 
-theorem JJ_mul (E : Fin n → Fin n → Module.End ℂ V) {T : Module.End ℂ V} (h : T ∈ JJ E)
-    (S : Module.End ℂ V) : T * S ∈ JJ E := fun x => h (S x)
+theorem JJ_mul
+    (E : Fin n → Fin n → Module.End ℂ V) {T : Module.End ℂ V} (h : T ∈ JJ E) (S : Module.End ℂ V)
+    : T * S ∈ JJ E := fun x =>
+  h (S x)
 
 def HH (E : Fin n → Fin n → Module.End ℂ V) : Module.End ℂ V := ∑ c : Fin n, ((c : ℕ) : ℂ) • E c c
 
-theorem HH_comm {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) (a b : Fin n) :
-    HH E * E a b - E a b * HH E = (((a : ℕ) : ℂ) - ((b : ℕ) : ℂ)) • E a b := by
-  have h : ∀ c : Fin n, ((c : ℕ) : ℂ) • E c c * E a b - E a b * ((c : ℕ) : ℂ) • E c c =
-      (if c = a then ((a : ℕ) : ℂ) • E a b else 0) - (if c = b then ((b : ℕ) : ℂ) • E a b else 0) := by
+theorem HH_comm {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) (a b : Fin n)
+    : HH E * E a b - E a b * HH E = (((a : ℕ) : ℂ) - ((b : ℕ) : ℂ)) • E a b := by
+  have h
+      : ∀ c : Fin n,
+        ((c : ℕ) : ℂ) • E c c * E a b - E a b * ((c : ℕ) : ℂ) • E c c
+          = (if c = a then ((a : ℕ) : ℂ) • E a b else 0)
+            - (if c = b then ((b : ℕ) : ℂ) • E a b else 0) := by
     intro c
     rw [smul_mul_assoc, mul_smul_comm, ← smul_sub, hE c c a b, smul_sub]
     congr 1
@@ -72,15 +77,16 @@ theorem HH_comm {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) (a b :
 def adH (E : Fin n → Fin n → Module.End ℂ V) : Module.End ℂ (Module.End ℂ V) :=
   LinearMap.mulLeft ℂ (HH E) - LinearMap.mulRight ℂ (HH E)
 
-theorem adH_apply (E : Fin n → Fin n → Module.End ℂ V) (T : Module.End ℂ V) :
-    adH E T = HH E * T - T * HH E := rfl
+theorem adH_apply (E : Fin n → Fin n → Module.End ℂ V) (T : Module.End ℂ V)
+    : adH E T = HH E * T - T * HH E :=
+  rfl
 
-theorem adH_mul (E : Fin n → Fin n → Module.End ℂ V) (S T : Module.End ℂ V) :
-    adH E (S * T) = adH E S * T + S * adH E T := by
+theorem adH_mul (E : Fin n → Fin n → Module.End ℂ V) (S T : Module.End ℂ V)
+    : adH E (S * T) = adH E S * T + S * adH E T := by
   simp only [adH_apply]; noncomm_ring
 
-theorem HH_NV {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) {y : V} (hy : y ∈ NV E) :
-    HH E y ∈ NV E := by
+theorem HH_NV {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) {y : V} (hy : y ∈ NV E)
+    : HH E y ∈ NV E := by
   refine Submodule.iSup_induction _ (motive := fun y => HH E y ∈ NV E) hy ?_ ?_ ?_
   · rintro i _ ⟨w, rfl⟩
     have h := LinearMap.congr_fun (HH_comm hE i.1.1 i.1.2) w
@@ -89,40 +95,46 @@ theorem HH_NV {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) {y : V} 
     exact (NV E).add_mem ((NV E).smul_mem _ (mem_NV E i.2 _)) (mem_NV E i.2 _)
   · simp
   · intro x y hx hy
-    rw [map_add (f := _)]; exact (NV E).add_mem hx hy
+    rw [map_add (f := _)]
+    exact (NV E).add_mem hx hy
 
-theorem adH_JJ {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) :
-    JJ E ≤ (JJ E).comap (adH E) := by
+theorem adH_JJ {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E)
+    : JJ E ≤ (JJ E).comap (adH E) := by
   intro T hT x
   exact (NV E).sub_mem (HH_NV hE (hT x)) (hT _)
 
 def PP (E : Fin n → Fin n → Module.End ℂ V) : Submodule ℂ (Module.End ℂ V) :=
   Submodule.span ℂ {T | ∃ k : ℕ, adH E T = ((k : ℂ) + 1) • T}
 
-theorem congruenceCondition_mul {E : Fin n → Fin n → Module.End ℂ V} {T S : Module.End ℂ V} (hT : T ∈ PP E)
-    {m : ℕ} (hS : adH E S = (m : ℂ) • S) : T * S ∈ PP E := by
+theorem congruenceCondition_mul
+    {E : Fin n → Fin n → Module.End ℂ V} {T S : Module.End ℂ V} (hT : T ∈ PP E)
+    {m : ℕ} (hS : adH E S = (m : ℂ) • S)
+    : T * S ∈ PP E := by
   induction hT using Submodule.span_induction with
   | mem T h =>
     obtain ⟨k, hk⟩ := h
     refine Submodule.subset_span ⟨k + m, ?_⟩
     rw [adH_mul, hk, hS, smul_mul_assoc, mul_smul_comm, ← add_smul]
-    congr 1; push_cast; ring
+    congr 1
+    push_cast
+    ring
   | zero => simp
   | add x y _ _ hx hy => rw [add_mul]; exact (PP E).add_mem hx hy
   | smul c x _ hx => rw [smul_mul_assoc]; exact (PP E).smul_mem c hx
 
-theorem adH_evd {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) (b : FreeAlgebra ℂ (Fin n)) :
-    adH E (evd (fun c => E c c) b) = 0 := by
+theorem adH_evd {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) (b : FreeAlgebra ℂ (Fin n))
+    : adH E (evd (fun c => E c c) b) = 0 := by
   induction b using FreeAlgebra.induction with
-  | grade0 r =>
-    rw [AlgHom.commutes, adH_apply, Algebra.commutes, sub_self]
+  | grade0 r => rw [AlgHom.commutes, adH_apply, Algebra.commutes, sub_self]
   | grade1 c =>
     simp only [evd, FreeAlgebra.lift_ι_apply, adH_apply, HH_comm hE, sub_self, zero_smul]
   | mul a b ha hb => rw [map_mul, adH_mul, ha, hb]; simp
   | add a b ha hb => rw [map_add (f := _), map_add (f := _), ha, hb, add_zero]
 
-theorem mem_JJ_of {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) {t p : Module.End ℂ V}
-    (ht : adH E t = 0) (hp : p ∈ PP E) (h : t - p ∈ JJ E) : t ∈ JJ E := by
+theorem mem_JJ_of
+    {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E)
+    {t p : Module.End ℂ V} (ht : adH E t = 0) (hp : p ∈ PP E) (h : t - p ∈ JJ E)
+    : t ∈ JJ E := by
   set D : Module.End ℂ (Module.End ℂ V ⧸ JJ E) := (JJ E).mapQ (JJ E) (adH E) (adH_JJ hE) with hD
   have hd := iSupIndep_def.mp (Module.End.eigenspaces_iSupIndep D) 0
   have h1 : (JJ E).mkQ t ∈ D.eigenspace 0 := by
@@ -133,8 +145,8 @@ theorem mem_JJ_of {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) {t p
     induction hp using Submodule.span_induction with
     | mem T h =>
       obtain ⟨k, hk⟩ := h
-      refine Submodule.mem_iSup_of_mem ((k : ℂ) + 1) (Submodule.mem_iSup_of_mem
-        (Nat.cast_add_one_ne_zero k) ?_)
+      refine Submodule.mem_iSup_of_mem ((k : ℂ) + 1)
+        (Submodule.mem_iSup_of_mem (Nat.cast_add_one_ne_zero k) ?_)
       rw [Module.End.mem_eigenspace_iff, hD, Submodule.mkQ_apply, Submodule.mapQ_apply, hk]
       rfl
     | zero => simp
@@ -145,8 +157,8 @@ theorem mem_JJ_of {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E) {t p
   have := (Submodule.disjoint_def.mp hd) _ h1 h2
   exact (Submodule.Quotient.mk_eq_zero _).mp this
 
-theorem ev_ι (E : Fin n → Fin n → Module.End ℂ V) (p : Fin n × Fin n) :
-    ev E (FreeAlgebra.ι ℂ p) = E p.1 p.2 := by
+theorem ev_ι (E : Fin n → Fin n → Module.End ℂ V) (p : Fin n × Fin n)
+    : ev E (FreeAlgebra.ι ℂ p) = E p.1 p.2 := by
   simp [ev]
 
 end Mod
@@ -160,17 +172,18 @@ inductive Low : FreeAlgebra ℂ (Fin n × Fin n) → Prop
 theorem Low.zero : Low (0 : FreeAlgebra ℂ (Fin n × Fin n)) := by
   simpa using Low.smul (0 : ℂ) (1 : FreeAlgebra ℂ (Fin n × Fin n)) Low.one
 
-theorem Low.mul' {u : FreeAlgebra ℂ (Fin n × Fin n)} (hu : Low u) :
-    ∃ b : FreeAlgebra ℂ (Fin n), ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
-      (E : Fin n → Fin n → Module.End ℂ V), GlRel E → ev E u - evd (fun c => E c c) b ∈ PP E := by
+theorem Low.mul' {u : FreeAlgebra ℂ (Fin n × Fin n)} (hu : Low u)
+    : ∃ b : FreeAlgebra ℂ (Fin n),
+      ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (E : Fin n → Fin n → Module.End ℂ V),
+        GlRel E → ev E u - evd (fun c => E c c) b ∈ PP E := by
   induction hu with
   | one => exact ⟨1, fun V _ _ E _ => by simp⟩
   | mul u p _ hp ih =>
     obtain ⟨b, hb⟩ := ih
     obtain ⟨i, j⟩ := p
-    have key : ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
-      (E : Fin n → Fin n → Module.End ℂ V), GlRel E →
-        adH E (E i j) = (((i : ℕ) - (j : ℕ) : ℕ) : ℂ) • E i j := by
+    have key
+        : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (E : Fin n → Fin n → Module.End ℂ V),
+          GlRel E → adH E (E i j) = (((i : ℕ) - (j : ℕ) : ℕ) : ℂ) • E i j := by
       intro V _ _ E hE
       rw [adH_apply, HH_comm hE, Nat.cast_sub hp]
     rcases eq_or_lt_of_le hp with h | h
@@ -198,7 +211,8 @@ theorem Low.mul' {u : FreeAlgebra ℂ (Fin n × Fin n)} (hu : Low u) :
     refine ⟨b + b', fun V _ _ E hE => ?_⟩
     have := (PP E).add_mem (hb V E hE) (hb' V E hE)
     rw [map_add (f := _), map_add (f := _)]
-    convert this using 1; abel
+    convert this using 1
+    abel
   | smul c u _ hu =>
     obtain ⟨b, hb⟩ := hu
     refine ⟨c • b, fun V _ _ E hE => ?_⟩
@@ -206,16 +220,20 @@ theorem Low.mul' {u : FreeAlgebra ℂ (Fin n × Fin n)} (hu : Low u) :
     exact (PP E).smul_mem c (hb V E hE)
 
 def Red (a : FreeAlgebra ℂ (Fin n × Fin n)) : Prop :=
-  ∃ u, Low u ∧ ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
-      (E : Fin n → Fin n → Module.End ℂ V), GlRel E → ev E a - ev E u ∈ JJ E
+  ∃ u,
+    Low u
+      ∧ ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (E : Fin n → Fin n → Module.End ℂ V),
+        GlRel E → ev E a - ev E u ∈ JJ E
 
-theorem Red.add {a a' : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a) (h' : Red a') : Red (a + a') := by
+theorem Red.add {a a' : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a) (h' : Red a')
+    : Red (a + a') := by
   obtain ⟨u, hu, h⟩ := h
   obtain ⟨u', hu', h'⟩ := h'
   refine ⟨u + u', Low.add _ _ hu hu', fun V _ _ E hE => ?_⟩
   have := (JJ E).add_mem (h V E hE) (h' V E hE)
   rw [map_add (f := _), map_add (f := _)]
-  convert this using 1; abel
+  convert this using 1
+  abel
 
 theorem Red.smul (c : ℂ) {a : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a) : Red (c • a) := by
   obtain ⟨u, hu, h⟩ := h
@@ -226,21 +244,24 @@ theorem Red.smul (c : ℂ) {a : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a) : 
 theorem Red.of_low {u : FreeAlgebra ℂ (Fin n × Fin n)} (hu : Low u) : Red u :=
   ⟨u, hu, fun V _ _ E _ => by simp⟩
 
-theorem Red.congr {a a' : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a)
-    (he : ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
-      (E : Fin n → Fin n → Module.End ℂ V), GlRel E → ev E a' = ev E a) : Red a' := by
+theorem Red.congr
+    {a a' : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a)
+    (he : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (E : Fin n → Fin n → Module.End ℂ V),
+      GlRel E → ev E a' = ev E a)
+    : Red a' := by
   obtain ⟨u, hu, h⟩ := h
   exact ⟨u, hu, fun V _ _ E hE => he V E hE ▸ h V E hE⟩
 
-theorem Red.mul_low {a : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a) (p : Fin n × Fin n)
-    (hp : p.2 ≤ p.1) : Red (a * FreeAlgebra.ι ℂ p) := by
+theorem Red.mul_low
+    {a : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a) (p : Fin n × Fin n) (hp : p.2 ≤ p.1)
+    : Red (a * FreeAlgebra.ι ℂ p) := by
   obtain ⟨u, hu, h⟩ := h
   refine ⟨_, Low.mul u p hu hp, fun V _ _ E hE => ?_⟩
   rw [map_mul, map_mul, ← sub_mul]
   exact JJ_mul E (h V E hE) _
 
-theorem Low.red_mul {u : FreeAlgebra ℂ (Fin n × Fin n)} (hu : Low u) :
-    ∀ p : Fin n × Fin n, Red (u * FreeAlgebra.ι ℂ p) := by
+theorem Low.red_mul {u : FreeAlgebra ℂ (Fin n × Fin n)} (hu : Low u)
+    : ∀ p : Fin n × Fin n, Red (u * FreeAlgebra.ι ℂ p) := by
   induction hu with
   | one =>
     intro p
@@ -266,15 +287,16 @@ theorem Low.red_mul {u : FreeAlgebra ℂ (Fin n × Fin n)} (hu : Low u) :
   | add u v _ _ hu hv => intro p; rw [add_mul]; exact (hu p).add (hv p)
   | smul c u _ hu => intro p; rw [smul_mul_assoc]; exact (hu p).smul c
 
-theorem Red.mul_ι {a : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a) (p : Fin n × Fin n) :
-    Red (a * FreeAlgebra.ι ℂ p) := by
+theorem Red.mul_ι {a : FreeAlgebra ℂ (Fin n × Fin n)} (h : Red a) (p : Fin n × Fin n)
+    : Red (a * FreeAlgebra.ι ℂ p) := by
   obtain ⟨u, hu, h⟩ := h
   obtain ⟨u', hu', h'⟩ := hu.red_mul p
   refine ⟨u', hu', fun V _ _ E hE => ?_⟩
   have := (JJ E).add_mem (JJ_mul E (h V E hE) (ev E (FreeAlgebra.ι ℂ p))) (h' V E hE)
   rw [map_mul] at this ⊢
   convert this using 1
-  rw [sub_mul]; abel
+  rw [sub_mul]
+  abel
 
 theorem red_all (a : FreeAlgebra ℂ (Fin n × Fin n)) : Red a := by
   have : ∀ z, Red z → Red (z * a) := by

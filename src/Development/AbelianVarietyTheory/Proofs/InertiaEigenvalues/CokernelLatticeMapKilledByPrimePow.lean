@@ -16,6 +16,7 @@ theorem main : GlobalTheory.IndefiniteRowSideFullHecke.RepresentationBounds.Stmt
   haveI : FiniteDimensional ℚ_[l] K := hT.finite
   haveI : CompleteSpace K := FiniteDimensional.complete ℚ_[l] K
   exact GlobalTheory.T.killsCoker_all_of_killsCoker_phiModuleLattice O K l e a ι κ η H D₁ D₂ F _
-    (GlobalTheory.T.breuilKisin_pow_kills_lattice_cokernel O K l e a ι κ η H D₁ D₂ F Sig U N hB hD₁.chars_subset hD₂ hF)
+    (GlobalTheory.T.breuilKisin_pow_kills_lattice_cokernel O K l e a ι κ η H D₁ D₂ F Sig U N hB
+      hD₁.chars_subset hD₂ hF)
 
 end GlobalTheory.Proof.cokernel_latticeMap_killed_by_prime_pow

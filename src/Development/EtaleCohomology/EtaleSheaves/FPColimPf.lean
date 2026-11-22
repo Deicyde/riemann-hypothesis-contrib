@@ -13,8 +13,9 @@ attribute [local instance] Classical.propDecidable
 
 def FP (X : CommRingCat.{0}) : ObjectProperty (Under X) := fun S => S.hom.hom.FinitePresentation
 
-def FPColim : Prop := ∀ (X : CommRingCat.{0}) (S : Under X),
-  ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J), (FP X).colimitsOfShape J S
+def FPColim : Prop :=
+  ∀ (X : CommRingCat.{0}) (S : Under X), ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J),
+    (FP X).colimitsOfShape J S
 
 section Alg
 variable (R A : Type) [CommRing R] [CommRing A] [Algebra R A]
@@ -42,8 +43,11 @@ def Idx.join (i j : Idx R A) : Idx R A where
     · exact (j.hv t h).trans Finset.subset_union_right
 
 instance : IsDirected (Idx R A) (· ≤ ·) :=
-  ⟨fun i j => ⟨i.join j, ⟨Finset.subset_union_left, Finset.subset_union_left⟩,
-    ⟨Finset.subset_union_right, Finset.subset_union_right⟩⟩⟩
+  ⟨fun i j => ⟨
+    i.join j,
+    ⟨Finset.subset_union_left, Finset.subset_union_left⟩,
+    ⟨Finset.subset_union_right, Finset.subset_union_right⟩
+  ⟩⟩
 
 instance : Nonempty (Idx R A) := ⟨⟨∅, ∅, by simp, by simp⟩⟩
 
@@ -62,10 +66,11 @@ theorem retr_rename (i : Idx R A) (p : MvPolynomial i.s R) : retr i (rename Subt
   ext x
   simp
 
-theorem rename_retr (i : Idx R A) (t : MvPolynomial A R) (ht : t.vars ⊆ i.s) :
-    rename Subtype.val (retr i t) = t := by
-  obtain ⟨q, rfl⟩ := exists_rename_eq_of_vars_subset_range t (Subtype.val : i.s → A)
-    Subtype.val_injective (fun x hx => ⟨⟨x, ht hx⟩, rfl⟩)
+theorem rename_retr (i : Idx R A) (t : MvPolynomial A R) (ht : t.vars ⊆ i.s)
+    : rename Subtype.val (retr i t) = t := by
+  obtain ⟨q, rfl⟩ :=
+    exists_rename_eq_of_vars_subset_range t (Subtype.val : i.s → A) Subtype.val_injective
+      (fun x hx => ⟨⟨x, ht hx⟩, rfl⟩)
   rw [retr_rename]
 
 theorem rel_fg (i : Idx R A) : (rel i).FG := by
@@ -99,46 +104,56 @@ def toA (i : Idx R A) : D i →ₐ[R] A :=
       exact i.hT t ht
     rwa [aeval_rename] at h0)
 
-@[simp] theorem trans_mk (i j : Idx R A) (h : i ≤ j) (p) :
-    trans i j h (Ideal.Quotient.mk _ p) = Ideal.Quotient.mk _ (rename (fun x : i.s => (⟨x.1, h.1 x.2⟩ : j.s)) p) := rfl
+@[simp]
+theorem trans_mk (i j : Idx R A) (h : i ≤ j) (p)
+    : trans i j h (Ideal.Quotient.mk _ p)
+      = Ideal.Quotient.mk _ (rename (fun x : i.s => (⟨x.1, h.1 x.2⟩ : j.s)) p) :=
+  rfl
 
-@[simp] theorem toA_mk (i : Idx R A) (p) :
-    toA i (Ideal.Quotient.mk _ p) = aeval (fun x : i.s => (x : A)) p := rfl
+@[simp]
+theorem toA_mk (i : Idx R A) (p)
+    : toA i (Ideal.Quotient.mk _ p) = aeval (fun x : i.s => (x : A)) p :=
+  rfl
 
 theorem trans_id (i : Idx R A) : trans i i le_rfl = AlgHom.id R _ := by
   apply Ideal.Quotient.algHom_ext
   apply MvPolynomial.algHom_ext
-  intro x; simp [Ideal.Quotient.mkₐ_eq_mk]
+  intro x
+  simp [Ideal.Quotient.mkₐ_eq_mk]
 
-theorem trans_comp (i j k : Idx R A) (h₁ : i ≤ j) (h₂ : j ≤ k) :
-    trans i k (h₁.trans h₂) = (trans j k h₂).comp (trans i j h₁) := by
+theorem trans_comp (i j k : Idx R A) (h₁ : i ≤ j) (h₂ : j ≤ k)
+    : trans i k (h₁.trans h₂) = (trans j k h₂).comp (trans i j h₁) := by
   apply Ideal.Quotient.algHom_ext
   apply MvPolynomial.algHom_ext
-  intro x; simp [Ideal.Quotient.mkₐ_eq_mk]
+  intro x
+  simp [Ideal.Quotient.mkₐ_eq_mk]
 
 theorem toA_trans (i j : Idx R A) (h : i ≤ j) : (toA j).comp (trans i j h) = toA i := by
   apply Ideal.Quotient.algHom_ext
   apply MvPolynomial.algHom_ext
-  intro x; simp [Ideal.Quotient.mkₐ_eq_mk]
+  intro x
+  simp [Ideal.Quotient.mkₐ_eq_mk]
 
 end Alg
 
 section Cat
 variable (X : CommRingCat.{0}) (A : Type) [CommRing A] [Algebra X A]
 
-abbrev mkU (B : Type) [CommRing B] [Algebra X B] : Under X := Under.mk (CommRingCat.ofHom (algebraMap X B))
+abbrev mkU (B : Type) [CommRing B] [Algebra X B] : Under X :=
+  Under.mk (CommRingCat.ofHom (algebraMap X B))
 
 variable {X}
 
-def uHom {B C : Type} [CommRing B] [Algebra X B] [CommRing C] [Algebra X C] (φ : B →ₐ[X] C) :
-    mkU X B ⟶ mkU X C :=
+def uHom {B C : Type} [CommRing B] [Algebra X B] [CommRing C] [Algebra X C] (φ : B →ₐ[X] C)
+    : mkU X B ⟶ mkU X C :=
   Under.homMk (CommRingCat.ofHom φ.toRingHom) (by ext x; simp)
 
-theorem uHom_id {B : Type} [CommRing B] [Algebra X B] : uHom (AlgHom.id X B) = 𝟙 _ := by
-  ext; rfl
+theorem uHom_id {B : Type} [CommRing B] [Algebra X B] : uHom (AlgHom.id X B) = 𝟙 _ := by ext; rfl
 
-theorem uHom_comp {B C E : Type} [CommRing B] [Algebra X B] [CommRing C] [Algebra X C] [CommRing E] [Algebra X E]
-    (φ : B →ₐ[X] C) (ψ : C →ₐ[X] E) : uHom (ψ.comp φ) = uHom φ ≫ uHom ψ := by
+theorem uHom_comp
+    {B C E : Type} [CommRing B] [Algebra X B] [CommRing C] [Algebra X C] [CommRing E] [Algebra X E]
+    (φ : B →ₐ[X] C) (ψ : C →ₐ[X] E)
+    : uHom (ψ.comp φ) = uHom φ ≫ uHom ψ := by
   ext; rfl
 
 def diag : Idx X A ⥤ Under X where
@@ -149,11 +164,13 @@ def diag : Idx X A ⥤ Under X where
 
 def cocone : Cocone (diag (X := X) A) where
   pt := mkU X A
-  ι := { app := fun i => uHom (toA i)
-         naturality := fun i j f => by
-           simp only [Functor.const_obj_obj, Functor.const_obj_map]
-           show uHom (trans i j f.le) ≫ uHom (toA j) = uHom (toA i)
-           rw [← uHom_comp, toA_trans] }
+  ι := {
+    app := fun i => uHom (toA i)
+    naturality := fun i j f => by
+      simp only [Functor.const_obj_obj, Functor.const_obj_map]
+      show uHom (trans i j f.le) ≫ uHom (toA j) = uHom (toA i)
+      rw [← uHom_comp, toA_trans]
+  }
 
 def isColimitCocone : IsColimit (cocone (X := X) A) := by
   have : ReflectsColimitsOfShape (Idx X A) (Under.forget X ⋙ forget CommRingCat) :=
@@ -161,7 +178,11 @@ def isColimitCocone : IsColimit (cocone (X := X) A) := by
   refine isColimitOfReflects (Under.forget X ⋙ forget CommRingCat) ?_
   refine Types.FilteredColimit.isColimitOf _ _ ?_ ?_
   · intro (a : A)
-    refine ⟨⟨{a}, ∅, by simp, by simp⟩, Ideal.Quotient.mk _ (MvPolynomial.X ⟨a, Finset.mem_singleton_self a⟩), ?_⟩
+    refine ⟨
+      ⟨{a}, ∅, by simp, by simp⟩,
+      Ideal.Quotient.mk _ (MvPolynomial.X ⟨a, Finset.mem_singleton_self a⟩),
+      ?_
+    ⟩
     show a = aeval _ (MvPolynomial.X _)
     rw [aeval_X]
   · intro i j (xi : D i) (xj : D j) hx
@@ -173,35 +194,50 @@ def isColimitCocone : IsColimit (cocone (X := X) A) := by
     have hr0 : aeval (R := X) (fun a : A => a) r = 0 := by
       rw [hr, map_sub, aeval_rename, aeval_rename]
       exact sub_eq_zero.2 hx
-    let k : Idx X A := ⟨i.s ∪ j.s ∪ r.vars, i.T ∪ j.T ∪ {r}, by
+    let k : Idx X A := ⟨
+      i.s ∪ j.s ∪ r.vars,
+      i.T ∪ j.T ∪ {r},
+      by
         intro t ht
         simp only [Finset.mem_union, Finset.mem_singleton] at ht
         rcases ht with (h | h) | rfl
         · exact i.hT t h
         · exact j.hT t h
-        · exact hr0, by
+        · exact hr0,
+      by
         intro t ht
         simp only [Finset.mem_union, Finset.mem_singleton] at ht
         rcases ht with (h | h) | rfl
         · exact (i.hv t h).trans (Finset.subset_union_left.trans Finset.subset_union_left)
         · exact (j.hv t h).trans (Finset.subset_union_right.trans Finset.subset_union_left)
-        · exact Finset.subset_union_right⟩
-    have hi : i ≤ k := ⟨Finset.subset_union_left.trans Finset.subset_union_left,
-      Finset.subset_union_left.trans Finset.subset_union_left⟩
-    have hj : j ≤ k := ⟨Finset.subset_union_right.trans Finset.subset_union_left,
-      Finset.subset_union_right.trans Finset.subset_union_left⟩
+        · exact Finset.subset_union_right
+    ⟩
+    have hi : i ≤ k := ⟨
+      Finset.subset_union_left.trans Finset.subset_union_left,
+      Finset.subset_union_left.trans Finset.subset_union_left
+    ⟩
+    have hj : j ≤ k := ⟨
+      Finset.subset_union_right.trans Finset.subset_union_left,
+      Finset.subset_union_right.trans Finset.subset_union_left
+    ⟩
     refine ⟨k, homOfLE hi, homOfLE hj, ?_⟩
     show trans i k hi (Ideal.Quotient.mk _ p) = trans j k hj (Ideal.Quotient.mk _ q)
-    rw [trans_mk, trans_mk, Ideal.Quotient.eq, rel, Ideal.mem_comap, map_sub, rename_rename, rename_rename]
+    rw [trans_mk, trans_mk, Ideal.Quotient.eq, rel, Ideal.mem_comap, map_sub, rename_rename,
+      rename_rename]
     apply Ideal.subset_span
     show r ∈ ((i.T ∪ j.T ∪ {r} : Finset _) : Set (MvPolynomial A X))
     exact Finset.mem_coe.2 (Finset.mem_union_right _ (Finset.mem_singleton_self _))
 
 theorem fp_diag (i : Idx X A) : FP X ((diag (X := X) A).obj i) :=
-  show (algebraMap X (D i)).FinitePresentation from RingHom.finitePresentation_algebraMap.2 inferInstance
+  show (algebraMap X (D i)).FinitePresentation from
+    RingHom.finitePresentation_algebraMap.2 inferInstance
 
-theorem colim_mkU : (FP X).colimitsOfShape (Idx X A) (mkU X A) :=
-  ⟨{ diag := diag A, ι := (cocone A).ι, isColimit := isColimitCocone A, prop_diag_obj := fp_diag A }⟩
+theorem colim_mkU : (FP X).colimitsOfShape (Idx X A) (mkU X A) := ⟨{
+  diag := diag A
+  ι := (cocone A).ι
+  isColimit := isColimitCocone A
+  prop_diag_obj := fp_diag A
+}⟩
 
 end Cat
 

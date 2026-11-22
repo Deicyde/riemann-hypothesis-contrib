@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
 namespace UpperTheory.V.GradeZeroInterpolatingElement.DescentNormaliser
 
@@ -14,17 +16,23 @@ open Matrix
 
 section Abstract
 
-variable {O : Type} [CommRing O] [IsLocalRing O] {Γ Γ' ι : Type} [Group Γ] [TopologicalSpace Γ] [Group Γ']
-  [TopologicalSpace Γ'] [Fintype ι] [DecidableEq ι] {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
+variable
+  {O : Type} [CommRing O] [IsLocalRing O]
+  {Γ Γ' ι : Type}
+  [Group Γ] [TopologicalSpace Γ] [Group Γ'] [TopologicalSpace Γ'] [Fintype ι] [DecidableEq ι]
+  {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
 
-private theorem closed_ker {rbar : Γ →* Matrix ι ι (ResidueField O)} (ρ : Lift O rbar R) :
-    IsClosed (ρ.hom.ker : Set Γ) := by
+private theorem closed_ker {rbar : Γ →* Matrix ι ι (ResidueField O)} (ρ : Lift O rbar R)
+    : IsClosed (ρ.hom.ker : Set Γ) := by
   have hH : IsHausdorff (maximalIdeal R) R := (IsCO.complete (O := O) (R := R)).toIsHausdorff
-  have key : (ρ.hom.ker : Set Γ) = ⋂ a, ⋂ b, ⋂ N : ℕ,
-      (fun g => Ideal.Quotient.mk (maximalIdeal R ^ N) (ρ.hom g a b)) ⁻¹'
-        {Ideal.Quotient.mk (maximalIdeal R ^ N) ((1 : Matrix ι ι R) a b)} := by
+  have key
+      : (ρ.hom.ker : Set Γ)
+        = ⋂ a, ⋂ b, ⋂ N : ℕ,
+          (fun g => Ideal.Quotient.mk (maximalIdeal R ^ N) (ρ.hom g a b)) ⁻¹'
+            {Ideal.Quotient.mk (maximalIdeal R ^ N) ((1 : Matrix ι ι R) a b)} := by
     ext g
-    simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_iInter, Set.mem_preimage, Set.mem_singleton_iff]
+    simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_iInter, Set.mem_preimage,
+      Set.mem_singleton_iff]
     constructor
     · intro h a b N
       rw [h]
@@ -37,17 +45,20 @@ private theorem closed_ker {rbar : Γ →* Matrix ι ι (ResidueField O)} (ρ : 
         exact Ideal.Quotient.eq.mp (h a b n)
       exact sub_eq_zero.mp hz
   rw [key]
-  exact isClosed_iInter fun a => isClosed_iInter fun b => isClosed_iInter fun N =>
-    (ρ.cont a b N).isClosed_fiber _
+  exact isClosed_iInter fun a =>
+    isClosed_iInter fun b => isClosed_iInter fun N => (ρ.cont a b N).isClosed_fiber _
 
-private theorem exists_down {rbar : Γ →* Matrix ι ι (ResidueField O)} {rb : Γ' →* Matrix ι ι (ResidueField O)}
-    (φ : Γ →* Γ') (hφ : Topology.IsQuotientMap φ) (hb : rb.comp φ = rbar) (ρ : Lift O rbar R)
-    (h : Γ' →* Matrix ι ι R) (hh : h.comp φ = ρ.hom) : ∃ r : Lift O rb R, r.hom = h := by
+private theorem exists_down
+    {rbar : Γ →* Matrix ι ι (ResidueField O)} {rb : Γ' →* Matrix ι ι (ResidueField O)}
+    (φ : Γ →* Γ') (hφ : Topology.IsQuotientMap φ) (hb : rb.comp φ = rbar)
+    (ρ : Lift O rbar R) (h : Γ' →* Matrix ι ι R) (hh : h.comp φ = ρ.hom)
+    : ∃ r : Lift O rb R, r.hom = h := by
   refine ⟨⟨h, fun a b N => ?_, fun g' a b => ?_⟩, rfl⟩
   · intro s
     rw [← hφ.isOpen_preimage]
-    have e : (fun g' => Ideal.Quotient.mk (maximalIdeal R ^ N) (h g' a b)) ∘ φ =
-        fun g => Ideal.Quotient.mk (maximalIdeal R ^ N) (ρ.hom g a b) := by
+    have e
+        : (fun g' => Ideal.Quotient.mk (maximalIdeal R ^ N) (h g' a b)) ∘ φ
+          = fun g => Ideal.Quotient.mk (maximalIdeal R ^ N) (ρ.hom g a b) := by
       funext g
       rw [← hh]
       rfl
@@ -59,11 +70,16 @@ private theorem exists_down {rbar : Γ →* Matrix ι ι (ResidueField O)} {rb :
     rw [← hh] at hr
     exact hr
 
-private theorem exists_up {rbar : Γ →* Matrix ι ι (ResidueField O)} {rb : Γ' →* Matrix ι ι (ResidueField O)}
-    (φ : Γ →* Γ') (hφ : Continuous φ) (hb : rb.comp φ = rbar) (r : Lift O rb R) :
-    ∃ ρ : Lift O rbar R, ρ.hom = r.hom.comp φ := by
+private theorem exists_up
+    {rbar : Γ →* Matrix ι ι (ResidueField O)} {rb : Γ' →* Matrix ι ι (ResidueField O)}
+    (φ : Γ →* Γ') (hφ : Continuous φ) (hb : rb.comp φ = rbar)
+    (r : Lift O rb R)
+    : ∃ ρ : Lift O rbar R, ρ.hom = r.hom.comp φ := by
   subst hb
-  exact ⟨⟨r.hom.comp φ, fun a b N => (r.cont a b N).comp_continuous hφ, fun g a b => r.red (φ g) a b⟩, rfl⟩
+  exact ⟨
+    ⟨r.hom.comp φ, fun a b N => (r.cont a b N).comp_continuous hφ, fun g a b => r.red (φ g) a b⟩,
+    rfl
+  ⟩
 
 end Abstract
 
@@ -77,29 +93,34 @@ private theorem JR_eq : (form O).JR R = J4 R := by
 
 private theorem J_adj (X : M4 R) : J4 R * adj X = Xᵀ * J4 R := by
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [J4, adj, sgn, Matrix.mul_apply, Fin.sum_univ_four, Fin.rev] <;> ring
+  fin_cases i <;> fin_cases j <;> simp [J4, adj, sgn, Matrix.mul_apply, Fin.sum_univ_four, Fin.rev]
+    <;> ring
 
-private theorem J_sq : -J4 R * J4 R = 1 := by
+private theorem J_sq : - J4 R * J4 R = 1 := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [J4, Matrix.mul_apply, Fin.sum_univ_four]
 
 private theorem gsp_iff (ν : R) (X : M4 R) : IsGSp ν X ↔ Xᵀ * J4 R * X = ν • J4 R := by
-  have hJ' : J4 R * -J4 R = 1 := by rw [Matrix.mul_neg, ← Matrix.neg_mul, J_sq]
-  have hA : adj X = -J4 R * (Xᵀ * J4 R) := by
+  have hJ' : J4 R * - J4 R = 1 := by rw [Matrix.mul_neg, ← Matrix.neg_mul, J_sq]
+  have hA : adj X = - J4 R * (Xᵀ * J4 R) := by
     rw [← J_adj, ← Matrix.mul_assoc, J_sq, Matrix.one_mul]
   have e1 : Xᵀ * J4 R * X = J4 R * (adj X * X) := by
-    rw [hA, show J4 R * (-J4 R * (Xᵀ * J4 R) * X) = (J4 R * -J4 R) * (Xᵀ * J4 R * X) by noncomm_ring,
+    rw [hA,
+      show J4 R * (- J4 R * (Xᵀ * J4 R) * X) = (J4 R * - J4 R) * (Xᵀ * J4 R * X) by noncomm_ring,
       hJ', Matrix.one_mul]
   unfold IsGSp
   constructor
   · intro h
     rw [e1, h, Matrix.mul_smul, Matrix.mul_one]
   · intro h
-    calc adj X * X = (-J4 R * J4 R) * (adj X * X) := by rw [J_sq, Matrix.one_mul]
-      _ = -J4 R * (Xᵀ * J4 R * X) := by rw [e1, Matrix.mul_assoc]
+    calc
+      adj X * X
+        = (- J4 R * J4 R) * (adj X * X) := by rw [J_sq, Matrix.one_mul]
+      _ = - J4 R * (Xᵀ * J4 R * X) := by rw [e1, Matrix.mul_assoc]
       _ = ν • 1 := by rw [h, Matrix.mul_smul, J_sq]
 
-private theorem gsp_diag (ν : R) (d : Fin 4 → R) (h : ∀ i, d i * d i.rev = ν) : IsGSp ν (diagonal d) := by
+private theorem gsp_diag (ν : R) (d : Fin 4 → R) (h : ∀ i, d i * d i.rev = ν)
+    : IsGSp ν (diagonal d) := by
   have hs : ∀ i : Fin 4, sgn i * sgn i = 1 := by
     intro i
     fin_cases i <;> simp [sgn]
@@ -109,7 +130,8 @@ private theorem gsp_diag (ν : R) (d : Fin 4 → R) (h : ∀ i, d i * d i.rev = 
     by_cases hij : i = j
     · subst hij
       rw [hs, one_smul, diagonal_apply_eq, diagonal_apply_eq]
-    · rw [diagonal_apply_ne _ hij, diagonal_apply_ne _ (fun e => hij (Fin.rev_injective e).symm), smul_zero]
+    · rw [diagonal_apply_ne _ hij, diagonal_apply_ne _ (fun e => hij (Fin.rev_injective e).symm),
+        smul_zero]
   unfold IsGSp
   rw [hA, diagonal_mul_diagonal, Matrix.smul_one_eq_diagonal]
   congr 1
@@ -117,8 +139,11 @@ private theorem gsp_diag (ν : R) (d : Fin 4 → R) (h : ∀ i, d i * d i.rev = 
   rw [mul_comm]
   exact h i
 
-private theorem normalises {Γ : Type} [Group Γ] (ρ : Γ →* M4 R)
-    (h : ∀ g, ∃ (ν : R) (d : Fin 4 → R), (∀ i, d i * d i.rev = ν) ∧ ρ g = diagonal d) : (form O).Normalises ρ := by
+private theorem normalises
+    {Γ : Type} [Group Γ]
+    (ρ : Γ →* M4 R)
+    (h : ∀ g, ∃ (ν : R) (d : Fin 4 → R), (∀ i, d i * d i.rev = ν) ∧ ρ g = diagonal d)
+    : (form O).Normalises ρ := by
   refine ⟨fun g => ?_, ⟨1, fun g a b _ => rfl⟩, fun g a b hab => ?_⟩
   · obtain ⟨ν, d, hd, hg⟩ := h g
     refine ⟨ν, ?_⟩
@@ -128,8 +153,9 @@ private theorem normalises {Γ : Type} [Group Γ] (ρ : Γ →* M4 R)
     rw [hg]
     exact diagonal_apply_ne _ (fun e => hab (by rw [e]))
 
-private theorem pres_iff {J X Y Y' : M4 R} {ν : R} (h1 : Y * Y' = 1) (h2 : Y' * Y = 1) (hY : Yᵀ * J * Y = ν • J) :
-    (X * Y')ᵀ * J * (X * Y') = J ↔ Xᵀ * J * X = ν • J := by
+private theorem pres_iff
+    {J X Y Y' : M4 R} {ν : R} (h1 : Y * Y' = 1) (h2 : Y' * Y = 1) (hY : Yᵀ * J * Y = ν • J)
+    : (X * Y')ᵀ * J * (X * Y') = J ↔ Xᵀ * J * X = ν • J := by
   have e : (X * Y')ᵀ * J * (X * Y') = Y'ᵀ * (Xᵀ * J * X) * Y' := by
     rw [Matrix.transpose_mul]
     noncomm_ring
@@ -138,18 +164,25 @@ private theorem pres_iff {J X Y Y' : M4 R} {ν : R} (h1 : Y * Y' = 1) (h2 : Y' *
   rw [e, ← hY]
   constructor
   · intro hc
-    calc Xᵀ * J * X = (Yᵀ * Y'ᵀ) * (Xᵀ * J * X) * (Y' * Y) := by rw [t1, h2, Matrix.one_mul, Matrix.mul_one]
+    calc
+      Xᵀ * J * X
+        = (Yᵀ * Y'ᵀ) * (Xᵀ * J * X) * (Y' * Y) := by rw [t1, h2, Matrix.one_mul, Matrix.mul_one]
       _ = Yᵀ * (Y'ᵀ * (Xᵀ * J * X) * Y') * Y := by noncomm_ring
       _ = Yᵀ * J * Y := by rw [hc]
   · intro hc
     rw [hc]
-    calc Y'ᵀ * (Yᵀ * J * Y) * Y' = (Y'ᵀ * Yᵀ) * J * (Y * Y') := by noncomm_ring
+    calc
+      Y'ᵀ * (Yᵀ * J * Y) * Y'
+        = (Y'ᵀ * Yᵀ) * J * (Y * Y') := by noncomm_ring
       _ = J := by rw [t2, h1, Matrix.one_mul, Matrix.mul_one]
 
-private theorem hh_iff [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] [IsCO O R]
-    {Γ : Type} [Group Γ] [TopologicalSpace Γ] {rb : Γ →* M4 (ResidueField O)} (r0 : Lift O rb O) (r : Lift O rb R)
-    (s : Γ) (ν : O) (h : IsGSp ν (r0.hom s)) :
-    (form O).HH (r.hom s * (r0.hom s⁻¹).map (algebraMap O R)) ↔ IsGSp (algebraMap O R ν) (r.hom s) := by
+private theorem hh_iff
+    [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] [IsCO O R]
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+    {rb : Γ →* M4 (ResidueField O)} (r0 : Lift O rb O) (r : Lift O rb R)
+    (s : Γ) (ν : O) (h : IsGSp ν (r0.hom s))
+    : (form O).HH (r.hom s * (r0.hom s⁻¹).map (algebraMap O R))
+      ↔ IsGSp (algebraMap O R ν) (r.hom s) := by
   have hJ : (J4 O).map (algebraMap O R) = J4 R := JR_eq (O := O) (R := R)
   have h1 : (r0.hom s).map (algebraMap O R) * (r0.hom s⁻¹).map (algebraMap O R) = 1 := by
     rw [← Matrix.map_mul, ← map_mul, mul_inv_cancel, map_one,
@@ -157,11 +190,13 @@ private theorem hh_iff [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (max
   have h2 : (r0.hom s⁻¹).map (algebraMap O R) * (r0.hom s).map (algebraMap O R) = 1 := by
     rw [← Matrix.map_mul, ← map_mul, inv_mul_cancel, map_one,
       Matrix.map_one _ (map_zero (algebraMap O R)) (map_one (algebraMap O R))]
-  have hY : ((r0.hom s).map (algebraMap O R))ᵀ * J4 R * (r0.hom s).map (algebraMap O R) =
-      algebraMap O R ν • J4 R := by
+  have hY
+      : ((r0.hom s).map (algebraMap O R))ᵀ * J4 R * (r0.hom s).map (algebraMap O R)
+        = algebraMap O R ν • J4 R := by
     have h0 := congrArg (fun M => M.map (algebraMap O R)) ((gsp_iff ν (r0.hom s)).mp h)
     rw [Matrix.map_mul, Matrix.map_mul, Matrix.transpose_map, hJ,
-      Matrix.map_smul' _ _ _ (fun a b => map_mul (algebraMap O R) a b), hJ] at h0
+        Matrix.map_smul' _ _ _ (fun a b => map_mul (algebraMap O R) a b), hJ]
+      at h0
     exact h0
   have hC : (r.hom s * (r0.hom s⁻¹).map (algebraMap O R)).map (res O R) = 1 := by
     have e1 : (r.hom s).map (res O R) = rb s := by
@@ -182,16 +217,23 @@ end Form
 
 section Places
 
-variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c)
+variable
+  {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+  {l : ℕ} [Fact l.Prime]
+  {c : Coef l} (D : Raw Ω c)
 
-private theorem val_iff {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 ℚ)} (hv : IsPlaceOver A v) (n : ℕ) :
-    A.valuation (n : Ω) < 1 ↔ ((n : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
+private theorem val_iff
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 ℚ)} (hv : IsPlaceOver A v) (n : ℕ)
+    : A.valuation (n : Ω) < 1 ↔ ((n : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
   have e : (algebraMap ℚ Ω) (((n : 𝓞 ℚ)) : ℚ) = (n : Ω) := by simp
   rw [← e]
   exact hv _
 
-private theorem ns_le {M : Type} [Monoid M] (f : G ℚ Ω →* M) (hc : IsClosed (f.ker : Set (G ℚ Ω)))
-    (h : ∀ A, Raw.Away D.S A → Ine (F := ℚ) A ≤ f.ker) : NS Ω D.SP ≤ f.ker := by
+private theorem ns_le
+    {M : Type} [Monoid M]
+    (f : G ℚ Ω →* M)
+    (hc : IsClosed (f.ker : Set (G ℚ Ω))) (h : ∀ A, Raw.Away D.S A → Ine (F := ℚ) A ≤ f.ker)
+    : NS Ω D.SP ≤ f.ker := by
   unfold NS
   refine Subgroup.topologicalClosure_minimal _ ?_ hc
   refine Subgroup.normalClosure_le_normal ?_
@@ -204,8 +246,9 @@ private theorem ns_le {M : Type} [Monoid M] (f : G ℚ Ω →* M) (hc : IsClosed
     exact ⟨p, hp, (val_iff hA p).mp hlt⟩
   exact h A hAw hgA
 
-private theorem toGS_ine {A : ValuationSubring Ω} (hA : Raw.Away D.S A) {g : G ℚ Ω} (hg : g ∈ Ine (F := ℚ) A) :
-    toGS Ω D.SP g = 1 := by
+private theorem toGS_ine
+    {A : ValuationSubring Ω} (hA : Raw.Away D.S A) {g : G ℚ Ω} (hg : g ∈ Ine (F := ℚ) A)
+    : toGS Ω D.SP g = 1 := by
   show (QuotientGroup.mk' (NS Ω D.SP)) g = 1
   rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   by_cases htop : A = ⊤
@@ -223,8 +266,9 @@ private theorem toGS_ine {A : ValuationSubring Ω} (hA : Raw.Away D.S A) {g : G 
     exact ⟨v, hvS, A, hv, hg⟩
 
 omit [CharZero Ω] [IsAlgClosure ℚ Ω] in
-private theorem not_both (A : ValuationSubring Ω) {m n : ℕ} (hc : m.Coprime n)
-    (hm : A.valuation (m : Ω) < 1) : ¬ A.valuation (n : Ω) < 1 := by
+private theorem not_both
+    (A : ValuationSubring Ω) {m n : ℕ} (hc : m.Coprime n) (hm : A.valuation (m : Ω) < 1)
+    : ¬ A.valuation (n : Ω) < 1 := by
   intro hn
   have hb := Nat.gcd_eq_gcd_ab m n
   rw [hc.gcd_eq_one, Nat.cast_one] at hb
@@ -233,17 +277,20 @@ private theorem not_both (A : ValuationSubring Ω) {m n : ℕ} (hc : m.Coprime n
     push_cast at h0
     exact h0
   have ha : A.valuation ((m.gcdA n : ℤ) : Ω) ≤ 1 := (A.valuation_le_one_iff _).mpr (intCast_mem A _)
-  have hb2 : A.valuation ((m.gcdB n : ℤ) : Ω) ≤ 1 := (A.valuation_le_one_iff _).mpr (intCast_mem A _)
+  have hb2 : A.valuation ((m.gcdB n : ℤ) : Ω) ≤ 1 :=
+    (A.valuation_le_one_iff _).mpr (intCast_mem A _)
   have h1 : A.valuation ((m : Ω) * ((m.gcdA n : ℤ) : Ω)) < 1 := by
     rw [map_mul]
-    calc A.valuation (m : Ω) * A.valuation ((m.gcdA n : ℤ) : Ω) ≤ A.valuation (m : Ω) * 1 := by
-          gcongr
+    calc
+      A.valuation (m : Ω) * A.valuation ((m.gcdA n : ℤ) : Ω)
+        ≤ A.valuation (m : Ω) * 1 := by gcongr
       _ = A.valuation (m : Ω) := mul_one _
       _ < 1 := hm
   have h2 : A.valuation ((n : Ω) * ((m.gcdB n : ℤ) : Ω)) < 1 := by
     rw [map_mul]
-    calc A.valuation (n : Ω) * A.valuation ((m.gcdB n : ℤ) : Ω) ≤ A.valuation (n : Ω) * 1 := by
-          gcongr
+    calc
+      A.valuation (n : Ω) * A.valuation ((m.gcdB n : ℤ) : Ω)
+        ≤ A.valuation (n : Ω) * 1 := by gcongr
       _ = A.valuation (n : Ω) := mul_one _
       _ < 1 := hn
   have h3 : A.valuation (1 : Ω) < 1 := by
@@ -259,8 +306,9 @@ private theorem T_sub (hD : D.Good) {p : ℕ} (hp : p ∈ D.T) : p ∈ D.S := by
     exact hD.l_mem
   · exact h.1
 
-private theorem kill_iff (hD : D.Good) {M : Type} [Monoid M] (f : D.Gam →* M) :
-    (∀ q ∈ D.S \ D.T, ∀ g ∈ D.Ip q ⊓ D.rbar.ker, f (toGS Ω D.SP g) = 1) ↔ D.UnrT (f.comp (toGS Ω D.SP)) 1 := by
+private theorem kill_iff (hD : D.Good) {M : Type} [Monoid M] (f : D.Gam →* M)
+    : (∀ q ∈ D.S \ D.T, ∀ g ∈ D.Ip q ⊓ D.rbar.ker, f (toGS Ω D.SP g) = 1)
+      ↔ D.UnrT (f.comp (toGS Ω D.SP)) 1 := by
   constructor
   · intro hk A hA g hg hr
     show f (toGS Ω D.SP g) = 1
@@ -273,8 +321,14 @@ private theorem kill_iff (hD : D.Good) {M : Type} [Monoid M] (f : D.Gam →* M) 
       have hpr : Nat.Prime p := hD.S_prime p hpS
       obtain ⟨u, -, hu⟩ := (Chr.placesQ Ω).2.2 p A (D.pl p) hpr hpA (hD.pl_over p hpr)
       have hg' := hu g hg
-      have hk' := hk p (Finset.mem_sdiff.mpr ⟨hpS, hpT⟩) (u⁻¹ * g * u) (Subgroup.mem_inf.mpr ⟨hg', by
-        rw [MonoidHom.mem_ker, map_mul, map_mul, hr, mul_one, ← map_mul, inv_mul_cancel, map_one]⟩)
+      have hk' :=
+        hk p (Finset.mem_sdiff.mpr ⟨hpS, hpT⟩) (u⁻¹ * g * u)
+          (Subgroup.mem_inf.mpr ⟨
+            hg',
+            by
+              rw [MonoidHom.mem_ker, map_mul, map_mul, hr, mul_one, ← map_mul, inv_mul_cancel,
+                map_one]
+          ⟩)
       have e : toGS Ω D.SP g = toGS Ω D.SP u * toGS Ω D.SP (u⁻¹ * g * u) * (toGS Ω D.SP u)⁻¹ := by
         rw [map_mul, map_mul, map_inv]
         group
@@ -295,13 +349,30 @@ end Places
 end UpperTheory.V.GradeZeroInterpolatingElement.DescentNormaliser
 
 open UpperTheory.V.GradeZeroInterpolatingElement.DescentNormaliser in
-theorem UpperTheory.V.GradeZeroInterpolatingElement.descend :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∃ (rb : D.Gam →* M4 (ResidueField c.O)) (r0 : Lift c.O rb c.O), rb.comp (toGS Ω D.SP) = D.rbar ∧ r0.hom.comp (toGS Ω D.SP) = D.r0 ∧ (form c.O).Normalises rb ∧ (form c.O).Normalises r0.hom ∧ ∀ (R : Type) [CommRing R] [Algebra c.O R] [IsCO c.O R], (∀ r : Lift c.O rb R, ∃ ρ : Lift c.O D.rbar R, ρ.hom = r.hom.comp (toGS Ω D.SP) ∧ ((form c.O).InH r0.hom R r ↔ D.Mult ρ.hom) ∧ ((∀ q : D.frame.Q, killCond (rb.comp (D.frame.ψ q)) (D.frame.N q) R (r.comap (D.frame.ψ q) (D.frame.hψ q))) ↔ D.UnrT ρ.hom 1)) ∧ ∀ ρ : Lift c.O D.rbar R, D.UnrT ρ.hom 1 → ∃ r : Lift c.O rb R, ρ.hom = r.hom.comp (toGS Ω D.SP) := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.descend
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∃ (rb : D.Gam →* M4 (ResidueField c.O)) (r0 : Lift c.O rb c.O),
+          rb.comp (toGS Ω D.SP) = D.rbar ∧ r0.hom.comp (toGS Ω D.SP) = D.r0
+            ∧ (form c.O).Normalises rb ∧ (form c.O).Normalises r0.hom
+            ∧ ∀ (R : Type) [CommRing R] [Algebra c.O R] [IsCO c.O R],
+              (∀ r : Lift c.O rb R, ∃ ρ : Lift c.O D.rbar R,
+                  ρ.hom = r.hom.comp (toGS Ω D.SP) ∧ ((form c.O).InH r0.hom R r ↔ D.Mult ρ.hom)
+                    ∧ ((∀ q : D.frame.Q,
+                        killCond (rb.comp (D.frame.ψ q)) (D.frame.N q) R
+                          (r.comap (D.frame.ψ q) (D.frame.hψ q)))
+                      ↔ D.UnrT ρ.hom 1))
+                ∧ ∀ ρ : Lift c.O D.rbar R,
+                  D.UnrT ρ.hom 1 → ∃ r : Lift c.O rb R, ρ.hom = r.hom.comp (toGS Ω D.SP) := by
   intro Ω _ _ _ l _ c D hD
   obtain ⟨-, -, -, -, -, hpsth, -, -, -, -, hcont, -, -, hunr⟩ := facts D hD
-  have hdiag : ∀ g, D.r0 g = Matrix.diagonal (fun i => ((D.ps i g : (↥c.O)ˣ) : ↥c.O)) := fun g => rfl
-  have hd : ∀ g (i : Fin 4), ((D.ps i g : (↥c.O)ˣ) : ↥c.O) * ((D.ps i.rev g : (↥c.O)ˣ) : ↥c.O) =
-      ((D.th g : (↥c.O)ˣ) : ↥c.O) := by
+  have hdiag : ∀ g, D.r0 g = Matrix.diagonal (fun i => ((D.ps i g : (↥c.O)ˣ) : ↥c.O)) := fun g =>
+    rfl
+  have hd
+      : ∀ g (i : Fin 4),
+        ((D.ps i g : (↥c.O)ˣ) : ↥c.O) * ((D.ps i.rev g : (↥c.O)ˣ) : ↥c.O)
+          = ((D.th g : (↥c.O)ˣ) : ↥c.O) := by
     intro g i
     rw [← Units.val_mul, ← MonoidHom.mul_apply, hpsth i]
   have hres : ∀ x : ↥c.O, res ↥c.O ↥c.O x = residue ↥c.O x := fun x => (res _ _).commutes x
@@ -345,8 +416,12 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.descend :
     apply normalises
     intro s
     obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective s
-    refine ⟨residue ↥c.O ((D.th g : (↥c.O)ˣ) : ↥c.O),
-      fun i => residue ↥c.O ((D.ps i g : (↥c.O)ˣ) : ↥c.O), fun i => ?_, ?_⟩
+    refine ⟨
+      residue ↥c.O ((D.th g : (↥c.O)ˣ) : ↥c.O),
+      fun i => residue ↥c.O ((D.ps i g : (↥c.O)ˣ) : ↥c.O),
+      fun i => ?_,
+      ?_
+    ⟩
     · rw [← map_mul, hd g i]
     · show (D.r0 g).map (residue ↥c.O) = _
       rw [hdiag, Matrix.diagonal_map (map_zero _)]
@@ -355,9 +430,11 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.descend :
   refine ⟨fun r => ?_, fun ρ hρ => ?_⟩
   · obtain ⟨ρ, hρ⟩ := exists_up (toGS Ω D.SP) hcont' hrb r
     refine ⟨ρ, hρ, ?_, ?_⟩
-    · have key : ∀ g : G ℚ Ω, (form ↥c.O).HH (r.hom (toGS Ω D.SP g) *
-          (r0'.hom (toGS Ω D.SP g)⁻¹).map (algebraMap ↥c.O R)) ↔
-          IsGSp (algebraMap ↥c.O R ((D.th g : (↥c.O)ˣ) : ↥c.O)) (r.hom (toGS Ω D.SP g)) := by
+    · have key
+          : ∀ g : G ℚ Ω,
+            (form ↥c.O).HH
+                (r.hom (toGS Ω D.SP g) * (r0'.hom (toGS Ω D.SP g)⁻¹).map (algebraMap ↥c.O R))
+              ↔ IsGSp (algebraMap ↥c.O R ((D.th g : (↥c.O)ˣ) : ↥c.O)) (r.hom (toGS Ω D.SP g)) := by
         intro g
         apply hh_iff r0' r
         rw [hr0']

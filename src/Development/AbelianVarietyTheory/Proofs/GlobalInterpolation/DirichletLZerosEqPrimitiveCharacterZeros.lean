@@ -10,20 +10,23 @@ open scoped Classical
 
 namespace GlobalTheory.Lin
 
-
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
 open scoped Classical in
-theorem _root_.GlobalTheory.Lin.zeros_eq_zeros_primitiveCharacter :
-    ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (s : ℂ), 0 < s.re → (χ ≠ 1 ∨ s ≠ 1) →
-      haveI : NeZero χ.conductor := ⟨χ.conductor_ne_zero⟩;
-      (LFunction χ s = 0 ↔ LFunction χ.primitiveCharacter s = 0) ∧
-        _root_.GlobalTheory.Lin.ord χ s = _root_.GlobalTheory.Lin.ord χ.primitiveCharacter s := by
+theorem _root_.GlobalTheory.Lin.zeros_eq_zeros_primitiveCharacter
+    : ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (s : ℂ),
+      0 < s.re → (χ ≠ 1 ∨ s ≠ 1)
+        → haveI : NeZero χ.conductor := ⟨χ.conductor_ne_zero⟩
+          (LFunction χ s = 0 ↔ LFunction χ.primitiveCharacter s = 0)
+            ∧ _root_.GlobalTheory.Lin.ord χ s
+              = _root_.GlobalTheory.Lin.ord χ.primitiveCharacter s := by
   intro q _ χ s hs hχs
   haveI : NeZero χ.conductor := ⟨χ.conductor_ne_zero⟩
   set E : ℂ → ℂ := fun z => ∏ p ∈ q.primeFactors, (1 - χ.primitiveCharacter p * (p : ℂ) ^ (-z))
     with hE
-  have hform : ∀ z, (χ.primitiveCharacter ≠ 1 ∨ z ≠ 1) →
-      LFunction χ z = LFunction χ.primitiveCharacter z * E z := by
+  have hform
+      : ∀ z,
+        (χ.primitiveCharacter ≠ 1 ∨ z ≠ 1)
+          → LFunction χ z = LFunction χ.primitiveCharacter z * E z := by
     intro z hz
     have h := LFunction_changeLevel χ.conductor_dvd_level χ.primitiveCharacter hz
     rwa [changeLevel_primitiveCharacter] at h
@@ -32,8 +35,9 @@ theorem _root_.GlobalTheory.Lin.zeros_eq_zeros_primitiveCharacter :
     · left
       intro h1
       apply h
-      calc χ = changeLevel χ.conductor_dvd_level χ.primitiveCharacter :=
-            (changeLevel_primitiveCharacter χ).symm
+      calc
+        χ = changeLevel χ.conductor_dvd_level χ.primitiveCharacter :=
+          (changeLevel_primitiveCharacter χ).symm
         _ = 1 := by rw [h1, map_one]
     · exact Or.inr h
   have hEne : E s ≠ 0 := by
@@ -42,18 +46,19 @@ theorem _root_.GlobalTheory.Lin.zeros_eq_zeros_primitiveCharacter :
     have hp1 : 1 < p := (Nat.prime_of_mem_primeFactors hp).one_lt
     have hlt : ‖χ.primitiveCharacter p * (p : ℂ) ^ (-s)‖ < 1 := by
       rw [norm_mul, Complex.norm_natCast_cpow_of_pos (by omega), Complex.neg_re]
-      calc _ ≤ 1 * (p : ℝ) ^ (-s.re) :=
-            mul_le_mul_of_nonneg_right (norm_le_one _ _) (by positivity)
+      calc
+        _ ≤ 1 * (p : ℝ) ^ (-s.re) := mul_le_mul_of_nonneg_right (norm_le_one _ _) (by positivity)
         _ < 1 := by
-            rw [one_mul]
-            exact Real.rpow_lt_one_of_one_lt_of_neg (by exact_mod_cast hp1) (by linarith)
+          rw [one_mul]
+          exact Real.rpow_lt_one_of_one_lt_of_neg (by exact_mod_cast hp1) (by linarith)
     intro h0
     rw [sub_eq_zero] at h0
     rw [← h0, norm_one] at hlt
     exact lt_irrefl _ hlt
   have hEd : Differentiable ℂ E := by
-    have h : Differentiable ℂ (∏ p ∈ q.primeFactors,
-        fun z : ℂ => 1 - χ.primitiveCharacter p * (p : ℂ) ^ (-z)) :=
+    have h : Differentiable ℂ
+        (∏ p ∈ q.primeFactors,
+          fun z : ℂ => 1 - χ.primitiveCharacter p * (p : ℂ) ^ (-z)) :=
       Differentiable.finsetProd (fun p hp => by
         have hp0 : (p : ℂ) ≠ 0 := by exact_mod_cast (Nat.prime_of_mem_primeFactors hp).ne_zero
         fun_prop (disch := exact Or.inl hp0))

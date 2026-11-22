@@ -16,67 +16,84 @@ namespace GlobalTheory.AdIsom.SelfDualGlue
 
 variable {D : D7} {u : D.what₂.Word} {Y X : HSp D} {ι : X.V →ₗ[D.host.E] Y.V} {z : Y.V}
 
-theorem vA_flat (x : X.V) (a : D.host.E) : vA Y (ι x + a • z) = mA Y X ι *ᵥ vA X x + inc D a • vA Y z := by
+theorem vA_flat (x : X.V) (a : D.host.E)
+    : vA Y (ι x + a • z) = mA Y X ι *ᵥ vA X x + inc D a • vA Y z := by
   rw [vA_add, vA_smul, mA_mulVec_vA]
 
-theorem inc_hD_flat (h : IsLine Y X ι z u) (x x' : X.V) (a a' : D.host.E) :
-    inc D (Y.hD (ι x + a • z) (ι x' + a' • z)) =
-      hA X (vA X x) (vA X x') - inc D a * cjA D (inc D a') * inc D (Tu D u) := by
+theorem inc_hD_flat (h : IsLine Y X ι z u) (x x' : X.V) (a a' : D.host.E)
+    : inc D (Y.hD (ι x + a • z) (ι x' + a' • z))
+      = hA X (vA X x) (vA X x') - inc D a * cjA D (inc D a') * inc D (Tu D u) := by
   rw [← hA_vA, vA_flat, vA_flat]
   exact hA_flat h _ _ _ _
 
-theorem mem_glueLat_iff {L₀ : Lat X} {x₀ : X.V} (y : Y.V) : y ∈ glueLat Y X ι z u L₀ x₀ ↔
-    ∃ x : X.V, Formalism.L2.Herm.crd X x ∈ L₀ ∧ ∃ a : 𝓞 D.host.E,
-      y = ι (x + (a : D.host.E) • x₀) + ((a : D.host.E) * (Tu D u)⁻¹) • z := by
+theorem mem_glueLat_iff {L₀ : Lat X} {x₀ : X.V} (y : Y.V)
+    : y ∈ glueLat Y X ι z u L₀ x₀
+      ↔ ∃ x : X.V,
+        Formalism.L2.Herm.crd X x ∈ L₀
+          ∧ ∃ a : 𝓞 D.host.E,
+            y = ι (x + (a : D.host.E) • x₀) + ((a : D.host.E) * (Tu D u)⁻¹) • z := by
   rw [mem_glueLat]
   refine exists_congr fun x => and_congr_right fun _ => exists_congr fun a => ?_
   rw [map_add (f := _), map_smul, smul_add, smul_smul]
   constructor <;> rintro rfl <;> abel
 
-theorem coords_of_mem (h : IsLine Y X ι z u) {L₀ : Lat X} {x₀ x : X.V} {a : D.host.E}
-    (hm : ι x + a • z ∈ glueLat Y X ι z u L₀ x₀) :
-    ∃ x₁ ∈ hat L₀, ∃ b ∈ OA D, vA X x = x₁ + b • vA X x₀ ∧ inc D a = b * inc D (Tu D u)⁻¹ := by
+theorem coords_of_mem
+    (h : IsLine Y X ι z u)
+    {L₀ : Lat X} {x₀ x : X.V} {a : D.host.E} (hm : ι x + a • z ∈ glueLat Y X ι z u L₀ x₀)
+    : ∃ x₁ ∈ hat L₀, ∃ b ∈ OA D, vA X x = x₁ + b • vA X x₀ ∧ inc D a = b * inc D (Tu D u)⁻¹ := by
   have hv := vA_mem_hat Y hm
   rw [vA_flat, mem_hat_glueLat] at hv
   obtain ⟨x₁, hx₁, b, hb, e⟩ := hv
   obtain ⟨e1, e2⟩ := flat_inj h e
   exact ⟨x₁, hx₁, b, hb, e1, e2⟩
 
-theorem mem_flatSp (x : X.V) (a : D.host.E) : ι x + a • z ∈ flatSp Y X ι z := Submodule.add_mem_sup (LinearMap.mem_range_self ι x)
+theorem mem_flatSp (x : X.V) (a : D.host.E) : ι x + a • z ∈ flatSp Y X ι z :=
+  Submodule.add_mem_sup (LinearMap.mem_range_self ι x)
     (Submodule.smul_mem _ a (Submodule.mem_span_singleton_self z))
 
-
 set_option maxHeartbeats 1600000 in
-theorem isGlueVec_of_isSDIn : ∀ (D : D7) (u : D.what₂.Word) (Y X : HSp D) (ι : X.V →ₗ[D.host.E] Y.V) (z : Y.V), IsLine Y X ι z u → ∀ (L₀ : Lat X) (x₀ : X.V), Submodule.IsFullLattice D.host.E L₀ → IsSDIn Y (flatSp Y X ι z) (glueLat Y X ι z u L₀ x₀) → IsPrim Y z (glueLat Y X ι z u L₀ x₀) → IsGlueVec X u L₀ (vA X x₀) := by
+theorem isGlueVec_of_isSDIn
+    : ∀ (D : D7) (u : D.what₂.Word) (Y X : HSp D) (ι : X.V →ₗ[D.host.E] Y.V) (z : Y.V),
+      IsLine Y X ι z u
+        → ∀ (L₀ : Lat X) (x₀ : X.V),
+          Submodule.IsFullLattice D.host.E L₀ → IsSDIn Y (flatSp Y X ι z) (glueLat Y X ι z u L₀ x₀)
+            → IsPrim Y z (glueLat Y X ι z u L₀ x₀)
+            → IsGlueVec X u L₀ (vA X x₀) := by
   intro D u Y X ι z h L₀ x₀ hlat hSD hP
   obtain ⟨-, -, hsd⟩ := hSD
 
-  have key : ∀ (p : X.V) (α : D.host.E) (q : X.V) (β : D.host.E),
-      ι p + α • z ∈ glueLat Y X ι z u L₀ x₀ → ι q + β • z ∈ glueLat Y X ι z u L₀ x₀ →
-      hA X (vA X p) (vA X q) - inc D α * cjA D (inc D β) * inc D (Tu D u) ∈ OA D := by
+  have key
+      : ∀ (p : X.V) (α : D.host.E) (q : X.V) (β : D.host.E),
+        ι p + α • z ∈ glueLat Y X ι z u L₀ x₀ → ι q + β • z ∈ glueLat Y X ι z u L₀ x₀
+          → hA X (vA X p) (vA X q) - inc D α * cjA D (inc D β) * inc D (Tu D u) ∈ OA D := by
     intro p α q β hp hq
     rw [← inc_hD_flat h, inc_mem_iff]
     exact (hsd _ (mem_flatSp (ι := ι) (z := z) q β)).1 hq _ hp
 
-  have hX : ∀ p : X.V, Formalism.L2.Herm.crd X p ∈ L₀ → ι p + (0 : D.host.E) • z ∈ glueLat Y X ι z u L₀ x₀ := by
+  have hX
+      : ∀ p : X.V,
+        Formalism.L2.Herm.crd X p ∈ L₀ → ι p + (0 : D.host.E) • z ∈ glueLat Y X ι z u L₀ x₀ := by
     intro p hp
     rw [mem_glueLat_iff]
     exact ⟨p, hp, 0, by simp⟩
   have hg : ι x₀ + (Tu D u)⁻¹ • z ∈ glueLat Y X ι z u L₀ x₀ := by
     rw [mem_glueLat_iff]
     exact ⟨0, by simp, 1, by simp⟩
-  have hv : ∀ y : Fin X.rank → D.host.E,
-      (fun i => inc D (y i)) = vA X ((Formalism.L2.Herm.crd X).symm y) := by
+  have hv
+      : ∀ y : Fin X.rank → D.host.E,
+        (fun i => inc D (y i)) = vA X ((Formalism.L2.Herm.crd X).symm y) := by
     intro y
     funext i
     simp [vA]
-  have hrat : ∀ p q : X.V, Formalism.L2.Herm.crd X p ∈ L₀ → Formalism.L2.Herm.crd X q ∈ L₀ →
-      hA X (vA X p) (vA X q) ∈ OA D := by
+  have hrat
+      : ∀ p q : X.V,
+        Formalism.L2.Herm.crd X p ∈ L₀ → Formalism.L2.Herm.crd X q ∈ L₀
+          → hA X (vA X p) (vA X q) ∈ OA D := by
     intro p q hp hq
     simpa using key p 0 q 0 (hX p hp) (hX q hq)
 
-  have hright : ∀ f, (∀ y ∈ L₀, hA X f (fun i => inc D (y i)) ∈ OA D) →
-      ∀ y ∈ hat L₀, hA X f y ∈ OA D := by
+  have hright
+      : ∀ f, (∀ y ∈ L₀, hA X f (fun i => inc D (y i)) ∈ OA D) → ∀ y ∈ hat L₀, hA X f y ∈ OA D := by
     intro f hf y hy
     refine hat_induction (p := fun y => hA X f y ∈ OA D) hf ?_ ?_ ?_ hy
     · show hA X f 0 ∈ OA D
@@ -102,7 +119,8 @@ theorem isGlueVec_of_isSDIn : ∀ (D : D7) (u : D.what₂.Word) (Y X : HSp D) (�
   obtain ⟨x₁, hx₁, b, -, e1, e2⟩ := coords_of_mem h hz
   have hb : b = inc D (Tu D u) := by
     rw [map_one] at e2
-    calc b = b * (inc D (Tu D u)⁻¹ * inc D (Tu D u)) := by rw [inc_inv_mul, mul_one]
+    calc
+      b = b * (inc D (Tu D u)⁻¹ * inc D (Tu D u)) := by rw [inc_inv_mul, mul_one]
       _ = inc D (Tu D u) := by rw [← mul_assoc, ← e2, one_mul]
   have h0 : vA X (0 : X.V) = 0 := by simpa using vA_add X (0 : X.V) 0
   refine ⟨?_, hint, ?_, ?_, ?_⟩
@@ -114,9 +132,7 @@ theorem isGlueVec_of_isSDIn : ∀ (D : D7) (u : D.what₂.Word) (Y X : HSp D) (�
     simpa using key x₀ (Tu D u)⁻¹ _ 0 hg (hX _ (by simpa using hy))
   · have := key x₀ (Tu D u)⁻¹ x₀ (Tu D u)⁻¹ hg hg
     rwa [cjA_inc_inv, mul_assoc, inc_inv_mul, mul_one] at this
-  ·
-
-    intro y hy
+  · intro y hy
     obtain ⟨y₀, hy₀⟩ := exists_sub_inc_mem_hat hlat.span_eq_top y
     obtain ⟨q, rfl⟩ := (Formalism.L2.Herm.crd X).surjective y₀
     change y - vA X q ∈ hat L₀ at hy₀

@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
 
 namespace UpperTheory.V.Z.Sym.Sig
 
@@ -24,9 +25,11 @@ def proj (hs : s * s = Δ) : Lsq K Δ →+* K where
   map_zero' := by simp
   map_add' x y := by simp; ring
 
-def eU (hs : s * s = Δ) : U3 Δ →* GL (Fin 3) K := (GeneralLinearGroup.map (proj hs)).comp Unitary.toUnits
+def eU (hs : s * s = Δ) : U3 Δ →* GL (Fin 3) K :=
+  (GeneralLinearGroup.map (proj hs)).comp Unitary.toUnits
 
-def eD (hs : s * s = Δ) : DX Δ →* GL (Fin 2) K := (GeneralLinearGroup.map (proj hs)).comp (DX Δ).subtype
+def eD (hs : s * s = Δ) : DX Δ →* GL (Fin 2) K :=
+  (GeneralLinearGroup.map (proj hs)).comp (DX Δ).subtype
 
 def ev {τ a : K} (h : a * a = τ * a - 1) : Etau K τ →+* K where
   toFun x := x.re + a * x.im
@@ -39,12 +42,13 @@ def evU {τ a : K} (h : a * a = τ * a - 1) : (Etau K τ)ˣ →* Kˣ := Units.ma
 
 theorem root_left (a : Kˣ) : (a : K) * a = ((a : K) + (a⁻¹ : Kˣ)) * a - 1 := by simp [add_mul]
 
-theorem root_right (a : Kˣ) : ((a⁻¹ : Kˣ) : K) * (a⁻¹ : Kˣ) = ((a : K) + (a⁻¹ : Kˣ)) * (a⁻¹ : Kˣ) - 1 := by simp [add_mul]
+theorem root_right (a : Kˣ)
+    : ((a⁻¹ : Kˣ) : K) * (a⁻¹ : Kˣ) = ((a : K) + (a⁻¹ : Kˣ)) * (a⁻¹ : Kˣ) - 1 := by
+  simp [add_mul]
 
 end Alg
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-
 
 variable (k) in
 structure IsInts (O : Type) [CommRing O] [Algebra O k] : Prop where
@@ -55,11 +59,13 @@ namespace Lev
 
 variable (V : Lev k)
 
-def unitaryHeckeTestSum (Ry : Finset kˣ) (t : kˣ) (g : GL (Fin 3) k) : ℂ := ∑ y ∈ Ry, V.unitaryDoubleCosetIndicator ![t * (unif k)⁻¹, y, (unif k)⁻¹] g
+def unitaryHeckeTestSum (Ry : Finset kˣ) (t : kˣ) (g : GL (Fin 3) k) : ℂ :=
+  ∑ y ∈ Ry, V.unitaryDoubleCosetIndicator ![t * (unif k)⁻¹, y, (unif k)⁻¹] g
 
 def quaternionDoubleCosetIndicator (t : kˣ) (g : GL (Fin 2) k) : ℂ := one (g ∈ V.DC ![t, t⁻¹])
 
-def twistedCentralTestFunction (χ : kˣ →* ℂˣ) (t : kˣ) (g : GL (Fin 2) k) : ℂ := (((χ t)⁻¹ : ℂˣ) : ℂ) * V.fZ χ ![t, 1] g
+def twistedCentralTestFunction (χ : kˣ →* ℂˣ) (t : kˣ) (g : GL (Fin 2) k) : ℂ :=
+  (((χ t)⁻¹ : ℂˣ) : ℂ) * V.fZ χ ![t, 1] g
 
 def data {Δ s : k} (hs : s * s = Δ) (Ry : Finset kˣ) (χ : kˣ →* ℂˣ) : SigData Δ where
   P := {t | valuation k (t : k) < valuation k (unif k : k) ^ 2}

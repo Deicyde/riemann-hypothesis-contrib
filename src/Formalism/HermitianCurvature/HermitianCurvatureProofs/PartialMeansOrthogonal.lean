@@ -10,10 +10,13 @@ namespace Formalism.FourierDecayAlt.P
 
 namespace A6x1
 
-theorem norm_sq_sum_orth {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] {A : Type}
-    [Fintype A] (P : A → E) (e₁ : A → ℂ) (he : ∀ ρ, ‖e₁ ρ‖ = 1)
-    (h : ∀ ρ ρ', ρ ≠ ρ' → inner ℂ (P ρ) (P ρ') = 0) :
-    ‖∑ ρ, e₁ ρ • P ρ‖ ^ 2 = ∑ ρ, ‖P ρ‖ ^ 2 := by
+theorem norm_sq_sum_orth
+    {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    {A : Type} [Fintype A]
+    (P : A → E)
+    (e₁ : A → ℂ) (he : ∀ ρ, ‖e₁ ρ‖ = 1)
+    (h : ∀ ρ ρ', ρ ≠ ρ' → inner ℂ (P ρ) (P ρ') = 0)
+    : ‖∑ ρ, e₁ ρ • P ρ‖ ^ 2 = ∑ ρ, ‖P ρ‖ ^ 2 := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← inner_self_eq_norm_sq (𝕜 := ℂ), sum_inner, map_sum]
@@ -50,13 +53,14 @@ theorem orthogonalMeanNorm : Formalism.FourierDecayAlt.A6.OrthNorm := by
 theorem averageBoundOfSteps : Formalism.FourierDecayAlt.A6.AvgBoundAssemble := by
   intro hM hP hO E _ _ A B _ _ u T e₁ e₂ hT he h
   rw [hM E A B u e₁ e₂]
-  have h1 := hO E A (fun ρ => (Fintype.card B : ℂ)⁻¹ • ∑ b, e₂ b • u (ρ, b)) e₁ he
-    (hP E A B u e₂ h)
-  have h2 := hT ((Fintype.card A : ℂ)⁻¹ •
-    ∑ ρ, e₁ ρ • ((Fintype.card B : ℂ)⁻¹ • ∑ b, e₂ b • u (ρ, b)))
-  calc _ ≤ ‖(Fintype.card A : ℂ)⁻¹ •
-        ∑ ρ, e₁ ρ • ((Fintype.card B : ℂ)⁻¹ • ∑ b, e₂ b • u (ρ, b))‖ ^ 2 := by
-        gcongr
+  have h1 := hO E A (fun ρ => (Fintype.card B : ℂ)⁻¹ • ∑ b, e₂ b • u (ρ, b)) e₁ he (hP E A B u e₂ h)
+  have h2 :=
+    hT ((Fintype.card A : ℂ)⁻¹ • ∑ ρ, e₁ ρ • ((Fintype.card B : ℂ)⁻¹ • ∑ b, e₂ b • u (ρ, b)))
+  calc
+    _ ≤ ‖(Fintype.card A : ℂ)⁻¹ •
+          ∑ ρ, e₁ ρ • ((Fintype.card B : ℂ)⁻¹ • ∑ b, e₂ b • u (ρ, b))‖
+        ^ 2 := by
+      gcongr
     _ = _ := by rw [h1]; ring
 
 theorem averageBound : Formalism.FourierDecayAlt.A6.AvgBound :=

@@ -18,13 +18,14 @@ open scoped ComplexConjugate ContDiff
 
 namespace GlobalTheory.CxForm
 
-theorem dbarAt_congr {n : ℕ} {γ δ : V n → Alt n} {v : V n} (h : γ =ᶠ[𝓝 v] δ) :
-    dbarAt γ v = dbarAt δ v := by
+theorem dbarAt_congr {n : ℕ} {γ δ : V n → Alt n} {v : V n} (h : γ =ᶠ[𝓝 v] δ)
+    : dbarAt γ v = dbarAt δ v := by
   unfold dbarAt coefwise
   refine Finset.sum_congr rfl fun a _ => ?_
   congr 1
   refine Finset.sum_congr rfl fun S _ => ?_
-  have hS : (fun x => (bas n).repr (γ x) S) =ᶠ[𝓝 v] fun x => (bas n).repr (δ x) S := h.mono fun x hx => congrArg (fun y => (bas n).repr y S) hx
+  have hS : (fun x => (bas n).repr (γ x) S) =ᶠ[𝓝 v] fun x => (bas n).repr (δ x) S :=
+    h.mono fun x hx => congrArg (fun y => (bas n).repr y S) hx
   show GlobalTheory.dbar _ v (coordVec a) • _ = GlobalTheory.dbar _ v (coordVec a) • _
   rw [GlobalTheory.dbar_congr hS]
 

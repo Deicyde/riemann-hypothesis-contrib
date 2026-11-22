@@ -9,20 +9,21 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 namespace GlobalTheory.ZM.SymmCommutant
 
-
-
 end GlobalTheory.ZM.SymmCommutant
 
 namespace GlobalTheory.ZM
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
 private lemma entry_eq_sum_of_mul_eq_mul_kronecker (K : Type) [Field K] (h : ℕ)
     (Ei Em : Matrix (Fin 8) (Fin 8) ℤ) (Θ : Matrix (Fin 8 × Fin h) (Fin 8 × Fin h) K)
@@ -47,15 +48,28 @@ private lemma entry_eq_sum_of_mul_eq_mul_kronecker (K : Type) [Field K] (h : ℕ
     Matrix.of_apply, Fintype.sum_prod_type, Matrix.single_apply, Matrix.one_apply] at e
   simpa [Finset.mul_sum, _root_.mul_comm, _root_.mul_left_comm, _root_.mul_assoc] using e
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-theorem _root_.GlobalTheory.ZM.finrank_symm_commutant_le : ∀ (K : Type) [Field K] (h : ℕ) (Em Ei : Matrix (Fin 8) (Fin 8) ℤ) (V : Submodule K (Matrix (Fin 8 × Fin h) (Fin 8 × Fin h) K)), Em.IsSymm → Ei * Em = 1 → (∀ Θ ∈ V, Θ.IsSymm ∧ ∀ u v : Fin 8, Matrix.kronecker ((Matrix.single u v (1 : ℤ)).map (Int.cast : ℤ → K)) (1 : Matrix (Fin h) (Fin h) K) * Θ = Θ * (Matrix.kronecker ((Ei * (Matrix.single u v (1 : ℤ)).transpose * Em).map (Int.cast : ℤ → K)) (1 : Matrix (Fin h) (Fin h) K)).transpose) → Module.finrank K V ≤ h * (h + 1) / 2 := by
+theorem _root_.GlobalTheory.ZM.finrank_symm_commutant_le
+    : ∀ (K : Type) [Field K] (h : ℕ) (Em Ei : Matrix (Fin 8) (Fin 8) ℤ)
+        (V : Submodule K (Matrix (Fin 8 × Fin h) (Fin 8 × Fin h) K)),
+      Em.IsSymm → Ei * Em = 1
+        → (∀ Θ ∈ V,
+          Θ.IsSymm
+            ∧ ∀ u v : Fin 8,
+              Matrix.kronecker ((Matrix.single u v (1 : ℤ)).map (Int.cast : ℤ → K))
+                    (1 : Matrix (Fin h) (Fin h) K)
+                  * Θ
+                = Θ * (Matrix.kronecker
+                  ((Ei * (Matrix.single u v (1 : ℤ)).transpose * Em).map (Int.cast : ℤ → K))
+                  (1 : Matrix (Fin h) (Fin h) K)).transpose)
+        → Module.finrank K V ≤ h * (h + 1) / 2 := by
   intro K _ h Em Ei V hEm hEiEm hV
-  let B : Matrix (Fin 8 × Fin h) (Fin 8 × Fin h) K → Fin h → Fin h → K :=
-    fun Θ i j => ∑ d, Θ (0, i) (d, j) * (Em 0 d : K)
-  have key : ∀ Θ ∈ V, ∀ v c i j, Θ (v, i) (c, j) = (Ei c v : K) * B Θ i j :=
-    fun Θ hΘ v c i j => entry_eq_sum_of_mul_eq_mul_kronecker K h Ei Em Θ (hV Θ hΘ).2 v c i j
+  let B : Matrix (Fin 8 × Fin h) (Fin 8 × Fin h) K → Fin h → Fin h → K := fun Θ i j =>
+    ∑ d, Θ (0, i) (d, j) * (Em 0 d : K)
+  have key : ∀ Θ ∈ V, ∀ v c i j, Θ (v, i) (c, j) = (Ei c v : K) * B Θ i j := fun Θ hΘ v c i j =>
+    entry_eq_sum_of_mul_eq_mul_kronecker K h Ei Em Θ (hV Θ hΘ).2 v c i j
   have hsum : ∑ d, (Ei 0 d : K) * (Em 0 d : K) = 1 := by
     have e := congrFun (congrFun hEiEm 0) 0
     simp only [Matrix.mul_apply, Matrix.one_apply_eq] at e
@@ -66,22 +80,26 @@ theorem _root_.GlobalTheory.ZM.finrank_symm_commutant_le : ∀ (K : Type) [Field
     exact e''
   have symmB : ∀ Θ ∈ V, ∀ i j, B Θ i j = B Θ j i := by
     intro Θ hΘ i j
-    calc B Θ i j = ∑ d, (Ei 0 d : K) * B Θ j i * (Em 0 d : K) :=
-          Finset.sum_congr rfl fun d _ => by
-            rw [← key Θ hΘ d 0 j i, (hV Θ hΘ).1.apply (0, i) (d, j)]
+    calc
+      B Θ i j = ∑ d, (Ei 0 d : K) * B Θ j i * (Em 0 d : K) :=
+        Finset.sum_congr rfl fun d _ => by rw [← key Θ hΘ d 0 j i, (hV Θ hΘ).1.apply (0, i) (d, j)]
       _ = B Θ j i * ∑ d, (Ei 0 d : K) * (Em 0 d : K) := by
-          rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun d _ => by ring
+        rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun d _ => by ring
       _ = B Θ j i := by rw [hsum, _root_.mul_one]
-  let L : V →ₗ[K] (Sym2 (Fin h) → K) :=
-    { toFun := fun Θ s => B Θ (Quot.out s).1 (Quot.out s).2
-      map_add' := by
-        intro x y; funext s
-        simp [B, Finset.sum_add_distrib, add_mul]
-      map_smul' := by
-        intro r x; funext s
-        simp [B, Finset.mul_sum, _root_.mul_assoc] }
+  let L : V →ₗ[K] (Sym2 (Fin h) → K) := {
+    toFun := fun Θ s => B Θ (Quot.out s).1 (Quot.out s).2
+    map_add' := by
+      intro x y
+      funext s
+      simp [B, Finset.sum_add_distrib, add_mul]
+    map_smul' := by
+      intro r x
+      funext s
+      simp [B, Finset.mul_sum, _root_.mul_assoc]
+  }
   have inj : Function.Injective L := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro Θ hΘ0
     have hB : ∀ i j, B Θ i j = 0 := by
       intro i j
@@ -97,10 +115,11 @@ theorem _root_.GlobalTheory.ZM.finrank_symm_commutant_le : ∀ (K : Type) [Field
     ext ⟨v, i⟩ ⟨c, j⟩
     rw [key Θ Θ.2, hB]
     simp
-  calc Module.finrank K V ≤ Module.finrank K (Sym2 (Fin h) → K) :=
-        LinearMap.finrank_le_finrank_of_injective inj
+  calc
+    Module.finrank K V
+      ≤ Module.finrank K (Sym2 (Fin h) → K) := LinearMap.finrank_le_finrank_of_injective inj
     _ = h * (h + 1) / 2 := by
-        rw [Module.finrank_fintype_fun_eq_card, Sym2.card, Fintype.card_fin, Nat.choose_two_right,
-          Nat.add_sub_cancel, mul_comm]
+      rw [Module.finrank_fintype_fun_eq_card, Sym2.card, Fintype.card_fin, Nat.choose_two_right,
+        Nat.add_sub_cancel, mul_comm]
 
 end GlobalTheory.ZM

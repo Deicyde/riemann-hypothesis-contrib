@@ -18,7 +18,8 @@ theorem bumpOn : BumpOn := by
   let f : ContDiffBump (0 : Fin n → Fin n → ℂ) :=
     ⟨max r 1, max r 1 + 1, lt_of_lt_of_le one_pos (le_max_right _ _), by linarith⟩
   refine ⟨fun g => ((f (matCoord ι g) : ℝ) : ℂ), ⟨?_, ?_⟩, ?_⟩
-  · refine HasCompactSupport.intro (hemb.isCompact_preimage (isCompact_closedBall (0 : Fin n → Fin n → ℂ) (max r 1 + 1))) ?_
+  · refine HasCompactSupport.intro
+      (hemb.isCompact_preimage (isCompact_closedBall (0 : Fin n → Fin n → ℂ) (max r 1 + 1))) ?_
     intro g hg
     simp only [Set.mem_preimage, Metric.mem_closedBall, not_le] at hg
     have : f (matCoord ι g) = 0 := f.zero_of_le_dist hg.le

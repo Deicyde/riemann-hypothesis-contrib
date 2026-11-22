@@ -4,10 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Ws.auChi :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ} [Fact l.Prime] (c : Coef l), W.pushCh (algebraMap c.O (PadicAlgCl l)) (chiO F Ω l c.O) = cycBar F Ω l ∧ Continuous (cycBar F Ω l) := by
+theorem UpperTheory.V.Ws.auChi
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ}
+        [Fact l.Prime] (c : Coef l),
+      W.pushCh (algebraMap c.O (PadicAlgCl l)) (chiO F Ω l c.O) = cycBar F Ω l
+        ∧ Continuous (cycBar F Ω l) := by
   intro F Ω _ _ _ _ _ l _ c
   refine ⟨?_, ?_⟩
   · ext g

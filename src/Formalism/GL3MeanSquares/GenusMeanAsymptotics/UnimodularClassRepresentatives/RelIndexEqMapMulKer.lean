@@ -12,18 +12,20 @@ noncomputable section
 namespace Formalism.HermitianLattices.Ext.L3.D2
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 namespace J
 
-theorem relIndex_eq_map_mul_ker {G G' : Type*} [AddCommGroup G] [AddCommGroup G'] (f : G →+ G')
-    {A B : AddSubgroup G} (hBA : B ≤ A) :
-    B.relIndex A = (B.map f).relIndex (A.map f) * (B ⊓ f.ker).relIndex (A ⊓ f.ker) := by
+theorem relIndex_eq_map_mul_ker
+    {G G' : Type*} [AddCommGroup G] [AddCommGroup G']
+    (f : G →+ G')
+    {A B : AddSubgroup G} (hBA : B ≤ A)
+    : B.relIndex A = (B.map f).relIndex (A.map f) * (B ⊓ f.ker).relIndex (A ⊓ f.ker) := by
   have h1 : (B.map f).relIndex (A.map f) = (B ⊔ (A ⊓ f.ker)).relIndex A := by
     rw [AddSubgroup.relIndex_map_map]
-    have e1 : A ⊔ f.ker = A ⊔ (B ⊔ f.ker) := by
-      rw [← sup_assoc, sup_eq_left.2 hBA]
+    have e1 : A ⊔ f.ker = A ⊔ (B ⊔ f.ker) := by rw [← sup_assoc, sup_eq_left.2 hBA]
     rw [e1, AddSubgroup.relIndex_sup_right, ← AddSubgroup.inf_relIndex_right]
     congr 1
     rw [inf_comm A, sup_inf_assoc_of_le _ hBA]
@@ -34,8 +36,11 @@ theorem relIndex_eq_map_mul_ker {G G' : Type*} [AddCommGroup G] [AddCommGroup G'
   exact (AddSubgroup.relIndex_mul_relIndex _ _ _ le_sup_left (sup_le hBA inf_le_left)).symm
 
 def adjF (s : V →ₗ⋆[K] V →ₗ[K] K) : V →ₗ⋆[K] V →ₗ[K] K :=
-  LinearMap.mk₂'ₛₗ (starRingEnd K) (RingHom.id K) (fun x y => star (s y x))
-    (fun x x' y => by simp) (fun c x y => by simp [starRingEnd_apply]) (fun x y y' => by simp)
+  LinearMap.mk₂'ₛₗ (starRingEnd K) (RingHom.id K)
+    (fun x y => star (s y x))
+    (fun x x' y => by simp)
+    (fun c x y => by simp [starRingEnd_apply])
+    (fun x y y' => by simp)
     (fun c x y => by simp [starRingEnd_apply])
 
 theorem adjF_apply (s : V →ₗ⋆[K] V →ₗ[K] K) (x y : V) : adjF s x y = star (s y x) := rfl
@@ -52,21 +57,20 @@ def symF : (V →ₗ⋆[K] V →ₗ[K] K) →+ (V →ₗ⋆[K] V →ₗ[K] K) wh
 
 theorem symF_apply (s : V →ₗ⋆[K] V →ₗ[K] K) (x y : V) : symF s x y = s x y + star (s y x) := rfl
 
-theorem exists_skew_unit (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) :
-    ∃ δ : K, star δ = -δ ∧ δ ≠ 0 ∧ δ ∈ pK K 𝔭 0 ∧ δ⁻¹ ∈ pK K 𝔭 0 := by
+theorem exists_skew_unit
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : ∃ δ : K, star δ = -δ ∧ δ ≠ 0 ∧ δ ∈ pK K 𝔭 0 ∧ δ⁻¹ ∈ pK K 𝔭 0 := by
   obtain ⟨θ, hθ⟩ := idealPowerSpanBounds.exists_theta hK hF h𝔭
   set d : 𝓞 K := θ - conjO K θ with hd
-  have hcd : conjO K d = -d := by
-    rw [hd, map_sub, conjO_conjO, neg_sub]
-  obtain ⟨n, hn⟩ := (conjO_eq_iff_mem_range hF (d * conjO K d)).1 (by
-    rw [map_mul, conjO_conjO, mul_comm])
+  have hcd : conjO K d = -d := by rw [hd, map_sub, conjO_conjO, neg_sub]
+  obtain ⟨n, hn⟩ :=
+    (conjO_eq_iff_mem_range hF (d * conjO K d)).1 (by rw [map_mul, conjO_conjO, mul_comm])
   have hone : (1 : 𝓞 K) ∉ extP K 𝔭 := by
     intro h1
     have hcomap : Ideal.comap (algebraMap (𝓞 F) (𝓞 K)) (extP K 𝔭) = 𝔭 :=
       Ideal.comap_map_eq_self_of_faithfullyFlat 𝔭
-    have hone_mem : (1 : 𝓞 F) ∈ 𝔭 := by
-      rwa [← hcomap, Ideal.mem_comap, map_one]
+    have hone_mem : (1 : 𝓞 F) ∈ 𝔭 := by rwa [← hcomap, Ideal.mem_comap, map_one]
     exact h𝔭.ne_top ((Ideal.eq_top_iff_one _).2 hone_mem)
   have hn𝔭 : n ∉ 𝔭 := by
     intro hmem
@@ -101,9 +105,11 @@ theorem exists_skew_unit (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (h
     rw [e]
     field_simp
 
-theorem map_symF_sesqL (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (A : Submodule (𝓞 K) V)
-    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) :
-    (sesqL A 𝔭 k).map symF = hermL A 𝔭 k := by
+theorem map_symF_sesqL
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (A : Submodule (𝓞 K) V)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    (k : ℕ)
+    : (sesqL A 𝔭 k).map symF = hermL A 𝔭 k := by
   ext t
   constructor
   · rintro ⟨s, hs, rfl⟩
@@ -126,11 +132,13 @@ theorem map_symF_sesqL (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF 
       simp only [LinearMap.smul_apply, smul_eq_mul, star_mul', ht y x]
       rw [← add_mul, hθK, one_mul]
 
-theorem map_smul_hermL (A : Submodule (𝓞 K) V)
-    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) {δ : K} (hδ : star δ = -δ) (hδ0 : δ ≠ 0)
-    (hδ1 : δ ∈ pK K 𝔭 0) (hδ2 : δ⁻¹ ∈ pK K 𝔭 0) :
-    (hermL A 𝔭 k).map (DistribSMul.toAddMonoidHom (V →ₗ⋆[K] V →ₗ[K] K) δ) =
-      sesqL A 𝔭 k ⊓ (symF (K := K) (V := V)).ker := by
+theorem map_smul_hermL
+    (A : Submodule (𝓞 K) V)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    (k : ℕ)
+    {δ : K} (hδ : star δ = -δ) (hδ0 : δ ≠ 0) (hδ1 : δ ∈ pK K 𝔭 0) (hδ2 : δ⁻¹ ∈ pK K 𝔭 0)
+    : (hermL A 𝔭 k).map (DistribSMul.toAddMonoidHom (V →ₗ⋆[K] V →ₗ[K] K) δ)
+      = sesqL A 𝔭 k ⊓ (symF (K := K) (V := V)).ker := by
   ext s
   constructor
   · rintro ⟨t, ⟨ht, ht'⟩, rfl⟩
@@ -141,8 +149,8 @@ theorem map_smul_hermL (A : Submodule (𝓞 K) V)
     · show symF _ = 0
       ext x y
       rw [symF_apply]
-      simp only [DistribSMul.toAddMonoidHom_apply, LinearMap.smul_apply, smul_eq_mul,
-        star_mul', ht y x, hδ, LinearMap.zero_apply]
+      simp only [DistribSMul.toAddMonoidHom_apply, LinearMap.smul_apply, smul_eq_mul, star_mul',
+        ht y x, hδ, LinearMap.zero_apply]
       ring
   · rintro ⟨hs, hs'⟩
     replace hs' : symF s = 0 := hs'
@@ -163,17 +171,19 @@ theorem map_smul_hermL (A : Submodule (𝓞 K) V)
 theorem one_mem_pK (𝔭 : Ideal (𝓞 F)) : (1 : K) ∈ pK K 𝔭 0 := by
   simpa using algebraMap_mem_pK (K := K) 𝔭 1
 
-theorem mul_mem_pK_zero {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {x y : K} (hx : x ∈ pK K 𝔭 0)
-    (hy : y ∈ pK K 𝔭 0) : x * y ∈ pK K 𝔭 0 := by
+theorem mul_mem_pK_zero
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {x y : K} (hx : x ∈ pK K 𝔭 0) (hy : y ∈ pK K 𝔭 0)
+    : x * y ∈ pK K 𝔭 0 := by
   have := mul_mem_pK h𝔭 hx hy
   rwa [add_zero] at this
 
 theorem nO_one {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) : nO 𝔭 (1 : K) = 1 :=
   nO_unit h𝔭 (one_mem_pK 𝔭) (by simpa using one_mem_pK (K := K) 𝔭) one_ne_zero
 
-theorem nO_prod {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {ι : Type} (s : Finset ι) (z : ι → K)
-    (hz : ∀ i, z i ∈ pK K 𝔭 0 ∧ z i ≠ 0) :
-    (∏ i ∈ s, z i) ∈ pK K 𝔭 0 ∧ nO 𝔭 (∏ i ∈ s, z i) = ∏ i ∈ s, nO 𝔭 (z i) := by
+theorem nO_prod
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {ι : Type} (s : Finset ι) (z : ι → K) (hz : ∀ i, z i ∈ pK K 𝔭 0 ∧ z i ≠ 0)
+    : (∏ i ∈ s, z i) ∈ pK K 𝔭 0 ∧ nO 𝔭 (∏ i ∈ s, z i) = ∏ i ∈ s, nO 𝔭 (z i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using ⟨one_mem_pK (K := K) 𝔭, nO_one (K := K) h𝔭⟩
@@ -181,24 +191,29 @@ theorem nO_prod {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {ι : Type} (s 
     rw [Finset.prod_insert hi, Finset.prod_insert hi]
     exact ⟨mul_mem_pK_zero h𝔭 (hz i).1 ih.1, by rw [nO_mul h𝔭 (hz i).1 (hz i).2 ih.1, ih.2]⟩
 
-theorem nO_pow {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {z : K} (hz : z ∈ pK K 𝔭 0) (hz0 : z ≠ 0)
-    (n : ℕ) : z ^ n ∈ pK K 𝔭 0 ∧ nO 𝔭 (z ^ n) = nO 𝔭 z ^ n := by
+theorem nO_pow
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {z : K} (hz : z ∈ pK K 𝔭 0) (hz0 : z ≠ 0) (n : ℕ)
+    : z ^ n ∈ pK K 𝔭 0 ∧ nO 𝔭 (z ^ n) = nO 𝔭 z ^ n := by
   simpa using nO_prod h𝔭 (Finset.range n) (fun _ => z) (fun _ => ⟨hz, hz0⟩)
 
-theorem form_rel (s : V →ₗ⋆[K] V →ₗ[K] K) {x y x' y' : V} {γ u v : K} (hx : γ • x' = u • x)
-    (hy : γ • y' = v • y) : star γ * γ * s x' y' = star u * v * s x y := by
+theorem form_rel
+    (s : V →ₗ⋆[K] V →ₗ[K] K) {x y x' y' : V} {γ u v : K} (hx : γ • x' = u • x) (hy : γ • y' = v • y)
+    : star γ * γ * s x' y' = star u * v * s x y := by
   have h1 : s (γ • x') (γ • y') = s (u • x) (v • y) := by rw [hx, hy]
   simp only [map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, RingHom.id_apply]
     at h1
   linear_combination h1
 
-theorem gram_rel (h : V →ₗ⋆[K] V →ₗ[K] K) {m : ℕ} (a b : Fin m → V) (e : Fin m → K) (γ : K)
-    (hab : ∀ i, γ • b i = e i • a i) :
-    (star γ * γ) ^ m * (Matrix.of fun i j => h (b i) (b j)).det =
-      ((∏ i, star (e i)) * ∏ i, e i) * (Matrix.of fun i j => h (a i) (a j)).det := by
-  have h1 : (star γ * γ) • (Matrix.of fun i j => h (b i) (b j)) =
-      Matrix.diagonal (fun i => star (e i)) * (Matrix.of fun i j => h (a i) (a j)) *
-        Matrix.diagonal e := by
+theorem gram_rel
+    (h : V →ₗ⋆[K] V →ₗ[K] K)
+    {m : ℕ} (a b : Fin m → V) (e : Fin m → K)
+    (γ : K) (hab : ∀ i, γ • b i = e i • a i)
+    : (star γ * γ) ^ m * (Matrix.of fun i j => h (b i) (b j)).det
+      = ((∏ i, star (e i)) * ∏ i, e i) * (Matrix.of fun i j => h (a i) (a j)).det := by
+  have h1
+      : (star γ * γ) • (Matrix.of fun i j => h (b i) (b j))
+        = Matrix.diagonal (fun i => star (e i)) * (Matrix.of fun i j => h (a i) (a j))
+          * Matrix.diagonal e := by
     ext i j
     rw [Matrix.mul_diagonal, Matrix.diagonal_mul]
     simp only [Matrix.smul_apply, Matrix.of_apply, smul_eq_mul]
@@ -206,33 +221,40 @@ theorem gram_rel (h : V →ₗ⋆[K] V →ₗ[K] K) {m : ℕ} (a b : Fin m → V
     ring
   have h2 := congrArg Matrix.det h1
   rw [Matrix.det_smul, Matrix.det_mul, Matrix.det_mul, Matrix.det_diagonal, Matrix.det_diagonal,
-    Fintype.card_fin] at h2
+      Fintype.card_fin]
+    at h2
   rw [h2]
   ring
 
 end J
 
-theorem relIndex_sesqL_eq_sq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (A₀ B₀ : Submodule (𝓞 K) V)
-    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {k k' : ℕ}
-    (hle : sesqL (locF 𝔭 B₀) 𝔭 k' ≤ sesqL (locF 𝔭 A₀) 𝔭 k) :
-    (sesqL (locF 𝔭 B₀) 𝔭 k').relIndex (sesqL (locF 𝔭 A₀) 𝔭 k) =
-      (hermL (locF 𝔭 B₀) 𝔭 k').relIndex (hermL (locF 𝔭 A₀) 𝔭 k) ^ 2 := by
+theorem relIndex_sesqL_eq_sq
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    (A₀ B₀ : Submodule (𝓞 K) V)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {k k' : ℕ} (hle : sesqL (locF 𝔭 B₀) 𝔭 k' ≤ sesqL (locF 𝔭 A₀) 𝔭 k)
+    : (sesqL (locF 𝔭 B₀) 𝔭 k').relIndex (sesqL (locF 𝔭 A₀) 𝔭 k)
+      = (hermL (locF 𝔭 B₀) 𝔭 k').relIndex (hermL (locF 𝔭 A₀) 𝔭 k) ^ 2 := by
   obtain ⟨δ, hδ, hδ0, hδ1, hδ2⟩ := J.exists_skew_unit hK hF h𝔭
-  rw [J.relIndex_eq_map_mul_ker J.symF hle, J.map_symF_sesqL hK hF _ h𝔭, J.map_symF_sesqL hK hF _ h𝔭,
-    ← J.map_smul_hermL _ h𝔭 k' hδ hδ0 hδ1 hδ2, ← J.map_smul_hermL _ h𝔭 k hδ hδ0 hδ1 hδ2,
-    AddSubgroup.relIndex_map_map_of_injective, sq]
+  rw [J.relIndex_eq_map_mul_ker J.symF hle, J.map_symF_sesqL hK hF _ h𝔭,
+    J.map_symF_sesqL hK hF _ h𝔭, ← J.map_smul_hermL _ h𝔭 k' hδ hδ0 hδ1 hδ2,
+    ← J.map_smul_hermL _ h𝔭 k hδ hδ0 hδ1 hδ2, AddSubgroup.relIndex_map_map_of_injective, sq]
   intro s t hst
   have := congrArg (fun u => δ⁻¹ • u) hst
   simpa [smul_smul, inv_mul_cancel₀ hδ0] using this
 
-theorem relIndex_sesqL (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {A₀ : Submodule (𝓞 K) V}
-    (hA₀ : Submodule.IsFullLattice K A₀) (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀) {B₀ : Submodule (𝓞 K) V}
-    (hB₀ : Submodule.IsFullLattice K B₀) (hB₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h B₀) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {k c : ℕ}
-    (hle : sesqL (locF 𝔭 B₀) 𝔭 (k + c) ≤ sesqL (locF 𝔭 A₀) 𝔭 k) :
-    (sesqL (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (sesqL (locF 𝔭 A₀) 𝔭 k) *
-        Ideal.absNorm 𝔭 ^ (2 * (finrank K V * vd h (locF 𝔭 B₀) 𝔭)) =
-      Ideal.absNorm 𝔭 ^ (2 * (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭)) := by
+theorem relIndex_sesqL
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {A₀ : Submodule (𝓞 K) V} (hA₀ : Submodule.IsFullLattice K A₀)
+    (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀)
+    {B₀ : Submodule (𝓞 K) V} (hB₀ : Submodule.IsFullLattice K B₀)
+    (hB₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h B₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {k c : ℕ} (hle : sesqL (locF 𝔭 B₀) 𝔭 (k + c) ≤ sesqL (locF 𝔭 A₀) 𝔭 k)
+    : (sesqL (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (sesqL (locF 𝔭 A₀) 𝔭 k)
+        * Ideal.absNorm 𝔭 ^ (2 * (finrank K V * vd h (locF 𝔭 B₀) 𝔭))
+      = Ideal.absNorm 𝔭 ^ (2 * (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭)) := by
   classical
   obtain ⟨a, b, e, γ, hγ, he, hA, hB, hab⟩ := exists_smith hA₀ hB₀ h𝔭
   have habK : ∀ i, (γ : K) • b i = (e i : K) • a i := fun i => by
@@ -277,12 +299,14 @@ theorem relIndex_sesqL (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF 
   have hle' : matL 𝔭 (k + c) f g ≤ matL 𝔭 k (fun _ _ => 1) (fun _ _ => 1) := by
     rw [hSA, hSB] at hle
     exact (AddSubgroup.comap_le_comap_of_surjective hΦs).1 hle
-  have hf : ∀ i j, f i j ∈ pK K 𝔭 0 ∧ f i j ≠ 0 := fun i j =>
-    ⟨J.mul_mem_pK_zero h𝔭 (star_mem_pK hF h𝔭 (hem i)) (hem j),
-      mul_ne_zero (star_ne_zero.2 (heK i)) (heK j)⟩
+  have hf : ∀ i j, f i j ∈ pK K 𝔭 0 ∧ f i j ≠ 0 := fun i j => ⟨
+    J.mul_mem_pK_zero h𝔭 (star_mem_pK hF h𝔭 (hem i)) (hem j),
+    mul_ne_zero (star_ne_zero.2 (heK i)) (heK j)
+  ⟩
   have H1 := relIndex_matL hK hF h𝔭 f g hf (fun _ _ => hγγ) k c hle'
-  have hidx : (sesqL (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (sesqL (locF 𝔭 A₀) 𝔭 k) =
-      (matL 𝔭 (k + c) f g).relIndex (matL 𝔭 k (fun _ _ => 1) (fun _ _ => 1)) := by
+  have hidx
+      : (sesqL (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (sesqL (locF 𝔭 A₀) 𝔭 k)
+        = (matL 𝔭 (k + c) f g).relIndex (matL 𝔭 k (fun _ _ => 1) (fun _ _ => 1)) := by
     rw [hSA, hSB, AddSubgroup.relIndex_comap, AddSubgroup.map_comap_eq_self_of_surjective hΦs]
   rw [← hidx] at H1
   obtain ⟨hDa, hDa0, hDan⟩ := nO_gram hK hF hs hd hA₀.toIsLattice hA₀i h𝔭 a hA
@@ -292,19 +316,24 @@ theorem relIndex_sesqL (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF 
   have hng : nO 𝔭 (star (γ : K) * γ) = nO 𝔭 (γ : K) * nO 𝔭 (γ : K) := by
     rw [nO_mul h𝔭 (star_mem_pK hF h𝔭 hγm) (star_ne_zero.2 hγK) hγm, nO_star hF h𝔭]
   have H2 := congrArg (nO 𝔭) (J.gram_rel h a b (fun i => (e i : K)) γ habK)
-  have hp1 := J.nO_prod h𝔭 Finset.univ (fun i => star (e i : K))
-    (fun i => ⟨star_mem_pK hF h𝔭 (hem i), star_ne_zero.2 (heK i)⟩)
+  have hp1 :=
+    J.nO_prod h𝔭 Finset.univ
+      (fun i => star (e i : K))
+      (fun i => ⟨star_mem_pK hF h𝔭 (hem i), star_ne_zero.2 (heK i)⟩)
   have hp2 := J.nO_prod h𝔭 Finset.univ (fun i => (e i : K)) (fun i => ⟨hem i, heK i⟩)
   have hp3 := J.nO_pow h𝔭 hγγ.1 hγγ.2 (finrank K V)
   rw [nO_mul h𝔭 hp3.1 (pow_ne_zero _ hγγ.2) hDb, hp3.2, hng, hDbn,
-    nO_mul h𝔭 (J.mul_mem_pK_zero h𝔭 hp1.1 hp2.1)
-      (mul_ne_zero (Finset.prod_ne_zero_iff.2 fun i _ => star_ne_zero.2 (heK i))
-        (Finset.prod_ne_zero_iff.2 fun i _ => heK i)) hDa,
-    nO_mul h𝔭 hp1.1 (Finset.prod_ne_zero_iff.2 fun i _ => star_ne_zero.2 (heK i)) hp2.1,
-    hp1.2, hp2.2, hDan] at H2
+      nO_mul h𝔭 (J.mul_mem_pK_zero h𝔭 hp1.1 hp2.1)
+        (mul_ne_zero (Finset.prod_ne_zero_iff.2 fun i _ => star_ne_zero.2 (heK i))
+          (Finset.prod_ne_zero_iff.2 fun i _ => heK i))
+        hDa,
+      nO_mul h𝔭 hp1.1 (Finset.prod_ne_zero_iff.2 fun i _ => star_ne_zero.2 (heK i)) hp2.1, hp1.2,
+      hp2.2, hDan]
+    at H2
   simp only [nO_star hF h𝔭] at H2
   simp only [hnf, g, hng, Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ,
-    Fintype.card_fin, Finset.prod_pow] at H1
+      Fintype.card_fin, Finset.prod_pow]
+    at H1
   have hE0 : (∏ i, nO 𝔭 (e i : K)) ≠ 0 :=
     Finset.prod_ne_zero_iff.2 fun i _ => nO_ne_zero hK hF h𝔭 (hem i) (heK i)
   generalize (∏ i, nO 𝔭 (e i : K)) = E at H1 H2 hE0
@@ -314,21 +343,28 @@ theorem relIndex_sesqL (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF 
   generalize vd h (locF 𝔭 A₀) 𝔭 = vA at H2 ⊢
   generalize vd h (locF 𝔭 B₀) 𝔭 = vB at H2 ⊢
   generalize finrank K V = m at H1 H2 ⊢
-  apply Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero (mul_ne_zero (pow_ne_zero m hE0) (pow_ne_zero m hE0)))
-  calc X * q ^ (2 * (m * vB)) * (E ^ m * E ^ m) = (X * (E ^ m * E ^ m)) * q ^ (2 * (m * vB)) := by ring
+  apply Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero (mul_ne_zero (pow_ne_zero m hE0)
+    (pow_ne_zero m hE0)))
+  calc
+    X * q ^ (2 * (m * vB)) * (E ^ m * E ^ m)
+      = (X * (E ^ m * E ^ m)) * q ^ (2 * (m * vB)) := by ring
     _ = (G ^ m) ^ m * (G ^ m) ^ m * q ^ (2 * m ^ 2 * c) * q ^ (2 * (m * vB)) := by rw [H1]
     _ = ((G * G) ^ m * q ^ (2 * vB)) ^ m * q ^ (2 * m ^ 2 * c) := by ring
     _ = (E * E * q ^ (2 * vA)) ^ m * q ^ (2 * m ^ 2 * c) := by rw [H2]
     _ = q ^ (2 * (m ^ 2 * c + m * vA)) * (E ^ m * E ^ m) := by ring
 
-theorem relIndex_hermL (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {A₀ : Submodule (𝓞 K) V}
-    (hA₀ : Submodule.IsFullLattice K A₀) (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀) {B₀ : Submodule (𝓞 K) V}
-    (hB₀ : Submodule.IsFullLattice K B₀) (hB₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h B₀) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {k c : ℕ}
-    (hle : sesqL (locF 𝔭 B₀) 𝔭 (k + c) ≤ sesqL (locF 𝔭 A₀) 𝔭 k) :
-    (hermL (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (hermL (locF 𝔭 A₀) 𝔭 k) *
-        Ideal.absNorm 𝔭 ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭) =
-      Ideal.absNorm 𝔭 ^ (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭) := by
+theorem relIndex_hermL
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {A₀ : Submodule (𝓞 K) V} (hA₀ : Submodule.IsFullLattice K A₀)
+    (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀)
+    {B₀ : Submodule (𝓞 K) V} (hB₀ : Submodule.IsFullLattice K B₀)
+    (hB₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h B₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {k c : ℕ} (hle : sesqL (locF 𝔭 B₀) 𝔭 (k + c) ≤ sesqL (locF 𝔭 A₀) 𝔭 k)
+    : (hermL (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (hermL (locF 𝔭 A₀) 𝔭 k)
+        * Ideal.absNorm 𝔭 ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭)
+      = Ideal.absNorm 𝔭 ^ (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭) := by
   have h1 := relIndex_sesqL hK hF hs hd hA₀ hA₀i hB₀ hB₀i h𝔭 hle
   rw [relIndex_sesqL_eq_sq hK hF A₀ B₀ h𝔭 hle] at h1
   apply Nat.pow_left_injective (n := 2) (by norm_num)

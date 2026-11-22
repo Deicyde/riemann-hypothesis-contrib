@@ -10,7 +10,8 @@ noncomputable section
 namespace GlobalTheory.LvT
 
 open Formalism.BasicNotions Classical NumberField
-open Formalism.MainNotions.product_first_zeroth_parts (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
+open Formalism.MainNotions.product_first_zeroth_parts
+  (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
 
 structure LocF (q : ℕ) (F : Type) [Field F] where
   K : Type
@@ -34,7 +35,8 @@ def std : Submodule Lc.O (Fin n → Lc.K) := Submodule.pi Set.univ fun _ => (1 :
 def IsFrame (h : GL (Fin n) Lc.K) (Λ : Submodule Lc.O (Fin n → Lc.K)) : Prop :=
   ∀ x, Matrix.mulVec (h : Matrix (Fin n) (Fin n) Lc.K) x ∈ Λ ↔ x ∈ Lc.std n
 
-@[ext] structure Raw where
+@[ext]
+structure Raw where
   L : Submodule Lc.O (Fin n → Lc.K)
   f : (Fin n → Lc.K) → F
 
@@ -47,15 +49,15 @@ structure Raw.Ok (p : Raw Lc n) : Prop where
   off : ∀ x, x ∉ p.L → p.f x = 0
   ne : ∃ x, p.f x ≠ 0
 
-
 variable (Lc n) in
 def PP : Type := {p : Raw Lc n // p.Ok}
 
 def PP.ker (p : PP Lc n) : Set (Fin n → Lc.K) := {x | x ∈ p.1.L ∧ p.1.f x = 0}
 
 def PP.IsAct (g : GL (Fin n) Lc.K) (p p' : PP Lc n) : Prop :=
-  ∀ x, (Matrix.mulVec (g : Matrix (Fin n) (Fin n) Lc.K) x ∈ p'.1.L ↔ x ∈ p.1.L) ∧
-    p'.1.f (Matrix.mulVec (g : Matrix (Fin n) (Fin n) Lc.K) x) = p.1.f x
+  ∀ x,
+    (Matrix.mulVec (g : Matrix (Fin n) (Fin n) Lc.K) x ∈ p'.1.L ↔ x ∈ p.1.L)
+      ∧ p'.1.f (Matrix.mulVec (g : Matrix (Fin n) (Fin n) Lc.K) x) = p.1.f x
 
 def PP.IsUp (p : PP Lc n) (x : Fin n → Lc.K) (p₁ : PP Lc n) : Prop :=
   x ∈ p.1.L ∧ p₁.ker = (p.1.L : Set (Fin n → Lc.K)) ∧ p₁.1.f (((q : Lc.K))⁻¹ • x) = 1
@@ -75,8 +77,11 @@ structure PtModel (X : Ch D u) (i : ℕ) where
   Z : Type
   [actP : MulAction G (Z × ∀ v, LocF.PP (Lc v) (D.R.N i))]
   loc : ∀ v, G →* GL (Fin (D.R.N i)) (Lc v).K
-  smul_fst : ∀ (g : G) (p p' : Z × ∀ v, LocF.PP (Lc v) (D.R.N i)), p.1 = p'.1 → (g • p).1 = (g • p').1
-  smul_snd : ∀ (g : G) (p : Z × ∀ v, LocF.PP (Lc v) (D.R.N i)) v, LocF.PP.IsAct (loc v g) (p.2 v) ((g • p).2 v)
+  smul_fst
+    : ∀ (g : G) (p p' : Z × ∀ v, LocF.PP (Lc v) (D.R.N i)), p.1 = p'.1 → (g • p).1 = (g • p').1
+  smul_snd
+    : ∀ (g : G) (p : Z × ∀ v, LocF.PP (Lc v) (D.R.N i)) v,
+      LocF.PP.IsAct (loc v g) (p.2 v) ((g • p).2 v)
   rep : X.C.cls i → Z × ∀ v, LocF.PP (Lc v) (D.R.N i)
   rep_surj : ∀ p, ∃ (c : X.C.cls i) (g : G), g • rep c = p
   rep_inj : ∀ (c c' : X.C.cls i) (g : G), g • rep c = rep c' → c = c'
@@ -90,25 +95,39 @@ structure PtModel (X : Ch D u) (i : ℕ) where
   ipV_eq : ∀ c (y y' : Val), X.fm.ipV i c y y' = H y y'
   mem_Fi : ∀ φ, φ ∈ X.fm.Fi i ↔ ∀ c, ∃ y : Val, φ c = y ∧ ∀ g : G, g • rep c = rep c → act g y = y
   piL : ∀ v c, (Fin (D.R.N i) → (Lc v).K) → X.fm.lv i v c
-  piL_add : ∀ v c, ∀ x ∈ ((rep c).2 v).1.L, ∀ y ∈ ((rep c).2 v).1.L, piL v c (x + y) = piL v c x + piL v c y
-  piL_smul : ∀ v c (a : (Lc v).O), ∀ x ∈ ((rep c).2 v).1.L, piL v c (a • x) = (Lc v).res a • piL v c x
+  piL_add
+    : ∀ v c, ∀ x ∈ ((rep c).2 v).1.L, ∀ y ∈ ((rep c).2 v).1.L,
+      piL v c (x + y) = piL v c x + piL v c y
+  piL_smul
+    : ∀ v c (a : (Lc v).O), ∀ x ∈ ((rep c).2 v).1.L, piL v c (a • x) = (Lc v).res a • piL v c x
   piL_surj : ∀ v c y, ∃ x ∈ ((rep c).2 v).1.L, piL v c x = y
   piL_f : ∀ v c, ∀ x ∈ ((rep c).2 v).1.L, X.fm.fv i v c (piL v c x) = ((rep c).2 v).1.f x
   piK : ∀ v c, (Fin (D.R.N i) → (Lc v).K) → X.fm.lk i v c
-  piK_add : ∀ v c, ∀ x ∈ ((rep c).2 v).ker, ∀ y ∈ ((rep c).2 v).ker, piK v c (x + y) = piK v c x + piK v c y
-  piK_smul : ∀ v c (a : (Lc v).O), ∀ x ∈ ((rep c).2 v).ker, piK v c (a • x) = (Lc v).res a • piK v c x
+  piK_add
+    : ∀ v c, ∀ x ∈ ((rep c).2 v).ker, ∀ y ∈ ((rep c).2 v).ker,
+      piK v c (x + y) = piK v c x + piK v c y
+  piK_smul
+    : ∀ v c (a : (Lc v).O), ∀ x ∈ ((rep c).2 v).ker, piK v c (a • x) = (Lc v).res a • piK v c x
   piK_surj : ∀ v c y, ∃ x ∈ ((rep c).2 v).ker, piK v c x = y
   piK_te : ∀ v c e, ((rep c).2 v).1.f e = 1 → piK v c ((X.A.T : (Lc v).K) • e) = X.fm.te i v c
-  up_eq : ∀ v c x p₁, ((rep c).2 v).1.f x = 1 → ((rep c).2 v).IsUp x p₁ →
-    ∃ g : G, g • rep (X.fm.up i v c (piL v c x)) = ((rep c).1, Function.update (rep c).2 v p₁) ∧
-      ∀ y : Val, X.fm.upT i v c (piL v c x) y = act g y
-  dn_eq : ∀ v c (γ : Module.Dual (X.A.Fv v) (X.fm.lk i v c)) (p₀ : LocF.PP (Lc v) (D.R.N i)),
-    (p₀.1.L : Set _) = ((rep c).2 v).ker → (∀ x ∈ p₀.1.L, p₀.1.f x = γ (piK v c x)) →
-    ∃ g : G, g • rep (X.fm.dn i v c γ) = ((rep c).1, Function.update (rep c).2 v p₀) ∧
-      ∀ y : Val, X.fm.dnT i v c γ y = act g y
-  dil_eq : ∀ v c (a : (X.A.Fv v)ˣ) p', LocF.PP.IsDil (a : X.A.Fv v) ((rep c).2 v) p' →
-    ∃ g : G, g • rep (X.fm.dil i v a c) = ((rep c).1, Function.update (rep c).2 v p') ∧
-      ∀ y : Val, X.fm.dilT i v a c y = act g y
+  up_eq
+    : ∀ v c x p₁,
+      ((rep c).2 v).1.f x = 1 → ((rep c).2 v).IsUp x p₁
+        → ∃ g : G,
+          g • rep (X.fm.up i v c (piL v c x)) = ((rep c).1, Function.update (rep c).2 v p₁)
+            ∧ ∀ y : Val, X.fm.upT i v c (piL v c x) y = act g y
+  dn_eq
+    : ∀ v c (γ : Module.Dual (X.A.Fv v) (X.fm.lk i v c)) (p₀ : LocF.PP (Lc v) (D.R.N i)),
+      (p₀.1.L : Set _) = ((rep c).2 v).ker → (∀ x ∈ p₀.1.L, p₀.1.f x = γ (piK v c x))
+        → ∃ g : G,
+          g • rep (X.fm.dn i v c γ) = ((rep c).1, Function.update (rep c).2 v p₀)
+            ∧ ∀ y : Val, X.fm.dnT i v c γ y = act g y
+  dil_eq
+    : ∀ v c (a : (X.A.Fv v)ˣ) p',
+      LocF.PP.IsDil (a : X.A.Fv v) ((rep c).2 v) p'
+        → ∃ g : G,
+          g • rep (X.fm.dil i v a c) = ((rep c).1, Function.update (rep c).2 v p')
+            ∧ ∀ y : Val, X.fm.dilT i v a c y = act g y
 
 attribute [instance] PtModel.grp PtModel.actP
 
@@ -144,8 +163,11 @@ variable {X : Ch D u} {i : ℕ} (M : PtModel X i)
 def lamT (X : Ch D u) (i : ℕ) (τ : D.what₂.Tau) : DomWeight (D.R.N i) :=
   wSh (X.fm.lam i τ) ((i * (D.R.t + 1) / 2 : ℕ) : ℤ)
 
-def IsFrameS (v : X.A.vT) (h : GL (Fin (D.R.N i)) (M.Lc v).K) (s : Set (Fin (D.R.N i) → (M.Lc v).K)) : Prop :=
-  ∀ x, Matrix.mulVec (h : Matrix (Fin (D.R.N i)) (Fin (D.R.N i)) (M.Lc v).K) x ∈ s ↔ x ∈ (M.Lc v).std (D.R.N i)
+def IsFrameS (v : X.A.vT) (h : GL (Fin (D.R.N i)) (M.Lc v).K) (s : Set (Fin (D.R.N i) → (M.Lc v).K))
+    : Prop :=
+  ∀ x,
+    Matrix.mulVec (h : Matrix (Fin (D.R.N i)) (Fin (D.R.N i)) (M.Lc v).K) x ∈ s
+      ↔ x ∈ (M.Lc v).std (D.R.N i)
 
 structure Coord where
   co : M.Val →ₗ[ℂ] MvPolynomial (D.what₂.Tau × Fin (D.R.N i) × Fin (D.R.N i)) ℂ
@@ -157,14 +179,16 @@ structure Coord where
 
 variable {M} (Co : M.Coord)
 
-def Coord.mv (w : D.what₂.places.Pl) (h : ∀ v, GL (Fin (D.R.N i)) (M.Lc v).K) (τ : D.what₂.Tau) : GL (Fin (D.R.N i)) ℂ :=
+def Coord.mv (w : D.what₂.places.Pl) (h : ∀ v, GL (Fin (D.R.N i)) (M.Lc v).K) (τ : D.what₂.Tau)
+    : GL (Fin (D.R.N i)) ℂ :=
   let v := (X.fm.tauOf w).symm τ
-  let g : GL (Fin (D.R.N i)) ℂ := Matrix.GeneralLinearGroup.map (D.what₂.embLL.comp (Co.j w v)) (h v)
+  let g : GL (Fin (D.R.N i)) ℂ :=
+    Matrix.GeneralLinearGroup.map (D.what₂.embLL.comp (Co.j w v)) (h v)
   if X.fm.seenP w then g else inside₂ ℂ _ g
 
-def Coord.mov (w : D.what₂.places.Pl) (h : ∀ v, GL (Fin (D.R.N i)) (M.Lc v).K) :
-    MvPolynomial (D.what₂.Tau × Fin (D.R.N i) × Fin (D.R.N i)) ℂ →ₗ[ℂ]
-      MvPolynomial (D.what₂.Tau × Fin (D.R.N i) × Fin (D.R.N i)) ℂ :=
+def Coord.mov (w : D.what₂.places.Pl) (h : ∀ v, GL (Fin (D.R.N i)) (M.Lc v).K)
+    : MvPolynomial (D.what₂.Tau × Fin (D.R.N i) × Fin (D.R.N i)) ℂ →ₗ[ℂ]
+        MvPolynomial (D.what₂.Tau × Fin (D.R.N i) × Fin (D.R.N i)) ℂ :=
   blk fun τ => roundAct ℂ _ (lamT X i τ) (Co.mv w h τ)
 
 def Coord.valB (w : D.what₂.places.Pl) (V : Finset X.A.vT) (p : M.Pt) : Set M.Val :=
@@ -172,22 +196,36 @@ def Coord.valB (w : D.what₂.places.Pl) (V : Finset X.A.vT) (p : M.Pt) : Set M.
     (∀ v, M.IsFrameS v (h v) (if X.fm.seenP w = true ∧ v ∉ V then ((p.2 v).1.L : Set _) else (p.2 v).ker)) ∧
     ∃ z ∈ IntSpan D w (X.fm.lam i), Co.co y = Co.mov w h z}
 
-def ValIn (M : PtModel X i) (W : M.Pt → Set M.Val) (φ : Fn X i) : Prop := ∀ c, ∃ y ∈ W (M.rep c), φ c = y
+def ValIn (M : PtModel X i) (W : M.Pt → Set M.Val) (φ : Fn X i) : Prop :=
+  ∀ c, ∃ y ∈ W (M.rep c), φ c = y
 
 structure Coord.Ok : Prop where
-  act_co : ∀ w, OverT X w → ∀ g : M.G, ∃ (ζ : D.what₂.LL) (k : ℕ), 0 < k ∧ ζ ^ k = 1 ∧
-    ∀ y, Co.co (M.act g y) = D.what₂.embLL ζ • Co.mov w (fun v => M.loc v g) (Co.co y)
-  S_on : ∀ w, OverT X w → ∀ φ ∈ X.fm.Fi i,
-    (∃ x ∈ X.fm.S i w, X.fm.emb i x = φ) ↔ M.ValIn (Co.valB w ∅) φ
-  B_on : ∀ w, OverT X w → X.fm.seenP w = true → ∀ v, ∀ φ ∈ X.fm.Fi i,
-    (∃ x ∈ X.fm.Bw i w v, X.fm.emb i x = φ) ↔ M.ValIn (Co.valB w {v}) φ
-  off_act : ∀ w, ¬ OverT X w → ∀ (g : M.G) (p : M.Pt) y, M.act g y ∈ Co.Woff w (g • p).1 ↔ y ∈ Co.Woff w p.1
-  S_off : ∀ w, ¬ OverT X w → ∀ φ ∈ X.fm.Fi i,
-    (∃ x ∈ X.fm.S i w, X.fm.emb i x = φ) ↔ M.ValIn (fun p => (Co.Woff w p.1 : Set M.Val)) φ
+  act_co
+    : ∀ w,
+      OverT X w
+        → ∀ g : M.G, ∃ (ζ : D.what₂.LL) (k : ℕ),
+          0 < k ∧ ζ ^ k = 1
+            ∧ ∀ y, Co.co (M.act g y) = D.what₂.embLL ζ • Co.mov w (fun v => M.loc v g) (Co.co y)
+  S_on
+    : ∀ w,
+      OverT X w → ∀ φ ∈ X.fm.Fi i, (∃ x ∈ X.fm.S i w, X.fm.emb i x = φ) ↔ M.ValIn (Co.valB w ∅) φ
+  B_on
+    : ∀ w,
+      OverT X w → X.fm.seenP w = true
+        → ∀ v, ∀ φ ∈ X.fm.Fi i, (∃ x ∈ X.fm.Bw i w v, X.fm.emb i x = φ) ↔ M.ValIn (Co.valB w {v}) φ
+  off_act
+    : ∀ w,
+      ¬ OverT X w → ∀ (g : M.G) (p : M.Pt) y, M.act g y ∈ Co.Woff w (g • p).1 ↔ y ∈ Co.Woff w p.1
+  S_off
+    : ∀ w,
+      ¬ OverT X w
+        → ∀ φ ∈ X.fm.Fi i,
+          (∃ x ∈ X.fm.S i w, X.fm.emb i x = φ) ↔ M.ValIn (fun p => (Co.Woff w p.1 : Set M.Val)) φ
 
 end PtModel
 
-def ValTie {X : Ch D u} (Lv : LevTie X) : Type := ∀ i (h : i ≤ D.R.m), {Co : (Lv i h).Coord // Co.Ok}
+def ValTie {X : Ch D u} (Lv : LevTie X) : Type :=
+  ∀ i (h : i ≤ D.R.m), {Co : (Lv i h).Coord // Co.Ok}
 
 end
 section
@@ -209,16 +247,22 @@ def DilLaw : Prop :=
   ∀ v (a : (X.A.Fv v)ˣ) p q p' q', M.Dil v a p q → M'.Dil v a p' q' → K.k q q' = K.k p p'
 
 def UKLaw : Prop :=
-  ∀ v p p' y, (∑ᶠ p₁ ∈ {p₁ | M'.Inc v p' p₁}, K.k p p₁ y) =
-    ((X.A.T : ℂ) ^ ((D.R.t + 1) / 2)) • ∑ᶠ p₀ ∈ {p₀ | M.Inc v p₀ p}, K.k p₀ p' y
+  ∀ v p p' y,
+    (∑ᶠ p₁ ∈ {p₁ | M'.Inc v p' p₁}, K.k p p₁ y)
+      = ((X.A.T : ℂ) ^ ((D.R.t + 1) / 2)) • ∑ᶠ p₀ ∈ {p₀ | M.Inc v p₀ p}, K.k p₀ p' y
 
 def IntBar (Co : M.Coord) (Co' : M'.Coord) : Prop :=
-  ∀ w, OverT X w → X.fm.seenP w = false → ∀ p p', ∀ y ∈ Co.valB w ∅ p,
-    ∃ y' ∈ Co'.valB w ∅ p', K.k p p' y = ((X.A.T : ℂ) ^ (D.R.f * ((D.R.t + 1) / 2))) • y'
+  ∀ w,
+    OverT X w → X.fm.seenP w = false
+      → ∀ p p', ∀ y ∈ Co.valB w ∅ p, ∃ y' ∈ Co'.valB w ∅ p',
+        K.k p p' y = ((X.A.T : ℂ) ^ (D.R.f * ((D.R.t + 1) / 2))) • y'
 
 def IntP (Co : M.Coord) (Co' : M'.Coord) : Prop :=
-  ∀ w, OverT X w → X.fm.seenP w = true → ∀ p p', ∀ y ∈ Co.valB w ∅ p,
-    ((X.A.T : ℂ) ^ ((D.R.f * D.R.N i : ℕ) + ∑ τ, X.C.sDiv i τ : ℤ)) • K.k p p' y ∈ Co'.valB w Finset.univ p'
+  ∀ w,
+    OverT X w → X.fm.seenP w = true
+      → ∀ p p', ∀ y ∈ Co.valB w ∅ p,
+        ((X.A.T : ℂ) ^ ((D.R.f * D.R.N i : ℕ) + ∑ τ, X.C.sDiv i τ : ℤ)) • K.k p p' y
+          ∈ Co'.valB w Finset.univ p'
 
 end KerPt
 
@@ -262,24 +306,36 @@ section
 variable {D : D7} {u : D.what₂.Word} {X : Ch D u}
 
 def WtBounds (X : Ch D u) : Prop :=
-  (∀ τ ∈ tops D, 0 ≤ X.fm.bTop τ) ∧
-  ∀ i, i < D.R.m → ∀ τ, 0 ≤ X.C.sDiv i τ ∧ X.C.sDiv i τ ≤ Wt X τ ∧
-    (PtModel.lamT X (i + 1) τ).detShift = -X.C.sDiv i τ ∧
-    (τ ∉ tops D → (PtModel.lamT X (i + 1) τ).w ⟨0, D.R.N_pos _⟩ ≤ Wt X τ)
+  (∀ τ ∈ tops D, 0 ≤ X.fm.bTop τ)
+    ∧ ∀ i,
+      i < D.R.m
+        → ∀ τ,
+          0 ≤ X.C.sDiv i τ ∧ X.C.sDiv i τ ≤ Wt X τ
+            ∧ (PtModel.lamT X (i + 1) τ).detShift = - X.C.sDiv i τ
+            ∧ (τ ∉ tops D → (PtModel.lamT X (i + 1) τ).w ⟨0, D.R.N_pos _⟩ ≤ Wt X τ)
 
 def UKSharp (X : Ch D u) : Prop :=
-  ∀ w, OverT X w → ∀ i, i < D.R.m →
-    Into X w (fun φ => tpow X (if X.fm.seenP w then 2 * ∑ τ, Wt X τ + D.R.f * D.R.N D.R.m else 0) •
-      Uprod X (i + 1) w (KT X i φ)) (X.fm.S i w) (X.fm.S (i + 1) w)
+  ∀ w,
+    OverT X w
+      → ∀ i,
+        i < D.R.m
+          → Into X w
+            (fun φ =>
+              tpow X (if X.fm.seenP w then 2 * ∑ τ, Wt X τ + D.R.f * D.R.N D.R.m else 0)
+                • Uprod X (i + 1) w (KT X i φ))
+            (X.fm.S i w) (X.fm.S (i + 1) w)
 
 def FormsStable (X : Ch D u) : Prop :=
-  (∀ i, i ≤ D.R.m → ∀ v, ∀ φ ∈ X.fm.Fi i, Uop X i v φ ∈ X.fm.Fi i) ∧
-  (∀ i, i ≤ D.R.m → ∀ v v', ∀ φ ∈ X.fm.Fi i, Uop X i v (Uop X i v' φ) = Uop X i v' (Uop X i v φ)) ∧
-  ∀ i, i < D.R.m → ∀ φ ∈ X.fm.Fi i, KT X i φ ∈ X.fm.Fi (i + 1)
+  (∀ i, i ≤ D.R.m → ∀ v, ∀ φ ∈ X.fm.Fi i, Uop X i v φ ∈ X.fm.Fi i)
+    ∧ (∀ i,
+      i ≤ D.R.m → ∀ v v', ∀ φ ∈ X.fm.Fi i, Uop X i v (Uop X i v' φ) = Uop X i v' (Uop X i v φ))
+    ∧ ∀ i, i < D.R.m → ∀ φ ∈ X.fm.Fi i, KT X i φ ∈ X.fm.Fi (i + 1)
 
 def Step0Tie (Tw : TwForms D) (u : D.what₂.Word) (μ : D.what₂.Tup) : Prop :=
-  ∀ w, Formalism.MainNotions.product_first_zeroth_parts.OverT D u w → (Tw.fm u μ).seenP w = (D.fm u).seenP w ∧
-    ∀ x ∈ LT.Nlam D u w, Tw.e0 u μ x ∈ Nlam (tw Tw u μ) w
+  ∀ w,
+    Formalism.MainNotions.product_first_zeroth_parts.OverT D u w
+      → (Tw.fm u μ).seenP w = (D.fm u).seenP w
+        ∧ ∀ x ∈ LT.Nlam D u w, Tw.e0 u μ x ∈ Nlam (tw Tw u μ) w
 
 end
 end GlobalTheory.LvT

@@ -22,77 +22,104 @@ noncomputable section
 
 namespace GlobalTheory.JSW.NzSph
 
-theorem finite_bad (E : Type) [Field E] [NumberField E] (a : ℕ) (k : GL (Fin a) (Af E)) :
-    {w : HeightOneSpectrum (𝓞 E) | GeneralLinearGroup.map (pLoc E w) k ∉ KGL w (n := a)}.Finite :=
+theorem finite_bad (E : Type) [Field E] [NumberField E] (a : ℕ) (k : GL (Fin a) (Af E))
+    : {w : HeightOneSpectrum (𝓞 E) | GeneralLinearGroup.map (pLoc E w) k ∉ KGL w (n := a)}.Finite :=
   GlobalTheory.T.finiteAdelicGL_mem_integral_cofinite_places E a k
 
-theorem exists_outside (E : Type) [Field E] [NumberField E] (a : ℕ) (S : Finset (HeightOneSpectrum (𝓞 E)))
-    (k : GL (Fin a) (Af E)) : ∃ k' : GL (Fin a) (Af E),
-      (∀ w ∉ S, GeneralLinearGroup.map (pLoc E w) k' = GeneralLinearGroup.map (pLoc E w) k) ∧
-      ∀ w ∈ S, GeneralLinearGroup.map (pLoc E w) k' = 1 :=
+theorem exists_outside
+    (E : Type) [Field E] [NumberField E]
+    (a : ℕ)
+    (S : Finset (HeightOneSpectrum (𝓞 E))) (k : GL (Fin a) (Af E))
+    : ∃ k' : GL (Fin a) (Af E),
+      (∀ w ∉ S, GeneralLinearGroup.map (pLoc E w) k' = GeneralLinearGroup.map (pLoc E w) k)
+        ∧ ∀ w ∈ S, GeneralLinearGroup.map (pLoc E w) k' = 1 :=
   GlobalTheory.T.exists_finiteAdelicGL_agree_outside_trivial_on_finset E a S k
 
-theorem local_decomp (E : Type) [Field E] [NumberField E] (a : ℕ) (w : HeightOneSpectrum (𝓞 E))
-    (ϖ : (w.adicCompletion E)ˣ) (hϖ : IsUnifV E w (ϖ : w.adicCompletion E)) (g : GL (Fin a) (w.adicCompletion E)) :
-    ∃ u ∈ GlobalTheory.SmGL.unipB (w.adicCompletion E) (Fin a), ∃ (N : ℕ) (l : Fin a → ℕ), ∃ k ∈ KGL w (n := a),
-      g = u * GlobalTheory.JSW.diagPow ϖ⁻¹ (fun _ => N) * GlobalTheory.JSW.diagPow ϖ l * k :=
+theorem local_decomp
+    (E : Type) [Field E] [NumberField E]
+    (a : ℕ) (w : HeightOneSpectrum (𝓞 E)) (ϖ : (w.adicCompletion E)ˣ)
+    (hϖ : IsUnifV E w (ϖ : w.adicCompletion E)) (g : GL (Fin a) (w.adicCompletion E))
+    : ∃ u ∈ GlobalTheory.SmGL.unipB (w.adicCompletion E) (Fin a), ∃ (N : ℕ) (l : Fin a → ℕ),
+      ∃ k ∈ KGL w (n := a),
+        g = u * GlobalTheory.JSW.diagPow ϖ⁻¹ (fun _ => N) * GlobalTheory.JSW.diagPow ϖ l * k :=
   GlobalTheory.T.iwasawa_decomposition_adicCompletionGL_diagonalPowers E a w ϖ hϖ g
 
-theorem act_fin_eq_of_outside (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (φ : Sm E a)
-    (hφ : IsAutForm φ) (S : Finset (HeightOneSpectrum (𝓞 E)))
-    (hS : ∀ w ∉ S, ∀ k ∈ KGL w (n := a), act (.fin (locGL E a w k)) φ = φ) (k : GL (Fin a) (Af E))
-    (hk : ∀ w ∉ S, GeneralLinearGroup.map (pLoc E w) k ∈ KGL w (n := a))
-    (hk1 : ∀ w ∈ S, GeneralLinearGroup.map (pLoc E w) k = 1) : act (.fin k) φ = φ :=
+theorem act_fin_eq_of_outside
+    (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    (a : ℕ) (φ : Sm E a) (hφ : IsAutForm φ)
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    (hS : ∀ w ∉ S, ∀ k ∈ KGL w (n := a), act (.fin (locGL E a w k)) φ = φ)
+    (k : GL (Fin a) (Af E)) (hk : ∀ w ∉ S, GeneralLinearGroup.map (pLoc E w) k ∈ KGL w (n := a))
+    (hk1 : ∀ w ∈ S, GeneralLinearGroup.map (pLoc E w) k = 1)
+    : act (.fin k) φ = φ :=
   GlobalTheory.T.smoothAutomorphicForm_fixed_of_locally_integral_fixed E a φ hφ S hS k hk hk1
 
 end GlobalTheory.JSW.NzSph
 
 namespace GlobalTheory.JSW.NzSph
 
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.MultiplicityOne
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.MultiplicityOne
 
 variable {E : Type} [Field E] [NumberField E] {a : ℕ}
 
-theorem map_pLoc_pFin (w : HeightOneSpectrum (𝓞 E)) (g : GA E a) :
-    GeneralLinearGroup.map (pLoc E w) (GeneralLinearGroup.map (pFin E) g) =
-      GeneralLinearGroup.map ((pLoc E w).comp (pFin E)) g := by
+theorem map_pLoc_pFin (w : HeightOneSpectrum (𝓞 E)) (g : GA E a)
+    : GeneralLinearGroup.map (pLoc E w) (GeneralLinearGroup.map (pFin E) g)
+      = GeneralLinearGroup.map ((pLoc E w).comp (pFin E)) g := by
   ext; rfl
 
-theorem comp_finGL (v : HeightOneSpectrum (𝓞 E)) (h : GL (Fin a) (Af E)) :
-    GeneralLinearGroup.map ((pLoc E v).comp (pFin E)) (finGL E a h) = GeneralLinearGroup.map (pLoc E v) h := by
+theorem comp_finGL (v : HeightOneSpectrum (𝓞 E)) (h : GL (Fin a) (Af E))
+    : GeneralLinearGroup.map ((pLoc E v).comp (pFin E)) (finGL E a h)
+      = GeneralLinearGroup.map (pLoc E v) h := by
   rw [finGL, map_cornerGL_of_hom (sFin E) ((pLoc E v).comp (pFin E)) (pLoc E v) (fun x => rfl)]
 
-theorem diagPow_const_comm {K : Type} [CommRing K] {n : ℕ} (c : Kˣ) (N : ℕ) (h : GL (Fin n) K) :
-    GlobalTheory.JSW.diagPow c (fun _ : Fin n => N) * h = h * GlobalTheory.JSW.diagPow c (fun _ : Fin n => N) := by
+theorem diagPow_const_comm {K : Type} [CommRing K] {n : ℕ} (c : Kˣ) (N : ℕ) (h : GL (Fin n) K)
+    : GlobalTheory.JSW.diagPow c (fun _ : Fin n => N) * h
+      = h * GlobalTheory.JSW.diagPow c (fun _ : Fin n => N) := by
   ext i j
   simp [GlobalTheory.JSW.diagPow, Matrix.diagonal_mul, Matrix.mul_diagonal, mul_comm]
 
 variable [_root_.NumberField.IsTotallyComplex E]
 
-theorem whit_act_fin (φ : Sm E a) (k : GL (Fin a) (Af E)) (y : GA E a) :
-    whit (act (.fin k) φ).1 y = whit φ.1 (y * finGL E a k) := by
+theorem whit_act_fin (φ : Sm E a) (k : GL (Fin a) (Af E)) (y : GA E a)
+    : whit (act (.fin k) φ).1 y = whit φ.1 (y * finGL E a k) := by
   rw [whit_mul_right]; rfl
 
-theorem act_fin_mul (k k' : GL (Fin a) (Af E)) (φ : Sm E a) :
-    act (.fin (k * k')) φ = act (.fin k) (act (.fin k') φ) := by
+theorem act_fin_mul (k k' : GL (Fin a) (Af E)) (φ : Sm E a)
+    : act (.fin (k * k')) φ = act (.fin k) (act (.fin k') φ) := by
   show finRep E a (k * k') φ = finRep E a k (finRep E a k' φ)
-  rw [map_mul]; rfl
+  rw [map_mul]
+  rfl
 
-theorem exists_whittaker_ne_zero_induction_bad_places (S : Finset (HeightOneSpectrum (𝓞 E)))
-    (hψ : ∀ w ∉ S, ∀ x : w.adicCompletion E, (∀ y ∈ Ov E w, (GroundTheory.Global.adelicChar _ (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y))) : ℂ) = 1) ↔ x ∈ Ov E w)
+theorem exists_whittaker_ne_zero_induction_bad_places
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    (hψ : ∀ w ∉ S, ∀ x : w.adicCompletion E,
+      (∀ y ∈ Ov E w,
+          (GroundTheory.Global.adelicChar _
+                (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y)))
+              : ℂ)
+            = 1)
+        ↔ x ∈ Ov E w)
     (π : CuspSub E a) (α : HeightOneSpectrum (𝓞 E) → Fin a → ℂˣ)
-    (hα : ∀ w ∉ S, HasSatGL w (π.locRep w) (Finset.univ.val.map (α w))) (T : Finset (HeightOneSpectrum (𝓞 E))) :
-    ∀ φ ∈ π.V, (∀ w ∉ S, ∀ k ∈ KGL w (n := a), act (.fin (locGL E a w k)) φ = φ) → ∀ g : GA E a,
-      (∀ w ∉ S, w ∉ T → GeneralLinearGroup.map ((pLoc E w).comp (pFin E)) g ∈ KGL w (n := a)) → whit φ.1 g ≠ 0 →
-      ∃ φ ∈ π.V, (∀ w ∉ S, ∀ k ∈ KGL w (n := a), act (.fin (locGL E a w k)) φ = φ) ∧
-        ∃ x ∈ GlobalTheory.JSW.supS (E := E) (a := a) S, whit φ.1 x ≠ 0 := by
+    (hα : ∀ w ∉ S, HasSatGL w (π.locRep w) (Finset.univ.val.map (α w)))
+    (T : Finset (HeightOneSpectrum (𝓞 E)))
+    : ∀ φ ∈ π.V,
+      (∀ w ∉ S, ∀ k ∈ KGL w (n := a), act (.fin (locGL E a w k)) φ = φ)
+        → ∀ g : GA E a,
+          (∀ w ∉ S, w ∉ T → GeneralLinearGroup.map ((pLoc E w).comp (pFin E)) g ∈ KGL w (n := a))
+            → whit φ.1 g ≠ 0
+            → ∃ φ ∈ π.V,
+              (∀ w ∉ S, ∀ k ∈ KGL w (n := a), act (.fin (locGL E a w k)) φ = φ)
+                ∧ ∃ x ∈ GlobalTheory.JSW.supS (E := E) (a := a) S, whit φ.1 x ≠ 0 := by
   classical
   induction T using Finset.induction_on with
   | empty =>
     intro φ hφV hφ g hg hW
     obtain ⟨k, hk1, hk2⟩ := exists_outside E a S (GeneralLinearGroup.map (pFin E) g)
-    have hinv : act (.fin k) φ = φ := act_fin_eq_of_outside E a φ (π.cusp φ hφV).1 S hφ k
-      (fun w hw => by rw [hk1 w hw, map_pLoc_pFin]; exact hg w hw (Finset.notMem_empty w)) hk2
+    have hinv : act (.fin k) φ = φ :=
+      act_fin_eq_of_outside E a φ (π.cusp φ hφV).1 S hφ k
+        (fun w hw => by rw [hk1 w hw, map_pLoc_pFin]; exact hg w hw (Finset.notMem_empty w))
+        hk2
     refine ⟨φ, hφV, hφ, g * (finGL E a k)⁻¹, fun w hw => ?_, ?_⟩
     · rw [map_mul, map_inv, comp_finGL, hk1 w hw, map_pLoc_pFin, mul_inv_cancel]
     · have e : g = g * (finGL E a k)⁻¹ * finGL E a k := by group
@@ -117,16 +144,20 @@ theorem exists_whittaker_ne_zero_induction_bad_places (S : Finset (HeightOneSpec
     let y := g * (F gw)⁻¹
     have hyw : GeneralLinearGroup.map ((pLoc E w).comp (pFin E)) y = 1 := by
       show GeneralLinearGroup.map ((pLoc E w).comp (pFin E)) (g * (finGL E a (locGL E a w gw))⁻¹) = 1
-      rw [map_mul, map_inv, comp_finGL, pLoc_locGL]; exact mul_inv_cancel _
-    have hyv : ∀ v, v ≠ w → GeneralLinearGroup.map ((pLoc E v).comp (pFin E)) y =
-        GeneralLinearGroup.map ((pLoc E v).comp (pFin E)) g := by
+      rw [map_mul, map_inv, comp_finGL, pLoc_locGL]
+      exact mul_inv_cancel _
+    have hyv
+        : ∀ v,
+          v ≠ w
+            → GeneralLinearGroup.map ((pLoc E v).comp (pFin E)) y
+              = GeneralLinearGroup.map ((pLoc E v).comp (pFin E)) g := by
       intro v hv
       show GeneralLinearGroup.map ((pLoc E v).comp (pFin E)) (g * (finGL E a (locGL E a w gw))⁻¹) = _
       rw [map_mul, map_inv, comp_finGL, pLoc_locGL_of_ne hv, inv_one, mul_one]
     have hg' : g = y * F u * F z * F d * F k := by
-      have : F gw = F u * F z * F d * F k := by
-        rw [hdec, map_mul, map_mul, map_mul]
-      calc g = y * F gw := by simp only [y]; group
+      have : F gw = F u * F z * F d * F k := by rw [hdec, map_mul, map_mul, map_mul]
+      calc
+        g = y * F gw := by simp only [y]; group
         _ = _ := by rw [this]; simp only [mul_assoc]
     have hcont : Continuous φ.1 := (π.cusp _ hφV).1.continuous
     have hleft : AutomorphicForm.IsLeftInvariant φ.1 := fun γ x => by
@@ -150,7 +181,8 @@ theorem exists_whittaker_ne_zero_induction_bad_places (S : Finset (HeightOneSpec
       have hc : locGL E a v k' * locGL E a w z = locGL E a w z * locGL E a v k' := by
         by_cases hvw : v = w
         · subst hvw; rw [← map_mul, ← map_mul, diagPow_const_comm]
-        · exact (GlobalTheory.CuspRep.LocSph.comm_locGL v (locGL E a w z) (pLoc_locGL_of_ne hvw z) k').symm
+        · exact (GlobalTheory.CuspRep.LocSph.comm_locGL v (locGL E a w z) (pLoc_locGL_of_ne hvw z)
+            k').symm
       simp only [φ₁]
       rw [← act_fin_mul, hc, act_fin_mul, hφ v hv k' hk']
     have h3 : whit φ₁.1 (y * F d) ≠ 0 := by
@@ -159,7 +191,9 @@ theorem exists_whittaker_ne_zero_induction_bad_places (S : Finset (HeightOneSpec
       rw [e, hF z, ← whit_act_fin] at h2
       exact h2
     have h4 : whit φ₁.1 y ≠ 0 := by
-      have := GlobalTheory.JSW.whit_mul_locGL_diagPow E a π w (α w) (hψ w hwS) (hα w hwS) φ₁ hφ₁V (hφ₁ w hwS) y hyw ϖ hϖ l
+      have :=
+        GlobalTheory.JSW.whit_mul_locGL_diagPow E a π w (α w) (hψ w hwS) (hα w hwS) φ₁ hφ₁V
+          (hφ₁ w hwS) y hyw ϖ hϖ l
       rw [hF d] at h3
       rw [this] at h3
       exact right_ne_zero_of_mul h3
@@ -169,18 +203,40 @@ theorem exists_whittaker_ne_zero_induction_bad_places (S : Finset (HeightOneSpec
     · rw [hyv v hvw]
       exact hg v hv (by rw [Finset.mem_insert, not_or]; exact ⟨hvw, hvT⟩)
 
-theorem exists_sph_whit_ne_zero : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (m : ℕ) (S : Finset (HeightOneSpectrum (𝓞 E))), (∀ w ∉ S, ∀ x : w.adicCompletion E, (∀ y ∈ Ov E w, (GroundTheory.Global.adelicChar _ (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y))) : ℂ) = 1) ↔ x ∈ Ov E w) → ∀ (π : CuspSub E (m + 1)) (α : HeightOneSpectrum (𝓞 E) → Fin (m + 1) → ℂˣ), (∀ w ∉ S, HasSatGL w (π.locRep w) (Finset.univ.val.map (α w))) → ∃ φ ∈ π.V, (∀ w ∉ S, ∀ k ∈ KGL w (n := (m + 1)), act (.fin (locGL E (m + 1) w k)) φ = φ) ∧ ∃ x ∈ GlobalTheory.JSW.supS (E := E) (a := (m + 1)) S, GlobalTheory.JSW.whit φ.1 x ≠ 0 := by
+theorem exists_sph_whit_ne_zero
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (m : ℕ)
+        (S : Finset (HeightOneSpectrum (𝓞 E))),
+      (∀ w ∉ S, ∀ x : w.adicCompletion E,
+          (∀ y ∈ Ov E w,
+              (GroundTheory.Global.adelicChar _
+                    (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y)))
+                  : ℂ)
+                = 1)
+            ↔ x ∈ Ov E w)
+        → ∀ (π : CuspSub E (m + 1)) (α : HeightOneSpectrum (𝓞 E) → Fin (m + 1) → ℂˣ),
+          (∀ w ∉ S, HasSatGL w (π.locRep w) (Finset.univ.val.map (α w)))
+            → ∃ φ ∈ π.V,
+              (∀ w ∉ S, ∀ k ∈ KGL w (n := (m + 1)), act (.fin (locGL E (m + 1) w k)) φ = φ)
+                ∧ ∃ x ∈ GlobalTheory.JSW.supS (E := E) (a := (m + 1)) S,
+                  GlobalTheory.JSW.whit φ.1 x ≠ 0 := by
   intro E _ _ _ m S hψ π α hα
-  obtain ⟨φ₀, hφ₀V, hφ₀0, hφ₀K⟩ := GlobalTheory.T.exists_global_spherical_vector_of_satake_family E (m + 1) π S (fun w => Finset.univ.val.map (α w)) hα
+  obtain ⟨φ₀, hφ₀V, hφ₀0, hφ₀K⟩ :=
+    GlobalTheory.T.exists_global_spherical_vector_of_satake_family E (m + 1) π S
+      (fun w => Finset.univ.val.map (α w))
+      hα
   obtain ⟨g, hg⟩ : ∃ g, whit φ₀.1 g ≠ 0 := by
     by_contra h
     push_neg at h
-    exact hφ₀0 (GlobalTheory.T.cusp_form_eq_zero_of_whittaker_vanishing E (m + 1) φ₀ (π.cusp φ₀ hφ₀V) h)
+    exact hφ₀0 (GlobalTheory.T.cusp_form_eq_zero_of_whittaker_vanishing E (m + 1) φ₀
+      (π.cusp φ₀ hφ₀V) h)
   have hfin := finite_bad E (m + 1) (GeneralLinearGroup.map (pFin E) g)
-  refine exists_whittaker_ne_zero_induction_bad_places S hψ π α hα hfin.toFinset φ₀ hφ₀V hφ₀K g (fun w _ hwT => ?_) hg
+  refine exists_whittaker_ne_zero_induction_bad_places S hψ π α hα hfin.toFinset φ₀ hφ₀V hφ₀K g
+    (fun w _ hwT => ?_)
+    hg
   by_contra h
   refine hwT (hfin.mem_toFinset.2 ?_)
   show GeneralLinearGroup.map (pLoc E w) (GeneralLinearGroup.map (pFin E) g) ∉ KGL w (n := (m + 1))
-  rw [map_pLoc_pFin]; exact h
+  rw [map_pLoc_pFin]
+  exact h
 
 end GlobalTheory.JSW.NzSph

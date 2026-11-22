@@ -5,10 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.finAm :
-    ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (n : ℕ) (x : NP F n) (m g : ℕ), Finite (x.Am m) ∧ Nat.card (x.Am m) = Nat.card x.K ^ m ∧ Finite (DD (x.Am m) g) ∧ (∀ y : x.Am m, l • y = 0) ∧ (∀ y : DD (x.Am m) g, l • y = 0) ∧ (algebraMap x.A (x.Am m) x.t) ^ m = 0 ∧ (algebraMap x.A (DD (x.Am m) g) x.t) ^ m = 0 ∧ (l ≠ 2 → IsUnit (2 : x.A)) ∧ CharP x.K l := by
+theorem UpperTheory.V.Pa.finAm
+    : ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (n : ℕ) (x : NP F n) (m g : ℕ),
+      Finite (x.Am m) ∧ Nat.card (x.Am m) = Nat.card x.K ^ m ∧ Finite (DD (x.Am m) g)
+        ∧ (∀ y : x.Am m, l • y = 0) ∧ (∀ y : DD (x.Am m) g, l • y = 0)
+        ∧ (algebraMap x.A (x.Am m) x.t) ^ m = 0 ∧ (algebraMap x.A (DD (x.Am m) g) x.t) ^ m = 0
+        ∧ (l ≠ 2 → IsUnit (2 : x.A)) ∧ CharP x.K l := by
   intro l _ F n x m g
   obtain ⟨h1, h2, -, -, h5, -⟩ := UpperTheory.V.Pa.am_fin l F n x m g
   have hA : (l : x.A) = 0 := h5
@@ -16,16 +21,24 @@ theorem UpperTheory.V.Pa.finAm :
     have := congrArg (PowerSeries.constantCoeff (R := x.K)) hA
     rwa [map_natCast, map_zero] at this
   have hc : CharP x.K l := (CharP.charP_iff_prime_eq_zero (Fact.out)).2 e
-  have hAm : (l : x.Am m) = 0 := by
-    rw [← map_natCast (algebraMap x.A (x.Am m)), hA, map_zero]
+  have hAm : (l : x.Am m) = 0 := by rw [← map_natCast (algebraMap x.A (x.Am m)), hA, map_zero]
   have hDD : (l : DD (x.Am m) g) = 0 := by
     rw [← map_natCast (DD.C (X := x.Am m) (g := g)), hAm, map_zero]
   haveI := h1
   have ht : (algebraMap x.A (x.Am m) x.t) ^ m = 0 := by
     rw [← map_pow, Ideal.Quotient.algebraMap_eq, Ideal.Quotient.eq_zero_iff_mem]
     exact Ideal.mem_span_singleton_self _
-  refine ⟨h1, h2, Finite.of_equiv _ DD.equiv.symm, fun y => by rw [nsmul_eq_mul, hAm, zero_mul],
-    fun y => by rw [nsmul_eq_mul, hDD, zero_mul], ht, ?_, ?_, hc⟩
+  refine ⟨
+    h1,
+    h2,
+    Finite.of_equiv _ DD.equiv.symm,
+    fun y => by rw [nsmul_eq_mul, hAm, zero_mul],
+    fun y => by rw [nsmul_eq_mul, hDD, zero_mul],
+    ht,
+    ?_,
+    ?_,
+    hc
+  ⟩
   · show (DD.C (algebraMap x.A (x.Am m) x.t)) ^ m = 0
     rw [← map_pow, ht, map_zero]
   · intro hl

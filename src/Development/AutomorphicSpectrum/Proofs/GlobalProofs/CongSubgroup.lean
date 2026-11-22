@@ -16,24 +16,23 @@ namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
 
 variable {V : Type} [AddCommGroup V] [Module ℚ V]
 
-def coneOn (s : Finset V) : Set V :=
-  {x | ∃ t : V → ℚ, (∀ i ∈ s, 0 < t i) ∧ x = ∑ i ∈ s, t i • i}
+def coneOn (s : Finset V) : Set V := {x | ∃ t : V → ℚ, (∀ i ∈ s, 0 < t i) ∧ x = ∑ i ∈ s, t i • i}
 
 def SignConst (l : V →ₗ[ℚ] ℚ) (C : Set V) : Prop :=
   (∀ x ∈ C, l x = 0) ∨ (∀ x ∈ C, 0 < l x) ∨ (∀ x ∈ C, l x < 0)
 
 inductive Tile (P : Set V) (Q : Set V → Prop) : Set V → Prop
   | empty : Tile P Q ∅
-  | cone (s : Finset V) (hli : LinearIndepOn ℚ id (s : Set V)) (hP : (s : Set V) ⊆ P) (hQ : Q (coneOn s)) :
-      Tile P Q (coneOn s)
+  | cone
+    (s : Finset V) (hli : LinearIndepOn ℚ id (s : Set V)) (hP : (s : Set V) ⊆ P) (hQ : Q (coneOn s))
+    : Tile P Q (coneOn s)
   | union {A B : Set V} (hA : Tile P Q A) (hB : Tile P Q B) (hAB : Disjoint A B) : Tile P Q (A ∪ B)
 
 def posCone (F : Type) [Field F] [NumberField F] : ConvexCone ℚ F where
   carrier := {x | TotPos F x}
   smul_mem' := by
     intro c hc x hx σ
-    have h : σ (c • x) = (c : ℝ) * σ x := by
-      rw [Rat.smul_def, map_mul, map_ratCast]
+    have h : σ (c • x) = (c : ℝ) * σ x := by rw [Rat.smul_def, map_mul, map_ratCast]
     rw [h]
     exact mul_pos (by exact_mod_cast hc) (hx σ)
   add_mem' := by

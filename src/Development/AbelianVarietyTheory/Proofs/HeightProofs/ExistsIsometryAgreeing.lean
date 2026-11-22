@@ -12,26 +12,37 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.DetOneAdd
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj GlobalTheory.FinalJoin GlobalTheory.CompRat
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj GlobalTheory.FinalJoin
+  GlobalTheory.CompRat
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.HalfLift
 
-theorem exists_isometry_agreeing {E : Type} [Field E] [NumberField E] [IsCMField E]
-    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (Dw : Datum H) (l : Level H) (g g' : Dw.La →ₗ[𝓞 E] Dw.La)
-    (h : ∀ a, g' (g a) - a ∈ l.Mb • (⊤ : Submodule (𝓞 E) Dw.La) ∧
-      g (g' a) - a ∈ l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)) :
-    ∃ s : Sim Dw, (∀ n, s.ν n = 1) ∧
-      ∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) Dw.La), Dw.ModN l.M (s.f l.M a - g a) := by
-  have hle : ∀ f : Dw.La →ₗ[𝓞 E] Dw.La, l.Mb • (⊤ : Submodule (𝓞 E) Dw.La) ≤
-      (l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)).comap f := fun f => by
+theorem exists_isometry_agreeing
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+    (Dw : Datum H) (l : Level H) (g g' : Dw.La →ₗ[𝓞 E] Dw.La)
+    (h : ∀ a,
+      g' (g a) - a ∈ l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)
+        ∧ g (g' a) - a ∈ l.Mb • (⊤ : Submodule (𝓞 E) Dw.La))
+    : ∃ s : Sim Dw,
+      (∀ n, s.ν n = 1)
+        ∧ ∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) Dw.La),
+          Dw.ModN l.M (s.f l.M a - g a) := by
+  have hle
+      : ∀ f : Dw.La →ₗ[𝓞 E] Dw.La,
+        l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)
+          ≤ (l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)).comap f := fun f => by
     rw [← Submodule.map_le_iff_le_comap, Submodule.map_smul'']
     exact Submodule.smul_mono le_rfl le_top
-  obtain ⟨s, h1, h2, -⟩ := GlobalTheory.LevelIsometry.exists_isometry_inducing E H Dw l
-    (LinearEquiv.ofLinear (Submodule.mapQ _ _ g (hle g)) (Submodule.mapQ _ _ g' (hle g'))
-      (Submodule.linearMap_qext _ (LinearMap.ext fun a => (Submodule.Quotient.eq _).2 (h a).2))
-      (Submodule.linearMap_qext _ (LinearMap.ext fun a => (Submodule.Quotient.eq _).2 (h a).1)))
+  obtain ⟨s, h1, h2, -⟩ :=
+    GlobalTheory.LevelIsometry.exists_isometry_inducing E H Dw l
+      (LinearEquiv.ofLinear (Submodule.mapQ _ _ g (hle g)) (Submodule.mapQ _ _ g' (hle g'))
+        (Submodule.linearMap_qext _ (LinearMap.ext fun a => (Submodule.Quotient.eq _).2 (h a).2))
+        (Submodule.linearMap_qext _ (LinearMap.ext fun a => (Submodule.Quotient.eq _).2 (h a).1)))
   refine ⟨s, h1, fun a ha => ?_⟩
   have key : ∀ x, s.f l.M x - g x ∈ l.Mb • (⊤ : Submodule (𝓞 E) Dw.La) := fun x =>
     (Submodule.Quotient.eq _).1 (h2 x)
@@ -41,20 +52,37 @@ theorem exists_isometry_agreeing {E : Type} [Field E] [NumberField E] [IsCMField
   · rw [map_add (f := _), map_add (f := _), add_sub_add_comm]
     exact GlobalTheory.SimAlg.modN_add hy hz
 
-theorem add_sub_eq_nsmul {A : Type} [AddCommGroup A] (N : ℕ) (x e w : A) :
-    x + N • e + N • w - x = N • (e + w) := by
+theorem add_sub_eq_nsmul {A : Type} [AddCommGroup A] (N : ℕ) (x e w : A)
+    : x + N • e + N • w - x = N • (e + w) := by
   rw [smul_add]
   abel
 
-theorem exists_unitary_inducing : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H) (l : Level H) (V : HSp D) (ι : Dw.La →ₗ[𝓞 D.host.E] (Fin V.rank → D.host.E)), GlobalTheory.Member.IotaOK Dw V ι → ∀ g g' : Dw.La →ₗ[𝓞 D.host.E] Dw.La, (∀ a, g' (g a) - a ∈ l.Mb • (⊤ : Submodule (𝓞 D.host.E) Dw.La) ∧ g (g' a) - a ∈ l.Mb • (⊤ : Submodule (𝓞 D.host.E) Dw.La)) → ∃ u ∈ GfC V, gLat V u = latHat V ∧ ∀ a ∈ l.Mb.map (H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) • (⊤ : Submodule (𝓞 D.host.E) Dw.La), ∃ w ∈ latGHat V 1, (finHom V u).1.mulVec (finVec V (ι a)) - finVec V (ι (g a)) = (l.M : ℕ) • w := by
+theorem exists_unitary_inducing
+    : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H)
+        (l : Level H) (V : HSp D) (ι : Dw.La →ₗ[𝓞 D.host.E] (Fin V.rank → D.host.E)),
+      GlobalTheory.Member.IotaOK Dw V ι
+        → ∀ g g' : Dw.La →ₗ[𝓞 D.host.E] Dw.La,
+          (∀ a,
+              g' (g a) - a ∈ l.Mb • (⊤ : Submodule (𝓞 D.host.E) Dw.La)
+                ∧ g (g' a) - a ∈ l.Mb • (⊤ : Submodule (𝓞 D.host.E) Dw.La))
+            → ∃ u ∈ GfC V,
+              gLat V u = latHat V
+                ∧ ∀ a
+                    ∈ l.Mb.map (H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E)
+                      • (⊤ : Submodule (𝓞 D.host.E) Dw.La),
+                  ∃ w ∈ latGHat V 1,
+                    (finHom V u).1.mulVec (finVec V (ι a)) - finVec V (ι (g a))
+                      = (l.M : ℕ) • w := by
   intro D H Dw l V ι hι g g' h
   obtain ⟨s, hν, hs⟩ := exists_isometry_agreeing Dw l g g' h
-  obtain ⟨κ, hκ, hκs⟩ := GlobalTheory.ShortMove.exists_adelic_of_isometry D V H Dw ι hι.emb hι.isom s hν
+  obtain ⟨κ, hκ, hκs⟩ :=
+    GlobalTheory.ShortMove.exists_adelic_of_isometry D V H Dw ι hι.emb hι.isom s hν
   obtain ⟨b, hb, u, hu, e⟩ := (GlobalTheory.UnitarySplit.real_finite_split D V).1 κ
   have hb' : finHom V b = 1 := hb
   have hf : finHom V u = finHom V κ := by rw [e, map_mul, hb', one_mul]
   obtain ⟨-, m2, -, m4⟩ := GlobalTheory.Member.latG_move D V
-  have hL : latG V 1 = latG V u := GlobalTheory.Member.LatMove.lat_eq_of_hat_eq V (hκ.symm.trans (m2 u κ hf).2.symm)
+  have hL : latG V 1 = latG V u :=
+    GlobalTheory.Member.LatMove.lat_eq_of_hat_eq V (hκ.symm.trans (m2 u κ hf).2.symm)
   have hc := m4 1 u hL
   rw [inv_one, one_mul] at hc
   refine ⟨u, hu, GlobalTheory.MarkDet.gLat_eq_of_finCong hc, fun a ha => ?_⟩

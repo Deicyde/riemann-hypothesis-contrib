@@ -9,12 +9,28 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Chart
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.HermitianLatticesTheory Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.UG.P Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.HermitianLatticesTheory Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG
+  Formalism.UG.P Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2
+  GlobalTheory.Mem.Col2.TC Matrix
 open scoped TensorProduct
 
 namespace GlobalTheory.Mem.Col2.Splice
 
-theorem isPtOf_splice : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (hc : Formalism.BasicNotions.CMData F E) (n : ℕ) [NeZero n] (ST SG Q Q0 Q1 : Finset (HeightOneSpectrum (𝓞 E))) (v : HeightOneSpectrum (𝓞 F)) (g0 h : GL (Fin n) (TensorProduct F E (FiniteAdeleRing (𝓞 F) F))) (p0 : DecoF E n ST SG Q0) (p1 : DecoF E n ST SG Q1) (q : DecoF E n ST SG Q), GlobalTheory.Mem.Col2.IsPtOf hc g0 p0 → GlobalTheory.Mem.Col2.IsPtOf hc h p1 → (∀ P ∈ Q, ¬ IsOver v P) → (∀ w ∈ SG, ¬ IsOver v w) → Deco.SameOff ST SG v q.deco.1 p1.deco.1 → (∀ P : HeightOneSpectrum (𝓞 E), IsOver v P → localization₂ P.asIdeal q.deco.1.N = localization₂ P.asIdeal p0.deco.1.N) → (∀ P : ST, IsOver v P.1 → q.deco.1.f P = p0.deco.1.f P) → (∀ P : Q, ∃ P' : Q1, P'.1 = P.1 ∧ p1.fr P' = q.fr P) → GlobalTheory.Mem.Col2.IsPtOf hc (h * rll_put n v (bc (prV (E := E) v) (h⁻¹ * g0))) q := by
+theorem isPtOf_splice
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+        (hc : Formalism.BasicNotions.CMData F E) (n : ℕ) [NeZero n]
+        (ST SG Q Q0 Q1 : Finset (HeightOneSpectrum (𝓞 E))) (v : HeightOneSpectrum (𝓞 F))
+        (g0 h : GL (Fin n) (TensorProduct F E (FiniteAdeleRing (𝓞 F) F))) (p0 : DecoF E n ST SG Q0)
+        (p1 : DecoF E n ST SG Q1) (q : DecoF E n ST SG Q),
+      GlobalTheory.Mem.Col2.IsPtOf hc g0 p0 → GlobalTheory.Mem.Col2.IsPtOf hc h p1
+        → (∀ P ∈ Q, ¬ IsOver v P) → (∀ w ∈ SG, ¬ IsOver v w)
+        → Deco.SameOff ST SG v q.deco.1 p1.deco.1
+        → (∀ P : HeightOneSpectrum (𝓞 E),
+          IsOver v P → localization₂ P.asIdeal q.deco.1.N = localization₂ P.asIdeal p0.deco.1.N)
+        → (∀ P : ST, IsOver v P.1 → q.deco.1.f P = p0.deco.1.f P)
+        → (∀ P : Q, ∃ P' : Q1, P'.1 = P.1 ∧ p1.fr P' = q.fr P)
+        → GlobalTheory.Mem.Col2.IsPtOf hc (h * rll_put n v (bc (prV (E := E) v) (h⁻¹ * g0))) q := by
   intro F E _ _ _ _ _ _ hc n _ ST SG Q Q0 Q1 v g0 h p0 p1 q h0 h1 hQ hSG hoff hN hf hfr
   obtain ⟨⟨hg0, hd0⟩, -⟩ := (ChTwRead.isPtOf_iff hc g0 p0).1 h0
   obtain ⟨⟨hh, hd1⟩, hfr1⟩ := (ChTwRead.isPtOf_iff hc h p1).1 h1
@@ -24,8 +40,10 @@ theorem isPtOf_splice : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [Nu
   have hne : ∀ P : HeightOneSpectrum (𝓞 E), ¬ IsOver v P → P.under (𝓞 F) ≠ v := by
     rintro P hP rfl
     exact hP rfl
-  have hw : ∀ P : HeightOneSpectrum (𝓞 E), ¬ IsOver v P →
-      bc (prV (E := E) (P.under (𝓞 F))) m = bc (prV (E := E) (P.under (𝓞 F))) h := by
+  have hw
+      : ∀ P : HeightOneSpectrum (𝓞 E),
+        ¬ IsOver v P
+          → bc (prV (E := E) (P.under (𝓞 F))) m = bc (prV (E := E) (P.under (𝓞 F))) h := by
     intro P hP
     rw [hm, map_mul, rll_put_ne n v _ (hne P hP), mul_one]
   have hmU : m ∈ UAd hc n :=
@@ -54,8 +72,10 @@ theorem isPtOf_splice : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [Nu
     subst hP'
     rw [← e, ← hfr1 ⟨_, hP1⟩ i j]
     refine ChTwRead.adAt_congr_prV P.1 ?_
-    have := congrArg (fun g : GL (Fin n) (E ⊗[F] (P.1.under (𝓞 F)).adicCompletion F) =>
-      g.val i j) (hw P.1 hPv)
+    have :=
+      congrArg
+        (fun g : GL (Fin n) (E ⊗[F] (P.1.under (𝓞 F)).adicCompletion F) => g.val i j)
+        (hw P.1 hPv)
     exact this
 
 end GlobalTheory.Mem.Col2.Splice

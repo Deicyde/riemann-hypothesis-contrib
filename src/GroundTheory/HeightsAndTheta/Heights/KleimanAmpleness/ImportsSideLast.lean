@@ -15,15 +15,15 @@ open GroundTheory.Heights₂.Heights.FieldNumbers (relDim)
 open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH (mIdealOver)
 
 def SegreLiftComap.Statement : Prop :=
-  ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (W' : Ideal (MRing (segreIdx ι) F)), IsMultiProjPrime W' →
-      segreRels ι F ⊆ W' →
-      IsMultiProjPrime (W'.comap (segreIncl ι F)) ∧ W' = segreLift ι F (W'.comap (segreIncl ι F))
+  ∀ (F : Type) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
+      (W' : Ideal (MRing (segreIdx ι) F)),
+    IsMultiProjPrime W' → segreRels ι F ⊆ W'
+      → IsMultiProjPrime (W'.comap (segreIncl ι F)) ∧ W' = segreLift ι F (W'.comap (segreIncl ι F))
 
-theorem SegreLiftComap.hyps :
-    IsMultiProjPrime (⊥ : Ideal (MRing (segreIdx (fun _ : Unit => Fin 1)) ℚ)) ∧
-      segreRels (fun _ : Unit => Fin 1) ℚ ⊆
-        ((⊥ : Ideal (MRing (segreIdx (fun _ : Unit => Fin 1)) ℚ)) : Set _) := by
+theorem SegreLiftComap.hyps
+    : IsMultiProjPrime (⊥ : Ideal (MRing (segreIdx (fun _ : Unit => Fin 1)) ℚ))
+      ∧ segreRels (fun _ : Unit => Fin 1) ℚ
+        ⊆ ((⊥ : Ideal (MRing (segreIdx (fun _ : Unit => Fin 1)) ℚ)) : Set _) := by
   have : ∀ k, Nonempty (segreIdx (fun _ : Unit => Fin 1) k) := fun k => by
     rcases k with _ | _
     · exact ⟨fun _ => (0 : Fin 1)⟩

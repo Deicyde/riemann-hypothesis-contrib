@@ -4,10 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published UpperTheory.V.Af.Sol
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published UpperTheory.V.Af.Sol
 
-theorem UpperTheory.solvable_auxiliary_galois_extension :
-    UpperTheory.V.Af.Sol.ExistsCompositumWithPrimeDegreeGalois := by
+theorem UpperTheory.solvable_auxiliary_galois_extension
+    : UpperTheory.V.Af.Sol.ExistsCompositumWithPrimeDegreeGalois := by
   intro M Ω _ _ _ _ _ L _ _ _ hp hlt
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed M
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap M Ω).injective
@@ -18,8 +21,7 @@ theorem UpperTheory.solvable_auxiliary_galois_extension :
     rw [← IntermediateField.adjoin.finrank hαi, hα, IntermediateField.finrank_top']
   let φ : L →ₐ[ℚ] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   set β := φ α with hβdef
   have hβP : minpoly ℚ β = P := minpoly.algHom_eq φ φ.injective α
@@ -39,7 +41,8 @@ theorem UpperTheory.solvable_auxiliary_galois_extension :
     intro x
     have h1 : φ x ∈ (⊤ : IntermediateField ℚ L).map φ := ⟨x, trivial, rfl⟩
     rw [← hα, IntermediateField.adjoin_map, Set.image_singleton] at h1
-    have h2 : IntermediateField.adjoin ℚ {φ α} ≤ (IntermediateField.adjoin M {β}).restrictScalars ℚ :=
+    have h2
+        : IntermediateField.adjoin ℚ {φ α} ≤ (IntermediateField.adjoin M {β}).restrictScalars ℚ :=
       IntermediateField.adjoin_simple_le_iff.mpr (IntermediateField.mem_adjoin_simple_self M β)
     exact h2 h1
   have hPs : (P.map (algebraMap ℚ L)).Splits := Normal.splits inferInstance α
@@ -75,13 +78,17 @@ theorem UpperTheory.solvable_auxiliary_galois_extension :
     refine Polynomial.natDegree_le_of_dvd ?_ hQ0
     have h4 := minpoly.dvd_map_of_isScalarTower ℚ M β
     rwa [hβP] at h4
-  have hx : minpoly ℚ (⟨β, IntermediateField.mem_adjoin_simple_self M β⟩ : IntermediateField.adjoin M {β}) = P := by
+  have hx
+      : minpoly ℚ
+          (⟨β, IntermediateField.mem_adjoin_simple_self M β⟩ : IntermediateField.adjoin M {β})
+        = P := by
     rw [← minpoly.algHom_eq (IsScalarTower.toAlgHom ℚ (IntermediateField.adjoin M {β}) Ω)
       (algebraMap (IntermediateField.adjoin M {β}) Ω).injective]
     exact hβP
   have hdvd : Module.finrank ℚ L ∣ Module.finrank ℚ (IntermediateField.adjoin M {β}) := by
-    have h5 := minpoly.degree_dvd (Algebra.IsIntegral.isIntegral (R := ℚ)
-      (⟨β, IntermediateField.mem_adjoin_simple_self M β⟩ : IntermediateField.adjoin M {β}))
+    have h5 :=
+      minpoly.degree_dvd (Algebra.IsIntegral.isIntegral (R := ℚ)
+        (⟨β, IntermediateField.mem_adjoin_simple_self M β⟩ : IntermediateField.adjoin M {β}))
     rwa [hx, hPdeg] at h5
   have hMpos : 0 < Module.finrank ℚ M := Module.finrank_pos
   have hEpos : 0 < Module.finrank M (IntermediateField.adjoin M {β}) := Module.finrank_pos
@@ -96,8 +103,9 @@ theorem UpperTheory.solvable_auxiliary_galois_extension :
     have hz : (z : Ω) ∈ Algebra.adjoin M {β} := by
       rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hβM.isAlgebraic]
       exact z.2
-    have hsub : Algebra.adjoin M {β} ≤
-        (Algebra.adjoin M (Set.range f)).map (IntermediateField.adjoin M {β}).val := by
+    have hsub
+        : Algebra.adjoin M {β}
+          ≤ (Algebra.adjoin M (Set.range f)).map (IntermediateField.adjoin M {β}).val := by
       rw [AlgHom.map_adjoin]
       apply Algebra.adjoin_mono
       rintro _ rfl
@@ -105,5 +113,15 @@ theorem UpperTheory.solvable_auxiliary_galois_extension :
     obtain ⟨w, hw, hwz⟩ := hsub hz
     have hwz' : w = z := Subtype.ext hwz
     exact hwz' ▸ hw
-  exact ⟨IntermediateField.adjoin M {β}, inferInstance, hnf, inferInstance, inferInstance,
-    inferInstance, f, hgal, hdeg, htop⟩
+  exact ⟨
+    IntermediateField.adjoin M {β},
+    inferInstance,
+    hnf,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    f,
+    hgal,
+    hdeg,
+    htop
+  ⟩

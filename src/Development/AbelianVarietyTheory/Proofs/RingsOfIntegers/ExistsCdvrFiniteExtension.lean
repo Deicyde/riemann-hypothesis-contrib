@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Definitions.PlaceAdaptation.Adapt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -19,7 +22,8 @@ open IsDedekindDomain
 
 section Val
 
-variable {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
+variable
+  {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
   [IsFractionRing V K']
 
 theorem vV_unit (u : Vˣ) : vV V (algebraMap V K' u) = 0 := by
@@ -28,8 +32,7 @@ theorem vV_unit (u : Vˣ) : vV V (algebraMap V K' u) = 0 := by
     exact fun h => (IsLocalRing.mem_maximalIdeal _).1 h u.isUnit
   simp [vV, this]
 
-theorem vV_pow {x : K'} (hx : x ≠ 0) (n : ℕ) : vV V (x ^ n) = n * vV V x := by
-  simp [vV]
+theorem vV_pow {x : K'} (hx : x ≠ 0) (n : ℕ) : vV V (x ^ n) = n * vV V x := by simp [vV]
 
 theorem vV_pos {a : V} (ha : a ≠ 0) (hu : ¬ IsUnit a) : 0 < vV V (algebraMap V K' a) := by
   have h0 : algebraMap V K' a ≠ 0 := by simpa using ha
@@ -37,7 +40,9 @@ theorem vV_pos {a : V} (ha : a ≠ 0) (hu : ¬ IsUnit a) : 0 < vV V (algebraMap 
     rw [valV, HeightOneSpectrum.valuation_lt_one_iff_mem]
     exact hu
   have := (WithZero.log_lt_log (valV_ne_zero (V := V) h0) one_ne_zero).2 this
-  simp only [vV]; simp at this; omega
+  simp only [vV]
+  simp at this
+  omega
 
 theorem vV_irr {a : V} (ha : Irreducible a) : vV V (algebraMap V K' a) = 1 := by
   have : valV V (algebraMap V K' a) = WithZero.exp (-1 : ℤ) := by
@@ -45,17 +50,21 @@ theorem vV_irr {a : V} (ha : Irreducible a) : vV V (algebraMap V K' a) = 1 := by
     exact HeightOneSpectrum.intValuation_singleton _ ha.ne_zero ha.maximalIdeal_eq
   simp [vV, this]
 
-theorem exists_index {V' K'' : Type} [CommRing V'] [IsDomain V'] [IsDiscreteValuationRing V'] [Field K'']
-    [Algebra V' K''] [IsFractionRing V' K''] (j : V →+* V') [IsLocalHom j] (i : K' →+* K'')
-    (hi : ∀ v, i (algebraMap V K' v) = algebraMap V' K'' (j v)) :
-    ∃ r : ℕ, 0 < r ∧ ∀ x, vV V' (i x) = (r : ℤ) * vV V x := by
+theorem exists_index
+    {V' K'' : Type} [CommRing V'] [IsDomain V'] [IsDiscreteValuationRing V'] [Field K'']
+    [Algebra V' K''] [IsFractionRing V' K'']
+    (j : V →+* V') [IsLocalHom j]
+    (i : K' →+* K'') (hi : ∀ v, i (algebraMap V K' v) = algebraMap V' K'' (j v))
+    : ∃ r : ℕ, 0 < r ∧ ∀ x, vV V' (i x) = (r : ℤ) * vV V x := by
   obtain ⟨p, hp⟩ := IsDiscreteValuationRing.exists_irreducible V
-  have inj : ∀ v, v ≠ 0 → algebraMap V' K'' (j v) ≠ 0 := fun v hv => by
-    rw [← hi]; simpa using hv
+  have inj : ∀ v, v ≠ 0 → algebraMap V' K'' (j v) ≠ 0 := fun v hv => by rw [← hi]; simpa using hv
   have pos : 0 < vV V' (algebraMap V' K'' (j p)) :=
-    vV_pos (fun h => inj p hp.ne_zero (by simp [h])) (fun h => hp.not_isUnit (isUnit_of_map_unit j p h))
+    vV_pos
+      (fun h => inj p hp.ne_zero (by simp [h]))
+      (fun h => hp.not_isUnit (isUnit_of_map_unit j p h))
   obtain ⟨r, hr⟩ := Int.eq_ofNat_of_zero_le pos.le
-  have key : ∀ v : V, v ≠ 0 → vV V' (i (algebraMap V K' v)) = (r : ℤ) * vV V (algebraMap V K' v) := by
+  have key
+      : ∀ v : V, v ≠ 0 → vV V' (i (algebraMap V K' v)) = (r : ℤ) * vV V (algebraMap V K' v) := by
     intro v hv
     obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hv hp
     have h1 : algebraMap V K' p ≠ 0 := by simpa using hp.ne_zero
@@ -65,7 +74,8 @@ theorem exists_index {V' K'' : Type} [CommRing V'] [IsDomain V'] [IsDiscreteValu
       vV_pow (inj p hp.ne_zero), vV_pow h1, vV_unit, vV_irr hp, hr]
     have := vV_unit (K' := K'') (Units.map j.toMonoidHom u)
     simp only [Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe] at this
-    rw [this]; ring
+    rw [this]
+    ring
   refine ⟨r, by omega, fun x => ?_⟩
   by_cases hx : x = 0
   · simp [hx, vV]
@@ -73,7 +83,8 @@ theorem exists_index {V' K'' : Type} [CommRing V'] [IsDomain V'] [IsDiscreteValu
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   have ha0 : a ≠ 0 := by rintro rfl; simp at hx
   have hb1 : algebraMap V K' b ≠ 0 := by simpa using hb0
-  have e : algebraMap V K' a / algebraMap V K' b * algebraMap V K' b = algebraMap V K' a := div_mul_cancel₀ _ hb1
+  have e : algebraMap V K' a / algebraMap V K' b * algebraMap V K' b = algebraMap V K' a :=
+    div_mul_cancel₀ _ hb1
   have e1 := vV_mul (V := V) hx hb1
   have e2 := vV_mul (V := V') ((map_ne_zero i).2 hx) ((map_ne_zero i).2 hb1)
   rw [← map_mul, e, key a ha0, key b hb0] at e2
@@ -83,7 +94,13 @@ theorem exists_index {V' K'' : Type} [CommRing V'] [IsDomain V'] [IsDiscreteValu
 
 end Val
 
-theorem exists_cdvr_finite_extension : ∀ (T : CDVR) (L : Type) [Field L] [Algebra T.Fr L] [FiniteDimensional T.Fr L], ∃ (T' : CDVR) (iT : T.Fr →+* T'.Fr) (e : ℕ) (ψ : L ≃+* T'.Fr) (φ : T.V →+* T'.V), 0 < e ∧ (∀ a : T.Fr, vV T'.V (iT a) = (e : ℤ) * vV T.V a) ∧ (∀ a, ψ (algebraMap T.Fr L a) = iT a) ∧ (∀ a, algebraMap T'.V T'.Fr (φ a) = iT (algebraMap T.V T.Fr a)) ∧ (T.FinRes → T'.FinRes) := by
+theorem exists_cdvr_finite_extension
+    : ∀ (T : CDVR) (L : Type) [Field L] [Algebra T.Fr L] [FiniteDimensional T.Fr L],
+      ∃ (T' : CDVR) (iT : T.Fr →+* T'.Fr) (e : ℕ) (ψ : L ≃+* T'.Fr) (φ : T.V →+* T'.V),
+        0 < e ∧ (∀ a : T.Fr, vV T'.V (iT a) = (e : ℤ) * vV T.V a)
+          ∧ (∀ a, ψ (algebraMap T.Fr L a) = iT a)
+          ∧ (∀ a, algebraMap T'.V T'.Fr (φ a) = iT (algebraMap T.V T.Fr a))
+          ∧ (T.FinRes → T'.FinRes) := by
   intro T L _ _ _
   haveI : CharZero T.Fr := algebraRat.charZero _
   obtain ⟨W, _, _, _, _, _, _, _, hc, hfin, hinj, hloc, -, -⟩ :=
@@ -92,7 +109,8 @@ theorem exists_cdvr_finite_extension : ∀ (T : CDVR) (L : Type) [Field L] [Alge
   let T' : CDVR := { V := W }
   let ψ : L ≃+* FractionRing W := (FractionRing.algEquiv W L).symm.toRingEquiv
   let iT : T.Fr →+* FractionRing W := ψ.toRingHom.comp (algebraMap T.Fr L)
-  have hφ : ∀ a, iT (algebraMap T.V T.Fr a) = algebraMap W (FractionRing W) (algebraMap T.V W a) := by
+  have hφ
+      : ∀ a, iT (algebraMap T.V T.Fr a) = algebraMap W (FractionRing W) (algebraMap T.V W a) := by
     intro a
     have h1 : algebraMap T.Fr L (algebraMap T.V T.Fr a) = algebraMap W L (algebraMap T.V W a) :=
       (RingHom.congr_fun hc a).symm

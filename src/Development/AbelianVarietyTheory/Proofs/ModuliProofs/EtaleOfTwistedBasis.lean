@@ -22,8 +22,8 @@ private lemma mul_eq_zero_of_mem_of_sq_eq_bot (hI : I ^ 2 = ⊥) {s t : B} (hs :
   rw [hI] at h
   exact (Submodule.mem_bot B).1 h
 
-theorem pow_eq_of_sub_one_mem (hI : I ^ 2 = ⊥) {u : B} (hu : u - 1 ∈ I) (N : ℕ) :
-    u ^ N = 1 + N * (u - 1) := by
+theorem pow_eq_of_sub_one_mem (hI : I ^ 2 = ⊥) {u : B} (hu : u - 1 ∈ I) (N : ℕ)
+    : u ^ N = 1 + N * (u - 1) := by
   have hsq : (u - 1) * (u - 1) = 0 := mul_eq_zero_of_mem_of_sq_eq_bot hI hu hu
   induction N with
   | zero => simp
@@ -32,8 +32,11 @@ theorem pow_eq_of_sub_one_mem (hI : I ^ 2 = ⊥) {u : B} (hu : u - 1 ∈ I) (N :
     push_cast
     linear_combination (↑n : B) * hsq
 
-theorem eq_of_pow_eq (hI : I ^ 2 = ⊥) {N : ℕ} (hN : IsUnit (N : B)) {u v : B} (hu : u - 1 ∈ I)
-    (hv : v - 1 ∈ I) (h : u ^ N = v ^ N) : u = v := by
+theorem eq_of_pow_eq
+    (hI : I ^ 2 = ⊥)
+    {N : ℕ} (hN : IsUnit (N : B))
+    {u v : B} (hu : u - 1 ∈ I) (hv : v - 1 ∈ I) (h : u ^ N = v ^ N)
+    : u = v := by
   rw [pow_eq_of_sub_one_mem hI hu N, pow_eq_of_sub_one_mem hI hv N] at h
   have h3 : (N : B) * (u - 1) = N * (v - 1) := add_left_cancel h
   have h4 := hN.mul_left_cancel h3
@@ -48,17 +51,21 @@ private lemma isUnit_of_isUnit_quotient_of_sq_eq_bot (hI : I ^ 2 = ⊥) {a : B} 
   have h : a * (w * (2 - a * w)) = 1 := by linear_combination (-1 : B) * hsq
   exact ⟨⟨a, w * (2 - a * w), h, by rw [mul_comm]; exact h⟩, rfl⟩
 
-theorem exists_lift_splitting (hI : I ^ 2 = ⊥) {C : Type} [CommGroup C] [Finite C]
-    (hN : IsUnit ((Nat.card C : ℕ) : B)) (c : C → C → Bˣ)
-    (hc : ∀ x y z, c x y * c (x * y) z = c y z * c x (y * z)) (b : C → B ⧸ I)
-    (hb : ∀ x, IsUnit (b x))
-    (hbc : ∀ x y, Ideal.Quotient.mk I (c x y) * b (x * y) = b x * b y) :
-    ∃ a : C → B, (∀ x, Ideal.Quotient.mk I (a x) = b x) ∧ ∀ x y, c x y * a (x * y) = a x * a y := by
+theorem exists_lift_splitting
+    (hI : I ^ 2 = ⊥)
+    {C : Type} [CommGroup C] [Finite C]
+    (hN : IsUnit ((Nat.card C : ℕ) : B))
+    (c : C → C → Bˣ) (hc : ∀ x y z, c x y * c (x * y) z = c y z * c x (y * z))
+    (b : C → B ⧸ I)
+    (hb : ∀ x, IsUnit (b x)) (hbc : ∀ x y, Ideal.Quotient.mk I (c x y) * b (x * y) = b x * b y)
+    : ∃ a : C → B,
+      (∀ x, Ideal.Quotient.mk I (a x) = b x) ∧ ∀ x y, c x y * a (x * y) = a x * a y := by
   classical
   have := Fintype.ofFinite C
   rw [Nat.card_eq_fintype_card] at hN
   choose a₀ ha₀ using fun x => Ideal.Quotient.mk_surjective (b x)
-  have hu : ∀ x, IsUnit (a₀ x) := fun x => isUnit_of_isUnit_quotient_of_sq_eq_bot hI (by rw [ha₀]; exact hb x)
+  have hu : ∀ x, IsUnit (a₀ x) := fun x =>
+    isUnit_of_isUnit_quotient_of_sq_eq_bot hI (by rw [ha₀]; exact hb x)
   set δ : C → C → B := fun x y =>
     ((c x y : B) * a₀ (x * y) - a₀ x * a₀ y) * ↑(hu x).unit⁻¹ * ↑(hu y).unit⁻¹ with hδeq
   have hδI : ∀ x y, δ x y ∈ I := by
@@ -97,7 +104,8 @@ theorem exists_lift_splitting (hI : I ^ 2 = ⊥) {C : Type} [CommGroup C] [Finit
     intro x y
     have hs := Finset.sum_congr rfl (fun z (_ : z ∈ Finset.univ) => hco x y z)
     rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ,
-      nsmul_eq_mul] at hs
+        nsmul_eq_mul]
+      at hs
     have hre : ∑ z, δ x (y * z) = ∑ z, δ x z :=
       Fintype.sum_equiv (Equiv.mulLeft y) _ _ (fun z => rfl)
     rw [hre] at hs
@@ -119,9 +127,12 @@ theorem exists_lift_splitting (hI : I ^ 2 = ⊥) {C : Type} [CommGroup C] [Finit
 
 end SquareZero
 
-theorem exists_twisted_algebra (R : Type) [CommRing R] (C : Type) [CommGroup C] (c : C → C → Rˣ)
-    (hs : ∀ x y, c x y = c y x) (hc : ∀ x y z, c x y * c (x * y) z = c y z * c x (y * z)) :
-    ∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (e : Module.Basis C R A),
+theorem exists_twisted_algebra
+    (R : Type) [CommRing R]
+    (C : Type) [CommGroup C]
+    (c : C → C → Rˣ)
+    (hs : ∀ x y, c x y = c y x) (hc : ∀ x y z, c x y * c (x * y) z = c y z * c x (y * z))
+    : ∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (e : Module.Basis C R A),
       (∀ x y, e x * e y = (c x y : R) • e (x * y)) ∧ e 1 = algebraMap R A (c 1 1) := by
   classical
   set T : C → Module.End R (C →₀ R) := fun x =>
@@ -156,25 +167,30 @@ theorem exists_twisted_algebra (R : Type) [CommRing R] (C : Type) [CommGroup C] 
     rw [hTmul, hTmul, hs, mul_comm x y]
   have hAc := Algebra.isMulCommutative_adjoin R (fun a ha b hb _ => hcomm a ha b hb)
   set S := Algebra.adjoin R (Set.range T) with hSeq
-  let hA : CommRing S :=
-    { (inferInstance : Ring S) with mul_comm := fun a b => hAc.is_comm.comm a b }
-  let f : R →+* S :=
-    { toFun := fun r => ⟨algebraMap R (Module.End R (C →₀ R)) r, S.algebraMap_mem r⟩
-      map_one' := Subtype.ext (map_one _)
-      map_mul' := fun r s => Subtype.ext (map_mul _ r s)
-      map_zero' := Subtype.ext (map_zero _)
-      map_add' := fun r s => Subtype.ext (map_add _ r s) }
+  let hA : CommRing S := {
+    (inferInstance : Ring S) with
+    mul_comm := fun a b => hAc.is_comm.comm a b
+  }
+  let f : R →+* S := {
+    toFun := fun r => ⟨algebraMap R (Module.End R (C →₀ R)) r, S.algebraMap_mem r⟩
+    map_one' := Subtype.ext (map_one _)
+    map_mul' := fun r s => Subtype.ext (map_mul _ r s)
+    map_zero' := Subtype.ext (map_zero _)
+    map_add' := fun r s => Subtype.ext (map_add _ r s)
+  }
   let alg : Algebra R S := f.toAlgebra
-  let V : S →ₗ[R] Module.End R (C →₀ R) :=
-    { toFun := fun a => (a : Module.End R (C →₀ R))
-      map_add' := fun _ _ => rfl
-      map_smul' := fun r a => by
-        show algebraMap R _ r * (a : Module.End R (C →₀ R)) = r • (a : Module.End R (C →₀ R))
-        rw [Algebra.smul_def] }
+  let V : S →ₗ[R] Module.End R (C →₀ R) := {
+    toFun := fun a => (a : Module.End R (C →₀ R))
+    map_add' := fun _ _ => rfl
+    map_smul' := fun r a => by
+      show algebraMap R _ r * (a : Module.End R (C →₀ R)) = r • (a : Module.End R (C →₀ R))
+      rw [Algebra.smul_def]
+  }
   let e : C → S := fun x => ⟨T x, Algebra.subset_adjoin ⟨x, rfl⟩⟩
   have hliT : LinearIndependent R T := by
-    have h0 := (Finsupp.basisSingleOne : Module.Basis C R (C →₀ R)).linearIndependent.units_smul
-      (fun x => c x 1)
+    have h0 :=
+      (Finsupp.basisSingleOne : Module.Basis C R (C →₀ R)).linearIndependent.units_smul
+        (fun x => c x 1)
     apply LinearIndependent.of_comp (LinearMap.applyₗ (Finsupp.single (1 : C) (1 : R)))
     convert h0 using 1
     funext x
@@ -182,17 +198,19 @@ theorem exists_twisted_algebra (R : Type) [CommRing R] (C : Type) [CommGroup C] 
   have hli : LinearIndependent R e := LinearIndependent.of_comp V hliT
   have hone : (1 : Module.End R (C →₀ R)) = ((c 1 1)⁻¹ : Rˣ) • T 1 := by
     rw [hT1, Units.smul_def, smul_smul, ← Units.val_mul, inv_mul_cancel, Units.val_one, one_smul]
-  have hle : Algebra.adjoin R (Set.range T) ≤ (Submodule.span R (Set.range T)).toSubalgebra
-      (by rw [hone]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨1, rfl⟩))
-      (by
-        intro a b ha hb
-        have hm := Submodule.mul_mem_mul ha hb
-        rw [Submodule.span_mul_span] at hm
-        refine Submodule.span_le.2 ?_ hm
-        rintro _ ⟨_, ⟨x, rfl⟩, _, ⟨y, rfl⟩, rfl⟩
-        beta_reduce
-        rw [hTmul]
-        exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)) :=
+  have hle
+      : Algebra.adjoin R (Set.range T)
+        ≤ (Submodule.span R (Set.range T)).toSubalgebra
+          (by rw [hone]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨1, rfl⟩))
+          (by
+            intro a b ha hb
+            have hm := Submodule.mul_mem_mul ha hb
+            rw [Submodule.span_mul_span] at hm
+            refine Submodule.span_le.2 ?_ hm
+            rintro _ ⟨_, ⟨x, rfl⟩, _, ⟨y, rfl⟩, rfl⟩
+            beta_reduce
+            rw [hTmul]
+            exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)) :=
     Algebra.adjoin_le (fun _ h => Submodule.subset_span h)
   have hsp : ⊤ ≤ Submodule.span R (Set.range e) := by
     intro y _
@@ -214,11 +232,15 @@ theorem exists_twisted_algebra (R : Type) [CommRing R] (C : Type) [CommGroup C] 
     show T 1 = algebraMap R (Module.End R (C →₀ R)) (c 1 1 : R)
     rw [hT1, Algebra.algebraMap_eq_smul_one]
 
-theorem etale_of_twisted_basis {R : Type} [CommRing R] {C : Type} [CommGroup C] [Finite C]
+theorem etale_of_twisted_basis
+    {R : Type} [CommRing R]
+    {C : Type} [CommGroup C] [Finite C]
     (c : C → C → Rˣ) (hc : ∀ x y z, c x y * c (x * y) z = c y z * c x (y * z))
-    (hN : IsUnit ((Nat.card C : ℕ) : R)) {A : Type} [CommRing A] [Algebra R A]
+    (hN : IsUnit ((Nat.card C : ℕ) : R))
+    {A : Type} [CommRing A] [Algebra R A]
     (e : Module.Basis C R A) (he : ∀ x y, e x * e y = (c x y : R) • e (x * y))
-    (h1 : e 1 = algebraMap R A (c 1 1)) (hu : ∀ x, IsUnit (e x)) : Algebra.Etale R A := by
+    (h1 : e 1 = algebraMap R A (c 1 1)) (hu : ∀ x, IsUnit (e x))
+    : Algebra.Etale R A := by
   classical
   have hfree : Module.Free R A := Module.Free.of_basis e
   have hfin : Module.Finite R A := Module.Finite.of_basis e
@@ -228,8 +250,9 @@ theorem etale_of_twisted_basis {R : Type} [CommRing R] {C : Type} [CommGroup C] 
     intro x y z
     have := congrArg (fun t : Rˣ => (t : R)) (hc x y z)
     simpa using this
-  have hmap : ∀ {T : Type} [CommRing T] [Algebra R T] (g : A →ₐ[R] T) (x y : C),
-      algebraMap R T (c x y) * g (e (x * y)) = g (e x) * g (e y) := by
+  have hmap
+      : ∀ {T : Type} [CommRing T] [Algebra R T] (g : A →ₐ[R] T) (x y : C),
+        algebraMap R T (c x y) * g (e (x * y)) = g (e x) * g (e y) := by
     intro T _ _ g x y
     rw [← map_mul, he, map_smul, Algebra.smul_def]
   have hone : (1 : A) = (↑(c 1 1)⁻¹ : R) • e 1 := by
@@ -263,9 +286,10 @@ theorem etale_of_twisted_basis {R : Type} [CommRing R] {C : Type} [CommGroup C] 
     have hwmul : ∀ x y, w (x * y) = w x * w y := by
       intro x y
       have k : algebraMap R B (c x y) * v x * v y = v (x * y) := by
-        calc algebraMap R B (c x y) * v x * v y
-            = algebraMap R B (c x y) * v x * v y * (g₁ (e (x * y)) * v (x * y)) := by
-              rw [hinv, mul_one]
+        calc
+          algebraMap R B (c x y) * v x * v y
+              = algebraMap R B (c x y) * v x * v y * (g₁ (e (x * y)) * v (x * y)) := by
+            rw [hinv, mul_one]
           _ = (algebraMap R B (c x y) * g₁ (e (x * y))) * v x * v y * v (x * y) := by ring
           _ = (g₁ (e x) * v x) * (g₁ (e y) * v y) * v (x * y) := by rw [hmap]; ring
           _ = v (x * y) := by rw [hinv, hinv]; ring
@@ -297,9 +321,10 @@ theorem etale_of_twisted_basis {R : Type} [CommRing R] {C : Type} [CommGroup C] 
       intro x y
       have := hmap f x y
       simpa [hcpeq] using this
-    obtain ⟨a, ha, hac⟩ := exists_lift_splitting hI hN' c' hc' (fun x => f (e x))
-      (fun x => (hu x).map f) hbc
-    have ha1u : IsUnit (a 1) := isUnit_of_isUnit_quotient_of_sq_eq_bot hI (by rw [ha]; exact (hu 1).map f)
+    obtain ⟨a, ha, hac⟩ :=
+      exists_lift_splitting hI hN' c' hc' (fun x => f (e x)) (fun x => (hu x).map f) hbc
+    have ha1u : IsUnit (a 1) :=
+      isUnit_of_isUnit_quotient_of_sq_eq_bot hI (by rw [ha]; exact (hu 1).map f)
     have ha1 : a 1 = algebraMap R B (c 1 1) := by
       have h := hac 1 1
       rw [one_mul] at h
@@ -330,8 +355,14 @@ theorem etale_of_twisted_basis {R : Type} [CommRing R] {C : Type} [CommGroup C] 
     show Ideal.Quotient.mk I (L (e x)) = f (e x)
     rw [hLe, ha]
 
-theorem exists_etale_splitting :
-    ∀ (R : Type) [CommRing R] (n : ℕ) (C : Type) [CommGroup C] [Finite C] (c : C → C → Rˣ), IsUnit (n : R) → 0 < n → (∀ x : C, x ^ n = 1) → (∀ x y, c x y = c y x) → (∀ x y z, c x y * c (x * y) z = c y z * c x (y * z)) → ∃ (R' : Type) (_ : CommRing R') (_ : Algebra R R'), Algebra.Etale R R' ∧ Module.Finite R R' ∧ Module.FaithfullyFlat R R' ∧ ∃ b : C → R'ˣ, ∀ x y, Units.map (algebraMap R R').toMonoidHom (c x y) * b (x * y) = b x * b y := by
+theorem exists_etale_splitting
+    : ∀ (R : Type) [CommRing R] (n : ℕ) (C : Type) [CommGroup C] [Finite C] (c : C → C → Rˣ),
+      IsUnit (n : R) → 0 < n → (∀ x : C, x ^ n = 1) → (∀ x y, c x y = c y x)
+        → (∀ x y z, c x y * c (x * y) z = c y z * c x (y * z))
+        → ∃ (R' : Type) (_ : CommRing R') (_ : Algebra R R'),
+          Algebra.Etale R R' ∧ Module.Finite R R' ∧ Module.FaithfullyFlat R R'
+            ∧ ∃ b : C → R'ˣ, ∀ x y,
+              Units.map (algebraMap R R').toMonoidHom (c x y) * b (x * y) = b x * b y := by
   intro R _ n C _ _ c hn hn0 hexp hs hc
   obtain ⟨A, hA, hAlg, e, he, h1⟩ := exists_twisted_algebra R C c hs hc
   have hone : (1 : A) = (↑(c 1 1)⁻¹ : R) • e 1 := by
@@ -360,8 +391,16 @@ theorem exists_etale_splitting :
     rw [hm, Nat.cast_mul] at hun
     exact isUnit_of_mul_isUnit_left hun
   have hfree : Module.Free R A := Module.Free.of_basis e
-  refine ⟨A, hA, hAlg, etale_of_twisted_basis c hc hN e he h1 hu, Module.Finite.of_basis e, ?_,
-    fun x => (hu x).unit, fun x y => ?_⟩
+  refine ⟨
+    A,
+    hA,
+    hAlg,
+    etale_of_twisted_basis c hc hN e he h1 hu,
+    Module.Finite.of_basis e,
+    ?_,
+    fun x => (hu x).unit,
+    fun x y => ?_
+  ⟩
   · rcases subsingleton_or_nontrivial R with hR | hR
     · exact { submodule_ne_top := fun m hm => (hm.ne_top (Subsingleton.elim _ _)).elim }
     · have hnt : Nontrivial A := nontrivial_of_ne (e 1) 0 (e.ne_zero 1)

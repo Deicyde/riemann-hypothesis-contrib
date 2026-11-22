@@ -9,5 +9,16 @@ public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StFiniteF
 
 open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets Topology Filter
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.meet_over_hypersurface_of_germ : FiniteFibreGermIntegral.Statement → IrreducibleGermMeetOverHypersurface.Statement := by
-  first | exact @GlobalTheory.CompanionTheory.ComplexSets.irreducibleGermMeetOverHypersurface_of_finiteFibreGermIntegral | exact GlobalTheory.CompanionTheory.ComplexSets.irreducibleGermMeetOverHypersurface_of_finiteFibreGermIntegral | (intros; apply GlobalTheory.CompanionTheory.ComplexSets.irreducibleGermMeetOverHypersurface_of_finiteFibreGermIntegral <;> assumption)
+theorem _root_.GlobalTheory.T.meet_over_hypersurface_of_germ
+    : FiniteFibreGermIntegral.Statement → IrreducibleGermMeetOverHypersurface.Statement := by
+  first
+  | exact
+      @GlobalTheory.CompanionTheory.ComplexSets.irreducibleGermMeetOverHypersurface_of_finiteFibreGermIntegral
+  | exact
+      GlobalTheory.CompanionTheory.ComplexSets.irreducibleGermMeetOverHypersurface_of_finiteFibreGermIntegral
+  | (
+      intros
+      apply
+          GlobalTheory.CompanionTheory.ComplexSets.irreducibleGermMeetOverHypersurface_of_finiteFibreGermIntegral
+        <;> assumption
+    )

@@ -9,20 +9,26 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Ncard
 
 noncomputable section
 
-open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
 
 namespace GlobalTheory.MemN
 
-theorem nonempty_places_closure (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] :
-    Nonempty (Formalism.GaloisCohomology.Places E Ω) :=
-  ⟨⟨fun v => (exists_valuationSubring_over (Ω := Ω) v).choose,
-    fun v => (exists_valuationSubring_over (Ω := Ω) v).choose_spec⟩⟩
+theorem nonempty_places_closure (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+    : Nonempty (Formalism.GaloisCohomology.Places E Ω) := ⟨⟨
+  fun v => (exists_valuationSubring_over (Ω := Ω) v).choose,
+  fun v => (exists_valuationSubring_over (Ω := Ω) v).choose_spec
+⟩⟩
 
-def emptyLayer (B : Base) (C : Cols B) (W : RowsRest B C) (χ : Chi B.toPre)
-    (ldat : ∀ (p : ℕ) [Fact p.Prime], Formalism.GaloisCohomology.LData B.host.E (AlgebraicClosure B.host.E) p)
-    (h : ∀ (p : ℕ) [Fact p.Prime] (e : ℕ), 0 < e → e < B.R.t → ∀ n : ℕ,
-      Formalism.GaloisCohomology.shaLen (ldat p) (e : ℤ) = (n : ℕ∞) → W.shaLen p e = (n : ℚ)) :
-    NData B.R B.host W.what₂ where
+def emptyLayer
+    (B : Base) (C : Cols B) (W : RowsRest B C) (χ : Chi B.toPre)
+    (ldat : ∀ (p : ℕ) [Fact p.Prime],
+      Formalism.GaloisCohomology.LData B.host.E (AlgebraicClosure B.host.E) p)
+    (h : ∀ (p : ℕ) [Fact p.Prime] (e : ℕ),
+      0 < e → e < B.R.t
+        → ∀ n : ℕ,
+          Formalism.GaloisCohomology.shaLen (ldat p) (e : ℤ) = (n : ℕ∞) → W.shaLen p e = (n : ℚ))
+    : NData B.R B.host W.what₂ where
   Om := AlgebraicClosure B.host.E
   plOm := (nonempty_places_closure B.host.E (AlgebraicClosure B.host.E)).some
   ldat := ldat
@@ -100,10 +106,14 @@ def emptyLayer (B : Base) (C : Cols B) (W : RowsRest B C) (χ : Chi B.toPre)
   lab := fun _ _ _ => (Polynomial.X - 1) ^ B.R.r
   lab_monic := fun k _ _ => by
     haveI : Fact (B.host.g k).Prime := ⟨B.host.g_prime k⟩
-    have h1 : (Polynomial.X - 1 : Polynomial (ZMod (B.host.g k))) = Polynomial.X - Polynomial.C 1 := by simp
+    have h1
+        : (Polynomial.X - 1 : Polynomial (ZMod (B.host.g k))) = Polynomial.X - Polynomial.C 1 := by
+      simp
     rw [h1]
-    exact ⟨(Polynomial.monic_X_sub_C _).pow _, by
-      rw [(Polynomial.monic_X_sub_C _).natDegree_pow, Polynomial.natDegree_X_sub_C, mul_one]⟩
+    exact ⟨
+      (Polynomial.monic_X_sub_C _).pow _,
+      by rw [(Polynomial.monic_X_sub_C _).natDegree_pow, Polynomial.natDegree_X_sub_C, mul_one]
+    ⟩
   chiT := χ
   restN_card_levelGroup_eq := rfl
 

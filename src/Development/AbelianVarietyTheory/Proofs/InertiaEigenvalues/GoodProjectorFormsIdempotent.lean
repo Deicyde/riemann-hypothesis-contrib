@@ -5,7 +5,8 @@ public import Formalism.LocalToGlobal.IndefiniteReal.DoubleCosetOperators.NHkRow
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.IntegralHeckeForms NumberField Polynomial Formalism.IndefR.NX
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.IntegralHeckeForms
+  NumberField Polynomial Formalism.IndefR.NX
 open scoped TensorProduct
 
 noncomputable section
@@ -19,8 +20,10 @@ def rhoTw {D : D7} (S : RatDat D.ntw) (j : ℕ) : G0g D.nd →* Module.End D.wha
     simp only [map_mul, mul_inv, Units.val_mul]
     rw [smul_mul_smul_comm]
 
-theorem goodProjW_idem : ∀ (D : D7) (S : RatDat D.ntw) (j : ℕ), D.ntw.Tw →
-    goodProjW S j D.nexp.eLL0 * goodProjW S j D.nexp.eLL0 = goodProjW S j D.nexp.eLL0 := by
+theorem goodProjW_idem
+    : ∀ (D : D7) (S : RatDat D.ntw) (j : ℕ),
+      D.ntw.Tw
+        → goodProjW S j D.nexp.eLL0 * goodProjW S j D.nexp.eLL0 = goodProjW S j D.nexp.eLL0 := by
   intro D S j i
   set s := (D.nexp.eAlg i true).coeff.support with hs
   have hsupp : ∀ g, g ∉ s → D.nexp.eLL0 g = 0 := fun g hg => by
@@ -52,20 +55,25 @@ theorem goodProjW_idem : ∀ (D : D7) (S : RatDat D.ntw) (j : ℕ), D.ntw.Tw →
     rw [← MonoidAlgebra.coeff_mapRingHom, ← MonoidAlgebra.coeff_mapRingHom, hxy]
   have hidem : eL * eL = eL := hinj (by rw [map_mul, hmap, D.nexp.eAlg_idem])
   let eLL := MonoidAlgebra.mapRingHom (G0g D.nd) (algebraMap ↥D.LL0 D.what₂.LL) eL
-  have hP : goodProjW S j D.nexp.eLL0 =
-      MonoidAlgebra.lift D.what₂.LL (Module.End D.what₂.LL (S.WL j)) (G0g D.nd) (rhoTw S j) eLL := by
+  have hP
+      : goodProjW S j D.nexp.eLL0
+        = MonoidAlgebra.lift D.what₂.LL (Module.End D.what₂.LL (S.WL j)) (G0g D.nd) (rhoTw S j)
+          eLL := by
     rw [MonoidAlgebra.lift_apply]
     unfold goodProjW
     rw [finsum_eq_sum_of_support_subset _ (s := s) fun g hg => by
       by_contra hgs
       exact hg (by simp only [hsupp g hgs, IntermediateField.coe_zero, zero_mul, zero_smul])]
-    rw [Finsupp.sum_of_support_subset _ (s := s) (fun g hg => by
-      by_contra hgs
-      apply Finsupp.mem_support_iff.1 hg
-      simp only [eLL, MonoidAlgebra.coeff_mapRingHom, heL, hsupp g hgs, map_zero]) (fun a b => b • rhoTw S j a) (fun _ _ => zero_smul _ _)]
+    rw [Finsupp.sum_of_support_subset _ (s := s)
+      (fun g hg => by
+        by_contra hgs
+        apply Finsupp.mem_support_iff.1 hg
+        simp only [eLL, MonoidAlgebra.coeff_mapRingHom, heL, hsupp g hgs, map_zero])
+      (fun a b => b • rhoTw S j a)
+      (fun _ _ => zero_smul _ _)]
     refine Finset.sum_congr rfl fun g _ => ?_
-    simp only [eLL, MonoidAlgebra.coeff_mapRingHom, heL, rhoTw, MonoidHom.coe_mk, OneHom.coe_mk, mul_smul,
-      Units.val_inv_eq_inv_val]
+    simp only [eLL, MonoidAlgebra.coeff_mapRingHom, heL, rhoTw, MonoidHom.coe_mk, OneHom.coe_mk,
+      mul_smul, Units.val_inv_eq_inv_val]
     rfl
   rw [hP, ← map_mul, ← map_mul, hidem]
 

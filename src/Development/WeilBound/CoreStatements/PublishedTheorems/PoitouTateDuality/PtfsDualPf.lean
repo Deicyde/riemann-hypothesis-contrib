@@ -8,7 +8,8 @@ public import GroundTheory.ProfiniteCohomology.PoitouTate.PoitouTateNineTermGs
 
 noncomputable section
 
-open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh GroundTheory.Global ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh GroundTheory.Global
+  ReciprocityTheory.Gal Formalism.ConjugateSelfDual
 
 namespace PositivityTheory.Lit1.PTN
 
@@ -35,15 +36,16 @@ def rootOf : ZMod N →+ Additive (rootsOfUnity N L) where
 
 theorem rootOf_apply (c : ZMod N) : rootOf w c = Additive.ofMul (w ^ c.val) := rfl
 
-theorem rootOf_bijective (hw : IsPrimitiveRoot (((w : Lˣ) : L)) N) : Function.Bijective (rootOf w) := by
+theorem rootOf_bijective (hw : IsPrimitiveRoot (((w : Lˣ) : L)) N)
+    : Function.Bijective (rootOf w) := by
   have hwu : IsPrimitiveRoot w N := by
     rw [← IsPrimitiveRoot.coe_submonoidClass_iff, ← IsPrimitiveRoot.coe_units_iff]
     exact hw
   refine ⟨fun a b h => ?_, fun x => ?_⟩
   · have h' : w ^ a.val = w ^ b.val := Additive.ofMul.injective h
     exact ZMod.val_injective N (hwu.pow_inj (ZMod.val_lt a) (ZMod.val_lt b) h')
-  · obtain ⟨i, hi, hx⟩ := hw.eq_pow_of_pow_eq_one
-      (ξ := (((Additive.toMul x : rootsOfUnity N L) : Lˣ) : L)) (by
+  · obtain ⟨i, hi, hx⟩ :=
+      hw.eq_pow_of_pow_eq_one (ξ := (((Additive.toMul x : rootsOfUnity N L) : Lˣ) : L)) (by
         have := (mem_rootsOfUnity N _).1 (Additive.toMul x).2
         rw [← Units.val_pow_eq_pow_val, this, Units.val_one])
     refine ⟨(i : ZMod N), ?_⟩
@@ -57,36 +59,44 @@ end Roots
 
 section DualGen
 
-variable {Γ H : Type} [Group Γ] [Group H] [TopologicalSpace Γ] [TopologicalSpace H] (θ : Γ ≃ₜ* H)
+variable
+  {Γ H : Type} [Group Γ] [Group H] [TopologicalSpace Γ] [TopologicalSpace H]
+  (θ : Γ ≃ₜ* H)
   {N : ℕ} [NeZero N]
-  {M : Type} [AddCommGroup M] [Module (ZMod N) M] (ρ : Representation (ZMod N) Γ M)
-  (χ : Γ →* (ZMod N)ˣ) (A D : Rep.{0} (ULift.{0} ℤ) H) (eM : M ≃+ A.V)
-  (hM : ∀ g m, eM (ρ g m) = A.ρ (θ g) (eM m)) (rr : ZMod N ≃+ D.V)
+  {M : Type} [AddCommGroup M] [Module (ZMod N) M]
+  (ρ : Representation (ZMod N) Γ M) (χ : Γ →* (ZMod N)ˣ) (A D : Rep.{0} (ULift.{0} ℤ) H)
+  (eM : M ≃+ A.V) (hM : ∀ g m, eM (ρ g m) = A.ρ (θ g) (eM m)) (rr : ZMod N ≃+ D.V)
   (hr : ∀ g c, D.ρ (θ g) (rr c) = rr ((χ g : ZMod N) * c))
 
-
 include hM hr in
-theorem dualGen : ∃ eD : TDual (ZMod N) M ≃+ (dualRep D A).V,
-    (∀ g f, eD (twDual χ ρ g f) = (dualRep D A).ρ (θ g) (eD f)) ∧
-      ∀ f m, (eD f : A.V →ₗ[ULift.{0} ℤ] D.V) (eM m) = rr (f m) := by
+theorem dualGen
+    : ∃ eD : TDual (ZMod N) M ≃+ (dualRep D A).V,
+      (∀ g f, eD (twDual χ ρ g f) = (dualRep D A).ρ (θ g) (eD f))
+        ∧ ∀ f m, (eD f : A.V →ₗ[ULift.{0} ℤ] D.V) (eM m) = rr (f m) := by
   let fwd : TDual (ZMod N) M → (A.V →ₗ[ULift.{0} ℤ] D.V) := fun f =>
     (uliftIntLinearEquivAddHom A.V D.V).symm
-      (rr.toAddMonoidHom.comp (((f : M →ₗ[ZMod N] ZMod N)).toAddMonoidHom.comp eM.symm.toAddMonoidHom))
+      (rr.toAddMonoidHom.comp
+        (((f : M →ₗ[ZMod N] ZMod N)).toAddMonoidHom.comp eM.symm.toAddMonoidHom))
   let bwd : (A.V →ₗ[ULift.{0} ℤ] D.V) → TDual (ZMod N) M := fun φ =>
-    (rr.symm.toAddMonoidHom.comp ((uliftIntLinearEquivAddHom A.V D.V φ).comp eM.toAddMonoidHom)).toZModLinearMap N
-  let eD : TDual (ZMod N) M ≃+ (dualRep D A).V :=
-    { toFun := fwd
-      invFun := bwd
-      left_inv := fun f => LinearMap.ext fun m => by
+    (rr.symm.toAddMonoidHom.comp ((uliftIntLinearEquivAddHom A.V D.V φ).comp
+      eM.toAddMonoidHom)).toZModLinearMap N
+  let eD : TDual (ZMod N) M ≃+ (dualRep D A).V := {
+    toFun := fwd
+    invFun := bwd
+    left_inv := fun f =>
+      LinearMap.ext fun m => by
         show rr.symm (rr (f (eM.symm (eM m)))) = f m
         rw [AddEquiv.symm_apply_apply, AddEquiv.symm_apply_apply]
-      right_inv := fun φ => LinearMap.ext fun a => by
+    right_inv := fun φ =>
+      LinearMap.ext fun a => by
         show rr (rr.symm (φ (eM (eM.symm a)))) = φ a
         rw [AddEquiv.apply_symm_apply, AddEquiv.apply_symm_apply]
-      map_add' := fun f f' => LinearMap.ext fun a => by
+    map_add' := fun f f' =>
+      LinearMap.ext fun a => by
         show rr ((f + f') (eM.symm a)) = rr (f (eM.symm a)) + rr (f' (eM.symm a))
         rw [← map_add (f := _)]
-        rfl }
+        rfl
+  }
   refine ⟨eD, fun g f => ?_, fun f m => ?_⟩
   · refine LinearMap.ext fun a => ?_
     have h1 : eM.symm (A.ρ (θ g⁻¹) a) = ρ g⁻¹ (eM.symm a) := by
@@ -100,12 +110,16 @@ theorem dualGen : ∃ eD : TDual (ZMod N) M ≃+ (dualRep D A).V,
 
 end DualGen
 
-theorem exists_root_of_primitive {L : Type} [Field L] {N : ℕ} (hN0 : N ≠ 0) {z : L}
-    (hz : IsPrimitiveRoot z N) : ∃ w : rootsOfUnity N L, ((w : Lˣ) : L) = z :=
-  ⟨⟨(hz.isUnit hN0).unit, (mem_rootsOfUnity _ _).2 (Units.ext (by
-      rw [Units.val_pow_eq_pow_val, IsUnit.unit_spec, hz.pow_eq_one, Units.val_one]))⟩,
-    IsUnit.unit_spec _⟩
-
+theorem exists_root_of_primitive
+    {L : Type} [Field L] {N : ℕ} (hN0 : N ≠ 0) {z : L} (hz : IsPrimitiveRoot z N)
+    : ∃ w : rootsOfUnity N L, ((w : Lˣ) : L) = z := ⟨
+  ⟨
+    (hz.isUnit hN0).unit,
+    (mem_rootsOfUnity _ _).2
+      (Units.ext (by rw [Units.val_pow_eq_pow_val, IsUnit.unit_spec, hz.pow_eq_one, Units.val_one]))
+  ⟩,
+  IsUnit.unit_spec _
+⟩
 
 set_option maxHeartbeats 1000000 in
 theorem gsRoots_act_rootOf (Kf : FiniteSubfield) [NumberField Kf.1] [IsAlgClosure Kf.1 (AlgebraicClosure ℚ)]
@@ -155,9 +169,11 @@ theorem gsRoots_act_rootOf (Kf : FiniteSubfield) [NumberField Kf.1] [IsAlgClosur
     SubgroupClass.coe_pow, Units.val_pow_eq_pow_val, IntermediateField.coe_pow, hwv, map_pow, hτ,
     ← pow_mul, ZMod.val_mul, hmod]
 
-theorem natCast_pow_not_mem (Kf : FiniteSubfield) (S : Finset (HeightOneSpectrum (𝓞 Kf.1))) {l r : ℕ}
-    [Fact l.Prime] (hS : ContainsAbove S l) :
-    ∀ v ∉ (S : Set (HeightOneSpectrum (𝓞 Kf.1))), (((l ^ r : ℕ) : ℕ) : 𝓞 Kf.1) ∉ v.asIdeal := by
+theorem natCast_pow_not_mem
+    (Kf : FiniteSubfield) (S : Finset (HeightOneSpectrum (𝓞 Kf.1)))
+    {l r : ℕ} [Fact l.Prime]
+    (hS : ContainsAbove S l)
+    : ∀ v ∉ (S : Set (HeightOneSpectrum (𝓞 Kf.1))), (((l ^ r : ℕ) : ℕ) : 𝓞 Kf.1) ∉ v.asIdeal := by
   intro v hv h
   apply hv
   have : ((l : ℕ) : 𝓞 Kf.1) ^ r ∈ v.asIdeal := by simpa using h

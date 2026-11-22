@@ -25,8 +25,10 @@ theorem pLev : PLev := by
   obtain ⟨hgr, hok, -, hup⟩ := rowB Ω M hM
   obtain ⟨-, hokK, -, -⟩ := rowB Ω (k * M) hkM
   obtain ⟨hupQ, hupOk, hupgr, -⟩ := hup k hk
-  have hsgup : ∀ e : ℕ, 1 < e → e.Coprime 6 → e.Coprime (k * M) → ∀ z : Row M, z ≠ 0 →
-      up k M z ≠ 0 → sg X e (k * M) (up k M z) = sg X e M z := by
+  have hsgup
+      : ∀ e : ℕ,
+        1 < e → e.Coprime 6 → e.Coprime (k * M)
+          → ∀ z : Row M, z ≠ 0 → up k M z ≠ 0 → sg X e (k * M) (up k M z) = sg X e M z := by
     intro e he he6 hek z hz hz'
     have hem : e.Coprime M := Nat.Coprime.coprime_dvd_right (dvd_mul_left M k) hek
     rw [← (sgB Ω ε X e (k * M) he he6 hkM hek (up k M z) hz').2.2.2 (toQ M z)
@@ -53,7 +55,8 @@ theorem pLev : PLev := by
     obtain ⟨-, hwMv⟩ := hw s x y hxy
     obtain ⟨-, hw'Mv⟩ := hw' s (up k M x) (up k M y) hupxy
     rw [hupgr s⁻¹ x, hupgr s⁻¹ y, hsgup c hc hc6 hck _ hx1 hux1, hsgup d hd hd6 hdk _ hy1 huy1,
-      hsgup c hc hc6 hck _ hx hux, hsgup d hd hd6 hdk _ hy huy] at hw'Mv
+        hsgup c hc hc6 hck _ hx hux, hsgup d hd hd6 hdk _ hy huy]
+      at hw'Mv
     have hgx : ∀ z : Row M, gr M s (gr M s⁻¹ z) = z := by
       intro z
       rw [← (hgr s s⁻¹ z).1, mul_inv_cancel, (hgr 1 1 z).2]
@@ -61,12 +64,15 @@ theorem pLev : PLev := by
       rw [(sgB Ω ε X c M hc hc6 hM hcM _ hx1).2.2.1 s, hgx]
     have hτv : X.gal s (sg X d M (gr M s⁻¹ y)) = sg X d M y := by
       rw [(sgB Ω ε X d M hd hd6 hM hdM _ hy1).2.2.1 s, hgx]
-    have hP := (ht (sg X c M (gr M s⁻¹ x)) (sg X d M (gr M s⁻¹ y))
-      (sgB Ω ε X c M hc hc6 hM hcM _ hx1).1 (sgB Ω ε X d M hd hd6 hM hdM _ hy1).1).1
-    have hQ := (ht (sg X c M x) (sg X d M y)
-      (sgB Ω ε X c M hc hc6 hM hcM _ hx).1 (sgB Ω ε X d M hd hd6 hM hdM _ hy).1).1
-    have key := (mvEx Ω ε X m hm (X.gal s) s (hgal s) _ _ _ hP).2.2.2 _
-      (by rw [hτu, hτv]; exact hQ) _ (w' s (up k M x) (up k M y)) hwMv
+    have hP :=
+      (ht (sg X c M (gr M s⁻¹ x)) (sg X d M (gr M s⁻¹ y)) (sgB Ω ε X c M hc hc6 hM hcM _ hx1).1
+        (sgB Ω ε X d M hd hd6 hM hdM _ hy1).1).1
+    have hQ :=
+      (ht (sg X c M x) (sg X d M y) (sgB Ω ε X c M hc hc6 hM hcM _ hx).1
+        (sgB Ω ε X d M hd hd6 hM hdM _ hy).1).1
+    have key :=
+      (mvEx Ω ε X m hm (X.gal s) s (hgal s) _ _ _ hP).2.2.2 _ (by rw [hτu, hτv]; exact hQ) _
+        (w' s (up k M x) (up k M y)) hwMv
     have htw : tw X m M s (fun _ _ => (1 : X.Kˣ)) x y = 1 := by simp [tw]
     rw [htw, mul_one, div_one]
     exact key.1 hw'Mv

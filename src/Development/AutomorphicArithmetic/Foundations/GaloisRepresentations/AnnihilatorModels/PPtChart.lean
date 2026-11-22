@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.ptChart_of :
-    PtChart := by
+theorem UpperTheory.Gal.crystallineComparison.ptChart_of : PtChart := by
   intro Y V hV κ _
   refine ⟨?_, ?_, ?_⟩
   · intro f g hfg

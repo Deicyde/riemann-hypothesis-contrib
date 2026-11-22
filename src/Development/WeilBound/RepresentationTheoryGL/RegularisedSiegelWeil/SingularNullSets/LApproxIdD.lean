@@ -8,19 +8,26 @@ public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open IsDedekindDomain NumberField
 
 namespace PositivityTheory.Rg.Rsw.L.LApproxId
 
-theorem small_eventually {ι A M : Type} [Finite ι] [TopologicalSpace A] [Zero A] [TopologicalSpace M]
-    (R : (ι → A) → M) (hR : Continuous R) (U : Set M) (hU : IsOpen U) (h0 : R 0 ∈ U) (Sp : ℕ → Set A)
-    (hSp : Tendsto Sp atTop (𝓝 0).smallSets) : ∀ᶠ k in atTop, ∀ w : ι → A, (∀ i, w i ∈ Sp k) → R w ∈ U := by
+theorem small_eventually
+    {ι A M : Type} [Finite ι] [TopologicalSpace A] [Zero A] [TopologicalSpace M]
+    (R : (ι → A) → M) (hR : Continuous R)
+    (U : Set M) (hU : IsOpen U) (h0 : R 0 ∈ U)
+    (Sp : ℕ → Set A) (hSp : Tendsto Sp atTop (𝓝 0).smallSets)
+    : ∀ᶠ k in atTop, ∀ w : ι → A, (∀ i, w i ∈ Sp k) → R w ∈ U := by
   have hW : R ⁻¹' U ∈ 𝓝 (0 : ι → A) := hR.continuousAt.preimage_mem_nhds (hU.mem_nhds h0)
   rw [nhds_pi, Filter.mem_pi] at hW
   obtain ⟨I, -, tt, htt, hsub⟩ := hW
@@ -38,9 +45,15 @@ theorem approxId_of (h1 : OneD) : ApproxId := by
   have : Module.Finite D.host.F D.host.E := Module.finite_of_finrank_eq_succ (n := 1) hCM.2.2.1
   have : BorelSpace (AF D.host.F) := ⟨rfl⟩
   have : BorelSpace (Mx D t t) := ⟨rfl⟩
-  obtain ⟨eA, heA⟩ := GlobalTheory.T.exists_homeomorph_hermR_coordinates D.host.F D.host.E D.sp.cm.sig hCM (AF D.host.F) _ (Module.finBasis D.host.F D.host.E) t
-  obtain ⟨-, hBd⟩ := GlobalTheory.T.coordinate_form_symmetric_nondegenerate D.host.F D.host.E D.sp.cm.sig hCM _ (Module.finBasis D.host.F D.host.E) t
-  have hpair := GlobalTheory.T.hermitian_pairing_in_coordinates D.host.F D.host.E D.sp.cm.sig hCM (AF D.host.F) _ (Module.finBasis D.host.F D.host.E) t
+  obtain ⟨eA, heA⟩ :=
+    GlobalTheory.T.exists_homeomorph_hermR_coordinates D.host.F D.host.E D.sp.cm.sig hCM
+      (AF D.host.F) _ (Module.finBasis D.host.F D.host.E) t
+  obtain ⟨-, hBd⟩ :=
+    GlobalTheory.T.coordinate_form_symmetric_nondegenerate D.host.F D.host.E D.sp.cm.sig hCM _
+      (Module.finBasis D.host.F D.host.E) t
+  have hpair :=
+    GlobalTheory.T.hermitian_pairing_in_coordinates D.host.F D.host.E D.sp.cm.sig hCM (AF D.host.F)
+      _ (Module.finBasis D.host.F D.host.E) t
   generalize Module.finBasis D.host.F D.host.E = b at heA hBd hpair
   have hε0 : IsIdF S ((1, LIdemEx.indS S) : AF D.host.F) := ⟨rfl, fun v => rfl⟩
   obtain ⟨ε, hε, heS⟩ : ∃ ε : AF D.host.F, IsIdF S ε ∧ e = algebraMap (AF D.host.F) (AE D) ε :=
@@ -51,13 +64,22 @@ theorem approxId_of (h1 : OneD) : ApproxId := by
     isClosed_eq (continuous_const.mul continuous_id) continuous_id
   have : LocallyCompactSpace (fixE ε) := hcl.locallyCompactSpace
   have : SecondCountableTopology (fixE ε) := TopologicalSpace.Subtype.secondCountableTopology _
-  obtain ⟨g1, G1, Sp, hg, hlim, hsupp, hSp⟩ := h1 D.host.F hCM.1 ψ hψ S ε hε (Measure.addHaar) inferInstance
+  obtain ⟨g1, G1, Sp, hg, hlim, hsupp, hSp⟩ :=
+    h1 D.host.F hCM.1 ψ hψ S ε hε (Measure.addHaar) inferInstance
   obtain ⟨c, -, hTr⟩ := transfer Θ lam (Measure.addHaar : Measure (fixE ε))
   set Bm := (coordForm D.sp.cm.sig b t).map (algebraMap D.host.F (AF D.host.F)) with hBm
-  let sT : Mx D t t → _ := fun T => if hT : T ∈ hermA D t then
-    Bm *ᵥ hCo (AF D.host.F) D.sp.cm.sig b ⟨T, (memHA D t T).1 hT⟩ else 0
-  refine ⟨fun k x => ∏ i, g1 k (Θ x i), fun k T => if T ∈ hermA D t then (c : ℝ) * ∏ i, G1 k (sT T i) else 0,
-    fun k => ⟨?_, ?_, fun T hT => ⟨?_, ?_⟩⟩, fun x => ?_, ?_⟩
+  let sT : Mx D t t → _ := fun T =>
+    if hT : T ∈ hermA D t then
+      Bm *ᵥ hCo (AF D.host.F) D.sp.cm.sig b ⟨T, (memHA D t T).1 hT⟩
+    else
+      0
+  refine ⟨
+    fun k x => ∏ i, g1 k (Θ x i),
+    fun k T => if T ∈ hermA D t then (c : ℝ) * ∏ i, G1 k (sT T i) else 0,
+    fun k => ⟨?_, ?_, fun T hT => ⟨?_, ?_⟩⟩,
+    fun x => ?_,
+    ?_
+  ⟩
   · exact (hTr (fun _ => g1 k)).2 (fun _ => (hg k).1)
   · intro x
     rw [norm_prod]
@@ -71,26 +93,30 @@ theorem approxId_of (h1 : OneD) : ApproxId := by
       rw [pch_eq D t ψ x.1.1 T x.1.2 hT, hpair, dotProduct, char_sum]
       refine Finset.prod_congr rfl fun i _ => ?_
       simp only [sT, dif_pos hT, hΘ, heA]
-    calc ∫ x, (∏ i, g1 k (Θ x i)) * pch ψ x.1.1 T ∂lam
-        = ∫ x, ∏ i, (fun i h => g1 k h * ψ (h.1 * sT T i)) i (Θ x i) ∂lam := by
-          congr 1; funext x; rw [hpt, ← Finset.prod_mul_distrib]
+    calc
+      ∫ x, (∏ i, g1 k (Θ x i)) * pch ψ x.1.1 T ∂lam
+          = ∫ x, ∏ i, (fun i h => g1 k h * ψ (h.1 * sT T i)) i (Θ x i) ∂lam := by
+        congr 1; funext x; rw [hpt, ← Finset.prod_mul_distrib]
       _ = (c : ℂ) * ∏ i, ∫ h, g1 k h * ψ (h.1 * sT T i) ∂(Measure.addHaar : Measure (fixE ε)) :=
-          (hTr (fun i h => g1 k h * ψ (h.1 * sT T i))).1
+        (hTr (fun i h => g1 k h * ψ (h.1 * sT T i))).1
       _ = _ := by
-          rw [if_pos hT]
-          push_cast
-          congr 1
-          exact Finset.prod_congr rfl fun i _ => ((hg k).2.2 _).2
+        rw [if_pos hT]
+        push_cast
+        congr 1
+        exact Finset.prod_congr rfl fun i _ => ((hg k).2.2 _).2
   · have := tendsto_finsetProd Finset.univ (fun i _ => hlim (Θ x i))
     simpa using this
   · intro C hC hCT ε' hε'
     have hunit : IsUnit Bm.det := by
-      have h := (RingHom.map_det (algebraMap D.host.F (AF D.host.F)) (coordForm D.sp.cm.sig b t)).symm
+      have h :=
+        (RingHom.map_det (algebraMap D.host.F (AF D.host.F)) (coordForm D.sp.cm.sig b t)).symm
       rw [hBm]
       exact h ▸ (isUnit_iff_ne_zero.mpr hBd).map _
-    let R : (Idx t (Module.finrank D.host.F D.host.E) → AF D.host.F) → Mx D t t := fun w => (eA.symm (Bm⁻¹ *ᵥ w)).1
+    let R : (Idx t (Module.finrank D.host.F D.host.E) → AF D.host.F) → Mx D t t := fun w =>
+      (eA.symm (Bm⁻¹ *ᵥ w)).1
     have hRc : Continuous R :=
-      continuous_subtype_val.comp (eA.symm.continuous.comp (continuous_const.matrix_mulVec continuous_id))
+      continuous_subtype_val.comp (eA.symm.continuous.comp (continuous_const.matrix_mulVec
+        continuous_id))
     have hU : IsOpen {M : Mx D t t | -M ∉ C} := hC.isOpen_compl.preimage continuous_neg
     have h0 : R 0 ∈ {M : Mx D t t | -M ∉ C} := by
       have : R 0 = 0 := by simp [R, Matrix.mulVec_zero]
@@ -114,10 +140,12 @@ theorem approxId_of (h1 : OneD) : ApproxId := by
       rwa [hfixT] at this
     have hmem := hk (fun i => -(sT T i)) hw
     have hR : R (fun i => -(sT T i)) = -T := by
-      have h2 : (fun i => -(sT T i)) = -(Bm *ᵥ hCo (AF D.host.F) D.sp.cm.sig b ⟨T, (memHA D t T).1 hTA⟩) := by
+      have h2
+          : (fun i => -(sT T i))
+            = -(Bm *ᵥ hCo (AF D.host.F) D.sp.cm.sig b ⟨T, (memHA D t T).1 hTA⟩) := by
         funext i; simp only [sT, dif_pos hTA, Pi.neg_apply]
-      simp only [R, h2, Matrix.mulVec_neg, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hunit, Matrix.one_mulVec,
-        map_neg, ← heA, eA.symm_apply_apply]
+      simp only [R, h2, Matrix.mulVec_neg, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hunit,
+        Matrix.one_mulVec, map_neg, ← heA, eA.symm_apply_apply]
       rfl
     simp only [hR, neg_neg] at hmem
     exact hmem hTC

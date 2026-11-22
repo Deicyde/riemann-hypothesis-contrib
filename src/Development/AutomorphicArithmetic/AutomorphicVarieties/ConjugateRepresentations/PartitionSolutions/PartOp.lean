@@ -13,16 +13,17 @@ namespace UpperTheory.V.Cj.A
 
 section
 
-variable {Γ V S I : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V] [MulAction Γ I] {d : ℕ}
-  {G : Dr.Geo Γ V S d} {φ : I → S → V → ℝ}
+variable
+  {Γ V S I : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V] [MulAction Γ I]
+  {d : ℕ} {G : Dr.Geo Γ V S d} {φ : I → S → V → ℝ}
 
-private theorem part_fin_φ (hφ : IsPart G φ) (s : S) {p : V} (hp : p ∈ G.Y) :
-    (Function.support fun i : I => φ i s p).Finite := by
+private theorem part_fin_φ (hφ : IsPart G φ) (s : S) {p : V} (hp : p ∈ G.Y)
+    : (Function.support fun i : I => φ i s p).Finite := by
   obtain ⟨N, hN, hf⟩ := hφ.locFin s p hp
   exact hf.subset fun i hi => ⟨p, mem_of_mem_nhds hN, hi⟩
 
-private theorem part_fin (hφ : IsPart G φ) {q : ℕ} (c : I → G.Om q) (s : S) (p : V) :
-    (Function.support fun i : I => φ i s p • (c i).1 s p).Finite := by
+private theorem part_fin (hφ : IsPart G φ) {q : ℕ} (c : I → G.Om q) (s : S) (p : V)
+    : (Function.support fun i : I => φ i s p • (c i).1 s p).Finite := by
   by_cases hp : p ∈ G.Y
   · refine (part_fin_φ hφ s hp).subset fun i hi h0 => hi ?_
     beta_reduce at h0 ⊢
@@ -31,8 +32,8 @@ private theorem part_fin (hφ : IsPart G φ) {q : ℕ} (c : I → G.Om q) (s : S
     beta_reduce
     rw [((c i).2 s).2 p hp, smul_zero]
 
-private theorem part_shift (hφ : IsPart G φ) (γ : Γ) (i : I) (s : S) (p : V) :
-    φ (γ • i) s p = φ i (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) := by
+private theorem part_shift (hφ : IsPart G φ) (γ : Γ) (i : I) (s : S) (p : V)
+    : φ (γ • i) s p = φ i (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) := by
   have h := hφ.equiv γ⁻¹ (γ • i) s p
   rw [inv_smul_smul] at h
   exact h.symm
@@ -41,7 +42,12 @@ end
 
 theorem partOp : PartOp := by
   intro Γ V S I _ _ _ _ d G φ hφ q
-  refine ⟨{ toFun := fun c => ⟨_, partMem Γ V S I d G φ hφ q c⟩, map_add' := ?_, map_smul' := ?_ }, ?_, ?_, ?_⟩
+  refine ⟨
+    { toFun := fun c => ⟨_, partMem Γ V S I d G φ hφ q c⟩, map_add' := ?_, map_smul' := ?_ },
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro c c'
     refine Subtype.ext (funext fun s => funext fun p => ?_)
     simp only [Pi.add_apply, Submodule.coe_add, smul_add]
@@ -59,8 +65,8 @@ theorem partOp : PartOp := by
     · simp [(x.2 s).2 p hp]
   · intro γ c
     refine Subtype.ext (funext fun s => funext fun p => Eq.symm ?_)
-    change G.tr q γ (∑ᶠ i : I, φ i (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (c i).1 (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p)) =
-      ∑ᶠ i : I, φ i s p • G.tr q γ ((c (γ⁻¹ • i)).1 (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p))
+    change G.tr q γ (∑ᶠ i : I, φ i (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (c i).1 (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p))
+      = ∑ᶠ i : I, φ i s p • G.tr q γ ((c (γ⁻¹ • i)).1 (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p))
     rw [map_finsum (G.tr q γ) (part_fin hφ c _ _)]
     refine Eq.trans ?_ (finsum_comp_equiv (MulAction.toPerm γ))
     refine finsum_congr fun i => ?_

@@ -31,8 +31,8 @@ theorem badSet_finite : (badSet F E).Finite := by
   · ext1
     simp [hwv.over]
 
-theorem fib_finite (v : HeightOneSpectrum (𝓞 F)) :
-    {P : HeightOneSpectrum (𝓞 E) | P.asIdeal.LiesOver v.asIdeal}.Finite := by
+theorem fib_finite (v : HeightOneSpectrum (𝓞 F))
+    : {P : HeightOneSpectrum (𝓞 E) | P.asIdeal.LiesOver v.asIdeal}.Finite := by
   refine ((IsDedekindDomain.primesOver_finite v.asIdeal (𝓞 E)).preimage
     (Set.injOn_of_injective (fun a b h => HeightOneSpectrum.ext h))).subset ?_
   intro P hP
@@ -41,41 +41,48 @@ theorem fib_finite (v : HeightOneSpectrum (𝓞 F)) :
 noncomputable def fib (v : HeightOneSpectrum (𝓞 F)) : Finset (HeightOneSpectrum (𝓞 E)) :=
   (fib_finite F E v).toFinset
 
-theorem mem_fib {v : HeightOneSpectrum (𝓞 F)} {P : HeightOneSpectrum (𝓞 E)} :
-    P ∈ fib F E v ↔ P.asIdeal.LiesOver v.asIdeal := by
+theorem mem_fib {v : HeightOneSpectrum (𝓞 F)} {P : HeightOneSpectrum (𝓞 E)}
+    : P ∈ fib F E v ↔ P.asIdeal.LiesOver v.asIdeal := by
   simp [fib]
 
 theorem natCast_pow_cpow (q f : ℕ) (s : ℂ) : ((q ^ f : ℕ) : ℂ) ^ s = ((q : ℂ) ^ s) ^ f := by
   induction f with
   | zero => simp
   | succ n ih =>
-    have h := Complex.mul_cpow_ofReal_nonneg (a := ((q ^ n : ℕ) : ℝ)) (b := (q : ℝ)) (by positivity) (by positivity) s
+    have h :=
+      Complex.mul_cpow_ofReal_nonneg (a := ((q ^ n : ℕ) : ℝ)) (b := (q : ℝ)) (by positivity)
+        (by positivity) s
     have e1 : ((q ^ (n + 1) : ℕ) : ℂ) = (((q ^ n : ℕ) : ℝ) : ℂ) * ((q : ℝ) : ℂ) := by
       push_cast; ring
     rw [e1, h, pow_succ, ← ih]
     simp only [Complex.ofReal_natCast]
 
-private theorem inertiaDeg_eq_ramIdx_mul_of_ramIdx_eq_one {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (p : Ideal (𝓞 F)) (P : HeightOneSpectrum (𝓞 E))
-    (he : p.ramificationIdx' P.asIdeal = 1) :
-    p.inertiaDeg' P.asIdeal = p.ramificationIdx' P.asIdeal * p.inertiaDeg' P.asIdeal := by
+private theorem inertiaDeg_eq_ramIdx_mul_of_ramIdx_eq_one
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (p : Ideal (𝓞 F)) (P : HeightOneSpectrum (𝓞 E)) (he : p.ramificationIdx' P.asIdeal = 1)
+    : p.inertiaDeg' P.asIdeal = p.ramificationIdx' P.asIdeal * p.inertiaDeg' P.asIdeal := by
   rw [he, one_mul]
 
-theorem local_factor (h2 : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 F)) (hv : v ∉ badSet F E) (s : ℂ) :
-    ∏ P ∈ fib F E v, (1 - (Ideal.absNorm P.asIdeal : ℂ) ^ (-s)) =
-      (1 - (Ideal.absNorm v.asIdeal : ℂ) ^ (-s)) *
-        (1 - PositivityTheory.SiegelWeilFormula.Gen.eSp E v * (Ideal.absNorm v.asIdeal : ℂ) ^ (-s)) := by
+theorem local_factor
+    (h2 : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 F)) (hv : v ∉ badSet F E) (s : ℂ)
+    : ∏ P ∈ fib F E v, (1 - (Ideal.absNorm P.asIdeal : ℂ) ^ (-s))
+      = (1 - (Ideal.absNorm v.asIdeal : ℂ) ^ (-s))
+        * (1
+          - PositivityTheory.SiegelWeilFormula.Gen.eSp E v
+            * (Ideal.absNorm v.asIdeal : ℂ) ^ (-s)) := by
   classical
   set p := v.asIdeal with hpdef
   have hp0 : p ≠ ⊥ := v.ne_bot
   haveI hpm : p.IsMaximal := v.isMaximal
   have hmap0 : Ideal.map (algebraMap (𝓞 F) (𝓞 E)) p ≠ ⊥ := Ideal.map_ne_bot_of_ne_bot hp0
-  have hunr : ∀ w : HeightOneSpectrum (𝓞 E), w.asIdeal.LiesOver p →
-      Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal := by
+  have hunr
+      : ∀ w : HeightOneSpectrum (𝓞 E),
+        w.asIdeal.LiesOver p → Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal := by
     simpa [badSet] using hv
   have hlies : ∀ P ∈ fib F E v, P.asIdeal.LiesOver p := fun P hP => (mem_fib F E).mp hP
-  have hmapfib : (fib F E v).map ⟨HeightOneSpectrum.asIdeal, fun a b h => HeightOneSpectrum.ext h⟩ =
-      IsDedekindDomain.primesOverFinset p (𝓞 E) := by
+  have hmapfib
+      : (fib F E v).map ⟨HeightOneSpectrum.asIdeal, fun a b h => HeightOneSpectrum.ext h⟩
+        = IsDedekindDomain.primesOverFinset p (𝓞 E) := by
     ext Q
     rw [Finset.mem_map, IsDedekindDomain.mem_primesOverFinset_iff hp0]
     constructor
@@ -102,8 +109,8 @@ theorem local_factor (h2 : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 
     rw [← h2, ← h]
     refine Finset.sum_congr rfl fun P hP => ?_
     exact inertiaDeg_eq_ramIdx_mul_of_ramIdx_eq_one p P (he P hP)
-  have hnorm : ∀ P ∈ fib F E v,
-      Ideal.absNorm P.asIdeal = Ideal.absNorm p ^ p.inertiaDeg' P.asIdeal := by
+  have hnorm
+      : ∀ P ∈ fib F E v, Ideal.absNorm P.asIdeal = Ideal.absNorm p ^ p.inertiaDeg' P.asIdeal := by
     intro P hP
     haveI := hlies P hP
     exact Ideal.absNorm_eq_pow_inertiaDeg'_of_liesOver P.asIdeal p hpm.isPrime hp0
@@ -135,9 +142,9 @@ theorem local_factor (h2 : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 
       obtain ⟨J, hJ⟩ := Ideal.dvd_iff_le.mpr hle
       have hn := congrArg Ideal.absNorm hJ
       rw [Ideal.absNorm_algebraMap, map_mul, hnorm a hamem, haf,
-        ← IsFractionRing.finrank_eq (𝓞 F) F (𝓞 E) E, h2] at hn
-      have hNp : 0 < Ideal.absNorm p :=
-        Nat.pos_of_ne_zero (by rwa [Ne, Ideal.absNorm_eq_zero_iff])
+          ← IsFractionRing.finrank_eq (𝓞 F) F (𝓞 E) E, h2]
+        at hn
+      have hNp : 0 < Ideal.absNorm p := Nat.pos_of_ne_zero (by rwa [Ne, Ideal.absNorm_eq_zero_iff])
       have hJ1 : Ideal.absNorm J = 1 := by
         have h' : Ideal.absNorm p ^ 2 * 1 = Ideal.absNorm p ^ 2 * Ideal.absNorm J := by
           rw [mul_one]

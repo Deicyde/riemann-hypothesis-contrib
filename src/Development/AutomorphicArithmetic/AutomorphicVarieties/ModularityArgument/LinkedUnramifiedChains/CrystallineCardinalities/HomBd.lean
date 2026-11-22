@@ -8,8 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr UpperTheory.V.Z.J
 
-theorem UpperTheory.V.Z.J.homBd :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (D : Type) [Group D] (ε : D →* ℤ_[l]ˣ) (k : ℕ) (N : Type) [AddCommGroup N] (ρ : Representation ℤ D N) (e : Ok l O k ≃+ N) (χ : D → O) (s₀ : D), (l : O) ≠ 0 → (∀ s x, ρ s (e x) = e (χ s • x)) → χ s₀ - algebraMap ℤ_[l] O (ε s₀) ≠ 0 → (HomMu l k ε ρ).ncard ≤ Nat.card (O ⧸ Ideal.span {χ s₀ - algebraMap ℤ_[l] O (ε s₀)}) := by
+theorem UpperTheory.V.Z.J.homBd
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] [Algebra ℤ_[l] O] (D : Type) [Group D] (ε : D →* ℤ_[l]ˣ) (k : ℕ) (N : Type)
+        [AddCommGroup N] (ρ : Representation ℤ D N) (e : Ok l O k ≃+ N) (χ : D → O) (s₀ : D),
+      (l : O) ≠ 0 → (∀ s x, ρ s (e x) = e (χ s • x)) → χ s₀ - algebraMap ℤ_[l] O (ε s₀) ≠ 0
+        → (HomMu l k ε ρ).ncard ≤ Nat.card (O ⧸ Ideal.span {χ s₀ - algebraMap ℤ_[l] O (ε s₀)}) := by
   intro l _ O _ _ _ _ _ D _ ε k N _ ρ e χ s₀ hl hρ hc
   classical
   obtain ⟨hfinOk, hfinQ, hkill, -, -, hsm, -⟩ := okFin l O hl
@@ -33,15 +37,16 @@ theorem UpperTheory.V.Z.J.homBd :
     have h3 := kill f hf a
     rw [← h2, map_sub, map_sub] at h3
     exact sub_eq_zero.mp h3
-  let Φ : HomMu l k ε ρ → (Ok l O k ⧸ I' →+ ZMod (l ^ k)) := fun f =>
-    { toFun := fun q => f.1 (e (Function.surjInv hπ q))
-      map_zero' := by
-        rw [wd f.1 f.2 _ 0 (by rw [Function.surjInv_eq hπ, map_zero]), map_zero, map_zero]
-      map_add' := by
-        intro q q'
-        rw [← map_add f.1, ← map_add e]
-        apply wd f.1 f.2
-        rw [map_add (f := _), Function.surjInv_eq hπ, Function.surjInv_eq hπ, Function.surjInv_eq hπ] }
+  let Φ : HomMu l k ε ρ → (Ok l O k ⧸ I' →+ ZMod (l ^ k)) := fun f => {
+    toFun := fun q => f.1 (e (Function.surjInv hπ q))
+    map_zero' := by
+      rw [wd f.1 f.2 _ 0 (by rw [Function.surjInv_eq hπ, map_zero]), map_zero, map_zero]
+    map_add' := by
+      intro q q'
+      rw [← map_add f.1, ← map_add e]
+      apply wd f.1 f.2
+      rw [map_add (f := _), Function.surjInv_eq hπ, Function.surjInv_eq hπ, Function.surjInv_eq hπ]
+  }
   have hΦ : Function.Injective Φ := by
     intro f g hfg
     have h1 : ∀ y, f.1 (e y) = g.1 (e y) := by
@@ -73,7 +78,9 @@ theorem UpperTheory.V.Z.J.homBd :
     obtain ⟨y, rfl⟩ := hπ q
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective y
     exact ⟨Ideal.Quotient.mk _ x, rfl⟩
-  calc (HomMu l k ε ρ).ncard = Nat.card (HomMu l k ε ρ) := (Nat.card_coe_set_eq _).symm
+  calc
+    (HomMu l k ε ρ).ncard
+      = Nat.card (HomMu l k ε ρ) := (Nat.card_coe_set_eq _).symm
     _ ≤ Nat.card (Ok l O k ⧸ I' →+ ZMod (l ^ k)) := Nat.card_le_card_of_injective Φ hΦ
     _ = Nat.card (Ok l O k ⧸ I') := hcard2
     _ ≤ Nat.card (O ⧸ Ideal.span {c}) := Nat.card_le_card_of_surjective ψ hψ

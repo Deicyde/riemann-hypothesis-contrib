@@ -7,24 +7,28 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Lit.Geo Matrix
 
-private theorem form_bd {d : ℕ} (G : Matrix (Fin d) (Fin d) ℂ) (x y : Fin d → ℂ) :
-    ‖star x ⬝ᵥ G *ᵥ y‖ ≤ (∑ i, ∑ j, ‖G i j‖) * ‖x‖ * ‖y‖ := by
+private theorem form_bd {d : ℕ} (G : Matrix (Fin d) (Fin d) ℂ) (x y : Fin d → ℂ)
+    : ‖star x ⬝ᵥ G *ᵥ y‖ ≤ (∑ i, ∑ j, ‖G i j‖) * ‖x‖ * ‖y‖ := by
   simp only [dotProduct, Matrix.mulVec, Finset.sum_mul]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => ?_)
   rw [Finset.mul_sum]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun j _ => ?_)
   rw [norm_mul, norm_mul, Pi.star_apply, norm_star]
-  calc ‖x i‖ * (‖G i j‖ * ‖y j‖) = ‖G i j‖ * ‖x i‖ * ‖y j‖ := by ring
+  calc
+    ‖x i‖ * (‖G i j‖ * ‖y j‖)
+      = ‖G i j‖ * ‖x i‖ * ‖y j‖ := by ring
     _ ≤ ‖G i j‖ * ‖x‖ * ‖y‖ := by
       gcongr
       · exact norm_le_pi_norm x i
       · exact norm_le_pi_norm y j
 
-theorem UpperTheory.V.Lit.Geo.ptBd :
-    PtBd := by
+theorem UpperTheory.V.Lit.Geo.ptBd : PtBd := by
   intro E _ _ _ a ha U hU Ξ r χ G n e hD q
-  refine ⟨∑ I : Fin q → Fin n, (∑ i, ∑ j, ‖G i j‖) * (∏ i, ‖UpperTheory.V.Lit.Dr.hv (e (I i))‖) ^ 2,
-    by positivity, fun α β hα hβ g M M' hM hM' h1 h2 => ?_⟩
+  refine ⟨
+    ∑ I : Fin q → Fin n, (∑ i, ∑ j, ‖G i j‖) * (∏ i, ‖UpperTheory.V.Lit.Dr.hv (e (I i))‖) ^ 2,
+    by positivity,
+    fun α β hα hβ g M M' hM hM' h1 h2 => ?_
+  ⟩
   rw [ptRetr E a ha U hU Ξ r χ G n e hD q α β hα hβ g, Finset.sum_mul, Finset.sum_mul]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun I _ => ?_)
   refine (form_bd _ _ _).trans ?_

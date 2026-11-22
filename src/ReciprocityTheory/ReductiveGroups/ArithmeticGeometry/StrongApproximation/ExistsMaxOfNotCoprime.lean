@@ -7,8 +7,9 @@ public import Mathlib
 namespace ReciprocityTheory.ChartRestriction.G.SA
 
 section
-variable {K : Type*} [CommRing K] {σ : K →+* K} (hσ : ∀ x, σ (σ x) = x)
-  (hfix : ∀ x, σ x = x → x ≠ 0 → IsUnit x)
+variable
+  {K : Type*} [CommRing K]
+  {σ : K →+* K} (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x → x ≠ 0 → IsUnit x)
 include hσ hfix
 
 theorem norm_zero_of_not_unit {z : K} (hz : ¬ IsUnit z) : z * σ z = 0 := by
@@ -16,9 +17,12 @@ theorem norm_zero_of_not_unit {z : K} (hz : ¬ IsUnit z) : z * σ z = 0 := by
   have hfx : σ (z * σ z) = z * σ z := by rw [map_mul, hσ, mul_comm]
   exact hz (isUnit_of_mul_isUnit_left (hfix _ hfx h))
 
-theorem gp [IsReduced K] (h2 : IsUnit (2 : K)) {δ : K} (hδ : IsUnit δ) (hσδ : σ δ = -δ) {x y : K}
-    (hxy : IsCoprime x y) :
-    IsUnit x ∨ IsUnit (x + δ * y) ∨ IsUnit (x + (-1) * δ * y) := by
+theorem gp
+    [IsReduced K]
+    (h2 : IsUnit (2 : K))
+    {δ : K} (hδ : IsUnit δ) (hσδ : σ δ = -δ)
+    {x y : K} (hxy : IsCoprime x y)
+    : IsUnit x ∨ IsUnit (x + δ * y) ∨ IsUnit (x + (-1) * δ * y) := by
   by_contra hcon
   push_neg at hcon
   obtain ⟨h1, h2', h3⟩ := hcon
@@ -38,8 +42,7 @@ theorem gp [IsReduced K] (h2 : IsUnit (2 : K)) {δ : K} (hδ : IsUnit δ) (hσδ
     linear_combination (σ a * σ x + σ b * σ y) * hab + hab' - σ a * b * hxy' - a * σ a * e1 -
       b * σ b * hyy
   have hu : IsUnit (x * σ y) := isUnit_iff_exists_inv.mpr ⟨_, by rw [mul_comm]; exact key⟩
-  have hsq : (x * σ y) * (x * σ y) = 0 := by
-    linear_combination (y * σ y) * e1 - (x * σ y) * hxy'
+  have hsq : (x * σ y) * (x * σ y) = 0 := by linear_combination (y * σ y) * e1 - (x * σ y) * hxy'
   have h0 : IsUnit (0 : K) := by
     have := hu.mul hu
     rwa [hsq] at this
@@ -48,8 +51,8 @@ theorem gp [IsReduced K] (h2 : IsUnit (2 : K)) {δ : K} (hδ : IsUnit δ) (hσδ
 
 end
 
-theorem exists_max_of_not_coprime {K : Type*} [CommRing K] {a b : K} (h : ¬ IsCoprime a b) :
-    ∃ m : Ideal K, m.IsMaximal ∧ a ∈ m ∧ b ∈ m := by
+theorem exists_max_of_not_coprime {K : Type*} [CommRing K] {a b : K} (h : ¬ IsCoprime a b)
+    : ∃ m : Ideal K, m.IsMaximal ∧ a ∈ m ∧ b ∈ m := by
   have hI : Ideal.span {a, b} ≠ ⊤ := by
     intro hI
     have h1 : (1 : K) ∈ Ideal.span {a, b} := by
@@ -60,12 +63,14 @@ theorem exists_max_of_not_coprime {K : Type*} [CommRing K] {a b : K} (h : ¬ IsC
   obtain ⟨m, hm, hIm⟩ := Ideal.exists_le_maximal _ hI
   exact ⟨m, hm, hIm (Ideal.subset_span (by simp)), hIm (Ideal.subset_span (by simp))⟩
 
-theorem stepA {K : Type*} [CommRing K] {σ : K →+* K}
-    (hmax : ∀ m₀ m₁ m₂ : Ideal K, m₀.IsMaximal → m₁.IsMaximal → m₂.IsMaximal →
-      m₀ = m₁ ∨ m₀ = m₂ ∨ m₁ = m₂)
-    (h2 : IsUnit (2 : K)) {α β ω ν c : K} (hν : IsUnit ν) (hdef : ν = α * σ β + σ α * β + ω)
-    (hnc : ¬ IsCoprime α β) :
-    IsCoprime (α - ω + c * β) β ∨ IsCoprime (α + ω + c * β) β := by
+theorem stepA
+    {K : Type*} [CommRing K]
+    {σ : K →+* K}
+    (hmax : ∀ m₀ m₁ m₂ : Ideal K,
+      m₀.IsMaximal → m₁.IsMaximal → m₂.IsMaximal → m₀ = m₁ ∨ m₀ = m₂ ∨ m₁ = m₂)
+    (h2 : IsUnit (2 : K))
+    {α β ω ν c : K} (hν : IsUnit ν) (hdef : ν = α * σ β + σ α * β + ω) (hnc : ¬ IsCoprime α β)
+    : IsCoprime (α - ω + c * β) β ∨ IsCoprime (α + ω + c * β) β := by
   by_contra hcon
   push_neg at hcon
   obtain ⟨h1, h1'⟩ := hcon

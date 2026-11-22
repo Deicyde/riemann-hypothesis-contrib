@@ -9,7 +9,8 @@ noncomputable section
 
 namespace GlobalTheory.Mem.Col2.JetEx
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker
 
 def FinAlg (T : Set ℂ) : Prop :=
   ∃ Z : Finset ℂ, (∀ z ∈ Z, IsAlgebraic ℚ z) ∧ T ⊆ (Subfield.closure (Z : Set ℂ) : Set ℂ)
@@ -23,8 +24,9 @@ theorem finAlg_of_finite {T : Set ℂ} (h : T.Finite) (ha : ∀ z ∈ T, IsAlgeb
   rw [h.coe_toFinset]
   exact Subfield.subset_closure
 
-theorem finAlg_biUnion {κ : Type} {s : Set κ} (hs : s.Finite) {T : κ → Set ℂ} (h : ∀ k ∈ s, FinAlg (T k)) :
-    FinAlg (⋃ k ∈ s, T k) := by
+theorem finAlg_biUnion
+    {κ : Type} {s : Set κ} (hs : s.Finite) {T : κ → Set ℂ} (h : ∀ k ∈ s, FinAlg (T k))
+    : FinAlg (⋃ k ∈ s, T k) := by
   classical
   choose! Z hZ hsub using h
   refine ⟨hs.toFinset.biUnion Z, ?_, ?_⟩
@@ -58,13 +60,17 @@ def jetSet (n : ℕ) : Set ℂ :=
       z = (A.chiF a b N N')⁻¹ * jetC A.cD (A.thInd S N N' c x) e}
 
 def JetAlg : Prop :=
-  ∀ (N : Submodule (𝓞 X.E) (Sp X.E a)) (N' : Submodule (𝓞 X.E) (Sp X.E b)) (c : ℕ) (x : HomE X.E a b),
-    InRange S M c N N' x → ∀ e : DVar X.Tau a b →₀ ℕ,
-      IsAlgebraic ℚ ((A.chiF a b N N')⁻¹ * derivAt0 (A.thInd S N N' c x) e)
+  ∀ (N : Submodule (𝓞 X.E) (Sp X.E a)) (N' : Submodule (𝓞 X.E) (Sp X.E b)) (c : ℕ)
+      (x : HomE X.E a b),
+    InRange S M c N N' x
+      → ∀ e : DVar X.Tau a b →₀ ℕ,
+        IsAlgebraic ℚ ((A.chiF a b N N')⁻¹ * derivAt0 (A.thInd S N N' c x) e)
 
 def VacEq : Prop :=
-  ∀ (γ : UF X.E a) (γ' : UF X.E b) (N : Submodule (𝓞 X.E) (Sp X.E a)) (N' : Submodule (𝓞 X.E) (Sp X.E b)),
-    IsSdLat N → IsSdLat N' → ∀ z, A.e a b (gmap γ.1 N) (gmap γ'.1 N') z = A.e a b N N' (A.pullV a b γ.1 γ'.1 z)
+  ∀ (γ : UF X.E a) (γ' : UF X.E b) (N : Submodule (𝓞 X.E) (Sp X.E a))
+      (N' : Submodule (𝓞 X.E) (Sp X.E b)),
+    IsSdLat N → IsSdLat N'
+      → ∀ z, A.e a b (gmap γ.1 N) (gmap γ'.1 N') z = A.e a b N N' (A.pullV a b γ.1 γ'.1 z)
 
 end GlobalTheory.Mem.Col2.JetEx
 

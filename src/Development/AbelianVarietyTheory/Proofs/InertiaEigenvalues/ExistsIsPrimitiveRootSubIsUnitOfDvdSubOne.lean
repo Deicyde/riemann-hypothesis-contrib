@@ -8,13 +8,13 @@ open PowerSeries
 
 namespace GlobalTheory
 
-
 open IsLocalRing Polynomial in
-theorem exists_isPrimitiveRoot_sub_isUnit_of_dvd_sub_one {l : ℕ} {O : Type} [CommRing O]
-    [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
-    (hl : l.Prime) (hu : ¬ IsUnit (l : O)) (e : ℕ) (he : e ∣ l - 1) :
-    ∃ ω : O, IsPrimitiveRoot ω e ∧
-      ∀ i j : ℕ, i < e → j < e → i ≠ j → IsUnit (ω ^ i - ω ^ j) := by
+theorem exists_isPrimitiveRoot_sub_isUnit_of_dvd_sub_one
+    {l : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
+    (hl : l.Prime) (hu : ¬ IsUnit (l : O))
+    (e : ℕ) (he : e ∣ l - 1)
+    : ∃ ω : O, IsPrimitiveRoot ω e ∧ ∀ i j : ℕ, i < e → j < e → i ≠ j → IsUnit (ω ^ i - ω ^ j) := by
   classical
   have : Fact l.Prime := ⟨hl⟩
   have hl1 : l - 1 ≠ 0 := by have := hl.two_le; omega
@@ -36,10 +36,11 @@ theorem exists_isPrimitiveRoot_sub_isUnit_of_dvd_sub_one {l : ℕ} {O : Type} [C
     have h := hg'.pow_of_dvd hd (Nat.div_dvd_of_dvd he)
     rw [Nat.div_div_self he hl1] at h
     exact IsPrimitiveRoot.coe_units_iff.2 h
-  have hζk := hζ.map_of_injective (f := ZMod.castHom (dvd_refl l) (ResidueField O))
-    (RingHom.injective _)
-  obtain ⟨ω₀, hω₀⟩ := residue_surjective
-    (ZMod.castHom (dvd_refl l) (ResidueField O) ((g ^ ((l - 1) / e) : (ZMod l)ˣ) : ZMod l))
+  have hζk :=
+    hζ.map_of_injective (f := ZMod.castHom (dvd_refl l) (ResidueField O)) (RingHom.injective _)
+  obtain ⟨ω₀, hω₀⟩ :=
+    residue_surjective (ZMod.castHom (dvd_refl l) (ResidueField O)
+      ((g ^ ((l - 1) / e) : (ZMod l)ˣ) : ZMod l))
   rw [← hω₀] at hζk
 
   have heu : IsUnit (e : O) := by
@@ -48,14 +49,15 @@ theorem exists_isPrimitiveRoot_sub_isUnit_of_dvd_sub_one {l : ℕ} {O : Type} [C
     have := Nat.le_of_dvd (Nat.pos_of_ne_zero he0) ((CharP.cast_eq_zero_iff _ l e).1 h)
     omega
   have hω₀u : IsUnit ω₀ := (residue_ne_zero_iff_isUnit _).1 (hζk.ne_zero he0)
-  obtain ⟨ω, hroot, hsub⟩ := HenselianRing.is_henselian (I := maximalIdeal O)
-    (Polynomial.X ^ e - Polynomial.C 1 : O[X]) (monic_X_pow_sub_C 1 he0) ω₀
-    (by
-      rw [← residue_eq_zero_iff]
-      simp [hζk.pow_eq_one])
-    (by
-      have h : IsUnit ((e : O) * ω₀ ^ (e - 1)) := heu.mul (hω₀u.pow _)
-      simpa [Polynomial.derivative_X_pow] using h.map (Ideal.Quotient.mk (maximalIdeal O)))
+  obtain ⟨ω, hroot, hsub⟩ :=
+    HenselianRing.is_henselian (I := maximalIdeal O) (Polynomial.X ^ e - Polynomial.C 1 : O[X])
+      (monic_X_pow_sub_C 1 he0) ω₀
+      (by
+        rw [← residue_eq_zero_iff]
+        simp [hζk.pow_eq_one])
+      (by
+        have h : IsUnit ((e : O) * ω₀ ^ (e - 1)) := heu.mul (hω₀u.pow _)
+        simpa [Polynomial.derivative_X_pow] using h.map (Ideal.Quotient.mk (maximalIdeal O)))
   have hres : residue O ω = residue O ω₀ := by
     rw [← sub_eq_zero, ← map_sub, residue_eq_zero_iff]; exact hsub
   have hωe : ω ^ e = 1 := by

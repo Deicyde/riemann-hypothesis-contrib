@@ -14,14 +14,19 @@ open GlobalTheory.SqTop
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.CMVal
+open NumberField IsDedekindDomain Formalism.BasicNotions GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.FunObj.SqNum GlobalTheory.CMVal
 open Formalism.L2.Host (HChar)
 
 namespace GlobalTheory.ToricExist
 
-theorem exists_rat_repr (D : D7) {w : D.host.E} (hw : w ^ 2 = -(D.host.d : D.host.E)) (hd : 0 < D.host.d)
-    (σ : D.host.E →+* ℂ) (hσ : σ w = Complex.I * (Real.sqrt D.host.d : ℝ)) :
-    w ∈ D.host.K ∧ ∀ y : D.host.K, ∃ a b : ℚ, (y : D.host.E) = (a : D.host.E) + (b : D.host.E) * w := by
+theorem exists_rat_repr
+    (D : D7)
+    {w : D.host.E} (hw : w ^ 2 = -(D.host.d : D.host.E))
+    (hd : 0 < D.host.d)
+    (σ : D.host.E →+* ℂ) (hσ : σ w = Complex.I * (Real.sqrt D.host.d : ℝ))
+    : w ∈ D.host.K
+      ∧ ∀ y : D.host.K, ∃ a b : ℚ, (y : D.host.E) = (a : D.host.E) + (b : D.host.E) * w := by
   set bb : D.host.E := D.host.sqd with hbb
   have hb : bb ^ 2 = -(D.host.d : D.host.E) := D.host.sqd_sq
   have hbK : bb ∈ D.host.K := IntermediateField.mem_adjoin_simple_self ℚ _
@@ -62,21 +67,31 @@ theorem exists_rat_repr (D : D7) {w : D.host.E} (hw : w ^ 2 = -(D.host.d : D.hos
   have e := B.sum_repr y
   rw [Fin.sum_univ_two, hB, hB] at e
   have e2 := congrArg (fun z : D.host.K => (z : D.host.E)) e
-  simp only [IntermediateField.coe_add, IntermediateField.coe_smul, Matrix.cons_val_zero, Matrix.cons_val_one,
-    IntermediateField.coe_one, Rat.smul_def, mul_one] at e2
+  simp only [IntermediateField.coe_add, IntermediateField.coe_smul, Matrix.cons_val_zero,
+      Matrix.cons_val_one, IntermediateField.coe_one, Rat.smul_def, mul_one]
+    at e2
   rw [← e2]
   rfl
 
-theorem exists_phiK (D : D7) (hFD : GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsFieldData D.host.d (cmPhi D)) :
-    ∃ φK : D.host.K →+* ℂ, (∀ τ, (cmPhi D τ).comp (algebraMap D.host.K D.host.E) = φK) ∧
-      ∀ Λ, GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsIntLattice D.host.d Λ → GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport.IsLatOf φK 1 Λ := by
+theorem exists_phiK
+    (D : D7)
+    (hFD : GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsFieldData D.host.d
+      (cmPhi D))
+    : ∃ φK : D.host.K →+* ℂ,
+      (∀ τ, (cmPhi D τ).comp (algebraMap D.host.K D.host.E) = φK)
+        ∧ ∀ Λ,
+          GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsIntLattice D.host.d Λ
+            → GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport.IsLatOf φK 1 Λ := by
   obtain ⟨-, hd4, -, -, -, hcard, -, w, hw, hwφ⟩ := hFD
   have hne : Nonempty D.what₂.Tau := Fintype.card_pos_iff.1 (by omega)
   obtain ⟨τ₀⟩ := hne
   obtain ⟨hwK, hrep⟩ := exists_rat_repr D hw (by omega) (cmPhi D τ₀) (hwφ τ₀)
   let φK : D.host.K →+* ℂ := (cmPhi D τ₀).comp (algebraMap D.host.K D.host.E)
-  have hval : ∀ (τ : D.what₂.Tau) (y : D.host.K) (a b : ℚ), (y : D.host.E) = (a : D.host.E) + (b : D.host.E) * w →
-      cmPhi D τ (y : D.host.E) = (a : ℂ) + (b : ℂ) * (Complex.I * (Real.sqrt D.host.d : ℝ)) := by
+  have hval
+      : ∀ (τ : D.what₂.Tau) (y : D.host.K) (a b : ℚ),
+        (y : D.host.E) = (a : D.host.E) + (b : D.host.E) * w
+          → cmPhi D τ (y : D.host.E)
+            = (a : ℂ) + (b : ℂ) * (Complex.I * (Real.sqrt D.host.d : ℝ)) := by
     intro τ y a b h
     rw [h, map_add (f := _), map_mul, map_ratCast, map_ratCast, hwφ τ]
   have hcomp : ∀ τ, (cmPhi D τ).comp (algebraMap D.host.K D.host.E) = φK := fun τ => by
@@ -96,7 +111,8 @@ theorem exists_phiK (D : D7) (hFD : GlobalTheory.IndefiniteRowSideFullHecke.Clas
       show cmPhi D τ₀ (y : D.host.E) = _
       exact hval τ₀ y a b (by simp [y])
     refine ⟨y, ?_, hy⟩
-    have hyi : IsIntegral ℤ y := (isIntegral_algHom_iff φK.toIntAlgHom hinj).1 (by rw [← hy] at hint; exact hint)
+    have hyi : IsIntegral ℤ y :=
+      (isIntegral_algHom_iff φK.toIntAlgHom hinj).1 (by rw [← hy] at hint; exact hint)
     exact (FractionalIdeal.mem_one_iff _).2 ⟨⟨y, hyi⟩, rfl⟩
   · rintro ⟨y, hy, rfl⟩
     obtain ⟨y', rfl⟩ := (FractionalIdeal.mem_one_iff _).1 hy
@@ -104,33 +120,45 @@ theorem exists_phiK (D : D7) (hFD : GlobalTheory.IndefiniteRowSideFullHecke.Clas
     refine (hΛ _).2 ⟨?_, a, b, hval τ₀ _ a b h⟩
     exact (RingOfIntegers.isIntegral_coe y').map φK.toIntAlgHom
 
-theorem gBig_of {P R : GP} (hP : GBig P)
-    (h : ∀ {D : D7} {T : Type} {Lc : Formalism.IndefR.Links.LevCh D T} {sc : Consts} (G : GridData Lc sc) (μ₀ : T) (C x b : ℝ),
-      Lc.Is μ₀ → P G μ₀ C x b → R G μ₀ C x b) : GBig R := by
+theorem gBig_of
+    {P R : GP} (hP : GBig P)
+    (h : ∀ {D : D7} {T : Type} {Lc : Formalism.IndefR.Links.LevCh D T} {sc : Consts}
+        (G : GridData Lc sc) (μ₀ : T) (C x b : ℝ),
+      Lc.Is μ₀ → P G μ₀ C x b → R G μ₀ C x b)
+    : GBig R := by
   obtain ⟨CF0, h1⟩ := hP
   refine ⟨CF0, fun ε CF hCF => ?_⟩
   obtain ⟨C0, x0, h2⟩ := h1 ε CF hCF
-  exact ⟨C0, x0, fun C hC D large₂ he hx hr T Lc μ₀ hμ G => h G μ₀ _ _ _ hμ (h2 C hC D large₂ he hx hr T Lc μ₀ hμ G)⟩
+  exact ⟨
+    C0,
+    x0,
+    fun C hC D large₂ he hx hr T Lc μ₀ hμ G =>
+      h G μ₀ _ _ _ hμ (h2 C hC D large₂ he hx hr T Lc μ₀ hμ G)
+  ⟩
 
-theorem gBig_and {P Q : GP} (hP : GBig P) (hQ : GBig Q) :
-    GBig fun {_ _ _ _} G μ₀ C x b => P G μ₀ C x b ∧ Q G μ₀ C x b := by
+theorem gBig_and {P Q : GP} (hP : GBig P) (hQ : GBig Q)
+    : GBig fun {_ _ _ _} G μ₀ C x b => P G μ₀ C x b ∧ Q G μ₀ C x b := by
   obtain ⟨CF1, h1⟩ := hP
   obtain ⟨CF2, h2⟩ := hQ
   refine ⟨max CF1 CF2, fun ε CF hCF => ?_⟩
   obtain ⟨C1, x1, k1⟩ := h1 ε CF (le_trans (le_max_left _ _) hCF)
   obtain ⟨C2, x2, k2⟩ := h2 ε CF (le_trans (le_max_right _ _) hCF)
   refine ⟨max C1 C2, max x1 x2, fun C hC D large₂ he hx hr T Lc μ₀ hμ G => ⟨?_, ?_⟩⟩
-  · exact k1 C (le_trans (le_max_left _ _) hC) D large₂ he (le_trans (le_max_left _ _) hx) hr T Lc μ₀ hμ G
-  · exact k2 C (le_trans (le_max_right _ _) hC) D large₂ he (le_trans (le_max_right _ _) hx) hr T Lc μ₀ hμ G
+  · exact k1 C (le_trans (le_max_left _ _) hC) D large₂ he (le_trans (le_max_left _ _) hx) hr T Lc
+      μ₀ hμ G
+  · exact k2 C (le_trans (le_max_right _ _) hC) D large₂ he (le_trans (le_max_right _ _) hx) hr T Lc
+      μ₀ hμ G
 
-theorem exists_prime {E : Type} [Field E] [NumberField E] {𝔣 : Ideal (OF E)} (h : IsBaseCond 𝔣) :
-    Nonempty (HeightOneSpectrum (𝓞 E)) := by
+theorem exists_prime {E : Type} [Field E] [NumberField E] {𝔣 : Ideal (OF E)} (h : IsBaseCond 𝔣)
+    : Nonempty (HeightOneSpectrum (𝓞 E)) := by
   obtain ⟨M, hM, hfM⟩ := Ideal.exists_le_maximal 𝔣 h.2.1
   let v : HeightOneSpectrum (OF E) := ⟨M, hM.isPrime, fun e => h.1 (eq_bot_iff.2 (e ▸ hfM))⟩
   obtain ⟨P, -⟩ := (h.2.2 v (Ideal.dvd_iff_le.2 hfM)).1
   exact ⟨P⟩
 
-theorem torEx : GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport.Transport → FieldDat → LNe → TorEx := by
+theorem torEx
+    : GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport.Transport → FieldDat → LNe
+      → TorEx := by
   intro hT hF hL
   refine gBig_of (gBig_and hF hL) ?_
   intro D T Lc sc G μ₀ C x b hμ ⟨hf, hl⟩ i j s hs1 hs2 c
@@ -142,22 +170,33 @@ theorem torEx : GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport.Tra
     | none => exact (GlobalTheory.FunObj.SqNum.Model.isValChar_nu hμ G i j hs2).1
     | some c => exact (GlobalTheory.FunObj.SqNum.Model.isValChar_nu hμ G i j hs2).2 c
   obtain ⟨P⟩ := exists_prime hBC
-  have hAux : IsFinSetSplitPlacesCoprimeConductor (condF G.pl) ∅ := fun q hq => absurd hq (Finset.notMem_empty q)
-  have hTS : ∀ Λ, IsHeckeL (fam G μ₀ i j c) Λ →
-      IsToricSum (cmPhi D) s (kap D sc.cGap i j s) (condF G.pl) (fam G μ₀ i j c) (Λ s) := fun Λ hΛ => by
-    have := GlobalTheory.ToricSumValue.toricSum_eq GlobalTheory.Published.HeckeEntire_holds D.host.E D.what₂.Tau (cmPhi D) hφ s
-      (kap D sc.cGap i j s) (condF G.pl) ∅ (fam G μ₀ i j c) (fun _ => P) Λ hU hs1 hBC hAux hV
-      (fun q hq => absurd hq (Finset.notMem_empty q)) hΛ
+  have hAux : IsFinSetSplitPlacesCoprimeConductor (condF G.pl) ∅ := fun q hq =>
+    absurd hq (Finset.notMem_empty q)
+  have hTS
+      : ∀ Λ,
+        IsHeckeL (fam G μ₀ i j c) Λ
+          → IsToricSum (cmPhi D) s (kap D sc.cGap i j s) (condF G.pl) (fam G μ₀ i j c)
+            (Λ s) := fun Λ hΛ => by
+    have :=
+      GlobalTheory.ToricSumValue.toricSum_eq GlobalTheory.Published.HeckeEntire_holds D.host.E
+        D.what₂.Tau (cmPhi D) hφ s (kap D sc.cGap i j s) (condF G.pl) ∅ (fam G μ₀ i j c)
+        (fun _ => P)
+        Λ hU hs1 hBC hAux hV
+        (fun q hq => absurd hq (Finset.notMem_empty q))
+        hΛ
     simpa [condQ] using this
   obtain ⟨Λ, hΛ, hne⟩ := (hl i j).2 c
   refine ⟨Λ s, ⟨hV, hTS Λ hΛ⟩, hne s hs1, fun Λ' h => by rw [hΛ.unique h], fun Λ₁ hΛ₁ => ?_⟩
   obtain ⟨φK, hcomp, hlat⟩ := exists_phiK D hFD'
   haveI := hCM
   haveI := hAb
-  obtain ⟨t, 𝔞, Λσ, -, -, hTr⟩ := hT D.host.K D.host.d hd4 (GlobalTheory.CurveLattice.finrank_hostK D)
-    (GlobalTheory.CurveLattice.discr_hostK D) φK Λ₁ (hlat Λ₁ hΛ₁)
-  have hk := hTr D.host.E hU D.what₂.Tau (cmPhi D) hcard hφ hcomp s (kap D sc.cGap i j s) (condF G.pl) hs1
-    (fun τ => (GlobalTheory.FunObj.SqNum.Model.kap_add D sc.cGap i j τ hs2).2) hBC
+  obtain ⟨t, 𝔞, Λσ, -, -, hTr⟩ :=
+    hT D.host.K D.host.d hd4 (GlobalTheory.CurveLattice.finrank_hostK D)
+      (GlobalTheory.CurveLattice.discr_hostK D) φK Λ₁ (hlat Λ₁ hΛ₁)
+  have hk :=
+    hTr D.host.E hU D.what₂.Tau (cmPhi D) hcard hφ hcomp s (kap D sc.cGap i j s) (condF G.pl) hs1
+      (fun τ => (GlobalTheory.FunObj.SqNum.Model.kap_add D sc.cGap i j τ hs2).2)
+      hBC
   exact (hk.1 ∅ _ _ ⟨hAux, hV, by simpa [condQ] using hTS Λ hΛ⟩).1
 
 end GlobalTheory.ToricExist

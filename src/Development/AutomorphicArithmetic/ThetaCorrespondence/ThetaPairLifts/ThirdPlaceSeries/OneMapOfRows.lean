@@ -16,19 +16,26 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
-open Formalism.L2 Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR.Cx
+open Formalism.L2 Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.IndefR.Cx
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
 namespace GlobalTheory.BigTop.Fun
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
 set_option maxHeartbeats 1600000 in
-theorem exists_unit_root_ze_leafC_of_square_nonzero (p : PtAt ex Csz) (hp : p.PointConditions') {CF : ℝ} (d : FunIn p CF) (a : SlopeTestRemainingChoices p d.G d.W d.n) (ht : TieAt d a)
+theorem exists_unit_root_ze_leafC_of_square_nonzero
+    (p : PtAt ex Csz) (hp : p.PointConditions')
+    {CF : ℝ} (d : FunIn p CF) (a : SlopeTestRemainingChoices p d.G d.W d.n) (ht : TieAt d a)
     (hwf : (Df p).WF) (hR : ∃ R0 : IndefRows (Df p), R0.toIndefData = p.S false)
-    (hQ : (∀ b u, ConvK a.ch b u) ∧ (∀ u, (∀ b, psiK a.ch b u = 0) → u = 0) ∧
-      (∀ i j t, SquareNonzero a.ch.W a.ch.S.B a.ch.rm t i j ∧ a.ch.c i j t ≠ 0) ∧
-      (a.ch.FieldOK → ∃ κ ze, FormulaAt a.ch κ ze)) :
-    ∃ ze : Tup p → D.what₂.LL, ze p.P.A3.fam3.base3.μ0 = 1 ∧ (∀ t, ∃ n : ℕ, 0 < n ∧ ze t ^ n = 1) ∧
-      LeafC (p.S false) (d.data ze ∅ fun _ => 0) := by
+    (hQ : (∀ b u, ConvK a.ch b u) ∧ (∀ u, (∀ b, psiK a.ch b u = 0) → u = 0)
+      ∧ (∀ i j t, SquareNonzero a.ch.W a.ch.S.B a.ch.rm t i j ∧ a.ch.c i j t ≠ 0)
+      ∧ (a.ch.FieldOK → ∃ κ ze, FormulaAt a.ch κ ze))
+    : ∃ ze : Tup p → D.what₂.LL,
+      ze p.P.A3.fam3.base3.μ0 = 1 ∧ (∀ t, ∃ n : ℕ, 0 < n ∧ ze t ^ n = 1)
+        ∧ LeafC (p.S false) (d.data ze ∅ fun _ => 0) := by
   classical
   obtain ⟨hL, hI, hC, hF⟩ := hQ
   obtain ⟨κ, ze, hz, hform⟩ := hF ht.ok.field
@@ -40,26 +47,40 @@ theorem exists_unit_root_ze_leafC_of_square_nonzero (p : PtAt ex Csz) (hp : p.Po
     exact zero_ne_one e
   have hze : ∀ t, D.what₂.embLL (ze t) ≠ 0 := fun t => (map_ne_zero _).2 (hzK t)
   have hc0 : ∀ t, cTot a.ch t ≠ 0 := fun t => (cTot_ne_zero_iff _ _).2 fun i j => (hC i j t).2
-  have key : ∀ t (y : Fin ((Df p).nV t) → D.what₂.LL) (b : Fin d.n),
-      D.what₂.embLL (ze t) * cTot a.ch t * psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false t
-        (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq t).mulVec y))) =
-        κ * D.what₂.embLL ((d.V t).mulVec y b) := by
+  have key
+      : ∀ t (y : Fin ((Df p).nV t) → D.what₂.LL) (b : Fin d.n),
+        D.what₂.embLL (ze t) * cTot a.ch t
+            * psiK a.ch b
+              ((p.R.toCx3 p.F).iC p.F.cr false t
+                (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq t).mulVec y)))
+          = κ * D.what₂.embLL ((d.V t).mulVec y b) := by
     intro t y b
     rw [← _root_.GlobalTheory.T.theta_j_ev0_eq_ic_pq p hp t y, ht.sums t (TieModel.inUse p t) y b]
     exact hform t _ (_root_.GlobalTheory.T.eV0_mem_goodF' p hp t y) b
-  have lin : ∀ (b : Fin d.n) (z : Fin (p.S false).D → D.what₂.LL),
-      psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0 (cpt p.P.A3.fam3.base3.v0.embedding z)) =
-        ∑ k, D.what₂.embLL (z k) *
-          psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0 (Pi.single k 1)) := by
-    intro b z
-    have := out_sum_tw (twAt D.what₂.embLL p.P.A3.A.v0) (psiL a.ch b (hL b))
-      ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0) (cpt p.P.A3.fam3.base3.v0.embedding z)
-    refine this.trans (Finset.sum_congr rfl fun k _ => ?_)
-    exact congrArg (· * psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0 (Pi.single k 1))) (twist_conj_base_embedding_eq p (z k))
+  have lin
+      : ∀ (b : Fin d.n) (z : Fin (p.S false).D → D.what₂.LL),
+        psiK a.ch b
+            ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0
+              (cpt p.P.A3.fam3.base3.v0.embedding z))
+          = ∑ k, D.what₂.embLL (z k) *
+              psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0 (Pi.single k 1)) :=
+    by
+      intro b z
+      have :=
+        out_sum_tw (twAt D.what₂.embLL p.P.A3.A.v0) (psiL a.ch b (hL b))
+          ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0)
+          (cpt p.P.A3.fam3.base3.v0.embedding z)
+      refine this.trans (Finset.sum_congr rfl fun k _ => ?_)
+      exact congrArg
+        (· * psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0 (Pi.single k 1)))
+        (twist_conj_base_embedding_eq p (z k))
   have hκ : κ ≠ 0 := by
     intro hκ0
-    have h0 : ∀ y, (p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0
-        (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq p.P.A3.fam3.base3.μ0).mulVec y)) = 0 := by
+    have h0
+        : ∀ y,
+          (p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0
+              (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq p.P.A3.fam3.base3.μ0).mulVec y))
+            = 0 := by
       intro y
       apply hI
       intro b
@@ -73,40 +94,53 @@ theorem exists_unit_root_ze_leafC_of_square_nonzero (p : PtAt ex Csz) (hp : p.Po
     have h2 := congrFun (hinj (h1.trans (map_zero _).symm)) i0
     simp [cpt] at h2
   let c0 : ℂ := κ⁻¹ * D.what₂.embLL (ze p.P.A3.fam3.base3.μ0) * cTot a.ch p.P.A3.fam3.base3.μ0
-  let Ψc : Matrix (Fin d.n) (Fin (p.S false).D) ℂ := Matrix.of fun b k =>
-    c0 * psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0 (Pi.single k 1))
+  let Ψc : Matrix (Fin d.n) (Fin (p.S false).D) ℂ :=
+    Matrix.of fun b k =>
+      c0 * psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false p.P.A3.fam3.base3.μ0 (Pi.single k 1))
   let ze' : Tup p → D.what₂.LL := fun t => ze t / ze p.P.A3.fam3.base3.μ0
   let r : Tup p → D.what₂.LL := fun t => ze' t * ∏ ij, d.rq t ij
-  have hmain : ∀ t ∈ (Set.univ : Set (Tup p)),
-      Ψc * ((p.S false).ι t * (Df p).Pq t).map D.what₂.embLL = ((r t)⁻¹ • d.V t).map D.what₂.embLL := by
+  have hmain
+      : ∀ t ∈ (Set.univ : Set (Tup p)),
+        Ψc * ((p.S false).ι t * (Df p).Pq t).map D.what₂.embLL
+          = ((r t)⁻¹ • d.V t).map D.what₂.embLL := by
     intro t _
-    have H : ∀ y : Fin ((Df p).nV t) → D.what₂.LL, ∀ b,
-        (Ψc * ((p.S false).ι t * (Df p).Pq t).map D.what₂.embLL).mulVec (cpt D.what₂.embLL y) b =
-          (((r t)⁻¹ • d.V t).map D.what₂.embLL).mulVec (cpt D.what₂.embLL y) b := by
+    have H
+        : ∀ y : Fin ((Df p).nV t) → D.what₂.LL, ∀ b,
+          (Ψc * ((p.S false).ι t * (Df p).Pq t).map D.what₂.embLL).mulVec (cpt D.what₂.embLL y) b
+            = (((r t)⁻¹ • d.V t).map D.what₂.embLL).mulVec (cpt D.what₂.embLL y) b := by
       intro y b
-      have e1 : Ψc.mulVec (cpt D.what₂.embLL (((p.S false).ι t).mulVec (((Df p).Pq t).mulVec y))) b =
-          c0 * psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false t
-            (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq t).mulVec y))) := by
+      have e1
+          : Ψc.mulVec (cpt D.what₂.embLL (((p.S false).ι t).mulVec (((Df p).Pq t).mulVec y))) b
+            = c0 * psiK a.ch b
+              ((p.R.toCx3 p.F).iC p.F.cr false t
+                (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq t).mulVec y))) := by
         rw [← hrow, lin, Finset.mul_sum]
         simp only [Matrix.mulVec, dotProduct, Ψc, Matrix.of_apply, cpt]
         exact Finset.sum_congr rfl fun k _ => by ring
       have e3 := (TieModel.ratio_eq ht t).2
-      have eL : (Ψc * ((p.S false).ι t * (Df p).Pq t).map D.what₂.embLL).mulVec (cpt D.what₂.embLL y) b =
-          c0 * psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false t
-            (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq t).mulVec y))) := by
+      have eL
+          : (Ψc * ((p.S false).ι t * (Df p).Pq t).map D.what₂.embLL).mulVec (cpt D.what₂.embLL y) b
+            = c0 * psiK a.ch b
+              ((p.R.toCx3 p.F).iC p.F.cr false t
+                (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq t).mulVec y))) := by
         rw [← Matrix.mulVec_mulVec, ← cpt_mulVec, ← Matrix.mulVec_mulVec]
         exact e1
-      have eR : (((r t)⁻¹ • d.V t).map D.what₂.embLL).mulVec (cpt D.what₂.embLL y) b =
-          (D.what₂.embLL (ze t) / D.what₂.embLL (ze p.P.A3.fam3.base3.μ0) *
-            (cTot a.ch t / cTot a.ch p.P.A3.fam3.base3.μ0))⁻¹ * D.what₂.embLL ((d.V t).mulVec y b) := by
+      have eR
+          : (((r t)⁻¹ • d.V t).map D.what₂.embLL).mulVec (cpt D.what₂.embLL y) b
+            = (D.what₂.embLL (ze t) / D.what₂.embLL (ze p.P.A3.fam3.base3.μ0)
+                * (cTot a.ch t / cTot a.ch p.P.A3.fam3.base3.μ0))⁻¹
+              * D.what₂.embLL ((d.V t).mulVec y b) := by
         rw [← cpt_mulVec]
         show D.what₂.embLL ((((r t)⁻¹ • d.V t).mulVec y) b) = _
         rw [Matrix.smul_mulVec, Pi.smul_apply, smul_eq_mul, map_mul, map_inv₀]
-        rw [show r t = ze t / ze p.P.A3.fam3.base3.μ0 * ∏ ij, d.rq t ij from rfl, map_mul, map_div₀, e3]
+        rw [show r t = ze t / ze p.P.A3.fam3.base3.μ0 * ∏ ij, d.rq t ij from rfl, map_mul, map_div₀,
+          e3]
         rfl
-      have hP : psiK a.ch b ((p.R.toCx3 p.F).iC p.F.cr false t
-            (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq t).mulVec y))) =
-          κ * D.what₂.embLL ((d.V t).mulVec y b) / (D.what₂.embLL (ze t) * cTot a.ch t) :=
+      have hP
+          : psiK a.ch b
+              ((p.R.toCx3 p.F).iC p.F.cr false t
+                (cpt p.P.A3.fam3.base3.v0.embedding (((Df p).Pq t).mulVec y)))
+            = κ * D.what₂.embLL ((d.V t).mulVec y b) / (D.what₂.embLL (ze t) * cTot a.ch t) :=
         eq_div_of_mul_eq (mul_ne_zero (hze t) (hc0 t)) (by rw [mul_comm]; exact key t y b)
       rw [eL, eR, hP]
       exact mul_eq_one_of_covolume_identity _ _ _ _ _ _ hκ (hze t) (hze _) (hc0 t) (hc0 _)
@@ -117,9 +151,10 @@ theorem exists_unit_root_ze_leafC_of_square_nonzero (p : PtAt ex Csz) (hp : p.Po
     rw [hs, Matrix.mulVec_single, Matrix.mulVec_single] at this
     simpa using this
   have hbij : Function.Bijective ((p.S false).ι p.P.A3.fam3.base3.μ0).mulVec := (hR0 ▸ R0.l1c).1 _
-  obtain ⟨⟨Ψ, -, hΨ⟩, -⟩ := GlobalTheory.complex_matrix_descends_of_rational_on_tuple D.what₂.embLL d.n (p.S false).D (Df p).dQ
-    (Df p).nV (p.S false).ι (Df p).Pq d.V r Set.univ p.P.A3.fam3.base3.μ0 Ψc trivial hbij
-    (hwf.Pq_surj _) hmain
+  obtain ⟨⟨Ψ, -, hΨ⟩, -⟩ :=
+    GlobalTheory.complex_matrix_descends_of_rational_on_tuple D.what₂.embLL d.n (p.S false).D
+      (Df p).dQ (Df p).nV (p.S false).ι (Df p).Pq d.V r Set.univ p.P.A3.fam3.base3.μ0 Ψc trivial
+      hbij (hwf.Pq_surj _) hmain
   refine ⟨ze', by simp only [ze']; exact div_self (hzK _), fun t => ?_, Ψ, fun t _ => ?_⟩
   · obtain ⟨n, hn, e⟩ := hz t
     obtain ⟨m, hm, e'⟩ := hz p.P.A3.fam3.base3.μ0
@@ -129,12 +164,22 @@ theorem exists_unit_root_ze_leafC_of_square_nonzero (p : PtAt ex Csz) (hp : p.Po
   · refine (hΨ t trivial).trans ?_
     show _ = (∏ ij, d.rq t ij)⁻¹ • ((ze' t)⁻¹ • d.V t)
     rw [smul_smul, mul_inv, mul_comm]
-theorem oneMap_of_bundle_setAt_kernel_conditions (hB : _root_.GlobalTheory.BigTop.Fun.BundleCondition) (hS : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint) (h1 : LinK) (h2 : InjK) (h3 : ConstK) (h4 : Formula2K) : _root_.GlobalTheory.BigTop.Fun.LeafUniqueMap @Comparison₂ := by
+theorem oneMap_of_bundle_setAt_kernel_conditions
+    (hB : _root_.GlobalTheory.BigTop.Fun.BundleCondition)
+    (hS : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint) (h1 : LinK) (h2 : InjK) (h3 : ConstK)
+    (h4 : Formula2K)
+    : _root_.GlobalTheory.BigTop.Fun.LeafUniqueMap @Comparison₂ := by
   obtain ⟨CF0, hQ⟩ := hS.atPt (h1.and (h2.and (h3.and h4)))
-  refine ⟨CF0, fun CF hCF => (hQ CF hCF).imp fun Fm CH _ e _ => ⟨0, fun C _ => _root_.GlobalTheory.BigTop.Fun.evPt_mono e fun x hx i p hp q d hd => ?_⟩⟩
+  refine ⟨
+    CF0,
+    fun CF hCF =>
+      (hQ CF hCF).imp fun Fm CH _ e _ =>
+        ⟨0, fun C _ => _root_.GlobalTheory.BigTop.Fun.evPt_mono e fun x hx i p hp q d hd => ?_⟩
+  ⟩
   obtain ⟨-, a, ht⟩ := hd
   obtain ⟨wf, R0, hR⟩ := hB p hp
-  exact _root_.GlobalTheory.BigTop.Fun.exists_unit_root_ze_leafC_of_square_nonzero p hp d a ht wf ⟨R0, hR⟩ (q d.G d.W d.n a ht.ok)
+  exact _root_.GlobalTheory.BigTop.Fun.exists_unit_root_ze_leafC_of_square_nonzero p hp d a ht wf
+    ⟨R0, hR⟩ (q d.G d.W d.n a ht.ok)
 end GlobalTheory.BigTop.Fun
 end
 end

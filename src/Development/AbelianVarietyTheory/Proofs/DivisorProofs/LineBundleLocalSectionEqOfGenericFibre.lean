@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open GlobalTheory.ProjSpace GlobalTheory.UMin.ThBdl
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -19,31 +22,52 @@ noncomputable section
 
 namespace GlobalTheory.UMin.ThBdl
 
-theorem genPt_dom {S : Scheme.{0}} [IsIntegral S] {K : Type} [Field K] (ξ : Sp K ⟶ S)
-    (hξ : Set.range ξ = {genericPoint S}) : QuasiCompact ξ ∧ IsSchemeTheoreticallyDominant ξ := by
-  have hd : IsDominant ξ := ⟨by
-    show Dense (Set.range ξ)
-    rw [hξ]
-    exact dense_iff_closure_eq.2 (genericPoint_spec S)⟩
+theorem genPt_dom
+    {S : Scheme.{0}} [IsIntegral S]
+    {K : Type} [Field K]
+    (ξ : Sp K ⟶ S) (hξ : Set.range ξ = {genericPoint S})
+    : QuasiCompact ξ ∧ IsSchemeTheoreticallyDominant ξ := by
+  have hd : IsDominant ξ :=
+    ⟨by
+      show Dense (Set.range ξ)
+      rw [hξ]
+      exact dense_iff_closure_eq.2 (genericPoint_spec S)⟩
   refine ⟨⟨fun U _ _ => (Set.subsingleton_of_subsingleton).isCompact⟩, ?_⟩
   exact IsSchemeTheoreticallyDominant.of_isDominant ξ
 
-theorem app_snd_injective {S : Scheme.{0}} [IsIntegral S] (G : Over S) [Flat G.hom] {K : Type} [Field K]
-    (ξ : Sp K ⟶ S) (hξ : Set.range ξ = {genericPoint S}) (O : G.left.Opens) :
-    Function.Injective ((snd (Over.mk ξ) G).left.app O).hom := by
+theorem app_snd_injective
+    {S : Scheme.{0}} [IsIntegral S]
+    (G : Over S) [Flat G.hom]
+    {K : Type} [Field K]
+    (ξ : Sp K ⟶ S) (hξ : Set.range ξ = {genericPoint S})
+    (O : G.left.Opens)
+    : Function.Injective ((snd (Over.mk ξ) G).left.app O).hom := by
   obtain ⟨_, _⟩ := genPt_dom ξ hξ
-  have hP : IsPullback (fst (Over.mk ξ) G).left (snd (Over.mk ξ) G).left ξ G.hom := .of_hasPullback _ _
-  have : IsSchemeTheoreticallyDominant (snd (Over.mk ξ) G).left := IsSchemeTheoreticallyDominant.of_isPullback hP
+  have hP : IsPullback (fst (Over.mk ξ) G).left (snd (Over.mk ξ) G).left ξ G.hom :=
+    .of_hasPullback _ _
+  have : IsSchemeTheoreticallyDominant (snd (Over.mk ξ) G).left :=
+    IsSchemeTheoreticallyDominant.of_isPullback hP
   have : QuasiCompact (snd (Over.mk ξ) G).left :=
     MorphismProperty.of_isPullback (P := @QuasiCompact) hP inferInstance
   exact (snd (Over.mk ξ) G).left.app_injective O
 
-theorem locSec_eq_of_genIs : ∀ (S : Scheme.{0}) [IsIntegral S] (G : Over S) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G →
-    ∀ (L : LB G.left) (K : Type) [Field K] (ξ : Sp K ⟶ S), Set.range ξ = {genericPoint S} →
-    ∀ (N N' : S.Opens) (s : LocSec G L N) (s' : LocSec G L N') (v : SecM G L 1 (Over.mk ξ)),
-      GenIs ξ s v → GenIs ξ s' v → ∀ i,
-        resG _ (fun _ hx => ⟨hx.1, hx.2.1⟩ : L.U i ⊓ G.hom ⁻¹ᵁ (N ⊓ N') ≤ L.U i ⊓ G.hom ⁻¹ᵁ N) (s i) =
-          resG _ (fun _ hx => ⟨hx.1, hx.2.2⟩ : L.U i ⊓ G.hom ⁻¹ᵁ (N ⊓ N') ≤ L.U i ⊓ G.hom ⁻¹ᵁ N') (s' i) := by
+theorem locSec_eq_of_genIs
+    : ∀ (S : Scheme.{0}) [IsIntegral S] (G : Over S) [GrpObj G] [IsCommMonObj G],
+      IsSemiAbelian G
+        → ∀ (L : LB G.left) (K : Type) [Field K] (ξ : Sp K ⟶ S),
+          Set.range ξ = {genericPoint S}
+            → ∀ (N N' : S.Opens) (s : LocSec G L N) (s' : LocSec G L N')
+                (v : SecM G L 1 (Over.mk ξ)),
+              GenIs ξ s v → GenIs ξ s' v
+                → ∀ i,
+                  resG _
+                      (fun _ hx => ⟨hx.1, hx.2.1⟩
+                        : L.U i ⊓ G.hom ⁻¹ᵁ (N ⊓ N') ≤ L.U i ⊓ G.hom ⁻¹ᵁ N)
+                      (s i)
+                    = resG _
+                      (fun _ hx => ⟨hx.1, hx.2.2⟩
+                        : L.U i ⊓ G.hom ⁻¹ᵁ (N ⊓ N') ≤ L.U i ⊓ G.hom ⁻¹ᵁ N')
+                      (s' i) := by
   intro S _ G _ _ hG L K _ ξ hξ N N' s s' v ⟨h₁, e₁⟩ ⟨h₂, e₂⟩ i
   have := hG.smooth
   have hfl : Flat G.hom := inferInstance
@@ -60,13 +84,17 @@ theorem locSec_eq_of_genIs : ∀ (S : Scheme.{0}) [IsIntegral S] (G : Over S) [G
     rw [← Scheme.Hom.app_eq_appLE]
     exact app_snd_injective G ξ hξ O
   apply hinj
-  have k₁ : ((snd (Over.mk ξ) G).left.appLE O W hle).hom
-      (resG _ (fun _ hx => ⟨hx.1, hx.2.1⟩ : O ≤ L.U i ⊓ G.hom ⁻¹ᵁ N) (s i)) = genPull h₁ s (fun _ => i) := by
+  have k₁
+      : ((snd (Over.mk ξ) G).left.appLE O W hle).hom
+          (resG _ (fun _ hx => ⟨hx.1, hx.2.1⟩ : O ≤ L.U i ⊓ G.hom ⁻¹ᵁ N) (s i))
+        = genPull h₁ s (fun _ => i) := by
     dsimp only [resG]
     rw [← CommRingCat.comp_apply, Scheme.Hom.map_appLE]
     rfl
-  have k₂ : ((snd (Over.mk ξ) G).left.appLE O W hle).hom
-      (resG _ (fun _ hx => ⟨hx.1, hx.2.2⟩ : O ≤ L.U i ⊓ G.hom ⁻¹ᵁ N') (s' i)) = genPull h₂ s' (fun _ => i) := by
+  have k₂
+      : ((snd (Over.mk ξ) G).left.appLE O W hle).hom
+          (resG _ (fun _ hx => ⟨hx.1, hx.2.2⟩ : O ≤ L.U i ⊓ G.hom ⁻¹ᵁ N') (s' i))
+        = genPull h₂ s' (fun _ => i) := by
     dsimp only [resG]
     rw [← CommRingCat.comp_apply, Scheme.Hom.map_appLE]
     rfl

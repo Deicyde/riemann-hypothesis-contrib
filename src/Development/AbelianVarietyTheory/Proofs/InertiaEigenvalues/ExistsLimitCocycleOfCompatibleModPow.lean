@@ -10,29 +10,39 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Coeffic
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 open Filter Topology Pointwise
 
 namespace GlobalTheory.LimCocycle
 
-theorem eventually_smul_mem {LL W : Type} [Field LL] [TopologicalSpace LL] [AddCommGroup W] [Module LL W]
-    [TopologicalSpace W] [ContinuousSMul LL W] (c : ℕ → LL) (hc : Tendsto c atTop (𝓝 0))
-    {K : Set W} (hK : IsCompact K) {U : Set W} (hU : U ∈ 𝓝 (0 : W)) :
-    ∀ᶠ m in atTop, ∀ y ∈ K, c m • y ∈ U := by
+theorem eventually_smul_mem
+    {LL W : Type} [Field LL] [TopologicalSpace LL] [AddCommGroup W] [Module LL W]
+    [TopologicalSpace W] [ContinuousSMul LL W]
+    (c : ℕ → LL) (hc : Tendsto c atTop (𝓝 0))
+    {K : Set W} (hK : IsCompact K)
+    {U : Set W} (hU : U ∈ 𝓝 (0 : W))
+    : ∀ᶠ m in atTop, ∀ y ∈ K, c m • y ∈ U := by
   have h : ∀ᶠ a in 𝓝 (0 : LL), ∀ y ∈ K, a • y ∈ U := by
     refine hK.eventually_forall_of_forall_eventually (fun y _ => ?_)
-    have := (continuous_fst.smul continuous_snd : Continuous fun p : LL × W => p.1 • p.2).tendsto ((0 : LL), y)
+    have :=
+      (continuous_fst.smul continuous_snd : Continuous fun p : LL × W => p.1 • p.2).tendsto
+        ((0 : LL), y)
     exact this.eventually_mem (by simpa using hU)
   exact hc.eventually h
 
-theorem isCompact_of_fg {O LL V : Type} [CommRing O] [Field LL] [Algebra O LL] [TopologicalSpace LL]
-    [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V] [TopologicalSpace V]
-    [ContinuousAdd V] [ContinuousSMul LL V]
-    (hc : IsCompact (Set.range (algebraMap O LL))) (T : Submodule O V) (hT : T.FG) :
-    IsCompact (T : Set V) := by
+theorem isCompact_of_fg
+    {O LL V : Type}
+    [CommRing O] [Field LL] [Algebra O LL] [TopologicalSpace LL] [AddCommGroup V] [Module LL V]
+    [Module O V] [IsScalarTower O LL V] [TopologicalSpace V] [ContinuousAdd V] [ContinuousSMul LL V]
+    (hc : IsCompact (Set.range (algebraMap O LL)))
+    (T : Submodule O V) (hT : T.FG)
+    : IsCompact (T : Set V) := by
   obtain ⟨n, s, hs⟩ := Submodule.fg_iff_exists_fin_generating_family.1 hT
-  have heq : (T : Set V) = (fun c : Fin n → LL => ∑ i, c i • s i) ''
-      (Set.univ.pi fun _ => Set.range (algebraMap O LL)) := by
+  have heq
+      : (T : Set V)
+        = (fun c : Fin n → LL => ∑ i, c i • s i)
+          '' (Set.univ.pi fun _ => Set.range (algebraMap O LL)) := by
     ext x
     constructor
     · intro hx
@@ -59,9 +69,26 @@ end GlobalTheory.LimCocycle
 
 namespace GlobalTheory.LimCocycle
 
-theorem limit_cocycle : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∀ (A : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ) (ϖ : O), Irreducible ϖ → ∀ (hI : ∀ n : ℕ, StableSub LA (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T)) (w : ℕ → ↥(GK K) → ↥LA.T), (∀ n, (fun g => (Submodule.Quotient.mk (w n g) : ↥LA.T ⧸ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T))) ∈ quotientCocycles LA _ (hI n)) → (∀ n g, w (n + 1) g - w n g ∈ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T)) → ∃ d ∈ latticeCocycles LA, ∀ n g, ∃ t ∈ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T), d g = (w n g : A.V) + (t : A.V) := by
+theorem limit_cocycle
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL]
+        [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL],
+      GoodO (Qp := ℚ_[l]) LL O
+        → ∀ (A : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ) (ϖ : O),
+          Irreducible ϖ
+            → ∀ (hI : ∀ n : ℕ, StableSub LA (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T))
+                (w : ℕ → ↥(GK K) → ↥LA.T),
+              (∀ n,
+                  (fun g =>
+                      (Submodule.Quotient.mk (w n g)
+                        : ↥LA.T ⧸ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T)))
+                    ∈ quotientCocycles LA _ (hI n))
+                → (∀ n g, w (n + 1) g - w n g ∈ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T))
+                → ∃ d ∈ latticeCocycles LA, ∀ n g,
+                  ∃ t ∈ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T),
+                    d g = (w n g : A.V) + (t : A.V) := by
   intro l _ K LL _ _ _ O _ _ hG A LA ϖ hϖ hI w hw hstep
-  have hcO : IsCompact (Set.range (algebraMap O LL)) := (GlobalTheory.T.coefficient_ring_integers_compact_adic_properties l LL O hG).2.1
+  have hcO : IsCompact (Set.range (algebraMap O LL)) :=
+    (GlobalTheory.T.coefficient_ring_integers_compact_adic_properties l LL O hG).2.1
   obtain ⟨⟨hD, hDVR, hFr⟩, hfin, hmod, htop, hopen⟩ := hG
   haveI := hD
   haveI := hDVR
@@ -87,7 +114,9 @@ theorem limit_cocycle : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) 
         funext Algebra.algebraMap_eq_smul_one
       rw [h]
       exact continuous_id.smul continuous_const
-    have h1 := (hcont.tendsto 0).comp (tendsto_pow_atTop_nhds_zero_of_norm_lt_one (Padic.norm_p_lt_one (p := l)))
+    have h1 :=
+      (hcont.tendsto 0).comp
+        (tendsto_pow_atTop_nhds_zero_of_norm_lt_one (Padic.norm_p_lt_one (p := l)))
     rw [map_zero] at h1
     refine h1.congr (fun m => ?_)
     simp [c, Function.comp, map_pow, map_natCast]
@@ -96,7 +125,8 @@ theorem limit_cocycle : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) 
     intro h
     have h2 := congrArg (algebraMap O LL) h
     rw [map_natCast, map_zero, ← map_natCast (algebraMap ℚ_[l] LL),
-      map_eq_zero_iff _ (algebraMap ℚ_[l] LL).injective, Nat.cast_eq_zero] at h2
+        map_eq_zero_iff _ (algebraMap ℚ_[l] LL).injective, Nat.cast_eq_zero]
+      at h2
     exact hlpr.ne_zero h2
   have hlnu : ¬ IsUnit ((l : ℕ) : O) := by
     intro hu
@@ -115,9 +145,11 @@ theorem limit_cocycle : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) 
   have hQmono : ∀ m n, m ≤ n → Q n ≤ Q m := by
     intro m n hmn x hx
     obtain ⟨y, hy, rfl⟩ := (Submodule.mem_smul_pointwise_iff_exists _ _ _).1 hx
-    refine (Submodule.mem_smul_pointwise_iff_exists _ _ _).2 ⟨ϖ ^ (n - m) • y, LA.T.smul_mem _ hy, ?_⟩
+    refine (Submodule.mem_smul_pointwise_iff_exists _ _ _).2
+      ⟨ϖ ^ (n - m) • y, LA.T.smul_mem _ hy, ?_⟩
     rw [smul_smul, ← pow_add, Nat.add_sub_cancel' hmn]
-  have hmem : ∀ n (t : ↥LA.T), t ∈ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T) ↔ (t : A.V) ∈ Q n := by
+  have hmem
+      : ∀ n (t : ↥LA.T), t ∈ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T) ↔ (t : A.V) ∈ Q n := by
     intro n t
     rw [Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists,
       Submodule.mem_smul_pointwise_iff_exists]
@@ -159,21 +191,22 @@ theorem limit_cocycle : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) 
   have hlim : ∀ g, ∃ x : A.V, ∀ n, x - (w n g : A.V) ∈ Q n := by
     intro g
     let C : ℕ → Set A.V := fun n => (fun x => x - (w n g : A.V)) ⁻¹' (Q n : Set A.V)
-    have hne := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed C
-      (fun n x hx => by
-        have h1 : x - (w (n + 1) g : A.V) ∈ Q n := hQmono n (n + 1) (Nat.le_succ n) hx
-        have h2 : ((w (n + 1) g : A.V) - (w n g : A.V)) ∈ Q n := by
-          have := (hmem n _).1 (hstep n g)
-          simpa using this
-        show x - (w n g : A.V) ∈ Q n
-        have := (Q n).add_mem h1 h2
-        simpa using this)
-      (fun n => ⟨w n g, by simp [C]⟩)
-      (by
-        have : C 0 = (Homeomorph.subRight (w 0 g : A.V)) ⁻¹' (Q 0 : Set A.V) := rfl
-        rw [this]
-        exact (Homeomorph.subRight (w 0 g : A.V)).isCompact_preimage.2 (hQc 0))
-      (fun n => (hQc n).isClosed.preimage (continuous_sub_right _))
+    have hne :=
+      IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed C
+        (fun n x hx => by
+          have h1 : x - (w (n + 1) g : A.V) ∈ Q n := hQmono n (n + 1) (Nat.le_succ n) hx
+          have h2 : ((w (n + 1) g : A.V) - (w n g : A.V)) ∈ Q n := by
+            have := (hmem n _).1 (hstep n g)
+            simpa using this
+          show x - (w n g : A.V) ∈ Q n
+          have := (Q n).add_mem h1 h2
+          simpa using this)
+        (fun n => ⟨w n g, by simp [C]⟩)
+        (by
+          have : C 0 = (Homeomorph.subRight (w 0 g : A.V)) ⁻¹' (Q 0 : Set A.V) := rfl
+          rw [this]
+          exact (Homeomorph.subRight (w 0 g : A.V)).isCompact_preimage.2 (hQc 0))
+        (fun n => (hQc n).isClosed.preimage (continuous_sub_right _))
     obtain ⟨x, hx⟩ := hne
     exact ⟨x, fun n => Set.mem_iInter.1 hx n⟩
   choose d hd using hlim
@@ -195,8 +228,10 @@ theorem limit_cocycle : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) 
     intro g h
     have : d (g * h) - d g - A.ρ g (d h) = 0 := by
       refine hsep _ (fun n => ?_)
-      have e : d (g * h) - d g - A.ρ g (d h) = (d (g * h) - w n (g * h)) - (d g - w n g)
-          - A.ρ g (d h - w n h) + ((w n (g * h) : A.V) - w n g - A.ρ g (w n h)) := by
+      have e
+          : d (g * h) - d g - A.ρ g (d h)
+            = (d (g * h) - w n (g * h)) - (d g - w n g) - A.ρ g (d h - w n h)
+              + ((w n (g * h) : A.V) - w n g - A.ρ g (w n h)) := by
         rw [map_sub]; abel
       rw [e]
       exact (Q n).add_mem ((Q n).sub_mem ((Q n).sub_mem (hd _ n) (hd g n)) (hQρ n g _ (hd h n)))

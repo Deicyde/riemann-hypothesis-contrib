@@ -10,16 +10,21 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.Proposition5Numerics
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
 open Formalism.MainNotions.G.WittFrameLocaliserOrders Formalism.MainNotions.G.symbolGeneratorData
 
-theorem vb_arith1 (T s c : ℝ) (hc : 0 ≤ c) : T - s / 2 - 60 * c ≤ T - s / 8 - 3 / 8 * s - 24 * c := by linarith
+theorem vb_arith1 (T s c : ℝ) (hc : 0 ≤ c)
+    : T - s / 2 - 60 * c ≤ T - s / 8 - 3 / 8 * s - 24 * c := by
+  linarith
 
-theorem vb_arith2 (T s c : ℝ) (hs : 0 ≤ s) : T - s / 2 - 60 * c ≤ T - 3 / 8 * s - 60 * c := by linarith
+theorem vb_arith2 (T s c : ℝ) (hs : 0 ≤ s) : T - s / 2 - 60 * c ≤ T - 3 / 8 * s - 60 * c := by
+  linarith
 
-theorem multideg_mapDomain {ι κ : Type} [Fintype ι] {n : ℕ} (g : ι → κ) (u : ι × Fin n →₀ ℕ) (i : κ) :
-    multideg (Finsupp.mapDomain (fun v : ι × Fin n => (g v.1, v.2)) u) i =
-      ∑ x : ι, if g x = i then multideg u x else 0 := by
+theorem multideg_mapDomain {ι κ : Type} [Fintype ι] {n : ℕ} (g : ι → κ) (u : ι × Fin n →₀ ℕ) (i : κ)
+    : multideg (Finsupp.mapDomain (fun v : ι × Fin n => (g v.1, v.2)) u) i
+      = ∑ x : ι, if g x = i then multideg u x else 0 := by
   unfold multideg
   induction u using Finsupp.induction_linear with
   | zero => simp
@@ -54,8 +59,9 @@ section L
 
 variable {n' r : ℕ} [NeZero n'] {Fr : Frames n' r} {L₁ N₁ : ℕ} {J : ℕ} {nL : ZMod J → ℕ}
 
-theorem ml_mem_letters (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) (y : ML J nL r) :
-    (mlPos Fr nL y).2 ∈ Fr.letters (segZ (mlPos Fr nL y).1) := by
+theorem ml_mem_letters
+    (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) (y : ML J nL r)
+    : (mlPos Fr nL y).2 ∈ Fr.letters (segZ (mlPos Fr nL y).1) := by
   have hv := hV
   obtain ⟨-, -, hinc, hstep, hTT, -⟩ := hv
   have hmon : ∀ k : ℤ, ∀ a b : ℕ, a ≤ b → b < r → Fr.fr k a ≤ Fr.fr k b := by
@@ -93,8 +99,10 @@ theorem ml_mem_letters (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL
     simp only [mlPos]
     exact fr_mem_letters hV hr _ _ (by omega)
 
-theorem tl_mem_letters (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) (x : TL J nL r) :
-    (tlPos Fr nL x).2 ∈ Fr.letters (segZ (tlPos Fr nL x).1) ∧ ¬ Fr.IsW (segZ (tlPos Fr nL x).1) (tlPos Fr nL x).2 := by
+theorem tl_mem_letters
+    (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) (x : TL J nL r)
+    : (tlPos Fr nL x).2 ∈ Fr.letters (segZ (tlPos Fr nL x).1)
+      ∧ ¬ Fr.IsW (segZ (tlPos Fr nL x).1) (tlPos Fr nL x).2 := by
   have hv := hV
   obtain ⟨-, -, hinc, hstep, -⟩ := hv
   have hmon : ∀ k : ℤ, ∀ a b : ℕ, a ≤ b → b < r → Fr.fr k a ≤ Fr.fr k b := by
@@ -128,14 +136,20 @@ end L
 
 section Main
 
-variable (p : ℕ) {n' r K : ℕ} [NeZero n'] [NeZero r] [NeZero K] (O : Type) [CommRing O] [IsDomain O]
-  [IsDiscreteValuationRing O] (Fr : Frames n' r) (TT : Finset (Fin n')) (L₁ L₂ N₁ G' : ℕ) (deg d : Fin n' → ℕ) (Y : ℝ)
-  (cP : ℕ) {J : ℕ} [NeZero J] (Dt : SignedChainData p O r J) (dPl dNo : TL J Dt.nL r → ℕ) (ka : ZMod J → ℕ → Fin K → ℤ)
-  (rho : TL J Dt.nL r × Fin (r + K) → ℕ) (No : MvPolynomial (TL J Dt.nL r × Fin K) O)
-  (Go : MvPolynomial (ML J Dt.nL r × Fin r) O)
+variable
+  (p : ℕ)
+  {n' r K : ℕ} [NeZero n'] [NeZero r] [NeZero K]
+  (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  (Fr : Frames n' r) (TT : Finset (Fin n')) (L₁ L₂ N₁ G' : ℕ) (deg d : Fin n' → ℕ) (Y : ℝ) (cP : ℕ)
+  {J : ℕ} [NeZero J]
+  (Dt : SignedChainData p O r J) (dPl dNo : TL J Dt.nL r → ℕ)
+  (ka : ZMod J → ℕ → Fin K → ℤ) (rho : TL J Dt.nL r × Fin (r + K) → ℕ)
+  (No : MvPolynomial (TL J Dt.nL r × Fin K) O) (Go : MvPolynomial (ML J Dt.nL r × Fin r) O)
 
-theorem valBd_of (hM : MFH p Fr TT L₁ L₂ N₁ G' deg d Y (r + K) cP)
-    (hH : MH p O Fr deg Y N₁ G' cP d Dt dPl dNo ka rho No Go) : ValBd p O Fr deg Y N₁ G' cP Dt ka No Go := by
+theorem valBd_of
+    (hM : MFH p Fr TT L₁ L₂ N₁ G' deg d Y (r + K) cP)
+    (hH : MH p O Fr deg Y N₁ G' cP d Dt dPl dNo ka rho No Go)
+    : ValBd p O Fr deg Y N₁ G' cP Dt ka No Go := by
   have hF := hM.frames
   have hV : Fr.Valid L₁ N₁ := hF.2.1
   have hr : 1 ≤ r := by
@@ -166,24 +180,30 @@ theorem valBd_of (hM : MFH p Fr TT L₁ L₂ N₁ G' deg d Y (r + K) cP)
       simp only [hu'] at hpre
       apply val_of_pre Dt hV hsgn Go _ _ hpre
       have h1 := hYl j ⟨r - 1 - (u - Dt.nL j), hm⟩ hmm2
-      have h2 := Formalism.MainNotions.G.Joints.valS_le_union Dt.modelLet (Dt.linkML j ⟨r - 1 - (u - Dt.nL j), hm⟩)
-        {y : ML J Dt.nL r | ∃ m' : Fin r, (⟨r - 1 - (u - Dt.nL j), hm⟩ : Fin r) < m' ∧ y = ML.lab j m'}
-        (by
-          rintro _ ⟨m', -, rfl⟩
-          rfl)
-        (MvPolynomial.map (algebraMap O (KK O)) Go)
+      have h2 :=
+        Formalism.MainNotions.G.Joints.valS_le_union Dt.modelLet
+          (Dt.linkML j ⟨r - 1 - (u - Dt.nL j), hm⟩)
+          {y : ML J Dt.nL r | ∃ m' : Fin r, (⟨r - 1 - (u - Dt.nL j), hm⟩ : Fin r) < m' ∧ y = ML.lab j m'}
+          (by
+            rintro _ ⟨m', -, rfl⟩
+            rfl)
+          (MvPolynomial.map (algebraMap O (KK O)) Go)
       have hs : (0 : ℝ) ≤ slU Fr p deg Y (r + K) Dt.nL j u := by
-        have hx := tl_mem_letters hV hr hnL (⟨j, Sum.inr ⟨r - 1 - (u - Dt.nL j), hm⟩⟩ : TL J Dt.nL r)
+        have hx :=
+          tl_mem_letters hV hr hnL (⟨j, Sum.inr ⟨r - 1 - (u - Dt.nL j), hm⟩⟩ : TL J Dt.nL r)
         have hmg := hM.margin _ _ hx.1 hx.2
-        have hpos : (tlPos Fr Dt.nL (⟨j, Sum.inr ⟨r - 1 - (u - Dt.nL j), hm⟩⟩ : TL J Dt.nL r)) =
-            (j, posU Fr (Dt.nL j) (segZ j) u) := by
+        have hpos
+            : (tlPos Fr Dt.nL (⟨j, Sum.inr ⟨r - 1 - (u - Dt.nL j), hm⟩⟩ : TL J Dt.nL r))
+              = (j, posU Fr (Dt.nL j) (segZ j) u) := by
           simp only [tlPos, posTL, posU, if_neg (show ¬ u < Dt.nL j by omega)]
           congr 2
           omega
         rw [hpos] at hmg
         unfold slU
         have hcp : (0 : ℝ) ≤ 128 * (cP : ℝ) := by positivity
-        have hmg' : (128 * (cP : ℝ)) ≤ ((sl p Fr deg Y (r + K) (segZ j) (posU Fr (Dt.nL j) (segZ j) u) : ℤ) : ℝ) := by
+        have hmg'
+            : (128 * (cP : ℝ))
+              ≤ ((sl p Fr deg Y (r + K) (segZ j) (posU Fr (Dt.nL j) (segZ j) u) : ℤ) : ℝ) := by
           exact_mod_cast hmg
         linarith
       intro k hk
@@ -195,8 +215,9 @@ theorem valBd_of (hM : MFH p Fr TT L₁ L₂ N₁ G' deg d Y (r + K) cP)
       rw [hthL j _ hmm2, hc] at h3
       simp only [hu'] at h3
       unfold tauU
-      have h5 := vb_arith2 (thStar Fr p deg Y (r + K) (mStar p Fr (r + K) N₁ (p ^ G') cP) Dt.nL K ka j u)
-        (slU Fr p deg Y (r + K) Dt.nL j u) (cP : ℝ) hs
+      have h5 :=
+        vb_arith2 (thStar Fr p deg Y (r + K) (mStar p Fr (r + K) N₁ (p ^ G') cP) Dt.nL K ka j u)
+          (slU Fr p deg Y (r + K) Dt.nL j u) (cP : ℝ) hs
       have h6 : (k' : ℝ) ≤ (k : ℝ) := by exact_mod_cast h4
       linarith
   · intro j u hu
@@ -212,11 +233,15 @@ theorem valBd_of (hM : MFH p Fr TT L₁ L₂ N₁ G' deg d Y (r + K) cP)
     exact vb_arith1 _ _ _ hc0
   · intro j u hu
     unfold pU
-    exact ⟨lam_of_pre Dt hV hsgn No _ _ (tl_pre_lt hV hnL j u hu) _ (hNorm j u hu.le),
-      lam_of_pre Dt hV hsgn No _ _ (tl_pre_le hV hnL j u hu) _ (hNorm j (u + 1) hu)⟩
+    exact ⟨
+      lam_of_pre Dt hV hsgn No _ _ (tl_pre_lt hV hnL j u hu) _ (hNorm j u hu.le),
+      lam_of_pre Dt hV hsgn No _ _ (tl_pre_le hV hnL j u hu) _ (hNorm j (u + 1) hu)
+    ⟩
 
-theorem suppOK_of (hM : MFH p Fr TT L₁ L₂ N₁ G' deg d Y (r + K) cP)
-    (hH : MH p O Fr deg Y N₁ G' cP d Dt dPl dNo ka rho No Go) : SuppOK p O Fr Dt dNo No Go := by
+theorem suppOK_of
+    (hM : MFH p Fr TT L₁ L₂ N₁ G' deg d Y (r + K) cP)
+    (hH : MH p O Fr deg Y N₁ G' cP d Dt dPl dNo ka rho No Go)
+    : SuppOK p O Fr Dt dNo No Go := by
   unfold MH SignedChainDegreeCondition Tied NormTest at hH
   obtain ⟨⟨⟨hJ, hnL, -⟩, -⟩, -, ⟨-, hPol, -⟩, -⟩ := hH
   have hF := hM.frames
@@ -261,7 +286,9 @@ end Main
 
 theorem restValBdG : RestValBdG := by
   intro p _ n' r K _ _ _ O _ _ _ _ Fr TT L₁ L₂ N₁ G' deg d Y cP hM J _ Dt dPl dNo ka rho No Go hH
-  exact ⟨valBd_of p O Fr TT L₁ L₂ N₁ G' deg d Y cP Dt dPl dNo ka rho No Go hM hH,
-    suppOK_of p O Fr TT L₁ L₂ N₁ G' deg d Y cP Dt dPl dNo ka rho No Go hM hH⟩
+  exact ⟨
+    valBd_of p O Fr TT L₁ L₂ N₁ G' deg d Y cP Dt dPl dNo ka rho No Go hM hH,
+    suppOK_of p O Fr TT L₁ L₂ N₁ G' deg d Y cP Dt dPl dNo ka rho No Go hM hH
+  ⟩
 
 end Formalism.MainNotions.Proposition5Numerics

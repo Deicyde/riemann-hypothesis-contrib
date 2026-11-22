@@ -15,25 +15,31 @@ variable {k Γ : Type*} [Field k] [LinearOrderedCommGroupWithZero Γ]
 def Cong (v : Valuation k Γ) (r : Γ) {n : ℕ} (A : Matrix (Fin n) (Fin n) k) : Prop :=
   ∀ i j, v (A i j - (1 : Matrix (Fin n) (Fin n) k) i j) ≤ r
 
-theorem exists_udl (v : Valuation k Γ) {r : Γ} (hr : r < 1) (n : ℕ)
-    (g : Matrix (Fin n) (Fin n) k) (hg : Cong v r g) :
-    ∃ u d l : Matrix (Fin n) (Fin n) k, Cong v r u ∧ Cong v r l ∧
-      (∀ i j, j < i → u i j = 0) ∧ (∀ i, u i i = 1) ∧ (∀ i j, i ≠ j → d i j = 0) ∧
-      (∀ i j, i < j → l i j = 0) ∧ (∀ i, l i i = 1) ∧ g = u * d * l := by
+theorem exists_udl
+    (v : Valuation k Γ)
+    {r : Γ} (hr : r < 1)
+    (n : ℕ) (g : Matrix (Fin n) (Fin n) k) (hg : Cong v r g)
+    : ∃ u d l : Matrix (Fin n) (Fin n) k,
+      Cong v r u ∧ Cong v r l ∧ (∀ i j, j < i → u i j = 0) ∧ (∀ i, u i i = 1)
+        ∧ (∀ i j, i ≠ j → d i j = 0) ∧ (∀ i j, i < j → l i j = 0) ∧ (∀ i, l i i = 1)
+        ∧ g = u * d * l := by
   classical
-  let I : Ideal v.integer :=
-    { carrier := {x | v (x : k) ≤ r}
-      add_mem' := fun {a b} ha hb => by
-        have := Valuation.map_add_le v ha hb
-        simpa using this
-      zero_mem' := by simp
-      smul_mem' := fun c x hx => by
-        have hc : v (c : k) ≤ 1 := c.2
-        have hx' : v (x : k) ≤ r := hx
-        show v ((c * x : v.integer) : k) ≤ r
-        rw [Subring.coe_mul, map_mul]
-        calc v (c : k) * v (x : k) ≤ 1 * r := mul_le_mul' hc hx'
-          _ = r := one_mul r }
+  let I : Ideal v.integer := {
+    carrier := {x | v (x : k) ≤ r}
+    add_mem' := fun {a b} ha hb => by
+      have := Valuation.map_add_le v ha hb
+      simpa using this
+    zero_mem' := by simp
+    smul_mem' := fun c x hx => by
+      have hc : v (c : k) ≤ 1 := c.2
+      have hx' : v (x : k) ≤ r := hx
+      show v ((c * x : v.integer) : k) ≤ r
+      rw [Subring.coe_mul, map_mul]
+      calc
+        v (c : k) * v (x : k)
+          ≤ 1 * r := mul_le_mul' hc hx'
+        _ = r := one_mul r
+  }
   have hImem : ∀ x : v.integer, x ∈ I ↔ v (x : k) ≤ r := fun x => Iff.rfl
   have hI : ∀ x ∈ I, IsUnit (1 + x) := by
     intro x hx
@@ -59,8 +65,10 @@ theorem exists_udl (v : Valuation k Γ) {r : Γ} (hr : r < 1) (n : ℕ)
     have := Valuation.map_add_le v ((hg i j).trans hr.le) (hone i j)
     simpa using this
   let g' : Matrix (Fin n) (Fin n) v.integer := fun i j => ⟨g i j, hint i j⟩
-  have hone' : ∀ i j, (((1 : Matrix (Fin n) (Fin n) v.integer) i j : v.integer) : k) =
-      (1 : Matrix (Fin n) (Fin n) k) i j := by
+  have hone'
+      : ∀ i j,
+        (((1 : Matrix (Fin n) (Fin n) v.integer) i j : v.integer) : k)
+          = (1 : Matrix (Fin n) (Fin n) k) i j := by
     intro i j
     by_cases h : i = j
     · subst h
@@ -71,15 +79,27 @@ theorem exists_udl (v : Valuation k Γ) {r : Γ} (hr : r < 1) (n : ℕ)
     rw [hImem, AddSubgroupClass.coe_sub, hone']
     exact hg i j
   obtain ⟨u, d, l, hu, hd, hl, h⟩ := IwahoriUDL.exists_udl_of_isUnit I hI n g' hg'
-  have back : ∀ a : Matrix (Fin n) (Fin n) v.integer,
-      (∀ i j, a i j - (1 : Matrix (Fin n) (Fin n) v.integer) i j ∈ I) →
-        Cong v r (a.map v.integer.subtype) := by
+  have back
+      : ∀ a : Matrix (Fin n) (Fin n) v.integer,
+        (∀ i j, a i j - (1 : Matrix (Fin n) (Fin n) v.integer) i j ∈ I)
+          → Cong v r (a.map v.integer.subtype) := by
     intro a ha i j
     have := (hImem _).1 (ha i j)
     rw [AddSubgroupClass.coe_sub, hone'] at this
     exact this
-  refine ⟨u.map v.integer.subtype, d.map v.integer.subtype, l.map v.integer.subtype,
-    back u hu.1, back l hl.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    u.map v.integer.subtype,
+    d.map v.integer.subtype,
+    l.map v.integer.subtype,
+    back u hu.1,
+    back l hl.1,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro i j hij
     simp [hu.2.1 i j hij]
   · intro i
@@ -95,12 +115,15 @@ theorem exists_udl (v : Valuation k Γ) {r : Γ} (hr : r < 1) (n : ℕ)
       rfl
     rw [hgg, h, Matrix.map_mul, Matrix.map_mul]
 
-theorem up_split (v : Valuation k Γ) {r : Γ} (hr : r < 1) {n : ℕ} (β : Fin n → ℕ)
-    (hβ : Monotone β) (u : Matrix (Fin n) (Fin n) k) (hu : Cong v r u)
-    (hu0 : ∀ i j, j < i → u i j = 0) (hu1 : ∀ i, u i i = 1) :
-    ∃ a m : Matrix (Fin n) (Fin n) k, a.det = 1 ∧ m.det = 1 ∧ Cong v r a ∧ Cong v r m ∧
-      (∀ i j, β j ≤ β i → a i j = (1 : Matrix (Fin n) (Fin n) k) i j) ∧
-      (∀ i j, β i ≠ β j → m i j = 0) ∧ u = a * m := by
+theorem up_split
+    (v : Valuation k Γ)
+    {r : Γ} (hr : r < 1)
+    {n : ℕ} (β : Fin n → ℕ) (hβ : Monotone β) (u : Matrix (Fin n) (Fin n) k) (hu : Cong v r u)
+    (hu0 : ∀ i j, j < i → u i j = 0) (hu1 : ∀ i, u i i = 1)
+    : ∃ a m : Matrix (Fin n) (Fin n) k,
+      a.det = 1 ∧ m.det = 1 ∧ Cong v r a ∧ Cong v r m
+        ∧ (∀ i j, β j ≤ β i → a i j = (1 : Matrix (Fin n) (Fin n) k) i j)
+        ∧ (∀ i j, β i ≠ β j → m i j = 0) ∧ u = a * m := by
   classical
   let m : Matrix (Fin n) (Fin n) k := fun i j => if β i = β j then u i j else 0
   have hmb : ∀ i j, β i ≠ β j → m i j = 0 := fun i j h => if_neg h
@@ -111,8 +134,9 @@ theorem up_split (v : Valuation k Γ) {r : Γ} (hr : r < 1) {n : ℕ} (β : Fin 
     · rw [hmu i j hb, hu0 i j h]
     · exact hmb i j hb
   have hm1 : ∀ i, m i i = 1 := fun i => by rw [hmu i i rfl, hu1]
-  have hdet : ∀ A : Matrix (Fin n) (Fin n) k, (∀ i j, j < i → A i j = 0) → (∀ i, A i i = 1) →
-      A.det = 1 := by
+  have hdet
+      : ∀ A : Matrix (Fin n) (Fin n) k,
+        (∀ i j, j < i → A i j = 0) → (∀ i, A i i = 1) → A.det = 1 := by
     intro A h0 h1
     rw [Matrix.det_of_upperTriangular (fun i j h => h0 i j h)]
     simp [h1]
@@ -169,21 +193,24 @@ theorem up_split (v : Valuation k Γ) {r : Γ} (hr : r < 1) {n : ℕ} (β : Fin 
       rw [key, hmw]
   · rw [Matrix.mul_assoc, hwm, Matrix.mul_one]
 
-theorem cong_transpose (v : Valuation k Γ) {r : Γ} {n : ℕ} {A : Matrix (Fin n) (Fin n) k}
-    (hA : Cong v r A) : Cong v r Aᵀ := by
+theorem cong_transpose
+    (v : Valuation k Γ) {r : Γ} {n : ℕ} {A : Matrix (Fin n) (Fin n) k} (hA : Cong v r A)
+    : Cong v r Aᵀ := by
   intro i j
   have h1 : (1 : Matrix (Fin n) (Fin n) k) i j = (1 : Matrix (Fin n) (Fin n) k) j i := by
     simp [Matrix.one_apply, eq_comm]
   rw [h1, Matrix.transpose_apply]
   exact hA j i
 
-theorem units_conj {M : Type*} [Monoid M] (p q : Mˣ) (x : M) :
-    ((p⁻¹ : Mˣ) : M) * ((p : M) * x * (q : M)) * ((q⁻¹ : Mˣ) : M) = x := by
+theorem units_conj {M : Type*} [Monoid M] (p q : Mˣ) (x : M)
+    : ((p⁻¹ : Mˣ) : M) * ((p : M) * x * (q : M)) * ((q⁻¹ : Mˣ) : M) = x := by
   simp [mul_assoc]
 
-theorem blockDiag_mul {n : ℕ} (β : Fin n → ℕ) {A B : Matrix (Fin n) (Fin n) k}
-    (hA : ∀ i j, β i ≠ β j → A i j = 0) (hB : ∀ i j, β i ≠ β j → B i j = 0) :
-    ∀ i j, β i ≠ β j → (A * B) i j = 0 := by
+theorem blockDiag_mul
+    {n : ℕ} (β : Fin n → ℕ)
+    {A B : Matrix (Fin n) (Fin n) k}
+    (hA : ∀ i j, β i ≠ β j → A i j = 0) (hB : ∀ i j, β i ≠ β j → B i j = 0)
+    : ∀ i j, β i ≠ β j → (A * B) i j = 0 := by
   intro i j hij
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_zero fun x _ => ?_
@@ -191,24 +218,32 @@ theorem blockDiag_mul {n : ℕ} (β : Fin n → ℕ) {A B : Matrix (Fin n) (Fin 
   · rw [hB x j (fun e => hij (hx.trans e)), mul_zero]
   · rw [hA i x hx, zero_mul]
 
-theorem factor (v : Valuation k Γ) {r : Γ} (hr : r < 1) {n : ℕ} (β : Fin n → ℕ)
-    (hβ : Monotone β) (g : GL (Fin n) k) (hg : Cong v r (g : Matrix (Fin n) (Fin n) k)) :
-    ∃ nm : GL (Fin n) k, Cong v r (nm : Matrix (Fin n) (Fin n) k) ∧
-    ∃ l : GL (Fin n) k, Cong v r (l : Matrix (Fin n) (Fin n) k) ∧
-    ∃ np : GL (Fin n) k, Cong v r (np : Matrix (Fin n) (Fin n) k) ∧
-      (∀ i j, β i ≤ β j → (nm : Matrix (Fin n) (Fin n) k) i j =
-        (1 : Matrix (Fin n) (Fin n) k) i j) ∧
-      (∀ i j, β i ≠ β j → (l : Matrix (Fin n) (Fin n) k) i j = 0) ∧
-      (∀ i j, β j ≤ β i → (np : Matrix (Fin n) (Fin n) k) i j =
-        (1 : Matrix (Fin n) (Fin n) k) i j) ∧ g = np * l * nm := by
+theorem factor
+    (v : Valuation k Γ)
+    {r : Γ} (hr : r < 1)
+    {n : ℕ} (β : Fin n → ℕ) (hβ : Monotone β) (g : GL (Fin n) k)
+    (hg : Cong v r (g : Matrix (Fin n) (Fin n) k))
+    : ∃ nm : GL (Fin n) k,
+      Cong v r (nm : Matrix (Fin n) (Fin n) k)
+        ∧ ∃ l : GL (Fin n) k,
+          Cong v r (l : Matrix (Fin n) (Fin n) k)
+            ∧ ∃ np : GL (Fin n) k,
+              Cong v r (np : Matrix (Fin n) (Fin n) k)
+                ∧ (∀ i j,
+                  β i ≤ β j
+                    → (nm : Matrix (Fin n) (Fin n) k) i j = (1 : Matrix (Fin n) (Fin n) k) i j)
+                ∧ (∀ i j, β i ≠ β j → (l : Matrix (Fin n) (Fin n) k) i j = 0)
+                ∧ (∀ i j,
+                  β j ≤ β i
+                    → (np : Matrix (Fin n) (Fin n) k) i j = (1 : Matrix (Fin n) (Fin n) k) i j)
+                ∧ g = np * l * nm := by
   classical
   obtain ⟨u, d, t, hu, ht, hu0, hu1, hd0, ht0, ht1, hudt⟩ := exists_udl v hr n _ hg
   obtain ⟨a, m, had, hmd, haC, hmC, hab, hmb, huam⟩ := up_split v hr β hβ u hu hu0 hu1
   have htC : Cong v r tᵀ := cong_transpose v ht
   obtain ⟨b, c, hbd, hcd, hbC, hcC, hbb, hcb, htbc⟩ :=
     up_split v hr β hβ tᵀ htC (fun i j h => ht0 j i h) ht1
-  have htt : t = cᵀ * bᵀ := by
-    rw [← Matrix.transpose_mul, ← htbc, Matrix.transpose_transpose]
+  have htt : t = cᵀ * bᵀ := by rw [← Matrix.transpose_mul, ← htbc, Matrix.transpose_transpose]
   have hbtC : Cong v r bᵀ := cong_transpose v hbC
   let npg : GL (Fin n) k := Matrix.nonsingInvUnit a (by simp [had])
   let nmg : GL (Fin n) k := Matrix.nonsingInvUnit bᵀ (by simp [hbd])
@@ -216,8 +251,9 @@ theorem factor (v : Valuation k Γ) {r : Γ} (hr : r < 1) {n : ℕ} (β : Fin n 
   have hnmK : nmg ∈ PrincipalCongruence.principalCongruence v r hr := hbtC
   have hgK : g ∈ PrincipalCongruence.principalCongruence v r hr := hg
   have hlK := mul_mem (mul_mem (inv_mem hnpK) hgK) (inv_mem hnmK)
-  have hprod : (g : Matrix (Fin n) (Fin n) k) =
-      (npg : Matrix (Fin n) (Fin n) k) * (m * d * cᵀ) * (nmg : Matrix (Fin n) (Fin n) k) := by
+  have hprod
+      : (g : Matrix (Fin n) (Fin n) k)
+        = (npg : Matrix (Fin n) (Fin n) k) * (m * d * cᵀ) * (nmg : Matrix (Fin n) (Fin n) k) := by
     show (g : Matrix (Fin n) (Fin n) k) = a * (m * d * cᵀ) * bᵀ
     rw [hudt, huam, htt]
     simp only [Matrix.mul_assoc]
@@ -227,7 +263,8 @@ theorem factor (v : Valuation k Γ) {r : Γ} (hr : r < 1) {n : ℕ} (β : Fin n 
   refine ⟨nmg, hnmK, npg⁻¹ * g * nmg⁻¹, hlK, npg, hnpK, ?_, ?_, hab, by group⟩
   · intro i j hij
     show bᵀ i j = _
-    rw [Matrix.transpose_apply, hbb j i hij, ← Matrix.transpose_apply (1 : Matrix (Fin n) (Fin n) k) j i, Matrix.transpose_one]
+    rw [Matrix.transpose_apply, hbb j i hij,
+      ← Matrix.transpose_apply (1 : Matrix (Fin n) (Fin n) k) j i, Matrix.transpose_one]
   · rw [hlev]
     refine blockDiag_mul β (blockDiag_mul β hmb ?_) ?_
     · intro i j hij
@@ -235,7 +272,29 @@ theorem factor (v : Valuation k Γ) {r : Γ} (hr : r < 1) {n : ℕ} (β : Fin n 
     · intro i j hij
       exact hcb j i hij.symm
 
-theorem iwahori_block_upper_levi_lower : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (N : ℕ) (ϖ : k) (m : ℕ) (β : Fin N → ℕ), ϖ ≠ 0 → ValuativeRel.valuation k (ϖ) < 1 → (∀ x : k, ValuativeRel.valuation k (x) < 1 → ValuativeRel.valuation k (x) ≤ ValuativeRel.valuation k (ϖ)) → 1 ≤ m → Monotone β → ∀ g ∈ {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ ValuativeRel.valuation k (ϖ ^ m)}, ∃ nm ∈ {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ ValuativeRel.valuation k (ϖ ^ m)}, ∃ l ∈ {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ ValuativeRel.valuation k (ϖ ^ m)}, ∃ np ∈ {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ ValuativeRel.valuation k (ϖ ^ m)}, (∀ i j, β i ≤ β j → (nm : Matrix (Fin N) (Fin N) k) i j = (1 : Matrix (Fin N) (Fin N) k) i j) ∧ (∀ i j, β i ≠ β j → (l : Matrix (Fin N) (Fin N) k) i j = 0) ∧ (∀ i j, β j ≤ β i → (np : Matrix (Fin N) (Fin N) k) i j = (1 : Matrix (Fin N) (Fin N) k) i j) ∧ g = np * l * nm := by
+theorem iwahori_block_upper_levi_lower
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N : ℕ) (ϖ : k) (m : ℕ) (β : Fin N → ℕ),
+      ϖ ≠ 0 → ValuativeRel.valuation k (ϖ) < 1
+        → (∀ x : k,
+          ValuativeRel.valuation k (x) < 1
+            → ValuativeRel.valuation k (x) ≤ ValuativeRel.valuation k (ϖ))
+        → 1 ≤ m → Monotone β
+        → ∀ g
+            ∈ {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ ValuativeRel.valuation k (ϖ ^ m)},
+          ∃ nm
+              ∈ {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ ValuativeRel.valuation k (ϖ ^ m)},
+            ∃ l ∈ {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ ValuativeRel.valuation k (ϖ ^ m)},
+              ∃ np
+                  ∈ {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ ValuativeRel.valuation k (ϖ ^ m)},
+                (∀ i j,
+                    β i ≤ β j
+                      → (nm : Matrix (Fin N) (Fin N) k) i j = (1 : Matrix (Fin N) (Fin N) k) i j)
+                  ∧ (∀ i j, β i ≠ β j → (l : Matrix (Fin N) (Fin N) k) i j = 0)
+                  ∧ (∀ i j,
+                    β j ≤ β i
+                      → (np : Matrix (Fin N) (Fin N) k) i j = (1 : Matrix (Fin N) (Fin N) k) i j)
+                  ∧ g = np * l * nm := by
   intro k _ _ _ _ N ϖ m β _ hϖ _ hm hβ g hg
   have hr : ValuativeRel.valuation k (ϖ ^ m) < 1 := by
     rw [map_pow]

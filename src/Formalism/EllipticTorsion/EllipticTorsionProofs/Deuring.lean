@@ -59,7 +59,9 @@ theorem deuring_model : ModelDeuring := by
       ring
     have hR : ‖j * (a ^ 3 - 27)‖ ≤ ‖a‖ ^ 3 := by
       rw [norm_mul, hn2]
-      calc ‖j‖ * ‖a‖ ^ 3 ≤ 1 * ‖a‖ ^ 3 := by gcongr
+      calc
+        ‖j‖ * ‖a‖ ^ 3
+          ≤ 1 * ‖a‖ ^ 3 := by gcongr
         _ = ‖a‖ ^ 3 := one_mul _
     rw [ha] at hL
     have hlt2 : ‖a‖ ^ 3 < ‖a‖ ^ 12 := pow_lt_pow_right₀ hlt (by norm_num)
@@ -74,17 +76,17 @@ theorem deuring_model : ModelDeuring := by
     by_contra hne
     have hlt : ‖a ^ 3 - 27‖ < 1 := lt_of_le_of_ne hΔle hne
     have e1 : a ^ 3 = 27 + (a ^ 3 - 27) := by ring
-    have hA : ‖a ^ 3‖ = 1 := by
-      rw [e1, norm_add_eq_left (by rw [h27]; exact hlt), h27]
+    have hA : ‖a ^ 3‖ = 1 := by rw [e1, norm_add_eq_left (by rw [h27]; exact hlt), h27]
     have e2 : a ^ 3 - 24 = 3 + (a ^ 3 - 27) := by ring
-    have hB : ‖a ^ 3 - 24‖ = 1 := by
-      rw [e2, norm_add_eq_left (by rw [h3]; exact hlt), h3]
+    have hB : ‖a ^ 3 - 24‖ = 1 := by rw [e2, norm_add_eq_left (by rw [h3]; exact hlt), h3]
     have hL : ‖a ^ 3 * (a ^ 3 - 24) ^ 3‖ = 1 := by
       rw [norm_mul, hA, norm_pow, hB]
       norm_num
     rw [ha, norm_mul] at hL
     have h4 : ‖j‖ * ‖a ^ 3 - 27‖ < 1 := by
-      calc ‖j‖ * ‖a ^ 3 - 27‖ ≤ 1 * ‖a ^ 3 - 27‖ := by gcongr
+      calc
+        ‖j‖ * ‖a ^ 3 - 27‖
+          ≤ 1 * ‖a ^ 3 - 27‖ := by gcongr
         _ < 1 := by rw [one_mul]; exact hlt
     linarith
   refine ⟨a, ha1, ?_, ?_⟩

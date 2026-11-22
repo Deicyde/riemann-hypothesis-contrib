@@ -4,11 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.FW
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick
+  UpperTheory.V.FW
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.FW.embCyc :
-    ∀ (N m M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsAbelianGalois ℚ K] (K' : Type) [Field K'] [NumberField K'] [Algebra K K'] [IsCyclotomicExtension {m} K K'] (L : Type) [Field L] [NumberField L] [Algebra K' L] [IsCyclotomicExtension {M} K' L], N ∣ M → m ∣ M → Nonempty (K →ₐ[ℚ] CyclotomicField N ℚ) → IsCyclotomicExtension {M} ℚ L := by
+theorem UpperTheory.V.FW.embCyc
+    : ∀ (N m M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsAbelianGalois ℚ K]
+        (K' : Type) [Field K'] [NumberField K'] [Algebra K K'] [IsCyclotomicExtension {m} K K']
+        (L : Type) [Field L] [NumberField L] [Algebra K' L] [IsCyclotomicExtension {M} K' L],
+      N ∣ M → m ∣ M → Nonempty (K →ₐ[ℚ] CyclotomicField N ℚ) → IsCyclotomicExtension {M} ℚ L := by
   intro N m M _ K _ _ _ K' _ _ _ _ L _ _ _ _ hNM hmM hφ
   obtain ⟨φ⟩ := hφ
   have hM0 : M ≠ 0 := NeZero.ne M
@@ -40,8 +45,10 @@ theorem UpperTheory.V.FW.embCyc :
   have h1 : ∀ y, ψ y ∈ F := by
     intro y
     have hy := IsCyclotomicExtension.adjoin_roots (S := {N}) (A := ℚ) y
-    have hle : Algebra.adjoin ℚ {b : CyclotomicField N ℚ | ∃ n : ℕ, n ∈ ({N} : Set ℕ) ∧ n ≠ 0 ∧ b ^ n = 1}
-        ≤ F.comap ψ := by
+    have hle
+        : Algebra.adjoin ℚ
+            {b : CyclotomicField N ℚ | ∃ n : ℕ, n ∈ ({N} : Set ℕ) ∧ n ≠ 0 ∧ b ^ n = 1}
+          ≤ F.comap ψ := by
       rw [Algebra.adjoin_le_iff]
       rintro b ⟨n, hn, -, hb⟩
       rw [Set.mem_singleton_iff] at hn
@@ -71,7 +78,8 @@ theorem UpperTheory.V.FW.embCyc :
       rw [Set.mem_singleton_iff] at hn
       rw [hn] at hbn
       exact hroot _ m hmM (by rw [← map_pow, hbn, map_one])
-    | algebraMap k => exact h2 k
+    | algebraMap k =>
+      exact h2 k
     | add a b _ _ ha hb =>
       rw [map_add (f := _)]
       exact add_mem ha hb

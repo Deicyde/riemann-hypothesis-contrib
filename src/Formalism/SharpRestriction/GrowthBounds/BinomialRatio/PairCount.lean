@@ -12,12 +12,16 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G
 
-theorem pc_strip_le {r : ℕ} {nu mu : Fin r → ℤ} {g : ℕ} (h : Strip nu mu g) (i : Fin r) : nu i ≤ mu i + g := by
+theorem pc_strip_le {r : ℕ} {nu mu : Fin r → ℤ} {g : ℕ} (h : Strip nu mu g) (i : Fin r)
+    : nu i ≤ mu i + g := by
   have hsum : ∑ j, (nu j - mu j) = (g : ℤ) := by
     rw [Finset.sum_sub_distrib]
     exact h.2.2
   have hle : nu i - mu i ≤ ∑ j, (nu j - mu j) :=
-    Finset.single_le_sum (f := fun j => nu j - mu j) (fun j _ => sub_nonneg.2 (h.1 j)) (Finset.mem_univ i)
+    Finset.single_le_sum
+      (f := fun j => nu j - mu j)
+      (fun j _ => sub_nonneg.2 (h.1 j))
+      (Finset.mem_univ i)
   linarith
 
 def pcU (n : ℕ) : ℕ := if n = 0 then 0 else n / 2 + 1
@@ -27,29 +31,35 @@ def pcL (n : ℕ) : ℕ := (n - 1) / 2
 theorem pcU_vec {n : ℕ} (h : n = 0 ∨ n % 2 = 1) : pcU (n + 1) = pcU n + 1 := by
   unfold pcU
   split_ifs <;> omega
-theorem pcU_cov {n : ℕ} (h : ¬ (n = 0 ∨ n % 2 = 1)) : pcU (n + 1) = pcU n := by
+theorem pcU_cov {n : ℕ} (h : ¬(n = 0 ∨ n % 2 = 1)) : pcU (n + 1) = pcU n := by
   unfold pcU
   split_ifs <;> omega
 theorem pcL_vec {n : ℕ} (h : n = 0 ∨ n % 2 = 1) : pcL (n + 1) = pcL n := by
   unfold pcL
   omega
-theorem pcL_cov {n : ℕ} (h : ¬ (n = 0 ∨ n % 2 = 1)) : pcL (n + 1) = pcL n + 1 := by
+theorem pcL_cov {n : ℕ} (h : ¬(n = 0 ∨ n % 2 = 1)) : pcL (n + 1) = pcL n + 1 := by
   unfold pcL
   omega
 
-theorem pc_deg {s : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : ∀ i, Ai i ≤ M) (hC : ∀ i, Ci i ≤ M)
-    (a : Fin (2 * s + 1)) : (kLetters A Ai Ci).deg a ≤ if a.val = 0 then A else M := by
+theorem pc_deg
+    {s : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ}
+    (hA : ∀ i, Ai i ≤ M) (hC : ∀ i, Ci i ≤ M) (a : Fin (2 * s + 1))
+    : (kLetters A Ai Ci).deg a ≤ if a.val = 0 then A else M := by
   simp only [kLetters]
   split_ifs <;> first | exact le_rfl | exact hA _ | exact hC _ | exact Nat.zero_le _
 
-theorem pc_shape {s r : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : ∀ i, Ai i ≤ M) (hC : ∀ i, Ci i ≤ M)
-    {mu : Fin (2 * s + 1 + 1) → Fin (r + 1) → ℤ} (h : IsChain (kLetters A Ai Ci) mu) (n : Fin (2 * s + 1 + 1)) :
-    ∀ idx : Fin (r + 1), (pcU n.val ≤ idx.val → mu n idx ≤ 0) ∧ (idx.val + pcL n.val < r + 1 → 0 ≤ mu n idx) ∧
-      |mu n idx| ≤ (if n.val = 0 then 0 else (A : ℤ)) + n.val * M := by
+theorem pc_shape
+    {s r : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : ∀ i, Ai i ≤ M) (hC : ∀ i, Ci i ≤ M)
+    {mu : Fin (2 * s + 1 + 1) → Fin (r + 1) → ℤ} (h : IsChain (kLetters A Ai Ci) mu)
+    (n : Fin (2 * s + 1 + 1))
+    : ∀ idx : Fin (r + 1),
+      (pcU n.val ≤ idx.val → mu n idx ≤ 0) ∧ (idx.val + pcL n.val < r + 1 → 0 ≤ mu n idx)
+        ∧ |mu n idx| ≤ (if n.val = 0 then 0 else (A : ℤ)) + n.val * M := by
   have hM0 : (0 : ℤ) ≤ M := Int.natCast_nonneg _
-  have key : ∀ t : ℕ, ∀ ht : t < 2 * s + 1 + 1, ∀ idx : Fin (r + 1),
-      (pcU t ≤ idx.val → mu ⟨t, ht⟩ idx ≤ 0) ∧ (idx.val + pcL t < r + 1 → 0 ≤ mu ⟨t, ht⟩ idx) ∧
-      |mu ⟨t, ht⟩ idx| ≤ (if t = 0 then 0 else (A : ℤ)) + (t : ℤ) * M := by
+  have key
+      : ∀ t : ℕ, ∀ ht : t < 2 * s + 1 + 1, ∀ idx : Fin (r + 1),
+        (pcU t ≤ idx.val → mu ⟨t, ht⟩ idx ≤ 0) ∧ (idx.val + pcL t < r + 1 → 0 ≤ mu ⟨t, ht⟩ idx)
+          ∧ |mu ⟨t, ht⟩ idx| ≤ (if t = 0 then 0 else (A : ℤ)) + (t : ℤ) * M := by
     intro t
     induction t with
     | zero =>
@@ -72,8 +82,9 @@ theorem pc_shape {s r : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : �
         simp only at hdeg
         split_ifs at hdeg ⊢ <;> exact_mod_cast hdeg
       have hdeg0 : (0 : ℤ) ≤ ((kLetters A Ai Ci).deg ⟨t, by omega⟩ : ℤ) := Int.natCast_nonneg _
-      have hB : (if t = 0 then 0 else (A : ℤ)) + (t : ℤ) * M + (if t = 0 then (A : ℤ) else M) ≤
-          (if t + 1 = 0 then 0 else (A : ℤ)) + ((t + 1 : ℕ) : ℤ) * M := by
+      have hB
+          : (if t = 0 then 0 else (A : ℤ)) + (t : ℤ) * M + (if t = 0 then (A : ℤ) else M)
+            ≤ (if t + 1 = 0 then 0 else (A : ℤ)) + ((t + 1 : ℕ) : ℤ) * M := by
         rcases Nat.eq_zero_or_pos t with rfl | htpos
         · norm_num <;> linarith
         · rw [if_neg (by omega), if_neg (by omega), if_neg (by omega)]
@@ -111,7 +122,8 @@ theorem pc_shape {s r : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : �
           linarith
         · rw [pcL_cov hv] at hi
           have h1 := hint idx ⟨idx.val + 1, by omega⟩ (by show idx.val + 1 = idx.val + 1; rfl)
-          have h2 := (ih ht' ⟨idx.val + 1, by omega⟩).2.1 (by show idx.val + 1 + pcL t < r + 1; omega)
+          have h2 :=
+            (ih ht' ⟨idx.val + 1, by omega⟩).2.1 (by show idx.val + 1 + pcL t < r + 1; omega)
           linarith
         · have h1 := (ih ht' idx).2.2
           have h2 := hle idx
@@ -124,15 +136,18 @@ def pcPosition (K s q : ℕ) : ℕ := if q < s + 1 then q else K - (2 * s + 1 - 
 def pcEnc (K s : ℕ) (v : Fin K → ℤ) (q : Fin (2 * s + 1)) : ℤ :=
   if h : pcPosition K s q.val < K then v ⟨_, h⟩ else 0
 
-theorem pcEnc_apply {K s : ℕ} (v : Fin K → ℤ) (q : Fin (2 * s + 1)) (i : Fin K) (hs : pcPosition K s q.val = i.val) :
-    pcEnc K s v q = v i := by
+theorem pcEnc_apply
+    {K s : ℕ} (v : Fin K → ℤ) (q : Fin (2 * s + 1)) (i : Fin K) (hs : pcPosition K s q.val = i.val)
+    : pcEnc K s v q = v i := by
   unfold pcEnc
   rw [dite_eq_left (by rw [hs]; exact i.2)]
   congr 1
   exact Fin.ext hs
 
-theorem pcEnc_inj {K s : ℕ} {v v' : Fin K → ℤ} (hz : ∀ i : Fin K, s + 1 ≤ i.val → i.val + s < K → v i = 0)
-    (hz' : ∀ i : Fin K, s + 1 ≤ i.val → i.val + s < K → v' i = 0) (he : pcEnc K s v = pcEnc K s v') : v = v' := by
+theorem pcEnc_inj
+    {K s : ℕ} {v v' : Fin K → ℤ} (hz : ∀ i : Fin K, s + 1 ≤ i.val → i.val + s < K → v i = 0)
+    (hz' : ∀ i : Fin K, s + 1 ≤ i.val → i.val + s < K → v' i = 0) (he : pcEnc K s v = pcEnc K s v')
+    : v = v' := by
   funext i
   by_cases hzone : s + 1 ≤ i.val ∧ i.val + s < K
   · rw [hz i hzone.1 hzone.2, hz' i hzone.1 hzone.2]
@@ -140,7 +155,7 @@ theorem pcEnc_inj {K s : ℕ} {v v' : Fin K → ℤ} (hz : ∀ i : Fin K, s + 1 
       by_cases hi : i.val < s + 1
       · exact ⟨⟨i.val, by omega⟩, by simp [pcPosition, hi]⟩
       · refine ⟨⟨2 * s + 1 - (K - i.val), by have := i.2; omega⟩, ?_⟩
-        have h1 : ¬ (2 * s + 1 - (K - i.val) < s + 1) := by have := i.2; omega
+        have h1 : ¬(2 * s + 1 - (K - i.val) < s + 1) := by have := i.2; omega
         simp only [pcPosition, h1, if_false]
         have := i.2
         omega
@@ -149,19 +164,24 @@ theorem pcEnc_inj {K s : ℕ} {v v' : Fin K → ℤ} (hz : ∀ i : Fin K, s + 1 
     have e2 := pcEnc_apply v' q i hq
     rw [← e1, ← e2, he]
 
-theorem pcEnc_abs {K s : ℕ} {v : Fin K → ℤ} {T : ℤ} (hT : 0 ≤ T) (hv : ∀ i, |v i| ≤ T) (q : Fin (2 * s + 1)) :
-    pcEnc K s v q ∈ Finset.Icc (-T) T := by
+theorem pcEnc_abs
+    {K s : ℕ} {v : Fin K → ℤ} {T : ℤ} (hT : 0 ≤ T) (hv : ∀ i, |v i| ≤ T) (q : Fin (2 * s + 1))
+    : pcEnc K s v q ∈ Finset.Icc (-T) T := by
   unfold pcEnc
   split_ifs with h
   · exact Finset.mem_Icc.2 (abs_le.1 (hv _))
   · exact Finset.mem_Icc.2 ⟨by linarith, hT⟩
 
-theorem pc_count {s r : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : ∀ i, Ai i ≤ M) (hC : ∀ i, Ci i ≤ M) :
-    (pairSet r A Ai Ci).ncard ≤ (2 * (A + (2 * s + 1) * M) + 1) ^ ((2 * s + 3) * (2 * s + 1)) := by
+theorem pc_count
+    {s r : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : ∀ i, Ai i ≤ M) (hC : ∀ i, Ci i ≤ M)
+    : (pairSet r A Ai Ci).ncard
+      ≤ (2 * (A + (2 * s + 1) * M) + 1) ^ ((2 * s + 3) * (2 * s + 1)) := by
   classical
   set T : ℤ := (A : ℤ) + (2 * (s : ℤ) + 1) * M with hTdef
   have hT0 : 0 ≤ T := by positivity
-  have hbd : ∀ {mu : Fin (2 * s + 1 + 1) → Fin (r + 1) → ℤ}, IsChain (kLetters A Ai Ci) mu → ∀ n idx, |mu n idx| ≤ T := by
+  have hbd
+      : ∀ {mu : Fin (2 * s + 1 + 1) → Fin (r + 1) → ℤ},
+        IsChain (kLetters A Ai Ci) mu → ∀ n idx, |mu n idx| ≤ T := by
     intro mu h n idx
     refine (pc_shape hA hC h n idx).2.2.trans ?_
     have hn : (n.val : ℤ) ≤ 2 * (s : ℤ) + 1 := by have := n.2; omega
@@ -169,8 +189,10 @@ theorem pc_count {s r : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : �
     have hA0 : (0 : ℤ) ≤ (A : ℤ) := Int.natCast_nonneg _
     have := mul_le_mul_of_nonneg_right hn hM
     split_ifs <;> linarith
-  have hzero : ∀ {mu : Fin (2 * s + 1 + 1) → Fin (r + 1) → ℤ}, IsChain (kLetters A Ai Ci) mu → ∀ n (i : Fin (r + 1)),
-      s + 1 ≤ i.val → i.val + s < r + 1 → mu n i = 0 := by
+  have hzero
+      : ∀ {mu : Fin (2 * s + 1 + 1) → Fin (r + 1) → ℤ},
+        IsChain (kLetters A Ai Ci) mu
+          → ∀ n (i : Fin (r + 1)), s + 1 ≤ i.val → i.val + s < r + 1 → mu n i = 0 := by
     intro mu h n i h1 h2
     have hn := n.2
     have hsh := pc_shape hA hC h n i
@@ -178,8 +200,8 @@ theorem pc_count {s r : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : �
     have hL : i.val + pcL n.val < r + 1 := by unfold pcL; omega
     exact le_antisymm (hsh.1 hU) (hsh.2.1 hL)
   let tgt : Finset ((Fin (2 * s + 1 + 1) → Fin (2 * s + 1) → ℤ) × (Fin (2 * s + 1) → ℤ)) :=
-    (Fintype.piFinset fun _ => Fintype.piFinset fun _ => Finset.Icc (-T) T) ×ˢ
-      (Fintype.piFinset fun _ => Finset.Icc (-T) T)
+    (Fintype.piFinset fun _ => Fintype.piFinset fun _ => Finset.Icc (-T) T)
+      ×ˢ (Fintype.piFinset fun _ => Finset.Icc (-T) T)
   have hlamb : ∀ x ∈ pairSet r A Ai Ci, ∀ i, |x.2 i| ≤ T := by
     intro x hx i
     have h1 := abs_le.mp (hbd hx.1 (Fin.last _) i.succ)
@@ -197,42 +219,47 @@ theorem pc_count {s r : ℕ} {A : ℕ} {Ai Ci : Fin s → ℕ} {M : ℕ} (hA : �
     have hL : (i.succ : Fin (r + 1)).val + pcL (Fin.last (2 * s + 1)).val < r + 1 := by
       rw [hl, Fin.val_succ]; unfold pcL; omega
     exact le_antisymm (h3.2.trans (hsh1.1 hU)) ((hsh2.2.1 hL).trans h3.1)
-  have hle := Set.ncard_le_ncard_of_injOn (s := pairSet r A Ai Ci) (t := (tgt : Set _))
-    (fun x => (fun n => pcEnc (r + 1) s (x.1 n), pcEnc r s x.2))
-    (by
-      intro x hx
-      simp only [tgt, Finset.coe_product, Set.mem_prod, Finset.mem_coe, Fintype.mem_piFinset]
-      exact ⟨fun n q => pcEnc_abs hT0 (hbd hx.1 n) q, fun q => pcEnc_abs hT0 (hlamb x hx) q⟩)
-    (by
-      intro x hx y hy hxy
-      simp only [Prod.mk.injEq] at hxy
-      refine Prod.ext ?_ ?_
-      · funext n
-        exact pcEnc_inj (hzero hx.1 n) (hzero hy.1 n) (congrFun hxy.1 n)
-      · exact pcEnc_inj (hlamz x hx) (hlamz y hy) hxy.2)
-    (Finset.finite_toSet tgt)
+  have hle :=
+    Set.ncard_le_ncard_of_injOn (s := pairSet r A Ai Ci) (t := (tgt : Set _))
+      (fun x => (fun n => pcEnc (r + 1) s (x.1 n), pcEnc r s x.2))
+      (by
+        intro x hx
+        simp only [tgt, Finset.coe_product, Set.mem_prod, Finset.mem_coe, Fintype.mem_piFinset]
+        exact ⟨fun n q => pcEnc_abs hT0 (hbd hx.1 n) q, fun q => pcEnc_abs hT0 (hlamb x hx) q⟩)
+      (by
+        intro x hx y hy hxy
+        simp only [Prod.mk.injEq] at hxy
+        refine Prod.ext ?_ ?_
+        · funext n
+          exact pcEnc_inj (hzero hx.1 n) (hzero hy.1 n) (congrFun hxy.1 n)
+        · exact pcEnc_inj (hlamz x hx) (hlamz y hy) hxy.2)
+      (Finset.finite_toSet tgt)
   rw [Set.ncard_coe_finset] at hle
   refine hle.trans (le_of_eq ?_)
   have hc : (Finset.Icc (-T) T).card = 2 * (A + (2 * s + 1) * M) + 1 := by
     rw [Int.card_Icc]
     have : T + 1 - -T = ((2 * (A + (2 * s + 1) * M) + 1 : ℕ) : ℤ) := by rw [hTdef]; push_cast; ring
     rw [this, Int.toNat_natCast]
-  simp only [tgt, Finset.card_product, Fintype.card_piFinset, Finset.prod_const, Finset.card_univ, Fintype.card_fin, hc]
+  simp only [tgt, Finset.card_product, Fintype.card_piFinset, Finset.prod_const, Finset.card_univ,
+    Fintype.card_fin, hc]
   rw [← pow_mul, ← pow_add]
   congr 1
   ring
 
-theorem pc_coarseC_mul {s r : ℕ} (p : ℕ) (S : SegData s) (aTop : Fin s → ℕ) (b : SegBlock s r) (i : Fin s) :
-    (coarseC p S aTop b i : ℝ) * (p : ℝ) ^ (S.G - S.d i) ≤ (aTop i : ℝ) := by
+theorem pc_coarseC_mul
+    {s r : ℕ} (p : ℕ) (S : SegData s) (aTop : Fin s → ℕ) (b : SegBlock s r) (i : Fin s)
+    : (coarseC p S aTop b i : ℝ) * (p : ℝ) ^ (S.G - S.d i) ≤ (aTop i : ℝ) := by
   unfold coarseC SegData.P
   have h1 : (aTop i - ∑ c, b.ry i c) / p ^ (S.G - S.d i) * p ^ (S.G - S.d i) ≤ aTop i :=
     (Nat.div_mul_le_self _ _).trans (Nat.sub_le _ _)
   exact_mod_cast h1
 
-theorem pairCount_of_std {C0 Cde CE1 CE2 H : ℝ} {X : Loc} (h : Std C0 Cde CE1 CE2 H X) (j : Fin (numSeg X.TT))
-    (rz ry : Fin (segS X.TT j) → Fin (X.m + 1) → ℕ) (A : ℕ) (hA : (A : ℝ) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ)) :
-    ((pairSet X.m A (clA C0 CE1 CE2 X j rz ry) (clC C0 CE1 CE2 X j rz ry)).ncard : ℝ) ≤
-      (8 * (X.a : ℝ)) ^ (4 * (X.N1 + 1) ^ 2) := by
+theorem pairCount_of_std
+    {C0 Cde CE1 CE2 H : ℝ} {X : Loc} (h : Std C0 Cde CE1 CE2 H X) (j : Fin (numSeg X.TT))
+    (rz ry : Fin (segS X.TT j) → Fin (X.m + 1) → ℕ)
+    (A : ℕ) (hA : (A : ℝ) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ))
+    : ((pairSet X.m A (clA C0 CE1 CE2 X j rz ry) (clC C0 CE1 CE2 X j rz ry)).ncard : ℝ)
+      ≤ (8 * (X.a : ℝ)) ^ (4 * (X.N1 + 1) ^ 2) := by
   have hp1 : (1 : ℝ) ≤ X.p := h.p1
   have hp0 : (0 : ℝ) < X.p := by linarith
   have hN1 : (1 : ℝ) ≤ X.N1 := by exact_mod_cast h.N1pos
@@ -254,8 +281,9 @@ theorem pairCount_of_std {C0 Cde CE1 CE2 H : ℝ} {X : Loc} (h : Std C0 Cde CE1 
       have := h.La1
       positivity
     linarith
-  have hPp : ∀ i : Fin (segS X.TT j), (X.p : ℝ) ≤
-      (X.p : ℝ) ^ ((X.seg C0 CE1 CE2 j).G - (X.seg C0 CE1 CE2 j).d i) := fun i => by
+  have hPp
+      : ∀ i : Fin (segS X.TT j),
+        (X.p : ℝ) ≤ (X.p : ℝ) ^ ((X.seg C0 CE1 CE2 j).G - (X.seg C0 CE1 CE2 j).d i) := fun i => by
     have hd := dist_pos_lt X.TT j i
     exact le_self_pow₀ hp1 (by show segG X.TT j - (segDists X.TT j).get i ≠ 0; omega)
   set M : ℕ := ⌊2 * (X.a : ℝ) / X.p⌋₊ with hM
@@ -263,8 +291,10 @@ theorem pairCount_of_std {C0 Cde CE1 CE2 H : ℝ} {X : Loc} (h : Std C0 Cde CE1 
     apply Nat.le_floor
     rw [le_div_iff₀ hp0]
     have h1 := coarseA_mul X.p (X.seg C0 CE1 CE2 j) (digitBlock rz ry) i
-    have h2 : ((X.seg C0 CE1 CE2 j).bTop i : ℝ) ≤ X.b' * (1 + be X C0) := (h.winB _ (pos_mem X.TT j i).1).2
-    have h3 : (0 : ℝ) ≤ (coarseA X.p (X.seg C0 CE1 CE2 j) (digitBlock rz ry) i : ℝ) := Nat.cast_nonneg _
+    have h2 : ((X.seg C0 CE1 CE2 j).bTop i : ℝ) ≤ X.b' * (1 + be X C0) :=
+      (h.winB _ (pos_mem X.TT j i).1).2
+    have h3 : (0 : ℝ) ≤ (coarseA X.p (X.seg C0 CE1 CE2 j) (digitBlock rz ry) i : ℝ) :=
+      Nat.cast_nonneg _
     have h4 := mul_le_mul_of_nonneg_left (hPp i) h3
     have h5 : X.b' * (1 + be X C0) ≤ 2 * X.b' := by nlinarith
     show (coarseA X.p (X.seg C0 CE1 CE2 j) (digitBlock rz ry) i : ℝ) * X.p ≤ 2 * X.a
@@ -273,8 +303,11 @@ theorem pairCount_of_std {C0 Cde CE1 CE2 H : ℝ} {X : Loc} (h : Std C0 Cde CE1 
     apply Nat.le_floor
     rw [le_div_iff₀ hp0]
     have h1 := pc_coarseC_mul X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (digitBlock rz ry) i
-    have h2 : ((segATop X.TT X.aT j i : ℕ) : ℝ) ≤ X.a * (1 + 2 / (X.k * X.Y)) := (h.winA _ (pos_mem X.TT j i).1).2
-    have h3 : (0 : ℝ) ≤ (coarseC X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (digitBlock rz ry) i : ℝ) :=
+    have h2 : ((segATop X.TT X.aT j i : ℕ) : ℝ) ≤ X.a * (1 + 2 / (X.k * X.Y)) :=
+      (h.winA _ (pos_mem X.TT j i).1).2
+    have h3
+        : (0 : ℝ)
+          ≤ (coarseC X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (digitBlock rz ry) i : ℝ) :=
       Nat.cast_nonneg _
     have h4 := mul_le_mul_of_nonneg_left (hPp i) h3
     have h6 : 2 / (X.k * X.Y) ≤ 1 := by
@@ -306,17 +339,25 @@ theorem pairCount_of_std {C0 Cde CE1 CE2 H : ℝ} {X : Loc} (h : Std C0 Cde CE1 
     push_cast
     linarith
   have he : (2 * segS X.TT j + 3) * (2 * segS X.TT j + 1) ≤ 4 * (X.N1 + 1) ^ 2 := by nlinarith
-  calc ((pairSet X.m A (clA C0 CE1 CE2 X j rz ry) (clC C0 CE1 CE2 X j rz ry)).ncard : ℝ)
-      ≤ (((2 * (A + (2 * segS X.TT j + 1) * M) + 1) ^ ((2 * segS X.TT j + 3) * (2 * segS X.TT j + 1)) : ℕ) : ℝ) := by
-        exact_mod_cast hcount
-    _ = ((2 * (A + (2 * segS X.TT j + 1) * M) + 1 : ℕ) : ℝ) ^ ((2 * segS X.TT j + 3) * (2 * segS X.TT j + 1)) := by
-        push_cast; ring
+  calc
+    ((pairSet X.m A (clA C0 CE1 CE2 X j rz ry) (clC C0 CE1 CE2 X j rz ry)).ncard : ℝ)
+        ≤ (((2 * (A + (2 * segS X.TT j + 1) * M) + 1)
+              ^ ((2 * segS X.TT j + 3) * (2 * segS X.TT j + 1))
+            : ℕ)
+          : ℝ) := by
+      exact_mod_cast hcount
+    _ = ((2 * (A + (2 * segS X.TT j + 1) * M) + 1 : ℕ) : ℝ)
+        ^ ((2 * segS X.TT j + 3) * (2 * segS X.TT j + 1)) := by
+      push_cast; ring
     _ ≤ (8 * (X.a : ℝ)) ^ ((2 * segS X.TT j + 3) * (2 * segS X.TT j + 1)) :=
-        pow_le_pow_left₀ (Nat.cast_nonneg _) hc _
+      pow_le_pow_left₀ (Nat.cast_nonneg _) hc _
     _ ≤ (8 * (X.a : ℝ)) ^ (4 * (X.N1 + 1) ^ 2) := pow_le_pow_right₀ (by linarith) he
 
 theorem restPairCount : RestPairCount :=
-  TransportedAlt.of_explicit (fun _ => 1) (fun _ _ => 1) (fun Cc _ CE1 CE2 _ => T2 CE1 CE2 Cc 1)
+  TransportedAlt.of_explicit
+    (fun _ => 1)
+    (fun _ _ => 1)
+    (fun Cc _ CE1 CE2 _ => T2 CE1 CE2 Cc 1)
     fun _ _ _ _ _ _ _ _ _ _ hCc hC0 _ h1 h2 _ _ _ _ _ _ _ _ _ t1 t2 t3 t4 t5 => by
       intro X _ hD hI hc j rz ry _ A _ hA
       exact pairCount_of_std (std_of hCc hC0 h1 h2 le_rfl t1 t2 t3 t4 t5 hD hI hc) j rz ry A hA

@@ -15,15 +15,15 @@ private lemma pz {T : End K V} {x : V} {k m : ℕ} (hkm : k ≤ m) (hx : (T ^ k)
   obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hkm
   rw [show k + d = d + k from Nat.add_comm k d, pow_add, Module.End.mul_apply, hx, map_zero]
 
-theorem goal1 {A B : End K V} (h : Commute A B) {a b : K} {x : V}
-    (hA : x ∈ A.maxGenEigenspace a) (hB : x ∈ B.maxGenEigenspace b) :
-    x ∈ (A * B).maxGenEigenspace (a * b) := by
+theorem goal1
+    {A B : End K V} (h : Commute A B)
+    {a b : K} {x : V} (hA : x ∈ A.maxGenEigenspace a) (hB : x ∈ B.maxGenEigenspace b)
+    : x ∈ (A * B).maxGenEigenspace (a * b) := by
   rw [mem_maxGenEigenspace] at hA hB ⊢
   obtain ⟨k, hk⟩ := hA
   obtain ⟨l, hl⟩ := hB
   have hNB : Commute (A - a • 1) B := h.sub_left ((Commute.one_left B).smul_left a)
-  have hNM : Commute (A - a • 1) (B - b • 1) :=
-    hNB.sub_right ((Commute.one_right _).smul_right b)
+  have hNM : Commute (A - a • 1) (B - b • 1) := hNB.sub_right ((Commute.one_right _).smul_right b)
   have hBM : Commute B (B - b • 1) :=
     (Commute.refl B).sub_right ((Commute.one_right B).smul_right b)
   have key : A * B - (a * b) • (1 : End K V) = (A - a • 1) * B + a • (B - b • 1) := by

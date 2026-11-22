@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Spl
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 namespace TorusConst
@@ -66,7 +67,6 @@ lemma natDegree_eq_zero_of_inv {F : Type} [Field F] (a b : F[X])
   have h4 : (reflect b.natDegree b).natDegree ≤ b.natDegree := natDegree_reflect_le.trans (by simp)
   rw [h3, natDegree_mul_X_pow _ ha] at h4
   omega
-
 
 set_option backward.isDefEq.respectTransparency false in
 lemma exists_extension {W Z Y S : Scheme.{0}} [IsIntegral Z]
@@ -153,8 +153,10 @@ lemma comp_aevalTower {R A A' : Type} [CommRing R] [Algebra K R] [CommRing A] [A
     simp
   · simp
 
-noncomputable def val {R A : Type} [CommRing R] [Algebra K R] [CommRing A] [Algebra K A]
-    (F : sp K R[X] ⟶ B) (c : R →ₐ[K] A) (x : A) : sp K A ⟶ B :=
+noncomputable def val
+    {R A : Type} [CommRing R] [Algebra K R] [CommRing A] [Algebra K A]
+    (F : sp K R[X] ⟶ B) (c : R →ₐ[K] A) (x : A)
+    : sp K A ⟶ B :=
   spm (aevalTower c x) ≫ F
 
 lemma spm_val {R A A' : Type} [CommRing R] [Algebra K R] [CommRing A] [Algebra K A]
@@ -339,22 +341,20 @@ section laurent
 open LaurentPolynomial
 variable {L : Type} [Field L] [Algebra K L]
 
-noncomputable def ev {A : Type} [CommRing A] [Algebra K A] (c : L →ₐ[K] A) (x : Aˣ) :
-    L[T;T⁻¹] →ₐ[K] A where
+noncomputable def ev {A : Type} [CommRing A] [Algebra K A] (c : L →ₐ[K] A) (x : Aˣ)
+    : L[T;T⁻¹] →ₐ[K] A where
   toRingHom := LaurentPolynomial.eval₂ (c : L →+* A) x
   commutes' r := by
     change LaurentPolynomial.eval₂ (c : L →+* A) x (LaurentPolynomial.C (algebraMap K L r)) = _
     rw [LaurentPolynomial.eval₂_C]
     exact c.commutes r
 
-
 variable (K L) in
-noncomputable def inc : L[X] →ₐ[K] L[T;T⁻¹] := (toLaurentAlg : L[X] →ₐ[L] L[T;T⁻¹]).restrictScalars K
-
+noncomputable def inc : L[X] →ₐ[K] L[T;T⁻¹] :=
+  (toLaurentAlg : L[X] →ₐ[L] L[T;T⁻¹]).restrictScalars K
 
 variable (K L) in
 noncomputable def cst : L →ₐ[K] L[T;T⁻¹] := (inc K L).comp CAlgHom
-
 
 variable (L) in
 noncomputable def tU : (L[T;T⁻¹])ˣ := (isUnit_T (R := L) 1).unit
@@ -426,11 +426,13 @@ lemma ev_eq [GrpObj B] [IsProper B.hom] (u : sp K L[T;T⁻¹] ⟶ B) (x y : Lˣ)
 
 end laurent
 
-theorem eq_const (Y : Type) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y] [GrpObj B]
-    [IsProper B.hom] (f : splitTorus (Spec (CommRingCat.of K)) Y ⟶ B) :
-    f = toUnit _ ≫ η ≫ f := by
-  have h1 : ∀ (L : Type) [Field L] [Algebra K L] (φ : Multiplicative Y →* Lˣ) (l : Y →+ ℤ) (x : Lˣ),
-      pt K Y L (coch l Lˣ x * φ) ≫ f = pt K Y L φ ≫ f := by
+theorem eq_const
+    (Y : Type) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y] [GrpObj B] [IsProper B.hom]
+    (f : splitTorus (Spec (CommRingCat.of K)) Y ⟶ B)
+    : f = toUnit _ ≫ η ≫ f := by
+  have h1
+      : ∀ (L : Type) [Field L] [Algebra K L] (φ : Multiplicative Y →* Lˣ) (l : Y →+ ℤ) (x : Lˣ),
+        pt K Y L (coch l Lˣ x * φ) ≫ f = pt K Y L φ ≫ f := by
     intro L _ _ φ l x
     let ψ : Multiplicative Y →* (LaurentPolynomial L)ˣ :=
       coch l _ (tU L) * (Units.map (cst K L : L →* LaurentPolynomial L)).comp φ
@@ -441,17 +443,20 @@ theorem eq_const (Y : Type) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite 
       refine MonoidHom.ext fun a => ?_
       have e1 : Units.map (ev (AlgHom.id K L) x : LaurentPolynomial L →* L) (tU L) = x :=
         Units.ext (ev_tU _ _)
-      have e2 : Units.map (ev (AlgHom.id K L) x : LaurentPolynomial L →* L)
-          (Units.map (cst K L : L →* LaurentPolynomial L) (φ a)) = φ a :=
+      have e2
+          : Units.map (ev (AlgHom.id K L) x : LaurentPolynomial L →* L)
+              (Units.map (cst K L : L →* LaurentPolynomial L) (φ a))
+            = φ a :=
         Units.ext (AlgHom.congr_fun (ev_comp_cst (AlgHom.id K L) x) _)
       change Units.map (ev (AlgHom.id K L) x : LaurentPolynomial L →* L)
-        (tU L ^ l a.toAdd * Units.map (cst K L : L →* LaurentPolynomial L) (φ a)) =
-        x ^ l a.toAdd * φ a
+          (tU L ^ l a.toAdd * Units.map (cst K L : L →* LaurentPolynomial L) (φ a))
+        = x ^ l a.toAdd * φ a
       rw [map_mul, map_zpow, e1, e2]
     have h3 := ev_eq (pt K Y _ ψ ≫ f) x 1
     rwa [← Category.assoc, ← Category.assoc, h2, h2, map_one, _root_.one_mul] at h3
-  have h2 : ∀ (L : Type) [Field L] [Algebra K L] (φ : Multiplicative Y →* Lˣ),
-      pt K Y L φ ≫ f = pt K Y L 1 ≫ f := by
+  have h2
+      : ∀ (L : Type) [Field L] [Algebra K L] (φ : Multiplicative Y →* Lˣ),
+        pt K Y L φ ≫ f = pt K Y L 1 ≫ f := by
     intro L _ _ φ
     rw [char_eq_prod Y (Module.Free.chooseBasis ℤ Y) _ φ]
     generalize (Finset.univ : Finset (Module.Free.ChooseBasisIndex ℤ Y)) = s
@@ -468,15 +473,21 @@ theorem eq_const (Y : Type) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite 
       ← Category.assoc (spm _), ← Category.assoc (spm _ ≫ _), Category.assoc (toUnit _)]
     congr 1
     exact toUnit_unique _ _
-  have h4 : (pt K Y R (univ K Y)).left ≫ f.left =
-      (pt K Y R (univ K Y)).left ≫ (toUnit _ ≫ η ≫ f).left := congrArg CommaMorphism.left h3
+  have h4
+      : (pt K Y R (univ K Y)).left ≫ f.left
+        = (pt K Y R (univ K Y)).left ≫ (toUnit _ ≫ η ≫ f).left :=
+    congrArg CommaMorphism.left h3
   rw [pt_univ] at h4
   ext1
   exact (cancel_epi _).1 h4
 
 end TorusConst
 
-theorem splitTorus_to_abelian_const : ∀ (K : Type) [Field K] [IsAlgClosed K] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (B : Over (Sp K)) [GrpObj B], IsAbelianScheme B → ∀ f : splitTorus (Sp K) X ⟶ B, ∃ b : 𝟙_ (Over (Sp K)) ⟶ B, f = toUnit _ ≫ b := by
+theorem splitTorus_to_abelian_const
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (X : Type) [AddCommGroup X] [Module.Free ℤ X]
+        [Module.Finite ℤ X] (B : Over (Sp K)) [GrpObj B],
+      IsAbelianScheme B
+        → ∀ f : splitTorus (Sp K) X ⟶ B, ∃ b : 𝟙_ (Over (Sp K)) ⟶ B, f = toUnit _ ≫ b := by
   intro K _ _ X _ _ _ B _ hB f
   have := hB.proper
   exact ⟨η ≫ f, TorusConst.eq_const X f⟩

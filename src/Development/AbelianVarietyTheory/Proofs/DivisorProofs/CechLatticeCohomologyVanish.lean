@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.LogDR
 
 set_option autoImplicit false
@@ -17,23 +18,26 @@ noncomputable section
 
 namespace GlobalTheory.LatCech
 
-variable {ι : Type} [LinearOrder ι] {V : Type} [AddCommGroup V]
+variable
+  {ι : Type} [LinearOrder ι]
+  {V : Type} [AddCommGroup V]
   (A : Cube.{0} ι ℤ) (φ : ∀ s : Finset ι, A.obj s →+ V)
 
-def toFam (m : ℕ) (x : Cube.Term A m) : Finset ι → V :=
-  fun s => if h : s.card = m then φ s (x ⟨s, h⟩) else 0
+def toFam (m : ℕ) (x : Cube.Term A m) : Finset ι → V := fun s =>
+  if h : s.card = m then φ s (x ⟨s, h⟩) else 0
 
 variable {A φ}
 
-theorem toFam_zero (m : ℕ) : toFam A φ m 0 = 0 := by
-  funext s; unfold toFam; split_ifs <;> simp
+theorem toFam_zero (m : ℕ) : toFam A φ m 0 = 0 := by funext s; unfold toFam; split_ifs <;> simp
 
 theorem nonempty_of_card {m : ℕ} (hm : 0 < m) {s : Finset ι} (h : s.card = m) : s.Nonempty :=
   Finset.card_pos.1 (by rw [h]; exact hm)
 
-theorem delta_toFam {m : ℕ} (hm : 0 < m)
+theorem delta_toFam
+    {m : ℕ} (hm : 0 < m)
     (hres : ∀ (s t : Finset ι) (h : s ⊆ t), s.Nonempty → ∀ x, φ t (Cube.res A h x) = φ s x)
-    (x : Cube.Term A m) : DI.delta (toFam A φ m x) = toFam A φ (m + 1) (Cube.d A m x) := by
+    (x : Cube.Term A m)
+    : DI.delta (toFam A φ m x) = toFam A φ (m + 1) (Cube.d A m x) := by
   funext t
   unfold DI.delta toFam
   by_cases ht : t.card = m + 1
@@ -46,12 +50,14 @@ theorem delta_toFam {m : ℕ} (hm : 0 < m)
     refine Finset.sum_eq_zero fun i hi => ?_
     have hc : (t.erase i).card ≠ m := by
       have := Finset.card_pos.2 ⟨i, hi⟩
-      rw [Finset.card_erase_of_mem hi]; omega
+      rw [Finset.card_erase_of_mem hi]
+      omega
     rw [dite_eq_right hc, smul_zero]
 
-theorem toFam_inCech {N : Finset ι → AddSubgroup V} {m : ℕ} (hm : 0 < m)
-    (hrange : ∀ s, s.Nonempty → (φ s).range = N s) (x : Cube.Term A m) :
-    DI.InCech N m (toFam A φ m x) := by
+theorem toFam_inCech
+    {N : Finset ι → AddSubgroup V} {m : ℕ}
+    (hm : 0 < m) (hrange : ∀ s, s.Nonempty → (φ s).range = N s) (x : Cube.Term A m)
+    : DI.InCech N m (toFam A φ m x) := by
   refine ⟨?_, fun s => ?_, fun s hs => ?_⟩
   · unfold toFam; rw [dite_eq_right (by simp; omega)]
   · unfold toFam
@@ -60,17 +66,22 @@ theorem toFam_inCech {N : Finset ι → AddSubgroup V} {m : ℕ} (hm : 0 < m)
     · exact zero_mem _
   · unfold toFam; rw [dite_eq_right hs]
 
-theorem toFam_injective {m : ℕ} (hm : 0 < m) (hinj : ∀ s, s.Nonempty → Function.Injective (φ s))
-    {x y : Cube.Term A m} (h : toFam A φ m x = toFam A φ m y) : x = y := by
+theorem toFam_injective
+    {m : ℕ} (hm : 0 < m)
+    (hinj : ∀ s, s.Nonempty → Function.Injective (φ s))
+    {x y : Cube.Term A m} (h : toFam A φ m x = toFam A φ m y)
+    : x = y := by
   funext s
   have := congrFun h s.1
   unfold toFam at this
   rw [dite_eq_left s.2, dite_eq_left s.2] at this
   exact hinj _ (nonempty_of_card hm s.2) this
 
-theorem exists_toFam {N : Finset ι → AddSubgroup V} {m : ℕ} (hm : 0 < m)
-    (hrange : ∀ s, s.Nonempty → (φ s).range = N s) {c : Finset ι → V} (hc : DI.InCech N m c) :
-    ∃ x : Cube.Term A m, toFam A φ m x = c := by
+theorem exists_toFam
+    {N : Finset ι → AddSubgroup V} {m : ℕ}
+    (hm : 0 < m) (hrange : ∀ s, s.Nonempty → (φ s).range = N s)
+    {c : Finset ι → V} (hc : DI.InCech N m c)
+    : ∃ x : Cube.Term A m, toFam A φ m x = c := by
   have hex : ∀ s : {s : Finset ι // s.card = m}, ∃ y, φ s.1 y = c s.1 := fun s =>
     AddMonoidHom.mem_range.1 (by rw [hrange _ (nonempty_of_card hm s.2)]; exact hc.2.1 s.1)
   choose g hg using hex
@@ -80,24 +91,26 @@ theorem exists_toFam {N : Finset ι → AddSubgroup V} {m : ℕ} (hm : 0 < m)
   · exact hg ⟨s, h⟩
   · exact (hc.2.2 s h).symm
 
-theorem exact_iff_cechZero {N : Finset ι → AddSubgroup V} {m : ℕ} (hm : 0 < m)
+theorem exact_iff_cechZero
+    {N : Finset ι → AddSubgroup V} {m : ℕ} (hm : 0 < m)
     (hinj : ∀ s, s.Nonempty → Function.Injective (φ s))
     (hrange : ∀ s, s.Nonempty → (φ s).range = N s)
-    (hres : ∀ (s t : Finset ι) (h : s ⊆ t), s.Nonempty → ∀ x, φ t (Cube.res A h x) = φ s x) :
-    Function.Exact (Cube.d A m) (Cube.d A (m + 1)) ↔ DI.CechZero N m := by
+    (hres : ∀ (s t : Finset ι) (h : s ⊆ t), s.Nonempty → ∀ x, φ t (Cube.res A h x) = φ s x)
+    : Function.Exact (Cube.d A m) (Cube.d A (m + 1)) ↔ DI.CechZero N m := by
   have hm1 : 0 < m + 1 := Nat.succ_pos m
   constructor
   · intro hex c hc hdc
     obtain ⟨x, rfl⟩ := exists_toFam (A := A) hm1 hrange hc
-    have hdx : Cube.d A (m + 1) x = 0 := toFam_injective (Nat.succ_pos _) hinj
-      (by rw [← delta_toFam hm1 hres, hdc, toFam_zero])
+    have hdx : Cube.d A (m + 1) x = 0 :=
+      toFam_injective (Nat.succ_pos _) hinj (by rw [← delta_toFam hm1 hres, hdc, toFam_zero])
     obtain ⟨y, hy⟩ := (hex x).1 hdx
     exact ⟨toFam A φ m y, toFam_inCech hm hrange y, by rw [delta_toFam hm hres, hy]⟩
   · intro hcz x
     constructor
     · intro hdx
-      obtain ⟨y', hy'c, hy'd⟩ := hcz (toFam A φ (m + 1) x) (toFam_inCech hm1 hrange x)
-        (by rw [delta_toFam hm1 hres, hdx, toFam_zero])
+      obtain ⟨y', hy'c, hy'd⟩ :=
+        hcz (toFam A φ (m + 1) x) (toFam_inCech hm1 hrange x)
+          (by rw [delta_toFam hm1 hres, hdx, toFam_zero])
       obtain ⟨y, rfl⟩ := exists_toFam (A := A) hm hrange hy'c
       exact ⟨y, toFam_injective hm1 hinj (by rw [← delta_toFam hm hres, hy'd])⟩
     · rintro ⟨y, rfl⟩
@@ -107,11 +120,13 @@ end GlobalTheory.LatCech
 
 namespace GlobalTheory
 
-theorem cechZero_latSec_iff_subsingleton_coh : ∀ (X : Scheme.{0}) [IsIntegral X] [X.IsSeparated]
-    {V : Type} [AddCommGroup V] [Module X.functionField V] (M : X → AddSubgroup V) (F : X.Modules)
-    [F.IsQuasicoherent] {ι : Type} [Fintype ι] [LinearOrder ι] (U : ι → X.Opens), LatModel M F →
-    (∀ i, IsAffineOpen (U i)) → (∀ i, genericPoint X ∈ U i) → ⨆ i, U i = ⊤ → ∀ b : ℕ, 0 < b →
-    (DI.CechZero (fun s => latSec M (inter U s)) b ↔ Subsingleton (coh F b)) := by
+theorem cechZero_latSec_iff_subsingleton_coh
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [X.IsSeparated] {V : Type} [AddCommGroup V]
+        [Module X.functionField V] (M : X → AddSubgroup V) (F : X.Modules) [F.IsQuasicoherent]
+        {ι : Type} [Fintype ι] [LinearOrder ι] (U : ι → X.Opens),
+      LatModel M F → (∀ i, IsAffineOpen (U i)) → (∀ i, genericPoint X ∈ U i) → ⨆ i, U i = ⊤
+        → ∀ b : ℕ,
+          0 < b → (DI.CechZero (fun s => latSec M (inter U s)) b ↔ Subsingleton (coh F b)) := by
   intro X _ hsepX V _ _ M F _ ι _ _ U hL hA hg hc b hb
   letI : X.IsSeparated := hsepX
   have hsep : ∀ s : Finset ι, s.Nonempty → IsAffineOpen (⨅ i ∈ s, U i) :=
@@ -134,10 +149,13 @@ theorem cechZero_latSec_iff_subsingleton_coh : ∀ (X : Scheme.{0}) [IsIntegral 
     · rintro ⟨x, rfl⟩
       exact AddMonoidHom.mem_range.2 ⟨_, rfl⟩
     · rintro ⟨z, rfl⟩
-      exact AddMonoidHom.mem_range.2 ⟨(sectionsOn.toΓ F (cechOpen ⊤ U s)).symm z,
-        congrArg (hL.val _ (hgen s)) ((sectionsOn.toΓ F (cechOpen ⊤ U s)).apply_symm_apply z)⟩
-  have hres : ∀ (s t : Finset ι) (h : s ⊆ t), s.Nonempty →
-      ∀ x, φ t (Cube.res (cechCube ℤ F ⊤ U) h x) = φ s x := by
+      exact AddMonoidHom.mem_range.2 ⟨
+        (sectionsOn.toΓ F (cechOpen ⊤ U s)).symm z,
+        congrArg (hL.val _ (hgen s)) ((sectionsOn.toΓ F (cechOpen ⊤ U s)).apply_symm_apply z)
+      ⟩
+  have hres
+      : ∀ (s t : Finset ι) (h : s ⊆ t),
+        s.Nonempty → ∀ x, φ t (Cube.res (cechCube ℤ F ⊤ U) h x) = φ s x := by
     intro s t h _ x
     show hL.val _ _ (sectionsOn.toΓ F _ (sectionsOn.res ℤ F (cechOpen_anti ⊤ U h) x)) =
       hL.val _ _ (sectionsOn.toΓ F _ x)
@@ -145,9 +163,10 @@ theorem cechZero_latSec_iff_subsingleton_coh : ∀ (X : Scheme.{0}) [IsIntegral 
       (sectionsOn.toΓ F _ x)
   obtain ⟨p, rfl⟩ : ∃ p, b = p + 1 := ⟨b - 1, by omega⟩
   have e' := e F (p + 1)
-  rw [show Subsingleton (coh F (p + 1)) ↔ Subsingleton (cechH ℤ F ⊤ U (p + 1)) from
-    ⟨fun h => haveI := h; e'.injective.subsingleton,
-      fun h => haveI := h; e'.symm.injective.subsingleton⟩,
+  rw [show Subsingleton (coh F (p + 1)) ↔ Subsingleton (cechH ℤ F ⊤ U (p + 1)) from ⟨
+      fun h => haveI := h; e'.injective.subsingleton,
+      fun h => haveI := h; e'.symm.injective.subsingleton
+    ⟩,
     ← ModuleCat.isZero_iff_subsingleton, cechH_def, cech_def,
     ← HomologicalComplex.exactAt_iff_isZero_homology, cechComplex_exactAt_succ_iff]
   exact (LatCech.exact_iff_cechZero (φ := φ) (Nat.succ_pos p) hinj hrange hres).symm

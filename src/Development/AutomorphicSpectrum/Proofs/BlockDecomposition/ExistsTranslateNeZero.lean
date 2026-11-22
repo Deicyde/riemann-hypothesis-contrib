@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsS
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.LFun PositivityTheory.JacquetShalikaLocal
+open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.LFun
+  PositivityTheory.JacquetShalikaLocal
 
 namespace GlobalTheory.CompanionTheory.SatakeBound
 
@@ -18,63 +19,84 @@ def IsFix (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) (v : π.V) : Prop 
   ∀ k ∈ KGL w (n := a), π.locRep w k v = v
 
 def sphSpan (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) : Submodule ℂ (Sm E a) :=
-  Submodule.span ℂ {φ | ∃ (g : GL (Fin a) (w.adicCompletion E)) (v : π.V), IsFix π w v ∧ φ = (π.locRep w g v).1}
+  Submodule.span ℂ
+    {φ | ∃ (g : GL (Fin a) (w.adicCompletion E)) (v : π.V), IsFix π w v ∧ φ = (π.locRep w g v).1}
 
-theorem locRep_val (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) (g : GL (Fin a) (w.adicCompletion E)) (v : π.V) :
-    (π.locRep w g v).1 = finRep E a (locGL E a w g) v.1 := rfl
+theorem locRep_val
+    (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) (g : GL (Fin a) (w.adicCompletion E)) (v : π.V)
+    : (π.locRep w g v).1 = finRep E a (locGL E a w g) v.1 :=
+  rfl
 
-theorem mem_sphSpan (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) (g : GL (Fin a) (w.adicCompletion E)) {v : π.V}
-    (hv : IsFix π w v) : (π.locRep w g v).1 ∈ sphSpan π w :=
+theorem mem_sphSpan
+    (π : CuspSub E a)
+    (w : HeightOneSpectrum (𝓞 E)) (g : GL (Fin a) (w.adicCompletion E))
+    {v : π.V} (hv : IsFix π w v)
+    : (π.locRep w g v).1 ∈ sphSpan π w :=
   Submodule.subset_span ⟨g, v, hv, rfl⟩
 
-theorem isFix_op (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) (o : Op E a)
-    (hc : ∀ g, act o * finRep E a (locGL E a w g) = finRep E a (locGL E a w g) * act o) {v : π.V} (hv : IsFix π w v) :
-    IsFix π w (π.op o v) := fun k hk => by
+theorem isFix_op
+    (π : CuspSub E a)
+    (w : HeightOneSpectrum (𝓞 E)) (o : Op E a)
+    (hc : ∀ g, act o * finRep E a (locGL E a w g) = finRep E a (locGL E a w g) * act o)
+    {v : π.V} (hv : IsFix π w v)
+    : IsFix π w (π.op o v) := fun k hk => by
   refine Subtype.ext ?_
   rw [locRep_val, CuspSub.op_val]
   have e := LinearMap.congr_fun (hc k) v.1
   simp only [Module.End.mul_apply] at e
   rw [← e, ← locRep_val, hv k hk]
 
-theorem act_translate (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) (o : Op E a)
+theorem act_translate
+    (π : CuspSub E a)
+    (w : HeightOneSpectrum (𝓞 E)) (o : Op E a)
     (hc : ∀ g, act o * finRep E a (locGL E a w g) = finRep E a (locGL E a w g) * act o)
-    (g : GL (Fin a) (w.adicCompletion E)) {v : π.V} (hv : IsFix π w v) :
-    act o (π.locRep w g v).1 ∈ sphSpan π w := by
+    (g : GL (Fin a) (w.adicCompletion E))
+    {v : π.V} (hv : IsFix π w v)
+    : act o (π.locRep w g v).1 ∈ sphSpan π w := by
   have e := LinearMap.congr_fun (hc g) v.1
   simp only [Module.End.mul_apply] at e
   rw [locRep_val, e]
   exact mem_sphSpan π w g (isFix_op π w o hc hv)
 
-theorem cpt_comm (y : Kinf E a) (k : GL (Fin a) (Af E)) :
-    act (.cpt y : Op E a) * finRep E a k = finRep E a k * act (.cpt y : Op E a) := by
+theorem cpt_comm (y : Kinf E a) (k : GL (Fin a) (Af E))
+    : act (.cpt y : Op E a) * finRep E a k = finRep E a k * act (.cpt y : Op E a) := by
   change rt E a _ * rt E a _ = rt E a _ * rt E a _
   rw [← map_mul, ← map_mul]
   exact congrArg (rt E a) (infGL_comm _ _)
 
-theorem lie_comm' (X : Lie E a) (k : GL (Fin a) (Af E)) :
-    act (.lie X : Op E a) * finRep E a k = finRep E a k * act (.lie X : Op E a) :=
+theorem lie_comm' (X : Lie E a) (k : GL (Fin a) (Af E))
+    : act (.lie X : Op E a) * finRep E a k = finRep E a k * act (.lie X : Op E a) :=
   lie_rt_fin X k
 
-theorem fin_translate (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) (k : GL (Fin a) (Af E))
-    (g : GL (Fin a) (w.adicCompletion E)) {v : π.V} (hv : IsFix π w v) :
-    finRep E a k (π.locRep w g v).1 ∈ sphSpan π w := by
-  obtain ⟨h, gw, e, hc⟩ := GlobalTheory.T.exists_split_adelicMatrix_localComponent E a w (finGL E a (k * locGL E a w g))
-  obtain ⟨h', hh'⟩ : ∃ h' : GL (Fin a) (Af E), h' = k * locGL E a w g * (locGL E a w gw)⁻¹ := ⟨_, rfl⟩
-  have hh : h = finGL E a h' := by
-    rw [hh', map_mul, map_inv, e, mul_inv_cancel_right]
-  have hcomm : ∀ u, finRep E a h' * finRep E a (locGL E a w u) = finRep E a (locGL E a w u) * finRep E a h' := fun u => by
+theorem fin_translate
+    (π : CuspSub E a)
+    (w : HeightOneSpectrum (𝓞 E))
+    (k : GL (Fin a) (Af E)) (g : GL (Fin a) (w.adicCompletion E))
+    {v : π.V} (hv : IsFix π w v)
+    : finRep E a k (π.locRep w g v).1 ∈ sphSpan π w := by
+  obtain ⟨h, gw, e, hc⟩ :=
+    GlobalTheory.T.exists_split_adelicMatrix_localComponent E a w (finGL E a (k * locGL E a w g))
+  obtain ⟨h', hh'⟩ : ∃ h' : GL (Fin a) (Af E), h' = k * locGL E a w g * (locGL E a w gw)⁻¹ :=
+    ⟨_, rfl⟩
+  have hh : h = finGL E a h' := by rw [hh', map_mul, map_inv, e, mul_inv_cancel_right]
+  have hcomm
+      : ∀ u,
+        finRep E a h' * finRep E a (locGL E a w u)
+          = finRep E a (locGL E a w u) * finRep E a h' := fun u => by
     have h2 := congrArg (rt E a) (hc u)
     rw [hh, map_mul, map_mul] at h2
     exact h2
   have hfix : IsFix π w (π.op (.fin h') v) := isFix_op π w (.fin h') (fun u => hcomm u) hv
   have e2 : finRep E a k (π.locRep w g v).1 = (π.locRep w gw (π.op (.fin h') v)).1 := by
     rw [locRep_val, locRep_val, CuspSub.op_val]
-    change (finRep E a k * finRep E a (locGL E a w g)) v.1 = (finRep E a (locGL E a w gw) * finRep E a h') v.1
+    change (finRep E a k * finRep E a (locGL E a w g)) v.1
+      = (finRep E a (locGL E a w gw) * finRep E a h') v.1
     rw [← hcomm, ← map_mul, ← map_mul, hh', inv_mul_cancel_right]
   rw [e2]
   exact mem_sphSpan π w gw hfix
 
-theorem isStable_sphSpan (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) : _root_.GlobalTheory.CuspRep.IsStable (sphSpan π w) := by
+theorem isStable_sphSpan (π : CuspSub E a) (w : HeightOneSpectrum (𝓞 E))
+    : _root_.GlobalTheory.CuspRep.IsStable (sphSpan π w) := by
   intro o φ hφ
   induction hφ using Submodule.span_induction with
   | mem x hx =>

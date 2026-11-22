@@ -12,22 +12,26 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SpanFinra
 set_option autoImplicit false
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open GlobalTheory GlobalTheory.CxPts GlobalTheory.VB
 
 namespace GlobalTheory.NormalOpen
 
-theorem exists_mul_isInteger (A K : Type*) [CommRing A] [IsDomain A] [Field K] [Algebra A K]
-    [IsFractionRing A K] [Module.Finite A (integralClosure A K)] :
-    ∃ f : A, f ≠ 0 ∧ ∀ y : K, IsIntegral A y → ∃ a : A, algebraMap A K a = f • y := by
+theorem exists_mul_isInteger
+    (A K : Type*) [CommRing A] [IsDomain A] [Field K] [Algebra A K] [IsFractionRing A K]
+    [Module.Finite A (integralClosure A K)]
+    : ∃ f : A, f ≠ 0 ∧ ∀ y : K, IsIntegral A y → ∃ a : A, algebraMap A K a = f • y := by
   classical
   obtain ⟨s, hs⟩ := Module.Finite.fg_top (R := A) (M := integralClosure A K)
-  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors A)
-    (s.image fun z : integralClosure A K => (z : K))
+  obtain ⟨b, hb⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors A)
+      (s.image fun z : integralClosure A K => (z : K))
   refine ⟨b, nonZeroDivisors.ne_zero b.2, fun y hy => ?_⟩
-  have key : ∀ z ∈ Submodule.span A (s : Set (integralClosure A K)),
-      ∃ a : A, algebraMap A K a = (b : A) • (z : K) := by
+  have key
+      : ∀ z ∈ Submodule.span A (s : Set (integralClosure A K)), ∃ a : A,
+        algebraMap A K a = (b : A) • (z : K) := by
     intro z hz
     induction hz using Submodule.span_induction with
     | mem x hx => exact hb _ (Finset.mem_image_of_mem _ hx)
@@ -42,9 +46,9 @@ theorem exists_mul_isInteger (A K : Type*) [CommRing A] [IsDomain A] [Field K] [
       rw [map_mul, ha, Subalgebra.coe_smul, smul_comm, ← Algebra.smul_def]
   exact key ⟨y, hy⟩ (hs ▸ Submodule.mem_top)
 
-theorem exists_isIntegrallyClosed_away (A : Type*) [CommRing A] [IsDomain A]
-    [Module.Finite A (integralClosure A (FractionRing A))] :
-    ∃ f : A, f ≠ 0 ∧ IsIntegrallyClosed (Localization.Away f) := by
+theorem exists_isIntegrallyClosed_away
+    (A : Type*) [CommRing A] [IsDomain A] [Module.Finite A (integralClosure A (FractionRing A))]
+    : ∃ f : A, f ≠ 0 ∧ IsIntegrallyClosed (Localization.Away f) := by
   let K := FractionRing A
   obtain ⟨f, hf, h⟩ := exists_mul_isInteger A K
   refine ⟨f, hf, ?_⟩
@@ -59,8 +63,8 @@ theorem exists_isIntegrallyClosed_away (A : Type*) [CommRing A] [IsDomain A]
     IsFractionRing.isFractionRing_of_isDomain_of_isLocalization (Submonoid.powers f) B K
   rw [isIntegrallyClosed_iff K]
   intro x hx
-  obtain ⟨m, hm⟩ := IsIntegral.exists_multiple_integral_of_isLocalization (Submonoid.powers f)
-    (Rₘ := B) x hx
+  obtain ⟨m, hm⟩ :=
+    IsIntegral.exists_multiple_integral_of_isLocalization (Submonoid.powers f) (Rₘ := B) x hx
   obtain ⟨a, ha⟩ := h _ hm
   let t : Submonoid.powers f := ⟨f, Submonoid.mem_powers f⟩ * m
   refine ⟨IsLocalization.mk' B a t, ?_⟩
@@ -70,9 +74,12 @@ theorem exists_isIntegrallyClosed_away (A : Type*) [CommRing A] [IsDomain A]
   rw [e, mul_comm, ← Algebra.smul_def, Submonoid.smul_def, smul_smul]
   rfl
 
-theorem exists_normal_opens : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k) (D : ℕ),
-    IsArithVar p D → ∃ Ω : X.Opens, (Ω : Set X).Nonempty ∧
-      ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Ω.toScheme := by
+theorem exists_normal_opens
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k) (D : ℕ),
+      IsArithVar p D
+        → ∃ Ω : X.Opens,
+          (Ω : Set X).Nonempty
+            ∧ ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Ω.toScheme := by
   intro k _ X p D h
   have := h.isIntegral
   have := h.finite
@@ -83,8 +90,9 @@ theorem exists_normal_opens : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : 
   have := finite_integralClosure_of_essFiniteType_int A
   obtain ⟨f, hf, hc⟩ := exists_isIntegrallyClosed_away A
   let B := Localization.Away f
-  have : IsDomain B := IsLocalization.isDomain_of_le_nonZeroDivisors (M := Submonoid.powers f) _
-    (powers_le_nonZeroDivisors_of_noZeroDivisors hf)
+  have : IsDomain B :=
+    IsLocalization.isDomain_of_le_nonZeroDivisors (M := Submonoid.powers f) _
+      (powers_le_nonZeroDivisors_of_noZeroDivisors hf)
   have : IsOpenImmersion (spMap (algebraMap A B)) := IsOpenImmersion.of_isLocalization f
   let j : Sp B ⟶ X := spMap (algebraMap A B) ≫ i
   have hB : GlobalTheory.IsNormalScheme (Sp B) := GlobalTheory.IsNormalScheme.spec (.of B)

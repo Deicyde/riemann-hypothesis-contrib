@@ -12,24 +12,33 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsUni
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion EllipticPart TraceEq)
+open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
+  (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion
+    EllipticPart TraceEq)
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.DIV
+  Formalism.L2.Indef Formalism.DivisionValues Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR.Cx
 open GlobalTheory.LiftRows
 
 open scoped TensorProduct
 
 namespace GlobalTheory.TwistLat
 
-theorem comm_symm_mem_intLoc {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (v : HeightOneSpectrum (𝓞 F)) {a : E ⊗[F] Fv F v} (ha : a ∈ Formalism.BasicNotions.intV E v) :
-    (Algebra.TensorProduct.comm F (Fv F v) E).symm a ∈ GlobalTheory.AdelicU.intLoc F E v := by
-  have hle : Formalism.BasicNotions.intV E v ≤ (GlobalTheory.AdelicU.intLoc F E v).comap
-      ((Algebra.TensorProduct.comm F (Fv F v) E).symm : E ⊗[F] Fv F v →+* Fv F v ⊗[F] E) := by
+theorem comm_symm_mem_intLoc
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (v : HeightOneSpectrum (𝓞 F))
+    {a : E ⊗[F] Fv F v} (ha : a ∈ Formalism.BasicNotions.intV E v)
+    : (Algebra.TensorProduct.comm F (Fv F v) E).symm a ∈ GlobalTheory.AdelicU.intLoc F E v := by
+  have hle
+      : Formalism.BasicNotions.intV E v
+        ≤ (GlobalTheory.AdelicU.intLoc F E v).comap
+          ((Algebra.TensorProduct.comm F (Fv F v) E).symm : E ⊗[F] Fv F v →+* Fv F v ⊗[F] E) := by
     unfold Formalism.BasicNotions.intV Formalism.UG.tensInt
     rw [Subring.closure_le]
     rintro z (⟨⟨e, he⟩, rfl⟩ | ⟨⟨b, hb⟩, rfl⟩)
@@ -40,47 +49,70 @@ theorem comm_symm_mem_intLoc {F E : Type} [Field F] [NumberField F] [Field E] [N
       simpa using GlobalTheory.AdelicU.tmul_mem_intLoc (E := E) (v := v) (a := b) hb 1
   exact hle ha
 
-theorem mem_latLoc_iff_comm_mem_locL : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (v : HeightOneSpectrum (𝓞 F)) (y : Fin n → Fv F v ⊗[F] E), y ∈ GlobalTheory.AdelicU.latLoc F L v ↔ (fun i => Algebra.TensorProduct.comm F (Fv F v) E (y i)) ∈ Formalism.L2.Herm.locL v L := by
+theorem mem_latLoc_iff_comm_mem_locL
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
+        (L : Submodule (𝓞 E) (Fin n → E)) (v : HeightOneSpectrum (𝓞 F)) (y : Fin n → Fv F v ⊗[F] E),
+      y ∈ GlobalTheory.AdelicU.latLoc F L v
+        ↔ (fun i => Algebra.TensorProduct.comm F (Fv F v) E (y i))
+          ∈ Formalism.L2.Herm.locL v L := by
   intro F E _ _ _ _ _ n L v y
   constructor
   · intro hy
     refine GlobalTheory.AdelicU.latLoc_induction
-      (p := fun y => (fun i => Algebra.TensorProduct.comm F (Fv F v) E (y i)) ∈ Formalism.L2.Herm.locL v L)
-      (fun a ha x hx => ?_) ?_ (fun y z hy hz => ?_) (fun y hy => ?_) hy
+      (p := fun y =>
+        (fun i => Algebra.TensorProduct.comm F (Fv F v) E (y i)) ∈ Formalism.L2.Herm.locL v L)
+      (fun a ha x hx => ?_)
+      ?_
+      (fun y z hy hz => ?_)
+      (fun y hy => ?_)
+      hy
     · have hmem : ((1 : E) ⊗ₜ[F] a) ∈ Formalism.BasicNotions.intV E v :=
         Subring.subset_closure (Or.inr ⟨⟨a, ha⟩, rfl⟩)
-      have h2 := (Formalism.L2.Herm.locL v L).smul_mem ⟨_, hmem⟩
-        (Submodule.subset_span ⟨x, hx, rfl⟩ : (fun i => Formalism.UG.inclE (F := F) (Fv F v) (x i)) ∈ Formalism.L2.Herm.locL v L)
+      have h2 :=
+        (Formalism.L2.Herm.locL v L).smul_mem ⟨_, hmem⟩
+          (Submodule.subset_span ⟨x, hx, rfl⟩
+            : (fun i => Formalism.UG.inclE (F := F) (Fv F v) (x i)) ∈ Formalism.L2.Herm.locL v L)
       convert h2 using 1
       funext i
       simp [Formalism.UG.inclE, Subring.smul_def]
     · convert (Formalism.L2.Herm.locL v L).zero_mem using 1
-      funext i; simp
+      funext i
+      simp
     · convert (Formalism.L2.Herm.locL v L).add_mem hy hz using 1
-      funext i; simp
+      funext i
+      simp
     · convert (Formalism.L2.Herm.locL v L).neg_mem hy using 1
-      funext i; simp
+      funext i
+      simp
   · intro hy
-    have key : ∀ z : Fin n → E ⊗[F] Fv F v, z ∈ Formalism.L2.Herm.locL v L →
-        (fun i => (Algebra.TensorProduct.comm F (Fv F v) E).symm (z i)) ∈ GlobalTheory.AdelicU.latLoc F L v := by
+    have key
+        : ∀ z : Fin n → E ⊗[F] Fv F v,
+          z ∈ Formalism.L2.Herm.locL v L
+            → (fun i => (Algebra.TensorProduct.comm F (Fv F v) E).symm (z i))
+              ∈ GlobalTheory.AdelicU.latLoc F L v := by
       intro z hz
       unfold Formalism.L2.Herm.locL Formalism.UG.latS at hz
       induction hz using Submodule.span_induction with
       | mem z hz =>
         obtain ⟨x, hx, rfl⟩ := hz
         convert GlobalTheory.AdelicU.tmul_mem_latLoc (F := F) (v := v) (one_mem _) hx using 1
-        funext i; simp [Formalism.UG.inclE]
+        funext i
+        simp [Formalism.UG.inclE]
       | zero =>
         convert (GlobalTheory.AdelicU.latLoc F L v).zero_mem using 1
-        funext i; simp
+        funext i
+        simp
       | add z w _ _ hz hw =>
         convert (GlobalTheory.AdelicU.latLoc F L v).add_mem hz hw using 1
-        funext i; simp
+        funext i
+        simp
       | smul c z _ hz =>
         have h2 := (GlobalTheory.AdelicU.latLoc F L v).smul_mem ⟨_, comm_symm_mem_intLoc v c.2⟩ hz
         convert h2 using 1
-        funext i; simp [Subring.smul_def]
+        funext i
+        simp [Subring.smul_def]
     convert key _ hy using 1
-    funext i; simp
+    funext i
+    simp
 
 end GlobalTheory.TwistLat

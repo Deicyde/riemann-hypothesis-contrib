@@ -12,7 +12,9 @@ open GlobalTheory.PRep PositivityTheory.SphericalProduct
 
 namespace GlobalTheory.CompanionTheory.Cass
 
-theorem sphericalProduct_A4 : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G], PositivityTheory.SphericalProduct.A4 G := by
+theorem sphericalProduct_A4
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G],
+      PositivityTheory.SphericalProduct.A4 G := by
   intro G _ _ _
   unfold PositivityTheory.SphericalProduct.A4
   intro D V _ _ π hπ hex

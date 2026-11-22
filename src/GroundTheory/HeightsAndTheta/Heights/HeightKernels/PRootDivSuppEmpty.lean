@@ -19,8 +19,8 @@ namespace RootDivisorSupportEmpty
 theorem isIntegral_of_pow_eq_one {z : ℂ} {k : ℕ} (hk : 0 < k) (hz : z ^ k = 1) : IsIntegral ℤ z :=
   ⟨Polynomial.X ^ k - 1, Polynomial.monic_X_pow_sub_C 1 hk.ne', by simp [hz]⟩
 
-theorem isIntegral_det {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (h : ∀ a b, IsIntegral ℤ (M a b)) :
-    IsIntegral ℤ M.det := by
+theorem isIntegral_det {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (h : ∀ a b, IsIntegral ℤ (M a b))
+    : IsIntegral ℤ M.det := by
   have : M.det ∈ integralClosure ℤ ℂ := by
     rw [Matrix.det_apply]
     refine Subalgebra.sum_mem _ fun σ _ => ?_
@@ -28,8 +28,10 @@ theorem isIntegral_det {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (h : ∀ a b, 
     exact zsmul_mem (Subalgebra.prod_mem _ fun i _ => h _ _) _
   exact this
 
-theorem isIntegral_rootCoord {f j m : ℕ} {ζ : Fin f → Matrix (Fin j) (Fin m) ℂ} (hζ : IsRootMatrix ζ)
-    (p : Σ _ : Fin f, PlIdx j m) : IsIntegral ℤ (rootCoord ζ p) := by
+theorem isIntegral_rootCoord
+    {f j m : ℕ} {ζ : Fin f → Matrix (Fin j) (Fin m) ℂ}
+    (hζ : IsRootMatrix ζ) (p : Σ _ : Fin f, PlIdx j m)
+    : IsIntegral ℤ (rootCoord ζ p) := by
   refine isIntegral_det _ fun a b => ?_
   simp only [colsOf, Matrix.submatrix_apply, id, onePipe, Matrix.of_apply]
   refine Fin.addCases (fun c => ?_) (fun c => ?_) ((p.2.1.orderEmbOfFin p.2.2) b)
@@ -43,7 +45,6 @@ theorem isIntegral_rootCoord {f j m : ℕ} {ζ : Fin f → Matrix (Fin j) (Fin m
 
 end RootDivisorSupportEmpty
 
-
 open RootDivisorSupportEmpty in
 theorem RootDivSuppEmpty.proof : RootDivSuppEmpty.Statement := by
   intro f j m ζ hζ
@@ -52,7 +53,8 @@ theorem RootDivSuppEmpty.proof : RootDivSuppEmpty.Statement := by
   rintro ⟨hQmin, hrel⟩
   have hQp : Q.IsPrime := hQmin.1.1
   have hle := hQmin.1.2
-  have hs : rootAnchorSection f j m ∈ Q := hle (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
+  have hs : rootAnchorSection f j m ∈ Q :=
+    hle (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
   obtain ⟨τ, -, hτ⟩ := (hQp.prod_mem_iff).1 hs
   obtain ⟨I, hI⟩ := hrel τ
   apply hI
@@ -64,12 +66,13 @@ theorem RootDivSuppEmpty.proof : RootDivSuppEmpty.Statement := by
   have hG : G ∈ rootPointIdeal ζ := by
     rw [rootPointIdeal, mCoordIdeal, RingHom.mem_ker]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hGdef, mConeMap, map_sum, map_mul, map_pow, MvPolynomial.aeval_C, MvPolynomial.aeval_X,
-      hy0, MvPolynomial.C_1, one_mul]
-    have hterm : ∀ k ∈ Finset.range (n + 1),
-        algebraMap ℤ (MvPolynomial (Fin f) ℂ) (p.coeff k) * (C (rootCoord ζ ⟨τ, I⟩) * X τ) ^ k *
-          (X τ : MvPolynomial (Fin f) ℂ) ^ (n - k) =
-        C ((p.coeff k : ℂ) * rootCoord ζ ⟨τ, I⟩ ^ k) * X τ ^ n := by
+      simp only [hGdef, mConeMap, map_sum, map_mul, map_pow, MvPolynomial.aeval_C,
+        MvPolynomial.aeval_X, hy0, MvPolynomial.C_1, one_mul]
+    have hterm
+        : ∀ k ∈ Finset.range (n + 1),
+          algebraMap ℤ (MvPolynomial (Fin f) ℂ) (p.coeff k) * (C (rootCoord ζ ⟨τ, I⟩) * X τ) ^ k
+              * (X τ : MvPolynomial (Fin f) ℂ) ^ (n - k)
+            = C ((p.coeff k : ℂ) * rootCoord ζ ⟨τ, I⟩ ^ k) * X τ ^ n := by
       intro k hk
       have hkn : k ≤ n := Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
       rw [eq_intCast, ← map_intCast (C : ℂ →+* MvPolynomial (Fin f) ℂ), mul_pow, C_mul, C_pow,
@@ -88,7 +91,8 @@ theorem RootDivSuppEmpty.proof : RootDivSuppEmpty.Statement := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [hGdef, map_sum, map_mul, map_pow, h0] at h1
     rw [Finset.sum_range_succ, Finset.sum_eq_zero, zero_add, Nat.sub_self, pow_zero, mul_one,
-      hpm.coeff_natDegree, map_one, map_one, one_mul] at h1
+        hpm.coeff_natDegree, map_one, map_one, one_mul]
+      at h1
     · exact h1
     · intro k hk
       rw [zero_pow (Nat.sub_ne_zero_of_lt (Finset.mem_range.1 hk)), mul_zero]

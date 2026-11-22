@@ -21,19 +21,22 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem qAll_isBoundedAtImInfty {p : ℂ → Prop} {N : ℕ} {f : ℍ → ℂ} (hN : 0 < N) (h : QAll p N f) :
-    UpperHalfPlane.IsBoundedAtImInfty f := by
+theorem qAll_isBoundedAtImInfty {p : ℂ → Prop} {N : ℕ} {f : ℍ → ℂ} (hN : 0 < N) (h : QAll p N f)
+    : UpperHalfPlane.IsBoundedAtImInfty f := by
   obtain ⟨a, ha, -⟩ := h
   exact (GlobalTheory.QFam.hasQ_mdifferentiable_and_isBoundedAtImInfty N f a hN ha).2
 
-theorem isBoundedAtImInfty_of_monic_root {n : ℕ} {h : ℍ → ℂ} {s : Fin n → ℍ → ℂ}
-    (hs : ∀ j, UpperHalfPlane.IsBoundedAtImInfty (s j))
-    (hrel : ∀ τ, h τ ^ n + ∑ j, s j τ * h τ ^ (j : ℕ) = 0) : UpperHalfPlane.IsBoundedAtImInfty h := by
-  have hb : ∀ τ, ‖h τ‖ ≤ 1 + ∑ j, ‖s j τ‖ := fun τ => GlobalTheory.T.norm_root_le_one_add_sum_norm_coeff n (fun j => s j τ) (h τ) (hrel τ)
+theorem isBoundedAtImInfty_of_monic_root
+    {n : ℕ} {h : ℍ → ℂ} {s : Fin n → ℍ → ℂ} (hs : ∀ j, UpperHalfPlane.IsBoundedAtImInfty (s j))
+    (hrel : ∀ τ, h τ ^ n + ∑ j, s j τ * h τ ^ (j : ℕ) = 0)
+    : UpperHalfPlane.IsBoundedAtImInfty h := by
+  have hb : ∀ τ, ‖h τ‖ ≤ 1 + ∑ j, ‖s j τ‖ := fun τ =>
+    GlobalTheory.T.norm_root_le_one_add_sum_norm_coeff n (fun j => s j τ) (h τ) (hrel τ)
   have hsum : (fun τ => 1 + ∑ j, ‖s j τ‖) =O[UpperHalfPlane.atImInfty] (1 : ℍ → ℝ) := by
     refine Asymptotics.IsBigO.add (Asymptotics.isBigO_refl _ _) ?_
     convert Asymptotics.IsBigO.sum (A := fun j τ => ‖s j τ‖) (s := Finset.univ) (fun j _ => (hs j).norm_left) using 1
-    ext τ; simp [Finset.sum_apply]
+    ext τ
+    simp [Finset.sum_apply]
   refine Asymptotics.IsBigO.trans (Asymptotics.isBigO_of_le _ fun τ => ?_) hsum
   refine (hb τ).trans (le_of_eq ?_)
   rw [Real.norm_of_nonneg (by positivity)]
@@ -42,10 +45,16 @@ end GlobalTheory.FN
 
 namespace GlobalTheory.FN
 
-theorem qAll_range_of_monic_root : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ) (N n : ℕ) (h : ℍ → ℂ) (s : Fin n → ℍ → ℂ), 0 < N → MDifferentiable 𝓘(ℂ) 𝓘(ℂ) h → (∀ τ : ℍ, h ((N : ℝ) +ᵥ τ) = h τ) → (∀ j, QAll (· ∈ ε.range) N (s j)) → (∀ τ, h τ ^ n + ∑ j, s j τ * h τ ^ (j : ℕ) = 0) → QAll (· ∈ ε.range) N h := by
+theorem qAll_range_of_monic_root
+    : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ) (N n : ℕ) (h : ℍ → ℂ)
+        (s : Fin n → ℍ → ℂ),
+      0 < N → MDifferentiable 𝓘(ℂ) 𝓘(ℂ) h → (∀ τ : ℍ, h ((N : ℝ) +ᵥ τ) = h τ)
+        → (∀ j, QAll (· ∈ ε.range) N (s j)) → (∀ τ, h τ ^ n + ∑ j, s j τ * h τ ^ (j : ℕ) = 0)
+        → QAll (· ∈ ε.range) N h := by
   intro Ω _ _ ε N n h s hN hh hper hs hrel
-  obtain ⟨b, hb⟩ := GlobalTheory.T.hasQExpansion_of_periodic_bounded_holomorphic N h hN hh hper
-    (isBoundedAtImInfty_of_monic_root (fun j => qAll_isBoundedAtImInfty hN (hs j)) hrel)
+  obtain ⟨b, hb⟩ :=
+    GlobalTheory.T.hasQExpansion_of_periodic_bounded_holomorphic N h hN hh hper
+      (isBoundedAtImInfty_of_monic_root (fun j => qAll_isBoundedAtImInfty hN (hs j)) hrel)
   choose a ha hain using hs
   let p : ℕ → ℍ → ℂ := fun i => if hi : i < n then s ⟨i, hi⟩ else fun _ => 1
   let c : ℕ → ℕ → ℂ := fun i => if hi : i < n then a ⟨i, hi⟩ else fun k => if k = 0 then 1 else 0
@@ -87,7 +96,8 @@ theorem qAll_range_of_monic_root : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (
         · exact ⟨0, map_zero ε⟩
     · simp only [map_zero]
       exact ⟨0, map_zero ε⟩
-  have key := GlobalTheory.T.coeff_mem_range_of_isRoot_of_coeff_mem_range Ω ε (PowerSeries.mk b) Q hQ0 hcr hQ
+  have key :=
+    GlobalTheory.T.coeff_mem_range_of_isRoot_of_coeff_mem_range Ω ε (PowerSeries.mk b) Q hQ0 hcr hQ
   exact ⟨b, hb, fun k => by simpa using key k⟩
 
 end GlobalTheory.FN

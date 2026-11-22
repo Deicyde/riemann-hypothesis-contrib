@@ -9,13 +9,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
+open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
 open UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Lit.Dr
 open scoped TensorProduct GlobalTheory.CuspRep.CuspidalL2GL
 open UpperTheory.V.Cj UpperTheory.V.Cj.H
 
-theorem UpperTheory.V.Cj.H.exactLim :
-    UpperTheory.V.Cj.H.ExactLim := by
+theorem UpperTheory.V.Cj.H.exactLim : UpperTheory.V.Cj.H.ExactLim := by
   intro E _ _ _ a ha U hU Ξ q β ω hβ dβ hω dω hl hex
   obtain ⟨c, hc⟩ := (perEx E a U Ξ q).1 β hβ dβ
   obtain ⟨cn, hcn, ht⟩ := perLim E a U Ξ q ω hω dω hl

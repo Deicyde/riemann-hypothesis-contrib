@@ -10,12 +10,14 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
-theorem SectionRingFinite.proof (hL : SectionLatticeFinite.Statement) (hS : SectionSpanStep.Statement) :
-    SectionRingFinite.Statement := by
+theorem SectionRingFinite.proof
+    (hL : SectionLatticeFinite.Statement) (hS : SectionSpanStep.Statement)
+    : SectionRingFinite.Statement := by
   intro K _ ι _ Ω _ y a q w hy hw hgen
   classical
   obtain ⟨n₀, hn₀⟩ := hS K ι Ω y a q w hy hw hgen
@@ -42,8 +44,9 @@ theorem SectionRingFinite.proof (hL : SectionLatticeFinite.Statement) (hS : Sect
     intro g hg
     apply AddSubgroup.subset_closure
     refine ⟨P.equivFin ⟨(n, g), memP n g hn hg⟩, 0, ?_, ?_⟩ <;> simp [f]
-  have step : ∀ n (j : Fin q), ∀ s ∈ AddSubgroup.closure (T n),
-      s * w j ∈ AddSubgroup.closure (T (n + 1)) := by
+  have step
+      : ∀ n (j : Fin q), ∀ s ∈ AddSubgroup.closure (T n),
+        s * w j ∈ AddSubgroup.closure (T (n + 1)) := by
     intro n j s hs
     induction hs using AddSubgroup.closure_induction with
     | mem x hx =>

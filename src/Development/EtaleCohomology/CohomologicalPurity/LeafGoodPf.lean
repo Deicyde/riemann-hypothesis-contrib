@@ -9,8 +9,12 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC CochainCo
 
 namespace LateralTheory.CohomologicalPurity.Bd
 
-theorem pb_v {R : Type} [CommRing R] {A B I : Cx R} (f : A ⟶ B) {n : ℤ} (c : Cochain B I n) (p q : ℤ) (hpq : p + n = q) :
-    (pb f c).v p q hpq = f.f p ≫ c.v p q hpq := by
+theorem pb_v
+    {R : Type} [CommRing R]
+    {A B I : Cx R} (f : A ⟶ B)
+    {n : ℤ} (c : Cochain B I n)
+    (p q : ℤ) (hpq : p + n = q)
+    : (pb f c).v p q hpq = f.f p ≫ c.v p q hpq := by
   simp [pb, Cochain.zero_cochain_comp_v, Cochain.ofHom_v]
 
 theorem LeafGood_of : LeafGood := by
@@ -25,9 +29,14 @@ theorem LeafGood_of : LeafGood := by
     rw [pb_v]
     simp [Cochain.mk_v]
   · intro n c c' h
-    refine ⟨Cochain.mk (fun p q hpq => (hp p).desc (c.v p q hpq) (c'.v p q hpq) (by
-      have := congrArg (fun x => x.v p q hpq) h
-      simpa only [pb_v] using this)), ?_, ?_⟩
+    refine ⟨
+      Cochain.mk (fun p q hpq =>
+        (hp p).desc (c.v p q hpq) (c'.v p q hpq) (by
+          have := congrArg (fun x => x.v p q hpq) h
+          simpa only [pb_v] using this)),
+      ?_,
+      ?_
+    ⟩
     · refine Cochain.ext _ _ (fun p q hpq => ?_); rw [pb_v]; simp [Cochain.mk_v]
     · refine Cochain.ext _ _ (fun p q hpq => ?_); rw [pb_v]; simp [Cochain.mk_v]
   · intro n b b' h1 h2

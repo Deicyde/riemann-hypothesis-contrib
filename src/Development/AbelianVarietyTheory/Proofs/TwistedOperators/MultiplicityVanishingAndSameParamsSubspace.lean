@@ -21,19 +21,27 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.EvenOnto
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.EvenOnto
 
-theorem val_eq_zero_imp (D : D7) : MetEx D → ForStage D fun c _ s => ∀ (x : s.CC c) w, w ≠ 0 → PiLocalization₂.val x w = 0 → x = 0 := by
+theorem val_eq_zero_imp (D : D7)
+    : MetEx D
+      → ForStage D fun c _ s => ∀ (x : s.CC c) w, w ≠ 0 → PiLocalization₂.val x w = 0 → x = 0 := by
   intro hM c hc j hj s hs x w hw hx
   obtain ⟨ipD, ip, hm⟩ := hM c hc j hj s hs
   have h1 := hm.schur x x w w
-  have h0 : Lift.pet s.ν s.fd ((x : SmT s.M →ₗ[ℂ] (GA D s.V → ℂ)) w) ((x : SmT s.M →ₗ[ℂ] (GA D s.V → ℂ)) w) = 0 := by
+  have h0
+      : Lift.pet s.ν s.fd ((x : SmT s.M →ₗ[ℂ] (GA D s.V → ℂ)) w)
+          ((x : SmT s.M →ₗ[ℂ] (GA D s.V → ℂ)) w)
+        = 0 := by
     have hx' : (x : SmT s.M →ₗ[ℂ] (GA D s.V → ℂ)) w = 0 := hx
     rw [hx']
     simp [Lift.pet]
@@ -52,18 +60,32 @@ theorem val_eq_zero_imp (D : D7) : MetEx D → ForStage D fun c _ s => ∀ (x : 
   rw [hip] at this
   simp at this
 
-
 open GlobalTheory.LFun.ParLin in
-theorem isPar_add_smul : ∀ (D : D7) (c : Com D) (s : PiLocalization₂ D), (∀ (u u' : s.CC c) B B' (a : ℂ), IsPar u B → IsPar u' B' →
-    (∀ w ∉ (GlobalTheory.LFun.above D.host.E (c.S : Set (HeightOneSpectrum (𝓞 D.host.F)))), B w = B' w) →
-    u + a • u' ≠ 0 → IsPar (u + a • u') B) ∧ ∀ (u : s.CC c) B (a : ℂ), IsPar u B → a ≠ 0 → IsPar (a • u) B := by
+theorem isPar_add_smul
+    : ∀ (D : D7) (c : Com D) (s : PiLocalization₂ D),
+      (∀ (u u' : s.CC c) B B' (a : ℂ),
+          IsPar u B → IsPar u' B'
+            → (∀ w
+                ∉ (GlobalTheory.LFun.above D.host.E (c.S : Set (HeightOneSpectrum (𝓞 D.host.F)))),
+              B w = B' w)
+            → u + a • u' ≠ 0
+            → IsPar (u + a • u') B)
+        ∧ ∀ (u : s.CC c) B (a : ℂ), IsPar u B → a ≠ 0 → IsPar (a • u) B := by
   intro D c s
   have cne : ∀ f : GA D s.V → ℂ, f ≠ 0 → (fun g => conj (f g)) ≠ 0 := fun f hf h0 =>
     hf (funext fun g => by simpa using congrFun h0 g)
-  refine ⟨fun u u' B B' a hu hu' hB h0 => ⟨h0, fun v hv => ?_⟩, fun u B a hu ha => ⟨smul_ne_zero ha hu.1, fun v hv => ?_⟩⟩
-  · have hval : PiLocalization₂.val (u + a • u') v = PiLocalization₂.val u v + a • PiLocalization₂.val u' v := by simp [PiLocalization₂.val]
-    have hc : (fun g => conj (PiLocalization₂.val (u + a • u') v g)) =
-        (fun g => conj (PiLocalization₂.val u v g)) + (conj a) • (fun g => conj (PiLocalization₂.val u' v g)) := by
+  refine ⟨
+    fun u u' B B' a hu hu' hB h0 => ⟨h0, fun v hv => ?_⟩,
+    fun u B a hu ha => ⟨smul_ne_zero ha hu.1, fun v hv => ?_⟩
+  ⟩
+  · have hval
+        : PiLocalization₂.val (u + a • u') v
+          = PiLocalization₂.val u v + a • PiLocalization₂.val u' v := by
+      simp [PiLocalization₂.val]
+    have hc
+        : (fun g => conj (PiLocalization₂.val (u + a • u') v g))
+          = (fun g => conj (PiLocalization₂.val u v g))
+            + (conj a) • (fun g => conj (PiLocalization₂.val u' v g)) := by
       funext g; simp [hval]
     unfold ParFun
     rw [hc]
@@ -84,18 +106,35 @@ theorem isPar_add_smul : ∀ (D : D7) (c : Com D) (s : PiLocalization₂ D), (�
         exact hu.2 v h1
       · have ha : a ≠ 0 := fun e => h2 (by simp [e])
         have hu'v : PiLocalization₂.val u' v ≠ 0 := fun e => h2 (by simp [e])
-        refine paramFun_add (hu.2 v h1) (paramFun_smul (paramFun_of_agree (hu'.2 v hu'v) hB) (by simpa using ha)) ?_
+        refine paramFun_add (hu.2 v h1)
+          (paramFun_smul (paramFun_of_agree (hu'.2 v hu'v) hB) (by simpa using ha)) ?_
         rw [← hc]
         exact cne _ hv
-  · have hval : PiLocalization₂.val (a • u) v = a • PiLocalization₂.val u v := by simp [PiLocalization₂.val]
+  · have hval : PiLocalization₂.val (a • u) v = a • PiLocalization₂.val u v := by
+      simp [PiLocalization₂.val]
     have hu0 : PiLocalization₂.val u v ≠ 0 := fun e => hv (by rw [hval, e, smul_zero])
-    have hc : (fun g => conj (PiLocalization₂.val (a • u) v g)) = (conj a) • (fun g => conj (PiLocalization₂.val u v g)) := by
+    have hc
+        : (fun g => conj (PiLocalization₂.val (a • u) v g))
+          = (conj a) • (fun g => conj (PiLocalization₂.val u v g)) := by
       funext g; simp [hval]
     unfold ParFun
     rw [hc]
     exact paramFun_smul (hu.2 v hu0) (by simpa using ha)
 
-theorem vanish_and_parLin : ∀ D : D7, MetEx D → (ForStage D fun c _ s => ∀ (x : s.CC c) w, w ≠ 0 → PiLocalization₂.val x w = 0 → x = 0) ∧ ∀ (c : Com D) (s : PiLocalization₂ D), (∀ (u u' : s.CC c) B B' (a : ℂ), IsPar u B → IsPar u' B' → (∀ w ∉ (GlobalTheory.LFun.above D.host.E (c.S : Set (HeightOneSpectrum (𝓞 D.host.F)))), B w = B' w) → u + a • u' ≠ 0 → IsPar (u + a • u') B) ∧ ∀ (u : s.CC c) B (a : ℂ), IsPar u B → a ≠ 0 → IsPar (a • u) B :=
-  fun D hM => ⟨val_eq_zero_imp D hM, isPar_add_smul D⟩
+theorem vanish_and_parLin
+    : ∀ D : D7,
+      MetEx D
+        → (ForStage D fun c _ s => ∀ (x : s.CC c) w, w ≠ 0 → PiLocalization₂.val x w = 0 → x = 0)
+          ∧ ∀ (c : Com D) (s : PiLocalization₂ D),
+            (∀ (u u' : s.CC c) B B' (a : ℂ),
+                IsPar u B → IsPar u' B'
+                  → (∀ w
+                      ∉ (GlobalTheory.LFun.above D.host.E
+                        (c.S : Set (HeightOneSpectrum (𝓞 D.host.F)))),
+                    B w = B' w)
+                  → u + a • u' ≠ 0
+                  → IsPar (u + a • u') B)
+              ∧ ∀ (u : s.CC c) B (a : ℂ), IsPar u B → a ≠ 0 → IsPar (a • u) B := fun D hM =>
+  ⟨val_eq_zero_imp D hM, isPar_add_smul D⟩
 
 end GlobalTheory.EvenOnto

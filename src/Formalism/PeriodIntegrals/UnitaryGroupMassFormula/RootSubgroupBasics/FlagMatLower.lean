@@ -18,8 +18,8 @@ def hτ (k r : ℕ) (i : ℕ) : ℕ := if r ≤ i ∧ i ≤ r + k then i else 2 
 
 def hs (k r : ℕ) (i : ℕ) : ℂ := if i = r + k then -1 else 1
 
-theorem Hpk_apply (i j : Fin (2 * r + k + 1)) :
-    Hpk k r i j = if j.val = hτ k r i.val then hs k r i.val else 0 := by
+theorem Hpk_apply (i j : Fin (2 * r + k + 1))
+    : Hpk k r i j = if j.val = hτ k r i.val then hs k r i.val else 0 := by
   have hi := i.isLt
   have hj := j.isLt
   simp only [Hpk, hτ, hs, Fin.ext_iff]
@@ -57,32 +57,42 @@ theorem Hpk_mul_self : Hpk k r * Hpk k r = 1 := by
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem uh_left {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r)) :
-    (Hpk k r * gᴴ * Hpk k r) * g = 1 := by
+theorem uh_left {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r))
+    : (Hpk k r * gᴴ * Hpk k r) * g = 1 := by
   have h : gᴴ * Hpk k r * g = Hpk k r := hg
-  calc Hpk k r * gᴴ * Hpk k r * g = Hpk k r * (gᴴ * Hpk k r * g) := by simp only [Matrix.mul_assoc]
+  calc
+    Hpk k r * gᴴ * Hpk k r * g
+      = Hpk k r * (gᴴ * Hpk k r * g) := by simp only [Matrix.mul_assoc]
     _ = 1 := by rw [h, Hpk_mul_self]
 
-theorem uh_inv_mul {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r)) :
-    g⁻¹ * g = 1 := Matrix.nonsing_inv_mul g (Matrix.isUnit_det_of_left_inverse (uh_left hg))
+theorem uh_inv_mul
+    {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r))
+    : g⁻¹ * g = 1 :=
+  Matrix.nonsing_inv_mul g (Matrix.isUnit_det_of_left_inverse (uh_left hg))
 
-theorem uh_mul_inv {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r)) :
-    g * g⁻¹ = 1 := Matrix.mul_nonsing_inv g (Matrix.isUnit_det_of_left_inverse (uh_left hg))
+theorem uh_mul_inv
+    {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r))
+    : g * g⁻¹ = 1 :=
+  Matrix.mul_nonsing_inv g (Matrix.isUnit_det_of_left_inverse (uh_left hg))
 
 def Fm (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) ℂ :=
   Matrix.of fun i b => fvec k r z b i
 
-theorem zhat_eq (z z' : Fin (2 * r + k + 1) → ℂ) (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
-    Zhat k r z z' g = (Fm k r z)ᴴ * (Hpk k r * g) * Fm k r z' := by
+theorem zhat_eq
+    (z z' : Fin (2 * r + k + 1) → ℂ) (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : Zhat k r z z' g = (Fm k r z)ᴴ * (Hpk k r * g) * Fm k r z' := by
   ext a b
-  simp only [Zhat, herm, Fm, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply, dotProduct,
-    Matrix.mulVec, Pi.star_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
+  simp only [Zhat, herm, Fm, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply,
+    dotProduct, Matrix.mulVec, Pi.star_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun x _ => ?_
   exact Finset.sum_comm
 
-theorem flagMat_lower {z : Fin (2 * r + k + 1) → ℂ} {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (ha : a ∈ Nset k r) (i j : Fin (r + 1)) (hji : j ≤ i) : flagMat k r z a i j = if i = j then 1 else 0 := by
+theorem flagMat_lower
+    {z : Fin (2 * r + k + 1) → ℂ} {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (ha : a ∈ Nset k r)
+    (i j : Fin (r + 1)) (hji : j ≤ i)
+    : flagMat k r z a i j = if i = j then 1 else 0 := by
   have hji' : j.val ≤ i.val := hji
   have hcol : ∀ (c d : Fin (2 * r + k + 1)), (a *ᵥ Pi.single c (1 : ℂ)) d = a d c := by
     intro c d
@@ -107,19 +117,25 @@ theorem flagMat_lower {z : Fin (2 * r + k + 1) → ℂ} {a : Matrix (Fin (2 * r 
       exact Fin.ext h'
   · rw [dite_eq_right hi]
 
-theorem flagMat_upper {z : Fin (2 * r + k + 1) → ℂ} {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (ha : a ∈ Nset k r) : (flagMat k r z a).BlockTriangular id := by
+theorem flagMat_upper
+    {z : Fin (2 * r + k + 1) → ℂ} {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (ha : a ∈ Nset k r)
+    : (flagMat k r z a).BlockTriangular id := by
   intro i j hij
   have hij' : j < i := hij
   rw [flagMat_lower ha i j (le_of_lt hij'), if_neg (ne_of_gt hij')]
 
-theorem flagMat_diag {z : Fin (2 * r + k + 1) → ℂ} {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (ha : a ∈ Nset k r) (i : Fin (r + 1)) : flagMat k r z a i i = 1 := by
+theorem flagMat_diag
+    {z : Fin (2 * r + k + 1) → ℂ} {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (ha : a ∈ Nset k r)
+    (i : Fin (r + 1))
+    : flagMat k r z a i i = 1 := by
   rw [flagMat_lower ha i i le_rfl, if_pos rfl]
 
-theorem mul_Fm {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
-    {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (ha : a ∈ Nset k r) :
-    a * Fm k r z = Fm k r z * flagMat k r z a := by
+theorem mul_Fm
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (ha : a ∈ Nset k r)
+    : a * Fm k r z = Fm k r z * flagMat k r z a := by
   ext i b
   have hF1 : ∀ c : Fin r, fvec k r z (Fin.castSucc c) = bvec (eI k r c) := by
     intro c
@@ -143,8 +159,8 @@ theorem mul_Fm {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
   simp only [Fm, Matrix.of_apply, hF1, hF2, hM1, hM2, bvec]
   by_cases hi : i.val < r
   · have hei : eI k r ⟨i.val, hi⟩ = i := Fin.ext rfl
-    rw [Finset.sum_eq_single ⟨i.val, hi⟩, hei, hz i (Or.inl hi), Pi.single_eq_same, one_mul, zero_mul,
-      add_zero]
+    rw [Finset.sum_eq_single ⟨i.val, hi⟩, hei, hz i (Or.inl hi), Pi.single_eq_same, one_mul,
+      zero_mul, add_zero]
     · intro c _ hc
       rw [Pi.single_eq_of_ne, zero_mul]
       intro h
@@ -154,7 +170,9 @@ theorem mul_Fm {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
       exact Fin.ext (by rw [← hv, ← h'])
     · intro h
       exact absurd (Finset.mem_univ _) h
-  · have hsum : ∑ c : Fin r, (Pi.single (eI k r c) (1 : ℂ) : Fin (2 * r + k + 1) → ℂ) i * (a *ᵥ fvec k r z b) (eI k r c) = 0 := by
+  · have hsum
+        : ∑ c : Fin r, (Pi.single (eI k r c) (1 : ℂ) : Fin (2 * r + k + 1) → ℂ) i * (a *ᵥ fvec k r z b) (eI k r c)
+          = 0 := by
       apply Finset.sum_eq_zero
       intro c _
       rw [Pi.single_eq_of_ne, zero_mul]
@@ -199,10 +217,11 @@ theorem mul_Fm {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
       have hv : (eI k r ⟨b.val, hbr⟩).val = b.val := rfl
       omega
 
-theorem flag_rel {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : inWb k r z')
-    {g a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r))
-    (ha : a ∈ RStab k r g) :
-    (flagMat k r z a)ᴴ * Zhat k r z z' g * flagMat k r z' (g⁻¹ * a * g) = Zhat k r z z' g := by
+theorem flag_rel
+    {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : inWb k r z')
+    {g a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (hg : g ∈ UH (Hpk k r)) (ha : a ∈ RStab k r g)
+    : (flagMat k r z a)ᴴ * Zhat k r z z' g * flagMat k r z' (g⁻¹ * a * g) = Zhat k r z z' g := by
   have hx : g⁻¹ * a * g ∈ Nset k r := ha.2
   have ha1 : a ∈ Nset k r := ha.1
   have hU : aᴴ * Hpk k r * a = Hpk k r := ha1.1
@@ -210,17 +229,18 @@ theorem flag_rel {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : i
   have h2 := mul_Fm hz' hx
   have hgg : g * g⁻¹ = 1 := uh_mul_inv hg
   rw [zhat_eq]
-  calc (flagMat k r z a)ᴴ * ((Fm k r z)ᴴ * (Hpk k r * g) * Fm k r z') * flagMat k r z' (g⁻¹ * a * g)
-      = (Fm k r z * flagMat k r z a)ᴴ * (Hpk k r * g) *
-          (Fm k r z' * flagMat k r z' (g⁻¹ * a * g)) := by
-        rw [Matrix.conjTranspose_mul]
-        simp only [Matrix.mul_assoc]
+  calc
+    (flagMat k r z a)ᴴ * ((Fm k r z)ᴴ * (Hpk k r * g) * Fm k r z') * flagMat k r z' (g⁻¹ * a * g)
+        = (Fm k r z * flagMat k r z a)ᴴ * (Hpk k r * g)
+          * (Fm k r z' * flagMat k r z' (g⁻¹ * a * g)) := by
+      rw [Matrix.conjTranspose_mul]
+      simp only [Matrix.mul_assoc]
     _ = (a * Fm k r z)ᴴ * (Hpk k r * g) * (g⁻¹ * a * g * Fm k r z') := by rw [← h1, ← h2]
     _ = (Fm k r z)ᴴ * (aᴴ * Hpk k r * (g * g⁻¹) * a) * g * Fm k r z' := by
-        rw [Matrix.conjTranspose_mul]
-        simp only [Matrix.mul_assoc]
+      rw [Matrix.conjTranspose_mul]
+      simp only [Matrix.mul_assoc]
     _ = (Fm k r z)ᴴ * (Hpk k r * g) * Fm k r z' := by
-        rw [hgg, Matrix.mul_one, hU]
-        simp only [Matrix.mul_assoc]
+      rw [hgg, Matrix.mul_one, hU]
+      simp only [Matrix.mul_assoc]
 
 end PI.AmpRootCommon

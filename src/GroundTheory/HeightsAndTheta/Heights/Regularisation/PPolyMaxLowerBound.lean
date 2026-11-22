@@ -15,26 +15,29 @@ open ReciprocityTheory.AnForm.M (FinHolAtlas)
 
 noncomputable section
 
-theorem PolyMaxLowerBound.exists_pos_le {n : ℕ} (f : Fin n → ℝ) (hf : ∀ j, 0 < f j) :
-    ∃ δ, 0 < δ ∧ ∀ j, δ ≤ f j := by
+theorem PolyMaxLowerBound.exists_pos_le {n : ℕ} (f : Fin n → ℝ) (hf : ∀ j, 0 < f j)
+    : ∃ δ, 0 < δ ∧ ∀ j, δ ≤ f j := by
   rcases isEmpty_or_nonempty (Fin n) with h | h
   · exact ⟨1, one_pos, fun j => (IsEmpty.false j).elim⟩
   · obtain ⟨j₀, hj₀⟩ := Finite.exists_min f
     exact ⟨f j₀, hf j₀, hj₀⟩
 
-theorem PolyMaxLowerBound.chart_margin {X : Type} [TopologicalSpace X] [CompactSpace X] {D : ℕ}
-    {A : FinHolAtlas D X} (R : RegChartData A) (j : Fin R.N) :
-    ∃ δ Q : ℝ, 0 < δ ∧ 0 ≤ Q ∧ ∀ x ∈ R.mid j, ∀ y ∈ closedBall (R.chart j x) δ,
-      y ∈ (R.chart j).target ∧ |R.q j y| ≤ Q := by
+theorem PolyMaxLowerBound.chart_margin
+    {X : Type} [TopologicalSpace X] [CompactSpace X]
+    {D : ℕ} {A : FinHolAtlas D X} (R : RegChartData A) (j : Fin R.N)
+    : ∃ δ Q : ℝ,
+      0 < δ ∧ 0 ≤ Q
+        ∧ ∀ x ∈ R.mid j, ∀ y ∈ closedBall (R.chart j x) δ,
+          y ∈ (R.chart j).target ∧ |R.q j y| ≤ Q := by
   have hK : IsCompact ((R.chart j) '' closure (R.mid j)) :=
-    isClosed_closure.isCompact.image_of_continuousOn
-      ((R.chart j).continuousOn.mono (R.closure_mid j))
+    isClosed_closure.isCompact.image_of_continuousOn ((R.chart j).continuousOn.mono
+      (R.closure_mid j))
   have hKT : (R.chart j) '' closure (R.mid j) ⊆ (R.chart j).target := by
     rintro _ ⟨x, hx, rfl⟩
     exact (R.chart j).map_source (R.closure_mid j hx)
   obtain ⟨δ, hδ, hsub⟩ := hK.exists_cthickening_subset_open (R.chart j).open_target hKT
-  obtain ⟨Q, hQ⟩ := (hK.cthickening (r := δ)).exists_bound_of_continuousOn
-    ((R.q_smooth j).continuousOn.mono hsub)
+  obtain ⟨Q, hQ⟩ :=
+    (hK.cthickening (r := δ)).exists_bound_of_continuousOn ((R.q_smooth j).continuousOn.mono hsub)
   refine ⟨δ, max Q 0, hδ, le_max_right _ _, fun x hx y hy => ?_⟩
   have hy' : y ∈ cthickening δ ((R.chart j) '' closure (R.mid j)) :=
     closedBall_subset_cthickening (mem_image_of_mem _ (subset_closure hx)) δ hy
@@ -43,8 +46,8 @@ theorem PolyMaxLowerBound.chart_margin {X : Type} [TopologicalSpace X] [CompactS
   rw [Real.norm_eq_abs] at this
   exact this.trans (le_max_left _ _)
 
-theorem PolyMaxLowerBound.exists_far_point {D : ℕ} (z : Fin D → ℂ) {t : ℝ} (ht : 0 < t) :
-    ∃ y ∈ closedBall z t, ∀ i, t / 2 ≤ ‖y i‖ := by
+theorem PolyMaxLowerBound.exists_far_point {D : ℕ} (z : Fin D → ℂ) {t : ℝ} (ht : 0 < t)
+    : ∃ y ∈ closedBall z t, ∀ i, t / 2 ≤ ‖y i‖ := by
   classical
   refine ⟨fun i => if t / 2 ≤ ‖z i‖ then z i else z i + (t : ℂ), ?_, fun i => ?_⟩
   · rw [mem_closedBall, dist_pi_le_iff ht.le]
@@ -58,16 +61,19 @@ theorem PolyMaxLowerBound.exists_far_point {D : ℕ} (z : Fin D → ℂ) {t : �
     · simp only [if_neg h]
       replace h := not_le.mp h
       have h1 : ‖((t : ℝ) : ℂ)‖ ≤ ‖z i + (t : ℂ)‖ + ‖z i‖ := by
-        calc ‖((t : ℝ) : ℂ)‖ = ‖(z i + (t : ℂ)) - z i‖ := by ring_nf
+        calc
+          ‖((t : ℝ) : ℂ)‖
+            = ‖(z i + (t : ℂ)) - z i‖ := by ring_nf
           _ ≤ ‖z i + (t : ℂ)‖ + ‖z i‖ := norm_sub_le _ _
       rw [Complex.norm_real, Real.norm_eq_abs, abs_of_pos ht] at h1
       linarith
 
-theorem PolyMaxLowerBound.log_inv_half_sq {t : ℝ} (ht : 0 < t) :
-    Real.log ((t / 2) ^ 2)⁻¹ = 2 * Real.log 2 + 2 * Real.log t⁻¹ := by
+theorem PolyMaxLowerBound.log_inv_half_sq {t : ℝ} (ht : 0 < t)
+    : Real.log ((t / 2) ^ 2)⁻¹ = 2 * Real.log 2 + 2 * Real.log t⁻¹ := by
   have h : ((t / 2) ^ 2)⁻¹ = (2 * t⁻¹) ^ 2 := by field_simp
   rw [h, Real.log_pow, Real.log_mul (by norm_num) (inv_ne_zero ht.ne')]
-  push_cast; ring
+  push_cast
+  ring
 
 theorem PolyMaxLowerBound.proof : PolyMaxLowerBound.Statement := by
   intro X _ _ _ D A R
@@ -89,10 +95,10 @@ theorem PolyMaxLowerBound.proof : PolyMaxLowerBound.Statement := by
   have hlogΛ : 0 ≤ Real.log Λ := Real.log_nonneg hΛ1
   set C : ℝ := Q + |R.Clog| * (Real.log Λ + 1) with hCdef
   have hC0 : 0 ≤ C := by positivity
-  refine ⟨C, min δ (Real.exp (-Real.exp 1)), lt_min hδ0 (Real.exp_pos _), ?_⟩
+  refine ⟨C, min δ (Real.exp (- Real.exp 1)), lt_min hδ0 (Real.exp_pos _), ?_⟩
   intro t ht htt K j x hx
   have htδ : t ≤ δ := (htt.trans_le (min_le_left _ _)).le
-  have hte : t < Real.exp (-Real.exp 1) := htt.trans_le (min_le_right _ _)
+  have hte : t < Real.exp (- Real.exp 1) := htt.trans_le (min_le_right _ _)
   set ℓ : ℝ := Real.log t⁻¹ with hℓdef
   have hℓe : Real.exp 1 < ℓ := by
     rw [hℓdef, Real.lt_log_iff_exp_lt (inv_pos.2 ht)]
@@ -109,8 +115,7 @@ theorem PolyMaxLowerBound.proof : PolyMaxLowerBound.Statement := by
     rw [hi, norm_zero] at this
     linarith
   have hsrc := (R.chart j).map_target hyT
-  have hYo : (R.chart j).symm y ∈ R.Yo :=
-    (R.mem_Yo j _ hsrc).2 (by rwa [(R.chart j).right_inv hyT])
+  have hYo : (R.chart j).symm y ∈ R.Yo := (R.mem_Yo j _ hsrc).2 (by rwa [(R.chart j).right_inv hyT])
   have hr1 := R.one_le_r _ hYo
 
   have hsum : ∑ i ∈ R.S j, Real.log (‖y i‖ ^ 2)⁻¹ ≤ D * (2 * Real.log 2 + 2 * ℓ) := by
@@ -122,14 +127,15 @@ theorem PolyMaxLowerBound.proof : PolyMaxLowerBound.Statement := by
       apply Real.log_le_log (by positivity)
       exact inv_anti₀ (by positivity) (pow_le_pow_left₀ h2.le (hyn i) 2)
     have hM : 0 ≤ 2 * Real.log 2 + 2 * ℓ := by linarith
-    calc ∑ i ∈ R.S j, Real.log (‖y i‖ ^ 2)⁻¹ ≤ ∑ i ∈ R.S j, (2 * Real.log 2 + 2 * ℓ) :=
-          Finset.sum_le_sum hterm
+    calc
+      ∑ i ∈ R.S j, Real.log (‖y i‖ ^ 2)⁻¹
+        ≤ ∑ i ∈ R.S j, (2 * Real.log 2 + 2 * ℓ) := Finset.sum_le_sum hterm
       _ = (R.S j).card * (2 * Real.log 2 + 2 * ℓ) := by rw [Finset.sum_const, nsmul_eq_mul]
       _ ≤ D * (2 * Real.log 2 + 2 * ℓ) := by
-          apply mul_le_mul_of_nonneg_right _ hM
-          have := Finset.card_le_univ (R.S j)
-          rw [Fintype.card_fin] at this
-          exact_mod_cast this
+        apply mul_le_mul_of_nonneg_right _ hM
+        have := Finset.card_le_univ (R.S j)
+        rw [Fintype.card_fin] at this
+        exact_mod_cast this
   have hrle : R.r ((R.chart j).symm y) ≤ Λ * ℓ := by
     rw [R.r_chart j y ⟨hyT, hyD⟩]
     have hf : R.f j y ≤ |B| := (le_abs_self _).trans ((hB j y hyT).trans (le_abs_self B))
@@ -150,17 +156,19 @@ theorem PolyMaxLowerBound.proof : PolyMaxLowerBound.Statement := by
   have hq : -Q ≤ R.q j y := by
     have := (abs_le.1 (hqy.trans (hQj j))).1
     linarith
-  have h1 : -(|R.Clog| * Real.log (R.r ((R.chart j).symm y))) ≤
-      -R.Clog * Real.log (R.r ((R.chart j).symm y)) := by
+  have h1
+      : -(|R.Clog| * Real.log (R.r ((R.chart j).symm y)))
+        ≤ -R.Clog * Real.log (R.r ((R.chart j).symm y)) := by
     have := mul_le_mul_of_nonneg_right (le_abs_self R.Clog) hlogr0
     linarith
-  have h2 : |R.Clog| * Real.log (R.r ((R.chart j).symm y)) ≤
-      |R.Clog| * (Real.log Λ + 1) * Real.log ℓ := by
+  have h2
+      : |R.Clog| * Real.log (R.r ((R.chart j).symm y))
+        ≤ |R.Clog| * (Real.log Λ + 1) * Real.log ℓ := by
     have h3 : Real.log Λ + Real.log ℓ ≤ (Real.log Λ + 1) * Real.log ℓ := by nlinarith
-    calc |R.Clog| * Real.log (R.r ((R.chart j).symm y)) ≤ |R.Clog| * (Real.log Λ + Real.log ℓ) :=
-          mul_le_mul_of_nonneg_left hlogr (abs_nonneg _)
-      _ ≤ |R.Clog| * ((Real.log Λ + 1) * Real.log ℓ) :=
-          mul_le_mul_of_nonneg_left h3 (abs_nonneg _)
+    calc
+      |R.Clog| * Real.log (R.r ((R.chart j).symm y))
+        ≤ |R.Clog| * (Real.log Λ + Real.log ℓ) := mul_le_mul_of_nonneg_left hlogr (abs_nonneg _)
+      _ ≤ |R.Clog| * ((Real.log Λ + 1) * Real.log ℓ) := mul_le_mul_of_nonneg_left h3 (abs_nonneg _)
       _ = _ := by ring
   have hQℓ : Q ≤ Q * Real.log ℓ := le_mul_of_one_le_right hQ0 hlogℓ
   have hu : -C * Real.log ℓ ≤ R.u j y := by

@@ -48,26 +48,27 @@ theorem selfDualVol : PositivityTheory.SiegelWeilFormula.Gunr.SelfDualVol := by
       push_neg at h2
       obtain ⟨x0, hx0, hne⟩ := h2
       have h3 : ∫ x, Φ x * χ x y ∂μ = χ x0 y * ∫ x, Φ x * χ x y ∂μ := by
-        calc ∫ x, Φ x * χ x y ∂μ = ∫ x, (fun x => Φ x * χ x y) (x0 + x) ∂μ :=
-              (integral_add_left_eq_self _ x0).symm
+        calc
+          ∫ x, Φ x * χ x y ∂μ
+            = ∫ x, (fun x => Φ x * χ x y) (x0 + x) ∂μ := (integral_add_left_eq_self _ x0).symm
           _ = ∫ x, χ x0 y * (Φ x * χ x y) ∂μ := by
-              congr 1
-              funext x
-              have : Φ (x0 + x) = Φ x := by
-                by_cases hx : x ∈ L
-                · rw [hΦin _ (L.add_mem hx0 hx), hΦin _ hx]
-                · rw [hΦout _ (fun h => hx ((L.add_mem_cancel_left hx0).1 h)), hΦout _ hx]
-              simp only [this, hadd]
-              ring
+            congr 1
+            funext x
+            have : Φ (x0 + x) = Φ x := by
+              by_cases hx : x ∈ L
+              · rw [hΦin _ (L.add_mem hx0 hx), hΦin _ hx]
+              · rw [hΦout _ (fun h => hx ((L.add_mem_cancel_left hx0).1 h)), hΦout _ hx]
+            simp only [this, hadd]
+            ring
           _ = χ x0 y * ∫ x, Φ x * χ x y ∂μ := integral_const_mul _ _
-      have h4 : (1 - χ x0 y) * ∫ x, Φ x * χ x y ∂μ = 0 := by
-        rw [sub_mul, one_mul, ← h3, sub_self]
+      have h4 : (1 - χ x0 y) * ∫ x, Φ x * χ x y ∂μ = 0 := by rw [sub_mul, one_mul, ← h3, sub_self]
       exact (mul_eq_zero.1 h4).resolve_left (sub_ne_zero.2 (Ne.symm hne))
   have hInt : Integrable (fun y => ∫ x, Φ x * χ x y ∂μ) μ := by
     rw [funext hI]
     exact (integrable_indicator_iff hLm).2 (integrableOn_const hfin)
   have h0 := hinv Φ hΦc hΦs hInt 0
-  have hout : (fun y => (∫ x, Φ x * χ x y ∂μ) * χ y 0) = (L : Set V).indicator (fun _ => (m : ℂ)) := by
+  have hout
+      : (fun y => (∫ x, Φ x * χ x y ∂μ) * χ y 0) = (L : Set V).indicator (fun _ => (m : ℂ)) := by
     funext y
     rw [hI]
     by_cases hy : y ∈ L

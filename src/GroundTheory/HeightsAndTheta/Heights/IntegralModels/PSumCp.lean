@@ -42,35 +42,37 @@ theorem SumCp.proof (hM : MertensUpper.Statement) : SumCp.Statement := by
   have hSsub : S ⊆ P ∪ T := by
     intro p hp
     obtain ⟨hpp, hpB | hpd⟩ := hS p hp
-    · exact Finset.mem_union_left _ (Finset.mem_filter.mpr
-        ⟨Finset.mem_Iic.mpr (Nat.le_floor hpB), hpp⟩)
-    · exact Finset.mem_union_right _ (Nat.mem_primeFactors.mpr
-        ⟨hpp, Int.natCast_dvd.mp hpd, Int.natAbs_ne_zero.mpr hd⟩)
+    · exact Finset.mem_union_left _
+        (Finset.mem_filter.mpr ⟨Finset.mem_Iic.mpr (Nat.le_floor hpB), hpp⟩)
+    · exact Finset.mem_union_right _
+        (Nat.mem_primeFactors.mpr ⟨hpp, Int.natCast_dvd.mp hpd, Int.natAbs_ne_zero.mpr hd⟩)
 
   have hW : ∑ p ∈ S, primeWeight p * Real.log p ≤ 4 * (Real.log B + CM) + K1 := by
     have hnn : ∀ p ∈ P ∪ T, 0 ≤ primeWeight p * Real.log p := by
       intro p hp
       have hpp : p.Prime := (Finset.mem_union.mp hp).elim (hPprime p) (hTprime p)
       exact mul_nonneg (primeWeight_nonneg hpp) (hlog p hpp)
-    calc ∑ p ∈ S, primeWeight p * Real.log p
-        ≤ ∑ p ∈ P ∪ T, primeWeight p * Real.log p :=
-          Finset.sum_le_sum_of_subset_of_nonneg hSsub (fun p hp _ => hnn p hp)
+    calc
+      ∑ p ∈ S, primeWeight p * Real.log p ≤ ∑ p ∈ P ∪ T, primeWeight p * Real.log p :=
+        Finset.sum_le_sum_of_subset_of_nonneg hSsub (fun p hp _ => hnn p hp)
       _ ≤ ∑ p ∈ P, primeWeight p * Real.log p + K1 := by
-          rw [← Finset.sum_union_inter]
-          have : 0 ≤ ∑ p ∈ P ∩ T, primeWeight p * Real.log p :=
-            Finset.sum_nonneg fun p hp => hnn p (Finset.mem_union_left _ (Finset.mem_inter.mp hp).1)
-          linarith
+        rw [← Finset.sum_union_inter]
+        have : 0 ≤ ∑ p ∈ P ∩ T, primeWeight p * Real.log p :=
+          Finset.sum_nonneg fun p hp => hnn p (Finset.mem_union_left _ (Finset.mem_inter.mp hp).1)
+        linarith
       _ ≤ ∑ p ∈ P, 4 * (Real.log p / p) + K1 := by
-          have hsum : ∑ p ∈ P, primeWeight p * Real.log p ≤ ∑ p ∈ P, 4 * (Real.log p / p) := by
-            refine Finset.sum_le_sum fun p hp => ?_
-            have hpp := hPprime p hp
-            have hw := mul_le_mul_of_nonneg_right (primeWeight_le hpp) (hlog p hpp)
-            calc primeWeight p * Real.log p ≤ 4 / p * Real.log p := hw
-              _ = 4 * (Real.log p / p) := by ring
-          linarith
+        have hsum : ∑ p ∈ P, primeWeight p * Real.log p ≤ ∑ p ∈ P, 4 * (Real.log p / p) := by
+          refine Finset.sum_le_sum fun p hp => ?_
+          have hpp := hPprime p hp
+          have hw := mul_le_mul_of_nonneg_right (primeWeight_le hpp) (hlog p hpp)
+          calc
+            primeWeight p * Real.log p
+              ≤ 4 / p * Real.log p := hw
+            _ = 4 * (Real.log p / p) := by ring
+        linarith
       _ ≤ 4 * (Real.log B + CM) + K1 := by
-          rw [← Finset.mul_sum]
-          linarith [hCM B hB]
+        rw [← Finset.mul_sum]
+        linarith [hCM B hB]
 
   have hV : ∑ p ∈ S, 2 * (padicValInt p d : ℝ) * Real.log p ≤ K2 := by
     rw [← Finset.sum_filter_of_ne (p := fun p => p ∈ T)]
@@ -82,12 +84,14 @@ theorem SumCp.proof (hM : MertensUpper.Statement) : SumCp.Statement := by
       by_contra hpT
       apply hne
       have hpp := (hS p hp).1
-      have hnd : ¬ (p : ℤ) ∣ d := fun hpd => hpT (Nat.mem_primeFactors.mpr
-        ⟨hpp, Int.natCast_dvd.mp hpd, Int.natAbs_ne_zero.mpr hd⟩)
+      have hnd : ¬ (p : ℤ) ∣ d := fun hpd =>
+        hpT (Nat.mem_primeFactors.mpr ⟨hpp, Int.natCast_dvd.mp hpd, Int.natAbs_ne_zero.mpr hd⟩)
       rw [padicValInt.eq_zero_of_not_dvd hnd]
       simp
-  have hsplit : ∑ p ∈ S, (primeWeight p + 2 * padicValInt p d) * Real.log p
-      = ∑ p ∈ S, primeWeight p * Real.log p + ∑ p ∈ S, 2 * (padicValInt p d : ℝ) * Real.log p := by
+  have hsplit
+      : ∑ p ∈ S, (primeWeight p + 2 * padicValInt p d) * Real.log p
+        = ∑ p ∈ S, primeWeight p * Real.log p
+          + ∑ p ∈ S, 2 * (padicValInt p d : ℝ) * Real.log p := by
     rw [← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun p _ => by ring
   have hA : 4 * CM + K1 + K2 ≤ A := le_abs_self _

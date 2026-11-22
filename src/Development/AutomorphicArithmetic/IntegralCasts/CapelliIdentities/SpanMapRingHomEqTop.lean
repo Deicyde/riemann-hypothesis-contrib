@@ -4,14 +4,17 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qe1.span_map_ringHom_eq_top :
-    ∀ {k K G ι : Type} [inst : Field k] [inst_1 : Field K]
-    [Fintype ι] [DecidableEq ι] (φ : k →+* K) (f : G → Matrix ι ι k),
-    Submodule.span k (Set.range f) = ⊤ → Submodule.span K (Set.range fun (g : G) ↦ (f g).map (⇑φ : k → K)) = ⊤ := by
+theorem UpperTheory.Reformulated.B.Qe1.span_map_ringHom_eq_top
+    : ∀ {k K G ι : Type} [inst : Field k] [inst_1 : Field K] [Fintype ι] [DecidableEq ι]
+        (φ : k →+* K) (f : G → Matrix ι ι k),
+      Submodule.span k (Set.range f) = ⊤
+        → Submodule.span K (Set.range fun (g : G) ↦ (f g).map (⇑φ : k → K)) = ⊤ := by
   intro k K G ι _ _ _ _ φ f h
-  have key : ∀ M : Matrix ι ι k, M ∈ Submodule.span k (Set.range f) →
-      M.map (⇑φ : k → K) ∈
-        Submodule.span K (Set.range fun (g : G) ↦ (f g).map (⇑φ : k → K)) := by
+  have key
+      : ∀ M : Matrix ι ι k,
+        M ∈ Submodule.span k (Set.range f)
+          → M.map (⇑φ : k → K)
+            ∈ Submodule.span K (Set.range fun (g : G) ↦ (f g).map (⇑φ : k → K)) := by
     intro M hM
     induction hM using Submodule.span_induction with
     | mem x hx =>
@@ -39,8 +42,7 @@ theorem UpperTheory.Reformulated.B.Qe1.span_map_ringHom_eq_top :
   intro N _
   rw [Matrix.matrix_eq_sum_single N]
   refine Submodule.sum_mem _ fun i _ => Submodule.sum_mem _ fun j _ => ?_
-  have e : Matrix.single i j (N i j)
-      = N i j • (Matrix.single i j (1 : k)).map (⇑φ : k → K) := by
+  have e : Matrix.single i j (N i j) = N i j • (Matrix.single i j (1 : k)).map (⇑φ : k → K) := by
     ext a b
     by_cases hab : i = a ∧ j = b <;> simp [Matrix.single, hab]
   rw [e]

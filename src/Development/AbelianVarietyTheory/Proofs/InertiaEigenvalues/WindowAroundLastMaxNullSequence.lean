@@ -8,7 +8,13 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem window_around_last_max : ∀ (β : ℤ → ℝ) (c : ℝ) (h : ℕ), 0 < c → (∀ k, 0 ≤ β k) → (∃ k, β k ≠ 0) → Filter.Tendsto β Filter.cofinite (nhds 0) → ∃ (D E M : ℕ), h ≤ D ∧ M + h ≤ E ∧ 0 < β ((M + h : ℕ) - D) ∧ (∀ k, β k ≤ β ((M + h : ℕ) - D)) ∧ (∀ k, ((M + h : ℕ) : ℤ) - D < k → β k < β ((M + h : ℕ) - D)) ∧ ∀ k : ℤ, (k < -(D : ℤ) ∨ (E : ℤ) - D < k) → β k ≤ c * β ((M + h : ℕ) - D) := by
+theorem window_around_last_max
+    : ∀ (β : ℤ → ℝ) (c : ℝ) (h : ℕ),
+      0 < c → (∀ k, 0 ≤ β k) → (∃ k, β k ≠ 0) → Filter.Tendsto β Filter.cofinite (nhds 0)
+        → ∃ (D E M : ℕ),
+          h ≤ D ∧ M + h ≤ E ∧ 0 < β ((M + h : ℕ) - D) ∧ (∀ k, β k ≤ β ((M + h : ℕ) - D))
+            ∧ (∀ k, ((M + h : ℕ) : ℤ) - D < k → β k < β ((M + h : ℕ) - D))
+            ∧ ∀ k : ℤ, (k < -(D : ℤ) ∨ (E : ℤ) - D < k) → β k ≤ c * β ((M + h : ℕ) - D) := by
   intro β c h hc hβ0 hne hlim
   have hfin : ∀ ε : ℝ, 0 < ε → {k | ε ≤ β k}.Finite := by
     intro ε hε
@@ -40,7 +46,8 @@ theorem window_around_last_max : ∀ (β : ℤ → ℝ) (c : ℝ) (h : ℕ), 0 <
     · exfalso
       have hkU : k ∈ U := by
         refine Finset.mem_filter.2 ⟨?_, h1⟩
-        simp [T]; linarith
+        simp [T]
+        linarith
       have := U.le_max' k hkU
       omega
   have hc₀ : 0 < β N := by rw [hN]; linarith

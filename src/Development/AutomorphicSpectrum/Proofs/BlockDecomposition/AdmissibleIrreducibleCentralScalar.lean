@@ -8,16 +8,23 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.T2SpaceGener
 
 @[expose] public section
 
-open Filter Topology MeasureTheory GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult ValuativeRel
+open Filter Topology MeasureTheory GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.LocGL GlobalTheory.JHMult ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.SchurCentre
 
-theorem scalar_acts_by_scalar : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (N : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V), IsSmooth π → π.IsIrreducible → IsAdmissible π → ∀ t : kˣ, ∃ c : ℂ, ∀ v, π (Matrix.GeneralLinearGroup.scalar (Fin N) t) v = c • v := by
+theorem scalar_acts_by_scalar
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V),
+      IsSmooth π → π.IsIrreducible → IsAdmissible π
+        → ∀ t : kˣ, ∃ c : ℂ, ∀ v, π (Matrix.GeneralLinearGroup.scalar (Fin N) t) v = c • v := by
   intro k _ _ _ _ N V _ _ π hs hirr hadm t
   haveI := hirr
 
-  have hz : ∀ g : GL (Fin N) k, g * Matrix.GeneralLinearGroup.scalar (Fin N) t =
-      Matrix.GeneralLinearGroup.scalar (Fin N) t * g := by
+  have hz
+      : ∀ g : GL (Fin N) k,
+        g * Matrix.GeneralLinearGroup.scalar (Fin N) t
+          = Matrix.GeneralLinearGroup.scalar (Fin N) t * g := by
     intro g
     ext i j
     simp [Matrix.GeneralLinearGroup.scalar, Matrix.mul_apply, Matrix.diagonal_apply, mul_comm]
@@ -35,19 +42,20 @@ theorem scalar_acts_by_scalar : ∀ (k : Type) [Field k] [ValuativeRel k] [Topol
     ext u
     simp [h u]
 
-  let S : Subgroup (GL (Fin N) k) :=
-    { carrier := {g | π g v = v}
-      mul_mem' := by
-        intro a b ha hb
-        simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
-        rw [hb, ha]
-      one_mem' := by simp
-      inv_mem' := by
-        intro a ha
-        simp only [Set.mem_setOf_eq] at *
-        conv_lhs => rw [← ha]
-        rw [← Module.End.mul_apply, ← map_mul]
-        simp }
+  let S : Subgroup (GL (Fin N) k) := {
+    carrier := {g | π g v = v}
+    mul_mem' := by
+      intro a b ha hb
+      simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
+      rw [hb, ha]
+    one_mem' := by simp
+    inv_mem' := by
+      intro a ha
+      simp only [Set.mem_setOf_eq] at *
+      conv_lhs => rw [← ha]
+      rw [← Module.End.mul_apply, ← map_mul]
+      simp
+  }
   let K : Subgroup (GL (Fin N) k) := GlobalTheory.SplitWeil.KO k (Fin N) ⊓ S
   have hKo : IsOpen (K : Set (GL (Fin N) k)) :=
     (GlobalTheory.SplitFlip.isOpen_KO (k := k) (n := Fin N)).inter (hs v)
@@ -73,12 +81,13 @@ theorem scalar_acts_by_scalar : ∀ (k : Type) [Field k] [ValuativeRel k] [Topol
     have := congrArg Subtype.val hw.apply_eq_smul
     simpa using this
 
-  let f : Representation.IntertwiningMap π π :=
-    { toLinearMap := π z - c • LinearMap.id
-      isIntertwining' := by
-        intro g
-        ext u
-        simp [hcomm] }
+  let f : Representation.IntertwiningMap π π := {
+    toLinearMap := π z - c • LinearMap.id
+    isIntertwining' := by
+      intro g
+      ext u
+      simp [hcomm]
+  }
   refine ⟨c, fun u => ?_⟩
   rcases Representation.IsIrreducible.bijective_or_eq_zero f with hb | h0
   · exfalso

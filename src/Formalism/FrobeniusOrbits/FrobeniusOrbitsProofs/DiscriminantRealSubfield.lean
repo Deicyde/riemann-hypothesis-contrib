@@ -303,7 +303,8 @@ lemma mem_F_iff (ζ : L) (x : ℚ⟮ζ⟯) :
 
 def equivF (ζ : L) : Fz ζ ≃+* F1 ζ where
   toFun x := ⟨((x : ℚ⟮ζ⟯) : L), (mem_F_iff ζ x).1 x.2⟩
-  invFun y := ⟨⟨y, real_subfield_le_adjoin ζ y.2⟩, (mem_F_iff ζ ⟨y, real_subfield_le_adjoin ζ y.2⟩).2 y.2⟩
+  invFun y :=
+    ⟨⟨y, real_subfield_le_adjoin ζ y.2⟩, (mem_F_iff ζ ⟨y, real_subfield_le_adjoin ζ y.2⟩).2 y.2⟩
   left_inv _ := Subtype.ext (Subtype.ext rfl)
   right_inv := fun ⟨_, _⟩ => rfl
   map_mul' _ _ := rfl

@@ -15,15 +15,27 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top NumberField
+  IsDedekindDomain
 
 namespace GlobalTheory.Mem.Top.V4.TwoPass
 
-theorem large_of_sup {C : FC} {K K' : TransportedAlt} {CH : ℝ} (h : C.Large (K.sup K') CH) : C.Large K CH ∧ C.Large K' CH :=
-  ⟨⟨fun c hc => (le_max_left _ _).trans (h.1 c hc), trivial, fun c hc => (le_max_left _ _).trans (h.2.2.1 c hc),
-      fun c hc => (le_max_left _ _).trans (h.2.2.2 c hc)⟩,
-    ⟨fun c hc => (le_max_right _ _).trans (h.1 c hc), trivial, fun c hc => (le_max_right _ _).trans (h.2.2.1 c hc),
-      fun c hc => (le_max_right _ _).trans (h.2.2.2 c hc)⟩⟩
+theorem large_of_sup {C : FC} {K K' : TransportedAlt} {CH : ℝ} (h : C.Large (K.sup K') CH)
+    : C.Large K CH ∧ C.Large K' CH := ⟨
+  ⟨
+    fun c hc => (le_max_left _ _).trans (h.1 c hc),
+    trivial,
+    fun c hc => (le_max_left _ _).trans (h.2.2.1 c hc),
+    fun c hc => (le_max_left _ _).trans (h.2.2.2 c hc)
+  ⟩,
+  ⟨
+    fun c hc => (le_max_right _ _).trans (h.1 c hc),
+    trivial,
+    fun c hc => (le_max_right _ _).trans (h.2.2.1 c hc),
+    fun c hc => (le_max_right _ _).trans (h.2.2.2 c hc)
+  ⟩
+⟩
 
 theorem ev_and {p q : Ctx → Prop} (hp : Ev p) (hq : Ev q) : Ev fun K => p K ∧ q K := by
   obtain ⟨a, ha, hp⟩ := hp
@@ -40,8 +52,13 @@ theorem ev_and {p q : Ctx → Prop} (hp : Ev p) (hq : Ev q) : Ev fun K => p K �
   refine ⟨max a2 b2, fun ch hch => ?_⟩
   obtain ⟨a3, ha3⟩ := ha2 ch (le_trans (le_max_left _ _) hch)
   obtain ⟨b3, hb3⟩ := hb2 ch (le_trans (le_max_right _ _) hch)
-  exact ⟨max a3 b3, fun X h1 h2 h3 h4 hx =>
-    ⟨ha3 X h1 h2 h3 h4 (le_trans (le_max_left _ _) hx), hb3 X h1 h2 h3 h4 (le_trans (le_max_right _ _) hx)⟩⟩
+  exact ⟨
+    max a3 b3,
+    fun X h1 h2 h3 h4 hx => ⟨
+      ha3 X h1 h2 h3 h4 (le_trans (le_max_left _ _) hx),
+      hb3 X h1 h2 h3 h4 (le_trans (le_max_right _ _) hx)
+    ⟩
+  ⟩
 
 theorem ev_mono {p q : Ctx → Prop} (h : ∀ K, p K → q K) (hp : Ev p) : Ev q := by
   obtain ⟨a, ha, hp⟩ := hp

@@ -5,45 +5,53 @@ public import Development.WeilBound.CoreStatements.HodgeTatePoints.MhBase
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
 noncomputable section
 
 namespace PositivityTheory.HtPt.Mh
 
-theorem emb : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T), ∃! j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤)), Γ.IsEmb (Γ.btOrder ⊤) j := by
+theorem emb
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T),
+      ∃! j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤)), Γ.IsEmb (Γ.btOrder ⊤) j := by
   intro R _ _ T _ _ Γ
   let A := Γ.btOrder ⊤
-  have htop (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ ⊤) (s : Γ(Γ.G.left, ⊤)) :
-      valAt (Γ.pt t).left ⊤ h s = val (Γ.pt t).left s := by
+  have htop (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ ⊤) (s : Γ(Γ.G.left, ⊤))
+      : valAt (Γ.pt t).left ⊤ h s = val (Γ.pt t).left s := by
     simp only [valAt, val, Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
     rfl
-  have hsec (a : A) : ∃ s : Γ(Γ.G.left, ⊤), ∀ t,
-      val (Γ.pt t).left s = algebraMap R (FractionRing R) (a.1 t) := by
+  have hsec (a : A)
+      : ∃ s : Γ(Γ.G.left, ⊤), ∀ t, val (Γ.pt t).left s = algebraMap R (FractionRing R) (a.1 t) := by
     have ha := (Twhopf.mem_order R T Γ ⊤ a.1).1 a.2
     obtain ⟨s, hs⟩ := (Twhopf.reg_iff R T Γ ⊤ _).1 (ha 1)
     refine ⟨s, fun t => (htop t le_top s).symm.trans ?_⟩
     simpa only [_root_.one_mul] using hs t le_top
-  have hsec_ext {s s' : Γ(Γ.G.left, ⊤)}
-      (h : ∀ t, val (Γ.pt t).left s = val (Γ.pt t).left s') : s = s' := by
+  have hsec_ext {s s' : Γ(Γ.G.left, ⊤)} (h : ∀ t, val (Γ.pt t).left s = val (Γ.pt t).left s')
+      : s = s' := by
     rw [← sub_eq_zero]
     refine Twhopf.sec_inj R T Γ ⊤ _ fun t ht => ?_
     rw [htop, map_sub, h, sub_self]
-  have hhom_ext {B : Type} [CommRing B] {j j' : Γ.G.left ⟶ Spec (CommRingCat.of B)}
-      (h : ∀ t, (Γ.pt t).left ≫ j = (Γ.pt t).left ≫ j') : j = j' :=
+  have hhom_ext
+      {B : Type} [CommRing B]
+      {j j' : Γ.G.left ⟶ Spec (CommRingCat.of B)} (h : ∀ t, (Γ.pt t).left ≫ j = (Γ.pt t).left ≫ j')
+      : j = j' :=
     pb_ext fun a => hsec_ext fun t => by rw [val_pb_comp, h, ← val_pb_comp]
   choose s hs using hsec
-  let φ : A →+* Γ(Γ.G.left, ⊤) :=
-    { toFun := s
-      map_one' := hsec_ext fun t => by rw [hs, map_one]; simp
-      map_mul' := fun a b => hsec_ext fun t => by rw [hs, map_mul, hs, hs]; simp
-      map_zero' := hsec_ext fun t => by rw [hs, map_zero]; simp
-      map_add' := fun a b => hsec_ext fun t => by rw [hs, map_add (f := _), hs, hs]; simp }
+  let φ : A →+* Γ(Γ.G.left, ⊤) := {
+    toFun := s
+    map_one' := hsec_ext fun t => by rw [hs, map_one]; simp
+    map_mul' := fun a b => hsec_ext fun t => by rw [hs, map_mul, hs, hs]; simp
+    map_zero' := hsec_ext fun t => by rw [hs, map_zero]; simp
+    map_add' := fun a b => hsec_ext fun t => by rw [hs, map_add (f := _), hs, hs]; simp
+  }
   obtain ⟨j, hj⟩ := exists_pb φ
-  have hpt : ∀ t, (Γ.pt t).left ≫ j = Spec.map (CommRingCat.ofHom
-      ((algebraMap R (FractionRing R)).comp
-        ((Pi.evalRingHom (fun _ : T => R) t).comp A.val.toRingHom))) := by
+  have hpt
+      : ∀ t,
+        (Γ.pt t).left ≫ j
+          = Spec.map (CommRingCat.ofHom ((algebraMap R (FractionRing R)).comp
+            ((Pi.evalRingHom (fun _ : T => R) t).comp A.val.toRingHom))) := by
     intro t
     apply comp_eq_spec
     intro a
@@ -56,11 +64,21 @@ theorem emb : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] 
   show _ = Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R)))
   congr 2
 
-theorem emb_square : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (R' : Type) [CommRing R'] [IsDomain R'] [Algebra R R'] (Γ' : QFGroup R' T) (F : Γ'.G.left ⟶ Γ.G.left), Γ'.IsBaseChange Γ (algebraMap R R') F → ∀ (A : Subalgebra R (T → R)) (A' : Subalgebra R' (T → R')) (ψ : A →+* A'), (∀ (a : A) t, (ψ a).1 t = algebraMap R R' (a.1 t)) → ∀ (j : Γ.G.left ⟶ Spec (CommRingCat.of A)) (j' : Γ'.G.left ⟶ Spec (CommRingCat.of A')), Γ.IsEmb A j → Γ'.IsEmb A' j' → F ≫ j = j' ≫ Spec.map (CommRingCat.ofHom ψ) := by
+theorem emb_square
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T)
+        (R' : Type) [CommRing R'] [IsDomain R'] [Algebra R R'] (Γ' : QFGroup R' T)
+        (F : Γ'.G.left ⟶ Γ.G.left),
+      Γ'.IsBaseChange Γ (algebraMap R R') F
+        → ∀ (A : Subalgebra R (T → R)) (A' : Subalgebra R' (T → R')) (ψ : A →+* A'),
+          (∀ (a : A) t, (ψ a).1 t = algebraMap R R' (a.1 t))
+            → ∀ (j : Γ.G.left ⟶ Spec (CommRingCat.of A))
+                (j' : Γ'.G.left ⟶ Spec (CommRingCat.of A')),
+              Γ.IsEmb A j → Γ'.IsEmb A' j' → F ≫ j = j' ≫ Spec.map (CommRingCat.ofHom ψ) := by
   intro R _ _ T _ _ Γ R' _ _ _ Γ' F hF A A' ψ hψ j j' hj hj'
   obtain ⟨B, _, i, k, k', σ, hk, hki, hki', -, hσ, hσ'⟩ := hF.pts
-  have hhom_ext {f g : Γ'.G.left ⟶ Spec (CommRingCat.of A)}
-      (h : ∀ t, (Γ'.pt t).left ≫ f = (Γ'.pt t).left ≫ g) : f = g := by
+  have hhom_ext
+      {f g : Γ'.G.left ⟶ Spec (CommRingCat.of A)} (h : ∀ t, (Γ'.pt t).left ≫ f = (Γ'.pt t).left ≫ g)
+      : f = g := by
     apply pb_ext
     intro a
     rw [← sub_eq_zero]
@@ -69,8 +87,10 @@ theorem emb_square : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGr
     change val (Γ'.pt t).left (pb f a - pb g a) = 0
     rw [map_sub, val_pb_comp, h, ← val_pb_comp, sub_self]
   refine hhom_ext fun t => ?_
-  have h1 : σ t ≫ j = Spec.map (CommRingCat.ofHom
-      (i.comp ((Pi.evalRingHom (fun _ : T => R) t).comp A.val.toRingHom))) := by
+  have h1
+      : σ t ≫ j
+        = Spec.map (CommRingCat.ofHom (i.comp ((Pi.evalRingHom (fun _ : T => R) t).comp
+          A.val.toRingHom))) := by
     obtain ⟨c, hc⟩ := Spec.map_surjective (σ t ≫ j)
     have h2 := hj.pt t
     rw [← hσ t, Category.assoc, ← hc, ← CommRingCat.ofHom_hom c, spec_comp, ← hki] at h2
@@ -82,26 +102,35 @@ theorem emb_square : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGr
   congr 2
   exact RingHom.ext fun a => congrArg (algebraMap R' (FractionRing R')) (hψ a t).symm
 
-theorem valAt_comp {B : Type} [CommRing B] {X Y : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ Y) (F : Y ⟶ X)
-    (U : X.Opens) (h : ⊤ ≤ (x ≫ F) ⁻¹ᵁ U) (s : Γ(X, U)) :
-    valAt (x ≫ F) U h s = valAt x (F ⁻¹ᵁ U) h ((F.app U).hom s) := by
+theorem valAt_comp
+    {B : Type} [CommRing B]
+    {X Y : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ Y) (F : Y ⟶ X) (U : X.Opens)
+    (h : ⊤ ≤ (x ≫ F) ⁻¹ᵁ U) (s : Γ(X, U))
+    : valAt (x ≫ F) U h s = valAt x (F ⁻¹ᵁ U) h ((F.app U).hom s) := by
   simp only [valAt, Scheme.Hom.comp_appLE]
   rfl
 
-theorem exists_den_of_open {A : Type} [CommRing A] {X : Scheme.{0}} (j : X ⟶ Spec (CommRingCat.of A))
-    [IsOpenImmersion j] (g : X) (s : Γ(X, ⊤)) :
-    ∃ u a : A, u ∉ (j g).asIdeal ∧ ∀ (K : Type) [Field K] (x : Spec (CommRingCat.of K) ⟶ X),
-      val x (pb j u) * val x s = val x (pb j a) := by
-  have htop {K : Type} [CommRing K] {Y : Scheme.{0}} (x : Spec (CommRingCat.of K) ⟶ Y)
-      (h : ⊤ ≤ x ⁻¹ᵁ ⊤) (b : Γ(Y, ⊤)) : valAt x ⊤ h b = val x b := by
+theorem exists_den_of_open
+    {A : Type} [CommRing A]
+    {X : Scheme.{0}} (j : X ⟶ Spec (CommRingCat.of A)) [IsOpenImmersion j]
+    (g : X) (s : Γ(X, ⊤))
+    : ∃ u a : A,
+      u ∉ (j g).asIdeal
+        ∧ ∀ (K : Type) [Field K] (x : Spec (CommRingCat.of K) ⟶ X),
+          val x (pb j u) * val x s = val x (pb j a) := by
+  have htop
+      {K : Type} [CommRing K]
+      {Y : Scheme.{0}} (x : Spec (CommRingCat.of K) ⟶ Y) (h : ⊤ ≤ x ⁻¹ᵁ ⊤) (b : Γ(Y, ⊤))
+      : valAt x ⊤ h b = val x b := by
     simp only [valAt, val, Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
     rfl
   have hY := isAffineOpen_top (Spec (CommRingCat.of A))
   obtain ⟨r, hr, hg⟩ := hY.exists_basicOpen_le (V := j.opensRange) ⟨j g, g, rfl⟩ trivial
   let D := (Spec (CommRingCat.of A)).basicOpen r
   have := j.isIso_app D hr
-  obtain ⟨s', hs'⟩ := (ConcreteCategory.bijective_of_isIso (j.app D)).2
-    ((X.presheaf.map (homOfLE (le_top : j ⁻¹ᵁ D ≤ ⊤)).op).hom s)
+  obtain ⟨s', hs'⟩ :=
+    (ConcreteCategory.bijective_of_isIso (j.app D)).2
+      ((X.presheaf.map (homOfLE (le_top : j ⁻¹ᵁ D ≤ ⊤)).op).hom s)
   have hl := hY.isLocalization_basicOpen r
   obtain ⟨⟨a, _, n, rfl⟩, ha⟩ := IsLocalization.surj (Submonoid.powers r) s'
   let c := (Scheme.ΓSpecIso (CommRingCat.of A)).hom.hom
@@ -119,11 +148,15 @@ theorem exists_den_of_open {A : Type} [CommRing A] {X : Scheme.{0}} (j : X ⟶ S
     have hx : ⊤ ≤ (x ≫ j) ⁻¹ᵁ D := by
       rw [Scheme.preimage_basicOpen_top, top_le_iff]
       apply Scheme.basicOpen_of_isUnit
-      have hu : IsUnit ((Scheme.ΓSpecIso (CommRingCat.of K)).hom.hom ((x ≫ j).appTop r)) := Ne.isUnit h0
+      have hu : IsUnit ((Scheme.ΓSpecIso (CommRingCat.of K)).hom.hom ((x ≫ j).appTop r)) :=
+        Ne.isUnit h0
       simpa using hu.map (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom
     have e := congrArg (SubOrder.valHom (x ≫ j) D hx) ha
-    have hres : ∀ b, SubOrder.valHom (x ≫ j) D hx (algebraMap Γ(Spec (CommRingCat.of A), ⊤) _ b) = val (x ≫ j) b :=
-      fun b => (Twhopf.valAt_restrict (x ≫ j) (homOfLE (le_top : D ≤ ⊤)) hx le_top b).trans (htop _ _ _)
+    have hres
+        : ∀ b,
+          SubOrder.valHom (x ≫ j) D hx (algebraMap Γ(Spec (CommRingCat.of A), ⊤) _ b)
+            = val (x ≫ j) b := fun b =>
+      (Twhopf.valAt_restrict (x ≫ j) (homOfLE (le_top : D ≤ ⊤)) hx le_top b).trans (htop _ _ _)
     rw [map_mul, hres, hres, SubOrder.valHom_apply, valAt_comp] at e
     have e2 : valAt x (j ⁻¹ᵁ D) hx ((j.app D).hom s') = val x s :=
       (congrArg (valAt x (j ⁻¹ᵁ D) hx) hs').trans
@@ -132,41 +165,48 @@ theorem exists_den_of_open {A : Type} [CommRing A] {X : Scheme.{0}} (j : X ⟶ S
     rw [← e]
     ring
 
-theorem char : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (A : Subalgebra R (T → R)), IsHopfOrder A → ∀ (j : Γ.G.left ⟶ Spec (CommRingCat.of A)), Γ.IsEmb A j → IsOpenImmersion j → Γ.TranslatesCover A j ⊤ → Γ.btOrder ⊤ = A := by
+theorem char
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T)
+        (A : Subalgebra R (T → R)),
+      IsHopfOrder A
+        → ∀ (j : Γ.G.left ⟶ Spec (CommRingCat.of A)),
+          Γ.IsEmb A j → IsOpenImmersion j → Γ.TranslatesCover A j ⊤ → Γ.btOrder ⊤ = A := by
   intro R _ _ T _ _ Γ A hA j hj hopen hcov
-  have htop (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ ⊤) (s : Γ(Γ.G.left, ⊤)) :
-      valAt (Γ.pt t).left ⊤ h s = val (Γ.pt t).left s := by
+  have htop (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ ⊤) (s : Γ(Γ.G.left, ⊤))
+      : valAt (Γ.pt t).left ⊤ h s = val (Γ.pt t).left s := by
     simp only [valAt, val, Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
     rfl
-  have hmem (f : T → R) : f ∈ Γ.btOrder ⊤ ↔
-      ∀ t, ∃ s : Γ(Γ.G.left, ⊤), ∀ h,
-        val (Γ.pt h).left s = algebraMap R (FractionRing R) (f (t * h)) := by
+  have hmem (f : T → R)
+      : f ∈ Γ.btOrder ⊤
+        ↔ ∀ t, ∃ s : Γ(Γ.G.left, ⊤), ∀ h,
+          val (Γ.pt h).left s = algebraMap R (FractionRing R) (f (t * h)) := by
     rw [Twhopf.mem_order]
-    change (∀ t, ∀ g ∈ (⊤ : Γ.G.left.Opens), Γ.RegularAt
-      (fun h => algebraMap R (FractionRing R) (f (t * h))) g) ↔ _
+    change (∀ t, ∀ g ∈ (⊤ : Γ.G.left.Opens),
+        Γ.RegularAt (fun h => algebraMap R (FractionRing R) (f (t * h))) g)
+      ↔ _
     simp only [Twhopf.reg_iff, htop]
     simp
-  have hval (t : T) (a : A) :
-      val (Γ.pt t).left (pb j a) = algebraMap R (FractionRing R) (a.1 t) :=
+  have hval (t : T) (a : A) : val (Γ.pt t).left (pb j a) = algebraMap R (FractionRing R) (a.1 t) :=
     val_pb (hj.pt t) a
   have tr := Twhopf.translate_mem R T A hA
   apply le_antisymm
   · intro f hf
     rw [hmem] at hf
-    let I : Ideal A :=
-      { carrier := {a | a.1 * f ∈ A}
-        add_mem' := fun {a b} ha hb => by
-          change (a.1 + b.1) * f ∈ A
-          rw [add_mul]
-          exact A.add_mem ha hb
-        zero_mem' := by
-          change (0 : T → R) * f ∈ A
-          rw [zero_mul]
-          exact A.zero_mem
-        smul_mem' := fun c a ha => by
-          change (c.1 * a.1) * f ∈ A
-          rw [_root_.mul_assoc]
-          exact A.mul_mem c.2 ha }
+    let I : Ideal A := {
+      carrier := {a | a.1 * f ∈ A}
+      add_mem' := fun {a b} ha hb => by
+        change (a.1 + b.1) * f ∈ A
+        rw [add_mul]
+        exact A.add_mem ha hb
+      zero_mem' := by
+        change (0 : T → R) * f ∈ A
+        rw [zero_mul]
+        exact A.zero_mem
+      smul_mem' := fun c a ha => by
+        change (c.1 * a.1) * f ∈ A
+        rw [_root_.mul_assoc]
+        exact A.mul_mem c.2 ha
+    }
     have hI : I = ⊤ := by
       by_contra hne
       obtain ⟨P, hP, hIP⟩ := Ideal.exists_le_maximal I hne

@@ -8,8 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.Holomorph
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 
 namespace GlobalTheory.PeriodSpan
@@ -21,8 +21,8 @@ def torusPts (E : TorusExtension ((Over.pullback y).obj G)) : Set (Over.mk y ⟶
   {x | ∃ t : Over.mk (𝟙 (Sp ℂ)) ⟶ splitTorus (Spec (.of ℂ)) E.X, (t ≫ E.i).left ≫ pullback.fst G.hom y = x.left}
 
 def IsPerHol (ψ : ℂ → (Over.mk y ⟶ G)) : Prop :=
-  (∀ s t, ψ (s + t) = ψ s * ψ t) ∧ IsHolTo Set.univ (fun s => (ψ s).left) ∧
-    ψ (2 * Real.pi * Complex.I) = 1
+  (∀ s t, ψ (s + t) = ψ s * ψ t) ∧ IsHolTo Set.univ (fun s => (ψ s).left)
+    ∧ ψ (2 * Real.pi * Complex.I) = 1
 
 def perHolSub : Subgroup (Over.mk y ⟶ G) :=
   Subgroup.closure (⋃ (ψ : ℂ → (Over.mk y ⟶ G)) (_ : IsPerHol G y ψ), Set.range ψ)

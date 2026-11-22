@@ -15,17 +15,29 @@ noncomputable section
 
 namespace GlobalTheory.SerCmp.LabConv
 
-theorem isCuspOf_of_hasCuspLabel : ∀ (g : ℕ) [Fact g.Prime] (L : GlobalTheory.GLq.LabelDatum g) (t : Formalism.CyclotomicNorms.Fbar g →* ℂ) (ht : ∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t x = t y → x = y) (hζ : Formalism.L2.NT.IsGenSys L.gen), t = L.teich → ∀ (d : ℕ) (V : FDRep ℂ (GL (Fin d) (ZMod g))) (P : (ZMod g)[X]), 1 ≤ d → GlobalTheory.GLq.IsCusp (fun x => V.character x) → Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel (Formalism.L2.NT.convC t ht L.gen hζ) V P → GlobalTheory.GLq.IsCuspOf L P (fun x => V.character x) := by
+theorem isCuspOf_of_hasCuspLabel
+    : ∀ (g : ℕ) [Fact g.Prime] (L : GlobalTheory.GLq.LabelDatum g)
+        (t : Formalism.CyclotomicNorms.Fbar g →* ℂ)
+        (ht : ∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t x = t y → x = y)
+        (hζ : Formalism.L2.NT.IsGenSys L.gen),
+      t = L.teich
+        → ∀ (d : ℕ) (V : FDRep ℂ (GL (Fin d) (ZMod g))) (P : (ZMod g)[X]),
+          1 ≤ d → GlobalTheory.GLq.IsCusp (fun x => V.character x)
+            → Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel
+              (Formalism.L2.NT.convC t ht L.gen hζ) V P
+            → GlobalTheory.GLq.IsCuspOf L P (fun x => V.character x) := by
   intro g _ L t ht hζ htL d V P hd hcusp hlab
   subst htL
   obtain ⟨hm, hi, hX, hdeg, hval⟩ := hlab
   rw [Fintype.card_fin] at hdeg
-  have hPl : GlobalTheory.GLq.IsPrimeLab d P := ⟨hm, hi, Formalism.L2.NT.coeff_zero_ne_of_monic_irr hm hi hX, hdeg⟩
+  have hPl : GlobalTheory.GLq.IsPrimeLab d P :=
+    ⟨hm, hi, Formalism.L2.NT.coeff_zero_ne_of_monic_irr hm hi hX, hdeg⟩
   refine ⟨hPl, hcusp, ?_⟩
   intro x hx y hy z hz
   have hd0 : 0 < d := hd
   have hcpl : GlobalTheory.GLq.IsPrimeLab d (y : GlobalTheory.GLq.Mt g d).charpoly := by
-    refine ⟨Matrix.charpoly_monic _, hy, ?_, by rw [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]⟩
+    refine
+      ⟨Matrix.charpoly_monic _, hy, ?_, by rw [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]⟩
     intro h0
     have hdet := Matrix.det_eq_sign_charpoly_coeff (y : GlobalTheory.GLq.Mt g d)
     rw [h0, mul_zero] at hdet

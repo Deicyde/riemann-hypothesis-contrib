@@ -8,18 +8,21 @@ noncomputable section
 
 namespace Formalism.MainNotions.UnusedSlot80.InvW
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80 Formalism.MainNotions.N.Ln03
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80
+  Formalism.MainNotions.N.Ln03
 
 section Parts
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
 
 structure LevBasics (W : LocWach PD LL O v n) (a : ZMod n) (s : ℕ) where
   F : Type
@@ -40,19 +43,32 @@ structure LevBasics (W : LocWach PD LL O v n) (a : ZMod n) (s : ℕ) where
 
 attribute [instance] LevBasics.fF LevBasics.algOF
 
-def LevDiv (W : LocWach PD LL O v n) (a : ZMod n) (s : ℕ) (F : Type) [Field F] [Algebra O F]
-    (ev : Rs F PD.p s → LetA O n →+* F) : Prop :=
-  ∀ g ∈ W.AΔ, (∀ ζ : Rs F PD.p s, ev ζ g = 0) → ∃ (κ : ℕ) (w : LetA O n), w ∈ W.AΔ ∧
-    ((PD.p : ℕ) : LetA O n) ^ κ * (letE a * g) = ps W s * w
+def LevDiv
+    (W : LocWach PD LL O v n) (a : ZMod n)
+    (s : ℕ)
+    (F : Type) [Field F] [Algebra O F]
+    (ev : Rs F PD.p s → LetA O n →+* F)
+    : Prop :=
+  ∀ g ∈ W.AΔ,
+    (∀ ζ : Rs F PD.p s, ev ζ g = 0)
+      → ∃ (κ : ℕ) (w : LetA O n), w ∈ W.AΔ ∧ ((PD.p : ℕ) : LetA O n) ^ κ * (letE a * g) = ps W s * w
 
-def LevRat (W : LocWach PD LL O v n) (a : ZMod n) (s : ℕ) (F : Type) [Field F] [Algebra O F]
-    (ev : Rs F PD.p s → LetA O n →+* F) : Prop :=
-  ∀ g ∈ W.AΔ, ∀ d ∈ W.AΔ, (∀ ζ : Rs F PD.p s, ev ζ d ≠ 0) → ∀ c : F,
-    (∀ ζ : Rs F PD.p s, ev ζ g = c * ev ζ d) →
-    ∃ (κ : ℕ) (x : O), ((PD.p : ℕ) : F) ^ κ * c = algebraMap O F x
+def LevRat
+    (W : LocWach PD LL O v n) (a : ZMod n)
+    (s : ℕ)
+    (F : Type) [Field F] [Algebra O F]
+    (ev : Rs F PD.p s → LetA O n →+* F)
+    : Prop :=
+  ∀ g ∈ W.AΔ, ∀ d ∈ W.AΔ,
+    (∀ ζ : Rs F PD.p s, ev ζ d ≠ 0)
+      → ∀ c : F,
+        (∀ ζ : Rs F PD.p s, ev ζ g = c * ev ζ d)
+          → ∃ (κ : ℕ) (x : O), ((PD.p : ℕ) : F) ^ κ * c = algebraMap O F x
 
-def levEv_of (W : LocWach PD LL O v n) (a : ZMod n) (s : ℕ) (hB : LevBasics W a s) (hD : LevDiv W a s hB.F hB.ev)
-    (hR : LevRat W a s hB.F hB.ev) : LevEv W a s where
+def levEv_of
+    (W : LocWach PD LL O v n) (a : ZMod n) (s : ℕ) (hB : LevBasics W a s)
+    (hD : LevDiv W a s hB.F hB.ev) (hR : LevRat W a s hB.F hB.ev)
+    : LevEv W a s where
   F := hB.F
   fF := hB.fF
   algOF := hB.algOF
@@ -68,9 +84,12 @@ def levEv_of (W : LocWach PD LL O v n) (a : ZMod n) (s : ℕ) (hB : LevBasics W 
   div := hD
   rat := hR
 
-theorem invLevCore_of_parts (W : LocWach PD LL O v n) (hπ : W.π₀ ∈ W.AΔ) (hB : ∀ a s, LevBasics W a s)
-    (hD : ∀ a s, LevDiv W a s (hB a s).F (hB a s).ev) (hR : ∀ a s, LevRat W a s (hB a s).F (hB a s).ev)
-    (hPC : InvCut.PrecompConst) : CutU.InvLevCore W :=
+theorem invLevCore_of_parts
+    (W : LocWach PD LL O v n) (hπ : W.π₀ ∈ W.AΔ) (hB : ∀ a s, LevBasics W a s)
+    (hD : ∀ a s, LevDiv W a s (hB a s).F (hB a s).ev)
+    (hR : ∀ a s, LevRat W a s (hB a s).F (hB a s).ev)
+    (hPC : InvCut.PrecompConst)
+    : CutU.InvLevCore W :=
   invLevCore_of W hπ (fun a s => levEv_of W a s (hB a s) (hD a s) (hR a s)) hPC
 
 end Parts

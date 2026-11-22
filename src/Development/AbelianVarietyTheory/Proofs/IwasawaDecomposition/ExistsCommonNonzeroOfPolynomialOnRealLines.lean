@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_common_nonzero_of_polynomial_on_lines (V : Type) [AddCommGroup V] [Module ℝ V]
-    (ι : Type) [Finite ι] (f : ι → V → ℂ)
-    (hpoly : ∀ i a b, ∃ p : Polynomial ℂ, ∀ s : ℝ, f i (a + s • b) = p.eval (s : ℂ))
-    (hne : ∀ i, ∃ v, f i v ≠ 0) : ∃ v, ∀ i, f i v ≠ 0 := by
+theorem exists_common_nonzero_of_polynomial_on_lines
+    (V : Type) [AddCommGroup V] [Module ℝ V]
+    (ι : Type) [Finite ι]
+    (f : ι → V → ℂ) (hpoly : ∀ i a b, ∃ p : Polynomial ℂ, ∀ s : ℝ, f i (a + s • b) = p.eval (s : ℂ))
+    (hne : ∀ i, ∃ v, f i v ≠ 0)
+    : ∃ v, ∀ i, f i v ≠ 0 := by
   classical
   have _ := Fintype.ofFinite ι
   have key : ∀ t : Finset ι, ∃ v, ∀ i ∈ t, f i v ≠ 0 := by
@@ -30,8 +32,9 @@ theorem exists_common_nonzero_of_polynomial_on_lines (V : Type) [AddCommGroup V]
         · apply hv i hi
           have := hp i 0
           simpa [h] using this
-      have hfin : Set.Finite (⋃ i ∈ (insert j t : Finset ι),
-          (fun s : ℝ => (s : ℂ)) ⁻¹' {z | (p i).IsRoot z}) :=
+      have hfin : Set.Finite
+          (⋃ i ∈ (insert j t : Finset ι),
+            (fun s : ℝ => (s : ℂ)) ⁻¹' {z | (p i).IsRoot z}) :=
         Set.Finite.biUnion (Finset.finite_toSet _) fun i hi =>
           (Polynomial.finite_setOf_isRoot (hp0 i hi)).preimage Complex.ofReal_injective.injOn
       obtain ⟨s, hs⟩ := hfin.exists_notMem

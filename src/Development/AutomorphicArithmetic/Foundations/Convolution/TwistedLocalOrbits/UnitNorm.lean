@@ -4,11 +4,13 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
 
-private theorem finiteField_norm_trace_surjective {k : Type} [Field k] [Finite k] (τ : k ≃+* k) (q : ℕ) (hq : orderOf τ = q) :
-    (∀ u : k, τ u = u → ∃ w : k, ∏ i ∈ Finset.range q, (τ ^ i) w = u) ∧
-      ∃ a : k, ∑ i ∈ Finset.range q, (τ ^ i) a = 1 := by
+private theorem finiteField_norm_trace_surjective
+    {k : Type} [Field k] [Finite k] (τ : k ≃+* k) (q : ℕ) (hq : orderOf τ = q)
+    : (∀ u : k, τ u = u → ∃ w : k, ∏ i ∈ Finset.range q, (τ ^ i) w = u)
+      ∧ ∃ a : k, ∑ i ∈ Finset.range q, (τ ^ i) a = 1 := by
   classical
   subst hq
   haveI : Finite (k ≃+* k) := Finite.of_injective (fun f : k ≃+* k => (f : k → k)) DFunLike.coe_injective
@@ -38,13 +40,15 @@ private theorem finiteField_norm_trace_surjective {k : Type} [Field k] [Finite k
     rw [Finset.sum_range]
     exact h.symm
 
-private theorem unramified_norm_trace_surjective {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
-    (σ : E ≃+* E) (q : ℕ) (h : Unram σ q) :
-    (∀ u : E, valuation E u = 1 → σ u = u →
-      ∃ w : E, valuation E w ≤ 1 ∧ valuation E (∏ i ∈ Finset.range q, σ^[i] w - u) < 1) ∧
-      ∃ a : E, valuation E a ≤ 1 ∧ valuation E (∑ i ∈ Finset.range q, σ^[i] a - 1) < 1 := by
-  let s : 𝒪[E] ≃+* 𝒪[E] := σ.restrict 𝒪[E] 𝒪[E] fun x => by
-    simp only [Valuation.mem_integer_iff, h.isom x]
+private theorem unramified_norm_trace_surjective
+    {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
+    (σ : E ≃+* E) (q : ℕ) (h : Unram σ q)
+    : (∀ u : E,
+        valuation E u = 1 → σ u = u
+          → ∃ w : E, valuation E w ≤ 1 ∧ valuation E (∏ i ∈ Finset.range q, σ^[i] w - u) < 1)
+      ∧ ∃ a : E, valuation E a ≤ 1 ∧ valuation E (∑ i ∈ Finset.range q, σ^[i] a - 1) < 1 := by
+  let s : 𝒪[E] ≃+* 𝒪[E] :=
+    σ.restrict 𝒪[E] 𝒪[E] fun x => by simp only [Valuation.mem_integer_iff, h.isom x]
   have hs : ∀ x : 𝒪[E], ((s x : 𝒪[E]) : E) = σ x := fun x => rfl
   have hsi : ∀ (i : ℕ) (x : 𝒪[E]), ((s^[i] x : 𝒪[E]) : E) = σ^[i] x := by
     intro i x
@@ -53,15 +57,19 @@ private theorem unramified_norm_trace_surjective {E : Type} [Field E] [Valuative
     | succ i ih => rw [Function.iterate_succ_apply', Function.iterate_succ_apply', hs, ih]
   let τ : 𝓀[E] ≃+* 𝓀[E] := IsLocalRing.ResidueField.mapEquiv s
   have hτ : ∀ x : 𝒪[E], τ (IsLocalRing.residue _ x) = IsLocalRing.residue _ (s x) := fun x => rfl
-  have hτi : ∀ (i : ℕ) (x : 𝒪[E]), (τ ^ i) (IsLocalRing.residue _ x) = IsLocalRing.residue _ (s^[i] x) := by
+  have hτi
+      : ∀ (i : ℕ) (x : 𝒪[E]),
+        (τ ^ i) (IsLocalRing.residue _ x) = IsLocalRing.residue _ (s^[i] x) := by
     intro i x
     induction i with
     | zero => rfl
     | succ i ih => rw [Function.iterate_succ_apply', pow_succ', RingAut.mul_apply, ih, hτ]
-  have key : ∀ x y : 𝒪[E], IsLocalRing.residue _ x = IsLocalRing.residue _ y ↔ valuation E ((x : E) - y) < 1 := by
+  have key
+      : ∀ x y : 𝒪[E],
+        IsLocalRing.residue _ x = IsLocalRing.residue _ y ↔ valuation E ((x : E) - y) < 1 := by
     intro x y
-    rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
-      Valuation.Integer.not_isUnit_iff_valuation_lt_one]
+    rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal,
+      mem_nonunits_iff, Valuation.Integer.not_isUnit_iff_valuation_lt_one]
     rfl
   have hord : orderOf τ = q := by
     rw [orderOf_eq_iff h.pos]
@@ -78,8 +86,8 @@ private theorem unramified_norm_trace_surjective {E : Type} [Field E] [Valuative
   obtain ⟨h1, z, hz⟩ := finiteField_norm_trace_surjective τ q hord
   constructor
   · intro u hu hσ
-    obtain ⟨z, hz⟩ := h1 (IsLocalRing.residue _ (⟨u, hu.le⟩ : 𝒪[E])) (by
-      rw [hτ]; congr 1; exact Subtype.ext hσ)
+    obtain ⟨z, hz⟩ :=
+      h1 (IsLocalRing.residue _ (⟨u, hu.le⟩ : 𝒪[E])) (by rw [hτ]; congr 1; exact Subtype.ext hσ)
     obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective z
     refine ⟨x, x.2, ?_⟩
     simp only [hτi] at hz
@@ -92,25 +100,34 @@ private theorem unramified_norm_trace_surjective {E : Type} [Field E] [Valuative
       rw [← map_sum, ← map_one (IsLocalRing.residue 𝒪[E]), key] at hz
     simpa only [AddSubmonoidClass.coe_finsetSum, hsi, OneMemClass.coe_one] using hz
 
-private theorem prod_expand {E : Type} [Field E] [ValuativeRel E] (d : E) (hd : valuation E d ≤ 1) (x : ℕ → E)
-    (hx : ∀ i, valuation E (x i) ≤ 1) (m : ℕ) :
-    ∃ c : E, valuation E c ≤ 1 ∧
-      ∏ i ∈ Finset.range m, (1 + d * x i) = 1 + d * ∑ i ∈ Finset.range m, x i + d ^ 2 * c := by
+private theorem prod_expand
+    {E : Type} [Field E] [ValuativeRel E]
+    (d : E) (hd : valuation E d ≤ 1)
+    (x : ℕ → E) (hx : ∀ i, valuation E (x i) ≤ 1)
+    (m : ℕ)
+    : ∃ c : E,
+      valuation E c ≤ 1
+        ∧ ∏ i ∈ Finset.range m, (1 + d * x i) = 1 + d * ∑ i ∈ Finset.range m, x i + d ^ 2 * c := by
   induction m with
   | zero => exact ⟨0, by simp, by simp⟩
   | succ m ih =>
     obtain ⟨c, hc, he⟩ := ih
     refine ⟨c + (∑ i ∈ Finset.range m, x i) * x m + d * c * x m, ?_, ?_⟩
-    · have hS : valuation E (∑ i ∈ Finset.range m, x i) ≤ 1 := Valuation.map_sum_le _ fun i _ => hx i
+    · have hS : valuation E (∑ i ∈ Finset.range m, x i) ≤ 1 :=
+        Valuation.map_sum_le _ fun i _ => hx i
       refine Valuation.map_add_le _ (Valuation.map_add_le _ hc ?_) ?_
       · rw [map_mul]; exact mul_le_one' hS (hx m)
       · rw [map_mul, map_mul]; exact mul_le_one' (mul_le_one' hd hc) (hx m)
     · rw [Finset.prod_range_succ, Finset.sum_range_succ, he]; ring
 
 open scoped WithZeroTopology in
-theorem UpperTheory.ConvolutionTheory.Loc.unitNorm :
-    ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] (σ : E ≃+* E) (q : ℕ), Unram σ q →
-      ∀ u : E, valuation E u = 1 → σ u = u → ∃ w : E, valuation E w = 1 ∧ ∏ i ∈ Finset.range q, σ^[i] w = u := by
+theorem UpperTheory.ConvolutionTheory.Loc.unitNorm
+    : ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
+        (σ : E ≃+* E) (q : ℕ),
+      Unram σ q
+        → ∀ u : E,
+          valuation E u = 1 → σ u = u
+            → ∃ w : E, valuation E w = 1 ∧ ∏ i ∈ Finset.range q, σ^[i] w = u := by
   intro E _ _ _ _ σ q h u hu hσu
   obtain ⟨hres, a, ha, hTa⟩ := unramified_norm_trace_surjective σ q h
   obtain ⟨w₀, hw₀, hNw₀⟩ := hres u hu hσu
@@ -126,7 +143,8 @@ theorem UpperTheory.ConvolutionTheory.Loc.unitNorm :
     | succ i ih => rw [Function.iterate_succ_apply', h.isom, ih]
   have hfix : ∀ (i : ℕ) (x : E), σ x = x → σ^[i] x = x := fun i x hx => Function.iterate_fixed hx i
 
-  have hNfix : ∀ x : E, x ≠ 0 → σ (∏ i ∈ Finset.range q, σ^[i] x) = ∏ i ∈ Finset.range q, σ^[i] x := by
+  have hNfix
+      : ∀ x : E, x ≠ 0 → σ (∏ i ∈ Finset.range q, σ^[i] x) = ∏ i ∈ Finset.range q, σ^[i] x := by
     intro x hx
     have e1 := Finset.prod_range_succ (fun i => σ^[i] x) q
     rw [Finset.prod_range_succ', h.ord] at e1
@@ -167,13 +185,16 @@ theorem UpperTheory.ConvolutionTheory.Loc.unitNorm :
   have hcσ : Continuous σ := by
     refine continuous_of_continuousAt_zero σ.toAddMonoidHom ?_
     rw [ContinuousAt, map_zero]
-    refine ((IsValuativeTopology.hasBasis_nhds_zero E).tendsto_iff (IsValuativeTopology.hasBasis_nhds_zero E)).2 ?_
+    refine ((IsValuativeTopology.hasBasis_nhds_zero E).tendsto_iff
+      (IsValuativeTopology.hasBasis_nhds_zero E)).2 ?_
     intro γ _
     exact ⟨γ, trivial, fun x hx => (h.isom x).trans_lt hx⟩
   have hcont : Continuous fun x : E => valuation E (∏ i ∈ Finset.range q, σ^[i] x - u) :=
     IsValuativeTopology.continuous_valuation.comp
       ((continuous_finsetProd _ fun i _ => hcσ.iterate i).sub continuous_const)
-  obtain ⟨w, hw, hmin⟩ := (IsNonarchimedeanLocalField.isCompact_closedBall E 1).exists_isMinOn ⟨w₀, hw₀⟩ hcont.continuousOn
+  obtain ⟨w, hw, hmin⟩ :=
+    (IsNonarchimedeanLocalField.isCompact_closedBall E 1).exists_isMinOn ⟨w₀, hw₀⟩
+      hcont.continuousOn
   have hlt : valuation E (∏ i ∈ Finset.range q, σ^[i] w - u) < 1 := lt_of_le_of_lt (hmin hw₀) hNw₀
   have hN1 := near _ _ hu hlt
   have hw1 : valuation E w = 1 := by
@@ -203,8 +224,11 @@ theorem UpperTheory.ConvolutionTheory.Loc.unitNorm :
   have hw' : valuation E (w * (1 + d * b)) ≤ 1 := by
     rw [map_mul, hw1, one_mul]
     refine Valuation.map_add_le _ (map_one _).le ?_
-    rw [map_mul]; exact mul_le_one' hd1.le hb
-  have hle : valuation E (N - u) ≤ valuation E (∏ i ∈ Finset.range q, σ^[i] (w * (1 + d * b)) - u) := hmin hw'
+    rw [map_mul]
+    exact mul_le_one' hd1.le hb
+  have hle
+      : valuation E (N - u) ≤ valuation E (∏ i ∈ Finset.range q, σ^[i] (w * (1 + d * b)) - u) :=
+    hmin hw'
   have e1 : ∀ i : ℕ, σ^[i] (w * (1 + d * b)) = σ^[i] w * (1 + d * σ^[i] b) := by
     intro i
     rw [hit, map_mul, map_add (f := _), map_one, map_mul, ← hit, ← hit, ← hit, hfix i d hdσ]
@@ -212,7 +236,8 @@ theorem UpperTheory.ConvolutionTheory.Loc.unitNorm :
   rw [Finset.prod_mul_distrib, he, hTb, ← hN, ← hdv] at hle
   have e2 : N * (1 + d * 1 + d ^ 2 * c) - u = N * (d * (d * c)) := by
     have : u = N * (1 + d) := by rw [hd]; field_simp; ring
-    rw [this]; ring
+    rw [this]
+    ring
   rw [e2, map_mul, hN1, one_mul, map_mul, map_mul] at hle
   have : valuation E d * (valuation E d * valuation E c) < valuation E d :=
     mul_lt_of_lt_one_right hd0 (lt_of_le_of_lt (mul_le_of_le_one_right' hc) hd1)

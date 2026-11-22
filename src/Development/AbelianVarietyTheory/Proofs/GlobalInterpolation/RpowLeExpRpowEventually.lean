@@ -6,25 +6,43 @@ public import Formalism.LocalRingCardinality.CoeNeZeroOfNotMem
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions NumberField
+  IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem rpow_le_exp_rpow_eventually {ε : ℝ} (hε : 0 < ε) (c : ℝ) :
-    ∃ x0 : ℝ, ∀ x ≥ x0, x ^ c ≤ Real.exp (x ^ ε) := by
-  have h := ((tendsto_exp_div_rpow_atTop (c / ε)).comp (tendsto_rpow_atTop hε)).eventually_ge_atTop 1
+theorem rpow_le_exp_rpow_eventually {ε : ℝ} (hε : 0 < ε) (c : ℝ)
+    : ∃ x0 : ℝ, ∀ x ≥ x0, x ^ c ≤ Real.exp (x ^ ε) := by
+  have h :=
+    ((tendsto_exp_div_rpow_atTop (c / ε)).comp (tendsto_rpow_atTop hε)).eventually_ge_atTop 1
   obtain ⟨x0, hx0⟩ := Filter.eventually_atTop.1 (h.and (Filter.eventually_gt_atTop 0))
   refine ⟨x0, fun x hx => ?_⟩
   obtain ⟨h1, h2⟩ := hx0 x hx
   simp only [Function.comp] at h1
-  rw [← Real.rpow_mul h2.le, mul_div_cancel₀ _ hε.ne', le_div_iff₀ (Real.rpow_pos_of_pos h2 _), one_mul] at h1
+  rw [← Real.rpow_mul h2.le, mul_div_cancel₀ _ hε.ne', le_div_iff₀ (Real.rpow_pos_of_pos h2 _),
+      one_mul]
+    at h1
   exact h1
 
-theorem poly_sizes_ranks_weights : ∀ (eps : ℝ) (Fm : FamP eps), (∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x, 0 ≤ Fm.Ct ∧ ((Fm.D x i).R.f : ℝ) ≤ x ^ (3 : ℝ) ∧ ((Fm.D x i).R.m : ℝ) ≤ x ∧ ((Fm.D x i).R.k : ℝ) ≤ x ^ (5 : ℝ) ∧ ((Fm.D x i).R.N (Fm.D x i).R.m : ℝ) ≤ x ^ (Fm.Ct + 6) ∧ ((Fm.D x i).R.nV : ℝ) ≤ x ^ (Fm.Ct + 6) ∧ ((Fm.D x i).host.TT.card : ℝ) ≤ x ^ (3 : ℝ) ∧ (Fm.L x i).sc.x = x ∧ (Fm.L x i).sc.a = x * (Fm.L x i).sc.b ∧ 1 ≤ (Fm.L x i).sc.L ∧ (Fm.L x i).sc.L ≤ x ∧ x ^ (Fm.Ct + 6) ≤ (Fm.L x i).sc.b ∧ (∀ t, (0 : ℝ) ≤ (Fm.L x i).aT t ∧ ((Fm.L x i).aT t : ℝ) ≤ 2 * x * (Fm.L x i).sc.b) ∧ (Fm.L x i).B0 ≤ x ^ (5 : ℝ) * (Fm.L x i).sc.b ∧ 0 ≤ (Fm.L x i).B0) := by
+theorem poly_sizes_ranks_weights
+    : ∀ (eps : ℝ) (Fm : FamP eps),
+      (∃ x0 : ℝ, ∀ x ≥ x0,
+        Fm.x1 < x
+          → ∀ i : Fm.Ix x,
+            0 ≤ Fm.Ct ∧ ((Fm.D x i).R.f : ℝ) ≤ x ^ (3 : ℝ) ∧ ((Fm.D x i).R.m : ℝ) ≤ x
+              ∧ ((Fm.D x i).R.k : ℝ) ≤ x ^ (5 : ℝ)
+              ∧ ((Fm.D x i).R.N (Fm.D x i).R.m : ℝ) ≤ x ^ (Fm.Ct + 6)
+              ∧ ((Fm.D x i).R.nV : ℝ) ≤ x ^ (Fm.Ct + 6)
+              ∧ ((Fm.D x i).host.TT.card : ℝ) ≤ x ^ (3 : ℝ) ∧ (Fm.L x i).sc.x = x
+              ∧ (Fm.L x i).sc.a = x * (Fm.L x i).sc.b ∧ 1 ≤ (Fm.L x i).sc.L ∧ (Fm.L x i).sc.L ≤ x
+              ∧ x ^ (Fm.Ct + 6) ≤ (Fm.L x i).sc.b
+              ∧ (∀ t, (0 : ℝ) ≤ (Fm.L x i).aT t ∧ ((Fm.L x i).aT t : ℝ) ≤ 2 * x * (Fm.L x i).sc.b)
+              ∧ (Fm.L x i).B0 ≤ x ^ (5 : ℝ) * (Fm.L x i).sc.b ∧ 0 ≤ (Fm.L x i).B0) := by
   intro eps Fm
   have heps : 0 < eps := by
     obtain ⟨i⟩ := Fm.Ix_zero
-    rw [← Fm.L_eps 0 i]; exact (Fm.L 0 i).sc.eps_pos
+    rw [← Fm.L_eps 0 i]
+    exact (Fm.L 0 i).sc.eps_pos
   obtain ⟨x0, hx0⟩ := rpow_le_exp_rpow_eventually heps (Fm.Ct + 6)
   refine ⟨max x0 4, fun x hx hx1 i => ?_⟩
   have hexp := hx0 x (le_trans (le_max_left _ _) hx)
@@ -63,8 +81,7 @@ theorem poly_sizes_ranks_weights : ∀ (eps : ℝ) (Fm : FamP eps), (∃ x0 : �
   have hm : ((Fm.D x i).R.m : ℝ) ≤ x := by
     have h1 : x ^ (eps / 100) ≤ Real.sqrt x := by
       rw [Real.sqrt_eq_rpow]; exact Real.rpow_le_rpow_of_exponent_le h1x (by linarith)
-    have h2 : Real.sqrt (x * x ^ (-(eps / 8))) ≤ Real.sqrt x :=
-      Real.sqrt_le_sqrt (by nlinarith)
+    have h2 : Real.sqrt (x * x ^ (-(eps / 8))) ≤ Real.sqrt x := Real.sqrt_le_sqrt (by nlinarith)
     refine hM2.trans ((mul_le_mul h1 h2 (by positivity) (by positivity)).trans ?_)
     exact (Real.mul_self_sqrt h0x.le).le
   have hk : ((Fm.D x i).R.k : ℝ) ≤ x ^ (5 : ℝ) :=
@@ -90,12 +107,12 @@ theorem poly_sizes_ranks_weights : ∀ (eps : ℝ) (Fm : FamP eps), (∃ x0 : �
       have a1 : (Fm.D x i).R.k ≤ (Fm.D x i).R.t := by omega
       have a2 : 1 ≤ (Fm.D x i).R.t := by omega
       nlinarith
-    have h2 : ((Fm.D x i).R.N (Fm.D x i).R.m : ℝ) ≤ 3 * (Fm.D x i).R.m * (Fm.D x i).R.t := by exact_mod_cast h1
+    have h2 : ((Fm.D x i).R.N (Fm.D x i).R.m : ℝ) ≤ 3 * (Fm.D x i).R.m * (Fm.D x i).R.t := by
+      exact_mod_cast h1
     refine h2.trans (le_trans ?_ hbig)
     gcongr
   have hnV : ((Fm.D x i).R.nV : ℝ) ≤ x ^ (Ct + 6) := by
-    have h1 : (Fm.D x i).R.nV ≤ 2 * (Fm.D x i).R.t := by
-      unfold Ranks.nV Ranks.r; omega
+    have h1 : (Fm.D x i).R.nV ≤ 2 * (Fm.D x i).R.t := by unfold Ranks.nV Ranks.r; omega
     have h2 : ((Fm.D x i).R.nV : ℝ) ≤ 2 * (Fm.D x i).R.t := by exact_mod_cast h1
     refine h2.trans (le_trans ?_ hbig)
     have := htw.1
@@ -109,7 +126,9 @@ theorem poly_sizes_ranks_weights : ∀ (eps : ℝ) (Fm : FamP eps), (∃ x0 : �
   have hL1 : 1 ≤ L.sc.L := by rw [hL]; exact Real.one_le_rpow h1x heps.le
   have hL2 : L.sc.L ≤ x := by
     rw [hL]
-    calc x ^ eps ≤ x ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le h1x (by linarith)
+    calc
+      x ^ eps
+        ≤ x ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le h1x (by linarith)
       _ = x := Real.rpow_one x
   have hb : L.sc.b = Real.exp (x ^ eps) := by unfold Scale.b; rw [hL]
   have hb0 : 0 < L.sc.b := by rw [hb]; positivity
@@ -122,13 +141,17 @@ theorem poly_sizes_ranks_weights : ∀ (eps : ℝ) (Fm : FamP eps), (∃ x0 : �
     have hk1 : (1 : ℝ) ≤ (Fm.D x i).R.k := by
       have : 1 ≤ (Fm.D x i).R.k := by omega
       exact_mod_cast this
-    have hA : 1 ≤ L.sc.x ^ (Scale.A / 2) := Real.one_le_rpow L.sc.one_lt_alt.le (by unfold Scale.A; norm_num)
+    have hA : 1 ≤ L.sc.x ^ (Scale.A / 2) :=
+      Real.one_le_rpow L.sc.one_lt_alt.le (by unfold Scale.A; norm_num)
     have h3 := div_le_self ha0.le (one_le_mul_of_one_le_of_one_le hk1 hA)
     refine ⟨by linarith, ?_⟩
-    rw [mul_assoc, ← ha]; linarith
-  · rw [hB0, show (5 : ℝ) = 3 + 1 + 1 by norm_num, Real.rpow_add h0x, Real.rpow_add h0x, Real.rpow_one]
-    calc ((Fm.D x i).R.f : ℝ) * (Fm.D x i).R.m * L.sc.b * L.sc.L ≤ x ^ (3 : ℝ) * x * L.sc.b * x := by
-          gcongr
+    rw [mul_assoc, ← ha]
+    linarith
+  · rw [hB0, show (5 : ℝ) = 3 + 1 + 1 by norm_num, Real.rpow_add h0x, Real.rpow_add h0x,
+      Real.rpow_one]
+    calc
+      ((Fm.D x i).R.f : ℝ) * (Fm.D x i).R.m * L.sc.b * L.sc.L
+        ≤ x ^ (3 : ℝ) * x * L.sc.b * x := by gcongr
       _ = _ := by ring
   · rw [hB0]; positivity
 

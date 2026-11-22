@@ -13,7 +13,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UpqLo
 
 noncomputable section
 
-open MeasureTheory Matrix Filter Topology Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding
+open MeasureTheory Matrix Filter Topology Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding
 open scoped ENNReal NNReal
 
 namespace GlobalTheory.FibreInvariance
@@ -45,14 +47,14 @@ theorem normSq_det (g : UpqT P Q) : Complex.normSq (UpqT.mat g).det = 1 := by
   apply Complex.ofReal_injective
   rw [Complex.normSq_eq_conj_mul_self, starRingEnd_apply, h2, Complex.ofReal_one]
 
-theorem map_volume_act (g : UpqT P Q) :
-    (volume : Measure (Sp P Q)).map (act g) = volume := by
+theorem map_volume_act (g : UpqT P Q) : (volume : Measure (Sp P Q)).map (act g) = volume := by
   have hdetC : LinearMap.det (Matrix.mulVecLin (UpqT.mat g)) = (UpqT.mat g).det :=
     LinearMap.det_toLin' _
   have hdet : LinearMap.det ((Matrix.mulVecLin (UpqT.mat g)).restrictScalars ℝ) = 1 := by
     rw [LinearMap.det_restrictScalars, Algebra.norm_complex_apply, hdetC, normSq_det]
-  have hmap := Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (Sp P Q))
-    (f := (Matrix.mulVecLin (UpqT.mat g)).restrictScalars ℝ) (by rw [hdet]; exact one_ne_zero)
+  have hmap :=
+    Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (Sp P Q))
+      (f := (Matrix.mulVecLin (UpqT.mat g)).restrictScalars ℝ) (by rw [hdet]; exact one_ne_zero)
   rw [hdet, inv_one, abs_one, ENNReal.ofReal_one, one_smul] at hmap
   exact hmap
 
@@ -84,15 +86,16 @@ theorem act_ne_zero_iff (g : UpqT P Q) (x : Sp P Q) : act g x ≠ 0 ↔ x ≠ 0 
     rw [← act_inv_act g x, h]
     exact mulVec_zero _
 
-theorem isDxDq_map {fib : ℝ → Measure (Sp P Q)} (h : IsDxDq fib) (g : UpqT P Q) :
-    IsDxDq fun t => (fib t).map (act g) := by
+theorem isDxDq_map {fib : ℝ → Measure (Sp P Q)} (h : IsDxDq fib) (g : UpqT P Q)
+    : IsDxDq fun t => (fib t).map (act g) := by
   have hm : Measurable (act g) := (continuous_act g).measurable
   have hO : IsOpen {x : Sp P Q | x ≠ 0} := isOpen_ne
   have hU : act g ⁻¹' {x : Sp P Q | x ≠ 0} = {x | x ≠ 0} := by
     ext x
     exact act_ne_zero_iff g x
-  have hpre : ∀ t : ℝ, act g ⁻¹' (qf ⁻¹' {id t} ∩ {x : Sp P Q | x ≠ 0}) =
-      qf ⁻¹' {id t} ∩ {x | x ≠ 0} := by
+  have hpre
+      : ∀ t : ℝ,
+        act g ⁻¹' (qf ⁻¹' {id t} ∩ {x : Sp P Q | x ≠ 0}) = qf ⁻¹' {id t} ∩ {x | x ≠ 0} := by
     intro t
     rw [Set.preimage_inter, hU, ← Set.preimage_comp]
     congr 1
@@ -124,16 +127,18 @@ theorem isDxDq_map {fib : ℝ → Measure (Sp P Q)} (h : IsDxDq fib) (g : UpqT P
     obtain ⟨hi, hcont⟩ := h3 _ hc hs hU'
     refine ⟨fun b hb => ?_, ?_⟩
     · exact (integrable_map_measure hφc.aestronglyMeasurable hm.aemeasurable).2 (hi b hb)
-    · have he : (fun b => ∫ v, φ v ∂((fib b).map (act g))) = fun b => ∫ v, (φ ∘ act g) v ∂(fib b) := by
+    · have he
+          : (fun b => ∫ v, φ v ∂((fib b).map (act g))) = fun b => ∫ v, (φ ∘ act g) v ∂(fib b) := by
         funext b
         exact integral_map hm.aemeasurable hφc.aestronglyMeasurable
       dsimp only
       rw [he]
       exact hcont
 
-theorem fibre_finite_invariant : ∀ (P Q : ℕ) (fib : ℝ → Measure (Sp P Q)) (β : ℝ), IsDxDq fib →
-    β ≠ 0 → IsFiniteMeasureOnCompacts (fib β) ∧
-      ∀ g : UpqT P Q, (fib β).map (act g) = fib β := by
+theorem fibre_finite_invariant
+    : ∀ (P Q : ℕ) (fib : ℝ → Measure (Sp P Q)) (β : ℝ),
+      IsDxDq fib → β ≠ 0
+        → IsFiniteMeasureOnCompacts (fib β) ∧ ∀ g : UpqT P Q, (fib β).map (act g) = fib β := by
   intro P Q fib β h hβ
   have hq : Continuous (qf : Sp P Q → ℝ) := qf_continuous
   have hO : IsOpen {x : Sp P Q | x ≠ 0} := isOpen_ne
@@ -161,7 +166,7 @@ theorem fibre_finite_invariant : ∀ (P Q : ℕ) (fib : ℝ → Measure (Sp P Q)
         apply closure_minimal _ (isClosed_le continuous_const (continuous_abs.comp hq))
         intro x hx
         by_contra hc
-        have hc' : ¬ (|β| / 2 ≤ |qf x|) := hc
+        have hc' : ¬(|β| / 2 ≤ |qf x|) := hc
         exact hx (hφ0 (show |qf x| ≤ |β| / 2 from le_of_lt (not_le.mp hc')))
       intro x hx hx0
       have hx2 := hcl hx
@@ -172,16 +177,17 @@ theorem fibre_finite_invariant : ∀ (P Q : ℕ) (fib : ℝ → Measure (Sp P Q)
     have hnull : fib β (qf ⁻¹' {β} ∩ {x | x ≠ 0})ᶜ = 0 := h1 β
     have hmeas : Measurable fun x => ENNReal.ofReal (φ x) :=
       ENNReal.measurable_ofReal.comp φ.continuous.measurable
-    calc fib β K ≤ fib β ((K ∩ qf ⁻¹' {β}) ∪ (qf ⁻¹' {β} ∩ {x | x ≠ 0})ᶜ) := by
-          apply measure_mono
-          intro x hx
-          by_cases hxS : qf x = β
-          · exact Or.inl ⟨hx, hxS⟩
-          · exact Or.inr fun hx' => hxS hx'.1
+    calc
+      fib β K ≤ fib β ((K ∩ qf ⁻¹' {β}) ∪ (qf ⁻¹' {β} ∩ {x | x ≠ 0})ᶜ) := by
+        apply measure_mono
+        intro x hx
+        by_cases hxS : qf x = β
+        · exact Or.inl ⟨hx, hxS⟩
+        · exact Or.inr fun hx' => hxS hx'.1
       _ ≤ fib β (K ∩ qf ⁻¹' {β}) + fib β (qf ⁻¹' {β} ∩ {x | x ≠ 0})ᶜ := measure_union_le _ _
       _ = ∫⁻ _ in K ∩ qf ⁻¹' {β}, 1 ∂(fib β) := by rw [hnull, add_zero, setLIntegral_one]
       _ ≤ ∫⁻ x in K ∩ qf ⁻¹' {β}, ENNReal.ofReal (φ x) ∂(fib β) :=
-          setLIntegral_mono hmeas fun x hx => by rw [hφ1 hx]; simp
+        setLIntegral_mono hmeas fun x hx => by rw [hφ1 hx]; simp
       _ ≤ ∫⁻ x, ENNReal.ofReal (φ x) ∂(fib β) := setLIntegral_le_lintegral _ _
       _ < ⊤ := hfin
   · exact GlobalTheory.IsFibreFamily_eq_at (dx P Q) qf {x | x ≠ 0} {x | x ≠ 0} {x | x ≠ 0} Set.univ

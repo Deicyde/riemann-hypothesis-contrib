@@ -8,7 +8,13 @@ namespace GlobalTheory.IsoSep
 
 open Representation
 
-theorem main : ∀ (H V W : Type) [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ H V) (σ : Representation ℂ H W), σ.IsIrreducible → (⨆ f : σ.IntertwiningMap ρ, LinearMap.range f.toLinearMap) = ⊤ → (∀ (W' : Type) [AddCommGroup W'] [Module ℂ W'] (σ' : Representation ℂ H W'), σ'.IsIrreducible → ∀ f' : σ'.IntertwiningMap ρ, f' ≠ 0 → Nonempty (σ.Equiv σ')) → ∀ v : V, v ≠ 0 → ∃ p : ρ.IntertwiningMap σ, p v ≠ 0 := by
+theorem main
+    : ∀ (H V W : Type) [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+        (ρ : Representation ℂ H V) (σ : Representation ℂ H W),
+      σ.IsIrreducible → (⨆ f : σ.IntertwiningMap ρ, LinearMap.range f.toLinearMap) = ⊤
+        → (∀ (W' : Type) [AddCommGroup W'] [Module ℂ W'] (σ' : Representation ℂ H W'),
+          σ'.IsIrreducible → ∀ f' : σ'.IntertwiningMap ρ, f' ≠ 0 → Nonempty (σ.Equiv σ'))
+        → ∀ v : V, v ≠ 0 → ∃ p : ρ.IntertwiningMap σ, p v ≠ 0 := by
   intro H V W _ _ _ _ _ ρ σ hσ hsum hiso v hv
   haveI := hσ
   let e := Subrepresentation.subrepresentationSubmoduleOrderIso (ρ := ρ)
@@ -23,10 +29,13 @@ theorem main : ∀ (H V W : Type) [Group H] [AddCommGroup V] [Module ℂ V] [Add
       rw [h] at hw
       exact hw
     · intro U hU
-      let U' : Subrepresentation σ := ⟨U.toSubmodule.comap f.toLinearMap, fun g w hw => by
-        show f (σ g w) ∈ U.toSubmodule
-        rw [f.isIntertwining]
-        exact U.apply_mem_toSubmodule g hw⟩
+      let U' : Subrepresentation σ := ⟨
+        U.toSubmodule.comap f.toLinearMap,
+        fun g w hw => by
+          show f (σ g w) ∈ U.toSubmodule
+          rw [f.isIntertwining]
+          exact U.apply_mem_toSubmodule g hw
+      ⟩
       rcases eq_bot_or_eq_top U' with h | h
       · refine le_antisymm (fun x hx => ?_) bot_le
         obtain ⟨w, rfl⟩ := hU.le hx
@@ -47,17 +56,22 @@ theorem main : ∀ (H V W : Type) [Group H] [AddCommGroup V] [Module ℂ V] [Add
     refine eq_top_iff.2 fun x _ => ?_
     have hx : ρ.asModuleEquiv x ∈ (⨆ f : σ.IntertwiningMap ρ, LinearMap.range f.toLinearMap) := by
       rw [hsum]; trivial
-    have key := Submodule.iSup_induction _ (motive := fun y : V => ρ.asModuleEquiv.symm y ∈
-      sSup {m : Submodule (MonoidAlgebra ℂ H) ρ.asModule | IsSimpleModule (MonoidAlgebra ℂ H) m}) hx
-      (fun f y hy => by
-        by_cases hf : f = 0
-        · subst hf
-          obtain ⟨w, rfl⟩ := hy
-          simp
-        · refine le_sSup (a := e f.range) ?_ ?_
-          · exact isSimpleModule_iff_isAtom.2 ((e.isAtom_iff _).2 (hatom f hf))
-          · exact hy)
-      (by simp) (fun a b ha hb => by simpa only [map_add] using add_mem ha hb)
+    have key :=
+      Submodule.iSup_induction _
+        (motive := fun y : V =>
+          ρ.asModuleEquiv.symm y ∈ sSup
+            {m : Submodule (MonoidAlgebra ℂ H) ρ.asModule | IsSimpleModule (MonoidAlgebra ℂ H) m})
+        hx
+        (fun f y hy => by
+          by_cases hf : f = 0
+          · subst hf
+            obtain ⟨w, rfl⟩ := hy
+            simp
+          · refine le_sSup (a := e f.range) ?_ ?_
+            · exact isSimpleModule_iff_isAtom.2 ((e.isAtom_iff _).2 (hatom f hf))
+            · exact hy)
+        (by simp)
+        (fun a b ha hb => by simpa only [map_add] using add_mem ha hb)
     simpa using key
 
   let K : Submodule (MonoidAlgebra ℂ H) ρ.asModule := Submodule.span _ {ρ.asModuleEquiv.symm v}
@@ -71,26 +85,32 @@ theorem main : ∀ (H V W : Type) [Group H] [AddCommGroup V] [Module ℂ V] [Add
   obtain ⟨C, hC⟩ := exists_isCompl N
   let N' := e.symm N
   let C' := e.symm C
-  have hC' : IsCompl N' C' := (e.isCompl_iff).2 (by
-    simp only [N', C', OrderIso.apply_symm_apply]; exact hC)
-  have hN' : IsAtom N' := (e.isAtom_iff N').1 (by simp only [N', OrderIso.apply_symm_apply]; exact hN)
+  have hC' : IsCompl N' C' :=
+    (e.isCompl_iff).2 (by simp only [N', C', OrderIso.apply_symm_apply]; exact hC)
+  have hN' : IsAtom N' :=
+    (e.isAtom_iff N').1 (by simp only [N', OrderIso.apply_symm_apply]; exact hN)
   have hc : IsCompl N'.toSubmodule C'.toSubmodule := by
     constructor
     · rw [disjoint_iff]; exact congrArg Subrepresentation.toSubmodule hC'.inf_eq_bot
     · rw [codisjoint_iff]; exact congrArg Subrepresentation.toSubmodule hC'.sup_eq_top
   let P := Submodule.projectionOnto N'.toSubmodule C'.toSubmodule hc
   let τ := N'.toRepresentation
-  let p : ρ.IntertwiningMap τ := ⟨P, fun g => LinearMap.ext fun x => by
-    have hx : x ∈ N'.toSubmodule ⊔ C'.toSubmodule := by rw [hc.sup_eq_top]; trivial
-    obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 hx
-    have h1 : P (ρ g y) = ⟨ρ g y, N'.apply_mem_toSubmodule g hy⟩ :=
-      Submodule.projectionOnto_apply_left hc ⟨ρ g y, N'.apply_mem_toSubmodule g hy⟩
-    have h2 : P (ρ g z) = 0 :=
-      Submodule.projectionOnto_apply_right hc ⟨ρ g z, C'.apply_mem_toSubmodule g hz⟩
-    have h3 : P y = ⟨y, hy⟩ := Submodule.projectionOnto_apply_left hc ⟨y, hy⟩
-    have h4 : P z = 0 := Submodule.projectionOnto_apply_right hc ⟨z, hz⟩
-    simp only [LinearMap.coe_comp, Function.comp_apply, map_add (f := _), h1, h2, h3, h4, add_zero, map_zero]
-    rfl⟩
+  let p : ρ.IntertwiningMap τ := ⟨
+    P,
+    fun g =>
+      LinearMap.ext fun x => by
+        have hx : x ∈ N'.toSubmodule ⊔ C'.toSubmodule := by rw [hc.sup_eq_top]; trivial
+        obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 hx
+        have h1 : P (ρ g y) = ⟨ρ g y, N'.apply_mem_toSubmodule g hy⟩ :=
+          Submodule.projectionOnto_apply_left hc ⟨ρ g y, N'.apply_mem_toSubmodule g hy⟩
+        have h2 : P (ρ g z) = 0 :=
+          Submodule.projectionOnto_apply_right hc ⟨ρ g z, C'.apply_mem_toSubmodule g hz⟩
+        have h3 : P y = ⟨y, hy⟩ := Submodule.projectionOnto_apply_left hc ⟨y, hy⟩
+        have h4 : P z = 0 := Submodule.projectionOnto_apply_right hc ⟨z, hz⟩
+        simp only [LinearMap.coe_comp, Function.comp_apply, map_add (f := _), h1, h2, h3, h4,
+          add_zero, map_zero]
+        rfl
+  ⟩
   have hpv : p v ≠ 0 := by
     intro h0
     have hvC : v ∈ C'.toSubmodule := (Submodule.projectionOnto_apply_eq_zero_iff hc).1 h0
@@ -110,9 +130,12 @@ theorem main : ∀ (H V W : Type) [Group H] [AddCommGroup V] [Module ℂ V] [Add
       rw [← h] at hm
       have : (⟨x0, hx0⟩ : N'.toSubmodule) = 0 := (Submodule.mem_bot ℂ).1 hm
       exact hx00 (congrArg Subtype.val this)
-    · let U'' : Subrepresentation ρ := ⟨U.toSubmodule.map N'.toSubmodule.subtype, fun g x hx => by
-        obtain ⟨y, hy, rfl⟩ := hx
-        exact ⟨τ g y, U.apply_mem_toSubmodule g hy, rfl⟩⟩
+    · let U'' : Subrepresentation ρ := ⟨
+        U.toSubmodule.map N'.toSubmodule.subtype,
+        fun g x hx => by
+          obtain ⟨y, hy, rfl⟩ := hx
+          exact ⟨τ g y, U.apply_mem_toSubmodule g hy, rfl⟩
+      ⟩
       have hle : U'' ≤ N' := by
         rintro _ ⟨y, -, rfl⟩
         exact y.2

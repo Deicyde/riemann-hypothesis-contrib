@@ -4,11 +4,14 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.invariant_sesquilinearForm_eq_smul_of_irreducible :
-    ∀ {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V] (ρ : G →* Module.End ℂ V)
-      (_hI : ∀ W : Submodule ℂ V, (∀ g, ∀ w ∈ W, ρ g w ∈ W) → W = ⊥ ∨ W = ⊤)
-      (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (_hh : ∀ a b, B b a = star (B a b)) (_hp : ∀ a, a ≠ 0 → 0 < (B a a).re)
-      (_hinv : ∀ g a b, B (ρ g a) (ρ g b) = B a b) (B₁ : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ), (∀ g a b, B₁ (ρ g a) (ρ g b) = B₁ a b) → ∃ c : ℂ, ∀ a b, B₁ a b = c * B a b := by
+theorem UpperTheory.invariant_sesquilinearForm_eq_smul_of_irreducible
+    : ∀ {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V]
+        (ρ : G →* Module.End ℂ V)
+        (_hI : ∀ W : Submodule ℂ V, (∀ g, ∀ w ∈ W, ρ g w ∈ W) → W = ⊥ ∨ W = ⊤)
+        (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (_hh : ∀ a b, B b a = star (B a b))
+        (_hp : ∀ a, a ≠ 0 → 0 < (B a a).re) (_hinv : ∀ g a b, B (ρ g a) (ρ g b) = B a b)
+        (B₁ : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ),
+      (∀ g a b, B₁ (ρ g a) (ρ g b) = B₁ a b) → ∃ c : ℂ, ∀ a b, B₁ a b = c * B a b := by
   intro G V _ _ _ _ _ ρ hI B hh hp hinv B₁ h₁
   classical
   let n := Module.finrank ℂ V
@@ -18,15 +21,17 @@ theorem UpperTheory.invariant_sesquilinearForm_eq_smul_of_irreducible :
   have hinj : Function.Injective φB := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro a ha
-    have h0 : B a = 0 := e.ext (fun j => by
-      have := congrFun ha j
-      simpa [φB] using this)
+    have h0 : B a = 0 :=
+      e.ext (fun j => by
+        have := congrFun ha j
+        simpa [φB] using this)
     by_contra hne
     have := hp a hne
     rw [h0] at this
     simp at this
   have hsurj : Function.Surjective φB :=
-    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by rw [Module.finrank_fin_fun])).mp hinj
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by rw [Module.finrank_fin_fun])).mp
+      hinj
   let E := LinearEquiv.ofBijective φB ⟨hinj, hsurj⟩
   let T : Module.End ℂ V := E.symm.toLinearMap ∘ₗ φ₁
   obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue T

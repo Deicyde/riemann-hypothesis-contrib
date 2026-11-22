@@ -9,17 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AlgebraMa
 @[expose] public section
 
 open scoped MatrixGroups
-open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisensteinGalois GlobalTheory.GeoFix
+open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisensteinGalois
+  GlobalTheory.GeoFix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_finite_padic_span_of_pow_p_mul_mem :
-    ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
-      IsClo p Ω → ∀ (d : ℕ) (E : Fin d → Ω),
-        (∀ t, IsInt (p := p) (E t) ∧ IsAlgZp (p := p) (E t)) →
-        ∀ v : ℕ, ∃ (m : ℕ) (f : Fin m → Ω),
-          (∀ j, IsInt (p := p) (f j) ∧ IsAlgZp (p := p) (f j)) ∧
-          ∀ (l : Fin d → ℤ_[p]) (y : Ω), IsInt (p := p) y →
-            (p : Ω) ^ v * y = ∑ t, zp Ω (l t) * E t →
-            ∃ μ : Fin m → ℤ_[p], y = ∑ j, zp Ω (μ j) * f j := by
+theorem _root_.GlobalTheory.T.exists_finite_padic_span_of_pow_p_mul_mem
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      IsClo p Ω
+        → ∀ (d : ℕ) (E : Fin d → Ω),
+          (∀ t, IsInt (p := p) (E t) ∧ IsAlgZp (p := p) (E t))
+            → ∀ v : ℕ, ∃ (m : ℕ) (f : Fin m → Ω),
+              (∀ j, IsInt (p := p) (f j) ∧ IsAlgZp (p := p) (f j))
+                ∧ ∀ (l : Fin d → ℤ_[p]) (y : Ω),
+                  IsInt (p := p) y → (p : Ω) ^ v * y = ∑ t, zp Ω (l t) * E t
+                    → ∃ μ : Fin m → ℤ_[p], y = ∑ j, zp Ω (μ j) * f j := by
   intro p _ Ω _ _ hc d E hE v
   let : Algebra ℤ_[p] Ω := zpAlg (p := p) (Ω := Ω)
   have : IsScalarTower ℤ_[p] (O0 p) Ω := IsScalarTower.of_algebraMap_eq fun _ => rfl
@@ -34,21 +36,22 @@ theorem _root_.GlobalTheory.T.exists_finite_padic_span_of_pow_p_mul_mem :
     rw [zp, algebraMap_zp_eq, HahnSeries.C_apply]
   have hpv : ((p : Ω) ^ v) ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero)
   let S : Submodule ℤ_[p] Ω := Submodule.span ℤ_[p] (Set.range E)
-  let S' : Submodule ℤ_[p] Ω :=
-    { carrier := {y | IsInt (p := p) y ∧ (p : Ω) ^ v * y ∈ S}
-      add_mem' := by
-        rintro x y ⟨hxInt, hxS⟩ ⟨hyInt, hyS⟩
-        exact ⟨IsIntegral.add hxInt hyInt, by rw [mul_add]; exact S.add_mem hxS hyS⟩
-      zero_mem' := ⟨isIntegral_zero, by simp⟩
-      smul_mem' := by
-        rintro c x ⟨hxInt, hxS⟩
-        refine ⟨?_, ?_⟩
-        · change IsIntegral (O0 p) (c • x)
-          rw [Algebra.smul_def, IsScalarTower.algebraMap_apply ℤ_[p] (O0 p) Ω]
-          exact IsIntegral.mul isIntegral_algebraMap hxInt
-        · change (p : Ω) ^ v * (c • x) ∈ S
-          rw [mul_smul_comm]
-          exact S.smul_mem c hxS }
+  let S' : Submodule ℤ_[p] Ω := {
+    carrier := {y | IsInt (p := p) y ∧ (p : Ω) ^ v * y ∈ S}
+    add_mem' := by
+      rintro x y ⟨hxInt, hxS⟩ ⟨hyInt, hyS⟩
+      exact ⟨IsIntegral.add hxInt hyInt, by rw [mul_add]; exact S.add_mem hxS hyS⟩
+    zero_mem' := ⟨isIntegral_zero, by simp⟩
+    smul_mem' := by
+      rintro c x ⟨hxInt, hxS⟩
+      refine ⟨?_, ?_⟩
+      · change IsIntegral (O0 p) (c • x)
+        rw [Algebra.smul_def, IsScalarTower.algebraMap_apply ℤ_[p] (O0 p) Ω]
+        exact IsIntegral.mul isIntegral_algebraMap hxInt
+      · change (p : Ω) ^ v * (c • x) ∈ S
+        rw [mul_smul_comm]
+        exact S.smul_mem c hxS
+  }
   let U := Submodule.span ℤ_[p] (Set.range fun t => E t / (p : Ω) ^ v)
   have hle : S' ≤ U := by
     rintro y ⟨_, hy⟩
@@ -57,8 +60,8 @@ theorem _root_.GlobalTheory.T.exists_finite_padic_span_of_pow_p_mul_mem :
     apply (Submodule.mem_span_range_iff_exists_fun ℤ_[p]).2
     refine ⟨c, ?_⟩
     calc
-      ∑ t, c t • (E t / (p : Ω) ^ v) = (∑ t, c t • E t) / (p : Ω) ^ v := by
-        simp only [Finset.sum_div, smul_div_assoc]
+      ∑ t, c t • (E t / (p : Ω) ^ v)
+        = (∑ t, c t • E t) / (p : Ω) ^ v := by simp only [Finset.sum_div, smul_div_assoc]
       _ = y := (div_eq_iff hpv).2 (hc.trans (mul_comm _ _))
   have hnoeth : IsNoetherian ℤ_[p] U :=
     isNoetherian_of_fg_of_noetherian _ (Submodule.fg_span (Set.finite_range _))
@@ -75,8 +78,10 @@ theorem _root_.GlobalTheory.T.exists_finite_padic_span_of_pow_p_mul_mem :
     | mem x hx =>
       obtain ⟨t, rfl⟩ := hx
       exact (hAlg _).1 (hE t).2
-    | zero => exact isAlgebraic_zero
-    | add x y _ _ hx hy => exact hx.add hy
+    | zero =>
+      exact isAlgebraic_zero
+    | add x y _ _ hx hy =>
+      exact hx.add hy
     | smul c x _ hx =>
       rw [Algebra.smul_def]
       exact (isAlgebraic_algebraMap c).mul hx

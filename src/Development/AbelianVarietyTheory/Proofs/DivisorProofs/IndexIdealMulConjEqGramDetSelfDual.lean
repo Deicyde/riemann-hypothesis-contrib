@@ -31,23 +31,29 @@ theorem bdd_of_fg {Λ : Submodule (𝓞 E) (Fin p → E)} (h : Λ.FG) : GlobalTh
   | add x y _ _ hx hy => rw [smul_add]; exact add_mem hx hy
   | smul b x _ hx => rw [smul_comm]; exact Submodule.smul_mem _ _ hx
 
-
 omit [NumberField E] in
-theorem ιMulti_single_ne_zero :
-    exteriorPower.ιMulti E p (fun j : Fin p => (Pi.single j (1 : E) : Fin p → E)) ≠ 0 := by
+theorem ιMulti_single_ne_zero
+    : exteriorPower.ιMulti E p (fun j : Fin p => (Pi.single j (1 : E) : Fin p → E)) ≠ 0 := by
   intro h
-  have := congrArg (exteriorPower.alternatingMapLinearEquiv
-    (Matrix.detRowAlternating : (Fin p → E) [⋀^Fin p]→ₗ[E] E)) h
+  have :=
+    congrArg
+      (exteriorPower.alternatingMapLinearEquiv
+        (Matrix.detRowAlternating : (Fin p → E) [⋀^Fin p]→ₗ[E] E))
+      h
   rw [exteriorPower.alternatingMapLinearEquiv_apply_ιMulti, map_zero] at this
   change Matrix.det (Matrix.of fun j : Fin p => (Pi.single j (1 : E) : Fin p → E)) = 0 at this
   rw [show (Matrix.of fun j : Fin p => (Pi.single j (1 : E) : Fin p → E)) = 1 from by
-    ext i j; simp [Matrix.one_apply, Pi.single_apply, eq_comm], Matrix.det_one] at this
+        ext i j; simp [Matrix.one_apply, Pi.single_apply, eq_comm],
+      Matrix.det_one]
+    at this
   exact one_ne_zero this
 
-
 omit [NumberField E] in
-theorem idx_eq (Λ : Submodule (𝓞 E) (Fin p → E)) (J : Ideal (𝓞 E)) (hJ : J • GlobalTheory.BetaEx.detSpan Λ = 1) :
-    GlobalTheory.FlatCM.idx E p Λ (Submodule.span (𝓞 E) (Set.range fun a => (Pi.single a (1 : E) : Fin p → E))) = J := by
+theorem idx_eq
+    (Λ : Submodule (𝓞 E) (Fin p → E)) (J : Ideal (𝓞 E)) (hJ : J • GlobalTheory.BetaEx.detSpan Λ = 1)
+    : GlobalTheory.FlatCM.idx E p Λ
+        (Submodule.span (𝓞 E) (Set.range fun a => (Pi.single a (1 : E) : Fin p → E)))
+      = J := by
   rw [GlobalTheory.FlatCM.idx, GlobalTheory.FlatCM.Model.detSpan_span]
   set ω := exteriorPower.ιMulti E p (fun j : Fin p => (Pi.single j (1 : E) : Fin p → E)) with hω
   have hω0 : ω ≠ 0 := ιMulti_single_ne_zero
@@ -69,7 +75,9 @@ theorem idx_eq (Λ : Submodule (𝓞 E) (Fin p → E)) (J : Ideal (𝓞 E)) (hJ 
       exact algebraMap_smul E b ω
     · rintro ⟨b, rfl⟩
       exact ⟨b, (algebraMap_smul E b ω).symm⟩
-  have hint : ∀ r ∈ J, ∀ x ∈ GlobalTheory.BetaEx.detSpan Λ, ∃ b : 𝓞 E, (b : E) = r * x := fun r hr x hx => by
+  have hint
+      : ∀ r ∈ J, ∀ x ∈ GlobalTheory.BetaEx.detSpan Λ, ∃ b : 𝓞 E,
+        (b : E) = r * x := fun r hr x hx => by
     have := Submodule.smul_mem_smul hr hx
     rw [hJ] at this
     obtain ⟨b, hb⟩ := Submodule.mem_one.1 this
@@ -89,7 +97,8 @@ theorem idx_eq (Λ : Submodule (𝓞 E) (Fin p → E)) (J : Ideal (𝓞 E)) (hJ 
         have := h _ hm
         rw [hι u, ← algebraMap_smul E r, smul_smul] at this
         exact (hspan _).1 this
-      | zero => exact ⟨0, by simp⟩
+      | zero =>
+        exact ⟨0, by simp⟩
       | add x y _ _ hx hy =>
         obtain ⟨a, ha⟩ := hx
         obtain ⟨b, hb⟩ := hy
@@ -97,8 +106,11 @@ theorem idx_eq (Λ : Submodule (𝓞 E) (Fin p → E)) (J : Ideal (𝓞 E)) (hJ 
       | smul c x _ hx =>
         obtain ⟨a, ha⟩ := hx
         exact ⟨c * a, by change (c : E) * (a : E) = (r : E) * ((c : E) * x); rw [ha]; ring⟩
-    have h1 : (1 : E) ∈ J • GlobalTheory.BetaEx.detSpan Λ := by rw [hJ]; exact Submodule.one_le.1 le_rfl
-    have h3 : ∀ z ∈ J • GlobalTheory.BetaEx.detSpan Λ, (r : E) * z ∈ Submodule.map (Algebra.linearMap (𝓞 E) E) J := by
+    have h1 : (1 : E) ∈ J • GlobalTheory.BetaEx.detSpan Λ := by
+      rw [hJ]; exact Submodule.one_le.1 le_rfl
+    have h3
+        : ∀ z ∈ J • GlobalTheory.BetaEx.detSpan Λ,
+          (r : E) * z ∈ Submodule.map (Algebra.linearMap (𝓞 E) E) J := by
       intro z hz
       refine Submodule.smul_induction_on hz ?_ ?_
       · intro a ha x hx
@@ -106,9 +118,11 @@ theorem idx_eq (Λ : Submodule (𝓞 E) (Fin p → E)) (J : Ideal (𝓞 E)) (hJ 
         refine ⟨a * b, J.mul_mem_right b ha, ?_⟩
         rw [Algebra.linearMap_apply, map_mul, Algebra.smul_def]
         change (a : E) * (b : E) = (r : E) * ((a : E) * x)
-        rw [hb]; ring
+        rw [hb]
+        ring
       · intro x y hx hy
-        rw [mul_add]; exact add_mem hx hy
+        rw [mul_add]
+        exact add_mem hx hy
     obtain ⟨b, hb, hbr⟩ := h3 1 h1
     rw [mul_one] at hbr
     have : b = r := RingOfIntegers.ext hbr
@@ -129,13 +143,19 @@ namespace GlobalTheory.SelfDualIndex
 
 open scoped Matrix
 
-theorem idx_mul_map_bar_eq : ∀ (E : Type) [Field E] [NumberField E] (bar : 𝓞 E →+* 𝓞 E) (barE : E →+* E),
-    (∀ x : 𝓞 E, barE x = ((bar x : 𝓞 E) : E)) → ∀ (p : ℕ) (G : Matrix (Fin p) (Fin p) (𝓞 E))
-    (Λ : Submodule (𝓞 E) (Fin p → E)), Λ.FG → (∀ x : Fin p → 𝓞 E, (fun a => (x a : E)) ∈ Λ) →
-    (∀ d : Fin p → E, d ∈ Λ ↔ ∀ c ∈ Λ, ∃ y : 𝓞 E, (y : E) = ∑ a, ∑ b, c a * (G a b : E) * barE (d b)) →
-    GlobalTheory.FlatCM.idx E p Λ (Submodule.span (𝓞 E) (Set.range fun a => (Pi.single a (1 : E) : Fin p → E))) *
-      (GlobalTheory.FlatCM.idx E p Λ (Submodule.span (𝓞 E) (Set.range fun a => (Pi.single a (1 : E) : Fin p → E)))).map bar =
-      Ideal.span {G.det} := by
+theorem idx_mul_map_bar_eq
+    : ∀ (E : Type) [Field E] [NumberField E] (bar : 𝓞 E →+* 𝓞 E) (barE : E →+* E),
+      (∀ x : 𝓞 E, barE x = ((bar x : 𝓞 E) : E))
+        → ∀ (p : ℕ) (G : Matrix (Fin p) (Fin p) (𝓞 E)) (Λ : Submodule (𝓞 E) (Fin p → E)),
+          Λ.FG → (∀ x : Fin p → 𝓞 E, (fun a => (x a : E)) ∈ Λ)
+            → (∀ d : Fin p → E,
+              d ∈ Λ ↔ ∀ c ∈ Λ, ∃ y : 𝓞 E, (y : E) = ∑ a, ∑ b, c a * (G a b : E) * barE (d b))
+            → GlobalTheory.FlatCM.idx E p Λ
+                  (Submodule.span (𝓞 E) (Set.range fun a => (Pi.single a (1 : E) : Fin p → E)))
+                * (GlobalTheory.FlatCM.idx E p Λ
+                  (Submodule.span (𝓞 E)
+                    (Set.range fun a => (Pi.single a (1 : E) : Fin p → E)))).map bar
+              = Ideal.span {G.det} := by
   intro E _ _ bar barE hbar p G Λ hfg hO hsd
   have hsurj : Function.Surjective barE := (Algebra.IsAlgebraic.algHom_bijective barE.toRatAlgHom).2
 
@@ -144,8 +164,9 @@ theorem idx_mul_map_bar_eq : ∀ (E : Type) [Field E] [NumberField E] (bar : �
     convert hO b using 1
     funext a
     exact (hb a).symm
-  obtain ⟨J, -, hJ, -⟩ := GlobalTheory.BetaEx.exists_index_ideal _ Λ hstd (bdd_of_fg hfg)
-    (fun m _ => GlobalTheory.BetaEx.exists_smul_std m)
+  obtain ⟨J, -, hJ, -⟩ :=
+    GlobalTheory.BetaEx.exists_index_ideal _ Λ hstd (bdd_of_fg hfg)
+      (fun m _ => GlobalTheory.BetaEx.exists_smul_std m)
   rw [GlobalTheory.DetIdeal.detSpan_std] at hJ
   have hJ1 : J • GlobalTheory.BetaEx.detSpan Λ = 1 := hJ.symm
   rw [idx_eq Λ J hJ1]
@@ -154,14 +175,16 @@ theorem idx_mul_map_bar_eq : ∀ (E : Type) [Field E] [NumberField E] (bar : �
 
   set G' : Matrix (Fin p) (Fin p) E := G.map fun x => (x : E) with hG'
   have hG'det : G'.det = (G.det : E) := (RingHom.map_det (algebraMap (𝓞 E) E) G).symm
-  have hpair : ∀ c d : Fin p → E,
-      ∑ a, ∑ b, c a * (G a b : E) * barE (d b) = (G' *ᵥ fun b => barE (d b)) ⬝ᵥ c := by
+  have hpair
+      : ∀ c d : Fin p → E,
+        ∑ a, ∑ b, c a * (G a b : E) * barE (d b) = (G' *ᵥ fun b => barE (d b)) ⬝ᵥ c := by
     intro c d
     simp only [dotProduct, Matrix.mulVec, Finset.sum_mul, hG', Matrix.map_apply]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
     ring
-  have hdetW : ∀ V : Matrix (Fin p) (Fin p) E,
-      (Matrix.of fun i => G' *ᵥ fun b => barE (V i b)).det = (G.det : E) * barE V.det := by
+  have hdetW
+      : ∀ V : Matrix (Fin p) (Fin p) E,
+        (Matrix.of fun i => G' *ᵥ fun b => barE (V i b)).det = (G.det : E) * barE V.det := by
     intro V
     have e : (Matrix.of fun i => G' *ᵥ fun b => barE (V i b)) = barE.mapMatrix V * G'ᵀ := by
       ext i a
@@ -222,22 +245,27 @@ theorem idx_mul_map_bar_eq : ∀ (E : Type) [Field E] [NumberField E] (bar : �
     induction hx using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨v, hv, rfl⟩ := (GlobalTheory.BetaEx.mem_detSet Λ x).1 hx
-      have hm := GlobalTheory.BetaEx.det_mem (Matrix.of fun i => G' *ᵥ fun b => barE (v i b)) fun i => hΦ (v i) (hv i)
+      have hm :=
+        GlobalTheory.BetaEx.det_mem (Matrix.of fun i => G' *ᵥ fun b => barE (v i b)) fun i =>
+          hΦ (v i) (hv i)
       rw [hdual, hdetW] at hm
       obtain ⟨j, hj, hje⟩ := hm
       exact ⟨j, hj, hje⟩
-    | zero => exact ⟨0, J.zero_mem, by simp⟩
+    | zero =>
+      exact ⟨0, J.zero_mem, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨a, ha, hae⟩ := hx
       obtain ⟨b, hb, hbe⟩ := hy
       refine ⟨a + b, J.add_mem ha hb, ?_⟩
       change (a : E) + (b : E) = _
-      rw [hae, hbe, map_add (f := _)]; ring
+      rw [hae, hbe, map_add (f := _)]
+      ring
     | smul c x _ hx =>
       obtain ⟨a, ha, hae⟩ := hx
       refine ⟨bar c * a, J.mul_mem_left _ ha, ?_⟩
       change (bar c : E) * (a : E) = _
-      rw [hae, hsm]; ring
+      rw [hae, hsm]
+      ring
 
   have hB2 : ∀ a ∈ J, ∀ b ∈ J, ∃ c : 𝓞 E, (c : E) * (G.det : E) = (a : E) * barE b := by
     intro a ha b hb
@@ -249,11 +277,12 @@ theorem idx_mul_map_bar_eq : ∀ (E : Type) [Field E] [NumberField E] (bar : �
       obtain ⟨W, hW, rfl⟩ := (GlobalTheory.BetaEx.mem_detSet _ e).1 he
       have hGu : IsUnit G'.det := by rw [hG'det]; exact isUnit_iff_ne_zero.2 hG0
       set V : Matrix (Fin p) (Fin p) E := Matrix.of fun i k => Function.surjInv hsurj ((G'⁻¹ *ᵥ W i) k) with hV
-      have hVb : ∀ i, (fun k => barE (V i k)) = G'⁻¹ *ᵥ W i := fun i => funext fun k =>
-        Function.surjInv_eq hsurj _
+      have hVb : ∀ i, (fun k => barE (V i k)) = G'⁻¹ *ᵥ W i := fun i =>
+        funext fun k => Function.surjInv_eq hsurj _
       have hWV : W = Matrix.of fun i => G' *ᵥ fun k => barE (V i k) := by
         ext i k
-        rw [Matrix.of_apply, hVb, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hGu, Matrix.one_mulVec]
+        rw [Matrix.of_apply, hVb, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hGu,
+          Matrix.one_mulVec]
       have hVΛ : ∀ i, V i ∈ Λ := by
         intro i
         refine (hsd _).2 fun c hc => ?_
@@ -268,13 +297,15 @@ theorem idx_mul_map_bar_eq : ∀ (E : Type) [Field E] [NumberField E] (bar : �
       refine ⟨bar c0, ?_⟩
       rw [hWV, hdetW, ← hbar, hc0, map_mul, hbar b]
       ring
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨c, hc⟩ := hx
       obtain ⟨c', hc'⟩ := hy
       refine ⟨c + c', ?_⟩
       change ((c : E) + (c' : E)) * _ = _
-      rw [add_mul, hc, hc']; ring
+      rw [add_mul, hc, hc']
+      ring
     | smul r x _ hx =>
       obtain ⟨c, hc⟩ := hx
       refine ⟨r * c, ?_⟩
@@ -297,7 +328,8 @@ theorem idx_mul_map_bar_eq : ∀ (E : Type) [Field E] [NumberField E] (bar : �
     | smul r x _ hx => rw [smul_eq_mul, mul_left_comm]; exact Ideal.mul_mem_left _ _ hx
   · rw [Ideal.span_singleton_le_iff_mem]
     have h1 : (1 : E) ∈ J • D := by rw [hJ1]; exact Submodule.one_le.1 le_rfl
-    have key : ∀ e ∈ J • D, ∀ e' ∈ J • D, ∃ z ∈ J * J.map bar, (z : E) = (G.det : E) * e * barE e' := by
+    have key
+        : ∀ e ∈ J • D, ∀ e' ∈ J • D, ∃ z ∈ J * J.map bar, (z : E) = (G.det : E) * e * barE e' := by
       intro e he e' he'
       refine Submodule.smul_induction_on he ?_ ?_
       · intro a ha x hx
@@ -305,7 +337,11 @@ theorem idx_mul_map_bar_eq : ∀ (E : Type) [Field E] [NumberField E] (bar : �
         · intro a' ha' x' hx'
           obtain ⟨j, hj, hje⟩ := hB1 x' hx'
           obtain ⟨c, hc⟩ := hone j hj x hx
-          refine ⟨a * bar a' * c, Ideal.mul_mem_right _ _ (Ideal.mul_mem_mul ha (Ideal.mem_map_of_mem _ ha')), ?_⟩
+          refine ⟨
+            a * bar a' * c,
+            Ideal.mul_mem_right _ _ (Ideal.mul_mem_mul ha (Ideal.mem_map_of_mem _ ha')),
+            ?_
+          ⟩
           change (a : E) * (bar a' : E) * (c : E) = _
           rw [hsm, hc, hje, Algebra.smul_def]
           change _ = (G.det : E) * ((a : E) * x) * _
@@ -315,13 +351,15 @@ theorem idx_mul_map_bar_eq : ∀ (E : Type) [Field E] [NumberField E] (bar : �
           obtain ⟨z', hz', hze'⟩ := hy'
           refine ⟨z + z', add_mem hz hz', ?_⟩
           change (z : E) + (z' : E) = _
-          rw [hze, hze', map_add (f := _)]; ring
+          rw [hze, hze', map_add (f := _)]
+          ring
       · intro y y' hy hy'
         obtain ⟨z, hz, hze⟩ := hy
         obtain ⟨z', hz', hze'⟩ := hy'
         refine ⟨z + z', add_mem hz hz', ?_⟩
         change (z : E) + (z' : E) = _
-        rw [hze, hze']; ring
+        rw [hze, hze']
+        ring
     obtain ⟨z, hz, hze⟩ := key 1 h1 1 h1
     rw [map_one, mul_one, mul_one] at hze
     have : z = G.det := RingOfIntegers.ext hze

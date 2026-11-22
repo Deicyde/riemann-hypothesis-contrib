@@ -4,11 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-theorem UpperTheory.admissible_prime_not_dvd_orderOf_and_not_dvd_level :
-    ∀ (l F r d : ℕ), F ≠ 0 → l.Prime → r.Prime → r ≡ 1 [MOD F] → ML.admitted l F r d → ¬ l ∣ orderOf (r : ZMod (F * d)) ∧ ¬ r ∣ F * d := by
+theorem UpperTheory.admissible_prime_not_dvd_orderOf_and_not_dvd_level
+    : ∀ (l F r d : ℕ),
+      F ≠ 0 → l.Prime → r.Prime → r ≡ 1 [MOD F] → ML.admitted l F r d
+        → ¬ l ∣ orderOf (r : ZMod (F * d)) ∧ ¬ r ∣ F * d := by
   intro l F r d _ hl hr hrF hd
   obtain ⟨hsq, hq⟩ := hd
   have hone : ∀ p : ℕ, p.Prime → p ≡ 1 [MOD F] → ¬ p ∣ F := fun p hp h hpF => by
@@ -34,7 +38,8 @@ theorem UpperTheory.admissible_prime_not_dvd_orderOf_and_not_dvd_level :
           exact (Nat.prime_of_mem_primeFactors ha).prime
         · intro a ha
           have h2 : (r : ZMod a) ^ n = 1 :=
-            orderOf_dvd_iff_pow_eq_one.1 (Finset.dvd_prod_of_mem (fun q : ℕ => orderOf (r : ZMod q)) ha)
+            orderOf_dvd_iff_pow_eq_one.1
+              (Finset.dvd_prod_of_mem (fun q : ℕ => orderOf (r : ZMod q)) ha)
           have h3 : r ^ n ≡ 1 [MOD a] := by
             rw [← ZMod.natCast_eq_natCast_iff]
             simpa using h2

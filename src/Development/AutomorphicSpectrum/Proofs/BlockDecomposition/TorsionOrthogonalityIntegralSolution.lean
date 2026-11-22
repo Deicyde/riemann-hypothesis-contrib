@@ -16,7 +16,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CmConjug
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
 open scoped Matrix
 
 noncomputable section
@@ -33,8 +34,9 @@ def kcSub {m : ℕ} (c : Matrix (Fin m) (Fin m) E) : Submodule (𝓞 E) (Fin m �
     intro r y hy i
     obtain ⟨o, ho⟩ := hy i
     refine ⟨r * o, ?_⟩
-    have h : (fun j => algebraMap (𝓞 E) E ((r • y) j)) =
-        (algebraMap (𝓞 E) E r) • fun j => algebraMap (𝓞 E) E (y j) := by
+    have h
+        : (fun j => algebraMap (𝓞 E) E ((r • y) j))
+          = (algebraMap (𝓞 E) E r) • fun j => algebraMap (𝓞 E) E (y j) := by
       funext j
       simp
     rw [h, Matrix.mulVec_smul, Pi.smul_apply, ← ho, map_mul, smul_eq_mul]
@@ -63,13 +65,14 @@ theorem bMod_fg {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (w : Fin m → E) : (bM
 
 variable {F : Type} [Field F] [Algebra F E]
 
-theorem sO_mem_tor (σ : E →ₐ[F] E) (hinv : ∀ x, σ (σ x) = x)
-    (hsO : ∀ o : 𝓞 E, ((sO σ o : 𝓞 E) : E) = σ (o : E)) {m : ℕ}
-    (c : Matrix (Fin m) (Fin m) E) (hc : ∀ a b, σ (c b a) = c a b) (u : Fin m → E) (a : 𝓞 E)
-    (ha : ∀ y ∈ Kc c, (a : E) * ∑ j, σ (u j) * (y j : E) ∈ (1 : Submodule (𝓞 E) E)) :
-    sO σ a ∈ tor c u := by
+theorem sO_mem_tor
+    (σ : E →ₐ[F] E) (hinv : ∀ x, σ (σ x) = x) (hsO : ∀ o : 𝓞 E, ((sO σ o : 𝓞 E) : E) = σ (o : E))
+    {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (hc : ∀ a b, σ (c b a) = c a b) (u : Fin m → E)
+    (a : 𝓞 E) (ha : ∀ y ∈ Kc c, (a : E) * ∑ j, σ (u j) * (y j : E) ∈ (1 : Submodule (𝓞 E) E))
+    : sO σ a ∈ tor c u := by
   have hmem : (sO σ a) • u ∈ lam c := by
-    refine GlobalTheory.T.mem_lattice_of_dual_pairing E m (lam c) (GlobalTheory.T.lam_is_lattice E m c) _ ?_
+    refine GlobalTheory.T.mem_lattice_of_dual_pairing E m (lam c)
+      (GlobalTheory.T.lam_is_lattice E m c) _ ?_
     intro a' hL
 
     have hstd : ∀ j, (Pi.single j (1 : E) : Fin m → E) ∈ intVec E m := by
@@ -88,7 +91,8 @@ theorem sO_mem_tor (σ : E →ₐ[F] E) (hinv : ∀ x, σ (σ x) = x)
     have hcol : ∀ i, ∃ p : 𝓞 E, algebraMap (𝓞 E) E p = ∑ j, a' j * c j i := by
       intro i
       have hx : c *ᵥ (Pi.single i (1 : E) : Fin m → E) ∈ lam c :=
-        Submodule.mem_sup_right (Submodule.mem_map_of_mem (f := c.mulVecLin.restrictScalars (𝓞 E)) (hstd i))
+        Submodule.mem_sup_right (Submodule.mem_map_of_mem (f := c.mulVecLin.restrictScalars (𝓞 E))
+          (hstd i))
       have h1 := hL _ hx
       rw [Submodule.mem_one] at h1
       obtain ⟨p, hp⟩ := h1
@@ -104,8 +108,7 @@ theorem sO_mem_tor (σ : E →ₐ[F] E) (hinv : ∀ x, σ (σ x) = x)
         rw [e1, hp, map_sum]
       simp only [Matrix.mulVec, dotProduct]
       refine Finset.sum_congr rfl fun j _ => ?_
-      have e2 : algebraMap (𝓞 E) E (sO σ (o j)) = σ (a' j) := by
-        rw [← ho j]; exact hsO (o j)
+      have e2 : algebraMap (𝓞 E) E (sO σ (o j)) = σ (a' j) := by rw [← ho j]; exact hsO (o j)
       rw [e2, map_mul, hc i j, mul_comm]
     have h2 := ha _ hy
     rw [Submodule.mem_one] at h2 ⊢
@@ -116,8 +119,7 @@ theorem sO_mem_tor (σ : E →ₐ[F] E) (hinv : ∀ x, σ (σ x) = x)
       rw [e1, hq, map_mul, map_sum]
     simp only [dotProduct, Finset.mul_sum, Pi.smul_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
-    have e3 : ((sO σ (o j) : 𝓞 E) : E) = σ (a' j) := by
-      rw [hsO, ← ho j]
+    have e3 : ((sO σ (o j) : 𝓞 E) : E) = σ (a' j) := by rw [hsO, ← ho j]
     simp only [e3, map_mul, hinv, Algebra.smul_def]
     have e4 : algebraMap (𝓞 E) E (sO σ a) = σ (a : E) := hsO a
     rw [e4]
@@ -127,9 +129,17 @@ theorem sO_mem_tor (σ : E →ₐ[F] E) (hinv : ∀ x, σ (σ x) = x)
 
 end GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.DualCover
 
-
 open GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.DualCover in
-theorem GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.dual_cover : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (m : ℕ) (c : Matrix (Fin m) (Fin m) E), (∀ a b, σ (c b a) = c a b) → ∀ (u : Fin m → E) (b : E), (∀ t ∈ tor c u, σ (t : E) * b ∈ (1 : Submodule (𝓞 E) E)) → ∃ y : Fin m → 𝓞 E, y ∈ Kc c ∧ b - ∑ j, σ (u j) * (y j : E) ∈ (1 : Submodule (𝓞 E) E) := by
+theorem GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.dual_cover
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (m : ℕ) (c : Matrix (Fin m) (Fin m) E),
+          (∀ a b, σ (c b a) = c a b)
+            → ∀ (u : Fin m → E) (b : E),
+              (∀ t ∈ tor c u, σ (t : E) * b ∈ (1 : Submodule (𝓞 E) E))
+                → ∃ y : Fin m → 𝓞 E,
+                  y ∈ Kc c ∧ b - ∑ j, σ (u j) * (y j : E) ∈ (1 : Submodule (𝓞 E) E) := by
   open GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.DualCover in
   intro F E _ _ _ _ _ σ hcm m c hc u b hb
   obtain ⟨hinv, -, hsO, -⟩ := GlobalTheory.T.cm_conjugation_properties F E σ hcm
@@ -157,7 +167,8 @@ theorem GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.dual_cover : ∀ (F E
         intro y hy
         have hyB : ∑ j, σ (u j) * (y j : E) ∈ B := by
           change _ ∈ bMod c w
-          exact Submodule.mem_sup_right (Submodule.mem_map_of_mem (f := pair w) (show y ∈ kcSub c from hy))
+          exact Submodule.mem_sup_right (Submodule.mem_map_of_mem (f := pair w)
+            (show y ∈ kcSub c from hy))
         have := hx _ hyB
         rw [FractionalIdeal.mem_one_iff] at this
         obtain ⟨q, hq⟩ := this

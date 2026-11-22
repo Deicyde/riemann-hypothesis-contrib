@@ -16,11 +16,13 @@ theorem norm_one_add_conj_mul (z : ℂ) : ‖1 + (starRingEnd ℂ) z * z‖ = 1 
     Complex.norm_of_nonneg (by positivity)]
 
 theorem gB_one (w : Low 3 → ℂ) : gB 1 w = (1 + ‖w ⟨(2, 1), by decide⟩‖ ^ 2) ^ (-2 : ℤ) := by
-  simp [gB, Fin.prod_univ_two, colGram, lminor, Matrix.det_fin_one, Matrix.mul_apply, Fin.sum_univ_two, blkW, lowMat]
+  simp [gB, Fin.prod_univ_two, colGram, lminor, Matrix.det_fin_one, Matrix.mul_apply,
+    Fin.sum_univ_two, blkW, lowMat]
   rw [norm_one_add_conj_mul]
 
 theorem gB_two (w : Low 3 → ℂ) : gB 2 w = (1 + ‖w ⟨(1, 0), by decide⟩‖ ^ 2) ^ (-2 : ℤ) := by
-  simp [gB, Fin.prod_univ_two, colGram, lminor, Matrix.det_fin_one, Matrix.mul_apply, Fin.sum_univ_two, blkW, lowMat]
+  simp [gB, Fin.prod_univ_two, colGram, lminor, Matrix.det_fin_one, Matrix.mul_apply,
+    Fin.sum_univ_two, blkW, lowMat]
   rw [norm_one_add_conj_mul]
 
 noncomputable def dom (x : ℂ) : ℝ≥0∞ :=
@@ -41,11 +43,12 @@ theorem lintegral_dom_lt_top : ∫⁻ x, dom x < ⊤ := by
   · exact (integrable_rpow_neg_one_add_norm_sq (E := ℂ) (μ := volume) (r := 4)
       (by rw [Complex.finrank_real_complex]; norm_num)).lintegral_lt_top
 
-theorem le_prod_dom (w : Low 3 → ℂ) (e : Low 3) (hw : ∀ p, p ≠ e → ‖w p‖ ≤ 1) :
-    ENNReal.ofReal ((1 + ‖w e‖ ^ 2) ^ (-2 : ℤ)) ≤ ∏ p, dom (w p) := by
+theorem le_prod_dom (w : Low 3 → ℂ) (e : Low 3) (hw : ∀ p, p ≠ e → ‖w p‖ ≤ 1)
+    : ENNReal.ofReal ((1 + ‖w e‖ ^ 2) ^ (-2 : ℤ)) ≤ ∏ p, dom (w p) := by
   rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ e)]
-  calc ENNReal.ofReal ((1 + ‖w e‖ ^ 2) ^ (-2 : ℤ)) = ENNReal.ofReal ((1 + ‖w e‖ ^ 2) ^ (-2 : ℤ)) * 1 :=
-        (mul_one _).symm
+  calc
+    ENNReal.ofReal ((1 + ‖w e‖ ^ 2) ^ (-2 : ℤ))
+      = ENNReal.ofReal ((1 + ‖w e‖ ^ 2) ^ (-2 : ℤ)) * 1 := (mul_one _).symm
     _ ≤ dom (w e) * ∏ p ∈ Finset.univ.erase e, dom (w p) := by
       refine mul_le_mul' ?_ ?_
       · unfold dom
@@ -77,8 +80,12 @@ theorem hB_le (p0 : ℕ) (hp : p0 = 1 ∨ p0 = 2) (w : Low 3 → ℂ) : hB p0 w 
 theorem lintegral_hB_lt_top : ∀ p0 : ℕ, (p0 = 1 ∨ p0 = 2) → ∫⁻ w : Low 3 → ℂ, hB p0 w < ⊤ := by
   intro p0 hp
   refine lt_of_le_of_lt (lintegral_mono fun w => hB_le p0 hp w) ?_
-  have h := GlobalTheory.RestrMeas.lintegral_fintype_prod_eq_prod (E := fun _ : Low 3 => ℂ)
-    (μ := fun _ => (volume : Measure ℂ)) (f := fun _ => dom) (fun _ => measurable_dom.aemeasurable)
+  have h :=
+    GlobalTheory.RestrMeas.lintegral_fintype_prod_eq_prod
+      (E := fun _ : Low 3 => ℂ)
+      (μ := fun _ => (volume : Measure ℂ))
+      (f := fun _ => dom)
+      (fun _ => measurable_dom.aemeasurable)
   rw [volume_pi, h]
   exact ENNReal.prod_lt_top fun _ _ => lintegral_dom_lt_top
 

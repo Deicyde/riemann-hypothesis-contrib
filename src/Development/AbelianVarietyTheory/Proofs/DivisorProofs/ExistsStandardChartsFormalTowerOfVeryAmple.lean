@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsI
 @[expose] public section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.FormalAlg GlobalTheory.Degen.FormalEmb
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw GlobalTheory.FormalAlg GlobalTheory.Degen.FormalEmb
 
 set_option autoImplicit false
 
@@ -20,13 +22,13 @@ section Level0
 
 variable {X : Scheme.{0}} {H : LB X}
 
-theorem exists_chart_of_mem_nonzeroLocus (s : LB.Sec H) {x : X} (hx : x ∈ nonzeroLocus s) :
-    ∃ k, x ∈ H.U k := by
+theorem exists_chart_of_mem_nonzeroLocus (s : LB.Sec H) {x : X} (hx : x ∈ nonzeroLocus s)
+    : ∃ k, x ∈ H.U k := by
   obtain ⟨l, hl⟩ := TopologicalSpace.Opens.mem_iSup.1 hx
   exact ⟨l, X.basicOpen_le _ hl⟩
 
-theorem mem_nonzeroLocus_iff_basicOpen (s : LB.Sec H) (k : H.ι) {x : X} (hk : x ∈ H.U k) :
-    x ∈ nonzeroLocus s ↔ x ∈ X.basicOpen (s.f k) := by
+theorem mem_nonzeroLocus_iff_basicOpen (s : LB.Sec H) (k : H.ι) {x : X} (hk : x ∈ H.U k)
+    : x ∈ nonzeroLocus s ↔ x ∈ X.basicOpen (s.f k) := by
   refine ⟨fun hx => ?_, fun hx => TopologicalSpace.Opens.mem_iSup.2 ⟨k, hx⟩⟩
   obtain ⟨l, hl⟩ := TopologicalSpace.Opens.mem_iSup.1 hx
   have e := congrArg X.basicOpen (s.compat k l)
@@ -35,19 +37,28 @@ theorem mem_nonzeroLocus_iff_basicOpen (s : LB.Sec H) (k : H.ι) {x : X} (hk : x
   have hx' : x ∈ H.U k ⊓ H.U l := ⟨hk, X.basicOpen_le _ hl⟩
   exact (e.ge ⟨hx', hx', hl⟩).2
 
-theorem isUnit_rs (s : LB.Sec H) (k : H.ι) {O : X.Opens} (hk : O ≤ H.U k)
-    (h : O ≤ nonzeroLocus s) : IsUnit (rs X hk (s.f k)) := by
-  have hb : O ≤ X.basicOpen (s.f k) := fun x hx => (mem_nonzeroLocus_iff_basicOpen s k (hk hx)).1 (h hx)
+theorem isUnit_rs (s : LB.Sec H) (k : H.ι) {O : X.Opens} (hk : O ≤ H.U k) (h : O ≤ nonzeroLocus s)
+    : IsUnit (rs X hk (s.f k)) := by
+  have hb : O ≤ X.basicOpen (s.f k) := fun x hx =>
+    (mem_nonzeroLocus_iff_basicOpen s k (hk hx)).1 (h hx)
   have hu : IsUnit (rs X (X.basicOpen_le (s.f k)) (s.f k)) :=
     X.toRingedSpace.isUnit_res_basicOpen (s.f k)
   simpa only [rs_rs] using hu.map (rs X hb)
 
-theorem ratio_self (s : LB.Sec H) {V : X.Opens} (h : V ≤ nonzeroLocus s) (r : Γ(X, V))
-    (hr : ∀ k, rs X (inf_le_right : V ⊓ H.U k ≤ H.U k) (s.f k) =
-      rs X (inf_le_left : V ⊓ H.U k ≤ V) r * rs X (inf_le_right : V ⊓ H.U k ≤ H.U k) (s.f k)) :
-    r = 1 := by
-  refine X.sheaf.eq_of_locally_eq' (fun k : H.ι => V ⊓ H.U k) V (fun k => homOfLE inf_le_left)
-    (fun x hx => ?_) _ _ fun k => ?_
+theorem ratio_self
+    (s : LB.Sec H)
+    {V : X.Opens} (h : V ≤ nonzeroLocus s) (r : Γ(X, V))
+    (hr : ∀ k,
+      rs X (inf_le_right : V ⊓ H.U k ≤ H.U k) (s.f k)
+        = rs X (inf_le_left : V ⊓ H.U k ≤ V) r * rs X (inf_le_right : V ⊓ H.U k ≤ H.U k) (s.f k))
+    : r = 1 := by
+  refine X.sheaf.eq_of_locally_eq'
+    (fun k : H.ι => V ⊓ H.U k)
+    V
+    (fun k => homOfLE inf_le_left)
+    (fun x hx => ?_)
+    _ _
+    fun k => ?_
   · obtain ⟨l, hl⟩ := exists_chart_of_mem_nonzeroLocus s (h hx)
     exact TopologicalSpace.Opens.mem_iSup.2 ⟨l, hx, hl⟩
   · change rs X inf_le_left r = rs X inf_le_left 1
@@ -55,20 +66,24 @@ theorem ratio_self (s : LB.Sec H) {V : X.Opens} (h : V ≤ nonzeroLocus s) (r : 
     exact (isUnit_rs s k inf_le_right (inf_le_left.trans h)).mul_right_cancel
       ((hr k).symm.trans (_root_.one_mul _).symm)
 
-variable {n : ℕ} (s : Fin (n + 1) → LB.Sec H) (r : ∀ i, Fin (n + 1) → Γ(X, nonzeroLocus (s i)))
-  (hr : ∀ i j k, rs X (inf_le_right : nonzeroLocus (s i) ⊓ H.U k ≤ H.U k) ((s j).f k) =
-    rs X (inf_le_left : nonzeroLocus (s i) ⊓ H.U k ≤ nonzeroLocus (s i)) (r i j) *
-      rs X (inf_le_right : nonzeroLocus (s i) ⊓ H.U k ≤ H.U k) ((s i).f k))
-
+variable
+  {n : ℕ} (s : Fin (n + 1) → LB.Sec H) (r : ∀ i, Fin (n + 1) → Γ(X, nonzeroLocus (s i)))
+  (hr : ∀ i j k,
+    rs X (inf_le_right : nonzeroLocus (s i) ⊓ H.U k ≤ H.U k) ((s j).f k)
+      = rs X (inf_le_left : nonzeroLocus (s i) ⊓ H.U k ≤ nonzeroLocus (s i)) (r i j)
+        * rs X (inf_le_right : nonzeroLocus (s i) ⊓ H.U k ≤ H.U k) ((s i).f k))
 
 include hr in
-theorem basicOpen_ratio (i j : Fin (n + 1)) :
-    X.basicOpen (r i j) = nonzeroLocus (s i) ⊓ nonzeroLocus (s j) := by
-  have key : ∀ k, (nonzeroLocus (s i) ⊓ H.U k) ⊓ X.basicOpen ((s j).f k) =
-      (nonzeroLocus (s i) ⊓ H.U k) ⊓ X.basicOpen (r i j) := by
+theorem basicOpen_ratio (i j : Fin (n + 1))
+    : X.basicOpen (r i j) = nonzeroLocus (s i) ⊓ nonzeroLocus (s j) := by
+  have key
+      : ∀ k,
+        (nonzeroLocus (s i) ⊓ H.U k) ⊓ X.basicOpen ((s j).f k)
+          = (nonzeroLocus (s i) ⊓ H.U k) ⊓ X.basicOpen (r i j) := by
     intro k
     have e := congrArg X.basicOpen (hr i j k)
-    rw [Scheme.basicOpen_mul, X.basicOpen_of_isUnit (isUnit_rs (s i) k inf_le_right inf_le_left)] at e
+    rw [Scheme.basicOpen_mul, X.basicOpen_of_isUnit (isUnit_rs (s i) k inf_le_right inf_le_left)]
+      at e
     erw [Scheme.basicOpen_res, Scheme.basicOpen_res] at e
     rw [e, inf_assoc, inf_comm (X.basicOpen (r i j)), ← inf_assoc, inf_idem]
   ext x
@@ -86,14 +101,18 @@ theorem basicOpen_ratio (i j : Fin (n + 1)) :
     rw [key k] at hm
     exact hm.2
 
-
 include hr in
-theorem ratio_cocycle (i j l : Fin (n + 1)) :
-    rs X (inf_le_left : nonzeroLocus (s i) ⊓ nonzeroLocus (s j) ≤ nonzeroLocus (s i)) (r i l) =
-      rs X (inf_le_left : nonzeroLocus (s i) ⊓ nonzeroLocus (s j) ≤ nonzeroLocus (s i)) (r i j) *
-        rs X (inf_le_right : nonzeroLocus (s i) ⊓ nonzeroLocus (s j) ≤ nonzeroLocus (s j)) (r j l) := by
-  refine X.sheaf.eq_of_locally_eq' (fun k : H.ι => (nonzeroLocus (s i) ⊓ nonzeroLocus (s j)) ⊓ H.U k)
-    (nonzeroLocus (s i) ⊓ nonzeroLocus (s j)) (fun k => homOfLE inf_le_left) (fun x hx => ?_) _ _
+theorem ratio_cocycle (i j l : Fin (n + 1))
+    : rs X (inf_le_left : nonzeroLocus (s i) ⊓ nonzeroLocus (s j) ≤ nonzeroLocus (s i)) (r i l)
+      = rs X (inf_le_left : nonzeroLocus (s i) ⊓ nonzeroLocus (s j) ≤ nonzeroLocus (s i)) (r i j)
+        * rs X (inf_le_right : nonzeroLocus (s i) ⊓ nonzeroLocus (s j) ≤ nonzeroLocus (s j))
+          (r j l) := by
+  refine X.sheaf.eq_of_locally_eq'
+    (fun k : H.ι => (nonzeroLocus (s i) ⊓ nonzeroLocus (s j)) ⊓ H.U k)
+    (nonzeroLocus (s i) ⊓ nonzeroLocus (s j))
+    (fun k => homOfLE inf_le_left)
+    (fun x hx => ?_)
+    _ _
     fun k => ?_
   · obtain ⟨l', hl⟩ := exists_chart_of_mem_nonzeroLocus (s i) hx.1
     exact TopologicalSpace.Opens.mem_iSup.2 ⟨l', hx, hl⟩
@@ -106,8 +125,9 @@ theorem ratio_cocycle (i j l : Fin (n + 1)) :
     have e2 := congrArg (rs X hi) (hr i j k)
     have e3 := congrArg (rs X hj) (hr j l k)
     simp only [map_mul, rs_rs] at e1 e2 e3 ⊢
-    have hu := isUnit_rs (s i) k (inf_le_right : (nonzeroLocus (s i) ⊓ nonzeroLocus (s j)) ⊓ H.U k ≤ H.U k)
-      (inf_le_left.trans inf_le_left)
+    have hu :=
+      isUnit_rs (s i) k (inf_le_right : (nonzeroLocus (s i) ⊓ nonzeroLocus (s j)) ⊓ H.U k ≤ H.U k)
+        (inf_le_left.trans inf_le_left)
     refine hu.mul_right_cancel ?_
     rw [← e1, e3, e2]
     ring
@@ -125,8 +145,9 @@ variable {R : Type} [CommRing R] {I : Ideal R}
 theorem surjective_thickTrans (e : ℕ) : Surjective (thickTrans R I e) := by
   refine ⟨fun x => ?_⟩
   have h : I ^ (e + 1 + 1) ≤ I ^ (e + 1) := Ideal.pow_le_pow_right (by omega)
-  have hx : (x : PrimeSpectrum (R ⧸ I ^ (e + 1 + 1))) ∈
-      Set.range (PrimeSpectrum.comap (Ideal.Quotient.factor h)) := by
+  have hx
+      : (x : PrimeSpectrum (R ⧸ I ^ (e + 1 + 1)))
+        ∈ Set.range (PrimeSpectrum.comap (Ideal.Quotient.factor h)) := by
     rw [_root_.range_comap_of_surjective _ _ (Ideal.Quotient.factor_surjective h)]
     intro a ha
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a
@@ -142,8 +163,8 @@ theorem surjective_thickTrans (e : ℕ) : Surjective (thickTrans R I e) := by
     exact Ideal.zero_mem _
   exact hx
 
-theorem isNilpotent_ker_factor (e : ℕ) (h : I ^ (e + 1 + 1) ≤ I ^ (e + 1)) :
-    IsNilpotent (RingHom.ker (Ideal.Quotient.factor h)) := by
+theorem isNilpotent_ker_factor (e : ℕ) (h : I ^ (e + 1 + 1) ≤ I ^ (e + 1))
+    : IsNilpotent (RingHom.ker (Ideal.Quotient.factor h)) := by
   refine ⟨2, le_bot_iff.1 ?_⟩
   rw [pow_two, Ideal.mul_le]
   intro x hx y hy
@@ -156,28 +177,30 @@ theorem isNilpotent_ker_factor (e : ℕ) (h : I ^ (e + 1 + 1) ≤ I ^ (e + 1)) :
   rw [pow_add]
   exact Ideal.mul_mem_mul ha hb
 
-variable {Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1))))}
+variable
+  {Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1))))}
   {β : ∀ e, (Y e).left ⟶ (Y (e + 1)).left} {n : ℕ}
-
 
 variable (Y n) in
 abbrev Lvl (e : ℕ) : Type :=
-  {p : (Σ D : Fin (n + 1) → (Y e).left.Opens, ∀ i, Fin (n + 1) → Γ((Y e).left, D i)) //
-    ∀ i, IsAffineOpen (p.1 i)}
-
+  {p : (Σ D : Fin (n + 1) → (Y e).left.Opens, ∀ i, Fin (n + 1) → Γ((Y e).left, D i))
+    // ∀ i, IsAffineOpen (p.1 i)}
 
 variable (β) in
 def Lifts (e : ℕ) (q : Lvl Y n e) (q' : Lvl Y n (e + 1)) : Prop :=
-  ∃ h : ∀ i, β e ⁻¹ᵁ q'.1.1 i = q.1.1 i,
-    ∀ i j, ((β e).appLE (q'.1.1 i) (q.1.1 i) (h i).ge).hom (q'.1.2 i j) = q.1.2 i j
+  ∃ h : ∀ i, β e ⁻¹ᵁ q'.1.1 i = q.1.1 i, ∀ i j,
+    ((β e).appLE (q'.1.1 i) (q.1.1 i) (h i).ge).hom (q'.1.2 i j) = q.1.2 i j
 
-theorem exists_lifts {e : ℕ} (hsq : IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e))
-    (q : Lvl Y n e) : ∃ q' : Lvl Y n (e + 1), Lifts β e q q' := by
+theorem exists_lifts
+    {e : ℕ} (hsq : IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e)) (q : Lvl Y n e)
+    : ∃ q' : Lvl Y n (e + 1), Lifts β e q q' := by
   have hle : I ^ (e + 1 + 1) ≤ I ^ (e + 1) := Ideal.pow_le_pow_right (by omega)
-  have hsurj : Function.Surjective (Ideal.Quotient.factor hle) := Ideal.Quotient.factor_surjective hle
-  have hD := fun i => GlobalTheory.AffineThickening.exists_isAffineOpen_preimage_eq_of_isNilpotent _ _
-    (Ideal.Quotient.factor hle) hsurj (isNilpotent_ker_factor e hle) _ _ (Y (e + 1)).hom (Y e).hom
-    (β e) hsq (q.1.1 i) (q.2 i)
+  have hsurj : Function.Surjective (Ideal.Quotient.factor hle) :=
+    Ideal.Quotient.factor_surjective hle
+  have hD := fun i =>
+    GlobalTheory.AffineThickening.exists_isAffineOpen_preimage_eq_of_isNilpotent _ _
+      (Ideal.Quotient.factor hle) hsurj (isNilpotent_ker_factor e hle) _ _ (Y (e + 1)).hom (Y e).hom
+      (β e) hsq (q.1.1 i) (q.2 i)
   choose D' hD' hpre using hD
   haveI : IsClosedImmersion (β e) :=
     MorphismProperty.of_isPullback (P := @IsClosedImmersion) hsq.flip
@@ -191,23 +214,37 @@ theorem exists_lifts {e : ℕ} (hsq : IsPullback (β e) (Y e).hom (Y (e + 1)).ho
   choose ρ' hρ' using fun i j => hs i (q.1.2 i j)
   exact ⟨⟨⟨D', ρ'⟩, hD'⟩, hpre, hρ'⟩
 
-
 variable (β) in
-def seq (hsq : ∀ e, IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e))
-    (q₀ : Lvl Y n 0) (e : ℕ) : Lvl Y n e :=
+def seq
+    (hsq : ∀ e, IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e)) (q₀ : Lvl Y n 0)
+    (e : ℕ)
+    : Lvl Y n e :=
   Nat.rec (motive := Lvl Y n) q₀ (fun e q => Classical.choose (exists_lifts (hsq e) q)) e
 
-theorem seq_lifts (hsq : ∀ e, IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e))
-    (q₀ : Lvl Y n 0) (e : ℕ) : Lifts β e (seq β hsq q₀ e) (seq β hsq q₀ (e + 1)) :=
+theorem seq_lifts
+    (hsq : ∀ e, IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e)) (q₀ : Lvl Y n 0)
+    (e : ℕ)
+    : Lifts β e (seq β hsq q₀ e) (seq β hsq q₀ (e + 1)) :=
   Classical.choose_spec (exists_lifts (hsq e) (seq β hsq q₀ e))
 
 end Tower
 
 end GlobalTheory.FormalAlg.ChartsEx
 
-
 open GlobalTheory.FormalAlg.ChartsEx in
-theorem GlobalTheory.FormalAlg.exists_charts_of_veryAmpleBy : ∀ (R : Type) [CommRing R] (I : Ideal R), ∀ (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1))))) (β : ∀ e, (Y e).left ⟶ (Y (e + 1)).left), (∀ e, IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e)) → ∀ (H₀ : LB (Y 0).left) (n : ℕ) (s₀ : Fin (n + 1) → LB.Sec H₀), H₀.IsLB → VeryAmpleBy (Y 0).hom H₀ s₀ → ∃ C : Charts I Y β n, (∀ i, C.D 0 i = nonzeroLocus (s₀ i)) ∧ ∀ i j (m : H₀.ι), rs (Y 0).left (inf_le_right : C.D 0 i ⊓ H₀.U m ≤ H₀.U m) ((s₀ j).f m) = rs (Y 0).left (inf_le_left : C.D 0 i ⊓ H₀.U m ≤ C.D 0 i) (C.ρ 0 i j) * rs (Y 0).left (inf_le_right : C.D 0 i ⊓ H₀.U m ≤ H₀.U m) ((s₀ i).f m) := by
+theorem GlobalTheory.FormalAlg.exists_charts_of_veryAmpleBy
+    : ∀ (R : Type) [CommRing R] (I : Ideal R),
+      ∀ (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))))
+          (β : ∀ e, (Y e).left ⟶ (Y (e + 1)).left),
+        (∀ e, IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans R I e))
+          → ∀ (H₀ : LB (Y 0).left) (n : ℕ) (s₀ : Fin (n + 1) → LB.Sec H₀),
+            H₀.IsLB → VeryAmpleBy (Y 0).hom H₀ s₀
+              → ∃ C : Charts I Y β n,
+                (∀ i, C.D 0 i = nonzeroLocus (s₀ i))
+                  ∧ ∀ i j (m : H₀.ι),
+                    rs (Y 0).left (inf_le_right : C.D 0 i ⊓ H₀.U m ≤ H₀.U m) ((s₀ j).f m)
+                      = rs (Y 0).left (inf_le_left : C.D 0 i ⊓ H₀.U m ≤ C.D 0 i) (C.ρ 0 i j) * rs
+                        (Y 0).left (inf_le_right : C.D 0 i ⊓ H₀.U m ≤ H₀.U m) ((s₀ i).f m) := by
   intro R _ I Y β hsq H₀ n s₀ _ hva
   obtain ⟨hcov, hloc⟩ := hva
   choose haff r hrel hsurj using hloc
@@ -228,13 +265,19 @@ theorem GlobalTheory.FormalAlg.exists_charts_of_veryAmpleBy : ∀ (R : Type) [Co
         rw [ih]
         trivial
       exact hx
-  refine ⟨{ D := fun e => (seq β hsq q₀ e).1.1
-            aff := fun e => (seq β hsq q₀ e).2
-            cover := hcover
-            pre := fun e => (seq_lifts hsq q₀ e).1
-            ρ := fun e => (seq β hsq q₀ e).1.2
-            ρ_pull := fun e => (seq_lifts hsq q₀ e).2
-            ρ_self := fun i => ratio_self (s₀ i) le_rfl (r i i) (hrel i i)
-            basic := fun i j => basicOpen_ratio s₀ r hrel i j
-            cocycle := fun i j l => ratio_cocycle s₀ r hrel i j l
-            surj := hsurj }, fun i => rfl, hrel⟩
+  refine ⟨
+    {
+      D := fun e => (seq β hsq q₀ e).1.1
+      aff := fun e => (seq β hsq q₀ e).2
+      cover := hcover
+      pre := fun e => (seq_lifts hsq q₀ e).1
+      ρ := fun e => (seq β hsq q₀ e).1.2
+      ρ_pull := fun e => (seq_lifts hsq q₀ e).2
+      ρ_self := fun i => ratio_self (s₀ i) le_rfl (r i i) (hrel i i)
+      basic := fun i j => basicOpen_ratio s₀ r hrel i j
+      cocycle := fun i j l => ratio_cocycle s₀ r hrel i j l
+      surj := hsurj
+    },
+    fun i => rfl,
+    hrel
+  ⟩

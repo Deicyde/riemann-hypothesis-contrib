@@ -21,11 +21,12 @@ theorem thBounds : ThBounds := by
   · rw [he]
     exact inv_strictAnti₀ (by positivity) hlt
   · have h1 : (k : ℝ) ^ ((3 : ℝ) / 2) < (l : ℝ) ^ 3 := by
-      calc (k : ℝ) ^ ((3 : ℝ) / 2) < ((l : ℝ) ^ 2) ^ ((3 : ℝ) / 2) :=
-            Real.rpow_lt_rpow (by positivity) h (by norm_num)
+      calc
+        (k : ℝ) ^ ((3 : ℝ) / 2)
+          < ((l : ℝ) ^ 2) ^ ((3 : ℝ) / 2) := Real.rpow_lt_rpow (by positivity) h (by norm_num)
         _ = (l : ℝ) ^ 3 := by
-            rw [← Real.rpow_natCast, ← Real.rpow_mul (by positivity), ← Real.rpow_natCast]
-            norm_num
+          rw [← Real.rpow_natCast, ← Real.rpow_mul (by positivity), ← Real.rpow_natCast]
+          norm_num
     have h2 : i0 k l ≤ 3 := Nat.sInf_le ⟨⟨1, by norm_num⟩, le_rfl, h1⟩
     rw [he, le_antisymm h2 h3]
 
@@ -85,8 +86,10 @@ lemma tail_le (N : ℕ) : ∀ (Q : Finset ℕ) (Y : ℝ), 0 < Y → (∀ p ∈ Q
       ring
     linarith
 
-theorem main : Formalism.UnitaryBoundIntegral.ThBounds ∧ ∀ (k : ℕ) (Q : Finset ℕ), 1 ≤ k → (∀ p ∈ Q, p.Prime) →
-    ∑ p ∈ Q, thl k p * Real.log p ≤ 20 / k := by
+theorem main
+    : Formalism.UnitaryBoundIntegral.ThBounds
+      ∧ ∀ (k : ℕ) (Q : Finset ℕ),
+        1 ≤ k → (∀ p ∈ Q, p.Prime) → ∑ p ∈ Q, thl k p * Real.log p ≤ 20 / k := by
   refine ⟨thBounds, fun k Q hk hQ => ?_⟩
   have hk' : (1 : ℝ) ≤ k := by exact_mod_cast hk
   set Y : ℝ := Real.sqrt k with hYdef
@@ -97,32 +100,36 @@ theorem main : Formalism.UnitaryBoundIntegral.ThBounds ∧ ∀ (k : ℕ) (Q : Fi
     rw [← hY2, ← Real.rpow_natCast, ← Real.rpow_mul hY.le, ← Real.rpow_natCast]
     norm_num
   rw [← Finset.sum_filter_add_sum_filter_not Q (fun p : ℕ => (p : ℝ) ≤ Y)]
-  have h1 : ∑ p ∈ Q.filter (fun p : ℕ => (p : ℝ) ≤ Y), thl k p * Real.log p
-      ≤ (Y ^ 3)⁻¹ * (3 / 2 * Y) := by
-    calc _ ≤ ∑ p ∈ Q.filter (fun p : ℕ => (p : ℝ) ≤ Y), (Y ^ 3)⁻¹ * Real.log p := by
-          refine Finset.sum_le_sum fun p hp => ?_
-          refine mul_le_mul_of_nonneg_right ?_ (Real.log_natCast_nonneg p)
-          rw [← hY3]
-          exact (thBounds k p hk (hQ p (Finset.mem_filter.1 hp).1).two_le).2.1.le
+  have h1
+      : ∑ p ∈ Q.filter (fun p : ℕ => (p : ℝ) ≤ Y), thl k p * Real.log p
+        ≤ (Y ^ 3)⁻¹ * (3 / 2 * Y) := by
+    calc
+      _ ≤ ∑ p ∈ Q.filter (fun p : ℕ => (p : ℝ) ≤ Y), (Y ^ 3)⁻¹ * Real.log p := by
+        refine Finset.sum_le_sum fun p hp => ?_
+        refine mul_le_mul_of_nonneg_right ?_ (Real.log_natCast_nonneg p)
+        rw [← hY3]
+        exact (thBounds k p hk (hQ p (Finset.mem_filter.1 hp).1).two_le).2.1.le
       _ ≤ _ := by
-          rw [← Finset.mul_sum]
-          refine mul_le_mul_of_nonneg_left ?_ (by positivity)
-          exact sum_log_le _ _ hY.le (fun p hp => hQ p (Finset.mem_filter.1 hp).1)
-            (fun p hp => (Finset.mem_filter.1 hp).2)
+        rw [← Finset.mul_sum]
+        refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+        exact sum_log_le _ _ hY.le
+          (fun p hp => hQ p (Finset.mem_filter.1 hp).1)
+          (fun p hp => (Finset.mem_filter.1 hp).2)
   have h2 : ∑ p ∈ Q.filter (fun p : ℕ => ¬ (p : ℝ) ≤ Y), thl k p * Real.log p ≤ 4 / Y ^ 2 := by
-    calc _ ≤ ∑ p ∈ Q.filter (fun p : ℕ => ¬ (p : ℝ) ≤ Y), ((p : ℝ) ^ 3)⁻¹ * Real.log p := by
-          refine Finset.sum_le_sum fun p hp => ?_
-          refine mul_le_mul_of_nonneg_right ?_ (Real.log_natCast_nonneg p)
-          exact (thBounds k p hk (hQ p (Finset.mem_filter.1 hp).1).two_le).1
+    calc
+      _ ≤ ∑ p ∈ Q.filter (fun p : ℕ => ¬ (p : ℝ) ≤ Y), ((p : ℝ) ^ 3)⁻¹ * Real.log p := by
+        refine Finset.sum_le_sum fun p hp => ?_
+        refine mul_le_mul_of_nonneg_right ?_ (Real.log_natCast_nonneg p)
+        exact (thBounds k p hk (hQ p (Finset.mem_filter.1 hp).1).two_le).1
       _ ≤ _ := by
-          refine tail_le (Q.sup id) _ Y hY (fun p hp => hQ p (Finset.mem_filter.1 hp).1)
-            (fun p hp => ?_)
-          obtain ⟨a, b⟩ := Finset.mem_filter.1 hp
-          refine ⟨not_le.1 b, ?_⟩
-          have h3 : p ≤ Q.sup id := Finset.le_sup (f := id) a
-          have h4 : p ≤ 2 ^ (Q.sup id) := h3.trans Nat.lt_two_pow_self.le
-          have h5 : (p : ℝ) ≤ 2 ^ (Q.sup id) := by exact_mod_cast h4
-          exact h5.trans (le_mul_of_one_le_right (by positivity) hY1)
+        refine
+          tail_le (Q.sup id) _ Y hY (fun p hp => hQ p (Finset.mem_filter.1 hp).1) (fun p hp => ?_)
+        obtain ⟨a, b⟩ := Finset.mem_filter.1 hp
+        refine ⟨not_le.1 b, ?_⟩
+        have h3 : p ≤ Q.sup id := Finset.le_sup (f := id) a
+        have h4 : p ≤ 2 ^ (Q.sup id) := h3.trans Nat.lt_two_pow_self.le
+        have h5 : (p : ℝ) ≤ 2 ^ (Q.sup id) := by exact_mod_cast h4
+        exact h5.trans (le_mul_of_one_le_right (by positivity) hY1)
   have h3 : (Y ^ 3)⁻¹ * (3 / 2 * Y) + 4 / Y ^ 2 = (11 / 2) / Y ^ 2 := by
     field_simp
     ring

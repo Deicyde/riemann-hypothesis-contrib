@@ -19,9 +19,12 @@ section Q4
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 variable {Q : Type} [AddCommGroup Q] [Module E Q] [Module (𝓞 E) Q] [IsScalarTower (𝓞 E) E Q]
 
-theorem mink_fix (L : Submodule (𝓞 E) Q) (hL : L.FG) (φ : Q →ₗ[E] Q) (hφL : ∀ x ∈ L, φ x ∈ L)
-    (n : ℕ) (hn : 0 < n) (hpow : ∀ x, φ^[n] x = x) (g : ℕ) (hg : 3 ≤ g)
-    (hcong : ∀ x ∈ L, ∃ y ∈ L, φ x - x = g • y) : ∀ x ∈ L, φ x = x := by
+theorem mink_fix
+    (L : Submodule (𝓞 E) Q) (hL : L.FG)
+    (φ : Q →ₗ[E] Q) (hφL : ∀ x ∈ L, φ x ∈ L)
+    (n : ℕ) (hn : 0 < n) (hpow : ∀ x, φ^[n] x = x)
+    (g : ℕ) (hg : 3 ≤ g) (hcong : ∀ x ∈ L, ∃ y ∈ L, φ x - x = g • y)
+    : ∀ x ∈ L, φ x = x := by
   have hfinO : Module.Finite (𝓞 E) L := Module.Finite.iff_fg.2 hL
   have hfinZ : Module.Finite ℤ L := Module.Finite.trans (𝓞 E) L
   have : IsAddTorsionFree L :=
@@ -48,7 +51,8 @@ theorem mink_fix (L : Submodule (𝓞 E) Q) (hL : L.FG) (φ : Q →ₗ[E] Q) (h�
     refine ⟨⟨y, hy⟩, Subtype.ext ?_⟩
     simp only [Submodule.coe_sub, hψ, h, Submodule.coe_smul_of_tower, natCast_zsmul]
   choose yf hyf using hc
-  let b := (Module.Free.chooseBasis ℤ L).reindex (Fintype.equivFin (Module.Free.ChooseBasisIndex ℤ L))
+  let b :=
+    (Module.Free.chooseBasis ℤ L).reindex (Fintype.equivFin (Module.Free.ChooseBasisIndex ℤ L))
   let A := LinearMap.toMatrixAlgEquiv b ψ
   let B : Matrix (Fin (Fintype.card (Module.Free.ChooseBasisIndex ℤ L)))
       (Fin (Fintype.card (Module.Free.ChooseBasisIndex ℤ L))) ℤ :=
@@ -62,10 +66,12 @@ theorem mink_fix (L : Submodule (𝓞 E) Q) (hL : L.FG) (φ : Q →ₗ[E] Q) (h�
     rw [LinearMap.toMatrixAlgEquiv_apply]
     have h := hyf (b j)
     rw [sub_eq_iff_eq_add'] at h
-    rw [h, map_add (f := _), map_zsmul, Finsupp.add_apply, Finsupp.smul_apply, Module.Basis.repr_self,
-      Finsupp.single_apply]
+    rw [h, map_add (f := _), map_zsmul, Finsupp.add_apply, Finsupp.smul_apply,
+      Module.Basis.repr_self, Finsupp.single_apply]
     simp [B, Matrix.one_apply, eq_comm]
-  have hA1 := Formalism.HermitianLatticeCounting.P.finite_order_congruence _ n (g : ℤ) A B (by exact_mod_cast hg) hn hAn hAB
+  have hA1 :=
+    Formalism.HermitianLatticeCounting.P.finite_order_congruence _ n (g : ℤ) A B
+      (by exact_mod_cast hg) hn hAn hAB
   have hψ1 : ψ = 1 := by
     apply (LinearMap.toMatrixAlgEquiv b).injective
     rw [map_one]

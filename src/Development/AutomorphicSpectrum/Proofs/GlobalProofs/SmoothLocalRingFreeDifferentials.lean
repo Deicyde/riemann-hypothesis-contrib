@@ -9,15 +9,17 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.ResKCoords
 
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R ReciprocityTheory.ChartRestriction.G.Geo.ResK
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R ReciprocityTheory.ChartRestriction.G.Geo.ResK
 
-theorem kaehler_atPrime_of_away (K A : Type) [Field K] [CommRing A] [Algebra K A] (D : ℕ) (s : Set A)
-    (hs : Ideal.span s = ⊤)
+theorem kaehler_atPrime_of_away
+    (K A : Type) [Field K] [CommRing A] [Algebra K A]
+    (D : ℕ) (s : Set A) (hs : Ideal.span s = ⊤)
     (h : ∀ t ∈ s, Algebra.IsStandardSmoothOfRelativeDimension D K (Localization.Away t))
-    (P : Ideal A) [P.IsPrime] :
-    Module.Free (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K] ∧
-      Module.Finite (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K] ∧
-      Module.finrank (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K] = D := by
+    (P : Ideal A) [P.IsPrime]
+    : Module.Free (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K]
+      ∧ Module.Finite (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K]
+      ∧ Module.finrank (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K] = D := by
   obtain ⟨t, ht, htP⟩ : ∃ t ∈ s, t ∉ P := by
     by_contra hc
     push_neg at hc
@@ -44,18 +46,21 @@ theorem kaehler_atPrime_of_away (K A : Type) [Field K] [CommRing A] [Algebra K A
     (algebraMap (Localization.Away t) (Localization.AtPrime P)).domain_nontrivial
   haveI : Algebra.IsStandardSmooth K (Localization.Away t) :=
     Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth D
-  have r := Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential (R := K)
-    (S := Localization.Away t) D
-  let e := KaehlerDifferential.tensorKaehlerEquivOfFormallyEtale K (Localization.Away t)
-    (Localization.AtPrime P)
+  have r :=
+    Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential (R := K)
+      (S := Localization.Away t) D
+  let e :=
+    KaehlerDifferential.tensorKaehlerEquivOfFormallyEtale K (Localization.Away t)
+      (Localization.AtPrime P)
   refine ⟨.of_equiv e, .equiv e, ?_⟩
   rw [← e.finrank_eq, Module.finrank_baseChange, Module.finrank, r]
   simp
 
-theorem finitePresentation_of_away (K A : Type) [Field K] [CommRing A] [Algebra K A] (D : ℕ) (s : Set A)
-    (hs : Ideal.span s = ⊤)
-    (h : ∀ t ∈ s, Algebra.IsStandardSmoothOfRelativeDimension D K (Localization.Away t)) :
-    Algebra.FinitePresentation K A := by
+theorem finitePresentation_of_away
+    (K A : Type) [Field K] [CommRing A] [Algebra K A]
+    (D : ℕ) (s : Set A) (hs : Ideal.span s = ⊤)
+    (h : ∀ t ∈ s, Algebra.IsStandardSmoothOfRelativeDimension D K (Localization.Away t))
+    : Algebra.FinitePresentation K A := by
   refine RingHom.finitePresentation_algebraMap.1
     (RingHom.finitePresentation_ofLocalizationSpanTarget (algebraMap K A) s hs fun r => ?_)
   haveI := h r.1 r.2
@@ -64,22 +69,25 @@ theorem finitePresentation_of_away (K A : Type) [Field K] [CommRing A] [Algebra 
   rw [← IsScalarTower.algebraMap_eq K A (Localization.Away r.1)]
   exact (RingHom.finitePresentation_algebraMap).2 inferInstance
 
-theorem finitePresentation_and_kaehler_atPrime :
-    ∀ (K : Type) [Field K] (D : ℕ) (Y : Scheme.{0}) (g : Y ⟶ Sp K), SmoothOfRelativeDimension D g →
-      ∀ (U : Y.affineOpens) (P : Ideal Γ(Y, U.1)) [P.IsPrime],
-      letI := secAlgebra g U.1
-      Algebra.FinitePresentation K Γ(Y, U.1) ∧
-        Module.Free (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K] ∧
-        Module.Finite (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K] ∧
-        Module.finrank (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K] = D := by
+theorem finitePresentation_and_kaehler_atPrime
+    : ∀ (K : Type) [Field K] (D : ℕ) (Y : Scheme.{0}) (g : Y ⟶ Sp K),
+      SmoothOfRelativeDimension D g
+        → ∀ (U : Y.affineOpens) (P : Ideal Γ(Y, U.1)) [P.IsPrime],
+          letI := secAlgebra g U.1
+          Algebra.FinitePresentation K Γ(Y, U.1)
+            ∧ Module.Free (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K]
+            ∧ Module.Finite (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K]
+            ∧ Module.finrank (Localization.AtPrime P) Ω[Localization.AtPrime P⁄K] = D := by
   intro K _ D Y g hg U P _
   letI := secAlgebra g U.1
-  obtain ⟨s, hs, h'⟩ := HasRingHomProperty.appLE (@SmoothOfRelativeDimension D) g hg
-    ⟨⊤, isAffineOpen_top _⟩ U (fun _ _ => trivial)
+  obtain ⟨s, hs, h'⟩ :=
+    HasRingHomProperty.appLE (@SmoothOfRelativeDimension D) g hg ⟨⊤, isAffineOpen_top _⟩ U
+      (fun _ _ => trivial)
   have key : ∀ t ∈ s, Algebra.IsStandardSmoothOfRelativeDimension D K (Localization.Away t) := by
     intro t ht
-    have h2 := (RingHom.isStandardSmoothOfRelativeDimension_respectsIso (n := D)).2
-      _ (Scheme.ΓSpecIso (CommRingCat.of K)).symm.commRingCatIsoToRingEquiv (h' t ht)
+    have h2 :=
+      (RingHom.isStandardSmoothOfRelativeDimension_respectsIso (n := D)).2 _
+        (Scheme.ΓSpecIso (CommRingCat.of K)).symm.commRingCatIsoToRingEquiv (h' t ht)
     rw [← RingHom.isStandardSmoothOfRelativeDimension_algebraMap]
     rw [IsScalarTower.algebraMap_eq K Γ(Y, U.1) (Localization.Away t)]
     exact h2

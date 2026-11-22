@@ -16,8 +16,10 @@ namespace GlobalTheory.RootDiscrExp
 
 open ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf
 
-theorem finrank_le_two_mul_padicValInt_discr (E : Type) [Field E] [NumberField E] [IsGalois ℚ E] (p : ℕ)
-    (hp : p.Prime) (hd : (p : ℤ) ∣ discr E) : Module.finrank ℚ E ≤ 2 * padicValInt p (discr E) := by
+theorem finrank_le_two_mul_padicValInt_discr
+    (E : Type) [Field E] [NumberField E] [IsGalois ℚ E]
+    (p : ℕ) (hp : p.Prime) (hd : (p : ℤ) ∣ discr E)
+    : Module.finrank ℚ E ≤ 2 * padicValInt p (discr E) := by
   classical
   have := Fact.mk hp
   have hd0 : (discr E).natAbs ≠ 0 := Int.natAbs_ne_zero.2 (discr_ne_zero E)
@@ -38,7 +40,8 @@ theorem finrank_le_two_mul_padicValInt_discr (E : Type) [Field E] [NumberField E
   have hp0 : Ideal.span {(p : ℤ)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact Nat.cast_ne_zero.2 hp.ne_zero
-  obtain ⟨P, hPmax, hPo⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) (Ideal.span {(p : ℤ)})
+  obtain ⟨P, hPmax, hPo⟩ :=
+    Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) (Ideal.span {(p : ℤ)})
   have hP : P.IsPrime := hPmax.isPrime
   have hpP : (p : 𝓞 E) ∈ P := by
     have h1 : (p : ℤ) ∈ P.under ℤ := by
@@ -58,8 +61,8 @@ theorem finrank_le_two_mul_padicValInt_discr (E : Type) [Field E] [NumberField E
     exact natCast_ne_zero_oe (E := E) p ((Submodule.mem_bot _).1 hpP)
   have fD := FiniteMultiplicity.of_prime_left (Ideal.prime_of_isPrime hP0 hP) hD0
   have hd' := fD.le_multiplicity_of_pow_dvd hdvd
-  have hc : ∀ X : Ideal (𝓞 E), X ≠ ⊥ → (normalizedFactors X).count P = multiplicity P X := fun X hX =>
-    (⟨P, hP, hP0⟩ : HeightOneSpectrum (𝓞 E)).count_normalizedFactors_eq_multiplicity hX
+  have hc : ∀ X : Ideal (𝓞 E), X ≠ ⊥ → (normalizedFactors X).count P = multiplicity P X :=
+    fun X hX => (⟨P, hP, hP0⟩ : HeightOneSpectrum (𝓞 E)).count_normalizedFactors_eq_multiplicity hX
   rw [hc _ hD0, hc _ hI0] at h
   rw [hc _ hI0] at hpos
   rw [ha]
@@ -75,9 +78,12 @@ theorem finrank_le_two_mul_padicValInt_discr (E : Type) [Field E] [NumberField E
   refine Nat.le_of_mul_le_mul_right ?_ hpos
   nlinarith [Nat.mul_le_mul_left n hek]
 
-theorem half_le_delta_two_vp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [IsAbelianGalois ℚ E] (I : Type)
-    [Fintype I] (d : ℕ) (φ : I → E →+* ℂ), GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsFieldData d φ →
-    (1 / 2 : ℝ) ≤ GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.delta_vp E 2 := by
+theorem half_le_delta_two_vp
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [IsAbelianGalois ℚ E] (I : Type)
+        [Fintype I] (d : ℕ) (φ : I → E →+* ℂ),
+      GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.IsFieldData d φ
+        → (1 / 2 : ℝ)
+          ≤ GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds.delta_vp E 2 := by
   intro E _ _ _ _ I _ d φ h
   have h1 := finrank_le_two_mul_padicValInt_discr E 2 Nat.prime_two (by exact_mod_cast h.2.2.2.2.1)
   have hn : (0 : ℝ) < Module.finrank ℚ E := by exact_mod_cast Module.finrank_pos

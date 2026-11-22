@@ -9,11 +9,13 @@ namespace GlobalTheory.CompanionTheory.Ar.Num.SpanExact
 
 open GlobalTheory.CompanionTheory.Ar.Num
 
-variable {o Ω : Type*} [CommRing o] [Field Ω] [Algebra o Ω]
+variable
+  {o Ω : Type*} [CommRing o] [Field Ω] [Algebra o Ω]
   {E E₂ : Type*} [AddCommGroup E] [Module Ω E] [AddCommGroup E₂] [Module Ω E₂]
 
-theorem smul_mem_spanOver (R : Subalgebra o Ω) (S : Set E) {a : Ω} (ha : a ∈ R) {v : E}
-    (hv : v ∈ spanOver R S) : a • v ∈ spanOver R S := by
+theorem smul_mem_spanOver
+    (R : Subalgebra o Ω) (S : Set E) {a : Ω} (ha : a ∈ R) {v : E} (hv : v ∈ spanOver R S)
+    : a • v ∈ spanOver R S := by
   unfold spanOver at hv ⊢
   induction hv using AddSubgroup.closure_induction with
   | mem x hx =>
@@ -23,8 +25,8 @@ theorem smul_mem_spanOver (R : Subalgebra o Ω) (S : Set E) {a : Ω} (ha : a ∈
   | add x y _ _ hx hy => rw [smul_add]; exact add_mem hx hy
   | neg x _ hx => rw [smul_neg]; exact neg_mem hx
 
-theorem map_spanOver (R : Subalgebra o Ω) (S : Set E) (q : E →ₗ[Ω] E₂) :
-    (spanOver R S).map q.toAddMonoidHom = spanOver R (q '' S) := by
+theorem map_spanOver (R : Subalgebra o Ω) (S : Set E) (q : E →ₗ[Ω] E₂)
+    : (spanOver R S).map q.toAddMonoidHom = spanOver R (q '' S) := by
   unfold spanOver
   rw [AddMonoidHom.map_closure]
   congr 1
@@ -35,20 +37,33 @@ theorem map_spanOver (R : Subalgebra o Ω) (S : Set E) (q : E →ₗ[Ω] E₂) :
   · rintro ⟨a, ha, _, ⟨e, he, rfl⟩, rfl⟩
     exact ⟨a • e, ⟨a, ha, e, he, rfl⟩, by simp⟩
 
-theorem local_step (R R₁ : Subalgebra o Ω) (hR : R ≤ R₁) (q : E →ₗ[Ω] E₂) (L : AddSubgroup E)
-    (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) {r : ℕ} (f : Ω) (hf : f ∈ R) (b : Fin r → E₂)
-    (hb : LinearIndependent Ω b) (hsp : Submodule.span Ω (Set.range b) = ⊤)
-    (hloc : ∀ e, (∃ n : ℕ, f ^ n • e ∈ L.map q.toAddMonoidHom) ↔
-        ∃ a : Fin r → Ω, (∀ j, ∃ n : ℕ, f ^ n * a j ∈ R) ∧ e = ∑ j, a j • b j)
-    {v : E} (hv : v ∈ spanOver R₁ (L : Set E)) (hq : q v = 0) :
-    ∃ m : ℕ, f ^ m • v ∈ spanOver R₁ {e | e ∈ L ∧ q e = 0} := by
+theorem local_step
+    (R R₁ : Subalgebra o Ω) (hR : R ≤ R₁)
+    (q : E →ₗ[Ω] E₂)
+    (L : AddSubgroup E) (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L)
+    {r : ℕ}
+    (f : Ω) (hf : f ∈ R)
+    (b : Fin r → E₂) (hb : LinearIndependent Ω b) (hsp : Submodule.span Ω (Set.range b) = ⊤)
+    (hloc : ∀ e,
+      (∃ n : ℕ, f ^ n • e ∈ L.map q.toAddMonoidHom)
+        ↔ ∃ a : Fin r → Ω, (∀ j, ∃ n : ℕ, f ^ n * a j ∈ R) ∧ e = ∑ j, a j • b j)
+    {v : E} (hv : v ∈ spanOver R₁ (L : Set E)) (hq : q v = 0)
+    : ∃ m : ℕ, f ^ m • v ∈ spanOver R₁ {e | e ∈ L ∧ q e = 0} := by
   classical
   have h1 : ∀ j, ∃ n : ℕ, ∃ s ∈ L, q s = f ^ n • b j := by
     intro j
-    obtain ⟨n, s, hs, hs'⟩ := (hloc (b j)).2 ⟨Pi.single j 1, fun k => ⟨0, by
-      by_cases h : k = j
-      · subst h; simpa using R.one_mem
-      · simpa [h] using R.zero_mem⟩, by simp [Pi.single_apply]⟩
+    obtain ⟨n, s, hs, hs'⟩ :=
+      (hloc (b j)).2 ⟨
+        Pi.single j 1,
+        fun k => ⟨
+          0,
+          by
+            by_cases h : k = j
+            · subst h; simpa using R.one_mem
+            · simpa [h] using R.zero_mem
+        ⟩,
+        by simp [Pi.single_apply]
+      ⟩
     exact ⟨n, s, hs, hs'⟩
   choose n s hs hqs using h1
   set N := ∑ j, n j with hN
@@ -62,7 +77,8 @@ theorem local_step (R R₁ : Subalgebra o Ω) (hR : R ≤ R₁) (q : E →ₗ[Ω
   let σ : E₂ →ₗ[Ω] E := B.constr Ω t
   have hσ : ∀ j, σ (b j) = t j := fun j => by
     have : b j = B j := by simp [B]
-    rw [this]; simp [σ]
+    rw [this]
+    simp [σ]
   set S := spanOver R₁ {e | e ∈ L ∧ q e = 0} with hS
   have hup : ∀ (w : E) (m k : ℕ), f ^ m • w ∈ S → f ^ (k + m) • w ∈ S := fun w m k h => by
     rw [pow_add, mul_smul]
@@ -97,7 +113,8 @@ theorem local_step (R R₁ : Subalgebra o Ω) (hR : R ≤ R₁) (q : E →ₗ[Ω
         rw [smul_comm, sub_self]
       · simp only [map_smul]
         module
-    | zero => exact ⟨0, by simpa using S.zero_mem⟩
+    | zero =>
+      exact ⟨0, by simpa using S.zero_mem⟩
     | add x y _ _ hx hy =>
       obtain ⟨m, hm⟩ := hx
       obtain ⟨k, hk⟩ := hy
@@ -117,20 +134,24 @@ theorem local_step (R R₁ : Subalgebra o Ω) (hR : R ≤ R₁) (q : E →ₗ[Ω
   refine ⟨m + N, ?_⟩
   simpa [hq, smul_smul, pow_add] using hm
 
-theorem mem_spanOver_ker (R R₁ : Subalgebra o Ω) (hR : R ≤ R₁) (q : E →ₗ[Ω] E₂) (L : AddSubgroup E)
-    (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) {r : ℕ} (hF : LocFree R r (L.map q.toAddMonoidHom))
-    {v : E} (hv : v ∈ spanOver R₁ (L : Set E)) (hq : q v = 0) :
-    v ∈ spanOver R₁ {e | e ∈ L ∧ q e = 0} := by
+theorem mem_spanOver_ker
+    (R R₁ : Subalgebra o Ω) (hR : R ≤ R₁)
+    (q : E →ₗ[Ω] E₂)
+    (L : AddSubgroup E) (hL : ∀ a ∈ R, ∀ e ∈ L, a • e ∈ L)
+    {r : ℕ} (hF : LocFree R r (L.map q.toAddMonoidHom))
+    {v : E} (hv : v ∈ spanOver R₁ (L : Set E)) (hq : q v = 0)
+    : v ∈ spanOver R₁ {e | e ∈ L ∧ q e = 0} := by
   obtain ⟨-, k, f, c, hf, hc, hsum, hl⟩ := hF
-  let J : Ideal R :=
-    { carrier := {a | (a : Ω) • v ∈ spanOver R₁ {e | e ∈ L ∧ q e = 0}}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq, Subalgebra.coe_add, add_smul] at ha hb ⊢
-        exact add_mem ha hb
-      zero_mem' := by simp
-      smul_mem' := fun a b hb => by
-        simp only [Set.mem_setOf_eq, smul_eq_mul, MulMemClass.coe_mul, mul_smul] at hb ⊢
-        exact smul_mem_spanOver R₁ _ (hR a.2) hb }
+  let J : Ideal R := {
+    carrier := {a | (a : Ω) • v ∈ spanOver R₁ {e | e ∈ L ∧ q e = 0}}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq, Subalgebra.coe_add, add_smul] at ha hb ⊢
+      exact add_mem ha hb
+    zero_mem' := by simp
+    smul_mem' := fun a b hb => by
+      simp only [Set.mem_setOf_eq, smul_eq_mul, MulMemClass.coe_mul, mul_smul] at hb ⊢
+      exact smul_mem_spanOver R₁ _ (hR a.2) hb
+  }
   have h1 : (1 : R) ∈ J.radical := by
     have : (1 : R) = ∑ l, (⟨c l, hc l⟩ : R) * ⟨f l, hf l⟩ := by
       apply Subtype.ext
@@ -144,7 +165,18 @@ theorem mem_spanOver_ker (R R₁ : Subalgebra o Ω) (hR : R ≤ R₁) (q : E →
   have : ((1 ^ m : R) : Ω) • v ∈ spanOver R₁ {e | e ∈ L ∧ q e = 0} := hm
   simpa using this
 
-theorem span_comap_exact : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R R₁ : Subalgebra o Ω), R ≤ R₁ → ∀ {E E₁ E₂ : Type} [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁] [AddCommGroup E₂] [Module Ω E₂] (i : E₁ →ₗ[Ω] E) (q : E →ₗ[Ω] E₂), Function.Injective i → LinearMap.range i = LinearMap.ker q → ∀ (L : AddSubgroup E) (r₂ : ℕ), (∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) → LocFree R r₂ (L.map q.toAddMonoidHom) → (spanOver R₁ (L : Set E)).comap i.toAddMonoidHom = spanOver R₁ (L.comap i.toAddMonoidHom : Set E₁) ∧ (spanOver R₁ (L : Set E)).map q.toAddMonoidHom = spanOver R₁ (L.map q.toAddMonoidHom : Set E₂) := by
+theorem span_comap_exact
+    : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R R₁ : Subalgebra o Ω),
+      R ≤ R₁
+        → ∀ {E E₁ E₂ : Type} [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁]
+            [AddCommGroup E₂] [Module Ω E₂] (i : E₁ →ₗ[Ω] E) (q : E →ₗ[Ω] E₂),
+          Function.Injective i → LinearMap.range i = LinearMap.ker q
+            → ∀ (L : AddSubgroup E) (r₂ : ℕ),
+              (∀ a ∈ R, ∀ e ∈ L, a • e ∈ L) → LocFree R r₂ (L.map q.toAddMonoidHom)
+                → (spanOver R₁ (L : Set E)).comap i.toAddMonoidHom
+                    = spanOver R₁ (L.comap i.toAddMonoidHom : Set E₁)
+                  ∧ (spanOver R₁ (L : Set E)).map q.toAddMonoidHom
+                    = spanOver R₁ (L.map q.toAddMonoidHom : Set E₂) := by
   intro o Ω _ _ _ R R₁ hR E E₁ E₂ _ _ _ _ _ _ i q hi hex L r₂ hL hF
   refine ⟨?_, ?_⟩
   · have himg : i '' (L.comap i.toAddMonoidHom : Set E₁) = {e | e ∈ L ∧ q e = 0} := by
@@ -168,8 +200,7 @@ theorem span_comap_exact : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o 
       obtain rfl : y = x := hi hxy
       exact hy
     · intro hx
-      have h1 : i x ∈ spanOver R₁ {e | e ∈ L ∧ q e = 0} := by
-        rw [← hmap]; exact ⟨x, hx, rfl⟩
+      have h1 : i x ∈ spanOver R₁ {e | e ∈ L ∧ q e = 0} := by rw [← hmap]; exact ⟨x, hx, rfl⟩
       have h2 : spanOver R₁ {e | e ∈ L ∧ q e = 0} ≤ spanOver R₁ (L : Set E) :=
         AddSubgroup.closure_mono fun w ⟨a, ha, e, he, hw⟩ => ⟨a, ha, e, he.1, hw⟩
       exact h2 h1

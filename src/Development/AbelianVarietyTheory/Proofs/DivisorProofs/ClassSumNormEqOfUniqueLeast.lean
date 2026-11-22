@@ -10,14 +10,28 @@ open Classical
 
 namespace GlobalTheory.UPoinc
 
-theorem classSum_norm_eq_of_unique_least : ∀ (p : ℕ) [Fact p.Prime] (X Y : Type) [AddCommGroup X] [AddCommGroup Y] (e : X ≃+ Y) (β : LinearMap.BilinForm ℤ X) (be : LinearMap.BilinForm ℤ Y) (sc sc' : ℝ), 0 < sc → (∀ a b, sc * (β a b : ℝ) = sc' * (be (e a) (e b) : ℝ)) → ∀ (m : ℕ) (t : Y → PadicAlgCl p), (∀ μ, ‖t μ‖ ≤ Real.exp (-(sc' * (be μ μ : ℝ) / 2))) → ∀ (v : PadicAlgCl p) (ν : Y), (∀ δ : ℝ, 0 < δ → ∃ S₀ : Finset Y, ∀ S : Finset Y, (∀ μ ∈ S, CongMod m μ ν) → (∀ μ ∈ S₀, CongMod m μ ν → μ ∈ S) → ‖v - ∑ μ ∈ S, t μ‖ ≤ δ) → ∀ μ : X, CongMod m (e μ) ν → ‖t (e μ)‖ = Real.exp (-(sc' * (be (e μ) (e μ) : ℝ) / 2)) → (∀ μ' : X, CongMod m μ' μ → μ' ≠ μ → β μ μ < β μ' μ') → ‖v‖ = Real.exp (-(sc * (β μ μ : ℝ)) / 2) := by
+theorem classSum_norm_eq_of_unique_least
+    : ∀ (p : ℕ) [Fact p.Prime] (X Y : Type) [AddCommGroup X] [AddCommGroup Y] (e : X ≃+ Y)
+        (β : LinearMap.BilinForm ℤ X) (be : LinearMap.BilinForm ℤ Y) (sc sc' : ℝ),
+      0 < sc → (∀ a b, sc * (β a b : ℝ) = sc' * (be (e a) (e b) : ℝ))
+        → ∀ (m : ℕ) (t : Y → PadicAlgCl p),
+          (∀ μ, ‖t μ‖ ≤ Real.exp (-(sc' * (be μ μ : ℝ) / 2)))
+            → ∀ (v : PadicAlgCl p) (ν : Y),
+              (∀ δ : ℝ,
+                  0 < δ
+                    → ∃ S₀ : Finset Y, ∀ S : Finset Y,
+                      (∀ μ ∈ S, CongMod m μ ν) → (∀ μ ∈ S₀, CongMod m μ ν → μ ∈ S)
+                        → ‖v - ∑ μ ∈ S, t μ‖ ≤ δ)
+                → ∀ μ : X,
+                  CongMod m (e μ) ν → ‖t (e μ)‖ = Real.exp (-(sc' * (be (e μ) (e μ) : ℝ) / 2))
+                    → (∀ μ' : X, CongMod m μ' μ → μ' ≠ μ → β μ μ < β μ' μ')
+                    → ‖v‖ = Real.exp (-(sc * (β μ μ : ℝ)) / 2) := by
   intro p _ X Y _ _ e β be sc sc' hsc hid m t ht v ν hv μ hμν htμ hmin
-  have hR' : ‖t (e μ)‖ = Real.exp (-(sc * (β μ μ : ℝ)) / 2) := by
-    rw [htμ, hid μ μ]; congr 1; ring
+  have hR' : ‖t (e μ)‖ = Real.exp (-(sc * (β μ μ : ℝ)) / 2) := by rw [htμ, hid μ μ]; congr 1; ring
   have hlt1 : Real.exp (-(sc * ((β μ μ : ℝ) + 1)) / 2) < Real.exp (-(sc * (β μ μ : ℝ)) / 2) :=
     Real.exp_lt_exp.2 (by nlinarith)
-  have hbound : ∀ y : Y, CongMod m y ν → y ≠ e μ →
-      ‖t y‖ ≤ Real.exp (-(sc * ((β μ μ : ℝ) + 1)) / 2) := by
+  have hbound
+      : ∀ y : Y, CongMod m y ν → y ≠ e μ → ‖t y‖ ≤ Real.exp (-(sc * ((β μ μ : ℝ) + 1)) / 2) := by
     intro y h1 h2
     obtain ⟨w1, hw1⟩ := h1
     obtain ⟨w2, hw2⟩ := hμν
@@ -26,15 +40,18 @@ theorem classSum_norm_eq_of_unique_least : ∀ (p : ℕ) [Fact p.Prime] (X Y : T
       apply e.injective
       rw [e.apply_symm_apply, map_add (f := _), map_nsmul, e.apply_symm_apply, hw1, hw2, smul_sub]
       abel
-    have hne : e.symm y ≠ μ := by
-      intro h; apply h2; rw [← h, e.apply_symm_apply]
+    have hne : e.symm y ≠ μ := by intro h; apply h2; rw [← h, e.apply_symm_apply]
     have hlt := Int.add_one_le_of_lt (hmin (e.symm y) hx hne)
     have hle : (β μ μ : ℝ) + 1 ≤ (β (e.symm y) (e.symm y) : ℝ) := by exact_mod_cast hlt
-    calc ‖t y‖ ≤ Real.exp (-(sc' * (be y y : ℝ) / 2)) := ht y
+    calc
+      ‖t y‖
+        ≤ Real.exp (-(sc' * (be y y : ℝ) / 2)) := ht y
       _ = Real.exp (-(sc * (β (e.symm y) (e.symm y) : ℝ)) / 2) := by
-          have h3 := hid (e.symm y) (e.symm y)
-          rw [e.apply_symm_apply] at h3
-          rw [h3]; congr 1; ring
+        have h3 := hid (e.symm y) (e.symm y)
+        rw [e.apply_symm_apply] at h3
+        rw [h3]
+        congr 1
+        ring
       _ ≤ Real.exp (-(sc * ((β μ μ : ℝ) + 1)) / 2) := Real.exp_le_exp.2 (by nlinarith)
   have hRpos : 0 < Real.exp (-(sc * (β μ μ : ℝ)) / 2) := Real.exp_pos _
   obtain ⟨S₀, hS₀⟩ := hv (Real.exp (-(sc * (β μ μ : ℝ)) / 2) / 2) (by positivity)
@@ -43,8 +60,9 @@ theorem classSum_norm_eq_of_unique_least : ∀ (p : ℕ) [Fact p.Prime] (X Y : T
     rcases Finset.mem_insert.1 hx with rfl | hx
     · exact hμν
     · exact (Finset.mem_filter.1 hx).2
-  have hclose := hS₀ (insert (e μ) (S₀.filter (fun x => CongMod m x ν))) hSc
-    (fun x hx hc => Finset.mem_insert_of_mem (Finset.mem_filter.2 ⟨hx, hc⟩))
+  have hclose :=
+    hS₀ (insert (e μ) (S₀.filter (fun x => CongMod m x ν))) hSc
+      (fun x hx hc => Finset.mem_insert_of_mem (Finset.mem_filter.2 ⟨hx, hc⟩))
   set S := insert (e μ) (S₀.filter (fun x => CongMod m x ν)) with hSdef
   have hsum : ∑ x ∈ S, t x = t (e μ) + ∑ x ∈ S.erase (e μ), t x :=
     (Finset.add_sum_erase S t (Finset.mem_insert_self _ _)).symm

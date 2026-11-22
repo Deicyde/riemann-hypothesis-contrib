@@ -19,7 +19,8 @@ namespace GroundTheory.Heights₂.Heights.Swarm
 
 theorem BranchChartInt.proof : GroundTheory.Heights₂.Heights.BranchChartInt.Statement :=
   GroundTheory.Heights₂.Heights.BranchChartInt.proof
-    (GroundTheory.Heights₂.Heights.HolomorphicFibreSumInt.proof GroundTheory.Heights₂.Heights.WeightedAreaFormula.proof)
+    (GroundTheory.Heights₂.Heights.HolomorphicFibreSumInt.proof
+      GroundTheory.Heights₂.Heights.WeightedAreaFormula.proof)
     (GroundTheory.Heights₂.Heights.BranchSheetAE.proof
       GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.RankDeficientFibreInfinite.proof
       GroundTheory.Heights₂.Heights.ComplexSets.FibreBound.proof

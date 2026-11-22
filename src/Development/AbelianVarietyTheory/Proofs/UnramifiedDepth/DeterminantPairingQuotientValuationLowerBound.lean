@@ -15,32 +15,40 @@ namespace GlobalTheory.DetPairingBound
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Sh.PowerSeriesCoeffGaps
 
-theorem cayDet_isHomogeneous (n : ℕ) (C : Type) [CommRing C] :
-    (cayDet n C).IsHomogeneous n := by
+theorem cayDet_isHomogeneous (n : ℕ) (C : Type) [CommRing C] : (cayDet n C).IsHomogeneous n := by
   show (Matrix.mvPolynomialX (Fin n) (Fin n) C).det.IsHomogeneous n
   rw [Matrix.det_apply']
   refine IsHomogeneous.sum _ _ _ fun σ _ => ?_
   rw [← map_intCast (MvPolynomial.C : C →+* MvPolynomial (Fin n × Fin n) C)]
   refine IsHomogeneous.C_mul ?_ _
-  have h := IsHomogeneous.prod (Finset.univ : Finset (Fin n))
-    (fun i => Matrix.mvPolynomialX (Fin n) (Fin n) C (σ i) i) (fun _ => 1)
-    (fun i _ => by simpa [Matrix.mvPolynomialX_apply] using isHomogeneous_X (R := C) ((σ i, i) : Fin n × Fin n))
+  have h :=
+    IsHomogeneous.prod (Finset.univ : Finset (Fin n))
+      (fun i => Matrix.mvPolynomialX (Fin n) (Fin n) C (σ i) i)
+      (fun _ => 1)
+      (fun i _ => by
+        simpa [Matrix.mvPolynomialX_apply] using
+          isHomogeneous_X (R := C) ((σ i, i) : Fin n × Fin n))
   simpa using h
 
-theorem coeff_cayDet_pow_nonneg (C : Type) [Field C] (v : AddValuation C (WithTop ℝ))
-    (n x : ℕ) (A : Fin n × Fin n →₀ ℕ) : 0 ≤ v (AddMonoidAlgebra.coeff (cayDet n C ^ x) A) := by
+theorem coeff_cayDet_pow_nonneg
+    (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (n x : ℕ) (A : Fin n × Fin n →₀ ℕ)
+    : 0 ≤ v (AddMonoidAlgebra.coeff (cayDet n C ^ x) A) := by
   rw [← cayDet_map (R := C), ← map_pow, coeff_map, eq_intCast]
   exact intCast_nonneg v _
 
-theorem sum_eq_of_mem_support (C : Type) [CommRing C] (n x : ℕ) (A : Fin n × Fin n →₀ ℕ)
-    (hA : A ∈ (cayDet n C ^ x).support) : ∑ j, A j = n * x := by
+theorem sum_eq_of_mem_support
+    (C : Type) [CommRing C] (n x : ℕ) (A : Fin n × Fin n →₀ ℕ) (hA : A ∈ (cayDet n C ^ x).support)
+    : ∑ j, A j = n * x := by
   have h := (cayDet_isHomogeneous n C).pow x
   rw [← Finsupp.degree_eq_sum]
   by_contra hne
   exact (mem_support_iff.mp hA) (h.coeff_eq_zero hne)
 
-theorem le_val_div {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) {N D : C} {a d r : ℝ}
-    (hN : (a : WithTop ℝ) ≤ v N) (hD : v D = d) (h : r ≤ a - d) : (r : WithTop ℝ) ≤ v (N / D) := by
+theorem le_val_div
+    {C : Type} [Field C]
+    (v : AddValuation C (WithTop ℝ))
+    {N D : C} {a d r : ℝ} (hN : (a : WithTop ℝ) ≤ v N) (hD : v D = d) (h : r ≤ a - d)
+    : (r : WithTop ℝ) ≤ v (N / D) := by
   have hD0 : D ≠ 0 := by
     rintro rfl
     simp at hD

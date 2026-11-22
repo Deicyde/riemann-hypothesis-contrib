@@ -13,10 +13,13 @@ namespace DiscreteGroups.sglob.LConv
 
 open CompanionTheory.D.gk.admitted
 
-theorem irred_of_scalar {G : Type} [Group G] {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (π : G →* (H →L[ℂ] H)) (hπ : ∀ g x, ‖π g x‖ = ‖x‖)
+theorem irred_of_scalar
+    {G : Type} [Group G]
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (π : G →* (H →L[ℂ] H)) (hπ : ∀ g x, ‖π g x‖ = ‖x‖)
     (hsc : ∀ T : H →L[ℂ] H, (∀ g, T * π g = π g * T) → ∃ c : ℂ, T = c • (1 : H →L[ℂ] H))
-    (S : Submodule ℂ H) (hcl : IsClosed (S : Set H)) (hS : ∀ g, ∀ v ∈ S, π g v ∈ S) : S = ⊥ ∨ S = ⊤ := by
+    (S : Submodule ℂ H) (hcl : IsClosed (S : Set H)) (hS : ∀ g, ∀ v ∈ S, π g v ∈ S)
+    : S = ⊥ ∨ S = ⊤ := by
   have : CompleteSpace S := hcl.completeSpace_coe
   have hcomm : ∀ g, S.starProjection * π g = π g * S.starProjection := by
     intro g
@@ -44,12 +47,11 @@ theorem irred_of_scalar {G : Type} [Group G] {H : Type} [NormedAddCommGroup H] [
     have h3 := S.starProjection_apply_mem z
     rwa [hP, hc1, one_smul] at h3
 
-theorem word_eq_mul_prod {R : Type*} [Ring R] (e : R) (he : e * e = e) (l : List R) :
-    word e l = e * (l.map fun a => e * a * e).prod := by
+theorem word_eq_mul_prod {R : Type*} [Ring R] (e : R) (he : e * e = e) (l : List R)
+    : word e l = e * (l.map fun a => e * a * e).prod := by
   induction l with
   | nil => simp
-  | cons a l ih =>
-    simp only [word_cons, ih, List.map_cons, List.prod_cons, ← mul_assoc, he]
+  | cons a l ih => simp only [word_cons, ih, List.map_cons, List.prod_cons, ← mul_assoc, he]
 
 theorem finiteOfAlt : FiniteOfAlt := by
   intro G _ H _ _ _ π hπ hsc e he d hd

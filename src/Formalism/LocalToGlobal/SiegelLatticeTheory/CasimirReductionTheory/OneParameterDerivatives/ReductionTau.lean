@@ -9,7 +9,6 @@ set_option autoImplicit false
 
 namespace Formalism.L2.SG.Pf
 
-theorem reduction_theory : Formalism.L2.SG.LitS.ReductionTau :=
-  Tau.reductionTau
+theorem reduction_theory : Formalism.L2.SG.LitS.ReductionTau := Tau.reductionTau
 
 end Formalism.L2.SG.Pf

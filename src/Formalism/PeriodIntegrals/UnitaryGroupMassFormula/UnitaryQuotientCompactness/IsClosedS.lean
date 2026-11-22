@@ -105,7 +105,11 @@ lemma inv_mem_S {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
 
 theorem sGroup_of (hUW : UWCompact) : SsetGroup := by
   intro k r z hz hT
-  exact ⟨isClosed_S (hUW k r z hz hT), one_mem_S, fun a ha b hb => mul_mem_S ha hb,
-    fun a ha => inv_mem_S ha⟩
+  exact ⟨
+    isClosed_S (hUW k r z hz hT),
+    one_mem_S,
+    fun a ha b hb => mul_mem_S ha hb,
+    fun a ha => inv_mem_S ha
+  ⟩
 
 end PI.QuotSetU.UnitaryGroupMassFormula.SW

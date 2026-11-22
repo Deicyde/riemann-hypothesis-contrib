@@ -19,11 +19,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsAnt
 @[expose] public section
 
 open NumberField Matrix Complex IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level Host
 open GlobalTheory.SW hiding Level IsSB
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
-open GlobalTheory.ExportSeries (Base Twist Weight PairRep GLR detChar detFam fockGL harm harmLat IsCoefRing finPt series idem)
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.IndefR.FWT Formalism.L2.Pj
+open GlobalTheory.ExportSeries
+  (Base Twist Weight PairRep GLR detChar detFam fockGL harm harmLat IsCoefRing finPt series idem)
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
@@ -33,22 +38,32 @@ noncomputable section
 
 namespace GlobalTheory.SingleDatum.AddValue
 
-theorem theta_transSum {D : D7} {H : Geo.Tor.Host D.host.E} {Dw : Datum H} {ψ : AddChar (AF D.host.F) ℂ}
-    (hψ : IsStdChar D ψ (-1)) (V W : HSp D) (l : Geo.Tor.Level H) (ι : Dw.La →ₗ[𝓞 D.host.E] (Fin W.rank → D.host.E))
-    (e : AE D) {f₀ : WO V W → ℂ} (hf : IsThetaFunO ψ V W f₀) (w : (Fin V.rank → LevQ Dw l) → ℂ) :
-    IsThetaFunO ψ V W (transSum ψ V W l ι e f₀ w) := by
+theorem theta_transSum
+    {D : D7} {H : Geo.Tor.Host D.host.E} {Dw : Datum H} {ψ : AddChar (AF D.host.F) ℂ}
+    (hψ : IsStdChar D ψ (-1)) (V W : HSp D) (l : Geo.Tor.Level H)
+    (ι : Dw.La →ₗ[𝓞 D.host.E] (Fin W.rank → D.host.E)) (e : AE D)
+    {f₀ : WO V W → ℂ} (hf : IsThetaFunO ψ V W f₀)
+    (w : (Fin V.rank → LevQ Dw l) → ℂ)
+    : IsThetaFunO ψ V W (transSum ψ V W l ι e f₀ w) := by
   haveI := GlobalTheory.AdTh.ShortSeries.finite_levQ Dw l
   letI : Fintype (Fin V.rank → LevQ Dw l) := Fintype.ofFinite _
   unfold transSum
   rw [finsum_eq_sum_of_fintype]
   refine GlobalTheory.WeilVacMove.isTheta_smul _ ?_
-  exact Finset.sum_induction _ (IsThetaFunO ψ V W) (fun _ _ => GlobalTheory.WeilVacMove.isTheta_add) GlobalTheory.WeilVacMove.isTheta_zero
-    fun q _ => GlobalTheory.WeilVacMove.isTheta_smul _ (GlobalTheory.AnisoMean.isTheta_heisO hψ hf _)
+  exact Finset.sum_induction _ (IsThetaFunO ψ V W)
+    (fun _ _ => GlobalTheory.WeilVacMove.isTheta_add)
+    GlobalTheory.WeilVacMove.isTheta_zero
+    fun q _ =>
+      GlobalTheory.WeilVacMove.isTheta_smul _ (GlobalTheory.AnisoMean.isTheta_heisO hψ hf _)
 
-theorem fvar_eq {D : D7} {m n : ℕ} {τ : D.host.E →+* ℂ} {i p : ℕ} {j : Fin n} {x y : FVar D m n}
-    (hx : x.2.2 = j ∧ ((τ = tauE D x.1 ∧ (x.2.1 : ℕ) = i) ∨ (τ = conjEmb (tauE D x.1) ∧ (x.2.1 : ℕ) = p + i)))
-    (hy : y.2.2 = j ∧ ((τ = tauE D y.1 ∧ (y.2.1 : ℕ) = i) ∨ (τ = conjEmb (tauE D y.1) ∧ (y.2.1 : ℕ) = p + i)))
-    (hne : ∀ s t : D.what₂.Tau, tauE D s ≠ conjEmb (tauE D t)) : x = y := by
+theorem fvar_eq
+    {D : D7} {m n : ℕ} {τ : D.host.E →+* ℂ} {i p : ℕ} {j : Fin n} {x y : FVar D m n}
+    (hx : x.2.2 = j
+      ∧ ((τ = tauE D x.1 ∧ (x.2.1 : ℕ) = i) ∨ (τ = conjEmb (tauE D x.1) ∧ (x.2.1 : ℕ) = p + i)))
+    (hy : y.2.2 = j
+      ∧ ((τ = tauE D y.1 ∧ (y.2.1 : ℕ) = i) ∨ (τ = conjEmb (tauE D y.1) ∧ (y.2.1 : ℕ) = p + i)))
+    (hne : ∀ s t : D.what₂.Tau, tauE D s ≠ conjEmb (tauE D t))
+    : x = y := by
   have hc : ∀ s t : D.what₂.Tau, conjEmb (tauE D s) = conjEmb (tauE D t) → s = t := fun s t h => by
     apply GlobalTheory.StdRat.tauE_injective D
     ext z

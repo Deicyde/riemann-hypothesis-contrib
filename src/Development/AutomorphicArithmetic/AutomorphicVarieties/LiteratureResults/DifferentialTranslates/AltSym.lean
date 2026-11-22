@@ -11,17 +11,24 @@ namespace UpperTheory.V.Lit.Dr
 theorem altSym : AltSym := by
   intro V F _ _ _ _ q w p L γ u D hw hL hγ hu hD
   have hA : HasFDerivAt w (fderiv ℝ w p) p := hw.hasFDerivAt
-  have hDi : ∀ i, D i = fderiv ℝ w p (L i p) (fun j => L (i.succAbove j) p) +
-      ∑ j : Fin q, w p (Function.update (fun j' => L (i.succAbove j') p) j
-        (L (i.succAbove j) (L i p))) := by
+  have hDi
+      : ∀ i,
+        D i
+          = fderiv ℝ w p (L i p) (fun j => L (i.succAbove j) p)
+            + ∑ j : Fin q, w p (Function.update (fun j' => L (i.succAbove j') p) j
+                (L (i.succAbove j) (L i p))) := by
     intro i
-    have hg : ∀ j : Fin q, HasFDerivAt (fun t => u i (i.succAbove j) t)
-        (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ) (L (i.succAbove j) (L i p))) 0 :=
+    have hg
+        : ∀ j : Fin q,
+          HasFDerivAt
+            (fun t => u i (i.succAbove j) t)
+            (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ) (L (i.succAbove j) (L i p))) 0 :=
       fun j => ((hu i (i.succAbove j)).2).hasFDerivAt
     have hA' : HasFDerivAt w (fderiv ℝ w p) (γ i 0) := by
       rw [(hγ i).1]
       exact hA
-    have hf : HasFDerivAt (fun t => w (γ i t))
+    have hf : HasFDerivAt
+        (fun t => w (γ i t))
         ((fderiv ℝ w p).comp (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ) (L i p))) 0 :=
       hA'.comp 0 (hγ i).2.hasFDerivAt
     have H := (hf.continuousAlternatingMap_apply hg).hasDerivAt
@@ -32,8 +39,10 @@ theorem altSym : AltSym := by
     fun i => rfl
   rw [extDeriv, ContinuousAlternatingMap.alternatizeUncurryFin_apply]
   simp only [hDi, smul_add, Finset.sum_add_distrib, hrm]
-  suffices hS : ∑ i : Fin (q + 1), (-1 : ℤ) ^ (i : ℕ) • ∑ j : Fin q,
-      w p (Function.update (fun j' => L (i.succAbove j') p) j (L (i.succAbove j) (L i p))) = 0 by
+  suffices hS
+      : ∑ i : Fin (q + 1), (-1 : ℤ) ^ (i : ℕ) • ∑ j : Fin q,
+          w p (Function.update (fun j' => L (i.succAbove j') p) j (L (i.succAbove j) (L i p)))
+        = 0 by
     rw [hS, add_zero]
   set M : Fin (q + 1) → Fin (q + 1) → V := fun i k => L k (L i p) with hM
   have hMs : ∀ i k, M i k = M k i := fun i k => hL k i
@@ -52,7 +61,7 @@ theorem altSym : AltSym := by
       simp only [c, hik, Ne.symm hik, if_false, hY]
       exact (w p).neg_one_pow_smul_map_removeNth_add_eq_zero_of_eq (v := Y i k) (by simp [Y]) hik
   have hsum : ∑ i, ∑ k, c i k = 0 := by
-    have h1 : ∑ i, ∑ k, c i k = -∑ i, ∑ k, c i k := by
+    have h1 : ∑ i, ∑ k, c i k = - ∑ i, ∑ k, c i k := by
       conv_lhs => rw [Finset.sum_comm]
       rw [← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_
@@ -64,9 +73,14 @@ theorem altSym : AltSym := by
       nth_rewrite 2 [h1]
       exact add_neg_cancel _
     exact (smul_eq_zero.mp h2).resolve_left two_ne_zero
-  have hne : ∀ (i : Fin (q + 1)) (j : Fin q), i ≠ i.succAbove j := fun i j => (Fin.succAbove_ne i j).symm
-  have hrow : ∀ i : Fin (q + 1), (-1 : ℤ) ^ (i : ℕ) • ∑ j : Fin q, w p (Function.update
-      (fun j' => L (i.succAbove j') p) j (L (i.succAbove j) (L i p))) = ∑ k, c i k := by
+  have hne : ∀ (i : Fin (q + 1)) (j : Fin q), i ≠ i.succAbove j := fun i j =>
+    (Fin.succAbove_ne i j).symm
+  have hrow
+      : ∀ i : Fin (q + 1),
+        (-1 : ℤ) ^ (i : ℕ)
+            • ∑ j : Fin q, w p (Function.update
+              (fun j' => L (i.succAbove j') p) j (L (i.succAbove j) (L i p)))
+          = ∑ k, c i k := by
     intro i
     rw [Fin.sum_univ_succAbove _ i, Finset.smul_sum]
     simp only [c, if_pos rfl, zero_add, hne, if_false]

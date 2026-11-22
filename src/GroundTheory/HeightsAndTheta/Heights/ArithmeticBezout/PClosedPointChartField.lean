@@ -24,8 +24,9 @@ theorem ClosedPointChartField.proof : ClosedPointChartField.Statement := by
   set g : MvPolynomial (Fin n) F →ₐ[F] FractionRing (MvPolynomial (Fin n) F ⧸ I) :=
     aeval fun m => ξ m * (ξ i)⁻¹ with hg
 
-  have hhom : ∀ (h : MvPolynomial (Fin n) F) (d : ℕ), h.IsHomogeneous d →
-      ChartZeroTrdeg.homogAt h i d = h := by
+  have hhom
+      : ∀ (h : MvPolynomial (Fin n) F) (d : ℕ),
+        h.IsHomogeneous d → ChartZeroTrdeg.homogAt h i d = h := by
     intro h d hh
     conv_rhs => rw [h.as_sum]
     refine Finset.sum_congr rfl fun α hα => ?_
@@ -49,7 +50,7 @@ theorem ClosedPointChartField.proof : ClosedPointChartField.Statement := by
           exact Ideal.subset_span rfl
         conv_lhs => rw [p.as_sum]
         set_option synthInstance.maxHeartbeats 100000 in
-          simp only [ChartZeroTrdeg.homogAt, map_sum, map_mul, map_pow, h1, one_pow, mul_one]
+        simp only [ChartZeroTrdeg.homogAt, map_sum, map_mul, map_pow, h1, one_pow, mul_one]
       have := (I ⊔ Ideal.span {X i - 1}).add_mem (Ideal.mem_sup_left hH) (Ideal.mem_sup_right hd)
       simpa using this
     · refine sup_le ?_ ?_
@@ -63,8 +64,8 @@ theorem ClosedPointChartField.proof : ClosedPointChartField.Statement := by
           (ChartZeroTrdeg.aeval_genPt_eq_zero_iff' I _).2 (hI.isHomog f hf d)
         by_cases hz : homogeneousComponent d f = 0
         · rw [hz, map_zero]
-        have := ChartZeroTrdeg.aeval_homogAt (homogeneousComponent d f) i d
-          (hh.totalDegree hz).le ξ hξ
+        have :=
+          ChartZeroTrdeg.aeval_homogAt (homogeneousComponent d f) i d (hh.totalDegree hz).le ξ hξ
         rw [hhom _ d hh, h0] at this
         exact (mul_eq_zero.mp this.symm).resolve_left (pow_ne_zero _ hξ)
       · rw [Ideal.span_le, Set.singleton_subset_iff]
@@ -74,7 +75,8 @@ theorem ClosedPointChartField.proof : ClosedPointChartField.Statement := by
   let e : (MvPolynomial (Fin n) F ⧸ (I ⊔ Ideal.span {X i - 1})) ≃ₐ[F] g.range :=
     (Ideal.quotientEquivAlgOfEq F (hker.symm.trans (AlgHom.ker_rangeRestrict g).symm)).trans
       (Ideal.quotientKerAlgEquivOfSurjective g.rangeRestrict_surjective)
-  have htr := GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof F n 0 I i hI (by simpa using hdim) hXi
+  have htr :=
+    GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof F n 0 I i hI (by simpa using hdim) hXi
   rw [Algebra.adjoin_range_eq_range_aeval] at htr
   have halg : Algebra.IsAlgebraic F g.range := trdeg_eq_zero_iff.1 (by simpa using htr)
   have hfield : IsField g.range := isField_of_isIntegral_of_isField' (Field.toIsField F)

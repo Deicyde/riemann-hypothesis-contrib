@@ -14,9 +14,10 @@ namespace GroundTheory.Automorphic
 open Set Filter Topology MeasureTheory
 open scoped Pointwise
 
-variable {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [LocallyCompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
-  [MeasurableSpace G] [BorelSpace G] {μ : Measure G} [μ.IsHaarMeasure]
+variable
+  {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [T2Space G] [TotallyDisconnectedSpace G] [MeasurableSpace G] [BorelSpace G]
+  {μ : Measure G} [μ.IsHaarMeasure]
   {K : Subgroup G} (hKc : IsCompact (K : Set G)) (hKo : IsOpen (K : Set G))
 
 namespace HeckeAlgebra
@@ -25,40 +26,41 @@ section General
 
 variable {V : Type*} [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V}
 
-
 omit [μ.IsHaarMeasure] in
-theorem heckeAct_mul [IsFiniteMeasureOnCompacts μ] [μ.IsMulLeftInvariant] (a b : HeckeAlgebra μ)
-    {v : V} (hv : v ∈ smoothVectors ρ) :
-    heckeAct μ ρ (a * b : HeckeAlgebra μ) v = heckeAct μ ρ a (heckeAct μ ρ b v) := by
+theorem heckeAct_mul
+    [IsFiniteMeasureOnCompacts μ] [μ.IsMulLeftInvariant]
+    (a b : HeckeAlgebra μ)
+    {v : V} (hv : v ∈ smoothVectors ρ)
+    : heckeAct μ ρ (a * b : HeckeAlgebra μ) v = heckeAct μ ρ a (heckeAct μ ρ b v) := by
   rw [coe_mul]
   exact heckeAct_groupConv a.mem b.mem hv
 
-theorem heckeAct_corner {v : V} (hv : v ∈ fixedVectors ρ K) (f : HeckeAlgebra μ) :
-    heckeAct μ ρ (HeckeAlgebraLevel.corner hKc hKo f : HeckeAlgebra μ) v =
-      heckeAct μ ρ (idem μ hKc hKo * f : HeckeAlgebra μ) v := by
+theorem heckeAct_corner {v : V} (hv : v ∈ fixedVectors ρ K) (f : HeckeAlgebra μ)
+    : heckeAct μ ρ (HeckeAlgebraLevel.corner hKc hKo f : HeckeAlgebra μ) v
+      = heckeAct μ ρ (idem μ hKc hKo * f : HeckeAlgebra μ) v := by
   rw [HeckeAlgebraLevel.val_corner, heckeAct_mul _ _ (smooth_of_mem_fixedVectors hKo hv),
     heckeAct_idem_of_mem (μ := μ) hKc hKo hv]
 
-theorem heckeAct_idem_apply (g : G) {v : V} (hv : v ∈ fixedVectors ρ K) :
-    heckeAct μ ρ (idem μ hKc hKo) (ρ g v) =
-      heckeAct μ ρ (idem μ hKc hKo * leftReg μ g (idem μ hKc hKo) : HeckeAlgebra μ) v := by
+theorem heckeAct_idem_apply (g : G) {v : V} (hv : v ∈ fixedVectors ρ K)
+    : heckeAct μ ρ (idem μ hKc hKo) (ρ g v)
+      = heckeAct μ ρ (idem μ hKc hKo * leftReg μ g (idem μ hKc hKo) : HeckeAlgebra μ) v := by
   have hs := smooth_of_mem_fixedVectors hKo hv
   rw [heckeAct_mul _ _ hs]
   conv_lhs => rw [← heckeAct_idem_of_mem (μ := μ) hKc hKo hv]
   rw [heckeAct_ltrans g (idem μ hKc hKo).mem hs]
   rfl
 
-
 omit [LocallyCompactSpace G] [T2Space G] [TotallyDisconnectedSpace G] [MeasurableSpace G]
   [BorelSpace G] [IsTopologicalGroup G] in
-theorem mem_span_orbit [ρ.IsIrreducible] {v : V} (hv : v ≠ 0) (w : V) :
-    w ∈ Submodule.span ℂ (range fun g => ρ g v) := by
+theorem mem_span_orbit [ρ.IsIrreducible] {v : V} (hv : v ≠ 0) (w : V)
+    : w ∈ Submodule.span ℂ (range fun g => ρ g v) := by
   set S := Submodule.span ℂ (range fun g => ρ g v)
   have hS : ∀ g, ∀ ⦃x⦄, x ∈ S → ρ g x ∈ S := by
     intro g x hx
-    have : S ≤ S.comap (ρ g) := Submodule.span_le.2 (by
-      rintro _ ⟨h, rfl⟩
-      exact Submodule.subset_span ⟨g * h, by simp [Module.End.mul_apply]⟩)
+    have : S ≤ S.comap (ρ g) :=
+      Submodule.span_le.2 (by
+        rintro _ ⟨h, rfl⟩
+        exact Submodule.subset_span ⟨g * h, by simp [Module.End.mul_apply]⟩)
     exact this hx
   rcases IsSimpleOrder.eq_bot_or_eq_top (⟨S, hS⟩ : Subrepresentation ρ) with h | h
   · exfalso
@@ -76,21 +78,20 @@ section Simple
 
 variable {V : Type*} [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V}
 
-theorem isSimpleModule_fixedVectors (hρ : IsSmooth ρ) [ρ.IsIrreducible]
-    (hK : fixedVectors ρ K ≠ ⊥) :
-    IsSimpleModule (HeckeAlgebraLevel μ K hKc hKo) (fixedVectors ρ K) := by
+theorem isSimpleModule_fixedVectors (hρ : IsSmooth ρ) [ρ.IsIrreducible] (hK : fixedVectors ρ K ≠ ⊥)
+    : IsSimpleModule (HeckeAlgebraLevel μ K hKc hKo) (fixedVectors ρ K) := by
   rw [isSimpleModule_iff_toSpanSingleton_surjective]
   refine ⟨?_, fun x hx y => ?_⟩
   · obtain ⟨v, hv, hv0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hK
     exact ⟨⟨⟨v, hv⟩, 0, fun h => hv0 (congrArg Subtype.val h)⟩⟩
   · have hx0 : (x : V) ≠ 0 := fun h => hx (Subtype.ext h)
-    let M : HeckeAlgebra μ →ₗ[ℂ] V :=
-      { toFun := fun f => heckeAct μ ρ (idem μ hKc hKo * f : HeckeAlgebra μ) x
-        map_add' := fun a b => by
-          rw [mul_add, coe_add, heckeAct_add_left (mem _) (mem _) (hρ _)]
-        map_smul' := fun c a => by
-          simp only [RingHom.id_apply]
-          rw [mul_smul_comm, coe_smul, heckeAct_smul_left c (mem _) (hρ _)] }
+    let M : HeckeAlgebra μ →ₗ[ℂ] V := {
+      toFun := fun f => heckeAct μ ρ (idem μ hKc hKo * f : HeckeAlgebra μ) x
+      map_add' := fun a b => by rw [mul_add, coe_add, heckeAct_add_left (mem _) (mem _) (hρ _)]
+      map_smul' := fun c a => by
+        simp only [RingHom.id_apply]
+        rw [mul_smul_comm, coe_smul, heckeAct_smul_left c (mem _) (hρ _)]
+    }
     let L : V →ₗ[ℂ] V := heckeRep (μ := μ) hρ (idem μ hKc hKo)
     have hspan : Submodule.span ℂ (range fun g => ρ g x) ≤ (LinearMap.range M).comap L := by
       refine Submodule.span_le.2 ?_
@@ -109,8 +110,11 @@ section Construction
 
 namespace HeckeAlgebraLevel
 
-theorem smul_mem_ideal (I : Submodule (HeckeAlgebraLevel μ K hKc hKo) (HeckeAlgebraLevel μ K hKc hKo))
-    (c : ℂ) {h : HeckeAlgebraLevel μ K hKc hKo} (hh : h ∈ I) : c • h ∈ I := by
+theorem smul_mem_ideal
+    (I : Submodule (HeckeAlgebraLevel μ K hKc hKo) (HeckeAlgebraLevel μ K hKc hKo))
+    (c : ℂ)
+    {h : HeckeAlgebraLevel μ K hKc hKo} (hh : h ∈ I)
+    : c • h ∈ I := by
   have : c • h = (c • (1 : HeckeAlgebraLevel μ K hKc hKo)) * h := by
     apply ext hKc hKo
     rw [val_smul, val_mul, val_smul, val_one, smul_mul_assoc,
@@ -121,8 +125,9 @@ theorem smul_mem_ideal (I : Submodule (HeckeAlgebraLevel μ K hKc hKo) (HeckeAlg
 def cornerₗ : HeckeAlgebra μ →ₗ[ℂ] HeckeAlgebraLevel μ K hKc hKo where
   toFun := corner hKc hKo
   map_add' a b := ext hKc hKo (by simp only [val_corner, val_add, mul_add, add_mul])
-  map_smul' c a := ext hKc hKo (by
-    simp only [val_corner, val_smul, RingHom.id_apply, mul_smul_comm, smul_mul_assoc])
+  map_smul' c a :=
+    ext hKc hKo
+      (by simp only [val_corner, val_smul, RingHom.id_apply, mul_smul_comm, smul_mul_assoc])
 
 end HeckeAlgebraLevel
 
@@ -142,8 +147,8 @@ def heckeKernel : Submodule ℂ (HeckeAlgebra μ) where
     rw [map_smul, map_smul]
     exact smul_mem_ideal hKc hKo I c (hφ g)
 
-theorem heckeKernel_le_comap (g : G) :
-    heckeKernel hKc hKo I ≤ (heckeKernel hKc hKo I).comap (leftReg μ g) := by
+theorem heckeKernel_le_comap (g : G)
+    : heckeKernel hKc hKo I ≤ (heckeKernel hKc hKo I).comap (leftReg μ g) := by
   intro φ hφ g'
   rw [← Module.End.mul_apply, ← map_mul]
   exact hφ (g' * g)
@@ -168,26 +173,31 @@ def orbitMap (v : V) (hv : v ∈ smoothVectors ρ) : HeckeAlgebra μ →ₗ[ℂ]
     rw [coe_smul]
     exact heckeAct_smul_left c a.mem hv
 
-theorem nonempty_equiv_quotRep (I : Submodule (HeckeAlgebraLevel μ K hKc hKo)
-    (HeckeAlgebraLevel μ K hKc hKo)) (hρ : IsSmooth ρ) [ρ.IsIrreducible] {v₀ : V}
-    (hv₀ : v₀ ∈ fixedVectors ρ K) (h0 : v₀ ≠ 0)
-    (hI : ∀ h : HeckeAlgebraLevel μ K hKc hKo, h ∈ I ↔ heckeAct μ ρ (h : HeckeAlgebra μ) v₀ = 0) :
-    Nonempty ((quotRep hKc hKo I).Equiv ρ) := by
+theorem nonempty_equiv_quotRep
+    (I : Submodule (HeckeAlgebraLevel μ K hKc hKo) (HeckeAlgebraLevel μ K hKc hKo))
+    (hρ : IsSmooth ρ)
+    [ρ.IsIrreducible]
+    {v₀ : V} (hv₀ : v₀ ∈ fixedVectors ρ K) (h0 : v₀ ≠ 0)
+    (hI : ∀ h : HeckeAlgebraLevel μ K hKc hKo, h ∈ I ↔ heckeAct μ ρ (h : HeckeAlgebra μ) v₀ = 0)
+    : Nonempty ((quotRep hKc hKo I).Equiv ρ) := by
   let Φ := orbitMap (μ := μ) v₀ (hρ v₀)
   have hΦ : ∀ f, Φ f = heckeAct μ ρ f v₀ := fun _ => rfl
   have crit : ∀ x : V, (∀ g, heckeAct μ ρ (idem μ hKc hKo) (ρ g x) = 0) → x = 0 := by
     intro x hx
     by_contra hx0
-    have hle : Submodule.span ℂ (range fun g => ρ g x) ≤
-        LinearMap.ker (heckeRep (μ := μ) hρ (idem μ hKc hKo)) :=
+    have hle
+        : Submodule.span ℂ (range fun g => ρ g x)
+          ≤ LinearMap.ker (heckeRep (μ := μ) hρ (idem μ hKc hKo)) :=
       Submodule.span_le.2 (by
         rintro _ ⟨g, rfl⟩
         exact hx g)
     have := hle (mem_span_orbit hx0 v₀)
     rw [LinearMap.mem_ker, heckeRep_apply, heckeAct_idem_of_mem (μ := μ) hKc hKo hv₀] at this
     exact h0 this
-  have key : ∀ φ g, heckeAct μ ρ (idem μ hKc hKo) (ρ g (Φ φ)) =
-      heckeAct μ ρ (cornerₗ hKc hKo (leftReg μ g φ) : HeckeAlgebra μ) v₀ := by
+  have key
+      : ∀ φ g,
+        heckeAct μ ρ (idem μ hKc hKo) (ρ g (Φ φ))
+          = heckeAct μ ρ (cornerₗ hKc hKo (leftReg μ g φ) : HeckeAlgebra μ) v₀ := by
     intro φ g
     rw [hΦ, heckeAct_ltrans g φ.mem (hρ v₀)]
     change heckeAct μ ρ (idem μ hKc hKo) (heckeAct μ ρ (leftReg μ g φ : HeckeAlgebra μ) v₀) = _
@@ -210,15 +220,18 @@ theorem nonempty_equiv_quotRep (I : Submodule (HeckeAlgebraLevel μ K hKc hKo)
     have hle : Submodule.span ℂ (range fun g => ρ g v₀) ≤ LinearMap.range Φ :=
       Submodule.span_le.2 (by
         rintro _ ⟨g, rfl⟩
-        exact ⟨leftReg μ g (idem μ hKc hKo), by
-          rw [hint, hΦ, heckeAct_idem_of_mem (μ := μ) hKc hKo hv₀]⟩)
+        exact ⟨
+          leftReg μ g (idem μ hKc hKo),
+          by rw [hint, hΦ, heckeAct_idem_of_mem (μ := μ) hKc hKo hv₀]
+        ⟩)
     exact hle (mem_span_orbit h0 w)
   let T : HeckeAlgebra μ ⧸ heckeKernel hKc hKo I →ₗ[ℂ] V :=
     (heckeKernel hKc hKo I).liftQ Φ (fun φ hφ => (hker φ).2 hφ)
-  let Tint : Representation.IntertwiningMap (quotRep hKc hKo I) ρ :=
-    { toLinearMap := T
-      isIntertwining' := fun g => (heckeKernel hKc hKo I).linearMap_qext
-        (LinearMap.ext fun φ => hint g φ) }
+  let Tint : Representation.IntertwiningMap (quotRep hKc hKo I) ρ := {
+    toLinearMap := T
+    isIntertwining' := fun g =>
+      (heckeKernel hKc hKo I).linearMap_qext (LinearMap.ext fun φ => hint g φ)
+  }
   refine ⟨Tint.ofBijective ⟨fun y z hyz => ?_, fun w => ?_⟩⟩
   · obtain ⟨φ, rfl⟩ := (heckeKernel hKc hKo I).mkQ_surjective y
     obtain ⟨ψ, rfl⟩ := (heckeKernel hKc hKo I).mkQ_surjective z
@@ -228,21 +241,25 @@ theorem nonempty_equiv_quotRep (I : Submodule (HeckeAlgebraLevel μ K hKc hKo)
   · obtain ⟨φ, rfl⟩ := hsurj w
     exact ⟨(heckeKernel hKc hKo I).mkQ φ, rfl⟩
 
-theorem nonempty_equiv_of_fixedVectors_equiv {W : Type*} [AddCommGroup W] [Module ℂ W]
-    {σ : Representation ℂ G W} (hρ : IsSmooth ρ) (hσ : IsSmooth σ) [ρ.IsIrreducible]
-    [σ.IsIrreducible] (hK : fixedVectors ρ K ≠ ⊥)
-    (e : fixedVectors ρ K ≃ₗ[HeckeAlgebraLevel μ K hKc hKo] fixedVectors σ K) :
-    Nonempty (ρ.Equiv σ) := by
+theorem nonempty_equiv_of_fixedVectors_equiv
+    {W : Type*} [AddCommGroup W] [Module ℂ W]
+    {σ : Representation ℂ G W}
+    (hρ : IsSmooth ρ) (hσ : IsSmooth σ)
+    [ρ.IsIrreducible] [σ.IsIrreducible]
+    (hK : fixedVectors ρ K ≠ ⊥)
+    (e : fixedVectors ρ K ≃ₗ[HeckeAlgebraLevel μ K hKc hKo] fixedVectors σ K)
+    : Nonempty (ρ.Equiv σ) := by
   obtain ⟨v₀, hv₀, h0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hK
   set I := LinearMap.ker (LinearMap.toSpanSingleton (HeckeAlgebraLevel μ K hKc hKo)
     (fixedVectors ρ K) ⟨v₀, hv₀⟩)
-  have hIρ : ∀ h : HeckeAlgebraLevel μ K hKc hKo, h ∈ I ↔
-      heckeAct μ ρ (h : HeckeAlgebra μ) v₀ = 0 := by
+  have hIρ
+      : ∀ h : HeckeAlgebraLevel μ K hKc hKo, h ∈ I ↔ heckeAct μ ρ (h : HeckeAlgebra μ) v₀ = 0 := by
     intro h
     rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply, Subtype.ext_iff]
     rfl
-  have hIσ : ∀ h : HeckeAlgebraLevel μ K hKc hKo, h ∈ I ↔
-      heckeAct μ σ (h : HeckeAlgebra μ) (e ⟨v₀, hv₀⟩ : W) = 0 := by
+  have hIσ
+      : ∀ h : HeckeAlgebraLevel μ K hKc hKo,
+        h ∈ I ↔ heckeAct μ σ (h : HeckeAlgebra μ) (e ⟨v₀, hv₀⟩ : W) = 0 := by
     intro h
     rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply, ← e.map_eq_zero_iff, e.map_smul,
       Subtype.ext_iff]

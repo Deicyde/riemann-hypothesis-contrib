@@ -16,30 +16,35 @@ noncomputable section
 
 variable {K : Type*} [Field K] [NumberField K]
 
-theorem le_one_of_forall_count_nonneg {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0)
-    (h : ∀ v : HeightOneSpectrum (𝓞 K), 0 ≤ count K v I) : I ≤ 1 := by
+theorem le_one_of_forall_count_nonneg
+    {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) (h : ∀ v : HeightOneSpectrum (𝓞 K), 0 ≤ count K v I)
+    : I ≤ 1 := by
   rw [← finprod_heightOneSpectrum_factorization' (K := K) hI]
   refine finprod_induction (· ≤ 1) le_rfl (fun a b ha hb ↦ ?_) fun v ↦ ?_
-  · calc a * b ≤ 1 * b := mul_le_mul_left ha b
+  · calc
+      a * b
+        ≤ 1 * b := mul_le_mul_left ha b
       _ = b := one_mul b
       _ ≤ 1 := hb
   · obtain ⟨n, hn⟩ := Int.eq_ofNat_of_zero_le (h v)
     rw [hn, zpow_natCast, ← coeIdeal_pow]
     exact coeIdeal_le_one
 
-theorem le_iff_forall_count_le {I J : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0) :
-    I ≤ J ↔ ∀ v : HeightOneSpectrum (𝓞 K), count K v J ≤ count K v I := by
+theorem le_iff_forall_count_le {I J : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
+    : I ≤ J ↔ ∀ v : HeightOneSpectrum (𝓞 K), count K v J ≤ count K v I := by
   refine ⟨fun h v ↦ count_mono K v hI h, fun h ↦ ?_⟩
   have hJ' : J⁻¹ ≠ 0 := inv_ne_zero hJ
-  have hle : I * J⁻¹ ≤ 1 := le_one_of_forall_count_nonneg (mul_ne_zero hI hJ') fun v ↦ by
-    rw [count_mul K v hI hJ', count_inv]
-    linarith [h v]
-  calc I = I * J⁻¹ * J := by rw [mul_assoc, inv_mul_cancel₀ hJ, mul_one]
+  have hle : I * J⁻¹ ≤ 1 :=
+    le_one_of_forall_count_nonneg (mul_ne_zero hI hJ') fun v ↦ by
+      rw [count_mul K v hI hJ', count_inv]
+      linarith [h v]
+  calc
+    I = I * J⁻¹ * J := by rw [mul_assoc, inv_mul_cancel₀ hJ, mul_one]
     _ ≤ 1 * J := mul_le_mul_left hle J
     _ = J := one_mul J
 
-theorem mem_iff_forall_valuation_le {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) {x : K} :
-    x ∈ I ↔ ∀ v : HeightOneSpectrum (𝓞 K), v.valuation K x ≤ exp (-count K v I) := by
+theorem mem_iff_forall_valuation_le {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) {x : K}
+    : x ∈ I ↔ ∀ v : HeightOneSpectrum (𝓞 K), v.valuation K x ≤ exp (- count K v I) := by
   rcases eq_or_ne x 0 with rfl | hx
   · exact iff_of_true (FractionalIdeal.zero_mem I) fun v ↦ by simp only [map_zero, _root_.zero_le]
   have hs : spanSingleton (𝓞 K)⁰ x ≠ 0 := spanSingleton_ne_zero_iff.2 hx
@@ -55,8 +60,9 @@ theorem le_exp_sub_one_of_lt {y : ℤᵐ⁰} {n : ℤ} (h : y < exp n) : y ≤ e
   have := (log_lt_iff_lt_exp hy).2 h
   omega
 
-theorem exists_mem_valuation_eq {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0)
-    (v : HeightOneSpectrum (𝓞 K)) : ∃ a ∈ I, v.valuation K a = exp (-count K v I) := by
+theorem exists_mem_valuation_eq
+    {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) (v : HeightOneSpectrum (𝓞 K))
+    : ∃ a ∈ I, v.valuation K a = exp (- count K v I) := by
   set P : FractionalIdeal (𝓞 K)⁰ K := (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K) with hPdef
   have hP : P ≠ 0 := coeIdeal_ne_zero.mpr v.ne_bot
   have hIP : I * P ≠ 0 := mul_ne_zero hI hP
@@ -74,25 +80,28 @@ theorem exists_mem_valuation_eq {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 
   rw [count_mul K w hI hP]
   by_cases hw : w = v
   · subst hw
-    rw [hPdef, count_self, show -(count K w I + 1) = -count K w I - 1 by ring]
+    rw [hPdef, count_self, show -(count K w I + 1) = - count K w I - 1 by ring]
     exact le_exp_sub_one_of_lt hlt
   · rw [hPdef, count_maximal_coprime K w (Ne.symm hw), add_zero]
     exact (mem_iff_forall_valuation_le hI).1 haI w
 
-def localIdeal (I : FractionalIdeal (𝓞 K)⁰ K) (v : HeightOneSpectrum (𝓞 K)) :
-    Submodule (v.adicCompletionIntegers K) (v.adicCompletion K) :=
+def localIdeal (I : FractionalIdeal (𝓞 K)⁰ K) (v : HeightOneSpectrum (𝓞 K))
+    : Submodule (v.adicCompletionIntegers K) (v.adicCompletion K) :=
   Submodule.span _ ((fun x : K ↦ (x : v.adicCompletion K)) '' (I : Set K))
 
-theorem coe_mem_localIdeal {I : FractionalIdeal (𝓞 K)⁰ K} (v : HeightOneSpectrum (𝓞 K)) {x : K}
-    (hx : x ∈ I) : (x : v.adicCompletion K) ∈ localIdeal I v :=
+theorem coe_mem_localIdeal
+    {I : FractionalIdeal (𝓞 K)⁰ K} (v : HeightOneSpectrum (𝓞 K)) {x : K} (hx : x ∈ I)
+    : (x : v.adicCompletion K) ∈ localIdeal I v :=
   Submodule.subset_span ⟨x, hx, rfl⟩
 
-theorem mem_localIdeal_iff {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0)
-    (v : HeightOneSpectrum (𝓞 K)) {y : v.adicCompletion K} :
-    y ∈ localIdeal I v ↔ Valued.v y ≤ exp (-count K v I) := by
+theorem mem_localIdeal_iff
+    {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0)
+    (v : HeightOneSpectrum (𝓞 K))
+    {y : v.adicCompletion K}
+    : y ∈ localIdeal I v ↔ Valued.v y ≤ exp (- count K v I) := by
   constructor
   · intro hy
-    refine Submodule.span_induction (p := fun y _ ↦ Valued.v y ≤ exp (-count K v I)) ?_ ?_ ?_ ?_ hy
+    refine Submodule.span_induction (p := fun y _ ↦ Valued.v y ≤ exp (- count K v I)) ?_ ?_ ?_ ?_ hy
     · rintro _ ⟨x, hx, rfl⟩
       rw [valuedAdicCompletion_eq_valuation']
       exact (mem_iff_forall_valuation_le hI).1 hx v
@@ -105,7 +114,7 @@ theorem mem_localIdeal_iff {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0)
       exact (mul_le_of_le_one_left' r.2).trans ha
   · intro hy
     obtain ⟨a, haI, ha⟩ := exists_mem_valuation_eq hI v
-    have ha' : Valued.v (a : v.adicCompletion K) = exp (-count K v I) := by
+    have ha' : Valued.v (a : v.adicCompletion K) = exp (- count K v I) := by
       rw [valuedAdicCompletion_eq_valuation', ha]
     have ha0 : (a : v.adicCompletion K) ≠ 0 := by
       intro h
@@ -120,18 +129,19 @@ theorem mem_localIdeal_iff {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0)
     rw [hy']
     exact Submodule.smul_mem _ _ (coe_mem_localIdeal v haI)
 
-theorem mem_iff_forall_mem_localIdeal {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) {x : K} :
-    x ∈ I ↔ ∀ v : HeightOneSpectrum (𝓞 K), (x : v.adicCompletion K) ∈ localIdeal I v := by
+theorem mem_iff_forall_mem_localIdeal {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) {x : K}
+    : x ∈ I ↔ ∀ v : HeightOneSpectrum (𝓞 K), (x : v.adicCompletion K) ∈ localIdeal I v := by
   rw [mem_iff_forall_valuation_le hI]
   refine forall_congr' fun v ↦ ?_
   rw [mem_localIdeal_iff hI, valuedAdicCompletion_eq_valuation']
 
-theorem eventually_coe_mem_localIdeal {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) (x : K) :
-    ∀ᶠ v in Filter.cofinite, (x : v.adicCompletion K) ∈ localIdeal I v := by
+theorem eventually_coe_mem_localIdeal {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) (x : K)
+    : ∀ᶠ v in Filter.cofinite, (x : v.adicCompletion K) ∈ localIdeal I v := by
   have h1 : ∀ᶠ v : HeightOneSpectrum (𝓞 K) in Filter.cofinite, count K v I = 0 :=
     FractionalIdeal.finite_factors (K := K) I
-  have h2 : ∀ᶠ v : HeightOneSpectrum (𝓞 K) in Filter.cofinite,
-      (x : v.adicCompletion K) ∈ v.adicCompletionIntegers K :=
+  have h2
+      : ∀ᶠ v : HeightOneSpectrum (𝓞 K) in Filter.cofinite,
+        (x : v.adicCompletion K) ∈ v.adicCompletionIntegers K :=
     (algebraMap K (FiniteAdeleRing (𝓞 K) K) x).2
   filter_upwards [h1, h2] with v hv1 hv2
   rw [mem_localIdeal_iff hI, hv1, neg_zero, exp_zero]
@@ -141,12 +151,11 @@ namespace IdeleGroup
 
 local notation "𝓘" => (FractionalIdeal (𝓞 K)⁰ K)ˣ
 
-theorem valued_eq_exp_neg_ord (v : HeightOneSpectrum (𝓞 K)) (s : IdeleGroup K) :
-    Valued.v ((s : 𝔸[K]).2 v) = exp (-ord v s) := by
+theorem valued_eq_exp_neg_ord (v : HeightOneSpectrum (𝓞 K)) (s : IdeleGroup K)
+    : Valued.v ((s : 𝔸[K]).2 v) = exp (- ord v s) := by
   rw [ord, neg_neg, exp_log (valued_ne_zero v s)]
 
-theorem component_ne_zero (v : HeightOneSpectrum (𝓞 K)) (s : IdeleGroup K) :
-    (s : 𝔸[K]).2 v ≠ 0 :=
+theorem component_ne_zero (v : HeightOneSpectrum (𝓞 K)) (s : IdeleGroup K) : (s : 𝔸[K]).2 v ≠ 0 :=
   (Valuation.ne_zero_iff _).1 (valued_ne_zero v s)
 
 instance : MulAction (IdeleGroup K) 𝓘 where
@@ -158,31 +167,27 @@ instance : MulAction (IdeleGroup K) 𝓘 where
     change toFractionalIdeal (s * t) * I = toFractionalIdeal s * (toFractionalIdeal t * I)
     rw [map_mul, mul_assoc]
 
-theorem smul_def (s : IdeleGroup K) (I : 𝓘) : s • I = toFractionalIdeal s * I :=
-  rfl
+theorem smul_def (s : IdeleGroup K) (I : 𝓘) : s • I = toFractionalIdeal s * I := rfl
 
-theorem count_smul (v : HeightOneSpectrum (𝓞 K)) (s : IdeleGroup K) (I : 𝓘) :
-    count K v ((s • I : 𝓘) : FractionalIdeal (𝓞 K)⁰ K) =
-      ord v s + count K v (I : FractionalIdeal (𝓞 K)⁰ K) := by
+theorem count_smul (v : HeightOneSpectrum (𝓞 K)) (s : IdeleGroup K) (I : 𝓘)
+    : count K v ((s • I : 𝓘) : FractionalIdeal (𝓞 K)⁰ K)
+      = ord v s + count K v (I : FractionalIdeal (𝓞 K)⁰ K) := by
   rw [smul_def, Units.val_mul, count_mul K v (Units.ne_zero _) (Units.ne_zero _),
     count_toFractionalIdeal]
 
-theorem smul_eq_self_iff {s : IdeleGroup K} {I : 𝓘} :
-    s • I = I ↔ s ∈ standardOpenSubgroup K := by
+theorem smul_eq_self_iff {s : IdeleGroup K} {I : 𝓘} : s • I = I ↔ s ∈ standardOpenSubgroup K := by
   rw [← ker_toFractionalIdeal, MonoidHom.mem_ker, smul_def, mul_eq_right]
 
-theorem diagonal_smul (a : Kˣ) (I : 𝓘) :
-    diagonal K a • I = toPrincipalIdeal (𝓞 K) K a * I := by
+theorem diagonal_smul (a : Kˣ) (I : 𝓘) : diagonal K a • I = toPrincipalIdeal (𝓞 K) K a * I := by
   rw [smul_def, toFractionalIdeal_diagonal]
 
-theorem coe_diagonal_smul (a : Kˣ) (I : 𝓘) :
-    ((diagonal K a • I : 𝓘) : FractionalIdeal (𝓞 K)⁰ K) =
-      spanSingleton (𝓞 K)⁰ (a : K) * I := by
+theorem coe_diagonal_smul (a : Kˣ) (I : 𝓘)
+    : ((diagonal K a • I : 𝓘) : FractionalIdeal (𝓞 K)⁰ K) = spanSingleton (𝓞 K)⁰ (a : K) * I := by
   rw [diagonal_smul, Units.val_mul, coe_toPrincipalIdeal]
 
-theorem localIdeal_smul (s : IdeleGroup K) (I : 𝓘) (v : HeightOneSpectrum (𝓞 K)) :
-    localIdeal ((s • I : 𝓘) : FractionalIdeal (𝓞 K)⁰ K) v =
-      (localIdeal (I : FractionalIdeal (𝓞 K)⁰ K) v).map
+theorem localIdeal_smul (s : IdeleGroup K) (I : 𝓘) (v : HeightOneSpectrum (𝓞 K))
+    : localIdeal ((s • I : 𝓘) : FractionalIdeal (𝓞 K)⁰ K) v
+      = (localIdeal (I : FractionalIdeal (𝓞 K)⁰ K) v).map
         (LinearMap.mulLeft (v.adicCompletionIntegers K) ((s : 𝔸[K]).2 v)) := by
   ext y
   rw [mem_localIdeal_iff (Units.ne_zero _), Submodule.mem_map, count_smul]
@@ -191,13 +196,14 @@ theorem localIdeal_smul (s : IdeleGroup K) (I : 𝓘) (v : HeightOneSpectrum (�
   · intro hy
     refine ⟨((s : 𝔸[K]).2 v)⁻¹ * y, ?_, ?_⟩
     · rw [mem_localIdeal_iff (Units.ne_zero _), map_mul, map_inv₀, valued_eq_exp_neg_ord]
-      calc (exp (-ord v s))⁻¹ * Valued.v y
-          ≤ (exp (-ord v s))⁻¹ * exp (-(ord v s + count K v (I : FractionalIdeal (𝓞 K)⁰ K))) :=
-            mul_le_mul_right hy _
-        _ = exp (-count K v (I : FractionalIdeal (𝓞 K)⁰ K)) := by
-            rw [← exp_neg, neg_neg, ← exp_add]
-            congr 1
-            ring
+      calc
+        (exp (- ord v s))⁻¹ * Valued.v y
+            ≤ (exp (- ord v s))⁻¹ * exp (-(ord v s + count K v (I : FractionalIdeal (𝓞 K)⁰ K))) :=
+          mul_le_mul_right hy _
+        _ = exp (- count K v (I : FractionalIdeal (𝓞 K)⁰ K)) := by
+          rw [← exp_neg, neg_neg, ← exp_add]
+          congr 1
+          ring
     · rw [LinearMap.mulLeft_apply, mul_inv_cancel_left₀ ht]
   · rintro ⟨z, hz, rfl⟩
     rw [mem_localIdeal_iff (Units.ne_zero _)] at hz

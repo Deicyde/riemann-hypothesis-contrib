@@ -20,8 +20,9 @@ namespace RegularityValuationCentre
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem ltIdeal_one_isPrime {R Γ : Type*} [CommRing R] [LinearOrderedCommGroupWithZero Γ] (v : Valuation R Γ) :
-    (v.ltIdeal 1).IsPrime := by
+theorem ltIdeal_one_isPrime
+    {R Γ : Type*} [CommRing R] [LinearOrderedCommGroupWithZero Γ] (v : Valuation R Γ)
+    : (v.ltIdeal 1).IsPrime := by
   refine ⟨fun h => ?_, fun {x y} hxy => ?_⟩
   · have h1 : (1 : v.integer) ∈ v.ltIdeal 1 := h ▸ Submodule.mem_top
     simp [Valuation.mem_ltIdeal_iff] at h1
@@ -34,47 +35,53 @@ theorem ltIdeal_one_isPrime {R Γ : Type*} [CommRing R] [LinearOrderedCommGroupW
 
 def tWeight [DecidableEq K] (k : K) : K → ℕ := fun k' => if k' = k then 1 else 0
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem specMap_component [DecidableEq K] {E : Type*} [Field E] (ψ : MRing ι →+* E) (k : K) (d : ℕ)
-    (g : MRing ι) :
-    RegularityFunctionFieldNumber.specMap ψ ∅ (weightedHomogeneousComponent (blockWeight k) d g) =
-      weightedHomogeneousComponent (tWeight k) d (RegularityFunctionFieldNumber.specMap ψ ∅ g) := by
+theorem specMap_component
+    [DecidableEq K] {E : Type*} [Field E] (ψ : MRing ι →+* E) (k : K) (d : ℕ) (g : MRing ι)
+    : RegularityFunctionFieldNumber.specMap ψ ∅ (weightedHomogeneousComponent (blockWeight k) d g)
+      = weightedHomogeneousComponent (tWeight k) d
+        (RegularityFunctionFieldNumber.specMap ψ ∅ g) := by
   induction g using MvPolynomial.induction_on' with
   | monomial m c =>
-    have hX : ∀ p : Σ k, ι k, IsWeightedHomogeneous (tWeight k)
-        (RegularityFunctionFieldNumber.cS E ∅ p.1 * MvPolynomial.C (ψ (X p))) (tWeight k p.1) := by
+    have hX
+        : ∀ p : Σ k, ι k,
+          IsWeightedHomogeneous (tWeight k)
+            (RegularityFunctionFieldNumber.cS E ∅ p.1 * MvPolynomial.C (ψ (X p)))
+            (tWeight k p.1) := by
       intro p
       simp only [RegularityFunctionFieldNumber.cS, Finset.notMem_empty, ite_false]
       rw [mul_comm]
       exact (isWeightedHomogeneous_X E (tWeight k) p.1).C_mul _
-    have hh : IsWeightedHomogeneous (tWeight k) (RegularityFunctionFieldNumber.specMap ψ ∅ (monomial m c))
+    have hh : IsWeightedHomogeneous (tWeight k)
+        (RegularityFunctionFieldNumber.specMap ψ ∅ (monomial m c))
         (Finsupp.weight (blockWeight k) m) := by
-      rw [RegularityFunctionFieldNumber.specMap, aeval_monomial, Finsupp.weight_apply, Finsupp.prod, Finsupp.sum,
-        show algebraMap ℤ (MvPolynomial K E) c = MvPolynomial.C (c : E) by simp]
+      rw [RegularityFunctionFieldNumber.specMap, aeval_monomial, Finsupp.weight_apply, Finsupp.prod,
+        Finsupp.sum, show algebraMap ℤ (MvPolynomial K E) c = MvPolynomial.C (c : E) by simp]
       exact (IsWeightedHomogeneous.prod _ _ _ fun p _ => (hX p).pow (m p)).C_mul _
-    have hm : IsWeightedHomogeneous (blockWeight k) (monomial m c) (Finsupp.weight (blockWeight k) m) :=
+    have hm
+        : IsWeightedHomogeneous (blockWeight k) (monomial m c) (Finsupp.weight (blockWeight k) m) :=
       isWeightedHomogeneous_monomial _ _ _ rfl
     by_cases h : d = Finsupp.weight (blockWeight k) m
     · rw [h, hm.weightedHomogeneousComponent_same, hh.weightedHomogeneousComponent_same]
     · rw [hm.weightedHomogeneousComponent_ne d h, hh.weightedHomogeneousComponent_ne d h, map_zero]
   | add p q hp hq =>
-    rw [map_add (f := _), map_add (f := _), hp, hq, map_add (RegularityFunctionFieldNumber.specMap ψ ∅) p q]
+    rw [map_add (f := _), map_add (f := _), hp, hq,
+      map_add (RegularityFunctionFieldNumber.specMap ψ ∅) p q]
     exact ((weightedHomogeneousComponent (R := E) (tWeight k) d).map_add _ _).symm
 
-
 set_option backward.isDefEq.respectTransparency.types false in
-theorem ker_isMultiHomogIdeal [DecidableEq K] {E : Type*} [Field E] (ψ : MRing ι →+* E) :
-    IsMultiHomogIdeal (RingHom.ker (RegularityFunctionFieldNumber.specMap ψ ∅)) := by
+theorem ker_isMultiHomogIdeal [DecidableEq K] {E : Type*} [Field E] (ψ : MRing ι →+* E)
+    : IsMultiHomogIdeal (RingHom.ker (RegularityFunctionFieldNumber.specMap ψ ∅)) := by
   refine isMultiHomogIdeal_of_isHomogeneous fun k d g hg => ?_
-  have hc : weightedHomogeneousComponent (blockWeight k) d g ∈ RingHom.ker (RegularityFunctionFieldNumber.specMap ψ ∅) := by
+  have hc
+      : weightedHomogeneousComponent (blockWeight k) d g
+        ∈ RingHom.ker (RegularityFunctionFieldNumber.specMap ψ ∅) := by
     rw [RingHom.mem_ker] at hg ⊢
     rw [specMap_component, hg, map_zero]
   rw [← weightedDecomposition.decompose'_apply] at hc
   exact hc
 
 end RegularityValuationCentre
-
 
 set_option maxHeartbeats 400000 in
 open regularityEmbedding_holds in
@@ -85,35 +92,49 @@ theorem RegularityValuationCentre.proof : RegularityValuationCentre.Statement :=
   have := hPp
   have hX0 : ∀ {f : MRing ι}, f ∉ P → toFrac P f ≠ 0 := fun hf h => hf (toFrac_eq_zero.mp h)
 
-  have hratio : ∀ (p : Σ k, ι k) (i : ι p.1), (X ⟨p.1, i⟩ : MRing ι) ∉ P → ∃ x : funField P,
-      (x : FractionRing (MRing ι ⧸ P)) * toFrac P (X ⟨p.1, i⟩) = toFrac P (X p) := fun p i hi =>
+  have hratio
+      : ∀ (p : Σ k, ι k) (i : ι p.1),
+        (X ⟨p.1, i⟩ : MRing ι) ∉ P
+          → ∃ x : funField P,
+            (x : FractionRing (MRing ι ⧸ P)) * toFrac P (X ⟨p.1, i⟩)
+              = toFrac P (X p) := fun p i hi =>
     exists_funField_mul_eq (isMultiHomog_X_single p.1 p.2) (isMultiHomog_X_single p.1 i) hi
   choose j0 hj0 using hPr
   choose s hs using fun p : Σ k, ι k => hratio p (j0 p.1) (hj0 p.1)
 
-  have hj : ∀ k, ∃ i, (X ⟨k, i⟩ : MRing ι) ∉ P ∧
-      ∀ i', (X ⟨k, i'⟩ : MRing ι) ∉ P → v (s ⟨k, i'⟩) ≤ v (s ⟨k, i⟩) := by
+  have hj
+      : ∀ k, ∃ i,
+        (X ⟨k, i⟩ : MRing ι) ∉ P
+          ∧ ∀ i', (X ⟨k, i'⟩ : MRing ι) ∉ P → v (s ⟨k, i'⟩) ≤ v (s ⟨k, i⟩) := by
     intro k
-    obtain ⟨i, hi, hmax⟩ := Finset.exists_max_image (Finset.univ.filter fun i => (X ⟨k, i⟩ : MRing ι) ∉ P)
-      (fun i => v (s ⟨k, i⟩)) ⟨j0 k, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hj0 k⟩⟩
-    exact ⟨i, (Finset.mem_filter.mp hi).2,
-      fun i' hi' => hmax i' (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi'⟩)⟩
+    obtain ⟨i, hi, hmax⟩ :=
+      Finset.exists_max_image (Finset.univ.filter fun i => (X ⟨k, i⟩ : MRing ι) ∉ P)
+        (fun i => v (s ⟨k, i⟩))
+        ⟨j0 k, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hj0 k⟩⟩
+    exact ⟨
+      i,
+      (Finset.mem_filter.mp hi).2,
+      fun i' hi' => hmax i' (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi'⟩)
+    ⟩
   choose j hjP hjmax using hj
   choose r hr using fun p : Σ k, ι k => hratio p (j p.1) (hjP p.1)
 
   have hrle : ∀ p, v (r p) ≤ 1 := by
     intro p
     by_cases hp : (X p : MRing ι) ∈ P
-    · have h0 : r p = 0 := Subtype.ext <|
-        (mul_eq_zero.mp ((hr p).trans (toFrac_eq_zero.mpr hp))).resolve_right (hX0 (hjP p.1))
+    · have h0 : r p = 0 :=
+        Subtype.ext <|
+          (mul_eq_zero.mp ((hr p).trans (toFrac_eq_zero.mpr hp))).resolve_right (hX0 (hjP p.1))
       simp [h0]
     · obtain ⟨t, ht⟩ := hratio ⟨p.1, j0 p.1⟩ (j p.1) (hjP p.1)
       have hs' := hs ⟨p.1, j p.1⟩
       dsimp only at ht hs'
-      have hst : s ⟨p.1, j p.1⟩ * t = 1 := Subtype.ext <| mul_right_cancel₀ (hX0 (hjP p.1)) <| by
-        rw [Subring.coe_mul, Subring.coe_one, mul_assoc, ht, hs', one_mul]
-      have hrs : r p * s ⟨p.1, j p.1⟩ = s p := Subtype.ext <| mul_right_cancel₀ (hX0 (hj0 p.1)) <| by
-        rw [Subring.coe_mul, mul_assoc, hs', hr, hs]
+      have hst : s ⟨p.1, j p.1⟩ * t = 1 :=
+        Subtype.ext <| mul_right_cancel₀ (hX0 (hjP p.1)) <| by
+          rw [Subring.coe_mul, Subring.coe_one, mul_assoc, ht, hs', one_mul]
+      have hrs : r p * s ⟨p.1, j p.1⟩ = s p :=
+        Subtype.ext <| mul_right_cancel₀ (hX0 (hj0 p.1)) <| by
+          rw [Subring.coe_mul, mul_assoc, hs', hr, hs]
       have hvs : v (s ⟨p.1, j p.1⟩) ≠ 0 := fun h => by
         have h1 := congrArg v hst
         rw [map_mul, h, zero_mul, map_one] at h1
@@ -133,21 +154,31 @@ theorem RegularityValuationCentre.proof : RegularityValuationCentre.Statement :=
       exact mul_mem hf (by simpa [chartHom] using (Valuation.mem_integer_iff v (r p)).mpr (hrle p))
   have : (v.ltIdeal 1).IsPrime := RegularityValuationCentre.ltIdeal_one_isPrime v
 
-  obtain ⟨E, _, ψE, hψE⟩ : ∃ (E : Type) (_ : Field E) (ψE : MRing ι →+* E),
-      ∀ g, ψE g = 0 ↔ v (chartHom r g) < 1 := by
-    refine ⟨FractionRing (v.integer ⧸ v.ltIdeal 1), inferInstance, (algebraMap (v.integer ⧸ v.ltIdeal 1) _).comp
-      ((Ideal.Quotient.mk (v.ltIdeal 1)).comp ((chartHom r).codRestrict v.integer hψle)), fun g => ?_⟩
+  obtain ⟨E, _, ψE, hψE⟩
+      : ∃ (E : Type) (_ : Field E) (ψE : MRing ι →+* E), ∀ g, ψE g = 0 ↔ v (chartHom r g) < 1 := by
+    refine ⟨
+      FractionRing (v.integer ⧸ v.ltIdeal 1),
+      inferInstance,
+      (algebraMap (v.integer ⧸ v.ltIdeal 1) _).comp
+        ((Ideal.Quotient.mk (v.ltIdeal 1)).comp ((chartHom r).codRestrict v.integer hψle)),
+      fun g => ?_
+    ⟩
     rw [RingHom.comp_apply, RingHom.comp_apply, map_eq_zero_iff _ (IsFractionRing.injective _ _),
       Ideal.Quotient.eq_zero_iff_mem, Valuation.mem_ltIdeal_iff, Units.val_one]
     rfl
 
-  have hform : ∀ (g : MRing ι) (a : K → ℕ), IsMultiHomog g a →
-      (g ∈ RingHom.ker (RegularityFunctionFieldNumber.specMap ψE ∅) ↔ v (chartHom r g) < 1) := by
+  have hform
+      : ∀ (g : MRing ι) (a : K → ℕ),
+        IsMultiHomog g a
+          → (g ∈ RingHom.ker (RegularityFunctionFieldNumber.specMap ψE ∅)
+            ↔ v (chartHom r g) < 1) := by
     intro g a hg
-    rw [RingHom.mem_ker, RegularityFunctionFieldNumber.specMap_form ψE ∅ hg, ← hψE, mul_eq_zero, MvPolynomial.C_eq_zero]
+    rw [RingHom.mem_ker, RegularityFunctionFieldNumber.specMap_form ψE ∅ hg, ← hψE, mul_eq_zero,
+      MvPolynomial.C_eq_zero]
     refine or_iff_right (Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ ?_)
     simp [RegularityFunctionFieldNumber.cS, MvPolynomial.X_ne_zero]
-  have hWp : (RingHom.ker (RegularityFunctionFieldNumber.specMap ψE ∅)).IsPrime := RingHom.ker_isPrime _
+  have hWp : (RingHom.ker (RegularityFunctionFieldNumber.specMap ψE ∅)).IsPrime :=
+    RingHom.ker_isPrime _
   have hPW : P ≤ RingHom.ker (RegularityFunctionFieldNumber.specMap ψE ∅) := by
     obtain ⟨S, hS, hPS⟩ := hPh
     refine hPS.le.trans (Ideal.span_le.mpr fun g hg => ?_)
@@ -166,10 +197,14 @@ theorem RegularityValuationCentre.proof : RegularityValuationCentre.Statement :=
     · subst h
       simp
     · exact absurd rfl hμ
-  refine ⟨RingHom.ker (RegularityFunctionFieldNumber.specMap ψE ∅),
-    ⟨hWp, RegularityValuationCentre.ker_isMultiHomogIdeal ψE, fun k => ⟨j k, ?_⟩⟩, hPW, ?_, fun z hz => ?_⟩
-  ·
-    have hrj : r ⟨k, j k⟩ = 1 :=
+  refine ⟨
+    RingHom.ker (RegularityFunctionFieldNumber.specMap ψE ∅),
+    ⟨hWp, RegularityValuationCentre.ker_isMultiHomogIdeal ψE, fun k => ⟨j k, ?_⟩⟩,
+    hPW,
+    ?_,
+    fun z hz => ?_
+  ⟩
+  · have hrj : r ⟨k, j k⟩ = 1 :=
       Subtype.ext (mul_right_cancel₀ (hX0 (hjP k)) ((hr ⟨k, j k⟩).trans (one_mul _).symm))
     rw [hform _ _ (isMultiHomog_X_single k (j k))]
     have hXr : chartHom r (X ⟨k, j k⟩) = r ⟨k, j k⟩ := eval₂Hom_X' _ _ _
@@ -179,8 +214,7 @@ theorem RegularityValuationCentre.proof : RegularityValuationCentre.Statement :=
     have hCn : chartHom r (C n) = (n : funField P) := eval₂Hom_C _ _ _
     rw [hCn]
     exact hn
-  ·
-    obtain ⟨u, w, a, hu, hw, hwW, e⟩ := LocRingFrac.proof K ι P _ hPp hWp hPW z hz
+  · obtain ⟨u, w, a, hu, hw, hwW, e⟩ := LocRingFrac.proof K ι P _ hPp hWp hPW z hz
     have hzw : z * chartHom r w = chartHom r u :=
       Subtype.ext <| mul_right_cancel₀ (toFrac_prod_ne_zero j hjP a) <| by
         rw [Subring.coe_mul, mul_assoc, chartHom_mul j r hr hw, chartHom_mul j r hr hu]

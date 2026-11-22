@@ -18,22 +18,32 @@ def gradeColMat (b : Module.Basis (Fin n) k (Fin n → k)) : Matrix (Fin n) (Fin
 def gradeRowMat (b : Module.Basis (Fin n) k (Fin n → k)) : Matrix (Fin n) (Fin n) k :=
   b.toMatrix (Pi.basisFun k (Fin n))
 
-def gradeBasisGL (b : Module.Basis (Fin n) k (Fin n → k)) : GL (Fin n) k :=
-  ⟨gradeColMat b, gradeRowMat b, Module.Basis.toMatrix_mul_toMatrix_flip _ _, Module.Basis.toMatrix_mul_toMatrix_flip _ _⟩
+def gradeBasisGL (b : Module.Basis (Fin n) k (Fin n → k)) : GL (Fin n) k := ⟨
+  gradeColMat b,
+  gradeRowMat b,
+  Module.Basis.toMatrix_mul_toMatrix_flip _ _,
+  Module.Basis.toMatrix_mul_toMatrix_flip _ _
+⟩
 
-theorem gradeColMat_mulVec (b : Module.Basis (Fin n) k (Fin n → k)) (u : Fin n → k) :
-    gradeColMat b *ᵥ u = ∑ i, u i • b i := by
+theorem gradeColMat_mulVec (b : Module.Basis (Fin n) k (Fin n → k)) (u : Fin n → k)
+    : gradeColMat b *ᵥ u = ∑ i, u i • b i := by
   ext r
-  simp [gradeColMat, Matrix.mulVec, dotProduct, Module.Basis.toMatrix_apply, Finset.sum_apply, mul_comm]
+  simp [gradeColMat, Matrix.mulVec, dotProduct, Module.Basis.toMatrix_apply, Finset.sum_apply,
+    mul_comm]
 
-theorem grade_mat_ext {ι : Type} (b : Module.Basis ι k (Fin n → k)) (X Y : Matrix (Fin n) (Fin n) k)
-    (h : ∀ i, X *ᵥ b i = Y *ᵥ b i) : X = Y := by
+theorem grade_mat_ext
+    {ι : Type} (b : Module.Basis ι k (Fin n → k))
+    (X Y : Matrix (Fin n) (Fin n) k) (h : ∀ i, X *ᵥ b i = Y *ᵥ b i)
+    : X = Y := by
   apply Matrix.toLin'.injective
   exact b.ext fun i => by simpa [Matrix.toLin'_apply] using h i
 
-theorem grade_eig {ι : Type} (b : Module.Basis ι k (Fin n → k)) (g : Matrix (Fin n) (Fin n) k) (d : ι → k)
-    (hg : ∀ i, g *ᵥ b i = d i • b i) (S : Set ι) (c : k) (hS : ∀ i ∈ S, d i = c) (y : Fin n → k)
-    (hy : y ∈ span k (b '' S)) : g *ᵥ y = c • y := by
+theorem grade_eig
+    {ι : Type} (b : Module.Basis ι k (Fin n → k))
+    (g : Matrix (Fin n) (Fin n) k) (d : ι → k) (hg : ∀ i, g *ᵥ b i = d i • b i)
+    (S : Set ι) (c : k) (hS : ∀ i ∈ S, d i = c)
+    (y : Fin n → k) (hy : y ∈ span k (b '' S))
+    : g *ᵥ y = c • y := by
   let f : (Fin n → k) →ₗ[k] (Fin n → k) := Matrix.toLin' g - c • LinearMap.id
   have hle : span k (b '' S) ≤ LinearMap.ker f := by
     rw [span_le]
@@ -41,22 +51,25 @@ theorem grade_eig {ι : Type} (b : Module.Basis ι k (Fin n → k)) (g : Matrix 
     simp [f, Matrix.toLin'_apply, hg, hS i hi]
   have := hle hy
   simp only [LinearMap.mem_ker, f, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply,
-    Matrix.toLin'_apply] at this
+      Matrix.toLin'_apply]
+    at this
   exact sub_eq_zero.mp this
 
-theorem grade_fin (b : Module.Basis (Fin n) k (Fin n → k)) (w : Fin n → ℤ)
+theorem grade_fin
+    (b : Module.Basis (Fin n) k (Fin n → k)) (w : Fin n → ℤ)
     (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (N : Matrix (Fin n) (Fin n) k) (v : Fin n → k)
     (hZ : ∀ z ∈ Z, ∀ j, z *ᵥ b j ∈ span k (b '' {j' | w j' = w j}))
     (hN : ∀ j, N *ᵥ b j ∈ span k (b '' {j' | w j' = w j + 1}))
     (hv : v ∈ span k (b '' {j | w j = 0}))
-    (hA : ∀ a : Matrix (Fin n) (Fin n) k, (∀ z ∈ Z, z * a = a * z) → a * N = N * a →
-      ∀ j, w j < 0 → b.repr (a *ᵥ v) j = 0) :
-    (∀ t : kˣ,
+    (hA : ∀ a : Matrix (Fin n) (Fin n) k,
+      (∀ z ∈ Z, z * a = a * z) → a * N = N * a → ∀ j, w j < 0 → b.repr (a *ᵥ v) j = 0)
+    : (∀ t : kˣ,
         let g : Matrix (Fin n) (Fin n) k :=
           (gradeBasisGL b).val * diagonal (fun i => ((t ^ w i : kˣ) : k)) * (gradeBasisGL b)⁻¹.val
-        (∀ a ∈ Z, a * g = g * a) ∧ g * N = (t : k) • (N * g) ∧ g *ᵥ v = v) ∧
-      ∀ a : Matrix (Fin n) (Fin n) k, (∀ z ∈ Z, z * a = a * z) → a * N = N * a →
-        ∃ u : Fin n → k, a *ᵥ v = (gradeBasisGL b).val *ᵥ u ∧ ∀ i, w i < 0 → u i = 0 := by
+        (∀ a ∈ Z, a * g = g * a) ∧ g * N = (t : k) • (N * g) ∧ g *ᵥ v = v)
+      ∧ ∀ a : Matrix (Fin n) (Fin n) k,
+        (∀ z ∈ Z, z * a = a * z) → a * N = N * a
+          → ∃ u : Fin n → k, a *ᵥ v = (gradeBasisGL b).val *ᵥ u ∧ ∀ i, w i < 0 → u i = 0 := by
   classical
   refine ⟨fun t => ?_, fun a ha haN => ?_⟩
   · intro g
@@ -78,30 +91,48 @@ theorem grade_fin (b : Module.Basis (Fin n) k (Fin n → k)) (w : Fin n → ℤ)
     · apply grade_mat_ext b
       intro j
       rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hg, Matrix.mulVec_smul]
-      rw [grade_eig b g (fun i => ((t ^ w i : kˣ) : k)) hg {j' | w j' = w j} _ (fun i hi => by rw [hi]) _ (hZ a ha j)]
+      rw [grade_eig b g
+        (fun i => ((t ^ w i : kˣ) : k))
+        hg {j' | w j' = w j} _
+        (fun i hi => by rw [hi])
+        _ (hZ a ha j)]
     · apply grade_mat_ext b
       intro j
-      rw [← Matrix.mulVec_mulVec, Matrix.smul_mulVec, ← Matrix.mulVec_mulVec, hg, Matrix.mulVec_smul,
-        grade_eig b g (fun i => ((t ^ w i : kˣ) : k)) hg {j' | w j' = w j + 1} (((t ^ (w j + 1) : kˣ) : k))
-          (fun i hi => by rw [hi]) _ (hN j), smul_smul, _root_.zpow_add_one, Units.val_mul, Units.val_zpow_eq_zpow_val,
-        mul_comm]
-    · rw [grade_eig b g (fun i => ((t ^ w i : kˣ) : k)) hg {j | w j = 0} 1 (fun i hi => by rw [hi]; simp) v hv, one_smul]
+      rw [← Matrix.mulVec_mulVec, Matrix.smul_mulVec, ← Matrix.mulVec_mulVec, hg,
+        Matrix.mulVec_smul,
+        grade_eig b g
+          (fun i => ((t ^ w i : kˣ) : k))
+          hg {j' | w j' = w j + 1} (((t ^ (w j + 1) : kˣ) : k))
+          (fun i hi => by rw [hi])
+          _ (hN j),
+        smul_smul, _root_.zpow_add_one, Units.val_mul, Units.val_zpow_eq_zpow_val, mul_comm]
+    · rw [grade_eig b g
+          (fun i => ((t ^ w i : kˣ) : k))
+          hg {j | w j = 0} 1
+          (fun i hi => by rw [hi]; simp)
+          v hv,
+        one_smul]
   · refine ⟨⇑(b.repr (a *ᵥ v)), ?_, fun i hi => hA a ha haN i hi⟩
     simp only [gradeBasisGL]
     rw [gradeColMat_mulVec, b.sum_repr]
 
-theorem grade_of_basis {κ : Type} [Fintype κ] (β : Module.Basis κ k (Fin n → k)) (ω : κ → ℤ)
-    (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (N : Matrix (Fin n) (Fin n) k) (v : Fin n → k)
+theorem grade_of_basis
+    {κ : Type} [Fintype κ]
+    (β : Module.Basis κ k (Fin n → k)) (ω : κ → ℤ) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+    (N : Matrix (Fin n) (Fin n) k) (v : Fin n → k)
     (hZ : ∀ z ∈ Z, ∀ j, z *ᵥ β j ∈ span k (β '' {j' | ω j' = ω j}))
     (hN : ∀ j, N *ᵥ β j ∈ span k (β '' {j' | ω j' = ω j + 1}))
     (hv : v ∈ span k (β '' {j | ω j = 0}))
-    (hA : ∀ a : Matrix (Fin n) (Fin n) k, (∀ z ∈ Z, z * a = a * z) → a * N = N * a →
-      ∀ j, ω j < 0 → β.repr (a *ᵥ v) j = 0) :
-    ∃ (P : GL (Fin n) k) (w : Fin n → ℤ), (∀ t : kˣ,
-        let g : Matrix (Fin n) (Fin n) k := P.val * diagonal (fun i => ((t ^ w i : kˣ) : k)) * P⁻¹.val
-        (∀ a ∈ Z, a * g = g * a) ∧ g * N = (t : k) • (N * g) ∧ g *ᵥ v = v) ∧
-      ∀ a : Matrix (Fin n) (Fin n) k, (∀ z ∈ Z, z * a = a * z) → a * N = N * a →
-        ∃ u : Fin n → k, a *ᵥ v = P.val *ᵥ u ∧ ∀ i, w i < 0 → u i = 0 := by
+    (hA : ∀ a : Matrix (Fin n) (Fin n) k,
+      (∀ z ∈ Z, z * a = a * z) → a * N = N * a → ∀ j, ω j < 0 → β.repr (a *ᵥ v) j = 0)
+    : ∃ (P : GL (Fin n) k) (w : Fin n → ℤ),
+      (∀ t : kˣ,
+          let g : Matrix (Fin n) (Fin n) k :=
+            P.val * diagonal (fun i => ((t ^ w i : kˣ) : k)) * P⁻¹.val
+          (∀ a ∈ Z, a * g = g * a) ∧ g * N = (t : k) • (N * g) ∧ g *ᵥ v = v)
+        ∧ ∀ a : Matrix (Fin n) (Fin n) k,
+          (∀ z ∈ Z, z * a = a * z) → a * N = N * a
+            → ∃ u : Fin n → k, a *ᵥ v = P.val *ᵥ u ∧ ∀ i, w i < 0 → u i = 0 := by
   have hcard : Fintype.card κ = n := by
     rw [← Module.finrank_eq_card_basis β, Module.finrank_fin_fun]
   let e : κ ≃ Fin n := Fintype.equivFinOfCardEq hcard
@@ -130,26 +161,35 @@ theorem grade_of_basis {κ : Type} [Fintype κ] (β : Module.Basis κ k (Fin n �
     have := hA a ha haN (e.symm i) hi
     simpa [b] using this
 
-theorem grade_of_frame {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {M : Type} [Fintype M] {L : M → Type}
-    [∀ m, Fintype (L m)] {R : Z → (m : M) → L m → L m → k} {o : (m : M) → L m → k}
-    {N : Matrix (Fin n) (Fin n) k} {v : Fin n → k} (F : Frame Z M L R o N v) :
-    ∃ (P : GL (Fin n) k) (w : Fin n → ℤ), (∀ t : kˣ,
-        let g : Matrix (Fin n) (Fin n) k := P.val * diagonal (fun i => ((t ^ w i : kˣ) : k)) * P⁻¹.val
-        (∀ a ∈ Z, a * g = g * a) ∧ g * N = (t : k) • (N * g) ∧ g *ᵥ v = v) ∧
-      ∀ a : Matrix (Fin n) (Fin n) k, (∀ z ∈ Z, z * a = a * z) → a * N = N * a →
-        ∃ u : Fin n → k, a *ᵥ v = P.val *ᵥ u ∧ ∀ i, w i < 0 → u i = 0 := by
-  let ω : (Σ m, L m × (Σ a : F.ι m, Fin (F.l m a))) → ℤ := fun j => ((j.2.2.2 : ℕ) : ℤ) - (F.s j.1 j.2.2.1 : ℤ)
+theorem grade_of_frame
+    {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {M : Type} [Fintype M]
+    {L : M → Type} [∀ m, Fintype (L m)]
+    {R : Z → (m : M) → L m → L m → k} {o : (m : M) → L m → k} {N : Matrix (Fin n) (Fin n) k}
+    {v : Fin n → k} (F : Frame Z M L R o N v)
+    : ∃ (P : GL (Fin n) k) (w : Fin n → ℤ),
+      (∀ t : kˣ,
+          let g : Matrix (Fin n) (Fin n) k :=
+            P.val * diagonal (fun i => ((t ^ w i : kˣ) : k)) * P⁻¹.val
+          (∀ a ∈ Z, a * g = g * a) ∧ g * N = (t : k) • (N * g) ∧ g *ᵥ v = v)
+        ∧ ∀ a : Matrix (Fin n) (Fin n) k,
+          (∀ z ∈ Z, z * a = a * z) → a * N = N * a
+            → ∃ u : Fin n → k, a *ᵥ v = P.val *ᵥ u ∧ ∀ i, w i < 0 → u i = 0 := by
+  let ω : (Σ m, L m × (Σ a : F.ι m, Fin (F.l m a))) → ℤ := fun j =>
+    ((j.2.2.2 : ℕ) : ℤ) - (F.s j.1 j.2.2.1 : ℤ)
   apply grade_of_basis F.β ω Z N v
   · rintro z hz ⟨m, p, jj⟩
-    rw [show (z : Matrix (Fin n) (Fin n) k) = ((⟨z, hz⟩ : Z) : Matrix (Fin n) (Fin n) k) from rfl, F.hZ]
+    rw [show (z : Matrix (Fin n) (Fin n) k) = ((⟨z, hz⟩ : Z) : Matrix (Fin n) (Fin n) k) from rfl,
+      F.hZ]
     refine sum_mem fun q _ => smul_mem _ _ (subset_span ⟨⟨m, q, jj⟩, rfl, rfl⟩)
   · rintro ⟨m, p, a, i⟩
     rw [F.hN]
     split_ifs with h
     · exact subset_span ⟨_, by simp only [Set.mem_ofPred_eq, ω]; push_cast; ring, rfl⟩
     · exact zero_mem _
-  · suffices h : (∑ m, ∑ p, ∑ a, if h : F.s m a < F.l m a then o m p • F.β ⟨m, (p, ⟨a, ⟨F.s m a, h⟩⟩)⟩ else 0) ∈
-        span k (F.β '' {j | ω j = 0}) by rw [← F.hv] at h; exact h
+  · suffices h
+        : (∑ m, ∑ p, ∑ a, if h : F.s m a < F.l m a then o m p • F.β ⟨m, (p, ⟨a, ⟨F.s m a, h⟩⟩)⟩ else 0)
+          ∈ span k (F.β '' {j | ω j = 0}) by
+      rw [← F.hv] at h; exact h
     refine sum_mem fun m _ => sum_mem fun p _ => sum_mem fun a _ => ?_
     split_ifs with h
     · exact smul_mem _ _ (subset_span ⟨_, by simp [ω], rfl⟩)

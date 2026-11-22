@@ -21,7 +21,7 @@ theorem Hf_add_left (x y z : EuclideanSpace ℂ ι) : Hf (x + y) z = Hf x z + Hf
 theorem Hf_add_right (x y z : EuclideanSpace ℂ ι) : Hf z (x + y) = Hf z x + Hf z y := by
   simp only [Hf, PiLp.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib]
 
-theorem Hf_neg_left (x z : EuclideanSpace ℂ ι) : Hf (-x) z = -Hf x z := by
+theorem Hf_neg_left (x z : EuclideanSpace ℂ ι) : Hf (-x) z = - Hf x z := by
   simp only [Hf, PiLp.neg_apply, neg_mul, Finset.sum_neg_distrib]
 
 theorem Hf_conj (x y : EuclideanSpace ℂ ι) : (starRingEnd ℂ) (Hf x y) = Hf y x := by
@@ -49,7 +49,8 @@ theorem ka_zero {Y : GT ι} {q : ℕ} (hC : Coc Y q) : Y.ka 0 = 1 := by
   have h := hC 0 (Submodule.zero_mem _) 0 (Submodule.zero_mem _)
   have hz : Hf (0 : EuclideanSpace ℂ ι) 0 = 0 := by simp [Hf]
   simp only [add_zero, hz, Complex.zero_im, mul_zero, neg_zero, Complex.ofReal_zero, zero_mul,
-    Complex.exp_zero, mul_one] at h
+      Complex.exp_zero, mul_one]
+    at h
   have hne : Y.ka 0 ≠ 0 := by
     intro h0
     have h1 := Y.ka_abs 0 (Submodule.zero_mem _)
@@ -57,9 +58,13 @@ theorem ka_zero {Y : GT ι} {q : ℕ} (hC : Coc Y q) : Y.ka 0 = 1 := by
     exact zero_ne_one h1
   exact mul_left_cancel₀ hne (h.symm.trans (mul_one _).symm)
 
-theorem paTh_add {Y : GT ι} {q : ℕ} (hC : Coc Y q) (F : EuclideanSpace ℂ ι → ℂ)
-    {γ : EuclideanSpace ℂ ι} (hγ : γ ∈ lat Y.b) (v : EuclideanSpace ℂ ι) :
-    paTh Y q F (v + γ) = Y.ka γ * cexp (q * Real.pi * Hf v γ + q * Real.pi * Hf γ γ / 2) * paTh Y q F v := by
+theorem paTh_add
+    {Y : GT ι} {q : ℕ} (hC : Coc Y q)
+    (F : EuclideanSpace ℂ ι → ℂ)
+    {γ : EuclideanSpace ℂ ι} (hγ : γ ∈ lat Y.b)
+    (v : EuclideanSpace ℂ ι)
+    : paTh Y q F (v + γ)
+      = Y.ka γ * cexp (q * Real.pi * Hf v γ + q * Real.pi * Hf γ γ / 2) * paTh Y q F v := by
   simp only [paTh]
   rw [← (Equiv.addLeft (⟨γ, hγ⟩ : lat Y.b)).tsum_eq, ← tsum_mul_left]
   refine tsum_congr fun δ => ?_
@@ -67,12 +72,13 @@ theorem paTh_add {Y : GT ι} {q : ℕ} (hC : Coc Y q) (F : EuclideanSpace ℂ ι
   rw [hC γ hγ δ δ.2]
   have hF : v + γ - (γ + (δ : EuclideanSpace ℂ ι)) = v - δ := by abel
   rw [hF]
-  have hexp : cexp (-(Real.pi * q * (Hf γ (δ : EuclideanSpace ℂ ι)).im) * I) *
-      cexp (q * Real.pi * Hf (v + γ) (γ + (δ : EuclideanSpace ℂ ι)) -
-        q * Real.pi * Hf (γ + (δ : EuclideanSpace ℂ ι)) (γ + (δ : EuclideanSpace ℂ ι)) / 2) =
-      cexp (q * Real.pi * Hf v γ + q * Real.pi * Hf γ γ / 2) *
-        cexp (q * Real.pi * Hf v (δ : EuclideanSpace ℂ ι) -
-          q * Real.pi * Hf (δ : EuclideanSpace ℂ ι) (δ : EuclideanSpace ℂ ι) / 2) := by
+  have hexp
+      : cexp (-(Real.pi * q * (Hf γ (δ : EuclideanSpace ℂ ι)).im) * I) * cexp
+          (q * Real.pi * Hf (v + γ) (γ + (δ : EuclideanSpace ℂ ι))
+            - q * Real.pi * Hf (γ + (δ : EuclideanSpace ℂ ι)) (γ + (δ : EuclideanSpace ℂ ι)) / 2)
+        = cexp (q * Real.pi * Hf v γ + q * Real.pi * Hf γ γ / 2) * cexp
+          (q * Real.pi * Hf v (δ : EuclideanSpace ℂ ι)
+            - q * Real.pi * Hf (δ : EuclideanSpace ℂ ι) (δ : EuclideanSpace ℂ ι) / 2) := by
     rw [← Complex.exp_add, ← Complex.exp_add]
     congr 1
     rw [Hf_add_left, Hf_add_right, Hf_add_right, Hf_add_left, Hf_add_right, Hf_add_right]

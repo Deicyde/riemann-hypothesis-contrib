@@ -10,12 +10,20 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TensO
 set_option autoImplicit false
 noncomputable section
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CechPic
 
 namespace GlobalTheory
 
-theorem IsAmpleLB.tens_of_isNef : GlobalTheory.Published.NefNumerics → ∀ (k : Type) [Field k] (X : Scheme.{0}) (f : X ⟶ Sp k), IsProjOver f → ∀ A N : LB X, GlobalTheory.IsAmpleLB A → (letI := GlobalTheory.algebraΓOfHom f; GlobalTheory.IsNef k N) → GlobalTheory.IsAmpleLB (GlobalTheory.CechPic.tens A N) := by
+theorem IsAmpleLB.tens_of_isNef
+    : GlobalTheory.Published.NefNumerics
+      → ∀ (k : Type) [Field k] (X : Scheme.{0}) (f : X ⟶ Sp k),
+        IsProjOver f
+          → ∀ A N : LB X,
+            GlobalTheory.IsAmpleLB A
+              → (letI := GlobalTheory.algebraΓOfHom f; GlobalTheory.IsNef k N)
+              → GlobalTheory.IsAmpleLB (GlobalTheory.CechPic.tens A N) := by
   intro h k _ X f hf A N hA hN
   letI := GlobalTheory.algebraΓOfHom f
   refine IsAmpleLB.tens_of_forall_isPsEff k X f hf A N hA hN.isLB fun Z hZ => ?_

@@ -19,13 +19,14 @@ def part (N i : ℤ) (a : Lau p) : Lau p where
   coeff r := if r % N = i then a.coeff r else 0
   isPWO_support' := a.isPWO_support.mono (fun r hr h => hr (by simp [h]))
 
-theorem part_coeff (N i : ℤ) (a : Lau p) (r : ℤ) :
-    (part N i a).coeff r = if r % N = i then a.coeff r else 0 := rfl
+theorem part_coeff (N i : ℤ) (a : Lau p) (r : ℤ)
+    : (part N i a).coeff r = if r % N = i then a.coeff r else 0 :=
+  rfl
 
 def contr (N : ℤ) (hN : 0 < N) (b : Lau p) : Lau p where
   coeff j := b.coeff (N * j)
   isPWO_support' := by
-    refine Set.IsWF.isPWO (BddBelow.wellFoundedOn_lt ⟨-|b.order|, fun j hj => ?_⟩)
+    refine Set.IsWF.isPWO (BddBelow.wellFoundedOn_lt ⟨- |b.order|, fun j hj => ?_⟩)
     have h : b.order ≤ N * j := HahnSeries.order_le_of_coeff_ne_zero hj
     have h1 := neg_abs_le b.order
     have h2 := abs_nonneg b.order
@@ -33,8 +34,8 @@ def contr (N : ℤ) (hN : 0 < N) (b : Lau p) : Lau p where
     push_neg at hc
     nlinarith
 
-theorem sum_ite {M : Type} [AddCommMonoid M] (N : ℕ) (hN : 0 < N) (r : ℤ) (f : ℕ → M) :
-    ∑ i : Fin N, (if r % (N : ℤ) = ((i : ℕ) : ℤ) then f i else 0) = f (r % (N : ℤ)).toNat := by
+theorem sum_ite {M : Type} [AddCommMonoid M] (N : ℕ) (hN : 0 < N) (r : ℤ) (f : ℕ → M)
+    : ∑ i : Fin N, (if r % (N : ℤ) = ((i : ℕ) : ℤ) then f i else 0) = f (r % (N : ℤ)).toNat := by
   have hN' : (0 : ℤ) < N := by exact_mod_cast hN
   have h0 := Int.emod_nonneg r hN'.ne'
   have h1 := Int.emod_lt_of_pos r hN'

@@ -13,20 +13,23 @@ open Topology Filter Metric Complex Real
 
 noncomputable section
 
-theorem CircleArgumentPrinciple.differentiable_prod_sub (Z : Multiset ℂ) :
-    Differentiable ℂ fun s : ℂ => (Z.map fun a => s - a).prod := by
+theorem CircleArgumentPrinciple.differentiable_prod_sub (Z : Multiset ℂ)
+    : Differentiable ℂ fun s : ℂ => (Z.map fun a => s - a).prod := by
   induction Z using Multiset.induction_on with
   | empty => simp
   | cons a Z ih =>
     simp only [Multiset.map_cons, Multiset.prod_cons]
     exact (differentiable_id.sub_const a).mul ih
 
-theorem CircleArgumentPrinciple.integral_prod_mul {O : Set ℂ} {c : ℂ} {r : ℝ} (hr : 0 < r) (hO : IsOpen O)
-    (hball : closedBall c r ⊆ O) {u φ : ℂ → ℂ} (hu : DifferentiableOn ℂ u O)
-    (hu0 : ∀ s ∈ closedBall c r, u s ≠ 0) (hφ : DifferentiableOn ℂ φ O) (Z : Multiset ℂ)
-    (hZ : ∀ a ∈ Z, a ∈ ball c r) :
-    (2 * π * I)⁻¹ * (∮ s in C(c, r), φ s * deriv (fun s => (Z.map fun a => s - a).prod * u s) s /
-      ((Z.map fun a => s - a).prod * u s)) = (Z.map φ).sum := by
+theorem CircleArgumentPrinciple.integral_prod_mul
+    {O : Set ℂ} {c : ℂ} {r : ℝ} (hr : 0 < r) (hO : IsOpen O) (hball : closedBall c r ⊆ O)
+    {u φ : ℂ → ℂ} (hu : DifferentiableOn ℂ u O) (hu0 : ∀ s ∈ closedBall c r, u s ≠ 0)
+    (hφ : DifferentiableOn ℂ φ O)
+    (Z : Multiset ℂ) (hZ : ∀ a ∈ Z, a ∈ ball c r)
+    : (2 * π * I)⁻¹
+        * (∮ s in C(c, r), φ s * deriv (fun s => (Z.map fun a => s - a).prod * u s) s /
+            ((Z.map fun a => s - a).prod * u s))
+      = (Z.map φ).sum := by
   induction Z using Multiset.induction_on with
   | empty =>
     simp only [Multiset.map_zero, Multiset.prod_zero, one_mul, Multiset.sum_zero]
@@ -36,8 +39,9 @@ theorem CircleArgumentPrinciple.integral_prod_mul {O : Set ℂ} {c : ℂ} {r : �
       exact ((hφ.differentiableAt hzO).mul ((hu.deriv hO).differentiableAt hzO)).div
         (hu.differentiableAt hzO) (hu0 z hz)
     rw [circleIntegral_eq_zero_of_differentiable_on_off_countable hr.le Set.countable_empty
-      (fun z hz => (hd z hz).continuousAt.continuousWithinAt)
-      (fun z hz => hd z (ball_subset_closedBall hz.1)), mul_zero]
+        (fun z hz => (hd z hz).continuousAt.continuousWithinAt)
+        (fun z hz => hd z (ball_subset_closedBall hz.1)),
+      mul_zero]
   | cons a Z ih =>
     have hZ' : ∀ b ∈ Z, b ∈ ball c r := fun b hb => hZ b (Multiset.mem_cons_of_mem hb)
     have ha : a ∈ ball c r := hZ a (Multiset.mem_cons_self a Z)
@@ -58,12 +62,15 @@ theorem CircleArgumentPrinciple.integral_prod_mul {O : Set ℂ} {c : ℂ} {r : �
       simp only [Multiset.mem_map, not_exists, not_and]
       exact fun b hb h0 => hne s hs b (Multiset.mem_cons_of_mem hb) h0
     have hsplit : Set.EqOn
-        (fun s => φ s * deriv (fun s => ((a ::ₘ Z).map fun b => s - b).prod * u s) s /
-          (((a ::ₘ Z).map fun b => s - b).prod * u s))
-        (fun s => (s - a)⁻¹ • φ s + φ s * deriv F s / F s) (sphere c r) := by
+        (fun s =>
+          φ s * deriv (fun s => ((a ::ₘ Z).map fun b => s - b).prod * u s) s
+            / (((a ::ₘ Z).map fun b => s - b).prod * u s))
+        (fun s => (s - a)⁻¹ • φ s + φ s * deriv F s / F s)
+        (sphere c r) := by
       intro s hs
       have hsO : O ∈ 𝓝 s := hO.mem_nhds (hball (sphere_subset_closedBall hs))
-      have hfun : (fun s => ((a ::ₘ Z).map fun b => s - b).prod * u s) = fun s => (s - a) * F s := by
+      have hfun
+          : (fun s => ((a ::ₘ Z).map fun b => s - b).prod * u s) = fun s => (s - a) * F s := by
         funext w
         simp only [Multiset.map_cons, Multiset.prod_cons, hFdef, mul_assoc]
       have hval : ((a ::ₘ Z).map fun b => s - b).prod * u s = (s - a) * F s := by
@@ -92,30 +99,33 @@ theorem CircleArgumentPrinciple.integral_prod_mul {O : Set ℂ} {c : ℂ} {r : �
       two_pi_I_inv_smul_circleIntegral_sub_inv_smul_of_differentiable_on_off_countable
         Set.countable_empty ha (hφ.continuousOn.mono hball)
         (fun z hz => hφ.differentiableAt (hO.mem_nhds (hball (ball_subset_closedBall hz.1))))
-    rw [circleIntegral.integral_congr hr.le hsplit, circleIntegral.integral_add hint1 hint2, mul_add,
-      ← smul_eq_mul, hcauchy, ih hZ', Multiset.map_cons, Multiset.sum_cons]
+    rw [circleIntegral.integral_congr hr.le hsplit, circleIntegral.integral_add hint1 hint2,
+      mul_add, ← smul_eq_mul, hcauchy, ih hZ', Multiset.map_cons, Multiset.sum_cons]
 
-theorem CircleArgumentPrinciple.factorisation {h : ℂ → ℂ} {O : Set ℂ} {c : ℂ} {r : ℝ} (hr : 0 < r)
-    (hO : IsOpen O) (hball : closedBall c r ⊆ O) (hh : DifferentiableOn ℂ h O)
-    (hsph : ∀ s ∈ sphere c r, h s ≠ 0) :
-    ∃ (Z : Multiset ℂ) (u : ℂ → ℂ),
-      (∀ a ∈ Z, a ∈ ball c r) ∧ DifferentiableOn ℂ u O ∧ (∀ s ∈ closedBall c r, u s ≠ 0) ∧
-      (∀ s ∈ O, h s = (Z.map fun a => s - a).prod * u s) := by
+theorem CircleArgumentPrinciple.factorisation
+    {h : ℂ → ℂ} {O : Set ℂ} {c : ℂ} {r : ℝ} (hr : 0 < r) (hO : IsOpen O)
+    (hball : closedBall c r ⊆ O) (hh : DifferentiableOn ℂ h O) (hsph : ∀ s ∈ sphere c r, h s ≠ 0)
+    : ∃ (Z : Multiset ℂ) (u : ℂ → ℂ),
+      (∀ a ∈ Z, a ∈ ball c r) ∧ DifferentiableOn ℂ u O ∧ (∀ s ∈ closedBall c r, u s ≠ 0)
+        ∧ (∀ s ∈ O, h s = (Z.map fun a => s - a).prod * u s) := by
   have han : AnalyticOnNhd ℂ h O := hh.analyticOnNhd hO
 
   have hord : ∀ z ∈ closedBall c r, analyticOrderAt h z ≠ ⊤ := by
     intro z hz htop
-    have h0 := (han.mono hball).eqOn_zero_of_preconnected_of_eventuallyEq_zero
-      (convex_closedBall c r).isPreconnected hz (analyticOrderAt_eq_top.1 htop)
+    have h0 :=
+      (han.mono hball).eqOn_zero_of_preconnected_of_eventuallyEq_zero
+        (convex_closedBall c r).isPreconnected hz (analyticOrderAt_eq_top.1 htop)
     have hs : c + (r : ℂ) ∈ sphere c r := by
-      rw [mem_sphere, dist_eq_norm, add_sub_cancel_left, Complex.norm_real, Real.norm_of_nonneg hr.le]
+      rw [mem_sphere, dist_eq_norm, add_sub_cancel_left, Complex.norm_real,
+        Real.norm_of_nonneg hr.le]
     exact hsph _ hs (h0 (sphere_subset_closedBall hs))
 
   set S0 : Set ℂ := {z | z ∈ closedBall c r ∧ h z = 0} with hS0def
   have hS0fin : S0.Finite := by
     apply IsCompact.finite
     · refine (isCompact_closedBall c r).of_isClosed_subset ?_ (fun z hz => hz.1)
-      exact (hh.continuousOn.mono hball).preimage_isClosed_of_isClosed isClosed_closedBall isClosed_singleton
+      exact (hh.continuousOn.mono hball).preimage_isClosed_of_isClosed isClosed_closedBall
+        isClosed_singleton
     · rw [isDiscrete_iff_nhdsNE]
       intro z hz
       rcases (han z (hball hz.1)).eventually_eq_zero_or_eventually_ne_zero with h1 | h1
@@ -143,8 +153,8 @@ theorem CircleArgumentPrinciple.factorisation {h : ℂ → ℂ} {O : Set ℂ} {c
     induction S using Finset.induction_on with
     | empty => simp
     | insert b T hb ih =>
-      rw [Finset.sum_insert hb, Finset.prod_insert hb, Multiset.map_add (f := _), Multiset.prod_add, ih,
-        Multiset.map_replicate, Multiset.prod_replicate]
+      rw [Finset.sum_insert hb, Finset.prod_insert hb, Multiset.map_add (f := _), Multiset.prod_add,
+        ih, Multiset.map_replicate, Multiset.prod_replicate]
   have hPdiff : Differentiable ℂ P := by
     simp only [hPdef]
     fun_prop
@@ -158,8 +168,9 @@ theorem CircleArgumentPrinciple.factorisation {h : ℂ → ℂ} {O : Set ℂ} {c
     · intro hs
       exact ⟨s, hs, by rw [sub_self]; exact zero_pow (hmpos s hs)⟩
 
-  have hloc : ∀ a ∈ S, ∃ G : ℂ → ℂ, AnalyticAt ℂ G a ∧ G a ≠ 0 ∧
-      ∀ᶠ w in 𝓝[≠] a, P w ≠ 0 ∧ h w / P w = G w := by
+  have hloc
+      : ∀ a ∈ S, ∃ G : ℂ → ℂ,
+        AnalyticAt ℂ G a ∧ G a ≠ 0 ∧ ∀ᶠ w in 𝓝[≠] a, P w ≠ 0 ∧ h w / P w = G w := by
     intro a ha
     obtain ⟨g, hg, hga, hev⟩ :=
       (han a (hball ((hmemS a).1 ha).1)).analyticOrderAt_eq_natCast.1 (hmcast a ha)
@@ -200,23 +211,20 @@ theorem CircleArgumentPrinciple.factorisation {h : ℂ → ℂ} {O : Set ℂ} {c
     filter_upwards [(hPdiff s).continuousAt.eventually_ne hs] with w hw
     simp only [hudef, hw, if_false]
   refine ⟨Z, u, ?_, ?_, ?_, ?_⟩
-  ·
-    intro a haZ
+  · intro a haZ
     obtain ⟨b, hb, hab⟩ := Multiset.mem_sum.1 haZ
     rw [Multiset.eq_of_mem_replicate hab]
     obtain ⟨hbc, hb0⟩ := (hmemS b).1 hb
     rw [mem_ball]
     refine lt_of_le_of_ne (mem_closedBall.1 hbc) fun hbr => hsph b ?_ hb0
     exact mem_sphere.2 hbr
-  ·
-    intro s hs
+  · intro s hs
     by_cases hPs : P s = 0
     · obtain ⟨G, hG, -, hEq⟩ := hu_near s ((hP0 s).1 hPs)
       exact (hG.differentiableAt.congr_of_eventuallyEq hEq).differentiableWithinAt
     · exact (((hh.differentiableAt (hO.mem_nhds hs)).div (hPdiff s) hPs).congr_of_eventuallyEq
         (hu_off s hPs)).differentiableWithinAt
-  ·
-    intro s hs
+  · intro s hs
     by_cases hPs : P s = 0
     · obtain ⟨G, -, hGs, hEq⟩ := hu_near s ((hP0 s).1 hPs)
       rw [hEq.eq_of_nhds]
@@ -224,8 +232,7 @@ theorem CircleArgumentPrinciple.factorisation {h : ℂ → ℂ} {O : Set ℂ} {c
     · have hhs : h s ≠ 0 := fun h0 => hPs ((hP0 s).2 ((hmemS s).2 ⟨hs, h0⟩))
       simp only [hudef, hPs, if_false]
       exact div_ne_zero hhs hPs
-  ·
-    intro s hs
+  · intro s hs
     rw [hPZ]
     by_cases hPs : P s = 0
     · rw [hPs, zero_mul]

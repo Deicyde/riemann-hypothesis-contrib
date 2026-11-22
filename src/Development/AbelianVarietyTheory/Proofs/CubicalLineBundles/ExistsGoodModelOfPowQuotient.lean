@@ -19,8 +19,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.Locally
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Serre
 open scoped CategoryTheory.Obj UpperHalfPlane TensorProduct
 
@@ -28,9 +30,15 @@ namespace GlobalTheory.PowQuotient
 
 variable {S S' : Scheme.{0}}
 
-theorem isMonHom_prod {G H : Over S} [GrpObj G] [GrpObj H] [IsCommMonObj H] {n : ℕ} (a : Fin n → (G ⟶ H))
-    (ha : ∀ i, IsMonHom (a i)) : IsMonHom (∏ i, a i) :=
-  Finset.prod_induction a (fun z => IsMonHom z) (fun x y _ _ => isMonHom_mul x y) isMonHom_one fun i _ => ha i
+theorem isMonHom_prod
+    {G H : Over S} [GrpObj G] [GrpObj H] [IsCommMonObj H]
+    {n : ℕ} (a : Fin n → (G ⟶ H)) (ha : ∀ i, IsMonHom (a i))
+    : IsMonHom (∏ i, a i) :=
+  Finset.prod_induction a
+    (fun z => IsMonHom z)
+    (fun x y _ _ => isMonHom_mul x y)
+    isMonHom_one
+    fun i _ => ha i
 
 end GlobalTheory.PowQuotient
 

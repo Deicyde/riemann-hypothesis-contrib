@@ -15,13 +15,17 @@ noncomputable section
 
 namespace Formalism.DivisionValues
 
-theorem dual_lattice_measure :
-    ∀ (K : Type) [Field K] [NumberField K] [StarRing K]
-      [_root_.NumberField.IsTotallyComplex K] (D : ℕ), 0 < D →
-      ∀ X : InfinitePlace K → Matrix (Fin D) (Fin D) ℂ, (∀ v, IsUnit (X v).det) →
-      ∀ R : Submodule (𝓞 K) (Fin D → K), Submodule.IsFullLattice K R →
-        Formalism.HN.muDef (Pi.basisFun K (Fin D)).dualBasis
-          (Formalism.HN.dualFrame X) (Formalism.HN.dualLat R) = lcv X R / D := by
+theorem dual_lattice_measure
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
+        (D : ℕ),
+      0 < D
+        → ∀ X : InfinitePlace K → Matrix (Fin D) (Fin D) ℂ,
+          (∀ v, IsUnit (X v).det)
+            → ∀ R : Submodule (𝓞 K) (Fin D → K),
+              Submodule.IsFullLattice K R
+                → Formalism.HN.muDef (Pi.basisFun K (Fin D)).dualBasis (Formalism.HN.dualFrame X)
+                    (Formalism.HN.dualLat R)
+                  = lcv X R / D := by
   intro K _ _ _ _ D hD X hX R hR
   have hFG : R.FG := hR.toIsLattice.fg
   have hsp : Submodule.span K (R : Set (Fin D → K)) = ⊤ := by
@@ -40,9 +44,13 @@ theorem dual_lattice_measure :
     have hmem : (Pi.basisFun K (Fin D)).dualBasis ⟨0, hD⟩ ∈ (⊤ : Submodule K _) := Submodule.mem_top
     rw [← hdsp, Submodule.mem_bot] at hmem
     exact (Pi.basisFun K (Fin D)).dualBasis.ne_zero _ hmem
-  have hmu := (Formalism.HN.size_maximal_slope K (Module.Dual K (Fin D → K)) (Fin D) (Pi.basisFun K (Fin D)).dualBasis
-    (Formalism.HN.dualFrame X) hdX (Formalism.HN.dualLat R) hdFG hne).2.1
-  have hht := (Formalism.HN.place_lattice_structure K (Fin D → K) (Fin D) (Pi.basisFun K (Fin D)) X hX R hFG).2.2
+  have hmu :=
+    (Formalism.HN.size_maximal_slope K (Module.Dual K (Fin D → K)) (Fin D)
+      (Pi.basisFun K (Fin D)).dualBasis (Formalism.HN.dualFrame X) hdX (Formalism.HN.dualLat R) hdFG
+      hne).2.1
+  have hht :=
+    (Formalism.HN.place_lattice_structure K (Fin D → K) (Fin D) (Pi.basisFun K (Fin D)) X hX R
+      hFG).2.2
   have hrk : Formalism.HN.rkK R = D := by
     unfold Formalism.HN.rkK
     erw [hsp]

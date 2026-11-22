@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNatMul
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.SWQ
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.SWQ
 open scoped TensorProduct NNReal ENNReal
 
 noncomputable section
@@ -16,10 +17,11 @@ variable {F : Type} [Field F] [NumberField F] {N : ℕ}
 
 theorem re_add (x y : Ainf F) (w : InfinitePlace F) : re (x + y) w = re x w + re y w := by
   show (InfinitePlace.Completion.extensionEmbedding w (x w + y w)).re = _
-  rw [map_add (f := _), Complex.add_re]; rfl
+  rw [map_add (f := _), Complex.add_re]
+  rfl
 
-theorem abs_re_algebraMap (hF : IsTotallyReal F) (x : F) (w : InfinitePlace F) :
-    |re (algebraMap F (Ainf F) x) w| = w x := by
+theorem abs_re_algebraMap (hF : IsTotallyReal F) (x : F) (w : InfinitePlace F)
+    : |re (algebraMap F (Ainf F) x) w| = w x := by
   unfold re
   have hw : w.IsReal := hF.isReal w
   rw [InfiniteAdeleRing.algebraMap_apply]
@@ -38,8 +40,7 @@ theorem sz_sub_le (u y : Fin N → AF F) : sz u - sz y ≤ sz (u + y) := by
   refine Finset.sum_le_sum fun l _ => ?_
   rw [← Finset.sum_sub_distrib]
   refine Finset.sum_le_sum fun w _ => ?_
-  have h : re (inf (u + y) l) w = re (inf u l) w + re (inf y l) w := by
-    rw [← re_add]; congr 1
+  have h : re (inf (u + y) l) w = re (inf u l) w + re (inf y l) w := by rw [← re_add]; congr 1
   rw [h]
   have := abs_sub_abs_le_abs_sub (re (inf u l) w) (-(re (inf y l) w))
   simpa [abs_neg, sub_neg_eq_add] using this
@@ -51,8 +52,9 @@ theorem continuous_sz : Continuous (sz : (Fin N → AF F) → ℝ) := by
     show Continuous fun u : Fin N → AF F => (u l).1
     exact continuous_fst.comp (continuous_apply l)
   have h2 : Continuous fun x : Ainf F => re x w :=
-    Complex.continuous_re.comp ((InfinitePlace.Completion.isometry_extensionEmbedding w).continuous.comp
-      (continuous_apply w))
+    Complex.continuous_re.comp
+      ((InfinitePlace.Completion.isometry_extensionEmbedding w).continuous.comp
+        (continuous_apply w))
   exact continuous_abs.comp (h2.comp h1)
 
 theorem continuous_fin : Continuous (fin : (Fin N → AF F) → Fin N → Af F) := by
@@ -69,31 +71,40 @@ theorem inf_rat (ξ : Fin N → F) (l : Fin N) : inf (rat ξ) l = algebraMap F (
 theorem fin_rat (ξ : Fin N → F) (l : Fin N) : fin (rat ξ) l = algebraMap F (Af F) (ξ l) := by
   simp [fin, rat]
 
-theorem norm_le_sz (hF : IsTotallyReal F) (ξ : Fin N → F) :
-    ‖(fun l => mixedEmbedding F (ξ l))‖ ≤ sz (rat ξ) := by
+theorem norm_le_sz (hF : IsTotallyReal F) (ξ : Fin N → F)
+    : ‖(fun l => mixedEmbedding F (ξ l))‖ ≤ sz (rat ξ) := by
   refine (pi_norm_le_iff_of_nonneg (sz_nonneg _)).2 fun l => ?_
   classical
   rw [mixedEmbedding.norm_eq_sup'_normAtPlace]
   refine Finset.sup'_le _ _ fun w _ => ?_
   rw [mixedEmbedding.normAtPlace_apply]
   unfold sz
-  calc w (ξ l) = |re (inf (rat ξ) l) w| := by rw [inf_rat, abs_re_algebraMap hF]
+  calc
+    w (ξ l)
+      = |re (inf (rat ξ) l) w| := by rw [inf_rat, abs_re_algebraMap hF]
     _ ≤ ∑ w', |re (inf (rat ξ) l) w'| :=
-        Finset.single_le_sum (f := fun w' => |re (inf (rat ξ) l) w'|) (fun _ _ => abs_nonneg _)
-          (Finset.mem_univ w)
-    _ ≤ _ := Finset.single_le_sum (f := fun l' => ∑ w', |re (inf (rat ξ) l') w'|)
-          (fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _) (Finset.mem_univ l)
+      Finset.single_le_sum
+        (f := fun w' => |re (inf (rat ξ) l) w'|)
+        (fun _ _ => abs_nonneg _)
+        (Finset.mem_univ w)
+    _ ≤ _ :=
+      Finset.single_le_sum
+        (f := fun l' => ∑ w', |re (inf (rat ξ) l') w'|)
+        (fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _)
+        (Finset.mem_univ l)
 
-theorem finrank_le_of_discrete {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    (L : Submodule ℤ E) [DiscreteTopology L] : Module.finrank ℤ L ≤ Module.finrank ℝ E := by
+theorem finrank_le_of_discrete
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+    (L : Submodule ℤ E) [DiscreteTopology L]
+    : Module.finrank ℤ L ≤ Module.finrank ℝ E := by
   let E' := Submodule.span ℝ (L : Set E)
   let L' : Submodule ℤ E' := ZLattice.comap ℝ L E'.subtype
   haveI : DiscreteTopology L' :=
     ZLattice.comap_discreteTopology _ _ (by fun_prop) Subtype.val_injective
   haveI : IsZLattice ℝ L' :=
     ⟨Submodule.map_injective_of_injective E'.subtype_injective (by simp [E', L'])⟩
-  let e : L' ≃ₗ[ℤ] L := Submodule.comapSubtypeEquivOfLe (p := L) (q := E'.restrictScalars ℤ)
-    Submodule.subset_span
+  let e : L' ≃ₗ[ℤ] L :=
+    Submodule.comapSubtypeEquivOfLe (p := L) (q := E'.restrictScalars ℤ) Submodule.subset_span
   rw [← e.finrank_eq, ZLattice.rank ℝ L']
   exact Submodule.finrank_le E'
 
@@ -102,10 +113,16 @@ end GlobalTheory.SumMaj
 namespace GlobalTheory.SumMaj
 open scoped Classical
 
-theorem summable_majorant : ∀ (F : Type) [Field F] [NumberField F] (N : ℕ), IsTotallyReal F →
-    ∀ K : Set (Fin N → Af F), IsCompact K → ∃ k : ℕ, ∀ ω : Set (Fin N → AF F), IsCompact ω →
-      ∃ c : (Fin N → F) → ℝ, Summable c ∧ (∀ ξ, 0 ≤ c ξ) ∧
-        ∀ ξ, ∀ y ∈ ω, fin (rat ξ + y) ∈ K → 1 ≤ c ξ * (1 + sz (rat ξ + y)) ^ k := by
+theorem summable_majorant
+    : ∀ (F : Type) [Field F] [NumberField F] (N : ℕ),
+      IsTotallyReal F
+        → ∀ K : Set (Fin N → Af F),
+          IsCompact K
+            → ∃ k : ℕ, ∀ ω : Set (Fin N → AF F),
+              IsCompact ω
+                → ∃ c : (Fin N → F) → ℝ,
+                  Summable c ∧ (∀ ξ, 0 ≤ c ξ)
+                    ∧ ∀ ξ, ∀ y ∈ ω, fin (rat ξ + y) ∈ K → 1 ≤ c ξ * (1 + sz (rat ξ + y)) ^ k := by
   intro F _ _ N hF K hK
   refine ⟨Module.finrank ℝ (Fin N → mixedEmbedding.mixedSpace F) + 1, fun ω hω => ?_⟩
   set k := Module.finrank ℝ (Fin N → mixedEmbedding.mixedSpace F) + 1 with hk
@@ -121,15 +138,18 @@ theorem summable_majorant : ∀ (F : Type) [Field F] [NumberField F] (N : ℕ), 
   set S : Set (Fin N → F) := {ξ | fin (rat ξ) ∈ K'} with hS
   set c : (Fin N → F) → ℝ := S.indicator fun ξ => (1 + B0) ^ k / (1 + sz (rat ξ)) ^ k with hc
   have hc0 : ∀ ξ, 0 ≤ c ξ := fun ξ =>
-    Set.indicator_nonneg (fun ξ _ => div_nonneg (pow_nonneg (by linarith) _)
-      (pow_nonneg (by linarith [sz_nonneg (rat ξ)]) _)) ξ
+    Set.indicator_nonneg
+      (fun ξ _ =>
+        div_nonneg (pow_nonneg (by linarith) _) (pow_nonneg (by linarith [sz_nonneg (rat ξ)]) _))
+      ξ
   refine ⟨c, ?_, hc0, fun ξ y hy hξ => ?_⟩
   · haveI := GlobalTheory.WeilM.discreteTopology_denomLattice F (Fin N) hM0
     set L := GlobalTheory.WeilM.denomLattice F (Fin N) M with hL
     have memL : ∀ ξ ∈ S, (fun i => mixedEmbedding F (ξ i)) ∈ L := by
       intro ξ hξ i
-      obtain ⟨y, hy⟩ := (GlobalTheory.IntegralFinAdele.integral_finiteAdele_properties F).2.2.2.1 ((M : F) * ξ i)
-        fun v => by
+      obtain ⟨y, hy⟩ :=
+        (GlobalTheory.IntegralFinAdele.integral_finiteAdele_properties
+            F).2.2.2.1 ((M : F) * ξ i) fun v => by
           rw [map_mul, map_natCast]
           have := hM _ hξ i v
           rwa [fin_rat] at this
@@ -138,8 +158,8 @@ theorem summable_majorant : ∀ (F : Type) [Field F] [NumberField F] (N : ℕ), 
       rw [← nsmul_eq_mul, map_nsmul, ← Nat.cast_smul_eq_nsmul ℝ] at h2
       exact h2.symm
     let j : S → L := fun ξ => ⟨_, memL ξ.1 ξ.2⟩
-    have hj : Function.Injective j := fun a b h => Subtype.ext (funext fun i =>
-      mixedEmbedding_injective F (congrFun (congrArg Subtype.val h) i))
+    have hj : Function.Injective j := fun a b h =>
+      Subtype.ext (funext fun i => mixedEmbedding_injective F (congrFun (congrArg Subtype.val h) i))
     have hkL : Module.finrank ℤ L < k := Nat.lt_succ_of_le (finrank_le_of_discrete L)
     have hg : Summable fun z : L => ((1 + ‖z‖) ^ k)⁻¹ := by
       refine Summable.of_norm_bounded_eventually (ZLattice.summable_norm_pow_inv L k hkL) ?_
@@ -154,7 +174,10 @@ theorem summable_majorant : ∀ (F : Type) [Field F] [NumberField F] (N : ℕ), 
     · intro ξ hξ
       have : ξ ∉ S := fun h => hξ ⟨⟨ξ, h⟩, rfl⟩
       exact Set.indicator_of_notMem this _
-    · refine Summable.of_nonneg_of_le (fun ξ => hc0 _) (fun ξ => ?_) ((hg.comp_injective hj).mul_left ((1 + B0) ^ k))
+    · refine Summable.of_nonneg_of_le
+        (fun ξ => hc0 _)
+        (fun ξ => ?_)
+        ((hg.comp_injective hj).mul_left ((1 + B0) ^ k))
       show c ξ.1 ≤ (1 + B0) ^ k * ((1 + ‖j ξ‖) ^ k)⁻¹
       rw [hc, Set.indicator_of_mem ξ.2, div_eq_mul_inv]
       refine mul_le_mul_of_nonneg_left ?_ (pow_nonneg (by linarith) _)

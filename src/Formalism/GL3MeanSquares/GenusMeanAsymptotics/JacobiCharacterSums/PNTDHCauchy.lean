@@ -95,7 +95,8 @@ theorem deuring_heilbronn_cauchy : DHCauchy := by
   have hnz : ∀ z ∈ Metric.ball z₀ (r / 6) \ (Z : Set ℂ), f z ≠ 0 := fun z hz h0 =>
     hz.2 (Finset.mem_coe.2 ((hZ z).2
       ⟨Metric.closedBall_subset_closedBall (by linarith) (Metric.ball_subset_closedBall hz.1), h0⟩))
-  have hGd : DifferentiableOn ℂ (fun z => deriv f z / f z - ∑ ρ ∈ Z, (m ρ : ℂ) / (z - ρ))
+  have hGd : DifferentiableOn ℂ
+      (fun z => deriv f z / f z - ∑ ρ ∈ Z, (m ρ : ℂ) / (z - ρ))
       (Metric.ball z₀ (r / 6) \ (Z : Set ℂ)) := by
     intro z hz
     have h1 := hfan z hz.1
@@ -104,16 +105,18 @@ theorem deuring_heilbronn_cauchy : DHCauchy := by
     refine DifferentiableAt.fun_sum (fun ρ hρ => ?_)
     exact (differentiableAt_const _).div (differentiableAt_id.sub_const ρ)
       (sub_ne_zero.2 (fun h => hz.2 (h ▸ Finset.mem_coe.2 hρ)))
-  obtain ⟨H, hHd, hHe, hHb⟩ := dhc_removable Z _ _ (72 * Real.log B / r) Metric.isOpen_ball hGd
-    (fun z hz => hbd z (Metric.ball_subset_closedBall hz.1) (hnz z hz))
+  obtain ⟨H, hHd, hHe, hHb⟩ :=
+    dhc_removable Z _ _ (72 * Real.log B / r) Metric.isOpen_ball hGd
+      (fun z hz => hbd z (Metric.ball_subset_closedBall hz.1) (hnz z hz))
   intro k s hs hfs
   have hsZ : s ∉ (Z : Set ℂ) := fun h => hfs ((hZ s).1 (Finset.mem_coe.1 h)).2
   have hsU : s ∈ Metric.ball z₀ (r / 6) := by
     rw [Metric.mem_closedBall] at hs
     rw [Metric.mem_ball]
     linarith
-  have hev : (fun z => -(deriv f z / f z)) =ᶠ[𝓝 s]
-      fun z => -(∑ ρ ∈ Z, (m ρ : ℂ) / (z - ρ)) - H z := by
+  have hev
+      : (fun z => -(deriv f z / f z)) =ᶠ[𝓝 s]
+        fun z => -(∑ ρ ∈ Z, (m ρ : ℂ) / (z - ρ)) - H z := by
     have hn : Metric.ball z₀ (r / 6) \ (Z : Set ℂ) ∈ 𝓝 s :=
       (Metric.isOpen_ball.sdiff Z.finite_toSet.isClosed).mem_nhds ⟨hsU, hsZ⟩
     filter_upwards [hn] with z hz
@@ -128,15 +131,18 @@ theorem deuring_heilbronn_cauchy : DHCauchy := by
     exact dhc_cauchy H z₀ s (r / 12) _ (by positivity) (h2 ▸ hHd) (h2 ▸ hHb) hs k
   have hfac : (k.factorial : ℂ) ≠ 0 := by exact_mod_cast k.factorial_ne_zero
   have hpm : ((-1 : ℂ) ^ k * (-1) ^ k) = 1 := by rw [← mul_pow]; simp
-  rw [hev.iteratedDeriv_eq k, iteratedDeriv_fun_sub (ContDiffAt.neg (ContDiffAt.sum hcd)) hHan.contDiffAt,
+  rw [hev.iteratedDeriv_eq k,
+    iteratedDeriv_fun_sub (ContDiffAt.neg (ContDiffAt.sum hcd)) hHan.contDiffAt,
     iteratedDeriv_fun_neg, iteratedDeriv_fun_sum hcd]
   simp_rw [dhc_iter]
-  have he : (-1 : ℂ) ^ k / (k.factorial : ℂ) *
-        (-∑ ρ ∈ Z, (m ρ : ℂ) * ((-1) ^ k * (k.factorial : ℂ)) * ((s - ρ) ^ (k + 1))⁻¹ -
-          iteratedDeriv k H s) + ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ) ^ (k + 1) =
-      -((-1 : ℂ) ^ k / (k.factorial : ℂ) * iteratedDeriv k H s) := by
-    have : ∑ ρ ∈ Z, (m ρ : ℂ) * ((-1) ^ k * (k.factorial : ℂ)) * ((s - ρ) ^ (k + 1))⁻¹ =
-        ((-1) ^ k * (k.factorial : ℂ)) * ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ) ^ (k + 1) := by
+  have he
+      : (-1 : ℂ) ^ k / (k.factorial : ℂ)
+            * (- ∑ ρ ∈ Z, (m ρ : ℂ) * ((-1) ^ k * (k.factorial : ℂ)) * ((s - ρ) ^ (k + 1))⁻¹
+              - iteratedDeriv k H s)
+          + ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ) ^ (k + 1)
+        = -((-1 : ℂ) ^ k / (k.factorial : ℂ) * iteratedDeriv k H s) := by
+    have : ∑ ρ ∈ Z, (m ρ : ℂ) * ((-1) ^ k * (k.factorial : ℂ)) * ((s - ρ) ^ (k + 1))⁻¹
+        = ((-1) ^ k * (k.factorial : ℂ)) * ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ) ^ (k + 1) := by
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl (fun ρ _ => ?_)
       rw [div_eq_mul_inv]
@@ -147,7 +153,8 @@ theorem deuring_heilbronn_cauchy : DHCauchy := by
     linear_combination (-(k.factorial : ℂ) * S) * hpm
   rw [he, norm_neg, norm_mul, norm_div, norm_pow, norm_neg, norm_one, one_pow, Complex.norm_natCast]
   have hfr : (0 : ℝ) < k.factorial := by exact_mod_cast k.factorial_pos
-  calc 1 / (k.factorial : ℝ) * ‖iteratedDeriv k H s‖
+  calc
+    1 / (k.factorial : ℝ) * ‖iteratedDeriv k H s‖
       ≤ 1 / (k.factorial : ℝ) * (k.factorial * (72 * Real.log B / r) / (r / 12) ^ k) := by gcongr
     _ = 72 * Real.log B / r * (12 / r) ^ k := by
       rw [div_pow, div_pow]

@@ -15,13 +15,21 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsS
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-theorem zh_of_semistableReduction : GlobalTheory.Published.SemistableReductionSt → GlobalTheory.ZH.ZHSt :=
-  fun S => GlobalTheory.T.exists_semiAbelianModel_of_geometricHalf S GlobalTheory.T.uniformisationExistence_and_torsion_statements.1 GlobalTheory.T.all_six_abelian_scheme_laws_hold.1 GlobalTheory.T.all_six_abelian_scheme_laws_hold.2.1 GlobalTheory.T.uniformisationExistence_and_torsion_statements.2 (GlobalTheory.T.zarhinGeometric_of_semistableReduction S)
+theorem zh_of_semistableReduction
+    : GlobalTheory.Published.SemistableReductionSt → GlobalTheory.ZH.ZHSt := fun S =>
+  GlobalTheory.T.exists_semiAbelianModel_of_geometricHalf S
+    GlobalTheory.T.uniformisationExistence_and_torsion_statements.1
+    GlobalTheory.T.all_six_abelian_scheme_laws_hold.1
+    GlobalTheory.T.all_six_abelian_scheme_laws_hold.2.1
+    GlobalTheory.T.uniformisationExistence_and_torsion_statements.2
+    (GlobalTheory.T.zarhinGeometric_of_semistableReduction S)
 
 end GlobalTheory

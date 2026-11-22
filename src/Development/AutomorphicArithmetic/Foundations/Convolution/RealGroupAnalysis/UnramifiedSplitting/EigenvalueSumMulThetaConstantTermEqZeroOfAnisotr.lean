@@ -13,14 +13,17 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.V.Af.Smo (Eig EigAt)
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
 open scoped Classical
 
-private theorem memK {K : Type} [Field K] [NumberField K] (v : P K)
-    (x : Matrix.SpecialLinearGroup (Fin 2) (Kv v)) (h : ∀ i j, IsInt (x i j)) :
-    Matrix.SpecialLinearGroup.toGL x ∈ GlobalTheory.LFun.KGL v (n := 2) := by
+private theorem memK
+    {K : Type} [Field K] [NumberField K]
+    (v : P K) (x : Matrix.SpecialLinearGroup (Fin 2) (Kv v)) (h : ∀ i j, IsInt (x i j))
+    : Matrix.SpecialLinearGroup.toGL x ∈ GlobalTheory.LFun.KGL v (n := 2) := by
   let a : Matrix (Fin 2) (Fin 2) (Formalism.UG.Ov K v) := fun i j => ⟨x i j, h i j⟩
   have ha : a.det = 1 := by
     apply Subtype.ext
@@ -51,15 +54,20 @@ private theorem int_neg_one {K : Type} [Field K] [NumberField K] (v : P K) : IsI
   unfold IsInt
   rw [Valuation.map_neg, map_one]
 
-private noncomputable def xN {K : Type} [Field K] [NumberField K] {v : P K} (b : Kv v) : Matrix.SpecialLinearGroup (Fin 2) (Kv v) :=
+private noncomputable def xN {K : Type} [Field K] [NumberField K] {v : P K} (b : Kv v)
+    : Matrix.SpecialLinearGroup (Fin 2) (Kv v) :=
   ⟨!![1, b; 0, 1], by simp [Matrix.det_fin_two]⟩
 
-private noncomputable def xW {K : Type} [Field K] [NumberField K] (v : P K) : Matrix.SpecialLinearGroup (Fin 2) (Kv v) :=
+private noncomputable def xW {K : Type} [Field K] [NumberField K] (v : P K)
+    : Matrix.SpecialLinearGroup (Fin 2) (Kv v) :=
   ⟨!![0, 1; -1, 0], by simp [Matrix.det_fin_two]⟩
 
-private noncomputable def xC {K : Type} [Field K] [NumberField K] {v : P K} (ϖ : (Kv v)ˣ) (x : Matrix.SpecialLinearGroup (Fin 2) (Kv v)) :
-    Matrix.SpecialLinearGroup (Fin 2) (Kv v) :=
-  ⟨!![x 0 0, ((ϖ⁻¹ : (Kv v)ˣ) : Kv v) * x 0 1; (ϖ : Kv v) * x 1 0, x 1 1], by
+private noncomputable def xC
+    {K : Type} [Field K] [NumberField K]
+    {v : P K} (ϖ : (Kv v)ˣ) (x : Matrix.SpecialLinearGroup (Fin 2) (Kv v))
+    : Matrix.SpecialLinearGroup (Fin 2) (Kv v) := ⟨
+  !![x 0 0, ((ϖ⁻¹ : (Kv v)ˣ) : Kv v) * x 0 1; (ϖ : Kv v) * x 1 0, x 1 1],
+  by
     have hx := x.det_coe
     rw [Matrix.det_fin_two] at hx
     rw [Matrix.det_fin_two_of]
@@ -67,10 +75,14 @@ private noncomputable def xC {K : Type} [Field K] [NumberField K] {v : P K} (ϖ 
       have := ϖ.inv_mul
       linear_combination (x 0 1 * x 1 0) * this
     rw [e]
-    exact hx⟩
+    exact hx
+⟩
 
-private theorem xC_conj {K : Type} [Field K] [NumberField K] {v : P K} (ϖ : (Kv v)ˣ) (x : Matrix.SpecialLinearGroup (Fin 2) (Kv v)) :
-    Matrix.SpecialLinearGroup.toGL x * dL ϖ 1 = dL ϖ 1 * Matrix.SpecialLinearGroup.toGL (xC ϖ x) := by
+private theorem xC_conj
+    {K : Type} [Field K] [NumberField K]
+    {v : P K} (ϖ : (Kv v)ˣ) (x : Matrix.SpecialLinearGroup (Fin 2) (Kv v))
+    : Matrix.SpecialLinearGroup.toGL x * dL ϖ 1
+      = dL ϖ 1 * Matrix.SpecialLinearGroup.toGL (xC ϖ x) := by
   apply Units.ext
   have hm := ϖ.mul_inv
   have e1 : ((1 : (Kv v)ˣ) : Kv v) = 1 := Units.val_one
@@ -89,8 +101,9 @@ private theorem xC_conj {K : Type} [Field K] [NumberField K] {v : P K} (ϖ : (Kv
     rw [e1]
     ring
 
-private theorem w_conj {K : Type} [Field K] [NumberField K] {v : P K} (ϖ : (Kv v)ˣ) :
-    dL 1 ϖ * Matrix.SpecialLinearGroup.toGL (xW v) = Matrix.SpecialLinearGroup.toGL (xW v) * dL ϖ 1 := by
+private theorem w_conj {K : Type} [Field K] [NumberField K] {v : P K} (ϖ : (Kv v)ˣ)
+    : dL 1 ϖ * Matrix.SpecialLinearGroup.toGL (xW v)
+      = Matrix.SpecialLinearGroup.toGL (xW v) * dL ϖ 1 := by
   apply Units.ext
   have e1 : ((1 : (Kv v)ˣ) : Kv v) = 1 := Units.val_one
   refine Matrix.ext fun i k => ?_

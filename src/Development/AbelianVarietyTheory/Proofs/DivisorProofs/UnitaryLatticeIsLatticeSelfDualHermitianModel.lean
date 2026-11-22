@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ModelLat
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.UnitLemma GlobalTheory.InertUnitOrb
@@ -17,19 +18,21 @@ noncomputable section
 
 namespace GlobalTheory.InertUnitOrb.SelfDualLat
 
-theorem stdH_eq_dot (K : UQ) {n : ℕ} (a b : Fin n → K.E) :
-    stdH K n a b = a ⬝ᵥ (fun k => K.c (b k)) := rfl
+theorem stdH_eq_dot (K : UQ) {n : ℕ} (a b : Fin n → K.E)
+    : stdH K n a b = a ⬝ᵥ (fun k => K.c (b k)) :=
+  rfl
 
-theorem stdH_mulVec (K : UQ) {n : ℕ} (P : Matrix (Fin n) (Fin n) K.E)
-    (hP : Pᵀ * P.map K.c = 1) (u v : Fin n → K.E) :
-    stdH K n (P *ᵥ u) (P *ᵥ v) = stdH K n u v := by
+theorem stdH_mulVec
+    (K : UQ) {n : ℕ} (P : Matrix (Fin n) (Fin n) K.E) (hP : Pᵀ * P.map K.c = 1) (u v : Fin n → K.E)
+    : stdH K n (P *ᵥ u) (P *ᵥ v) = stdH K n u v := by
   have hv : (fun k => K.c ((P *ᵥ v) k)) = P.map K.c *ᵥ (fun k => K.c (v k)) := by
     funext k
     exact RingHom.map_mulVec (K.c : K.E →+* K.E) P v k
-  rw [stdH_eq_dot, stdH_eq_dot, hv, dotProduct_mulVec, ← vecMul_transpose, vecMul_vecMul, hP, vecMul_one]
+  rw [stdH_eq_dot, stdH_eq_dot, hv, dotProduct_mulVec, ← vecMul_transpose, vecMul_vecMul, hP,
+    vecMul_one]
 
-theorem intVec_eq_range (K : UQ) (n : ℕ) :
-    intVec K n = LinearMap.range ((Algebra.linearMap K.O K.E).compLeft (Fin n)) := by
+theorem intVec_eq_range (K : UQ) (n : ℕ)
+    : intVec K n = LinearMap.range ((Algebra.linearMap K.O K.E).compLeft (Fin n)) := by
   ext v
   constructor
   · intro hv
@@ -43,13 +46,28 @@ theorem intVec_fg (K : UQ) (n : ℕ) : (intVec K n).FG := by
   rw [intVec_eq_range, LinearMap.range_eq_map]
   exact Submodule.FG.map _ Module.Finite.fg_top
 
-theorem single_mem_intVec (K : UQ) {n : ℕ} (i : Fin n) : (Pi.single i (1 : K.E) : Fin n → K.E) ∈ intVec K n := by
+theorem single_mem_intVec (K : UQ) {n : ℕ} (i : Fin n)
+    : (Pi.single i (1 : K.E) : Fin n → K.E) ∈ intVec K n := by
   intro j
   by_cases h : j = i
   · subst h; exact ⟨1, by simp⟩
   · exact ⟨0, by simp [Pi.single_apply, h]⟩
 
-theorem unitLat_isLat_selfDual : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ (w : Pl E), ¬ IsSplitAt w → ∀ (K : UQ) (e : K.E ≃+* w.adicCompletion E), (∀ x, e (K.c x) = cj w (e x)) → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1) → ∀ (n : ℕ) (B : InvAlg K) (ψ : B.A ≃ₗ[K.E] (Fin n → K.E)), ∀ (x : B.Aˣ), B.σ (x : B.A) = x → (∀ y z, stdH K n (ψ y) (ψ z) = B.herm x y z) → ∀ q : UL n w, IsLat K.O K.E (unitLat e B ψ q) ∧ ∀ y, y ∈ unitLat e B ψ q ↔ ∀ z ∈ unitLat e B ψ q, B.herm x y z ∈ (algebraMap K.O K.E).range := by
+theorem unitLat_isLat_selfDual
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ (w : Pl E),
+          ¬ IsSplitAt w
+            → ∀ (K : UQ) (e : K.E ≃+* w.adicCompletion E),
+              (∀ x, e (K.c x) = cj w (e x))
+                → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1)
+                → ∀ (n : ℕ) (B : InvAlg K) (ψ : B.A ≃ₗ[K.E] (Fin n → K.E)), ∀ (x : B.Aˣ),
+                  B.σ (x : B.A) = x → (∀ y z, stdH K n (ψ y) (ψ z) = B.herm x y z)
+                    → ∀ q : UL n w,
+                      IsLat K.O K.E (unitLat e B ψ q)
+                        ∧ ∀ y,
+                          y ∈ unitLat e B ψ q
+                            ↔ ∀ z ∈ unitLat e B ψ q, B.herm x y z ∈ (algebraMap K.O K.E).range := by
   intro E _ _ _ _ w hns K e he hint n B ψ x hx hψ q
   set Qm : Matrix (Fin n) (Fin n) (w.adicCompletion E) :=
     (((q⁻¹ : UL n w) : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) with hQm

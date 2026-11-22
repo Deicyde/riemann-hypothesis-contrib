@@ -15,8 +15,8 @@ namespace Formalism.L2.SG.Pf.Tau
 
 open Size Formalism.MainNotions.S
 
-theorem inclE_mem_intAf (I : AutInst) (c : 𝓞 I.E) :
-    Formalism.UG.inclE (F := I.F) (Af I.F) (c : I.E) ∈ IntAf I.F I.E := by
+theorem inclE_mem_intAf (I : AutInst) (c : 𝓞 I.E)
+    : Formalism.UG.inclE (F := I.F) (Af I.F) (c : I.E) ∈ IntAf I.F I.E := by
   apply Subring.subset_closure
   left
   exact ⟨⟨(c : I.E), c, rfl⟩, rfl⟩
@@ -25,35 +25,40 @@ def latSubmodule (I : AutInst) (x : I.GA) : Submodule (𝓞 I.E) (Fin I.n → I.
   carrier := latSet I x
   zero_mem' := by
     show (I.fmat x.2⁻¹) *ᵥ _ ∈ I.Lf
-    have : (fun i : Fin I.n => Formalism.UG.inclE (F := I.F) (Af I.F) ((0 : Fin I.n → I.E) i)) = 0 := by
+    have : (fun i : Fin I.n => Formalism.UG.inclE (F := I.F) (Af I.F) ((0 : Fin I.n → I.E) i))
+        = 0 := by
       funext i; simp
     rw [this, Matrix.mulVec_zero]
     exact I.Lf.zero_mem
   add_mem' := by
     intro u w hu hw
     show (I.fmat x.2⁻¹) *ᵥ _ ∈ I.Lf
-    have h : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((u + w) i)) =
-        (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (u i)) +
-          (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (w i)) := by
+    have h
+        : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((u + w) i))
+          = (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (u i))
+            + (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (w i)) := by
       funext i; simp
     rw [h, Matrix.mulVec_add]
     exact I.Lf.add_mem hu hw
   smul_mem' := by
     intro c u hu
     show (I.fmat x.2⁻¹) *ᵥ _ ∈ I.Lf
-    have h : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((c • u) i)) =
-        Formalism.UG.inclE (F := I.F) (Af I.F) (c : I.E) •
-          (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (u i)) := by
+    have h
+        : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((c • u) i))
+          = Formalism.UG.inclE (F := I.F) (Af I.F) (c : I.E)
+            • (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (u i)) := by
       funext i
       simp [Algebra.smul_def]
     rw [h, Matrix.mulVec_smul]
     have := I.Lf.smul_mem (⟨_, inclE_mem_intAf I c⟩ : IntAf I.F I.E) hu
     exact this
 
-theorem coe_latSubmodule (I : AutInst) (x : I.GA) :
-    ((latSubmodule I x : Submodule (𝓞 I.E) (Fin I.n → I.E)) : Set (Fin I.n → I.E)) = latSet I x := rfl
+theorem coe_latSubmodule (I : AutInst) (x : I.GA)
+    : ((latSubmodule I x : Submodule (𝓞 I.E) (Fin I.n → I.E)) : Set (Fin I.n → I.E)) = latSet I x :=
+  rfl
 
-theorem lattice_finitelyGenerated_of_commensurable (h0 : LatticeCommensurable) : LatticeFinitelyGenerated := by
+theorem lattice_finitelyGenerated_of_commensurable (h0 : LatticeCommensurable)
+    : LatticeFinitelyGenerated := by
   intro I x
   obtain ⟨m, hm1, hA, -⟩ := h0 I x
   refine ⟨latSubmodule I x, ?_, coe_latSubmodule I x⟩

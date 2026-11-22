@@ -49,27 +49,32 @@ end GlobalTheory.SeqCx.LinkSplit
 
 namespace GlobalTheory.SeqCx
 
-private theorem map_mem_splitSeq_iff_of_pairing_preserved {R : Type} [CommRing R] {a b : ℕ}
-    (f : (Fin a → R) × (Fin a → R) → (Fin b → R) × (Fin b → R))
-    (hf : ∀ x y, (f y).2 ⬝ᵥ (f x).1 = y.2 ⬝ᵥ x.1) (l : List ((Fin a → R) × (Fin a → R))) :
-    List.map f l ∈ splitSeq R b ↔ l ∈ splitSeq R a := by
-  rw [(GlobalTheory.T.subClosed_splitSeq_and_uniSeq_with_mem_iff R b).2.2.1, (GlobalTheory.T.subClosed_splitSeq_and_uniSeq_with_mem_iff R a).2.2.1, List.pairwise_map]
+private theorem map_mem_splitSeq_iff_of_pairing_preserved
+    {R : Type} [CommRing R]
+    {a b : ℕ} (f : (Fin a → R) × (Fin a → R) → (Fin b → R) × (Fin b → R))
+    (hf : ∀ x y, (f y).2 ⬝ᵥ (f x).1 = y.2 ⬝ᵥ x.1) (l : List ((Fin a → R) × (Fin a → R)))
+    : List.map f l ∈ splitSeq R b ↔ l ∈ splitSeq R a := by
+  rw [(GlobalTheory.T.subClosed_splitSeq_and_uniSeq_with_mem_iff R b).2.2.1,
+    (GlobalTheory.T.subClosed_splitSeq_and_uniSeq_with_mem_iff R a).2.2.1, List.pairwise_map]
   simp only [List.mem_map, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂, hf]
 
-
 open LinkSplit in
-theorem exactAt_link_splitSeq : ∀ (R : Type) [CommRing R] (s : ℕ), StableRangeLe R s →
-    ∀ (N m p : ℕ) (ρ : List ((Fin N → R) × (Fin N → R))), ρ ∈ splitSeq R N → ρ.length + m = N →
-      s ≤ m → ExactAt (splitSeq R m) p → ExactAt (linkIn (splitSeq R N) Set.univ ρ) p := by
+theorem exactAt_link_splitSeq
+    : ∀ (R : Type) [CommRing R] (s : ℕ),
+      StableRangeLe R s
+        → ∀ (N m p : ℕ) (ρ : List ((Fin N → R) × (Fin N → R))),
+          ρ ∈ splitSeq R N → ρ.length + m = N → s ≤ m → ExactAt (splitSeq R m) p
+            → ExactAt (linkIn (splitSeq R N) Set.univ ρ) p := by
   intro R _ s hs N m p ρ hρ hlen hsm hex
   have hmN : m ≤ N := by omega
-  obtain ⟨g, hg⟩ := GlobalTheory.T.exists_GL_splitSeq_standard_of_stableRangeLe R s hs N ρ hρ (by omega)
-    (fun j => (⟨m + (j : ℕ), by omega⟩ : Fin N))
-    (by intro a b h; ext; simp only [Fin.mk.injEq] at h; omega)
-  let T : (Fin N → R) × (Fin N → R) → (Fin N → R) × (Fin N → R) :=
-    fun x => ((↑g : Matrix (Fin N) (Fin N) R) *ᵥ x.1, x.2 ᵥ* (↑g⁻¹ : Matrix (Fin N) (Fin N) R))
-  let Ti : (Fin N → R) × (Fin N → R) → (Fin N → R) × (Fin N → R) :=
-    fun x => ((↑g⁻¹ : Matrix (Fin N) (Fin N) R) *ᵥ x.1, x.2 ᵥ* (↑g : Matrix (Fin N) (Fin N) R))
+  obtain ⟨g, hg⟩ :=
+    GlobalTheory.T.exists_GL_splitSeq_standard_of_stableRangeLe R s hs N ρ hρ (by omega)
+      (fun j => (⟨m + (j : ℕ), by omega⟩ : Fin N))
+      (by intro a b h; ext; simp only [Fin.mk.injEq] at h; omega)
+  let T : (Fin N → R) × (Fin N → R) → (Fin N → R) × (Fin N → R) := fun x =>
+    ((↑g : Matrix (Fin N) (Fin N) R) *ᵥ x.1, x.2 ᵥ* (↑g⁻¹ : Matrix (Fin N) (Fin N) R))
+  let Ti : (Fin N → R) × (Fin N → R) → (Fin N → R) × (Fin N → R) := fun x =>
+    ((↑g⁻¹ : Matrix (Fin N) (Fin N) R) *ᵥ x.1, x.2 ᵥ* (↑g : Matrix (Fin N) (Fin N) R))
   have hTTi : ∀ x, T (Ti x) = x := by
     intro x
     refine Prod.ext ?_ ?_
@@ -84,8 +89,8 @@ theorem exactAt_link_splitSeq : ∀ (R : Type) [CommRing R] (s : ℕ), StableRan
     intro x y
     simp only [T]
     rw [dotProduct_mulVec, vecMul_vecMul, Units.inv_mul, vecMul_one]
-  let P : (Fin m → R) × (Fin m → R) → (Fin N → R) × (Fin N → R) :=
-    fun x => (LinkSplit.pad x.1, LinkSplit.pad x.2)
+  let P : (Fin m → R) × (Fin m → R) → (Fin N → R) × (Fin N → R) := fun x =>
+    (LinkSplit.pad x.1, LinkSplit.pad x.2)
   have hPdot : ∀ x y, (P y).2 ⬝ᵥ (P x).1 = y.2 ⬝ᵥ x.1 := fun x y => LinkSplit.pad_dot hmN _ _
   have hPinj : Function.Injective P := by
     intro x y h
@@ -97,9 +102,14 @@ theorem exactAt_link_splitSeq : ∀ (R : Type) [CommRing R] (s : ℕ), StableRan
   have hmemT := map_mem_splitSeq_iff_of_pairing_preserved T hTdot
   have hmemP := map_mem_splitSeq_iff_of_pairing_preserved P hPdot
   have hchar := (GlobalTheory.T.subClosed_splitSeq_and_uniSeq_with_mem_iff R N).2.2.1
-  have hρT : ∀ j : Fin ρ.length, T (ρ.get j) =
-      (Pi.single (⟨m + (j : ℕ), by omega⟩ : Fin N) 1, Pi.single (⟨m + (j : ℕ), by omega⟩ : Fin N) 1) :=
-    fun j => Prod.ext (hg j).1 (hg j).2
+  have hρT
+      : ∀ j : Fin ρ.length,
+        T (ρ.get j)
+          = (
+            Pi.single (⟨m + (j : ℕ), by omega⟩ : Fin N) 1,
+            Pi.single (⟨m + (j : ℕ), by omega⟩ : Fin N) 1
+          ) := fun j =>
+    Prod.ext (hg j).1 (hg j).2
   have key : linkIn (splitSeq R N) Set.univ ρ = List.map Ti '' (List.map P '' splitSeq R m) := by
     ext w
     constructor
@@ -156,16 +166,21 @@ theorem exactAt_link_splitSeq : ∀ (R : Type) [CommRing R] (s : ℕ), StableRan
         obtain ⟨y, -, rfl⟩ := List.mem_map.1 hb
         rw [hρT j]
         have hk : m ≤ ((⟨m + (j : ℕ), by omega⟩ : Fin N) : ℕ) := Nat.le_add_right _ _
-        simp only [P, single_dotProduct, dotProduct_single, LinkSplit.pad_apply_ge _ _ hk,
-          mul_zero, zero_mul, and_self]
-  rw [key, GlobalTheory.T.seqChain_exactAt_map_iff _ _ Ti hTiinj, GlobalTheory.T.seqChain_exactAt_map_iff _ _ P hPinj]
+        simp only [P, single_dotProduct, dotProduct_single, LinkSplit.pad_apply_ge _ _ hk, mul_zero,
+          zero_mul, and_self]
+  rw [key, GlobalTheory.T.seqChain_exactAt_map_iff _ _ Ti hTiinj,
+    GlobalTheory.T.seqChain_exactAt_map_iff _ _ P hPinj]
   exact hex
 
 end GlobalTheory.SeqCx
 
 section
 open GlobalTheory.SeqCx Matrix UpperTheory.V.KL
-theorem _root_.GlobalTheory.T.exactAt_linkIn_splitSeq_of_exactAt_splitSeq : ∀ (R : Type) [CommRing R] (s : ℕ), StableRangeLe R s → ∀ (N m p : ℕ) (ρ : List ((Fin N → R) × (Fin N → R))), ρ ∈ splitSeq R N → ρ.length + m = N → s ≤ m → ExactAt (splitSeq R m) p → ExactAt (linkIn (splitSeq R N) Set.univ ρ) p := by
-  first
-  | exact @GlobalTheory.SeqCx.exactAt_link_splitSeq
+theorem _root_.GlobalTheory.T.exactAt_linkIn_splitSeq_of_exactAt_splitSeq
+    : ∀ (R : Type) [CommRing R] (s : ℕ),
+      StableRangeLe R s
+        → ∀ (N m p : ℕ) (ρ : List ((Fin N → R) × (Fin N → R))),
+          ρ ∈ splitSeq R N → ρ.length + m = N → s ≤ m → ExactAt (splitSeq R m) p
+            → ExactAt (linkIn (splitSeq R N) Set.univ ρ) p := by
+  first | exact @GlobalTheory.SeqCx.exactAt_link_splitSeq
 end

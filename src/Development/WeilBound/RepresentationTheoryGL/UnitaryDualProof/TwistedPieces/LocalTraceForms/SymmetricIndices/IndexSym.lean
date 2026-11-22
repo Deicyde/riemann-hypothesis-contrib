@@ -12,15 +12,20 @@ open Matrix GroundTheory.Automorphic ValuativeRel
 
 namespace PositivityTheory.RgUd.TP.Loc.Uni
 
-open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc.SLF PositivityTheory.RgUd.T.Desc.SLT PositivityTheory.RgUd.T.Desc.SLT.Bi PositivityTheory.RgUd.TP
+open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc.SLF PositivityTheory.RgUd.T.Desc.SLT
+  PositivityTheory.RgUd.T.Desc.SLT.Bi PositivityTheory.RgUd.TP
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-theorem core' (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k)
+theorem core'
+    (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k)
     (hsym : ∀ x ∈ Bz Z, ∀ y ∈ Bz Z, τ (x * y) = τ (y * x))
-    (hnd : ∀ x ∈ Bz Z, (∀ y ∈ Bz Z, τ (x * y) = 0) → x = 0) (g : GL (Fin n) k)
-    (hg : g ∈ Gz Z) : ∃ c : ℕ, ∀ r ≥ c, ((Lat Z r).map (conjA g⁻¹)).relIndex (Lat Z 0) = (Lat Z r).relIndex (Lat Z 0) ∧
-      (Lat Z r).relIndex (Lat Z 0) ≠ 0 := by
+    (hnd : ∀ x ∈ Bz Z, (∀ y ∈ Bz Z, τ (x * y) = 0) → x = 0)
+    (g : GL (Fin n) k) (hg : g ∈ Gz Z)
+    : ∃ c : ℕ, ∀ r ≥ c,
+      ((Lat Z r).map (conjA g⁻¹)).relIndex (Lat Z 0) = (Lat Z r).relIndex (Lat Z 0)
+        ∧ (Lat Z r).relIndex (Lat Z 0) ≠ 0 := by
   obtain ⟨c, -, hc⟩ := exists_shift Z g hg
   refine ⟨c, fun r hr => ?_⟩
   have hg' : g⁻¹ ∈ Gz Z := (GzS Z).inv_mem hg
@@ -36,24 +41,28 @@ theorem core' (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matrix (Fin n)
   have hϖ0 : ϖ ≠ 0 := (GLnLocal.irreducible_uniformizer k).ne_zero
   have hϖk : ((ϖ ^ r : 𝒪[k]) : k) = pi k ^ r := by simp [ϖ]
   let f1 : LatO Z →ₗ[𝒪[k]] LatO Z := (ϖ ^ r) • LinearMap.id
-  let f2 : LatO Z →ₗ[𝒪[k]] LatO Z :=
-    { toFun := fun y => ⟨pi k ^ r • conjA g⁻¹ y, hmem y y.2⟩
-      map_add' := fun x y => Subtype.ext (by simp [mul_add, add_mul, smul_add])
-      map_smul' := fun a y => Subtype.ext (by
-        change pi k ^ r • conjA g⁻¹ ((a : k) • (y : Matrix (Fin n) (Fin n) k)) =
-          (a : k) • (pi k ^ r • conjA g⁻¹ (y : Matrix (Fin n) (Fin n) k))
-        rw [← smulA_apply (a : k), conjA_smulA, smulA_apply, smul_comm]) }
+  let f2 : LatO Z →ₗ[𝒪[k]] LatO Z := {
+    toFun := fun y => ⟨pi k ^ r • conjA g⁻¹ y, hmem y y.2⟩
+    map_add' := fun x y => Subtype.ext (by simp [mul_add, add_mul, smul_add])
+    map_smul' := fun a y =>
+      Subtype.ext (by
+        change pi k ^ r • conjA g⁻¹ ((a : k) • (y : Matrix (Fin n) (Fin n) k))
+          = (a : k) • (pi k ^ r • conjA g⁻¹ (y : Matrix (Fin n) (Fin n) k))
+        rw [← smulA_apply (a : k), conjA_smulA, smulA_apply, smul_comm])
+  }
   let B := Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k))
   let F1 : B →ₗ[k] B := (pi k ^ r) • LinearMap.id
   let F2 : B →ₗ[k] B := (pi k ^ r) • conjB Z g⁻¹ hg'
-  have t1 := det_transfer Z F1 f1 (fun x => by
-    change pi k ^ r • (x : Matrix (Fin n) (Fin n) k) = ((ϖ ^ r : 𝒪[k]) : k) • (x : Matrix (Fin n) (Fin n) k)
-    rw [hϖk])
+  have t1 :=
+    det_transfer Z F1 f1 (fun x => by
+      change pi k ^ r • (x : Matrix (Fin n) (Fin n) k)
+        = ((ϖ ^ r : 𝒪[k]) : k) • (x : Matrix (Fin n) (Fin n) k)
+      rw [hϖk])
   have t2 := det_transfer Z F2 f2 (fun x => rfl)
   have dF : LinearMap.det F1 = LinearMap.det F2 := by
-    simp only [F1, F2, LinearMap.det_smul, LinearMap.det_id,
-      det_conjB Z τ hsym hnd g⁻¹ hg']
-  have df : LinearMap.det f1 = LinearMap.det f2 := Subtype.val_injective (t1.trans (dF.trans t2.symm))
+    simp only [F1, F2, LinearMap.det_smul, LinearMap.det_id, det_conjB Z τ hsym hnd g⁻¹ hg']
+  have df : LinearMap.det f1 = LinearMap.det f2 :=
+    Subtype.val_injective (t1.trans (dF.trans t2.symm))
   have hf1 : LinearMap.det f1 ≠ 0 := by
     simp only [f1, LinearMap.det_smul, LinearMap.det_id, mul_one]
     exact pow_ne_zero _ (pow_ne_zero _ hϖ0)
@@ -64,23 +73,31 @@ theorem core' (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (τ : Matrix (Fin n)
     · rintro ⟨y, hy, rfl⟩
       refine ⟨⟨y, hy⟩, ?_⟩
       change ((ϖ ^ r : 𝒪[k]) : k) • y = smulA (pi k ^ r) y
-      rw [hϖk]; rfl
+      rw [hϖk]
+      rfl
     · rintro ⟨y, rfl⟩
       refine ⟨y, y.2, ?_⟩
-      change smulA (pi k ^ r) (y : Matrix (Fin n) (Fin n) k) = ((ϖ ^ r : 𝒪[k]) : k) • (y : Matrix (Fin n) (Fin n) k)
-      rw [hϖk]; rfl
-  have i2 : ((Lat Z r).map (conjA g⁻¹)).relIndex (Lat Z 0) = Nat.card (LatO Z ⧸ LinearMap.range f2) := by
+      change smulA (pi k ^ r) (y : Matrix (Fin n) (Fin n) k)
+        = ((ϖ ^ r : 𝒪[k]) : k) • (y : Matrix (Fin n) (Fin n) k)
+      rw [hϖk]
+      rfl
+  have i2
+      : ((Lat Z r).map (conjA g⁻¹)).relIndex (Lat Z 0)
+        = Nat.card (LatO Z ⧸ LinearMap.range f2) := by
     refine relIndex_eq_card Z _ f2 fun x => ?_
     rw [hL, AddSubgroup.map_map, AddSubgroup.mem_map]
     constructor
     · rintro ⟨y, hy, rfl⟩
       refine ⟨⟨y, hy⟩, ?_⟩
       change pi k ^ r • conjA g⁻¹ y = conjA g⁻¹ (smulA (pi k ^ r) y)
-      rw [conjA_smulA]; rfl
+      rw [conjA_smulA]
+      rfl
     · rintro ⟨y, rfl⟩
       refine ⟨y, y.2, ?_⟩
-      change conjA g⁻¹ (smulA (pi k ^ r) (y : Matrix (Fin n) (Fin n) k)) = pi k ^ r • conjA g⁻¹ (y : Matrix (Fin n) (Fin n) k)
-      rw [conjA_smulA]; rfl
+      change conjA g⁻¹ (smulA (pi k ^ r) (y : Matrix (Fin n) (Fin n) k))
+        = pi k ^ r • conjA g⁻¹ (y : Matrix (Fin n) (Fin n) k)
+      rw [conjA_smulA]
+      rfl
   have c1 := PI.NGStepBBW.card_coker_endo f1 hf1
   have c2 := PI.NGStepBBW.card_coker_endo f2 (df ▸ hf1)
   refine ⟨?_, ?_⟩
@@ -104,8 +121,9 @@ theorem indexSym' (hT : TraceForm k) : IndexSym (k := k) := by
   · rw [relIndex_Lc Z h1m (by omega), Bi.relIndex_lat]
     exact (hc1 r hr).2
 
-theorem unimod (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    TraceForm k → PositivityTheory.RgUd.T.Desc.SLF.Unimod (k := k) := fun hT =>
+theorem unimod
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : TraceForm k → PositivityTheory.RgUd.T.Desc.SLF.Unimod (k := k) := fun hT =>
   PositivityTheory.RgUd.T.Desc.SLF.Un2.unimod_of_indexSym (indexSym' hT)
 
 end PositivityTheory.RgUd.TP.Loc.Uni

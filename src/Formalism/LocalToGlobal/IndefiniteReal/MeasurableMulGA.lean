@@ -7,7 +7,9 @@ public import Formalism.LocalToGlobal.GlobalTheory.GL5.FamilyMassVolumeIdentityO
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory
 open Formalism.L2.Theta
 
 namespace Formalism.IndefR.PeterssonHilbertSpace
@@ -17,16 +19,21 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7}
 
 theorem countable_GQ (V : HSp D) : Countable (GQ V) :=
-  Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.countableGamma (F := D.host.F) (E := D.host.E) D.sp.cm.sig V.gram
+  Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.countableGamma (F := D.host.F)
+    (E := D.host.E) D.sp.cm.sig V.gram
 
 theorem measurableMul_GA (V : HSp D) : MeasurableMul (GA D V) :=
-  Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.measurableMulHA (F := D.host.F) (E := D.host.E) D.sp.cm.sig V.gram
+  Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.measurableMulHA (F := D.host.F)
+    (E := D.host.E) D.sp.cm.sig V.gram
 
 theorem borel_GA (V : HSp D) : BorelSpace (GA D V) :=
-  Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.borelHA (F := D.host.F) (E := D.host.E) D.sp.cm.sig V.gram
+  Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.borelHA (F := D.host.F) (E := D.host.E)
+    D.sp.cm.sig V.gram
 
-theorem petPos (V : HSp D) (μ : Measure (GA D V)) (𝓕 : Set (GA D V)) (hH : μ.IsHaarMeasure)
-    (hF : IsFundamentalDomain (GQ V) 𝓕 μ) : PetPos V μ 𝓕 := by
+theorem petPos
+    (V : HSp D) (μ : Measure (GA D V)) (𝓕 : Set (GA D V))
+    (hH : μ.IsHaarMeasure) (hF : IsFundamentalDomain (GQ V) 𝓕 μ)
+    : PetPos V μ 𝓕 := by
   intro F hc hinv hne hint
   have := countable_GQ V
   have := measurableMul_GA V

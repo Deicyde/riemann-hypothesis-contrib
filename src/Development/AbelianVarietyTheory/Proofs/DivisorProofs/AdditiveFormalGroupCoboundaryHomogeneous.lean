@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.FormalCoboun
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 set_option autoImplicit false
 
@@ -16,18 +17,17 @@ namespace GlobalTheory.HomogCob
 
 variable {R : Type} [CommRing R]
 
-theorem hom_mul {σ : Type} {m n : ℕ} {g h : MvPowerSeries σ R}
-    (hg : ∀ e : σ →₀ ℕ, e.degree ≠ m → coeff e g = 0)
-    (hh : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e h = 0) :
-    ∀ e : σ →₀ ℕ, e.degree ≠ m + n → coeff e (g * h) = 0 := by
+theorem hom_mul
+    {σ : Type} {m n : ℕ} {g h : MvPowerSeries σ R} (hg : ∀ e : σ →₀ ℕ, e.degree ≠ m → coeff e g = 0)
+    (hh : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e h = 0)
+    : ∀ e : σ →₀ ℕ, e.degree ≠ m + n → coeff e (g * h) = 0 := by
   classical
   intro e he
   rw [coeff_mul]
   refine Finset.sum_eq_zero fun p hp => ?_
   rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
   by_cases h1 : p.1.degree = m
-  · have h2 : p.2.degree ≠ n := by
-      intro h2; apply he; rw [← hp, map_add (f := _), h1, h2]
+  · have h2 : p.2.degree ≠ n := by intro h2; apply he; rw [← hp, map_add (f := _), h1, h2]
     rw [hh _ h2, mul_zero]
   · rw [hg _ h1, zero_mul]
 
@@ -35,91 +35,101 @@ theorem hom_one {σ : Type} : ∀ e : σ →₀ ℕ, e.degree ≠ 0 → coeff e 
   classical
   intro e he
   rw [coeff_one, if_neg]
-  rintro rfl; exact he (map_zero _)
+  rintro rfl
+  exact he (map_zero _)
 
-theorem hom_pow {σ : Type} {g : MvPowerSeries σ R}
-    (hg : ∀ e : σ →₀ ℕ, e.degree ≠ 1 → coeff e g = 0) (b : ℕ) :
-    ∀ e : σ →₀ ℕ, e.degree ≠ b → coeff e (g ^ b) = 0 := by
+theorem hom_pow
+    {σ : Type} {g : MvPowerSeries σ R} (hg : ∀ e : σ →₀ ℕ, e.degree ≠ 1 → coeff e g = 0) (b : ℕ)
+    : ∀ e : σ →₀ ℕ, e.degree ≠ b → coeff e (g ^ b) = 0 := by
   induction b with
   | zero => simpa using hom_one
   | succ b ih => rw [pow_succ]; exact hom_mul ih hg
 
-theorem hom_prod {σ τ : Type} {a : σ → MvPowerSeries τ R}
-    (ha : ∀ s, ∀ e : τ →₀ ℕ, e.degree ≠ 1 → coeff e (a s) = 0) (d : σ →₀ ℕ) :
-    ∀ e : τ →₀ ℕ, e.degree ≠ d.degree → coeff e (d.prod fun s n => a s ^ n) = 0 := by
+theorem hom_prod
+    {σ τ : Type} {a : σ → MvPowerSeries τ R}
+    (ha : ∀ s, ∀ e : τ →₀ ℕ, e.degree ≠ 1 → coeff e (a s) = 0) (d : σ →₀ ℕ)
+    : ∀ e : τ →₀ ℕ, e.degree ≠ d.degree → coeff e (d.prod fun s n => a s ^ n) = 0 := by
   induction d using Finsupp.induction with
   | zero => simpa using hom_one
   | single_add s b f _ _ ih =>
-    rw [Finsupp.prod_add_index' (by simp) (by intros; rw [pow_add]), Finsupp.prod_single_index (by simp),
-      map_add, Finsupp.degree_single]
+    rw [Finsupp.prod_add_index' (by simp) (by intros; rw [pow_add]),
+      Finsupp.prod_single_index (by simp), map_add, Finsupp.degree_single]
     exact hom_mul (hom_pow (ha s) b) ih
 
-theorem hom_subst {σ τ : Type} [Finite σ] {a : σ → MvPowerSeries τ R}
-    (ha : ∀ s, ∀ e : τ →₀ ℕ, e.degree ≠ 1 → coeff e (a s) = 0) {N : ℕ} {f : MvPowerSeries σ R}
-    (hf : ∀ e : σ →₀ ℕ, e.degree ≠ N → coeff e f = 0) :
-    ∀ e : τ →₀ ℕ, e.degree ≠ N → coeff e (subst a f) = 0 := by
+theorem hom_subst
+    {σ τ : Type} [Finite σ]
+    {a : σ → MvPowerSeries τ R} (ha : ∀ s, ∀ e : τ →₀ ℕ, e.degree ≠ 1 → coeff e (a s) = 0)
+    {N : ℕ} {f : MvPowerSeries σ R} (hf : ∀ e : σ →₀ ℕ, e.degree ≠ N → coeff e f = 0)
+    : ∀ e : τ →₀ ℕ, e.degree ≠ N → coeff e (subst a f) = 0 := by
   intro e he
-  have hs : HasSubst a := hasSubst_of_constantCoeff_zero fun s => by
-    rw [← coeff_zero_eq_constantCoeff_apply]; exact ha s 0 (by simp)
+  have hs : HasSubst a :=
+    hasSubst_of_constantCoeff_zero fun s => by
+      rw [← coeff_zero_eq_constantCoeff_apply]; exact ha s 0 (by simp)
   rw [coeff_subst hs]
   refine finsum_eq_zero_of_forall_eq_zero fun d => ?_
   by_cases hd : d.degree = N
   · rw [hom_prod ha d e (by rw [hd]; exact he), smul_zero]
   · rw [hf d hd, zero_smul]
 
-theorem hom_X {σ : Type} (s : σ) :
-    ∀ e : σ →₀ ℕ, e.degree ≠ 1 → coeff e (X s : MvPowerSeries σ R) = 0 := by
+theorem hom_X {σ : Type} (s : σ)
+    : ∀ e : σ →₀ ℕ, e.degree ≠ 1 → coeff e (X s : MvPowerSeries σ R) = 0 := by
   classical
   intro e he
   rw [coeff_X, if_neg]
-  rintro rfl; exact he (by simp)
+  rintro rfl
+  exact he (by simp)
 
-theorem hom_add {σ : Type} {n : ℕ} {g h : MvPowerSeries σ R}
-    (hg : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e g = 0)
-    (hh : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e h = 0) :
-    ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e (g + h) = 0 := by
+theorem hom_add
+    {σ : Type} {n : ℕ} {g h : MvPowerSeries σ R} (hg : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e g = 0)
+    (hh : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e h = 0)
+    : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e (g + h) = 0 := by
   intro e he; rw [map_add (f := _), hg e he, hh e he, add_zero]
 
-theorem hom_sub {σ : Type} {n : ℕ} {g h : MvPowerSeries σ R}
-    (hg : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e g = 0)
-    (hh : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e h = 0) :
-    ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e (g - h) = 0 := by
+theorem hom_sub
+    {σ : Type} {n : ℕ} {g h : MvPowerSeries σ R} (hg : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e g = 0)
+    (hh : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e h = 0)
+    : ∀ e : σ →₀ ℕ, e.degree ≠ n → coeff e (g - h) = 0 := by
   intro e he; rw [map_sub, hg e he, hh e he, sub_zero]
 
-theorem hom_addLaw (d : ℕ) (i : Fin d) :
-    ∀ e : Fin d ⊕ Fin d →₀ ℕ, e.degree ≠ 1 → coeff e (addLaw R d i) = 0 :=
+theorem hom_addLaw (d : ℕ) (i : Fin d)
+    : ∀ e : Fin d ⊕ Fin d →₀ ℕ, e.degree ≠ 1 → coeff e (addLaw R d i) = 0 :=
   hom_add (hom_X _) (hom_X _)
 
-theorem hom_elim {τ : Type} {d : ℕ} {u v : Fin d → MvPowerSeries τ R}
+theorem hom_elim
+    {τ : Type} {d : ℕ} {u v : Fin d → MvPowerSeries τ R}
     (hu : ∀ s, ∀ e : τ →₀ ℕ, e.degree ≠ 1 → coeff e (u s) = 0)
-    (hv : ∀ s, ∀ e : τ →₀ ℕ, e.degree ≠ 1 → coeff e (v s) = 0) :
-    ∀ s, ∀ e : τ →₀ ℕ, e.degree ≠ 1 → coeff e (Sum.elim u v s) = 0 := by
+    (hv : ∀ s, ∀ e : τ →₀ ℕ, e.degree ≠ 1 → coeff e (v s) = 0)
+    : ∀ s, ∀ e : τ →₀ ℕ, e.degree ≠ 1 → coeff e (Sum.elim u v s) = 0 := by
   rintro (s | s) <;> simp only [Sum.elim_inl, Sum.elim_inr] <;> [exact hu s; exact hv s]
 
-theorem coeff_cob1_addLaw_eq_zero_of_degree_ne (d N : ℕ) (f : MvPowerSeries (Fin d) R)
-    (hf : ∀ α : Fin d →₀ ℕ, α.degree ≠ N → coeff α f = 0) :
-    ∀ γ : Fin d ⊕ Fin d →₀ ℕ, γ.degree ≠ N → coeff γ (cob1 (addLaw R d) f) = 0 := by
+theorem coeff_cob1_addLaw_eq_zero_of_degree_ne
+    (d N : ℕ) (f : MvPowerSeries (Fin d) R) (hf : ∀ α : Fin d →₀ ℕ, α.degree ≠ N → coeff α f = 0)
+    : ∀ γ : Fin d ⊕ Fin d →₀ ℕ, γ.degree ≠ N → coeff γ (cob1 (addLaw R d) f) = 0 := by
   unfold cob1 inL inR
   exact hom_sub (hom_sub (hom_subst (hom_addLaw d) hf) (hom_subst (fun _ => hom_X _) hf))
     (hom_subst (fun _ => hom_X _) hf)
 
-theorem coeff_cob2_addLaw_eq_zero_of_degree_ne (d N : ℕ) (c : MvPowerSeries (Fin d ⊕ Fin d) R)
-    (hc : ∀ α : Fin d ⊕ Fin d →₀ ℕ, α.degree ≠ N → coeff α c = 0) :
-    ∀ γ : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, γ.degree ≠ N → coeff γ (cob2 (addLaw R d) c) = 0 := by
+theorem coeff_cob2_addLaw_eq_zero_of_degree_ne
+    (d N : ℕ) (c : MvPowerSeries (Fin d ⊕ Fin d) R)
+    (hc : ∀ α : Fin d ⊕ Fin d →₀ ℕ, α.degree ≠ N → coeff α c = 0)
+    : ∀ γ : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, γ.degree ≠ N → coeff γ (cob2 (addLaw R d) c) = 0 := by
   have h1 : ∀ s, ∀ e : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, e.degree ≠ 1 → coeff e (x1 (R := R) s) = 0 :=
     fun s => hom_X _
   have h2 : ∀ s, ∀ e : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, e.degree ≠ 1 → coeff e (x2 (R := R) s) = 0 :=
     fun s => hom_X _
   have h3 : ∀ s, ∀ e : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, e.degree ≠ 1 → coeff e (x3 (R := R) s) = 0 :=
     fun s => hom_X _
-  have hop : ∀ {u v : Fin d → MvPowerSeries (Fin d ⊕ (Fin d ⊕ Fin d)) R},
-      (∀ s, ∀ e : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, e.degree ≠ 1 → coeff e (u s) = 0) →
-      (∀ s, ∀ e : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, e.degree ≠ 1 → coeff e (v s) = 0) →
-      ∀ s, ∀ e : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, e.degree ≠ 1 → coeff e (op (addLaw R d) u v s) = 0 :=
-    fun hu hv s => hom_subst (hom_elim hu hv) (hom_addLaw d s)
+  have hop
+      : ∀ {u v : Fin d → MvPowerSeries (Fin d ⊕ (Fin d ⊕ Fin d)) R},
+        (∀ s, ∀ e : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, e.degree ≠ 1 → coeff e (u s) = 0)
+          → (∀ s, ∀ e : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, e.degree ≠ 1 → coeff e (v s) = 0)
+          → ∀ s, ∀ e : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ,
+            e.degree ≠ 1 → coeff e (op (addLaw R d) u v s) = 0 := fun hu hv s =>
+    hom_subst (hom_elim hu hv) (hom_addLaw d s)
   unfold cob2 at2
-  exact hom_sub (hom_add (hom_sub (hom_subst (hom_elim h2 h3) hc)
-    (hom_subst (hom_elim (hop h1 h2) h3) hc)) (hom_subst (hom_elim h1 (hop h2 h3)) hc))
+  exact hom_sub
+    (hom_add (hom_sub (hom_subst (hom_elim h2 h3) hc) (hom_subst (hom_elim (hop h1 h2) h3) hc))
+      (hom_subst (hom_elim h1 (hop h2 h3)) hc))
     (hom_subst (hom_elim h1 h2) hc)
 
 end GlobalTheory.HomogCob
@@ -128,21 +138,26 @@ namespace GlobalTheory.HomogCob
 
 variable {R : Type} [CommRing R]
 
-theorem prod_X_map {σ τ : Type} (g : σ → τ) (δ : σ →₀ ℕ) :
-    (δ.prod fun s n => (X (g s) : MvPowerSeries τ R) ^ n) = monomial (δ.mapDomain g) 1 := by
+theorem prod_X_map {σ τ : Type} (g : σ → τ) (δ : σ →₀ ℕ)
+    : (δ.prod fun s n => (X (g s) : MvPowerSeries τ R) ^ n) = monomial (δ.mapDomain g) 1 := by
   induction δ using Finsupp.induction with
   | zero => simp
   | single_add a b f _ _ ih =>
-    rw [Finsupp.prod_add_index' (by simp) (by intros; rw [pow_add]), Finsupp.prod_single_index (by simp),
-      ih, Finsupp.mapDomain_add, Finsupp.mapDomain_single, X_pow_eq, monomial_mul_monomial, mul_one]
+    rw [Finsupp.prod_add_index' (by simp) (by intros; rw [pow_add]),
+      Finsupp.prod_single_index (by simp), ih, Finsupp.mapDomain_add, Finsupp.mapDomain_single,
+      X_pow_eq, monomial_mul_monomial, mul_one]
 
-theorem coeff_swap_eq (d : ℕ) (c : MvPowerSeries (Fin d ⊕ Fin d) R) (γ : Fin d ⊕ Fin d →₀ ℕ) :
-    coeff γ (swap c) = coeff (γ.mapDomain Sum.swap) c := by
+theorem coeff_swap_eq (d : ℕ) (c : MvPowerSeries (Fin d ⊕ Fin d) R) (γ : Fin d ⊕ Fin d →₀ ℕ)
+    : coeff γ (swap c) = coeff (γ.mapDomain Sum.swap) c := by
   classical
-  have ha : (Sum.elim (fun i => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) R))
-      (fun i => X (Sum.inl i))) = fun s => X (Sum.swap s) := by
+  have ha
+      : (Sum.elim
+          (fun i => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) R))
+          (fun i => X (Sum.inl i)))
+        = fun s => X (Sum.swap s) := by
     funext s; rcases s with s | s <;> rfl
-  have hs : HasSubst (fun s : Fin d ⊕ Fin d => (X (Sum.swap s) : MvPowerSeries (Fin d ⊕ Fin d) R)) :=
+  have hs
+      : HasSubst (fun s : Fin d ⊕ Fin d => (X (Sum.swap s) : MvPowerSeries (Fin d ⊕ Fin d) R)) :=
     hasSubst_of_constantCoeff_zero fun s => constantCoeff_X _
   unfold swap at2
   rw [ha, coeff_subst hs]
@@ -162,20 +177,20 @@ namespace GlobalTheory.HomogCob
 
 variable {R : Type} [CommRing R]
 
-theorem mdl_inl {d : ℕ} (β : Fin d →₀ ℕ) (k : Fin d) :
-    (β.mapDomain Sum.inl : Fin d ⊕ Fin d →₀ ℕ) (Sum.inl k) = β k :=
+theorem mdl_inl {d : ℕ} (β : Fin d →₀ ℕ) (k : Fin d)
+    : (β.mapDomain Sum.inl : Fin d ⊕ Fin d →₀ ℕ) (Sum.inl k) = β k :=
   Finsupp.mapDomain_apply_of_injective Sum.inl_injective β k
 
-theorem mdl_inr {d : ℕ} (β : Fin d →₀ ℕ) (k : Fin d) :
-    (β.mapDomain Sum.inl : Fin d ⊕ Fin d →₀ ℕ) (Sum.inr k) = 0 :=
+theorem mdl_inr {d : ℕ} (β : Fin d →₀ ℕ) (k : Fin d)
+    : (β.mapDomain Sum.inl : Fin d ⊕ Fin d →₀ ℕ) (Sum.inr k) = 0 :=
   Finsupp.mapDomain_notin_range _ _ (by simp)
 
-theorem mdr_inl {d : ℕ} (β : Fin d →₀ ℕ) (k : Fin d) :
-    (β.mapDomain Sum.inr : Fin d ⊕ Fin d →₀ ℕ) (Sum.inl k) = 0 :=
+theorem mdr_inl {d : ℕ} (β : Fin d →₀ ℕ) (k : Fin d)
+    : (β.mapDomain Sum.inr : Fin d ⊕ Fin d →₀ ℕ) (Sum.inl k) = 0 :=
   Finsupp.mapDomain_notin_range _ _ (by simp)
 
-theorem eqA {d : ℕ} (a β : Fin d →₀ ℕ) (j : Fin d) (h : 1 ≤ β j) :
-    a = β - Finsupp.single j 1 ↔ a + Finsupp.single j 1 = β := by
+theorem eqA {d : ℕ} (a β : Fin d →₀ ℕ) (j : Fin d) (h : 1 ≤ β j)
+    : a = β - Finsupp.single j 1 ↔ a + Finsupp.single j 1 = β := by
   constructor
   · rintro rfl
     ext k
@@ -186,15 +201,15 @@ theorem eqA {d : ℕ} (a β : Fin d →₀ ℕ) (j : Fin d) (h : 1 ≤ β j) :
     simp only [Finsupp.coe_add, Finsupp.coe_tsub, Pi.add_apply, Pi.sub_apply, Finsupp.single_apply]
     split_ifs <;> omega
 
-theorem neA {d : ℕ} (a β : Fin d →₀ ℕ) (j : Fin d) (h : β j = 0) :
-    a + Finsupp.single j 1 ≠ β := by
+theorem neA {d : ℕ} (a β : Fin d →₀ ℕ) (j : Fin d) (h : β j = 0) : a + Finsupp.single j 1 ≠ β := by
   intro e
   have := DFunLike.congr_fun e j
   simp at this
   omega
 
-theorem eqB {d : ℕ} (a β : Fin d →₀ ℕ) (j i : Fin d) (hji : j ≠ i) (h : 1 ≤ β j) :
-    a = β - Finsupp.single j 1 + Finsupp.single i 1 ↔ a + Finsupp.single j 1 = β + Finsupp.single i 1 := by
+theorem eqB {d : ℕ} (a β : Fin d →₀ ℕ) (j i : Fin d) (hji : j ≠ i) (h : 1 ≤ β j)
+    : a = β - Finsupp.single j 1 + Finsupp.single i 1
+      ↔ a + Finsupp.single j 1 = β + Finsupp.single i 1 := by
   constructor
   · rintro rfl
     ext k
@@ -207,38 +222,39 @@ theorem eqB {d : ℕ} (a β : Fin d →₀ ℕ) (j i : Fin d) (hji : j ≠ i) (h
   · intro e
     ext k
     have := DFunLike.congr_fun e k
-    simp only [Finsupp.coe_add, Finsupp.coe_tsub, Pi.add_apply, Pi.sub_apply, Finsupp.single_apply] at this ⊢
+    simp only [Finsupp.coe_add, Finsupp.coe_tsub, Pi.add_apply, Pi.sub_apply, Finsupp.single_apply]
+      at this ⊢
     by_cases h1 : j = k
     · subst h1; simp [hji] at this ⊢; omega
     · by_cases h2 : i = k
       · subst h2; simp [h1] at this ⊢; omega
       · simp [h1, h2] at this ⊢; omega
 
-theorem neB {d : ℕ} (a β : Fin d →₀ ℕ) (j i : Fin d) (hji : j ≠ i) (h : β j = 0) :
-    a + Finsupp.single j 1 ≠ β + Finsupp.single i 1 := by
+theorem neB {d : ℕ} (a β : Fin d →₀ ℕ) (j i : Fin d) (hji : j ≠ i) (h : β j = 0)
+    : a + Finsupp.single j 1 ≠ β + Finsupp.single i 1 := by
   intro e
   have := DFunLike.congr_fun e j
   simp [Finsupp.single_apply, hji.symm] at this
   omega
 
-theorem eqC {d : ℕ} (β : Fin d →₀ ℕ) (j : Fin d) (h : 1 ≤ β j) :
-    β - Finsupp.single j 1 + Finsupp.single j 1 = β := by
+theorem eqC {d : ℕ} (β : Fin d →₀ ℕ) (j : Fin d) (h : 1 ≤ β j)
+    : β - Finsupp.single j 1 + Finsupp.single j 1 = β := by
   ext k
   simp only [Finsupp.coe_add, Finsupp.coe_tsub, Pi.add_apply, Pi.sub_apply, Finsupp.single_apply]
   split_ifs with h1 <;> (try subst h1) <;> omega
 
-theorem subA {d : ℕ} (β : Fin d →₀ ℕ) (j : Fin d) :
-    (β.mapDomain Sum.inl : Fin d ⊕ Fin d →₀ ℕ) - Finsupp.single (Sum.inl j) 1 =
-      (β - Finsupp.single j 1).mapDomain Sum.inl := by
+theorem subA {d : ℕ} (β : Fin d →₀ ℕ) (j : Fin d)
+    : (β.mapDomain Sum.inl : Fin d ⊕ Fin d →₀ ℕ) - Finsupp.single (Sum.inl j) 1
+      = (β - Finsupp.single j 1).mapDomain Sum.inl := by
   ext k
   rcases k with k | k
   · simp only [Finsupp.coe_tsub, Pi.sub_apply, mdl_inl, Finsupp.single_apply, Sum.inl.injEq]
   · simp [mdl_inr, Finsupp.single_apply]
 
-theorem subB {d : ℕ} (β : Fin d →₀ ℕ) (j i : Fin d) :
-    (β.mapDomain Sum.inl : Fin d ⊕ Fin d →₀ ℕ) + Finsupp.single (Sum.inr i) 1 -
-      Finsupp.single (Sum.inl j) 1 =
-      (β - Finsupp.single j 1).mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1 := by
+theorem subB {d : ℕ} (β : Fin d →₀ ℕ) (j i : Fin d)
+    : (β.mapDomain Sum.inl : Fin d ⊕ Fin d →₀ ℕ) + Finsupp.single (Sum.inr i) 1
+        - Finsupp.single (Sum.inl j) 1
+      = (β - Finsupp.single j 1).mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1 := by
   ext k
   rcases k with k | k
   · simp [mdl_inl, Finsupp.single_apply]
@@ -253,10 +269,16 @@ variable {R : Type} [CommRing R]
 theorem hX {σ : Type} (s : σ) : (X s : MvPowerSeries σ R) = monomial (Finsupp.single s 1) 1 := by
   rw [← pow_one (X s), X_pow_eq]
 
-theorem coeff_prod_addLaw (d n : ℕ) : ∀ α : Fin d →₀ ℕ, α.degree = n → ∀ β : Fin d →₀ ℕ,
-    coeff (β.mapDomain Sum.inl) (α.prod fun s m => addLaw R d s ^ m) = (if α = β then 1 else 0) ∧
-    ∀ i : Fin d, coeff (β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1)
-      (α.prod fun s m => addLaw R d s ^ m) = if α = β + Finsupp.single i 1 then (α i : R) else 0 := by
+theorem coeff_prod_addLaw (d n : ℕ)
+    : ∀ α : Fin d →₀ ℕ,
+      α.degree = n
+        → ∀ β : Fin d →₀ ℕ,
+          coeff (β.mapDomain Sum.inl) (α.prod fun s m => addLaw R d s ^ m)
+              = (if α = β then 1 else 0)
+            ∧ ∀ i : Fin d,
+              coeff (β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1)
+                  (α.prod fun s m => addLaw R d s ^ m)
+                = if α = β + Finsupp.single i 1 then (α i : R) else 0 := by
   classical
   induction n with
   | zero =>
@@ -269,7 +291,9 @@ theorem coeff_prod_addLaw (d n : ℕ) : ∀ α : Fin d →₀ ℕ, α.degree = n
       by_cases hβ : β = 0
       · subst hβ; simp
       · rw [if_neg, if_neg (Ne.symm hβ)]
-        intro h; apply hβ; ext k
+        intro h
+        apply hβ
+        ext k
         have := DFunLike.congr_fun h (Sum.inl k)
         simpa [mdl_inl] using this
     · rw [coeff_one, if_neg, if_neg]
@@ -286,27 +310,33 @@ theorem coeff_prod_addLaw (d n : ℕ) : ∀ α : Fin d →₀ ℕ, α.degree = n
       have : α = 0 := Finsupp.ext hc
       rw [this, map_zero] at hα
       omega
-    obtain ⟨a, rfl⟩ : ∃ a, α = a + Finsupp.single j 1 := ⟨α - Finsupp.single j 1, by
-      ext k
-      simp only [Finsupp.coe_add, Finsupp.coe_tsub, Pi.add_apply, Pi.sub_apply, Finsupp.single_apply]
-      split_ifs with h1 <;> (try subst h1) <;> omega⟩
-    have ha : a.degree = n := by
-      rw [map_add (f := _), Finsupp.degree_single] at hα; omega
-    have hP : ((a + Finsupp.single j 1).prod fun s m => addLaw R d s ^ m) =
-        (a.prod fun s m => addLaw R d s ^ m) * monomial (Finsupp.single (Sum.inl j) 1) 1 +
-        (a.prod fun s m => addLaw R d s ^ m) * monomial (Finsupp.single (Sum.inr j) 1) 1 := by
+    obtain ⟨a, rfl⟩ : ∃ a, α = a + Finsupp.single j 1 := ⟨
+      α - Finsupp.single j 1,
+      by
+        ext k
+        simp only [Finsupp.coe_add, Finsupp.coe_tsub, Pi.add_apply, Pi.sub_apply,
+          Finsupp.single_apply]
+        split_ifs with h1 <;> (try subst h1) <;> omega
+    ⟩
+    have ha : a.degree = n := by rw [map_add (f := _), Finsupp.degree_single] at hα; omega
+    have hP
+        : ((a + Finsupp.single j 1).prod fun s m => addLaw R d s ^ m)
+          = (a.prod fun s m => addLaw R d s ^ m) * monomial (Finsupp.single (Sum.inl j) 1) 1
+            + (a.prod fun s m => addLaw R d s ^ m) * monomial (Finsupp.single (Sum.inr j) 1) 1 := by
       rw [Finsupp.prod_add_index' (by simp) (by intros; rw [pow_add]),
         Finsupp.prod_single_index (by simp), pow_one, ← hX, ← hX, ← mul_add]
       rfl
     rw [hP]
     refine ⟨?_, fun i => ?_⟩
-    · rw [map_add (f := _), coeff_mul_monomial, coeff_mul_monomial, if_neg (c := Finsupp.single (Sum.inr j) 1 ≤ _), add_zero]
+    · rw [map_add (f := _), coeff_mul_monomial, coeff_mul_monomial,
+        if_neg (c := Finsupp.single (Sum.inr j) 1 ≤ _), add_zero]
       swap
       · rw [Finsupp.single_le_iff, mdl_inr]; omega
       by_cases hb : 1 ≤ β j
       · rw [if_pos (by rw [Finsupp.single_le_iff, mdl_inl]; exact hb), subA, (ih a ha _).1, mul_one]
         simp only [eqA a β j hb]
-      · rw [if_neg (by rw [Finsupp.single_le_iff, mdl_inl]; exact hb), if_neg (neA a β j (by omega))]
+      · rw [if_neg (by rw [Finsupp.single_le_iff, mdl_inl]; exact hb),
+          if_neg (neA a β j (by omega))]
     · rw [map_add (f := _), coeff_mul_monomial, coeff_mul_monomial]
       by_cases hji : j = i
       · subst hji
@@ -326,7 +356,8 @@ theorem coeff_prod_addLaw (d n : ℕ) : ∀ α : Fin d →₀ ℕ, α.degree = n
             simp [this]
           · simp [hab]
       · rw [if_neg (c := Finsupp.single (Sum.inr j) 1 ≤ _)
-          (by rw [Finsupp.single_le_iff]; simp [mdl_inr, Finsupp.single_apply, Ne.symm hji]), add_zero]
+            (by rw [Finsupp.single_le_iff]; simp [mdl_inr, Finsupp.single_apply, Ne.symm hji]),
+          add_zero]
         have hi : (((a + Finsupp.single j 1 : Fin d →₀ ℕ) i : ℕ) : R) = (a i : R) := by
           simp [Finsupp.single_apply, hji]
         rw [hi]
@@ -343,33 +374,35 @@ namespace GlobalTheory.HomogCob
 
 variable {R : Type} [CommRing R]
 
-theorem coeff_cob1_additive_law_mixed (d : ℕ) (f : MvPowerSeries (Fin d) R) (β : Fin d →₀ ℕ) (i : Fin d)
-    (hβ : β ≠ 0) :
-    coeff (β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1) (cob1 (addLaw R d) f) =
-      ((β i + 1 : ℕ) : R) * coeff (β + Finsupp.single i 1) f := by
+theorem coeff_cob1_additive_law_mixed
+    (d : ℕ) (f : MvPowerSeries (Fin d) R) (β : Fin d →₀ ℕ) (i : Fin d) (hβ : β ≠ 0)
+    : coeff (β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1) (cob1 (addLaw R d) f)
+      = ((β i + 1 : ℕ) : R) * coeff (β + Finsupp.single i 1) f := by
   classical
   have hL : HasSubst (fun s : Fin d => (X (Sum.inl s) : MvPowerSeries (Fin d ⊕ Fin d) R)) :=
     hasSubst_of_constantCoeff_zero fun s => constantCoeff_X _
   have hR : HasSubst (fun s : Fin d => (X (Sum.inr s) : MvPowerSeries (Fin d ⊕ Fin d) R)) :=
     hasSubst_of_constantCoeff_zero fun s => constantCoeff_X _
-  have hA : HasSubst (addLaw R d) := hasSubst_of_constantCoeff_zero fun s => by
-    simp [addLaw]
+  have hA : HasSubst (addLaw R d) := hasSubst_of_constantCoeff_zero fun s => by simp [addLaw]
   unfold cob1 inL inR
   rw [map_sub, map_sub, coeff_subst hL, coeff_subst hR, coeff_subst hA]
   simp_rw [prod_X_map, coeff_monomial]
-  have h1 : (∑ᶠ δ : Fin d →₀ ℕ, coeff δ f • (if β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1 =
-      δ.mapDomain Sum.inl then (1 : R) else 0)) = 0 := by
+  have h1
+      : (∑ᶠ δ : Fin d →₀ ℕ, coeff δ f • (if β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1 =
+          δ.mapDomain Sum.inl then (1 : R) else 0))
+        = 0 := by
     refine finsum_eq_zero_of_forall_eq_zero fun δ => ?_
     rw [if_neg, smul_zero]
     intro h
     have := DFunLike.congr_fun h (Sum.inr i)
     simp [mdl_inr, Finsupp.mapDomain_apply_of_injective Sum.inl_injective] at this
-  have h2 : (∑ᶠ δ : Fin d →₀ ℕ, coeff δ f • (if β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1 =
-      δ.mapDomain Sum.inr then (1 : R) else 0)) = 0 := by
+  have h2
+      : (∑ᶠ δ : Fin d →₀ ℕ, coeff δ f • (if β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1 =
+          δ.mapDomain Sum.inr then (1 : R) else 0))
+        = 0 := by
     refine finsum_eq_zero_of_forall_eq_zero fun δ => ?_
     rw [if_neg, smul_zero]
-    obtain ⟨k, hk⟩ : ∃ k, β k ≠ 0 := by
-      by_contra! hc; exact hβ (Finsupp.ext hc)
+    obtain ⟨k, hk⟩ : ∃ k, β k ≠ 0 := by by_contra! hc; exact hβ (Finsupp.ext hc)
     intro h
     have := DFunLike.congr_fun h (Sum.inl k)
     simp [mdl_inl, mdr_inl] at this
@@ -383,6 +416,22 @@ theorem coeff_cob1_additive_law_mixed (d : ℕ) (f : MvPowerSeries (Fin d) R) (�
 
 end GlobalTheory.HomogCob
 
-theorem GlobalTheory.homog_cob_addLaw : ∀ (R : Type) [CommRing R] (d N : ℕ), (∀ f : MvPowerSeries (Fin d) R, (∀ α : Fin d →₀ ℕ, α.degree ≠ N → coeff α f = 0) → ∀ γ : Fin d ⊕ Fin d →₀ ℕ, γ.degree ≠ N → coeff γ (cob1 (addLaw R d) f) = 0) ∧ (∀ c : MvPowerSeries (Fin d ⊕ Fin d) R, (∀ α : Fin d ⊕ Fin d →₀ ℕ, α.degree ≠ N → coeff α c = 0) → ∀ γ : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, γ.degree ≠ N → coeff γ (cob2 (addLaw R d) c) = 0) ∧ (∀ (c : MvPowerSeries (Fin d ⊕ Fin d) R) (γ : Fin d ⊕ Fin d →₀ ℕ), coeff γ (swap c) = coeff (γ.mapDomain Sum.swap) c) ∧ ∀ (f : MvPowerSeries (Fin d) R) (β : Fin d →₀ ℕ) (i : Fin d), β ≠ 0 → coeff (β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1) (cob1 (addLaw R d) f) = ((β i + 1 : ℕ) : R) * coeff (β + Finsupp.single i 1) f :=
-  fun _ _ d N => ⟨GlobalTheory.HomogCob.coeff_cob1_addLaw_eq_zero_of_degree_ne d N, GlobalTheory.HomogCob.coeff_cob2_addLaw_eq_zero_of_degree_ne d N, GlobalTheory.HomogCob.coeff_swap_eq d,
-    GlobalTheory.HomogCob.coeff_cob1_additive_law_mixed d⟩
+theorem GlobalTheory.homog_cob_addLaw
+    : ∀ (R : Type) [CommRing R] (d N : ℕ),
+      (∀ f : MvPowerSeries (Fin d) R,
+          (∀ α : Fin d →₀ ℕ, α.degree ≠ N → coeff α f = 0)
+            → ∀ γ : Fin d ⊕ Fin d →₀ ℕ, γ.degree ≠ N → coeff γ (cob1 (addLaw R d) f) = 0)
+        ∧ (∀ c : MvPowerSeries (Fin d ⊕ Fin d) R,
+          (∀ α : Fin d ⊕ Fin d →₀ ℕ, α.degree ≠ N → coeff α c = 0)
+            → ∀ γ : Fin d ⊕ (Fin d ⊕ Fin d) →₀ ℕ, γ.degree ≠ N → coeff γ (cob2 (addLaw R d) c) = 0)
+        ∧ (∀ (c : MvPowerSeries (Fin d ⊕ Fin d) R) (γ : Fin d ⊕ Fin d →₀ ℕ),
+          coeff γ (swap c) = coeff (γ.mapDomain Sum.swap) c)
+        ∧ ∀ (f : MvPowerSeries (Fin d) R) (β : Fin d →₀ ℕ) (i : Fin d),
+          β ≠ 0
+            → coeff (β.mapDomain Sum.inl + Finsupp.single (Sum.inr i) 1) (cob1 (addLaw R d) f)
+              = ((β i + 1 : ℕ) : R) * coeff (β + Finsupp.single i 1) f := fun _ _ d N => ⟨
+  GlobalTheory.HomogCob.coeff_cob1_addLaw_eq_zero_of_degree_ne d N,
+  GlobalTheory.HomogCob.coeff_cob2_addLaw_eq_zero_of_degree_ne d N,
+  GlobalTheory.HomogCob.coeff_swap_eq d,
+  GlobalTheory.HomogCob.coeff_cob1_additive_law_mixed d
+⟩

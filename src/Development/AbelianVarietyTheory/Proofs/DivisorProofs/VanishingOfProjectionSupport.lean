@@ -23,14 +23,25 @@ lemma lintegral_indicator_translate {X : Type} [AddCommGroup X] [MeasurableSpace
   · rw [Set.indicator_of_notMem (show x + z ∉ {x | P x - z ∈ S} from fun h' => hxs (hx.mp h')),
       Set.indicator_of_notMem (show x ∉ {x | P x ∈ S} from hxs)]
 
-theorem vanish_at_point : ∀ {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] [LocallyCompactSpace X]
-    [MeasurableSpace X] [BorelSpace X] (μ : Measure X) [μ.IsAddHaarMeasure] (P : X →+ X), Continuous P →
-    (∀ x, P (P x) = P x) → ∀ (Φ Ψ : X → ℂ), Continuous Φ → Continuous Ψ → ∀ K : Set X, IsCompact K →
-    (∀ x, Φ x ≠ 0 → P x ∈ K) → ∀ y : X, (∀ z, P z = z → Φ (y + z) = 0) →
-    (∀ O : Set X, IsOpen O → y ∈ O → ∃ h : X → ENNReal, Measurable h ∧ (∀ x, h x ≤ 1) ∧
-      (∀ x z, P z = z → h (x + z) = h x) ∧ (∀ x, h x ≠ 0 → x + (P y - P x) ∈ O) ∧
-      (∃ O' : Set X, IsOpen O' ∧ y ∈ O' ∧ ∀ x ∈ O', Ψ x ≠ 0 → 1 / 2 ≤ h x) ∧
-      ∫⁻ x, h x * ‖Ψ x‖ₑ ^ 2 ∂μ = ∫⁻ x, h x * ‖Φ x‖ₑ ^ 2 ∂μ) → Ψ y = 0 := by
+theorem vanish_at_point
+    : ∀ {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
+        [LocallyCompactSpace X] [MeasurableSpace X] [BorelSpace X] (μ : Measure X)
+        [μ.IsAddHaarMeasure] (P : X →+ X),
+      Continuous P → (∀ x, P (P x) = P x)
+        → ∀ (Φ Ψ : X → ℂ),
+          Continuous Φ → Continuous Ψ
+            → ∀ K : Set X,
+              IsCompact K → (∀ x, Φ x ≠ 0 → P x ∈ K)
+                → ∀ y : X,
+                  (∀ z, P z = z → Φ (y + z) = 0)
+                    → (∀ O : Set X,
+                      IsOpen O → y ∈ O
+                        → ∃ h : X → ENNReal,
+                          Measurable h ∧ (∀ x, h x ≤ 1) ∧ (∀ x z, P z = z → h (x + z) = h x)
+                            ∧ (∀ x, h x ≠ 0 → x + (P y - P x) ∈ O)
+                            ∧ (∃ O' : Set X, IsOpen O' ∧ y ∈ O' ∧ ∀ x ∈ O', Ψ x ≠ 0 → 1 / 2 ≤ h x)
+                            ∧ ∫⁻ x, h x * ‖Ψ x‖ₑ ^ 2 ∂μ = ∫⁻ x, h x * ‖Φ x‖ₑ ^ 2 ∂μ)
+                    → Ψ y = 0 := by
   intro X _ _ _ _ _ _ μ _ P hPc hPP Φ Ψ hΦ hΨ K hK hΦK y hΦy hyp
   by_contra hne
   set δ : NNReal := ‖Ψ y‖₊ / 2 with hδ
@@ -59,18 +70,20 @@ theorem vanish_at_point : ∀ {X : Type} [AddCommGroup X] [TopologicalSpace X] [
   set PK := P '' K with hPK
   have hPKc : IsCompact PK := hK.image hPc
   have hPKfix : ∀ a ∈ PK, P a = a := by rintro _ ⟨k, -, rfl⟩; exact hPP k
-  obtain ⟨t, htPK, hcover⟩ := hPKc.elim_nhds_subcover (fun a => {w | w - (a - P y) ∈ U1}) (by
-    intro a _
-    apply (hU1o.preimage (continuous_id.sub continuous_const)).mem_nhds
-    show a - (a - P y) ∈ U1
-    rwa [sub_sub_cancel])
+  obtain ⟨t, htPK, hcover⟩ :=
+    hPKc.elim_nhds_subcover (fun a => {w | w - (a - P y) ∈ U1}) (by
+      intro a _
+      apply (hU1o.preimage (continuous_id.sub continuous_const)).mem_nhds
+      show a - (a - P y) ∈ U1
+      rwa [sub_sub_cancel])
   set N := t.card with hN
   set ε : NNReal := δ / (N + 1) with hεdef
   have hεpos : 0 < ε := div_pos hδpos (by positivity)
   have hε : ε ^ 2 * N < δ ^ 2 := by
-    rw [hεdef, ← NNReal.coe_lt_coe]; push_cast
-    have hδr : (0:ℝ) < δ := hδpos
-    have hNr : (0:ℝ) ≤ N := Nat.cast_nonneg _
+    rw [hεdef, ← NNReal.coe_lt_coe]
+    push_cast
+    have hδr : (0 : ℝ) < δ := hδpos
+    have hNr : (0 : ℝ) ≤ N := Nat.cast_nonneg _
     rw [div_pow, div_mul_eq_mul_div, div_lt_iff₀ (by positivity)]
     nlinarith [pow_pos hδr 2, mul_nonneg (pow_pos hδr 2).le (sq_nonneg (N:ℝ)), mul_nonneg (pow_pos hδr 2).le hNr]
   have htube : ∀ᶠ b in 𝓝 (y - P y), ∀ a ∈ PK, ‖Φ (a + b)‖₊ < ε := by
@@ -97,7 +110,7 @@ theorem vanish_at_point : ∀ {X : Type} [AddCommGroup X] [TopologicalSpace X] [
   have hdec : ∀ x : X, P x + (x - P x) = x := fun x => by abel
   set A : Set X := {x | P x ∈ U1} with hA
   set I := ∫⁻ x, A.indicator h x ∂μ with hI
-  have hlow : (δ:ENNReal) ^ 2 * I ≤ ∫⁻ x, h x * ‖Ψ x‖ₑ ^ 2 ∂μ := by
+  have hlow : (δ : ENNReal) ^ 2 * I ≤ ∫⁻ x, h x * ‖Ψ x‖ₑ ^ 2 ∂μ := by
     rw [hI, ← lintegral_const_mul' _ _ (by simp)]
     apply lintegral_mono
     intro x
@@ -114,9 +127,11 @@ theorem vanish_at_point : ∀ {X : Type} [AddCommGroup X] [TopologicalSpace X] [
         rw [enorm_eq_nnnorm]
         exact ENNReal.coe_le_coe.mpr hxV.le
     · simp [hxA]
-  have hup : ∫⁻ x, h x * ‖Φ x‖ₑ ^ 2 ∂μ ≤ (ε:ENNReal) ^ 2 * (N * I) := by
-    have hpt : ∀ x, h x * ‖Φ x‖ₑ ^ 2 ≤
-        (ε:ENNReal) ^ 2 * ∑ a ∈ t, Set.indicator {x | P x - (a - P y) ∈ U1} h x := by
+  have hup : ∫⁻ x, h x * ‖Φ x‖ₑ ^ 2 ∂μ ≤ (ε : ENNReal) ^ 2 * (N * I) := by
+    have hpt
+        : ∀ x,
+          h x * ‖Φ x‖ₑ ^ 2
+            ≤ (ε : ENNReal) ^ 2 * ∑ a ∈ t, Set.indicator {x | P x - (a - P y) ∈ U1} h x := by
       intro x
       by_cases hx0 : h x = 0
       · simp [hx0]
@@ -131,32 +146,39 @@ theorem vanish_at_point : ∀ {X : Type} [AddCommGroup X] [TopologicalSpace X] [
       have hsmall : ‖Φ x‖₊ < ε := by
         have := hO3sub _ (hsupp' x hx0).2 (P x) hPx
         rwa [hdec] at this
-      calc h x * ‖Φ x‖ₑ ^ 2 ≤ h x * (ε:ENNReal) ^ 2 := by
-            gcongr
-            rw [enorm_eq_nnnorm]
-            exact ENNReal.coe_le_coe.mpr hsmall.le
-        _ = (ε:ENNReal) ^ 2 * Set.indicator {x | P x - (a - P y) ∈ U1} h x := by
-            rw [Set.indicator_of_mem (show x ∈ {x | P x - (a - P y) ∈ U1} from hxa), mul_comm]
-        _ ≤ (ε:ENNReal) ^ 2 * ∑ a ∈ t, Set.indicator {x | P x - (a - P y) ∈ U1} h x := by
-            gcongr
-            exact Finset.single_le_sum (f := fun a => Set.indicator {x | P x - (a - P y) ∈ U1} h x)
-              (fun _ _ => bot_le) hat
-    calc _ ≤ ∫⁻ x, (ε:ENNReal) ^ 2 * ∑ a ∈ t, Set.indicator {x | P x - (a - P y) ∈ U1} h x ∂μ :=
-          lintegral_mono hpt
-      _ = (ε:ENNReal) ^ 2 * ∑ a ∈ t, ∫⁻ x, Set.indicator {x | P x - (a - P y) ∈ U1} h x ∂μ := by
-          rw [lintegral_const_mul' _ _ (by simp), MeasureTheory.lintegral_finsetSum]
-          intro a _
-          exact hhm.indicator ((hU1o.preimage (hPc.sub continuous_const)).measurableSet)
-      _ = (ε:ENNReal) ^ 2 * (N * I) := by
-          congr 1
-          rw [Finset.sum_congr rfl (fun a ha => lintegral_indicator_translate μ P h hinv U1 (a - P y)
-            (by rw [map_sub, hPKfix a (htPK a ha), hPP])), Finset.sum_const, nsmul_eq_mul]
+      calc
+        h x * ‖Φ x‖ₑ ^ 2 ≤ h x * (ε : ENNReal) ^ 2 := by
+          gcongr
+          rw [enorm_eq_nnnorm]
+          exact ENNReal.coe_le_coe.mpr hsmall.le
+        _ = (ε : ENNReal) ^ 2 * Set.indicator {x | P x - (a - P y) ∈ U1} h x := by
+          rw [Set.indicator_of_mem (show x ∈ {x | P x - (a - P y) ∈ U1} from hxa), mul_comm]
+        _ ≤ (ε : ENNReal) ^ 2 * ∑ a ∈ t, Set.indicator {x | P x - (a - P y) ∈ U1} h x := by
+          gcongr
+          exact Finset.single_le_sum
+            (f := fun a => Set.indicator {x | P x - (a - P y) ∈ U1} h x)
+            (fun _ _ => bot_le)
+            hat
+    calc
+      _ ≤ ∫⁻ x, (ε:ENNReal) ^ 2 * ∑ a ∈ t, Set.indicator {x | P x - (a - P y) ∈ U1} h x ∂μ :=
+        lintegral_mono hpt
+      _ = (ε : ENNReal) ^ 2 * ∑ a ∈ t, ∫⁻ x, Set.indicator {x | P x - (a - P y) ∈ U1} h x ∂μ := by
+        rw [lintegral_const_mul' _ _ (by simp), MeasureTheory.lintegral_finsetSum]
+        intro a _
+        exact hhm.indicator ((hU1o.preimage (hPc.sub continuous_const)).measurableSet)
+      _ = (ε : ENNReal) ^ 2 * (N * I) := by
+        congr 1
+        rw [Finset.sum_congr rfl (fun a ha =>
+            lintegral_indicator_translate μ P h hinv U1 (a - P y)
+              (by rw [map_sub, hPKfix a (htPK a ha), hPP])),
+          Finset.sum_const, nsmul_eq_mul]
   have hIpos : I ≠ 0 := by
     let W := O' ∩ {x | Ψ x ≠ 0} ∩ A
-    have hWo : IsOpen W := (hO'o.inter (isOpen_ne_fun hΨ continuous_const)).inter (hU1o.preimage hPc)
+    have hWo : IsOpen W :=
+      (hO'o.inter (isOpen_ne_fun hΨ continuous_const)).inter (hU1o.preimage hPc)
     have hyW : y ∈ W := ⟨⟨hyO', hne⟩, hPyU1⟩
     have hWpos : 0 < μ W := hWo.measure_pos μ ⟨y, hyW⟩
-    have hle : (1/2 : ENNReal) * μ W ≤ I := by
+    have hle : (1 / 2 : ENNReal) * μ W ≤ I := by
       rw [← lintegral_indicator_const hWo.measurableSet]
       apply lintegral_mono
       intro x
@@ -179,14 +201,15 @@ theorem vanish_at_point : ∀ {X : Type} [AddCommGroup X] [TopologicalSpace X] [
       · rw [Set.indicator_of_mem hxA]
         by_cases hx0 : h x = 0
         · simp [hx0]
-        · have hxU : x ∈ U := hCU ⟨(P x, x - P x),
-            ⟨interior_subset hxA, interior_subset (hsupp' x hx0).1⟩, hdec x⟩
+        · have hxU : x ∈ U :=
+            hCU ⟨(P x, x - P x), ⟨interior_subset hxA, interior_subset (hsupp' x hx0).1⟩, hdec x⟩
           rw [Set.indicator_of_mem hxU]
           simpa using hh1 x
       · simp [hxA]
     exact ne_top_of_le_ne_top hUfin.ne hle
-  have hchain : (δ:ENNReal) ^ 2 * I ≤ ((ε:ENNReal) ^ 2 * N) * I := by
-    calc _ ≤ _ := hlow
+  have hchain : (δ : ENNReal) ^ 2 * I ≤ ((ε : ENNReal) ^ 2 * N) * I := by
+    calc
+      _ ≤ _ := hlow
       _ = _ := heq
       _ ≤ _ := hup
       _ = _ := by ring

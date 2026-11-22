@@ -4,36 +4,55 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module Topology UpperTheory.V.Loc UpperTheory.V.U3
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module Topology
+  UpperTheory.V.Loc UpperTheory.V.U3
 
-private def Reach {G A V : Type} [Group G] [CommRing A] [AddCommGroup V] [Module A V]
-    (ρ : Representation A G V) (S : Set (G →* Aˣ)) (U : Submodule A V) : Prop :=
-  ∃ (n : ℕ) (F : ℕ → Submodule A V), F 0 = ⊥ ∧ F n = U ∧ ∀ i < n, F i ≤ F (i + 1) ∧
-    ∃ κ ∈ S, ∃ x, F (i + 1) = F i ⊔ Submodule.span A {x} ∧ ∀ g, ρ g x - ((κ g : Aˣ) : A) • x ∈ F i
+private def Reach
+    {G A V : Type} [Group G] [CommRing A] [AddCommGroup V] [Module A V]
+    (ρ : Representation A G V) (S : Set (G →* Aˣ)) (U : Submodule A V)
+    : Prop :=
+  ∃ (n : ℕ) (F : ℕ → Submodule A V),
+    F 0 = ⊥ ∧ F n = U
+      ∧ ∀ i < n,
+        F i ≤ F (i + 1)
+          ∧ ∃ κ ∈ S, ∃ x,
+            F (i + 1) = F i ⊔ Submodule.span A {x} ∧ ∀ g, ρ g x - ((κ g : Aˣ) : A) • x ∈ F i
 
-private theorem reach_bot {G A V : Type} [Group G] [CommRing A] [AddCommGroup V] [Module A V]
-    (ρ : Representation A G V) (S : Set (G →* Aˣ)) : Reach ρ S ⊥ :=
+private theorem reach_bot
+    {G A V : Type} [Group G] [CommRing A] [AddCommGroup V] [Module A V]
+    (ρ : Representation A G V) (S : Set (G →* Aˣ))
+    : Reach ρ S ⊥ :=
   ⟨0, fun _ => ⊥, rfl, rfl, fun i hi => absurd hi (Nat.not_lt_zero i)⟩
 
-private theorem reach_step {G A V : Type} [Group G] [CommRing A] [AddCommGroup V] [Module A V]
+private theorem reach_step
+    {G A V : Type} [Group G] [CommRing A] [AddCommGroup V] [Module A V]
     {ρ : Representation A G V} {S : Set (G →* Aˣ)} {U : Submodule A V} (h : Reach ρ S U)
-    {κ : G →* Aˣ} (hκ : κ ∈ S) {x : V} (hx : ∀ g, ρ g x - ((κ g : Aˣ) : A) • x ∈ U) :
-    Reach ρ S (U ⊔ Submodule.span A {x}) := by
+    {κ : G →* Aˣ} (hκ : κ ∈ S)
+    {x : V} (hx : ∀ g, ρ g x - ((κ g : Aˣ) : A) • x ∈ U)
+    : Reach ρ S (U ⊔ Submodule.span A {x}) := by
   obtain ⟨n, F, h0, hn, hs⟩ := h
-  refine ⟨n + 1, fun i => if i ≤ n then F i else U ⊔ Submodule.span A {x}, by simp [h0], by simp, fun i hi => ?_⟩
+  refine ⟨
+    n + 1,
+    fun i => if i ≤ n then F i else U ⊔ Submodule.span A {x},
+    by simp [h0],
+    by simp,
+    fun i hi => ?_
+  ⟩
   rcases Nat.lt_succ_iff_lt_or_eq.mp hi with hi | rfl
   · have h1 : i ≤ n := hi.le
     have h2 : i + 1 ≤ n := hi
     simp only [h1, h2, if_true]
     exact hs i hi
-  · have h2 : ¬ (i + 1 ≤ i) := by omega
+  · have h2 : ¬(i + 1 ≤ i) := by omega
     simp only [h2, le_refl, if_true, if_false, hn]
     exact ⟨le_sup_left, κ, hκ, x, rfl, hx⟩
 
-private theorem reach_fin {G A V : Type} [Group G] [CommRing A] [AddCommGroup V] [Module A V]
+private theorem reach_fin
+    {G A V : Type} [Group G] [CommRing A] [AddCommGroup V] [Module A V]
     {ρ : Representation A G V} {S : Set (G →* Aˣ)} {U : Submodule A V} (h : Reach ρ S U)
-    {T : Set V} (hT : T.Finite) :
-    (∀ x ∈ T, ∃ κ ∈ S, ∀ g, ρ g x - ((κ g : Aˣ) : A) • x ∈ U) → Reach ρ S (U ⊔ Submodule.span A T) := by
+    {T : Set V} (hT : T.Finite)
+    : (∀ x ∈ T, ∃ κ ∈ S, ∀ g, ρ g x - ((κ g : Aˣ) : A) • x ∈ U)
+      → Reach ρ S (U ⊔ Submodule.span A T) := by
   induction T, hT using Set.Finite.induction_on with
   | empty =>
     intro _
@@ -49,8 +68,17 @@ private theorem reach_fin {G A V : Type} [Group G] [CommRing A] [AddCommGroup V]
     rw [e]
     exact hr2
 
-theorem UpperTheory.filtBy_restrictScalars_of_residual_characters :
-    ∀ {G E B V : Type} [Group G] [Field E] [CommRing B] [Algebra E B] [Module.Finite E B] [AddCommGroup V] [Module B V] [Module E V] [IsScalarTower E B V] (π : B →ₐ[E] E), (∀ a, π a = 0 → IsNilpotent a) → ∀ (ρ : Representation B G V) (S : Set (G →* Eˣ)) {ι : Type} [Finite ι] (x : ι → V) (κ : ι → G →* Eˣ), Submodule.span B (Set.range x) = ⊤ → (∀ j, κ j ∈ S) → (∀ g j, ρ g (x j) - ((κ j g : Eˣ) : E) • x j ∈ (RingHom.ker (π : B →+* E)) • (⊤ : Submodule B V)) → FiltBy (resCoef E ρ) S := by
+theorem UpperTheory.filtBy_restrictScalars_of_residual_characters
+    : ∀ {G E B V : Type} [Group G] [Field E] [CommRing B] [Algebra E B] [Module.Finite E B]
+        [AddCommGroup V] [Module B V] [Module E V] [IsScalarTower E B V] (π : B →ₐ[E] E),
+      (∀ a, π a = 0 → IsNilpotent a)
+        → ∀ (ρ : Representation B G V) (S : Set (G →* Eˣ)) {ι : Type} [Finite ι] (x : ι → V)
+            (κ : ι → G →* Eˣ),
+          Submodule.span B (Set.range x) = ⊤ → (∀ j, κ j ∈ S)
+            → (∀ g j,
+              ρ g (x j) - ((κ j g : Eˣ) : E) • x j
+                ∈ (RingHom.ker (π : B →+* E)) • (⊤ : Submodule B V))
+            → FiltBy (resCoef E ρ) S := by
   intro G E B V _ _ _ _ _ _ _ _ _ π hπ ρ S ι _ x κ hx hκ hstep
   have hnil : IsNilpotent (RingHom.ker (π : B →+* E)) := by
     haveI : IsNoetherianRing B := isNoetherian_of_tower E inferInstance
@@ -58,8 +86,9 @@ theorem UpperTheory.filtBy_restrictScalars_of_residual_characters :
     intro a ha
     exact mem_nilradical.mpr (hπ a ha)
   obtain ⟨N, hN⟩ := hnil
-  obtain ⟨M, hM⟩ : ∃ M : ℕ → Submodule E V, ∀ k,
-      M k = ((RingHom.ker (π : B →+* E)) ^ k • (⊤ : Submodule B V)).restrictScalars E :=
+  obtain ⟨M, hM⟩
+      : ∃ M : ℕ → Submodule E V, ∀ k,
+        M k = ((RingHom.ker (π : B →+* E)) ^ k • (⊤ : Submodule B V)).restrictScalars E :=
     ⟨_, fun _ => rfl⟩
   have hMm : ∀ k v, v ∈ M k ↔ v ∈ (RingHom.ker (π : B →+* E)) ^ k • (⊤ : Submodule B V) := by
     intro k v
@@ -69,20 +98,23 @@ theorem UpperTheory.filtBy_restrictScalars_of_residual_characters :
     have hfg : (((RingHom.ker (π : B →+* E)) ^ p).restrictScalars E).FG := IsNoetherian.noetherian _
     obtain ⟨s, hsf, hs⟩ := Submodule.fg_def.mp hfg
     have hsub : ∀ a ∈ s, a ∈ (RingHom.ker (π : B →+* E)) ^ p := fun a ha => by
-      have : a ∈ ((RingHom.ker (π : B →+* E)) ^ p).restrictScalars E := hs ▸ Submodule.subset_span ha
+      have : a ∈ ((RingHom.ker (π : B →+* E)) ^ p).restrictScalars E :=
+        hs ▸ Submodule.subset_span ha
       exact this
     have hTf : (Set.image2 (fun a j => a • x j) s (Set.univ : Set ι)).Finite :=
       hsf.image2 _ Set.finite_univ
-    have hr := reach_fin (ρ := resCoef E ρ) (S := S) h hTf (by
-      rintro y ⟨a, ha, j, -, rfl⟩
-      refine ⟨κ j, hκ j, fun g => ?_⟩
-      rw [hMm]
-      show ρ g (a • x j) - ((κ j g : Eˣ) : E) • (a • x j) ∈
-        ((RingHom.ker (π : B →+* E)) ^ (p + 1) • (⊤ : Submodule B V))
-      rw [map_smul, smul_comm ((κ j g : Eˣ) : E) a, ← smul_sub, pow_succ, Submodule.mul_smul]
-      exact Submodule.smul_mem_smul (hsub a ha) (hstep g j))
-    have claim : ∀ n ∈ Submodule.span B (Set.range x), ∀ a ∈ (RingHom.ker (π : B →+* E)) ^ p,
-        a • n ∈ Submodule.span E (Set.image2 (fun a j => a • x j) s (Set.univ : Set ι)) := by
+    have hr :=
+      reach_fin (ρ := resCoef E ρ) (S := S) h hTf (by
+        rintro y ⟨a, ha, j, -, rfl⟩
+        refine ⟨κ j, hκ j, fun g => ?_⟩
+        rw [hMm]
+        show ρ g (a • x j) - ((κ j g : Eˣ) : E) • (a • x j) ∈
+          ((RingHom.ker (π : B →+* E)) ^ (p + 1) • (⊤ : Submodule B V))
+        rw [map_smul, smul_comm ((κ j g : Eˣ) : E) a, ← smul_sub, pow_succ, Submodule.mul_smul]
+        exact Submodule.smul_mem_smul (hsub a ha) (hstep g j))
+    have claim
+        : ∀ n ∈ Submodule.span B (Set.range x), ∀ a ∈ (RingHom.ker (π : B →+* E)) ^ p,
+          a • n ∈ Submodule.span E (Set.image2 (fun a j => a • x j) s (Set.univ : Set ι)) := by
       intro n hn
       induction hn using Submodule.span_induction with
       | mem y hy =>
@@ -101,7 +133,8 @@ theorem UpperTheory.filtBy_restrictScalars_of_residual_characters :
         | smul c b _ hb =>
           rw [smul_assoc]
           exact Submodule.smul_mem _ c hb
-      | zero => intro a _; simp
+      | zero =>
+        intro a _; simp
       | add y z _ _ hy hz =>
         intro a ha
         rw [smul_add]
@@ -110,7 +143,10 @@ theorem UpperTheory.filtBy_restrictScalars_of_residual_characters :
         intro a ha
         rw [smul_smul]
         exact hy (a * b) (Ideal.mul_mem_right b _ ha)
-    have e : M p = M (p + 1) ⊔ Submodule.span E (Set.image2 (fun a j => a • x j) s (Set.univ : Set ι)) := by
+    have e
+        : M p
+          = M (p + 1)
+            ⊔ Submodule.span E (Set.image2 (fun a j => a • x j) s (Set.univ : Set ι)) := by
       apply le_antisymm
       · intro v hv
         apply Submodule.mem_sup_right

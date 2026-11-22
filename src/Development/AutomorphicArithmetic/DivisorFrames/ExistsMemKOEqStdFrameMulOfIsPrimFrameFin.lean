@@ -9,8 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGLMulI
 open GlobalTheory.SplitFlip GlobalTheory.SplitWeil ValuativeRel
 
 open Matrix in
-theorem UpperTheory.exists_mem_KO_eq_stdFrame_mul_of_isPrimFrame_fin :
-    ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {A D : Type} [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] {a' : ℕ} (σ : A ⊕ Fin a' ≃ D) (X : Matrix A D k), IsPrimFrame (GlobalTheory.SplitFlip.stdLat k D) X → ∃ κ ∈ GlobalTheory.SplitWeil.KO k D, X = X0 k σ * (invT κ).val := by
+theorem UpperTheory.exists_mem_KO_eq_stdFrame_mul_of_isPrimFrame_fin
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {A D : Type} [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] {a' : ℕ}
+        (σ : A ⊕ Fin a' ≃ D) (X : Matrix A D k),
+      IsPrimFrame (GlobalTheory.SplitFlip.stdLat k D) X
+        → ∃ κ ∈ GlobalTheory.SplitWeil.KO k D, X = X0 k σ * (invT κ).val := by
   intro k _ _ _ _ A D _ _ _ _ a' σ X hX
   have hXint : ∀ i j, X i j ∈ 𝒪[k] := mem_matLat_stdLat.1 hX.2.1
   obtain ⟨R, hRint, hXR⟩ := GlobalTheory.PrimFrameMove.exists_rightInverse hX
@@ -31,13 +35,13 @@ theorem UpperTheory.exists_mem_KO_eq_stdFrame_mul_of_isPrimFrame_fin :
     have h2 := Matrix.rank_le_card_height Y
     rw [Fintype.card_fin] at h2
     omega
-  obtain ⟨g₀, hg₀⟩ := GlobalTheory.PrimFrameExist.exists_gl_mul_isPrimFrame k a' D (fun _ => 1) Y hYrank
+  obtain ⟨g₀, hg₀⟩ :=
+    GlobalTheory.PrimFrameExist.exists_gl_mul_isPrimFrame k a' D (fun _ => 1) Y hYrank
   set Y' : Matrix (Fin a') D k := (g₀ : Matrix (Fin a') (Fin a') k) * Y with hY'eq
   have hY'prim : IsPrimFrame (stdLat k D) Y' := hg₀
   have hY'int : ∀ i j, Y' i j ∈ 𝒪[k] := mem_matLat_stdLat.1 hY'prim.2.1
   obtain ⟨S, hSint, hY'S⟩ := GlobalTheory.PrimFrameMove.exists_rightInverse hY'prim
-  have hY'X : Y' * X.transpose = 0 := by
-    rw [hY'eq, Matrix.mul_assoc, hYX, Matrix.mul_zero]
+  have hY'X : Y' * X.transpose = 0 := by rw [hY'eq, Matrix.mul_assoc, hYX, Matrix.mul_zero]
   have hRX : R.transpose * X.transpose = 1 := by
     rw [← Matrix.transpose_mul, hXR, Matrix.transpose_one]
   set S' : Matrix D (Fin a') k := S - X.transpose * (R.transpose * S) with hS'eq
@@ -45,8 +49,9 @@ theorem UpperTheory.exists_mem_KO_eq_stdFrame_mul_of_isPrimFrame_fin :
     rw [hS'eq, Matrix.mul_sub, ← Matrix.mul_assoc, hRX, Matrix.one_mul, sub_self]
   have hY'S' : Y' * S' = 1 := by
     rw [hS'eq, Matrix.mul_sub, ← Matrix.mul_assoc, hY'X, Matrix.zero_mul, sub_zero, hY'S]
-  have mulInt : ∀ {m n o : Type} [Fintype n] (P : Matrix m n k) (Q : Matrix n o k),
-      (∀ i j, P i j ∈ 𝒪[k]) → (∀ i j, Q i j ∈ 𝒪[k]) → ∀ i j, (P * Q) i j ∈ 𝒪[k] := by
+  have mulInt
+      : ∀ {m n o : Type} [Fintype n] (P : Matrix m n k) (Q : Matrix n o k),
+        (∀ i j, P i j ∈ 𝒪[k]) → (∀ i j, Q i j ∈ 𝒪[k]) → ∀ i j, (P * Q) i j ∈ 𝒪[k] := by
     intro m n o _ P Q hP hQ i j
     rw [Matrix.mul_apply]
     exact sum_mem fun x _ => mul_mem (hP _ _) (hQ _ _)

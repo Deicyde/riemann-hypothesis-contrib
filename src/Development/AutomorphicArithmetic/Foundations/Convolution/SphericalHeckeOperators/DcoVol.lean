@@ -4,13 +4,16 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Spherica
 
 @[expose] public section
 
-open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa UpperTheory.ConvolutionTheory.H
+open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical
+  GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa UpperTheory.ConvolutionTheory.H
 
-private theorem meas_union {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
-    (μ : Measure G) [μ.IsMulLeftInvariant] (A I J : Subgroup G) (t : G)
-    (hJ : ∀ x, x ∈ J ↔ t⁻¹ * x * t ∈ I) (hI : MeasurableSet (I : Set G))
-    [Finite (A ⧸ J.subgroupOf A)] :
-    μ {g | ∃ x ∈ A, ∃ y ∈ I, g = x * t * y} = J.relIndex A * μ (I : Set G) := by
+private theorem meas_union
+    {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (A I J : Subgroup G) (t : G) (hJ : ∀ x, x ∈ J ↔ t⁻¹ * x * t ∈ I)
+    (hI : MeasurableSet (I : Set G))
+    [Finite (A ⧸ J.subgroupOf A)]
+    : μ {g | ∃ x ∈ A, ∃ y ∈ I, g = x * t * y} = J.relIndex A * μ (I : Set G) := by
   classical
   let S : A ⧸ J.subgroupOf A → Set G := fun q => (fun g => ((q.out : G) * t)⁻¹ * g) ⁻¹' (I : Set G)
   have hU : {g | ∃ x ∈ A, ∃ y ∈ I, g = x * t * y} = ⋃ q, S q := by
@@ -37,10 +40,12 @@ private theorem meas_union {G : Type*} [Group G] [MeasurableSpace G] [Measurable
   rw [ENNReal.tsum_const, Subgroup.relIndex, Subgroup.index, ENat.card_eq_coe_natCard]
   simp
 
-private theorem index_modular {B : Type*} [Group B] [TopologicalSpace B] [IsTopologicalGroup B]
-    [LocallyCompactSpace B] [T2Space B] (A J : Subgroup B) (t : B) (hAc : IsCompact (A : Set B)) (hAo : IsOpen (A : Set B))
-    (hJ : ∀ x, x ∈ J ↔ t⁻¹ * x * t ∈ A) (hJA : J ≤ A) :
-    Measure.modularCharacter t * J.relIndex A = 1 := by
+private theorem index_modular
+    {B : Type*}
+    [Group B] [TopologicalSpace B] [IsTopologicalGroup B] [LocallyCompactSpace B] [T2Space B]
+    (A J : Subgroup B) (t : B) (hAc : IsCompact (A : Set B)) (hAo : IsOpen (A : Set B))
+    (hJ : ∀ x, x ∈ J ↔ t⁻¹ * x * t ∈ A) (hJA : J ≤ A)
+    : Measure.modularCharacter t * J.relIndex A = 1 := by
   borelize B
   let ν : Measure B := Measure.haar
   have hJs : (J : Set B) = (fun g => t⁻¹ * g) ⁻¹' ((fun g => g * t) ⁻¹' (A : Set B)) := by
@@ -71,17 +76,21 @@ private theorem index_modular {B : Type*} [Group B] [TopologicalSpace B] [IsTopo
   rw [mul_comm] at h4
   exact_mod_cast h4
 
-private theorem meas_dcoset {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
-    [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsMulLeftInvariant] (B I : Subgroup G)
-    [LocallyCompactSpace B] (hB : IsClosed (B : Set G)) (hIc : IsCompact (I : Set G)) (hIo : IsOpen (I : Set G))
+private theorem meas_dcoset
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+    [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (B I : Subgroup G) [LocallyCompactSpace B]
+    (hB : IsClosed (B : Set G)) (hIc : IsCompact (I : Set G)) (hIo : IsOpen (I : Set G))
     (t : B) (h1 : ∀ x ∈ B, x ∈ I → (t : G) * x * (t : G)⁻¹ ∈ I)
-    (h2 : ∀ k ∈ I, ∃ x ∈ B, x ∈ I ∧ ∃ z, (t : G)⁻¹ * z * t ∈ I ∧ k = x * z) :
-    Measure.modularCharacter t * μ {g | ∃ x ∈ I, ∃ y ∈ I, g = x * t * y} = μ (I : Set G) := by
+    (h2 : ∀ k ∈ I, ∃ x ∈ B, x ∈ I ∧ ∃ z, (t : G)⁻¹ * z * t ∈ I ∧ k = x * z)
+    : Measure.modularCharacter t * μ {g | ∃ x ∈ I, ∃ y ∈ I, g = x * t * y} = μ (I : Set G) := by
   let J : Subgroup G := I.comap (MulAut.conj (t : G)⁻¹).toMonoidHom
   have hJ : ∀ x, x ∈ J ↔ (t : G)⁻¹ * x * t ∈ I := fun x => by simp [J]
   have hJo : IsOpen (J : Set G) := by
     have : (J : Set G) = (fun x => (t : G)⁻¹ * x * t) ⁻¹' (I : Set G) := Set.ext hJ
-    rw [this]; exact hIo.preimage (by fun_prop)
+    rw [this]
+    exact hIo.preimage (by fun_prop)
   have hAc : IsCompact ((I ⊓ B : Subgroup G) : Set G) := hIc.inter_right hB
   have : CompactSpace (I ⊓ B : Subgroup G) := isCompact_iff_compactSpace.1 hAc
   have : Finite ((I ⊓ B : Subgroup G) ⧸ J.subgroupOf (I ⊓ B)) :=
@@ -95,14 +104,15 @@ private theorem meas_dcoset {G : Type*} [Group G] [TopologicalSpace G] [IsTopolo
       exact ⟨x, ⟨hxI, hxB⟩, _, I.mul_mem hz hy, by group⟩
     · rintro ⟨x, hx, y, hy, rfl⟩
       exact ⟨x, hx.1, y, hy, rfl⟩
-  have e3 := index_modular (I.subgroupOf B) (J.subgroupOf B) t
-    (hB.isClosedEmbedding_subtypeVal.isCompact_preimage hIc) (hIo.preimage continuous_subtype_val)
-    (fun x => by rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf, hJ]; rfl)
-    (fun x hx => by
-      rw [Subgroup.mem_subgroupOf, hJ] at hx
-      have := h1 _ (B.mul_mem (B.mul_mem (B.inv_mem t.2) x.2) t.2) hx
-      rw [Subgroup.mem_subgroupOf]
-      simpa [mul_assoc] using this)
+  have e3 :=
+    index_modular (I.subgroupOf B) (J.subgroupOf B) t
+      (hB.isClosedEmbedding_subtypeVal.isCompact_preimage hIc) (hIo.preimage continuous_subtype_val)
+      (fun x => by rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf, hJ]; rfl)
+      (fun x hx => by
+        rw [Subgroup.mem_subgroupOf, hJ] at hx
+        have := h1 _ (B.mul_mem (B.mul_mem (B.inv_mem t.2) x.2) t.2) hx
+        rw [Subgroup.mem_subgroupOf]
+        simpa [mul_assoc] using this)
   have e4 : (J.subgroupOf B).relIndex (I.subgroupOf B) = J.relIndex (I ⊓ B) := by
     rw [← Subgroup.inf_subgroupOf_right I B, Subgroup.relIndex_subgroupOf inf_le_right]
   rw [e4] at e3
@@ -111,53 +121,81 @@ private theorem meas_dcoset {G : Type*} [Group G] [TopologicalSpace G] [IsTopolo
     exact_mod_cast e3
   rw [e5, one_mul]
 
-private theorem conj_mem {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
-    (a : Fin n → ℤ) {g : GL (Fin n) F} (hg : g ∈ iwahori F n)
-    (h : ∀ i j, a i < a j → (g : Matrix (Fin n) (Fin n) F) i j = 0) :
-    torusPow F n a * g * (torusPow F n a)⁻¹ ∈ iwahori F n := by
-  have he : ∀ i j, ((torusPow F n a * g * (torusPow F n a)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i j =
-      (uniformizer F : F) ^ (a i - a j) * (g : Matrix (Fin n) (Fin n) F) i j := by
+private theorem conj_mem
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {n : ℕ} (a : Fin n → ℤ)
+    {g : GL (Fin n) F}
+    (hg : g ∈ iwahori F n) (h : ∀ i j, a i < a j → (g : Matrix (Fin n) (Fin n) F) i j = 0)
+    : torusPow F n a * g * (torusPow F n a)⁻¹ ∈ iwahori F n := by
+  have he
+      : ∀ i j,
+        ((torusPow F n a * g * (torusPow F n a)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i j
+          = (uniformizer F : F) ^ (a i - a j) * (g : Matrix (Fin n) (Fin n) F) i j := by
     intro i j
-    rw [← torusPow_neg, Units.val_mul, Units.val_mul, coe_torusPow, coe_torusPow, Matrix.mul_diagonal,
-      Matrix.diagonal_mul, sub_eq_add_neg, zpow_add₀ (GLnLocal.uniformizer_ne_zero F), Pi.neg_apply]
+    rw [← torusPow_neg, Units.val_mul, Units.val_mul, coe_torusPow, coe_torusPow,
+      Matrix.mul_diagonal, Matrix.diagonal_mul, sub_eq_add_neg,
+      zpow_add₀ (GLnLocal.uniformizer_ne_zero F), Pi.neg_apply]
     ring
-  have hle : ∀ i j, ValuativeRel.valuation F
-      (((torusPow F n a * g * (torusPow F n a)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i j) ≤
-      ValuativeRel.valuation F ((g : Matrix (Fin n) (Fin n) F) i j) := by
+  have hle
+      : ∀ i j,
+        ValuativeRel.valuation F
+            (((torusPow F n a * g * (torusPow F n a)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i
+              j)
+          ≤ ValuativeRel.valuation F ((g : Matrix (Fin n) (Fin n) F) i j) := by
     intro i j
     rw [he]
     rcases lt_or_ge (a i) (a j) with hij | hij
     · rw [h i j hij, mul_zero]
     · obtain ⟨d, hd⟩ : ∃ d : ℕ, a i - a j = d := ⟨(a i - a j).toNat, by omega⟩
       rw [hd, zpow_natCast, map_mul, map_pow]
-      simpa [mul_comm] using mul_le_of_le_one_right' (a := ValuativeRel.valuation F ((g : Matrix (Fin n) (Fin n) F) i j)) (pow_le_one' (GLnLocal.valuation_uniformizer_lt_one F).le d)
+      simpa [mul_comm] using
+        mul_le_of_le_one_right' (a := ValuativeRel.valuation F ((g : Matrix (Fin n) (Fin n) F) i j))
+          (pow_le_one' (GLnLocal.valuation_uniformizer_lt_one F).le d)
   obtain ⟨h1, h2, h3⟩ := (mem_iwahori_iff F n).1 hg
-  refine (mem_iwahori_iff F n).2 ⟨fun i j => (hle i j).trans (h1 i j),
-    fun i j hij => (hle i j).trans_lt (h2 i j hij), fun i => ?_⟩
+  refine (mem_iwahori_iff F n).2 ⟨
+    fun i j => (hle i j).trans (h1 i j),
+    fun i j hij => (hle i j).trans_lt (h2 i j hij),
+    fun i => ?_
+  ⟩
   rw [he, sub_self, zpow_zero, one_mul, h3]
 
-theorem UpperTheory.ConvolutionTheory.H.dcoVol :
-    ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (n : ℕ)
-      [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)] (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] (a : Fin n → ℤ), Antitone a →
-      halfModulus F a ^ 2 * (μ.real (dco F a) : ℂ) = (μ.real (iwahori F n : Set (GL (Fin n) F)) : ℂ) := by
+theorem UpperTheory.ConvolutionTheory.H.dcoVol
+    : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        (n : ℕ) [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)]
+        (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure] (a : Fin n → ℤ),
+      Antitone a
+        → halfModulus F a ^ 2 * (μ.real (dco F a) : ℂ)
+          = (μ.real (iwahori F n : Set (GL (Fin n) F)) : ℂ) := by
   intro F _ _ _ _ n _ _ μ _ a ha
-  have key := meas_dcoset μ (blockUpper F n (id : Fin n → Fin n)) (iwahori F n) (Measures.isClosed_blockUpper F n _)
-    (isCompact_iwahori F n) (isOpen_iwahori F n) (torusBorel F n a)
-    (fun x hxB hxI => conj_mem a hxI fun i j hij =>
-      (mem_blockUpper F n).1 hxB (lt_of_not_ge fun h => (ha h).not_gt hij))
-    (fun k hk => by
-      obtain ⟨x, hx, y, hy, z, hz, rfl⟩ :=
-        Parabolic.iwahori_iwahoriFactorization' (β := (id : Fin n → Fin n)) monotone_id k hk
-      refine ⟨x * y, mul_mem (Parabolic.unipotentRadical_le_blockUpper hx.2)
-        (Parabolic.levi_le_blockUpper hy.2), mul_mem hx.1 hy.1, z, ?_, rfl⟩
-      have := conj_mem (-a) hz.1 fun i j hij =>
-        (Parabolic.mem_oppositeUnipotentRadical.1 hz.2).1 i j
-          (lt_of_not_ge fun h => (ha h).not_gt (neg_lt_neg_iff.1 hij))
-      rwa [torusPow_neg, inv_inv] at this)
+  have key :=
+    meas_dcoset μ (blockUpper F n (id : Fin n → Fin n)) (iwahori F n)
+      (Measures.isClosed_blockUpper F n _) (isCompact_iwahori F n) (isOpen_iwahori F n)
+      (torusBorel F n a)
+      (fun x hxB hxI =>
+        conj_mem a hxI fun i j hij =>
+          (mem_blockUpper F n).1 hxB (lt_of_not_ge fun h => (ha h).not_gt hij))
+      (fun k hk => by
+        obtain ⟨x, hx, y, hy, z, hz, rfl⟩ :=
+          Parabolic.iwahori_iwahoriFactorization' (β := (id : Fin n → Fin n)) monotone_id k hk
+        refine ⟨
+          x * y,
+          mul_mem (Parabolic.unipotentRadical_le_blockUpper hx.2)
+            (Parabolic.levi_le_blockUpper hy.2),
+          mul_mem hx.1 hy.1,
+          z,
+          ?_,
+          rfl
+        ⟩
+        have :=
+          conj_mem (-a) hz.1 fun i j hij =>
+            (Parabolic.mem_oppositeUnipotentRadical.1 hz.2).1 i j
+              (lt_of_not_ge fun h => (ha h).not_gt (neg_lt_neg_iff.1 hij))
+        rwa [torusPow_neg, inv_inv] at this)
   have h2 : halfModulus F a ^ 2 = ((Measure.modularCharacter (torusBorel F n a) : ℝ) : ℂ) := by
     rw [halfModulus_eq, modularCharacter_torusBorel, ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul,
       zpow_natCast, sqrtQ_sq]
     push_cast
     rfl
-  rw [h2, measureReal_def, measureReal_def, ← key, ENNReal.toReal_mul, ENNReal.coe_toReal, Complex.ofReal_mul]
+  rw [h2, measureReal_def, measureReal_def, ← key, ENNReal.toReal_mul, ENNReal.coe_toReal,
+    Complex.ofReal_mul]
   rfl

@@ -24,8 +24,7 @@ theorem lowExp_lowPart (m : Fin n × Fin n →₀ ℕ) : LowExp (lowPart m) := b
   rw [lowPart, Finsupp.support_filter, Finset.mem_filter] at ha
   exact ha.2
 
-theorem canon_lowPart (m : Fin n × Fin n →₀ ℕ) :
-    canon (lowPart m) = word (blockW (lowL n) m) := by
+theorem canon_lowPart (m : Fin n × Fin n →₀ ℕ) : canon (lowPart m) = word (blockW (lowL n) m) := by
   have hd : ∀ a ∈ diagL n, lowPart m a = 0 := fun a ha => by
     rw [lowPart, Finsupp.filter_apply_neg]
     exact not_lower_of_diag (mem_diagL.1 ha)
@@ -49,8 +48,10 @@ theorem wt_lowPart {m : Fin n × Fin n →₀ ℕ} (hu : ¬ HasUpper m) : wt (lo
     rw [this, mul_zero]
   · exact h
 
-theorem wt_eq_of_mem_support {μ : Fin n → ℤ} {x : U n} (hx : IsAdW μ x)
-    {m : Fin n × Fin n →₀ ℕ} (hm : m ∈ (pbw.repr x).support) : wt m = μ := by
+theorem wt_eq_of_mem_support
+    {μ : Fin n → ℤ} {x : U n} (hx : IsAdW μ x)
+    {m : Fin n × Fin n →₀ ℕ} (hm : m ∈ (pbw.repr x).support)
+    : wt m = μ := by
   funext k
   set s := (pbw.repr x).support
   set c := fun m => pbw.repr x m
@@ -69,29 +70,34 @@ theorem wt_eq_of_mem_support {μ : Fin n → ℤ} {x : U n} (hx : IsAdW μ x)
   have h3 := sub_eq_zero.1 ((mul_eq_zero.1 h2).resolve_left hc)
   exact_mod_cast h3
 
-theorem canon_mem {μ : Fin n → ℤ} {m : Fin n × Fin n →₀ ℕ} (hw : wt m = μ) :
-    canon m ∈ lowSpanW μ ⊔ vermaIdeal (rhoVec n) := by
+theorem canon_mem {μ : Fin n → ℤ} {m : Fin n × Fin n →₀ ℕ} (hw : wt m = μ)
+    : canon m ∈ lowSpanW μ ⊔ vermaIdeal (rhoVec n) := by
   by_cases hu : HasUpper m
   · exact Submodule.mem_sup_right (nPlusU_le_vermaIdeal _ (canon_mem_nPlusU hu))
-  · have hnil : blockW (upL n) m = [] := blockW_eq_nil fun a ha => by
-      by_contra h
-      exact hu ⟨a, mem_upL.1 ha, h⟩
+  · have hnil : blockW (upL n) m = [] :=
+      blockW_eq_nil fun a ha => by
+        by_contra h
+        exact hu ⟨a, mem_upL.1 ha, h⟩
     set p : MvPolynomial (Fin n) ℂ := MvPolynomial.monomial (diagExp m) 1
     set ev : ℂ := MvPolynomial.eval (rhoVec n) p
-    have hdec : canon m = ev • canon (lowPart m) +
-        word (blockW (lowL n) m) * (hcEmb p - algebraMap ℂ (U n) ev) := by
+    have hdec
+        : canon m
+          = ev • canon (lowPart m)
+            + word (blockW (lowL n) m) * (hcEmb p - algebraMap ℂ (U n) ev) := by
       rw [canon_eq_triangular, hnil, canon_lowPart, mul_sub, word_nil, mul_one,
         Algebra.algebraMap_eq_smul_one, mul_smul_comm, mul_one]
       abel
     rw [hdec]
-    refine Submodule.add_mem_sup (Submodule.smul_mem _ _ (Submodule.subset_span
-      ⟨lowPart m, lowExp_lowPart m, (wt_lowPart hu).trans hw, rfl⟩)) ?_
+    refine Submodule.add_mem_sup
+      (Submodule.smul_mem _ _
+        (Submodule.subset_span ⟨lowPart m, lowExp_lowPart m, (wt_lowPart hu).trans hw, rfl⟩))
+      ?_
     exact mul_mem_vermaIdeal _ _ (hcEmb_sub_eval_mem_vermaIdeal _ p)
 
 end Verma
 
-theorem mem_lowSpanW_sup_vermaIdeal_of_isAdW {n : ℕ} (μ : Fin n → ℤ) (x : U n) (hx : IsAdW μ x) :
-    x ∈ lowSpanW μ ⊔ vermaIdeal (rhoVec n) := by
+theorem mem_lowSpanW_sup_vermaIdeal_of_isAdW {n : ℕ} (μ : Fin n → ℤ) (x : U n) (hx : IsAdW μ x)
+    : x ∈ lowSpanW μ ⊔ vermaIdeal (rhoVec n) := by
   rw [← sum_repr_canon x]
   exact Submodule.sum_mem _ fun m hm =>
     Submodule.smul_mem _ _ (Verma.canon_mem (Verma.wt_eq_of_mem_support hx hm))

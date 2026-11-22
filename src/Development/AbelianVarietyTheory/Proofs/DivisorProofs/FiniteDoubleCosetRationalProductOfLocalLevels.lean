@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsOpenProduc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -17,8 +18,13 @@ namespace GlobalTheory.BCT.ClassFinLev
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
 def finPart : UA E n →* finU (E := E) (n := n) where
-  toFun u := ⟨⟨finGL E n (GeneralLinearGroup.map (pFin E) u.1), GlobalTheory.DefU.ClassFin.finGL_mem_UA _ (GlobalTheory.DefU.ClassFin.cT_pFin u)⟩,
-    pInf_finGL _⟩
+  toFun u := ⟨
+    ⟨
+      finGL E n (GeneralLinearGroup.map (pFin E) u.1),
+      GlobalTheory.DefU.ClassFin.finGL_mem_UA _ (GlobalTheory.DefU.ClassFin.cT_pFin u)
+    ⟩,
+    pInf_finGL _
+  ⟩
   map_one' := Subtype.ext (Subtype.ext (by simp))
   map_mul' a b := Subtype.ext (Subtype.ext (by simp))
 
@@ -37,8 +43,12 @@ theorem finPart_rat {γ : UA E n} (hγ : γ ∈ ratU E n) : finPart γ ∈ ratFi
   have hg : cT (conjAd E) γ.1.val * 1 * γ.1.val = 1 := γ.2
   rw [← hγ₀, mul_one] at hg
   have hv : (ratGL E n γ₀).val = γ₀.val.map (algebraMap E (Ad E)) := rfl
-  rw [hv, GlobalTheory.DefU.ClassFin.cT_map (algebraMap E (Ad E)) (IsCMField.complexConj E).toRingEquiv.toRingHom (conjAd E)
-    (fun y => (conjAd_algebraMap y).symm), ← Matrix.map_mul] at hg
+  rw [hv,
+      GlobalTheory.DefU.ClassFin.cT_map (algebraMap E (Ad E))
+        (IsCMField.complexConj E).toRingEquiv.toRingHom (conjAd E)
+        (fun y => (conjAd_algebraMap y).symm),
+      ← Matrix.map_mul]
+    at hg
   have hU : γ₀ ∈ UE E n := by
     change cT (IsCMField.complexConj E).toRingEquiv.toRingHom γ₀.val * 1 * γ₀.val = 1
     rw [mul_one]
@@ -55,11 +65,16 @@ theorem finPart_rat {γ : UA E n} (hγ : γ ∈ ratU E n) : finPart γ ∈ ratFi
   rw [← hγ₀]
   rfl
 
-theorem finite_doubleCoset_of_isOpen (K : Subgroup (finU (E := E) (n := n))) (hK : IsOpen (K : Set (finU (E := E) (n := n)))) :
-    Finite (DoubleCoset.Quotient (ratFinU E n : Set (finU (E := E) (n := n))) (K : Set (finU (E := E) (n := n)))) := by
+theorem finite_doubleCoset_of_isOpen
+    (K : Subgroup (finU (E := E) (n := n))) (hK : IsOpen (K : Set (finU (E := E) (n := n))))
+    : Finite (DoubleCoset.Quotient (ratFinU E n : Set (finU (E := E) (n := n)))
+      (K : Set (finU (E := E) (n := n)))) := by
   obtain ⟨T, hT⟩ := GlobalTheory.DefU.ClassFin.classSet_finite E n K hK
-  let φ : T → DoubleCoset.Quotient (ratFinU E n : Set (finU (E := E) (n := n))) (K : Set (finU (E := E) (n := n))) :=
-    fun s => DoubleCoset.mk _ _ (finPart (s : UA E n))
+  let φ
+      : T
+        → DoubleCoset.Quotient (ratFinU E n : Set (finU (E := E) (n := n)))
+          (K : Set (finU (E := E) (n := n))) := fun s =>
+    DoubleCoset.mk _ _ (finPart (s : UA E n))
   refine Finite.of_surjective φ fun q => ?_
   obtain ⟨g, rfl⟩ : ∃ g, DoubleCoset.mk _ _ g = q := ⟨q.out, DoubleCoset.out_eq' q⟩
   obtain ⟨γ, hγ, s, hs, x, hx, k, hk, e⟩ := hT (g : UA E n)
@@ -74,8 +89,18 @@ theorem finite_doubleCoset_of_isOpen (K : Subgroup (finU (E := E) (n := n))) (hK
 
 end GlobalTheory.BCT.ClassFinLev
 
-
 open GlobalTheory.BCT.ClassFinLev in
-theorem GlobalTheory.BCT.finite_doubleCoset_globLev : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ n : ℕ, 1 ≤ n → ∀ (S : Set (Pl E)), IsSection S → ∀ (K' : ∀ w : Pl E, Subgroup (UL n w)), IsLevelFam (fun w : Pl E => MonoidHom.id (UL n w)) (KL n) K' → Finite (DoubleCoset.Quotient (ratFinU E n : Set (finU (E := E) (n := n))) (globLev S K' : Set (finU (E := E) (n := n)))) := by
+theorem GlobalTheory.BCT.finite_doubleCoset_globLev
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ n : ℕ,
+          1 ≤ n
+            → ∀ (S : Set (Pl E)),
+              IsSection S
+                → ∀ (K' : ∀ w : Pl E, Subgroup (UL n w)),
+                  IsLevelFam (fun w : Pl E => MonoidHom.id (UL n w)) (KL n) K'
+                    → Finite (DoubleCoset.Quotient (ratFinU E n : Set (finU (E := E) (n := n)))
+                      (globLev S K' : Set (finU (E := E) (n := n)))) := by
   intro E _ _ _ hE n _ S _ K' hK
-  exact finite_doubleCoset_of_isOpen _ (GlobalTheory.T.isOpen_productOfLocalLevelsUnitary E hE n S K' hK)
+  exact finite_doubleCoset_of_isOpen _
+    (GlobalTheory.T.isOpen_productOfLocalLevelsUnitary E hE n S K' hK)

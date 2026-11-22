@@ -6,4 +6,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HermitianDefinit
 
 @[expose] public section
 
-theorem posDefCongruentOne : Formalism.L2.Props.HermDefON := fun _ G hG => PI.UnitaryGroupMassFormula.HermDefON.exists_congr_one G hG
+theorem posDefCongruentOne : Formalism.L2.Props.HermDefON := fun _ G hG =>
+  PI.UnitaryGroupMassFormula.HermDefON.exists_congr_one G hG

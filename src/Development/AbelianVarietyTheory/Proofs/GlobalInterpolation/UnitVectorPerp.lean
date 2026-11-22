@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.HasCom
 
 namespace GlobalTheory.UnitPerpObj
 
-theorem unitVectorPerp (D : Formalism.BasicNotions.D7) : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualLatticeComplements.UnitVectorPerp D :=
-  (GlobalTheory.UnitVectorPerpCompare.unitVectorPerp_iff D).1 (GlobalTheory.UnitPerp.unitVectorPerp D)
+theorem unitVectorPerp (D : Formalism.BasicNotions.D7)
+    : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualLatticeComplements.UnitVectorPerp D :=
+  (GlobalTheory.UnitVectorPerpCompare.unitVectorPerp_iff D).1
+    (GlobalTheory.UnitPerp.unitVectorPerp D)
 
 end GlobalTheory.UnitPerpObj

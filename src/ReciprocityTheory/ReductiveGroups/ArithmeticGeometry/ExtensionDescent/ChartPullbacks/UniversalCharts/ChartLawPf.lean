@@ -18,7 +18,8 @@ attribute [local instance] Over.cartesianMonoidalCategory
 variable {R : Type} [CommRing R]
 
 theorem jetAug_zero_injective (κ : Type) : Function.Injective (jetAug R κ 0) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro a ha
   have h : RingHom.ker (jetAug R κ 0) = ⊥ := by
     rw [← pow_one (RingHom.ker (jetAug R κ 0))]
@@ -32,8 +33,8 @@ theorem jetAug_eq_comp (κ : Type) (m : ℕ) : jetAug R κ m = (jetAug R κ 0).c
 
 variable {G : Over (Spec (CommRingCat.of R))} [GrpObj G]
 
-theorem exists_isLieBasis [IsLocalRing R] (G : Over (Sp R)) [GrpObj G] (hsm : Smooth G.hom) :
-    ∃ (d : ℕ) (v : Fin d → (epsR R ⟶ G)), IsLieBasis v := by
+theorem exists_isLieBasis [IsLocalRing R] (G : Over (Sp R)) [GrpObj G] (hsm : Smooth G.hom)
+    : ∃ (d : ℕ) (v : Fin d → (epsR R ⟶ G)), IsLieBasis v := by
   haveI := hsm
   obtain ⟨n, x, hx⟩ := univChartLoc G
   let v : Fin n → (epsR R ⟶ G) := fun i => spMap (dualLift (Pi.single i 1)) ≫ x 1

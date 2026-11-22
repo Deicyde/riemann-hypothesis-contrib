@@ -8,12 +8,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 
 open IsLocalRing Polynomial Matrix UpperTheory.V
 
-private theorem quadratic_twist_charpoly_eq {K G : Type} [Field K] [Group G] (h2 : (2 : K) ≠ 0)
+private theorem quadratic_twist_charpoly_eq
+    {K G : Type} [Field K] [Group G]
+    (h2 : (2 : K) ≠ 0)
     (r : G →* Matrix (Fin 4) (Fin 4) K) (S : Subgroup G) (φ : G →* Kˣ)
     (e : (Fin 4 → K) ≃ₗ[K] (Fin 4 → K)) (h1 : φ ≠ 1) (hS : S ≤ φ.ker) (hsq : ∀ g, φ g * φ g = 1)
-    (he : ∀ g v, r g *ᵥ e v = (φ g : K) • e (r g *ᵥ v)) :
-    ∃ η : G →* ℤˣ, η ≠ 1 ∧ S ≤ η.ker ∧
-      ∀ g, (r g).charpoly = ((((η g : ℤˣ) : ℤ) : K) • r g).charpoly := by
+    (he : ∀ g v, r g *ᵥ e v = (φ g : K) • e (r g *ᵥ v))
+    : ∃ η : G →* ℤˣ,
+      η ≠ 1 ∧ S ≤ η.ker ∧ ∀ g, (r g).charpoly = ((((η g : ℤˣ) : ℤ) : K) • r g).charpoly := by
   classical
   let ι : ℤˣ →* Kˣ := Units.map (Int.castRingHom K).toMonoidHom
   have hι : ∀ u : ℤˣ, ((ι u : Kˣ) : K) = ((u : ℤ) : K) := fun u => rfl
@@ -33,8 +35,7 @@ private theorem quadratic_twist_charpoly_eq {K G : Type} [Field K] [Group G] (h2
       simpa using this
   have hex : ∀ g, ∃ u : ℤˣ, ι u = φ g := by
     intro g
-    have h : (φ g : K) * (φ g : K) = 1 := by
-      rw [← Units.val_mul, hsq, Units.val_one]
+    have h : (φ g : K) * (φ g : K) = 1 := by rw [← Units.val_mul, hsq, Units.val_one]
     rcases mul_self_eq_one_iff.mp h with h | h
     · exact ⟨1, Units.ext (by rw [hι, h]; simp)⟩
     · exact ⟨-1, Units.ext (by rw [hι, h]; simp)⟩
@@ -62,10 +63,16 @@ private theorem quadratic_twist_charpoly_eq {K G : Type} [Field K] [Group G] (h2
         Matrix.toLin'_apply, he, Matrix.smul_mulVec, map_smul]
     rw [← Matrix.charpoly_toLin', ← hc, LinearEquiv.charpoly_conj, Matrix.charpoly_toLin']
 
-theorem UpperTheory.V.Ws.exists_sign_twist_charpoly_of_not_irreducible_restriction :
-    ∀ (K G : Type) [Field K] [IsAlgClosed K] [Group G], (2 : K) ≠ 0 → ∀ r : G →* Matrix (Fin 4) (Fin 4) K, U3.MatIrr ⊤ r →
-      ∀ S : Subgroup G, commutator G ≤ S → S.index ∣ 4 → ¬ U3.MatIrr S r →
-      ∃ η : G →* ℤˣ, η ≠ 1 ∧ S ≤ η.ker ∧ ∀ g, (r g).charpoly = ((((η g : ℤˣ) : ℤ) : K) • r g).charpoly := by
+theorem UpperTheory.V.Ws.exists_sign_twist_charpoly_of_not_irreducible_restriction
+    : ∀ (K G : Type) [Field K] [IsAlgClosed K] [Group G],
+      (2 : K) ≠ 0
+        → ∀ r : G →* Matrix (Fin 4) (Fin 4) K,
+          U3.MatIrr ⊤ r
+            → ∀ S : Subgroup G,
+              commutator G ≤ S → S.index ∣ 4 → ¬ U3.MatIrr S r
+                → ∃ η : G →* ℤˣ,
+                  η ≠ 1 ∧ S ≤ η.ker
+                    ∧ ∀ g, (r g).charpoly = ((((η g : ℤˣ) : ℤ) : K) • r g).charpoly := by
   intro K G _ _ _ h2 r hirr S hcomm hidx hred
   have hab : ∀ a b : G, a * b * a⁻¹ * b⁻¹ ∈ S := fun a b =>
     hcomm (Subgroup.commutator_mem_commutator (Subgroup.mem_top a) (Subgroup.mem_top b))
@@ -74,7 +81,8 @@ theorem UpperTheory.V.Ws.exists_sign_twist_charpoly_of_not_irreducible_restricti
     simpa using this⟩
   have h4 : ((4 : ℕ) : K) ≠ 0 := by
     have : ((4 : ℕ) : K) = 2 * 2 := by norm_num
-    rw [this]; exact mul_ne_zero h2 h2
+    rw [this]
+    exact mul_ne_zero h2 h2
   obtain ⟨m, hm⟩ := hidx
   have hiK : (S.index : K) ≠ 0 := by
     intro h
@@ -86,11 +94,12 @@ theorem UpperTheory.V.Ws.exists_sign_twist_charpoly_of_not_irreducible_restricti
   have hρ : ∀ g v, ρ g v = r g *ᵥ v := fun g v => Matrix.toLinAlgEquiv'_apply _ _
   unfold U3.MatIrr at hirr hred
   push Not at hred
-  obtain ⟨φ, e, h1, hS, he⟩ := UpperTheory.V.Pr.T.selfTwist ρ S hfi hiK hab
-    (fun W hW => hirr W (fun g _ v hv => hρ g v ▸ hW g v hv))
-    (by
-      obtain ⟨W, hW, hb, ht⟩ := hred
-      exact ⟨W, fun g hg v hv => (hρ g v).symm ▸ hW g hg v hv, hb, ht⟩)
+  obtain ⟨φ, e, h1, hS, he⟩ :=
+    UpperTheory.V.Pr.T.selfTwist ρ S hfi hiK hab
+      (fun W hW => hirr W (fun g _ v hv => hρ g v ▸ hW g v hv))
+      (by
+        obtain ⟨W, hW, hb, ht⟩ := hred
+        exact ⟨W, fun g hg v hv => (hρ g v).symm ▸ hW g hg v hv, hb, ht⟩)
   simp only [hρ] at he
   by_cases hsq : ∀ g, φ g * φ g = 1
   · exact quadratic_twist_charpoly_eq h2 r S φ e h1 hS hsq he

@@ -11,18 +11,16 @@ open NumberField GroundTheory.Automorphic Module Matrix
 
 noncomputable section
 
-variable {F E : Type*} [Field F] [Field E] [Algebra F E]
-  [Algebra.IsQuadraticExtension F E]
+variable {F E : Type*} [Field F] [Field E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-
 omit [DecidableEq ι] in
-theorem star_mulVec_dotProduct_mulVec_mulVec (M H : Matrix ι ι ℂ) (y z : ι → ℂ) :
-    star (M *ᵥ y) ⬝ᵥ (H *ᵥ (M *ᵥ z)) = star y ⬝ᵥ ((Mᴴ * H * M) *ᵥ z) := by
+theorem star_mulVec_dotProduct_mulVec_mulVec (M H : Matrix ι ι ℂ) (y z : ι → ℂ)
+    : star (M *ᵥ y) ⬝ᵥ (H *ᵥ (M *ᵥ z)) = star y ⬝ᵥ ((Mᴴ * H * M) *ᵥ z) := by
   rw [star_mulVec, mulVec_mulVec, ← dotProduct_mulVec, mulVec_mulVec, mul_assoc]
 
-theorem ArchInvariant.proof (h : HermitianForm F E W) (v : Basis ι E W) :
-    ArchInvariant.Statement h v := by
+theorem ArchInvariant.proof (h : HermitianForm F E W) (v : Basis ι E W)
+    : ArchInvariant.Statement h v := by
   intro g y z w
   have hmem := mem_archUnitary.mp (g⁻¹ : archUnitary h v).2 w
   set M : Matrix ι ι ℂ := (((g⁻¹ : archUnitary h v) : InfinitePlace E → GL ι ℂ) w : Matrix ι ι ℂ)

@@ -8,17 +8,24 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EmbBar
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 open GlobalTheory.Doubling (absE)
 open GlobalTheory.CompanionTheory.GodementH
 
 namespace GlobalTheory.CompanionTheory.GodementH
 
-theorem trace_norm_local_sizes : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ x : E, ∃ y₁ y₂ : F,
-    x ^ 2 - algebraMap F E y₁ * x + algebraMap F E y₂ = 0 ∧ ∀ (v : Pl (F := F)) (τ : E →ₐ[F] FvBar F v),
-      ‖algebraMap F (Fv F v) y₁‖₊ ≤ max (absBar F v (τ x)) (absBar F v (τ (σ x))) ∧
-      ‖algebraMap F (Fv F v) y₂‖₊ = absBar F v (τ x) * absBar F v (τ (σ x)) := by
+theorem trace_norm_local_sizes
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ x : E, ∃ y₁ y₂ : F,
+          x ^ 2 - algebraMap F E y₁ * x + algebraMap F E y₂ = 0
+            ∧ ∀ (v : Pl (F := F)) (τ : E →ₐ[F] FvBar F v),
+              ‖algebraMap F (Fv F v) y₁‖₊ ≤ max (absBar F v (τ x)) (absBar F v (τ (σ x)))
+                ∧ ‖algebraMap F (Fv F v) y₂‖₊ = absBar F v (τ x) * absBar F v (τ (σ x)) := by
   intro F E _ _ _ _ _ σ hCM x
   obtain ⟨_, hEc, hfin2, hconj⟩ := hCM
   obtain ⟨τ0⟩ : Nonempty (E →+* ℂ) := inferInstance
@@ -33,7 +40,8 @@ theorem trace_norm_local_sizes : ∀ (F E : Type) [Field F] [NumberField F] [Fie
       have h1 := hconj τ0 w
       rw [hcon w] at h1
       exact h1.symm
-    exact InfinitePlace.not_isReal_iff_isComplex.2 (hEc.isComplex (InfinitePlace.mk τ0)) ⟨τ0, hreal, rfl⟩
+    exact InfinitePlace.not_isReal_iff_isComplex.2 (hEc.isComplex (InfinitePlace.mk τ0))
+      ⟨τ0, hreal, rfl⟩
   haveI : FiniteDimensional F E := Module.finite_of_finrank_pos (by omega)
   have hfix : ∀ z : E, σ z = z → ∃ y : F, algebraMap F E y = z := by
     intro z hz
@@ -46,7 +54,8 @@ theorem trace_norm_local_sizes : ∀ (F E : Type) [Field F] [NumberField F] [Fie
       have hw' : w ∈ LinearMap.ker (σ.toLinearMap - LinearMap.id) := htop ▸ Submodule.mem_top
       rw [LinearMap.mem_ker] at hw'
       exact hw (sub_eq_zero.1 hw')
-    have h1 : Module.finrank F (Submodule.span F {(1 : E)}) = 1 := finrank_span_singleton one_ne_zero
+    have h1 : Module.finrank F (Submodule.span F {(1 : E)}) = 1 :=
+      finrank_span_singleton one_ne_zero
     have hlt := Submodule.finrank_lt hker
     have hge := Submodule.finrank_mono hSle
     have heq := Submodule.eq_of_le_of_finrank_eq hSle (by omega)
@@ -59,8 +68,10 @@ theorem trace_norm_local_sizes : ∀ (F E : Type) [Field F] [NumberField F] [Fie
   obtain ⟨y₁, hy₁⟩ := hfix (x + σ x) (by rw [map_add (f := _), hσσ, add_comm])
   obtain ⟨y₂, hy₂⟩ := hfix (x * σ x) (by rw [map_mul, hσσ, mul_comm])
   refine ⟨y₁, y₂, by rw [hy₁, hy₂]; ring, fun v τ => ?_⟩
-  have key : ∀ y : F, τ (algebraMap F E y) =
-      algebraMap (Fv F v) (FvBar F v) (algebraMap F (Fv F v) y) := fun y => by
+  have key
+      : ∀ y : F,
+        τ (algebraMap F E y)
+          = algebraMap (Fv F v) (FvBar F v) (algebraMap F (Fv F v) y) := fun y => by
     rw [τ.commutes]
     exact IsScalarTower.algebraMap_apply F (Fv F v) (FvBar F v) y
   constructor

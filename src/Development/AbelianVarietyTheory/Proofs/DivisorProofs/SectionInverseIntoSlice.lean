@@ -5,21 +5,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OmAOneApply
 
 @[expose] public section
 
-open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
+open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM
+  GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
 
 namespace GlobalTheory.RankFibreKer
 
-theorem eq_of_isFirstMax_of_isFirstMax {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {a d : ℕ} {Y : Matrix (Fin a) (Fin d) k} {J J' : Fin a ↪ Fin d} (h : IsFirstMax Y J) (h' : IsFirstMax Y J') :
-    J = J' := by
+theorem eq_of_isFirstMax_of_isFirstMax
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {a d : ℕ} {Y : Matrix (Fin a) (Fin d) k} {J J' : Fin a ↪ Fin d}
+    (h : IsFirstMax Y J) (h' : IsFirstMax Y J')
+    : J = J' := by
   apply idx.injective
   rcases lt_trichotomy (idx J) (idx J') with hl | he | hl
   · exact absurd ((h'.2 J).2 hl) (not_lt.2 (h.2 J').1)
   · exact he
   · exact absurd ((h.2 J').2 hl) (not_lt.2 (h'.2 J).1)
 
-theorem sec_inv_mul_mem_slice : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (a d : ℕ) (Y : Matrix (Fin a) (Fin d) k) (J : Fin a ↪ Fin d), IsFirstMax Y J →
-    ((GlobalTheory.RankFibreKer.sec Y)⁻¹).val * Y ∈ slice (k := k) a d := by
+theorem sec_inv_mul_mem_slice
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (a d : ℕ) (Y : Matrix (Fin a) (Fin d) k) (J : Fin a ↪ Fin d),
+      IsFirstMax Y J → ((GlobalTheory.RankFibreKer.sec Y)⁻¹).val * Y ∈ slice (k := k) a d := by
   intro k _ _ _ _ a d Y J hJ
   have hex : ∃ J, IsFirstMax Y J := ⟨J, hJ⟩
   have hc : hex.choose = J := eq_of_isFirstMax_of_isFirstMax hex.choose_spec hJ
@@ -41,6 +46,7 @@ theorem sec_inv_mul_mem_slice : ∀ (k : Type) [Field k] [ValuativeRel k] [Topol
     constructor
     · rw [inv_mul_le_iff₀ (zero_lt_iff.2 h0), mul_one]; exact (hJ.2 J').1
     · intro hl
-      rw [inv_mul_lt_iff₀ (zero_lt_iff.2 h0), mul_one]; exact (hJ.2 J').2 hl
+      rw [inv_mul_lt_iff₀ (zero_lt_iff.2 h0), mul_one]
+      exact (hJ.2 J').2 hl
 
 end GlobalTheory.RankFibreKer

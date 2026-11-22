@@ -6,11 +6,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU Formalism.BasicNotions UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU Formalism.BasicNotions UpperTheory.Gal.CertificateRingHomMap
 open scoped Classical
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pSchHom_of :
-    UpperTheory.Gal.CertificateRingHomMap.SchHom := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pSchHom_of
+    : UpperTheory.Gal.CertificateRingHomMap.SchHom := by
   intro n t _
   refine ⟨fun lam c _ => UpperTheory.Gal.Schur.SchurHomog_holds ℂ n lam t c, fun m => ?_⟩
   obtain ⟨h0, h1⟩ := UpperTheory.Gal.Schur.SchurDet_holds ℂ n t

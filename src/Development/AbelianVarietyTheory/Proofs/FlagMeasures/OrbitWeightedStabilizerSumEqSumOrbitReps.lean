@@ -11,24 +11,27 @@ open scoped ENNReal Classical
 
 namespace GlobalTheory.Mass
 
-
 open NumberField Matrix in
 open scoped ENNReal Classical in
-theorem _root_.GlobalTheory.Mass.orbSum_eq_sum_reps : ∀ (G α : Type) [Group G] [MulAction G α]
-    (X : Set α) (N : α → ℝ≥0∞), _root_.GlobalTheory.Mass.Stable G X → (∀ (g : G) x, N (g • x) = N x) →
-    ∀ s : Finset α, (∀ x ∈ s, x ∈ X) → (∀ x ∈ X, ∃! y, y ∈ s ∧ ∃ g : G, g • y = x) →
-    _root_.GlobalTheory.Mass.orbSum G X N =
-      ∑ x ∈ s, ((ENat.card (MulAction.stabilizer G x) : ℕ∞) : ℝ≥0∞)⁻¹ * N x := by
+theorem _root_.GlobalTheory.Mass.orbSum_eq_sum_reps
+    : ∀ (G α : Type) [Group G] [MulAction G α] (X : Set α) (N : α → ℝ≥0∞),
+      _root_.GlobalTheory.Mass.Stable G X → (∀ (g : G) x, N (g • x) = N x)
+        → ∀ s : Finset α,
+          (∀ x ∈ s, x ∈ X) → (∀ x ∈ X, ∃! y, y ∈ s ∧ ∃ g : G, g • y = x)
+            → _root_.GlobalTheory.Mass.orbSum G X N
+              = ∑ x ∈ s, ((ENat.card (MulAction.stabilizer G x) : ℕ∞) : ℝ≥0∞)⁻¹ * N x := by
   intro G α _ _ X N hX hN s hs huniq
   have hX' : ∀ (g : G), ∀ x ∈ X, g • x ∈ X := hX
   unfold _root_.GlobalTheory.Mass.orbSum
   have hout : ∀ x : α, ∃ g : G, g • x = (Quotient.mk (MulAction.orbitRel G α) x).out := fun x =>
-    MulAction.mem_orbit_iff.mp (MulAction.orbitRel_apply.mp
-      (Quotient.exact (Quotient.out_eq (Quotient.mk (MulAction.orbitRel G α) x))))
-  have hterm : ∀ x : α,
-      ((ENat.card (MulAction.stabilizer G (Quotient.mk (MulAction.orbitRel G α) x).out) : ℕ∞) :
-          ℝ≥0∞)⁻¹ * N (Quotient.mk (MulAction.orbitRel G α) x).out
-        = ((ENat.card (MulAction.stabilizer G x) : ℕ∞) : ℝ≥0∞)⁻¹ * N x := by
+    MulAction.mem_orbit_iff.mp (MulAction.orbitRel_apply.mp (Quotient.exact (Quotient.out_eq
+      (Quotient.mk (MulAction.orbitRel G α) x))))
+  have hterm
+      : ∀ x : α,
+        ((ENat.card (MulAction.stabilizer G (Quotient.mk (MulAction.orbitRel G α) x).out) : ℕ∞)
+              : ℝ≥0∞)⁻¹
+            * N (Quotient.mk (MulAction.orbitRel G α) x).out
+          = ((ENat.card (MulAction.stabilizer G x) : ℕ∞) : ℝ≥0∞)⁻¹ * N x := by
     intro x
     obtain ⟨g, hg⟩ := hout x
     rw [← hg, hN,
@@ -48,9 +51,10 @@ theorem _root_.GlobalTheory.Mass.orbSum_eq_sum_reps : ∀ (G α : Type) [Group G
     obtain ⟨y, ⟨hy, g, hg⟩, -⟩ := huniq q.out hq
     refine ⟨⟨y, hy⟩, Subtype.ext ?_⟩
     show Quotient.mk _ y = q
-    calc Quotient.mk (MulAction.orbitRel G α) y = Quotient.mk _ q.out :=
-          Quotient.sound (MulAction.orbitRel_apply.mpr
-            (MulAction.mem_orbit_iff.mpr ⟨g⁻¹, inv_smul_eq_iff.mpr hg.symm⟩))
+    calc
+      Quotient.mk (MulAction.orbitRel G α) y = Quotient.mk _ q.out :=
+        Quotient.sound (MulAction.orbitRel_apply.mpr (MulAction.mem_orbit_iff.mpr
+          ⟨g⁻¹, inv_smul_eq_iff.mpr hg.symm⟩))
       _ = q := Quotient.out_eq q
   rw [← (Equiv.ofBijective e ⟨he_inj, he_surj⟩).tsum_eq, tsum_fintype, ← Finset.sum_coe_sort s]
   exact Finset.sum_congr rfl fun x _ => hterm x.1

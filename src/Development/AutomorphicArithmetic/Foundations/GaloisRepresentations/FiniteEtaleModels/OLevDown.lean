@@ -10,8 +10,11 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 
 namespace UpperTheory.Gal.FiniteEtaleModels.O
 
@@ -19,22 +22,29 @@ section Generic
 
 variable {A B M : Type} [CommRing A] [Ring B] [Algebra A B] [AddCommGroup M] [Module B M]
 
-private def idealSub (B M : Type) {A : Type} [CommRing A] [Ring B] [Algebra A B] [AddCommGroup M] [Module B M]
-    (𝔞 : Ideal A) : Submodule B M :=
+private def idealSub
+    (B M : Type)
+    {A : Type} [CommRing A] [Ring B] [Algebra A B] [AddCommGroup M] [Module B M]
+    (𝔞 : Ideal A)
+    : Submodule B M :=
   Submodule.span B {z | ∃ c ∈ 𝔞, ∃ z' : M, z = algebraMap A B c • z'}
 
-private theorem smul_mem_idealSub {𝔞 : Ideal A} {c : A} (hc : c ∈ 𝔞) (z : M) :
-    algebraMap A B c • z ∈ idealSub B M 𝔞 :=
+private theorem smul_mem_idealSub {𝔞 : Ideal A} {c : A} (hc : c ∈ 𝔞) (z : M)
+    : algebraMap A B c • z ∈ idealSub B M 𝔞 :=
   Submodule.subset_span ⟨c, hc, z, rfl⟩
 
-private theorem functional_mem (hb : Function.Surjective (algebraMap A B)) (f : M →ₗ[B] B) (𝔞 : Ideal A) {w : M}
-    (hw : w ∈ idealSub B M 𝔞) : ∃ d ∈ 𝔞, f w = algebraMap A B d := by
+private theorem functional_mem
+    (hb : Function.Surjective (algebraMap A B)) (f : M →ₗ[B] B)
+    (𝔞 : Ideal A)
+    {w : M} (hw : w ∈ idealSub B M 𝔞)
+    : ∃ d ∈ 𝔞, f w = algebraMap A B d := by
   induction hw using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨c, hc, z', rfl⟩ := hx
     obtain ⟨e, he⟩ := hb (f z')
     exact ⟨c * e, 𝔞.mul_mem_right e hc, by rw [map_smul, ← he, smul_eq_mul, map_mul]⟩
-  | zero => exact ⟨0, 𝔞.zero_mem, by simp⟩
+  | zero =>
+    exact ⟨0, 𝔞.zero_mem, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨d₁, h₁, e₁⟩ := hx
     obtain ⟨d₂, h₂, e₂⟩ := hy
@@ -44,9 +54,12 @@ private theorem functional_mem (hb : Function.Surjective (algebraMap A B)) (f : 
     obtain ⟨a, rfl⟩ := hb b
     exact ⟨a * d, 𝔞.mul_mem_left a hd, by rw [map_smul, e, smul_eq_mul, map_mul]⟩
 
-private theorem mem_of_mul_mem [IsDedekindDomain A] [Module.Projective B M]
-    (hb : Function.Bijective (algebraMap A B)) (I J : Ideal A) (hI : I ≠ ⊥) (z : M)
-    (h : ∀ c ∈ I, algebraMap A B c • z ∈ idealSub B M (I * J)) : z ∈ idealSub B M J := by
+private theorem mem_of_mul_mem
+    [IsDedekindDomain A] [Module.Projective B M]
+    (hb : Function.Bijective (algebraMap A B))
+    (I J : Ideal A) (hI : I ≠ ⊥)
+    (z : M) (h : ∀ c ∈ I, algebraMap A B c • z ∈ idealSub B M (I * J))
+    : z ∈ idealSub B M J := by
   obtain ⟨s, hs⟩ := Module.projective_def'.mp ‹Module.Projective B M›
   have key : ∀ m : M, ∃ d ∈ J, s z m = algebraMap A B d := by
     intro m
@@ -72,9 +85,9 @@ private theorem mem_of_mul_mem [IsDedekindDomain A] [Module.Projective B M]
   rw [e]
   exact smul_mem_idealSub hd m
 
-private theorem exists_sub_mem {ε : A} {𝔟 : Ideal A} {z : M}
-    (hz : z ∈ idealSub B M (Ideal.span {ε} ⊔ 𝔟)) :
-    ∃ y, z - algebraMap A B ε • y ∈ idealSub B M 𝔟 := by
+private theorem exists_sub_mem
+    {ε : A} {𝔟 : Ideal A} {z : M} (hz : z ∈ idealSub B M (Ideal.span {ε} ⊔ 𝔟))
+    : ∃ y, z - algebraMap A B ε • y ∈ idealSub B M 𝔟 := by
   induction hz using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨c, hc, z', rfl⟩ := hx
@@ -99,8 +112,10 @@ private theorem exists_sub_mem {ε : A} {𝔟 : Ideal A} {z : M}
     have := Submodule.smul_mem _ b h
     rwa [smul_sub, smul_smul, ← Algebra.commutes, ← smul_smul] at this
 
-private theorem smul_mem_of_mul {ε : A} {𝔟₁ 𝔟₂ : Ideal A} (h : (Ideal.span {ε} ⊔ 𝔟₁) * 𝔟₂ = 𝔟₁) {x : M}
-    (hx : x ∈ idealSub B M 𝔟₂) : algebraMap A B ε • x ∈ idealSub B M 𝔟₁ := by
+private theorem smul_mem_of_mul
+    {ε : A} {𝔟₁ 𝔟₂ : Ideal A} (h : (Ideal.span {ε} ⊔ 𝔟₁) * 𝔟₂ = 𝔟₁)
+    {x : M} (hx : x ∈ idealSub B M 𝔟₂)
+    : algebraMap A B ε • x ∈ idealSub B M 𝔟₁ := by
   induction hx using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨c, hc, z', rfl⟩ := hx
@@ -119,8 +134,10 @@ private theorem smul_mem_of_mul {ε : A} {𝔟₁ 𝔟₂ : Ideal A} (h : (Ideal
     rw [smul_smul, Algebra.commutes, ← smul_smul]
     exact Submodule.smul_mem _ b hx
 
-private theorem smul_mem_of_eps {ε c : A} {𝔟 : Ideal A} {y : M} (hc : c ∈ Ideal.span {ε} ⊔ 𝔟)
-    (hy : algebraMap A B ε • y ∈ idealSub B M 𝔟) : algebraMap A B c • y ∈ idealSub B M 𝔟 := by
+private theorem smul_mem_of_eps
+    {ε c : A} {𝔟 : Ideal A} {y : M}
+    (hc : c ∈ Ideal.span {ε} ⊔ 𝔟) (hy : algebraMap A B ε • y ∈ idealSub B M 𝔟)
+    : algebraMap A B c • y ∈ idealSub B M 𝔟 := by
   obtain ⟨u, hu, v, hv, rfl⟩ := Submodule.mem_sup.mp hc
   obtain ⟨a, rfl⟩ := Ideal.mem_span_singleton'.mp hu
   rw [map_add (f := _), add_smul, map_mul, ← smul_smul]
@@ -128,8 +145,8 @@ private theorem smul_mem_of_eps {ε c : A} {𝔟 : Ideal A} {y : M} (hc : c ∈ 
 
 end Generic
 
-private theorem wSub_one {q : ℕ} [Fact q.Prime] (D : Datum q) (𝔟 : Ideal (𝓞 D.F)) :
-    wSub D 𝔟 1 = idealSub D.O D.La 𝔟 := by
+private theorem wSub_one {q : ℕ} [Fact q.Prime] (D : Datum q) (𝔟 : Ideal (𝓞 D.F))
+    : wSub D 𝔟 1 = idealSub D.O D.La 𝔟 := by
   unfold wSub idealSub
   rw [pow_one]
 
@@ -150,8 +167,9 @@ theorem levDown : LevDown := by
     rw [pow_one] at hc ⊢
     rw [← hmul] at hc
     exact Ideal.mul_le_right (I := Ideal.span {ε} ⊔ 𝔟₁) (J := 𝔟₂) hc
-  have down : ∀ y : D.La, algebraMap (𝓞 D.F) D.O ε • y ∈ idealSub D.O D.La 𝔟₁ →
-      y ∈ idealSub D.O D.La 𝔟₂ := by
+  have down
+      : ∀ y : D.La,
+        algebraMap (𝓞 D.F) D.O ε • y ∈ idealSub D.O D.La 𝔟₁ → y ∈ idealSub D.O D.La 𝔟₂ := by
     intro y hy
     refine mem_of_mul_mem hbij _ 𝔟₂ hI y (fun c hc => ?_)
     rw [hmul]
@@ -159,8 +177,12 @@ theorem levDown : LevDown := by
   obtain ⟨hadd, hact, hker, hpt⟩ := id hl
   unfold IsEtLev
   beta_reduce
-  refine ⟨fun x y => by rw [smul_add, hadd], fun c x => ?_, fun x hx => ?_,
-    fun k _ _ x => ⟨fun y hy => ?_, fun g hg => ?_⟩⟩
+  refine ⟨
+    fun x y => by rw [smul_add, hadd],
+    fun c x => ?_,
+    fun x hx => ?_,
+    fun k _ _ x => ⟨fun y hy => ?_, fun g hg => ?_⟩
+  ⟩
   · rw [smul_smul, Algebra.commutes, ← smul_smul, hact]
   · apply hker
     rw [hw₁]

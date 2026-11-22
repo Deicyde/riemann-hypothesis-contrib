@@ -9,9 +9,10 @@ open MeasureTheory Topology
 
 namespace GlobalTheory.QuadFibre
 
-theorem exists_local_sqrt_near_one (K : Type) [NontriviallyNormedField K] [CompleteSpace K]
-    (h2 : (2 : K) ≠ 0) : ∃ (N : Set K) (g : K → K), IsOpen N ∧ (1 : K) ∈ N ∧ ContinuousOn g N ∧
-      ∀ u ∈ N, g u ^ 2 = u := by
+theorem exists_local_sqrt_near_one
+    (K : Type) [NontriviallyNormedField K] [CompleteSpace K] (h2 : (2 : K) ≠ 0)
+    : ∃ (N : Set K) (g : K → K),
+      IsOpen N ∧ (1 : K) ∈ N ∧ ContinuousOn g N ∧ ∀ u ∈ N, g u ^ 2 = u := by
   have hd : HasStrictDerivAt (fun x : K => x ^ 2) (2 : K) 1 := by
     simpa using hasStrictDerivAt_pow 2 (1 : K)
   have hf := hd.hasStrictFDerivAt_equiv h2
@@ -22,8 +23,9 @@ theorem exists_local_sqrt_near_one (K : Type) [NontriviallyNormedField K] [Compl
   · have := e.right_inv hu
     rwa [he] at this
 
-theorem exists_isSqrtOn (K : Type) [NontriviallyNormedField K] [IsUltrametricDist K]
-    [ProperSpace K] (h2 : (2 : K) ≠ 0) : ∃ (U : Set K) (s : K → K), IsSqrtOn U s := by
+theorem exists_isSqrtOn
+    (K : Type) [NontriviallyNormedField K] [IsUltrametricDist K] [ProperSpace K] (h2 : (2 : K) ≠ 0)
+    : ∃ (U : Set K) (s : K → K), IsSqrtOn U s := by
   classical
   obtain ⟨N, g, hN, h1, hg, hsq⟩ := exists_local_sqrt_near_one K h2
   obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.1 hN 1 h1
@@ -31,10 +33,8 @@ theorem exists_isSqrtOn (K : Type) [NontriviallyNormedField K] [IsUltrametricDis
   have hr0 : 0 < r := lt_min (by linarith) (by norm_num)
   have hrε : r < ε := lt_of_le_of_lt (min_le_left _ _) (by linarith)
   have hr1 : r < 1 := lt_of_le_of_lt (min_le_right _ _) (by norm_num)
-  have hsub : Metric.closedBall (1 : K) r ⊆ N :=
-    (Metric.closedBall_subset_ball hrε).trans hball
-  have hopen : IsOpen (Metric.closedBall (1 : K) r) :=
-    IsUltrametricDist.isOpen_closedBall _ hr0.ne'
+  have hsub : Metric.closedBall (1 : K) r ⊆ N := (Metric.closedBall_subset_ball hrε).trans hball
+  have hopen : IsOpen (Metric.closedBall (1 : K) r) := IsUltrametricDist.isOpen_closedBall _ hr0.ne'
   have hclopen : IsClopen (Metric.closedBall (1 : K) r) := ⟨Metric.isClosed_closedBall, hopen⟩
   have hnorm : ∀ a ∈ Metric.closedBall (1 : K) r, ‖a‖ = 1 := by
     intro a ha
@@ -43,8 +43,18 @@ theorem exists_isSqrtOn (K : Type) [NontriviallyNormedField K] [IsUltrametricDis
     have := IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm hlt.ne
     rw [sub_add_cancel, max_eq_right hlt.le, norm_one] at this
     exact this
-  refine ⟨Metric.closedBall 1 r, (Metric.closedBall (1 : K) r).piecewise g (fun _ => 1), hopen,
-    isCompact_closedBall _ _, Metric.mem_closedBall_self hr0.le, ?_, ?_, hnorm, ?_, ?_⟩
+  refine ⟨
+    Metric.closedBall 1 r,
+    (Metric.closedBall (1 : K) r).piecewise g (fun _ => 1),
+    hopen,
+    isCompact_closedBall _ _,
+    Metric.mem_closedBall_self hr0.le,
+    ?_,
+    ?_,
+    hnorm,
+    ?_,
+    ?_
+  ⟩
   · intro a ha b hb
     have hna := hnorm a ha
     rw [mem_closedBall_iff_norm] at ha hb ⊢

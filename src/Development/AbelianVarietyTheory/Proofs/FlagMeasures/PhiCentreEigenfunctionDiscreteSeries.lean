@@ -9,7 +9,8 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.TrPowSumFilterZero
 
 @[expose] public section
 
-open Matrix Finset Filter Topology Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Dec
+open Matrix Finset Filter Topology Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Dec
 
 noncomputable section
 
@@ -119,8 +120,8 @@ lemma sum_cycWord {A : Type} [Ring A] (E : Fin n → Fin n → A) (m : ℕ) :
   simp only [Function.comp_apply, Fin.snoc_eq_cons_rotate]
 
 section Linfty
-attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
-  Matrix.linftyOpNormedSpace
+attribute [local instance]
+  Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra Matrix.linftyOpNormedSpace
 
 lemma slope_exp (X : Matrix (Fin n) (Fin n) ℂ) :
     Tendsto (slope (fun t : ℂ => NormedSpace.exp (t • X)) 0) (𝓝[≠] 0) (𝓝 X) := by
@@ -146,10 +147,13 @@ lemma hol_ext {U : Set E} {F G : holSpace U} (h : ∀ z ∈ U, F.1 z = G.1 z) : 
   · exact h z hz
   · rw [F.2.2 z hz, G.2.2 z hz]
 
-def mk {U : Set E} (hU : IsOpen U) (F : E → ℂ) (hF : AnalyticOnNhd ℂ F U) : holSpace U :=
-  ⟨U.indicator F, fun z hz => (hF z hz).congr
-    (by filter_upwards [hU.mem_nhds hz] with y hy using (Set.indicator_of_mem hy F).symm),
-    fun z hz => Set.indicator_of_notMem hz F⟩
+def mk {U : Set E} (hU : IsOpen U) (F : E → ℂ) (hF : AnalyticOnNhd ℂ F U) : holSpace U := ⟨
+  U.indicator F,
+  fun z hz =>
+    (hF z hz).congr
+      (by filter_upwards [hU.mem_nhds hz] with y hy using (Set.indicator_of_mem hy F).symm),
+  fun z hz => Set.indicator_of_notMem hz F
+⟩
 
 lemma mk_apply {U : Set E} (hU : IsOpen U) (F : E → ℂ)
     (hF : AnalyticOnNhd ℂ F U) {z : E} (hz : z ∈ U) : (mk hU F hF).1 z = F z := by
@@ -166,13 +170,15 @@ lemma analytic_vec {F : E → ℂ} {z : E} (hF : AnalyticAt ℂ F z)
   exact hB.comp_of_eq hpair rfl
 
 def vec {U : Set E} (hU : IsOpen U) : (E →ₗ[ℂ] E) →ₗ[ℂ] Module.End ℂ (holSpace U) :=
-  LinearMap.mk₂ ℂ (fun T F => mk hU (fun y => fderiv ℂ F.1 y (T y)) fun z hz => analytic_vec (F.2.1 z hz) T)
+  LinearMap.mk₂ ℂ
+    (fun T F => mk hU (fun y => fderiv ℂ F.1 y (T y)) fun z hz => analytic_vec (F.2.1 z hz) T)
     (fun X Y F => hol_ext fun z hz => by simp [mk, hz])
     (fun c X F => hol_ext fun z hz => by simp [mk, hz])
-    (fun X F G => hol_ext fun z hz => by
-      simp [mk, hz, fderiv_add (F.2.1 z hz).differentiableAt (G.2.1 z hz).differentiableAt])
-    (fun c X F => hol_ext fun z hz => by
-      simp [mk, hz, fderiv_const_smul (F.2.1 z hz).differentiableAt])
+    (fun X F G =>
+      hol_ext fun z hz => by
+        simp [mk, hz, fderiv_add (F.2.1 z hz).differentiableAt (G.2.1 z hz).differentiableAt])
+    (fun c X F =>
+      hol_ext fun z hz => by simp [mk, hz, fderiv_const_smul (F.2.1 z hz).differentiableAt])
 
 lemma vec_apply {U : Set E} (hU : IsOpen U) (T : E →ₗ[ℂ] E)
     (F : holSpace U) {z : E} (hz : z ∈ U) : (vec hU T F).1 z = fderiv ℂ F.1 z (T z) := by
@@ -231,8 +237,8 @@ lemma hasDerivAt_curve (g X : Matrix (Fin n) (Fin n) ℂ) :
     simp only [slope_def_module, Matrix.mul_smul, Matrix.mul_sub]
   exact hasDerivAt_iff_tendsto_slope.2 h'
 
-def der {U : Set (Matrix (Fin n) (Fin n) ℂ)} (hU : IsOpen U) :
-    Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Module.End ℂ (holSpace U) :=
+def der {U : Set (Matrix (Fin n) (Fin n) ℂ)} (hU : IsOpen U)
+    : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Module.End ℂ (holSpace U) :=
   vec hU ∘ₗ (LinearMap.mul ℂ (Matrix (Fin n) (Fin n) ℂ)).flip
 
 lemma der_comm {U : Set (Matrix (Fin n) (Fin n) ℂ)} (hU : IsOpen U) (X Y : Matrix (Fin n) (Fin n) ℂ) :
@@ -420,22 +426,28 @@ theorem phiEigen : PhiEigen := by
   have h1 : k⁻¹ * k = 1 := Matrix.nonsing_inv_mul k hdet
   have h2 : k * k⁻¹ = 1 := Matrix.mul_nonsing_inv k hdet
   have hzU : z ∈ {y | k⁻¹ * y * k ∈ Omega n} := hz
-  have hmk : ∀ y ∈ {y | k⁻¹ * y * k ∈ Omega n},
-      (mk (isOpen_conj k k⁻¹) _ (analytic_Phi lam k k⁻¹)).1 y = Phi lam (k⁻¹ * y * k) :=
+  have hmk
+      : ∀ y ∈ {y | k⁻¹ * y * k ∈ Omega n},
+        (mk (isOpen_conj k k⁻¹) _ (analytic_Phi lam k k⁻¹)).1 y = Phi lam (k⁻¹ * y * k) :=
     fun y hy => mk_apply _ _ _ hy
-  have step1 : gelfH m (fun y => Phi lam (k⁻¹ * y * k)) z =
-      ((∑ c, (Matrix.of (fun a b => der (isOpen_conj k k⁻¹) (Matrix.single a b (1 : ℂ))) ^ (m + 1)) c c)
-        (mk (isOpen_conj k k⁻¹) _ (analytic_Phi lam k k⁻¹))).1 z := by
+  have step1
+      : gelfH m (fun y => Phi lam (k⁻¹ * y * k)) z
+        = ((∑ c, (Matrix.of (fun a b => der (isOpen_conj k k⁻¹) (Matrix.single a b (1 : ℂ))) ^ (m + 1)) c c)
+          (mk (isOpen_conj k k⁻¹) _ (analytic_Phi lam k k⁻¹))).1 z := by
     rw [← sum_cycWord, LinearMap.sum_apply, Submodule.coe_sum, Finset.sum_apply]
     simp only [gelfH]
     exact Finset.sum_congr rfl fun a _ => (rholW_apply _ _ _ hmk z hzU).symm
-  have step2 : (∑ c, (Matrix.of (fun a b => der (isOpen_conj k k⁻¹) (Matrix.single a b (1 : ℂ))) ^ (m + 1)) c c) =
-      ∑ c, (Matrix.of (fun a b => der (isOpen_conj k k⁻¹) (k * Matrix.single a b (1 : ℂ) * k⁻¹)) ^ (m + 1)) c c := by
-    rw [of_conj]
-    exact (trace_pow_conj _ _ _ (by rw [← Matrix.transpose_mul, h2, Matrix.transpose_one]) m).symm
+  have step2
+      : (∑ c, (Matrix.of (fun a b => der (isOpen_conj k k⁻¹) (Matrix.single a b (1 : ℂ))) ^ (m + 1)) c c)
+        = ∑ c, (Matrix.of (fun a b => der (isOpen_conj k k⁻¹) (k * Matrix.single a b (1 : ℂ) * k⁻¹)) ^ (m + 1)) c c :=
+    by
+      rw [of_conj]
+      exact (trace_pow_conj _ _ _ (by rw [← Matrix.transpose_mul, h2, Matrix.transpose_one]) m).symm
   have hglr := glRel_conj (isOpen_conj k k⁻¹) k k⁻¹ h1
-  have hv : IsHW (fun a b => der (isOpen_conj k k⁻¹) (k * Matrix.single a b (1 : ℂ) * k⁻¹))
-      (fun a => -(muInt lam a : ℂ)) (mk (isOpen_conj k k⁻¹) _ (analytic_Phi lam k k⁻¹)) := by
+  have hv : IsHW
+      (fun a b => der (isOpen_conj k k⁻¹) (k * Matrix.single a b (1 : ℂ) * k⁻¹))
+      (fun a => -(muInt lam a : ℂ))
+      (mk (isOpen_conj k k⁻¹) _ (analytic_Phi lam k k⁻¹)) := by
     refine ⟨fun a => ?_, fun a b hab => ?_⟩
     · have h3 := der_Phi lam k k⁻¹ h1 (le_refl a)
       rw [if_pos rfl] at h3
@@ -458,7 +470,8 @@ theorem phiEigen : PhiEigen := by
     simp only [lsh, hfl, hmC]
     push_cast
     ring
-  rw [step1, step2, trace_pow_hw _ _ _ hglr hv, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, hmk z hzU, hl]
+  rw [step1, step2, trace_pow_hw _ _ _ hglr hv, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul,
+    hmk z hzU, hl]
   rfl
 
 end GlobalTheory.PhiEigenfun

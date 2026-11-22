@@ -14,16 +14,20 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 noncomputable section
 
-theorem RegularityDivisorSupportClosed.le_of_height_map_eq_zero {A : Type*} [CommRing A] {P Q : Ideal A} [P.IsPrime]
-    (h : (Q.map (Ideal.Quotient.mk P)).height = 0) : Q ≤ P := by
+theorem RegularityDivisorSupportClosed.le_of_height_map_eq_zero
+    {A : Type*} [CommRing A]
+    {P Q : Ideal A} [P.IsPrime]
+    (h : (Q.map (Ideal.Quotient.mk P)).height = 0)
+    : Q ≤ P := by
   intro x hx
   rw [Ideal.height_eq_zero_iff_eq_bot] at h
   have : Ideal.Quotient.mk P x ∈ Q.map (Ideal.Quotient.mk P) := Ideal.mem_map_of_mem _ hx
   rwa [h, Ideal.mem_bot, Ideal.Quotient.eq_zero_iff_mem] at this
 
-theorem RegularityDivisorSupportClosed.not_add_add {m : ℕ} {a b : ℕ∞} (ha : a ≠ 0) (hb : b ≠ 0)
-    (h : ((m : WithBot ℕ∞) + (a : WithBot ℕ∞)) + (b : WithBot ℕ∞) = ((m + 1 : ℕ) : WithBot ℕ∞)) :
-    False := by
+theorem RegularityDivisorSupportClosed.not_add_add
+    {m : ℕ} {a b : ℕ∞} (ha : a ≠ 0) (hb : b ≠ 0)
+    (h : ((m : WithBot ℕ∞) + (a : WithBot ℕ∞)) + (b : WithBot ℕ∞) = ((m + 1 : ℕ) : WithBot ℕ∞))
+    : False := by
   have h' : (m : ℕ∞) + a + b = ((m + 1 : ℕ) : ℕ∞) := by exact_mod_cast h
   induction a using ENat.recTopCoe with
   | top => simp at h'; exact ENat.natCast_ne_top (m + 1) (by exact_mod_cast h'.symm)
@@ -46,8 +50,14 @@ theorem RegularityDivisorSupportClosed.proof : RegularityDivisorSupportClosed.St
   · rintro ⟨hWmin, hWrel⟩
     have h1 := dim_quot_minimal_add_one P W s hsP hWmin
     rw [hPdim] at h1
-    refine ⟨⟨⟨hWmin.1.1, isMultiHomogIdeal_of_mem_minimalPrimes hPh hs hWmin, hWrel⟩,
-      withBot_eq_of_add_one (by rw [h1, Nat.add_comm])⟩, le_sup_left.trans hWmin.1.2, hsW' hWmin.1.2⟩
+    refine ⟨
+      ⟨
+        ⟨hWmin.1.1, isMultiHomogIdeal_of_mem_minimalPrimes hPh hs hWmin, hWrel⟩,
+        withBot_eq_of_add_one (by rw [h1, Nat.add_comm])
+      ⟩,
+      le_sup_left.trans hWmin.1.2,
+      hsW' hWmin.1.2
+    ⟩
   · rintro ⟨⟨⟨hWp, -, hWrel⟩, hWdim⟩, hPW, hsW⟩
     have hle : P ⊔ Ideal.span {s} ≤ W := sup_le hPW ((Ideal.span_singleton_le_iff_mem _).mpr hsW)
     refine ⟨⟨⟨hWp, hle⟩, fun Q hQ hQW => ?_⟩, hWrel⟩

@@ -14,10 +14,14 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem isExp_comp_affine : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (f f' : ℍ → ℂ) (l m : ℚ) (h h' : HahnSeries ℚ Ω), 0 < l →
-    (∀ z ∈ Hs, up f' z = up f ((l : ℂ) * z + m)) →
-    (∀ r : ℚ, ε (h'.coeff (r * l)) = Complex.exp (2 * Real.pi * Complex.I * ((r * m : ℚ) : ℂ)) * ε (h.coeff r)) →
-    IsExp ε f h → IsExp ε f' h' := by
+theorem isExp_comp_affine
+    : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (f f' : ℍ → ℂ) (l m : ℚ) (h h' : HahnSeries ℚ Ω),
+      0 < l → (∀ z ∈ Hs, up f' z = up f ((l : ℂ) * z + m))
+        → (∀ r : ℚ,
+          ε (h'.coeff (r * l))
+            = Complex.exp (2 * Real.pi * Complex.I * ((r * m : ℚ) : ℂ)) * ε (h.coeff r))
+        → IsExp ε f h
+        → IsExp ε f' h' := by
   intro Ω _ ε f f' l m h h' hl hf hc hexp
   obtain ⟨⟨N, hN, hden⟩, C, hC⟩ := hexp
   have hl0 : l ≠ 0 := hl.ne'

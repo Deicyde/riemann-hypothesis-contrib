@@ -25,8 +25,8 @@ def collapse (a b : σ) : MvPolynomial σ ℚ →ₐ[ℚ] MvPolynomial σ ℚ :=
 theorem collapse_X_sub (a b : σ) : collapse a b (X a - X b : MvPolynomial σ ℚ) = 0 := by
   simp [collapse]
 
-theorem dvd_sub_collapse (a b : σ) (Q : MvPolynomial σ ℚ) :
-    (X a - X b : MvPolynomial σ ℚ) ∣ Q - collapse a b Q := by
+theorem dvd_sub_collapse (a b : σ) (Q : MvPolynomial σ ℚ)
+    : (X a - X b : MvPolynomial σ ℚ) ∣ Q - collapse a b Q := by
   induction Q using MvPolynomial.induction_on with
   | C c => simp [collapse]
   | add p q hp hq =>
@@ -34,21 +34,24 @@ theorem dvd_sub_collapse (a b : σ) (Q : MvPolynomial σ ℚ) :
     exact dvd_add hp hq
   | mul_X p i hp =>
     rw [map_mul]
-    have e : p * X i - collapse a b p * collapse a b (X i) =
-        (p - collapse a b p) * X i + collapse a b p * (X i - collapse a b (X i)) := by ring
+    have e
+        : p * X i - collapse a b p * collapse a b (X i)
+          = (p - collapse a b p) * X i + collapse a b p * (X i - collapse a b (X i)) := by
+      ring
     rw [e]
     refine dvd_add (dvd_mul_of_dvd_left hp _) (dvd_mul_of_dvd_right ?_ _)
     by_cases h : i = a
     · rw [h]; simp [collapse]
     · simp [collapse, h]
 
-theorem collapse_eq_zero_of_dvd (a b : σ) {P : MvPolynomial σ ℚ}
-    (h : (X a - X b : MvPolynomial σ ℚ) ∣ P) : collapse a b P = 0 := by
+theorem collapse_eq_zero_of_dvd
+    (a b : σ) {P : MvPolynomial σ ℚ} (h : (X a - X b : MvPolynomial σ ℚ) ∣ P)
+    : collapse a b P = 0 := by
   obtain ⟨c, rfl⟩ := h
   rw [map_mul, collapse_X_sub, zero_mul]
 
-theorem dvd_of_collapse_eq_zero (a b : σ) {P : MvPolynomial σ ℚ}
-    (h : collapse a b P = 0) : (X a - X b : MvPolynomial σ ℚ) ∣ P := by
+theorem dvd_of_collapse_eq_zero (a b : σ) {P : MvPolynomial σ ℚ} (h : collapse a b P = 0)
+    : (X a - X b : MvPolynomial σ ℚ) ∣ P := by
   simpa [h] using dvd_sub_collapse a b P
 
 theorem proof : FlagDiffPrime.Statement := by

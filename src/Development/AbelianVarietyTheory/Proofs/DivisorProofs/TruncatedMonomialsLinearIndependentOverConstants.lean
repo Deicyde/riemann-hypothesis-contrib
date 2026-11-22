@@ -10,33 +10,39 @@ namespace GlobalTheory
 
 open MvPolynomial
 
-theorem truncMono_deriv_aeval {k A : Type} [Field k] [CommRing A] [Algebra k A] {d : ℕ}
-    (x : Fin d → A) (E : Fin d → Derivation k A A)
-    (hE : ∀ i j, E i (x j) = if i = j then 1 else 0) (B : Subalgebra k A)
-    (hB : ∀ i, ∀ b ∈ B, E i b = 0) (i : Fin d) (F : MvPolynomial (Fin d) B) :
-    E i (aeval x F) = aeval x (pderiv i F) := by
+theorem truncMono_deriv_aeval
+    {k A : Type} [Field k] [CommRing A] [Algebra k A]
+    {d : ℕ}
+    (x : Fin d → A) (E : Fin d → Derivation k A A) (hE : ∀ i j, E i (x j) = if i = j then 1 else 0)
+    (B : Subalgebra k A) (hB : ∀ i, ∀ b ∈ B, E i b = 0)
+    (i : Fin d) (F : MvPolynomial (Fin d) B)
+    : E i (aeval x F) = aeval x (pderiv i F) := by
   induction F using MvPolynomial.induction_on with
   | C b =>
     rw [aeval_C, pderiv_C, map_zero]
     exact hB i _ b.2
-  | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, map_add (f := _), map_add (f := _)]
+  | add p q hp hq =>
+    rw [map_add (f := _), map_add (f := _), hp, hq, map_add (f := _), map_add (f := _)]
   | mul_X p j hp =>
     have h1 : E i (aeval x p * x j) = aeval x p * E i (x j) + x j * E i (aeval x p) := by
       rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul]
-    rw [map_mul, aeval_X, h1, hp, pderiv_mul, pderiv_X, map_add (f := _), map_mul, map_mul, aeval_X, hE]
+    rw [map_mul, aeval_X, h1, hp, pderiv_mul, pderiv_X, map_add (f := _), map_mul, map_mul, aeval_X,
+      hE]
     by_cases h : i = j
     · subst h; simp; ring
     · simp [h, Pi.single_apply, Ne.symm h]; ring
 
-theorem truncMono_eq_zero {p : ℕ} [Fact p.Prime] {k A : Type} [Field k] [CommRing A]
-    [Algebra k A] [CharP k p] {d : ℕ}
-    (x : Fin d → A) (E : Fin d → Derivation k A A)
-    (hE : ∀ i j, E i (x j) = if i = j then 1 else 0) (B : Subalgebra k A)
-    (hB : ∀ i, ∀ b ∈ B, E i b = 0) :
-    ∀ n : ℕ, ∀ F : MvPolynomial (Fin d) B,
+theorem truncMono_eq_zero
+    {p : ℕ} [Fact p.Prime]
+    {k A : Type} [Field k] [CommRing A] [Algebra k A] [CharP k p]
+    {d : ℕ}
+    (x : Fin d → A) (E : Fin d → Derivation k A A) (hE : ∀ i j, E i (x j) = if i = j then 1 else 0)
+    (B : Subalgebra k A) (hB : ∀ i, ∀ b ∈ B, E i b = 0)
+    : ∀ n : ℕ, ∀ F : MvPolynomial (Fin d) B,
       (∀ m ∈ F.support, (∀ i, m i < p) ∧ ∑ i, m i ≤ n) → aeval x F = 0 → F = 0 := by
-  have hconst : ∀ F : MvPolynomial (Fin d) B, (∀ m, m ≠ 0 → AddMonoidAlgebra.coeff F m = 0) →
-      aeval x F = 0 → F = 0 := by
+  have hconst
+      : ∀ F : MvPolynomial (Fin d) B,
+        (∀ m, m ≠ 0 → AddMonoidAlgebra.coeff F m = 0) → aeval x F = 0 → F = 0 := by
     intro F hc hF
     have hFC : F = C (AddMonoidAlgebra.coeff F 0) := by
       refine MvPolynomial.ext _ _ (fun m => ?_)
@@ -71,8 +77,7 @@ theorem truncMono_eq_zero {p : ℕ} [Fact p.Prime] {k A : Type} [Field k] [CommR
         · simp
         · have h2 := hm'.2
           simp only [Finsupp.coe_add, Pi.add_apply, Finset.sum_add_distrib] at h2
-          have h3 : ∑ j, (Finsupp.single i 1 : Fin d →₀ ℕ) j = 1 := by
-            simp [Finsupp.single_apply]
+          have h3 : ∑ j, (Finsupp.single i 1 : Fin d →₀ ℕ) j = 1 := by simp [Finsupp.single_apply]
           omega
       · rw [← truncMono_deriv_aeval x E hE B hB, hF, map_zero]
     apply hconst F _ hF
@@ -89,7 +94,9 @@ theorem truncMono_eq_zero {p : ℕ} [Fact p.Prime] {k A : Type} [Field k] [CommR
     have hmi : (m - Finsupp.single i 1 : Fin d →₀ ℕ) i + 1 = m i := by
       simp only [Finsupp.coe_tsub, Pi.sub_apply, Finsupp.single_eq_same]; omega
     have hunit : IsUnit (((m - Finsupp.single i 1 : Fin d →₀ ℕ) i : B) + 1) := by
-      have e : (((m - Finsupp.single i 1 : Fin d →₀ ℕ) i : B) + 1) = algebraMap k B ((m i : ℕ) : k) := by
+      have e
+          : (((m - Finsupp.single i 1 : Fin d →₀ ℕ) i : B) + 1)
+            = algebraMap k B ((m i : ℕ) : k) := by
         rw [map_natCast, ← hmi]; push_cast; rfl
       rw [e]
       apply IsUnit.map
@@ -98,8 +105,7 @@ theorem truncMono_eq_zero {p : ℕ} [Fact p.Prime] {k A : Type} [Field k] [CommR
       intro hdvd
       exact hi (Nat.eq_zero_of_dvd_of_lt hdvd hlt)
     have hcoef' : F.coeff m * (((m - Finsupp.single i 1 : Fin d →₀ ℕ) i : B) + 1) = 0 := by
-      have hmi' : m i - 1 = (m - Finsupp.single i 1 : Fin d →₀ ℕ) i := by
-        omega
+      have hmi' : m i - 1 = (m - Finsupp.single i 1 : Fin d →₀ ℕ) i := by omega
       simpa only [← hmi'] using hcoef.symm
     exact hc ((hunit.mul_left_eq_zero).mp hcoef')
 
@@ -108,11 +114,18 @@ end GlobalTheory
 namespace GlobalTheory
 open MvPolynomial
 
-theorem truncMono_linearIndependent : ∀ (p : ℕ) [Fact p.Prime] (k A : Type) [Field k] [CommRing A] [Algebra k A] [CharP k p] (d : ℕ) (x : Fin d → A) (E : Fin d → Derivation k A A), (∀ i j, E i (x j) = if i = j then 1 else 0) → ∀ B : Subalgebra k A, (∀ i, ∀ b ∈ B, E i b = 0) → LinearIndependent B (fun a : Fin d → Fin p => ∏ i, x i ^ (a i : ℕ)) := by
+theorem truncMono_linearIndependent
+    : ∀ (p : ℕ) [Fact p.Prime] (k A : Type) [Field k] [CommRing A] [Algebra k A] [CharP k p] (d : ℕ)
+        (x : Fin d → A) (E : Fin d → Derivation k A A),
+      (∀ i j, E i (x j) = if i = j then 1 else 0)
+        → ∀ B : Subalgebra k A,
+          (∀ i, ∀ b ∈ B, E i b = 0)
+            → LinearIndependent B (fun a : Fin d → Fin p => ∏ i, x i ^ (a i : ℕ)) := by
   intro p _ k A _ _ _ _ d x E hE B hB
   rw [Fintype.linearIndependent_iff]
   intro g hg
-  let toF : (Fin d → Fin p) → (Fin d →₀ ℕ) := fun a => Finsupp.equivFunOnFinite.symm (fun i => (a i : ℕ))
+  let toF : (Fin d → Fin p) → (Fin d →₀ ℕ) := fun a =>
+    Finsupp.equivFunOnFinite.symm (fun i => (a i : ℕ))
   have hinj : Function.Injective toF := by
     intro a b hab
     funext i
@@ -148,8 +161,7 @@ theorem truncMono_linearIndependent : ∀ (p : ℕ) [Fact p.Prime] (k A : Type) 
   rw [hF0] at this
   simp only [AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply] at this
   simp_rw [hinj.eq_iff] at this
-  have hsum : (∑ b : Fin d → Fin p, if b = a then g b else 0) = g a := by
-    simp
+  have hsum : (∑ b : Fin d → Fin p, if b = a then g b else 0) = g a := by simp
   rw [hsum] at this
   simpa using this.symm
 

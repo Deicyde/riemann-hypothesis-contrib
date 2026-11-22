@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Integr
 noncomputable section
 
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 namespace GlobalTheory.RealLift
 
@@ -19,7 +20,6 @@ section Laws
 open scoped Classical
 
 variable {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
-
 
 variable (F κ) in
 def intPts : Set (κ → Af F) :=
@@ -44,13 +44,18 @@ theorem indicator_intPts_mem_SB : (intPts F κ).indicator (1 : (κ → Af F) →
 
 theorem zero_mem_intPts : (0 : κ → Af F) ∈ intPts F κ := fun _ _ v => zero_mem _
 
-def ptAt (a : κ → mixedEmbedding.mixedSpace F) (y : κ → Af F) : κ → AF F :=
-  fun i => ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (a i), y i)
+def ptAt (a : κ → mixedEmbedding.mixedSpace F) (y : κ → Af F) : κ → AF F := fun i =>
+  ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (a i), y i)
 
-theorem pureA_ptAt (f : (κ → mixedEmbedding.mixedSpace F) → ℂ) (g : (κ → Af F) → ℂ) (a : κ → mixedEmbedding.mixedSpace F)
-    (y : κ → Af F) : pureA F f g (ptAt a y) = f a * g y := by
-  change f (fun i => InfiniteAdeleRing.ringEquiv_mixedSpace F
-    ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (a i))) * g y = f a * g y
+theorem pureA_ptAt
+    (f : (κ → mixedEmbedding.mixedSpace F) → ℂ) (g : (κ → Af F) → ℂ)
+    (a : κ → mixedEmbedding.mixedSpace F) (y : κ → Af F)
+    : pureA F f g (ptAt a y) = f a * g y := by
+  change f (fun i =>
+        InfiniteAdeleRing.ringEquiv_mixedSpace F
+          ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (a i)))
+      * g y
+    = f a * g y
   congr 1
   congr 1
   funext i
@@ -63,7 +68,8 @@ theorem fin_eq_zero_of_at {z : κ → AF F} (hz : At (evI F) z) (i : κ) : (z i)
 
 theorem at_of_fin_eq_zero {z : κ → AF F} (hz : ∀ i, (z i).2 = 0) : At (evI F) z := by
   intro u hu
-  have hu1 : u.1 = 0 := (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (by rw [map_zero]; exact hu)
+  have hu1 : u.1 = 0 :=
+    (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (by rw [map_zero]; exact hu)
   funext i
   refine Prod.ext ?_ ?_
   · change u.1 * (z i).1 = 0
@@ -71,21 +77,26 @@ theorem at_of_fin_eq_zero {z : κ → AF F} (hz : ∀ i, (z i).2 = 0) : At (evI 
   · change u.2 * (z i).2 = 0
     rw [hz i, mul_zero]
 
-theorem tens_eq_pureA (f : (κ → mixedEmbedding.mixedSpace F) → ℂ) {r : (κ → AF F) → ℂ}
-    (hr : ∀ x z, At (evI F) z → r (x + z) = r x) :
-    tens (evI F) f r = pureA F f (fun y => r (fun i => ((0 : Ainf F), y i))) := by
+theorem tens_eq_pureA
+    (f : (κ → mixedEmbedding.mixedSpace F) → ℂ)
+    {r : (κ → AF F) → ℂ} (hr : ∀ x z, At (evI F) z → r (x + z) = r x)
+    : tens (evI F) f r = pureA F f (fun y => r (fun i => ((0 : Ainf F), y i))) := by
   funext x
   simp only [tens, pureA, evI]
   congr 1
-  have h := hr (fun i => ((0 : Ainf F), (x i).2)) (fun i => ((x i).1, (0 : Af F)))
-    (at_of_fin_eq_zero fun i => rfl)
+  have h :=
+    hr
+      (fun i => ((0 : Ainf F), (x i).2))
+      (fun i => ((x i).1, (0 : Af F)))
+      (at_of_fin_eq_zero fun i => rfl)
   rw [← h]
   congr 1
   funext i
   exact Prod.ext (zero_add _).symm (add_zero _).symm
 
-theorem mem_SB_of_pureA_mem {f : SInf F κ} (hf : f ≠ 0) {g : (κ → Af F) → ℂ} (h : pureA F f g ∈ schA F κ) :
-    g ∈ SB (κ → Af F) := by
+theorem mem_SB_of_pureA_mem
+    {f : SInf F κ} (hf : f ≠ 0) {g : (κ → Af F) → ℂ} (h : pureA F f g ∈ schA F κ)
+    : g ∈ SB (κ → Af F) := by
   obtain ⟨a, ha⟩ : ∃ a, f a ≠ 0 := by
     by_contra h0
     push_neg at h0
@@ -107,12 +118,15 @@ theorem mem_SB_of_pureA_mem {f : SInf F κ} (hf : f ≠ 0) {g : (κ → Af F) �
   have h3 := (SB (κ → Af F)).smul_mem (f a)⁻¹ h1
   rwa [smul_smul, inv_mul_cancel₀ ha, one_smul] at h3
 
-theorem eval_mem_adm (x : κ → AF F) :
-    (LinearMap.proj x : ((κ → AF F) → ℂ) →ₗ[ℂ] ℂ) ∈ (adeleClass F).adm κ := by
+theorem eval_mem_adm (x : κ → AF F)
+    : (LinearMap.proj x : ((κ → AF F) → ℂ) →ₗ[ℂ] ℂ) ∈ (adeleClass F).adm κ := by
   intro g _
-  refine ⟨g (fun i => (x i).2) • ((BoundedContinuousFunction.evalCLM ℂ
-    (fun i => InfiniteAdeleRing.ringEquiv_mixedSpace F (x i).1)).comp
-      (SchwartzMap.toBoundedContinuousFunctionCLM ℂ _ ℂ)), fun f => ?_⟩
+  refine ⟨
+    g (fun i => (x i).2) • ((BoundedContinuousFunction.evalCLM ℂ
+        (fun i => InfiniteAdeleRing.ringEquiv_mixedSpace F (x i).1)).comp
+      (SchwartzMap.toBoundedContinuousFunctionCLM ℂ _ ℂ)),
+    fun f => ?_
+  ⟩
   simp [pureA, mul_comm]
 
 end Laws
@@ -135,10 +149,14 @@ theorem actsLaws : ActsLaws := by
     funext i
     change (x i).2 + (z i).2 = (x i).2
     rw [fin_eq_zero_of_at hz, add_zero]
-  have htens₀ : ∀ φ : (κ → mixedEmbedding.mixedSpace F) → ℂ, tens (evI F) φ r₀ = pureA F φ g₀ := fun φ => rfl
-  have hrest₀ : Rest (evI F) (⇑f) r₀ := ⟨hr₀inv, by rw [htens₀]; exact Submodule.subset_span ⟨f, g₀, hg₀, rfl⟩⟩
+  have htens₀ : ∀ φ : (κ → mixedEmbedding.mixedSpace F) → ℂ, tens (evI F) φ r₀ = pureA F φ g₀ :=
+    fun φ => rfl
+  have hrest₀ : Rest (evI F) (⇑f) r₀ :=
+    ⟨hr₀inv, by rw [htens₀]; exact Submodule.subset_span ⟨f, g₀, hg₀, rfl⟩⟩
 
-  have hext : ∀ h₁ h₂ : SInf F κ, (∀ a, pureA F h₁ g₀ (ptAt a 0) = pureA F h₂ g₀ (ptAt a 0)) → h₁ = h₂ := by
+  have hext
+      : ∀ h₁ h₂ : SInf F κ,
+        (∀ a, pureA F h₁ g₀ (ptAt a 0) = pureA F h₂ g₀ (ptAt a 0)) → h₁ = h₂ := by
     intro h₁ h₂ h
     ext a
     simpa [pureA_ptAt, hg₀0] using h a
@@ -151,11 +169,12 @@ theorem actsLaws : ActsLaws := by
   · intro T hT0 hSD r hr x
     by_cases hf : f = 0
     · subst hf
-      have hf₁ : f₁ = 0 := hext _ _ fun a => by
-        have h := hSD g₀ hg₀ _ (eval_mem_adm (ptAt a 0))
-        simp only [LinearMap.proj_apply, hzero, hT0] at h
-        rw [hzero]
-        exact (h.unique (hasDerivAt_const 0 (0 : ℂ)))
+      have hf₁ : f₁ = 0 :=
+        hext _ _ fun a => by
+          have h := hSD g₀ hg₀ _ (eval_mem_adm (ptAt a 0))
+          simp only [LinearMap.proj_apply, hzero, hT0] at h
+          rw [hzero]
+          exact (h.unique (hasDerivAt_const 0 (0 : ℂ)))
       subst hf₁
       rw [hzeroT]
       simp only [hT0, Pi.zero_apply]
@@ -168,10 +187,11 @@ theorem actsLaws : ActsLaws := by
   · intro T hT0 hSA r hr
     by_cases hf : f = 0
     · subst hf
-      have hf₁ : f₁ = 0 := hext _ _ fun a => by
-        have h := hSA g₀ hg₀
-        rw [hzero, hT0] at h
-        rw [← h, hzero]
+      have hf₁ : f₁ = 0 :=
+        hext _ _ fun a => by
+          have h := hSA g₀ hg₀
+          rw [hzero, hT0] at h
+          rw [← h, hzero]
       subst hf₁
       rw [hzeroT, hT0]
     · have hg : (fun y => r (fun i => ((0 : Ainf F), y i))) ∈ SB (κ → Af F) :=

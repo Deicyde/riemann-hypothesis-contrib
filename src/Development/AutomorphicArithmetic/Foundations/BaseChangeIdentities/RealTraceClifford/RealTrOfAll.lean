@@ -27,15 +27,19 @@ variable {U : Type} [NormedAddCommGroup U] [InnerProductSpace ℂ U] (π : G n �
 
 def coef (w v : U) : Mat n → ℂ := fun g => ⟪w, piM π g v⟫_ℂ
 
-def IsOpK [MeasurableSpace (G n)] (μ : Measure (G n)) (E : KMod n) (k : Mat n → (E.V →L[ℂ] E.V))
-    (B : ((E.V →L[ℂ] ℂ) →L[ℂ] U) →ₗ[ℂ] ((E.V →L[ℂ] ℂ) →L[ℂ] U)) : Prop :=
+def IsOpK
+    [MeasurableSpace (G n)]
+    (μ : Measure (G n))
+    (E : KMod n)
+    (k : Mat n → (E.V →L[ℂ] E.V)) (B : ((E.V →L[ℂ] ℂ) →L[ℂ] U) →ₗ[ℂ] ((E.V →L[ℂ] ℂ) →L[ℂ] U))
+    : Prop :=
   ∀ t ξ, B t ξ = ∫ y : G n, π y (t (ξ ∘L k y.val)) ∂μ
 
 end U
 
 def KerReg (E : KMod n) (k : Mat n → (E.V →L[ℂ] E.V)) : Prop :=
-  Continuous (fun y : G n => k y.val) ∧ HasCompactSupport (fun y : G n => k y.val) ∧
-    ∀ y ∈ GLs n, ∀ k₁ k₂ : UK n, k (k₁.1 * y * k₂.1) = E.ρ k₁ * k y * E.ρ k₂
+  Continuous (fun y : G n => k y.val) ∧ HasCompactSupport (fun y : G n => k y.val)
+    ∧ ∀ y ∈ GLs n, ∀ k₁ k₂ : UK n, k (k₁.1 * y * k₂.1) = E.ρ k₁ * k y * E.ρ k₂
 
 section Alg
 

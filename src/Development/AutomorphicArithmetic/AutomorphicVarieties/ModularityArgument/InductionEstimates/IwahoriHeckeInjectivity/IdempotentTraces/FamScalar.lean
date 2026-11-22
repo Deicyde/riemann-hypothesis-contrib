@@ -14,21 +14,36 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Global GroundTheory.Global.SemiLocal
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  GroundTheory.Global GroundTheory.Global.SemiLocal
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1
+  PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open GlobalTheory.CuspRep UpperTheory.V.Published
 open scoped ComplexConjugate Classical InnerProductSpace ComplexOrder
 
-open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.famScalar :
-    ∀ (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (μ : Measure (G1 K (2 + 2))) [μ.IsHaarMeasure] (μ₂ : Measure (G1 K 2))
-          [μ₂.IsHaarMeasure] (τ₁ τ₂ : Submodule ℂ (L2 μ₂)), Pair μ₂ τ₁ τ₂ → ∀ κ e κ₂ p₁ p₂ k₀, ArchLine τ₁ τ₂ κ e κ₂ p₁ p₂ k₀ →
-          ∀ (S : Finset (Pl K)) (U : ∀ w : Pl K, Subgroup (Gw (2 + 2) w)), Lev U → ∀ (D : TypeDat K (2 + 2)), IsTy D κ e (levOn S U) →
-          ∀ (d : ℕ) (A : Line μ τ₁ τ₂ D d) (𝔞 : Amp μ) (φ : TF K (2 + 2)) (c : ℂ) (β : ℝ → Eu d →L[ℂ] Eu d), 𝔞.U = levOn S U →
-          (∀ x, φ x = (levOn S U : Set (FA K (2 + 2))).indicator 1 x) → c ≠ 0 → Rop μ (c • tens 𝔞.a₀ φ) = 𝔞.A → ActsBy μ A (c • tens 𝔞.a₀ φ) β →
-          (∃ v g, ∫ y, 𝔞.a₀ y * flat 0 (A.sec v) (g * archP K (2 + 2) y) ∂𝔞.ν ≠ 0) → 0 < d ∧ ∃ x : ℝ, 0 < x ∧ symb β 0 = (x : ℂ) • (1 : Eu d →L[ℂ] Eu d) := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.famScalar
+    : ∀ (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+        (μ : Measure (G1 K (2 + 2))) [μ.IsHaarMeasure] (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure]
+        (τ₁ τ₂ : Submodule ℂ (L2 μ₂)),
+      Pair μ₂ τ₁ τ₂
+        → ∀ κ e κ₂ p₁ p₂ k₀,
+          ArchLine τ₁ τ₂ κ e κ₂ p₁ p₂ k₀
+            → ∀ (S : Finset (Pl K)) (U : ∀ w : Pl K, Subgroup (Gw (2 + 2) w)),
+              Lev U
+                → ∀ (D : TypeDat K (2 + 2)),
+                  IsTy D κ e (levOn S U)
+                    → ∀ (d : ℕ) (A : Line μ τ₁ τ₂ D d) (𝔞 : Amp μ) (φ : TF K (2 + 2)) (c : ℂ)
+                        (β : ℝ → Eu d →L[ℂ] Eu d),
+                      𝔞.U = levOn S U → (∀ x, φ x = (levOn S U : Set (FA K (2 + 2))).indicator 1 x)
+                        → c ≠ 0 → Rop μ (c • tens 𝔞.a₀ φ) = 𝔞.A → ActsBy μ A (c • tens 𝔞.a₀ φ) β
+                        → (∃ v g, ∫ y, 𝔞.a₀ y * flat 0 (A.sec v) (g * archP K (2 + 2) y) ∂𝔞.ν ≠ 0)
+                        → 0 < d ∧ ∃ x : ℝ, 0 < x ∧ symb β 0 = (x : ℂ) • (1 : Eu d →L[ℂ] Eu d) := by
   intro K _ _ _ μ _ μ₂ _ τ₁ τ₂ hP κ e κ₂ p₁ p₂ k₀ hL S U hLev D hD d A 𝔞 φ c β hU hφ hc hR hA hne
   obtain ⟨v₀, g₀, hI⟩ := hne
   have hsec : ∀ v, IsSec τ₁ τ₂ (A.sec v) ∧ D.Fix (A.sec v) := fun v => (A.onto _).1 ⟨v, rfl⟩
@@ -50,13 +65,15 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.famScalar :
     exact (heckeEx K μ μ₂ τ₁ τ₂ hP κ e hL.idem S U hLev D hD d A).2.2 _ φ β hφ hA'
   obtain ⟨l, hl⟩ := Module.End.exists_eigenvalue (symb β 0 : Eu d →ₗ[ℂ] Eu d)
   have hE : Module.End.eigenspace (symb β 0 : Eu d →ₗ[ℂ] Eu d) l = ⊤ := by
-    refine (irrW K μ μ₂ τ₁ τ₂ hP κ e κ₂ p₁ p₂ k₀ hL S U hLev D hD d A _ fun w _ g M hM v hv => ?_).resolve_left hl
+    refine (irrW K μ μ₂ τ₁ τ₂ hP κ e κ₂ p₁ p₂ k₀ hL S U hLev D hD d A _ fun w _ g M hM v hv =>
+      ?_).resolve_left hl
     rw [Module.End.mem_eigenspace_iff] at hv ⊢
     have h := LinearMap.congr_fun (hcomm _ M hM).eq v
     simp only [Module.End.mul_apply] at h
     rw [← h, hv, map_smul]
   have hT : ∀ v, symb β 0 v = l • v := fun v =>
-    Module.End.mem_eigenspace_iff.1 (hE ▸ Submodule.mem_top : v ∈ Module.End.eigenspace (symb β 0 : Eu d →ₗ[ℂ] Eu d) l)
+    Module.End.mem_eigenspace_iff.1
+      (hE ▸ Submodule.mem_top : v ∈ Module.End.eigenspace (symb β 0 : Eu d →ₗ[ℂ] Eu d) l)
   have hl0 : 0 ≤ l := by
     obtain ⟨v, hv⟩ := exists_ne (0 : Eu d)
     have hp := ContinuousLinearMap.nonneg_iff_isPositive.1 hpos
@@ -73,12 +90,15 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.famScalar :
     exact ((mul_eq_zero.1 (by simpa using b.symm)).resolve_right hn.ne').symm
   have hlne : l ≠ 0 := by
     rintro rfl
-    obtain ⟨⟨c', hc', hint, -⟩, -⟩ := tensAmp K (2 + 2) (by norm_num) μ 𝔞 φ (fun x => by rw [hφ, hU])
+    obtain ⟨⟨c', hc', hint, -⟩, -⟩ :=
+      tensAmp K (2 + 2) (by norm_num) μ 𝔞 φ (fun x => by rw [hφ, hU])
     have hH : Continuous fun x : G1 K (2 + 2) => Complex.exp ((0 + 2) * (HP 2 2 x : ℂ)) :=
-      Complex.continuous_exp.comp (continuous_const.mul (Complex.continuous_ofReal.comp hpSpec.2.2.2.1))
+      Complex.continuous_exp.comp (continuous_const.mul (Complex.continuous_ofReal.comp
+        hpSpec.2.2.2.1))
     have hΘ : Continuous (flat 0 (A.sec v₀)) := hH.mul (hsec v₀).1.cont
     have hfix : FixF 𝔞.U (flat 0 (A.sec v₀)) := by
-      refine (((UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.secTr μ₂ τ₁ τ₂ κ e hL.idem).2.1 _ (hsec v₀).1.cont).2 𝔞.U 𝔞.le).2 ?_
+      refine (((UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.secTr μ₂ τ₁ τ₂ κ e
+        hL.idem).2.1 _ (hsec v₀).1.cont).2 𝔞.U 𝔞.le).2 ?_
       rw [hU]
       exact ((hD.fix _ (hsec v₀).1.cont).1 (hsec v₀).2).2
     have e1 := hA.2.2 0 v₀ g₀

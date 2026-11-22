@@ -15,8 +15,10 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDe
 
 variable {k r : ℕ}
 
-theorem mul_of_col (z : Fin (2 * r + k + 1) → ℂ) (s : B.Mat k r) (x : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
-    (h : ∀ b, s *ᵥ fvec k r z b = ∑ c, x c b • fvec k r z c) : s * Ff k r z = Ff k r z * x := by
+theorem mul_of_col
+    (z : Fin (2 * r + k + 1) → ℂ) (s : B.Mat k r) (x : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
+    (h : ∀ b, s *ᵥ fvec k r z b = ∑ c, x c b • fvec k r z c)
+    : s * Ff k r z = Ff k r z * x := by
   ext i b
   have hb := congrFun (h b) i
   simp only [Matrix.mulVec, dotProduct, Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at hb
@@ -24,18 +26,32 @@ theorem mul_of_col (z : Fin (2 * r + k + 1) → ℂ) (s : B.Mat k r) (x : Matrix
   exact Finset.sum_congr rfl fun c _ => mul_comm _ _
 
 def coefOf (b : Fin (r + 1)) (y : Fin (2 * r + k + 1) → ℂ) (a : Fin (r + 1)) : ℂ :=
-  if a = b then 1 else if h : a.val < b.val then y (eI k r ⟨a.val, by omega⟩) else 0
+  if a = b then
+    1
+  else if h : a.val < b.val then
+    y (eI k r ⟨a.val, by omega⟩)
+  else
+    0
 
-theorem expand_of_tail (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (b : Fin (r + 1))
-    (y : Fin (2 * r + k + 1) → ℂ) (hy : ∀ i : Fin (2 * r + k + 1), b.val ≤ i.val → y i = fvec k r z b i) :
-    y = ∑ a, coefOf (k := k) b y a • fvec k r z a := by
+theorem expand_of_tail
+    (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z)
+    (b : Fin (r + 1)) (y : Fin (2 * r + k + 1) → ℂ)
+    (hy : ∀ i : Fin (2 * r + k + 1), b.val ≤ i.val → y i = fvec k r z b i)
+    : y = ∑ a, coefOf (k := k) b y a • fvec k r z a := by
   ext i
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ b)]
   simp only [coefOf, if_pos rfl, one_mul]
-  have hrest : ∀ a ∈ Finset.univ.erase b, (if a = b then (1 : ℂ) else
-      if h : a.val < b.val then y (eI k r ⟨a.val, by omega⟩) else 0) * fvec k r z a i =
-      if h : a.val < b.val ∧ i.val = a.val then y i else 0 := by
+  have hrest
+      : ∀ a ∈ Finset.univ.erase b,
+        (if a = b then
+           (1 : ℂ)
+         else if h : a.val < b.val then
+           y (eI k r ⟨a.val, by omega⟩)
+         else
+           0)
+            * fvec k r z a i
+          = if h : a.val < b.val ∧ i.val = a.val then y i else 0 := by
     intro a ha
     have hab : a ≠ b := Finset.ne_of_mem_erase ha
     rw [if_neg hab]
@@ -86,26 +102,29 @@ theorem expand_of_tail (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (b : 
       simp at this
       omega
 
-theorem coefOf_UT (y : Fin (r + 1) → Fin (2 * r + k + 1) → ℂ) :
-    (Matrix.of fun a b => coefOf (k := k) b (y b) a) ∈ UTset (r + 1) := by
+theorem coefOf_UT (y : Fin (r + 1) → Fin (2 * r + k + 1) → ℂ)
+    : (Matrix.of fun a b => coefOf (k := k) b (y b) a) ∈ UTset (r + 1) := by
   refine ⟨fun a b hab => ?_, fun a => ?_⟩
   · simp only [Matrix.of_apply, coefOf, if_neg hab.ne']
     rw [dite_eq_right (fun h => lt_asymm h (Fin.lt_def.1 hab))]
   · simp [coefOf]
 
-theorem Sset_frame (z : Fin (2 * r + k + 1) → ℂ) (hz : StdZ k r z) (s : B.Mat k r) (hs : s ∈ Sset k r z) :
-    s ∈ B.GV k r ∧ s * Ff k r z = Ff k r z * uMap k r z s ∧ uMap k r z s ∈ UTset (r + 1) := by
+theorem Sset_frame
+    (z : Fin (2 * r + k + 1) → ℂ) (hz : StdZ k r z) (s : B.Mat k r) (hs : s ∈ Sset k r z)
+    : s ∈ B.GV k r ∧ s * Ff k r z = Ff k r z * uMap k r z s ∧ uMap k r z s ∈ UTset (r + 1) := by
   obtain ⟨h, hh, m, hm, rfl⟩ := hs
   have hGV : h * m ∈ B.GV k r := by
     show (h * m)ᴴ * Hpk k r * (h * m) = Hpk k r
     have h1 : hᴴ * Hpk k r * h = Hpk k r := hh.1
     have h2 : mᴴ * Hpk k r * m = Hpk k r := hm.1
     rw [Matrix.conjTranspose_mul]
-    calc mᴴ * hᴴ * Hpk k r * (h * m) = mᴴ * (hᴴ * Hpk k r * h) * m := by
-          simp only [Matrix.mul_assoc]
+    calc
+      mᴴ * hᴴ * Hpk k r * (h * m)
+        = mᴴ * (hᴴ * Hpk k r * h) * m := by simp only [Matrix.mul_assoc]
       _ = Hpk k r := by rw [h1, h2]
-  have htail : ∀ b : Fin (r + 1), ∀ i : Fin (2 * r + k + 1), b.val ≤ i.val →
-      (m *ᵥ fvec k r z b) i = fvec k r z b i := by
+  have htail
+      : ∀ b : Fin (r + 1), ∀ i : Fin (2 * r + k + 1),
+        b.val ≤ i.val → (m *ᵥ fvec k r z b) i = fvec k r z b i := by
     intro b i hbi
     by_cases hbr : b.val < r
     · have hf : fvec k r z b = bvec (eI k r ⟨b.val, hbr⟩) := by simp [fvec, hbr]
@@ -128,8 +147,8 @@ theorem Sset_frame (z : Fin (2 * r + k + 1) → ℂ) (hz : StdZ k r z) (s : B.Ma
           · rw [hz.1 j (Or.inr (not_le.1 hj2)), mul_zero]
         · rw [hz.1 j (Or.inl (not_le.1 hj1)), mul_zero]
       · simp
-  have hmX : m * Ff k r z = Ff k r z *
-      (Matrix.of fun a b => coefOf (k := k) b (m *ᵥ fvec k r z b) a) :=
+  have hmX
+      : m * Ff k r z = Ff k r z * (Matrix.of fun a b => coefOf (k := k) b (m *ᵥ fvec k r z b) a) :=
     mul_of_col z m _ (fun b => expand_of_tail z hz.1 b _ (htail b))
   have hhF : h * Ff k r z = Ff k r z := by
     ext i a
@@ -140,8 +159,9 @@ theorem Sset_frame (z : Fin (2 * r + k + 1) → ℂ) (hz : StdZ k r z) (s : B.Ma
       · exact hh.2.2
     have e2 := congrFun e i
     simpa [Matrix.mulVec, dotProduct, Matrix.mul_apply, Ff] using e2
-  have hsF : h * m * Ff k r z = Ff k r z *
-      (Matrix.of fun a b => coefOf (k := k) b (m *ᵥ fvec k r z b) a) := by
+  have hsF
+      : h * m * Ff k r z
+        = Ff k r z * (Matrix.of fun a b => coefOf (k := k) b (m *ᵥ fvec k r z b) a) := by
     rw [Matrix.mul_assoc, hmX, ← Matrix.mul_assoc, hhF]
   have hu := uMap_eq z hz _ _ hsF
   refine ⟨hGV, ?_, ?_⟩
@@ -150,8 +170,8 @@ theorem Sset_frame (z : Fin (2 * r + k + 1) → ℂ) (hz : StdZ k r z) (s : B.Ma
   · rw [hu]
     exact coefOf_UT (fun b => m *ᵥ fvec k r z b)
 
-theorem rho_conj (γ : B.Mat k r) (hγ : γ ∈ B.GV k r) (ρ s0 : B.Mat k r)
-    (h : ρ = γ * s0 * γ⁻¹) : γ⁻¹ * ρ * γ = s0 ∧ γ * s0 = ρ * γ := by
+theorem rho_conj (γ : B.Mat k r) (hγ : γ ∈ B.GV k r) (ρ s0 : B.Mat k r) (h : ρ = γ * s0 * γ⁻¹)
+    : γ⁻¹ * ρ * γ = s0 ∧ γ * s0 = ρ * γ := by
   have hγ' : γᴴ * Hpk k r * γ = Hpk k r := hγ
   have hl : (Hpk k r * γᴴ * Hpk k r) * γ = 1 := by
     have e : Hpk k r * (γᴴ * Hpk k r * γ) = 1 := by rw [hγ', hpk_mul_self]
@@ -160,10 +180,13 @@ theorem rho_conj (γ : B.Mat k r) (hγ : γ ∈ B.GV k r) (ρ s0 : B.Mat k r)
   have h1 : γ⁻¹ * γ = 1 := by rw [hinv, hl]
   subst h
   constructor
-  · calc γ⁻¹ * (γ * s0 * γ⁻¹) * γ = (γ⁻¹ * γ) * s0 * (γ⁻¹ * γ) := by
-          simp only [Matrix.mul_assoc]
+  · calc
+      γ⁻¹ * (γ * s0 * γ⁻¹) * γ
+        = (γ⁻¹ * γ) * s0 * (γ⁻¹ * γ) := by simp only [Matrix.mul_assoc]
       _ = s0 := by rw [h1, Matrix.one_mul, Matrix.mul_one]
-  · calc γ * s0 = γ * s0 * (γ⁻¹ * γ) := by rw [h1, Matrix.mul_one]
+  · calc
+      γ * s0
+        = γ * s0 * (γ⁻¹ * γ) := by rw [h1, Matrix.mul_one]
       _ = γ * s0 * γ⁻¹ * γ := by simp only [Matrix.mul_assoc]
 
 theorem mapsStep : MapsStep := by
@@ -179,21 +202,23 @@ theorem mapsStep : MapsStep := by
     exact hsU
   · show (uMap k r z ρ)ᴴ * Zhat k r z z' γ * uMap k r z' (γ⁻¹ * ρ * γ) = Zhat k r z z' γ
     rw [hc1, Zhat_eq]
-    calc (uMap k r z ρ)ᴴ * ((Ff k r z)ᴴ * Hpk k r * γ * Ff k r z') * uMap k r z' s'
-        = (Ff k r z * uMap k r z ρ)ᴴ * Hpk k r * γ * (Ff k r z' * uMap k r z' s') := by
-          rw [Matrix.conjTranspose_mul]
-          simp only [Matrix.mul_assoc]
+    calc
+      (uMap k r z ρ)ᴴ * ((Ff k r z)ᴴ * Hpk k r * γ * Ff k r z') * uMap k r z' s'
+          = (Ff k r z * uMap k r z ρ)ᴴ * Hpk k r * γ * (Ff k r z' * uMap k r z' s') := by
+        rw [Matrix.conjTranspose_mul]
+        simp only [Matrix.mul_assoc]
       _ = (ρ * Ff k r z)ᴴ * Hpk k r * (γ * s') * Ff k r z' := by
-          rw [← hρF, ← hsF]
-          simp only [Matrix.mul_assoc]
+        rw [← hρF, ← hsF]
+        simp only [Matrix.mul_assoc]
       _ = (Ff k r z)ᴴ * (ρᴴ * Hpk k r * ρ) * γ * Ff k r z' := by
-          rw [hc2, Matrix.conjTranspose_mul]
-          simp only [Matrix.mul_assoc]
+        rw [hc2, Matrix.conjTranspose_mul]
+        simp only [Matrix.mul_assoc]
       _ = (Ff k r z)ᴴ * Hpk k r * γ * Ff k r z' := by rw [hρH]
 
-theorem mul_eq_of_fix (z z' : Fin (2 * r + k + 1) → ℂ) (γ ρ : B.Mat k r)
-    (hfix : ∀ v ∈ Uperp k r z z' γ, ρ *ᵥ v = v) {ι : Type*} (Q : Matrix (Fin (2 * r + k + 1)) ι ℂ)
-    (hQ : ((Fm k r z z' γ)ᴴ * Hpk k r) * Q = 0) : ρ * Q = Q := by
+theorem mul_eq_of_fix
+    (z z' : Fin (2 * r + k + 1) → ℂ) (γ ρ : B.Mat k r) (hfix : ∀ v ∈ Uperp k r z z' γ, ρ *ᵥ v = v)
+    {ι : Type*} (Q : Matrix (Fin (2 * r + k + 1)) ι ℂ) (hQ : ((Fm k r z z' γ)ᴴ * Hpk k r) * Q = 0)
+    : ρ * Q = Q := by
   have hE : (Matrix.of fun i j => star (gramVec k r z z' γ i j)) = (Fm k r z z' γ)ᴴ := by
     ext a b
     simp [Fm, Matrix.conjTranspose_apply]
@@ -213,7 +238,8 @@ theorem gramInv_of (h : GramIndependentSignature) : GramInv := by
   obtain ⟨-, ⟨Q, -, hQG⟩, -, -⟩ := h k r z z' γ hs hp
   have hdet := congrArg Matrix.det hQG
   rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_fromBlocks_zero₂₁, Matrix.det_one, Matrix.det_neg,
-    Matrix.det_one] at hdet
+      Matrix.det_one]
+    at hdet
   rw [isUnit_iff_ne_zero]
   intro h0
   rw [h0, mul_zero, zero_mul] at hdet
@@ -227,31 +253,32 @@ theorem pairFormula_of (hG : GramInv) : PairFormula := by
   obtain ⟨hc1, hc2⟩ := rho_conj γ hp.1 ρ s' hρeq
   have hGinv : gramM k r z z' γ * (gramM k r z z' γ)⁻¹ = 1 :=
     Matrix.mul_nonsing_inv _ (hG k r z z' γ hs hp)
-  have hρFm : ρ * Fm k r z z' γ =
-      Fm k r z z' γ * Wm (uMap k r z ρ) (uMap k r z' (γ⁻¹ * ρ * γ)) := by
+  have hρFm
+      : ρ * Fm k r z z' γ = Fm k r z z' γ * Wm (uMap k r z ρ) (uMap k r z' (γ⁻¹ * ρ * γ)) := by
     rw [hc1, Fm_eq, Wm, Matrix.mul_fromCols, Matrix.fromCols_mul_fromBlocks]
     simp only [Matrix.mul_zero, add_zero, zero_add]
     congr 1
-    all_goals first
-      | exact hρF
-      | rw [← Matrix.mul_assoc, ← hc2, Matrix.mul_assoc, hsF, Matrix.mul_assoc]
+    all_goals
+      first | exact hρF | rw [← Matrix.mul_assoc, ← hc2, Matrix.mul_assoc, hsF, Matrix.mul_assoc]
   have hQ : ((Fm k r z z' γ)ᴴ * Hpk k r) * (1 - Fm k r z z' γ * Km k r z z' γ) = 0 := by
     rw [Matrix.mul_sub, Matrix.mul_one, Km]
-    have e : (Fm k r z z' γ)ᴴ * Hpk k r *
-        (Fm k r z z' γ * ((gramM k r z z' γ)⁻¹ * (Fm k r z z' γ)ᴴ * Hpk k r)) =
-        ((Fm k r z z' γ)ᴴ * Hpk k r * Fm k r z z' γ) * (gramM k r z z' γ)⁻¹ *
-          ((Fm k r z z' γ)ᴴ * Hpk k r) := by
+    have e
+        : (Fm k r z z' γ)ᴴ * Hpk k r
+            * (Fm k r z z' γ * ((gramM k r z z' γ)⁻¹ * (Fm k r z z' γ)ᴴ * Hpk k r))
+          = ((Fm k r z z' γ)ᴴ * Hpk k r * Fm k r z z' γ) * (gramM k r z z' γ)⁻¹
+            * ((Fm k r z z' γ)ᴴ * Hpk k r) := by
       simp only [Matrix.mul_assoc]
     rw [e, ← gramM_eq, hGinv, Matrix.one_mul, sub_self]
   have hfixQ := mul_eq_of_fix z z' γ ρ hfix _ hQ
-  calc ρ = ρ * (Fm k r z z' γ * Km k r z z' γ) + ρ * (1 - Fm k r z z' γ * Km k r z z' γ) := by
-        rw [← Matrix.mul_add, add_sub_cancel, Matrix.mul_one]
-    _ = Fm k r z z' γ * Wm (uMap k r z ρ) (uMap k r z' (γ⁻¹ * ρ * γ)) * Km k r z z' γ +
-          (1 - Fm k r z z' γ * Km k r z z' γ) := by
-        rw [hfixQ, ← Matrix.mul_assoc, hρFm]
+  calc
+    ρ = ρ * (Fm k r z z' γ * Km k r z z' γ) + ρ * (1 - Fm k r z z' γ * Km k r z z' γ) := by
+      rw [← Matrix.mul_add, add_sub_cancel, Matrix.mul_one]
+    _ = Fm k r z z' γ * Wm (uMap k r z ρ) (uMap k r z' (γ⁻¹ * ρ * γ)) * Km k r z z' γ
+        + (1 - Fm k r z z' γ * Km k r z z' γ) := by
+      rw [hfixQ, ← Matrix.mul_assoc, hρFm]
     _ = rhoOf k r z z' γ (pairMap k r z z' γ ρ).1 (pairMap k r z z' γ ρ).2 := by
-        simp only [rhoOf, pairMap, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one]
-        abel
+      simp only [rhoOf, pairMap, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one]
+      abel
 
 theorem det_UT {m : ℕ} {u : Matrix (Fin m) (Fin m) ℂ} (hu : u ∈ UTset m) : u.det = 1 := by
   rw [Matrix.det_of_upperTriangular (fun i j hij => hu.1 i j hij)]
@@ -263,15 +290,15 @@ theorem compDet : CompDet := by
   obtain ⟨hq1, hq2, hqe⟩ := hqS
   have hZu : IsUnit (Zhat k r z z' γ) :=
     (Matrix.isUnit_iff_isUnit_det _).2 (isUnit_iff_ne_zero.2 (det_Zhat_ne z z' hs γ hp))
-  have hU : ∀ {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ}, u ∈ UTset (r + 1) → IsUnit u :=
-    fun hu => (Matrix.isUnit_iff_isUnit_det _).2 (by rw [det_UT hu]; exact isUnit_one)
-  have hUH : ∀ {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ}, u ∈ UTset (r + 1) → IsUnit uᴴ :=
-    fun hu => (Matrix.isUnit_iff_isUnit_det _).2
+  have hU : ∀ {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ}, u ∈ UTset (r + 1) → IsUnit u := fun hu =>
+    (Matrix.isUnit_iff_isUnit_det _).2 (by rw [det_UT hu]; exact isUnit_one)
+  have hUH
+      : ∀ {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ}, u ∈ UTset (r + 1) → IsUnit uᴴ := fun hu =>
+    (Matrix.isUnit_iff_isUnit_det _).2
       (by rw [Matrix.det_conjTranspose, det_UT hu, star_one]; exact isUnit_one)
   constructor
   · intro h1
-    have e : (p.1ᴴ * Zhat k r z z' γ) * p.2 = (p.1ᴴ * Zhat k r z z' γ) * q.2 := by
-      rw [hpe, h1, hqe]
+    have e : (p.1ᴴ * Zhat k r z z' γ) * p.2 = (p.1ᴴ * Zhat k r z z' γ) * q.2 := by rw [hpe, h1, hqe]
     exact Prod.ext h1 (((hUH hp1).mul hZu).mul_left_cancel e)
   · intro h2
     have e : p.1ᴴ * (Zhat k r z z' γ * p.2) = q.1ᴴ * (Zhat k r z z' γ * p.2) := by

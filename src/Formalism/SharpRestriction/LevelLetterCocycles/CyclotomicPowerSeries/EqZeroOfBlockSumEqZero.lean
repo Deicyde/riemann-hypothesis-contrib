@@ -14,27 +14,29 @@ section Ln03DescendDvd
 
 variable {O : Type} [CommRing O]
 
-def powerSeriesBlockSum (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ) (b : Fin m → PowerSeries O) :
-    PowerSeries O :=
+def powerSeriesBlockSum (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ) (b : Fin m → PowerSeries O)
+    : PowerSeries O :=
   ∑ i : Fin m, X ^ (i : ℕ) * ι (b i)
 
-def powerSeriesBlockSplit (m : ℕ) (g : ℕ → O) : Fin m → PowerSeries O :=
-  fun i => PowerSeries.mk fun j => g (m * j + i)
+def powerSeriesBlockSplit (m : ℕ) (g : ℕ → O) : Fin m → PowerSeries O := fun i =>
+  PowerSeries.mk fun j => g (m * j + i)
 
-theorem blockSum_add (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ) (b b' : Fin m → PowerSeries O) :
-    powerSeriesBlockSum ι m (b + b') = powerSeriesBlockSum ι m b + powerSeriesBlockSum ι m b' := by
+theorem blockSum_add (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ) (b b' : Fin m → PowerSeries O)
+    : powerSeriesBlockSum ι m (b + b')
+      = powerSeriesBlockSum ι m b + powerSeriesBlockSum ι m b' := by
   simp only [powerSeriesBlockSum, Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib]
 
-theorem blockSum_sub (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ) (b b' : Fin m → PowerSeries O) :
-    powerSeriesBlockSum ι m (b - b') = powerSeriesBlockSum ι m b - powerSeriesBlockSum ι m b' := by
+theorem blockSum_sub (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ) (b b' : Fin m → PowerSeries O)
+    : powerSeriesBlockSum ι m (b - b')
+      = powerSeriesBlockSum ι m b - powerSeriesBlockSum ι m b' := by
   simp only [powerSeriesBlockSum, Pi.sub_apply, map_sub, mul_sub, Finset.sum_sub_distrib]
 
-theorem blockSum_zero (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ) :
-    powerSeriesBlockSum ι m 0 = 0 := by
+theorem blockSum_zero (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ)
+    : powerSeriesBlockSum ι m 0 = 0 := by
   simp [powerSeriesBlockSum]
 
-theorem blockSplit_add (m : ℕ) (g h : ℕ → O) :
-    powerSeriesBlockSplit m (g + h) = powerSeriesBlockSplit m g + powerSeriesBlockSplit m h := by
+theorem blockSplit_add (m : ℕ) (g h : ℕ → O)
+    : powerSeriesBlockSplit m (g + h) = powerSeriesBlockSplit m g + powerSeriesBlockSplit m h := by
   funext i
   ext j
   simp [powerSeriesBlockSplit]
@@ -44,16 +46,20 @@ theorem blockSplit_zero (m : ℕ) : powerSeriesBlockSplit m (0 : ℕ → O) = 0 
   ext j
   simp [powerSeriesBlockSplit]
 
-theorem X_pow_mul_dvd_algHom_of_X_pow_dvd {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
-    (hX : ι X = w * X ^ m) (J : ℕ) (b : PowerSeries O) (hb : X ^ J ∣ b) : X ^ (m * J) ∣ ι b := by
+theorem X_pow_mul_dvd_algHom_of_X_pow_dvd
+    {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O} (hX : ι X = w * X ^ m)
+    (J : ℕ) (b : PowerSeries O) (hb : X ^ J ∣ b)
+    : X ^ (m * J) ∣ ι b := by
   obtain ⟨c, rfl⟩ := hb
   refine ⟨w ^ J * ι c, ?_⟩
   rw [map_mul, map_pow, hX, mul_pow, ← pow_mul]
   ring
 
-theorem coeff_blockSum_eq_zero {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
-    (hX : ι X = w * X ^ m) (hm : 0 < m) (h : ℕ → O) (n : ℕ) (hh : ∀ n' ≤ n, h n' = 0) :
-    coeff n (powerSeriesBlockSum ι m (powerSeriesBlockSplit m h)) = 0 := by
+theorem coeff_blockSum_eq_zero
+    {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
+    (hX : ι X = w * X ^ m) (hm : 0 < m)
+    (h : ℕ → O) (n : ℕ) (hh : ∀ n' ≤ n, h n' = 0)
+    : coeff n (powerSeriesBlockSum ι m (powerSeriesBlockSplit m h)) = 0 := by
   unfold powerSeriesBlockSum
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -78,14 +84,17 @@ theorem coeff_blockSum_eq_zero {ι : PowerSeries O →ₐ[O] PowerSeries O} {m :
     omega
   · rfl
 
-private theorem div_eq_and_mod_eq_of_mul_add_eq {m j r n : ℕ} (hm : 0 < m) (hr : r < m) (h : m * j + r = n) :
-    n / m = j ∧ n % m = r :=
+private theorem div_eq_and_mod_eq_of_mul_add_eq
+    {m j r n : ℕ} (hm : 0 < m) (hr : r < m) (h : m * j + r = n)
+    : n / m = j ∧ n % m = r :=
   (Nat.div_mod_unique hm).mpr ⟨by omega, hr⟩
 
-theorem coeff_blockSum_single {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
-    (hX : ι X = w * X ^ m) (hm : 0 < m) (n : ℕ) (x : O) :
-    coeff n (powerSeriesBlockSum ι m (powerSeriesBlockSplit m fun n' => if n' = n then x else 0)) =
-      x * constantCoeff w ^ (n / m) := by
+theorem coeff_blockSum_single
+    {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
+    (hX : ι X = w * X ^ m) (hm : 0 < m)
+    (n : ℕ) (x : O)
+    : coeff n (powerSeriesBlockSum ι m (powerSeriesBlockSplit m fun n' => if n' = n then x else 0))
+      = x * constantCoeff w ^ (n / m) := by
   obtain ⟨i0, hi0⟩ : ∃ i0 : Fin m, (i0 : ℕ) = n % m := ⟨⟨n % m, Nat.mod_lt _ hm⟩, rfl⟩
   have key : ∀ (i : Fin m) (j : ℕ), m * j + (i : ℕ) = n ↔ (i = i0 ∧ j = n / m) := by
     intro i j
@@ -98,8 +107,10 @@ theorem coeff_blockSum_single {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : 
       have h4 : (i : ℕ) = n % m := by rw [h1, hi0]
       rw [h2, h4]
       exact h3
-  have hb : ∀ i : Fin m, powerSeriesBlockSplit m (fun n' => if n' = n then x else 0) i =
-      if i = i0 then x • (X : PowerSeries O) ^ (n / m) else 0 := by
+  have hb
+      : ∀ i : Fin m,
+        powerSeriesBlockSplit m (fun n' => if n' = n then x else 0) i
+          = if i = i0 then x • (X : PowerSeries O) ^ (n / m) else 0 := by
     intro i
     ext j
     simp only [powerSeriesBlockSplit, coeff_mk]
@@ -112,8 +123,9 @@ theorem coeff_blockSum_single {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : 
   unfold powerSeriesBlockSum
   rw [Finset.sum_eq_single i0]
   · rw [hb i0, if_pos rfl, map_smul, map_pow, hX]
-    have e : (X : PowerSeries O) ^ (i0 : ℕ) * x • (w * X ^ m) ^ (n / m) =
-        x • (w ^ (n / m) * X ^ n) := by
+    have e
+        : (X : PowerSeries O) ^ (i0 : ℕ) * x • (w * X ^ m) ^ (n / m)
+          = x • (w ^ (n / m) * X ^ n) := by
       rw [mul_smul_comm, mul_pow, ← pow_mul, hi0]
       congr 1
       rw [show (X : PowerSeries O) ^ n = X ^ (n % m) * X ^ (m * (n / m)) by
@@ -126,13 +138,18 @@ theorem coeff_blockSum_single {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : 
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem coeff_blockSum_triangular {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
-    (hX : ι X = w * X ^ m) (hm : 0 < m) (g : ℕ → O) (n : ℕ) :
-    coeff n (powerSeriesBlockSum ι m (powerSeriesBlockSplit m g)) =
-      coeff n (powerSeriesBlockSum ι m (powerSeriesBlockSplit m fun n' => if n' < n then g n' else 0)) +
-        g n * constantCoeff w ^ (n / m) := by
-  have hsplit : g = (fun n' => if n' < n then g n' else 0) + (fun n' => if n' = n then g n else 0)
-      + (fun n' => if n < n' then g n' else 0) := by
+theorem coeff_blockSum_triangular
+    {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
+    (hX : ι X = w * X ^ m) (hm : 0 < m)
+    (g : ℕ → O) (n : ℕ)
+    : coeff n (powerSeriesBlockSum ι m (powerSeriesBlockSplit m g))
+      = coeff n
+          (powerSeriesBlockSum ι m (powerSeriesBlockSplit m fun n' => if n' < n then g n' else 0))
+        + g n * constantCoeff w ^ (n / m) := by
+  have hsplit
+      : g
+        = (fun n' => if n' < n then g n' else 0) + (fun n' => if n' = n then g n else 0)
+          + (fun n' => if n < n' then g n' else 0) := by
     funext n'
     simp only [Pi.add_apply]
     rcases lt_trichotomy n' n with h | rfl | h
@@ -140,14 +157,20 @@ theorem coeff_blockSum_triangular {ι : PowerSeries O →ₐ[O] PowerSeries O} {
     · simp
     · rw [if_neg (not_lt.mpr h.le), if_neg h.ne', if_pos h, zero_add, zero_add]
   conv_lhs => rw [hsplit]
-  rw [blockSplit_add, blockSplit_add, blockSum_add, blockSum_add, map_add (f := _), map_add (f := _),
-    coeff_blockSum_single hX hm n (g n),
-    coeff_blockSum_eq_zero hX hm (fun n' => if n < n' then g n' else 0) n
-      (fun n' hn' => if_neg (not_lt.mpr hn')), add_zero]
+  rw [blockSplit_add, blockSplit_add, blockSum_add, blockSum_add, map_add (f := _),
+    map_add (f := _), coeff_blockSum_single hX hm n (g n),
+    coeff_blockSum_eq_zero hX hm
+      (fun n' => if n < n' then g n' else 0)
+      n
+      (fun n' hn' => if_neg (not_lt.mpr hn')),
+    add_zero]
 
-theorem eq_zero_of_blockSum_eq_zero {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
-    (hX : ι X = w * X ^ m) (hm : 0 < m) (hw0 : IsUnit (constantCoeff w)) (g : ℕ → O)
-    (h0 : powerSeriesBlockSum ι m (powerSeriesBlockSplit m g) = 0) (n : ℕ) : g n = 0 := by
+theorem eq_zero_of_blockSum_eq_zero
+    {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
+    (hX : ι X = w * X ^ m) (hm : 0 < m) (hw0 : IsUnit (constantCoeff w))
+    (g : ℕ → O) (h0 : powerSeriesBlockSum ι m (powerSeriesBlockSplit m g) = 0)
+    (n : ℕ)
+    : g n = 0 := by
   suffices H : ∀ N, ∀ k < N, g k = 0 from H (n + 1) n (Nat.lt_succ_self n)
   intro N
   induction N with
@@ -168,28 +191,37 @@ theorem eq_zero_of_blockSum_eq_zero {ι : PowerSeries O →ₐ[O] PowerSeries O}
       simp only [map_zero, zero_add] at this
       exact ((hw0.pow (N / m)).mul_left_eq_zero).mp this.symm
 
-def blockInverse (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ) (wi : O) (f : PowerSeries O)
-    (n : ℕ) : O :=
-  wi ^ (n / m) * (coeff n f - coeff n (powerSeriesBlockSum ι m (powerSeriesBlockSplit m fun n' =>
-    if _h : n' < n then blockInverse ι m wi f n' else 0)))
+def blockInverse
+    (ι : PowerSeries O →ₐ[O] PowerSeries O) (m : ℕ) (wi : O) (f : PowerSeries O) (n : ℕ)
+    : O :=
+  wi ^ (n / m)
+    * (coeff n f - coeff n
+      (powerSeriesBlockSum ι m
+        (powerSeriesBlockSplit m fun n' => if _h : n' < n then blockInverse ι m wi f n' else 0)))
 termination_by n
 
-theorem blockSum_blockInverse {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
-    (hX : ι X = w * X ^ m) (hm : 0 < m) (hw0 : IsUnit (constantCoeff w)) (f : PowerSeries O) :
-    powerSeriesBlockSum ι m (powerSeriesBlockSplit m (blockInverse ι m (↑hw0.unit⁻¹) f)) = f := by
+theorem blockSum_blockInverse
+    {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
+    (hX : ι X = w * X ^ m) (hm : 0 < m) (hw0 : IsUnit (constantCoeff w))
+    (f : PowerSeries O)
+    : powerSeriesBlockSum ι m (powerSeriesBlockSplit m (blockInverse ι m (↑hw0.unit⁻¹) f)) = f := by
   ext n
   have hu : ((hw0.unit⁻¹ : Oˣ) : O) ^ (n / m) * constantCoeff w ^ (n / m) = 1 := by
     rw [← mul_pow, hw0.val_inv_mul, one_pow]
-  have hI : blockInverse ι m (↑hw0.unit⁻¹) f n = ((hw0.unit⁻¹ : Oˣ) : O) ^ (n / m) *
-      (coeff n f - coeff n (powerSeriesBlockSum ι m (powerSeriesBlockSplit m fun n' =>
-        if n' < n then blockInverse ι m (↑hw0.unit⁻¹) f n' else 0))) := by
+  have hI
+      : blockInverse ι m (↑hw0.unit⁻¹) f n
+        = ((hw0.unit⁻¹ : Oˣ) : O) ^ (n / m)
+          * (coeff n f - coeff n
+            (powerSeriesBlockSum ι m
+              (powerSeriesBlockSplit m fun n' =>
+                if n' < n then blockInverse ι m (↑hw0.unit⁻¹) f n' else 0))) := by
     rw [blockInverse]
     try simp only [dite_eq_ite]
   rw [coeff_blockSum_triangular hX hm _ n, hI, mul_right_comm, hu, one_mul]
   ring
 
-theorem blockSplit_coeff {m : ℕ} (hm : 0 < m) (b : Fin m → PowerSeries O) :
-    powerSeriesBlockSplit m (fun n => coeff (n / m) (b ⟨n % m, Nat.mod_lt _ hm⟩)) = b := by
+theorem blockSplit_coeff {m : ℕ} (hm : 0 < m) (b : Fin m → PowerSeries O)
+    : powerSeriesBlockSplit m (fun n => coeff (n / m) (b ⟨n % m, Nat.mod_lt _ hm⟩)) = b := by
   funext i
   ext j
   simp only [powerSeriesBlockSplit, coeff_mk]
@@ -199,11 +231,17 @@ theorem blockSplit_coeff {m : ℕ} (hm : 0 < m) (b : Fin m → PowerSeries O) :
 
 end Ln03DescendDvd
 
-private theorem power_series_block_sum_injective {O : Type} [CommRing O] {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
+private theorem power_series_block_sum_injective
+    {O : Type} [CommRing O]
+    {ι : PowerSeries O →ₐ[O] PowerSeries O} {m : ℕ} {w : PowerSeries O}
     (hX : ι X = w * X ^ m) (hm : 0 < m) (hw0 : IsUnit (constantCoeff w))
-    {b b' : Fin m → PowerSeries O} (h : powerSeriesBlockSum ι m b = powerSeriesBlockSum ι m b') : b = b' := by
+    {b b' : Fin m → PowerSeries O} (h : powerSeriesBlockSum ι m b = powerSeriesBlockSum ι m b')
+    : b = b' := by
   have e := blockSplit_coeff hm (b - b')
-  have hd : powerSeriesBlockSum ι m (powerSeriesBlockSplit m fun n => coeff (n / m) ((b - b') ⟨n % m, Nat.mod_lt _ hm⟩)) = 0 := by
+  have hd
+      : powerSeriesBlockSum ι m
+          (powerSeriesBlockSplit m fun n => coeff (n / m) ((b - b') ⟨n % m, Nat.mod_lt _ hm⟩))
+        = 0 := by
     rw [e, blockSum_sub, h, sub_self]
   have hz : (fun n => coeff (n / m) ((b - b') ⟨n % m, Nat.mod_lt _ hm⟩)) = (0 : ℕ → O) :=
     funext fun n => eq_zero_of_blockSum_eq_zero hX hm hw0 _ hd n
@@ -215,7 +253,9 @@ theorem descendDvd : DescendDvdStatement := by
   intro O _ ι m hm hex
   obtain ⟨w, hw⟩ := hex
   have hw0 : IsUnit (constantCoeff (w : PowerSeries O)) := (Units.isUnit w).map constantCoeff
-  have e0 : ∀ a : PowerSeries O, powerSeriesBlockSum ι m (fun i => if (i : ℕ) = 0 then a else 0) = ι a := by
+  have e0
+      : ∀ a : PowerSeries O,
+        powerSeriesBlockSum ι m (fun i => if (i : ℕ) = 0 then a else 0) = ι a := by
     intro a
     unfold powerSeriesBlockSum
     rw [Finset.sum_eq_single ⟨0, hm⟩]
@@ -227,15 +267,19 @@ theorem descendDvd : DescendDvdStatement := by
       exact absurd (Finset.mem_univ _) h
   refine ⟨?_, ?_⟩
   · intro p q hpq
-    have hb := power_series_block_sum_injective hw hm hw0 (b := fun i => if (i : ℕ) = 0 then p else 0)
-      (b' := fun i => if (i : ℕ) = 0 then q else 0) (by rw [e0, e0, hpq])
+    have hb :=
+      power_series_block_sum_injective hw hm hw0
+        (b := fun i => if (i : ℕ) = 0 then p else 0)
+        (b' := fun i => if (i : ℕ) = 0 then q else 0)
+        (by rw [e0, e0, hpq])
     have := congrFun hb ⟨0, hm⟩
     simpa using this
   · rintro p a ⟨c, hc⟩
     obtain ⟨d, hd⟩ : ∃ d : Fin m → PowerSeries O, powerSeriesBlockSum ι m d = c :=
       ⟨_, blockSum_blockInverse hw hm hw0 c⟩
-    have key : powerSeriesBlockSum ι m (fun i => p * d i) =
-        powerSeriesBlockSum ι m (fun i => if (i : ℕ) = 0 then a else 0) := by
+    have key
+        : powerSeriesBlockSum ι m (fun i => p * d i)
+          = powerSeriesBlockSum ι m (fun i => if (i : ℕ) = 0 then a else 0) := by
       rw [e0, hc, ← hd]
       unfold powerSeriesBlockSum
       rw [Finset.mul_sum]

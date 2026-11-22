@@ -4,11 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
-theorem UpperTheory.V.J.flatHt :
-    ∀ (A R : Type) [CommRing A] [CommRing R] [IsNoetherianRing A] [IsNoetherianRing R] (ι : A →+* R), ι.Flat → ∀ (q : Ideal A) (Q : Ideal R),
-        Q.IsPrime → Q.comap ι = q → Q ∈ (q.map ι).minimalPrimes → Q.height = q.height := by
+theorem UpperTheory.V.J.flatHt
+    : ∀ (A R : Type) [CommRing A] [CommRing R] [IsNoetherianRing A] [IsNoetherianRing R]
+        (ι : A →+* R),
+      ι.Flat
+        → ∀ (q : Ideal A) (Q : Ideal R),
+          Q.IsPrime → Q.comap ι = q → Q ∈ (q.map ι).minimalPrimes → Q.height = q.height := by
   intro A R _ _ _ _ ι hι q Q hQ hcomap hmin
   letI : Algebra A R := ι.toAlgebra
   haveI : Module.Flat A R := hι
@@ -16,8 +21,7 @@ theorem UpperTheory.V.J.flatHt :
   haveI : q.IsPrime := hcomap ▸ Ideal.comap_isPrime ι Q
   haveI : Q.LiesOver q := ⟨hcomap.symm⟩
   rw [Ideal.height_eq_height_add_of_liesOver_of_hasGoingDown q Q]
-  suffices h0 : (Q.map (Ideal.Quotient.mk (q.map (algebraMap A R)))).height = 0 by
-    rw [h0, add_zero]
+  suffices h0 : (Q.map (Ideal.Quotient.mk (q.map (algebraMap A R)))).height = 0 by rw [h0, add_zero]
   have hJQ : q.map (algebraMap A R) ≤ Q := hmin.1.2
   have hker : RingHom.ker (Ideal.Quotient.mk (q.map (algebraMap A R))) ≤ Q := by
     rw [Ideal.mk_ker]

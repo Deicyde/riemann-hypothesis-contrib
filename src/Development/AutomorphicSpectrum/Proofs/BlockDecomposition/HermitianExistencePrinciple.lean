@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.T2SpaceTe
 
 noncomputable section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain Topology
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.RgBase
@@ -18,15 +19,15 @@ open PositivityTheory.Rg.Base1
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem norm_tmul_one {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (x : AF F ⊗[F] E) :
-    (Algebra.norm (AF F) x) ⊗ₜ[F] (1 : E) = sigR (AF F) σ x * x := by
+theorem norm_tmul_one {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (x : AF F ⊗[F] E)
+    : (Algebra.norm (AF F) x) ⊗ₜ[F] (1 : E) = sigR (AF F) σ x * x := by
   have e := GlobalTheory.Doubling.algebraMap_norm_eq h (R := AF F) x
   rw [Algebra.TensorProduct.algebraMap_apply] at e
   rw [mul_comm]
   exact e
 
-theorem isNm_iff {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (x : (AF F ⊗[F] E)ˣ) (a : (AF F)ˣ) :
-    IsNm σ x a ↔ Algebra.norm (AF F) (x : AF F ⊗[F] E) = a := by
+theorem isNm_iff {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (x : (AF F ⊗[F] E)ˣ) (a : (AF F)ˣ)
+    : IsNm σ x a ↔ Algebra.norm (AF F) (x : AF F ⊗[F] E) = a := by
   have hinj : Function.Injective (fun r : AF F => r ⊗ₜ[F] (1 : E)) :=
     Algebra.TensorProduct.includeLeft_injective (S := F) (algebraMap F E).injective
   unfold IsNm
@@ -46,7 +47,8 @@ theorem hEx : HEx := by
       · exact (isNm_iff h x _).2 (congrArg Units.val hx)
       · exact (mul_div_cancel (GlobalTheory.QuadSymbol.toUnits F (AdeleRing (𝓞 F) F) t) a).symm
     · rintro ⟨t, x, n, hn, rfl⟩
-      have h1 : GlobalTheory.IdeleNormChar.normSign E (pr t) = 1 := GlobalTheory.IdeleNormChar.normSign_toUnits E t
+      have h1 : GlobalTheory.IdeleNormChar.normSign E (pr t) = 1 :=
+        GlobalTheory.IdeleNormChar.normSign_toUnits E t
       have h2 : GlobalTheory.IdeleNormChar.normSign E n = 1 :=
         GlobalTheory.IdeleNormChar.normSign_of_mem E ⟨x, Units.ext ((isNm_iff h x n).1 hn)⟩
       rw [map_mul, h1, h2, one_mul]

@@ -19,7 +19,10 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.MeanSquareAdd
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.WeilParts
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.WeilParts
 open scoped TensorProduct Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -27,11 +30,16 @@ namespace GlobalTheory.ThetaMeanSquareForm
 
 open GlobalTheory.HeisOrtho
 
-theorem exists_form {X : Type} [MeasurableSpace X] (ν : Measure X) [IsFiniteMeasure ν] (M : Submodule ℂ (X → ℂ))
-    (hm : ∀ f ∈ M, Measurable f) (hb : ∀ f ∈ M, ∃ C : ℝ, ∀ x, ‖f x‖ ≤ C) :
-    ∃ B : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ, (∀ f g : M, B f g = ∫ x, (f : X → ℂ) x * (starRingEnd ℂ) ((g : X → ℂ) x) ∂ν) ∧
-      ∀ f : M, ∫⁻ x, ‖(f : X → ℂ) x‖ₑ ^ 2 ∂ν = ENNReal.ofReal (B f f).re := by
-  have hi : ∀ f g : M, Integrable (fun x => (f : X → ℂ) x * (starRingEnd ℂ) ((g : X → ℂ) x)) ν := fun f g => by
+theorem exists_form
+    {X : Type} [MeasurableSpace X]
+    (ν : Measure X) [IsFiniteMeasure ν]
+    (M : Submodule ℂ (X → ℂ)) (hm : ∀ f ∈ M, Measurable f) (hb : ∀ f ∈ M, ∃ C : ℝ, ∀ x, ‖f x‖ ≤ C)
+    : ∃ B : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ,
+      (∀ f g : M, B f g = ∫ x, (f : X → ℂ) x * (starRingEnd ℂ) ((g : X → ℂ) x) ∂ν)
+        ∧ ∀ f : M, ∫⁻ x, ‖(f : X → ℂ) x‖ₑ ^ 2 ∂ν = ENNReal.ofReal (B f f).re := by
+  have hi
+      : ∀ f g : M,
+        Integrable (fun x => (f : X → ℂ) x * (starRingEnd ℂ) ((g : X → ℂ) x)) ν := fun f g => by
     obtain ⟨C, hC⟩ := hb f f.2
     obtain ⟨C', hC'⟩ := hb g g.2
     refine Integrable.of_bound
@@ -39,8 +47,13 @@ theorem exists_form {X : Type} [MeasurableSpace X] (ν : Measure X) [IsFiniteMea
       (C * C') (Filter.Eventually.of_forall fun x => ?_)
     rw [norm_mul, Complex.norm_conj]
     exact mul_le_mul (hC x) (hC' x) (norm_nonneg _) ((norm_nonneg _).trans (hC x))
-  refine ⟨LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
-    (fun f g : M => ∫ x, (f : X → ℂ) x * (starRingEnd ℂ) ((g : X → ℂ) x) ∂ν) ?_ ?_ ?_ ?_, fun _ _ => rfl, fun f => ?_⟩
+  refine ⟨
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun f g : M => ∫ x, (f : X → ℂ) x * (starRingEnd ℂ) ((g : X → ℂ) x) ∂ν)
+      ?_ ?_ ?_ ?_,
+    fun _ _ => rfl,
+    fun f => ?_
+  ⟩
   · intro f f' g
     rw [← integral_add (hi f g) (hi f' g)]
     simp only [Submodule.coe_add, Pi.add_apply, add_mul]
@@ -63,7 +76,19 @@ theorem exists_form {X : Type} [MeasurableSpace X] (ν : Measure X) [IsFiniteMea
     refine lintegral_congr fun x => ?_
     rw [ENNReal.ofReal_pow (norm_nonneg _), ofReal_norm_eq_enorm]
 
-theorem exists_invariant_form : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D), IsCharAF D.host.F ψ → ∀ M : Submodule ℂ (WO S T → ℂ), (∀ f ∈ M, IsThetaFunO ψ S T f) → ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)), μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratL T S) 𝓕 μ → ∃ B : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ, (∀ (u : WO S T) (f g f' g' : M), (f' : WO S T → ℂ) = heisO ψ S T u f → (g' : WO S T → ℂ) = heisO ψ S T u g → B f' g' = B f g) ∧ ∀ f : M, ∫⁻ w in 𝓕, ‖(f : WO S T → ℂ) w‖ₑ ^ 2 ∂μ = ENNReal.ofReal (B f f).re := by
+theorem exists_invariant_form
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D),
+      IsCharAF D.host.F ψ
+        → ∀ M : Submodule ℂ (WO S T → ℂ),
+          (∀ f ∈ M, IsThetaFunO ψ S T f)
+            → ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)),
+              μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratL T S) 𝓕 μ
+                → ∃ B : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ,
+                  (∀ (u : WO S T) (f g f' g' : M),
+                      (f' : WO S T → ℂ) = heisO ψ S T u f → (g' : WO S T → ℂ) = heisO ψ S T u g
+                        → B f' g' = B f g)
+                    ∧ ∀ f : M,
+                      ∫⁻ w in 𝓕, ‖(f : WO S T → ℂ) w‖ₑ ^ 2 ∂μ = ENNReal.ofReal (B f f).re := by
   intro D ψ S T hψ M hM μ 𝓕 hμ h𝓕
   obtain ⟨i1, i2, i3, i4, i5, K, hK, hKc⟩ := GlobalTheory.AdelicMatrixLattice.lattice D T S
   haveI : BorelSpace (WO S T) := ⟨rfl⟩
@@ -83,14 +108,17 @@ theorem exists_invariant_form : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S
   obtain ⟨B, hB, hN⟩ := exists_form (μ.restrict 𝓕) M (fun f hf => (hM f hf).cont.measurable) hb
   refine ⟨B, fun u f g f' g' hf hg => ?_, hN⟩
   rw [hB, hB, hf, hg]
-  have key := setIntegral_add_right (G := WO S T) (ratL T S) μ 𝓕 h𝓕
-    (fun w => (f : WO S T → ℂ) w * (starRingEnd ℂ) ((g : WO S T → ℂ) w)) (by
-      rintro _ ⟨γ, rfl⟩ w
-      have h0 := mul_conj_of_norm_one (hψ.2.1 (-(symplOH S T (ratW T S γ) w)))
-      have h1 := (hM f f.2).quasi γ w
-      have h2 := (hM g g.2).quasi γ w
-      show (f : WO S T → ℂ) (ratW T S γ + w) * (starRingEnd ℂ) ((g : WO S T → ℂ) (ratW T S γ + w)) = _
-      rw [h1, h2, map_mul, mul_mul_mul_comm, h0, one_mul]) u
+  have key :=
+    setIntegral_add_right (G := WO S T) (ratL T S) μ 𝓕 h𝓕
+      (fun w => (f : WO S T → ℂ) w * (starRingEnd ℂ) ((g : WO S T → ℂ) w))
+      (by
+        rintro _ ⟨γ, rfl⟩ w
+        have h0 := mul_conj_of_norm_one (hψ.2.1 (-(symplOH S T (ratW T S γ) w)))
+        have h1 := (hM f f.2).quasi γ w
+        have h2 := (hM g g.2).quasi γ w
+        show (f : WO S T → ℂ) (ratW T S γ + w) * (starRingEnd ℂ) ((g : WO S T → ℂ) (ratW T S γ + w)) = _
+        rw [h1, h2, map_mul, mul_mul_mul_comm, h0, one_mul])
+      u
   rw [← key]
   refine integral_congr_ae (Filter.Eventually.of_forall fun w => ?_)
   have h0 := mul_conj_of_norm_one (hψ.2.1 (symplOH S T w u))

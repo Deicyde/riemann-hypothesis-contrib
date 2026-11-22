@@ -101,35 +101,41 @@ private lemma cancel_lemma_7 {A : Type} [CommRing A] [Algebra R A] {X : Over (Sp
   simp only [Over.comp_left] at h1
   exact (cancel_mono jU.left).mp h1
 
-theorem univChartLoc [IsLocalRing R] (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [Smooth G.hom] :
-    ∃ (d : ℕ) (x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin d) m) ⟶ G), IsUnivChart G d x := by
+theorem univChartLoc [IsLocalRing R] (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [Smooth G.hom]
+    : ∃ (d : ℕ) (x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin d) m) ⟶ G), IsUnivChart G d x := by
   classical
   let e : Spec (CommRingCat.of R) ⟶ G.left :=
     (MonObj.one : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ G).left
   have he : e ≫ G.hom = 𝟙 (Spec (CommRingCat.of R)) :=
     Over.w (MonObj.one : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ G)
 
-  obtain ⟨U, hU, hqU⟩ : ∃ U : G.left.Opens, IsAffineOpen U ∧
-      e.base (IsLocalRing.closedPoint R) ∈ U := by
+  obtain ⟨U, hU, hqU⟩
+      : ∃ U : G.left.Opens, IsAffineOpen U ∧ e.base (IsLocalRing.closedPoint R) ∈ U := by
     first
-    | (obtain ⟨W, hW, hxW, -⟩ := exists_isAffineOpen_mem_and_subset
-          (show e.base (IsLocalRing.closedPoint R) ∈ (⊤ : G.left.Opens) from trivial)
-       exact ⟨W, hW, hxW⟩)
-    | (obtain ⟨W, hW, hxW, -⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.mp
-          G.left.isBasis_affineOpens)
-          (show e.base (IsLocalRing.closedPoint R) ∈ (⊤ : G.left.Opens) from trivial)
-       exact ⟨W, hW, hxW⟩)
-    | (obtain ⟨W, hW, hxW, -⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.mp
-          (isBasis_affineOpens G.left))
-          (show e.base (IsLocalRing.closedPoint R) ∈ (⊤ : G.left.Opens) from trivial)
-       exact ⟨W, hW, hxW⟩)
+    | (
+        obtain ⟨W, hW, hxW, -⟩ :=
+          exists_isAffineOpen_mem_and_subset
+            (show e.base (IsLocalRing.closedPoint R) ∈ (⊤ : G.left.Opens) from trivial)
+        exact ⟨W, hW, hxW⟩
+      )
+    | (
+        obtain ⟨W, hW, hxW, -⟩ :=
+          (TopologicalSpace.Opens.isBasis_iff_nbhd.mp G.left.isBasis_affineOpens)
+            (show e.base (IsLocalRing.closedPoint R) ∈ (⊤ : G.left.Opens) from trivial)
+        exact ⟨W, hW, hxW⟩
+      )
+    | (
+        obtain ⟨W, hW, hxW, -⟩ :=
+          (TopologicalSpace.Opens.isBasis_iff_nbhd.mp (isBasis_affineOpens G.left))
+            (show e.base (IsLocalRing.closedPoint R) ∈ (⊤ : G.left.Opens) from trivial)
+        exact ⟨W, hW, hxW⟩
+      )
   have he_mem : ∀ w, e.base w ∈ U := mem_of_local_lemma e U hqU
   let jU := hU.fromSpec
   haveI hjUo : IsOpenImmersion jU := (inferInstance : IsOpenImmersion hU.fromSpec)
   have hrange : Set.range jU.base = (U : Set G.left) := hU.range_fromSpec
   let Bc : CommRingCat := G.left.presheaf.obj (Opposite.op U)
-  let fB : CommRingCat.of R ⟶ Bc :=
-    Spec.preimage (jU ≫ G.hom : Spec Bc ⟶ Spec (CommRingCat.of R))
+  let fB : CommRingCat.of R ⟶ Bc := Spec.preimage (jU ≫ G.hom : Spec Bc ⟶ Spec (CommRingCat.of R))
   have hfB : Spec.map fB = jU ≫ G.hom := Spec.map_preimage _
   letI : Algebra R Bc := fB.hom.toAlgebra
   let jO : sp (R₀ := R) Bc ⟶ G := Over.homMk jU hfB.symm
@@ -165,9 +171,7 @@ theorem univChartLoc [IsLocalRing R] (G : Over (Spec (CommRingCat.of R))) [GrpOb
     rw [Over.comp_left, one_left_lemma_5]
     change Spec.map eps0 ≫ jU = Spec.map (CommRingCat.ofHom (algebraMap R R)) ≫ e
     rw [hε, he']
-    first
-    | rw [Algebra.id.map_eq_id, CommRingCat.ofHom_id, Spec.map_id, Category.id_comp]
-    | simp
+    first | rw [Algebra.id.map_eq_id, CommRingCat.ofHom_id, Spec.map_id, Category.id_comp] | simp
 
   obtain ⟨n, pr, hpr1, hpr2, hpr3⟩ := algChart Bc eps
   refine ⟨n, fun m => spMap (pr m) ≫ jO, ?_⟩
@@ -185,26 +189,24 @@ theorem univChartLoc [IsLocalRing R] (G : Over (Spec (CommRingCat.of R))) [GrpOb
       simp only [Over.comp_left, one_left_lemma_5] at h0
       rw [h0]
       change Spec.map (CommRingCat.ofHom (algebraMap R R)) ≫ e = e
-      first
-      | rw [Algebra.id.map_eq_id, CommRingCat.ofHom_id, Spec.map_id, Category.id_comp]
-      | simp
+      first | rw [Algebra.id.map_eq_id, CommRingCat.ofHom_id, Spec.map_id, Category.id_comp] | simp
 
     have hyU : Set.range y.left.base ⊆ Set.range jU.base := by
       rw [hrange]
       rintro _ ⟨z, rfl⟩
       obtain ⟨w, rfl⟩ := surj_lemma_2 aug m hm z
-      have key : y.left.base ((Spec.map (CommRingCat.ofHom aug.toRingHom)).base w) =
-          e.base w := by
+      have key : y.left.base ((Spec.map (CommRingCat.ofHom aug.toRingHom)).base w) = e.base w := by
         rw [← hyl]
         first | rfl | simp
       rw [key]
       exact he_mem w
     let y' : Spec (CommRingCat.of A) ⟶ Spec Bc := IsOpenImmersion.lift jU y.left hyU
     have hy' : y' ≫ jU = y.left := IsOpenImmersion.lift_fac _ _ _
-    let yO : sp (R₀ := R) A ⟶ sp (R₀ := R) Bc := Over.homMk y' (by
-      change y' ≫ Spec.map fB = _
-      rw [hfB, ← Category.assoc, hy']
-      exact Over.w y)
+    let yO : sp (R₀ := R) A ⟶ sp (R₀ := R) Bc :=
+      Over.homMk y' (by
+        change y' ≫ Spec.map fB = _
+        rw [hfB, ← Category.assoc, hy']
+        exact Over.w y)
     have hyO : yO ≫ jO = y := by
       apply Over.OverMorphism.ext
       rw [Over.comp_left]

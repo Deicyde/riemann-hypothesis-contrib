@@ -10,8 +10,8 @@ open MeasureTheory
 
 noncomputable section
 
-theorem unfold_Zn {d : ℕ} (g : (Fin d → ℝ) → ENNReal) :
-    ∫⁻ x, g x = ∑' n : Fin d → ℤ, ∫⁻ x in cubeIco (Fin d), g (x + fun i => (n i : ℝ)) := by
+theorem unfold_Zn {d : ℕ} (g : (Fin d → ℝ) → ENNReal)
+    : ∫⁻ x, g x = ∑' n : Fin d → ℤ, ∫⁻ x in cubeIco (Fin d), g (x + fun i => (n i : ℝ)) := by
   classical
   set b := Pi.basisFun ℝ (Fin d) with hb
   haveI : VAddInvariantMeasure (Submodule.span ℤ (Set.range b)) (Fin d → ℝ) volume :=
@@ -25,7 +25,8 @@ theorem unfold_Zn {d : ℕ} (g : (Fin d → ℝ) → ENNReal) :
   have hmem : ∀ n : Fin d → ℤ, (fun i => (n i : ℝ)) ∈ Submodule.span ℤ (Set.range b) := by
     intro n
     rw [Module.Basis.mem_span_iff_repr_mem]
-    intro i; simp [b]
+    intro i
+    simp [b]
   let e : (Fin d → ℤ) → Submodule.span ℤ (Set.range b) := fun n => ⟨_, hmem n⟩
   have he : Function.Bijective e := by
     constructor
@@ -42,16 +43,19 @@ theorem unfold_Zn {d : ℕ} (g : (Fin d → ℝ) → ENNReal) :
       funext i
       simpa [b, e] using hn i
   rw [← (Equiv.ofBijective e he).tsum_eq]
-  congr 1; funext n
-  congr 1; funext x
+  congr 1
+  funext n
+  congr 1
+  funext x
   show g ((fun i => (n i : ℝ)) + x) = _
   rw [add_comm]
 
-theorem gauss_lin {d : ℕ} {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℝ W]
-    [FiniteDimensional ℝ W] (ob : OrthonormalBasis (Fin d) ℝ W) (u b : Fin d → W)
-    (hub : ∀ j i, inner ℝ (u j) (b i) = if j = i then (1 : ℝ) else 0) :
-    ∫⁻ a : Fin d → ℝ, ENNReal.ofReal (Real.exp (-(2 * Real.pi) * ‖∑ j, a j • u j‖ ^ 2)) =
-      ENNReal.ofReal (|ob.toBasis.det b| * (2 : ℝ) ^ (-(d : ℝ) / 2)) := by
+theorem gauss_lin
+    {d : ℕ} {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℝ W] [FiniteDimensional ℝ W]
+    (ob : OrthonormalBasis (Fin d) ℝ W)
+    (u b : Fin d → W) (hub : ∀ j i, inner ℝ (u j) (b i) = if j = i then (1 : ℝ) else 0)
+    : ∫⁻ a : Fin d → ℝ, ENNReal.ofReal (Real.exp (-(2 * Real.pi) * ‖∑ j, a j • u j‖ ^ 2))
+      = ENNReal.ofReal (|ob.toBasis.det b| * (2 : ℝ) ^ (-(d : ℝ) / 2)) := by
   classical
   set M : Matrix (Fin d) (Fin d) ℝ := fun i j => ob.repr (u j) i with hM
   set B : Matrix (Fin d) (Fin d) ℝ := ob.toBasis.toMatrix b with hB
@@ -69,47 +73,54 @@ theorem gauss_lin {d : ℕ} {W : Type} [NormedAddCommGroup W] [InnerProductSpace
     rwa [Matrix.det_mul, Matrix.det_transpose, Matrix.det_one] at this
   have hdetB : ob.toBasis.det b = B.det := by rw [Module.Basis.det_apply]
   have hM0 : M.det ≠ 0 := left_ne_zero_of_mul_eq_one hdet
-  have hnorm : ∀ a : Fin d → ℝ,
-      ‖∑ j, a j • u j‖ = ‖(WithLp.toLp 2 (M.mulVec a) : EuclideanSpace ℝ (Fin d))‖ := by
+  have hnorm
+      : ∀ a : Fin d → ℝ,
+        ‖∑ j, a j • u j‖ = ‖(WithLp.toLp 2 (M.mulVec a) : EuclideanSpace ℝ (Fin d))‖ := by
     intro a
     rw [← ob.repr.norm_map]
     congr 1
     ext i
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [hM, Matrix.mulVec, dotProduct, map_sum, mul_comm]
+    simp [hM, Matrix.mulVec, dotProduct, map_sum, mul_comm]
   set G : (Fin d → ℝ) → ENNReal := fun y =>
     ENNReal.ofReal (Real.exp (-(2 * Real.pi) * ‖(WithLp.toLp 2 y : EuclideanSpace ℝ (Fin d))‖ ^ 2))
     with hG
   have hGm : Measurable G := by
     refine (Continuous.measurable ?_)
-    exact ENNReal.continuous_ofReal.comp (Real.continuous_exp.comp
-      (continuous_const.mul ((PiLp.continuous_toLp 2 _).norm.pow 2)))
-  have hL : (fun a : Fin d → ℝ =>
-      ENNReal.ofReal (Real.exp (-(2 * Real.pi) * ‖∑ j, a j • u j‖ ^ 2))) =
-      fun a => G (Matrix.toLin' M a) := by
+    exact ENNReal.continuous_ofReal.comp (Real.continuous_exp.comp (continuous_const.mul
+      ((PiLp.continuous_toLp 2 _).norm.pow 2)))
+  have hL
+      : (fun a : Fin d → ℝ => ENNReal.ofReal (Real.exp (-(2 * Real.pi) * ‖∑ j, a j • u j‖ ^ 2)))
+        = fun a => G (Matrix.toLin' M a) := by
     funext a; simp only [hG, hnorm, Matrix.toLin'_apply]
   rw [hL, ← lintegral_map hGm (Matrix.toLin' M).continuous_of_finiteDimensional.measurable,
     Measure.map_linearMap_addHaar_eq_smul_addHaar _ (by rwa [LinearMap.det_toLin']),
     lintegral_smul_measure, LinearMap.det_toLin']
-  have hE : ∫⁻ y, G y =
-      ∫⁻ v : EuclideanSpace ℝ (Fin d), ENNReal.ofReal (Real.exp (-(2 * Real.pi) * ‖v‖ ^ 2)) := by
-    have hp := MeasurePreserving.symm _
-      (EuclideanSpace.volume_preserving_symm_measurableEquiv_toLp (Fin d))
-    exact hp.lintegral_comp_emb (MeasurableEquiv.measurableEmbedding _)
-      (fun v : EuclideanSpace ℝ (Fin d) => ENNReal.ofReal (Real.exp (-(2 * Real.pi) * ‖v‖ ^ 2)))
-  have hI : ∫ v : EuclideanSpace ℝ (Fin d), Real.exp (-(2 * Real.pi) * ‖v‖ ^ 2) =
-      (2 : ℝ) ^ (-(d : ℝ) / 2) := by
+  have hE
+      : ∫⁻ y, G y
+        = ∫⁻ v : EuclideanSpace ℝ (Fin d), ENNReal.ofReal (Real.exp (-(2 * Real.pi) * ‖v‖ ^ 2)) :=
+    by
+      have hp :=
+        MeasurePreserving.symm _
+          (EuclideanSpace.volume_preserving_symm_measurableEquiv_toLp (Fin d))
+      exact hp.lintegral_comp_emb (MeasurableEquiv.measurableEmbedding _)
+        (fun v : EuclideanSpace ℝ (Fin d) => ENNReal.ofReal (Real.exp (-(2 * Real.pi) * ‖v‖ ^ 2)))
+  have hI
+      : ∫ v : EuclideanSpace ℝ (Fin d), Real.exp (-(2 * Real.pi) * ‖v‖ ^ 2)
+        = (2 : ℝ) ^ (-(d : ℝ) / 2) := by
     rw [GaussianFourier.integral_rexp_neg_mul_sq_norm (by positivity), finrank_euclideanSpace,
       Fintype.card_fin]
     have h2 : Real.pi / (2 * Real.pi) = (2 : ℝ)⁻¹ := by field_simp
     rw [h2, Real.inv_rpow (by norm_num), ← Real.rpow_neg (by norm_num), neg_div]
-  have hint : Integrable (fun v : EuclideanSpace ℝ (Fin d) =>
-      Real.exp (-(2 * Real.pi) * ‖v‖ ^ 2)) := by
+  have hint
+      : Integrable (fun v : EuclideanSpace ℝ (Fin d) => Real.exp (-(2 * Real.pi) * ‖v‖ ^ 2)) := by
     refine Integrable.of_integral_ne_zero ?_
-    rw [hI]; positivity
-  rw [hE, ← ofReal_integral_eq_lintegral_ofReal hint
-    (Filter.Eventually.of_forall fun _ => (Real.exp_pos _).le), hI, smul_eq_mul,
-    ← ENNReal.ofReal_mul (abs_nonneg _), hdetB, eq_inv_of_mul_eq_one_right hdet]
+    rw [hI]
+    positivity
+  rw [hE,
+    ← ofReal_integral_eq_lintegral_ofReal hint
+      (Filter.Eventually.of_forall fun _ => (Real.exp_pos _).le),
+    hI, smul_eq_mul, ← ENNReal.ofReal_mul (abs_nonneg _), hdetB, eq_inv_of_mul_eq_one_right hdet]
 
 end
 

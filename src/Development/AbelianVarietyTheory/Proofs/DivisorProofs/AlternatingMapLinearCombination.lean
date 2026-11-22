@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.AlternatingLinearCombination
 
-theorem alternating_map_linear_combination {L M N : Type} [Field L] [AddCommGroup M] [Module L M]
-    [AddCommGroup N] [Module L N] {n : ℕ} (f : M [⋀^Fin n]→ₗ[L] N) (g : Fin n → M)
-    (a : Fin n → Fin n → L) :
-    (f fun i => ∑ l : Fin n, a i l • g l) = Matrix.det (Matrix.of a) • f g := by
+theorem alternating_map_linear_combination
+    {L M N : Type} [Field L] [AddCommGroup M] [Module L M] [AddCommGroup N] [Module L N]
+    {n : ℕ} (f : M [⋀^Fin n]→ₗ[L] N) (g : Fin n → M) (a : Fin n → Fin n → L)
+    : (f fun i => ∑ l : Fin n, a i l • g l) = Matrix.det (Matrix.of a) • f g := by
   classical
   rw [← sub_eq_zero, ← Module.forall_dual_apply_eq_zero_iff L]
   intro φ

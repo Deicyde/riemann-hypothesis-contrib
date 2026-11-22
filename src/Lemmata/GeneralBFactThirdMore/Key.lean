@@ -16,15 +16,15 @@ private lemma key {E : Type} [Field E] [NumberField E] (c : E) :
   · rw [h, zsmul_eq_mul] at hy
     simpa using hy.neg
 
-theorem goal1 :
-  ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {n : Nat}
-  (L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) (Fin n → E)),
-  Eq.{1} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} L)) Top.top.{0} →
-    ∀ (w : Fin n → E),
-      Exists.{1} fun (m : Nat) ↦ And (LT.lt.{0} 0 m) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} m w)) := by
+theorem goal1
+    : ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {n : Nat}
+        (L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) (Fin n → E)),
+      Eq.{1} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} L)) Top.top.{0}
+        → ∀ (w : Fin n → E),
+          Exists.{1} fun (m : Nat) ↦
+            And (LT.lt.{0} 0 m) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} m w)) := by
   intro E _ _ n L hL w
-  have hw : w ∈ Submodule.span E (L : Set (Fin n → E)) := by
-    rw [hL]; exact Submodule.mem_top
+  have hw : w ∈ Submodule.span E (L : Set (Fin n → E)) := by rw [hL]; exact Submodule.mem_top
   induction hw using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_pos, by simpa using hx⟩
   | zero => exact ⟨1, one_pos, by simp⟩

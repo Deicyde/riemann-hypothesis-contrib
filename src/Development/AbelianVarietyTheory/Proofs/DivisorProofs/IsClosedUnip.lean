@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdeli
 @[expose] public section
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.UnipDom
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.UnipDom
 
 noncomputable section
 
@@ -20,8 +22,9 @@ def carrierSet (σ : E →ₐ[F] E) {d d₁ : ℕ} (W : Spc F E d) (H' : Plane E
   {u | mat u *ᵥ incV F H'.x = incV F H'.x ∧
     ∀ z, ∃ a : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E), mat u *ᵥ (incM F H'.ι *ᵥ z) = incM F H'.ι *ᵥ z + a • incV F H'.x}
 
-theorem mat_mul {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (g h : UA σ J) :
-    mat (g * h) = mat g * mat h := rfl
+theorem mat_mul {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (g h : UA σ J)
+    : mat (g * h) = mat g * mat h :=
+  rfl
 
 theorem mat_inv_mul {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (g : UA σ J) :
     mat g⁻¹ * mat g = 1 := by
@@ -30,19 +33,23 @@ theorem mat_inv_mul {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E
   show (((g⁻¹ * g : UA σ J) : GL (Fin n) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) = 1
   simp
 
-theorem mat_one {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} :
-    mat (1 : UA σ J) = 1 := rfl
+theorem mat_one {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} : mat (1 : UA σ J) = 1 := rfl
 
-def carrierSub (σ : E →ₐ[F] E) {d d₁ : ℕ} (W : Spc F E d) (H' : Plane E d d₁) : Subgroup (UA σ W.J) where
+def carrierSub (σ : E →ₐ[F] E) {d d₁ : ℕ} (W : Spc F E d) (H' : Plane E d d₁)
+    : Subgroup (UA σ W.J) where
   carrier := carrierSet σ W H'
-  one_mem' := ⟨by rw [mat_one, Matrix.one_mulVec], fun z => ⟨0, by rw [mat_one, Matrix.one_mulVec, zero_smul, add_zero]⟩⟩
+  one_mem' := ⟨
+    by rw [mat_one, Matrix.one_mulVec],
+    fun z => ⟨0, by rw [mat_one, Matrix.one_mulVec, zero_smul, add_zero]⟩
+  ⟩
   mul_mem' := by
     rintro u v ⟨hu1, hu2⟩ ⟨hv1, hv2⟩
     refine ⟨by rw [mat_mul, ← Matrix.mulVec_mulVec, hv1, hu1], fun z => ?_⟩
     obtain ⟨a, ha⟩ := hu2 z
     obtain ⟨b, hb⟩ := hv2 z
     refine ⟨a + b, ?_⟩
-    rw [mat_mul, ← Matrix.mulVec_mulVec, hb, Matrix.mulVec_add, ha, Matrix.mulVec_smul, hu1, add_smul, add_assoc]
+    rw [mat_mul, ← Matrix.mulVec_mulVec, hb, Matrix.mulVec_add, ha, Matrix.mulVec_smul, hu1,
+      add_smul, add_assoc]
   inv_mem' := by
     rintro u ⟨hu1, hu2⟩
     have hx : mat u⁻¹ *ᵥ incV F H'.x = incV F H'.x := by
@@ -57,8 +64,8 @@ def carrierSub (σ : E →ₐ[F] E) {d d₁ : ℕ} (W : Spc F E d) (H' : Plane E
     rw [neg_smul, ← sub_eq_add_neg, eq_sub_iff_add_eq]
     exact h1
 
-theorem unip_eq (σ : E →ₐ[F] E) {d d₁ : ℕ} (W : Spc F E d) (H' : Plane E d d₁) :
-    unip σ W H' = carrierSub σ W H' := by
+theorem unip_eq (σ : E →ₐ[F] E) {d d₁ : ℕ} (W : Spc F E d) (H' : Plane E d d₁)
+    : unip σ W H' = carrierSub σ W H' := by
   apply le_antisymm
   · exact (Subgroup.closure_le _).2 fun u hu => hu
   · intro u hu
@@ -66,7 +73,10 @@ theorem unip_eq (σ : E →ₐ[F] E) {d d₁ : ℕ} (W : Spc F E d) (H' : Plane 
 
 section Top
 
-variable [T2Space (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))] [IsTopologicalRing (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))]
+variable
+  [T2Space (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))]
+  [IsTopologicalRing (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
+    (E := E))]
 
 theorem isClosed_line {d : ℕ} (x : Fin d → E) : IsClosed {w : Fin d → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E) | ∃ a : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E), w = a • incV F x} := by
   by_cases hx : x = 0
@@ -102,31 +112,37 @@ theorem isClosed_line {d : ℕ} (x : Fin d → E) : IsClosed {w : Fin d → _roo
 end Top
 
 variable [T2Space (AE F E)] [IsTopologicalRing (AE F E)] in
-theorem isClosed_carrierSet (σ : E →ₐ[F] E) {d d₁ : ℕ} (W : Spc F E d) (H' : Plane E d d₁) :
-    IsClosed (carrierSet σ W H') := by
+theorem isClosed_carrierSet (σ : E →ₐ[F] E) {d d₁ : ℕ} (W : Spc F E d) (H' : Plane E d d₁)
+    : IsClosed (carrierSet σ W H') := by
   have hm : Continuous fun u : UA σ W.J => mat u := Units.continuous_val.comp continuous_subtype_val
   have h1 : IsClosed {u : UA σ W.J | mat u *ᵥ incV F H'.x = incV F H'.x} :=
     isClosed_eq (hm.matrix_mulVec continuous_const) continuous_const
-  have h2 : ∀ z : Fin d₁ → AE F E, IsClosed {u : UA σ W.J | ∃ a : AE F E,
-      mat u *ᵥ (incM F H'.ι *ᵥ z) = incM F H'.ι *ᵥ z + a • incV F H'.x} := by
+  have h2
+      : ∀ z : Fin d₁ → AE F E,
+        IsClosed
+          {u : UA σ W.J | ∃ a : AE F E,
+            mat u *ᵥ (incM F H'.ι *ᵥ z) = incM F H'.ι *ᵥ z + a • incV F H'.x} := by
     intro z
-    have : {u : UA σ W.J | ∃ a : AE F E, mat u *ᵥ (incM F H'.ι *ᵥ z) = incM F H'.ι *ᵥ z + a • incV F H'.x} =
-        (fun u : UA σ W.J => mat u *ᵥ (incM F H'.ι *ᵥ z) - incM F H'.ι *ᵥ z) ⁻¹'
-          {w | ∃ a : AE F E, w = a • incV F H'.x} := by
+    have : {u : UA σ W.J | ∃ a : AE F E, mat u *ᵥ (incM F H'.ι *ᵥ z) = incM F H'.ι *ᵥ z + a • incV F H'.x}
+        = (fun u : UA σ W.J => mat u *ᵥ (incM F H'.ι *ᵥ z) - incM F H'.ι *ᵥ z)
+          ⁻¹' {w | ∃ a : AE F E, w = a • incV F H'.x} := by
       ext u
       simp only [Set.mem_setOf_eq, Set.mem_preimage, sub_eq_iff_eq_add']
     rw [this]
     exact (isClosed_line H'.x).preimage ((hm.matrix_mulVec continuous_const).sub continuous_const)
-  have : carrierSet σ W H' = {u : UA σ W.J | mat u *ᵥ incV F H'.x = incV F H'.x} ∩
-      ⋂ z : Fin d₁ → AE F E, {u : UA σ W.J | ∃ a : AE F E,
-        mat u *ᵥ (incM F H'.ι *ᵥ z) = incM F H'.ι *ᵥ z + a • incV F H'.x} := by
+  have : carrierSet σ W H'
+      = {u : UA σ W.J | mat u *ᵥ incV F H'.x = incV F H'.x}
+        ∩ ⋂ z : Fin d₁ → AE F E, {u : UA σ W.J | ∃ a : AE F E,
+            mat u *ᵥ (incM F H'.ι *ᵥ z) = incM F H'.ι *ᵥ z + a • incV F H'.x} := by
     ext u
     simp [carrierSet]
   rw [this]
   exact h1.inter (isClosed_iInter h2)
 
-theorem isClosed_unip : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
-    (d d₁ : ℕ) (W : Spc F E d) (H' : Plane E d d₁), IsClosed ((unip σ W H' : Subgroup (UA σ W.J)) : Set (UA σ W.J)) := by
+theorem isClosed_unip
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (d d₁ : ℕ) (W : Spc F E d) (H' : Plane E d d₁),
+      IsClosed ((unip σ W H' : Subgroup (UA σ W.J)) : Set (UA σ W.J)) := by
   intro F E _ _ _ _ _ σ d d₁ W H'
   haveI := GlobalTheory.AdelicUnitaryTop.t2Space_adeleRing_numberField F
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E

@@ -20,10 +20,10 @@ open scoped ENNReal NNReal NumberField.AdeleRing
 
 variable {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
 
-theorem map_smul_pi (n : ℕ) (a : IdeleGroup K) :
-    (Measure.pi fun _ : Fin n ↦ adeleMeasure K).map (fun x i ↦ a • x i) =
-      (Real.toNNReal ((IdeleGroup.ideleModule K a : ℝ))⁻¹) ^ n •
-        Measure.pi fun _ : Fin n ↦ adeleMeasure K := by
+theorem map_smul_pi (n : ℕ) (a : IdeleGroup K)
+    : (Measure.pi fun _ : Fin n ↦ adeleMeasure K).map (fun x i ↦ a • x i)
+      = (Real.toNNReal ((IdeleGroup.ideleModule K a : ℝ))⁻¹) ^ n
+        • Measure.pi fun _ : Fin n ↦ adeleMeasure K := by
   have hsm : Measurable fun y : 𝔸[K] ↦ a • y := (Homeomorph.smul a).continuous.measurable
   have hmeas : Measurable fun x : Fin n → 𝔸[K] ↦ fun i ↦ a • x i :=
     Measurable.of_eval fun i ↦ hsm.comp (measurable_pi_apply i)
@@ -31,19 +31,22 @@ theorem map_smul_pi (n : ℕ) (a : IdeleGroup K) :
   have hmap : (adeleMeasure K).map (fun y ↦ a • y) = c • adeleMeasure K := by
     rw [map_smul_adeleMeasure]
     rfl
-  have h1 : (Measure.pi fun _ : Fin n ↦ adeleMeasure K).map (fun x i ↦ a • x i) =
-      Measure.pi fun _ : Fin n ↦ c • adeleMeasure K := by
+  have h1
+      : (Measure.pi fun _ : Fin n ↦ adeleMeasure K).map (fun x i ↦ a • x i)
+        = Measure.pi fun _ : Fin n ↦ c • adeleMeasure K := by
     refine (pi_eq fun s hs ↦ ?_).symm
     rw [map_apply hmeas (MeasurableSet.univ_pi hs)]
-    have hpre : (fun x : Fin n → 𝔸[K] ↦ fun i ↦ a • x i) ⁻¹' Set.univ.pi s =
-        Set.univ.pi fun i ↦ (fun y ↦ a • y) ⁻¹' s i := by
+    have hpre
+        : (fun x : Fin n → 𝔸[K] ↦ fun i ↦ a • x i) ⁻¹' Set.univ.pi s
+          = Set.univ.pi fun i ↦ (fun y ↦ a • y) ⁻¹' s i := by
       ext x
       simp
     rw [hpre, pi_pi]
     refine Finset.prod_congr rfl fun i _ ↦ ?_
     rw [← hmap, map_apply hsm (hs i)]
-  have h2 : (Measure.pi fun _ : Fin n ↦ c • adeleMeasure K) =
-      c ^ n • Measure.pi fun _ : Fin n ↦ adeleMeasure K := by
+  have h2
+      : (Measure.pi fun _ : Fin n ↦ c • adeleMeasure K)
+        = c ^ n • Measure.pi fun _ : Fin n ↦ adeleMeasure K := by
     refine pi_eq fun s hs ↦ ?_
     rw [Measure.smul_apply, pi_pi, ENNReal.smul_def, smul_eq_mul]
     simp only [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
@@ -51,16 +54,19 @@ theorem map_smul_pi (n : ℕ) (a : IdeleGroup K) :
       ENNReal.coe_pow]
   rw [h1, h2]
 
-theorem ideleModule_ideleEmbedding (x : IdeleGroup K) :
-    (IdeleGroup.ideleModule L (ideleEmbedding K L x) : ℝ) =
-      (IdeleGroup.ideleModule K x : ℝ) ^ Module.finrank K L := by
+theorem ideleModule_ideleEmbedding (x : IdeleGroup K)
+    : (IdeleGroup.ideleModule L (ideleEmbedding K L x) : ℝ)
+      = (IdeleGroup.ideleModule K x : ℝ) ^ Module.finrank K L := by
   have := isModuleTopology_adeleRing (K := K) (L := L)
   set n := Module.finrank K L with hn
   let e : 𝔸[L] ≃ₗ[𝔸[K]] (Fin n → 𝔸[K]) := (adeleBasis (Module.finBasis K L)).equivFun
   have hce : Continuous e := IsModuleTopology.continuous_of_linearMap e.toLinearMap
   have hcs : Continuous e.symm := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap
-  let h : 𝔸[L] ≃ₜ (Fin n → 𝔸[K]) :=
-    { toEquiv := e.toEquiv, continuous_toFun := hce, continuous_invFun := hcs }
+  let h : 𝔸[L] ≃ₜ (Fin n → 𝔸[K]) := {
+    toEquiv := e.toEquiv
+    continuous_toFun := hce
+    continuous_invFun := hcs
+  }
   set μ : Measure (Fin n → 𝔸[K]) := Measure.pi fun _ ↦ adeleMeasure K with hμ
   set ν : Measure 𝔸[L] := μ.map e.symm with hν
   have hms : Measurable e.symm := hcs.measurable
@@ -111,8 +117,9 @@ theorem ideleModule_ideleEmbedding (x : IdeleGroup K) :
     rw [ENNReal.ofReal_pow hK0, ENNReal.coe_pow]
     rfl
   rw [h4] at h3
-  have h5 := (ENNReal.ofReal_eq_ofReal_iff (inv_nonneg.2 (IdeleGroup.ideleModule L X).2.le)
-    (pow_nonneg hK0 n)).1 h3
+  have h5 :=
+    (ENNReal.ofReal_eq_ofReal_iff (inv_nonneg.2 (IdeleGroup.ideleModule L X).2.le)
+      (pow_nonneg hK0 n)).1 h3
   rw [inv_pow] at h5
   exact inv_inj.1 h5
 
@@ -120,13 +127,18 @@ end
 
 section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology Filter
-  PositivityTheory.Rg.Base1 GroundTheory.Global GlobalTheory.CompanionTheory.SW.RankOneSiegelWeil
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology Filter PositivityTheory.Rg.Base1 GroundTheory.Global
+  GlobalTheory.CompanionTheory.SW.RankOneSiegelWeil
 open scoped TensorProduct ENNReal NNReal Matrix Classical
 
-theorem ideleModule_ideleEquiv_ofF : ∀ (F E : Type) [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ a : (AF F)ˣ,
-    (IdeleGroup.ideleModule E (GroundTheory.BlockD.ThmBHecke.ideleEquiv F E (ofF a)) : ℝ) = md a ^ 2 := by
+theorem ideleModule_ideleEquiv_ofF
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ a : (AF F)ˣ,
+          (IdeleGroup.ideleModule E (GroundTheory.BlockD.ThmBHecke.ideleEquiv F E (ofF a)) : ℝ)
+            = md a ^ 2 := by
   intro F E _ _ _ _ _ σ hcm a
   have he : GroundTheory.BlockD.ThmBHecke.ideleEquiv F E (ofF a) = ideleEmbedding F E a :=
     Units.ext (GroundTheory.BlockD.ThmBHecke.adeleEquiv_algebraMap (a : AF F))

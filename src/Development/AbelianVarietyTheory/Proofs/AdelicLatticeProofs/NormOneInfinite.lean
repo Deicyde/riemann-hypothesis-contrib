@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.NormOneInfinite
 
-theorem normOne_infinite {F E : Type} [Field F] [Field E] [CharZero E] [Algebra F E]
-    (c : Gal(E/F)) (hc : ∀ x : E, (c : E → E) ((c : E → E) x) = x) (h1 : c ≠ (1 : Gal(E/F))) :
-    Set.Infinite {l : E | l * (c : E → E) l = (1 : E)} := by
+theorem normOne_infinite
+    {F E : Type} [Field F] [Field E] [CharZero E] [Algebra F E]
+    (c : Gal(E/F)) (hc : ∀ x : E, (c : E → E) ((c : E → E) x) = x) (h1 : c ≠ (1 : Gal(E/F)))
+    : Set.Infinite {l : E | l * (c : E → E) l = (1 : E)} := by
   have hx : ∃ x : E, c x ≠ x := by
     by_contra hall
     simp only [ne_eq, not_exists, not_not] at hall
@@ -30,17 +31,22 @@ theorem normOne_infinite {F E : Type} [Field F] [Field E] [CharZero E] [Algebra 
     have e : x - c x = n := (sub_eq_zero.mp h0).symm
     apply hd
     apply h2d
-    calc x - c x = c (x - c x) := by rw [e, hcn]
+    calc
+      x - c x
+        = c (x - c x) := by rw [e, hcn]
       _ = -(x - c x) := hcd
   have hadd : ∀ n : ℕ, (n : E) + (x - c x) ≠ 0 := by
     intro n h0
     have e : x - c x = -(n : E) := by linear_combination h0
     apply hd
     apply h2d
-    calc x - c x = c (x - c x) := by rw [e, map_neg, hcn]
+    calc
+      x - c x
+        = c (x - c x) := by rw [e, map_neg, hcn]
       _ = -(x - c x) := hcd
   refine Set.infinite_of_injective_forall_mem
-    (f := fun n : ℕ => ((n : E) + (x - c x)) / ((n : E) - (x - c x))) ?_ ?_
+    (f := fun n : ℕ => ((n : E) + (x - c x)) / ((n : E) - (x - c x)))
+    ?_ ?_
   · intro n m hnm
     simp only at hnm
     rw [div_eq_div_iff (hsub n) (hsub m)] at hnm
@@ -51,8 +57,9 @@ theorem normOne_infinite {F E : Type} [Field F] [Field E] [CharZero E] [Algebra 
       · exact absurd h' hd
     · exact (Nat.cast_injective (sub_eq_zero.mp h)).symm
   · intro n
-    change ((n : E) + (x - c x)) / ((n : E) - (x - c x)) *
-      c (((n : E) + (x - c x)) / ((n : E) - (x - c x))) = 1
+    change ((n : E) + (x - c x)) / ((n : E) - (x - c x))
+        * c (((n : E) + (x - c x)) / ((n : E) - (x - c x)))
+      = 1
     rw [map_div₀, map_add (f := _), map_sub c (n : E) (x - c x), hcn, hcd]
     have h4 : (n : E) + -(x - c x) = (n : E) - (x - c x) := by ring
     have h5 : (n : E) - -(x - c x) = (n : E) + (x - c x) := by ring

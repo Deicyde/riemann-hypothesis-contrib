@@ -4,8 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.exists_pow_dvd_sub_of_two_pow_dvd_sub_one :
-    ∀ (Q a c : ℤ) (e n : ℕ), 2 ≤ e → Odd a → Q = 1 + 2 ^ e * a → (2 : ℤ) ^ e ∣ c - 1 → ∃ i : ℕ, (2 : ℤ) ^ n ∣ Q ^ i - c := by
+theorem UpperTheory.exists_pow_dvd_sub_of_two_pow_dvd_sub_one
+    : ∀ (Q a c : ℤ) (e n : ℕ),
+      2 ≤ e → Odd a → Q = 1 + 2 ^ e * a → (2 : ℤ) ^ e ∣ c - 1
+        → ∃ i : ℕ, (2 : ℤ) ^ n ∣ Q ^ i - c := by
   intro Q a c e n he ha hQ hc
   have hL : ∀ m : ℕ, ∃ u : ℤ, Odd u ∧ Q ^ (2 ^ m) = 1 + 2 ^ (e + m) * u := by
     intro m
@@ -22,8 +24,7 @@ theorem UpperTheory.exists_pow_dvd_sub_of_two_pow_dvd_sub_one :
       · rw [pow_succ, pow_mul, hQu, show e + (m + 1) = k + 2 by omega, hk]
         ring
   have hQodd : Odd Q := by
-    have hev : Even ((2 : ℤ) ^ e * a) :=
-      (Int.even_pow.2 ⟨even_two, by omega⟩).mul_right _
+    have hev : Even ((2 : ℤ) ^ e * a) := (Int.even_pow.2 ⟨even_two, by omega⟩).mul_right _
     rw [hQ, add_comm]
     exact hev.add_one
   induction n with

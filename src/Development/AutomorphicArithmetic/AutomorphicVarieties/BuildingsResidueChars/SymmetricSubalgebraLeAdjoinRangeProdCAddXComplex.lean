@@ -7,26 +7,38 @@ public import Mathlib.RingTheory.Polynomial.Vieta
 @[expose] public section
 
 open MvPolynomial in
-theorem UpperTheory.symmetricSubalgebra_le_adjoin_range_prod_C_add_X_complex :
-    ∀ n : ℕ, MvPolynomial.symmetricSubalgebra (Fin n) ℂ ≤ Algebra.adjoin ℂ (Set.range fun u : ℂ => ∏ k : Fin n, (MvPolynomial.C u + MvPolynomial.X k : MvPolynomial (Fin n) ℂ)) := by
+theorem UpperTheory.symmetricSubalgebra_le_adjoin_range_prod_C_add_X_complex
+    : ∀ n : ℕ,
+      MvPolynomial.symmetricSubalgebra (Fin n) ℂ
+        ≤ Algebra.adjoin ℂ
+          (Set.range fun u : ℂ =>
+            ∏ k : Fin n, (MvPolynomial.C u + MvPolynomial.X k : MvPolynomial (Fin n) ℂ)) := by
   intro n
   set S := Algebra.adjoin ℂ (Set.range fun u : ℂ => ∏ k : Fin n, (MvPolynomial.C u + MvPolynomial.X k : MvPolynomial (Fin n) ℂ)) with hS
-  have hv : ∀ u : ℂ, ∏ k : Fin n, (C u + X k : MvPolynomial (Fin n) ℂ)
-      = ∑ j ∈ Finset.range (n + 1), u ^ (n - j) • esymm (Fin n) ℂ j := by
+  have hv
+      : ∀ u : ℂ,
+        ∏ k : Fin n, (C u + X k : MvPolynomial (Fin n) ℂ)
+          = ∑ j ∈ Finset.range (n + 1), u ^ (n - j) • esymm (Fin n) ℂ j := by
     intro u
-    have h := congrArg (Polynomial.eval (C u : MvPolynomial (Fin n) ℂ))
-      (MvPolynomial.prod_C_add_X_eq_sum_esymm ℂ (Fin n))
-    simp only [Polynomial.eval_prod, Polynomial.eval_finsetSum, Polynomial.eval_add, Polynomial.eval_X,
-      Polynomial.eval_C, Polynomial.eval_mul, Polynomial.eval_pow, Fintype.card_fin] at h
+    have h :=
+      congrArg (Polynomial.eval (C u : MvPolynomial (Fin n) ℂ))
+        (MvPolynomial.prod_C_add_X_eq_sum_esymm ℂ (Fin n))
+    simp only [Polynomial.eval_prod, Polynomial.eval_finsetSum, Polynomial.eval_add,
+        Polynomial.eval_X, Polynomial.eval_C, Polynomial.eval_mul, Polynomial.eval_pow,
+        Fintype.card_fin]
+      at h
     rw [h]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [smul_eq_C_mul, map_pow, mul_comm]
   have he : ∀ j, j < n + 1 → esymm (Fin n) ℂ j ∈ S := by
     intro j hj
     by_contra hc
-    obtain ⟨φ, hφ, h0⟩ := Submodule.exists_dual_map_eq_bot_of_notMem (p := Subalgebra.toSubmodule S) hc inferInstance
+    obtain ⟨φ, hφ, h0⟩ :=
+      Submodule.exists_dual_map_eq_bot_of_notMem (p := Subalgebra.toSubmodule S) hc inferInstance
     have h1 : ∀ x ∈ S, φ x = 0 := fun x hx => (Submodule.eq_bot_iff _).1 h0 _ ⟨x, hx, rfl⟩
-    have hp : (∑ i ∈ Finset.range (n + 1), Polynomial.monomial (n - i) (φ (esymm (Fin n) ℂ i))) = 0 := by
+    have hp
+        : (∑ i ∈ Finset.range (n + 1), Polynomial.monomial (n - i) (φ (esymm (Fin n) ℂ i)))
+          = 0 := by
       apply Polynomial.funext
       intro u
       have h2 := h1 _ (Algebra.subset_adjoin ⟨u, rfl⟩)

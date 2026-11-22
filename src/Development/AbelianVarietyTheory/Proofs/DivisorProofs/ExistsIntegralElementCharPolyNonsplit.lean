@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHermit
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -17,16 +18,17 @@ namespace GlobalTheory.ExInertUnit
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem eventually_mem_integers (a : E) :
-    ∀ᶠ w : Pl E in cofinite, algebraMap E (w.adicCompletion E) a ∈ w.adicCompletionIntegers E :=
+theorem eventually_mem_integers (a : E)
+    : ∀ᶠ w : Pl E in cofinite, algebraMap E (w.adicCompletion E) a ∈ w.adicCompletionIntegers E :=
   (algebraMap E (FiniteAdeleRing (𝓞 E) E) a).2
 
-theorem mem_KGL_of_entries (w : Pl E) (g : GLw n w)
-    (h1 : ∀ a b, g.val a b ∈ w.adicCompletionIntegers E)
-    (h2 : ∀ a b, (g⁻¹).val a b ∈ w.adicCompletionIntegers E) : g ∈ GlobalTheory.LFun.KGL w (n := n) := by
+theorem mem_KGL_of_entries
+    (w : Pl E) (g : GLw n w) (h1 : ∀ a b, g.val a b ∈ w.adicCompletionIntegers E)
+    (h2 : ∀ a b, (g⁻¹).val a b ∈ w.adicCompletionIntegers E)
+    : g ∈ GlobalTheory.LFun.KGL w (n := n) := by
   let O : Subring (w.adicCompletion E) := Ov E w
-  have inj : Function.Injective (O.subtype.mapMatrix (m := Fin n)) :=
-    fun A B h => funext fun i => funext fun j => Subtype.ext (congrFun (congrFun h i) j)
+  have inj : Function.Injective (O.subtype.mapMatrix (m := Fin n)) := fun A B h =>
+    funext fun i => funext fun j => Subtype.ext (congrFun (congrFun h i) j)
   let A : Matrix (Fin n) (Fin n) O := fun i j => ⟨g.val i j, h1 i j⟩
   let B : Matrix (Fin n) (Fin n) O := fun i j => ⟨(g⁻¹).val i j, h2 i j⟩
   have hA : O.subtype.mapMatrix A = g.val := rfl
@@ -35,26 +37,33 @@ theorem mem_KGL_of_entries (w : Pl E) (g : GLw n w)
   · rw [map_mul, hA, hB, map_one, Units.mul_inv]
   · rw [map_mul, hA, hB, map_one, Units.inv_mul]
 
-theorem entries_of_mem_KGL {w : Pl E} {k : GLw n w} (hk : k ∈ GlobalTheory.LFun.KGL w (n := n)) (i j : Fin n) :
-    k.val i j ∈ w.adicCompletionIntegers E := by
+theorem entries_of_mem_KGL
+    {w : Pl E} {k : GLw n w} (hk : k ∈ GlobalTheory.LFun.KGL w (n := n)) (i j : Fin n)
+    : k.val i j ∈ w.adicCompletionIntegers E := by
   obtain ⟨a, rfl⟩ := hk
   exact (a.val i j).2
 
-theorem mul_entries {w : Pl E} {A B : Matrix (Fin n) (Fin n) (w.adicCompletion E)}
-    (hA : ∀ i j, A i j ∈ w.adicCompletionIntegers E) (hB : ∀ i j, B i j ∈ w.adicCompletionIntegers E)
-    (i j : Fin n) : (A * B) i j ∈ w.adicCompletionIntegers E := by
+theorem mul_entries
+    {w : Pl E} {A B : Matrix (Fin n) (Fin n) (w.adicCompletion E)}
+    (hA : ∀ i j, A i j ∈ w.adicCompletionIntegers E)
+    (hB : ∀ i j, B i j ∈ w.adicCompletionIntegers E)
+    (i j : Fin n)
+    : (A * B) i j ∈ w.adicCompletionIntegers E := by
   rw [Matrix.mul_apply]
   exact sum_mem fun k _ => mul_mem (hA i k) (hB k j)
 
-
 set_option maxHeartbeats 800000 in
-theorem local_step (hE : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (M G : Matrix (Fin n) (Fin n) E)
+theorem local_step
+    (hE : Unr E)
+    (w : Pl E) (hw : ¬ IsSplitAt w)
+    (M G : Matrix (Fin n) (Fin n) E)
     (hG : IsUnit G) (hGh : cT (IsCMField.complexConj E).toRingEquiv.toRingHom G = G)
     (hMG : cT (IsCMField.complexConj E).toRingEquiv.toRingHom M * G * M = G)
     (hM : ∀ i j, algebraMap E (w.adicCompletion E) (M i j) ∈ w.adicCompletionIntegers E)
     (hG1 : ∀ i j, algebraMap E (w.adicCompletion E) (G i j) ∈ w.adicCompletionIntegers E)
-    (hG2 : ∀ i j, algebraMap E (w.adicCompletion E) (G⁻¹ i j) ∈ w.adicCompletionIntegers E) :
-    ∃ γ : UL n w, γ ∈ KL n w ∧ γ.1.val.charpoly = M.charpoly.map (algebraMap E (w.adicCompletion E)) := by
+    (hG2 : ∀ i j, algebraMap E (w.adicCompletion E) (G⁻¹ i j) ∈ w.adicCompletionIntegers E)
+    : ∃ γ : UL n w,
+      γ ∈ KL n w ∧ γ.1.val.charpoly = M.charpoly.map (algebraMap E (w.adicCompletion E)) := by
   obtain ⟨-, -, hv, hns, -⟩ := GlobalTheory.ConjAtPlace.main E hE w
   obtain ⟨hconj, ⟨ϖ, q, hU, -⟩, -⟩ := hns hw
   let f := algebraMap E (w.adicCompletion E)
@@ -72,10 +81,10 @@ theorem local_step (hE : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (M G : Matrix (
     rw [Matrix.coe_units_inv, IsUnit.unit_spec]
     exact Matrix.inv_eq_left_inv h
   have hgK : hGu.unit ∈ GlobalTheory.LFun.KGL w (n := n) :=
-    mem_KGL_of_entries w _ (fun a b => by rw [IsUnit.unit_spec]; exact hG1 a b)
+    mem_KGL_of_entries w _
+      (fun a b => by rw [IsUnit.unit_spec]; exact hG1 a b)
       (fun a b => by rw [hginv]; exact hG2 a b)
-  have hgh : cT (cj w) hGu.unit.val = hGu.unit.val := by
-    rw [IsUnit.unit_spec, hcT, hGh]
+  have hgh : cT (cj w) hGu.unit.val = hGu.unit.val := by rw [IsUnit.unit_spec, hcT, hGh]
   obtain ⟨k, hk, hkk⟩ := GlobalTheory.LFun.InertChart.exists_norm hU hgK hgh
   have hMu : IsUnit M := by
     have h : (G⁻¹ * cT c M * G) * M = 1 := by
@@ -90,16 +99,18 @@ theorem local_step (hE : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (M G : Matrix (
     rw [← cT_mul, Units.mul_inv, cT_one]
   set γ0 : GLw n w := k * hMwu.unit * k⁻¹ with hγ0
   have hγU : cT (cj w) γ0.val * 1 * γ0.val = 1 := by
-    calc cT (cj w) γ0.val * 1 * γ0.val
-        = cT (cj w) (k⁻¹ : GLw n w).val * (cT (cj w) hMwu.unit.val * (cT (cj w) k.val * k.val) * hMwu.unit.val)
+    calc
+      cT (cj w) γ0.val * 1 * γ0.val
+          = cT (cj w) (k⁻¹ : GLw n w).val
+            * (cT (cj w) hMwu.unit.val * (cT (cj w) k.val * k.val) * hMwu.unit.val)
             * (k⁻¹ : GLw n w).val := by
-          rw [hγ0, Units.val_mul, Units.val_mul, cT_mul, cT_mul]
-          simp only [Matrix.mul_assoc, Matrix.mul_one]
+        rw [hγ0, Units.val_mul, Units.val_mul, cT_mul, cT_mul]
+        simp only [Matrix.mul_assoc, Matrix.mul_one]
       _ = cT (cj w) (k⁻¹ : GLw n w).val * (cT (cj w) k.val * k.val) * (k⁻¹ : GLw n w).val := by
-          rw [hkk, hmG]
+        rw [hkk, hmG]
       _ = 1 := by
-          simp only [← Matrix.mul_assoc]
-          rw [hkinv, Matrix.one_mul, Units.mul_inv]
+        simp only [← Matrix.mul_assoc]
+        rw [hkinv, Matrix.one_mul, Units.mul_inv]
   have hγUL : γ0 ∈ UL n w := by
     rw [UL, if_neg hw]
     exact hγU

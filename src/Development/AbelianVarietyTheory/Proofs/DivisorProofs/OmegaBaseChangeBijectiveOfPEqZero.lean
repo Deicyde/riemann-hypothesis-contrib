@@ -5,17 +5,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RigOfOmegaIn
 
 @[expose] public section
 
-open TensorProduct Coalgebra Bialgebra CategoryTheory WithConv GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open TensorProduct Coalgebra Bialgebra CategoryTheory WithConv GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory
 
 namespace PDiv
 
-theorem liftSemi_toBaseChange_cot_bijective (R R' A : Type) [CommRing R] [CommRing R'] [Algebra R R']
-    [CommRing A] [Bialgebra R A] : Function.Bijective (liftSemi (toBaseChange R R' A).cot) := by
-  have heq : (counitAlgHom R' (R' ⊗[R] A)).comp
-      ((AlgEquiv.refl : (R' ⊗[R] A) ≃ₐ[R'] (R' ⊗[R] A)) : (R' ⊗[R] A) →ₐ[R'] (R' ⊗[R] A)) =
-      AugCot.baseChangeAug R' (counitAlgHom R A) := by
+theorem liftSemi_toBaseChange_cot_bijective
+    (R R' A : Type) [CommRing R] [CommRing R'] [Algebra R R'] [CommRing A] [Bialgebra R A]
+    : Function.Bijective (liftSemi (toBaseChange R R' A).cot) := by
+  have heq
+      : (counitAlgHom R' (R' ⊗[R] A)).comp
+          ((AlgEquiv.refl : (R' ⊗[R] A) ≃ₐ[R'] (R' ⊗[R] A)) : (R' ⊗[R] A) →ₐ[R'] (R' ⊗[R] A))
+        = AugCot.baseChangeAug R' (counitAlgHom R A) := by
     apply Algebra.TensorProduct.ext'
     intro r a
     simp [AugCot.baseChangeAug_tmul, Algebra.smul_def, mul_comm]
@@ -35,17 +38,21 @@ end PDiv
 
 namespace PDivGroup
 
-theorem omega_baseChange_bijective {p : ℕ} {R : Type} [CommRing R] (G : PDivGroup p R) (R' : Type)
-    [CommRing R'] [Algebra R R'] (hp : (p : R) = 0) :
-    Function.Bijective (liftSemi (G.toBase R').omega) := by
+theorem omega_baseChange_bijective
+    {p : ℕ} {R : Type} [CommRing R]
+    (G : PDivGroup p R)
+    (R' : Type) [CommRing R'] [Algebra R R']
+    (hp : (p : R) = 0)
+    : Function.Bijective (liftSemi (G.toBase R').omega) := by
   have hp' : (p : R') = 0 := by rw [← map_natCast (algebraMap R R'), hp, map_zero]
   have hL := G.omegaLevel_one_bijective hp
   have hL' := (G.baseChange R').omegaLevel_one_bijective hp'
   have hg := liftSemi_toBaseChange_cot_bijective R R' (G.A 1)
   let e : R' ⊗[R] G.omega ≃ₗ[R'] R' ⊗[R] Cot R (G.A 1) :=
     LinearEquiv.baseChange R R' _ _ (LinearEquiv.ofBijective (G.omegaLevel 1) hL)
-  have hcomp : ((G.baseChange R').omegaLevel 1).comp (liftSemi (G.toBase R').omega) =
-      (liftSemi (toBaseChange R R' (G.A 1)).cot).comp e.toLinearMap := by
+  have hcomp
+      : ((G.baseChange R').omegaLevel 1).comp (liftSemi (G.toBase R').omega)
+        = (liftSemi (toBaseChange R R' (G.A 1)).cot).comp e.toLinearMap := by
     apply TensorProduct.AlgebraTensorModule.ext
     intro r w
     simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, liftSemi_tmul, map_smul, e,

@@ -13,9 +13,12 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MemSpanSingle
 open ValuativeRel Formalism.MainNotions.S.Loc GlobalTheory.HL NumberField IsDedekindDomain
 open scoped Pointwise ENNReal Classical
 
-theorem GlobalTheory.glue_latt_isLattice {E : Type} [Field E] [NumberField E] (n : ℕ) (Γ : Submodule (𝓞 E) (Fin n → E)) (N : ℕ) (hN : N ≠ 0)
-    (hlow : ∀ x : Fin n → E, (∀ i, IsIntegral ℤ (x i)) → (N : E) • x ∈ Γ)
-    (hup : ∀ x ∈ Γ, ∀ i, IsIntegral ℤ ((N : E) * x i)) : Submodule.IsLattice E Γ := by
+theorem GlobalTheory.glue_latt_isLattice
+    {E : Type} [Field E] [NumberField E]
+    (n : ℕ) (Γ : Submodule (𝓞 E) (Fin n → E))
+    (N : ℕ) (hN : N ≠ 0) (hlow : ∀ x : Fin n → E, (∀ i, IsIntegral ℤ (x i)) → (N : E) • x ∈ Γ)
+    (hup : ∀ x ∈ Γ, ∀ i, IsIntegral ℤ ((N : E) * x i))
+    : Submodule.IsLattice E Γ := by
   have hNE : (N : E) ≠ 0 := Nat.cast_ne_zero.mpr hN
   let f : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin n → E) :=
     ((N : E)⁻¹ • (LinearMap.pi fun i => (Algebra.linearMap (𝓞 E) E).comp (LinearMap.proj i)))

@@ -19,24 +19,31 @@ namespace CrystallineSemistableComparison
 
 section Ring
 
-variable (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible ϖ)
+variable
+  (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  (ϖ : O) (hϖ : Irreducible ϖ)
   (m r : ℕ) (h1 : 1 ≤ r) (h2 : r ≤ m)
 
 include hϖ h1 h2 in
-theorem ssModel_isDomain : IsDomain (GlobalTheory.Et.ssModel O ϖ m r) := GlobalTheory.T.semistable_model_ring_isDomain O ϖ hϖ m r h1 h2
+theorem ssModel_isDomain : IsDomain (GlobalTheory.Et.ssModel O ϖ m r) :=
+  GlobalTheory.T.semistable_model_ring_isDomain O ϖ hϖ m r h1 h2
 
 include hϖ h1 h2 in
 theorem ssModel_algebraMap_ne_zero : algebraMap O (GlobalTheory.Et.ssModel O ϖ m r) ϖ ≠ 0 := by
   haveI := ssModel_isDomain O ϖ hϖ m r h1 h2
   intro h
   have h0 : ϖ ∈ nonZeroDivisors O := mem_nonZeroDivisors_of_ne_zero hϖ.ne_zero
-  have := GlobalTheory.LogCris.model_mul_eq_zero ϖ h0 (1 : GlobalTheory.Et.ssModel O ϖ m r) (by rw [h, zero_mul])
+  have :=
+    GlobalTheory.LogCris.model_mul_eq_zero ϖ h0 (1 : GlobalTheory.Et.ssModel O ϖ m r)
+      (by rw [h, zero_mul])
   exact one_ne_zero this
 
 include hϖ h1 h2 in
-theorem ssModel_algebraMap_injective : Function.Injective (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r)) := by
+theorem ssModel_algebraMap_injective
+    : Function.Injective (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r)) := by
   haveI := ssModel_isDomain O ϖ hϖ m r h1 h2
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro c hc
   by_contra hc0
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hc0 hϖ
@@ -46,8 +53,9 @@ theorem ssModel_algebraMap_injective : Function.Injective (algebraMap O (GlobalT
   · exact ssModel_algebraMap_ne_zero O ϖ hϖ m r h1 h2 (pow_eq_zero_iff'.1 h).1
 
 include hϖ h1 h2 in
-theorem ssModel_normal (F : Type) [Field F] [Algebra O F] [IsLocalization.Away ϖ F] :
-    IsDomain (GlobalTheory.Et.ssModel O ϖ m r) ∧ IsIntegrallyClosed (GlobalTheory.Et.ssModel O ϖ m r) := by
+theorem ssModel_normal (F : Type) [Field F] [Algebra O F] [IsLocalization.Away ϖ F]
+    : IsDomain (GlobalTheory.Et.ssModel O ϖ m r)
+      ∧ IsIntegrallyClosed (GlobalTheory.Et.ssModel O ϖ m r) := by
   have hd := ssModel_isDomain O ϖ hϖ m r h1 h2
   refine ⟨hd, ?_⟩
   have ht := ssModel_algebraMap_ne_zero O ϖ hϖ m r h1 h2
@@ -56,12 +64,15 @@ theorem ssModel_normal (F : Type) [Field F] [Algebra O F] [IsLocalization.Away �
   haveI : Smooth (Spec.map (CommRingCat.ofHom (IsLocalization.Away.map F
       (Localization.Away (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r) ϖ)) (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r)) ϖ))) :=
     HasRingHomProperty.Spec_iff.mpr hs
-  have hn := GlobalTheory.isNormalScheme_of_smooth (Spec.map (CommRingCat.ofHom (IsLocalization.Away.map F
-      (Localization.Away (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r) ϖ)) (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r)) ϖ)))
+  have hn :=
+    GlobalTheory.isNormalScheme_of_smooth (Spec.map (CommRingCat.ofHom (IsLocalization.Away.map F
+      (Localization.Away (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r) ϖ))
+      (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r)) ϖ)))
   haveI : IsDomain (Localization.Away (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r) ϖ)) :=
     IsLocalization.isDomain_localization (powers_le_nonZeroDivisors_of_noZeroDivisors ht)
-  have hic := (GlobalTheory.IsNormalScheme.spec_iff_of_isDomain
-    (CommRingCat.of (Localization.Away (algebraMap O (GlobalTheory.Et.ssModel O ϖ m r) ϖ)))).mp hn
+  have hic :=
+    (GlobalTheory.IsNormalScheme.spec_iff_of_isDomain (CommRingCat.of (Localization.Away (algebraMap
+      O (GlobalTheory.Et.ssModel O ϖ m r) ϖ)))).mp hn
   exact GlobalTheory.T.isIntegrallyClosed_of_reduced_quotient_localization _ _ ht hred hic
 
 include hϖ h1 h2 in
@@ -75,7 +86,8 @@ end Ring
 
 section Scheme
 
-variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} [FiniteDimensional ℚ_[l] K]
+variable
+  {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} [FiniteDimensional ℚ_[l] K]
 
 theorem good_isNormalScheme (M : Model l K) (hM : M.Good) : GlobalTheory.IsNormalScheme M.X := by
   haveI := OK_dvr (l := l) (K := K)
@@ -98,7 +110,8 @@ theorem good_isLocallyNoetherian (M : Model l K) (hM : M.Good) : IsLocallyNoethe
     exact TopologicalSpace.Opens.mem_iSup.mpr ⟨y, hx y⟩
   · letI := (ψ x).toAlgebra
     haveI : Algebra.Etale _ _ := hψ x
-    exact Algebra.FiniteType.isNoetherianRing (GlobalTheory.Et.ssModel (OK l K) ϖ (m x) (r x)) Γ(M.X, U x)
+    exact Algebra.FiniteType.isNoetherianRing (GlobalTheory.Et.ssModel (OK l K) ϖ (m x) (r x))
+      Γ(M.X, U x)
 
 theorem good_flat (M : Model l K) (hM : M.Good) : Flat M.p := by
   haveI := OK_dvr (l := l) (K := K)
@@ -107,14 +120,17 @@ theorem good_flat (M : Model l K) (hM : M.Good) : Flat M.p := by
   refine HasRingHomProperty.of_iSup_eq_top (P := @Flat) (U := fun x => ⟨U x, hU x⟩) ?_ fun x => ?_
   · refine top_le_iff.mp fun y _ => ?_
     exact TopologicalSpace.Opens.mem_iSup.mpr ⟨y, hx y⟩
-  · have e : (M.p.appLE ⊤ (U x) le_top) = (Scheme.ΓSpecIso (CommRingCat.of (OK l K))).hom ≫
-        CommRingCat.ofHom ((ψ x).comp (algebraMap (OK l K) _)) := by
+  · have e
+        : (M.p.appLE ⊤ (U x) le_top)
+          = (Scheme.ΓSpecIso (CommRingCat.of (OK l K))).hom
+            ≫ CommRingCat.ofHom ((ψ x).comp (algebraMap (OK l K) _)) := by
       rw [hc x]; simp
     show RingHom.Flat (M.p.appLE ⊤ (U x) le_top).hom
     rw [e, CommRingCat.hom_comp]
     refine RingHom.Flat.comp (RingHom.Flat.of_bijective (ConcreteCategory.bijective_of_isIso _)) ?_
     haveI : Etale (Spec.map (CommRingCat.ofHom (ψ x))) := HasRingHomProperty.Spec_iff.mpr (hψ x)
-    have hf : RingHom.Flat (ψ x) := HasRingHomProperty.Spec_iff.mp (inferInstance : Flat (Spec.map (CommRingCat.ofHom (ψ x))))
+    have hf : RingHom.Flat (ψ x) :=
+      HasRingHomProperty.Spec_iff.mp (inferInstance : Flat (Spec.map (CommRingCat.ofHom (ψ x))))
     refine RingHom.Flat.comp ?_ hf
     exact RingHom.flat_algebraMap_iff.mpr (ssModel_flat (OK l K) ϖ hϖ (m x) (r x) (h1 x) (h2 x))
 

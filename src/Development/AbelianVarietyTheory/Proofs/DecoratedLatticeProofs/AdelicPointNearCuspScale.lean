@@ -22,8 +22,9 @@ noncomputable section
 
 namespace GlobalTheory.CuspGeo
 
-theorem exists_scale_of_bdd {ι : Type*} (N : ι → ℝ) (t a : ℝ) (ht : 0 < t) (hN : ∀ i, t ≤ N i) (ha : 0 < a) :
-    ∃ m : ℝ, 0 < m ∧ m ≤ a ∧ (∀ i, m / 2 ≤ N i) ∧ (m = a ∨ ∃ i, N i ≤ m) := by
+theorem exists_scale_of_bdd
+    {ι : Type*} (N : ι → ℝ) (t a : ℝ) (ht : 0 < t) (hN : ∀ i, t ≤ N i) (ha : 0 < a)
+    : ∃ m : ℝ, 0 < m ∧ m ≤ a ∧ (∀ i, m / 2 ≤ N i) ∧ (m = a ∨ ∃ i, N i ≤ m) := by
   by_cases h : ∃ i, N i ≤ a
   · obtain ⟨i₀, hi₀⟩ := h
     have hbdd : BddBelow (Set.range N) := ⟨t, by rintro _ ⟨i, rfl⟩; exact hN i⟩
@@ -44,21 +45,32 @@ theorem exists_scale_of_bdd {ι : Type*} (N : ι → ℝ) (t a : ℝ) (ht : 0 < 
   · push_neg at h
     exact ⟨a, ha, le_rfl, fun i => by linarith [h i], Or.inl rfl⟩
 
-theorem exists_root_scale (n : ℕ) (s₀ m : ℝ) (hs : 0 < s₀) (hm : 0 < m) :
-    ∃ η : ℝ, 0 < η ∧ s₀ * η ^ (n + 1) = m := by
+theorem exists_root_scale (n : ℕ) (s₀ m : ℝ) (hs : 0 < s₀) (hm : 0 < m)
+    : ∃ η : ℝ, 0 < η ∧ s₀ * η ^ (n + 1) = m := by
   refine ⟨(m / s₀) ^ ((((n + 1 : ℕ) : ℝ))⁻¹), Real.rpow_pos_of_pos (div_pos hm hs) _, ?_⟩
   rw [Real.rpow_inv_natCast_pow (div_pos hm hs).le (Nat.succ_ne_zero n)]
   field_simp
 
-theorem exists_scale_real (I : AutInst) (y : I.Ginf) (s₀ η₀ : ℝ) (hs : 0 < s₀) (hη : 0 < η₀) :
-    ∃ η : ℝ, 0 < η ∧ η ≤ η₀ ∧ NoShort I y (s₀ / 2 * η ^ (I.n + 1)) ∧
-      (η₀ ≤ η ∨ ∃ u, IntVec I u ∧ u ≠ 0 ∧ ‖vec I y u‖ ≤ s₀ * η ^ (I.n + 1)) := by
+theorem exists_scale_real (I : AutInst) (y : I.Ginf) (s₀ η₀ : ℝ) (hs : 0 < s₀) (hη : 0 < η₀)
+    : ∃ η : ℝ,
+      0 < η ∧ η ≤ η₀ ∧ NoShort I y (s₀ / 2 * η ^ (I.n + 1))
+        ∧ (η₀ ≤ η ∨ ∃ u, IntVec I u ∧ u ≠ 0 ∧ ‖vec I y u‖ ≤ s₀ * η ^ (I.n + 1)) := by
   obtain ⟨t, ht, hNS⟩ := GlobalTheory.T.exists_pos_noShortIntegralVectorFromPoint I y
-  obtain ⟨m, hm0, hma, hmN, hmc⟩ := exists_scale_of_bdd (ι := {u // IntVec I u ∧ u ≠ 0})
-    (fun u => ‖vec I y u.1‖) t (s₀ * η₀ ^ (I.n + 1)) ht (fun u => hNS u.1 u.2.1 u.2.2) (by positivity)
+  obtain ⟨m, hm0, hma, hmN, hmc⟩ :=
+    exists_scale_of_bdd (ι := {u // IntVec I u ∧ u ≠ 0})
+      (fun u => ‖vec I y u.1‖)
+      t (s₀ * η₀ ^ (I.n + 1)) ht
+      (fun u => hNS u.1 u.2.1 u.2.2)
+      (by positivity)
   obtain ⟨η, hη0, hηm⟩ := exists_root_scale I.n s₀ m hs hm0
   have hpow : η ^ (I.n + 1) ≤ η₀ ^ (I.n + 1) := le_of_mul_le_mul_left (by rw [hηm]; exact hma) hs
-  refine ⟨η, hη0, (pow_le_pow_iff_left₀ hη0.le hη.le (Nat.succ_ne_zero _)).1 hpow, fun u hu hu0 => ?_, ?_⟩
+  refine ⟨
+    η,
+    hη0,
+    (pow_le_pow_iff_left₀ hη0.le hη.le (Nat.succ_ne_zero _)).1 hpow,
+    fun u hu hu0 => ?_,
+    ?_
+  ⟩
   · have h1 := hmN ⟨u, hu, hu0⟩
     have h2 : s₀ / 2 * η ^ (I.n + 1) = m / 2 := by rw [← hηm]; ring
     rw [h2]
@@ -70,15 +82,15 @@ theorem exists_scale_real (I : AutInst) (y : I.Ginf) (s₀ η₀ : ℝ) (hs : 0 
     · right
       exact ⟨u, hu, hu0, hηm ▸ hle⟩
 
-theorem close_mono (I : AutInst) {u : I.Ginf} {a b : ℝ} (h : Close I u a) (hab : a ≤ b) : Close I u b :=
-  fun v i j => (h v i j).trans hab
+theorem close_mono (I : AutInst) {u : I.Ginf} {a b : ℝ} (h : Close I u a) (hab : a ≤ b)
+    : Close I u b := fun v i j =>
+  (h v i j).trans hab
 
 end GlobalTheory.CuspGeo
 
 noncomputable section
 
 namespace GlobalTheory.CuspGeo
-
 
 open Formalism.MainNotions.LeviCoordinates in
 theorem nearInst : ∀ I : AutInst, NearInst I := by
@@ -87,8 +99,7 @@ theorem nearInst : ∀ I : AutInst, NearInst I := by
     rw [← SetLike.mem_coe, rr_GF_coe]
   obtain ⟨-, -, -, hKsC, hKsO, ⟨Ks, hKs⟩, -⟩ := GlobalTheory.CongTop.adelic_topology I
   set Kq : Subgroup I.Gf := Kp ⊓ Ks with hKq
-  have hKqO : IsOpen (Kq : Set I.Gf) := by
-    rw [hKq, Subgroup.coe_inf, hKs]; exact hKo.inter hKsO
+  have hKqO : IsOpen (Kq : Set I.Gf) := by rw [hKq, Subgroup.coe_inf, hKs]; exact hKo.inter hKsO
   have hKqC : IsCompact (Kq : Set I.Gf) :=
     hKsC.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ hKqO)
       (by rw [← hKs]; exact fun z hz => (Subgroup.mem_inf.1 hz).2)
@@ -98,18 +109,28 @@ theorem nearInst : ∀ I : AutInst, NearInst I := by
     have : ∀ s ∈ S, ∀ᶠ g in 𝓝 (1 : I.Gf), s⁻¹ * g * s ∈ Kq := fun s _ =>
       (hKqO.preimage (by fun_prop : Continuous fun g : I.Gf => s⁻¹ * g * s)).mem_nhds (by simp)
     exact (Filter.eventually_all_finset S).2 this
-  obtain ⟨s₀, η₀, Cs, hs₀, hη₀, hSC⟩ := GlobalTheory.T.shortVectorCuspUnipotentCover_all_instances I U hU
+  obtain ⟨s₀, η₀, Cs, hs₀, hη₀, hSC⟩ :=
+    GlobalTheory.T.shortVectorCuspUnipotentCover_all_instances I U hU
   obtain ⟨b, CH, KH, hKH, hHt⟩ := GlobalTheory.T.quantitativeMahlerCriterion_unitaryGroup I
   set s₁ := min s₀ 1 with hs₁
   set η₁ := min η₀ 1 with hη₁
   have hs₁0 : 0 < s₁ := lt_min hs₀ one_pos
   have hη₁0 : 0 < η₁ := lt_min hη₀ one_pos
   set C := max (CH / (s₁ / 2) ^ b) Cs with hC
-  refine ⟨(I.n + 1) * b, C, η₁, (fun p : I.Gf × I.Gf × I.Gf => p.1 * p.2.1 * p.2.2) '' (KH ×ˢ ((S : Set I.Gf) ×ˢ (Kq : Set I.Gf))),
-    hη₁0, (hKH.prod (S.finite_toSet.isCompact.prod hKqC)).image (by fun_prop), fun x => ?_⟩
+  refine ⟨
+    (I.n + 1) * b,
+    C,
+    η₁,
+    (fun p : I.Gf × I.Gf × I.Gf => p.1 * p.2.1 * p.2.2)
+      '' (KH ×ˢ ((S : Set I.Gf) ×ˢ (Kq : Set I.Gf))),
+    hη₁0,
+    (hKH.prod (S.finite_toSet.isCompact.prod hKqC)).image (by fun_prop),
+    fun x => ?_
+  ⟩
   obtain ⟨γf, ⟨γE, hγE, hγEf⟩, s, hsS, k, hk, hx2⟩ := hS x.2
   set γ₀ : I.GA := (fun v => Formalism.L2.S.S7.DensRat.ratReal I γE hγE v, γf) with hγ₀def
-  have hγ₀ : γ₀ ∈ I.GFset := ⟨γE, hγE, fun v => by simp [hγ₀def, Formalism.L2.S.S7.DensRat.ratReal, uMat], hγEf⟩
+  have hγ₀ : γ₀ ∈ I.GFset :=
+    ⟨γE, hγE, fun v => by simp [hγ₀def, Formalism.L2.S.S7.DensRat.ratReal, uMat], hγEf⟩
   set y : I.Ginf := γ₀.1⁻¹ * x.1 with hy
   have hx : x = γ₀ * ((y, s * k) : I.GA) :=
     Prod.ext (by simp [hy]) (by simp [hγ₀def, hx2, mul_assoc])
@@ -123,7 +144,13 @@ theorem nearInst : ∀ I : AutInst, NearInst I := by
     have h3 : 0 ≤ η ^ (I.n + 1) := by positivity
     nlinarith
   obtain ⟨γ₁, hγ₁, hγ₁K, hγ₁b⟩ := hHt y t ht0 ht1 hNS
-  refine ⟨η, hη0, hη1, ⟨γ₁ * γ₀⁻¹, hmem.2 ((rr_GF I).mul_mem (hmem.1 hγ₁) ((rr_GF I).inv_mem (hmem.1 hγ₀))), ?_, ?_⟩, ?_⟩
+  refine ⟨
+    η,
+    hη0,
+    hη1,
+    ⟨γ₁ * γ₀⁻¹, hmem.2 ((rr_GF I).mul_mem (hmem.1 hγ₁) ((rr_GF I).inv_mem (hmem.1 hγ₀))), ?_, ?_⟩,
+    ?_
+  ⟩
   · refine ⟨(γ₁.2, s, k), ⟨hγ₁K, hsS, hk⟩, ?_⟩
     rw [hx]
     simp [mul_assoc]
@@ -153,19 +180,34 @@ theorem nearInst : ∀ I : AutInst, NearInst I := by
     rw [← hN] at hm' hγ₂N ⊢
     exact N.mul_mem (N.inv_mem hγ₂N) hm'
   obtain ⟨γ₃, hγ₃, hγ₃U, hclose⟩ := hcov m''.1 (hpart m'' hm''N).1
-  refine ⟨γ₀ * γ₂ * γ₃⁻¹ * γ₀⁻¹, hmem.2 ((rr_GF I).mul_mem ((rr_GF I).mul_mem ((rr_GF I).mul_mem (hmem.1 hγ₀)
-    (hmem.1 hγ₂)) ((rr_GF I).inv_mem (hmem.1 hγ₃))) ((rr_GF I).inv_mem (hmem.1 hγ₀))),
-    y⁻¹ * (γ₃.1 * m''.1) * y, (s * k)⁻¹ * (γ₃.2 * m''.2) * (s * k), ?_, ?_,
-    close_mono I hclose (mul_le_mul_of_nonneg_right (le_max_right _ _) hη0.le)⟩
-  · have e : (s * k)⁻¹ * (γ₃.2 * m''.2) * (s * k) = k⁻¹ * ((s⁻¹ * γ₃.2 * s) * (s⁻¹ * m''.2 * s)) * k := by group
+  refine ⟨
+    γ₀ * γ₂ * γ₃⁻¹ * γ₀⁻¹,
+    hmem.2 ((rr_GF I).mul_mem
+      ((rr_GF I).mul_mem ((rr_GF I).mul_mem (hmem.1 hγ₀) (hmem.1 hγ₂))
+        ((rr_GF I).inv_mem (hmem.1 hγ₃)))
+      ((rr_GF I).inv_mem (hmem.1 hγ₀))),
+    y⁻¹ * (γ₃.1 * m''.1) * y,
+    (s * k)⁻¹ * (γ₃.2 * m''.2) * (s * k),
+    ?_,
+    ?_,
+    close_mono I hclose (mul_le_mul_of_nonneg_right (le_max_right _ _) hη0.le)
+  ⟩
+  · have e
+        : (s * k)⁻¹ * (γ₃.2 * m''.2) * (s * k)
+          = k⁻¹ * ((s⁻¹ * γ₃.2 * s) * (s⁻¹ * m''.2 * s)) * k := by
+      group
     rw [e]
     have hk' : k⁻¹ * ((s⁻¹ * γ₃.2 * s) * (s⁻¹ * m''.2 * s)) * k ∈ Kq :=
       Kq.mul_mem (Kq.mul_mem (Kq.inv_mem hk) (Kq.mul_mem (hγ₃U s hsS) (hγ₂U s hsS))) hk
     exact (Subgroup.mem_inf.1 hk').1
-  · have hyu : ((y, s * k) : I.GA) * (y⁻¹ * (γ₃.1 * m''.1) * y, (s * k)⁻¹ * (γ₃.2 * m''.2) * (s * k)) =
-        γ₃ * m'' * (y, s * k) := Prod.ext (by simp; group) (by simp; group)
+  · have hyu
+        : ((y, s * k) : I.GA) * (y⁻¹ * (γ₃.1 * m''.1) * y, (s * k)⁻¹ * (γ₃.2 * m''.2) * (s * k))
+          = γ₃ * m'' * (y, s * k) :=
+      Prod.ext (by simp; group) (by simp; group)
     have hmm : m = γ₀ * γ₂ * m'' * γ₀⁻¹ := by rw [hm'']; group
-    calc m * x = γ₀ * γ₂ * γ₃⁻¹ * (γ₃ * m'' * (y, s * k)) := by rw [hmm, hx]; group
+    calc
+      m * x
+        = γ₀ * γ₂ * γ₃⁻¹ * (γ₃ * m'' * (y, s * k)) := by rw [hmm, hx]; group
       _ = _ := by rw [← hyu, hx]; group
 
 end GlobalTheory.CuspGeo

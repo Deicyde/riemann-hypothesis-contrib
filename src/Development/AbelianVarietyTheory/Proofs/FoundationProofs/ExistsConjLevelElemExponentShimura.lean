@@ -12,13 +12,18 @@ open Matrix GlobalTheory.KZ
 
 namespace GlobalTheory
 
-
 open scoped MatrixGroups TensorProduct in
 open Matrix in
-theorem _root_.GlobalTheory.exists_primitiveRoot_pow_cyclotomicCharacter {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
-    (l n M : ℕ) [Fact l.Prime] (hM : 0 < M) (hn : l ^ n ∣ M) (s : Ω ≃ₐ[ℚ] Ω) :
-    ∃ ζ : Ω, IsPrimitiveRoot ζ M ∧ ∃ i : ℕ, i.Coprime M ∧ s ζ = ζ ^ i ∧
-      (i : ZMod (l ^ n)) = PadicInt.toZModPow n (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) := by
+theorem _root_.GlobalTheory.exists_primitiveRoot_pow_cyclotomicCharacter
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (l n M : ℕ) [Fact l.Prime]
+    (hM : 0 < M) (hn : l ^ n ∣ M) (s : Ω ≃ₐ[ℚ] Ω)
+    : ∃ ζ : Ω,
+      IsPrimitiveRoot ζ M
+        ∧ ∃ i : ℕ,
+          i.Coprime M ∧ s ζ = ζ ^ i
+            ∧ (i : ZMod (l ^ n))
+              = PadicInt.toZModPow n (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) := by
   haveI : NeZero M := ⟨hM.ne'⟩
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := algebraRat.charZero Ω
@@ -36,8 +41,7 @@ theorem _root_.GlobalTheory.exists_primitiveRoot_pow_cyclotomicCharacter {Ω : T
   have hcard' : Nat.card (rootsOfUnity (l ^ n) Ω) = l ^ n :=
     HasEnoughRootsOfUnity.natCard_rootsOfUnity Ω (l ^ n)
   set c' := modularCyclotomicCharacter Ω hcard' s.toRingEquiv
-  have hζ' : IsPrimitiveRoot (ζ ^ (M / l ^ n)) (l ^ n) :=
-    hζ.pow hM (Nat.div_mul_cancel hn).symm
+  have hζ' : IsPrimitiveRoot (ζ ^ (M / l ^ n)) (l ^ n) := hζ.pow hM (Nat.div_mul_cancel hn).symm
   have h1 : s (ζ ^ (M / l ^ n)) = (ζ ^ (M / l ^ n)) ^ (c : ZMod M).val := by
     rw [map_pow, hsζ, ← pow_mul, ← pow_mul, mul_comm]
   have h2 : s (ζ ^ (M / l ^ n)) = (ζ ^ (M / l ^ n)) ^ (c' : ZMod (l ^ n)).val := by
@@ -50,14 +54,15 @@ theorem _root_.GlobalTheory.exists_primitiveRoot_pow_cyclotomicCharacter {Ω : T
   rw [← ZMod.natCast_zmod_val (c' : ZMod (l ^ n))]
   exact (ZMod.natCast_eq_natCast_iff _ _ _).2 h3
 
-
 open scoped MatrixGroups TensorProduct in
 open Matrix in
-theorem _root_.GlobalTheory.exists_sl2_conj_diag_zmod (M i : ℕ) (hi : i.Coprime M) (γ : SL(2, ℤ)) :
-    ∃ δ : SL(2, ℤ), (_root_.GlobalTheory.KZ.en γ 0 0 : ZMod M) = _root_.GlobalTheory.KZ.en δ 0 0 ∧
-      (_root_.GlobalTheory.KZ.en γ 0 1 : ZMod M) = (i : ZMod M) * _root_.GlobalTheory.KZ.en δ 0 1 ∧
-      (i : ZMod M) * _root_.GlobalTheory.KZ.en γ 1 0 = _root_.GlobalTheory.KZ.en δ 1 0 ∧
-      (_root_.GlobalTheory.KZ.en γ 1 1 : ZMod M) = _root_.GlobalTheory.KZ.en δ 1 1 := by
+theorem _root_.GlobalTheory.exists_sl2_conj_diag_zmod (M i : ℕ) (hi : i.Coprime M) (γ : SL(2, ℤ))
+    : ∃ δ : SL(2, ℤ),
+      (_root_.GlobalTheory.KZ.en γ 0 0 : ZMod M) = _root_.GlobalTheory.KZ.en δ 0 0
+        ∧ (_root_.GlobalTheory.KZ.en γ 0 1 : ZMod M)
+          = (i : ZMod M) * _root_.GlobalTheory.KZ.en δ 0 1
+        ∧ (i : ZMod M) * _root_.GlobalTheory.KZ.en γ 1 0 = _root_.GlobalTheory.KZ.en δ 1 0
+        ∧ (_root_.GlobalTheory.KZ.en γ 1 1 : ZMod M) = _root_.GlobalTheory.KZ.en δ 1 1 := by
   set u : (ZMod M)ˣ := ZMod.unitOfCoprime i hi
   have hu : (u : ZMod M) = i := rfl
   have hγdet : (γ : Matrix (Fin 2) (Fin 2) ℤ).det = 1 := γ.2
@@ -86,23 +91,41 @@ theorem _root_.GlobalTheory.exists_sl2_conj_diag_zmod (M i : ℕ) (hi : i.Coprim
   · simp
   · simp
 
-theorem exists_conj_level_exponent :
-    ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N l n M : ℕ) [Fact l.Prime], 0 < M → N ∣ M → l ∣ M →
-      l ^ n ∣ M → ∀ (s : Ω ≃ₐ[ℚ] Ω) (γ : SL(2, ℤ)), γ ∈ Gam N l → ∃ γ'' ∈ Gam N l, ∃ ζ : Ω, IsPrimitiveRoot ζ M ∧
-      ∃ d : ℤ, s ζ = ζ ^ d ∧ ((en γ 0 0 : ZMod M) = en γ'' 0 0 ∧ (en γ 0 1 : ZMod M) = d * en γ'' 0 1 ∧
-        (d : ZMod M) * en γ 1 0 = en γ'' 1 0 ∧ (en γ 1 1 : ZMod M) = en γ'' 1 1) ∧
-        (d : ZMod (l ^ n)) = PadicInt.toZModPow n (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) := by
+theorem exists_conj_level_exponent
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N l n M : ℕ) [Fact l.Prime],
+      0 < M → N ∣ M → l ∣ M → l ^ n ∣ M
+        → ∀ (s : Ω ≃ₐ[ℚ] Ω) (γ : SL(2, ℤ)),
+          γ ∈ Gam N l
+            → ∃ γ'' ∈ Gam N l, ∃ ζ : Ω,
+              IsPrimitiveRoot ζ M
+                ∧ ∃ d : ℤ,
+                  s ζ = ζ ^ d
+                    ∧ ((en γ 0 0 : ZMod M) = en γ'' 0 0 ∧ (en γ 0 1 : ZMod M) = d * en γ'' 0 1
+                      ∧ (d : ZMod M) * en γ 1 0 = en γ'' 1 0 ∧ (en γ 1 1 : ZMod M) = en γ'' 1 1)
+                    ∧ (d : ZMod (l ^ n))
+                      = PadicInt.toZModPow n (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) := by
   intro Ω _ _ _ N l n M _ hM hN hl hn s γ hγ
   obtain ⟨ζ, hζ, i, hi, hs, hχ⟩ := exists_primitiveRoot_pow_cyclotomicCharacter l n M hM hn s
   obtain ⟨δ, h00, h01, h10, h11⟩ := exists_sl2_conj_diag_zmod M i hi γ
-  have red : ∀ {K : ℕ}, K ∣ M → ∀ {x y : ℤ}, (x : ZMod M) = y → (x : ZMod K) = y := fun {K} hK x y h => by
+  have red
+      : ∀ {K : ℕ},
+        K ∣ M → ∀ {x y : ℤ}, (x : ZMod M) = y → (x : ZMod K) = y := fun {K} hK x y h => by
     simpa only [map_intCast] using congrArg (ZMod.castHom hK (ZMod K)) h
   have h10' : (((i : ℤ) * en γ 1 0 : ℤ) : ZMod M) = en δ 1 0 := by push_cast; exact h10
   obtain ⟨hγ1, hγ0⟩ := Subgroup.mem_inf.1 hγ
   obtain ⟨a1, a2, a3⟩ := (CongruenceSubgroup.Gamma1_mem N γ).1 hγ1
   have a4 := CongruenceSubgroup.Gamma0_mem.1 hγ0
-  refine ⟨δ, Subgroup.mem_inf.2 ⟨(CongruenceSubgroup.Gamma1_mem N δ).2 ⟨?_, ?_, ?_⟩,
-    CongruenceSubgroup.Gamma0_mem.2 ?_⟩, ζ, hζ, i, by rw [zpow_natCast, hs], ⟨h00, ?_, ?_, h11⟩, ?_⟩
+  refine ⟨
+    δ,
+    Subgroup.mem_inf.2
+      ⟨(CongruenceSubgroup.Gamma1_mem N δ).2 ⟨?_, ?_, ?_⟩, CongruenceSubgroup.Gamma0_mem.2 ?_⟩,
+    ζ,
+    hζ,
+    i,
+    by rw [zpow_natCast, hs],
+    ⟨h00, ?_, ?_, h11⟩,
+    ?_
+  ⟩
   · exact (red hN h00).symm.trans a1
   · exact (red hN h11).symm.trans a2
   · refine (red hN h10').symm.trans ?_

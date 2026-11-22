@@ -123,13 +123,15 @@ theorem hostOrbitCount : HostOrbitCount := by
     intro i
     obtain ⟨h2, h1, -⟩ := hostOrbitsPlaces e φ (Or.inl h0) τ hτ i
     exact Prod.ext (h1 h0) h2
-  have hr : (Set.range fun i : ℕ => placeOf (φ ^ i * τ)) =
-      (fun x : HGrp e => ((τ.1, x * τ.2) : GG e)) '' Set.range (fun i : ℕ => φ.2 ^ i) := by
+  have hr
+      : (Set.range fun i : ℕ => placeOf (φ ^ i * τ))
+        = (fun x : HGrp e => ((τ.1, x * τ.2) : GG e)) '' Set.range (fun i : ℕ => φ.2 ^ i) := by
     ext y
     simp [hpl]
   rw [hr, Set.ncard_image_of_injective _ (fun x y hxy => by simpa using hxy)]
   rw [show Set.range (fun i : ℕ => φ.2 ^ i) = (Submonoid.powers φ.2 : Set (HGrp e)) from
-    (Submonoid.coe_powers φ.2).symm, ← Nat.card_coe_set_eq]
+      (Submonoid.coe_powers φ.2).symm,
+    ← Nat.card_coe_set_eq]
   exact Nat.card_submonoidPowers
 
 theorem hostFiniteOrder : HostFiniteOrder := by

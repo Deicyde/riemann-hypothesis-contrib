@@ -10,8 +10,10 @@ namespace Formalism.MainNotions.FormalGroupSystem.Pf
 
 open Formalism.MainNotions.G Formalism.BasicNotions Finset
 
-theorem tsum_rat_tail (g : ℕ → ℚ) (hs : Summable (fun e => (g e : ℝ))) (E N : ℕ) (Q : ℚ) (hQ1 : 1 < Q)
-    (h4 : ∀ e, E ≤ e → g (e + N) = g e / Q) : ∃ q : ℚ, ∑' e, (g e : ℝ) = q := by
+theorem tsum_rat_tail
+    (g : ℕ → ℚ) (hs : Summable (fun e => (g e : ℝ)))
+    (E N : ℕ) (Q : ℚ) (hQ1 : 1 < Q) (h4 : ∀ e, E ≤ e → g (e + N) = g e / Q)
+    : ∃ q : ℚ, ∑' e, (g e : ℝ) = q := by
   have hsE : Summable (fun i => (g (i + E) : ℝ)) := (summable_nat_add_iff E).2 hs
   have h1 := hsE.sum_add_tsum_nat_add N
   have h2 : ∀ i, (g (i + N + E) : ℝ) = (g (i + E) : ℝ) / Q := by
@@ -40,19 +42,24 @@ theorem tsum_rat_tail (g : ℕ → ℚ) (hs : Summable (fun e => (g e : ℝ))) (
 def fqT (P : ℕ) (α : ℤ) (c : ℕ → ℤ) (Ds : Finset ℕ) (e : ℕ) : ℚ :=
   if 2 * e + 1 ∈ Ds then 0 else max ((α : ℚ) / (P : ℚ) ^ (2 * e + 1) - (c e : ℚ)) 0
 
-theorem fqT_cast (P : ℕ) (α : ℤ) (c : ℕ → ℤ) (Ds : Finset ℕ) (e : ℕ) :
-    (if 2 * e + 1 ∈ Ds then (0 : ℝ) else max ((α : ℝ) / (P : ℝ) ^ (2 * e + 1) - (c e : ℝ)) 0) =
-      (fqT P α c Ds e : ℝ) := by
+theorem fqT_cast (P : ℕ) (α : ℤ) (c : ℕ → ℤ) (Ds : Finset ℕ) (e : ℕ)
+    : (if 2 * e + 1 ∈ Ds then (0 : ℝ) else max ((α : ℝ) / (P : ℝ) ^ (2 * e + 1) - (c e : ℝ)) 0)
+      = (fqT P α c Ds e : ℝ) := by
   unfold fqT
   split_ifs
   · simp
   · push_cast
     try rfl
 
-theorem tsum_rat (P N : ℕ) (hP : 2 ≤ P) (hN : 0 < N) (α : ℤ) (c : ℕ → ℤ) (hc : ∀ e, c (e + N) = c e)
-    (Ds : Finset ℕ) :
-    ∃ q : ℚ, ∑' e : ℕ, (if 2 * e + 1 ∈ Ds then (0 : ℝ) else
-      max ((α : ℝ) / (P : ℝ) ^ (2 * e + 1) - (c e : ℝ)) 0) = q := by
+theorem tsum_rat
+    (P N : ℕ) (hP : 2 ≤ P) (hN : 0 < N)
+    (α : ℤ)
+    (c : ℕ → ℤ) (hc : ∀ e, c (e + N) = c e)
+    (Ds : Finset ℕ)
+    : ∃ q : ℚ,
+      ∑' e : ℕ, (if 2 * e + 1 ∈ Ds then (0 : ℝ) else
+          max ((α : ℝ) / (P : ℝ) ^ (2 * e + 1) - (c e : ℝ)) 0)
+        = q := by
   simp_rw [fqT_cast]
   by_cases hs : Summable (fun e => (fqT P α c Ds e : ℝ))
   swap
@@ -65,7 +72,9 @@ theorem tsum_rat (P N : ℕ) (hP : 2 ≤ P) (hN : 0 < N) (α : ℤ) (c : ℕ →
   have h2 : ∀ e, Ds.sup id + α.natAbs + 1 ≤ e → |(α : ℚ)| * 2 < (P : ℚ) ^ (2 * e + 1) := by
     intro e he
     have a1 : α.natAbs * 2 < P ^ (2 * e + 1) :=
-      calc α.natAbs * 2 < 2 * e + 1 := by omega
+      calc
+        α.natAbs * 2
+          < 2 * e + 1 := by omega
         _ < 2 ^ (2 * e + 1) := Nat.lt_two_pow_self
         _ ≤ P ^ (2 * e + 1) := Nat.pow_le_pow_left hP _
     have a2 : ((α.natAbs : ℕ) : ℚ) = |(α : ℚ)| := by rw [Nat.cast_natAbs, Int.cast_abs]
@@ -86,7 +95,8 @@ theorem tsum_rat (P N : ℕ) (hP : 2 ≤ P) (hN : 0 < N) (α : ℤ) (c : ℕ →
     by_contra hneg
     have hneg : c e0 ≤ -1 := by omega
     have tend := hs.tendsto_atTop_zero
-    obtain ⟨M, hM⟩ := (tend.eventually (gt_mem_nhds (by norm_num : (0 : ℝ) < 1 / 2))).exists_forall_of_atTop
+    obtain ⟨M, hM⟩ :=
+      (tend.eventually (gt_mem_nhds (by norm_num : (0 : ℝ) < 1 / 2))).exists_forall_of_atTop
     have hge : M ≤ e0 + M * N := by nlinarith
     have hlt : (fqT P α c Ds (e0 + M * N) : ℝ) < 1 / 2 := hM _ hge
     have hlt' : fqT P α c Ds (e0 + M * N) < 1 / 2 := by
@@ -99,8 +109,10 @@ theorem tsum_rat (P N : ℕ) (hP : 2 ≤ P) (hN : 0 < N) (α : ℤ) (c : ℕ →
     have b2 : ((c e0 : ℤ) : ℚ) ≤ -1 := by exact_mod_cast hneg
     have b3 := le_max_left ((α : ℚ) / (P : ℚ) ^ (2 * (e0 + M * N) + 1) - (c e0 : ℚ)) 0
     linarith [b1.1]
-  have h4 : ∀ e, Ds.sup id + α.natAbs + 1 ≤ e →
-      fqT P α c Ds (e + N) = fqT P α c Ds e / (P : ℚ) ^ (2 * N) := by
+  have h4
+      : ∀ e,
+        Ds.sup id + α.natAbs + 1 ≤ e
+          → fqT P α c Ds (e + N) = fqT P α c Ds e / (P : ℚ) ^ (2 * N) := by
     intro e he
     have he' : Ds.sup id + α.natAbs + 1 ≤ e + N := le_trans he (Nat.le_add_right _ _)
     unfold fqT
@@ -109,7 +121,8 @@ theorem tsum_rat (P N : ℕ) (hP : 2 ≤ P) (hN : 0 < N) (α : ℤ) (c : ℕ →
     rcases (h3 e he).eq_or_lt with h0 | h0
     · rw [← h0]
       simp only [Int.cast_zero, sub_zero]
-      have : (α : ℚ) / (P : ℚ) ^ (2 * (e + N) + 1) = (α : ℚ) / (P : ℚ) ^ (2 * e + 1) / (P : ℚ) ^ (2 * N) := by
+      have : (α : ℚ) / (P : ℚ) ^ (2 * (e + N) + 1)
+          = (α : ℚ) / (P : ℚ) ^ (2 * e + 1) / (P : ℚ) ^ (2 * N) := by
         rw [div_div, ← pow_add]
         congr 2
         ring
@@ -123,13 +136,22 @@ theorem tsum_rat (P N : ℕ) (hP : 2 ≤ P) (hN : 0 < N) (α : ℤ) (c : ℕ →
     exact one_lt_pow₀ this (by omega)
   exact tsum_rat_tail _ hs _ N _ hQ1 h4
 
-theorem gA_rat {n' k1 : ℕ} (p t : ℕ) (hp : 2 ≤ p) (hn : 0 < n') (TT : Finset (Fin n'))
-    (lam0 : Fin n' → Fin (k1 + 1) → ℤ) (w : ℕ → Fin n' → ℤ) (j : ℕ) : ∃ q : ℚ, gA p t TT lam0 w j = q := by
-  have h1 : ∀ s : Fin n', ∃ q : ℚ, ∑' e : ℕ,
-      (if 2 * e + 1 ∈ dSet TT s then (0 : ℝ) else
-        max ((al TT lam0 s : ℝ) / (p : ℝ) ^ (2 * e + 1) - (cap t TT lam0 w j (posAdd s (2 * e + 1)) : ℝ)) 0) = q := by
+theorem gA_rat
+    {n' k1 : ℕ}
+    (p t : ℕ) (hp : 2 ≤ p)
+    (hn : 0 < n') (TT : Finset (Fin n')) (lam0 : Fin n' → Fin (k1 + 1) → ℤ) (w : ℕ → Fin n' → ℤ)
+    (j : ℕ)
+    : ∃ q : ℚ, gA p t TT lam0 w j = q := by
+  have h1
+      : ∀ s : Fin n', ∃ q : ℚ,
+        ∑' e : ℕ,
+            (if 2 * e + 1 ∈ dSet TT s then (0 : ℝ) else
+              max ((al TT lam0 s : ℝ) / (p : ℝ) ^ (2 * e + 1) - (cap t TT lam0 w j (posAdd s (2 * e + 1)) : ℝ)) 0)
+          = q := by
     intro s
-    apply tsum_rat p n' hp hn (al TT lam0 s) (fun e => cap t TT lam0 w j (posAdd s (2 * e + 1))) _ (dSet TT s)
+    apply tsum_rat p n' hp hn (al TT lam0 s)
+      (fun e => cap t TT lam0 w j (posAdd s (2 * e + 1)))
+      _ (dSet TT s)
     intro e
     have : posAdd s (2 * (e + n') + 1) = posAdd s (2 * e + 1) := by
       unfold posAdd
@@ -139,9 +161,13 @@ theorem gA_rat {n' k1 : ℕ} (p t : ℕ) (hp : 2 ≤ p) (hn : 0 < n') (TT : Fins
       rw [this, Nat.add_mul_mod_self_right]
     simp only [this]
   choose q hq using h1
-  refine ⟨∑ s ∈ TT, q s - (∑ s : Fin n', ((NN k1 t j : ℚ) * lgp p (al TT lam0 s) +
-      (NN k1 t (j - 1) : ℚ) * (NN k1 t j : ℚ) * lgp p (lsz t TT lam0 w j s)) +
-    ∑ s ∈ TT, ((lgp p (al TT lam0 s) : ℚ)) ^ 2), ?_⟩
+  refine ⟨
+    ∑ s ∈ TT, q s
+      - (∑ s : Fin n', ((NN k1 t j : ℚ) * lgp p (al TT lam0 s) +
+          (NN k1 t (j - 1) : ℚ) * (NN k1 t j : ℚ) * lgp p (lsz t TT lam0 w j s))
+        + ∑ s ∈ TT, ((lgp p (al TT lam0 s) : ℚ)) ^ 2),
+    ?_
+  ⟩
   unfold gA de
   simp only [hq]
   push_cast

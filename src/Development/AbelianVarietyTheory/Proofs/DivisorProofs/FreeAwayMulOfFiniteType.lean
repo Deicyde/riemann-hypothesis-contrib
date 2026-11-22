@@ -9,7 +9,15 @@ open TensorProduct
 
 namespace GlobalTheory
 
-theorem free_away_mul_of_finiteType : ∀ {A B : Type} [CommRing A] [CommRing B] [IsDomain A] [IsNoetherianRing A] [Algebra A B] [Algebra.FiniteType A B] [Algebra.IsAlgebraic A B], ∃ a : A, a ≠ 0 ∧ ∀ (c : A) (A' B' : Type) [CommRing A'] [CommRing B'] [Algebra A A'] [Algebra B B'] [Algebra A' B'] [Algebra A B'] [IsScalarTower A A' B'] [IsScalarTower A B B'], IsLocalization.Away (a * c) A' → IsLocalization.Away (algebraMap A B (a * c)) B' → Module.Free A' B' := by
+theorem free_away_mul_of_finiteType
+    : ∀ {A B : Type} [CommRing A] [CommRing B] [IsDomain A] [IsNoetherianRing A] [Algebra A B]
+        [Algebra.FiniteType A B] [Algebra.IsAlgebraic A B],
+      ∃ a : A,
+        a ≠ 0
+          ∧ ∀ (c : A) (A' B' : Type) [CommRing A'] [CommRing B'] [Algebra A A'] [Algebra B B']
+              [Algebra A' B'] [Algebra A B'] [IsScalarTower A A' B'] [IsScalarTower A B B'],
+            IsLocalization.Away (a * c) A' → IsLocalization.Away (algebraMap A B (a * c)) B'
+              → Module.Free A' B' := by
   intro A B _ _ _ _ _ _ _
   obtain ⟨a, ha0, hfree⟩ := (generic_freeness A).2.1 B B
   refine ⟨a, ha0, fun c A' B' _ _ _ _ _ _ _ _ hA hB => ?_⟩
@@ -32,8 +40,9 @@ theorem free_away_mul_of_finiteType : ∀ {A B : Type} [CommRing A] [CommRing B]
       (IsScalarTower.toAlgHom A B B').toLinearMap := by
     rw [isLocalizedModule_iff_isLocalization, Algebra.algebraMapSubmonoid, Submonoid.map_powers]
     exact hB
-  have hbc := IsLocalizedModule.isBaseChange (Submonoid.powers (a * c)) A'
-    (IsScalarTower.toAlgHom A B B').toLinearMap
+  have hbc :=
+    IsLocalizedModule.isBaseChange (Submonoid.powers (a * c)) A'
+      (IsScalarTower.toAlgHom A B B').toLinearMap
   exact Module.Free.of_equiv hbc.equiv
 
 end GlobalTheory

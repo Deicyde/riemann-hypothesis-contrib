@@ -7,30 +7,36 @@ public import Development.AutomorphicArithmetic.Foundations.BaseChangeIdentities
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
 
 set_option synthInstance.maxHeartbeats 200000
 
-open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.B3 PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcN.F2
+open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.B3 PositivityTheory.Rg.BcB.F.Eig
+  PositivityTheory.Rg.BcN.F2
 
 namespace UpperTheory.BaseChangeIdentities.FrameWordIdentity
 
-attribute [local instance] borelG borelF borelA GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+attribute [local instance]
+  borelG borelF borelA GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem val_one_of_ordL {E : Type} [Field E] [NumberField E] {w : Pl E} (u : (w.adicCompletion E)ˣ)
-    (hu : ordL (u : w.adicCompletion E) = 0) : Valued.v (u : w.adicCompletion E) = 1 := by
+private theorem val_one_of_ordL
+    {E : Type} [Field E] [NumberField E]
+    {w : Pl E} (u : (w.adicCompletion E)ˣ) (hu : ordL (u : w.adicCompletion E) = 0)
+    : Valued.v (u : w.adicCompletion E) = 1 := by
   have h1 : Valued.v (u : w.adicCompletion E) ≠ 0 := (Valuation.ne_zero_iff _).mpr u.ne_zero
   unfold ordL at hu
   rw [dite_eq_right h1] at hu
   rw [← WithZero.coe_unzero h1]
   have e : Multiplicative.toAdd (WithZero.unzero h1) = 0 := by omega
-  have e' : WithZero.unzero h1 = 1 := by
-    rw [← ofAdd_toAdd (WithZero.unzero h1), e]; rfl
-  rw [e']; rfl
+  have e' : WithZero.unzero h1 = 1 := by rw [← ofAdd_toAdd (WithZero.unzero h1), e]; rfl
+  rw [e']
+  rfl
 
 theorem frfacts_pf : FrFacts := by
   intro hR E _ _ _ n π S T F₀ F

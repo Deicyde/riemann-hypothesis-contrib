@@ -16,8 +16,11 @@ section Emb
 variable {m : ℕ} {R : Type*} [CommRing R]
 
 def emb : GG (m := m) (R := R) →* Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) R where
-  toFun x := if x.right = 1 then Matrix.fromBlocks x.mat 0 0 (theta x.left : GL (Fin m) R)
-    else Matrix.fromBlocks 0 x.mat (theta x.left : GL (Fin m) R) 0
+  toFun x :=
+    if x.right = 1 then
+      Matrix.fromBlocks x.mat 0 0 (theta x.left : GL (Fin m) R)
+    else
+      Matrix.fromBlocks 0 x.mat (theta x.left : GL (Fin m) R) 0
   map_one' := by
     have h : theta (1 : GL (Fin m) R) = 1 := map_one (thetaAut (m := m) (R := R))
     simp [GG.mat, h]
@@ -25,8 +28,8 @@ def emb : GG (m := m) (R := R) →* Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) R
     have h : ((-1 : ℤˣ) = 1) = False := by decide
     obtain ⟨a, s⟩ := x
     obtain ⟨b, t⟩ := y
-    rcases Int.units_eq_one_or s with rfl | rfl <;> rcases Int.units_eq_one_or t with rfl | rfl <;>
-      simp [GG.mat, h, theta_mul, theta_theta, Matrix.fromBlocks_multiply]
+    rcases Int.units_eq_one_or s with rfl | rfl <;> rcases Int.units_eq_one_or t with rfl | rfl
+      <;> simp [GG.mat, h, theta_mul, theta_theta, Matrix.fromBlocks_multiply]
 
 def wt6 : Fin 3 ⊕ Fin 3 → ℤ := Sum.elim wt1 wt1
 
@@ -42,17 +45,24 @@ variable (η : Γ →* ℤˣ) (Ψ : Γ →* Oˣ)
 
 def rbar : Γ →* GG (m := 3) (R := ResidueField O) := r0 η (barChar O Ψ)
 
-@[ext] structure GLift (R : Type) [CommRing R] [Algebra O R] [IsCO O R] where
+@[ext]
+structure GLift (R : Type) [CommRing R] [Algebra O R] [IsCO O R] where
   hom : Γ →* GG (m := 3) (R := R)
   cont : ∀ a b, AdicCont (maximalIdeal R) fun g => (hom g).mat a b
   red : ∀ g, GG.map (res O R : R →+* ResidueField O) (hom g) = rbar O η Ψ g
 
-variable {O η Ψ} {R R' : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R']
+variable
+  {O η Ψ} {R R' : Type}
+  [CommRing R] [Algebra O R] [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R']
 
-theorem GLift.hasMult (r : GLift O η Ψ R) : HasMult η r.hom := fun g => congrArg SemidirectProduct.right (r.red g)
+theorem GLift.hasMult (r : GLift O η Ψ R) : HasMult η r.hom := fun g =>
+  congrArg SemidirectProduct.right (r.red g)
 
-theorem GG.map_map {m : ℕ} {A B C : Type*} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (f' : B →+* C)
-    (x : GG (m := m) (R := A)) : GG.map f' (GG.map f x) = GG.map (f'.comp f) x := rfl
+theorem GG.map_map
+    {m : ℕ} {A B C : Type*} [CommRing A] [CommRing B] [CommRing C]
+    (f : A →+* B) (f' : B →+* C) (x : GG (m := m) (R := A))
+    : GG.map f' (GG.map f x) = GG.map (f'.comp f) x :=
+  rfl
 
 def GLift.map (f : R →ₐ[O] R') (r : GLift O η Ψ R) : GLift O η Ψ R' where
   hom := (GG.map (f : R →+* R')).comp r.hom
@@ -64,29 +74,39 @@ def GLift.map (f : R →ₐ[O] R') (r : GLift O η Ψ R) : GLift O η Ψ R' wher
       exact hy
     exact (r.cont a b N).comp (Ideal.quotientMap _ (f : R →+* R') hle)
   red g := by
-    have e : (res O R' : R' →+* ResidueField O).comp (f : R →+* R') = (res O R : R →+* ResidueField O) :=
+    have e
+        : (res O R' : R' →+* ResidueField O).comp (f : R →+* R')
+          = (res O R : R →+* ResidueField O) :=
       RingHom.ext fun x => res_map (O := O) (R := R) (R' := R') f x
     rw [MonoidHom.comp_apply, GG.map_map, e, r.red]
 
-def GLift.comap {H : Type} [Group H] [TopologicalSpace H] (φ : H →* Γ) (hφ : Continuous φ) (r : GLift O η Ψ R) :
-    GLift O (η.comp φ) (Ψ.comp φ) R where
+def GLift.comap
+    {H : Type} [Group H] [TopologicalSpace H] (φ : H →* Γ) (hφ : Continuous φ) (r : GLift O η Ψ R)
+    : GLift O (η.comp φ) (Ψ.comp φ) R where
   hom := r.hom.comp φ
   cont a b N := (r.cont a b N).comp_continuous hφ
   red g := r.red (φ g)
 
+variable (O η Ψ) in
+def GCond
+    (O : Type) [CommRing O] [IsLocalRing O]
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+    (η : Γ →* ℤˣ) (Ψ : Γ →* Oˣ)
+    : Type 1 :=
+  ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R], GLift O η Ψ R → Prop
 
 variable (O η Ψ) in
-def GCond (O : Type) [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ]
-    (η : Γ →* ℤˣ) (Ψ : Γ →* Oˣ) : Type 1 := ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R], GLift O η Ψ R → Prop
-
-
-variable (O η Ψ) in
-def GCond.noCondition (O : Type) [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ]
-    (η : Γ →* ℤˣ) (Ψ : Γ →* Oˣ) : GCond O η Ψ := fun _ _ _ _ _ => True
+def GCond.noCondition
+    (O : Type) [CommRing O] [IsLocalRing O]
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+    (η : Γ →* ℤˣ) (Ψ : Γ →* Oˣ)
+    : GCond O η Ψ := fun _ _ _ _ _ =>
+  True
 
 def GRepresents (P : GCond O η Ψ) (r : GLift O η Ψ R) : Prop :=
   ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'],
-    (∀ f : R →ₐ[O] R', P R' (r.map f)) ∧ ∀ r' : GLift O η Ψ R', P R' r' → ∃! f : R →ₐ[O] R', r.map f = r'
+    (∀ f : R →ₐ[O] R', P R' (r.map f))
+      ∧ ∀ r' : GLift O η Ψ R', P R' r' → ∃! f : R →ₐ[O] R', r.map f = r'
 
 structure Univ (P : GCond O η Ψ) : Type 1 where
   R : Type
@@ -98,17 +118,21 @@ structure Univ (P : GCond O η Ψ) : Type 1 where
 
 attribute [instance] Univ.cr Univ.al Univ.co
 
-def OnI (U : Univ (GCond.noCondition O η Ψ)) (I : Ideal U.R) : GCond O η Ψ :=
-  fun R _ _ _ r => ∃ f : U.R →ₐ[O] R, U.r.map f = r ∧ I ≤ RingHom.ker f
+def OnI (U : Univ (GCond.noCondition O η Ψ)) (I : Ideal U.R) : GCond O η Ψ := fun R _ _ _ r =>
+  ∃ f : U.R →ₐ[O] R, U.r.map f = r ∧ I ≤ RingHom.ker f
 
 def Kills (N : Set Γ) : GCond O η Ψ := fun _ _ _ _ r => ∀ g ∈ N, r.hom g = 1
 
-def BoxCond (N : Set Γ) {H : Type} [Group H] [TopologicalSpace H] (ι : H →* Γ) (hι : Continuous ι)
-    (U : Univ (GCond.noCondition O (η.comp ι) (Ψ.comp ι))) (I : Ideal U.R) : GCond O η Ψ :=
-  fun R _ _ _ r => Kills N R r ∧ OnI U I R (r.comap ι hι)
+def BoxCond
+    (N : Set Γ)
+    {H : Type} [Group H] [TopologicalSpace H]
+    (ι : H →* Γ) (hι : Continuous ι) (U : Univ (GCond.noCondition O (η.comp ι) (Ψ.comp ι)))
+    (I : Ideal U.R)
+    : GCond O η Ψ := fun R _ _ _ r =>
+  Kills N R r ∧ OnI U I R (r.comap ι hι)
 
-def NormCond (c g₁ : Γ) (P : GCond O η Ψ) : GCond O η Ψ :=
-  fun R _ _ _ r => Normalised c g₁ r.hom ∧ P R r
+def NormCond (c g₁ : Γ) (P : GCond O η Ψ) : GCond O η Ψ := fun R _ _ _ r =>
+  Normalised c g₁ r.hom ∧ P R r
 
 end Lift
 
@@ -116,24 +140,31 @@ section Points
 
 variable (O : Type) [CommRing O] {Γ R : Type} [Group Γ] [CommRing R] [Algebra O R]
 
-def entAlg (r : Γ →* GG (m := 3) (R := R)) : Subalgebra O R := Algebra.adjoin O {x | ∃ g a b, x = (r g).mat a b}
+def entAlg (r : Γ →* GG (m := 3) (R := R)) : Subalgebra O R :=
+  Algebra.adjoin O {x | ∃ g a b, x = (r g).mat a b}
 
 def entMon (r : Γ →* GG (m := 3) (R := R)) (j : ℤ) : Set R :=
   {x | ∃ L : List (Γ × Fin 3 × Fin 3), (L.map fun s => wt s.2.1 s.2.2).sum = j ∧
     x = (L.map fun s => (r s.1).mat s.2.1 s.2.2).prod}
 
-def weightZeroSubalgebra (r : Γ →* GG (m := 3) (R := R)) : Subalgebra O R := Algebra.adjoin O (entMon r 0)
+def weightZeroSubalgebra (r : Γ →* GG (m := 3) (R := R)) : Subalgebra O R :=
+  Algebra.adjoin O (entMon r 0)
 
 variable {O} {κ : Type} [CommRing κ] [Algebra O κ]
 
-def push (f : R →ₐ[O] κ) (r : Γ →* GG (m := 3) (R := R)) : Γ →* GG (m := 3) (R := κ) := (GG.map (f : R →+* κ)).comp r
+def push (f : R →ₐ[O] κ) (r : Γ →* GG (m := 3) (R := R)) : Γ →* GG (m := 3) (R := κ) :=
+  (GG.map (f : R →+* κ)).comp r
 
-def IsPush {A : Subalgebra O R} (ξ : A →ₐ[O] κ) (r : Γ →* GG (m := 3) (R := R)) (r' : Γ →* GG (m := 3) (R := κ)) : Prop :=
+def IsPush
+    {A : Subalgebra O R} (ξ : A →ₐ[O] κ)
+    (r : Γ →* GG (m := 3) (R := R)) (r' : Γ →* GG (m := 3) (R := κ))
+    : Prop :=
   ∀ g, (r' g).right = (r g).right ∧ ∀ a b, ∃ h : (r g).mat a b ∈ A, (r' g).mat a b = ξ ⟨_, h⟩
 
-def tanCoc (F : R →ₐ[O] DualNumber κ) (r : Γ →* GG (m := 3) (R := R)) (g : Γ) : Matrix (Fin 3) (Fin 3) κ :=
-  ((r g).mat.map fun x => (F x).snd) *
-    (((r g).left⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R).map fun x => (F x).fst
+def tanCoc (F : R →ₐ[O] DualNumber κ) (r : Γ →* GG (m := 3) (R := R)) (g : Γ)
+    : Matrix (Fin 3) (Fin 3) κ :=
+  ((r g).mat.map fun x => (F x).snd)
+    * (((r g).left⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R).map fun x => (F x).fst
 
 def dualFst (F : R →ₐ[O] DualNumber κ) : R →ₐ[O] κ := (TrivSqZeroExt.fstHom O κ κ).comp F
 
@@ -141,7 +172,8 @@ def Rigid (r : Γ →* GG (m := 3) (R := R)) (f : R →ₐ[O] κ) : Prop :=
   ∀ F : R →ₐ[O] DualNumber κ, dualFst F = f → ∃ X, tanCoc F r = cob (push f r) X
 
 def RigidWt (j : ℤ) (r : Γ →* GG (m := 3) (R := R)) (f : R →ₐ[O] κ) : Prop :=
-  ∀ F : R →ₐ[O] DualNumber κ, dualFst F = f → (∀ g, tanCoc F r g ∈ gw (R := κ) j) → ∃ X, tanCoc F r = cob (push f r) X
+  ∀ F : R →ₐ[O] DualNumber κ,
+    dualFst F = f → (∀ g, tanCoc F r g ∈ gw (R := κ) j) → ∃ X, tanCoc F r = cob (push f r) X
 
 def IsLocPt [IsLocalRing R] {κ : Type} [NormedField κ] [Algebra O κ] (f : R →ₐ[O] κ) : Prop :=
   ∀ x ∈ maximalIdeal R, ‖f x‖ < 1
@@ -150,10 +182,13 @@ end Points
 
 section Base
 
-variable (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O]
-  {Γ : Type} [Group Γ] [TopologicalSpace Γ] (η : Γ →* ℤˣ) (Ψ : Γ →* Oˣ)
+variable
+  (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O]
+  {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+  (η : Γ →* ℤˣ) (Ψ : Γ →* Oˣ)
 
-def baseLift (hΨ : ∀ j : ℤ, AdicCont (maximalIdeal O) fun g => ((Ψ g ^ j : Oˣ) : O)) : GLift O η Ψ O where
+def baseLift (hΨ : ∀ j : ℤ, AdicCont (maximalIdeal O) fun g => ((Ψ g ^ j : Oˣ) : O))
+    : GLift O η Ψ O where
   hom := r0 η Ψ
   cont a b := by
     by_cases h : a = b

@@ -23,8 +23,8 @@ theorem expC_injOn (ε : Fin n → Bool) : ∃ ρ₀ > 0, Set.InjOn (expC ε) (M
   rw [uMat_expC, uMat_expC] at e2
   exact Matrix.of.injective e2
 
-theorem lamM_apply (ε : Fin n → Bool) (s : ℝ) {B : Set (Formalism.REAL.UJ ε)} (hB : MeasurableSet B) :
-    lamM ε s B = ∫⁻ t in expC ε ⁻¹' B ∩ Metric.ball 0 s, jd ε t := by
+theorem lamM_apply (ε : Fin n → Bool) (s : ℝ) {B : Set (Formalism.REAL.UJ ε)} (hB : MeasurableSet B)
+    : lamM ε s B = ∫⁻ t in expC ε ⁻¹' B ∩ Metric.ball 0 s, jd ε t := by
   have hm : MeasurableSet (expC ε ⁻¹' B) := (continuous_expC ε).measurable hB
   rw [lamM, Measure.map_apply (continuous_expC ε).measurable hB, withDensity_apply _ hm,
     Measure.restrict_restrict hm]
@@ -79,7 +79,8 @@ theorem locInvOf (ε : Fin n → Bool) : LocInvOf ε := by
   have hTm : MeasurableSet T := ((continuous_expC ε).measurable hA).inter measurableSet_ball
   rw [lamM_apply ε s hzAm, lamM_apply ε s hA, ← himage,
     lintegral_image_eq_lintegral_abs_det_fderiv_mul volume hTm
-      (fun t ht => ((hφ.differentiableAt (hU.mem_nhds (hTU t ht).1)).hasFDerivAt).hasFDerivWithinAt) hinjT]
+      (fun t ht => ((hφ.differentiableAt (hU.mem_nhds (hTU t ht).1)).hasFDerivAt).hasFDerivWithinAt)
+      hinjT]
   refine setLIntegral_congr_fun hTm (fun t ht => ?_)
   simp only [jd]
   rw [← ENNReal.ofReal_mul (abs_nonneg _), mul_comm, hJ U φ (uMat z) hU hφ hΘ t (hTU t ht).1]

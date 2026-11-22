@@ -18,8 +18,9 @@ section Abstract
 
 variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem finite_out_ne_zero (K : Subgroup G) (hKo : IsOpen (K : Set G)) {φ : G → ℂ} (hφ : HasCompactSupport φ) :
-    {q : G ⧸ K | φ q.out ≠ 0}.Finite := by
+theorem finite_out_ne_zero
+    (K : Subgroup G) (hKo : IsOpen (K : Set G)) {φ : G → ℂ} (hφ : HasCompactSupport φ)
+    : {q : G ⧸ K | φ q.out ≠ 0}.Finite := by
   haveI : DiscreteTopology (G ⧸ K) := QuotientGroup.discreteTopology hKo
   have hc : IsCompact ((QuotientGroup.mk : G → G ⧸ K) '' tsupport φ) :=
     hφ.isCompact.image QuotientGroup.continuous_mk
@@ -28,8 +29,8 @@ theorem finite_out_ne_zero (K : Subgroup G) (hKo : IsOpen (K : Set G)) {φ : G �
 
 variable [MeasurableSpace G] [BorelSpace G]
 
-theorem measure_coset (μ : Measure G) [μ.IsMulLeftInvariant] (K : Subgroup G) (q : G ⧸ K) :
-    μ ((QuotientGroup.mk : G → G ⧸ K) ⁻¹' {q}) = μ (K : Set G) := by
+theorem measure_coset (μ : Measure G) [μ.IsMulLeftInvariant] (K : Subgroup G) (q : G ⧸ K)
+    : μ ((QuotientGroup.mk : G → G ⧸ K) ⁻¹' {q}) = μ (K : Set G) := by
   have e : (QuotientGroup.mk : G → G ⧸ K) ⁻¹' {q} = (fun h => q.out⁻¹ * h) ⁻¹' (K : Set G) := by
     ext g
     simp only [Set.mem_preimage, Set.mem_singleton_iff, SetLike.mem_coe]
@@ -37,10 +38,11 @@ theorem measure_coset (μ : Measure G) [μ.IsMulLeftInvariant] (K : Subgroup G) 
     exact eq_comm
   rw [e, measure_preimage_mul]
 
-theorem integral_eq_sum (μ : Measure G) [μ.IsMulLeftInvariant] (K : Subgroup G) (hKo : IsOpen (K : Set G))
-    (hfin : μ (K : Set G) ≠ ⊤) {φ : G → ℂ} (hφ : HasCompactSupport φ)
-    (hr : ∀ g, ∀ k ∈ K, φ (g * k) = φ g) :
-    ∫ g, φ g ∂μ = μ.real (K : Set G) • ∑ᶠ q : G ⧸ K, φ q.out := by
+theorem integral_eq_sum
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (K : Subgroup G) (hKo : IsOpen (K : Set G)) (hfin : μ (K : Set G) ≠ ⊤)
+    {φ : G → ℂ} (hφ : HasCompactSupport φ) (hr : ∀ g, ∀ k ∈ K, φ (g * k) = φ g)
+    : ∫ g, φ g ∂μ = μ.real (K : Set G) • ∑ᶠ q : G ⧸ K, φ q.out := by
   classical
   haveI : DiscreteTopology (G ⧸ K) := QuotientGroup.discreteTopology hKo
   have hF := finite_out_ne_zero K hKo hφ
@@ -50,10 +52,14 @@ theorem integral_eq_sum (μ : Measure G) [μ.IsMulLeftInvariant] (K : Subgroup G
   have hout : ∀ g : G, φ ((g : G ⧸ K)).out = φ g := fun g => by
     obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul K g
     rw [hk, hr g k k.2]
-  have hsum : φ = fun g => ∑ q ∈ S, ((QuotientGroup.mk : G → G ⧸ K) ⁻¹' {q}).indicator (fun _ => φ q.out) g := by
+  have hsum
+      : φ
+        = fun g =>
+          ∑ q ∈ S, ((QuotientGroup.mk : G → G ⧸ K) ⁻¹' {q}).indicator (fun _ => φ q.out) g := by
     funext g
-    have : ∀ q : G ⧸ K, ((QuotientGroup.mk : G → G ⧸ K) ⁻¹' {q}).indicator (fun _ => φ q.out) g =
-        if (g : G ⧸ K) = q then φ q.out else 0 := fun q => by
+    have : ∀ q : G ⧸ K,
+        ((QuotientGroup.mk : G → G ⧸ K) ⁻¹' {q}).indicator (fun _ => φ q.out) g
+          = if (g : G ⧸ K) = q then φ q.out else 0 := fun q => by
       simp [Set.indicator_apply]
     simp only [this, Finset.sum_ite_eq]
     split_ifs with h
@@ -62,7 +68,9 @@ theorem integral_eq_sum (μ : Measure G) [μ.IsMulLeftInvariant] (K : Subgroup G
         by_contra h0
         exact h (hF.mem_toFinset.2 h0)
       rw [← hout g, this]
-  have hint : ∀ q ∈ S, Integrable (((QuotientGroup.mk : G → G ⧸ K) ⁻¹' {q}).indicator (fun _ => φ q.out)) μ := by
+  have hint
+      : ∀ q ∈ S,
+        Integrable (((QuotientGroup.mk : G → G ⧸ K) ⁻¹' {q}).indicator (fun _ => φ q.out)) μ := by
     intro q _
     refine (integrable_indicator_iff (hmeas q)).2 (integrableOn_const ?_)
     rw [measure_coset]
@@ -74,13 +82,15 @@ theorem integral_eq_sum (μ : Measure G) [μ.IsMulLeftInvariant] (K : Subgroup G
   rw [integral_indicator_const _ (hmeas q)]
   simp only [Measure.real, measure_coset]
 
-theorem adjoint_of_inv (μ : Measure G) [μ.IsHaarMeasure] [μ.IsInvInvariant] (K : Subgroup G)
-    (hKo : IsOpen (K : Set G)) (hKc : IsCompact (K : Set G)) (e : G → ℂ) (he : HasCompactSupport e)
-    (hbi : ∀ k₁ ∈ K, ∀ k₂ ∈ K, ∀ g, e (k₁ * g * k₂) = e g)
-    {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ)
-    (hB : ∀ g v w, B (ρ g v) (ρ g w) = B v w) (v w : V) (hv : ∀ k ∈ K, ρ k v = v) (hw : ∀ k ∈ K, ρ k w = w) :
-    B (∑ᶠ q : G ⧸ K, e q.out • ρ q.out v) w =
-      B v (∑ᶠ q : G ⧸ K, starRingEnd ℂ (e q.out⁻¹) • ρ q.out w) := by
+theorem adjoint_of_inv
+    (μ : Measure G) [μ.IsHaarMeasure] [μ.IsInvInvariant]
+    (K : Subgroup G) (hKo : IsOpen (K : Set G)) (hKc : IsCompact (K : Set G))
+    (e : G → ℂ) (he : HasCompactSupport e) (hbi : ∀ k₁ ∈ K, ∀ k₂ ∈ K, ∀ g, e (k₁ * g * k₂) = e g)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hB : ∀ g v w, B (ρ g v) (ρ g w) = B v w)
+    (v w : V) (hv : ∀ k ∈ K, ρ k v = v) (hw : ∀ k ∈ K, ρ k w = w)
+    : B (∑ᶠ q : G ⧸ K, e q.out • ρ q.out v) w
+      = B v (∑ᶠ q : G ⧸ K, starRingEnd ℂ (e q.out⁻¹) • ρ q.out w) := by
   have hfin : μ (K : Set G) ≠ ⊤ := hKc.measure_lt_top.ne
   have hpos : μ.real (K : Set G) ≠ 0 :=
     (ENNReal.toReal_pos (hKo.measure_pos μ ⟨1, K.one_mem⟩).ne' hfin).ne'
@@ -122,12 +132,15 @@ end Abstract
 
 section GeneralLinearIntegers
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem isInvInvariant [MeasurableSpace F] [BorelSpace F] (μ : Measure (GL ι F)) [μ.IsHaarMeasure]
-    (K : Subgroup (GL ι F)) (hKo : IsOpen (K : Set (GL ι F))) (hKc : IsCompact (K : Set (GL ι F))) :
-    μ.IsInvInvariant := by
+theorem isInvInvariant
+    [MeasurableSpace F] [BorelSpace F]
+    (μ : Measure (GL ι F)) [μ.IsHaarMeasure]
+    (K : Subgroup (GL ι F)) (hKo : IsOpen (K : Set (GL ι F))) (hKc : IsCompact (K : Set (GL ι F)))
+    : μ.IsInvInvariant := by
   refine ⟨?_⟩
   have hc := Measure.isMulLeftInvariant_eq_smul μ.inv μ
   have hne : μ (K : Set (GL ι F)) ≠ 0 := (hKo.measure_pos μ ⟨1, K.one_mem⟩).ne'
@@ -143,11 +156,15 @@ theorem isInvInvariant [MeasurableSpace F] [BorelSpace F] (μ : Measure (GL ι F
 
 end GeneralLinearIntegers
 
-theorem hk_adjoint : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-    (ι : Type) [Fintype ι] [DecidableEq ι] (K : Subgroup (GL ι F)) (e : GL ι F → ℂ), IsHk K e →
-    IsHk K (hstar e) ∧ ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL ι F) V)
-      (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ), (∀ g v w, B (ρ g v) (ρ g w) = B v w) → ∀ v ∈ fixed ρ K, ∀ w ∈ fixed ρ K,
-      B (hk ρ K e v) w = B v (hk ρ K (hstar e) w) := by
+theorem hk_adjoint
+    : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        (ι : Type) [Fintype ι] [DecidableEq ι] (K : Subgroup (GL ι F)) (e : GL ι F → ℂ),
+      IsHk K e
+        → IsHk K (hstar e)
+          ∧ ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL ι F) V)
+              (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ),
+            (∀ g v w, B (ρ g v) (ρ g w) = B v w)
+              → ∀ v ∈ fixed ρ K, ∀ w ∈ fixed ρ K, B (hk ρ K e v) w = B v (hk ρ K (hstar e) w) := by
   intro F _ _ _ _ ι _ _ K e he
   obtain ⟨hKo, hKc, hc, hbi⟩ := he
   refine ⟨⟨hKo, hKc, ?_, ?_⟩, ?_⟩
@@ -160,6 +177,7 @@ theorem hk_adjoint : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace
     borelize F
     haveI := isInvInvariant (Measure.haar : Measure (GL ι F)) K hKo hKc
     exact adjoint_of_inv Measure.haar K hKo hKc e hc hbi ρ B hB v w
-      (fun k hk => by simpa using hv ⟨k, hk⟩) (fun k hk => by simpa using hw ⟨k, hk⟩)
+      (fun k hk => by simpa using hv ⟨k, hk⟩)
+      (fun k hk => by simpa using hw ⟨k, hk⟩)
 
 end GlobalTheory.CompanionTheory.HeckeAdj

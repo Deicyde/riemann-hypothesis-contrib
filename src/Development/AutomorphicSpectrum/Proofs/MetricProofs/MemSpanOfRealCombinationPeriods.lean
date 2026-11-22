@@ -9,19 +9,21 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.QuotientLattic
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+  GroundTheory.Heights₂.Heights.Regular
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp
 
-theorem mem_span_part_of_period_real_comb :
-    ∀ (g k n : ℕ) (Λ : Type) [AddCommGroup Λ] (P : Λ →+ (Fin g → ℂ))
-      (b : Module.Basis (Fin n) ℤ Λ) (f : Fin k → Fin n),
-      LinearIndependent ℝ (fun j => P (b j)) → Function.Injective f →
-      ∀ (x : Λ) (c : Fin k → ℝ), P x = ∑ i, (c i : ℂ) • P (b (f i)) →
-        x ∈ Submodule.span ℤ (Set.range fun i => b (f i)) := by
+theorem mem_span_part_of_period_real_comb
+    : ∀ (g k n : ℕ) (Λ : Type) [AddCommGroup Λ] (P : Λ →+ (Fin g → ℂ))
+        (b : Module.Basis (Fin n) ℤ Λ) (f : Fin k → Fin n),
+      LinearIndependent ℝ (fun j => P (b j)) → Function.Injective f
+        → ∀ (x : Λ) (c : Fin k → ℝ),
+          P x = ∑ i, (c i : ℂ) • P (b (f i))
+            → x ∈ Submodule.span ℤ (Set.range fun i => b (f i)) := by
   intro g k n Λ _ P b f hli hf x c hx
   classical
-
   have hPx : P x = ∑ j, ((b.repr x j : ℤ) : ℝ) • P (b j) := by
     conv_lhs => rw [← b.sum_repr x]
     set_option synthInstance.maxHeartbeats 100000 in

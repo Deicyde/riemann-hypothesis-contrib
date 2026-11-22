@@ -22,7 +22,8 @@ def mcast {a b : ℕ} (h : a = b) (τ : MRep k a) : MRep k b := h ▸ τ
 
 def gres {n : ℕ} (π : GRep k (n + 1)) : MRep k n := resM k π.ρ
 
-def phiN (ψ : AddChar k Circle) {n : ℕ} (τ : MRep k (n + 1)) : MRep k n := mtw (MRep.phiM k ψ τ) (-1 / 2)
+def phiN (ψ : AddChar k Circle) {n : ℕ} (τ : MRep k (n + 1)) : MRep k n :=
+  mtw (MRep.phiM k ψ τ) (-1 / 2)
 
 def psiN {n : ℕ} (τ : MRep k n) : GRep k n := (⟨_, psiMinus k τ.ρ⟩ : GRep k n).tw (-1 / 2)
 
@@ -37,7 +38,8 @@ def MIso {n : ℕ} (A B : MRep k n) : Prop := Nonempty (A.ρ.Equiv B.ρ)
 def GIso {n : ℕ} (A B : GRep k n) : Prop := Nonempty (A.ρ.Equiv B.ρ)
 
 def MExt {n : ℕ} (A B C : MRep k n) : Prop :=
-  ∃ S : Subrepresentation B.ρ, Nonempty ((subQuot S ⊥).Equiv A.ρ) ∧ Nonempty ((subQuot ⊤ S).Equiv C.ρ)
+  ∃ S : Subrepresentation B.ρ,
+    Nonempty ((subQuot S ⊥).Equiv A.ρ) ∧ Nonempty ((subQuot ⊤ S).Equiv C.ρ)
 
 end GlobalTheory.RgGu.Leib
 

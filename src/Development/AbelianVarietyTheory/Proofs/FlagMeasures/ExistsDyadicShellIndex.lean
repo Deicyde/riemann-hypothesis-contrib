@@ -9,8 +9,8 @@ open Finset
 
 namespace GlobalTheory
 
-theorem exists_dyadic_shell_index (ep : ℝ) (hep : 0 < ep) :
-    ∃ sh : ℝ → ℕ, (∀ s, s ≤ 2 ^ sh s * ep) ∧ ∀ s j, j < sh s → 2 ^ j * ep < s := by
+theorem exists_dyadic_shell_index (ep : ℝ) (hep : 0 < ep)
+    : ∃ sh : ℝ → ℕ, (∀ s, s ≤ 2 ^ sh s * ep) ∧ ∀ s j, j < sh s → 2 ^ j * ep < s := by
   classical
   have hex : ∀ s : ℝ, ∃ n : ℕ, s ≤ 2 ^ n * ep := by
     intro s
@@ -21,18 +21,29 @@ theorem exists_dyadic_shell_index (ep : ℝ) (hep : 0 < ep) :
   refine ⟨fun s => Nat.find (hex s), fun s => Nat.find_spec (hex s), fun s j hj => ?_⟩
   exact not_le.mp (Nat.find_min (hex s) hj)
 
-theorem sum_prod_box_erase_zero (ι : Type) [Fintype ι] [DecidableEq ι] (W : ℕ → ℝ) (N : ℕ) :
-    ∑ k ∈ (Fintype.piFinset (fun _ : ι => range (N + 1))).erase (fun _ => 0), ∏ v, W (k v)
+theorem sum_prod_box_erase_zero (ι : Type) [Fintype ι] [DecidableEq ι] (W : ℕ → ℝ) (N : ℕ)
+    : ∑ k ∈ (Fintype.piFinset (fun _ : ι => range (N + 1))).erase (fun _ => 0), ∏ v, W (k v)
       = (W 0 + ∑ i ∈ range N, W (i + 1)) ^ Fintype.card ι - W 0 ^ Fintype.card ι := by
   classical
   have hz : (fun _ : ι => (0 : ℕ)) ∈ Fintype.piFinset (fun _ : ι => range (N + 1)) := by
     simp [Fintype.mem_piFinset]
   rw [Finset.sum_erase_eq_sub hz,
-    ← Finset.prod_univ_sum (fun _ : ι => range (N + 1)) (fun _ j => W j),
-    Finset.prod_const, Finset.prod_const, Finset.card_univ, Finset.sum_range_succ', add_comm]
+    ← Finset.prod_univ_sum (fun _ : ι => range (N + 1)) (fun _ j => W j), Finset.prod_const,
+    Finset.prod_const, Finset.card_univ, Finset.sum_range_succ', add_comm]
 
-theorem sum_over_dyadic_shells :
-    ∀ (Γ ι : Type) [Fintype ι] (d : Γ → ι → ℝ) (w : Γ → ℝ) (A κ h ep c : ℝ), 0 ≤ A → 0 ≤ κ → 0 < ep → 0 < c → ep ≤ 1 / c → κ * ep ≤ Real.log 2 → 32 * κ ≤ h * ep → 1 ≤ h * ep ^ 2 / 16 → (∀ γ v, 0 ≤ d γ v) → (∀ r : ι → ℝ, (∀ v, 0 ≤ r v) → {γ | ∀ v, d γ v ≤ r v}.Finite ∧ (({γ | ∀ v, d γ v ≤ r v}.ncard : ℕ) : ℝ) ≤ A * Real.exp (κ * ∑ v, r v)) → (∀ γ, ∃ v, ep < d γ v) → (∀ γ, 0 ≤ w γ ∧ w γ ≤ ∏ v, Real.exp (-(h / 8) * min (d γ v ^ 2) (d γ v / c))) → Summable w ∧ ∑' γ, w γ ≤ A * (2 * Fintype.card ι * 3 ^ Fintype.card ι * Real.exp (-(h * ep ^ 2 / 16))) := by
+theorem sum_over_dyadic_shells
+    : ∀ (Γ ι : Type) [Fintype ι] (d : Γ → ι → ℝ) (w : Γ → ℝ) (A κ h ep c : ℝ),
+      0 ≤ A → 0 ≤ κ → 0 < ep → 0 < c → ep ≤ 1 / c → κ * ep ≤ Real.log 2 → 32 * κ ≤ h * ep
+        → 1 ≤ h * ep ^ 2 / 16 → (∀ γ v, 0 ≤ d γ v)
+        → (∀ r : ι → ℝ,
+          (∀ v, 0 ≤ r v)
+            → {γ | ∀ v, d γ v ≤ r v}.Finite
+              ∧ (({γ | ∀ v, d γ v ≤ r v}.ncard : ℕ) : ℝ) ≤ A * Real.exp (κ * ∑ v, r v))
+        → (∀ γ, ∃ v, ep < d γ v)
+        → (∀ γ, 0 ≤ w γ ∧ w γ ≤ ∏ v, Real.exp (-(h / 8) * min (d γ v ^ 2) (d γ v / c)))
+        → Summable w
+          ∧ ∑' γ, w γ
+            ≤ A * (2 * Fintype.card ι * 3 ^ Fintype.card ι * Real.exp (-(h * ep ^ 2 / 16))) := by
   intro Γ ι _ d w A κ h ep c hA hκ hep hc hepc hκep hh hT hd hcount hfar hw
   classical
   obtain ⟨sh, hsh1, hsh2⟩ := exists_dyadic_shell_index ep hep
@@ -85,12 +96,14 @@ theorem sum_over_dyadic_shells :
       rw [h2, hTdef]
       nlinarith
 
-  have hfib : ∀ (u : Finset Γ) (k : ι → ℕ),
-      ((u.filter fun γ => K γ = k).card : ℝ) ≤ A * ∏ v, Real.exp (κ * (2 ^ k v * ep)) := by
+  have hfib
+      : ∀ (u : Finset Γ) (k : ι → ℕ),
+        ((u.filter fun γ => K γ = k).card : ℝ) ≤ A * ∏ v, Real.exp (κ * (2 ^ k v * ep)) := by
     intro u k
     have hr : ∀ v, 0 ≤ (2 : ℝ) ^ k v * ep := fun v => mul_nonneg (pow_nonneg (by norm_num) _) hep.le
     obtain ⟨hfin, hcard⟩ := hcount (fun v => 2 ^ k v * ep) hr
-    have hsub : ((u.filter fun γ => K γ = k : Finset Γ) : Set Γ) ⊆ {γ | ∀ v, d γ v ≤ 2 ^ k v * ep} := by
+    have hsub
+        : ((u.filter fun γ => K γ = k : Finset Γ) : Set Γ) ⊆ {γ | ∀ v, d γ v ≤ 2 ^ k v * ep} := by
       intro γ hγ
       have hγ' := Finset.mem_filter.mp (Finset.mem_coe.mp hγ)
       intro v
@@ -99,14 +112,16 @@ theorem sum_over_dyadic_shells :
       exact this
     have hle := Set.ncard_le_ncard hsub hfin
     rw [Set.ncard_coe_finset] at hle
-    calc ((u.filter fun γ => K γ = k).card : ℝ)
+    calc
+      ((u.filter fun γ => K γ = k).card : ℝ)
         ≤ (({γ | ∀ v, d γ v ≤ 2 ^ k v * ep}.ncard : ℕ) : ℝ) := by exact_mod_cast hle
       _ ≤ A * Real.exp (κ * ∑ v, 2 ^ k v * ep) := hcard
-      _ = A * ∏ v, Real.exp (κ * (2 ^ k v * ep)) := by
-        rw [Finset.mul_sum, Real.exp_sum]
+      _ = A * ∏ v, Real.exp (κ * (2 ^ k v * ep)) := by rw [Finset.mul_sum, Real.exp_sum]
 
-  have hpart : ∀ u : Finset Γ, ∑ γ ∈ u, w γ
-      ≤ A * (2 * Fintype.card ι * 3 ^ Fintype.card ι * Real.exp (-(h * ep ^ 2 / 16))) := by
+  have hpart
+      : ∀ u : Finset Γ,
+        ∑ γ ∈ u, w γ
+          ≤ A * (2 * Fintype.card ι * 3 ^ Fintype.card ι * Real.exp (-(h * ep ^ 2 / 16))) := by
     intro u
     set N : ℕ := u.sup fun γ => Finset.univ.sup (K γ) with hN
     set B := (Fintype.piFinset fun _ : ι => range (N + 1)).erase (fun _ => 0) with hB
@@ -128,7 +143,9 @@ theorem sum_over_dyadic_shells :
     have hal2 : W 0 ≤ 2 := by
       show Real.exp (κ * (2 ^ 0 * ep)) * (if (0 : ℕ) = 0 then 1 else Real.exp (-T * 2 ^ 0)) ≤ 2
       rw [if_pos rfl, pow_zero, one_mul, mul_one]
-      calc Real.exp (κ * ep) ≤ Real.exp (Real.log 2) := Real.exp_le_exp.mpr hκep
+      calc
+        Real.exp (κ * ep)
+          ≤ Real.exp (Real.log 2) := Real.exp_le_exp.mpr hκep
         _ = 2 := Real.exp_log (by norm_num)
     have hT1 : 1 ≤ T := hT
     have hWs : ∀ i, W (i + 1) ≤ Real.exp (-T) * (1 / 2 : ℝ) ^ i := by
@@ -145,39 +162,42 @@ theorem sum_over_dyadic_shells :
       have h4 : 0 < Real.exp (-1) := Real.exp_pos _
       nlinarith
     have hbe : ∑ i ∈ range N, W (i + 1) ≤ 2 * Real.exp (-T) := by
-      calc ∑ i ∈ range N, W (i + 1) ≤ ∑ i ∈ range N, Real.exp (-T) * (1 / 2 : ℝ) ^ i :=
-            Finset.sum_le_sum fun i _ => hWs i
+      calc
+        ∑ i ∈ range N, W (i + 1)
+          ≤ ∑ i ∈ range N, Real.exp (-T) * (1 / 2 : ℝ) ^ i := Finset.sum_le_sum fun i _ => hWs i
         _ = Real.exp (-T) * ∑ i ∈ range N, (1 / 2 : ℝ) ^ i := by rw [Finset.mul_sum]
         _ ≤ Real.exp (-T) * 2 :=
-            mul_le_mul_of_nonneg_left (sum_geometric_two_le N) (Real.exp_pos _).le
+          mul_le_mul_of_nonneg_left (sum_geometric_two_le N) (Real.exp_pos _).le
         _ = 2 * Real.exp (-T) := mul_comm _ _
     have hbe0 : 0 ≤ ∑ i ∈ range N, W (i + 1) := Finset.sum_nonneg fun i _ => hW0 _
     have hbe1 : ∑ i ∈ range N, W (i + 1) ≤ 1 := by linarith
     have hbox := sum_prod_box_erase_zero ι W N
     have key := hpow (W 0) (∑ i ∈ range N, W (i + 1)) (Fintype.card ι) hal0 hal2 hbe0 hbe1
-    calc ∑ γ ∈ u, w γ ≤ ∑ γ ∈ u, ∏ v, F (K γ v) := Finset.sum_le_sum fun γ _ => hwF γ
+    calc
+      ∑ γ ∈ u, w γ
+        ≤ ∑ γ ∈ u, ∏ v, F (K γ v) := Finset.sum_le_sum fun γ _ => hwF γ
       _ = ∑ k ∈ B, ∑ γ ∈ u with K γ = k, ∏ v, F (k v) :=
-          (Finset.sum_fiberwise_of_maps_to' hmaps (fun k => ∏ v, F (k v))).symm
+        (Finset.sum_fiberwise_of_maps_to' hmaps (fun k => ∏ v, F (k v))).symm
       _ = ∑ k ∈ B, ((u.filter fun γ => K γ = k).card : ℝ) * ∏ v, F (k v) := by
-          refine Finset.sum_congr rfl fun k _ => ?_
-          rw [Finset.sum_const, nsmul_eq_mul]
+        refine Finset.sum_congr rfl fun k _ => ?_
+        rw [Finset.sum_const, nsmul_eq_mul]
       _ ≤ ∑ k ∈ B, (A * ∏ v, Real.exp (κ * (2 ^ k v * ep))) * ∏ v, F (k v) :=
-          Finset.sum_le_sum fun k _ =>
-            mul_le_mul_of_nonneg_right (hfib u k) (Finset.prod_nonneg fun v _ => hF0 _)
+        Finset.sum_le_sum fun k _ =>
+          mul_le_mul_of_nonneg_right (hfib u k) (Finset.prod_nonneg fun v _ => hF0 _)
       _ = A * ∑ k ∈ B, ∏ v, W (k v) := by
-          rw [Finset.mul_sum]
-          refine Finset.sum_congr rfl fun k _ => ?_
-          rw [mul_assoc, ← Finset.prod_mul_distrib]
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl fun k _ => ?_
+        rw [mul_assoc, ← Finset.prod_mul_distrib]
       _ = A * ((W 0 + ∑ i ∈ range N, W (i + 1)) ^ Fintype.card ι - W 0 ^ Fintype.card ι) := by
-          rw [hB, hbox]
+        rw [hB, hbox]
       _ ≤ A * (Fintype.card ι * (2 * Real.exp (-T)) * 3 ^ Fintype.card ι) := by
-          refine mul_le_mul_of_nonneg_left (key.trans ?_) hA
-          have h3 : (0 : ℝ) ≤ 3 ^ Fintype.card ι := pow_nonneg (by norm_num) _
-          have hn : (0 : ℝ) ≤ Fintype.card ι := Nat.cast_nonneg _
-          exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hbe hn) h3
+        refine mul_le_mul_of_nonneg_left (key.trans ?_) hA
+        have h3 : (0 : ℝ) ≤ 3 ^ Fintype.card ι := pow_nonneg (by norm_num) _
+        have hn : (0 : ℝ) ≤ Fintype.card ι := Nat.cast_nonneg _
+        exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hbe hn) h3
       _ = A * (2 * Fintype.card ι * 3 ^ Fintype.card ι * Real.exp (-(h * ep ^ 2 / 16))) := by
-          rw [hTdef]
-          ring
+        rw [hTdef]
+        ring
   have hw0 : 0 ≤ w := fun γ => (hw γ).1
   exact ⟨summable_of_sum_le hw0 hpart, Real.tsum_le_of_sum_le hw0 hpart⟩
 

@@ -17,14 +17,17 @@ theorem enorm_ofReal_toReal_le (r : ℝ≥0∞) : ‖((r.toReal : ℝ) : ℂ)‖
   rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg ENNReal.toReal_nonneg]
   exact ENNReal.ofReal_toReal_le
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
-theorem lintegral_indicator_ne_top (μ : Measure G) [μ.IsHaarMeasure]
-    (T : Subgroup G) (ν : Measure T) [ν.IsHaarMeasure] [ν.IsInvInvariant] {C : Set G}
-    (hT : IsClosed (T : Set G)) (hC : IsCompact C) {ρ0 : G → ℝ≥0∞}
-    (h0 : IsQuotNormaliser T ν ρ0) :
-    ∫⁻ g, ((T : Set G) * C).indicator 1 g * ρ0 g ∂μ ≠ ⊤ := by
+theorem lintegral_indicator_ne_top
+    (μ : Measure G) [μ.IsHaarMeasure]
+    (T : Subgroup G) (ν : Measure T) [ν.IsHaarMeasure] [ν.IsInvInvariant]
+    {C : Set G}
+    (hT : IsClosed (T : Set G)) (hC : IsCompact C)
+    {ρ0 : G → ℝ≥0∞} (h0 : IsQuotNormaliser T ν ρ0)
+    : ∫⁻ g, ((T : Set G) * C).indicator 1 g * ρ0 g ∂μ ≠ ⊤ := by
   classical
   have : LocallyCompactSpace T := hT.isClosedEmbedding_subtypeVal.locallyCompactSpace
   have : SecondCountableTopology T := TopologicalSpace.Subtype.secondCountableTopology (T : Set G)
@@ -44,9 +47,15 @@ theorem lintegral_indicator_ne_top (μ : Measure G) [μ.IsHaarMeasure]
     intro t ht x
     constructor
     · rintro ⟨s, hs, c, hc, hsc⟩
-      exact ⟨t⁻¹ * s, T.mul_mem (T.inv_mem ht) hs, c, hc, by
-        show t⁻¹ * s * c = x
-        rw [mul_assoc, show s * c = t * x from hsc, inv_mul_cancel_left]⟩
+      exact ⟨
+        t⁻¹ * s,
+        T.mul_mem (T.inv_mem ht) hs,
+        c,
+        hc,
+        by
+          show t⁻¹ * s * c = x
+          rw [mul_assoc, show s * c = t * x from hsc, inv_mul_cancel_left]
+      ⟩
     · rintro ⟨s, hs, c, hc, rfl⟩
       exact ⟨t * s, T.mul_mem ht hs, c, hc, mul_assoc _ _ _⟩
   have hKind : Measurable (K.indicator (1 : G → ℝ≥0∞)) := measurable_one.indicator hKm
@@ -57,8 +66,10 @@ theorem lintegral_indicator_ne_top (μ : Measure G) [μ.IsHaarMeasure]
     exact this.lintegral_prod_right'
   have hIT : ∀ t ∈ T, ∀ g, I (t * g) = I g := by
     intro t ht g
-    have := lintegral_mul_right_eq_self (μ := ν)
-      (fun h : T => K.indicator (1 : G → ℝ≥0∞) ((h : G) * g)) ⟨t, ht⟩
+    have :=
+      lintegral_mul_right_eq_self (μ := ν)
+        (fun h : T => K.indicator (1 : G → ℝ≥0∞) ((h : G) * g))
+        ⟨t, ht⟩
     simp only [hIdef]
     rw [← this]
     refine lintegral_congr fun h => ?_
@@ -94,12 +105,14 @@ theorem lintegral_indicator_ne_top (μ : Measure G) [μ.IsHaarMeasure]
     refine ⟨Measurable.piecewise hSm (hKind.mul hIm.inv) h0.1, fun g => ?_⟩
     by_cases hg : g ∈ S
     · have hmem : ∀ h : T, (h : G) * g ∈ S := fun h => (hSinv _ h.2 g).2 hg
-      calc ∫⁻ h : T, ρ ((h : G) * g) ∂ν = ∫⁻ h : T, K.indicator 1 ((h : G) * g) * (I g)⁻¹ ∂ν := by
-            refine lintegral_congr fun h => ?_
-            simp only [hρdef, Set.piecewise_eq_of_mem _ _ _ (hmem h), hIT _ h.2]
+      calc
+        ∫⁻ h : T, ρ ((h : G) * g) ∂ν = ∫⁻ h : T, K.indicator 1 ((h : G) * g) * (I g)⁻¹ ∂ν := by
+          refine lintegral_congr fun h => ?_
+          simp only [hρdef, Set.piecewise_eq_of_mem _ _ _ (hmem h), hIT _ h.2]
         _ = I g * (I g)⁻¹ := lintegral_mul_const _ (hKind.comp (hmcoe.mul_const g))
-        _ = 1 := ENNReal.mul_inv_cancel
-              (ne_of_gt (lt_of_lt_of_le (pos_iff_ne_zero.mpr hVpos) (hIC g hg))) (hIfin g)
+        _ = 1 :=
+          ENNReal.mul_inv_cancel (ne_of_gt (lt_of_lt_of_le (pos_iff_ne_zero.mpr hVpos) (hIC g hg)))
+            (hIfin g)
     · have hmem : ∀ h : T, (h : G) * g ∉ S := fun h hh => hg ((hSinv _ h.2 g).1 hh)
       rw [← h0.2 g]
       refine lintegral_congr fun h => ?_
@@ -120,20 +133,28 @@ theorem lintegral_indicator_ne_top (μ : Measure G) [μ.IsHaarMeasure]
   · rw [lintegral_mul_const _ hKind, lintegral_indicator_one hKm]
     exact ENNReal.mul_lt_top hKc.measure_lt_top (ENNReal.inv_lt_top.mpr (pos_iff_ne_zero.mpr hVpos))
 
-theorem main (μ : Measure G) [μ.IsHaarMeasure] (T : Subgroup G) (ν : Measure T) [ν.IsHaarMeasure]
-    [ν.IsInvInvariant] (C : Set G) (hT : IsClosed (T : Set G)) (hC : IsCompact C) :
-    ∃ A : ℝ, 0 ≤ A ∧ ∀ (F : G → ℂ) (B : ℝ), 0 ≤ B → Measurable F →
-      (∀ t ∈ T, ∀ x, F (t * x) = F x) → (∀ x, F x ≠ 0 → x ∈ (T : Set G) * C) →
-      (∀ x ∈ C, ‖F x‖ ≤ B) → quotLIntegral μ T ν (fun x => ‖F x‖ₑ) ≠ ⊤ ∧
-        ‖quotIntegral μ T ν F‖ ≤ A * B := by
+theorem main
+    (μ : Measure G) [μ.IsHaarMeasure]
+    (T : Subgroup G) (ν : Measure T) [ν.IsHaarMeasure] [ν.IsInvInvariant]
+    (C : Set G)
+    (hT : IsClosed (T : Set G)) (hC : IsCompact C)
+    : ∃ A : ℝ,
+      0 ≤ A
+        ∧ ∀ (F : G → ℂ) (B : ℝ),
+          0 ≤ B → Measurable F → (∀ t ∈ T, ∀ x, F (t * x) = F x)
+            → (∀ x, F x ≠ 0 → x ∈ (T : Set G) * C) → (∀ x ∈ C, ‖F x‖ ≤ B)
+            → quotLIntegral μ T ν (fun x => ‖F x‖ₑ) ≠ ⊤ ∧ ‖quotIntegral μ T ν F‖ ≤ A * B := by
   classical
   by_cases hex : ∃ ρ, IsQuotNormaliser T ν ρ
   · have h0 : IsQuotNormaliser T ν hex.choose := hex.choose_spec
     set S : Set G := (T : Set G) * C with hSdef
     have hL : ∫⁻ g, S.indicator 1 g * hex.choose g ∂μ ≠ ⊤ :=
       lintegral_indicator_ne_top μ T ν hT hC h0
-    refine ⟨(∫⁻ g, S.indicator 1 g * hex.choose g ∂μ).toReal, ENNReal.toReal_nonneg,
-      fun F B hB hF hFT hFS hFC => ?_⟩
+    refine ⟨
+      (∫⁻ g, S.indicator 1 g * hex.choose g ∂μ).toReal,
+      ENNReal.toReal_nonneg,
+      fun F B hB hF hFT hFS hFC => ?_
+    ⟩
     have hbound : ∀ g, ‖F g‖ₑ ≤ ENNReal.ofReal B * S.indicator 1 g := by
       intro g
       by_cases hg : g ∈ S
@@ -145,33 +166,36 @@ theorem main (μ : Measure G) [μ.IsHaarMeasure] (T : Subgroup G) (ν : Measure 
           by_contra h
           exact hg (hFS g h)
         simp [this]
-    have hle : ∫⁻ g, ‖F g‖ₑ * hex.choose g ∂μ ≤
-        ENNReal.ofReal B * ∫⁻ g, S.indicator 1 g * hex.choose g ∂μ := by
-      calc ∫⁻ g, ‖F g‖ₑ * hex.choose g ∂μ
-          ≤ ∫⁻ g, ENNReal.ofReal B * (S.indicator 1 g * hex.choose g) ∂μ :=
-            lintegral_mono fun g => by
-              rw [← mul_assoc]
-              gcongr
-              exact hbound g
+    have hle
+        : ∫⁻ g, ‖F g‖ₑ * hex.choose g ∂μ
+          ≤ ENNReal.ofReal B * ∫⁻ g, S.indicator 1 g * hex.choose g ∂μ := by
+      calc
+        ∫⁻ g, ‖F g‖ₑ * hex.choose g ∂μ
+            ≤ ∫⁻ g, ENNReal.ofReal B * (S.indicator 1 g * hex.choose g) ∂μ :=
+          lintegral_mono fun g => by
+            rw [← mul_assoc]
+            gcongr
+            exact hbound g
         _ = ENNReal.ofReal B * ∫⁻ g, S.indicator 1 g * hex.choose g ∂μ :=
-            lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
+          lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
     have hne : ENNReal.ofReal B * ∫⁻ g, S.indicator 1 g * hex.choose g ∂μ ≠ ⊤ :=
       ENNReal.mul_ne_top ENNReal.ofReal_ne_top hL
     have hfin : ∫⁻ g, ‖F g‖ₑ * hex.choose g ∂μ ≠ ⊤ := ne_top_of_le_ne_top hne hle
     refine ⟨by rw [quotLIntegral, dite_eq_left hex]; exact hfin, ?_⟩
     rw [quotIntegral, dite_eq_left hex]
-    calc ‖∫ g, F g * ((hex.choose g).toReal : ℂ) ∂μ‖
+    calc
+      ‖∫ g, F g * ((hex.choose g).toReal : ℂ) ∂μ‖
         = ‖∫ g, F g * ((hex.choose g).toReal : ℂ) ∂μ‖ₑ.toReal := (toReal_enorm _).symm
       _ ≤ (∫⁻ g, ‖F g‖ₑ * hex.choose g ∂μ).toReal := by
-          refine ENNReal.toReal_mono hfin ((enorm_integral_le_lintegral_enorm _).trans
-            (lintegral_mono fun g => ?_))
-          rw [enorm_mul]
-          gcongr
-          exact enorm_ofReal_toReal_le _
+        refine ENNReal.toReal_mono hfin
+          ((enorm_integral_le_lintegral_enorm _).trans (lintegral_mono fun g => ?_))
+        rw [enorm_mul]
+        gcongr
+        exact enorm_ofReal_toReal_le _
       _ ≤ (ENNReal.ofReal B * ∫⁻ g, S.indicator 1 g * hex.choose g ∂μ).toReal :=
-          ENNReal.toReal_mono hne hle
+        ENNReal.toReal_mono hne hle
       _ = (∫⁻ g, S.indicator 1 g * hex.choose g ∂μ).toReal * B := by
-          rw [ENNReal.toReal_mul, ENNReal.toReal_ofReal hB, mul_comm]
+        rw [ENNReal.toReal_mul, ENNReal.toReal_ofReal hB, mul_comm]
   · refine ⟨0, le_rfl, fun F B _ _ _ _ _ => ?_⟩
     simp [quotLIntegral, quotIntegral, hex]
 

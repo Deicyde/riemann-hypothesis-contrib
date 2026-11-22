@@ -24,10 +24,14 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 noncomputable section
 
 open scoped ComplexConjugate NNReal ENNReal
-open MeasureTheory Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Doubling GlobalTheory.Eis GlobalTheory.Cusp GlobalTheory.MixModel
+open MeasureTheory Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Doubling GlobalTheory.Eis GlobalTheory.Cusp
+  GlobalTheory.MixModel
 open GlobalTheory.Mem.Th (InfF CptF)
-open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero (delta swSec sZero IsKFinVec ThetaClause DoublingIso)
+open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero
+  (delta swSec sZero IsKFinVec ThetaClause DoublingIso)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

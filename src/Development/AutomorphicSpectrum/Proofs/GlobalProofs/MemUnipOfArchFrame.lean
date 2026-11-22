@@ -13,8 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CompInfRTens
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SmGL GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-  GlobalTheory.UAut GlobalTheory.SiegelSet GlobalTheory.ThK.SquareIntegrability GlobalTheory.LFun.SplitTie
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SmGL GlobalTheory.PRep GlobalTheory.SplitWeil
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.UAut GlobalTheory.SiegelSet
+  GlobalTheory.ThK.SquareIntegrability GlobalTheory.LFun.SplitTie
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open scoped TensorProduct
 
@@ -28,9 +30,11 @@ section Lin
 
 variable {A : Type} [CommRing A] {r : ℕ}
 
-theorem pow_support (P : Fin r → Fin r → Prop) (hPt : ∀ i l j, P i l → P l j → P i j) (hPlt : ∀ i l, P i l → i < l)
-    (Q : Matrix (Fin r) (Fin r) A) (hQ : ∀ i l, Q i l ≠ 0 → P i l) (k : ℕ) :
-    ∀ i j, (Q ^ (k + 1)) i j ≠ 0 → P i j ∧ i.val + k + 1 ≤ j.val := by
+theorem pow_support
+    (P : Fin r → Fin r → Prop) (hPt : ∀ i l j, P i l → P l j → P i j) (hPlt : ∀ i l, P i l → i < l)
+    (Q : Matrix (Fin r) (Fin r) A) (hQ : ∀ i l, Q i l ≠ 0 → P i l)
+    (k : ℕ)
+    : ∀ i j, (Q ^ (k + 1)) i j ≠ 0 → P i j ∧ i.val + k + 1 ≤ j.val := by
   induction k with
   | zero =>
     intro i j h
@@ -48,9 +52,10 @@ theorem pow_support (P : Fin r → Fin r → Prop) (hPt : ∀ i l j, P i l → P
     rw [Fin.lt_def] at this
     omega
 
-theorem exists_inv_pattern (P : Fin r → Fin r → Prop) (hPt : ∀ i l j, P i l → P l j → P i j) (hPlt : ∀ i l, P i l → i < l)
-    (Q : Matrix (Fin r) (Fin r) A) (hQ : ∀ i l, Q i l ≠ 0 → P i l) :
-    ∃ Q' : Matrix (Fin r) (Fin r) A, (∀ i l, Q' i l ≠ 0 → P i l) ∧ (1 + Q) * (1 + Q') = 1 := by
+theorem exists_inv_pattern
+    (P : Fin r → Fin r → Prop) (hPt : ∀ i l j, P i l → P l j → P i j) (hPlt : ∀ i l, P i l → i < l)
+    (Q : Matrix (Fin r) (Fin r) A) (hQ : ∀ i l, Q i l ≠ 0 → P i l)
+    : ∃ Q' : Matrix (Fin r) (Fin r) A, (∀ i l, Q' i l ≠ 0 → P i l) ∧ (1 + Q) * (1 + Q') = 1 := by
   have hQn : ∀ i l, (-Q) i l ≠ 0 → P i l := fun i l h => hQ i l (by simpa using h)
   have hnil : (-Q) ^ (r + 1) = 0 := by
     ext i j
@@ -63,42 +68,55 @@ theorem exists_inv_pattern (P : Fin r → Fin r → Prop) (hPt : ∀ i l j, P i 
     obtain ⟨t, -, ht⟩ := Finset.exists_ne_zero_of_sum_ne_zero h
     exact (pow_support P hPt hPlt (-Q) hQn t i l ht).1
   · have e := mul_neg_geom_sum (-Q) (r + 1)
-    rw [hnil, sub_zero, sub_neg_eq_add, Finset.sum_range_succ', pow_zero, add_comm _ (1 : Matrix _ _ _)] at e
+    rw [hnil, sub_zero, sub_neg_eq_add, Finset.sum_range_succ', pow_zero,
+        add_comm _ (1 : Matrix _ _ _)]
+      at e
     exact e
 
 end Lin
 
 section Main
 
-theorem mem_unip_of_arch_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (r : ℕ) (Xf : Matrix (Fin n) (Fin r) E)
-    (S : Finset (Fin r)) (u : GAd σ J), u ∈ infPts σ J →
-    (∀ w : InfinitePlace F, ∃ N : Matrix (Fin r) (Fin r) (w.Completion ⊗[F] E),
-      (matHom _ σ J (projArch σ J w u)).1 * Xf.map (inclR (F := F) w.Completion) =
-        Xf.map (inclR (F := F) w.Completion) + Xf.map (inclR (F := F) w.Completion) * N ∧
-      (∀ i j, N i j ≠ 0 → ∃ k ∈ S, i ≤ k ∧ k < j) ∧
-      (∀ v : Fin n → w.Completion ⊗[F] E,
-        (∀ i : Fin r, (∃ k ∈ S, i ≤ k) → ((Formalism.UG.cT (σ : E →+* E) Xf * J).map (inclR (F := F) w.Completion) *ᵥ v) i = 0) →
-        ∃ a : Fin r → w.Completion ⊗[F] E, (∀ i, a i ≠ 0 → ∃ k ∈ S, i ≤ k) ∧
-          (matHom _ σ J (projArch σ J w u)).1 *ᵥ v - v = Xf.map (inclR (F := F) w.Completion) *ᵥ a)) →
-    u ∈ GlobalTheory.StdPar.unip σ J Xf S := by
+theorem mem_unip_of_arch_frame
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (r : ℕ)
+        (Xf : Matrix (Fin n) (Fin r) E) (S : Finset (Fin r)) (u : GAd σ J),
+      u ∈ infPts σ J
+        → (∀ w : InfinitePlace F, ∃ N : Matrix (Fin r) (Fin r) (w.Completion ⊗[F] E),
+          (matHom _ σ J (projArch σ J w u)).1 * Xf.map (inclR (F := F) w.Completion)
+              = Xf.map (inclR (F := F) w.Completion) + Xf.map (inclR (F := F) w.Completion) * N
+            ∧ (∀ i j, N i j ≠ 0 → ∃ k ∈ S, i ≤ k ∧ k < j)
+            ∧ (∀ v : Fin n → w.Completion ⊗[F] E,
+              (∀ i : Fin r,
+                  (∃ k ∈ S, i ≤ k)
+                    → ((Formalism.UG.cT (σ : E →+* E) Xf * J).map (inclR (F := F) w.Completion)
+                          *ᵥ v)
+                        i
+                      = 0)
+                → ∃ a : Fin r → w.Completion ⊗[F] E,
+                  (∀ i, a i ≠ 0 → ∃ k ∈ S, i ≤ k)
+                    ∧ (matHom _ σ J (projArch σ J w u)).1 *ᵥ v - v
+                      = Xf.map (inclR (F := F) w.Completion) *ᵥ a))
+        → u ∈ GlobalTheory.StdPar.unip σ J Xf S := by
   intro F E _ _ _ _ _ σ n J r Xf S u hu hN
   classical
   choose Nw hM hQw hPw using hN
-  let ψ : AF F ⊗[F] E →+* Af F ⊗[F] E := (Algebra.TensorProduct.map (sndA F) (AlgHom.id F E)).toRingHom
-  let N : Matrix (Fin r) (Fin r) (AF F ⊗[F] E) := Matrix.of fun i v => glueInf F E (fun w => Nw w i v)
+  let ψ : AF F ⊗[F] E →+* Af F ⊗[F] E :=
+    (Algebra.TensorProduct.map (sndA F) (AlgHom.id F E)).toRingHom
+  let N : Matrix (Fin r) (Fin r) (AF F ⊗[F] E) :=
+    Matrix.of fun i v => glueInf F E (fun w => Nw w i v)
   have hcN : ∀ w, N.map (compInf F E w) = Nw w := fun w => Matrix.ext fun i v => compInf_glueInf _ w
   have hsN : N.map ψ = 0 := Matrix.ext fun i v => sndA_glueInf _
-  have hcZ : ∀ {a b : ℕ} (Z : Matrix (Fin a) (Fin b) E) (w : InfinitePlace F),
-      (adMat F Z).map (compInf F E w) = Z.map (inclR (F := F) w.Completion) := fun Z w =>
+  have hcZ
+      : ∀ {a b : ℕ} (Z : Matrix (Fin a) (Fin b) E) (w : InfinitePlace F),
+        (adMat F Z).map (compInf F E w) = Z.map (inclR (F := F) w.Completion) := fun Z w =>
     Matrix.ext fun i j => by
       show compInf F E w ((1 : AF F) ⊗ₜ[F] Z i j) = (1 : w.Completion) ⊗ₜ[F] Z i j
       simp [compInf]
   set M : Matrix (Fin n) (Fin n) (AF F ⊗[F] E) := (matHom _ σ J u).1 with hMdef
   have hcM : ∀ w, M.map (compInf F E w) = (matHom _ σ J (projArch σ J w u)).1 := fun w =>
     Matrix.ext fun a b => by rw [matHom_projArch]; rfl
-  have hsM : M.map ψ = 1 := Matrix.ext fun a b =>
-    congrArg (fun g => (g : GL (Fin n) _).1 a b) hu
+  have hsM : M.map ψ = 1 := Matrix.ext fun a b => congrArg (fun g => (g : GL (Fin n) _).1 a b) hu
   set C := adMat F Xf with hC
   have hMat : M * C = C + C * N := by
     ext a b
@@ -106,12 +124,13 @@ theorem mem_unip_of_arch_frame : ∀ (F E : Type) [Field F] [NumberField F] [Fie
     · intro w
       have e1 : compInf F E w ((M * C) a b) = ((M * C).map (compInf F E w)) a b := rfl
       have e2 : compInf F E w ((C + C * N) a b) = ((C + C * N).map (compInf F E w)) a b := rfl
-      rw [e1, e2, Matrix.map_mul, Matrix.map_add _ (map_add _), Matrix.map_mul, hcM, hcN, hC, hcZ, hM w]
+      rw [e1, e2, Matrix.map_mul, Matrix.map_add _ (map_add _), Matrix.map_mul, hcM, hcN, hC, hcZ,
+        hM w]
     · show ψ _ = ψ _
       have e1 : ψ ((M * C) a b) = ((M * C).map ψ) a b := rfl
       have e2 : ψ ((C + C * N) a b) = ((C + C * N).map ψ) a b := rfl
-      rw [e1, e2, Matrix.map_mul, Matrix.map_add _ (map_add _), Matrix.map_mul, hsM, hsN, Matrix.one_mul,
-        Matrix.mul_zero, add_zero]
+      rw [e1, e2, Matrix.map_mul, Matrix.map_add _ (map_add _), Matrix.map_mul, hsM, hsN,
+        Matrix.one_mul, Matrix.mul_zero, add_zero]
   let P : Fin r → Fin r → Prop := fun i j => ∃ k ∈ S, i ≤ k ∧ k < j
   have hPt : ∀ i l j, P i l → P l j → P i j := fun i l j ⟨k, hk, h1, h2⟩ ⟨k', hk', h1', h2'⟩ =>
     ⟨k', hk', h1.trans (h2.le.trans h1'), h2'⟩
@@ -120,9 +139,10 @@ theorem mem_unip_of_arch_frame : ∀ (F E : Type) [Field F] [NumberField F] [Fie
     intro i l h
     by_contra hc
     apply h
-    have : (fun w => Nw w i l) = fun _ => 0 := funext fun w => by
-      by_contra h'
-      exact hc (hQw w i l h')
+    have : (fun w => Nw w i l) = fun _ => 0 :=
+      funext fun w => by
+        by_contra h'
+        exact hc (hQw w i l h')
     show glueInf F E _ = 0
     rw [this, glueInf_zero]
   obtain ⟨N', hQ', hinv⟩ := exists_inv_pattern P hPt hPlt N hQ
@@ -131,12 +151,16 @@ theorem mem_unip_of_arch_frame : ∀ (F E : Type) [Field F] [NumberField F] [Fie
     rw [hM'def, hMdef, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one]
   have hMC : M * C = C * (1 + N) := by rw [hMat, Matrix.mul_add, Matrix.mul_one]
   have hM'C : M' * C = C * (1 + N') := by
-    calc M' * C = M' * (C * ((1 + N) * (1 + N'))) := by rw [hinv, Matrix.mul_one]
+    calc
+      M' * C
+        = M' * (C * ((1 + N) * (1 + N'))) := by rw [hinv, Matrix.mul_one]
       _ = M' * (M * C) * (1 + N') := by rw [hMC]; simp only [Matrix.mul_assoc]
       _ = C * (1 + N') := by rw [← Matrix.mul_assoc, hM'M, Matrix.one_mul]
-  have hsupp : ∀ (D : Set (Fin r)) (Q : Matrix (Fin r) (Fin r) (AF F ⊗[F] E)), (∀ i l, Q i l ≠ 0 → P i l) →
-      (∀ i l, P i l → l ∈ D → i ∈ D) → ∀ a : Fin r → AF F ⊗[F] E, (∀ l, l ∉ D → a l = 0) →
-      ∀ l, l ∉ D → ((1 + Q) *ᵥ a) l = 0 := by
+  have hsupp
+      : ∀ (D : Set (Fin r)) (Q : Matrix (Fin r) (Fin r) (AF F ⊗[F] E)),
+        (∀ i l, Q i l ≠ 0 → P i l) → (∀ i l, P i l → l ∈ D → i ∈ D)
+          → ∀ a : Fin r → AF F ⊗[F] E,
+            (∀ l, l ∉ D → a l = 0) → ∀ l, l ∉ D → ((1 + Q) *ᵥ a) l = 0 := by
     intro D Q hq hD a ha i hi
     rw [Matrix.add_mulVec, Matrix.one_mulVec, Pi.add_apply, ha i hi, zero_add]
     show ∑ l, Q i l * a l = 0
@@ -144,8 +168,9 @@ theorem mem_unip_of_arch_frame : ∀ (F E : Type) [Field F] [NumberField F] [Fie
     by_cases h : Q i l = 0
     · rw [h, zero_mul]
     · rw [ha l (fun hl => hi (hD i l (hq i l h) hl)), mul_zero]
-  have hstab : ∀ D : Set (Fin r), (∀ i l, P i l → l ∈ D → i ∈ D) →
-      ∀ y, y ∈ colSpan F Xf D ↔ M *ᵥ y ∈ colSpan F Xf D := by
+  have hstab
+      : ∀ D : Set (Fin r),
+        (∀ i l, P i l → l ∈ D → i ∈ D) → ∀ y, y ∈ colSpan F Xf D ↔ M *ᵥ y ∈ colSpan F Xf D := by
     intro D hD y
     constructor
     · intro hy
@@ -156,8 +181,12 @@ theorem mem_unip_of_arch_frame : ∀ (F E : Type) [Field F] [NumberField F] [Fie
       obtain ⟨a, ha, hay⟩ := (mem_span_cols_iff C D _).1 hy
       refine (mem_span_cols_iff C D _).2 ⟨(1 + N') *ᵥ a, hsupp D N' hQ' hD a ha, ?_⟩
       rw [mulVec_mulVec, ← hM'C, ← mulVec_mulVec, hay, mulVec_mulVec, hM'M, one_mulVec]
-  refine ⟨Subgroup.mem_iInf.2 fun j => ⟨fun y => hstab _ (fun i l h hl => hPt i l j h hl) y, fun y hy => ?_⟩,
-    hstab _ (fun i l ⟨k, hk, h1, _⟩ _ => ⟨k, hk, h1⟩), fun y hy => ?_⟩
+  refine ⟨
+    Subgroup.mem_iInf.2 fun j =>
+      ⟨fun y => hstab _ (fun i l h hl => hPt i l j h hl) y, fun y hy => ?_⟩,
+    hstab _ (fun i l ⟨k, hk, h1, _⟩ _ => ⟨k, hk, h1⟩),
+    fun y hy => ?_
+  ⟩
   · rw [colSpan, Set.image_singleton, Submodule.mem_span_singleton] at hy
     obtain ⟨a, rfl⟩ := hy
     show M *ᵥ _ - _ ∈ _
@@ -174,10 +203,17 @@ theorem mem_unip_of_arch_frame : ∀ (F E : Type) [Field F] [NumberField F] [Fie
       show (C *ᵥ fun i => N i j) i = (C + C * N) i j - C i j
       rw [Matrix.add_apply, add_sub_cancel_left]
       rfl
-  · have hy' : ∀ i : Fin r, (∃ k ∈ S, i ≤ k) → (adMat F (Formalism.UG.cT (σ : E →+* E) Xf * J) *ᵥ y) i = 0 := fun i hi =>
-      (Submodule.mem_iInf _).1 ((Submodule.mem_iInf _).1 hy i) hi
-    have hyw : ∀ w : InfinitePlace F, ∀ i : Fin r, (∃ k ∈ S, i ≤ k) →
-        ((Formalism.UG.cT (σ : E →+* E) Xf * J).map (inclR (F := F) w.Completion) *ᵥ (compInf F E w ∘ y)) i = 0 := by
+  · have hy'
+        : ∀ i : Fin r,
+          (∃ k ∈ S, i ≤ k) → (adMat F (Formalism.UG.cT (σ : E →+* E) Xf * J) *ᵥ y) i = 0 :=
+      fun i hi => (Submodule.mem_iInf _).1 ((Submodule.mem_iInf _).1 hy i) hi
+    have hyw
+        : ∀ w : InfinitePlace F, ∀ i : Fin r,
+          (∃ k ∈ S, i ≤ k)
+            → ((Formalism.UG.cT (σ : E →+* E) Xf * J).map (inclR (F := F) w.Completion)
+                  *ᵥ (compInf F E w ∘ y))
+                i
+              = 0 := by
       intro w i hi
       have := congrArg (compInf F E w) (hy' i hi)
       rwa [RingHom.map_mulVec, hcZ, map_zero] at this
@@ -186,21 +222,25 @@ theorem mem_unip_of_arch_frame : ∀ (F E : Type) [Field F] [NumberField F] [Fie
     have hcA : ∀ w, compInf F E w ∘ A = a w := fun w => funext fun i => compInf_glueInf _ w
     have hsA : ψ ∘ A = 0 := funext fun i => sndA_glueInf _
     refine (mem_span_cols_iff C _ _).2 ⟨A, fun l hl => ?_, ?_⟩
-    · have : (fun w => a w l) = fun _ => 0 := funext fun w => by
-        by_contra h'
-        exact hl (ha w l h')
+    · have : (fun w => a w l) = fun _ => 0 :=
+        funext fun w => by
+          by_contra h'
+          exact hl (ha w l h')
       show glueInf F E _ = 0
       rw [this, glueInf_zero]
     · funext i
       apply tens_ext
       · intro w
-        have e1 : compInf F E w ((M *ᵥ y - y) i) =
-            ((matHom _ σ J (projArch σ J w u)).1 *ᵥ (compInf F E w ∘ y) - compInf F E w ∘ y) i := by
+        have e1
+            : compInf F E w ((M *ᵥ y - y) i)
+              = ((matHom _ σ J (projArch σ J w u)).1 *ᵥ (compInf F E w ∘ y) - compInf F E w ∘ y)
+                i := by
           rw [Pi.sub_apply, map_sub, RingHom.map_mulVec, hcM]
           rfl
         rw [e1, congrFun (hA w) i, RingHom.map_mulVec, hC, hcZ, hcA]
       · show ψ _ = ψ _
-        rw [Pi.sub_apply, map_sub, RingHom.map_mulVec, RingHom.map_mulVec, hsM, one_mulVec, hsA, mulVec_zero]
+        rw [Pi.sub_apply, map_sub, RingHom.map_mulVec, RingHom.map_mulVec, hsM, one_mulVec, hsA,
+          mulVec_zero]
         simp
 
 end Main

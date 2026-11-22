@@ -6,7 +6,8 @@ public import Development.AutomorphicArithmetic.CMTraceForms.Places
 @[expose] public section
 
 open NumberField TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs Formalism.L2.Pj UpperTheory.Depth
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs Formalism.L2.Pj UpperTheory.Depth
 
 noncomputable section
 
@@ -14,11 +15,13 @@ namespace UpperTheory.PlacesDiscr
 
 section Emb
 
-variable {E : Type} [Field E] [NumberField E] {C : Type} [Field C] [CharZero C]
+variable
+  {E : Type} [Field E] [NumberField E]
+  {C : Type} [Field C] [CharZero C]
   {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
 
-private theorem exists_lift_val (hv : v.Integers O) (φ : E →ₐ[ℚ] C) (a : 𝓞 E) :
-    ∃ x : O, algebraMap O C x = φ (a : E) := by
+private theorem exists_lift_val (hv : v.Integers O) (φ : E →ₐ[ℚ] C) (a : 𝓞 E)
+    : ∃ x : O, algebraMap O C x = φ (a : E) := by
   have h1 : IsIntegral ℤ (φ (a : E)) :=
     (NumberField.RingOfIntegers.isIntegral_coe a).map φ.toRingHom.toIntAlgHom
   have h2 : IsIntegral O (φ (a : E)) := h1.tower_top
@@ -27,14 +30,14 @@ private theorem exists_lift_val (hv : v.Integers O) (φ : E →ₐ[ℚ] C) (a : 
 private def restrEmb (hv : v.Integers O) (φ : E →ₐ[ℚ] C) : 𝓞 E →+* O where
   toFun a := (exists_lift_val hv φ a).choose
   map_one' := hv.hom_inj (by rw [(exists_lift_val hv φ _).choose_spec]; simp)
-  map_mul' a b := hv.hom_inj (by
-    rw [map_mul]; simp only [(exists_lift_val hv φ _).choose_spec]; simp)
+  map_mul' a b :=
+    hv.hom_inj (by rw [map_mul]; simp only [(exists_lift_val hv φ _).choose_spec]; simp)
   map_zero' := hv.hom_inj (by rw [(exists_lift_val hv φ _).choose_spec]; simp)
-  map_add' a b := hv.hom_inj (by
-    rw [map_add (f := _)]; simp only [(exists_lift_val hv φ _).choose_spec]; simp)
+  map_add' a b :=
+    hv.hom_inj (by rw [map_add (f := _)]; simp only [(exists_lift_val hv φ _).choose_spec]; simp)
 
-private theorem restrEmb_spec (hv : v.Integers O) (φ : E →ₐ[ℚ] C) (a : 𝓞 E) :
-    algebraMap O C (restrEmb hv φ a) = φ (a : E) :=
+private theorem restrEmb_spec (hv : v.Integers O) (φ : E →ₐ[ℚ] C) (a : 𝓞 E)
+    : algebraMap O C (restrEmb hv φ a) = φ (a : E) :=
   (exists_lift_val hv φ a).choose_spec
 
 variable {p : ℕ} [Fact p.Prime]
@@ -59,14 +62,14 @@ variable {s : ℕ} (w : Fin s → Place p R)
 private def sumMap : (∀ i, (w i).Ow) →ₗ[ℤ_[p]] (ℤ_[p] ⊗[ℤ] R) :=
   ∑ i, (w i).Ow.subtype ∘ₗ LinearMap.proj i
 
-private theorem sumMap_apply (x : ∀ i, (w i).Ow) :
-    sumMap w x = ∑ i, (x i : ℤ_[p] ⊗[ℤ] R) := by
+private theorem sumMap_apply (x : ∀ i, (w i).Ow) : sumMap w x = ∑ i, (x i : ℤ_[p] ⊗[ℤ] R) := by
   simp [sumMap]
 
 variable {w}
 
-private theorem e_mul_sum (h1 : ∀ i j, i ≠ j → (w i).e * (w j).e = 0) (i : Fin s)
-    (x : ∀ i, (w i).Ow) : (w i).e * sumMap w x = x i := by
+private theorem e_mul_sum
+    (h1 : ∀ i j, i ≠ j → (w i).e * (w j).e = 0) (i : Fin s) (x : ∀ i, (w i).Ow)
+    : (w i).e * sumMap w x = x i := by
   have hx : ∀ j, ∃ y, (w j).e * y = (x j : ℤ_[p] ⊗[ℤ] R) := fun j => by
     have h : (x j : ℤ_[p] ⊗[ℤ] R) ∈ (LinearMap.mulLeft ℤ_[p] (w j).e).range := (x j).2
     obtain ⟨y, hy⟩ := h
@@ -80,8 +83,8 @@ private theorem e_mul_sum (h1 : ∀ i j, i ≠ j → (w i).e * (w j).e = 0) (i :
   · intro h
     exact absurd (Finset.mem_univ i) h
 
-private theorem e_mul_sig_sum (h3 : ∀ i j, (w i).e * (w j).bar = 0) (i : Fin s)
-    (x : ∀ i, (w i).Ow) : (w i).e * sig p R (sumMap w x) = 0 := by
+private theorem e_mul_sig_sum (h3 : ∀ i j, (w i).e * (w j).bar = 0) (i : Fin s) (x : ∀ i, (w i).Ow)
+    : (w i).e * sig p R (sumMap w x) = 0 := by
   have hx : ∀ j, ∃ y, (w j).e * y = (x j : ℤ_[p] ⊗[ℤ] R) := fun j => by
     have h : (x j : ℤ_[p] ⊗[ℤ] R) ∈ (LinearMap.mulLeft ℤ_[p] (w j).e).range := (x j).2
     obtain ⟨y, hy⟩ := h
@@ -93,40 +96,39 @@ private theorem e_mul_sig_sum (h3 : ∀ i j, (w i).e * (w j).bar = 0) (i : Fin s
   have hb : sig p R (w j).e = (w j).bar := rfl
   rw [← hy, map_mul, ← mul_assoc, hb, h3 i j, zero_mul]
 
-private def splitEquiv (h1 : ∀ i j, i ≠ j → (w i).e * (w j).e = 0)
-    (h2 : (∑ i, (w i).e) + (∑ i, (w i).bar) = 1) (h3 : ∀ i j, (w i).e * (w j).bar = 0) :
-    ((∀ i, (w i).Ow) × (∀ i, (w i).Ow)) ≃ₗ[ℤ_[p]] (ℤ_[p] ⊗[ℤ] R) :=
-  LinearEquiv.ofBijective
-    ((sumMap w).coprod ((sig p R).toLinearMap ∘ₗ sumMap w)) (by
-      constructor
-      · rw [injective_iff_map_eq_zero]
-        rintro ⟨x, y⟩ hxy
-        have k1 : sumMap w x + sig p R (sumMap w y) = 0 := hxy
-        have k2 : x = 0 := by
-          funext i
-          have := congrArg ((w i).e * ·) k1
-          simp only [mul_add, e_mul_sum h1, e_mul_sig_sum h3, add_zero, mul_zero] at this
-          exact Subtype.ext this
-        rw [k2, map_zero, zero_add] at k1
-        have k4 := congrArg (sig p R) k1
-        rw [sig_sig, map_zero] at k4
-        have k5 : y = 0 := by
-          funext i
-          have := e_mul_sum h1 i y
-          rw [k4, mul_zero] at this
-          exact Subtype.ext this.symm
-        exact Prod.ext k2 k5
-      · intro a
-        refine ⟨(fun i => ⟨(w i).e * a, a, rfl⟩,
-          fun i => ⟨(w i).e * sig p R a, sig p R a, rfl⟩), ?_⟩
-        change sumMap w _ + sig p R (sumMap w _) = a
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [sumMap_apply, sumMap_apply, map_sum]
-        change ∑ i, (w i).e * a + ∑ i, sig p R ((w i).e * sig p R a) = a
-        simp only [map_mul, sig_sig]
-        rw [← Finset.sum_mul, ← Finset.sum_mul, ← add_mul]
-        change ((∑ i, (w i).e) + (∑ i, (w i).bar)) * a = a
-        rw [h2, one_mul])
+private def splitEquiv
+    (h1 : ∀ i j, i ≠ j → (w i).e * (w j).e = 0) (h2 : (∑ i, (w i).e) + (∑ i, (w i).bar) = 1)
+    (h3 : ∀ i j, (w i).e * (w j).bar = 0)
+    : ((∀ i, (w i).Ow) × (∀ i, (w i).Ow)) ≃ₗ[ℤ_[p]] (ℤ_[p] ⊗[ℤ] R) :=
+  LinearEquiv.ofBijective ((sumMap w).coprod ((sig p R).toLinearMap ∘ₗ sumMap w)) (by
+    constructor
+    · rw [injective_iff_map_eq_zero]
+      rintro ⟨x, y⟩ hxy
+      have k1 : sumMap w x + sig p R (sumMap w y) = 0 := hxy
+      have k2 : x = 0 := by
+        funext i
+        have := congrArg ((w i).e * ·) k1
+        simp only [mul_add, e_mul_sum h1, e_mul_sig_sum h3, add_zero, mul_zero] at this
+        exact Subtype.ext this
+      rw [k2, map_zero, zero_add] at k1
+      have k4 := congrArg (sig p R) k1
+      rw [sig_sig, map_zero] at k4
+      have k5 : y = 0 := by
+        funext i
+        have := e_mul_sum h1 i y
+        rw [k4, mul_zero] at this
+        exact Subtype.ext this.symm
+      exact Prod.ext k2 k5
+    · intro a
+      refine ⟨(fun i => ⟨(w i).e * a, a, rfl⟩, fun i => ⟨(w i).e * sig p R a, sig p R a, rfl⟩), ?_⟩
+      change sumMap w _ + sig p R (sumMap w _) = a
+      set_option synthInstance.maxHeartbeats 100000 in
+        rw [sumMap_apply, sumMap_apply, map_sum]
+      change ∑ i, (w i).e * a + ∑ i, sig p R ((w i).e * sig p R a) = a
+      simp only [map_mul, sig_sig]
+      rw [← Finset.sum_mul, ← Finset.sum_mul, ← add_mul]
+      change ((∑ i, (w i).e) + (∑ i, (w i).bar)) * a = a
+      rw [h2, one_mul])
 
 end Split
 
@@ -134,16 +136,23 @@ end UpperTheory.PlacesDiscr
 
 end
 
-private theorem tauExt_comp_star_eq_tauExt_sig {p : ℕ} [Fact p.Prime] {R : Type} [CommRing R] [StarRing R]
-    {O : Type} [CommRing O] [Algebra ℤ_[p] O] (τ : R →+* O) (x : ℤ_[p] ⊗[ℤ] R) :
-    tauExt (τ.comp (starRingEnd R)) x = tauExt τ (sig p R x) := by
+private theorem tauExt_comp_star_eq_tauExt_sig
+    {p : ℕ} [Fact p.Prime]
+    {R : Type} [CommRing R] [StarRing R]
+    {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+    (τ : R →+* O) (x : ℤ_[p] ⊗[ℤ] R)
+    : tauExt (τ.comp (starRingEnd R)) x = tauExt τ (sig p R x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul a b => simp [tauExt, sig, starRingEnd_apply]
   | add x y hx hy => rw [map_add (f := _), map_add (f := _), map_add (f := _), hx, hy]
 
-private theorem eq_zero_or_one_of_idempotent_integers {C : Type} [Field C] {v : Valuation C NNReal} {O : Type} [CommRing O]
-    [Algebra O C] (hv : v.Integers O) (x : O) (hx : x * x = x) : x = 0 ∨ x = 1 := by
+private theorem eq_zero_or_one_of_idempotent_integers
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    (x : O) (hx : x * x = x)
+    : x = 0 ∨ x = 1 := by
   have h := congrArg (algebraMap O C) hx
   rw [map_mul] at h
   have h2 : algebraMap O C x * (algebraMap O C x - 1) = 0 := by rw [mul_sub, h, mul_one, sub_self]
@@ -153,12 +162,16 @@ private theorem eq_zero_or_one_of_idempotent_integers {C : Type} [Field C] {v : 
   · right
     exact hv.hom_inj (by rw [map_one]; exact sub_eq_zero.mp h3)
 
-private theorem det_linearForms_basis_change {A M O κ : Type} [CommRing A] [AddCommGroup M] [Module A M] [CommRing O]
-    [Algebra A O] [Fintype κ] [DecidableEq κ] (f : κ → (M →ₗ[A] O)) (γ γ' : Module.Basis κ A M) :
-    (Matrix.of fun m k => f k (γ' m)).det
+private theorem det_linearForms_basis_change
+    {A M O κ : Type} [CommRing A] [AddCommGroup M] [Module A M] [CommRing O] [Algebra A O]
+    [Fintype κ] [DecidableEq κ]
+    (f : κ → (M →ₗ[A] O)) (γ γ' : Module.Basis κ A M)
+    : (Matrix.of fun m k => f k (γ' m)).det
       = algebraMap A O (γ.toMatrix γ').det * (Matrix.of fun m k => f k (γ m)).det := by
-  have key : (Matrix.of fun m k => f k (γ' m))
-      = Matrix.transpose ((γ.toMatrix γ').map (algebraMap A O)) * Matrix.of fun m k => f k (γ m) := by
+  have key
+      : (Matrix.of fun m k => f k (γ' m))
+        = Matrix.transpose ((γ.toMatrix γ').map (algebraMap A O))
+          * Matrix.of fun m k => f k (γ m) := by
     ext m k
     rw [Matrix.mul_apply]
     simp only [Matrix.of_apply, Matrix.transpose_apply, Matrix.map_apply]
@@ -169,27 +182,34 @@ private theorem det_linearForms_basis_change {A M O κ : Type} [CommRing A] [Add
     rw [map_smul, Algebra.smul_def]
   rw [key, Matrix.det_mul, Matrix.det_transpose, RingHom.map_det, RingHom.mapMatrix_apply]
 
-private theorem det_blockDiagonal'_eq_prod_det {s : ℕ} {m : Fin s → Type} [∀ i, Fintype (m i)] [∀ i, DecidableEq (m i)]
-    {O : Type} [CommRing O] (d : ∀ i, Matrix (m i) (m i) O) :
-    (Matrix.blockDiagonal' d).det = ∏ i, (d i).det := by
+private theorem det_blockDiagonal'_eq_prod_det
+    {s : ℕ} {m : Fin s → Type} [∀ i, Fintype (m i)] [∀ i, DecidableEq (m i)]
+    {O : Type} [CommRing O]
+    (d : ∀ i, Matrix (m i) (m i) O)
+    : (Matrix.blockDiagonal' d).det = ∏ i, (d i).det := by
   rw [(Matrix.blockTriangular_blockDiagonal' d).det_fintype]
   refine Finset.prod_congr rfl fun k _ => ?_
-  let e : m k ≃ {x : (Σ i, m i) // x.1 = k} :=
-    { toFun := fun a => ⟨⟨k, a⟩, rfl⟩
-      invFun := fun x => cast (congrArg m x.2) x.1.2
-      left_inv := fun a => rfl
-      right_inv := by
-        rintro ⟨⟨i, a⟩, rfl⟩
-        rfl }
+  let e : m k ≃ {x : (Σ i, m i) // x.1 = k} := {
+    toFun := fun a => ⟨⟨k, a⟩, rfl⟩
+    invFun := fun x => cast (congrArg m x.2) x.1.2
+    left_inv := fun a => rfl
+    right_inv := by
+      rintro ⟨⟨i, a⟩, rfl⟩
+      rfl
+  }
   rw [← Matrix.det_submatrix_equiv_self e]
   congr 1
   ext a b
   simp [Matrix.toSquareBlock_def, Matrix.blockDiagonal'_apply, e]
 
-private theorem valuation_intCast_eq_pow_padicValInt {C : Type} [Field C] [CharZero C] {v : Valuation C NNReal} {O : Type}
-    [CommRing O] [Algebra O C] (hv : v.Integers O) (p : ℕ) [hp : Fact p.Prime]
-    (hpO : ¬ IsUnit (p : O)) (a : ℤ) (ha : a ≠ 0) :
-    v (a : C) = v (p : C) ^ padicValInt p a := by
+private theorem valuation_intCast_eq_pow_padicValInt
+    {C : Type} [Field C] [CharZero C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    (p : ℕ) [hp : Fact p.Prime]
+    (hpO : ¬ IsUnit (p : O))
+    (a : ℤ) (ha : a ≠ 0)
+    : v (a : C) = v (p : C) ^ padicValInt p a := by
   have hle : ∀ n : ℤ, v (n : C) ≤ 1 := fun n => by
     have := hv.map_le_one (n : O)
     rwa [map_intCast] at this
@@ -204,13 +224,13 @@ private theorem valuation_intCast_eq_pow_padicValInt {C : Type} [Field C] [CharZ
   obtain ⟨m, hm⟩ := padicValInt_dvd (p := p) a
   have hnd : ¬ (p : ℤ) ∣ m := by
     rintro ⟨c, hc⟩
-    have h := (padicValInt_dvd_iff (p := p) (padicValInt p a + 1) a).mp
-      ⟨c, by rw [pow_succ]; linear_combination hm + (p : ℤ) ^ padicValInt p a * hc⟩
+    have h :=
+      (padicValInt_dvd_iff (p := p) (padicValInt p a + 1) a).mp
+        ⟨c, by rw [pow_succ]; linear_combination hm + (p : ℤ) ^ padicValInt p a * hc⟩
     rcases h with h | h
     · exact ha h
     · omega
-  have hcop : IsCoprime (p : ℤ) m :=
-    (Nat.prime_iff_prime_int.mp hp.out).coprime_iff_not_dvd.mpr hnd
+  have hcop : IsCoprime (p : ℤ) m := (Nat.prime_iff_prime_int.mp hp.out).coprime_iff_not_dvd.mpr hnd
   obtain ⟨x, y, hxy⟩ := hcop
   have hm1 : v (m : C) = 1 := by
     refine le_antisymm (hle m) (not_lt.mp fun hlt => ?_)
@@ -227,41 +247,54 @@ private theorem valuation_intCast_eq_pow_padicValInt {C : Type} [Field C] [CharZ
   have hc : (a : C) = (p : C) ^ padicValInt p a * m := by exact_mod_cast hm
   rw [hc, map_mul, map_pow, hm1, mul_one]
 
-private theorem discr_CMDatum_eq_prod_places_lemma_6 {p : ℕ} [Fact p.Prime] {R : Type} [CommRing R] [StarRing R] {s : ℕ}
-    {w : Fin s → Place p R} (h1 : ∀ i j, i ≠ j → (w i).e * (w j).e = 0)
+private theorem discr_CMDatum_eq_prod_places_lemma_6
+    {p : ℕ} [Fact p.Prime]
+    {R : Type} [CommRing R] [StarRing R]
+    {s : ℕ} {w : Fin s → Place p R} (h1 : ∀ i j, i ≠ j → (w i).e * (w j).e = 0)
     (h2 : (∑ i, (w i).e) + (∑ i, (w i).bar) = 1) (h3 : ∀ i j, (w i).e * (w j).bar = 0)
-    (B : ∀ i, Module.Basis (Fin (w i).n) ℤ_[p] (w i).Ow) (i : Fin s) (a : Fin (w i).n) :
-    (((Pi.basis B).prod (Pi.basis B)).map (UpperTheory.PlacesDiscr.splitEquiv h1 h2 h3)).reindex
-        (Equiv.sigmaSumDistrib _ _).symm ⟨i, Sum.inl a⟩ = ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] R) ∧
-    (((Pi.basis B).prod (Pi.basis B)).map (UpperTheory.PlacesDiscr.splitEquiv h1 h2 h3)).reindex
-        (Equiv.sigmaSumDistrib _ _).symm ⟨i, Sum.inr a⟩ = sig p R ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] R) := by
-  have hs : UpperTheory.PlacesDiscr.sumMap w (Pi.single i (B i a)) = ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] R) := by
+    (B : ∀ i, Module.Basis (Fin (w i).n) ℤ_[p] (w i).Ow) (i : Fin s) (a : Fin (w i).n)
+    : (((Pi.basis B).prod (Pi.basis B)).map (UpperTheory.PlacesDiscr.splitEquiv h1 h2 h3)).reindex
+          (Equiv.sigmaSumDistrib _ _).symm ⟨i, Sum.inl a⟩
+        = ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] R)
+      ∧ (((Pi.basis B).prod (Pi.basis B)).map (UpperTheory.PlacesDiscr.splitEquiv h1 h2 h3)).reindex
+          (Equiv.sigmaSumDistrib _ _).symm ⟨i, Sum.inr a⟩
+        = sig p R ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] R) := by
+  have hs
+      : UpperTheory.PlacesDiscr.sumMap w (Pi.single i (B i a))
+        = ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] R) := by
     rw [UpperTheory.PlacesDiscr.sumMap_apply, Finset.sum_eq_single i]
     · simp
     · intro j _ hj
       simp [Pi.single_apply, hj]
     · simp
-  have hsplit : ∀ x y, UpperTheory.PlacesDiscr.splitEquiv h1 h2 h3 (x, y)
-      = UpperTheory.PlacesDiscr.sumMap w x + sig p R (UpperTheory.PlacesDiscr.sumMap w y) := fun x y => rfl
+  have hsplit
+      : ∀ x y,
+        UpperTheory.PlacesDiscr.splitEquiv h1 h2 h3 (x, y)
+          = UpperTheory.PlacesDiscr.sumMap w x + sig p R (UpperTheory.PlacesDiscr.sumMap w y) :=
+    fun x y => rfl
   constructor
-  · simp only [Module.Basis.reindex_apply, Module.Basis.map_apply, Equiv.symm_symm, Equiv.sigmaSumDistrib_apply,
-      Sum.map_inl, Module.Basis.prod_apply, Sum.elim_inl, Function.comp_apply, Pi.basis_apply,
-      LinearMap.inl_apply]
+  · simp only [Module.Basis.reindex_apply, Module.Basis.map_apply, Equiv.symm_symm,
+      Equiv.sigmaSumDistrib_apply, Sum.map_inl, Module.Basis.prod_apply, Sum.elim_inl,
+      Function.comp_apply, Pi.basis_apply, LinearMap.inl_apply]
     rw [hsplit, map_zero, map_zero, add_zero, hs]
-  · simp only [Module.Basis.reindex_apply, Module.Basis.map_apply, Equiv.symm_symm, Equiv.sigmaSumDistrib_apply,
-      Sum.map_inr, Module.Basis.prod_apply, Sum.elim_inr, Function.comp_apply, Pi.basis_apply,
-      LinearMap.inr_apply]
+  · simp only [Module.Basis.reindex_apply, Module.Basis.map_apply, Equiv.symm_symm,
+      Equiv.sigmaSumDistrib_apply, Sum.map_inr, Module.Basis.prod_apply, Sum.elim_inr,
+      Function.comp_apply, Pi.basis_apply, LinearMap.inr_apply]
     rw [hsplit, map_zero, zero_add, hs]
 
-
 open UpperTheory.PlacesDiscr in
-theorem UpperTheory.discr_CMDatum_eq_prod_places :
-    ∀ (E : Type) [Field E] [NumberField E] [StarRing (𝓞 E)] (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ∀ [Fact (¬ IsUnit (p : O))] [Algebra ℤ_[p] O]
-      (s : ℕ) (w : Fin s → Place p (𝓞 E)), (∀ i j, i ≠ j → (w i).e * (w j).e = 0) → (∑ i, (w i).e) + (∑ i, (w i).bar) = 1 →
-      (∀ i j, (w i).e * (w j).bar = 0) →
-      2 * ∑ i, (w i).n = Module.finrank ℚ E ∧ ∀ t : ∀ i, Fin (w i).n ≃ Emb (O := O) (w i).e, ∃ vdi : Fin s → ℝ,
-        (∀ i, HasVd p v (w i) (t i) (vdi i)) ∧
-        ∑ i, ((w i).n : ℝ) * vdi i = (padicValInt p (NumberField.discr E) : ℝ) / 2 := by
+theorem UpperTheory.discr_CMDatum_eq_prod_places
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing (𝓞 E)] (p : ℕ) [Fact p.Prime] (C : Type)
+        [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O]
+        [Algebra O C],
+      v.Integers O
+        → ∀ [Fact (¬ IsUnit (p : O))] [Algebra ℤ_[p] O] (s : ℕ) (w : Fin s → Place p (𝓞 E)),
+          (∀ i j, i ≠ j → (w i).e * (w j).e = 0) → (∑ i, (w i).e) + (∑ i, (w i).bar) = 1
+            → (∀ i j, (w i).e * (w j).bar = 0)
+            → 2 * ∑ i, (w i).n = Module.finrank ℚ E
+              ∧ ∀ t : ∀ i, Fin (w i).n ≃ Emb (O := O) (w i).e, ∃ vdi : Fin s → ℝ,
+                (∀ i, HasVd p v (w i) (t i) (vdi i))
+                  ∧ ∑ i, ((w i).n : ℝ) * vdi i = (padicValInt p (NumberField.discr E) : ℝ) / 2 := by
   intro E _ _ _ p _ C _ _ _ v O _ _ hv _ _ s w h1 h2 h3
   have hfr : Module.finrank ℤ_[p] (ℤ_[p] ⊗[ℤ] 𝓞 E) = Module.finrank ℚ E := by
     rw [Module.finrank_baseChange, NumberField.RingOfIntegers.rank]
@@ -276,7 +309,8 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
     Matrix.of fun a b => tauExt (t i b : 𝓞 E →+* O) ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] 𝓞 E)
   have key : ∏ i, v (algebraMap O C ((A i).det ^ 2)) ^ 2 = v ((NumberField.discr E : ℤ) : C) := by
     classical
-    have hO : (0 : O) ≠ 1 := fun h => (zero_ne_one : (0 : C) ≠ 1) (by simpa using congrArg (algebraMap O C) h)
+    have hO : (0 : O) ≠ 1 := fun h =>
+      (zero_ne_one : (0 : C) ≠ 1) (by simpa using congrArg (algebraMap O C) h)
     have hE : ∀ i b, tauExt (t i b : 𝓞 E →+* O) (w i).e = 1 := fun i b => (t i b).2
     have hOw : ∀ j (x : (w j).Ow), ∃ y, (w j).e * y = (x : ℤ_[p] ⊗[ℤ] 𝓞 E) := fun j x => by
       have h : (x : ℤ_[p] ⊗[ℤ] 𝓞 E) ∈ (LinearMap.mulLeft ℤ_[p] (w j).e).range := x.2
@@ -290,14 +324,18 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
       intro τ i hτ j hji
       have := congrArg (tauExt τ) (h1 i j (Ne.symm hji))
       rwa [map_mul, hτ, one_mul, map_zero] at this
-    have hz1 : ∀ (τ : 𝓞 E →+* O) i, tauExt τ (w i).e = 1 → ∀ j (x : (w j).Ow),
-        tauExt τ (sig p (𝓞 E) (x : ℤ_[p] ⊗[ℤ] 𝓞 E)) = 0 := by
+    have hz1
+        : ∀ (τ : 𝓞 E →+* O) i,
+          tauExt τ (w i).e = 1
+            → ∀ j (x : (w j).Ow), tauExt τ (sig p (𝓞 E) (x : ℤ_[p] ⊗[ℤ] 𝓞 E)) = 0 := by
       intro τ i hτ j x
       obtain ⟨y, hy⟩ := hOw j x
       have hb : sig p (𝓞 E) (w j).e = (w j).bar := rfl
       rw [← hy, map_mul, hb, map_mul, hbar τ i hτ j, zero_mul]
-    have hz2 : ∀ (τ : 𝓞 E →+* O) i, tauExt τ (w i).e = 1 → ∀ j, j ≠ i → ∀ x : (w j).Ow,
-        tauExt τ (x : ℤ_[p] ⊗[ℤ] 𝓞 E) = 0 := by
+    have hz2
+        : ∀ (τ : 𝓞 E →+* O) i,
+          tauExt τ (w i).e = 1
+            → ∀ j, j ≠ i → ∀ x : (w j).Ow, tauExt τ (x : ℤ_[p] ⊗[ℤ] 𝓞 E) = 0 := by
       intro τ i hτ j hji x
       obtain ⟨y, hy⟩ := hOw j x
       rw [← hy, map_mul, hoth τ i hτ j hji, zero_mul]
@@ -306,14 +344,19 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
       ext x
       simp [starRingEnd_apply]
     let ρ : (Σ i : Fin s, (Fin (w i).n ⊕ Fin (w i).n)) → (𝓞 E →+* O) := fun k =>
-      Sum.elim (fun a => (t k.1 a : 𝓞 E →+* O)) (fun a => (t k.1 a : 𝓞 E →+* O).comp (starRingEnd (𝓞 E))) k.2
+      Sum.elim
+        (fun a => (t k.1 a : 𝓞 E →+* O))
+        (fun a => (t k.1 a : 𝓞 E →+* O).comp (starRingEnd (𝓞 E)))
+        k.2
     have hsurj : ∀ τ : 𝓞 E →+* O, ∃ k, ρ k = τ := by
       intro τ
       by_contra hne
       push_neg at hne
       have he0 : ∀ i, tauExt τ (w i).e = 0 := by
         intro i
-        rcases eq_zero_or_one_of_idempotent_integers hv (tauExt τ (w i).e) (by rw [← map_mul, (w i).idem]) with h | h
+        rcases eq_zero_or_one_of_idempotent_integers hv (tauExt τ (w i).e)
+            (by rw [← map_mul, (w i).idem])
+          with h | h
         · exact h
         · exfalso
           exact hne ⟨i, Sum.inl ((t i).symm ⟨τ, h⟩)⟩ (by simp [ρ])
@@ -322,7 +365,9 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
         have hidem : (w i).bar * (w i).bar = (w i).bar := by
           show sig p (𝓞 E) (w i).e * sig p (𝓞 E) (w i).e = sig p (𝓞 E) (w i).e
           rw [← map_mul, (w i).idem]
-        rcases eq_zero_or_one_of_idempotent_integers hv (tauExt τ (w i).bar) (by rw [← map_mul, hidem]) with h | h
+        rcases eq_zero_or_one_of_idempotent_integers hv (tauExt τ (w i).bar)
+            (by rw [← map_mul, hidem])
+          with h | h
         · exact h
         · exfalso
           have hmem : tauExt (τ.comp (starRingEnd (𝓞 E))) (w i).e = 1 := by
@@ -345,7 +390,8 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
       have h2' := UpperTheory.PlacesDiscr.restrEmb_spec hv σ' (RingOfIntegers.basis E i)
       rw [h] at h1'
       exact h1'.symm.trans h2'
-    have hcard : Fintype.card (E →ₐ[ℚ] C) = Fintype.card (Σ i : Fin s, (Fin (w i).n ⊕ Fin (w i).n)) := by
+    have hcard
+        : Fintype.card (E →ₐ[ℚ] C) = Fintype.card (Σ i : Fin s, (Fin (w i).n ⊕ Fin (w i).n)) := by
       rw [AlgHom.card ℚ E C, ← hsum, Fintype.card_sigma]
       simp only [Fintype.card_sum, Fintype.card_fin]
       rw [Finset.mul_sum]
@@ -365,14 +411,16 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
       have := hg (eg.symm k)
       have hk : g (eg.symm k) = k := eg.apply_symm_apply k
       rwa [hk] at this
-    let γs := (((Pi.basis B).prod (Pi.basis B)).map (UpperTheory.PlacesDiscr.splitEquiv h1 h2 h3)).reindex
-      (Equiv.sigmaSumDistrib (fun i => Fin (w i).n) (fun i => Fin (w i).n)).symm
-    have hγl : ∀ i a, γs ⟨i, Sum.inl a⟩ = ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] 𝓞 E) :=
-      fun i a => (discr_CMDatum_eq_prod_places_lemma_6 h1 h2 h3 B i a).1
+    let γs :=
+      (((Pi.basis B).prod (Pi.basis B)).map (UpperTheory.PlacesDiscr.splitEquiv h1 h2 h3)).reindex
+        (Equiv.sigmaSumDistrib (fun i => Fin (w i).n) (fun i => Fin (w i).n)).symm
+    have hγl : ∀ i a, γs ⟨i, Sum.inl a⟩ = ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] 𝓞 E) := fun i a =>
+      (discr_CMDatum_eq_prod_places_lemma_6 h1 h2 h3 B i a).1
     have hγr : ∀ i a, γs ⟨i, Sum.inr a⟩ = sig p (𝓞 E) ((B i a : (w i).Ow) : ℤ_[p] ⊗[ℤ] 𝓞 E) :=
       fun i a => (discr_CMDatum_eq_prod_places_lemma_6 h1 h2 h3 B i a).2
-    have hblock : (Matrix.of fun m k => tauExt (ρ k) (γs m))
-        = Matrix.blockDiagonal' (fun i => Matrix.fromBlocks (A i) 0 0 (A i)) := by
+    have hblock
+        : (Matrix.of fun m k => tauExt (ρ k) (γs m))
+          = Matrix.blockDiagonal' (fun i => Matrix.fromBlocks (A i) 0 0 (A i)) := by
       ext ⟨j, u⟩ ⟨i, c⟩
       rw [Matrix.of_apply, Matrix.blockDiagonal'_apply]
       by_cases hij : j = i
@@ -409,8 +457,9 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
     have hdetN : (Matrix.of fun m k => tauExt (ρ k) (γs m)).det = ∏ i, ((A i).det * (A i).det) := by
       rw [hblock, det_blockDiagonal'_eq_prod_det]
       simp only [Matrix.det_fromBlocks_zero₂₁]
-    have hcι : Fintype.card (Module.Free.ChooseBasisIndex ℤ (𝓞 E))
-        = Fintype.card (Σ i : Fin s, (Fin (w i).n ⊕ Fin (w i).n)) := by
+    have hcι
+        : Fintype.card (Module.Free.ChooseBasisIndex ℤ (𝓞 E))
+          = Fintype.card (Σ i : Fin s, (Fin (w i).n ⊕ Fin (w i).n)) := by
       rw [← hcard, AlgHom.card ℚ E C, ← Module.finrank_eq_card_chooseBasisIndex,
         NumberField.RingOfIntegers.rank]
     let eι := Fintype.equivOfCardEq hcι
@@ -418,28 +467,38 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
     have hN0 := det_linearForms_basis_change (fun k => (tauExt (ρ k)).toLinearMap) γs γ0
     simp only [AlgHom.toLinearMap_apply] at hN0
     have hU : IsUnit (γs.toMatrix γ0).det :=
-      isUnit_iff_exists_inv.mpr ⟨(γ0.toMatrix γs).det,
-        by rw [← Matrix.det_mul, Module.Basis.toMatrix_mul_toMatrix_flip, Matrix.det_one]⟩
+      isUnit_iff_exists_inv.mpr ⟨
+        (γ0.toMatrix γs).det,
+        by rw [← Matrix.det_mul, Module.Basis.toMatrix_mul_toMatrix_flip, Matrix.det_one]
+      ⟩
     have hvU : v (algebraMap O C (algebraMap ℤ_[p] O (γs.toMatrix γ0).det)) = 1 :=
       hv.one_of_isUnit (hU.map _)
-    have hD := Algebra.discr_eq_det_embeddingsMatrixReindex_pow_two ℚ C
-      (NumberField.integralBasis E) (eι.trans eg.symm)
+    have hD :=
+      Algebra.discr_eq_det_embeddingsMatrixReindex_pow_two ℚ C (NumberField.integralBasis E)
+        (eι.trans eg.symm)
     rw [← NumberField.coe_discr, map_intCast] at hD
-    have hEMR : (Algebra.embeddingsMatrixReindex ℚ C (NumberField.integralBasis E) (eι.trans eg.symm)).det
-        = algebraMap O C (Matrix.of fun m k => tauExt (ρ k) (γ0 m)).det := by
+    have hEMR
+        : (Algebra.embeddingsMatrixReindex ℚ C (NumberField.integralBasis E) (eι.trans eg.symm)).det
+          = algebraMap O C (Matrix.of fun m k => tauExt (ρ k) (γ0 m)).det := by
       rw [RingHom.map_det, ← Matrix.det_submatrix_equiv_self eι.symm]
       congr 1
       ext m k
       simp [Algebra.embeddingsMatrixReindex, Algebra.embeddingsMatrix, γ0, hρ,
         NumberField.integralBasis_apply, UpperTheory.PlacesDiscr.restrEmb_spec, tauExt]
-    have hfin : v ((algebraMap O C (algebraMap ℤ_[p] O (γs.toMatrix γ0).det * ∏ i, ((A i).det * (A i).det))) ^ 2)
-        = ∏ i, v (algebraMap O C ((A i).det ^ 2)) ^ 2 := by
+    have hfin
+        : v
+            ((algebraMap O C
+                (algebraMap ℤ_[p] O (γs.toMatrix γ0).det * ∏ i, ((A i).det * (A i).det)))
+              ^ 2)
+          = ∏ i, v (algebraMap O C ((A i).det ^ 2)) ^ 2 := by
       rw [map_pow, map_mul, map_mul, hvU, one_mul, map_prod, map_prod, ← Finset.prod_pow]
       refine Finset.prod_congr rfl fun i _ => ?_
       rw [sq ((A i).det)]
     rw [hD, hEMR, hN0, hdetN, hfin]
   have hdisc : NumberField.discr E ≠ 0 := NumberField.discr_ne_zero E
-  have hvdisc := valuation_intCast_eq_pow_padicValInt hv p (Fact.out : ¬ IsUnit (p : O)) (NumberField.discr E) hdisc
+  have hvdisc :=
+    valuation_intCast_eq_pow_padicValInt hv p (Fact.out : ¬ IsUnit (p : O)) (NumberField.discr E)
+      hdisc
   have hpC : algebraMap O C (p : O) = (p : C) := map_natCast _ _
   have hpne : (p : C) ≠ 0 := Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero
   set q : ℝ := ((v (algebraMap O C (p : O)) : NNReal) : ℝ) with hqdef
@@ -472,8 +531,7 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
     · have hA : (A i).det = 1 := by
         haveI : IsEmpty (Fin (w i).n) := by rw [h0]; infer_instance
         exact Matrix.det_isEmpty
-      have hx1 : x i = 1 := by
-        simp only [hxdef, hA, one_pow, map_one, NNReal.coe_one]
+      have hx1 : x i = 1 := by simp only [hxdef, hA, one_pow, map_one, NNReal.coe_one]
       rw [hx1, Real.logb_one, zero_div, mul_zero]
     · have : ((w i).n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr h0
       field_simp
@@ -486,7 +544,9 @@ theorem UpperTheory.discr_CMDatum_eq_prod_places :
       rw [← Finset.prod_pow]; exact hprod
     have h3 : 2 * Real.logb q (∏ i, x i) = (padicValInt p (NumberField.discr E) : ℝ) := by
       have := congrArg (Real.logb q) h2
-      rw [Real.logb_pow, Real.logb_pow, Real.logb_self_eq_one_iff.mpr ⟨hq0.ne', hq1, by intro h; linarith⟩] at this
+      rw [Real.logb_pow, Real.logb_pow,
+          Real.logb_self_eq_one_iff.mpr ⟨hq0.ne', hq1, by intro h; linarith⟩]
+        at this
       push_cast at this
       linarith
     linarith

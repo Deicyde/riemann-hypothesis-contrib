@@ -10,9 +10,11 @@ open AlgebraicGeometry CategoryTheory
 
 noncomputable section
 
-theorem algebraMap_mem_nonZeroDivisors_of_isLocalization {R S : Type*} [CommRing R] [CommRing S]
-    [Algebra R S] (M : Submonoid R) [IsLocalization M S] {a : R} (ha : a ∈ nonZeroDivisors R) :
-    algebraMap R S a ∈ nonZeroDivisors S := by
+theorem algebraMap_mem_nonZeroDivisors_of_isLocalization
+    {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
+    (M : Submonoid R) [IsLocalization M S]
+    {a : R} (ha : a ∈ nonZeroDivisors R)
+    : algebraMap R S a ∈ nonZeroDivisors S := by
   rw [mem_nonZeroDivisors_iff_right] at ha ⊢
   intro x hx
   obtain ⟨⟨y, m⟩, rfl⟩ := IsLocalization.mk'_surjective M x
@@ -21,15 +23,18 @@ theorem algebraMap_mem_nonZeroDivisors_of_isLocalization {R S : Type*} [CommRing
   obtain ⟨c, hc⟩ := (IsLocalization.map_eq_zero_iff M S _).1 h1
   exact (IsLocalization.mk'_eq_zero_iff y m).2 ⟨c, ha _ (by rw [← hc, mul_assoc])⟩
 
-theorem reesChart_lift {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {m : ℕ} (g : Fin m → R)
-    (j : Fin m) (hj : φ (g j) ∈ nonZeroDivisors S) (c : Fin m → S) (hc : ∀ k, φ (g k) = c k * φ (g j)) :
-    ∃ ψ : FinalTheorems.reesChart g j →+* S, ψ.comp (algebraMap R (FinalTheorems.reesChart g j)) = φ := by
+theorem reesChart_lift
+    {R S : Type} [CommRing R] [CommRing S]
+    (φ : R →+* S)
+    {m : ℕ} (g : Fin m → R) (j : Fin m) (hj : φ (g j) ∈ nonZeroDivisors S) (c : Fin m → S)
+    (hc : ∀ k, φ (g k) = c k * φ (g j))
+    : ∃ ψ : FinalTheorems.reesChart g j →+* S,
+      ψ.comp (algebraMap R (FinalTheorems.reesChart g j)) = φ := by
   let S' := Localization.Away (φ (g j))
   have hinj : Function.Injective (algebraMap S S') :=
     IsLocalization.injective S' (Submonoid.powers_le.2 hj)
   let L : Localization.Away (g j) →+* S' := IsLocalization.Away.map _ _ φ (g j)
-  have hL : ∀ r, L (algebraMap R _ r) = algebraMap S S' (φ r) := fun r =>
-    IsLocalization.map_eq _ _
+  have hL : ∀ r, L (algebraMap R _ r) = algebraMap S S' (φ r) := fun r => IsLocalization.map_eq _ _
   have key : ∀ x ∈ FinalTheorems.reesChart g j, L x ∈ (algebraMap S S').range := by
     intro x hx
     induction hx using Algebra.adjoin_induction with
@@ -38,11 +43,14 @@ theorem reesChart_lift {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {
       refine ⟨c k, ?_⟩
       have hu : IsUnit (algebraMap S S' (φ (g j))) := IsLocalization.Away.algebraMap_isUnit _
       apply hu.mul_left_injective
-      have := congrArg L (IsLocalization.mk'_spec (Localization.Away (g j)) (g k)
-        (⟨g j, Submonoid.mem_powers _⟩ : Submonoid.powers (g j)))
+      have :=
+        congrArg L
+          (IsLocalization.mk'_spec (Localization.Away (g j)) (g k)
+            (⟨g j, Submonoid.mem_powers _⟩ : Submonoid.powers (g j)))
       rw [map_mul, hL, hL] at this
       show algebraMap S S' (c k) * _ = L _ * _
-      rw [← map_mul, ← hc]; exact this.symm
+      rw [← map_mul, ← hc]
+      exact this.symm
     | algebraMap r => exact ⟨φ r, (hL r).symm⟩
     | add x y _ _ hx hy => rw [map_add]; exact add_mem hx hy
     | mul x y _ _ hx hy => rw [map_mul]; exact mul_mem hx hy
@@ -59,16 +67,18 @@ theorem reesChart_lift {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {
   simp [F, E, hL]
   try rfl
 
-theorem ringEquiv_mem_nonZeroDivisors {A B : Type*} [CommRing A] [CommRing B] (e : A ≃+* B) {a : A}
-    (ha : a ∈ nonZeroDivisors A) : e a ∈ nonZeroDivisors B := by
+theorem ringEquiv_mem_nonZeroDivisors
+    {A B : Type*} [CommRing A] [CommRing B] (e : A ≃+* B) {a : A} (ha : a ∈ nonZeroDivisors A)
+    : e a ∈ nonZeroDivisors B := by
   rw [mem_nonZeroDivisors_iff_right] at ha ⊢
   intro x hx
-  have : e.symm x * a = 0 := by
-    apply e.injective; rw [map_mul, e.apply_symm_apply, hx, map_zero]
+  have : e.symm x * a = 0 := by apply e.injective; rw [map_mul, e.apply_symm_apply, hx, map_zero]
   simpa using congrArg e (ha _ this)
 
-theorem effCartier_comap_of_isOpenImmersion' {X Y : Scheme.{0}} (I : Y.IdealSheafData) (f : X ⟶ Y)
-    [IsOpenImmersion f] (hI : FinalTheorems.EffCartier I) : FinalTheorems.EffCartier (I.comap f) := by
+theorem effCartier_comap_of_isOpenImmersion'
+    {X Y : Scheme.{0}} (I : Y.IdealSheafData) (f : X ⟶ Y) [IsOpenImmersion f]
+    (hI : FinalTheorems.EffCartier I)
+    : FinalTheorems.EffCartier (I.comap f) := by
   intro x
   obtain ⟨U, h, hxU, hh, hU⟩ := hI (f x)
   obtain ⟨r, hrle, hxr⟩ := U.2.exists_basicOpen_le (V := f.opensRange) ⟨f x, ⟨x, rfl⟩⟩ hxU
@@ -77,8 +87,9 @@ theorem effCartier_comap_of_isOpenImmersion' {X Y : Scheme.{0}} (I : Y.IdealShea
   have hUX : IsAffineOpen (f ⁻¹ᵁ Y.basicOpen r) := by
     rw [← f.isAffineOpen_iff_of_isOpenImmersion, himg]; exact U.2.basicOpen r
   have hle : f ''ᵁ (f ⁻¹ᵁ Y.basicOpen r) ≤ U.1 := himg.le.trans (Y.basicOpen_le r)
-  have hnzd : ∀ (O : Y.Opens) (hO : O = Y.basicOpen r) (hOU : O ≤ U.1),
-      Y.presheaf.map (homOfLE hOU).op h ∈ nonZeroDivisors Γ(Y, O) := by
+  have hnzd
+      : ∀ (O : Y.Opens) (hO : O = Y.basicOpen r) (hOU : O ≤ U.1),
+        Y.presheaf.map (homOfLE hOU).op h ∈ nonZeroDivisors Γ(Y, O) := by
     rintro O rfl hOU
     have := U.2.isLocalization_basicOpen r
     exact algebraMap_mem_nonZeroDivisors_of_isLocalization (Submonoid.powers r) hh
@@ -92,26 +103,39 @@ theorem effCartier_comap_of_isOpenImmersion' {X Y : Scheme.{0}} (I : Y.IdealShea
       Ideal.comap_coe, Ideal.comap_symm, Ideal.map_span, Set.image_singleton]
     rfl
 
-theorem inter_reesCharts' {X W : Scheme.{0}} (π : W ⟶ X) (J : X.IdealSheafData) (hB : FinalTheorems.Blowup π J)
-    (U : X.affineOpens) {m : ℕ} (g : Fin m → Γ(X, U.1)) (_hg : Ideal.span (Set.range g) = J.ideal U)
+theorem inter_reesCharts'
+    {X W : Scheme.{0}}
+    (π : W ⟶ X) (J : X.IdealSheafData) (hB : FinalTheorems.Blowup π J) (U : X.affineOpens)
+    {m : ℕ} (g : Fin m → Γ(X, U.1)) (_hg : Ideal.span (Set.range g) = J.ideal U)
     (V : Fin m → W.Opens) (hV : ∀ i, V i ≤ π ⁻¹ᵁ U.1)
     (e : ∀ i, (V i).toScheme ≅ Spec (CommRingCat.of (FinalTheorems.reesChart g i)))
-    (he : ∀ i, (e i).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap Γ(X, U.1) (FinalTheorems.reesChart g i))) ≫
-      U.2.fromSpec = (V i).ι ≫ π)
+    (he : ∀ i,
+      (e i).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap Γ(X, U.1) (FinalTheorems.reesChart g i)))
+          ≫ U.2.fromSpec
+        = (V i).ι ≫ π)
     (i j : Fin m) (t : Γ(W, V i))
-    (ht : t = (V i).topIso.hom ((e i).hom.appTop ((Scheme.ΓSpecIso _).inv
-      ⟨IsLocalization.mk' (Localization.Away (g i)) (g j) (⟨g i, Submonoid.mem_powers _⟩ : Submonoid.powers (g i)),
-        Algebra.subset_adjoin ⟨j, rfl⟩⟩))) :
-    V i ⊓ V j = W.basicOpen t := by
+    (ht : t
+      = (V i).topIso.hom
+        ((e i).hom.appTop
+          ((Scheme.ΓSpecIso _).inv ⟨
+            IsLocalization.mk' (Localization.Away (g i)) (g j)
+              (⟨g i, Submonoid.mem_powers _⟩ : Submonoid.powers (g i)),
+            Algebra.subset_adjoin ⟨j, rfl⟩
+          ⟩)))
+    : V i ⊓ V j = W.basicOpen t := by
   classical
   let σ : ∀ k, FinalTheorems.reesChart g k →+* Γ(W, V k) := fun k =>
-    (V k).topIso.hom.hom.comp (((e k).hom.appTop).hom.comp
-      (Scheme.ΓSpecIso (.of (FinalTheorems.reesChart g k))).inv.hom)
-  let q : ∀ k l, FinalTheorems.reesChart g k := fun k l =>
-    ⟨IsLocalization.mk' (Localization.Away (g k)) (g l) (⟨g k, Submonoid.mem_powers _⟩ : Submonoid.powers (g k)),
-      Algebra.subset_adjoin ⟨l, rfl⟩⟩
-  have hq : ∀ k l, algebraMap Γ(X, U.1) (FinalTheorems.reesChart g k) (g l) =
-      q k l * algebraMap Γ(X, U.1) (FinalTheorems.reesChart g k) (g k) := fun k l =>
+    (V k).topIso.hom.hom.comp
+      (((e k).hom.appTop).hom.comp (Scheme.ΓSpecIso (.of (FinalTheorems.reesChart g k))).inv.hom)
+  let q : ∀ k l, FinalTheorems.reesChart g k := fun k l => ⟨
+    IsLocalization.mk' (Localization.Away (g k)) (g l)
+      (⟨g k, Submonoid.mem_powers _⟩ : Submonoid.powers (g k)),
+    Algebra.subset_adjoin ⟨l, rfl⟩
+  ⟩
+  have hq
+      : ∀ k l,
+        algebraMap Γ(X, U.1) (FinalTheorems.reesChart g k) (g l)
+          = q k l * algebraMap Γ(X, U.1) (FinalTheorems.reesChart g k) (g k) := fun k l =>
     Subtype.ext (IsLocalization.mk'_spec _ _ _).symm
   have hsec : ∀ k r, σ k (algebraMap _ _ r) = π.appLE _ (V k) (hV k) r := fun k r =>
     sec_algebraMap_of_iso π U (V k) (hV k) _ (e k) (he k) r
@@ -134,8 +158,10 @@ theorem inter_reesCharts' {X W : Scheme.{0}} (π : W ⟶ X) (J : X.IdealSheafDat
     have hwi : w ∈ V i := hw.1
     have hwj : w ∈ V j := hw.2
     rw [Scheme.mem_basicOpen W t w hwi, hti]
-    have hg : ∀ k l (hwk : w ∈ V k), W.presheaf.germ (V k) w hwk (π.appLE _ (V k) (hV k) (g l)) =
-        W.presheaf.germ (π ⁻¹ᵁ U.1) w (hV k hwk) (π.app U.1 (g l)) := by
+    have hg
+        : ∀ k l (hwk : w ∈ V k),
+          W.presheaf.germ (V k) w hwk (π.appLE _ (V k) (hV k) (g l))
+            = W.presheaf.germ (π ⁻¹ᵁ U.1) w (hV k hwk) (π.app U.1 (g l)) := by
       intro k l hwk
       simp only [Scheme.Hom.appLE, CommRingCat.comp_apply, TopCat.Presheaf.germ_res_apply]
     have h1 := congrArg (W.presheaf.germ (V i) w hwi) (hP i j)
@@ -144,8 +170,11 @@ theorem inter_reesCharts' {X W : Scheme.{0}} (π : W ⟶ X) (J : X.IdealSheafDat
     rw [map_mul, hg, hg] at h2
     have hA := germ_mem_nonZeroDivisors hVi (hnz i) w hwi
     rw [hg] at hA
-    have h3 : (W.presheaf.germ (V j) w hwj (σ j (q j i)) * W.presheaf.germ (V i) w hwi (σ i (q i j)) - 1) *
-        W.presheaf.germ (π ⁻¹ᵁ U.1) w (hV i hwi) (π.app U.1 (g i)) = 0 := by
+    have h3
+        : (W.presheaf.germ (V j) w hwj (σ j (q j i)) * W.presheaf.germ (V i) w hwi (σ i (q i j))
+              - 1)
+            * W.presheaf.germ (π ⁻¹ᵁ U.1) w (hV i hwi) (π.app U.1 (g i))
+          = 0 := by
       rw [sub_mul, one_mul, mul_assoc, ← h1, ← h2, sub_self]
     have h4 := sub_eq_zero.1 ((mem_nonZeroDivisors_iff_right.1 hA) _ h3)
     exact IsUnit.of_mul_eq_one_right _ h4

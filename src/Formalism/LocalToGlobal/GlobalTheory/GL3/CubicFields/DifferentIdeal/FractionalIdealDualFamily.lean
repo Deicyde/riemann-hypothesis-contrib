@@ -25,29 +25,40 @@ lemma lift_integral_mem_range (M : IntermediateField ℚ ℂ) [NumberField M] {z
     exact hi
   exact ⟨⟨liftM M z, hint⟩, rfl⟩
 
-theorem mem_mmR_of (K E : Type) [Field K] [Field E] [NumberField K] [NumberField E] [Algebra K E]
-    (φ₀ : K →+* ℂ) (M : IntermediateField ℚ ℂ) [NumberField M] (ι : Type) [Fintype ι] [DecidableEq ι]
-    (emb : ι → E →+* ℂ) (hinj : Function.Injective emb)
-    (hres : ∀ i (y : K), emb i (algebraMap K E y) = φ₀ y)
-    (hcard : Fintype.card ι = Module.finrank K E) (hM : ∀ i y, emb i y ∈ M) (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hI : I ≠ 0) (v : ι → M)
-    (hv : v ∈ mmR M emb I) :
-    ∀ b ∈ ((FractionalIdeal.dual (𝓞 K) K I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E), ∑ i, v i * liftM M (emb i b) ∈ (algebraMap (𝓞 M) M).range := by
+theorem mem_mmR_of
+    (K E : Type) [Field K] [Field E] [NumberField K] [NumberField E] [Algebra K E]
+    (φ₀ : K →+* ℂ)
+    (M : IntermediateField ℚ ℂ) [NumberField M]
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (emb : ι → E →+* ℂ)
+    (hinj : Function.Injective emb) (hres : ∀ i (y : K), emb i (algebraMap K E y) = φ₀ y)
+    (hcard : Fintype.card ι = Module.finrank K E) (hM : ∀ i y, emb i y ∈ M)
+    (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hI : I ≠ 0)
+    (v : ι → M) (hv : v ∈ mmR M emb I)
+    : ∀ b
+        ∈ ((FractionalIdeal.dual (𝓞 K) K I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
+          : Submodule (𝓞 E) E),
+      ∑ i, v i * liftM M (emb i b) ∈ (algebraMap (𝓞 M) M).range := by
   intro b hb
-  have hι : Nonempty ι := by
-    rw [← Fintype.card_pos_iff, hcard]; exact Module.finrank_pos
+  have hι : Nonempty ι := by rw [← Fintype.card_pos_iff, hcard]; exact Module.finrank_pos
   obtain ⟨i0⟩ := hι
   have hφ : ∀ y, φ₀ y ∈ M := fun y => by rw [← hres i0 y]; exact hM i0 _
-  have hb' : ∀ a ∈ (I : Submodule (𝓞 E) E), Algebra.trace K E (b * a) ∈ (algebraMap (𝓞 K) K).range := by
+  have hb'
+      : ∀ a ∈ (I : Submodule (𝓞 E) E), Algebra.trace K E (b * a) ∈ (algebraMap (𝓞 K) K).range := by
     intro a ha
     have := (FractionalIdeal.mem_dual hI).mp hb a ha
     simpa [Algebra.traceForm_apply] using this
-  refine Submodule.span_induction (p := fun v _ => ∑ i, v i * liftM M (emb i b) ∈ (algebraMap (𝓞 M) M).range) ?_ ?_ ?_ ?_ hv
+  refine Submodule.span_induction
+    (p := fun v _ => ∑ i, v i * liftM M (emb i b) ∈ (algebraMap (𝓞 M) M).range)
+    ?_ ?_ ?_ ?_ hv
   · rintro w ⟨a, ha, rfl⟩
-    have : ∑ i, liftM M (emb i a) * liftM M (emb i b) = liftM M (φ₀ (Algebra.trace K E (a * b))) := by
+    have : ∑ i, liftM M (emb i a) * liftM M (emb i b)
+        = liftM M (φ₀ (Algebra.trace K E (a * b))) := by
       rw [← sum_emb_eq_trace K E φ₀ M ι emb hinj hres hcard hM]
       refine Finset.sum_congr rfl fun i _ => ?_
       apply Subtype.ext
-      rw [IntermediateField.coe_mul, coe_lift_intermediate (hM i a), coe_lift_intermediate (hM i b), coe_lift_intermediate (hM i (a * b)), map_mul]
+      rw [IntermediateField.coe_mul, coe_lift_intermediate (hM i a), coe_lift_intermediate (hM i b),
+        coe_lift_intermediate (hM i (a * b)), map_mul]
     simp only [this]
     obtain ⟨t, ht⟩ := hb' a ha
     apply lift_integral_mem_range M (hφ _)
@@ -146,13 +157,21 @@ lemma trace_dual_of_functional (K E : Type) [Field K] [Field E] [NumberField K] 
   simp only [LinearMap.smul_apply, Module.Basis.coord_apply, smul_eq_mul]
   ring
 
-theorem mem_mmR_iff (K E : Type) [Field K] [Field E] [NumberField K] [NumberField E] [Algebra K E]
-    (φ₀ : K →+* ℂ) (M : IntermediateField ℚ ℂ) [NumberField M] (ι : Type) [Fintype ι] [DecidableEq ι]
-    (emb : ι → E →+* ℂ) (hinj : Function.Injective emb)
-    (hres : ∀ i (y : K), emb i (algebraMap K E y) = φ₀ y)
-    (hcard : Fintype.card ι = Module.finrank K E) (hM : ∀ i y, emb i y ∈ M) (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hI : I ≠ 0) (v : ι → M) :
-    v ∈ mmR M emb I ↔
-      ∀ b ∈ ((FractionalIdeal.dual (𝓞 K) K I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E), ∑ i, v i * liftM M (emb i b) ∈ (algebraMap (𝓞 M) M).range := by
+theorem mem_mmR_iff
+    (K E : Type) [Field K] [Field E] [NumberField K] [NumberField E] [Algebra K E]
+    (φ₀ : K →+* ℂ)
+    (M : IntermediateField ℚ ℂ) [NumberField M]
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (emb : ι → E →+* ℂ)
+    (hinj : Function.Injective emb) (hres : ∀ i (y : K), emb i (algebraMap K E y) = φ₀ y)
+    (hcard : Fintype.card ι = Module.finrank K E) (hM : ∀ i y, emb i y ∈ M)
+    (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hI : I ≠ 0)
+    (v : ι → M)
+    : v ∈ mmR M emb I
+      ↔ ∀ b
+          ∈ ((FractionalIdeal.dual (𝓞 K) K I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
+            : Submodule (𝓞 E) E),
+        ∑ i, v i * liftM M (emb i b) ∈ (algebraMap (𝓞 M) M).range := by
   refine ⟨mem_mmR_of K E φ₀ M ι emb hinj hres hcard hM I hI v, fun hv => ?_⟩
   obtain ⟨i0⟩ : Nonempty ι := by rw [← Fintype.card_pos_iff, hcard]; exact Module.finrank_pos
   have hφ : ∀ y, φ₀ y ∈ M := fun y => by rw [← hres i0 y]; exact hM i0 _
@@ -164,14 +183,18 @@ theorem mem_mmR_iff (K E : Type) [Field K] [Field E] [NumberField K] [NumberFiel
     rw [Algebra.smul_def, map_mul]; congr 1; exact Subtype.ext (hres i t)
   set P := (I : Submodule (𝓞 E) E).restrictScalars (𝓞 K)
   obtain ⟨s, hs, hspan, hli⟩ := exists_linearIndependent K ((I : Submodule (𝓞 E) E) : Set E)
-  let e : Module.Basis s K E := Module.Basis.mk hli (by rw [Subtype.range_coe, hspan, fractional_ideal_span_top K E I hI])
+  let e : Module.Basis s K E :=
+    Module.Basis.mk hli (by rw [Subtype.range_coe, hspan, fractional_ideal_span_top K E I hI])
   letI : Fintype s := @Fintype.ofFinite _ (Module.Finite.finite_basis e)
   have he : ∀ l, e l ∈ P := fun l => by rw [Module.Basis.mk_apply]; exact hs l.2
   obtain ⟨n, g, f, hg, hfg⟩ := fractional_ideal_dual_family K E I
   choose b hb using fun j => trace_dual_of_functional K E P e he (f j)
-  have hbd : ∀ j, b j ∈ ((FractionalIdeal.dual (𝓞 K) K I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) :
-      Submodule (𝓞 E) E) :=
-    fun j => (FractionalIdeal.mem_dual hI).mpr fun a ha => ⟨f j ⟨a, ha⟩, (hb j a ha).symm⟩
+  have hbd
+      : ∀ j,
+        b j
+          ∈ ((FractionalIdeal.dual (𝓞 K) K I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
+            : Submodule (𝓞 E) E) := fun j =>
+    (FractionalIdeal.mem_dual hI).mpr fun a ha => ⟨f j ⟨a, ha⟩, (hb j a ha).symm⟩
   have hid : ∀ y (hy : y ∈ P), y = ∑ j, Algebra.traceForm K E (b j) y • g j := by
     intro y hy
     conv_lhs => rw [show y = ((⟨y, hy⟩ : P) : E) from rfl, hfg ⟨y, hy⟩]
@@ -186,14 +209,16 @@ theorem mem_mmR_iff (K E : Type) [Field K] [Field E] [NumberField K] [NumberFiel
     have hdb := sum_emb_dualBasis K E φ₀ M ι emb hinj hres hcard hM e k i
     simp only [hψ, ← he'] at hdb
     rw [← hdb]
-    have h1 : ∀ l, ψ k (e l) = ∑ j, φM (Algebra.traceForm K E (b j) (e l)) * ψ k (g j) := fun l => by
+    have h1
+        : ∀ l, ψ k (e l) = ∑ j, φM (Algebra.traceForm K E (b j) (e l)) * ψ k (g j) := fun l => by
       conv_lhs => rw [hid (e l) (he l)]
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]; simp only [hψK]
-    have h2 : ∀ j, ψ i (b j) = ∑ l, φM (Algebra.traceForm K E (b j) (e l)) * ψ i (e' l) := fun j => by
+      rw [map_sum]; simp only [hψK]
+    have h2
+        : ∀ j, ψ i (b j) = ∑ l, φM (Algebra.traceForm K E (b j) (e l)) * ψ i (e' l) := fun j => by
       conv_lhs => rw [hbexp j]
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]; simp only [hψK]
+      rw [map_sum]; simp only [hψK]
     simp only [h1, h2, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun j _ => ?_
@@ -207,6 +232,7 @@ theorem mem_mmR_iff (K E : Type) [Field K] [Field E] [NumberField K] [NumberFiel
     simp only [mul_assoc, ← Finset.mul_sum, key]
     simp
   rw [hv']
-  exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨g j, hg j, rfl⟩)
+  exact Submodule.sum_mem _ fun j _ =>
+    Submodule.smul_mem _ _ (Submodule.subset_span ⟨g j, hg j, rfl⟩)
 
 end Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5

@@ -9,20 +9,22 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.CentreSp
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open GlobalTheory.CuspRep (CuspSub GA Af Ad finGL locGL)
 open UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Dp UpperTheory.V
 
-private theorem orth_closure {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {U U' : Submodule ℂ H}
-    (h : U ⟂ U') : U.topologicalClosure ⟂ U'.topologicalClosure := by
+private theorem orth_closure
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {U U' : Submodule ℂ H} (h : U ⟂ U')
+    : U.topologicalClosure ⟂ U'.topologicalClosure := by
   have key : ∀ {A B : Submodule ℂ H}, A ⟂ B → A.topologicalClosure ⟂ B := fun {A B} hAB =>
-    Submodule.isOrtho_iff_le.2
-      (Submodule.topologicalClosure_minimal _ (Submodule.isOrtho_iff_le.1 hAB) (Submodule.isClosed_orthogonal B))
+    Submodule.isOrtho_iff_le.2 (Submodule.topologicalClosure_minimal _
+      (Submodule.isOrtho_iff_le.1 hAB) (Submodule.isClosed_orthogonal B))
   exact (key (key h).symm).symm
 
-theorem UpperTheory.ConvolutionTheory.Dp.multiplicity_one_cuspidal_spectrum_normOneGL :
-    UpperTheory.ConvolutionTheory.C.CuspidalMultiplicityOneTotallyComplex := by
+theorem UpperTheory.ConvolutionTheory.Dp.multiplicity_one_cuspidal_spectrum_normOneGL
+    : UpperTheory.ConvolutionTheory.C.CuspidalMultiplicityOneTotallyComplex := by
   intro E _ _ _ n μ _ V V' hV hV' hne
   obtain ⟨π, hπ⟩ := ExistsUnique.exists (exCusp E n μ V hV)
   obtain ⟨π', hπ'⟩ := ExistsUnique.exists (exCusp E n μ V' hV')

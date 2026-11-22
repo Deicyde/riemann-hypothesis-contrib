@@ -22,7 +22,8 @@ structure AutTie (D : D7) (B : RowsAut) (pl : InfinitePlace B.I.F ≃ D.what₂.
   g_eq : B.g = D.host.g 0 * D.host.g 1
   g0_eq : B.g₀ = D.host.g 0
   D_eq : B.D = D.what₂.Dall
-  Dstar_eq : D.what₂.Dstar =
-    B.I.Dstar (∏ v, fdegOf (Formalism.REAL.muG (B.I.ε v)) (B.σ v) (B.w v)) B.μf B.fund B.e
+  Dstar_eq
+    : D.what₂.Dstar
+      = B.I.Dstar (∏ v, fdegOf (Formalism.REAL.muG (B.I.ε v)) (B.σ v) (B.w v)) B.μf B.fund B.e
 
 end Formalism.MainNotions.S

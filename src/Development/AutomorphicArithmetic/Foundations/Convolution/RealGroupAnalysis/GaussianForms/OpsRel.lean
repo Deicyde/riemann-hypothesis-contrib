@@ -7,7 +7,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
@@ -34,8 +36,9 @@ private lemma quaternaryForm_unit_scaling {F : Type} [Field F] [NumberField F] (
   simp only [B4]
   linear_combination (2 * (y 2 * v 2 - rt δ * (y 3 * v 3)) - y 1 * v 0 - y 0 * v 1) * h
 
-theorem UpperTheory.ConvolutionTheory.R2.C.opsRel :
-    ∀ (F : Type) [Field F] [NumberField F] (δ : F) (η : (A F)ˣ →* ℂˣ) (O : Ops δ η), δ ≠ 0 → (∀ a, η a ^ 2 = 1) → Rel O.N O.M O.W := by
+theorem UpperTheory.ConvolutionTheory.R2.C.opsRel
+    : ∀ (F : Type) [Field F] [NumberField F] (δ : F) (η : (A F)ˣ →* ℂˣ) (O : Ops δ η),
+      δ ≠ 0 → (∀ a, η a ^ 2 = 1) → Rel O.N O.M O.W := by
   intro F _ _ δ η O hδ hη
   have hinv : ∀ a : (A F)ˣ, η a⁻¹ = η a := by
     intro a
@@ -81,14 +84,19 @@ theorem UpperTheory.ConvolutionTheory.R2.C.opsRel :
     ext φ v
     simp only [Module.End.mul_apply]
     rw [O.W_apply, O.M_apply, O.W_apply]
-    have hM : (O.M a φ).1 = fun y => ((η a : ℂˣ) : ℂ) * ((ab a ^ 2 : ℝ) : ℂ) * φ.1 fun i => (a : A F) * y i :=
+    have hM
+        : (O.M a φ).1
+          = fun y => ((η a : ℂˣ) : ℂ) * ((ab a ^ 2 : ℝ) : ℂ) * φ.1 fun i => (a : A F) * y i :=
       funext (O.M_apply a φ)
     rw [hM, hinv, habinv]
     have hs := measScale F a (fun y => φ.1 y * ψ (B4 δ y (fun i => ((a⁻¹ : (A F)ˣ) : A F) * v i)))
     simp only [quaternaryForm_unit_scaling] at hs
     simp only [ft4]
-    have hl : ∀ y, ((η a : ℂˣ) : ℂ) * ((ab a ^ 2 : ℝ) : ℂ) * φ.1 (fun i => (a : A F) * y i) * ψ (B4 δ y v)
-        = (((η a : ℂˣ) : ℂ) * ((ab a ^ 2 : ℝ) : ℂ)) * (φ.1 (fun i => (a : A F) * y i) * ψ (B4 δ y v)) := by
+    have hl
+        : ∀ y,
+          ((η a : ℂˣ) : ℂ) * ((ab a ^ 2 : ℝ) : ℂ) * φ.1 (fun i => (a : A F) * y i) * ψ (B4 δ y v)
+            = (((η a : ℂˣ) : ℂ) * ((ab a ^ 2 : ℝ) : ℂ))
+              * (φ.1 (fun i => (a : A F) * y i) * ψ (B4 δ y v)) := by
       intro y; ring
     simp only [hl]
     rw [MeasureTheory.integral_const_mul, hs]

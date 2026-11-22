@@ -10,19 +10,28 @@ namespace Formalism.L2.Forms
 
 open Formalism.BasicNotions Matrix
 
-theorem isUnit_det_cols {E : Type} [Field E] {N n : ℕ} (hN : n + 1 = N) (A : Matrix (Fin N) (Fin n) E) (z : Fin N → E)
-    (hA : Function.Injective A.mulVec) (hz : ∀ x, A *ᵥ x ≠ z) :
-    IsUnit (Matrix.of (fun a (b : Fin N) => if hb : (b : ℕ) < n then A a ⟨b, hb⟩ else z a)).det := by
+theorem isUnit_det_cols
+    {E : Type} [Field E]
+    {N n : ℕ} (hN : n + 1 = N) (A : Matrix (Fin N) (Fin n) E) (z : Fin N → E)
+    (hA : Function.Injective A.mulVec) (hz : ∀ x, A *ᵥ x ≠ z)
+    : IsUnit (Matrix.of (fun a (b : Fin N) =>
+      if hb : (b : ℕ) < n then A a ⟨b, hb⟩ else z a)).det := by
   subst hN
   apply (Matrix.isUnit_iff_isUnit_det _).mp
   rw [← Matrix.mulVec_injective_iff_isUnit]
   intro v1 v2 h12
-  have hv : (Matrix.of fun a (b : Fin (n + 1)) => if hb : (b : ℕ) < n then A a ⟨b, hb⟩ else z a) *ᵥ (v1 - v2) = 0 := by
+  have hv
+      : (Matrix.of fun a (b : Fin (n + 1)) => if hb : (b : ℕ) < n then A a ⟨b, hb⟩ else z a)
+          *ᵥ (v1 - v2)
+        = 0 := by
     rw [Matrix.mulVec_sub, h12, sub_self]
   rw [← sub_eq_zero]
   generalize v1 - v2 = v at hv ⊢
-  have hsplit : ∀ a, ((Matrix.of fun a (b : Fin (n + 1)) => if hb : (b : ℕ) < n then A a ⟨b, hb⟩ else z a) *ᵥ v) a =
-      (A *ᵥ fun j => v j.castSucc) a + v (Fin.last n) * z a := by
+  have hsplit
+      : ∀ a,
+        ((Matrix.of fun a (b : Fin (n + 1)) => if hb : (b : ℕ) < n then A a ⟨b, hb⟩ else z a) *ᵥ v)
+            a
+          = (A *ᵥ fun j => v j.castSucc) a + v (Fin.last n) * z a := by
     intro a
     simp [Matrix.mulVec, dotProduct, Fin.sum_univ_castSucc, mul_comm]
   have hv' : ∀ a, (A *ᵥ fun j => v j.castSucc) a + v (Fin.last n) * z a = 0 := fun a => by
@@ -32,14 +41,17 @@ theorem isUnit_det_cols {E : Type} [Field E] {N n : ℕ} (hN : n + 1 = N) (A : M
     apply hz (-(v (Fin.last n))⁻¹ • fun j : Fin n => v j.castSucc)
     funext a
     rw [Matrix.mulVec_smul, Pi.smul_apply, smul_eq_mul]
-    have e : (A *ᵥ fun j : Fin n => v j.castSucc) a = -(v (Fin.last n) * z a) := by linear_combination hv' a
-    rw [e]; field_simp
+    have e : (A *ᵥ fun j : Fin n => v j.castSucc) a = -(v (Fin.last n) * z a) := by
+      linear_combination hv' a
+    rw [e]
+    field_simp
   have hcs : (fun j : Fin n => v j.castSucc) = 0 := by
     apply hA
     funext a
     have := hv' a
     rw [hlast, zero_mul, add_zero] at this
-    rw [this, Matrix.mulVec_zero]; rfl
+    rw [this, Matrix.mulVec_zero]
+    rfl
   funext j
   refine Fin.lastCases ?_ (fun i => ?_) j
   · exact hlast
@@ -60,7 +72,9 @@ theorem iXc_injective : Function.Injective (iXc D) := by
   letI := D.host.cmStar
   intro x y h
   unfold iXc at h
-  simp only [LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe, EmbeddingLike.apply_eq_iff_eq] at h
+  simp only [LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe,
+      EmbeddingLike.apply_eq_iff_eq]
+    at h
   exact (LinearEquiv.injective _) (iX'_injective D h)
 
 theorem iXm_mulVec_injective : Function.Injective (iXm D).mulVec := by

@@ -16,8 +16,8 @@ section Alg
 
 variable {M : Type*} [AddCommGroup M] [Module ℂ M]
 
-def layer (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (V : Submodule ℂ M) :
-    ℕ → Submodule ℂ M
+def layer (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (V : Submodule ℂ M)
+    : ℕ → Submodule ℂ M
   | 0 => V
   | k + 1 => layer ε E V k ⊔ ⨆ (a : Fin n) (b : Fin n) (_ : ε a ≠ ε b), (layer ε E V k).map (E a b)
 

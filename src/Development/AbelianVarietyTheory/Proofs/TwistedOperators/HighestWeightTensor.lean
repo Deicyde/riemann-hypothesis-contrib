@@ -341,7 +341,7 @@ theorem highestWeight_tensor : admQ7 := by
       have := ctrR_act a₁ a₂ (Eab a b) ψ u
       rw [hu.2 a b hab, map_zero] at this
       rw [map_neg]
-      change -ctrR _ u = a₁ _ (ctrR ψ u)
+      change - ctrR _ u = a₁ _ (ctrR ψ u)
       exact neg_eq_of_add_eq_zero_left this.symm
   refine ⟨ν - μ, ?_, by abel⟩
   rw [Submodule.ne_bot_iff]

@@ -11,15 +11,24 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.IsL
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AbLaw
 
-theorem secOn_pull_surjective_of_surjective :
-    ∀ (A A' : Type) [CommRing A] [CommRing A'] (g : A →+* A'), Function.Surjective g → ∀ (X X' : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of A)) (f' : X' ⟶ Spec (CommRingCat.of A')) (β : X' ⟶ X), IsPullback β f' f (Spec.map (CommRingCat.ofHom g)) → ∀ H : LB X, H.IsLB → ∀ D : X.Opens, IsAffineOpen D → Function.Surjective (SecOn.pull H β D) := by
+theorem secOn_pull_surjective_of_surjective
+    : ∀ (A A' : Type) [CommRing A] [CommRing A'] (g : A →+* A'),
+      Function.Surjective g
+        → ∀ (X X' : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of A))
+            (f' : X' ⟶ Spec (CommRingCat.of A')) (β : X' ⟶ X),
+          IsPullback β f' f (Spec.map (CommRingCat.ofHom g))
+            → ∀ H : LB X,
+              H.IsLB → ∀ D : X.Opens, IsAffineOpen D → Function.Surjective (SecOn.pull H β D) := by
   intro A A' _ _ g hg X X' f f' β hβ H hH D hD y
   letI := g.toAlgebra
   obtain ⟨z, hz⟩ := (SecOnR.baseChangeHom_bijective (R := A) (R' := A') hH hβ hD rfl).2 y

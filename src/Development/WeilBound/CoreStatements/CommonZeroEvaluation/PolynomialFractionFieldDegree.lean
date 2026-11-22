@@ -8,7 +8,14 @@ namespace ModelDimension
 
 open MvPolynomial
 
-theorem polynomial_fraction_field_degree : ∀ (κ K L I : Type) [Field κ] [Field K] [Field L] [Algebra K L] (ψ : κ ≃+* K) (T : I → L), AlgebraicIndependent K T → ∃ φ : FractionRing (MvPolynomial I κ) →+* L, (∀ a, φ (algebraMap (MvPolynomial I κ) _ (MvPolynomial.C a)) = algebraMap K L (ψ a)) ∧ (∀ i, φ (algebraMap (MvPolynomial I κ) _ (MvPolynomial.X i)) = T i) ∧ (letI := φ.toAlgebra; Module.finrank (FractionRing (MvPolynomial I κ)) L) = Module.finrank (IntermediateField.adjoin K (Set.range T)) L := by
+theorem polynomial_fraction_field_degree
+    : ∀ (κ K L I : Type) [Field κ] [Field K] [Field L] [Algebra K L] (ψ : κ ≃+* K) (T : I → L),
+      AlgebraicIndependent K T
+        → ∃ φ : FractionRing (MvPolynomial I κ) →+* L,
+          (∀ a, φ (algebraMap (MvPolynomial I κ) _ (MvPolynomial.C a)) = algebraMap K L (ψ a))
+            ∧ (∀ i, φ (algebraMap (MvPolynomial I κ) _ (MvPolynomial.X i)) = T i)
+            ∧ (letI := φ.toAlgebra; Module.finrank (FractionRing (MvPolynomial I κ)) L)
+              = Module.finrank (IntermediateField.adjoin K (Set.range T)) L := by
   intro κ K L I _ _ _ _ ψ T hT
   let f : κ →+* L := (algebraMap K L).comp ψ.toRingHom
   let ρ : MvPolynomial I κ →+* L := MvPolynomial.eval₂Hom f T
@@ -30,14 +37,18 @@ theorem polynomial_fraction_field_degree : ∀ (κ K L I : Type) [Field κ] [Fie
     | add p q hp hq => rw [map_add (f := _)]; exact S.add_mem hp hq
     | mul_X p i hp =>
       rw [map_mul]
-      exact S.mul_mem hp (by simpa [ρ] using IntermediateField.subset_adjoin K (Set.range T) ⟨i, rfl⟩)
+      exact S.mul_mem hp
+        (by simpa [ρ] using IntermediateField.subset_adjoin K (Set.range T) ⟨i, rfl⟩)
   have hφS : ∀ x, φ x ∈ S := by
     intro x
     obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := MvPolynomial I κ) x
     rw [map_div₀, hφ, hφ]
     exact S.div_mem (hρS a) (hρS b)
-  have hS : S ≤ φ.fieldRange.toIntermediateField (K := K) (fun k =>
-      RingHom.mem_fieldRange.2 ⟨algebraMap _ _ (MvPolynomial.C (ψ.symm k)), by rw [hφ]; simp [ρ, f]⟩) := by
+  have hS
+      : S
+        ≤ φ.fieldRange.toIntermediateField (K := K) (fun k =>
+          RingHom.mem_fieldRange.2
+            ⟨algebraMap _ _ (MvPolynomial.C (ψ.symm k)), by rw [hφ]; simp [ρ, f]⟩) := by
     rw [IntermediateField.adjoin_le_iff]
     rintro _ ⟨i, rfl⟩
     exact RingHom.mem_fieldRange.2 ⟨algebraMap _ _ (MvPolynomial.X i), by rw [hφ]; simp [ρ]⟩

@@ -15,7 +15,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.QCoh
 open IsLocalRing
@@ -23,9 +24,14 @@ open GlobalTheory.CompanionTheory.KoszulCount
 
 namespace GlobalTheory.CompanionTheory.KoszulCount
 
-theorem interNumRed_eq_one_of_eq_singleton {K : Type} [Field K] [IsAlgClosed K] {X : Scheme.{0}}
-    [Algebra K Γ(X, ⊤)] (hp : IsProjOver (strHom K (X := X))) (Z : Closeds X) {w : X}
-    (hZ : (Z : Set X) = {w}) (P : Fin 0 → LB X) : interNumRed K Z P = 1 := by
+theorem interNumRed_eq_one_of_eq_singleton
+    {K : Type} [Field K] [IsAlgClosed K]
+    {X : Scheme.{0}} [Algebra K Γ(X, ⊤)]
+    (hp : IsProjOver (strHom K (X := X)))
+    (Z : Closeds X)
+    {w : X} (hZ : (Z : Set X) = {w})
+    (P : Fin 0 → LB X)
+    : interNumRed K Z P = 1 := by
   letI := algebraΓAlong K (redι Z)
   have hk := appTop_algebraMap_along K (redι Z)
   have hX : IsProper (strHom K (X := X)) := (isProper_and_exists_isAmpleLB_of_isProjOver hp).1
@@ -60,37 +66,50 @@ theorem interNumRed_eq_one_of_eq_singleton {K : Type} [Field K] [IsAlgClosed K] 
   haveI : IsFinite (strHom K (Scheme.IdealSheafData.vanishingIdeal Z).subscheme) :=
     IsFinite.iff_isProper_and_isAffineHom.2 ⟨inferInstance, inferInstance⟩
   have hfin : Module.Finite K Γ((Scheme.IdealSheafData.vanishingIdeal Z).subscheme, ⊤) := by
-    have hf := IsFinite.finite_app (strHom K (Scheme.IdealSheafData.vanishingIdeal Z).subscheme) ⊤
-      (isAffineOpen_top _)
+    have hf :=
+      IsFinite.finite_app (strHom K (Scheme.IdealSheafData.vanishingIdeal Z).subscheme) ⊤
+        (isAffineOpen_top _)
     have hi : ((Scheme.ΓSpecIso (CommRingCat.of K)).inv).hom.Finite :=
       RingHom.Finite.of_surjective _
         (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of K)).inv).2
     have hc := hf.comp hi
-    have e : algebraMap K Γ((Scheme.IdealSheafData.vanishingIdeal Z).subscheme, ⊤) =
-        ((strHom K (Scheme.IdealSheafData.vanishingIdeal Z).subscheme).app ⊤).hom.comp
-          ((Scheme.ΓSpecIso (CommRingCat.of K)).inv).hom :=
+    have e
+        : algebraMap K Γ((Scheme.IdealSheafData.vanishingIdeal Z).subscheme, ⊤)
+          = ((strHom K (Scheme.IdealSheafData.vanishingIdeal Z).subscheme).app ⊤).hom.comp
+            ((Scheme.ΓSpecIso (CommRingCat.of K)).inv).hom :=
       RingHom.ext (algebraMap_eq_strHom K (Scheme.IdealSheafData.vanishingIdeal Z).subscheme)
     rw [← RingHom.finite_algebraMap, e]
     exact hc
-  have hbij := IsAlgClosed.algebraMap_bijective_of_isIntegral (k := K)
-    (K := Γ((Scheme.IdealSheafData.vanishingIdeal Z).subscheme, ⊤))
-  have e1 : interNumRed K Z P =
-      chi K (structureModule (Scheme.IdealSheafData.vanishingIdeal Z).subscheme) := by
+  have hbij :=
+    IsAlgClosed.algebraMap_bijective_of_isIntegral (k := K)
+      (K := Γ((Scheme.IdealSheafData.vanishingIdeal Z).subscheme, ⊤))
+  have e1
+      : interNumRed K Z P
+        = chi K (structureModule (Scheme.IdealSheafData.vanishingIdeal Z).subscheme) := by
     change interNumOn K (redι Z) P = _
     exact (interNumOn_eq_interNum_pull hk isEmptyElim).trans (interNum_of_isEmpty K _ _)
   rw [e1, chi_structureModule_of_isAffine]
-  have e2 := (LinearEquiv.ofBijective (Algebra.linearMap K
-    Γ((Scheme.IdealSheafData.vanishingIdeal Z).subscheme, ⊤)) hbij).finrank_eq
+  have e2 :=
+    (LinearEquiv.ofBijective
+      (Algebra.linearMap K Γ((Scheme.IdealSheafData.vanishingIdeal Z).subscheme, ⊤))
+      hbij).finrank_eq
   rw [← e2]
   simp
 
-theorem chi_eq_ncard_support : ∀ {K : Type} [Field K] [IsAlgClosed K] {X : Scheme.{0}} [Algebra K Γ(X, ⊤)], IsProjOver (strHom K (X := X)) → ∀ (F : X.Modules) [IsFiniteQC F], suppDim F ≤ (0 : ℕ) → (∀ x : X, Module.length (X.presheaf.stalk x) (F.presheaf.stalk x :) ≤ 1) → chi K F = ((support F).ncard : ℤ) ∧ ∀ x ∈ support F, IsClosed ({x} : Set X) := by
+theorem chi_eq_ncard_support
+    : ∀ {K : Type} [Field K] [IsAlgClosed K] {X : Scheme.{0}} [Algebra K Γ(X, ⊤)],
+      IsProjOver (strHom K (X := X))
+        → ∀ (F : X.Modules) [IsFiniteQC F],
+          suppDim F ≤ (0 : ℕ)
+            → (∀ x : X, Module.length (X.presheaf.stalk x) (F.presheaf.stalk x :) ≤ 1)
+            → chi K F = ((support F).ncard : ℤ) ∧ ∀ x ∈ support F, IsClosed ({x} : Set X) := by
   intro K _ _ X _ hp F _ hd hlen
   haveI : AlgebraicGeometry.IsNoetherian X := isNoetherian_of_isProjOver hp
-  have hdim0 : ∀ w ∈ support F,
-      topologicalKrullDim (closure ({w} : Set X)) = ((0 : ℕ) : WithBot ℕ∞) := by
+  have hdim0
+      : ∀ w ∈ support F, topologicalKrullDim (closure ({w} : Set X)) = ((0 : ℕ) : WithBot ℕ∞) := by
     intro w hw
-    have hle := (GlobalTheory.CompanionTheory.Ar.IntersectionNumberLength.dim_closure_le_suppDim hw).trans hd
+    have hle :=
+      (GlobalTheory.CompanionTheory.Ar.IntersectionNumberLength.dim_closure_le_suppDim hw).trans hd
     have hne : topologicalKrullDim (closure ({w} : Set X)) ≠ ⊥ := by
       rw [Ne, topologicalKrullDim_eq_bot_iff]
       exact not_isEmpty_of_nonempty (α := (closure ({w} : Set X) : Set X))
@@ -106,7 +125,8 @@ theorem chi_eq_ncard_support : ∀ {K : Type} [Field K] [IsAlgClosed K] {X : Sch
     refine isClosed_of_closure_subset fun y hy => ?_
     have hys : y ∈ support F :=
       (isClosed_support F).closure_subset_iff.2 (Set.singleton_subset_iff.2 hx) hy
-    exact (GlobalTheory.CompanionTheory.Ar.IntersectionNumberLength.eq_of_mem_closure hd (hdim0 y hys) x hx hy).symm
+    exact (GlobalTheory.CompanionTheory.Ar.IntersectionNumberLength.eq_of_mem_closure hd
+      (hdim0 y hys) x hx hy).symm
   have hfin : (support F).Finite := by
     obtain ⟨S, hSf, hSc, hSi, hS⟩ :=
       NoetherianSpace.exists_finite_set_isClosed_irreducible (isClosed_support F)
@@ -127,8 +147,10 @@ theorem chi_eq_ncard_support : ∀ {K : Type} [Field K] [IsAlgClosed K] {X : Sch
     exact Set.finite_singleton _
   refine ⟨?_, hcl⟩
   have hP : ∀ i : Fin 0, ((finZeroElim : Fin 0 → LB X) i).IsLB := isEmptyElim
-  have h := GlobalTheory.CompanionTheory.Ar.IntersectionNumberLength.interNum_eq_sum_length_mul_interNumRed K X hp (Fin 0)
-    finZeroElim hP F (by simpa using hd) hfin.toFinset (fun w hw _ => hfin.mem_toFinset.2 hw)
+  have h :=
+    GlobalTheory.CompanionTheory.Ar.IntersectionNumberLength.interNum_eq_sum_length_mul_interNumRed
+      K X hp (Fin 0) finZeroElim hP F (by simpa using hd) hfin.toFinset
+      (fun w hw _ => hfin.mem_toFinset.2 hw)
   rw [interNum_of_isEmpty] at h
   rw [h, Set.ncard_eq_toFinset_card _ hfin, Finset.card_eq_sum_ones, Nat.cast_sum]
   refine Finset.sum_congr rfl fun w hw => ?_

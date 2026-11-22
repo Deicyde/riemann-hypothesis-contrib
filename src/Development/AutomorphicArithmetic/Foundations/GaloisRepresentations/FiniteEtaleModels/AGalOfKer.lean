@@ -7,16 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylor
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.G3 (sp)
 open GlobalTheory.UPel.HT.HeckeAd (IsTranslA heckeSubA)
 open scoped TensorProduct
 open UpperTheory.Gal.FiniteEtaleModels
 
-theorem UpperTheory.Gal.FiniteEtaleModels.galOfKer_holds :
-    GalOfKer := by
+theorem UpperTheory.Gal.FiniteEtaleModels.galOfKer_holds : GalOfKer := by
   intro S A B _ _ _ _ hA hB ψ ψ' κ hψ hψ' h1 h2 hκ H hfin hHψ hinj hsurj
   haveI := hA
   haveI := hB
@@ -34,8 +36,16 @@ theorem UpperTheory.Gal.FiniteEtaleModels.galOfKer_holds :
   haveI : Etale (ψ'.left ≫ ψ.left) := by rw [← Over.comp_left, h2]; exact hbE
   haveI : Surjective (ψ'.left ≫ ψ.left) := by rw [← Over.comp_left, h2]; exact hbS
   haveI : FormallyUnramified ψ'.left := FormallyUnramified.of_comp ψ'.left ψ.left
-  refine ⟨hfin, ?_, ?_, ?_, IsFinite.of_comp ψ.left ψ'.left, Etale.of_comp ψ.left ψ'.left,
-    Surjective.of_comp ψ'.left ψ.left, ?_⟩
+  refine ⟨
+    hfin,
+    ?_,
+    ?_,
+    ?_,
+    IsFinite.of_comp ψ.left ψ'.left,
+    Etale.of_comp ψ.left ψ'.left,
+    Surjective.of_comp ψ'.left ψ.left,
+    ?_
+  ⟩
   · simp [Hecke.PullHecke.transl_one]
   · intro a c
     simp [Hecke.PullHecke.transl_mul]
@@ -57,8 +67,10 @@ theorem UpperTheory.Gal.FiniteEtaleModels.galOfKer_holds :
     have hg : (Y1 * Y0⁻¹) ≫ ψ = 1 := by
       rw [MonObj.mul_comp, GrpObj.inv_comp, hY, _root_.mul_inv_cancel]
     obtain ⟨g₀, hg₀H, hgg₀⟩ := hsurj K (y ≫ A.hom) (Y1 * Y0⁻¹) hg
-    have key : ∀ h : 𝟙_ (Over S) ⟶ A, (y ≫ Over.Hom.left (Hecke.transl h) = y' ↔
-        toUnit (Over.mk (y ≫ A.hom)) ≫ h = Y1 * Y0⁻¹) := by
+    have key
+        : ∀ h : 𝟙_ (Over S) ⟶ A,
+          (y ≫ Over.Hom.left (Hecke.transl h) = y'
+            ↔ toUnit (Over.mk (y ≫ A.hom)) ≫ h = Y1 * Y0⁻¹) := by
       intro h
       have e := Hecke.Comp.comp_transl Y0 h
       constructor

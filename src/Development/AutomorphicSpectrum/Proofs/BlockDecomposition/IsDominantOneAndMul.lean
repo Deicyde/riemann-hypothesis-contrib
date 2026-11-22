@@ -9,11 +9,12 @@ open GlobalTheory.PRep GlobalTheory.SmGL ValuativeRel PositivityTheory.Lbc
 
 namespace GlobalTheory.CompanionTheory.Lbc
 
-theorem isDominant_one_and_mul :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-      (N : ℕ) (J : Subgroup (GL (Fin N) k)) (h : ℕ) (d : Fin h → ℕ) (hd : ∑ a, d a = N),
-      IsDominant k N J d hd 1 ∧ ∀ t t' : Levi k (Bl d), IsDominant k N J d hd t →
-        IsDominant k N J d hd t' → IsDominant k N J d hd (t * t') := by
+theorem isDominant_one_and_mul
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N : ℕ) (J : Subgroup (GL (Fin N) k)) (h : ℕ) (d : Fin h → ℕ) (hd : ∑ a, d a = N),
+      IsDominant k N J d hd 1
+        ∧ ∀ t t' : Levi k (Bl d),
+          IsDominant k N J d hd t → IsDominant k N J d hd t' → IsDominant k N J d hd (t * t') := by
   intro k _ _ _ _ N J h d hd
   refine ⟨⟨fun n hn => ?_, fun n hn => ?_, fun x hx => ?_⟩, ?_⟩
   · simpa using hn

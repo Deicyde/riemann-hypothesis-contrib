@@ -11,10 +11,11 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-theorem RankFracDegree.isFractionRing_of_closure {F Ω A : Type} [Field F] [Field Ω] [Algebra F Ω] [CommRing A]
+theorem RankFracDegree.isFractionRing_of_closure
+    {F Ω A : Type} [Field F] [Field Ω] [Algebra F Ω] [CommRing A]
     (K : IntermediateField F Ω) (f : A →+* Ω) (hf : Function.Injective f) (hK : ∀ a, f a ∈ K)
-    (hcl : K.toSubfield ≤ Subfield.closure (Set.range f)) :
-    @IsFractionRing A _ K _ (f.codRestrict K hK).toAlgebra := by
+    (hcl : K.toSubfield ≤ Subfield.closure (Set.range f))
+    : @IsFractionRing A _ K _ (f.codRestrict K hK).toAlgebra := by
   let _ : Algebra A K := (f.codRestrict K hK).toAlgebra
   have hmap : ∀ a, ((algebraMap A K a : K) : Ω) = f a := fun _ => rfl
   have hnz : ∀ a : A, a ∈ nonZeroDivisors A → f a ≠ 0 := by
@@ -24,7 +25,11 @@ theorem RankFracDegree.isFractionRing_of_closure {F Ω A : Type} [Field F] [Fiel
     exact one_ne_zero (by simpa using congrArg f h10 : (1 : Ω) = 0)
   show IsLocalization (nonZeroDivisors A) K
   rw [isLocalization_iff]
-  refine ⟨fun y => IsUnit.mk0 _ fun h => hnz y y.2 (by rw [← hmap, h]; rfl), fun z => ?_, fun {x y} h => ?_⟩
+  refine ⟨
+    fun y => IsUnit.mk0 _ fun h => hnz y y.2 (by rw [← hmap, h]; rfl),
+    fun z => ?_,
+    fun {x y} h => ?_
+  ⟩
   · obtain ⟨y, hy, w, hw, hyw⟩ := Subfield.mem_closure_iff.mp (hcl z.2)
     rw [← RingHom.coe_range, Subring.closure_eq] at hy hw
     obtain ⟨a, rfl⟩ := hy

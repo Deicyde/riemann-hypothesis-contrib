@@ -7,14 +7,18 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EndValuedFor
 
 set_option autoImplicit false
 
-open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.GoodTop
+open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame
+  GlobalTheory.GoodMetric GlobalTheory.GoodTop
 open ReciprocityTheory.L2DbarEstimates (V)
 open scoped ContDiff Matrix
 
 namespace GlobalTheory.GoodTop
 
-theorem glueMeas_zero_dens {n : ℕ} {Y κ : Type} [TopologicalSpace Y] [MeasurableSpace Y]
-    (e : κ → OpenPartialHomeomorph Y (V n)) : glueMeas e (fun _ _ => 0) = 0 := by
+theorem glueMeas_zero_dens
+    {n : ℕ} {Y κ : Type} [TopologicalSpace Y] [MeasurableSpace Y]
+    (e : κ → OpenPartialHomeomorph Y (V n))
+    : glueMeas e (fun _ _ => 0) = 0 := by
   have h : ∀ i, chartMeas (e i) (fun _ => 0) = 0 := by
     intro i
     unfold chartMeas
@@ -24,8 +28,10 @@ theorem glueMeas_zero_dens {n : ℕ} {Y κ : Type} [TopologicalSpace Y] [Measura
   simp only [h]
   exact le_antisymm (iSup_le fun _ => le_rfl) (Measure.zero_le _)
 
-theorem hasInt_zero {n : ℕ} {Y κ : Type} [TopologicalSpace Y] [MeasurableSpace Y]
-    (e : κ → OpenPartialHomeomorph Y (V n)) (S : Set Y) : HasInt e (fun _ _ => 0) S 0 := by
+theorem hasInt_zero
+    {n : ℕ} {Y κ : Type} [TopologicalSpace Y] [MeasurableSpace Y]
+    (e : κ → OpenPartialHomeomorph Y (V n)) (S : Set Y)
+    : HasInt e (fun _ _ => 0) S 0 := by
   unfold HasInt
   simp only [mul_zero, ENNReal.ofReal_zero, glueMeas_zero_dens]
   simp

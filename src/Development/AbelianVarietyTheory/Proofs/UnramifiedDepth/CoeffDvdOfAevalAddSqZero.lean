@@ -5,7 +5,8 @@ public import ReciprocityTheory.DualLattices.FormalChartAtZero
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory
 
@@ -72,11 +73,15 @@ private lemma polCoef_span {R : Type} [CommRing R] {g N : ℕ} (f : MvPolynomial
   simp only [Finsupp.single_eq_same] at this
   exact absurd (hm j) (not_lt.mpr this)
 
-theorem coeff_dvd_of_aeval_add_sq_zero :
-  (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] (g N : ℕ) (G : MvPolynomial (Fin g) R₀),
-    (∀ (S : Type) [CommRing S] [Algebra R₀ S], (p : S) = 0 → ∀ a e : Fin g → S, (∀ i, a i ^ N = 0) → (∀ i j, e i * e j = 0) →
-      MvPolynomial.aeval (a + e) G = MvPolynomial.aeval a G) →
-    ∀ m : Fin g →₀ ℕ, (∀ i, m i < N) → (∃ i, ¬ p ∣ m i) → ∃ r : R₀, AddMonoidAlgebra.coeff G m = p * r) := by
+theorem coeff_dvd_of_aeval_add_sq_zero
+    : (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] (g N : ℕ) (G : MvPolynomial (Fin g) R₀),
+      (∀ (S : Type) [CommRing S] [Algebra R₀ S],
+          (p : S) = 0
+            → ∀ a e : Fin g → S,
+              (∀ i, a i ^ N = 0) → (∀ i j, e i * e j = 0)
+                → MvPolynomial.aeval (a + e) G = MvPolynomial.aeval a G)
+        → ∀ m : Fin g →₀ ℕ,
+          (∀ i, m i < N) → (∃ i, ¬ p ∣ m i) → ∃ r : R₀, AddMonoidAlgebra.coeff G m = p * r) := by
   intro R₀ _ p hp g N G H m hm ⟨i, hi⟩
   let I : Ideal R₀ := Ideal.span {(p : R₀)}
   let R := R₀ ⧸ I
@@ -87,16 +92,16 @@ theorem coeff_dvd_of_aeval_add_sq_zero :
     have : (Ideal.Quotient.mk I) (p : R₀) = 0 :=
       Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.subset_span rfl)
     simpa using this
-  have hpA : (p : A) = 0 := by
-    rw [← map_natCast (algebraMap R A), hpR, map_zero]
+  have hpA : (p : A) = 0 := by rw [← map_natCast (algebraMap R A), hpR, map_zero]
   let x : Fin g → A := fun j => Ideal.Quotient.mk J (MvPolynomial.X j)
   have hx : ∀ j, x j ^ N = 0 := fun j => by
     simp only [x]
     rw [← map_pow, Ideal.Quotient.eq_zero_iff_mem]
     exact Ideal.subset_span ⟨j, rfl⟩
   have h4 := polCoef_pderiv p G H hpA x hx i
-  have h5 : ∀ f : MvPolynomial (Fin g) R₀, MvPolynomial.aeval x f
-      = Ideal.Quotient.mk J (MvPolynomial.map (algebraMap R₀ R) f) := by
+  have h5
+      : ∀ f : MvPolynomial (Fin g) R₀,
+        MvPolynomial.aeval x f = Ideal.Quotient.mk J (MvPolynomial.map (algebraMap R₀ R) f) := by
     intro f
     induction f using MvPolynomial.induction_on with
     | C r => simp only [MvPolynomial.aeval_C, MvPolynomial.map_C]; rfl
@@ -107,8 +112,7 @@ theorem coeff_dvd_of_aeval_add_sq_zero :
     rcases Nat.eq_zero_or_pos (m i) with h | h
     · exact absurd (h ▸ dvd_zero p) hi
     · exact h
-  have h6 := polCoef_span _ h4 (m - Finsupp.single i 1)
-    (fun j => lt_of_le_of_lt (by simp) (hm j))
+  have h6 := polCoef_span _ h4 (m - Finsupp.single i 1) (fun j => lt_of_le_of_lt (by simp) (hm j))
   have hle : Finsupp.single i 1 ≤ m := Finsupp.single_le_iff.mpr hpos
   rw [MvPolynomial.coeff_map, MvPolynomial.coeff_pderiv, tsub_add_cancel_of_le hle] at h6
   have h7 : AddMonoidAlgebra.coeff G m * (m i : R₀) ∈ I := by
@@ -121,7 +125,9 @@ theorem coeff_dvd_of_aeval_add_sq_zero :
   have hc : IsCoprime (p : R₀) (m i : R₀) :=
     Nat.Coprime.cast ((Nat.Prime.coprime_iff_not_dvd hp.out).mpr hi)
   obtain ⟨u, v, huv⟩ := hc
-  exact ⟨u * AddMonoidAlgebra.coeff G m + v * s, by
-    linear_combination (-AddMonoidAlgebra.coeff G m) * huv - v * hs⟩
+  exact ⟨
+    u * AddMonoidAlgebra.coeff G m + v * s,
+    by linear_combination (-AddMonoidAlgebra.coeff G m) * huv - v * hs
+  ⟩
 
 end GlobalTheory

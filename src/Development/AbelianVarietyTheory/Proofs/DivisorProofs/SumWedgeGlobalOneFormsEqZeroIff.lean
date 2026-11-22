@@ -9,8 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGlobal
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.AbCoh
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory
+  CartesianMonoidalCategory MonObj TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -19,21 +22,34 @@ noncomputable section
 
 namespace GlobalTheory.AbCoh
 
-theorem wsum_eq_zero_iff : ∀ (R : Type) [CommRing R] (C : Type) [Category.{0} C] (F : C ⥤ CommAlgCat.{0} R), HasFrame F → CohomZeroIsConstants F → ∀ (n : ℕ) (u v : Fin n → Glob1 F), wsum F u v = 0 ↔ ∀ l l' : Glob1 F →ₗ[R] R, ∑ k, (l (u k) * l' (v k) - l (v k) * l' (u k)) = 0 := by
+theorem wsum_eq_zero_iff
+    : ∀ (R : Type) [CommRing R] (C : Type) [Category.{0} C] (F : C ⥤ CommAlgCat.{0} R),
+      HasFrame F → CohomZeroIsConstants F
+        → ∀ (n : ℕ) (u v : Fin n → Glob1 F),
+          wsum F u v = 0
+            ↔ ∀ l l' : Glob1 F →ₗ[R] R, ∑ k, (l (u k) * l' (v k) - l (v k) * l' (u k)) = 0 := by
   intro R _ C _ F hfr hH n u v
   constructor
   · intro hw l l'
-    obtain ⟨δ, -, hδ⟩ := GlobalTheory.T.exists_globalVectorField_of_oneForm_functional R C F hfr hH l
-    obtain ⟨δ', -, hδ'⟩ := GlobalTheory.T.exists_globalVectorField_of_oneForm_functional R C F hfr hH l'
-    have key : ∀ T, algebraMap R (F.obj T) (∑ k, (l (u k) * l' (v k) - l (v k) * l' (u k))) = 0 := by
+    obtain ⟨δ, -, hδ⟩ :=
+      GlobalTheory.T.exists_globalVectorField_of_oneForm_functional R C F hfr hH l
+    obtain ⟨δ', -, hδ'⟩ :=
+      GlobalTheory.T.exists_globalVectorField_of_oneForm_functional R C F hfr hH l'
+    have key
+        : ∀ T, algebraMap R (F.obj T) (∑ k, (l (u k) * l' (v k) - l (v k) * l' (u k))) = 0 := by
       intro T
-      have h0 := congrArg (exteriorPower.pairingDual (F.obj T) Ω[F.obj T⁄R] 2
-        (exteriorPower.ιMulti (F.obj T) 2 ![δ T, δ' T])) (congrFun hw T)
+      have h0 :=
+        congrArg
+          (exteriorPower.pairingDual (F.obj T) Ω[F.obj T⁄R] 2
+            (exteriorPower.ιMulti (F.obj T) 2 ![δ T, δ' T]))
+          (congrFun hw T)
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [wsum, map_sum, wedge_eq_ιMulti, exteriorPower.pairingDual_ιMulti_ιMulti,
-        Matrix.det_fin_two, map_zero, Pi.zero_apply] at h0
-      simp only [Matrix.of_apply, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_fin_one,
-        Matrix.head_cons, hδ, hδ'] at h0
+            Matrix.det_fin_two, map_zero, Pi.zero_apply]
+          at h0
+      simp only [Matrix.of_apply, Matrix.cons_val_zero, Matrix.cons_val_one,
+          Matrix.cons_val_fin_one, Matrix.head_cons, hδ, hδ']
+        at h0
       set_option synthInstance.maxHeartbeats 100000 in
         rw [← h0, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
@@ -63,8 +79,8 @@ theorem wsum_eq_zero_iff : ∀ (R : Type) [CommRing R] (C : Type) [Category.{0} 
       have hu : ∀ k, (u k).1 T = ∑ i, L i (u k) • (Φ.w i).1 T := fun k => hexp _
       have hv : ∀ k, (v k).1 T = ∑ i, L i (v k) • (Φ.w i).1 T := fun k => hexp _
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [wsum, hu, hv, map_sum, LinearMap.sum_apply, wedge_smul_left, wedge_smul_right, c, x,
-        Finset.sum_smul, mul_smul]
+        simp only [wsum, hu, hv, map_sum, LinearMap.sum_apply, wedge_smul_left, wedge_smul_right, c,
+          x, Finset.sum_smul, mul_smul]
       conv_lhs => arg 2; ext k; rw [Finset.sum_comm]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => ?_

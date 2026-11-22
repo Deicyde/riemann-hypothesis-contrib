@@ -9,42 +9,55 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsStdCharNeg
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct FourierTransform
 open MeasureTheory GroundTheory.Automorphic.GJMatrix
 
 namespace GlobalTheory.StdCharEq
 
-theorem trace_eq_infiniteTrace (F : Type) [Field F] [NumberField F] (x : InfiniteAdeleRing F) :
-    Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (InfiniteAdeleRing.ringEquiv_mixedSpace F x) =
-      GroundTheory.Global.infiniteTrace F x := by
+theorem trace_eq_infiniteTrace (F : Type) [Field F] [NumberField F] (x : InfiniteAdeleRing F)
+    : Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (InfiniteAdeleRing.ringEquiv_mixedSpace F x)
+      = GroundTheory.Global.infiniteTrace F x := by
   classical
-  rw [← GroundTheory.Global.mixedTrace_homeomorphMixedSpace, GroundTheory.Global.homeomorphMixedSpace_apply,
-    GroundTheory.Global.mixedTrace_apply, Algebra.trace_prod_apply, PI.ProdFormulaE.Tr.trace_pi,
-    PI.ProdFormulaE.Tr.trace_pi]
+  rw [← GroundTheory.Global.mixedTrace_homeomorphMixedSpace,
+    GroundTheory.Global.homeomorphMixedSpace_apply, GroundTheory.Global.mixedTrace_apply,
+    Algebra.trace_prod_apply, PI.ProdFormulaE.Tr.trace_pi, PI.ProdFormulaE.Tr.trace_pi]
   simp only [Algebra.trace_self_apply, Algebra.trace_complex_apply]
 
-theorem eq_adelicChar : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsStd ψ →
-    ∀ x : AF F, ψ x = (GroundTheory.Global.adelicChar F x : ℂ) := by
+theorem eq_adelicChar
+    : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+      IsStd ψ → ∀ x : AF F, ψ x = (GroundTheory.Global.adelicChar F x : ℂ) := by
   intro F _ _ ψ hψ
-  have hadd : ∀ a b : AF F, (GroundTheory.Global.adelicChar F (a + b) : ℂ) =
-      (GroundTheory.Global.adelicChar F a : ℂ) * (GroundTheory.Global.adelicChar F b : ℂ) := fun a b => by
+  have hadd
+      : ∀ a b : AF F,
+        (GroundTheory.Global.adelicChar F (a + b) : ℂ)
+          = (GroundTheory.Global.adelicChar F a : ℂ)
+            * (GroundTheory.Global.adelicChar F b : ℂ) := fun a b => by
     rw [← Circle.coe_mul]
     exact congrArg _ ((GroundTheory.Global.adelicChar F).map_add_eq_mul a b)
-  have hinf : ∀ x : Ainf F, ψ (pairA F x 0) = (GroundTheory.Global.adelicChar F (pairA F x 0) : ℂ) := fun x => by
-    have h : GroundTheory.Global.adelicChar F (pairA F x 0) = 𝐞 (-GroundTheory.Global.infiniteTrace F x) :=
+  have hinf
+      : ∀ x : Ainf F,
+        ψ (pairA F x 0) = (GroundTheory.Global.adelicChar F (pairA F x 0) : ℂ) := fun x => by
+    have h
+        : GroundTheory.Global.adelicChar F (pairA F x 0)
+          = 𝐞 (- GroundTheory.Global.infiniteTrace F x) :=
       GroundTheory.Global.adelicChar_infinite x
-    rw [GlobalTheory.StdCharFromIsStd.psi_pairA hψ, trace_eq_infiniteTrace, h, Real.fourierChar_apply]
+    rw [GlobalTheory.StdCharFromIsStd.psi_pairA hψ, trace_eq_infiniteTrace, h,
+      Real.fourierChar_apply]
     congr 1
     push_cast
     ring
   have hp : Continuous fun y : Af F => pairA F 0 y := continuous_const.prodMk continuous_id
   have hc : Continuous fun a : AF F => (GroundTheory.Global.adelicChar F a : ℂ) :=
     continuous_subtype_val.comp GroundTheory.Global.continuous_adelicChar
-  have hcl : IsClosed {y : Af F | ψ (pairA F 0 y) = (GroundTheory.Global.adelicChar F (pairA F 0 y) : ℂ)} :=
+  have hcl : IsClosed
+      {y : Af F | ψ (pairA F 0 y) = (GroundTheory.Global.adelicChar F (pairA F 0 y) : ℂ)} :=
     isClosed_eq (hψ.1.comp hp) (hc.comp hp)
-  have hrange : Set.range (algebraMap F (Af F)) ⊆
-      {y : Af F | ψ (pairA F 0 y) = (GroundTheory.Global.adelicChar F (pairA F 0 y) : ℂ)} := by
+  have hrange
+      : Set.range (algebraMap F (Af F))
+        ⊆ {y : Af F | ψ (pairA F 0 y) = (GroundTheory.Global.adelicChar F (pairA F 0 y) : ℂ)} := by
     rintro _ ⟨a, rfl⟩
     have h1 := hψ.2.1 a
     have h2 : (GroundTheory.Global.adelicChar F (algebraMap F (AF F) a) : ℂ) = 1 := by

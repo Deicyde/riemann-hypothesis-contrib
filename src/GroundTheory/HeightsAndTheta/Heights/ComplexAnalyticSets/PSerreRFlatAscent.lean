@@ -20,15 +20,20 @@ theorem SerreRFlatAscent.proof : SerreRFlatAscent.Statement := by
   let := Localization.AtPrime.algebraOfLiesOver (P.under A) P
   have : IsLocalHom (algebraMap (Localization.AtPrime (P.under A)) (Localization.AtPrime P)) :=
     Localization.isLocalHom_localRingHom _ _ _ Ideal.LiesOver.over
-  have := isLocalRing_closedFibre (R := Localization.AtPrime (P.under A)) (S := Localization.AtPrime P)
+  have :=
+    isLocalRing_closedFibre (R := Localization.AtPrime (P.under A)) (S := Localization.AtPrime P)
   let e := Ideal.quotEquivOfEq (map_maximalIdeal_localization_eq (A := A) P).symm
-  have hsum := ringKrullDim_eq_add_ringKrullDim_closedFibre (R := Localization.AtPrime (P.under A))
-    (S := Localization.AtPrime P)
+  have hsum :=
+    ringKrullDim_eq_add_ringKrullDim_closedFibre (R := Localization.AtPrime (P.under A))
+      (S := Localization.AtPrime P)
   have h0A : (0 : WithBot ℕ∞) ≤ ringKrullDim (Localization.AtPrime (P.under A)) :=
     ringKrullDim_nonneg_of_nontrivial
-  have h0F : (0 : WithBot ℕ∞) ≤ ringKrullDim (Localization.AtPrime P ⧸
-      (maximalIdeal (Localization.AtPrime (P.under A))).map
-        (algebraMap (Localization.AtPrime (P.under A)) (Localization.AtPrime P))) :=
+  have h0F
+      : (0 : WithBot ℕ∞)
+        ≤ ringKrullDim
+          (Localization.AtPrime P ⧸
+            (maximalIdeal (Localization.AtPrime (P.under A))).map
+              (algebraMap (Localization.AtPrime (P.under A)) (Localization.AtPrime P))) :=
     ringKrullDim_nonneg_of_nontrivial
   rw [hsum] at hdim
   have hAk := (le_add_of_nonneg_right h0F).trans hdim

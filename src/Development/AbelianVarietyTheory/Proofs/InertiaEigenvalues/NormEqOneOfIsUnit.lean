@@ -38,9 +38,11 @@ def ball : ValuationSubring E where
 
 theorem norm_le_one (x : (ball : ValuationSubring E)) : ‖(x : E)‖ ≤ 1 := x.2
 
-theorem norm_eq_one_of_isUnit {x : (ball : ValuationSubring E)} (hx : IsUnit x) : ‖(x : E)‖ = 1 := by
+theorem norm_eq_one_of_isUnit {x : (ball : ValuationSubring E)} (hx : IsUnit x)
+    : ‖(x : E)‖ = 1 := by
   obtain ⟨u, rfl⟩ := hx
-  have h0 : ((u : (ball : ValuationSubring E)) : E) * ((u⁻¹ : (ball : ValuationSubring E)ˣ) : E) = 1 :=
+  have h0
+      : ((u : (ball : ValuationSubring E)) : E) * ((u⁻¹ : (ball : ValuationSubring E)ˣ) : E) = 1 :=
     congrArg Subtype.val u.mul_inv
   have h := congrArg norm h0
   rw [norm_mul, norm_one] at h
@@ -58,29 +60,36 @@ instance : Finite (MaximalSpectrum (ball : ValuationSubring E)) := by
 
 abbrev ι : (ball : ValuationSubring E) →+* E := (ball : ValuationSubring E).subtype
 
-theorem exists_cyclic_basis {n : ℕ} (M : Matrix (Fin n) (Fin n) E) (hM : ∀ i j, ‖M i j‖ ≤ 1)
-    (hs : ∃ u v : Polynomial E, (∀ i, ‖u.coeff i‖ ≤ 1) ∧ (∀ i, ‖v.coeff i‖ ≤ 1) ∧
-      u * M.charpoly + v * Polynomial.derivative M.charpoly = 1) :
-    ∃ K : Matrix (Fin n) (Fin n) (ball : ValuationSubring E), IsUnit K.det ∧
-      M * K.map ι = K.map ι * GlobalTheory.Orb.companionMat n M.charpoly := by
+theorem exists_cyclic_basis
+    {n : ℕ} (M : Matrix (Fin n) (Fin n) E) (hM : ∀ i j, ‖M i j‖ ≤ 1)
+    (hs : ∃ u v : Polynomial E,
+      (∀ i, ‖u.coeff i‖ ≤ 1) ∧ (∀ i, ‖v.coeff i‖ ≤ 1)
+        ∧ u * M.charpoly + v * Polynomial.derivative M.charpoly = 1)
+    : ∃ K : Matrix (Fin n) (Fin n) (ball : ValuationSubring E),
+      IsUnit K.det ∧ M * K.map ι = K.map ι * GlobalTheory.Orb.companionMat n M.charpoly := by
   obtain ⟨u, v, hu, hv, huv⟩ := hs
-  let M' : Matrix (Fin n) (Fin n) (ball : ValuationSubring E) := Matrix.of fun i j => ⟨M i j, hM i j⟩
+  let M' : Matrix (Fin n) (Fin n) (ball : ValuationSubring E) :=
+    Matrix.of fun i j => ⟨M i j, hM i j⟩
   have hM' : M'.map ι = M := by ext i j; rfl
-  have lift : ∀ p : Polynomial E, (∀ i, ‖p.coeff i‖ ≤ 1) →
-      ∃ q : Polynomial (ball : ValuationSubring E), q.map ι = p := by
+  have lift
+      : ∀ p : Polynomial E,
+        (∀ i, ‖p.coeff i‖ ≤ 1) → ∃ q : Polynomial (ball : ValuationSubring E), q.map ι = p := by
     intro p hp
-    exact (Polynomial.mem_lifts p).1 ((Polynomial.lifts_iff_coeff_lifts p).2 fun i => ⟨⟨p.coeff i, hp i⟩, rfl⟩)
+    exact (Polynomial.mem_lifts p).1
+      ((Polynomial.lifts_iff_coeff_lifts p).2 fun i => ⟨⟨p.coeff i, hp i⟩, rfl⟩)
   obtain ⟨u', hu'⟩ := lift u hu
   obtain ⟨v', hv'⟩ := lift v hv
   have hsep : M'.charpoly.Separable := by
     refine ⟨u', v', Polynomial.map_injective ι Subtype.val_injective ?_⟩
-    rw [Polynomial.map_add (f := _), Polynomial.map_mul, Polynomial.map_mul, ← Polynomial.derivative_map,
-      ← Matrix.charpoly_map, hM', hu', hv', Polynomial.map_one]
+    rw [Polynomial.map_add (f := _), Polynomial.map_mul, Polynomial.map_mul,
+      ← Polynomial.derivative_map, ← Matrix.charpoly_map, hM', hu', hv', Polynomial.map_one]
     exact huv
-  obtain ⟨w, hw⟩ := GlobalTheory.RegSS.Semilocal.cyclicSemilocal_of_cyclicField GlobalTheory.RegSS.cyclicField _
-    (Fin n) M' hsep
+  obtain ⟨w, hw⟩ :=
+    GlobalTheory.RegSS.Semilocal.cyclicSemilocal_of_cyclicField GlobalTheory.RegSS.cyclicField _
+      (Fin n) M' hsep
   let σ : Equiv.Perm (Fin n) := (Fintype.equivFin (Fin n)).trans (finCongr (Fintype.card_fin n))
-  have hk : GlobalTheory.RegSS.krylov M' w = (GlobalTheory.ClassParam.krylov M' w).submatrix id σ := by
+  have hk
+      : GlobalTheory.RegSS.krylov M' w = (GlobalTheory.ClassParam.krylov M' w).submatrix id σ := by
     ext i j
     simp [GlobalTheory.RegSS.krylov, GlobalTheory.ClassParam.krylov, σ]
   refine ⟨GlobalTheory.ClassParam.krylov M' w, ?_, ?_⟩
@@ -89,11 +98,21 @@ theorem exists_cyclic_basis {n : ℕ} (M : Matrix (Fin n) (Fin n) E) (hM : ∀ i
   · rw [GlobalTheory.ClassParam.krylov_map, hM']
     exact GlobalTheory.Orb.mul_krylov_eq M _
 
-theorem split_place : ∀ (E : Type) [NontriviallyNormedField E] [IsUltrametricDist E] [LocallyCompactSpace E] (n : ℕ) (A x : Matrix (Fin n) (Fin n) E), (∀ i j, ‖A i j‖ ≤ 1) → (∃ u v : Polynomial E, (∀ i, ‖u.coeff i‖ ≤ 1) ∧ (∀ i, ‖v.coeff i‖ ≤ 1) ∧ u * A.charpoly + v * Polynomial.derivative A.charpoly = 1) → IsUnit x → (∀ i j, ‖(x⁻¹ * A * x) i j‖ ≤ 1) → ∃ t k : Matrix (Fin n) (Fin n) E, IsUnit t ∧ t * A = A * t ∧ (∀ i j, ‖k i j‖ ≤ 1) ∧ ‖k.det‖ = 1 ∧ x = t * k := by
+theorem split_place
+    : ∀ (E : Type) [NontriviallyNormedField E] [IsUltrametricDist E] [LocallyCompactSpace E] (n : ℕ)
+        (A x : Matrix (Fin n) (Fin n) E),
+      (∀ i j, ‖A i j‖ ≤ 1)
+        → (∃ u v : Polynomial E,
+          (∀ i, ‖u.coeff i‖ ≤ 1) ∧ (∀ i, ‖v.coeff i‖ ≤ 1)
+            ∧ u * A.charpoly + v * Polynomial.derivative A.charpoly = 1)
+        → IsUnit x → (∀ i j, ‖(x⁻¹ * A * x) i j‖ ≤ 1)
+        → ∃ t k : Matrix (Fin n) (Fin n) E,
+          IsUnit t ∧ t * A = A * t ∧ (∀ i j, ‖k i j‖ ≤ 1) ∧ ‖k.det‖ = 1 ∧ x = t * k := by
   intro E _ _ _ n A x hA hs hx hy
   obtain ⟨U, rfl⟩ := hx
-  have hcp : ((U : Matrix (Fin n) (Fin n) E)⁻¹ * A *
-      (U : Matrix (Fin n) (Fin n) E)).charpoly = A.charpoly :=
+  have hcp
+      : ((U : Matrix (Fin n) (Fin n) E)⁻¹ * A * (U : Matrix (Fin n) (Fin n) E)).charpoly
+        = A.charpoly :=
     Matrix.charpoly_units_conj' U A
   obtain ⟨KA, hKA, hA'⟩ := exists_cyclic_basis A hA hs
   obtain ⟨Ky, hKy, hy'⟩ := exists_cyclic_basis _ hy (hcp ▸ hs)
@@ -114,18 +133,23 @@ theorem split_place : ∀ (E : Type) [NontriviallyNormedField E] [IsUltrametricD
   have hUU : (U : Matrix (Fin n) (Fin n) E) * (U : Matrix (Fin n) (Fin n) E)⁻¹ = 1 := by
     rw [← Matrix.coe_units_inv]; exact Units.mul_inv U
   have haA : a⁻¹ * A = C * a⁻¹ := by
-    calc a⁻¹ * A = a⁻¹ * (A * a) * a⁻¹ := by
-          rw [Matrix.mul_assoc, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ ha, Matrix.mul_one]
-      _ = C * a⁻¹ := by
-          rw [hA', ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ ha, Matrix.one_mul]
+    calc
+      a⁻¹ * A = a⁻¹ * (A * a) * a⁻¹ := by
+        rw [Matrix.mul_assoc, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ ha, Matrix.mul_one]
+      _ = C * a⁻¹ := by rw [hA', ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ ha, Matrix.one_mul]
   refine ⟨(U : Matrix (Fin n) (Fin n) E) * b * a⁻¹, (KA * Ky⁻¹).map ι, ?_, ?_, ?_, ?_, ?_⟩
   · exact (U.isUnit.mul ((Matrix.isUnit_iff_isUnit_det _).2 hb)).mul
       ((Matrix.isUnit_iff_isUnit_det _).2 (Matrix.isUnit_nonsing_inv_det a ha))
-  · calc (U : Matrix (Fin n) (Fin n) E) * b * a⁻¹ * A = (U : Matrix (Fin n) (Fin n) E) * (b * C) * a⁻¹ := by
-          rw [Matrix.mul_assoc, haA, ← Matrix.mul_assoc, Matrix.mul_assoc ((U : Matrix (Fin n) (Fin n) E) : Matrix (Fin n) (Fin n) E)]
-      _ = (U : Matrix (Fin n) (Fin n) E) * ((U : Matrix (Fin n) (Fin n) E)⁻¹ * A * (U : Matrix (Fin n) (Fin n) E) * b) * a⁻¹ := by rw [hy']
+  · calc
+      (U : Matrix (Fin n) (Fin n) E) * b * a⁻¹ * A
+          = (U : Matrix (Fin n) (Fin n) E) * (b * C) * a⁻¹ := by
+        rw [Matrix.mul_assoc, haA, ← Matrix.mul_assoc,
+          Matrix.mul_assoc ((U : Matrix (Fin n) (Fin n) E) : Matrix (Fin n) (Fin n) E)]
+      _ = (U : Matrix (Fin n) (Fin n) E)
+          * ((U : Matrix (Fin n) (Fin n) E)⁻¹ * A * (U : Matrix (Fin n) (Fin n) E) * b) * a⁻¹ := by
+        rw [hy']
       _ = A * ((U : Matrix (Fin n) (Fin n) E) * b * a⁻¹) := by
-          simp only [← Matrix.mul_assoc, hUU, Matrix.one_mul]
+        simp only [← Matrix.mul_assoc, hUU, Matrix.one_mul]
   · intro i j
     exact norm_le_one _
   · rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]

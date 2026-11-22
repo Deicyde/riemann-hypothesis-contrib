@@ -11,23 +11,31 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SymmetricKMap
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId GlobalTheory.Jet
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+  GlobalTheory.Jet
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
 
 namespace GlobalTheory.Jet
 
-theorem form_eq_zero_of_casK (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool)
-    (E : Fin n → Fin n → Module.End ℂ V) (lam : Fin n → ℝ) (g : ℝ) (u : V) (j : ℕ) (hE : GlRel E)
-    (hU : IsUnitary ε E) (hu : KHighest ε E (LamOf ε lam) u) (hfd : FiniteDimensional ℂ (kSpan ε E u))
+theorem form_eq_zero_of_casK
+    (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (lam : Fin n → ℝ)
+    (g : ℝ)
+    (u : V)
+    (j : ℕ)
+    (hE : GlRel E) (hU : IsUnitary ε E) (hu : KHighest ε E (LamOf ε lam) u)
+    (hfd : FiniteDimensional ℂ (kSpan ε E u))
     (hgap : ∀ a b : Fin n, a < b → ε a ≠ ε b → g ≤ lam a - lam b) (hg : 2 * (n : ℝ) < g)
     (T : Arr V n (j + 1) →ₗ[ℂ] ℂ)
     (hTc : ∀ F ∈ arrV0 ε E u (j + 1),
       T (CasK ε (arrE E (j + 1)) F - ((ckv ε (LamOf ε lam) : ℝ) : ℂ) • F) = 0)
     (hTs : ∀ F ∈ arrV0 ε E u (j + 1), ∀ s : Equiv.Perm (Fin (j + 1)), T (permArr V n s F) = T F)
-    (hTm : ∀ F ∈ arrV0 ε E u (j + 1), (∀ α', sliceLin V n α' F ∈ Vminus ε E (LamOf ε lam) u) → T F = 0) :
-    ∀ F ∈ arrV0 ε E u (j + 1), T F = 0 := by
+    (hTm
+      : ∀ F ∈ arrV0 ε E u (j + 1), (∀ α', sliceLin V n α' F ∈ Vminus ε E (LamOf ε lam) u) → T F = 0)
+    : ∀ F ∈ arrV0 ε E u (j + 1), T F = 0 := by
   haveI : FiniteDimensional ℂ (kSpan ε E u) := hfd
   haveI hWfd : FiniteDimensional ℂ (arrV0 ε E u (j + 1)) := by
     let φ : arrV0 ε E u (j + 1) →ₗ[ℂ] ((Fin (j + 1) → Fin n × Fin n) → kSpan ε E u) :=
@@ -43,19 +51,23 @@ theorem form_eq_zero_of_casK (V : Type) [NormedAddCommGroup V] [InnerProductSpac
     have h' := congrArg (fun f => ((f α : kSpan ε E u) : V)) h
     simpa [φ, arrOf] using h'
   haveI : CompleteSpace (arrV0 ε E u (j + 1)) := FiniteDimensional.complete ℂ _
-  let f : arrV0 ε E u (j + 1) →L[ℂ] ℂ := LinearMap.toContinuousLinearMap (T ∘ₗ (arrV0 ε E u (j + 1)).subtype)
+  let f : arrV0 ε E u (j + 1) →L[ℂ] ℂ :=
+    LinearMap.toContinuousLinearMap (T ∘ₗ (arrV0 ε E u (j + 1)).subtype)
   let G0 : arrV0 ε E u (j + 1) := (InnerProductSpace.toDual ℂ (arrV0 ε E u (j + 1))).symm f
   have hGW : (G0 : Arr V n (j + 1)) ∈ arrV0 ε E u (j + 1) := G0.2
   have hG : ∀ F ∈ arrV0 ε E u (j + 1), T F = ⟪(G0 : Arr V n (j + 1)), F⟫_ℂ := by
     intro F hF
-    have h1 := InnerProductSpace.toDual_symm_apply (𝕜 := ℂ) (E := arrV0 ε E u (j + 1)) (x := ⟨F, hF⟩) (y := f)
+    have h1 :=
+      InnerProductSpace.toDual_symm_apply (𝕜 := ℂ) (E := arrV0 ε E u (j + 1)) (x := ⟨F, hF⟩)
+        (y := f)
     rw [Submodule.coe_inner] at h1
     rw [h1]
     rfl
   set G : Arr V n (j + 1) := (G0 : Arr V n (j + 1)) with hGdef
 
-  have hinv : ∀ (s : Equiv.Perm (Fin (j + 1))) (H : Arr V n (j + 1)),
-      permArr V n s (permArr V n s⁻¹ H) = H := by
+  have hinv
+      : ∀ (s : Equiv.Perm (Fin (j + 1))) (H : Arr V n (j + 1)),
+        permArr V n s (permArr V n s⁻¹ H) = H := by
     intro s H
     apply indexArray_ext
     intro α
@@ -68,8 +80,9 @@ theorem form_eq_zero_of_casK (V : Type) [NormedAddCommGroup V] [InnerProductSpac
     have horth : ∀ F ∈ arrV0 ε E u (j + 1), ⟪permArr V n s G - G, F⟫_ℂ = 0 := by
       intro F hF
       rw [inner_sub_left, sub_eq_zero]
-      calc ⟪permArr V n s G, F⟫_ℂ = ⟪permArr V n s G, permArr V n s (permArr V n s⁻¹ F)⟫_ℂ := by
-            rw [hinv]
+      calc
+        ⟪permArr V n s G, F⟫_ℂ
+          = ⟪permArr V n s G, permArr V n s (permArr V n s⁻¹ F)⟫_ℂ := by rw [hinv]
         _ = ⟪G, permArr V n s⁻¹ F⟫_ℂ := inner_permutePositions s _ _
         _ = T (permArr V n s⁻¹ F) := (hG _ (permute_mem_highest_jets hF _)).symm
         _ = T F := hTs F hF s⁻¹
@@ -94,9 +107,10 @@ theorem form_eq_zero_of_casK (V : Type) [NormedAddCommGroup V] [InnerProductSpac
           · exact hm
           · exact zero_mem _
         rw [hG _ hins, inner_eq_sum_firstPositionSlice] at hT0
-        have hterm : ∀ β' : Fin j → Fin n × Fin n,
-            ⟪sliceLin V n β' G, sliceLin V n β' (sliceIns α' m)⟫_ℂ =
-              if β' = α' then ⟪sliceLin V n α' G, m⟫_ℂ else 0 := by
+        have hterm
+            : ∀ β' : Fin j → Fin n × Fin n,
+              ⟪sliceLin V n β' G, sliceLin V n β' (sliceIns α' m)⟫_ℂ
+                = if β' = α' then ⟪sliceLin V n α' G, m⟫_ℂ else 0 := by
           intro β'
           rw [slice_sliceIns]
           split_ifs with h
@@ -122,11 +136,13 @@ theorem form_eq_zero_of_casK (V : Type) [NormedAddCommGroup V] [InnerProductSpac
     rw [compactCasimir_apply]
     refine Submodule.sum_mem _ (fun a _ => Submodule.sum_mem _ (fun b _ => ?_))
     split_ifs with h
-    · exact admissibleArrays_invariant ε E u (j + 1) a b h _ (admissibleArrays_invariant ε E u (j + 1) b a h.symm G hGW)
+    · exact admissibleArrays_invariant ε E u (j + 1) a b h _
+        (admissibleArrays_invariant ε E u (j + 1) b a h.symm G hGW)
     · exact zero_mem _
   have hc := hTc G hGW
   rw [hG _ (Submodule.sub_mem _ hCW (Submodule.smul_mem _ _ hGW)), inner_sub_right,
-    inner_smul_right, sub_eq_zero] at hc
+      inner_smul_right, sub_eq_zero]
+    at hc
   have hre : (⟪G, CasK ε (arrE E (j + 1)) G⟫_ℂ).re = ckv ε (LamOf ε lam) * ‖G‖ ^ 2 := by
     rw [hc, Complex.re_ofReal_mul, re_inner_self_indexArray]
   have hpos := nPos V n ε E lam g u j hE hU hu hfd hgap G hN
@@ -140,30 +156,37 @@ theorem form_eq_zero_of_casK (V : Type) [NormedAddCommGroup V] [InnerProductSpac
   intro F hF
   rw [hG F hF, hG0, inner_zero_left]
 
-private theorem ew_append_singleton {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ}
-    (E : Fin n → Fin n → Module.End ℂ V) (w : List (Fin n × Fin n)) (p : Fin n × Fin n) :
-    ew E (w ++ [p]) = ew E w * E p.1 p.2 := by
+private theorem ew_append_singleton
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (w : List (Fin n × Fin n)) (p : Fin n × Fin n)
+    : ew E (w ++ [p]) = ew E w * E p.1 p.2 := by
   induction w with
   | nil => simp [ew]
   | cons q w ih => simp only [List.cons_append, ew, ih, mul_assoc]
 
-theorem thetaA_eq_sum_slice {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n j : ℕ}
-    (E : Fin n → Fin n → Module.End ℂ V) (F : Arr V n (j + 1)) :
-    thetaA E (j + 1) F = ∑ α' : Fin j → Fin n × Fin n, ew E (List.ofFn α').reverse
-      (∑ a, ∑ b, E a b (at1 (sliceLin V n α' F) a b)) := by
-  have hθ : ∀ H : Arr V n (j + 1), thetaA E (j + 1) H =
-      ∑ α : Fin (j + 1) → Fin n × Fin n, ew E (List.ofFn α).reverse (H α) := by
+theorem thetaA_eq_sum_slice
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {n j : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (F : Arr V n (j + 1))
+    : thetaA E (j + 1) F
+      = ∑ α' : Fin j → Fin n × Fin n, ew E (List.ofFn α').reverse
+        (∑ a, ∑ b, E a b (at1 (sliceLin V n α' F) a b)) := by
+  have hθ
+      : ∀ H : Arr V n (j + 1),
+        thetaA E (j + 1) H
+          = ∑ α : Fin (j + 1) → Fin n × Fin n, ew E (List.ofFn α).reverse (H α) := by
     intro H
     simp [thetaA, arrOf]
   rw [hθ, sum_fin_cons]
   refine Finset.sum_congr rfl (fun α' _ => ?_)
-  have hterm : ∀ β : Fin 1 → Fin n × Fin n,
-      ew E (List.ofFn (Fin.cons (β 0) α' : Fin (j + 1) → Fin n × Fin n)).reverse
-          (F (Fin.cons (β 0) α')) =
-        ew E (List.ofFn α').reverse (E (β 0).1 (β 0).2 (F (Fin.cons (β 0) α'))) := by
+  have hterm
+      : ∀ β : Fin 1 → Fin n × Fin n,
+        ew E (List.ofFn (Fin.cons (β 0) α' : Fin (j + 1) → Fin n × Fin n)).reverse
+            (F (Fin.cons (β 0) α'))
+          = ew E (List.ofFn α').reverse (E (β 0).1 (β 0).2 (F (Fin.cons (β 0) α'))) := by
     intro β
     rw [List.ofFn_succ]
-    simp only [Fin.cons_zero, Fin.cons_succ, List.reverse_cons, ew_append_singleton, Module.End.mul_apply]
+    simp only [Fin.cons_zero, Fin.cons_succ, List.reverse_cons, ew_append_singleton,
+      Module.End.mul_apply]
   simp only [hterm]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← map_sum]
@@ -176,9 +199,10 @@ theorem thetaA_eq_sum_slice {V : Type} [NormedAddCommGroup V] [InnerProductSpace
   rw [← Fintype.sum_prod_type']
   exact Fintype.sum_equiv (Equiv.funUnique (Fin 1) (Fin n × Fin n)) _ _ (fun β => rfl)
 
-theorem thetaA_casK {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n j : ℕ} (ε : Fin n → Bool)
-    (E : Fin n → Fin n → Module.End ℂ V) (hE : GlRel E) (F : Arr V n j) :
-    thetaA E j (CasK ε (arrE E j) F) = CasK ε E (thetaA E j F) := by
+theorem thetaA_casK
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {n j : ℕ} (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (hE : GlRel E) (F : Arr V n j)
+    : thetaA E j (CasK ε (arrE E j) F) = CasK ε E (thetaA E j F) := by
   have harr : ∀ (c d : Fin n) (H : Arr V n j), thetaA E j (arrE E j c d H) = E c d (thetaA E j H) :=
     ((arrModule V n ε E j).1 hE).2
   set_option synthInstance.maxHeartbeats 100000 in
@@ -191,9 +215,11 @@ theorem thetaA_casK {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] 
   · rw [harr, harr]
   · exact map_zero _
 
-theorem inner_casK_symm {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n : ℕ} (ε : Fin n → Bool)
-    (E : Fin n → Fin n → Module.End ℂ V) (hU : KUnit ε E) (x y : V) :
-    ⟪x, CasK ε E y⟫_ℂ = ⟪CasK ε E x, y⟫_ℂ := by
+theorem inner_casK_symm
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {n : ℕ} (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (hU : KUnit ε E)
+    (x y : V)
+    : ⟪x, CasK ε E y⟫_ℂ = ⟪CasK ε E x, y⟫_ℂ := by
   rw [compactCasimir_apply, compactCasimir_apply, inner_sum, sum_inner]
   refine Finset.sum_congr rfl (fun a _ => ?_)
   rw [inner_sum, sum_inner]
@@ -202,7 +228,13 @@ theorem inner_casK_symm {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ
   · rw [← hU b a h.symm x (E b a y), hU a b h (E b a x) y]
   · rw [inner_zero_right, inner_zero_left]
 
-theorem kHighest_eq_smul_of_minus_killed : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (lam : Fin n → ℝ) (g : ℝ) (u : V), GlRel E → IsUnitary ε E → KHighest ε E (LamOf ε lam) u → FiniteDimensional ℂ (kSpan ε E u) → (∀ a b : Fin n, a < b → ε a ≠ ε b → g ≤ lam a - lam b) → 2 * (n : ℝ) < g → (∀ G ∈ Vminus ε E (LamOf ε lam) u, ∑ a, ∑ b, E a b (at1 G a b) = 0) → ∀ x ∈ cyc E u, KHighest ε E (LamOf ε lam) x → ∃ c : ℂ, x = c • u := by
+theorem kHighest_eq_smul_of_minus_killed
+    : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool)
+        (E : Fin n → Fin n → Module.End ℂ V) (lam : Fin n → ℝ) (g : ℝ) (u : V),
+      GlRel E → IsUnitary ε E → KHighest ε E (LamOf ε lam) u → FiniteDimensional ℂ (kSpan ε E u)
+        → (∀ a b : Fin n, a < b → ε a ≠ ε b → g ≤ lam a - lam b) → 2 * (n : ℝ) < g
+        → (∀ G ∈ Vminus ε E (LamOf ε lam) u, ∑ a, ∑ b, E a b (at1 G a b) = 0)
+        → ∀ x ∈ cyc E u, KHighest ε E (LamOf ε lam) x → ∃ c : ℂ, x = c • u := by
   intro V _ _ n ε E lam g u hE hU hu hfd hgap hg hmin x hx hxk
   have hKU : KUnit ε E := isUnitary_kUnit ε E hU
   have hKR : KRel ε E := glRel_kRel ε E hE
@@ -219,8 +251,8 @@ theorem kHighest_eq_smul_of_minus_killed : ∀ (V : Type) [NormedAddCommGroup V]
     refine ⟨fun a => ?_, fun a b h1 h2 => ?_⟩
     · rw [hzdef, map_sub, map_smul, hxk.1 a, hu.1 a, smul_sub, smul_comm c]
     · rw [hzdef, map_sub, map_smul, hxk.2 a b h1 h2, hu.2 a b h1 h2, smul_zero, sub_zero]
-  have memO : ∀ y : V, y ∈ (ℂ ∙ z)ᗮ ↔ ⟪z, y⟫_ℂ = 0 :=
-    fun y => Submodule.mem_orthogonal_singleton_iff_inner_right
+  have memO : ∀ y : V, y ∈ (ℂ ∙ z)ᗮ ↔ ⟪z, y⟫_ℂ = 0 := fun y =>
+    Submodule.mem_orthogonal_singleton_iff_inner_right
   have base : pfil ε E u 0 ≤ (ℂ ∙ z)ᗮ := by
     rw [hP0, (kLow V n ε E (LamOf ε lam) u hKR hu).1, lowSpan]
     refine Submodule.span_le.mpr ?_
@@ -232,29 +264,33 @@ theorem kHighest_eq_smul_of_minus_killed : ∀ (V : Type) [NormedAddCommGroup V]
       exact inner_eq_zero_symm.mp huz
     | cons p w =>
       obtain ⟨h1, h2⟩ := hw p (List.mem_cons_self ..)
-      rw [ew, Module.End.mul_apply, ← hKU p.2 p.1 h1.symm, hzK.2 p.2 p.1 h2 h1.symm, inner_zero_left]
+      rw [ew, Module.End.mul_apply, ← hKU p.2 p.1 h1.symm, hzK.2 p.2 p.1 h2 h1.symm,
+        inner_zero_left]
   have step : ∀ j, pfil ε E u j ≤ (ℂ ∙ z)ᗮ → pfil ε E u (j + 1) ≤ (ℂ ∙ z)ᗮ := by
     intro j ih
     have hT : ∀ F ∈ arrV0 ε E u (j + 1), ⟪z, thetaA E (j + 1) F⟫_ℂ = 0 := by
-      have key := form_eq_zero_of_casK V n ε E lam g u j hE hU hu hfd hgap hg
-        ((innerₛₗ ℂ z).comp (thetaA E (j + 1)))
-        (by
-          intro F hF
-          rw [LinearMap.comp_apply, innerₛₗ_apply_apply, map_sub, map_smul, thetaA_casK ε E hE,
-            inner_sub_right, inner_smul_right, inner_casK_symm ε E hKU,
-            kCasSpan V n ε E (LamOf ε lam) z hKR hzK z (mem_compactSpan_self ε E z),
-            inner_smul_left, Complex.conj_ofReal, sub_self])
-        (by
-          intro F hF s
-          rw [LinearMap.comp_apply, LinearMap.comp_apply, innerₛₗ_apply_apply, innerₛₗ_apply_apply]
-          have h3 := (memO _).mp (ih (hTsym j F hF s))
-          rw [inner_sub_right, sub_eq_zero] at h3
-          exact h3)
-        (by
-          intro F hF hsl
-          rw [LinearMap.comp_apply, innerₛₗ_apply_apply, thetaA_eq_sum_slice, Finset.sum_eq_zero, inner_zero_right]
-          intro α' _
-          rw [hmin _ (hsl α'), map_zero])
+      have key :=
+        form_eq_zero_of_casK V n ε E lam g u j hE hU hu hfd hgap hg
+          ((innerₛₗ ℂ z).comp (thetaA E (j + 1)))
+          (by
+            intro F hF
+            rw [LinearMap.comp_apply, innerₛₗ_apply_apply, map_sub, map_smul, thetaA_casK ε E hE,
+              inner_sub_right, inner_smul_right, inner_casK_symm ε E hKU,
+              kCasSpan V n ε E (LamOf ε lam) z hKR hzK z (mem_compactSpan_self ε E z),
+              inner_smul_left, Complex.conj_ofReal, sub_self])
+          (by
+            intro F hF s
+            rw [LinearMap.comp_apply, LinearMap.comp_apply, innerₛₗ_apply_apply,
+              innerₛₗ_apply_apply]
+            have h3 := (memO _).mp (ih (hTsym j F hF s))
+            rw [inner_sub_right, sub_eq_zero] at h3
+            exact h3)
+          (by
+            intro F hF hsl
+            rw [LinearMap.comp_apply, innerₛₗ_apply_apply, thetaA_eq_sum_slice, Finset.sum_eq_zero,
+              inner_zero_right]
+            intro α' _
+            rw [hmin _ (hsl α'), map_zero])
       intro F hF
       simpa using key F hF
     intro y hy

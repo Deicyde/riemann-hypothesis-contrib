@@ -16,22 +16,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RigOfOmegaIn
 
 set_option autoImplicit false
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.PtExt
 
-theorem lie_psi_cl_eq_tanVal (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (N : ℕ)
-    (hN : (p : R) ^ N = 0) (A : Over (Sp R)) [GrpObj A] (hA : IsAbelianScheme A)
-    (G : PDivGroup p R) (t : PDivGroup.TorsionTower G A)
-    (ψ : PrimitiveSubmodule A →ₗ[R] G.omega)
+theorem lie_psi_cl_eq_tanVal
+    (p : ℕ) [Fact p.Prime]
+    (R : Type) [CommRing R]
+    (N : ℕ) (hN : (p : R) ^ N = 0)
+    (A : Over (Sp R)) [GrpObj A]
+    (hA : IsAbelianScheme A)
+    (G : PDivGroup p R) (t : PDivGroup.TorsionTower G A) (ψ : PrimitiveSubmodule A →ₗ[R] G.omega)
     (hψ : ∀ c : PrimitiveSubmodule A, GlobalTheory.PtExt.IsCan t c.1 (G.rigOfOmega (ψ c)))
     (β : Form (A.hom ≫ 𝟙 _)) (hβ : Form.cl _ β ∈ primDR A)
-    (hF : (⟨_, hβ⟩ : primDR A) ∈ PrimitiveSubmodule A) (x : G.Lie) (v : epsR R ⟶ A)
-    (hx : t.LieCorr x v) : x (ψ ⟨_, hF⟩) = tanVal v β := by
+    (hF : (⟨_, hβ⟩ : primDR A) ∈ PrimitiveSubmodule A)
+    (x : G.Lie) (v : epsR R ⟶ A) (hx : t.LieCorr x v)
+    : x (ψ ⟨_, hF⟩) = tanVal v β := by
   obtain ⟨w, hw1, hw2⟩ := isCan_form R A p G t β hβ
   have hw : ψ ⟨_, hF⟩ = w :=
     PDivGroup.rigOfOmega_injective_of_pow p R N hN G

@@ -19,26 +19,27 @@ open scoped Matrix
 namespace PositivityTheory.Xgn.A_xgr_r_om
 
 section
-variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C] {v : Valuation C NNReal}
-  {F : Type} [Field F]
+variable
+  {C : Type} [Field C]
+  {R : Type} [CommRing R] [Algebra R C]
+  {v : Valuation C NNReal} {F : Type} [Field F]
 
-theorem mem_x_ideal_iff (M : Submodule R (F → C)) (χ : MulChar F R) (r : R) :
-    r ∈ xIdeal M χ ↔ (fun a => algebraMap R C (r * χ a)) ∈ M := by
+theorem mem_x_ideal_iff (M : Submodule R (F → C)) (χ : MulChar F R) (r : R)
+    : r ∈ xIdeal M χ ↔ (fun a => algebraMap R C (r * χ a)) ∈ M := by
   rw [xIdeal, Submodule.mem_comap, LinearMap.toSpanSingleton_apply]
   have he : (r • fun a : F => algebraMap R C (χ a)) = fun a => algebraMap R C (r * χ a) := by
     funext a
     simp [Algebra.smul_def, map_mul]
   rw [he]
 
-theorem mem_aug (M : Submodule R (F → C)) (g : F → C) :
-    g ∈ augIdeal M ↔ g ∈ M ∧ g 0 = 0 := Iff.rfl
+theorem mem_aug (M : Submodule R (F → C)) (g : F → C) : g ∈ augIdeal M ↔ g ∈ M ∧ g 0 = 0 := Iff.rfl
 
-theorem v_le_of_mem (hv : v.Integers R) {a b : R} (h : a ∈ Ideal.span {b}) :
-    v (algebraMap R C a) ≤ v (algebraMap R C b) := by
+theorem v_le_of_mem (hv : v.Integers R) {a b : R} (h : a ∈ Ideal.span {b})
+    : v (algebraMap R C a) ≤ v (algebraMap R C b) := by
   exact hv.le_of_dvd (Ideal.mem_span_singleton.mp h)
 
-theorem v_eq_of_span (hv : v.Integers R) {a b : R} (h : Ideal.span {a} = Ideal.span {b}) :
-    v (algebraMap R C a) = v (algebraMap R C b) := by
+theorem v_eq_of_span (hv : v.Integers R) {a b : R} (h : Ideal.span {a} = Ideal.span {b})
+    : v (algebraMap R C a) = v (algebraMap R C b) := by
   apply le_antisymm
   · apply v_le_of_mem hv
     rw [← h]
@@ -47,9 +48,11 @@ theorem v_eq_of_span (hv : v.Integers R) {a b : R} (h : Ideal.span {a} = Ideal.s
     rw [h]
     exact Ideal.mem_span_singleton_self b
 
-theorem sq_bound (hv : v.Integers R) {X : Type} (s : Set (X → C)) (l : (X → C) →ₗ[R] C)
-    (b : NNReal) (h : ∀ g ∈ s, ∀ g' ∈ s, v (l (g * g')) ≤ b) :
-    ∀ g ∈ sqIdeal (Submodule.span R s), v (l g) ≤ b := by
+theorem sq_bound
+    (hv : v.Integers R)
+    {X : Type} (s : Set (X → C)) (l : (X → C) →ₗ[R] C)
+    (b : NNReal) (h : ∀ g ∈ s, ∀ g' ∈ s, v (l (g * g')) ≤ b)
+    : ∀ g ∈ sqIdeal (Submodule.span R s), v (l g) ≤ b := by
   have key : ∀ x y : X → C, v (l x) ≤ b → v (l y) ≤ b → v (l (x + y)) ≤ b := by
     intro x y hx hy
     rw [map_add (f := _)]
@@ -83,24 +86,27 @@ theorem sq_bound (hv : v.Integers R) {X : Type} (s : Set (X → C)) (l : (X → 
 
 variable [Fintype F] [DecidableEq F]
 
-theorem pow_mem_aug (AA : HopfOrder (C := C) R F) {g : F → C} (hg : g ∈ augIdeal AA.carrier)
-    (k : ℕ) : g ^ (k + 1) ∈ augIdeal AA.carrier := by
+theorem pow_mem_aug (AA : HopfOrder (C := C) R F) {g : F → C} (hg : g ∈ augIdeal AA.carrier) (k : ℕ)
+    : g ^ (k + 1) ∈ augIdeal AA.carrier := by
   rw [mem_aug] at hg ⊢
   refine ⟨?_, by simp [Pi.pow_apply, hg.2]⟩
   induction k with
   | zero => simpa using hg.1
   | succ n ih => rw [pow_succ]; exact AA.mul_mem _ _ ih hg.1
 
-theorem pow_mem_sq (AA : HopfOrder (C := C) R F) (χ : MulChar F R) {c : R}
-    (hc : c ∈ xIdeal AA.carrier χ) {k : ℕ} (hk : 2 ≤ k) :
-    (fun a => algebraMap R C (c ^ k * (χ ^ k) a)) ∈ sqIdeal (augIdeal AA.carrier) := by
+theorem pow_mem_sq
+    (AA : HopfOrder (C := C) R F) (χ : MulChar F R)
+    {c : R} (hc : c ∈ xIdeal AA.carrier χ)
+    {k : ℕ} (hk : 2 ≤ k)
+    : (fun a => algebraMap R C (c ^ k * (χ ^ k) a)) ∈ sqIdeal (augIdeal AA.carrier) := by
   obtain ⟨j, rfl⟩ : ∃ j, k = j + 2 := ⟨k - 2, by omega⟩
   have hg : (fun a => algebraMap R C (c * χ a)) ∈ augIdeal AA.carrier := by
     rw [mem_aug]
     refine ⟨(mem_x_ideal_iff _ χ c).mp hc, ?_⟩
     simp [MulChar.map_nonunit χ not_isUnit_zero]
-  have he : (fun a => algebraMap R C (c ^ (j + 2) * (χ ^ (j + 2)) a)) =
-      (fun a => algebraMap R C (c * χ a)) * (fun a => algebraMap R C (c * χ a)) ^ (j + 1) := by
+  have he
+      : (fun a => algebraMap R C (c ^ (j + 2) * (χ ^ (j + 2)) a))
+        = (fun a => algebraMap R C (c * χ a)) * (fun a => algebraMap R C (c * χ a)) ^ (j + 1) := by
     funext a
     simp only [Pi.mul_apply, Pi.pow_apply, MulChar.pow_apply' χ (by omega : j + 2 ≠ 0), map_pow,
       map_mul]
@@ -116,21 +122,22 @@ theorem sq_le (AA : HopfOrder (C := C) R F) : sqIdeal (augIdeal AA.carrier) ≤ 
   exact AA.mul_mem f f' ((mem_aug _ f).mp hf).1 ((mem_aug _ f').mp hf').1
 
 omit [Fintype F] [DecidableEq F] in
-theorem eig_fun (χ : MulChar F R) (r : R) (a x : F) :
-    algebraMap R C (r * χ (a • x)) = algebraMap R C (χ a) * algebraMap R C (r * χ x) := by
+theorem eig_fun (χ : MulChar F R) (r : R) (a x : F)
+    : algebraMap R C (r * χ (a • x)) = algebraMap R C (χ a) * algebraMap R C (r * χ x) := by
   simp only [smul_eq_mul, map_mul]; ring
 
 end
 
-theorem digits {p f m : ℕ} (h1 : 1 ≤ m) (h2 : m < p ^ f) :
-    ∃ d : Fin f → Fin p, (∃ n, (d n : ℕ) ≠ 0) ∧ ∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ) = m := by
+theorem digits {p f m : ℕ} (h1 : 1 ≤ m) (h2 : m < p ^ f)
+    : ∃ d : Fin f → Fin p, (∃ n, (d n : ℕ) ≠ 0) ∧ ∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ) = m := by
   have hp : 0 < p := by
     rcases Nat.eq_zero_or_pos p with h0 | h0
     · subst h0
       rcases f with _ | f <;> simp at h2 <;> omega
     · exact h0
-  have key : ∀ (g : ℕ) (m : ℕ), m < p ^ g →
-      ∃ d : Fin g → Fin p, ∑ n : Fin g, (d n : ℕ) * p ^ (n : ℕ) = m := by
+  have key
+      : ∀ (g : ℕ) (m : ℕ),
+        m < p ^ g → ∃ d : Fin g → Fin p, ∑ n : Fin g, (d n : ℕ) * p ^ (n : ℕ) = m := by
     intro g
     induction g with
     | zero =>
@@ -140,14 +147,16 @@ theorem digits {p f m : ℕ} (h1 : 1 ≤ m) (h2 : m < p ^ f) :
       simp [hm]
     | succ g ih =>
       intro m hm
-      obtain ⟨d', hd'⟩ := ih (m / p) (by
-        rw [Nat.div_lt_iff_lt_mul hp, ← pow_succ]
-        exact hm)
+      obtain ⟨d', hd'⟩ :=
+        ih (m / p) (by
+          rw [Nat.div_lt_iff_lt_mul hp, ← pow_succ]
+          exact hm)
       refine ⟨Fin.cons ⟨m % p, Nat.mod_lt _ hp⟩ d', ?_⟩
       rw [Fin.sum_univ_succ]
       simp only [Fin.cons_zero, Fin.cons_succ, Fin.val_zero, Fin.val_succ, pow_zero, mul_one]
-      have hs : ∑ x : Fin g, (d' x : ℕ) * p ^ ((x : ℕ) + 1) =
-          (∑ x : Fin g, (d' x : ℕ) * p ^ (x : ℕ)) * p := by
+      have hs
+          : ∑ x : Fin g, (d' x : ℕ) * p ^ ((x : ℕ) + 1)
+            = (∑ x : Fin g, (d' x : ℕ) * p ^ (x : ℕ)) * p := by
         rw [Finset.sum_mul]
         exact Finset.sum_congr rfl (fun x _ => by ring)
       rw [hs, hd']
@@ -160,10 +169,14 @@ theorem digits {p f m : ℕ} (h1 : 1 ≤ m) (h2 : m < p ^ f) :
     Finset.sum_eq_zero (fun n _ => by simp [hne n])
   omega
 
-theorem hasLen_quot {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
-    (v : Valuation C NNReal) {M : Type} [AddCommGroup M] [Module R M] (φ : R →ₗ[R] M)
-    (hφ : Function.Surjective φ) (δ : R) (hk : LinearMap.ker φ = Ideal.span {δ}) :
-    HasLen v R M (v (algebraMap R C δ)) := by
+theorem hasLen_quot
+    {C : Type} [Field C]
+    {R : Type} [CommRing R] [Algebra R C]
+    (v : Valuation C NNReal)
+    {M : Type} [AddCommGroup M] [Module R M]
+    (φ : R →ₗ[R] M) (hφ : Function.Surjective φ)
+    (δ : R) (hk : LinearMap.ker φ = Ideal.span {δ})
+    : HasLen v R M (v (algebraMap R C δ)) := by
   refine ⟨1, fun _ => δ, ⟨?_⟩, by simp⟩
   exact ((φ.quotKerEquivOfSurjective hφ).symm.trans (Submodule.quotEquivOfEq _ _ hk)).trans
     (LinearEquiv.funUnique (Fin 1) R (R ⧸ Ideal.span {δ})).symm

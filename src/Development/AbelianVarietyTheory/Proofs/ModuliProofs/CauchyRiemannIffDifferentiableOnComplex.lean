@@ -19,10 +19,11 @@ private lemma pi_single_eq_re_smul_add_im_smul {g : ℕ} (a : Fin g) (w : ℂ) :
     apply Complex.ext <;> simp
   · simp [hj]
 
-theorem map_I_smul_of_cauchyRiemann {g : ℕ} (L : (Fin g → ℂ) →L[ℝ] ℂ)
+theorem map_I_smul_of_cauchyRiemann
+    {g : ℕ} (L : (Fin g → ℂ) →L[ℝ] ℂ)
     (h : ∀ a, L (Pi.single a 1 : Fin g → ℂ) + I * L (I • (Pi.single a 1 : Fin g → ℂ)) = 0)
-    (c : ℂ) (v : Fin g → ℂ) : L (c • v) = c • L v := by
-
+    (c : ℂ) (v : Fin g → ℂ)
+    : L (c • v) = c • L v := by
   have hI : ∀ a, L (I • (Pi.single a 1 : Fin g → ℂ)) = I * L (Pi.single a 1) := by
     intro a
     linear_combination (-I) * h a + L (I • (Pi.single a 1 : Fin g → ℂ)) * I_sq
@@ -43,24 +44,33 @@ theorem map_I_smul_of_cauchyRiemann {g : ℕ} (L : (Fin g → ℂ) →L[ℝ] ℂ
   simp only [Pi.smul_apply, smul_eq_mul]
   ring
 
-theorem cauchyRiemann_iff_differentiableOn_complex :
-    ∀ (g : ℕ) (U : Set (Fin g → ℂ)) (f : (Fin g → ℂ) → ℂ), IsOpen U → (DifferentiableOn ℝ f U → ((∀ a, ∀ z ∈ U, (fderiv ℝ f z (Pi.single a 1 : Fin g → ℂ) + I * fderiv ℝ f z (I • (Pi.single a 1 : Fin g → ℂ))) = 0) ↔ DifferentiableOn ℂ f U)) ∧ (DifferentiableOn ℂ f U → ContDiffOn ℝ ∞ f U ∧ ∀ v, DifferentiableOn ℂ (fun z => fderiv ℂ f z v) U) := by
+theorem cauchyRiemann_iff_differentiableOn_complex
+    : ∀ (g : ℕ) (U : Set (Fin g → ℂ)) (f : (Fin g → ℂ) → ℂ),
+      IsOpen U
+        → (DifferentiableOn ℝ f U
+            → ((∀ a, ∀ z ∈ U,
+                (fderiv ℝ f z (Pi.single a 1 : Fin g → ℂ)
+                    + I * fderiv ℝ f z (I • (Pi.single a 1 : Fin g → ℂ)))
+                  = 0)
+              ↔ DifferentiableOn ℂ f U))
+          ∧ (DifferentiableOn ℂ f U
+            → ContDiffOn ℝ ∞ f U ∧ ∀ v, DifferentiableOn ℂ (fun z => fderiv ℂ f z v) U) := by
   intro g U f hU
   refine ⟨fun hR => ⟨fun hCR => ?_, fun hC => ?_⟩, fun hC => ?_⟩
-  ·
-    intro z hz
+  · intro z hz
     have hzR : DifferentiableAt ℝ f z := hR.differentiableAt (hU.mem_nhds hz)
     set L := fderiv ℝ f z with hL
     have hlin : ∀ (c : ℂ) (v : Fin g → ℂ), L (c • v) = c • L v :=
       map_I_smul_of_cauchyRiemann L (fun a => hCR a z hz)
-    let L' : (Fin g → ℂ) →L[ℂ] ℂ :=
-      { toFun := L
-        map_add' := L.map_add
-        map_smul' := hlin
-        cont := L.continuous }
-    have hres : L'.restrictScalars ℝ = L := by
-      ext v; rfl
-    exact (hasFDerivAt_of_restrictScalars ℝ hzR.hasFDerivAt hres).differentiableAt.differentiableWithinAt
+    let L' : (Fin g → ℂ) →L[ℂ] ℂ := {
+      toFun := L
+      map_add' := L.map_add
+      map_smul' := hlin
+      cont := L.continuous
+    }
+    have hres : L'.restrictScalars ℝ = L := by ext v; rfl
+    exact (hasFDerivAt_of_restrictScalars ℝ hzR.hasFDerivAt
+      hres).differentiableAt.differentiableWithinAt
   · intro a z hz
     have hzC : DifferentiableAt ℂ f z := hC.differentiableAt (hU.mem_nhds hz)
     rw [hzC.fderiv_restrictScalars ℝ]

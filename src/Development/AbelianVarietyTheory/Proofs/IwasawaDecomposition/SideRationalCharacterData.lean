@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Inert
 @[expose] public section
 
 noncomputable section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 open Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR GlobalTheory.HeckeGal
 
 namespace GlobalTheory.ChiTame
@@ -20,8 +23,11 @@ section General
 
 variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
 
-theorem val_pow_sub_pow_lt (A : ValuationSubring Ω) {x y : Ω} (hx : A.valuation x ≤ 1) (hy : A.valuation y ≤ 1)
-    (h : A.valuation (x - y) < 1) (k : ℕ) : A.valuation (x ^ k - y ^ k) < 1 := by
+theorem val_pow_sub_pow_lt
+    (A : ValuationSubring Ω)
+    {x y : Ω} (hx : A.valuation x ≤ 1) (hy : A.valuation y ≤ 1) (h : A.valuation (x - y) < 1)
+    (k : ℕ)
+    : A.valuation (x ^ k - y ^ k) < 1 := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -33,8 +39,11 @@ theorem val_pow_sub_pow_lt (A : ValuationSubring Ω) {x y : Ω} (hx : A.valuatio
     · rw [map_mul, map_pow]
       exact lt_of_le_of_lt (mul_le_of_le_one_right' (pow_le_one' hy k)) h
 
-theorem ine_fix_root {A : ValuationSubring Ω} {m : ℕ} (hm : A.valuation (m : Ω) = 1) (hm0 : m ≠ 0) {ζ : Ω}
-    (hζ : ζ ^ m = 1) {ρ : G E Ω} (hρ : ρ ∈ Ine (F := E) A) : ρ ζ = ζ := by
+theorem ine_fix_root
+    {A : ValuationSubring Ω} {m : ℕ} (hm : A.valuation (m : Ω) = 1) (hm0 : m ≠ 0)
+    {ζ : Ω} (hζ : ζ ^ m = 1)
+    {ρ : G E Ω} (hρ : ρ ∈ Ine (F := E) A)
+    : ρ ζ = ζ := by
   have hζ1 : A.valuation ζ = 1 := GlobalTheory.val_eq_one_of_pow_eq_one A hm0 hζ
   have hζ0 : ζ ≠ 0 := by intro h; rw [h, zero_pow hm0] at hζ; exact zero_ne_one hζ
   have hclose : A.valuation (ρ ζ - ζ) < 1 := hρ.2 ζ hζ1.le
@@ -42,18 +51,24 @@ theorem ine_fix_root {A : ValuationSubring Ω} {m : ℕ} (hm : A.valuation (m : 
     refine GlobalTheory.eq_one_of_pow_eq_one_of_val_sub_lt A hm ?_ ?_
     · rw [mul_pow, ← map_pow, inv_pow, hζ, map_one, inv_one, one_mul]
     · have e : ρ ζ * ζ⁻¹ - 1 = (ρ ζ - ζ) * ζ⁻¹ := by field_simp
-      rw [e, Valuation.map_mul, map_inv₀, hζ1, inv_one, mul_one]; exact hclose
+      rw [e, Valuation.map_mul, map_inv₀, hζ1, inv_one, mul_one]
+      exact hclose
   exact (mul_inv_eq_one₀ hζ0).1 hξ
 
-theorem eq_one_of_wild [IsAlgClosure E Ω] {v : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω}
-    (hA : IsPlaceOver A v) {K : Type} [Field K] [TopologicalSpace K] [T2Space K] (r : G E Ω →* Kˣ)
-    (hr : Continuous r) {m : ℕ} (hm : ((m : ℕ) : 𝓞 E) ∉ v.asIdeal) (hI : ∀ σ ∈ Ine (F := E) A, r σ ^ m = 1)
-    (τ : G E Ω) (hτ : ∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1) : r τ = 1 := by
+theorem eq_one_of_wild
+    [IsAlgClosure E Ω]
+    {v : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω} (hA : IsPlaceOver A v)
+    {K : Type} [Field K] [TopologicalSpace K] [T2Space K]
+    (r : G E Ω →* Kˣ) (hr : Continuous r)
+    {m : ℕ} (hm : ((m : ℕ) : 𝓞 E) ∉ v.asIdeal) (hI : ∀ σ ∈ Ine (F := E) A, r σ ^ m = 1)
+    (τ : G E Ω) (hτ : ∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1)
+    : r τ = 1 := by
   have hm0 : m ≠ 0 := by
     rintro rfl
     exact hm (by simp)
   by_contra hne
-  have hd : orderOf (r τ) ∣ m := orderOf_dvd_of_pow_eq_one (hI τ (GlobalTheory.TameGenPowers.wild_mem_Ine hτ))
+  have hd : orderOf (r τ) ∣ m :=
+    orderOf_dvd_of_pow_eq_one (hI τ (GlobalTheory.TameGenPowers.wild_mem_Ine hτ))
   have hne1 : orderOf (r τ) ≠ 1 := by rwa [Ne, orderOf_eq_one_iff]
   obtain ⟨l, hl, k, hk⟩ := Nat.exists_prime_and_dvd hne1
   have hlv : ((l : ℕ) : 𝓞 E) ∉ v.asIdeal := by
@@ -79,11 +94,17 @@ theorem eq_one_of_wild [IsAlgClosure E Ω] {v : HeightOneSpectrum (𝓞 E)} {A :
   have := Nat.pos_of_ne_zero hk0
   nlinarith
 
-theorem exists_pow_pair [IsAlgClosure E Ω] {v : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω}
-    (hA : IsPlaceOver A v) {γ : G E Ω} (hγ : TameGenAt A γ) {K : Type} [Field K] [TopologicalSpace K] [T2Space K]
-    (r : G E Ω →* Kˣ) (hr : Continuous r) {m : ℕ} (hm : ((m : ℕ) : 𝓞 E) ∉ v.asIdeal)
-    (hI : ∀ σ ∈ Ine (F := E) A, r σ ^ m = 1) {π : Ω} (hπ0 : π ≠ 0) {c : E} (hπ : π ^ m = algebraMap E Ω c)
-    {ρ : G E Ω} (hρ : ρ ∈ Ine (F := E) A) : ∃ n : ℕ, ρ π = (γ π / π) ^ n * π ∧ r ρ = r γ ^ n := by
+theorem exists_pow_pair
+    [IsAlgClosure E Ω]
+    {v : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω} (hA : IsPlaceOver A v)
+    {γ : G E Ω} (hγ : TameGenAt A γ)
+    {K : Type} [Field K] [TopologicalSpace K] [T2Space K]
+    (r : G E Ω →* Kˣ) (hr : Continuous r)
+    {m : ℕ} (hm : ((m : ℕ) : 𝓞 E) ∉ v.asIdeal) (hI : ∀ σ ∈ Ine (F := E) A, r σ ^ m = 1)
+    {π : Ω} (hπ0 : π ≠ 0)
+    {c : E} (hπ : π ^ m = algebraMap E Ω c)
+    {ρ : G E Ω} (hρ : ρ ∈ Ine (F := E) A)
+    : ∃ n : ℕ, ρ π = (γ π / π) ^ n * π ∧ r ρ = r γ ^ n := by
   have hm0 : m ≠ 0 := by
     rintro rfl
     exact hm (by simp)
@@ -96,18 +117,27 @@ theorem exists_pow_pair [IsAlgClosure E Ω] {v : HeightOneSpectrum (𝓞 E)} {A 
   set ζ := γ π / π with hζ
   have hζm : ζ ^ m = 1 := hroot γ
   obtain ⟨m', rfl⟩ := Nat.exists_eq_succ_of_ne_zero hm0
-  have hK : ∀ σ ∈ Subgroup.closure (insert γ {σ : G E Ω | ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1}),
-      σ ∈ Ine (F := E) A ∧ ∃ n : ℕ, σ π = ζ ^ n * π ∧ r σ = r γ ^ n := by
+  have hK
+      : ∀ σ
+          ∈ Subgroup.closure (insert γ
+            {σ : G E Ω | ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1}),
+        σ ∈ Ine (F := E) A ∧ ∃ n : ℕ, σ π = ζ ^ n * π ∧ r σ = r γ ^ n := by
     intro σ hσ
     induction hσ using Subgroup.closure_induction with
     | mem τ hτ =>
       rcases hτ with rfl | hτ
       · exact ⟨hγ.1, 1, by rw [pow_one, hζ, div_mul_cancel₀ _ hπ0], (pow_one _).symm⟩
-      · refine ⟨GlobalTheory.TameGenPowers.wild_mem_Ine hτ, 0, ?_, by rw [pow_zero, eq_one_of_wild hA r hr hm hI τ hτ]⟩
+      · refine ⟨
+          GlobalTheory.TameGenPowers.wild_mem_Ine hτ,
+          0,
+          ?_,
+          by rw [pow_zero, eq_one_of_wild hA r hr hm hI τ hτ]
+        ⟩
         have := GlobalTheory.eq_one_of_pow_eq_one_of_val_sub_lt A hmA (hroot τ) (hτ π hπ0)
         rw [pow_zero, one_mul]
         exact (div_eq_one_iff_eq hπ0).1 this
-    | one => exact ⟨one_mem _, 0, by simp, by simp⟩
+    | one =>
+      exact ⟨one_mem _, 0, by simp, by simp⟩
     | mul σ τ _ _ h1 h2 =>
       obtain ⟨i1, a, a1, a2⟩ := h1
       obtain ⟨i2, b, b1, b2⟩ := h2
@@ -118,13 +148,15 @@ theorem exists_pow_pair [IsAlgClosure E Ω] {v : HeightOneSpectrum (𝓞 E)} {A 
       obtain ⟨i1, a, a1, a2⟩ := h1
       refine ⟨inv_mem i1, a * m', ?_, ?_⟩
       · apply σ.injective
-        rw [mul_inv_apply, map_mul, map_pow, ine_fix_root hmA hm0 hζm i1, a1, ← mul_assoc, ← pow_add,
-          show a * m' + a = (m' + 1) * a by ring, pow_mul, hζm, one_pow, one_mul]
-      · rw [map_inv, a2, inv_eq_iff_mul_eq_one, ← pow_add, show a + a * m' = (m' + 1) * a by ring, pow_mul,
-          hI γ hγ.1, one_pow]
+        rw [mul_inv_apply, map_mul, map_pow, ine_fix_root hmA hm0 hζm i1, a1, ← mul_assoc,
+          ← pow_add, show a * m' + a = (m' + 1) * a by ring, pow_mul, hζm, one_pow, one_mul]
+      · rw [map_inv, a2, inv_eq_iff_mul_eq_one, ← pow_add, show a + a * m' = (m' + 1) * a by ring,
+          pow_mul, hI γ hγ.1, one_pow]
   haveI : IsGalois E Ω := IsAlgClosure.isGalois E Ω
-  have hfin : ({u : Kˣ | u ^ (m' + 1) = 1} \ {r ρ}).Finite := (GlobalTheory.TameGenPowers.finite_roots K _ hm0).diff
-  have ho1 : IsOpen (r ⁻¹' ({u : Kˣ | u ^ (m' + 1) = 1} \ {r ρ})ᶜ) := hfin.isClosed.isOpen_compl.preimage hr
+  have hfin : ({u : Kˣ | u ^ (m' + 1) = 1} \ {r ρ}).Finite :=
+    (GlobalTheory.TameGenPowers.finite_roots K _ hm0).diff
+  have ho1 : IsOpen (r ⁻¹' ({u : Kˣ | u ^ (m' + 1) = 1} \ {r ρ})ᶜ) :=
+    hfin.isClosed.isOpen_compl.preimage hr
   have ho2 := (stabilizer_isOpen_of_isIntegral (K := E) π).preimage (continuous_const_mul ρ⁻¹)
   obtain ⟨σ, ⟨h1, h2⟩, h3⟩ := mem_closure_iff.1 (hγ.2 hρ) _ (ho1.inter ho2) ⟨by simp, by simp⟩
   obtain ⟨i1, n, n1, n2⟩ := hK σ h3
@@ -137,15 +169,21 @@ theorem exists_pow_pair [IsAlgClosure E Ω] {v : HeightOneSpectrum (𝓞 E)} {A 
     by_contra hne
     exact h1 ⟨hI σ i1, fun h => hne (Eq.symm h)⟩
 
-theorem exists_tameRep (hP : GlobalTheory.Published.GlobalArtinReciprocity) [_root_.NumberField.IsTotallyComplex E] [IsAlgClosure E Ω]
-    {art : Ideles E →* Gab E Ω} (ha : IsGlobalArtin art) {v : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω}
-    (hA : IsPlaceOver A v) {g : ℕ} (hg : g.Prime) (hN : normV v = g) (hgv : ((g : ℕ) : 𝓞 E) ∈ v.asIdeal)
+theorem exists_tameRep
+    (hP : GlobalTheory.Published.GlobalArtinReciprocity)
+    [_root_.NumberField.IsTotallyComplex E] [IsAlgClosure E Ω]
+    {art : Ideles E →* Gab E Ω} (ha : IsGlobalArtin art)
+    {v : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω} (hA : IsPlaceOver A v)
+    {g : ℕ} (hg : g.Prime) (hN : normV v = g) (hgv : ((g : ℕ) : 𝓞 E) ∈ v.asIdeal)
     (hgv2 : ((g : ℕ) : 𝓞 E) ∉ v.asIdeal ^ 2)
     (hunit : ∀ a : ℕ, a.Coprime g → ∀ x : Eˣ, (x : E) = a → IsUnitAt v (atFin v x))
-    {γ : G E Ω} (hγ : TameGenAt A γ) {K : Type} [Field K] [TopologicalSpace K] [T2Space K]
-    (r : G E Ω →* Kˣ) (hr : Continuous r) (hI : ∀ σ ∈ Ine (F := E) A, r σ ^ (g - 1) = 1) :
-    ∃ (u : 𝓞 E) (hu : (u : E) ≠ 0), NX.TameRep v 1 γ u ∧ IsUnitAt v (atFin v (Units.mk0 (u : E) hu)) ∧
-      ∃ σ : G E Ω, art (localIdele E v (atFin v (Units.mk0 (u : E) hu))) = toAb E Ω σ ∧ r σ = r γ := by
+    {γ : G E Ω} (hγ : TameGenAt A γ)
+    {K : Type} [Field K] [TopologicalSpace K] [T2Space K]
+    (r : G E Ω →* Kˣ) (hr : Continuous r) (hI : ∀ σ ∈ Ine (F := E) A, r σ ^ (g - 1) = 1)
+    : ∃ (u : 𝓞 E) (hu : (u : E) ≠ 0),
+      NX.TameRep v 1 γ u ∧ IsUnitAt v (atFin v (Units.mk0 (u : E) hu))
+        ∧ ∃ σ : G E Ω,
+          art (localIdele E v (atFin v (Units.mk0 (u : E) hu))) = toAb E Ω σ ∧ r σ = r γ := by
   haveI : Fact g.Prime := ⟨hg⟩
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   have hg2 := hg.two_le
@@ -172,11 +210,13 @@ theorem exists_tameRep (hP : GlobalTheory.Published.GlobalArtinReciprocity) [_ro
       exact hg.ne_one hac
     simpa using this
   have hx := hunit a hac (Units.mk0 _ ha0) (by simp)
-  obtain ⟨σ, hσ, eσ, vσ⟩ := GlobalTheory.TameRecip.exists_ine_of_unit hP E Ω art ha v A hA g hgv hgv2 π (by rw [hN]; exact hπ)
-    _ (a : 𝓞 E) hx (by
-      show Valued.v (algebraMap E (v.adicCompletion E) ((a : 𝓞 E) : E) - _) < 1
-      rw [sub_self, map_zero]
-      exact zero_lt_one)
+  obtain ⟨σ, hσ, eσ, vσ⟩ :=
+    GlobalTheory.TameRecip.exists_ine_of_unit hP E Ω art ha v A hA g hgv hgv2 π
+      (by rw [hN]; exact hπ) _ (a : 𝓞 E) hx
+      (by
+        show Valued.v (algebraMap E (v.adicCompletion E) ((a : 𝓞 E) : E) - _) < 1
+        rw [sub_self, map_zero]
+        exact zero_lt_one)
   obtain ⟨n, n1, n2⟩ := exists_pow_pair hA hγ r hr hg1 hI hπ0 hπ hσ
   set ζ := γ π / π with hζ
   have hζm : ζ ^ (g - 1) = 1 := by
@@ -193,7 +233,8 @@ theorem exists_tameRep (hP : GlobalTheory.Published.GlobalArtinReciprocity) [_ro
     obtain ⟨e, he⟩ := Nat.gcd_dvd_right n (g - 1)
     obtain ⟨n', hn'⟩ := Nat.gcd_dvd_left n (g - 1)
     have h1 : (ζ ^ n) ^ e = 1 := by
-      rw [← pow_mul, show n * e = (g - 1) * n' by rw [he]; nth_rewrite 1 [hn']; ring, pow_mul, hζm, one_pow]
+      rw [← pow_mul, show n * e = (g - 1) * n' by rw [he]; nth_rewrite 1 [hn']; ring, pow_mul, hζm,
+        one_pow]
     have h2 := hpow e
     rw [h1] at h2
     have h3 : ((1 - (a : ℤ) ^ e : ℤ) : 𝓞 E) ∈ v.asIdeal := by
@@ -201,11 +242,13 @@ theorem exists_tameRep (hP : GlobalTheory.Published.GlobalArtinReciprocity) [_ro
       simpa using h2
     have h4 : (g : ℤ) ∣ 1 - (a : ℤ) ^ e := by
       by_contra hnd
-      obtain ⟨s, t, hst⟩ := ((Nat.prime_iff_prime_int.1 hg).irreducible.coprime_iff_not_dvd.2 hnd).map
-        (Int.castRingHom (𝓞 E))
+      obtain ⟨s, t, hst⟩ :=
+        ((Nat.prime_iff_prime_int.1 hg).irreducible.coprime_iff_not_dvd.2 hnd).map
+          (Int.castRingHom (𝓞 E))
       apply v.isPrime.ne_top
       rw [Ideal.eq_top_iff_one, ← hst]
-      exact v.asIdeal.add_mem (v.asIdeal.mul_mem_left _ (by simpa using hgv)) (v.asIdeal.mul_mem_left _ h3)
+      exact v.asIdeal.add_mem (v.asIdeal.mul_mem_left _ (by simpa using hgv))
+        (v.asIdeal.mul_mem_left _ h3)
     have h5 : b ^ e = 1 := by
       have := (ZMod.intCast_zmod_eq_zero_iff_dvd _ g).2 h4
       apply Units.ext
@@ -220,16 +263,25 @@ theorem exists_tameRep (hP : GlobalTheory.Published.GlobalArtinReciprocity) [_ro
     show Nat.gcd n (g - 1) = 1
     generalize Nat.gcd n (g - 1) = d at *
     nlinarith
-  obtain ⟨k, hk⟩ : ∃ k, n * k ≡ 1 [MOD g - 1] :=
-    ⟨n ^ (Nat.totient (g - 1) - 1), by
+  obtain ⟨k, hk⟩ : ∃ k, n * k ≡ 1 [MOD g - 1] := ⟨
+    n ^ (Nat.totient (g - 1) - 1),
+    by
       rw [← pow_succ', Nat.sub_add_cancel (Nat.totient_pos.2 hm)]
-      exact Nat.ModEq.pow_totient hcop⟩
+      exact Nat.ModEq.pow_totient hcop
+  ⟩
   have hu : (((a : 𝓞 E) ^ k : 𝓞 E) : E) ≠ 0 := by
     push_cast
     exact pow_ne_zero _ (by simpa using ha0)
   have hmk : Units.mk0 _ hu = Units.mk0 _ ha0 ^ k := Units.ext (by simp)
-  refine ⟨(a : 𝓞 E) ^ k, hu, ⟨A, hA, hγ.1, g, π, hgv, hgv2, by rw [hN]; exact hπ, ?_⟩,
-    hunit (a ^ k) (hac.pow_left k) _ (by simp), σ ^ k, ?_, ?_⟩
+  refine ⟨
+    (a : 𝓞 E) ^ k,
+    hu,
+    ⟨A, hA, hγ.1, g, π, hgv, hgv2, by rw [hN]; exact hπ, ?_⟩,
+    hunit (a ^ k) (hac.pow_left k) _ (by simp),
+    σ ^ k,
+    ?_,
+    ?_
+  ⟩
   · have h1 := hpow k
     rw [← pow_mul, pow_eq_pow_of_modEq hk hζm, pow_one, ← map_pow] at h1
     simpa using h1

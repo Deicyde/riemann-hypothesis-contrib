@@ -5,15 +5,26 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne
 
 namespace GlobalTheory.WeilOpenFin
 
-theorem exists_finset_fix_le : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w), (∀ (σ : G E Ω) (s : Finset Ω), ∃ m : ℕ, 0 < m ∧ ∀ x ∈ s, (σ ^ m) x = x) → (∀ k : ℕ, 0 < k → ∃ ζ : Ω, ∀ σ : Weil h, (σ : G E Ω) ζ = ζ → (k : ℤ) ∣ deg σ) → (∀ M : Subgroup (Ine (F := E) A), IsOpen (M : Set (Ine (F := E) A)) → ∃ s : Finset Ω, ∀ σ : Ine (F := E) A, (∀ x ∈ s, (σ : G E Ω) x = x) → σ ∈ M) → ∀ H : Subgroup (Weil h), H.FiniteIndex → IsOpen {σ : Ine (F := E) A | ineIncl h σ ∈ H} → ∃ s : Finset Ω, ∀ σ : Weil h, (∀ x ∈ s, (σ : G E Ω) x = x) → σ ∈ H := by
+theorem exists_finset_fix_le
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w),
+      (∀ (σ : G E Ω) (s : Finset Ω), ∃ m : ℕ, 0 < m ∧ ∀ x ∈ s, (σ ^ m) x = x)
+        → (∀ k : ℕ, 0 < k → ∃ ζ : Ω, ∀ σ : Weil h, (σ : G E Ω) ζ = ζ → (k : ℤ) ∣ deg σ)
+        → (∀ M : Subgroup (Ine (F := E) A),
+          IsOpen (M : Set (Ine (F := E) A))
+            → ∃ s : Finset Ω, ∀ σ : Ine (F := E) A, (∀ x ∈ s, (σ : G E Ω) x = x) → σ ∈ M)
+        → ∀ H : Subgroup (Weil h),
+          H.FiniteIndex → IsOpen {σ : Ine (F := E) A | ineIncl h σ ∈ H}
+            → ∃ s : Finset Ω, ∀ σ : Weil h, (∀ x ∈ s, (σ : G E Ω) x = x) → σ ∈ H := by
   intro E Ω _ _ _ _ _ A w h h1 h2 h3 H hH hopen
   classical
-
-  have hfix : ∀ (g : G E Ω) (t : Finset Ω), (∀ x ∈ t, g x = x) → ∀ n : ℤ, ∀ x ∈ t, (g ^ n) x = x := by
+  have hfix
+      : ∀ (g : G E Ω) (t : Finset Ω), (∀ x ∈ t, g x = x) → ∀ n : ℤ, ∀ x ∈ t, (g ^ n) x = x := by
     intro g t hg n x hx
     have hm : g ∈ MulAction.stabilizer (G E Ω) x := by
       rw [MulAction.mem_stabilizer_iff, AlgEquiv.smul_def]; exact hg x hx
@@ -29,7 +40,8 @@ theorem exists_finset_fix_le : ∀ (E Ω : Type) [Field E] [NumberField E] [Fiel
   have hψH : ψ ∈ H := by
     apply Subgroup.normalCore_le
     show φ ^ (m * H.normalCore.index) ∈ H.normalCore
-    rw [pow_mul]; exact Subgroup.pow_index_mem _ _
+    rw [pow_mul]
+    exact Subgroup.pow_index_mem _ _
   have hψdeg : deg ψ = k := by simp [ψ, φ]
   have hψfix : ∀ x ∈ s₁, (ψ : G E Ω) x = x := by
     intro x hx
@@ -39,8 +51,7 @@ theorem exists_finset_fix_le : ∀ (E Ω : Type) [Field E] [NumberField E] [Fiel
   refine ⟨insert ζ s₁, fun τ hτ => ?_⟩
   obtain ⟨i, hi⟩ := hζ τ (hτ ζ (Finset.mem_insert_self _ _))
   let ρ : Weil h := τ * ψ ^ (-i)
-  have hρdeg : deg ρ = 0 := by
-    simp only [ρ, deg_mul, deg_zpow, hψdeg, hi]; ring
+  have hρdeg : deg ρ = 0 := by simp only [ρ, deg_mul, deg_zpow, hψdeg, hi]; ring
   have hρIne : (ρ : G E Ω) ∈ Ine (F := E) A := deg_eq_zero_iff.mp hρdeg
   have hρfix : ∀ x ∈ s₁, (ρ : G E Ω) x = x := by
     intro x hx

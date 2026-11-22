@@ -21,8 +21,12 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeil.Archimedea
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WhitFree
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -31,8 +35,14 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.WhitFree.Coefs
 
-theorem mem_gramNear_iff {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ) {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) (R : Type) [CommRing R] [Algebra F R] {n : ℕ} (c : HermR R σ n) (U : Set (HermR R σ n)) (X : Fin n → Fin M → R ⊗[F] E) :
-    X ∈ gramNear R σ J c U ↔ c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R X ∈ U := by
+theorem mem_gramNear_iff
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ)
+    {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J)
+    (R : Type) [CommRing R] [Algebra F R]
+    {n : ℕ} (c : HermR R σ n) (U : Set (HermR R σ n)) (X : Fin n → Fin M → R ⊗[F] E)
+    : X ∈ gramNear R σ J c U
+      ↔ c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R X ∈ U := by
   constructor
   · rintro ⟨u, hu, e⟩
     have : c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R X = u := Subtype.ext e
@@ -40,47 +50,111 @@ theorem mem_gramNear_iff {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
   · intro h
     exact ⟨_, h, rfl⟩
 
-theorem gramTest_eq {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ) {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) (R : Type) [CommRing R] [Algebra F R] {n : ℕ} (c : HermR R σ n) (ρ : HermR R σ n → ℝ) (X : Fin n → Fin M → R ⊗[F] E) :
-    gramTest R σ J c ρ X = ρ (c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R X) := by
+theorem gramTest_eq
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ)
+    {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J)
+    (R : Type) [CommRing R] [Algebra F R]
+    {n : ℕ} (c : HermR R σ n) (ρ : HermR R σ n → ℝ) (X : Fin n → Fin M → R ⊗[F] E)
+    : gramTest R σ J c ρ X
+      = ρ (c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R X) := by
   have h : (c : Matrix (Fin n) (Fin n) (R ⊗[F] E)) - gramR R σ J X ∈ HermR R σ n :=
     (c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R X).2
   unfold gramTest
   exact dif_pos h
 
-theorem hermMap_sub_gramH {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ) {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) {R R' : Type} [CommRing R] [Algebra F R] [CommRing R'] [Algebra F R'] (f : R →ₐ[F] R') {n : ℕ} (c : HermR R σ n) (X : Fin n → Fin M → R ⊗[F] E) :
-    GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap f σ (c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R X) =
-      GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap f σ c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R' (fun a i => Algebra.TensorProduct.map f (AlgHom.id F E) (X a i)) := by
-  rw [GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap_sub, GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap_gramH]
+theorem hermMap_sub_gramH
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ)
+    {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J)
+    {R R' : Type} [CommRing R] [Algebra F R] [CommRing R'] [Algebra F R']
+    (f : R →ₐ[F] R')
+    {n : ℕ} (c : HermR R σ n) (X : Fin n → Fin M → R ⊗[F] E)
+    : GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap f σ
+        (c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R X)
+      = GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap f σ c
+        - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ R'
+          (fun a i => Algebra.TensorProduct.map f (AlgHom.id F E) (X a i)) := by
+  rw [GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap_sub,
+    GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap_gramH]
 
-theorem hermMap_hermOf' {F E : Type} [Field F] [Field E] [Algebra F E] {R R' : Type} [CommRing R] [Algebra F R] [CommRing R'] [Algebra F R'] (f : R →ₐ[F] R') (σ : E →ₐ[F] E) {n : ℕ} (T : Matrix (Fin n) (Fin n) E) (hT : ∀ a c, σ (T c a) = T a c) :
-    GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap f σ (hermOf R σ T hT) = hermOf R' σ T hT :=
+theorem hermMap_hermOf'
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    {R R' : Type} [CommRing R] [Algebra F R] [CommRing R'] [Algebra F R']
+    (f : R →ₐ[F] R')
+    (σ : E →ₐ[F] E)
+    {n : ℕ} (T : Matrix (Fin n) (Fin n) E) (hT : ∀ a c, σ (T c a) = T a c)
+    : GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap f σ (hermOf R σ T hT) = hermOf R' σ T hT :=
   GlobalTheory.CompanionTheory.SiegelND.Coef.hermMap_hermOf f σ T hT
 
-theorem hermV_sub_gram {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ) {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) {n : ℕ} (T : Matrix (Fin n) (Fin n) E) (hT : ∀ a c, σ (T c a) = T a c) (x : Fin n → Fin M → AF F ⊗[F] E) (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) :
-    GlobalTheory.CompanionTheory.SiegelND.Coef.hermV σ v (GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin σ (hermOf (AF F) σ T hT - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (AF F) x)) =
-      hermOf (Fv F v) σ T hT - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (Fv F v) (HeckeCharacterZeroLocus.SiegelWeilU.projV v (HeckeCharacterZeroLocus.SiegelWeilU.projFin x)) := by
-  unfold GlobalTheory.CompanionTheory.SiegelND.Coef.hermV GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin
+theorem hermV_sub_gram
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ)
+    {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J)
+    {n : ℕ}
+    (T : Matrix (Fin n) (Fin n) E) (hT : ∀ a c, σ (T c a) = T a c) (x : Fin n → Fin M → AF F ⊗[F] E)
+    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F))
+    : GlobalTheory.CompanionTheory.SiegelND.Coef.hermV σ v
+        (GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin σ
+          (hermOf (AF F) σ T hT - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (AF F) x))
+      = hermOf (Fv F v) σ T hT - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (Fv F v)
+        (HeckeCharacterZeroLocus.SiegelWeilU.projV v
+          (HeckeCharacterZeroLocus.SiegelWeilU.projFin x)) := by
+  unfold GlobalTheory.CompanionTheory.SiegelND.Coef.hermV
+    GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin
   rw [hermMap_sub_gramH hCM hJ, hermMap_sub_gramH hCM hJ, hermMap_hermOf', hermMap_hermOf']
   rfl
 
-theorem hermInf_sub_gram {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ) {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) {n : ℕ} (T : Matrix (Fin n) (Fin n) E) (hT : ∀ a c, σ (T c a) = T a c) (x : Fin n → Fin M → AF F ⊗[F] E) :
-    GlobalTheory.CompanionTheory.SiegelND.Coef.hermInf σ (hermOf (AF F) σ T hT - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (AF F) x) =
-      hermOf (Ainf F) σ T hT - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (Ainf F) (HeckeCharacterZeroLocus.SiegelWeilU.projInf x) := by
+theorem hermInf_sub_gram
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ)
+    {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J)
+    {n : ℕ}
+    (T : Matrix (Fin n) (Fin n) E) (hT : ∀ a c, σ (T c a) = T a c) (x : Fin n → Fin M → AF F ⊗[F] E)
+    : GlobalTheory.CompanionTheory.SiegelND.Coef.hermInf σ
+        (hermOf (AF F) σ T hT - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (AF F) x)
+      = hermOf (Ainf F) σ T hT - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (Ainf F)
+        (HeckeCharacterZeroLocus.SiegelWeilU.projInf x) := by
   unfold GlobalTheory.CompanionTheory.SiegelND.Coef.hermInf
   rw [hermMap_sub_gramH hCM hJ, hermMap_hermOf']
   rfl
 
-theorem hermV_entries {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {σ : E →ₐ[F] E} {n : ℕ} (B : HermR (AF F) σ n) (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) :
-    (fun a i => (GlobalTheory.CompanionTheory.SiegelND.Coef.hermV σ v (GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin σ B) : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) a i) =
-      HeckeCharacterZeroLocus.SiegelWeilU.projV v (HeckeCharacterZeroLocus.SiegelWeilU.projFin (fun a i => (B : Matrix (Fin n) (Fin n) (AF F ⊗[F] E)) a i)) := rfl
+theorem hermV_entries
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {σ : E →ₐ[F] E} {n : ℕ} (B : HermR (AF F) σ n)
+    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F))
+    : (fun a i =>
+        (GlobalTheory.CompanionTheory.SiegelND.Coef.hermV σ v
+              (GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin σ B)
+            : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))
+          a i)
+      = HeckeCharacterZeroLocus.SiegelWeilU.projV v
+        (HeckeCharacterZeroLocus.SiegelWeilU.projFin (fun a i =>
+          (B : Matrix (Fin n) (Fin n) (AF F ⊗[F] E)) a i)) :=
+  rfl
 
-theorem mem_intH_iff {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {σ : E →ₐ[F] E} {d n : ℕ} (b : Module.Basis (Fin d) F E) (S : Finset (IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F))) (B : HermR (AF F) σ n)
-    (h3 : ∀ v, v ∉ S → ∀ Y : HermR (Fv F v) σ n, Y ∈ GlobalTheory.CompanionTheory.SiegelND.Coef.latH σ b v n ↔
-      (fun a i => (Y : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) a i) ∈ (latV (M := n) (n := n) b v : Set (Fin n → Fin n → Fv F v ⊗[F] E))) :
-    B ∈ intH σ b S ↔ GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin σ B ∈ GlobalTheory.CompanionTheory.SiegelND.Coef.intH σ b n S := by
+theorem mem_intH_iff
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {σ : E →ₐ[F] E} {d n : ℕ} (b : Module.Basis (Fin d) F E)
+    (S : Finset (IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)))
+    (B : HermR (AF F) σ n)
+    (h3 : ∀ v,
+      v ∉ S
+        → ∀ Y : HermR (Fv F v) σ n,
+          Y ∈ GlobalTheory.CompanionTheory.SiegelND.Coef.latH σ b v n
+            ↔ (fun a i => (Y : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) a i)
+              ∈ (latV (M := n) (n := n) b v : Set (Fin n → Fin n → Fv F v ⊗[F] E)))
+    : B ∈ intH σ b S
+      ↔ GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin σ B
+        ∈ GlobalTheory.CompanionTheory.SiegelND.Coef.intH σ b n S := by
   constructor
   · intro h v hv
-    have hh : HeckeCharacterZeroLocus.SiegelWeilU.projV v (HeckeCharacterZeroLocus.SiegelWeilU.projFin (fun a i => (B : Matrix (Fin n) (Fin n) (AF F ⊗[F] E)) a i)) ∈ (latV (M := n) (n := n) b v : Set (Fin n → Fin n → Fv F v ⊗[F] E)) := h v hv
+    have hh
+        : HeckeCharacterZeroLocus.SiegelWeilU.projV v
+            (HeckeCharacterZeroLocus.SiegelWeilU.projFin (fun a i =>
+              (B : Matrix (Fin n) (Fin n) (AF F ⊗[F] E)) a i))
+          ∈ (latV (M := n) (n := n) b v : Set (Fin n → Fin n → Fv F v ⊗[F] E)) :=
+      h v hv
     rw [← hermV_entries] at hh
     exact (h3 v hv _).2 hh
   · intro h v hv
@@ -88,34 +162,62 @@ theorem mem_intH_iff {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F
     rw [hermV_entries] at hh
     exact hh
 
-theorem indicator_intH {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {σ : E →ₐ[F] E} {d n : ℕ} (b : Module.Basis (Fin d) F E) (S : Finset (IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F))) (B : HermR (AF F) σ n)
-    (h3 : ∀ v, v ∉ S → ∀ Y : HermR (Fv F v) σ n, Y ∈ GlobalTheory.CompanionTheory.SiegelND.Coef.latH σ b v n ↔
-      (fun a i => (Y : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) a i) ∈ (latV (M := n) (n := n) b v : Set (Fin n → Fin n → Fv F v ⊗[F] E))) :
-    (intH σ b S).indicator (fun _ => (1 : ℂ)) B =
-      (GlobalTheory.CompanionTheory.SiegelND.Coef.intH σ b n S).indicator (fun _ => (1 : ℂ)) (GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin σ B) := by
+theorem indicator_intH
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {σ : E →ₐ[F] E} {d n : ℕ} (b : Module.Basis (Fin d) F E)
+    (S : Finset (IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)))
+    (B : HermR (AF F) σ n)
+    (h3 : ∀ v,
+      v ∉ S
+        → ∀ Y : HermR (Fv F v) σ n,
+          Y ∈ GlobalTheory.CompanionTheory.SiegelND.Coef.latH σ b v n
+            ↔ (fun a i => (Y : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) a i)
+              ∈ (latV (M := n) (n := n) b v : Set (Fin n → Fin n → Fv F v ⊗[F] E)))
+    : (intH σ b S).indicator (fun _ => (1 : ℂ)) B
+      = (GlobalTheory.CompanionTheory.SiegelND.Coef.intH σ b n S).indicator
+        (fun _ => (1 : ℂ))
+        (GlobalTheory.CompanionTheory.SiegelND.Coef.hermFin σ B) := by
   classical
   have hiff := mem_intH_iff b S B h3
   by_cases h : B ∈ intH σ b S
-  · exact (Set.indicator_of_mem h (fun _ => (1 : ℂ))).trans (Set.indicator_of_mem (hiff.1 h) (fun _ => (1 : ℂ))).symm
-  · exact (Set.indicator_of_notMem h (fun _ => (1 : ℂ))).trans (Set.indicator_of_notMem (fun h' => h (hiff.2 h')) (fun _ => (1 : ℂ))).symm
+  · exact (Set.indicator_of_mem h (fun _ => (1 : ℂ))).trans
+      (Set.indicator_of_mem (hiff.1 h) (fun _ => (1 : ℂ))).symm
+  · exact (Set.indicator_of_notMem h (fun _ => (1 : ℂ))).trans
+      (Set.indicator_of_notMem (fun h' => h (hiff.2 h')) (fun _ => (1 : ℂ))).symm
 
-theorem measurable_gramTest {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ) {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) {n : ℕ} (c : HermR (Ainf F) σ n) (ρ : HermR (Ainf F) σ n → ℝ) (hρ : Continuous ρ) :
-    Measurable (gramTest (Ainf F) σ J c ρ) := by
+theorem measurable_gramTest
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ)
+    {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J)
+    {n : ℕ} (c : HermR (Ainf F) σ n) (ρ : HermR (Ainf F) σ n → ℝ) (hρ : Continuous ρ)
+    : Measurable (gramTest (Ainf F) σ J c ρ) := by
   obtain ⟨a1, a2, a3, a4, -⟩ := GlobalTheory.CompanionTheory.SW.isLocR_Ainf F hCM.1
-  haveI := a1; haveI := a2; haveI := a3; haveI := a4
-  obtain ⟨t1, -, -, -, -, -, -, hB, -, hG⟩ := GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (Ainf F)
+  haveI := a1
+  haveI := a2
+  haveI := a3
+  haveI := a4
+  obtain ⟨t1, -, -, -, -, -, -, hB, -, hG⟩ :=
+    GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (Ainf F)
   haveI := t1
   haveI := hB n M
-  have e : gramTest (Ainf F) σ J c ρ = fun X => ρ (c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (Ainf F) X) :=
+  have e
+      : gramTest (Ainf F) σ J c ρ
+        = fun X => ρ (c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (Ainf F) X) :=
     funext (gramTest_eq hCM hJ (Ainf F) c ρ)
   rw [e]
-  have hc : Continuous fun X : Fin n → Fin M → Ainf F ⊗[F] E => c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (Ainf F) X :=
+  have hc : Continuous fun X : Fin n → Fin M → Ainf F ⊗[F] E =>
+      c - GlobalTheory.CompanionTheory.SiegelND.Coef.gramH hCM hJ (Ainf F) X :=
     Continuous.subtype_mk (continuous_const.sub (hG n M J)) _
   exact (hρ.comp hc).measurable
 
-theorem sfinite_herm {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ) {n : ℕ} (db : Measure (HermR (AF F) σ n)) (h : db.IsAddHaarMeasure) : SFinite db := by
+theorem sfinite_herm
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ)
+    {n : ℕ} (db : Measure (HermR (AF F) σ n)) (h : db.IsAddHaarMeasure)
+    : SFinite db := by
   obtain ⟨⟨a1, a2, a3⟩, -⟩ := GlobalTheory.CompanionTheory.AdeleTop.adele_top F
-  obtain ⟨t1, t2, t3, t4, -, -, -, -, hC, -⟩ := GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (AF F)
+  obtain ⟨t1, t2, t3, t4, -, -, -, -, hC, -⟩ :=
+    GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hCM (AF F)
   haveI : IsTopologicalRing (AF F ⊗[F] E) := t1
   haveI : LocallyCompactSpace (AF F ⊗[F] E) := t2
   haveI : SecondCountableTopology (AF F ⊗[F] E) := t3
@@ -129,7 +231,6 @@ theorem sfinite_herm {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   haveI := h
   haveI := Measure.IsAddHaarMeasure.sigmaFinite db
   infer_instance
-
 
 set_option maxHeartbeats 600000 in
 theorem coefS_pure : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ n : ℕ, 0 < n → 2 * n < M → ∀ ψ : AddChar (AF F) ℂ, IsCharAF F ψ → ∀ dx : Measure (Fin n → Fin M → AF F ⊗[F] E), SdW F E σ M J (AF F) ψ n dx → ∀ db : Measure (HermR (AF F) σ n), SdHerm F E σ (AF F) ψ n db → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (laminf : Measure (Ainf F)) (lam : ∀ v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F), Measure (Fv F v)), GlobalTheory.CompanionTheory.SW.IsStdInf laminf → (∀ v, GlobalTheory.CompanionTheory.SW.IsStdV v (lam v)) → ∀ (minf : HermR (Ainf F) σ n → Measure (Fin n → Fin M → Ainf F ⊗[F] E)), IsGramFibFree (Ainf F) σ J n (GlobalTheory.CompanionTheory.SW.coordW (Ainf F) b laminf n M) (GlobalTheory.CompanionTheory.SW.coordHerm (Ainf F) σ b laminf n) minf → ∀ (m : ∀ v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F), HermR (Fv F v) σ n → Measure (Fin n → Fin M → Fv F v ⊗[F] E)), (∀ v, IsGramFibFree (Fv F v) σ J n (GlobalTheory.CompanionTheory.SW.coordW (Fv F v) b (lam v) n M) (GlobalTheory.CompanionTheory.SW.coordHerm (Fv F v) σ b (lam v) n) (m v)) → ∀ (T : Matrix (Fin n) (Fin n) E) (hT : ∀ a c, σ (T c a) = T a c), ∃ S₁ : Finset (IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)), ∀ S, S₁ ⊆ S → ∀ φ : (Fin n → Fin M → Ainf F ⊗[F] E) → ℂ, GlobalTheory.Published.SiegelOneVector.IsSchwartzArch φ → ∀ A : ∀ v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F), Set (Fin n → Fin M → Fv F v ⊗[F] E), (∀ v, IsCompact (A v) ∧ IsOpen (A v)) → (∀ v, v ∉ S → A v = latV b v) → coefS σ J ψ dx db (pureN φ A) T b S = (∫ X, φ X ∂(minf (hermOf (Ainf F) σ T hT))) * ∏ v ∈ S, ((m v (hermOf (Fv F v) σ T hT) (A v)).toReal : ℂ) := by

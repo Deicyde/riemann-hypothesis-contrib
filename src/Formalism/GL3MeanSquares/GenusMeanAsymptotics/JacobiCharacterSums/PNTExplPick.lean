@@ -12,13 +12,12 @@ namespace Formalism.HermitianLattices.Ext.PrimesInProgressions
 
 open Formalism.ZeroFreeDirichlet
 
-theorem ex_pick (S : Finset ℝ) (a b : ℝ) (hab : a < b) :
-    ∃ x : ℝ, a ≤ x ∧ x ≤ b ∧ ∀ s ∈ S, (b - a) / (2 * ((S.card : ℝ) + 1)) ≤ |x - s| := by
+theorem ex_pick (S : Finset ℝ) (a b : ℝ) (hab : a < b)
+    : ∃ x : ℝ, a ≤ x ∧ x ≤ b ∧ ∀ s ∈ S, (b - a) / (2 * ((S.card : ℝ) + 1)) ≤ |x - s| := by
   set h : ℝ := (b - a) / (2 * ((S.card : ℝ) + 1)) with hh
   have hn : (0 : ℝ) < 2 * ((S.card : ℝ) + 1) := by positivity
   have hpos : 0 < h := div_pos (by linarith) hn
-  have hmul : h * (2 * ((S.card : ℝ) + 1)) = b - a := by
-    rw [hh]; field_simp
+  have hmul : h * (2 * ((S.card : ℝ) + 1)) = b - a := by rw [hh]; field_simp
   by_contra hcon
   push Not at hcon
   have key : ∀ i ∈ Finset.range (S.card + 1), ∃ s ∈ S, |a + (2 * (i : ℝ) + 1) * h - s| < h := by
@@ -44,12 +43,18 @@ theorem ex_pick (S : Finset ℝ) (a b : ℝ) (hab : a < b) :
   · have : (j : ℝ) + 1 ≤ i := by exact_mod_cast hlt
     nlinarith
 
-theorem ex_choose : ∃ C : ℝ, 0 < C ∧ ∀ κ : ℝ, 0 < κ → κ ≤ 1 / 20 →
-    ∀ (M : ℕ) [NeZero M] (χ : DirichletCharacter ℂ M) (T : ℝ), 3 ≤ M → 2 ≤ T →
-    ∃ σ₁ T' δ : ℝ, 1 - κ ≤ σ₁ ∧ σ₁ ≤ 1 - 3 * κ / 4 ∧ T ≤ T' ∧ T' ≤ T + 1 ∧ 0 < δ ∧ δ ≤ 1 / 20 ∧
-      κ / (C * (T + 1) * Real.log ((M : ℝ) * (T + 2))) ≤ δ ∧
-      (∀ ρ : ℂ, exLF χ ρ = 0 → 9 / 10 ≤ ρ.re → |ρ.im| ≤ T + 3 → δ ≤ |σ₁ - ρ.re|) ∧
-      (∀ ρ : ℂ, exLF χ ρ = 0 → 9 / 10 ≤ ρ.re → δ ≤ |(|ρ.im| - T')|) := by
+theorem ex_choose
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ κ : ℝ,
+          0 < κ → κ ≤ 1 / 20
+            → ∀ (M : ℕ) [NeZero M] (χ : DirichletCharacter ℂ M) (T : ℝ),
+              3 ≤ M → 2 ≤ T
+                → ∃ σ₁ T' δ : ℝ,
+                  1 - κ ≤ σ₁ ∧ σ₁ ≤ 1 - 3 * κ / 4 ∧ T ≤ T' ∧ T' ≤ T + 1 ∧ 0 < δ ∧ δ ≤ 1 / 20
+                    ∧ κ / (C * (T + 1) * Real.log ((M : ℝ) * (T + 2))) ≤ δ
+                    ∧ (∀ ρ : ℂ, exLF χ ρ = 0 → 9 / 10 ≤ ρ.re → |ρ.im| ≤ T + 3 → δ ≤ |σ₁ - ρ.re|)
+                    ∧ (∀ ρ : ℂ, exLF χ ρ = 0 → 9 / 10 ≤ ρ.re → δ ≤ |(|ρ.im| - T')|) := by
   obtain ⟨C0, hC0, hbox⟩ := ex_box
   refine ⟨8 * (4 * C0 + 1), by positivity, ?_⟩
   intro κ hκ hκ' M _ χ T hM hT
@@ -65,12 +70,12 @@ theorem ex_choose : ∃ C : ℝ, 0 < C ∧ ∀ κ : ℝ, 0 < κ → κ ≤ 1 / 2
     linarith
   have hlg2 : Real.log ((M : ℝ) * (T + 3 + 2)) ≤ 2 * lg := by
     have h1 : (M : ℝ) * (T + 3 + 2) ≤ ((M : ℝ) * (T + 2)) ^ 2 := by nlinarith
-    have h2 : Real.log (((M : ℝ) * (T + 2)) ^ 2) = 2 * lg := by
-      rw [Real.log_pow]; push_cast; ring
+    have h2 : Real.log (((M : ℝ) * (T + 2)) ^ 2) = 2 * lg := by rw [Real.log_pow]; push_cast; ring
     rw [← h2]
     exact Real.log_le_log (by nlinarith) h1
   have hNb : 8 * (N + 1) ≤ 8 * (4 * C0 + 1) * (T + 1) * lg := by
-    have h1 : C0 * (T + 3 + 1) * Real.log ((M : ℝ) * (T + 3 + 2)) ≤ C0 * (2 * (T + 1)) * (2 * lg) := by
+    have h1
+        : C0 * (T + 3 + 1) * Real.log ((M : ℝ) * (T + 3 + 2)) ≤ C0 * (2 * (T + 1)) * (2 * lg) := by
       apply mul_le_mul _ hlg2 _ (by positivity)
       · apply mul_le_mul_of_nonneg_left (by linarith) hC0.le
       · apply Real.log_nonneg; nlinarith
@@ -84,13 +89,15 @@ theorem ex_choose : ∃ C : ℝ, 0 < C ∧ ∀ κ : ℝ, 0 < κ → κ ≤ 1 / 2
   have hc2 : (((Z.image (fun ρ : ℂ => |ρ.im|)).card : ℕ) : ℝ) ≤ N := by
     rw [hN]; exact Nat.cast_le.mpr Finset.card_image_le
   have hδpos : 0 < κ / (8 * (N + 1)) := by positivity
-  have hg1 : κ / (8 * (N + 1)) ≤
-      (1 - 3 * κ / 4 - (1 - κ)) / (2 * (((Z.image Complex.re).card : ℝ) + 1)) := by
+  have hg1
+      : κ / (8 * (N + 1))
+        ≤ (1 - 3 * κ / 4 - (1 - κ)) / (2 * (((Z.image Complex.re).card : ℝ) + 1)) := by
     have e : (1 - 3 * κ / 4 - (1 - κ)) = κ / 4 := by ring
     rw [e, div_le_div_iff₀ (by positivity) (by positivity)]
     nlinarith
-  have hg2 : κ / (8 * (N + 1)) ≤
-      (T + 1 - T) / (2 * (((Z.image (fun ρ : ℂ => |ρ.im|)).card : ℝ) + 1)) := by
+  have hg2
+      : κ / (8 * (N + 1))
+        ≤ (T + 1 - T) / (2 * (((Z.image (fun ρ : ℂ => |ρ.im|)).card : ℝ) + 1)) := by
     have e : (T + 1 - T) = 1 := by ring
     rw [e, div_le_div_iff₀ (by positivity) (by positivity)]
     nlinarith

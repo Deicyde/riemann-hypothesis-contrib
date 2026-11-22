@@ -25,18 +25,22 @@ private lemma exists_moved (σ : Equiv.Perm ι) (hσ : σ ≠ 1) (i : ι) :
     intro h2
     exact hi (σ.injective h2)
 
-theorem goal1 (A : ℝ → Matrix ι ι ℂ) (A' : Matrix ι ι ℂ) (h0 : A 0 = 1)
-    (h : ∀ i j, HasDerivAt (fun t => A t i j) (A' i j) 0) :
-    HasDerivAt (fun t => (A t).det) A'.trace 0 := by
-  have hfun : (fun t => (A t).det) =
-      fun t => ∑ σ : Equiv.Perm ι, ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, A t (σ i) i := by
+theorem goal1
+    (A : ℝ → Matrix ι ι ℂ) (A' : Matrix ι ι ℂ)
+    (h0 : A 0 = 1) (h : ∀ i j, HasDerivAt (fun t => A t i j) (A' i j) 0)
+    : HasDerivAt (fun t => (A t).det) A'.trace 0 := by
+  have hfun
+      : (fun t => (A t).det)
+        = fun t => ∑ σ : Equiv.Perm ι, ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, A t (σ i) i := by
     funext t
     exact Matrix.det_apply' (A t)
   rw [hfun]
-  have key : ∀ σ : Equiv.Perm ι,
-      HasDerivAt (fun t => ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, A t (σ i) i)
-        (((Equiv.Perm.sign σ : ℤ) : ℂ) *
-          ∑ i, (∏ j ∈ univ.erase i, A 0 (σ j) j) • A' (σ i) i) 0 := by
+  have key
+      : ∀ σ : Equiv.Perm ι,
+        HasDerivAt
+          (fun t => ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, A t (σ i) i)
+          (((Equiv.Perm.sign σ : ℤ) : ℂ) * ∑ i, (∏ j ∈ univ.erase i, A 0 (σ j) j) • A' (σ i) i)
+          0 := by
     intro σ
     exact (HasDerivAt.fun_finsetProd (u := univ) (fun i _ => h (σ i) i)).const_mul _
   have hs := HasDerivAt.fun_sum (u := univ) (fun σ _ => key σ)

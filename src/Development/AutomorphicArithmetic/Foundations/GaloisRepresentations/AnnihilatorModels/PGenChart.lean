@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.genChart_of :
-    GenChart := by
+theorem UpperTheory.Gal.crystallineComparison.genChart_of : GenChart := by
   intro Y π U hU V _ _ f hmin
   set πU := Y.presheaf.map (homOfLE le_top).op π with hπU
   let P : PrimeSpectrum Γ(Y, U) := ⟨Ideal.comap f (IsLocalRing.maximalIdeal V), inferInstance⟩
@@ -36,7 +35,8 @@ theorem UpperTheory.Gal.crystallineComparison.genChart_of :
       rw [hU.range_fromSpec]
       exact hx'U
     have hqp : q ⤳ P := hU.fromSpec.isOpenEmbedding.isInducing.specializes_iff.mp hsp
-    have hqp' : q.asIdeal ≤ P.asIdeal := (PrimeSpectrum.le_iff_specializes (R := Γ(Y, U)) q P).mpr hqp
+    have hqp' : q.asIdeal ≤ P.asIdeal :=
+      (PrimeSpectrum.le_iff_specializes (R := Γ(Y, U)) q P).mpr hqp
     have hπq : πU ∈ q.asIdeal := by
       by_contra h
       exact hx' ((hmem q).mpr h)

@@ -13,20 +13,22 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DeRhamF
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.BlochKatoAnn
 
 section Abstract
 
-variable {k Z Z' : Type} [Field k] [AddCommGroup Z] [Module k Z] [AddCommGroup Z'] [Module k Z']
+variable
+  {k Z Z' : Type} [Field k] [AddCommGroup Z] [Module k Z] [AddCommGroup Z'] [Module k Z']
   [FiniteDimensional k Z] [FiniteDimensional k Z']
 
 def rorth (β : Z →ₗ[k] Z' →ₗ[k] k) (W : Submodule k Z) : Submodule k Z' :=
   (W.map β).dualCoannihilator
 
-theorem mem_rorth (β : Z →ₗ[k] Z' →ₗ[k] k) (W : Submodule k Z) (b : Z') :
-    b ∈ rorth β W ↔ ∀ a ∈ W, β a b = 0 := by
+theorem mem_rorth (β : Z →ₗ[k] Z' →ₗ[k] k) (W : Submodule k Z) (b : Z')
+    : b ∈ rorth β W ↔ ∀ a ∈ W, β a b = 0 := by
   unfold rorth
   rw [Submodule.mem_dualCoannihilator]
   constructor
@@ -35,12 +37,11 @@ theorem mem_rorth (β : Z →ₗ[k] Z' →ₗ[k] k) (W : Submodule k Z) (b : Z')
   · rintro h _ ⟨a, ha, rfl⟩
     exact h a ha
 
-theorem finrank_rorth (β : Z →ₗ[k] Z' →ₗ[k] k) (W : Submodule k Z) (hW : LinearMap.ker β ≤ W) :
-    finrank k (rorth β W) + finrank k W = finrank k Z' + finrank k (LinearMap.ker β) := by
+theorem finrank_rorth (β : Z →ₗ[k] Z' →ₗ[k] k) (W : Submodule k Z) (hW : LinearMap.ker β ≤ W)
+    : finrank k (rorth β W) + finrank k W = finrank k Z' + finrank k (LinearMap.ker β) := by
   have h1 := Subspace.finrank_add_finrank_dualCoannihilator_eq (W.map β)
   have h2 := LinearMap.finrank_range_add_finrank_ker (β.domRestrict W)
-  have h3 : LinearMap.range (β.domRestrict W) = W.map β := by
-    rw [LinearMap.range_domRestrict]
+  have h3 : LinearMap.range (β.domRestrict W) = W.map β := by rw [LinearMap.range_domRestrict]
   have h4 : LinearMap.ker (β.domRestrict W) = (LinearMap.ker β).comap W.subtype := by
     rw [LinearMap.ker_domRestrict]
   have h5 : finrank k ((LinearMap.ker β).comap W.subtype) = finrank k (LinearMap.ker β) :=
@@ -60,18 +61,18 @@ theorem rorth_top (β : Z →ₗ[k] Z' →ₗ[k] k) : rorth β ⊤ = LinearMap.k
     have := LinearMap.congr_fun h a
     simpa using this
 
-theorem exact_ann (β : Z →ₗ[k] Z' →ₗ[k] k) (W : Submodule k Z) (W' : Submodule k Z')
-    (hW : LinearMap.ker β ≤ W) (hW' : LinearMap.ker β.flip ≤ W')
-    (hort : ∀ a ∈ W, ∀ b ∈ W', β a b = 0)
-    (hdim : finrank k W + finrank k W' = finrank k Z + finrank k (LinearMap.ker β.flip)) :
-    rorth β W = W' ∧ rorth β.flip W' = W := by
+theorem exact_ann
+    (β : Z →ₗ[k] Z' →ₗ[k] k) (W : Submodule k Z) (W' : Submodule k Z') (hW : LinearMap.ker β ≤ W)
+    (hW' : LinearMap.ker β.flip ≤ W') (hort : ∀ a ∈ W, ∀ b ∈ W', β a b = 0)
+    (hdim : finrank k W + finrank k W' = finrank k Z + finrank k (LinearMap.ker β.flip))
+    : rorth β W = W' ∧ rorth β.flip W' = W := by
   have hT := finrank_rorth β ⊤ (le_top)
   rw [rorth_top, finrank_top] at hT
   have hA := finrank_rorth β W hW
   have hB := finrank_rorth β.flip W' hW'
   have l1 : W' ≤ rorth β W := fun b hb => (mem_rorth β W b).2 fun a ha => hort a ha b hb
-  have l2 : W ≤ rorth β.flip W' := fun a ha => (mem_rorth β.flip W' a).2 fun b hb => by
-    rw [LinearMap.flip_apply]; exact hort a ha b hb
+  have l2 : W ≤ rorth β.flip W' := fun a ha =>
+    (mem_rorth β.flip W' a).2 fun b hb => by rw [LinearMap.flip_apply]; exact hort a ha b hb
   constructor
   · exact (Submodule.eq_of_le_of_finrank_eq l1 (by omega)).symm
   · exact (Submodule.eq_of_le_of_finrank_eq l2 (by omega)).symm
@@ -84,16 +85,19 @@ namespace GlobalTheory.BlochKatoAnn
 
 section Concrete
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] {O : Type} [CommRing O]
-    [Algebra O LL]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
+  {O : Type} [CommRing O] [Algebra O LL]
 
-theorem galoisCoboundaries_le_continuousCocycles (A : GRep G Qp LL O) : B1 A.ρ ≤ continuousCocycles A.ρ := by
+theorem galoisCoboundaries_le_continuousCocycles (A : GRep G Qp LL O)
+    : B1 A.ρ ≤ continuousCocycles A.ρ := by
   rintro _ ⟨x, rfl⟩
   refine ⟨?_, fun g h => ?_⟩
   · have : (cob A.ρ x : G → A.V) = fun g => A.ρ g x + (-x) := by
@@ -112,13 +116,17 @@ theorem B1_le_Z1f (A : GRep G Qp LL O) : B1 A.ρ ≤ finiteCocycles PD A.ρ := b
   refine ⟨x ⊗ₜ[Qp] (1 : B), fun g => ?_⟩
   simp [cob, actVB, sub_tmul]
 
-theorem blochKatoFiniteCocycles_le_continuousCocycles (A : GRep G Qp LL O) : finiteCocycles PD A.ρ ≤ continuousCocycles A.ρ := fun _ h => h.1
+theorem blochKatoFiniteCocycles_le_continuousCocycles (A : GRep G Qp LL O)
+    : finiteCocycles PD A.ρ ≤ continuousCocycles A.ρ := fun _ h =>
+  h.1
 
-theorem finite_continuous_cocycles_localGaloisRep (A : GRep G Qp LL O) (h : Module.Finite LL (H1V A.ρ)) :
-    FiniteDimensional LL (continuousCocycles A.ρ) := by
+theorem finite_continuous_cocycles_localGaloisRep
+    (A : GRep G Qp LL O) (h : Module.Finite LL (H1V A.ρ))
+    : FiniteDimensional LL (continuousCocycles A.ρ) := by
   haveI : FiniteDimensional LL (B1 A.ρ) := LinearMap.finiteDimensional_range (cob A.ρ)
   have hK : FiniteDimensional LL ((B1 A.ρ).comap (continuousCocycles A.ρ).subtype) :=
-    Module.Finite.equiv (Submodule.comapSubtypeEquivOfLe (galoisCoboundaries_le_continuousCocycles A)).symm
+    Module.Finite.equiv (Submodule.comapSubtypeEquivOfLe (galoisCoboundaries_le_continuousCocycles
+      A)).symm
   show Module.Finite LL (continuousCocycles A.ρ)
   rw [Module.finite_def]
   apply Submodule.fg_of_fg_map_of_fg_inf_ker ((B1 A.ρ).comap (continuousCocycles A.ρ).subtype).mkQ
@@ -127,15 +135,16 @@ theorem finite_continuous_cocycles_localGaloisRep (A : GRep G Qp LL O) (h : Modu
   · rw [top_inf_eq, Submodule.ker_mkQ]
     exact Module.Finite.iff_fg.1 hK
 
-theorem finrank_H1V (A : GRep G Qp LL O) [FiniteDimensional LL (continuousCocycles A.ρ)] :
-    finrank LL (H1V A.ρ) + finrank LL (B1 A.ρ) = finrank LL (continuousCocycles A.ρ) := by
+theorem finrank_H1V (A : GRep G Qp LL O) [FiniteDimensional LL (continuousCocycles A.ρ)]
+    : finrank LL (H1V A.ρ) + finrank LL (B1 A.ρ) = finrank LL (continuousCocycles A.ρ) := by
   have e := Submodule.finrank_quotient_add_finrank ((B1 A.ρ).comap (continuousCocycles A.ρ).subtype)
-  rw [(Submodule.comapSubtypeEquivOfLe (galoisCoboundaries_le_continuousCocycles A)).finrank_eq] at e
+  rw [(Submodule.comapSubtypeEquivOfLe (galoisCoboundaries_le_continuousCocycles A)).finrank_eq]
+    at e
   exact e
 
-theorem finrank_H1fV (A : GRep G Qp LL O) [FiniteDimensional LL (continuousCocycles A.ρ)] :
-    finrank LL (FiniteCohomology PD A.ρ) + finrank LL (B1 A.ρ) =
-      finrank LL ((finiteCocycles PD A.ρ).comap (continuousCocycles A.ρ).subtype) := by
+theorem finrank_H1fV (A : GRep G Qp LL O) [FiniteDimensional LL (continuousCocycles A.ρ)]
+    : finrank LL (FiniteCohomology PD A.ρ) + finrank LL (B1 A.ρ)
+      = finrank LL ((finiteCocycles PD A.ρ).comap (continuousCocycles A.ρ).subtype) := by
   have eW := (Submodule.comapSubtypeEquivOfLe (blochKatoFiniteCocycles_le_continuousCocycles PD A))
   haveI : FiniteDimensional LL (finiteCocycles PD A.ρ) := Module.Finite.equiv eW
   have e := Submodule.finrank_quotient_add_finrank ((B1 A.ρ).comap (finiteCocycles PD A.ρ).subtype)
@@ -149,9 +158,10 @@ end GlobalTheory.BlochKatoAnn
 
 namespace GlobalTheory.BlochKatoAnn
 
-theorem bkA_exact_annihilators : Formalism.GaloisCohomology.LocalTateDualityK → Formalism.GaloisCohomology.LocalEulerCharK →
-    ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI →
-      ∀ K : FinExt l, bkACore (P.PD K) := by
+theorem bkA_exact_annihilators
+    : Formalism.GaloisCohomology.LocalTateDualityK → Formalism.GaloisCohomology.LocalEulerCharK
+      → ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+        LocTied l P AI → ∀ K : FinExt l, bkACore (P.PD K) := by
   intro hTD hEC l _ P AI hT K
   intro LL _ _ _ O _ _ hO A A' m hdr hdual
   have hdual' : IsDual1 (P.PD K) A'.ρ A.ρ m.flip := by
@@ -163,11 +173,14 @@ theorem bkA_exact_annihilators : Formalism.GaloisCohomology.LocalTateDualityK �
   have hdr' : IsDR (P.PD K) A'.ρ := hdrd LL O hO A A' m hdr hdual
   have hfil := hfd LL O hO A A' m hdr hdual
   obtain ⟨hH1fin, hH1⟩ := GlobalTheory.T.finrank_H1_dual_pair hTD hEC l P K LL O hO A A' m hdual
-  obtain ⟨hH1fin', -⟩ := GlobalTheory.T.finrank_H1_dual_pair hTD hEC l P K LL O hO A' A m.flip hdual'
+  obtain ⟨hH1fin', -⟩ :=
+    GlobalTheory.T.finrank_H1_dual_pair hTD hEC l P K LL O hO A' A m.flip hdual'
   obtain ⟨-, hf⟩ := GlobalTheory.T.finrank_H1f_de_rham l P AI hT K LL O hO A hdr
   obtain ⟨-, hf'⟩ := GlobalTheory.T.finrank_H1f_de_rham l P AI hT K LL O hO A' hdr'
-  have hort := GlobalTheory.T.cup_product_finite_classes_coboundary l P AI hT K LL O hO A A' m hdr hdual
-  obtain ⟨β, hβ, hl, hr⟩ := GlobalTheory.T.tateDuality_degreeOne_continuous_cocycles hTD l P K LL O hO A A' m hdual
+  have hort :=
+    GlobalTheory.T.cup_product_finite_classes_coboundary l P AI hT K LL O hO A A' m hdr hdual
+  obtain ⟨β, hβ, hl, hr⟩ :=
+    GlobalTheory.T.tateDuality_degreeOne_continuous_cocycles hTD l P K LL O hO A A' m hdual
   haveI := finite_continuous_cocycles_localGaloisRep A hH1fin
   haveI := finite_continuous_cocycles_localGaloisRep A' hH1fin'
   have hkl : LinearMap.ker β = (B1 A.ρ).comap (continuousCocycles A.ρ).subtype := by
@@ -190,14 +203,19 @@ theorem bkA_exact_annihilators : Formalism.GaloisCohomology.LocalTateDualityK �
     · intro h
       ext a
       simpa using h a
-  have hW : LinearMap.ker β ≤ (finiteCocycles (P.PD K) A.ρ).comap (continuousCocycles A.ρ).subtype := by
+  have hW
+      : LinearMap.ker β ≤ (finiteCocycles (P.PD K) A.ρ).comap (continuousCocycles A.ρ).subtype := by
     rw [hkl]
     exact Submodule.comap_mono (B1_le_Z1f (P.PD K) A)
-  have hW' : LinearMap.ker β.flip ≤ (finiteCocycles (P.PD K) A'.ρ).comap (continuousCocycles A'.ρ).subtype := by
+  have hW'
+      : LinearMap.ker β.flip
+        ≤ (finiteCocycles (P.PD K) A'.ρ).comap (continuousCocycles A'.ρ).subtype := by
     rw [hkr]
     exact Submodule.comap_mono (B1_le_Z1f (P.PD K) A')
-  have horth : ∀ a ∈ (finiteCocycles (P.PD K) A.ρ).comap (continuousCocycles A.ρ).subtype,
-      ∀ b ∈ (finiteCocycles (P.PD K) A'.ρ).comap (continuousCocycles A'.ρ).subtype, β a b = 0 := by
+  have horth
+      : ∀ a ∈ (finiteCocycles (P.PD K) A.ρ).comap (continuousCocycles A.ρ).subtype,
+        ∀ b ∈ (finiteCocycles (P.PD K) A'.ρ).comap (continuousCocycles A'.ρ).subtype,
+          β a b = 0 := by
     intro a ha b hb
     rw [hβ]
     exact hort a.1 ha b.1 hb
@@ -213,16 +231,19 @@ theorem bkA_exact_annihilators : Formalism.GaloisCohomology.LocalTateDualityK �
   have hdV := hdual.2.2.2
   unfold IsDR at hdr hdr'
   rw [← hdV] at hdr'
-  have hdim : finrank LL ((finiteCocycles (P.PD K) A.ρ).comap (continuousCocycles A.ρ).subtype) +
-      finrank LL ((finiteCocycles (P.PD K) A'.ρ).comap (continuousCocycles A'.ρ).subtype) =
-      finrank LL (continuousCocycles A.ρ) + finrank LL (LinearMap.ker β.flip) := by
+  have hdim
+      : finrank LL ((finiteCocycles (P.PD K) A.ρ).comap (continuousCocycles A.ρ).subtype)
+          + finrank LL ((finiteCocycles (P.PD K) A'.ρ).comap (continuousCocycles A'.ρ).subtype)
+        = finrank LL (continuousCocycles A.ρ) + finrank LL (LinearMap.ker β.flip) := by
     rw [eKr]
     zify at eZ eW eW' hH1 hfil hdr hdr' ⊢
     linarith
   obtain ⟨h1, h2⟩ := exact_ann β _ _ hW hW' horth hdim
   constructor
   · intro a ha
-    change (⟨a, ha⟩ : continuousCocycles A.ρ) ∈ (finiteCocycles (P.PD K) A.ρ).comap (continuousCocycles A.ρ).subtype ↔ _
+    change (⟨a, ha⟩ : continuousCocycles A.ρ)
+        ∈ (finiteCocycles (P.PD K) A.ρ).comap (continuousCocycles A.ρ).subtype
+      ↔ _
     rw [← h2, mem_rorth]
     constructor
     · intro h b hb
@@ -233,7 +254,9 @@ theorem bkA_exact_annihilators : Formalism.GaloisCohomology.LocalTateDualityK �
       rw [LinearMap.flip_apply, hβ]
       exact h b.1 hb
   · intro b hb
-    change (⟨b, hb⟩ : continuousCocycles A'.ρ) ∈ (finiteCocycles (P.PD K) A'.ρ).comap (continuousCocycles A'.ρ).subtype ↔ _
+    change (⟨b, hb⟩ : continuousCocycles A'.ρ)
+        ∈ (finiteCocycles (P.PD K) A'.ρ).comap (continuousCocycles A'.ρ).subtype
+      ↔ _
     rw [← h1, mem_rorth]
     constructor
     · intro h a ha

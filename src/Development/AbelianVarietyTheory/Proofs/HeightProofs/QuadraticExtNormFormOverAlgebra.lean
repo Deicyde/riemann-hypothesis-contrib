@@ -10,9 +10,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory.QuadNormBase
 
-theorem norm_of_basis {R A : Type} [CommRing R] [CommRing A] [Algebra R A]
-    (B : Module.Basis (Fin 2) R A) (d : R) (h0 : B 0 = 1) (h1 : B 1 * B 1 = d • B 0) (x y : R) :
-    Algebra.norm R (x • B 0 + y • B 1) = x ^ 2 - d * y ^ 2 := by
+theorem norm_of_basis
+    {R A : Type} [CommRing R] [CommRing A] [Algebra R A]
+    (B : Module.Basis (Fin 2) R A) (d : R)
+    (h0 : B 0 = 1) (h1 : B 1 * B 1 = d • B 0) (x y : R)
+    : Algebra.norm R (x • B 0 + y • B 1) = x ^ 2 - d * y ^ 2 := by
   have e0 : (x • B 0 + y • B 1) * B 0 = x • B 0 + y • B 1 := by rw [h0, mul_one]
   have e1 : (x • B 0 + y • B 1) * B 1 = (y * d) • B 0 + x • B 1 := by
     rw [add_mul, smul_mul_assoc, smul_mul_assoc, h1, smul_smul, add_comm]
@@ -23,10 +25,12 @@ theorem norm_of_basis {R A : Type} [CommRing R] [CommRing A] [Algebra R A]
   simp
   ring
 
-theorem exists_basis (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E] (σ : E →ₐ[F] E)
-    (hr : Module.finrank F E = 2) (hσ : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x) :
-    ∃ (δ : F) (b : Module.Basis (Fin 2) F E), ¬ IsSquare δ ∧ b 0 = 1 ∧ σ (b 1) = - b 1 ∧
-      b 1 * b 1 = algebraMap F E δ := by
+theorem exists_basis
+    (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    (hr : Module.finrank F E = 2) (hσ : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x)
+    : ∃ (δ : F) (b : Module.Basis (Fin 2) F E),
+      ¬ IsSquare δ ∧ b 0 = 1 ∧ σ (b 1) = - b 1 ∧ b 1 * b 1 = algebraMap F E δ := by
   haveI : CharZero E := charZero_of_injective_algebraMap (algebraMap F E).injective
   obtain ⟨x0, hx0⟩ := hne
   have hsm : ∀ (c : F) (e : E), σ (c • e) = c • σ e := fun c e => by
@@ -44,8 +48,7 @@ theorem exists_basis (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E]
     have ht : t = 0 := (smul_eq_zero.1 h4).resolve_right hθ0
     subst ht
     exact ⟨by simpa using hst, rfl⟩
-  let b : Module.Basis (Fin 2) F E :=
-    basisOfLinearIndependentOfCardEqFinrank hli (by simp [hr])
+  let b : Module.Basis (Fin 2) F E := basisOfLinearIndependentOfCardEqFinrank hli (by simp [hr])
   have hb0 : b 0 = 1 := by simp [b]
   have hb1 : b 1 = θ := by simp [b]
   have hrep := b.sum_repr (θ * θ)
@@ -68,7 +71,17 @@ theorem exists_basis (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E]
   have h5 : (2 : E) * θ = 0 := by linear_combination hσθ - hfix
   exact hθ0 (by simpa only [mul_eq_zero, two_ne_zero, false_or] using h5)
 
-theorem norm_form : ∀ (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E] (σ : E →ₐ[F] E), Module.finrank F E = 2 → (∀ x, σ (σ x) = x) → (∃ x, σ x ≠ x) → ∃ δ : F, ¬ IsSquare δ ∧ ∀ (R : Type) [CommRing R] [Algebra F R], (∀ z : R ⊗[F] E, ∃ x y : R, Algebra.norm R z = x ^ 2 - algebraMap F R δ * y ^ 2 ∧ z * sigR R σ z = algebraMap R (R ⊗[F] E) (x ^ 2 - algebraMap F R δ * y ^ 2)) ∧ ∀ x y : R, ∃ z : R ⊗[F] E, z * sigR R σ z = algebraMap R (R ⊗[F] E) (x ^ 2 - algebraMap F R δ * y ^ 2) := by
+theorem norm_form
+    : ∀ (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E] (σ : E →ₐ[F] E),
+      Module.finrank F E = 2 → (∀ x, σ (σ x) = x) → (∃ x, σ x ≠ x)
+        → ∃ δ : F,
+          ¬ IsSquare δ
+            ∧ ∀ (R : Type) [CommRing R] [Algebra F R],
+              (∀ z : R ⊗[F] E, ∃ x y : R,
+                  Algebra.norm R z = x ^ 2 - algebraMap F R δ * y ^ 2
+                    ∧ z * sigR R σ z = algebraMap R (R ⊗[F] E) (x ^ 2 - algebraMap F R δ * y ^ 2))
+                ∧ ∀ x y : R, ∃ z : R ⊗[F] E,
+                  z * sigR R σ z = algebraMap R (R ⊗[F] E) (x ^ 2 - algebraMap F R δ * y ^ 2) := by
   intro F E _ _ _ _ σ hr hσ hne
   obtain ⟨δ, b, hδ, hb0, hb1, hsq⟩ := exists_basis F E σ hr hσ hne
   refine ⟨δ, hδ, ?_⟩
@@ -77,15 +90,17 @@ theorem norm_form : ∀ (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F
   have hB : ∀ i, B i = 1 ⊗ₜ[F] b i := fun i => Algebra.TensorProduct.basis_apply b i
   have h0 : B 0 = 1 := by rw [hB, hb0]; rfl
   have h1 : B 1 * B 1 = algebraMap F R δ • B 0 := by
-    rw [hB, hB, Algebra.TensorProduct.tmul_mul_tmul, hsq, hb0, Algebra.algebraMap_eq_smul_one (A := E),
-      TensorProduct.tmul_smul, one_mul, algebraMap_smul]
+    rw [hB, hB, Algebra.TensorProduct.tmul_mul_tmul, hsq, hb0,
+      Algebra.algebraMap_eq_smul_one (A := E), TensorProduct.tmul_smul, one_mul, algebraMap_smul]
   have hs : ∀ (r : R) (e : E), sigR R σ (r ⊗ₜ[F] e) = r ⊗ₜ[F] σ e := fun r e => rfl
-  have key : ∀ x y : R, (x • B 0 + y • B 1) * sigR R σ (x • B 0 + y • B 1) =
-      algebraMap R (R ⊗[F] E) (x ^ 2 - algebraMap F R δ * y ^ 2) := by
+  have key
+      : ∀ x y : R,
+        (x • B 0 + y • B 1) * sigR R σ (x • B 0 + y • B 1)
+          = algebraMap R (R ⊗[F] E) (x ^ 2 - algebraMap F R δ * y ^ 2) := by
     intro x y
     have e : sigR R σ (x • B 0 + y • B 1) = x • B 0 - y • B 1 := by
-      rw [map_add (f := _), hB, hB, TensorProduct.smul_tmul', TensorProduct.smul_tmul', hs, hs, hb1, hb0,
-        map_one, TensorProduct.tmul_neg, sub_eq_add_neg]
+      rw [map_add (f := _), hB, hB, TensorProduct.smul_tmul', TensorProduct.smul_tmul', hs, hs, hb1,
+        hb0, map_one, TensorProduct.tmul_neg, sub_eq_add_neg]
     rw [e]
     rw [h0] at h1 ⊢
     generalize algebraMap F R δ = d at h1 ⊢

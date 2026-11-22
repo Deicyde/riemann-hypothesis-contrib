@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
-private theorem entIn_sub_iff {C : Type} [CommRing C] (I : Ideal C) (X Y : Matrix (Fin 3) (Fin 3) C) :
-    EntIn I (X - Y) ↔ X.map (Ideal.Quotient.mk I) = Y.map (Ideal.Quotient.mk I) := by
+private theorem entIn_sub_iff {C : Type} [CommRing C] (I : Ideal C) (X Y : Matrix (Fin 3) (Fin 3) C)
+    : EntIn I (X - Y) ↔ X.map (Ideal.Quotient.mk I) = Y.map (Ideal.Quotient.mk I) := by
   constructor
   · intro h
     ext a b
@@ -16,8 +17,8 @@ private theorem entIn_sub_iff {C : Type} [CommRing C] (I : Ideal C) (X Y : Matri
   · intro h a b
     exact Ideal.Quotient.eq.1 (congrFun (congrFun h a) b)
 
-private theorem congOne_iff {C : Type} [CommRing C] (I : Ideal C) (h : GL (Fin 3) C) :
-    CongOne I h ↔ GeneralLinearGroup.map (Ideal.Quotient.mk I) h = 1 := by
+private theorem congOne_iff {C : Type} [CommRing C] (I : Ideal C) (h : GL (Fin 3) C)
+    : CongOne I h ↔ GeneralLinearGroup.map (Ideal.Quotient.mk I) h = 1 := by
   unfold CongOne
   rw [entIn_sub_iff, Matrix.map_one _ (map_zero _) (map_one _)]
   constructor
@@ -26,34 +27,42 @@ private theorem congOne_iff {C : Type} [CommRing C] (I : Ideal C) (h : GL (Fin 3
   · intro e
     exact congrArg Units.val e
 
-private theorem conjBy_app {C D : Type} [CommRing C] [Group D] (h : GL (Fin 3) C)
-    (r : D →* GG (m := 3) (R := C)) (g : D) :
-    conjBy h r g = GG.ofGL h * r g * (GG.ofGL h)⁻¹ := rfl
+private theorem conjBy_app
+    {C D : Type} [CommRing C] [Group D] (h : GL (Fin 3) C) (r : D →* GG (m := 3) (R := C)) (g : D)
+    : conjBy h r g = GG.ofGL h * r g * (GG.ofGL h)⁻¹ :=
+  rfl
 
-private theorem conjBy_comp {C D E : Type} [CommRing C] [Group D] [Group E] (h : GL (Fin 3) C)
-    (r : D →* GG (m := 3) (R := C))
-    (f : E →* D) : (conjBy h r).comp f = conjBy h (r.comp f) := rfl
+private theorem conjBy_comp
+    {C D E : Type} [CommRing C] [Group D] [Group E]
+    (h : GL (Fin 3) C) (r : D →* GG (m := 3) (R := C)) (f : E →* D)
+    : (conjBy h r).comp f = conjBy h (r.comp f) :=
+  rfl
 
-private theorem conjBy_conjBy {C D : Type} [CommRing C] [Group D] (h h' : GL (Fin 3) C)
-    (r : D →* GG (m := 3) (R := C)) :
-    conjBy (h * h')⁻¹ (conjBy h r) = conjBy h'⁻¹ r := by
+private theorem conjBy_conjBy
+    {C D : Type} [CommRing C] [Group D] (h h' : GL (Fin 3) C) (r : D →* GG (m := 3) (R := C))
+    : conjBy (h * h')⁻¹ (conjBy h r) = conjBy h'⁻¹ r := by
   refine MonoidHom.ext fun g => ?_
   simp only [conjBy_app, map_inv, map_mul]
   group
 
-private theorem map_conjBy {C D : Type} [CommRing C] [Group D] (I : Ideal C) (h : GL (Fin 3) C)
-    (hh : CongOne I h) (r : D →* GG (m := 3) (R := C)) (g : D) :
-    GG.map (Ideal.Quotient.mk I) (conjBy h r g) = GG.map (Ideal.Quotient.mk I) (r g) := by
+private theorem map_conjBy
+    {C D : Type} [CommRing C] [Group D]
+    (I : Ideal C) (h : GL (Fin 3) C) (hh : CongOne I h)
+    (r : D →* GG (m := 3) (R := C)) (g : D)
+    : GG.map (Ideal.Quotient.mk I) (conjBy h r g) = GG.map (Ideal.Quotient.mk I) (r g) := by
   have e : GG.map (Ideal.Quotient.mk I) (GG.ofGL h) = 1 := by
     unfold GG.map
     rw [SemidirectProduct.map_inl, (congOne_iff I h).1 hh, map_one]
-  simp only [conjBy, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply, map_mul, map_inv, e,
-    one_mul, inv_one, mul_one]
+  simp only [conjBy, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply, map_mul,
+    map_inv, e, one_mul, inv_one, mul_one]
 
-theorem UpperTheory.V.UnitaryThreeInertia.cond_conj :
-    ∀ {O : Type} [CommRing O] [IsLocalRing O] {G Γ ι : Type} [Group G] [Group Γ] (F : Frame O G Γ ι) {R : Type} [CommRing R] [IsLocalRing R] [Algebra O R] (h : GL (Fin 3) R), InHat h →
-      (∀ v (r : F.D v →* GG (m := 3) (R := R)), F.LocAt v r → F.LocAt v (conjBy h r)) ∧
-        ∀ r : Γ →* GG (m := 3) (R := R), F.Cond r → F.Cond (conjBy h r) := by
+theorem UpperTheory.V.UnitaryThreeInertia.cond_conj
+    : ∀ {O : Type} [CommRing O] [IsLocalRing O] {G Γ ι : Type} [Group G] [Group Γ]
+        (F : Frame O G Γ ι) {R : Type} [CommRing R] [IsLocalRing R] [Algebra O R]
+        (h : GL (Fin 3) R),
+      InHat h
+        → (∀ v (r : F.D v →* GG (m := 3) (R := R)), F.LocAt v r → F.LocAt v (conjBy h r))
+          ∧ ∀ r : Γ →* GG (m := 3) (R := R), F.Cond r → F.Cond (conjBy h r) := by
   intro O _ _ G Γ ι _ _ F R _ _ _ h hh
   have hmul : ∀ h' : GL (Fin 3) R, InHat h' → InHat (h * h') := fun h' hh' => by
     refine (congOne_iff _ _).2 ?_

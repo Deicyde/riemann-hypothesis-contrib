@@ -10,7 +10,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW
+  GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
@@ -19,8 +20,10 @@ namespace GlobalTheory.CompanionTheory.SW.BB.InfDens
 
 section Alg
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] {σ : E →ₐ[F] E} (R : Type) [CommRing R]
-  [Algebra F R]
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  {σ : E →ₐ[F] E}
+  (R : Type) [CommRing R] [Algebra F R]
 
 theorem sigR_sigR (hs : ∀ x, σ (σ x) = x) (z : R ⊗[F] E) : sigR R σ (sigR R σ z) = z := by
   induction z using TensorProduct.induction_on with
@@ -28,21 +31,24 @@ theorem sigR_sigR (hs : ∀ x, σ (σ x) = x) (z : R ⊗[F] E) : sigR R σ (sigR
   | tmul r y => simp [sigR, hs]
   | add a c ha hc => rw [map_add (f := _), map_add (f := _), ha, hc]
 
-theorem sigR_inclR (y : E) : sigR R σ (inclR R y) = inclR R (σ y) := by
-  simp [sigR, inclR]
+theorem sigR_inclR (y : E) : sigR R σ (inclR R y) = inclR R (σ y) := by simp [sigR, inclR]
 
-theorem sigR_hR (hs : ∀ x, σ (σ x) = x) {M : ℕ} {J : Matrix (Fin M) (Fin M) E}
-    (hJ : ∀ i j, σ (J j i) = J i j) (x y : Fin M → R ⊗[F] E) :
-    sigR R σ (hR R σ J x y) = hR R σ J y x := by
+theorem sigR_hR
+    (hs : ∀ x, σ (σ x) = x)
+    {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : ∀ i j, σ (J j i) = J i j) (x y : Fin M → R ⊗[F] E)
+    : sigR R σ (hR R σ J x y) = hR R σ J y x := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [hR, hform, JR, map_sum, map_mul, Matrix.map_apply, sigR_sigR R hs, sigR_inclR, hJ]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
   ring
 
-theorem gramR_mem (hs : ∀ x, σ (σ x) = x) {M n : ℕ} {J : Matrix (Fin M) (Fin M) E}
-    (hJ : ∀ i j, σ (J j i) = J i j) (X : Fin n → Fin M → R ⊗[F] E) :
-    gramR R σ J X ∈ HermR R σ n := fun a c => sigR_hR R hs hJ (X c) (X a)
+theorem gramR_mem
+    (hs : ∀ x, σ (σ x) = x)
+    {M n : ℕ} {J : Matrix (Fin M) (Fin M) E}
+    (hJ : ∀ i j, σ (J j i) = J i j) (X : Fin n → Fin M → R ⊗[F] E)
+    : gramR R σ J X ∈ HermR R σ n := fun a c =>
+  sigR_hR R hs hJ (X c) (X a)
 
 end Alg
 
@@ -50,17 +56,20 @@ section Real
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
 
-theorem e_half_trace {σ : E →ₐ[F] E} {M d : ℕ} {J : Matrix (Fin M) (Fin M) E}
+theorem e_half_trace
+    {σ : E →ₐ[F] E} {M d : ℕ} {J : Matrix (Fin M) (Fin M) E}
     (b : Module.Basis (Fin d) F E) (B : Matrix (Fin M × Fin d) (Fin M × Fin d) F)
     (hB : ∀ x y : Fin M → Ainf F ⊗[F] E,
-      Algebra.trace (Ainf F) (Ainf F ⊗[F] E) (hR (Ainf F) σ J x y) =
-        cv (Ainf F) b x ⬝ᵥ (B.map (algebraMap F (Ainf F)) *ᵥ cv (Ainf F) b y))
+      Algebra.trace (Ainf F) (Ainf F ⊗[F] E) (hR (Ainf F) σ J x y)
+        = cv (Ainf F) b x ⬝ᵥ (B.map (algebraMap F (Ainf F)) *ᵥ cv (Ainf F) b y))
     (ρ : InfinitePlace F → (F →+* ℝ)) (e : Ainf F ≃+* (InfinitePlace F → ℝ))
     (hρ : ∀ x w, e (algebraMap F (Ainf F) x) w = ρ w x)
-    (X : Fin 1 → Fin M → Ainf F ⊗[F] E) (w : InfinitePlace F) :
-    e (algebraMap F (Ainf F) (1 / 2) *
-        Algebra.trace (Ainf F) (Ainf F ⊗[F] E) (gramR (Ainf F) σ J X 0 0)) w =
-      (1 / 2 : ℝ) * (xw e b X w ⬝ᵥ (B.map (ρ w) *ᵥ xw e b X w)) := by
+    (X : Fin 1 → Fin M → Ainf F ⊗[F] E) (w : InfinitePlace F)
+    : e
+        (algebraMap F (Ainf F) (1 / 2)
+          * Algebra.trace (Ainf F) (Ainf F ⊗[F] E) (gramR (Ainf F) σ J X 0 0))
+        w
+      = (1 / 2 : ℝ) * (xw e b X w ⬝ᵥ (B.map (ρ w) *ᵥ xw e b X w)) := by
   let ew : Ainf F →+* ℝ := (Pi.evalRingHom (fun _ : InfinitePlace F => ℝ) w).comp (e : Ainf F →+* _)
   have hew : ∀ a, ew a = e a w := fun _ => rfl
   have hcomp : ew.comp (algebraMap F (Ainf F)) = ρ w := RingHom.ext fun x => hρ x w
@@ -73,8 +82,9 @@ theorem e_half_trace {σ : E →ₐ[F] E} {M d : ℕ} {J : Matrix (Fin M) (Fin M
   rw [← hew, map_mul, hew, hρ, hhalf]
   show _ * ew (Algebra.trace (Ainf F) (Ainf F ⊗[F] E) (hR (Ainf F) σ J (X 0) (X 0))) = _
   rw [hB, hx, hm, RingHom.map_dotProduct]
-  have hv : ⇑ew ∘ (B.map (algebraMap F (Ainf F)) *ᵥ cv (Ainf F) b (X 0)) =
-      (B.map (algebraMap F (Ainf F))).map ew *ᵥ (⇑ew ∘ cv (Ainf F) b (X 0)) :=
+  have hv
+      : ⇑ew ∘ (B.map (algebraMap F (Ainf F)) *ᵥ cv (Ainf F) b (X 0))
+        = (B.map (algebraMap F (Ainf F))).map ew *ᵥ (⇑ew ∘ cv (Ainf F) b (X 0)) :=
     funext fun i => RingHom.map_mulVec ew _ _ i
   rw [hv]
 

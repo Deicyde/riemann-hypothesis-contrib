@@ -10,8 +10,11 @@ set_option linter.unusedSectionVars false
 
 noncomputable section
 open scoped TensorProduct NNReal Matrix Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.Ldexa
 open PositivityTheory.SiegelWeilFormula.Ald
@@ -20,8 +23,10 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 
 variable {m n : ℕ}
 
-def BfE (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) : LinearMap.BilinForm F (Matrix (Fin m) (Fin n) E) :=
-  LinearMap.mk₂ F (fun x z => Algebra.trace F E (xᵀ * J * z.map σ).trace)
+def BfE (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E)
+    : LinearMap.BilinForm F (Matrix (Fin m) (Fin n) E) :=
+  LinearMap.mk₂ F
+    (fun x z => Algebra.trace F E (xᵀ * J * z.map σ).trace)
     (fun x x' z => by simp [Matrix.transpose_add, Matrix.add_mul, Matrix.trace_add])
     (fun c x z => by simp [Matrix.transpose_smul, Matrix.smul_mul, Matrix.trace_smul])
     (fun x z z' => by simp [Matrix.map_add _ (map_add σ), Matrix.mul_add, Matrix.trace_add])
@@ -29,11 +34,15 @@ def BfE (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) : LinearMap.BilinFor
       have : (c • z).map σ = c • z.map σ := by ext i j; exact σ.toLinearMap.map_smul c (z i j)
       simp [this, Matrix.mul_smul, Matrix.trace_smul])
 
-theorem BfE_apply (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (x z : Matrix (Fin m) (Fin n) E) :
-    BfE σ J x z = Algebra.trace F E (xᵀ * J * z.map σ).trace := rfl
+theorem BfE_apply (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (x z : Matrix (Fin m) (Fin n) E)
+    : BfE σ J x z = Algebra.trace F E (xᵀ * J * z.map σ).trace :=
+  rfl
 
-theorem BfE_nondeg [FiniteDimensional F E] (σ : E →ₐ[F] E) (hσ : ∀ a, σ (σ a) = a) (J : Matrix (Fin m) (Fin m) E)
-    (hJ : J.det ≠ 0) : (BfE (n := n) σ J).Nondegenerate := by
+theorem BfE_nondeg
+    [FiniteDimensional F E]
+    (σ : E →ₐ[F] E) (hσ : ∀ a, σ (σ a) = a)
+    (J : Matrix (Fin m) (Fin m) E) (hJ : J.det ≠ 0)
+    : (BfE (n := n) σ J).Nondegenerate := by
   have hdet : IsUnit J.det := isUnit_iff_ne_zero.mpr hJ
   have hdetT : IsUnit Jᵀ.det := by
     rw [Matrix.det_transpose]
@@ -54,8 +63,9 @@ theorem BfE_nondeg [FiniteDimensional F E] (σ : E →ₐ[F] E) (hσ : ∀ a, σ
       push_neg at h
       exact hy (Matrix.ext h)
     have h1 := hx ((Matrix.single b0 j0 ((Jᵀ * x) b0 j0)⁻¹).map σ)
-    have hσσ : ((Matrix.single b0 j0 ((Jᵀ * x) b0 j0)⁻¹).map σ).map σ =
-        Matrix.single b0 j0 ((Jᵀ * x) b0 j0)⁻¹ := by
+    have hσσ
+        : ((Matrix.single b0 j0 ((Jᵀ * x) b0 j0)⁻¹).map σ).map σ
+          = Matrix.single b0 j0 ((Jᵀ * x) b0 j0)⁻¹ := by
       ext a b
       simp only [Matrix.map_apply]
       exact hσ _

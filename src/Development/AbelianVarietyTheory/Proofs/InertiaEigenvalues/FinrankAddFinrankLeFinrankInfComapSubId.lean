@@ -8,8 +8,13 @@ open TensorProduct Module
 
 namespace GlobalTheory
 
-theorem finrank_add_finrank_le_finrank_inf_comap_sub_id :
-    ∀ (k : Type) [Field k] (M W : Type) [AddCommGroup M] [Module k M] [AddCommGroup W] [Module k W] (D R : Submodule k M) [FiniteDimensional k ↥D] (F : M →ₗ[k] M) (B : M →ₗ[k] W →ₗ[k] k), R ≤ D → (∀ x ∈ D, F x ∈ D) → (∀ x ∈ R, ∀ w, B x w = 0) → (∀ x ∈ D, ∀ w, B (F x) w = B x w) → (∀ w, (∀ x ∈ D, B x w = 0) → w = 0) → finrank k W + finrank k ↥R ≤ finrank k ↥(D ⊓ R.comap (F - LinearMap.id)) := by
+theorem finrank_add_finrank_le_finrank_inf_comap_sub_id
+    : ∀ (k : Type) [Field k] (M W : Type) [AddCommGroup M] [Module k M] [AddCommGroup W]
+        [Module k W] (D R : Submodule k M) [FiniteDimensional k ↥D] (F : M →ₗ[k] M)
+        (B : M →ₗ[k] W →ₗ[k] k),
+      R ≤ D → (∀ x ∈ D, F x ∈ D) → (∀ x ∈ R, ∀ w, B x w = 0) → (∀ x ∈ D, ∀ w, B (F x) w = B x w)
+        → (∀ w, (∀ x ∈ D, B x w = 0) → w = 0)
+        → finrank k W + finrank k ↥R ≤ finrank k ↥(D ⊓ R.comap (F - LinearMap.id)) := by
   intro k _ M W _ _ _ _ D R _ F B hRD hFD hBR hBF hnd
 
   let RV : Submodule k ↥D := R.comap D.subtype
@@ -22,8 +27,7 @@ theorem finrank_add_finrank_le_finrank_inf_comap_sub_id :
     rw [Submodule.mem_dualAnnihilator]
     intro x hx
     exact hBR x.1 hx w
-  let L : W →ₗ[k] Module.Dual k (↥D ⧸ RV) :=
-    RV.dualCopairing ∘ₗ P.codRestrict RV.dualAnnihilator hP
+  let L : W →ₗ[k] Module.Dual k (↥D ⧸ RV) := RV.dualCopairing ∘ₗ P.codRestrict RV.dualAnnihilator hP
   have hL : ∀ w (x : ↥D), L w (RV.mkQ x) = B x.1 w := fun _ _ => rfl
 
   have hLinj : Function.Injective L := by

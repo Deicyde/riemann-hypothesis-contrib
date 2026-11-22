@@ -13,16 +13,24 @@ noncomputable section
 
 section place
 
-variable {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+variable
+  {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
 
-def LimEvT (p : KB.Pl P Wp Wq) (χ : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (Y : Finset ℝ) (N : ℕ) : Prop :=
-  ∀ w, TBB.AdmW P p.l0 Y w → w.length ≤ N →
-    Tendsto (fun ε : ℝ => (p.RR (D.cutF p.T.base χ F ε) 0 w [] []).re) (𝓝[>] 0) (𝓝 (p.RR F 0 w [] []).re)
+def LimEvT
+    (p : KB.Pl P Wp Wq) (χ : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (Y : Finset ℝ) (N : ℕ)
+    : Prop :=
+  ∀ w,
+    TBB.AdmW P p.l0 Y w → w.length ≤ N
+      → Tendsto
+        (fun ε : ℝ => (p.RR (D.cutF p.T.base χ F ε) 0 w [] []).re)
+        (𝓝[>] 0) (𝓝 (p.RR F 0 w [] []).re)
 
-theorem limE_of_partsT (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (χ : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp))
-    (Y : Finset ℝ) (N : ℕ) (hnn : ∀ y, 0 ≤ nn y) (hEv : LimEvT p χ F Y N) (hPos : LimPos p F Y N)
-    (hBd : LimBd p nn F Y N) : LimE p nn χ F Y N := by
+theorem limE_of_partsT
+    (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (χ : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (Y : Finset ℝ)
+    (N : ℕ)
+    (hnn : ∀ y, 0 ≤ nn y) (hEv : LimEvT p χ F Y N) (hPos : LimPos p F Y N) (hBd : LimBd p nn F Y N)
+    : LimE p nn χ F Y N := by
   intro w hw hl
   have hE := hEv w hw hl
   have hP := hPos w hw hl
@@ -33,7 +41,12 @@ theorem limE_of_partsT (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (χ : ℝ → ℝ)
       obtain ⟨l, _, rfl⟩ := List.mem_map.1 hx
       exact hnn _)
   by_cases hb : 0 < (B.beta p.T.base F F).re
-  · refine ⟨(p.RR F 0 w [] []).re / (B.beta p.T.base F F).re, div_nonneg hP hb.le, (div_le_iff₀ hb).2 hB, ?_⟩
+  · refine ⟨
+      (p.RR F 0 w [] []).re / (B.beta p.T.base F F).re,
+      div_nonneg hP hb.le,
+      (div_le_iff₀ hb).2 hB,
+      ?_
+    ⟩
     rw [div_mul_cancel₀ _ hb.ne']
     exact hE
   · have hb' : (B.beta p.T.base F F).re ≤ 0 := not_lt.1 hb
@@ -45,7 +58,6 @@ theorem limE_of_partsT (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (χ : ℝ → ℝ)
     exact hE
 
 end place
-
 
 end
 

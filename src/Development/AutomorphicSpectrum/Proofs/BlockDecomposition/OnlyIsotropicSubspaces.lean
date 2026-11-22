@@ -12,17 +12,16 @@ namespace GlobalTheory.CompanionTheory.IsotropicDegreeBound
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem conjE_conjE (a : E) : conjE E (conjE E a) = a :=
-  IsCMField.complexConj_apply_apply E a
+theorem conjE_conjE (a : E) : conjE E (conjE E a) = a := IsCMField.complexConj_apply_apply E a
 
-theorem mem_perpD_iff (d : GL (Fin n) E) (W : Submodule E (Fin n → E)) (y : Fin n → E) :
-    y ∈ perpD (conjE E) d W ↔ ∀ x ∈ W, (conjE E ∘ x) ⬝ᵥ ((d⁻¹).val *ᵥ y) = 0 := by
+theorem mem_perpD_iff (d : GL (Fin n) E) (W : Submodule E (Fin n → E)) (y : Fin n → E)
+    : y ∈ perpD (conjE E) d W ↔ ∀ x ∈ W, (conjE E ∘ x) ⬝ᵥ ((d⁻¹).val *ᵥ y) = 0 := by
   have key : y ∈ perpD (conjE E) d W ↔ (d⁻¹).val *ᵥ y ∈ perp (conjE E) W := by
     constructor
     · rintro ⟨z, hz, rfl⟩
       have : (d⁻¹).val *ᵥ (Matrix.toLin' d.val z) = z := by
-        rw [Matrix.toLin'_apply, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one,
-          Matrix.one_mulVec]
+        rw [Matrix.toLin'_apply, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel,
+          Units.val_one, Matrix.one_mulVec]
       rw [this]
       exact hz
     · intro h
@@ -32,41 +31,41 @@ theorem mem_perpD_iff (d : GL (Fin n) E) (W : Submodule E (Fin n → E)) (y : Fi
   rw [key]
   exact Iff.rfl
 
-theorem gram_nrm (d : GL (Fin n) E) :
-    ((nrm d).val.map (conjE E))ᵀ * (d⁻¹).val * (nrm d).val = (d⁻¹).val := by
+theorem gram_nrm (d : GL (Fin n) E)
+    : ((nrm d).val.map (conjE E))ᵀ * (d⁻¹).val * (nrm d).val = (d⁻¹).val := by
   set D := d.val with hD
   set Di := (d⁻¹).val with hDi
   have hval : (nrm d).val = D * (Di.map (conjE E))ᵀ := by
     simp only [nrm, Units.val_mul]
     rfl
-  have hinv : Di * D = 1 := by
-    rw [hDi, hD, ← Units.val_mul, inv_mul_cancel, Units.val_one]
+  have hinv : Di * D = 1 := by rw [hDi, hD, ← Units.val_mul, inv_mul_cancel, Units.val_one]
   have hc : (Di.map (conjE E)) * (D.map (conjE E)) = 1 := by
     rw [← Matrix.map_mul, hinv, Matrix.map_one _ (map_zero _) (map_one _)]
   have hcc : (Di.map (conjE E)).map (conjE E) = Di := by
     ext i j
     simp [conjE_conjE]
   have hm : ((nrm d).val.map (conjE E))ᵀ = Di * (D.map (conjE E))ᵀ := by
-    rw [hval, Matrix.map_mul, Matrix.transpose_mul, Matrix.transpose_map, Matrix.transpose_transpose, hcc]
+    rw [hval, Matrix.map_mul, Matrix.transpose_mul, Matrix.transpose_map,
+      Matrix.transpose_transpose, hcc]
   rw [hm, hval]
-  calc Di * (D.map (conjE E))ᵀ * Di * (D * (Di.map (conjE E))ᵀ)
-      = Di * (D.map (conjE E))ᵀ * (Di * D) * (Di.map (conjE E))ᵀ := by
-        simp only [Matrix.mul_assoc]
+  calc
+    Di * (D.map (conjE E))ᵀ * Di * (D * (Di.map (conjE E))ᵀ)
+      = Di * (D.map (conjE E))ᵀ * (Di * D) * (Di.map (conjE E))ᵀ := by simp only [Matrix.mul_assoc]
     _ = Di * ((Di.map (conjE E)) * (D.map (conjE E)))ᵀ := by
-        rw [hinv, Matrix.transpose_mul, Matrix.mul_one, Matrix.mul_assoc]
+      rw [hinv, Matrix.transpose_mul, Matrix.mul_one, Matrix.mul_assoc]
     _ = Di := by rw [hc, Matrix.transpose_one, Matrix.mul_one]
 
-theorem pairing_nrm (d : GL (Fin n) E) (u v : Fin n → E) :
-    (conjE E ∘ ((nrm d).val *ᵥ u)) ⬝ᵥ ((d⁻¹).val *ᵥ ((nrm d).val *ᵥ v)) =
-      (conjE E ∘ u) ⬝ᵥ ((d⁻¹).val *ᵥ v) := by
+theorem pairing_nrm (d : GL (Fin n) E) (u v : Fin n → E)
+    : (conjE E ∘ ((nrm d).val *ᵥ u)) ⬝ᵥ ((d⁻¹).val *ᵥ ((nrm d).val *ᵥ v))
+      = (conjE E ∘ u) ⬝ᵥ ((d⁻¹).val *ᵥ v) := by
   have h1 : conjE E ∘ ((nrm d).val *ᵥ u) = ((nrm d).val.map (conjE E)) *ᵥ (conjE E ∘ u) := by
     funext i
     exact RingHom.map_mulVec (conjE E) (nrm d).val u i
-  rw [h1, ← Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
-    gram_nrm]
+  rw [h1, ← Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
+    Matrix.mulVec_mulVec, gram_nrm]
 
-theorem img_nrm_inf (d : GL (Fin n) E) (W : Submodule E (Fin n → E)) (hW : img (nrm d) W = W) :
-    img (nrm d) (W ⊓ perpD (conjE E) d W) = W ⊓ perpD (conjE E) d W := by
+theorem img_nrm_inf (d : GL (Fin n) E) (W : Submodule E (Fin n → E)) (hW : img (nrm d) W = W)
+    : img (nrm d) (W ⊓ perpD (conjE E) d W) = W ⊓ perpD (conjE E) d W := by
   have hinj : Function.Injective (Matrix.toLin' (nrm d).val) := by
     intro a b hab
     have h := congrArg (fun z => ((nrm d)⁻¹).val *ᵥ z) hab
@@ -85,14 +84,14 @@ theorem img_nrm_inf (d : GL (Fin n) E) (W : Submodule E (Fin n → E)) (hW : img
   refine Submodule.eq_of_le_of_finrank_eq hle ?_
   exact (Submodule.equivMapOfInjective _ hinj _).finrank_eq.symm
 
-theorem inf_le_perpD_inf (d : GL (Fin n) E) (W : Submodule E (Fin n → E)) :
-    W ⊓ perpD (conjE E) d W ≤ perpD (conjE E) d (W ⊓ perpD (conjE E) d W) := by
+theorem inf_le_perpD_inf (d : GL (Fin n) E) (W : Submodule E (Fin n → E))
+    : W ⊓ perpD (conjE E) d W ≤ perpD (conjE E) d (W ⊓ perpD (conjE E) d W) := by
   intro y hy
   rw [mem_perpD_iff]
   exact fun x hx => (mem_perpD_iff d W y).1 hy.2 x hx.1
 
-theorem prof_gap {τ : ℝ} (hτ : 0 ≤ τ) {a b m : ℕ} (hab : a < b) (hbm : b ≤ m) :
-    prof m τ a + 2 * τ ≤ prof m τ b := by
+theorem prof_gap {τ : ℝ} (hτ : 0 ≤ τ) {a b m : ℕ} (hab : a < b) (hbm : b ≤ m)
+    : prof m τ a + 2 * τ ≤ prof m τ b := by
   have h1 : (a : ℝ) + 1 ≤ b := by exact_mod_cast hab
   have h2 : (b : ℝ) ≤ m := by exact_mod_cast hbm
   have h3 : (2 : ℝ) ≤ ((b : ℝ) - a) * (2 * m + 1 - a - b) := by

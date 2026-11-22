@@ -10,16 +10,21 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.WeakW
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.IndefR.Datum GlobalTheory.Mem.AutSpace GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraExponentialFamilies GlobalTheory.CuspDecay GlobalTheory.Mem.Lift
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.IndefR.Datum GlobalTheory.Mem.AutSpace
+  GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraExponentialFamilies GlobalTheory.CuspDecay
+  GlobalTheory.Mem.Lift
 open scoped TensorProduct ContDiff Topology
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.Lift.GenZero
 
-theorem exists_hasDerivAt_char (s : ℝ → ℂ) (hs : ∀ t t', s (t + t') = s t * s t') (h0 : s 0 = 1)
-    (hc : ContinuousAt s 0) : ∃ m : ℂ, HasDerivAt s m 0 := by
+theorem exists_hasDerivAt_char
+    (s : ℝ → ℂ) (hs : ∀ t t', s (t + t') = s t * s t') (h0 : s 0 = 1) (hc : ContinuousAt s 0)
+    : ∃ m : ℂ, HasDerivAt s m 0 := by
   have hcont : Continuous s := by
     refine continuous_iff_continuousAt.2 fun t₀ => ?_
     have e : s = fun t => s (t - t₀) * s t₀ := funext fun t => by rw [← hs, sub_add_cancel]
@@ -41,7 +46,8 @@ theorem exists_hasDerivAt_char (s : ℝ → ℂ) (hs : ∀ t t', s (t + t') = s 
     funext t
     rw [eq_div_iff hε]
     have h1 : g (t + ε) - g t = ∫ y in t..(t + ε), s y :=
-      intervalIntegral.integral_interval_sub_left (hcont.intervalIntegrable _ _) (hcont.intervalIntegrable _ _)
+      intervalIntegral.integral_interval_sub_left (hcont.intervalIntegrable _ _)
+        (hcont.intervalIntegrable _ _)
     rw [h1]
     have h2 := intervalIntegral.integral_comp_add_left (a := 0) (b := ε) s t
     rw [add_zero] at h2
@@ -49,14 +55,20 @@ theorem exists_hasDerivAt_char (s : ℝ → ℂ) (hs : ∀ t t', s (t + t') = s 
     simp only [hs, g]
     exact (intervalIntegral.integral_const_mul _ _).symm
   have h3 : HasDerivAt (fun t => g (t + ε)) (s (0 + ε)) 0 := HasDerivAt.comp_add_const 0 ε (hg _)
-  exact ⟨_, ((h3.sub (hg 0)).div_const (g ε)).congr_of_eventuallyEq
-    (Filter.Eventually.of_forall fun t => congrFun e t)⟩
+  exact ⟨
+    _,
+    ((h3.sub (hg 0)).div_const (g ε)).congr_of_eventuallyEq
+      (Filter.Eventually.of_forall fun t => congrFun e t)
+  ⟩
 
-theorem lie_of_path {ι : Type} [Fintype ι] [DecidableEq ι] (H X : Matrix ι ι ℂ) (m : ℝ → Matrix ι ι ℂ) (h0 : m 0 = 1)
-    (hm : ∀ t, (m t)ᴴ * H * m t = H) (hX : ∀ k l, HasDerivAt (fun t => m t k l) (X k l) 0) :
-    Xᴴ * H + H * X = 0 := by
+theorem lie_of_path
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (H X : Matrix ι ι ℂ) (m : ℝ → Matrix ι ι ℂ) (h0 : m 0 = 1) (hm : ∀ t, (m t)ᴴ * H * m t = H)
+    (hX : ∀ k l, HasDerivAt (fun t => m t k l) (X k l) 0)
+    : Xᴴ * H + H * X = 0 := by
   ext i j
-  have h1 : HasDerivAt (fun t => ∑ l, (∑ k, star (m t k i) * H k l) * m t l j)
+  have h1 : HasDerivAt
+      (fun t => ∑ l, (∑ k, star (m t k i) * H k l) * m t l j)
       (∑ l, ((∑ k, star (X k i) * H k l) * m 0 l j + (∑ k, star (m 0 k i) * H k l) * X l j)) 0 :=
     HasDerivAt.fun_sum fun l _ =>
       (HasDerivAt.fun_sum fun k _ => (hX k i).star.mul_const (H k l)).mul (hX l j)
@@ -73,31 +85,60 @@ theorem lie_of_path {ι : Type} [Fintype ι] [DecidableEq ι] (H X : Matrix ι �
 
 open scoped Classical
 
-
 set_option maxHeartbeats 1000000 in
 open GlobalTheory.RealWeil in
-theorem exists_generator : ∀ (D : D7) (θ : InfF D) (σ : (D.what₂.Tau → ℂ) →+ AE D), GlobalTheory.FockCompare.Chart θ σ → ∀ (ψ : AddChar (AF D.host.F) ℂ) (hψ : IsStdChar D ψ (-1)) (S T : HSp D) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)), GlobalTheory.Ker.IsWeak ψ S T om → OmCont ψ S T om → ∀ γ : ℝ → GA D S × GA D T, Continuous γ → (∀ s t, γ (s + t) = γ s * γ t) → (∀ t, (γ t).1 ∈ GinfC S ∧ (γ t).2 ∈ GinfC T) → ∀ X : Matrix (GlobalTheory.RealWeil.Ix S T) (GlobalTheory.RealWeil.Ix S T) ℂ, (∀ k l, HasDerivAt (fun t => GlobalTheory.RealWeil.mM θ S T (γ t) k l) (X k l) 0) → ∃ lam : ℂ, ∀ F : GlobalTheory.RealWeil.BB ψ S T, IsThetaFunO ψ S T F.1 → ∃ u : ℝ → GlobalTheory.RealWeil.BB ψ S T, (∀ t, ((u t).1 : WO S T → ℂ) = om (γ t) F.1) ∧ HasDerivAt u (nOp (GlobalTheory.RealWeil.rhoV hψ σ S T) (GlobalTheory.RealWeil.HM S T) X F + lam • F) 0 := by
+theorem exists_generator
+    : ∀ (D : D7) (θ : InfF D) (σ : (D.what₂.Tau → ℂ) →+ AE D),
+      GlobalTheory.FockCompare.Chart θ σ
+        → ∀ (ψ : AddChar (AF D.host.F) ℂ) (hψ : IsStdChar D ψ (-1)) (S T : HSp D)
+            (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
+          GlobalTheory.Ker.IsWeak ψ S T om → OmCont ψ S T om
+            → ∀ γ : ℝ → GA D S × GA D T,
+              Continuous γ → (∀ s t, γ (s + t) = γ s * γ t)
+                → (∀ t, (γ t).1 ∈ GinfC S ∧ (γ t).2 ∈ GinfC T)
+                → ∀ X : Matrix (GlobalTheory.RealWeil.Ix S T) (GlobalTheory.RealWeil.Ix S T) ℂ,
+                  (∀ k l, HasDerivAt (fun t => GlobalTheory.RealWeil.mM θ S T (γ t) k l) (X k l) 0)
+                    → ∃ lam : ℂ, ∀ F : GlobalTheory.RealWeil.BB ψ S T,
+                      IsThetaFunO ψ S T F.1
+                        → ∃ u : ℝ → GlobalTheory.RealWeil.BB ψ S T,
+                          (∀ t, ((u t).1 : WO S T → ℂ) = om (γ t) F.1) ∧ HasDerivAt u
+                            (nOp (GlobalTheory.RealWeil.rhoV hψ σ S T)
+                                (GlobalTheory.RealWeil.HM S T) X F
+                              + lam • F)
+                            0 := by
   intro D θ σ h ψ hψ S T om hw hc γ hγ hadd hinf X hX
   have hγ0 : γ 0 = 1 := by
     have := hadd 0 0
     rw [add_zero] at this
     exact mul_left_cancel (a := γ 0) (by rw [← this, mul_one])
   have hH := isHeis_rhoB (S := S) (T := T) h hψ
-  have hL := lie_of_path (HM S T) X (fun t => mM θ S T (γ t)) (by simp only [hγ0, map_one])
-    (fun t => mM_unitary h.inf _) hX
-  obtain ⟨κ, _, c, p, q, hq, hn⟩ := GlobalTheory.Mem.Lift.Normal.normal_quad (Ix S T) (HM S T) X HM_herm HM_det hL
-  obtain ⟨Ω, hΩ, -, hd⟩ := GlobalTheory.T.hasDerivAt_oscillatorAction_unitaryPath_quadratic (Ix S T) (HM S T) HM_herm HM_det (BB ψ S T) (rhoV hψ σ S T) hH
-    (GA D S × GA D T) (mM θ S T) (mM_unitary h.inf)
+  have hL :=
+    lie_of_path (HM S T) X
+      (fun t => mM θ S T (γ t))
+      (by simp only [hγ0, map_one])
+      (fun t => mM_unitary h.inf _)
+      hX
+  obtain ⟨κ, _, c, p, q, hq, hn⟩ :=
+    GlobalTheory.Mem.Lift.Normal.normal_quad (Ix S T) (HM S T) X HM_herm HM_det hL
+  obtain ⟨Ω, hΩ, -, hd⟩ :=
+    GlobalTheory.T.hasDerivAt_oscillatorAction_unitaryPath_quadratic (Ix S T) (HM S T) HM_herm
+      HM_det (BB ψ S T) (rhoV hψ σ S T) hH (GA D S × GA D T) (mM θ S T) (mM_unitary h.inf)
   obtain ⟨lam, hlam⟩ := hd γ X hγ0 hX κ c p q hq
   have sm := sm_of_theta (S := S) (T := T) h hψ
   choose s hs1 hs using fun t => GlobalTheory.T.weakWeilRep_eq_unit_smul_oscillator_real_points D θ σ h ψ hψ S T om hw Ω hΩ (γ t).1 (hinf t).1 (γ t).2 (hinf t).2
-  replace hs : ∀ t (F : BB ψ S T), IsThetaFunO ψ S T F.1 → om (γ t) F.1 = s t • ((Ω (γ t) F).1 : WO S T → ℂ) := hs
+  replace hs
+      : ∀ t (F : BB ψ S T),
+        IsThetaFunO ψ S T F.1 → om (γ t) F.1 = s t • ((Ω (γ t) F).1 : WO S T → ℂ) :=
+    hs
   obtain ⟨-, hsmul, hsm, hone, hmul, -⟩ := hΩ
-  have cs : ∀ (a : ℂ) (G : BB ψ S T), ((a • G).1 : WO S T → ℂ) = a • (G.1 : WO S T → ℂ) := fun _ _ => rfl
+  have cs : ∀ (a : ℂ) (G : BB ψ S T), ((a • G).1 : WO S T → ℂ) = a • (G.1 : WO S T → ℂ) :=
+    fun _ _ => rfl
   have hne : ∀ t, s t ≠ 0 := fun t e => by simpa [e] using hs1 t
-  have hD : ∀ F : BB ψ S T, IsThetaFunO ψ S T F.1 →
-      HasDerivAt (fun t => Ω (γ t) F) (nOp (rhoV hψ σ S T) (HM S T) X F + lam • F) 0 := fun F hF =>
-    hn _ _ hH F (sm F hF) ▸ hlam F (sm F hF)
+  have hD
+      : ∀ F : BB ψ S T,
+        IsThetaFunO ψ S T F.1
+          → HasDerivAt (fun t => Ω (γ t) F) (nOp (rhoV hψ σ S T) (HM S T) X F + lam • F) 0 :=
+    fun F hF => hn _ _ hH F (sm F hF) ▸ hlam F (sm F hF)
   by_cases hex : ∃ F₀ : BB ψ S T, IsThetaFunO ψ S T F₀.1 ∧ F₀ ≠ 0
   swap
   · push Not at hex
@@ -126,10 +167,11 @@ theorem exists_generator : ∀ (D : D7) (θ : InfF D) (σ : (D.what₂.Tau → �
   have hms : ∀ t t', s (t + t') = s t * s t' := by
     intro t t'
     have h1 := hs (t + t') F₀ hF₀
-    rw [hadd, map_mul, Module.End.mul_apply, hs t' F₀ hF₀, map_smul, hs t _ (hth t'), ← hmul _ _ _ (sm _ hF₀),
-      smul_smul] at h1
-    have h2 : (s t' * s t) • Ω (γ t * γ t') F₀ = s (t + t') • Ω (γ t * γ t') F₀ := QB_ext fun x => by
-      rw [cs, cs, h1]
+    rw [hadd, map_mul, Module.End.mul_apply, hs t' F₀ hF₀, map_smul, hs t _ (hth t'),
+        ← hmul _ _ _ (sm _ hF₀), smul_smul]
+      at h1
+    have h2 : (s t' * s t) • Ω (γ t * γ t') F₀ = s (t + t') • Ω (γ t * γ t') F₀ :=
+      QB_ext fun x => by rw [cs, cs, h1]
     rw [← smul_left_injective ℂ (hΩne _) h2, mul_comm]
   have hs0 : s 0 = 1 := by
     have := hms 0 0
@@ -151,7 +193,8 @@ theorem exists_generator : ∀ (D : D7) (θ : InfF D) (σ : (D.what₂.Tau → �
     rw [Pi.div_apply, div_eq_iff ht, hs t F₀ hF₀, ev_apply]
     rfl
   obtain ⟨m, hm⟩ := exists_hasDerivAt_char s hms hs0 hcs
-  refine ⟨lam + m, fun F hF => ⟨fun t => s t • Ω (γ t) F, fun t => (cs _ _).trans (hs t F hF).symm, ?_⟩⟩
+  refine
+    ⟨lam + m, fun F hF => ⟨fun t => s t • Ω (γ t) F, fun t => (cs _ _).trans (hs t F hF).symm, ?_⟩⟩
   have h1 := hm.smul (hD F hF)
   rw [hs0, one_smul, hγ0, hone _ (sm _ hF)] at h1
   rw [add_smul, ← add_assoc]

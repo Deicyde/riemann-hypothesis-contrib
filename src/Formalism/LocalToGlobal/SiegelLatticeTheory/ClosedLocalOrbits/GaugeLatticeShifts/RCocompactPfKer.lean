@@ -34,7 +34,8 @@ theorem kerBaseChange_holds : KerBaseChange := by
     have hcomp : T ∘ₗ (C.subtype ∘ₗ g) ∘ₗ T = T := LinearMap.ext hTQT
     have h := congrArg LinearMap.toMatrix' hcomp
     rwa [LinearMap.toMatrix'_comp, LinearMap.toMatrix'_comp, hT, LinearMap.toMatrix'_toLin', ← hQ,
-      ← Matrix.mul_assoc] at h
+        ← Matrix.mul_assoc]
+      at h
   refine ⟨1 - Q * A, ?_, ?_⟩
   · rw [Matrix.mul_sub, Matrix.mul_one, ← Matrix.mul_assoc, hAQA, sub_self]
   · intro z hz
@@ -43,6 +44,7 @@ theorem kerBaseChange_holds : KerBaseChange := by
       rw [map_one] at h
       simp only [RingHom.mapMatrix_apply] at h
       rw [h, Matrix.map_mul]
-    rw [e, Matrix.sub_mulVec, Matrix.one_mulVec, ← Matrix.mulVec_mulVec, hz, Matrix.mulVec_zero, sub_zero]
+    rw [e, Matrix.sub_mulVec, Matrix.one_mulVec, ← Matrix.mulVec_mulVec, hz, Matrix.mulVec_zero,
+      sub_zero]
 
 end Formalism.L2.SG.Pf.RCoc

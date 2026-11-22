@@ -9,18 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.Exists
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.DatumCoverAdjoint
 
 open GlobalTheory.DatumInverseCharacter
 
-theorem span_image_sup_eq_top {R M J : Type} [CommRing R] [AddCommGroup M] [Module R M] (K : Ideal R)
-    (φ : M →ₗ[R] M) (hφ : ∀ a, ∃ b, φ b - a ∈ (K • ⊤ : Submodule R M)) (x : J → M) (s : Set J)
-    (h : Submodule.span R (x '' s) ⊔ (K • ⊤ : Submodule R M) = ⊤) :
-    Submodule.span R ((fun i => φ (x i)) '' s) ⊔ (K • ⊤ : Submodule R M) = ⊤ := by
+theorem span_image_sup_eq_top
+    {R M J : Type} [CommRing R] [AddCommGroup M] [Module R M]
+    (K : Ideal R) (φ : M →ₗ[R] M) (hφ : ∀ a, ∃ b, φ b - a ∈ (K • ⊤ : Submodule R M))
+    (x : J → M) (s : Set J) (h : Submodule.span R (x '' s) ⊔ (K • ⊤ : Submodule R M) = ⊤)
+    : Submodule.span R ((fun i => φ (x i)) '' s) ⊔ (K • ⊤ : Submodule R M) = ⊤ := by
   rw [eq_top_iff]
   intro a _
   obtain ⟨b, hb⟩ := hφ a
@@ -32,15 +36,34 @@ theorem span_image_sup_eq_top {R M J : Type} [CommRing R] [AddCommGroup M] [Modu
   have := sub_mem h2 (Submodule.mem_sup_right hb)
   rwa [sub_sub_cancel] at this
 
-theorem datum_adjoint : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (n : ℕ) (d : DeltaDat Xo c n), d.l₂.M = l.M * d.pd → d.l₂.Mb = l.Mb * d.I → ∀ (ph : (Fin n → LaJ Xo c d) → c.F) (ψ : (LaI Xo c d ≃ₗ[𝓞 E] LaI Xo c d) →* c.Fˣ) (x₀ : Fin n → LaJ Xo c d), d.PhiPin ph ψ x₀ → ∀ g : Sim Dw, (∀ a, g.f d.l₂.M a - a ∈ d.I • (⊤ : Submodule (𝓞 E) Dw.La)) → ∃ σq : LevQ Dw d.l₂ ≃ LevQ Dw d.l₂, (∀ a, σq (Submodule.Quotient.mk a) = Submodule.Quotient.mk (g.f d.l₂.M a)) ∧ ∀ (rk : Bool) (x0 : Fin n → Dw.La), AdmX (l := l) rk x0 → ∃ x0' : Fin n → Dw.La, AdmX (l := l) rk x0' ∧ ∀ q : Fin n → LevQ Dw d.l₂, d.w x0 (fun b => σq.symm (q b)) = d.w x0' q := by
+theorem datum_adjoint
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H)
+        (l : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l)
+        (n : ℕ) (d : DeltaDat Xo c n),
+      d.l₂.M = l.M * d.pd → d.l₂.Mb = l.Mb * d.I
+        → ∀ (ph : (Fin n → LaJ Xo c d) → c.F) (ψ : (LaI Xo c d ≃ₗ[𝓞 E] LaI Xo c d) →* c.Fˣ)
+            (x₀ : Fin n → LaJ Xo c d),
+          d.PhiPin ph ψ x₀
+            → ∀ g : Sim Dw,
+              (∀ a, g.f d.l₂.M a - a ∈ d.I • (⊤ : Submodule (𝓞 E) Dw.La))
+                → ∃ σq : LevQ Dw d.l₂ ≃ LevQ Dw d.l₂,
+                  (∀ a, σq (Submodule.Quotient.mk a) = Submodule.Quotient.mk (g.f d.l₂.M a))
+                    ∧ ∀ (rk : Bool) (x0 : Fin n → Dw.La),
+                      AdmX (l := l) rk x0
+                        → ∃ x0' : Fin n → Dw.La,
+                          AdmX (l := l) rk x0'
+                            ∧ ∀ q : Fin n → LevQ Dw d.l₂,
+                              d.w x0 (fun b => σq.symm (q b)) = d.w x0' q := by
   intro E _ _ _ H Dw l Xo c n d hM hb ph ψ x₀ hpin g hg
   obtain ⟨-, -, -, -, -, hφ⟩ := hpin
   have hM₂ : 0 < d.l₂.M := by have := d.l₂.three_le; omega
   have hM₁ : 0 < l.M := by have := l.three_le; omega
   have hpd : 0 < d.pd := Nat.pos_of_mul_pos_left (hM ▸ hM₂)
   have hIJ := half_prod hM hb
-  have hspan : ∀ (l' : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H),
-      ((l'.M : ℕ) : 𝓞 E) ∈ l'.Mb * l'.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := fun l' => by
+  have hspan
+      : ∀ (l' : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H),
+        ((l'.M : ℕ) : 𝓞 E) ∈ l'.Mb * l'.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := fun l' => by
     rw [l'.prod]; exact Ideal.mem_span_singleton_self _
   have hbI : d.l₂.Mb ≤ d.I := hb ▸ (Ideal.mul_le_inf.trans inf_le_right)
   have hbM : d.l₂.Mb ≤ l.Mb := hb ▸ (Ideal.mul_le_inf.trans inf_le_left)
@@ -52,18 +75,29 @@ theorem datum_adjoint : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (
   obtain ⟨σ, hσ⟩ := exists_quot_equiv Dw hmb f g' hg'
   obtain ⟨fa, hfa⟩ := exists_adjoint Dw f
   obtain ⟨ga, hga⟩ := exists_adjoint Dw g'
-  have hsurj : ∀ a, ∃ b, ga b - a ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La) := fun a =>
-    ⟨fa a, mem_of_modN Dw hmJ (modN_of_dvd Dw hM₂ fun v => by
-      rw [map_sub, LinearMap.sub_apply, hga, hfa, ← map_sub]
-      exact dvd_of_modN Dw a (hg' v).2)⟩
-  refine ⟨σ.toEquiv, hσ, fun rk x0 hx => ⟨fun b => ga (x0 b),
-    span_image_sup_eq_top (Mfr l) ga hsurj x0 _ hx, fun q => ?_⟩⟩
-  have hq : ∀ b, f (levRep (σ.toEquiv.symm (q b))) - levRep (q b) ∈ (d.l₂.Mb • ⊤ : Submodule (𝓞 E) Dw.La) := by
+  have hsurj : ∀ a, ∃ b, ga b - a ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La) := fun a => ⟨
+    fa a,
+    mem_of_modN Dw hmJ
+      (modN_of_dvd Dw hM₂ fun v => by
+        rw [map_sub, LinearMap.sub_apply, hga, hfa, ← map_sub]
+        exact dvd_of_modN Dw a (hg' v).2)
+  ⟩
+  refine ⟨
+    σ.toEquiv,
+    hσ,
+    fun rk x0 hx =>
+      ⟨fun b => ga (x0 b), span_image_sup_eq_top (Mfr l) ga hsurj x0 _ hx, fun q => ?_⟩
+  ⟩
+  have hq
+      : ∀ b,
+        f (levRep (σ.toEquiv.symm (q b))) - levRep (q b)
+          ∈ (d.l₂.Mb • ⊤ : Submodule (𝓞 E) Dw.La) := by
     intro b
     rw [← Submodule.Quotient.eq, ← hσ, levRep_spec, levRep_spec]
     exact σ.apply_symm_apply _
-  have hz : zetaM c ^ pairL (l := l) x0 (fun b => levRep (σ.toEquiv.symm (q b))) =
-      zetaM c ^ pairL (l := l) (fun b => ga (x0 b)) (fun b => levRep (q b)) := by
+  have hz
+      : zetaM c ^ pairL (l := l) x0 (fun b => levRep (σ.toEquiv.symm (q b)))
+        = zetaM c ^ pairL (l := l) (fun b => ga (x0 b)) (fun b => levRep (q b)) := by
     refine zpow_congr hM₁ (root_pow c dvd_rfl) ?_
     unfold pairL
     rw [← Finset.sum_sub_distrib]

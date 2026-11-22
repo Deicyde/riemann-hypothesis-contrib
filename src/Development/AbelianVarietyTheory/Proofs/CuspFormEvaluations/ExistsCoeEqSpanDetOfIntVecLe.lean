@@ -12,14 +12,17 @@ public import ReciprocityTheory.DualLattices.SmallLevelClassSet
 
 namespace GlobalTheory.TensorLat
 
-open NumberField Complex ReciprocityTheory.ChartRestriction.G.I2 ReciprocityTheory.ChartRestriction.G.FD
+open NumberField Complex ReciprocityTheory.ChartRestriction.G.I2
+  ReciprocityTheory.ChartRestriction.G.FD
 open ReciprocityTheory.GeometryOfNumbersTheory (stdLat)
 open scoped nonZeroDivisors
 
-theorem relIndex_eq_of_hom {M M' : Type*} [AddCommGroup M] [AddCommGroup M']
-    {A₁ A₂ : AddSubgroup M} {B₁ B₂ : AddSubgroup M'} (f : M →+ M')
-    (hf : ∀ v ∈ A₂, f v ∈ B₂) (hker : ∀ v ∈ A₂, f v ∈ B₁ ↔ v ∈ A₁)
-    (hsurj : ∀ u ∈ B₂, ∃ v ∈ A₂, u - f v ∈ B₁) : A₁.relIndex A₂ = B₁.relIndex B₂ := by
+theorem relIndex_eq_of_hom
+    {M M' : Type*} [AddCommGroup M] [AddCommGroup M']
+    {A₁ A₂ : AddSubgroup M} {B₁ B₂ : AddSubgroup M'}
+    (f : M →+ M') (hf : ∀ v ∈ A₂, f v ∈ B₂) (hker : ∀ v ∈ A₂, f v ∈ B₁ ↔ v ∈ A₁)
+    (hsurj : ∀ u ∈ B₂, ∃ v ∈ A₂, u - f v ∈ B₁)
+    : A₁.relIndex A₂ = B₁.relIndex B₂ := by
   have h1 : A₁ ⊓ A₂ = B₁.comap f ⊓ A₂ := by
     ext v
     simp only [AddSubgroup.mem_inf, AddSubgroup.mem_comap]
@@ -31,35 +34,40 @@ theorem relIndex_eq_of_hom {M M' : Type*} [AddCommGroup M] [AddCommGroup M']
     · obtain ⟨v, hv, h⟩ := hsurj u hu
       exact AddSubgroup.mem_sup.2 ⟨_, h, f v, ⟨v, hv, rfl⟩, sub_add_cancel _ _⟩
   rw [← AddSubgroup.inf_relIndex_right, h1, AddSubgroup.inf_relIndex_right,
-    AddSubgroup.relIndex_comap, ← AddSubgroup.relIndex_sup_left, h2,
-    AddSubgroup.relIndex_sup_left]
+    AddSubgroup.relIndex_comap, ← AddSubgroup.relIndex_sup_left, h2, AddSubgroup.relIndex_sup_left]
 
-theorem relIndex_pi_univ {ι : Type*} [Fintype ι] {G : ι → Type*} [∀ i, AddCommGroup (G i)]
-    (L' L : ∀ i, AddSubgroup (G i)) :
-    (AddSubgroup.pi Set.univ L').relIndex (AddSubgroup.pi Set.univ L) =
-      ∏ i, (L' i).relIndex (L i) := by
-  let f : (AddSubgroup.pi Set.univ L) →+ (∀ i, L i ⧸ (L' i).addSubgroupOf (L i)) :=
-    { toFun := fun x i => QuotientAddGroup.mk ⟨x.1 i, x.2 i (Set.mem_univ i)⟩
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+theorem relIndex_pi_univ
+    {ι : Type*} [Fintype ι]
+    {G : ι → Type*} [∀ i, AddCommGroup (G i)]
+    (L' L : ∀ i, AddSubgroup (G i))
+    : (AddSubgroup.pi Set.univ L').relIndex (AddSubgroup.pi Set.univ L)
+      = ∏ i, (L' i).relIndex (L i) := by
+  let f : (AddSubgroup.pi Set.univ L) →+ (∀ i, L i ⧸ (L' i).addSubgroupOf (L i)) := {
+    toFun := fun x i => QuotientAddGroup.mk ⟨x.1 i, x.2 i (Set.mem_univ i)⟩
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   have hf : Function.Surjective f := fun y =>
     ⟨⟨fun i => (y i).out, fun i _ => (y i).out.2⟩, funext fun i => (y i).out_eq⟩
   have hc : (AddSubgroup.pi Set.univ L').addSubgroupOf (AddSubgroup.pi Set.univ L) = f.ker := by
     ext x
     rw [AddMonoidHom.mem_ker, funext_iff, AddSubgroup.mem_addSubgroupOf, AddSubgroup.mem_pi]
     refine forall_congr' fun i => ?_
-    change _ ↔ (QuotientAddGroup.mk ⟨x.1 i, x.2 i (Set.mem_univ i)⟩ :
-      L i ⧸ (L' i).addSubgroupOf (L i)) = 0
+    change _
+      ↔ (QuotientAddGroup.mk ⟨x.1 i, x.2 i (Set.mem_univ i)⟩ : L i ⧸ (L' i).addSubgroupOf (L i)) = 0
     simp [AddSubgroup.mem_addSubgroupOf]
   rw [AddSubgroup.relIndex, hc, AddSubgroup.index_ker, AddMonoidHom.range_eq_top.2 hf,
     AddSubgroup.card_top, Nat.card_pi]
   rfl
 
-theorem card_eq_relIndex_of_reps {M : Type*} [AddCommGroup M] {A B : AddSubgroup M} {R : Finset M}
-    (hR : ∀ y ∈ R, y ∈ B) (hR' : ∀ y ∈ B, ∃! r ∈ R, y - r ∈ A) : R.card = A.relIndex B := by
+theorem card_eq_relIndex_of_reps
+    {M : Type*} [AddCommGroup M]
+    {A B : AddSubgroup M} {R : Finset M} (hR : ∀ y ∈ R, y ∈ B) (hR' : ∀ y ∈ B, ∃! r ∈ R, y - r ∈ A)
+    : R.card = A.relIndex B := by
   rw [← Fintype.card_coe, ← Nat.card_eq_fintype_card]
   refine Nat.card_eq_of_bijective
-    (fun y : R => (QuotientAddGroup.mk ⟨y, hR y y.2⟩ : B ⧸ A.addSubgroupOf B)) ⟨?_, ?_⟩
+    (fun y : R => (QuotientAddGroup.mk ⟨y, hR y y.2⟩ : B ⧸ A.addSubgroupOf B))
+    ⟨?_, ?_⟩
   · intro y y' h
     have h1 : (y : M) - y' ∈ A := by
       simpa [AddSubgroup.mem_addSubgroupOf] using QuotientAddGroup.eq_iff_sub_mem.1 h
@@ -70,17 +78,18 @@ theorem card_eq_relIndex_of_reps {M : Type*} [AddCommGroup M] {A B : AddSubgroup
     refine ⟨⟨r, hr⟩, (QuotientAddGroup.eq_iff_sub_mem.2 ?_).symm⟩
     simpa [AddSubgroup.mem_addSubgroupOf] using h
 
-theorem exists_reps_of_relIndex_ne_zero {M : Type*} [AddCommGroup M] {A B : AddSubgroup M}
-    (h : A.relIndex B ≠ 0) :
-    ∃ R : Finset M, (∀ y ∈ R, y ∈ B) ∧ ∀ y ∈ B, ∃! r ∈ R, y - r ∈ A := by
+theorem exists_reps_of_relIndex_ne_zero
+    {M : Type*} [AddCommGroup M] {A B : AddSubgroup M} (h : A.relIndex B ≠ 0)
+    : ∃ R : Finset M, (∀ y ∈ R, y ∈ B) ∧ ∀ y ∈ B, ∃! r ∈ R, y - r ∈ A := by
   classical
   haveI : Fintype (B ⧸ A.addSubgroupOf B) := AddSubgroup.fintypeOfIndexNeZero h
   refine ⟨Finset.univ.image fun q : B ⧸ A.addSubgroupOf B => (q.out : M), ?_, fun y hy => ?_⟩
   · intro y hy
     obtain ⟨q, -, rfl⟩ := Finset.mem_image.1 hy
     exact q.out.2
-  · have key : ∀ q : B ⧸ A.addSubgroupOf B,
-        y - (q.out : M) ∈ A ↔ QuotientAddGroup.mk ⟨y, hy⟩ = q := fun q => by
+  · have key
+        : ∀ q : B ⧸ A.addSubgroupOf B,
+          y - (q.out : M) ∈ A ↔ QuotientAddGroup.mk ⟨y, hy⟩ = q := fun q => by
       conv_rhs => rw [← QuotientAddGroup.out_eq' q, QuotientAddGroup.eq_iff_sub_mem]
       simp [AddSubgroup.mem_addSubgroupOf]
     refine ⟨_, ⟨Finset.mem_image_of_mem _ (Finset.mem_univ _), (key _).2 rfl⟩, ?_⟩
@@ -116,11 +125,14 @@ open ReciprocityTheory.MultiplicativeHeights.SemiDegIdx ReciprocityTheory.PGsh
 
 variable {K : Type} [Field K] [NumberField K] {n : ℕ}
 
-theorem exists_coe_eq_span_det_of_intVec_le (X : Submodule (𝓞 K) (Fin n → K)) (hfg : X.FG)
-    (hstd : intVec K n ≤ X) :
-    ∃ J : FractionalIdeal (𝓞 K)⁰ K, (J : Submodule (𝓞 K) K) = Submodule.span (𝓞 K)
-        {d | ∃ v : Fin n → Fin n → K, (∀ i, v i ∈ X) ∧ d = (Matrix.of v).det} ∧
-      FractionalIdeal.absNorm J * ((intVec K n).toAddSubgroup.relIndex X.toAddSubgroup : ℚ) = 1 := by
+theorem exists_coe_eq_span_det_of_intVec_le
+    (X : Submodule (𝓞 K) (Fin n → K)) (hfg : X.FG) (hstd : intVec K n ≤ X)
+    : ∃ J : FractionalIdeal (𝓞 K)⁰ K,
+      (J : Submodule (𝓞 K) K)
+          = Submodule.span (𝓞 K)
+            {d | ∃ v : Fin n → Fin n → K, (∀ i, v i ∈ X) ∧ d = (Matrix.of v).det}
+        ∧ FractionalIdeal.absNorm J * ((intVec K n).toAddSubgroup.relIndex X.toAddSubgroup : ℚ)
+          = 1 := by
   obtain ⟨C, z, hfgC, h1, htri, hdiag, hin, hdec, hidx⟩ :=
     ReciprocityTheory.MultiplicativeHeights.SemiDegIdx.lattice_split K n X hfg hstd
   let CF : Fin n → FractionalIdeal (𝓞 K)⁰ K := fun i =>
@@ -148,15 +160,19 @@ theorem exists_coe_eq_span_det_of_intVec_le (X : Submodule (𝓞 K) (Fin n → K
   · rw [hidx, map_prod, Nat.cast_prod, ← Finset.prod_mul_distrib]
     exact Finset.prod_eq_one fun i _ => absNorm_mul_relIndex_one (C i) (hfgC i) (h1 i)
 
-theorem exists_coe_eq_span_det {Λ Λ' : Submodule (𝓞 K) (Fin n → K)} (hle : Λ ≤ Λ') (hfg : Λ'.FG)
-    (hsp : Submodule.span K (Λ : Set (Fin n → K)) = ⊤) :
-    ∃ J J' : FractionalIdeal (𝓞 K)⁰ K, J ≠ 0 ∧ J' ≠ 0 ∧
-      (J : Submodule (𝓞 K) K) = Submodule.span (𝓞 K)
-        {d | ∃ v : Fin n → Fin n → K, (∀ i, v i ∈ Λ) ∧ d = (Matrix.of v).det} ∧
-      (J' : Submodule (𝓞 K) K) = Submodule.span (𝓞 K)
-        {d | ∃ v : Fin n → Fin n → K, (∀ i, v i ∈ Λ') ∧ d = (Matrix.of v).det} ∧
-      FractionalIdeal.absNorm J =
-        (Λ.toAddSubgroup.relIndex Λ'.toAddSubgroup : ℚ) * FractionalIdeal.absNorm J' := by
+theorem exists_coe_eq_span_det
+    {Λ Λ' : Submodule (𝓞 K) (Fin n → K)}
+    (hle : Λ ≤ Λ') (hfg : Λ'.FG) (hsp : Submodule.span K (Λ : Set (Fin n → K)) = ⊤)
+    : ∃ J J' : FractionalIdeal (𝓞 K)⁰ K,
+      J ≠ 0 ∧ J' ≠ 0
+        ∧ (J : Submodule (𝓞 K) K)
+          = Submodule.span (𝓞 K)
+            {d | ∃ v : Fin n → Fin n → K, (∀ i, v i ∈ Λ) ∧ d = (Matrix.of v).det}
+        ∧ (J' : Submodule (𝓞 K) K)
+          = Submodule.span (𝓞 K)
+            {d | ∃ v : Fin n → Fin n → K, (∀ i, v i ∈ Λ') ∧ d = (Matrix.of v).det}
+        ∧ FractionalIdeal.absNorm J
+          = (Λ.toAddSubgroup.relIndex Λ'.toAddSubgroup : ℚ) * FractionalIdeal.absNorm J' := by
   classical
   choose d hd0 hd using fun k : Fin n => exists_smul_mem_of_mem_span_fraction (K := K) Λ
     (Pi.single k (1 : K)) (hsp ▸ Submodule.mem_top)
@@ -177,16 +193,22 @@ theorem exists_coe_eq_span_det {Λ Λ' : Submodule (𝓞 K) (Fin n → K)} (hle 
     rw [Submodule.mem_comap, hμ, hδ, algebraMap_smul,
       ← Finset.prod_erase_mul _ _ (Finset.mem_univ k), mul_smul]
     exact Λ.smul_mem _ (hd k)
-  have key : ∀ Y : Submodule (𝓞 K) (Fin n → K), Λ ≤ Y → Y.FG →
-      ∃ J : FractionalIdeal (𝓞 K)⁰ K, (J : Submodule (𝓞 K) K) = Submodule.span (𝓞 K)
-        {d | ∃ v : Fin n → Fin n → K, (∀ i, v i ∈ Y) ∧ d = (Matrix.of v).det} ∧
-      FractionalIdeal.absNorm J * ((intVec K n).toAddSubgroup.relIndex
-        (Y.comap μ).toAddSubgroup : ℚ) = |Algebra.norm ℚ (δ ^ n)| := by
+  have key
+      : ∀ Y : Submodule (𝓞 K) (Fin n → K),
+        Λ ≤ Y → Y.FG
+          → ∃ J : FractionalIdeal (𝓞 K)⁰ K,
+            (J : Submodule (𝓞 K) K)
+                = Submodule.span (𝓞 K)
+                  {d | ∃ v : Fin n → Fin n → K, (∀ i, v i ∈ Y) ∧ d = (Matrix.of v).det}
+              ∧ FractionalIdeal.absNorm J
+                  * ((intVec K n).toAddSubgroup.relIndex (Y.comap μ).toAddSubgroup : ℚ)
+                = |Algebra.norm ℚ (δ ^ n)| := by
     intro Y hY hYfg
-    obtain ⟨J, hJ, hN⟩ := exists_coe_eq_span_det_of_intVec_le (Y.comap μ)
-      (Submodule.fg_of_fg_map_injective μ hinj
-        (by rwa [Submodule.map_comap_eq_of_surjective hsurj]))
-      (hstd.trans (Submodule.comap_mono hY))
+    obtain ⟨J, hJ, hN⟩ :=
+      exists_coe_eq_span_det_of_intVec_le (Y.comap μ)
+        (Submodule.fg_of_fg_map_injective μ hinj
+          (by rwa [Submodule.map_comap_eq_of_surjective hsurj]))
+        (hstd.trans (Submodule.comap_mono hY))
     refine ⟨FractionalIdeal.spanSingleton _ (δ ^ n) * J, ?_, ?_⟩
     · rw [FractionalIdeal.coe_mul, FractionalIdeal.coe_spanSingleton, hJ, Submodule.span_mul_span,
         Set.singleton_mul]
@@ -208,13 +230,16 @@ theorem exists_coe_eq_span_det {Λ Λ' : Submodule (𝓞 K) (Fin n → K)} (hle 
   obtain ⟨J', hJ', hN'⟩ := key Λ' hle hfg
   have hn0 : |Algebra.norm ℚ (δ ^ n)| ≠ 0 :=
     abs_ne_zero.2 (Algebra.norm_ne_zero_iff.2 (pow_ne_zero _ hδ0))
-  have hidx : (Λ.comap μ).toAddSubgroup.relIndex (Λ'.comap μ).toAddSubgroup =
-      Λ.toAddSubgroup.relIndex Λ'.toAddSubgroup := by
+  have hidx
+      : (Λ.comap μ).toAddSubgroup.relIndex (Λ'.comap μ).toAddSubgroup
+        = Λ.toAddSubgroup.relIndex Λ'.toAddSubgroup := by
     change (Λ.toAddSubgroup.comap μ.toAddMonoidHom).relIndex
-      (Λ'.toAddSubgroup.comap μ.toAddMonoidHom) = _
+        (Λ'.toAddSubgroup.comap μ.toAddMonoidHom)
+      = _
     rw [AddSubgroup.relIndex_comap, AddSubgroup.map_comap_eq_self_of_surjective hsurj]
-  have htower := AddSubgroup.relIndex_mul_relIndex (intVec K n).toAddSubgroup
-    (Λ.comap μ).toAddSubgroup (Λ'.comap μ).toAddSubgroup hstd (Submodule.comap_mono hle)
+  have htower :=
+    AddSubgroup.relIndex_mul_relIndex (intVec K n).toAddSubgroup (Λ.comap μ).toAddSubgroup
+      (Λ'.comap μ).toAddSubgroup hstd (Submodule.comap_mono hle)
   refine ⟨J, J', ?_, ?_, hJ, hJ', ?_⟩
   · rintro rfl
     rw [map_zero, zero_mul] at hN

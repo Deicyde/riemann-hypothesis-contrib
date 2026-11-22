@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.splitsEquiv_of :
-    SplitsOfEquiv := by
+theorem UpperTheory.Gal.crystallineComparison.splitsEquiv_of : SplitsOfEquiv := by
   intro R S B _ _ _ _ _ I e
   let z : I → (S →ₐ[R] B) := fun i =>
     (((Pi.evalAlgHom B (fun _ => B) i).comp e.toAlgHom).restrictScalars R).comp

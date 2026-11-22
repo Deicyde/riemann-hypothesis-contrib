@@ -15,34 +15,50 @@ private noncomputable def ilcP (B : Type) [CommRing B] : ℕ → B[X]
 end UpperTheory.V.AlgebraTools
 
 open UpperTheory.V.AlgebraTools in
-theorem UpperTheory.V.AlgebraTools.idem_lift_complete :
-    ∀ {B E : Type} [CommRing B] [Ring E] [Algebra B E] (I : Ideal B) [IsAdicComplete I E] (z : E) (M : ℕ), (z * z - z) ^ M ∈ I • (⊤ : Submodule B E) → ∃ e : E, IsIdempotentElem e ∧ ∀ N : ℕ, ∃ q : B[X], e - (z + (z * z - z) * aeval z q) ∈ I ^ N • (⊤ : Submodule B E) := by
+theorem UpperTheory.V.AlgebraTools.idem_lift_complete
+    : ∀ {B E : Type} [CommRing B] [Ring E] [Algebra B E] (I : Ideal B) [IsAdicComplete I E] (z : E)
+        (M : ℕ),
+      (z * z - z) ^ M ∈ I • (⊤ : Submodule B E)
+        → ∃ e : E,
+          IsIdempotentElem e
+            ∧ ∀ N : ℕ, ∃ q : B[X],
+              e - (z + (z * z - z) * aeval z q) ∈ I ^ N • (⊤ : Submodule B E) := by
   intro B E _ _ _ I _ z M hM
   set S : ℕ → Submodule B E := fun n => I ^ n • (⊤ : Submodule B E) with hS
-  have L2r : ∀ n (x y : E), x ∈ I ^ n • (⊤ : Submodule B E) →
-      x * y ∈ I ^ n • (⊤ : Submodule B E) := by
+  have L2r
+      : ∀ n (x y : E), x ∈ I ^ n • (⊤ : Submodule B E) → x * y ∈ I ^ n • (⊤ : Submodule B E) := by
     intro n x y hx
-    refine Submodule.smul_induction_on (p := fun x => x * y ∈ I ^ n • (⊤ : Submodule B E)) hx
-      (fun a ha m _ => ?_) (fun x1 x2 h1 h2 => ?_)
+    refine Submodule.smul_induction_on
+      (p := fun x => x * y ∈ I ^ n • (⊤ : Submodule B E))
+      hx
+      (fun a ha m _ => ?_)
+      (fun x1 x2 h1 h2 => ?_)
     · rw [smul_mul_assoc]
       exact Submodule.smul_mem_smul ha Submodule.mem_top
     · rw [add_mul]
       exact add_mem h1 h2
-  have L2l : ∀ n (x y : E), x ∈ I ^ n • (⊤ : Submodule B E) →
-      y * x ∈ I ^ n • (⊤ : Submodule B E) := by
+  have L2l
+      : ∀ n (x y : E), x ∈ I ^ n • (⊤ : Submodule B E) → y * x ∈ I ^ n • (⊤ : Submodule B E) := by
     intro n x y hx
-    refine Submodule.smul_induction_on (p := fun x => y * x ∈ I ^ n • (⊤ : Submodule B E)) hx
-      (fun a ha m _ => ?_) (fun x1 x2 h1 h2 => ?_)
+    refine Submodule.smul_induction_on
+      (p := fun x => y * x ∈ I ^ n • (⊤ : Submodule B E))
+      hx
+      (fun a ha m _ => ?_)
+      (fun x1 x2 h1 h2 => ?_)
     · rw [mul_smul_comm]
       exact Submodule.smul_mem_smul ha Submodule.mem_top
     · rw [mul_add]
       exact add_mem h1 h2
-  have L3 : ∀ n (x w : E), x ∈ I • (⊤ : Submodule B E) → w ∈ I ^ n • (⊤ : Submodule B E) →
-      x * w ∈ I ^ (n + 1) • (⊤ : Submodule B E) := by
+  have L3
+      : ∀ n (x w : E),
+        x ∈ I • (⊤ : Submodule B E) → w ∈ I ^ n • (⊤ : Submodule B E)
+          → x * w ∈ I ^ (n + 1) • (⊤ : Submodule B E) := by
     intro n x w hx hw
     refine Submodule.smul_induction_on
-      (p := fun x => x * w ∈ I ^ (n + 1) • (⊤ : Submodule B E)) hx
-      (fun a ha m _ => ?_) (fun x1 x2 h1 h2 => ?_)
+      (p := fun x => x * w ∈ I ^ (n + 1) • (⊤ : Submodule B E))
+      hx
+      (fun a ha m _ => ?_)
+      (fun x1 x2 h1 h2 => ?_)
     · rw [smul_mul_assoc]
       have h := Submodule.smul_mem_smul ha (L2l n w m hw)
       rwa [← Submodule.smul_assoc, Ideal.smul_eq_mul, ← pow_succ'] at h
@@ -57,8 +73,9 @@ theorem UpperTheory.V.AlgebraTools.idem_lift_complete :
     | succ n ih =>
       rw [pow_succ' x n]
       exact L3 n x _ hx ih
-  have Mem : ∀ n k, M * n ≤ 2 ^ k → ∀ y : E,
-      (z * z - z) ^ (2 ^ k) * y ∈ I ^ n • (⊤ : Submodule B E) := by
+  have Mem
+      : ∀ n k,
+        M * n ≤ 2 ^ k → ∀ y : E, (z * z - z) ^ (2 ^ k) * y ∈ I ^ n • (⊤ : Submodule B E) := by
     intro n k hk y
     have h : (z * z - z) ^ (2 ^ k) = ((z * z - z) ^ M) ^ n * (z * z - z) ^ (2 ^ k - M * n) := by
       rw [← pow_mul, ← pow_add, Nat.add_sub_cancel' hk]
@@ -74,14 +91,18 @@ theorem UpperTheory.V.AlgebraTools.idem_lift_complete :
       refine ⟨Q - (1 + 2 * X * Q + (X * X - X) * Q ^ 2 - Q) * (2 * (X + (X * X - X) * Q) - 1), ?_⟩
       rw [ilcP, hQ]
       ring
-  have ProjectiveLineTwo : ∀ k, ∃ W : B[X], ilcP B k * ilcP B k - ilcP B k = (X * X - X) ^ (2 ^ k) * W := by
+  have ProjectiveLineTwo
+      : ∀ k, ∃ W : B[X], ilcP B k * ilcP B k - ilcP B k = (X * X - X) ^ (2 ^ k) * W := by
     intro k
     induction k with
     | zero => exact ⟨1, by rw [ilcP]; ring⟩
     | succ k ih =>
       obtain ⟨W, hW⟩ := ih
-      have hid : ∀ P : B[X], (3 * P ^ 2 - 2 * P ^ 3) * (3 * P ^ 2 - 2 * P ^ 3) -
-          (3 * P ^ 2 - 2 * P ^ 3) = (P * P - P) ^ 2 * (4 * (P * P - P) - 3) := fun P => by ring
+      have hid
+          : ∀ P : B[X],
+            (3 * P ^ 2 - 2 * P ^ 3) * (3 * P ^ 2 - 2 * P ^ 3) - (3 * P ^ 2 - 2 * P ^ 3)
+              = (P * P - P) ^ 2 * (4 * (P * P - P) - 3) := fun P => by
+        ring
       refine ⟨W ^ 2 * (4 * (X * X - X) ^ (2 ^ k) * W - 3), ?_⟩
       rw [ilcP, hid, hW, pow_succ 2 k, pow_mul]
       ring
@@ -98,16 +119,18 @@ theorem UpperTheory.V.AlgebraTools.idem_lift_complete :
     | succ j ih =>
       obtain ⟨V0, hV0⟩ := ih
       obtain ⟨V1, hV1⟩ := PL3 (k + j)
-      have hpow : (X * X - X : B[X]) ^ (2 ^ (k + j)) =
-          (X * X - X) ^ (2 ^ k) * (X * X - X) ^ (2 ^ (k + j) - 2 ^ k) := by
+      have hpow
+          : (X * X - X : B[X]) ^ (2 ^ (k + j))
+            = (X * X - X) ^ (2 ^ k) * (X * X - X) ^ (2 ^ (k + j) - 2 ^ k) := by
         rw [← pow_add, Nat.add_sub_cancel' (Nat.pow_le_pow_right (by norm_num) (by omega))]
       refine ⟨(X * X - X) ^ (2 ^ (k + j) - 2 ^ k) * V1 + V0, ?_⟩
       rw [show k + (j + 1) = k + j + 1 by omega]
       linear_combination hV1 + hV0 + V1 * hpow
   have hD : aeval z (X * X - X : B[X]) = z * z - z := by simp
   let f : ℕ → E := fun n => aeval z (ilcP B (M * n))
-  have hdiff : ∀ k j, ∃ V : B[X], aeval z (ilcP B (k + j)) - aeval z (ilcP B k) =
-      (z * z - z) ^ (2 ^ k) * aeval z V := by
+  have hdiff
+      : ∀ k j, ∃ V : B[X],
+        aeval z (ilcP B (k + j)) - aeval z (ilcP B k) = (z * z - z) ^ (2 ^ k) * aeval z V := by
     intro k j
     obtain ⟨V, hV⟩ := PL4 k j
     refine ⟨V, ?_⟩
@@ -143,12 +166,15 @@ theorem UpperTheory.V.AlgebraTools.idem_lift_complete :
       apply IsHausdorff.haus (inferInstance : IsHausdorff I E)
       intro n
       rw [SModEq.sub_mem, sub_zero]
-      have e1 : L * L - L = (f n * f n - f n) + (f n * (L - f n) + (L - f n) * f n +
-          (L - f n) * (L - f n) - (L - f n)) := by noncomm_ring
+      have e1
+          : L * L - L
+            = (f n * f n - f n)
+              + (f n * (L - f n) + (L - f n) * f n + (L - f n) * (L - f n) - (L - f n)) := by
+        noncomm_ring
       rw [e1]
       have hdn := hd n
-      exact add_mem (hsq n) (sub_mem (add_mem (add_mem (L2l _ _ _ hdn) (L2r _ _ _ hdn))
-        (L2r _ _ _ hdn)) hdn)
+      exact add_mem (hsq n)
+        (sub_mem (add_mem (add_mem (L2l _ _ _ hdn) (L2r _ _ _ hdn)) (L2r _ _ _ hdn)) hdn)
     exact sub_eq_zero.mp h0
   refine ⟨L, hidem, fun N => ?_⟩
   obtain ⟨Q, hQ⟩ := PoincareLelongAlt (M * N)

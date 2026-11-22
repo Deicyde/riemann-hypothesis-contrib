@@ -34,8 +34,8 @@ def antisymmetrize (f N : ℕ) (H : RootRing f N) : RootRing f N :=
   ∑ w : Fin f → Equiv.Perm (Fin N), blockSign f N w • blockPermute f N w H
 
 def dividedDifference (f N : ℕ) (H : RootRing f N) : FractionRing (RootRing f N) :=
-  algebraMap (RootRing f N) (FractionRing (RootRing f N)) (antisymmetrize f N H) /
-    algebraMap (RootRing f N) (FractionRing (RootRing f N)) (blockVandermonde f N)
+  algebraMap (RootRing f N) (FractionRing (RootRing f N)) (antisymmetrize f N H)
+    / algebraMap (RootRing f N) (FractionRing (RootRing f N)) (blockVandermonde f N)
 
 def topDegree (f N : ℕ) : ℕ := f * (N * (N - 1) / 2)
 
@@ -66,12 +66,14 @@ def youngCells {m : ℕ} (lam : Fin m → ℕ) : Finset (Fin m × ℕ) :=
   (Finset.univ ×ˢ Finset.range (∑ i, lam i)).filter (fun c => c.2 < lam c.1)
 
 def numStandardTable {m : ℕ} (lam : Fin m → ℕ) : ℕ :=
-  Nat.card {T : youngCells lam ≃ Fin (youngCells lam).card //
-    ∀ p q : youngCells lam, p.1.1 ≤ q.1.1 → p.1.2 ≤ q.1.2 → T p ≤ T q}
+  Nat.card
+    {T : youngCells lam ≃ Fin (youngCells lam).card
+      // ∀ p q : youngCells lam, p.1.1 ≤ q.1.1 → p.1.2 ≤ q.1.2 → T p ≤ T q}
 
 def symmetricGroupCharacter {m : ℕ} (lam : Fin m → ℕ) (rho : List ℕ) : ℚ :=
-  AddMonoidAlgebra.coeff (vandermondeOf (fun i : Fin m => (X i : MvPolynomial (Fin m) ℚ)) *
-      (rho.map fun q => psum (Fin m) ℚ q).prod)
+  AddMonoidAlgebra.coeff
+    (vandermondeOf (fun i : Fin m => (X i : MvPolynomial (Fin m) ℚ))
+      * (rho.map fun q => psum (Fin m) ℚ q).prod)
     (Finsupp.equivFunOnFinite.symm fun i : Fin m => lam i + (m - 1 - (i : ℕ)))
 
 def partitionsOf (m n : ℕ) : Finset (Fin m → ℕ) :=
@@ -118,189 +120,229 @@ def restX (r a : ℕ) : ℚ := 2 * (((r * a : ℕ) : ℚ) + ((r + a : ℕ) : ℚ
 
 def rectangle (r a : ℕ) : Fin r → ℕ := fun _ => a
 
-def hookShape (r k l : ℕ) : Fin r → ℕ :=
-  fun i => if (i : ℕ) = 0 then k - l else if (i : ℕ) ≤ l then 1 else 0
+def hookShape (r k l : ℕ) : Fin r → ℕ := fun i =>
+  if (i : ℕ) = 0 then
+    k - l
+  else if (i : ℕ) ≤ l then
+    1
+  else
+    0
 
 def DividedDifferenceOfVandermonde.Statement : Prop :=
-  ∀ f N : ℕ, dividedDifference f N (blockVandermonde f N) =
-    algebraMap ℚ (FractionRing (RootRing f N)) ((N.factorial : ℚ) ^ f)
+  ∀ f N : ℕ,
+    dividedDifference f N (blockVandermonde f N)
+      = algebraMap ℚ (FractionRing (RootRing f N)) ((N.factorial : ℚ) ^ f)
 
 def LemmaA.Statement : Prop :=
-  ∀ f N : ℕ, ∃ c : ℚ, c ≠ 0 ∧
-    (∀ H : RootRing f N, H.IsHomogeneous (topDegree f N) →
-      algebraMap ℚ (FractionRing (RootRing f N)) (flagIntegral f N H) =
-        algebraMap ℚ (FractionRing (RootRing f N)) c * dividedDifference f N H) ∧
-    ∀ (F : RootRing f N) (Q : ℕ → Fin f → RootRing f N), IsPowerSumDecomposition f N F Q →
-    ∀ (k : ℕ) (hk1 : 1 ≤ k) (hkN : k ≤ N) (τ : Fin f) (G : RootRing f N),
-      G.IsHomogeneous (k - 1) →
-      ∃ P : RootRing f N,
-        algebraMap (RootRing f N) (FractionRing (RootRing f N)) P =
-          dividedDifference f N (G * F) ∧
-        (F.IsHomogeneous (topDegree f N + 1) → (restrictToBlock f N τ P).IsHomogeneous k) ∧
-        ∃ S : MvPolynomial (Fin N) ℚ, powerSumHom N S = restrictToBlock f N τ P ∧
-          flagIntegral f N (G * Q k τ) =
-            c * AddMonoidAlgebra.coeff S (Finsupp.single (⟨k - 1, by omega⟩ : Fin N) 1)
+  ∀ f N : ℕ, ∃ c : ℚ,
+    c ≠ 0
+      ∧ (∀ H : RootRing f N,
+        H.IsHomogeneous (topDegree f N)
+          → algebraMap ℚ (FractionRing (RootRing f N)) (flagIntegral f N H)
+            = algebraMap ℚ (FractionRing (RootRing f N)) c * dividedDifference f N H)
+      ∧ ∀ (F : RootRing f N) (Q : ℕ → Fin f → RootRing f N),
+        IsPowerSumDecomposition f N F Q
+          → ∀ (k : ℕ) (hk1 : 1 ≤ k) (hkN : k ≤ N) (τ : Fin f) (G : RootRing f N),
+            G.IsHomogeneous (k - 1)
+              → ∃ P : RootRing f N,
+                algebraMap (RootRing f N) (FractionRing (RootRing f N)) P
+                    = dividedDifference f N (G * F)
+                  ∧ (F.IsHomogeneous (topDegree f N + 1)
+                    → (restrictToBlock f N τ P).IsHomogeneous k)
+                  ∧ ∃ S : MvPolynomial (Fin N) ℚ,
+                    powerSumHom N S = restrictToBlock f N τ P
+                      ∧ flagIntegral f N (G * Q k τ)
+                        = c
+                          * AddMonoidAlgebra.coeff S (Finsupp.single (⟨k - 1, by omega⟩ : Fin N) 1)
 
 def LemmaB.Statement : Prop :=
   ∀ (r a : ℕ) (c : SmallBlock), ∃ κ : ℚ,
-    (κ = (r.factorial : ℚ) * a.factorial ∨ κ = -((r.factorial : ℚ) * a.factorial)) ∧
-    ∀ lam : Fin r → ℕ, Antitone lam →
-      dividedDifference 1 (r + a)
-          (aeval (yRoot 1 r a c 0) (schur (Fin r) lam) *
-            vandermondeOf (yRoot 1 r a c 0) * vandermondeOf (zRoot 1 r a c 0)) =
-        if ∀ i, a ≤ lam i then
-          algebraMap (RootRing 1 (r + a)) (FractionRing (RootRing 1 (r + a)))
-            (C κ * aeval (fun i : Fin (r + a) => C c.sign * X ((0 : Fin 1), i))
-              (schur (Fin (r + a)) (fun i => lam i - a)))
-        else 0
+    (κ = (r.factorial : ℚ) * a.factorial ∨ κ = -((r.factorial : ℚ) * a.factorial))
+      ∧ ∀ lam : Fin r → ℕ,
+        Antitone lam
+          → dividedDifference 1 (r + a)
+              (aeval (yRoot 1 r a c 0) (schur (Fin r) lam) * vandermondeOf (yRoot 1 r a c 0)
+                * vandermondeOf (zRoot 1 r a c 0))
+            = if ∀ i, a ≤ lam i then
+                algebraMap (RootRing 1 (r + a)) (FractionRing (RootRing 1 (r + a)))
+                  (C κ * aeval
+                    (fun i : Fin (r + a) => C c.sign * X ((0 : Fin 1), i))
+                    (schur (Fin (r + a)) (fun i => lam i - a)))
+              else
+                0
 
 def LemmaC.Statement : Prop :=
-  ∀ (r a : ℕ) (nu : Fin r → ℕ), Antitone nu →
-    numStandardTable (fun i => a + nu i) ≤
-      Nat.choose (r * a + ∑ i, nu i) (∑ i, nu i) * numStandardTable (rectangle r a) *
-        numStandardTable nu
+  ∀ (r a : ℕ) (nu : Fin r → ℕ),
+    Antitone nu
+      → numStandardTable (fun i => a + nu i)
+        ≤ Nat.choose (r * a + ∑ i, nu i) (∑ i, nu i) * numStandardTable (rectangle r a)
+          * numStandardTable nu
 
 def FrobeniusDimensionFormula.Statement : Prop :=
-  ∀ (m : ℕ) (lam : Fin m → ℕ), Antitone lam →
-    (numStandardTable lam : ℚ) =
-      ((∑ i, lam i).factorial : ℚ) *
-        vandermondeOf (fun i : Fin m => ((lam i + (m - 1 - (i : ℕ)) : ℕ) : ℚ)) /
-        ∏ i : Fin m, ((lam i + (m - 1 - (i : ℕ))).factorial : ℚ)
+  ∀ (m : ℕ) (lam : Fin m → ℕ),
+    Antitone lam
+      → (numStandardTable lam : ℚ)
+        = ((∑ i, lam i).factorial : ℚ)
+          * vandermondeOf (fun i : Fin m => ((lam i + (m - 1 - (i : ℕ)) : ℕ) : ℚ))
+          / ∏ i : Fin m, ((lam i + (m - 1 - (i : ℕ))).factorial : ℚ)
 
 def SchurPowerSumCoefficient.Statement : Prop :=
-  ∀ (N r k : ℕ) (hk1 : 1 ≤ k) (hkN : k ≤ N) (nu : Fin r → ℕ), Antitone nu → ∑ i, nu i = k →
-    ∃ S : MvPolynomial (Fin N) ℚ, powerSumHom N S = schur (Fin N) nu ∧
-      AddMonoidAlgebra.coeff S (Finsupp.single (⟨k - 1, by omega⟩ : Fin N) 1) =
-        if ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1 then
-          (-1 : ℚ) ^ ((Finset.univ.filter fun i : Fin r => (i : ℕ) ≠ 0 ∧ nu i = 1).card) / k
-        else 0
+  ∀ (N r k : ℕ) (hk1 : 1 ≤ k) (hkN : k ≤ N) (nu : Fin r → ℕ),
+    Antitone nu → ∑ i, nu i = k
+      → ∃ S : MvPolynomial (Fin N) ℚ,
+        powerSumHom N S = schur (Fin N) nu
+          ∧ AddMonoidAlgebra.coeff S (Finsupp.single (⟨k - 1, by omega⟩ : Fin N) 1)
+            = if ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1 then
+                (-1 : ℚ) ^ ((Finset.univ.filter fun i : Fin r => (i : ℕ) ≠ 0 ∧ nu i = 1).card) / k
+              else
+                0
 
 def FrobeniusCharacterFormula.Statement : Prop :=
-  ∀ r q m : ℕ, 1 ≤ q →
-    psum (Fin r) ℚ q * psum (Fin r) ℚ 1 ^ m =
-      ∑ lam ∈ partitionsOf r (q + m),
-        C (symmetricGroupCharacter lam (q :: List.replicate m 1)) * schur (Fin r) lam
+  ∀ r q m : ℕ,
+    1 ≤ q
+      → psum (Fin r) ℚ q * psum (Fin r) ℚ 1 ^ m
+        = ∑ lam ∈ partitionsOf r (q + m),
+            C (symmetricGroupCharacter lam (q :: List.replicate m 1)) * schur (Fin r) lam
 
 def CharacterBound.Statement : Prop :=
-  ∀ (m : ℕ) (lam : Fin m → ℕ) (rho : List ℕ), Antitone lam → (∀ q ∈ rho, 1 ≤ q) →
-    |symmetricGroupCharacter lam rho| ≤ numStandardTable lam
+  ∀ (m : ℕ) (lam : Fin m → ℕ) (rho : List ℕ),
+    Antitone lam → (∀ q ∈ rho, 1 ≤ q) → |symmetricGroupCharacter lam rho| ≤ numStandardTable lam
 
 def CharacterAtIdentity.Statement : Prop :=
-  ∀ (m : ℕ) (lam : Fin m → ℕ), Antitone lam →
-    symmetricGroupCharacter lam (List.replicate (∑ i, lam i) 1) = numStandardTable lam
+  ∀ (m : ℕ) (lam : Fin m → ℕ),
+    Antitone lam
+      → symmetricGroupCharacter lam (List.replicate (∑ i, lam i) 1) = numStandardTable lam
 
 def RestPolynomialDecomposes.Statement : Prop :=
-  ∀ (f r a : ℕ) (c : SmallBlock),
-    ∃ Q : ℕ → Fin f → RootRing f (r + a),
-      IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q
+  ∀ (f r a : ℕ) (c : SmallBlock), ∃ Q : ℕ → Fin f → RootRing f (r + a),
+    IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q
 
 def SameFactorFormula.Statement : Prop :=
-  ∀ (f r a : ℕ) (c : SmallBlock), 1 ≤ f → 1 ≤ r → 1 ≤ a →
-    ∃ C₀ : ℚ, C₀ ≠ 0 ∧
-      fibreDegree f r a c =
-        C₀ * (f * (r * a)).factorial / ((r * a).factorial : ℚ) ^ f *
-          (numStandardTable (rectangle r a) : ℚ) ^ f ∧
-      ∀ Q : ℕ → Fin f → RootRing f (r + a),
-        IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q →
-        ∀ (k : ℕ) (hk2 : 2 ≤ k) (hkN : k ≤ r + a) (τ : Fin f),
-          ∃ S : MvPolynomial (Fin (r + a)) ℚ,
-            powerSumHom (r + a) S =
-              ∑ nu ∈ partitionsOf r k,
-                C (symmetricGroupCharacter (fun i => a + nu i)
-                    ((k - 1) :: List.replicate (r * a + 1) 1)) *
-                  aeval (fun i : Fin (r + a) => C c.sign * X i) (schur (Fin (r + a)) nu) ∧
-            restTerm f (r + a) Q k τ (smallPowerSum f r a c (k - 1) τ) =
-              C₀ * k * (f * (r * a) + 1).factorial /
-                  (((r * a + 1).factorial : ℚ) * ((r * a).factorial : ℚ) ^ (f - 1)) *
-                (numStandardTable (rectangle r a) : ℚ) ^ (f - 1) *
-                AddMonoidAlgebra.coeff S (Finsupp.single (⟨k - 1, by omega⟩ : Fin (r + a)) 1)
+  ∀ (f r a : ℕ) (c : SmallBlock),
+    1 ≤ f → 1 ≤ r → 1 ≤ a
+      → ∃ C₀ : ℚ,
+        C₀ ≠ 0
+          ∧ fibreDegree f r a c
+            = C₀ * (f * (r * a)).factorial / ((r * a).factorial : ℚ) ^ f
+              * (numStandardTable (rectangle r a) : ℚ) ^ f
+          ∧ ∀ Q : ℕ → Fin f → RootRing f (r + a),
+            IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q
+              → ∀ (k : ℕ) (hk2 : 2 ≤ k) (hkN : k ≤ r + a) (τ : Fin f),
+                ∃ S : MvPolynomial (Fin (r + a)) ℚ,
+                  powerSumHom (r + a) S
+                      = ∑ nu ∈ partitionsOf r k,
+                          C (symmetricGroupCharacter (fun i => a + nu i)
+                              ((k - 1) :: List.replicate (r * a + 1) 1)) *
+                            aeval (fun i : Fin (r + a) => C c.sign * X i) (schur (Fin (r + a)) nu)
+                    ∧ restTerm f (r + a) Q k τ (smallPowerSum f r a c (k - 1) τ)
+                      = C₀ * k * (f * (r * a) + 1).factorial
+                        / (((r * a + 1).factorial : ℚ) * ((r * a).factorial : ℚ) ^ (f - 1))
+                        * (numStandardTable (rectangle r a) : ℚ) ^ (f - 1)
+                        * AddMonoidAlgebra.coeff S
+                          (Finsupp.single (⟨k - 1, by omega⟩ : Fin (r + a)) 1)
 
 def SameFactorBound.Statement : Prop :=
-  ∀ (f r a : ℕ) (c : SmallBlock), 1 ≤ f → 1 ≤ r → 1 ≤ a →
-    fibreDegree f r a c ≠ 0 ∧
-    (∃ Q, IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q) ∧
-    ∀ Q : ℕ → Fin f → RootRing f (r + a),
-      IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q →
-      ∀ k : ℕ, 2 ≤ k → k ≤ r + a → ∀ τ : Fin f,
-        |restTerm f (r + a) Q k τ (smallPowerSum f r a c (k - 1) τ)| ≤
-          ((f * (r * a) + 1 : ℕ) : ℚ) * |fibreDegree f r a c| * restX r a ^ (k - 1) /
-            (k.factorial : ℚ)
+  ∀ (f r a : ℕ) (c : SmallBlock),
+    1 ≤ f → 1 ≤ r → 1 ≤ a
+      → fibreDegree f r a c ≠ 0
+        ∧ (∃ Q, IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q)
+        ∧ ∀ Q : ℕ → Fin f → RootRing f (r + a),
+          IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q
+            → ∀ k : ℕ,
+              2 ≤ k → k ≤ r + a
+                → ∀ τ : Fin f,
+                  |restTerm f (r + a) Q k τ (smallPowerSum f r a c (k - 1) τ)|
+                    ≤ ((f * (r * a) + 1 : ℕ) : ℚ) * |fibreDegree f r a c| * restX r a ^ (k - 1)
+                      / (k.factorial : ℚ)
 
 def OtherFactorBound.Statement : Prop :=
-  ∀ (f r a : ℕ) (c : SmallBlock), 1 ≤ f → 1 ≤ r → 1 ≤ a →
-    fibreDegree f r a c ≠ 0 ∧
-    (∃ Q, IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q) ∧
-    ∀ Q : ℕ → Fin f → RootRing f (r + a),
-      IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q →
-      ∀ k : ℕ, 2 ≤ k → k ≤ r + a → ∀ τ τ' : Fin f, τ' ≠ τ →
-        (r * a < k - 1 → restTerm f (r + a) Q k τ (smallPowerSum f r a c (k - 1) τ') = 0) ∧
-        |restTerm f (r + a) Q k τ (smallPowerSum f r a c (k - 1) τ')| ≤
-          ((f * (r * a) + 1 : ℕ) : ℚ) * |fibreDegree f r a c| * restX r a ^ (k - 1) /
-            (k.factorial : ℚ)
+  ∀ (f r a : ℕ) (c : SmallBlock),
+    1 ≤ f → 1 ≤ r → 1 ≤ a
+      → fibreDegree f r a c ≠ 0
+        ∧ (∃ Q, IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q)
+        ∧ ∀ Q : ℕ → Fin f → RootRing f (r + a),
+          IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q
+            → ∀ k : ℕ,
+              2 ≤ k → k ≤ r + a
+                → ∀ τ τ' : Fin f,
+                  τ' ≠ τ
+                    → (r * a < k - 1
+                        → restTerm f (r + a) Q k τ (smallPowerSum f r a c (k - 1) τ') = 0)
+                      ∧ |restTerm f (r + a) Q k τ (smallPowerSum f r a c (k - 1) τ')|
+                        ≤ ((f * (r * a) + 1 : ℕ) : ℚ) * |fibreDegree f r a c| * restX r a ^ (k - 1)
+                          / (k.factorial : ℚ)
 
 def XBound.Statement : Prop :=
-  ∀ r a : ℕ, 2 ≤ r + a →
-    (restX r a : ℝ) ≤ ((r + a : ℕ) : ℝ) ^ 2 / 2 + 2 * ((r + a : ℕ) : ℝ) ∧
-      ((r + a : ℕ) : ℝ) ^ 2 / 2 + 2 * ((r + a : ℕ) : ℝ) ≤ 3 / 2 * ((r + a : ℕ) : ℝ) ^ 2
+  ∀ r a : ℕ,
+    2 ≤ r + a
+      → (restX r a : ℝ) ≤ ((r + a : ℕ) : ℝ) ^ 2 / 2 + 2 * ((r + a : ℕ) : ℝ)
+        ∧ ((r + a : ℕ) : ℝ) ^ 2 / 2 + 2 * ((r + a : ℕ) : ℝ) ≤ 3 / 2 * ((r + a : ℕ) : ℝ) ^ 2
 
 def XOverPrime.Statement : Prop :=
-  ∀ (f r a : ℕ) (B₀ p : ℝ), 1 ≤ f → 2 ≤ r + a →
-    4 * (f : ℝ) * ((r + a : ℕ) : ℝ) ^ 2 ≤ B₀ → B₀ < p → (restX r a : ℝ) / p ≤ 3 / 8
+  ∀ (f r a : ℕ) (B₀ p : ℝ),
+    1 ≤ f → 2 ≤ r + a → 4 * (f : ℝ) * ((r + a : ℕ) : ℝ) ^ 2 ≤ B₀ → B₀ < p
+      → (restX r a : ℝ) / p ≤ 3 / 8
 
 def GeometricTail.Statement : Prop :=
-  ∀ (p : ℝ) (k : ℕ), 2 ≤ p → 1 ≤ k →
-    Summable (fun n : ℕ => (p ^ ((n + 1) * k))⁻¹) ∧
-      ∑' n : ℕ, (p ^ ((n + 1) * k))⁻¹ ≤ 2 * (p ^ k)⁻¹
+  ∀ (p : ℝ) (k : ℕ),
+    2 ≤ p → 1 ≤ k
+      → Summable (fun n : ℕ => (p ^ ((n + 1) * k))⁻¹)
+        ∧ ∑' n : ℕ, (p ^ ((n + 1) * k))⁻¹ ≤ 2 * (p ^ k)⁻¹
 
 def ExponentialTail.Statement : Prop :=
-  ∀ p X : ℝ, 0 < p → 0 ≤ X → X ≤ 3 / 8 * p →
-    Summable (fun k : ℕ => 2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ)) ∧
-      ∑' k : ℕ, 2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ) ≤
-        Real.exp (3 / 8) * X / p ^ 2 ∧
-      Real.exp (3 / 8) * X / p ^ 2 ≤ 1.5 * X / p ^ 2
+  ∀ p X : ℝ,
+    0 < p → 0 ≤ X → X ≤ 3 / 8 * p
+      → Summable (fun k : ℕ => 2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ))
+        ∧ ∑' k : ℕ, 2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ)
+          ≤ Real.exp (3 / 8) * X / p ^ 2
+        ∧ Real.exp (3 / 8) * X / p ^ 2 ≤ 1.5 * X / p ^ 2
 
 def ChebyshevThetaBound.Statement : Prop :=
-  ∀ x : ℝ, 0 ≤ x →
-    ∑ p ∈ (Finset.range (⌊x⌋₊ + 1)).filter Nat.Prime, Real.log p ≤ x * Real.log 4
+  ∀ x : ℝ, 0 ≤ x → ∑ p ∈ (Finset.range (⌊x⌋₊ + 1)).filter Nat.Prime, Real.log p ≤ x * Real.log 4
 
 def RestConstants.Statement : Prop :=
-  2 * Real.log 4 ≤ 2.78 ∧
-    ∀ f N : ℕ, 1 ≤ f → 2 ≤ N →
-      1.5 * (f : ℝ) * (3 / 2 * (N : ℝ) ^ 2) * (2.78 / (4 * f * (N : ℝ) ^ 2)) ≤ 1.6
+  2 * Real.log 4 ≤ 2.78
+    ∧ ∀ f N : ℕ,
+      1 ≤ f → 2 ≤ N → 1.5 * (f : ℝ) * (3 / 2 * (N : ℝ) ^ 2) * (2.78 / (4 * f * (N : ℝ) ^ 2)) ≤ 1.6
 
-def restPrimeModel (f r a : ℕ) (c : SmallBlock) (Q : ℕ → Fin f → RootRing f (r + a))
-    (s : ℕ → ℕ → Fin f → Fin f) (e : ℕ → ℕ → Fin f → ℕ → ℚ) (p : ℕ) : ℝ :=
-  Real.log p * ∑ τ : Fin f, ∑ k ∈ Finset.Icc 2 (r + a), ∑' n : ℕ,
-    ((p : ℝ) ^ ((n + 1) * k))⁻¹ *
-      ((e p (n + 1) τ k * restTerm f (r + a) Q k τ
-        (smallPowerSum f r a c (k - 1) (s p (n + 1) τ)) : ℚ) : ℝ)
+def restPrimeModel
+    (f r a : ℕ)
+    (c : SmallBlock) (Q : ℕ → Fin f → RootRing f (r + a)) (s : ℕ → ℕ → Fin f → Fin f)
+    (e : ℕ → ℕ → Fin f → ℕ → ℚ) (p : ℕ)
+    : ℝ :=
+  Real.log p
+    * ∑ τ : Fin f, ∑ k ∈ Finset.Icc 2 (r + a), ∑' n : ℕ,
+      ((p : ℝ) ^ ((n + 1) * k))⁻¹ *
+        ((e p (n + 1) τ k * restTerm f (r + a) Q k τ
+          (smallPowerSum f r a c (k - 1) (s p (n + 1) τ)) : ℚ) : ℝ)
 
 def RestPrimeBound.Statement : Prop :=
-  ∀ (f r a : ℕ) (c : SmallBlock) (B₀ : ℝ), 1 ≤ f → 1 ≤ r → 1 ≤ a →
-    4 * (f : ℝ) * ((r + a : ℕ) : ℝ) ^ 2 ≤ B₀ →
-    (∃ Q, IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q) ∧
-    ∀ (Q : ℕ → Fin f → RootRing f (r + a)),
-      IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q →
-    ∀ (s : ℕ → ℕ → Fin f → Fin f) (e : ℕ → ℕ → Fin f → ℕ → ℚ),
-      (∀ p n τ k, e p n τ k = 1 ∨ e p n τ k = -1) →
-    ∀ p : ℕ, p.Prime → B₀ < p →
-      |restPrimeModel f r a c Q s e p| ≤
-        1.5 * f * (restX r a : ℝ) * (Real.log p / (p : ℝ) ^ 2) *
-          ((f * (r * a) + 1 : ℕ) : ℝ) * |(fibreDegree f r a c : ℝ)|
+  ∀ (f r a : ℕ) (c : SmallBlock) (B₀ : ℝ),
+    1 ≤ f → 1 ≤ r → 1 ≤ a → 4 * (f : ℝ) * ((r + a : ℕ) : ℝ) ^ 2 ≤ B₀
+      → (∃ Q, IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q)
+        ∧ ∀ (Q : ℕ → Fin f → RootRing f (r + a)),
+          IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q
+            → ∀ (s : ℕ → ℕ → Fin f → Fin f) (e : ℕ → ℕ → Fin f → ℕ → ℚ),
+              (∀ p n τ k, e p n τ k = 1 ∨ e p n τ k = -1)
+                → ∀ p : ℕ,
+                  p.Prime → B₀ < p
+                    → |restPrimeModel f r a c Q s e p|
+                      ≤ 1.5 * f * (restX r a : ℝ) * (Real.log p / (p : ℝ) ^ 2)
+                        * ((f * (r * a) + 1 : ℕ) : ℝ) * |(fibreDegree f r a c : ℝ)|
 
 def RestBound.Statement : Prop :=
-  ∀ (f r a : ℕ) (c : SmallBlock) (B₀ : ℝ), 1 ≤ f → 1 ≤ r → 1 ≤ a →
-    4 * (f : ℝ) * ((r + a : ℕ) : ℝ) ^ 2 ≤ B₀ →
-    (∃ Q, IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q) ∧
-    ∀ (Q : ℕ → Fin f → RootRing f (r + a)),
-      IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q →
-    ∀ (s : ℕ → ℕ → Fin f → Fin f) (e : ℕ → ℕ → Fin f → ℕ → ℚ),
-      (∀ p n τ k, e p n τ k = 1 ∨ e p n τ k = -1) →
-    ∀ P : Set ℕ,
-      Summable (fun p : {p : ℕ // p ∈ P ∧ p.Prime ∧ B₀ < p} =>
-        |restPrimeModel f r a c Q s e p|) ∧
-      |∑' p : {p : ℕ // p ∈ P ∧ p.Prime ∧ B₀ < p}, restPrimeModel f r a c Q s e p| ≤
-        1.6 * ((f * (r * a) + 1 : ℕ) : ℝ) * |(fibreDegree f r a c : ℝ)|
+  ∀ (f r a : ℕ) (c : SmallBlock) (B₀ : ℝ),
+    1 ≤ f → 1 ≤ r → 1 ≤ a → 4 * (f : ℝ) * ((r + a : ℕ) : ℝ) ^ 2 ≤ B₀
+      → (∃ Q, IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q)
+        ∧ ∀ (Q : ℕ → Fin f → RootRing f (r + a)),
+          IsPowerSumDecomposition f (r + a) (restPolynomial f r a c) Q
+            → ∀ (s : ℕ → ℕ → Fin f → Fin f) (e : ℕ → ℕ → Fin f → ℕ → ℚ),
+              (∀ p n τ k, e p n τ k = 1 ∨ e p n τ k = -1)
+                → ∀ P : Set ℕ,
+                  Summable (fun p : {p : ℕ // p ∈ P ∧ p.Prime ∧ B₀ < p} =>
+                      |restPrimeModel f r a c Q s e p|)
+                    ∧ |∑' p : {p : ℕ // p ∈ P ∧ p.Prime ∧ B₀ < p}, restPrimeModel f r a c Q s e p|
+                      ≤ 1.6 * ((f * (r * a) + 1 : ℕ) : ℝ) * |(fibreDegree f r a c : ℝ)|
 
 end
 

@@ -26,8 +26,9 @@ theorem intertwiner_preserves_highestWeight : HWVec := by
 
   have hker : LinearMap.ker Φ = ⊥ := by
     rcases hirr (LinearMap.ker Φ) le_top (fun g hg w hw => by
-      rw [LinearMap.mem_ker] at hw ⊢
-      rw [hint g hg w, hw, map_zero]) with h | h
+        rw [LinearMap.mem_ker] at hw ⊢
+        rw [hint g hg w, hw, map_zero])
+      with h | h
     · exact h
     · exact absurd (LinearMap.ker_eq_top.1 h) hΦ
   have hinj : Function.Injective Φ := LinearMap.ker_eq_bot.1 hker
@@ -43,13 +44,20 @@ theorem intertwiner_preserves_highestWeight : HWVec := by
     rintro k hk _ ⟨w, rfl⟩
     exact ⟨T k w, (hιK k hk w).symm⟩
 
-  have hwt : ∀ (μ : Fin n → ℝ) (w : W), Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) T μ w →
-      ∀ θ : Fin n → ℝ, wK hD (diag_mem_Kset' ε θ) (ι w) = Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • ι w := by
+  have hwt
+      : ∀ (μ : Fin n → ℝ) (w : W),
+        Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) T μ w
+          → ∀ θ : Fin n → ℝ,
+            wK hD (diag_mem_Kset' ε θ) (ι w)
+              = Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • ι w := by
     intro μ w hw θ
     rw [hιK _ _ w, hw θ (by rw [mir_Kset_eq]; exact diag_mem_Kset' ε θ), map_smul]
-  have hwt' : ∀ (μ : Fin n → ℝ) (w : W),
-      (∀ θ : Fin n → ℝ, wK hD (diag_mem_Kset' ε θ) (ι w) = Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • ι w) →
-      Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) T μ w := by
+  have hwt'
+      : ∀ (μ : Fin n → ℝ) (w : W),
+        (∀ θ : Fin n → ℝ,
+            wK hD (diag_mem_Kset' ε θ) (ι w)
+              = Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • ι w)
+          → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) T μ w := by
     intro μ w hw θ _
     apply hιinj
     rw [map_smul, ← hιK _ (diag_mem_Kset' ε θ) w, hw θ]
@@ -63,32 +71,39 @@ theorem intertwiner_preserves_highestWeight : HWVec := by
   obtain ⟨w', hw'⟩ := hyS
   have hyd : ∀ c, diagE ε (eT E) cpT cmT c c y = (((γ + root a b) c : ℝ) : ℂ) • y := by
     intro c
-    have hc := congrArg (fun F => F z)
-      (diagAction_commutator (eT_isGlRep hD.glRep) cpT_cmT_isCAR (eT_commutesCAR E) ε c c a b rfl hε)
+    have hc :=
+      congrArg
+        (fun F => F z)
+        (diagAction_commutator (eT_isGlRep hD.glRep) cpT_cmT_isCAR (eT_commutesCAR E) ε c c a b rfl
+          hε)
     simp only [Module.End.mul_apply, LinearMap.sub_apply] at hc
     rw [hzd c, map_smul] at hc
-    have e1 : diagE ε (eT E) cpT cmT c c y =
-        ((γ c : ℝ) : ℂ) • y + ((if c = a then diagE ε (eT E) cpT cmT c b else 0) -
-          (if b = c then diagE ε (eT E) cpT cmT a c else 0)) z := by
+    have e1
+        : diagE ε (eT E) cpT cmT c c y
+          = ((γ c : ℝ) : ℂ) • y
+            + ((if c = a then diagE ε (eT E) cpT cmT c b else 0)
+                - (if b = c then diagE ε (eT E) cpT cmT a c else 0))
+              z := by
       rw [hy, LinearMap.sub_apply, ← hc]; abel
     rw [e1]
     by_cases hca : c = a
     · subst hca
       have hcb : ¬ b = c := fun h => (ne_of_lt hab) h.symm
-      simp only [if_neg hcb, sub_zero, Pi.add_apply, root, Pi.sub_apply, Pi.single_eq_same, ↓reduceIte]
+      simp only [if_neg hcb, sub_zero, Pi.add_apply, root, Pi.sub_apply, Pi.single_eq_same,
+        ↓ reduceIte]
       rw [Pi.single_eq_of_ne (ne_of_lt hab)]
       simp only [sub_zero, Complex.ofReal_add, Complex.ofReal_one, add_smul, one_smul]
       rfl
     · by_cases hcb : b = c
       · subst hcb
         simp only [if_neg hca, zero_sub, Pi.add_apply, root, Pi.sub_apply, Pi.single_eq_same,
-          LinearMap.neg_apply, ↓reduceIte]
+          LinearMap.neg_apply, ↓ reduceIte]
         rw [Pi.single_eq_of_ne hca]
-        simp only [zero_sub, Complex.ofReal_add, Complex.ofReal_neg, Complex.ofReal_one, add_smul, neg_smul,
-          one_smul]
+        simp only [zero_sub, Complex.ofReal_add, Complex.ofReal_neg, Complex.ofReal_one, add_smul,
+          neg_smul, one_smul]
         rfl
-      · simp only [if_neg hca, if_neg hcb, sub_zero, LinearMap.zero_apply, add_zero, Pi.add_apply, root,
-          Pi.sub_apply]
+      · simp only [if_neg hca, if_neg hcb, sub_zero, LinearMap.zero_apply, add_zero, Pi.add_apply,
+          root, Pi.sub_apply]
         rw [Pi.single_eq_of_ne hca, Pi.single_eq_of_ne (Ne.symm hcb)]
         simp
   have hw'w : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) T (γ + root a b) w' := by
@@ -97,8 +112,7 @@ theorem intertwiner_preserves_highestWeight : HWVec := by
     rw [hw']
     exact wK_diag_wt hσ hD hyd θ
   by_contra hne
-  have hw'0 : w' ≠ 0 := by
-    intro h; apply hne; rw [← hw', h, map_zero]
+  have hw'0 : w' ≠ 0 := by intro h; apply hne; rw [← hw', h, map_zero]
   exact not_cdom_add_root ε γ hab (hdom _ w' (Submodule.mem_top) hw'0 hw'w)
 
 end GlobalTheory.PsCo.PcEF

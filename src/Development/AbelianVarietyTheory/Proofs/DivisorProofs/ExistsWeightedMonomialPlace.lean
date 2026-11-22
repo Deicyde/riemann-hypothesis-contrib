@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DvrLocPrinci
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -24,21 +26,25 @@ namespace GlobalTheory
 
 open MvPolynomial
 
-theorem exists_weightedMonomialPlace : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel c Q),
-    letI := hQ.isLocalRing; ∀ (r : ℕ) (z : Fin (r + 1) → Q) (wt : Fin (r + 1) → ℕ),
-    IsNoetherianRing Q → Ideal.span (Set.range z) = IsLocalRing.maximalIdeal Q →
-    IsQuasiRegularSeq Q z → wt 0 = 1 → (∀ i, 1 ≤ wt i) →
-    ∃ (V : Place c) (hC : V.Contains Q) (u : Fin r → V.ring),
-      (∀ i, (u i : L) * (z 0 : L) ^ wt i.succ = z i.succ) ∧
-      Irreducible (⟨z 0, hC _ (z 0).2⟩ : V.ring) ∧
-      (∀ q ∈ IsLocalRing.maximalIdeal Q,
-        (⟨q, hC _ q.2⟩ : V.ring) ∈ IsLocalRing.maximalIdeal V.ring) ∧
-      (∀ P : MvPolynomial (Fin r) Q, (∃ α, P.coeff α ∉ IsLocalRing.maximalIdeal Q) →
-        IsUnit (MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u P)) ∧
-      ∀ f : V.ring, ∃ P R : MvPolynomial (Fin r) Q,
-        IsUnit (MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u R) ∧
-        f * MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u R =
-          MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u P := by
+theorem exists_weightedMonomialPlace
+    : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel c Q),
+      letI := hQ.isLocalRing
+      ∀ (r : ℕ) (z : Fin (r + 1) → Q) (wt : Fin (r + 1) → ℕ),
+        IsNoetherianRing Q → Ideal.span (Set.range z) = IsLocalRing.maximalIdeal Q
+          → IsQuasiRegularSeq Q z → wt 0 = 1 → (∀ i, 1 ≤ wt i)
+          → ∃ (V : Place c) (hC : V.Contains Q) (u : Fin r → V.ring),
+            (∀ i, (u i : L) * (z 0 : L) ^ wt i.succ = z i.succ)
+              ∧ Irreducible (⟨z 0, hC _ (z 0).2⟩ : V.ring)
+              ∧ (∀ q ∈ IsLocalRing.maximalIdeal Q,
+                (⟨q, hC _ q.2⟩ : V.ring) ∈ IsLocalRing.maximalIdeal V.ring)
+              ∧ (∀ P : MvPolynomial (Fin r) Q,
+                (∃ α, P.coeff α ∉ IsLocalRing.maximalIdeal Q)
+                  → IsUnit (MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u
+                    P))
+              ∧ ∀ f : V.ring, ∃ P R : MvPolynomial (Fin r) Q,
+                IsUnit (MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u R)
+                  ∧ f * MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u R
+                    = MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u P := by
   intro L _ c Q hQ
   letI := hQ.isLocalRing
   intro r z wt hN hm hz hw0 hw
@@ -46,18 +52,22 @@ theorem exists_weightedMonomialPlace : ∀ {L : Type} [Field L] (c : ℂ →+* L
   have hz0 : (z 0 : L) ≠ 0 := by
     intro h
     have h1 : z 0 = 0 := Subtype.ext h
-    have := GlobalTheory.T.coeff_mem_span_of_weightedHomogeneous_relation_quasiRegular z wt hw hz (wt 0) (X 0) (isWeightedHomogeneous_X Q wt 0)
-      (by simp [h1]) (Finsupp.single 0 1)
+    have :=
+      GlobalTheory.T.coeff_mem_span_of_weightedHomogeneous_relation_quasiRegular z wt hw hz (wt 0)
+        (X 0) (isWeightedHomogeneous_X Q wt 0) (by simp [h1]) (Finsupp.single 0 1)
     rw [coeff_X, if_pos rfl, hm] at this
     exact (IsLocalRing.maximalIdeal.isMaximal Q).ne_top ((Ideal.eq_top_iff_one _).mpr this)
   set u : Fin r → L := fun i => (z i.succ : L) / (z 0 : L) ^ wt i.succ with hu
-  have key0 : ∀ P : MvPolynomial (Fin r) Q, eval₂ Q.subtype u P = 0 →
-      ∀ α, P.coeff α ∈ IsLocalRing.maximalIdeal Q := by
+  have key0
+      : ∀ P : MvPolynomial (Fin r) Q,
+        eval₂ Q.subtype u P = 0 → ∀ α, P.coeff α ∈ IsLocalRing.maximalIdeal Q := by
     intro P hP α
-    obtain ⟨N, F, hF, hFe, hc⟩ := GlobalTheory.T.exists_weightedHomogeneous_homogenisation Q r z wt hw0 hz0 P
+    obtain ⟨N, F, hF, hFe, hc⟩ :=
+      GlobalTheory.T.exists_weightedHomogeneous_homogenisation Q r z wt hw0 hz0 P
     obtain ⟨β, hβ⟩ := hc α
     rw [← hβ, ← hm]
-    refine GlobalTheory.T.coeff_mem_span_of_weightedHomogeneous_relation_quasiRegular z wt hw hz N F hF ?_ β
+    refine GlobalTheory.T.coeff_mem_span_of_weightedHomogeneous_relation_quasiRegular z wt hw hz N F
+      hF ?_ β
     apply Subtype.ext
     rw [hFe, hP, mul_zero]
     rfl
@@ -72,9 +82,11 @@ theorem exists_weightedMonomialPlace : ∀ {L : Type} [Field L] (c : ℂ →+* L
   have hzA : ∀ j, ∃ a : A, ((z j : Q) : L) = (z 0 : L) * a := by
     intro j
     refine Fin.cases ⟨1, by simp⟩ (fun i => ?_) j
-    refine ⟨⟨(z 0 : L) ^ (wt i.succ - 1) * u i, A.mul_mem (A.pow_mem (hQA _ (z 0).2) _) (huA i)⟩, ?_⟩
+    refine
+      ⟨⟨(z 0 : L) ^ (wt i.succ - 1) * u i, A.mul_mem (A.pow_mem (hQA _ (z 0).2) _) (huA i)⟩, ?_⟩
     show ((z i.succ : Q) : L) = (z 0 : L) * ((z 0 : L) ^ (wt i.succ - 1) * ((z i.succ : L) / (z 0 : L) ^ wt i.succ))
-    rw [← mul_assoc, ← pow_succ', Nat.sub_add_cancel (hw i.succ), mul_div_cancel₀ _ (pow_ne_zero _ hz0)]
+    rw [← mul_assoc, ← pow_succ', Nat.sub_add_cancel (hw i.succ),
+      mul_div_cancel₀ _ (pow_ne_zero _ hz0)]
   have hmA : Ideal.map (eA.comp C) (IsLocalRing.maximalIdeal Q) ≤ Ideal.span {t} := by
     rw [Ideal.map_le_iff_le_comap, ← hm, Ideal.span_le]
     rintro _ ⟨j, rfl⟩
@@ -95,7 +107,8 @@ theorem exists_weightedMonomialPlace : ∀ {L : Type} [Field L] (c : ℂ →+* L
     refine key0 P ?_
     have := congrArg Subtype.val ((RingHom.mem_ker).mp hP)
     simpa [heA_val, he] using this
-  have hprimeC : (Ideal.map (C : Q →+* MvPolynomial (Fin r) Q) (IsLocalRing.maximalIdeal Q)).IsPrime := by
+  have hprimeC
+      : (Ideal.map (C : Q →+* MvPolynomial (Fin r) Q) (IsLocalRing.maximalIdeal Q)).IsPrime := by
     have := MvPolynomial.ker_map (σ := Fin r) (IsLocalRing.residue Q)
     rw [IsLocalRing.ker_residue] at this
     rw [← this]
@@ -103,8 +116,9 @@ theorem exists_weightedMonomialPlace : ∀ {L : Type} [Field L] (c : ℂ →+* L
   have hprime : (Ideal.span {t}).IsPrime := by
     rw [hspan]
     exact Ideal.map_isPrime_of_surjective heA_surj hker
-  have key1 : ∀ P : MvPolynomial (Fin r) Q, eA P ∈ Ideal.span {t} →
-      P ∈ Ideal.map C (IsLocalRing.maximalIdeal Q) := by
+  have key1
+      : ∀ P : MvPolynomial (Fin r) Q,
+        eA P ∈ Ideal.span {t} → P ∈ Ideal.map C (IsLocalRing.maximalIdeal Q) := by
     intro P hP
     rw [hspan] at hP
     obtain ⟨x, hx, hxP⟩ := (Ideal.mem_map_iff_of_surjective eA heA_surj).mp hP
@@ -121,7 +135,8 @@ theorem exists_weightedMonomialPlace : ∀ {L : Type} [Field L] (c : ℂ →+* L
     have h1 : (Q.subtype.codRestrict A fun q => hQA _ q.2) = eA.comp C := by
       ext q; simp [heA_val, he]
     rw [h1]
-    exact RingHom.FiniteType.comp_surjective (RingHom.finiteType_algebraMap.mpr inferInstance) heA_surj
+    exact RingHom.FiniteType.comp_surjective (RingHom.finiteType_algebraMap.mpr inferInstance)
+      heA_surj
   have hconst : ∀ a, c a ∈ V := fun a => hAV _ (hQA _ (hQ.const_mem a))
   have hessV : (c.codRestrict V hconst).EssFiniteType := by
     have h := (hQ.essFiniteType.comp hQAf.essFiniteType).comp hess
@@ -129,9 +144,10 @@ theorem exists_weightedMonomialPlace : ∀ {L : Type} [Field L] (c : ℂ →+* L
   let P0 : Place c := ⟨V, hconst, hdvr, hessV⟩
   have hC : P0.Contains Q := fun f hf => hAV _ (hQA _ hf)
   let uV : Fin r → P0.ring := fun i => ⟨u i, hAV _ (huA i)⟩
-  have hev : ∀ P : MvPolynomial (Fin r) Q,
-      ((MvPolynomial.eval₂ (Q.subtype.codRestrict P0.ring fun q => hC _ q.2) uV P : P0.ring) : L) =
-        e P := by
+  have hev
+      : ∀ P : MvPolynomial (Fin r) Q,
+        ((MvPolynomial.eval₂ (Q.subtype.codRestrict P0.ring fun q => hC _ q.2) uV P : P0.ring) : L)
+          = e P := by
     intro P
     exact MvPolynomial.eval₂_comp_left (P0.ring.subtype)
       (Q.subtype.codRestrict P0.ring fun q => hC _ q.2) uV P
@@ -157,7 +173,9 @@ theorem exists_weightedMonomialPlace : ∀ {L : Type} [Field L] (c : ℂ →+* L
     refine ⟨P, R, ?_, Subtype.ext ?_⟩
     · convert hunit _ hs using 1
       exact Subtype.ext (hev R)
-    · calc ((f * MvPolynomial.eval₂ (Q.subtype.codRestrict P0.ring fun q => hC _ q.2) uV R : P0.ring) : L)
+    · calc
+        ((f * MvPolynomial.eval₂ (Q.subtype.codRestrict P0.ring fun q => hC _ q.2) uV R : P0.ring)
+            : L)
           = (f : L) * e R := by rw [← hev R]; rfl
         _ = e P := hfs
         _ = _ := (hev P).symm

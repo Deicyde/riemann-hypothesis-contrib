@@ -17,19 +17,19 @@ noncomputable section
 
 section Presentation
 
-variable {k : Type u} [Field k] {P S : Type u} [CommRing P] [CommRing S] [Algebra k P]
-  [Algebra k S] [Algebra P S] [IsScalarTower k P S] [IsLocalRing P] [IsLocalRing S]
+variable
+  {k : Type u} [Field k]
+  {P S : Type u} [CommRing P] [CommRing S] [Algebra k P] [Algebra k S] [Algebra P S]
+  [IsScalarTower k P S] [IsLocalRing P] [IsLocalRing S]
 
-variable (hsurj : Function.Surjective (algebraMap P S))
+variable
+  (hsurj : Function.Surjective (algebraMap P S))
   (hres : Function.Surjective (algebraMap k (ResidueField S)))
-
 
 include hsurj in
 omit [Algebra k P] [Algebra k S] [IsScalarTower k P S] in
 lemma comap_maximalIdeal_eq : (maximalIdeal S).comap (algebraMap P S) = maximalIdeal P :=
   eq_maximalIdeal (Ideal.comap_isMaximal_of_surjective _ hsurj)
-
-
 
 omit [Algebra k P] [Algebra k S] [IsScalarTower k P S] in
 include hsurj in
@@ -39,7 +39,6 @@ lemma ker_le_maximalIdeal : RingHom.ker (algebraMap P S) ≤ maximalIdeal P := b
   exact zero_mem _
 
 variable [IsNoetherianRing P]
-
 
 omit [Algebra k P] [Algebra k S] [IsScalarTower k P S] in
 include hsurj in
@@ -101,7 +100,6 @@ lemma spanFinrank_quotient_le (J : Ideal P) [IsLocalRing (P ⧸ J)]
     _ ≤ (σ '' G).ncard := Set.ncard_image_le (hGfin.image _)
     _ ≤ G.ncard := Set.ncard_image_le hGfin
     _ = (maximalIdeal S).spanFinrank := by rw [Set.ncard_def, hGc, ENat.toNat_natCast]
-
 
 omit [Algebra k P] [Algebra k S] [IsScalarTower k P S] in
 include hsurj in

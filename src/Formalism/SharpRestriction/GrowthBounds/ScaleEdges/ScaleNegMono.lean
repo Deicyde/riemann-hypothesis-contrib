@@ -10,14 +10,14 @@ namespace Formalism.MainNotions.Pf14
 
 open Formalism.MainNotions.G Formalism.GradedWeylDivisibility
 
-theorem w_ne_zero {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
+theorem w_ne_zero
+    {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
     [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
-    {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O} (hS : HidaSetting p n' W Qq O Kf ι σ j w) :
-    algebraMap O Kf w ≠ 0 := by
+    {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O} (hS : HidaSetting p n' W Qq O Kf ι σ j w)
+    : algebraMap O Kf w ≠ 0 := by
   intro h
   have := hS.frac_alt
-  have h2 : algebraMap O Kf ((p : ℕ) : O) = 0 := by
-    rw [← hS.w_sq, map_pow, h, zero_pow two_ne_zero]
+  have h2 : algebraMap O Kf ((p : ℕ) : O) = 0 := by rw [← hS.w_sq, map_pow, h, zero_pow two_ne_zero]
   have h3 : ι (algebraMap W Qq ((p : ℕ) : W)) = 0 := by
     rw [hS.ι_comp, map_natCast j]
     exact h2
@@ -27,14 +27,16 @@ theorem w_ne_zero {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsD
 
 section Scale
 
-variable {O Kf X : Type*} [CommRing O] [Field Kf] [Algebra O Kf] [AddCommGroup X] [Module Kf X] [Module O X]
-  [IsScalarTower O Kf X]
+variable
+  {O Kf X : Type*} [CommRing O] [Field Kf] [Algebra O Kf] [AddCommGroup X] [Module Kf X]
+  [Module O X] [IsScalarTower O Kf X]
 
 theorem mem_scale {c : Kf} {M : Submodule O X} {x : X} : x ∈ scale c M ↔ ∃ y ∈ M, c • y = x := by
   simp only [scale, Submodule.mem_map, LinearMap.restrictScalars_apply, LinearMap.lsmul_apply]
 
-theorem scale_neg_mono (w : O) (hw : algebraMap O Kf w ≠ 0) {s t : ℕ} (hst : s ≤ t) (M : Submodule O X) :
-    scale (algebraMap O Kf w ^ (-(s : ℤ))) M ≤ scale (algebraMap O Kf w ^ (-(t : ℤ))) M := by
+theorem scale_neg_mono
+    (w : O) (hw : algebraMap O Kf w ≠ 0) {s t : ℕ} (hst : s ≤ t) (M : Submodule O X)
+    : scale (algebraMap O Kf w ^ (-(s : ℤ))) M ≤ scale (algebraMap O Kf w ^ (-(t : ℤ))) M := by
   intro x hx
   rw [mem_scale] at hx ⊢
   obtain ⟨y, hy, rfl⟩ := hx
@@ -42,7 +44,8 @@ theorem scale_neg_mono (w : O) (hw : algebraMap O Kf w ≠ 0) {s t : ℕ} (hst :
   rw [← algebraMap_smul Kf (w ^ (t - s)) y, smul_smul, map_pow, ← zpow_natCast, ← zpow_add₀ hw,
     show -(t : ℤ) + ((t - s : ℕ) : ℤ) = -(s : ℤ) by omega]
 
-theorem scale_pos_le (w : O) (c : ℕ) (M : Submodule O X) : scale (algebraMap O Kf w ^ (c : ℤ)) M ≤ M := by
+theorem scale_pos_le (w : O) (c : ℕ) (M : Submodule O X)
+    : scale (algebraMap O Kf w ^ (c : ℤ)) M ≤ M := by
   intro x hx
   rw [mem_scale] at hx
   obtain ⟨y, hy, rfl⟩ := hx
@@ -51,8 +54,10 @@ theorem scale_pos_le (w : O) (c : ℕ) (M : Submodule O X) : scale (algebraMap O
 
 end Scale
 
-theorem ValLe.mono {O Kf : Type*} [CommRing O] [Field Kf] [Algebra O Kf] {π : O} {D D' : ℕ} {x : Kf}
-    (h : ValLe π D x) (hD : D ≤ D') : ValLe π D' x := by
+theorem ValLe.mono
+    {O Kf : Type*} [CommRing O] [Field Kf] [Algebra O Kf]
+    {π : O} {D D' : ℕ} {x : Kf} (h : ValLe π D x) (hD : D ≤ D')
+    : ValLe π D' x := by
   obtain ⟨a, b, hx, hab⟩ := h
   refine ⟨a, b * π ^ (D' - D), hx, ?_⟩
   rw [← mul_assoc, hab, ← pow_add, Nat.add_sub_cancel' hD]

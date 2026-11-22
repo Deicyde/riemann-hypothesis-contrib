@@ -37,10 +37,11 @@ theorem linModulusV_of (h : LinModulus) : LinModulusV := by
     rw [hmv, hE, hE]
     simp [g]
   have hES : MeasurableSet (E '' S) := E.measurableSet_image.mpr hS
-  have key := h F ι (LinearMap.toMatrix' g) (by rw [hdet]; exact hf) (ν.map E) inferInstance
-    (E '' S) hES
-  rw [himg, hdet, MeasurableEquiv.map_apply, MeasurableEquiv.map_apply,
-    E.preimage_image, E.preimage_image] at key
+  have key :=
+    h F ι (LinearMap.toMatrix' g) (by rw [hdet]; exact hf) (ν.map E) inferInstance (E '' S) hES
+  rw [himg, hdet, MeasurableEquiv.map_apply, MeasurableEquiv.map_apply, E.preimage_image,
+      E.preimage_image]
+    at key
   exact key
 
 end PI.NglqJacSplitW

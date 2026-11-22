@@ -10,16 +10,18 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 noncomputable section
 namespace GlobalTheory.ZM
 
-def twistSnd {h : ℕ} (A : Matrix (Fin 8) (Fin 8) ℤ) :
-    (Fin 8 → (Fin h ⊕ Fin h → ℤ)) →ₗ[ℤ] (Fin 8 → (Fin h ⊕ Fin h → ℤ)) where
+def twistSnd {h : ℕ} (A : Matrix (Fin 8) (Fin 8) ℤ)
+    : (Fin 8 → (Fin h ⊕ Fin h → ℤ)) →ₗ[ℤ] (Fin 8 → (Fin h ⊕ Fin h → ℤ)) where
   toFun y := fun u => Sum.elim (fun a => y u (.inl a)) (fun a => A.mulVec (fun w => y w (.inr a)) u)
   map_add' y y' := by
     funext u c
@@ -32,17 +34,21 @@ def twistSnd {h : ℕ} (A : Matrix (Fin 8) (Fin 8) ℤ) :
     · simp
     · simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm]
 
-theorem twistSnd_twistSnd {h : ℕ} (A B : Matrix (Fin 8) (Fin 8) ℤ) (hAB : A * B = 1)
-    (y : Fin 8 → (Fin h ⊕ Fin h → ℤ)) : twistSnd A (twistSnd B y) = y := by
+theorem twistSnd_twistSnd
+    {h : ℕ} (A B : Matrix (Fin 8) (Fin 8) ℤ) (hAB : A * B = 1) (y : Fin 8 → (Fin h ⊕ Fin h → ℤ))
+    : twistSnd A (twistSnd B y) = y := by
   funext u c
   rcases c with a | a
   · rfl
   · change A.mulVec (B.mulVec (fun w => y w (.inr a))) u = _
     rw [Matrix.mulVec_mulVec, hAB, Matrix.one_mulVec]
 
-theorem sum_omegaStd_twistSnd {h : ℕ} (A B : Matrix (Fin 8) (Fin 8) ℤ) (hA : A.transpose = A)
-    (hAB : A * B = 1) (y y' : Fin 8 → (Fin h ⊕ Fin h → ℤ)) :
-    ∑ u, ∑ v, A u v * omegaStd (twistSnd B y u) (twistSnd B y' v) = ∑ u, omegaStd (y u) (y' u) := by
+theorem sum_omegaStd_twistSnd
+    {h : ℕ}
+    (A B : Matrix (Fin 8) (Fin 8) ℤ) (hA : A.transpose = A) (hAB : A * B = 1)
+    (y y' : Fin 8 → (Fin h ⊕ Fin h → ℤ))
+    : ∑ u, ∑ v, A u v * omegaStd (twistSnd B y u) (twistSnd B y' v)
+      = ∑ u, omegaStd (y u) (y' u) := by
   have key : ∀ (z : Fin 8 → ℤ) (u : Fin 8), ∑ v, A u v * B.mulVec z v = z u := by
     intro z u
     change A.mulVec (B.mulVec z) u = _
@@ -50,16 +56,18 @@ theorem sum_omegaStd_twistSnd {h : ℕ} (A B : Matrix (Fin 8) (Fin 8) ℤ) (hA :
   have hs : ∀ u v, A u v = A v u := fun u v => by
     conv_lhs => rw [← hA]
     rfl
-  have h1 : ∑ u, ∑ v, A u v * ∑ a, y u (.inl a) * B.mulVec (fun w => y' w (.inr a)) v
-      = ∑ u, ∑ a, y u (.inl a) * y' u (.inr a) := by
+  have h1
+      : ∑ u, ∑ v, A u v * ∑ a, y u (.inl a) * B.mulVec (fun w => y' w (.inr a)) v
+        = ∑ u, ∑ a, y u (.inl a) * y' u (.inr a) := by
     refine Finset.sum_congr rfl fun u _ => ?_
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [← key (fun w => y' w (.inr a)) u, Finset.mul_sum]
     exact Finset.sum_congr rfl fun v _ => by ring
-  have h2 : ∑ u, ∑ v, A u v * ∑ a, B.mulVec (fun w => y w (.inr a)) u * y' v (.inl a)
-      = ∑ u, ∑ a, y u (.inr a) * y' u (.inl a) := by
+  have h2
+      : ∑ u, ∑ v, A u v * ∑ a, B.mulVec (fun w => y w (.inr a)) u * y' v (.inl a)
+        = ∑ u, ∑ a, y u (.inr a) * y' u (.inl a) := by
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun v _ => ?_
     simp only [Finset.mul_sum]
@@ -72,25 +80,26 @@ theorem sum_omegaStd_twistSnd {h : ℕ} (A B : Matrix (Fin 8) (Fin 8) ℤ) (hA :
   rfl
 
 def sharpIndex (h : ℕ) : Fin 8 × (Fin h ⊕ Fin h) ≃ Fin (2 * (8 * h)) :=
-  (Equiv.prodSumDistrib _ _ _).trans <|
-    (Equiv.sumCongr finProdFinEquiv finProdFinEquiv).trans <|
-      finSumFinEquiv.trans (finCongr (two_mul _).symm)
+  (Equiv.prodSumDistrib _ _ _).trans <| (Equiv.sumCongr finProdFinEquiv finProdFinEquiv).trans <|
+    finSumFinEquiv.trans (finCongr (two_mul _).symm)
 
-theorem sharpIndex_inl (h : ℕ) (u : Fin 8) (a : Fin h) :
-    (sharpIndex h (u, .inl a) : ℕ) = (finProdFinEquiv (u, a) : ℕ) := by
+theorem sharpIndex_inl (h : ℕ) (u : Fin 8) (a : Fin h)
+    : (sharpIndex h (u, .inl a) : ℕ) = (finProdFinEquiv (u, a) : ℕ) := by
   simp [sharpIndex]
 
-theorem sharpIndex_inr (h : ℕ) (u : Fin 8) (a : Fin h) :
-    (sharpIndex h (u, .inr a) : ℕ) = (finProdFinEquiv (u, a) : ℕ) + 8 * h := by
+theorem sharpIndex_inr (h : ℕ) (u : Fin 8) (a : Fin h)
+    : (sharpIndex h (u, .inr a) : ℕ) = (finProdFinEquiv (u, a) : ℕ) + 8 * h := by
   simp [sharpIndex]
 
-theorem sum_omegaStd_single (h : ℕ) (i j : Fin (2 * (8 * h))) :
-    ∑ u, omegaStd (fun c => (Pi.single i 1 : Fin (2 * (8 * h)) → ℤ) (sharpIndex h (u, c)))
-      (fun c => (Pi.single j 1 : Fin (2 * (8 * h)) → ℤ) (sharpIndex h (u, c))) = Out.stdSymp (8 * h) i j := by
+theorem sum_omegaStd_single (h : ℕ) (i j : Fin (2 * (8 * h)))
+    : ∑ u, omegaStd (fun c => (Pi.single i 1 : Fin (2 * (8 * h)) → ℤ) (sharpIndex h (u, c)))
+        (fun c => (Pi.single j 1 : Fin (2 * (8 * h)) → ℤ) (sharpIndex h (u, c)))
+      = Out.stdSymp (8 * h) i j := by
   obtain ⟨⟨u, c⟩, rfl⟩ := (sharpIndex h).surjective i
   obtain ⟨⟨v, d⟩, rfl⟩ := (sharpIndex h).surjective j
-  have hinj : ∀ (u v : Fin 8) (a b : Fin h),
-      ((finProdFinEquiv (u, a) : ℕ) = (finProdFinEquiv (v, b) : ℕ)) ↔ (u = v ∧ a = b) := by
+  have hinj
+      : ∀ (u v : Fin 8) (a b : Fin h),
+        ((finProdFinEquiv (u, a) : ℕ) = (finProdFinEquiv (v, b) : ℕ)) ↔ (u = v ∧ a = b) := by
     intro u v a b
     rw [Fin.val_inj, Equiv.apply_eq_iff_eq, Prod.mk.injEq]
   rcases c with a | a <;> rcases d with b | b
@@ -136,16 +145,21 @@ def sharpReindex (h : ℕ) : (Fin (2 * (8 * h)) → ℤ) ≃ₗ[ℤ] (Fin 8 → 
   left_inv x := by funext i; simp
   right_inv y := by funext u c; simp
 
-theorem exists_isE8_isSharpBasis : ∃ W : Matrix (Fin 8) (Fin 8) ℤ, IsE8 W ∧ ∀ h : ℕ, ∃ bas : (Fin (2 * (8 * h)) → ℤ) ≃ₗ[ℤ] (Fin 8 → (Fin h ⊕ Fin h → ℤ)), IsSharpBasis W bas := by
+theorem exists_isE8_isSharpBasis
+    : ∃ W : Matrix (Fin 8) (Fin 8) ℤ,
+      IsE8 W
+        ∧ ∀ h : ℕ, ∃ bas : (Fin (2 * (8 * h)) → ℤ) ≃ₗ[ℤ] (Fin 8 → (Fin h ⊕ Fin h → ℤ)),
+          IsSharpBasis W bas := by
   refine ⟨GlobalTheory.W8, ?_, fun h => ?_⟩
   · unfold IsE8
     rw [GlobalTheory.w8_add_transpose_eq_e8]
     exact ⟨GlobalTheory.e8_posDef, GlobalTheory.e8_det_eq_one⟩
-  · let e : (Fin 8 → (Fin h ⊕ Fin h → ℤ)) ≃ₗ[ℤ] (Fin 8 → (Fin h ⊕ Fin h → ℤ)) :=
-      { twistSnd GlobalTheory.E8inv with
-        invFun := twistSnd GlobalTheory.E8
-        left_inv := twistSnd_twistSnd _ _ GlobalTheory.e8_mul_e8inv
-        right_inv := twistSnd_twistSnd _ _ GlobalTheory.e8inv_mul_e8 }
+  · let e : (Fin 8 → (Fin h ⊕ Fin h → ℤ)) ≃ₗ[ℤ] (Fin 8 → (Fin h ⊕ Fin h → ℤ)) := {
+      twistSnd GlobalTheory.E8inv with
+      invFun := twistSnd GlobalTheory.E8
+      left_inv := twistSnd_twistSnd _ _ GlobalTheory.e8_mul_e8inv
+      right_inv := twistSnd_twistSnd _ _ GlobalTheory.e8inv_mul_e8
+    }
     refine ⟨(sharpReindex h).trans e, fun i j => ?_⟩
     rw [GlobalTheory.w8_add_transpose_eq_e8, ← sum_omegaStd_single h i j]
     exact sum_omegaStd_twistSnd _ _ GlobalTheory.e8_transpose GlobalTheory.e8_mul_e8inv _ _

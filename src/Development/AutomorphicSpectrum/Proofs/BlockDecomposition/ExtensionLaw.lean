@@ -14,9 +14,11 @@ namespace GlobalTheory.CompanionTheory.RgEisExt
 
 variable {G : Type} [Group G]
 
-theorem ext_mul {K P : Subgroup G} {f : G → ℝ} (hadd : ∀ p ∈ P, ∀ q ∈ P, f (p * q) = f p + f q)
-    (hfK : ∀ p ∈ P, p ∈ K → f p = 0) {p k : G} (hp : p ∈ P) (hk : k ∈ K) :
-    PositivityTheory.RgEis.ext K P f (p * k) = f p := by
+theorem ext_mul
+    {K P : Subgroup G} {f : G → ℝ}
+    (hadd : ∀ p ∈ P, ∀ q ∈ P, f (p * q) = f p + f q) (hfK : ∀ p ∈ P, p ∈ K → f p = 0)
+    {p k : G} (hp : p ∈ P) (hk : k ∈ K)
+    : PositivityTheory.RgEis.ext K P f (p * k) = f p := by
   have hex : ∃ c : K, p * k * (c : G)⁻¹ ∈ P := ⟨⟨k, hk⟩, by simpa using hp⟩
   rw [PositivityTheory.RgEis.ext, dite_eq_left hex]
   have hcP : p * k * (hex.choose : G)⁻¹ ∈ P := hex.choose_spec
@@ -32,8 +34,8 @@ theorem ext_mul {K P : Subgroup G} {f : G → ℝ} (hadd : ∀ p ∈ P, ∀ q �
 
 theorem extLaw : ExtLaw := by
   intro G _ _ _ _ Γ K P f hK hP hIwa hadd hfc hfK hfΓ
-  have hval : ∀ p ∈ P, ∀ k ∈ K, PositivityTheory.RgEis.ext K P f (p * k) = f p :=
-    fun p hp k hk => ext_mul hadd hfK hp hk
+  have hval : ∀ p ∈ P, ∀ k ∈ K, PositivityTheory.RgEis.ext K P f (p * k) = f p := fun p hp k hk =>
+    ext_mul hadd hfK hp hk
   have hone : ∀ p ∈ P, PositivityTheory.RgEis.ext K P f p = f p := by
     intro p hp
     simpa using hval p hp 1 K.one_mem
@@ -50,7 +52,8 @@ theorem extLaw : ExtLaw := by
   · open Pointwise in
     · rw [continuous_iff_isClosed]
       intro C hC
-      have hset : PositivityTheory.RgEis.ext K P f ⁻¹' C = ((P : Set G) ∩ f ⁻¹' C) * (K : Set G) := by
+      have hset
+          : PositivityTheory.RgEis.ext K P f ⁻¹' C = ((P : Set G) ∩ f ⁻¹' C) * (K : Set G) := by
         ext g
         constructor
         · intro hg

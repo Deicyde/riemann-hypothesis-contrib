@@ -17,8 +17,9 @@ namespace Choice
 
 variable {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] {R : Type*} [CommRing R]
 
-theorem homog_mul {f g : MRingOver R ι} {a b : K → ℕ} (hf : IsMultiHomog f a)
-    (hg : IsMultiHomog g b) : IsMultiHomog (f * g) (a + b) := by
+theorem homog_mul
+    {f g : MRingOver R ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
+    : IsMultiHomog (f * g) (a + b) := by
   classical
   intro m hm k
   obtain ⟨m1, hm1, m2, hm2, rfl⟩ := Finset.mem_add.mp (MvPolynomial.support_mul f g hm)
@@ -33,10 +34,8 @@ theorem homog_one : IsMultiHomog (1 : MRingOver R ι) 0 := by
   subst hm'
   simp
 
-
 open Classical in
-theorem homog_X (k : K) (i : ι k) :
-    IsMultiHomog (X ⟨k, i⟩ : MRingOver R ι) (Pi.single k 1) := by
+theorem homog_X (k : K) (i : ι k) : IsMultiHomog (X ⟨k, i⟩ : MRingOver R ι) (Pi.single k 1) := by
   classical
   intro m hm k'
   have hm' : m = Finsupp.single ⟨k, i⟩ 1 := by
@@ -49,8 +48,8 @@ theorem homog_X (k : K) (i : ι k) :
   · have : ∀ j : ι k', (⟨k, i⟩ : Σ k, ι k) ≠ ⟨k', j⟩ := fun j e => h (congrArg Sigma.fst e).symm
     simp [Finsupp.single_apply, this, h, Pi.single_apply]
 
-theorem homog_pow {f : MRingOver R ι} {a : K → ℕ} (hf : IsMultiHomog f a) (n : ℕ) :
-    IsMultiHomog (f ^ n) (n • a) := by
+theorem homog_pow {f : MRingOver R ι} {a : K → ℕ} (hf : IsMultiHomog f a) (n : ℕ)
+    : IsMultiHomog (f ^ n) (n • a) := by
   induction n with
   | zero => simpa using (homog_one (R := R) (ι := ι))
   | succ n ih =>
@@ -61,16 +60,18 @@ theorem homog_zero (a : K → ℕ) : IsMultiHomog (0 : MRingOver R ι) a := by
   intro m hm
   simp at hm
 
-theorem homog_add {f g : MRingOver R ι} {a : K → ℕ} (hf : IsMultiHomog f a)
-    (hg : IsMultiHomog g a) : IsMultiHomog (f + g) a := by
+theorem homog_add {f g : MRingOver R ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f + g) a := by
   classical
   intro m hm k
   rcases Finset.mem_union.mp (MvPolynomial.support_add hm) with h | h
   · exact hf m h k
   · exact hg m h k
 
-theorem homog_sum {β : Type*} (s : Finset β) (f : β → MRingOver R ι) {a : K → ℕ}
-    (h : ∀ b ∈ s, IsMultiHomog (f b) a) : IsMultiHomog (∑ b ∈ s, f b) a := by
+theorem homog_sum
+    {β : Type*} (s : Finset β) (f : β → MRingOver R ι)
+    {a : K → ℕ} (h : ∀ b ∈ s, IsMultiHomog (f b) a)
+    : IsMultiHomog (∑ b ∈ s, f b) a := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using homog_zero (R := R) (ι := ι) a
@@ -79,8 +80,10 @@ theorem homog_sum {β : Type*} (s : Finset β) (f : β → MRingOver R ι) {a : 
     exact homog_add (h b (Finset.mem_insert_self b s))
       (ih fun b' hb' => h b' (Finset.mem_insert_of_mem hb'))
 
-theorem homog_prod {β : Type*} (s : Finset β) (f : β → MRingOver R ι) (a : β → K → ℕ)
-    (h : ∀ b ∈ s, IsMultiHomog (f b) (a b)) : IsMultiHomog (∏ b ∈ s, f b) (∑ b ∈ s, a b) := by
+theorem homog_prod
+    {β : Type*}
+    (s : Finset β) (f : β → MRingOver R ι) (a : β → K → ℕ) (h : ∀ b ∈ s, IsMultiHomog (f b) (a b))
+    : IsMultiHomog (∏ b ∈ s, f b) (∑ b ∈ s, a b) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using homog_one (R := R) (ι := ι)
@@ -89,11 +92,13 @@ theorem homog_prod {β : Type*} (s : Finset β) (f : β → MRingOver R ι) (a :
     exact homog_mul (h b (Finset.mem_insert_self b s))
       (ih fun b' hb' => h b' (Finset.mem_insert_of_mem hb'))
 
-theorem homog_coordProd (c : ∀ k, ι k) (d : K → ℕ) :
-    IsMultiHomog (∏ k, (X ⟨k, c k⟩ : MRingOver R ι) ^ d k) d := by
+theorem homog_coordProd (c : ∀ k, ι k) (d : K → ℕ)
+    : IsMultiHomog (∏ k, (X ⟨k, c k⟩ : MRingOver R ι) ^ d k) d := by
   classical
-  have key : ∀ s : Finset K, IsMultiHomog (∏ k ∈ s, (X ⟨k, c k⟩ : MRingOver R ι) ^ d k)
-      (∑ k ∈ s, d k • Pi.single k 1) := by
+  have key
+      : ∀ s : Finset K,
+        IsMultiHomog (∏ k ∈ s, (X ⟨k, c k⟩ : MRingOver R ι) ^ d k)
+          (∑ k ∈ s, d k • Pi.single k 1) := by
     intro s
     induction s using Finset.induction_on with
     | empty => simpa using (homog_one (R := R) (ι := ι))
@@ -106,17 +111,19 @@ theorem homog_coordProd (c : ∀ k, ι k) (d : K → ℕ) :
   have := key Finset.univ
   rwa [e] at this
 
-theorem coordProd_not_mem {V : Ideal (MRingOver R ι)} (hV : V.IsPrime) (c : ∀ k, ι k)
-    (hc : ∀ k, (X ⟨k, c k⟩ : MRingOver R ι) ∉ V) (d : K → ℕ) :
-    (∏ k, (X ⟨k, c k⟩ : MRingOver R ι) ^ d k) ∉ V := by
+theorem coordProd_not_mem
+    {V : Ideal (MRingOver R ι)} (hV : V.IsPrime)
+    (c : ∀ k, ι k) (hc : ∀ k, (X ⟨k, c k⟩ : MRingOver R ι) ∉ V)
+    (d : K → ℕ)
+    : (∏ k, (X ⟨k, c k⟩ : MRingOver R ι) ^ d k) ∉ V := by
   intro h
   obtain ⟨k, -, hk⟩ := (hV.prod_mem_iff).mp h
   exact hc k (hV.mem_of_pow_mem _ hk)
 
-theorem exists_form_avoid (S : Set (Ideal (MRingOver R ι))) (hS : S.Finite)
-    (hS' : ∀ W ∈ S, IsMultiProjPrime W) :
-    ∃ d₀ : K → ℕ, ∀ d : K → ℕ, d₀ ≤ d →
-      ∃ f : MRingOver R ι, IsMultiHomog f d ∧ ∀ W ∈ S, f ∉ W := by
+theorem exists_form_avoid
+    (S : Set (Ideal (MRingOver R ι))) (hS : S.Finite) (hS' : ∀ W ∈ S, IsMultiProjPrime W)
+    : ∃ d₀ : K → ℕ, ∀ d : K → ℕ,
+      d₀ ≤ d → ∃ f : MRingOver R ι, IsMultiHomog f d ∧ ∀ W ∈ S, f ∉ W := by
   classical
   set T : Finset (Ideal (MRingOver R ι)) :=
     hS.toFinset.filter (fun W => ∀ W' ∈ S, W ≤ W' → W' = W) with hT
@@ -125,10 +132,15 @@ theorem exists_form_avoid (S : Set (Ideal (MRingOver R ι))) (hS : S.Finite)
   have hle : ∀ W ∈ S, ∃ W' ∈ T, W ≤ W' := by
     intro W hW
     obtain ⟨W', hWW', hW'⟩ := hS.exists_le_maximal hW
-    exact ⟨W', Finset.mem_filter.mpr ⟨hS.mem_toFinset.mpr hW'.prop,
-      fun W'' hW'' h => le_antisymm (hW'.2 hW'' h) h⟩, hWW'⟩
-  have hgen : ∀ W ∈ T, ∀ W' ∈ T, W' ≠ W →
-      ∃ g : MRingOver R ι, ∃ a : K → ℕ, IsMultiHomog g a ∧ g ∈ W' ∧ g ∉ W := by
+    exact ⟨
+      W',
+      Finset.mem_filter.mpr
+        ⟨hS.mem_toFinset.mpr hW'.prop, fun W'' hW'' h => le_antisymm (hW'.2 hW'' h) h⟩,
+      hWW'
+    ⟩
+  have hgen
+      : ∀ W ∈ T, ∀ W' ∈ T,
+        W' ≠ W → ∃ g : MRingOver R ι, ∃ a : K → ℕ, IsMultiHomog g a ∧ g ∈ W' ∧ g ∉ W := by
     intro W hW W' hW' hne
     obtain ⟨S', hS'h, hS'eq⟩ := (hS' W' (hTS W' hW')).2.1
     by_contra hc
@@ -179,8 +191,9 @@ theorem exists_form_avoid (S : Set (Ideal (MRingOver R ι))) (hS : S.Finite)
       intro W₀ hW₀ h
       rw [← Finset.add_sum_erase _ _ hW₀] at h
       have hrest : (∑ W ∈ T.erase W₀, a W * m W) ∈ W₀ :=
-        Ideal.sum_mem _ fun W hW => Ideal.mul_mem_right _ _
-          (haMem W (Finset.mem_of_mem_erase hW) W₀ hW₀ (Finset.ne_of_mem_erase hW).symm)
+        Ideal.sum_mem _ fun W hW =>
+          Ideal.mul_mem_right _ _
+            (haMem W (Finset.mem_of_mem_erase hW) W₀ hW₀ (Finset.ne_of_mem_erase hW).symm)
       have h1 := (Ideal.add_mem_iff_left _ hrest).mp h
       rcases (hS' W₀ (hTS W₀ hW₀)).1.mem_or_mem h1 with h2 | h2
       · exact haNot W₀ hW₀ h2

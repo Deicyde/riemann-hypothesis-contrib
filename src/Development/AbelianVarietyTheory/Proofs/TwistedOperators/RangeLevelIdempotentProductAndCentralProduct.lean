@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FactTypeP
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S IsDedekindDomain NumberField
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Cx Formalism.IndefR.Links
 open Formalism.IndefR.Datum (InfFam)
@@ -15,10 +17,15 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.LevRange
 
-theorem range_sum_eq_eig {G M : Type} [Group G] [Fintype G] [AddCommGroup M] [Module ℂ M] (ρ : Representation ℂ G M)
-    (P : Subgroup G) (χ : P → ℂ) (E : G → ℂ) (k : ℂ) (hk : k ≠ 0) (h0 : ∀ g, g ∉ P → E g = 0)
-    (h1 : ∀ g : P, E g * χ g = k) (hm : ∀ a b : P, χ (a * b) = χ a * χ b) :
-    LinearMap.range (∑ g, E g • ρ g) = eig ρ P χ := by
+theorem range_sum_eq_eig
+    {G M : Type} [Group G] [Fintype G] [AddCommGroup M] [Module ℂ M]
+    (ρ : Representation ℂ G M)
+    (P : Subgroup G) (χ : P → ℂ)
+    (E : G → ℂ)
+    (k : ℂ) (hk : k ≠ 0)
+    (h0 : ∀ g, g ∉ P → E g = 0) (h1 : ∀ g : P, E g * χ g = k)
+    (hm : ∀ a b : P, χ (a * b) = χ a * χ b)
+    : LinearMap.range (∑ g, E g • ρ g) = eig ρ P χ := by
   classical
   have hs : ∀ (p : P) (g : G), E g = χ p * E (p * g) := by
     intro p g
@@ -26,11 +33,11 @@ theorem range_sum_eq_eig {G M : Type} [Group G] [Fintype G] [AddCommGroup M] [Mo
     · have e1 := h1 ⟨g, hg⟩
       have e2 := h1 (p * ⟨g, hg⟩)
       rw [hm] at e2
-      have hne : χ ⟨g, hg⟩ ≠ 0 := by
-        intro h; rw [h, mul_zero] at e1; exact hk e1.symm
+      have hne : χ ⟨g, hg⟩ ≠ 0 := by intro h; rw [h, mul_zero] at e1; exact hk e1.symm
       apply mul_right_cancel₀ hne
       simp only [Subgroup.coe_mul] at e1 e2
-      rw [e1, ← e2]; ring
+      rw [e1, ← e2]
+      ring
     · have : (p : G) * g ∉ P := fun h => hg ((P.mul_mem_cancel_left p.2).1 h)
       rw [h0 g hg, h0 _ this, mul_zero]
   apply le_antisymm
@@ -58,8 +65,10 @@ theorem range_sum_eq_eig {G M : Type} [Group G] [Fintype G] [AddCommGroup M] [Mo
     refine ⟨(∑ g : G, if g ∈ P then k else 0)⁻¹ • x, ?_⟩
     rw [map_smul, hT, smul_smul, inv_mul_cancel₀ hne, one_smul]
 
-theorem range_mul_eq_inf {M : Type} [AddCommGroup M] [Module ℂ M] (C T : Module.End ℂ M) (hC : C * C = C)
-    (hc : C * T = T * C) : LinearMap.range (C * T) = LinearMap.range T ⊓ LinearMap.ker (C - LinearMap.id) := by
+theorem range_mul_eq_inf
+    {M : Type} [AddCommGroup M] [Module ℂ M]
+    (C T : Module.End ℂ M) (hC : C * C = C) (hc : C * T = T * C)
+    : LinearMap.range (C * T) = LinearMap.range T ⊓ LinearMap.ker (C - LinearMap.id) := by
   apply le_antisymm
   · rintro _ ⟨y, rfl⟩
     refine ⟨⟨C y, ?_⟩, ?_⟩
@@ -70,17 +79,22 @@ theorem range_mul_eq_inf {M : Type} [AddCommGroup M] [Module ℂ M] (C T : Modul
     refine ⟨y, ?_⟩
     simpa [sub_eq_zero] using h
 
-theorem op_comp {G H M : Type} [Group G] [Fintype G] [Group H] [Fintype H] [AddCommGroup M] [Module ℂ M]
-    (Φ : G ≃* H) (ρ : Representation ℂ G M) (e : H → ℂ) :
-    GlobalTheory.BadShare.op (M := M) (ρ.comp Φ.symm.toMonoidHom) e = ∑ g, e (Φ g) • ρ g := by
+theorem op_comp
+    {G H M : Type} [Group G] [Fintype G] [Group H] [Fintype H] [AddCommGroup M] [Module ℂ M]
+    (Φ : G ≃* H) (ρ : Representation ℂ G M) (e : H → ℂ)
+    : GlobalTheory.BadShare.op (M := M) (ρ.comp Φ.symm.toMonoidHom) e = ∑ g, e (Φ g) • ρ g := by
   unfold GlobalTheory.BadShare.op
   rw [← Equiv.sum_comp Φ.toEquiv]
   refine Finset.sum_congr rfl fun g _ => ?_
   simp
 
-theorem tens_e_mul {g N : ℕ} [Fact g.Prime] {ι : Type} [Fintype ι] (L : ι → GlobalTheory.BadShare.Lev g N)
-    (γ : ι → GlobalTheory.BadShare.GG g N) (h : ∀ v, (L v).Mem (γ v)) :
-    GlobalTheory.BadShare.tens (fun v => (L v).e) γ * ∏ v, (L v).chi (γ v) = ∏ v, (Nat.card {u // (L v).Mem u} : ℂ)⁻¹ := by
+theorem tens_e_mul
+    {g N : ℕ} [Fact g.Prime]
+    {ι : Type} [Fintype ι]
+    (L : ι → GlobalTheory.BadShare.Lev g N) (γ : ι → GlobalTheory.BadShare.GG g N)
+    (h : ∀ v, (L v).Mem (γ v))
+    : GlobalTheory.BadShare.tens (fun v => (L v).e) γ * ∏ v, (L v).chi (γ v)
+      = ∏ v, (Nat.card {u // (L v).Mem u} : ℂ)⁻¹ := by
   unfold GlobalTheory.BadShare.tens
   rw [← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun v _ => ?_
@@ -88,21 +102,50 @@ theorem tens_e_mul {g N : ℕ} [Fact g.Prime] {ι : Type} [Fintype ι] (L : ι �
   simp only [GlobalTheory.BadShare.Lev.e, GlobalTheory.BadShare.eps, if_pos (h v)]
   field_simp
 
-theorem tens_e_zero {g N : ℕ} [Fact g.Prime] {ι : Type} [Fintype ι] (L : ι → GlobalTheory.BadShare.Lev g N)
-    (γ : ι → GlobalTheory.BadShare.GG g N) (h : ¬ ∀ v, (L v).Mem (γ v)) :
-    GlobalTheory.BadShare.tens (fun v => (L v).e) γ = 0 := by
+theorem tens_e_zero
+    {g N : ℕ} [Fact g.Prime]
+    {ι : Type} [Fintype ι]
+    (L : ι → GlobalTheory.BadShare.Lev g N) (γ : ι → GlobalTheory.BadShare.GG g N)
+    (h : ¬ ∀ v, (L v).Mem (γ v))
+    : GlobalTheory.BadShare.tens (fun v => (L v).e) γ = 0 := by
   obtain ⟨v, hv⟩ := not_forall.1 h
-  exact Finset.prod_eq_zero (Finset.mem_univ v) (by simp only [GlobalTheory.BadShare.Lev.e, GlobalTheory.BadShare.eps, if_neg hv])
+  exact Finset.prod_eq_zero (Finset.mem_univ v)
+    (by simp only [GlobalTheory.BadShare.Lev.e, GlobalTheory.BadShare.eps, if_neg hv])
 
-theorem prod_card_ne {g N : ℕ} [Fact g.Prime] {ι : Type} [Fintype ι] (L : ι → GlobalTheory.BadShare.Lev g N) :
-    (∏ v, (Nat.card {u // (L v).Mem u} : ℂ)⁻¹) ≠ 0 := by
+theorem prod_card_ne
+    {g N : ℕ} [Fact g.Prime] {ι : Type} [Fintype ι] (L : ι → GlobalTheory.BadShare.Lev g N)
+    : (∏ v, (Nat.card {u // (L v).Mem u} : ℂ)⁻¹) ≠ 0 := by
   refine Finset.prod_ne_zero_iff.2 fun v _ => inv_ne_zero ?_
   haveI : Nonempty {u // (L v).Mem u} := ⟨⟨1, GlobalTheory.BadShare.Basic.mem_one (L v)⟩⟩
   exact_mod_cast Nat.card_pos.ne'
 
-theorem ranges : ∀ (g₁ g₂ N : ℕ) [Fact g₁.Prime] [Fact g₂.Prime] (ι₁ ι₂ G M : Type) [Fintype ι₁] [Fintype ι₂] [DecidableEq ι₁] [DecidableEq ι₂] [Group G] [Fintype G] [AddCommGroup M] [Module ℂ M] (Φ : G ≃* (ι₁ → GlobalTheory.BadShare.GG g₁ N) × (ι₂ → GlobalTheory.BadShare.GG g₂ N)) (L₁ : ι₁ → GlobalTheory.BadShare.Lev g₁ N) (L₂ : ι₂ → GlobalTheory.BadShare.Lev g₂ N) (P : Subgroup G) (χ : P → ℂ) (ρ : Representation ℂ G M) [Fintype ((ι₁ → GlobalTheory.BadShare.GG g₁ N) × (ι₂ → GlobalTheory.BadShare.GG g₂ N))] (c : (ι₁ → GlobalTheory.BadShare.GG g₁ N) × (ι₂ → GlobalTheory.BadShare.GG g₂ N) → ℂ), (∀ g : G, g ∈ P ↔ (∀ v, (L₁ v).Mem ((Φ g).1 v)) ∧ ∀ v, (L₂ v).Mem ((Φ g).2 v)) → (∀ g : P, χ g = (∏ v, (L₁ v).chi ((Φ g).1 v)) * ∏ v, (L₂ v).chi ((Φ g).2 v)) → GlobalTheory.BadShare.conv c c = c → (∀ a, GlobalTheory.BadShare.conv c a = GlobalTheory.BadShare.conv a c) → LinearMap.range (GlobalTheory.BadShare.op (M := M) (ρ.comp Φ.symm.toMonoidHom) (GlobalTheory.BadShare.tens2 (GlobalTheory.BadShare.tens fun v => (L₁ v).e) (GlobalTheory.BadShare.tens fun v => (L₂ v).e))) = eig ρ P χ ∧ LinearMap.range (GlobalTheory.BadShare.op (M := M) (ρ.comp Φ.symm.toMonoidHom) (GlobalTheory.BadShare.conv c (GlobalTheory.BadShare.tens2 (GlobalTheory.BadShare.tens fun v => (L₁ v).e) (GlobalTheory.BadShare.tens fun v => (L₂ v).e)))) = eig ρ P χ ⊓ LinearMap.ker ((∑ g : G, c (Φ g) • ρ g) - LinearMap.id) := by
+theorem ranges
+    : ∀ (g₁ g₂ N : ℕ) [Fact g₁.Prime] [Fact g₂.Prime] (ι₁ ι₂ G M : Type) [Fintype ι₁] [Fintype ι₂]
+        [DecidableEq ι₁] [DecidableEq ι₂] [Group G] [Fintype G] [AddCommGroup M] [Module ℂ M]
+        (Φ : G ≃* (ι₁ → GlobalTheory.BadShare.GG g₁ N) × (ι₂ → GlobalTheory.BadShare.GG g₂ N))
+        (L₁ : ι₁ → GlobalTheory.BadShare.Lev g₁ N) (L₂ : ι₂ → GlobalTheory.BadShare.Lev g₂ N)
+        (P : Subgroup G) (χ : P → ℂ) (ρ : Representation ℂ G M)
+        [Fintype ((ι₁ → GlobalTheory.BadShare.GG g₁ N) × (ι₂ → GlobalTheory.BadShare.GG g₂ N))]
+        (c : (ι₁ → GlobalTheory.BadShare.GG g₁ N) × (ι₂ → GlobalTheory.BadShare.GG g₂ N) → ℂ),
+      (∀ g : G, g ∈ P ↔ (∀ v, (L₁ v).Mem ((Φ g).1 v)) ∧ ∀ v, (L₂ v).Mem ((Φ g).2 v))
+        → (∀ g : P, χ g = (∏ v, (L₁ v).chi ((Φ g).1 v)) * ∏ v, (L₂ v).chi ((Φ g).2 v))
+        → GlobalTheory.BadShare.conv c c = c
+        → (∀ a, GlobalTheory.BadShare.conv c a = GlobalTheory.BadShare.conv a c)
+        → LinearMap.range (GlobalTheory.BadShare.op (M := M) (ρ.comp Φ.symm.toMonoidHom)
+              (GlobalTheory.BadShare.tens2 (GlobalTheory.BadShare.tens fun v => (L₁ v).e)
+                (GlobalTheory.BadShare.tens fun v => (L₂ v).e)))
+            = eig ρ P χ
+          ∧ LinearMap.range (GlobalTheory.BadShare.op (M := M) (ρ.comp Φ.symm.toMonoidHom)
+              (GlobalTheory.BadShare.conv c
+                (GlobalTheory.BadShare.tens2 (GlobalTheory.BadShare.tens fun v => (L₁ v).e)
+                  (GlobalTheory.BadShare.tens fun v => (L₂ v).e))))
+            = eig ρ P χ ⊓ LinearMap.ker ((∑ g : G, c (Φ g) • ρ g) - LinearMap.id) := by
   intro g₁ g₂ N _ _ ι₁ ι₂ G M _ _ _ _ _ _ _ _ Φ L₁ L₂ P χ ρ _ c hP hχ hcc hc
-  have key : LinearMap.range (GlobalTheory.BadShare.op (M := M) (ρ.comp Φ.symm.toMonoidHom) (GlobalTheory.BadShare.tens2 (GlobalTheory.BadShare.tens fun v => (L₁ v).e) (GlobalTheory.BadShare.tens fun v => (L₂ v).e))) = eig ρ P χ := by
+  have key
+      : LinearMap.range (GlobalTheory.BadShare.op (M := M) (ρ.comp Φ.symm.toMonoidHom)
+          (GlobalTheory.BadShare.tens2 (GlobalTheory.BadShare.tens fun v => (L₁ v).e)
+            (GlobalTheory.BadShare.tens fun v => (L₂ v).e)))
+        = eig ρ P χ := by
     rw [op_comp]
     refine range_sum_eq_eig ρ P χ _ _ (mul_ne_zero (prod_card_ne L₁) (prod_card_ne L₂)) ?_ ?_ ?_
     · intro g hg

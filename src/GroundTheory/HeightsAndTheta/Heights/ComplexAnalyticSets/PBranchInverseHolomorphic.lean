@@ -17,10 +17,11 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Filter Topology
 
-theorem BranchInverseHolomorphic.proof (hdim : BranchFillDimension.Statement)
-    (hopen : NormalOpenMapping.Statement) (hreg : BranchInverseOffHypersurface.Statement)
-    (hext : NormalRiemannExtension.Statement) (hirr : NormalLocallyIrreducible.Statement) :
-    BranchInverseHolomorphic.Statement := by
+theorem BranchInverseHolomorphic.proof
+    (hdim : BranchFillDimension.Statement) (hopen : NormalOpenMapping.Statement)
+    (hreg : BranchInverseOffHypersurface.Statement) (hext : NormalRiemannExtension.Statement)
+    (hirr : NormalLocallyIrreducible.Statement)
+    : BranchInverseHolomorphic.Statement := by
   intro σ _ I h w k r φ B hI hIc hh hw hφd hφi hφZ hB hfill
   set Δ := Metric.ball (0 : Fin k → ℂ) r with hΔ
   have hk := hdim σ I h w k r φ B hI hh hw hφd hφi hφZ hB hfill
@@ -32,9 +33,10 @@ theorem BranchInverseHolomorphic.proof (hdim : BranchFillDimension.Statement)
     rintro _ ⟨t, ht, rfl⟩
     rw [ContinuousWithinAt, hψφ t ht, tendsto_nhds]
     intro V hVo htV
-    obtain ⟨O', hO'o, hO'⟩ := hopen σ I k (V ∩ Δ) φ hI hIc hk (hVo.inter Metric.isOpen_ball)
-      (hφd.mono Set.inter_subset_right) (hφi.mono Set.inter_subset_right)
-      (hφZ.mono_left Set.inter_subset_right)
+    obtain ⟨O', hO'o, hO'⟩ :=
+      hopen σ I k (V ∩ Δ) φ hI hIc hk (hVo.inter Metric.isOpen_ball)
+        (hφd.mono Set.inter_subset_right) (hφi.mono Set.inter_subset_right)
+        (hφZ.mono_left Set.inter_subset_right)
     have hmem : φ t ∈ zeroSetIn I ∩ O' := hO' ▸ Set.mem_image_of_mem φ ⟨htV, ht⟩
     filter_upwards [inter_mem_nhdsWithin (φ '' Δ) (hO'o.mem_nhds hmem.2)] with z hz
     obtain ⟨⟨s, hs, rfl⟩, hzO'⟩ := hz
@@ -46,14 +48,16 @@ theorem BranchInverseHolomorphic.proof (hdim : BranchFillDimension.Statement)
   have hψreg := hreg' Δ φ ψ Metric.isOpen_ball hφd hφi hφZ hψφ
   rw [hO] at hψreg hψc
 
-  have hcoord : ∀ j : Fin k, ∃ g : (σ → ℂ) → ℂ, HolomorphicOnSubset g (zeroSetIn I ∩ O) ∧
-      Set.EqOn g (fun z => ψ z j) ((zeroSetIn I ∩ O) \ {z | eval z h' = 0}) := by
+  have hcoord
+      : ∀ j : Fin k, ∃ g : (σ → ℂ) → ℂ,
+        HolomorphicOnSubset g (zeroSetIn I ∩ O)
+          ∧ Set.EqOn g (fun z => ψ z j) ((zeroSetIn I ∩ O) \ {z | eval z h' = 0}) := by
     intro j
     refine hext σ I h' O (fun z => ψ z j) hI hIc hh' hOo ?_ ?_
     · intro z hz
       obtain ⟨U, hUo, hzU, F, hF, hFeq⟩ := hψreg z hz
-      exact ⟨U, hUo, hzU, fun y => F y j, differentiableOn_pi.mp hF j,
-        fun y hy => congrFun (hFeq hy) j⟩
+      exact
+        ⟨U, hUo, hzU, fun y => F y j, differentiableOn_pi.mp hF j, fun y hy => congrFun (hFeq hy) j⟩
     · refine (Metric.isBounded_closedBall (x := (0 : ℂ)) (r := r)).subset ?_
       rintro _ ⟨z, hz, rfl⟩
       have hz' : z ∈ φ '' Δ := by rw [hO]; exact hz.1
@@ -70,7 +74,8 @@ theorem BranchInverseHolomorphic.proof (hdim : BranchFillDimension.Statement)
     set P := (zeroSetIn I ∩ B') \ {y | eval y h' = 0} with hP
     have hPsub : P ⊆ zeroSetIn I ∩ O := fun y hy => ⟨hy.1.1, hB'O hy.1.2⟩
     have : (𝓝[P] z).NeBot := mem_closure_iff_nhdsWithin_neBot.mp (hdense ⟨hz.1, hzB'⟩)
-    have h1 : Tendsto (g j) (𝓝[P] z) (𝓝 (g j z)) := (((hg j).continuousWithinAt hz).mono hPsub).tendsto
+    have h1 : Tendsto (g j) (𝓝[P] z) (𝓝 (g j z)) :=
+      (((hg j).continuousWithinAt hz).mono hPsub).tendsto
     have h2 : Tendsto (fun y => ψ y j) (𝓝[P] z) (𝓝 (ψ z j)) :=
       (((continuous_apply j).continuousAt.comp_continuousWithinAt (hψc z hz)).mono hPsub).tendsto
     refine tendsto_nhds_unique h1 (h2.congr' ?_)
@@ -80,8 +85,14 @@ theorem BranchInverseHolomorphic.proof (hdim : BranchFillDimension.Statement)
   rw [hO]
   intro z hz
   choose U hUo hzU F hF hFeq using fun j => hg j z hz
-  refine ⟨⋂ j, U j, isOpen_iInter_of_finite hUo, Set.mem_iInter.mpr hzU, fun y j => F j y,
-    differentiableOn_pi.mpr fun j => (hF j).mono (Set.iInter_subset _ j), fun y hy => ?_⟩
+  refine ⟨
+    ⋂ j, U j,
+    isOpen_iInter_of_finite hUo,
+    Set.mem_iInter.mpr hzU,
+    fun y j => F j y,
+    differentiableOn_pi.mpr fun j => (hF j).mono (Set.iInter_subset _ j),
+    fun y hy => ?_
+  ⟩
   funext j
   show ψ y j = F j y
   rw [← hgψ j y hy.1]

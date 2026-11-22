@@ -12,45 +12,52 @@ namespace GlobalTheory
 section SlopeTestRemainingChoices
 variable {G : Type} [Group G] [MeasurableSpace G] [MeasurableMul G]
 
-theorem setIntegral_subgroup_mul_left (ν : Measure G) [ν.IsMulLeftInvariant] {Λ : Subgroup G}
-    (c : Λ) (f : G → ℂ) (s : Set G) :
-    ∫ g in s, f ((c : G) * g) ∂ν = ∫ g in c • s, f g ∂ν := by
+theorem setIntegral_subgroup_mul_left
+    (ν : Measure G) [ν.IsMulLeftInvariant] {Λ : Subgroup G} (c : Λ) (f : G → ℂ) (s : Set G)
+    : ∫ g in s, f ((c : G) * g) ∂ν = ∫ g in c • s, f g ∂ν := by
   have hpre : (fun g : G => (c : G) * g) ⁻¹' (c • s) = s := by
     ext g
     simp [Set.mem_smul_set_iff_inv_smul_mem, Subgroup.smul_def]
-  have h := (measurePreserving_mul_left ν (c : G)).setIntegral_preimage_emb
-    (measurableEmbedding_mulLeft (c : G)) f (c • s)
+  have h :=
+    (measurePreserving_mul_left ν (c : G)).setIntegral_preimage_emb
+      (measurableEmbedding_mulLeft (c : G)) f (c • s)
   rwa [hpre] at h
 
-theorem setLIntegral_subgroup_mul_left (ν : Measure G) [ν.IsMulLeftInvariant] {Λ : Subgroup G}
-    (c : Λ) (f : G → ℝ≥0∞) (s : Set G) :
-    ∫⁻ g in s, f ((c : G) * g) ∂ν = ∫⁻ g in c • s, f g ∂ν := by
+theorem setLIntegral_subgroup_mul_left
+    (ν : Measure G) [ν.IsMulLeftInvariant] {Λ : Subgroup G} (c : Λ) (f : G → ℝ≥0∞) (s : Set G)
+    : ∫⁻ g in s, f ((c : G) * g) ∂ν = ∫⁻ g in c • s, f g ∂ν := by
   have hpre : (fun g : G => (c : G) * g) ⁻¹' (c • s) = s := by
     ext g
     simp [Set.mem_smul_set_iff_inv_smul_mem, Subgroup.smul_def]
-  have h := (measurePreserving_mul_left ν (c : G)).setLIntegral_comp_preimage_emb
-    (measurableEmbedding_mulLeft (c : G)) f (c • s)
+  have h :=
+    (measurePreserving_mul_left ν (c : G)).setLIntegral_comp_preimage_emb
+      (measurableEmbedding_mulLeft (c : G)) f (c • s)
   rwa [hpre] at h
 
-theorem isFundamentalDomain_iUnion_inv_smul {ν : Measure G} [ν.IsMulLeftInvariant]
-    {Λ : Subgroup G} [Countable Λ] {𝓖 : Set G} (h : IsFundamentalDomain Λ 𝓖 ν)
-    (S : Subgroup Λ) [Countable (Λ ⧸ S)] :
-    IsFundamentalDomain (S.map Λ.subtype) (⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖) ν := by
+theorem isFundamentalDomain_iUnion_inv_smul
+    {ν : Measure G} [ν.IsMulLeftInvariant]
+    {Λ : Subgroup G} [Countable Λ]
+    {𝓖 : Set G} (h : IsFundamentalDomain Λ 𝓖 ν)
+    (S : Subgroup Λ) [Countable (Λ ⧸ S)]
+    : IsFundamentalDomain (S.map Λ.subtype) (⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖) ν := by
   refine ⟨.iUnion (fun q => h.nullMeasurableSet_smul q.out⁻¹), ?_, ?_⟩
   · filter_upwards [h.ae_covers] with g hg
     obtain ⟨l, hl⟩ := hg
     have hs : ((QuotientGroup.mk l : Λ ⧸ S).out)⁻¹ * l ∈ S :=
       QuotientGroup.eq.mp (QuotientGroup.out_eq' _)
-    refine ⟨⟨(((QuotientGroup.mk l : Λ ⧸ S).out⁻¹ * l : Λ) : G), ⟨_, hs, rfl⟩⟩,
-      Set.mem_iUnion.2 ⟨QuotientGroup.mk l, ?_⟩⟩
+    refine ⟨
+      ⟨(((QuotientGroup.mk l : Λ ⧸ S).out⁻¹ * l : Λ) : G), ⟨_, hs, rfl⟩⟩,
+      Set.mem_iUnion.2 ⟨QuotientGroup.mk l, ?_⟩
+    ⟩
     rw [Set.mem_inv_smul_set_iff]
     simpa [Subgroup.smul_def, mul_assoc] using hl
   · rintro ⟨s, hs⟩ ⟨t, ht⟩ hst
     obtain ⟨s', hs', rfl⟩ := Subgroup.mem_map.1 hs
     obtain ⟨t', ht', rfl⟩ := Subgroup.mem_map.1 ht
-    have hsub : (⟨Λ.subtype s', hs⟩ : S.map Λ.subtype) • (⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖) ∩
-        (⟨Λ.subtype t', ht⟩ : S.map Λ.subtype) • (⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖) ⊆
-        ⋃ q : Λ ⧸ S, ⋃ r : Λ ⧸ S, ((s' * (q.out)⁻¹) • 𝓖 ∩ (t' * (r.out)⁻¹) • 𝓖) := by
+    have hsub
+        : (⟨Λ.subtype s', hs⟩ : S.map Λ.subtype) • (⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖)
+            ∩ (⟨Λ.subtype t', ht⟩ : S.map Λ.subtype) • (⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖)
+          ⊆ ⋃ q : Λ ⧸ S, ⋃ r : Λ ⧸ S, ((s' * (q.out)⁻¹) • 𝓖 ∩ (t' * (r.out)⁻¹) • 𝓖) := by
       rintro x ⟨hx1, hx2⟩
       rw [Set.mem_smul_set_iff_inv_smul_mem, Set.mem_iUnion] at hx1 hx2
       obtain ⟨q, hq⟩ := hx1
@@ -83,16 +90,25 @@ theorem isFundamentalDomain_iUnion_inv_smul {ν : Measure G} [ν.IsMulLeftInvari
 
 end SlopeTestRemainingChoices
 
-theorem tsum_setIntegral_eq_zero_of_stabilizer :
-    ∀ {G X : Type} [Group G] [MeasurableSpace G] [MeasurableMul G] (ν : Measure G)
-    [ν.IsMulLeftInvariant], SFinite ν → ∀ (Λ : Subgroup G), Countable Λ → ∀ 𝓖 : Set G,
-    IsFundamentalDomain Λ 𝓖 ν → ∀ (a : Λ → X → X), (∀ x, a 1 x = x) →
-    (∀ γ δ x, a (γ * δ) x = a γ (a δ x)) → ∀ F : X → G → ℂ,
-    (∀ γ x g, F (a γ x) g = F x ((γ : G)⁻¹ * g)) → (∀ x, AEStronglyMeasurable (F x) ν) →
-    ∑' x, ∫⁻ g in 𝓖, ‖F x g‖ₑ ∂ν ≠ ⊤ →
-    (∀ x (Γ : Subgroup G), (∀ g, g ∈ Γ ↔ ∃ h : g ∈ Λ, a ⟨g, h⟩ x = x) → ∀ 𝓓 : Set G,
-      IsFundamentalDomain Γ 𝓓 ν → IntegrableOn (F x) 𝓓 ν → ∫ g in 𝓓, F x g ∂ν = 0) →
-    ∑' x, ∫ g in 𝓖, F x g ∂ν = 0 := by
+theorem tsum_setIntegral_eq_zero_of_stabilizer
+    : ∀ {G X : Type} [Group G] [MeasurableSpace G] [MeasurableMul G] (ν : Measure G)
+        [ν.IsMulLeftInvariant],
+      SFinite ν
+        → ∀ (Λ : Subgroup G),
+          Countable Λ
+            → ∀ 𝓖 : Set G,
+              IsFundamentalDomain Λ 𝓖 ν
+                → ∀ (a : Λ → X → X),
+                  (∀ x, a 1 x = x) → (∀ γ δ x, a (γ * δ) x = a γ (a δ x))
+                    → ∀ F : X → G → ℂ,
+                      (∀ γ x g, F (a γ x) g = F x ((γ : G)⁻¹ * g))
+                        → (∀ x, AEStronglyMeasurable (F x) ν) → ∑' x, ∫⁻ g in 𝓖, ‖F x g‖ₑ ∂ν ≠ ⊤
+                        → (∀ x (Γ : Subgroup G),
+                          (∀ g, g ∈ Γ ↔ ∃ h : g ∈ Λ, a ⟨g, h⟩ x = x)
+                            → ∀ 𝓓 : Set G,
+                              IsFundamentalDomain Γ 𝓓 ν → IntegrableOn (F x) 𝓓 ν
+                                → ∫ g in 𝓓, F x g ∂ν = 0)
+                        → ∑' x, ∫ g in 𝓖, F x g ∂ν = 0 := by
   intro G X _ _ _ ν _ _ Λ hΛ 𝓖 h𝓖 a ha1 ham F hF hmeas hfin hzero
   letI : MulAction Λ X := { smul := a, one_smul := ha1, mul_smul := ham }
   have hsmul : ∀ (γ : Λ) (x : X), γ • x = a γ x := fun _ _ => rfl
@@ -107,11 +123,11 @@ theorem tsum_setIntegral_eq_zero_of_stabilizer :
     simp only [hsmul, hF, Subgroup.coe_inv]
   have hsum : Summable T := by
     refine Summable.of_norm ?_
-    have h1 : ∑' x, ‖T x‖ₑ ≠ ⊤ := ne_top_of_le_ne_top hfin
-      (ENNReal.tsum_le_tsum fun x => enorm_integral_le_lintegral_enorm _)
+    have h1 : ∑' x, ‖T x‖ₑ ≠ ⊤ :=
+      ne_top_of_le_ne_top hfin (ENNReal.tsum_le_tsum fun x => enorm_integral_le_lintegral_enorm _)
     simpa using ENNReal.summable_toReal h1
-  have horb : ∀ x₀ : X,
-      HasSum (fun q : Λ ⧸ stabilizer Λ x₀ => T (ofQuotientStabilizer Λ x₀ q)) 0 := by
+  have horb
+      : ∀ x₀ : X, HasSum (fun q : Λ ⧸ stabilizer Λ x₀ => T (ofQuotientStabilizer Λ x₀ q)) 0 := by
     intro x₀
     set S := stabilizer Λ x₀ with hSdef
     haveI : Countable (Λ ⧸ S) := QuotientGroup.mk_surjective.countable
@@ -130,7 +146,8 @@ theorem tsum_setIntegral_eq_zero_of_stabilizer :
     have hint : IntegrableOn (F x₀) (⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖) ν := by
       refine ⟨(hmeas x₀).restrict, ?_⟩
       show ∫⁻ g in ⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖, ‖F x₀ g‖ₑ ∂ν < ⊤
-      calc ∫⁻ g in ⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖, ‖F x₀ g‖ₑ ∂ν
+      calc
+        ∫⁻ g in ⋃ q : Λ ⧸ S, (q.out)⁻¹ • 𝓖, ‖F x₀ g‖ₑ ∂ν
           ≤ ∑' q : Λ ⧸ S, ∫⁻ g in (q.out)⁻¹ • 𝓖, ‖F x₀ g‖ₑ ∂ν := lintegral_iUnion_le _ _
         _ = ∑' q : Λ ⧸ S, ∫⁻ g in 𝓖, ‖F (q.out • x₀) g‖ₑ ∂ν := by simp only [hL]
         _ ≤ ∑' x, ∫⁻ g in 𝓖, ‖F x g‖ₑ ∂ν :=

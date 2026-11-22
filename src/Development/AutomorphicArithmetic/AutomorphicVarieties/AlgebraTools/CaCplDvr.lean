@@ -10,10 +10,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.IsCplAt.dvr :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] (π : R), Prime π →
-      ∀ (B : Type) [CommRing B] [IsLocalRing B] [Algebra R B], IsCplAt R (Ideal.span {π}) B →
-      ∃ _ : IsDomain B, IsDiscreteValuationRing B ∧ Irreducible (algebraMap R B π) := by
+theorem UpperTheory.V.AlgebraTools.IsCplAt.dvr
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] (π : R),
+      Prime π
+        → ∀ (B : Type) [CommRing B] [IsLocalRing B] [Algebra R B],
+          IsCplAt R (Ideal.span {π}) B
+            → ∃ _ : IsDomain B, IsDiscreteValuationRing B ∧ Irreducible (algebraMap R B π) := by
   intro R _ _ _ π hπ B _ _ _ h
   haveI : IsNoetherianRing B := h.noeth
   set f := algebraMap R B with hf
@@ -38,7 +40,8 @@ theorem UpperTheory.V.AlgebraTools.IsCplAt.dvr :
     apply mul_right_cancel₀ hπn
     rw [ht]
     ring
-  have hK := Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal B) (Ideal.IsMaximal.ne_top inferInstance)
+  have hK :=
+    Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal B) (Ideal.IsMaximal.ne_top inferInstance)
   have hfac : ∀ x : B, x ≠ 0 → ∃ (k : ℕ) (u : B), IsUnit u ∧ x = f π ^ k * u := by
     intro x hx
     classical

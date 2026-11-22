@@ -23,9 +23,9 @@ lemma ite_zero_eq_ite_smul {A : Type*} [Ring A] [Algebra ℂ A] (P : Prop) [Deci
     (if P then X else 0) = (if P then (1 : ℂ) else 0) • X := by
   split_ifs <;> simp
 
-private theorem Tm_eq_smul_one_add {A : Type*} [Ring A] [Algebra ℂ A] {n : ℕ}
-    (E : Fin n → Fin n → A) (x : ℂ) (a b : Fin n) :
-    Tm E x a b = (x * (if a = b then (1 : ℂ) else 0)) • (1 : A) + E a b := by
+private theorem Tm_eq_smul_one_add
+    {A : Type*} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A) (x : ℂ) (a b : Fin n)
+    : Tm E x a b = (x * (if a = b then (1 : ℂ) else 0)) • (1 : A) + E a b := by
   rw [shiftedGenerator_eq_ite_smul_add, ite_zero_eq_mul_ite]
 
 lemma shiftedGenerator_quadratic {A : Type*} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A) (hE : GlRel E)
@@ -125,8 +125,11 @@ lemma prod_ofFn_alternating_sum {A : Type*} [Ring A] {t : ℕ} (f₁ f₂ f₃ f
     drop_ofFn_congr f₄ f₁ (i + 2) (fun k hk => h₄ k (by omega) (by omega)),
     sandwich_alternating_sum, hmid, mul_zero, zero_mul]
 
-def exchangeTwo_self_eq_one {A : Type*} [Ring A] [Algebra ℂ A] {n t : ℕ} (E : Fin n → Fin n → A)
-    (a b : Fin t → Fin n) (u : ℂ) (σ : Equiv.Perm (Fin t)) : A :=
+def exchangeTwo_self_eq_one
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    {n t : ℕ} (E : Fin n → Fin n → A) (a b : Fin t → Fin n)
+    (u : ℂ) (σ : Equiv.Perm (Fin t))
+    : A :=
   (List.ofFn fun k : Fin t => Tm E (u - (k : ℂ)) (a (σ k)) (b k)).prod
 
 lemma quantumMinor_eq_sum_term {A : Type*} [Ring A] [Algebra ℂ A] {n t : ℕ} (E : Fin n → Fin n → A)

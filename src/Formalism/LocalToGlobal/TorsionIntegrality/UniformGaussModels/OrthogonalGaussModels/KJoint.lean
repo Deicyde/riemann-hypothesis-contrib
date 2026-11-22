@@ -19,20 +19,23 @@ open Formalism.G (unitBall)
 
 namespace KJ
 
-theorem phC_eq (p : ℕ) [Fact p.Prime] (L : PeriodPair) (ι : ℂ ≃+* ℂ_[p]) :
-    phC p L ι = Formalism.L2.Th1.E.phL p L ι := by
+theorem phC_eq (p : ℕ) [Fact p.Prime] (L : PeriodPair) (ι : ℂ ≃+* ℂ_[p])
+    : phC p L ι = Formalism.L2.Th1.E.phL p L ι := by
   unfold phC Formalism.L2.Th1.E.phL
   rw [Formalism.L2.Th1.E.wpBridge p L ι]
 
-theorem phSum_one {K : Type} [Field K] {n : Type} [Fintype n] (ph : PowerSeries K) :
-    Formalism.L2.Th1.G.phSum (fun _ : n => (1 : K)) ph = Formalism.L2.Th1.E.phSum ph := by
+theorem phSum_one {K : Type} [Field K] {n : Type} [Fintype n] (ph : PowerSeries K)
+    : Formalism.L2.Th1.G.phSum (fun _ : n => (1 : K)) ph = Formalism.L2.Th1.E.phSum ph := by
   unfold Formalism.L2.Th1.G.phSum Formalism.L2.Th1.E.phSum Formalism.InvariantFactorPaths.G7.at1
   exact Finset.sum_congr rfl fun i _ => one_smul _ _
 
-theorem toZ_thetaProd {K : Type} [Field K] {κ n : Type} [Fintype κ] [Fintype n] {linv : PowerSeries K}
-    (h0 : PowerSeries.constantCoeff linv = 0) (r : κ → K) (H : κ → n → PowerSeries K) :
-    Formalism.L2.Th1.G.toZ linv (Formalism.L2.Th1.E.thetaProd r H) =
-      Formalism.L2.Th1.E.thetaProd r (fun k i => PowerSeries.subst linv (H k i)) := by
+theorem toZ_thetaProd
+    {K : Type} [Field K]
+    {κ n : Type} [Fintype κ] [Fintype n]
+    {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0)
+    (r : κ → K) (H : κ → n → PowerSeries K)
+    : Formalism.L2.Th1.G.toZ linv (Formalism.L2.Th1.E.thetaProd r H)
+      = Formalism.L2.Th1.E.thetaProd r (fun k i => PowerSeries.subst linv (H k i)) := by
   unfold Formalism.L2.Th1.E.thetaProd Formalism.InvariantFactorPaths.G7.at1
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← Formalism.L2.Th1.G.toZHom_apply h0, map_sum]

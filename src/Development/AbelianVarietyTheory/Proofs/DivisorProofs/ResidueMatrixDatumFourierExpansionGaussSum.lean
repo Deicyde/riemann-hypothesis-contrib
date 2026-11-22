@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MatrixG
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR
 open Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
-open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.OnTies GlobalTheory.OnCmp GlobalTheory.BaseCmp
+open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.OnTies
+  GlobalTheory.OnCmp GlobalTheory.BaseCmp
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Classical
@@ -21,11 +24,14 @@ section Local
 
 variable {k : Type} [Field k] [Fintype k]
 
-theorem sum_char_trace {n r : ℕ} {ψ : AddChar k ℂ} (hψ : ψ.IsPrimitive) (w : Matrix (Fin n) (Fin r) k) :
-    ∑ x : Matrix (Fin r) (Fin n) k, ψ (Matrix.trace (x * w)) =
-      if w = 0 then ((Nat.card k : ℂ) ^ (n * r)) else 0 := by
+theorem sum_char_trace
+    {n r : ℕ} {ψ : AddChar k ℂ} (hψ : ψ.IsPrimitive) (w : Matrix (Fin n) (Fin r) k)
+    : ∑ x : Matrix (Fin r) (Fin n) k, ψ (Matrix.trace (x * w))
+      = if w = 0 then ((Nat.card k : ℂ) ^ (n * r)) else 0 := by
   let L : Matrix (Fin r) (Fin n) k →+ k :=
-    AddMonoidHom.mk' (fun x => Matrix.trace (x * w)) (fun a b => by rw [Matrix.add_mul, Matrix.trace_add])
+    AddMonoidHom.mk'
+      (fun x => Matrix.trace (x * w))
+      (fun a b => by rw [Matrix.add_mul, Matrix.trace_add])
   have h := AddChar.sum_eq_ite (ψ.compAddMonoidHom L)
   have h2 : ψ.compAddMonoidHom L = 0 ↔ w = 0 := by
     constructor
@@ -49,34 +55,45 @@ theorem sum_char_trace {n r : ℕ} {ψ : AddChar k ℂ} (hψ : ψ.IsPrimitive) (
     have : Fintype.card (Matrix (Fin r) (Fin n) k) = Fintype.card k ^ (n * r) := by
       change Fintype.card (Fin r → Fin n → k) = _
       simp [pow_mul]
-    rw [this]; push_cast; rfl
+    rw [this]
+    push_cast
+    rfl
   · rw [if_neg (fun h => hw (h2.1 h)), if_neg hw]
 
-theorem inversion {n r : ℕ} {ψ : AddChar k ℂ} (hψ : ψ.IsPrimitive) (f : Matrix (Fin n) (Fin r) k → ℂ)
-    (u : Matrix (Fin n) (Fin r) k) :
-    f u = ∑ x : Matrix (Fin r) (Fin n) k,
-      (((Nat.card k : ℂ) ^ (n * r))⁻¹ * ∑ v, f v * ψ (Matrix.trace (-x * v))) * ψ (Matrix.trace (x * u)) := by
-  have hc : ((Nat.card k : ℂ) ^ (n * r)) ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.2 Nat.card_pos.ne')
-  have h1 : ∀ x : Matrix (Fin r) (Fin n) k,
-      (((Nat.card k : ℂ) ^ (n * r))⁻¹ * ∑ v, f v * ψ (Matrix.trace (-x * v))) * ψ (Matrix.trace (x * u)) =
-      ∑ v, ((Nat.card k : ℂ) ^ (n * r))⁻¹ * f v * ψ (Matrix.trace (x * (u - v))) := fun x => by
-    rw [Finset.mul_sum, Finset.sum_mul]
-    refine Finset.sum_congr rfl fun v _ => ?_
-    rw [mul_assoc, mul_assoc, mul_assoc, ← AddChar.map_add_eq_mul, ← Matrix.trace_add, Matrix.mul_sub, Matrix.neg_mul,
-      neg_add_eq_sub]
-  simp only [h1]
-  rw [Finset.sum_comm, Finset.sum_eq_single u]
-  · rw [← Finset.mul_sum, sum_char_trace hψ, if_pos (sub_self u)]
-    field_simp
-  · intro v _ hv
-    rw [← Finset.mul_sum, sum_char_trace hψ, if_neg (fun h => hv (sub_eq_zero.1 h).symm), mul_zero]
-  · simp
+theorem inversion
+    {n r : ℕ} {ψ : AddChar k ℂ}
+    (hψ : ψ.IsPrimitive) (f : Matrix (Fin n) (Fin r) k → ℂ) (u : Matrix (Fin n) (Fin r) k)
+    : f u
+      = ∑ x : Matrix (Fin r) (Fin n) k,
+        (((Nat.card k : ℂ) ^ (n * r))⁻¹ * ∑ v, f v * ψ (Matrix.trace (-x * v))) * ψ (Matrix.trace (x * u)) :=
+  by
+    have hc : ((Nat.card k : ℂ) ^ (n * r)) ≠ 0 :=
+      pow_ne_zero _ (Nat.cast_ne_zero.2 Nat.card_pos.ne')
+    have h1
+        : ∀ x : Matrix (Fin r) (Fin n) k,
+          (((Nat.card k : ℂ) ^ (n * r))⁻¹ * ∑ v, f v * ψ (Matrix.trace (-x * v)))
+              * ψ (Matrix.trace (x * u))
+            = ∑ v, ((Nat.card k : ℂ) ^ (n * r))⁻¹ * f v * ψ (Matrix.trace (x * (u - v))) := fun x =>
+      by
+        rw [Finset.mul_sum, Finset.sum_mul]
+        refine Finset.sum_congr rfl fun v _ => ?_
+        rw [mul_assoc, mul_assoc, mul_assoc, ← AddChar.map_add_eq_mul, ← Matrix.trace_add,
+          Matrix.mul_sub, Matrix.neg_mul, neg_add_eq_sub]
+    simp only [h1]
+    rw [Finset.sum_comm, Finset.sum_eq_single u]
+    · rw [← Finset.mul_sum, sum_char_trace hψ, if_pos (sub_self u)]
+      field_simp
+    · intro v _ hv
+      rw [← Finset.mul_sum, sum_char_trace hψ, if_neg (fun h => hv (sub_eq_zero.1 h).symm),
+        mul_zero]
+    · simp
 
-def embTop (n : ℕ) {r : ℕ} (g : Matrix (Fin r) (Fin r) k) : Matrix (Fin n) (Fin r) k :=
-  fun i j => if h : i.val < r then g ⟨i.val, h⟩ j else 0
+def embTop (n : ℕ) {r : ℕ} (g : Matrix (Fin r) (Fin r) k) : Matrix (Fin n) (Fin r) k := fun i j =>
+  if h : i.val < r then g ⟨i.val, h⟩ j else 0
 
 omit [Fintype k] in
-theorem topL_embTop {n r : ℕ} (h : r ≤ n) (g : Matrix (Fin r) (Fin r) k) : topL r (embTop n g) = g := by
+theorem topL_embTop {n r : ℕ} (h : r ≤ n) (g : Matrix (Fin r) (Fin r) k)
+    : topL r (embTop n g) = g := by
   ext i j
   have : i.val < n := lt_of_lt_of_le i.2 h
   simp [topL, embTop, this]
@@ -87,15 +104,17 @@ theorem lowZero_embTop {n r : ℕ} (g : Matrix (Fin r) (Fin r) k) : LowZero r (e
   simp [embTop, not_lt.2 hi]
 
 omit [Fintype k] in
-theorem embTop_topL {n r : ℕ} {u : Matrix (Fin n) (Fin r) k} (hu : LowZero r u) : embTop n (topL r u) = u := by
+theorem embTop_topL {n r : ℕ} {u : Matrix (Fin n) (Fin r) k} (hu : LowZero r u)
+    : embTop n (topL r u) = u := by
   ext i j
   by_cases hi : i.val < r
   · simp [topL, embTop, hi]
   · simp [embTop, hi, hu i j (not_lt.1 hi) j.2]
 
 omit [Fintype k] in
-theorem trace_embTop {n r : ℕ} (h : r ≤ n) (x : Matrix (Fin r) (Fin n) k) (g : Matrix (Fin r) (Fin r) k) :
-    Matrix.trace (x * embTop n g) = Matrix.trace (topL r x * g) := by
+theorem trace_embTop
+    {n r : ℕ} (h : r ≤ n) (x : Matrix (Fin r) (Fin n) k) (g : Matrix (Fin r) (Fin r) k)
+    : Matrix.trace (x * embTop n g) = Matrix.trace (topL r x * g) := by
   obtain ⟨t, rfl⟩ := Nat.exists_eq_add_of_le h
   simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -104,18 +123,22 @@ theorem trace_embTop {n r : ℕ} (h : r ≤ n) (x : Matrix (Fin r) (Fin n) k) (g
   simp [embTop, topL, h2]
   rfl
 
-theorem transform {n r : ℕ} (h : r ≤ n) {ψ : AddChar k ℂ} (hψ : ψ.IsPrimitive) {ξ : kˣ →* ℂˣ} (hξ : ξ ≠ 1)
-    (x : Matrix (Fin r) (Fin n) k) :
-    ∑ v : Matrix (Fin n) (Fin r) k,
-      (if h : LowZero r v ∧ IsUnit (topL r v).det then ((ξ h.2.unit : ℂˣ) : ℂ) ^ (-1 : ℤ) else 0) * ψ (Matrix.trace (x * v)) =
-      (∑ g : GL (Fin r) k, (((ξ (Matrix.GeneralLinearGroup.det g))⁻¹ : ℂˣ) : ℂ) *
-        ψ (Matrix.trace (g : Matrix (Fin r) (Fin r) k))) *
-      (if h : IsUnit (topL r x).det then ((ξ h.unit : ℂˣ) : ℂ) else 0) := by
+theorem transform
+    {n r : ℕ} (h : r ≤ n)
+    {ψ : AddChar k ℂ} (hψ : ψ.IsPrimitive)
+    {ξ : kˣ →* ℂˣ} (hξ : ξ ≠ 1)
+    (x : Matrix (Fin r) (Fin n) k)
+    : ∑ v : Matrix (Fin n) (Fin r) k,
+        (if h : LowZero r v ∧ IsUnit (topL r v).det then ((ξ h.2.unit : ℂˣ) : ℂ) ^ (-1 : ℤ) else 0) * ψ (Matrix.trace (x * v))
+      = (∑ g : GL (Fin r) k, (((ξ (Matrix.GeneralLinearGroup.det g))⁻¹ : ℂˣ) : ℂ) *
+          ψ (Matrix.trace (g : Matrix (Fin r) (Fin r) k)))
+        * (if h : IsUnit (topL r x).det then ((ξ h.unit : ℂˣ) : ℂ) else 0) := by
   obtain ⟨h0, h1⟩ := GlobalTheory.matrixGaussSum_singular_and_invertible k ℂ ψ ξ r hψ hξ
-  have step : ∑ v : Matrix (Fin n) (Fin r) k,
-      (if h : LowZero r v ∧ IsUnit (topL r v).det then ((ξ h.2.unit : ℂˣ) : ℂ) ^ (-1 : ℤ) else 0) * ψ (Matrix.trace (x * v)) =
-      ∑ g : GL (Fin r) k, (((ξ (Matrix.GeneralLinearGroup.det g))⁻¹ : ℂˣ) : ℂ) *
-        ψ (Matrix.trace (topL r x * (g : Matrix (Fin r) (Fin r) k))) := by
+  have step
+      : ∑ v : Matrix (Fin n) (Fin r) k,
+          (if h : LowZero r v ∧ IsUnit (topL r v).det then ((ξ h.2.unit : ℂˣ) : ℂ) ^ (-1 : ℤ) else 0) * ψ (Matrix.trace (x * v))
+        = ∑ g : GL (Fin r) k, (((ξ (Matrix.GeneralLinearGroup.det g))⁻¹ : ℂˣ) : ℂ) *
+            ψ (Matrix.trace (topL r x * (g : Matrix (Fin r) (Fin r) k))) := by
     symm
     apply Finset.sum_of_injOn (fun g : GL (Fin r) k => embTop n (g : Matrix (Fin r) (Fin r) k))
     · intro a _ b _ hab
@@ -132,7 +155,8 @@ theorem transform {n r : ℕ} (h : r ≤ n) {ψ : AddChar k ℂ} (hψ : ψ.IsPri
       have hx : IsUnit (topL r (embTop n (g : Matrix (Fin r) (Fin r) k))).det := by
         rw [topL_embTop h]; exact (Matrix.isUnit_iff_isUnit_det _).1 g.isUnit
       have hdet : hx.unit = Matrix.GeneralLinearGroup.det g := Units.ext (by simp [topL_embTop h])
-      rw [dif_pos ⟨lowZero_embTop _, hx⟩, trace_embTop h, hdet, zpow_neg_one, Units.val_inv_eq_inv_val]
+      rw [dif_pos ⟨lowZero_embTop _, hx⟩, trace_embTop h, hdet, zpow_neg_one,
+        Units.val_inv_eq_inv_val]
   rw [step]
   by_cases hy : IsUnit (topL r x).det
   · have hm := (Matrix.isUnit_iff_isUnit_det _).2 hy
@@ -147,9 +171,9 @@ theorem transform {n r : ℕ} (h : r ≤ n) {ψ : AddChar k ℂ} (hψ : ψ.IsPri
 
 end Local
 
-theorem dite_prod {ι : Type} (Q : Finset ι) (p : ι → Prop) (f : ∀ i, p i → ℂ) :
-    (if h : ∀ i ∈ Q, p i then ∏ i ∈ Q.attach, f i.1 (h i.1 i.2) else 0) =
-      ∏ i ∈ Q.attach, if h : p i.1 then f i.1 h else 0 := by
+theorem dite_prod {ι : Type} (Q : Finset ι) (p : ι → Prop) (f : ∀ i, p i → ℂ)
+    : (if h : ∀ i ∈ Q, p i then ∏ i ∈ Q.attach, f i.1 (h i.1 i.2) else 0)
+      = ∏ i ∈ Q.attach, if h : p i.1 then f i.1 h else 0 := by
   split_ifs with h
   · exact Finset.prod_congr rfl fun i _ => (dif_pos (h i.1 i.2)).symm
   · push_neg at h

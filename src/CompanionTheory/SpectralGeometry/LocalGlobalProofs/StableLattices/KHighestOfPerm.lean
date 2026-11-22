@@ -15,19 +15,22 @@ open CompanionTheory.RgExh CompanionTheory.RgExh.Fin
 
 variable {n : ℕ}
 
-theorem kHighest_of_perm {V : Type} [AddCommGroup V] [Module ℂ V] {ε : Fin n → Bool} {s : Equiv.Perm (Fin n)}
-    (hs : ∀ a b, a < b → ε (s a) = ε (s b) → s a < s b) {E : Fin n → Fin n → Module.End ℂ V}
-    {μ : Fin n → ℝ} {x : V} (h : KHighest (ε ∘ s) (fun a b => E (s a) (s b)) μ x) :
-    KHighest ε E (μ ∘ s.symm) x := by
+theorem kHighest_of_perm
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {ε : Fin n → Bool} {s : Equiv.Perm (Fin n)} (hs : ∀ a b, a < b → ε (s a) = ε (s b) → s a < s b)
+    {E : Fin n → Fin n → Module.End ℂ V} {μ : Fin n → ℝ} {x : V}
+    (h : KHighest (ε ∘ s) (fun a b => E (s a) (s b)) μ x)
+    : KHighest ε E (μ ∘ s.symm) x := by
   refine ⟨fun a => ?_, fun a b hab he => ?_⟩
   · simpa using h.1 (s.symm a)
   · have h1 : (ε ∘ s) (s.symm a) = (ε ∘ s) (s.symm b) := by simpa using he
     simpa using h.2 (s.symm a) (s.symm b) (GlobalTheory.DSId.PermK.mono_symm hs a b hab h1) h1
 
-theorem kHighest_perm {V : Type} [AddCommGroup V] [Module ℂ V] {ε : Fin n → Bool} {s : Equiv.Perm (Fin n)}
-    (hs : ∀ a b, a < b → ε (s a) = ε (s b) → s a < s b) {E : Fin n → Fin n → Module.End ℂ V}
-    {μ : Fin n → ℝ} {x : V} (h : KHighest ε E (μ ∘ s.symm) x) :
-    KHighest (ε ∘ s) (fun a b => E (s a) (s b)) μ x := by
+theorem kHighest_perm
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {ε : Fin n → Bool} {s : Equiv.Perm (Fin n)} (hs : ∀ a b, a < b → ε (s a) = ε (s b) → s a < s b)
+    {E : Fin n → Fin n → Module.End ℂ V} {μ : Fin n → ℝ} {x : V} (h : KHighest ε E (μ ∘ s.symm) x)
+    : KHighest (ε ∘ s) (fun a b => E (s a) (s b)) μ x := by
   refine ⟨fun a => ?_, fun a b hab he => h.2 _ _ (hs a b hab he) he⟩
   simpa using h.1 (s a)
 

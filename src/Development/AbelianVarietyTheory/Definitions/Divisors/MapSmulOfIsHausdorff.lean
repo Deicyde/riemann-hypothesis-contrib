@@ -17,7 +17,8 @@ noncomputable section
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.PDiv GlobalTheory.ChTor GlobalTheory.EigenSplit
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -29,11 +30,15 @@ variable (p : ℕ) (M : Type) [CommGroup M]
 
 def tateSeq : Subgroup (ℕ → M) where
   carrier := {s | ∀ n, s n ^ p ^ n = 1 ∧ s (n + 1) ^ p = s n}
-  mul_mem' := fun {s t} hs ht n => ⟨by rw [Pi.mul_apply, mul_pow, (hs n).1, (ht n).1, _root_.mul_one],
-    by rw [Pi.mul_apply, mul_pow, (hs n).2, (ht n).2, Pi.mul_apply]⟩
+  mul_mem' := fun {s t} hs ht n => ⟨
+    by rw [Pi.mul_apply, mul_pow, (hs n).1, (ht n).1, _root_.mul_one],
+    by rw [Pi.mul_apply, mul_pow, (hs n).2, (ht n).2, Pi.mul_apply]
+  ⟩
   one_mem' := fun _ => ⟨one_pow _, one_pow _⟩
-  inv_mem' := fun {s} hs n => ⟨by rw [Pi.inv_apply, inv_pow, (hs n).1, inv_one],
-    by rw [Pi.inv_apply, inv_pow, (hs n).2, Pi.inv_apply]⟩
+  inv_mem' := fun {s} hs n => ⟨
+    by rw [Pi.inv_apply, inv_pow, (hs n).1, inv_one],
+    by rw [Pi.inv_apply, inv_pow, (hs n).2, Pi.inv_apply]
+  ⟩
 
 def Tate : Type := Additive (tateSeq p M)
 
@@ -52,16 +57,22 @@ theorem ext {s t : Tate p M} (h : ∀ n, s.lev n = t.lev n) : s = t := by
 def mk (s : ℕ → M) (h : ∀ n, s n ^ p ^ n = 1 ∧ s (n + 1) ^ p = s n) : Tate p M :=
   Additive.ofMul (α := tateSeq p M) ⟨s, h⟩
 
-@[simp] theorem lev_mk (s : ℕ → M) (h : ∀ n, s n ^ p ^ n = 1 ∧ s (n + 1) ^ p = s n) (n : ℕ) :
-    (mk s h).lev n = s n := rfl
+@[simp]
+theorem lev_mk (s : ℕ → M) (h : ∀ n, s n ^ p ^ n = 1 ∧ s (n + 1) ^ p = s n) (n : ℕ)
+    : (mk s h).lev n = s n :=
+  rfl
 
-theorem lev_pow (t : Tate p M) (n : ℕ) : t.lev n ^ p ^ n = 1 := ((Additive.toMul (α := tateSeq p M) t).2 n).1
+theorem lev_pow (t : Tate p M) (n : ℕ) : t.lev n ^ p ^ n = 1 :=
+  ((Additive.toMul (α := tateSeq p M) t).2 n).1
 
-theorem lev_succ (t : Tate p M) (n : ℕ) : t.lev (n + 1) ^ p = t.lev n := ((Additive.toMul (α := tateSeq p M) t).2 n).2
+theorem lev_succ (t : Tate p M) (n : ℕ) : t.lev (n + 1) ^ p = t.lev n :=
+  ((Additive.toMul (α := tateSeq p M) t).2 n).2
 
-@[simp] theorem lev_add (s t : Tate p M) (n : ℕ) : (s + t).lev n = s.lev n * t.lev n := rfl
+@[simp]
+theorem lev_add (s t : Tate p M) (n : ℕ) : (s + t).lev n = s.lev n * t.lev n := rfl
 
-@[simp] theorem lev_zero (n : ℕ) : (0 : Tate p M).lev n = 1 := rfl
+@[simp]
+theorem lev_zero (n : ℕ) : (0 : Tate p M).lev n = 1 := rfl
 
 theorem lev_add_pow (t : Tate p M) (n k : ℕ) : t.lev (n + k) ^ p ^ k = t.lev n := by
   induction k with
@@ -73,9 +84,13 @@ theorem lev_add_pow (t : Tate p M) (n k : ℕ) : t.lev (n + k) ^ p ^ k = t.lev n
 variable [Fact p.Prime]
 
 instance : SMul ℤ_[p] (Tate p M) where
-  smul a t := mk (fun n => t.lev n ^ digit n a) fun n =>
-    ⟨by rw [← pow_mul, mul_comm, pow_mul, lev_pow, one_pow],
-      by rw [← pow_mul, mul_comm, pow_mul, lev_succ, pow_digit_succ (t.lev_pow n)]⟩
+  smul a t :=
+    mk
+      (fun n => t.lev n ^ digit n a)
+      fun n => ⟨
+        by rw [← pow_mul, mul_comm, pow_mul, lev_pow, one_pow],
+        by rw [← pow_mul, mul_comm, pow_mul, lev_succ, pow_digit_succ (t.lev_pow n)]
+      ⟩
 
 theorem lev_smul (a : ℤ_[p]) (t : Tate p M) (n : ℕ) : (a • t).lev n = t.lev n ^ digit n a := rfl
 
@@ -87,20 +102,25 @@ instance : Module ℤ_[p] (Tate p M) where
   add_smul a b t := ext fun n => pow_digit_add (t.lev_pow n) a b
   zero_smul t := ext fun n => by rw [lev_smul, digit_zero, pow_zero, lev_zero]
 
-
 variable (p) in
 def map {M' : Type} [CommGroup M'] (f : M →* M') : Tate p M →ₗ[ℤ_[p]] Tate p M' where
-  toFun t := mk (fun n => f (t.lev n)) fun n =>
-    ⟨by rw [← map_pow, lev_pow, map_one], by rw [← map_pow, lev_succ]⟩
+  toFun t :=
+    mk
+      (fun n => f (t.lev n))
+      fun n => ⟨by rw [← map_pow, lev_pow, map_one], by rw [← map_pow, lev_succ]⟩
   map_add' _ _ := ext fun _ => map_mul f _ _
   map_smul' _ _ := ext fun _ => map_pow f _ _
 
-@[simp] theorem lev_map {M' : Type} [CommGroup M'] (f : M →* M') (t : Tate p M) (n : ℕ) :
-    (map p f t).lev n = f (t.lev n) := rfl
+@[simp]
+theorem lev_map {M' : Type} [CommGroup M'] (f : M →* M') (t : Tate p M) (n : ℕ)
+    : (map p f t).lev n = f (t.lev n) :=
+  rfl
 
-theorem map_smul_of_isHausdorff {T O : Type} [AddCommGroup T] [Module ℤ_[p] T] [CommRing O]
-    [Algebra ℤ_[p] O] [IsHausdorff (Ideal.span {(p : O)}) O] (f : T →+ O) (a : ℤ_[p]) (t : T) :
-    f (a • t) = a • f t := by
+theorem map_smul_of_isHausdorff
+    {T O : Type} [AddCommGroup T] [Module ℤ_[p] T] [CommRing O] [Algebra ℤ_[p] O]
+    [IsHausdorff (Ideal.span {(p : O)}) O]
+    (f : T →+ O) (a : ℤ_[p]) (t : T)
+    : f (a • t) = a • f t := by
   have hH : IsHausdorff (Ideal.span {(p : O)}) O := inferInstance
   refine sub_eq_zero.1 (hH.haus _ fun n => ?_)
   obtain ⟨b, hb⟩ := pow_dvd_sub_digit (p := p) n a
@@ -142,8 +162,8 @@ theorem Eps.isPrimitiveRoot (ε : Eps p C) (n : ℕ) : IsPrimitiveRoot (ε.1.lev
     rw [← hord]
     exact IsPrimitiveRoot.orderOf _
 
-theorem Eps.bijective (ε : Eps p C) :
-    Function.Bijective (LinearMap.toSpanSingleton ℤ_[p] (Tate p Cˣ) ε.1) := by
+theorem Eps.bijective (ε : Eps p C)
+    : Function.Bijective (LinearMap.toSpanSingleton ℤ_[p] (Tate p Cˣ) ε.1) := by
   have hp : p.Prime := Fact.out
   have hε := ε.isPrimitiveRoot
   refine ⟨?_, ?_⟩
@@ -157,9 +177,11 @@ theorem Eps.bijective (ε : Eps p C) :
     exact ((hε n).pow_eq_one_iff_dvd _).1 h1
   · intro t
     have hex : ∀ n, ∃ i : ℕ, ε.1.lev n ^ i = t.lev n := fun n => by
-      have hC : IsPrimitiveRoot ((ε.1.lev n : Cˣ) : C) (p ^ n) := IsPrimitiveRoot.coe_units_iff.2 (hε n)
-      obtain ⟨i, -, hi⟩ := hC.eq_pow_of_pow_eq_one (ξ := ((t.lev n : Cˣ) : C))
-        (by rw [← Units.val_pow_eq_pow_val, t.lev_pow, Units.val_one])
+      have hC : IsPrimitiveRoot ((ε.1.lev n : Cˣ) : C) (p ^ n) :=
+        IsPrimitiveRoot.coe_units_iff.2 (hε n)
+      obtain ⟨i, -, hi⟩ :=
+        hC.eq_pow_of_pow_eq_one (ξ := ((t.lev n : Cˣ) : C))
+          (by rw [← Units.val_pow_eq_pow_val, t.lev_pow, Units.val_one])
       exact ⟨i, Units.ext (by rw [Units.val_pow_eq_pow_val, hi])⟩
     choose k hk using hex
     have hstep : ∀ n, ((k (n + 1) : ℕ) : ZMod (p ^ n)) = k n := fun n => by
@@ -184,31 +206,40 @@ theorem Eps.bijective (ε : Eps p C) :
       (PadicInt.norm_le_pow_iff_mem_span_pow _ _).2 (hmem n m hnm)
     have hlim : Filter.Tendsto (fun N : ℕ => (p : ℝ) ^ (-(N : ℤ))) Filter.atTop (nhds 0) := by
       have hp1 : (1 : ℝ) < p := by exact_mod_cast hp.one_lt
-      have h5 := tendsto_pow_atTop_nhds_zero_of_lt_one (inv_nonneg.2 (zero_le_one.trans hp1.le)) (inv_lt_one_of_one_lt₀ hp1)
+      have h5 :=
+        tendsto_pow_atTop_nhds_zero_of_lt_one (inv_nonneg.2 (zero_le_one.trans hp1.le))
+          (inv_lt_one_of_one_lt₀ hp1)
       refine h5.congr fun N => ?_
       rw [zpow_neg, zpow_natCast, inv_pow]
     have hcau : CauchySeq x := by
-      refine cauchySeq_of_le_tendsto_0 (fun N : ℕ => (p : ℝ) ^ (-(N : ℤ))) (fun m m' N hm hm' => ?_) hlim
+      refine
+        cauchySeq_of_le_tendsto_0 (fun N : ℕ => (p : ℝ) ^ (-(N : ℤ))) (fun m m' N hm hm' => ?_) hlim
       rw [dist_eq_norm]
       have h6 : x m - x m' = (x m - x N) - (x m' - x N) := by ring
       rw [h6]
-      exact (PadicInt.norm_le_pow_iff_mem_span_pow _ _).2 (Ideal.sub_mem _ (hmem N m hm) (hmem N m' hm'))
+      exact (PadicInt.norm_le_pow_iff_mem_span_pow _ _).2
+        (Ideal.sub_mem _ (hmem N m hm) (hmem N m' hm'))
     obtain ⟨a, ha⟩ := cauchySeq_tendsto_of_complete hcau
     have hA : ∀ n, PadicInt.toZModPow n a = (k n : ZMod (p ^ n)) := fun n => by
       have h7 : ‖a - x n‖ ≤ (p : ℝ) ^ (-(n : ℤ)) :=
-        le_of_tendsto ((ha.sub_const (x n)).norm) (Filter.eventually_atTop.2 ⟨n, fun m hm => hnorm n m hm⟩)
+        le_of_tendsto ((ha.sub_const (x n)).norm)
+          (Filter.eventually_atTop.2 ⟨n, fun m hm => hnorm n m hm⟩)
       have h8 := (PadicInt.norm_le_pow_iff_mem_span_pow _ _).1 h7
       rw [← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, sub_eq_zero] at h8
       rw [h8, hx]
       simp only [map_natCast]
-    exact ⟨a, Tate.ext fun n => by
-      rw [LinearMap.toSpanSingleton_apply, Tate.lev_smul, pow_digit_eq (ε.1.lev_pow n) (hA n).symm, hk]⟩
+    exact ⟨
+      a,
+      Tate.ext fun n => by
+        rw [LinearMap.toSpanSingleton_apply, Tate.lev_smul,
+          pow_digit_eq (ε.1.lev_pow n) (hA n).symm, hk]
+    ⟩
 
-def Eps.equiv (ε : Eps p C) : ℤ_[p] ≃ₗ[ℤ_[p]] Tate p Cˣ :=
-  LinearEquiv.ofBijective _ ε.bijective
+def Eps.equiv (ε : Eps p C) : ℤ_[p] ≃ₗ[ℤ_[p]] Tate p Cˣ := LinearEquiv.ofBijective _ ε.bijective
 
-theorem Eps.lev_equiv (ε : Eps p C) (a : ℤ_[p]) (n : ℕ) :
-    (ε.equiv a).lev n = ε.1.lev n ^ digit n a := rfl
+theorem Eps.lev_equiv (ε : Eps p C) (a : ℤ_[p]) (n : ℕ)
+    : (ε.equiv a).lev n = ε.1.lev n ^ digit n a :=
+  rfl
 
 instance [IsAlgClosed C] [CharZero C] : Nonempty (Eps p C) := by
   have hp : p.Prime := Fact.out
@@ -246,21 +277,29 @@ def weil : ℕ → Pts A.A → Pts A.A → Cˣ := (exists_weil_function C A).cho
 
 variable {A} {k : ℕ}
 
-theorem weilIs_iff (hk : 1 ≤ k) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ k = 1) (w : Cˣ) :
-    Out.WeilIs A.A A.L (k : ℤ) z s (unitOn w) ↔ w = weil A k z s := ((exists_weil_function C A).choose_spec k hk).1 z s hz hs w
+theorem weilIs_iff (hk : 1 ≤ k) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ k = 1) (w : Cˣ)
+    : Out.WeilIs A.A A.L (k : ℤ) z s (unitOn w) ↔ w = weil A k z s :=
+  ((exists_weil_function C A).choose_spec k hk).1 z s hz hs w
 
-theorem weil_mul_left (hk : 1 ≤ k) {z z' s : Pts A.A} (hz : z ^ k = 1) (hz' : z' ^ k = 1)
-    (hs : s ^ k = 1) : weil A k (z * z') s = weil A k z s * weil A k z' s := (((exists_weil_function C A).choose_spec k hk).2.1 z z' s hz hz' hs).1
+theorem weil_mul_left
+    (hk : 1 ≤ k) {z z' s : Pts A.A} (hz : z ^ k = 1) (hz' : z' ^ k = 1) (hs : s ^ k = 1)
+    : weil A k (z * z') s = weil A k z s * weil A k z' s :=
+  (((exists_weil_function C A).choose_spec k hk).2.1 z z' s hz hz' hs).1
 
-theorem weil_mul_right (hk : 1 ≤ k) {z z' s : Pts A.A} (hz : z ^ k = 1) (hz' : z' ^ k = 1)
-    (hs : s ^ k = 1) : weil A k s (z * z') = weil A k s z * weil A k s z' := (((exists_weil_function C A).choose_spec k hk).2.1 z z' s hz hz' hs).2
+theorem weil_mul_right
+    (hk : 1 ≤ k) {z z' s : Pts A.A} (hz : z ^ k = 1) (hz' : z' ^ k = 1) (hs : s ^ k = 1)
+    : weil A k s (z * z') = weil A k s z * weil A k s z' :=
+  (((exists_weil_function C A).choose_spec k hk).2.1 z z' s hz hz' hs).2
 
-theorem weil_level (hk : 1 ≤ k) {l : ℕ} (hl : 1 ≤ l) {z s : Pts A.A} (hz : z ^ k = 1)
-    (hs : s ^ (k * l) = 1) : weil A (k * l) z s = weil A k z (s ^ l) := ((exists_weil_function C A).choose_spec k hk).2.2.1 l z s hl hz hs
+theorem weil_level
+    (hk : 1 ≤ k) {l : ℕ} (hl : 1 ≤ l) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ (k * l) = 1)
+    : weil A (k * l) z s = weil A k z (s ^ l) :=
+  ((exists_weil_function C A).choose_spec k hk).2.2.1 l z s hl hz hs
 
-theorem weil_perfect (hk : 1 ≤ k) (κ : Pts A.A → Cˣ)
-    (hκ : ∀ z z', z ^ k = 1 → z' ^ k = 1 → κ (z * z') = κ z * κ z') :
-    ∃! s : Pts A.A, s ^ k = 1 ∧ ∀ z, z ^ k = 1 → weil A k z s = κ z := ((exists_weil_function C A).choose_spec k hk).2.2.2 κ hκ
+theorem weil_perfect
+    (hk : 1 ≤ k) (κ : Pts A.A → Cˣ) (hκ : ∀ z z', z ^ k = 1 → z' ^ k = 1 → κ (z * z') = κ z * κ z')
+    : ∃! s : Pts A.A, s ^ k = 1 ∧ ∀ z, z ^ k = 1 → weil A k z s = κ z :=
+  ((exists_weil_function C A).choose_spec k hk).2.2.2 κ hκ
 
 theorem weil_self (hk : 1 ≤ k) {z : Pts A.A} (hz : z ^ k = 1) : weil A k z z = 1 := by
   have h1 := (GlobalTheory.lawsFieldsSeparately.2.2.2.2.2.2.2.2.2.1 : Out.WeilSt)
@@ -268,8 +307,8 @@ theorem weil_self (hk : 1 ≤ k) {z : Pts A.A} (hz : z ^ k = 1) : weil A k z z =
   have h2 := (h1 _ A k _).2.2.1 z hz
   exact ((weilIs_iff hk hz hz 1).1 (by rw [unitOn_one']; exact h2)).symm
 
-theorem weil_pow_left (hk : 1 ≤ k) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ k = 1) (m : ℕ) :
-    weil A k (z ^ m) s = weil A k z s ^ m := by
+theorem weil_pow_left (hk : 1 ≤ k) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ k = 1) (m : ℕ)
+    : weil A k (z ^ m) s = weil A k z s ^ m := by
   induction m with
   | zero =>
     simp only [pow_zero]
@@ -277,10 +316,11 @@ theorem weil_pow_left (hk : 1 ≤ k) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ 
     rw [_root_.mul_one] at h
     exact mul_left_cancel (h.symm.trans (_root_.mul_one _).symm)
   | succ m ih =>
-    rw [pow_succ, pow_succ, weil_mul_left hk (by rw [← pow_mul, mul_comm, pow_mul, hz, one_pow]) hz hs, ih]
+    rw [pow_succ, pow_succ,
+      weil_mul_left hk (by rw [← pow_mul, mul_comm, pow_mul, hz, one_pow]) hz hs, ih]
 
-theorem weil_pow_right (hk : 1 ≤ k) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ k = 1) (m : ℕ) :
-    weil A k s (z ^ m) = weil A k s z ^ m := by
+theorem weil_pow_right (hk : 1 ≤ k) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ k = 1) (m : ℕ)
+    : weil A k s (z ^ m) = weil A k s z ^ m := by
   induction m with
   | zero =>
     simp only [pow_zero]
@@ -288,7 +328,8 @@ theorem weil_pow_right (hk : 1 ≤ k) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^
     rw [_root_.mul_one] at h
     exact mul_left_cancel (h.symm.trans (_root_.mul_one _).symm)
   | succ m ih =>
-    rw [pow_succ, pow_succ, weil_mul_right hk (by rw [← pow_mul, mul_comm, pow_mul, hz, one_pow]) hz hs, ih]
+    rw [pow_succ, pow_succ,
+      weil_mul_right hk (by rw [← pow_mul, mul_comm, pow_mul, hz, one_pow]) hz hs, ih]
 
 variable (p : ℕ) [Fact p.Prime]
 
@@ -301,37 +342,44 @@ abbrev TateA : Type := Tate p (Pts A.A)
 
 def weilT : TateA A p →ₗ[ℤ_[p]] TateA A p →ₗ[ℤ_[p]] Tate p Cˣ :=
   LinearMap.mk₂ ℤ_[p]
-    (fun s t => Tate.mk (fun n => weil A (p ^ n) (s.lev n) (t.lev n)) fun n =>
-      ⟨by
-        rw [← weil_pow_left (one_le_ppow p n) (s.lev_pow n) (t.lev_pow n), s.lev_pow]
-        simpa using weil_pow_left (one_le_ppow p n) (s.lev_pow n) (t.lev_pow n) 0, by
-        rw [← weil_pow_left (one_le_ppow p _) (s.lev_pow _) (t.lev_pow _), s.lev_succ, pow_succ,
-          weil_level (one_le_ppow p n) (Fact.out : p.Prime).pos (s.lev_pow n) (t.lev_pow (n + 1)),
-          t.lev_succ]⟩)
-    (fun s s' t => Tate.ext fun n =>
-      weil_mul_left (one_le_ppow p n) (s.lev_pow n) (s'.lev_pow n) (t.lev_pow n))
+    (fun s t =>
+      Tate.mk
+        (fun n => weil A (p ^ n) (s.lev n) (t.lev n))
+        fun n => ⟨
+          by
+            rw [← weil_pow_left (one_le_ppow p n) (s.lev_pow n) (t.lev_pow n), s.lev_pow]
+            simpa using weil_pow_left (one_le_ppow p n) (s.lev_pow n) (t.lev_pow n) 0,
+          by
+            rw [← weil_pow_left (one_le_ppow p _) (s.lev_pow _) (t.lev_pow _), s.lev_succ, pow_succ,
+              weil_level (one_le_ppow p n) (Fact.out : p.Prime).pos (s.lev_pow n)
+                (t.lev_pow (n + 1)),
+              t.lev_succ]
+        ⟩)
+    (fun s s' t =>
+      Tate.ext fun n => weil_mul_left (one_le_ppow p n) (s.lev_pow n) (s'.lev_pow n) (t.lev_pow n))
     (fun _ s t => Tate.ext fun n => weil_pow_left (one_le_ppow p n) (s.lev_pow n) (t.lev_pow n) _)
-    (fun s t t' => Tate.ext fun n =>
-      weil_mul_right (one_le_ppow p n) (t.lev_pow n) (t'.lev_pow n) (s.lev_pow n))
+    (fun s t t' =>
+      Tate.ext fun n => weil_mul_right (one_le_ppow p n) (t.lev_pow n) (t'.lev_pow n) (s.lev_pow n))
     (fun _ s t => Tate.ext fun n => weil_pow_right (one_le_ppow p n) (t.lev_pow n) (s.lev_pow n) _)
 
-theorem lev_weilT (s t : TateA A p) (n : ℕ) :
-    (weilT A p s t).lev n = weil A (p ^ n) (s.lev n) (t.lev n) := rfl
+theorem lev_weilT (s t : TateA A p) (n : ℕ)
+    : (weilT A p s t).lev n = weil A (p ^ n) (s.lev n) (t.lev n) :=
+  rfl
 
 variable {p}
 
 def pairT (ε : Eps p C) : LinearMap.BilinForm ℤ_[p] (TateA A p) :=
   (weilT A p).compr₂ ε.equiv.symm.toLinearMap
 
-theorem pow_pairT (ε : Eps p C) (s t : TateA A p) (n : ℕ) :
-    ε.1.lev n ^ digit n (pairT A ε s t) = weil A (p ^ n) (s.lev n) (t.lev n) := by
+theorem pow_pairT (ε : Eps p C) (s t : TateA A p) (n : ℕ)
+    : ε.1.lev n ^ digit n (pairT A ε s t) = weil A (p ^ n) (s.lev n) (t.lev n) := by
   have h : pairT A ε s t = ε.equiv.symm (weilT A p s t) := rfl
   rw [h, ← Eps.lev_equiv, LinearEquiv.apply_symm_apply, lev_weilT]
 
 theorem isAlt_pairT (ε : Eps p C) : (pairT A ε).IsAlt := by
   intro s
-  have h0 : weilT A p s s = 0 := Tate.ext fun n => by
-    rw [lev_weilT, Tate.lev_zero, weil_self (one_le_ppow p n) (s.lev_pow n)]
+  have h0 : weilT A p s s = 0 :=
+    Tate.ext fun n => by rw [lev_weilT, Tate.lev_zero, weil_self (one_le_ppow p n) (s.lev_pow n)]
   have e : pairT A ε s s = ε.equiv.symm (weilT A p s s) := rfl
   rw [e, h0, map_zero]
 
@@ -339,40 +387,51 @@ end Abelian
 
 section Action
 
-variable {S : Scheme.{0}} {G : Over S} [GrpObj G] [IsCommMonObj G] {Λ : Type} [CommRing Λ]
+variable
+  {S : Scheme.{0}} {G : Over S} [GrpObj G] [IsCommMonObj G]
+  {Λ : Type} [CommRing Λ]
   (α : Out.RingAct G Λ)
 
 def actPts (T : Over S) (a : Λ) : (T ⟶ G) →* (T ⟶ G) :=
   haveI := α.hom a
   MonoidHom.mk' (fun x => x ≫ α.act a) fun x y => MonObj.mul_comp x y _
 
-theorem actPts_add (T : Over S) (a b : Λ) (x : T ⟶ G) :
-    x ≫ α.act (a + b) = (x ≫ α.act a) * (x ≫ α.act b) := by
+theorem actPts_add (T : Over S) (a b : Λ) (x : T ⟶ G)
+    : x ≫ α.act (a + b) = (x ≫ α.act a) * (x ≫ α.act b) := by
   rw [α.map_add a b]
   exact MonObj.comp_mul _ _ _
 
 def actTate (p : ℕ) [Fact p.Prime] (T : Over S) : Λ →+* Module.End ℤ_[p] (Tate p (T ⟶ G)) :=
-  RingHom.mk' (MonoidHom.mk (OneHom.mk (fun a => Tate.map p (actPts α T a))
-      (LinearMap.ext fun t => Tate.ext fun n => by
-        change t.lev n ≫ α.act 1 = t.lev n
-        rw [α.map_one, Category.comp_id]))
-      (fun a b => LinearMap.ext fun t => Tate.ext fun n => by
-        change t.lev n ≫ α.act (a * b) = (t.lev n ≫ α.act b) ≫ α.act a
-        rw [α.map_mul, Category.assoc]))
+  RingHom.mk'
+    (MonoidHom.mk
+      (OneHom.mk
+        (fun a => Tate.map p (actPts α T a))
+        (LinearMap.ext fun t =>
+          Tate.ext fun n => by
+            change t.lev n ≫ α.act 1 = t.lev n
+            rw [α.map_one, Category.comp_id]))
+      (fun a b =>
+        LinearMap.ext fun t =>
+          Tate.ext fun n => by
+            change t.lev n ≫ α.act (a * b) = (t.lev n ≫ α.act b) ≫ α.act a
+            rw [α.map_mul, Category.assoc]))
     fun a b => LinearMap.ext fun t => Tate.ext fun n => actPts_add α T a b (t.lev n)
 
-theorem lev_actTate (p : ℕ) [Fact p.Prime] (T : Over S) (a : Λ) (t : Tate p (T ⟶ G)) (n : ℕ) :
-    (actTate α p T a t).lev n = t.lev n ≫ α.act a := rfl
+theorem lev_actTate (p : ℕ) [Fact p.Prime] (T : Over S) (a : Λ) (t : Tate p (T ⟶ G)) (n : ℕ)
+    : (actTate α p T a t).lev n = t.lev n ≫ α.act a :=
+  rfl
 
 end Action
 
 section Rosati
 
-variable {C : Type} [Field C] [IsAlgClosed C] [CharZero C] {A : Out.PolAV (Sp C)}
-  {Λ : Type} [CommRing Λ] [StarRing Λ] (o : A.OAct Λ)
+variable
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {A : Out.PolAV (Sp C)} {Λ : Type} [CommRing Λ] [StarRing Λ]
+  (o : A.OAct Λ)
 
-theorem weil_act {k : ℕ} (hk : 1 ≤ k) (a : Λ) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ k = 1) :
-    weil A k (z ≫ o.act a) s = weil A k z (s ≫ o.act (star a)) := by
+theorem weil_act {k : ℕ} (hk : 1 ≤ k) (a : Λ) {z s : Pts A.A} (hz : z ^ k = 1) (hs : s ^ k = 1)
+    : weil A k (z ≫ o.act a) s = weil A k z (s ≫ o.act (star a)) := by
   have hG : Out.GlobalFnsSt := GlobalTheory.lawsFieldsSeparately.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
   have hC : Out.CubeSt := GlobalTheory.lawsFieldsSeparately.2.2.2.2.2.2.1
   haveI := o.toRingAct.hom a
@@ -386,12 +445,17 @@ theorem weil_act {k : ℕ} (hk : 1 ≤ k) (a : Λ) {z s : Pts A.A} (hz : z ^ k =
     rw [hs, map_one] at h3
     exact h3.symm
   have h1 := (weilIs_iff hk hz hs' (weil A k z (s ≫ o.act (star a)))).2 rfl
-  have h2 := (GlobalTheory.weilIs_rosati_iff hG hC A (o.act a) (o.act (star a)) (o.rosati a) k z s hz hs _).2 h1
+  have h2 :=
+    (GlobalTheory.weilIs_rosati_iff hG hC A (o.act a) (o.act (star a)) (o.rosati a) k z s hz hs _).2
+      h1
   exact ((weilIs_iff hk hz' hs _).1 h2).symm
 
-theorem pairT_act {p : ℕ} [Fact p.Prime] (ε : Eps p C) (a : Λ) (s t : TateA A p) :
-    pairT A ε (actTate o.toRingAct p _ a s) t = pairT A ε s (actTate o.toRingAct p _ (star a) t) := by
-  have h : weilT A p (actTate o.toRingAct p _ a s) t = weilT A p s (actTate o.toRingAct p _ (star a) t) :=
+theorem pairT_act {p : ℕ} [Fact p.Prime] (ε : Eps p C) (a : Λ) (s t : TateA A p)
+    : pairT A ε (actTate o.toRingAct p _ a s) t
+      = pairT A ε s (actTate o.toRingAct p _ (star a) t) := by
+  have h
+      : weilT A p (actTate o.toRingAct p _ a s) t
+        = weilT A p s (actTate o.toRingAct p _ (star a) t) :=
     Tate.ext fun n => by
       rw [lev_weilT, lev_weilT, lev_actTate, lev_actTate]
       exact weil_act o (one_le_ppow p n) a (s.lev_pow n) (t.lev_pow n)

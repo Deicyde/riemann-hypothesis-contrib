@@ -7,10 +7,11 @@ public import Mathlib
 namespace GlobalTheory
 
 theorem mem_smul_of_forall_char_pow_eq_one
-    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (F : Type) [Field F]
-    [IsAlgClosed F] (k : ℕ) (hk : (k : F) ≠ 0) (d : X)
-    (hd : ∀ τ : Multiplicative X →* Fˣ, τ ^ k = 1 → τ (Multiplicative.ofAdd d) = 1) :
-    ∃ z : X, d = k • z := by
+    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (F : Type) [Field F] [IsAlgClosed F]
+    (k : ℕ) (hk : (k : F) ≠ 0)
+    (d : X) (hd : ∀ τ : Multiplicative X →* Fˣ, τ ^ k = 1 → τ (Multiplicative.ofAdd d) = 1)
+    : ∃ z : X, d = k • z := by
   classical
   let b := Module.Free.chooseBasis ℤ X
   by_contra hne
@@ -23,7 +24,7 @@ theorem mem_smul_of_forall_char_pow_eq_one
     ext j
     rw [← natCast_zsmul]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finsupp.single_apply, Int.mul_ediv_cancel' (h j)]
+    simp [map_sum, Finsupp.single_apply, Int.mul_ediv_cancel' (h j)]
   obtain ⟨i, hi⟩ := hex
   have hk0 : k ≠ 0 := by rintro rfl; exact hk (by simp)
   haveI : NeZero (k : F) := ⟨hk⟩
@@ -33,8 +34,7 @@ theorem mem_smul_of_forall_char_pow_eq_one
   have hu : IsPrimitiveRoot u k := IsPrimitiveRoot.coe_units_iff.mp (by simpa [u] using hζ)
   let τ : Multiplicative X →* Fˣ :=
     (zpowersHom Fˣ u).comp (AddMonoidHom.toMultiplicative (b.coord i).toAddMonoidHom)
-  have hτ : ∀ x : X, τ (Multiplicative.ofAdd x) = u ^ (b.repr x i) := by
-    intro x; simp [τ]
+  have hτ : ∀ x : X, τ (Multiplicative.ofAdd x) = u ^ (b.repr x i) := by intro x; simp [τ]
   have hτk : τ ^ k = 1 := by
     ext x
     show (τ x ^ k : Fˣ).val = (1 : Fˣ).val

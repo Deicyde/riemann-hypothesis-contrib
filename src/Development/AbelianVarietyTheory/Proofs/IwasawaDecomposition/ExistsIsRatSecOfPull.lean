@@ -13,7 +13,9 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.Cartier
+  GlobalTheory.ProjVar
 open scoped Pointwise
 
 namespace GlobalTheory.TrueGeo.SmallSec
@@ -22,16 +24,19 @@ variable {F : Type} [Field F] [NumberField F]
 
 section Local
 
-variable {Z : Scheme.{0}} [IsIntegral Z] {D : CartierDiv Z} {x : Z} {u g : Z.functionFieldˣ}
-  {f : Z.functionField} {k τ : ℕ}
+variable
+  {Z : Scheme.{0}} [IsIntegral Z]
+  {D : CartierDiv Z} {x : Z} {u g : Z.functionFieldˣ} {f : Z.functionField} {k τ : ℕ}
 
 end Local
 
 variable {C : CxSt F} {Y : Var F} (A : Adl C Y) {k τ : ℕ} {f : Y.Fn}
 
-theorem isRatSec_pow {Z : Scheme.{0}} [IsIntegral Z] {L : LB Z} {r : L.ι → Z.functionFieldˣ}
-    (hr : IsRatSec L r) (τ : ℕ) : IsRatSec (lbPow L τ) fun c => r (c PUnit.unit) ^ τ :=
-  fun c c' h => by
+theorem isRatSec_pow
+    {Z : Scheme.{0}} [IsIntegral Z]
+    {L : LB Z} {r : L.ι → Z.functionFieldˣ} (hr : IsRatSec L r)
+    (τ : ℕ)
+    : IsRatSec (lbPow L τ) fun c => r (c PUnit.unit) ^ τ := fun c c' h => by
   have l : (lbPow L τ).U c ⊓ (lbPow L τ).U c' ≤ L.U (c PUnit.unit) ⊓ L.U (c' PUnit.unit) :=
     fun _ hx => ⟨Set.mem_iInter.1 hx.1 PUnit.unit, Set.mem_iInter.1 hx.2 PUnit.unit⟩
   have e : (lbPow L τ).g c c' = res l (L.g (c PUnit.unit) (c' PUnit.unit)) ^ τ := by
@@ -41,6 +46,5 @@ theorem isRatSec_pow {Z : Scheme.{0}} [IsIntegral Z] {L : LB Z} {r : L.ι → Z.
   rw [e, Units.val_pow_eq_pow_val, Units.val_pow_eq_pow_val, Units.val_pow_eq_pow_val, map_pow,
     ← mul_pow, hr _ _ (l h)]
   exact congrArg (fun a => (a * _) ^ τ) (fnOf_resG l h _).symm
-
 
 end GlobalTheory.TrueGeo.SmallSec

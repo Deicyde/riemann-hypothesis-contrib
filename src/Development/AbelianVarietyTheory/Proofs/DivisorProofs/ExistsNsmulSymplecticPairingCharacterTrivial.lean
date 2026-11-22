@@ -10,13 +10,16 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DefiniteT
 
 open NumberField MeasureTheory
 open scoped Classical
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum
 open Formalism.MainNotions.TaylorLogMetric (VC embT tor0 Hf lamOf area Th U)
 open Formalism.MainNotions.StandardLatticesGL3 (WeilO HeckeU TT stdL pt oddE0)
 open GlobalTheory.NormSum (Pair Tup minorPol ratG intG Cls gam)
 open GlobalTheory.NormDict GlobalTheory.NormExact
 open GlobalTheory.BotFormula (IsFinPt)
-open GlobalTheory.IndefiniteRowSideFullHecke.ClassFunctionSumIntegral (IsDefiniteSpace IsOpenCompactLevel)
+open GlobalTheory.IndefiniteRowSideFullHecke.ClassFunctionSumIntegral
+  (IsDefiniteSpace IsOpenCompactLevel)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -24,9 +27,12 @@ open scoped TensorProduct Topology
 
 namespace GlobalTheory.FinCharInt
 
-theorem tensInt_le {F E R : Type} [Field F] [CommRing E] [Algebra F E] [CommRing R] [Algebra F R]
+theorem tensInt_le
+    {F E R : Type} [Field F] [CommRing E] [Algebra F E] [CommRing R] [Algebra F R]
     (S₁ : Subring E) (S₂ : Subring R) (K : AddSubgroup (E ⊗[F] R))
-    (hK : ∀ b ∈ S₁, ∀ α ∈ S₂, b ⊗ₜ[F] α ∈ K) {x : E ⊗[F] R} (hx : x ∈ Formalism.UG.tensInt R S₁ S₂) : x ∈ K := by
+    (hK : ∀ b ∈ S₁, ∀ α ∈ S₂, b ⊗ₜ[F] α ∈ K)
+    {x : E ⊗[F] R} (hx : x ∈ Formalism.UG.tensInt R S₁ S₂)
+    : x ∈ K := by
   let C : AddSubgroup (E ⊗[F] R) := AddSubgroup.closure {z | ∃ b ∈ S₁, ∃ α ∈ S₂, z = b ⊗ₜ[F] α}
   have hC : C ≤ K := by
     refine (AddSubgroup.closure_le _).2 ?_
@@ -53,15 +59,20 @@ theorem tensInt_le {F E R : Type} [Field F] [CommRing E] [Algebra F E] [CommRing
     rcases hx with ⟨c, rfl⟩ | ⟨c, rfl⟩
     · exact AddSubgroup.subset_closure ⟨_, c.2, _, S₂.one_mem, rfl⟩
     · exact AddSubgroup.subset_closure ⟨_, S₁.one_mem, _, c.2, rfl⟩
-  | zero => exact C.zero_mem
-  | one => exact AddSubgroup.subset_closure ⟨_, S₁.one_mem, _, S₂.one_mem, Algebra.TensorProduct.one_def⟩
+  | zero =>
+    exact C.zero_mem
+  | one =>
+    exact AddSubgroup.subset_closure ⟨_, S₁.one_mem, _, S₂.one_mem, Algebra.TensorProduct.one_def⟩
   | add x y _ _ ihx ihy => exact C.add_mem ihx ihy
   | neg x _ ihx => exact C.neg_mem ihx
   | mul x y _ _ ihx ihy => exact hmul _ ihx _ ihy
 
-theorem exists_nsmul_kill {F : Type} [Field F] [NumberField F] {ψ : AddChar (AF F) ℂ} (hc : Continuous ψ)
-    (hn : ∀ x, ‖ψ x‖ = 1) {ι : Type} [Finite ι] (c : ι → AF F) :
-    ∃ N : ℕ, 0 < N ∧ ∀ i, ∀ α ∈ Formalism.UG.intAd F, ψ (N • (pairA F 0 α * c i)) = 1 := by
+theorem exists_nsmul_kill
+    {F : Type} [Field F] [NumberField F]
+    {ψ : AddChar (AF F) ℂ} (hc : Continuous ψ) (hn : ∀ x, ‖ψ x‖ = 1)
+    {ι : Type} [Finite ι]
+    (c : ι → AF F)
+    : ∃ N : ℕ, 0 < N ∧ ∀ i, ∀ α ∈ Formalism.UG.intAd F, ψ (N • (pairA F 0 α * c i)) = 1 := by
   have hU : (⋂ i, {α : Af F | ψ (pairA F 0 (α * (c i).2)) = 1}) ∈ 𝓝 (0 : Af F) := by
     refine Filter.iInter_mem.2 fun i => ?_
     have h1 : Continuous fun α : Af F => α * (c i).2 := continuous_id.mul continuous_const
@@ -103,25 +114,33 @@ theorem finIncl_finPart {a : AE D} (h : infPart D a = 0) : finIncl D (finPart D 
     | add a b ha hb => rw [smul_add, ha, hb, RingHom.map_add (f := _), map_add (f := _)]
     | tmul a x =>
       rw [TensorProduct.smul_tmul']
-      have : (1 - GlobalTheory.FinTranslate.eInf D) • a =
-          LinearMap.inr D.host.F (Ainf D.host.F) (Af D.host.F) (sndA D.host.F a) :=
-        Prod.ext (show (1 - 1) * a.1 = 0 by rw [sub_self, zero_mul]) (show (1 - 0) * a.2 = a.2 by rw [sub_zero, one_mul])
+      have : (1 - GlobalTheory.FinTranslate.eInf D) • a
+          = LinearMap.inr D.host.F (Ainf D.host.F) (Af D.host.F) (sndA D.host.F a) :=
+        Prod.ext (show (1 - 1) * a.1 = 0 by rw [sub_self, zero_mul])
+          (show (1 - 0) * a.2 = a.2 by rw [sub_zero, one_mul])
       rw [this]
       rfl
   rw [← key, sub_smul, one_smul, GlobalTheory.FinTranslate.smul_eq_zero_of_inf h, sub_zero]
 
-theorem exists_nsmul_kill_forms {ψ : AddChar (AF D.host.F) ℂ} (hc : Continuous ψ) (hn : ∀ x, ‖ψ x‖ = 1)
-    {ι : Type} [Finite ι] (lam : ι → (AE D →ₗ[AF D.host.F] AF D.host.F)) :
-    ∃ N : ℕ, 0 < N ∧ ∀ i, ∀ a : AE D, infPart D a = 0 → GlobalTheory.BotClassDict.finQ D a ∈ Formalism.MainNotions.StandardLatticesGL3.OhE D →
-      ψ (N • lam i a) = 1 := by
+theorem exists_nsmul_kill_forms
+    {ψ : AddChar (AF D.host.F) ℂ} (hc : Continuous ψ) (hn : ∀ x, ‖ψ x‖ = 1)
+    {ι : Type} [Finite ι]
+    (lam : ι → (AE D →ₗ[AF D.host.F] AF D.host.F))
+    : ∃ N : ℕ,
+      0 < N
+        ∧ ∀ i, ∀ a : AE D,
+          infPart D a = 0
+            → GlobalTheory.BotClassDict.finQ D a ∈ Formalism.MainNotions.StandardLatticesGL3.OhE D
+            → ψ (N • lam i a) = 1 := by
   let w := RingOfIntegers.basis D.host.E
-  obtain ⟨N, hN, h⟩ := exists_nsmul_kill hc hn
-    (fun p : ι × Module.Free.ChooseBasisIndex ℤ (𝓞 D.host.E) =>
+  obtain ⟨N, hN, h⟩ :=
+    exists_nsmul_kill hc hn (fun p : ι × Module.Free.ChooseBasisIndex ℤ (𝓞 D.host.E) =>
       lam p.1 ((1 : AF D.host.F) ⊗ₜ[D.host.F] (algebraMap (𝓞 D.host.E) D.host.E (w p.2))))
   refine ⟨N, hN, fun i a ha hint => ?_⟩
   let g : D.host.E ⊗[D.host.F] Af D.host.F →+ AF D.host.F :=
-    N • ((lam i).toAddMonoidHom.comp ((finIncl D).toAddMonoidHom.comp
-      (TensorProduct.comm D.host.F D.host.E (Af D.host.F)).toLinearMap.toAddMonoidHom))
+    N • ((lam i).toAddMonoidHom.comp
+      ((finIncl D).toAddMonoidHom.comp
+        (TensorProduct.comm D.host.F D.host.E (Af D.host.F)).toLinearMap.toAddMonoidHom))
   have hg : ∀ y, g (Lev.swapAE D y) = N • lam i (finIncl D y) := by
     intro y
     have : TensorProduct.comm D.host.F D.host.E (Af D.host.F) (Lev.swapAE D y) = y :=
@@ -153,12 +172,21 @@ noncomputable def symplR (S T : HSp D) (x : WO S T) : WO S T →ₗ[AF D.host.F]
   map_add' := GlobalTheory.FinTranslate.symplOH_add_right S T x
   map_smul' c y := GlobalTheory.FinTranslate.symplOH_smul_right S T c x y
 
-theorem char_sympl_nsmul_int : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ), Continuous ψ → (∀ x, ‖ψ x‖ = 1) →
-    ∀ (S T : HSp D) (A0 : WO S T), ∃ N : ℕ, 0 < N ∧ ∀ v : WO S T, (∀ i j, infPart D (v i j) = 0) →
-      (∀ i j, GlobalTheory.BotClassDict.finQ D (v i j) ∈ Formalism.MainNotions.StandardLatticesGL3.OhE D) → ψ (symplOH S T A0 (N • v)) = 1 := by
+theorem char_sympl_nsmul_int
+    : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ),
+      Continuous ψ → (∀ x, ‖ψ x‖ = 1)
+        → ∀ (S T : HSp D) (A0 : WO S T), ∃ N : ℕ,
+          0 < N
+            ∧ ∀ v : WO S T,
+              (∀ i j, infPart D (v i j) = 0)
+                → (∀ i j,
+                  GlobalTheory.BotClassDict.finQ D (v i j)
+                    ∈ Formalism.MainNotions.StandardLatticesGL3.OhE D)
+                → ψ (symplOH S T A0 (N • v)) = 1 := by
   intro D ψ hc hn S T A0
-  obtain ⟨N, hN, h⟩ := exists_nsmul_kill_forms hc hn
-    (fun p : Fin T.rank × Fin S.rank => (symplR S T A0).comp (Matrix.singleLinearMap (AF D.host.F) p.1 p.2))
+  obtain ⟨N, hN, h⟩ :=
+    exists_nsmul_kill_forms hc hn (fun p : Fin T.rank × Fin S.rank =>
+      (symplR S T A0).comp (Matrix.singleLinearMap (AF D.host.F) p.1 p.2))
   refine ⟨N, hN, fun v hv hint => ?_⟩
   show symplR S T A0 (N • v) ∈ kerSub ψ
   set_option synthInstance.maxHeartbeats 100000 in

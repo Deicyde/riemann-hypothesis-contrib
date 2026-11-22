@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IdealPeri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric NumberField GlobalTheory.Mem.Per
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric NumberField
+  GlobalTheory.Mem.Per
 open scoped nonZeroDivisors
 
 namespace GlobalTheory.Mem.Per.ConjCM
@@ -20,8 +21,7 @@ open GlobalTheory.ConjPoint
 
 variable {R : Ranks} (H : Host R)
 
-theorem mem_baseLat (w : ℂ) :
-    w ∈ baseLat H ↔ ∃ c ∈ H.ccK, w = H.φ₀ (((c : H.K) : H.E)) := by
+theorem mem_baseLat (w : ℂ) : w ∈ baseLat H ↔ ∃ c ∈ H.ccK, w = H.φ₀ (((c : H.K) : H.E)) := by
   constructor
   · intro hw
     induction hw using AddSubgroup.closure_induction with
@@ -40,8 +40,7 @@ theorem exists_periodPair_baseLat : ∃ L : PeriodPair, ∀ z, z ∈ baseLat H �
   have hr : Module.finrank ℚ H.K = 2 :=
     Formalism.FrobeniusOrbits.SplitK.finrank_K H.hyp.2.1.pos (H.sqd_sq)
   have hd : NumberField.discr H.K = -(H.d : ℤ) :=
-    GlobalTheory.discr_eq_neg_of_sq_eq hr H.hyp.2.1.squarefree
-      (by have := H.hyp.2.2.2.1; omega)
+    GlobalTheory.discr_eq_neg_of_sq_eq hr H.hyp.2.1.squarefree (by have := H.hyp.2.2.2.1; omega)
       (Formalism.FrobeniusOrbits.SplitK.bK_sq (H.sqd_sq))
   let σ : H.K →+* ℂ := H.φ₀.comp H.K.val.toRingHom
   let I : (Ideal (𝓞 H.K))⁰ := ⟨H.ccK, mem_nonZeroDivisors_of_ne_zero H.ccK_ne_bot⟩

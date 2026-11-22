@@ -12,31 +12,39 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames Formalism.GradedWeylDivisibility MvPolynomial Formalism.MainNotions.G.LatticeSystems
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames
+  Formalism.GradedWeylDivisibility MvPolynomial Formalism.MainNotions.G.LatticeSystems
 
-theorem pb_nabla_one {O K : Type} [CommRing O] [Field K] [Algebra O K] (m : ℕ) (lam : Fin (m + 1) → ℤ) :
-    nablaLTw O K m lam 1 = intO O (m + 1) (nuOf lam) := by
+theorem pb_nabla_one
+    {O K : Type} [CommRing O] [Field K] [Algebra O K] (m : ℕ) (lam : Fin (m + 1) → ℤ)
+    : nablaLTw O K m lam 1 = intO O (m + 1) (nuOf lam) := by
   ext F
-  rw [Formalism.GradedWeylDivisibility.nablaLTwMem O K m lam 1 (by simp) F, Matrix.det_one, one_zpow, one_smul, tn_rowAct_one]
+  rw [Formalism.GradedWeylDivisibility.nablaLTwMem O K m lam 1 (by simp) F, Matrix.det_one,
+    one_zpow, one_smul, tn_rowAct_one]
   exact Iff.rfl
 
-theorem pb_finrank (K : Type) [Field K] (n : ℕ) (nu : Fin n → ℕ) (hnu : Antitone nu) :
-    (Module.finrank K (dualWeyl K n n nu) : ℚ) = weylDim n (fun i => (nu i : ℤ)) := by
+theorem pb_finrank (K : Type) [Field K] (n : ℕ) (nu : Fin n → ℕ) (hnu : Antitone nu)
+    : (Module.finrank K (dualWeyl K n n nu) : ℚ) = weylDim n (fun i => (nu i : ℤ)) := by
   rw [Formalism.L2.G.Model.weyl_dualWeyl K n nu hnu]
   unfold weylDim
   refine Finset.prod_congr rfl fun i _ => Finset.prod_congr rfl fun j _ => ?_
   push_cast
   rfl
 
-theorem pb_smith_lam {p n' : ℕ} (R : RS p n') (m : ℕ) (lam : Fin (m + 1) → ℤ) (hlam : Antitone lam) :
-    ∃ B : MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf →ₗ[R.Kf] MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf →ₗ[R.Kf] R.Kf,
-      (∀ (g : Matrix (Fin (m + 1)) (Fin (m + 1)) R.Kf) (P Q : MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf),
-        B (rowAct R.Kf g P) Q = B P (rowAct R.Kf g.transpose Q)) ∧
-      (∀ P ∈ intO R.O (m + 1) (nuOf lam), ∀ Q ∈ intO R.O (m + 1) (nuOf lam), B P Q ∈ Set.range (algebraMap R.O R.Kf)) ∧
-      ∃ (nb : ℕ) (x x' : Fin nb → MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf) (ka : Fin nb → ℕ),
-        (nb : ℚ) = weylDim (m + 1) (fun j => (nuOf lam j : ℤ)) ∧ (∀ b, ka b ≤ Formalism.L2.G.Model.expN p m lam) ∧
-        (∀ b, x b ∈ intO R.O (m + 1) (nuOf lam)) ∧ (∀ a', x' a' ∈ intO R.O (m + 1) (nuOf lam)) ∧
-        ∀ a' b, B (x b) (x' a') = if a' = b then (p : R.Kf) ^ ka b else 0 := by
+theorem pb_smith_lam {p n' : ℕ} (R : RS p n') (m : ℕ) (lam : Fin (m + 1) → ℤ) (hlam : Antitone lam)
+    : ∃ B
+        : MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf →ₗ[R.Kf] MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf →ₗ[R.Kf] R.Kf,
+      (∀ (g : Matrix (Fin (m + 1)) (Fin (m + 1)) R.Kf)
+            (P Q : MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf),
+          B (rowAct R.Kf g P) Q = B P (rowAct R.Kf g.transpose Q))
+        ∧ (∀ P ∈ intO R.O (m + 1) (nuOf lam), ∀ Q ∈ intO R.O (m + 1) (nuOf lam),
+          B P Q ∈ Set.range (algebraMap R.O R.Kf))
+        ∧ ∃ (nb : ℕ) (x x' : Fin nb → MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf)
+            (ka : Fin nb → ℕ),
+          (nb : ℚ) = weylDim (m + 1) (fun j => (nuOf lam j : ℤ))
+            ∧ (∀ b, ka b ≤ Formalism.L2.G.Model.expN p m lam)
+            ∧ (∀ b, x b ∈ intO R.O (m + 1) (nuOf lam)) ∧ (∀ a', x' a' ∈ intO R.O (m + 1) (nuOf lam))
+            ∧ ∀ a' b, B (x b) (x' a') = if a' = b then (p : R.Kf) ^ ka b else 0 := by
   classical
   have hfr := R.std.1.frac_O
   have hinj : Function.Injective (algebraMap R.O R.Kf) := IsFractionRing.injective R.O R.Kf
@@ -45,21 +53,38 @@ theorem pb_smith_lam {p n' : ℕ} (R : RS p n') (m : ℕ) (lam : Fin (m + 1) →
   obtain ⟨Bs, -, hB1, hB3, hB2⟩ := la_basis hinj m lam 1 (by rw [Matrix.det_one]; exact isUnit_one)
   rw [pb_nabla_one] at hB1
   have : Fintype ↥(ssIdx (m + 1) (m + 1) (nuOf lam)) := (sSIdxFinite _ _ _).fintype
-  let e : Fin (Fintype.card ↥(ssIdx (m + 1) (m + 1) (nuOf lam))) ≃ ↥(ssIdx (m + 1) (m + 1) (nuOf lam)) :=
+  let e
+      : Fin (Fintype.card ↥(ssIdx (m + 1) (m + 1) (nuOf lam)))
+        ≃ ↥(ssIdx (m + 1) (m + 1) (nuOf lam)) :=
     (Fintype.equivFin _).symm
   have hrange : Set.range (Bs ∘ e) = Set.range Bs := e.surjective.range_comp Bs
   have hli : LinearIndependent R.Kf (Bs ∘ e) := hB3.comp e e.injective
-  have hsK : Submodule.span R.Kf (Set.range (Bs ∘ e)) = dualWeyl R.Kf (m + 1) (m + 1) (nuOf lam) := by rw [hrange, hB2]
-  have hsO : Submodule.span R.O (Set.range (Bs ∘ e)) = intO R.O (m + 1) (nuOf lam) := by rw [hrange, hB1]
+  have hsK
+      : Submodule.span R.Kf (Set.range (Bs ∘ e)) = dualWeyl R.Kf (m + 1) (m + 1) (nuOf lam) := by
+    rw [hrange, hB2]
+  have hsO : Submodule.span R.O (Set.range (Bs ∘ e)) = intO R.O (m + 1) (nuOf lam) := by
+    rw [hrange, hB1]
   have hpc : algebraMap R.O R.Kf (p : R.O) = (p : R.Kf) := map_natCast _ p
-  obtain ⟨x, x', ka, hka, hx, hx', hdiag⟩ := pb_abs (O := R.O) (K := R.Kf) R.w (p : R.O) R.std.2.1 R.std.1.w_sq
-    (Formalism.L2.G.Model.expN p m lam) _ (Bs ∘ e) hli B0
-    (by rw [hsK]; exact hb)
-    (by rw [hsK, hsO]; exact hc)
-    (by rw [hsO, hpc]; exact hd)
+  obtain ⟨x, x', ka, hka, hx, hx', hdiag⟩ :=
+    pb_abs (O := R.O) (K := R.Kf) R.w (p : R.O) R.std.2.1 R.std.1.w_sq
+      (Formalism.L2.G.Model.expN p m lam) _ (Bs ∘ e) hli B0 (by rw [hsK]; exact hb)
+      (by rw [hsK, hsO]; exact hc) (by rw [hsO, hpc]; exact hd)
   rw [hsO] at hx hx'
   rw [hpc] at hdiag
-  refine ⟨((p : R.Kf) ^ Formalism.L2.G.Model.expN p m lam) • B0, ?_, ?_, _, x, x', ka, ?_, hka, hx, hx', ?_⟩
+  refine ⟨
+    ((p : R.Kf) ^ Formalism.L2.G.Model.expN p m lam) • B0,
+    ?_,
+    ?_,
+    _,
+    x,
+    x',
+    ka,
+    ?_,
+    hka,
+    hx,
+    hx',
+    ?_
+  ⟩
   · intro g P Q
     rw [LinearMap.smul_apply, LinearMap.smul_apply, LinearMap.smul_apply, LinearMap.smul_apply, ha]
   · intro P hP Q hQ
@@ -67,7 +92,8 @@ theorem pb_smith_lam {p n' : ℕ} (R : RS p n') (m : ℕ) (lam : Fin (m + 1) →
     rw [map_smul] at h
     rw [LinearMap.smul_apply, LinearMap.smul_apply]
     exact h
-  · rw [← pb_finrank R.Kf (m + 1) (nuOf lam) (nuOf_anti lam hlam), ← hsK, finrank_span_eq_card hli, Fintype.card_fin]
+  · rw [← pb_finrank R.Kf (m + 1) (nuOf lam) (nuOf_anti lam hlam), ← hsK, finrank_span_eq_card hli,
+      Fintype.card_fin]
   · intro a' b
     rw [LinearMap.smul_apply, LinearMap.smul_apply, smul_eq_mul]
     exact hdiag a' b
@@ -81,7 +107,9 @@ theorem smithP : SmithP := by
     funext t
     simp only [nuOf, hν0]
     simp
-  have hexp : Formalism.L2.G.Model.expN p m (fun j => ((ν j : ℕ) : ℤ)) ≤ N0 (m + 1) * deF p (m + 1) (ν 0) := by
+  have hexp
+      : Formalism.L2.G.Model.expN p m (fun j => ((ν j : ℕ) : ℤ))
+        ≤ N0 (m + 1) * deF p (m + 1) (ν 0) := by
     unfold Formalism.L2.G.Model.expN
     split_ifs
     · exact Nat.zero_le _

@@ -16,12 +16,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemStabLo
 @[expose] public section
 
 open scoped InnerProductSpace TensorProduct
-open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Cx Formalism.IndefR.Links
 open Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField IsDedekindDomain
-open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict Formalism.L2.SG.PoincareInHH.PoincareSetting
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS GlobalTheory.Core.Mi
+open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict
+  Formalism.L2.SG.PoincareInHH.PoincareSetting
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS
+  GlobalTheory.Core.Mi
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.MiTop GlobalTheory.SeeSaw GlobalTheory.Fam ValuativeRel IsLocalRing GlobalTheory.FinPl
+open GlobalTheory.MiTop GlobalTheory.SeeSaw GlobalTheory.Fam ValuativeRel IsLocalRing
+  GlobalTheory.FinPl
 
 noncomputable section
 
@@ -32,7 +37,8 @@ open scoped NNReal
 
 section Local
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {v : HeightOneSpectrum (𝓞 F)} {k : ℕ}
 
 theorem exists_lt_nnnorm (v : HeightOneSpectrum (𝓞 F)) (C : ℝ≥0) : ∃ t : Fv F v, C < ‖t‖₊ := by
@@ -40,28 +46,32 @@ theorem exists_lt_nnnorm (v : HeightOneSpectrum (𝓞 F)) (C : ℝ≥0) : ∃ t 
   obtain ⟨t, ht⟩ := NormedField.exists_lt_norm (Fv F v) (C : ℝ)
   exact ⟨t, by exact_mod_cast ht⟩
 
-theorem valBar_smul (τ : E →ₐ[F] FvBar F v) (t : Fv F v) (y : Fv F v ⊗[F] E) :
-    valBar F v (finEmb F v τ (t • y)) = ‖t‖₊ * valBar F v (finEmb F v τ y) := by
+theorem valBar_smul (τ : E →ₐ[F] FvBar F v) (t : Fv F v) (y : Fv F v ⊗[F] E)
+    : valBar F v (finEmb F v τ (t • y)) = ‖t‖₊ * valBar F v (finEmb F v τ y) := by
   rw [map_smul, Algebra.smul_def, map_mul]
   congr 1
   exact absBar_algebraMap F v t
 
-theorem mem_intLoc_iff_valBar {y : Fv F v ⊗[F] E} :
-    y ∈ intLoc F E v ↔ ∀ τ : E →ₐ[F] FvBar F v, valBar F v (finEmb F v τ y) ≤ 1 :=
+theorem mem_intLoc_iff_valBar {y : Fv F v ⊗[F] E}
+    : y ∈ intLoc F E v ↔ ∀ τ : E →ₐ[F] FvBar F v, valBar F v (finEmb F v τ y) ≤ 1 :=
   mem_intLoc_iff_absFin_le_one.trans (absFin_le_iff F v)
 
-theorem exists_valBar_ne_zero {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j * u j = 1) (τ : E →ₐ[F] FvBar F v) :
-    ∃ j, valBar F v (finEmb F v τ (u j)) ≠ 0 := by
+theorem exists_valBar_ne_zero
+    {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j * u j = 1) (τ : E →ₐ[F] FvBar F v)
+    : ∃ j, valBar F v (finEmb F v τ (u j)) ≠ 0 := by
   by_contra hc
   push Not at hc
   have := congrArg (finEmb F v τ) h
   set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_one, Finset.sum_eq_zero fun j _ => by
-    rw [map_mul, (Valuation.zero_iff _).1 (hc j), mul_zero]] at this
+    rw [map_sum, map_one,
+        Finset.sum_eq_zero fun j _ => by rw [map_mul, (Valuation.zero_iff _).1 (hc j), mul_zero]]
+      at this
   exact zero_ne_one this
 
-theorem mem_intLoc_of_stable {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j * u j = 1) {c : Fv F v ⊗[F] E}
-    (hc : ∀ a, (∀ j, a * u j ∈ intLoc F E v) → ∀ j, c * a * u j ∈ intLoc F E v) : c ∈ intLoc F E v := by
+theorem mem_intLoc_of_stable
+    {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j * u j = 1)
+    {c : Fv F v ⊗[F] E} (hc : ∀ a, (∀ j, a * u j ∈ intLoc F E v) → ∀ j, c * a * u j ∈ intLoc F E v)
+    : c ∈ intLoc F E v := by
   obtain ⟨t, ht⟩ := exists_lt_nnnorm v (Finset.univ.sup fun j => absFin F v (u j))
   have ht0 : ‖t‖₊ ≠ 0 := (lt_of_le_of_lt zero_le ht).ne'
   have h0 : ∀ j, (t⁻¹ • (1 : Fv F v ⊗[F] E)) * u j ∈ intLoc F E v := fun j => by
@@ -86,14 +96,18 @@ theorem mem_intLoc_of_stable {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j *
     mul_pos (inv_pos.2 (pos_iff_ne_zero.2 ht0)) (pos_iff_ne_zero.2 hj)
   obtain ⟨m, hm⟩ := pow_unbounded_of_one_lt (‖t‖₊⁻¹ * valBar F v (finEmb F v τ (u j)))⁻¹ hlt
   have h1 := mem_intLoc_iff_valBar.1 (hk m j) τ
-  rw [mul_assoc, smul_mul_assoc, one_mul, map_mul, map_mul, map_pow, map_pow, valBar_smul, nnnorm_inv,
-    ← le_mul_inv_iff₀ hpos, one_mul] at h1
+  rw [mul_assoc, smul_mul_assoc, one_mul, map_mul, map_mul, map_pow, map_pow, valBar_smul,
+      nnnorm_inv, ← le_mul_inv_iff₀ hpos, one_mul]
+    at h1
   exact absurd h1 (not_le.2 hm)
 
-theorem isUnit_of_reflect {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j * u j = 1) {c : Fv F v ⊗[F] E}
-    (hc : ∀ a, (∀ j, c * a * u j ∈ intLoc F E v) → ∀ j, a * u j ∈ intLoc F E v) : IsUnit c := by
+theorem isUnit_of_reflect
+    {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j * u j = 1)
+    {c : Fv F v ⊗[F] E} (hc : ∀ a, (∀ j, c * a * u j ∈ intLoc F E v) → ∀ j, a * u j ∈ intLoc F E v)
+    : IsUnit c := by
   haveI : IsArtinianRing (Fv F v ⊗[F] E) := IsArtinianRing.of_finite (Fv F v) _
-  refine IsArtinianRing.isUnit_of_mem_nonZeroDivisors (mem_nonZeroDivisors_iff_left.2 fun a ha => ?_)
+  refine IsArtinianRing.isUnit_of_mem_nonZeroDivisors (mem_nonZeroDivisors_iff_left.2 fun a ha =>
+    ?_)
   refine absFin_eq_zero_iff.1 (le_antisymm ((absFin_le_iff F v).2 fun τ => ?_) zero_le)
   by_contra hne
   have hpa : 0 < valBar F v (finEmb F v τ a) := not_le.1 hne
@@ -101,15 +115,19 @@ theorem isUnit_of_reflect {u l : Fin k → Fv F v ⊗[F] E} (h : ∑ j, l j * u 
   have hpos : 0 < valBar F v (finEmb F v τ (a * u j)) := by
     rw [map_mul, map_mul]; exact mul_pos hpa (pos_iff_ne_zero.2 hj)
   obtain ⟨t, ht⟩ := exists_lt_nnnorm v (valBar F v (finEmb F v τ (a * u j)))⁻¹
-  have h1 := mem_intLoc_iff_valBar.1
-    (hc (t • a) (fun j => by rw [mul_smul_comm, ha, smul_zero, zero_mul]; exact zero_mem _) j) τ
+  have h1 :=
+    mem_intLoc_iff_valBar.1
+      (hc (t • a) (fun j => by rw [mul_smul_comm, ha, smul_zero, zero_mul]; exact zero_mem _) j) τ
   rw [smul_mul_assoc, valBar_smul, ← le_mul_inv_iff₀ hpos, one_mul] at h1
   exact absurd h1 (not_le.2 ht)
 
-theorem smul_mem_latLoc_iff {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.IsFullLattice E L)
-    {w l : Fin n → Fv F v ⊗[F] E} (h : l ⬝ᵥ w = 1) {c : Fv F v ⊗[F] E}
-    (hc : ∀ a : Fv F v ⊗[F] E, (c * a) • w ∈ latLoc F L v ↔ a • w ∈ latLoc F L v) (y : Fin n → Fv F v ⊗[F] E) :
-    y ∈ latLoc F L v ↔ c • y ∈ latLoc F L v := by
+theorem smul_mem_latLoc_iff
+    {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.IsFullLattice E L)
+    {w l : Fin n → Fv F v ⊗[F] E} (h : l ⬝ᵥ w = 1)
+    {c : Fv F v ⊗[F] E}
+    (hc : ∀ a : Fv F v ⊗[F] E, (c * a) • w ∈ latLoc F L v ↔ a • w ∈ latLoc F L v)
+    (y : Fin n → Fv F v ⊗[F] E)
+    : y ∈ latLoc F L v ↔ c • y ∈ latLoc F L v := by
   obtain ⟨k, S, Φ, h1, hS, hΦ⟩ := SelfDual.exists_frame L hL
   have h2 := SelfDual.map_mul_eq_one (F := F) (Fv F v) h1
   set u := Φ.map (inclR (F := F) (Fv F v)) *ᵥ w with hu
@@ -123,7 +141,8 @@ theorem smul_mem_latLoc_iff {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL
   have hc1 := mem_intLoc_of_stable hl fun a => (hc a).2
   obtain ⟨c, rfl⟩ := isUnit_of_reflect hl fun a => (hc a).1
   have hc2 : ((c⁻¹ : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) ∈ intLoc F E v :=
-    mem_intLoc_of_stable hl fun a ha => (hc _).1 fun j => by rw [Units.mul_inv_cancel_left]; exact ha j
+    mem_intLoc_of_stable hl fun a ha =>
+      (hc _).1 fun j => by rw [Units.mul_inv_cancel_left]; exact ha j
   refine ⟨fun hy => (latLoc F L v).smul_mem ⟨_, hc1⟩ hy, fun hy => ?_⟩
   have := (latLoc F L v).smul_mem ⟨_, hc2⟩ hy
   change ((c⁻¹ : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) • (c : Fv F v ⊗[F] E) • y ∈ _ at this
@@ -131,17 +150,34 @@ theorem smul_mem_latLoc_iff {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL
 
 end Local
 
-
 set_option maxHeartbeats 1600000 in
-theorem smul_mem_latV_iff : ∀ (D : D7) (V : Formalism.BasicNotions.TH.HSp D) (Λ : GlobalTheory.FinPl.Lat V), Submodule.IsFullLattice D.host.E Λ → ∀ (v : GlobalTheory.FinPl.Pl D) (ε : Fin V.rank → D.host.E), ε ≠ 0 → ∀ (c : AE D) (s : Matrix (Fin V.rank) (Fin V.rank) (AE D)), IsUnit s → (∀ a ∈ GlobalTheory.FinPl.idAt D (· = v), (Matrix.mulVec (s) (fun i => c * (a * Formalism.L2.Theta.incA D (ε i))) ∈ GlobalTheory.FinPl.latV V Λ (· = v) ↔ Matrix.mulVec (s) (fun i => a * Formalism.L2.Theta.incA D (ε i)) ∈ GlobalTheory.FinPl.latV V Λ (· = v))) → ∀ y : Fin V.rank → AE D, (∀ i, y i ∈ GlobalTheory.FinPl.idAt D (· = v)) → (y ∈ GlobalTheory.FinPl.latV V Λ (· = v) ↔ c • y ∈ GlobalTheory.FinPl.latV V Λ (· = v)) := by
+theorem smul_mem_latV_iff
+    : ∀ (D : D7) (V : Formalism.BasicNotions.TH.HSp D) (Λ : GlobalTheory.FinPl.Lat V),
+      Submodule.IsFullLattice D.host.E Λ
+        → ∀ (v : GlobalTheory.FinPl.Pl D) (ε : Fin V.rank → D.host.E),
+          ε ≠ 0
+            → ∀ (c : AE D) (s : Matrix (Fin V.rank) (Fin V.rank) (AE D)),
+              IsUnit s
+                → (∀ a ∈ GlobalTheory.FinPl.idAt D (· = v),
+                  (Matrix.mulVec (s) (fun i => c * (a * Formalism.L2.Theta.incA D (ε i)))
+                      ∈ GlobalTheory.FinPl.latV V Λ (· = v)
+                    ↔ Matrix.mulVec (s) (fun i => a * Formalism.L2.Theta.incA D (ε i))
+                      ∈ GlobalTheory.FinPl.latV V Λ (· = v)))
+                → ∀ y : Fin V.rank → AE D,
+                  (∀ i, y i ∈ GlobalTheory.FinPl.idAt D (· = v))
+                    → (y ∈ GlobalTheory.FinPl.latV V Λ (· = v)
+                      ↔ c • y ∈ GlobalTheory.FinPl.latV V Λ (· = v)) := by
   intro D V Λ hΛ v ε hε c s hs h y hy
   have hfg : Λ.FG := by
     letI := hΛ
     exact Submodule.IsLattice.fg D.host.E Λ
-  let π : AE D →+* Fv D.host.F v ⊗[D.host.F] D.host.E := (GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter.compFin D v).comp (finPart D)
-  have hπ : ∀ z : Fin V.rank → AE D, (∀ i, z i ∈ GlobalTheory.FinPl.idAt D (· = v)) →
-      (z ∈ GlobalTheory.FinPl.latV V Λ (· = v) ↔ (fun i => π (z i)) ∈ latLoc D.host.F Λ v) := fun z hz =>
-    GlobalTheory.StMoves.mem_latV_iff_latLoc V Λ hfg v z hz
+  let π : AE D →+* Fv D.host.F v ⊗[D.host.F] D.host.E :=
+    (GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter.compFin D v).comp (finPart D)
+  have hπ
+      : ∀ z : Fin V.rank → AE D,
+        (∀ i, z i ∈ GlobalTheory.FinPl.idAt D (· = v))
+          → (z ∈ GlobalTheory.FinPl.latV V Λ (· = v) ↔ (fun i => π (z i)) ∈ latLoc D.host.F Λ v) :=
+    fun z hz => GlobalTheory.StMoves.mem_latV_iff_latLoc V Λ hfg v z hz
   let w : Fin V.rank → AE D := s *ᵥ fun i => Formalism.L2.Theta.incA D (ε i)
   have hw : ∀ a : AE D, (s *ᵥ fun i => a * Formalism.L2.Theta.incA D (ε i)) = a • w := fun a =>
     Matrix.mulVec_smul s a _
@@ -149,13 +185,14 @@ theorem smul_mem_latV_iff : ∀ (D : D7) (V : Formalism.BasicNotions.TH.HSp D) (
     obtain ⟨i, hi⟩ := Function.ne_iff.1 hε
     obtain ⟨s', rfl⟩ := hs
     refine ⟨(Pi.single i (Formalism.L2.Theta.incA D (ε i)⁻¹)) ᵥ* (s'⁻¹).1, ?_⟩
-    rw [← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Units.inv_mul, Matrix.one_mulVec, single_dotProduct,
-      ← map_mul, inv_mul_cancel₀ hi, map_one]
+    rw [← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Units.inv_mul, Matrix.one_mulVec,
+      single_dotProduct, ← map_mul, inv_mul_cancel₀ hi, map_one]
   have hl' : (fun i => π (l i)) ⬝ᵥ (fun i => π (w i)) = 1 := by
     rw [← map_one π, ← hl]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, map_sum, map_mul]
-  have hsm : ∀ (a : AE D) (z : Fin V.rank → AE D), (fun i => π ((a • z) i)) = π a • fun i => π (z i) :=
+    simp only [dotProduct, map_sum, map_mul]
+  have hsm
+      : ∀ (a : AE D) (z : Fin V.rank → AE D), (fun i => π ((a • z) i)) = π a • fun i => π (z i) :=
     fun a z => funext fun i => map_mul π a (z i)
   rw [hπ y hy, hπ (c • y) fun i => Ideal.mul_mem_left _ _ (hy i), hsm]
   refine smul_mem_latLoc_iff Λ hΛ hl' (fun b => ?_) _
@@ -164,7 +201,8 @@ theorem smul_mem_latV_iff : ∀ (D : D7) (V : Formalism.BasicNotions.TH.HSp D) (
   have h1 := h (a 0) (ha 0)
   simp only [← mul_assoc] at h1
   rw [hw, hw, hπ ((c * a 0) • w) fun i => Ideal.mul_mem_right _ _ (Ideal.mul_mem_left _ _ (ha 0)),
-    hπ (a 0 • w) fun i => Ideal.mul_mem_right _ _ (ha 0), hsm, hsm, map_mul, hab'] at h1
+      hπ (a 0 • w) fun i => Ideal.mul_mem_right _ _ (ha 0), hsm, hsm, map_mul, hab']
+    at h1
   exact h1
 
 end GlobalTheory.LineUnit

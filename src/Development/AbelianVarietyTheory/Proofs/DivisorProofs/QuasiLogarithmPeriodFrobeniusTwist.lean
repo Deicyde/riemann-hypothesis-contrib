@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DividedInOfQ
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 set_option autoImplicit false
 
@@ -228,21 +230,25 @@ private lemma hasVal_map_of_compatible {p : ℕ} {B Q : Type} [CommRing B]
     simp [hs]
   rw [key, ← map_sub, hb, hs, map_mul, map_pow, map_natCast]
 
-
 open MvPowerSeries in
 set_option autoImplicit false in
-theorem _root_.GlobalTheory.QLog.hasPeriod_frob : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
-    [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C]
-    [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O →
-    ∀ (ε : PreTilt O p) (hε : _root_.GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta.IsPrimitiveSystem ε), ∀ F : _root_.GlobalTheory.QLog.BFrame ε,
-    ∀ (G : _root_.GlobalTheory.PDivGroup p O) (d : ℕ) (c : _root_.GlobalTheory.QLog.Chart G d)
-    (μ' : Fin d → MvPowerSeries (Fin d ⊕ Fin d) F.B),
-    _root_.GlobalTheory.QLog.IsLift F.θ μ' →
-    (∀ i, map F.θ (μ' i) = c.μ i) →
-    ∀ (f : MvPowerSeries (Fin d) F.Q) (t : G.Tate) (y : F.B),
-    _root_.GlobalTheory.QLog.QL μ' ⊤ f → c.HasPeriod F.θ t f y →
-    c.HasPeriod F.θ t
-      (_root_.GlobalTheory.QLog.frob p F.s f) (F.σ y) := by
+theorem _root_.GlobalTheory.QLog.hasPeriod_frob
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
+      v.Integers O
+        → ∀ (ε : PreTilt O p)
+            (hε
+              : _root_.GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta.IsPrimitiveSystem
+                ε),
+          ∀ F : _root_.GlobalTheory.QLog.BFrame ε,
+            ∀ (G : _root_.GlobalTheory.PDivGroup p O) (d : ℕ)
+                (c : _root_.GlobalTheory.QLog.Chart G d)
+                (μ' : Fin d → MvPowerSeries (Fin d ⊕ Fin d) F.B),
+              _root_.GlobalTheory.QLog.IsLift F.θ μ' → (∀ i, map F.θ (μ' i) = c.μ i)
+                → ∀ (f : MvPowerSeries (Fin d) F.Q) (t : G.Tate) (y : F.B),
+                  _root_.GlobalTheory.QLog.QL μ' ⊤ f → c.HasPeriod F.θ t f y
+                    → c.HasPeriod F.θ t (_root_.GlobalTheory.QLog.frob p F.s f) (F.σ y) := by
   intro p _ C _ _ _ v O _ _ _ _ _ _ ε hε F G d c μ' hlift hμ f t y hQL hper
   have hF := F.frame
   haveI := hF.complete
@@ -267,10 +273,11 @@ theorem _root_.GlobalTheory.QLog.hasPeriod_frob : ∀ (p : ℕ) [Fact p.Prime] (
     obtain ⟨N, a, ha⟩ := hznil i
     exact ⟨N, ⟨F.σ a, by rw [← map_pow, ha, map_mul, map_natCast]⟩⟩
   have h1 := hasVal_map_of_compatible (p := p) _ _ hs hq
-  obtain ⟨q', hq', -⟩ := _root_.GlobalTheory.QLog.existsUnique_hasVal_of_dIn p _ _ _ F.θ
-    hF (Fin d) (fun i => z i ^ p) hzpnil _ hdiffs
-  have hPD : ∀ x ∈ Ideal.span {(p : F.B)}, ∃ w ∈ Ideal.span {(p : F.B)},
-      x ^ p = (p : F.B) * w := by
+  obtain ⟨q', hq', -⟩ :=
+    _root_.GlobalTheory.QLog.existsUnique_hasVal_of_dIn p _ _ _ F.θ hF (Fin d)
+      (fun i => z i ^ p)
+      hzpnil _ hdiffs
+  have hPD : ∀ x ∈ Ideal.span {(p : F.B)}, ∃ w ∈ Ideal.span {(p : F.B)}, x ^ p = (p : F.B) * w := by
     intro x hx
     obtain ⟨e, rfl⟩ := Ideal.mem_span_singleton.mp hx
     refine ⟨(p : F.B) ^ (p - 1) * e ^ p, ?_, ?_⟩
@@ -281,27 +288,31 @@ theorem _root_.GlobalTheory.QLog.hasPeriod_frob : ∀ (p : ℕ) [Fact p.Prime] (
       congr 2
       have := (Fact.out : p.Prime).one_le
       omega
-  have hcong : ∀ i, F.σ (z i) - z i ^ p ∈ Ideal.span {(p : F.B)} :=
-    fun i => Ideal.mem_span_singleton.mpr (F.σ_pow (z i))
-  obtain ⟨e, -, e', hee⟩ := _root_.GlobalTheory.HasValCong.hasVal_sub_mem p _ _ _ F.θ hF
-    (Fin d) (fun i => F.σ (z i)) hσnil _ hPD (fun i => z i ^ p) _ _ _ hcong hdiffs
-    h1 hq' 0
-  obtain ⟨⟨E, hE, -⟩, -⟩ := _root_.GlobalTheory.CEval.continuous_eval p F.B
-    F.B (Fin d) z hznil
-  have hEX : (fun j => E ((X j : MvPowerSeries (Fin d) F.B) ^ p)) =
-      fun j => z j ^ p := by
+  have hcong : ∀ i, F.σ (z i) - z i ^ p ∈ Ideal.span {(p : F.B)} := fun i =>
+    Ideal.mem_span_singleton.mpr (F.σ_pow (z i))
+  obtain ⟨e, -, e', hee⟩ :=
+    _root_.GlobalTheory.HasValCong.hasVal_sub_mem p _ _ _ F.θ hF (Fin d)
+      (fun i => F.σ (z i))
+      hσnil _ hPD
+      (fun i => z i ^ p)
+      _ _ _ hcong hdiffs h1 hq' 0
+  obtain ⟨⟨E, hE, -⟩, -⟩ := _root_.GlobalTheory.CEval.continuous_eval p F.B F.B (Fin d) z hznil
+  have hEX : (fun j => E ((X j : MvPowerSeries (Fin d) F.B) ^ p)) = fun j => z j ^ p := by
     funext j
     rw [map_pow, hE.1 j]
-  have hfrob := _root_.GlobalTheory.QLog.hasVal_subst p _ _ _ F.θ hF (Fin d) z
-    hznil E hE (Fin d) (fun j => (X j : MvPowerSeries (Fin d) F.B) ^ p) _ q'
-    (fun j => by simp [hp0]) hdiffs (by rw [hEX]; exact hq')
-  have hu : _root_.GlobalTheory.QLog.up F.Q
-      (fun j => (X j : MvPowerSeries (Fin d) F.B) ^ p) = fun j => X j ^ p := by
+  have hfrob :=
+    _root_.GlobalTheory.QLog.hasVal_subst p _ _ _ F.θ hF (Fin d) z hznil E hE (Fin d)
+      (fun j => (X j : MvPowerSeries (Fin d) F.B) ^ p)
+      _ q'
+      (fun j => by simp [hp0])
+      hdiffs (by rw [hEX]; exact hq')
+  have hu
+      : _root_.GlobalTheory.QLog.up F.Q (fun j => (X j : MvPowerSeries (Fin d) F.B) ^ p)
+        = fun j => X j ^ p := by
     funext j
     simp [_root_.GlobalTheory.QLog.up]
   rw [hu] at hfrob
-  refine ⟨q', by unfold _root_.GlobalTheory.QLog.frob; exact hfrob,
-    F.σ b - (e + e'), ?_⟩
+  refine ⟨q', by unfold _root_.GlobalTheory.QLog.frob; exact hfrob, F.σ b - (e + e'), ?_⟩
   have hs' := congrArg F.s hb
   simp only [map_mul, map_pow, map_natCast, hs, map_add (f := _)] at hs'
   simp only [pow_zero, one_mul, map_add (f := _)] at hee

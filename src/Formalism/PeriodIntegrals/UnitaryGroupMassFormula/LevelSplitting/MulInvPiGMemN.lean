@@ -14,7 +14,9 @@ open scoped TensorProduct
 
 section R
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] {R : Type} [CommRing R] [Algebra F R]
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  {R : Type} [CommRing R] [Algebra F R]
   {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E} {r : ℕ} {P : Frame E M r} {T : F}
   (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T)
 include hσσ hJ hP
@@ -35,12 +37,13 @@ theorem piG_mem_H (g : HA R σ J) (hg : g ∈ Ssub R σ J P) : piG hσσ hJ hP g
   · rw [tupH, Fin.append_right]
     exact SemiG.Dat.Pi_f H _ b
 
-theorem piG_of_H {h : HA R σ J} (hh : h ∈ Hsub R σ J P) (hg : h ∈ Ssub R σ J P) :
-    piG hσσ hJ hP h hg = h := by
+theorem piG_of_H {h : HA R σ J} (hh : h ∈ Hsub R σ J P) (hg : h ∈ Ssub R σ J P)
+    : piG hσσ hJ hP h hg = h := by
   have hext : ∀ {g₁ g₂ : HA R σ J}, (∀ x, lin R σ J g₁ x = lin R σ J g₂ x) → g₁ = g₂ := by
     intro g₁ g₂ hgg
-    have hm : ((HA.mat R σ J g₁ : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E)) =
-        (HA.mat R σ J g₂ : GL (Fin M) (R ⊗[F] E)) := by
+    have hm
+        : ((HA.mat R σ J g₁ : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E))
+          = (HA.mat R σ J g₂ : GL (Fin M) (R ⊗[F] E)) := by
       ext i j
       have h1 := hgg (Pi.single j 1)
       simp only [lin, Matrix.mulVecLin_apply, Matrix.mulVec_single_one] at h1
@@ -62,12 +65,13 @@ theorem piG_of_H {h : HA R σ J} (hh : h ∈ Hsub R σ J P) (hg : h ∈ Ssub R �
   rw [lin_piG]
   exact SemiG.Dat.Pi_of_fix H ⟨he, hz⟩ hf (uni_lin h) x
 
-theorem piG_of_N {n : HA R σ J} (hn : n ∈ Nsub R σ J P) (hg : n ∈ Ssub R σ J P) :
-    piG hσσ hJ hP n hg = 1 := by
+theorem piG_of_N {n : HA R σ J} (hn : n ∈ Nsub R σ J P) (hg : n ∈ Ssub R σ J P)
+    : piG hσσ hJ hP n hg = 1 := by
   have hext : ∀ {g₁ g₂ : HA R σ J}, (∀ x, lin R σ J g₁ x = lin R σ J g₂ x) → g₁ = g₂ := by
     intro g₁ g₂ hgg
-    have hm : ((HA.mat R σ J g₁ : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E)) =
-        (HA.mat R σ J g₂ : GL (Fin M) (R ⊗[F] E)) := by
+    have hm
+        : ((HA.mat R σ J g₁ : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E))
+          = (HA.mat R σ J g₂ : GL (Fin M) (R ⊗[F] E)) := by
       ext i j
       have h1 := hgg (Pi.single j 1)
       simp only [lin, Matrix.mulVecLin_apply, Matrix.mulVec_single_one] at h1
@@ -81,13 +85,14 @@ theorem piG_of_N {n : HA R σ J} (hn : n ∈ Nsub R σ J P) (hg : n ∈ Ssub R �
   have h1 := hv a
   rwa [datR_h] at h1
 
-theorem piG_mul {g g' : HA R σ J} (hg : g ∈ Ssub R σ J P) (hg' : g' ∈ Ssub R σ J P) :
-    piG hσσ hJ hP (g * g') ((Ssub R σ J P).mul_mem hg hg') =
-      piG hσσ hJ hP g hg * piG hσσ hJ hP g' hg' := by
+theorem piG_mul {g g' : HA R σ J} (hg : g ∈ Ssub R σ J P) (hg' : g' ∈ Ssub R σ J P)
+    : piG hσσ hJ hP (g * g') ((Ssub R σ J P).mul_mem hg hg')
+      = piG hσσ hJ hP g hg * piG hσσ hJ hP g' hg' := by
   have hext : ∀ {g₁ g₂ : HA R σ J}, (∀ x, lin R σ J g₁ x = lin R σ J g₂ x) → g₁ = g₂ := by
     intro g₁ g₂ hgg
-    have hm : ((HA.mat R σ J g₁ : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E)) =
-        (HA.mat R σ J g₂ : GL (Fin M) (R ⊗[F] E)) := by
+    have hm
+        : ((HA.mat R σ J g₁ : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E))
+          = (HA.mat R σ J g₂ : GL (Fin M) (R ⊗[F] E)) := by
       ext i j
       have h1 := hgg (Pi.single j 1)
       simp only [lin, Matrix.mulVecLin_apply, Matrix.mulVec_single_one] at h1
@@ -97,8 +102,8 @@ theorem piG_mul {g g' : HA R σ J} (hg : g ∈ Ssub R σ J P) (hg' : g' ∈ Ssub
   rw [lin_piG, lin_mul, lin_piG, lin_piG, Pi_lin_mul hσσ hJ hP hg hg']
   rfl
 
-theorem mul_inv_piG_mem_N {s : HA R σ J} (hs : s ∈ Ssub R σ J P) :
-    s * (piG hσσ hJ hP s hs)⁻¹ ∈ Nsub R σ J P := by
+theorem mul_inv_piG_mem_N {s : HA R σ J} (hs : s ∈ Ssub R σ J P)
+    : s * (piG hσσ hJ hP s hs)⁻¹ ∈ Nsub R σ J P := by
   have H := datR_hyp (R := R) hσσ hJ hP
   set π := piG hσσ hJ hP s hs with hπ
   have hpe : ∀ b, lin R σ J π (ratV (F := F) R (P.e b)) = ratV (F := F) R (P.e b) := fun b => by
@@ -116,8 +121,9 @@ theorem mul_inv_piG_mem_N {s : HA R σ J} (hs : s ∈ Ssub R σ J P) :
       show hR R σ J (ratV (F := F) R (P.e a)) u = 0
       rw [← hR_lin π, hpe, hu, lin_lin_inv]
       exact hv a
-    have hZ : lin R σ J s (datR R σ J P T).z - (datR R σ J P T).z ∈
-        Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).e) :=
+    have hZ
+        : lin R σ J s (datR R σ J P T).z - (datR R σ J P T).z
+          ∈ Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).e) :=
       spanR_le Set.univ (stabilizer_fixes_tail_coords hs)
     have h1 := SemiG.Dat.N_part H (mapX_S hs) (mapW_S hs) hZ u hu'
     have h2 : (datR R σ J P T).Pi (lin R σ J s) u = v := by

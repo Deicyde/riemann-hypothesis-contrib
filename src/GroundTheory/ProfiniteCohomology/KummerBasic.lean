@@ -213,18 +213,20 @@ lemma kummerPairing_one_right (σ : Gal(L/K)) : kummerPairing K n L σ 1 = 1 := 
 variable (K n L)
 
 noncomputable def kummerPairingLeft : Gal(L/K) →* (kummerGroup K n L →* rootsOfUnity n K) where
-  toFun σ :=
-    { toFun := kummerPairing K n L σ
-      map_one' := kummerPairing_one_right σ
-      map_mul' := kummerPairing_mul_right σ }
+  toFun σ := {
+    toFun := kummerPairing K n L σ
+    map_one' := kummerPairing_one_right σ
+    map_mul' := kummerPairing_mul_right σ
+  }
   map_one' := by ext x : 1; exact kummerPairing_one_left x
   map_mul' σ τ := by ext x : 1; exact kummerPairing_mul_left σ τ x
 
 noncomputable def kummerPairingRight : kummerGroup K n L →* (Gal(L/K) →* rootsOfUnity n K) where
-  toFun x :=
-    { toFun := fun σ => kummerPairing K n L σ x
-      map_one' := kummerPairing_one_left x
-      map_mul' := fun σ τ => kummerPairing_mul_left σ τ x }
+  toFun x := {
+    toFun := fun σ => kummerPairing K n L σ x
+    map_one' := kummerPairing_one_left x
+    map_mul' := fun σ τ => kummerPairing_mul_left σ τ x
+  }
   map_one' := by ext σ : 1; exact kummerPairing_one_right σ
   map_mul' x y := by ext σ : 1; exact kummerPairing_mul_right σ x y
 
@@ -237,8 +239,8 @@ section Field
 
 variable (K : Type*) [Field K] (n : ℕ)
 
-def kummerField (Ω : Type*) [Field Ω] [Algebra K Ω] (Δ : Subgroup (UnitsModPow K n)) :
-    IntermediateField K Ω :=
+def kummerField (Ω : Type*) [Field Ω] [Algebra K Ω] (Δ : Subgroup (UnitsModPow K n))
+    : IntermediateField K Ω :=
   IntermediateField.adjoin K
     {α : Ω | ∃ a : Kˣ, (a : UnitsModPow K n) ∈ Δ ∧ α ^ n = algebraMap K Ω a}
 

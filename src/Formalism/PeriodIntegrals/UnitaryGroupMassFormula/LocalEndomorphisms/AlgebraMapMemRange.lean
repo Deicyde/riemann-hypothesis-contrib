@@ -9,13 +9,16 @@ open NumberField IsDedekindDomain Polynomial
 
 namespace PI.LocalEndW
 
-private theorem aeval_ringHom_apply_lemma {L M : Type*} [Field L] [Field M] [Algebra ℚ L] [Algebra ℚ M]
-    (φ : L →+* M) (p : ℚ[X]) (x : L) : aeval (φ x) p = φ (aeval x p) := by
+private theorem aeval_ringHom_apply_lemma
+    {L M : Type*} [Field L] [Field M] [Algebra ℚ L] [Algebra ℚ M] (φ : L →+* M) (p : ℚ[X]) (x : L)
+    : aeval (φ x) p = φ (aeval x p) := by
   rw [aeval_def, aeval_def, hom_eval₂, RingHom.ext_rat (φ.comp (algebraMap ℚ L)) (algebraMap ℚ M)]
 
-theorem algebraMap_mem_range {F : Type} [Field F] [NumberField F] {v : HeightOneSpectrum (𝓞 F)}
-    (τ : v.adicCompletion F →+* v.adicCompletion F) (a : F) :
-    algebraMap F (v.adicCompletion F) a ∈ Set.range τ := by
+theorem algebraMap_mem_range
+    {F : Type} [Field F] [NumberField F]
+    {v : HeightOneSpectrum (𝓞 F)} (τ : v.adicCompletion F →+* v.adicCompletion F)
+    (a : F)
+    : algebraMap F (v.adicCompletion F) a ∈ Set.range τ := by
   set K := v.adicCompletion F
   have : CharZero K := charZero_of_injective_algebraMap (algebraMap F K).injective
   let _ : Algebra ℚ K := DivisionRing.toRatAlgebra
@@ -36,14 +39,14 @@ theorem algebraMap_mem_range {F : Type} [Field F] [NumberField F] {v : HeightOne
   obtain ⟨r, hr⟩ := Finite.surjective_of_injective hg ⟨algebraMap F K a, haS⟩
   exact ⟨r.1, congrArg Subtype.val hr⟩
 
-private theorem denseRange_algebraMap_adicCompletion_lemma_2 {F : Type} [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) : DenseRange (algebraMap F (v.adicCompletion F)) := by
+private theorem denseRange_algebraMap_adicCompletion_lemma_2
+    {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+    : DenseRange (algebraMap F (v.adicCompletion F)) := by
   exact HeightOneSpectrum.denseRange_algebraMap F v
 
 theorem valSurjective : ValSurjective := by
   intro F _ _ v τ hτ y
-  have hclosed : IsClosed (Set.range τ) :=
-    (isUniformInducing_of_val τ hτ).isComplete_range.isClosed
+  have hclosed : IsClosed (Set.range τ) := (isUniformInducing_of_val τ hτ).isComplete_range.isClosed
   have hdense : Dense (Set.range τ) :=
     (denseRange_algebraMap_adicCompletion_lemma_2 v).mono (by
       rintro _ ⟨a, rfl⟩

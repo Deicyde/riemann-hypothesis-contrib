@@ -10,7 +10,8 @@ noncomputable section
 namespace GlobalTheory.EisBL.AETop
 
 open NumberField IsDedekindDomain Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.ThK.Dbl
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
@@ -38,8 +39,11 @@ instance secondCountableAE : SecondCountableTopology (AE F E) := by
   obtain ⟨e⟩ := nonempty_homeomorphAE (F := F) (E := E)
   exact e.secondCountableTopology
 
-instance topGrpGL {ι : Type} [Fintype ι] [DecidableEq ι] : IsTopologicalGroup (GL ι (AE F E)) := inferInstance
+instance topGrpGL {ι : Type} [Fintype ι] [DecidableEq ι] : IsTopologicalGroup (GL ι (AE F E)) :=
+  inferInstance
 
-instance isTopologicalGroup_G2 {σ : E →ₐ[F] E} {n : ℕ} {Y : Spc F E n} : IsTopologicalGroup (G2 σ Y) := inferInstance
+instance isTopologicalGroup_G2 {σ : E →ₐ[F] E} {n : ℕ} {Y : Spc F E n}
+    : IsTopologicalGroup (G2 σ Y) :=
+  inferInstance
 
 end GlobalTheory.EisBL.AETop

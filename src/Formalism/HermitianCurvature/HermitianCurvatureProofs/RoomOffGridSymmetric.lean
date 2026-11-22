@@ -8,20 +8,21 @@ namespace Formalism.FourierDecayAlt.P.PBD
 
 open Formalism.FourierDecayAlt NumberField
 
-theorem plusW_eq (ys : List ℝ) (w : List C.Letter) :
-    KB.plusW ys w = ys.map (fun y => ((true, y) : C.Letter)) ++ w := by
+theorem plusW_eq (ys : List ℝ) (w : List C.Letter)
+    : KB.plusW ys w = ys.map (fun y => ((true, y) : C.Letter)) ++ w := by
   induction ys with
   | nil => rfl
   | cons y ys ih => simp only [KB.plusW, ih, List.map_cons, List.cons_append]
 
-theorem minusW_eq (ys : List ℝ) (w : List C.Letter) :
-    KB.minusW ys w = ys.map (fun y => ((false, y + 1) : C.Letter)) ++ w := by
+theorem minusW_eq (ys : List ℝ) (w : List C.Letter)
+    : KB.minusW ys w = ys.map (fun y => ((false, y + 1) : C.Letter)) ++ w := by
   induction ys with
   | nil => rfl
   | cons y ys ih => simp only [KB.minusW, ih, List.map_cons, List.cons_append]
 
-theorem cutWord_iff (P : M.Par) (l0 : ℕ) (L : List C.Letter) :
-    KB.CutWord P l0 L ↔ (∀ x ∈ L, I.OnCut P.u P.u' l0 x.2) ∧ L.Pairwise (fun x y => 2 < |x.2 - y.2|) := by
+theorem cutWord_iff (P : M.Par) (l0 : ℕ) (L : List C.Letter)
+    : KB.CutWord P l0 L
+      ↔ (∀ x ∈ L, I.OnCut P.u P.u' l0 x.2) ∧ L.Pairwise (fun x y => 2 < |x.2 - y.2|) := by
   unfold KB.CutWord
   constructor
   · rintro ⟨h1, h2⟩
@@ -38,13 +39,14 @@ theorem cutWord_iff (P : M.Par) (l0 : ℕ) (L : List C.Letter) :
     · exact h2 a b h
     · rw [abs_sub_comm]; exact h2 b a h
 
-theorem pick_one (lo hi : ℝ) (Q B : Finset ℝ) (h : 9 * ((Q.card : ℝ) + B.card) + 1 ≤ hi - lo) :
-    ∃ y, lo ≤ y ∧ y + 1 ≤ hi ∧ y ∉ B ∧ y + 1 ∉ B ∧ ∀ q ∈ Q, 4 < |y - q| := by
+theorem pick_one (lo hi : ℝ) (Q B : Finset ℝ) (h : 9 * ((Q.card : ℝ) + B.card) + 1 ≤ hi - lo)
+    : ∃ y, lo ≤ y ∧ y + 1 ≤ hi ∧ y ∉ B ∧ y + 1 ∉ B ∧ ∀ q ∈ Q, 4 < |y - q| := by
   classical
   by_cases hn : Q.card + B.card = 0
   · have hQ : Q = ∅ := Finset.card_eq_zero.mp (by omega)
     have hB : B = ∅ := Finset.card_eq_zero.mp (by omega)
-    subst hQ; subst hB
+    subst hQ
+    subst hB
     simp only [Finset.card_empty, Nat.cast_zero, add_zero, mul_zero, zero_add] at h
     exact ⟨lo, le_refl _, by linarith, by simp, by simp, by simp⟩
   · have hn1 : (1 : ℝ) ≤ (Q.card : ℝ) + B.card := by
@@ -52,8 +54,9 @@ theorem pick_one (lo hi : ℝ) (Q B : Finset ℝ) (h : 9 * ((Q.card : ℝ) + B.c
       exact_mod_cast this
     by_contra hcon
     push_neg at hcon
-    have hsub : Set.Icc lo (hi - 1) ⊆
-        (⋃ q ∈ Q, Metric.closedBall q 4) ∪ ((B : Set ℝ) ∪ (fun b => b - 1) '' (B : Set ℝ)) := by
+    have hsub
+        : Set.Icc lo (hi - 1)
+          ⊆ (⋃ q ∈ Q, Metric.closedBall q 4) ∪ ((B : Set ℝ) ∪ (fun b => b - 1) '' (B : Set ℝ)) := by
       intro y hy
       by_cases hyB : y ∈ B
       · exact Or.inr (Or.inl hyB)
@@ -66,9 +69,10 @@ theorem pick_one (lo hi : ℝ) (Q B : Finset ℝ) (h : 9 * ((Q.card : ℝ) + B.c
     have hfin : ((B : Set ℝ) ∪ (fun b => b - 1) '' (B : Set ℝ)).Finite :=
       B.finite_toSet.union (B.finite_toSet.image _)
     have h1 := MeasureTheory.measure_mono (μ := MeasureTheory.volume) hsub
-    have h2 : MeasureTheory.volume ((⋃ q ∈ Q, Metric.closedBall q 4) ∪
-        ((B : Set ℝ) ∪ (fun b => b - 1) '' (B : Set ℝ))) ≤
-        ∑ q ∈ Q, MeasureTheory.volume (Metric.closedBall q (4 : ℝ)) := by
+    have h2
+        : MeasureTheory.volume
+            ((⋃ q ∈ Q, Metric.closedBall q 4) ∪ ((B : Set ℝ) ∪ (fun b => b - 1) '' (B : Set ℝ)))
+          ≤ ∑ q ∈ Q, MeasureTheory.volume (Metric.closedBall q (4 : ℝ)) := by
       refine (MeasureTheory.measure_union_le _ _).trans ?_
       rw [hfin.measure_zero, add_zero]
       exact MeasureTheory.measure_biUnion_finset_le _ _
@@ -83,11 +87,12 @@ theorem pick_one (lo hi : ℝ) (Q B : Finset ℝ) (h : 9 * ((Q.card : ℝ) + B.c
     have : (0 : ℝ) ≤ B.card := by positivity
     linarith
 
-theorem pick_many (lo hi : ℝ) (B : Finset ℝ) : ∀ (m : ℕ) (Q : Finset ℝ),
-    9 * ((Q.card : ℝ) + m + B.card) + 1 ≤ hi - lo →
-    ∃ ys : List ℝ, ys.length = m ∧
-      (∀ y ∈ ys, lo ≤ y ∧ y + 1 ≤ hi ∧ y ∉ B ∧ y + 1 ∉ B ∧ ∀ q ∈ Q, 4 < |y - q|) ∧
-      ys.Pairwise (fun y y' => 4 < |y - y'|) := by
+theorem pick_many (lo hi : ℝ) (B : Finset ℝ)
+    : ∀ (m : ℕ) (Q : Finset ℝ),
+      9 * ((Q.card : ℝ) + m + B.card) + 1 ≤ hi - lo
+        → ∃ ys : List ℝ,
+          ys.length = m ∧ (∀ y ∈ ys, lo ≤ y ∧ y + 1 ≤ hi ∧ y ∉ B ∧ y + 1 ∉ B ∧ ∀ q ∈ Q, 4 < |y - q|)
+            ∧ ys.Pairwise (fun y y' => 4 < |y - y'|) := by
   intro m
   induction m with
   | zero => exact fun _ _ => ⟨[], rfl, by simp, List.Pairwise.nil⟩
@@ -116,12 +121,14 @@ theorem two_lt_of_four_lt {y p : ℝ} (h : 4 < |y - p|) : 2 < |y + 1 - p| := by
   · exact lt_abs.mpr (Or.inr (by linarith))
 
 def RoomOffGrid : Prop :=
-  ∀ (P : M.Par) (l0 : ℕ) (lo hi : ℝ), (∀ Y, lo ≤ Y → Y ≤ hi → I.OnCut P.u P.u' l0 Y) →
-    ∀ (w : List C.Letter) (m : ℕ) (B : Finset ℝ), KB.CutWord P l0 w →
-      10 * ((w.length : ℝ) + m + B.card + 1) ≤ hi - lo →
-      ∃ ys : List ℝ, ys.length = m ∧ (∀ y ∈ ys, lo ≤ y ∧ y + 1 ≤ hi ∧ y ∉ B ∧ y + 1 ∉ B) ∧
-        ys.Pairwise (fun y y' => 4 < |y - y'|) ∧ KB.CutWord P l0 (KB.plusW ys w) ∧
-        KB.CutWord P l0 (KB.minusW ys w)
+  ∀ (P : M.Par) (l0 : ℕ) (lo hi : ℝ),
+    (∀ Y, lo ≤ Y → Y ≤ hi → I.OnCut P.u P.u' l0 Y)
+      → ∀ (w : List C.Letter) (m : ℕ) (B : Finset ℝ),
+        KB.CutWord P l0 w → 10 * ((w.length : ℝ) + m + B.card + 1) ≤ hi - lo
+          → ∃ ys : List ℝ,
+            ys.length = m ∧ (∀ y ∈ ys, lo ≤ y ∧ y + 1 ≤ hi ∧ y ∉ B ∧ y + 1 ∉ B)
+              ∧ ys.Pairwise (fun y y' => 4 < |y - y'|) ∧ KB.CutWord P l0 (KB.plusW ys w)
+              ∧ KB.CutWord P l0 (KB.minusW ys w)
 
 theorem roomOffGrid : RoomOffGrid := by
   intro P l0 lo hi hOn w m B hw hlen
@@ -131,14 +138,21 @@ theorem roomOffGrid : RoomOffGrid := by
     have := List.toFinset_card_le (w.map Prod.snd)
     rw [List.length_map] at this
     exact_mod_cast this
-  obtain ⟨ys, hlen', hys, hpw⟩ := pick_many lo hi B m ((w.map Prod.snd).toFinset) (by
-    have : (0 : ℝ) ≤ B.card := by positivity
-    have : (0 : ℝ) ≤ m := by positivity
-    linarith)
+  obtain ⟨ys, hlen', hys, hpw⟩ :=
+    pick_many lo hi B m ((w.map Prod.snd).toFinset) (by
+      have : (0 : ℝ) ≤ B.card := by positivity
+      have : (0 : ℝ) ≤ m := by positivity
+      linarith)
   have hfar : ∀ y ∈ ys, ∀ x ∈ w, 4 < |y - x.2| := fun y hy x hx =>
     (hys y hy).2.2.2.2 x.2 (List.mem_toFinset.2 (List.mem_map.2 ⟨x, hx, rfl⟩))
-  refine ⟨ys, hlen', fun y hy => ⟨(hys y hy).1, (hys y hy).2.1, (hys y hy).2.2.1, (hys y hy).2.2.2.1⟩,
-    hpw, ?_, ?_⟩
+  refine ⟨
+    ys,
+    hlen',
+    fun y hy => ⟨(hys y hy).1, (hys y hy).2.1, (hys y hy).2.2.1, (hys y hy).2.2.2.1⟩,
+    hpw,
+    ?_,
+    ?_
+  ⟩
   · rw [plusW_eq, cutWord_iff]
     refine ⟨fun x hx => ?_, ?_⟩
     · rcases List.mem_append.1 hx with hx | hx
@@ -170,4 +184,5 @@ theorem roomOffGrid : RoomOffGrid := by
 
 end Formalism.FourierDecayAlt.P.PBD
 
-theorem Formalism.FourierDecayAlt.P.room_off_grid : Formalism.FourierDecayAlt.P.PBD.RoomOffGrid := Formalism.FourierDecayAlt.P.PBD.roomOffGrid
+theorem Formalism.FourierDecayAlt.P.room_off_grid : Formalism.FourierDecayAlt.P.PBD.RoomOffGrid :=
+  Formalism.FourierDecayAlt.P.PBD.roomOffGrid

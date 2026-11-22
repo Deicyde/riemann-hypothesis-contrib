@@ -20,12 +20,14 @@ open Formalism.L2.SG.Pf.EnergyAbs
 
 variable {G : Type} [Group G] [TopologicalSpace G] [MeasurableSpace G]
 variable {HH : Type} [NormedAddCommGroup HH] [InnerProductSpace ℂ HH] [CompleteSpace HH]
-variable {V V' : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+variable
+  {V V' : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
   [NormedAddCommGroup V'] [InnerProductSpace ℂ V'] [FiniteDimensional ℂ V']
 
-theorem continuous_hsA_Xop {σ : G → (HH →L[ℂ] HH)} (hσ : IsUnitRep σ) (μS ν μS' ν' : Measure G) (d : ℝ)
-    (w : HH) (W : G → V) (W' : G → V') (A A' : Set G) :
-    Continuous (fun g => hsA (Xop μS ν μS' ν' σ d w W W' A A' g)) := by
+theorem continuous_hsA_Xop
+    {σ : G → (HH →L[ℂ] HH)} (hσ : IsUnitRep σ)
+    (μS ν μS' ν' : Measure G) (d : ℝ) (w : HH) (W : G → V) (W' : G → V') (A A' : Set G)
+    : Continuous (fun g => hsA (Xop μS ν μS' ν' σ d w W W' A A' g)) := by
   have hc : ∀ a : HH, Continuous (fun g => σ g a) := hσ.2.2.2
   unfold hsA Xop sand
   refine continuous_finsetSum _ fun i _ => ?_
@@ -33,17 +35,22 @@ theorem continuous_hsA_Xop {σ : G → (HH →L[ℂ] HH)} (hσ : IsUnitRep σ) (
   simp only [FunLike.coe_smul, Pi.smul_apply, ContinuousLinearMap.comp_apply]
   exact ((ContinuousLinearMap.adjoint _).continuous.comp (hc _)).const_smul _
 
-theorem lintegral_hsA_Xop {μ : Measure G} {σ : G → (HH →L[ℂ] HH)} {d : ℝ} (hSch : IsSchur μ σ d)
-    (μS ν μS' ν' : Measure G) (w : HH) (W : G → V) (W' : G → V') (A A' : Set G) :
-    ∫⁻ g, ENNReal.ofReal (hsA (Xop μS ν μS' ν' σ d w W W' A A' g)) ∂μ =
-      ENNReal.ofReal (d * (∑ i, ‖yv μS ν σ w W A (stdOrthonormalBasis ℂ V i)‖ ^ 2) *
-        (∑ j, ‖yv μS' ν' σ w W' A' (stdOrthonormalBasis ℂ V' j)‖ ^ 2)) := by
+theorem lintegral_hsA_Xop
+    {μ : Measure G} {σ : G → (HH →L[ℂ] HH)} {d : ℝ} (hSch : IsSchur μ σ d)
+    (μS ν μS' ν' : Measure G) (w : HH) (W : G → V) (W' : G → V') (A A' : Set G)
+    : ∫⁻ g, ENNReal.ofReal (hsA (Xop μS ν μS' ν' σ d w W W' A A' g)) ∂μ
+      = ENNReal.ofReal
+        (d * (∑ i, ‖yv μS ν σ w W A (stdOrthonormalBasis ℂ V i)‖ ^ 2)
+          * (∑ j, ‖yv μS' ν' σ w W' A' (stdOrthonormalBasis ℂ V' j)‖ ^ 2)) := by
   have hd : 0 < d := hSch.1
-  have h1 : ∀ g, ENNReal.ofReal (hsA (Xop μS ν μS' ν' σ d w W W' A A' g)) =
-      ENNReal.ofReal (d ^ 2) *
-        ENNReal.ofReal (hsA (sand σ (Yop μS ν σ w W A) (Yop μS' ν' σ w W' A') g)) := by
+  have h1
+      : ∀ g,
+        ENNReal.ofReal (hsA (Xop μS ν μS' ν' σ d w W W' A A' g))
+          = ENNReal.ofReal (d ^ 2)
+            * ENNReal.ofReal (hsA (sand σ (Yop μS ν σ w W A) (Yop μS' ν' σ w W' A') g)) := by
     intro g
-    rw [Xop, hsA_smul, Complex.norm_real, Real.norm_eq_abs, sq_abs, ENNReal.ofReal_mul (sq_nonneg d)]
+    rw [Xop, hsA_smul, Complex.norm_real, Real.norm_eq_abs, sq_abs,
+      ENNReal.ofReal_mul (sq_nonneg d)]
   simp_rw [h1]
   rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top, lintegral_hsA_sand hSch,
     ← ENNReal.ofReal_mul (sq_nonneg d)]
@@ -51,13 +58,18 @@ theorem lintegral_hsA_Xop {μ : Measure G} {σ : G → (HH →L[ℂ] HH)} {d : �
   simp only [Yop_apply_basis]
   field_simp
 
-theorem tendsto_energy {d : ℝ} (hd : 0 < d) {a b : ℕ → ℝ≥0∞} (ha : ∀ n, 0 < a n ∧ a n < ⊤)
-    (hb : ∀ n, 0 < b n ∧ b n < ⊤) {N N' : ℕ → ℝ}
-    (hN : Tendsto (fun n => N n / (a n).toReal) atTop (𝓝 (1 / d)))
-    (hN' : Tendsto (fun n => N' n / (b n).toReal) atTop (𝓝 (1 / d))) :
-    Tendsto (fun n => (a n * b n)⁻¹ * ENNReal.ofReal (d * N n * N' n)) atTop (𝓝 (ENNReal.ofReal (1 / d))) := by
-  have key : ∀ n, (a n * b n)⁻¹ * ENNReal.ofReal (d * N n * N' n) =
-      ENNReal.ofReal (d * (N n / (a n).toReal) * (N' n / (b n).toReal)) := by
+theorem tendsto_energy
+    {d : ℝ} (hd : 0 < d)
+    {a b : ℕ → ℝ≥0∞} (ha : ∀ n, 0 < a n ∧ a n < ⊤) (hb : ∀ n, 0 < b n ∧ b n < ⊤)
+    {N N' : ℕ → ℝ} (hN : Tendsto (fun n => N n / (a n).toReal) atTop (𝓝 (1 / d)))
+    (hN' : Tendsto (fun n => N' n / (b n).toReal) atTop (𝓝 (1 / d)))
+    : Tendsto
+      (fun n => (a n * b n)⁻¹ * ENNReal.ofReal (d * N n * N' n))
+      atTop (𝓝 (ENNReal.ofReal (1 / d))) := by
+  have key
+      : ∀ n,
+        (a n * b n)⁻¹ * ENNReal.ofReal (d * N n * N' n)
+          = ENNReal.ofReal (d * (N n / (a n).toReal) * (N' n / (b n).toReal)) := by
     intro n
     obtain ⟨ha0, hat⟩ := ha n
     obtain ⟨hb0, hbt⟩ := hb n

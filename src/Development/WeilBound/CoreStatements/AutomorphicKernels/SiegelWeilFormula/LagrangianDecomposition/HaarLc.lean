@@ -8,8 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralAdel
 noncomputable section
 
 open scoped TensorProduct NNReal ENNReal Matrix Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 open GlobalTheory.ModuLR GlobalTheory.GaugeEx GlobalTheory.JacSubst
 
 namespace PositivityTheory.SiegelWeilFormula.Ald
@@ -49,9 +52,12 @@ theorem haarLc : HaarLc := by
         ((t : Matrix (Fin m) (Fin m) (AE F E)) * M * ((1 : GL (Fin 1) (AE F E)) : Matrix (Fin 1) (Fin 1) (AE F E))) i 0
       rw [Units.val_one, Matrix.mul_one]
       simp [Matrix.mulVec, dotProduct, Matrix.mul_apply]
-    have hu : hΛ.unit = Units.map (Algebra.norm (AF F) : AE F E →* AF F) (Matrix.GeneralLinearGroup.det t) := by
+    have hu
+        : hΛ.unit
+          = Units.map (Algebra.norm (AF F) : AE F E →* AF F) (Matrix.GeneralLinearGroup.det t) := by
       ext
-      simp only [IsUnit.unit_spec, hdet, Units.coe_map, MonoidHom.coe_coe, map_one, one_pow, mul_one, pow_one]
+      simp only [IsUnit.unit_spec, hdet, Units.coe_map, MonoidHom.coe_coe, map_one, one_pow,
+        mul_one, pow_one]
     rw [h1, hχ, chi_AF_det, hu, ht, norm_det_unitary hcm hJ g, map_one]
 
   have hV : ∀ (ν : Measure (Fin m → AE F E)), ν.IsAddHaarMeasure → ν.map φ = ν := by
@@ -66,9 +72,13 @@ theorem haarLc : HaarLc := by
   have hH : (μ.map cm).IsAddHaarMeasure := ContinuousAddEquiv.isAddHaarMeasure_map μ (colv m bs)
   have hmap : (μ.map cm).map pm = μ.map cm := hV _ hH
   have e1 : ∀ x, Lc bs (mat g) x = cm.symm (pm (cm x)) := fun x => by rw [Lc_eq_colv]; rfl
-  calc ∫⁻ x, f (Lc bs (mat g) x) ∂μ = ∫⁻ x, (fun y => f (cm.symm (pm y))) (cm x) ∂μ := by simp_rw [e1]
-    _ = ∫⁻ y, f (cm.symm (pm y)) ∂(μ.map cm) := (lintegral_map_equiv (fun y => f (cm.symm (pm y))) cm).symm
-    _ = ∫⁻ y, f (cm.symm y) ∂((μ.map cm).map pm) := (lintegral_map_equiv (fun y => f (cm.symm y)) pm).symm
+  calc
+    ∫⁻ x, f (Lc bs (mat g) x) ∂μ
+      = ∫⁻ x, (fun y => f (cm.symm (pm y))) (cm x) ∂μ := by simp_rw [e1]
+    _ = ∫⁻ y, f (cm.symm (pm y)) ∂(μ.map cm) :=
+      (lintegral_map_equiv (fun y => f (cm.symm (pm y))) cm).symm
+    _ = ∫⁻ y, f (cm.symm y) ∂((μ.map cm).map pm) :=
+      (lintegral_map_equiv (fun y => f (cm.symm y)) pm).symm
     _ = ∫⁻ y, f (cm.symm y) ∂(μ.map cm) := by rw [hmap]
     _ = ∫⁻ x, f (cm.symm (cm x)) ∂μ := lintegral_map_equiv (fun y => f (cm.symm y)) cm
     _ = ∫⁻ x, f x ∂μ := by simp

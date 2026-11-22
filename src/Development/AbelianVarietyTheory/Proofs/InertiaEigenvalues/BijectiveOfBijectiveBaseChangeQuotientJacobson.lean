@@ -11,8 +11,12 @@ open TensorProduct
 namespace GlobalTheory.BSP
 
 open TensorProduct in
-private theorem exists_eq_one_tmul_quotient {A : Type} [CommRing A] (I : Ideal A) {M : Type}
-    [AddCommGroup M] [Module A M] (z : (A ⧸ I) ⊗[A] M) : ∃ x : M, z = (1 : A ⧸ I) ⊗ₜ[A] x := by
+private theorem exists_eq_one_tmul_quotient
+    {A : Type} [CommRing A]
+    (I : Ideal A)
+    {M : Type} [AddCommGroup M] [Module A M]
+    (z : (A ⧸ I) ⊗[A] M)
+    : ∃ x : M, z = (1 : A ⧸ I) ⊗ₜ[A] x := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨0, by simp⟩
   | tmul t x =>
@@ -26,17 +30,21 @@ private theorem exists_eq_one_tmul_quotient {A : Type} [CommRing A] (I : Ideal A
     exact ⟨x + x', by rw [TensorProduct.tmul_add]⟩
 
 open TensorProduct in
-private theorem one_tmul_quotient_eq_zero_iff_mem_smul {A : Type} [CommRing A] (I : Ideal A) {M : Type}
-    [AddCommGroup M] [Module A M] (y : M) :
-    (1 : A ⧸ I) ⊗ₜ[A] y = 0 ↔ y ∈ I • (⊤ : Submodule A M) := by
+private theorem one_tmul_quotient_eq_zero_iff_mem_smul
+    {A : Type} [CommRing A] (I : Ideal A) {M : Type} [AddCommGroup M] [Module A M] (y : M)
+    : (1 : A ⧸ I) ⊗ₜ[A] y = 0 ↔ y ∈ I • (⊤ : Submodule A M) := by
   have h := quotTensorEquivQuotSMul_mk_tmul (M := M) I 1 y
   rw [map_one, one_smul] at h
   rw [← (quotTensorEquivQuotSMul M I).map_eq_zero_iff, h, Submodule.Quotient.mk_eq_zero]
 
-
 open TensorProduct in
-theorem _root_.GlobalTheory.BSP.bijective_of_bijective_baseChange_quotient :
-    ∀ (A : Type) [CommRing A] (𝔞 : Ideal A), 𝔞 ≤ Ideal.jacobson ⊥ → ∀ (P : Type) [AddCommGroup P] [Module A P] [Module.Finite A P] (P' : Type) [AddCommGroup P'] [Module A P'] [Module.Finite A P'] [Module.Projective A P'] (w : P →ₗ[A] P'), Function.Bijective (w.baseChange (A ⧸ 𝔞)) → Function.Bijective w := by
+theorem _root_.GlobalTheory.BSP.bijective_of_bijective_baseChange_quotient
+    : ∀ (A : Type) [CommRing A] (𝔞 : Ideal A),
+      𝔞 ≤ Ideal.jacobson ⊥
+        → ∀ (P : Type) [AddCommGroup P] [Module A P] [Module.Finite A P] (P' : Type)
+            [AddCommGroup P'] [Module A P'] [Module.Finite A P'] [Module.Projective A P']
+            (w : P →ₗ[A] P'),
+          Function.Bijective (w.baseChange (A ⧸ 𝔞)) → Function.Bijective w := by
   intro A _ 𝔞 h𝔞 P _ _ _ P' _ _ _ _ w hw
   have surj : Function.Surjective w := by
     rw [← LinearMap.range_eq_top, eq_top_iff]
@@ -69,7 +77,8 @@ theorem _root_.GlobalTheory.BSP.bijective_of_bijective_baseChange_quotient :
       rw [one_tmul_quotient_eq_zero_iff_mem_smul] at h0
       rw [LinearMap.range_eq_map, ← Submodule.map_smul'', ← hπw _ (hwπ p)]
       exact Submodule.mem_map_of_mem h0
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro p hp
   have : π p ∈ LinearMap.range π := ⟨p, rfl⟩
   rw [hbot, Submodule.mem_bot, hπw p hp] at this

@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PrincipalLev
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult
   MeasureTheory Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer
 open scoped TensorProduct
@@ -24,12 +26,14 @@ abbrev Bas (V : HSp D) : Type := D.what₂.Tau → Matrix (Fin V.rank) (Fin V.ra
 
 abbrev Pol (S T : HSp D) : Type := MvPolynomial (FVar D T.rank S.rank) ℂ
 
-abbrev cmp (θ : InfFam D) (V : HSp D) (τ : D.what₂.Tau) (g : GA D V) : Matrix (Fin V.rank) (Fin V.rank) ℂ :=
+abbrev cmp (θ : InfFam D) (V : HSp D) (τ : D.what₂.Tau) (g : GA D V)
+    : Matrix (Fin V.rank) (Fin V.rank) ℂ :=
   infMat D.sp.cm.sig V.gram (θ τ) g
 
 def StrictInterlace (n : ℕ) (A B : Finset ℚ) : Prop :=
-  ∃ (a : Fin (n + 1) → ℚ) (b : Fin n → ℚ), A = Finset.univ.image a ∧ B = Finset.univ.image b ∧
-    ∀ i : Fin n, b i < a i.castSucc ∧ a i.succ < b i
+  ∃ (a : Fin (n + 1) → ℚ) (b : Fin n → ℚ),
+    A = Finset.univ.image a ∧ B = Finset.univ.image b
+      ∧ ∀ i : Fin n, b i < a i.castSucc ∧ a i.succ < b i
 
 section Pair
 
@@ -49,7 +53,8 @@ variable (π : CoefA S) (π' : CoefA T)
 
 end Pair
 
-def fp (V : HSp D) (g : GA D V) : GfC V := ⟨GlobalTheory.LevelNbhd.finPartG V g, GlobalTheory.LevelNbhd.finPartG_mem_GfC V g⟩
+def fp (V : HSp D) (g : GA D V) : GfC V :=
+  ⟨GlobalTheory.LevelNbhd.finPartG V g, GlobalTheory.LevelNbhd.finPartG_mem_GfC V g⟩
 
 section Global
 
@@ -67,15 +72,18 @@ end Last
 
 section Chain
 
-variable (P : TPar D) (θ : InfFam D) (X : ℕ → HSp D) {X' L : HSp D} (o : OrthDec (X D.R.m) X' L) (B : ∀ j, Bas (X j))
+variable
+  (P : TPar D) (θ : InfFam D)
+  (X : ℕ → HSp D)
+  {X' L : HSp D} (o : OrthDec (X D.R.m) X' L)
+  (B : ∀ j, Bas (X j))
 
 variable {X} (π : ∀ j, CoefA (X j))
 
-variable (ψ : AddChar (AF D.host.F) ℂ) (om : ∀ j, Om (X j) (X (j + 1))) (f : ∀ j, WO (X j) (X (j + 1)) → ℂ)
+variable
+  (ψ : AddChar (AF D.host.F) ℂ) (om : ∀ j, Om (X j) (X (j + 1))) (f : ∀ j, WO (X j) (X (j + 1)) → ℂ)
 
 variable (μ : ∀ j, Measure (GA D (X j))) (𝓕 : ∀ j, Set (GA D (X j)))
-
-
 
 end Chain
 

@@ -8,8 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSectionFam
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,8 +21,9 @@ noncomputable section
 
 namespace GlobalTheory.Pinch
 
-theorem isUnit_add_of_not_isUnit {R : Type*} [CommRing R] [IsLocalRing R] {u m : R}
-    (hu : IsUnit u) (hm : ¬ IsUnit m) : IsUnit (u + m) := by
+theorem isUnit_add_of_not_isUnit
+    {R : Type*} [CommRing R] [IsLocalRing R] {u m : R} (hu : IsUnit u) (hm : ¬ IsUnit m)
+    : IsUnit (u + m) := by
   by_contra h
   have h1 : u + m ∈ IsLocalRing.maximalIdeal R := (IsLocalRing.mem_maximalIdeal _).mpr h
   have h2 : m ∈ IsLocalRing.maximalIdeal R := (IsLocalRing.mem_maximalIdeal _).mpr hm
@@ -28,14 +32,27 @@ theorem isUnit_add_of_not_isUnit {R : Type*} [CommRing R] [IsLocalRing R] {u m :
     simpa using this
   exact (IsLocalRing.mem_maximalIdeal _).mp h3 hu
 
-theorem secFam_unit_at_finite : ∀ (X : Scheme.{0}) (L : LB X) (W : X.Opens) (J : Type) (D : J → X.Opens), (∀ j, D j ≤ W) → ∀ (k : J → L.ι) (hD : ∀ j, D j ≤ L.U (k j)) (F : Set X), F.Finite → ∀ (a : X → Γ(X, W)), (∀ x ∈ F, x ∈ X.basicOpen (a x)) → (∀ x ∈ F, ∀ y ∈ F, y ≠ x → y ∉ X.basicOpen (a x)) → ∀ (E : X → ∀ j, Γ(X, D j)), (∀ x ∈ F, GlobalTheory.Pinch.IsSecFam L D k hD (E x)) → (∀ x ∈ F, ∀ j (h : x ∈ D j), IsUnit ((X.presheaf.germ (D j) x h).hom (E x j))) → ∃ e : ∀ j, Γ(X, D j), GlobalTheory.Pinch.IsSecFam L D k hD e ∧ ∀ x ∈ F, ∀ j (h : x ∈ D j), IsUnit ((X.presheaf.germ (D j) x h).hom (e j)) := by
+theorem secFam_unit_at_finite
+    : ∀ (X : Scheme.{0}) (L : LB X) (W : X.Opens) (J : Type) (D : J → X.Opens),
+      (∀ j, D j ≤ W)
+        → ∀ (k : J → L.ι) (hD : ∀ j, D j ≤ L.U (k j)) (F : Set X),
+          F.Finite
+            → ∀ (a : X → Γ(X, W)),
+              (∀ x ∈ F, x ∈ X.basicOpen (a x)) → (∀ x ∈ F, ∀ y ∈ F, y ≠ x → y ∉ X.basicOpen (a x))
+                → ∀ (E : X → ∀ j, Γ(X, D j)),
+                  (∀ x ∈ F, GlobalTheory.Pinch.IsSecFam L D k hD (E x))
+                    → (∀ x ∈ F, ∀ j (h : x ∈ D j), IsUnit ((X.presheaf.germ (D j) x h).hom (E x j)))
+                    → ∃ e : ∀ j, Γ(X, D j),
+                      GlobalTheory.Pinch.IsSecFam L D k hD e
+                        ∧ ∀ x ∈ F, ∀ j (h : x ∈ D j),
+                          IsUnit ((X.presheaf.germ (D j) x h).hom (e j)) := by
   intro X L W J D hDW k hD F hF a ha hsep E hE hEu
   classical
   let r : ∀ j, Γ(X, W) →+* Γ(X, D j) := fun j => (X.presheaf.map (homOfLE (hDW j)).op).hom
   refine ⟨fun j => ∑ x ∈ hF.toFinset, r j (a x) * E x j, ?_, ?_⟩
-  ·
-    have hr : ∀ j z (hz : z ∈ D j) (s : Γ(X, W)),
-        (X.presheaf.germ (D j) z hz).hom (r j s) = (X.presheaf.germ W z (hDW j hz)).hom s := by
+  · have hr
+        : ∀ j z (hz : z ∈ D j) (s : Γ(X, W)),
+          (X.presheaf.germ (D j) z hz).hom (r j s) = (X.presheaf.germ W z (hDW j hz)).hom s := by
       intro j z hz s
       exact TopCat.Presheaf.germ_res_apply X.presheaf (homOfLE (hDW j)) z hz s
     intro j j' z hz hz'
@@ -50,15 +67,17 @@ theorem secFam_unit_at_finite : ∀ (X : Scheme.{0}) (L : LB X) (W : X.Opens) (J
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_mul]
     rw [← Finset.add_sum_erase _ _ hyF]
-    have hr : ∀ s : Γ(X, W),
-        (X.presheaf.germ (D j) y hyj).hom (r j s) = (X.presheaf.germ W y hyW).hom s :=
-      fun s => TopCat.Presheaf.germ_res_apply X.presheaf (homOfLE (hDW j)) y hyj s
+    have hr
+        : ∀ s : Γ(X, W),
+          (X.presheaf.germ (D j) y hyj).hom (r j s) = (X.presheaf.germ W y hyW).hom s := fun s =>
+      TopCat.Presheaf.germ_res_apply X.presheaf (homOfLE (hDW j)) y hyj s
     apply isUnit_add_of_not_isUnit
     · rw [hr]
       exact ((X.mem_basicOpen (a y) y hyW).mp (ha y hy)).mul (hEu y hy j hyj)
     · intro hu
-      have hmem : ∑ x ∈ hF.toFinset.erase y,
-          (X.presheaf.germ (D j) y hyj).hom (r j (a x)) * (X.presheaf.germ (D j) y hyj).hom (E x j)
+      have hmem
+          : ∑ x ∈ hF.toFinset.erase y,
+              (X.presheaf.germ (D j) y hyj).hom (r j (a x)) * (X.presheaf.germ (D j) y hyj).hom (E x j)
             ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk y) := by
         refine Ideal.sum_mem _ fun x hx => ?_
         have hxy : x ≠ y := (Finset.mem_erase.mp hx).1

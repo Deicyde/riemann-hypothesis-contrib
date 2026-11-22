@@ -11,10 +11,11 @@ public import Development.ResolutionOfSingularities.EmbeddedResolution.Algebraic
 namespace FunctorialResolution.EmbeddedResolution
 namespace EtaleCoordinates
 
-private theorem algebraMap_mem_map_of_mul_mem {S : Type*} [CommRing S] (G : S) (T : Type*)
-    [CommRing T] [Algebra S T] [IsLocalization (Submonoid.powers G) T] (J : Ideal S) (g r x : S)
-    (hG : G = g * r) (hgx : g * x ∈ J) :
-    algebraMap S T x ∈ Ideal.map (algebraMap S T) J := by
+private theorem algebraMap_mem_map_of_mul_mem
+    {S : Type*} [CommRing S]
+    (G : S) (T : Type*) [CommRing T] [Algebra S T] [IsLocalization (Submonoid.powers G) T]
+    (J : Ideal S) (g r x : S) (hG : G = g * r) (hgx : g * x ∈ J)
+    : algebraMap S T x ∈ Ideal.map (algebraMap S T) J := by
   have hGu : IsUnit (algebraMap S T G) :=
     IsLocalization.map_units T (⟨G, Submonoid.mem_powers G⟩ : Submonoid.powers G)
   rw [hG, map_mul] at hGu
@@ -24,13 +25,16 @@ private theorem algebraMap_mem_map_of_mul_mem {S : Type*} [CommRing S] (G : S) (
   rw [hx]
   exact Ideal.mul_mem_left _ _ (Ideal.mem_map_of_mem _ hgx)
 
-theorem exists_away_map_ideal_eq {S : Type*} [CommRing S] (q : Ideal S) [q.IsPrime]
+theorem exists_away_map_ideal_eq
+    {S : Type*} [CommRing S]
+    (q : Ideal S) [q.IsPrime]
     (A : Type*) [CommRing A] [Algebra S A] [IsLocalization q.primeCompl A]
-    (I J : Ideal S) (hI : I.FG) (hJ : J.FG)
-    (h : Ideal.map (algebraMap S A) I = Ideal.map (algebraMap S A) J) :
-    ∃ g : S, g ∉ q ∧
-      Ideal.map (algebraMap S (Localization.Away g)) I =
-        Ideal.map (algebraMap S (Localization.Away g)) J := by
+    (I J : Ideal S)
+    (hI : I.FG) (hJ : J.FG) (h : Ideal.map (algebraMap S A) I = Ideal.map (algebraMap S A) J)
+    : ∃ g : S,
+      g ∉ q
+        ∧ Ideal.map (algebraMap S (Localization.Away g)) I
+          = Ideal.map (algebraMap S (Localization.Away g)) J := by
   classical
   obtain ⟨tI, htI⟩ := hI
   obtain ⟨tJ, htJ⟩ := hJ

@@ -8,17 +8,23 @@ public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.Lan
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col
 
 namespace UpperTheory.Kd.C7
 
-private theorem lc_mono {R : Type} [CommRing R] {l m n n' : ℕ} {f g : PowerSeries R} (h : n' ≤ n)
-    (H : LC l m n f g) : LC l m n' f g := by
+private theorem lc_mono
+    {R : Type} [CommRing R] {l m n n' : ℕ} {f g : PowerSeries R} (h : n' ≤ n) (H : LC l m n f g)
+    : LC l m n' f g := by
   unfold LC at *
   exact Ideal.span_singleton_le_span_singleton.2 (pow_dvd_pow _ h) H
 
-private theorem lc_comb {R : Type} [CommRing R] {l m n : ℕ} {f f' g g' : PowerSeries R}
-    (H : LC l m n f g) (H' : LC l m n f' g') (E : LC l m n g g') : LC l m n (f - f') 0 := by
+private theorem lc_comb
+    {R : Type} [CommRing R]
+    {l m n : ℕ} {f f' g g' : PowerSeries R}
+    (H : LC l m n f g) (H' : LC l m n f' g') (E : LC l m n g g')
+    : LC l m n (f - f') 0 := by
   unfold LC at *
   have := Ideal.sub_mem _ (Ideal.add_mem _ H E) H'
   rw [map_sub, map_zero, sub_zero]
@@ -41,10 +47,12 @@ theorem pRepUniq : SRepUniq := by
   obtain ⟨P', hP', hPD'⟩ := h₂ m (by omega)
   have hPn : BPres β A ζ Z m (m - max c₁ c₂) P :=
     pPresMono l hl2 Ω A hA c β ζ hζ Z Z m (m - c₁) (m - max c₁ c₂) P (by omega)
-      (fun s _ => cg_of_eq _ rfl) hP
+      (fun s _ => cg_of_eq _ rfl)
+      hP
   have hPn' : BPres β A ζ Z m (m - max c₁ c₂) P' :=
     pPresMono l hl2 Ω A hA c β ζ hζ Z' Z m (m - c₂) (m - max c₁ c₂) P' (by omega)
-      (fun s hs => cg_of_eq _ (hZ m s hs).symm) hP'
+      (fun s hs => cg_of_eq _ (hZ m s hs).symm)
+      hP'
   have hE := (pPresDl l hl2 Ω A hA j Φ c β ζ hζ Z m (m - max c₁ c₂) (by omega) P P' hPn hPn' i).2
   have hcomb := lc_comb (lc_mono (by omega) (hPD i)) (lc_mono (by omega) (hPD' i)) hE
   have hfin := lc_mono (n' := m - (max c₁ c₂ + 1)) (by omega) hcomb

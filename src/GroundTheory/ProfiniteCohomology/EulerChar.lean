@@ -19,8 +19,8 @@ section Counting
 
 variable {R M N : Type*} [Ring R] [AddCommGroup M] [AddCommGroup N] [Module R M] [Module R N]
 
-theorem card_eq_card_ker_mul_card_range (f : M →ₗ[R] N) :
-    Nat.card M = Nat.card (LinearMap.ker f) * Nat.card (LinearMap.range f) := by
+theorem card_eq_card_ker_mul_card_range (f : M →ₗ[R] N)
+    : Nat.card M = Nat.card (LinearMap.ker f) * Nat.card (LinearMap.range f) := by
   have h1 := AddSubgroup.card_mul_index f.toAddMonoidHom.ker
   rw [AddSubgroup.index_ker] at h1
   exact h1.symm
@@ -29,50 +29,58 @@ end Counting
 
 variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem eulerChar_eq (A : Rep.{u} k G) [IsDiscreteRep A] :
-    eulerChar A = (Nat.card (cohomology A 0) : ℚ) * Nat.card (cohomology A 2) /
-      Nat.card (cohomology A 1) := by
+theorem eulerChar_eq (A : Rep.{u} k G) [IsDiscreteRep A]
+    : eulerChar A
+      = (Nat.card (cohomology A 0) : ℚ) * Nat.card (cohomology A 2)
+        / Nat.card (cohomology A 1) := by
   simp [eulerChar, Finset.prod_range_succ, div_eq_mul_inv]
   ring
 
 section ShortExact
 
-theorem card_range_eq_card_ker_of_exact {T : ShortComplex (ModuleCat k)} (hT : T.Exact) :
-    Nat.card (LinearMap.range T.f.hom) = Nat.card (LinearMap.ker T.g.hom) := by
+theorem card_range_eq_card_ker_of_exact {T : ShortComplex (ModuleCat k)} (hT : T.Exact)
+    : Nat.card (LinearMap.range T.f.hom) = Nat.card (LinearMap.ker T.g.hom) := by
   rw [ShortComplex.moduleCat_exact_iff_range_eq_ker] at hT
   rw [hT]
 
-variable {S : ShortComplex (Rep.{u} k G)} [IsDiscreteRep S.X₁] [IsDiscreteRep S.X₂]
-  [IsDiscreteRep S.X₃]
+variable
+  {S : ShortComplex (Rep.{u} k G)} [IsDiscreteRep S.X₁] [IsDiscreteRep S.X₂] [IsDiscreteRep S.X₃]
 
-theorem eulerChar_shortExact_of_finite (hS : S.ShortExact)
+theorem eulerChar_shortExact_of_finite
+    (hS : S.ShortExact)
     [Finite (cohomology S.X₁ 1)] [Finite (cohomology S.X₂ 1)] [Finite (cohomology S.X₃ 1)]
-    [Subsingleton (cohomology S.X₁ 3)] :
-    eulerChar S.X₂ = eulerChar S.X₁ * eulerChar S.X₃ := by
+    [Subsingleton (cohomology S.X₁ 3)]
+    : eulerChar S.X₂ = eulerChar S.X₁ * eulerChar S.X₃ := by
   have hk := fun {X Y : ModuleCat k} (φ : X ⟶ Y) => card_eq_card_ker_mul_card_range φ.hom
-  have e2 : ∀ i, Nat.card (LinearMap.range (cohomologyMap S.f i).hom) =
-      Nat.card (LinearMap.ker (cohomologyMap S.g i).hom) := fun i =>
+  have e2
+      : ∀ i,
+        Nat.card (LinearMap.range (cohomologyMap S.f i).hom)
+          = Nat.card (LinearMap.ker (cohomologyMap S.g i).hom) := fun i =>
     card_range_eq_card_ker_of_exact ((cochainsShortComplex_shortExact hS).homology_exact₂ i)
-  have e30 : Nat.card (LinearMap.range (cohomologyMap S.g 0).hom) =
-      Nat.card (LinearMap.ker (δ hS 0 1 rfl).hom) :=
+  have e30
+      : Nat.card (LinearMap.range (cohomologyMap S.g 0).hom)
+        = Nat.card (LinearMap.ker (δ hS 0 1 rfl).hom) :=
     card_range_eq_card_ker_of_exact (cohomology_exact₃ hS 0 1 rfl)
-  have e31 : Nat.card (LinearMap.range (cohomologyMap S.g 1).hom) =
-      Nat.card (LinearMap.ker (δ hS 1 2 rfl).hom) :=
+  have e31
+      : Nat.card (LinearMap.range (cohomologyMap S.g 1).hom)
+        = Nat.card (LinearMap.ker (δ hS 1 2 rfl).hom) :=
     card_range_eq_card_ker_of_exact (cohomology_exact₃ hS 1 2 rfl)
-  have e32 : Nat.card (LinearMap.range (cohomologyMap S.g 2).hom) =
-      Nat.card (LinearMap.ker (δ hS 2 3 rfl).hom) :=
+  have e32
+      : Nat.card (LinearMap.range (cohomologyMap S.g 2).hom)
+        = Nat.card (LinearMap.ker (δ hS 2 3 rfl).hom) :=
     card_range_eq_card_ker_of_exact (cohomology_exact₃ hS 2 3 rfl)
-  have e10 : Nat.card (LinearMap.range (δ hS 0 1 rfl).hom) =
-      Nat.card (LinearMap.ker (cohomologyMap S.f 1).hom) :=
+  have e10
+      : Nat.card (LinearMap.range (δ hS 0 1 rfl).hom)
+        = Nat.card (LinearMap.ker (cohomologyMap S.f 1).hom) :=
     card_range_eq_card_ker_of_exact (cohomology_exact₁ hS 0 1 rfl)
-  have e11 : Nat.card (LinearMap.range (δ hS 1 2 rfl).hom) =
-      Nat.card (LinearMap.ker (cohomologyMap S.f 2).hom) :=
+  have e11
+      : Nat.card (LinearMap.range (δ hS 1 2 rfl).hom)
+        = Nat.card (LinearMap.ker (cohomologyMap S.f 2).hom) :=
     card_range_eq_card_ker_of_exact (cohomology_exact₁ hS 1 2 rfl)
   have h0 : Nat.card (LinearMap.ker (cohomologyMap S.f 0).hom) = 1 := by
     have := hS.mono_f
     have hm : Mono (cohomologyMap S.f 0) :=
-      HomologicalComplex.mono_homologyMap_of_mono_of_not_rel (cochainsMap S.f) 0
-        (fun i => by simp)
+      HomologicalComplex.mono_homologyMap_of_mono_of_not_rel (cochainsMap S.f) 0 (fun i => by simp)
     rw [LinearMap.ker_eq_bot.2 ((ModuleCat.mono_iff_injective _).1 hm)]
     simp
   have htop : Nat.card (LinearMap.range (δ hS 2 3 rfl).hom) = 1 :=
@@ -83,11 +91,10 @@ theorem eulerChar_shortExact_of_finite (hS : S.ShortExact)
   rw [hk (cohomologyMap S.f 1), ← e10] at hA1
   rw [hk (cohomologyMap S.g 1), ← e2 1] at hB1
   rw [hk (δ hS 1 2 rfl), ← e31] at hC1
-  rw [eulerChar_eq, eulerChar_eq, eulerChar_eq,
-    hk (cohomologyMap S.f 0), hk (cohomologyMap S.f 1), hk (cohomologyMap S.f 2),
-    hk (cohomologyMap S.g 0), hk (cohomologyMap S.g 1), hk (cohomologyMap S.g 2),
-    hk (δ hS 0 1 rfl), hk (δ hS 1 2 rfl), hk (δ hS 2 3 rfl),
-    h0, htop, ← e2 0, ← e2 1, ← e2 2, ← e30, ← e31, ← e32, ← e10, ← e11]
+  rw [eulerChar_eq, eulerChar_eq, eulerChar_eq, hk (cohomologyMap S.f 0), hk (cohomologyMap S.f 1),
+    hk (cohomologyMap S.f 2), hk (cohomologyMap S.g 0), hk (cohomologyMap S.g 1),
+    hk (cohomologyMap S.g 2), hk (δ hS 0 1 rfl), hk (δ hS 1 2 rfl), hk (δ hS 2 3 rfl), h0, htop,
+    ← e2 0, ← e2 1, ← e2 2, ← e30, ← e31, ← e32, ← e10, ← e11]
   simp only [mul_ne_zero_iff] at hA1 hB1 hC1
   obtain ⟨hz0, hx1⟩ := hA1
   obtain ⟨-, hy1⟩ := hB1
@@ -101,9 +108,11 @@ section Hypothesis
 
 variable {P : ℕ → Prop}
 
-theorem eulerChar_pos (hG : HasFiniteCohomology (k := k) (G := G) P)
-    (A : Rep.{u} k G) [IsDiscreteRep A]
-    [Finite A] (hA : P (Nat.card A)) : 0 < eulerChar A := by
+theorem eulerChar_pos
+    (hG : HasFiniteCohomology (k := k) (G := G) P)
+    (A : Rep.{u} k G) [IsDiscreteRep A] [Finite A]
+    (hA : P (Nat.card A))
+    : 0 < eulerChar A := by
   obtain ⟨hfin, -⟩ := hG A ‹_› hA
   have h0 := hfin 0
   have h1 := hfin 1
@@ -114,13 +123,14 @@ theorem eulerChar_pos (hG : HasFiniteCohomology (k := k) (G := G) P)
   have p2 : (0 : ℚ) < Nat.card (cohomology A 2) := by exact_mod_cast Nat.card_pos
   positivity
 
-variable {S : ShortComplex (Rep.{u} k G)} [IsDiscreteRep S.X₁] [IsDiscreteRep S.X₂]
-  [IsDiscreteRep S.X₃]
+variable
+  {S : ShortComplex (Rep.{u} k G)} [IsDiscreteRep S.X₁] [IsDiscreteRep S.X₂] [IsDiscreteRep S.X₃]
 
-theorem eulerChar_shortExact_of_mem (hG : HasFiniteCohomology (k := k) (G := G) P)
-    (hS : S.ShortExact) [Finite S.X₁] [Finite S.X₂] [Finite S.X₃] (h₁ : P (Nat.card S.X₁))
-    (h₂ : P (Nat.card S.X₂)) (h₃ : P (Nat.card S.X₃)) :
-    eulerChar S.X₂ = eulerChar S.X₁ * eulerChar S.X₃ := by
+theorem eulerChar_shortExact_of_mem
+    (hG : HasFiniteCohomology (k := k) (G := G) P) (hS : S.ShortExact)
+    [Finite S.X₁] [Finite S.X₂] [Finite S.X₃]
+    (h₁ : P (Nat.card S.X₁)) (h₂ : P (Nat.card S.X₂)) (h₃ : P (Nat.card S.X₃))
+    : eulerChar S.X₂ = eulerChar S.X₁ * eulerChar S.X₃ := by
   obtain ⟨f₁, z₁⟩ := hG S.X₁ ‹_› h₁
   have := f₁ 1
   have := z₁ 3 le_rfl
@@ -128,10 +138,12 @@ theorem eulerChar_shortExact_of_mem (hG : HasFiniteCohomology (k := k) (G := G) 
   have := (hG S.X₃ ‹_› h₃).1 1
   exact eulerChar_shortExact_of_finite hS
 
-theorem eulerChar_shortExact (hP : ∀ m n, m ∣ n → P n → P m)
-    (hG : HasFiniteCohomology (k := k) (G := G) P)
-    (hS : S.ShortExact) [Finite S.X₂] (h₂ : P (Nat.card S.X₂)) :
-    eulerChar S.X₂ = eulerChar S.X₁ * eulerChar S.X₃ := by
+theorem eulerChar_shortExact
+    (hP : ∀ m n, m ∣ n → P n → P m) (hG : HasFiniteCohomology (k := k) (G := G) P)
+    (hS : S.ShortExact)
+    [Finite S.X₂]
+    (h₂ : P (Nat.card S.X₂))
+    : eulerChar S.X₂ = eulerChar S.X₁ * eulerChar S.X₃ := by
   have hinj : Function.Injective S.f.hom := (Rep.mono_iff_injective _).1 hS.mono_f
   have hsurj : Function.Surjective S.g.hom := (Rep.epi_iff_surjective _).1 hS.epi_g
   have : Finite S.X₁ := Finite.of_injective _ hinj
@@ -140,8 +152,8 @@ theorem eulerChar_shortExact (hP : ∀ m n, m ∣ n → P n → P m)
     hP _ _ (AddSubgroup.card_dvd_of_injective S.f.hom.toLinearMap.toAddMonoidHom hinj) h₂
   have h₃ : P (Nat.card S.X₃) := by
     refine hP _ _ ⟨Nat.card (LinearMap.ker S.g.hom.toLinearMap), ?_⟩ h₂
-    rw [card_eq_card_ker_mul_card_range S.g.hom.toLinearMap,
-      LinearMap.range_eq_top.2 hsurj, mul_comm]
+    rw [card_eq_card_ker_mul_card_range S.g.hom.toLinearMap, LinearMap.range_eq_top.2 hsurj,
+      mul_comm]
     congr 1
     exact Nat.card_congr (Submodule.topEquiv).toEquiv
   exact eulerChar_shortExact_of_mem hG hS h₁ h₂ h₃
@@ -152,42 +164,44 @@ section Shapiro
 
 variable [CompactSpace G] (U : OpenSubgroup G)
 
-theorem eulerChar_coind (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B] :
-    eulerChar (Rep.coind (U : Subgroup G).subtype B) = eulerChar B := by
+theorem eulerChar_coind (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B]
+    : eulerChar (Rep.coind (U : Subgroup G).subtype B) = eulerChar B := by
   simp only [eulerChar]
   refine Finset.prod_congr rfl fun q _ => ?_
   rw [Nat.card_congr (shapiroIso U B q).toLinearEquiv.toEquiv]
 
-theorem eulerChar_res_eq_eulerChar_coind (A : Rep.{u} k G) [IsDiscreteRep A] :
-    eulerChar (Rep.res (U : Subgroup G).subtype A) =
-      eulerChar (Rep.coind (U : Subgroup G).subtype (Rep.res (U : Subgroup G).subtype A)) :=
+theorem eulerChar_res_eq_eulerChar_coind (A : Rep.{u} k G) [IsDiscreteRep A]
+    : eulerChar (Rep.res (U : Subgroup G).subtype A)
+      = eulerChar (Rep.coind (U : Subgroup G).subtype (Rep.res (U : Subgroup G).subtype A)) :=
   (eulerChar_coind U _).symm
 
-noncomputable def coindValues (B : Rep.{u} k (U : Subgroup G)) :
-    Rep.coind (U : Subgroup G).subtype B →+ (G ⧸ (U : Subgroup G) → B) :=
+noncomputable def coindValues (B : Rep.{u} k (U : Subgroup G))
+    : Rep.coind (U : Subgroup G).subtype B →+ (G ⧸ (U : Subgroup G) → B) :=
   AddMonoidHom.mk' (fun f c => f.1 (Quotient.out c)⁻¹) fun _ _ => rfl
 
 omit [IsTopologicalGroup G] [CompactSpace G] in
-theorem coindValues_injective (B : Rep.{u} k (U : Subgroup G)) :
-    Function.Injective (coindValues U B) := by
+theorem coindValues_injective (B : Rep.{u} k (U : Subgroup G))
+    : Function.Injective (coindValues U B) := by
   intro f g hfg
   apply Subtype.ext
   funext x
   obtain ⟨u, hu⟩ := QuotientGroup.mk_out_eq_mul (U : Subgroup G) x⁻¹
-  have hx : x = (U : Subgroup G).subtype u * (Quotient.out
-      (QuotientGroup.mk x⁻¹ : G ⧸ (U : Subgroup G)))⁻¹ := by
+  have hx
+      : x
+        = (U : Subgroup G).subtype u
+          * (Quotient.out (QuotientGroup.mk x⁻¹ : G ⧸ (U : Subgroup G)))⁻¹ := by
     rw [show (Quotient.out (QuotientGroup.mk x⁻¹ : G ⧸ (U : Subgroup G))) = x⁻¹ * u from hu]
     simp
   have h := congrFun hfg (QuotientGroup.mk x⁻¹)
   simp only [coindValues, AddMonoidHom.mk'_apply] at h
   rw [hx, f.2 u, g.2 u, h]
 
-instance finite_coind (B : Rep.{u} k (U : Subgroup G)) [Finite B] :
-    Finite (Rep.coind (U : Subgroup G).subtype B) :=
+instance finite_coind (B : Rep.{u} k (U : Subgroup G)) [Finite B]
+    : Finite (Rep.coind (U : Subgroup G).subtype B) :=
   Finite.of_injective _ (coindValues_injective U B)
 
-theorem card_coind_dvd (B : Rep.{u} k (U : Subgroup G)) [Finite B] :
-    Nat.card (Rep.coind (U : Subgroup G).subtype B) ∣ Nat.card B ^ (U : Subgroup G).index := by
+theorem card_coind_dvd (B : Rep.{u} k (U : Subgroup G)) [Finite B]
+    : Nat.card (Rep.coind (U : Subgroup G).subtype B) ∣ Nat.card B ^ (U : Subgroup G).index := by
   have h := AddSubgroup.card_dvd_of_injective (coindValues U B) (coindValues_injective U B)
   rwa [Nat.card_fun] at h
 

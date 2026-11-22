@@ -10,11 +10,17 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 namespace GlobalTheory.MuUnrTie
-theorem main_alt_alt : GlobalTheory.Published.AutomorphicFormsFiniteGL → ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D),
-    GlobalTheory.HubX.MuUnr D := by
+theorem main_alt_alt
+    : GlobalTheory.Published.AutomorphicFormsFiniteGL
+      → ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7)
+          (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D),
+        GlobalTheory.HubX.MuUnr D := by
   intro _ hL D P i hl w hw
   have hj := D.nd.j_range i
   let j : Fin D.R.m := ⟨D.nd.j i - 1, lt_of_lt_of_le (Nat.sub_lt hj.1 Nat.zero_lt_one) hj.2⟩

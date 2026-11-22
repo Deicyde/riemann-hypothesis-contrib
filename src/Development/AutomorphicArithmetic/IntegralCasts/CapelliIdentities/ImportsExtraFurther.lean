@@ -25,12 +25,14 @@ private lemma card_le {C F : Type} [Field C] [Fintype F] [AddCommGroup F] :
 end UpperTheory.Reformulated.B.AddCharacterCount.Helpers
 
 open UpperTheory.Reformulated.B.AddCharacterCount.Helpers in
-theorem UpperTheory.Reformulated.B.AddCharacterCount.main :
-    ∀ {C F : Type} [inst : Field C] [inst_1 : Field F] [Fintype F] [DecidableEq F] (ψ : AddChar F C),
-      ψ ≠ (1 : AddChar F C) →
-        ∃ (e : F ≃ AddChar F C),
-          (∀ (h h' : F), (e : F → AddChar F C) (h + h') = (e : F → AddChar F C) h * (e : F → AddChar F C) h') ∧
-            ∀ (h a : F), ((e : F → AddChar F C) h : F → C) a = (ψ : F → C) (h * a) := by
+theorem UpperTheory.Reformulated.B.AddCharacterCount.main
+    : ∀ {C F : Type} [inst : Field C] [inst_1 : Field F] [Fintype F] [DecidableEq F]
+        (ψ : AddChar F C),
+      ψ ≠ (1 : AddChar F C)
+        → ∃ (e : F ≃ AddChar F C),
+          (∀ (h h' : F),
+              (e : F → AddChar F C) (h + h') = (e : F → AddChar F C) h * (e : F → AddChar F C) h')
+            ∧ ∀ (h a : F), ((e : F → AddChar F C) h : F → C) a = (ψ : F → C) (h * a) := by
   intro C F _ _ _ _ ψ hψ
   have hinj : Function.Injective ψ.mulShift :=
     AddChar.to_mulShift_inj_of_isPrimitive (AddChar.IsPrimitive.of_ne_one hψ)

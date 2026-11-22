@@ -6,14 +6,18 @@ public import Mathlib
 
 namespace KStar.Tree
 
-theorem exists_conj_of_algHom {B : Type} [CommRing B] [IsLocalRing B] {r : ℕ}
-    (θ : Matrix (Fin r) (Fin r) B →ₐ[B] Matrix (Fin r) (Fin r) B) :
-    ∃ J : GL (Fin r) B, ∀ x, θ x * (J : Matrix (Fin r) (Fin r) B) = (J : Matrix (Fin r) (Fin r) B) * x := by
+theorem exists_conj_of_algHom
+    {B : Type} [CommRing B] [IsLocalRing B]
+    {r : ℕ} (θ : Matrix (Fin r) (Fin r) B →ₐ[B] Matrix (Fin r) (Fin r) B)
+    : ∃ J : GL (Fin r) B, ∀ x,
+      θ x * (J : Matrix (Fin r) (Fin r) B) = (J : Matrix (Fin r) (Fin r) B) * x := by
   classical
   rcases isEmpty_or_nonempty (Fin r) with hr | ⟨⟨i0⟩⟩
   · exact ⟨1, fun x => Subsingleton.elim _ _⟩
-  have hF : ∀ i j k l : Fin r, θ (Matrix.single i j (1 : B)) * θ (Matrix.single k l 1) =
-      if j = k then θ (Matrix.single i l 1) else 0 := by
+  have hF
+      : ∀ i j k l : Fin r,
+        θ (Matrix.single i j (1 : B)) * θ (Matrix.single k l 1)
+          = if j = k then θ (Matrix.single i l 1) else 0 := by
     intro i j k l
     rw [← map_mul]
     split_ifs with h
@@ -34,8 +38,8 @@ theorem exists_conj_of_algHom {B : Type} [CommRing B] [IsLocalRing B] {r : ℕ}
     intro h0
     have hz : ∀ j, θ (Matrix.single j j (1 : B)) = 0 := by
       intro j
-      have : θ (Matrix.single j j (1 : B)) =
-          θ (Matrix.single j i0 1) * θ (Matrix.single i0 i0 1) * θ (Matrix.single i0 j 1) := by
+      have : θ (Matrix.single j j (1 : B))
+          = θ (Matrix.single j i0 1) * θ (Matrix.single i0 i0 1) * θ (Matrix.single i0 j 1) := by
         rw [hF, if_pos rfl, hF, if_pos rfl]
       rw [this, h0, mul_zero, zero_mul]
     have h1 : (1 : Matrix (Fin r) (Fin r) B) = 0 := by
@@ -47,8 +51,9 @@ theorem exists_conj_of_algHom {B : Type} [CommRing B] [IsLocalRing B] {r : ℕ}
     by_contra hcon
     push_neg at hcon
     apply hne
-    have he : θ (Matrix.single i0 i0 (1 : B)) * θ (Matrix.single i0 i0 1) =
-        θ (Matrix.single i0 i0 1) := by
+    have he
+        : θ (Matrix.single i0 i0 (1 : B)) * θ (Matrix.single i0 i0 1)
+          = θ (Matrix.single i0 i0 1) := by
       rw [hF, if_pos rfl]
     have hres : (IsLocalRing.residue B).mapMatrix (θ (Matrix.single i0 i0 (1 : B))) = 0 := by
       ext i j
@@ -64,15 +69,18 @@ theorem exists_conj_of_algHom {B : Type} [CommRing B] [IsLocalRing B] {r : ℕ}
     have h4 : θ (Matrix.single i0 i0 (1 : B)) * (1 - θ (Matrix.single i0 i0 1)) = 0 := by
       rw [mul_sub, mul_one, he, sub_self]
     exact hu.mul_left_eq_zero.mp h4
-  have hKJ : (∑ j, Matrix.single j a (1 : B) * θ (Matrix.single i0 j 1)) *
-      (∑ l, θ (Matrix.single l i0 (1 : B)) * Matrix.single b l 1) =
-      ∑ j : Fin r, Matrix.single j j (θ (Matrix.single i0 i0 (1 : B)) a b) := by
+  have hKJ
+      : (∑ j, Matrix.single j a (1 : B) * θ (Matrix.single i0 j 1))
+          * (∑ l, θ (Matrix.single l i0 (1 : B)) * Matrix.single b l 1)
+        = ∑ j : Fin r, Matrix.single j j (θ (Matrix.single i0 i0 (1 : B)) a b) := by
     rw [Finset.sum_mul]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Finset.mul_sum]
-    have key : ∀ l, Matrix.single j a (1 : B) * θ (Matrix.single i0 j 1) *
-        (θ (Matrix.single l i0 (1 : B)) * Matrix.single b l 1) =
-        if j = l then Matrix.single j j (θ (Matrix.single i0 i0 (1 : B)) a b) else 0 := by
+    have key
+        : ∀ l,
+          Matrix.single j a (1 : B) * θ (Matrix.single i0 j 1)
+              * (θ (Matrix.single l i0 (1 : B)) * Matrix.single b l 1)
+            = if j = l then Matrix.single j j (θ (Matrix.single i0 i0 (1 : B)) a b) else 0 := by
       intro l
       rw [← mul_assoc, mul_assoc (Matrix.single j a (1 : B)), hF]
       split_ifs with h
@@ -81,8 +89,9 @@ theorem exists_conj_of_algHom {B : Type} [CommRing B] [IsLocalRing B] {r : ℕ}
       · rw [mul_zero, zero_mul]
     simp_rw [key]
     rw [Finset.sum_ite_eq, if_pos (Finset.mem_univ _)]
-  have hdiag : ∑ j : Fin r, Matrix.single j j (θ (Matrix.single i0 i0 (1 : B)) a b) =
-      Matrix.diagonal (fun _ : Fin r => θ (Matrix.single i0 i0 (1 : B)) a b) := by
+  have hdiag
+      : ∑ j : Fin r, Matrix.single j j (θ (Matrix.single i0 i0 (1 : B)) a b)
+        = Matrix.diagonal (fun _ : Fin r => θ (Matrix.single i0 i0 (1 : B)) a b) := by
     ext p q
     rw [Matrix.sum_apply, Finset.sum_eq_single p]
     · simp [Matrix.single_apply, Matrix.diagonal_apply]
@@ -109,16 +118,20 @@ theorem exists_conj_of_algHom {B : Type} [CommRing B] [IsLocalRing B] {r : ℕ}
     rw [hs, map_smul, smul_mul_assoc, Matrix.mul_smul]
     congr 1
     rw [Finset.mul_sum, Finset.sum_mul]
-    have hl : ∀ j, θ (Matrix.single k l (1 : B)) * (θ (Matrix.single j i0 1) * Matrix.single b j 1) =
-        if l = j then θ (Matrix.single k i0 (1 : B)) * Matrix.single b l 1 else 0 := by
+    have hl
+        : ∀ j,
+          θ (Matrix.single k l (1 : B)) * (θ (Matrix.single j i0 1) * Matrix.single b j 1)
+            = if l = j then θ (Matrix.single k i0 (1 : B)) * Matrix.single b l 1 else 0 := by
       intro j
       rw [← mul_assoc, hF]
       split_ifs with h
       · subst h
         rfl
       · rw [zero_mul]
-    have hr : ∀ j, θ (Matrix.single j i0 (1 : B)) * Matrix.single b j 1 * Matrix.single k l 1 =
-        if k = j then θ (Matrix.single k i0 (1 : B)) * Matrix.single b l 1 else 0 := by
+    have hr
+        : ∀ j,
+          θ (Matrix.single j i0 (1 : B)) * Matrix.single b j 1 * Matrix.single k l 1
+            = if k = j then θ (Matrix.single k i0 (1 : B)) * Matrix.single b l 1 else 0 := by
       intro j
       rw [mul_assoc]
       split_ifs with h
@@ -126,10 +139,14 @@ theorem exists_conj_of_algHom {B : Type} [CommRing B] [IsLocalRing B] {r : ℕ}
         rw [Matrix.single_mul_single_same, mul_one]
       · rw [Matrix.single_mul_single_of_ne _ _ _ _ (Ne.symm h), mul_zero]
     simp_rw [hl, hr]
-    rw [Finset.sum_ite_eq, Finset.sum_ite_eq, if_pos (Finset.mem_univ _), if_pos (Finset.mem_univ _)]
+    rw [Finset.sum_ite_eq, Finset.sum_ite_eq, if_pos (Finset.mem_univ _),
+      if_pos (Finset.mem_univ _)]
 
-theorem det_algHom {B : Type} [CommRing B] [IsLocalRing B] {r : ℕ}
-    (θ : Matrix (Fin r) (Fin r) B →ₐ[B] Matrix (Fin r) (Fin r) B) (x : Matrix (Fin r) (Fin r) B) : (θ x).det = x.det := by
+theorem det_algHom
+    {B : Type} [CommRing B] [IsLocalRing B]
+    {r : ℕ}
+    (θ : Matrix (Fin r) (Fin r) B →ₐ[B] Matrix (Fin r) (Fin r) B) (x : Matrix (Fin r) (Fin r) B)
+    : (θ x).det = x.det := by
   obtain ⟨J, hJ⟩ := exists_conj_of_algHom θ
   have h := congrArg Matrix.det (hJ x)
   rw [Matrix.det_mul, Matrix.det_mul, mul_comm (J : Matrix (Fin r) (Fin r) B).det] at h

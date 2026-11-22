@@ -15,8 +15,9 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 
 open ReciprocityTheory.AnForm.M (FinHolAtlas LocPot logNormSec)
 
-theorem log_le_one_add_mul_log {a b B : ℝ} (ha : Real.exp 1 ≤ a) (hb : 0 < b) (hB : 0 ≤ B)
-    (hab : b ≤ a + B) : Real.log b ≤ (1 + B) * Real.log a := by
+theorem log_le_one_add_mul_log
+    {a b B : ℝ} (ha : Real.exp 1 ≤ a) (hb : 0 < b) (hB : 0 ≤ B) (hab : b ≤ a + B)
+    : Real.log b ≤ (1 + B) * Real.log a := by
   have he : 2 ≤ Real.exp 1 := by linarith [Real.add_one_le_exp (1 : ℝ)]
   have ha0 : 0 < a := by linarith
   have hla : 1 ≤ Real.log a := by
@@ -31,14 +32,15 @@ theorem log_le_one_add_mul_log {a b B : ℝ} (ha : Real.exp 1 ≤ a) (hb : 0 < b
     linarith
   nlinarith [mul_le_mul_of_nonneg_left hla hB]
 
-theorem ListTailLog.proof (hE : LemmaETailLog.Statement) (hM : ListMono.Statement)
-    (hC : RegSection.Statement) (hS : TailShift.Statement) : ListTailLog.Statement := by
+theorem ListTailLog.proof
+    (hE : LemmaETailLog.Statement) (hM : ListMono.Statement) (hC : RegSection.Statement)
+    (hS : TailShift.Statement)
+    : ListTailLog.Statement := by
   intro X _ _ _ D A R hr Om C₁
   obtain ⟨L, s, hL, hs, hs1, hYo, hden, hrc, hrEc, B, hB⟩ := hC D A R
   have hrE : ∀ x ∈ R.Yo, Real.exp 1 ≤ rSec L s x := fun x hx => by
     rw [← hYo] at hx
-    have hpos : 0 < ‖s x x‖ * Real.exp (-L.φ x x) :=
-      mul_pos (norm_pos_iff.2 hx) (Real.exp_pos _)
+    have hpos : 0 < ‖s x x‖ * Real.exp (- L.φ x x) := mul_pos (norm_pos_iff.2 hx) (Real.exp_pos _)
     have : logNormSec L s x ≤ 0 := Real.log_nonpos hpos.le (hs1 x)
     simp only [rSec]
     linarith
@@ -50,11 +52,17 @@ theorem ListTailLog.proof (hE : LemmaETailLog.Statement) (hM : ListMono.Statemen
   obtain ⟨hA, hpos, hmono⟩ := hM D A R.Yo R.r Om C₁ th u R.isOpen_Yo hT
   have hu : ∀ i, IsLemmaEPot A Om L s (max C₁ 0 * (1 + max B 0)) (u i) := fun i => by
     have hTi := hT i
-    refine ⟨by rw [hYo]; exact hTi.u_smooth, by rw [hYo]; exact hA i,
-      by rw [hYo]; exact hTi.u_nonpos, fun x hx => ?_, ?_⟩
+    refine ⟨
+      by rw [hYo]; exact hTi.u_smooth,
+      by rw [hYo]; exact hA i,
+      by rw [hYo]; exact hTi.u_nonpos,
+      fun x hx => ?_,
+      ?_
+    ⟩
     · rw [hYo] at hx
-      have hl := log_le_one_add_mul_log (b := R.r x) (hrE x hx) (by linarith [hr x hx, Real.exp_pos 1])
-        (le_max_right B 0) (by linarith [(abs_le.1 (hB x hx)).2, le_max_left B 0])
+      have hl :=
+        log_le_one_add_mul_log (b := R.r x) (hrE x hx) (by linarith [hr x hx, Real.exp_pos 1])
+          (le_max_right B 0) (by linarith [(abs_le.1 (hB x hx)).2, le_max_left B 0])
       have h0 : 0 ≤ Real.log (R.r x) :=
         Real.log_nonneg (by linarith [hr x hx, Real.add_one_le_exp (1 : ℝ)])
       have := mul_le_mul_of_nonneg_left hl (le_max_right C₁ 0)
@@ -71,12 +79,17 @@ theorem ListTailLog.proof (hE : LemmaETailLog.Statement) (hM : ListMono.Statemen
     rw [hYo] at h1
     intro R₀ hR₀
     obtain ⟨hi, hle⟩ := h1 R₀ hR₀
-    obtain ⟨hi', hle'⟩ := hmono _
-      (fun x => Set.indicator_nonneg (fun y hy => Real.log_nonneg
-        (by linarith [hrE y hy.1, Real.add_one_le_exp (1 : ℝ)])) x)
-      (fun x hx => Set.indicator_of_notMem (by exact fun h => hx h.1) _) hi
+    obtain ⟨hi', hle'⟩ :=
+      hmono _
+        (fun x =>
+          Set.indicator_nonneg
+            (fun y hy => Real.log_nonneg (by linarith [hrE y hy.1, Real.add_one_le_exp (1 : ℝ)]))
+            x)
+        (fun x hx => Set.indicator_of_notMem (by exact fun h => hx h.1) _)
+        hi
     exact ⟨hi', hle'.trans hle⟩
   exact hCE' A R.Yo R.r (rSec L s) _ R.isOpen_Yo hrc hrEc hr hrE
-    (fun x hx => (hB x hx).trans (le_max_left B 0)) hpos h2
+    (fun x hx => (hB x hx).trans (le_max_left B 0))
+    hpos h2
 
 end GroundTheory.Heights₂.Heights.AnalyticLimit

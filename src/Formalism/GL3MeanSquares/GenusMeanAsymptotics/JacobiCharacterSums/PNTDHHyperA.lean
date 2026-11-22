@@ -22,10 +22,11 @@ def cF (N : ℕ) : ℂ := ∑ n ∈ Ioc 0 N, (∑ d ∈ n.divisors, χ (d : ZMod
 
 def hH (k : ℕ) : ℝ := ∑ a ∈ Ioc 0 k, ((a : ℝ))⁻¹
 
-theorem cF_eq (N : ℕ) :
-    cF χ N = ∑ b ∈ Ioc 0 N, χ (b : ZMod q) / (b : ℂ) * (hH (N / b) : ℂ) := by
-  have hcond : ∀ (n d : ℕ), n ∈ Finset.Ioc 0 N ∧ d ∈ n.divisors ↔
-      n ∈ (Finset.Ioc 0 N).filter (d ∣ ·) ∧ d ∈ Finset.Ioc 0 N := by
+theorem cF_eq (N : ℕ) : cF χ N = ∑ b ∈ Ioc 0 N, χ (b : ZMod q) / (b : ℂ) * (hH (N / b) : ℂ) := by
+  have hcond
+      : ∀ (n d : ℕ),
+        n ∈ Finset.Ioc 0 N ∧ d ∈ n.divisors
+          ↔ n ∈ (Finset.Ioc 0 N).filter (d ∣ ·) ∧ d ∈ Finset.Ioc 0 N := by
     intro n d
     simp only [Finset.mem_Ioc, Nat.mem_divisors, Finset.mem_filter]
     constructor
@@ -66,13 +67,16 @@ theorem cF_eq (N : ℕ) :
   have hd0' : (d : ℂ) ≠ 0 := by exact_mod_cast hd0.ne'
   field_simp
 
-theorem cF_split (N U : ℕ) (hUN : U ≤ N) :
-    cF χ N = ∑ b ∈ Ioc 0 U, χ (b : ZMod q) / (b : ℂ) * (hH (N / b) : ℂ) +
-      ∑ a ∈ Ioc 0 N, ((a : ℂ))⁻¹ * ∑ b ∈ Ioc U (N / a), χ (b : ZMod q) / (b : ℂ) := by
+theorem cF_split (N U : ℕ) (hUN : U ≤ N)
+    : cF χ N
+      = ∑ b ∈ Ioc 0 U, χ (b : ZMod q) / (b : ℂ) * (hH (N / b) : ℂ)
+        + ∑ a ∈ Ioc 0 N, ((a : ℂ))⁻¹ * ∑ b ∈ Ioc U (N / a), χ (b : ZMod q) / (b : ℂ) := by
   rw [cF_eq, ← Finset.sum_Ioc_consecutive _ (Nat.zero_le U) hUN]
   congr 1
-  have hcond : ∀ (b a : ℕ), b ∈ Finset.Ioc U N ∧ a ∈ Finset.Ioc 0 (N / b) ↔
-      b ∈ Finset.Ioc U (N / a) ∧ a ∈ Finset.Ioc 0 N := by
+  have hcond
+      : ∀ (b a : ℕ),
+        b ∈ Finset.Ioc U N ∧ a ∈ Finset.Ioc 0 (N / b)
+          ↔ b ∈ Finset.Ioc U (N / a) ∧ a ∈ Finset.Ioc 0 N := by
     intro b a
     simp only [Finset.mem_Ioc]
     constructor
@@ -84,8 +88,11 @@ theorem cF_split (N U : ℕ) (hUN : U ≤ N) :
     · rintro ⟨⟨hUb, hbNa⟩, ha0, haN⟩
       have h1 : b * a ≤ N := (Nat.le_div_iff_mul_le ha0).mp hbNa
       have hb0 : 0 < b := by omega
-      exact ⟨⟨hUb, le_trans (Nat.le_mul_of_pos_right b ha0) h1⟩, ha0,
-        (Nat.le_div_iff_mul_le hb0).mpr (by linarith)⟩
+      exact ⟨
+        ⟨hUb, le_trans (Nat.le_mul_of_pos_right b ha0) h1⟩,
+        ha0,
+        (Nat.le_div_iff_mul_le hb0).mpr (by linarith)
+      ⟩
   unfold hH
   push_cast
   simp only [Finset.mul_sum]

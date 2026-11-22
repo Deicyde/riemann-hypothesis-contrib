@@ -11,11 +11,11 @@ namespace ReciprocityTheory.L2DbarEstimates.I
 open MeasureTheory Metric Filter Topology
 open scoped ENNReal ContDiff
 
-theorem covDet (n : ℕ) (f' : V n →L[ℂ] V n) :
-    |(f'.restrictScalars ℝ : V n →L[ℝ] V n).det| =
-      ‖LinearMap.det (f' : V n →ₗ[ℂ] V n)‖ ^ 2 := by
-  rw [ContinuousLinearMap.det, ContinuousLinearMap.coe_restrictScalars, LinearMap.det_restrictScalars,
-    Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq, abs_of_nonneg (by positivity)]
+theorem covDet (n : ℕ) (f' : V n →L[ℂ] V n)
+    : |(f'.restrictScalars ℝ : V n →L[ℝ] V n).det| = ‖LinearMap.det (f' : V n →ₗ[ℂ] V n)‖ ^ 2 := by
+  rw [ContinuousLinearMap.det, ContinuousLinearMap.coe_restrictScalars,
+    LinearMap.det_restrictScalars, Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq,
+    abs_of_nonneg (by positivity)]
 
 theorem cov (n : ℕ) : CovStatement n := by
   intro W G f hW hG hinj _

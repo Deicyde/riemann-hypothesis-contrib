@@ -9,12 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIntegrally
 
 noncomputable section
 
-open WittVector CategoryTheory Opposite Matrix GlobalTheory GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open WittVector CategoryTheory Opposite Matrix GlobalTheory GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 namespace GlobalTheory.ConstDatum
 
-theorem isLocalRing_of_integers {C : Type} [Field C] {v : Valuation C NNReal} {O : Type}
-    [CommRing O] [Algebra O C] (hv : v.Integers O) : IsLocalRing O := by
+theorem isLocalRing_of_integers
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    : IsLocalRing O := by
   haveI : Nontrivial O := (algebraMap O C).domain_nontrivial
   refine IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun a => ?_
   by_contra h
@@ -28,18 +33,20 @@ theorem isLocalRing_of_integers {C : Type} [Field C] {v : Valuation C NNReal} {O
   rw [h4, v.map_one] at h3
   exact lt_irrefl _ (lt_of_le_of_lt h3 (max_lt h1 h2))
 
-variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (Ideal.span {(p : O)}) O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
 
 theorem etale_al (ε : PreTilt O p) (h : ℕ) (y : Fin h → O) : (etale ε h).al y = y := by
   simp [Datum.al, etale, Matrix.map_one _ (map_zero _) (map_one _)]
 
-theorem theta_mu {ε : PreTilt O p} (hε : IsPrimitiveSystem ε) : fontaineTheta O p (Sandwich.mu ε) = 0 := by
+theorem theta_mu {ε : PreTilt O p} (hε : IsPrimitiveSystem ε)
+    : fontaineTheta O p (Sandwich.mu ε) = 0 := by
   rw [Sandwich.mu, map_sub, fontaineTheta_teichmuller, map_one, sub_eq_zero]
   exact hε.zeta_zero
 
-theorem etale_bb {ε : PreTilt O p} (hε : IsPrimitiveSystem ε) (h : ℕ) (y : Fin h → O) :
-    (etale ε h).bb y = 0 := by
+theorem etale_bb {ε : PreTilt O p} (hε : IsPrimitiveSystem ε) (h : ℕ) (y : Fin h → O)
+    : (etale ε h).bb y = 0 := by
   ext i
   simp [Datum.bb, etale, Matrix.mulVec, dotProduct, theta_mu hε]
 
@@ -48,13 +55,19 @@ theorem etale_Fil {ε : PreTilt O p} (hε : IsPrimitiveSystem ε) (h : ℕ) : (e
 
 end GlobalTheory.ConstDatum
 
-
 open GlobalTheory.ConstDatum in
-theorem GlobalTheory.PDivLat.hasDatum_of_isConst : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ G : PDivGroup p O, IsConst G → HasDatum hε G := by
+theorem GlobalTheory.PDivLat.hasDatum_of_isConst
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
+      v.Integers O
+        → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ G : PDivGroup p O,
+          IsConst G → HasDatum hε G := by
   intro p _ C _ _ _ v O _ _ _ _ _ hv ε hε G hG
   haveI := GlobalTheory.PointGroup.isIntegrallyClosedIn_of_integers hv
   haveI := isLocalRing_of_integers hv
-  obtain ⟨hω, hbij⟩ := GlobalTheory.T.constantPDivGroup_omega_trivial_hodgeTate_basis p C v O hv G hG
+  obtain ⟨hω, hbij⟩ :=
+    GlobalTheory.T.constantPDivGroup_omega_trivial_hodgeTate_basis p C v O hv G hG
   haveI := GlobalTheory.PointGroup.finite_tate hv G
   haveI := GlobalTheory.PointGroup.free_tate hv G
   have hrank : Module.finrank ℤ_[p] G.Tate = G.height := G.finrank_tate C

@@ -169,7 +169,8 @@ theorem gauss_elementary_symmetric : GaussEsymm := by
   intro K _ Q g l hQ
   rw [gauss_zpow Q hQ g l]
   rcases le_or_gt l g with h | h
-  · rw [show ((l : ℤ) * ((g : ℤ) - l)) = ((l * (g - l) : ℕ) : ℤ) by push_cast [Nat.cast_sub h]; ring,
+  · rw [show ((l : ℤ) * ((g : ℤ) - l)) = ((l * (g - l) : ℕ) : ℤ) by
+        push_cast [Nat.cast_sub h]; ring,
       zpow_natCast]
   · rw [eF_of_card_lt _ _ (by simpa using h)]
     simp
@@ -181,9 +182,12 @@ theorem hecke_convolution : HEConvolution := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_mul, map_pow, map_neg, map_one, map_zero] at h2
   rw [← Finset.sum_range_reflect]
-  have hterm : ∀ j ∈ range (n + 1), (-1 : K) ^ (n + 1 - 1 - j) * hF x (n + 1 - 1 - j) * eF x (n - (n + 1 - 1 - j)) =
-      (-1) ^ n * ((-1) ^ j * MvPolynomial.eval x (MvPolynomial.esymm σ K j) *
-        MvPolynomial.eval x (MvPolynomial.hsymm σ K (n - j))) := by
+  have hterm
+      : ∀ j ∈ range (n + 1),
+        (-1 : K) ^ (n + 1 - 1 - j) * hF x (n + 1 - 1 - j) * eF x (n - (n + 1 - 1 - j))
+          = (-1) ^ n
+            * ((-1) ^ j * MvPolynomial.eval x (MvPolynomial.esymm σ K j)
+              * MvPolynomial.eval x (MvPolynomial.hsymm σ K (n - j))) := by
     intro j hj
     simp only [Finset.mem_range] at hj
     rw [show n + 1 - 1 - j = n - j by omega, show n - (n - j) = j by omega]
@@ -213,8 +217,8 @@ theorem iterate_statement : Iterate := by
   | zero =>
     intro _ i
     simp only [Kc, LinearMap.comp_id, LinearMap.id_comp]
-    rw [Finset.sum_eq_single 0 (fun l _ hl => by rw [eF_isEmpty, if_neg hl, zero_smul])
-      (by simp), eF_isEmpty, if_pos rfl, one_smul, Nat.sub_zero]
+    rw [Finset.sum_eq_single 0 (fun l _ hl => by rw [eF_isEmpty, if_neg hl, zero_smul]) (by simp),
+      eF_isEmpty, if_pos rfl, one_smul, Nat.sub_zero]
   | succ j ih =>
     intro hj i
     have ih' := ih (by omega)
@@ -245,33 +249,40 @@ theorem theorem_c_i : ThmCi := by
   intro K ι _ M _ _ Kk Tm pp ν k t r j Ev Od lam w m hpp hrk hI
   set Q := pp ^ ν with hQdef
   have hQ : Q ≠ 0 := pow_ne_zero _ hpp
-  have hinv := inversion_formula K M Kk (fun a i => (Q ^ (-((i : ℤ) * ((NN k t a : ℤ) - i)))) • Tm a i)
-    Q t m j hI j le_rfl r
-  have hZ : Zop pp ν Ev Od lam w m k t r j (Tm j) =
-      (pp ^ (NprimeZ Ev Od lam (w j) r) * Q ^ ((r : ℤ) * ((NN k t j : ℤ) - r))) •
-        ∑ l ∈ range (r + 1), ((-1 : K) ^ l * hF (FFam Q t m j) l) •
-          ((Q ^ (-(((r - l : ℕ) : ℤ) * ((NN k t j : ℤ) - ((r - l : ℕ) : ℤ))))) • Tm j (r - l)) := by
-    unfold Zop
-    rw [Finset.smul_sum]
-    refine Finset.sum_congr rfl fun l hl => ?_
-    have hlr : l ≤ r := by simp only [Finset.mem_range] at hl; omega
-    unfold cCoef Ttil
-    simp only [smul_smul]
-    congr 1
-    have h1 : pp ^ (NprimeZ Ev Od lam (w j) r - NprimeZ Ev Od lam (w j) (r - l)) *
-        pp ^ (NprimeZ Ev Od lam (w j) (r - l)) = pp ^ (NprimeZ Ev Od lam (w j) r) := by
-      rw [← zpow_add₀ hpp]
-      ring_nf
-    have h2 : Q ^ ((l : ℤ) * ((NN k t j : ℤ) - 2 * r + l)) =
-        Q ^ ((r : ℤ) * ((NN k t j : ℤ) - r)) *
-          Q ^ (-(((r - l : ℕ) : ℤ) * ((NN k t j : ℤ) - ((r - l : ℕ) : ℤ)))) := by
-      rw [← zpow_add₀ hQ]
+  have hinv :=
+    inversion_formula K M Kk
+      (fun a i => (Q ^ (-((i : ℤ) * ((NN k t a : ℤ) - i)))) • Tm a i)
+      Q t m j hI j le_rfl r
+  have hZ
+      : Zop pp ν Ev Od lam w m k t r j (Tm j)
+        = (pp ^ (NprimeZ Ev Od lam (w j) r) * Q ^ ((r : ℤ) * ((NN k t j : ℤ) - r)))
+          • ∑ l ∈ range (r + 1), ((-1 : K) ^ l * hF (FFam Q t m j) l) •
+              ((Q ^ (-(((r - l : ℕ) : ℤ) * ((NN k t j : ℤ) - ((r - l : ℕ) : ℤ))))) • Tm j (r - l)) :=
+    by
+      unfold Zop
+      rw [Finset.smul_sum]
+      refine Finset.sum_congr rfl fun l hl => ?_
+      have hlr : l ≤ r := by simp only [Finset.mem_range] at hl; omega
+      unfold cCoef Ttil
+      simp only [smul_smul]
       congr 1
-      push_cast [Nat.cast_sub hlr]
-      ring
-    rw [h2]
-    linear_combination ((-1 : K) ^ l * Q ^ ((r : ℤ) * ((NN k t j : ℤ) - r)) *
-      Q ^ (-(((r - l : ℕ) : ℤ) * ((NN k t j : ℤ) - ((r - l : ℕ) : ℤ)))) * hF (FFam Q t m j) l) * h1
+      have h1
+          : pp ^ (NprimeZ Ev Od lam (w j) r - NprimeZ Ev Od lam (w j) (r - l))
+              * pp ^ (NprimeZ Ev Od lam (w j) (r - l))
+            = pp ^ (NprimeZ Ev Od lam (w j) r) := by
+        rw [← zpow_add₀ hpp]
+        ring_nf
+      have h2
+          : Q ^ ((l : ℤ) * ((NN k t j : ℤ) - 2 * r + l))
+            = Q ^ ((r : ℤ) * ((NN k t j : ℤ) - r))
+              * Q ^ (-(((r - l : ℕ) : ℤ) * ((NN k t j : ℤ) - ((r - l : ℕ) : ℤ)))) := by
+        rw [← zpow_add₀ hQ]
+        congr 1
+        push_cast [Nat.cast_sub hlr]
+        ring
+      rw [h2]
+      linear_combination ((-1 : K) ^ l * Q ^ ((r : ℤ) * ((NN k t j : ℤ) - r)) *
+        Q ^ (-(((r - l : ℕ) : ℤ) * ((NN k t j : ℤ) - ((r - l : ℕ) : ℤ)))) * hF (FFam Q t m j) l) * h1
   rw [hZ, LinearMap.smul_comp, hinv]
   simp only [LinearMap.comp_smul, smul_smul]
   congr 1

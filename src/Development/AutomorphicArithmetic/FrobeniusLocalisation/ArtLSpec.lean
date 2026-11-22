@@ -9,8 +9,9 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-private theorem exists_unit {N l : ℕ} (hN : N ≠ 0) (hl : l.Prime) :
-    ∃ u : (ZMod N)ˣ, (u : ZMod N).val ≡ l [MOD ordCompl[l] N] ∧ (u : ZMod N).val ≡ 1 [MOD ordProj[l] N] := by
+private theorem exists_unit {N l : ℕ} (hN : N ≠ 0) (hl : l.Prime)
+    : ∃ u : (ZMod N)ˣ,
+      (u : ZMod N).val ≡ l [MOD ordCompl[l] N] ∧ (u : ZMod N).val ≡ 1 [MOD ordProj[l] N] := by
   have hcl : Nat.Coprime l (ordCompl[l] N) := Nat.coprime_ordCompl hl hN
   have hcop : Nat.Coprime (ordCompl[l] N) (ordProj[l] N) := (Nat.Coprime.pow_left _ hcl).symm
   obtain ⟨k, hk1, hk2⟩ := Nat.chineseRemainder hcop l 1
@@ -31,9 +32,11 @@ private theorem exists_unit {N l : ℕ} (hN : N ≠ 0) (hl : l.Prime) :
   · rw [ZMod.coe_unitOfCoprime, ZMod.val_natCast]
     exact ((Nat.mod_modEq k N).of_dvd (Nat.ordProj_dvd N l)).trans hk2
 
-private theorem unit_unique {N l : ℕ} (hN : N ≠ 0) (hl : l.Prime) {u v : (ZMod N)ˣ}
-    (h1 : (u : ZMod N).val ≡ (v : ZMod N).val [MOD ordCompl[l] N])
-    (h2 : (u : ZMod N).val ≡ (v : ZMod N).val [MOD ordProj[l] N]) : u = v := by
+private theorem unit_unique
+    {N l : ℕ} (hN : N ≠ 0) (hl : l.Prime)
+    {u v : (ZMod N)ˣ} (h1 : (u : ZMod N).val ≡ (v : ZMod N).val [MOD ordCompl[l] N])
+    (h2 : (u : ZMod N).val ≡ (v : ZMod N).val [MOD ordProj[l] N])
+    : u = v := by
   have hcop : Nat.Coprime (ordProj[l] N) (ordCompl[l] N) :=
     Nat.Coprime.pow_left _ (Nat.coprime_ordCompl hl hN)
   have h := (Nat.modEq_and_modEq_iff_modEq_mul hcop).mp ⟨h2, h1⟩
@@ -46,12 +49,25 @@ private theorem unit_unique {N l : ℕ} (hN : N ≠ 0) (hl : l.Prime) {u v : (ZM
   unfold Nat.ModEq at h
   rwa [Nat.mod_eq_of_lt hu, Nat.mod_eq_of_lt hv] at h
 
-private theorem val_iff {N f : ℕ} [NeZero N] (hf : f ∣ N) (u : (ZMod N)ˣ) (a : ℕ) :
-    (u : ZMod N).val ≡ a [MOD f] ↔ ((ZMod.unitsMap hf u : (ZMod f)ˣ) : ZMod f) = (a : ZMod f) := by
+private theorem val_iff {N f : ℕ} [NeZero N] (hf : f ∣ N) (u : (ZMod N)ˣ) (a : ℕ)
+    : (u : ZMod N).val ≡ a [MOD f]
+      ↔ ((ZMod.unitsMap hf u : (ZMod f)ˣ) : ZMod f) = (a : ZMod f) := by
   rw [ZMod.unitsMap_val, ZMod.cast_eq_val, ZMod.natCast_eq_natCast_iff]
 
-theorem UpperTheory.HF.artL_spec :
-    ∀ {φ : Frame} (H : HostRaw φ) {l : ℕ}, l.Prime → (∃ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN] ∧ (u : ZMod H.condN).val ≡ 1 [MOD ordProj[l] H.condN] ∧ H.artL l = H.art u) ∧ (∀ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN] → (u : ZMod H.condN).val ≡ 1 [MOD ordProj[l] H.condN] → H.art u = H.artL l) ∧ ∀ g : φ.GG, g ∈ H.decG l ↔ ∃ (u : (ZMod H.condN)ˣ) (k : ℕ), (u : ZMod H.condN).val ≡ l ^ k [MOD ordCompl[l] H.condN] ∧ g = H.art u := by
+theorem UpperTheory.HF.artL_spec
+    : ∀ {φ : Frame} (H : HostRaw φ) {l : ℕ},
+      l.Prime
+        → (∃ u : (ZMod H.condN)ˣ,
+            (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN]
+              ∧ (u : ZMod H.condN).val ≡ 1 [MOD ordProj[l] H.condN] ∧ H.artL l = H.art u)
+          ∧ (∀ u : (ZMod H.condN)ˣ,
+            (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN]
+              → (u : ZMod H.condN).val ≡ 1 [MOD ordProj[l] H.condN]
+              → H.art u = H.artL l)
+          ∧ ∀ g : φ.GG,
+            g ∈ H.decG l
+              ↔ ∃ (u : (ZMod H.condN)ˣ) (k : ℕ),
+                (u : ZMod H.condN).val ≡ l ^ k [MOD ordCompl[l] H.condN] ∧ g = H.art u := by
   intro φ H l hl
   haveI : NeZero H.condN := ⟨H.condN_ne_zero⟩
   have hN : H.condN ≠ 0 := H.condN_ne_zero
@@ -60,23 +76,31 @@ theorem UpperTheory.HF.artL_spec :
     unfold UpperTheory.HF.Formalism.HC.HostRaw.artL
     rw [dite_eq_left hex]
   obtain ⟨hc1, hc2⟩ := hex.choose_spec
-  have part2 : ∀ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN] →
-      (u : ZMod H.condN).val ≡ 1 [MOD ordProj[l] H.condN] → H.art u = H.artL l := by
+  have part2
+      : ∀ u : (ZMod H.condN)ˣ,
+        (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN]
+          → (u : ZMod H.condN).val ≡ 1 [MOD ordProj[l] H.condN]
+          → H.art u = H.artL l := by
     intro u hu1 hu2
     rw [hart, unit_unique hN hl (hu1.trans hc1.symm) (hu2.trans hc2.symm)]
   refine ⟨⟨hex.choose, hc1, hc2, hart⟩, part2, ?_⟩
   have hA : ordCompl[l] H.condN ∣ H.condN := Nat.ordCompl_dvd _ _
   haveI : NeZero (ordCompl[l] H.condN) :=
     ⟨fun h => hN (Nat.eq_zero_of_zero_dvd (h ▸ hA))⟩
-  obtain ⟨lA, hlA⟩ : ∃ w : (ZMod (ordCompl[l] H.condN))ˣ, (w : ZMod (ordCompl[l] H.condN)) = (l : ZMod _) :=
+  obtain ⟨lA, hlA⟩
+      : ∃ w : (ZMod (ordCompl[l] H.condN))ˣ, (w : ZMod (ordCompl[l] H.condN)) = (l : ZMod _) :=
     ⟨ZMod.unitOfCoprime l (Nat.coprime_ordCompl hl hN), ZMod.coe_unitOfCoprime _ _⟩
-  have key : ∀ (u : (ZMod H.condN)ˣ) (k : ℕ),
-      (u : ZMod H.condN).val ≡ l ^ k [MOD ordCompl[l] H.condN] ↔ ZMod.unitsMap hA u = lA ^ k := by
+  have key
+      : ∀ (u : (ZMod H.condN)ˣ) (k : ℕ),
+        (u : ZMod H.condN).val ≡ l ^ k [MOD ordCompl[l] H.condN] ↔ ZMod.unitsMap hA u = lA ^ k := by
     intro u k
     rw [val_iff hA u (l ^ k), Units.ext_iff, Units.val_pow_eq_pow_val, hlA, Nat.cast_pow]
   let T : Subgroup φ.GG := ((Subgroup.zpowers lA).comap (ZMod.unitsMap hA)).map H.art
-  have memT : ∀ g, g ∈ T ↔ ∃ (u : (ZMod H.condN)ˣ) (k : ℕ),
-      (u : ZMod H.condN).val ≡ l ^ k [MOD ordCompl[l] H.condN] ∧ g = H.art u := by
+  have memT
+      : ∀ g,
+        g ∈ T
+          ↔ ∃ (u : (ZMod H.condN)ˣ) (k : ℕ),
+            (u : ZMod H.condN).val ≡ l ^ k [MOD ordCompl[l] H.condN] ∧ g = H.art u := by
     intro g
     simp only [T, Subgroup.mem_map, Subgroup.mem_comap, ← mem_powers_iff_mem_zpowers,
       Submonoid.mem_powers_iff]
@@ -99,10 +123,12 @@ theorem UpperTheory.HF.artL_spec :
   have hle2 : T ≤ UpperTheory.HF.Formalism.HC.HostRaw.decG H l := by
     intro g hg
     obtain ⟨u, k, hk, rfl⟩ := (memT g).mp hg
-    have hw : ((u * (hex.choose ^ k)⁻¹ : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ 1
-        [MOD ordCompl[l] H.condN] := by
-      have h := (key (u * (hex.choose ^ k)⁻¹) 0).mpr
-        (by rw [map_mul, map_inv, map_pow, hu1, (key u k).mp hk]; simp)
+    have hw
+        : ((u * (hex.choose ^ k)⁻¹ : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ 1
+          [MOD ordCompl[l] H.condN] := by
+      have h :=
+        (key (u * (hex.choose ^ k)⁻¹) 0).mpr
+          (by rw [map_mul, map_inv, map_pow, hu1, (key u k).mp hk]; simp)
       simpa using h
     have hmem : H.art (u * (hex.choose ^ k)⁻¹) ∈ UpperTheory.HF.Formalism.HC.HostRaw.inertG H l :=
       (UpperTheory.HF.Formalism.HC.HostRaw.mem_inertG H l _).mpr ⟨_, hw, rfl⟩

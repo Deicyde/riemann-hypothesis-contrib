@@ -18,10 +18,10 @@ section
 
 variable {k : Type} [Field k] {N m : ℕ}
 
-theorem weight_mapDomain_base (e : Fin (N + 1) →₀ ℕ) :
-    Finsupp.weight (NumbersDVR.blockWeight (graphIdx N m))
-        (Finsupp.mapDomain (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)) e) =
-      Sum.elim (fun _ => e.degree) (fun _ => 0) := by
+theorem weight_mapDomain_base (e : Fin (N + 1) →₀ ℕ)
+    : Finsupp.weight (NumbersDVR.blockWeight (graphIdx N m))
+        (Finsupp.mapDomain (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)) e)
+      = Sum.elim (fun _ => e.degree) (fun _ => 0) := by
   classical
   have hinj : Function.Injective (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)) :=
     fun a b h => eq_of_heq (Sigma.mk.inj h).2
@@ -36,16 +36,20 @@ theorem weight_mapDomain_base (e : Fin (N + 1) →₀ ℕ) :
     rintro ⟨a, ha⟩
     cases (Sigma.mk.inj ha).1
 
-theorem rename_base_homogeneousComponent (d : ℕ) (f : Kleiman.Poly k N) :
-    rename (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)) (homogeneousComponent d f) =
-      weightedHomogeneousComponent (NumbersDVR.blockWeight (graphIdx N m)) (Sum.elim (fun _ => d) (fun _ => 0))
+theorem rename_base_homogeneousComponent (d : ℕ) (f : Kleiman.Poly k N)
+    : rename
+        (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c))
+        (homogeneousComponent d f)
+      = weightedHomogeneousComponent (NumbersDVR.blockWeight (graphIdx N m))
+        (Sum.elim (fun _ => d) (fun _ => 0))
         (rename (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)) f) := by
   classical
   have hinj : Function.Injective (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)) :=
     fun a b h => eq_of_heq (Sigma.mk.inj h).2
   ext e'
   rw [coeff_weightedHomogeneousComponent]
-  by_cases he : ∃ e, Finsupp.mapDomain (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)) e = e'
+  by_cases he
+    : ∃ e, Finsupp.mapDomain (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)) e = e'
   · obtain ⟨e, rfl⟩ := he
     rw [coeff_rename_mapDomain _ hinj, coeff_rename_mapDomain _ hinj, coeff_homogeneousComponent,
       weight_mapDomain_base]
@@ -60,17 +64,22 @@ theorem rename_base_homogeneousComponent (d : ℕ) (f : Kleiman.Poly k N) :
 
 end
 
-theorem CurveComap.proof (hR : SectionRatio.Statement) (hD : RatioDim.Statement) : CurveComap.Statement := by
+theorem CurveComap.proof (hR : SectionRatio.Statement) (hD : RatioDim.Statement)
+    : CurveComap.Statement := by
   intro k _ N Ω _ _ x Q n m s hx hgen W hW hle e
   have := hW.isPrime
   obtain ⟨j, hj⟩ := hW.relevant (Sum.inr ())
-  have hdim := hD k N m W hW.isPrime hW.multiHomog j hj fun b => by
-    obtain ⟨d, f, g, -, -, h1, h2⟩ := hR k N Ω x Q n m s hx hgen W hW hle j b hj
-    exact ⟨f, g, h1, h2⟩
-  have hsub : Kleiman.IsSubvar x (W.comap (rename fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c))) e ↔
-      ringKrullDim (Kleiman.Poly k N ⧸
-          W.comap (rename fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c))) =
-        ((e + 1 : ℕ) : WithBot ℕ∞) := by
+  have hdim :=
+    hD k N m W hW.isPrime hW.multiHomog j hj fun b => by
+      obtain ⟨d, f, g, -, -, h1, h2⟩ := hR k N Ω x Q n m s hx hgen W hW hle j b hj
+      exact ⟨f, g, h1, h2⟩
+  have hsub
+      : Kleiman.IsSubvar x
+          (W.comap (rename fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c))) e
+        ↔ ringKrullDim
+            (Kleiman.Poly k N ⧸
+              W.comap (rename fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)))
+          = ((e + 1 : ℕ) : WithBot ℕ∞) := by
     refine ⟨fun h => h.dim, fun h => ⟨Ideal.comap_isPrime _ _, fun f hf d => ?_, ?_, ?_, h⟩⟩
     · rw [Ideal.mem_comap] at hf ⊢
       rw [rename_base_homogeneousComponent]
@@ -78,21 +87,29 @@ theorem CurveComap.proof (hR : SectionRatio.Statement) (hD : RatioDim.Statement)
     · rw [← comap_mIdealOver_graph (S := k) x s]
       exact Ideal.comap_mono hle
     · obtain ⟨i, hi⟩ := hW.relevant (Sum.inl ())
-      have hXi : rename (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)) (X i : Kleiman.Poly k N) =
-          X ⟨baseBlock, i⟩ := rename_X _ _
+      have hXi
+          : rename
+              (fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c))
+              (X i : Kleiman.Poly k N)
+            = X ⟨baseBlock, i⟩ :=
+        rename_X _ _
       exact ⟨i, by rw [Ideal.mem_comap, hXi]; exact hi⟩
-  rw [hsub, FieldNumbers.CutRegular.relDim_eq_natCast_iff, hdim, Fintype.card_sum, Fintype.card_unit]
-  generalize ringKrullDim (Kleiman.Poly k N ⧸
-    W.comap (rename fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c))) = D
+  rw [hsub, FieldNumbers.CutRegular.relDim_eq_natCast_iff, hdim, Fintype.card_sum,
+    Fintype.card_unit]
+  generalize ringKrullDim
+      (Kleiman.Poly k N ⧸
+        W.comap (rename fun a : Fin (N + 1) => (⟨baseBlock, a⟩ : Σ c, graphIdx N m c)))
+    = D
   induction D using WithBot.recBotCoe with
   | bot =>
     rw [WithBot.bot_add]
     exact iff_of_false (WithBot.bot_ne_natCast _) (WithBot.bot_ne_natCast _)
   | coe t =>
-    rw [← WithBot.coe_one, ← WithBot.coe_add, ← WithBot.coe_natCast, ← WithBot.coe_natCast, WithBot.coe_inj,
-      WithBot.coe_inj]
+    rw [← WithBot.coe_one, ← WithBot.coe_add, ← WithBot.coe_natCast, ← WithBot.coe_natCast,
+      WithBot.coe_inj, WithBot.coe_inj]
     induction t using ENat.recTopCoe with
-    | top => exact iff_of_false (by rw [top_add]; exact ENat.top_ne_natCast _) (ENat.top_ne_natCast _)
+    | top =>
+      exact iff_of_false (by rw [top_add]; exact ENat.top_ne_natCast _) (ENat.top_ne_natCast _)
     | coe t =>
       norm_cast
       omega

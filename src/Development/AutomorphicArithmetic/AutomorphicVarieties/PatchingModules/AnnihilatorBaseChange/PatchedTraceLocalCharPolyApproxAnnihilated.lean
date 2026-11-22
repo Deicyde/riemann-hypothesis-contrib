@@ -8,21 +8,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem gDet_chi_map_mapRingHom {n : ℕ} {R R' G : Type} [CommRing R] [CommRing R'] [Group G]
-    (D : GDet n R G) (f : R →+* R') (x : MonoidAlgebra R G) :
-    (D.map f).chi (MonoidAlgebra.mapRingHom G f x) = (D.chi x).map f := by
+private theorem gDet_chi_map_mapRingHom
+    {n : ℕ} {R R' G : Type} [CommRing R] [CommRing R'] [Group G]
+    (D : GDet n R G) (f : R →+* R') (x : MonoidAlgebra R G)
+    : (D.map f).chi (MonoidAlgebra.mapRingHom G f x) = (D.chi x).map f := by
   unfold GDet.chi GDet.map
   dsimp only
   letI : Algebra R (Polynomial R') := ((algebraMap R' (Polynomial R')).comp f).toAlgebra
-  let g : Polynomial R →ₐ[R] Polynomial R' :=
-    { Polynomial.mapRingHom f with
-      commutes' := fun c => by
-        simp [RingHom.algebraMap_toAlgebra, Polynomial.algebraMap_apply] }
-  have h := D.nat (Polynomial R) (Polynomial R') g
-    (MonoidAlgebra.single 1 Polynomial.X - MonoidAlgebra.mapRingHom G Polynomial.C x)
+  let g : Polynomial R →ₐ[R] Polynomial R' := {
+    Polynomial.mapRingHom f with
+    commutes' := fun c => by simp [RingHom.algebraMap_toAlgebra, Polynomial.algebraMap_apply]
+  }
+  have h :=
+    D.nat (Polynomial R) (Polynomial R') g
+      (MonoidAlgebra.single 1 Polynomial.X - MonoidAlgebra.mapRingHom G Polynomial.C x)
   refine Eq.trans ?_ h
   congr 1
   rw [map_sub]
@@ -32,16 +35,18 @@ private theorem gDet_chi_map_mapRingHom {n : ℕ} {R R' G : Type} [CommRing R] [
   · ext a
     simp [g, MonoidAlgebra.mapRingHom, Polynomial.mapRingHom]
 
-private theorem gDet_tr_map_mapRingHom {n : ℕ} {R R' G : Type} [CommRing R] [CommRing R'] [Group G]
-    (D : GDet n R G) (f : R →+* R') (x : MonoidAlgebra R G) :
-    (D.map f).tr (MonoidAlgebra.mapRingHom G f x) = f (D.tr x) := by
+private theorem gDet_tr_map_mapRingHom
+    {n : ℕ} {R R' G : Type} [CommRing R] [CommRing R'] [Group G]
+    (D : GDet n R G) (f : R →+* R') (x : MonoidAlgebra R G)
+    : (D.map f).tr (MonoidAlgebra.mapRingHom G f x) = f (D.tr x) := by
   unfold GDet.tr GDet.lam
   rw [gDet_chi_map_mapRingHom, Polynomial.coeff_map]
   simp
 
-private theorem gDet_tr_comap_eq_tr_mapDomainRingHom {n : ℕ} {R G H : Type} [CommRing R] [Group G] [Group H]
-    (D : GDet n R G) (φ : H →* G) (x : MonoidAlgebra R H) :
-    (D.comap φ).tr x = D.tr (MonoidAlgebra.mapDomainRingHom R φ x) := by
+private theorem gDet_tr_comap_eq_tr_mapDomainRingHom
+    {n : ℕ} {R G H : Type} [CommRing R] [Group G] [Group H]
+    (D : GDet n R G) (φ : H →* G) (x : MonoidAlgebra R H)
+    : (D.comap φ).tr x = D.tr (MonoidAlgebra.mapDomainRingHom R φ x) := by
   unfold GDet.tr GDet.lam GDet.chi GDet.comap
   dsimp only
   rw [MonoidHom.comp_apply]

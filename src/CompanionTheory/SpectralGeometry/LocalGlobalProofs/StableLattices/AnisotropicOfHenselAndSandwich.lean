@@ -13,7 +13,9 @@ namespace GlobalTheory.CompanionTheory.HermAniso
 
 section Core
 
-variable {L : Type} [NontriviallyNormedField L] {V : Type} [AddCommGroup V] [Module L V]
+variable
+  {L : Type} [NontriviallyNormedField L]
+  {V : Type} [AddCommGroup V] [Module L V]
   {s : L →+* L} {h : V → V → L}
 
 lemma add_left (hh : IsHerm s h) (x y z : V) : h (x + y) z = h x z + h y z := by
@@ -135,8 +137,8 @@ theorem aniso : StHensel → StSandwich → StAniso := by
   unfold StAniso ForAll
   intro L _ _ _ _ s hs δ hδ V _ _ _ h hh hani Λ hΛ x
   have h1 := hh.2.2.1
-  have hp : ∀ x y : V, ‖h x x‖ ≤ 1 → ‖h y y‖ ≤ 1 → ‖h x y + h y x‖ ≤ 1 :=
-    fun x y hx hy => pair_le hH hs hh hani hx hy
+  have hp : ∀ x y : V, ‖h x x‖ ≤ 1 → ‖h y y‖ ≤ 1 → ‖h x y + h y x‖ ≤ 1 := fun x y hx hy =>
+    pair_le hH hs hh hani hx hy
   obtain ⟨V₀, hV₀⟩ := exists_ball hs hh hp
   have hsmul : ∀ a : L, ‖a‖ ≤ 1 → ∀ x ∈ V₀, a • x ∈ V₀ := by
     intro a ha x hx
@@ -144,7 +146,9 @@ theorem aniso : StHensel → StSandwich → StAniso := by
     rw [norm_q_smul hs hh]
     have := norm_nonneg a
     have h2 := norm_nonneg (h x x)
-    calc ‖a‖ * ‖a‖ * ‖h x x‖ ≤ 1 * 1 * 1 := by gcongr
+    calc
+      ‖a‖ * ‖a‖ * ‖h x x‖
+        ≤ 1 * 1 * 1 := by gcongr
       _ = 1 := by norm_num
   have hδle : ∀ x ∈ V₀, ∀ y ∈ V₀, ‖h x y‖ ≤ ‖δ‖ := by
     intro x hx y hy
@@ -173,8 +177,10 @@ theorem aniso : StHensel → StSandwich → StAniso := by
         rw [norm_mul]
         exact mul_le_mul_of_nonneg_left (hδle _ (hle (hbΛ j)) x hx) (norm_nonneg _)
       have e2 : ∑ j, ‖M i j‖ * ‖δ‖ ≤ ∑ i, ∑ j, ‖M i j‖ * ‖δ‖ :=
-        Finset.single_le_sum (f := fun i => ∑ j, ‖M i j‖ * ‖δ‖)
-          (fun i _ => Finset.sum_nonneg fun j _ => by positivity) (Finset.mem_univ i)
+        Finset.single_le_sum
+          (f := fun i => ∑ j, ‖M i j‖ * ‖δ‖)
+          (fun i _ => Finset.sum_nonneg fun j _ => by positivity)
+          (Finset.mem_univ i)
       linarith
   obtain ⟨c, hc0, hc1⟩ := NormedField.exists_norm_lt L (inv_pos.mpr hC0)
   have hcne : c ≠ 0 := norm_pos_iff.mp hc0
@@ -187,7 +193,9 @@ theorem aniso : StHensel → StSandwich → StAniso := by
     have e2 : ‖c‖ * C ≤ 1 := by
       have := mul_le_mul_of_nonneg_right hc1.le hC0.le
       rwa [inv_mul_cancel₀ hC0.ne'] at this
-    calc ‖c‖ * ‖b.repr x i‖ ≤ ‖c‖ * C := mul_le_mul_of_nonneg_left e hc0.le
+    calc
+      ‖c‖ * ‖b.repr x i‖
+        ≤ ‖c‖ * C := mul_le_mul_of_nonneg_left e hc0.le
       _ ≤ 1 := e2
   have hab : ∀ x : V, ∃ a : L, a ≠ 0 ∧ a • x ∈ V₀ := by
     intro x
@@ -201,11 +209,12 @@ theorem aniso : StHensel → StSandwich → StAniso := by
       rwa [inv_mul_cancel₀ (by positivity)] at this
     have e2 : ‖a‖ ≤ 1 := by nlinarith
     have e3 : ‖a‖ * ‖h x x‖ ≤ 1 := by nlinarith
-    calc ‖a‖ * ‖a‖ * ‖h x x‖ = ‖a‖ * (‖a‖ * ‖h x x‖) := by ring
+    calc
+      ‖a‖ * ‖a‖ * ‖h x x‖
+        = ‖a‖ * (‖a‖ * ‖h x x‖) := by ring
       _ ≤ 1 * 1 := by gcongr
       _ = 1 := by norm_num
-  have hlat : IsLat L V₀ :=
-    hS L V Λ V₀ c ⟨m, b, hb⟩ hcne hbound hab hsmul
+  have hlat : IsLat L V₀ := hS L V Λ V₀ c ⟨m, b, hb⟩ hcne hbound hab hsmul
   have heq : V₀ = Λ := hΛ.2.2 V₀ hlat (fun x hx => (hV₀ x).mp hx) hle
   rw [← heq]
   exact hV₀ x

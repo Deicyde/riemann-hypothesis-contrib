@@ -8,9 +8,10 @@ open Matrix
 
 namespace GlobalTheory.BlockInvertibleLocal
 
-theorem exists_linearMap_injective_add_comp {k V : Type} [Field k] [AddCommGroup V] [Module k V]
-    [FiniteDimensional k V] (a c : V →ₗ[k] V) (h : LinearMap.ker a ⊓ LinearMap.ker c = ⊥) :
-    ∃ x : V →ₗ[k] V, Function.Injective (a + x ∘ₗ c) := by
+theorem exists_linearMap_injective_add_comp
+    {k V : Type} [Field k] [AddCommGroup V] [Module k V] [FiniteDimensional k V]
+    (a c : V →ₗ[k] V) (h : LinearMap.ker a ⊓ LinearMap.ker c = ⊥)
+    : ∃ x : V →ₗ[k] V, Function.Injective (a + x ∘ₗ c) := by
   set W := LinearMap.range (c ∘ₗ (LinearMap.ker a).subtype) with hWdef
   obtain ⟨R, hR⟩ := Submodule.exists_isCompl (LinearMap.range a)
   obtain ⟨W', hW⟩ := Submodule.exists_isCompl W
@@ -30,15 +31,20 @@ theorem exists_linearMap_injective_add_comp {k V : Type} [Field k] [AddCommGroup
   refine ⟨x, ?_⟩
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro v hv
-  obtain ⟨w, hw, w', hw', hsum⟩ := Submodule.mem_sup.1 (hW.sup_eq_top ▸ Submodule.mem_top : c v ∈ W ⊔ W')
+  obtain ⟨w, hw, w', hw', hsum⟩ :=
+    Submodule.mem_sup.1 (hW.sup_eq_top ▸ Submodule.mem_top : c v ∈ W ⊔ W')
   have hxw : x (c v) = ((e ⟨w, hw⟩ : R) : V) := by
     rw [← hsum, map_add (f := _)]
-    have hl := LinearMap.ofIsCompl_left_apply (φ := R.subtype ∘ₗ e.toLinearMap) (ψ := (0 : W' →ₗ[k] V)) hW ⟨w, hw⟩
-    have hr := LinearMap.ofIsCompl_right_apply (φ := R.subtype ∘ₗ e.toLinearMap) (ψ := (0 : W' →ₗ[k] V)) hW ⟨w', hw'⟩
+    have hl :=
+      LinearMap.ofIsCompl_left_apply (φ := R.subtype ∘ₗ e.toLinearMap) (ψ := (0 : W' →ₗ[k] V)) hW
+        ⟨w, hw⟩
+    have hr :=
+      LinearMap.ofIsCompl_right_apply (φ := R.subtype ∘ₗ e.toLinearMap) (ψ := (0 : W' →ₗ[k] V)) hW
+        ⟨w', hw'⟩
     simp only at hl hr
-    rw [hl, hr]; simp
-  have hv' : a v + ((e ⟨w, hw⟩ : R) : V) = 0 := by
-    rw [← hxw]; simpa using hv
+    rw [hl, hr]
+    simp
+  have hv' : a v + ((e ⟨w, hw⟩ : R) : V) = 0 := by rw [← hxw]; simpa using hv
   have hav : a v = 0 := by
     refine Submodule.disjoint_def.1 hR.disjoint (a v) (LinearMap.mem_range_self a v) ?_
     rw [eq_neg_of_add_eq_zero_left hv']
@@ -55,9 +61,10 @@ theorem exists_linearMap_injective_add_comp {k V : Type} [Field k] [AddCommGroup
   rw [h, Submodule.mem_bot] at hmem
   exact hmem
 
-theorem exists_isUnit_det_add_mul_of_field {k : Type} [Field k] {n : ℕ}
-    (A B C D : Matrix (Fin n) (Fin n) k) (h : IsUnit (fromBlocks A B C D).det) :
-    ∃ X : Matrix (Fin n) (Fin n) k, IsUnit (A + X * C).det := by
+theorem exists_isUnit_det_add_mul_of_field
+    {k : Type} [Field k]
+    {n : ℕ} (A B C D : Matrix (Fin n) (Fin n) k) (h : IsUnit (fromBlocks A B C D).det)
+    : ∃ X : Matrix (Fin n) (Fin n) k, IsUnit (A + X * C).det := by
   have hinj : Function.Injective (fromBlocks A B C D).mulVec :=
     Matrix.mulVec_injective_iff_isUnit.2 ((Matrix.isUnit_iff_isUnit_det _).2 h)
   have hker : LinearMap.ker (toLin' A) ⊓ LinearMap.ker (toLin' C) = ⊥ := by
@@ -78,9 +85,10 @@ theorem exists_isUnit_det_add_mul_of_field {k : Type} [Field k] {n : ℕ}
   funext v
   simp [Matrix.add_mulVec, ← Matrix.mulVec_mulVec]
 
-theorem exists_isUnit_det_add_mul : ∀ {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ}
-    (A B C D : Matrix (Fin n) (Fin n) O),
-    IsUnit (Matrix.fromBlocks A B C D).det → ∃ X : Matrix (Fin n) (Fin n) O, IsUnit (A + X * C).det := by
+theorem exists_isUnit_det_add_mul
+    : ∀ {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (A B C D : Matrix (Fin n) (Fin n) O),
+      IsUnit (Matrix.fromBlocks A B C D).det
+        → ∃ X : Matrix (Fin n) (Fin n) O, IsUnit (A + X * C).det := by
   intro O _ _ n A B C D h
   have h' : IsUnit (fromBlocks (A.map (IsLocalRing.residue O)) (B.map (IsLocalRing.residue O))
       (C.map (IsLocalRing.residue O)) (D.map (IsLocalRing.residue O))).det := by
@@ -88,9 +96,10 @@ theorem exists_isUnit_det_add_mul : ∀ {O : Type} [CommRing O] [IsLocalRing O] 
     have := h.map (IsLocalRing.residue O)
     rwa [RingHom.map_det] at this
   obtain ⟨Y, hY⟩ := exists_isUnit_det_add_mul_of_field _ _ _ _ h'
-  obtain ⟨X, hX⟩ : ∃ X : Matrix (Fin n) (Fin n) O, X.map (IsLocalRing.residue O) = Y :=
-    ⟨Y.map (Function.surjInv IsLocalRing.residue_surjective), by
-      ext i j; simp [Function.surjInv_eq]⟩
+  obtain ⟨X, hX⟩ : ∃ X : Matrix (Fin n) (Fin n) O, X.map (IsLocalRing.residue O) = Y := ⟨
+    Y.map (Function.surjInv IsLocalRing.residue_surjective),
+    by ext i j; simp [Function.surjInv_eq]
+  ⟩
   refine ⟨X, ?_⟩
   rw [← IsLocalRing.residue_ne_zero_iff_isUnit, RingHom.map_det, RingHom.mapMatrix_apply,
     Matrix.map_add _ (map_add _), Matrix.map_mul, hX]

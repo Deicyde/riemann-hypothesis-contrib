@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TraceWedgePa
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma perfectPairing_surjective {F Q P : Type*} [Field F] [AddCommGroup Q] [Module F Q] [AddCommGroup P] [Module F P]
@@ -27,17 +28,21 @@ private lemma perfectPairing_surjective {F Q P : Type*} [Field F] [AddCommGroup 
   exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
       (by rw [show Module.finrank F (Q →ₗ[F] F) = Module.finrank F Q from Subspace.dual_finrank_eq, hr])).1 hinj'
 
-theorem UpperTheory.Gal.productCup_of_system.dualForm_of :
-    DualForm := by
+theorem UpperTheory.Gal.productCup_of_system.dualForm_of : DualForm := by
   intro F K _ _ _ _ _ _ d x hc τ ht a ha ψ
-  obtain ⟨hinj, hrk, hfdP⟩ := GlobalTheory.T.trace_wedge_pairing_perfect_rational_forms ℂ F K d (xv x) hc τ ht (d - a) a (by omega)
-  obtain ⟨-, -, hfdQ⟩ := GlobalTheory.T.trace_wedge_pairing_perfect_rational_forms ℂ F K d (xv x) hc τ ht a (d - a) (by omega)
+  obtain ⟨hinj, hrk, hfdP⟩ :=
+    GlobalTheory.T.trace_wedge_pairing_perfect_rational_forms ℂ F K d (xv x) hc τ ht (d - a) a
+      (by omega)
+  obtain ⟨-, -, hfdQ⟩ :=
+    GlobalTheory.T.trace_wedge_pairing_perfect_rational_forms ℂ F K d (xv x) hc τ ht a (d - a)
+      (by omega)
   haveI : FiniteDimensional F K := hc.fin
   haveI : FiniteDimensional F (⋀[K]^(d - a) Ω[K⁄ℂ]) := Module.Finite.trans K _
   haveI : FiniteDimensional F (⋀[K]^a Ω[K⁄ℂ]) := Module.Finite.trans K _
   let T : DR ℂ K →ₗ[F] F := (Algebra.trace F K) ∘ₗ (τ.restrictScalars F)
   let B : (⋀[K]^a Ω[K⁄ℂ]) →ₗ[F] (⋀[K]^(d - a) Ω[K⁄ℂ]) →ₗ[F] F :=
-    LinearMap.mk₂ F (fun w y => T ((y : DR ℂ K) * (w : DR ℂ K)))
+    LinearMap.mk₂ F
+      (fun w y => T ((y : DR ℂ K) * (w : DR ℂ K)))
       (fun w w' y => by simp [mul_add])
       (fun c w y => by simp [mul_smul_comm])
       (fun w y y' => by simp [add_mul])
@@ -45,7 +50,8 @@ theorem UpperTheory.Gal.productCup_of_system.dualForm_of :
   have hr : Module.finrank F (⋀[K]^a Ω[K⁄ℂ]) = Module.finrank F (⋀[K]^(d - a) Ω[K⁄ℂ]) := by
     rw [← Module.finrank_mul_finrank F K (⋀[K]^a Ω[K⁄ℂ]),
       ← Module.finrank_mul_finrank F K (⋀[K]^(d - a) Ω[K⁄ℂ]), hrk]
-  obtain ⟨hs, hs'⟩ := perfectPairing_surjective hr B (fun w hw => Subtype.ext (hinj w.1 w.2 fun y hy => hw ⟨y, hy⟩))
+  obtain ⟨hs, hs'⟩ :=
+    perfectPairing_surjective hr B (fun w hw => Subtype.ext (hinj w.1 w.2 fun y hy => hw ⟨y, hy⟩))
   constructor
   · obtain ⟨w, hw⟩ := hs (ψ ∘ₗ (Submodule.subtype _).restrictScalars F)
     exact ⟨w.1, w.2, fun y hy => (LinearMap.congr_fun hw ⟨y, hy⟩).symm⟩

@@ -11,14 +11,15 @@ set_option autoImplicit false
 
 namespace GlobalTheory.PD
 
-
 set_option maxHeartbeats 1000000 in
 open TensorProduct in
-theorem exists_notMem_smul_D_mem_span (k K : Type) [Field k] [Field K] [Algebra k K] (B : Subalgebra k K)
-    [IsFractionRing B K] [Algebra.Smooth k B] (d : ℕ) (hd : Module.finrank K Ω[K⁄k] = d)
-    (P : Ideal B) [P.IsPrime] :
-    ∃ (f : B) (u : Fin d → B), f ∉ P ∧
-      ∀ v : B, f • D k B v ∈ Submodule.span B (Set.range fun j => D k B (u j)) := by
+theorem exists_notMem_smul_D_mem_span
+    (k K : Type) [Field k] [Field K] [Algebra k K]
+    (B : Subalgebra k K) [IsFractionRing B K] [Algebra.Smooth k B]
+    (d : ℕ) (hd : Module.finrank K Ω[K⁄k] = d)
+    (P : Ideal B) [P.IsPrime]
+    : ∃ (f : B) (u : Fin d → B),
+      f ∉ P ∧ ∀ v : B, f • D k B v ∈ Submodule.span B (Set.range fun j => D k B (u j)) := by
   haveI : Algebra.FormallyEtale B K := Algebra.FormallyEtale.of_isLocalization (nonZeroDivisors B)
   have hinj : Function.Injective (algebraMap B K) := IsFractionRing.injective B K
   haveI : FaithfulSMul B K := (faithfulSMul_iff_algebraMap_injective B K).2 hinj
@@ -42,14 +43,17 @@ theorem exists_notMem_smul_D_mem_span (k K : Type) [Field k] [Field K] [Algebra 
         | mem y hy =>
           obtain ⟨v, rfl⟩ := hy
           exact Submodule.subset_span ⟨v, rfl⟩
-        | zero => rw [tmul_zero]; exact zero_mem _
-        | add y z _ _ hy hz => rw [tmul_add]; exact add_mem hy hz
+        | zero =>
+          rw [tmul_zero]; exact zero_mem _
+        | add y z _ _ hy hz =>
+          rw [tmul_add]; exact add_mem hy hz
         | smul r y _ hy =>
           rw [tmul_smul, ← algebraMap_smul P.ResidueField r]
           exact Submodule.smul_mem _ _ hy
       have : a ⊗ₜ[B] m = a • ((1 : P.ResidueField) ⊗ₜ[B] m) := by
         rw [smul_tmul', smul_eq_mul, mul_one]
-      rw [this]; exact Submodule.smul_mem _ _ h1
+      rw [this]
+      exact Submodule.smul_mem _ _ h1
   obtain ⟨s, hs, hspan, hli⟩ := exists_linearIndependent P.ResidueField (Set.range g)
   let bs : Module.Basis s P.ResidueField (P.ResidueField ⊗[B] Ω[B⁄k]) :=
     Module.Basis.mk hli (by rw [Subtype.range_coe, hspan, hg])
@@ -84,7 +88,8 @@ theorem exists_notMem_smul_D_mem_span (k K : Type) [Field k] [Field K] [Algebra 
         simpa only [φ, LinearMap.baseChange_tmul, LinearMap.zero_apply] using this
     exact ⟨fun x y => by rw [h0 x, h0 y]⟩
   have hnot : (⟨P, inferInstance⟩ : PrimeSpectrum B) ∉ Module.support B (Ω[B⁄k] ⧸ N) := by
-    rw [Module.mem_support_iff_nontrivial_residueField_tensorProduct, not_nontrivial_iff_subsingleton]
+    rw [Module.mem_support_iff_nontrivial_residueField_tensorProduct,
+      not_nontrivial_iff_subsingleton]
     exact hsub
   rw [Module.mem_support_iff_of_finite] at hnot
   obtain ⟨f, hf, hfP⟩ := Set.not_subset.1 hnot
@@ -97,26 +102,31 @@ end GlobalTheory.PD
 
 namespace GlobalTheory.PD
 
-theorem exists_local_dbasis (k K : Type) [Field k] [Field K] [Algebra k K] (B : Subalgebra k K)
-    [IsFractionRing B K] [Algebra.Smooth k B] (d : ℕ) (hd : Module.finrank K Ω[K⁄k] = d)
-    (P : Ideal B) [P.IsPrime] :
-    ∃ (f : B) (u : Fin d → B) (b : Module.Basis (Fin d) K Ω[K⁄k]), f ∉ P ∧ (∀ j, b j = D k K (u j : K)) ∧
-      ∀ (v : B) (j : Fin d), ∃ c : B, (f : K) * b.repr (D k K (v : K)) j = c := by
+theorem exists_local_dbasis
+    (k K : Type) [Field k] [Field K] [Algebra k K]
+    (B : Subalgebra k K) [IsFractionRing B K] [Algebra.Smooth k B]
+    (d : ℕ) (hd : Module.finrank K Ω[K⁄k] = d)
+    (P : Ideal B) [P.IsPrime]
+    : ∃ (f : B) (u : Fin d → B) (b : Module.Basis (Fin d) K Ω[K⁄k]),
+      f ∉ P ∧ (∀ j, b j = D k K (u j : K))
+        ∧ ∀ (v : B) (j : Fin d), ∃ c : B, (f : K) * b.repr (D k K (v : K)) j = c := by
   obtain ⟨f, u, hfP, hfN⟩ := exists_notMem_smul_D_mem_span k K B d hd P
   have hinj : Function.Injective (algebraMap B K) := IsFractionRing.injective B K
   have hf0 : (f : K) ≠ 0 := by
     intro h
     apply hfP
     have : f = 0 := hinj (by rw [map_zero]; exact h)
-    rw [this]; exact P.zero_mem
-  have hcoef : ∀ v : B, ∃ c : Fin d → B,
-      (f : K) • D k K (v : K) = ∑ j, (c j : K) • D k K (u j : K) := by
+    rw [this]
+    exact P.zero_mem
+  have hcoef
+      : ∀ v : B, ∃ c : Fin d → B, (f : K) • D k K (v : K) = ∑ j, (c j : K) • D k K (u j : K) := by
     intro v
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun B).1 (hfN v)
     refine ⟨c, ?_⟩
     have := congrArg (KaehlerDifferential.map k k B K) hc
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.map_smul, KaehlerDifferential.map_D, Subalgebra.smul_def] at this
+      simp only [map_sum, LinearMap.map_smul, KaehlerDifferential.map_D, Subalgebra.smul_def]
+        at this
     exact this.symm
   let W : Submodule K Ω[K⁄k] := Submodule.span K (Set.range fun j => D k K (u j : K))
   have hB : ∀ v : B, D k K (v : K) ∈ W := by
@@ -130,16 +140,19 @@ theorem exists_local_dbasis (k K : Type) [Field k] [Field K] [Algebra k K] (B : 
   have hK : ∀ w : K, D k K w ∈ W := by
     intro w
     obtain ⟨x, y, hy, rfl⟩ := IsFractionRing.div_surjective (A := B) w
-    have hy0 : algebraMap B K y ≠ 0 :=
-      (map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hy)
-    have hx : D k K (algebraMap B K x) = (algebraMap B K x / algebraMap B K y) • D k K (algebraMap B K y)
-        + algebraMap B K y • D k K (algebraMap B K x / algebraMap B K y) := by
+    have hy0 : algebraMap B K y ≠ 0 := (map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hy)
+    have hx
+        : D k K (algebraMap B K x)
+          = (algebraMap B K x / algebraMap B K y) • D k K (algebraMap B K y)
+            + algebraMap B K y • D k K (algebraMap B K x / algebraMap B K y) := by
       conv_lhs => rw [show algebraMap B K x = algebraMap B K x / algebraMap B K y * algebraMap B K y by
         rw [div_mul_cancel₀ _ hy0]]
       rw [Derivation.leibniz, add_comm]
     have h2 : algebraMap B K y • D k K (algebraMap B K x / algebraMap B K y) ∈ W := by
-      have e : algebraMap B K y • D k K (algebraMap B K x / algebraMap B K y) =
-          D k K (algebraMap B K x) - (algebraMap B K x / algebraMap B K y) • D k K (algebraMap B K y) := by
+      have e
+          : algebraMap B K y • D k K (algebraMap B K x / algebraMap B K y)
+            = D k K (algebraMap B K x)
+              - (algebraMap B K x / algebraMap B K y) • D k K (algebraMap B K y) := by
         rw [hx]; abel
       rw [e]
       exact sub_mem (hB x) (Submodule.smul_mem _ _ (hB y))
@@ -148,7 +161,8 @@ theorem exists_local_dbasis (k K : Type) [Field k] [Field K] [Algebra k K] (B : 
   have htop : ⊤ ≤ W := by
     rw [← KaehlerDifferential.span_range_derivation k K]
     exact Submodule.span_le.2 (Set.range_subset_iff.2 hK)
-  let b := basisOfTopLeSpanOfCardEqFinrank (fun j => D k K (u j : K)) htop (by rw [Fintype.card_fin, hd])
+  let b :=
+    basisOfTopLeSpanOfCardEqFinrank (fun j => D k K (u j : K)) htop (by rw [Fintype.card_fin, hd])
   have hb : ∀ j, b j = D k K (u j : K) := fun j => by
     simp only [b, coe_basisOfTopLeSpanOfCardEqFinrank]
   refine ⟨f, u, b, hfP, hb, fun v j => ?_⟩

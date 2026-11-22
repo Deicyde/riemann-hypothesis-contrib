@@ -13,24 +13,39 @@ open Formalism.IndefR.DatumF MeasureTheory GlobalTheory.FinWeil
 
 namespace GlobalTheory.FinLatF
 
-theorem latRepF_cont : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E),
-    B.IsGood σ → ∀ (nS nT : ℕ) (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E),
-      IsHermND σ JS → IsHermND σ JT → ∀ ξ₀ : E, ξ₀ ≠ 0 → σ ξ₀ = -ξ₀ →
-      ∀ (hc : GlobalTheory.FinLatF.HeisClosedF σ JS JT ξ₀ B.ψ) (Λ : Submodule (𝓞 E) (Matrix (Fin nT) (Fin nS) E)) (w : 𝓞 E)
-        (lam : ℕ →* ℂ) (Om : GAF σ JS × GAF σ JT →* Module.End ℂ (GlobalTheory.WeilPartsF.thetaSubF σ JS JT ξ₀ B.ψ)),
-        GlobalTheory.FinLatF.IsLatRepF σ JS JT ξ₀ B.ψ hc Λ w lam Om →
-        ∀ f (w : WOF F E nS nT), Continuous fun p : GAF σ JS × GAF σ JT => (Om p f : WOF F E nS nT → ℂ) w := by
+theorem latRepF_cont
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E),
+      B.IsGood σ
+        → ∀ (nS nT : ℕ) (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E),
+          IsHermND σ JS → IsHermND σ JT
+            → ∀ ξ₀ : E,
+              ξ₀ ≠ 0 → σ ξ₀ = -ξ₀
+                → ∀ (hc : GlobalTheory.FinLatF.HeisClosedF σ JS JT ξ₀ B.ψ)
+                    (Λ : Submodule (𝓞 E) (Matrix (Fin nT) (Fin nS) E)) (w : 𝓞 E) (lam : ℕ →* ℂ)
+                    (Om : GAF σ JS × GAF σ JT
+                      →* Module.End ℂ (GlobalTheory.WeilPartsF.thetaSubF σ JS JT ξ₀ B.ψ)),
+                  GlobalTheory.FinLatF.IsLatRepF σ JS JT ξ₀ B.ψ hc Λ w lam Om
+                    → ∀ f (w : WOF F E nS nT),
+                      Continuous fun p : GAF σ JS × GAF σ JT => (Om p f : WOF F E nS nT → ℂ) w := by
   intro F E _ _ _ _ _ σ B hB nS nT JS JT hS hT ξ₀ _ hξ hc Λ w lam Om h f u
   have hσ : ∀ x, σ (σ x) = x := fun x => GlobalTheory.AdelicU.cm_conj_conj hB.cm x
   have H := isHeis_opFF hσ hS hT hξ hc h.hw
-  have hfix : ∀ p : GAF σ JS × GAF σ JT, (∀ a ∈ latF F E nS nT Λ, rhoFF σ JS JT p a ∈ latF F E nS nT Λ) →
-      ∀ e, Fixes (opFF hc w) (latF F E nS nT Λ) e → Om p e = e := by
+  have hfix
+      : ∀ p : GAF σ JS × GAF σ JT,
+        (∀ a ∈ latF F E nS nT Λ, rhoFF σ JS JT p a ∈ latF F E nS nT Λ)
+          → ∀ e, Fixes (opFF hc w) (latF F E nS nT Λ) e → Om p e = e := by
     intro p hp e he
     rw [h.vac p e he]
-    exact GlobalTheory.FinWeilO.normOp_of_le H lam (h.sd' p) (by rintro _ ⟨a, ha, rfl⟩; exact hp a ha) he
-  have hev : ∀ f : GlobalTheory.WeilPartsF.thetaSubF σ JS JT ξ₀ B.ψ, ∀ᶠ p in 𝓝 (1 : GAF σ JS × GAF σ JT), Om p f = f := by
+    exact GlobalTheory.FinWeilO.normOp_of_le H lam (h.sd' p)
+      (by rintro _ ⟨a, ha, rfl⟩; exact hp a ha) he
+  have hev
+      : ∀ f : GlobalTheory.WeilPartsF.thetaSubF σ JS JT ξ₀ B.ψ,
+        ∀ᶠ p in 𝓝 (1 : GAF σ JS × GAF σ JT), Om p f = f := by
     intro f
-    have hf : f ∈ Submodule.span ℂ {m | ∃ x e, Fixes (opFF hc w) (latF F E nS nT Λ) e ∧ m = opFF hc w x e} := by
+    have hf
+        : f ∈ Submodule.span ℂ
+          {m | ∃ x e, Fixes (opFF hc w) (latF F E nS nT Λ) e ∧ m = opFF hc w x e} := by
       rw [h.span]; trivial
     induction hf using Submodule.span_induction with
     | mem _ hm =>
@@ -43,8 +58,10 @@ theorem latRepF_cont : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
       have e4 := H.comp x (N • l) e
       rw [he _ (nsmul_mem hl N), e2, one_smul] at e4
       rw [h.op, hfix p hp e he, hl', ← e4]
-    | zero => exact Filter.Eventually.of_forall fun p => map_zero _
-    | add u v _ _ hu hv => filter_upwards [hu, hv] with p h3 h4 using by rw [map_add (f := _), h3, h4]
+    | zero =>
+      exact Filter.Eventually.of_forall fun p => map_zero _
+    | add u v _ _ hu hv =>
+      filter_upwards [hu, hv] with p h3 h4 using by rw [map_add (f := _), h3, h4]
     | smul c u _ hu => filter_upwards [hu] with p h3 using by rw [map_smul, h3]
   haveI : IsTopologicalGroup (GAF σ JS) := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.topGroupHA _ _
   haveI : IsTopologicalGroup (GAF σ JT) := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.topGroupHA _ _

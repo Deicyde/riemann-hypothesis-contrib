@@ -12,17 +12,17 @@ open scoped TensorProduct
 namespace GlobalTheory
 
 theorem finite_retractions_of_adjoin_finset_integral
-    (D T E : Type) [CommRing D] [IsDomain D] [CommRing T] [IsDomain T] [Algebra D T]
-    [CommRing E] [Algebra D E] [Algebra.IsIntegral D E] (ι : T →ₐ[D] E) (F : Finset E)
-    (hF : Algebra.adjoin D (Set.range ι ∪ (F : Set E)) = ⊤) :
-    {χ : E →ₐ[D] T | χ.comp ι = AlgHom.id D T}.Finite := by
+    (D T E : Type) [CommRing D] [IsDomain D] [CommRing T] [IsDomain T] [Algebra D T] [CommRing E]
+    [Algebra D E] [Algebra.IsIntegral D E]
+    (ι : T →ₐ[D] E) (F : Finset E) (hF : Algebra.adjoin D (Set.range ι ∪ (F : Set E)) = ⊤)
+    : {χ : E →ₐ[D] T | χ.comp ι = AlgHom.id D T}.Finite := by
   classical
   choose p hpm hp0 using fun x : E => (Algebra.IsIntegral.isIntegral (R := D) x)
   have hfin : (Set.pi Set.univ fun f : F =>
       ((((p f.1).map (algebraMap D T)).roots.toFinset : Finset T) : Set T)).Finite :=
     Set.Finite.pi (fun f => Finset.finite_toSet _)
-  refine Set.Finite.of_finite_image (f := fun χ : E →ₐ[D] T => fun f : F => χ f.1)
-    (hfin.subset ?_) ?_
+  refine
+    Set.Finite.of_finite_image (f := fun χ : E →ₐ[D] T => fun f : F => χ f.1) (hfin.subset ?_) ?_
   · rintro _ ⟨χ, _, rfl⟩
     refine Set.mem_univ_pi.2 fun f => ?_
     simp only [Finset.mem_coe, Multiset.mem_toFinset]
@@ -38,11 +38,11 @@ theorem finite_retractions_of_adjoin_finset_integral
       rw [e₁, e₂]
     · exact congrFun he ⟨x, hx⟩
 
-theorem finite_retractions_of_adjoin_finset_integral' :
-    ∀ (D T E : Type) [CommRing D] [IsDomain D] [CommRing T] [IsDomain T] [Algebra D T]
-      [CommRing E] [Algebra D E] [Algebra.IsIntegral D E] (ι : T →ₐ[D] E) (F : Finset E),
-      Algebra.adjoin D (Set.range ι ∪ (F : Set E)) = ⊤ →
-        {χ : E →ₐ[D] T | χ.comp ι = AlgHom.id D T}.Finite :=
-  fun D T E _ _ _ _ _ _ _ _ ι F hF => finite_retractions_of_adjoin_finset_integral D T E ι F hF
+theorem finite_retractions_of_adjoin_finset_integral'
+    : ∀ (D T E : Type) [CommRing D] [IsDomain D] [CommRing T] [IsDomain T] [Algebra D T]
+        [CommRing E] [Algebra D E] [Algebra.IsIntegral D E] (ι : T →ₐ[D] E) (F : Finset E),
+      Algebra.adjoin D (Set.range ι ∪ (F : Set E)) = ⊤
+        → {χ : E →ₐ[D] T | χ.comp ι = AlgHom.id D T}.Finite := fun D T E _ _ _ _ _ _ _ _ ι F hF =>
+  finite_retractions_of_adjoin_finset_integral D T E ι F hF
 
 end GlobalTheory

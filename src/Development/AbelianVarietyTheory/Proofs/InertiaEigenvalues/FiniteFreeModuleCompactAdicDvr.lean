@@ -10,17 +10,18 @@ open IsLocalRing
 
 theorem finite_free_compact_adic_dvr
     {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
-    [IsTopologicalRing O] [CompactSpace O] (hadic : IsAdic (IsLocalRing.maximalIdeal O))
+    [IsTopologicalRing O] [CompactSpace O]
+    (hadic : IsAdic (IsLocalRing.maximalIdeal O))
     {M : Type} [AddCommGroup M] [Module O M] [TopologicalSpace M] [IsTopologicalAddGroup M]
     [ContinuousSMul O M] [T2Space M] [Module.Free O M] [Module.Finite O M]
-    (ϖ : O) (hϖ : Irreducible ϖ) :
-    CompactSpace M ∧ IsOpen (LinearMap.range (LinearMap.lsmul O M ϖ) : Set M) ∧
-      Topology.IsClosedEmbedding (fun m : M => ϖ • m) := by
+    (ϖ : O) (hϖ : Irreducible ϖ)
+    : CompactSpace M ∧ IsOpen (LinearMap.range (LinearMap.lsmul O M ϖ) : Set M)
+      ∧ Topology.IsClosedEmbedding (fun m : M => ϖ • m) := by
   classical
   let b := Module.Free.chooseBasis O M
   have hΦ : Continuous (b.equivFun.symm : (Module.Free.ChooseBasisIndex O M → O) → M) := by
-    have : (b.equivFun.symm : (Module.Free.ChooseBasisIndex O M → O) → M) =
-        fun v => ∑ i, v i • b i := by
+    have : (b.equivFun.symm : (Module.Free.ChooseBasisIndex O M → O) → M)
+        = fun v => ∑ i, v i • b i := by
       funext v; simp
     rw [this]
     exact continuous_finsetSum _ fun i _ => (continuous_apply i).smul continuous_const
@@ -40,9 +41,8 @@ theorem finite_free_compact_adic_dvr
     have hS : IsOpen S := isOpen_iInter_of_finite fun i => hm.preimage (continuous_apply i)
     have heq : (LinearMap.range (LinearMap.lsmul O M ϖ) : Set M) = H '' S := by
       ext m
-      simp only [SetLike.mem_coe, LinearMap.mem_range, LinearMap.lsmul_apply, S,
-        Set.mem_image, Set.mem_iInter, Set.mem_preimage, hϖ.maximalIdeal_eq,
-        Ideal.mem_span_singleton', hH]
+      simp only [SetLike.mem_coe, LinearMap.mem_range, LinearMap.lsmul_apply, S, Set.mem_image,
+        Set.mem_iInter, Set.mem_preimage, hϖ.maximalIdeal_eq, Ideal.mem_span_singleton', hH]
       constructor
       · rintro ⟨x, rfl⟩
         refine ⟨b.equivFun (ϖ • x), fun i => ⟨b.equivFun x i, ?_⟩, by simp⟩

@@ -10,21 +10,26 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.NadelVanish
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 set_option autoImplicit false
 
 namespace GlobalTheory.Discrepancy
 
-theorem DivOver.isAt_lift : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [IsIntegral X] [IsIntegral Y]
-    (p : X ⟶ Sp k) (s : Y ⟶ X) [IsDominant s], Function.Bijective (functionFieldMap s) →
-    IsProper s → ∀ (E' : DivOver (s ≫ p)) (E : DivOver p), DivOver.Over s E' E →
-    ∀ z : X, E.IsAt z → ∃ w : Y, s w = z ∧ E'.IsAt w := by
+theorem DivOver.isAt_lift
+    : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) [IsIntegral X] [IsIntegral Y] (p : X ⟶ Sp k)
+        (s : Y ⟶ X) [IsDominant s],
+      Function.Bijective (functionFieldMap s) → IsProper s
+        → ∀ (E' : DivOver (s ≫ p)) (E : DivOver p),
+          DivOver.Over s E' E → ∀ z : X, E.IsAt z → ∃ w : Y, s w = z ∧ E'.IsAt w := by
   intro k _ X Y _ _ p s _ hbij hprop E' E hOver z hz
-  obtain ⟨w, hw, hwt⟩ := GlobalTheory.T.divisor_center_proper_lift k X Y p s hbij hprop E' E hOver z
-    (hz.through specializes_rfl)
+  obtain ⟨w, hw, hwt⟩ :=
+    GlobalTheory.T.divisor_center_proper_lift k X Y p s hbij hprop E' E hOver z
+      (hz.through specializes_rfl)
   subst hw
   refine ⟨w, rfl, fun f => ⟨fun hf => ?_, hwt f⟩⟩
   obtain ⟨g, rfl⟩ := hbij.2 f

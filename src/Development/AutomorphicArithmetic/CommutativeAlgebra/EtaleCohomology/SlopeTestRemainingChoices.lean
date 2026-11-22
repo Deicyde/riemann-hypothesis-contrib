@@ -18,7 +18,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistUni
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace UpperTheory.Et
 
@@ -57,15 +58,23 @@ end Site
 section Rep
 variable {R : Type} [CommRing R]
 
-def Rep {I : Cx R} {U : Scheme.{0}} {n : ℤ} (z : Sec (I.X n) U) (c : CohomologyClass ((chains R).obj (sch.obj U)) I n) : Prop :=
-  ∃ α : Cocycle ((chains R).obj (sch.obj U)) I n, CohomologyClass.mk α = c ∧ ev α.1 0 n (by simp) U (𝟙 U) = z
+def Rep
+    {I : Cx R} {U : Scheme.{0}} {n : ℤ}
+    (z : Sec (I.X n) U) (c : CohomologyClass ((chains R).obj (sch.obj U)) I n)
+    : Prop :=
+  ∃ α : Cocycle ((chains R).obj (sch.obj U)) I n,
+    CohomologyClass.mk α = c ∧ ev α.1 0 n (by simp) U (𝟙 U) = z
 
 variable {S Y : Scheme.{0}} (p' : Y ⟶ S)
 
 end Rep
 
 section Classes
-variable (q : ℕ) {S Y : Scheme.{0}} (p' : Y ⟶ S) {ι : Type} [Fintype ι] {e : ι → ℤ} {j : ℤ} (w : ∀ b, Ht q (sch.obj Y) (e b) j)
+variable
+  (q : ℕ)
+  {S Y : Scheme.{0}} (p' : Y ⟶ S)
+  {ι : Type} [Fintype ι]
+  {e : ι → ℤ} {j : ℤ} (w : ∀ b, Ht q (sch.obj Y) (e b) j)
 
 end Classes
 

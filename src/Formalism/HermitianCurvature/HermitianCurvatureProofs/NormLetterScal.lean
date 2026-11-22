@@ -10,17 +10,22 @@ namespace Formalism.FourierDecayAlt.P.StandardPairingDecay
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Matrix
+open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt.B Matrix
 open scoped ComplexConjugate
 
 theorem norm_letter_scal (σ : ℂ) (b : Bool) : ‖(if b then σ else conj σ)‖ = ‖σ‖ := by
   cases b <;> simp
 
-theorem uInv_ccle {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (A : ℝ) (m : ℕ) (σ : ℂ)
-    (hσ : ‖σ‖ ≤ 2) :
-    ∀ (w : List C.Letter) (x : Wd.Ix (Fin w.length) → B.Mat k r → E) (c : ℝ), (∀ e, B.CCle A m (x e) c) →
-      ∀ e, B.CCle A m (KB.uInv σ w x e) (3 ^ w.length * c) ∧
-        B.CCle A m (fun g => KB.uInv σ w x e g - x e g) (3 ^ w.length * ‖σ‖ * c) := by
+theorem uInv_ccle
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (A : ℝ) (m : ℕ)
+    (σ : ℂ) (hσ : ‖σ‖ ≤ 2)
+    : ∀ (w : List C.Letter) (x : Wd.Ix (Fin w.length) → B.Mat k r → E) (c : ℝ),
+      (∀ e, B.CCle A m (x e) c)
+        → ∀ e,
+          B.CCle A m (KB.uInv σ w x e) (3 ^ w.length * c)
+            ∧ B.CCle A m (fun g => KB.uInv σ w x e g - x e g) (3 ^ w.length * ‖σ‖ * c) := by
   intro w
   induction w with
   | nil =>
@@ -43,8 +48,7 @@ theorem uInv_ccle {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ
     simp only [KB.uInv]
     by_cases he : e 0 = 0
     · rw [ite_eq_left he]
-      have hxe : x e = x (Fin.cons (0 : Fin 2) (fun a => e a.succ)) := by
-        conv_lhs => rw [hce, he]
+      have hxe : x e = x (Fin.cons (0 : Fin 2) (fun a => e a.succ)) := by conv_lhs => rw [hce, he]
       refine ⟨JCx2.pd_ccle_mono_c ih0.1 (by rw [hp]; nlinarith), ?_⟩
       rw [hxe]
       exact JCx2.pd_ccle_mono_c ih0.2 (by rw [hp]; nlinarith [mul_nonneg h3 hσ0])
@@ -53,27 +57,44 @@ theorem uInv_ccle {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ
         rcases Fin.exists_fin_two.1 ⟨e 0, rfl⟩ with h | h
         · exact absurd h he
         · exact h
-      have hxe : x e = x (Fin.cons (1 : Fin 2) (fun a => e a.succ)) := by
-        conv_lhs => rw [hce, he1]
+      have hxe : x e = x (Fin.cons (1 : Fin 2) (fun a => e a.succ)) := by conv_lhs => rw [hce, he1]
       refine ⟨?_, ?_⟩
-      · have := BetaSesquilinearity.CCle_add ih1.1 (BetaSesquilinearity.CCle_smul (if l.1 then σ else conj σ) ih0.1)
+      · have :=
+          BetaSesquilinearity.CCle_add ih1.1
+            (BetaSesquilinearity.CCle_smul (if l.1 then σ else conj σ) ih0.1)
         rw [hs] at this
-        exact JCx2.pd_ccle_mono_c (show B.CCle A m ((KB.uInv σ w (fun e' => x (Fin.cons (1 : Fin 2) e')) (fun a => e a.succ)) +
-          (if l.1 then σ else conj σ) • KB.uInv σ w (fun e' => x (Fin.cons (0 : Fin 2) e')) (fun a => e a.succ)) _ from this)
+        exact JCx2.pd_ccle_mono_c
+          (show B.CCle A m
+              ((KB.uInv σ w (fun e' => x (Fin.cons (1 : Fin 2) e')) (fun a => e a.succ))
+                + (if l.1 then σ else conj σ)
+                  • KB.uInv σ w (fun e' => x (Fin.cons (0 : Fin 2) e')) (fun a => e a.succ))
+              _ from
+            this)
           (by rw [hp]; nlinarith [mul_nonneg h3 hc])
-      · have := BetaSesquilinearity.CCle_add ih1.2 (BetaSesquilinearity.CCle_smul (if l.1 then σ else conj σ) ih0.1)
+      · have :=
+          BetaSesquilinearity.CCle_add ih1.2
+            (BetaSesquilinearity.CCle_smul (if l.1 then σ else conj σ) ih0.1)
         rw [hs] at this
         rw [hxe]
-        have hf : (fun g => (KB.uInv σ w (fun e' => x (Fin.cons (1 : Fin 2) e')) (fun a => e a.succ) +
-            (if l.1 then σ else conj σ) • KB.uInv σ w (fun e' => x (Fin.cons (0 : Fin 2) e')) (fun a => e a.succ)) g -
-            x (Fin.cons (1 : Fin 2) (fun a => e a.succ)) g) =
-            fun g => (KB.uInv σ w (fun e' => x (Fin.cons (1 : Fin 2) e')) (fun a => e a.succ) g -
-              x (Fin.cons (1 : Fin 2) (fun a => e a.succ)) g) +
-              (if l.1 then σ else conj σ) • KB.uInv σ w (fun e' => x (Fin.cons (0 : Fin 2) e')) (fun a => e a.succ) g := by
+        have hf
+            : (fun g =>
+                (KB.uInv σ w (fun e' => x (Fin.cons (1 : Fin 2) e')) (fun a => e a.succ)
+                      + (if l.1 then σ else conj σ)
+                        • KB.uInv σ w (fun e' => x (Fin.cons (0 : Fin 2) e')) (fun a => e a.succ))
+                    g
+                  - x (Fin.cons (1 : Fin 2) (fun a => e a.succ)) g)
+              = fun g =>
+                (KB.uInv σ w (fun e' => x (Fin.cons (1 : Fin 2) e')) (fun a => e a.succ) g
+                    - x (Fin.cons (1 : Fin 2) (fun a => e a.succ)) g)
+                  + (if l.1 then σ else conj σ) • KB.uInv σ w
+                    (fun e' => x (Fin.cons (0 : Fin 2) e'))
+                    (fun a => e a.succ)
+                    g := by
           funext g
           simp only [Pi.add_apply, Pi.smul_apply]
           abel
         rw [hf]
-        exact JCx2.pd_ccle_mono_c this (by rw [hp]; nlinarith [mul_nonneg h3 hc, mul_nonneg (mul_nonneg h3 hσ0) hc])
+        exact JCx2.pd_ccle_mono_c this
+          (by rw [hp]; nlinarith [mul_nonneg h3 hc, mul_nonneg (mul_nonneg h3 hσ0) hc])
 
 end Formalism.FourierDecayAlt.P.StandardPairingDecay

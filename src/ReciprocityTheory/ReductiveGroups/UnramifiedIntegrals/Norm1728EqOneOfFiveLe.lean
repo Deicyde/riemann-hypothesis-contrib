@@ -14,8 +14,10 @@ open Formalism.L2.Th1.CM Formalism.L2.Th1.F
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem valDiv2_even_of_pows {l t : ℝ} (hl : 1 < l) {a b : ℤ} {n : ℕ} (hn : ¬ 2 ∣ n)
-    (h4 : t ^ 4 = l ^ b) (h1 : t ^ (2 * n) * l ^ a = 1) : ∃ m : ℤ, b = 2 * m := by
+theorem valDiv2_even_of_pows
+    {l t : ℝ} (hl : 1 < l)
+    {a b : ℤ} {n : ℕ} (hn : ¬ 2 ∣ n) (h4 : t ^ 4 = l ^ b) (h1 : t ^ (2 * n) * l ^ a = 1)
+    : ∃ m : ℤ, b = 2 * m := by
   have hl0 : l ≠ 0 := by positivity
   have e1 : l ^ (b * n + 2 * a) = 1 := by
     rw [zpow_add₀ hl0, zpow_mul, ← h4, zpow_natCast, mul_comm 2 a, zpow_mul]
@@ -46,10 +48,15 @@ theorem valDiv2_norm_27 (l : ℕ) [Fact l.Prime] (h5 : 5 ≤ l) : ‖(27 : ℂ_[
     omega
   simpa using red_norm_natCast l h
 
-theorem valDiv2 (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3) (hCM : HasCMBy d L) (l : ℕ)
-    [Fact l.Prime] (h5 : 5 ≤ l) (hld : ¬ l ∣ d) (ι : ℂ ≃+* ℂ_[l]) (hJ : ι (jInv L) ∈ MaximalUnramifiedExtension l)
-    (hJ1 : ‖ι (jInv L)‖ ≤ 1) (h0 : ι (jInv L) ≠ 1728) :
-    ∃ m : ℤ, ‖ι (jInv L) - 1728‖ = (l : ℝ) ^ (2 * m) := by
+theorem valDiv2
+    (d : ℕ)
+    (L : PeriodPair)
+    (hsq : Squarefree d) (hd4 : d % 4 = 3) (hCM : HasCMBy d L)
+    (l : ℕ) [Fact l.Prime]
+    (h5 : 5 ≤ l) (hld : ¬ l ∣ d)
+    (ι : ℂ ≃+* ℂ_[l]) (hJ : ι (jInv L) ∈ MaximalUnramifiedExtension l) (hJ1 : ‖ι (jInv L)‖ ≤ 1)
+    (h0 : ι (jInv L) ≠ 1728)
+    : ∃ m : ℤ, ‖ι (jInv L) - 1728‖ = (l : ℝ) ^ (2 * m) := by
   have hl : l.Prime := Fact.out
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hl.one_lt
   have n1728 := norm_1728_eq_one_of_five_le l h5
@@ -84,10 +91,8 @@ theorem valDiv2 (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3
   have h3 : L.g₃ ≠ 0 := fun h => hj1 ((jInv_eq_iff L).2 h)
   obtain ⟨L0, hCM0, -, hg2, hg3⟩ := exists_cm_lattice_equal_invariants d L hCM h2 h3
   obtain ⟨c, hc⟩ : ∃ c : ℂ_[l], c = 27 * J / (J - 1728) := ⟨_, rfl⟩
-  have ig2 : ι L0.g₂ = c := by
-    rw [hg2, hc, hJdef, map_div₀, map_mul, map_sub, map_ofNat, map_ofNat]
-  have ig3 : ι L0.g₃ = c := by
-    rw [hg3, hc, hJdef, map_div₀, map_mul, map_sub, map_ofNat, map_ofNat]
+  have ig2 : ι L0.g₂ = c := by rw [hg2, hc, hJdef, map_div₀, map_mul, map_sub, map_ofNat, map_ofNat]
+  have ig3 : ι L0.g₃ = c := by rw [hg3, hc, hJdef, map_div₀, map_mul, map_sub, map_ofNat, map_ofNat]
   have mc : c ∈ MaximalUnramifiedExtension l := by
     rw [hc]
     exact div_mem (mul_mem m27 hJ) hwK
@@ -105,8 +110,8 @@ theorem valDiv2 (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3
     rw [iD, norm_mul, norm_pow, nc, norm_div, norm_mul, n27, n1728, ← hx]
     ring
   have hD0 : ι (L0.g₂ ^ 3 - 27 * L0.g₃ ^ 2) ≠ 0 := norm_ne_zero_iff.1 (by rw [nD]; positivity)
-  obtain ⟨μ, hμ'⟩ := IsAlgClosed.exists_pow_nat_eq (ι (L0.g₂ ^ 3 - 27 * L0.g₃ ^ 2))⁻¹
-    (n := 12) (by norm_num)
+  obtain ⟨μ, hμ'⟩ :=
+    IsAlgClosed.exists_pow_nat_eq (ι (L0.g₂ ^ 3 - 27 * L0.g₃ ^ 2))⁻¹ (n := 12) (by norm_num)
   have hμ : μ ^ 12 * ι (L0.g₂ ^ 3 - 27 * L0.g₃ ^ 2) = 1 := by
     rw [hμ']
     exact inv_mul_cancel₀ hD0
@@ -136,9 +141,11 @@ theorem valDiv2 (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3
     exact pow_lt_one₀ ht0 ht1 (by norm_num)
   obtain ⟨N, T, hlN, h2N, h2T, hT, hk⟩ := kerProd d L0 hsq hd4 hCM0 l hl h5 hld 2 (Or.inl rfl)
   have hP : ι (∏ z ∈ T, L0.weierstrassP z) ∈ MaximalUnramifiedExtension l := by
-    have := hk ((MaximalUnramifiedExtension l).comap (ι : ℂ →+* ℂ_[l])) (by rw [Subfield.mem_comap]; simpa [ig2] using mc)
-      (by rw [Subfield.mem_comap]; simpa [ig3] using mc)
-      (by rw [Subfield.mem_comap]; exact omega_mem_kur d hsq hd4 l hld ι)
+    have :=
+      hk ((MaximalUnramifiedExtension l).comap (ι : ℂ →+* ℂ_[l]))
+        (by rw [Subfield.mem_comap]; simpa [ig2] using mc)
+        (by rw [Subfield.mem_comap]; simpa [ig3] using mc)
+        (by rw [Subfield.mem_comap]; exact omega_mem_kur d hsq hd4 l hld ι)
     rw [Subfield.mem_comap] at this
     exact this
   have hU := unit_prod L0 l ι h5 μ hμ n4.le n6lt.le 2 N (Or.inr ⟨rfl, n6lt⟩) hlN h2N T hT

@@ -90,10 +90,15 @@ namespace PositivityTheory.SiegelWeilCoefficients
 open PositivityTheory.Rg.Sw.Glob PositivityTheory.PfSWUS
 
 theorem coefND : CoefND :=
-  GlobalTheory.T.nondegenerate_of_whittaker GlobalTheory.T.unfolding_holds (GlobalTheory.T.theta_coefficient_of_convergence wtc)
-    (GlobalTheory.T.whittaker_nondegenerate_of_iwasawa (GlobalTheory.T.whittaker_maximal_compact_general whitGenLt (GlobalTheory.T.dictionary_maximal_compact_parts GlobalTheory.T.fock_splitting_maximal_compact GlobalTheory.T.whittaker_additivity
-      (PositivityTheory.PfSWUS.HandIAdd.ifrBAdd_of_weilThetaConvergence wtc) PositivityTheory.PfSWUS.SwMatch.matchMono)
-      GlobalTheory.T.anisotropy_of_range))
+  GlobalTheory.T.nondegenerate_of_whittaker GlobalTheory.T.unfolding_holds
+    (GlobalTheory.T.theta_coefficient_of_convergence wtc)
+    (GlobalTheory.T.whittaker_nondegenerate_of_iwasawa
+      (GlobalTheory.T.whittaker_maximal_compact_general whitGenLt
+        (GlobalTheory.T.dictionary_maximal_compact_parts
+          GlobalTheory.T.fock_splitting_maximal_compact GlobalTheory.T.whittaker_additivity
+          (PositivityTheory.PfSWUS.HandIAdd.ifrBAdd_of_weilThetaConvergence wtc)
+          PositivityTheory.PfSWUS.SwMatch.matchMono)
+        GlobalTheory.T.anisotropy_of_range))
 
 theorem lit : GlobalTheory.Published.SiegelWeilUnitarySchrodingerLit := by
   intro D n V a1 a2 a3 ψ hψ χ hχ hη θ hθ μ 𝓕 hμ ω hω H hH l hl s hs ν hν Φ hΦ g

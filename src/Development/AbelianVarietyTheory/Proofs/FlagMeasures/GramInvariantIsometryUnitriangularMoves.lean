@@ -18,7 +18,10 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianLatt
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData
+  Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
 open scoped Pointwise ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -26,23 +29,30 @@ noncomputable section
 
 namespace GlobalTheory.HL
 
-theorem leadMinor_triMul {E : Type} [Field E] {m : ℕ} (A B Z : Matrix (Fin m) (Fin m) E)
-    (hA : ∀ i j, i < j → A i j = 0) (hA1 : ∀ i, A i i = 1)
-    (hB : ∀ i j, j < i → B i j = 0) (hB1 : ∀ i, B i i = 1) (l : ℕ) :
-    leadMinorE (A * Z * B) l = leadMinorE Z l := by
+theorem leadMinor_triMul
+    {E : Type} [Field E]
+    {m : ℕ} (A B Z : Matrix (Fin m) (Fin m) E) (hA : ∀ i j, i < j → A i j = 0)
+    (hA1 : ∀ i, A i i = 1) (hB : ∀ i j, j < i → B i j = 0) (hB1 : ∀ i, B i i = 1)
+    (l : ℕ)
+    : leadMinorE (A * Z * B) l = leadMinorE Z l := by
   unfold leadMinorE
   by_cases hl : l ≤ m
   · rw [dite_eq_left hl, dite_eq_left hl]
-    have red : ∀ g : Fin m → E, (∀ i : Fin m, l ≤ (i : ℕ) → g i = 0) →
-        ∑ i, g i = ∑ i : Fin l, g (Fin.castLE hl i) := by
+    have red
+        : ∀ g : Fin m → E,
+          (∀ i : Fin m, l ≤ (i : ℕ) → g i = 0) → ∑ i, g i = ∑ i : Fin l, g (Fin.castLE hl i) := by
       intro g hg
       refine (Finset.sum_of_injOn (Fin.castLE hl) (Fin.castLE_injective hl).injOn
-        (fun _ _ => Finset.mem_coe.2 (Finset.mem_univ _)) (fun i _ hi => hg i ?_) (fun _ _ => rfl)).symm
+        (fun _ _ => Finset.mem_coe.2 (Finset.mem_univ _))
+        (fun i _ hi => hg i ?_)
+        (fun _ _ => rfl)).symm
       by_contra h
       exact hi ⟨⟨i, by omega⟩, Finset.mem_coe.2 (Finset.mem_univ _), rfl⟩
-    have key : (A * Z * B).submatrix (Fin.castLE hl) (Fin.castLE hl) =
-        A.submatrix (Fin.castLE hl) (Fin.castLE hl) * Z.submatrix (Fin.castLE hl) (Fin.castLE hl) *
-          B.submatrix (Fin.castLE hl) (Fin.castLE hl) := by
+    have key
+        : (A * Z * B).submatrix (Fin.castLE hl) (Fin.castLE hl)
+          = A.submatrix (Fin.castLE hl) (Fin.castLE hl)
+            * Z.submatrix (Fin.castLE hl) (Fin.castLE hl)
+            * B.submatrix (Fin.castLE hl) (Fin.castLE hl) := by
       ext a b
       simp only [Matrix.submatrix_apply, Matrix.mul_apply]
       rw [red]
@@ -69,24 +79,30 @@ theorem leadMinor_triMul {E : Type} [Field E] {m : ℕ} (A B Z : Matrix (Fin m) 
 
 variable {D : D7}
 
-theorem zhat_movesTo {T T' : D.host.E} (F0 : LFlag (D.sp.Y 0) D.R.rS T) (F0' : LFlag (D.sp.Y 0) D.R.rS T')
-    (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T') (ρ : (VS D).V ≃ₗ[D.host.E] (VS D).V)
-    (U U' : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E) (h : MovesTo F0 F0' F F' ρ U U') :
-    Zhat F.fl F'.fl = U.conjTranspose * Zhat F0.fl F0'.fl * U' := by
+theorem zhat_movesTo
+    {T T' : D.host.E} (F0 : LFlag (D.sp.Y 0) D.R.rS T) (F0' : LFlag (D.sp.Y 0) D.R.rS T')
+    (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
+    (ρ : (VS D).V ≃ₗ[D.host.E] (VS D).V)
+    (U U' : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E) (h : MovesTo F0 F0' F F' ρ U U')
+    : Zhat F.fl F'.fl = U.conjTranspose * Zhat F0.fl F0'.fl * U' := by
   obtain ⟨hρ, -, -, hU, hU'⟩ := h
   have hρ' : ∀ x y, (VS D).hT (ρ x) (ρ y) = (VS D).hT x y := hρ
   refine Matrix.ext fun a b => ?_
-  have e1 : Zhat F.fl F'.fl a b = (VS D).hT (ρ (frame F a)) (ρ (frame F' b)) := by
-    rw [hρ']; rfl
+  have e1 : Zhat F.fl F'.fl a b = (VS D).hT (ρ (frame F a)) (ρ (frame F' b)) := by rw [hρ']; rfl
   rw [e1, hU a, hU' b]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Zhat, brS, Matrix.mul_apply, Matrix.conjTranspose_apply, map_sum, LinearMap.sum_apply,
-    map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
+    simp only [Zhat, brS, Matrix.mul_apply, Matrix.conjTranspose_apply, map_sum,
+      LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
   simp only [RingHom.id_apply, frame, Finset.mul_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun d _ => Finset.sum_congr rfl fun c _ => ?_
   ring
 
-theorem gval_movesTo : ∀ {D : D7} {T T' : D.host.E} (F0 : LFlag (D.sp.Y 0) D.R.rS T) (F0' : LFlag (D.sp.Y 0) D.R.rS T') (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T') (ρ : (VS D).V ≃ₗ[D.host.E] (VS D).V) (U U' : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E), MovesTo F0 F0' F F' ρ U U' → Gval F F' = Gval F0 F0' := by
+theorem gval_movesTo
+    : ∀ {D : D7} {T T' : D.host.E} (F0 : LFlag (D.sp.Y 0) D.R.rS T)
+        (F0' : LFlag (D.sp.Y 0) D.R.rS T') (F : LFlag (D.sp.Y 0) D.R.rS T)
+        (F' : LFlag (D.sp.Y 0) D.R.rS T') (ρ : (VS D).V ≃ₗ[D.host.E] (VS D).V)
+        (U U' : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E),
+      MovesTo F0 F0' F F' ρ U U' → Gval F F' = Gval F0 F0' := by
   intro D T T' F0 F0' F F' ρ U U' h
   have hZ := zhat_movesTo F0 F0' F F' ρ U U' h
   obtain ⟨-, hu, hu', -, -⟩ := h
@@ -94,8 +110,12 @@ theorem gval_movesTo : ∀ {D : D7} {T T' : D.host.E} (F0 : LFlag (D.sp.Y 0) D.R
     intro l
     show leadMinorE (Zhat F.fl F'.fl) l = leadMinorE (Zhat F0.fl F0'.fl) l
     rw [hZ]
-    refine leadMinor_triMul _ _ _ (fun i j hij => ?_) (fun i => ?_) (fun i j hij => (hu' i j).1 hij)
-      (fun i => (hu' i i).2 rfl) l
+    refine leadMinor_triMul _ _ _
+      (fun i j hij => ?_)
+      (fun i => ?_)
+      (fun i j hij => (hu' i j).1 hij)
+      (fun i => (hu' i i).2 rfl)
+      l
     · simp [Matrix.conjTranspose_apply, (hu j i).1 hij]
     · simp [Matrix.conjTranspose_apply, (hu i i).2 rfl]
   show Gflag F.fl F'.fl = Gflag F0.fl F0'.fl

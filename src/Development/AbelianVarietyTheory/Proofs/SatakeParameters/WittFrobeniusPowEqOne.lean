@@ -9,12 +9,14 @@ namespace GlobalTheory
 
 open WittVector
 
-theorem isPrecomplete_pi {R : Type*} [CommRing R] (I : Ideal R) [IsPrecomplete I R]
-    (ι : Type*) [Finite ι] : IsPrecomplete I (ι → R) := by
+theorem isPrecomplete_pi
+    {R : Type*} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (ι : Type*) [Finite ι]
+    : IsPrecomplete I (ι → R) := by
   classical
   cases nonempty_fintype ι
-  have coord : ∀ (J : Ideal R) (x : ι → R),
-      x ∈ (J • ⊤ : Submodule R (ι → R)) ↔ ∀ i, x i ∈ (J • ⊤ : Submodule R R) := by
+  have coord
+      : ∀ (J : Ideal R) (x : ι → R),
+        x ∈ (J • ⊤ : Submodule R (ι → R)) ↔ ∀ i, x i ∈ (J • ⊤ : Submodule R R) := by
     intro J x
     constructor
     · intro hx i
@@ -47,8 +49,9 @@ theorem isPrecomplete_pi {R : Type*} [CommRing R] (I : Ideal R) [IsPrecomplete I
 
 section
 
-variable {p : ℕ} [Fact p.Prime] {k k' : Type} [Field k] [CharP k p] [PerfectRing k p]
-  [Field k'] [CharP k' p] [PerfectRing k' p]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {k k' : Type} [Field k] [CharP k p] [PerfectRing k p] [Field k'] [CharP k' p] [PerfectRing k' p]
 
 end
 

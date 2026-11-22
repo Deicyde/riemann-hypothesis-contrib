@@ -9,9 +9,11 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem norm_finset_sum_lt_of_forall_lt {K : Type*} [NormedField K] [IsUltrametricDist K]
-    (s : Finset ℕ) (f : ℕ → K) {r : ℝ} (hr : 0 < r) (h : ∀ i ∈ s, ‖f i‖ < r) :
-    ‖∑ i ∈ s, f i‖ < r := by
+theorem norm_finset_sum_lt_of_forall_lt
+    {K : Type*} [NormedField K] [IsUltrametricDist K]
+    (s : Finset ℕ) (f : ℕ → K)
+    {r : ℝ} (hr : 0 < r) (h : ∀ i ∈ s, ‖f i‖ < r)
+    : ‖∑ i ∈ s, f i‖ < r := by
   first
   | exact @_root_.GlobalTheory.NormSumLt.main
   | exact _root_.GlobalTheory.NormSumLt.main
@@ -20,14 +22,16 @@ theorem norm_finset_sum_lt_of_forall_lt {K : Type*} [NormedField K] [IsUltrametr
   | (intros; apply @_root_.GlobalTheory.NormSumLt.main <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.NormSumLt.main ..)
 
-theorem norm_le_one_of_isIntegral_int {K : Type*} [NormedField K] [IsUltrametricDist K]
-    {z : K} (hz : IsIntegral ℤ z) : ‖z‖ ≤ 1 := by
+theorem norm_le_one_of_isIntegral_int
+    {K : Type*} [NormedField K] [IsUltrametricDist K] {z : K} (hz : IsIntegral ℤ z)
+    : ‖z‖ ≤ 1 := by
   obtain ⟨p, hm, hp⟩ := hz
   by_contra hlt
   push_neg at hlt
   set n := p.natDegree
   rw [Polynomial.eval₂_eq_sum_range, Finset.sum_range_succ, Polynomial.coeff_natDegree,
-    hm.leadingCoeff, map_one, one_mul] at hp
+      hm.leadingCoeff, map_one, one_mul]
+    at hp
   set S := ∑ i ∈ Finset.range n, (algebraMap ℤ K) (p.coeff i) * z ^ i
   have hS : ‖S‖ < ‖z‖ ^ n := by
     refine norm_finset_sum_lt_of_forall_lt _ _ (pow_pos (by linarith) n) ?_
@@ -35,37 +39,41 @@ theorem norm_le_one_of_isIntegral_int {K : Type*} [NormedField K] [IsUltrametric
     rw [norm_mul, norm_pow]
     have h1 : ‖(algebraMap ℤ K) (p.coeff i)‖ ≤ 1 := by
       rw [eq_intCast]; exact IsUltrametricDist.norm_intCast_le_one K _
-    calc ‖(algebraMap ℤ K) (p.coeff i)‖ * ‖z‖ ^ i ≤ 1 * ‖z‖ ^ i :=
-          mul_le_mul_of_nonneg_right h1 (pow_nonneg (norm_nonneg _) _)
+    calc
+      ‖(algebraMap ℤ K) (p.coeff i)‖ * ‖z‖ ^ i
+        ≤ 1 * ‖z‖ ^ i := mul_le_mul_of_nonneg_right h1 (pow_nonneg (norm_nonneg _) _)
       _ = ‖z‖ ^ i := one_mul _
       _ < ‖z‖ ^ n := pow_lt_pow_right₀ hlt (Finset.mem_range.mp hi)
   have h2 : z ^ n = -S := by linear_combination hp
   have h3 : ‖z‖ ^ n = ‖S‖ := by rw [← norm_pow, h2, norm_neg]
   linarith
 
-theorem exists_embedding_padicAlgCl_place (E : Type) [Field E] [NumberField E] (l : ℕ)
-    [Fact l.Prime] : ∃ (τ : E →+* PadicAlgCl l) (w : HeightOneSpectrum (𝓞 E)),
-      ∀ x : 𝓞 E, ‖τ (x : E)‖ < 1 ↔ x ∈ w.asIdeal := by
+theorem exists_embedding_padicAlgCl_place
+    (E : Type) [Field E] [NumberField E] (l : ℕ) [Fact l.Prime]
+    : ∃ (τ : E →+* PadicAlgCl l) (w : HeightOneSpectrum (𝓞 E)), ∀ x : 𝓞 E,
+      ‖τ (x : E)‖ < 1 ↔ x ∈ w.asIdeal := by
   let τ : E →+* PadicAlgCl l := (IsAlgClosed.lift : E →ₐ[ℚ] PadicAlgCl l).toRingHom
   have hle : ∀ x : 𝓞 E, ‖τ (x : E)‖ ≤ 1 := fun x =>
     norm_le_one_of_isIntegral_int ((x.isIntegral_coe).map τ.toIntAlgHom)
-  let I : Ideal (𝓞 E) :=
-    { carrier := {x | ‖τ (x : E)‖ < 1}
-      add_mem' := by
-        intro a b ha hb
-        simp only [Set.mem_setOf_eq] at *
-        push_cast
-        rw [map_add (f := _)]
-        exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ha hb)
-      zero_mem' := by simp
-      smul_mem' := by
-        intro c x hx
-        simp only [Set.mem_setOf_eq, smul_eq_mul] at *
-        push_cast
-        rw [map_mul, norm_mul]
-        calc ‖τ (c : E)‖ * ‖τ (x : E)‖ ≤ 1 * ‖τ (x : E)‖ :=
-              mul_le_mul_of_nonneg_right (hle c) (norm_nonneg _)
-          _ < 1 := by rw [one_mul]; exact hx }
+  let I : Ideal (𝓞 E) := {
+    carrier := {x | ‖τ (x : E)‖ < 1}
+    add_mem' := by
+      intro a b ha hb
+      simp only [Set.mem_setOf_eq] at *
+      push_cast
+      rw [map_add (f := _)]
+      exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ha hb)
+    zero_mem' := by simp
+    smul_mem' := by
+      intro c x hx
+      simp only [Set.mem_setOf_eq, smul_eq_mul] at *
+      push_cast
+      rw [map_mul, norm_mul]
+      calc
+        ‖τ (c : E)‖ * ‖τ (x : E)‖
+          ≤ 1 * ‖τ (x : E)‖ := mul_le_mul_of_nonneg_right (hle c) (norm_nonneg _)
+        _ < 1 := by rw [one_mul]; exact hx
+  }
   have hmem : ∀ x : 𝓞 E, x ∈ I ↔ ‖τ (x : E)‖ < 1 := fun x => Iff.rfl
   have hprime : I.IsPrime := by
     refine ⟨?_, ?_⟩

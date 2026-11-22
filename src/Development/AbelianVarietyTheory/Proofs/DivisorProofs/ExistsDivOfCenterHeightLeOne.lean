@@ -7,23 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NadelVanishi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
 open Polynomial
 
 namespace GlobalTheory
 
-
 open IsLocalRing in
-theorem valuationRing_atPrime_of_minimal {A : Type} [CommRing A] [IsDomain A] [IsNoetherianRing A]
-    [IsIntegrallyClosed A] (q : Ideal A) [q.IsPrime]
-    (hmin : ∀ p : Ideal A, p.IsPrime → p ≠ ⊥ → p ≤ q → p = q) :
-    ValuationRing (Localization.AtPrime q) := by
+theorem valuationRing_atPrime_of_minimal
+    {A : Type} [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
+    (q : Ideal A) [q.IsPrime]
+    (hmin : ∀ p : Ideal A, p.IsPrime → p ≠ ⊥ → p ≤ q → p = q)
+    : ValuationRing (Localization.AtPrime q) := by
   have hT := tfae_of_isNoetherianRing_of_isLocalRing_of_isDomain (Localization.AtPrime q)
   have h1 : IsIntegrallyClosed (Localization.AtPrime q) :=
     isIntegrallyClosed_of_isLocalization _ q.primeCompl q.primeCompl_le_nonZeroDivisors
-  have h2 : ∀ Q' : Ideal (Localization.AtPrime q), Q' ≠ ⊥ → Q'.IsPrime →
-      Q' = maximalIdeal (Localization.AtPrime q) := by
+  have h2
+      : ∀ Q' : Ideal (Localization.AtPrime q),
+        Q' ≠ ⊥ → Q'.IsPrime → Q' = maximalIdeal (Localization.AtPrime q) := by
     intro Q' hQ' hQ'p
     have hc : (Q'.comap (algebraMap A (Localization.AtPrime q))).IsPrime := Ideal.comap_isPrime _ _
     have hle : Q'.comap (algebraMap A (Localization.AtPrime q)) ≤ q := by
@@ -39,14 +41,20 @@ theorem valuationRing_atPrime_of_minimal {A : Type} [CommRing A] [IsDomain A] [I
     have heq := hmin _ hc hne hle
     rw [← IsLocalization.map_under q.primeCompl (Localization.AtPrime q) Q']
     rw [Ideal.under, heq, Localization.AtPrime.map_eq_maximalIdeal]
-  have h12 : IsIntegrallyClosed (Localization.AtPrime q) ∧ ∀ Q' : Ideal (Localization.AtPrime q),
-      Q' ≠ ⊥ → Q'.IsPrime → Q' = maximalIdeal (Localization.AtPrime q) := ⟨h1, h2⟩
+  have h12
+      : IsIntegrallyClosed (Localization.AtPrime q)
+        ∧ ∀ Q' : Ideal (Localization.AtPrime q),
+          Q' ≠ ⊥ → Q'.IsPrime → Q' = maximalIdeal (Localization.AtPrime q) :=
+    ⟨h1, h2⟩
   exact (hT.out 4 2).mp h12
 
-theorem mul_eq_mul_of_atPrime {A : Type} [CommRing A] [IsDomain A] (q : Ideal A) [q.IsPrime]
+theorem mul_eq_mul_of_atPrime
+    {A : Type} [CommRing A] [IsDomain A]
+    (q : Ideal A) [q.IsPrime]
     (x y a : A) (s : q.primeCompl)
-    (h : algebraMap A (Localization.AtPrime q) x * IsLocalization.mk' _ a s =
-      algebraMap A (Localization.AtPrime q) y) : x * a = y * s := by
+    (h : algebraMap A (Localization.AtPrime q) x * IsLocalization.mk' _ a s
+      = algebraMap A (Localization.AtPrime q) y)
+    : x * a = y * s := by
   rw [IsLocalization.mul_mk'_eq_mk'_of_mul, IsLocalization.mk'_eq_iff_eq_mul, ← map_mul] at h
   exact IsLocalization.injective (Localization.AtPrime q) q.primeCompl_le_nonZeroDivisors h
 
@@ -54,16 +62,23 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem exists_div_of_center_height_le_one : ∀ (K : Type) [Field K] (R : Subring K) [IsNoetherianRing R]
-    [IsIntegrallyClosed R] [IsFractionRing R K] (E : ValuationSubring K), R ≤ E.toSubring →
-    (∀ p : Ideal R, p.IsPrime → p ≠ ⊥ → (∀ r ∈ p, (r : K) ∈ E.nonunits) →
-      ∀ r : R, (r : K) ∈ E.nonunits → r ∈ p) →
-    ∀ e ∈ E, ∃ a ∈ R, ∃ s ∈ R, s⁻¹ ∈ E ∧ e = a / s := by
+theorem exists_div_of_center_height_le_one
+    : ∀ (K : Type) [Field K] (R : Subring K) [IsNoetherianRing R] [IsIntegrallyClosed R]
+        [IsFractionRing R K] (E : ValuationSubring K),
+      R ≤ E.toSubring
+        → (∀ p : Ideal R,
+          p.IsPrime → p ≠ ⊥ → (∀ r ∈ p, (r : K) ∈ E.nonunits)
+            → ∀ r : R, (r : K) ∈ E.nonunits → r ∈ p)
+        → ∀ e ∈ E, ∃ a ∈ R, ∃ s ∈ R, s⁻¹ ∈ E ∧ e = a / s := by
   intro K _ R _ _ _ E hRE hyp e he
   classical
-  let φ : R →+* E :=
-    { toFun := fun r => ⟨r, hRE r.2⟩, map_one' := rfl, map_mul' := fun _ _ => rfl,
-      map_zero' := rfl, map_add' := fun _ _ => rfl }
+  let φ : R →+* E := {
+    toFun := fun r => ⟨r, hRE r.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   let q : Ideal R := (IsLocalRing.maximalIdeal E).comap φ
   have hqmem : ∀ r : R, r ∈ q ↔ E.valuation (r : K) < 1 := fun r => E.valuation_lt_one_iff (φ r)
   have hRv : ∀ r : R, E.valuation (r : K) ≤ 1 := fun r => (E.valuation_le_one_iff _).2 (hRE r.2)
@@ -87,7 +102,10 @@ theorem exists_div_of_center_height_le_one : ∀ (K : Type) [Field K] (R : Subri
   by_cases hq : q = ⊥
   · have hyq : (y : R) ∉ q := by
       rw [hq, Ideal.mem_bot]
-      intro h; apply hy0; rw [h]; rfl
+      intro h
+      apply hy0
+      rw [h]
+      rfl
     exact ⟨x, (x : R).2, y, (y : R).2, hinv _ hyq, hxy.symm⟩
   · have hmin : ∀ p : Ideal R, p.IsPrime → p ≠ ⊥ → p ≤ q → p = q := by
       intro p hp hp0 hpq
@@ -97,9 +115,11 @@ theorem exists_div_of_center_height_le_one : ∀ (K : Type) [Field K] (R : Subri
       · exact E.mem_nonunits_iff.2 ((hqmem t).1 (hpq ht))
       · exact E.mem_nonunits_iff.2 ((hqmem r).1 hr)
     haveI : ValuationRing (Localization.AtPrime q) := valuationRing_atPrime_of_minimal q hmin
-    obtain ⟨c, hc⟩ := ValuationRing.cond (algebraMap R (Localization.AtPrime q) x)
-      (algebraMap R (Localization.AtPrime q) y)
-    obtain ⟨⟨a, s⟩, rfl⟩ := IsLocalization.mk'_surjective (S := Localization.AtPrime q) q.primeCompl c
+    obtain ⟨c, hc⟩ :=
+      ValuationRing.cond (algebraMap R (Localization.AtPrime q) x)
+        (algebraMap R (Localization.AtPrime q) y)
+    obtain ⟨⟨a, s⟩, rfl⟩ :=
+      IsLocalization.mk'_surjective (S := Localization.AtPrime q) q.primeCompl c
     dsimp only at hc
     have hsq : (s : R) ∉ q := s.2
     rcases hc with hc | hc

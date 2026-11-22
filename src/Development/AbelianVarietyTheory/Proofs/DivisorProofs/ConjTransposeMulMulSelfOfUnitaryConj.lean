@@ -9,37 +9,42 @@ open Matrix
 
 namespace GlobalTheory
 
-
 open scoped ComplexOrder in
 open Matrix in
-theorem _root_.GlobalTheory.conjTranspose_mul_mul_self_of_unitary_conj :
-    ∀ (n d : ℕ) (J P : Matrix (Fin n) (Fin n) ℂ) (Xb Yb : Matrix (Fin n) (Fin d) ℂ) (y₀ : GL (Fin d) ℂ),
-    J.conjTranspose = J → P.conjTranspose = P → Xb.conjTranspose * J * Xb = 0 → Yb.conjTranspose * J * Yb = 0 →
-    Xb.conjTranspose * J * Yb = 1 →
-    P * Xb = J * Yb * ((y₀⁻¹).1.conjTranspose * (y₀⁻¹).1) → P * Yb = J * Xb * (y₀.1 * (y₀.1).conjTranspose) →
-    ∀ k : GL (Fin d) ℂ, (k.1).conjTranspose * k.1 = 1 →
-      let m : GL (Fin d) ℂ := y₀ * k * y₀⁻¹
-      let G : Matrix (Fin n) (Fin n) ℂ := 1 + Xb * (m.1 - 1) * (Yb.conjTranspose * J) + Yb * ((m⁻¹).1.conjTranspose - 1) * (Xb.conjTranspose * J)
-      G.conjTranspose * P * G = P := by
+theorem _root_.GlobalTheory.conjTranspose_mul_mul_self_of_unitary_conj
+    : ∀ (n d : ℕ) (J P : Matrix (Fin n) (Fin n) ℂ) (Xb Yb : Matrix (Fin n) (Fin d) ℂ)
+        (y₀ : GL (Fin d) ℂ),
+      J.conjTranspose = J → P.conjTranspose = P → Xb.conjTranspose * J * Xb = 0
+        → Yb.conjTranspose * J * Yb = 0 → Xb.conjTranspose * J * Yb = 1
+        → P * Xb = J * Yb * ((y₀⁻¹).1.conjTranspose * (y₀⁻¹).1)
+        → P * Yb = J * Xb * (y₀.1 * (y₀.1).conjTranspose)
+        → ∀ k : GL (Fin d) ℂ,
+          (k.1).conjTranspose * k.1 = 1
+            → let m : GL (Fin d) ℂ := y₀ * k * y₀⁻¹
+              let G : Matrix (Fin n) (Fin n) ℂ :=
+                1 + Xb * (m.1 - 1) * (Yb.conjTranspose * J)
+                  + Yb * ((m⁻¹).1.conjTranspose - 1) * (Xb.conjTranspose * J)
+              G.conjTranspose * P * G = P := by
   intro n d J P X Y y₀ hJ hP hXX hYY hXY hPX hPY k hk m G
   have hki : (k⁻¹).1 = k.1ᴴ := by
-    calc (k⁻¹).1 = (k.1ᴴ * k.1) * (k⁻¹).1 := by rw [hk, Matrix.one_mul]
+    calc
+      (k⁻¹).1
+        = (k.1ᴴ * k.1) * (k⁻¹).1 := by rw [hk, Matrix.one_mul]
       _ = k.1ᴴ := by rw [Matrix.mul_assoc, Units.mul_inv, Matrix.mul_one]
   have hm : m.1 = y₀.1 * k.1 * (y₀⁻¹).1 := by simp [m]
   have hmi : (m⁻¹).1 = y₀.1 * k.1ᴴ * (y₀⁻¹).1 := by
     simp only [m, _root_.mul_inv_rev, inv_inv, Units.val_mul, hki, Matrix.mul_assoc]
-  have hab : y₀.1ᴴ * (y₀⁻¹).1ᴴ = 1 := by
-    rw [← conjTranspose_mul, Units.inv_mul, conjTranspose_one]
+  have hab : y₀.1ᴴ * (y₀⁻¹).1ᴴ = 1 := by rw [← conjTranspose_mul, Units.inv_mul, conjTranspose_one]
   have hAm : m.1ᴴ * ((y₀⁻¹).1ᴴ * (y₀⁻¹).1) * m.1 = (y₀⁻¹).1ᴴ * (y₀⁻¹).1 := by
     rw [hm]
     simp only [conjTranspose_mul, Matrix.mul_assoc]
-    rw [← Matrix.mul_assoc y₀.1ᴴ, hab, Matrix.one_mul, ← Matrix.mul_assoc (y₀⁻¹).1 y₀.1, Units.inv_mul,
-      Matrix.one_mul, ← Matrix.mul_assoc k.1ᴴ k.1, hk, Matrix.one_mul]
+    rw [← Matrix.mul_assoc y₀.1ᴴ, hab, Matrix.one_mul, ← Matrix.mul_assoc (y₀⁻¹).1 y₀.1,
+      Units.inv_mul, Matrix.one_mul, ← Matrix.mul_assoc k.1ᴴ k.1, hk, Matrix.one_mul]
   have hBm : (m⁻¹).1 * (y₀.1 * y₀.1ᴴ) * (m⁻¹).1ᴴ = y₀.1 * y₀.1ᴴ := by
     rw [hmi]
     simp only [conjTranspose_mul, conjTranspose_conjTranspose, Matrix.mul_assoc]
-    rw [← Matrix.mul_assoc (y₀⁻¹).1 y₀.1, Units.inv_mul, Matrix.one_mul, ← Matrix.mul_assoc y₀.1ᴴ, hab,
-      Matrix.one_mul, ← Matrix.mul_assoc k.1ᴴ k.1, hk, Matrix.one_mul]
+    rw [← Matrix.mul_assoc (y₀⁻¹).1 y₀.1, Units.inv_mul, Matrix.one_mul, ← Matrix.mul_assoc y₀.1ᴴ,
+      hab, Matrix.one_mul, ← Matrix.mul_assoc k.1ᴴ k.1, hk, Matrix.one_mul]
   have hAh : ((y₀⁻¹).1ᴴ * (y₀⁻¹).1)ᴴ = (y₀⁻¹).1ᴴ * (y₀⁻¹).1 := by
     rw [conjTranspose_mul, conjTranspose_conjTranspose]
   have hBh : (y₀.1 * y₀.1ᴴ)ᴴ = y₀.1 * y₀.1ᴴ := by
@@ -66,22 +71,34 @@ theorem _root_.GlobalTheory.conjTranspose_mul_mul_self_of_unitary_conj :
     simp only [← Matrix.mul_assoc, hXY, Matrix.one_mul]
   have r4 : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin d) c ℂ), Yᴴ * (J * (X * Z)) = Z := fun Z => by
     simp only [← Matrix.mul_assoc, hYX, Matrix.one_mul]
-  have r5 : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin d) c ℂ), P * (X * Z) = J * (Y * (A * Z)) := fun Z => by
+  have r5
+      : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin d) c ℂ),
+        P * (X * Z) = J * (Y * (A * Z)) := fun Z => by
     simp only [← Matrix.mul_assoc, hPX]
-  have r6 : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin d) c ℂ), P * (Y * Z) = J * (X * (B * Z)) := fun Z => by
+  have r6
+      : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin d) c ℂ),
+        P * (Y * Z) = J * (X * (B * Z)) := fun Z => by
     simp only [← Matrix.mul_assoc, hPY]
-  have r7 : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin n) c ℂ), Xᴴ * (P * Z) = A * (Yᴴ * (J * Z)) := fun Z => by
+  have r7
+      : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin n) c ℂ),
+        Xᴴ * (P * Z) = A * (Yᴴ * (J * Z)) := fun Z => by
     simp only [← Matrix.mul_assoc, hXP]
-  have r8 : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin n) c ℂ), Yᴴ * (P * Z) = B * (Xᴴ * (J * Z)) := fun Z => by
+  have r8
+      : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin n) c ℂ),
+        Yᴴ * (P * Z) = B * (Xᴴ * (J * Z)) := fun Z => by
     simp only [← Matrix.mul_assoc, hYP]
-  have r9 : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin d) c ℂ), m₁ᴴ * (A * (m₁ * Z)) = A * Z := fun Z => by
+  have r9
+      : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin d) c ℂ),
+        m₁ᴴ * (A * (m₁ * Z)) = A * Z := fun Z => by
     simp only [← Matrix.mul_assoc, hAm]
-  have r10 : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin d) c ℂ), m₂ * (B * (m₂ᴴ * Z)) = B * Z := fun Z => by
+  have r10
+      : ∀ {c : Type} [Fintype c] (Z : Matrix (Fin d) c ℂ),
+        m₂ * (B * (m₂ᴴ * Z)) = B * Z := fun Z => by
     simp only [← Matrix.mul_assoc, hBm]
   simp only [conjTranspose_add, conjTranspose_mul, conjTranspose_sub, conjTranspose_one,
     conjTranspose_conjTranspose, hJ, Matrix.add_mul, Matrix.mul_add, Matrix.sub_mul, Matrix.mul_sub,
-    Matrix.one_mul, Matrix.mul_one, Matrix.mul_assoc, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, hXP, hYP,
-    Matrix.mul_zero, Matrix.zero_mul, sub_zero, add_zero, zero_add]
+    Matrix.one_mul, Matrix.mul_one, Matrix.mul_assoc, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, hXP,
+    hYP, Matrix.mul_zero, Matrix.zero_mul, sub_zero, add_zero, zero_add]
   abel
 
 end GlobalTheory

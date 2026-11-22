@@ -14,17 +14,19 @@ namespace Formalism.HermitianLattices.Ext.PrimesInProgressions.Dens
 
 open Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD Formalism.ZeroFreeDirichlet
 
-theorem count_block0 (M : ℕ) (T σ c : ℝ) (S : Finset (DirichletCharacter ℂ 1 × ℂ)) (N U : ℕ)
+theorem count_block0
+    (M : ℕ) (T σ c : ℝ) (S : Finset (DirichletCharacter ℂ 1 × ℂ)) (N U : ℕ)
     (hM : 3 ≤ M) (hT : 2 ≤ T) (hσ : 3 / 4 ≤ σ) (hσ1 : σ ≤ 1) (hq : 512 ≤ qd M T) (hc0 : 0 < c)
-    (hc : 87880000 / c ^ 2 * Real.log (qd M T) ^ 7 ≤ Real.sqrt (qd M T))
-    (hU1 : qd M T ^ 3 ≤ U) (hU2 : 2 * U ≤ qd M T ^ 12)
-    (hS : ∀ p ∈ S, σ ≤ p.2.re ∧ p.2.re ≤ 1 ∧ |p.2.im| ≤ T)
+    (hc : 87880000 / c ^ 2 * Real.log (qd M T) ^ 7 ≤ Real.sqrt (qd M T)) (hU1 : qd M T ^ 3 ≤ U)
+    (hU2 : 2 * U ≤ qd M T ^ 12) (hS : ∀ p ∈ S, σ ≤ p.2.re ∧ p.2.re ≤ 1 ∧ |p.2.im| ≤ T)
     (hsp : ∀ p ∈ S, ∀ p' ∈ S, p ≠ p' → 1 ≤ |p.2.im - p'.2.im|)
-    (hbig : ∀ p ∈ S, c / (((pJd M T : ℝ) + 1) * Real.log (qd M T)) ≤
-      ‖blkD (pYd M T) N U (fun n => p.1 (n : ZMod 1)) p.2‖) :
-    (S.card : ℝ) ≤ 4 * (64 * ((M : ℝ) * T) ^ (24 * (1 - σ))) * (26 * Real.log ((M : ℝ) * T)) ^ 3 *
-      (17 * Real.log ((M : ℝ) * T)) *
-      ((50 * Real.log ((M : ℝ) * T) * (2 * Real.log ((M : ℝ) * T))) ^ 2 / c ^ 2) := by
+    (hbig : ∀ p ∈ S,
+      c / (((pJd M T : ℝ) + 1) * Real.log (qd M T))
+        ≤ ‖blkD (pYd M T) N U (fun n => p.1 (n : ZMod 1)) p.2‖)
+    : (S.card : ℝ)
+      ≤ 4 * (64 * ((M : ℝ) * T) ^ (24 * (1 - σ))) * (26 * Real.log ((M : ℝ) * T)) ^ 3
+        * (17 * Real.log ((M : ℝ) * T))
+        * ((50 * Real.log ((M : ℝ) * T) * (2 * Real.log ((M : ℝ) * T))) ^ 2 / c ^ 2) := by
   set q := qd M T with hqdef
   set x : ℝ := (M : ℝ) * T with hx
   have hM' : (3 : ℝ) ≤ M := by exact_mod_cast hM
@@ -60,28 +62,33 @@ theorem count_block0 (M : ℕ) (T σ c : ℝ) (S : Finset (DirichletCharacter �
     linarith
   have hK0 : 0 ≤ 8 * (((1 : ℕ) : ℝ) + 1) * (2 + 2 * T) := by positivity
   have hK : 8 * (((1 : ℕ) : ℝ) + 1) * (2 + 2 * T) ≤ 16 * q := by
-    have : 8 * (((1 : ℕ) : ℝ) + 1) * (2 + 2 * T) ≤ 16 * x := by
-      rw [hx]; push_cast; nlinarith
+    have : 8 * (((1 : ℕ) : ℝ) + 1) * (2 + 2 * T) ≤ 16 * x := by rw [hx]; push_cast; nlinarith
     linarith
   have hθ : (0 : ℝ) < c / (((pJd M T : ℝ) + 1) * Real.log q) := by positivity
-  have hsmall := first_small_condition ((U : ℝ) ^ (1 - 2 * σ)) (1 + Real.log (2 * (U : ℝ)))
-    (8 * (((1 : ℕ) : ℝ) + 1) * (2 + 2 * T)) ((pJd M T : ℝ) + 1) q (Real.sqrt q) (Real.log q) c
-    (by linarith) (Real.sqrt_pos.2 (by linarith)) hc0 (rpow_neg_exponent_bound q U σ (by omega) hσ hU1)
-    (by linarith) hl hK0 hK hJ0 hJ hc
-  have hmain := dyadic_block_count S (fun p n => p.1 (n : ZMod 1)) (fun p => p.2) (pYd M T) N U σ
-    (c / (((pJd M T : ℝ) + 1) * Real.log q)) (9 + 8 * Real.log (2 * T + 1))
-    (8 * (((1 : ℕ) : ℝ) + 1) * (2 + 2 * T))
-    hU hθ (by linarith) hG0 hK0 (fun p _ n => DirichletCharacter.norm_le_one _ _)
-    (fun p hp => (hS p hp).1)
-    (off_diagonal_bound 1 S σ T U hU hT (by linarith) hS (fun p hp p' hp' hne _ => hsp p hp p' hp' hne))
-    hbig hsmall
+  have hsmall :=
+    first_small_condition ((U : ℝ) ^ (1 - 2 * σ)) (1 + Real.log (2 * (U : ℝ)))
+      (8 * (((1 : ℕ) : ℝ) + 1) * (2 + 2 * T)) ((pJd M T : ℝ) + 1) q (Real.sqrt q) (Real.log q) c
+      (by linarith) (Real.sqrt_pos.2 (by linarith)) hc0
+      (rpow_neg_exponent_bound q U σ (by omega) hσ hU1) (by linarith) hl hK0 hK hJ0 hJ hc
+  have hmain :=
+    dyadic_block_count S
+      (fun p n => p.1 (n : ZMod 1))
+      (fun p => p.2)
+      (pYd M T) N U σ (c / (((pJd M T : ℝ) + 1) * Real.log q)) (9 + 8 * Real.log (2 * T + 1))
+      (8 * (((1 : ℕ) : ℝ) + 1) * (2 + 2 * T)) hU hθ (by linarith) hG0 hK0
+      (fun p _ n => DirichletCharacter.norm_le_one _ _)
+      (fun p hp => (hS p hp).1)
+      (off_diagonal_bound 1 S σ T U hU hT (by linarith) hS
+        (fun p hp p' hp' hne _ => hsp p hp p' hp' hne))
+      hbig hsmall
   refine hmain.trans ?_
   have hu2 := rpow_pos_exponent_bound q U x σ (by linarith) hqx hσ hσ1 (by omega)
   have hu0 : 0 ≤ (U : ℝ) ^ (2 - 2 * σ) := by positivity
-  have he : 4 * (U : ℝ) ^ (2 - 2 * σ) * (1 + Real.log (2 * (U : ℝ))) ^ 3 *
-      (9 + 8 * Real.log (2 * T + 1)) / (c / (((pJd M T : ℝ) + 1) * Real.log q)) ^ 2 =
-      4 * (U : ℝ) ^ (2 - 2 * σ) * (1 + Real.log (2 * (U : ℝ))) ^ 3 *
-      (9 + 8 * Real.log (2 * T + 1)) * ((((pJd M T : ℝ) + 1) * Real.log q) ^ 2 / c ^ 2) := by
+  have he
+      : 4 * (U : ℝ) ^ (2 - 2 * σ) * (1 + Real.log (2 * (U : ℝ))) ^ 3
+          * (9 + 8 * Real.log (2 * T + 1)) / (c / (((pJd M T : ℝ) + 1) * Real.log q)) ^ 2
+        = 4 * (U : ℝ) ^ (2 - 2 * σ) * (1 + Real.log (2 * (U : ℝ))) ^ 3
+          * (9 + 8 * Real.log (2 * T + 1)) * ((((pJd M T : ℝ) + 1) * Real.log q) ^ 2 / c ^ 2) := by
     have hLq0 : Real.log q ≠ 0 := by linarith
     field_simp
   rw [he]
@@ -121,8 +128,9 @@ theorem zero_count_first : Count0 := by
   set S' : Finset (DirichletCharacter ℂ 1 × ℂ) := S.image e with hS'
   have hcard : S'.card = S.card := card_image_of_injOn hinj
   let Sij : ℕ × ℕ → Finset (DirichletCharacter ℂ 1 × ℂ) := fun ij =>
-    S'.filter (fun p => c / (((pJd M T : ℝ) + 1) * Real.log (qd M T)) ≤
-      ‖blkD (pYd M T) (2 ^ ij.1 * pNd M T) (pYd M T * 2 ^ ij.2) (fun n => p.1 (n : ZMod 1)) p.2‖)
+    S'.filter (fun p =>
+      c / (((pJd M T : ℝ) + 1) * Real.log (qd M T))
+        ≤ ‖blkD (pYd M T) (2 ^ ij.1 * pNd M T) (pYd M T * 2 ^ ij.2) (fun n => p.1 (n : ZMod 1)) p.2‖)
   have hsub : S' ⊆ (range 2 ×ˢ range (pJd M T + 1)).biUnion Sij := by
     intro p hp
     obtain ⟨a, ha, rfl⟩ := mem_image.1 hp
@@ -133,14 +141,16 @@ theorem zero_count_first : Count0 := by
   have hj : ∀ ij ∈ range 2 ×ˢ range (pJd M T + 1), ((Sij ij).card : ℝ) ≤ B := by
     intro ij hij
     have hjJ : ij.2 < pJd M T + 1 := mem_range.1 (mem_product.1 hij).2
-    have hYN : 2 * (qd M T ^ 3 * 2 ^ pJd M T) ≤ qd M T ^ 12 := dyadic_size_le_pow_twelve (qd M T) hq512
+    have hYN : 2 * (qd M T ^ 3 * 2 ^ pJd M T) ≤ qd M T ^ 12 :=
+      dyadic_size_le_pow_twelve (qd M T) hq512
     apply count_block0 M T σ c (Sij ij) (2 ^ ij.1 * pNd M T) (pYd M T * 2 ^ ij.2) hM hT hσ hσ1 hq512
       hc0 hc
     · exact Nat.le_mul_of_pos_right _ (by positivity)
-    · calc 2 * (pYd M T * 2 ^ ij.2) ≤ 2 * (qd M T ^ 3 * 2 ^ pJd M T) := by
-            unfold pYd
-            gcongr
-            omega
+    · calc
+        2 * (pYd M T * 2 ^ ij.2) ≤ 2 * (qd M T ^ 3 * 2 ^ pJd M T) := by
+          unfold pYd
+          gcongr
+          omega
         _ ≤ _ := hYN
     · intro p hp
       obtain ⟨a, ha, rfl⟩ := mem_image.1 (mem_filter.1 hp).1
@@ -156,12 +166,14 @@ theorem zero_count_first : Count0 := by
     have := (card_le_card hsub).trans card_biUnion_le
     rw [hcard] at this
     exact_mod_cast this
-  have h2 : ∑ ij ∈ range 2 ×ˢ range (pJd M T + 1), ((Sij ij).card : ℝ) ≤
-      2 * ((pJd M T : ℝ) + 1) * B := by
+  have h2
+      : ∑ ij ∈ range 2 ×ˢ range (pJd M T + 1), ((Sij ij).card : ℝ)
+        ≤ 2 * ((pJd M T : ℝ) + 1) * B := by
     have := sum_le_card_nsmul (range 2 ×ˢ range (pJd M T + 1)) (fun ij => ((Sij ij).card : ℝ)) B hj
     simpa using this
   have hJ' : (pJd M T : ℝ) + 1 ≤ 50 * Real.log ((M : ℝ) * T) := by
-    have hJ : ((pJd M T : ℕ) : ℝ) + 1 ≤ 25 * Real.log (qd M T) := dyadic_index_le_log (qd M T) (by omega)
+    have hJ : ((pJd M T : ℕ) : ℝ) + 1 ≤ 25 * Real.log (qd M T) :=
+      dyadic_index_le_log (qd M T) (by omega)
     have hqx1 : ((qd M T : ℕ) : ℝ) < (M : ℝ) * T + 1 := Nat.ceil_lt_add_one (by linarith)
     have hq' : (512 : ℝ) ≤ (qd M T : ℝ) := by exact_mod_cast hq512
     have h3 : Real.log (qd M T) ≤ Real.log (2 * ((M : ℝ) * T)) :=
@@ -170,13 +182,16 @@ theorem zero_count_first : Count0 := by
     have h4 : Real.log 2 ≤ Real.log ((M : ℝ) * T) := Real.log_le_log (by norm_num) (by linarith)
     linarith
   have h3 : 2 * ((pJd M T : ℝ) + 1) * B ≤ 2 * (50 * Real.log ((M : ℝ) * T)) * B := by gcongr
-  have h4 : 2 * (50 * Real.log ((M : ℝ) * T)) * B =
-      100 * (4 * 64 * 26 ^ 3 * 17 * (100 ^ 2 / c ^ 2)) * ((M : ℝ) * T) ^ (24 * (1 - σ)) *
-        Real.log ((M : ℝ) * T) ^ 9 := by
+  have h4
+      : 2 * (50 * Real.log ((M : ℝ) * T)) * B
+        = 100 * (4 * 64 * 26 ^ 3 * 17 * (100 ^ 2 / c ^ 2)) * ((M : ℝ) * T) ^ (24 * (1 - σ))
+          * Real.log ((M : ℝ) * T) ^ 9 := by
     rw [hB]; ring
   have h5 : Real.log ((M : ℝ) * T) ^ 9 ≤ Real.log ((M : ℝ) * T) ^ 10 :=
     pow_le_pow_right₀ hl1 (by norm_num)
-  calc (S.card : ℝ) ≤ 2 * (50 * Real.log ((M : ℝ) * T)) * B := h1.trans (h2.trans h3)
+  calc
+    (S.card : ℝ)
+      ≤ 2 * (50 * Real.log ((M : ℝ) * T)) * B := h1.trans (h2.trans h3)
     _ = _ := h4
     _ ≤ _ := by gcongr
 

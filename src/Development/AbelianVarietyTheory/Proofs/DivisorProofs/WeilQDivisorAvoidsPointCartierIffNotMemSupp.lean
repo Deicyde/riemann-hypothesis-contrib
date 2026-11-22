@@ -9,9 +9,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Poi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 set_option autoImplicit false
 
@@ -73,20 +75,19 @@ private lemma exists_coheight_one_generalization_not_unitAt {X : Scheme.{0}} [Is
     rw [h1] at hdim
     exact_mod_cast hdim
 
-
 open CategoryTheory AlgebraicGeometry TopologicalSpace in
 set_option autoImplicit false in
-theorem _root_.GlobalTheory.PairStep.off_qWeil_iff_notMem_supp : ∀ (X : Scheme.{0}) [IsIntegral X]
-    [IsLocallyNoetherian X] (D₀ : _root_.GlobalTheory.Cartier.CartierDiv X) (m : ℕ) (z : X),
-    D₀.Eff → 0 < m →
-      (_root_.GlobalTheory.PairStep.Off (_root_.GlobalTheory.Discrepancy.qWeil D₀ m) z ↔
-        z ∉ D₀.supp) := by
+theorem _root_.GlobalTheory.PairStep.off_qWeil_iff_notMem_supp
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X]
+        (D₀ : _root_.GlobalTheory.Cartier.CartierDiv X) (m : ℕ) (z : X),
+      D₀.Eff → 0 < m
+        → (_root_.GlobalTheory.PairStep.Off (_root_.GlobalTheory.Discrepancy.qWeil D₀ m) z
+          ↔ z ∉ D₀.supp) := by
   intro X _ _ D m z hD hm
   have hm' : (m : ℚ) ≠ 0 := by exact_mod_cast hm.ne'
   obtain ⟨g, hg⟩ := D.exists_isEqn z
   obtain ⟨U, hzU, hU⟩ := hg.exists_nhds
-  have hgen : ∀ w : X, w ⤳ z → D.IsEqn w g := fun w hwz =>
-    hU w (hwz.mem_open U.isOpen hzU)
+  have hgen : ∀ w : X, w ⤳ z → D.IsEqn w g := fun w hwz => hU w (hwz.mem_open U.isOpen hzU)
   unfold _root_.GlobalTheory.PairStep.Off _root_.GlobalTheory.Discrepancy.qWeil
   simp only [div_eq_zero_iff, hm', or_false, Int.cast_eq_zero]
   rw [hg.mem_supp_iff, not_not]
@@ -94,7 +95,8 @@ theorem _root_.GlobalTheory.PairStep.off_qWeil_iff_notMem_supp : ∀ (X : Scheme
   · intro h
     by_contra hnu
     have hreg := (_root_.GlobalTheory.Cartier.CartierDiv.eff_iff.mp hD) z g hg
-    obtain ⟨w, hwz, hw1, hwnu⟩ := exists_coheight_one_generalization_not_unitAt (Units.ne_zero g) hreg hnu
+    obtain ⟨w, hwz, hw1, hwnu⟩ :=
+      exists_coheight_one_generalization_not_unitAt (Units.ne_zero g) hreg hnu
     have hmult := h w hwz
     rw [(hgen w hwz).mult_eq] at hmult
     obtain ⟨a, ha⟩ := _root_.GlobalTheory.Discrepancy.regAt_of_specializes hwz hreg
@@ -107,14 +109,16 @@ theorem _root_.GlobalTheory.PairStep.off_qWeil_iff_notMem_supp : ∀ (X : Scheme
     haveI : Ring.KrullDimLE 1 (X.presheaf.stalk w) := by
       rw [Ring.krullDimLE_iff, hdim]
       exact_mod_cast le_rfl
-    have hfin := isFiniteLength_quotient_span_singleton (X.presheaf.stalk w)
-      (mem_nonZeroDivisors_of_ne_zero ha0)
+    have hfin :=
+      isFiniteLength_quotient_span_singleton (X.presheaf.stalk w)
+        (mem_nonZeroDivisors_of_ne_zero ha0)
     have htop := Module.length_ne_top_iff.mpr hfin
     have hzero : Module.length (X.presheaf.stalk w) (X.presheaf.stalk w ⧸ Ideal.span {a}) ≠ 0 := by
       rw [Ne, Module.length_eq_zero_iff, Ideal.Quotient.subsingleton_iff,
         Ideal.span_singleton_eq_top]
       exact fun hunit => hwnu ⟨a, hunit, ha⟩
-    have : (Module.length (X.presheaf.stalk w) (X.presheaf.stalk w ⧸ Ideal.span {a})).toNat ≠ 0 := by
+    have : (Module.length (X.presheaf.stalk w) (X.presheaf.stalk w ⧸ Ideal.span {a})).toNat
+        ≠ 0 := by
       rw [Ne, ENat.toNat_eq_zero]
       tauto
     exact this (by exact_mod_cast hmult)

@@ -6,11 +6,14 @@ public import Development.EtaleCohomology.EtaleSheaves.H0TwistOverClosedField
 
 namespace LateralTheory.E.E4
 
-def LeafUnitsFG : Prop := ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDedekindDomain B]
-  [Algebra k B] [Algebra.FiniteType k B], Group.FG (Bˣ ⧸ (Units.map (algebraMap k B).toMonoidHom).range)
+def LeafUnitsFG : Prop :=
+  ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDedekindDomain B] [Algebra k B]
+      [Algebra.FiniteType k B],
+    Group.FG (Bˣ ⧸ (Units.map (algebraMap k B).toMonoidHom).range)
 
-theorem units_range_le_pow (q : ℕ) [NeZero q] (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [Algebra k B] :
-    (Units.map (algebraMap k B).toMonoidHom).range ≤ (powMonoidHom q : Bˣ →* Bˣ).range := by
+theorem units_range_le_pow
+    (q : ℕ) [NeZero q] (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [Algebra k B]
+    : (Units.map (algebraMap k B).toMonoidHom).range ≤ (powMonoidHom q : Bˣ →* Bˣ).range := by
   rintro _ ⟨a, rfl⟩
   obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (a : k) (Nat.pos_of_ne_zero (NeZero.ne q))
   have hz0 : z ≠ 0 := by

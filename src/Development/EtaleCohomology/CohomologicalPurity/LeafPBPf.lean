@@ -11,24 +11,31 @@ namespace LateralTheory.CohomologicalPurity.Thom
 
 def LeafPBInvSp : Prop := ∀ (q : ℕ) (R : Type) [CommRing R], IsUnit (q : R) → Inv q (sp R)
 
-def LeafPBCmp : Prop := A1 → ∀ (q : ℕ) [NeZero q] (N : ℕ) (R : Type) [CommRing R], IsUnit (q : R) →
-  ∃ (V : sp R ⟶ ofCat (glCat N)) (e : pullback V (PGL.pr N) ⟶ PR N 0 R),
-    e ≫ prod.snd = pullback.fst V (PGL.pr N) ∧
-    e ≫ prod.fst ≫ Pj.line N 0 = pullback.snd V (PGL.pr N) ≫ PGL.line N ∧
-    ∀ i : ℤ, Eqv _ e (tw q i)
+def LeafPBCmp : Prop :=
+  A1
+    → ∀ (q : ℕ) [NeZero q] (N : ℕ) (R : Type) [CommRing R],
+      IsUnit (q : R)
+        → ∃ (V : sp R ⟶ ofCat (glCat N)) (e : pullback V (PGL.pr N) ⟶ PR N 0 R),
+          e ≫ prod.snd = pullback.fst V (PGL.pr N)
+            ∧ e ≫ prod.fst ≫ Pj.line N 0 = pullback.snd V (PGL.pr N) ≫ PGL.line N
+            ∧ ∀ i : ℤ, Eqv _ e (tw q i)
 
-def LeafAffEqv : Prop := A1 → ∀ (q : ℕ) [NeZero q] {E E' : Spc} (e : E ⟶ E'),
-  (∀ (n : ℕ) (A : Type) [CommRing A], Function.Bijective
-    (fun x : Sx E n (Spec (CommRingCat.of A)) => (e.app (op (SimplexCategory.mk n))).app (op (Spec (CommRingCat.of A))) x)) →
-  ∀ i : ℤ, Eqv _ e (tw q i)
+def LeafAffEqv : Prop :=
+  A1
+    → ∀ (q : ℕ) [NeZero q] {E E' : Spc} (e : E ⟶ E'),
+      (∀ (n : ℕ) (A : Type) [CommRing A],
+          Function.Bijective (fun x : Sx E n (Spec (CommRingCat.of A)) =>
+            (e.app (op (SimplexCategory.mk n))).app (op (Spec (CommRingCat.of A))) x))
+        → ∀ i : ℤ, Eqv _ e (tw q i)
 
-def LeafPBMap : Prop := ∀ (N : ℕ) (R : Type) [CommRing R],
-  ∃ (V : sp R ⟶ ofCat (glCat N)) (e : pullback V (PGL.pr N) ⟶ PR N 0 R),
-    e ≫ prod.snd = pullback.fst V (PGL.pr N) ∧
-    e ≫ prod.fst ≫ Pj.line N 0 = pullback.snd V (PGL.pr N) ≫ PGL.line N ∧
-    ∀ (n : ℕ) (A : Type) [CommRing A], Function.Bijective
-      (fun x : Sx (pullback V (PGL.pr N)) n (Spec (CommRingCat.of A)) =>
-        (e.app (op (SimplexCategory.mk n))).app (op (Spec (CommRingCat.of A))) x)
+def LeafPBMap : Prop :=
+  ∀ (N : ℕ) (R : Type) [CommRing R],
+    ∃ (V : sp R ⟶ ofCat (glCat N)) (e : pullback V (PGL.pr N) ⟶ PR N 0 R),
+      e ≫ prod.snd = pullback.fst V (PGL.pr N)
+        ∧ e ≫ prod.fst ≫ Pj.line N 0 = pullback.snd V (PGL.pr N) ≫ PGL.line N
+        ∧ ∀ (n : ℕ) (A : Type) [CommRing A],
+          Function.Bijective (fun x : Sx (pullback V (PGL.pr N)) n (Spec (CommRingCat.of A)) =>
+            (e.app (op (SimplexCategory.mk n))).app (op (Spec (CommRingCat.of A))) x)
 
 theorem leafPBCmp_of (hMap : LeafPBMap) (hAff : LeafAffEqv) : LeafPBCmp := by
   intro hA1 q _ N R _ _
@@ -42,12 +49,17 @@ theorem leafPBInvSp : LeafPBInvSp := by
   have h2 := h1.map f.appTop.hom
   simpa using h2
 
-theorem pull_cast' {q : ℕ} {E E' : Spc} (f : E ⟶ E') {n i n' i' : ℤ} (hn : n = n') (hi : i = i')
-    (x : Ht q E' n i) : pull _ f _ _ (Ht.cast hn hi x) = Ht.cast (E := E) hn hi (pull _ f _ _ x) := by
+theorem pull_cast'
+    {q : ℕ} {E E' : Spc} (f : E ⟶ E') {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x : Ht q E' n i)
+    : pull _ f _ _ (Ht.cast hn hi x) = Ht.cast (E := E) hn hi (pull _ f _ _ x) := by
   subst hn; subst hi; rfl
 
-theorem pull_cpow' (hA : DivisorNaturality) (q : ℕ) [NeZero q] {E E' : Spc} (f : E ⟶ E') (hE : Inv q E')
-    (x : Ht q E' 2 1) (k : ℕ) : pull _ f _ _ (cpow q x k) = cpow q (pull _ f _ _ x) k := by
+theorem pull_cpow'
+    (hA : DivisorNaturality)
+    (q : ℕ) [NeZero q]
+    {E E' : Spc} (f : E ⟶ E') (hE : Inv q E') (x : Ht q E' 2 1)
+    (k : ℕ)
+    : pull _ f _ _ (cpow q x k) = cpow q (pull _ f _ _ x) k := by
   induction k with
   | zero => rw [cpow_zero, cpow_zero, pull_cast', (hA q).2.1 f hE]
   | succ k ih =>
@@ -66,7 +78,8 @@ theorem LeafPB_of' (hGeo : LeafGeo) (hCmp : LeafPBCmp) : LeafPB := by
   funext a
   simp only [Function.comp_apply, poly, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
-  rw [pull_cast', (hA6 q).1, pull_cpow' hA6 q e hPR, ← pull_comp, h1, hyp, (hA6 q).2.2.1 e _ hPR, h2]
+  rw [pull_cast', (hA6 q).1, pull_cpow' hA6 q e hPR, ← pull_comp, h1, hyp, (hA6 q).2.2.1 e _ hPR,
+    h2]
 
 theorem LeafPB_of (hGeo : LeafGeo) (hMap : LeafPBMap) (hAff : LeafAffEqv) : LeafPB :=
   LeafPB_of' hGeo (leafPBCmp_of hMap hAff)

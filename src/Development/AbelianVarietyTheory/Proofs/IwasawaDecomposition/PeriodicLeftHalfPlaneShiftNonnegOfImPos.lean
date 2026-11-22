@@ -8,18 +8,23 @@ open Complex MeasureTheory
 
 namespace GlobalTheory
 
-theorem periodic_strip_shift_nonneg (c : ℝ) (f : ℂ → ℂ) (m : ℤ)
-    (hf : DifferentiableOn ℂ f {s : ℂ | s.re < c})
+theorem periodic_strip_shift_nonneg
+    (c : ℝ) (f : ℂ → ℂ) (m : ℤ) (hf : DifferentiableOn ℂ f {s : ℂ | s.re < c})
     (hper : ∀ s : ℂ, s.re < c → f (s + 2 * Real.pi * Complex.I) = f s + m)
-    (hpos : ∀ s : ℂ, s.re < c → 0 < (f s).im) : 0 ≤ m := by
+    (hpos : ∀ s : ℂ, s.re < c → 0 < (f s).im)
+    : 0 ≤ m := by
   have hcont : ContinuousOn f {s : ℂ | s.re < c} := hf.continuousOn
-  have hvert : ∀ x : ℝ, x < c → IntervalIntegrable (fun y : ℝ => f (x + y * I)) volume 0 (2 * Real.pi) := by
+  have hvert
+      : ∀ x : ℝ,
+        x < c → IntervalIntegrable (fun y : ℝ => f (x + y * I)) volume 0 (2 * Real.pi) := by
     intro x hx
     apply ContinuousOn.intervalIntegrable
     refine hcont.comp (by fun_prop) ?_
     intro y _
     simp [hx]
-  have hhor : ∀ (x₁ x₂ : ℝ), x₁ ≤ x₂ → x₂ < c → IntervalIntegrable (fun x : ℝ => f (x : ℂ)) volume x₁ x₂ := by
+  have hhor
+      : ∀ (x₁ x₂ : ℝ),
+        x₁ ≤ x₂ → x₂ < c → IntervalIntegrable (fun x : ℝ => f (x : ℂ)) volume x₁ x₂ := by
     intro x₁ x₂ h12 h2
     apply ContinuousOn.intervalIntegrable
     refine hcont.comp (by fun_prop) ?_
@@ -29,25 +34,31 @@ theorem periodic_strip_shift_nonneg (c : ℝ) (f : ℂ → ℂ) (m : ℤ)
     linarith [hx.2]
   have hVim : ∀ x : ℝ, x < c → 0 ≤ (∫ y : ℝ in (0:ℝ)..(2 * Real.pi), f (x + y * I)).im := by
     intro x hx
-    have h2pi : (0:ℝ) ≤ 2 * Real.pi := by positivity
+    have h2pi : (0 : ℝ) ≤ 2 * Real.pi := by positivity
     have hc := Complex.imCLM.intervalIntegral_comp_comm (hvert x hx)
     simp only [Complex.imCLM_apply] at hc
     rw [← hc]
     apply intervalIntegral.integral_nonneg h2pi
     intro y _
     exact (hpos _ (by simp [hx])).le
-  have key : ∀ x₁ x₂ : ℝ, x₁ ≤ x₂ → x₂ < c →
-      (∫ y : ℝ in (0:ℝ)..(2 * Real.pi), f (x₁ + y * I)).im
-        = (∫ y : ℝ in (0:ℝ)..(2 * Real.pi), f (x₂ + y * I)).im + m * (x₂ - x₁) := by
+  have key
+      : ∀ x₁ x₂ : ℝ,
+        x₁ ≤ x₂ → x₂ < c
+          → (∫ y : ℝ in (0:ℝ)..(2 * Real.pi), f (x₁ + y * I)).im
+            = (∫ y : ℝ in (0:ℝ)..(2 * Real.pi), f (x₂ + y * I)).im + m * (x₂ - x₁) := by
     intro x₁ x₂ h12 h2c
-    have hrect := Complex.integral_boundary_rect_eq_zero_of_differentiableOn f (x₁ : ℂ)
-      ((x₂ : ℂ) + ((2 * Real.pi : ℝ) : ℂ) * I) ?_
-    · simp only [ofReal_re, ofReal_im, add_re, add_im, mul_re, mul_im, I_re, I_im, ofReal_re, ofReal_im,
-        mul_zero, mul_one, sub_zero, zero_mul, add_zero, zero_add, ofReal_zero] at hrect
-      have htop : (∫ x : ℝ in x₁..x₂, f (x + ((2 * Real.pi : ℝ) : ℂ) * I))
-          = (∫ x : ℝ in x₁..x₂, f (x : ℂ)) + (m : ℂ) * ((x₂ - x₁ : ℝ) : ℂ) := by
-        have hc : (∫ x : ℝ in x₁..x₂, f (x + ((2 * Real.pi : ℝ) : ℂ) * I))
-            = ∫ x : ℝ in x₁..x₂, (f (x : ℂ) + m) := by
+    have hrect :=
+      Complex.integral_boundary_rect_eq_zero_of_differentiableOn f (x₁ : ℂ)
+        ((x₂ : ℂ) + ((2 * Real.pi : ℝ) : ℂ) * I) ?_
+    · simp only [ofReal_re, ofReal_im, add_re, add_im, mul_re, mul_im, I_re, I_im, ofReal_re,
+          ofReal_im, mul_zero, mul_one, sub_zero, zero_mul, add_zero, zero_add, ofReal_zero]
+        at hrect
+      have htop
+          : (∫ x : ℝ in x₁..x₂, f (x + ((2 * Real.pi : ℝ) : ℂ) * I))
+            = (∫ x : ℝ in x₁..x₂, f (x : ℂ)) + (m : ℂ) * ((x₂ - x₁ : ℝ) : ℂ) := by
+        have hc
+            : (∫ x : ℝ in x₁..x₂, f (x + ((2 * Real.pi : ℝ) : ℂ) * I))
+              = ∫ x : ℝ in x₁..x₂, (f (x : ℂ) + m) := by
           apply intervalIntegral.integral_congr
           intro x hx
           rw [Set.uIcc_of_le h12] at hx
@@ -67,7 +78,9 @@ theorem periodic_strip_shift_nonneg (c : ℝ) (f : ℂ → ℂ) (m : ℤ)
     · apply hf.mono
       intro z hz
       rw [Complex.mem_reProdIm] at hz
-      simp only [ofReal_re, add_re, mul_re, I_re, I_im, ofReal_im, mul_zero, mul_one, sub_zero, add_zero] at hz
+      simp only [ofReal_re, add_re, mul_re, I_re, I_im, ofReal_im, mul_zero, mul_one, sub_zero,
+          add_zero]
+        at hz
       rw [Set.uIcc_of_le h12] at hz
       show z.re < c
       linarith [hz.1.2]

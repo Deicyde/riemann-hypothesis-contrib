@@ -11,8 +11,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -20,11 +23,13 @@ namespace GlobalTheory.IsoLimitIdeal
 
 open ThickeningClosed
 
-theorem isIso_of_isClosedImmersion {V : Type} [CommRing V] [IsLocalRing V] [IsNoetherianRing V]
-    (I : Ideal V) (hI : I ≠ ⊤) {X Z : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of V)) [IsProper f] (j : Z ⟶ X)
-    [IsClosedImmersion j]
-    (h : ∀ n : ℕ, ∃ l : pullback f (thick V I n) ⟶ Z,
-      l ≫ j = pullback.fst f (thick V I n)) : IsIso j := by
+theorem isIso_of_isClosedImmersion
+    {V : Type} [CommRing V] [IsLocalRing V] [IsNoetherianRing V]
+    (I : Ideal V) (hI : I ≠ ⊤)
+    {X Z : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of V)) [IsProper f]
+    (j : Z ⟶ X) [IsClosedImmersion j]
+    (h : ∀ n : ℕ, ∃ l : pullback f (thick V I n) ⟶ Z, l ≫ j = pullback.fst f (thick V I n))
+    : IsIso j := by
   have : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian f
   have key : ∀ x, x ∈ zeroLocusOpen j.ker := by
     intro x
@@ -43,31 +48,34 @@ theorem isIso_of_isClosedImmersion {V : Type} [CommRing V] [IsLocalRing V] [IsNo
   obtain ⟨s, hs, hsa⟩ := exists_mul_eq_zero_of_mem j.ker U ⟨J, hJ.isPrime⟩ (key _) ha
   exact (IsLocalization.map_eq_zero_iff J.primeCompl _ a).2 ⟨⟨s, hs⟩, hsa⟩
 
-theorem main : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (I : Ideal R), I ≠ ⊤ → ∀ (Γ₁ Y : Over (Spec (CommRingCat.of R))) (p : Γ₁ ⟶ Y) [IsProper Y.hom] [IsProper p.left], (∀ e, IsIso ((Over.pullback (thick R I e)).map p)) → IsIso p := by
+theorem main
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (I : Ideal R),
+      I ≠ ⊤
+        → ∀ (Γ₁ Y : Over (Spec (CommRingCat.of R))) (p : Γ₁ ⟶ Y) [IsProper Y.hom] [IsProper p.left],
+          (∀ e, IsIso ((Over.pullback (thick R I e)).map p)) → IsIso p := by
   intro V _ _ _ I hI Γ₁ Y p _ _ h
   have hw : p.left ≫ Y.hom = Γ₁.hom := Over.w p
-  let q (e : ℕ) : pullback Γ₁.hom (thick V I e) ⟶
-      pullback Y.hom (thick V I e) :=
+  let q (e : ℕ) : pullback Γ₁.hom (thick V I e) ⟶ pullback Y.hom (thick V I e) :=
     ((Over.pullback (thick V I e)).map p).left
   have hq (e : ℕ) : IsIso (q e) := by
     haveI := h e
-    exact inferInstanceAs (IsIso ((Over.forget _).map
-      ((Over.pullback (thick V I e)).map p)))
+    exact inferInstanceAs (IsIso ((Over.forget _).map ((Over.pullback (thick V I e)).map p)))
   have q1 (e : ℕ) : q e ≫ pullback.fst _ _ = pullback.fst _ _ ≫ p.left := pullback.lift_fst _ _ _
   have q2 (e : ℕ) : q e ≫ pullback.snd _ _ = pullback.snd _ _ := pullback.lift_snd _ _ _
   have hd : IsIso (pullback.diagonal p.left) := by
-    refine isIso_of_isClosedImmersion I hI (pullback.fst p.left p.left ≫ p.left ≫ Y.hom) _ fun n ↦ ?_
-    have c := pullback.condition (f := pullback.fst p.left p.left ≫ p.left ≫ Y.hom)
-      (g := thick V I n)
+    refine isIso_of_isClosedImmersion I hI (pullback.fst p.left p.left ≫ p.left ≫ Y.hom) _ fun n ↦
+      ?_
+    have c :=
+      pullback.condition (f := pullback.fst p.left p.left ≫ p.left ≫ Y.hom) (g := thick V I n)
     have c' := pullback.condition (f := p.left) (g := p.left)
     set u := pullback.fst (pullback.fst p.left p.left ≫ p.left ≫ Y.hom)
       (thick V I n)
     set v := pullback.snd (pullback.fst p.left p.left ≫ p.left ≫ Y.hom)
       (thick V I n)
-    have e : pullback.lift (f := Γ₁.hom) (u ≫ pullback.fst _ _) v
-          (by rw [← c, ← hw, Category.assoc]) =
-        pullback.lift (f := Γ₁.hom) (u ≫ pullback.snd _ _) v
-          (by rw [← c, ← hw, Category.assoc, ← reassoc_of% c']) := by
+    have e
+        : pullback.lift (f := Γ₁.hom) (u ≫ pullback.fst _ _) v (by rw [← c, ← hw, Category.assoc])
+          = pullback.lift (f := Γ₁.hom) (u ≫ pullback.snd _ _) v
+            (by rw [← c, ← hw, Category.assoc, ← reassoc_of% c']) := by
       haveI := hq n
       rw [← cancel_mono (q n)]
       apply pullback.hom_ext
@@ -80,8 +88,7 @@ theorem main : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] 
     · simp
     · simp [e']
   have hm : Mono p.left := (pullback.isIso_diagonal_iff p.left).1 hd
-  have hc : IsClosedImmersion p.left :=
-    (IsClosedImmersion.iff_isProper_and_mono p.left).2 ⟨‹_›, hm⟩
+  have hc : IsClosedImmersion p.left := (IsClosedImmersion.iff_isProper_and_mono p.left).2 ⟨‹_›, hm⟩
   have hi : IsIso p.left := by
     refine isIso_of_isClosedImmersion I hI Y.hom _ fun n ↦ ?_
     haveI := hq n

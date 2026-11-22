@@ -19,8 +19,7 @@ private theorem delI_inj : Function.Injective D.delI := by
     intro k
     induction k with
     | zero => simp
-    | succ k ih =>
-      rw [pow_succ', Module.End.mul_apply, ih, map_nsmul, hg, smul_smul, ← pow_succ]
+    | succ k ih => rw [pow_succ', Module.End.mul_apply, ih, map_nsmul, hg, smul_smul, ← pow_succ]
   have h1 := hk D.n
   rw [D.gI_pow, Module.End.one_apply] at h1
   have ha : (2 : ℤ) ≤ D.a := by exact_mod_cast D.two_le
@@ -29,8 +28,7 @@ private theorem delI_inj : Function.Injective D.delI := by
   have hne : (D.a : ℤ) ^ D.n - 1 ≠ 0 := by
     norm_num at hp
     omega
-  have hc : ((D.a : ℤ) ^ D.n) • z = (D.a ^ D.n) • z := by
-    rw [← Nat.cast_pow, natCast_zsmul]
+  have hc : ((D.a : ℤ) ^ D.n) • z = (D.a ^ D.n) • z := by rw [← Nat.cast_pow, natCast_zsmul]
   refine D.tf _ z hne ?_
   rw [sub_smul, one_smul, hc, ← h1, sub_self]
 
@@ -43,8 +41,8 @@ private theorem d_tors {t : Y} (ht : t ∈ Submodule.torsion ℤ Y) : D.d t = 0 
   refine D.tf m _ (nonZeroDivisors.coe_ne_zero m) ?_
   rw [← map_zsmul, hm', map_zero]
 
-private theorem card_ker_eq_coker {C : Type} [AddCommGroup C] [Finite C] (f : C →ₗ[ℤ] C) :
-    Nat.card (LinearMap.ker f) = Nat.card (C ⧸ LinearMap.range f) := by
+private theorem card_ker_eq_coker {C : Type} [AddCommGroup C] [Finite C] (f : C →ₗ[ℤ] C)
+    : Nat.card (LinearMap.ker f) = Nat.card (C ⧸ LinearMap.range f) := by
   have h1 : Nat.card C = Nat.card (C ⧸ LinearMap.ker f) * Nat.card (LinearMap.ker f) :=
     AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup (LinearMap.ker f).toAddSubgroup
   have h2 : Nat.card C = Nat.card (C ⧸ LinearMap.range f) * Nat.card (LinearMap.range f) :=
@@ -64,12 +62,13 @@ private theorem exists_psi : ∃ ψ : D.U →ₗ[ℤ] I, ∀ u : D.U, D.delI (ψ
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.ZK.Ct.cardW :
-    ∀ (Y I : Type) [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I), Finite (I ⧸ LinearMap.range D.d) → Finite D.EQ → Finite D.ClQ ∧ Finite D.W ∧ Nat.card D.W = Nat.card D.EQ * Nat.card D.ClQ := by
+theorem UpperTheory.V.ZK.Ct.cardW
+    : ∀ (Y I : Type) [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I),
+      Finite (I ⧸ LinearMap.range D.d) → Finite D.EQ
+        → Finite D.ClQ ∧ Finite D.W ∧ Nat.card D.W = Nat.card D.EQ * Nat.card D.ClQ := by
   intro Y I _ _ D hC hE
   obtain ⟨ψ, hψ⟩ := exists_psi D
-  have hψ0 : ∀ u : D.U, D.d u = 0 → ψ u = 0 := fun u hu =>
-    delI_inj D (by rw [hψ, hu, map_zero])
+  have hψ0 : ∀ u : D.U, D.d u = 0 → ψ u = 0 := fun u hu => delI_inj D (by rw [hψ, hu, map_zero])
   let S := (LinearMap.range D.del ⊔ Submodule.torsion ℤ Y).submoduleOf D.U
   let p := LinearMap.range D.d
   have hpf : p ≤ p.comap D.delI := by
@@ -135,14 +134,16 @@ theorem UpperTheory.V.ZK.Ct.cardW :
       have hk0 : ψ (Submodule.inclusion hkU k) = 0 := hψ0 _ k.2
       change p.mkQ (ψ (Submodule.inclusion hkU k)) = 0
       rw [hk0, map_zero]
-  have hkerι : LinearMap.ker ι = (Submodule.map D.del (LinearMap.ker D.d) ⊔
-      Submodule.torsion ℤ Y).submoduleOf (LinearMap.ker D.d) := by
+  have hkerι
+      : LinearMap.ker ι
+        = (Submodule.map D.del (LinearMap.ker D.d) ⊔ Submodule.torsion ℤ Y).submoduleOf
+          (LinearMap.ker D.d) := by
     ext k
     rw [LinearMap.mem_ker]
     change S.mkQ (Submodule.inclusion hkU k) = 0 ↔ _
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
-    change (k : Y) ∈ LinearMap.range D.del ⊔ Submodule.torsion ℤ Y ↔
-      (k : Y) ∈ Submodule.map D.del (LinearMap.ker D.d) ⊔ Submodule.torsion ℤ Y
+    change (k : Y) ∈ LinearMap.range D.del ⊔ Submodule.torsion ℤ Y
+      ↔ (k : Y) ∈ Submodule.map D.del (LinearMap.ker D.d) ⊔ Submodule.torsion ℤ Y
     constructor
     · intro h
       obtain ⟨a, ⟨y, rfl⟩, t, ht, hat⟩ := Submodule.mem_sup.1 h
@@ -159,17 +160,20 @@ theorem UpperTheory.V.ZK.Ct.cardW :
   haveI : Finite (I ⧸ p) := hC
   haveI : Finite D.EQ := hE
   have hr : LinearMap.range f = Submodule.map p.mkQ (LinearMap.range D.delI) :=
-    calc LinearMap.range f = LinearMap.range (f ∘ₗ p.mkQ) :=
-          (LinearMap.range_comp_of_range_eq_top f (Submodule.range_mkQ p)).symm
+    calc
+      LinearMap.range f = LinearMap.range (f ∘ₗ p.mkQ) :=
+        (LinearMap.range_comp_of_range_eq_top f (Submodule.range_mkQ p)).symm
       _ = LinearMap.range (p.mkQ ∘ₗ D.delI) := by rw [Submodule.mapQ_mkQ]
       _ = Submodule.map p.mkQ (LinearMap.range D.delI) := LinearMap.range_comp _ _
   have hQ : Finite ((I ⧸ p) ⧸ Submodule.map p.mkQ (LinearMap.range D.delI)) :=
     Finite.of_surjective _ (Submodule.mkQ_surjective _)
   have hClQ : Finite D.ClQ :=
-    Finite.of_equiv _ (Submodule.quotientQuotientEquivQuotientSup p (LinearMap.range D.delI)).toEquiv
+    Finite.of_equiv _
+      (Submodule.quotientQuotientEquivQuotientSup p (LinearMap.range D.delI)).toEquiv
   have hcoker : Nat.card D.ClQ = Nat.card ((I ⧸ p) ⧸ LinearMap.range f) := by
     rw [hr]
-    exact Nat.card_congr (Submodule.quotientQuotientEquivQuotientSup p (LinearMap.range D.delI)).toEquiv.symm
+    exact Nat.card_congr (Submodule.quotientQuotientEquivQuotientSup p
+      (LinearMap.range D.delI)).toEquiv.symm
   have hkf := card_ker_eq_coker f
   have hEQ : Nat.card D.EQ = Nat.card (LinearMap.range ι) :=
     Nat.card_congr ((Submodule.quotEquivOfEq _ _ hkerι.symm).trans ι.quotKerEquivRange).toEquiv

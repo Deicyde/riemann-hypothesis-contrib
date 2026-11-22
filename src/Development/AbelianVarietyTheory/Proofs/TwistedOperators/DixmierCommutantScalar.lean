@@ -8,10 +8,13 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.How
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -21,9 +24,11 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem dixmier_aeval_injective {V : Type} [AddCommGroup V] [Module ℂ V] (T : Module.End ℂ V)
-    (hT : ∀ c : ℂ, Function.Injective ⇑(T - c • (1 : Module.End ℂ V))) (p : ℂ[X]) (hp : p ≠ 0) :
-    Function.Injective (aeval T p) := by
+theorem dixmier_aeval_injective
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (T : Module.End ℂ V) (hT : ∀ c : ℂ, Function.Injective ⇑(T - c • (1 : Module.End ℂ V)))
+    (p : ℂ[X]) (hp : p ≠ 0)
+    : Function.Injective (aeval T p) := by
   have hs := C_leadingCoeff_mul_prod_multiset_X_sub_C (p := p) IsAlgClosed.card_roots_eq_natDegree
   have hlin : ∀ a : ℂ, aeval T (X - C a) = T - a • 1 := by
     intro a; simp [Algebra.algebraMap_eq_smul_one]
@@ -31,12 +36,15 @@ theorem dixmier_aeval_injective {V : Type} [AddCommGroup V] [Module ℂ V] (T : 
     intro m
     induction m using Multiset.induction_on with
     | empty =>
-      simp only [Multiset.map_zero, Multiset.prod_zero, map_one, Module.End.one_eq_id, LinearMap.id_coe]
+      simp only [Multiset.map_zero, Multiset.prod_zero, map_one, Module.End.one_eq_id,
+        LinearMap.id_coe]
       exact Function.injective_id
     | cons a m ih =>
-      rw [Multiset.map_cons, Multiset.prod_cons, map_mul, Module.End.mul_eq_comp, LinearMap.coe_comp]
+      rw [Multiset.map_cons, Multiset.prod_cons, map_mul, Module.End.mul_eq_comp,
+        LinearMap.coe_comp]
       refine Function.Injective.comp ?_ ih
-      rw [hlin]; exact hT a
+      rw [hlin]
+      exact hT a
   rw [← hs, map_mul, Module.End.mul_eq_comp, LinearMap.coe_comp]
   refine Function.Injective.comp ?_ (key _)
   rw [aeval_C, Algebra.algebraMap_eq_smul_one]
@@ -44,10 +52,13 @@ theorem dixmier_aeval_injective {V : Type} [AddCommGroup V] [Module ℂ V] (T : 
   simp only [LinearMap.smul_apply, Module.End.one_apply] at hxy
   exact smul_right_injective V (leadingCoeff_ne_zero.mpr hp) hxy
 
-theorem dixmier_commutant_scalar (ι V : Type) [AddCommGroup V] [Module ℂ V] (ρ : ι → Module.End ℂ V)
+theorem dixmier_commutant_scalar
+    (ι V : Type) [AddCommGroup V] [Module ℂ V]
+    (ρ : ι → Module.End ℂ V)
     (hrank : Module.rank ℂ V ≤ Cardinal.aleph0)
     (hirr : ∀ N : Submodule ℂ V, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤)
-    (T : Module.End ℂ V) (hT : ∀ i, T * ρ i = ρ i * T) : ∃ c : ℂ, T = c • 1 := by
+    (T : Module.End ℂ V) (hT : ∀ i, T * ρ i = ρ i * T)
+    : ∃ c : ℂ, T = c • 1 := by
   by_contra hne
   push_neg at hne
   have hcomm : ∀ c : ℂ, ∀ i, (T - c • 1) * ρ i = ρ i * (T - c • 1) := by
@@ -56,19 +67,22 @@ theorem dixmier_commutant_scalar (ι V : Type) [AddCommGroup V] [Module ℂ V] (
     intro c
     rw [← LinearMap.ker_eq_bot]
     rcases hirr (LinearMap.ker (T - c • 1)) (fun i x hx => by
-      rw [LinearMap.mem_ker] at hx ⊢
-      rw [← Module.End.mul_apply, hcomm c i, Module.End.mul_apply, hx, map_zero]) with h | h
+        rw [LinearMap.mem_ker] at hx ⊢
+        rw [← Module.End.mul_apply, hcomm c i, Module.End.mul_apply, hx, map_zero])
+      with h | h
     · exact h
     · exact absurd (sub_eq_zero.mp (LinearMap.ker_eq_top.mp h)) (hne c)
   obtain ⟨v₀, hv₀⟩ : ∃ v : V, v ≠ 0 := by
-    by_contra h; push_neg at h
+    by_contra h
+    push_neg at h
     exact hne 0 (LinearMap.ext fun v => (h _).trans (h _).symm)
   have hsurj : ∀ c : ℂ, Function.Surjective ⇑(T - c • (1 : Module.End ℂ V)) := by
     intro c
     rw [← LinearMap.range_eq_top]
     rcases hirr (LinearMap.range (T - c • 1)) (fun i x hx => by
-      obtain ⟨y, rfl⟩ := hx
-      exact ⟨ρ i y, by rw [← Module.End.mul_apply, hcomm c i, Module.End.mul_apply]⟩) with h | h
+        obtain ⟨y, rfl⟩ := hx
+        exact ⟨ρ i y, by rw [← Module.End.mul_apply, hcomm c i, Module.End.mul_apply]⟩)
+      with h | h
     · exfalso
       have h1 : (T - c • 1) v₀ ∈ LinearMap.range (T - c • 1) := LinearMap.mem_range_self _ _
       rw [h, Submodule.mem_bot] at h1

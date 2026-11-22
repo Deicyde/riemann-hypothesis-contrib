@@ -8,15 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsSemi
 
 @[expose] public section
 
-open MvPolynomial Formalism.BasicNotions Formalism.GradedWeylDivisibility GlobalTheory.Branching GlobalTheory.GLDuality
+open MvPolynomial Formalism.BasicNotions Formalism.GradedWeylDivisibility GlobalTheory.Branching
+  GlobalTheory.GLDuality
 open Formalism.REAL (fockF)
 open scoped DirectSum TensorProduct Kronecker Matrix
 
 namespace GlobalTheory.GLDuality
 
-theorem matRep_diagGL_monomial {n n' : ℕ} (t : Fin n → ℂˣ) (d : Fin n' × Fin n →₀ ℕ) (c : ℂ) :
-    matRep n n' (diagGL ℂ n t, 1) (monomial d c) =
-      (∏ s, (t s : ℂ) ^ (Finsupp.weight (colW n' n) d s)) • monomial d c := by
+theorem matRep_diagGL_monomial {n n' : ℕ} (t : Fin n → ℂˣ) (d : Fin n' × Fin n →₀ ℕ) (c : ℂ)
+    : matRep n n' (diagGL ℂ n t, 1) (monomial d c)
+      = (∏ s, (t s : ℂ) ^ (Finsupp.weight (colW n' n) d s)) • monomial d c := by
   have hX : ∀ v : Fin n' × Fin n, matRep n n' (diagGL ℂ n t, 1) (X v) = (t v.2 : ℂ) • X v := by
     rintro ⟨a, s⟩
     rw [matRep_X, Finset.sum_eq_single a, Finset.sum_eq_single s]
@@ -30,7 +31,8 @@ theorem matRep_diagGL_monomial {n n' : ℕ} (t : Fin n → ℂˣ) (d : Fin n' ×
   induction d using Finsupp.induction_linear generalizing c with
   | zero => simp [matRep_apply]
   | add d e hd he =>
-    have h1 : (monomial (d + e) c : MvPolynomial (Fin n' × Fin n) ℂ) = monomial d c * monomial e 1 := by
+    have h1
+        : (monomial (d + e) c : MvPolynomial (Fin n' × Fin n) ℂ) = monomial d c * monomial e 1 := by
       rw [monomial_mul, mul_one]
     have hd' := hd c
     have he' := he 1
@@ -49,10 +51,10 @@ theorem matRep_diagGL_monomial {n n' : ℕ} (t : Fin n → ℂˣ) (d : Fin n' ×
       · simp
     · simp
 
-theorem matRep_diagGL_component {n n' : ℕ} (t : Fin n → ℂˣ) (μ : Fin n → ℕ)
-    (v : MvPolynomial (Fin n' × Fin n) ℂ) :
-    matRep n n' (diagGL ℂ n t, 1) (weightedHomogeneousComponent (colW n' n) μ v) =
-      (∏ s, (t s : ℂ) ^ μ s) • weightedHomogeneousComponent (colW n' n) μ v := by
+theorem matRep_diagGL_component
+    {n n' : ℕ} (t : Fin n → ℂˣ) (μ : Fin n → ℕ) (v : MvPolynomial (Fin n' × Fin n) ℂ)
+    : matRep n n' (diagGL ℂ n t, 1) (weightedHomogeneousComponent (colW n' n) μ v)
+      = (∏ s, (t s : ℂ) ^ μ s) • weightedHomogeneousComponent (colW n' n) μ v := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     rw [weightedHomogeneousComponent_apply, map_sum, Finset.smul_sum]
@@ -81,10 +83,11 @@ theorem torusPowChar_injective {n : ℕ} : Function.Injective (torusPowChar (n :
   have h' : (2 : ℕ) ^ μ a = 2 ^ ν a := by exact_mod_cast h1
   exact Nat.pow_right_injective le_rfl h'
 
-theorem weightedHomogeneousComponent_colW_mem (n n' : ℕ) (M : Submodule ℂ (MvPolynomial (Fin n' × Fin n) ℂ))
+theorem weightedHomogeneousComponent_colW_mem
+    (n n' : ℕ) (M : Submodule ℂ (MvPolynomial (Fin n' × Fin n) ℂ))
     (hM : ∀ t : Fin n → ℂˣ, ∀ v ∈ M, matRep n n' (diagGL ℂ n t, 1) v ∈ M) (ν : Fin n → ℕ)
-    (v : MvPolynomial (Fin n' × Fin n) ℂ) (hv : v ∈ M) :
-    weightedHomogeneousComponent (colW n' n) ν v ∈ M := by
+    (v : MvPolynomial (Fin n' × Fin n) ℂ) (hv : v ∈ M)
+    : weightedHomogeneousComponent (colW n' n) ν v ∈ M := by
   classical
   rw [← Subspace.forall_mem_dualAnnihilator_apply_eq_zero_iff]
   intro l hl
@@ -92,9 +95,11 @@ theorem weightedHomogeneousComponent_colW_mem (n n' : ℕ) (M : Submodule ℂ (M
   have hsum := sum_weightedHomogeneousComponent (colW n' n) v
   rw [finsum_eq_sum _ hfin] at hsum
   by_cases hν : ν ∈ hfin.toFinset
-  · have hli := (linearIndependent_monoidHom (Fin n → ℂˣ) ℂ).comp _ (torusPowChar_injective (n := n))
+  · have hli :=
+      (linearIndependent_monoidHom (Fin n → ℂˣ) ℂ).comp _ (torusPowChar_injective (n := n))
     refine linearIndependent_iff'.1 hli hfin.toFinset
-      (fun μ => l (weightedHomogeneousComponent (colW n' n) μ v)) ?_ ν hν
+      (fun μ => l (weightedHomogeneousComponent (colW n' n) μ v))
+      ?_ ν hν
     funext t
     have h0 := (Submodule.mem_dualAnnihilator l).1 hl _ (hM t v hv)
     set_option synthInstance.maxHeartbeats 100000 in

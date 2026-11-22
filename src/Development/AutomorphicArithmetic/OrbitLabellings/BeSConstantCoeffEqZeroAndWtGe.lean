@@ -9,21 +9,30 @@ public import Formalism.GaussJetBounds.OneLetterRadius
 open scoped BigOperators
 open Formalism.DworkPowerSeriesWeights Formalism.IncomingBounds UpperTheory.G2
 
-private theorem pos_add_mul {Lt : Type} {i : ℕ} {pos : Lt → ℕ → Lt} (hp : IsPos i pos) (z : Lt) (a k : ℕ) :
-    pos z (a + i * k) = pos z a := by
+private theorem pos_add_mul
+    {Lt : Type} {i : ℕ} {pos : Lt → ℕ → Lt} (hp : IsPos i pos) (z : Lt) (a k : ℕ)
+    : pos z (a + i * k) = pos z a := by
   induction k with
   | zero => simp
   | succ k ih => rw [Nat.mul_succ, ← add_assoc, ← hp.add, hp.period, ih]
 
-private theorem pos_congr {Lt : Type} {i : ℕ} {pos : Lt → ℕ → Lt} (hp : IsPos i pos) (z : Lt) {a b : ℕ}
-    (h : a ≡ b [MOD 2 * i]) : pos z a = pos z b := by
+private theorem pos_congr
+    {Lt : Type} {i : ℕ} {pos : Lt → ℕ → Lt} (hp : IsPos i pos) (z : Lt)
+    {a b : ℕ} (h : a ≡ b [MOD 2 * i])
+    : pos z a = pos z b := by
   have h' : a % i = b % i := Nat.ModEq.of_mul_left 2 h
   rw [← Nat.mod_add_div a i, ← Nat.mod_add_div b i, pos_add_mul hp, pos_add_mul hp, h']
 
-private theorem radii_sum_ge_one_opposite_parity {Lt : Type} {l i : ℕ} [NeZero i] (hl : (1 : ℝ) ≤ l) {pos : Lt → ℕ → Lt} (hp : IsPos i pos)
-    {sig : Lt → ℝ} (hs : IsRadii l pos sig) (r : Lt) (s s' : ZMod (2 * i)) (a b : ℕ) (hab : b ≤ a)
-    (hpar : s.val % 2 ≠ s'.val % 2) (h : s + (a : ZMod (2 * i)) = s' + (b : ZMod (2 * i))) :
-    1 ≤ (l : ℝ) ^ a * sig (pos r s.val) + (l : ℝ) ^ b * sig (pos r s'.val) := by
+private theorem radii_sum_ge_one_opposite_parity
+    {Lt : Type} {l i : ℕ} [NeZero i]
+    (hl : (1 : ℝ) ≤ l)
+    {pos : Lt → ℕ → Lt} (hp : IsPos i pos)
+    {sig : Lt → ℝ} (hs : IsRadii l pos sig)
+    (r : Lt)
+    (s s' : ZMod (2 * i))
+    (a b : ℕ) (hab : b ≤ a)
+    (hpar : s.val % 2 ≠ s'.val % 2) (h : s + (a : ZMod (2 * i)) = s' + (b : ZMod (2 * i)))
+    : 1 ≤ (l : ℝ) ^ a * sig (pos r s.val) + (l : ℝ) ^ b * sig (pos r s'.val) := by
   obtain ⟨e, rfl⟩ := Nat.exists_eq_add_of_le hab
   have h1 : ((s.val + e : ℕ) : ZMod (2 * i)) = ((s'.val : ℕ) : ZMod (2 * i)) := by
     push_cast at h ⊢
@@ -35,29 +44,47 @@ private theorem radii_sum_ge_one_opposite_parity {Lt : Type} {l i : ℕ} [NeZero
   have h4 := hs.2 (pos r s.val) e he
   rw [hp.add, pos_congr hp r h2] at h4
   have h5 : (1 : ℝ) ≤ (l : ℝ) ^ b := one_le_pow₀ hl
-  calc (1 : ℝ) = 1 * 1 := (one_mul _).symm
+  calc
+    (1 : ℝ)
+      = 1 * 1 := (one_mul _).symm
     _ ≤ (l : ℝ) ^ b * ((l : ℝ) ^ e * sig (pos r s.val) + sig (pos r s'.val)) :=
-        mul_le_mul h5 h4 zero_le_one (by linarith)
+      mul_le_mul h5 h4 zero_le_one (by linarith)
     _ = _ := by ring
 
-theorem UpperTheory.beS_constantCoeff_eq_zero_and_wtGe :
-    ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CharZero K] (l i : ℕ) [NeZero i], l.Prime → Odd l → ‖(l : K)‖ < 1 →
-    ∀ (K0 : Subfield K), Unram l K0 → ∀ ζ : K, IsPrimitiveRoot ζ (l ^ (2 * i) - 1) →
-    ∀ (Lt β : Type) [Fintype Lt] [Fintype β] [DecidableEq Lt] [DecidableEq β] (pos : Lt → ℕ → Lt), IsPos i pos →
-    ∀ sig : Lt → ℝ, IsRadii l pos sig → ∀ (R : Finset Lt) (sg : Lt → K) (be : Lt → MvPowerSeries (ZMod (2 * i)) K),
-    (∀ r ∈ R, sg r = 1 ∨ sg r = -1) → (∀ r ∈ R, BHyp l (2 * i) K0 ζ (be r)) →
-    MvPowerSeries.constantCoeff (beS (β := β) i pos R sg be) = 0 ∧
-      WtGe ‖(l : K)‖ (fun v : Lt × β => rho l + sig v.1) (1 / ((l : ℝ) - 1)) (beS (β := β) i pos R sg be) := by
+theorem UpperTheory.beS_constantCoeff_eq_zero_and_wtGe
+    : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CharZero K] (l i : ℕ) [NeZero i],
+      l.Prime → Odd l → ‖(l : K)‖ < 1
+        → ∀ (K0 : Subfield K),
+          Unram l K0
+            → ∀ ζ : K,
+              IsPrimitiveRoot ζ (l ^ (2 * i) - 1)
+                → ∀ (Lt β : Type) [Fintype Lt] [Fintype β] [DecidableEq Lt] [DecidableEq β]
+                    (pos : Lt → ℕ → Lt),
+                  IsPos i pos
+                    → ∀ sig : Lt → ℝ,
+                      IsRadii l pos sig
+                        → ∀ (R : Finset Lt) (sg : Lt → K)
+                            (be : Lt → MvPowerSeries (ZMod (2 * i)) K),
+                          (∀ r ∈ R, sg r = 1 ∨ sg r = -1) → (∀ r ∈ R, BHyp l (2 * i) K0 ζ (be r))
+                            → MvPowerSeries.constantCoeff (beS (β := β) i pos R sg be) = 0
+                              ∧ WtGe ‖(l : K)‖
+                                (fun v : Lt × β => rho l + sig v.1)
+                                (1 / ((l : ℝ) - 1)) (beS (β := β) i pos R sg be) := by
   intro K _ _ _ l i _ hl hodd hpi K0 hK0 ζ hζ Lt β _ _ _ _ pos hp sig hs R sg be hsg hbe
   have hl1 : (1 : ℝ) ≤ l := by exact_mod_cast hl.one_le
   have h0 : 0 < ‖(l : K)‖ := norm_pos_iff.mpr (Nat.cast_ne_zero.mpr hl.ne_zero)
   have h1 : ‖(l : K)‖ ≤ 1 := hpi.le
   have hi : 2 ≤ 2 * i := by have := NeZero.pos i; omega
-  have hX0 : ∀ (r : Lt) (b : β) (s : ZMod (2 * i)),
-      MvPowerSeries.constantCoeff (MvPowerSeries.X (pos r s.val, b) : MvPowerSeries (Lt × β) K) = 0 :=
-    fun r b s => MvPowerSeries.constantCoeff_X _
-  have hXw : ∀ v : Lt × β, WtGe ‖(l : K)‖ (fun v : Lt × β => rho l + sig v.1) (rho l + sig v.1)
-      (MvPowerSeries.X v : MvPowerSeries (Lt × β) K) := by
+  have hX0
+      : ∀ (r : Lt) (b : β) (s : ZMod (2 * i)),
+        MvPowerSeries.constantCoeff (MvPowerSeries.X (pos r s.val, b) : MvPowerSeries (Lt × β) K)
+          = 0 := fun r b s =>
+    MvPowerSeries.constantCoeff_X _
+  have hXw
+      : ∀ v : Lt × β,
+        WtGe ‖(l : K)‖
+          (fun v : Lt × β => rho l + sig v.1)
+          (rho l + sig v.1) (MvPowerSeries.X v : MvPowerSeries (Lt × β) K) := by
     intro v n
     rw [monoWtGe_iff, MvPowerSeries.coeff_X]
     split_ifs with h
@@ -82,8 +109,11 @@ theorem UpperTheory.beS_constantCoeff_eq_zero_and_wtGe :
     exact MvPowerSeries.constantCoeff_subst_eq_zero
       (MvPowerSeries.hasSubst_of_constantCoeff_zero (hX0 r b)) (hX0 r b) hbe0
   · refine wtGe_sum h0 _ _ fun r hr => ?_
-    obtain ⟨hS1, hS2⟩ := lemmaS K l (2 * i) hl hodd hi (even_two_mul i) hpi K0 hK0 ζ hζ (be r) (hbe r hr)
-    have hbeR : WtGe ‖(l : K)‖ (fun s : ZMod (2 * i) => rho l + sig (pos r s.val)) (1 / ((l : ℝ) - 1)) (be r) := by
+    obtain ⟨hS1, hS2⟩ :=
+      lemmaS K l (2 * i) hl hodd hi (even_two_mul i) hpi K0 hK0 ζ hζ (be r) (hbe r hr)
+    have hbeR : WtGe ‖(l : K)‖
+        (fun s : ZMod (2 * i) => rho l + sig (pos r s.val))
+        (1 / ((l : ℝ) - 1)) (be r) := by
       intro n
       by_cases hb : IsBiPower l n
       · obtain ⟨s, s', α, γ, hs0, hs', _, hsum, rfl⟩ := hb
@@ -104,5 +134,7 @@ theorem UpperTheory.beS_constantCoeff_eq_zero_and_wtGe :
       rw [norm_div, hs1]
       exact (div_le_one (lt_of_lt_of_le one_pos h2)).mpr h2
     refine asmOne_smul_wt hsg1 (wtGe_sum h0 _ _ fun b _ => ?_)
-    exact substitution_weight_bound K ‖(l : K)‖ h0 hpi (ZMod (2 * i)) (Lt × β) _ _ _ _ (be r) (hX0 r b)
-      (fun s => hXw (pos r s.val, b)) hbeR
+    exact substitution_weight_bound K ‖(l : K)‖ h0 hpi (ZMod (2 * i)) (Lt × β) _ _ _ _ (be r)
+      (hX0 r b)
+      (fun s => hXw (pos r s.val, b))
+      hbeR

@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.CharDeriv
 
-theorem hasDerivAt_of_continuous_hom :
-    ∀ (χ : ℝ → ℂ), Continuous χ → χ 0 = 1 → (∀ s t, χ (s + t) = χ s * χ t) →
-      ∃ c : ℂ, ∀ t, HasDerivAt χ (c * χ t) t := by
+theorem hasDerivAt_of_continuous_hom
+    : ∀ (χ : ℝ → ℂ),
+      Continuous χ → χ 0 = 1 → (∀ s t, χ (s + t) = χ s * χ t)
+        → ∃ c : ℂ, ∀ t, HasDerivAt χ (c * χ t) t := by
   intro χ hc h0 hadd
   have hP : ∀ x : ℝ, HasDerivAt (fun y : ℝ => ∫ s in (0 : ℝ)..y, χ s) (χ x) x := fun x =>
     intervalIntegral.integral_hasDerivAt_right (hc.intervalIntegrable _ _)
@@ -22,8 +23,11 @@ theorem hasDerivAt_of_continuous_hom :
     have h2 := h1.unique (hasDerivAt_const (0 : ℝ) (0 : ℂ))
     rw [h0] at h2
     exact one_ne_zero h2
-  have key : ∀ t : ℝ, χ t = ((∫ s in (0 : ℝ)..(t + δ), χ s) - ∫ s in (0 : ℝ)..t, χ s) /
-      (∫ s in (0 : ℝ)..δ, χ s) := by
+  have key
+      : ∀ t : ℝ,
+        χ t
+          = ((∫ s in (0 : ℝ)..(t + δ), χ s) - ∫ s in (0 : ℝ)..t, χ s)
+            / (∫ s in (0 : ℝ)..δ, χ s) := by
     intro t
     rw [eq_div_iff hI, ← intervalIntegral.integral_const_mul]
     have h1 : (∫ s in (0 : ℝ)..δ, χ t * χ s) = ∫ u in t..(t + δ), χ u := by
@@ -35,13 +39,16 @@ theorem hasDerivAt_of_continuous_hom :
     exact (intervalIntegral.integral_interval_sub_left (hc.intervalIntegrable _ _)
       (hc.intervalIntegrable _ _)).symm
   refine ⟨(χ δ - 1) / (∫ s in (0 : ℝ)..δ, χ s), fun t => ?_⟩
-  have hD : HasDerivAt (fun y : ℝ => ((∫ s in (0 : ℝ)..(y + δ), χ s) - ∫ s in (0 : ℝ)..y, χ s) /
-      (∫ s in (0 : ℝ)..δ, χ s)) ((χ (t + δ) - χ t) / (∫ s in (0 : ℝ)..δ, χ s)) t := by
+  have hD : HasDerivAt
+      (fun y : ℝ =>
+        ((∫ s in (0 : ℝ)..(y + δ), χ s) - ∫ s in (0 : ℝ)..y, χ s) / (∫ s in (0 : ℝ)..δ, χ s))
+      ((χ (t + δ) - χ t) / (∫ s in (0 : ℝ)..δ, χ s)) t := by
     have h3 : HasDerivAt (fun y : ℝ => ∫ s in (0 : ℝ)..(y + δ), χ s) (χ (t + δ)) t := by
       simpa using (hP (t + δ)).comp_add_const t δ
     exact (h3.sub (hP t)).div_const _
-  have hval : (χ δ - 1) / (∫ s in (0 : ℝ)..δ, χ s) * χ t =
-      (χ (t + δ) - χ t) / (∫ s in (0 : ℝ)..δ, χ s) := by
+  have hval
+      : (χ δ - 1) / (∫ s in (0 : ℝ)..δ, χ s) * χ t
+        = (χ (t + δ) - χ t) / (∫ s in (0 : ℝ)..δ, χ s) := by
     rw [hadd t δ]
     ring
   rw [hval]

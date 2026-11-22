@@ -11,25 +11,30 @@ open scoped TensorProduct
 open GlobalTheory.LKInvGood
 open GlobalTheory.LocMatrix in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.localOrderTensorPadic_free_almost_all : ∀ (F B : Type) [Field F] [NumberField F] [Ring B] [Algebra F B] [Algebra ℚ B]
-    [IsScalarTower ℚ F B] [FiniteDimensional F B] (Λ : Subring B)
-    (hΛ : ∀ a : NumberField.RingOfIntegers F, algebraMap F B (a : F) ∈ Λ),
-    Module.Finite ℤ Λ → (∀ b : B, ∃ m : ℕ, 0 < m ∧ (m : B) * b ∈ Λ) →
-    ∃ N : ℕ, 0 < N ∧ ∀ (ℓ : ℕ) [Fact ℓ.Prime], ¬ ℓ ∣ N →
-      letI := GlobalTheory.LocMatrix.cenAlgebra ℓ F B Λ hΛ;
-      Module.Free (cenOrder ℓ F) (locOrder ℓ Λ) ∧
-        Module.finrank (cenOrder ℓ F) (locOrder ℓ Λ) = Module.finrank F B := by
+theorem _root_.GlobalTheory.T.localOrderTensorPadic_free_almost_all
+    : ∀ (F B : Type) [Field F] [NumberField F] [Ring B] [Algebra F B] [Algebra ℚ B]
+        [IsScalarTower ℚ F B] [FiniteDimensional F B] (Λ : Subring B)
+        (hΛ : ∀ a : NumberField.RingOfIntegers F, algebraMap F B (a : F) ∈ Λ),
+      Module.Finite ℤ Λ → (∀ b : B, ∃ m : ℕ, 0 < m ∧ (m : B) * b ∈ Λ)
+        → ∃ N : ℕ,
+          0 < N
+            ∧ ∀ (ℓ : ℕ) [Fact ℓ.Prime],
+              ¬ ℓ ∣ N
+                → letI := GlobalTheory.LocMatrix.cenAlgebra ℓ F B Λ hΛ
+                  Module.Free (cenOrder ℓ F) (locOrder ℓ Λ)
+                    ∧ Module.finrank (cenOrder ℓ F) (locOrder ℓ Λ) = Module.finrank F B := by
   intro F B _ _ _ _ _ _ _ Λ hΛ hfin hspan
   obtain ⟨v, hvΛ⟩ := exists_basis_mem (F := F) Λ hspan
   obtain ⟨D, hD, hDΛ⟩ := exists_den Λ hfin v
   refine ⟨D, hD, fun ℓ _ hℓ => ?_⟩
   let inst := GlobalTheory.LocMatrix.cenAlgebra ℓ F B Λ hΛ
-  have hBasis : Nonempty (Module.Basis (Fin (Module.finrank F B)) (cenOrder ℓ F) (locOrder ℓ Λ)) := by
+  have hBasis
+      : Nonempty (Module.Basis (Fin (Module.finrank F B)) (cenOrder ℓ F) (locOrder ℓ Λ)) := by
     let w : Fin (Module.finrank F B) → locOrder ℓ Λ := fun i =>
       ⟨(1 : ℚ_[ℓ]) ⊗ₜ v i, Algebra.subset_adjoin ⟨_, hvΛ i, rfl⟩⟩
-    have hsum (c : Fin (Module.finrank F B) → cenOrder ℓ F) :
-        ((∑ i, c i • w i : locOrder ℓ Λ) : ℚ_[ℓ] ⊗[ℚ] B) =
-          combMap (F := F) ℓ v (fun i => (c i : ℚ_[ℓ] ⊗[ℚ] F)) := by
+    have hsum (c : Fin (Module.finrank F B) → cenOrder ℓ F)
+        : ((∑ i, c i • w i : locOrder ℓ Λ) : ℚ_[ℓ] ⊗[ℚ] B)
+          = combMap (F := F) ℓ v (fun i => (c i : ℚ_[ℓ] ⊗[ℚ] F)) := by
       rw [AddSubmonoidClass.coe_finsetSum, combMap_apply]
       rfl
     have hli : LinearIndependent (cenOrder ℓ F) w := by

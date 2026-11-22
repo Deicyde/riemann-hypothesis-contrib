@@ -20,36 +20,43 @@ section Values
 variable {κ : Type*} [Fintype κ] {ι : κ → Type*} [∀ k, Fintype (ι k)] {Ω : Type*} [Field Ω]
 
 def IsValueAt (y : (Σ k, ι k) → Ω) (a : Ω) (z : (Σ k, ι k) → ℂ) (v : ℂ) : Prop :=
-  ∃ (d : κ → ℕ) (g h : MRing ι), IsMultiHomog g d ∧ IsMultiHomog h d ∧ aeval y h ≠ 0 ∧
-    aeval y g = a * aeval y h ∧ eval z (map (Int.castRingHom ℂ) h) ≠ 0 ∧
-    eval z (map (Int.castRingHom ℂ) g) = v * eval z (map (Int.castRingHom ℂ) h)
+  ∃ (d : κ → ℕ) (g h : MRing ι),
+    IsMultiHomog g d ∧ IsMultiHomog h d ∧ aeval y h ≠ 0 ∧ aeval y g = a * aeval y h
+      ∧ eval z (map (Int.castRingHom ℂ) h) ≠ 0
+      ∧ eval z (map (Int.castRingHom ℂ) g) = v * eval z (map (Int.castRingHom ℂ) h)
 
-def RegularAt (y : (Σ k, ι k) → Ω) (a : Ω) (z : (Σ k, ι k) → ℂ) : Prop :=
-  ∃ v, IsValueAt y a z v
-
+def RegularAt (y : (Σ k, ι k) → Ω) (a : Ω) (z : (Σ k, ι k) → ℂ) : Prop := ∃ v, IsValueAt y a z v
 
 open Classical in
-def valAt (y : (Σ k, ι k) → Ω) (a : Ω) (z : (Σ k, ι k) → ℂ) : ℂ :=
-  by classical
-     exact if h : RegularAt y a z then h.choose else 0
+def valAt (y : (Σ k, ι k) → Ω) (a : Ω) (z : (Σ k, ι k) → ℂ) : ℂ := by
+  classical
+  exact if h : RegularAt y a z then h.choose else 0
 
 end Values
 
 section Frames
 
-variable {κ : Type*} [Fintype κ] {ι : κ → Type*} [∀ k, Fintype (ι k)] {Ω : Type*} [Field Ω]
+variable
+  {κ : Type*} [Fintype κ]
+  {ι : κ → Type*} [∀ k, Fintype (ι k)]
+  {Ω : Type*} [Field Ω]
   {N : ℕ} {E : Type*} [AddCommGroup E] [Module Ω E]
 
-def IsLocSection (y : (Σ k, ι k) → Ω) (W : ChartBundle ℤ (NumbersDVR.segreVec y) N E)
-    (z : (Σ k, ι k) → ℂ) (e : E) : Prop :=
-  ∃ c : ∀ k, ι k, (∀ k, z ⟨k, c k⟩ ≠ 0) ∧ ∃ (m : ℕ) (a : Fin m → Ω) (s : Fin m → E),
-    (∀ l, s l ∈ W.lat c) ∧ (∀ l, RegularAt y (a l) z) ∧ e = ∑ l, a l • s l
+def IsLocSection
+    (y : (Σ k, ι k) → Ω) (W : ChartBundle ℤ (NumbersDVR.segreVec y) N E)
+    (z : (Σ k, ι k) → ℂ) (e : E)
+    : Prop :=
+  ∃ c : ∀ k, ι k,
+    (∀ k, z ⟨k, c k⟩ ≠ 0)
+      ∧ ∃ (m : ℕ) (a : Fin m → Ω) (s : Fin m → E),
+        (∀ l, s l ∈ W.lat c) ∧ (∀ l, RegularAt y (a l) z) ∧ e = ∑ l, a l • s l
 
-def IsFrameAt (y : (Σ k, ι k) → Ω) (W : ChartBundle ℤ (NumbersDVR.segreVec y) N E)
-    (z : (Σ k, ι k) → ℂ) (b : Fin N → E) : Prop :=
-  (∀ q, IsLocSection y W z (b q)) ∧
-    ∀ e, IsLocSection y W z e → ∃ a : Fin N → Ω, (∀ q, RegularAt y (a q) z) ∧ e = ∑ q, a q • b q
-
+def IsFrameAt
+    (y : (Σ k, ι k) → Ω) (W : ChartBundle ℤ (NumbersDVR.segreVec y) N E)
+    (z : (Σ k, ι k) → ℂ) (b : Fin N → E)
+    : Prop :=
+  (∀ q, IsLocSection y W z (b q))
+    ∧ ∀ e, IsLocSection y W z e → ∃ a : Fin N → Ω, (∀ q, RegularAt y (a q) z) ∧ e = ∑ q, a q • b q
 
 end Frames
 

@@ -12,32 +12,39 @@ namespace AAInvW
 
 open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.C3
 
-theorem ly_Eab_left {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (H : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n) (F : Matrix (Fin n) (Fin n) ℂ → E) (s : Matrix (Fin n) (Fin n) ℂ) :
-    EabH H a b (fun x => F (s * x)) = fun x => EabH H a b F (s * x) := by
+theorem ly_Eab_left
+    {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (H : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n) (F : Matrix (Fin n) (Fin n) ℂ → E)
+    (s : Matrix (Fin n) (Fin n) ℂ)
+    : EabH H a b (fun x => F (s * x)) = fun x => EabH H a b F (s * x) := by
   funext x
   simp only [EabH, RdV, Matrix.mul_assoc]
 
-theorem ly_Top_left {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+theorem ly_Top_left
+    {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
     (H : Matrix (Fin n) (Fin n) ℂ) (v : ℂ) (a b : Fin n) (F : Matrix (Fin n) (Fin n) ℂ → E)
-    (s : Matrix (Fin n) (Fin n) ℂ) :
-    Formalism.QuantumDeterminants.Top (EabH H) v a b (fun x => F (s * x)) = fun x => Formalism.QuantumDeterminants.Top (EabH H) v a b F (s * x) := by
+    (s : Matrix (Fin n) (Fin n) ℂ)
+    : Formalism.QuantumDeterminants.Top (EabH H) v a b (fun x => F (s * x))
+      = fun x => Formalism.QuantumDeterminants.Top (EabH H) v a b F (s * x) := by
   funext x
   simp only [Formalism.QuantumDeterminants.Top, EabH, RdV, Matrix.mul_assoc]
 
-theorem ly_foldr_comm {X E : Type*} (L : (X → E) → (X → E)) (l : List ((X → E) → (X → E)))
-    (hl : ∀ T ∈ l, ∀ f, T (L f) = L (T f)) (f : X → E) :
-    l.foldr (fun T h => T h) (L f) = L (l.foldr (fun T h => T h) f) := by
+theorem ly_foldr_comm
+    {X E : Type*} (L : (X → E) → (X → E)) (l : List ((X → E) → (X → E)))
+    (hl : ∀ T ∈ l, ∀ f, T (L f) = L (T f)) (f : X → E)
+    : l.foldr (fun T h => T h) (L f) = L (l.foldr (fun T h => T h) f) := by
   induction l with
   | nil => rfl
   | cons T l ih =>
     simp only [List.foldr_cons]
     rw [ih (fun T' hT' => hl T' (by simp [hT'])), hl T (by simp)]
 
-theorem ly_qminor_left {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (H : Matrix (Fin n) (Fin n) ℂ) {t : ℕ} (a b : Fin t → Fin n) (u : ℂ) (F : Matrix (Fin n) (Fin n) ℂ → E)
-    (s x : Matrix (Fin n) (Fin n) ℂ) :
-    qminorOp (EabH H) a b u (fun y => F (s * y)) x = qminorOp (EabH H) a b u F (s * x) := by
+theorem ly_qminor_left
+    {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (H : Matrix (Fin n) (Fin n) ℂ)
+    {t : ℕ} (a b : Fin t → Fin n)
+    (u : ℂ) (F : Matrix (Fin n) (Fin n) ℂ → E) (s x : Matrix (Fin n) (Fin n) ℂ)
+    : qminorOp (EabH H) a b u (fun y => F (s * y)) x = qminorOp (EabH H) a b u F (s * x) := by
   unfold qminorOp
   rw [Finset.sum_apply, Finset.sum_apply]
   refine Finset.sum_congr rfl (fun σ _ => ?_)

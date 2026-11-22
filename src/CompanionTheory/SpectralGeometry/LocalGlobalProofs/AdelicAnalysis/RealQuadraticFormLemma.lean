@@ -53,14 +53,16 @@ lemma integral_series {Pr : Measure Ω} {s : Z → Ω → ℂ} (hm : ∀ z, Meas
 
 variable [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V]
 
-theorem fourier_series {Pr : Measure Ω} {s : Z → Ω → ℂ} (hm : ∀ z, Measurable (s z))
-    (hfin : ∫⁻ ω, ∑' z, ‖s z ω‖ₑ ∂Pr ≠ ∞) {μ : Measure V} [IsFiniteMeasure μ]
+theorem fourier_series
+    {Pr : Measure Ω} {s : Z → Ω → ℂ}
+    (hm : ∀ z, Measurable (s z)) (hfin : ∫⁻ ω, ∑' z, ‖s z ω‖ₑ ∂Pr ≠ ∞)
+    {μ : Measure V} [IsFiniteMeasure μ]
     {u : Z → V → ℂ} (hu : ∀ z, Continuous (u z)) (hun : ∀ z x, ‖u z x‖ = 1)
-    {v : V → ℂ} (hv : Continuous v) (hvn : ∀ x, ‖v x‖ = 1) (Sel : Set Z) (Vol : ℂ)
-    (h1 : ∀ z ∈ Sel, ∫ x, u z x * v x ∂μ = Vol)
-    (h0 : ∀ z ∉ Sel, (∫ x, u z x * v x ∂μ = 0) ∨ ∀ ω, s z ω = 0) :
-    Integrable (fun x => (∫ ω, ∑' z, u z x * s z ω ∂Pr) * v x) μ ∧
-      ∫ x, (∫ ω, ∑' z, u z x * s z ω ∂Pr) * v x ∂μ = Vol * ∑' z : Sel, ∫ ω, s z.1 ω ∂Pr := by
+    {v : V → ℂ} (hv : Continuous v) (hvn : ∀ x, ‖v x‖ = 1)
+    (Sel : Set Z) (Vol : ℂ) (h1 : ∀ z ∈ Sel, ∫ x, u z x * v x ∂μ = Vol)
+    (h0 : ∀ z ∉ Sel, (∫ x, u z x * v x ∂μ = 0) ∨ ∀ ω, s z ω = 0)
+    : Integrable (fun x => (∫ ω, ∑' z, u z x * s z ω ∂Pr) * v x) μ
+      ∧ ∫ x, (∫ ω, ∑' z, u z x * s z ω ∂Pr) * v x ∂μ = Vol * ∑' z : Sel, ∫ ω, s z.1 ω ∂Pr := by
   set S : Z → ℂ := fun z => ∫ ω, s z ω ∂Pr with hS
   have hSs : Summable fun z => ‖S z‖ := summable_norm_integral hm hfin
   have hA : ∀ x, ∫ ω, ∑' z, u z x * s z ω ∂Pr = ∑' z, u z x * S z := fun x =>
@@ -104,17 +106,21 @@ theorem fourier_series {Pr : Measure Ω} {s : Z → Ω → ℂ} (hm : ∀ z, Mea
   simp_rw [hval]
   rw [← tsum_subtype, tsum_mul_left]
 
-theorem sum_selected {Pr : Measure Ω} {s : Z → Ω → ℂ} (hm : ∀ z, Measurable (s z))
-    (hfin : ∫⁻ ω, ∑' z, ‖s z ω‖ₑ ∂Pr ≠ ∞) (hpos : ∀ z ω, s z ω = ((‖s z ω‖ : ℝ) : ℂ)) (Sel : Set Z) :
-    ∑' z : Sel, ∫ ω, s z.1 ω ∂Pr = (((∫⁻ ω, ∑' z : Sel, ‖s z.1 ω‖ₑ ∂Pr).toReal : ℝ) : ℂ) := by
+theorem sum_selected
+    {Pr : Measure Ω} {s : Z → Ω → ℂ} (hm : ∀ z, Measurable (s z))
+    (hfin : ∫⁻ ω, ∑' z, ‖s z ω‖ₑ ∂Pr ≠ ∞) (hpos : ∀ z ω, s z ω = ((‖s z ω‖ : ℝ) : ℂ))
+    (Sel : Set Z)
+    : ∑' z : Sel, ∫ ω, s z.1 ω ∂Pr = (((∫⁻ ω, ∑' z : Sel, ‖s z.1 ω‖ₑ ∂Pr).toReal : ℝ) : ℂ) := by
   have hS : ∀ z : Z, ∫ ω, s z ω ∂Pr = (((∫⁻ ω, ‖s z ω‖ₑ ∂Pr).toReal : ℝ) : ℂ) := by
     intro z
     rw [← integral_norm_eq_lintegral_enorm (hm z).aestronglyMeasurable, ← integral_complex_ofReal]
     exact integral_congr_ae (Filter.Eventually.of_forall fun ω => hpos z ω)
   simp_rw [hS]
   rw [lintegral_tsum (f := fun (z : Sel) ω => ‖s z.1 ω‖ₑ) fun z => (hm z.1).enorm.aemeasurable,
-    ENNReal.tsum_toReal_eq (f := fun z : Sel => ∫⁻ ω, ‖s z.1 ω‖ₑ ∂Pr)
-      fun z => term_lint_ne_top hm hfin z.1, Complex.ofReal_tsum]
+    ENNReal.tsum_toReal_eq
+      (f := fun z : Sel => ∫⁻ ω, ‖s z.1 ω‖ₑ ∂Pr)
+      fun z => term_lint_ne_top hm hfin z.1,
+    Complex.ofReal_tsum]
 
 end Series
 

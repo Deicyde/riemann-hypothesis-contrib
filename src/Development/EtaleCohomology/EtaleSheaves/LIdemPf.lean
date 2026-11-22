@@ -65,7 +65,9 @@ theorem LIdem_of : LateralTheory.E.HensIdemCut.LIdem := by
     | succ n =>
       have hp : e ^ (n + 1) = e := IsIdempotentElem.pow_succ_eq n he
       have h1 : e * (e - 1) ^ (n + 1) = 0 := by
-        calc e * (e - 1) ^ (n + 1) = (e * e - e) * (e - 1) ^ n := by ring
+        calc
+          e * (e - 1) ^ (n + 1)
+            = (e * e - e) * (e - 1) ^ n := by ring
           _ = 0 := by rw [he, sub_self, zero_mul]
       rw [hp] at hsum' ⊢
       linear_combination e * hsum' - α * he - γ * h1

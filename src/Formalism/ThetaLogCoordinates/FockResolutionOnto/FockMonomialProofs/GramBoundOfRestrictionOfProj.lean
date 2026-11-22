@@ -9,18 +9,21 @@ public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProof
 
 namespace Formalism.InvariantFactorPaths.L4
 
-open Formalism.GM Formalism.GM.M Formalism.GM.TM Formalism.GM.MeanGammaLemmas Formalism.CountingSumsFrames MvPolynomial Finset
+open Formalism.GM Formalism.GM.M Formalism.GM.TM Formalism.GM.MeanGammaLemmas
+  Formalism.CountingSumsFrames MvPolynomial Finset
 
 section Gen
 
 variable {p : ℕ} [Fact p.Prime] {σ : Type}
 
-private theorem coeff_initPart_eq_ite (v : σ) (e : ℕ) (f : MvPolynomial σ ℚ_[p]) (n : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (initPart v e f) n = if n v = e then AddMonoidAlgebra.coeff f n else 0 := by
+private theorem coeff_initPart_eq_ite (v : σ) (e : ℕ) (f : MvPolynomial σ ℚ_[p]) (n : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (initPart v e f) n
+      = if n v = e then AddMonoidAlgebra.coeff f n else 0 := by
   classical
   unfold initPart
   rw [coeff_sum]
-  simp only [apply_ite (AddMonoidAlgebra.coeff · n), coeff_monomial, AddMonoidAlgebra.coeff_zero, Pi.zero_apply]
+  simp only [apply_ite (AddMonoidAlgebra.coeff · n), coeff_monomial, AddMonoidAlgebra.coeff_zero,
+    Pi.zero_apply]
   rw [Finset.sum_eq_single n]
   · by_cases h : n v = e <;> simp [h]
   · intro b _ hb
@@ -32,23 +35,23 @@ private theorem coeff_initPart_eq_ite (v : σ) (e : ℕ) (f : MvPolynomial σ �
 theorem p_pow_ne_zero (n : ℕ) : ((p : ℚ_[p]) ^ n) ≠ 0 :=
   pow_ne_zero _ (Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero)
 
-noncomputable def strip (p : ℕ) [Fact p.Prime] (v : σ) (e : ℕ) :
-    MvPolynomial σ ℚ_[p] →ₗ[ℚ_[p]] MvPolynomial σ ℚ_[p] where
+noncomputable def strip (p : ℕ) [Fact p.Prime] (v : σ) (e : ℕ)
+    : MvPolynomial σ ℚ_[p] →ₗ[ℚ_[p]] MvPolynomial σ ℚ_[p] where
   toFun f := (initPart v e f).divMonomial (Finsupp.single v e)
-  map_add' x y := by
-    rw [initPart_add]; ext m; simp only [coeff_divMonomial, MvPolynomial.coeff_add]
+  map_add' x y := by rw [initPart_add]; ext m; simp only [coeff_divMonomial, MvPolynomial.coeff_add]
   map_smul' a x := by
     rw [initPart_smul]; ext m; simp only [coeff_divMonomial, coeff_smul, RingHom.id_apply]
 
-theorem coeff_strip (v : σ) (e : ℕ) (n : σ →₀ ℕ) (f : MvPolynomial σ ℚ_[p]) :
-    AddMonoidAlgebra.coeff (strip p v e f) n = if n v = 0 then AddMonoidAlgebra.coeff f (Finsupp.single v e + n) else 0 := by
+theorem coeff_strip (v : σ) (e : ℕ) (n : σ →₀ ℕ) (f : MvPolynomial σ ℚ_[p])
+    : AddMonoidAlgebra.coeff (strip p v e f) n
+      = if n v = 0 then AddMonoidAlgebra.coeff f (Finsupp.single v e + n) else 0 := by
   classical
   show AddMonoidAlgebra.coeff ((initPart v e f).divMonomial (Finsupp.single v e)) n = _
   rw [coeff_divMonomial, coeff_initPart_eq_ite]
   by_cases h : n v = 0 <;> simp [h]
 
-theorem strip_monomial_ne (v : σ) (e : ℕ) (m : σ →₀ ℕ) (hm : m v ≠ e) :
-    strip p v e (monomial m 1) = 0 := by
+theorem strip_monomial_ne (v : σ) (e : ℕ) (m : σ →₀ ℕ) (hm : m v ≠ e)
+    : strip p v e (monomial m 1) = 0 := by
   classical
   ext n
   rw [coeff_strip]
@@ -60,8 +63,8 @@ theorem strip_monomial_ne (v : σ) (e : ℕ) (m : σ →₀ ℕ) (hm : m v ≠ e
     simp [h]
   · rfl
 
-theorem strip_monomial_eq (v : σ) (e : ℕ) (m : σ →₀ ℕ) (hm : m v = 0) :
-    strip p v e (monomial (Finsupp.single v e + m) 1) = monomial m 1 := by
+theorem strip_monomial_eq (v : σ) (e : ℕ) (m : σ →₀ ℕ) (hm : m v = 0)
+    : strip p v e (monomial (Finsupp.single v e + m) 1) = monomial m 1 := by
   classical
   ext n
   rw [coeff_strip, coeff_monomial, coeff_monomial]
@@ -77,13 +80,13 @@ theorem strip_monomial_eq (v : σ) (e : ℕ) (m : σ →₀ ℕ) (hm : m v = 0) 
     rintro rfl
     exact h1 hm
 
-theorem monomial_single_add (v : σ) (e : ℕ) (m : σ →₀ ℕ) :
-    (monomial (Finsupp.single v e + m) 1 : MvPolynomial σ ℚ_[p]) = X v ^ e * monomial m 1 := by
+theorem monomial_single_add (v : σ) (e : ℕ) (m : σ →₀ ℕ)
+    : (monomial (Finsupp.single v e + m) 1 : MvPolynomial σ ℚ_[p]) = X v ^ e * monomial m 1 := by
   rw [X_pow_eq_monomial, monomial_mul, one_mul]
 
-private theorem prod_factorial_single_add_eq_mul (v : σ) (e : ℕ) (m : σ →₀ ℕ) (hm : m v = 0) :
-    ((Finsupp.single v e + m).prod fun _ k => (k.factorial : ℚ_[p])) =
-      (e.factorial : ℚ_[p]) * m.prod fun _ k => (k.factorial : ℚ_[p]) := by
+private theorem prod_factorial_single_add_eq_mul (v : σ) (e : ℕ) (m : σ →₀ ℕ) (hm : m v = 0)
+    : ((Finsupp.single v e + m).prod fun _ k => (k.factorial : ℚ_[p]))
+      = (e.factorial : ℚ_[p]) * m.prod fun _ k => (k.factorial : ℚ_[p]) := by
   classical
   have hdisj : Disjoint (Finsupp.single v e).support m.support := by
     rw [Finset.disjoint_left]
@@ -94,21 +97,26 @@ private theorem prod_factorial_single_add_eq_mul (v : σ) (e : ℕ) (m : σ →�
     exact (Finsupp.mem_support_iff.mp hb) hm
   rw [Finsupp.prod_add_index_of_disjoint hdisj, Finsupp.prod_single_index (by simp)]
 
-private theorem fock_eq_sum_coeff_mul_factorial (F G : MvPolynomial σ ℚ_[p]) (S : Finset (σ →₀ ℕ)) (hS : F.support ⊆ S) :
-    fock p F G = ∑ m ∈ S, F.coeff m * G.coeff m * (m.prod fun _ k => (k.factorial : ℚ_[p])) := by
+private theorem fock_eq_sum_coeff_mul_factorial
+    (F G : MvPolynomial σ ℚ_[p]) (S : Finset (σ →₀ ℕ)) (hS : F.support ⊆ S)
+    : fock p F G = ∑ m ∈ S, F.coeff m * G.coeff m * (m.prod fun _ k => (k.factorial : ℚ_[p])) := by
   unfold fock
   refine Finset.sum_subset hS ?_
   intro m _ hm
   have h0 : F.coeff m = 0 := by simpa [mem_support_iff] using hm
   rw [h0, zero_mul, zero_mul]
 
-theorem fock_eq_zero_of (F G : MvPolynomial σ ℚ_[p]) (h : ∀ m, AddMonoidAlgebra.coeff F m = 0 ∨ AddMonoidAlgebra.coeff G m = 0) : fock p F G = 0 := by
+theorem fock_eq_zero_of
+    (F G : MvPolynomial σ ℚ_[p])
+    (h : ∀ m, AddMonoidAlgebra.coeff F m = 0 ∨ AddMonoidAlgebra.coeff G m = 0)
+    : fock p F G = 0 := by
   unfold fock
   refine Finset.sum_eq_zero fun m _ => ?_
   rcases h m with h1 | h1 <;> simp [h1]
 
-theorem coeff_pow_mul_ne (v : σ) (e : ℕ) (y : MvPolynomial σ ℚ_[p]) (hy : y ∈ FreeOf p v) (m : σ →₀ ℕ)
-    (hm : m v ≠ e) : AddMonoidAlgebra.coeff (X v ^ e * y) m = 0 := by
+theorem coeff_pow_mul_ne
+    (v : σ) (e : ℕ) (y : MvPolynomial σ ℚ_[p]) (hy : y ∈ FreeOf p v) (m : σ →₀ ℕ) (hm : m v ≠ e)
+    : AddMonoidAlgebra.coeff (X v ^ e * y) m = 0 := by
   classical
   rw [X_pow_eq_monomial, coeff_monomial_mul']
   split_ifs with h
@@ -123,16 +131,18 @@ theorem coeff_pow_mul_ne (v : σ) (e : ℕ) (y : MvPolynomial σ ℚ_[p]) (hy : 
     omega
   · rfl
 
-theorem fock_pow_mul (v : σ) (e : ℕ) (y z : MvPolynomial σ ℚ_[p]) (hy : y ∈ FreeOf p v) :
-    fock p (X v ^ e * y) (X v ^ e * z) = (e.factorial : ℚ_[p]) * fock p y z := by
+theorem fock_pow_mul (v : σ) (e : ℕ) (y z : MvPolynomial σ ℚ_[p]) (hy : y ∈ FreeOf p v)
+    : fock p (X v ^ e * y) (X v ^ e * z) = (e.factorial : ℚ_[p]) * fock p y z := by
   classical
   have hy' : ∀ m ∈ y.support, m v = 0 := by
     intro m hm
     unfold FreeOf at hy
     rw [mem_restrictSupport_iff] at hy
     exact hy (Finset.mem_coe.mpr hm)
-  have hcoeff : ∀ (u : MvPolynomial σ ℚ_[p]) (m : σ →₀ ℕ),
-      AddMonoidAlgebra.coeff (X v ^ e * u) (Finsupp.single v e + m) = AddMonoidAlgebra.coeff u m := by
+  have hcoeff
+      : ∀ (u : MvPolynomial σ ℚ_[p]) (m : σ →₀ ℕ),
+        AddMonoidAlgebra.coeff (X v ^ e * u) (Finsupp.single v e + m)
+          = AddMonoidAlgebra.coeff u m := by
     intro u m
     rw [X_pow_eq_monomial, coeff_monomial_mul, one_mul]
   have hsub : (X v ^ e * y).support ⊆ y.support.image (fun m => Finsupp.single v e + m) := by
@@ -143,7 +153,8 @@ theorem fock_pow_mul (v : σ) (e : ℕ) (y z : MvPolynomial σ ℚ_[p]) (hy : y 
       refine ⟨m - Finsupp.single v e, mem_support_iff.mpr (by simpa using hm), ?_⟩
       exact add_tsub_cancel_of_le h
     · exact absurd rfl hm
-  rw [fock_eq_sum_coeff_mul_factorial _ _ _ hsub, Finset.sum_image (fun a _ b _ h => add_left_cancel h)]
+  rw [fock_eq_sum_coeff_mul_factorial _ _ _ hsub,
+    Finset.sum_image (fun a _ b _ h => add_left_cancel h)]
   unfold fock
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
@@ -156,30 +167,45 @@ section Last
 
 variable {p : ℕ} [Fact p.Prime] {K r : ℕ} [NeZero r]
 
-theorem xH_le_free (LL : Letters (K + 1)) {q : ℕ} (J : Fin q → ℕ) (M : Fin q → WithTop ℤ) (ρ : Fin r)
-    (w : Fin r → ℤ) (y : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) (hy : y ∈ XH p LL J M ρ w) :
-    y ∈ FreeOf p (Fin.last K, ρ) := by
+theorem xH_le_free
+    (LL : Letters (K + 1))
+    {q : ℕ} (J : Fin q → ℕ) (M : Fin q → WithTop ℤ)
+    (ρ : Fin r) (w : Fin r → ℤ) (y : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p])
+    (hy : y ∈ XH p LL J M ρ w)
+    : y ∈ FreeOf p (Fin.last K, ρ) := by
   unfold XH XSp at hy
-  exact (Submodule.mem_inf.mp (Submodule.mem_inf.mp (Submodule.mem_inf.mp (Submodule.mem_inf.mp hy).1).1).1).2
+  exact (Submodule.mem_inf.mp (Submodule.mem_inf.mp (Submodule.mem_inf.mp (Submodule.mem_inf.mp
+    hy).1).1).1).2
 
-theorem grSpan_eq (LLw : Letters (K + 1)) {q : ℕ} (J : Fin q → ℕ) (M : Fin q → WithTop ℤ) (ρ : Fin r)
-    (w : Fin r → ℤ) (e e1 : ℕ) (hr : 2 ≤ r) (hρ : (ρ : ℕ) = r - 1) (hv : LLw.vec (Fin.last K) = true)
-    (he : e ≤ LLw.deg (Fin.last K))
-    (hP : HypP p (setLast LLw (LLw.deg (Fin.last K) - e)) ρ e1)
+theorem grSpan_eq
+    (LLw : Letters (K + 1))
+    {q : ℕ} (J : Fin q → ℕ) (M : Fin q → WithTop ℤ)
+    (ρ : Fin r)
+    (w : Fin r → ℤ)
+    (e e1 : ℕ)
+    (hr : 2 ≤ r) (hρ : (ρ : ℕ) = r - 1) (hv : LLw.vec (Fin.last K) = true)
+    (he : e ≤ LLw.deg (Fin.last K)) (hP : HypP p (setLast LLw (LLw.deg (Fin.last K) - e)) ρ e1)
     (hE : HypE p (setLast LLw (LLw.deg (Fin.last K) - e)) ρ e1)
-    (hO : ResOntoK p (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ)
-    (x : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) :
-    x ∈ grSpan p LLw J M ρ w e ↔
-      ∃ y ∈ XH p (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ (shiftWt w ρ e),
+    (hO
+      : ResOntoK p (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ)
+    (x : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p])
+    : x ∈ grSpan p LLw J M ρ w e
+      ↔ ∃ y
+          ∈ XH p (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ
+            (shiftWt w ρ e),
         x = X (Fin.last K, ρ) ^ e * y := by
-  have hMM := restriction_min_max_holds p K r (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ (shiftWt w ρ e) e1
-    hr hρ hv hP hE hO
+  have hMM :=
+    restriction_min_max_holds p K r (setLast LLw (LLw.deg (Fin.last K) - e)) J
+      (shiftLastLetterThresholds K J M e) ρ (shiftWt w ρ e) e1 hr hρ hv hP hE hO
   have hGr := graded_eq_holds p K r LLw J M ρ w e hv he
   constructor
   · intro hx
-    have hle : grSpan p LLw J M ρ w e ≤
-        (XH p (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ (shiftWt w ρ e)).map
-          (LinearMap.mulLeft ℚ_[p] (X (Fin.last K, ρ) ^ e : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p])) := by
+    have hle
+        : grSpan p LLw J M ρ w e
+          ≤ (XH p (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ
+              (shiftWt w ρ e)).map
+            (LinearMap.mulLeft ℚ_[p]
+              (X (Fin.last K, ρ) ^ e : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p])) := by
       unfold grSpan
       rw [Submodule.span_le]
       intro z hz
@@ -191,11 +217,14 @@ theorem grSpan_eq (LLw : Letters (K + 1)) {q : ℕ} (J : Fin q → ℕ) (M : Fin
   · rintro ⟨y, hy, rfl⟩
     obtain ⟨h, hh, rfl⟩ := (hMM y).mp hy
     obtain ⟨n, hn⟩ := exists_pow_smul_intPol h
-    have h1 : ((p : ℚ_[p]) ^ n) • h ∈
-        MMwZ p (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ (shiftWt w ρ e) :=
+    have h1
+        : ((p : ℚ_[p]) ^ n) • h ∈ MMwZ p (setLast LLw (LLw.deg (Fin.last K) - e)) J
+          (shiftLastLetterThresholds K J M e) ρ (shiftWt w ρ e) :=
       Submodule.mem_inf.mpr ⟨Submodule.smul_mem _ _ hh, hn⟩
-    have h2 : X (Fin.last K, ρ) ^ e * initPart (Fin.last K, ρ) 0 (((p : ℚ_[p]) ^ n) • h) ∈
-        grSpan p LLw J M ρ w e := Submodule.subset_span ((hGr _).mpr ⟨_, h1, rfl⟩)
+    have h2
+        : X (Fin.last K, ρ) ^ e * initPart (Fin.last K, ρ) 0 (((p : ℚ_[p]) ^ n) • h)
+          ∈ grSpan p LLw J M ρ w e :=
+      Submodule.subset_span ((hGr _).mpr ⟨_, h1, rfl⟩)
     have h3 := (grSpan p LLw J M ρ w e).smul_mem (((p : ℚ_[p]) ^ n)⁻¹) h2
     rwa [initPart_smul, mul_smul_comm, smul_smul, inv_mul_cancel₀ (p_pow_ne_zero n), one_smul] at h3
 
@@ -204,14 +233,18 @@ end Last
 theorem projAtOf_of (hX : ProjX) : ProjAtOf := by
   intro p _ K r _ LLw q J M ρ w e e1 h1 h2 h3 h4 h5 h6 h7
   classical
-  obtain ⟨Pr', hPr'⟩ := hX p K r (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ
-    (shiftWt w ρ e) e1 h1 h2 h3 h5 h6
+  obtain ⟨Pr', hPr'⟩ :=
+    hX p K r (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ
+      (shiftWt w ρ e) e1 h1 h2 h3 h5 h6
   refine ⟨(LinearMap.mulLeft ℚ_[p] (X (Fin.last K, ρ) ^ e)) ∘ₗ Pr' ∘ₗ strip p (Fin.last K, ρ) e, ?_⟩
   intro m hm
   have hgr := grSpan_eq LLw J M ρ w e e1 h1 h2 h3 h4 h5 h6 h7
-  have hfree : ∀ g ∈ grSpan p LLw J M ρ w e,
-      ∃ y ∈ XH p (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ (shiftWt w ρ e),
-        y ∈ FreeOf p (Fin.last K, ρ) ∧ g = X (Fin.last K, ρ) ^ e * y := by
+  have hfree
+      : ∀ g ∈ grSpan p LLw J M ρ w e,
+        ∃ y
+            ∈ XH p (setLast LLw (LLw.deg (Fin.last K) - e)) J (shiftLastLetterThresholds K J M e) ρ
+              (shiftWt w ρ e),
+          y ∈ FreeOf p (Fin.last K, ρ) ∧ g = X (Fin.last K, ρ) ^ e * y := by
     intro g hg
     obtain ⟨y, hy, rfl⟩ := (hgr g).mp hg
     exact ⟨y, hy, xH_le_free _ J _ ρ _ y hy, rfl⟩
@@ -219,8 +252,9 @@ theorem projAtOf_of (hX : ProjX) : ProjAtOf := by
   · have hle : Finsupp.single (Fin.last K, ρ) e ≤ m := by
       rw [Finsupp.single_le_iff]
       exact hme.ge
-    obtain ⟨m', hm'v, hmm⟩ : ∃ m' : Fin (K + 1) × Fin r →₀ ℕ, m' (Fin.last K, ρ) = 0 ∧
-        m = Finsupp.single (Fin.last K, ρ) e + m' :=
+    obtain ⟨m', hm'v, hmm⟩
+        : ∃ m' : Fin (K + 1) × Fin r →₀ ℕ,
+          m' (Fin.last K, ρ) = 0 ∧ m = Finsupp.single (Fin.last K, ρ) e + m' :=
       ⟨m - Finsupp.single (Fin.last K, ρ) e, by simp [hme], (add_tsub_cancel_of_le hle).symm⟩
     subst hmm
     have hMD : MultiDeg (setLast LLw (LLw.deg (Fin.last K) - e)) m' := by
@@ -230,7 +264,8 @@ theorem projAtOf_of (hX : ProjX) : ProjAtOf := by
       change _ = Function.update LLw.deg (Fin.last K) (LLw.deg (Fin.last K) - e) i
       rw [Function.update_apply]
       simp only [Finsupp.coe_add, Pi.add_apply, Finset.sum_add_distrib, Finsupp.single_apply,
-        Prod.mk.injEq] at hi
+          Prod.mk.injEq]
+        at hi
       by_cases hik : i = Fin.last K
       · subst hik
         simp at hi
@@ -241,9 +276,12 @@ theorem projAtOf_of (hX : ProjX) : ProjAtOf := by
         rw [if_neg hik]
         exact hi
     obtain ⟨hP1, hP2, hP3⟩ := hPr' m' hMD hm'v
-    have hPr : ((LinearMap.mulLeft ℚ_[p] (X (Fin.last K, ρ) ^ e)) ∘ₗ Pr' ∘ₗ strip p (Fin.last K, ρ) e)
-        (monomial (Finsupp.single (Fin.last K, ρ) e + m') 1) = X (Fin.last K, ρ) ^ e * Pr' (monomial m' 1) := by
-      rw [LinearMap.comp_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply, strip_monomial_eq _ _ _ hm'v]
+    have hPr
+        : ((LinearMap.mulLeft ℚ_[p] (X (Fin.last K, ρ) ^ e)) ∘ₗ Pr' ∘ₗ strip p (Fin.last K, ρ) e)
+            (monomial (Finsupp.single (Fin.last K, ρ) e + m') 1)
+          = X (Fin.last K, ρ) ^ e * Pr' (monomial m' 1) := by
+      rw [LinearMap.comp_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply,
+        strip_monomial_eq _ _ _ hm'v]
     rw [hPr]
     refine ⟨(hgr _).mpr ⟨_, hP1, rfl⟩, ?_, ?_⟩
     · unfold IntPol at hP2 ⊢
@@ -255,9 +293,12 @@ theorem projAtOf_of (hX : ProjX) : ProjAtOf := by
     · intro g hg
       obtain ⟨y, hy, hyf, rfl⟩ := hfree g hg
       rw [fock_pow_mul _ _ _ _ hyf, hP3 y hy, monomial_single_add, fock_pow_mul _ _ _ _ hyf]
-  · have hPr : ((LinearMap.mulLeft ℚ_[p] (X (Fin.last K, ρ) ^ e)) ∘ₗ Pr' ∘ₗ strip p (Fin.last K, ρ) e)
-        (monomial m 1) = 0 := by
-      rw [LinearMap.comp_apply, LinearMap.comp_apply, strip_monomial_ne _ _ _ hme, map_zero, map_zero]
+  · have hPr
+        : ((LinearMap.mulLeft ℚ_[p] (X (Fin.last K, ρ) ^ e)) ∘ₗ Pr' ∘ₗ strip p (Fin.last K, ρ) e)
+            (monomial m 1)
+          = 0 := by
+      rw [LinearMap.comp_apply, LinearMap.comp_apply, strip_monomial_ne _ _ _ hme, map_zero,
+        map_zero]
     rw [hPr]
     refine ⟨Submodule.zero_mem _, by rw [smul_zero]; exact Submodule.zero_mem _, ?_⟩
     intro g hg

@@ -8,17 +8,23 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem range_idempotent_projective {A : Type} [CommRing A] (n : ℕ) (P : Matrix (Fin n) (Fin n) A)
-    (hP : P * P = P) : Module.Projective A (LinearMap.range P.mulVecLin) := by
-  refine Module.Projective.of_split (LinearMap.range P.mulVecLin).subtype P.mulVecLin.rangeRestrict ?_
+theorem range_idempotent_projective
+    {A : Type} [CommRing A] (n : ℕ) (P : Matrix (Fin n) (Fin n) A) (hP : P * P = P)
+    : Module.Projective A (LinearMap.range P.mulVecLin) := by
+  refine Module.Projective.of_split (LinearMap.range P.mulVecLin).subtype P.mulVecLin.rangeRestrict
+    ?_
   ext ⟨v, w, rfl⟩ j
   simp [Matrix.mulVec_mulVec, hP]
 
-theorem exists_rank_ideal_of_idempotent : ∀ (A : Type) [CommRing A] (I : Type) [Fintype I] (n : ℕ) (P : I → Matrix (Fin n) (Fin n) A),
-    (∀ i, P i * P i = P i) → ∀ (m : ℕ), ∃ x : A, ∀ (T : Type) [CommRing T] (f : A →+* T),
-      ((∀ (k : Type) [Field k] [IsAlgClosed k] (h : T →+* k) (i : I),
-          Module.rankAtStalk (LinearMap.range (P i).mulVecLin)
-            (⟨RingHom.ker (h.comp f), RingHom.ker_isPrime _⟩ : PrimeSpectrum A) = m) ↔ f x = 0) := by
+theorem exists_rank_ideal_of_idempotent
+    : ∀ (A : Type) [CommRing A] (I : Type) [Fintype I] (n : ℕ) (P : I → Matrix (Fin n) (Fin n) A),
+      (∀ i, P i * P i = P i)
+        → ∀ (m : ℕ), ∃ x : A, ∀ (T : Type) [CommRing T] (f : A →+* T),
+          ((∀ (k : Type) [Field k] [IsAlgClosed k] (h : T →+* k) (i : I),
+              Module.rankAtStalk (LinearMap.range (P i).mulVecLin)
+                  (⟨RingHom.ker (h.comp f), RingHom.ker_isPrime _⟩ : PrimeSpectrum A)
+                = m)
+            ↔ f x = 0) := by
   intro A _ I _ n P hP m
   let V : Set (PrimeSpectrum A) :=
     ⋂ i, {q | Module.rankAtStalk (LinearMap.range (P i).mulVecLin) q = m}
@@ -30,16 +36,19 @@ theorem exists_rank_ideal_of_idempotent : ∀ (A : Type) [CommRing A] (I : Type)
       (M := LinearMap.range (P i).mulVecLin)).isClopen_fiber m
   obtain ⟨e, x, hmul, hadd, hVe⟩ := PrimeSpectrum.isClopen_iff_mul_add.mp hV
   refine ⟨x, fun T _ f => ?_⟩
-  have hmem : ∀ q : PrimeSpectrum A, q ∈ V ↔ e ∉ q.asIdeal := by
-    intro q; rw [hVe]; rfl
-  have hmem' : ∀ q : PrimeSpectrum A, q ∈ V ↔ ∀ i, Module.rankAtStalk (LinearMap.range (P i).mulVecLin) q = m := by
+  have hmem : ∀ q : PrimeSpectrum A, q ∈ V ↔ e ∉ q.asIdeal := by intro q; rw [hVe]; rfl
+  have hmem'
+      : ∀ q : PrimeSpectrum A,
+        q ∈ V ↔ ∀ i, Module.rankAtStalk (LinearMap.range (P i).mulVecLin) q = m := by
     intro q; simp [V]
   constructor
   · intro H
     have hxx : f x * f x = f x := by
       have : x * x = x := by
         have h1 : x = x * (e + x) := by rw [hadd, mul_one]
-        calc x * x = x * (e + x) - x * e := by ring
+        calc
+          x * x
+            = x * (e + x) - x * e := by ring
           _ = x := by rw [← h1, mul_comm x e, hmul, sub_zero]
       rw [← map_mul, this]
     have hnil : IsNilpotent (f x) := by
@@ -47,8 +56,9 @@ theorem exists_rank_ideal_of_idempotent : ∀ (A : Type) [CommRing A] (I : Type)
       intro (Q : Ideal T) hQ
       haveI : Q.IsPrime := hQ
       let k := AlgebraicClosure (FractionRing (T ⧸ Q))
-      let h : T →+* k := (algebraMap (FractionRing (T ⧸ Q)) k).comp
-        ((algebraMap (T ⧸ Q) (FractionRing (T ⧸ Q))).comp (Ideal.Quotient.mk Q))
+      let h : T →+* k :=
+        (algebraMap (FractionRing (T ⧸ Q)) k).comp
+          ((algebraMap (T ⧸ Q) (FractionRing (T ⧸ Q))).comp (Ideal.Quotient.mk Q))
       have hker : RingHom.ker h = Q := by
         ext t
         simp only [h, RingHom.mem_ker, RingHom.comp_apply]
@@ -62,7 +72,8 @@ theorem exists_rank_ideal_of_idempotent : ∀ (A : Type) [CommRing A] (I : Type)
         exact hx
     obtain ⟨N, hN⟩ := hnil
     have : ∀ j : ℕ, f x ^ (j + 1) = f x := by
-      intro j; induction j with
+      intro j
+      induction j with
       | zero => simp
       | succ j ih => rw [pow_succ, ih, hxx]
     rcases N with _ | N
@@ -75,7 +86,9 @@ theorem exists_rank_ideal_of_idempotent : ∀ (A : Type) [CommRing A] (I : Type)
     rw [RingHom.mem_ker, RingHom.comp_apply]
     have : f e = 1 := by
       have := congrArg f hadd
-      rw [map_add (f := _), hx, add_zero, map_one] at this; exact this
-    rw [this, map_one]; exact one_ne_zero
+      rw [map_add (f := _), hx, add_zero, map_one] at this
+      exact this
+    rw [this, map_one]
+    exact one_ne_zero
 
 end GlobalTheory

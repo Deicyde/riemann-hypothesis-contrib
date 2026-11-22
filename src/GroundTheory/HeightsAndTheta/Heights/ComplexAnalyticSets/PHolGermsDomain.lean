@@ -13,13 +13,13 @@ open Topology Filter Metric
 
 noncomputable section
 
-def HolGermsDomain.Statement : Prop :=
-  ∀ (σ : Type) [Fintype σ] (w : σ → ℂ), IsDomain (holGerms w)
+def HolGermsDomain.Statement : Prop := ∀ (σ : Type) [Fintype σ] (w : σ → ℂ), IsDomain (holGerms w)
 
-theorem eventually_zero_or_of_mul_eventually_zero {σ : Type} [Fintype σ] {w : σ → ℂ}
-    {f g : (σ → ℂ) → ℂ} (hf : AnalyticAt ℂ f w) (hg : AnalyticAt ℂ g w)
-    (hfg : ∀ᶠ z in 𝓝 w, f z * g z = 0) :
-    (∀ᶠ z in 𝓝 w, f z = 0) ∨ ∀ᶠ z in 𝓝 w, g z = 0 := by
+theorem eventually_zero_or_of_mul_eventually_zero
+    {σ : Type} [Fintype σ]
+    {w : σ → ℂ} {f g : (σ → ℂ) → ℂ}
+    (hf : AnalyticAt ℂ f w) (hg : AnalyticAt ℂ g w) (hfg : ∀ᶠ z in 𝓝 w, f z * g z = 0)
+    : (∀ᶠ z in 𝓝 w, f z = 0) ∨ ∀ᶠ z in 𝓝 w, g z = 0 := by
   obtain ⟨r₁, hr₁, hf'⟩ := hf.exists_ball_analyticOnNhd
   obtain ⟨r₂, hr₂, hg'⟩ := hg.exists_ball_analyticOnNhd
   obtain ⟨r₃, hr₃, hfg'⟩ := Metric.eventually_nhds_iff_ball.1 hfg
@@ -42,8 +42,9 @@ theorem eventually_zero_or_of_mul_eventually_zero {σ : Type} [Fintype σ] {w : 
       filter_upwards [h1, h2] with x hx1 hx2
       have h3 := hfg' x (hU3 hx2)
       simpa [hx1] using h3
-    have hEq := (hg'.mono hU2).eqOn_zero_of_preconnected_of_eventuallyEq_zero
-      (convex_ball w _).isPreconnected hz hgz
+    have hEq :=
+      (hg'.mono hU2).eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball w _).isPreconnected
+        hz hgz
     filter_upwards [ball_mem_nhds w hr] with x hx
     simpa using hEq hx
 

@@ -14,8 +14,8 @@ namespace ReciprocityTheory.ChartRestriction.TR.Weyl
 
 open ReciprocityTheory.ChartRestriction.DS.S7
 
-def sq_ssEquiv (k : ℕ) (ν : Fin k → ℕ) :
-    ↥(Formalism.GradedWeylDivisibility.ssIdx k k ν) ≃ sq_SSZ k (fun t => (ν t : ℤ)) :=
+def sq_ssEquiv (k : ℕ) (ν : Fin k → ℕ)
+    : ↥(Formalism.GradedWeylDivisibility.ssIdx k k ν) ≃ sq_SSZ k (fun t => (ν t : ℤ)) :=
   Equiv.subtypeEquiv (Finsupp.equivFunOnFinite.trans (Equiv.curry (Fin k) (Fin k) ℕ)) (by
     intro m
     constructor
@@ -31,17 +31,19 @@ def sq_ssEquiv (k : ℕ) (ν : Fin k → ℕ) :
         exact h1 l j hlj a
       · exact Nat.cast_injective (R := ℤ) (h2 t))
 
-theorem sq_wsum_add {n : ℕ} (lam : Fin n → ℤ) (c : ℤ) :
-    wsum (fun i => lam i + c) = wsum lam + n * c := by
+theorem sq_wsum_add {n : ℕ} (lam : Fin n → ℤ) (c : ℤ)
+    : wsum (fun i => lam i + c) = wsum lam + n * c := by
   simp [wsum, Finset.sum_add_distrib]
 
 def sq_shiftEmb {n : ℕ} (c : ℤ) : (Fin n → ℤ) ↪ (Fin n → ℤ) :=
   ⟨fun mu i => mu i + c, fun x y h => funext fun i => by simpa using congrFun h i⟩
 
-theorem sq_shiftEmb_apply {n : ℕ} (c : ℤ) (mu : Fin n → ℤ) : sq_shiftEmb c mu = fun i => mu i + c := rfl
+theorem sq_shiftEmb_apply {n : ℕ} (c : ℤ) (mu : Fin n → ℤ) : sq_shiftEmb c mu = fun i => mu i + c :=
+  rfl
 
-theorem sq_gt_shift {K : Type*} [Field K] : ∀ (n : ℕ) (lam : Fin n → ℤ) (c : ℤ) (t : Fin n → K),
-    (∀ i, t i ≠ 0) → gtChar n (fun i => lam i + c) t = (∏ i, t i) ^ c * gtChar n lam t := by
+theorem sq_gt_shift {K : Type*} [Field K]
+    : ∀ (n : ℕ) (lam : Fin n → ℤ) (c : ℤ) (t : Fin n → K),
+      (∀ i, t i ≠ 0) → gtChar n (fun i => lam i + c) t = (∏ i, t i) ^ c * gtChar n lam t := by
   intro n
   induction n with
   | zero => intro lam c t _; simp [gtChar]
@@ -59,15 +61,21 @@ theorem sq_gt_shift {K : Type*} [Field K] : ∀ (n : ℕ) (lam : Fin n → ℤ) 
         exact ⟨by linarith [(ha i).1], by linarith [(ha i).2]⟩
     rw [gtChar, gtChar, himg, sum_map, mul_sum]
     refine sum_congr rfl fun mu _ => ?_
-    rw [sq_shiftEmb_apply, ih mu c _ (fun i => ht _), sq_wsum_add, sq_wsum_add, Fin.prod_univ_castSucc, mul_zpow]
-    have e : wsum lam + ((n + 1 : ℕ) : ℤ) * c - (wsum mu + (n : ℤ) * c) = (wsum lam - wsum mu) + c := by
+    rw [sq_shiftEmb_apply, ih mu c _ (fun i => ht _), sq_wsum_add, sq_wsum_add,
+      Fin.prod_univ_castSucc, mul_zpow]
+    have e
+        : wsum lam + ((n + 1 : ℕ) : ℤ) * c - (wsum mu + (n : ℤ) * c)
+          = (wsum lam - wsum mu) + c := by
       push_cast; ring
     rw [e, zpow_add₀ (ht _)]
     ring
 
-theorem sq_ss_sum {K : Type*} [Field K] (N : ℕ) (ν : Fin N → ℕ) [Fintype ↥(Formalism.GradedWeylDivisibility.ssIdx N N ν)]
-    (t : Fin N → K) :
-    ∑ m : ↥(Formalism.GradedWeylDivisibility.ssIdx N N ν), ∏ a, t a ^ Formalism.GradedWeylDivisibility.rowWt m.1 a = gtChar N (fun i => (ν i : ℤ)) t := by
+theorem sq_ss_sum
+    {K : Type*} [Field K]
+    (N : ℕ) (ν : Fin N → ℕ) [Fintype ↥(Formalism.GradedWeylDivisibility.ssIdx N N ν)]
+    (t : Fin N → K)
+    : ∑ m : ↥(Formalism.GradedWeylDivisibility.ssIdx N N ν), ∏ a, t a ^ Formalism.GradedWeylDivisibility.rowWt m.1 a
+      = gtChar N (fun i => (ν i : ℤ)) t := by
   have : Fintype (sq_SSZ N (fun i => (ν i : ℤ))) := @Fintype.ofFinite _ (sq_SSZ_finite N _)
   refine (Fintype.sum_equiv (sq_ssEquiv N ν) _ (fun g => sq_mono t g.1) (fun m => rfl)).trans ?_
   exact sq_gt_sum N _ (fun s => Int.natCast_nonneg _) t
@@ -83,28 +91,38 @@ theorem sqChar : SqCharStatement := by
     rw [hg, Matrix.det_diagonal] at hdet
     exact hdet (Finset.prod_eq_zero (mem_univ a) h)
   obtain ⟨b, ⟨hli, hspan, hhom⟩, -⟩ := Formalism.GradedWeylDivisibility.sSBasis ℂ N N lam.natW
-  have : Fintype ↥(Formalism.GradedWeylDivisibility.ssIdx N N lam.natW) := (Formalism.GradedWeylDivisibility.sSIdxFinite N N lam.natW).fintype
-  let B : Module.Basis ↥(Formalism.GradedWeylDivisibility.ssIdx N N lam.natW) ℂ (Formalism.BasicNotions.nablaSq ℂ N lam) :=
+  have : Fintype ↥(Formalism.GradedWeylDivisibility.ssIdx N N lam.natW) :=
+    (Formalism.GradedWeylDivisibility.sSIdxFinite N N lam.natW).fintype
+  let B : Module.Basis ↥(Formalism.GradedWeylDivisibility.ssIdx N N lam.natW) ℂ
+      (Formalism.BasicNotions.nablaSq ℂ N lam) :=
     (Module.Basis.span hli).map (LinearEquiv.ofEq _ _ hspan)
   have hB : ∀ m, (B m : MvPolynomial (Fin N × Fin N) ℂ) = b m := by
     intro m
     simp only [B, Module.Basis.map_apply, Module.Basis.span_apply]
     rfl
   let c : ℂ := Formalism.BasicNotions.detPow ℂ N g lam.detShift
-  let w : ↥(Formalism.GradedWeylDivisibility.ssIdx N N lam.natW) → ℂ := fun m => ∏ a, t a ^ Formalism.GradedWeylDivisibility.rowWt m.1 a
-  let f : Formalism.BasicNotions.nablaSq ℂ N lam →ₗ[ℂ] Formalism.BasicNotions.nablaSq ℂ N lam := B.constr ℂ (fun m => (c * w m) • B m)
-  have hact : ∀ x : MvPolynomial (Fin N × Fin N) ℂ,
-      Formalism.BasicNotions.sqAct ℂ N lam g x = c • Formalism.GradedWeylDivisibility.rowAct ℂ (Matrix.diagonal t) x := by
+  let w : ↥(Formalism.GradedWeylDivisibility.ssIdx N N lam.natW) → ℂ := fun m =>
+    ∏ a, t a ^ Formalism.GradedWeylDivisibility.rowWt m.1 a
+  let f : Formalism.BasicNotions.nablaSq ℂ N lam →ₗ[ℂ] Formalism.BasicNotions.nablaSq ℂ N lam :=
+    B.constr ℂ (fun m => (c * w m) • B m)
+  have hact
+      : ∀ x : MvPolynomial (Fin N × Fin N) ℂ,
+        Formalism.BasicNotions.sqAct ℂ N lam g x
+          = c • Formalism.GradedWeylDivisibility.rowAct ℂ (Matrix.diagonal t) x := by
     intro x
     simp only [Formalism.BasicNotions.sqAct, hg, Matrix.diagonal_transpose, c]
   refine ⟨f, ?_, ?_⟩
-  · have hL : (Formalism.BasicNotions.nablaSq ℂ N lam).subtype ∘ₗ f =
-        (c • (Formalism.GradedWeylDivisibility.rowAct ℂ (n := N) (Matrix.diagonal t)).toLinearMap) ∘ₗ
-          (Formalism.BasicNotions.nablaSq ℂ N lam).subtype := by
+  · have hL
+        : (Formalism.BasicNotions.nablaSq ℂ N lam).subtype ∘ₗ f
+          = (c • (Formalism.GradedWeylDivisibility.rowAct ℂ (n := N)
+              (Matrix.diagonal t)).toLinearMap)
+            ∘ₗ (Formalism.BasicNotions.nablaSq ℂ N lam).subtype := by
       refine B.ext fun m => ?_
       simp only [LinearMap.comp_apply, Submodule.subtype_apply, f, Module.Basis.constr_basis,
         LinearMap.smul_apply, AlgHom.toLinearMap_apply, hB]
-      rw [Submodule.coe_smul, hB, Formalism.GradedWeylDivisibility.rowActDiagWeight ℂ N N t (Formalism.GradedWeylDivisibility.rowWt m.1) (b m) (hhom m),
+      rw [Submodule.coe_smul, hB,
+        Formalism.GradedWeylDivisibility.rowActDiagWeight ℂ N N t
+          (Formalism.GradedWeylDivisibility.rowWt m.1) (b m) (hhom m),
         smul_smul]
     intro x
     rw [hact]
@@ -128,7 +146,7 @@ theorem sqChar : SqCharStatement := by
       ring
     rw [hw, sq_gt_shift N _ _ t ht]
     congr 1
-    simp only [c, Formalism.BasicNotions.detPow, Units.val_zpow_eq_zpow_val, Matrix.GeneralLinearGroup.val_det_apply,
-      hg, Matrix.det_diagonal]
+    simp only [c, Formalism.BasicNotions.detPow, Units.val_zpow_eq_zpow_val,
+      Matrix.GeneralLinearGroup.val_det_apply, hg, Matrix.det_diagonal]
 
 end ReciprocityTheory.ChartRestriction.TR.Weyl

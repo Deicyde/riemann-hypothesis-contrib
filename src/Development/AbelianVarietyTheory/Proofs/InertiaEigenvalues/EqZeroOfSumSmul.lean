@@ -36,13 +36,14 @@ theorem isLaurent_co (x : Laur L M) : IsLaurent (co x) := by
   exact ⟨((HahnModule.of L).symm x).order, fun k hk => HahnSeries.coeff_eq_zero_of_lt_order hk⟩
 
 def mk (u : ℤ → M) (hu : IsLaurent u) : Laur L M :=
-  HahnModule.of L (HahnSeries.ofSuppBddBelow u (by
-    obtain ⟨m, hm⟩ := hu
-    exact ⟨m, fun k hk => not_lt.1 fun h => hk (hm k h)⟩))
+  HahnModule.of L
+    (HahnSeries.ofSuppBddBelow u (by
+      obtain ⟨m, hm⟩ := hu
+      exact ⟨m, fun k hk => not_lt.1 fun h => hk (hm k h)⟩))
 
-private theorem coeff_ofPowerSeries_smul_eq_serMul (f : L⟦X⟧) (y : HahnModule ℤ L M) (k : ℤ) :
-    ((HahnModule.of L).symm (HahnSeries.ofPowerSeries ℤ L f • y)).coeff k =
-      serMul f ((HahnModule.of L).symm y).coeff k := by
+private theorem coeff_ofPowerSeries_smul_eq_serMul (f : L⟦X⟧) (y : HahnModule ℤ L M) (k : ℤ)
+    : ((HahnModule.of L).symm (HahnSeries.ofPowerSeries ℤ L f • y)).coeff k
+      = serMul f ((HahnModule.of L).symm y).coeff k := by
   set F := HahnSeries.ofPowerSeries ℤ L f with hFdef
   have hF : ∀ j : ℕ, F.coeff (j : ℤ) = PowerSeries.coeff j f := fun j =>
     HahnSeries.ofPowerSeries_apply_coeff f j
@@ -55,8 +56,10 @@ private theorem coeff_ofPowerSeries_smul_eq_serMul (f : L⟦X⟧) (y : HahnModul
     rintro ⟨j, -, hj⟩
     change (j : ℤ) = i at hj
     omega
-  have key : ∀ ij : ℤ × ℤ, F.coeff ij.1 ≠ 0 → ij.1 + ij.2 = k →
-      ((ij.1.toNat : ℕ) : ℤ) = ij.1 ∧ k - ((ij.1.toNat : ℕ) : ℤ) = ij.2 := by
+  have key
+      : ∀ ij : ℤ × ℤ,
+        F.coeff ij.1 ≠ 0 → ij.1 + ij.2 = k
+          → ((ij.1.toNat : ℕ) : ℤ) = ij.1 ∧ k - ((ij.1.toNat : ℕ) : ℤ) = ij.2 := by
     intro ij h1 h3
     have := hneg _ h1
     constructor <;> omega
@@ -99,9 +102,12 @@ theorem co_smul (f : L⟦X⟧) (x : Laur L M) : co (f • x) = serMul f (co x) :
   funext k
   exact coeff_ofPowerSeries_smul_eq_serMul f x k
 
-private theorem co_smul_add_eq_coeff_smul_co (f : L⟦X⟧) (x : Laur L M) (m : ℤ) (n : ℕ)
-    (hf : ∀ j < n, PowerSeries.coeff j f = 0) (hx : ∀ k < m, co x k = 0) :
-    co (f • x) (m + n) = PowerSeries.coeff n f • co x m := by
+private theorem co_smul_add_eq_coeff_smul_co
+    (f : L⟦X⟧)
+    (x : Laur L M) (m : ℤ)
+    (n : ℕ) (hf : ∀ j < n, PowerSeries.coeff j f = 0)
+    (hx : ∀ k < m, co x k = 0)
+    : co (f • x) (m + n) = PowerSeries.coeff n f • co x m := by
   rw [co_smul]
   show ∑ᶠ j : ℕ, PowerSeries.coeff j f • co x (m + n - j) = _
   rw [finsum_eq_single _ n]
@@ -111,8 +117,8 @@ private theorem co_smul_add_eq_coeff_smul_co (f : L⟦X⟧) (x : Laur L M) (m : 
     · rw [hf j h, zero_smul]
     · rw [hx (m + n - j) (by omega), smul_zero]
 
-theorem co_smul_low (f : L⟦X⟧) (x : Laur L M) (m : ℤ) (hx : ∀ k < m, co x k = 0) :
-    (∀ k < m, co (f • x) k = 0) ∧ co (f • x) m = constantCoeff f • co x m := by
+theorem co_smul_low (f : L⟦X⟧) (x : Laur L M) (m : ℤ) (hx : ∀ k < m, co x k = 0)
+    : (∀ k < m, co (f • x) k = 0) ∧ co (f • x) m = constantCoeff f • co x m := by
   refine ⟨fun k hk => ?_, ?_⟩
   · rw [co_smul]
     show ∑ᶠ j : ℕ, PowerSeries.coeff j f • co x (k - j) = 0
@@ -121,23 +127,28 @@ theorem co_smul_low (f : L⟦X⟧) (x : Laur L M) (m : ℤ) (hx : ∀ k < m, co 
     simpa using e
 
 def tw (c : L) (g : M →ₗ[L] M') : Laur L M →+ Laur L M' where
-  toFun x := mk (fun k => c ^ k • g (co x k)) (by
-    obtain ⟨m, hm⟩ := isLaurent_co x
-    exact ⟨m, fun k hk => by simp [hm k hk]⟩)
-  map_zero' := co_injective (by
-    funext k
-    simp
-    rfl)
-  map_add' x y := co_injective (by
-    funext k
-    simp
-    rfl)
+  toFun x :=
+    mk (fun k => c ^ k • g (co x k)) (by
+      obtain ⟨m, hm⟩ := isLaurent_co x
+      exact ⟨m, fun k hk => by simp [hm k hk]⟩)
+  map_zero' :=
+    co_injective (by
+      funext k
+      simp
+      rfl)
+  map_add' x y :=
+    co_injective (by
+      funext k
+      simp
+      rfl)
 
-@[simp] theorem co_tw (c : L) (g : M →ₗ[L] M') (x : Laur L M) (k : ℤ) :
-    co (tw c g x) k = c ^ k • g (co x k) := rfl
+@[simp]
+theorem co_tw (c : L) (g : M →ₗ[L] M') (x : Laur L M) (k : ℤ)
+    : co (tw c g x) k = c ^ k • g (co x k) :=
+  rfl
 
-theorem tw_smul {c : L} (hc : c ≠ 0) (g : M →ₗ[L] M') (f : L⟦X⟧) (x : Laur L M) :
-    tw c g (f • x) = rescale c f • tw c g x := by
+theorem tw_smul {c : L} (hc : c ≠ 0) (g : M →ₗ[L] M') (f : L⟦X⟧) (x : Laur L M)
+    : tw c g (f • x) = rescale c f • tw c g x := by
   apply co_injective
   funext k
   rw [co_tw, co_smul, co_smul]

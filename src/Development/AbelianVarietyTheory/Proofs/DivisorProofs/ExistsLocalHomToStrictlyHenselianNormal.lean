@@ -16,9 +16,12 @@ open IsLocalRing Polynomial
 
 namespace GlobalTheory.NormalStrictHens
 
-theorem exists_mem_finset {S : Type} [CommRing S] {ι : Type} [Preorder ι] [IsDirected ι (· ≤ ·)]
-    [Nonempty ι] (R : ι → Subring S) (hmono : Monotone R) (hcov : ∀ x : S, ∃ i, x ∈ R i)
-    (s : Finset S) : ∃ i, ∀ x ∈ s, x ∈ R i := by
+theorem exists_mem_finset
+    {S : Type} [CommRing S]
+    {ι : Type} [Preorder ι] [IsDirected ι (· ≤ ·)] [Nonempty ι]
+    (R : ι → Subring S) (hmono : Monotone R) (hcov : ∀ x : S, ∃ i, x ∈ R i)
+    (s : Finset S)
+    : ∃ i, ∀ x ∈ s, x ∈ R i := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨Classical.arbitrary ι, by simp⟩
@@ -31,9 +34,12 @@ theorem exists_mem_finset {S : Type} [CommRing S] {ι : Type} [Preorder ι] [IsD
     · exact hmono hjk hj
     · exact hmono hik (hi y hy)
 
-theorem isDomain_of_directed {S : Type} [CommRing S] [Nontrivial S] {ι : Type} [Preorder ι]
-    [IsDirected ι (· ≤ ·)] [Nonempty ι] (R : ι → Subring S) (hmono : Monotone R)
-    (hcov : ∀ x : S, ∃ i, x ∈ R i) (hdom : ∀ i, IsDomain (R i)) : IsDomain S := by
+theorem isDomain_of_directed
+    {S : Type} [CommRing S] [Nontrivial S]
+    {ι : Type} [Preorder ι] [IsDirected ι (· ≤ ·)] [Nonempty ι]
+    (R : ι → Subring S)
+    (hmono : Monotone R) (hcov : ∀ x : S, ∃ i, x ∈ R i) (hdom : ∀ i, IsDomain (R i))
+    : IsDomain S := by
   classical
   haveI : NoZeroDivisors S := ⟨fun {x y} hxy => by
     obtain ⟨k, hk⟩ := exists_mem_finset R hmono hcov {x, y}
@@ -46,10 +52,12 @@ theorem isDomain_of_directed {S : Type} [CommRing S] [Nontrivial S] {ι : Type} 
     · exact Or.inr (congrArg Subtype.val h)⟩
   exact NoZeroDivisors.to_isDomain S
 
-theorem isIntegrallyClosed_of_directed {S : Type} [CommRing S] [IsDomain S] {ι : Type} [Preorder ι]
-    [IsDirected ι (· ≤ ·)] [Nonempty ι] (R : ι → Subring S) (hmono : Monotone R)
-    (hcov : ∀ x : S, ∃ i, x ∈ R i) (hdom : ∀ i, IsDomain (R i))
-    (hic : ∀ i, IsIntegrallyClosed (R i)) : IsIntegrallyClosed S := by
+theorem isIntegrallyClosed_of_directed
+    {S : Type} [CommRing S] [IsDomain S]
+    {ι : Type} [Preorder ι] [IsDirected ι (· ≤ ·)] [Nonempty ι]
+    (R : ι → Subring S) (hmono : Monotone R) (hcov : ∀ x : S, ∃ i, x ∈ R i)
+    (hdom : ∀ i, IsDomain (R i)) (hic : ∀ i, IsIntegrallyClosed (R i))
+    : IsIntegrallyClosed S := by
   classical
   rw [isIntegrallyClosed_iff (FractionRing S)]
   intro x hx
@@ -67,21 +75,25 @@ theorem isIntegrallyClosed_of_directed {S : Type} [CommRing S] [IsDomain S] {ι 
   have hinj : Function.Injective ((algebraMap S (FractionRing S)).comp (R k).subtype) :=
     (IsFractionRing.injective S (FractionRing S)).comp Subtype.val_injective
   let φ : FractionRing (R k) →+* FractionRing S := IsFractionRing.lift hinj
-  have hφ : ∀ r : R k, φ (algebraMap (R k) (FractionRing (R k)) r) = algebraMap S (FractionRing S) r :=
+  have hφ
+      : ∀ r : R k, φ (algebraMap (R k) (FractionRing (R k)) r) = algebraMap S (FractionRing S) r :=
     fun r => IsFractionRing.lift_algebraMap hinj r
   have hb0 : (⟨b, hb⟩ : R k) ∈ nonZeroDivisors (R k) := by
     rw [mem_nonZeroDivisors_iff_ne_zero]
     intro h
     exact nonZeroDivisors.coe_ne_zero b (congrArg Subtype.val h)
-  have hφy : φ (IsLocalization.mk' (FractionRing (R k)) (⟨a, ha⟩ : R k) ⟨⟨b, hb⟩, hb0⟩) =
-      IsLocalization.mk' (FractionRing S) a b := by
+  have hφy
+      : φ (IsLocalization.mk' (FractionRing (R k)) (⟨a, ha⟩ : R k) ⟨⟨b, hb⟩, hb0⟩)
+        = IsLocalization.mk' (FractionRing S) a b := by
     rw [IsFractionRing.lift_mk', IsFractionRing.mk'_eq_div]
     rfl
-  have hcomp : φ.comp (algebraMap (R k) (FractionRing (R k))) =
-      (algebraMap S (FractionRing S)).comp (R k).subtype := by
+  have hcomp
+      : φ.comp (algebraMap (R k) (FractionRing (R k)))
+        = (algebraMap S (FractionRing S)).comp (R k).subtype := by
     ext r
     exact hφ r
-  have hy : IsIntegral (R k) (IsLocalization.mk' (FractionRing (R k)) (⟨a, ha⟩ : R k) ⟨⟨b, hb⟩, hb0⟩) := by
+  have hy : IsIntegral (R k)
+      (IsLocalization.mk' (FractionRing (R k)) (⟨a, ha⟩ : R k) ⟨⟨b, hb⟩, hb0⟩) := by
     refine ⟨f.toSubring (R k) hcf, hgm, ?_⟩
     apply φ.injective
     rw [map_zero, hom_eval₂, hφy, hcomp, ← eval₂_map, hgf]
@@ -94,15 +106,17 @@ end GlobalTheory.NormalStrictHens
 
 namespace GlobalTheory
 
-
 open GlobalTheory.NormalStrictHens in
-theorem exists_strictlyHenselian_normal_between : ∀ (T : Type) [CommRing T] [IsDomain T] [IsLocalRing T],
-    GlobalTheory.LocAcyc.AbsIntClosed T →
-    ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A] [IsIntegrallyClosed A]
-      (i : A →+* T), IsLocalHom i →
-    ∃ (A' : Type) (_ : CommRing A') (_ : IsDomain A') (_ : HenselianLocalRing A')
-      (_ : IsSepClosed (ResidueField A')) (_ : IsNoetherianRing A') (_ : IsIntegrallyClosed A')
-      (ι : A →+* A') (α : A' →+* T), α.comp ι = i ∧ IsLocalHom α := by
+theorem exists_strictlyHenselian_normal_between
+    : ∀ (T : Type) [CommRing T] [IsDomain T] [IsLocalRing T],
+      GlobalTheory.LocAcyc.AbsIntClosed T
+        → ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A]
+            [IsIntegrallyClosed A] (i : A →+* T),
+          IsLocalHom i
+            → ∃ (A' : Type) (_ : CommRing A') (_ : IsDomain A') (_ : HenselianLocalRing A')
+                (_ : IsSepClosed (ResidueField A')) (_ : IsNoetherianRing A')
+                (_ : IsIntegrallyClosed A') (ι : A →+* A') (α : A' →+* T),
+              α.comp ι = i ∧ IsLocalHom α := by
   intro T _ _ _ hT A _ _ _ _ _ i hi
   haveI := hi
   obtain ⟨hThens, hTac, -⟩ :=
@@ -112,25 +126,28 @@ theorem exists_strictlyHenselian_normal_between : ∀ (T : Type) [CommRing T] [I
   obtain ⟨S, _, _, _, hloc, hsc, -, hmax, -, ι, _, _, _, Si, hmono, hcov, hSi⟩ :=
     GlobalTheory.exists_strictHenselisation A (SeparableClosure (ResidueField A))
   haveI := hsc
-  have hind : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap A S) :=
+  have hind : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap
+      A S) :=
     GlobalTheory.StrictHensUnion.indEtale_of_directed_union A S ι Si hmono hcov fun k => by
       obtain ⟨B, _, _, _, q, _, ⟨e⟩⟩ := hSi k
       exact GlobalTheory.StrictHensUnion.indEtale_of_algEquiv e
         (GlobalTheory.StrictHensUnion.indEtale_localization_of_etale A B q.primeCompl)
-  have hsh : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation (algebraMap A S) :=
+  have hsh : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation
+      (algebraMap A S) :=
     ⟨inferInstance, hsc, hloc, hind⟩
   haveI : IsNoetherianRing S := GlobalTheory.StalkNoeth.isNoetherianRing_of_indEt A S hind
   have hdi : ∀ k, IsDomain (Si k).toSubring ∧ IsIntegrallyClosed (Si k).toSubring := fun k => by
     obtain ⟨B, _, _, _, q, _, ⟨e⟩⟩ := hSi k
     obtain ⟨h1, h2⟩ := GlobalTheory.etale_localization_atPrime_isDomain_isIntegrallyClosed A B q
     let e' : Localization.AtPrime q ≃+* (Si k).toSubring :=
-      e.toRingEquiv.trans
-        { toFun := fun x => ⟨x.1, x.2⟩
-          invFun := fun x => ⟨x.1, x.2⟩
-          left_inv := fun _ => rfl
-          right_inv := fun _ => rfl
-          map_mul' := fun _ _ => rfl
-          map_add' := fun _ _ => rfl }
+      e.toRingEquiv.trans {
+        toFun := fun x => ⟨x.1, x.2⟩
+        invFun := fun x => ⟨x.1, x.2⟩
+        left_inv := fun _ => rfl
+        right_inv := fun _ => rfl
+        map_mul' := fun _ _ => rfl
+        map_add' := fun _ _ => rfl
+      }
     exact ⟨e'.symm.toMulEquiv.isDomain _, IsIntegrallyClosed.of_equiv e'⟩
   have hmono' : Monotone fun k => (Si k).toSubring := fun _ _ h => hmono h
   haveI : IsDomain S := isDomain_of_directed _ hmono' hcov fun k => (hdi k).1
@@ -142,8 +159,19 @@ theorem exists_strictlyHenselian_normal_between : ∀ (T : Type) [CommRing T] [I
     rw [← hmax, Ideal.map_le_iff_le_comap, Ideal.comap_comap, hα]
     intro a ha
     exact map_nonunit i a ha
-  refine ⟨S, inferInstance, inferInstance, inferInstance, hsc, inferInstance, hic,
-    algebraMap A S, α, hα, ⟨fun s hs => ?_⟩⟩
+  refine ⟨
+    S,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    hsc,
+    inferInstance,
+    hic,
+    algebraMap A S,
+    α,
+    hα,
+    ⟨fun s hs => ?_⟩
+  ⟩
   by_contra h
   exact (mem_maximalIdeal _).1 (hle ((mem_maximalIdeal s).2 h)) hs
 

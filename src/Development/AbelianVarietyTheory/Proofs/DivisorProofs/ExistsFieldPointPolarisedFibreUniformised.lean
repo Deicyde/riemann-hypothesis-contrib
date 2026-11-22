@@ -19,8 +19,10 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Pol
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -31,9 +33,10 @@ noncomputable section
 
 namespace GlobalTheory.PolPoint
 
-theorem isProper_of_image {S T : Scheme.{0}} (A : Over S) (B : Over T) (g : T ⟶ S) (φ : B.left ⟶ A.left)
-    (h : IsPullback φ B.hom A.hom g) (W : S.Opens) (hg : ∀ t, g t ∈ W) (hpr : IsProper (A.hom ∣_ W)) :
-    IsProper B.hom := by
+theorem isProper_of_image
+    {S T : Scheme.{0}} (A : Over S) (B : Over T) (g : T ⟶ S) (φ : B.left ⟶ A.left)
+    (h : IsPullback φ B.hom A.hom g) (W : S.Opens) (hg : ∀ t, g t ∈ W) (hpr : IsProper (A.hom ∣_ W))
+    : IsProper B.hom := by
   have hr : Set.range g ⊆ Set.range W.ι := by
     rintro _ ⟨y, rfl⟩
     rw [Scheme.Opens.range_ι]
@@ -51,10 +54,24 @@ theorem isProper_of_image {S T : Scheme.{0}} (A : Over S) (B : Over T) (g : T �
   have big : IsPullback (ψ ≫ (A.hom ⁻¹ᵁ W).ι) B.hom A.hom (l ≫ W.ι) := by rw [hψ, hl]; exact h
   have sq : IsPullback ψ B.hom (A.hom ∣_ W) l := by
     refine IsPullback.of_right big ?_ (isPullback_morphismRestrict A.hom W).flip
-    rw [← cancel_mono W.ι, Category.assoc, morphismRestrict_ι, ← Category.assoc, hψ, h.w, Category.assoc, hl]
+    rw [← cancel_mono W.ι, Category.assoc, morphismRestrict_ι, ← Category.assoc, hψ, h.w,
+      Category.assoc, hl]
   exact MorphismProperty.of_isPullback (P := @IsProper) sq hpr
 
-theorem exists_field_point_polarised : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], Base R → ∀ (D : DegData R (maximalIdeal R)) (A : PolAV (Sp (FractionRing R))) (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G → ∀ U : Unif (maximalIdeal R) D A G, ∀ W : (Sp R).Opens, IsProper (G.hom ∣_ W) → ∀ y : PrimeSpectrum R, y ∈ W → y.asIdeal ≠ ⊥ → ∃ (K₁ : Type) (_ : Field K₁) (z : Sp K₁ ⟶ Sp R), z (closedPoint K₁) = y ∧ IsProper (pullback.snd G.hom z) ∧ RelAmple ((Over.pullback z).obj G) (U.LG.L.pull (pullback.fst G.hom z)) ∧ KTriv ((Over.pullback z).obj G) (U.LG.L.pull (pullback.fst G.hom z)) := by
+theorem exists_field_point_polarised
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      Base R
+        → ∀ (D : DegData R (maximalIdeal R)) (A : PolAV (Sp (FractionRing R))) (G : Over (Sp R))
+            [GrpObj G] [IsCommMonObj G],
+          IsSemiAbelian G
+            → ∀ U : Unif (maximalIdeal R) D A G, ∀ W : (Sp R).Opens,
+              IsProper (G.hom ∣_ W)
+                → ∀ y : PrimeSpectrum R,
+                  y ∈ W → y.asIdeal ≠ ⊥
+                    → ∃ (K₁ : Type) (_ : Field K₁) (z : Sp K₁ ⟶ Sp R),
+                      z (closedPoint K₁) = y ∧ IsProper (pullback.snd G.hom z)
+                        ∧ RelAmple ((Over.pullback z).obj G) (U.LG.L.pull (pullback.fst G.hom z))
+                        ∧ KTriv ((Over.pullback z).obj G) (U.LG.L.pull (pullback.fst G.hom z)) := by
   intro R _ _ _ hR D A G _ _ hG U W hW y hyW hy
   obtain ⟨⟨hN, -, -, -⟩, -⟩ := hR
   let O := Localization.AtPrime y.asIdeal
@@ -81,7 +98,8 @@ theorem exists_field_point_polarised : ∀ (R : Type) [CommRing R] [IsDomain R] 
       exact IsLocalRing.le_maximalIdeal (q.isPrime.comap ρ).ne_top hs
     exact ((PrimeSpectrum.le_iff_specializes _ _).1 hle).mem_open W.isOpen hyW
   let B := (Over.pullback (spMap a)).obj G
-  have hcart : IsPullback (pullback.fst G.hom (spMap a)) B.hom G.hom (spMap a) := IsPullback.of_hasPullback _ _
+  have hcart : IsPullback (pullback.fst G.hom (spMap a)) B.hom G.hom (spMap a) :=
+    IsPullback.of_hasPullback _ _
   have hpB : IsProper B.hom := isProper_of_image G B (spMap a) _ hcart W hgen hW
   have hsB := IsSemiAbelian.pullback (spMap a) G hG
   have hAb : IsAbelianScheme B := ⟨hsB.comm, hsB.smooth, hpB, hsB.geomConnected⟩
@@ -92,11 +110,14 @@ theorem exists_field_point_polarised : ∀ (R : Type) [CommRing R] [IsDomain R] 
     GlobalTheory.ThetaBaseChange.grp_generic U.toUnifPre
   have hgi : U.gen.inv.left ≫ U.gen.hom.left = 𝟙 _ := by
     rw [← Over.comp_left, Iso.inv_hom_id, Over.id_left]
-  have hLφ : LBIso A.L (M.L.L.pull φ) := LBIso.chartPull (h := U.gen.inv.left) (chartPullSec A.L _ _ hgi)
-    (chartPullSame U.LG.L _ (fun _ => pullback.fst G.hom (jK R)) _ _ fun _ => rfl) U.ext
+  have hLφ : LBIso A.L (M.L.L.pull φ) :=
+    LBIso.chartPull (h := U.gen.inv.left) (chartPullSec A.L _ _ hgi)
+      (chartPullSame U.LG.L _ (fun _ => pullback.fst G.hom (jK R)) _ _ fun _ => rfl) U.ext
   obtain ⟨P', M', φ', hφ', hL', hM'⟩ :=
-    GlobalTheory.PolExtendDVR.exists_baseChange (K' := FractionRing V) hL.polBaseChange a ha A G M φ hφ hLφ
-  obtain ⟨hAB, hKB⟩ := GlobalTheory.polarisation_extends_dvr hL hL2 V (FractionRing V) P' B M' φ' hAb hφ' hL'
+    GlobalTheory.PolExtendDVR.exists_baseChange (K' := FractionRing V) hL.polBaseChange a ha A G M φ
+      hφ hLφ
+  obtain ⟨hAB, hKB⟩ :=
+    GlobalTheory.polarisation_extends_dvr hL hL2 V (FractionRing V) P' B M' φ' hAb hφ' hL'
   let r := IsLocalRing.residue V
   obtain ⟨z, hz0⟩ : ∃ z : Sp (IsLocalRing.ResidueField V) ⟶ Sp R, z = spMap (r.comp a) := ⟨_, rfl⟩
   have hz : z = spMap r ≫ spMap a := by
@@ -104,8 +125,9 @@ theorem exists_field_point_polarised : ∀ (R : Type) [CommRing R] [IsDomain R] 
     unfold spMap
     rw [← Spec.map_comp]
     rfl
-  let ψ : pullback G.hom z ⟶ B.left := pullback.lift (pullback.fst G.hom z) (pullback.snd G.hom z ≫ spMap r)
-    (by rw [pullback.condition, hz, Category.assoc])
+  let ψ : pullback G.hom z ⟶ B.left :=
+    pullback.lift (pullback.fst G.hom z) (pullback.snd G.hom z ≫ spMap r)
+      (by rw [pullback.condition, hz, Category.assoc])
   have hψ : ψ ≫ pullback.fst G.hom (spMap a) = pullback.fst G.hom z := pullback.lift_fst _ _ _
   have hψ2 : ψ ≫ B.hom = ((Over.pullback z).obj G).hom ≫ spMap r := pullback.lift_snd _ _ _
   have hgz : IsGrpPullback ((Over.pullback z).obj G) B (spMap r) ψ :=
@@ -117,8 +139,10 @@ theorem exists_field_point_polarised : ∀ (R : Type) [CommRing R] [IsDomain R] 
   obtain ⟨w, hw⟩ := hiso
   have hw' := (isGen_iff w).1 hw
   refine ⟨IsLocalRing.ResidueField V, inferInstance, z, ?_, ?_, ?_, ?_⟩
-  · have e1 : PrimeSpectrum.comap r (IsLocalRing.closedPoint (IsLocalRing.ResidueField V)) =
-        IsLocalRing.closedPoint V := IsLocalRing.comap_closedPoint r
+  · have e1
+        : PrimeSpectrum.comap r (IsLocalRing.closedPoint (IsLocalRing.ResidueField V))
+          = IsLocalRing.closedPoint V :=
+      IsLocalRing.comap_closedPoint r
     have e2 : PrimeSpectrum.comap ρ (IsLocalRing.closedPoint V) = IsLocalRing.closedPoint O :=
       IsLocalRing.comap_closedPoint ρ
     have e3 : PrimeSpectrum.comap (algebraMap R O) (IsLocalRing.closedPoint O) = y :=
@@ -128,7 +152,9 @@ theorem exists_field_point_polarised : ∀ (R : Type) [CommRing R] [IsDomain R] 
       (PrimeSpectrum.comap r (IsLocalRing.closedPoint (IsLocalRing.ResidueField V)))) = y
     rw [e1, e2, e3]
   · exact MorphismProperty.of_isPullback (P := @IsProper) hgz.1 hpB
-  · exact relAmple_pull hgz.1 M'.L.isLB (pull_isLB U.LG.isLB _) hw' ⊤ (isAffineOpen_top _) (fun _ => trivial) hAB
+  · exact relAmple_pull hgz.1 M'.L.isLB (pull_isLB U.LG.isLB _) hw' ⊤ (isAffineOpen_top _)
+      (fun _ => trivial)
+      hAB
   · exact kTriv_pull hgz M'.L.isLB (pull_isLB U.LG.isLB _) hw' hKB
 
 end GlobalTheory.PolPoint

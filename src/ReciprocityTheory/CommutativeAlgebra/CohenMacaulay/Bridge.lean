@@ -18,16 +18,19 @@ theorem isCM_iff_isCMMod : IsCM R ↔ IsCMMod R R := by
   · rintro ⟨h1, -, n, hn, h2⟩
     exact ⟨h1, n, hd.symm.trans hn, h2⟩
 
-theorem modDepthGE_congr {M N : Type*} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (e : M ≃ₗ[R] N) (n : ℕ) : ModDepthGE R M n ↔ ModDepthGE R N n := by
+theorem modDepthGE_congr
+    {M N : Type*} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (e : M ≃ₗ[R] N) (n : ℕ)
+    : ModDepthGE R M n ↔ ModDepthGE R N n := by
   constructor
   · rintro ⟨rs, h1, h2, h3⟩
     exact ⟨rs, h1, h2, (e.isRegular_congr rs).mp h3⟩
   · rintro ⟨rs, h1, h2, h3⟩
     exact ⟨rs, h1, h2, (e.isRegular_congr rs).mpr h3⟩
 
-theorem isCMMod_congr {M N : Type*} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (e : M ≃ₗ[R] N) : IsCMMod R M ↔ IsCMMod R N := by
+theorem isCMMod_congr
+    {M N : Type*} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N] (e : M ≃ₗ[R] N)
+    : IsCMMod R M ↔ IsCMMod R N := by
   have hs : Module.support R M = Module.support R N :=
     (Module.support_subset_of_injective e.toLinearMap e.injective).antisymm
       (Module.support_subset_of_surjective e.toLinearMap e.surjective)
@@ -94,10 +97,12 @@ lemma mk_mem_maximalIdeal_quot (I : Ideal R) [IsLocalRing (R ⧸ I)] {r : R}
   rw [Ideal.Quotient.eq_zero_iff_mem.mpr h1] at h4
   exact not_isUnit_zero h4
 
-theorem depthGE_quotient_iff (I : Ideal R) [IsLocalRing (R ⧸ I)] (n : ℕ) :
-    DepthGE (R ⧸ I) n ↔ ModDepthGE R (R ⧸ I) n := by
-  have key : ∀ rs : List R, RingTheory.Sequence.IsRegular (R ⧸ I) (rs.map (Ideal.Quotient.mk I)) ↔
-      RingTheory.Sequence.IsRegular (R ⧸ I) rs := fun rs => by
+theorem depthGE_quotient_iff (I : Ideal R) [IsLocalRing (R ⧸ I)] (n : ℕ)
+    : DepthGE (R ⧸ I) n ↔ ModDepthGE R (R ⧸ I) n := by
+  have key
+      : ∀ rs : List R,
+        RingTheory.Sequence.IsRegular (R ⧸ I) (rs.map (Ideal.Quotient.mk I))
+          ↔ RingTheory.Sequence.IsRegular (R ⧸ I) rs := fun rs => by
     have := isRegular_map_algebraMap_iff' (S := R ⧸ I) (M := R ⧸ I) rs
     rwa [Ideal.Quotient.algebraMap_eq] at this
   have hs : Function.Surjective (Ideal.Quotient.mk I) := Ideal.Quotient.mk_surjective
@@ -120,8 +125,8 @@ theorem depthGE_quotient_iff (I : Ideal R) [IsLocalRing (R ⧸ I)] (n : ℕ) :
     obtain ⟨y, hy, rfl⟩ := List.mem_map.mp hx
     exact mk_mem_maximalIdeal_quot I (hmem y hy)
 
-theorem isCM_quotient_iff [IsNoetherianRing R] (I : Ideal R) [IsLocalRing (R ⧸ I)] :
-    IsCM (R ⧸ I) ↔ IsCMMod R (R ⧸ I) := by
+theorem isCM_quotient_iff [IsNoetherianRing R] (I : Ideal R) [IsLocalRing (R ⧸ I)]
+    : IsCM (R ⧸ I) ↔ IsCMMod R (R ⧸ I) := by
   have hfin : Module.Finite R (R ⧸ I) :=
     Module.Finite.of_surjective (Submodule.mkQ I) (Submodule.mkQ_surjective I)
   have hd : Module.supportDim R (R ⧸ I) = ringKrullDim (R ⧸ I) := by
@@ -132,8 +137,9 @@ theorem isCM_quotient_iff [IsNoetherianRing R] (I : Ideal R) [IsLocalRing (R ⧸
   · rintro ⟨-, -, n, hn, h⟩
     exact ⟨inferInstance, n, hd.symm.trans hn, (depthGE_quotient_iff I n).mpr h⟩
 
-theorem DepthGE.of_ringEquiv {S : Type*} [CommRing S] [IsLocalRing S] (e : R ≃+* S) {n : ℕ}
-    (h : DepthGE R n) : DepthGE S n := by
+theorem DepthGE.of_ringEquiv
+    {S : Type*} [CommRing S] [IsLocalRing S] (e : R ≃+* S) {n : ℕ} (h : DepthGE R n)
+    : DepthGE S n := by
   obtain ⟨rs, hlen, hmem, hreg⟩ := h
   refine ⟨rs.map (e : R →+* S), by simp [hlen], ?_, ?_⟩
   · intro x hx
@@ -147,10 +153,14 @@ theorem DepthGE.of_ringEquiv {S : Type*} [CommRing S] [IsLocalRing S] (e : R ≃
     have h2 : RingHomInvPair (e.symm : S →+* R) (e : R →+* S) := ⟨by ext; simp, by ext; simp⟩
     exact (LinearEquiv.isRegular_congr' (σ' := (e.symm : S →+* R)) e.toSemilinearEquiv rs).mp hreg
 
-theorem IsCM.of_ringEquiv {S : Type*} [CommRing S] [IsLocalRing S] (e : R ≃+* S)
-    (h : IsCM R) : IsCM S := by
+theorem IsCM.of_ringEquiv {S : Type*} [CommRing S] [IsLocalRing S] (e : R ≃+* S) (h : IsCM R)
+    : IsCM S := by
   obtain ⟨hN, n, hn, hd⟩ := h
-  exact ⟨isNoetherianRing_of_ringEquiv R e, n, (ringKrullDim_eq_of_ringEquiv e).symm.trans hn,
-    hd.of_ringEquiv e⟩
+  exact ⟨
+    isNoetherianRing_of_ringEquiv R e,
+    n,
+    (ringKrullDim_eq_of_ringEquiv e).symm.trans hn,
+    hd.of_ringEquiv e
+  ⟩
 
 end ReciprocityTheory.CA

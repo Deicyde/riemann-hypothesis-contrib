@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.FiniteA
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,22 +20,23 @@ namespace GlobalTheory.HeisenbergWeightDim
 
 variable {F : Type} [Field F] {A : Type} [CommGroup A] {E : Type} [AddCommGroup E] [Module F E]
 
-theorem units_eq_of_smul_eq {x y : Fˣ} {w : E} (hw : w ≠ 0) (h : (x : F) • w = (y : F) • w) :
-    x = y :=
+theorem units_eq_of_smul_eq {x y : Fˣ} {w : E} (hw : w ≠ 0) (h : (x : F) • w = (y : F) • w)
+    : x = y :=
   Units.ext (smul_left_injective F hw h)
 
 variable [Nontrivial E] {e : A → A → Fˣ} {Φ : A → (E ≃ₗ[F] E)}
 
-theorem comm_swap (hc : ∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) (a b : A) :
-    e a b * e b a = 1 := by
+theorem comm_swap (hc : ∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) (a b : A)
+    : e a b * e b a = 1 := by
   obtain ⟨v, hv⟩ := exists_ne (0 : E)
   have hw : Φ a (Φ b v) ≠ 0 := by simpa using hv
   apply units_eq_of_smul_eq hw
   rw [Units.val_mul, mul_smul, ← hc b a v, ← hc a b v, Units.val_one, one_smul]
 
-theorem comm_mul_left (hm : ∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) • Φ a (Φ b v))
-    (hc : ∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) (a a' b : A) :
-    e (a * a') b = e a b * e a' b := by
+theorem comm_mul_left
+    (hm : ∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) • Φ a (Φ b v))
+    (hc : ∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) (a a' b : A)
+    : e (a * a') b = e a b * e a' b := by
   obtain ⟨v, hv⟩ := exists_ne (0 : E)
   have hw : Φ b (Φ (a * a') v) ≠ 0 := by simpa using hv
   apply units_eq_of_smul_eq hw
@@ -43,20 +46,23 @@ theorem comm_mul_left (hm : ∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) 
   congr 1
   ring
 
-theorem comm_mul_right (hm : ∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) • Φ a (Φ b v))
-    (hc : ∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) (a b b' : A) :
-    e a (b * b') = e a b * e a b' := by
+theorem comm_mul_right
+    (hm : ∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) • Φ a (Φ b v))
+    (hc : ∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) (a b b' : A)
+    : e a (b * b') = e a b * e a b' := by
   rw [eq_inv_of_mul_eq_one_left (comm_swap hc a (b * b')),
     eq_inv_of_mul_eq_one_left (comm_swap hc a b), eq_inv_of_mul_eq_one_left (comm_swap hc a b'),
     comm_mul_left hm hc, mul_inv]
 
-theorem exists_comm_eq [Finite A] [HasEnoughRootsOfUnity F (Monoid.exponent A)]
+theorem exists_comm_eq
+    [Finite A] [HasEnoughRootsOfUnity F (Monoid.exponent A)]
     (hm : ∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) • Φ a (Φ b v))
-    (hc : ∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v))
-    (hn : ∀ a, (∀ b, e a b = 1) → a = 1) (T : Subgroup A) (χ : T →* Fˣ) :
-    ∃ a, ∀ t : T, e t a = χ t := by
+    (hc : ∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) (hn : ∀ a, (∀ b, e a b = 1) → a = 1)
+    (T : Subgroup A) (χ : T →* Fˣ)
+    : ∃ a, ∀ t : T, e t a = χ t := by
   let P : A →* (A →* Fˣ) :=
-    MonoidHom.mk' (fun a => MonoidHom.mk' (fun b => e b a) (fun b b' => comm_mul_left hm hc b b' a))
+    MonoidHom.mk'
+      (fun a => MonoidHom.mk' (fun b => e b a) (fun b b' => comm_mul_left hm hc b b' a))
       (fun a a' => by
         apply MonoidHom.ext
         intro b
@@ -83,10 +89,20 @@ end GlobalTheory.HeisenbergWeightDim
 
 namespace GlobalTheory
 
-
 open HeisenbergWeightDim in
-theorem heisenberg_weightSpace_finrank :
-    ∀ (F : Type) [Field F] [IsAlgClosed F] (A : Type) [CommGroup A] [Finite A] (E : Type) [AddCommGroup E] [Module F E] [FiniteDimensional F E] (e : A → A → Fˣ) (Φ : A → (E ≃ₗ[F] E)), (Nat.card A : F) ≠ 0 → Module.finrank F E ^ 2 = Nat.card A → (∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) • Φ a (Φ b v)) → (∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) → (∀ a, (∀ b, e a b = 1) → a = 1) → ∀ (T : Subgroup A) (lam : T →* (E ≃ₗ[F] E)), (∀ t : T, ∃ c : Fˣ, ∀ v, lam t v = (c : F) • Φ t v) → ∀ Wt : (T →* Fˣ) → Submodule F E, (∀ χ v, v ∈ Wt χ ↔ ∀ t, lam t v = (χ t : F) • v) → (⨆ χ, Wt χ = ⊤) ∧ ∀ χ, Module.finrank F (Wt χ) * Nat.card T = Module.finrank F E := by
+theorem heisenberg_weightSpace_finrank
+    : ∀ (F : Type) [Field F] [IsAlgClosed F] (A : Type) [CommGroup A] [Finite A] (E : Type)
+        [AddCommGroup E] [Module F E] [FiniteDimensional F E] (e : A → A → Fˣ)
+        (Φ : A → (E ≃ₗ[F] E)),
+      (Nat.card A : F) ≠ 0 → Module.finrank F E ^ 2 = Nat.card A
+        → (∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) • Φ a (Φ b v))
+        → (∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) → (∀ a, (∀ b, e a b = 1) → a = 1)
+        → ∀ (T : Subgroup A) (lam : T →* (E ≃ₗ[F] E)),
+          (∀ t : T, ∃ c : Fˣ, ∀ v, lam t v = (c : F) • Φ t v)
+            → ∀ Wt : (T →* Fˣ) → Submodule F E,
+              (∀ χ v, v ∈ Wt χ ↔ ∀ t, lam t v = (χ t : F) • v)
+                → (⨆ χ, Wt χ = ⊤)
+                  ∧ ∀ χ, Module.finrank F (Wt χ) * Nat.card T = Module.finrank F E := by
   intro F _ _ A _ _ E _ _ _ e Φ hA hdim hm hc hn T lam hlam Wt hWt
   classical
   have hpos : 0 < Nat.card A := Nat.card_pos
@@ -104,12 +120,15 @@ theorem heisenberg_weightSpace_finrank :
   haveI : HasEnoughRootsOfUnity F (Monoid.exponent T) :=
     hAe.of_dvd F (Monoid.exponent_submonoid_dvd T.toSubmonoid)
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot F (Nat.card A)
-  let ρ : Representation F T E :=
-    { toFun := fun t => (lam t : E →ₗ[F] E)
-      map_one' := by ext v; simp
-      map_mul' := by intro s t; ext v; simp }
-  obtain ⟨hfin, hint, -⟩ := finiteAbelian_weightDecomposition F (Nat.card A) ζ hpos
-    (IsUnit.mk0 _ hA) hζ T (fun t => Subtype.ext (by simp)) E ρ
+  let ρ : Representation F T E := {
+    toFun := fun t => (lam t : E →ₗ[F] E)
+    map_one' := by ext v; simp
+    map_mul' := by intro s t; ext v; simp
+  }
+  obtain ⟨hfin, hint, -⟩ :=
+    finiteAbelian_weightDecomposition F (Nat.card A) ζ hpos (IsUnit.mk0 _ hA) hζ T
+      (fun t => Subtype.ext (by simp))
+      E ρ
   have hW : (fun c : T →* Fˣ => ⨅ t, LinearMap.ker (ρ t - (c t : F) • LinearMap.id)) = Wt := by
     funext c
     ext v

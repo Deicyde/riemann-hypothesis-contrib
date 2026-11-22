@@ -17,8 +17,9 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 def ParallelSig {D : D7} (V : HSp D) (p q : ℕ) : Prop :=
   ∀ τ : D.host.E →+* ℂ, Formalism.UG.HasSignature (V.gram.map τ) p q
 
-theorem parallelSig_of_sigOK {D : D7} {V : HSp D} {p q : ℕ} (h : V.SigOK) (hs : ∀ τ, V.sig τ = (p, q)) :
-    ParallelSig V p q := fun τ => by
+theorem parallelSig_of_sigOK
+    {D : D7} {V : HSp D} {p q : ℕ} (h : V.SigOK) (hs : ∀ τ, V.sig τ = (p, q))
+    : ParallelSig V p q := fun τ => by
   have := h τ
   rwa [hs τ] at this
 

@@ -9,14 +9,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools
+open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
 
-private theorem hk_one {A G M : Type} [CommRing A] [Group G] [AddCommGroup M] [Module A M]
-    (ρ : Representation A G M) (I : Subgroup G) (hI : HeckePair I) : hk ρ I 1 = 1 :=
+private theorem hk_one
+    {A G M : Type} [CommRing A] [Group G] [AddCommGroup M] [Module A M]
+    (ρ : Representation A G M)
+    (I : Subgroup G) (hI : HeckePair I)
+    : hk ρ I 1 = 1 :=
   (hkNorm A G M ρ I 1 hI (one_mem _)).2.1
 
-theorem UpperTheory.V.AlgebraTools.permUnit :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (C : Subgroup 𝓀[k]ˣ) (A M : Type) [CommRing A] [AddCommGroup M] [Module A M] (ρ : Representation A (GL (Fin n) k) M) (w : Equiv.Perm (Fin n)), IsUnit (resCard k : A) → IsUnit (hk ρ (iwC k n C) (pm k n w)) := by
+theorem UpperTheory.V.AlgebraTools.permUnit
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (C : Subgroup 𝓀[k]ˣ) (A M : Type) [CommRing A] [AddCommGroup M] [Module A M]
+        (ρ : Representation A (GL (Fin n) k) M) (w : Equiv.Perm (Fin n)),
+      IsUnit (resCard k : A) → IsUnit (hk ρ (iwC k n C) (pm k n w)) := by
   intro k _ _ _ _ n C A M _ _ _ ρ w hq
   have hI : HeckePair (iwC k n C) := (heckePairIwC k n C).1
   induction h : invLen w generalizing w with

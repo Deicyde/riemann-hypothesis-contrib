@@ -26,9 +26,11 @@ theorem AnalyticSimpleRootBranch.proof : AnalyticSimpleRootBranch.Statement := b
     intro s
     simp [hp, hF, Polynomial.eval_finsetSum]
 
-  have hpart : fderiv ℂ F (y, τ) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ =
-      (1 : ℂ →L[ℂ] ℂ).smulRight (p.derivative.eval τ) := by
-    have h1 : HasFDerivAt (fun s : ℂ => F (y, s))
+  have hpart
+      : fderiv ℂ F (y, τ) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ
+        = (1 : ℂ →L[ℂ] ℂ).smulRight (p.derivative.eval τ) := by
+    have h1 : HasFDerivAt
+        (fun s : ℂ => F (y, s))
         (fderiv ℂ F (y, τ) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ) τ :=
       (hFa.differentiableAt.hasFDerivAt).comp τ ((hasFDerivAt_const y τ).prodMk (hasFDerivAt_id τ))
     have h2 : (fun s : ℂ => F (y, s)) = fun s => p.eval s := funext fun s => (hpe s).symm
@@ -37,7 +39,8 @@ theorem AnalyticSimpleRootBranch.proof : AnalyticSimpleRootBranch.Statement := b
   have hinv : (fderiv ℂ F (y, τ) ∘L ContinuousLinearMap.inr ℂ (Fin d → ℂ) ℂ).IsInvertible := by
     rw [hpart]
     refine ⟨ContinuousLinearEquiv.unitsEquivAut ℂ (Units.mk0 _ hder), ?_⟩
-    ext; simp
+    ext
+    simp
   have hω : (ω : WithTop ℕ∞) ≠ 0 := by simp
   set ψ := hcd.implicitFunction hω hinv with hψdef
   have hψy : ψ y = τ := hcd.implicitFunction_apply_self hω hinv
@@ -48,8 +51,18 @@ theorem AnalyticSimpleRootBranch.proof : AnalyticSimpleRootBranch.Statement := b
   set W : Set (Fin d → ℂ) := U₁ ∩ {x | AnalyticAt ℂ ψ x} with hW
   have hWo : IsOpen W := hU₁o.inter (isOpen_analyticAt ℂ ψ)
   have hWc : ContinuousOn ψ W := fun x hx => hx.2.continuousAt.continuousWithinAt
-  refine ⟨W ∩ ψ ⁻¹' B, B, ψ, hWc.isOpen_inter_preimage hWo hBo, ⟨⟨hyU₁, hψa⟩, by simpa [hψy] using hτB⟩,
-    hBo, hτB, fun x hx => hx.1.2, hψy, fun y' hy' => ⟨hy'.2, fun s hs => ?_⟩⟩
+  refine ⟨
+    W ∩ ψ ⁻¹' B,
+    B,
+    ψ,
+    hWc.isOpen_inter_preimage hWo hBo,
+    ⟨⟨hyU₁, hψa⟩, by simpa [hψy] using hτB⟩,
+    hBo,
+    hτB,
+    fun x hx => hx.1.2,
+    hψy,
+    fun y' hy' => ⟨hy'.2, fun s hs => ?_⟩
+  ⟩
   have h := hsub (Set.mk_mem_prod hy'.1.1 hs)
   simp only [Set.mem_ofPred_eq] at h
   change F (y', s) = 0 ↔ s = ψ y'

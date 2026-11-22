@@ -11,9 +11,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped ComplexOrder
 
-private theorem UpperTheory.V.KT.detlow_num (d : ℕ) (hd : d = 0 ∨ 2 ≤ d) (E P g : ℝ) (hE : 1 ≤ E)
-    (hP : 0 ≤ P) (h1 : 1 ≤ (4 * (d : ℝ)) ^ d * g) (h2 : 2 ^ d * g = E * P ^ 2) :
-    1 ≤ E * (d : ℝ) ^ d * P := by
+private theorem UpperTheory.V.KT.detlow_num
+    (d : ℕ) (hd : d = 0 ∨ 2 ≤ d)
+    (E P g : ℝ)
+    (hE : 1 ≤ E) (hP : 0 ≤ P) (h1 : 1 ≤ (4 * (d : ℝ)) ^ d * g) (h2 : 2 ^ d * g = E * P ^ 2)
+    : 1 ≤ E * (d : ℝ) ^ d * P := by
   have hq : (1 : ℝ) ≤ ((d : ℝ) / 2) ^ d := by
     rcases hd with rfl | hd2
     · simp
@@ -22,8 +24,9 @@ private theorem UpperTheory.V.KT.detlow_num (d : ℕ) (hd : d = 0 ∨ 2 ≤ d) (
       rw [le_div_iff₀ (by norm_num : (0 : ℝ) < 2)]
       linarith
   have hprod : 1 ≤ E * P ^ 2 * (d : ℝ) ^ d * (d : ℝ) ^ d := by
-    calc (1 : ℝ) ≤ ((d : ℝ) / 2) ^ d * ((4 * (d : ℝ)) ^ d * g) :=
-          one_le_mul_of_one_le_of_one_le hq h1
+    calc
+      (1 : ℝ)
+        ≤ ((d : ℝ) / 2) ^ d * ((4 * (d : ℝ)) ^ d * g) := one_le_mul_of_one_le_of_one_le hq h1
       _ = E * P ^ 2 * (d : ℝ) ^ d * (d : ℝ) ^ d := by
         rw [← mul_assoc, ← mul_pow, show (d : ℝ) / 2 * (4 * d) = 2 * d * d by ring, mul_pow,
           mul_pow, ← h2]
@@ -31,23 +34,27 @@ private theorem UpperTheory.V.KT.detlow_num (d : ℕ) (hd : d = 0 ∨ 2 ≤ d) (
   have hE0 : 0 ≤ E := by linarith
   have hX : 0 ≤ E * (d : ℝ) ^ d * P := mul_nonneg (mul_nonneg hE0 (by positivity)) hP
   have hsq : 1 ≤ (E * (d : ℝ) ^ d * P) ^ 2 := by
-    calc (1 : ℝ) ≤ E * P ^ 2 * (d : ℝ) ^ d * (d : ℝ) ^ d := hprod
+    calc
+      (1 : ℝ)
+        ≤ E * P ^ 2 * (d : ℝ) ^ d * (d : ℝ) ^ d := hprod
       _ ≤ E * (E * P ^ 2 * (d : ℝ) ^ d * (d : ℝ) ^ d) := by
         nlinarith [mul_nonneg (sub_nonneg.2 hE) (le_trans zero_le_one hprod)]
       _ = (E * (d : ℝ) ^ d * P) ^ 2 := by ring
   nlinarith
 
-theorem UpperTheory.V.KT.detlow :
-    ∀ (L : Type) [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] (N : ℕ) (h : HS L N), h ∈ Ry L N →
-    1 ≤ (I0 L N : ℝ) * ∏ w, (mat h w).det.re := by
+theorem UpperTheory.V.KT.detlow
+    : ∀ (L : Type) [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] (N : ℕ)
+        (h : HS L N),
+      h ∈ Ry L N → 1 ≤ (I0 L N : ℝ) * ∏ w, (mat h w).det.re := by
   intro L _ _ _ N h hh
   classical
   obtain ⟨hherm, hquad, hreal, hbij⟩ := gramq L N h
   have hint0 : (intVec (0 : Fin N × BI L → ℤ) : KT.Lat L N) = 0 := by
     funext a
     simp [intVec]
-  have hpos : ∀ c : Fin N × BI L → ℤ, c ≠ 0 →
-      1 ≤ (fun i => (c i : ℝ)) ⬝ᵥ KT.gram h *ᵥ (fun i => (c i : ℝ)) := by
+  have hpos
+      : ∀ c : Fin N × BI L → ℤ,
+        c ≠ 0 → 1 ≤ (fun i => (c i : ℝ)) ⬝ᵥ KT.gram h *ᵥ (fun i => (c i : ℝ)) := by
     intro c hc
     rw [hquad, hreal]
     have hne : intVec c ≠ 0 := fun h0 => hc (hbij.1 (h0.trans hint0.symm))
@@ -76,8 +83,9 @@ theorem UpperTheory.V.KT.detlow :
         omega
       show 2 ≤ Module.finrank ℚ L * N
       nlinarith
-  have key := UpperTheory.V.KT.detlow_num (dd L N) hd ((absD L : ℝ) ^ N) (∏ w, (mat h w).det.re)
-    (KT.gram h).det hE hPpos hdet hgd
+  have key :=
+    UpperTheory.V.KT.detlow_num (dd L N) hd ((absD L : ℝ) ^ N) (∏ w, (mat h w).det.re)
+      (KT.gram h).det hE hPpos hdet hgd
   have e : ((I0 L N : ℕ) : ℝ) = (absD L : ℝ) ^ N * (dd L N : ℝ) ^ (dd L N) := by
     unfold I0
     rw [Nat.cast_mul, Nat.cast_pow, Nat.cast_pow]

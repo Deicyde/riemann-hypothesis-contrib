@@ -17,18 +17,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MultAddMultC
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory NumberField IsLocalRing IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.PGsh
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm Formalism.MainNotions.ModuliIntegralCharts.H1
-open GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.SlopeRec GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.RefSum GlobalTheory.FactorDepth GlobalTheory.CharDepth GlobalTheory.FGDepth GlobalTheory.PtTie GlobalTheory.PlaceInt
+open AlgebraicGeometry CategoryTheory NumberField IsLocalRing IsDedekindDomain
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.PGsh
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.DVR
+  ReciprocityTheory.ChartRestriction.G.DVR.QForm Formalism.MainNotions.ModuliIntegralCharts.H1
+open GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.SlopeRec GlobalTheory.CovTop
+  GlobalTheory.BigTop GlobalTheory.RefSum GlobalTheory.FactorDepth GlobalTheory.CharDepth
+  GlobalTheory.FGDepth GlobalTheory.PtTie GlobalTheory.PlaceInt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.RefSum.NumPt
 
-theorem jet_real {f m r t b g dF R : ℝ} (hf0 : 0 ≤ f) (hm0 : 0 ≤ m) (hr0 : 0 ≤ r) (hd0 : 0 ≤ dF)
-    (ht : 11 ≤ t) (hf : f ≤ t) (hm : m ≤ t) (hr : r ≤ t) (hb : t ^ 7 ≤ b) (hd : dF ≤ f * r * (2 * (2 * b) + 1))
-    (hR : R ≤ b) (hg : b ^ 8 ≤ g) :
-    4 * dF + 4 ≤ g ∧ dF * (2 * Real.sqrt (2 * f * m)) < g ∧
-      R * (2 * f * m) ^ 3 * (r * (2 * f * m) / 4 + 2 * dF ^ 2) / g ≤ 1 / 2500 := by
+theorem jet_real
+    {f m r t b g dF R : ℝ} (hf0 : 0 ≤ f) (hm0 : 0 ≤ m) (hr0 : 0 ≤ r) (hd0 : 0 ≤ dF) (ht : 11 ≤ t)
+    (hf : f ≤ t) (hm : m ≤ t) (hr : r ≤ t) (hb : t ^ 7 ≤ b) (hd : dF ≤ f * r * (2 * (2 * b) + 1))
+    (hR : R ≤ b) (hg : b ^ 8 ≤ g)
+    : 4 * dF + 4 ≤ g ∧ dF * (2 * Real.sqrt (2 * f * m)) < g
+      ∧ R * (2 * f * m) ^ 3 * (r * (2 * f * m) / 4 + 2 * dF ^ 2) / g ≤ 1 / 2500 := by
   have ht1 : (1 : ℝ) ≤ t := by linarith
   have hp : ∀ n : ℕ, n ≤ 7 → t ^ n ≤ b := fun n hn => (pow_le_pow_right₀ ht1 hn).trans hb
   have h100 : 100 ≤ b := by nlinarith [hp 2 (by norm_num)]
@@ -40,7 +47,8 @@ theorem jet_real {f m r t b g dF R : ℝ} (hf0 : 0 ≤ f) (hm0 : 0 ≤ m) (hr0 :
     have : t ^ 3 = t * t ^ 2 := by ring
     nlinarith [hp 3 (by norm_num)]
   have hdb : dF ≤ b ^ 2 := by
-    have h1 : f * r * (2 * (2 * b) + 1) ≤ t ^ 2 * (5 * b) := mul_le_mul hfr (by linarith) (by linarith) ht2
+    have h1 : f * r * (2 * (2 * b) + 1) ≤ t ^ 2 * (5 * b) :=
+      mul_le_mul hfr (by linarith) (by linarith) ht2
     nlinarith
   have hN0 : 0 ≤ 2 * f * m := by positivity
   have hN : 2 * f * m ≤ b := by nlinarith
@@ -80,8 +88,10 @@ theorem jet_real {f m r t b g dF R : ℝ} (hf0 : 0 ≤ f) (hm0 : 0 ≤ m) (hr0 :
 
 theorem finrank_host (D : D7) : Module.finrank ℚ D.host.E = 2 * D.R.f := D.host.finrank_E'
 
-theorem jetNum_of_sizes {D : D7} {L : SizeData₂ D} (S : SizesAt L) {dF : ℕ}
-    (hd : (dF : ℝ) ≤ D.R.f * D.R.r * (2 * (2 * L.sc.b) + 1)) : JetNum D dF (1 / 2500) := by
+theorem jetNum_of_sizes
+    {D : D7} {L : SizeData₂ D} (S : SizesAt L)
+    {dF : ℕ} (hd : (dF : ℝ) ≤ D.R.f * D.R.r * (2 * (2 * L.sc.b) + 1))
+    : JetNum D dF (1 / 2500) := by
   obtain ⟨-, -, -, -, -, sC, sQD, -, -, -, -, -, -, -, -, -, -, -, -, -, sG, -⟩ := S
   obtain ⟨-, -, -, -, -, -, h1, h2⟩ := sQD
   have a1 := D.R.two_le_m
@@ -107,20 +117,24 @@ theorem jetNum_of_sizes {D : D7} {L : SizeData₂ D} (S : SizesAt L) {dF : ℕ}
   have hc : D.host.rdE ≤ szCond L := by
     unfold szCond
     have h0 : (0 : ℝ) ≤ D.host.QS := Nat.cast_nonneg _
-    have : (D.host.QS : ℝ) * Real.sqrt ((D.host.q : ℝ) * D.host.d) ≤ D.host.QS * ((D.host.q : ℝ) * D.host.d) :=
+    have : (D.host.QS : ℝ) * Real.sqrt ((D.host.q : ℝ) * D.host.d)
+        ≤ D.host.QS * ((D.host.q : ℝ) * D.host.d) :=
       mul_le_mul_of_nonneg_left hs h0
     nlinarith [mul_nonneg h0 (Real.sqrt_nonneg ((D.host.q : ℝ) * D.host.d))]
   have hc1 : (1 : ℝ) ≤ szCond L := h1.trans hc
   have ht1 : (1 : ℝ) ≤ D.R.t := by linarith
   have sC' : szCond L ^ 36 * (D.R.t : ℝ) ^ 150 ≤ L.sc.b := le_trans sC hsb
   have hb : (D.R.t : ℝ) ^ 7 ≤ L.sc.b :=
-    ((pow_le_pow_right₀ ht1 (by norm_num)).trans (le_mul_of_one_le_left (by positivity) (one_le_pow₀ hc1))).trans sC'
+    ((pow_le_pow_right₀ ht1 (by norm_num)).trans
+      (le_mul_of_one_le_left (by positivity) (one_le_pow₀ hc1))).trans sC'
   have hrd : D.host.rdE ^ 2 ≤ L.sc.b :=
     (((pow_le_pow_left₀ (by linarith) hc 2).trans (pow_le_pow_right₀ hc1 (by norm_num))).trans
       (le_mul_of_one_le_right (by positivity) (one_le_pow₀ ht1))).trans sC'
   have hR : rr0 D ≤ L.sc.b := by
     have hn1 : (1 : ℝ) ≤ Module.finrank ℚ D.host.E := by exact_mod_cast Module.finrank_pos
-    have e : |(NumberField.discr D.host.E : ℝ)| ^ ((2 : ℝ) / Module.finrank ℚ D.host.E) = D.host.rdE ^ 2 := by
+    have e
+        : |(NumberField.discr D.host.E : ℝ)| ^ ((2 : ℝ) / Module.finrank ℚ D.host.E)
+          = D.host.rdE ^ 2 := by
       unfold Formalism.BasicNotions.Host.rdE
       rw [← Real.rpow_natCast, ← Real.rpow_mul (abs_nonneg _)]
       congr 1
@@ -132,24 +146,29 @@ theorem jetNum_of_sizes {D : D7} {L : SizeData₂ D} (S : SizesAt L) {dF : ℕ}
   intro k
   have hg : L.sc.b ^ 8 ≤ (D.host.g k : ℝ) :=
     (pow_le_pow_left₀ (by linarith) (le_mul_of_one_le_left (by linarith) hk) 8).trans (sG k k).1
-  obtain ⟨c1, c2, c3⟩ := jet_real (Nat.cast_nonneg _) (Nat.cast_nonneg _) (Nat.cast_nonneg _) (Nat.cast_nonneg _)
-    ht hf hm hr hb hd hR hg
+  obtain ⟨c1, c2, c3⟩ :=
+    jet_real (Nat.cast_nonneg _) (Nat.cast_nonneg _) (Nat.cast_nonneg _) (Nat.cast_nonneg _) ht hf
+      hm hr hb hd hR hg
   exact ⟨by exact_mod_cast c1, c2, c3⟩
 
 section Cols
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
 
-theorem mult_add_mult_conj (D : Datum H) (τ : E →+* ℂ) :
-    D.mult τ + D.mult (ReciprocityTheory.ChartRestriction.G.Geo.Tor.conjEmb τ) = D.p + D.q :=
+theorem mult_add_mult_conj (D : Datum H) (τ : E →+* ℂ)
+    : D.mult τ + D.mult (ReciprocityTheory.ChartRestriction.G.Geo.Tor.conjEmb τ) = D.p + D.q :=
   _root_.GlobalTheory.ConjugateMultiplicitySum.mult_add_mult_conj D τ
 
 theorem two_mul_rank_le_nCol (Dw : Datum H) : 2 * (Dw.p + Dw.q) ≤ nCol Dw := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   have h := mult_add_mult_conj Dw τ
   have hle : ∀ σ, Dw.mult σ ≤ Fintype.card (Lt1 Dw) := fun σ => by
-    have := Fintype.card_le_of_injective (fun i : Fin (Dw.mult σ) => (⟨σ, i⟩ : Lt1 Dw))
-      (@sigma_mk_injective _ (fun τ => Fin (Dw.mult τ)) σ)
+    have :=
+      Fintype.card_le_of_injective
+        (fun i : Fin (Dw.mult σ) => (⟨σ, i⟩ : Lt1 Dw))
+        (@sigma_mk_injective _ (fun τ => Fin (Dw.mult τ)) σ)
     rwa [Fintype.card_fin] at this
   have h1 := hle τ
   have h2 := hle (ReciprocityTheory.ChartRestriction.G.Geo.Tor.conjEmb τ)
@@ -158,10 +177,13 @@ theorem two_mul_rank_le_nCol (Dw : Datum H) : 2 * (Dw.p + Dw.q) ≤ nCol Dw := b
 
 end Cols
 
-theorem log_g_le {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (hL : 1 ≤ L.sc.L) (hf : 1 ≤ D.R.f) (hr : 1 ≤ D.R.r) :
-    Real.log (D.host.g 0) + Real.log (D.host.g 1) ≤ (2 + 2 * P.CYL) * zBase L ^ 12 := by
+theorem log_g_le
+    {D : D7} {L : SizeData₂ D}
+    (P : ParameterChoice' D L) (hL : 1 ≤ L.sc.L) (hf : 1 ≤ D.R.f) (hr : 1 ≤ D.R.r)
+    : Real.log (D.host.g 0) + Real.log (D.host.g 1) ≤ (2 + 2 * P.CYL) * zBase L ^ 12 := by
   obtain ⟨Y, h1, -, h3, h4⟩ := P.g_Y
-  have hk : (0 : ℝ) < D.R.k := by exact_mod_cast (by have := D.R.m_add_three_le_k; omega : 0 < D.R.k)
+  have hk : (0 : ℝ) < D.R.k := by
+    exact_mod_cast (by have := D.R.m_add_three_le_k; omega : 0 < D.R.k)
   have hb : 0 < L.sc.b := Real.exp_pos _
   have hY : 0 < Y := lt_of_lt_of_le (by positivity) h1
   have hg : ∀ i, Real.log (D.host.g i) ≤ L.sc.L + P.CYL * L.sc.L := fun i => by
@@ -171,7 +193,8 @@ theorem log_g_le {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (hL : 1
     linarith
   have hf' : (1 : ℝ) ≤ D.R.f := by exact_mod_cast hf
   have hr' : (1 : ℝ) ≤ D.R.r := by exact_mod_cast hr
-  have hZ : L.sc.L ≤ zBase L := le_mul_of_one_le_left (by linarith) (one_le_mul_of_one_le_of_one_le hf' hr')
+  have hZ : L.sc.L ≤ zBase L :=
+    le_mul_of_one_le_left (by linarith) (one_le_mul_of_one_le_of_one_le hf' hr')
   have hZ' : L.sc.L ≤ zBase L ^ 12 := hZ.trans (le_self_pow₀ (hL.trans hZ) (by norm_num))
   have := mul_le_mul_of_nonneg_left hZ' (show 0 ≤ 2 + 2 * P.CYL by linarith [P.CYL_pos])
   linarith [hg 0, hg 1]

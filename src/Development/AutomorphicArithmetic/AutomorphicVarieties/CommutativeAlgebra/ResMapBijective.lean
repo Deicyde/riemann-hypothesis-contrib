@@ -18,8 +18,9 @@ class IsCO (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] 
 
 attribute [instance] IsCO.complete IsCO.isLocalHom
 
-instance IsCO.self (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
-    [IsAdicComplete (maximalIdeal O) O] : IsCO O O where
+instance IsCO.self
+    (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O]
+    : IsCO O O where
   complete := inferInstance
   isLocalHom := ⟨fun _ h => h⟩
   res_surj x := ⟨x, by simp⟩
@@ -36,21 +37,21 @@ theorem resMap_bijective : Function.Bijective (ResidueField.map (algebraMap O R)
   rw [ResidueField.map_residue]
   exact ((Ideal.Quotient.eq).2 ha).symm
 
-def res : R →ₐ[O] ResidueField O :=
-  { ((RingEquiv.ofBijective _ (resMap_bijective O R)).symm.toRingHom.comp (residue R)) with
-    commutes' := fun a => by
-      show (RingEquiv.ofBijective _ (resMap_bijective O R)).symm (residue R (algebraMap O R a)) = residue O a
-      rw [RingEquiv.symm_apply_eq]
-      exact (ResidueField.map_residue _ _).symm }
+def res : R →ₐ[O] ResidueField O := {
+  ((RingEquiv.ofBijective _ (resMap_bijective O R)).symm.toRingHom.comp (residue R)) with
+  commutes' := fun a => by
+    show (RingEquiv.ofBijective _ (resMap_bijective O R)).symm (residue R (algebraMap O R a)) = residue O a
+    rw [RingEquiv.symm_apply_eq]
+    exact (ResidueField.map_residue _ _).symm
+}
 
 theorem res_eq_zero_iff (x : R) : res O R x = 0 ↔ x ∈ maximalIdeal R := by
   show (RingEquiv.ofBijective _ (resMap_bijective O R)).symm (residue R x) = 0 ↔ _
   rw [map_eq_zero_iff _ (RingEquiv.injective _), residue_eq_zero_iff]
 
-
 variable {O R} in
-theorem res_map {R' : Type} [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R') (x : R) :
-    res O R' (f x) = res O R x := by
+theorem res_map {R' : Type} [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R') (x : R)
+    : res O R' (f x) = res O R x := by
   obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) x
   have h1 : res O R x = algebraMap O _ a := by
     have := (res_eq_zero_iff O R _).2 ha
@@ -88,32 +89,35 @@ def wtPart (j : X) : Submodule O (MvPowerSeries σ O) where
   zero_mem' n _ := map_zero _
   smul_mem' c f hf n hn := by rw [map_smul, hf n hn, smul_zero]
 
-
 open Classical in
 def wcomp (j : X) : MvPowerSeries σ O →ₗ[O] MvPowerSeries σ O where
   toFun f := fun n => if Finsupp.weight wt n = j then coeff n f else 0
-  map_add' f g := funext fun n => by
-    show (if _ then _ else _) = (if _ then _ else _) + (if _ then _ else (0 : O))
-    split_ifs <;> simp
-  map_smul' c f := funext fun n => by
-    show (if _ then _ else _) = c • (if _ then _ else (0 : O))
-    split_ifs <;> simp
+  map_add' f g :=
+    funext fun n => by
+      show (if _ then _ else _) = (if _ then _ else _) + (if _ then _ else (0 : O))
+      split_ifs <;> simp
+  map_smul' c f :=
+    funext fun n => by
+      show (if _ then _ else _) = c • (if _ then _ else (0 : O))
+      split_ifs <;> simp
 
 open Classical in
-theorem coeff_wcomp (j : X) (f : MvPowerSeries σ O) (n : σ →₀ ℕ) :
-    coeff n (wcomp O wt j f) = if Finsupp.weight wt n = j then coeff n f else 0 := rfl
+theorem coeff_wcomp (j : X) (f : MvPowerSeries σ O) (n : σ →₀ ℕ)
+    : coeff n (wcomp O wt j f) = if Finsupp.weight wt n = j then coeff n f else 0 :=
+  rfl
 
-theorem wcomp_mem (j : X) (f : MvPowerSeries σ O) : wcomp O wt j f ∈ wtPart O wt j :=
-  fun n hn => by rw [coeff_wcomp, if_neg hn]
+theorem wcomp_mem (j : X) (f : MvPowerSeries σ O) : wcomp O wt j f ∈ wtPart O wt j := fun n hn => by
+  rw [coeff_wcomp, if_neg hn]
 
-theorem mul_mem_wtPart {i j : X} {f g : MvPowerSeries σ O} (hf : f ∈ wtPart O wt i) (hg : g ∈ wtPart O wt j) :
-    f * g ∈ wtPart O wt (i + j) := fun n hn => by
+theorem mul_mem_wtPart
+    {i j : X} {f g : MvPowerSeries σ O} (hf : f ∈ wtPart O wt i) (hg : g ∈ wtPart O wt j)
+    : f * g ∈ wtPart O wt (i + j) := fun n hn => by
   classical
   rw [coeff_mul]
   refine Finset.sum_eq_zero fun p hp => ?_
   by_cases h1 : Finsupp.weight wt p.1 = i
-  · have h2 : Finsupp.weight wt p.2 ≠ j := fun h2 => hn (by
-      rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 hp, map_add (f := _), h1, h2])
+  · have h2 : Finsupp.weight wt p.2 ≠ j := fun h2 =>
+      hn (by rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 hp, map_add (f := _), h1, h2])
     rw [hg _ h2, mul_zero]
   · rw [hf _ h1, zero_mul]
 
@@ -123,7 +127,8 @@ theorem one_mem_wtPart : (1 : MvPowerSeries σ O) ∈ wtPart O wt 0 := fun n hn 
   rintro rfl
   exact hn (map_zero _)
 
-theorem X_mem_wtPart (i : σ) : (MvPowerSeries.X i : MvPowerSeries σ O) ∈ wtPart O wt (wt i) := fun n hn => by
+theorem X_mem_wtPart (i : σ)
+    : (MvPowerSeries.X i : MvPowerSeries σ O) ∈ wtPart O wt (wt i) := fun n hn => by
   classical
   rw [coeff_X, if_neg]
   rintro rfl
@@ -137,13 +142,22 @@ def IsHomog (J : Ideal (MvPowerSeries σ O)) : Prop := ∀ f ∈ J, ∀ j, wcomp
 
 end Weights
 
-def gradedSub {O R X : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup X] (𝒜 : X → Submodule O R)
-    [SetLike.GradedMonoid 𝒜] : Subalgebra O R :=
+def gradedSub
+    {O R X : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup X]
+    (𝒜 : X → Submodule O R) [SetLike.GradedMonoid 𝒜]
+    : Subalgebra O R :=
   (⨆ j, 𝒜 j).toSubalgebra (le_iSup 𝒜 0 (SetLike.GradedOne.one_mem)) fun x y hx hy => by
-    refine Submodule.iSup_induction 𝒜 (motive := fun x => x * y ∈ ⨆ j, 𝒜 j) hx (fun i a ha => ?_) (by simp)
+    refine Submodule.iSup_induction 𝒜
+      (motive := fun x => x * y ∈ ⨆ j, 𝒜 j)
+      hx
+      (fun i a ha => ?_)
+      (by simp)
       (fun a b ha hb => by rw [add_mul]; exact add_mem ha hb)
-    exact Submodule.iSup_induction 𝒜 (motive := fun y => a * y ∈ ⨆ j, 𝒜 j) hy
-      (fun j b hb => le_iSup 𝒜 (i + j) (SetLike.GradedMul.mul_mem ha hb)) (by simp)
+    exact Submodule.iSup_induction 𝒜
+      (motive := fun y => a * y ∈ ⨆ j, 𝒜 j)
+      hy
+      (fun j b hb => le_iSup 𝒜 (i + j) (SetLike.GradedMul.mul_mem ha hb))
+      (by simp)
       (fun b c hb hc => by rw [mul_add]; exact add_mem hb hc)
 
 structure WPres (O X R : Type) [CommRing O] [AddCommGroup X] [CommRing R] [Algebra O R] where
@@ -160,7 +174,8 @@ namespace WPres
 
 variable {O X R : Type} [CommRing O] [AddCommGroup X] [CommRing R] [Algebra O R] (W : WPres O X R)
 
-def free (O : Type) [CommRing O] {σ : Type} [Fintype σ] (wt : σ → X) : WPres O X (MvPowerSeries σ O) where
+def free (O : Type) [CommRing O] {σ : Type} [Fintype σ] (wt : σ → X)
+    : WPres O X (MvPowerSeries σ O) where
   σ := σ
   wt := wt
   π := AlgHom.id O _
@@ -198,10 +213,15 @@ def HasOrigin : Prop := ∀ f, W.π f = 0 → constantCoeff f = 0
 
 def origin (h : W.HasOrigin) : R →ₐ[O] O :=
   (Ideal.Quotient.liftₐ (RingHom.ker W.π)
-    ({ (constantCoeff : MvPowerSeries W.σ O →+* O) with commutes' := fun a => by simp [MvPowerSeries.algebraMap_apply] } : MvPowerSeries W.σ O →ₐ[O] O)
+    ({
+       (constantCoeff : MvPowerSeries W.σ O →+* O) with
+       commutes' := fun a => by simp [MvPowerSeries.algebraMap_apply]
+     }
+      : MvPowerSeries W.σ O →ₐ[O] O)
     h).comp (Ideal.quotientKerAlgEquivOfSurjective W.surj).symm.toAlgHom
 
-theorem origin_π (h : W.HasOrigin) (f : MvPowerSeries W.σ O) : W.origin h (W.π f) = constantCoeff f := by
+theorem origin_π (h : W.HasOrigin) (f : MvPowerSeries W.σ O)
+    : W.origin h (W.π f) = constantCoeff f := by
   have : (Ideal.quotientKerAlgEquivOfSurjective W.surj).symm (W.π f) = Ideal.Quotient.mk _ f := by
     rw [AlgEquiv.symm_apply_eq]; rfl
   simp only [origin, AlgHom.comp_apply, AlgEquiv.coe_algHom]
@@ -212,35 +232,45 @@ end WPres
 
 section Points
 
-variable {O A X K : Type} [CommRing O] [CommRing A] [Algebra O A] [AddCommGroup X] [DecidableEq X]
+variable
+  {O A X K : Type} [CommRing O] [CommRing A] [Algebra O A] [AddCommGroup X] [DecidableEq X]
   (𝒜 : X → Submodule O A) [GradedAlgebra 𝒜] [CommRing K] [Algebra O K]
 
 def act (t : Multiplicative X →* Kˣ) (ξ : A →ₐ[O] K) : A →ₐ[O] K :=
-  (DirectSum.toAlgebra O (fun j => 𝒜 j)
+  (DirectSum.toAlgebra O
+    (fun j => 𝒜 j)
     (fun j => ((t (Multiplicative.ofAdd j) : Kˣ) : K) • (ξ.toLinearMap ∘ₗ (𝒜 j).subtype))
-    (by simp) (fun {i j} a b => by
-      simp only [LinearMap.smul_apply, LinearMap.comp_apply, Submodule.subtype_apply, AlgHom.toLinearMap_apply,
-        SetLike.coe_gMul, map_mul, ofAdd_add, Units.val_mul, smul_eq_mul]
+    (by simp)
+    (fun {i j} a b => by
+      simp only [LinearMap.smul_apply, LinearMap.comp_apply, Submodule.subtype_apply,
+        AlgHom.toLinearMap_apply, SetLike.coe_gMul, map_mul, ofAdd_add, Units.val_mul, smul_eq_mul]
       ring)).comp (DirectSum.decomposeAlgEquiv 𝒜).toAlgHom
 
-theorem act_of_mem (t : Multiplicative X →* Kˣ) (ξ : A →ₐ[O] K) {j : X} {f : A} (hf : f ∈ 𝒜 j) :
-    act 𝒜 t ξ f = t (Multiplicative.ofAdd j) * ξ f := by
-  have h : DirectSum.decompose 𝒜 f = DirectSum.of (fun j => 𝒜 j) j ⟨f, hf⟩ := DirectSum.decompose_of_mem 𝒜 hf
+theorem act_of_mem (t : Multiplicative X →* Kˣ) (ξ : A →ₐ[O] K) {j : X} {f : A} (hf : f ∈ 𝒜 j)
+    : act 𝒜 t ξ f = t (Multiplicative.ofAdd j) * ξ f := by
+  have h : DirectSum.decompose 𝒜 f = DirectSum.of (fun j => 𝒜 j) j ⟨f, hf⟩ :=
+    DirectSum.decompose_of_mem 𝒜 hf
   simp [act, h, DirectSum.toAlgebra]
   erw [DirectSum.toSemiring_of]
   rfl
 
 end Points
 
-def PtDer {O A B : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing B] [Algebra O B] (x : A →ₐ[O] B)
-    (Q : Type) [AddCommGroup Q] [Module O Q] [Module B Q] [SMulCommClass O B Q] : Submodule B (A →ₗ[O] Q) where
+def PtDer
+    {O A B : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing B] [Algebra O B]
+    (x : A →ₐ[O] B)
+    (Q : Type) [AddCommGroup Q] [Module O Q] [Module B Q] [SMulCommClass O B Q]
+    : Submodule B (A →ₗ[O] Q) where
   carrier := {D | ∀ f g, D (f * g) = x f • D g + x g • D f}
   add_mem' {D D'} h h' f g := by simp only [LinearMap.add_apply, h f g, h' f g, smul_add]; abel
   zero_mem' f g := by simp
   smul_mem' c D h f g := by simp only [LinearMap.smul_apply, h f g, smul_add, smul_smul, mul_comm]
 
-def HasWt {O A X Q : Type} [CommRing O] [CommRing A] [Algebra O A] [AddCommGroup Q] [Module O Q]
-    (𝒜 : X → Submodule O A) (j : X) (D : A →ₗ[O] Q) : Prop := ∀ i, i ≠ j → ∀ f ∈ 𝒜 i, D f = 0
+def HasWt
+    {O A X Q : Type} [CommRing O] [CommRing A] [Algebra O A] [AddCommGroup Q] [Module O Q]
+    (𝒜 : X → Submodule O A) (j : X) (D : A →ₗ[O] Q)
+    : Prop :=
+  ∀ i, i ≠ j → ∀ f ∈ 𝒜 i, D f = 0
 
 section Cot
 
@@ -274,15 +304,20 @@ end Cot
 
 section Lifts
 
-variable (O : Type) [CommRing O] [IsLocalRing O] {Γ ι : Type} [Group Γ] [TopologicalSpace Γ] [Fintype ι]
-  [DecidableEq ι] (rbar : Γ →* Matrix ι ι (ResidueField O))
+variable
+  (O : Type) [CommRing O] [IsLocalRing O]
+  {Γ ι : Type} [Group Γ] [TopologicalSpace Γ] [Fintype ι] [DecidableEq ι]
+  (rbar : Γ →* Matrix ι ι (ResidueField O))
 
-@[ext] structure Lift (R : Type) [CommRing R] [Algebra O R] [IsCO O R] where
+@[ext]
+structure Lift (R : Type) [CommRing R] [Algebra O R] [IsCO O R] where
   hom : Γ →* Matrix ι ι R
   cont : ∀ a b, AdicCont (maximalIdeal R) fun g => hom g a b
   red : ∀ g a b, res O R (hom g a b) = rbar g a b
 
-variable {O rbar} {R R' : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R']
+variable
+  {O rbar} {R R' : Type}
+  [CommRing R] [Algebra O R] [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R']
 
 def Lift.map (f : R →ₐ[O] R') (r : Lift O rbar R) : Lift O rbar R' where
   hom := (f.mapMatrix : Matrix ι ι R →ₐ[O] Matrix ι ι R').toMonoidHom.comp r.hom
@@ -295,45 +330,52 @@ def Lift.map (f : R →ₐ[O] R') (r : Lift O rbar R) : Lift O rbar R' where
     exact (r.cont a b N).comp (Ideal.quotientMap _ (f : R →+* R') hle)
   red g a b := (res_map (O := O) (R := R) (R' := R') f _).trans (r.red g a b)
 
-@[simp] theorem Lift.map_hom (f : R →ₐ[O] R') (r : Lift O rbar R) (g : Γ) (a b : ι) :
-    (r.map f).hom g a b = f (r.hom g a b) := rfl
+@[simp]
+theorem Lift.map_hom (f : R →ₐ[O] R') (r : Lift O rbar R) (g : Γ) (a b : ι)
+    : (r.map f).hom g a b = f (r.hom g a b) :=
+  rfl
 
-def Lift.comap {H : Type} [Group H] [TopologicalSpace H] (φ : H →* Γ) (hφ : Continuous φ) (r : Lift O rbar R) :
-    Lift O (rbar.comp φ) R where
+def Lift.comap
+    {H : Type} [Group H] [TopologicalSpace H] (φ : H →* Γ) (hφ : Continuous φ) (r : Lift O rbar R)
+    : Lift O (rbar.comp φ) R where
   hom := r.hom.comp φ
   cont a b N := (r.cont a b N).comp_continuous hφ
   red g a b := r.red (φ g) a b
 
-
 variable (O rbar) in
-def Cond (O : Type) [CommRing O] [IsLocalRing O] {Γ ι : Type} [Group Γ] [TopologicalSpace Γ]
-    [Fintype ι] [DecidableEq ι] (rbar : Γ →* Matrix ι ι (ResidueField O)) : Type 1 :=
+def Cond
+    (O : Type) [CommRing O] [IsLocalRing O]
+    {Γ ι : Type} [Group Γ] [TopologicalSpace Γ] [Fintype ι] [DecidableEq ι]
+    (rbar : Γ →* Matrix ι ι (ResidueField O))
+    : Type 1 :=
   ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R], Lift O rbar R → Prop
 
 def Represents (P : Cond O rbar) (r : Lift O rbar R) : Prop :=
   ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'],
-    (∀ f : R →ₐ[O] R', P R' (r.map f)) ∧ ∀ r' : Lift O rbar R', P R' r' → ∃! f : R →ₐ[O] R', r.map f = r'
+    (∀ f : R →ₐ[O] R', P R' (r.map f))
+      ∧ ∀ r' : Lift O rbar R', P R' r' → ∃! f : R →ₐ[O] R', r.map f = r'
 
 def Lift.Generates (r : Lift O rbar R) : Prop :=
-  ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f f' : R →ₐ[O] R'), r.map f = r.map f' → f = f'
+  ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f f' : R →ₐ[O] R'),
+    r.map f = r.map f' → f = f'
 
 variable {X : Type} [AddCommGroup X] (w : ι → X)
-
 
 def IsTorusConj (w : ι → X) (t : Multiplicative X →* Rˣ) (r r' : Lift O rbar R) : Prop :=
   ∀ g a b, r'.hom g a b = t (Multiplicative.ofAdd (w a - w b)) * r.hom g a b
 
 def Lift.TStable (r : Lift O rbar R) : Prop :=
-  ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R') (t : Multiplicative X →* R'ˣ),
-    (∀ j, res O R' (t j) = 1) → ∃ f' : R →ₐ[O] R',
-      IsTorusConj w t (Lift.map (O := O) (rbar := rbar) (R := R) (R' := R') f r)
-        (Lift.map (O := O) (rbar := rbar) (R := R) (R' := R') f' r)
-
+  ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R')
+      (t : Multiplicative X →* R'ˣ),
+    (∀ j, res O R' (t j) = 1)
+      → ∃ f' : R →ₐ[O] R',
+        IsTorusConj w t (Lift.map (O := O) (rbar := rbar) (R := R) (R' := R') f r)
+          (Lift.map (O := O) (rbar := rbar) (R := R) (R' := R') f' r)
 
 variable (Γ) in
 def PhiCond (l : ℕ) : Prop :=
-  ∀ H : Subgroup Γ, IsOpen (H : Set Γ) →
-    Finite {φ : H →* Multiplicative (ZMod l) // IsOpen (φ.ker : Set H)}
+  ∀ H : Subgroup Γ,
+    IsOpen (H : Set Γ) → Finite {φ : H →* Multiplicative (ZMod l) // IsOpen (φ.ker : Set H)}
 
 end Lifts
 

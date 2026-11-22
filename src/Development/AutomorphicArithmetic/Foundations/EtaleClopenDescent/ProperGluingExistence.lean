@@ -6,8 +6,8 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafGlueIsProperPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4 LateralTheory.E.LeafGlueProperPf
-  LateralTheory.E.LeafGlueIsProperPf
+open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
+  LateralTheory.E.LeafGlueProperPf LateralTheory.E.LeafGlueIsProperPf
 
 namespace UpperTheory.Cb
 
@@ -144,8 +144,8 @@ private lemma chart {Ω L : Type} [Field Ω] [Field L] [Algebra Ω L] {X : Schem
 end UpperTheory.Cb
 
 open UpperTheory.Cb in
-theorem UpperTheory.Cb.properGluing_existence :
-    LateralTheory.E.LeafGlueIsProperPf.LeafGlueExistence := by
+theorem UpperTheory.Cb.properGluing_existence
+    : LateralTheory.E.LeafGlueIsProperPf.LeafGlueExistence := by
   intro Ω L _ _ _ A B u h G S
   obtain ⟨-, -, -, hfA, hfB, -, -, hdA, hdB, hFA, hFB, hadj, hV⟩ := h
   haveI := hfA
@@ -154,16 +154,21 @@ theorem UpperTheory.Cb.properGluing_existence :
   haveI := hFB
   haveI := G.hiA
   haveI := G.hiB
-  have hagA : ∀ (K : Type) [Field K] (f : L →+* K),
-      Spec.map (CommRingCat.ofHom (f.comp (algebraMap A L))) ≫ G.iA =
-        Spec.map (CommRingCat.ofHom (f.comp (algebraMap B L))) ≫ G.iB := by
+  have hagA
+      : ∀ (K : Type) [Field K] (f : L →+* K),
+        Spec.map (CommRingCat.ofHom (f.comp (algebraMap A L))) ≫ G.iA
+          = Spec.map (CommRingCat.ofHom (f.comp (algebraMap B L))) ≫ G.iB := by
     intro K _ f
-    have eA : f.comp (algebraMap A L) = (f.comp (algebraMap (Dr Ω A u) L)).comp
-        (Subalgebra.inclusion (le_Dr_A A u)).toRingHom := by
+    have eA
+        : f.comp (algebraMap A L)
+          = (f.comp (algebraMap (Dr Ω A u) L)).comp
+            (Subalgebra.inclusion (le_Dr_A A u)).toRingHom := by
       ext x
       rfl
-    have eB : f.comp (algebraMap B L) = (f.comp (algebraMap (Dr Ω A u) L)).comp
-        (Subalgebra.inclusion (le_Dr_B A B u hadj)).toRingHom := by
+    have eB
+        : f.comp (algebraMap B L)
+          = (f.comp (algebraMap (Dr Ω A u) L)).comp
+            (Subalgebra.inclusion (le_Dr_B A B u hadj)).toRingHom := by
       ext x
       rfl
     rw [eA, eB]
@@ -184,7 +189,8 @@ theorem UpperTheory.Cb.properGluing_existence :
       rintro _ ⟨y, rfl⟩
       rwa [Subsingleton.elim y x0]
     have hg := IsOpenImmersion.lift_fac G.iB S.i₁ hr
-    refine chart G.c0 B A G.iB G.iA G.hcB G.hcA hdB (fun V hV' => (hV V hV').symm)
-      (fun K _ f => (hagA K f).symm) S
-      (Spec.preimage (IsOpenImmersion.lift G.iB S.i₁ hr)).hom ?_
+    refine chart G.c0 B A G.iB G.iA G.hcB G.hcA hdB
+      (fun V hV' => (hV V hV').symm)
+      (fun K _ f => (hagA K f).symm)
+      S (Spec.preimage (IsOpenImmersion.lift G.iB S.i₁ hr)).hom ?_
     rw [CommRingCat.ofHom_hom, Spec.map_preimage, hg]

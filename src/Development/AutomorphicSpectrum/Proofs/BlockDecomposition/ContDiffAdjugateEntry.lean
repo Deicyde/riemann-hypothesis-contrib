@@ -21,14 +21,14 @@ namespace GlobalTheory.CompanionTheory.WaveCp.Rep.Mol.HfSmooth
 theorem contDiff_entry {n : ℕ} (i j : Fin n) : ContDiff ℝ ∞ (fun y : Mat n => y i j) :=
   contDiff_apply_apply ℝ i j
 
-theorem contDiff_det {n : ℕ} {M : Mat n → Mat n} (hM : ∀ i j, ContDiff ℝ ∞ (fun y => M y i j)) :
-    ContDiff ℝ ∞ (fun y => (M y).det) := by
+theorem contDiff_det {n : ℕ} {M : Mat n → Mat n} (hM : ∀ i j, ContDiff ℝ ∞ (fun y => M y i j))
+    : ContDiff ℝ ∞ (fun y => (M y).det) := by
   simp only [Matrix.det_apply']
   refine ContDiff.sum fun σ _ => contDiff_const.mul ?_
   exact contDiff_prod fun i _ => hM _ _
 
-theorem contDiff_adjugate_entry {n : ℕ} (i j : Fin n) :
-    ContDiff ℝ ∞ (fun y : Mat n => y.adjugate i j) := by
+theorem contDiff_adjugate_entry {n : ℕ} (i j : Fin n)
+    : ContDiff ℝ ∞ (fun y : Mat n => y.adjugate i j) := by
   simp only [Matrix.adjugate_apply]
   refine contDiff_det fun a b => ?_
   by_cases h : a = j

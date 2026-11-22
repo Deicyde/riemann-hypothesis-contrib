@@ -5,16 +5,21 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsHeckeMap
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
 
 namespace GlobalTheory.UPel.HT.Hecke
 
-theorem exists_adjoint_similitude : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (g : D.La →ₗ[D.O] D.La) (c k : ℕ),
-    c.Coprime p → k.Coprime p → (∀ x y, D.EF (g x) (g y) = c * D.EF x y) → (∀ x, ∃ y, g y = k • x) →
-    c ∣ k ^ 2 → ∃ g' : D.La →ₗ[D.O] D.La, (∀ x, g (g' x) = k • x) ∧ (∀ x, g' (g x) = k • x) ∧
-      (∀ x y, D.EF (g' x) (g' y) = (k ^ 2 / c) * D.EF x y) ∧ (∀ x, ∃ y, g' y = k • x) ∧
-      (k ^ 2 / c).Coprime p ∧ (k ^ 2 / c) ∣ k ^ 2 ∧ c * (k ^ 2 / c) = k ^ 2 := by
+theorem exists_adjoint_similitude
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (g : D.La →ₗ[D.O] D.La) (c k : ℕ),
+      c.Coprime p → k.Coprime p → (∀ x y, D.EF (g x) (g y) = c * D.EF x y) → (∀ x, ∃ y, g y = k • x)
+        → c ∣ k ^ 2
+        → ∃ g' : D.La →ₗ[D.O] D.La,
+          (∀ x, g (g' x) = k • x) ∧ (∀ x, g' (g x) = k • x)
+            ∧ (∀ x y, D.EF (g' x) (g' y) = (k ^ 2 / c) * D.EF x y) ∧ (∀ x, ∃ y, g' y = k • x)
+            ∧ (k ^ 2 / c).Coprime p ∧ (k ^ 2 / c) ∣ k ^ 2 ∧ c * (k ^ 2 / c) = k ^ 2 := by
   intro p _ D g c k hc hk hE himg hck
   have hp1 : p ≠ 1 := (Fact.out : p.Prime).ne_one
   have hc0 : c ≠ 0 := by
@@ -37,11 +42,11 @@ theorem exists_adjoint_similitude : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (
     · exact absurd h' hcZ
     · exact h'
   choose f hf using himg
-  have fadd : ∀ x y, f (x + y) = f x + f y := fun x y => ginj (by rw [map_add (f := _), hf, hf, hf, smul_add])
-  have fsmul : ∀ (b : D.O) x, f (b • x) = b • f x := fun b x => ginj (by
-    rw [map_smul, hf, hf, smul_comm])
-  let g' : D.La →ₗ[D.O] D.La :=
-    { toFun := f, map_add' := fadd, map_smul' := fsmul }
+  have fadd : ∀ x y, f (x + y) = f x + f y := fun x y =>
+    ginj (by rw [map_add (f := _), hf, hf, hf, smul_add])
+  have fsmul : ∀ (b : D.O) x, f (b • x) = b • f x := fun b x =>
+    ginj (by rw [map_smul, hf, hf, smul_comm])
+  let g' : D.La →ₗ[D.O] D.La := { toFun := f, map_add' := fadd, map_smul' := fsmul }
   have h1 : ∀ x, g (g' x) = k • x := hf
   have h2 : ∀ x, g' (g x) = k • x := fun x => ginj (by rw [h1, map_nsmul])
   obtain ⟨q, hq⟩ := hck

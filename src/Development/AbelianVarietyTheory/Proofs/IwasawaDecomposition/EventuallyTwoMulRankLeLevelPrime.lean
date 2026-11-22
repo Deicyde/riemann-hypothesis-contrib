@@ -11,13 +11,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocalGl
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
 
 namespace GlobalTheory.Mem.Top.Bl
 
-theorem two_mul_r_le_g_level : EvLgG fun K B f _ => KPx B f → ∀ (T : TwDat B) (w : ColW B f T) (Z : w.Lt), ∀ k,
-    2 * (w.D Z).R.r ≤ (w.D Z).host.g k := by
+theorem two_mul_r_le_g_level
+    : EvLgG fun K B f _ =>
+      KPx B f
+        → ∀ (T : TwDat B) (w : ColW B f T) (Z : w.Lt), ∀ k, 2 * (w.D Z).R.r ≤ (w.D Z).host.g k := by
   refine evG_all fun K => lg_all K fun B f T hO _ T' w Z k => ?_
   obtain ⟨sp, hT, hY, hA, hV, hz, hB, -⟩ := hO
   have hR' : B.toPre.R = K.P.R := by rw [hB]; rfl
@@ -39,10 +45,12 @@ theorem two_mul_r_le_g_level : EvLgG fun K B f _ => KPx B f → ∀ (T : TwDat B
     simp only [Ranks.r]
     omega
   have h4 : 4 * K.P.R.k ≤ K.P.R.k ^ 8 := by
-    calc 4 * K.P.R.k ≤ K.P.R.k ^ 7 * K.P.R.k := by
-          apply Nat.mul_le_mul_right
-          calc 4 ≤ 2 ^ 7 := by norm_num
-            _ ≤ K.P.R.k ^ 7 := Nat.pow_le_pow_left h2k 7
+    calc
+      4 * K.P.R.k ≤ K.P.R.k ^ 7 * K.P.R.k := by
+        apply Nat.mul_le_mul_right
+        calc
+          4 ≤ 2 ^ 7 := by norm_num
+          _ ≤ K.P.R.k ^ 7 := Nat.pow_le_pow_left h2k 7
       _ = K.P.R.k ^ 8 := by ring
   omega
 

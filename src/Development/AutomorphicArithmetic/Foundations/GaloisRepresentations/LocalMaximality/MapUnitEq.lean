@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section LocDAux
@@ -114,8 +115,7 @@ private lemma map_unit_eq (act : S →ₐ[ℂ] Module.End ℂ E) (M' : Submodule
 
 end LocDAux
 
-theorem UpperTheory.Gal.productCup_of_system.locD_of :
-    RS → Htpy → LocD := by
+theorem UpperTheory.Gal.productCup_of_system.locD_of : RS → Htpy → LocD := by
   intro hRS hH S E _ _ _ _ act κ _ _ R M M' r v a b l0 d hSt hr ha hb hl0 hMM hloc hv
   refine ⟨fun hKE m hm c hc => ?_, fun m hm hsm => ?_⟩
   · have hcC := hc.1
@@ -162,7 +162,8 @@ theorem UpperTheory.Gal.productCup_of_system.locD_of :
         exact M'.zero_mem
     obtain ⟨N, hN⟩ := unif_pow act R M M' hSt ha hloc y hyM
     refine geo_mem (pwR act _) R ((kos act M r).B m)
-      (fun s hs x hx => kos_B_stab act R M r hSt m s hs x hx) ha hb c ?_ N ?_
+      (fun s hs x hx => kos_B_stab act R M r hSt m s hs x hx)
+      ha hb c ?_ N ?_
     · rw [← hl0]
       refine hH S E act κ R M r hSt m c hc (r l0) ⟨Pi.single l0 1, fun l => ?_, ?_⟩
       · by_cases h : l = l0
@@ -183,23 +184,24 @@ theorem UpperTheory.Gal.productCup_of_system.locD_of :
         rw [← hyc]
         rfl
   · let T : Set S := Set.range r
-    let Pn : Submodule ℂ E :=
-      { carrier := {x | ∃ N : ℕ, act (a ^ N) x ∈ sm act M T}
-        add_mem' := by
-          rintro x y ⟨N₁, h₁⟩ ⟨N₂, h₂⟩
-          refine ⟨N₁ + N₂, ?_⟩
-          rw [map_add (f := _)]
-          refine Submodule.add_mem _ ?_ ?_
-          · rw [add_comm, pow_add, map_mul, Module.End.mul_apply]
-            exact sm_stab act R M T hSt _ (R.pow_mem ha _) _ h₁
-          · rw [pow_add, map_mul, Module.End.mul_apply]
-            exact sm_stab act R M T hSt _ (R.pow_mem ha _) _ h₂
-        zero_mem' := ⟨0, by simp⟩
-        smul_mem' := by
-          rintro k x ⟨N, h⟩
-          refine ⟨N, ?_⟩
-          rw [map_smul]
-          exact Submodule.smul_mem _ k h }
+    let Pn : Submodule ℂ E := {
+      carrier := {x | ∃ N : ℕ, act (a ^ N) x ∈ sm act M T}
+      add_mem' := by
+        rintro x y ⟨N₁, h₁⟩ ⟨N₂, h₂⟩
+        refine ⟨N₁ + N₂, ?_⟩
+        rw [map_add (f := _)]
+        refine Submodule.add_mem _ ?_ ?_
+        · rw [add_comm, pow_add, map_mul, Module.End.mul_apply]
+          exact sm_stab act R M T hSt _ (R.pow_mem ha _) _ h₁
+        · rw [pow_add, map_mul, Module.End.mul_apply]
+          exact sm_stab act R M T hSt _ (R.pow_mem ha _) _ h₂
+      zero_mem' := ⟨0, by simp⟩
+      smul_mem' := by
+        rintro k x ⟨N, h⟩
+        refine ⟨N, ?_⟩
+        rw [map_smul]
+        exact Submodule.smul_mem _ k h
+    }
     have hle : sm act M' (Set.range fun l => r l * v) ≤ Pn := by
       refine iSup₂_le fun t ht => ?_
       obtain ⟨l, rfl⟩ := ht
@@ -209,12 +211,13 @@ theorem UpperTheory.Gal.productCup_of_system.locD_of :
       have e : act (a ^ N) (act (r l * v) m') = act (r l) (act (a ^ N) (act v m')) := by
         rw [map_mul, Module.End.mul_apply, act_comm act (a ^ N) (r l)]
       rw [e]
-      exact (le_iSup₂_of_le (f := fun t _ => M.map (act t)) (r l) ⟨l, rfl⟩ le_rfl :
-        _ ≤ sm act M T) ⟨_, hN, rfl⟩
+      exact (le_iSup₂_of_le (f := fun t _ => M.map (act t)) (r l) ⟨l, rfl⟩ le_rfl : _ ≤ sm act M T)
+        ⟨_, hN, rfl⟩
     obtain ⟨N, hN⟩ := hle hsm
     refine geo_mem act.toRingHom R (sm act M T)
-      (fun s hs x hx => sm_stab act R M T hSt s hs x hx) ha hb m ?_ N hN
+      (fun s hs x hx => sm_stab act R M T hSt s hs x hx)
+      ha hb m ?_ N hN
     change act (1 - a * b) m ∈ sm act M T
     rw [← hl0]
-    exact (le_iSup₂_of_le (f := fun t _ => M.map (act t)) (r l0) ⟨l0, rfl⟩ le_rfl :
-      _ ≤ sm act M T) ⟨_, hm, rfl⟩
+    exact (le_iSup₂_of_le (f := fun t _ => M.map (act t)) (r l0) ⟨l0, rfl⟩ le_rfl : _ ≤ sm act M T)
+      ⟨_, hm, rfl⟩

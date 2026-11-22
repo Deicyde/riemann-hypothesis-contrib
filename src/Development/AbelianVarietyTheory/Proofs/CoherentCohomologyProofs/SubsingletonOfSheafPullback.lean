@@ -128,22 +128,28 @@ end AffineVanishing
 
 open AffineVanishing
 
-theorem cohOn.subsingleton_of_isAffineOpen {X : Scheme.{u}} (F : X.Modules) [F.IsQuasicoherent]
-    {U : X.Opens} (hU : IsAffineOpen U) {n : ℕ} (hn : 0 < n) : Subsingleton (cohOn F U n) := by
+theorem cohOn.subsingleton_of_isAffineOpen
+    {X : Scheme.{u}} (F : X.Modules) [F.IsQuasicoherent]
+    {U : X.Opens} (hU : IsAffineOpen U)
+    {n : ℕ} (hn : 0 < n)
+    : Subsingleton (cohOn F U n) := by
   induction n using Nat.strong_induction_on generalizing X with
   | _ n ih =>
     obtain ⟨n, rfl⟩ := Nat.exists_eq_add_one_of_ne_zero hn.ne'
     haveI : IsAffine U := hU
-    have h := subsingleton_of_restrict U.ι F ⊤ n
-      (subsingleton_top n (fun q hq hqn G _ V hV ↦ ih q hqn G hV hq) (F.restrict U.ι))
+    have h :=
+      subsingleton_of_restrict U.ι F ⊤ n
+        (subsingleton_top n (fun q hq hqn G _ V hV ↦ ih q hqn G hV hq) (F.restrict U.ι))
     rwa [Scheme.Opens.ι_image_top] at h
 
-theorem coh.subsingleton_of_isAffine {X : Scheme.{u}} [IsAffine X] (F : X.Modules)
-    [F.IsQuasicoherent] {n : ℕ} (hn : 0 < n) : Subsingleton (coh F n) :=
+theorem coh.subsingleton_of_isAffine
+    {X : Scheme.{u}} [IsAffine X] (F : X.Modules) [F.IsQuasicoherent] {n : ℕ} (hn : 0 < n)
+    : Subsingleton (coh F n) :=
   cohOn.subsingleton_of_isAffineOpen F (isAffineOpen_top X) hn
 
-instance coh.subsingleton_succ_of_isAffine {X : Scheme.{u}} [IsAffine X] (F : X.Modules)
-    [F.IsQuasicoherent] (n : ℕ) : Subsingleton (coh F (n + 1)) :=
+instance coh.subsingleton_succ_of_isAffine
+    {X : Scheme.{u}} [IsAffine X] (F : X.Modules) [F.IsQuasicoherent] (n : ℕ)
+    : Subsingleton (coh F (n + 1)) :=
   coh.subsingleton_of_isAffine F n.succ_pos
 
 end GlobalTheory

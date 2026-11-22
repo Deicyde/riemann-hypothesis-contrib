@@ -21,8 +21,9 @@ theorem RootSumHolomorphic.proof : RootSumHolomorphic.Statement := by
     rw [hR] at hτ
     exact (Polynomial.mem_roots (hm.map _).ne_zero).1 (Multiset.mem_toFinset.1 hτ)
   have hder : ∀ τ ∈ R, (m.map (MvPolynomial.eval y₀)).derivative.eval τ ≠ 0 := fun τ hτ => by
-    have h := (hsep y₀ hy₀).eval₂_derivative_ne_zero (RingHom.id ℂ) (x := τ)
-      (by rw [Polynomial.eval₂_id]; exact hroot τ hτ)
+    have h :=
+      (hsep y₀ hy₀).eval₂_derivative_ne_zero (RingHom.id ℂ) (x := τ)
+        (by rw [Polynomial.eval₂_id]; exact hroot τ hτ)
     rwa [Polynomial.eval₂_id] at h
   have hbr := fun τ (hτ : τ ∈ R) => SimpleRootBranch.proof d m y₀ τ (hroot τ hτ) (hder τ hτ)
   choose! U B ψ hUo hyU hBo hτB hψd hψy hψroot using hbr
@@ -36,14 +37,14 @@ theorem RootSumHolomorphic.proof : RootSumHolomorphic.Statement := by
       ((hψd τ hτ).differentiableAt ((hUo τ hτ).mem_nhds (hyU τ hτ))).continuousAt
     have hBV : B τ ∩ V τ ∈ 𝓝 (ψ τ y₀) := by
       rw [hψy τ hτ]; exact ((hBo τ hτ).inter (hV τ).2).mem_nhds ⟨hτB τ hτ, (hV τ).1⟩
-    have hO : O τ ∈ 𝓝 (y₀, ψ τ y₀) := by
-      rw [hψy τ hτ]; exact (hOo τ hτ).mem_nhds (hyO τ hτ)
+    have hO : O τ ∈ 𝓝 (y₀, ψ τ y₀) := by rw [hψy τ hτ]; exact (hOo τ hτ).mem_nhds (hyO τ hτ)
     have hpc : ContinuousAt (fun y => (y, ψ τ y)) y₀ := continuousAt_id.prodMk hψc
     exact Filter.Eventually.and ((hUo τ hτ).mem_nhds (hyU τ hτ))
       (Filter.Eventually.and (hψc.preimage_mem_nhds hBV) (hpc.preimage_mem_nhds hO))
 
-  have heq : ∀ᶠ y in 𝓝 y₀, ((m.map (MvPolynomial.eval y)).roots.map (Φ y)).sum =
-      ∑ τ ∈ R, Ψ τ (y, ψ τ y) := by
+  have heq
+      : ∀ᶠ y in 𝓝 y₀, ((m.map (MvPolynomial.eval y)).roots.map (Φ y)).sum =
+        ∑ τ ∈ R, Ψ τ (y, ψ τ y) := by
     filter_upwards [hev] with y hy
     have hisroot : ∀ τ ∈ R, (m.map (MvPolynomial.eval y)).IsRoot (ψ τ y) := fun τ hτ =>
       ((hψroot τ hτ y (hy τ hτ).1).2 _ (hy τ hτ).2.1.1).2 rfl

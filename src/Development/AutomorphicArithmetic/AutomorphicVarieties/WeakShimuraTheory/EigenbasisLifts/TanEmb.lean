@@ -6,12 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Eb GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Eb
+  GlobalTheory.GalOfCusp
 
-private theorem dual_der (O R K : Type) [CommRing O] [IsDomain O] [CharZero O] [CommRing R] [IsLocalRing R]
-    [IsNoetherianRing R] [Algebra O R] [Field K] [Algebra O K] [FaithfulSMul O K] [Algebra.IsAlgebraic O K]
-    (y : R →ₐ[O] K) (hy : ∀ a ∈ maximalIdeal R, y a = 0) :
-    ∃ (D : Fin (maximalIdeal R).spanFinrank → R →ₗ[O] K) (r : Fin (maximalIdeal R).spanFinrank → R),
+private theorem dual_der
+    (O R K : Type)
+    [CommRing O] [IsDomain O] [CharZero O] [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    [Algebra O R] [Field K] [Algebra O K] [FaithfulSMul O K] [Algebra.IsAlgebraic O K]
+    (y : R →ₐ[O] K) (hy : ∀ a ∈ maximalIdeal R, y a = 0)
+    : ∃ (D : Fin (maximalIdeal R).spanFinrank → R →ₗ[O] K)
+        (r : Fin (maximalIdeal R).spanFinrank → R),
       (∀ i, D i ∈ PtDer y K) ∧ ∀ i j, D i (r j) = if j = i then 1 else 0 := by
   classical
   let yb : ResidueField R →+* K :=
@@ -27,28 +33,28 @@ private theorem dual_der (O R K : Type) [CommRing O] [IsDomain O] [CharZero O] [
     intro a b hab
     apply FaithfulSMul.algebraMap_injective O K
     rw [← h1, ← h1, hab]
-  have halg : Algebra.IsAlgebraic O (ResidueField R) :=
-    Algebra.IsAlgebraic.of_injective ya hyinj
+  have halg : Algebra.IsAlgebraic O (ResidueField R) := Algebra.IsAlgebraic.of_injective ya hyinj
   obtain ⟨d, hd⟩ := UpperTheory.V.Ws.Eb.cotDer O R hinj halg
   have hn : Module.finrank (ResidueField R) (CotangentSpace R) = (maximalIdeal R).spanFinrank :=
     (IsLocalRing.spanFinrank_maximalIdeal_eq_finrank_cotangentSpace R).symm
   let b := Module.finBasisOfFinrankEq (ResidueField R) (CotangentSpace R) hn
-  have hsurj : ∀ j, ∃ a : maximalIdeal R, (maximalIdeal R).toCotangent a = b j :=
-    fun j => (maximalIdeal R).toCotangent_surjective (b j)
+  have hsurj : ∀ j, ∃ a : maximalIdeal R, (maximalIdeal R).toCotangent a = b j := fun j =>
+    (maximalIdeal R).toCotangent_surjective (b j)
   choose a ha using hsurj
-  have hsm : ∀ (r : R) (v : CotangentSpace R) i,
-      yb (b.coord i (r • v)) = y r * yb (b.coord i v) := by
+  have hsm
+      : ∀ (r : R) (v : CotangentSpace R) i, yb (b.coord i (r • v)) = y r * yb (b.coord i v) := by
     intro r v i
     rw [← algebraMap_smul (ResidueField R) r v, map_smul, smul_eq_mul, map_mul, hyb]
-  let D : Fin (maximalIdeal R).spanFinrank → R →ₗ[O] K := fun i =>
-    { toFun := fun f => yb (b.coord i (d f))
-      map_add' := by
-        intro f g
-        simp only [map_add (f := _)]
-      map_smul' := by
-        intro c f
-        rw [RingHom.id_apply, Algebra.smul_def, Derivation.leibniz, Derivation.map_algebraMap,
-          smul_zero, add_zero, hsm, y.commutes, Algebra.smul_def] }
+  let D : Fin (maximalIdeal R).spanFinrank → R →ₗ[O] K := fun i => {
+    toFun := fun f => yb (b.coord i (d f))
+    map_add' := by
+      intro f g
+      simp only [map_add (f := _)]
+    map_smul' := by
+      intro c f
+      rw [RingHom.id_apply, Algebra.smul_def, Derivation.leibniz, Derivation.map_algebraMap,
+        smul_zero, add_zero, hsm, y.commutes, Algebra.smul_def]
+  }
   refine ⟨D, fun j => (a j : R), ?_, ?_⟩
   · intro i
     intro f g
@@ -59,9 +65,14 @@ private theorem dual_der (O R K : Type) [CommRing O] [IsDomain O] [CharZero O] [
     rw [hd, ha, Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_apply]
     split_ifs <;> simp
 
-theorem UpperTheory.V.Ws.Eb.tanEmb :
-    ∀ (O B K : Type) [CommRing O] [IsDomain O] [CharZero O] [CommRing B] [IsNoetherianRing B] [Algebra O B] [Field K] [Algebra O K] [FaithfulSMul O K] [Algebra.IsAlgebraic O K] (x : B →ₐ[O] K) (p : Ideal B) [p.IsPrime], p = RingHom.ker x →
-        ∀ N : ℕ, Module.rank K (PtDer x K) ≤ N → (maximalIdeal (Localization.AtPrime p)).spanFinrank ≤ N := by
+theorem UpperTheory.V.Ws.Eb.tanEmb
+    : ∀ (O B K : Type) [CommRing O] [IsDomain O] [CharZero O] [CommRing B] [IsNoetherianRing B]
+        [Algebra O B] [Field K] [Algebra O K] [FaithfulSMul O K] [Algebra.IsAlgebraic O K]
+        (x : B →ₐ[O] K) (p : Ideal B) [p.IsPrime],
+      p = RingHom.ker x
+        → ∀ N : ℕ,
+          Module.rank K (PtDer x K) ≤ N
+            → (maximalIdeal (Localization.AtPrime p)).spanFinrank ≤ N := by
   intro O B K _ _ _ _ _ _ _ _ _ _ x p _ hp N hN
   classical
   let R := Localization.AtPrime p
@@ -79,8 +90,7 @@ theorem UpperTheory.V.Ws.Eb.tanEmb :
   have hy : ∀ a ∈ maximalIdeal R, y a = 0 := by
     intro a ha
     obtain ⟨⟨b, s⟩, rfl⟩ := IsLocalization.mk'_surjective p.primeCompl a
-    have hb : b ∈ p := by
-      rwa [IsLocalization.AtPrime.mk'_mem_maximal_iff R p] at ha
+    have hb : b ∈ p := by rwa [IsLocalization.AtPrime.mk'_mem_maximal_iff R p] at ha
     have h1 := congrArg y (IsLocalization.mk'_spec R b s)
     rw [map_mul, hyx, hyx, (hker b).1 hb] at h1
     exact (mul_eq_zero.mp h1).resolve_right (hunit s).ne_zero
@@ -93,8 +103,8 @@ theorem UpperTheory.V.Ws.Eb.tanEmb :
   have hL : ∀ b, L b = algebraMap B R b := fun b => rfl
   have hmem : ∀ i, (D i).comp L ∈ PtDer x K := by
     intro i f g
-    rw [LinearMap.comp_apply, LinearMap.comp_apply, LinearMap.comp_apply, hL, hL, hL, map_mul,
-      hDl, hyx, hyx, smul_eq_mul, smul_eq_mul]
+    rw [LinearMap.comp_apply, LinearMap.comp_apply, LinearMap.comp_apply, hL, hL, hL, map_mul, hDl,
+      hyx, hyx, smul_eq_mul, smul_eq_mul]
   let v : Fin (maximalIdeal R).spanFinrank → PtDer x K := fun i => ⟨(D i).comp L, hmem i⟩
   have hli : LinearIndependent K v := by
     rw [Fintype.linearIndependent_iff]

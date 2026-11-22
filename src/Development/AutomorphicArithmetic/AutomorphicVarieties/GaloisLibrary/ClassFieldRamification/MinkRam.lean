@@ -8,8 +8,9 @@ public import Mathlib.NumberTheory.NumberField.Discriminant.Different
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.minkRam :
-    ∀ (K : Type) [Field K] [NumberField K], Module.finrank ℚ K ≠ 1 → ∃ p : ℕ, p.Prime ∧ ¬ UnramAt K p := by
+theorem UpperTheory.V.CF.minkRam
+    : ∀ (K : Type) [Field K] [NumberField K],
+      Module.finrank ℚ K ≠ 1 → ∃ p : ℕ, p.Prime ∧ ¬ UnramAt K p := by
   intro K _ _ hK
   have h1 : 1 < Module.finrank ℚ K := by
     have := Module.finrank_pos (R := ℚ) (M := K)

@@ -10,10 +10,10 @@ open Matrix
 namespace GlobalTheory
 
 theorem exists_combination_norm_ne_zero_of_linearIndependent
-    {B A : Type} [CommRing B] [IsDomain B] [CommRing A] [Algebra B A]
-    [Module.Free B A] [Module.Finite B A] {d : ℕ} (hd : Module.finrank B A = d)
-    (y : Fin d → A) (hy : LinearIndependent B y) :
-    ∃ x : Fin d → B, Algebra.norm B (∑ i, x i • y i) ≠ 0 := by
+    {B A : Type}
+    [CommRing B] [IsDomain B] [CommRing A] [Algebra B A] [Module.Free B A] [Module.Finite B A]
+    {d : ℕ} (hd : Module.finrank B A = d) (y : Fin d → A) (hy : LinearIndependent B y)
+    : ∃ x : Fin d → B, Algebra.norm B (∑ i, x i • y i) ≠ 0 := by
   classical
   let e := Module.finBasisOfFinrankEq B A hd
   let Y : Matrix (Fin d) (Fin d) B := fun i j => e.equivFun (y j) i
@@ -31,8 +31,8 @@ theorem exists_combination_norm_ne_zero_of_linearIndependent
   refine ⟨Y.adjugate *ᵥ e.equivFun 1, ?_⟩
   have hsum : ∑ j, (Y.adjugate *ᵥ e.equivFun 1) j • y j = algebraMap B A Y.det := by
     apply e.equivFun.injective
-    rw [key, Matrix.mulVec_mulVec, Matrix.mul_adjugate, Matrix.smul_mulVec,
-      Matrix.one_mulVec, Algebra.algebraMap_eq_smul_one, map_smul]
+    rw [key, Matrix.mulVec_mulVec, Matrix.mul_adjugate, Matrix.smul_mulVec, Matrix.one_mulVec,
+      Algebra.algebraMap_eq_smul_one, map_smul]
   rw [hsum, Algebra.norm_algebraMap]
   exact pow_ne_zero _ hdet
 

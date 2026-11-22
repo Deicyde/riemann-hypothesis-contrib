@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.exists_mul_eq_algebraMap_of_galois_fixed (O : Type) [CommRing O] [IsDomain O] [Algebra O ℂ] [FaithfulSMul O ℂ]
-    [Algebra.IsAlgebraic O ℂ] (z : ℂ) (hz : ∀ γ : ℂ ≃ₐ[O] ℂ, γ z = z) :
-    ∃ a b : O, b ≠ 0 ∧ algebraMap O ℂ b * z = algebraMap O ℂ a := by
+private theorem UpperTheory.exists_mul_eq_algebraMap_of_galois_fixed
+    (O : Type) [CommRing O] [IsDomain O] [Algebra O ℂ] [FaithfulSMul O ℂ] [Algebra.IsAlgebraic O ℂ]
+    (z : ℂ) (hz : ∀ γ : ℂ ≃ₐ[O] ℂ, γ z = z)
+    : ∃ a b : O, b ≠ 0 ∧ algebraMap O ℂ b * z = algebraMap O ℂ a := by
   letI : Algebra (FractionRing O) ℂ := FractionRing.liftAlgebra O ℂ
   haveI : IsScalarTower O (FractionRing O) ℂ := FractionRing.isScalarTower_liftAlgebra O ℂ
   haveI : Algebra.IsAlgebraic (FractionRing O) ℂ :=
@@ -27,23 +28,29 @@ private theorem UpperTheory.exists_mul_eq_algebraMap_of_galois_fixed (O : Type) 
     IsScalarTower.algebraMap_apply O (FractionRing O) ℂ a, ← map_mul, mul_comm,
     IsLocalization.mk'_spec]
 
-theorem UpperTheory.le_span_integralValued_of_galoisStable :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [Algebra O ℂ] [FaithfulSMul O ℂ] [Algebra.IsAlgebraic O ℂ] (X : Type) [Finite X] (I : Submodule ℂ (X → ℂ)), (∀ γ : ℂ ≃ₐ[O] ℂ, ∀ x ∈ I, (fun g => γ (x g)) ∈ I) → I ≤ Submodule.span ℂ {x | x ∈ I ∧ ∀ g, x g ∈ (algebraMap O ℂ).range} := by
+theorem UpperTheory.le_span_integralValued_of_galoisStable
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [Algebra O ℂ] [FaithfulSMul O ℂ]
+        [Algebra.IsAlgebraic O ℂ] (X : Type) [Finite X] (I : Submodule ℂ (X → ℂ)),
+      (∀ γ : ℂ ≃ₐ[O] ℂ, ∀ x ∈ I, (fun g => γ (x g)) ∈ I)
+        → I ≤ Submodule.span ℂ {x | x ∈ I ∧ ∀ g, x g ∈ (algebraMap O ℂ).range} := by
   intro O _ _ _ _ _ X _ I hI
   classical
   haveI := Fintype.ofFinite X
-  have hfix : ∀ x ∈ I, (∀ γ : ℂ ≃ₐ[O] ℂ, (fun g => γ (x g)) = x) →
-      x ∈ Submodule.span ℂ {x | x ∈ I ∧ ∀ g, x g ∈ (algebraMap O ℂ).range} := by
+  have hfix
+      : ∀ x ∈ I,
+        (∀ γ : ℂ ≃ₐ[O] ℂ, (fun g => γ (x g)) = x)
+          → x ∈ Submodule.span ℂ {x | x ∈ I ∧ ∀ g, x g ∈ (algebraMap O ℂ).range} := by
     intro x hx hγ
-    have hc : ∀ g, ∃ a b : O, b ≠ 0 ∧ algebraMap O ℂ b * x g = algebraMap O ℂ a :=
-      fun g => UpperTheory.exists_mul_eq_algebraMap_of_galois_fixed O (x g) (fun γ => congrFun (hγ γ) g)
+    have hc : ∀ g, ∃ a b : O, b ≠ 0 ∧ algebraMap O ℂ b * x g = algebraMap O ℂ a := fun g =>
+      UpperTheory.exists_mul_eq_algebraMap_of_galois_fixed O (x g) (fun γ => congrFun (hγ γ) g)
     choose a b hb hab using hc
     have hB : algebraMap O ℂ (∏ g, b g) ≠ 0 := by
       rw [map_prod]
       exact Finset.prod_ne_zero_iff.2 (fun g _ =>
         (map_ne_zero_iff _ (FaithfulSMul.algebraMap_injective O ℂ)).2 (hb g))
-    have hmem : algebraMap O ℂ (∏ g, b g) • x ∈
-        Submodule.span ℂ {x | x ∈ I ∧ ∀ g, x g ∈ (algebraMap O ℂ).range} := by
+    have hmem
+        : algebraMap O ℂ (∏ g, b g) • x
+          ∈ Submodule.span ℂ {x | x ∈ I ∧ ∀ g, x g ∈ (algebraMap O ℂ).range} := by
       apply Submodule.subset_span
       refine ⟨I.smul_mem _ hx, fun g => ⟨a g * ∏ h ∈ Finset.univ.erase g, b h, ?_⟩⟩
       show algebraMap O ℂ (a g * ∏ h ∈ Finset.univ.erase g, b h) = algebraMap O ℂ (∏ g, b g) * x g
@@ -52,8 +59,10 @@ theorem UpperTheory.le_span_integralValued_of_galoisStable :
       ring
     have h2 := Submodule.smul_mem _ (algebraMap O ℂ (∏ g, b g))⁻¹ hmem
     rwa [smul_smul, inv_mul_cancel₀ hB, one_smul] at h2
-  have key : ∀ n : ℕ, ∀ y ∈ I, (Finset.univ.filter (fun g => y g ≠ 0)).card ≤ n →
-      y ∈ Submodule.span ℂ {x | x ∈ I ∧ ∀ g, x g ∈ (algebraMap O ℂ).range} := by
+  have key
+      : ∀ n : ℕ, ∀ y ∈ I,
+        (Finset.univ.filter (fun g => y g ≠ 0)).card ≤ n
+          → y ∈ Submodule.span ℂ {x | x ∈ I ∧ ∀ g, x g ∈ (algebraMap O ℂ).range} := by
     intro n
     induction n with
     | zero =>
@@ -61,8 +70,8 @@ theorem UpperTheory.le_span_integralValued_of_galoisStable :
       have hy0 : y = 0 := by
         funext g
         by_contra h
-        have := Finset.card_pos.2
-          ⟨g, (by simpa using h : g ∈ Finset.univ.filter (fun g => y g ≠ 0))⟩
+        have :=
+          Finset.card_pos.2 ⟨g, (by simpa using h : g ∈ Finset.univ.filter (fun g => y g ≠ 0))⟩
         omega
       rw [hy0]
       exact Submodule.zero_mem _
@@ -86,8 +95,7 @@ theorem UpperTheory.le_span_integralValued_of_galoisStable :
         intro g
         rw [hx]
         simp [hg0]
-      have hyx : y = y g0 • x := by
-        rw [hx, smul_smul, mul_inv_cancel₀ hg0, one_smul]
+      have hyx : y = y g0 • x := by rw [hx, smul_smul, mul_inv_cancel₀ hg0, one_smul]
       by_cases hall : ∀ γ : ℂ ≃ₐ[O] ℂ, (fun g => γ (x g)) = x
       · rw [hyx]
         exact Submodule.smul_mem _ _ (hfix x hxI hall)
@@ -113,15 +121,16 @@ theorem UpperTheory.le_span_integralValued_of_galoisStable :
           simp [hxg0]
         have hy1 : y g1 ≠ 0 := fun e => hg1 (hdsupp g1 e)
         have hdcard : (Finset.univ.filter (fun g => d g ≠ 0)).card ≤ n := by
-          have hsub : Finset.univ.filter (fun g => d g ≠ 0) ⊆
-              (Finset.univ.filter (fun g => y g ≠ 0)).erase g0 := by
+          have hsub
+              : Finset.univ.filter (fun g => d g ≠ 0)
+                ⊆ (Finset.univ.filter (fun g => y g ≠ 0)).erase g0 := by
             intro g hg
             simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hg
             simp only [Finset.mem_erase, Finset.mem_filter, Finset.mem_univ, true_and]
             exact ⟨fun e => hg (e ▸ hdg0), fun e => hg (hdsupp g e)⟩
           have h1 := Finset.card_le_card hsub
-          have h2 := Finset.card_erase_of_mem
-            (show g0 ∈ Finset.univ.filter (fun g => y g ≠ 0) by simp [hg0])
+          have h2 :=
+            Finset.card_erase_of_mem (show g0 ∈ Finset.univ.filter (fun g => y g ≠ 0) by simp [hg0])
           omega
         have hdW := ih d hdI hdcard
         obtain ⟨y', hy'⟩ : ∃ y' : X → ℂ, y' = y - (y g1 / d g1) • d := ⟨_, rfl⟩
@@ -129,8 +138,9 @@ theorem UpperTheory.le_span_integralValued_of_galoisStable :
           rw [hy']
           exact I.sub_mem hy (I.smul_mem _ hdI)
         have hy'card : (Finset.univ.filter (fun g => y' g ≠ 0)).card ≤ n := by
-          have hsub : Finset.univ.filter (fun g => y' g ≠ 0) ⊆
-              (Finset.univ.filter (fun g => y g ≠ 0)).erase g1 := by
+          have hsub
+              : Finset.univ.filter (fun g => y' g ≠ 0)
+                ⊆ (Finset.univ.filter (fun g => y g ≠ 0)).erase g1 := by
             intro g hg
             simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hg
             simp only [Finset.mem_erase, Finset.mem_filter, Finset.mem_univ, true_and]
@@ -142,12 +152,11 @@ theorem UpperTheory.le_span_integralValued_of_galoisStable :
               apply hg
               rw [hy', Pi.sub_apply, Pi.smul_apply, smul_eq_mul, e, hdsupp g e, mul_zero, sub_zero]
           have h1 := Finset.card_le_card hsub
-          have h2 := Finset.card_erase_of_mem
-            (show g1 ∈ Finset.univ.filter (fun g => y g ≠ 0) by simp [hy1])
+          have h2 :=
+            Finset.card_erase_of_mem (show g1 ∈ Finset.univ.filter (fun g => y g ≠ 0) by simp [hy1])
           omega
         have hy'W := ih y' hy'I hy'card
-        have hyy : y = y' + (y g1 / d g1) • d := by
-          rw [hy', sub_add_cancel]
+        have hyy : y = y' + (y g1 / d g1) • d := by rw [hy', sub_add_cancel]
         rw [hyy]
         exact Submodule.add_mem _ hy'W (Submodule.smul_mem _ _ hdW)
   intro y hy

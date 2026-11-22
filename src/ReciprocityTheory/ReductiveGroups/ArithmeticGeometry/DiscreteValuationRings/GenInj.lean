@@ -16,24 +16,33 @@ namespace ReciprocityTheory.ChartRestriction.G.DVR
 
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-theorem away_fractionRing {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] {ϖ : V}
-    (hϖ : Irreducible ϖ) : IsLocalization.Away ϖ (FractionRing V) := by
-  first | exact Bl.SecondBlockLemmaO.goal1 .. | (apply Bl.SecondBlockLemmaO.goal1 <;> assumption) | (intros; apply Bl.SecondBlockLemmaO.goal1 <;> assumption)
+theorem away_fractionRing
+    {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] {ϖ : V} (hϖ : Irreducible ϖ)
+    : IsLocalization.Away ϖ (FractionRing V) := by
+  first
+  | exact Bl.SecondBlockLemmaO.goal1 ..
+  | (apply Bl.SecondBlockLemmaO.goal1 <;> assumption)
+  | (intros; apply Bl.SecondBlockLemmaO.goal1 <;> assumption)
 
 theorem gs_zero' {X Y : Scheme.{0}} (f : Y ⟶ X) (y : Y) (U : X.Opens) : gs f y U 0 = 0 := by
   unfold gs; split_ifs <;> simp
 
-theorem eq_zero_of_app_fst_open {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-    {X T : AlgebraicGeometry.Scheme.{0}} (p : X ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp V) [AlgebraicGeometry.Flat p]
-    (t : T ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp V) [AlgebraicGeometry.IsOpenImmersion t] [Nonempty T]
-    (W : X.Opens) (d : Γ(X, W)) (h : ((CategoryTheory.Limits.pullback.fst p t).app W).hom d = 0) : d = 0 := by
+theorem eq_zero_of_app_fst_open
+    {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    {X T : AlgebraicGeometry.Scheme.{0}} (p : X ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp V)
+    [AlgebraicGeometry.Flat p]
+    (t : T ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp V)
+    [AlgebraicGeometry.IsOpenImmersion t] [Nonempty T]
+    (W : X.Opens) (d : Γ(X, W)) (h : ((CategoryTheory.Limits.pullback.fst p t).app W).hom d = 0)
+    : d = 0 := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible V
   let ϖ' : Γ(Sp V, ⊤) := (Scheme.ΓSpecIso (CommRingCat.of V)).inv.hom ϖ
   have hrange : ∀ t' : Sp V, t' ∈ (Sp V).basicOpen ϖ' → t' ∈ Set.range t.base := by
     intro t' ht
     have ht' : t' ∈ (PrimeSpectrum.basicOpen ϖ : Set (PrimeSpectrum V)) := by
       have := basicOpen_eq_of_affine (R := CommRingCat.of V) ϖ
-      rw [← this]; exact ht
+      rw [← this]
+      exact ht
     have hbot : PrimeSpectrum.asIdeal (R := V) t' = ⊥ := by
       by_contra hne
       have hmax := Ideal.IsPrime.isMaximal (PrimeSpectrum.isPrime (R := V) t') hne
@@ -44,14 +53,16 @@ theorem eq_zero_of_app_fst_open {V : Type} [CommRing V] [IsDomain V] [IsDiscrete
     obtain ⟨y⟩ := ‹Nonempty T›
     have hle : PrimeSpectrum.asIdeal (R := V) t' ≤ PrimeSpectrum.asIdeal (R := V) (t.base y) := by
       rw [hbot]; exact bot_le
-    have hsp : t' ⤳ t.base y := (PrimeSpectrum.le_iff_specializes (R := V) _ _).1 ((PrimeSpectrum.asIdeal_le_asIdeal _ _).1 hle)
+    have hsp : t' ⤳ t.base y :=
+      (PrimeSpectrum.le_iff_specializes (R := V) _ _).1
+        ((PrimeSpectrum.asIdeal_le_asIdeal _ _).1 hle)
     exact hsp.mem_open t.isOpenEmbedding.isOpen_range ⟨y, rfl⟩
   let O : X.Opens := p ⁻¹ᵁ (Sp V).basicOpen ϖ'
-  let q := IsOpenImmersion.lift t (O.ι ≫ p) (by
-    rintro _ ⟨a, rfl⟩
-    exact hrange _ a.2)
-  let s : O.toScheme ⟶ pullback p t :=
-    pullback.lift O.ι q (IsOpenImmersion.lift_fac _ _ _).symm
+  let q :=
+    IsOpenImmersion.lift t (O.ι ≫ p) (by
+      rintro _ ⟨a, rfl⟩
+      exact hrange _ a.2)
+  let s : O.toScheme ⟶ pullback p t := pullback.lift O.ι q (IsOpenImmersion.lift_fac _ _ _).symm
   have hs : s ≫ pullback.fst p t = O.ι := pullback.lift_fst _ _ _
   have hO : ∀ x ∈ W, x ∈ O → gs (𝟙 X) x W d = 0 := by
     intro x hxW hxO
@@ -61,7 +72,8 @@ theorem eq_zero_of_app_fst_open {V : Type} [CommRing V] [IsDomain V] [IsDiscrete
       exact gs_zero' _ _ _
     rw [gs_stalkMap O.ι ⟨x, hxO⟩ W hxW] at e1
     have : IsIso (O.ι.stalkMap ⟨x, hxO⟩) := (IsOpenImmersion.iff_isIso_stalkMap.1 inferInstance).2 _
-    exact (ConcreteCategory.bijective_of_isIso (O.ι.stalkMap ⟨x, hxO⟩)).1 (e1.trans (map_zero _).symm)
+    exact (ConcreteCategory.bijective_of_isIso (O.ι.stalkMap ⟨x, hxO⟩)).1
+      (e1.trans (map_zero _).symm)
   refine fn_ext fun x hx => ?_
   rw [gs_zero']
   obtain ⟨_, ⟨U, hU, rfl⟩, hxU, hUW⟩ := X.isBasis_affineOpens.exists_subset_of_mem_open hx W.2
@@ -75,8 +87,7 @@ theorem eq_zero_of_app_fst_open {V : Type} [CommRing V] [IsDomain V] [IsDiscrete
   · refine fn_ext fun x' hx' => ?_
     have hx'U : x' ∈ U := X.basicOpen_le g hx'
     have hunit : IsUnit (X.presheaf.germ U x' hx'U g) := (X.mem_basicOpen g x' hx'U).1 hx'
-    have h2 : IsUnit (cst p x' ϖ) := by
-      rw [← hgs x' hx'U, gs_eq (𝟙 X) x' U hx'U]; exact hunit
+    have h2 : IsUnit (cst p x' ϖ) := by rw [← hgs x' hx'U, gs_eq (𝟙 X) x' U hx'U]; exact hunit
     have h3 : IsUnit (gs (𝟙 (Sp V)) (p x') ⊤ ϖ') := by
       rw [cst, gs_stalkMap p x' ⊤ trivial] at h2
       exact (isUnit_map_iff (p.stalkMap x').hom _).1 h2

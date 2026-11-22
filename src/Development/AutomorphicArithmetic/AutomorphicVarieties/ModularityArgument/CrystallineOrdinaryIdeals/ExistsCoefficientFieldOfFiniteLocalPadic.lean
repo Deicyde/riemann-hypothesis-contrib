@@ -8,7 +8,13 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem exists_coefficientField_of_finite_local_padic : ∀ {l : ℕ} [Fact l.Prime] (B : Type) [CommRing B] [IsLocalRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B], ∃ (E : Type) (_ : Field E) (_ : Algebra ℚ_[l] E) (_ : FiniteDimensional ℚ_[l] E) (_ : Algebra E B) (_ : IsScalarTower ℚ_[l] E B) (π : B →ₐ[E] E), ∀ a, π a = 0 → IsNilpotent a := by
+theorem exists_coefficientField_of_finite_local_padic
+    : ∀ {l : ℕ} [Fact l.Prime] (B : Type) [CommRing B] [IsLocalRing B] [Algebra ℚ_[l] B]
+        [Module.Finite ℚ_[l] B],
+      ∃ (E : Type) (_ : Field E) (_ : Algebra ℚ_[l] E) (_ : FiniteDimensional ℚ_[l] E)
+          (_ : Algebra E B) (_ : IsScalarTower ℚ_[l] E B) (π : B →ₐ[E] E),
+        ∀ a,
+          π a = 0 → IsNilpotent a := by
   intro l _ B _ _ _ _
   have hart : IsArtinianRing B := IsArtinianRing.of_finite ℚ_[l] B
   let g : B →ₐ[ℚ_[l]] ResidueField B := Ideal.Quotient.mkₐ ℚ_[l] (maximalIdeal B)
@@ -29,9 +35,10 @@ theorem exists_coefficientField_of_finite_local_padic : ∀ {l : ℕ} [Fact l.Pr
     refine IsScalarTower.of_algebraMap_eq fun r => ?_
     change algebraMap ℚ_[l] B r = s (algebraMap ℚ_[l] (ResidueField B) r)
     exact (s.commutes r).symm
-  let π : B →ₐ[ResidueField B] ResidueField B :=
-    { (g : B →+* ResidueField B) with
-      commutes' := fun x => hs x }
+  let π : B →ₐ[ResidueField B] ResidueField B := {
+    (g : B →+* ResidueField B) with
+    commutes' := fun x => hs x
+  }
   refine ⟨ResidueField B, inferInstance, inferInstance, inferInstance, alg, tower, π, ?_⟩
   intro a ha
   have hmem : a ∈ maximalIdeal B := by

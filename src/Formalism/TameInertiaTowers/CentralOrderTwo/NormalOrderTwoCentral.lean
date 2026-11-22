@@ -16,15 +16,19 @@ theorem normalOrderTwoCentral : NormalOrderTwoCentral := by
   · simp [hz1]
   have hc : g * z * g⁻¹ ∈ N := hN.conj_mem z hz g
   obtain ⟨y, hy, huniq⟩ := (Nat.card_eq_two_iff' (1 : N)).mp h2
-  have e1 : (⟨g * z * g⁻¹, hc⟩ : N) = y := huniq _ (by
-    intro h; apply hz1
-    have h' : g * z * g⁻¹ = 1 := congrArg Subtype.val h
-    calc z = g⁻¹ * (g * z * g⁻¹) * g := by group
-      _ = 1 := by rw [h']; group)
-  have e2 : (⟨z, hz⟩ : N) = y := huniq _ (by
-    intro h; exact hz1 (congrArg Subtype.val h))
+  have e1 : (⟨g * z * g⁻¹, hc⟩ : N) = y :=
+    huniq _ (by
+      intro h
+      apply hz1
+      have h' : g * z * g⁻¹ = 1 := congrArg Subtype.val h
+      calc
+        z = g⁻¹ * (g * z * g⁻¹) * g := by group
+        _ = 1 := by rw [h']; group)
+  have e2 : (⟨z, hz⟩ : N) = y := huniq _ (by intro h; exact hz1 (congrArg Subtype.val h))
   have : g * z * g⁻¹ = z := congrArg Subtype.val (e1.trans e2.symm)
-  calc g * z = g * z * g⁻¹ * g := by group
+  calc
+    g * z
+      = g * z * g⁻¹ * g := by group
     _ = z * g := by rw [this]
 
 lemma v24 : padicValInt 2 ((5 : ℤ) ^ 2 - 1) = 3 := by
@@ -44,18 +48,25 @@ theorem twistVal : TwistVal := by
   have key := (twoAdicVal 5 h5 h52 (2 ^ s * e) hpos).1
   rw [key]
   split_ifs with hev
-  · rw [v24, (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (by positivity) (by omega), Nat.padicValNat_def, Nat.multiplicity_prime_pow]
+  · rw [v24,
+      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+            a ≠ 0 → b ≠ 0
+              → _root_.padicValNat p (a * b)
+                = _root_.padicValNat p a + _root_.padicValNat p b from by
+          simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+        (by positivity) (by omega),
+      Nat.padicValNat_def, Nat.multiplicity_prime_pow]
     omega
   · rw [v4]
     have hs : s = 0 := by
       rcases Nat.eq_zero_or_pos s with h | h
       · exact h
-      · exfalso; apply hev
+      · exfalso
+        apply hev
         obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_lt h
         exact ⟨2 ^ k * e, by ring⟩
     subst hs
-    have he' : ¬ 2 ∣ e := by
-      intro hd; apply hev; simpa using (even_iff_two_dvd.mpr hd)
+    have he' : ¬ 2 ∣ e := by intro hd; apply hev; simpa using (even_iff_two_dvd.mpr hd)
     rw [Nat.padicValNat_def, multiplicity_eq_zero_of_not_dvd he']
 
 lemma gcd_two_pow (N k : ℕ) (hk : k ≠ 0) : Nat.gcd (2 ^ N) k = 2 ^ min N (padicValNat 2 k) := by
@@ -77,10 +88,10 @@ lemma gcd_two_pow (N k : ℕ) (hk : k ≠ 0) : Nat.gcd (2 ^ N) k = 2 ^ min N (pa
 theorem coinvLength : CoinvLength := by
   intro N u _ hu1
   set k := (u - 1).natAbs with hkdef
-  have hk : k ≠ 0 := by
-    rw [hkdef]; intro h; apply hu1; have := Int.natAbs_eq_zero.mp h; linarith
-  have hsub : AddSubgroup.zmultiples (((u - 1 : ℤ)) : ZMod (2 ^ N)) =
-      AddSubgroup.zmultiples ((k : ℕ) : ZMod (2 ^ N)) := by
+  have hk : k ≠ 0 := by rw [hkdef]; intro h; apply hu1; have := Int.natAbs_eq_zero.mp h; linarith
+  have hsub
+      : AddSubgroup.zmultiples (((u - 1 : ℤ)) : ZMod (2 ^ N))
+        = AddSubgroup.zmultiples ((k : ℕ) : ZMod (2 ^ N)) := by
     rcases Int.natAbs_eq (u - 1) with h | h
     · rw [h]; simp [hkdef]
     · rw [h]; simp [hkdef]
@@ -111,8 +122,7 @@ theorem genusAbelian : GenusAbelian := by
   have hbij : Function.Bijective f := by
     apply hsurj.bijective_of_nat_card_le
     rw [Nat.card_prod, Nat.card_prod, hcard, mul_assoc]
-  have h1 : f (⟨a, ha⟩, ⟨b, hb⟩, ⟨c, hc⟩) = f 1 := by
-    rw [hf, map_one]; simpa [mul_assoc] using habc
+  have h1 : f (⟨a, ha⟩, ⟨b, hb⟩, ⟨c, hc⟩) = f 1 := by rw [hf, map_one]; simpa [mul_assoc] using habc
   have h2 := hbij.1 h1
   simp only [Prod.mk_eq_one, Subgroup.mk_eq_one] at h2
   exact ⟨h2.1, h2.2.1, h2.2.2⟩

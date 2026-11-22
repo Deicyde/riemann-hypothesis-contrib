@@ -9,17 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Compa
 
 noncomputable section
 
-open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.TypeSum GlobalTheory.TypeSum.CasBasis
+open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.SmoothGlob GlobalTheory.TypeSum GlobalTheory.TypeSum.CasBasis
   GlobalTheory.LowTypeDetermined
 open scoped InnerProductSpace
 
 namespace GlobalTheory.TypeSum.CasBasis
 
-theorem exists_eigen_casOp : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (σ : Mx n → (H →L[ℂ] H)) (d e : ℕ) (X : Fin d → Mx n) (Y : Fin e → Mx n), Std ε σ →
-    (∀ i, X i ∈ lieSet ε) → (∀ b, Y b ∈ lieSet ε) →
-    (∀ k ∈ Kset ε, ∀ v, Sm ε σ v → casOp σ X Y (σ k v) = σ k (casOp σ X Y v)) →
-    ∃ (u : H) (χ : ℂ), Sm ε σ u ∧ u ≠ 0 ∧ casOp σ X Y u = χ • u := by
+theorem exists_eigen_casOp
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        [CompleteSpace H] (σ : Mx n → (H →L[ℂ] H)) (d e : ℕ) (X : Fin d → Mx n) (Y : Fin e → Mx n),
+      Std ε σ → (∀ i, X i ∈ lieSet ε) → (∀ b, Y b ∈ lieSet ε)
+        → (∀ k ∈ Kset ε, ∀ v, Sm ε σ v → casOp σ X Y (σ k v) = σ k (casOp σ X Y v))
+        → ∃ (u : H) (χ : ℂ), Sm ε σ u ∧ u ≠ 0 ∧ casOp σ X Y u = χ • u := by
   intro n ε H _ _ _ σ d e X Y h hX hY hK
   have hσ := h.1
   obtain ⟨v₀, hv₀K, hv₀⟩ := h.2.2.2.2
@@ -53,16 +55,18 @@ theorem exists_eigen_casOp : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [Nor
     congr 1
     funext k
     congr 1
-    rw [← inner_casOp hσ hX hY hy' (Sm.translate hσ hv (KCoef.toMK_mem_UJ k)), hK _ (toMK_mem_K k) v hv]
+    rw [← inner_casOp hσ hX hY hy' (Sm.translate hσ hv (KCoef.toMK_mem_UJ k)),
+      hK _ (toMK_mem_K k) v hv]
   have hVmap : ∀ u ∈ V, casOp σ X Y u ∈ V := by
     rintro _ ⟨v, hv, rfl⟩
     change casOp σ X Y (Q v) ∈ V
     rw [hcomm v hv]
     exact ⟨_, sm_casOp hσ hX hY hv, rfl⟩
-  let F : Module.End ℂ V :=
-    { toFun := fun u => ⟨casOp σ X Y u, hVmap u u.2⟩
-      map_add' := fun x y => Subtype.ext (casOp_add hσ hX hY (hVsm _ x.2) (hVsm _ y.2))
-      map_smul' := fun r x => Subtype.ext (casOp_smul hσ hX hY r (hVsm _ x.2)) }
+  let F : Module.End ℂ V := {
+    toFun := fun u => ⟨casOp σ X Y u, hVmap u u.2⟩
+    map_add' := fun x y => Subtype.ext (casOp_add hσ hX hY (hVsm _ x.2) (hVsm _ y.2))
+    map_smul' := fun r x => Subtype.ext (casOp_smul hσ hX hY r (hVsm _ x.2))
+  }
   have hQv₀ : Q v₀ ≠ 0 := by
     intro h0
     apply KCoef.inner_kAvg_ne_zero hσ hv₀

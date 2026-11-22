@@ -5,13 +5,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.productCup_of_system
 
 section
-variable {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
+variable
+  {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
 
 private lemma muP_tmul (τ : DR ℂ K →ₗ[K] K) (w' w'' w : DR ℂ K) :
     muP F K τ (w' ⊗ₜ w'') w = (Algebra.trace F K (τ (w' * w))) ⊗ₜ[ℂ] w'' := by
@@ -63,41 +65,44 @@ end
 
 end UpperTheory.Gal.productCup_of_system
 
-theorem UpperTheory.Gal.productCup_of_system.actsLin_of :
-    ActsLin := by
+theorem UpperTheory.Gal.productCup_of_system.actsLin_of : ActsLin := by
   intro F K _ _ _ _ _ _ d x _ τ _ a
-  have hadd : ∀ (m m' : DR ℂ K ⊗[ℂ] DR ℂ K) (c c' : K),
-      Acts (F := F) K τ a m c → Acts (F := F) K τ a m' c' →
-        Acts (F := F) K τ a (m + m') (c + c') ∧ Acts (F := F) K τ a (m - m') (c - c') := by
+  have hadd
+      : ∀ (m m' : DR ℂ K ⊗[ℂ] DR ℂ K) (c c' : K),
+        Acts (F := F) K τ a m c → Acts (F := F) K τ a m' c'
+          → Acts (F := F) K τ a (m + m') (c + c') ∧ Acts (F := F) K τ a (m - m') (c - c') := by
     intro m m' c c' hm hm'
     unfold Acts at hm hm' ⊢
     refine ⟨fun w hw => ?_, fun w hw => ?_⟩
     · rw [map_add (f := _), LinearMap.add_apply, map_add (f := _), hm w hw, hm' w hw, add_smul]
     · rw [map_sub, LinearMap.sub_apply, map_sub, hm w hw, hm' w hw, sub_smul]
-  have hr : ∀ (i j : Fin (d + 1)) (l : Mi d) (m : DR ℂ K ⊗[ℂ] DR ℂ K),
-      Acts (F := F) K τ a (actZ K ((sysZ K x a).r n11 (sysZ K x a).mu i j l) m) 0 := by
+  have hr
+      : ∀ (i j : Fin (d + 1)) (l : Mi d) (m : DR ℂ K ⊗[ℂ] DR ℂ K),
+        Acts (F := F) K τ a (actZ K ((sysZ K x a).r n11 (sysZ K x a).mu i j l) m) 0 := by
     intro i j l m
     unfold Acts
     intro w _
     rw [r_eq, map_sub, LinearMap.sub_apply, map_sub, LinearMap.sub_apply, map_sub, key3, key3,
       ← Units.val_mul, ← Units.val_mul, div_mul_div_comm, div_mul_div_comm,
       mul_comm (x (ofLex l).1) (x (ofLex l).2), sub_self, zero_smul]
-  have hsm : ∀ (i j : Fin (d + 1)) (M : Submodule ℂ (DR ℂ K ⊗[ℂ] DR ℂ K)),
-      ∀ m ∈ sm (actZ K) M (Set.range ((sysZ K x a).r n11 (sysZ K x a).mu i j)),
-        Acts (F := F) K τ a m 0 := by
+  have hsm
+      : ∀ (i j : Fin (d + 1)) (M : Submodule ℂ (DR ℂ K ⊗[ℂ] DR ℂ K)),
+        ∀ m ∈ sm (actZ K) M (Set.range ((sysZ K x a).r n11 (sysZ K x a).mu i j)),
+          Acts (F := F) K τ a m 0 := by
     intro i j M m hm
-    let N : Submodule ℂ (DR ℂ K ⊗[ℂ] DR ℂ K) :=
-      { carrier := {m | Acts (F := F) K τ a m 0}
-        add_mem' := fun {m m'} hm hm' => by simpa using (hadd m m' 0 0 hm hm').1
-        zero_mem' := by
-          simp only [Set.mem_setOf_eq, Acts]
-          intro w _
-          simp
-        smul_mem' := fun c m hm => by
-          simp only [Set.mem_setOf_eq, Acts] at hm ⊢
-          intro w hw
-          rw [map_smul, LinearMap.smul_apply, map_smul, hm w hw]
-          simp }
+    let N : Submodule ℂ (DR ℂ K ⊗[ℂ] DR ℂ K) := {
+      carrier := {m | Acts (F := F) K τ a m 0}
+      add_mem' := fun {m m'} hm hm' => by simpa using (hadd m m' 0 0 hm hm').1
+      zero_mem' := by
+        simp only [Set.mem_setOf_eq, Acts]
+        intro w _
+        simp
+      smul_mem' := fun c m hm => by
+        simp only [Set.mem_setOf_eq, Acts] at hm ⊢
+        intro w hw
+        rw [map_smul, LinearMap.smul_apply, map_smul, hm w hw]
+        simp
+    }
     have hle : sm (actZ K) M (Set.range ((sysZ K x a).r n11 (sysZ K x a).mu i j)) ≤ N := by
       unfold sm
       refine iSup₂_le fun s hs => ?_
@@ -123,14 +128,16 @@ theorem UpperTheory.Gal.productCup_of_system.actsLin_of :
       simpa only [map_add (f := _), LinearMap.add_apply, add_mul] using (hadd _ _ _ _ hs hs').1
   · intro u M m i j hm
     apply hsm i j (M.map (actZ K u))
-    have hle : sm (actZ K) M (Set.range ((sysZ K x a).r n11 (sysZ K x a).mu i j)) ≤
-        (sm (actZ K) (M.map (actZ K u))
-          (Set.range ((sysZ K x a).r n11 (sysZ K x a).mu i j))).comap (actZ K u) := by
+    have hle
+        : sm (actZ K) M (Set.range ((sysZ K x a).r n11 (sysZ K x a).mu i j))
+          ≤ (sm (actZ K) (M.map (actZ K u))
+            (Set.range ((sysZ K x a).r n11 (sysZ K x a).mu i j))).comap (actZ K u) := by
       unfold sm
       refine iSup₂_le fun s hs => ?_
       rintro _ ⟨v, hv, rfl⟩
       rw [Submodule.mem_comap]
-      refine Submodule.mem_iSup_of_mem s (Submodule.mem_iSup_of_mem hs ⟨actZ K u v, ⟨v, hv, rfl⟩, ?_⟩)
+      refine Submodule.mem_iSup_of_mem s
+        (Submodule.mem_iSup_of_mem hs ⟨actZ K u v, ⟨v, hv, rfl⟩, ?_⟩)
       rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul, mul_comm]
     exact hle hm
   · intro s m

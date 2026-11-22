@@ -10,8 +10,8 @@ namespace Formalism.L2.Th1.F
 
 namespace PeriodLatticeBasisLemmas
 
-private theorem mem_lattice_iff_exists_int_comb' (L : PeriodPair) {x : ℂ} :
-    x ∈ L.lattice ↔ ∃ m n : ℤ, (m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂ = x := by
+private theorem mem_lattice_iff_exists_int_comb' (L : PeriodPair) {x : ℂ}
+    : x ∈ L.lattice ↔ ∃ m n : ℤ, (m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂ = x := by
   exact L.mem_lattice
 
 private theorem periodPair_basis_zero_eq_omega_one (L : PeriodPair) : L.basis 0 = L.ω₁ := by
@@ -20,15 +20,17 @@ private theorem periodPair_basis_zero_eq_omega_one (L : PeriodPair) : L.basis 0 
 private theorem periodPair_basis_one_eq_omega_two (L : PeriodPair) : L.basis 1 = L.ω₂ := by
   exact L.basis_one
 
-private theorem basis_equivFun_real_comb_periods (L : PeriodPair) (s t : ℝ) :
-    L.basis.equivFun ((s : ℂ) * L.ω₁ + (t : ℂ) * L.ω₂) = ![s, t] := by
+private theorem basis_equivFun_real_comb_periods (L : PeriodPair) (s t : ℝ)
+    : L.basis.equivFun ((s : ℂ) * L.ω₁ + (t : ℂ) * L.ω₂) = ![s, t] := by
   have e : ((s : ℂ) * L.ω₁ + (t : ℂ) * L.ω₂) = L.basis.equivFun.symm ![s, t] := by
-    rw [Module.Basis.equivFun_symm_apply, Fin.sum_univ_two, periodPair_basis_zero_eq_omega_one, periodPair_basis_one_eq_omega_two]
+    rw [Module.Basis.equivFun_symm_apply, Fin.sum_univ_two, periodPair_basis_zero_eq_omega_one,
+      periodPair_basis_one_eq_omega_two]
     simp [Complex.real_smul]
   rw [e, LinearEquiv.apply_symm_apply]
 
-private theorem lattice_eq_iInter_preimage_int_coords (L : PeriodPair) :
-    (L.lattice : Set ℂ) = ⋂ i : Fin 2, (fun x => L.basis.equivFun x i) ⁻¹' Set.range ((↑) : ℤ → ℝ) := by
+private theorem lattice_eq_iInter_preimage_int_coords (L : PeriodPair)
+    : (L.lattice : Set ℂ)
+      = ⋂ i : Fin 2, (fun x => L.basis.equivFun x i) ⁻¹' Set.range ((↑) : ℤ → ℝ) := by
   ext x
   simp only [SetLike.mem_coe, Set.mem_iInter, Set.mem_preimage]
   constructor
@@ -45,7 +47,9 @@ private theorem lattice_eq_iInter_preimage_int_coords (L : PeriodPair) :
     obtain ⟨n, hn⟩ := h 1
     refine (mem_lattice_iff_exists_int_comb' L).mpr ⟨m, n, ?_⟩
     have hs := L.basis.sum_equivFun x
-    rw [Fin.sum_univ_two, periodPair_basis_zero_eq_omega_one, periodPair_basis_one_eq_omega_two, ← hm, ← hn] at hs
+    rw [Fin.sum_univ_two, periodPair_basis_zero_eq_omega_one, periodPair_basis_one_eq_omega_two,
+        ← hm, ← hn]
+      at hs
     rw [← hs]
     simp [Complex.real_smul]
 
@@ -53,7 +57,8 @@ private theorem isClosed_periodPair_lattice (L : PeriodPair) : IsClosed (L.latti
   rw [lattice_eq_iInter_preimage_int_coords]
   refine isClosed_iInter fun i => ?_
   have hc : Continuous fun x : ℂ => L.basis.equivFun x i :=
-    (continuous_apply i).comp (LinearMap.continuous_of_finiteDimensional L.basis.equivFun.toLinearMap)
+    (continuous_apply i).comp
+      (LinearMap.continuous_of_finiteDimensional L.basis.equivFun.toLinearMap)
   exact Int.isClosedEmbedding_coe_real.isClosed_range.preimage hc
 
 lemma isOpen_compl (L : PeriodPair) : IsOpen ((L.lattice : Set ℂ)ᶜ) :=
@@ -180,7 +185,8 @@ lemma semiChar_ne_zero (L : PeriodPair) (ω : ℂ) : semiChar L ω ≠ 0 := by
   unfold Formalism.L2.Th1.F.semiChar
   split_ifs <;> norm_num
 
-private theorem linearIndependent_real_periods (L : PeriodPair) : LinearIndependent ℝ ![L.ω₁, L.ω₂] := by
+private theorem linearIndependent_real_periods (L : PeriodPair)
+    : LinearIndependent ℝ ![L.ω₁, L.ω₂] := by
   exact L.indep
 
 lemma coords_half (L : PeriodPair) {a b a' b' : ℤ}
@@ -194,15 +200,16 @@ lemma coords_half (L : PeriodPair) {a b a' b' : ℤ}
   have h6 : 2 * b' - b = 0 := by exact_mod_cast h4
   constructor <;> omega
 
-private theorem int_comb_periods_mem_lattice (L : PeriodPair) (a b : ℤ) :
-    (a : ℂ) * L.ω₁ + (b : ℂ) * L.ω₂ ∈ L.lattice :=
+private theorem int_comb_periods_mem_lattice (L : PeriodPair) (a b : ℤ)
+    : (a : ℂ) * L.ω₁ + (b : ℂ) * L.ω₂ ∈ L.lattice :=
   (mem_lattice_iff_exists_int_comb' L).mpr ⟨a, b, rfl⟩
 
 private theorem semiChar_zero_eq_one (L : PeriodPair) : Formalism.L2.Th1.F.semiChar L 0 = 1 := by
   unfold Formalism.L2.Th1.F.semiChar
   rw [if_pos (by rw [zero_div]; exact L.lattice.zero_mem)]
 
-private theorem quasiPeriodic_zero_semiChar_zero (L : PeriodPair) : QP L 0 (Formalism.L2.Th1.F.semiChar L 0) := by
+private theorem quasiPeriodic_zero_semiChar_zero (L : PeriodPair)
+    : QP L 0 (Formalism.L2.Th1.F.semiChar L 0) := by
   rw [semiChar_zero_eq_one]
   unfold QP
   intro z
@@ -244,30 +251,33 @@ lemma qp_coords (hq : ZetaQuasi) (hl : SigmaLogDeriv) (ho : SigmaOdd) (hz : Sigm
 
 end PeriodLatticeBasisLemmas
 
-
 open PeriodLatticeBasisLemmas in
-theorem sigmaQuasi_of (hq : ZetaQuasi) (hl : SigmaLogDeriv) (_he : SigmaEntire) (ho : SigmaOdd)
-    (hz : SigmaZero) : SigmaQuasi := by
+theorem sigmaQuasi_of
+    (hq : ZetaQuasi) (hl : SigmaLogDeriv) (_he : SigmaEntire) (ho : SigmaOdd) (hz : SigmaZero)
+    : SigmaQuasi := by
   intro L ω z hω
-  obtain ⟨a, b, rfl⟩ := (_root_.Formalism.L2.Th1.F.PeriodLatticeBasisLemmas.mem_lattice_iff_exists_int_comb' L).mp hω
+  obtain ⟨a, b, rfl⟩ :=
+    (_root_.Formalism.L2.Th1.F.PeriodLatticeBasisLemmas.mem_lattice_iff_exists_int_comb' L).mp hω
   exact Formalism.L2.Th1.F.PeriodLatticeBasisLemmas.qp_coords hq hl ho hz L _ a b le_rfl z
 
-
 open PeriodLatticeBasisLemmas in
-theorem sigmaSimple_of (hq : SigmaQuasi) (he : SigmaEntire)
-    (h0 : ∀ L : PeriodPair, deriv (wSigma L) 0 = 1) : SigmaSimple := by
+theorem sigmaSimple_of
+    (hq : SigmaQuasi) (he : SigmaEntire) (h0 : ∀ L : PeriodPair, deriv (wSigma L) 0 = 1)
+    : SigmaSimple := by
   intro L
   refine ⟨h0 L, fun z hzL => ?_⟩
   have h : HasDerivAt (fun y => wSigma L (y + z)) (deriv (wSigma L) z) 0 := by
     have h' := (he L (0 + z)).hasDerivAt.comp (0 : ℂ) ((hasDerivAt_id' (0 : ℂ)).add_const z)
     rw [zero_add, mul_one] at h'
     exact h'
-  have hd1 : HasDerivAt (fun y => semiChar L z * Complex.exp (wEta L z * (y + z / 2))
-      * wSigma L y) (deriv (wSigma L) z) 0 := by
+  have hd1 : HasDerivAt
+      (fun y => semiChar L z * Complex.exp (wEta L z * (y + z / 2)) * wSigma L y)
+      (deriv (wSigma L) z) 0 := by
     convert h using 1
     funext y
     exact (hq L z y hzL).symm
-  have h3 : HasDerivAt (fun y => Complex.exp (wEta L z * (y + z / 2)))
+  have h3 : HasDerivAt
+      (fun y => Complex.exp (wEta L z * (y + z / 2)))
       (Complex.exp (wEta L z * (0 + z / 2)) * (wEta L z * 1)) 0 :=
     (((hasDerivAt_id' (0 : ℂ)).add_const (z / 2)).const_mul (wEta L z)).cexp
   have hd2 := (h3.const_mul (semiChar L z)).mul (he L 0).hasDerivAt

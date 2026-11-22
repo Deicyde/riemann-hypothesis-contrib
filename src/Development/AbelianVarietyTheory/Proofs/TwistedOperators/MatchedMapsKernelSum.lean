@@ -22,11 +22,16 @@ noncomputable section
 
 namespace GlobalTheory.PolKerCpt
 
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.WeilM GlobalTheory.AdelicU Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.WeilM
+  GlobalTheory.AdelicU Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
-theorem pure_sub {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (f g : SInf F κ)
-    (φ : ∀ v : Pl F, (κ → Fv F v) → ℂ) :
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure (f - g) φ = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure f φ - GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure g φ := by
+theorem pure_sub
+    {F : Type} [Field F] [NumberField F]
+    {κ : Type} [Fintype κ]
+    (f g : SInf F κ) (φ : ∀ v : Pl F, (κ → Fv F v) → ℂ)
+    : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure (f - g) φ
+      = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure f φ
+        - GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure g φ := by
   funext x
   simp [GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure, sub_mul]
 

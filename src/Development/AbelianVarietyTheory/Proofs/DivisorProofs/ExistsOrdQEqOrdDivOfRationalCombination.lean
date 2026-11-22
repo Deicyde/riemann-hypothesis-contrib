@@ -10,13 +10,16 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.AdjKltOfLtDi
 set_option autoImplicit false
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 
 namespace GlobalTheory.FieldPair
 
-theorem exists_ordQ_eq_ord_div : ∀ {k K : Type} [Field k] [Field K] (c : k →+* K) (φ : K →₀ ℚ),
-    φ 0 = 0 → ∃ (m : ℕ) (g : Kˣ), 0 < m ∧ ∀ E : Place c, E.ordQ φ = (E.ord (g : K) : ℚ) / m := by
+theorem exists_ordQ_eq_ord_div
+    : ∀ {k K : Type} [Field k] [Field K] (c : k →+* K) (φ : K →₀ ℚ),
+      φ 0 = 0 → ∃ (m : ℕ) (g : Kˣ), 0 < m ∧ ∀ E : Place c, E.ordQ φ = (E.ord (g : K) : ℚ) / m := by
   intro k K _ _ c φ
   induction φ using Finsupp.induction with
   | zero => intro _; exact ⟨1, 1, one_pos, fun E => by simp⟩
@@ -36,8 +39,9 @@ theorem exists_ordQ_eq_ord_div : ∀ {k K : Type} [Field k] [Field K] (c : k →
     · have hd : (b.den : ℚ) ≠ 0 := by exact_mod_cast b.pos.ne'
       have hm' : (m : ℚ) ≠ 0 := by exact_mod_cast hm.ne'
       rw [map_add (f := _), Place.ordQ_single, hg E, Units.val_mul, Units.val_pow_eq_pow_val,
-        Units.val_zpow_eq_zpow_val, E.ord_mul (pow_ne_zero _ g.ne_zero)
-          (zpow_ne_zero _ (Units.mk0 a ha0).ne_zero), E.ord_pow, E.ord_zpow, Units.val_mk0]
+        Units.val_zpow_eq_zpow_val,
+        E.ord_mul (pow_ne_zero _ g.ne_zero) (zpow_ne_zero _ (Units.mk0 a ha0).ne_zero), E.ord_pow,
+        E.ord_zpow, Units.val_mk0]
       push_cast
       rw [← Rat.mul_den_eq_num b]
       field_simp

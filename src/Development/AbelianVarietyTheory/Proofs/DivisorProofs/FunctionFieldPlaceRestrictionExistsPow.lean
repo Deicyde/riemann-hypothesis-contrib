@@ -25,8 +25,8 @@ theorem pow_inj {e : ℕ} (he : e ≠ 0) {a b : ℤᵐ⁰} (h : a ^ e = b ^ e) :
 theorem pow_le_one_iff' {e : ℕ} (he : e ≠ 0) {a : ℤᵐ⁰} : a ^ e ≤ 1 ↔ a ≤ 1 := by
   simpa using (pow_le_pow_iff_left₀ (zero_le' (a := a)) (zero_le' (a := (1 : ℤᵐ⁰))) he)
 
-theorem pow_of_iff (v q : Valuation F ℤᵐ⁰) (hq : Function.Surjective q)
-    (h : ∀ x, v x ≤ 1 ↔ q x ≤ 1) : ∃ e : ℕ, 0 < e ∧ ∀ x, v x = q x ^ e := by
+theorem pow_of_iff (v q : Valuation F ℤᵐ⁰) (hq : Function.Surjective q) (h : ∀ x, v x ≤ 1 ↔ q x ≤ 1)
+    : ∃ e : ℕ, 0 < e ∧ ∀ x, v x = q x ^ e := by
   obtain ⟨π, hπ⟩ := hq (exp (-1 : ℤ))
   have hπ0 : π ≠ 0 := by rintro rfl; rw [map_zero] at hπ; exact exp_ne_zero hπ.symm
   have hvπ0 : v π ≠ 0 := (Valuation.ne_zero_iff v).2 hπ0
@@ -61,8 +61,8 @@ theorem pow_of_iff (v q : Valuation F ℤᵐ⁰) (hq : Function.Surjective q)
   rw [ha, hc, ← exp_nsmul, exp_inj, nsmul_eq_mul, hbe]
   linear_combination h3
 
-theorem root (v : Valuation F ℤᵐ⁰) (hv : ∃ a, 1 < v a) :
-    ∃ q : Valuation F ℤᵐ⁰, Function.Surjective q ∧ ∃ e : ℕ, 0 < e ∧ ∀ x, v x = q x ^ e := by
+theorem root (v : Valuation F ℤᵐ⁰) (hv : ∃ a, 1 < v a)
+    : ∃ q : Valuation F ℤᵐ⁰, Function.Surjective q ∧ ∃ e : ℕ, 0 < e ∧ ∀ x, v x = q x ^ e := by
   classical
   have hS : ∃ n : ℕ, 0 < n ∧ ∃ x, v x = exp (n : ℤ) := by
     obtain ⟨a, ha⟩ := hv
@@ -74,8 +74,7 @@ theorem root (v : Valuation F ℤᵐ⁰) (hv : ∃ a, 1 < v a) :
   obtain ⟨π, hπ⟩ := (Nat.find_spec hS).2
   have hdvd : ∀ x, x ≠ 0 → ∃ m : ℤ, v x = exp ((Nat.find hS : ℤ) * m) := by
     intro x hx
-    obtain ⟨a, ha⟩ : ∃ a : ℤ, v x = exp a :=
-      ⟨_, (exp_log ((Valuation.ne_zero_iff v).2 hx)).symm⟩
+    obtain ⟨a, ha⟩ : ∃ a : ℤ, v x = exp a := ⟨_, (exp_log ((Valuation.ne_zero_iff v).2 hx)).symm⟩
     refine ⟨a / (Nat.find hS : ℤ), ?_⟩
     have hr0 : 0 ≤ a % (Nat.find hS : ℤ) := Int.emod_nonneg _ (by omega)
     have hr1 : a % (Nat.find hS : ℤ) < Nat.find hS := Int.emod_lt_of_pos _ (by omega)
@@ -85,7 +84,9 @@ theorem root (v : Valuation F ℤᵐ⁰) (hv : ∃ a, 1 < v a) :
       rcases hr0.lt_or_eq with h | h
       · exact h
       · exfalso; apply hne; rw [ha, exp_inj]; linear_combination -hdec - h
-    have hval : v (x * π ^ (-(a / (Nat.find hS : ℤ)))) = exp (((a % (Nat.find hS : ℤ)).toNat : ℕ) : ℤ) := by
+    have hval
+        : v (x * π ^ (-(a / (Nat.find hS : ℤ))))
+          = exp (((a % (Nat.find hS : ℤ)).toNat : ℕ) : ℤ) := by
       rw [map_mul, map_zpow₀, ha, hπ, ← exp_zsmul, ← exp_add, Int.toNat_of_nonneg hr0, exp_inj,
         smul_eq_mul]
       linear_combination -hdec
@@ -98,19 +99,20 @@ theorem root (v : Valuation F ℤᵐ⁰) (hv : ∃ a, 1 < v a) :
     · obtain ⟨m, hm⟩ := hdvd x hx
       exact ⟨exp m, by rw [hm, ← exp_nsmul, nsmul_eq_mul]⟩
   choose qf hqf using hroot
-  have hle : ∀ {a b : ℤᵐ⁰}, a ^ Nat.find hS ≤ b ^ Nat.find hS → a ≤ b :=
-    fun h => (pow_le_pow_iff_left₀ zero_le' zero_le' he0.ne').1 h
-  let q : Valuation F ℤᵐ⁰ :=
-    { toFun := qf
-      map_zero' := pow_inj he0.ne' (by rw [hqf, map_zero, zero_pow he0.ne'])
-      map_one' := pow_inj he0.ne' (by rw [hqf, map_one, one_pow])
-      map_mul' := fun x y => pow_inj he0.ne' (by rw [hqf, mul_pow, hqf, hqf, map_mul])
-      map_add_le_max' := fun x y => by
-        have h := v.map_add x y
-        rw [← hqf x, ← hqf y, ← hqf (x + y)] at h
-        rcases le_max_iff.1 h with h | h
-        · exact le_max_of_le_left (hle h)
-        · exact le_max_of_le_right (hle h) }
+  have hle : ∀ {a b : ℤᵐ⁰}, a ^ Nat.find hS ≤ b ^ Nat.find hS → a ≤ b := fun h =>
+    (pow_le_pow_iff_left₀ zero_le' zero_le' he0.ne').1 h
+  let q : Valuation F ℤᵐ⁰ := {
+    toFun := qf
+    map_zero' := pow_inj he0.ne' (by rw [hqf, map_zero, zero_pow he0.ne'])
+    map_one' := pow_inj he0.ne' (by rw [hqf, map_one, one_pow])
+    map_mul' := fun x y => pow_inj he0.ne' (by rw [hqf, mul_pow, hqf, hqf, map_mul])
+    map_add_le_max' := fun x y => by
+      have h := v.map_add x y
+      rw [← hqf x, ← hqf y, ← hqf (x + y)] at h
+      rcases le_max_iff.1 h with h | h
+      · exact le_max_of_le_left (hle h)
+      · exact le_max_of_le_right (hle h)
+  }
   have hqq : ∀ x, q x = qf x := fun _ => rfl
   refine ⟨q, ?_, Nat.find hS, he0, fun x => by rw [hqq, hqf]⟩
   have hqπ : q π = exp 1 :=
@@ -121,8 +123,10 @@ theorem root (v : Valuation F ℤᵐ⁰) (hv : ∃ a, 1 < v a) :
   · refine ⟨π ^ log t, ?_⟩
     rw [map_zpow₀, hqπ, ← exp_zsmul, smul_eq_mul, mul_one, exp_log ht]
 
-theorem exists_one_lt {E : Type} [Field E] [Algebra F E] [FiniteDimensional F E]
-    (p : Valuation E ℤᵐ⁰) (hp : Function.Surjective p) : ∃ a : F, 1 < p (algebraMap F E a) := by
+theorem exists_one_lt
+    {E : Type} [Field E] [Algebra F E] [FiniteDimensional F E]
+    (p : Valuation E ℤᵐ⁰) (hp : Function.Surjective p)
+    : ∃ a : F, 1 < p (algebraMap F E a) := by
   by_contra hcon
   push_neg at hcon
   obtain ⟨y, hy⟩ := hp (exp (1 : ℤ))
@@ -130,17 +134,23 @@ theorem exists_one_lt {E : Type} [Field E] [Algebra F E] [FiniteDimensional F E]
   obtain ⟨f, hfm, hfy⟩ := Algebra.IsIntegral.isIntegral (R := F) y
   rw [hfm.as_sum] at hfy
   simp only [Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finsetSum,
-    Polynomial.eval₂_mul, Polynomial.eval₂_C] at hfy
-  have hlt : p (∑ i ∈ Finset.range f.natDegree, algebraMap F E (f.coeff i) * y ^ i) <
-      p y ^ f.natDegree := by
+      Polynomial.eval₂_mul, Polynomial.eval₂_C]
+    at hfy
+  have hlt
+      : p (∑ i ∈ Finset.range f.natDegree, algebraMap F E (f.coeff i) * y ^ i)
+        < p y ^ f.natDegree := by
     apply p.map_sum_lt (pow_ne_zero _ (ne_of_gt (lt_trans zero_lt_one hy1)))
     intro i hi
     rw [map_mul, map_pow]
-    calc p (algebraMap F E (f.coeff i)) * p y ^ i ≤ 1 * p y ^ i := mul_le_mul_of_nonneg_right (hcon _) zero_le'
+    calc
+      p (algebraMap F E (f.coeff i)) * p y ^ i
+        ≤ 1 * p y ^ i := mul_le_mul_of_nonneg_right (hcon _) zero_le'
       _ = p y ^ i := one_mul _
       _ < p y ^ f.natDegree := pow_lt_pow_right₀ hy1 (Finset.mem_range.1 hi)
-  have hs : ∑ i ∈ Finset.range f.natDegree, algebraMap F E (f.coeff i) * y ^ i =
-      -(y ^ f.natDegree) := by linear_combination hfy
+  have hs
+      : ∑ i ∈ Finset.range f.natDegree, algebraMap F E (f.coeff i) * y ^ i
+        = -(y ^ f.natDegree) := by
+    linear_combination hfy
   rw [hs, Valuation.map_neg, map_pow] at hlt
   exact lt_irrefl _ hlt
 
@@ -150,18 +160,22 @@ namespace GlobalTheory.Nef
 
 open WithZero
 
-theorem place_res_exists_pow : ∀ (k F E : Type) [Field k] [Field F] [Field E] [Algebra k F] [Algebra k E]
-    [Algebra F E] [IsScalarTower k F E] [FiniteDimensional F E],
-    (∃ ρ : Place k E → Place k F, IsRes ρ) ∧ ∀ ρ : Place k E → Place k F, IsRes ρ → ∀ p,
-      ∃ e : ℕ, 0 < e ∧ (∀ x : F, p.1 (algebraMap F E x) = (ρ p).1 x ^ e) ∧
-        ∀ x : F, ord p (algebraMap F E x) = e * ord (ρ p) x := by
+theorem place_res_exists_pow
+    : ∀ (k F E : Type) [Field k] [Field F] [Field E] [Algebra k F] [Algebra k E] [Algebra F E]
+        [IsScalarTower k F E] [FiniteDimensional F E],
+      (∃ ρ : Place k E → Place k F, IsRes ρ)
+        ∧ ∀ ρ : Place k E → Place k F,
+          IsRes ρ
+            → ∀ p, ∃ e : ℕ,
+              0 < e ∧ (∀ x : F, p.1 (algebraMap F E x) = (ρ p).1 x ^ e)
+                ∧ ∀ x : F, ord p (algebraMap F E x) = e * ord (ρ p) x := by
   intro k F E _ _ _ _ _ _ _ _
   refine ⟨?_, fun ρ hρ p => ?_⟩
-  · have hex : ∀ p : Place k E, ∃ q : Place k F,
-        ∀ x, p.1 (algebraMap F E x) ≤ 1 ↔ q.1 x ≤ 1 := by
+  · have hex : ∀ p : Place k E, ∃ q : Place k F, ∀ x, p.1 (algebraMap F E x) ≤ 1 ↔ q.1 x ≤ 1 := by
       intro p
       obtain ⟨a, ha⟩ := PlaceResiduePowerBound.exists_one_lt (F := F) p.1 p.2.1
-      obtain ⟨q, hq, e, he, hpow⟩ := PlaceResiduePowerBound.root (p.1.comap (algebraMap F E)) ⟨a, ha⟩
+      obtain ⟨q, hq, e, he, hpow⟩ :=
+        PlaceResiduePowerBound.root (p.1.comap (algebraMap F E)) ⟨a, ha⟩
       refine ⟨⟨q, hq, fun c hc => ?_⟩, fun x => ?_⟩
       · apply PlaceResiduePowerBound.pow_inj he.ne'
         rw [← hpow, Valuation.comap_apply, ← IsScalarTower.algebraMap_apply, p.2.2 c hc, one_pow]
@@ -171,7 +185,8 @@ theorem place_res_exists_pow : ∀ (k F E : Type) [Field k] [Field F] [Field E] 
     choose ρ hρ using hex
     exact ⟨ρ, hρ⟩
   · obtain ⟨e, he, hpow⟩ :=
-      PlaceResiduePowerBound.pow_of_iff (p.1.comap (algebraMap F E)) (ρ p).1 (ρ p).2.1 (fun x => hρ p x)
+      PlaceResiduePowerBound.pow_of_iff (p.1.comap (algebraMap F E)) (ρ p).1 (ρ p).2.1
+        (fun x => hρ p x)
     refine ⟨e, he, fun x => hpow x, fun x => ?_⟩
     have h : p.1 (algebraMap F E x) = (ρ p).1 x ^ e := hpow x
     unfold ord

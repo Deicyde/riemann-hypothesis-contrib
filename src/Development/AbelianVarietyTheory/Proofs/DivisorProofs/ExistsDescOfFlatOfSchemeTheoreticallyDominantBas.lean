@@ -9,14 +9,19 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace GlobalTheory
 
-theorem exists_desc_of_flat_of_schemeTheoreticallyDominant :
-    ∀ {S S' U U' X Y Y' YU Y'' : Scheme.{0}} (f : S' ⟶ S) (j : U ⟶ S) (f' : U' ⟶ U) (j' : U' ⟶ S')
-      [Flat f] [Surjective f] [QuasiCompact f] [QuasiCompact j] [IsSchemeTheoreticallyDominant j],
-      IsPullback j' f' f j → ∀ (x : X ⟶ S) [IsSeparated x] (y : Y ⟶ S) [Flat y] (y' : Y' ⟶ S')
-      (π : Y' ⟶ Y), IsPullback π y' y f → ∀ (yU : YU ⟶ U) (ιY : YU ⟶ Y), IsPullback ιY yU y j →
-      ∀ (y'' : Y'' ⟶ U') (c : Y'' ⟶ Y') (cU : Y'' ⟶ YU), IsPullback c y'' y' j' →
-      IsPullback cU y'' yU f' → cU ≫ ιY = c ≫ π → ∀ (h' : Y' ⟶ X) (hU : YU ⟶ X),
-      h' ≫ x = y' ≫ f → c ≫ h' = cU ≫ hU → ∃ h : Y ⟶ X, π ≫ h = h' ∧ ιY ≫ h = hU ∧ h ≫ x = y := by
+theorem exists_desc_of_flat_of_schemeTheoreticallyDominant
+    : ∀ {S S' U U' X Y Y' YU Y'' : Scheme.{0}} (f : S' ⟶ S) (j : U ⟶ S) (f' : U' ⟶ U) (j' : U' ⟶ S')
+        [Flat f] [Surjective f] [QuasiCompact f] [QuasiCompact j] [IsSchemeTheoreticallyDominant j],
+      IsPullback j' f' f j
+        → ∀ (x : X ⟶ S) [IsSeparated x] (y : Y ⟶ S) [Flat y] (y' : Y' ⟶ S') (π : Y' ⟶ Y),
+          IsPullback π y' y f
+            → ∀ (yU : YU ⟶ U) (ιY : YU ⟶ Y),
+              IsPullback ιY yU y j
+                → ∀ (y'' : Y'' ⟶ U') (c : Y'' ⟶ Y') (cU : Y'' ⟶ YU),
+                  IsPullback c y'' y' j' → IsPullback cU y'' yU f' → cU ≫ ιY = c ≫ π
+                    → ∀ (h' : Y' ⟶ X) (hU : YU ⟶ X),
+                      h' ≫ x = y' ≫ f → c ≫ h' = cU ≫ hU
+                        → ∃ h : Y ⟶ X, π ≫ h = h' ∧ ιY ≫ h = hU ∧ h ≫ x = y := by
   intro S S' U U' X Y Y' YU Y'' f j f' j' _ _ _ _ _ hUsq x _ y _ y' π hπ yU ιY hι y'' c cU hc hcU
     hcomm h' hU hx hagree
   have : Flat π := MorphismProperty.of_isPullback (P := @Flat) hπ.flip ‹_›
@@ -28,11 +33,11 @@ theorem exists_desc_of_flat_of_schemeTheoreticallyDominant :
   have : Surjective cU := MorphismProperty.of_isPullback (P := @Surjective) hcU.flip ‹_›
   have : Epi cU := Flat.epi_of_flat_of_surjective cU
 
-  have key : ∀ {T : Scheme.{0}} (a : T ⟶ Y') (ψ : T ⟶ U) (w : (a ≫ π) ≫ y = ψ ≫ j),
-      a ≫ h' = hι.lift (a ≫ π) ψ w ≫ hU := by
+  have key
+      : ∀ {T : Scheme.{0}} (a : T ⟶ Y') (ψ : T ⟶ U) (w : (a ≫ π) ≫ y = ψ ≫ j),
+        a ≫ h' = hι.lift (a ≫ π) ψ w ≫ hU := by
     intro T a ψ w
-    have w1 : (a ≫ y') ≫ f = ψ ≫ j := by
-      rw [Category.assoc, ← hπ.w, ← Category.assoc, w]
+    have w1 : (a ≫ y') ≫ f = ψ ≫ j := by rw [Category.assoc, ← hπ.w, ← Category.assoc, w]
     let u : T ⟶ U' := hUsq.lift (a ≫ y') ψ w1
     have w2 : a ≫ y' = u ≫ j' := (hUsq.lift_fst _ _ _).symm
     let q : T ⟶ Y'' := hc.lift a u w2
@@ -40,7 +45,9 @@ theorem exists_desc_of_flat_of_schemeTheoreticallyDominant :
       apply hι.hom_ext
       · rw [Category.assoc, hcomm, ← Category.assoc, hc.lift_fst, hι.lift_fst]
       · rw [Category.assoc, hcU.w, ← Category.assoc, hc.lift_snd, hι.lift_snd, hUsq.lift_snd]
-    calc a ≫ h' = q ≫ c ≫ h' := by rw [← Category.assoc, hc.lift_fst]
+    calc
+      a ≫ h'
+        = q ≫ c ≫ h' := by rw [← Category.assoc, hc.lift_fst]
       _ = q ≫ cU ≫ hU := by rw [hagree]
       _ = _ := by rw [← Category.assoc, hq]
 
@@ -56,13 +63,16 @@ theorem exists_desc_of_flat_of_schemeTheoreticallyDominant :
         simpa [g, Category.assoc] using pullback.condition (f := g) (g := j)
       have e2 : ((φ ≫ pullback.snd π π) ≫ π) ≫ y = pullback.snd g j ≫ j := by
         rw [Category.assoc φ, ← pullback.condition]; exact e1
-      have l : hι.lift ((φ ≫ pullback.fst π π) ≫ π) (pullback.snd g j) e1 =
-          hι.lift ((φ ≫ pullback.snd π π) ≫ π) (pullback.snd g j) e2 := by
+      have l
+          : hι.lift ((φ ≫ pullback.fst π π) ≫ π) (pullback.snd g j) e1
+            = hι.lift ((φ ≫ pullback.snd π π) ≫ π) (pullback.snd g j) e2 := by
         congr 1; rw [Category.assoc, Category.assoc, pullback.condition]
       rw [← Category.assoc, ← Category.assoc, key _ _ e1, key _ _ e2, l]
   have H : ∀ {Z : Scheme.{0}} (a b : Z ⟶ Y'), a ≫ π = b ≫ π → a ≫ h' = b ≫ h' := by
     intro Z a b hab
-    calc a ≫ h' = pullback.lift a b hab ≫ pullback.fst π π ≫ h' := by rw [pullback.lift_fst_assoc]
+    calc
+      a ≫ h'
+        = pullback.lift a b hab ≫ pullback.fst π π ≫ h' := by rw [pullback.lift_fst_assoc]
       _ = pullback.lift a b hab ≫ pullback.snd π π ≫ h' := by rw [hP]
       _ = b ≫ h' := by rw [pullback.lift_snd_assoc]
   let h : Y ⟶ X := EffectiveEpi.desc π h' H

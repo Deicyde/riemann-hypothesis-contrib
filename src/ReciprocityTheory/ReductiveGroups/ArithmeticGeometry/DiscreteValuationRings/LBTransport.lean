@@ -137,7 +137,9 @@ section Transport
 
 open scoped Classical
 
-variable {X Y : Scheme.{0}} (L : LB X) {K K' : Type} [Fintype K] [Fintype K']
+variable
+  {X Y : Scheme.{0}} (L : LB X)
+  {K K' : Type} [Fintype K] [Fintype K']
   (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
 
 def piece (ρ : (Y ⟶ X) → L.ι) : Y.Opens := LB.wchart L φ (ρ ∘ φ) ⊓ LB.wchart L φ' (ρ ∘ φ')
@@ -162,10 +164,10 @@ lemma piece_le_tr {j' : K' → L.ι} {V : Y.Opens} {ρ : (Y ⟶ X) → L.ι} (hV
 
 variable (L φ φ')
 
-def cand (t : LB.Gen (LB.LinComb L φ ε)) (j' : K' → L.ι) (ρ : (Y ⟶ X) → L.ι) :
-    Γ(Y, LB.wchart L φ' j' ⊓ piece L φ φ' ρ)ˣ :=
-  (∏ k', tr L (LB.wchart L φ' j' ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j' k') ^ ε' k')⁻¹ *
-    res piece_le_wchart (t.s (ρ ∘ φ))
+def cand (t : LB.Gen (LB.LinComb L φ ε)) (j' : K' → L.ι) (ρ : (Y ⟶ X) → L.ι)
+    : Γ(Y, LB.wchart L φ' j' ⊓ piece L φ φ' ρ)ˣ :=
+  (∏ k', tr L (LB.wchart L φ' j' ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j' k') ^ ε' k')⁻¹
+    * res piece_le_wchart (t.s (ρ ∘ φ))
 
 variable {L φ ε φ' ε'}
 
@@ -224,47 +226,68 @@ lemma units_ext_cover {Y : Scheme.{0}} (W : Y.Opens) {ι : Type} (V : ι → Y.O
   have eb := hu b.val (fun i => by rw [h i]; rfl)
   exact Units.ext (ea.trans eb.symm)
 
-theorem gen_transport (hL : L.IsLB) (hs : LB.SameSum φ ε φ' ε') (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen) :
-    ∃ t' : LB.Gen (LB.LinComb L φ' ε'), t'.IsGen ∧ LB.Gen.Corr L φ ε φ' ε' t t' := by
-  have glue : ∀ j' : K' → L.ι, ∃ w : Γ(Y, LB.wchart L φ' j')ˣ,
-      ∀ ρ, res (inf_le_left : LB.wchart L φ' j' ⊓ piece L φ φ' ρ ≤ _) w = cand L φ ε φ' ε' t j' ρ :=
-    fun j' => units_glue (LB.wchart L φ' j') (fun ρ => LB.wchart L φ' j' ⊓ piece L φ φ' ρ) (fun _ => inf_le_left)
-      (le_iSup_piece L φ φ' hL _) (cand L φ ε φ' ε' t j') (fun ρ ρ₂ => cand_compat hL hs t ht j' ρ ρ₂)
+theorem gen_transport
+    (hL : L.IsLB) (hs : LB.SameSum φ ε φ' ε') (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen)
+    : ∃ t' : LB.Gen (LB.LinComb L φ' ε'), t'.IsGen ∧ LB.Gen.Corr L φ ε φ' ε' t t' := by
+  have glue
+      : ∀ j' : K' → L.ι, ∃ w : Γ(Y, LB.wchart L φ' j')ˣ, ∀ ρ,
+        res (inf_le_left : LB.wchart L φ' j' ⊓ piece L φ φ' ρ ≤ _) w
+          = cand L φ ε φ' ε' t j' ρ := fun j' =>
+    units_glue (LB.wchart L φ' j')
+      (fun ρ => LB.wchart L φ' j' ⊓ piece L φ φ' ρ)
+      (fun _ => inf_le_left)
+      (le_iSup_piece L φ φ' hL _) (cand L φ ε φ' ε' t j')
+      (fun ρ ρ₂ => cand_compat hL hs t ht j' ρ ρ₂)
   choose w hw using glue
 
-  have hwV : ∀ (j' : K' → L.ι) (ρ : (Y ⟶ X) → L.ι) {V : Y.Opens} (hV : V ≤ LB.wchart L φ' j' ⊓ piece L φ φ' ρ),
-      res (hV.trans inf_le_left) (w j') =
-        (∏ k', tr L V (φ' k') (ρ (φ' k')) (j' k') ^ ε' k')⁻¹ * res (hV.trans piece_le_wchart) (t.s (ρ ∘ φ)) := by
+  have hwV
+      : ∀ (j' : K' → L.ι) (ρ : (Y ⟶ X) → L.ι) {V : Y.Opens}
+          (hV : V ≤ LB.wchart L φ' j' ⊓ piece L φ φ' ρ),
+        res (hV.trans inf_le_left) (w j')
+          = (∏ k', tr L V (φ' k') (ρ (φ' k')) (j' k') ^ ε' k')⁻¹
+            * res (hV.trans piece_le_wchart) (t.s (ρ ∘ φ)) := by
     intro j' ρ V hV
     rw [← res_res' (inf_le_left : LB.wchart L φ' j' ⊓ piece L φ φ' ρ ≤ _) hV, hw j' ρ, cand_res]
   refine ⟨⟨w⟩, ?_, ?_⟩
-  ·
-    intro (i : K' → L.ι) (j : K' → L.ι)
+  · intro (i : K' → L.ι) (j : K' → L.ι)
     show res _ (w i) = _ * res _ (w j)
-    apply units_ext_cover _ (fun ρ => (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ)
-      (fun _ => inf_le_left) (le_iSup_piece L φ φ' hL _)
+    apply units_ext_cover _
+      (fun ρ => (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ)
+      (fun _ => inf_le_left)
+      (le_iSup_piece L φ φ' hL _)
     intro ρ
-    have hVi : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ ≤ LB.wchart L φ' i ⊓ piece L φ φ' ρ :=
-      fun _ hy => ⟨hy.1.1, hy.2⟩
-    have hVj : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ ≤ LB.wchart L φ' j ⊓ piece L φ φ' ρ :=
-      fun _ hy => ⟨hy.1.2, hy.2⟩
+    have hVi
+        : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ
+          ≤ LB.wchart L φ' i ⊓ piece L φ φ' ρ := fun _ hy =>
+      ⟨hy.1.1, hy.2⟩
+    have hVj
+        : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ
+          ≤ LB.wchart L φ' j ⊓ piece L φ φ' ρ := fun _ hy =>
+      ⟨hy.1.2, hy.2⟩
     erw [map_mul, res_res', res_res']
-    have hV12 : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ ≤ LB.wchart L φ' i ⊓ LB.wchart L φ' j :=
-      fun _ hy => hy.1
+    have hV12
+        : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ
+          ≤ LB.wchart L φ' i ⊓ LB.wchart L φ' j := fun _ hy =>
+      hy.1
     erw [hwV i ρ hVi, hwV j ρ hVj, linComb_g_res L φ' ε' i j hV12]
-    have hcoc : ∀ k', tr L ((LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j k') =
-        tr L _ (φ' k') (ρ (φ' k')) (i k') * tr L _ (φ' k') (i k') (j k') := fun k' =>
-      (tr_cocycle L hL (fun _ hy => ⟨⟨(piece_le_tr hVi k' hy).1, (piece_le_tr hVi k' hy).2⟩,
-        (piece_le_tr hVj k' hy).2⟩)).symm
-    have hA : ∏ k', tr L ((LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j k') ^ ε' k' =
-        (∏ k', tr L _ (φ' k') (ρ (φ' k')) (i k') ^ ε' k') * ∏ k', tr L _ (φ' k') (i k') (j k') ^ ε' k' := by
+    have hcoc
+        : ∀ k',
+          tr L ((LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j k')
+            = tr L _ (φ' k') (ρ (φ' k')) (i k') * tr L _ (φ' k') (i k') (j k') := fun k' =>
+      (tr_cocycle L hL (fun _ hy =>
+        ⟨⟨(piece_le_tr hVi k' hy).1, (piece_le_tr hVi k' hy).2⟩, (piece_le_tr hVj k' hy).2⟩)).symm
+    have hA
+        : ∏ k', tr L ((LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j k') ^ ε' k'
+          = (∏ k', tr L _ (φ' k') (ρ (φ' k')) (i k') ^ ε' k')
+            * ∏ k', tr L _ (φ' k') (i k') (j k') ^ ε' k' := by
       rw [← Finset.prod_mul_distrib]
       exact Finset.prod_congr rfl fun k' _ => by rw [hcoc k', mul_zpow]
     rw [hA, mul_inv_rev, ← mul_assoc, mul_inv_cancel_left]
-  ·
-    intro j j' hj hj' hjj'
-    apply units_ext_cover _ (fun ρ => (LB.wchart L φ j ⊓ LB.wchart L φ' j') ⊓ piece L φ φ' ρ)
-      (fun _ => inf_le_left) (le_iSup_piece L φ φ' hL _)
+  · intro j j' hj hj' hjj'
+    apply units_ext_cover _
+      (fun ρ => (LB.wchart L φ j ⊓ LB.wchart L φ' j') ⊓ piece L φ φ' ρ)
+      (fun _ => inf_le_left)
+      (le_iSup_piece L φ φ' hL _)
     intro ρ
     set O := (LB.wchart L φ j ⊓ LB.wchart L φ' j') ⊓ piece L φ φ' ρ
     have hO' : O ≤ LB.wchart L φ' j' ⊓ piece L φ φ' ρ := fun _ hy => ⟨hy.1.2, hy.2⟩
@@ -276,7 +299,12 @@ theorem gen_transport (hL : L.IsLB) (hs : LB.SameSum φ ε φ' ε') (t : LB.Gen 
     erw [hg]
 
     let σ : (Y ⟶ X) → L.ι := fun ψ =>
-      if h : ∃ k', φ' k' = ψ then j' h.choose else if h₂ : ∃ k, φ k = ψ then j h₂.choose else ρ ψ
+      if h : ∃ k', φ' k' = ψ then
+        j' h.choose
+      else if h₂ : ∃ k, φ k = ψ then
+        j h₂.choose
+      else
+        ρ ψ
     have hσ : ∀ k, σ (φ k) = j k := by
       intro k
       simp only [σ]
@@ -289,7 +317,9 @@ theorem gen_transport (hL : L.IsLB) (hs : LB.SameSum φ ε φ' ε') (t : LB.Gen 
       simp only [σ]
       rw [dite_eq_left ⟨k', rfl⟩]
       exact hj' _ _ (⟨k', rfl⟩ : ∃ k₀, φ' k₀ = φ' k').choose_spec
-    have hsum : ∏ k, tr L O (φ k) ((ρ ∘ φ) k) (j k) ^ ε k = ∏ k', tr L O (φ' k') (ρ (φ' k')) (j' k') ^ ε' k' := by
+    have hsum
+        : ∏ k, tr L O (φ k) ((ρ ∘ φ) k) (j k) ^ ε k
+          = ∏ k', tr L O (φ' k') (ρ (φ' k')) (j' k') ^ ε' k' := by
       have := prod_zpow_of_sameSum φ ε φ' ε' hs (fun ψ => tr L O ψ (ρ ψ) (σ ψ))
       simp only [hσ, hσ'] at this
       exact this
@@ -302,7 +332,8 @@ section SecTransport
 
 open scoped Classical
 
-variable {X Y : Scheme.{0}} {L : LB X} {K K' : Type} [Fintype K] [Fintype K']
+variable
+  {X Y : Scheme.{0}} {L : LB X} {K K' : Type} [Fintype K] [Fintype K']
   {φ : K → (Y ⟶ X)} {ε : K → ℤ} {φ' : K' → (Y ⟶ X)} {ε' : K' → ℤ}
 
 abbrev rs {Z : Scheme.{0}} {U V : Z.Opens} (h : V ≤ U) (x : Γ(Z, U)) : Γ(Z, V) :=
@@ -326,10 +357,12 @@ lemma sec_ext_cover {Y : Scheme.{0}} (W : Y.Opens) {ι : Type} (V : ι → Y.Ope
     simp only [rs_rs])
   exact (hu a (fun i => rfl)).trans (hu b (fun i => (h i).symm)).symm
 
-def candS (s : LB.Sec (LB.LinComb L φ ε)) (j' : K' → L.ι) (ρ : (Y ⟶ X) → L.ι) :
-    Γ(Y, LB.wchart L φ' j' ⊓ piece L φ φ' ρ) :=
-  (((∏ k', tr L (LB.wchart L φ' j' ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j' k') ^ ε' k')⁻¹ :
-    Γ(Y, LB.wchart L φ' j' ⊓ piece L φ φ' ρ)ˣ) : Γ(Y, _)) * rs piece_le_wchart (s.f (ρ ∘ φ))
+def candS (s : LB.Sec (LB.LinComb L φ ε)) (j' : K' → L.ι) (ρ : (Y ⟶ X) → L.ι)
+    : Γ(Y, LB.wchart L φ' j' ⊓ piece L φ φ' ρ) :=
+  (((∏ k', tr L (LB.wchart L φ' j' ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j' k') ^ ε' k')⁻¹
+        : Γ(Y, LB.wchart L φ' j' ⊓ piece L φ φ' ρ)ˣ)
+      : Γ(Y, _))
+    * rs piece_le_wchart (s.f (ρ ∘ φ))
 
 lemma candS_rs (s : LB.Sec (LB.LinComb L φ ε)) (j' : K' → L.ι) (ρ : (Y ⟶ X) → L.ι) {V : Y.Opens}
     (hV : V ≤ LB.wchart L φ' j' ⊓ piece L φ φ' ρ) :
@@ -385,49 +418,69 @@ lemma candS_compat (hL : L.IsLB) (hs : LB.SameSum φ ε φ' ε') (s : LB.Sec (LB
     exact Finset.prod_congr rfl fun k' _ => by rw [hcoc k', mul_zpow]
   rw [hA, mul_inv_rev, ← mul_assoc, ← Units.val_mul, mul_assoc, inv_mul_cancel, mul_one]
 
-theorem sec_transport (hL : L.IsLB) (hs : LB.SameSum φ ε φ' ε') (s : LB.Sec (LB.LinComb L φ ε)) :
-    ∃ s' : LB.Sec (LB.LinComb L φ' ε'), ∀ (j : K → L.ι) (j' : K' → L.ι), LB.Coh L φ j → LB.Coh L φ' j' →
-      (∀ k k', φ k = φ' k' → j k = j' k') →
-      rs (inf_le_left : LB.wchart L φ j ⊓ LB.wchart L φ' j' ≤ _) (s.f j) =
-        rs (inf_le_right : LB.wchart L φ j ⊓ LB.wchart L φ' j' ≤ _) (s'.f j') := by
-  have glue : ∀ j' : K' → L.ι, ∃ w : Γ(Y, LB.wchart L φ' j'),
-      ∀ ρ, rs (inf_le_left : LB.wchart L φ' j' ⊓ piece L φ φ' ρ ≤ _) w = candS (φ' := φ') (ε' := ε') s j' ρ :=
-    fun j' => (sec_glue (LB.wchart L φ' j') (fun ρ => LB.wchart L φ' j' ⊓ piece L φ φ' ρ) (fun _ => inf_le_left)
+theorem sec_transport (hL : L.IsLB) (hs : LB.SameSum φ ε φ' ε') (s : LB.Sec (LB.LinComb L φ ε))
+    : ∃ s' : LB.Sec (LB.LinComb L φ' ε'), ∀ (j : K → L.ι) (j' : K' → L.ι),
+      LB.Coh L φ j → LB.Coh L φ' j' → (∀ k k', φ k = φ' k' → j k = j' k')
+        → rs (inf_le_left : LB.wchart L φ j ⊓ LB.wchart L φ' j' ≤ _) (s.f j)
+          = rs (inf_le_right : LB.wchart L φ j ⊓ LB.wchart L φ' j' ≤ _) (s'.f j') := by
+  have glue
+      : ∀ j' : K' → L.ι, ∃ w : Γ(Y, LB.wchart L φ' j'), ∀ ρ,
+        rs (inf_le_left : LB.wchart L φ' j' ⊓ piece L φ φ' ρ ≤ _) w
+          = candS (φ' := φ') (ε' := ε') s j' ρ := fun j' =>
+    (sec_glue (LB.wchart L φ' j')
+      (fun ρ => LB.wchart L φ' j' ⊓ piece L φ φ' ρ)
+      (fun _ => inf_le_left)
       (le_iSup_piece L φ φ' hL _) (candS (φ' := φ') (ε' := ε') s j')
       (fun ρ ρ₂ => candS_compat hL hs s j' ρ ρ₂)).exists
   choose w hw using glue
-  have hwV : ∀ (j' : K' → L.ι) (ρ : (Y ⟶ X) → L.ι) {V : Y.Opens} (hV : V ≤ LB.wchart L φ' j' ⊓ piece L φ φ' ρ),
-      rs (hV.trans inf_le_left) (w j') =
-        (((∏ k', tr L V (φ' k') (ρ (φ' k')) (j' k') ^ ε' k')⁻¹ : Γ(Y, V)ˣ) : Γ(Y, V)) *
-          rs (hV.trans piece_le_wchart) (s.f (ρ ∘ φ)) := by
+  have hwV
+      : ∀ (j' : K' → L.ι) (ρ : (Y ⟶ X) → L.ι) {V : Y.Opens}
+          (hV : V ≤ LB.wchart L φ' j' ⊓ piece L φ φ' ρ),
+        rs (hV.trans inf_le_left) (w j')
+          = (((∏ k', tr L V (φ' k') (ρ (φ' k')) (j' k') ^ ε' k')⁻¹ : Γ(Y, V)ˣ) : Γ(Y, V))
+            * rs (hV.trans piece_le_wchart) (s.f (ρ ∘ φ)) := by
     intro j' ρ V hV
     rw [← rs_rs (inf_le_left : LB.wchart L φ' j' ⊓ piece L φ φ' ρ ≤ _) hV, hw j' ρ, candS_rs]
   refine ⟨⟨w, ?_⟩, ?_⟩
   · intro (i : K' → L.ι) (j : K' → L.ι)
     show rs _ (w i) = _ * rs _ (w j)
-    apply sec_ext_cover _ (fun ρ => (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ)
-      (fun _ => inf_le_left) (le_iSup_piece L φ φ' hL _)
+    apply sec_ext_cover _
+      (fun ρ => (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ)
+      (fun _ => inf_le_left)
+      (le_iSup_piece L φ φ' hL _)
     intro ρ
-    have hVi : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ ≤ LB.wchart L φ' i ⊓ piece L φ φ' ρ :=
-      fun _ hy => ⟨hy.1.1, hy.2⟩
-    have hVj : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ ≤ LB.wchart L φ' j ⊓ piece L φ φ' ρ :=
-      fun _ hy => ⟨hy.1.2, hy.2⟩
-    have hV12 : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ ≤ LB.wchart L φ' i ⊓ LB.wchart L φ' j :=
-      fun _ hy => hy.1
+    have hVi
+        : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ
+          ≤ LB.wchart L φ' i ⊓ piece L φ φ' ρ := fun _ hy =>
+      ⟨hy.1.1, hy.2⟩
+    have hVj
+        : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ
+          ≤ LB.wchart L φ' j ⊓ piece L φ φ' ρ := fun _ hy =>
+      ⟨hy.1.2, hy.2⟩
+    have hV12
+        : (LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ
+          ≤ LB.wchart L φ' i ⊓ LB.wchart L φ' j := fun _ hy =>
+      hy.1
     erw [rs_mul, rs_rs, rs_rs, rs_units]
     erw [hwV i ρ hVi, hwV j ρ hVj, linComb_g_res L φ' ε' i j hV12]
-    have hcoc : ∀ k', tr L ((LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j k') =
-        tr L _ (φ' k') (ρ (φ' k')) (i k') * tr L _ (φ' k') (i k') (j k') := fun k' =>
-      (tr_cocycle L hL (fun _ hy => ⟨⟨(piece_le_tr hVi k' hy).1, (piece_le_tr hVi k' hy).2⟩,
-        (piece_le_tr hVj k' hy).2⟩)).symm
-    have hA : ∏ k', tr L ((LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j k') ^ ε' k' =
-        (∏ k', tr L _ (φ' k') (ρ (φ' k')) (i k') ^ ε' k') * ∏ k', tr L _ (φ' k') (i k') (j k') ^ ε' k' := by
+    have hcoc
+        : ∀ k',
+          tr L ((LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j k')
+            = tr L _ (φ' k') (ρ (φ' k')) (i k') * tr L _ (φ' k') (i k') (j k') := fun k' =>
+      (tr_cocycle L hL (fun _ hy =>
+        ⟨⟨(piece_le_tr hVi k' hy).1, (piece_le_tr hVi k' hy).2⟩, (piece_le_tr hVj k' hy).2⟩)).symm
+    have hA
+        : ∏ k', tr L ((LB.wchart L φ' i ⊓ LB.wchart L φ' j) ⊓ piece L φ φ' ρ) (φ' k') (ρ (φ' k')) (j k') ^ ε' k'
+          = (∏ k', tr L _ (φ' k') (ρ (φ' k')) (i k') ^ ε' k')
+            * ∏ k', tr L _ (φ' k') (i k') (j k') ^ ε' k' := by
       rw [← Finset.prod_mul_distrib]
       exact Finset.prod_congr rfl fun k' _ => by rw [hcoc k', mul_zpow]
     rw [hA, mul_inv_rev, ← mul_assoc, ← Units.val_mul, ← mul_assoc, mul_inv_cancel, one_mul]
   · intro j j' hj hj' hjj'
-    apply sec_ext_cover _ (fun ρ => (LB.wchart L φ j ⊓ LB.wchart L φ' j') ⊓ piece L φ φ' ρ)
-      (fun _ => inf_le_left) (le_iSup_piece L φ φ' hL _)
+    apply sec_ext_cover _
+      (fun ρ => (LB.wchart L φ j ⊓ LB.wchart L φ' j') ⊓ piece L φ φ' ρ)
+      (fun _ => inf_le_left)
+      (le_iSup_piece L φ φ' hL _)
     intro ρ
     set O := (LB.wchart L φ j ⊓ LB.wchart L φ' j') ⊓ piece L φ φ' ρ
     have hO' : O ≤ LB.wchart L φ' j' ⊓ piece L φ φ' ρ := fun _ hy => ⟨hy.1.2, hy.2⟩
@@ -436,7 +489,12 @@ theorem sec_transport (hL : L.IsLB) (hs : LB.SameSum φ ε φ' ε') (s : LB.Sec 
     have hg := sec_compat_rs s (ρ ∘ φ) j hOw
     erw [hg]
     let σ : (Y ⟶ X) → L.ι := fun ψ =>
-      if h : ∃ k', φ' k' = ψ then j' h.choose else if h₂ : ∃ k, φ k = ψ then j h₂.choose else ρ ψ
+      if h : ∃ k', φ' k' = ψ then
+        j' h.choose
+      else if h₂ : ∃ k, φ k = ψ then
+        j h₂.choose
+      else
+        ρ ψ
     have hσ : ∀ k, σ (φ k) = j k := by
       intro k
       simp only [σ]
@@ -449,7 +507,9 @@ theorem sec_transport (hL : L.IsLB) (hs : LB.SameSum φ ε φ' ε') (s : LB.Sec 
       simp only [σ]
       rw [dite_eq_left ⟨k', rfl⟩]
       exact hj' _ _ (⟨k', rfl⟩ : ∃ k₀, φ' k₀ = φ' k').choose_spec
-    have hsum : ∏ k, tr L O (φ k) ((ρ ∘ φ) k) (j k) ^ ε k = ∏ k', tr L O (φ' k') (ρ (φ' k')) (j' k') ^ ε' k' := by
+    have hsum
+        : ∏ k, tr L O (φ k) ((ρ ∘ φ) k) (j k) ^ ε k
+          = ∏ k', tr L O (φ' k') (ρ (φ' k')) (j' k') ^ ε' k' := by
       have := prod_zpow_of_sameSum φ ε φ' ε' hs (fun ψ => tr L O ψ (ρ ψ) (σ ψ))
       simp only [hσ, hσ'] at this
       exact this

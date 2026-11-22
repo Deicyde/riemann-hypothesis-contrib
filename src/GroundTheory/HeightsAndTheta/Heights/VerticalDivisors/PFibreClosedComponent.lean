@@ -29,24 +29,30 @@ theorem FibreClosedComponent.proof : FibreClosedComponent.Statement := by
   have halg : algebraMap O (MvPolynomial (Fin n) O ⧸ P) = mk.comp C := by
     exact RingHom.ext fun _ => rfl
 
-  have hfin := Ideal.finite_minimalPrimes_of_isNoetherianRing (MvPolynomial (Fin n) O)
-    (P ⊔ Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal)
+  have hfin :=
+    Ideal.finite_minimalPrimes_of_isNoetherianRing (MvPolynomial (Fin n) O)
+      (P ⊔ Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal)
   let U : Set (PrimeSpectrum (MvPolynomial (Fin n) O ⧸ P)) :=
     {q | ∀ W' ∈ (P ⊔ Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal).minimalPrimes,
       W' ≠ W → ¬ W' ≤ q.asIdeal.comap mk}
   have hU : IsOpen U := by
-    have hUc : Uᶜ = ⋃ W' ∈ {W' | W' ∈ (P ⊔ Ideal.map (C : O →+* MvPolynomial (Fin n) O)
-        v.asIdeal).minimalPrimes ∧ W' ≠ W},
-        PrimeSpectrum.zeroLocus ((W'.map mk : Ideal (MvPolynomial (Fin n) O ⧸ P)) : Set _) := by
+    have hUc
+        : Uᶜ
+          = ⋃ W' ∈ {W' | W' ∈ (P ⊔ Ideal.map (C : O →+* MvPolynomial (Fin n) O)
+            v.asIdeal).minimalPrimes ∧ W' ≠ W},
+            PrimeSpectrum.zeroLocus ((W'.map mk : Ideal (MvPolynomial (Fin n) O ⧸ P)) : Set _) := by
       ext q
       simp only [U, Set.mem_compl_iff, Set.mem_ofPred_eq, not_forall, not_not, Set.mem_iUnion,
         PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe, Ideal.map_le_iff_le_comap, exists_prop,
         and_assoc]
     rw [← isClosed_compl_iff, hUc]
-    exact Set.Finite.isClosed_biUnion (hfin.subset (by exact fun _ h => h.1))
-      fun _ _ => PrimeSpectrum.isClosed_zeroLocus _
-  have hiso : IsOpen (X := PrimeSpectrum.comap (algebraMap O (MvPolynomial (Fin n) O ⧸ P)) ⁻¹'
-      {Q.comap (algebraMap O (MvPolynomial (Fin n) O ⧸ P))}) {⟨Q, rfl⟩} := by
+    exact Set.Finite.isClosed_biUnion (hfin.subset (by exact fun _ h => h.1)) fun _ _ =>
+      PrimeSpectrum.isClosed_zeroLocus _
+  have hiso : IsOpen
+      (X :=
+        PrimeSpectrum.comap (algebraMap O (MvPolynomial (Fin n) O ⧸ P))
+          ⁻¹' {Q.comap (algebraMap O (MvPolynomial (Fin n) O ⧸ P))})
+      {⟨Q, rfl⟩} := by
     refine isOpen_induced_iff.mpr ⟨U, hU, ?_⟩
     ext ⟨q, hq⟩
     simp only [Set.mem_preimage, Set.mem_singleton_iff]
@@ -54,7 +60,8 @@ theorem FibreClosedComponent.proof : FibreClosedComponent.Statement := by
     · intro hqU
       have hq' : q.asIdeal.comap (algebraMap O _) = Q.asIdeal.comap (algebraMap O _) :=
         congrArg PrimeSpectrum.asIdeal hq
-      have hle : P ⊔ Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal ≤ q.asIdeal.comap mk := by
+      have hle
+          : P ⊔ Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal ≤ q.asIdeal.comap mk := by
         refine sup_le ?_ ?_
         · intro x hx
           show mk x ∈ q.asIdeal
@@ -85,7 +92,8 @@ theorem FibreClosedComponent.proof : FibreClosedComponent.Statement := by
     (Algebra.quasiFiniteAt_iff_isOpen_singleton_fiber Q).mpr hiso
 
   obtain ⟨r, hrQ, hr, hm⟩ :=
-    Algebra.zariskisMainProperty_iff.mp (Algebra.ZariskisMainProperty.of_finiteType (R := O) Q.asIdeal)
+    Algebra.zariskisMainProperty_iff.mp (Algebra.ZariskisMainProperty.of_finiteType (R := O)
+      Q.asIdeal)
   have hr0 : r ≠ 0 := fun h => hrQ (h ▸ Q.asIdeal.zero_mem)
   have hDalg : ∀ d : MvPolynomial (Fin n) O ⧸ P, IsAlgebraic O d := by
     intro d
@@ -93,11 +101,13 @@ theorem FibreClosedComponent.proof : FibreClosedComponent.Statement := by
     exact IsAlgebraic.of_mul (mem_nonZeroDivisors_of_ne_zero (pow_ne_zero m hr0))
       (hr.pow m).isAlgebraic hm.isAlgebraic
 
-  have hIprime : (P.map (MvPolynomial.map (algebraMap O F) :
-      MvPolynomial (Fin n) O →+* MvPolynomial (Fin n) F)).IsPrime := by
+  have hIprime : (P.map
+      (MvPolynomial.map (algebraMap O F)
+        : MvPolynomial (Fin n) O →+* MvPolynomial (Fin n) F)).IsPrime := by
     let _ := MvPolynomial.algebraMvPolynomial (σ := Fin n) (R := O) (S := F)
     have hloc : IsLocalization ((nonZeroDivisors O).map (C : O →+* MvPolynomial (Fin n) O))
-        (MvPolynomial (Fin n) F) := MvPolynomial.isLocalization _ _
+        (MvPolynomial (Fin n) F) :=
+      MvPolynomial.isLocalization _ _
     refine IsLocalization.isPrime_of_isPrime_disjoint
       ((nonZeroDivisors O).map (C : O →+* MvPolynomial (Fin n) O)) (MvPolynomial (Fin n) F) P hP ?_
     rw [Set.disjoint_left]
@@ -107,7 +117,8 @@ theorem FibreClosedComponent.proof : FibreClosedComponent.Statement := by
     rw [hPO, Ideal.mem_bot] at hcP
     exact nonZeroDivisors.ne_zero hc hcP
 
-  let I := P.map (MvPolynomial.map (algebraMap O F) : MvPolynomial (Fin n) O →+* MvPolynomial (Fin n) F)
+  let I :=
+    P.map (MvPolynomial.map (algebraMap O F) : MvPolynomial (Fin n) O →+* MvPolynomial (Fin n) F)
   let φ : (MvPolynomial (Fin n) O ⧸ P) →ₐ[O] (MvPolynomial (Fin n) F ⧸ I) :=
     Ideal.quotientMapₐ I (MvPolynomial.mapAlgHom (Algebra.ofId O F)) Ideal.le_comap_map
   have hX : ∀ i, IsIntegral F (Ideal.Quotient.mk I (X i)) := by

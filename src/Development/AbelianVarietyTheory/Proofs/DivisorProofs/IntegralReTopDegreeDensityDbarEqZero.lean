@@ -17,12 +17,12 @@ open GlobalTheory.GoodMetric (coordVec)
 
 namespace GlobalTheory.CxForm
 
-theorem integrable_dbar_integral_eq_zero {n : ℕ} {G : V n → ℂ} (hG : ContDiff ℝ 1 G)
-    (hc : HasCompactSupport G) (u : V n) :
-    Integrable (fun v => dbar G v u) ∧ ∫ v, dbar G v u = 0 := by
+theorem integrable_dbar_integral_eq_zero
+    {n : ℕ} {G : V n → ℂ} (hG : ContDiff ℝ 1 G) (hc : HasCompactSupport G) (u : V n)
+    : Integrable (fun v => dbar G v u) ∧ ∫ v, dbar G v u = 0 := by
   have hint : ∀ w : V n, Integrable (fun y => fderiv ℝ G y w) := fun w =>
-    ((hG.continuous_fderiv (by norm_num)).clm_apply continuous_const).integrable_of_hasCompactSupport
-      (hc.fderiv_apply (𝕜 := ℝ) w)
+    ((hG.continuous_fderiv (by norm_num)).clm_apply
+      continuous_const).integrable_of_hasCompactSupport (hc.fderiv_apply (𝕜 := ℝ) w)
   refine ⟨?_, ?_⟩
   · simp only [dbar_apply, smul_eq_mul]
     exact ((hint _).add ((hint _).const_mul _)).const_mul _
@@ -32,20 +32,22 @@ theorem integrable_dbar_integral_eq_zero {n : ℕ} {G : V n → ℂ} (hG : ContD
       ReciprocityTheory.L2DbarEstimates.integral_fderiv_apply_eq_zero n G hG hc]
     simp
 
-theorem dens_dbarAt_eq_sum {n : ℕ} (F : V n → Alt n) (v : V n) :
-    dens (dbarAt F v) = ∑ a, ∑ S, dbar (fun x => (bas n).repr (F x) S) v (coordVec a) * dens (dzb a * bas n S) := by
+theorem dens_dbarAt_eq_sum {n : ℕ} (F : V n → Alt n) (v : V n)
+    : dens (dbarAt F v)
+      = ∑ a, ∑ S, dbar (fun x => (bas n).repr (F x) S) v (coordVec a) * dens (dzb a * bas n S) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dens, dbarAt, coefwise, Finset.mul_sum, mul_smul_comm, map_sum, map_smul, Finsupp.finsetSum_apply,
-    Finsupp.smul_apply, smul_eq_mul, Finset.sum_div, mul_div_assoc]
+  simp only [dens, dbarAt, coefwise, Finset.mul_sum, mul_smul_comm, map_sum, map_smul,
+    Finsupp.finsetSum_apply, Finsupp.smul_apply, smul_eq_mul, Finset.sum_div, mul_div_assoc]
 
-theorem integral_re_dens_dbarAt_eq_zero {n : ℕ} (F : V n → Alt n)
-    (hF : ∀ S, ContDiff ℝ 1 (fun v => (bas n).repr (F v) S)) (hc : HasCompactSupport F) :
-    ∫ v, (dens (dbarAt F v)).re = 0 := by
+theorem integral_re_dens_dbarAt_eq_zero
+    {n : ℕ} (F : V n → Alt n) (hF : ∀ S, ContDiff ℝ 1 (fun v => (bas n).repr (F v) S))
+    (hc : HasCompactSupport F)
+    : ∫ v, (dens (dbarAt F v)).re = 0 := by
   have h (a : Fin n) (S : Finset (Fin (n + n))) :=
     integrable_dbar_integral_eq_zero (hF S)
       (hc.comp_left (g := fun α : Alt n => (bas n).repr α S) (by simp)) (coordVec a)
-  have hi (a : Fin n) (S : Finset (Fin (n + n))) :
-      Integrable fun v => dbar (fun x => (bas n).repr (F x) S) v (coordVec a) * dens (dzb a * bas n S) :=
+  have hi (a : Fin n) (S : Finset (Fin (n + n))) : Integrable fun v =>
+      dbar (fun x => (bas n).repr (F x) S) v (coordVec a) * dens (dzb a * bas n S) :=
     (h a S).1.mul_const _
   have hD : Integrable fun v => dens (dbarAt F v) := by
     simp only [dens_dbarAt_eq_sum]

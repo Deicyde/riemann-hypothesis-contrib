@@ -17,12 +17,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowLeG
 set_option autoImplicit false
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter Asymptotics
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 
 namespace GlobalTheory
 
-theorem isAmpleLB_tens_of_isNef_of_dim_le_zero : ∀ (k : Type) [Field k] [Infinite k], (∀ (Y : Scheme.{0}) [Algebra k Γ(Y, ⊤)], IsProjOver (strHom k (X := Y)) → topologicalKrullDim Y ≤ (0 : ℕ) → ∀ A N : LB Y, IsAmpleLB A → IsNef k N → IsAmpleLB (tens A N)) := by
+theorem isAmpleLB_tens_of_isNef_of_dim_le_zero
+    : ∀ (k : Type) [Field k] [Infinite k],
+      (∀ (Y : Scheme.{0}) [Algebra k Γ(Y, ⊤)],
+        IsProjOver (strHom k (X := Y)) → topologicalKrullDim Y ≤ (0 : ℕ)
+          → ∀ A N : LB Y, IsAmpleLB A → IsNef k N → IsAmpleLB (tens A N)) := by
   intro k _ _ Y _ hp hd A N hA hN
   have : AlgebraicGeometry.IsNoetherian Y := isNoetherian_of_isProjOver hp
   have hAN : (tens A N).IsLB := (IsNef.tens_of_isProjOver (IsAmpleLB.isNef (k := k) hA) hN hp).isLB

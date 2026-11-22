@@ -12,13 +12,17 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory Filter Asymptotics
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory
+  Filter Asymptotics
 
 noncomputable section
 
-theorem ReductionToProjectiveBlock.proof (hRP : ReductionToProjective.Statement)
-    (hMC : BlockMetricChange.Statement) (hIm : BlockImageDatum.Statement) (hTop : BlockImageTop.Statement)
-    (hGD : BlockImageGenDeg.Statement) : ReductionToProjectiveBlock.Statement := by
+theorem ReductionToProjectiveBlock.proof
+    (hRP : ReductionToProjective.Statement) (hMC : BlockMetricChange.Statement)
+    (hIm : BlockImageDatum.Statement) (hTop : BlockImageTop.Statement)
+    (hGD : BlockImageGenDeg.Statement)
+    : ReductionToProjectiveBlock.Statement := by
   intro D K _ _ ι _ Ω _ _ I d hI
   obtain ⟨d₀, r, M, N, d', hy, hk, hB, hmet, hchi⟩ := hIm D K ι Ω d
 
@@ -32,7 +36,9 @@ theorem ReductionToProjectiveBlock.proof (hRP : ReductionToProjective.Statement)
     exact hTop D K ι Ω (Fin r) I d.y d.k₀ d₀.A M N d'.x d'.m hI d.arith d.birat d'.arith hB hdeg
       d₀.semipos.1 d'.smooth hmet
 
-  have hg : genDeg (ι := GlobalTheory (Fin r)) (coordIdeal ℤ d'.x) D 1 = genDeg (mCoordIdeal d.y) D d.A.a := by
+  have hg
+      : genDeg (ι := GlobalTheory (Fin r)) (coordIdeal ℤ d'.x) D 1
+        = genDeg (mCoordIdeal d.y) D d.A.a := by
     rw [d.deg]
     exact hGD D K ι Ω (Fin r) d.y d.k₀ M N d'.x d.arith d.birat hB
   rw [hg] at h2

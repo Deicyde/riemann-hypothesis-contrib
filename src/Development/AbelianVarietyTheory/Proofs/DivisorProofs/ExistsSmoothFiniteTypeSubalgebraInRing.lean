@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotDominates
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -18,10 +20,12 @@ noncomputable section
 
 namespace GlobalTheory.FieldPair
 
-theorem Place.exists_smooth_subalgebra : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ'] (F : Place (algebraMap ℂ κ')) (S : Finset κ'),
-    (∀ x ∈ S, x ∈ F.ring) → ∃ A : Subalgebra ℂ κ', Algebra.Smooth ℂ A ∧
-      A.toSubring ≤ F.ring.toSubring ∧ (∀ x ∈ S, x ∈ A) ∧
-      ∀ f : κ', ∃ a ∈ A, ∃ b ∈ A, b ≠ 0 ∧ f * b = a := by
+theorem Place.exists_smooth_subalgebra
+    : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ'] (F : Place (algebraMap ℂ κ')) (S : Finset κ'),
+      (∀ x ∈ S, x ∈ F.ring)
+        → ∃ A : Subalgebra ℂ κ',
+          Algebra.Smooth ℂ A ∧ A.toSubring ≤ F.ring.toSubring ∧ (∀ x ∈ S, x ∈ A)
+            ∧ ∀ f : κ', ∃ a ∈ A, ∃ b ∈ A, b ≠ 0 ∧ f * b = a := by
   intro κ' _ _ F S hS
   classical
   let R := F.ring
@@ -29,14 +33,13 @@ theorem Place.exists_smooth_subalgebra : ∀ {κ' : Type} [Field κ'] [Algebra �
   haveI : IsScalarTower ℂ R κ' := IsScalarTower.of_algebraMap_eq' rfl
   haveI : Algebra.EssFiniteType ℂ R := F.essFiniteType
   obtain ⟨σ, hσ⟩ := (Algebra.essFiniteType_iff ℂ R).mp inferInstance
-  let R' : Subalgebra ℂ κ' :=
-    { F.ring.toSubring with algebraMap_mem' := F.const_mem }
+  let R' : Subalgebra ℂ κ' := { F.ring.toSubring with algebraMap_mem' := F.const_mem }
   let T : Set κ' := ((σ.image (fun x : R => (x : κ')) ∪ S : Finset κ') : Set κ')
   let A₀ : Subalgebra ℂ κ' := Algebra.adjoin ℂ T
   have hT : T ⊆ R' := by
     intro x hx
-    simp only [T, Finset.coe_union, Finset.coe_image, Set.mem_union, Set.mem_image,
-      Finset.mem_coe] at hx
+    simp only [T, Finset.coe_union, Finset.coe_image, Set.mem_union, Set.mem_image, Finset.mem_coe]
+      at hx
     rcases hx with ⟨y, -, rfl⟩ | hx
     · exact y.2
     · exact hS x hx
@@ -44,13 +47,14 @@ theorem Place.exists_smooth_subalgebra : ∀ {κ' : Type} [Field κ'] [Algebra �
 
   have memA₀ : ∀ x : R, x ∈ Algebra.adjoin ℂ (σ : Set R) → (x : κ') ∈ A₀ := by
     intro x hx
-    have h1 : (IsScalarTower.toAlgHom ℂ R κ') x ∈
-        (Algebra.adjoin ℂ (σ : Set R)).map (IsScalarTower.toAlgHom ℂ R κ') := ⟨x, hx, rfl⟩
+    have h1
+        : (IsScalarTower.toAlgHom ℂ R κ') x
+          ∈ (Algebra.adjoin ℂ (σ : Set R)).map (IsScalarTower.toAlgHom ℂ R κ') :=
+      ⟨x, hx, rfl⟩
     rw [AlgHom.map_adjoin] at h1
     refine Algebra.adjoin_mono ?_ h1
     rintro _ ⟨y, hy, rfl⟩
-    simp only [T, Finset.coe_union, Finset.coe_image, Set.mem_union, Set.mem_image,
-      Finset.mem_coe]
+    simp only [T, Finset.coe_union, Finset.coe_image, Set.mem_union, Set.mem_image, Finset.mem_coe]
     exact Or.inl ⟨y, hy, rfl⟩
   have hfg : Algebra.FiniteType ℂ A₀ :=
     (Subalgebra.fg_iff_finiteType A₀).mp (Subalgebra.fg_adjoin_finset _)
@@ -63,7 +67,8 @@ theorem Place.exists_smooth_subalgebra : ∀ {κ' : Type} [Field κ'] [Algebra �
   have hloc : IsLocalization q.primeCompl R := by
     refine (isLocalization_iff _ _).2 ⟨?_, ?_, ?_⟩
     · rintro ⟨t, ht⟩
-      by_contra h; exact ht ((IsLocalRing.mem_maximalIdeal _).2 h)
+      by_contra h
+      exact ht ((IsLocalRing.mem_maximalIdeal _).2 h)
     · intro r
       obtain ⟨t, htA, ht, h⟩ := hσ r
       refine ⟨⟨⟨_, memA₀ _ h⟩, ⟨⟨_, memA₀ _ htA⟩, fun hq => ?_⟩⟩, rfl⟩
@@ -77,8 +82,7 @@ theorem Place.exists_smooth_subalgebra : ∀ {κ' : Type} [Field κ'] [Algebra �
     have e := (IsLocalization.algEquiv q.primeCompl (Localization.AtPrime q) R).restrictScalars ℂ
     exact Algebra.FormallySmooth.of_equiv e.symm
   obtain ⟨g, hgq, hsm⟩ := Algebra.IsSmoothAt.exists_notMem_smooth ℂ q
-  have hgu : IsUnit (ι g) := by
-    by_contra h; exact hgq ((IsLocalRing.mem_maximalIdeal _).2 h)
+  have hgu : IsUnit (ι g) := by by_contra h; exact hgq ((IsLocalRing.mem_maximalIdeal _).2 h)
   have hg0 : (g : κ') ≠ 0 := by
     intro h0
     obtain ⟨u, hu⟩ := hgu.exists_right_inv
@@ -87,19 +91,19 @@ theorem Place.exists_smooth_subalgebra : ∀ {κ' : Type} [Field κ'] [Algebra �
   have hgu' : IsUnit (A₀.val g) := (isUnit_iff_ne_zero).2 hg0
   let φ : Localization.Away g →ₐ[ℂ] κ' := IsLocalization.Away.liftAlgHom g hgu'
 
-  have hφ : ∀ a : A₀, φ (algebraMap A₀ (Localization.Away g) a) = a := by
-    intro a; simp [φ]
+  have hφ : ∀ a : A₀, φ (algebraMap A₀ (Localization.Away g) a) = a := by intro a; simp [φ]
   have hginv : (g : κ')⁻¹ ∈ F.ring := by
     obtain ⟨u, hu⟩ := hgu.exists_right_inv
     have h1 : (g : κ') * (u : κ') = 1 := by
       have := congrArg (fun x : R => (x : κ')) hu; simpa [ι] using this
-    rw [inv_eq_of_mul_eq_one_right h1]; exact u.2
+    rw [inv_eq_of_mul_eq_one_right h1]
+    exact u.2
   have hpow : ∀ s ∈ Submonoid.powers g, (s : κ') ≠ 0 ∧ (s : κ')⁻¹ ∈ F.ring := by
     rintro s ⟨n, rfl⟩
     refine ⟨by simpa using pow_ne_zero n hg0, ?_⟩
     simpa [inv_pow] using pow_mem hginv n
-  have hrep : ∀ x : Localization.Away g, ∃ a : A₀, ∃ s ∈ Submonoid.powers g,
-      φ x * (s : κ') = a := by
+  have hrep
+      : ∀ x : Localization.Away g, ∃ a : A₀, ∃ s ∈ Submonoid.powers g, φ x * (s : κ') = a := by
     intro x
     obtain ⟨⟨a, s, hs⟩, e⟩ := IsLocalization.surj (Submonoid.powers g) x
     refine ⟨a, s, hs, ?_⟩
@@ -107,14 +111,16 @@ theorem Place.exists_smooth_subalgebra : ∀ {κ' : Type} [Field κ'] [Algebra �
     rw [map_mul, hφ, hφ] at this
     exact this
   have hinj : Function.Injective φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     obtain ⟨⟨a, s, hs⟩, e⟩ := IsLocalization.surj (Submonoid.powers g) x
     have h1 := congrArg φ e
     rw [map_mul, hφ, hφ, hx, zero_mul] at h1
     have ha : a = 0 := Subtype.ext h1.symm
     rw [ha, map_zero] at e
-    exact (IsLocalization.map_units (Localization.Away g) (⟨s, hs⟩ : Submonoid.powers g)).mul_left_eq_zero.1 e
+    exact (IsLocalization.map_units (Localization.Away g)
+      (⟨s, hs⟩ : Submonoid.powers g)).mul_left_eq_zero.1 e
   let A : Subalgebra ℂ κ' := φ.range
   haveI : Algebra.Smooth ℂ A := Algebra.Smooth.of_equiv (AlgEquiv.ofInjective φ hinj)
   have hA₀A : ∀ a ∈ A₀, a ∈ A := fun a ha => ⟨algebraMap A₀ _ ⟨a, ha⟩, hφ ⟨a, ha⟩⟩
@@ -124,7 +130,8 @@ theorem Place.exists_smooth_subalgebra : ∀ {κ' : Type} [Field κ'] [Algebra �
     obtain ⟨hs0, hsi⟩ := hpow s hs
     have : φ x = a * (s : κ')⁻¹ := by rw [← e, mul_assoc, mul_inv_cancel₀ hs0, mul_one]
     show φ x ∈ F.ring
-    rw [this]; exact F.ring.mul_mem _ _ (hA₀R a.2) hsi
+    rw [this]
+    exact F.ring.mul_mem _ _ (hA₀R a.2) hsi
   · simp only [T, Finset.coe_union, Set.mem_union, Finset.mem_coe]; exact Or.inr hx
   · intro f
     have hfrac : ∃ a ∈ F.ring, ∃ b ∈ F.ring, b ≠ 0 ∧ f * b = a := by

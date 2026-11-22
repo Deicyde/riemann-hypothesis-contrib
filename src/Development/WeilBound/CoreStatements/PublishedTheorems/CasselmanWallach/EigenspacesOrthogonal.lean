@@ -6,7 +6,8 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.CasselmanWa
 
 noncomputable section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.TypeSum
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob
+  GlobalTheory.TypeSum
 open ReciprocityTheory.ChartRestriction.DS (actM casimirK)
 open scoped InnerProductSpace
 
@@ -16,8 +17,11 @@ namespace HilbertSchmidtSqEq₂
 
 theorem hs2_eq {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) : hs2 g = hs g := rfl
 
-theorem smul_seminorm_cont {E : Type} [AddCommGroup E] [Module ℂ E] [TopologicalSpace E] {q : Seminorm ℂ E}
-    (hq : Continuous q) (c : NNReal) : Continuous (c • q) := by
+theorem smul_seminorm_cont
+    {E : Type} [AddCommGroup E] [Module ℂ E] [TopologicalSpace E]
+    {q : Seminorm ℂ E} (hq : Continuous q)
+    (c : NNReal)
+    : Continuous (c • q) := by
   rw [Seminorm.coe_smul]
   exact hq.const_smul c
 
@@ -40,16 +44,22 @@ theorem e3c : SmoothMapSeminormBound := by
     obtain ⟨v, hv⟩ := h3a.1 y
     set w : H := ((((1 + casimirK ε A) ^ m) y : kfin ε σ) : H) with hwdef
     have hw : Sm ε σ w := hD.1 _ (((1 + casimirK ε A) ^ m) y).2
-    let F : kfin ε σ →ₗ[ℂ] (Matrix (Fin n) (Fin n) ℂ → ℂ) :=
-      { toFun := fun η g => ⟪w, σ g (η : H)⟫_ℂ
-        map_add' := fun a b => by funext g; simp [inner_add_right]
-        map_smul' := fun c a => by funext g; simp [inner_smul_right] }
+    let F : kfin ε σ →ₗ[ℂ] (Matrix (Fin n) (Fin n) ℂ → ℂ) := {
+      toFun := fun η g => ⟪w, σ g (η : H)⟫_ℂ
+      map_add' := fun a b => by funext g; simp [inner_add_right]
+      map_smul' := fun c a => by funext g; simp [inner_smul_right]
+    }
     have hF : ∀ (η : kfin ε σ) g, F η g = ⟪w, σ g (η : H)⟫_ℂ := fun _ _ => rfl
-    have h1 : ∀ η : kfin ε σ, ContinuousOn (F η) (ReciprocityTheory.ChartRestriction.DS.UJset ε) := fun η => by
+    have h1
+        : ∀ η : kfin ε σ,
+          ContinuousOn (F η) (ReciprocityTheory.ChartRestriction.DS.UJset ε) := fun η => by
       have := (continuousOn_const (c := w) (s := UJset ε)).inner (𝕜 := ℂ) (hU.2.2 (η : H))
       exact this
-    have h2 : ∀ X, ReciprocityTheory.ChartRestriction.DS.inP ε X → ∀ η : kfin ε σ, ∀ g ∈ ReciprocityTheory.ChartRestriction.DS.UJset ε,
-        HasDerivAt (fun t : ℝ => F η (g * NormedSpace.exp (t • X))) (F (actM A X η) g) 0 := by
+    have h2
+        : ∀ X,
+          ReciprocityTheory.ChartRestriction.DS.inP ε X
+            → ∀ η : kfin ε σ, ∀ g ∈ ReciprocityTheory.ChartRestriction.DS.UJset ε,
+              HasDerivAt (fun t : ℝ => F η (g * NormedSpace.exp (t • X))) (F (actM A X η) g) 0 := by
       intro X hX η g hg
       have hXl : X ∈ lieSet ε := hX.1
       have hg' : g ∈ UJset ε := hg
@@ -57,7 +67,9 @@ theorem e3c : SmoothMapSeminormBound := by
       have ho : HasDerivAt (fun t : ℝ => σ (NormedSpace.exp (t • X)) (η : H)) (dRep σ X η) 0 := by
         have := hasDerivAt_orbit hU hη' hXl 0
         rwa [zero_smul, NormedSpace.exp_zero, sigma_one hU] at this
-      have h4 : HasDerivAt (fun t : ℝ => σ g (σ (NormedSpace.exp (t • X)) (η : H))) (σ g (dRep σ X η)) 0 :=
+      have h4 : HasDerivAt
+          (fun t : ℝ => σ g (σ (NormedSpace.exp (t • X)) (η : H)))
+          (σ g (dRep σ X η)) 0 :=
         ((σ g).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt 0 ho
       have h5 := ((innerSL ℂ w).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt 0 h4
       simp only [ContinuousLinearMap.coe_restrictScalars', innerSL_apply_apply] at h5
@@ -65,7 +77,9 @@ theorem e3c : SmoothMapSeminormBound := by
       refine h5.congr_of_eventuallyEq (Filter.Eventually.of_forall fun t => ?_)
       simp only [Function.comp_apply, hF, innerSL_apply_apply]
       rw [sigma_mul hU hg' (exp_mem_UJ hXl t)]
-    have h3 : ∀ η : kfin ε σ, ∃ C : ℝ, ∀ g ∈ ReciprocityTheory.ChartRestriction.DS.UJset ε, ‖F η g‖ ≤ C * (1 + hs2 g) ^ N := by
+    have h3
+        : ∀ η : kfin ε σ, ∃ C : ℝ, ∀ g ∈ ReciprocityTheory.ChartRestriction.DS.UJset ε,
+          ‖F η g‖ ≤ C * (1 + hs2 g) ^ N := by
       intro η
       refine ⟨‖w‖ * ‖(η : H)‖, fun g hg => ?_⟩
       have hg' : g ∈ UJset ε := hg
@@ -74,10 +88,13 @@ theorem e3c : SmoothMapSeminormBound := by
         have := norm_inner_le_norm (𝕜 := ℂ) w (σ g (η : H))
         rwa [hU.2.1 g hg' (η : H)] at this
       have e2 : (1 : ℝ) ≤ (1 + hs g) ^ N := one_le_pow₀ (by linarith [hs_nonneg g])
-      calc _ ≤ ‖w‖ * ‖(η : H)‖ := e1
+      calc
+        _ ≤ ‖w‖ * ‖(η : H)‖ := e1
         _ = ‖w‖ * ‖(η : H)‖ * 1 := (mul_one _).symm
         _ ≤ _ := mul_le_mul_of_nonneg_left e2 (by positivity)
-    have h5b : ∀ e ∈ I₀, ∀ g ∈ ReciprocityTheory.ChartRestriction.DS.UJset ε, ‖F e g‖ ≤ (Cs * Q (T w)) * (1 + hs2 g) ^ N := by
+    have h5b
+        : ∀ e ∈ I₀, ∀ g ∈ ReciprocityTheory.ChartRestriction.DS.UJset ε,
+          ‖F e g‖ ≤ (Cs * Q (T w)) * (1 + hs2 g) ^ N := by
       intro e he g hg
       have hg' : g ∈ UJset ε := hg
       rw [hF, hs2_eq, inner_sigma hU hg' w (e : H), norm_inner_symm]
@@ -89,7 +106,8 @@ theorem e3c : SmoothMapSeminormBound := by
       have e3 : Ce e ≤ Cs := Finset.single_le_sum (f := Ce) (fun x _ => hCe0 x) he
       have hQ0 : 0 ≤ Q (T w) := apply_nonneg _ _
       have hW0 : 0 ≤ (1 + hs g) ^ N := pow_nonneg (by linarith [hs_nonneg g]) _
-      calc _ ≤ Ce e * Q (π g⁻¹ (T w)) := e1
+      calc
+        _ ≤ Ce e * Q (π g⁻¹ (T w)) := e1
         _ ≤ Ce e * ((1 + hs g) ^ N * Q (T w)) := mul_le_mul_of_nonneg_left e2 (hCe0 e)
         _ ≤ Cs * ((1 + hs g) ^ N * Q (T w)) := mul_le_mul_of_nonneg_right e3 (mul_nonneg hW0 hQ0)
         _ = _ := by ring

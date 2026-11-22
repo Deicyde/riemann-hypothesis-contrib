@@ -6,13 +6,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial Matrix IsLocalRing TensorProduct UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.lag_coi :
-    ∀ {R E ι : Type} [CommRing R] [Ring E] [Algebra R E] [Fintype ι] [DecidableEq ι] (a : ι → R) (P : E), (∀ i j, i ≠ j → IsUnit (a i - a j)) → aeval P (∏ i, (X - C (a i))) = 0 → CompleteOrthogonalIdempotents (lag a P) ∧ (∀ i, P * lag a P i = a i • lag a P i) ∧ (∀ (q : R[X]) i, aeval P q * lag a P i = q.eval (a i) • lag a P i) ∧ ∀ y i, Commute y P → Commute y (lag a P i) := by
+theorem UpperTheory.V.AlgebraTools.lag_coi
+    : ∀ {R E ι : Type} [CommRing R] [Ring E] [Algebra R E] [Fintype ι] [DecidableEq ι] (a : ι → R)
+        (P : E),
+      (∀ i j, i ≠ j → IsUnit (a i - a j)) → aeval P (∏ i, (X - C (a i))) = 0
+        → CompleteOrthogonalIdempotents (lag a P) ∧ (∀ i, P * lag a P i = a i • lag a P i)
+          ∧ (∀ (q : R[X]) i, aeval P q * lag a P i = q.eval (a i) • lag a P i)
+          ∧ ∀ y i, Commute y P → Commute y (lag a P i) := by
   intro R E ι _ _ _ _ _ a P ha hm
   have hc : ∀ i, IsUnit (∏ j ∈ Finset.univ.erase i, (a i - a j)) := fun i =>
     IsUnit.prod_iff.2 (fun j hj => ha i j (Ne.symm (Finset.ne_of_mem_erase hj)))
   let L : ι → R[X] := fun i =>
-    C (Ring.inverse (∏ j ∈ Finset.univ.erase i, (a i - a j))) * ∏ j ∈ Finset.univ.erase i, (X - C (a j))
+    C (Ring.inverse (∏ j ∈ Finset.univ.erase i, (a i - a j)))
+      * ∏ j ∈ Finset.univ.erase i, (X - C (a j))
   have hL : ∀ i, lag a P i = aeval P (L i) := by
     intro i
     simp only [L, lag, map_mul, aeval_C, Algebra.smul_def]
@@ -22,15 +28,18 @@ theorem UpperTheory.V.AlgebraTools.lag_coi :
     split_ifs with h
     · subst h
       exact Ring.inverse_mul_cancel _ (hc i)
-    · rw [Finset.prod_eq_zero (f := fun j => a k - a j)
-        (Finset.mem_erase.2 ⟨Ne.symm h, Finset.mem_univ k⟩) (sub_self (a k)), mul_zero]
+    · rw [Finset.prod_eq_zero
+          (f := fun j => a k - a j)
+          (Finset.mem_erase.2 ⟨Ne.symm h, Finset.mem_univ k⟩) (sub_self (a k)),
+        mul_zero]
   have hroot : ∀ i, aeval P (X - C (a i)) * lag a P i = 0 := by
     intro i
     rw [hL, ← map_mul]
-    have : (X - C (a i)) * L i =
-        C (Ring.inverse (∏ j ∈ Finset.univ.erase i, (a i - a j))) * ∏ j, (X - C (a j)) := by
+    have : (X - C (a i)) * L i
+        = C (Ring.inverse (∏ j ∈ Finset.univ.erase i, (a i - a j))) * ∏ j, (X - C (a j)) := by
       simp only [L]
-      rw [mul_left_comm, Finset.mul_prod_erase Finset.univ (fun j => X - C (a j)) (Finset.mem_univ i)]
+      rw [mul_left_comm,
+        Finset.mul_prod_erase Finset.univ (fun j => X - C (a j)) (Finset.mem_univ i)]
     rw [this, map_mul, hm, mul_zero]
   have hq : ∀ (q : R[X]) i, aeval P q * lag a P i = q.eval (a i) • lag a P i := by
     intro q i
@@ -39,7 +48,8 @@ theorem UpperTheory.V.AlgebraTools.lag_coi :
       rw [mul_comm, ← hg]
       ring
     conv_lhs => rw [hq']
-    rw [map_add (f := _), map_mul, add_mul, mul_assoc, hroot, mul_zero, zero_add, aeval_C, Algebra.smul_def]
+    rw [map_add (f := _), map_mul, add_mul, mul_assoc, hroot, mul_zero, zero_add, aeval_C,
+      Algebra.smul_def]
   have hP : ∀ i, P * lag a P i = a i • lag a P i := by
     intro i
     have := hq X i

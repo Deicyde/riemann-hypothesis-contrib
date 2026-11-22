@@ -34,7 +34,8 @@ def intRing : ValuationSubring F where
   carrier := {a | 0 ≤ v a}
   mul_mem' := fun {a b} ha hb => by
     show 0 ≤ v (a * b)
-    rw [AddValuation.map_mul]; exact add_nonneg ha hb
+    rw [AddValuation.map_mul]
+    exact add_nonneg ha hb
   one_mem' := by show 0 ≤ v 1; rw [AddValuation.map_one]
   add_mem' := fun {a b} ha hb => le_trans (le_min ha hb) (AddValuation.map_add v a b)
   zero_mem' := by show 0 ≤ v 0; rw [AddValuation.map_zero]; exact le_top
@@ -148,17 +149,19 @@ section Core
 
 variable {W : Type} [AddCommGroup W] [Module F W] {n : ℕ} (b : Fin n → W)
 
-theorem span_of_eigen (UU Pos : W → Prop) (hb : LinearIndependent F b)
+theorem span_of_eigen
+    (UU Pos : W → Prop)
+    (hb : LinearIndependent F b)
     (hUU : ∀ s, UU s ↔ ∃ c : Fin n → F, (∀ i, 0 ≤ v (c i)) ∧ s = ∑ i, c i • b i)
-    (hPos : ∀ s, UU s → ∀ ζ : F, ∀ s', 0 < v ζ → UU s' → s = ζ • s' → Pos s)
-    (hπ : ∃ π : F, 0 < v π)
-    {ι Γ : Type} [Fintype ι] (hcard : Fintype.card ι = n) (sv : ι → W)
-    (hsv : ∀ i, UU (sv i)) (hsvp : ∀ i, ¬ Pos (sv i))
+    (hPos : ∀ s, UU s → ∀ ζ : F, ∀ s', 0 < v ζ → UU s' → s = ζ • s' → Pos s) (hπ : ∃ π : F, 0 < v π)
+    {ι Γ : Type} [Fintype ι]
+    (hcard : Fintype.card ι = n)
+    (sv : ι → W) (hsv : ∀ i, UU (sv i)) (hsvp : ∀ i, ¬ Pos (sv i))
     (T : Γ → W →ₗ[F] W) (hT : ∀ γ s, UU s → UU (T γ s))
-    {N : ℕ} (hN : 1 ≤ N) (hvN : v (N : F) = 0) (χ : ι → Γ → F)
-    (hχN : ∀ i γ, χ i γ ^ N = 1) (heig : ∀ i γ, T γ (sv i) = χ i γ • sv i)
-    (hsep : ∀ i j, i ≠ j → ∃ γ, χ i γ ≠ χ j γ) :
-    ∀ s, UU s → ∃ a : ι → F, (∀ i, 0 ≤ v (a i)) ∧ s = ∑ i, a i • sv i := by
+    {N : ℕ} (hN : 1 ≤ N) (hvN : v (N : F) = 0)
+    (χ : ι → Γ → F) (hχN : ∀ i γ, χ i γ ^ N = 1) (heig : ∀ i γ, T γ (sv i) = χ i γ • sv i)
+    (hsep : ∀ i j, i ≠ j → ∃ γ, χ i γ ≠ χ j γ)
+    : ∀ s, UU s → ∃ a : ι → F, (∀ i, 0 ≤ v (a i)) ∧ s = ∑ i, a i • sv i := by
   classical
   have hUU0 : UU 0 := (hUU 0).2 ⟨0, fun i => by simp, by simp⟩
   have hUUsub : ∀ s t, UU s → UU t → UU (s - t) := by
@@ -181,12 +184,14 @@ theorem span_of_eigen (UU Pos : W → Prop) (hb : LinearIndependent F b)
     apply hsvp i
     exact hPos (sv i) (hsv i) 0 0 (by simp) hUU0 (by rw [h, zero_smul])
   have hχv : ∀ i γ, v (χ i γ) = 0 := fun i γ => val_root_unity v hN (hχN i γ)
-  have hχd : ∀ i j γ, χ i γ ≠ χ j γ → v (χ i γ - χ j γ) = 0 :=
-    fun i j γ h => val_sub_roots v hN hvN (hχN i γ) (hχN j γ) h
+  have hχd : ∀ i j γ, χ i γ ≠ χ j γ → v (χ i γ - χ j γ) = 0 := fun i j γ h =>
+    val_sub_roots v hN hvN (hχN i γ) (hχN j γ) h
 
-  have hred : ∀ (S : Finset ι) (a : ι → F) (j : ι) (γ : Γ), j ∈ S →
-      T γ (∑ i ∈ S, a i • sv i) - χ j γ • ∑ i ∈ S, a i • sv i =
-        ∑ i ∈ S.erase j, (a i * (χ i γ - χ j γ)) • sv i := by
+  have hred
+      : ∀ (S : Finset ι) (a : ι → F) (j : ι) (γ : Γ),
+        j ∈ S
+          → T γ (∑ i ∈ S, a i • sv i) - χ j γ • ∑ i ∈ S, a i • sv i
+            = ∑ i ∈ S.erase j, (a i * (χ i γ - χ j γ)) • sv i := by
     intro S a j γ hj
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finset.smul_sum, ← Finset.sum_sub_distrib]
@@ -209,11 +214,12 @@ theorem span_of_eigen (UU Pos : W → Prop) (hb : LinearIndependent F b)
       have hz : ∑ i ∈ S.erase j, (a i * (χ i γ - χ j γ)) • sv i = 0 := by
         rw [← hred S a j γ hj, ha, map_zero, smul_zero, sub_zero]
       have h1 : a k * (χ k γ - χ j γ) = 0 :=
-        ih (S.erase j) (Finset.erase_ssubset hj) (fun i => a i * (χ i γ - χ j γ)) hz k
-          (Finset.mem_erase.2 ⟨Ne.symm hjk, hk⟩)
+        ih (S.erase j) (Finset.erase_ssubset hj)
+          (fun i => a i * (χ i γ - χ j γ))
+          hz k (Finset.mem_erase.2 ⟨Ne.symm hjk, hk⟩)
       exact (mul_eq_zero.1 h1).resolve_right (sub_ne_zero.2 hγ)
-    · rw [Finset.sum_eq_single k (fun j hj hjk => absurd ⟨j, hj, hjk⟩ hex)
-        (fun h => absurd hk h)] at ha
+    · rw [Finset.sum_eq_single k (fun j hj hjk => absurd ⟨j, hj, hjk⟩ hex) (fun h => absurd hk h)]
+        at ha
       exact (smul_eq_zero.1 ha).resolve_right (hsv0 k)
 
   have key : ∀ S : Finset ι, ∀ a : ι → F, UU (∑ i ∈ S, a i • sv i) → ∀ k ∈ S, 0 ≤ v (a k) := by
@@ -228,12 +234,13 @@ theorem span_of_eigen (UU Pos : W → Prop) (hb : LinearIndependent F b)
         rw [← hred S a j γ hj]
         exact hUUsub _ _ (hT γ _ ha) (hUUsmul _ _ (le_of_eq (hχv j γ).symm) ha)
       have h1 : 0 ≤ v (a k * (χ k γ - χ j γ)) :=
-        ih (S.erase j) (Finset.erase_ssubset hj) (fun i => a i * (χ i γ - χ j γ)) hmem k
-          (Finset.mem_erase.2 ⟨Ne.symm hjk, hk⟩)
+        ih (S.erase j) (Finset.erase_ssubset hj)
+          (fun i => a i * (χ i γ - χ j γ))
+          hmem k (Finset.mem_erase.2 ⟨Ne.symm hjk, hk⟩)
       rw [AddValuation.map_mul, hχd k j γ hγ, add_zero] at h1
       exact h1
-    · rw [Finset.sum_eq_single k (fun j hj hjk => absurd ⟨j, hj, hjk⟩ hex)
-        (fun h => absurd hk h)] at ha
+    · rw [Finset.sum_eq_single k (fun j hj hjk => absurd ⟨j, hj, hjk⟩ hex) (fun h => absurd hk h)]
+        at ha
       by_contra hneg
       have hneg' : v (a k) < 0 := not_le.1 hneg
       have hak : a k ≠ 0 := by
@@ -248,8 +255,9 @@ theorem span_of_eigen (UU Pos : W → Prop) (hb : LinearIndependent F b)
         rw [← h0, add_zero] at hsum
         rw [hsum] at hneg'
         exact lt_irrefl _ hneg'
-      exact hsvp k (hPos (sv k) (hsv k) (a k)⁻¹ (a k • sv k) hpos ha
-        (by rw [smul_smul, inv_mul_cancel₀ hak, one_smul]))
+      exact hsvp k
+        (hPos (sv k) (hsv k) (a k)⁻¹ (a k • sv k) hpos ha
+          (by rw [smul_smul, inv_mul_cancel₀ hak, one_smul]))
   have hli : LinearIndependent F sv := by
     rw [Fintype.linearIndependent_iff]
     intro g hg i

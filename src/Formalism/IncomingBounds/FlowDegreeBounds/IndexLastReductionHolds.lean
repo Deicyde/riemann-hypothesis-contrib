@@ -14,24 +14,25 @@ namespace Formalism.IncomingBounds.LatticeIndexAlt
 
 open Formalism.LatticeIndexTer
 
-variable {O K X : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
-  [Algebra O K] [IsFractionRing O K] [AddCommGroup X] [Module K X] [Module O X]
-  [IsScalarTower O K X]
+variable
+  {O K X : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+  [IsFractionRing O K] [AddCommGroup X] [Module K X] [Module O X] [IsScalarTower O K X]
 
-theorem map_comap_sub (W : Submodule K X) (A : Submodule O X) :
-    (A.comap ((W.subtype).restrictScalars O)).map ((W.subtype).restrictScalars O) =
-      A ⊓ W.restrictScalars O := by
+theorem map_comap_sub (W : Submodule K X) (A : Submodule O X)
+    : (A.comap ((W.subtype).restrictScalars O)).map ((W.subtype).restrictScalars O)
+      = A ⊓ W.restrictScalars O := by
   ext x
-  simp only [Submodule.mem_map, Submodule.mem_comap, Submodule.mem_inf, Submodule.restrictScalars_mem]
+  simp only [Submodule.mem_map, Submodule.mem_comap, Submodule.mem_inf,
+    Submodule.restrictScalars_mem]
   constructor
   · rintro ⟨y, hy, rfl⟩
     exact ⟨hy, y.2⟩
   · rintro ⟨hx, hW⟩
     exact ⟨⟨x, hW⟩, hx, rfl⟩
 
-theorem qlen_comap (W : Submodule K X) (A B : Submodule O X) :
-    qlen O W (A.comap ((W.subtype).restrictScalars O)) (B.comap ((W.subtype).restrictScalars O)) =
-      qlen O X (A ⊓ W.restrictScalars O) (B ⊓ W.restrictScalars O) := by
+theorem qlen_comap (W : Submodule K X) (A B : Submodule O X)
+    : qlen O W (A.comap ((W.subtype).restrictScalars O)) (B.comap ((W.subtype).restrictScalars O))
+      = qlen O X (A ⊓ W.restrictScalars O) (B ⊓ W.restrictScalars O) := by
   unfold qlen
   have hinj : Function.Injective ((W.subtype).restrictScalars O) := fun a b h => Subtype.ext h
   let e : ↥(A.comap ((W.subtype).restrictScalars O)) ≃ₗ[O] ↥(A ⊓ W.restrictScalars O) :=
@@ -54,28 +55,31 @@ theorem qlen_comap (W : Submodule K X) (A B : Submodule O X) :
     rw [← key] at h'
     exact h'
 
-theorem idx_comap (W : Submodule K X) (A B : Submodule O X) :
-    idx O W (A.comap ((W.subtype).restrictScalars O)) (B.comap ((W.subtype).restrictScalars O)) =
-      idx O X (A ⊓ W.restrictScalars O) (B ⊓ W.restrictScalars O) := by
+theorem idx_comap (W : Submodule K X) (A B : Submodule O X)
+    : idx O W (A.comap ((W.subtype).restrictScalars O)) (B.comap ((W.subtype).restrictScalars O))
+      = idx O X (A ⊓ W.restrictScalars O) (B ⊓ W.restrictScalars O) := by
   unfold idx
   rw [qlen_comap W A B, qlen_comap W B A]
 
-
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] in
-theorem isLat_scale {Y : Type} [AddCommGroup Y] [Module K Y] [Module O Y] [IsScalarTower O K Y]
-    (c : K) (hc : c ≠ 0) (A : Submodule O Y) (hA : IsLat O K Y A) :
-    IsLat O K Y (A.map ((c • LinearMap.id : Y →ₗ[K] Y).restrictScalars O)) := by
+theorem isLat_scale
+    {Y : Type} [AddCommGroup Y] [Module K Y] [Module O Y] [IsScalarTower O K Y]
+    (c : K) (hc : c ≠ 0)
+    (A : Submodule O Y) (hA : IsLat O K Y A)
+    : IsLat O K Y (A.map ((c • LinearMap.id : Y →ₗ[K] Y).restrictScalars O)) := by
   unfold IsLat at hA ⊢
   refine ⟨hA.1.map _, ?_⟩
-  rw [Submodule.map_coe, LinearMap.coe_restrictScalars, Submodule.span_image, hA.2, Submodule.map_top,
-    LinearMap.range_eq_top]
+  rw [Submodule.map_coe, LinearMap.coe_restrictScalars, Submodule.span_image, hA.2,
+    Submodule.map_top, LinearMap.range_eq_top]
   intro x
   refine ⟨c⁻¹ • x, ?_⟩
   simp [smul_smul, hc]
 
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] in
-theorem isLat_sup {Y : Type} [AddCommGroup Y] [Module K Y] [Module O Y] [IsScalarTower O K Y]
-    (A B : Submodule O Y) (hA : A.FG) (hB : IsLat O K Y B) : IsLat O K Y (A ⊔ B) := by
+theorem isLat_sup
+    {Y : Type} [AddCommGroup Y] [Module K Y] [Module O Y] [IsScalarTower O K Y]
+    (A B : Submodule O Y) (hA : A.FG) (hB : IsLat O K Y B)
+    : IsLat O K Y (A ⊔ B) := by
   unfold IsLat at hB ⊢
   refine ⟨hA.sup hB.1, ?_⟩
   rw [eq_top_iff, ← hB.2]
@@ -92,11 +96,13 @@ theorem index_last_reduction_holds : IndexLastStep := by
   rw [← idx_comap W M Θ]
   have hc : (algebraMap O K ϖ) ^ e ≠ 0 :=
     zpow_ne_zero _ ((map_ne_zero_iff _ (IsFractionRing.injective O K)).2 hϖ.ne_zero)
-  have hNl := isLat_sup (K := K)
-    (M.map ((((algebraMap O K ϖ) ^ e) • LinearMap.id : X →ₗ[K] X).restrictScalars O)) Θ
-    (hM.1.map _) hΘ
-  generalize hN : M.map ((((algebraMap O K ϖ) ^ e) • LinearMap.id : X →ₗ[K] X).restrictScalars O)
-    ⊔ Θ = N at hNl ⊢
+  have hNl :=
+    isLat_sup (K := K)
+      (M.map ((((algebraMap O K ϖ) ^ e) • LinearMap.id : X →ₗ[K] X).restrictScalars O)) Θ
+      (hM.1.map _) hΘ
+  generalize hN
+      : M.map ((((algebraMap O K ϖ) ^ e) • LinearMap.id : X →ₗ[K] X).restrictScalars O) ⊔ Θ = N
+    at hNl ⊢
   have hMN : ∀ x ∈ M, (algebraMap O K ϖ) ^ e • x ∈ N := by
     intro x hx
     rw [← hN]

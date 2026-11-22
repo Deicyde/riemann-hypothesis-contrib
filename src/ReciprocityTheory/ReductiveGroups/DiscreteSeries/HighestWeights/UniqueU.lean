@@ -27,11 +27,14 @@ lemma uqU_mem_Kset {k : ℕ} {g : Matrix (Fin k) (Fin k) ℂ} (hg : g ∈ Formal
     exact h
   · rw [uqU_Jm_allTrue, Matrix.mul_one, Matrix.one_mul]
 
-theorem hcTypeU_unique {k : ℕ} {u : Fin k → ℝ} {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
+theorem hcTypeU_unique
+    {k : ℕ} {u : Fin k → ℝ} {H H' : Type}
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
     (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)) (π' : Matrix (Fin k) (Fin k) ℂ → (H' →L[ℂ] H'))
-    (hπ : Formalism.MainNotions.S.IsHCTypeU k u π) (hπ' : Formalism.MainNotions.S.IsHCTypeU k u π') :
-    ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ Formalism.MainNotions.S.UJset (Formalism.MainNotions.S.allPos k), ∀ v : H, π' g (U v) = U (π g v) := by
+    (hπ : Formalism.MainNotions.S.IsHCTypeU k u π) (hπ' : Formalism.MainNotions.S.IsHCTypeU k u π')
+    : ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ Formalism.MainNotions.S.UJset (Formalism.MainNotions.S.allPos k),
+      ∀ v : H,
+        π' g (U v) = U (π g v) := by
   obtain ⟨T, U₁, h₁⟩ := kType_of_hcTypeU π hπ
   obtain ⟨T', U₂, h₂⟩ := kType_of_hcTypeU π' hπ'
   obtain ⟨φ, hφ, -, -⟩ := kType_unique T T'

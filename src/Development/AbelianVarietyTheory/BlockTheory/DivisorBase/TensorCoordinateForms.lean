@@ -15,8 +15,9 @@ namespace GlobalTheory.IndefiniteRowSideFullHecke.TensorCoordinateForms
 def dirDeriv {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (v : V) (F : V → ℂ) : V → ℂ :=
   fun z => fderiv ℂ F z v
 
-def wordDeriv {κ V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (v : κ → V) (w : List κ)
-    (F : V → ℂ) : V → ℂ :=
+def wordDeriv
+    {κ V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (v : κ → V) (w : List κ) (F : V → ℂ)
+    : V → ℂ :=
   w.foldr (fun x G => dirDeriv (v x) G) F
 
 def IsSpelling {κ : Type} [DecidableEq κ] (w : (κ → ℕ) → List κ) : Prop :=
@@ -28,16 +29,20 @@ def omega (a : ℝ) (D : ℂ) : ℝ := 1 / (π * (lineForm a D D).re)
 
 section OnePlace
 
-variable {X X' : Type} [NormedAddCommGroup X] [InnerProductSpace ℂ X] [FiniteDimensional ℂ X]
-  [NormedAddCommGroup X'] [InnerProductSpace ℂ X'] [FiniteDimensional ℂ X'] {n₀ n₁ : ℕ}
+variable
+  {X X' : Type} [NormedAddCommGroup X] [InnerProductSpace ℂ X] [FiniteDimensional ℂ X]
+  [NormedAddCommGroup X'] [InnerProductSpace ℂ X'] [FiniteDimensional ℂ X']
+  {n₀ n₁ : ℕ}
 
 end OnePlace
 
 section Places
 
-variable {Pl : Type} [Fintype Pl] [DecidableEq Pl] {X X' : Pl → Type}
-  [∀ τ, NormedAddCommGroup (X τ)] [∀ τ, InnerProductSpace ℂ (X τ)] [∀ τ, FiniteDimensional ℂ (X τ)]
-  [∀ τ, NormedAddCommGroup (X' τ)] [∀ τ, InnerProductSpace ℂ (X' τ)] [∀ τ, FiniteDimensional ℂ (X' τ)]
+variable
+  {Pl : Type} [Fintype Pl] [DecidableEq Pl]
+  {X X' : Pl → Type} [∀ τ, NormedAddCommGroup (X τ)] [∀ τ, InnerProductSpace ℂ (X τ)]
+  [∀ τ, FiniteDimensional ℂ (X τ)] [∀ τ, NormedAddCommGroup (X' τ)]
+  [∀ τ, InnerProductSpace ℂ (X' τ)] [∀ τ, FiniteDimensional ℂ (X' τ)]
   {n₀ n₁ : ℕ}
 
 end Places

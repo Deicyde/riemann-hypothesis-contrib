@@ -17,8 +17,10 @@ private lemma intOn_of_bdd (hF : UpperTheory.V.Af.Rs.FdFin) (φ : ℍ → ℝ) (
     ((ae_restrict_iff' hF.1).2 (Filter.Eventually.of_forall hB))
 
 open UpperTheory.V.Af.Rs in
-theorem UpperTheory.V.Af.Rs.tTop :
-    UpperTheory.V.Af.Rs.FdFin → UpperTheory.V.Af.Rs.FdPos → UpperTheory.V.Af.Rs.WTop → UpperTheory.V.Af.Rs.ZDiff → UpperTheory.V.Af.Rs.ZLow → UpperTheory.V.Af.Rs.ZInt → UpperTheory.V.Af.Rs.TTop := by
+theorem UpperTheory.V.Af.Rs.tTop
+    : UpperTheory.V.Af.Rs.FdFin → UpperTheory.V.Af.Rs.FdPos → UpperTheory.V.Af.Rs.WTop
+      → UpperTheory.V.Af.Rs.ZDiff → UpperTheory.V.Af.Rs.ZLow → UpperTheory.V.Af.Rs.ZInt
+      → UpperTheory.V.Af.Rs.TTop := by
   intro hfd hpos hw hzd hzl hzi L _ G hG hre hex M
   obtain ⟨hGc, C', hC'⟩ := hG
   obtain ⟨C, hC⟩ := hzd L
@@ -28,8 +30,8 @@ theorem UpperTheory.V.Af.Rs.tTop :
   have hcard : ∀ x : ℝ, (Finset.univ : Finset (Fin 2 → ZMod L)).card • x = N * x := by
     intro x
     rw [Finset.card_univ, nsmul_eq_mul, hN]
-  obtain ⟨φ, hφ⟩ : ∃ φ : ℍ → ℝ,
-      φ = fun z => (∑ v, (G v z).re) / (2 * N * (‖(z : ℂ)‖ + 1) ^ 4) := ⟨_, rfl⟩
+  obtain ⟨φ, hφ⟩ : ∃ φ : ℍ → ℝ, φ = fun z => (∑ v, (G v z).re) / (2 * N * (‖(z : ℂ)‖ + 1) ^ 4) :=
+    ⟨_, rfl⟩
   obtain ⟨ψ, hψ⟩ : ∃ ψ : ℍ → ℝ, ψ = fun z => ∑ v, (G v z).re * z.im ^ 3 := ⟨_, rfl⟩
   have hreC : ∀ v, Continuous fun z => (G v z).re := fun v => Complex.continuous_re.comp (hGc v)
   have himC : Continuous fun z : ℍ => z.im := UpperHalfPlane.continuous_im
@@ -42,8 +44,8 @@ theorem UpperTheory.V.Af.Rs.tTop :
   have hψC : Continuous ψ := by
     rw [hψ]
     exact continuous_finsetSum _ (fun v _ => (hreC v).mul (himC.pow 3))
-  have hGb : ∀ v, ∀ z ∈ ModularGroup.fd,
-      0 ≤ (G v z).re * z.im ^ 3 ∧ (G v z).re * z.im ^ 3 ≤ C' := by
+  have hGb
+      : ∀ v, ∀ z ∈ ModularGroup.fd, 0 ≤ (G v z).re * z.im ^ 3 ∧ (G v z).re * z.im ^ 3 ≤ C' := by
     intro v z hz
     have hp : 0 ≤ z.im ^ 3 := by
       have := z.im_pos
@@ -64,8 +66,9 @@ theorem UpperTheory.V.Af.Rs.tTop :
     refine (div_le_self hs0 h1).trans ?_
     refine (Finset.sum_le_card_nsmul _ _ _ (fun v _ => ?_)).trans_eq (hcard _)
     have h8 := (hGb v z hz).2
-    have h3 := mul_le_mul_of_nonneg_left
-      (pow_le_pow_left₀ (by norm_num : (0:ℝ) ≤ 1 / 2) (half_le_im hz) 3) (hre v z)
+    have h3 :=
+      mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by norm_num : (0 : ℝ) ≤ 1 / 2) (half_le_im hz) 3)
+        (hre v z)
     norm_num at h3
     linarith
   have hφI := intOn_of_bdd hfd φ hφC _ hφb
@@ -86,8 +89,8 @@ theorem UpperTheory.V.Af.Rs.tTop :
     (Real.le_norm_self _).trans (norm_setIntegral_le_of_norm_le_const hfd.2 hψb)
   obtain ⟨s, hs, hWs⟩ := hw.2 ((M + |C| * (N * C' * volume.real ModularGroup.fd)) / c)
   refine ⟨s, hs, ?_⟩
-  have hpt : ∀ z ∈ ModularGroup.fd,
-      Wsum s * φ z - |C| * ψ z ≤ (∑ v, G v z * (Zc L v s z : ℂ)).re := by
+  have hpt
+      : ∀ z ∈ ModularGroup.fd, Wsum s * φ z - |C| * ψ z ≤ (∑ v, G v z * (Zc L v s z : ℂ)).re := by
     intro z hz
     have hlow := hzl L s hs z hz
     have hp3 : 0 ≤ z.im ^ 3 := by
@@ -101,8 +104,9 @@ theorem UpperTheory.V.Af.Rs.tTop :
         have h2 := mul_le_mul_of_nonneg_right (le_abs_self C) hp3
         have h3 := neg_abs_le (Zc L v s z - Zc L v' s z)
         linarith
-      have hq : 1 / 2 / (‖(z : ℂ)‖ + 1) ^ 4 * Wsum s =
-          N * (Wsum s / (2 * N * (‖(z : ℂ)‖ + 1) ^ 4)) := by
+      have hq
+          : 1 / 2 / (‖(z : ℂ)‖ + 1) ^ 4 * Wsum s
+            = N * (Wsum s / (2 * N * (‖(z : ℂ)‖ + 1) ^ 4)) := by
         have := hden z
         field_simp
       have h4 : N * (Wsum s / (2 * N * (‖(z : ℂ)‖ + 1) ^ 4)) ≤ N * (Zc L v s z + |C| * z.im ^ 3) :=
@@ -116,22 +120,26 @@ theorem UpperTheory.V.Af.Rs.tTop :
     rw [Finset.sum_div, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
     refine Finset.sum_le_sum (fun v _ => ?_)
     have h6 := mul_le_mul_of_nonneg_left (hZ v) (hre v z)
-    calc Wsum s * ((G v z).re / (2 * N * (‖(z : ℂ)‖ + 1) ^ 4)) - |C| * ((G v z).re * z.im ^ 3)
+    calc
+      Wsum s * ((G v z).re / (2 * N * (‖(z : ℂ)‖ + 1) ^ 4)) - |C| * ((G v z).re * z.im ^ 3)
         = (G v z).re * (Wsum s / (2 * N * (‖(z : ℂ)‖ + 1) ^ 4) - |C| * z.im ^ 3) := by ring
       _ ≤ (G v z).re * Zc L v s z := h6
   have hfI : IntegrableOn (fun z => ∑ v, G v z * (Zc L v s z : ℂ)) ModularGroup.fd :=
     integrable_finsetSum _ (fun v _ => hzi L G ⟨hGc, C', hC'⟩ s hs v v)
-  have hre_eq : (∫ z in ModularGroup.fd, ∑ v, G v z * (Zc L v s z : ℂ)).re =
-      ∫ z in ModularGroup.fd, (∑ v, G v z * (Zc L v s z : ℂ)).re := (integral_re hfI).symm
+  have hre_eq
+      : (∫ z in ModularGroup.fd, ∑ v, G v z * (Zc L v s z : ℂ)).re
+        = ∫ z in ModularGroup.fd, (∑ v, G v z * (Zc L v s z : ℂ)).re :=
+    (integral_re hfI).symm
   unfold TT
   rw [hre_eq]
-  calc M ≤ Wsum s * c - |C| * (N * C' * volume.real ModularGroup.fd) := by
-        have := (div_le_iff₀ hc).1 hWs
-        linarith
+  calc
+    M ≤ Wsum s * c - |C| * (N * C' * volume.real ModularGroup.fd) := by
+      have := (div_le_iff₀ hc).1 hWs
+      linarith
     _ ≤ ∫ z in ModularGroup.fd, (Wsum s * φ z - |C| * ψ z) := by
-        rw [integral_sub (hφI.const_mul _) (hψI.const_mul _), integral_const_mul,
-          integral_const_mul, ← hcd]
-        have := mul_le_mul_of_nonneg_left hψint (abs_nonneg C)
-        linarith
+      rw [integral_sub (hφI.const_mul _) (hψI.const_mul _), integral_const_mul, integral_const_mul,
+        ← hcd]
+      have := mul_le_mul_of_nonneg_left hψint (abs_nonneg C)
+      linarith
     _ ≤ ∫ z in ModularGroup.fd, (∑ v, G v z * (Zc L v s z : ℂ)).re :=
-        setIntegral_mono_on ((hφI.const_mul _).sub (hψI.const_mul _)) hfI.re hfd.1 hpt
+      setIntegral_mono_on ((hφI.const_mul _).sub (hψI.const_mul _)) hfI.re hfd.1 hpt

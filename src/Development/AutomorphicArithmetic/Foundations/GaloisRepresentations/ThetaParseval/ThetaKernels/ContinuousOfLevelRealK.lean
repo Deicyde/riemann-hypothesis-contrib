@@ -25,24 +25,39 @@ open Formalism.IndefR.DatumF
 open scoped Topology
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 attribute [local instance] finiteFE modTop topRing
-theorem continuous_of_level_real_k : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E),
-    _root_.UpperTheory.TP.W.GoodK σ B → ∀ (nS nT : ℕ) (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E),
-      IsHermND σ JS → IsHermND σ JT → ∀ ξ₀ : E, ξ₀ ≠ 0 → σ ξ₀ = -ξ₀ →
-      Formalism.IndefR.DatumF.IsStdCharF (fun w : InfinitePlace F => (B.emb w).1) B.ψ (-1) →
-      ∀ g : Formalism.IndefR.DatumF.WOF F E nS nT → ℂ,
-      (∃ U : AddSubgroup (Formalism.IndefR.DatumF.WOF F E nS nT), IsOpen (U : Set (Formalism.IndefR.DatumF.WOF F E nS nT)) ∧
-        ∀ u ∈ U, u.map (Formalism.IndefR.DatumF.infPartF F E) = 0 → Formalism.IndefR.DatumF.heisOF σ JS JT ξ₀ B.ψ (u) g = g) →
-      (∀ (k : ℕ) (L : (Fin k → ℝ) →+ Formalism.IndefR.DatumF.WOF F E nS nT), Continuous L → (∀ t, (L t).map (Formalism.IndefR.DatumF.finPartF F E) = 0) →
-        ∀ w : Formalism.IndefR.DatumF.WOF F E nS nT, ContDiff ℝ ∞ fun x => g (w + L x)) →
-      Continuous g := by
+theorem continuous_of_level_real_k
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E),
+      _root_.UpperTheory.TP.W.GoodK σ B
+        → ∀ (nS nT : ℕ) (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E),
+          IsHermND σ JS → IsHermND σ JT
+            → ∀ ξ₀ : E,
+              ξ₀ ≠ 0 → σ ξ₀ = -ξ₀
+                → Formalism.IndefR.DatumF.IsStdCharF
+                  (fun w : InfinitePlace F => (B.emb w).1)
+                  B.ψ (-1)
+                → ∀ g : Formalism.IndefR.DatumF.WOF F E nS nT → ℂ,
+                  (∃ U : AddSubgroup (Formalism.IndefR.DatumF.WOF F E nS nT),
+                      IsOpen (U : Set (Formalism.IndefR.DatumF.WOF F E nS nT))
+                        ∧ ∀ u ∈ U,
+                          u.map (Formalism.IndefR.DatumF.infPartF F E) = 0
+                            → Formalism.IndefR.DatumF.heisOF σ JS JT ξ₀ B.ψ (u) g = g)
+                    → (∀ (k : ℕ) (L : (Fin k → ℝ) →+ Formalism.IndefR.DatumF.WOF F E nS nT),
+                      Continuous L → (∀ t, (L t).map (Formalism.IndefR.DatumF.finPartF F E) = 0)
+                        → ∀ w : Formalism.IndefR.DatumF.WOF F E nS nT,
+                          ContDiff ℝ ∞ fun x => g (w + L x))
+                    → Continuous g := by
   intro F E _ _ _ _ _ σ B _ nS nT JS JT _ _ ξ₀ _ _ hstd g hU hsm
   haveI := finiteFE (F := F) (E := E)
   haveI := modTop (F := F) (E := E)
   haveI := topRing (F := F) (E := E)
   haveI : IsTopologicalAddGroup (AEF F E) := IsTopologicalRing.to_topologicalAddGroup
   obtain ⟨U, hUo, hUf⟩ := hU
-  let φ := (Module.finBasis ℝ (Fin nT × Fin nS × Fin (Module.finrank F E) → mixedEmbedding.mixedSpace F)).equivFunL
-  let L : (Fin _ → ℝ) →+ WOF F E nS nT := (realCh F E nS nT).comp φ.symm.toLinearEquiv.toAddMonoidHom
+  let φ :=
+    (Module.finBasis ℝ
+      (Fin nT × Fin nS × Fin (Module.finrank F E) → mixedEmbedding.mixedSpace F)).equivFunL
+  let L : (Fin _ → ℝ) →+ WOF F E nS nT :=
+    (realCh F E nS nT).comp φ.symm.toLinearEquiv.toAddMonoidHom
   have hLc : Continuous L := (continuous_realCh nS nT).comp φ.symm.continuous
   have hL0 : ∀ t, (L t).map (finPartF F E) = 0 := fun t => by
     funext i j
@@ -67,12 +82,13 @@ theorem continuous_of_level_real_k : ∀ (F E : Type) [Field F] [NumberField F] 
     rw [e]
     exact infPartF_sub_eInf_smul _
   have hga : Continuous fun w' => g (a w') := by
-    have h1 := (hsm _ L hLc hL0 w).continuous.comp
-      (φ.continuous.comp ((continuous_realCo nS nT).comp (hsmc.comp (continuous_sub_right w))))
+    have h1 :=
+      (hsm _ L hLc hL0 w).continuous.comp
+        (φ.continuous.comp ((continuous_realCo nS nT).comp (hsmc.comp (continuous_sub_right w))))
     refine h1.congr fun w' => ?_
     show g (w + L (φ (realCo F E nS nT (eInf F • (w' - w))))) = g (w + eInf F • (w' - w))
     rw [hLφ, realCh_realCo]
-  have hg : Continuous fun w' => B.ψ (-symplOHF σ JS JT ξ₀ (a w') (u w')) * g (a w') :=
+  have hg : Continuous fun w' => B.ψ (- symplOHF σ JS JT ξ₀ (a w') (u w')) * g (a w') :=
     (hstd.1.1.comp (continuous_symplOHF σ JS JT ξ₀ ha hu).neg).mul hga
   have hev : ∀ᶠ w' in 𝓝 w, u w' ∈ U :=
     hu.continuousAt.preimage_mem_nhds (hUo.mem_nhds (by rw [huw]; exact U.zero_mem))

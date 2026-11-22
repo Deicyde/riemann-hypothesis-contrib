@@ -12,8 +12,8 @@ open Formalism.MainNotions Formalism.BasicNotions Formalism.MainNotions.G Classi
 
 namespace GlobalTheory.Ggeo
 
-theorem bT_le_five_quarters {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (t : D.host.TT) :
-    (L.bT t : ℝ) ≤ L.sc.b' + L.sc.b' / 4 := by
+theorem bT_le_five_quarters {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (t : D.host.TT)
+    : (L.bT t : ℝ) ≤ L.sc.b' + L.sc.b' / 4 := by
   have hx1 := L.sc.one_lt_alt
   have hx : 0 < L.sc.x := lt_trans one_pos hx1
   have hb : 0 < L.sc.b := Real.exp_pos _
@@ -33,16 +33,27 @@ theorem bT_le_five_quarters {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D
     div_nonneg (mul_nonneg (mul_nonneg P.Crho_pos.le (Real.log_nonneg hx1.le)) hLa) hk.le
   unfold LevelStarExponents.rhoP at hr
   have h6 : LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k ≤ 1 / 4 := by
-    have : 4 * LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k =
-        4 * (LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k) := by ring
+    have : 4 * LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k
+        = 4 * (LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k) := by
+      ring
     linarith
   have h7 := P.bT_le t
-  have h8 : LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / D.R.k =
-      (LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k) * L.sc.b' := by ring
+  have h8
+      : LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / D.R.k
+        = (LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k) * L.sc.b' := by
+    ring
   have h9 := mul_le_mul_of_nonneg_right h6 hb'.le
   linarith
 
-theorem wPl_windows : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x, ∀ j < (Fm.D x i).R.m, ∀ (z : Bool × HH (Fm.D x i)), (Fm.L x i).sc.w'' (Fm.D x i).R.n ≤ wPl (Fm.D x i) (j + 1) z ∧ wPl (Fm.D x i) (j + 1) z ≤ (Fm.L x i).sc.b + (Fm.L x i).etaSz + 1 ∧ (IsTopPl (Fm.D x i) z → (Fm.L x i).sc.b' ≤ wPl (Fm.D x i) (j + 1) z ∧ wPl (Fm.D x i) (j + 1) z ≤ 2 * (Fm.L x i).sc.b') := by
+theorem wPl_windows
+    : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x
+        → ∀ i : Fm.Ix x, ∀ j < (Fm.D x i).R.m, ∀ (z : Bool × HH (Fm.D x i)),
+          (Fm.L x i).sc.w'' (Fm.D x i).R.n ≤ wPl (Fm.D x i) (j + 1) z
+            ∧ wPl (Fm.D x i) (j + 1) z ≤ (Fm.L x i).sc.b + (Fm.L x i).etaSz + 1
+            ∧ (IsTopPl (Fm.D x i) z
+              → (Fm.L x i).sc.b' ≤ wPl (Fm.D x i) (j + 1) z
+                ∧ wPl (Fm.D x i) (j + 1) z ≤ 2 * (Fm.L x i).sc.b') := by
   intro eps Fm
   obtain ⟨x0, h0⟩ := GlobalTheory.T.scale_family_size_relations_eventually Fm
   refine ⟨x0, fun x hx hx1 i j hj z => ?_⟩
@@ -56,8 +67,10 @@ theorem wPl_windows : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x
   have he := L.etaSz_pos
   have hq : L.sc.b' / L.sc.x ≤ L.sc.b' / 4 := div_le_div_of_nonneg_left hb'.le (by norm_num) h4
   have hq0 : 0 < L.sc.b' / L.sc.x := div_pos hb' hxp
-  have htop : ∀ (τ : D.what₂.Tau) (t : D.host.TT), (D.eTau τ : D.R.GG) = D.R.tau1 t →
-      L.sc.b' ≤ wj D (j + 1) τ ∧ wj D (j + 1) τ ≤ 2 * L.sc.b' := by
+  have htop
+      : ∀ (τ : D.what₂.Tau) (t : D.host.TT),
+        (D.eTau τ : D.R.GG) = D.R.tau1 t
+          → L.sc.b' ≤ wj D (j + 1) τ ∧ wj D (j + 1) τ ≤ 2 * L.sc.b' := by
     intro τ t ht
     obtain ⟨a1, a2⟩ := L.win_top (j + 1) (by omega) (by omega) τ t ht
     have a3 := L.bT_ge t

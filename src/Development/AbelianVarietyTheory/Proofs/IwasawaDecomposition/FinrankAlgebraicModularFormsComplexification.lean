@@ -4,7 +4,12 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Reads
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem
+  GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
@@ -18,9 +23,10 @@ noncomputable section
 
 namespace GlobalTheory.LevCmp
 
-theorem exists_finset_eval_eq_zero {X K W : Type} [Field K] [AddCommGroup W] [Module K W]
-    (V : Submodule K (X → W)) [FiniteDimensional K V] :
-    ∃ P : Finset X, ∀ f ∈ V, (∀ x ∈ P, f x = 0) → f = 0 := by
+theorem exists_finset_eval_eq_zero
+    {X K W : Type} [Field K] [AddCommGroup W] [Module K W]
+    (V : Submodule K (X → W)) [FiniteDimensional K V]
+    : ∃ P : Finset X, ∀ f ∈ V, (∀ x ∈ P, f x = 0) → f = 0 := by
   classical
   let N : Finset X → Submodule K V := fun P =>
     ⨅ x ∈ P, LinearMap.ker ((LinearMap.proj (R := K) (φ := fun _ : X => W) x).comp V.subtype)
@@ -39,23 +45,39 @@ theorem exists_finset_eval_eq_zero {X K W : Type} [Field K] [AddCommGroup W] [Mo
   exact (hN _ _).1 (key x ((hN P ⟨f, hf⟩).2 h0)) x (Finset.mem_insert_self x P)
 
 section Omega
-variable {K W W' ι : Type} [Field K] [AddCommGroup W] [Module K W] [AddCommGroup W'] [Module ℂ W']
+variable
+  {K W W' ι : Type} [Field K] [AddCommGroup W] [Module K W] [AddCommGroup W'] [Module ℂ W']
   [Fintype ι] [DecidableEq ι]
 
 def coordCx (e : K →+* ℂ) (b : Module.Basis ι K W) (b' : Module.Basis ι ℂ W') : W →ₛₗ[e] W' where
   toFun w := b'.equivFun.symm fun i => e (b.equivFun w i)
-  map_add' x y := b'.equivFun.injective (by
-    simp only [map_add (f := _), LinearEquiv.apply_symm_apply]; funext i; simp only [Pi.add_apply, map_add (f := _)])
-  map_smul' a x := b'.equivFun.injective (by
-    simp only [map_smul, LinearEquiv.apply_symm_apply]; funext i; simp only [Pi.smul_apply, smul_eq_mul, map_mul, RingHom.id_apply])
+  map_add' x y :=
+    b'.equivFun.injective (by
+      simp only [map_add (f := _), LinearEquiv.apply_symm_apply]
+      funext i
+      simp only [Pi.add_apply, map_add (f := _)])
+  map_smul' a x :=
+    b'.equivFun.injective (by
+      simp only [map_smul, LinearEquiv.apply_symm_apply]
+      funext i
+      simp only [Pi.smul_apply, smul_eq_mul, map_mul, RingHom.id_apply])
 
-theorem coordCx_coord (e : K →+* ℂ) (b : Module.Basis ι K W) (b' : Module.Basis ι ℂ W') (w : W) (i : ι) :
-    b'.equivFun (coordCx e b b' w) i = e (b.equivFun w i) := by
+theorem coordCx_coord
+    (e : K →+* ℂ) (b : Module.Basis ι K W) (b' : Module.Basis ι ℂ W') (w : W) (i : ι)
+    : b'.equivFun (coordCx e b b' w) i = e (b.equivFun w i) := by
   simp only [coordCx, LinearMap.coe_mk, AddHom.coe_mk, LinearEquiv.apply_symm_apply]
 
 end Omega
 
-theorem finrank_typeSp_cx : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (K : Type) [Field K] (e : K →+* ℂ) (W W' : Type) [AddCommGroup W] [Module K W] [AddCommGroup W'] [Module ℂ W'] (ρ : Representation K (GQ L n) W) (ρ' : Representation ℂ (GQ L n) W') (J : Subgroup (GAf L n)) (χ : J →* Kˣ), WtMatch e ρ ρ' → (∃ N : ℕ, 0 < N ∧ ∀ κ, NG.Cong L n N κ → ∃ h : κ ∈ J, χ ⟨κ, h⟩ = 1) → FiniteDimensional K (NX.TypeSpF L n K ρ J χ) → Module.finrank ℂ (NG.TypeSp ρ' J (cx e χ)) = Module.finrank K (NX.TypeSpF L n K ρ J χ) := by
+theorem finrank_typeSp_cx
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (K : Type) [Field K]
+        (e : K →+* ℂ) (W W' : Type) [AddCommGroup W] [Module K W] [AddCommGroup W'] [Module ℂ W']
+        (ρ : Representation K (GQ L n) W) (ρ' : Representation ℂ (GQ L n) W')
+        (J : Subgroup (GAf L n)) (χ : J →* Kˣ),
+      WtMatch e ρ ρ' → (∃ N : ℕ, 0 < N ∧ ∀ κ, NG.Cong L n N κ → ∃ h : κ ∈ J, χ ⟨κ, h⟩ = 1)
+        → FiniteDimensional K (NX.TypeSpF L n K ρ J χ)
+        → Module.finrank ℂ (NG.TypeSp ρ' J (cx e χ))
+          = Module.finrank K (NX.TypeSpF L n K ρ J χ) := by
   intro L _ _ _ n K _ e W W' _ _ _ _ ρ ρ' J χ hW hN hfin
   classical
   obtain ⟨ι, _, _, b, b', hM⟩ := hW
@@ -63,15 +85,22 @@ theorem finrank_typeSp_cx : ∀ (L : Type) [Field L] [NumberField L] [IsCMField 
   let β := Module.Basis.ofVectorSpace K ℂ
   let ω := coordCx e b b'
   have hωc : ∀ w i, b'.equivFun (ω w) i = e (b.equivFun w i) := fun w i => coordCx_coord e b b' w i
-  have hρ : ∀ γ w i, b.equivFun (ρ γ w) i = ∑ k, LinearMap.toMatrix b b (ρ γ) i k * b.equivFun w k := by
+  have hρ
+      : ∀ γ w i, b.equivFun (ρ γ w) i = ∑ k, LinearMap.toMatrix b b (ρ γ) i k * b.equivFun w k := by
     intro γ w i
     have := congrFun (LinearMap.toMatrix_mulVec_repr b b (ρ γ) w) i
-    simp only [Module.Basis.equivFun_apply]; rw [← this]; rfl
-  have hρ' : ∀ γ w i, b'.equivFun (ρ' γ w) i = ∑ k, e (LinearMap.toMatrix b b (ρ γ) i k) * b'.equivFun w k := by
+    simp only [Module.Basis.equivFun_apply]
+    rw [← this]
+    rfl
+  have hρ'
+      : ∀ γ w i,
+        b'.equivFun (ρ' γ w) i = ∑ k, e (LinearMap.toMatrix b b (ρ γ) i k) * b'.equivFun w k := by
     intro γ w i
     have := congrFun (LinearMap.toMatrix_mulVec_repr b' b' (ρ' γ) w) i
     rw [hM γ] at this
-    simp only [Module.Basis.equivFun_apply]; rw [← this]; rfl
+    simp only [Module.Basis.equivFun_apply]
+    rw [← this]
+    rfl
   have hωρ : ∀ γ w, ω (ρ γ w) = ρ' γ (ω w) := fun γ w =>
     b'.equivFun.injective (funext fun i => by rw [hωc, hρ, hρ', map_sum]; simp only [map_mul, hωc])
   have hβ1 : ∀ (y : K) (z : ℂ) α, β.repr (e y * z) α = y * β.repr z α := by
@@ -100,8 +129,9 @@ theorem finrank_typeSp_cx : ∀ (L : Type) [Field L] [NumberField L] [IsCMField 
       intro g i
       have := congrArg (fun F => b'.equivFun (F g) i) hc
       set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, Pi.smul_apply, smul_eq_mul, hωc,
-        Pi.zero_apply, map_zero] using this
+      simpa only [Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, Pi.smul_apply, smul_eq_mul,
+          hωc, Pi.zero_apply, map_zero]
+        using this
     have hα : ∀ α, ∀ j, β.repr (c j) α = 0 := by
       intro α
       apply hlinK
@@ -111,25 +141,30 @@ theorem finrank_typeSp_cx : ∀ (L : Type) [Field L] [NumberField L] [IsCMField 
       have := congrArg (fun z => β.repr z α) (hcoord g i)
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, mul_comm (c _), hβ1, map_zero,
-        Finsupp.coe_zero, Pi.zero_apply] at this
+            Finsupp.coe_zero, Pi.zero_apply]
+          at this
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, smul_eq_mul, map_zero, Pi.zero_apply]
+        simp only [Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, smul_eq_mul, map_zero,
+          Pi.zero_apply]
       rw [← this]
       exact Finset.sum_congr rfl fun j _ => mul_comm _ _
     exact β.repr.injective (by ext α; simp [hα α j])
 
-  have hspanV : ∀ a : Fin (Module.finrank K V) → K,
-      (fun g => ω ((∑ j, a j • ((v j : V) : GAf L n → W)) g)) ∈
-        Submodule.span ℂ (Set.range fun j => fun g => ω (((v j : V) : GAf L n → W) g)) := by
+  have hspanV
+      : ∀ a : Fin (Module.finrank K V) → K,
+        (fun g => ω ((∑ j, a j • ((v j : V) : GAf L n → W)) g))
+          ∈ Submodule.span ℂ (Set.range fun j => fun g => ω (((v j : V) : GAf L n → W) g)) := by
     intro a
-    have : (fun g => ω ((∑ j, a j • ((v j : V) : GAf L n → W)) g)) =
-        ∑ j, e (a j) • fun g => ω (((v j : V) : GAf L n → W) g) := by
+    have : (fun g => ω ((∑ j, a j • ((v j : V) : GAf L n → W)) g))
+        = ∑ j, e (a j) • fun g => ω (((v j : V) : GAf L n → W) g) := by
       funext g
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.sum_apply, Pi.smul_apply, map_sum, map_smulₛₗ]
+      simp only [Finset.sum_apply, Pi.smul_apply, map_sum, map_smulₛₗ]
     rw [this]
     exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
-  have hspan : NG.TypeSp ρ' J (cx e χ) = Submodule.span ℂ (Set.range fun j => fun g => ω (((v j : V) : GAf L n → W) g)) := by
+  have hspan
+      : NG.TypeSp ρ' J (cx e χ)
+        = Submodule.span ℂ (Set.range fun j => fun g => ω (((v j : V) : GAf L n → W) g)) := by
     refine le_antisymm ?_ (Submodule.span_le.2 (by rintro _ ⟨j, rfl⟩; exact hωV _ (v j).2))
     rintro F ⟨⟨hF1, -⟩, hF2⟩
     have hFk : ∀ (κ : J) g, F (g * κ) = e (χ κ) • F g := fun κ g => congrFun (hF2 κ) g
@@ -138,7 +173,10 @@ theorem finrank_typeSp_cx : ∀ (L : Type) [Field L] [NumberField L] [IsCMField 
       intro α g i; simp only [fa, LinearEquiv.apply_symm_apply]
     have hfaV : ∀ α, fa α ∈ V := by
       intro α
-      refine ⟨fun γ g => b.equivFun.injective (funext fun i => ?_), fun κ g => b.equivFun.injective (funext fun i => ?_)⟩
+      refine ⟨
+        fun γ g => b.equivFun.injective (funext fun i => ?_),
+        fun κ g => b.equivFun.injective (funext fun i => ?_)
+      ⟩
       set_option synthInstance.maxHeartbeats 100000 in
         · rw [hfa, hF1, hρ', hρ, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
           simp only [hβ1, hfa]
@@ -151,7 +189,8 @@ theorem finrank_typeSp_cx : ∀ (L : Type) [Field L] [NumberField L] [IsCMField 
       refine hP _ (hfaV α) fun g hg => b.equivFun.injective (funext fun i => ?_)
       rw [hfa, map_zero, Pi.zero_apply]
       by_contra h
-      exact hα (Finset.mem_biUnion.2 ⟨g, hg, Finset.mem_biUnion.2 ⟨i, Finset.mem_univ _, Finsupp.mem_support_iff.2 h⟩⟩)
+      exact hα (Finset.mem_biUnion.2
+        ⟨g, hg, Finset.mem_biUnion.2 ⟨i, Finset.mem_univ _, Finsupp.mem_support_iff.2 h⟩⟩)
     have hsub : ∀ g i, (β.repr (b'.equivFun (F g) i)).support ⊆ S := by
       intro g i α hα
       by_contra hS
@@ -165,7 +204,8 @@ theorem finrank_typeSp_cx : ∀ (L : Type) [Field L] [NumberField L] [IsCMField 
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, smul_eq_mul, hωc, hfa]
       conv_lhs => rw [← β.linearCombination_repr (b'.equivFun (F g) i)]
-      rw [Finsupp.linearCombination_apply, Finsupp.sum_of_support_subset _ (hsub g i) (fun a c => c • β a) (fun _ _ => zero_smul _ _)]
+      rw [Finsupp.linearCombination_apply,
+        Finsupp.sum_of_support_subset _ (hsub g i) (fun a c => c • β a) (fun _ _ => zero_smul _ _)]
       exact Finset.sum_congr rfl fun α _ => mul_comm _ _
     rw [hFeq]
     refine Submodule.sum_mem _ fun α _ => Submodule.smul_mem _ _ ?_

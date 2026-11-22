@@ -21,7 +21,8 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open Formalism.BasicNotions Formalism.DivisionValues Formalism.L2.DIV Formalism.L2.GlobalTheoryTheory.HLatOps
+open Formalism.BasicNotions Formalism.DivisionValues Formalism.L2.DIV
+  Formalism.L2.GlobalTheoryTheory.HLatOps
 
 namespace GSD
 
@@ -42,7 +43,8 @@ abbrev hGram (h : S.Ok) : Matrix (Fin (S.hDim h)) (Fin (S.hDim h)) K := (S.toCSD
 
 def PosH (h : S.Ok) : Prop := ∀ v : InfinitePlace K, ((S.hGram h).map v.embedding).PosDef
 
-@[reducible] def toH (h : S.Ok) (L : Submodule (𝓞 K) S.EqFun) : HLat K where
+@[reducible]
+def toH (h : S.Ok) (L : Submodule (𝓞 K) S.EqFun) : HLat K where
   V := S.EqFun
   ι := Fin (S.hDim h)
   b := S.hB h
@@ -67,7 +69,8 @@ def subB (h : S.Ok) (U : Submodule K S.EqFun) : Basis (Fin (S.subD h U)) K U :=
 def subMat (h : S.Ok) (U : Submodule K S.EqFun) : Matrix (Fin (S.hDim h)) (Fin (S.subD h U)) K :=
   subE (S.subZ h U)
 
-@[reducible] def subH (h : S.Ok) (U : Submodule K S.EqFun) (L : Submodule (𝓞 K) U) : HLat K where
+@[reducible]
+def subH (h : S.Ok) (U : Submodule K S.EqFun) (L : Submodule (𝓞 K) U) : HLat K where
   V := U
   ι := Fin (S.subD h U)
   b := S.subB h U
@@ -78,15 +81,18 @@ end GSD
 
 section Cols
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
 
-@[reducible] def latH (u : Pr.Word) (j : ℕ) : HLat X.K :=
+@[reducible]
+def latH (u : Pr.Word) (j : ℕ) : HLat X.K :=
   (colGSD W Ch u j).toH (colOk W Ch hX u j) (ColL W Ch u j)
 
-@[reducible] def Mu0H (u : Pr.Word) : HLat X.K :=
-  (colGSD W Ch u 0).toH (colOk W Ch hX u 0) (MfL W Ch u)
+@[reducible]
+def Mu0H (u : Pr.Word) : HLat X.K := (colGSD W Ch u 0).toH (colOk W Ch hX u 0) (MfL W Ch u)
 
-@[reducible] def MramH (u : Pr.Word) : HLat X.K :=
+@[reducible]
+def MramH (u : Pr.Word) : HLat X.K :=
   (colGSD W Ch u 0).subH (colOk W Ch hX u 0) (MramV W Ch u) (MramL W Ch u)
 
 def ramInclH (u : Pr.Word) : (MramH W Ch hX u).V →ₗ[X.K] (Mu0H W Ch hX u).V := ramIncl W Ch u
@@ -95,10 +101,13 @@ end Cols
 
 section Rows
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
-  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (mu : Tup X.F X.E X.K S)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
+  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+  {S : Set ℕ} (mu : Tup X.F X.E X.K S)
 
-@[reducible] def MtildeH (P : LevFam X.E X.K R.r Pr.vGs) : HLat X.K :=
+@[reducible]
+def MtildeH (P : LevFam X.E X.K R.r Pr.vGs) : HLat X.K :=
   (mtildeGSD W Ch sel mu P).toH (mtildeOk W Ch sel mu hX P) (MtildeL W Ch sel mu P)
 
 end Rows

@@ -11,20 +11,24 @@ open scoped ENNReal
 
 namespace GlobalTheory
 
-theorem glueMeas_univ_ne_top_of_compact {M : Type} [TopologicalSpace M] [CompactSpace M]
-    [MeasurableSpace M] [BorelSpace M] [SecondCountableTopology M] {n : ℕ} {ι : Type}
-    (e : ι → OpenPartialHomeomorph M (V n)) (hcov : ∀ y, ∃ i, y ∈ (e i).source)
-    (hd : ∀ i j, DifferentiableOn ℂ (e j ∘ (e i).symm)
-      ((e i).target ∩ (e i).symm ⁻¹' (e j).source))
+theorem glueMeas_univ_ne_top_of_compact
+    {M : Type} [TopologicalSpace M] [CompactSpace M] [MeasurableSpace M] [BorelSpace M]
+    [SecondCountableTopology M]
+    {n : ℕ} {ι : Type} (e : ι → OpenPartialHomeomorph M (V n)) (hcov : ∀ y, ∃ i, y ∈ (e i).source)
+    (hd : ∀ i j, DifferentiableOn ℂ (e j ∘ (e i).symm) ((e i).target ∩ (e i).symm ⁻¹' (e j).source))
     (r : ι → V n → ℝ) (hr : ∀ i, ContinuousOn (r i) (e i).target)
-    (hc : ∀ i j y, y ∈ (e i).source → y ∈ (e j).source →
-      r i (e i y) = ‖GlobalTheory.ChartGlue.transDet (e i) (e j) y‖ ^ 2 * r j (e j y)) :
-    GlobalTheory.ChartGlue.glueMeas e (fun i y => ENNReal.ofReal (r i (e i y))) univ ≠ ∞ := by
+    (hc : ∀ i j y,
+      y ∈ (e i).source → y ∈ (e j).source
+        → r i (e i y) = ‖GlobalTheory.ChartGlue.transDet (e i) (e j) y‖ ^ 2 * r j (e j y))
+    : GlobalTheory.ChartGlue.glueMeas e (fun i y => ENNReal.ofReal (r i (e i y))) univ ≠ ∞ := by
   classical
   set μ := GlobalTheory.ChartGlue.glueMeas e (fun i y => ENNReal.ofReal (r i (e i y))) with hμ
-  have hρ : ∀ i j y, y ∈ (e i).source → y ∈ (e j).source →
-      ENNReal.ofReal (r i (e i y)) =
-        ENNReal.ofReal (‖GlobalTheory.ChartGlue.transDet (e i) (e j) y‖ ^ 2) * ENNReal.ofReal (r j (e j y)) := by
+  have hρ
+      : ∀ i j y,
+        y ∈ (e i).source → y ∈ (e j).source
+          → ENNReal.ofReal (r i (e i y))
+            = ENNReal.ofReal (‖GlobalTheory.ChartGlue.transDet (e i) (e j) y‖ ^ 2)
+              * ENNReal.ofReal (r j (e j y)) := by
     intro i j y hi hj
     rw [← ENNReal.ofReal_mul (sq_nonneg _), hc i j y hi hj]
   have hloc : ∀ y : M, ∃ U : Set M, IsOpen U ∧ y ∈ U ∧ μ U < ∞ := by
@@ -45,20 +49,19 @@ theorem glueMeas_univ_ne_top_of_compact {M : Type} [TopologicalSpace M] [Compact
     have hm := GlobalTheory.ChartGlue.measurableSet_image (e i) hUo.measurableSet hUs
     rw [hμ, GlobalTheory.ChartGlue.glueMeas_apply e _ hd hρ i hUo.measurableSet hUs,
       GlobalTheory.ChartGlue.chartMeas_apply_of_subset _ _ hUo.measurableSet hUs]
-    calc ∫⁻ v in (e i) '' U, ENNReal.ofReal (r i ((e i) ((e i).symm v)))
-        ≤ ∫⁻ _ in (e i) '' U, ENNReal.ofReal C := by
-          refine setLIntegral_mono' hm fun v hv => ENNReal.ofReal_le_ofReal ?_
-          rw [(e i).right_inv (hδs (himg hv))]
-          have := hC v (himg hv)
-          rw [Real.norm_eq_abs] at this
-          exact (le_abs_self _).trans this
+    calc
+      ∫⁻ v in (e i) '' U, ENNReal.ofReal (r i ((e i) ((e i).symm v)))
+          ≤ ∫⁻ _ in (e i) '' U, ENNReal.ofReal C := by
+        refine setLIntegral_mono' hm fun v hv => ENNReal.ofReal_le_ofReal ?_
+        rw [(e i).right_inv (hδs (himg hv))]
+        have := hC v (himg hv)
+        rw [Real.norm_eq_abs] at this
+        exact (le_abs_self _).trans this
       _ = ENNReal.ofReal C * volume ((e i) '' U) := setLIntegral_const _ _
-      _ ≤ ENNReal.ofReal C * volume (Metric.closedBall ((e i) y) δ) := by
-          gcongr
+      _ ≤ ENNReal.ofReal C * volume (Metric.closedBall ((e i) y) δ) := by gcongr
       _ < ∞ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top measure_closedBall_lt_top
   choose U hUo hyU hUf using hloc
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover U hUo
-    (fun y _ => mem_iUnion.2 ⟨y, hyU y⟩)
+  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover U hUo (fun y _ => mem_iUnion.2 ⟨y, hyU y⟩)
   refine ne_of_lt (lt_of_le_of_lt (measure_mono ht) ?_)
   exact (measure_biUnion_finset_le t U).trans_lt (ENNReal.sum_lt_top.2 fun y _ => hUf y)
 

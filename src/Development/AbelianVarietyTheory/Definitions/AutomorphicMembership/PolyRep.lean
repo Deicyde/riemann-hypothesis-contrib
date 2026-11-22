@@ -18,14 +18,15 @@ variable {ι : Type} {m : ι → ℕ}
 
 abbrev EntIx (m : ι → ℕ) : Type := Σ τ, Fin (m τ) × Fin (m τ)
 
-def evEnt {M : ℕ} (P : Matrix (Fin M) (Fin M) (MvPolynomial (EntIx m) ℤ)) {R : Type} [CommRing R] (A : Mat m R) :
-    Matrix (Fin M) (Fin M) R :=
+def evEnt
+    {M : ℕ} (P : Matrix (Fin M) (Fin M) (MvPolynomial (EntIx m) ℤ))
+    {R : Type} [CommRing R]
+    (A : Mat m R)
+    : Matrix (Fin M) (Fin M) R :=
   P.map (aeval fun v : EntIx m => A v.1 v.2.1 v.2.2)
 
 structure PolyRep (m : ι → ℕ) : Type where
-
   M : ℕ
-
   ent : Matrix (Fin M) (Fin M) (MvPolynomial (EntIx m) ℤ)
   one : ∀ (R : Type) [CommRing R], evEnt ent (1 : Mat m R) = 1
   mul : ∀ (R : Type) [CommRing R] (A B : Mat m R), evEnt ent (A * B) = evEnt ent A * evEnt ent B
@@ -33,11 +34,14 @@ structure PolyRep (m : ι → ℕ) : Type where
 
 namespace PolyRep
 
-def ev (ρ : PolyRep m) {R : Type} [CommRing R] (A : Mat m R) : Matrix (Fin ρ.M) (Fin ρ.M) R := evEnt ρ.ent A
+def ev (ρ : PolyRep m) {R : Type} [CommRing R] (A : Mat m R) : Matrix (Fin ρ.M) (Fin ρ.M) R :=
+  evEnt ρ.ent A
 
-def lie [Fintype ι] (ρ : PolyRep m) {R : Type} [CommRing R] (A : Mat m R) : Matrix (Fin ρ.M) (Fin ρ.M) R :=
-  Matrix.of fun i j => ∑ v : EntIx m,
-    aeval (fun w : EntIx m => (1 : Mat m R) w.1 w.2.1 w.2.2) (pderiv v (ρ.ent i j)) * A v.1 v.2.1 v.2.2
+def lie [Fintype ι] (ρ : PolyRep m) {R : Type} [CommRing R] (A : Mat m R)
+    : Matrix (Fin ρ.M) (Fin ρ.M) R :=
+  Matrix.of fun i j =>
+    ∑ v : EntIx m,
+      aeval (fun w : EntIx m => (1 : Mat m R) w.1 w.2.1 w.2.2) (pderiv v (ρ.ent i j)) * A v.1 v.2.1 v.2.2
 
 def proj (m : ι → ℕ) (τ : ι) : PolyRep m where
   M := m τ

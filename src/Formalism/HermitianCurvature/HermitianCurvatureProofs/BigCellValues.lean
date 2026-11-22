@@ -8,7 +8,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.HomogeneityN
 
 namespace Formalism.FourierDecayAlt.P
 
-open Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+open Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q
 
 noncomputable section
 
@@ -64,7 +65,8 @@ theorem big_cell_values : TL.CellVals := by
     have hi : ((Fin.castLE (by omega) i : Fin (r + 1)) : ℕ) < r := i.isLt
     simp only [d, hi, dite_true]
     rfl
-  have hDl : Dmin k r Bs.z Bs.z' (bigCell k r x.1 μ) (Fin.last (r + 1)) = (∏ a : Fin r, x.1 a) * ζ := by
+  have hDl
+      : Dmin k r Bs.z Bs.z' (bigCell k r x.1 μ) (Fin.last (r + 1)) = (∏ a : Fin r, x.1 a) * ζ := by
     rw [hD]
     show ∏ i : Fin (r + 1), d (Fin.castLE (by omega) i) = _
     rw [Fin.prod_univ_castSucc]
@@ -76,7 +78,9 @@ theorem big_cell_values : TL.CellVals := by
       rfl
     · have hi : ¬ ((Fin.castLE (by omega) (Fin.last r) : Fin (r + 1)) : ℕ) < r := by simp
       simp only [d, hi, dite_false]
-  have hGf : Gf k r Bs.z Bs.z' (bigCell k r x.1 μ) = Complex.normSq (∏ a : Fin r, x.1 a) * GGl k r Bs.z Bs.z' x.2 := by
+  have hGf
+      : Gf k r Bs.z Bs.z' (bigCell k r x.1 μ)
+        = Complex.normSq (∏ a : Fin r, x.1 a) * GGl k r Bs.z Bs.z' x.2 := by
     unfold Gf
     rw [hDl, hDr]
     show _ = _ * (Complex.normSq ζ - Tz k r Bs.z * Tz k r Bs.z')

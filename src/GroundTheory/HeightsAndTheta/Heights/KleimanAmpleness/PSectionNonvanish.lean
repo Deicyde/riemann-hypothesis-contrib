@@ -35,7 +35,9 @@ theorem SectionNonvanish.proof : SectionNonvanish.Statement.{u, w} := by
     rw [hD I]
     exact hsec s hs
   have hone : (1 : Submodule (chartRing k x I) Ω) ≤ idealMod pp I :=
-    calc (1 : Submodule (chartRing k x I) Ω) = D.toSubSystem.sub I * P := hP.symm
+    calc
+      (1 : Submodule (chartRing k x I) Ω)
+        = D.toSubSystem.sub I * P := hP.symm
       _ ≤ idealMod pp I * D.toSubSystem.sub I * P := mul_le_mul' hsub le_rfl
       _ = idealMod pp I := by rw [mul_assoc]; erw [hP]; rw [mul_one]
   have h1 : (1 : Ω) ∈ idealMod pp I := hone (Submodule.mem_one.mpr ⟨1, map_one _⟩)

@@ -9,17 +9,22 @@ public import Development.AbelianVarietyTheory.BlockTheory.ExistenceTori.Generat
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 open Polynomial
 
 namespace GlobalTheory.RootOfUniformiserDVR
 
-theorem val_term_le_one' {F : Type} [Field F] {O : ValuationSubring F} {β : Type} (s : Finset β) (f : β → F)
+theorem val_term_le_one'
+    {F : Type} [Field F]
+    {O : ValuationSubring F} {β : Type} (s : Finset β) (f : β → F)
     (hf : ∀ i ∈ s, ∀ j ∈ s, f i ≠ 0 → O.valuation (f i) = O.valuation (f j) → i = j)
-    (hs : O.valuation (∑ i ∈ s, f i) ≤ 1) : ∀ i ∈ s, O.valuation (f i) ≤ 1 := by
+    (hs : O.valuation (∑ i ∈ s, f i) ≤ 1)
+    : ∀ i ∈ s, O.valuation (f i) ≤ 1 := by
   classical
   intro i hi
   obtain ⟨j, hj, hmax⟩ := s.exists_max_image (fun i => O.valuation (f i)) ⟨i, hi⟩
@@ -33,13 +38,20 @@ theorem val_term_le_one' {F : Type} [Field F] {O : ValuationSubring F} {β : Typ
   rw [Finset.mem_erase] at hk
   exact lt_of_le_of_ne (hmax k hk.2) fun he => hk.1 (hf j hj k hk.2 h0 he.symm).symm
 
-theorem cong_on_adjoin : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] (F : Type) [Field F]
-    [Algebra (FractionRing W) F] [Algebra W F] [IsScalarTower W (FractionRing W) F]
-    (O : ValuationSubring F),
-    (∀ w : W, algebraMap W F w ∈ O) → (∀ w ∈ maximalIdeal W, algebraMap W F w ∈ O.nonunits) →
-    ∀ (ϖ : W), Irreducible ϖ → ∀ (l : ℕ), l ≠ 0 → ∀ (x : F), x ^ l = algebraMap W F ϖ →
-    ∀ (g : F ≃ₐ[FractionRing W] F) (b : F), b ∈ IntermediateField.adjoin (FractionRing W) {x} →
-    O.valuation b ≤ 1 → O.valuation (g b - b) < 1 := by
+theorem cong_on_adjoin
+    : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] (F : Type) [Field F]
+        [Algebra (FractionRing W) F] [Algebra W F] [IsScalarTower W (FractionRing W) F]
+        (O : ValuationSubring F),
+      (∀ w : W, algebraMap W F w ∈ O) → (∀ w ∈ maximalIdeal W, algebraMap W F w ∈ O.nonunits)
+        → ∀ (ϖ : W),
+          Irreducible ϖ
+            → ∀ (l : ℕ),
+              l ≠ 0
+                → ∀ (x : F),
+                  x ^ l = algebraMap W F ϖ
+                    → ∀ (g : F ≃ₐ[FractionRing W] F) (b : F),
+                      b ∈ IntermediateField.adjoin (FractionRing W) {x} → O.valuation b ≤ 1
+                        → O.valuation (g b - b) < 1 := by
   intro W _ _ _ F _ _ _ _ O hO hm ϖ hϖ l hl0 x hx g b hb hb1
   have hϖ0 : ϖ ≠ 0 := hϖ.ne_zero
   set ϖK : FractionRing W := algebraMap W (FractionRing W) ϖ with hϖK
@@ -49,7 +61,9 @@ theorem cong_on_adjoin : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteVal
     intro u
     have a1 := (O.valuation_le_one_iff _).2 (hO u)
     have a2 := (O.valuation_le_one_iff _).2 (hO ((u⁻¹ : Wˣ) : W))
-    have e : O.valuation (algebraMap W F (u : W)) * O.valuation (algebraMap W F ((u⁻¹ : Wˣ) : W)) = 1 := by
+    have e
+        : O.valuation (algebraMap W F (u : W)) * O.valuation (algebraMap W F ((u⁻¹ : Wˣ) : W))
+          = 1 := by
       rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
     refine le_antisymm a1 ?_
     by_contra hc
@@ -60,8 +74,9 @@ theorem cong_on_adjoin : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteVal
   have hϖlt : O.valuation (algebraMap W F ϖ) < 1 := by
     have := hm ϖ ((IsLocalRing.mem_maximalIdeal _).2 hϖ.not_isUnit)
     exact this
-  have hWv : ∀ w : W, w ≠ 0 → ∃ n : ℕ,
-      O.valuation (algebraMap W F w) = O.valuation (algebraMap W F ϖ) ^ n := by
+  have hWv
+      : ∀ w : W,
+        w ≠ 0 → ∃ n : ℕ, O.valuation (algebraMap W F w) = O.valuation (algebraMap W F ϖ) ^ n := by
     intro w hw
     obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hw hϖ
     exact ⟨n, by rw [map_mul, map_mul, hunit, _root_.one_mul, map_pow, map_pow]⟩
@@ -75,8 +90,12 @@ theorem cong_on_adjoin : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteVal
       rw [IsScalarTower.algebraMap_apply W (FractionRing W) F] at h0
       exact (map_eq_zero _).mp h0
     exact (IsFractionRing.injective W (FractionRing W)) (by rw [this, map_zero])
-  have hK : ∀ a : FractionRing W, a ≠ 0 → ∃ m : ℤ,
-      O.valuation (algebraMap (FractionRing W) F a) = O.valuation (algebraMap (FractionRing W) F ϖK) ^ m := by
+  have hK
+      : ∀ a : FractionRing W,
+        a ≠ 0
+          → ∃ m : ℤ,
+            O.valuation (algebraMap (FractionRing W) F a)
+              = O.valuation (algebraMap (FractionRing W) F ϖK) ^ m := by
     intro a ha
     obtain ⟨p, q, hq, rfl⟩ := IsFractionRing.div_surjective (A := W) a
     have hq0 : q ≠ 0 := nonZeroDivisors.ne_zero hq
@@ -98,15 +117,20 @@ theorem cong_on_adjoin : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteVal
     rw [IsScalarTower.algebraMap_apply W (FractionRing W) F, ← hϖK, htl] at this
     exact (pow_lt_one_iff hl0).mp this
   have hinj : Function.Injective fun n : ℤ => t ^ n := zpow_right_injective₀ ht0 ht1.ne
-  have hval : ∀ (a : FractionRing W) (i : ℕ), algebraMap (FractionRing W) F a * x ^ i ≠ 0 →
-      ∃ m : ℤ, O.valuation (algebraMap (FractionRing W) F a * x ^ i) = t ^ ((i : ℤ) + l * m) := by
+  have hval
+      : ∀ (a : FractionRing W) (i : ℕ),
+        algebraMap (FractionRing W) F a * x ^ i ≠ 0
+          → ∃ m : ℤ,
+            O.valuation (algebraMap (FractionRing W) F a * x ^ i) = t ^ ((i : ℤ) + l * m) := by
     intro a i ha
     have ha0 : a ≠ 0 := by rintro rfl; simp at ha
     obtain ⟨m, hm⟩ := hK a ha0
     refine ⟨m, ?_⟩
-    rw [map_mul, hm, htl, map_pow, zpow_add₀ ht0.ne', zpow_mul, zpow_natCast, zpow_natCast, mul_comm]
-  have hmod : ∀ (i j : ℕ) (m n : ℤ), i < l → j < l → t ^ ((i : ℤ) + l * m) = t ^ ((j : ℤ) + l * n) →
-      i = j := by
+    rw [map_mul, hm, htl, map_pow, zpow_add₀ ht0.ne', zpow_mul, zpow_natCast, zpow_natCast,
+      mul_comm]
+  have hmod
+      : ∀ (i j : ℕ) (m n : ℤ),
+        i < l → j < l → t ^ ((i : ℤ) + l * m) = t ^ ((j : ℤ) + l * n) → i = j := by
     intro i j m n hi hj he
     have := congrArg (· % (l : ℤ)) (hinj he)
     simp only [Int.add_mul_emod_self_left] at this
@@ -121,23 +145,29 @@ theorem cong_on_adjoin : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteVal
   set p := p₀ %ₘ (X ^ l - C ϖK)
   have hp : aeval x p = aeval x p₀ := aeval_modByMonic_eq_self_of_root (by simp [hx'])
   have hdeg : p.natDegree < l := by
-    have := natDegree_modByMonic_lt p₀ hq (by
-      intro h1
-      have := congrArg natDegree h1
-      rw [natDegree_X_pow_sub_C _, natDegree_one] at this
-      exact hl0 this)
+    have :=
+      natDegree_modByMonic_lt p₀ hq (by
+        intro h1
+        have := congrArg natDegree h1
+        rw [natDegree_X_pow_sub_C _, natDegree_one] at this
+        exact hl0 this)
     rwa [natDegree_X_pow_sub_C _] at this
   change O.valuation (aeval x p₀) ≤ 1 at hb1
   change O.valuation (g (aeval x p₀) - aeval x p₀) < 1
   rw [← hp, aeval_eq_sum_range' hdeg] at hb1 ⊢
   simp only [Algebra.smul_def] at hb1 ⊢
-  have hle := val_term_le_one' _ _ (fun i hi j hj h0 he => by
-    obtain ⟨m, hm⟩ := hval _ i h0
-    obtain ⟨n, hn⟩ := hval (p.coeff j) j (by
-      intro h00
-      rw [h00, map_zero] at he
-      exact h0 (by simpa using he))
-    exact hmod i j m n (Finset.mem_range.mp hi) (Finset.mem_range.mp hj) (by rw [← hm, ← hn, he])) hb1
+  have hle :=
+    val_term_le_one' _ _
+      (fun i hi j hj h0 he => by
+        obtain ⟨m, hm⟩ := hval _ i h0
+        obtain ⟨n, hn⟩ :=
+          hval (p.coeff j) j (by
+            intro h00
+            rw [h00, map_zero] at he
+            exact h0 (by simpa using he))
+        exact hmod i j m n (Finset.mem_range.mp hi) (Finset.mem_range.mp hj)
+          (by rw [← hm, ← hn, he]))
+      hb1
   have hgx : O.valuation (g x) = t := by
     refine (pow_left_injective hl0 : Function.Injective (fun a : O.ValueGroup => a ^ l)) ?_
     show _ ^ l = t ^ l

@@ -8,8 +8,9 @@ open Topology Filter
 
 namespace GlobalTheory.SmoothFix
 
-theorem eq_one_of_pow_norm_sub_one_le_half {A : Type} [NormedRing A] [NormedAlgebra ℂ A] {x : A}
-    (h : ∀ m : ℕ, ‖x ^ m - 1‖ ≤ 1 / 2) : x = 1 := by
+theorem eq_one_of_pow_norm_sub_one_le_half
+    {A : Type} [NormedRing A] [NormedAlgebra ℂ A] {x : A} (h : ∀ m : ℕ, ‖x ^ m - 1‖ ≤ 1 / 2)
+    : x = 1 := by
   have h1 : ∀ k : ℕ, (3 / 2 : ℝ) ^ k * ‖x - 1‖ ≤ ‖x ^ (2 ^ k) - 1‖ := fun k => by
     induction k with
     | zero => simp
@@ -35,14 +36,17 @@ theorem eq_one_of_pow_norm_sub_one_le_half {A : Type} [NormedRing A] [NormedAlge
 
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
-theorem exists_nhds_fix : (∀ {V : Type} [AddCommGroup V] [Module ℂ V] (s : Set V),
-    (∀ l : V →ₗ[ℂ] ℂ, ∃ C : ℝ, ∀ x ∈ s, ‖l x‖ ≤ C) → FiniteDimensional ℂ (Submodule.span ℂ s)) →
-  ∀ {G : Type} [Group G] [TopologicalSpace G] (H : Subgroup G) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (S : G → Module.End ℂ V), (∀ x ∈ H, ∀ y ∈ H, S (x * y) = S x * S y) → S 1 = 1 →
-    (∀ (l : V →ₗ[ℂ] ℂ) (w : V), ContinuousOn (fun x => l (S x w)) (H : Set G)) →
-    (∀ U ∈ 𝓝 (1 : G), ∃ K : Subgroup G, K ≤ H ∧ IsCompact (K : Set G) ∧
-      (∃ O : Set G, IsOpen O ∧ (1 : G) ∈ O ∧ ∀ x ∈ O, x ∈ H → x ∈ K) ∧ (K : Set G) ⊆ U) →
-    ∀ v : V, ∃ U ∈ 𝓝 (1 : G), ∀ x ∈ U, x ∈ H → S x v = v := by
+theorem exists_nhds_fix
+    : (∀ {V : Type} [AddCommGroup V] [Module ℂ V] (s : Set V),
+        (∀ l : V →ₗ[ℂ] ℂ, ∃ C : ℝ, ∀ x ∈ s, ‖l x‖ ≤ C) → FiniteDimensional ℂ (Submodule.span ℂ s))
+      → ∀ {G : Type} [Group G] [TopologicalSpace G] (H : Subgroup G) {V : Type} [AddCommGroup V]
+          [Module ℂ V] (S : G → Module.End ℂ V),
+        (∀ x ∈ H, ∀ y ∈ H, S (x * y) = S x * S y) → S 1 = 1
+          → (∀ (l : V →ₗ[ℂ] ℂ) (w : V), ContinuousOn (fun x => l (S x w)) (H : Set G))
+          → (∀ U ∈ 𝓝 (1 : G), ∃ K : Subgroup G,
+            K ≤ H ∧ IsCompact (K : Set G)
+              ∧ (∃ O : Set G, IsOpen O ∧ (1 : G) ∈ O ∧ ∀ x ∈ O, x ∈ H → x ∈ K) ∧ (K : Set G) ⊆ U)
+          → ∀ v : V, ∃ U ∈ 𝓝 (1 : G), ∀ x ∈ U, x ∈ H → S x v = v := by
   intro hfd G _ _ H V _ _ S hmul h1 hcont hsmall v
   obtain ⟨K₀, hK₀H, hK₀c, ⟨O₀, hO₀o, hO₀1, hO₀K⟩, -⟩ := hsmall Set.univ univ_mem
   let s : Set V := (fun k => S k v) '' (K₀ : Set G)
@@ -79,7 +83,8 @@ theorem exists_nhds_fix : (∀ {V : Type} [AddCommGroup V] [Module ℂ V] (s : S
       rw [hmul _ hm _ (hK₀H k.2), Module.End.mul_apply]
   let b := Module.finBasis ℂ W
   choose c hc using fun i => LinearMap.exists_extend (b.coord i)
-  let M : G → Matrix (Fin (Module.finrank ℂ W)) (Fin (Module.finrank ℂ W)) ℂ := fun x i j => c i (S x (b j))
+  let M : G → Matrix (Fin (Module.finrank ℂ W)) (Fin (Module.finrank ℂ W)) ℂ := fun x i j =>
+    c i (S x (b j))
   have hMR : ∀ k : K₀, LinearMap.toMatrixAlgEquiv b (R k) = M k := by
     intro k
     ext i j

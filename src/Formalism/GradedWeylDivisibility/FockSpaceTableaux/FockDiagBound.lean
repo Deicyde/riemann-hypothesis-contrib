@@ -78,12 +78,15 @@ lemma ldiag_term0 (z : ℂ) (N : ℕ) :
       Complex.normSq_apply]
     ring
 
-private theorem mul_sq_mul_le_sq_mul_mul_of_le {c N p q : ℝ} (hc : 0 ≤ c) (hN : 0 ≤ N) (hp : 0 ≤ p)
-    (hpq : p ≤ q) : c * p ^ 2 * N ≤ q ^ 2 * (c * N) := by
+private theorem mul_sq_mul_le_sq_mul_mul_of_le
+    {c N p q : ℝ} (hc : 0 ≤ c) (hN : 0 ≤ N) (hp : 0 ≤ p) (hpq : p ≤ q)
+    : c * p ^ 2 * N ≤ q ^ 2 * (c * N) := by
   have h1 : p * p ≤ q * q := mul_self_le_mul_self hp hpq
   have h2 : 0 ≤ c * N := mul_nonneg hc hN
   have h3 := mul_le_mul_of_nonneg_right h1 h2
-  calc c * p ^ 2 * N = (p * p) * (c * N) := by ring
+  calc
+    c * p ^ 2 * N
+      = (p * p) * (c * N) := by ring
     _ ≤ (q * q) * (c * N) := h3
     _ = q ^ 2 * (c * N) := by ring
 
@@ -91,8 +94,10 @@ theorem fockDiagBound_of (h : DomPow) : FockDiagBound := by
   unfold DomPow at h
   unfold FockDiagBound
   intro r n t lam ht0 ht f hdom hsum
-  have hcoeff : ∀ m, AddMonoidAlgebra.coeff (rowAct ℂ (Matrix.diagonal fun a => (t a : ℂ)) f) m =
-      AddMonoidAlgebra.coeff f m * ((∏ a : Fin r, t a ^ rowDeg m a : ℝ) : ℂ) := by
+  have hcoeff
+      : ∀ m,
+        AddMonoidAlgebra.coeff (rowAct ℂ (Matrix.diagonal fun a => (t a : ℂ)) f) m
+          = AddMonoidAlgebra.coeff f m * ((∏ a : Fin r, t a ^ rowDeg m a : ℝ) : ℂ) := by
     intro m
     simp only [ldiag_coeff_rowAct_diag, Complex.ofReal_prod, Complex.ofReal_pow]
   have hsupp : (rowAct ℂ (Matrix.diagonal fun a => (t a : ℂ)) f).support ⊆ f.support := by
@@ -110,8 +115,7 @@ theorem fockDiagBound_of (h : DomPow) : FockDiagBound := by
   simp only [ldiag_term0, Complex.re_sum, Complex.ofReal_re]
   rw [hq, Finset.mul_sum]
   refine Finset.sum_le_sum fun m hm => ?_
-  have hP0 : 0 ≤ ∏ a : Fin r, t a ^ rowDeg m a :=
-    Finset.prod_nonneg fun a _ => pow_nonneg (ht0 a) _
+  have hP0 : 0 ≤ ∏ a : Fin r, t a ^ rowDeg m a := Finset.prod_nonneg fun a _ => pow_nonneg (ht0 a) _
   have hPle := h r t (rowDeg m) lam ht0 ht (hdom m hm) (hsum m hm)
   exact mul_sq_mul_le_sq_mul_mul_of_le (Complex.normSq_nonneg _) (Nat.cast_nonneg _) hP0 hPle
 

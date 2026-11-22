@@ -12,13 +12,15 @@ namespace GlobalTheory.GLm.ParBasic
 
 variable {g : ℕ} [Fact g.Prime] {a b : ℕ}
 
-theorem tl_apply (M : Mt g (a + b)) (i j : Fin a) : tl a M i j = M (Fin.castAdd b i) (Fin.castAdd b j) := by
+theorem tl_apply (M : Mt g (a + b)) (i j : Fin a)
+    : tl a M i j = M (Fin.castAdd b i) (Fin.castAdd b j) := by
   have hi : (i : ℕ) < a + b := by omega
   have hj : (j : ℕ) < a + b := by omega
   simp only [tl, entN, hi, hj, and_self, dif_pos]
   rfl
 
-theorem br_apply (M : Mt g (a + b)) (i j : Fin b) : br a b M i j = M (Fin.natAdd a i) (Fin.natAdd a j) := by
+theorem br_apply (M : Mt g (a + b)) (i j : Fin b)
+    : br a b M i j = M (Fin.natAdd a i) (Fin.natAdd a j) := by
   have hi : a + (i : ℕ) < a + b := by omega
   have hj : a + (j : ℕ) < a + b := by omega
   simp only [br, entN, hi, hj, and_self, dif_pos]
@@ -27,20 +29,23 @@ theorem br_apply (M : Mt g (a + b)) (i j : Fin b) : br a b M i j = M (Fin.natAdd
 def blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b) : Mt g (a + b) :=
   (Matrix.fromBlocks A B 0 D).submatrix finSumFinEquiv.symm finSumFinEquiv.symm
 
-def ur (a b : ℕ) (M : Mt g (a + b)) : Matrix (Fin a) (Fin b) (ZMod g) :=
-  fun i j => M (Fin.castAdd b i) (Fin.natAdd a j)
+def ur (a b : ℕ) (M : Mt g (a + b)) : Matrix (Fin a) (Fin b) (ZMod g) := fun i j =>
+  M (Fin.castAdd b i) (Fin.natAdd a j)
 
-theorem tl_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b) : tl a (blkM A B D) = A := by
+theorem tl_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b)
+    : tl a (blkM A B D) = A := by
   ext i j; simp [tl_apply, blkM]
 
-theorem br_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b) : br a b (blkM A B D) = D := by
+theorem br_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b)
+    : br a b (blkM A B D) = D := by
   ext i j; simp [br_apply, blkM]
 
-theorem ur_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b) : ur a b (blkM A B D) = B := by
+theorem ur_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b)
+    : ur a b (blkM A B D) = B := by
   ext i j; simp [ur, blkM]
 
-theorem inPar_iff (M : Mt g (a + b)) :
-    InPar a M ↔ ∀ (i : Fin b) (j : Fin a), M (Fin.natAdd a i) (Fin.castAdd b j) = 0 := by
+theorem inPar_iff (M : Mt g (a + b))
+    : InPar a M ↔ ∀ (i : Fin b) (j : Fin a), M (Fin.natAdd a i) (Fin.castAdd b j) = 0 := by
   constructor
   · intro h i j
     exact h _ _ (by simp) (by simp)
@@ -49,49 +54,59 @@ theorem inPar_iff (M : Mt g (a + b)) :
     convert this using 2 <;> ext <;> simp
     omega
 
-theorem inPar_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b) : InPar a (blkM A B D) := by
+theorem inPar_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b)
+    : InPar a (blkM A B D) := by
   rw [inPar_iff]
-  intro i j; simp [blkM]
+  intro i j
+  simp [blkM]
 
 theorem blkM_eq {M : Mt g (a + b)} (h : InPar a M) : blkM (tl a M) (ur a b M) (br a b M) = M := by
   rw [inPar_iff] at h
   ext i j
-  refine Fin.addCases (fun i => ?_) (fun i => ?_) i <;> refine Fin.addCases (fun j => ?_) (fun j => ?_) j <;>
-    simp [blkM, tl_apply, br_apply, ur, h]
+  refine Fin.addCases (fun i => ?_) (fun i => ?_) i
+    <;> refine Fin.addCases (fun j => ?_) (fun j => ?_) j <;> simp [blkM, tl_apply, br_apply, ur, h]
 
-theorem det_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b) :
-    (blkM A B D).det = A.det * D.det := by
+theorem det_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b)
+    : (blkM A B D).det = A.det * D.det := by
   rw [blkM, Matrix.det_submatrix_equiv_self, Matrix.det_fromBlocks_zero₂₁]
 
-theorem isUnit_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b) :
-    IsUnit (blkM A B D) ↔ IsUnit A ∧ IsUnit D := by
+theorem isUnit_blkM (A : Mt g a) (B : Matrix (Fin a) (Fin b) (ZMod g)) (D : Mt g b)
+    : IsUnit (blkM A B D) ↔ IsUnit A ∧ IsUnit D := by
   simp only [Matrix.isUnit_iff_isUnit_det, det_blkM, IsUnit.mul_iff]
 
-theorem blkM_mul (A A' : Mt g a) (B B' : Matrix (Fin a) (Fin b) (ZMod g)) (D D' : Mt g b) :
-    blkM A B D * blkM A' B' D' = blkM (A * A') (A * B' + B * D') (D * D') := by
+theorem blkM_mul (A A' : Mt g a) (B B' : Matrix (Fin a) (Fin b) (ZMod g)) (D D' : Mt g b)
+    : blkM A B D * blkM A' B' D' = blkM (A * A') (A * B' + B * D') (D * D') := by
   rw [blkM, blkM, Matrix.submatrix_mul_equiv, Matrix.fromBlocks_multiply]
   simp [blkM]
 
-theorem isUnit_blocks (x : Gn g (a + b)) (h : InPar a (x : Mt g (a + b))) :
-    IsUnit (tl a (x : Mt g (a + b))) ∧ IsUnit (br a b (x : Mt g (a + b))) := by
+theorem isUnit_blocks (x : Gn g (a + b)) (h : InPar a (x : Mt g (a + b)))
+    : IsUnit (tl a (x : Mt g (a + b))) ∧ IsUnit (br a b (x : Mt g (a + b))) := by
   rw [← isUnit_blkM _ (ur a b x.val), blkM_eq h]
   exact x.isUnit
 
-theorem blocks_mul (x y : Mt g (a + b)) (hx : InPar a x) (hy : InPar a y) :
-    InPar a (x * y) ∧ tl a (x * y) = tl a x * tl a y ∧ br a b (x * y) = br a b x * br a b y := by
+theorem blocks_mul (x y : Mt g (a + b)) (hx : InPar a x) (hy : InPar a y)
+    : InPar a (x * y) ∧ tl a (x * y) = tl a x * tl a y ∧ br a b (x * y) = br a b x * br a b y := by
   have e := blkM_mul (tl a x) (tl a y) (ur a b x) (ur a b y) (br a b x) (br a b y)
   rw [blkM_eq hx, blkM_eq hy] at e
   rw [e]
   exact ⟨inPar_blkM _ _ _, tl_blkM _ _ _, br_blkM _ _ _⟩
 
-theorem exists_subgroup {G : Type} [Group G] [Finite G] (p : G → Prop) (h1 : p 1)
-    (hm : ∀ x y, p x → p y → p (x * y)) : ∃ P : Subgroup G, ∀ x, x ∈ P ↔ p x := by
+theorem exists_subgroup
+    {G : Type} [Group G] [Finite G] (p : G → Prop) (h1 : p 1) (hm : ∀ x y, p x → p y → p (x * y))
+    : ∃ P : Subgroup G, ∀ x, x ∈ P ↔ p x := by
   have hp : ∀ x, p x → ∀ k : ℕ, p (x ^ k) := fun x hx k => by
     induction k with
     | zero => simpa using h1
     | succ k ih => rw [pow_succ]; exact hm _ _ ih hx
-  refine ⟨{ carrier := {x | p x}, mul_mem' := fun {x y} => hm x y, one_mem' := h1, inv_mem' := fun {x} hx => ?_ },
-    fun x => Iff.rfl⟩
+  refine ⟨
+    {
+      carrier := {x | p x}
+      mul_mem' := fun {x y} => hm x y
+      one_mem' := h1
+      inv_mem' := fun {x} hx => ?_
+    },
+    fun x => Iff.rfl
+  ⟩
   have : x⁻¹ = x ^ (orderOf x - 1) := by
     have h0 := orderOf_pos x
     rw [inv_eq_iff_mul_eq_one, ← pow_succ', Nat.sub_add_cancel h0, pow_orderOf_eq_one]
@@ -102,9 +117,11 @@ theorem exists_subgroup {G : Type} [Group G] [Finite G] (p : G → Prop) (h1 : p
 theorem inPar_one (a n : ℕ) : InPar a (1 : Mt g n) := fun i j hj hi =>
   Matrix.one_apply_ne (by rintro rfl; omega)
 
-theorem card_fibre (h₁ : Gn g a) (h₂ : Gn g b) :
-    (Finset.univ.filter fun x : Gn g (a + b) => InPar a (x : Mt g (a + b)) ∧
-      tl a (x : Mt g (a + b)) = (h₁ : Mt g a) ∧ br a b (x : Mt g (a + b)) = (h₂ : Mt g b)).card = g ^ (a * b) := by
+theorem card_fibre (h₁ : Gn g a) (h₂ : Gn g b)
+    : (Finset.univ.filter fun x : Gn g (a + b) =>
+        InPar a (x : Mt g (a + b)) ∧ tl a (x : Mt g (a + b)) = (h₁ : Mt g a)
+          ∧ br a b (x : Mt g (a + b)) = (h₂ : Mt g b)).card
+      = g ^ (a * b) := by
   have hc : (Finset.univ : Finset (Matrix (Fin a) (Fin b) (ZMod g))).card = g ^ (a * b) := by
     rw [Finset.card_univ]
     change Fintype.card (Fin a → Fin b → ZMod g) = _
@@ -125,11 +142,12 @@ theorem card_fibre (h₁ : Gn g a) (h₂ : Gn g b) :
 theorem toG_val {n : ℕ} {M : Mt g n} (h : IsUnit M) : (toG M).val = M := by
   rw [toG, dif_pos h, IsUnit.unit_spec]
 
-theorem card_par :
-    (Finset.univ.filter fun x : Gn g (a + b) => InPar a (x : Mt g (a + b))).card =
-      Fintype.card (Gn g a) * Fintype.card (Gn g b) * g ^ (a * b) := by
+theorem card_par
+    : (Finset.univ.filter fun x : Gn g (a + b) => InPar a (x : Mt g (a + b))).card
+      = Fintype.card (Gn g a) * Fintype.card (Gn g b) * g ^ (a * b) := by
   rw [Finset.card_eq_sum_card_fiberwise (t := (Finset.univ : Finset (Gn g a × Gn g b)))
-    (f := fun x : Gn g (a + b) => (toG (tl a x.val), toG (br a b x.val))) (fun _ _ => Finset.mem_univ _)]
+    (f := fun x : Gn g (a + b) => (toG (tl a x.val), toG (br a b x.val)))
+    (fun _ _ => Finset.mem_univ _)]
   rw [Finset.sum_congr rfl (g := fun _ => g ^ (a * b))]
   · simp
   · rintro ⟨h₁, h₂⟩ _
@@ -158,11 +176,32 @@ theorem isUniUp_mul {n : ℕ} (x y : Mt g n) (hx : IsUniUp x) (hy : IsUniUp y) :
       · rw [(hy k i).1 h, mul_zero]
     · simp
 
-theorem par_basic : ∀ (g : ℕ) [Fact g.Prime] (a b n : ℕ), n = a + b → (∃ P : Subgroup (Gn g n), ∀ x, x ∈ P ↔ InPar a (x : Mt g n)) ∧ (∃ U : Subgroup (Gn g n), ∀ x, x ∈ U ↔ IsUniUp (x : Mt g n)) ∧ (∀ x : Gn g n, InPar a (x : Mt g n) → IsUnit (tl a (x : Mt g n)) ∧ IsUnit (br a b (x : Mt g n))) ∧ (∀ x y : Mt g n, InPar a x → InPar a y → tl a (x * y) = tl a x * tl a y ∧ br a b (x * y) = br a b x * br a b y) ∧ (∀ (h₁ : Gn g a) (h₂ : Gn g b), (Finset.univ.filter fun x : Gn g n => InPar a (x : Mt g n) ∧ tl a (x : Mt g n) = (h₁ : Mt g a) ∧ br a b (x : Mt g n) = (h₂ : Mt g b)).card = g ^ (a * b)) ∧ (Finset.univ.filter fun x : Gn g n => InPar a (x : Mt g n)).card = Fintype.card (Gn g a) * Fintype.card (Gn g b) * g ^ (a * b) := by
+theorem par_basic
+    : ∀ (g : ℕ) [Fact g.Prime] (a b n : ℕ),
+      n = a + b
+        → (∃ P : Subgroup (Gn g n), ∀ x, x ∈ P ↔ InPar a (x : Mt g n))
+          ∧ (∃ U : Subgroup (Gn g n), ∀ x, x ∈ U ↔ IsUniUp (x : Mt g n))
+          ∧ (∀ x : Gn g n,
+            InPar a (x : Mt g n) → IsUnit (tl a (x : Mt g n)) ∧ IsUnit (br a b (x : Mt g n)))
+          ∧ (∀ x y : Mt g n,
+            InPar a x → InPar a y
+              → tl a (x * y) = tl a x * tl a y ∧ br a b (x * y) = br a b x * br a b y)
+          ∧ (∀ (h₁ : Gn g a) (h₂ : Gn g b),
+            (Finset.univ.filter fun x : Gn g n =>
+                InPar a (x : Mt g n) ∧ tl a (x : Mt g n) = (h₁ : Mt g a)
+                  ∧ br a b (x : Mt g n) = (h₂ : Mt g b)).card
+              = g ^ (a * b))
+          ∧ (Finset.univ.filter fun x : Gn g n => InPar a (x : Mt g n)).card
+            = Fintype.card (Gn g a) * Fintype.card (Gn g b) * g ^ (a * b) := by
   intro g _ a b n hn
   subst hn
-  exact ⟨exists_subgroup _ (inPar_one _ _) fun x y hx hy => (blocks_mul _ _ hx hy).1,
+  exact ⟨
+    exists_subgroup _ (inPar_one _ _) fun x y hx hy => (blocks_mul _ _ hx hy).1,
     exists_subgroup _ (isUniUp_one _) fun x y hx hy => isUniUp_mul _ _ hx hy,
-    isUnit_blocks, fun x y hx hy => (blocks_mul x y hx hy).2, card_fibre, card_par⟩
+    isUnit_blocks,
+    fun x y hx hy => (blocks_mul x y hx hy).2,
+    card_fibre,
+    card_par
+  ⟩
 
 end GlobalTheory.GLm.ParBasic

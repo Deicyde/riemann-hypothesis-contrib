@@ -8,7 +8,8 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ.Grp
 
@@ -18,17 +19,24 @@ variable {n : ℕ} (G : Grp k n)
 
 namespace P_DUnit
 
-theorem isUnit_det_sub (A : GL (Fin n) 𝒪[k]) (a : Fin G.s)
-    (hA : ∀ i j, G.bl j < G.bl i → (A : Matrix (Fin n) (Fin n) 𝒪[k]) i j ∈ IsLocalRing.maximalIdeal 𝒪[k]) :
-    IsUnit ((A : Matrix (Fin n) (Fin n) 𝒪[k]).submatrix
-      (Subtype.val : {i : Fin n // G.bl i ≤ a} → Fin n) Subtype.val).det := by
+theorem isUnit_det_sub
+    (A : GL (Fin n) 𝒪[k])
+    (a : Fin G.s)
+    (hA : ∀ i j,
+      G.bl j < G.bl i → (A : Matrix (Fin n) (Fin n) 𝒪[k]) i j ∈ IsLocalRing.maximalIdeal 𝒪[k])
+    : IsUnit
+      ((A : Matrix (Fin n) (Fin n) 𝒪[k]).submatrix (Subtype.val : {i : Fin n // G.bl i ≤ a} → Fin n)
+        Subtype.val).det := by
   set M := (IsLocalRing.residue 𝒪[k]).mapMatrix (A : Matrix (Fin n) (Fin n) 𝒪[k]) with hM
   have hdet : IsUnit M.det := by
     rw [hM, ← RingHom.map_det]
     exact (Matrix.isUnits_det_units A).map _
-  have htri := Matrix.twoBlockTriangular_det M (fun i => G.bl i ≤ a) (fun i hi j hj => by
-    rw [hM, RingHom.mapMatrix_apply, Matrix.map_apply, IsLocalRing.residue_eq_zero_iff]
-    exact hA i j (lt_of_le_of_lt hj (not_le.1 hi)))
+  have htri :=
+    Matrix.twoBlockTriangular_det M
+      (fun i => G.bl i ≤ a)
+      (fun i hi j hj => by
+        rw [hM, RingHom.mapMatrix_apply, Matrix.map_apply, IsLocalRing.residue_eq_zero_iff]
+        exact hA i j (lt_of_le_of_lt hj (not_le.1 hi)))
   rw [htri] at hdet
   have h1 := isUnit_of_mul_isUnit_left hdet
   rw [← IsLocalRing.residue_ne_zero_iff_isUnit, RingHom.map_det]
@@ -40,8 +48,10 @@ theorem step_DUnit : ModulusOnUnitsProp G := by
   intro hb g hg a
   obtain ⟨A, rfl⟩ := MonoidHom.mem_range.1 hg.1
   have hinj : Function.Injective (algebraMap 𝒪[k] k) := Subtype.val_injective
-  have hA : ∀ i j, G.bl j < G.bl i →
-      (A : Matrix (Fin n) (Fin n) 𝒪[k]) i j ∈ IsLocalRing.maximalIdeal 𝒪[k] := by
+  have hA
+      : ∀ i j,
+        G.bl j < G.bl i
+          → (A : Matrix (Fin n) (Fin n) 𝒪[k]) i j ∈ IsLocalRing.maximalIdeal 𝒪[k] := by
     intro i j hij
     obtain ⟨y, hy, hyx⟩ := hg.2 i j hij
     have hc : cc G.μ (G.bl j) (G.bl i) ≠ 0 := by

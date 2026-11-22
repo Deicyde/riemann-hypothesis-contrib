@@ -24,9 +24,12 @@ namespace Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.ProGW
 
 open Formalism.UG.P
 
-theorem isProGrp_of_pow {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (g : ℕ) (hg : g.Prime) (H : Subgroup G) (hc : IsCompact (H : Set G))
-    (hp : ∀ x ∈ H, Tendsto (fun m : ℕ => x ^ (g ^ m)) atTop (𝓝 1)) : IsProGrp g H := by
+theorem isProGrp_of_pow
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (g : ℕ) (hg : g.Prime)
+    (H : Subgroup G)
+    (hc : IsCompact (H : Set G)) (hp : ∀ x ∈ H, Tendsto (fun m : ℕ => x ^ (g ^ m)) atTop (𝓝 1))
+    : IsProGrp g H := by
   unfold IsProGrp
   refine ⟨hc, fun N hN hNn => ?_⟩
   haveI : CompactSpace H := isCompact_iff_compactSpace.mp hc
@@ -45,10 +48,14 @@ theorem isProGrp_of_pow {G : Type} [Group G] [TopologicalSpace G] [IsTopological
   obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hP
   exact ⟨n, hn⟩
 
-theorem isProGrp_map {G₁ G₂ : Type} [Group G₁] [TopologicalSpace G₁] [Group G₂] [TopologicalSpace G₂]
-    [IsTopologicalGroup G₂] (g : ℕ) (hg : g.Prime) (f : G₁ →* G₂) (hf : Continuous f) (H : Subgroup G₁)
-    (hc : IsCompact (H : Set G₁)) (hp : ∀ x ∈ H, Tendsto (fun m : ℕ => x ^ (g ^ m)) atTop (𝓝 1)) :
-    IsProGrp g (H.map f) := by
+theorem isProGrp_map
+    {G₁ G₂ : Type}
+    [Group G₁] [TopologicalSpace G₁] [Group G₂] [TopologicalSpace G₂] [IsTopologicalGroup G₂]
+    (g : ℕ) (hg : g.Prime)
+    (f : G₁ →* G₂) (hf : Continuous f)
+    (H : Subgroup G₁)
+    (hc : IsCompact (H : Set G₁)) (hp : ∀ x ∈ H, Tendsto (fun m : ℕ => x ^ (g ^ m)) atTop (𝓝 1))
+    : IsProGrp g (H.map f) := by
   refine isProGrp_of_pow g hg (H.map f) ?_ ?_
   · rw [Subgroup.coe_map]
     exact hc.image hf
@@ -57,11 +64,12 @@ theorem isProGrp_map {G₁ G₂ : Type} [Group G₁] [TopologicalSpace G₁] [Gr
     simpa [Function.comp_def, map_pow] using this
 
 section Ring
-variable {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] [CompactSpace R] [T2Space R]
+variable
+  {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] [CompactSpace R] [T2Space R]
   [IsNoetherianRing R]
 
-theorem pow_subset_nhds (I : Ideal R) (hI : (⨅ n : ℕ, I ^ n) = ⊥) (V : Set R) (hV : V ∈ 𝓝 (0 : R)) :
-    ∃ n : ℕ, ((I ^ n : Ideal R) : Set R) ⊆ V := by
+theorem pow_subset_nhds (I : Ideal R) (hI : (⨅ n : ℕ, I ^ n) = ⊥) (V : Set R) (hV : V ∈ 𝓝 (0 : R))
+    : ∃ n : ℕ, ((I ^ n : Ideal R) : Set R) ⊆ V := by
   have hcl : ∀ J : Ideal R, IsClosed (J : Set R) := by
     intro J
     obtain ⟨s, hs⟩ := IsNoetherian.noetherian J
@@ -89,14 +97,18 @@ theorem pow_subset_nhds (I : Ideal R) (hI : (⨅ n : ℕ, I ^ n) = ⊥) (V : Set
     refine ⟨max a b, ?_, ?_⟩
     · exact SetLike.coe_subset_coe.mpr (Ideal.pow_le_pow_right (le_max_left a b))
     · exact SetLike.coe_subset_coe.mpr (Ideal.pow_le_pow_right (le_max_right a b))
-  obtain ⟨n, hn⟩ := hK.elim_directed_family_closed (fun n : ℕ => ((I ^ n : Ideal R) : Set R))
-    (fun n => hcl _) (Set.disjoint_iff_inter_eq_empty.mpr hst) hdir
+  obtain ⟨n, hn⟩ :=
+    hK.elim_directed_family_closed
+      (fun n : ℕ => ((I ^ n : Ideal R) : Set R))
+      (fun n => hcl _)
+      (Set.disjoint_iff_inter_eq_empty.mpr hst) hdir
   refine ⟨n, fun x hx => hWV ?_⟩
   by_contra hxW
   exact Set.disjoint_left.mp hn hxW hx
 
-theorem tendsto_of_mem_pow (I : Ideal R) (hI : (⨅ n : ℕ, I ^ n) = ⊥) (x : ℕ → R) (c : R)
-    (hx : ∀ m, x m - c ∈ I ^ (m + 1)) : Tendsto x atTop (𝓝 c) := by
+theorem tendsto_of_mem_pow
+    (I : Ideal R) (hI : (⨅ n : ℕ, I ^ n) = ⊥) (x : ℕ → R) (c : R) (hx : ∀ m, x m - c ∈ I ^ (m + 1))
+    : Tendsto x atTop (𝓝 c) := by
   rw [← tendsto_sub_nhds_zero_iff]
   intro U hU
   obtain ⟨n, hn⟩ := pow_subset_nhds I hI U hU
@@ -122,9 +134,12 @@ private lemma ent_pow_sub_one_lemma_6 {R : Type} [CommRing R] {k : ℕ} (J : Ide
   rw [← geom_sum_mul B n]
   exact ent_mul_left_lemma_3 J _ _ hB i j
 
-theorem congPow {R : Type} [CommRing R] (I : Ideal R) (g k : ℕ) (hg : (g : R) ∈ I)
-    (A : Matrix (Fin k) (Fin k) R) (hA : ∀ i j, (A - 1) i j ∈ I) (m : ℕ) (i j : Fin k) :
-    (A ^ (g ^ m) - 1) i j ∈ I ^ (m + 1) := by
+theorem congPow
+    {R : Type} [CommRing R]
+    (I : Ideal R) (g k : ℕ)
+    (hg : (g : R) ∈ I) (A : Matrix (Fin k) (Fin k) R) (hA : ∀ i j, (A - 1) i j ∈ I)
+    (m : ℕ) (i j : Fin k)
+    : (A ^ (g ^ m) - 1) i j ∈ I ^ (m + 1) := by
   induction m generalizing i j with
   | zero => simpa using hA i j
   | succ m ih =>
@@ -133,11 +148,14 @@ theorem congPow {R : Type} [CommRing R] (I : Ideal R) (g k : ℕ) (hg : (g : R) 
       intro a b
       rw [Matrix.sum_apply]
       exact sum_mem fun t _ => ent_pow_sub_one_lemma_6 _ _ hB t a b
-    have hS : ∑ t ∈ Finset.range g, (A ^ (g ^ m)) ^ t =
-        ∑ t ∈ Finset.range g, ((A ^ (g ^ m)) ^ t - 1) + g • (1 : Matrix (Fin k) (Fin k) R) := by
+    have hS
+        : ∑ t ∈ Finset.range g, (A ^ (g ^ m)) ^ t
+          = ∑ t ∈ Finset.range g, ((A ^ (g ^ m)) ^ t - 1) + g • (1 : Matrix (Fin k) (Fin k) R) := by
       rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_range, sub_add_cancel]
-    have hkey : A ^ (g ^ (m + 1)) - 1 =
-        (∑ t ∈ Finset.range g, ((A ^ (g ^ m)) ^ t - 1)) * (A ^ (g ^ m) - 1) + g • (A ^ (g ^ m) - 1) := by
+    have hkey
+        : A ^ (g ^ (m + 1)) - 1
+          = (∑ t ∈ Finset.range g, ((A ^ (g ^ m)) ^ t - 1)) * (A ^ (g ^ m) - 1)
+            + g • (A ^ (g ^ m) - 1) := by
       rw [pow_succ, pow_mul, ← geom_sum_mul (A ^ (g ^ m)) g, hS, add_mul, smul_mul_assoc, one_mul]
     rw [hkey, Matrix.add_apply, Matrix.smul_apply, nsmul_eq_mul]
     have h2 : I ^ (m + 1) * I ^ (m + 1) ≤ I ^ (m + 1 + 1) := by
@@ -147,9 +165,11 @@ theorem congPow {R : Type} [CommRing R] (I : Ideal R) (g k : ℕ) (hg : (g : R) 
     rw [pow_succ' I (m + 1)]
     exact Ideal.mul_mem_mul hg (hB i j)
 
-theorem units_tendsto_one {M : Type} [Monoid M] [TopologicalSpace M] (f : ℕ → Mˣ)
-    (h1 : Tendsto (fun m => (f m : M)) atTop (𝓝 1)) (h2 : Tendsto (fun m => ((f m)⁻¹ : Mˣ).val) atTop (𝓝 1)) :
-    Tendsto f atTop (𝓝 1) := by
+theorem units_tendsto_one
+    {M : Type} [Monoid M] [TopologicalSpace M]
+    (f : ℕ → Mˣ) (h1 : Tendsto (fun m => (f m : M)) atTop (𝓝 1))
+    (h2 : Tendsto (fun m => ((f m)⁻¹ : Mˣ).val) atTop (𝓝 1))
+    : Tendsto f atTop (𝓝 1) := by
   rw [Units.isEmbedding_embedProduct.tendsto_nhds_iff, map_one]
   show Tendsto (fun m => ((f m : M), MulOpposite.op ((f m)⁻¹ : Mˣ).val)) atTop
     (𝓝 ((1 : M), MulOpposite.op (1 : M)))
@@ -165,8 +185,9 @@ theorem compactOv (v : HeightOneSpectrum (𝓞 F)) : CompactSpace (v.adicComplet
   have h2 : IsClosed ((v.adicCompletionIntegers F : Set (v.adicCompletion F))) :=
     Valued.isClosed_valuationSubring _
   have h3 : CompleteSpace (v.adicCompletionIntegers F) := h2.completeSpace_coe
-  exact Valued.integer.compactSpace_iff_completeSpace_and_isDiscreteValuationRing_and_finite_residueField.2
-    ⟨h3, (inferInstance : IsDiscreteValuationRing (v.adicCompletionIntegers F)), h1⟩
+  exact
+    Valued.integer.compactSpace_iff_completeSpace_and_isDiscreteValuationRing_and_finite_residueField.2
+      ⟨h3, (inferInstance : IsDiscreteValuationRing (v.adicCompletionIntegers F)), h1⟩
 
 theorem iwProG : Formalism.L2.G.Triv.IwProG := by
   intro F _ _ k v g hg hgv
@@ -177,11 +198,17 @@ theorem iwProG : Formalism.L2.G.Triv.IwProG := by
   have hI : (⨅ n : ℕ, 𝔪 ^ n) = ⊥ :=
     Ideal.iInf_pow_eq_bot_of_isLocalRing 𝔪 (Ideal.IsMaximal.ne_top inferInstance)
   let S : Subgroup (GL (Fin k) O) := (Subgroup.closure (upperUni k (O ⧸ 𝔪))).comap (redGL 𝔪)
-  have hred : ∀ (a : GL (Fin k) O) (i j : Fin k),
-      ((redGL 𝔪 a : GL (Fin k) (O ⧸ 𝔪)) : Matrix (Fin k) (Fin k) (O ⧸ 𝔪)) i j =
-        Ideal.Quotient.mk 𝔪 ((a : Matrix (Fin k) (Fin k) O) i j) := fun a i j => rfl
-  have hmem : ∀ a : GL (Fin k) O, a ∈ S ↔ ∀ i j : Fin k,
-      (j < i → (a : Matrix (Fin k) (Fin k) O) i j ∈ 𝔪) ∧ (a : Matrix (Fin k) (Fin k) O) i i - 1 ∈ 𝔪 := by
+  have hred
+      : ∀ (a : GL (Fin k) O) (i j : Fin k),
+        ((redGL 𝔪 a : GL (Fin k) (O ⧸ 𝔪)) : Matrix (Fin k) (Fin k) (O ⧸ 𝔪)) i j
+          = Ideal.Quotient.mk 𝔪 ((a : Matrix (Fin k) (Fin k) O) i j) := fun a i j =>
+    rfl
+  have hmem
+      : ∀ a : GL (Fin k) O,
+        a ∈ S
+          ↔ ∀ i j : Fin k,
+            (j < i → (a : Matrix (Fin k) (Fin k) O) i j ∈ 𝔪)
+              ∧ (a : Matrix (Fin k) (Fin k) O) i i - 1 ∈ 𝔪 := by
     intro a
     constructor
     · intro ha i j
@@ -197,13 +224,15 @@ theorem iwProG : Formalism.L2.G.Triv.IwProG := by
       refine ⟨fun hji => Ideal.Quotient.eq_zero_iff_mem.2 ((h i j).1 hji), ?_⟩
       have := Ideal.Quotient.eq_zero_iff_mem.2 (h i j).2
       rwa [map_sub, map_one, sub_eq_zero] at this
-  have hent : ∀ i j : Fin k, Continuous (fun a : GL (Fin k) O => (a : Matrix (Fin k) (Fin k) O) i j) :=
+  have hent
+      : ∀ i j : Fin k, Continuous (fun a : GL (Fin k) O => (a : Matrix (Fin k) (Fin k) O) i j) :=
     fun i j => Units.continuous_val.matrix_elem i j
   have hmcl : IsClosed (𝔪 : Set O) := (Ideal.isCompact_of_fg (IsNoetherian.noetherian _)).isClosed
   have hScl : IsClosed (S : Set (GL (Fin k) O)) := by
-    have : (S : Set (GL (Fin k) O)) = ⋂ i : Fin k, ⋂ j : Fin k,
-        ({a : GL (Fin k) O | j < i → (a : Matrix (Fin k) (Fin k) O) i j ∈ 𝔪} ∩
-          {a : GL (Fin k) O | (a : Matrix (Fin k) (Fin k) O) i i - 1 ∈ 𝔪}) := by
+    have : (S : Set (GL (Fin k) O))
+        = ⋂ i : Fin k, ⋂ j : Fin k,
+          ({a : GL (Fin k) O | j < i → (a : Matrix (Fin k) (Fin k) O) i j ∈ 𝔪} ∩
+            {a : GL (Fin k) O | (a : Matrix (Fin k) (Fin k) O) i i - 1 ∈ 𝔪}) := by
       ext a
       simp only [SetLike.mem_coe, hmem, Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq]
     rw [this]
@@ -212,7 +241,8 @@ theorem iwProG : Formalism.L2.G.Triv.IwProG := by
       · simp only [hji, true_implies]; exact hmcl.preimage (hent i j)
       · simp only [hji, false_implies, Set.setOf_true]; exact isClosed_univ
     · exact hmcl.preimage ((hent i i).sub continuous_const)
-  have : CompactSpace (Matrix (Fin k) (Fin k) O) := inferInstanceAs (CompactSpace (Fin k → Fin k → O))
+  have : CompactSpace (Matrix (Fin k) (Fin k) O) :=
+    inferInstanceAs (CompactSpace (Fin k → Fin k → O))
   have hcS : IsCompact (S : Set (GL (Fin k) O)) := hScl.isCompact
   have hpow : ∀ a ∈ S, Tendsto (fun m : ℕ => a ^ (g ^ m)) atTop (𝓝 1) := by
     intro a ha
@@ -230,11 +260,14 @@ theorem iwProG : Formalism.L2.G.Triv.IwProG := by
       rw [hB, Units.val_pow_eq_pow_val]
     have hB1 : ∀ i j, ((B : Matrix (Fin k) (Fin k) O) - 1) i j ∈ 𝔪 := by
       intro i j; rw [hBv]; exact Formalism.L2.G.Triv.unip_pow 𝔪 g hg hmax _ hA s hs i j
-    have hC : ∀ m (i j : Fin k), (((B ^ (g ^ m) : GL (Fin k) O) : Matrix (Fin k) (Fin k) O) - 1) i j ∈ 𝔪 ^ (m + 1) := by
+    have hC
+        : ∀ m (i j : Fin k),
+          (((B ^ (g ^ m) : GL (Fin k) O) : Matrix (Fin k) (Fin k) O) - 1) i j ∈ 𝔪 ^ (m + 1) := by
       intro m i j
       rw [Units.val_pow_eq_pow_val]
       exact congPow 𝔪 g k hmax _ hB1 m i j
-    have e : ∀ m, a ^ (g ^ (m + s)) = B ^ (g ^ m) := fun m => by rw [hB, ← pow_mul, ← pow_add, add_comm]
+    have e : ∀ m, a ^ (g ^ (m + s)) = B ^ (g ^ m) := fun m => by
+      rw [hB, ← pow_mul, ← pow_add, add_comm]
     rw [← Filter.tendsto_add_atTop_iff_nat s]
     simp only [e]
     refine units_tendsto_one _ ?_ ?_
@@ -245,8 +278,10 @@ theorem iwProG : Formalism.L2.G.Triv.IwProG := by
     · refine tendsto_pi_nhds.2 fun i => tendsto_pi_nhds.2 fun j => ?_
       refine tendsto_of_mem_pow 𝔪 hI _ _ fun m => ?_
       set u := B ^ (g ^ m)
-      have hid : ((u⁻¹ : GL (Fin k) O) : Matrix (Fin k) (Fin k) O) - 1 =
-          -(((u⁻¹ : GL (Fin k) O) : Matrix (Fin k) (Fin k) O) * ((u : Matrix (Fin k) (Fin k) O) - 1)) := by
+      have hid
+          : ((u⁻¹ : GL (Fin k) O) : Matrix (Fin k) (Fin k) O) - 1
+            = -(((u⁻¹ : GL (Fin k) O) : Matrix (Fin k) (Fin k) O)
+              * ((u : Matrix (Fin k) (Fin k) O) - 1)) := by
         rw [mul_sub, Units.inv_mul, mul_one, neg_sub]
       have : (((u⁻¹ : GL (Fin k) O) : Matrix (Fin k) (Fin k) O) - 1) i j ∈ 𝔪 ^ (m + 1) := by
         rw [hid, Matrix.neg_apply, Ideal.neg_mem_iff, Matrix.mul_apply]
@@ -261,18 +296,24 @@ end Iw
 
 open Formalism.UG.P
 
-theorem isProGrp_transfer {G₁ G₂ : Type} [Group G₁] [TopologicalSpace G₁] [Group G₂] [TopologicalSpace G₂]
-    (g : ℕ) (θ : G₁ →* G₂) (hθ : Continuous θ) (ψ : G₂ → G₁) (hψ : Continuous ψ)
-    (Uw : Subgroup G₁) (P : Subgroup G₂) (h1 : ∀ x ∈ Uw, θ x ∈ P) (h2 : ∀ p ∈ P, ψ p ∈ Uw ∧ θ (ψ p) = p)
-    (h3 : ∀ x ∈ Uw, ψ (θ x) = x) (hP : IsProGrp g P) : IsProGrp g Uw := by
+theorem isProGrp_transfer
+    {G₁ G₂ : Type} [Group G₁] [TopologicalSpace G₁] [Group G₂] [TopologicalSpace G₂]
+    (g : ℕ)
+    (θ : G₁ →* G₂) (hθ : Continuous θ)
+    (ψ : G₂ → G₁) (hψ : Continuous ψ)
+    (Uw : Subgroup G₁) (P : Subgroup G₂)
+    (h1 : ∀ x ∈ Uw, θ x ∈ P) (h2 : ∀ p ∈ P, ψ p ∈ Uw ∧ θ (ψ p) = p)
+    (h3 : ∀ x ∈ Uw, ψ (θ x) = x) (hP : IsProGrp g P)
+    : IsProGrp g Uw := by
   unfold IsProGrp at hP ⊢
   obtain ⟨hPc, hPn⟩ := hP
-  let e : Uw ≃* P :=
-    { toFun := fun x => ⟨θ x.1, h1 x.1 x.2⟩
-      invFun := fun p => ⟨ψ p, (h2 p p.2).1⟩
-      left_inv := fun x => Subtype.ext (h3 x.1 x.2)
-      right_inv := fun p => Subtype.ext (h2 p p.2).2
-      map_mul' := fun x y => Subtype.ext (map_mul θ x.1 y.1) }
+  let e : Uw ≃* P := {
+    toFun := fun x => ⟨θ x.1, h1 x.1 x.2⟩
+    invFun := fun p => ⟨ψ p, (h2 p p.2).1⟩
+    left_inv := fun x => Subtype.ext (h3 x.1 x.2)
+    right_inv := fun p => Subtype.ext (h2 p p.2).2
+    map_mul' := fun x y => Subtype.ext (map_mul θ x.1 y.1)
+  }
   have hec : Continuous (e.symm : P → Uw) := by
     show Continuous (fun p : P => (⟨ψ p, (h2 p p.2).1⟩ : Uw))
     exact (hψ.comp continuous_subtype_val).subtype_mk _
@@ -297,13 +338,14 @@ theorem isProGrp_transfer {G₁ G₂ : Type} [Group G₁] [TopologicalSpace G₁
 section Lift
 variable {R : Type} [CommRing R] {n : Type} [Fintype n] [DecidableEq n]
 
-def splitLift (J₁ : Matrix n n R) (hJ : IsUnit J₁.det) (u : GL n R) : GL n (R × R) :=
-  ⟨pairMat (u : Matrix n n R) (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹)ᵀ,
-   pairMat ((u⁻¹ : GL n R) : Matrix n n R) (J₁ * (u : Matrix n n R) * J₁⁻¹)ᵀ,
-   pairMat_mul_eq_one u.mul_inv
-     (by rw [← Matrix.transpose_mul, split_conj_mul J₁ hJ u.mul_inv, Matrix.transpose_one]),
-   pairMat_mul_eq_one u.inv_mul
-     (by rw [← Matrix.transpose_mul, split_conj_mul J₁ hJ u.inv_mul, Matrix.transpose_one])⟩
+def splitLift (J₁ : Matrix n n R) (hJ : IsUnit J₁.det) (u : GL n R) : GL n (R × R) := ⟨
+  pairMat (u : Matrix n n R) (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹)ᵀ,
+  pairMat ((u⁻¹ : GL n R) : Matrix n n R) (J₁ * (u : Matrix n n R) * J₁⁻¹)ᵀ,
+  pairMat_mul_eq_one u.mul_inv
+    (by rw [← Matrix.transpose_mul, split_conj_mul J₁ hJ u.mul_inv, Matrix.transpose_one]),
+  pairMat_mul_eq_one u.inv_mul
+    (by rw [← Matrix.transpose_mul, split_conj_mul J₁ hJ u.inv_mul, Matrix.transpose_one])
+⟩
 
 private lemma pm_mul_lemma (X Y X' Y' : Matrix n n R) :
     pairMat X Y * pairMat X' Y' = pairMat (X * X') (Y * Y') := by
@@ -312,57 +354,70 @@ private lemma pm_mul_lemma (X Y X' Y' : Matrix n n R) :
 private lemma pm_cT_lemma_2 (X Y : Matrix n n R) : cT (swapR R) (pairMat X Y) = pairMat Yᵀ Xᵀ := by
   ext i j <;> simp [cT, swapR, pairMat, Prod.ext_iff]
 
-theorem splitLift_mem (J₁ : Matrix n n R) (hJ : IsUnit J₁.det) (u : GL n R) :
-    splitLift J₁ hJ u ∈ UJ (swapR R) (splitJ J₁) := by
-  change cT (swapR R) (pairMat (u : Matrix n n R) (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹)ᵀ) *
-    splitJ J₁ * pairMat (u : Matrix n n R) (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹)ᵀ = splitJ J₁
+theorem splitLift_mem (J₁ : Matrix n n R) (hJ : IsUnit J₁.det) (u : GL n R)
+    : splitLift J₁ hJ u ∈ UJ (swapR R) (splitJ J₁) := by
+  change cT (swapR R) (pairMat (u : Matrix n n R) (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹)ᵀ)
+      * splitJ J₁ * pairMat (u : Matrix n n R) (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹)ᵀ
+    = splitJ J₁
   have e1 : J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹ * J₁ * (u : Matrix n n R) = J₁ := by
-    rw [Matrix.mul_assoc (J₁ * _) J₁⁻¹ J₁, Matrix.nonsing_inv_mul J₁ hJ, Matrix.mul_one, Matrix.mul_assoc,
-      Units.inv_mul, Matrix.mul_one]
+    rw [Matrix.mul_assoc (J₁ * _) J₁⁻¹ J₁, Matrix.nonsing_inv_mul J₁ hJ, Matrix.mul_one,
+      Matrix.mul_assoc, Units.inv_mul, Matrix.mul_one]
   have hs : splitJ J₁ = pairMat J₁ J₁ᵀ := rfl
   rw [hs, pm_cT_lemma_2, pm_mul_lemma, pm_mul_lemma, Matrix.transpose_transpose, e1]
   congr 1
-  calc (u : Matrix n n R)ᵀ * J₁ᵀ * (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹)ᵀ
-      = (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹ * J₁ * (u : Matrix n n R))ᵀ := by
-        simp only [Matrix.transpose_mul, Matrix.mul_assoc]
+  calc
+    (u : Matrix n n R)ᵀ * J₁ᵀ * (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹)ᵀ
+        = (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹ * J₁ * (u : Matrix n n R))ᵀ := by
+      simp only [Matrix.transpose_mul, Matrix.mul_assoc]
     _ = J₁ᵀ := by rw [e1]
 
-theorem splitLift_fst (J₁ : Matrix n n R) (hJ : IsUnit J₁.det) (u : GL n R) :
-    bc (RingHom.fst R R) (splitLift J₁ hJ u) = u := by
+theorem splitLift_fst (J₁ : Matrix n n R) (hJ : IsUnit J₁.det) (u : GL n R)
+    : bc (RingHom.fst R R) (splitLift J₁ hJ u) = u := by
   apply Units.ext
   ext i j
   simp [bc, splitLift, pairMat]
 
-theorem continuous_pairMat [TopologicalSpace R] {X : Type} [TopologicalSpace X] {A B : X → Matrix n n R}
-    (hA : Continuous A) (hB : Continuous B) : Continuous fun x => pairMat (A x) (B x) := by
+theorem continuous_pairMat
+    [TopologicalSpace R]
+    {X : Type} [TopologicalSpace X]
+    {A B : X → Matrix n n R} (hA : Continuous A) (hB : Continuous B)
+    : Continuous fun x => pairMat (A x) (B x) := by
   unfold pairMat
   exact continuous_matrix fun i j => (hA.matrix_elem i j).prodMk (hB.matrix_elem i j)
 
-theorem continuous_splitLift [TopologicalSpace R] [IsTopologicalRing R] (J₁ : Matrix n n R) (hJ : IsUnit J₁.det) :
-    Continuous (splitLift J₁ hJ) := by
+theorem continuous_splitLift
+    [TopologicalSpace R] [IsTopologicalRing R] (J₁ : Matrix n n R) (hJ : IsUnit J₁.det)
+    : Continuous (splitLift J₁ hJ) := by
   rw [Units.continuous_iff]
   constructor
   · show Continuous fun u : GL n R => pairMat (u : Matrix n n R) (J₁ * ((u⁻¹ : GL n R) : Matrix n n R) * J₁⁻¹)ᵀ
     exact continuous_pairMat Units.continuous_val
-      (((continuous_const.matrix_mul Units.continuous_coe_inv).matrix_mul continuous_const).matrix_transpose)
+      (((continuous_const.matrix_mul Units.continuous_coe_inv).matrix_mul
+        continuous_const).matrix_transpose)
   · show Continuous fun u : GL n R => pairMat ((u⁻¹ : GL n R) : Matrix n n R) (J₁ * (u : Matrix n n R) * J₁⁻¹)ᵀ
     exact continuous_pairMat Units.continuous_coe_inv
-      (((continuous_const.matrix_mul Units.continuous_val).matrix_mul continuous_const).matrix_transpose)
+      (((continuous_const.matrix_mul Units.continuous_val).matrix_mul
+        continuous_const).matrix_transpose)
 
 end Lift
 
-theorem proGTransfer_of_cont (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (k : ℕ)
-    (σ : E →ₐ[F] E) (J : Matrix (Fin k) (Fin k) E) (hJh : IsHerm (σ : E →+* E) J) (hdet : IsUnit J.det)
-    (v : HeightOneSpectrum (𝓞 F)) (s : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F)
+theorem proGTransfer_of_cont
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (k : ℕ) (σ : E →ₐ[F] E) (J : Matrix (Fin k) (Fin k) E)
+    (hJh : IsHerm (σ : E →+* E) J) (hdet : IsUnit J.det)
+    (v : HeightOneSpectrum (𝓞 F))
+    (s : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F)
     (hs : ∀ x, s (sigR σ (v.adicCompletion F) x) = swapR _ (s x))
     (hsc : letI := tensTopL (F := F) (E := E) (v.adicCompletion F); Continuous s)
     (hsic : letI := tensTopL (F := F) (E := E) (v.adicCompletion F); Continuous s.symm)
     (h : GL (Fin k) (v.adicCompletion F)) (P : Subgroup (GL (Fin k) (v.adicCompletion F)))
-    (Uw : Subgroup (GL (Fin k) (E ⊗[F] v.adicCompletion F))) (hUw : Uw ≤ UPts σ J (v.adicCompletion F))
-    (hiff : ∀ x ∈ UPts σ J (v.adicCompletion F), x ∈ Uw ↔ h⁻¹ * bc ((RingHom.fst _ _).comp s.toRingHom) x * h ∈ P)
-    (g : ℕ) (hP : IsProGrp g P) :
-    letI := tensTopL (F := F) (E := E) (v.adicCompletion F)
-    IsProGrp g Uw := by
+    (Uw : Subgroup (GL (Fin k) (E ⊗[F] v.adicCompletion F)))
+    (hUw : Uw ≤ UPts σ J (v.adicCompletion F))
+    (hiff : ∀ x ∈ UPts σ J (v.adicCompletion F),
+      x ∈ Uw ↔ h⁻¹ * bc ((RingHom.fst _ _).comp s.toRingHom) x * h ∈ P)
+    (g : ℕ) (hP : IsProGrp g P)
+    : letI := tensTopL (F := F) (E := E) (v.adicCompletion F)
+      IsProGrp g Uw := by
   set K := v.adicCompletion F
   letI : TopologicalSpace (E ⊗[F] K) := tensTopL (F := F) (E := E) K
   have hsig : ∀ e : E, sigR σ K (inclE (F := F) K e) = inclE (F := F) K (σ e) := by
@@ -377,20 +432,27 @@ theorem proGTransfer_of_cont (F E : Type) [Field F] [NumberField F] [Field E] [N
     rw [hh, ← hsig, hs]
     rfl
   have hJ1 : IsUnit J1.det := by
-    have e : J1 = (RingHom.mapMatrix ((RingHom.fst K K).comp ((s : E ⊗[F] K →+* K × K).comp
-        (inclE (F := F) K)))) J := by
+    have e
+        : J1
+          = (RingHom.mapMatrix ((RingHom.fst K K).comp
+              ((s : E ⊗[F] K →+* K × K).comp (inclE (F := F) K))))
+            J := by
       ext i j; rfl
     rw [e, ← RingHom.map_det]
     exact hdet.map _
   set φ : E ⊗[F] K →+* K := (RingHom.fst K K).comp s.toRingHom with hφdef
   let θ : GL (Fin k) (E ⊗[F] K) →* GL (Fin k) K := (MulAut.conj h⁻¹).toMonoidHom.comp (bc φ)
   have hθ : ∀ x, θ x = h⁻¹ * bc φ x * h := fun x => by simp [θ, MulAut.conj_apply]
-  let ψ : GL (Fin k) K → GL (Fin k) (E ⊗[F] K) :=
-    fun a => bc (s.symm : K × K →+* E ⊗[F] K) (splitLift J1 hJ1 (h * a * h⁻¹))
-  have hss : ∀ z : GL (Fin k) (E ⊗[F] K), bc (s.symm : K × K →+* E ⊗[F] K) (bc (s : E ⊗[F] K →+* K × K) z) = z :=
-    fun z => by apply Units.ext; ext i j; simp [bc]
-  have hφs : ∀ L : GL (Fin k) (K × K), bc φ (bc (s.symm : K × K →+* E ⊗[F] K) L) = bc (RingHom.fst K K) L :=
-    fun L => by apply Units.ext; ext i j; simp [bc, φ]
+  let ψ : GL (Fin k) K → GL (Fin k) (E ⊗[F] K) := fun a =>
+    bc (s.symm : K × K →+* E ⊗[F] K) (splitLift J1 hJ1 (h * a * h⁻¹))
+  have hss
+      : ∀ z : GL (Fin k) (E ⊗[F] K),
+        bc (s.symm : K × K →+* E ⊗[F] K) (bc (s : E ⊗[F] K →+* K × K) z) = z := fun z => by
+    apply Units.ext; ext i j; simp [bc]
+  have hφs
+      : ∀ L : GL (Fin k) (K × K),
+        bc φ (bc (s.symm : K × K →+* E ⊗[F] K) L) = bc (RingHom.fst K K) L := fun L => by
+    apply Units.ext; ext i j; simp [bc, φ]
   have hθψ : ∀ a, θ (ψ a) = a := by
     intro a
     rw [hθ]
@@ -401,11 +463,15 @@ theorem proGTransfer_of_cont (F E : Type) [Field F] [NumberField F] [Field E] [N
     intro a
     have h1 := splitLift_mem J1 hJ1 (h * a * h⁻¹)
     rw [← hJ'] at h1
-    have hc : (s.symm : K × K →+* E ⊗[F] K).comp (swapR K) = (sigR σ K).comp (s.symm : K × K →+* E ⊗[F] K) :=
+    have hc
+        : (s.symm : K × K →+* E ⊗[F] K).comp (swapR K)
+          = (sigR σ K).comp (s.symm : K × K →+* E ⊗[F] K) :=
       transport_symm_comp (sigR σ K) (swapR K) s (RingHom.ext hs)
     have h2 := transport_bc_mem (swapR K) (sigR σ K) _ hc _ _ h1
-    have hJm : (J.map ((s : E ⊗[F] K →+* K × K).comp (inclE (F := F) K))).map
-        (s.symm : K × K →+* E ⊗[F] K) = J.map (inclE (F := F) K) := by
+    have hJm
+        : (J.map ((s : E ⊗[F] K →+* K × K).comp (inclE (F := F) K))).map
+            (s.symm : K × K →+* E ⊗[F] K)
+          = J.map (inclE (F := F) K) := by
       ext i j; simp
     rw [hJm] at h2
     exact h2
@@ -428,11 +494,13 @@ theorem proGTransfer_of_cont (F E : Type) [Field F] [NumberField F] [Field E] [N
     have hb : Continuous (bc (n := Fin k) φ) :=
       Continuous.units_map _ (continuous_id.matrix_map (continuous_fst.comp hsc))
     have : (θ : GL (Fin k) (E ⊗[F] K) → GL (Fin k) K) = fun x => h⁻¹ * bc φ x * h := funext hθ
-    rw [this]; exact (continuous_const.mul hb).mul continuous_const
+    rw [this]
+    exact (continuous_const.mul hb).mul continuous_const
   have hψc : Continuous ψ := by
     have hb : Continuous (bc (n := Fin k) (s.symm : K × K →+* E ⊗[F] K)) :=
       Continuous.units_map _ (continuous_id.matrix_map hsic)
-    exact hb.comp ((continuous_splitLift J1 hJ1).comp ((continuous_const.mul continuous_id).mul continuous_const))
+    exact hb.comp ((continuous_splitLift J1 hJ1).comp
+      ((continuous_const.mul continuous_id).mul continuous_const))
   refine isProGrp_transfer g θ hθc ψ hψc Uw P ?_ ?_ ?_ hP
   · intro x hx; rw [hθ]; exact (hiff x (hUw hx)).1 hx
   · intro p hp
@@ -444,21 +512,26 @@ section Link
 
 def LocalEndHomeo : Prop :=
   ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
-    (τ : v.adicCompletion F →+* v.adicCompletion F),
-    Continuous τ ∧ ∃ τ' : v.adicCompletion F →+* v.adicCompletion F, Continuous τ' ∧ ∀ a, τ (τ' a) = a
+      (τ : v.adicCompletion F →+* v.adicCompletion F),
+    Continuous τ
+      ∧ ∃ τ' : v.adicCompletion F →+* v.adicCompletion F, Continuous τ' ∧ ∀ a, τ (τ' a) = a
 
-theorem split_cont_of_homeo (hE : LocalEndHomeo) (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F))
+theorem split_cont_of_homeo
+    (hE : LocalEndHomeo)
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F))
     (s : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F)
-    (hs : ∀ x, s (sigR σ (v.adicCompletion F) x) = swapR _ (s x)) :
-    letI := tensTopL (F := F) (E := E) (v.adicCompletion F); Continuous s ∧ Continuous s.symm := by
+    (hs : ∀ x, s (sigR σ (v.adicCompletion F) x) = swapR _ (s x))
+    : letI := tensTopL (F := F) (E := E) (v.adicCompletion F)
+      Continuous s ∧ Continuous s.symm := by
   set K := v.adicCompletion F
   letI : TopologicalSpace (E ⊗[F] K) := tensTopL (F := F) (E := E) K
   letI : Algebra K (E ⊗[F] K) := Algebra.TensorProduct.rightAlgebra
   haveI : IsModuleTopology K (E ⊗[F] K) := ⟨rfl⟩
   haveI := IsModuleTopology.toContinuousAdd K (E ⊗[F] K)
   haveI := IsModuleTopology.toContinuousSMul K (E ⊗[F] K)
-  let τ : K →+* K := (RingHom.fst K K).comp ((s : E ⊗[F] K →+* K × K).comp (algebraMap K (E ⊗[F] K)))
+  let τ : K →+* K :=
+    (RingHom.fst K K).comp ((s : E ⊗[F] K →+* K × K).comp (algebraMap K (E ⊗[F] K)))
   have hsig1 : ∀ a : K, sigR σ K (algebraMap K (E ⊗[F] K) a) = algebraMap K (E ⊗[F] K) a := by
     intro a
     change sigR σ K ((1 : E) ⊗ₜ[F] a) = (1 : E) ⊗ₜ[F] a
@@ -467,7 +540,8 @@ theorem split_cont_of_homeo (hE : LocalEndHomeo) (F E : Type) [Field F] [NumberF
     intro a
     have h1 := hs (algebraMap K (E ⊗[F] K) a)
     rw [hsig1] at h1
-    have h2 : (s (algebraMap K (E ⊗[F] K) a)).2 = (s (algebraMap K (E ⊗[F] K) a)).1 := congrArg Prod.snd h1
+    have h2 : (s (algebraMap K (E ⊗[F] K) a)).2 = (s (algebraMap K (E ⊗[F] K) a)).1 :=
+      congrArg Prod.snd h1
     exact Prod.ext rfl h2
   obtain ⟨hτc, τ', hτ'c, hττ'⟩ := hE F v τ
   constructor
@@ -480,27 +554,32 @@ theorem split_cont_of_homeo (hE : LocalEndHomeo) (F E : Type) [Field F] [NumberF
       intro c
       rw [RingEquiv.symm_apply_eq, hτ, hττ']
       rfl
-    let L : (K × K) →ₛₗ[τ'] E ⊗[F] K :=
-      { toFun := s.symm
-        map_add' := map_add s.symm
-        map_smul' := fun c p => by
-          rw [Algebra.smul_def, Algebra.smul_def, map_mul, hsym] }
+    let L : (K × K) →ₛₗ[τ'] E ⊗[F] K := {
+      toFun := s.symm
+      map_add' := map_add s.symm
+      map_smul' := fun c p => by rw [Algebra.smul_def, Algebra.smul_def, map_mul, hsym]
+    }
     exact IsModuleTopology.continuous_of_linearMapₛₗ hτ'c L
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem colProG (hE : LocalEndHomeo) {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
-    [StarRing E] [Algebra F E] {sp : Spaces R F E} {gp : Fin 2 → ℕ}
-    {ι' : Type} [Fintype ι'] {hc : ι' → HCParam R} {C : ColumnChain R ι' hc} {A : ColumnsAtT R C}
-    {clsLat : ∀ i, C.cls i → Submodule (𝓞 E) (sp.X i).V}
-    (L : ColLevel R F E sp gp C A clsLat) (hp : ∀ i, (gp i).Prime) : L.ProG := fun i v h => by
+theorem colProG
+    (hE : LocalEndHomeo)
+    {R : Ranks} {F E : Type}
+    [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+    {sp : Spaces R F E} {gp : Fin 2 → ℕ} {ι' : Type} [Fintype ι']
+    {hc : ι' → HCParam R} {C : ColumnChain R ι' hc} {A : ColumnsAtT R C}
+    {clsLat : ∀ i, C.cls i → Submodule (𝓞 E) (sp.X i).V} (L : ColLevel R F E sp gp C A clsLat)
+    (hp : ∀ i, (gp i).Prime)
+    : L.ProG := fun i v h => by
   obtain ⟨hsc, hsic⟩ := split_cont_of_homeo hE F E sp.cm.sig v (L.splitG i v h) (L.splitG_sig i v h)
-  exact proGTransfer_of_cont F E R.k sp.cm.sig sp.gram0 sp.baseGram_isHermitian (Formalism.L2.G.isUnit_det_gram0 sp) v
-    (L.splitG i v h) (L.splitG_sig i v h) hsc hsic (L.frG i v h) (iwU F R.k v) (L.Uloc v) (L.Uloc_le v)
-    (L.Uloc_g i v h) (gp i) (iwProG F R.k v (gp i) (hp i) h)
+  exact proGTransfer_of_cont F E R.k sp.cm.sig sp.gram0 sp.baseGram_isHermitian
+    (Formalism.L2.G.isUnit_det_gram0 sp) v (L.splitG i v h) (L.splitG_sig i v h) hsc hsic
+    (L.frG i v h) (iwU F R.k v) (L.Uloc v) (L.Uloc_le v) (L.Uloc_g i v h) (gp i)
+    (iwProG F R.k v (gp i) (hp i) h)
 
-theorem levels_pro_g_of_continuity (hE : LocalEndHomeo) : Link4p :=
-  fun D Lv u => colProG hE (Lv u) D.host.g_prime
+theorem levels_pro_g_of_continuity (hE : LocalEndHomeo) : Link4p := fun D Lv u =>
+  colProG hE (Lv u) D.host.g_prime
 
 end Link
 

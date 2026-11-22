@@ -18,8 +18,8 @@ namespace CrystallineSemistableComparison.HT
 
 variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)}
 
-theorem half1 (ht : TFil l) {e : E.EtFam l K} (he : EtP e) :
-    Half1 ht (fun {_} r {_} v x => IsLift ht e r v x) := by
+theorem half1 (ht : TFil l) {e : E.EtFam l K} (he : EtP e)
+    : Half1 ht (fun {_} r {_} v x => IsLift ht e r v x) := by
   exact {
     comp := fun h => h.1
     ex := exists_isLift_of_etP ht he
@@ -32,6 +32,7 @@ theorem half1 (ht : TFil l) {e : E.EtFam l K} (he : EtP e) :
     cup := isLift_cupS_of_cupT ht he
     one := isLift_oneS_of_lev_eq_one ht he
     first_chern_class_exists := he.first_chern_class_exists
-    c1 := h1_lift_of_firstChern ht he }
+    c1 := h1_lift_of_firstChern ht he
+  }
 
 end CrystallineSemistableComparison.HT

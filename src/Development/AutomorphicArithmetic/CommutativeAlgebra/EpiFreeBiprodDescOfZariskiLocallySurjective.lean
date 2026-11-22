@@ -26,12 +26,18 @@ private def sumD {P₁ P₂ Q : PSh} (f : P₁ ⟶ Q) (g : P₂ ⟶ Q) : sumP P�
     · exact congrFun (congrArg (fun t => t.hom) (f.naturality k)) x
     · exact congrFun (congrArg (fun t => t.hom) (g.naturality k)) x
 
-theorem UpperTheory.epi_freeBiprodDesc_of_zariskiLocally_surjective :
-    ∀ (R : Type) [CommRing R] {P₁ P₂ Q : PSh} (f : P₁ ⟶ Q) (g : P₂ ⟶ Q), (∀ (U : Scheme.{0}) (y : Q.obj (op U)), Loc U fun V h => (∃ x, f.app (op V) x = Q.map h.op y) ∨ ∃ x, g.app (op V) x = Q.map h.op y) → Epi (biprod.desc ((free R).map f) ((free R).map g)) := by
+theorem UpperTheory.epi_freeBiprodDesc_of_zariskiLocally_surjective
+    : ∀ (R : Type) [CommRing R] {P₁ P₂ Q : PSh} (f : P₁ ⟶ Q) (g : P₂ ⟶ Q),
+      (∀ (U : Scheme.{0}) (y : Q.obj (op U)),
+          Loc U fun V h =>
+            (∃ x, f.app (op V) x = Q.map h.op y) ∨ ∃ x, g.app (op V) x = Q.map h.op y)
+        → Epi (biprod.desc ((free R).map f) ((free R).map g)) := by
   intro R _ P₁ P₂ Q f g h
-  have mc : ∀ {P : PSh} (c : P ⟶ Q) {M : Shv R} (p : (free R).obj Q ⟶ M) (T : Scheme.{0})
-      (x : P.obj (op T)),
-      Sec.map ((free R).map c ≫ p) (freeGen R P T x) = Sec.map p (freeGen R Q T (c.app (op T) x)) := by
+  have mc
+      : ∀ {P : PSh} (c : P ⟶ Q) {M : Shv R} (p : (free R).obj Q ⟶ M) (T : Scheme.{0})
+          (x : P.obj (op T)),
+        Sec.map ((free R).map c ≫ p) (freeGen R P T x)
+          = Sec.map p (freeGen R Q T (c.app (op T) x)) := by
     intro P c M p T x
     have h4 := (GlobalTheory.T.free_sections_ext_res_map R P M).2.2.2 Q c T x
     show Sec.map p (Sec.map ((free R).map c) (freeGen R P T x)) = _
@@ -46,10 +52,8 @@ theorem UpperTheory.epi_freeBiprodDesc_of_zariskiLocally_surjective :
     · exact ⟨Sum.inr x, hx⟩
   constructor
   intro Z u v huv
-  have ha : (free R).map f ≫ u = (free R).map f ≫ v := by
-    simpa using congrArg (biprod.inl ≫ ·) huv
-  have hb : (free R).map g ≫ u = (free R).map g ≫ v := by
-    simpa using congrArg (biprod.inr ≫ ·) huv
+  have ha : (free R).map f ≫ u = (free R).map f ≫ v := by simpa using congrArg (biprod.inl ≫ ·) huv
+  have hb : (free R).map g ≫ u = (free R).map g ≫ v := by simpa using congrArg (biprod.inr ≫ ·) huv
   rw [← cancel_epi ((free R).map (sumD f g))]
   apply (GlobalTheory.T.free_sections_ext_res_map R (sumP P₁ P₂) Z).2.1
   intro T z

@@ -5,8 +5,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open NumberField in
-theorem UpperTheory.exists_CM_integral_of_exists_CM :
-    UpperTheory.V.Af.BA.ExCM → UpperTheory.V.Af.BA.ExCMInt := by
+theorem UpperTheory.exists_CM_integral_of_exists_CM
+    : UpperTheory.V.Af.BA.ExCM → UpperTheory.V.Af.BA.ExCMInt := by
   intro h F _ _ _
   obtain ⟨L, i1, i2, i3, i, s, hs, hfix⟩ := h F
   refine ⟨L, i1, i2, i3, RingOfIntegers.mapRingHom i, RingOfIntegers.mapRingHom s, ?_, ?_, ?_⟩

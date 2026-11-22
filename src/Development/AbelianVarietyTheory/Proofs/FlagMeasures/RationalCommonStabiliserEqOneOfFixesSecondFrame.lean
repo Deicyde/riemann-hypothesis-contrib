@@ -20,7 +20,9 @@ noncomputable section
 namespace GlobalTheory.HL.StabFix
 
 section Loc
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
+variable
+  {F : Type}
+  [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 variable {L : LocE F E} {r k : ℕ} (S : Frames L r k)
 
@@ -39,16 +41,15 @@ theorem local_eq_one (h : S.GLV) (hS : h ∈ S.St) (hf' : ∀ b, h (S.f' b) = S.
     rw [Frames.spanTo, Set.image_eq_range, GlobalTheory.FrameBasic.mem_perp_span L hHe]
     rintro ⟨j, hj⟩
     rw [S.gram]
-    have : j ≠ Fin.last r := by
-      intro e; simp [e] at hj
+    have : j ≠ Fin.last r := by intro e; simp [e] at hj
     simp [this]
   have hXle : S.spanTo S.f r ≤ S.ME := by
     refine le_trans (Submodule.span_mono (Set.image_mono ?_)) le_sup_left
     intro i hi
     exact Nat.lt_succ_of_lt hi
   have hME : S.ME = Submodule.span E (Set.range (Sum.elim S.f S.f')) := by
-    rw [Frames.ME, GlobalTheory.HL.FrameStab.spanTo_top, GlobalTheory.HL.FrameStab.spanTo_top, Set.Sum.elim_range,
-      Submodule.span_union]
+    rw [Frames.ME, GlobalTheory.HL.FrameStab.spanTo_top, GlobalTheory.HL.FrameStab.spanTo_top,
+      Set.Sum.elim_range, Submodule.span_union]
   have hsub : ∀ a b y, hf L S.Hm (a - b) y = hf L S.Hm a y - hf L S.Hm b y := fun a b y =>
     (GlobalTheory.FrameBasic.hfL L S.Hm y).map_sub a b
   have hfix : ∀ a, h (S.f a) = S.f a := by
@@ -80,13 +81,16 @@ theorem local_eq_one (h : S.GLV) (hS : h ∈ S.St) (hf' : ∀ b, h (S.f' b) = S.
   exact LinearEquiv.ext hall
 end Loc
 
-theorem nonempty_place (F : Type) [Field F] [NumberField F] : Nonempty (HeightOneSpectrum (𝓞 F)) := by
+theorem nonempty_place (F : Type) [Field F] [NumberField F]
+    : Nonempty (HeightOneSpectrum (𝓞 F)) := by
   obtain ⟨M, hM⟩ := Ideal.exists_maximal (𝓞 F)
   exact ⟨⟨M, hM.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hM (RingOfIntegers.not_isField F)⟩⟩
 
-theorem eq_one_of_fix : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {sig : E →ₐ[F] E} (A : Places F E sig), ∀ (r k : ℕ) (G : GFrames A r k), ∀ x ∈ G.St,
-    (∀ b, x (G.f' b) = G.f' b) → x = 1 := by
+theorem eq_one_of_fix
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {sig : E →ₐ[F] E} (A : Places F E sig),
+      ∀ (r k : ℕ) (G : GFrames A r k), ∀ x ∈ G.St,
+        (∀ b, x (G.f' b) = G.f' b) → x = 1 := by
   intro F E _ _ _ _ _ sig A r k G x hx hfix
   obtain ⟨p⟩ := nonempty_place F
   have := (A.loc p).lf
@@ -94,8 +98,11 @@ theorem eq_one_of_fix : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [Nu
   obtain ⟨x', hx'St, hext⟩ := hx p
   have hloc : ∀ b, x' ((G.S p).f' b) = (G.S p).f' b := by
     intro b
-    let u : ((A.loc p).Ep)ˣ := Units.map (algebraMap (A.loc p).Fp (A.loc p).Ep).toMonoidHom (G.c p ^ (r - (b : ℕ)))
-    have hu : ((u : (A.loc p).Ep)) = algebraMap (A.loc p).Fp (A.loc p).Ep ((G.c p : (A.loc p).Fp) ^ (r - (b : ℕ))) := by
+    let u : ((A.loc p).Ep)ˣ :=
+      Units.map (algebraMap (A.loc p).Fp (A.loc p).Ep).toMonoidHom (G.c p ^ (r - (b : ℕ)))
+    have hu
+        : ((u : (A.loc p).Ep))
+          = algebraMap (A.loc p).Fp (A.loc p).Ep ((G.c p : (A.loc p).Fp) ^ (r - (b : ℕ))) := by
       simp [u]
     have h1 : x' ((u : (A.loc p).Ep) • (G.S p).f' b) = (u : (A.loc p).Ep) • (G.S p).f' b := by
       rw [hu, G.f'_eq p b, hext, hfix b]

@@ -10,22 +10,36 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps Formalism.L2.Pj GlobalTheory.RunIn
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps
+  Formalism.L2.Pj GlobalTheory.RunIn
 
 namespace GlobalTheory
 
-theorem page_two_le_L_and_signs : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ) (X : PJ D B P j) (large₂ : SizeData₂ D) (H : KHyp) (C2 A2 CR CT : ℝ) (ka wL wF : WeightFamilies.Wt D j) (Tn nP nW : ℕ) (h0 : ℝ), FamilyHypotheses.HypPage large₂ X H C2 A2 CR CT ka wL wF Tn nP nW h0 → ReciprocityTheory.ChartRestriction.G.PullbackSections.SupBoundPageRows D large₂ ka → 2 ≤ large₂.sc.L ∧ 2 ≤ D.R.f ∧ 6 ≤ D.R.r ∧ 0 ≤ lamStar D ∧ (1 ≤ j → 1 ≤ WeightFamilies.dimY D j) ∧ (FamilyHypotheses.SupBoundPageRows D large₂ ka ↔ ReciprocityTheory.ChartRestriction.G.PullbackSections.SupBoundPageRows D large₂ ka) := by
+theorem page_two_le_L_and_signs
+    : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ)
+        (X : PJ D B P j) (large₂ : SizeData₂ D) (H : KHyp) (C2 A2 CR CT : ℝ)
+        (ka wL wF : WeightFamilies.Wt D j) (Tn nP nW : ℕ) (h0 : ℝ),
+      FamilyHypotheses.HypPage large₂ X H C2 A2 CR CT ka wL wF Tn nP nW h0
+        → ReciprocityTheory.ChartRestriction.G.PullbackSections.SupBoundPageRows D large₂ ka
+        → 2 ≤ large₂.sc.L ∧ 2 ≤ D.R.f ∧ 6 ≤ D.R.r ∧ 0 ≤ lamStar D
+          ∧ (1 ≤ j → 1 ≤ WeightFamilies.dimY D j)
+          ∧ (FamilyHypotheses.SupBoundPageRows D large₂ ka
+            ↔ ReciprocityTheory.ChartRestriction.G.PullbackSections.SupBoundPageRows D large₂
+              ka) := by
   intro D B P j X large₂ H C2 A2 CR CT ka wL wF Tn nP nW h0 hp hc
   have hm := D.R.two_le_m
   have hk := D.R.m_add_three_le_k
   have hf : 2 ≤ D.R.f := by
     have : 0 < D.R.ord := D.R.ord_pos
-    unfold Ranks.f Ranks.n; omega
+    unfold Ranks.f Ranks.n
+    omega
   have hr : 6 ≤ D.R.r := by unfold Ranks.r; omega
   refine ⟨?_, hf, hr, ?_, ?_, Iff.rfl⟩
   · obtain ⟨-, hS, -⟩ := hp
     have hn : ka.n = D.R.nV := hS.1
-    obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, hC, hZ, -⟩ := hS
+    obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, hC, hZ, -⟩ :=
+      hS
     obtain ⟨-, -, -, -, hlf, -, -, -, hln⟩ := hc
     by_contra hL
     push_neg at hL
@@ -37,13 +51,16 @@ theorem page_two_le_L_and_signs : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : 
     have he4 : Real.exp 4 ≤ 81 := by
       have : Real.exp 4 = Real.exp 1 ^ 4 := by rw [← Real.exp_nat_mul]; norm_num
       rw [this]
-      calc Real.exp 1 ^ 4 ≤ 3 ^ 4 := pow_le_pow_left₀ (Real.exp_pos 1).le he 4
+      calc
+        Real.exp 1 ^ 4
+          ≤ 3 ^ 4 := pow_le_pow_left₀ (Real.exp_pos 1).le he 4
         _ = 81 := by norm_num
     have hf1 : (D.R.f : ℝ) ≤ 81 :=
       ((Real.log_le_iff_le_exp hf0).1 (by linarith : Real.log D.R.f ≤ 4)).trans he4
     have hr1 : (D.R.r : ℝ) ≤ 81 :=
-      hrn.trans (((Real.log_le_iff_le_exp (hr0.trans_le hrn)).1
-        (by linarith : Real.log ka.n ≤ 4)).trans he4)
+      hrn.trans
+        (((Real.log_le_iff_le_exp (hr0.trans_le hrn)).1 (by linarith : Real.log ka.n ≤ 4)).trans
+          he4)
     have hfr : (D.R.f : ℝ) * D.R.r ≤ 81 * 81 := mul_le_mul hf1 hr1 hr0.le (by norm_num)
     have hZ2 : Zb D large₂ ≤ 81 * 81 * 2 := by
       unfold Zb

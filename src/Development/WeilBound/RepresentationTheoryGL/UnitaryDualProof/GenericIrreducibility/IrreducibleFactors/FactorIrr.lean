@@ -4,45 +4,56 @@ public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.Gene
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.Gal Formalism.ConjugateSelfDual IsDedekindDomain GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.CuspRep GlobalTheory.DefiniteBC
+open NumberField ReciprocityTheory.Gal Formalism.ConjugateSelfDual IsDedekindDomain
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.CuspRep GlobalTheory.DefiniteBC
 open scoped TensorProduct
 
 noncomputable section
 
 namespace PositivityTheory.RgUd.Exp.Fact
 
-theorem factorIrr (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    PositivityTheory.RgUd.Exp.FactorIrr k := by
+theorem factorIrr
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : PositivityTheory.RgUd.Exp.FactorIrr k := by
   intro r t V W _ _ _ _ A B hAs hBs hI
   classical
   obtain ⟨hX, hIirr⟩ := (GlobalTheory.CuspRep.isIrreducible_iff _).1 hI
   let ρ' := (extTensor A B).comp (GlobalTheory.SmGL.leviTwo k (Fin r) (Fin t)).symm.toMonoidHom
-  have hρ' : IsSmooth ρ' := isSmooth_comp (isSmooth_extTensor hAs hBs) _
-    (show Continuous fun g : Levi k (Two (Fin r) (Fin t)) => (g false, g true) from
-      (continuous_apply false).prodMk (continuous_apply true))
+  have hρ' : IsSmooth ρ' :=
+    isSmooth_comp (isSmooth_extTensor hAs hBs) _
+      (show Continuous fun g : Levi k (Two (Fin r) (Fin t)) => (g false, g true) from
+        (continuous_apply false).prodMk (continuous_apply true))
   have key : ∀ R : Submodule ℂ (V ⊗[ℂ] W), (∀ l, ∀ y ∈ R, ρ' l y ∈ R) → R = ⊥ ∨ R = ⊤ := by
     intro R hR
-    let Y : Submodule ℂ (IndSp (two (stdSum (rfl : r + t = r + t))) ρ') :=
-      { carrier := {f | ∀ g, f.1.1 g ∈ R}
-        add_mem' := fun ha hb g => add_mem (ha g) (hb g)
-        zero_mem' := fun g => zero_mem R
-        smul_mem' := fun c f hf g => R.smul_mem c (hf g) }
+    let Y : Submodule ℂ (IndSp (two (stdSum (rfl : r + t = r + t))) ρ') := {
+      carrier := {f | ∀ g, f.1.1 g ∈ R}
+      add_mem' := fun ha hb g => add_mem (ha g) (hb g)
+      zero_mem' := fun g => zero_mem R
+      smul_mem' := fun c f hf g => R.smul_mem c (hf g)
+    }
     have hYs : ∀ g, ∀ f ∈ Y, prod₂ A B g f ∈ Y := fun g f hf x => hf (x * g)
     rcases hIirr Y hYs with hY | hY
     · left
       refine (Submodule.eq_bot_iff R).2 fun u hu => ?_
-      obtain ⟨f, h1, h2⟩ := GlobalTheory.SmGL.ProdIrr.exists_indSp_apply_one (two (stdSum (rfl : r + t = r + t))) ρ' hρ' u
+      obtain ⟨f, h1, h2⟩ :=
+        GlobalTheory.SmGL.ProdIrr.exists_indSp_apply_one (two (stdSum (rfl : r + t = r + t))) ρ' hρ'
+          u
       have hf : f ∈ Y := fun g => by
         rcases h2 g with h | ⟨l, c, h⟩
         · rw [h]; exact zero_mem R
         · rw [h]; exact R.smul_mem c (hR l u hu)
       rw [hY, Submodule.mem_bot] at hf
-      rw [← h1, hf]; rfl
+      rw [← h1, hf]
+      rfl
     · right
       refine eq_top_iff.2 fun u _ => ?_
-      obtain ⟨f, h1, -⟩ := GlobalTheory.SmGL.ProdIrr.exists_indSp_apply_one (two (stdSum (rfl : r + t = r + t))) ρ' hρ' u
+      obtain ⟨f, h1, -⟩ :=
+        GlobalTheory.SmGL.ProdIrr.exists_indSp_apply_one (two (stdSum (rfl : r + t = r + t))) ρ' hρ'
+          u
       have hf : f ∈ Y := by rw [hY]; exact Submodule.mem_top
-      rw [← h1]; exact hf 1
+      rw [← h1]
+      exact hf 1
   have h0 : ¬ ∀ z : V ⊗[ℂ] W, z = 0 := by
     intro h
     obtain ⟨f₁, f₂, hne⟩ := hX
@@ -50,17 +61,25 @@ theorem factorIrr (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [Is
   have hV : Nontrivial V := by
     by_contra hV
     rw [not_nontrivial_iff_subsingleton] at hV
-    exact h0 fun z => TensorProduct.induction_on (motive := fun z => z = 0) z rfl
-      (fun x w => by rw [Subsingleton.elim x 0, TensorProduct.zero_tmul])
-      (fun a b ha hb => by rw [ha, hb, add_zero])
+    exact h0 fun z =>
+      TensorProduct.induction_on
+        (motive := fun z => z = 0)
+        z rfl
+        (fun x w => by rw [Subsingleton.elim x 0, TensorProduct.zero_tmul])
+        (fun a b ha hb => by rw [ha, hb, add_zero])
   have hW : Nontrivial W := by
     by_contra hW
     rw [not_nontrivial_iff_subsingleton] at hW
-    exact h0 fun z => TensorProduct.induction_on (motive := fun z => z = 0) z rfl
-      (fun x w => by rw [Subsingleton.elim w 0, TensorProduct.tmul_zero])
-      (fun a b ha hb => by rw [ha, hb, add_zero])
-  refine ⟨(GlobalTheory.CuspRep.isIrreducible_iff A).2 ⟨hV, fun S hS => ?_⟩,
-    (GlobalTheory.CuspRep.isIrreducible_iff B).2 ⟨hW, fun S hS => ?_⟩⟩
+    exact h0 fun z =>
+      TensorProduct.induction_on
+        (motive := fun z => z = 0)
+        z rfl
+        (fun x w => by rw [Subsingleton.elim w 0, TensorProduct.tmul_zero])
+        (fun a b ha hb => by rw [ha, hb, add_zero])
+  refine ⟨
+    (GlobalTheory.CuspRep.isIrreducible_iff A).2 ⟨hV, fun S hS => ?_⟩,
+    (GlobalTheory.CuspRep.isIrreducible_iff B).2 ⟨hW, fun S hS => ?_⟩
+  ⟩
   · obtain ⟨w₀, hw₀⟩ := exists_ne (0 : W)
     obtain ⟨ψ, hψ⟩ : ∃ ψ : Module.Dual ℂ W, ψ w₀ ≠ 0 := by
       by_contra h
@@ -74,10 +93,12 @@ theorem factorIrr (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [Is
       induction z using TensorProduct.induction_on with
       | zero => simp
       | tmul x w =>
-        exact ⟨⟨A ((GlobalTheory.SmGL.leviTwo k (Fin r) (Fin t)).symm l).1 x, hS _ _ x.2⟩ ⊗ₜ
-          B ((GlobalTheory.SmGL.leviTwo k (Fin r) (Fin t)).symm l).2 w, by simp [ρ']⟩
-      | add a b ha hb =>
-        rw [map_add (f := _), map_add (f := _)]; exact add_mem ha hb
+        exact ⟨
+          ⟨A ((GlobalTheory.SmGL.leviTwo k (Fin r) (Fin t)).symm l).1 x, hS _ _ x.2⟩
+            ⊗ₜ B ((GlobalTheory.SmGL.leviTwo k (Fin r) (Fin t)).symm l).2 w,
+          by simp [ρ']
+        ⟩
+      | add a b ha hb => rw [map_add (f := _), map_add (f := _)]; exact add_mem ha hb
     have hLR : ∀ y ∈ R, L y ∈ S := by
       rintro _ ⟨z, rfl⟩
       induction z using TensorProduct.induction_on with
@@ -111,10 +132,12 @@ theorem factorIrr (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [Is
       induction z using TensorProduct.induction_on with
       | zero => simp
       | tmul x w =>
-        exact ⟨A ((GlobalTheory.SmGL.leviTwo k (Fin r) (Fin t)).symm l).1 x ⊗ₜ
-          ⟨B ((GlobalTheory.SmGL.leviTwo k (Fin r) (Fin t)).symm l).2 w, hS _ _ w.2⟩, by simp [ρ']⟩
-      | add a b ha hb =>
-        rw [map_add (f := _), map_add (f := _)]; exact add_mem ha hb
+        exact ⟨
+          A ((GlobalTheory.SmGL.leviTwo k (Fin r) (Fin t)).symm l).1 x
+            ⊗ₜ ⟨B ((GlobalTheory.SmGL.leviTwo k (Fin r) (Fin t)).symm l).2 w, hS _ _ w.2⟩,
+          by simp [ρ']
+        ⟩
+      | add a b ha hb => rw [map_add (f := _), map_add (f := _)]; exact add_mem ha hb
     have hLR : ∀ y ∈ R, L y ∈ S := by
       rintro _ ⟨z, rfl⟩
       induction z using TensorProduct.induction_on with

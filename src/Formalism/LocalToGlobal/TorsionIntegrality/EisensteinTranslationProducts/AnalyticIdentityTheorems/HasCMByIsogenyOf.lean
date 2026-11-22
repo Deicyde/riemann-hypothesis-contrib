@@ -80,8 +80,10 @@ theorem cmPairHasCMBy_of (h : CmStable) : CmPairHasCMBy := by
   rw [heq]
   exact hst w hw
 
-theorem hasCMByIsogeny_of (hs : HasCMByStable) (he : KerRepsExist) (hc : KerRepsCard)
-    (hf : IsogenyFormulaInstance) (h2 : QuasiPeriodConstIsogeny) : HasCMByIsogeny := by
+theorem hasCMByIsogeny_of
+    (hs : HasCMByStable) (he : KerRepsExist) (hc : KerRepsCard) (hf : IsogenyFormulaInstance)
+    (h2 : QuasiPeriodConstIsogeny)
+    : HasCMByIsogeny := by
   intro d L hL m n hmn hd
   have hα0 := CmBy.ne_zero d hd m n hmn
   obtain ⟨hms, hnorm⟩ := hs d L hL m n
@@ -97,7 +99,8 @@ theorem jInvScale_of (h : Homogeneity) : JInvScale := by
   have e2 : ((c ^ 6)⁻¹ * L.g₃) ^ 2 = (c ^ 12)⁻¹ * L.g₃ ^ 2 := by ring
   rw [e1, e2, show (1728 : ℂ) * ((c ^ 12)⁻¹ * L.g₂ ^ 3) = (c ^ 12)⁻¹ * (1728 * L.g₂ ^ 3) by ring,
     show (c ^ 12)⁻¹ * L.g₂ ^ 3 - 27 * ((c ^ 12)⁻¹ * L.g₃ ^ 2)
-      = (c ^ 12)⁻¹ * (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) by ring,
+        = (c ^ 12)⁻¹ * (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) by
+      ring,
     mul_div_mul_left _ _ hc12]
 
 theorem has_cm_scale : HasCMByScale := hasCMByScale_of homogeneity

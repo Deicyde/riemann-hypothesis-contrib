@@ -30,15 +30,22 @@ theorem locCpt (n : ℕ) : LocallyCompactSpace (G n) := by
   haveI : LocallyCompactSpace (Mat n)ᵐᵒᵖ := MulOpposite.opHomeomorph.symm.isClosedEmbedding.locallyCompactSpace
   exact Units.isClosedEmbedding_embedProduct.locallyCompactSpace
 
-theorem exists_haar (n : ℕ) : ∃ (_ : MeasurableSpace (G n)) (_ : BorelSpace (G n)) (μ : Measure (G n)), μ.IsHaarMeasure := by
+theorem exists_haar (n : ℕ)
+    : ∃ (_ : MeasurableSpace (G n)) (_ : BorelSpace (G n)) (μ : Measure (G n)),
+      μ.IsHaarMeasure := by
   haveI := locCpt n
   letI : MeasurableSpace (G n) := borel _
   haveI : BorelSpace (G n) := ⟨rfl⟩
   exact ⟨inferInstance, inferInstance, Measure.haar, inferInstance⟩
 
-theorem waveEq {n : ℕ} (E : KMod n) (u : ℝ → Mat n → E.V) (hu : IsWave E u) (A : E.V →L[ℂ] E.V)
-    (hA : ∀ f ∈ CE E, ∀ g ∈ GLs n, Om f g = (1 / 4 : ℂ) • ∑ p : Ix n, Rd (hm p) (Rd (hm p) f) g + A (f g)) :
-    ∀ s, ∀ y ∈ GLs n, dt (dt u) s y = (1 / 4 : ℝ) • ∑ p : Ix n, Rr (hm p) (Rt (hm p) u s) y + (A.restrictScalars ℝ) (u s y) := by
+theorem waveEq
+    {n : ℕ} (E : KMod n) (u : ℝ → Mat n → E.V) (hu : IsWave E u) (A : E.V →L[ℂ] E.V)
+    (hA : ∀ f ∈ CE E, ∀ g ∈ GLs n,
+      Om f g = (1 / 4 : ℂ) • ∑ p : Ix n, Rd (hm p) (Rd (hm p) f) g + A (f g))
+    : ∀ s, ∀ y ∈ GLs n,
+      dt (dt u) s y
+        = (1 / 4 : ℝ) • ∑ p : Ix n, Rr (hm p) (Rt (hm p) u s) y
+          + (A.restrictScalars ℝ) (u s y) := by
   intro s y hy
   have h := hu.2.2.1 s y hy
   rw [hA _ (hu.2.1 s) y hy] at h
@@ -49,12 +56,21 @@ theorem waveEq {n : ℕ} (E : KMod n) (u : ℝ → Mat n → E.V) (hu : IsWave E
   rw [this]
   rfl
 
-theorem speed_pos (hL : LgFacts) (hR : RCalc) {n : ℕ} (C₁ : ℝ) (hC₁ : 0 ≤ C₁)
-    (hlg : ∀ x ∈ GLs n, ContDiffOn ℝ ∞ (fun y : Mat n => lg (x⁻¹ * y)) (GLs n) ∧ (∀ R : ℝ, IsCompact {y : G n | lg (x⁻¹ * y.val) ≤ R}) ∧ ∀ y ∈ GLs n, ∀ p : Ix n, |fderiv ℝ (fun y : Mat n => lg (x⁻¹ * y)) y (y * hm p)| ≤ C₁)
-    (χ : ℝ → ℝ) (h1 : ContDiff ℝ ∞ χ) (h2 : ∀ x, deriv χ x ≤ 0) (h3 : ∀ x, 0 ≤ χ x) (h4 : ∀ x, x ≤ 0 → χ x = 1) (h5 : ∀ x, 1 ≤ x → χ x = 0)
-    (E : KMod n) (u : ℝ → Mat n → E.V) (hu : IsWave E u) (t : ℝ) (ht : 0 ≤ t) (x : Mat n) (hx : x ∈ GLs n)
+theorem speed_pos
+    (hL : LgFacts) (hR : RCalc)
+    {n : ℕ} (C₁ : ℝ) (hC₁ : 0 ≤ C₁)
+    (hlg : ∀ x ∈ GLs n,
+      ContDiffOn ℝ ∞ (fun y : Mat n => lg (x⁻¹ * y)) (GLs n)
+        ∧ (∀ R : ℝ, IsCompact {y : G n | lg (x⁻¹ * y.val) ≤ R})
+        ∧ ∀ y ∈ GLs n, ∀ p : Ix n, |fderiv ℝ (fun y : Mat n => lg (x⁻¹ * y)) y (y * hm p)| ≤ C₁)
+    (χ : ℝ → ℝ) (h1 : ContDiff ℝ ∞ χ) (h2 : ∀ x, deriv χ x ≤ 0) (h3 : ∀ x, 0 ≤ χ x)
+    (h4 : ∀ x, x ≤ 0 → χ x = 1) (h5 : ∀ x, 1 ≤ x → χ x = 0)
+    (E : KMod n) (u : ℝ → Mat n → E.V) (hu : IsWave E u)
+    (t : ℝ) (ht : 0 ≤ t)
+    (x : Mat n) (hx : x ∈ GLs n)
     (C : ℝ) (hC : C₁ * (1 + Fintype.card (Ix n)) ≤ C)
-    (h0 : ∀ y ∈ GLs n, lg y ≤ lg (1 : Mat n) + 1 + C * t → u 0 (x * y) = 0) : u t x = 0 := by
+    (h0 : ∀ y ∈ GLs n, lg y ≤ lg (1 : Mat n) + 1 + C * t → u 0 (x * y) = 0)
+    : u t x = 0 := by
   obtain ⟨mG, bG, μ, hμ⟩ := exists_haar n
   letI : InnerProductSpace ℝ E.V := InnerProductSpace.rclikeToReal ℂ E.V
   obtain ⟨A, hA⟩ := GlobalTheory.T.casimir_right_laplacian_formula E
@@ -68,17 +84,26 @@ theorem speed_pos (hL : LgFacts) (hR : RCalc) {n : ℕ} (C₁ : ℝ) (hC₁ : 0 
   have hmul : ∀ y ∈ GLs n, x⁻¹ * y ∈ GLs n := fun y hy => by
     simp only [GLs, Set.mem_setOf_eq, Matrix.det_mul]
     exact mul_ne_zero hxi hy
-  have hbp : ∀ Ψ : Mat n → ℝ, ContDiffOn ℝ ∞ Ψ (GLs n) → (∃ R : ℝ, ∀ y ∈ GLs n, R < lg (x⁻¹ * y) → Ψ y = 0) → ∀ X : Mat n, ∫ y : G n, Rr X Ψ y.val ∂μ = 0 := by
+  have hbp
+      : ∀ Ψ : Mat n → ℝ,
+        ContDiffOn ℝ ∞ Ψ (GLs n) → (∃ R : ℝ, ∀ y ∈ GLs n, R < lg (x⁻¹ * y) → Ψ y = 0)
+          → ∀ X : Mat n, ∫ y : G n, Rr X Ψ y.val ∂μ = 0 := by
     intro Ψ hΨ ⟨R, hRΨ⟩ X
-    refine GlobalTheory.T.integral_right_derivative_zero_alt hR μ Ψ hΨ ⟨R + lg x, fun y hy hlt => hRΨ y hy ?_⟩ X
+    refine GlobalTheory.T.integral_right_derivative_zero_alt hR μ Ψ hΨ
+      ⟨R + lg x, fun y hy hlt => hRΨ y hy ?_⟩ X
     have := (hL n).1 x hx _ (hmul y hy)
     rw [← mul_assoc, hxx', one_mul] at this
     linarith
-  have hv := GlobalTheory.T.energy_identity_of_length_function (W := E.V) μ (fun y => lg (x⁻¹ * y)) l1 l2 C₁ hC₁ l3 hbp χ h1 h2 h3 h5 u hu.1
-    (A.restrictScalars ℝ) (waveEq E u hu A hA) C hC (lg (1 : Mat n) + C * t) h4 ?_ ?_ t ht x hx ?_
+  have hv :=
+    GlobalTheory.T.energy_identity_of_length_function (W := E.V) μ
+      (fun y => lg (x⁻¹ * y))
+      l1 l2 C₁ hC₁ l3 hbp χ h1 h2 h3 h5 u hu.1 (A.restrictScalars ℝ) (waveEq E u hu A hA) C hC
+      (lg (1 : Mat n) + C * t) h4 ?_ ?_ t ht x hx ?_
   · exact hv
   · intro y hy hlt
-    have := h0 (x⁻¹ * y) (hmul y hy) (by have h' : lg (x⁻¹ * y) < lg (1 : Mat n) + C * t + 1 := hlt; linarith)
+    have :=
+      h0 (x⁻¹ * y) (hmul y hy)
+        (by have h' : lg (x⁻¹ * y) < lg (1 : Mat n) + C * t + 1 := hlt; linarith)
     rwa [← mul_assoc, hxx', one_mul] at this
   · intro y hy
     exact hu.2.2.2 y hy
@@ -97,8 +122,14 @@ theorem asmSpeed : AsmSpeed := by
     have : 0 ≤ ∑ a, ∑ b, (‖(1 : Mat n) a b‖ ^ 2 + ‖(1 : Mat n)⁻¹ a b‖ ^ 2) := by positivity
     linarith
   refine ⟨C + lg (1 : Mat n) + 1, ?_⟩
-  have key : ∀ (E : KMod n) (u : ℝ → Mat n → E.V), IsWave E u → ∀ t : ℝ, 0 ≤ t → ∀ x ∈ GLs n,
-      (∀ y ∈ GLs n, lg y ≤ (C + lg (1 : Mat n) + 1) * (1 + t) → u 0 (x * y) = 0) → u t x = 0 := by
+  have key
+      : ∀ (E : KMod n) (u : ℝ → Mat n → E.V),
+        IsWave E u
+          → ∀ t : ℝ,
+            0 ≤ t
+              → ∀ x ∈ GLs n,
+                (∀ y ∈ GLs n, lg y ≤ (C + lg (1 : Mat n) + 1) * (1 + t) → u 0 (x * y) = 0)
+                  → u t x = 0 := by
     intro E u hu t ht x hx h0
     refine speed_pos hL hR C₁ hC₁ hlg χ h1 h2 h3 h4 h5 E u hu t ht x hx C le_rfl ?_
     intro y hy hle
@@ -107,10 +138,11 @@ theorem asmSpeed : AsmSpeed := by
   intro E u hu t x hx h0
   rcases le_total 0 t with ht | ht
   · exact key E u hu t ht x hx (by rwa [abs_of_nonneg ht] at h0)
-  · have := key E _ (GlobalTheory.T.wave_time_reversal E u hu) (-t) (by linarith) x hx (by
-      intro y hy hle
-      simp only [neg_zero]
-      exact h0 y hy (by rwa [abs_of_nonpos ht]))
+  · have :=
+      key E _ (GlobalTheory.T.wave_time_reversal E u hu) (-t) (by linarith) x hx (by
+        intro y hy hle
+        simp only [neg_zero]
+        exact h0 y hy (by rwa [abs_of_nonpos ht]))
     simpa using this
 
 end GlobalTheory.CompanionTheory.WaveSpd

@@ -7,11 +7,17 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 @[expose] public section
 
 open Matrix in
-private theorem hpk_sq (k r : ℕ) : Formalism.QuantumDeterminants.Hpk k r * Formalism.QuantumDeterminants.Hpk k r = 1 := by
-  have key : ∀ i : Fin (2 * r + k + 1), ∃ s : Fin (2 * r + k + 1),
-      (s.val = if r ≤ i.val ∧ i.val ≤ r + k then i.val else 2 * r + k - i.val) := fun i =>
-    ⟨⟨if r ≤ i.val ∧ i.val ≤ r + k then i.val else 2 * r + k - i.val, by
-      have := i.isLt; split_ifs <;> omega⟩, rfl⟩
+private theorem hpk_sq (k r : ℕ)
+    : Formalism.QuantumDeterminants.Hpk k r * Formalism.QuantumDeterminants.Hpk k r = 1 := by
+  have key
+      : ∀ i : Fin (2 * r + k + 1), ∃ s : Fin (2 * r + k + 1),
+        (s.val = if r ≤ i.val ∧ i.val ≤ r + k then i.val else 2 * r + k - i.val) := fun i => ⟨
+    ⟨
+      if r ≤ i.val ∧ i.val ≤ r + k then i.val else 2 * r + k - i.val,
+      by have := i.isLt; split_ifs <;> omega
+    ⟩,
+    rfl
+  ⟩
   ext i l
   obtain ⟨s, hs⟩ := key i
   have hi := i.isLt

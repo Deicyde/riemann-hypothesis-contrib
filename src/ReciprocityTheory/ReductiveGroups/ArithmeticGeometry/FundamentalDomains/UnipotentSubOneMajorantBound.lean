@@ -59,8 +59,10 @@ lemma maj_nonneg' (hself : ∀ v, X.Hf x τ v v = (X.maj x τ v : ℂ))
   · rw [hv, X.maj_zero' hself]
   · exact (hpos v hv).le
 
-variable {e : Fin r → ℂ} (δ : (Fin r → ℂ) →ₗ[ℂ] ℂ) (hx : x ∈ X.dom) (he : hermC τ.1 X.Gm e e = 0)
-  (hq : X.d2q x τ e ≠ 0) (hself : ∀ v, X.Hf x τ v v = (X.maj x τ v : ℂ))
+variable
+  {e : Fin r → ℂ}
+  (δ : (Fin r → ℂ) →ₗ[ℂ] ℂ) (hx : x ∈ X.dom) (he : hermC τ.1 X.Gm e e = 0) (hq : X.d2q x τ e ≠ 0)
+  (hself : ∀ v, X.Hf x τ v v = (X.maj x τ v : ℂ))
 include hx he hq hself
 
 lemma maj_Ce_bz (C b : ℂ) :

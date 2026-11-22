@@ -6,4 +6,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.RealFieldCompari
 
 @[expose] public section
 
-theorem adelic_compact_real_places : PI.AdBridgeSteps.RealK := PI.UnitaryGroupMassFormula.BridgeRealK.realK
+theorem adelic_compact_real_places : PI.AdBridgeSteps.RealK :=
+  PI.UnitaryGroupMassFormula.BridgeRealK.realK

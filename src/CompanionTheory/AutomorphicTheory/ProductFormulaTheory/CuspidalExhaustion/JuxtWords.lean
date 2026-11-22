@@ -7,7 +7,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.M
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc Zc.M
 
 namespace CompanionTheory.Exh
 
@@ -26,7 +27,8 @@ theorem decW_up (Δ : Segment k) : decW (up Δ) = nxt Δ :: decW Δ := by
     omega
   rw [h]
 
-theorem nxt_not_mem (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (Δ : Segment k) : nxt Δ ∉ decW Δ := by
+theorem nxt_not_mem (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (Δ : Segment k)
+    : nxt Δ ∉ decW Δ := by
   intro h
   rw [decW, List.mem_ofFn] at h
   obtain ⟨i, hi⟩ := h
@@ -34,8 +36,11 @@ theorem nxt_not_mem (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (Δ : 
   have h3 := (Fin.rev i).isLt
   omega
 
-theorem eq_decW_of_append (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (Δ : Segment k) (u P Q : List (IrrGL (k := k)))
-    (h1 : decW Δ = P ++ Q) (h2 : u ++ [nxt Δ] = P ++ nxt Δ :: Q) : u = decW Δ := by
+theorem eq_decW_of_append
+    (hA : GlobalTheory.Published.IrreducibleAdmissibleGL)
+    (Δ : Segment k) (u P Q : List (IrrGL (k := k)))
+    (h1 : decW Δ = P ++ Q) (h2 : u ++ [nxt Δ] = P ++ nxt Δ :: Q)
+    : u = decW Δ := by
   rcases Q.eq_nil_or_concat' with rfl | ⟨Q', q, rfl⟩
   · rw [h1, List.append_nil]
     exact (List.append_inj' h2 rfl).1

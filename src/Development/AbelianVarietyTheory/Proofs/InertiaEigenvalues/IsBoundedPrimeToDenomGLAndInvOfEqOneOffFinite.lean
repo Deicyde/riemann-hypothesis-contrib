@@ -18,11 +18,16 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BndMul
 @[expose] public section
 
 open NumberField Matrix Complex IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level Host
 open GlobalTheory.SW hiding Level IsSB
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
-open GlobalTheory.ExportSeries (Base Twist Weight PairRep GLR detChar detFam fockGL harm harmLat IsCoefRing finPt series idem)
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.IndefR.FWT Formalism.L2.Pj
+open GlobalTheory.ExportSeries
+  (Base Twist Weight PairRep GLR detChar detFam fockGL harm harmLat IsCoefRing finPt series idem)
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
@@ -31,17 +36,20 @@ open GlobalTheory.StdAtPrime
 
 namespace GlobalTheory.StdAtPrime
 
-theorem natCast_adicCompletion_v_le_one {E : Type} [Field E] [NumberField E]
-    (Q : HeightOneSpectrum (𝓞 E)) (k : ℕ) : Valued.v ((k : Q.adicCompletion E)) ≤ 1 := by
+theorem natCast_adicCompletion_v_le_one
+    {E : Type} [Field E] [NumberField E] (Q : HeightOneSpectrum (𝓞 E)) (k : ℕ)
+    : Valued.v ((k : Q.adicCompletion E)) ≤ 1 := by
   have h := HeightOneSpectrum.coe_mem_adicCompletionIntegers (K := E) (v := Q) (k : 𝓞 E)
   rw [HeightOneSpectrum.mem_adicCompletionIntegers] at h
   simpa using h
 
-theorem exists_coprime_natCast_mul_v_le_one {E : Type} [Field E] [NumberField E]
-    (p : ℕ) (hp : p.Prime) (Q : HeightOneSpectrum (𝓞 E)) (hpQ : (p : 𝓞 E) ∉ Q.asIdeal)
-    (x : Q.adicCompletion E) :
-    ∃ r : ℕ, r.Coprime p ∧ Valued.v ((r : Q.adicCompletion E) * x) ≤ 1 := by
-  obtain ⟨b, hb, hbx⟩ := HeightOneSpectrum.adicCompletion.mul_nonZeroDivisor_mem_adicCompletionIntegers Q x
+theorem exists_coprime_natCast_mul_v_le_one
+    {E : Type} [Field E] [NumberField E]
+    (p : ℕ) (hp : p.Prime)
+    (Q : HeightOneSpectrum (𝓞 E)) (hpQ : (p : 𝓞 E) ∉ Q.asIdeal) (x : Q.adicCompletion E)
+    : ∃ r : ℕ, r.Coprime p ∧ Valued.v ((r : Q.adicCompletion E) * x) ≤ 1 := by
+  obtain ⟨b, hb, hbx⟩ :=
+    HeightOneSpectrum.adicCompletion.mul_nonZeroDivisor_mem_adicCompletionIntegers Q x
   rw [HeightOneSpectrum.mem_adicCompletionIntegers] at hbx
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   set N := Ideal.absNorm (Ideal.span {b}) with hNdef
@@ -58,8 +66,10 @@ theorem exists_coprime_natCast_mul_v_le_one {E : Type} [Field E] [NumberField E]
     simp only [map_natCast] at h1 h2
     rw [h1, h2]
   have hNx : Valued.v ((N : Q.adicCompletion E) * x) ≤ 1 := by
-    have e : ((N : Q.adicCompletion E)) = (algebraMap (𝓞 E) (Q.adicCompletion E) c) *
-        (algebraMap (𝓞 E) (Q.adicCompletion E) b) := by
+    have e
+        : ((N : Q.adicCompletion E))
+          = (algebraMap (𝓞 E) (Q.adicCompletion E) c)
+            * (algebraMap (𝓞 E) (Q.adicCompletion E) b) := by
       rw [← map_mul, hc, map_natCast]
     rw [e, mul_assoc, Valuation.map_mul, mul_comm _ x]
     refine mul_le_one' ?_ hbx
@@ -74,11 +84,15 @@ end GlobalTheory.StdAtPrime
 
 namespace GlobalTheory.StdAtPrime
 
-theorem bnd_of_local {E : Type} [Field E] [NumberField E] (p : ℕ) (n : ℕ)
-    (A : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) (S : Set (HeightOneSpectrum (𝓞 E)))
-    (hS : S.Finite)
-    (hin : ∀ Q ∈ S, ∀ i j, ∃ r : ℕ, r.Coprime p ∧ Valued.v ((r : Q.adicCompletion E) * (A i j) Q) ≤ 1)
-    (hout : ∀ Q ∉ S, ∀ i j, Valued.v ((A i j) Q) ≤ 1) : Bnd p A := by
+theorem bnd_of_local
+    {E : Type} [Field E] [NumberField E]
+    (p : ℕ)
+    (n : ℕ) (A : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E))
+    (S : Set (HeightOneSpectrum (𝓞 E))) (hS : S.Finite)
+    (hin
+      : ∀ Q ∈ S, ∀ i j, ∃ r : ℕ, r.Coprime p ∧ Valued.v ((r : Q.adicCompletion E) * (A i j) Q) ≤ 1)
+    (hout : ∀ Q ∉ S, ∀ i j, Valued.v ((A i j) Q) ≤ 1)
+    : Bnd p A := by
   classical
   let f : HeightOneSpectrum (𝓞 E) × Fin n × Fin n → ℕ := fun t =>
     if h : t.1 ∈ S then Classical.choose (hin t.1 h t.2.1 t.2.2) else 1
@@ -103,9 +117,9 @@ theorem bnd_of_local {E : Type} [Field E] [NumberField E] (p : ℕ) (n : ℕ)
   · rw [Valuation.map_mul]
     exact mul_le_one' (natCast_adicCompletion_v_le_one Q _) (hout Q hQ i j)
 
-theorem one_entry_v_le_one {E : Type} [Field E] [NumberField E] (n : ℕ)
-    (Q : HeightOneSpectrum (𝓞 E)) (i j : Fin n) :
-    Valued.v (((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q) ≤ 1 := by
+theorem one_entry_v_le_one
+    {E : Type} [Field E] [NumberField E] (n : ℕ) (Q : HeightOneSpectrum (𝓞 E)) (i j : Fin n)
+    : Valued.v (((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q) ≤ 1 := by
   rw [Matrix.one_apply]
   split_ifs
   · have := natCast_adicCompletion_v_le_one Q 1
@@ -115,14 +129,18 @@ theorem one_entry_v_le_one {E : Type} [Field E] [NumberField E] (n : ℕ)
     rw [map_zero, map_zero]
     exact zero_le_one
 
-theorem inv_eq_one_off {E : Type} [Field E] [NumberField E] (n : ℕ)
-    (G : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (Q : HeightOneSpectrum (𝓞 E))
-    (hQ : ∀ i j, (G.1 i j) Q = ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q) :
-    ∀ i j, ((G⁻¹).1 i j) Q = ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q := by
+theorem inv_eq_one_off
+    {E : Type} [Field E] [NumberField E]
+    (n : ℕ) (G : GL (Fin n) (FiniteAdeleRing (𝓞 E) E))
+    (Q : HeightOneSpectrum (𝓞 E))
+    (hQ : ∀ i j, (G.1 i j) Q = ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q)
+    : ∀ i j, ((G⁻¹).1 i j) Q = ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q := by
   let ev : FiniteAdeleRing (𝓞 E) E →+* Q.adicCompletion E := RestrictedProduct.evalRingHom _ Q
   have hev : ∀ x : FiniteAdeleRing (𝓞 E) E, x Q = ev x := fun _ => rfl
-  have hone : ∀ i j, ev ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) =
-      (1 : Matrix (Fin n) (Fin n) (Q.adicCompletion E)) i j := by
+  have hone
+      : ∀ i j,
+        ev ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j)
+          = (1 : Matrix (Fin n) (Fin n) (Q.adicCompletion E)) i j := by
     intro i j; rw [Matrix.one_apply, Matrix.one_apply]; split_ifs <;> simp
   have h1 : ev.mapMatrix G.1 = 1 := by
     ext i j
@@ -139,12 +157,20 @@ theorem inv_eq_one_off {E : Type} [Field E] [NumberField E] (n : ℕ)
   have := congrFun (congrFun h2 i) j
   rwa [RingHom.mapMatrix_apply, Matrix.map_apply] at this
 
-theorem bnd_and_bnd_inv_of_eq_one_off_finite : ∀ {E : Type} [Field E] [NumberField E] (p : ℕ), p.Prime → ∀ (n : ℕ) (G : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (S : Set (HeightOneSpectrum (𝓞 E))), S.Finite → (∀ Q ∈ S, (p : 𝓞 E) ∉ Q.asIdeal) → (∀ Q ∉ S, ∀ i j, (G.1 i j) Q = ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q) → Bnd p G.1 ∧ Bnd p (G⁻¹).1 := by
+theorem bnd_and_bnd_inv_of_eq_one_off_finite
+    : ∀ {E : Type} [Field E] [NumberField E] (p : ℕ),
+      p.Prime
+        → ∀ (n : ℕ) (G : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (S : Set (HeightOneSpectrum (𝓞 E))),
+          S.Finite → (∀ Q ∈ S, (p : 𝓞 E) ∉ Q.asIdeal)
+            → (∀ Q ∉ S, ∀ i j,
+              (G.1 i j) Q = ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q)
+            → Bnd p G.1 ∧ Bnd p (G⁻¹).1 := by
   intro E _ _ p hp n G S hS hpS hG
   have hGi := fun Q hQ => inv_eq_one_off n G Q (hG Q hQ)
-  have key : ∀ A : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E),
-      (∀ Q ∉ S, ∀ i j, (A i j) Q = ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q) →
-      Bnd p A := by
+  have key
+      : ∀ A : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E),
+        (∀ Q ∉ S, ∀ i j, (A i j) Q = ((1 : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)) i j) Q)
+          → Bnd p A := by
     intro A hA
     refine bnd_of_local p n A S hS (fun Q hQ i j => ?_) (fun Q hQ i j => ?_)
     · exact exists_coprime_natCast_mul_v_le_one p hp Q (hpS Q hQ) _

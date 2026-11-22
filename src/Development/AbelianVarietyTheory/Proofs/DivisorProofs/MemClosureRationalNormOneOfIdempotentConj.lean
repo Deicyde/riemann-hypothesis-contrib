@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousLo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.QSA GlobalTheory.Published
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.QSA GlobalTheory.Published
 open Matrix
 open scoped Quaternion Topology TensorProduct
 
@@ -34,9 +35,11 @@ theorem continuous_imJ : Continuous (fun x : ℍ[R, a, b] => x.imJ) :=
 theorem continuous_imK : Continuous (fun x : ℍ[R, a, b] => x.imK) :=
   (continuous_apply 3).comp (continuous_induced_dom (f := (coords : ℍ[R, a, b] → Fin 4 → R)))
 
-theorem continuous_of_coords {X : Type*} [TopologicalSpace X] {f : X → ℍ[R, a, b]}
-    (h0 : Continuous fun x => (f x).re) (h1 : Continuous fun x => (f x).imI)
-    (h2 : Continuous fun x => (f x).imJ) (h3 : Continuous fun x => (f x).imK) : Continuous f := by
+theorem continuous_of_coords
+    {X : Type*} [TopologicalSpace X]
+    {f : X → ℍ[R, a, b]} (h0 : Continuous fun x => (f x).re) (h1 : Continuous fun x => (f x).imI)
+    (h2 : Continuous fun x => (f x).imJ) (h3 : Continuous fun x => (f x).imK)
+    : Continuous f := by
   refine continuous_induced_rng.2 (continuous_pi fun i => ?_)
   fin_cases i
   · exact h0
@@ -48,17 +51,20 @@ attribute [local fun_prop] continuous_re continuous_imI continuous_imJ continuou
 
 scoped instance : ContinuousMul ℍ[R, a, b] :=
   ⟨continuous_of_coords (by simp only [QuaternionAlgebra.re_mul]; fun_prop)
-    (by simp only [QuaternionAlgebra.imI_mul]; fun_prop) (by simp only [QuaternionAlgebra.imJ_mul]; fun_prop)
+    (by simp only [QuaternionAlgebra.imI_mul]; fun_prop)
+    (by simp only [QuaternionAlgebra.imJ_mul]; fun_prop)
     (by simp only [QuaternionAlgebra.imK_mul]; fun_prop)⟩
 
 scoped instance : ContinuousAdd ℍ[R, a, b] :=
   ⟨continuous_of_coords (by simp only [QuaternionAlgebra.re_add]; fun_prop)
-    (by simp only [QuaternionAlgebra.imI_add]; fun_prop) (by simp only [QuaternionAlgebra.imJ_add]; fun_prop)
+    (by simp only [QuaternionAlgebra.imI_add]; fun_prop)
+    (by simp only [QuaternionAlgebra.imJ_add]; fun_prop)
     (by simp only [QuaternionAlgebra.imK_add]; fun_prop)⟩
 
 scoped instance : ContinuousNeg ℍ[R, a, b] :=
   ⟨continuous_of_coords (by simp only [QuaternionAlgebra.re_neg]; fun_prop)
-    (by simp only [QuaternionAlgebra.imI_neg]; fun_prop) (by simp only [QuaternionAlgebra.imJ_neg]; fun_prop)
+    (by simp only [QuaternionAlgebra.imI_neg]; fun_prop)
+    (by simp only [QuaternionAlgebra.imJ_neg]; fun_prop)
     (by simp only [QuaternionAlgebra.imK_neg]; fun_prop)⟩
 
 scoped instance : IsTopologicalRing ℍ[R, a, b] := {}
@@ -71,11 +77,11 @@ scoped instance : ContinuousSMul R ℍ[R, a, b] :=
 
 scoped instance : ContinuousStar ℍ[R, a, b] :=
   ⟨continuous_of_coords (by simp only [QuaternionAlgebra.re_star]; fun_prop)
-    (by simp only [QuaternionAlgebra.imI_star]; fun_prop) (by simp only [QuaternionAlgebra.imJ_star]; fun_prop)
+    (by simp only [QuaternionAlgebra.imI_star]; fun_prop)
+    (by simp only [QuaternionAlgebra.imJ_star]; fun_prop)
     (by simp only [QuaternionAlgebra.imK_star]; fun_prop)⟩
 
-theorem continuous_nrm : Continuous (fun x : ℍ[R, a, b] => nrm x) := by
-  unfold nrm; fun_prop
+theorem continuous_nrm : Continuous (fun x : ℍ[R, a, b] => nrm x) := by unfold nrm; fun_prop
 
 end Top
 
@@ -87,8 +93,10 @@ namespace GlobalTheory.QSA.Unconj
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem isPlacesIdem_mul_self {S₁ : Finset (InfinitePlace F)} {S₂ : Finset (HeightOneSpectrum (𝓞 F))} {η : AF F}
-    (hη : IsPlacesIdem S₁ S₂ η) : η * η = η := by
+theorem isPlacesIdem_mul_self
+    {S₁ : Finset (InfinitePlace F)} {S₂ : Finset (HeightOneSpectrum (𝓞 F))} {η : AF F}
+    (hη : IsPlacesIdem S₁ S₂ η)
+    : η * η = η := by
   have h1 : fstA F (η * η) = fstA F η := by
     rw [map_mul]
     funext w
@@ -108,29 +116,33 @@ theorem isPlacesIdem_mul_self {S₁ : Finset (InfinitePlace F)} {S₂ : Finset (
 theorem rat_mul {a b : F} (x y : ℍ[F, a, b]) : rat (x * y) = rat x * rat y := by
   ext <;> simp [rat] <;> ring
 
-theorem rat_one {a b : F} : rat (1 : ℍ[F, a, b]) = 1 := by
-  ext <;> simp [rat]
+theorem rat_one {a b : F} : rat (1 : ℍ[F, a, b]) = 1 := by ext <;> simp [rat]
 
-theorem rat_star {a b : F} (x : ℍ[F, a, b]) : rat (star x) = star (rat x) := by
-  ext <;> simp [rat]
+theorem rat_star {a b : F} (x : ℍ[F, a, b]) : rat (star x) = star (rat x) := by ext <;> simp [rat]
 
-theorem rat_smul {a b : F} (t : F) (x : ℍ[F, a, b]) : rat (t • x) = algebraMap F (AF F) t • rat x := by
+theorem rat_smul {a b : F} (t : F) (x : ℍ[F, a, b])
+    : rat (t • x) = algebraMap F (AF F) t • rat x := by
   ext <;> simp [rat, Algebra.smul_def]
 
-theorem nrm_smul {R : Type*} [CommRing R] {a b : R} (s : R) (x : ℍ[R, a, b]) : nrm (s • x) = s ^ 2 * nrm x := by
+theorem nrm_smul {R : Type*} [CommRing R] {a b : R} (s : R) (x : ℍ[R, a, b])
+    : nrm (s • x) = s ^ 2 * nrm x := by
   simp only [nrm, QuaternionAlgebra.re_smul, QuaternionAlgebra.imI_smul, QuaternionAlgebra.imJ_smul,
     QuaternionAlgebra.imK_smul, smul_eq_mul]
   ring
 
-theorem star_smul' {R : Type*} [CommRing R] {a b : R} (s : R) (x : ℍ[R, a, b]) : star (s • x) = s • star x := by
+theorem star_smul' {R : Type*} [CommRing R] {a b : R} (s : R) (x : ℍ[R, a, b])
+    : star (s • x) = s • star x := by
   ext <;> simp <;> ring
 
 end GlobalTheory.QSA.Unconj
 
 namespace GlobalTheory.QSA.Unconj
-theorem conj_core {R : Type*} [CommRing R] {a b : R} (η s : R) (hηη : η * η = η) (X c c' h : ℍ[R, a, b])
-    (hh : η • h = h) :
-    (η • X) * c * h * (c' * ((η * s) • star (η • X))) = X * (c * h * c') * (s • star X) := by
+theorem conj_core
+    {R : Type*} [CommRing R]
+    {a b : R}
+    (η s : R) (hηη : η * η = η)
+    (X c c' h : ℍ[R, a, b]) (hh : η • h = h)
+    : (η • X) * c * h * (c' * ((η * s) • star (η • X))) = X * (c * h * c') * (s • star X) := by
   conv_rhs => rw [← hh]
   simp only [smul_mul_assoc, mul_smul_comm, smul_smul, star_smul', mul_assoc]
   rw [hηη, mul_left_comm, hηη]
@@ -138,10 +150,18 @@ end GlobalTheory.QSA.Unconj
 
 namespace GlobalTheory.QSA.Unconj
 
-theorem conj_mem_closure_normOne_of_idempotent : ∀ (F : Type) [Field F] [NumberField F] (a b : F), a ≠ 0 → b ≠ 0 →
-    ∀ (T₁ : Finset (InfinitePlace F)) (T₂ : Finset (HeightOneSpectrum (𝓞 F))) (η : AF F), IsPlacesIdem T₁ T₂ η →
-    ∀ ε : AF F, ε * ε = ε → ∀ g : DA F a b, nrm g = 1 → η • (g - 1) = g - 1 → ∀ c c' : DA F a b, c * c' = 1 →
-    c' * c = 1 → c * g * c' ∈ closure (H0 (a := a) (b := b) ε) → g ∈ closure (H0 (a := a) (b := b) ε) := by
+theorem conj_mem_closure_normOne_of_idempotent
+    : ∀ (F : Type) [Field F] [NumberField F] (a b : F),
+      a ≠ 0 → b ≠ 0
+        → ∀ (T₁ : Finset (InfinitePlace F)) (T₂ : Finset (HeightOneSpectrum (𝓞 F))) (η : AF F),
+          IsPlacesIdem T₁ T₂ η
+            → ∀ ε : AF F,
+              ε * ε = ε
+                → ∀ g : DA F a b,
+                  nrm g = 1 → η • (g - 1) = g - 1
+                    → ∀ c c' : DA F a b,
+                      c * c' = 1 → c' * c = 1 → c * g * c' ∈ closure (H0 (a := a) (b := b) ε)
+                        → g ∈ closure (H0 (a := a) (b := b) ε) := by
   intro F _ _ a b _ _ T₁ T₂ η hη ε hε g _ hgη c c' hcc' hc'c hx
   have hηη := isPlacesIdem_mul_self hη
   obtain ⟨-, -, hconj, -⟩ := GlobalTheory.T.closure_normOneProducts_h0_properties F a b ε hε
@@ -158,8 +178,11 @@ theorem conj_mem_closure_normOne_of_idempotent : ∀ (F : Type) [Field F] [Numbe
     simp [nrm]
   have hcstar : nrm c • star c' = c := by
     have h1 : star c' = nrm c' • c := by
-      calc star c' = c * (c' * star c') := by rw [← mul_assoc, hcc', one_mul]
-        _ = nrm c' • c := by rw [mul_star_eq, Algebra.algebraMap_eq_smul_one (nrm c'), mul_smul_comm, mul_one]
+      calc
+        star c'
+          = c * (c' * star c') := by rw [← mul_assoc, hcc', one_mul]
+        _ = nrm c' • c := by
+          rw [mul_star_eq, Algebra.algebraMap_eq_smul_one (nrm c'), mul_smul_comm, mul_one]
     rw [h1, smul_smul, mul_comm, hnn, one_smul]
   let u : (AF F)ˣ := ⟨nrm c', nrm c, hnn, by rw [mul_comm]; exact hnn⟩
   let Ξ : DA F a b × AF F → DA F a b := fun p => 1 + (p.1 * c) * (g - 1) * (c' * (p.2 • star p.1))
@@ -211,7 +234,8 @@ theorem conj_mem_closure_normOne_of_idempotent : ∀ (F : Type) [Field F] [Numbe
   have hn0 := hn0 hη0
   set δ' : ℍ[F, a, b] := (nrm δ)⁻¹ • star δ with hδ'
   have hδδ' : δ * δ' = 1 := by
-    rw [hδ', mul_smul_comm, mul_star_eq, Algebra.algebraMap_eq_smul_one (nrm δ), smul_smul, inv_mul_cancel₀ hn0, one_smul]
+    rw [hδ', mul_smul_comm, mul_star_eq, Algebra.algebraMap_eq_smul_one (nrm δ), smul_smul,
+      inv_mul_cancel₀ hn0, one_smul]
   refine ⟨rat δ * (c * g * c') * rat δ', ?_, hconj δ δ' hδδ' _ hx⟩
   have hmem := hN12 (Set.mk_mem_prod hδN.1 hn)
   have hval : Ξ (η • rat δ, η * algebraMap F (AF F) (nrm δ)⁻¹) = rat δ * (c * g * c') * rat δ' := by

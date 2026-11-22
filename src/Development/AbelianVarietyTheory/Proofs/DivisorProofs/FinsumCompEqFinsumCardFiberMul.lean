@@ -8,9 +8,10 @@ open scoped Pointwise
 
 namespace GlobalTheory
 
-theorem finsum_comp_eq_finsum_natCard_fiber_mul {X Y : Type} (π : X → Y) (h : Y → ℂ)
-    (hf : (∀ y, h y ≠ 0 → (π ⁻¹' {y}).Finite) ∨ (∀ y, h y ≠ 0 → Nat.card (π ⁻¹' {y}) = 0)) :
-    ∑ᶠ x, h (π x) = ∑ᶠ y, (Nat.card (π ⁻¹' {y}) : ℂ) * h y := by
+theorem finsum_comp_eq_finsum_natCard_fiber_mul
+    {X Y : Type} (π : X → Y) (h : Y → ℂ)
+    (hf : (∀ y, h y ≠ 0 → (π ⁻¹' {y}).Finite) ∨ (∀ y, h y ≠ 0 → Nat.card (π ⁻¹' {y}) = 0))
+    : ∑ᶠ x, h (π x) = ∑ᶠ y, (Nat.card (π ⁻¹' {y}) : ℂ) * h y := by
   classical
   by_cases hfin : (Function.support (h ∘ π)).Finite
   · set S := hfin.toFinset with hS
@@ -21,8 +22,9 @@ theorem finsum_comp_eq_finsum_natCard_fiber_mul {X Y : Type} (π : X → Y) (h :
       apply finsum_eq_sum_of_support_subset
       intro x hx
       exact (hmemS x).2 hx
-    have hR : ∑ᶠ y, (Nat.card (π ⁻¹' {y}) : ℂ) * h y
-        = ∑ y ∈ S.image π, (Nat.card (π ⁻¹' {y}) : ℂ) * h y := by
+    have hR
+        : ∑ᶠ y, (Nat.card (π ⁻¹' {y}) : ℂ) * h y
+          = ∑ y ∈ S.image π, (Nat.card (π ⁻¹' {y}) : ℂ) * h y := by
       apply finsum_eq_sum_of_support_subset
       intro y hy
       rw [Function.mem_support] at hy
@@ -34,8 +36,9 @@ theorem finsum_comp_eq_finsum_natCard_fiber_mul {X Y : Type} (π : X → Y) (h :
       refine ⟨x, ?_, hxy⟩
       rw [Finset.mem_coe, hmemS, hxy]
       exact h1
-    rw [hL, hR, ← Finset.sum_fiberwise_of_maps_to (g := π) (t := S.image π)
-      (fun x hx => Finset.mem_image_of_mem π hx)]
+    rw [hL, hR,
+      ← Finset.sum_fiberwise_of_maps_to (g := π) (t := S.image π)
+        (fun x hx => Finset.mem_image_of_mem π hx)]
     refine Finset.sum_congr rfl (fun y hy => ?_)
     obtain ⟨x₀, hx₀, rfl⟩ := Finset.mem_image.mp hy
     have hne : h (π x₀) ≠ 0 := (hmemS x₀).1 hx₀
@@ -48,8 +51,8 @@ theorem finsum_comp_eq_finsum_natCard_fiber_mul {X Y : Type} (π : X → Y) (h :
         rw [hmemS, hx]
         exact hne
       · exact fun hx => hx.2
-    rw [Finset.sum_congr rfl (fun x hx => by rw [(Finset.mem_filter.mp hx).2]),
-      Finset.sum_const, nsmul_eq_mul, hfib, Nat.card_coe_set_eq, Set.ncard_coe_finset]
+    rw [Finset.sum_congr rfl (fun x hx => by rw [(Finset.mem_filter.mp hx).2]), Finset.sum_const,
+      nsmul_eq_mul, hfib, Nat.card_coe_set_eq, Set.ncard_coe_finset]
   · rw [finsum_of_infinite_support (f := fun x => h (π x)) hfin]
     symm
     rcases hf with hf | hf

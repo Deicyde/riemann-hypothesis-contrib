@@ -13,24 +13,28 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.DeRhamChar
 
-open Module TensorProduct Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Cmp.JumpDict GlobalTheory.Cmp.SmallJumps
+open Module TensorProduct Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Cmp.JumpDict
+  GlobalTheory.Cmp.SmallJumps
 open scoped Classical
 
 section Char
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL Om : Type} [Field LL] [Algebra Qp LL] [Field Om] [Algebra Qp Om] [Algebra Om BdR]
-    [IsScalarTower Qp Om BdR]
-    (act : G →* (Om ≃ₐ[Qp] Om))
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL Om : Type}
+  [Field LL] [Algebra Qp LL] [Field Om] [Algebra Qp Om] [Algebra Om BdR] [IsScalarTower Qp Om BdR]
+  (act : G →* (Om ≃ₐ[Qp] Om))
 
 def tw (g : G) (σ : LL →ₐ[Qp] Om) : LL →ₐ[Qp] Om := ((act g).symm : Om →ₐ[Qp] Om).comp σ
 
-@[simp] theorem tw_apply (g : G) (σ : LL →ₐ[Qp] Om) (x : LL) : tw act g σ x = (act g).symm (σ x) := rfl
+@[simp]
+theorem tw_apply (g : G) (σ : LL →ₐ[Qp] Om) (x : LL) : tw act g σ x = (act g).symm (σ x) := rfl
 
 def IsInv (χ : G →* LLˣ) (f : (LL →ₐ[Qp] Om) → BdR) : Prop :=
   ∀ g σ, algebraMap Om BdR (σ (χ g : LL)) * PD.actdR g (f (tw act g σ)) = f σ
@@ -38,11 +42,13 @@ def IsInv (χ : G →* LLˣ) (f : (LL →ₐ[Qp] Om) → BdR) : Prop :=
 def IsE (τ : K →ₐ[Qp] LL) (f : (LL →ₐ[Qp] Om) → BdR) : Prop :=
   ∀ (c : K) σ, algebraMap K BdR c * f σ = algebraMap Om BdR (σ (τ c)) * f σ
 
-theorem ev_actVdR (hact : ∀ g x, PD.actdR g (algebraMap Om BdR x) = algebraMap Om BdR (act g x))
+theorem ev_actVdR
+    (hact : ∀ g x, PD.actdR g (algebraMap Om BdR x) = algebraMap Om BdR (act g x))
     {ρ : Representation LL G (Fin 1 → LL)} {χ : G →* LLˣ}
-    (hρ : ∀ g v, ρ g v = ((χ g : LLˣ) : LL) • v) (g : G) (σ : LL →ₐ[Qp] Om)
-    (z : (Fin 1 → LL) ⊗[Qp] BdR) :
-    ev σ (actVdR PD ρ g z) = algebraMap Om BdR (σ (χ g : LL)) * PD.actdR g (ev (tw act g σ) z) := by
+    (hρ : ∀ g v, ρ g v = ((χ g : LLˣ) : LL) • v)
+    (g : G) (σ : LL →ₐ[Qp] Om) (z : (Fin 1 → LL) ⊗[Qp] BdR)
+    : ev σ (actVdR PD ρ g z)
+      = algebraMap Om BdR (σ (χ g : LL)) * PD.actdR g (ev (tw act g σ) z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => simp only [map_add (f := _), hx, hy, mul_add]
@@ -51,24 +57,30 @@ theorem ev_actVdR (hact : ∀ g x, PD.actdR g (algebraMap Om BdR x) = algebraMap
     rw [h1, ev_tmul, ev_tmul, hρ, map_mul, hact]
     simp [mul_assoc]
 
-theorem ev_mulVdR (c : K) (σ : LL →ₐ[Qp] Om)
-    (z : (Fin 1 → LL) ⊗[Qp] BdR) :
-    ev σ (mulVdR (K := K) (BdR := BdR) (V := Fin 1 → LL) (LL := LL) c z) = algebraMap K BdR c * ev σ z := by
+theorem ev_mulVdR (c : K) (σ : LL →ₐ[Qp] Om) (z : (Fin 1 → LL) ⊗[Qp] BdR)
+    : ev σ (mulVdR (K := K) (BdR := BdR) (V := Fin 1 → LL) (LL := LL) c z)
+      = algebraMap K BdR c * ev σ z := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => simp only [map_add (f := _), hx, hy, mul_add]
   | tmul v b =>
-    have h1 : mulVdR (K := K) (BdR := BdR) (V := Fin 1 → LL) (LL := LL) c (v ⊗ₜ[Qp] b) =
-      v ⊗ₜ[Qp] (algebraMap K BdR c * b) := rfl
+    have h1
+        : mulVdR (K := K) (BdR := BdR) (V := Fin 1 → LL) (LL := LL) c (v ⊗ₜ[Qp] b)
+          = v ⊗ₜ[Qp] (algebraMap K BdR c * b) :=
+      rfl
     rw [h1, ev_tmul, ev_tmul]
     ring
 
 variable [FiniteDimensional Qp LL] [Algebra.IsSeparable Qp LL] [IsAlgClosed Om]
 
-theorem mem_DdRE_coord (hact : ∀ g x, PD.actdR g (algebraMap Om BdR x) = algebraMap Om BdR (act g x))
+theorem mem_DdRE_coord
+    (hact : ∀ g x, PD.actdR g (algebraMap Om BdR x) = algebraMap Om BdR (act g x))
     {ρ : Representation LL G (Fin 1 → LL)} {χ : G →* LLˣ}
-    (hρ : ∀ g v, ρ g v = ((χ g : LLˣ) : LL) • v) (τ : K →ₐ[Qp] LL) (z : (Fin 1 → LL) ⊗[Qp] BdR) :
-    z ∈ DdRE PD ρ τ ↔ IsInv PD act χ (fun σ => ev σ z) ∧ IsE (τ := τ) (Om := Om) (BdR := BdR) (fun σ => ev σ z) := by
+    (hρ : ∀ g v, ρ g v = ((χ g : LLˣ) : LL) • v)
+    (τ : K →ₐ[Qp] LL) (z : (Fin 1 → LL) ⊗[Qp] BdR)
+    : z ∈ DdRE PD ρ τ
+      ↔ IsInv PD act χ (fun σ => ev σ z)
+        ∧ IsE (τ := τ) (Om := Om) (BdR := BdR) (fun σ => ev σ z) := by
   rw [mem_DdRE_iff, mem_DdR_iff]
   constructor
   · rintro ⟨h1, h2⟩
@@ -76,24 +88,28 @@ theorem mem_DdRE_coord (hact : ∀ g x, PD.actdR g (algebraMap Om BdR x) = algeb
     · rw [← ev_actVdR PD act hact hρ, h1]
     · rw [← ev_mulVdR, h2, ev_smul]
   · rintro ⟨h1, h2⟩
-    refine ⟨fun g => ev_injective (Om := Om) fun σ => ?_, fun c => ev_injective (Om := Om) fun σ => ?_⟩
+    refine
+      ⟨fun g => ev_injective (Om := Om) fun σ => ?_, fun c => ev_injective (Om := Om) fun σ => ?_⟩
     · rw [ev_actVdR PD act hact hρ]; exact h1 g σ
     · rw [ev_mulVdR, ev_smul]; exact h2 c σ
 
-theorem mem_filV_coord (hOm : ∀ x : Om, algebraMap Om BdR x ∈ PD.Fil 0) (a : ℤ)
-    (z : (Fin 1 → LL) ⊗[Qp] BdR) :
-    z ∈ FilV PD (LL := LL) (V := Fin 1 → LL) a ↔ ∀ σ : LL →ₐ[Qp] Om, ev σ z ∈ PD.Fil a := by
-  have hm : ∀ (x : Om) (b : BdR), b ∈ PD.Fil a → algebraMap Om BdR x * b ∈ PD.Fil a := fun x b hb => by
+theorem mem_filV_coord
+    (hOm : ∀ x : Om, algebraMap Om BdR x ∈ PD.Fil 0) (a : ℤ) (z : (Fin 1 → LL) ⊗[Qp] BdR)
+    : z ∈ FilV PD (LL := LL) (V := Fin 1 → LL) a ↔ ∀ σ : LL →ₐ[Qp] Om, ev σ z ∈ PD.Fil a := by
+  have hm
+      : ∀ (x : Om) (b : BdR), b ∈ PD.Fil a → algebraMap Om BdR x * b ∈ PD.Fil a := fun x b hb => by
     simpa using PD.Fil_mul 0 a _ _ (hOm x) hb
   constructor
   · rintro ⟨y, rfl⟩ σ
     induction y using TensorProduct.induction_on with
     | zero => simp
-    | add x y hx hy =>
-      simpa only [map_add] using Submodule.add_mem (PD.Fil a) hx hy
+    | add x y hx hy => simpa only [map_add] using Submodule.add_mem (PD.Fil a) hx hy
     | tmul v c =>
-      have h1 : AlgebraTensorModule.map (LinearMap.id : (Fin 1 → LL) →ₗ[LL] _)
-        ((PD.Fil a).restrictScalars Qp).subtype (v ⊗ₜ[Qp] c) = v ⊗ₜ[Qp] (c : BdR) := rfl
+      have h1
+          : AlgebraTensorModule.map (LinearMap.id : (Fin 1 → LL) →ₗ[LL] _)
+              ((PD.Fil a).restrictScalars Qp).subtype (v ⊗ₜ[Qp] c)
+            = v ⊗ₜ[Qp] (c : BdR) :=
+        rfl
       rw [h1, ev_tmul]
       exact hm _ _ c.2
   · intro h
@@ -116,27 +132,31 @@ theorem one_notMem_fil_one [Nontrivial BdR] : (1 : BdR) ∉ PD.Fil 1 := by
   have h2 : a ≤ (a.toNat : ℤ) := Int.self_le_toNat a
   exact hA h2 (hn _)
 
-theorem block_of_ne [IsDomain BdR] {τ : K →ₐ[Qp] LL} {κ : K →ₐ[Qp] Om}
-    (hK : ∀ c : K, algebraMap K BdR c = algebraMap Om BdR (κ c))
-    {f : (LL →ₐ[Qp] Om) → BdR} (hE : IsE (τ := τ) (Om := Om) (BdR := BdR) f) {σ : LL →ₐ[Qp] Om}
-    (h : f σ ≠ 0) : σ.comp τ = κ := by
+theorem block_of_ne
+    [IsDomain BdR]
+    {τ : K →ₐ[Qp] LL} {κ : K →ₐ[Qp] Om} (hK : ∀ c : K, algebraMap K BdR c = algebraMap Om BdR (κ c))
+    {f : (LL →ₐ[Qp] Om) → BdR} (hE : IsE (τ := τ) (Om := Om) (BdR := BdR) f)
+    {σ : LL →ₐ[Qp] Om} (h : f σ ≠ 0)
+    : σ.comp τ = κ := by
   ext c
   have h1 := hE c σ
   rw [hK] at h1
   exact ((algebraMap Om BdR).injective (mul_right_cancel₀ h h1)).symm
 
-theorem multV_inv [IsDomain BdR] (κ : K →ₐ[Qp] Om)
-    (hK : ∀ c : K, algebraMap K BdR c = algebraMap Om BdR (κ c))
+theorem multV_inv
+    [IsDomain BdR]
+    (κ : K →ₐ[Qp] Om) (hK : ∀ c : K, algebraMap K BdR c = algebraMap Om BdR (κ c))
     (hact : ∀ g x, PD.actdR g (algebraMap Om BdR x) = algebraMap Om BdR (act g x))
-    (hfix : ∀ g c, act g (κ c) = κ c)
-    (hOm : ∀ x : Om, algebraMap Om BdR x ∈ PD.Fil 0)
+    (hfix : ∀ g c, act g (κ c) = κ c) (hOm : ∀ x : Om, algebraMap Om BdR x ∈ PD.Fil 0)
     (hval : ∀ (a : ℤ) (x : BdR), x ∈ PD.Fil a → x ∉ PD.Fil (a + 1) → ∃ y ∈ PD.Fil (-a), x * y = 1)
     {ρ ρ' : Representation LL G (Fin 1 → LL)} {χ χ' : G →* LLˣ}
     (hρ : ∀ g v, ρ g v = ((χ g : LLˣ) : LL) • v) (hρ' : ∀ g v, ρ' g v = ((χ' g : LLˣ) : LL) • v)
-    (hχ : ∀ g, (χ g : LL) * (χ' g : LL) = 1) (τ : K →ₐ[Qp] LL)
+    (hχ : ∀ g, (χ g : LL) * (χ' g : LL) = 1)
+    (τ : K →ₐ[Qp] LL)
     (htrans : ∀ σ σ' : LL →ₐ[Qp] Om, σ.comp τ = κ → σ'.comp τ = κ → ∃ g, ∀ x, act g (σ x) = σ' x)
-    (J : ℤ) (h : ∀ a, multV PD ρ τ a = if a = J then 1 else 0) (a : ℤ) :
-    multV PD ρ' τ a = if a = -J then 1 else 0 := by
+    (J : ℤ) (h : ∀ a, multV PD ρ τ a = if a = J then 1 else 0)
+    (a : ℤ)
+    : multV PD ρ' τ a = if a = -J then 1 else 0 := by
   obtain ⟨z, hzE, hgen, hz1, hz2⟩ := exists_gen PD ρ τ J h
   obtain ⟨hI, hE⟩ := (mem_DdRE_coord PD act hact hρ τ z).1 hzE
   set f : (LL →ₐ[Qp] Om) → BdR := fun σ => ev σ z with hf
@@ -171,7 +191,8 @@ theorem multV_inv [IsDomain BdR] (κ : K →ₐ[Qp] Om)
       · change f σ' ∈ _
         rw [hzero σ' hσ']
         exact Submodule.zero_mem _)
-  have hinv : ∀ σ, σ.comp τ = κ → ∃ y ∈ PD.Fil (-J), f σ * y = 1 := fun σ hσ => hval J _ (hJ σ) (hJ1 σ hσ)
+  have hinv : ∀ σ, σ.comp τ = κ → ∃ y ∈ PD.Fil (-J), f σ * y = 1 := fun σ hσ =>
+    hval J _ (hJ σ) (hJ1 σ hσ)
   choose! yv hyv hyv1 using hinv
   obtain ⟨σ₀, hσ₀⟩ : ∃ σ : LL →ₐ[Qp] Om, σ.comp τ = κ := by
     by_contra hno

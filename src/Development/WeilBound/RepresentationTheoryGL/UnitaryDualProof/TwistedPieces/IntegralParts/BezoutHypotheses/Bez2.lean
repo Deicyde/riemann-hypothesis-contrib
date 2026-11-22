@@ -10,12 +10,19 @@ open Polynomial PositivityTheory.RgUd.T.Nil.Asm
 
 namespace PositivityTheory.RgUd.TP.Nil.Asm
 
-theorem bez2 {M : Type*} [AddCommGroup M] [Module ℂ M] (K : Submodule ℂ M) (R R' : M →ₗ[ℂ] M)
-    (hRR : R ∘ₗ R' = LinearMap.id) (hR'R : R' ∘ₗ R = LinearMap.id) (hK : ∀ m ∈ K, R m ∈ K) (c : ℝ) (hc : 1 < c)
-    (d : ℝ) (a b : List ℝ) (hab : ∀ x ∈ a, ∀ y ∈ b, y + x ≠ d) (ζ : M)
+theorem bez2
+    {M : Type*} [AddCommGroup M] [Module ℂ M]
+    (K : Submodule ℂ M) (R R' : M →ₗ[ℂ] M)
+    (hRR : R ∘ₗ R' = LinearMap.id) (hR'R : R' ∘ₗ R = LinearMap.id) (hK : ∀ m ∈ K, R m ∈ K)
+    (c : ℝ) (hc : 1 < c)
+    (d : ℝ) (a b : List ℝ) (hab : ∀ x ∈ a, ∀ y ∈ b, y + x ≠ d)
+    (ζ : M)
     (h1 : ((b.map fun y => R - ((c ^ y : ℝ) : ℂ) • LinearMap.id).prod : Module.End ℂ M) ζ ∈ K)
-    (h2 : ((a.map fun x => ((c ^ d : ℝ) : ℂ) • R' - ((c ^ x : ℝ) : ℂ) • LinearMap.id).prod : Module.End ℂ M) ζ ∈ K) :
-    ζ ∈ K := by
+    (h2 : ((a.map fun x => ((c ^ d : ℝ) : ℂ) • R' - ((c ^ x : ℝ) : ℂ) • LinearMap.id).prod
+          : Module.End ℂ M)
+        ζ
+      ∈ K)
+    : ζ ∈ K := by
   set β : ℂ := ((c ^ d : ℝ) : ℂ)
   set γ : ℝ → ℂ := fun x => ((c ^ x : ℝ) : ℂ)
   have hRR' : (R : Module.End ℂ M) * R' = 1 := hRR
@@ -24,7 +31,8 @@ theorem bez2 {M : Type*} [AddCommGroup M] [Module ℂ M] (K : Submodule ℂ M) (
     rw [← pow_mul_prod R R' hRR' hR'R' β γ a, Module.End.mul_apply]
     exact pow_mem K R hK _ _ h2
   have hc0 : 0 < c := by linarith
-  have hcop : IsCoprime ((b.map fun y => X - C (γ y)).prod) ((a.map fun x => C β - C (γ x) * X).prod) := by
+  have hcop : IsCoprime ((b.map fun y => X - C (γ y)).prod)
+      ((a.map fun x => C β - C (γ x) * X).prod) := by
     refine isCoprime_list_prod_left _ _ b fun y hy => isCoprime_list_prod_right _ _ a fun x hx => ?_
     refine isCoprime_lin (γ y) β (γ x) ?_
     intro h0
@@ -40,7 +48,9 @@ theorem bez2 {M : Type*} [AddCommGroup M] [Module ℂ M] (K : Submodule ℂ M) (
     exact hab x hx y hy (by linarith)
   obtain ⟨u, v, huv⟩ := hcop
   have key := congrArg (fun p => (aeval (R : Module.End ℂ M) p) ζ) huv
-  simp only [map_add (f := _), map_mul, map_one, LinearMap.add_apply, Module.End.mul_apply, Module.End.one_apply] at key
+  simp only [map_add (f := _), map_mul, map_one, LinearMap.add_apply, Module.End.mul_apply,
+      Module.End.one_apply]
+    at key
   rw [← key]
   refine K.add_mem (aeval_mem K R hK u _ ?_) (aeval_mem K R hK v _ ?_)
   · rw [aeval_prod_lin R γ b]; exact h1

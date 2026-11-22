@@ -9,13 +9,22 @@ noncomputable section
 
 namespace SheetDecomposition
 
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.AI.I4 GroundTheory.Heights₂.Heights
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.AI.I4
+  GroundTheory.Heights₂.Heights
 
-variable {k : Type} [Field k] {Ω : Type} [Field Ω] [Algebra k Ω] {K : Type} [Fintype K] {ι : K → Type} [∀ b, Fintype (ι b)]
-  {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ b, Fintype (ι' b)]
+variable
+  {k : Type} [Field k]
+  {Ω : Type} [Field Ω] [Algebra k Ω]
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ b, Fintype (ι b)]
+  {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ b, Fintype (ι' b)]
 
-theorem inum_eq_zero_of_valEq_zero (h3 : UnitZero) {z : (Σ b, ι b) → Ω} {d : ℕ} (hz : IsPt k z d) (ht : fnField k z = ⊤)
-    (a : Fin d → K → ℤ) (i : Fin d) (h : ValEq k z (a i) z 0) : inum k z a = 0 := by
+theorem inum_eq_zero_of_valEq_zero
+    (h3 : UnitZero)
+    {z : (Σ b, ι b) → Ω} {d : ℕ} (hz : IsPt k z d) (ht : fnField k z = ⊤) (a : Fin d → K → ℤ)
+    (i : Fin d) (h : ValEq k z (a i) z 0)
+    : inum k z a = 0 := by
   obtain ⟨n, rfl⟩ : ∃ n, d = n + 1 := ⟨d - 1, by have := i.pos; omega⟩
   have key : inum k z a = inum k z (a ∘ Equiv.swap i (Fin.last n)) := by
     unfold inum NumbersDVR.intNum
@@ -26,12 +35,17 @@ theorem inum_eq_zero_of_valEq_zero (h3 : UnitZero) {z : (Σ b, ι b) → Ω} {d 
   rw [Equiv.swap_apply_right]
   exact h
 
-theorem inum_update (h1 : PtDim) (h3 : UnitZero) {z : (Σ b, ι b) → Ω} {d : ℕ} (hz : IsPt k z d) (ht : fnField k z = ⊤)
-    (a : Fin d → K → ℤ) (i : Fin d) (b : K → ℤ) (h : ValEq k z b z (a i)) : inum k z (Function.update a i b) = inum k z a := by
+theorem inum_update
+    (h1 : PtDim) (h3 : UnitZero)
+    {z : (Σ b, ι b) → Ω} {d : ℕ}
+    (hz : IsPt k z d) (ht : fnField k z = ⊤) (a : Fin d → K → ℤ) (i : Fin d)
+    (b : K → ℤ) (h : ValEq k z b z (a i))
+    : inum k z (Function.update a i b) = inum k z a := by
   classical
   obtain ⟨hprime, hdim, -⟩ := h1 k Ω K ι z d hz
-  have hadd := FieldNumbers.IntNumAdd.full k K ι (NumbersDVR.pointIdeal k z) hprime.multiHomog hprime.relevant d hdim
-    a i (b - a i) (a i)
+  have hadd :=
+    FieldNumbers.IntNumAdd.full k K ι (NumbersDVR.pointIdeal k z) hprime.multiHomog hprime.relevant
+      d hdim a i (b - a i) (a i)
   rw [sub_add_cancel, Function.update_eq_self] at hadd
   have hz0 : inum k z (Function.update a i (b - a i)) = 0 := by
     apply inum_eq_zero_of_valEq_zero h3 hz ht _ i
@@ -63,17 +77,22 @@ theorem inum_update (h1 : PtDim) (h3 : UnitZero) {z : (Σ b, ι b) → Ω} {d : 
   convert hadd using 1
   rw [hz0, zero_add]
 
-theorem inum_congr (h1 : PtDim) (h3 : UnitZero) {z : (Σ b, ι b) → Ω} {d : ℕ} (hz : IsPt k z d) (ht : fnField k z = ⊤)
-    (a a' : Fin d → K → ℤ) (h : ∀ j, ValEq k z (a j) z (a' j)) : inum k z a = inum k z a' := by
+theorem inum_congr
+    (h1 : PtDim) (h3 : UnitZero)
+    {z : (Σ b, ι b) → Ω} {d : ℕ} (hz : IsPt k z d) (ht : fnField k z = ⊤) (a a' : Fin d → K → ℤ)
+    (h : ∀ j, ValEq k z (a j) z (a' j))
+    : inum k z a = inum k z a' := by
   classical
-  have key : ∀ s : Finset (Fin d), inum k z (fun j => if j ∈ s then a' j else a j) = inum k z a := by
+  have key
+      : ∀ s : Finset (Fin d), inum k z (fun j => if j ∈ s then a' j else a j) = inum k z a := by
     intro s
     refine Finset.induction_on s ?_ ?_
     · simp
     · intro i s hi ih
       rw [← ih]
-      have e : (fun j => if j ∈ insert i s then a' j else a j) =
-          Function.update (fun j => if j ∈ s then a' j else a j) i (a' i) := by
+      have e
+          : (fun j => if j ∈ insert i s then a' j else a j)
+            = Function.update (fun j => if j ∈ s then a' j else a j) i (a' i) := by
         funext j
         by_cases hj : j = i
         · subst hj
@@ -84,20 +103,24 @@ theorem inum_congr (h1 : PtDim) (h3 : UnitZero) {z : (Σ b, ι b) → Ω} {d : �
       simpa [hi] using (h i).symm
   simpa using (key Finset.univ).symm
 
-theorem fnField_le_join_inl (y : (Σ b, ι b) → Ω) (y' : (Σ b, ι' b) → Ω) : fnField k y ≤ fnField k (joinPt y y') := by
+theorem fnField_le_join_inl (y : (Σ b, ι b) → Ω) (y' : (Σ b, ι' b) → Ω)
+    : fnField k y ≤ fnField k (joinPt y y') := by
   unfold fnField
   rw [IntermediateField.adjoin_le_iff]
   rintro t ⟨p, q, hpq, rfl⟩
   apply IntermediateField.subset_adjoin
   exact ⟨⟨Sum.inl p.1, p.2⟩, ⟨Sum.inl q.1, q.2⟩, congrArg Sum.inl hpq, rfl⟩
 
-theorem finite_of_le {F F' : IntermediateField k Ω} (h : F ≤ F') [FiniteDimensional F Ω] : FiniteDimensional F' Ω := by
+theorem finite_of_le {F F' : IntermediateField k Ω} (h : F ≤ F') [FiniteDimensional F Ω]
+    : FiniteDimensional F' Ω := by
   letI := (IntermediateField.inclusion h).toRingHom.toAlgebra
   haveI : IsScalarTower F F' Ω := IsScalarTower.of_algebraMap_eq fun _ => rfl
   exact Module.Finite.of_restrictScalars_finite F F' Ω
 
-theorem IsPt.join_inl {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω} {d : ℕ} (h : IsPt k y d) (h' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0) :
-    IsPt k (joinPt y y') d := by
+theorem IsPt.join_inl
+    {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω} {d : ℕ}
+    (h : IsPt k y d) (h' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0)
+    : IsPt k (joinPt y y') d := by
   obtain ⟨h0, hf, ht⟩ := h
   refine ⟨?_, ?_, ht⟩
   · rintro (b | b)
@@ -106,8 +129,11 @@ theorem IsPt.join_inl {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω} {d :
   · haveI := hf
     exact finite_of_le (fnField_le_join_inl (k := k) y y')
 
-theorem num_join_inl (h2 : NumPull) {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω} {d : ℕ} (h : IsPt k y d)
-    (h' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0) (a : Fin d → K → ℤ) : num k (joinPt y y') (fun j => Sum.elim (a j) 0) = num k y a := by
+theorem num_join_inl
+    (h2 : NumPull)
+    {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω} {d : ℕ}
+    (h : IsPt k y d) (h' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0) (a : Fin d → K → ℤ)
+    : num k (joinPt y y') (fun j => Sum.elim (a j) 0) = num k y a := by
   have hv : ReciprocityTheory.ChartRestriction.G.AI.I1.IsBlockMap (Sum.inl : K → K ⊕ K')
       (fun p : (Σ b, ι b) => (⟨Sum.inl p.1, p.2⟩ : Σ b, Sum.elim ι ι' b)) := by
     refine ⟨Sum.inl_injective, ?_, fun _ => rfl, ?_⟩
@@ -118,7 +144,10 @@ theorem num_join_inl (h2 : NumPull) {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b
       rfl
     · rintro ⟨b, i⟩ ⟨c, rfl⟩
       exact ⟨⟨c, i⟩, rfl⟩
-  have hp : ∀ j, ReciprocityTheory.ChartRestriction.G.AI.I1.pullDeg (Sum.inl : K → K ⊕ K') (a j) = Sum.elim (a j) (0 : K' → ℤ) := by
+  have hp
+      : ∀ j,
+        ReciprocityTheory.ChartRestriction.G.AI.I1.pullDeg (Sum.inl : K → K ⊕ K') (a j)
+          = Sum.elim (a j) (0 : K' → ℤ) := by
     intro j
     funext x
     cases x with
@@ -131,8 +160,11 @@ theorem num_join_inl (h2 : NumPull) {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b
   simp only [hp] at this
   exact this
 
-theorem num_join_inr (h2 : NumPull) {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω} {d : ℕ} (h : IsPt k y d) (h' : IsPt k y' d)
-    (a : Fin d → K' → ℤ) : num k (joinPt y y') (fun j => Sum.elim 0 (a j)) = num k y' a := by
+theorem num_join_inr
+    (h2 : NumPull)
+    {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω} {d : ℕ}
+    (h : IsPt k y d) (h' : IsPt k y' d) (a : Fin d → K' → ℤ)
+    : num k (joinPt y y') (fun j => Sum.elim 0 (a j)) = num k y' a := by
   have hv : ReciprocityTheory.ChartRestriction.G.AI.I1.IsBlockMap (Sum.inr : K' → K ⊕ K')
       (fun p : (Σ b, ι' b) => (⟨Sum.inr p.1, p.2⟩ : Σ b, Sum.elim ι ι' b)) := by
     refine ⟨Sum.inr_injective, ?_, fun _ => rfl, ?_⟩
@@ -143,7 +175,10 @@ theorem num_join_inr (h2 : NumPull) {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b
       rfl
     · rintro ⟨b, i⟩ ⟨c, rfl⟩
       exact ⟨⟨c, i⟩, rfl⟩
-  have hp : ∀ j, ReciprocityTheory.ChartRestriction.G.AI.I1.pullDeg (Sum.inr : K' → K ⊕ K') (a j) = Sum.elim (0 : K → ℤ) (a j) := by
+  have hp
+      : ∀ j,
+        ReciprocityTheory.ChartRestriction.G.AI.I1.pullDeg (Sum.inr : K' → K ⊕ K') (a j)
+          = Sum.elim (0 : K → ℤ) (a j) := by
     intro j
     funext x
     cases x with
@@ -156,8 +191,9 @@ theorem num_join_inr (h2 : NumPull) {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b
   simp only [hp] at this
   exact this
 
-theorem exists_top (y : (Σ b, ι b) → Ω) [FiniteDimensional (fnField k y) Ω] :
-    ∃ (m : ℕ) (w : (Σ _ : Unit, Option (Fin m)) → Ω), (∀ b, ∃ i, w ⟨b, i⟩ ≠ 0) ∧ fnField k (joinPt y w) = ⊤ := by
+theorem exists_top (y : (Σ b, ι b) → Ω) [FiniteDimensional (fnField k y) Ω]
+    : ∃ (m : ℕ) (w : (Σ _ : Unit, Option (Fin m)) → Ω),
+      (∀ b, ∃ i, w ⟨b, i⟩ ≠ 0) ∧ fnField k (joinPt y w) = ⊤ := by
   let B := Module.finBasis (fnField k y) Ω
   refine ⟨_, fun x => x.2.elim 1 B, fun _ => ⟨none, one_ne_zero⟩, eq_top_iff.2 fun t _ => ?_⟩
   rw [← B.sum_repr t]
@@ -171,7 +207,8 @@ theorem numEq : PtDim → NumPull → UnitZero → NumEq := by
   have hj := hy.join_inl hy'.1
   haveI := hj.2.1
   obtain ⟨m, w, hw, ht⟩ := exists_top (k := k) (joinPt y y')
-  rw [← num_join_inl h2 hy hy'.1, ← num_join_inr h2 hy hy', ← num_join_inl h2 hj hw, ← num_join_inl h2 hj hw]
+  rw [← num_join_inl h2 hy hy'.1, ← num_join_inr h2 hy hy', ← num_join_inl h2 hj hw,
+    ← num_join_inl h2 hj hw]
   unfold num
   congr 1
   refine inum_congr h1 h3 (hj.join_inl hw) ht _ _ fun j => ?_

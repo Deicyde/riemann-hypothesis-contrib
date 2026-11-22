@@ -13,9 +13,10 @@ open Formalism.WachCohomologyFacts.PLenBound in
 theorem submodule_generator_count : SubGen := by
   intro O _ _ _ M _ _ _ _ ℓ e F P h
   classical
-
-  have hA : ∀ n : ℕ, Module.length O (O ⧸ Ideal.span {ℓ ^ n}) ≤
-      (n : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) := by
+  have hA
+      : ∀ n : ℕ,
+        Module.length O (O ⧸ Ideal.span {ℓ ^ n})
+          ≤ (n : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) := by
     intro n
     induction n with
     | zero =>
@@ -61,11 +62,13 @@ theorem submodule_generator_count : SubGen := by
         rw [← Submodule.Quotient.mk_smul, smul_eq_mul, mul_comm]
       have hker : Module.length O (LinearMap.ker g) ≤ Module.length O (O ⧸ Ideal.span {ℓ}) :=
         Module.length_le_of_surjective _ hf1
-      rw [Module.length_eq_add_of_exact (LinearMap.ker g).subtype g
-        (Submodule.injective_subtype _) hg (LinearMap.exact_subtype_ker_map g)]
-      calc Module.length O (LinearMap.ker g) + Module.length O (O ⧸ Ideal.span {ℓ ^ n})
-          ≤ Module.length O (O ⧸ Ideal.span {ℓ}) +
-              (n : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) := add_le_add hker ih
+      rw [Module.length_eq_add_of_exact (LinearMap.ker g).subtype g (Submodule.injective_subtype _)
+        hg (LinearMap.exact_subtype_ker_map g)]
+      calc
+        Module.length O (LinearMap.ker g) + Module.length O (O ⧸ Ideal.span {ℓ ^ n})
+            ≤ Module.length O (O ⧸ Ideal.span {ℓ})
+              + (n : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) :=
+          add_le_add hker ih
         _ = ((n + 1 : ℕ) : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) := by
           push_cast
           ring
@@ -93,30 +96,31 @@ theorem submodule_generator_count : SubGen := by
     intro y
     obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ y
     refine ⟨fun i => Submodule.Quotient.mk (bF.repr x i), ?_⟩
-    have hx : (Submodule.Quotient.mk x : ↥F ⧸ Q) =
-        ∑ i, bF.repr x i • Submodule.Quotient.mk (bF i) := by
+    have hx
+        : (Submodule.Quotient.mk x : ↥F ⧸ Q) = ∑ i, bF.repr x i • Submodule.Quotient.mk (bF i) := by
       conv_lhs => rw [← bF.sum_repr x]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [← Submodule.mkQ_apply, map_sum]
       simp only [map_smul, Submodule.mkQ_apply]
     rw [hx]
-    simp only [ψ, φ, LinearMap.sum_apply, LinearMap.comp_apply,
-      LinearMap.proj_apply, Submodule.liftQ_apply, LinearMap.toSpanSingleton_apply,
-      Submodule.mkQ_apply]
+    simp only [ψ, φ, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply,
+      Submodule.liftQ_apply, LinearMap.toSpanSingleton_apply, Submodule.mkQ_apply]
   have hB : Module.length O (↥F ⧸ Q) ≤ (k : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ ^ e}) := by
-    calc Module.length O (↥F ⧸ Q) ≤ Module.length O (Fin k → O ⧸ Ideal.span {ℓ ^ e}) :=
-          Module.length_le_of_surjective ψ hψ
+    calc
+      Module.length O (↥F ⧸ Q)
+        ≤ Module.length O (Fin k → O ⧸ Ideal.span {ℓ ^ e}) := Module.length_le_of_surjective ψ hψ
       _ = (k : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ ^ e}) := by
-          rw [Module.length_pi_of_fintype]
-          simp
-  calc Module.length O (↥F ⧸ Q)
+        rw [Module.length_pi_of_fintype]
+        simp
+  calc
+    Module.length O (↥F ⧸ Q)
       ≤ (k : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ ^ e}) := hB
     _ ≤ (k : ℕ∞) * ((e : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ})) := by
-        gcongr
-        exact hA e
+      gcongr
+      exact hA e
     _ ≤ ((Module.finrank O M * e : ℕ) : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) := by
-        push_cast
-        rw [mul_assoc]
-        gcongr
+      push_cast
+      rw [mul_assoc]
+      gcongr
 
 end Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains

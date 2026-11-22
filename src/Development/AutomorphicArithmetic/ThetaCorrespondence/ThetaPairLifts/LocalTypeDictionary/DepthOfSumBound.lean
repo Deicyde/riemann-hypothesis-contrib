@@ -19,11 +19,15 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 section
 noncomputable section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.DepthUnf GlobalTheory.SumSize GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.DepthUnf GlobalTheory.SumSize GlobalTheory.RowClaim
 namespace GlobalTheory.DepthUnf
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-theorem depthK_of_hypotheses_alt : _root_.GlobalTheory.FunPr.ThetaLocalInputs → SumOKK → DepthK := by
+theorem depthK_of_hypotheses_alt
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs → SumOKK → DepthK := by
   intro _ _
   obtain ⟨CF0, h4⟩ := GlobalTheory.T.flatTensor_depth_conditions_away_from_twist
   refine ⟨CF0, fun CF hCF => ?_⟩
@@ -35,21 +39,34 @@ theorem depthK_of_hypotheses_alt : _root_.GlobalTheory.FunPr.ThetaLocalInputs �
   have hL : R.toLevCh.Is A.μ0 := hS.core.lev
   have hde := GlobalTheory.RowClaim.Test.pde_ne_q hS
   intro t Φ β hβ
-  have hc : ∀ P ∈ R.toLevCh.Q t, ((Ideal.absNorm D.host.ccK : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal := GlobalTheory.RowClaim.Test.guard hS t
+  have hc : ∀ P ∈ R.toLevCh.Q t, ((Ideal.absNorm D.host.ccK : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal :=
+    GlobalTheory.RowClaim.Test.guard hS t
   obtain ⟨K, hK, hval, hdep⟩ := H t Φ β hβ
   obtain ⟨τ, e, he, hexp⟩ := GridChoice.sumOK_ex hL ch.S.toGridChoice t Φ hde hc β hβ
-  obtain ⟨τK, hτK⟩ := GlobalTheory.T.exists_cosetIndicatorExpansion_of_depthPeriodic hL ch.S.toGridChoice t Φ β e τ K hK he hexp (hdep e he)
+  obtain ⟨τK, hτK⟩ :=
+    GlobalTheory.T.exists_cosetIndicatorExpansion_of_depthPeriodic hL ch.S.toGridChoice t Φ β e τ K
+      hK he hexp (hdep e he)
   obtain ⟨τm, hτm⟩ := hτK.exists_expDepth
   refine ⟨⟨τm, hτm⟩, fun w l hl hlw haw => ?_⟩
   have hk : 0 < expDepth ch.S.toGridChoice t Φ β := hτm.1
-  obtain ⟨e', he', hexp', hdk⟩ := GlobalTheory.T.depthPeriodic_of_cosetIndicatorExpansion _ t Φ β _ τm hτm
+  obtain ⟨e', he', hexp', hdk⟩ :=
+    GlobalTheory.T.depthPeriodic_of_cosetIndicatorExpansion _ t Φ β _ τm hτm
   have hg := GlobalTheory.T.flatProductDepthPeriodic_gcd _ t Φ β e' _ _ hdk (hdep e' he')
-  obtain ⟨τg, hτg⟩ := GlobalTheory.T.exists_cosetIndicatorExpansion_of_depthPeriodic hL _ t Φ β e' τm _ (Nat.gcd_pos_of_pos_left _ hk) he' hexp' hg
-  have hle : expDepth ch.S.toGridChoice t Φ β ≤ Nat.gcd (expDepth ch.S.toGridChoice t Φ β) K := Nat.sInf_le ⟨τg, hτg⟩
+  obtain ⟨τg, hτg⟩ :=
+    GlobalTheory.T.exists_cosetIndicatorExpansion_of_depthPeriodic hL _ t Φ β e' τm _
+      (Nat.gcd_pos_of_pos_left _ hk) he' hexp' hg
+  have hle : expDepth ch.S.toGridChoice t Φ β ≤ Nat.gcd (expDepth ch.S.toGridChoice t Φ β) K :=
+    Nat.sInf_le ⟨τg, hτg⟩
   have heq := le_antisymm (Nat.le_of_dvd hk (Nat.gcd_dvd_left _ _)) hle
   have hdvd : expDepth ch.S.toGridChoice t Φ β ∣ K := heq ▸ Nat.gcd_dvd_right _ K
   haveI := Fact.mk hl
-  exact ((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat} (ha : a ≠ 0), p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a) hK.ne').1 (((_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))).trans hdvd) |>.trans (hval w l hl hlw haw)
+  exact ((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le
+          : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat}
+              (ha : a ≠ 0),
+            p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a)
+        hK.ne').1
+      (((_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))).trans hdvd)
+    |>.trans (hval w l hl hlw haw)
 end GlobalTheory.DepthUnf
 end
 end
@@ -57,6 +74,10 @@ end
 section
 open GlobalTheory.SumSize GlobalTheory.RowClaim
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.depthK_of_sumOKK : _root_.GlobalTheory.FunPr.ThetaLocalInputs → SumOKK → DepthK := by
-  first | exact @_root_.GlobalTheory.DepthUnf.depthK_of_hypotheses_alt | exact _root_.GlobalTheory.DepthUnf.depthK_of_hypotheses_alt | (intros; apply _root_.GlobalTheory.DepthUnf.depthK_of_hypotheses_alt <;> assumption)
+theorem _root_.GlobalTheory.T.depthK_of_sumOKK
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs → SumOKK → DepthK := by
+  first
+  | exact @_root_.GlobalTheory.DepthUnf.depthK_of_hypotheses_alt
+  | exact _root_.GlobalTheory.DepthUnf.depthK_of_hypotheses_alt
+  | (intros; apply _root_.GlobalTheory.DepthUnf.depthK_of_hypotheses_alt <;> assumption)
 end

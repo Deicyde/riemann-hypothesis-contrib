@@ -27,9 +27,12 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.PointSurjectivity
 
@@ -37,12 +40,17 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.PointSurjectivity
 
-theorem over_affineOpen_of_isPullback : ∀ {k : Type} [Field k] {X T Z : Scheme.{0}} (a : X ⟶ Sp k) (b : T ⟶ Sp k) (p : Z ⟶ X) (q : Z ⟶ T)
-    (H : IsPullback p q a b) {V : T.Opens} (hV : IsAffineOpen V) {κ : Type} [LinearOrder κ] [Fintype κ]
-    (D : κ → X.Opens) (hD : ∀ i, IsAffineOpen (D i)) (hc : ⨆ i, D i = ⊤) (G : LB Z) (hG : G.IsLB), (∀ i, IsAffineOpen (p ⁻¹ᵁ D i ⊓ q ⁻¹ᵁ V)) ∧
-    ∃ (Y : Scheme.{0}) (π : Y ⟶ Z) (f : Y ⟶ Spec Γ(T, V)) (E : κ → Y.Opens),
-      IsPullback π f q hV.fromSpec ∧ (∀ i, IsAffineOpen (E i)) ∧ ⨆ i, E i = ⊤ ∧
-      Nonempty (cechLB (f ≫ hV.fromSpec ≫ b) (G.pull π) E ≅ cechLB (p ≫ a) G fun i => p ⁻¹ᵁ D i ⊓ q ⁻¹ᵁ V) := by
+theorem over_affineOpen_of_isPullback
+    : ∀ {k : Type} [Field k] {X T Z : Scheme.{0}} (a : X ⟶ Sp k) (b : T ⟶ Sp k) (p : Z ⟶ X)
+        (q : Z ⟶ T) (H : IsPullback p q a b) {V : T.Opens} (hV : IsAffineOpen V) {κ : Type}
+        [LinearOrder κ] [Fintype κ] (D : κ → X.Opens) (hD : ∀ i, IsAffineOpen (D i))
+        (hc : ⨆ i, D i = ⊤) (G : LB Z) (hG : G.IsLB),
+      (∀ i, IsAffineOpen (p ⁻¹ᵁ D i ⊓ q ⁻¹ᵁ V))
+        ∧ ∃ (Y : Scheme.{0}) (π : Y ⟶ Z) (f : Y ⟶ Spec Γ(T, V)) (E : κ → Y.Opens),
+          IsPullback π f q hV.fromSpec ∧ (∀ i, IsAffineOpen (E i)) ∧ ⨆ i, E i = ⊤
+            ∧ Nonempty
+              (cechLB (f ≫ hV.fromSpec ≫ b) (G.pull π) E
+                ≅ cechLB (p ≫ a) G fun i => p ⁻¹ᵁ D i ⊓ q ⁻¹ᵁ V) := by
   intro k _ X T Z a b p q H V hV κ _ _ D hD hc G hG
   let π := pullback.fst q hV.fromSpec
   let f := pullback.snd q hV.fromSpec
@@ -60,14 +68,22 @@ theorem over_affineOpen_of_isPullback : ∀ {k : Type} [Field k] {X T Z : Scheme
     rw [← hr, Scheme.Hom.preimage_inf, Scheme.Hom.preimage_opensRange, inf_top_eq,
       Scheme.Hom.comp_preimage]
   have hA (i : κ) : IsAffineOpen ((π ≫ p) ⁻¹ᵁ D i) := (hD i).preimage _
-  refine ⟨fun i => ?_, _, π, f, fun i => π ⁻¹ᵁ (p ⁻¹ᵁ D i ⊓ q ⁻¹ᵁ V), H₁,
-    fun i => (congrArg IsAffineOpen (hE i)).mpr (hA i), ?_, ?_⟩
+  refine ⟨
+    fun i => ?_,
+    _,
+    π,
+    f,
+    fun i => π ⁻¹ᵁ (p ⁻¹ᵁ D i ⊓ q ⁻¹ᵁ V),
+    H₁,
+    fun i => (congrArg IsAffineOpen (hE i)).mpr (hA i),
+    ?_,
+    ?_
+  ⟩
   · have h := (hA i).image_of_isOpenImmersion π
     rwa [Scheme.Hom.comp_preimage, Scheme.Hom.image_preimage_eq_opensRange_inf, hr, inf_comm] at h
   · simp only [hE]
     rw [← Scheme.Hom.preimage_iSup, hc, Scheme.Hom.preimage_top]
-  · have e : f ≫ hV.fromSpec ≫ b = π ≫ p ≫ a := by
-      rw [← H₁.w_assoc, H.w]
+  · have e : f ≫ hV.fromSpec ≫ b = π ≫ p ≫ a := by rw [← H₁.w_assoc, H.w]
     rw [e]
     exact cechLB_pull_iso_of_isOpenImmersion k _ _ G _ π κ _ hG fun i => hr ▸ inf_le_right
 

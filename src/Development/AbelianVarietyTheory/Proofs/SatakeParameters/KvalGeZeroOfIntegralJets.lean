@@ -10,9 +10,11 @@ open Formalism.MainNotions Classical
 
 namespace GlobalTheory.Proof.kvalGe_zero_of_integral_jets
 
-theorem kvalGe_zero : ∀ (Lt : Type) [Fintype Lt] [DecidableEq Lt] (N0 N1 l : ℕ) [Fact l.Prime]
-    (nu : Lt → YoungDiagram) (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l]),
-    Formalism.DworkPowerSeriesWeights.JetsIntegral Th → product_zeroth_first_parts.KvalGe N0 N1 l nu Th 0 := by
+theorem kvalGe_zero
+    : ∀ (Lt : Type) [Fintype Lt] [DecidableEq Lt] (N0 N1 l : ℕ) [Fact l.Prime]
+        (nu : Lt → YoungDiagram) (Th : MvPowerSeries (Lt × Fin N0 × Fin N1) ℂ_[l]),
+      Formalism.DworkPowerSeriesWeights.JetsIntegral Th
+        → product_zeroth_first_parts.KvalGe N0 N1 l nu Th 0 := by
   intro Lt _ _ N0 N1 l _ nu Th hTh I m
   rw [neg_zero, Real.rpow_zero]
   unfold product_zeroth_first_parts.applyAt0

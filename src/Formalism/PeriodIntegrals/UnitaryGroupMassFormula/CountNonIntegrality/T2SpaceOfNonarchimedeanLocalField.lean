@@ -12,8 +12,9 @@ namespace PI.CntNotIntW
 open scoped TensorProduct
 open ValuativeRel
 
-theorem t2Space_of_nonarchimedeanLocalField' (Fp : Type) [Field Fp] [ValuativeRel Fp] [TopologicalSpace Fp] [IsNonarchimedeanLocalField Fp] :
-    T2Space Fp := by
+theorem t2Space_of_nonarchimedeanLocalField'
+    (Fp : Type) [Field Fp] [ValuativeRel Fp] [TopologicalSpace Fp] [IsNonarchimedeanLocalField Fp]
+    : T2Space Fp := by
   have : T0Space Fp := by
     refine ⟨fun x y hxy => ?_⟩
     by_contra hne

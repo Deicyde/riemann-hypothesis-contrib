@@ -14,11 +14,10 @@ namespace GlobalTheory
 
 theorem finite_of_isIntegral_of_birational_of_finite_over_normal
     (R A B : Type*) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsNoetherianRing R]
-    [CharZero R] [CommRing A] [IsDomain A] [CommRing B] [IsDomain B]
-    [Algebra R A] [FaithfulSMul R A] [Module.Finite R A]
-    [Algebra A B] [FaithfulSMul A B] [Algebra.IsIntegral A B]
-    (hb : ∀ b : B, ∃ a a' : A, a' ≠ 0 ∧ algebraMap A B a' * b = algebraMap A B a) :
-    Module.Finite A B := by
+    [CharZero R] [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Algebra R A]
+    [FaithfulSMul R A] [Module.Finite R A] [Algebra A B] [FaithfulSMul A B] [Algebra.IsIntegral A B]
+    (hb : ∀ b : B, ∃ a a' : A, a' ≠ 0 ∧ algebraMap A B a' * b = algebraMap A B a)
+    : Module.Finite A B := by
   letI : Algebra R B := ((algebraMap A B).comp (algebraMap R A)).toAlgebra
   haveI : IsScalarTower R A B := IsScalarTower.of_algebraMap_eq fun _ => rfl
   let L := FractionRing B
@@ -62,8 +61,7 @@ theorem finite_of_isIntegral_of_birational_of_finite_over_normal
   let f : B →ₐ[R] integralClosure R L :=
     (IsScalarTower.toAlgHom R B L).codRestrict (integralClosure R L)
       (fun b => (Algebra.IsIntegral.isIntegral (R := R) b).map (IsScalarTower.toAlgHom R B L))
-  have hf : Function.Injective f.toLinearMap := fun x y h =>
-    hBL (congrArg Subtype.val h)
+  have hf : Function.Injective f.toLinearMap := fun x y h => hBL (congrArg Subtype.val h)
   haveI : IsNoetherian R (integralClosure R L) := isNoetherian_of_isNoetherianRing_of_finite _ _
   haveI : IsNoetherian R B := isNoetherian_of_injective f.toLinearMap hf
   haveI : Module.Finite R B := Module.IsNoetherian.finite R B
@@ -72,8 +70,8 @@ theorem finite_of_isIntegral_of_birational_of_finite_over_normal
 theorem finite_of_isIntegral_of_birational_complex
     (A B : Type) [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Algebra ℂ A]
     [Algebra.FiniteType ℂ A] [Algebra A B] [FaithfulSMul A B] [Algebra.IsIntegral A B]
-    (hb : ∀ b : B, ∃ a a' : A, a' ≠ 0 ∧ algebraMap A B a' * b = algebraMap A B a) :
-    Module.Finite A B := by
+    (hb : ∀ b : B, ∃ a a' : A, a' ≠ 0 ∧ algebraMap A B a' * b = algebraMap A B a)
+    : Module.Finite A B := by
   obtain ⟨d, g, hg, hfin⟩ := exists_finite_inj_algHom_of_fg ℂ A
   letI : Algebra (MvPolynomial (Fin d) ℂ) A := g.toRingHom.toAlgebra
   haveI : FaithfulSMul (MvPolynomial (Fin d) ℂ) A :=
@@ -81,8 +79,18 @@ theorem finite_of_isIntegral_of_birational_complex
   haveI : Module.Finite (MvPolynomial (Fin d) ℂ) A := hfin
   exact finite_of_isIntegral_of_birational_of_finite_over_normal (MvPolynomial (Fin d) ℂ) A B hb
 
-theorem finite_of_isIntegral_of_birational_of_presentation :
-    (∀ (A : Type) [CommRing A] [IsDomain A] [Algebra ℂ A] [Algebra.FiniteType ℂ A], ∃ (d : ℕ) (j : MvPolynomial (Fin d) ℂ →ₐ[ℂ] A) (a : A) (p : Polynomial (MvPolynomial (Fin d) ℂ)) (q : MvPolynomial (Fin d) ℂ), ringKrullDim A = d ∧ Function.Injective j ∧ j.toRingHom.Finite ∧ p.Monic ∧ Irreducible p ∧ (∀ r : Polynomial (MvPolynomial (Fin d) ℂ), r.eval₂ j.toRingHom a = 0 ↔ p ∣ r) ∧ q ≠ 0 ∧ Polynomial.C q ∈ Ideal.span {p, p.derivative} ∧ ∀ b : A, ∃ r : Polynomial (MvPolynomial (Fin d) ℂ), j q * b = r.eval₂ j.toRingHom a) → (∀ (A B : Type) [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Algebra ℂ A] [Algebra.FiniteType ℂ A] [Algebra A B] [FaithfulSMul A B] [Algebra.IsIntegral A B], (∀ b : B, ∃ a a' : A, a' ≠ 0 ∧ algebraMap A B a' * b = algebraMap A B a) → Module.Finite A B) := by
+theorem finite_of_isIntegral_of_birational_of_presentation
+    : (∀ (A : Type) [CommRing A] [IsDomain A] [Algebra ℂ A] [Algebra.FiniteType ℂ A],
+        ∃ (d : ℕ) (j : MvPolynomial (Fin d) ℂ →ₐ[ℂ] A) (a : A)
+            (p : Polynomial (MvPolynomial (Fin d) ℂ)) (q : MvPolynomial (Fin d) ℂ),
+          ringKrullDim A = d ∧ Function.Injective j ∧ j.toRingHom.Finite ∧ p.Monic ∧ Irreducible p
+            ∧ (∀ r : Polynomial (MvPolynomial (Fin d) ℂ), r.eval₂ j.toRingHom a = 0 ↔ p ∣ r) ∧ q ≠ 0
+            ∧ Polynomial.C q ∈ Ideal.span {p, p.derivative}
+            ∧ ∀ b : A, ∃ r : Polynomial (MvPolynomial (Fin d) ℂ), j q * b = r.eval₂ j.toRingHom a)
+      → (∀ (A B : Type) [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Algebra ℂ A]
+          [Algebra.FiniteType ℂ A] [Algebra A B] [FaithfulSMul A B] [Algebra.IsIntegral A B],
+        (∀ b : B, ∃ a a' : A, a' ≠ 0 ∧ algebraMap A B a' * b = algebraMap A B a)
+          → Module.Finite A B) := by
   intro _ A B _ _ _ _ _ _ _ _ _ hb
   exact finite_of_isIntegral_of_birational_complex A B hb
 

@@ -11,11 +11,12 @@ namespace GlobalTheory.BK
 
 open PowerSeries
 
-theorem PhiMod.exists_X_pow_smul_eq_l_pow_smul (O K : Type) [CommRing O] [NormedField K]
-    [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι]
-    [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] (P : PhiMod O K l e a ι)
-    (n : ℕ) : ∀ w ∈ P.MM, ∃ w' ∈ P.MM,
-      (X : K⟦X⟧) ^ (e * l ^ (n + 1)) • w = (l : K) ^ (l ^ n) • w' := by
+theorem PhiMod.exists_X_pow_smul_eq_l_pow_smul
+    (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+    (l e a : ℕ) (ι : Type)
+    [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e]
+    (P : PhiMod O K l e a ι) (n : ℕ)
+    : ∀ w ∈ P.MM, ∃ w' ∈ P.MM, (X : K⟦X⟧) ^ (e * l ^ (n + 1)) • w = (l : K) ^ (l ^ n) • w' := by
   intro w hw
   have hl0 := l_ne_zero (K := K) l
   have hlp := (Fact.out : l.Prime).pos

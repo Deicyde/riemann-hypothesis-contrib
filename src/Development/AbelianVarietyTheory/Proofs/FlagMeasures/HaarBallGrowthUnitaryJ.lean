@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsNetCard
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count
 open scoped InnerProductSpace
 
 namespace GlobalTheory.BallVol
@@ -147,12 +148,17 @@ lemma hs_le_of_dOp {n : ℕ} {g : Matrix (Fin n) (Fin n) ℂ} {r : ℝ} (h : dOp
     _ = (n * Real.exp r) ^ 2 := by simp; ring
     _ ≤ _ := by gcongr; linarith
 
-theorem ballVol : ∀ (n : ℕ) (ε : Fin n → Bool), ∃ C : ℝ, (∀ R : ℝ, 1 ≤ R → muG ε {g | hsG g ≤ R ^ 2} ≤ ENNReal.ofReal (C * R ^ (4 * n * rkR ε))) ∧ ∀ r : ℝ, 0 ≤ r → muG ε {g | dOp (uMat g) ≤ r} ≤ ENNReal.ofReal (C * Real.exp (4 * n * rkR ε * r)) := by
+theorem ballVol
+    : ∀ (n : ℕ) (ε : Fin n → Bool), ∃ C : ℝ,
+      (∀ R : ℝ, 1 ≤ R → muG ε {g | hsG g ≤ R ^ 2} ≤ ENNReal.ofReal (C * R ^ (4 * n * rkR ε)))
+        ∧ ∀ r : ℝ,
+          0 ≤ r
+            → muG ε {g | dOp (uMat g) ≤ r} ≤ ENNReal.ofReal (C * Real.exp (4 * n * rkR ε * r)) := by
   intro n ε
   obtain ⟨s, hs'⟩ : ∃ s : Bool, rkR ε = (univ.filter fun a => ε a = s).card := by
     unfold rkR
-    rcases min_choice (univ.filter fun a => ε a = true).card
-      (univ.filter fun a => ε a = false).card with h | h
+    rcases min_choice (univ.filter fun a => ε a = true).card (univ.filter fun a => ε a = false).card
+      with h | h
     · exact ⟨true, h⟩
     · exact ⟨false, h⟩
   obtain ⟨C, hC, h⟩ := vol_sign n ε s

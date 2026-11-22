@@ -22,16 +22,18 @@ open scoped Nat
 
 namespace Bridge.CrisLoc.PowMulEqZeroLemmas
 
-theorem expand {A : Type*} [CommRing A] {p : ℕ} (hp : p.Prime) (m : A) :
-    ∃ h : A, (m + 1) ^ p = m ^ p + 1 + p * m * (1 + m * h) := by
+theorem expand {A : Type*} [CommRing A] {p : ℕ} (hp : p.Prime) (m : A)
+    : ∃ h : A, (m + 1) ^ p = m ^ p + 1 + p * m * (1 + m * h) := by
   obtain ⟨r, hr⟩ := exists_add_pow_prime_eq hp (Polynomial.X : Polynomial ℤ) 1
   have h1 := congrArg (fun f => _root_.AddMonoidAlgebra.coeff (M := ℕ) f 1) hr
-  have e : (p : Polynomial ℤ) * Polynomial.X * 1 * r = Polynomial.C (p : ℤ) * (Polynomial.X * r) := by
+  have e
+      : (p : Polynomial ℤ) * Polynomial.X * 1 * r = Polynomial.C (p : ℤ) * (Polynomial.X * r) := by
     simp [mul_assoc]
   simp only [e, Polynomial.coeff_X_add_one_pow, Polynomial.coeff_add, Polynomial.coeff_C_mul,
-    Polynomial.coeff_X_pow, one_pow, Nat.choose_one_right, Polynomial.coeff_one] at h1
+      Polynomial.coeff_X_pow, one_pow, Nat.choose_one_right, Polynomial.coeff_one]
+    at h1
   rw [show (1 : ℕ) = 0 + 1 from rfl, Polynomial.coeff_X_mul] at h1
-  have hp1 : ¬ (1 = p) := hp.one_lt.ne
+  have hp1 : ¬(1 = p) := hp.one_lt.ne
   have hp0 : (p : ℤ) ≠ 0 := by exact_mod_cast hp.ne_zero
   have h2 : r.coeff 0 = 1 := by
     simp [hp1] at h1
@@ -43,10 +45,11 @@ theorem expand {A : Type*} [CommRing A] {p : ℕ} (hp : p.Prime) (m : A) :
   have h3 := congrArg (Polynomial.aeval m) hr
   rw [hs] at h3
   simp at h3
-  rw [h3]; ring
+  rw [h3]
+  ring
 
-theorem val_fact (p : ℕ) [hp : Fact p.Prime] (j : ℕ) :
-    p ^ j ≤ padicValNat p (p ^ j * (p - 1))! + 1 := by
+theorem val_fact (p : ℕ) [hp : Fact p.Prime] (j : ℕ)
+    : p ^ j ≤ padicValNat p (p ^ j * (p - 1))! + 1 := by
   induction j with
   | zero => simp
   | succ j ih =>
@@ -57,14 +60,15 @@ theorem val_fact (p : ℕ) [hp : Fact p.Prime] (j : ℕ) :
     rw [h1] at ih ⊢
     have : p * p ^ j = p ^ j * q + p ^ j := by
       generalize p ^ j = t
-      rw [hq]; ring
+      rw [hq]
+      ring
     omega
 
 variable {p : ℕ} [Fact p.Prime]
-variable {R : Type*} [CommRing R] [Fact ¬IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
+variable {R : Type*} [CommRing R] [Fact ¬ IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
 
-theorem isUnit_of_mem {y : Acris p R} (hy : y ∈ (span {(p : Acris p R)}).radical) :
-    IsUnit (1 + y) := by
+theorem isUnit_of_mem {y : Acris p R} (hy : y ∈ (span {(p : Acris p R)}).radical)
+    : IsUnit (1 + y) := by
   have h1 : (span {(p : Acris p R)}).radical ≤ Ideal.jacobson ⊥ :=
     (Ideal.isRadical_jacobson ⊥).radical_le_iff.2 (IsAdicComplete.le_jacobson_bot _)
   have := Ideal.mem_jacobson_bot.1 (h1 hy) 1
@@ -73,28 +77,33 @@ theorem isUnit_of_mem {y : Acris p R} (hy : y ∈ (span {(p : Acris p R)}).radic
 theorem p_mem : (p : Acris p R) ∈ (span {(p : Acris p R)}).radical :=
   Ideal.le_radical (mem_span_singleton_self _)
 
-theorem fact_dvd (a : Ainf p R) (ha : Ainf.theta p R a = 0) (n : ℕ) :
-    (n ! : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) a ^ n := by
+theorem fact_dvd (a : Ainf p R) (ha : Ainf.theta p R a = 0) (n : ℕ)
+    : (n ! : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) a ^ n := by
   have := congrArg (algebraMap (AcrisZero p R) (Acris p R)) (AcrisZero.factorial_mul_gamma n a ha)
   rw [map_mul, map_natCast, map_pow] at this
   exact ⟨_, this.symm⟩
 
-theorem mem_rad (a : Ainf p R) (ha : Ainf.theta p R a = 0) :
-    algebraMap (Ainf p R) (Acris p R) a ∈ (span {(p : Acris p R)}).radical :=
-  ⟨p, Ideal.mem_span_singleton.2 ((Nat.cast_dvd_cast
-    (Nat.dvd_factorial (Fact.out : p.Prime).pos le_rfl)).trans (fact_dvd a ha p))⟩
+theorem mem_rad (a : Ainf p R) (ha : Ainf.theta p R a = 0)
+    : algebraMap (Ainf p R) (Acris p R) a ∈ (span {(p : Acris p R)}).radical := ⟨
+  p,
+  Ideal.mem_span_singleton.2
+    ((Nat.cast_dvd_cast (Nat.dvd_factorial (Fact.out : p.Prime).pos le_rfl)).trans
+      (fact_dvd a ha p))
+⟩
 
-theorem pow_dvd_of_prod (a : Ainf p R) (ha : Ainf.theta p R a = 0) {b : Acris p R}
-    (hb : b ∈ (span {(p : Acris p R)}).radical) :
-    ∃ k : ℕ, (p : Acris p R) ^ (k + 1) ∣
-      ((algebraMap (Ainf p R) (Acris p R) a * b) ^ (p - 1)) ^ k := by
+theorem pow_dvd_of_prod
+    (a : Ainf p R) (ha : Ainf.theta p R a = 0)
+    {b : Acris p R} (hb : b ∈ (span {(p : Acris p R)}).radical)
+    : ∃ k : ℕ,
+      (p : Acris p R) ^ (k + 1) ∣ ((algebraMap (Ainf p R) (Acris p R) a * b) ^ (p - 1)) ^ k := by
   have hp : p.Prime := Fact.out
   obtain ⟨N, hN⟩ := hb
   rw [Ideal.mem_span_singleton] at hN
   refine ⟨p ^ (N * 2), ?_⟩
   rw [← pow_mul, mul_comm (p - 1), mul_pow]
-  have h1 : (p : Acris p R) ^ padicValNat p (p ^ (N * 2) * (p - 1))! ∣
-      algebraMap (Ainf p R) (Acris p R) a ^ (p ^ (N * 2) * (p - 1)) := by
+  have h1
+      : (p : Acris p R) ^ padicValNat p (p ^ (N * 2) * (p - 1))!
+        ∣ algebraMap (Ainf p R) (Acris p R) a ^ (p ^ (N * 2) * (p - 1)) := by
     refine Dvd.dvd.trans ?_ (fact_dvd a ha _)
     rw [← Nat.cast_pow]
     exact Nat.cast_dvd_cast (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
@@ -111,15 +120,16 @@ theorem pow_dvd_of_prod (a : Ainf p R) (ha : Ainf.theta p R a = 0) {b : Acris p 
   have := val_fact p (N * 2)
   omega
 
-theorem exists_pow_dvd [IsDomain R] (e : Tilt p R) (he : PreTilt.untilt e = 1) :
-    ∃ k : ℕ, (p : Acris p R) ^ (k + 1) ∣
-      ((algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) - 1) ^ (p - 1)) ^ k := by
+theorem exists_pow_dvd [IsDomain R] (e : Tilt p R) (he : PreTilt.untilt e = 1)
+    : ∃ k : ℕ,
+      (p : Acris p R) ^ (k + 1)
+        ∣ ((algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) - 1) ^ (p - 1)) ^ k := by
   have hp : p.Prime := Fact.out
-  obtain ⟨w, hw⟩ : ∃ w : Ainf p R, w ^ p = Ainf.teich p e :=
-    ⟨Ainf.teich p ((frobeniusEquiv (Tilt p R) p).symm e), by
-      rw [← map_pow, frobeniusEquiv_symm_pow_p]⟩
-  have hg : (∑ i ∈ Finset.range p, w ^ i) * (w - 1) = Ainf.teich p e - 1 := by
-    rw [geom_sum_mul, hw]
+  obtain ⟨w, hw⟩ : ∃ w : Ainf p R, w ^ p = Ainf.teich p e := ⟨
+    Ainf.teich p ((frobeniusEquiv (Tilt p R) p).symm e),
+    by rw [← map_pow, frobeniusEquiv_symm_pow_p]
+  ⟩
+  have hg : (∑ i ∈ Finset.range p, w ^ i) * (w - 1) = Ainf.teich p e - 1 := by rw [geom_sum_mul, hw]
   have h0 : Ainf.theta p R (Ainf.teich p e - 1) = 0 := by
     rw [map_sub, Ainf.theta_teich, he, map_one, sub_self]
   have hm := mem_rad _ h0
@@ -131,8 +141,9 @@ theorem exists_pow_dvd [IsDomain R] (e : Tilt p R) (he : PreTilt.untilt e = 1) :
       linear_combination -hh
     rw [← map_pow, this, map_sub, map_mul, map_natCast]
     exact sub_mem hm (Ideal.mul_mem_right _ _ p_mem)
-  have hs : algebraMap (Ainf p R) (Acris p R) (∑ i ∈ Finset.range p, w ^ i) ∈
-      (span {(p : Acris p R)}).radical := by
+  have hs
+      : algebraMap (Ainf p R) (Acris p R) (∑ i ∈ Finset.range p, w ^ i)
+        ∈ (span {(p : Acris p R)}).radical := by
     have : (∑ i ∈ Finset.range p, w ^ i) = p + ∑ i ∈ Finset.range p, (w ^ i - 1) := by
       simp [Finset.sum_sub_distrib]
     set_option synthInstance.maxHeartbeats 100000 in
@@ -141,22 +152,26 @@ theorem exists_pow_dvd [IsDomain R] (e : Tilt p R) (he : PreTilt.untilt e = 1) :
     obtain ⟨c, hc⟩ := sub_one_dvd_pow_sub_one w i
     rw [hc, map_mul]
     exact Ideal.mul_mem_right _ _ hw1
-  have hg' : algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) - 1 =
-      algebraMap (Ainf p R) (Acris p R) (∑ i ∈ Finset.range p, w ^ i) *
-        algebraMap (Ainf p R) (Acris p R) (w - 1) := by
+  have hg'
+      : algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) - 1
+        = algebraMap (Ainf p R) (Acris p R) (∑ i ∈ Finset.range p, w ^ i)
+          * algebraMap (Ainf p R) (Acris p R) (w - 1) := by
     rw [← map_mul, hg, map_sub, map_one]
   rw [← hg, map_mul] at h0
   rcases mul_eq_zero.1 h0 with h | h
   · rw [hg']; exact pow_dvd_of_prod _ h hw1
   · rw [hg', mul_comm]; exact pow_dvd_of_prod _ h hs
 
-theorem step [IsDomain R] (e : Tilt p R) (he : PreTilt.untilt e = 1) {z : Acris p R}
-    (hz : (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) ^ p - 1) * z = 0) :
-    (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) - 1) * z = 0 := by
+theorem step
+    [IsDomain R]
+    (e : Tilt p R) (he : PreTilt.untilt e = 1)
+    {z : Acris p R} (hz : (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) ^ p - 1) * z = 0)
+    : (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) - 1) * z = 0 := by
   have hp : p.Prime := Fact.out
   obtain ⟨k, c, hc⟩ := exists_pow_dvd e he
-  have hm : algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) - 1 ∈
-      (span {(p : Acris p R)}).radical := by
+  have hm
+      : algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) - 1
+        ∈ (span {(p : Acris p R)}).radical := by
     have := mem_rad (Ainf.teich p e - 1) (by rw [map_sub, Ainf.theta_teich, he, map_one, sub_self])
     rwa [map_sub, map_one] at this
   obtain ⟨m, hmu⟩ : ∃ m, algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e) = m + 1 :=
@@ -165,20 +180,20 @@ theorem step [IsDomain R] (e : Tilt p R) (he : PreTilt.untilt e = 1) {z : Acris 
   rw [hmu, add_sub_cancel_right] at hc hm ⊢
   obtain ⟨h, hh⟩ := expand hp m
   have hpp : m ^ p = m ^ (p - 1) * m := by rw [pow_sub_one_mul hp.ne_zero]
-  have h1 : (p * (1 + m * h) - (-m ^ (p - 1))) * (m * z) = 0 := by
+  have h1 : (p * (1 + m * h) - (- m ^ (p - 1))) * (m * z) = 0 := by
     rw [hh, hpp] at hz
     linear_combination hz
-  obtain ⟨d, hd⟩ := sub_dvd_pow_sub_pow (p * (1 + m * h)) (-m ^ (p - 1)) k
+  obtain ⟨d, hd⟩ := sub_dvd_pow_sub_pow (p * (1 + m * h)) (- m ^ (p - 1)) k
   obtain ⟨g, hg⟩ := sub_one_dvd_pow_sub_one (1 + m * h) k
-  have h2 : (p : Acris p R) ^ k * ((1 + (m * (h * g) - p * ((-1) ^ k * c))) * (m * z)) =
-      p ^ k * 0 := by
+  have h2
+      : (p : Acris p R) ^ k * ((1 + (m * (h * g) - p * ((-1) ^ k * c))) * (m * z)) = p ^ k * 0 := by
     rw [neg_pow, hc, mul_pow] at hd
     linear_combination (m * z) * hd + d * h1 - (p : Acris p R) ^ k * (m * z) * hg
   exact (isUnit_of_mem (sub_mem (Ideal.mul_mem_right _ _ hm)
     (Ideal.mul_mem_right _ _ p_mem))).mul_right_eq_zero.1 (Acris.p_pow_mul_cancel k h2)
 
-theorem tower {A : Type*} [CommRing A] (p : ℕ) (u y : A) (hy : u - 1 = p ^ 2 * y) (n : ℕ) :
-    ∃ c : A, u ^ p ^ n - 1 = p ^ n * (u - 1) * (1 + p * c) := by
+theorem tower {A : Type*} [CommRing A] (p : ℕ) (u y : A) (hy : u - 1 = p ^ 2 * y) (n : ℕ)
+    : ∃ c : A, u ^ p ^ n - 1 = p ^ n * (u - 1) * (1 + p * c) := by
   induction n with
   | zero => exact ⟨0, by simp⟩
   | succ n ih =>
@@ -186,19 +201,21 @@ theorem tower {A : Type*} [CommRing A] (p : ℕ) (u y : A) (hy : u - 1 = p ^ 2 *
     obtain ⟨r, hr⟩ := Polynomial.powAddExpansion (1 : A) (u ^ p ^ n - 1) p
     rw [add_sub_cancel, ← pow_mul, ← pow_succ, one_pow, one_pow, hc] at hr
     refine ⟨c + r * p ^ n * y * (1 + p * c) ^ 2, ?_⟩
-    rw [hr, hy]; ring
+    rw [hr, hy]
+    ring
 
-theorem of_log [IsDomain R] (e : tateModule p R) {z : Acris p R}
-    (hz : Acris.logTeich e * z = 0) :
-    (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e.1) - 1) * z = 0 := by
+theorem of_log [IsDomain R] (e : tateModule p R) {z : Acris p R} (hz : Acris.logTeich e * z = 0)
+    : (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e.1) - 1) * z = 0 := by
   have he : PreTilt.untilt e.1 = 1 := e.2
   have hu : Ainf.theta p R (Ainf.teich p e.1) = 1 := by rw [Ainf.theta_teich, he]
-  have hq : ∀ n, ∃ l d : Acris p R, (p : Acris p R) ^ n * l =
-      algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e.1) ^ p ^ n - 1 ∧
-      Acris.logTeich e = l + p ^ n * d := fun n => by
+  have hq
+      : ∀ n, ∃ l d : Acris p R,
+        (p : Acris p R) ^ n * l = algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e.1) ^ p ^ n - 1
+          ∧ Acris.logTeich e = l + p ^ n * d := fun n => by
     obtain ⟨l, h1, h2⟩ := Acris.exists_quot _ hu n
-    obtain ⟨d, hd⟩ := (Acris.eval_eq_zero_iff n (Acris.logTeich e - algebraMap _ _ l)).1
-      (by rw [map_sub, Acris.eval_algebraMap, sub_eq_zero]; exact h2)
+    obtain ⟨d, hd⟩ :=
+      (Acris.eval_eq_zero_iff n (Acris.logTeich e - algebraMap _ _ l)).1
+        (by rw [map_sub, Acris.eval_algebraMap, sub_eq_zero]; exact h2)
     refine ⟨algebraMap _ _ l, d, ?_, by linear_combination hd⟩
     have := congrArg (algebraMap (AcrisZero p R) (Acris p R)) h1
     set_option synthInstance.maxHeartbeats 200000 in
@@ -222,20 +239,25 @@ theorem of_log [IsDomain R] (e : tateModule p R) {z : Acris p R}
   rw [hd] at hz
   linear_combination (p : Acris p R) ^ 2 * hz - z * h3
 
-theorem log_change [IsDomain R] (e : tateModule p R) {ε : tateModule p R} (hε : IsPrimitive ε)
-    {z : Acris p R} (hz : Acris.logTeich ε * z = 0) : Acris.logTeich e * z = 0 := by
+theorem log_change
+    [IsDomain R]
+    (e : tateModule p R)
+    {ε : tateModule p R} (hε : IsPrimitive ε)
+    {z : Acris p R} (hz : Acris.logTeich ε * z = 0)
+    : Acris.logTeich e * z = 0 := by
   obtain ⟨a, rfl⟩ := hε.padicPow_surjective e
   refine Acris.eq_zero_of_forall_dvd fun k => ?_
-  obtain ⟨η, hη⟩ := tateModule.exists_padicPow_eq ε
-    (Ideal.mem_span_singleton.1 (PadicInt.appr_spec k a))
+  obtain ⟨η, hη⟩ :=
+    tateModule.exists_padicPow_eq ε (Ideal.mem_span_singleton.1 (PadicInt.appr_spec k a))
   refine ⟨Acris.logTeich η * z, ?_⟩
   rw [hη, Acris.logTeich_mul, Acris.logTeich_pow, Acris.logTeich_pow]
   push_cast
   linear_combination (a.appr k : Acris p R) * hz
 
-theorem main [IsDomain R] (e : tateModule p R) {m : BcrisPlus p R} (hm : m ∈ BcrisPlus.periods p R) :
-    ∀ x : Acris p R, m * algebraMap _ _ x = 0 →
-      ∃ n : ℕ, (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e.1) - 1) ^ n * x = 0 := by
+theorem main [IsDomain R] (e : tateModule p R) {m : BcrisPlus p R} (hm : m ∈ BcrisPlus.periods p R)
+    : ∀ x : Acris p R,
+      m * algebraMap _ _ x = 0
+        → ∃ n : ℕ, (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p e.1) - 1) ^ n * x = 0 := by
   induction hm using Submonoid.closure_induction_left with
   | one =>
     intro x hx
@@ -253,10 +275,23 @@ theorem main [IsDomain R] (e : tateModule p R) {m : BcrisPlus p R} (hm : m ∈ B
 
 end Bridge.CrisLoc.PowMulEqZeroLemmas
 
-theorem Bridge.CrisLoc.exists_pow_mul_eq_zero : ∀ (l : ℕ) [Fact l.Prime] (e : (Reformulated.AutPerF.Tilt l ↥(PadicComplexInt l))) (he : e.untilt = 1) (hne : e ≠ 1) {x : (Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))} (hx : algebraMap ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))) ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))) x = 0), ∃ n : ℕ, algebraMap ((Reformulated.AutPerF.Ainf l ↥(PadicComplexInt l))) ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))) (WittVector.teichmuller l e - 1) ^ n * x = 0 := by
+theorem Bridge.CrisLoc.exists_pow_mul_eq_zero
+    : ∀ (l : ℕ) [Fact l.Prime] (e : (Reformulated.AutPerF.Tilt l ↥(PadicComplexInt l)))
+        (he : e.untilt = 1) (hne : e ≠ 1) {x : (Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))}
+        (hx : algebraMap ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l)))
+            ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))) x
+          = 0),
+      ∃ n : ℕ,
+        algebraMap ((Reformulated.AutPerF.Ainf l ↥(PadicComplexInt l)))
+                ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l)))
+                (WittVector.teichmuller l e - 1)
+              ^ n
+            * x
+          = 0 := by
   intro l _ e he _ x hx
   rw [IsScalarTower.algebraMap_apply _ (BcrisPlus l ↥(PadicComplexInt l)),
-    IsLocalization.map_eq_zero_iff (BcrisPlus.periods l ↥(PadicComplexInt l))] at hx
+      IsLocalization.map_eq_zero_iff (BcrisPlus.periods l ↥(PadicComplexInt l))]
+    at hx
   obtain ⟨m, hm⟩ := hx
   obtain ⟨n, hn⟩ := Bridge.CrisLoc.PowMulEqZeroLemmas.main ⟨e, he⟩ m.2 x hm
   exact ⟨n, by rw [map_sub, map_one]; exact hn⟩
@@ -271,9 +306,10 @@ open scoped Nat
 
 namespace Bridge.CrisLoc.CrisAwayLemmas
 
-theorem binom_poly {p : ℕ} (hp : p.Prime) :
-    ∃ h : Polynomial ℤ, (1 + Polynomial.X) ^ p =
-      1 + Polynomial.X ^ p + (p : Polynomial ℤ) * Polynomial.X * (1 + Polynomial.X * h) := by
+theorem binom_poly {p : ℕ} (hp : p.Prime)
+    : ∃ h : Polynomial ℤ,
+      (1 + Polynomial.X) ^ p
+        = 1 + Polynomial.X ^ p + (p : Polynomial ℤ) * Polynomial.X * (1 + Polynomial.X * h) := by
   obtain ⟨r, hr⟩ := exists_add_pow_prime_eq hp (1 : Polynomial ℤ) Polynomial.X
   obtain ⟨k, hk⟩ := Polynomial.powAddExpansion (1 : Polynomial ℤ) Polynomial.X p
   obtain ⟨m, rfl⟩ : ∃ m, p = m + 2 := ⟨p - 2, by have := hp.two_le; omega⟩
@@ -285,45 +321,46 @@ theorem binom_poly {p : ℕ} (hp : p.Prime) :
     rw [Polynomial.X_dvd_iff]
     have := congrArg (fun f => _root_.AddMonoidAlgebra.coeff (M := ℕ) f 0) h1
     simp only [Polynomial.mul_coeff_zero, Polynomial.coeff_X_zero, zero_mul,
-      Polynomial.coeff_natCast_ite, if_true, mul_eq_zero] at this
+        Polynomial.coeff_natCast_ite, if_true, mul_eq_zero]
+      at this
     exact this.resolve_left (by simp; omega)
   obtain ⟨h, hh⟩ := h2
   refine ⟨h, ?_⟩
   rw [hr, eq_add_of_sub_eq hh]
   ring
 
-theorem binom {A : Type*} [CommRing A] {p : ℕ} (hp : p.Prime) (x : A) :
-    ∃ h : A, (1 + x) ^ p = 1 + x ^ p + (p : A) * x * (1 + x * h) := by
+theorem binom {A : Type*} [CommRing A] {p : ℕ} (hp : p.Prime) (x : A)
+    : ∃ h : A, (1 + x) ^ p = 1 + x ^ p + (p : A) * x * (1 + x * h) := by
   obtain ⟨h, hh⟩ := binom_poly hp
   refine ⟨Polynomial.aeval x h, ?_⟩
   simpa using congrArg (Polynomial.aeval x) hh
 
 universe u
 variable {p : ℕ} [Fact p.Prime]
-variable {R : Type u} [CommRing R] [Fact ¬IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
+variable {R : Type u} [CommRing R] [Fact ¬ IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
 
-theorem mem_jac {z : Acris p R} {n : ℕ} (h : (p : Acris p R) ∣ z ^ n) :
-    z ∈ (⊥ : Ideal (Acris p R)).jacobson := by
+theorem mem_jac {z : Acris p R} {n : ℕ} (h : (p : Acris p R) ∣ z ^ n)
+    : z ∈ (⊥ : Ideal (Acris p R)).jacobson := by
   have hj := IsAdicComplete.le_jacobson_bot (span {(p : Acris p R)})
   exact Ideal.isRadical_jacobson _ ⟨n, hj (mem_span_singleton.2 h)⟩
 
-theorem fact_gamma (n : ℕ) (x : Ainf p R) (hx : Ainf.theta p R x = 0) :
-    (n ! : Acris p R) * algebraMap _ _ (AcrisZero.gamma n x hx) =
-      algebraMap (Ainf p R) (Acris p R) x ^ n := by
+theorem fact_gamma (n : ℕ) (x : Ainf p R) (hx : Ainf.theta p R x = 0)
+    : (n ! : Acris p R) * algebraMap _ _ (AcrisZero.gamma n x hx)
+      = algebraMap (Ainf p R) (Acris p R) x ^ n := by
   have := congrArg (algebraMap (AcrisZero p R) (Acris p R)) (AcrisZero.factorial_mul_gamma n x hx)
   rwa [map_mul, map_natCast, map_pow, ← IsScalarTower.algebraMap_apply] at this
 
-theorem p_dvd_pow (x : Ainf p R) (hx : Ainf.theta p R x = 0) :
-    (p : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) x ^ p := by
+theorem p_dvd_pow (x : Ainf p R) (hx : Ainf.theta p R x = 0)
+    : (p : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) x ^ p := by
   rw [← fact_gamma p x hx]
-  exact Dvd.dvd.mul_right
-    (Nat.cast_dvd_cast (Nat.dvd_factorial (Fact.out : p.Prime).pos le_rfl)) _
+  exact Dvd.dvd.mul_right (Nat.cast_dvd_cast (Nat.dvd_factorial (Fact.out : p.Prime).pos le_rfl)) _
 
-theorem p_dvd_gamma_pow (x : Ainf p R) (hx : Ainf.theta p R x = 0) :
-    (p : Acris p R) ∣ algebraMap _ (Acris p R) (AcrisZero.gamma p x hx) ^ p := by
+theorem p_dvd_gamma_pow (x : Ainf p R) (hx : Ainf.theta p R x = 0)
+    : (p : Acris p R) ∣ algebraMap _ (Acris p R) (AcrisZero.gamma p x hx) ^ p := by
   have hp : p.Prime := Fact.out
-  have h : AcrisZero.gamma p x hx ^ p =
-      (p ! : AcrisZero p R) * ((Nat.uniformBell p p : ℕ) * AcrisZero.gamma (p * p) x hx) := by
+  have h
+      : AcrisZero.gamma p x hx ^ p
+        = (p ! : AcrisZero p R) * ((Nat.uniformBell p p : ℕ) * AcrisZero.gamma (p * p) x hx) := by
     apply Subtype.ext
     simp only [MulMemClass.coe_mul, SubmonoidClass.coe_pow, SubringClass.coe_natCast,
       AcrisZero.coe_gamma]
@@ -344,8 +381,9 @@ theorem theta_mu (η : tateModule p R) : Ainf.theta p R (Ainf.teich p η.1 - 1) 
 
 variable [IsDomain R] [CharZero R]
 
-theorem exists_congr (η : tateModule p R) : ∃ x c : Ainf p R, Ainf.theta p R x = 0 ∧
-    (p : Ainf p R) ∣ (Ainf.teich p η.1 - 1) ^ (p - 1) - x ^ p * c := by
+theorem exists_congr (η : tateModule p R)
+    : ∃ x c : Ainf p R,
+      Ainf.theta p R x = 0 ∧ (p : Ainf p R) ∣ (Ainf.teich p η.1 - 1) ^ (p - 1) - x ^ p * c := by
   have hp : p.Prime := Fact.out
   have e1 : ∀ y : Tilt p R, WittVector.constantCoeff (Ainf.teich p y) = y := fun y => by simp
   have e2 : η.1 - 1 = (tateRoot η - 1) ^ p := by rw [sub_pow_char, tateRoot_pow, one_pow]
@@ -355,41 +393,52 @@ theorem exists_congr (η : tateModule p R) : ∃ x c : Ainf p R, Ainf.theta p R 
     rw [← WittVector.constantCoeff_apply]
     have h := congrArg (WittVector.constantCoeff (p := p) (R := Tilt p R)) (Ainf.omega_mul η)
     rw [map_mul, map_sub, map_sub, map_one, e1, e1, e2] at h
-    have hne : tateRoot η - 1 ≠ 0 := fun h0 => hη (by
-      change PreTilt.untilt (tateRoot η) = 1
-      rw [sub_eq_zero.1 h0, map_one])
+    have hne : tateRoot η - 1 ≠ 0 := fun h0 =>
+      hη (by
+        change PreTilt.untilt (tateRoot η) = 1
+        rw [sub_eq_zero.1 h0, map_one])
     have h3 : WittVector.constantCoeff (Ainf.omega η) = (tateRoot η - 1) ^ (p - 1) := by
       apply mul_right_cancel₀ hne
       rw [h, ← pow_succ, Nat.sub_add_cancel hp.pos]
     rw [mul_one, map_sub, map_pow, map_pow, h3, map_sub, map_one, e1, e2, ← pow_mul, ← pow_mul,
       mul_comm, sub_self]
   · have h1 : PreTilt.untilt (tateRoot η) = 1 := not_not.1 hη
-    refine ⟨Ainf.teich p (tateRoot η) - 1, ((Ainf.teich p (tateRoot η) - 1) ^ p) ^ (p - 2),
-      by rw [map_sub, map_one, Ainf.theta_teich, h1, sub_self], ?_⟩
+    refine ⟨
+      Ainf.teich p (tateRoot η) - 1,
+      ((Ainf.teich p (tateRoot η) - 1) ^ p) ^ (p - 2),
+      by rw [map_sub, map_one, Ainf.theta_teich, h1, sub_self],
+      ?_
+    ⟩
     rw [Ainf.p_dvd_iff]
     rw [← WittVector.constantCoeff_apply]
     rw [← pow_succ', show p - 2 + 1 = p - 1 by have := hp.two_le; omega]
     simp only [map_sub, map_pow, map_one, e1, e2, sub_self]
 
-theorem exists_pow_eq_p_mul (η : tateModule p R) : ∃ y ∈ (⊥ : Ideal (Acris p R)).jacobson,
-    algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1) ^ (p - 1) = p * y := by
+theorem exists_pow_eq_p_mul (η : tateModule p R)
+    : ∃ y ∈ (⊥ : Ideal (Acris p R)).jacobson,
+      algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1) ^ (p - 1) = p * y := by
   have hp : p.Prime := Fact.out
   obtain ⟨x, c, hx, a, ha⟩ := exists_congr η
   have h0 : Ainf.theta p R a = 0 := by
     have := congrArg (Ainf.theta p R) ha
     rw [map_sub, map_pow, theta_mu, map_mul, map_pow, hx, zero_pow hp.ne_zero,
-      zero_pow (by have := hp.two_le; omega), zero_mul, sub_zero, map_mul, map_natCast] at this
+        zero_pow (by have := hp.two_le; omega), zero_mul, sub_zero, map_mul, map_natCast]
+      at this
     exact (mul_eq_zero.1 this.symm).resolve_left (Nat.cast_ne_zero.2 hp.ne_zero)
-  refine ⟨algebraMap _ _ a + algebraMap _ _ (AcrisZero.gamma p x hx) *
-    (((p - 1)! : ℕ) * algebraMap _ _ c), add_mem (mem_jac (p_dvd_pow a h0))
-      (Ideal.mul_mem_right _ _ (mem_jac (p_dvd_gamma_pow x hx))), ?_⟩
+  refine ⟨
+    algebraMap _ _ a
+      + algebraMap _ _ (AcrisZero.gamma p x hx) * (((p - 1)! : ℕ) * algebraMap _ _ c),
+    add_mem (mem_jac (p_dvd_pow a h0)) (Ideal.mul_mem_right _ _ (mem_jac (p_dvd_gamma_pow x hx))),
+    ?_
+  ⟩
   have h1 := fact_gamma p x hx
   rw [← Nat.mul_factorial_pred hp.ne_zero, Nat.cast_mul] at h1
-  rw [← map_pow, eq_add_of_sub_eq ha, map_add (f := _), map_mul, map_mul, map_pow, map_natCast, ← h1]
+  rw [← map_pow, eq_add_of_sub_eq ha, map_add (f := _), map_mul, map_mul, map_pow, map_natCast,
+    ← h1]
   ring
 
-theorem assoc_pow (η : tateModule p R) :
-    Associated ((p : Acris p R) * (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1) - 1))
+theorem assoc_pow (η : tateModule p R)
+    : Associated ((p : Acris p R) * (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1) - 1))
       (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1) ^ p - 1) := by
   have hp : p.Prime := Fact.out
   obtain ⟨y, hy, e⟩ := exists_pow_eq_p_mul η
@@ -399,36 +448,42 @@ theorem assoc_pow (η : tateModule p R) :
   obtain ⟨h, hh⟩ := binom hp (U - 1)
   have hu := Ideal.mem_jacobson_bot.1 (add_mem hy (Ideal.mul_mem_right h _ hm)) 1
   refine ⟨hu.unit, ?_⟩
-  have e' : (U - 1) ^ p = (U - 1) * (p * y) := by
-    rw [← e, ← pow_succ', Nat.sub_add_cancel hp.pos]
+  have e' : (U - 1) ^ p = (U - 1) * (p * y) := by rw [← e, ← pow_succ', Nat.sub_add_cancel hp.pos]
   rw [add_sub_cancel] at hh
   rw [IsUnit.unit_spec, hh, e']
   ring
 
 omit [IsDomain R] [CharZero R] in
-theorem exists_assoc_log (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
-    ∃ l : Acris p R, (p : Acris p R) ^ 2 * l = algebraMap (Ainf p R) _ u ^ p ^ 2 - 1 ∧
-      Associated l (Acris.log u hu) := by
+theorem exists_assoc_log (u : Ainf p R) (hu : Ainf.theta p R u = 1)
+    : ∃ l : Acris p R,
+      (p : Acris p R) ^ 2 * l = algebraMap (Ainf p R) _ u ^ p ^ 2 - 1
+        ∧ Associated l (Acris.log u hu) := by
   have hp : p.Prime := Fact.out
-  have h : ∀ n, ∃ l : Acris p R, (p : Acris p R) ^ n * l = algebraMap (Ainf p R) _ u ^ p ^ n - 1 ∧
-      (p : Acris p R) ^ n ∣ Acris.log u hu - l := fun n => by
+  have h
+      : ∀ n, ∃ l : Acris p R,
+        (p : Acris p R) ^ n * l = algebraMap (Ainf p R) _ u ^ p ^ n - 1
+          ∧ (p : Acris p R) ^ n ∣ Acris.log u hu - l := fun n => by
     obtain ⟨l, h1, h2⟩ := Acris.exists_quot u hu n
     refine ⟨algebraMap _ _ l, ?_, ?_⟩
     · have := congrArg (algebraMap (AcrisZero p R) (Acris p R)) h1
       set_option synthInstance.maxHeartbeats 200000 in
-       rwa [map_mul, map_pow, map_natCast, map_sub, map_pow, map_one,
-        ← IsScalarTower.algebraMap_apply] at this
+      rwa [map_mul, map_pow, map_natCast, map_sub, map_pow, map_one,
+          ← IsScalarTower.algebraMap_apply]
+        at this
     · rw [← Acris.eval_eq_zero_iff, RingHom.map_sub, h2, Acris.eval_algebraMap, sub_self]
   choose l hl ht using h
   generalize Acris.log u hu = t at *
   generalize algebraMap (Ainf p R) (Acris p R) u = U at *
   have step : ∀ n, ∃ c, l (n + 3) = l (n + 2) * (1 + p ^ (n + 1) * c) := fun n => by
     obtain ⟨h, hh⟩ := binom hp ((p : Acris p R) ^ (n + 2) * l (n + 2))
-    have e' : ((p : Acris p R) ^ (n + 2) * l (n + 2)) ^ p =
-        ((p : Acris p R) ^ (n + 2) * l (n + 2)) ^ 2 * (p ^ (n + 2) * l (n + 2)) ^ (p - 2) := by
+    have e'
+        : ((p : Acris p R) ^ (n + 2) * l (n + 2)) ^ p
+          = ((p : Acris p R) ^ (n + 2) * l (n + 2)) ^ 2 * (p ^ (n + 2) * l (n + 2)) ^ (p - 2) := by
       rw [← pow_add, Nat.add_sub_cancel' hp.two_le]
-    refine ⟨l (n + 2) * (p ^ (n + 2) * l (n + 2)) ^ (p - 2) + p * l (n + 2) * h,
-      Acris.p_pow_mul_cancel (n + 3) ?_⟩
+    refine ⟨
+      l (n + 2) * (p ^ (n + 2) * l (n + 2)) ^ (p - 2) + p * l (n + 2) * h,
+      Acris.p_pow_mul_cancel (n + 3) ?_
+    ⟩
     have e2 : U ^ p ^ (n + 3) = (1 + (p : Acris p R) ^ (n + 2) * l (n + 2)) ^ p := by
       rw [hl, add_sub_cancel, ← pow_mul, ← pow_succ]
     rw [hl (n + 3), e2, hh, e']
@@ -459,10 +514,9 @@ theorem exists_assoc_log (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
   rw [IsUnit.unit_spec]
   linear_combination -hz - (p : Acris p R) * ha
 
-theorem assoc_log (η : tateModule p R) :
-    Associated (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1)) (Acris.logTeich η) := by
-  obtain ⟨l, hl, hl'⟩ := exists_assoc_log (Ainf.teich p η.1)
-    (by rw [Ainf.theta_teich]; exact η.2)
+theorem assoc_log (η : tateModule p R)
+    : Associated (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1)) (Acris.logTeich η) := by
+  obtain ⟨l, hl, hl'⟩ := exists_assoc_log (Ainf.teich p η.1) (by rw [Ainf.theta_teich]; exact η.2)
   refine Associated.trans ?_ hl'
   obtain ⟨v, hv⟩ := assoc_pow η
   obtain ⟨w, hw⟩ := assoc_pow (η ^ p)
@@ -473,9 +527,11 @@ theorem assoc_log (η : tateModule p R) :
   ring
 
 omit [CharZero R] in
-theorem isUnit_log_iff {B : Type*} [CommRing B] (g : Acris p R →+* B) (hp : IsUnit (p : B))
-    {ε η : tateModule p R} (hε : IsPrimitive ε) (hη : η ≠ 1) :
-    IsUnit (g (Acris.logTeich η)) ↔ IsUnit (g (Acris.logTeich ε)) := by
+theorem isUnit_log_iff
+    {B : Type*} [CommRing B]
+    (g : Acris p R →+* B) (hp : IsUnit (p : B))
+    {ε η : tateModule p R} (hε : IsPrimitive ε) (hη : η ≠ 1)
+    : IsUnit (g (Acris.logTeich η)) ↔ IsUnit (g (Acris.logTeich ε)) := by
   obtain ⟨a, rfl⟩ := hε.padicPow_surjective η
   have ha : a ≠ 0 := fun h => hη (by rw [h, tateModule.padicPow_zero])
   have hu : IsUnit (g (algebraMap ℤ_[p] (Acris p R) a)) := by
@@ -485,8 +541,8 @@ theorem isUnit_log_iff {B : Type*} [CommRing B] (g : Acris p R →+* B) (hp : Is
   rw [Acris.logTeich_padicPow, map_mul, IsUnit.mul_iff]
   exact and_iff_right hu
 
-theorem away [ValuationRing R] [IsAlgClosed (FractionRing R)] (η : tateModule p R) (hη : η ≠ 1) :
-    IsLocalization.Away (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1))
+theorem away [ValuationRing R] [IsAlgClosed (FractionRing R)] (η : tateModule p R) (hη : η ≠ 1)
+    : IsLocalization.Away (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1))
       (Bcris p R) := by
   have h1 := assoc_log η
   have h2 := p_dvd_pow _ (theta_mu η)
@@ -512,23 +568,30 @@ theorem away [ValuationRing R] [IsAlgClosed (FractionRing R)] (η : tateModule p
   have hg : ∀ x : Acris p R, g (algebraMap _ _ x) = algebraMap _ _ x := fun x =>
     IsLocalization.Away.lift_eq _ _ x
   have hfg : f.comp g = RingHom.id _ :=
-    IsLocalization.ringHom_ext (Submonoid.powers μ) (RingHom.ext fun x => by
-      simp only [RingHom.comp_apply, RingHom.id_apply, hg, hf])
+    IsLocalization.ringHom_ext (Submonoid.powers μ)
+      (RingHom.ext fun x => by simp only [RingHom.comp_apply, RingHom.id_apply, hg, hf])
   have hgf : g.comp f = RingHom.id _ := by
     refine Bcris.hom_ext fun y => ?_
-    refine RingHom.congr_fun (BcrisPlus.hom_ext
-      (f := (g.comp f).comp (algebraMap (BcrisPlus p R) (Bcris p R)))
-      (g := algebraMap (BcrisPlus p R) (Bcris p R)) fun x => ?_) y
+    refine RingHom.congr_fun
+      (BcrisPlus.hom_ext (f := (g.comp f).comp (algebraMap (BcrisPlus p R) (Bcris p R)))
+        (g := algebraMap (BcrisPlus p R) (Bcris p R)) fun x => ?_)
+      y
     rw [RingHom.comp_apply, ← IsScalarTower.algebraMap_apply, RingHom.comp_apply, hf, hg]
   exact IsLocalization.isLocalization_of_algEquiv (Submonoid.powers μ)
     (AlgEquiv.ofRingEquiv (f := RingEquiv.ofRingHom g f hgf hfg) hg)
 
 end Bridge.CrisLoc.CrisAwayLemmas
 
-theorem Bridge.CrisLoc.bcris_away : ∀ (l : ℕ) [Fact l.Prime] (e : (Reformulated.AutPerF.Tilt l ↥(PadicComplexInt l))) (he : e.untilt = 1) (hne : e ≠ 1), IsLocalization.Away (algebraMap ((Reformulated.AutPerF.Ainf l ↥(PadicComplexInt l))) ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))) (WittVector.teichmuller l e - 1)) ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))) := by
+theorem Bridge.CrisLoc.bcris_away
+    : ∀ (l : ℕ) [Fact l.Prime] (e : (Reformulated.AutPerF.Tilt l ↥(PadicComplexInt l)))
+        (he : e.untilt = 1) (hne : e ≠ 1),
+      IsLocalization.Away
+        (algebraMap ((Reformulated.AutPerF.Ainf l ↥(PadicComplexInt l)))
+          ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))) (WittVector.teichmuller l e - 1))
+        ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))) := by
   intro l _ e he hne
-  exact Bridge.CrisLoc.CrisAwayLemmas.away (p := l) (R := PadicComplexInt l) ⟨e, he⟩
-    fun h => hne (congrArg Subtype.val h)
+  exact Bridge.CrisLoc.CrisAwayLemmas.away (p := l) (R := PadicComplexInt l) ⟨e, he⟩ fun h =>
+    hne (congrArg Subtype.val h)
 
 end
 end CrisAway
@@ -544,8 +607,8 @@ section General
 
 variable {A : Type*} [CommRing A]
 
-theorem mem_jac_of_pow {x : A} {n : ℕ} (h : x ^ n ∈ jacobson (⊥ : Ideal A)) :
-    x ∈ jacobson (⊥ : Ideal A) := by
+theorem mem_jac_of_pow {x : A} {n : ℕ} (h : x ^ n ∈ jacobson (⊥ : Ideal A))
+    : x ∈ jacobson (⊥ : Ideal A) := by
   rw [Ideal.jacobson, Ideal.mem_sInf] at h ⊢
   intro J hJ
   exact hJ.2.isPrime.mem_of_pow_mem n (h hJ)
@@ -553,18 +616,20 @@ theorem mem_jac_of_pow {x : A} {n : ℕ} (h : x ^ n ∈ jacobson (⊥ : Ideal A)
 theorem isUnit_of_sub_one_mem {x : A} (h : x - 1 ∈ jacobson (⊥ : Ideal A)) : IsUnit x := by
   simpa using Ideal.mem_jacobson_bot.1 h 1
 
-theorem exists_limit (a : A) [IsAdicComplete (span {a}) A] (d : ℕ → A)
-    (h : ∀ n, a ^ n ∣ d (n + 1) - d n) : ∃ L, ∀ n, a ^ n ∣ d n - L := by
+theorem exists_limit
+    (a : A) [IsAdicComplete (span {a}) A] (d : ℕ → A) (h : ∀ n, a ^ n ∣ d (n + 1) - d n)
+    : ∃ L, ∀ n, a ^ n ∣ d n - L := by
   have key : ∀ (n : ℕ) (x : A), x ∈ (span {a} ^ n • ⊤ : Submodule A A) ↔ a ^ n ∣ x := by
     intro n x
     rw [smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := span {a}) d (fun {m n} hmn => by
-    rw [SModEq.sub_mem, key]
-    induction n, hmn using Nat.le_induction with
-    | base => simp
-    | succ n hmn ih =>
-      have := dvd_sub ih ((pow_dvd_pow a hmn).trans (h n))
-      rwa [sub_sub, add_sub_cancel] at this)
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec' (I := span {a}) d (fun {m n} hmn => by
+      rw [SModEq.sub_mem, key]
+      induction n, hmn using Nat.le_induction with
+      | base => simp
+      | succ n hmn ih =>
+        have := dvd_sub ih ((pow_dvd_pow a hmn).trans (h n))
+        rwa [sub_sub, add_sub_cancel] at this)
   exact ⟨L, fun n => (key n _).1 (SModEq.sub_mem.1 (hL n))⟩
 
 theorem geom_sum_eq (n : ℕ) (v : A) : ∃ g, ∑ i ∈ Finset.range n, v ^ i = n + (v - 1) * g := by
@@ -576,9 +641,10 @@ theorem geom_sum_eq (n : ℕ) (v : A) : ∃ g, ∑ i ∈ Finset.range n, v ^ i =
   simp
 
 open Polynomial in
-theorem geom_sum_frob (p : ℕ) [Fact p.Prime] (v : A) : ∃ g,
-    ∑ i ∈ Finset.range p, (v ^ p) ^ i =
-      (∑ i ∈ Finset.range p, v ^ i) ^ p + p * (1 - p ^ (p - 1) + (v - 1) * g) := by
+theorem geom_sum_frob (p : ℕ) [Fact p.Prime] (v : A)
+    : ∃ g,
+      ∑ i ∈ Finset.range p, (v ^ p) ^ i
+        = (∑ i ∈ Finset.range p, v ^ i) ^ p + p * (1 - p ^ (p - 1) + (v - 1) * g) := by
   have hp : p.Prime := Fact.out
   set F : ℤ[X] := ∑ i ∈ Finset.range p, X ^ i with hF
   have h1 : C (p : ℤ) ∣ expand ℤ p F - F ^ p := by
@@ -606,38 +672,47 @@ theorem geom_sum_frob (p : ℕ) [Fact p.Prime] (v : A) : ∃ g,
 end General
 
 variable {p : ℕ} [Fact p.Prime]
-variable {R : Type*} [CommRing R] [Fact ¬IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
+variable {R : Type*} [CommRing R] [Fact ¬ IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
 
 theorem p_mem_jac : (p : Acris p R) ∈ jacobson (⊥ : Ideal (Acris p R)) :=
   IsAdicComplete.le_jacobson_bot (span {(p : Acris p R)}) (mem_span_singleton_self _)
 
-theorem factorial_dvd (n : ℕ) (x : Ainf p R) (hx : Ainf.theta p R x = 0) :
-    (n ! : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) x ^ n := by
+theorem factorial_dvd (n : ℕ) (x : Ainf p R) (hx : Ainf.theta p R x = 0)
+    : (n ! : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) x ^ n := by
   have := congrArg (algebraMap (AcrisZero p R) (Acris p R)) (AcrisZero.factorial_mul_gamma n x hx)
   rw [map_mul, map_pow, map_natCast, ← IsScalarTower.algebraMap_apply] at this
   exact ⟨_, this.symm⟩
 
-theorem p_dvd_pow (x : Ainf p R) (hx : Ainf.theta p R x = 0) :
-    (p : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) x ^ p :=
+theorem p_dvd_pow (x : Ainf p R) (hx : Ainf.theta p R x = 0)
+    : (p : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) x ^ p :=
   (Nat.cast_dvd_cast (Nat.dvd_factorial (Fact.out : p.Prime).pos le_rfl)).trans
     (factorial_dvd p x hx)
 
-theorem mem_jac_of_theta (x : Ainf p R) (hx : Ainf.theta p R x = 0) :
-    algebraMap (Ainf p R) (Acris p R) x ∈ jacobson (⊥ : Ideal (Acris p R)) := by
+theorem mem_jac_of_theta (x : Ainf p R) (hx : Ainf.theta p R x = 0)
+    : algebraMap (Ainf p R) (Acris p R) x ∈ jacobson (⊥ : Ideal (Acris p R)) := by
   obtain ⟨c, hc⟩ := p_dvd_pow x hx
   exact mem_jac_of_pow (n := p) (by rw [hc]; exact mul_mem_right _ _ p_mem_jac)
 
-theorem exists_pow_eq_mul (x : Ainf p R) (hx : Ainf.theta p R x = 0) :
-    ∃ c ∈ jacobson (⊥ : Ideal (Acris p R)), algebraMap (Ainf p R) (Acris p R) x ^ p = p * c := by
+theorem exists_pow_eq_mul (x : Ainf p R) (hx : Ainf.theta p R x = 0)
+    : ∃ c ∈ jacobson (⊥ : Ideal (Acris p R)), algebraMap (Ainf p R) (Acris p R) x ^ p = p * c := by
   have hp : p.Prime := Fact.out
   obtain ⟨c, hc⟩ := p_dvd_pow x hx
   refine ⟨c, mem_jac_of_pow (n := p) ?_, hc⟩
   have h1 : p ^ (p + 1) ∣ (p * p)! := by
-    rw [(by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat} (ha : a ≠ 0), p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a) (Nat.factorial_ne_zero _)]
+    rw [(by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le
+        : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat}
+            (ha : a ≠ 0),
+          p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a)
+      (Nat.factorial_ne_zero _)]
     simp only [Nat.padicValNat_def]
     rw [_root_.multiplicity_factorial_mul]
     have hval : 1 ≤ padicValNat p p ! := by
-      rw [← (by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat} (ha : a ≠ 0), p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a) (Nat.factorial_ne_zero _), pow_one]
+      rw [← (by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le
+            : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat}
+                (ha : a ≠ 0),
+              p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a)
+          (Nat.factorial_ne_zero _),
+        pow_one]
       exact Nat.dvd_factorial hp.pos le_rfl
     have : 1 ≤ multiplicity p p ! := by simpa only [Nat.padicValNat_def] using hval
     omega
@@ -649,9 +724,11 @@ theorem exists_pow_eq_mul (x : Ainf p R) (hx : Ainf.theta p R x = 0) :
 theorem theta_teich_sub_one (η : tateModule p R) : Ainf.theta p R (Ainf.teich p η.1 - 1) = 0 := by
   rw [map_sub, map_one, Ainf.theta_teich, tateModule.untilt_eq_one, sub_self]
 
-theorem exists_unit [IsDomain R] {ε : tateModule p R} (hε : IsPrimitive ε) :
-    ∃ w : Acris p R, IsUnit w ∧
-      ∑ i ∈ Finset.range p, algebraMap (Ainf p R) (Acris p R) (Ainf.teich p ε.1) ^ i = p * w := by
+theorem exists_unit [IsDomain R] {ε : tateModule p R} (hε : IsPrimitive ε)
+    : ∃ w : Acris p R,
+      IsUnit w
+        ∧ ∑ i ∈ Finset.range p, algebraMap (Ainf p R) (Acris p R) (Ainf.teich p ε.1) ^ i
+          = p * w := by
   have hp : p.Prime := Fact.out
   set v := algebraMap (Ainf p R) (Acris p R) (Ainf.teich p (tateRoot ε)) with hv
   have h1 : algebraMap (Ainf p R) (Acris p R) (Ainf.teich p ε.1) = v ^ p := by
@@ -678,20 +755,22 @@ theorem exists_unit [IsDomain R] {ε : tateModule p R} (hε : IsPrimitive ε) :
   · rw [h1, hg, ← h2, hc']
     ring
 
-theorem exists_log_eq (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
-    ∃ l d : Acris p R, IsUnit d ∧
-      (p : Acris p R) ^ 2 * l = algebraMap (Ainf p R) (Acris p R) u ^ p ^ 2 - 1 ∧
-      Acris.log u hu = l * d := by
+theorem exists_log_eq (u : Ainf p R) (hu : Ainf.theta p R u = 1)
+    : ∃ l d : Acris p R,
+      IsUnit d ∧ (p : Acris p R) ^ 2 * l = algebraMap (Ainf p R) (Acris p R) u ^ p ^ 2 - 1
+        ∧ Acris.log u hu = l * d := by
   set U := algebraMap (Ainf p R) (Acris p R) u with hU
-  have h0 : ∀ n, ∃ l : Acris p R, (p : Acris p R) ^ n * l = U ^ p ^ n - 1 ∧
-      (p : Acris p R) ^ n ∣ Acris.log u hu - l := by
+  have h0
+      : ∀ n, ∃ l : Acris p R,
+        (p : Acris p R) ^ n * l = U ^ p ^ n - 1 ∧ (p : Acris p R) ^ n ∣ Acris.log u hu - l := by
     intro n
     obtain ⟨l, hl, hl'⟩ := Acris.exists_quot u hu n
     refine ⟨algebraMap _ _ l, ?_, ?_⟩
     · have := congrArg (algebraMap (AcrisZero p R) (Acris p R)) hl
       set_option synthInstance.maxHeartbeats 200000 in
-       rwa [map_mul, map_pow, map_natCast, map_sub, map_one, map_pow,
-        ← IsScalarTower.algebraMap_apply] at this
+      rwa [map_mul, map_pow, map_natCast, map_sub, map_one, map_pow,
+          ← IsScalarTower.algebraMap_apply]
+        at this
     · rw [← Acris.eval_eq_zero_iff, RingHom.map_sub, hl', Acris.eval_algebraMap, sub_self]
   choose l hl hl' using h0
   have h1 : ∀ n, ∃ c, l (n + 3) = l (n + 2) * (1 + (p : Acris p R) ^ (n + 1) * c) := by
@@ -711,8 +790,7 @@ theorem exists_log_eq (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
     induction n with
     | zero => simp [d]
     | succ n ih => rw [hd, ← mul_assoc, ← ih]; exact hc n
-  obtain ⟨D, hD⟩ := exists_limit (p : Acris p R) d fun n =>
-    ⟨d n * p * c n, by rw [hd]; ring⟩
+  obtain ⟨D, hD⟩ := exists_limit (p : Acris p R) d fun n => ⟨d n * p * c n, by rw [hd]; ring⟩
   refine ⟨l 2, D, isUnit_of_sub_one_mem ?_, hl 2, ?_⟩
   · obtain ⟨z, hz⟩ := hD 1
     have : D - 1 = p * (c 0 - z) := by
@@ -728,11 +806,11 @@ theorem exists_log_eq (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
     rw [this]
     exact dvd_add ((pow_dvd_pow _ (by omega)).trans (hl' (n + 2))) ((hD n).mul_left _)
 
-theorem logTeich_dvd [IsDomain R] {ε : tateModule p R} (hε : IsPrimitive ε) :
-    Acris.logTeich ε ∣ algebraMap (Ainf p R) (Acris p R) (Ainf.teich p ε.1) - 1 := by
+theorem logTeich_dvd [IsDomain R] {ε : tateModule p R} (hε : IsPrimitive ε)
+    : Acris.logTeich ε ∣ algebraMap (Ainf p R) (Acris p R) (Ainf.teich p ε.1) - 1 := by
   obtain ⟨w, hw, h⟩ := exists_unit hε
-  obtain ⟨l, d, hd, hl, hlog⟩ := exists_log_eq (Ainf.teich p ε.1)
-    (by rw [Ainf.theta_teich]; exact ε.2)
+  obtain ⟨l, d, hd, hl, hlog⟩ :=
+    exists_log_eq (Ainf.teich p ε.1) (by rw [Ainf.theta_teich]; exact ε.2)
   have h' := congrArg (Acris.frob p R) h
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_pow, map_mul, map_natCast, Acris.frob_algebraMap, Ainf.frob_teich] at h'
@@ -740,28 +818,28 @@ theorem logTeich_dvd [IsDomain R] {ε : tateModule p R} (hε : IsPrimitive ε) :
   have h1 := mul_geom_sum U p
   have h2 := mul_geom_sum (U ^ p) p
   rw [h', ← h1, h, ← pow_mul, ← sq, ← hl] at h2
-  have h3 : l = (U - 1) * (w * Acris.frob p R w) :=
-    Acris.p_pow_mul_cancel 2 (by rw [← h2]; ring)
+  have h3 : l = (U - 1) * (w * Acris.frob p R w) := Acris.p_pow_mul_cancel 2 (by rw [← h2]; ring)
   rw [Acris.logTeich, hlog, h3, mul_assoc]
   exact ((hw.mul (hw.map _)).mul hd).mul_right_dvd.2 dvd_rfl
 
-theorem log_linear (η : tateModule p R) (a : ℤ_[p]) :
-    Acris.logTeich (tateModule.padicPow η a) =
-      algebraMap ℤ_[p] (Acris p R) a * Acris.logTeich η := by
+theorem log_linear (η : tateModule p R) (a : ℤ_[p])
+    : Acris.logTeich (tateModule.padicPow η a)
+      = algebraMap ℤ_[p] (Acris p R) a * Acris.logTeich η := by
   refine sub_eq_zero.1 (Acris.eq_zero_of_forall_dvd fun k => ?_)
   have h : (p : ℤ_[p]) ^ k ∣ a - (a.appr k : ℕ) := mem_span_singleton.1 (PadicInt.appr_spec k a)
   obtain ⟨ζ, hζ⟩ := tateModule.exists_padicPow_eq η h
   have h2 := map_dvd (algebraMap ℤ_[p] (Acris p R)) h
   rw [map_pow, map_natCast, map_sub, map_natCast] at h2
-  have h3 := dvd_sub (dvd_mul_right ((p : Acris p R) ^ k) (Acris.logTeich ζ))
-    (h2.mul_right (Acris.logTeich η))
+  have h3 :=
+    dvd_sub (dvd_mul_right ((p : Acris p R) ^ k) (Acris.logTeich ζ))
+      (h2.mul_right (Acris.logTeich η))
   convert h3 using 1
   simp only [hζ, Acris.logTeich_mul, Acris.logTeich_pow, Nat.cast_pow]
   ring
 
-theorem logTeich_dvd_of_ne_one [IsDomain R] {ε : tateModule p R} (hε : IsPrimitive ε)
-    (η : tateModule p R) (hη : η ≠ 1) :
-    Acris.logTeich ε ∣ algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1) := by
+theorem logTeich_dvd_of_ne_one
+    [IsDomain R] {ε : tateModule p R} (hε : IsPrimitive ε) (η : tateModule p R) (hη : η ≠ 1)
+    : Acris.logTeich ε ∣ algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1) := by
   obtain ⟨a, rfl⟩ := hε.padicPow_surjective η
   have ha : a ≠ 0 := by rintro rfl; exact hη (tateModule.padicPow_zero ε)
   have h1 := logTeich_dvd ((hε.padicPow_iff (PadicInt.unitCoeff ha)).2 (Units.isUnit _))
@@ -771,21 +849,26 @@ theorem logTeich_dvd_of_ne_one [IsDomain R] {ε : tateModule p R} (hε : IsPrimi
     tateModule.padicPow_natCast, SubmonoidClass.coe_pow, map_pow, map_sub, map_one, map_pow]
   exact sub_one_dvd_pow_sub_one _ _
 
-theorem main [IsDomain R] (η : tateModule p R) (hη : η ≠ 1) (b : Bcris p R) :
-    ∃ (n : ℕ) (x : Acris p R), b * algebraMap (Acris p R) (Bcris p R)
-      (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1)) ^ n =
-      algebraMap (Acris p R) (Bcris p R) x := by
+theorem main [IsDomain R] (η : tateModule p R) (hη : η ≠ 1) (b : Bcris p R)
+    : ∃ (n : ℕ) (x : Acris p R),
+      b * algebraMap (Acris p R) (Bcris p R)
+            (algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1))
+          ^ n
+        = algebraMap (Acris p R) (Bcris p R) x := by
   set μ := algebraMap (Ainf p R) (Acris p R) (Ainf.teich p η.1 - 1) with hμ
   obtain ⟨⟨x, s, hs⟩, hb⟩ := IsLocalization.surj (BcrisPlus.periods p R) b
-  have h1 : ∃ (n : ℕ) (y : Acris p R), algebraMap (Acris p R) (BcrisPlus p R) μ ^ n =
-      s * algebraMap (Acris p R) (BcrisPlus p R) y := by
+  have h1
+      : ∃ (n : ℕ) (y : Acris p R),
+        algebraMap (Acris p R) (BcrisPlus p R) μ ^ n
+          = s * algebraMap (Acris p R) (BcrisPlus p R) y := by
     clear hb
     induction hs using Submonoid.closure_induction with
     | mem s hs =>
       obtain ⟨ε, hε, rfl⟩ := hs
       obtain ⟨y, hy⟩ := logTeich_dvd_of_ne_one hε η hη
       exact ⟨1, y, by rw [pow_one, ← map_mul, ← hy]⟩
-    | one => exact ⟨0, 1, by simp⟩
+    | one =>
+      exact ⟨0, 1, by simp⟩
     | mul s t _ _ hs ht =>
       obtain ⟨m, y, hy⟩ := hs
       obtain ⟨n, z, hz⟩ := ht
@@ -804,7 +887,18 @@ theorem main [IsDomain R] (η : tateModule p R) (hη : η ≠ 1) (b : Bcris p R)
 
 end Bridge.CrisLoc.MulPowEqLemmas
 
-theorem Bridge.CrisLoc.exists_mul_pow_eq : ∀ (l : ℕ) [Fact l.Prime] (e : (Reformulated.AutPerF.Tilt l ↥(PadicComplexInt l))) (he : e.untilt = 1) (hne : e ≠ 1) (b : (Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))), ∃ (n : ℕ) (x : (Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))), b * algebraMap ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))) ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))) (algebraMap ((Reformulated.AutPerF.Ainf l ↥(PadicComplexInt l))) ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))) (WittVector.teichmuller l e - 1)) ^ n = algebraMap ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))) ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))) x := by
+theorem Bridge.CrisLoc.exists_mul_pow_eq
+    : ∀ (l : ℕ) [Fact l.Prime] (e : (Reformulated.AutPerF.Tilt l ↥(PadicComplexInt l)))
+        (he : e.untilt = 1) (hne : e ≠ 1) (b : (Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))),
+      ∃ (n : ℕ) (x : (Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))),
+        b * algebraMap ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l)))
+              ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l)))
+              (algebraMap ((Reformulated.AutPerF.Ainf l ↥(PadicComplexInt l)))
+                ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l)))
+                (WittVector.teichmuller l e - 1))
+            ^ n
+          = algebraMap ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l)))
+            ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))) x := by
   intro l _ e he hne b
   exact Bridge.CrisLoc.MulPowEqLemmas.main ⟨e, he⟩ (fun h => hne (congrArg Subtype.val h)) b
 
@@ -820,8 +914,8 @@ open scoped Nat
 
 namespace Bridge.CrisLoc.unitOfRootSeries
 
-theorem bound {p v n k : ℕ} (hp : 2 ≤ p) (hv : p ^ v ≤ k + 1) (hk : p * (2 * n + 2) ≤ k) :
-    p * (v + n) ≤ k := by
+theorem bound {p v n k : ℕ} (hp : 2 ≤ p) (hv : p ^ v ≤ k + 1) (hk : p * (2 * n + 2) ≤ k)
+    : p * (v + n) ≤ k := by
   rcases le_or_gt v (n + 2) with h | h
   · exact (Nat.mul_le_mul_left p (by omega)).trans hk
   · obtain ⟨w, rfl⟩ : ∃ w, v = w + 2 := ⟨v - 2, by omega⟩
@@ -834,10 +928,14 @@ theorem bound {p v n k : ℕ} (hp : 2 ≤ p) (hv : p ^ v ≤ k + 1) (hk : p * (2
     have h4 : p * (w + 2 + n + 1) = p * (w + 2 + n) + p := by ring
     omega
 
-theorem term_dvd {p : ℕ} [Fact p.Prime] {A : Type*} [CommRing A] (f : ℤ_[p] →+* A)
-    (hc : ∀ (m : ℕ) (y z : A), (p : A) ^ m * y = (p : A) ^ m * z → y = z)
-    {x : A} (hx : (p : A) ∣ x ^ p) {k n : ℕ} (hk : p * (2 * n + 2) ≤ k) {a : A}
-    (ha : ((k + 1 : ℕ) : A) * a = x ^ (k + 1)) : x * (p : A) ^ n ∣ a := by
+theorem term_dvd
+    {p : ℕ} [Fact p.Prime]
+    {A : Type*} [CommRing A]
+    (f : ℤ_[p] →+* A) (hc : ∀ (m : ℕ) (y z : A), (p : A) ^ m * y = (p : A) ^ m * z → y = z)
+    {x : A} (hx : (p : A) ∣ x ^ p)
+    {k n : ℕ} (hk : p * (2 * n + 2) ≤ k)
+    {a : A} (ha : ((k + 1 : ℕ) : A) * a = x ^ (k + 1))
+    : x * (p : A) ^ n ∣ a := by
   have hp : p.Prime := Fact.out
   obtain ⟨v, m, hm, h⟩ := Nat.exists_eq_pow_mul_and_not_dvd (Nat.succ_ne_zero k) p hp.ne_one
   have hv : p ^ v ≤ k + 1 := Nat.le_of_dvd k.succ_pos ⟨m, h⟩
@@ -859,58 +957,66 @@ theorem term_dvd {p : ℕ} [Fact p.Prime] {A : Type*} [CommRing A] (f : ℤ_[p] 
   ring
 
 variable {p : ℕ} [Fact p.Prime]
-variable {R : Type} [CommRing R] [Fact ¬IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
+variable {R : Type} [CommRing R] [Fact ¬ IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
 
 def term (u : Ainf p R) (hu : Ainf.theta p R u = 1) (k : ℕ) : Acris p R :=
   algebraMap (AcrisZero p R) (Acris p R)
     ((k ! : AcrisZero p R) * AcrisZero.gamma (k + 1) (u - 1) (by simp [hu]))
 
-theorem succ_mul_term (u : Ainf p R) (hu : Ainf.theta p R u = 1) (k : ℕ) :
-    ((k + 1 : ℕ) : Acris p R) * term u hu k =
-      algebraMap (Ainf p R) (Acris p R) (u - 1) ^ (k + 1) := by
+theorem succ_mul_term (u : Ainf p R) (hu : Ainf.theta p R u = 1) (k : ℕ)
+    : ((k + 1 : ℕ) : Acris p R) * term u hu k
+      = algebraMap (Ainf p R) (Acris p R) (u - 1) ^ (k + 1) := by
   rw [term, ← map_natCast (algebraMap (AcrisZero p R) (Acris p R)), ← map_mul, ← mul_assoc,
     ← Nat.cast_mul, ← Nat.factorial_succ, AcrisZero.factorial_mul_gamma, map_pow,
     ← IsScalarTower.algebraMap_apply]
 
-theorem partial_eq (u : Ainf p R) (hu : Ainf.theta p R u = 1) (N : ℕ) :
-    algebraMap (AcrisZero p R) (Acris p R) (Acris.logPartial N u hu) =
-      ∑ k ∈ Finset.range N, (-1) ^ k * term u hu k := by
+theorem partial_eq (u : Ainf p R) (hu : Ainf.theta p R u = 1) (N : ℕ)
+    : algebraMap (AcrisZero p R) (Acris p R) (Acris.logPartial N u hu)
+      = ∑ k ∈ Finset.range N, (-1) ^ k * term u hu k := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Acris.logPartial, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   set_option synthInstance.maxHeartbeats 200000 in
-    rw [term, mul_assoc, map_mul, map_pow, map_neg, map_one]
+  rw [term, mul_assoc, map_mul, map_pow, map_neg, map_one]
 
-theorem p_dvd_pow (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
-    (p : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) (u - 1) ^ p := by
-  have h := congrArg (algebraMap (AcrisZero p R) (Acris p R))
-    (AcrisZero.factorial_mul_gamma p (u - 1) (by simp [hu]))
+theorem p_dvd_pow (u : Ainf p R) (hu : Ainf.theta p R u = 1)
+    : (p : Acris p R) ∣ algebraMap (Ainf p R) (Acris p R) (u - 1) ^ p := by
+  have h :=
+    congrArg (algebraMap (AcrisZero p R) (Acris p R))
+      (AcrisZero.factorial_mul_gamma p (u - 1) (by simp [hu]))
   rw [map_mul, map_natCast, map_pow, ← IsScalarTower.algebraMap_apply] at h
   rw [← h]
   exact (Nat.cast_dvd_cast (Nat.dvd_factorial (Fact.out : p.Prime).pos le_rfl)).mul_right _
 
-theorem dvd_tail (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
-    ∃ N, algebraMap (Ainf p R) (Acris p R) (u - 1) ∣
-      Acris.log u hu - ∑ k ∈ Finset.range N, (-1) ^ k * term u hu k := by
+theorem dvd_tail (u : Ainf p R) (hu : Ainf.theta p R u = 1)
+    : ∃ N,
+      algebraMap (Ainf p R) (Acris p R) (u - 1)
+        ∣ Acris.log u hu - ∑ k ∈ Finset.range N, (-1) ^ k * term u hu k := by
   have hp : p.Prime := Fact.out
   let M : ℕ → ℕ := fun n => p ^ n + p * (2 * n + 2)
   have hM : ∀ n, M n ≤ M (n + 1) := fun n =>
     Nat.add_le_add (Nat.pow_le_pow_right hp.pos n.le_succ) (Nat.mul_le_mul_left p (by omega))
   let s : ℕ → Acris p R := fun n => ∑ k ∈ Finset.range (M n), (-1) ^ k * term u hu k
   have h1 : ∀ n, (p : Acris p R) ^ n ∣ Acris.log u hu - s n := fun n => by
-    rw [← Acris.eval_eq_zero_iff, RingHom.map_sub, Acris.eval_log u hu (Nat.le_add_right _ _ : p ^ n ≤ M n)]
+    rw [← Acris.eval_eq_zero_iff, RingHom.map_sub,
+      Acris.eval_log u hu (Nat.le_add_right _ _ : p ^ n ≤ M n)]
     simp only [s]
     rw [← partial_eq, Acris.eval_algebraMap, sub_self]
-  have h2 : ∀ n, algebraMap (Ainf p R) (Acris p R) (u - 1) * (p : Acris p R) ^ n ∣
-      s (n + 1) - s n := fun n => by
+  have h2
+      : ∀ n,
+        algebraMap (Ainf p R) (Acris p R) (u - 1) * (p : Acris p R) ^ n
+          ∣ s (n + 1) - s n := fun n => by
     simp only [s]
     rw [← Finset.sum_Ico_eq_sub _ (hM n)]
     refine Finset.dvd_sum fun k hk => Dvd.dvd.mul_left ?_ _
-    exact term_dvd (algebraMap ℤ_[p] (Acris p R)) (fun m _ _ h => Acris.p_pow_mul_cancel m h)
-      (p_dvd_pow u hu) ((Nat.le_add_left _ _).trans (Finset.mem_Ico.1 hk).1)
-      (succ_mul_term u hu k)
-  refine ⟨M 0, mem_span_singleton.1 (mem_span_of_approx (p : Acris p R) _
-    {y | ∃ n, (p : Acris p R) ^ n * y = Acris.log u hu - s n} ?_ ⟨0, by simp [s]⟩)⟩
+    exact term_dvd (algebraMap ℤ_[p] (Acris p R))
+      (fun m _ _ h => Acris.p_pow_mul_cancel m h)
+      (p_dvd_pow u hu) ((Nat.le_add_left _ _).trans (Finset.mem_Ico.1 hk).1) (succ_mul_term u hu k)
+  refine ⟨
+    M 0,
+    mem_span_singleton.1 (mem_span_of_approx (p : Acris p R) _
+      {y | ∃ n, (p : Acris p R) ^ n * y = Acris.log u hu - s n} ?_ ⟨0, by simp [s]⟩)
+  ⟩
   rintro y ⟨n, hy⟩
   obtain ⟨z, hz⟩ := h1 (n + 1)
   obtain ⟨b, hb⟩ := h2 n
@@ -918,9 +1024,9 @@ theorem dvd_tail (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
   rw [pow_succ] at hz
   linear_combination hy + hz + hb
 
-theorem dvd_log (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
-    algebraMap (Acris p R) (Bcris p R) (algebraMap (Ainf p R) (Acris p R) (u - 1)) ∣
-      algebraMap (Acris p R) (Bcris p R) (Acris.log u hu) := by
+theorem dvd_log (u : Ainf p R) (hu : Ainf.theta p R u = 1)
+    : algebraMap (Acris p R) (Bcris p R) (algebraMap (Ainf p R) (Acris p R) (u - 1))
+      ∣ algebraMap (Acris p R) (Bcris p R) (Acris.log u hu) := by
   obtain ⟨N, hN⟩ := dvd_tail u hu
   have h := map_dvd (algebraMap (Acris p R) (Bcris p R)) hN
   rw [map_sub _ (Acris.log u hu)] at h
@@ -939,8 +1045,10 @@ theorem dvd_log (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
     succ_mul_term, map_pow]
   exact dvd_pow_self _ k.succ_ne_zero
 
-theorem isUnit_logTeich [IsDomain R] [ValuationRing R] [IsAlgClosed (FractionRing R)] [CharZero R]
-    (η : tateModule p R) (h : η ≠ 1) : IsUnit (Bcris.logTeich η) := by
+theorem isUnit_logTeich
+    [IsDomain R] [ValuationRing R] [IsAlgClosed (FractionRing R)] [CharZero R]
+    (η : tateModule p R) (h : η ≠ 1)
+    : IsUnit (Bcris.logTeich η) := by
   obtain ⟨a, rfl⟩ := (isPrimitive_eps p R).padicPow_surjective η
   have ha : a ≠ 0 := by
     rintro rfl
@@ -952,10 +1060,18 @@ theorem isUnit_logTeich [IsDomain R] [ValuationRing R] [IsAlgClosed (FractionRin
 
 end Bridge.CrisLoc.unitOfRootSeries
 
-theorem Bridge.CrisLoc.unit_of_root : ∀ (l : ℕ) [Fact l.Prime] (e : (Reformulated.AutPerF.Tilt l ↥(PadicComplexInt l))) (he : e.untilt = 1) (hne : e ≠ 1), IsUnit (algebraMap ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))) ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l))) (algebraMap ((Reformulated.AutPerF.Ainf l ↥(PadicComplexInt l))) ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l))) (WittVector.teichmuller l e - 1))) := by
+theorem Bridge.CrisLoc.unit_of_root
+    : ∀ (l : ℕ) [Fact l.Prime] (e : (Reformulated.AutPerF.Tilt l ↥(PadicComplexInt l)))
+        (he : e.untilt = 1) (hne : e ≠ 1),
+      IsUnit (algebraMap ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l)))
+        ((Reformulated.AutPerF.Bcris l ↥(PadicComplexInt l)))
+        (algebraMap ((Reformulated.AutPerF.Ainf l ↥(PadicComplexInt l)))
+          ((Reformulated.AutPerF.Acris l ↥(PadicComplexInt l)))
+          (WittVector.teichmuller l e - 1))) := by
   intro l _ e he hne
-  have h := Bridge.CrisLoc.unitOfRootSeries.isUnit_logTeich
-    (⟨e, he⟩ : tateModule l ↥(PadicComplexInt l)) (fun h => hne (congrArg Subtype.val h))
+  have h :=
+    Bridge.CrisLoc.unitOfRootSeries.isUnit_logTeich (⟨e, he⟩ : tateModule l ↥(PadicComplexInt l))
+      (fun h => hne (congrArg Subtype.val h))
   exact isUnit_of_dvd_unit (Bridge.CrisLoc.unitOfRootSeries.dvd_log _ _) h
 
 end
@@ -964,9 +1080,12 @@ end UnitOfRootAlt
 namespace PowDivFactorialAlt
 section
 
-theorem Bridge.RingBasics.exists_pow_div_factorial : ∀ (l : ℕ) [Fact l.Prime] (n : ℕ), ∃ c : ℤ_[l], ((n.factorial : ℕ) : ℤ_[l]) * c = ((l : ℕ) : ℤ_[l]) ^ n := by
+theorem Bridge.RingBasics.exists_pow_div_factorial
+    : ∀ (l : ℕ) [Fact l.Prime] (n : ℕ), ∃ c : ℤ_[l],
+      ((n.factorial : ℕ) : ℤ_[l]) * c = ((l : ℕ) : ℤ_[l]) ^ n := by
   intro l hl n
-  obtain ⟨m, hm⟩ : l ^ padicValNat l n.factorial ∣ n.factorial := (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
+  obtain ⟨m, hm⟩ : l ^ padicValNat l n.factorial ∣ n.factorial :=
+    (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
   have hle : padicValNat l n.factorial ≤ n := by
     simpa only [Nat.padicValNat_def] using (multiplicity_factorial_le l n)
   have hnd : ¬ l ∣ m := by
@@ -991,7 +1110,8 @@ theorem Bridge.RingBasics.exists_pow_div_factorial : ∀ (l : ℕ) [Fact l.Prime
   refine ⟨u * ((l : ℕ) : ℤ_[l]) ^ d, ?_⟩
   rw [hm]
   push_cast
-  calc ((l : ℕ) : ℤ_[l]) ^ v * (m : ℤ_[l]) * (u * ((l : ℕ) : ℤ_[l]) ^ d)
+  calc
+    ((l : ℕ) : ℤ_[l]) ^ v * (m : ℤ_[l]) * (u * ((l : ℕ) : ℤ_[l]) ^ d)
       = ((l : ℕ) : ℤ_[l]) ^ v * ((m : ℤ_[l]) * u) * ((l : ℕ) : ℤ_[l]) ^ d := by ring
     _ = ((l : ℕ) : ℤ_[l]) ^ n := by rw [hu', mul_one, ← pow_add, ← hd]
 
@@ -1008,7 +1128,7 @@ open scoped Nat
 namespace Bridge.CrisLoc.CrisExtensionLemmas
 
 variable {p : ℕ} [Fact p.Prime]
-variable {R : Type} [CommRing R] [Fact ¬IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
+variable {R : Type} [CommRing R] [Fact ¬ IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
 
 end Bridge.CrisLoc.CrisExtensionLemmas
 

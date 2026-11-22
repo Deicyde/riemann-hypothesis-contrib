@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EventuallyBe
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host
 open GlobalTheory.BCT
 open scoped Classical
 
@@ -22,8 +23,9 @@ open PositivityTheory.Rg.BcB.G8
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem unitae_nrm (hU : Unr E) (n : ℕ) (w : Pl E) (δ : GL (Fin n) E) :
-    nrmL n w (locEl n w δ) = GeneralLinearGroup.map (algebraMap E (w.adicCompletion E)) (δ * thE E n δ) := by
+theorem unitae_nrm (hU : Unr E) (n : ℕ) (w : Pl E) (δ : GL (Fin n) E)
+    : nrmL n w (locEl n w δ)
+      = GeneralLinearGroup.map (algebraMap E (w.adicCompletion E)) (δ * thE E n δ) := by
   by_cases hs : IsSplitAt w
   · unfold nrmL locEl
     rw [if_pos hs, if_pos hs]
@@ -31,23 +33,31 @@ theorem unitae_nrm (hU : Unr E) (n : ℕ) (w : Pl E) (δ : GL (Fin n) E) :
     rw [if_neg hs, if_neg hs]
     obtain ⟨-, -, -, hns, -⟩ := GlobalTheory.ConjAtPlace.main E hU w
     obtain ⟨hp, -⟩ := hns hs
-    rw [map_mul, thE, GlobalTheory.ThetaPull.map_thetaGL (algebraMap E (w.adicCompletion E)) _ (cj w) (fun x => (hp x).symm)]
+    rw [map_mul, thE,
+      GlobalTheory.ThetaPull.map_thetaGL (algebraMap E (w.adicCompletion E)) _ (cj w)
+        (fun x => (hp x).symm)]
 
-theorem unitae_single (hU : Unr E) (n : ℕ) (δ : GL (Fin n) E) (hsep : (polE δ).Separable) :
-    ∀ᶠ w : Pl E in cofinite, locEl n w δ ∈ GlobalTheory.LFun.KGL w (n := n) ∧
-      (∀ g : GLw n w, g⁻¹ * locEl n w δ * thL n w g ∈ GlobalTheory.LFun.KGL w (n := n) →
-        ∃ t ∈ twCent (thL n w) (locEl n w δ), t⁻¹ * g ∈ GlobalTheory.LFun.KGL w (n := n)) ∧
-      (∀ t ∈ twCent (thL n w) (locEl n w δ), IsCompact (closure (Subgroup.zpowers t : Set (GLw n w))) →
-        t ∈ GlobalTheory.LFun.KGL w (n := n)) := by
+theorem unitae_single (hU : Unr E) (n : ℕ) (δ : GL (Fin n) E) (hsep : (polE δ).Separable)
+    : ∀ᶠ w : Pl E in cofinite, locEl n w δ ∈ GlobalTheory.LFun.KGL w (n := n) ∧
+        (∀ g : GLw n w, g⁻¹ * locEl n w δ * thL n w g ∈ GlobalTheory.LFun.KGL w (n := n) →
+          ∃ t ∈ twCent (thL n w) (locEl n w δ), t⁻¹ * g ∈ GlobalTheory.LFun.KGL w (n := n)) ∧
+        (∀ t ∈ twCent (thL n w) (locEl n w δ), IsCompact (closure (Subgroup.zpowers t : Set (GLw n w))) →
+          t ∈ GlobalTheory.LFun.KGL w (n := n)) := by
   filter_upwards [GlobalTheory.EulerTwU.eventually_pc_ratF_mem δ, GlobalTheory.EulerTwU.eventually_pc_ratF_mem (δ * thE E n δ),
     GlobalTheory.BCT.SepBezout.bezout_eventually E _ hsep] with w h1 h2 h3
   rw [GlobalTheory.EulerTwU.pc_ratF] at h1 h2
   have hN := unitae_nrm hU n w δ
-  have hbez : ∃ u v : (w.adicCompletion E)[X], (∀ i, u.coeff i ∈ w.adicCompletionIntegers E) ∧
-      (∀ i, v.coeff i ∈ w.adicCompletionIntegers E) ∧
-      u * (nrmL n w (locEl n w δ)).val.charpoly + v * derivative (nrmL n w (locEl n w δ)).val.charpoly = 1 := by
-    have e : (GeneralLinearGroup.map (algebraMap E (w.adicCompletion E)) (δ * thE E n δ)).val.charpoly =
-        (polE δ).map (algebraMap E (w.adicCompletion E)) := Matrix.charpoly_map _ _
+  have hbez
+      : ∃ u v : (w.adicCompletion E)[X],
+        (∀ i, u.coeff i ∈ w.adicCompletionIntegers E)
+          ∧ (∀ i, v.coeff i ∈ w.adicCompletionIntegers E)
+          ∧ u * (nrmL n w (locEl n w δ)).val.charpoly
+              + v * derivative (nrmL n w (locEl n w δ)).val.charpoly
+            = 1 := by
+    have e
+        : (GeneralLinearGroup.map (algebraMap E (w.adicCompletion E)) (δ * thE E n δ)).val.charpoly
+          = (polE δ).map (algebraMap E (w.adicCompletion E)) :=
+      Matrix.charpoly_map _ _
     rw [hN, e]
     exact h3
   have hy : locEl n w δ ∈ GlobalTheory.LFun.KGL w (n := n) := by
@@ -70,7 +80,8 @@ theorem unitae_single (hU : Unr E) (n : ℕ) (δ : GL (Fin n) E) (hsep : (polE �
         exact ht
       · rw [hgk, inv_mul_cancel_left]
         exact hk
-    · obtain ⟨t, ht, k, hk, hgk⟩ := GlobalTheory.InertUniq.eq_twCent_mul_KGL E hU n w hs _ g hy hbez hg
+    · obtain ⟨t, ht, k, hk, hgk⟩ :=
+        GlobalTheory.InertUniq.eq_twCent_mul_KGL E hU n w hs _ g hy hbez hg
       refine ⟨t, ht, ?_⟩
       rw [hgk, inv_mul_cancel_left]
       exact hk
@@ -89,24 +100,30 @@ theorem unitae_single (hU : Unr E) (n : ℕ) (δ : GL (Fin n) E) (hsep : (polE �
         have hth := GlobalTheory.ThetaPull.thetaGL_thetaGL (a := n) (cj w) hinv t
         unfold nrmL
         rw [if_neg hs]
-        calc t * (locEl n w δ * thetaGL n (cj w) (locEl n w δ))
-            = locEl n w δ * thetaGL n (cj w) t * thetaGL n (cj w) (locEl n w δ) := by rw [← mul_assoc, ht']
+        calc
+          t * (locEl n w δ * thetaGL n (cj w) (locEl n w δ))
+              = locEl n w δ * thetaGL n (cj w) t * thetaGL n (cj w) (locEl n w δ) := by
+            rw [← mul_assoc, ht']
           _ = locEl n w δ * thetaGL n (cj w) (t * locEl n w δ) := by rw [map_mul, mul_assoc]
           _ = locEl n w δ * thetaGL n (cj w) (locEl n w δ * thetaGL n (cj w) t) := by rw [ht']
           _ = locEl n w δ * thetaGL n (cj w) (locEl n w δ) * t := by rw [map_mul, hth, mul_assoc]
     exact GlobalTheory.StabInt.mem_KGL_of_commute E n w _ t hNK hbez hcomm hc
 
-theorem unitae_cpt_fst {A B : Type} [Group A] [TopologicalSpace A] [IsTopologicalGroup A] [T2Space A] [Group B]
-    [TopologicalSpace B] [IsTopologicalGroup B] (t : A × B) (h : IsCompact (closure (Subgroup.zpowers t : Set (A × B)))) :
-    IsCompact (closure (Subgroup.zpowers t.1 : Set A)) := by
+theorem unitae_cpt_fst
+    {A B : Type} [Group A] [TopologicalSpace A] [IsTopologicalGroup A] [T2Space A] [Group B]
+    [TopologicalSpace B] [IsTopologicalGroup B]
+    (t : A × B) (h : IsCompact (closure (Subgroup.zpowers t : Set (A × B))))
+    : IsCompact (closure (Subgroup.zpowers t.1 : Set A)) := by
   have hK := h.image continuous_fst
   refine hK.of_isClosed_subset isClosed_closure (closure_minimal ?_ hK.isClosed)
   rintro _ ⟨k, rfl⟩
   exact ⟨t ^ k, subset_closure ⟨k, rfl⟩, by simp⟩
 
-theorem unitae_cpt_snd {A B : Type} [Group A] [TopologicalSpace A] [IsTopologicalGroup A] [Group B]
-    [TopologicalSpace B] [IsTopologicalGroup B] [T2Space B] (t : A × B) (h : IsCompact (closure (Subgroup.zpowers t : Set (A × B)))) :
-    IsCompact (closure (Subgroup.zpowers t.2 : Set B)) := by
+theorem unitae_cpt_snd
+    {A B : Type} [Group A] [TopologicalSpace A] [IsTopologicalGroup A] [Group B]
+    [TopologicalSpace B] [IsTopologicalGroup B] [T2Space B]
+    (t : A × B) (h : IsCompact (closure (Subgroup.zpowers t : Set (A × B))))
+    : IsCompact (closure (Subgroup.zpowers t.2 : Set B)) := by
   have hK := h.image continuous_snd
   refine hK.of_isClosed_subset isClosed_closure (closure_minimal ?_ hK.isClosed)
   rintro _ ⟨k, rfl⟩
@@ -133,8 +150,10 @@ theorem unitAE_holds : UnitAE := by
     exact Prod.ext e1 e2
   · refine (Subgroup.closure_le _).2 fun t ht => ?_
     obtain ⟨ht1, ht2⟩ := ht
-    have e : t * (locEl a w.1 δ₁, locEl b w.1 δ₂) =
-        (locEl a w.1 δ₁, locEl b w.1 δ₂) * ((thL a w.1).prodMap (thL b w.1)) t := ht1
+    have e
+        : t * (locEl a w.1 δ₁, locEl b w.1 δ₂)
+          = (locEl a w.1 δ₁, locEl b w.1 δ₂) * ((thL a w.1).prodMap (thL b w.1)) t :=
+      ht1
     have e1 : t.1 ∈ twCent (thL a w.1) (locEl a w.1 δ₁) := congrArg Prod.fst e
     have e2 : t.2 ∈ twCent (thL b w.1) (locEl b w.1 δ₂) := congrArg Prod.snd e
     exact Subgroup.mem_prod.2 ⟨hk1 _ e1 (unitae_cpt_fst t ht2), hk2 _ e2 (unitae_cpt_snd t ht2)⟩

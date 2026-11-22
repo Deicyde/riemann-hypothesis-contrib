@@ -15,13 +15,22 @@ public import Development.AbelianVarietyTheory.Counterexamples.UpperHalfSurvey.V
 noncomputable section
 
 open scoped BigOperators
-open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj GlobalTheory.RowLaw GlobalTheory.RowVal ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj
+  GlobalTheory.RowLaw GlobalTheory.RowVal ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace GlobalTheory.RowVal
 
 open GlobalTheory.RowValueCheck
 
-theorem valOf_eq_hRow : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d] (I : Fin 2 → Type) [∀ g, Fintype (I g)] (κ : Type) [Fintype κ] (X : RawChart C d I κ) (H : X.Hyps V) (N : ℕ) (P : MvPolynomial (Fin N × WV I) C) (kind : Fin N → Option (Fin 2 × ZMod d × ZMod d)), RowsOK (X.rowData H).G (X.rowData H).Alt P kind → ∀ gr : Fin N → MvPowerSeries (WV I) C, ValOf (X.rowData H).hL P kind gr = jetAt0 P (∏ ρ, (rowCopy ρ (gr ρ) * mvExp (rowCopy ρ X.hRow))) := by
+theorem valOf_eq_hRow
+    : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d] (I : Fin 2 → Type) [∀ g, Fintype (I g)]
+        (κ : Type) [Fintype κ] (X : RawChart C d I κ) (H : X.Hyps V) (N : ℕ)
+        (P : MvPolynomial (Fin N × WV I) C) (kind : Fin N → Option (Fin 2 × ZMod d × ZMod d)),
+      RowsOK (X.rowData H).G (X.rowData H).Alt P kind
+        → ∀ gr : Fin N → MvPowerSeries (WV I) C,
+          ValOf (X.rowData H).hL P kind gr
+            = jetAt0 P (∏ ρ, (rowCopy ρ (gr ρ) * mvExp (rowCopy ρ X.hRow))) := by
   intro C _ V d _ I _ κ _ X H N P kind hk gr
   classical
   rw [valOf_eq]
@@ -44,9 +53,11 @@ theorem valOf_eq_hRow : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d]
         obtain ⟨ν, hν, hν'⟩ := hμ w hw
         exact hl ν hν w hν'
       exact if_pos fun w hw => h1 w (Finsupp.mem_support_iff.1 hw)
-  have hA := Agree.prod (S := S) Finset.univ (fun ρ =>
-    Agree.mul (F := rowCopy ρ (gr ρ)) (F' := rowCopy ρ (gr ρ)) (fun _ _ => rfl)
-      (agree_rowCopy S ρ _ _ (key ρ)).exp)
+  have hA :=
+    Agree.prod (S := S) Finset.univ (fun ρ =>
+      Agree.mul (F := rowCopy ρ (gr ρ)) (F' := rowCopy ρ (gr ρ))
+        (fun _ _ => rfl)
+        (agree_rowCopy S ρ _ _ (key ρ)).exp)
   unfold jetAt0
   exact Finset.sum_congr rfl fun μ hμ => by rw [hA μ fun x hx => ⟨μ, hμ, hx⟩]
 

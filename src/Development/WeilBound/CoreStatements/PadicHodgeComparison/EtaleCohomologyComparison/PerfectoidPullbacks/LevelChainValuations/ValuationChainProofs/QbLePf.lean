@@ -19,8 +19,8 @@ namespace CrystallineSemistableComparison.Pb.Kap
 
 variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} {R : Per l K} {m : ℕ}
 
-theorem qb_le_pf {L : Lev R m} (hL : L.Good) (M : Model l K) (s : ℕ) :
-    ∀ T, QB L M s T → QA L M s (((nmB M hL).mor 0).obj T) := by
+theorem qb_le_pf {L : Lev R m} (hL : L.Good) (M : Model l K) (s : ℕ)
+    : ∀ T, QB L M s T → QA L M s (((nmB M hL).mor 0).obj T) := by
   intro T hT
   obtain ⟨⟨h1, h2⟩, V, hV, hU⟩ := hT
   have hu : IsUnit ((l : ℕ) : T.B) := by

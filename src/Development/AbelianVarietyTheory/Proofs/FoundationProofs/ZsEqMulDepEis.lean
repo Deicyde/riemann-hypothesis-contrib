@@ -7,18 +7,27 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory
 
-theorem zs_eq_mul_dep_eis : ∀ (k l j : ℕ) (u v A A' : ℤ → ℂ) (c c' : ℂ), j + 2 ≤ k → Zs k l u v (fun x y => A x * A' y * ((y : ℂ) / x) ^ j) = mul (dep l (eis (k - 1 - j) c A u)) (dep l (eis (j + 1) c' (fun y => A' y * v y) fun _ => 1)) := by
+theorem zs_eq_mul_dep_eis
+    : ∀ (k l j : ℕ) (u v A A' : ℤ → ℂ) (c c' : ℂ),
+      j + 2 ≤ k
+        → Zs k l u v (fun x y => A x * A' y * ((y : ℂ) / x) ^ j)
+          = mul (dep l (eis (k - 1 - j) c A u))
+            (dep l (eis (j + 1) c' (fun y => A' y * v y) fun _ => 1)) := by
   intro k l j u v A A' c c' hjk
   funext n
   unfold Zs mul
   refine Finset.sum_congr rfl fun p _ => ?_
   by_cases h : l ∣ p.1 ∨ l ∣ p.2
-  · have hz : dep l (eis (k - 1 - j) c A u) p.1 * dep l (eis (j + 1) c' (fun y => A' y * v y) fun _ => 1) p.2 = 0 := by
+  · have hz
+        : dep l (eis (k - 1 - j) c A u) p.1
+            * dep l (eis (j + 1) c' (fun y => A' y * v y) fun _ => 1) p.2
+          = 0 := by
       rcases h with h | h <;> simp [dep, h]
     rw [hz]
     simp [h]

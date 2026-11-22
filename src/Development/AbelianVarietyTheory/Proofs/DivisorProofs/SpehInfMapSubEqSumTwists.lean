@@ -19,22 +19,31 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Char
 @[expose] public section
 
 open NumberField IsDedekindDomain
-open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.DefiniteBC
+open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions GlobalTheory.UnitaryBC
+  GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem GlobalTheory.DefiniteBC.spehInf_map_sub_eq_sum_twists : ∀ (d : ℕ) (m : Multiset ℂ) (F : ℂ),
-  ∑ k : Fin d, m.map (fun z => F + (((d : ℂ) - 1) / 2 - (k : ℕ)) - z) = (spehInf d m).map (fun z => F - z) := by
+theorem GlobalTheory.DefiniteBC.spehInf_map_sub_eq_sum_twists
+    : ∀ (d : ℕ) (m : Multiset ℂ) (F : ℂ),
+      ∑ k : Fin d, m.map (fun z => F + (((d : ℂ) - 1) / 2 - (k : ℕ)) - z)
+        = (spehInf d m).map (fun z => F - z) := by
   intro d m F
-  have hL : ∀ (f : ℕ → Multiset ℂ) (n : ℕ), ((List.range n).map f).sum = ∑ k ∈ Finset.range n, f k := by
+  have hL
+      : ∀ (f : ℕ → Multiset ℂ) (n : ℕ), ((List.range n).map f).sum = ∑ k ∈ Finset.range n, f k := by
     intro f n
     induction n with
     | zero => simp
-    | succ n ih => rw [List.range_succ, List.map_append, List.sum_append, ih, Finset.sum_range_succ]; simp
-  rw [Fin.sum_univ_eq_sum_range (fun k : ℕ => m.map (fun z => F + (((d : ℂ) - 1) / 2 - (k : ℕ)) - z)) d]
+    | succ n ih =>
+      rw [List.range_succ, List.map_append, List.sum_append, ih, Finset.sum_range_succ]; simp
+  rw [Fin.sum_univ_eq_sum_range
+    (fun k : ℕ => m.map (fun z => F + (((d : ℂ) - 1) / 2 - (k : ℕ)) - z))
+    d]
   unfold spehInf
   rw [hL]
-  have hM := map_sum (Multiset.mapAddMonoidHom (fun z : ℂ => F - z))
-    (fun k : ℕ => m.map (fun x => x + (((d : ℂ) - 1) / 2 - k))) (Finset.range d)
+  have hM :=
+    map_sum (Multiset.mapAddMonoidHom (fun z : ℂ => F - z))
+      (fun k : ℕ => m.map (fun x => x + (((d : ℂ) - 1) / 2 - k)))
+      (Finset.range d)
   simp only [Multiset.mapAddMonoidHom_apply] at hM
   rw [hM]
   rw [← Finset.sum_range_reflect]

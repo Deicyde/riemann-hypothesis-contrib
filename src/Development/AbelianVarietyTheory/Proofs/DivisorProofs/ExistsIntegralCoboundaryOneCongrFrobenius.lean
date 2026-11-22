@@ -6,17 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MapComb
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 namespace GlobalTheory.SmallSecondRoot
 
-theorem charP_mvPowerSeries (σ k : Type) [Field k] (p : ℕ) [CharP k p] :
-    CharP (MvPowerSeries σ k) p :=
+theorem charP_mvPowerSeries (σ k : Type) [Field k] (p : ℕ) [CharP k p]
+    : CharP (MvPowerSeries σ k) p :=
   charP_of_injective_algebraMap (algebraMap k (MvPowerSeries σ k)).injective p
 
-theorem coeff_pow_char_sum {σ k : Type} [DecidableEq σ] [Field k] (p : ℕ) [Fact p.Prime] [CharP k p]
-    (f : MvPowerSeries σ k) (α : σ →₀ ℕ) :
-    coeff α (f ^ p) = ∑ m ∈ Finset.Iic α, if α = p • m then coeff m f ^ p else 0 := by
+theorem coeff_pow_char_sum
+    {σ k : Type} [DecidableEq σ] [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (f : MvPowerSeries σ k) (α : σ →₀ ℕ)
+    : coeff α (f ^ p) = ∑ m ∈ Finset.Iic α, if α = p • m then coeff m f ^ p else 0 := by
   classical
   haveI := charP_mvPowerSeries σ k p
   have hp0 : p ≠ 0 := (Fact.out : p.Prime).ne_zero
@@ -39,15 +43,20 @@ theorem coeff_pow_char_sum {σ k : Type} [DecidableEq σ] [Field k] (p : ℕ) [F
   have hf : f = P + g := by simp [g]
   have hgp : coeff α (g ^ p) = 0 := by
     obtain ⟨n, hn⟩ := Nat.exists_eq_succ_of_ne_zero hp0
-    rw [hn, pow_succ]; exact hmul _
-  rw [show f ^ p = (P + g) ^ p from congrArg (· ^ p) hf, add_pow_char, map_add (f := _), hgp, add_zero]
+    rw [hn, pow_succ]
+    exact hmul _
+  rw [show f ^ p = (P + g) ^ p from congrArg (· ^ p) hf, add_pow_char, map_add (f := _), hgp,
+    add_zero]
   simp only [P]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [sum_pow_char, map_sum]
   simp only [monomial_pow, coeff_monomial]
 
-theorem coeff_smul_pow_char {σ k : Type} [DecidableEq σ] [Field k] (p : ℕ) [Fact p.Prime] [CharP k p]
-    (f : MvPowerSeries σ k) (β : σ →₀ ℕ) : coeff (p • β) (f ^ p) = coeff β f ^ p := by
+theorem coeff_smul_pow_char
+    {σ k : Type} [DecidableEq σ] [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (f : MvPowerSeries σ k) (β : σ →₀ ℕ)
+    : coeff (p • β) (f ^ p) = coeff β f ^ p := by
   classical
   have hp0 : p ≠ 0 := (Fact.out : p.Prime).ne_zero
   rw [coeff_pow_char_sum, Finset.sum_eq_single β]
@@ -57,21 +66,38 @@ theorem coeff_smul_pow_char {σ k : Type} [DecidableEq σ] [Field k] (p : ℕ) [
     intro hα
     exact hb (smul_right_injective _ hp0 hα).symm
   · intro hn
-    exact absurd (Finset.mem_Iic.2 (le_smul_of_one_le_left zero_le (Nat.one_le_iff_ne_zero.2 hp0))) hn
+    exact absurd (Finset.mem_Iic.2 (le_smul_of_one_le_left zero_le (Nat.one_le_iff_ne_zero.2 hp0)))
+      hn
 
-theorem coeff_pow_char_of_not {σ k : Type} [DecidableEq σ] [Field k] (p : ℕ) [Fact p.Prime] [CharP k p]
-    (f : MvPowerSeries σ k) (α : σ →₀ ℕ) (h : ¬∃ β, p • β = α) : coeff α (f ^ p) = 0 := by
+theorem coeff_pow_char_of_not
+    {σ k : Type} [DecidableEq σ] [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (f : MvPowerSeries σ k)
+    (α : σ →₀ ℕ) (h : ¬ ∃ β, p • β = α)
+    : coeff α (f ^ p) = 0 := by
   classical
   rw [coeff_pow_char_sum]
   refine Finset.sum_eq_zero fun b _ => ?_
   rw [if_neg]
-  intro hα; exact h ⟨b, hα.symm⟩
+  intro hα
+  exact h ⟨b, hα.symm⟩
 
 end GlobalTheory.SmallSecondRoot
 
 namespace GlobalTheory.SmallSecondRoot
 
-theorem exists_integral_cob1_congr_of_frobenius_congr : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O → ∀ (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O), IsLaw μ → ∀ (c : MvPowerSeries (Fin d ⊕ Fin d) O) (t : MvPowerSeries (Fin d) O), (∀ α : Fin d →₀ ℕ, (∃ i, ¬ p ∣ α i) → ¬IsUnit (coeff α t)) → (∀ β : Fin d ⊕ Fin d →₀ ℕ, ¬IsUnit (coeff (p • β) (cob1 μ t) - coeff β c ^ p)) → ∃ u : MvPowerSeries (Fin d) O, ∀ α, ¬IsUnit (coeff α c - coeff α (cob1 μ u)) := by
+theorem exists_integral_cob1_congr_of_frobenius_congr
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
+      v.Integers O
+        → ∀ (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O),
+          IsLaw μ
+            → ∀ (c : MvPowerSeries (Fin d ⊕ Fin d) O) (t : MvPowerSeries (Fin d) O),
+              (∀ α : Fin d →₀ ℕ, (∃ i, ¬ p ∣ α i) → ¬ IsUnit (coeff α t))
+                → (∀ β : Fin d ⊕ Fin d →₀ ℕ, ¬ IsUnit (coeff (p • β) (cob1 μ t) - coeff β c ^ p))
+                → ∃ u : MvPowerSeries (Fin d) O, ∀ α,
+                  ¬ IsUnit (coeff α c - coeff α (cob1 μ u)) := by
   intro p _ C _ _ _ v O _ _ _ _ _ hv d μ hμ c t ht hct
   classical
   haveI : ValuationRing O := ValuationRing.of_integers v hv
@@ -121,6 +147,7 @@ theorem exists_integral_cob1_congr_of_frobenius_congr : ∀ (p : ℕ) [Fact p.Pr
   rw [map_sub, sub_eq_zero, ← coeff_map, hcob, coeff_smul_pow_char, map_pow] at h1
   have h3 : coeff α (cob1 (fun i => map res (μ i)) (map res u)) = res (coeff α c) :=
     frobenius_inj _ p h1
-  rw [hres, map_sub, sub_eq_zero, ← h3, ← SmallSecond.map_formalGroupLawCoboundaryOne_eq res μ hμ.const, coeff_map]
+  rw [hres, map_sub, sub_eq_zero, ← h3,
+    ← SmallSecond.map_formalGroupLawCoboundaryOne_eq res μ hμ.const, coeff_map]
 
 end GlobalTheory.SmallSecondRoot

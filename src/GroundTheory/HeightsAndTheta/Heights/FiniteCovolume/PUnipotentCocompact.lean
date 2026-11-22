@@ -13,13 +13,15 @@ open NumberField GroundTheory.Automorphic Module Matrix Topology
 
 noncomputable section
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-theorem UnipotentCocompact.proof (h : HermitianForm F E W) (v : Basis ι E W)
-    (hP : UnipotentCoordProper.Statement h v) (hH : UnipotentHorizontal.Statement h v)
-    (hC : UnipotentCentral.Statement h v) : UnipotentCocompact.Statement h v := by
+theorem UnipotentCocompact.proof
+    (h : HermitianForm F E W) (v : Basis ι E W) (hP : UnipotentCoordProper.Statement h v)
+    (hH : UnipotentHorizontal.Statement h v) (hC : UnipotentCentral.Statement h v)
+    : UnipotentCocompact.Statement h v := by
   intro D La x₀ hLa hx₀ hne hiso
   obtain ⟨w₀, h1, h2⟩ := WittPartner.proof h x₀ hne hiso
   have hp : IsHyperbolicPair h x₀ w₀ := ⟨hiso, h2, h1⟩

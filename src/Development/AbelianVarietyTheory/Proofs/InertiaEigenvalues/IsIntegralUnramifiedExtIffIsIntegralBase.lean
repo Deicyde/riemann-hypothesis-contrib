@@ -13,18 +13,21 @@ namespace GlobalTheory.UnitLemma.Unr
 
 open GlobalTheory.UnitLemma Polynomial
 
-theorem isIntegral_overExt_iff (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU : IsUnrExt K K' d φ) (B : InvAlg K)
-    (ψ : K'.E →+* B.A) (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e) (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e))
-    (a : B.A) : @IsIntegral K'.O (overExt φ B ψ hψ hσ).A _ _ _ a ↔ IsIntegral K.O a := by
+theorem isIntegral_overExt_iff
+    (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU : IsUnrExt K K' d φ)
+    (B : InvAlg K) (ψ : K'.E →+* B.A)
+    (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e) (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e)) (a : B.A)
+    : @IsIntegral K'.O (overExt φ B ψ hψ hσ).A _ _ _ a ↔ IsIntegral K.O a := by
   classical
   choose ι hι using fun c => exists_int_image hU c
   have inj : Function.Injective (algebraMap K'.O K'.E) := IsFractionRing.injective K'.O K'.E
-  let f : K.O →+* K'.O :=
-    { toFun := ι
-      map_one' := inj (by rw [hι]; simp)
-      map_mul' := fun x y => inj (by simp [hι])
-      map_zero' := inj (by rw [hι]; simp)
-      map_add' := fun x y => inj (by simp [hι]) }
+  let f : K.O →+* K'.O := {
+    toFun := ι
+    map_one' := inj (by rw [hι]; simp)
+    map_mul' := fun x y => inj (by simp [hι])
+    map_zero' := inj (by rw [hι]; simp)
+    map_add' := fun x y => inj (by simp [hι])
+  }
   have hf : ∀ c, algebraMap K'.O K'.E (f c) = φ (algebraMap K.O K.E c) := hι
   letI : Algebra K.O K'.O := f.toAlgebra
   letI iC : Algebra K'.O B.A := (overExt φ B ψ hψ hσ).aO

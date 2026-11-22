@@ -7,8 +7,9 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.PoitouTateD
 
 noncomputable section
 
-open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh GroundTheory.Global ReciprocityTheory.Gal Formalism.ConjugateSelfDual
-  GlobalTheory.Published GlobalTheory.Published.PoitouTate PositivityTheory.PoitouTateConclusion
+open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh GroundTheory.Global
+  ReciprocityTheory.Gal Formalism.ConjugateSelfDual GlobalTheory.Published
+  GlobalTheory.Published.PoitouTate PositivityTheory.PoitouTateConclusion
 
 namespace PositivityTheory.Lit1.PTN
 

@@ -9,11 +9,12 @@ open IsLocalRing Polynomial
 
 namespace GlobalTheory.StrictHensel
 
-theorem henselian_of_sections {R : Type} [CommRing R] [IsLocalRing R]
+theorem henselian_of_sections
+    {R : Type} [CommRing R] [IsLocalRing R]
     (H : ∀ (A : Type) [CommRing A] [Algebra R A] [Algebra.Etale R A] (q : Ideal A) [q.IsPrime],
-      q.comap (algebraMap R A) = maximalIdeal R →
-        ∃ s : A →ₐ[R] R, (maximalIdeal R).comap s.toRingHom = q) :
-    HenselianLocalRing R := by
+      q.comap (algebraMap R A) = maximalIdeal R
+        → ∃ s : A →ₐ[R] R, (maximalIdeal R).comap s.toRingHom = q)
+    : HenselianLocalRing R := by
   refine ⟨fun f hf a₀ h₁ h₂ => ?_⟩
   let P : StandardEtalePair R := ⟨f, hf, derivative f, 1, 0, 1, by simp⟩
   have e : ∀ p : R[X], aeval (residue R a₀) p = residue R (p.eval a₀) := fun p => by
@@ -21,9 +22,11 @@ theorem henselian_of_sections {R : Type} [CommRing R] [IsLocalRing R]
   have hP : P.HasMap (residue R a₀) := by
     refine ⟨?_, ?_⟩
     · change aeval (residue R a₀) f = 0
-      rw [e]; exact (residue_eq_zero_iff _).mpr h₁
+      rw [e]
+      exact (residue_eq_zero_iff _).mpr h₁
     · change IsUnit (aeval (residue R a₀) (derivative f))
-      rw [e]; exact h₂.map (residue R)
+      rw [e]
+      exact h₂.map (residue R)
   let ψ := P.lift (residue R a₀) hP
   haveI : (RingHom.ker ψ).IsPrime := RingHom.ker_isPrime ψ
   have hq : (RingHom.ker ψ).comap (algebraMap R P.Ring) = maximalIdeal R := by
@@ -40,18 +43,19 @@ theorem henselian_of_sections {R : Type} [CommRing R] [IsLocalRing R]
     rw [← hs, Ideal.mem_comap] at hmem
     simpa using hmem
 
-theorem isSepClosed_of_sections {R : Type} [CommRing R] [IsLocalRing R]
+theorem isSepClosed_of_sections
+    {R : Type} [CommRing R] [IsLocalRing R]
     (H : ∀ (A : Type) [CommRing A] [Algebra R A] [Algebra.Etale R A] (q : Ideal A) [q.IsPrime],
-      q.comap (algebraMap R A) = maximalIdeal R →
-        ∃ s : A →ₐ[R] R, (maximalIdeal R).comap s.toRingHom = q) :
-    IsSepClosed (ResidueField R) := by
+      q.comap (algebraMap R A) = maximalIdeal R
+        → ∃ s : A →ₐ[R] R, (maximalIdeal R).comap s.toRingHom = q)
+    : IsSepClosed (ResidueField R) := by
   refine IsSepClosed.of_exists_root _ fun g hm hirr hsep => ?_
-  obtain ⟨f, hf, -, hfm⟩ := lifts_and_natDegree_eq_and_monic
-    ((mem_lifts g).2 (map_surjective _ residue_surjective g)) hm
+  obtain ⟨f, hf, -, hfm⟩ :=
+    lifts_and_natDegree_eq_and_monic ((mem_lifts g).2 (map_surjective _ residue_surjective g)) hm
   haveI : Fact (Irreducible g) := ⟨hirr⟩
   let P : StandardEtalePair R := ⟨f, hfm, derivative f, 1, 0, 1, by simp⟩
-  have e : ∀ p : R[X], aeval (AdjoinRoot.root g) p =
-      AdjoinRoot.mk g (p.map (residue R)) := fun p => by
+  have e
+      : ∀ p : R[X], aeval (AdjoinRoot.root g) p = AdjoinRoot.mk g (p.map (residue R)) := fun p => by
     rw [← AdjoinRoot.aeval_eq, ← ResidueField.algebraMap_eq, aeval_map_algebraMap]
   have hP : P.HasMap (AdjoinRoot.root g) := by
     refine ⟨?_, ?_⟩
@@ -80,11 +84,12 @@ end GlobalTheory.StrictHensel
 
 namespace GlobalTheory.StrictHensel
 
-theorem sections_of_henselian_sepClosed {R : Type} [CommRing R] [IsLocalRing R]
-    [HenselianLocalRing R] [IsSepClosed (ResidueField R)]
-    (A : Type) [CommRing A] [Algebra R A] [Algebra.Etale R A] (q : Ideal A) [q.IsPrime]
-    (hq : q.comap (algebraMap R A) = maximalIdeal R) :
-    ∃ s : A →ₐ[R] R, (maximalIdeal R).comap s.toRingHom = q := by
+theorem sections_of_henselian_sepClosed
+    {R : Type} [CommRing R] [IsLocalRing R] [HenselianLocalRing R] [IsSepClosed (ResidueField R)]
+    (A : Type) [CommRing A] [Algebra R A] [Algebra.Etale R A]
+    (q : Ideal A) [q.IsPrime]
+    (hq : q.comap (algebraMap R A) = maximalIdeal R)
+    : ∃ s : A →ₐ[R] R, (maximalIdeal R).comap s.toRingHom = q := by
   let S := Localization.AtPrime q
   haveI : IsLocalHom (algebraMap R S) := ⟨fun r hr => by
     rw [IsScalarTower.algebraMap_apply R A S, IsLocalization.AtPrime.isUnit_to_map_iff S q] at hr
@@ -95,9 +100,11 @@ theorem sections_of_henselian_sepClosed {R : Type} [CommRing R] [IsLocalRing R]
   haveI : Algebra.EssFiniteType R S := Algebra.EssFiniteType.comp R A S
   have hsurj := IsSepClosed.algebraMap_surjective (ResidueField R) (ResidueField S)
   let e : ResidueField R ≃ₐ[ResidueField R] ResidueField S :=
-    AlgEquiv.ofBijective (Algebra.ofId _ _) ⟨fun a b h => (algebraMap (ResidueField R) (ResidueField S)).injective h, hsurj⟩
-  let φ : A →ₐ[R] ResidueField R := ((e.symm.restrictScalars R).toAlgHom).comp
-    ((IsScalarTower.toAlgHom R S (ResidueField S)).comp (IsScalarTower.toAlgHom R A S))
+    AlgEquiv.ofBijective (Algebra.ofId _ _)
+      ⟨fun a b h => (algebraMap (ResidueField R) (ResidueField S)).injective h, hsurj⟩
+  let φ : A →ₐ[R] ResidueField R :=
+    ((e.symm.restrictScalars R).toAlgHom).comp
+      ((IsScalarTower.toAlgHom R S (ResidueField S)).comp (IsScalarTower.toAlgHom R A S))
   obtain ⟨s, hs⟩ := (GlobalTheory.T.bijective_residue_comp_etale_henselian R A R).2 φ
   refine ⟨s, ?_⟩
   ext x
@@ -116,11 +123,12 @@ end GlobalTheory.StrictHensel
 
 namespace GlobalTheory.StrictHensel
 
-theorem strictlyHenselian_iff : ∀ (R : Type) [CommRing R] [IsLocalRing R],
-    (∀ (A : Type) [CommRing A] [Algebra R A] [Algebra.Etale R A] (q : Ideal A) [q.IsPrime],
-      q.comap (algebraMap R A) = maximalIdeal R →
-        ∃ s : A →ₐ[R] R, (maximalIdeal R).comap s.toRingHom = q) ↔
-      (HenselianLocalRing R ∧ IsSepClosed (ResidueField R)) := by
+theorem strictlyHenselian_iff
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R],
+      (∀ (A : Type) [CommRing A] [Algebra R A] [Algebra.Etale R A] (q : Ideal A) [q.IsPrime],
+          q.comap (algebraMap R A) = maximalIdeal R
+            → ∃ s : A →ₐ[R] R, (maximalIdeal R).comap s.toRingHom = q)
+        ↔ (HenselianLocalRing R ∧ IsSepClosed (ResidueField R)) := by
   intro R _ _
   refine ⟨fun H => ⟨henselian_of_sections H, isSepClosed_of_sections H⟩, fun ⟨h₁, h₂⟩ => ?_⟩
   intro A _ _ _ q _ hq

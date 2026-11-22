@@ -4,11 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.LayerApproximation.first_layer {O R : Type} [CommRing O] [CommRing R]
-    [Algebra O R] (m : Ideal R) (A : Subalgebra O R) (T : Set R)
-    (h0 : ∀ (x : R), ∃ (a : O), x - algebraMap O R a ∈ m)
-    (hT : ∀ t ∈ T, t ∈ A ∧ t ∈ m) (hm : m ≤ Ideal.span T ⊔ m ^ (2 : ℕ)) :
-    ∀ x ∈ m, ∃ a ∈ A, a ∈ m ∧ x - a ∈ m ^ 2 := by
+private theorem UpperTheory.Reformulated.B.LayerApproximation.first_layer
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R]
+    (m : Ideal R) (A : Subalgebra O R) (T : Set R)
+    (h0 : ∀ (x : R), ∃ (a : O), x - algebraMap O R a ∈ m) (hT : ∀ t ∈ T, t ∈ A ∧ t ∈ m)
+    (hm : m ≤ Ideal.span T ⊔ m ^ (2 : ℕ))
+    : ∀ x ∈ m, ∃ a ∈ A, a ∈ m ∧ x - a ∈ m ^ 2 := by
   have hspan : ∀ y ∈ Ideal.span T, ∃ a ∈ A, a ∈ m ∧ y - a ∈ m ^ 2 := by
     intro y hy
     induction hy using Submodule.span_induction with
@@ -24,8 +25,7 @@ private theorem UpperTheory.Reformulated.B.LayerApproximation.first_layer {O R :
     | smul r u _ hu =>
       obtain ⟨a, ha, ham, hua⟩ := hu
       obtain ⟨c, hc⟩ := h0 r
-      refine ⟨algebraMap O R c * a, A.mul_mem (A.algebraMap_mem c) ha,
-        m.mul_mem_left _ ham, ?_⟩
+      refine ⟨algebraMap O R c * a, A.mul_mem (A.algebraMap_mem c) ha, m.mul_mem_left _ ham, ?_⟩
       have e : r • u - algebraMap O R c * a = r * (u - a) + (r - algebraMap O R c) * a := by
         rw [smul_eq_mul]; ring
       rw [e]
@@ -40,11 +40,12 @@ private theorem UpperTheory.Reformulated.B.LayerApproximation.first_layer {O R :
   rw [e]
   exact Ideal.add_mem _ hya hz
 
-private theorem UpperTheory.Reformulated.B.LayerApproximation.all_layers {O R : Type} [CommRing O] [CommRing R]
-    [Algebra O R] (m : Ideal R) (A : Subalgebra O R)
+private theorem UpperTheory.Reformulated.B.LayerApproximation.all_layers
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R]
+    (m : Ideal R) (A : Subalgebra O R)
     (h0 : ∀ (x : R), ∃ (a : O), x - algebraMap O R a ∈ m)
-    (h1 : ∀ x ∈ m, ∃ a ∈ A, a ∈ m ∧ x - a ∈ m ^ 2) (N : ℕ) :
-    ∀ x ∈ m ^ N, ∃ a ∈ A, a ∈ m ^ N ∧ x - a ∈ m ^ (N + 1) := by
+    (h1 : ∀ x ∈ m, ∃ a ∈ A, a ∈ m ∧ x - a ∈ m ^ 2) (N : ℕ)
+    : ∀ x ∈ m ^ N, ∃ a ∈ A, a ∈ m ^ N ∧ x - a ∈ m ^ (N + 1) := by
   induction N with
   | zero =>
     intro x _
@@ -73,18 +74,20 @@ private theorem UpperTheory.Reformulated.B.LayerApproximation.all_layers {O R : 
       rw [e]
       exact Ideal.add_mem _ hua hvb
 
-theorem UpperTheory.Reformulated.B.LayerApproximation.co_ext_approx :
-    ∀ {O R : Type} [inst : CommRing O] [inst_1 : CommRing R]
-    [inst_2 : Algebra O R] (m : Ideal R) (A : Subalgebra O R) (T : Set R),
-    (∀ (x : R), ∃ (a : O), x - (Algebra.algebraMap O R : O → R) a ∈ m) →
-      (∀ t ∈ T, t ∈ A ∧ t ∈ m) → m ≤ Ideal.span T ⊔ m ^ (2 : ℕ) → ∀ (N : ℕ) (x : R), ∃ a ∈ A, x - a ∈ m ^ N := by
+theorem UpperTheory.Reformulated.B.LayerApproximation.co_ext_approx
+    : ∀ {O R : Type} [inst : CommRing O] [inst_1 : CommRing R] [inst_2 : Algebra O R] (m : Ideal R)
+        (A : Subalgebra O R) (T : Set R),
+      (∀ (x : R), ∃ (a : O), x - (Algebra.algebraMap O R : O → R) a ∈ m) → (∀ t ∈ T, t ∈ A ∧ t ∈ m)
+        → m ≤ Ideal.span T ⊔ m ^ (2 : ℕ)
+        → ∀ (N : ℕ) (x : R), ∃ a ∈ A, x - a ∈ m ^ N := by
   intro O R _ _ _ m A T h0 hT hm N x
   have h1 := UpperTheory.Reformulated.B.LayerApproximation.first_layer m A T h0 hT hm
   induction N with
   | zero => exact ⟨0, A.zero_mem, by simp⟩
   | succ N ih =>
     obtain ⟨a, ha, hxa⟩ := ih
-    obtain ⟨b, hb, -, hab⟩ := UpperTheory.Reformulated.B.LayerApproximation.all_layers m A h0 h1 N _ hxa
+    obtain ⟨b, hb, -, hab⟩ :=
+      UpperTheory.Reformulated.B.LayerApproximation.all_layers m A h0 h1 N _ hxa
     refine ⟨a + b, A.add_mem ha hb, ?_⟩
     have e : x - (a + b) = x - a - b := by ring
     rw [e]

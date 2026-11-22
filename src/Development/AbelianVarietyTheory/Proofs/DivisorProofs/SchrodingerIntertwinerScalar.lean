@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsStdCharNeg
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.Doubling
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.Doubling
 open GlobalTheory.SWLit
 
 noncomputable section
@@ -27,13 +29,15 @@ def stdChar : AddChar (AF F) ℂ where
   map_zero_eq_one' := by simp
   map_add_eq_mul' a b := by simp [AddChar.map_add_eq_mul]
 
-theorem stdChar_inl (z : InfiniteAdeleRing F) :
-    Complex.exp (-(2 * Real.pi * Complex.I) *
-      (Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evI F (infiniteAdeleInl z : AF F)) : ℝ)) =
-      (adelicChar F (infiniteAdeleInl z) : ℂ) := by
-  have h2 : adelicChar F (infiniteAdeleInl z) = Real.fourierChar (-infiniteTrace F z) := adelicChar_infinite z
-  rw [h2, GlobalTheory.AdelicSvN.Weyl.trace_eq_mixedTrace, ← mixedTrace_homeomorphMixedSpace, homeomorphMixedSpace_apply,
-    Real.fourierChar_apply]
+theorem stdChar_inl (z : InfiniteAdeleRing F)
+    : Complex.exp
+        (-(2 * Real.pi * Complex.I)
+          * (Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evI F (infiniteAdeleInl z : AF F)) : ℝ))
+      = (adelicChar F (infiniteAdeleInl z) : ℂ) := by
+  have h2 : adelicChar F (infiniteAdeleInl z) = Real.fourierChar (- infiniteTrace F z) :=
+    adelicChar_infinite z
+  rw [h2, GlobalTheory.AdelicSvN.Weyl.trace_eq_mixedTrace, ← mixedTrace_homeomorphMixedSpace,
+    homeomorphMixedSpace_apply, Real.fourierChar_apply]
   congr 1
   have : evI F (infiniteAdeleInl z) = InfiniteAdeleRing.ringEquiv_mixedSpace F z := rfl
   rw [this]
@@ -43,7 +47,8 @@ theorem stdChar_inl (z : InfiniteAdeleRing F) :
 theorem isStd_stdChar : IsStd (stdChar F) := by
   refine ⟨continuous_subtype_val.comp continuous_adelicChar, fun x => ?_, fun a ha => ?_⟩
   · show (adelicChar F (algebraMap F (AF F) x) : ℂ) = 1
-    rw [adelicChar_algebraMap]; rfl
+    rw [adelicChar_algebraMap]
+    rfl
   · have h0 : evI F ((0, 1) : AF F) = 0 := by
       show InfiniteAdeleRing.ringEquiv_mixedSpace F (0 : InfiniteAdeleRing F) = 0
       exact map_zero _
@@ -59,6 +64,5 @@ end GlobalTheory.SubstIntertw
 namespace GlobalTheory.SubstIntertw
 
 open GroundTheory.Global
-
 
 end GlobalTheory.SubstIntertw

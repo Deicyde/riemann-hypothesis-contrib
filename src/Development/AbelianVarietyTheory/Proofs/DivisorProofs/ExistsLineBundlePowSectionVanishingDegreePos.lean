@@ -16,18 +16,23 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.VB GlobalTheory.LieVB GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.NeronCurve GlobalTheory.Nef
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.VB GlobalTheory.LieVB GlobalTheory.QCoh GlobalTheory.CechPic
+  GlobalTheory.NeronCurve GlobalTheory.Nef
 open GlobalTheory.Twist (resM)
 open scoped CategoryTheory.Obj RatFunc
 
 namespace GlobalTheory.Nef
 
-theorem exists_sec_lbPow_vanishing_of_degree_pos : ∀ (k : Type) [Field k] (C : Scheme.{0})
-    [Algebra k Γ(C, ⊤)], IsCurve k C → ∀ L : LB C, L.IsLB →
-      0 < interNum k (GlobalTheory.structureModule C) ![L] →
-      ∃ (m : ℕ) (σ : (lbPow L m).Sec) (c : C), 0 < m ∧ σ ≠ 0 ∧ c ∉ Out.nonzeroLocus σ := by
+theorem exists_sec_lbPow_vanishing_of_degree_pos
+    : ∀ (k : Type) [Field k] (C : Scheme.{0}) [Algebra k Γ(C, ⊤)],
+      IsCurve k C
+        → ∀ L : LB C,
+          L.IsLB → 0 < interNum k (GlobalTheory.structureModule C) ![L]
+            → ∃ (m : ℕ) (σ : (lbPow L m).Sec) (c : C), 0 < m ∧ σ ≠ 0 ∧ c ∉ Out.nonzeroLocus σ := by
   intro k _ C _ hC L hL hpos
   have := LieSemineg.isIntegral_curve hC.1 hC.2.2
   have hd : topologicalKrullDim C = 1 := LieSemineg.dim_curve hC.1
@@ -37,7 +42,7 @@ theorem exists_sec_lbPow_vanishing_of_degree_pos : ∀ (k : Type) [Field k] (C :
   set d := interNum k O ![L] with hdd
   set f := chiPic k O with hf
 
-  have hdeg : ∀ (M : LB C) (hM : M.IsLB), interNum k O ![M] = f 0 - f (-cls M hM) := by
+  have hdeg : ∀ (M : LB C) (hM : M.IsLB), interNum k O ![M] = f 0 - f (- cls M hM) := by
     intro M hM
     rw [interNum_one k O hM, chi_twistZ k O hM, hf, chiPic_zero, neg_one_zsmul]
 
@@ -49,7 +54,8 @@ theorem exists_sec_lbPow_vanishing_of_degree_pos : ∀ (k : Type) [Field k] (C :
       rw [hc, cls_lbPow hL m hLm, cls_triv, natCast_zsmul, neg_add_cancel]
     have hadd := interNum_one_of_cls_eq_add (k := k) hH hd (LB.isLB_triv C) hN hLm e
     rw [ArInt.interNum_one_lbPow_of_curve hH hd hL m, hdeg _ (LB.isLB_triv C), hdeg N hN, hc,
-      cls_triv, neg_zero, neg_neg] at hadd
+        cls_triv, neg_zero, neg_neg]
+      at hadd
     have hd' : interNum k (GlobalTheory.structureModule C) ![L] = d := rfl
     linarith
   set m : ℕ := (f 0).natAbs + 1 with hm
@@ -66,8 +72,7 @@ theorem exists_sec_lbPow_vanishing_of_degree_pos : ∀ (k : Type) [Field k] (C :
   have hχpos : 0 < chi k (twist O (lbPow L m)) := by
     rw [hχ]
     have h1 : (1 : ℤ) ≤ d := hpos
-    have h2 : -(f 0) ≤ ((f 0).natAbs : ℤ) := by
-      rw [Int.natCast_natAbs]; exact neg_le_abs (f 0)
+    have h2 : -(f 0) ≤ ((f 0).natAbs : ℤ) := by rw [Int.natCast_natAbs]; exact neg_le_abs (f 0)
     have h3 : (m : ℤ) = (f 0).natAbs + 1 := by rw [hm]; push_cast; ring
     nlinarith
   have hh0 : 0 < hdim k (twist O (lbPow L m)) 0 := by

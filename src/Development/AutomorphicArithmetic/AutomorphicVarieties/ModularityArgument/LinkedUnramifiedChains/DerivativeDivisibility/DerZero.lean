@@ -8,10 +8,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open Polynomial UpperTheory.V.Alg
 
-private theorem derivation_pow_eq_nsmul_pow_pred_mul {O B K : Type} [CommRing O] [CommRing B] [Field K] [Algebra O B]
-    [Algebra O K] (x : B →ₐ[O] K) (δ : B →ₗ[O] K)
-    (hL : ∀ f g : B, δ (f * g) = x f * δ g + x g * δ f) (t : B) (n : ℕ) :
-    δ (t ^ n) = (n : K) * x t ^ (n - 1) * δ t := by
+private theorem derivation_pow_eq_nsmul_pow_pred_mul
+    {O B K : Type} [CommRing O] [CommRing B] [Field K] [Algebra O B] [Algebra O K]
+    (x : B →ₐ[O] K) (δ : B →ₗ[O] K) (hL : ∀ f g : B, δ (f * g) = x f * δ g + x g * δ f)
+    (t : B) (n : ℕ)
+    : δ (t ^ n) = (n : K) * x t ^ (n - 1) * δ t := by
   induction n with
   | zero =>
     have h1 := hL 1 1
@@ -27,11 +28,13 @@ private theorem derivation_pow_eq_nsmul_pow_pred_mul {O B K : Type} [CommRing O]
       push_cast
       ring
 
-private theorem derivation_eval2_eq_eval2_derivative_mul {O Λ B K : Type} [CommRing O] [CommRing Λ] [CommRing B] [Field K]
-    [Algebra O Λ] [Algebra O B] [Algebra O K] (lam : Λ →ₐ[O] B) (x : B →ₐ[O] K) (δ : B →ₗ[O] K)
+private theorem derivation_eval2_eq_eval2_derivative_mul
+    {O Λ B K : Type}
+    [CommRing O] [CommRing Λ] [CommRing B] [Field K] [Algebra O Λ] [Algebra O B] [Algebra O K]
+    (lam : Λ →ₐ[O] B) (x : B →ₐ[O] K) (δ : B →ₗ[O] K)
     (hL : ∀ f g : B, δ (f * g) = x f * δ g + x g * δ f) (hlam : ∀ c : Λ, δ (lam c) = 0)
-    (t : B) (q : Λ[X]) :
-    δ (eval₂ (lam : Λ →+* B) t q) = x (eval₂ (lam : Λ →+* B) t (derivative q)) * δ t := by
+    (t : B) (q : Λ[X])
+    : δ (eval₂ (lam : Λ →+* B) t q) = x (eval₂ (lam : Λ →+* B) t (derivative q)) * δ t := by
   induction q using Polynomial.induction_on' with
   | add p r hp hr =>
     rw [eval₂_add, map_add (f := _), hp, hr, derivative_add, eval₂_add, map_add (f := _), add_mul]
@@ -42,8 +45,9 @@ private theorem derivation_eval2_eq_eval2_derivative_mul {O Λ B K : Type} [Comm
     simp only [map_mul, map_natCast, map_pow]
     ring
 
-private theorem eval_derivative_ne_zero_of_rootMultiplicity_eq_one {K : Type} [Field K] (F : K[X]) (a : K) (h : rootMultiplicity a F = 1) :
-    eval a (derivative F) ≠ 0 := by
+private theorem eval_derivative_ne_zero_of_rootMultiplicity_eq_one
+    {K : Type} [Field K] (F : K[X]) (a : K) (h : rootMultiplicity a F = 1)
+    : eval a (derivative F) ≠ 0 := by
   have hF0 : F ≠ 0 := by
     rintro rfl
     simp at h
@@ -54,19 +58,21 @@ private theorem eval_derivative_ne_zero_of_rootMultiplicity_eq_one {K : Type} [F
   rw [dvd_iff_isRoot] at hnd
   exact hnd
 
-theorem UpperTheory.V.J.derZero :
-    UpperTheory.V.J.DerZero := by
+theorem UpperTheory.V.J.derZero : UpperTheory.V.J.DerZero := by
   unfold UpperTheory.V.J.DerZero
   intro O Λ B K _ _ _ _ _ _ _ _ _ _ lam J t s g hC x i hker hmult δ hδ hJ hlam
   have hL : ∀ f g : B, δ (f * g) = x f * δ g + x g * δ f := fun f g => hδ f g
-  have hx : ∀ q : Λ[X], x (eval₂ (lam : Λ →+* B) t q) =
-      eval (x t) (map ((x.comp lam : Λ →ₐ[O] K) : Λ →+* K) q) := by
+  have hx
+      : ∀ q : Λ[X],
+        x (eval₂ (lam : Λ →+* B) t q)
+          = eval (x t) (map ((x.comp lam : Λ →ₐ[O] K) : Λ →+* K) q) := by
     intro q
     rw [eval_map]
     exact Polynomial.hom_eval₂ q (lam : Λ →+* B) (x : B →+* K) t
-  have hD : ∀ q : Λ[X], δ (eval₂ (lam : Λ →+* B) t q) =
-      x (eval₂ (lam : Λ →+* B) t (derivative q)) * δ t :=
-    fun q => derivation_eval2_eq_eval2_derivative_mul lam x δ hL hlam t q
+  have hD
+      : ∀ q : Λ[X],
+        δ (eval₂ (lam : Λ →+* B) t q) = x (eval₂ (lam : Λ →+* B) t (derivative q)) * δ t := fun q =>
+    derivation_eval2_eq_eval2_derivative_mul lam x δ hL hlam t q
   have hprod : (∏ j, g j) = g i * ∏ j ∈ Finset.univ.erase i, g j :=
     (Finset.mul_prod_erase _ _ (Finset.mem_univ i)).symm
   have hF' : x (eval₂ (lam : Λ →+* B) t (derivative (∏ j, g j))) ≠ 0 := by
@@ -84,8 +90,9 @@ theorem UpperTheory.V.J.derZero :
       rw [UpperTheory.V.J.cmp, Submodule.mem_colon_singleton, smul_eq_mul, ← eval₂_mul, ← hprod]
       exact hC.kill
     exact RingHom.mem_ker.mp (hker hm)
-  rw [hprod, derivative_mul, eval₂_add, eval₂_mul, eval₂_mul, map_add (f := _), map_mul, map_mul, hgi,
-    zero_mul, add_zero] at hF'
+  rw [hprod, derivative_mul, eval₂_add, eval₂_mul, eval₂_mul, map_add (f := _), map_mul, map_mul,
+      hgi, zero_mul, add_zero]
+    at hF'
   have hgd := left_ne_zero_of_mul hF'
   have hEn := right_ne_zero_of_mul hF'
   have hcmp : ∀ b ∈ UpperTheory.V.J.cmp lam J t g i, δ b = 0 := by

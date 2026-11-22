@@ -9,8 +9,9 @@ open GlobalTheory.EtC
 
 namespace GlobalTheory
 
-theorem field_finiteType_algClosed_SH : ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [Algebra k B]
-    [Algebra.FiniteType k B], IsField B → SH B := by
+theorem field_finiteType_algClosed_SH
+    : ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [Algebra k B] [Algebra.FiniteType k B],
+      IsField B → SH B := by
   intro k B _ _ _ _ _ hB
   letI : Field B := hB.toField
   haveI : Module.Finite k B := finite_of_finite_type_of_isJacobsonRing k B

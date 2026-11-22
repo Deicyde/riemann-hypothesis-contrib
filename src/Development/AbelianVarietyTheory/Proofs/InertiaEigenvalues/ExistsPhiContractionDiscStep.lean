@@ -11,20 +11,50 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Eisenst
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
 
 namespace GlobalTheory.BSP
 
-theorem norm_pow_mul_eq_of_norm_mul_eq {R : Type*} [NormedRing R] (E : R) (q : ℝ)
-    (hE : ∀ y, ‖E * y‖ = q * ‖y‖) (h : ℕ) (y : R) : ‖E ^ h * y‖ = q ^ h * ‖y‖ := by
+theorem norm_pow_mul_eq_of_norm_mul_eq
+    {R : Type*} [NormedRing R] (E : R) (q : ℝ) (hE : ∀ y, ‖E * y‖ = q * ‖y‖) (h : ℕ) (y : R)
+    : ‖E ^ h * y‖ = q ^ h * ‖y‖ := by
   induction h generalizing y with
   | zero => simp
   | succ n ih => rw [pow_succ, mul_assoc, ih, hE, pow_succ]; ring
 
-theorem exists_discStep : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (A : Type) [CommRing A] (s : bk.S →+* A) (ι : Type), TopBasis s bk.J ι → ∀ (φ : A →+* A), φ (s X) = s X ^ l → ∀ (Φ : Disc l (s X) bk.ρ₀ →+* Disc l (s X) bk.ρ₀), IsDiscMap (l := _) (u := _) (ρ := _) φ Φ → ∀ (κ : Type) (c : κ → κ → A), (∀ i (n : ℕ), {j | c i j ∉ (bk.J ^ n).map s}.Finite) → ∀ (h : ℕ) (V : κ → Disc l (s X) bk.ρ₀), (∀ j, HasSum (fun i => Φ (V i) * toDisc l (s X) bk.ρ₀ (c i j)) (toDisc l (s X) bk.ρ₀ (s bk.E) ^ h * V j)) → ∀ (ρ ρ' : ℝ≥0), bk.ρ₀ ≤ ρ → ρ < 1 → ρ' ^ l = ρ → ∀ (R : Disc l (s X) ρ →+* Disc l (s X) bk.ρ₀) (R' : Disc l (s X) ρ' →+* Disc l (s X) bk.ρ₀), IsDiscMap (l := _) (u := _) (ρ := _) (RingHom.id A) R → IsDiscMap (l := _) (u := _) (ρ := _) (RingHom.id A) R' → ∀ (U : κ → Disc l (s X) ρ) (C : ℝ), 0 ≤ C → Filter.Tendsto U Filter.cofinite (nhds 0) → (∀ j, R (U j) = V j) → (∀ j, ‖U j‖ ≤ C) → ∃ U' : κ → Disc l (s X) ρ', Filter.Tendsto U' Filter.cofinite (nhds 0) ∧ (∀ j, R' (U' j) = V j) ∧ ∀ j, (ρ' : ℝ) ^ (bk.Ep.natDegree * h) * ‖U' j‖ ≤ C := by
+theorem exists_discStep
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (A : Type) [CommRing A] (s : bk.S →+* A)
+        (ι : Type),
+      TopBasis s bk.J ι
+        → ∀ (φ : A →+* A),
+          φ (s X) = s X ^ l
+            → ∀ (Φ : Disc l (s X) bk.ρ₀ →+* Disc l (s X) bk.ρ₀),
+              IsDiscMap (l := _) (u := _) (ρ := _) φ Φ
+                → ∀ (κ : Type) (c : κ → κ → A),
+                  (∀ i (n : ℕ), {j | c i j ∉ (bk.J ^ n).map s}.Finite)
+                    → ∀ (h : ℕ) (V : κ → Disc l (s X) bk.ρ₀),
+                      (∀ j,
+                          HasSum
+                            (fun i => Φ (V i) * toDisc l (s X) bk.ρ₀ (c i j))
+                            (toDisc l (s X) bk.ρ₀ (s bk.E) ^ h * V j))
+                        → ∀ (ρ ρ' : ℝ≥0),
+                          bk.ρ₀ ≤ ρ → ρ < 1 → ρ' ^ l = ρ
+                            → ∀ (R : Disc l (s X) ρ →+* Disc l (s X) bk.ρ₀)
+                                (R' : Disc l (s X) ρ' →+* Disc l (s X) bk.ρ₀),
+                              IsDiscMap (l := _) (u := _) (ρ := _) (RingHom.id A) R
+                                → IsDiscMap (l := _) (u := _) (ρ := _) (RingHom.id A) R'
+                                → ∀ (U : κ → Disc l (s X) ρ) (C : ℝ),
+                                  0 ≤ C → Filter.Tendsto U Filter.cofinite (nhds 0)
+                                    → (∀ j, R (U j) = V j) → (∀ j, ‖U j‖ ≤ C)
+                                    → ∃ U' : κ → Disc l (s X) ρ',
+                                      Filter.Tendsto U' Filter.cofinite (nhds 0)
+                                        ∧ (∀ j, R' (U' j) = V j)
+                                        ∧ ∀ j, (ρ' : ℝ) ^ (bk.Ep.natDegree * h) * ‖U' j‖ ≤ C := by
   intro l _ K bk A _ s ι tb φ hφ Φ hΦ κ c hc h V hV ρ ρ' hρ₀ hρ1 hρ' R R' hR hR' U C hC hU hRU hUC
   obtain ⟨-, -, ⟨hρ₀pos, hρ₀1, -⟩, -⟩ := GlobalTheory.T.breuilKisin_flat_radius_ideal_facts l K bk
   have hl1 : 1 ≤ l := (Fact.out : l.Prime).one_lt.le
@@ -42,22 +72,30 @@ theorem exists_discStep : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K
     exact absurd hρ1 (not_lt.2 h2)
   have hρρ' : ρ ≤ ρ' := by rw [← hρ']; exact pow_le_of_le_one zero_le hρ'1.le (by omega)
 
-  obtain ⟨Φ', hΦ'⟩ := GlobalTheory.T.exists_closedDiscExtension_of_pow_dvd l A A φ (s X) (s X) ρ ρ' l hρ'pos (by rw [hφ]) hρ'.le
-  have hc1 := (GlobalTheory.T.closedDiscGaugeCompletion_basic_properties l A (s X) ρ).2.2.2 A A (s X) (s X) ρ' bk.ρ₀ φ (RingHom.id A) Φ' R' hΦ' hR'
-  have hc2 := (GlobalTheory.T.closedDiscGaugeCompletion_basic_properties l A (s X) ρ).2.2.2 A A (s X) (s X) bk.ρ₀ bk.ρ₀ (RingHom.id A) φ R Φ hR hΦ
+  obtain ⟨Φ', hΦ'⟩ :=
+    GlobalTheory.T.exists_closedDiscExtension_of_pow_dvd l A A φ (s X) (s X) ρ ρ' l hρ'pos
+      (by rw [hφ]) hρ'.le
+  have hc1 :=
+    (GlobalTheory.T.closedDiscGaugeCompletion_basic_properties l A (s X) ρ).2.2.2 A A (s X) (s X) ρ'
+      bk.ρ₀ φ (RingHom.id A) Φ' R' hΦ' hR'
+  have hc2 :=
+    (GlobalTheory.T.closedDiscGaugeCompletion_basic_properties l A (s X) ρ).2.2.2 A A (s X) (s X)
+      bk.ρ₀ bk.ρ₀ (RingHom.id A) φ R Φ hR hΦ
   rw [RingHom.id_comp] at hc1
   rw [RingHom.comp_id] at hc2
   have hcomm : ∀ x, R' (Φ' x) = Φ (R x) := fun x => RingHom.congr_fun (hc1.unique hc2) x
   haveI : IsUltrametricDist (Disc l (s X) ρ') := (GlobalTheory.T.closedDiscGaugeCompletion_basic_properties l A (s X) ρ').1
   haveI : NonarchimedeanAddGroup (Disc l (s X) ρ') := IsUltrametricDist.nonarchimedeanAddGroup
 
-  have hUn : Filter.Tendsto (fun i => ‖U i‖) Filter.cofinite (nhds 0) := tendsto_zero_iff_norm_tendsto_zero.1 hU
-  have hTle : ∀ i j, ‖Φ' (U i) * toDisc l (s X) ρ' (c i j)‖ ≤ ‖U i‖ * ‖toDisc l (s X) ρ' (c i j)‖ := fun i j =>
-    (norm_mul_le _ _).trans (mul_le_mul_of_nonneg_right (hΦ'.norm_le _) (norm_nonneg _))
+  have hUn : Filter.Tendsto (fun i => ‖U i‖) Filter.cofinite (nhds 0) :=
+    tendsto_zero_iff_norm_tendsto_zero.1 hU
+  have hTle : ∀ i j, ‖Φ' (U i) * toDisc l (s X) ρ' (c i j)‖ ≤ ‖U i‖ * ‖toDisc l (s X) ρ' (c i j)‖ :=
+    fun i j => (norm_mul_le _ _).trans (mul_le_mul_of_nonneg_right (hΦ'.norm_le _) (norm_nonneg _))
   have hTle' : ∀ i j, ‖Φ' (U i) * toDisc l (s X) ρ' (c i j)‖ ≤ ‖U i‖ := fun i j =>
     (hTle i j).trans (mul_le_of_le_one_right (norm_nonneg _) (norm_toDisc_le _))
   have hsum : ∀ j, Summable fun i => Φ' (U i) * toDisc l (s X) ρ' (c i j) := fun j =>
-    NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero (squeeze_zero_norm (fun i => hTle' i j) hUn)
+    NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero
+      (squeeze_zero_norm (fun i => hTle' i j) hUn)
   set Z : κ → Disc l (s X) ρ' := fun j => ∑' i, Φ' (U i) * toDisc l (s X) ρ' (c i j) with hZdef
   have hZC : ∀ j, ‖Z j‖ ≤ C := fun j =>
     IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg hC fun i => (hTle' i j).trans (hUC i)
@@ -65,8 +103,9 @@ theorem exists_discStep : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K
     AddMonoidHomClass.continuous_of_bound R' 1 fun y => (hR'.norm_le y).trans (one_mul _).ge
   have hRZ : ∀ j, R' (Z j) = toDisc l (s X) bk.ρ₀ (s bk.E) ^ h * V j := fun j => by
     have h1 := (hsum j).hasSum.map R' hR'c
-    have h2 : (R' ∘ fun i => Φ' (U i) * toDisc l (s X) ρ' (c i j)) =
-        fun i => Φ (V i) * toDisc l (s X) bk.ρ₀ (c i j) := by
+    have h2
+        : (R' ∘ fun i => Φ' (U i) * toDisc l (s X) ρ' (c i j))
+          = fun i => Φ (V i) * toDisc l (s X) bk.ρ₀ (c i j) := by
       funext i
       simp only [Function.comp_apply, map_mul, hcomm, hRU, hR'.ext, RingHom.id_apply]
     rw [h2] at h1
@@ -77,7 +116,9 @@ theorem exists_discStep : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K
     have hF : {i | r < ‖U i‖}.Finite := by
       have := Filter.eventually_cofinite.1 (hUn.eventually (ge_mem_nhds hr))
       simpa only [not_le] using this
-    obtain ⟨n, hn⟩ := GlobalTheory.T.norm_baseRingToClosedDisc_J_pow_small l K bk A s ρ' hρ'pos hρ'1 (r / (C + 1)) (by positivity)
+    obtain ⟨n, hn⟩ :=
+      GlobalTheory.T.norm_baseRingToClosedDisc_J_pow_small l K bk A s ρ' hρ'pos hρ'1 (r / (C + 1))
+        (by positivity)
     refine (hF.biUnion fun i _ => hc i n).subset ?_
     intro j hj
     by_contra hj'
@@ -90,13 +131,16 @@ theorem exists_discStep : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K
       nlinarith
     · exact (hTle' i j).trans (not_lt.1 hi)
   have hZ : Filter.Tendsto Z Filter.cofinite (nhds 0) := by
-    refine Metric.tendsto_nhds.2 fun ε hε => Filter.eventually_cofinite.2 ((hsmall (ε / 2) (by linarith)).subset ?_)
+    refine Metric.tendsto_nhds.2 fun ε hε =>
+      Filter.eventually_cofinite.2 ((hsmall (ε / 2) (by linarith)).subset ?_)
     intro j hj
     simp only [Set.mem_setOf_eq, dist_zero_right, not_lt] at hj ⊢
     linarith
 
-  obtain ⟨hnorm', hdiv'⟩ := GlobalTheory.T.eisenstein_div_closedDisc_of_topBasis l K bk A s ι tb ρ' (hρ₀.trans hρρ') hρ'1
-  obtain ⟨hnorm₀, -⟩ := GlobalTheory.T.eisenstein_div_closedDisc_of_topBasis l K bk A s ι tb bk.ρ₀ le_rfl hρ₀1
+  obtain ⟨hnorm', hdiv'⟩ :=
+    GlobalTheory.T.eisenstein_div_closedDisc_of_topBasis l K bk A s ι tb ρ' (hρ₀.trans hρρ') hρ'1
+  obtain ⟨hnorm₀, -⟩ :=
+    GlobalTheory.T.eisenstein_div_closedDisc_of_topBasis l K bk A s ι tb bk.ρ₀ le_rfl hρ₀1
   choose U' hU' using fun j => hdiv' R' hR' h (Z j) ⟨V j, hRZ j⟩
   have hq : (0 : ℝ) < (ρ' : ℝ) ^ (bk.Ep.natDegree * h) := by positivity
   have hnZ : ∀ j, ‖Z j‖ = (ρ' : ℝ) ^ (bk.Ep.natDegree * h) * ‖U' j‖ := fun j => by
@@ -105,7 +149,8 @@ theorem exists_discStep : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K
   · have he : ∀ j, ‖U' j‖ = ((ρ' : ℝ) ^ (bk.Ep.natDegree * h))⁻¹ * ‖Z j‖ := fun j => by
       rw [hnZ j, inv_mul_cancel_left₀ hq.ne']
     refine squeeze_zero_norm (fun j => (he j).le) ?_
-    simpa using (tendsto_zero_iff_norm_tendsto_zero.1 hZ).const_mul ((ρ' : ℝ) ^ (bk.Ep.natDegree * h))⁻¹
+    simpa using
+      (tendsto_zero_iff_norm_tendsto_zero.1 hZ).const_mul ((ρ' : ℝ) ^ (bk.Ep.natDegree * h))⁻¹
   · intro j
     have h1 : toDisc l (s X) bk.ρ₀ (s bk.E) ^ h * (R' (U' j) - V j) = 0 := by
       have h2 := hRZ j

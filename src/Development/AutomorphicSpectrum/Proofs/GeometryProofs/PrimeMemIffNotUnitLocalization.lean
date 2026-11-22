@@ -6,14 +6,18 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.LocalSubringUnits
 
-theorem mem_prime_iff_not_inv_mem :
-    ∀ {K : Type} [Field K] (T : Subring K) (P : Ideal T) (_ : P.IsPrime) (t : T),
-      t ∈ P ↔ ¬ ((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ (LocalSubring.ofPrime T P).toSubring) := by
+theorem mem_prime_iff_not_inv_mem
+    : ∀ {K : Type} [Field K] (T : Subring K) (P : Ideal T) (_ : P.IsPrime) (t : T),
+      t ∈ P ↔ ¬((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ (LocalSubring.ofPrime T P).toSubring) := by
   intro K _ T P hP t
   have key : IsUnit (algebraMap T (LocalSubring.ofPrime T P).toSubring t) ↔ t ∉ P :=
     IsLocalization.AtPrime.isUnit_to_map_iff (LocalSubring.ofPrime T P).toSubring P t
-  have hcoe : ((algebraMap T (LocalSubring.ofPrime T P).toSubring t :
-      (LocalSubring.ofPrime T P).toSubring) : K) = (t : K) := rfl
+  have hcoe
+      : ((algebraMap T (LocalSubring.ofPrime T P).toSubring t
+            : (LocalSubring.ofPrime T P).toSubring)
+          : K)
+        = (t : K) :=
+    rfl
   constructor
   · rintro ht ⟨h0, hinv⟩
     refine key.1 (IsUnit.of_mul_eq_one ⟨(t : K)⁻¹, hinv⟩ ?_) ht

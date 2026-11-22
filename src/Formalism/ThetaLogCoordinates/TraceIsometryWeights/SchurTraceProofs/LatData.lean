@@ -11,8 +11,8 @@ open Formalism.GM.M Formalism.GM.DimensionMonotonicity MvPolynomial Finset
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem mem_intPol_addSubgroup {σ : Type} (x : MvPolynomial σ ℚ_[p]) :
-    x ∈ (IntPol p σ).toAddSubgroup ↔ ∀ m, ‖x.coeff m‖ ≤ 1 := by
+theorem mem_intPol_addSubgroup {σ : Type} (x : MvPolynomial σ ℚ_[p])
+    : x ∈ (IntPol p σ).toAddSubgroup ↔ ∀ m, ‖x.coeff m‖ ≤ 1 := by
   rw [Submodule.mem_toAddSubgroup, intPol_iff_norm]
 
 theorem intPol_zpClosed (σ : Type) : ZpClosed p (IntPol p σ).toAddSubgroup := by
@@ -22,9 +22,11 @@ theorem intPol_zpClosed (σ : Type) : ZpClosed p (IntPol p σ).toAddSubgroup := 
   rw [coeff_smul, smul_eq_mul, norm_mul]
   exact (mul_le_of_le_one_left (norm_nonneg _) hc).trans (hx m)
 
-theorem intPol_whc {σ M : Type} [AddCommMonoid M] (w : σ → M) (μ : M) (x : MvPolynomial σ ℚ_[p])
-    (hx : x ∈ (IntPol p σ).toAddSubgroup) :
-    weightedHomogeneousComponent w μ x ∈ (IntPol p σ).toAddSubgroup := by
+theorem intPol_whc
+    {σ M : Type} [AddCommMonoid M]
+    (w : σ → M) (μ : M)
+    (x : MvPolynomial σ ℚ_[p]) (hx : x ∈ (IntPol p σ).toAddSubgroup)
+    : weightedHomogeneousComponent w μ x ∈ (IntPol p σ).toAddSubgroup := by
   classical
   rw [mem_intPol_addSubgroup] at hx ⊢
   intro m
@@ -33,19 +35,23 @@ theorem intPol_whc {σ M : Type} [AddCommMonoid M] (w : σ → M) (μ : M) (x : 
   · exact hx m
   · rw [norm_zero]; exact zero_le_one
 
-theorem polLatData_of (hB : LatBasisPol) {p : ℕ} [Fact p.Prime] {N r n : ℕ} (LL L2 : Letters N) (j : ℕ)
-    (e : Fin n ↪o Fin r) :
-    LatData p (GAe p LL j e) (Pol p r L2) (IntPol p (Fin N × Fin r)).toAddSubgroup L2.total := by
+theorem polLatData_of
+    (hB : LatBasisPol)
+    {p : ℕ} [Fact p.Prime]
+    {N r n : ℕ} (LL L2 : Letters N)
+    (j : ℕ) (e : Fin n ↪o Fin r)
+    : LatData p (GAe p LL j e) (Pol p r L2) (IntPol p (Fin N × Fin r)).toAddSubgroup L2.total := by
   let hfd := pol_fd (p := p) (r := r) L2
-  refine
-    { stable := GAe_pol_stable LL L2 j e
-      fd := hfd
-      finW := GAe_pol_finW LL L2 j e
-      bound := GAe_pol_bound LL L2 j e
-      closed := intPol_zpClosed _
-      div := ?_
-      graded := ?_
-      basis := ?_ }
+  refine {
+    stable := GAe_pol_stable LL L2 j e
+    fd := hfd
+    finW := GAe_pol_finW LL L2 j e
+    bound := GAe_pol_bound LL L2 j e
+    closed := intPol_zpClosed _
+    div := ?_
+    graded := ?_
+    basis := ?_
+  }
   · intro a b hab k x hx
     rw [Submodule.mem_toAddSubgroup] at hx
     rw [GAe_E, Submodule.mem_toAddSubgroup]

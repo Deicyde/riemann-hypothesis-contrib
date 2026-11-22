@@ -7,11 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LengthEqL
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
-private theorem cyclotomicCharacter_conj_ringEquiv {L M : Type} [Field L] [Field M] (p : ℕ) [Fact p.Prime]
-    (φ : L ≃+* M) (g : L ≃+* L) :
-    cyclotomicCharacter L p g = cyclotomicCharacter M p (φ.symm.trans (g.trans φ)) := by
+private theorem cyclotomicCharacter_conj_ringEquiv
+    {L M : Type} [Field L] [Field M] (p : ℕ) [Fact p.Prime] (φ : L ≃+* M) (g : L ≃+* L)
+    : cyclotomicCharacter L p g = cyclotomicCharacter M p (φ.symm.trans (g.trans φ)) := by
   by_cases H : ∀ i : ℕ, ∃ ζ : L, IsPrimitiveRoot ζ (p ^ i)
   · have hL (i : ℕ) : HasEnoughRootsOfUnity L (p ^ i) := ⟨H i, rootsOfUnity.isCyclic _ _⟩
     have hM (i : ℕ) : HasEnoughRootsOfUnity M (p ^ i) := by
@@ -25,8 +26,8 @@ private theorem cyclotomicCharacter_conj_ringEquiv {L M : Type} [Field L] [Field
     have hs : Units.map φ.symm.toMonoidHom t ∈ rootsOfUnity (p ^ n) L := by
       rw [mem_rootsOfUnity] at ht ⊢
       rw [← map_pow, ht, map_one]
-    have key := modularCyclotomicCharacter.spec L
-      (HasEnoughRootsOfUnity.natCard_rootsOfUnity L (p ^ n)) g hs
+    have key :=
+      modularCyclotomicCharacter.spec L (HasEnoughRootsOfUnity.natCard_rootsOfUnity L (p ^ n)) g hs
     simp only [Units.coe_map, Units.val_pow_eq_pow_val] at key
     change g (φ.symm (t : M)) = (φ.symm (t : M)) ^ _ at key
     rw [RingEquiv.trans_apply, RingEquiv.trans_apply, key, map_pow, RingEquiv.apply_symm_apply]
@@ -39,12 +40,18 @@ private theorem cyclotomicCharacter_conj_ringEquiv {L M : Type} [Field L] [Field
     ext1
     simp [cyclotomicCharacter, cyclotomicCharacter.toFun, H, H']
 
-theorem UpperTheory.V.LDataCardLeFinrank.ranges :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (D : LData F Ω l), (cycZ F Ω l).range = KStar.TotallyRealRoots.galImage l F ∧ D.chi.range = KStar.TotallyRealRoots.galImage l F ∧ ∀ v : D.S, (D.chi.comp (locFam D.S D.A v)).range = decImage F l (D.A v) := by
+theorem UpperTheory.V.LDataCardLeFinrank.ranges
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (D : LData F Ω l),
+      (cycZ F Ω l).range = KStar.TotallyRealRoots.galImage l F
+        ∧ D.chi.range = KStar.TotallyRealRoots.galImage l F
+        ∧ ∀ v : D.S, (D.chi.comp (locFam D.S D.A v)).range = decImage F l (D.A v) := by
   intro F Ω _ _ _ _ _ l _ D
   have hcyc : (cycZ F Ω l).range = KStar.TotallyRealRoots.galImage l F := by
     let e : Ω ≃ₐ[F] AlgebraicClosure F := IsAlgClosure.equiv F Ω (AlgebraicClosure F)
-    have hpt : ∀ σ : Gal(Ω/F), cycZ F Ω l σ = KStar.TotallyRealRoots.eps l F (AlgEquiv.autCongr e σ) := by
+    have hpt
+        : ∀ σ : Gal(Ω/F),
+          cycZ F Ω l σ = KStar.TotallyRealRoots.eps l F (AlgEquiv.autCongr e σ) := by
       intro σ
       simp only [cycZ, KStar.TotallyRealRoots.eps, MonoidHom.comp_apply]
       exact cyclotomicCharacter_conj_ringEquiv l e.toRingEquiv _

@@ -11,9 +11,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LinearUnifor
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc Formalism.L2.Pj
 open GlobalTheory
@@ -23,8 +27,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.UPoinc.TraitUniq
 
-theorem pow_eq_of_associated {W : Type} [CommRing W] [IsDomain W] {w : W} (hw : Irreducible w) {a b : ℕ}
-    (h : Associated (w ^ a) (w ^ b)) : a = b := by
+theorem pow_eq_of_associated
+    {W : Type} [CommRing W] [IsDomain W]
+    {w : W} (hw : Irreducible w)
+    {a b : ℕ} (h : Associated (w ^ a) (w ^ b))
+    : a = b := by
   have key : ∀ {a b : ℕ}, Associated (w ^ a) (w ^ b) → a ≤ b → a = b := by
     intro a b h hab
     by_contra hne
@@ -39,9 +46,11 @@ theorem pow_eq_of_associated {W : Type} [CommRing W] [IsDomain W] {w : W} (hw : 
   · exact key h hab
   · exact (key h.symm hab).symm
 
-theorem sq_associated {V W : Type} [CommRing V] [CommRing W] [IsDomain W] (f : V →+* W) (ϖ : V) (w : W) (m n : ℕ)
-    (hm : Associated (f ϖ) (w ^ m)) (v : Wˣ) (u : Vˣ) :
-    Associated ((v * f (u * ϖ ^ n)) ^ 2) (w ^ (2 * (m * n))) := by
+theorem sq_associated
+    {V W : Type} [CommRing V] [CommRing W] [IsDomain W]
+    (f : V →+* W) (ϖ : V) (w : W) (m n : ℕ) (hm : Associated (f ϖ) (w ^ m))
+    (v : Wˣ) (u : Vˣ)
+    : Associated ((v * f (u * ϖ ^ n)) ^ 2) (w ^ (2 * (m * n))) := by
   have hu : IsUnit (f (u : V)) := (Units.isUnit u).map f
   have e : (v * f (u * ϖ ^ n)) ^ 2 = (((v : W) * f u) ^ 2) * (f ϖ ^ n) ^ 2 := by
     rw [map_mul, map_pow]; ring
@@ -53,14 +62,21 @@ theorem sq_associated {V W : Type} [CommRing V] [CommRing W] [IsDomain W] (f : V
 
 end GlobalTheory.UPoinc.TraitUniq
 
-
 open GlobalTheory.UPoinc.TraitUniq in
 theorem GlobalTheory.UPoinc.uTraitUniqSt_holds : UTraitUniqSt := by
-  intro E _ _ _ H Dw l Xo c T T' W _ _ _ f f' fK fK' hB hW hf hf' hfl hfl' hK hK' hy w m m' hw hm hm'
-  obtain ⟨tW, ⟨φ⟩, ⟨φ'⟩⟩ := GlobalTheory.T.exists_common_semiAbelian_pullback_two_unitary_traits E H Dw l Xo c T T' W f f' fK fK' hB hW hf hf' hfl hfl' hK hK' hy
-  obtain ⟨PW, e1, he1⟩ := GlobalTheory.T.exists_linear_uniformisation_base_change_complete_dvr E H T.V T.cdvr T.t T.P W hB hW f hf hfl tW ⟨φ⟩
-  obtain ⟨PW', e1', he1'⟩ := GlobalTheory.T.exists_linear_uniformisation_base_change_complete_dvr E H T'.V T'.cdvr T'.t T'.P W hB hW f' hf' hfl' tW ⟨φ'⟩
-  obtain ⟨e2, he2⟩ := GlobalTheory.T.linear_uniformisations_character_iso_associated_coords E H W hB tW PW PW'
+  intro E _ _ _ H Dw l Xo c T T' W _ _ _ f f' fK fK' hB hW hf hf' hfl hfl' hK hK' hy w m m' hw hm
+    hm'
+  obtain ⟨tW, ⟨φ⟩, ⟨φ'⟩⟩ :=
+    GlobalTheory.T.exists_common_semiAbelian_pullback_two_unitary_traits E H Dw l Xo c T T' W f f'
+      fK fK' hB hW hf hf' hfl hfl' hK hK' hy
+  obtain ⟨PW, e1, he1⟩ :=
+    GlobalTheory.T.exists_linear_uniformisation_base_change_complete_dvr E H T.V T.cdvr T.t T.P W hB
+      hW f hf hfl tW ⟨φ⟩
+  obtain ⟨PW', e1', he1'⟩ :=
+    GlobalTheory.T.exists_linear_uniformisation_base_change_complete_dvr E H T'.V T'.cdvr T'.t T'.P
+      W hB hW f' hf' hfl' tW ⟨φ'⟩
+  obtain ⟨e2, he2⟩ :=
+    GlobalTheory.T.linear_uniformisations_character_iso_associated_coords E H W hB tW PW PW'
   let e : T.P.D.toPre.X ≃ₗ[𝓞 E] T'.P.D.toPre.X := e1.symm.trans (e2.trans e1')
 
   have diag : ∀ y, (m : ℤ) * T.be y y = m' * T'.be (e y) (e y) := by

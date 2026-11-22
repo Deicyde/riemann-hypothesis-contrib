@@ -15,21 +15,31 @@ namespace GlobalTheory.CompanionTheory.BZSeg
 
 section Quot
 
-variable {G V W Y : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] [AddCommGroup Y]
-  [Module ℂ Y]
+variable
+  {G V W Y : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+  [AddCommGroup Y] [Module ℂ Y]
 
 end Quot
 
 section Main
 
-variable {k : Type} [Field k] [TopologicalSpace k] {N : ℕ} {V W : Type} [AddCommGroup V] [Module ℂ V]
-  [AddCommGroup W] [Module ℂ W]
+variable
+  {k : Type} [Field k] [TopologicalSpace k]
+  {N : ℕ} {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
 
-theorem isGeneric_of_surjective {τ : Representation ℂ (GL (Fin N) k) W} {π : Representation ℂ (GL (Fin N) k) V}
-    (q : τ.IntertwiningMap π) (hq : Function.Surjective q) (h : IsGeneric π) : IsGeneric τ := by
+theorem isGeneric_of_surjective
+    {τ : Representation ℂ (GL (Fin N) k) W} {π : Representation ℂ (GL (Fin N) k) V}
+    (q : τ.IntertwiningMap π) (hq : Function.Surjective q) (h : IsGeneric π)
+    : IsGeneric τ := by
   obtain ⟨ψ, h1, h2, h3⟩ := h
-  refine ⟨ψ, h1, h2, nontrivial_twJacquet_of_surjective q.toLinearMap hq
-    (fun u v => Submodule.subset_span ⟨u, q v, ?_⟩) h3⟩
+  refine ⟨
+    ψ,
+    h1,
+    h2,
+    nontrivial_twJacquet_of_surjective q.toLinearMap hq
+      (fun u v => Submodule.subset_span ⟨u, q v, ?_⟩)
+      h3
+  ⟩
   rw [map_sub, map_smul]
   exact congrArg (· - _) (q.isIntertwining _ _ _ v)
 

@@ -51,21 +51,27 @@ private lemma Hpk_eI_apply_eq_ite_esI (a : Fin r) (m : Fin (2 * r + k + 1)) :
   simp only [Hpk, eI, esI, Fin.ext_iff, Fin.val_mk]
   split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem fix_gen (d : Fin (2 * r + k + 1) → ℂ) (d0 : ℂ) (hmid : ∀ i : Fin (2 * r + k + 1), r ≤ i.val → i.val ≤ r + k → d i = d0)
+theorem fix_gen
+    (d : Fin (2 * r + k + 1) → ℂ) (d0 : ℂ)
+    (hmid : ∀ i : Fin (2 * r + k + 1), r ≤ i.val → i.val ≤ r + k → d i = d0)
     {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hU : h ∈ UH (Hpk k r))
-    (hfix : ∀ a : Fin r, h *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ h *ᵥ bvec (esI k r a) = bvec (esI k r a))
-    (i j : Fin (2 * r + k + 1)) (hne : h i j ≠ 0) : d i = d j := by
+    (hfix : ∀ a : Fin r,
+      h *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ h *ᵥ bvec (esI k r a) = bvec (esI k r a))
+    (i j : Fin (2 * r + k + 1)) (hne : h i j ≠ 0)
+    : d i = d j := by
   have hUe : hᴴ * Hpk k r * h = Hpk k r := hU
-  have colE : ∀ a : Fin r, ∀ l, h l (eI k r a) = if l = eI k r a then 1 else 0 :=
-    fun a => apply_eq_ite_of_mulVec_bvec_eq' h _ (hfix a).1
-  have colS : ∀ a : Fin r, ∀ l, h l (esI k r a) = if l = esI k r a then 1 else 0 :=
-    fun a => apply_eq_ite_of_mulVec_bvec_eq' h _ (hfix a).2
-  have rowE : ∀ a : Fin r, ∀ q, h (eI k r a) q = if eI k r a = q then 1 else 0 :=
-    fun a => Hpk_apply_sig_ne_zero hUe (colS a) (Hpk_esI_apply_eq_ite_eI a)
-  have rowS : ∀ a : Fin r, ∀ q, h (esI k r a) q = if esI k r a = q then 1 else 0 :=
-    fun a => Hpk_apply_sig_ne_zero hUe (colE a) (Hpk_eI_apply_eq_ite_esI a)
-  have out : ∀ p : Fin (2 * r + k + 1), (p.val < r ∨ r + k < p.val) →
-      (∀ q, h p q = if p = q then 1 else 0) ∧ (∀ l, h l p = if l = p then 1 else 0) := by
+  have colE : ∀ a : Fin r, ∀ l, h l (eI k r a) = if l = eI k r a then 1 else 0 := fun a =>
+    apply_eq_ite_of_mulVec_bvec_eq' h _ (hfix a).1
+  have colS : ∀ a : Fin r, ∀ l, h l (esI k r a) = if l = esI k r a then 1 else 0 := fun a =>
+    apply_eq_ite_of_mulVec_bvec_eq' h _ (hfix a).2
+  have rowE : ∀ a : Fin r, ∀ q, h (eI k r a) q = if eI k r a = q then 1 else 0 := fun a =>
+    Hpk_apply_sig_ne_zero hUe (colS a) (Hpk_esI_apply_eq_ite_eI a)
+  have rowS : ∀ a : Fin r, ∀ q, h (esI k r a) q = if esI k r a = q then 1 else 0 := fun a =>
+    Hpk_apply_sig_ne_zero hUe (colE a) (Hpk_eI_apply_eq_ite_esI a)
+  have out
+      : ∀ p : Fin (2 * r + k + 1),
+        (p.val < r ∨ r + k < p.val)
+          → (∀ q, h p q = if p = q then 1 else 0) ∧ (∀ l, h l p = if l = p then 1 else 0) := by
     intro p hp
     rcases hp with hp | hp
     · have e : eI k r ⟨p.val, hp⟩ = p := Fin.ext rfl

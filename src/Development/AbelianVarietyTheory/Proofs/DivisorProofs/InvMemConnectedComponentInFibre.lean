@@ -4,14 +4,18 @@ public import Mathlib
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-theorem inv_mem_connectedComponentIn_fibre (S : Scheme.{0}) (G : Over S) [GrpObj G] (y : G.left)
-    (hy : y ∈ {x : G.left | x ∈ connectedComponentIn (G.hom ⁻¹' {G.hom x}) ((η[G]).left (G.hom x))}) :
-    (ι[G]).left y ∈ {x : G.left | x ∈ connectedComponentIn (G.hom ⁻¹' {G.hom x}) ((η[G]).left (G.hom x))} := by
+theorem inv_mem_connectedComponentIn_fibre
+    (S : Scheme.{0}) (G : Over S) [GrpObj G]
+    (y : G.left)
+    (hy : y ∈ {x : G.left | x ∈ connectedComponentIn (G.hom ⁻¹' {G.hom x}) ((η[G]).left (G.hom x))})
+    : (ι[G]).left y
+      ∈ {x : G.left | x ∈ connectedComponentIn (G.hom ⁻¹' {G.hom x}) ((η[G]).left (G.hom x))} := by
   simp only [Set.mem_setOf_eq] at hy ⊢
   have hw : ∀ z : G.left, G.hom ((ι[G]).left z) = G.hom z := by
     intro z
@@ -26,7 +30,8 @@ theorem inv_mem_connectedComponentIn_fibre (S : Scheme.{0}) (G : Over S) [GrpObj
   set e := (η[G]).left (G.hom y)
   have heF : e ∈ F := (connectedComponentIn_nonempty_iff.mp ⟨y, hy⟩)
   have hsub : (ι[G]).left '' connectedComponentIn F e ⊆ connectedComponentIn F e := by
-    refine (isPreconnected_connectedComponentIn.image _ (ι[G]).left.continuous.continuousOn).subset_connectedComponentIn
+    refine (isPreconnected_connectedComponentIn.image _
+        (ι[G]).left.continuous.continuousOn).subset_connectedComponentIn
       ⟨e, mem_connectedComponentIn heF, hη _⟩ ?_
     rintro _ ⟨z, hz, rfl⟩
     have hzF : z ∈ F := connectedComponentIn_subset _ _ hz

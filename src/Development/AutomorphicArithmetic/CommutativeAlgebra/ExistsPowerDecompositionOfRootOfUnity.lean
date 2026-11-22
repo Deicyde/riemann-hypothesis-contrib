@@ -119,14 +119,22 @@ private lemma decomp (T : TC A D) (X : Finset D) (hXB : ∀ x ∈ X, x ∈ T.B)
 end UpperTheory.LineDecomposition
 
 open UpperTheory.LineDecomposition in
-theorem UpperTheory.exists_power_decomposition_of_root_of_unity :
-    ∀ (A D : Type) [CommRing A] [CommRing D] [Algebra A D] (T : TC A D), T.Fin → ∀ (q : ℕ), IsUnit (q : A) → 0 < q → ∀ ω : D, ω ^ q = 1 → ∃ m₀ : ℕ, ∀ m ≥ m₀, ω * T.t ^ m ∈ T.S (2 * m) ∧
-      ∀ σ ∈ T.S (2 * q * m), ∃ a ∈ T.S (q * m), ∃ b ∈ T.S (q * m), ∃ c ∈ T.S (2 * m), σ = a + T.t ^ (q * m) * b - (q : D) * (ω * T.t ^ m) ^ (q - 1) * c := by
+theorem UpperTheory.exists_power_decomposition_of_root_of_unity
+    : ∀ (A D : Type) [CommRing A] [CommRing D] [Algebra A D] (T : TC A D),
+      T.Fin
+        → ∀ (q : ℕ),
+          IsUnit (q : A) → 0 < q
+            → ∀ ω : D,
+              ω ^ q = 1
+                → ∃ m₀ : ℕ, ∀ m ≥ m₀,
+                  ω * T.t ^ m ∈ T.S (2 * m)
+                    ∧ ∀ σ ∈ T.S (2 * q * m), ∃ a ∈ T.S (q * m), ∃ b ∈ T.S (q * m),
+                      ∃ c ∈ T.S (2 * m),
+                        σ = a + T.t ^ (q * m) * b - (q : D) * (ω * T.t ^ m) ^ (q - 1) * c := by
   classical
   intro A D _ _ _ T hF q hq hq0 ω hω
   obtain ⟨X, hXB, hX⟩ := hF
-  have hηω : ω ^ (q - 1) * ω = 1 := by
-    rw [← pow_succ, Nat.sub_add_cancel hq0, hω]
+  have hηω : ω ^ (q - 1) * ω = 1 := by rw [← pow_succ, Nat.sub_add_cancel hq0, hω]
   obtain ⟨k₁, hk₁⟩ := evB T ω
   obtain ⟨k₂, hk₂⟩ := evC T ω
   obtain ⟨k₃, hk₃⟩ := evCfin T (X.image (fun x => ω * x))
@@ -162,8 +170,7 @@ theorem UpperTheory.exists_power_decomposition_of_root_of_unity :
     exact hC
   refine ⟨hu, fun σ hσ => ?_⟩
   rw [memS] at hσ
-  obtain ⟨b₁, hb₁, c₁, hc₁, p₁, hy, hp1, hp2⟩ :=
-    decomp T X hXB hX hηω hB h3 h4 (T.s ^ (q * m) * σ)
+  obtain ⟨b₁, hb₁, c₁, hc₁, p₁, hy, hp1, hp2⟩ := decomp T X hXB hX hηω hB h3 h4 (T.s ^ (q * m) * σ)
   have hqm := tsPow T (q * m)
   have hupow : (ω * T.t ^ m) ^ q = T.t ^ (q * m) := by
     rw [mul_pow, hω, one_mul, ← pow_mul, Nat.mul_comm]
@@ -176,22 +183,24 @@ theorem UpperTheory.exists_power_decomposition_of_root_of_unity :
   have ha : T.t ^ (q * m) * c₁ ∈ T.S (q * m) := by
     rw [memS]
     constructor
-    · have ea : T.t ^ (q * m) * c₁ =
-          σ - T.t ^ (q * m) * b₁ - (ω * T.t ^ m) ^ (q - 1) * (ω * T.t ^ m * p₁) := by
+    · have ea
+          : T.t ^ (q * m) * c₁
+            = σ - T.t ^ (q * m) * b₁ - (ω * T.t ^ m) ^ (q - 1) * (ω * T.t ^ m * p₁) := by
         rw [hup]
         linear_combination (-T.t ^ (q * m)) * hy + σ * hqm
       rw [ea]
       exact T.B.sub_mem (T.B.sub_mem hσ.1 (T.B.mul_mem (T.B.pow_mem T.tB _) hb₁))
         (T.B.mul_mem (T.B.pow_mem hB _) hp1)
-    · have ec : T.s ^ (q * m) * (T.t ^ (q * m) * c₁) = c₁ := by
-        linear_combination c₁ * hqm
+    · have ec : T.s ^ (q * m) * (T.t ^ (q * m) * c₁) = c₁ := by linear_combination c₁ * hqm
       rw [ec]
       exact hc₁
   have hb : b₁ ∈ T.S (q * m) := by
     rw [memS]
     refine ⟨hb₁, ?_⟩
-    have eb : T.s ^ (q * m) * b₁ =
-        T.s ^ (2 * q * m) * σ - T.s ^ (q * m) * c₁ - (ω * T.s ^ m) ^ (q - 1) * (ω * T.s ^ m * p₁) := by
+    have eb
+        : T.s ^ (q * m) * b₁
+          = T.s ^ (2 * q * m) * σ - T.s ^ (q * m) * c₁
+            - (ω * T.s ^ m) ^ (q - 1) * (ω * T.s ^ m * p₁) := by
       rw [hsp, show 2 * q * m = q * m + q * m by ring, pow_add]
       linear_combination (-T.s ^ (q * m)) * hy
     rw [eb]
@@ -205,8 +214,15 @@ theorem UpperTheory.exists_power_decomposition_of_root_of_unity :
       linear_combination (ω * T.s ^ m * p₁) * hts
     rw [e]
     exact hp2
-  refine ⟨T.t ^ (q * m) * c₁, ha, b₁, hb, -(r • (ω * T.t ^ m * p₁)),
-    Submodule.neg_mem _ (Submodule.smul_mem _ r hpS), ?_⟩
+  refine ⟨
+    T.t ^ (q * m) * c₁,
+    ha,
+    b₁,
+    hb,
+    -(r • (ω * T.t ^ m * p₁)),
+    Submodule.neg_mem _ (Submodule.smul_mem _ r hpS),
+    ?_
+  ⟩
   have hrq : algebraMap A D r * (q : D) = 1 := by
     rw [← map_natCast (algebraMap A D), ← map_mul, hr, map_one]
   rw [Algebra.smul_def]

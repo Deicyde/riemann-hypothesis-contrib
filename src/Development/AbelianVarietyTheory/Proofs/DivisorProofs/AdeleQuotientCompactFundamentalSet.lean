@@ -10,12 +10,21 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdeli
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.UnipMass
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.UnipMass
 namespace GlobalTheory.AdeleCocompactExt
 
-theorem exists_compact_adeleE : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E],
-    ∃ K : Set (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)), IsCompact K ∧ ∀ a : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E), ∃ e : E, a - inclR (F := F) (AF F) e ∈ K := by
+theorem exists_compact_adeleE
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E],
+      ∃ K : Set (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
+          (E := E)),
+        IsCompact K
+          ∧ ∀ a : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
+              (E := E),
+            ∃ e : E,
+              a - inclR (F := F) (AF F) e ∈ K := by
   intro F E _ _ _ _ _
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   obtain ⟨K₀, hK₀, hK⟩ := GlobalTheory.AdeleCocompact.exists_compact_adele F
@@ -25,8 +34,11 @@ theorem exists_compact_adeleE : ∀ (F E : Type) [Field F] [NumberField F] [Fiel
   let B := Algebra.TensorProduct.basis (AF F) b
   have hφ : Continuous B.equivFun.symm :=
     IsModuleTopology.continuous_of_linearMap B.equivFun.symm.toLinearMap
-  refine ⟨B.equivFun.symm '' Set.pi Set.univ (fun _ => K₀),
-    (isCompact_univ_pi fun _ => hK₀).image hφ, ?_⟩
+  refine ⟨
+    B.equivFun.symm '' Set.pi Set.univ (fun _ => K₀),
+    (isCompact_univ_pi fun _ => hK₀).image hφ,
+    ?_
+  ⟩
   intro a
   choose x hx using fun k => hK (B.equivFun a k)
   refine ⟨∑ k, x k • b k, fun k => B.equivFun a k - algebraMap F (AF F) (x k), fun k _ => hx k, ?_⟩

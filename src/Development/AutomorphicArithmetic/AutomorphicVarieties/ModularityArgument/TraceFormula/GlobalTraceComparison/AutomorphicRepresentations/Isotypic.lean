@@ -13,7 +13,8 @@ noncomputable section
 open NumberField IsDedekindDomain Matrix
 open GlobalTheory.PRep Formalism.UG GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8 (K2)
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
+  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
 open scoped Classical
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
@@ -22,20 +23,24 @@ section Generic
 
 variable {G H : Type} [Group G] [Group H] [Subsingleton H]
 
-private theorem hint_prod (K : Subgroup G) (K₂ : Subgroup H) (u : G × H → ℂ)
-    (hu : ∀ k ∈ K.prod K₂, ∀ x, u (x * k) = u x) : hint (K.prod K₂) u = hint K fun g => u (g, 1) := by
+private theorem hint_prod
+    (K : Subgroup G) (K₂ : Subgroup H) (u : G × H → ℂ) (hu : ∀ k ∈ K.prod K₂, ∀ x, u (x * k) = u x)
+    : hint (K.prod K₂) u = hint K fun g => u (g, 1) := by
   have hv : ∀ k ∈ K, ∀ x, (fun g => u (g, 1)) (x * k) = (fun g => u (g, 1)) x := by
     intro k hk x
     have := hu (k, 1) (Subgroup.mem_prod.2 ⟨hk, K₂.one_mem⟩) (x, 1)
     simpa using this
-  rw [UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.hintSph (G × H) (K.prod K₂) u hu, UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.hintSph G K _ hv]
+  rw [UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.hintSph (G × H) (K.prod K₂) u hu,
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.hintSph G K _ hv]
   have hout : ∀ y : G × H, u ((y : (G × H) ⧸ K.prod K₂).out) = u y := by
     intro y
     obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul (K.prod K₂) y
     rw [hh]
     exact hu h h.2 y
   symm
-  refine finsum_eq_of_bijective (fun q : G ⧸ K => (((q.out, 1) : G × H) : (G × H) ⧸ K.prod K₂)) ⟨?_, ?_⟩ ?_
+  refine finsum_eq_of_bijective
+    (fun q : G ⧸ K => (((q.out, 1) : G × H) : (G × H) ⧸ K.prod K₂))
+    ⟨?_, ?_⟩ ?_
   · intro p q h
     have h' := QuotientGroup.eq.1 h
     have h1 : p.out⁻¹ * q.out ∈ K := by simpa using (Subgroup.mem_prod.1 h').1
@@ -63,15 +68,17 @@ private theorem tj_zero (w : Pl E) (j : ℕ) (y : GLw 0 w) : Tj ℂ 0 (Ov E w) (
 
 private def toFirst (n : ℕ) (p : Fin (n + 1) × Fin (0 + 1)) : Ex (Fin (n + 1)) := .gen p.1
 
-private theorem fn2_zero_apply_one_eq_fn1_bind (w : Pl E) (e : Ex (Fin (n + 1) × Fin (0 + 1))) (g : GLw n w) :
-    fn2 n 0 w e (g, 1) = fn1 n w (e.bind (toFirst n)) g := by
+private theorem fn2_zero_apply_one_eq_fn1_bind
+    (w : Pl E) (e : Ex (Fin (n + 1) × Fin (0 + 1))) (g : GLw n w)
+    : fn2 n 0 w e (g, 1) = fn1 n w (e.bind (toFirst n)) g := by
   induction e generalizing g with
   | one =>
     show (K2 n 0 w : Set (GLw n w × GLw 0 w)).indicator (1 : GLw n w × GLw 0 w → ℂ) (g, 1) =
       (KGL w (n := n) : Set (GLw n w)).indicator (1 : GLw n w → ℂ) g
     by_cases h : g ∈ KGL w (n := n)
     · rw [Set.indicator_of_mem (show (g, (1 : GLw 0 w)) ∈ (K2 n 0 w : Set _) from
-        Subgroup.mem_prod.2 ⟨h, Subgroup.one_mem _⟩), Set.indicator_of_mem (show g ∈ (KGL w (n := n) : Set _) from h)]
+          Subgroup.mem_prod.2 ⟨h, Subgroup.one_mem _⟩),
+        Set.indicator_of_mem (show g ∈ (KGL w (n := n) : Set _) from h)]
       rfl
     · rw [Set.indicator_of_notMem (fun h' => h (Subgroup.mem_prod.1 h').1),
         Set.indicator_of_notMem (show g ∉ (KGL w (n := n) : Set _) from h)]
@@ -98,8 +105,8 @@ private theorem fn2_zero_apply_one_eq_fn1_bind (w : Pl E) (e : Ex (Fin (n + 1) �
     · show fn2 n 0 w a (z * c) * fn2 n 0 w b ((z * c)⁻¹ * (g, 1)) = fn2 n 0 w a z * fn2 n 0 w b (z⁻¹ * (g, 1))
       rw [(hA.2 c hc z).2, _root_.mul_inv_rev, mul_assoc, (hB.2 c⁻¹ ((K2 n 0 w).inv_mem hc) _).1]
 
-private theorem ev_bind (w : Pl E) (B : Multiset ℂˣ) (e : Ex (Fin (n + 1) × Fin (0 + 1))) :
-    ev2 n 0 w e B 0 = ev1 n w (e.bind (toFirst n)) B := by
+private theorem ev_bind (w : Pl E) (B : Multiset ℂˣ) (e : Ex (Fin (n + 1) × Fin (0 + 1)))
+    : ev2 n 0 w e B 0 = ev1 n w (e.bind (toFirst n)) B := by
   have h0 : ∀ p : Fin (n + 1) × Fin (0 + 1), satEig (qV E w) 0 0 p.2 = 1 := by
     intro p
     have h : ((p.2 : Fin (0 + 1)) : ℕ) = 0 := by
@@ -124,10 +131,11 @@ private theorem ev_bind (w : Pl E) (B : Multiset ℂˣ) (e : Ex (Fin (n + 1) × 
 
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.ex2Act_pf :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ExAct → Ex2Act := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.ex2Act_pf
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.ExAct → Ex2Act := by
   intro hEx E _ _ _ n w e
-  have hf : (fun g => fn2 n 0 w e (g, 1)) = fn1 n w (e.bind (toFirst n)) := funext fun g => fn2_zero_apply_one_eq_fn1_bind w e g
+  have hf : (fun g => fn2 n 0 w e (g, 1)) = fn1 n w (e.bind (toFirst n)) :=
+    funext fun g => fn2_zero_apply_one_eq_fn1_bind w e g
   obtain ⟨h1, h2⟩ := hEx E n w (e.bind (toFirst n))
   rw [hf]
   refine ⟨h1, fun V _ _ ρ x B hx => ?_⟩

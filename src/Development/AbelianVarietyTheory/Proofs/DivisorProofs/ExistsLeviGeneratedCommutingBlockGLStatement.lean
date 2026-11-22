@@ -7,22 +7,23 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsCu
 
 @[expose] public section
 
-open Formalism.L2.DIV GlobalTheory.FinGL GlobalTheory.Parabolic GlobalTheory.IndefiniteRowSideFullHecke.BlockProductIsomorphism
+open Formalism.L2.DIV GlobalTheory.FinGL GlobalTheory.Parabolic
+  GlobalTheory.IndefiniteRowSideFullHecke.BlockProductIsomorphism
 open Matrix in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_levi_generated_commuting_blockGL :
-    ∀ (F : Type) [Field F] (r : ℕ) (b : Fin r → ℕ) (d : Set.range b → ℕ)
-      (h : ∀ c : Set.range b, (block b c).card = d c),
+theorem _root_.GlobalTheory.T.exists_levi_generated_commuting_blockGL
+    : ∀ (F : Type) [Field F] (r : ℕ) (b : Fin r → ℕ) (d : Set.range b → ℕ)
+        (h : ∀ c : Set.range b, (block b c).card = d c),
       ∃ f : ∀ c : Set.range b, GL (Fin (d c)) F →* levi (k := F) b,
         (∀ (c : Set.range b) (g : GL (Fin (d c)) F),
-          (f c g : GL (Fin r) F) = (blockHom F b c (h c) g : GL (Fin r) F)) ∧
-        (⨆ c, (f c).range) = ⊤ ∧
-        ∀ c c' : Set.range b, c ≠ c' → ∀ (x : GL (Fin (d c)) F) (y : GL (Fin (d c')) F),
-          Commute (f c x) (f c' y) := by
+            (f c g : GL (Fin r) F) = (blockHom F b c (h c) g : GL (Fin r) F))
+          ∧ (⨆ c, (f c).range) = ⊤
+          ∧ ∀ c c' : Set.range b,
+            c ≠ c'
+              → ∀ (x : GL (Fin (d c)) F) (y : GL (Fin (d c')) F), Commute (f c x) (f c' y) := by
   classical
   intro F _ r b d h
-  have mem_enum (c : Set.range b) (i : Fin r) :
-      i ∈ Set.range (blockEnum b c (h c)) ↔ b i = c := by
+  have mem_enum (c : Set.range b) (i : Fin r) : i ∈ Set.range (blockEnum b c (h c)) ↔ b i = c := by
     have hrange : Set.range (blockEnum b c (h c)) = (block b c : Set (Fin r)) :=
       Finset.range_orderEmbOfFin _ (h c)
     rw [hrange]
@@ -37,18 +38,19 @@ theorem _root_.GlobalTheory.T.exists_levi_generated_commuting_blockGL :
   let res (c : Set.range b) : levi (k := F) b →* GL (Fin (d c)) F :=
     leviBlock b (blockEnum b c (h c)) (blockEnum b c (h c)).injective fun i j hij => by
       rw [mem_enum, ← hij, blockEnum_mem b c (h c)]
-  have f_apply (c : Set.range b) (g : GL (Fin (d c)) F) :
-      ((f c g : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) =
-        extendMat (blockEnum b c (h c)) (g : Matrix (Fin (d c)) (Fin (d c)) F) := rfl
-  have res_apply (c : Set.range b) (m : levi (k := F) b) (a a' : Fin (d c)) :
-      (res c m : Matrix (Fin (d c)) (Fin (d c)) F) a a' =
-        ((m : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) (blockEnum b c (h c) a)
-          (blockEnum b c (h c) a') := rfl
+  have f_apply (c : Set.range b) (g : GL (Fin (d c)) F)
+      : ((f c g : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
+        = extendMat (blockEnum b c (h c)) (g : Matrix (Fin (d c)) (Fin (d c)) F) :=
+    rfl
+  have res_apply (c : Set.range b) (m : levi (k := F) b) (a a' : Fin (d c))
+      : (res c m : Matrix (Fin (d c)) (Fin (d c)) F) a a'
+        = ((m : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) (blockEnum b c (h c) a)
+          (blockEnum b c (h c) a') :=
+    rfl
   have res_f (c : Set.range b) (g : GL (Fin (d c)) F) : res c (f c g) = g := by
     refine Units.ext (Matrix.ext fun a a' => ?_)
     rw [res_apply, f_apply, extendMat_in]
-  have res_f_ne (c c' : Set.range b) (hc : c' ≠ c) (g : GL (Fin (d c)) F) :
-      res c' (f c g) = 1 := by
+  have res_f_ne (c c' : Set.range b) (hc : c' ≠ c) (g : GL (Fin (d c)) F) : res c' (f c g) = 1 := by
     refine Units.ext (Matrix.ext fun a a' => ?_)
     rw [res_apply, f_apply, extendMat_out]
     · simp [Matrix.one_apply]
@@ -56,8 +58,9 @@ theorem _root_.GlobalTheory.T.exists_levi_generated_commuting_blockGL :
       rw [mem_enum, blockEnum_mem b c' (h c')]
       exact fun e => hc (Subtype.ext e)
   refine ⟨f, fun _ _ => rfl, ?_, ?_⟩
-  · have generated : ∀ s : Finset (Set.range b), ∀ m : levi (k := F) b,
-        (∀ c : Set.range b, c ∉ s → res c m = 1) → m ∈ ⨆ c : Set.range b, (f c).range := by
+  · have generated
+        : ∀ s : Finset (Set.range b), ∀ m : levi (k := F) b,
+          (∀ c : Set.range b, c ∉ s → res c m = 1) → m ∈ ⨆ c : Set.range b, (f c).range := by
       intro s
       induction s using Finset.induction_on with
       | empty =>
@@ -71,8 +74,7 @@ theorem _root_.GlobalTheory.T.exists_levi_generated_commuting_blockGL :
             have hentry := res_apply c m a a'
             rw [hm c (Finset.notMem_empty _), ha, ha'] at hentry
             rw [← hentry]
-            have heq : i = j ↔ a = a' := by
-              rw [← (blockEnum b c (h c)).injective.eq_iff, ha, ha']
+            have heq : i = j ↔ a = a' := by rw [← (blockEnum b c (h c)).injective.eq_iff, ha, ha']
             simp [Matrix.one_apply, heq]
           · rw [m.2 i j hij]
             simp [Matrix.one_apply_ne (fun e => hij (congrArg b e))]
@@ -94,17 +96,17 @@ theorem _root_.GlobalTheory.T.exists_levi_generated_commuting_blockGL :
     exact eq_top_iff.2 fun m _ => generated Finset.univ m fun c hc => absurd (Finset.mem_univ c) hc
   · intro c c' hc x y
     refine Subtype.ext (Units.ext ?_)
-    change ((f c x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) *
-        ((f c' y : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) =
-      ((f c' y : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) *
-        ((f c x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
+    change ((f c x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
+        * ((f c' y : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
+      = ((f c' y : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
+        * ((f c x : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
     rw [f_apply, f_apply]
     let e := blockEnum b c (h c)
     let e' := blockEnum b c' (h c')
-    change extendMat e (x : Matrix (Fin (d c)) (Fin (d c)) F) *
-        extendMat e' (y : Matrix (Fin (d c')) (Fin (d c')) F) =
-      extendMat e' (y : Matrix (Fin (d c')) (Fin (d c')) F) *
-        extendMat e (x : Matrix (Fin (d c)) (Fin (d c)) F)
+    change extendMat e (x : Matrix (Fin (d c)) (Fin (d c)) F)
+        * extendMat e' (y : Matrix (Fin (d c')) (Fin (d c')) F)
+      = extendMat e' (y : Matrix (Fin (d c')) (Fin (d c')) F)
+        * extendMat e (x : Matrix (Fin (d c)) (Fin (d c)) F)
     have disjoint (a : Fin (d c)) (a' : Fin (d c')) : e a ≠ e' a' := by
       intro he
       apply hc

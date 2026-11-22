@@ -19,7 +19,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Mono0
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands
+  GlobalTheory.GLq
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -28,66 +30,84 @@ namespace UpperTheory.Zero.LLC
 
 section SlopeTestRemainingChoices
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
   {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
 
 private theorem charZero_compl (w : HeightOneSpectrum (𝓞 E)) : CharZero (w.adicCompletion E) :=
   charZero_of_injective_algebraMap (algebraMap E _).injective
 
-private theorem twist_congr (V : WD h) {ξ ξ' : Weil h →* ℂˣ} (hξ : GlobalTheory.WeilDeligne.IsSmooth ξ)
-    (hξ' : GlobalTheory.WeilDeligne.IsSmooth ξ') (e : ξ = ξ') : V.lpTwist ξ hξ = V.lpTwist ξ' hξ' := by
+private theorem twist_congr
+    (V : WD h)
+    {ξ ξ' : Weil h →* ℂˣ} (hξ : GlobalTheory.WeilDeligne.IsSmooth ξ)
+    (hξ' : GlobalTheory.WeilDeligne.IsSmooth ξ') (e : ξ = ξ')
+    : V.lpTwist ξ hξ = V.lpTwist ξ' hξ' := by
   subst e; rfl
 
-private theorem tw_congr (y : IrrGL (k := w.adicCompletion E)) {χ χ' : (w.adicCompletion E)ˣ →* ℂˣ} (hχ : IsSmoothChar χ)
-    (hχ' : IsSmoothChar χ') (e : χ = χ') : y.tw χ hχ = y.tw χ' hχ' := by
+private theorem tw_congr
+    (y : IrrGL (k := w.adicCompletion E))
+    {χ χ' : (w.adicCompletion E)ˣ →* ℂˣ} (hχ : IsSmoothChar χ) (hχ' : IsSmoothChar χ') (e : χ = χ')
+    : y.tw χ hχ = y.tw χ' hχ' := by
   subst e; rfl
 
-private theorem good_cases {x : IrrGL (k := w.adicCompletion E)} (hc : x.IsCusp) (hg : GoodCusp x) :
-    x.1 = 1 ∨ ((∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i) ∧
-      ∃ (y : IrrGL (k := w.adicCompletion E)) (χ : (w.adicCompletion E)ˣ →* ℂˣ) (hχ : IsSmoothChar χ),
-        y.IsCusp ∧ DZ y ∧ x = y.tw χ hχ) := by
+private theorem good_cases {x : IrrGL (k := w.adicCompletion E)} (hc : x.IsCusp) (hg : GoodCusp x)
+    : x.1 = 1
+      ∨ ((∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i)
+        ∧ ∃ (y : IrrGL (k := w.adicCompletion E)) (χ : (w.adicCompletion E)ˣ →* ℂˣ)
+            (hχ : IsSmoothChar χ),
+          y.IsCusp ∧ DZ y ∧ x = y.tw χ hχ) := by
   haveI := charZero_compl (E := E) w
   rcases hg with h1 | ⟨hq, y, χ, hχ, hd, rfl⟩
   · exact Or.inl h1
   · exact Or.inr ⟨hq, y, χ, hχ, ((clBasic _ y).2.1 χ hχ).2.1.1 hc, hd, rfl⟩
 
-private theorem goodCusp_self {y : IrrGL (k := w.adicCompletion E)}
-    (hq : ∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i) (hd : DZ y) : GoodCusp y :=
+private theorem goodCusp_self
+    {y : IrrGL (k := w.adicCompletion E)}
+    (hq : ∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i) (hd : DZ y)
+    : GoodCusp y :=
   Or.inr ⟨hq, y, 1, isSmoothChar_one, hd, (IrrGL.tw_one y _).symm⟩
 
 variable {a : Weil h →* (w.adicCompletion E)ˣ} {ha : IsLocalArtin h a}
 
-private theorem lpTw_eq (ha : IsLocalArtin h a) (V : WD h) (s : ℝ) :
-    V.lpTw s = V.lpTwist ((absPow (w.adicCompletion E) s).comp a) (ha.smooth (isSmoothChar_absPow _)) :=
+private theorem lpTw_eq (ha : IsLocalArtin h a) (V : WD h) (s : ℝ)
+    : V.lpTw s
+      = V.lpTwist ((absPow (w.adicCompletion E) s).comp a) (ha.smooth (isSmoothChar_absPow _)) :=
   twist_congr V _ _ (ha.absPow_comp s).symm
 
-private theorem twist_twist (ha : IsLocalArtin h a) (V : WD h) {χ χ' : (w.adicCompletion E)ˣ →* ℂˣ} (hχ : IsSmoothChar χ)
-    (hχ' : IsSmoothChar χ') (hm : IsSmoothChar (χ * χ')) :
-    (V.lpTwist (χ.comp a) (ha.smooth hχ)).lpTwist (χ'.comp a) (ha.smooth hχ') =
-      V.lpTwist ((χ * χ').comp a) (ha.smooth hm) := by
+private theorem twist_twist
+    (ha : IsLocalArtin h a) (V : WD h)
+    {χ χ' : (w.adicCompletion E)ˣ →* ℂˣ}
+    (hχ : IsSmoothChar χ) (hχ' : IsSmoothChar χ') (hm : IsSmoothChar (χ * χ'))
+    : (V.lpTwist (χ.comp a) (ha.smooth hχ)).lpTwist (χ'.comp a) (ha.smooth hχ')
+      = V.lpTwist ((χ * χ').comp a) (ha.smooth hm) := by
   obtain ⟨-, -, -, -, -, -, -, -, c9⟩ := wDBasic E Ω A w h V
   have e : (χ * χ').comp a = χ.comp a * χ'.comp a := MonoidHom.ext fun _ => rfl
   have hs : GlobalTheory.WeilDeligne.IsSmooth (χ.comp a * χ'.comp a) := e ▸ ha.smooth hm
   rw [(c9 _ (ha.smooth hχ)).2.2.2.1 _ (ha.smooth hχ') hs]
   exact twist_congr V _ _ e.symm
 
-private theorem twist_one (ha : IsLocalArtin h a) (V : WD h) (h1 : IsSmoothChar (1 : (w.adicCompletion E)ˣ →* ℂˣ)) :
-    V.lpTwist ((1 : (w.adicCompletion E)ˣ →* ℂˣ).comp a) (ha.smooth h1) = V := by
+private theorem twist_one
+    (ha : IsLocalArtin h a) (V : WD h) (h1 : IsSmoothChar (1 : (w.adicCompletion E)ˣ →* ℂˣ))
+    : V.lpTwist ((1 : (w.adicCompletion E)ˣ →* ℂˣ).comp a) (ha.smooth h1) = V := by
   obtain ⟨-, -, -, -, -, -, -, -, c9⟩ := wDBasic E Ω A w h V
   exact (c9 _ (ha.smooth h1)).2.2.2.2.1 (MonoidHom.one_comp a)
 
-private structure Gm (a : Weil h →* (w.adicCompletion E)ˣ) (ha : IsLocalArtin h a)
-    (r : IrrGL (k := w.adicCompletion E) → WD h) : Prop where
+private structure Gm
+    (a : Weil h →* (w.adicCompletion E)ˣ) (ha : IsLocalArtin h a)
+    (r : IrrGL (k := w.adicCompletion E) → WD h)
+    : Prop where
   one : ∀ χ hχ, r (.ofChar χ hχ) = WD.lpOfChar h (χ.comp a) (ha.smooth hχ)
   tw : ∀ x, x.IsCusp → GoodCusp x → ∀ χ hχ, r (x.tw χ hχ) = (r x).lpTwist (χ.comp a) (ha.smooth hχ)
-  par : (∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i) →
-    ∀ y, y.IsCusp → DZ y → Par a y (r y)
+  par
+    : (∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i)
+      → ∀ y, y.IsCusp → DZ y → Par a y (r y)
 
 variable {r : IrrGL (k := w.adicCompletion E) → WD h}
 
-private theorem Gm.basic (H : Gm a ha r) {x : IrrGL (k := w.adicCompletion E)} (hc : x.IsCusp) (hg : GoodCusp x) :
-    IsIrrWD (r x) ∧ (r x).lpDim = x.1 ∧
-      ∀ ω, HasCentralChar x.rep ω → ∀ σ, ((r x).eig σ).prod = (ω (a σ) : ℂ) := by
+private theorem Gm.basic
+    (H : Gm a ha r) {x : IrrGL (k := w.adicCompletion E)} (hc : x.IsCusp) (hg : GoodCusp x)
+    : IsIrrWD (r x) ∧ (r x).lpDim = x.1
+      ∧ ∀ ω, HasCentralChar x.rep ω → ∀ σ, ((r x).eig σ).prod = (ω (a σ) : ℂ) := by
   haveI := charZero_compl (E := E) w
   rcases good_cases hc hg with h1 | ⟨hq, y, χ, hχ, hy, hd, rfl⟩
   · obtain ⟨χ, hχ, rfl⟩ := ((clBasic _ x).2.2.2.2.1 h1).2
@@ -108,8 +128,10 @@ private theorem Gm.basic (H : Gm a ha r) {x : IrrGL (k := w.adicCompletion E)} (
     rw [hu ω hω, ← hu _ h₁, t3 σ, P.central ω₀ h₀ σ, P.dim]
     simp
 
-private theorem Gm.dual (H : Gm a ha r) {x y : IrrGL (k := w.adicCompletion E)} (hc : x.IsCusp) (hg : GoodCusp x)
-    (hd : DualCl x y) : r y = (r x).lpDual := by
+private theorem Gm.dual
+    (H : Gm a ha r)
+    {x y : IrrGL (k := w.adicCompletion E)} (hc : x.IsCusp) (hg : GoodCusp x) (hd : DualCl x y)
+    : r y = (r x).lpDual := by
   haveI := charZero_compl (E := E) w
   rcases good_cases hc hg with h1 | ⟨hq, u, χ, hχ, hu, hdz, rfl⟩
   · obtain ⟨χ, hχ, rfl⟩ := ((clBasic _ x).2.2.2.2.1 h1).2
@@ -129,7 +151,8 @@ private theorem Gm.dual (H : Gm a ha r) {x y : IrrGL (k := w.adicCompletion E)} 
     obtain ⟨g, hgp, i, hi'⟩ := hq
     have D := parDual E Ω A w h a ha g i hi' u u' hu hdz hu' (r u) P
     have U := (parUniq E Ω A w h a ha g i hi' u' hu'c hu'd (r u') P').1 _ D
-    have hq' : ∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i := ⟨g, hgp, i, hi'⟩
+    have hq' : ∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i :=
+      ⟨g, hgp, i, hi'⟩
     rw [ey, H.tw u' hu'c (goodCusp_self hq' hu'd), H.tw u hu (goodCusp_self hq' hdz), ← U]
     obtain ⟨-, -, -, -, -, -, -, -, c9⟩ := wDBasic E Ω A w h (r u)
     have hcomp : χ⁻¹.comp a = (χ.comp a)⁻¹ := MonoidHom.ext fun _ => rfl
@@ -137,11 +160,14 @@ private theorem Gm.dual (H : Gm a ha r) {x y : IrrGL (k := w.adicCompletion E)} 
     rw [(c9 _ (ha.smooth hχ)).2.2.2.2.2.1 hs]
     exact twist_congr _ _ _ hcomp
 
-private theorem Gm.tw_inj (H : Gm a ha r) {u v : IrrGL (k := w.adicCompletion E)}
+private theorem Gm.tw_inj
+    (H : Gm a ha r)
+    {u v : IrrGL (k := w.adicCompletion E)}
     (hq : ∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i)
-    (hu : u.IsCusp) (hud : DZ u) (hv : v.IsCusp) (hvd : DZ v) {χ χ' : (w.adicCompletion E)ˣ →* ℂˣ}
-    (hχ : IsSmoothChar χ) (hχ' : IsSmoothChar χ') (e : r (u.tw χ hχ) = r (v.tw χ' hχ')) :
-    u.tw χ hχ = v.tw χ' hχ' := by
+    (hu : u.IsCusp) (hud : DZ u) (hv : v.IsCusp) (hvd : DZ v)
+    {χ χ' : (w.adicCompletion E)ˣ →* ℂˣ}
+    (hχ : IsSmoothChar χ) (hχ' : IsSmoothChar χ') (e : r (u.tw χ hχ) = r (v.tw χ' hχ'))
+    : u.tw χ hχ = v.tw χ' hχ' := by
   haveI := charZero_compl (E := E) w
   have Pu := H.par hq u hu hud
   have Pv := H.par hq v hv hvd
@@ -151,8 +177,10 @@ private theorem Gm.tw_inj (H : Gm a ha r) {u v : IrrGL (k := w.adicCompletion E)
   have e2 := congrArg (fun V => V.lpTwist (χ⁻¹.comp a) (ha.smooth hi)) e
   rw [twist_twist ha _ hχ hi (hχ.mul hi), twist_twist ha _ hχ' hi hψ] at e2
   have e3 : r u = (r v).lpTwist ((χ' * χ⁻¹).comp a) (ha.smooth hψ) := by
-    rw [← e2, twist_congr (r u) (ha.smooth (hχ.mul hi)) (ha.smooth (isSmoothChar_one))
-      (by rw [mul_inv_cancel]), twist_one ha _ isSmoothChar_one]
+    rw [← e2,
+      twist_congr (r u) (ha.smooth (hχ.mul hi)) (ha.smooth (isSmoothChar_one))
+        (by rw [mul_inv_cancel]),
+      twist_one ha _ isSmoothChar_one]
   have hpos : 0 < (r v).lpDim := by rw [Pv.dim]; exact hv.1
   obtain ⟨-, -, -, -, -, -, -, -, c9⟩ := wDBasic E Ω A w h (r v)
   have wild := (c9 _ (ha.smooth hψ)).2.2.2.2.2.2.2 hpos Pv.tame (e3 ▸ Pu.tame)
@@ -178,7 +206,8 @@ theorem cuspEx : CuspEx := by
   obtain ⟨e, he⟩ := expo E Ω A w h a ha
   haveI : Nonempty (WD h) := ⟨WD.lpZero (h := h)⟩
   choose! J hJ using junkEx E Ω A w h
-  let r : IrrGL (k := w.adicCompletion E) → WD h := fun x => if GoodCusp x then r₀ x else (J x.1).lpTw (e x)
+  let r : IrrGL (k := w.adicCompletion E) → WD h := fun x =>
+    if GoodCusp x then r₀ x else (J x.1).lpTw (e x)
   have rg : ∀ x, GoodCusp x → r x = r₀ x := fun x hx => if_pos hx
   have rb : ∀ x, ¬ GoodCusp x → r x = (J x.1).lpTw (e x) := fun x hx => if_neg hx
   have two : ∀ x : IrrGL (k := w.adicCompletion E), x.IsCusp → ¬ GoodCusp x → 2 ≤ x.1 := by
@@ -195,14 +224,29 @@ theorem cuspEx : CuspEx := by
       obtain ⟨j1, j2, -, -⟩ := hJ _ (two x hx hg)
       obtain ⟨-, -, -, -, -, -, -, -, c9⟩ := wDBasic E Ω A w h (J x.1)
       exact ⟨(c9 _ _).2.1 j1, ((c9 _ _).1).trans j2⟩
-  have hcen : ∀ x : IrrGL (k := w.adicCompletion E), x.IsCusp → GoodCusp x → ∀ ω, HasCentralChar x.rep ω →
-      ∀ σ, ((r x).eig σ).prod = (ω (a σ) : ℂ) := by
+  have hcen
+      : ∀ x : IrrGL (k := w.adicCompletion E),
+        x.IsCusp → GoodCusp x
+          → ∀ ω, HasCentralChar x.rep ω → ∀ σ, ((r x).eig σ).prod = (ω (a σ) : ℂ) := by
     intro x hx hg
     rw [rg x hg]
     exact (H.basic hx hg).2.2
-  refine ⟨r, ⟨fun x hx => (hirr x hx).1, fun x hx => (hirr x hx).2, fun χ hχ => ?_, fun x hx s => ?_,
-    fun x hx ω hω σ => ?_, fun x hx hg χ hχ => ?_, hcen, fun x y hx _ hg hd => ?_, fun x y hx hy hgy eq => ?_,
-    fun x hx hg hd => ?_, fun x hx => ?_⟩⟩
+  refine ⟨
+    r,
+    ⟨
+      fun x hx => (hirr x hx).1,
+      fun x hx => (hirr x hx).2,
+      fun χ hχ => ?_,
+      fun x hx s => ?_,
+      fun x hx ω hω σ => ?_,
+      fun x hx hg χ hχ => ?_,
+      hcen,
+      fun x y hx _ hg hd => ?_,
+      fun x y hx hy hgy eq => ?_,
+      fun x hx hg hd => ?_,
+      fun x hx => ?_
+    ⟩
+  ⟩
   · rw [rg _ (Or.inl rfl)]
     exact H1 χ hχ
   · have hiff := ((clBasic _ x).2.1 _ (isSmoothChar_absPow (s : ℂ))).2.2.1
@@ -253,7 +297,8 @@ theorem cuspEx : CuspEx := by
       · rw [H2 v hv (goodCusp_self hq hvd) χ hχ] at eq
         have e2 := congrArg (fun V => V.lpTw (-(e x))) eq
         rw [WD.lpTw_add, add_neg_cancel, WD.lpTw_zero, lpTw_eq ha,
-          twist_twist ha _ hχ (isSmoothChar_absPow _) (hχ.mul (isSmoothChar_absPow _))] at e2
+            twist_twist ha _ hχ (isSmoothChar_absPow _) (hχ.mul (isSmoothChar_absPow _))]
+          at e2
         exact (hJ _ hx2).2.2.2 hq (r₀ v) _ _ (H3 hq v hv hvd).tame e2
   · rcases good_cases hx hg with h1 | ⟨hq, -, -, -, -, -, -⟩
     · obtain ⟨χ, hχ, rfl⟩ := ((clBasic _ x).2.2.2.2.1 h1).2
@@ -265,7 +310,8 @@ theorem cuspEx : CuspEx := by
   · intro g _ i hi n hn D R hR θ hθ τ hτ hN σ hσ hInf
     subst hσ
     have hd : DZ (cls σ) := DiscreteGroups.sglob.DzType.lDepth E w g i hi n τ σ hInf
-    have hq : ∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i := ⟨g, inferInstance, i, hi⟩
+    have hq : ∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i :=
+      ⟨g, inferInstance, i, hi⟩
     rw [rg _ (goodCusp_self hq hd)]
     exact (H3 hq _ hx hd).type g i hi n hn D R hR θ hθ τ hτ hN σ rfl hInf
 

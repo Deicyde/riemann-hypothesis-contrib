@@ -14,8 +14,8 @@ universe u
 
 variable {T U W : Scheme.{u}}
 
-noncomputable def pullbackSection (g : T ⟶ U) (N : U.Modules) :
-    Γ(N, ⊤) →+ Γ((Scheme.Modules.pullback g).obj N, ⊤) :=
+noncomputable def pullbackSection (g : T ⟶ U) (N : U.Modules)
+    : Γ(N, ⊤) →+ Γ((Scheme.Modules.pullback g).obj N, ⊤) :=
   (((Scheme.Modules.pullbackPushforwardAdjunction g).unit.app N).app ⊤).hom
 
 lemma pullbackSection_smul (g : T ⟶ U) (N : U.Modules) (a : Γ(U, ⊤)) (n : Γ(N, ⊤)) :

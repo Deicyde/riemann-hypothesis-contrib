@@ -21,8 +21,9 @@ theorem isOpen_Hs' : IsOpen Hs := isOpen_lt continuous_const Complex.continuous_
 theorem isConnected_Hs' : IsConnected Hs :=
   ⟨⟨Complex.I, by simp [Hs]⟩, (convex_halfSpace_im_gt (0 : ℝ)).isPreconnected⟩
 
-theorem eventually_nhdsNE {P : ℂ → Prop} (h : ∀ᶠ w in codiscreteWithin Hs, P w) {z : ℂ} (hz : z ∈ Hs) :
-    ∀ᶠ w in 𝓝[≠] z, P w := by
+theorem eventually_nhdsNE
+    {P : ℂ → Prop} (h : ∀ᶠ w in codiscreteWithin Hs, P w) {z : ℂ} (hz : z ∈ Hs)
+    : ∀ᶠ w in 𝓝[≠] z, P w := by
   rw [Filter.Eventually, mem_codiscreteWithin] at h
   have h1 := Filter.disjoint_principal_right.1 (h z hz)
   have h2 : ∀ᶠ w in 𝓝[≠] z, w ∈ Hs := nhdsWithin_le_nhds (isOpen_Hs'.mem_nhds hz)
@@ -30,17 +31,21 @@ theorem eventually_nhdsNE {P : ℂ → Prop} (h : ∀ᶠ w in codiscreteWithin H
   by_contra hP
   exact hw1 ⟨hw2, hP⟩
 
-theorem not_order_neg {h : ℂ → ℂ} {z : ℂ} (n : ℕ) (c : ℕ → ℂ → ℂ) (hc : ∀ i, ContinuousAt (c i) z)
-    (hrel : ∀ᶠ w in 𝓝[≠] z, h w ^ n + ∑ i ∈ Finset.range n, c i w * h w ^ i = 0) :
-    ¬ meromorphicOrderAt h z < 0 := by
+theorem not_order_neg
+    {h : ℂ → ℂ} {z : ℂ}
+    (n : ℕ) (c : ℕ → ℂ → ℂ) (hc : ∀ i, ContinuousAt (c i) z)
+    (hrel : ∀ᶠ w in 𝓝[≠] z, h w ^ n + ∑ i ∈ Finset.range n, c i w * h w ^ i = 0)
+    : ¬ meromorphicOrderAt h z < 0 := by
   intro hneg
   have hinf := tendsto_cobounded_of_meromorphicOrderAt_neg hneg
   have hinv : Tendsto (fun w => (h w)⁻¹) (𝓝[≠] z) (𝓝 0) := tendsto_inv₀_cobounded.comp hinf
   have hne : ∀ᶠ w in 𝓝[≠] z, h w ≠ 0 := by
-    have : ({0}ᶜ : Set ℂ) ∈ Bornology.cobounded ℂ := Bornology.isBounded_def.1 Bornology.isBounded_singleton
+    have : ({0}ᶜ : Set ℂ) ∈ Bornology.cobounded ℂ :=
+      Bornology.isBounded_def.1 Bornology.isBounded_singleton
     exact hinf this
-  have hF : Tendsto (fun w => 1 + ∑ i ∈ Finset.range n, c i w * ((h w)⁻¹) ^ (n - i)) (𝓝[≠] z)
-      (𝓝 (1 + ∑ i ∈ Finset.range n, c i z * (0 : ℂ) ^ (n - i))) :=
+  have hF : Tendsto
+      (fun w => 1 + ∑ i ∈ Finset.range n, c i w * ((h w)⁻¹) ^ (n - i))
+      (𝓝[≠] z) (𝓝 (1 + ∑ i ∈ Finset.range n, c i z * (0 : ℂ) ^ (n - i))) :=
     tendsto_const_nhds.add (tendsto_finsetSum _ fun i _ =>
       ((hc i).tendsto.mono_left nhdsWithin_le_nhds).mul (hinv.pow _))
   have hlim : (1 + ∑ i ∈ Finset.range n, c i z * (0 : ℂ) ^ (n - i)) = 1 := by
@@ -51,8 +56,9 @@ theorem not_order_neg {h : ℂ → ℂ} {z : ℂ} (n : ℕ) (c : ℕ → ℂ →
   have hev : ∀ᶠ w in 𝓝[≠] z, (1 + ∑ i ∈ Finset.range n, c i w * ((h w)⁻¹) ^ (n - i)) = 0 := by
     filter_upwards [hrel, hne] with w hw hw0
     have hp : h w ^ n ≠ 0 := pow_ne_zero _ hw0
-    have e : (1 + ∑ i ∈ Finset.range n, c i w * ((h w)⁻¹) ^ (n - i)) * h w ^ n =
-        h w ^ n + ∑ i ∈ Finset.range n, c i w * h w ^ i := by
+    have e
+        : (1 + ∑ i ∈ Finset.range n, c i w * ((h w)⁻¹) ^ (n - i)) * h w ^ n
+          = h w ^ n + ∑ i ∈ Finset.range n, c i w * h w ^ i := by
       rw [add_mul, one_mul, Finset.sum_mul]
       congr 1
       refine Finset.sum_congr rfl fun i hi => ?_
@@ -65,18 +71,21 @@ theorem not_order_neg {h : ℂ → ℂ} {z : ℂ} (n : ℕ) (c : ℕ → ℂ →
   rw [hlim] at h1
   exact one_ne_zero h1
 
-theorem exists_differentiableOn {h : ℂ → ℂ} (hm : MeromorphicOn h Hs) (n : ℕ) (c : ℕ → ℂ → ℂ)
-    (hc : ∀ i, DifferentiableOn ℂ (c i) Hs)
-    (hrel : ∀ᶠ w in codiscreteWithin Hs, h w ^ n + ∑ i ∈ Finset.range n, c i w * h w ^ i = 0) :
-    ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ h =ᶠ[codiscreteWithin Hs] φ := by
+theorem exists_differentiableOn
+    {h : ℂ → ℂ} (hm : MeromorphicOn h Hs)
+    (n : ℕ) (c : ℕ → ℂ → ℂ) (hc : ∀ i, DifferentiableOn ℂ (c i) Hs)
+    (hrel : ∀ᶠ w in codiscreteWithin Hs, h w ^ n + ∑ i ∈ Finset.range n, c i w * h w ^ i = 0)
+    : ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ h =ᶠ[codiscreteWithin Hs] φ := by
   refine ⟨toMeromorphicNFOn h Hs, ?_, toMeromorphicNFOn_eqOn_codiscrete hm⟩
   intro z hz
   have hNF : MeromorphicNFAt (toMeromorphicNFOn h Hs) z := meromorphicNFOn_toMeromorphicNFOn h Hs hz
   rcases meromorphicNFAt_iff_analyticAt_or.1 hNF with ha | ⟨-, hneg, -⟩
   · exact ha.differentiableAt.differentiableWithinAt
   · rw [meromorphicOrderAt_toMeromorphicNFOn hm hz] at hneg
-    exact absurd hneg (not_order_neg n c
-      (fun i => (hc i).continuousOn.continuousAt (isOpen_Hs'.mem_nhds hz)) (eventually_nhdsNE hrel hz))
+    exact absurd hneg
+      (not_order_neg n c
+        (fun i => (hc i).continuousOn.continuousAt (isOpen_Hs'.mem_nhds hz))
+        (eventually_nhdsNE hrel hz))
 
 end GlobalTheory.KZ.LevelOneFrac
 
@@ -84,10 +93,12 @@ namespace GlobalTheory.KZ.LevelOneFrac
 
 open Filter Topology Polynomial
 
-theorem germ_differentiableOn (G : Mero) (a b : ℂ → ℂ) (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
-    (hb0 : (b : Mero) ≠ 0) (hab : G * (b : Mero) = (a : Mero)) (p : Mero[X]) (hp : p.Monic)
-    (hc : ∀ i, ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ p.coeff i = (φ : Mero)) (he : p.eval G = 0) :
-    ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ G = (φ : Mero) := by
+theorem germ_differentiableOn
+    (G : Mero) (a b : ℂ → ℂ) (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
+    (hb0 : (b : Mero) ≠ 0) (hab : G * (b : Mero) = (a : Mero))
+    (p : Mero[X]) (hp : p.Monic)
+    (hc : ∀ i, ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ p.coeff i = (φ : Mero)) (he : p.eval G = 0)
+    : ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ G = (φ : Mero) := by
   have hA : AnalyticOnNhd ℂ a Hs := ha.analyticOnNhd isOpen_Hs'
   have hB : AnalyticOnNhd ℂ b Hs := hb.analyticOnNhd isOpen_Hs'
   have hx : ∃ x ∈ Hs, b x ≠ 0 := by
@@ -107,16 +118,19 @@ theorem germ_differentiableOn (G : Mero) (a b : ℂ → ℂ) (ha : Differentiabl
     simp only [Pi.mul_apply, Pi.inv_apply, Pi.one_apply]
     exact mul_inv_cancel₀ hz
   have hG : G = ((a / b : ℂ → ℂ) : Mero) := by
-    calc G = G * ((b * b⁻¹ : ℂ → ℂ) : Mero) := by rw [h1, mul_one]
+    calc
+      G = G * ((b * b⁻¹ : ℂ → ℂ) : Mero) := by rw [h1, mul_one]
       _ = (G * (b : Mero)) * ((b⁻¹ : ℂ → ℂ) : Mero) := by rw [Filter.Germ.coe_mul, mul_assoc]
       _ = ((a / b : ℂ → ℂ) : Mero) := by rw [hab, ← Filter.Germ.coe_mul, div_eq_mul_inv]
-  have hM : MeromorphicOn (a / b) Hs := fun z hz => (hA z hz).meromorphicAt.div (hB z hz).meromorphicAt
+  have hM : MeromorphicOn (a / b) Hs := fun z hz =>
+    (hA z hz).meromorphicAt.div (hB z hz).meromorphicAt
   choose c hcd hce using hc
   set n := p.natDegree
   set g : ℂ → ℂ := a / b
   have key : ((fun w => g w ^ n + ∑ i ∈ Finset.range n, c i w * g w ^ i : ℂ → ℂ) : Mero) = 0 := by
-    have e1 : ((fun w => g w ^ n + ∑ i ∈ Finset.range n, c i w * g w ^ i : ℂ → ℂ) : Mero) =
-        Filter.Germ.coeRingHom _ (g ^ n + ∑ i ∈ Finset.range n, c i * g ^ i) := by
+    have e1
+        : ((fun w => g w ^ n + ∑ i ∈ Finset.range n, c i w * g w ^ i : ℂ → ℂ) : Mero)
+          = Filter.Germ.coeRingHom _ (g ^ n + ∑ i ∈ Finset.range n, c i * g ^ i) := by
       congr 1
       ext w
       simp [Finset.sum_apply]
@@ -143,8 +157,10 @@ open Filter Topology Polynomial
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ}
 
-theorem holRep (X : Tower Ω ε) (hj : ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero)) {r : X.K}
-    (hr : r ∈ Algebra.adjoin Ω {X.jK}) : ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an r = (φ : Mero) := by
+theorem holRep
+    (X : Tower Ω ε) (hj : ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero))
+    {r : X.K} (hr : r ∈ Algebra.adjoin Ω {X.jK})
+    : ∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an r = (φ : Mero) := by
   induction hr using Algebra.adjoin_induction with
   | mem x hx => rw [Set.mem_singleton_iff.1 hx]; exact hj
   | algebraMap c => exact ⟨fun _ => ε c, differentiableOn_const _, X.an_c c⟩
@@ -157,16 +173,16 @@ theorem holRep (X : Tower Ω ε) (hj : ∃ φ : ℂ → ℂ, DifferentiableOn �
     obtain ⟨ψ, h3, h4⟩ := hy
     exact ⟨φ * ψ, h1.mul h3, by rw [map_mul, h2, h4, Filter.Germ.coe_mul]⟩
 
-theorem sl_eq_of_mem (X : Tower Ω ε) {r : X.K} (hr : r ∈ Algebra.adjoin Ω {X.jK}) (γ : SL(2, ℤ)) :
-    X.sl (ofSL γ) r = r := by
+theorem sl_eq_of_mem (X : Tower Ω ε) {r : X.K} (hr : r ∈ Algebra.adjoin Ω {X.jK}) (γ : SL(2, ℤ))
+    : X.sl (ofSL γ) r = r := by
   induction hr using Algebra.adjoin_induction with
   | mem x hx => rw [Set.mem_singleton_iff.1 hx]; exact X.j_inv γ
   | algebraMap c => exact (X.sl (ofSL γ)).commutes c
   | add x y _ _ hx hy => rw [map_add (f := _), hx, hy]
   | mul x y _ _ hx hy => rw [map_mul, hx, hy]
 
-theorem exists_denom (X : Tower Ω ε) {c : X.K} (hc : c ∈ IntermediateField.adjoin Ω {X.jK}) :
-    ∃ d ∈ Algebra.adjoin Ω {X.jK}, d ≠ 0 ∧ d * c ∈ Algebra.adjoin Ω {X.jK} := by
+theorem exists_denom (X : Tower Ω ε) {c : X.K} (hc : c ∈ IntermediateField.adjoin Ω {X.jK})
+    : ∃ d ∈ Algebra.adjoin Ω {X.jK}, d ≠ 0 ∧ d * c ∈ Algebra.adjoin Ω {X.jK} := by
   obtain ⟨r, hr, s, hs, rfl⟩ := (IntermediateField.mem_adjoin_iff_div (x := c)).1 hc
   by_cases h : s = 0
   · refine ⟨1, Subalgebra.one_mem _, one_ne_zero, ?_⟩
@@ -175,8 +191,9 @@ theorem exists_denom (X : Tower Ω ε) {c : X.K} (hc : c ∈ IntermediateField.a
   · refine ⟨s, hs, h, ?_⟩
     rwa [mul_div_cancel₀ r h]
 
-theorem exists_denom_finset (X : Tower Ω ε) (s : Finset X.K) (hs : ∀ c ∈ s, c ∈ IntermediateField.adjoin Ω {X.jK}) :
-    ∃ d ∈ Algebra.adjoin Ω {X.jK}, d ≠ 0 ∧ ∀ c ∈ s, d * c ∈ Algebra.adjoin Ω {X.jK} := by
+theorem exists_denom_finset
+    (X : Tower Ω ε) (s : Finset X.K) (hs : ∀ c ∈ s, c ∈ IntermediateField.adjoin Ω {X.jK})
+    : ∃ d ∈ Algebra.adjoin Ω {X.jK}, d ≠ 0 ∧ ∀ c ∈ s, d * c ∈ Algebra.adjoin Ω {X.jK} := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨1, Subalgebra.one_mem _, one_ne_zero, by simp⟩
@@ -193,8 +210,8 @@ theorem exists_denom_finset (X : Tower Ω ε) (s : Finset X.K) (hs : ∀ c ∈ s
 theorem isAlgebraic_adjoin (X : Tower Ω ε) (f : X.K) : IsAlgebraic (Algebra.adjoin Ω {X.jK}) f := by
   classical
   obtain ⟨p, hp0, hpf⟩ := X.alg_j f
-  obtain ⟨d, hd, hd0, hds⟩ := exists_denom_finset X (p.support.image (fun i => (p.coeff i : X.K)))
-    (by
+  obtain ⟨d, hd, hd0, hds⟩ :=
+    exists_denom_finset X (p.support.image (fun i => (p.coeff i : X.K))) (by
       intro c hc
       obtain ⟨i, -, rfl⟩ := Finset.mem_image.1 hc
       exact (p.coeff i).2)
@@ -221,9 +238,12 @@ theorem isAlgebraic_adjoin (X : Tower Ω ε) (f : X.K) : IsAlgebraic (Algebra.ad
   · rw [aeval_def, eval₂_eq_eval_map, hq]
     simp only [P, eval_mul, eval_C, eval_map, ← aeval_def, hpf, mul_zero]
 
-theorem mem_adjoin_of_sl_inv : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : GlobalTheory.KZ.Tower Ω ε),
-    (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero)) → ∀ f : X.K,
-    (∀ γ : SL(2, ℤ), X.sl (ofSL γ) f = f) → f ∈ IntermediateField.adjoin Ω {X.jK} := by
+theorem mem_adjoin_of_sl_inv
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ)
+        (X : GlobalTheory.KZ.Tower Ω ε),
+      (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero))
+        → ∀ f : X.K,
+          (∀ γ : SL(2, ℤ), X.sl (ofSL γ) f = f) → f ∈ IntermediateField.adjoin Ω {X.jK} := by
   intro Ω _ _ _ ε X hj f hf
   obtain ⟨y, hy0, hyi⟩ := (isAlgebraic_adjoin X f).exists_integral_multiple
   set g : X.K := (y : X.K) * f with hgdef
@@ -233,11 +253,14 @@ theorem mem_adjoin_of_sl_inv : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAl
     rw [hgdef, map_mul, sl_eq_of_mem X y.2 γ, hf γ]
   obtain ⟨p, hpm, hpe⟩ := hyi
   obtain ⟨a, b, ha, hb, hb0, hab⟩ := X.an_mero g
-  obtain ⟨φ, hφ, hgφ⟩ := germ_differentiableOn (X.an g) a b ha hb hb0 hab
-    (p.map (X.an.comp (algebraMap (Algebra.adjoin Ω {X.jK}) X.K))) (hpm.map _)
-    (fun i => by rw [coeff_map]; exact holRep X hj (p.coeff i).2)
-    (by rw [eval_map, ← Polynomial.hom_eval₂, hpe, map_zero])
-  have hgR : g ∈ Algebra.adjoin Ω {X.jK} := GlobalTheory.T.slTwo_invariant_holomorphic_mem_adjoin_jInvariant ε X ε.injective hj g hginv ⟨φ, hφ, hgφ⟩
+  obtain ⟨φ, hφ, hgφ⟩ :=
+    germ_differentiableOn (X.an g) a b ha hb hb0 hab
+      (p.map (X.an.comp (algebraMap (Algebra.adjoin Ω {X.jK}) X.K))) (hpm.map _)
+      (fun i => by rw [coeff_map]; exact holRep X hj (p.coeff i).2)
+      (by rw [eval_map, ← Polynomial.hom_eval₂, hpe, map_zero])
+  have hgR : g ∈ Algebra.adjoin Ω {X.jK} :=
+    GlobalTheory.T.slTwo_invariant_holomorphic_mem_adjoin_jInvariant ε X ε.injective hj g hginv
+      ⟨φ, hφ, hgφ⟩
   have hle := IntermediateField.algebra_adjoin_le_adjoin Ω ({X.jK} : Set X.K)
   have hyL : (y : X.K) ∈ IntermediateField.adjoin Ω {X.jK} := hle y.2
   have hgL : g ∈ IntermediateField.adjoin Ω {X.jK} := hle hgR

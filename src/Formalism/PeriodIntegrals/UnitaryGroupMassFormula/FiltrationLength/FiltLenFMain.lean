@@ -12,13 +12,16 @@ open Submodule
 
 variable {R W : Type} [CommRing R] [AddCommGroup W] [Module R W]
 
-theorem ell_stepF {V : Type} [AddCommGroup V] [Module R V]
-    (M N Fk Fk1 : Submodule R W) (ψ : ↥Fk →ₗ[R] V) (P Q : Submodule R V) (hNM : N ≤ M)
-    (hinj : ∀ x : ↥Fk, ψ x = 0 → (x : W) ∈ Fk1)
-    (hP : (M.comap Fk.subtype).map ψ ≤ P) (hQ : Q ≤ (N.comap Fk.subtype).map ψ) :
-    ell (M ⊓ Fk) ((N ⊓ Fk) ⊔ (M ⊓ Fk1)) ≤ Module.length R (↥P ⧸ Q.comap P.subtype) := by
+theorem ell_stepF
+    {V : Type} [AddCommGroup V] [Module R V]
+    (M N Fk Fk1 : Submodule R W) (ψ : ↥Fk →ₗ[R] V)
+    (P Q : Submodule R V)
+    (hNM : N ≤ M) (hinj : ∀ x : ↥Fk, ψ x = 0 → (x : W) ∈ Fk1) (hP : (M.comap Fk.subtype).map ψ ≤ P)
+    (hQ : Q ≤ (N.comap Fk.subtype).map ψ)
+    : ell (M ⊓ Fk) ((N ⊓ Fk) ⊔ (M ⊓ Fk1)) ≤ Module.length R (↥P ⧸ Q.comap P.subtype) := by
   have hgP : ∀ x : ↥(M ⊓ Fk), ψ (Submodule.inclusion inf_le_right x) ∈ P := fun x =>
-    hP (Submodule.mem_map_of_mem (show Submodule.inclusion inf_le_right x ∈ M.comap Fk.subtype from x.2.1))
+    hP (Submodule.mem_map_of_mem (show Submodule.inclusion inf_le_right x ∈ M.comap Fk.subtype from
+      x.2.1))
   let g : ↥(M ⊓ Fk) →ₗ[R] ↥P :=
     LinearMap.codRestrict P (ψ ∘ₗ Submodule.inclusion (inf_le_right : M ⊓ Fk ≤ Fk)) hgP
   let f : ↥(M ⊓ Fk) →ₗ[R] ↥P ⧸ Q.comap P.subtype := (Q.comap P.subtype).mkQ ∘ₗ g
@@ -42,7 +45,8 @@ theorem ell_stepF {V : Type} [AddCommGroup V] [Module R V]
     intro q
     induction q using Submodule.Quotient.induction_on with
     | H x => exact ⟨Submodule.Quotient.mk x, rfl⟩
-  calc Module.length R (↥(M ⊓ Fk) ⧸ ((N ⊓ Fk) ⊔ (M ⊓ Fk1)).comap (M ⊓ Fk).subtype)
+  calc
+    Module.length R (↥(M ⊓ Fk) ⧸ ((N ⊓ Fk) ⊔ (M ⊓ Fk1)).comap (M ⊓ Fk).subtype)
       ≤ Module.length R (↥(M ⊓ Fk) ⧸ LinearMap.ker f) := Module.length_le_of_surjective _ hsurj
     _ ≤ Module.length R (↥P ⧸ Q.comap P.subtype) :=
       Module.length_le_of_injective _
@@ -60,23 +64,29 @@ theorem filtLenF_main : PI.FiltLenF := by
     induction k with
     | zero => exact le_rfl
     | succ k ih => exact (hXmono k).trans ih
-  have hstep : ∀ k < a, ell (X k) (X (k + 1)) ≤
-      Module.length R (↥(P k) ⧸ (Q k).comap (P k).subtype) := by
+  have hstep
+      : ∀ k < a, ell (X k) (X (k + 1)) ≤ Module.length R (↥(P k) ⧸ (Q k).comap (P k).subtype) := by
     intro k hk
     have hD : (N ⊓ F k) ⊔ (M ⊓ F (k + 1)) ≤ X (k + 1) :=
       sup_le (inf_le_left.trans le_sup_left) le_sup_right
     have heq : X (k + 1) ⊔ (M ⊓ F k) = X k := by
       simp only [hX]
       apply le_antisymm
-      · exact sup_le (sup_le le_sup_left
-          (le_sup_of_le_right (inf_le_inf_left _ (hanti (Nat.le_succ k))))) le_sup_right
+      · exact sup_le
+          (sup_le le_sup_left (le_sup_of_le_right (inf_le_inf_left _ (hanti (Nat.le_succ k)))))
+          le_sup_right
       · exact sup_le (le_sup_of_le_left le_sup_left) le_sup_right
     have h1 : ell (X k) (X (k + 1)) ≤ ell (M ⊓ F k) ((N ⊓ F k) ⊔ (M ⊓ F (k + 1))) := by
-      calc ell (X k) (X (k + 1)) = ell (X (k + 1) ⊔ (M ⊓ F k)) (X (k + 1)) := by rw [heq]
+      calc
+        ell (X k) (X (k + 1))
+          = ell (X (k + 1) ⊔ (M ⊓ F k)) (X (k + 1)) := by rw [heq]
         _ ≤ _ := ell_sup_le hD
-    exact h1.trans (ell_stepF M N (F k) (F (k + 1)) (φ k) (P k) (Q k) hNM (hinj k) (hP k hk) (hQ k hk))
-  have hsum : ∀ j ≤ a, ell (X 0) (X j) ≤
-      ∑ k ∈ Finset.range j, Module.length R (↥(P k) ⧸ (Q k).comap (P k).subtype) := by
+    exact h1.trans (ell_stepF M N (F k) (F (k + 1)) (φ k) (P k) (Q k) hNM (hinj k) (hP k hk)
+      (hQ k hk))
+  have hsum
+      : ∀ j ≤ a,
+        ell (X 0) (X j)
+          ≤ ∑ k ∈ Finset.range j, Module.length R (↥(P k) ⧸ (Q k).comap (P k).subtype) := by
     intro j
     induction j with
     | zero => intro _; simp [ell, Submodule.comap_subtype_self]

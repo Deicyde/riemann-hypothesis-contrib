@@ -13,7 +13,10 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ValAtCompLoc
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+  GlobalTheory.CompanionTheory.Ar.Fl
 
 namespace RootFieldNumerics.RF
 
@@ -25,8 +28,8 @@ theorem numberField_of (L : Type) [Field L] (f : ℚ →+* L) (hf : f.FiniteType
   haveI : Algebra.FiniteType ℚ L := RingHom.finiteType_algebraMap.1 (e ▸ hf)
   exact { to_finiteDimensional := finite_of_finite_type_of_isJacobsonRing ℚ L }
 
-theorem exists_quot (B : Type) [CommRing B] [Nontrivial B] [Algebra ℚ B] [Algebra.FiniteType ℚ B] :
-    ∃ (L : Type) (_ : Field L) (_ : NumberField L), Nonempty (B →+* L) := by
+theorem exists_quot (B : Type) [CommRing B] [Nontrivial B] [Algebra ℚ B] [Algebra.FiniteType ℚ B]
+    : ∃ (L : Type) (_ : Field L) (_ : NumberField L), Nonempty (B →+* L) := by
   obtain ⟨m, hm⟩ := Ideal.exists_maximal B
   letI : Field (B ⧸ m) := Ideal.Quotient.field m
   have h1 : (algebraMap ℚ B).FiniteType := RingHom.finiteType_algebraMap.2 inferInstance
@@ -34,9 +37,11 @@ theorem exists_quot (B : Type) [CommRing B] [Nontrivial B] [Algebra ℚ B] [Alge
     (RingHom.FiniteType.comp (RingHom.FiniteType.of_surjective _ Ideal.Quotient.mk_surjective) h1)
   exact ⟨B ⧸ m, inferInstance, inferInstance, ⟨Ideal.Quotient.mk m⟩⟩
 
-theorem exists_numberField {A Ω κ : Type} [CommRing A] [Field Ω] [CharZero Ω] [Finite κ] (e : A →+* Ω) (t : κ → Ω)
-    (he : ∀ a, e a ∈ Algebra.adjoin ℤ (Set.range t)) (s : A) (hs : e s ≠ 0) :
-    ∃ (L : Type) (_ : Field L) (_ : NumberField L) (ε : A →+* L), ε s ≠ 0 := by
+theorem exists_numberField
+    {A Ω κ : Type} [CommRing A] [Field Ω] [CharZero Ω] [Finite κ]
+    (e : A →+* Ω) (t : κ → Ω) (he : ∀ a, e a ∈ Algebra.adjoin ℤ (Set.range t))
+    (s : A) (hs : e s ≠ 0)
+    : ∃ (L : Type) (_ : Field L) (_ : NumberField L) (ε : A →+* L), ε s ≠ 0 := by
   classical
   let B : Subalgebra ℚ Ω := Algebra.adjoin ℚ (insert (e s)⁻¹ (Set.range t))
   have hB : ∀ x ∈ Algebra.adjoin ℤ (Set.range t), x ∈ B := by
@@ -52,18 +57,24 @@ theorem exists_numberField {A Ω κ : Type} [CommRing A] [Field Ω] [CharZero Ω
   obtain ⟨L, _, _, ⟨g⟩⟩ := exists_quot B
   let e' : A →+* B := e.codRestrict B fun a => hB _ (he a)
   refine ⟨L, inferInstance, inferInstance, g.comp e', ?_⟩
-  have h1 : e' s * ⟨(e s)⁻¹, Algebra.subset_adjoin (Set.mem_insert _ _)⟩ = 1 := Subtype.ext (mul_inv_cancel₀ hs)
+  have h1 : e' s * ⟨(e s)⁻¹, Algebra.subset_adjoin (Set.mem_insert _ _)⟩ = 1 :=
+    Subtype.ext (mul_inv_cancel₀ hs)
   exact ((IsUnit.of_mul_eq_one _ h1).map g).ne_zero
 
-theorem exists_point {X : Scheme.{0}} {Ω : Type} [Field Ω] [CharZero Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {κ : Type}
-    [Finite κ] {x : κ → Ω} (hT : CoordTie ℤ ξ x) (W : X.Opens) (hW : genPt ξ ∈ W) :
-    ∃ (L : Type) (_ : Field L) (_ : NumberField L) (z : Spec (CommRingCat.of L) ⟶ X), centre z ∈ W := by
+theorem exists_point
+    {X : Scheme.{0}} {Ω : Type} [Field Ω] [CharZero Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {κ : Type} [Finite κ]
+    {x : κ → Ω} (hT : CoordTie ℤ ξ x)
+    (W : X.Opens) (hW : genPt ξ ∈ W)
+    : ∃ (L : Type) (_ : Field L) (_ : NumberField L) (z : Spec (CommRingCat.of L) ⟶ X),
+      centre z ∈ W := by
   obtain ⟨c, hc⟩ := hT.cover ⟨genPt ξ, specializes_rfl⟩
   obtain ⟨U, hU, hg, -, -, hr⟩ := SheetDecomposition.BBase.chart hT c hc.1
   obtain ⟨s, hsW, hsη⟩ := hU.exists_basicOpen_le (V := W) ⟨genPt ξ, hW⟩ hg
   have h0 : SheetDecomposition.BBase.ev ξ U hg s ≠ 0 :=
     (((Scheme.mem_basicOpen X s _ hg).1 hsη).map (Scheme.stalkClosedPointTo ξ).hom).ne_zero
-  obtain ⟨L, _, _, ε, hε⟩ := exists_numberField (SheetDecomposition.BBase.ev ξ U hg) _ (fun a => (hr _).1 ⟨a, rfl⟩) s h0
+  obtain ⟨L, _, _, ε, hε⟩ :=
+    exists_numberField (SheetDecomposition.BBase.ev ξ U hg) _ (fun a => (hr _).1 ⟨a, rfl⟩) s h0
   let φ : Γ(X, U) ⟶ CommRingCat.of L := CommRingCat.ofHom ε
   have hz : centre (Spec.map φ ≫ hU.fromSpec) ∈ U := by
     change _ ∈ (U : Set X)
@@ -72,37 +83,46 @@ theorem exists_point {X : Scheme.{0}} {Ω : Type} [Field Ω] [CharZero Ω] {ξ :
   refine ⟨L, inferInstance, inferInstance, Spec.map φ ≫ hU.fromSpec, hsW ?_⟩
   have h1 := congrArg (fun g => g.hom s) (SheetDecomposition.ChartForm.germ_point hU φ hz)
   refine (Scheme.mem_basicOpen X s _ hz).2
-    (isUnit_of_map_unit (Scheme.stalkClosedPointTo (Spec.map φ ≫ hU.fromSpec)).hom _ (IsUnit.mk0 _ ?_))
+    (isUnit_of_map_unit (Scheme.stalkClosedPointTo (Spec.map φ ≫ hU.fromSpec)).hom _
+      (IsUnit.mk0 _ ?_))
   intro h
   exact hε (h1.symm.trans h)
 
-def primeOf {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p]) : Ideal (𝓞 F) :=
-  { carrier := {b | ‖κ (b : F)‖ < 1}
-    add_mem' := fun {a b} ha hb => by
-      have := IsUltrametricDist.norm_add_le_max (κ (a : F)) (κ (b : F))
-      show ‖κ ((a + b : 𝓞 F) : F)‖ < 1
-      push_cast
-      rw [map_add (f := _)]
-      exact this.trans_lt (max_lt ha hb)
-    zero_mem' := by simp
-    smul_mem' := fun a b hb => by
-      show ‖κ ((a * b : 𝓞 F) : F)‖ < 1
-      have h1 : ‖κ (a : F)‖ ≤ 1 := by
-        have := HT.LatBasic.val_le_one (NormedField.valuation (K := ℂ_[p])) κ a
-        exact_mod_cast this
-      push_cast
-      rw [map_mul, norm_mul]
-      exact (mul_le_of_le_one_left (norm_nonneg _) h1).trans_lt hb }
+def primeOf {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p])
+    : Ideal (𝓞 F) := {
+  carrier := {b | ‖κ (b : F)‖ < 1}
+  add_mem' := fun {a b} ha hb => by
+    have := IsUltrametricDist.norm_add_le_max (κ (a : F)) (κ (b : F))
+    show ‖κ ((a + b : 𝓞 F) : F)‖ < 1
+    push_cast
+    rw [map_add (f := _)]
+    exact this.trans_lt (max_lt ha hb)
+  zero_mem' := by simp
+  smul_mem' := fun a b hb => by
+    show ‖κ ((a * b : 𝓞 F) : F)‖ < 1
+    have h1 : ‖κ (a : F)‖ ≤ 1 := by
+      have := HT.LatBasic.val_le_one (NormedField.valuation (K := ℂ_[p])) κ a
+      exact_mod_cast this
+    push_cast
+    rw [map_mul, norm_mul]
+    exact (mul_le_of_le_one_left (norm_nonneg _) h1).trans_lt hb
+}
 
-theorem norm_int_le {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p]) (a : 𝓞 F) :
-    ‖κ (a : F)‖ ≤ 1 := by
+theorem norm_int_le
+    {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p]) (a : 𝓞 F)
+    : ‖κ (a : F)‖ ≤ 1 := by
   have := HT.LatBasic.val_le_one (NormedField.valuation (K := ℂ_[p])) κ a
   exact_mod_cast this
 
-theorem norm_eq_one {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p]) {a : 𝓞 F}
-    (h : a ∉ primeOf κ) : ‖κ (a : F)‖ = 1 := le_antisymm (norm_int_le κ a) (not_lt.1 h)
+theorem norm_eq_one
+    {F : Type} [Field F] [NumberField F]
+    {p : Nat.Primes} (κ : F →+* ℂ_[p])
+    {a : 𝓞 F} (h : a ∉ primeOf κ)
+    : ‖κ (a : F)‖ = 1 :=
+  le_antisymm (norm_int_le κ a) (not_lt.1 h)
 
-instance primeOf_isPrime {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p]) : (primeOf κ).IsPrime where
+instance primeOf_isPrime {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p])
+    : (primeOf κ).IsPrime where
   ne_top' := by
     rw [Ideal.ne_top_iff_one]
     show ¬ ‖κ ((1 : 𝓞 F) : F)‖ < 1
@@ -115,7 +135,8 @@ instance primeOf_isPrime {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (
     rw [map_mul, norm_mul, norm_eq_one κ hn.1, norm_eq_one κ hn.2] at h'
     simp at h'
 
-theorem primeOf_ne_bot {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p]) : primeOf κ ≠ ⊥ := by
+theorem primeOf_ne_bot {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p])
+    : primeOf κ ≠ ⊥ := by
   intro h
   have h1 : ((p : ℕ) : 𝓞 F) ∈ primeOf κ := by
     show ‖κ (((p : ℕ) : 𝓞 F) : F)‖ < 1
@@ -125,9 +146,12 @@ theorem primeOf_ne_bot {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ
   rw [h, Ideal.mem_bot] at h1
   exact p.2.ne_zero (by exact_mod_cast h1)
 
-theorem exists_frac {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p]) {a : F} (ha : ‖κ a‖ ≤ 1) :
-    ∃ u s : 𝓞 F, s ∉ primeOf κ ∧ a = (u : F) * (s : F)⁻¹ := by
-  let V := Localization.subalgebra.ofField F (primeOf κ).primeCompl (primeOf κ).primeCompl_le_nonZeroDivisors
+theorem exists_frac
+    {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : F →+* ℂ_[p]) {a : F} (ha : ‖κ a‖ ≤ 1)
+    : ∃ u s : 𝓞 F, s ∉ primeOf κ ∧ a = (u : F) * (s : F)⁻¹ := by
+  let V :=
+    Localization.subalgebra.ofField F (primeOf κ).primeCompl
+      (primeOf κ).primeCompl_le_nonZeroDivisors
   haveI : IsDiscreteValuationRing V :=
     IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (𝓞 F) (primeOf_ne_bot κ) V
   rcases ValuationRing.isInteger_or_isInteger V a with ⟨x, hx⟩ | ⟨x, hx⟩
@@ -146,13 +170,25 @@ theorem exists_frac {F : Type} [Field F] [NumberField F] {p : Nat.Primes} (κ : 
       linarith
     · rw [← inv_inv a, e', mul_inv, inv_inv, mul_comm]
 
-theorem exists_dvr {L : Type} [Field L] [NumberField L] {p : Nat.Primes} (j : L →+* ℂ_[p]) :
-    ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V) (_ : Algebra V L)
-      (_ : IsFractionRing V L), ∀ a : L, ‖j a‖ ≤ 1 ↔ a ∈ (algebraMap V L).range := by
-  let V := Localization.subalgebra.ofField L (primeOf j).primeCompl (primeOf j).primeCompl_le_nonZeroDivisors
+theorem exists_dvr {L : Type} [Field L] [NumberField L] {p : Nat.Primes} (j : L →+* ℂ_[p])
+    : ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V)
+        (_ : Algebra V L) (_ : IsFractionRing V L),
+      ∀ a : L,
+        ‖j a‖ ≤ 1 ↔ a ∈ (algebraMap V L).range := by
+  let V :=
+    Localization.subalgebra.ofField L (primeOf j).primeCompl
+      (primeOf j).primeCompl_le_nonZeroDivisors
   haveI : IsDiscreteValuationRing V :=
     IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (𝓞 L) (primeOf_ne_bot j) V
-  refine ⟨V, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance, fun a => ⟨fun ha => ?_, ?_⟩⟩
+  refine ⟨
+    V,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    fun a => ⟨fun ha => ?_, ?_⟩
+  ⟩
   · obtain ⟨u, s, hs, e⟩ := exists_frac j ha
     exact ⟨⟨a, u, s, hs, e⟩, rfl⟩
   · rintro ⟨x, rfl⟩
@@ -165,8 +201,10 @@ section Val
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
 
-theorem normalCpt_of_tie {κ : Type} {x : κ → Ω} (hT : CoordTie ℤ ξ x)
-    (hX : ∀ q : X, IsDomain (X.presheaf.stalk q) ∧ IsIntegrallyClosed (X.presheaf.stalk q)) : NormalCpt ξ := by
+theorem normalCpt_of_tie
+    {κ : Type} {x : κ → Ω} (hT : CoordTie ℤ ξ x)
+    (hX : ∀ q : X, IsDomain (X.presheaf.stalk q) ∧ IsIntegrallyClosed (X.presheaf.stalk q))
+    : NormalCpt ξ := by
   intro p a ha
   have hξ := hT.gen
   obtain ⟨hd, hc⟩ := hX p.1
@@ -187,55 +225,74 @@ theorem normalCpt_of_tie {κ : Type} {x : κ → Ω} (hT : CoordTie ℤ ξ x)
   haveI : Algebra.IsIntegral (X.presheaf.stalk p.1) (regAt ξ p) :=
     Algebra.IsIntegral.of_surjective (R := X.presheaf.stalk p.1) (A := X.presheaf.stalk p.1)
       (Algebra.ofId _ _) (genMap ξ p).rangeRestrict_surjective
-  obtain ⟨b, hb⟩ := (IsIntegrallyClosed.isIntegral_iff (R := X.presheaf.stalk p.1) (K := Ω)).1
-    (isIntegral_trans (R := X.presheaf.stalk p.1) (A := regAt ξ p) a ha)
+  obtain ⟨b, hb⟩ :=
+    (IsIntegrallyClosed.isIntegral_iff (R := X.presheaf.stalk p.1) (K := Ω)).1
+      (isIntegral_trans (R := X.presheaf.stalk p.1) (A := regAt ξ p) a ha)
   exact ⟨b, hb⟩
 
-theorem int_reg (hN : NormalCpt ξ) {F : Type} [Field F] [NumberField F] (ψ : F →+* Ω) (q : Cpt ξ) (b : 𝓞 F) :
-    ψ (b : F) ∈ regAt ξ q := hN q _ ((map_isIntegral_int ψ (RingOfIntegers.isIntegral_coe b)).tower_top)
+theorem int_reg
+    (hN : NormalCpt ξ) {F : Type} [Field F] [NumberField F] (ψ : F →+* Ω) (q : Cpt ξ) (b : 𝓞 F)
+    : ψ (b : F) ∈ regAt ξ q :=
+  hN q _ ((map_isIntegral_int ψ (RingOfIntegers.isIntegral_coe b)).tower_top)
 
-theorem inv_reg {R : Type} [CommRing R] [IsLocalRing R] {z : Spec (CommRingCat.of R) ⟶ X} (h : genPt ξ ⤳ centre z)
-    {a : Ω} {r : R} (hv : ValAt ξ z a r) (hr : IsUnit r) : a⁻¹ ∈ regAt ξ ⟨centre z, h⟩ := by
+theorem inv_reg
+    {R : Type} [CommRing R] [IsLocalRing R]
+    {z : Spec (CommRingCat.of R) ⟶ X} (h : genPt ξ ⤳ centre z)
+    {a : Ω} {r : R} (hv : ValAt ξ z a r) (hr : IsUnit r)
+    : a⁻¹ ∈ regAt ξ ⟨centre z, h⟩ := by
   obtain ⟨h', g, rfl, rfl⟩ := hv
-  obtain ⟨u, rfl⟩ : IsUnit g :=
-    (Scheme.isLocalHom_stalkClosedPointTo' z).map_nonunit g hr
+  obtain ⟨u, rfl⟩ : IsUnit g := (Scheme.isLocalHom_stalkClosedPointTo' z).map_nonunit g hr
   exact ⟨u⁻¹.val, map_units_inv _ u⟩
 
-theorem exists_const (hξ : IsCptGen ξ) (hN : NormalCpt ξ) {F : Type} [Field F] [NumberField F] (ψ : F →+* Ω)
-    {L : Type} [Field L] [CharZero L] (z : Spec (CommRingCat.of L) ⟶ X) (h : genPt ξ ⤳ centre z) :
-    ∃ ψL : F →+* L, ∀ a, ValAt ξ z (ψ a) (ψL a) := by
+theorem exists_const
+    (hξ : IsCptGen ξ) (hN : NormalCpt ξ)
+    {F : Type} [Field F] [NumberField F]
+    (ψ : F →+* Ω)
+    {L : Type} [Field L] [CharZero L]
+    (z : Spec (CommRingCat.of L) ⟶ X) (h : genPt ξ ⤳ centre z)
+    : ∃ ψL : F →+* L, ∀ a, ValAt ξ z (ψ a) (ψL a) := by
   have hreg : ∀ a, ψ a ∈ regAt ξ ⟨centre z, h⟩ := by
     intro a
-    have halg : IsAlgebraic ℤ a := (IsFractionRing.isAlgebraic_iff ℤ ℚ F).2 (Algebra.IsAlgebraic.isAlgebraic a)
+    have halg : IsAlgebraic ℤ a :=
+      (IsFractionRing.isAlgebraic_iff ℤ ℚ F).2 (Algebra.IsAlgebraic.isAlgebraic a)
     obtain ⟨n, hn, hi⟩ := halg.exists_integral_multiple
     haveI : CharZero Ω := charZero_of_injective_ringHom ψ.injective
     have h1 := int_reg hN ψ ⟨centre z, h⟩ ⟨n • a, hi⟩
-    have h2 : ValAt ξ z (n : Ω) (n : L) := ⟨h, (n : X.presheaf.stalk (centre z)), map_intCast _ _, map_intCast _ _⟩
+    have h2 : ValAt ξ z (n : Ω) (n : L) :=
+      ⟨h, (n : X.presheaf.stalk (centre z)), map_intCast _ _, map_intCast _ _⟩
     have h3 := inv_reg h h2 (IsUnit.mk0 _ (by exact_mod_cast hn))
     have e : ψ a = (n : Ω)⁻¹ * ψ (n • a) := by
       rw [zsmul_eq_mul, map_mul, map_intCast, inv_mul_cancel_left₀ (by exact_mod_cast hn)]
     rw [e]
     exact mul_mem h3 h1
   let e : X.presheaf.stalk (centre z) ≃+* regAt ξ ⟨centre z, h⟩ :=
-    RingEquiv.ofBijective (genMap ξ ⟨centre z, h⟩).rangeRestrict
-      ⟨fun a b hab => hξ.inj ⟨centre z, h⟩ (congrArg Subtype.val hab), (genMap ξ ⟨centre z, h⟩).rangeRestrict_surjective⟩
-  refine ⟨(Scheme.stalkClosedPointTo z).hom.comp (e.symm.toRingHom.comp (ψ.codRestrict _ hreg)), fun a =>
-    ⟨h, e.symm ⟨ψ a, hreg a⟩, congrArg Subtype.val (e.apply_symm_apply ⟨ψ a, hreg a⟩), rfl⟩⟩
+    RingEquiv.ofBijective (genMap ξ ⟨centre z, h⟩).rangeRestrict ⟨
+      fun a b hab => hξ.inj ⟨centre z, h⟩ (congrArg Subtype.val hab),
+      (genMap ξ ⟨centre z, h⟩).rangeRestrict_surjective
+    ⟩
+  refine ⟨
+    (Scheme.stalkClosedPointTo z).hom.comp (e.symm.toRingHom.comp (ψ.codRestrict _ hreg)),
+    fun a => ⟨h, e.symm ⟨ψ a, hreg a⟩, congrArg Subtype.val (e.apply_symm_apply ⟨ψ a, hreg a⟩), rfl⟩
+  ⟩
 
-theorem val_unique (hξ : IsCptGen ξ) {R : Type} [CommRing R] [IsLocalRing R] {z : Spec (CommRingCat.of R) ⟶ X}
-    {a : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a r') : r = r' := by
+theorem val_unique
+    (hξ : IsCptGen ξ)
+    {R : Type} [CommRing R] [IsLocalRing R]
+    {z : Spec (CommRingCat.of R) ⟶ X} {a : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a r')
+    : r = r' := by
   obtain ⟨h1, s, hs, rfl⟩ := h
   obtain ⟨_, s', hs', rfl⟩ := h'
   rw [hξ.inj ⟨centre z, h1⟩ (hs.trans hs'.symm)]
 
 end Val
 
-theorem exists_lift_genFibre {F L : Type} [Field F] [NumberField F] [Field L] [CharZero L] {W : Scheme.{0}}
-    (s : W ⟶ Spec (CommRingCat.of (𝓞 F))) (z : Spec (CommRingCat.of L) ⟶ W) :
-    ∃ u : Spec (CommRingCat.of L) ⟶ pullback s (spMap (algebraMap (𝓞 F) F)), u ≫ pullback.fst _ _ = z := by
+theorem exists_lift_genFibre
+    {F L : Type} [Field F] [NumberField F] [Field L] [CharZero L]
+    {W : Scheme.{0}} (s : W ⟶ Spec (CommRingCat.of (𝓞 F))) (z : Spec (CommRingCat.of L) ⟶ W)
+    : ∃ u : Spec (CommRingCat.of L) ⟶ pullback s (spMap (algebraMap (𝓞 F) F)),
+      u ≫ pullback.fst _ _ = z := by
   let r : 𝓞 F →+* L := (Spec.preimage (z ≫ s)).hom
-  have hr : z ≫ s = spMap r := by
-    simp [r, spMap]
+  have hr : z ≫ s = spMap r := by simp [r, spMap]
   have hinj : Function.Injective r := by
     rw [RingHom.injective_iff_ker_eq_bot]
     refine Ideal.eq_bot_of_comap_eq_bot (R := ℤ) ?_
@@ -271,7 +328,9 @@ theorem pointEx : PointEx := by
   have hW : genPt 𝔐.ξ ∈ W := by
     change 𝔐.f (genPt 𝔐.ξ) ∉ C
     rw [CptIn.Intr.genPt_dominates 𝔐.fn_over, hgen]
-    have h1 : genPt (Z.ξ₀ ≫ Y.j) = pullback.fst Y.s (spMap (algebraMap (𝓞 c.F) c.F)) (Y.jQ (genPt Z.ξ₀)) := by
+    have h1
+        : genPt (Z.ξ₀ ≫ Y.j)
+          = pullback.fst Y.s (spMap (algebraMap (𝓞 c.F) c.F)) (Y.jQ (genPt Z.ξ₀)) := by
       simp [genPt, Model.j, Scheme.Hom.comp_apply]
       rfl
     rw [h1]
@@ -306,26 +365,44 @@ theorem pointEx : PointEx := by
     haveI : Algebra.IsAlgebraic F' L := Algebra.IsAlgebraic.tower_top (K := ℚ) F'
     let φ : L →ₐ[F'] ℂ_[p] := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     exact ⟨φ.toRingHom, RingHom.ext fun a => φ.commutes a⟩
   obtain ⟨V, _, _, _, _, _, hV⟩ := exists_dvr j
   obtain ⟨s₀, hft, hqc, -⟩ := ChartFType.main 𝔐.X Ω 𝔐.ξ _ _ 𝔐.all 𝔐.tie
   haveI : IsProper s₀ := LocModel.isProper_of_coordTie 𝔐.all 𝔐.tie s₀
-  obtain ⟨z, ⟨hz, -⟩, -⟩ := existsUnique_valuationRing_lift ℤ V L (Int.castRingHom V) 𝔐.X s₀ zL
-    (specZIsTerminal.hom_ext _ _)
+  obtain ⟨z, ⟨hz, -⟩, -⟩ :=
+    existsUnique_valuationRing_lift ℤ V L (Int.castRingHom V) 𝔐.X s₀ zL
+      (specZIsTerminal.hom_ext _ _)
   subst hz
-  refine ⟨V, L, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance,
-    j, ψL, z, hV, hj, hint, hψL, fun a ha => ?_⟩
+  refine ⟨
+    V,
+    L,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    j,
+    ψL,
+    z,
+    hV,
+    hj,
+    hint,
+    hψL,
+    fun a ha => ?_
+  ⟩
   obtain ⟨u, s, hs, rfl⟩ := exists_frac κ' ha
   rw [map_mul, map_inv₀]
   refine mul_mem (int_reg hN ψ _ u) ?_
   obtain ⟨g, hg⟩ := int_reg hN ψ ⟨centre z, 𝔐.all _⟩ s
   have hv : ValAt 𝔐.ξ z (ψ (s : F')) ((Scheme.stalkClosedPointTo z).hom g) := ⟨𝔐.all _, g, hg, rfl⟩
   refine inv_reg _ hv ?_
-  have h1 := val_unique 𝔐.tie.gen
-    (ChangeRing.valAt_change _ _ _ V L (algebraMap V L) z _ _ hv (𝔐.all _)) (hψL s)
+  have h1 :=
+    val_unique 𝔐.tie.gen (ChangeRing.valAt_change _ _ _ V L (algebraMap V L) z _ _ hv (𝔐.all _))
+      (hψL s)
   have h2 : ‖j (ψL s)‖ = 1 := by
     have : j (ψL s) = κ' s := by rw [← hj]; rfl
     rw [this]

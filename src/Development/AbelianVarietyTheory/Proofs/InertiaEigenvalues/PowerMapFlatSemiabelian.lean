@@ -28,17 +28,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CuspFor
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG GlobalTheory.LFun Formalism.L2.Host
+open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG
+  GlobalTheory.LFun Formalism.L2.Host
 open scoped ENNReal ComplexConjugate ContDiff
 
 namespace GlobalTheory.SBThetaUpper
 
-open GroundTheory.Automorphic.GJMatrix GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.ThetaPoisson GlobalTheory.ShortVecDecay GlobalTheory.RSTheta
+open GroundTheory.Automorphic.GJMatrix GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.ThetaPoisson
+  GlobalTheory.ShortVecDecay GlobalTheory.RSTheta
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem exists_norm_mul_pow_le {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a)) (M : ℕ) :
-    ∃ B : ℝ, ∀ y, ‖G y‖ * (1 + ‖fun i => pInf E (y i)‖) ^ M ≤ B := by
+theorem exists_norm_mul_pow_le
+    {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a)) (M : ℕ)
+    : ∃ B : ℝ, ∀ y, ‖G y‖ * (1 + ‖fun i => pInf E (y i)‖) ^ M ≤ B := by
   classical
   induction hG using Submodule.span_induction with
   | mem G hG =>
@@ -59,21 +62,29 @@ theorem exists_norm_mul_pow_le {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwar
     have a1 := hA₁ u
     rw [norm_iteratedFDeriv_zero] at a0 a1
     rw [pow_zero, one_mul] at a0
-    have h1 : ‖S u‖ ≤ C * ‖u‖ := (S : (Fin a → mixedEmbedding.mixedSpace E) →L[ℝ] (Fin a → Cinf E)).le_opNorm u
+    have h1 : ‖S u‖ ≤ C * ‖u‖ :=
+      (S : (Fin a → mixedEmbedding.mixedSpace E) →L[ℝ] (Fin a → Cinf E)).le_opNorm u
     have h2 : 1 + ‖S u‖ ≤ (1 + C) * (1 + ‖u‖) := by nlinarith [norm_nonneg u, norm_nonneg (S u)]
     have h3 : (1 + ‖S u‖) ^ M ≤ (1 + C) ^ M * (2 ^ M * (1 + ‖u‖ ^ M)) := by
-      calc (1 + ‖S u‖) ^ M ≤ ((1 + C) * (1 + ‖u‖)) ^ M := pow_le_pow_left₀ (by positivity) h2 M
+      calc
+        (1 + ‖S u‖) ^ M
+          ≤ ((1 + C) * (1 + ‖u‖)) ^ M := pow_le_pow_left₀ (by positivity) h2 M
         _ = (1 + C) ^ M * (1 + ‖u‖) ^ M := mul_pow _ _ _
         _ ≤ (1 + C) ^ M * (2 ^ M * (1 + ‖u‖ ^ M)) :=
-          mul_le_mul_of_nonneg_left (GlobalTheory.SchwartzBruhatMoments.one_add_pow_le (norm_nonneg u) M) (by positivity)
+          mul_le_mul_of_nonneg_left
+            (GlobalTheory.SchwartzBruhatMoments.one_add_pow_le (norm_nonneg u) M) (by positivity)
     have h4 : ‖φ u‖ * (1 + ‖S u‖) ^ M ≤ (1 + C) ^ M * 2 ^ M * (A₀ + A₁) := by
-      calc ‖φ u‖ * (1 + ‖S u‖) ^ M ≤ ‖φ u‖ * ((1 + C) ^ M * (2 ^ M * (1 + ‖u‖ ^ M))) :=
-            mul_le_mul_of_nonneg_left h3 (norm_nonneg _)
+      calc
+        ‖φ u‖ * (1 + ‖S u‖) ^ M ≤ ‖φ u‖ * ((1 + C) ^ M * (2 ^ M * (1 + ‖u‖ ^ M))) :=
+          mul_le_mul_of_nonneg_left h3 (norm_nonneg _)
         _ = ((1 + C) ^ M * 2 ^ M) * (‖φ u‖ + ‖u‖ ^ M * ‖φ u‖) := by ring
         _ ≤ _ := mul_le_mul_of_nonneg_left (add_le_add a0 a1) (by positivity)
-    calc ‖φ u‖ * ‖g z‖ * (1 + ‖S u‖) ^ M = ‖φ u‖ * (1 + ‖S u‖) ^ M * ‖g z‖ := by ring
+    calc
+      ‖φ u‖ * ‖g z‖ * (1 + ‖S u‖) ^ M
+        = ‖φ u‖ * (1 + ‖S u‖) ^ M * ‖g z‖ := by ring
       _ ≤ _ := mul_le_mul h4 hBy (norm_nonneg _) (le_trans (by positivity) h4)
-  | zero => exact ⟨0, fun y => by simp⟩
+  | zero =>
+    exact ⟨0, fun y => by simp⟩
   | add G H _ _ hG hH =>
     obtain ⟨B₁, h1⟩ := hG
     obtain ⟨B₂, h2⟩ := hH
@@ -86,25 +97,32 @@ theorem exists_norm_mul_pow_le {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwar
     rw [Pi.smul_apply, norm_smul, mul_assoc]
     exact mul_le_mul_of_nonneg_left (h y) (norm_nonneg _)
 
-theorem isSmallKernel_sq_mul {φ : GA E a → ℂ} (h : Decays φ) {G : (Fin a → Ad E) → ℂ}
-    (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a)) : IsSmallKernel fun g y => φ g ^ 2 * G y := by
-  obtain ⟨L, hL, hs⟩ := (GlobalTheory.SchwartzBruhatMoments.compactSupport_and_integrable_moments E a G hG).1
+theorem isSmallKernel_sq_mul
+    {φ : GA E a → ℂ} (h : Decays φ)
+    {G : (Fin a → Ad E) → ℂ} (hG : G ∈ schwartzBruhatPi (K := E) (ι := Fin a))
+    : IsSmallKernel fun g y => φ g ^ 2 * G y := by
+  obtain ⟨L, hL, hs⟩ :=
+    (GlobalTheory.SchwartzBruhatMoments.compactSupport_and_integrable_moments E a G hG).1
   refine ⟨⟨L, hL, fun g y hy => hs y (right_ne_zero_of_mul hy)⟩, fun L hL N M => ?_⟩
   obtain ⟨C, hC⟩ := h L hL {1} isCompact_singleton N
   obtain ⟨C', hC'⟩ := h L hL {1} isCompact_singleton 0
   obtain ⟨B, hB⟩ := exists_norm_mul_pow_le hG M
   refine ⟨|C| * |C'| * |B|, fun g ξ hξ hm y => ?_⟩
-  have hΔ : 0 < (GroundTheory.Global.IdeleGroup.ideleModule E (Matrix.GeneralLinearGroup.det g) : ℝ) :=
+  have hΔ
+      : 0 < (GroundTheory.Global.IdeleGroup.ideleModule E (Matrix.GeneralLinearGroup.det g) : ℝ) :=
     (GroundTheory.Global.IdeleGroup.ideleModule E _).2
   have h1 := (hC g 1 rfl ξ hξ hm).trans (mul_le_mul_of_nonneg_right (le_abs_self C) (by positivity))
-  have h2 := (hC' g 1 rfl ξ hξ hm).trans (mul_le_mul_of_nonneg_right (le_abs_self C') (by positivity))
+  have h2 :=
+    (hC' g 1 rfl ξ hξ hm).trans (mul_le_mul_of_nonneg_right (le_abs_self C') (by positivity))
   rw [mul_one] at h1 h2
   have h3 : ‖G y‖ ≤ |B| * (1 + ‖fun i => pInf E (y i)‖) ^ (-(M : ℝ)) := by
-    rw [Real.rpow_neg (by positivity), Real.rpow_natCast, ← div_eq_mul_inv, le_div_iff₀ (by positivity)]
+    rw [Real.rpow_neg (by positivity), Real.rpow_natCast, ← div_eq_mul_inv,
+      le_div_iff₀ (by positivity)]
     exact (hB y).trans (le_abs_self B)
   beta_reduce
   rw [norm_mul, sq, norm_mul]
-  refine (mul_le_mul (mul_le_mul h1 h2 (norm_nonneg _) (by positivity)) h3 (norm_nonneg _) (by positivity)).trans_eq ?_
+  refine (mul_le_mul (mul_le_mul h1 h2 (norm_nonneg _) (by positivity)) h3 (norm_nonneg _)
+    (by positivity)).trans_eq ?_
   ring
 
 set_option synthInstance.maxHeartbeats 400000 in

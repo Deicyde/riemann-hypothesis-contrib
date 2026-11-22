@@ -18,9 +18,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsKHwMa
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift
@@ -29,8 +32,8 @@ noncomputable section
 
 namespace GlobalTheory.LowestKType.DegBound
 
-theorem deg_X_mul_pderiv {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ) :
-    (MvPolynomial.X a * MvPolynomial.pderiv b P).totalDegree ≤ P.totalDegree := by
+theorem deg_X_mul_pderiv {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ)
+    : (MvPolynomial.X a * MvPolynomial.pderiv b P).totalDegree ≤ P.totalDegree := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     conv_lhs => rw [P.as_sum, map_sum, Finset.mul_sum]
@@ -48,8 +51,8 @@ theorem deg_X_mul_pderiv {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ) :
     rw [Finsupp.sum_add_index' (by simp) (by simp), Finsupp.sum_add_index' (by simp) (by simp)]
     simp [Function.id_def]
 
-theorem deg_pderiv_X_mul {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ) :
-    (MvPolynomial.pderiv b (MvPolynomial.X a * P)).totalDegree ≤ P.totalDegree := by
+theorem deg_pderiv_X_mul {σ : Type} (a b : σ) (P : MvPolynomial σ ℂ)
+    : (MvPolynomial.pderiv b (MvPolynomial.X a * P)).totalDegree ≤ P.totalDegree := by
   classical
   rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul]
   refine (MvPolynomial.totalDegree_add _ _).trans (max_le (deg_X_mul_pderiv _ _ _) ?_)
@@ -71,9 +74,11 @@ namespace GlobalTheory.LowestKType
 
 open GlobalTheory.LowestKType.DegBound
 
-theorem kop_totalDegree_le (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.Weight D n) (τ : D.what₂.Tau) (a b : Fin m)
-    (hab : Cpt w τ a b) (d : ℕ) (P : PolF D m n) (hP : P.totalDegree ≤ d) :
-    (kop w τ a b P).totalDegree ≤ d := by
+theorem kop_totalDegree_le
+    (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.Weight D n)
+    (τ : D.what₂.Tau) (a b : Fin m) (hab : Cpt w τ a b)
+    (d : ℕ) (P : PolF D m n) (hP : P.totalDegree ≤ d)
+    : (kop w τ a b P).totalDegree ≤ d := by
   classical
   refine le_trans ?_ hP
   suffices h : kop w τ a b ∈ nonRaising (FVar D m n) from h P
@@ -83,7 +88,9 @@ theorem kop_totalDegree_le (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.W
   · obtain ⟨rfl, rfl⟩ := hil
     refine Submodule.smul_mem _ _ (Submodule.sum_mem _ fun j _ => Submodule.add_mem _ ?_ ?_)
     · intro Q
-      simp only [GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.raiO, GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.lowO, GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.sgn, if_true, one_smul]
+      simp only [GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.raiO,
+        GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.lowO,
+        GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.sgn, if_true, one_smul]
       unfold Cpt at hab
       by_cases hi : (i : ℕ) < w.p τ
       · have hl : (l : ℕ) < w.p τ := hab.1 hi
@@ -91,8 +98,7 @@ theorem kop_totalDegree_le (D : D7) (n m : ℕ) (w : GlobalTheory.ExportSeries.W
         exact deg_X_mul_pderiv _ _ _
       · have hl : ¬ (l : ℕ) < w.p τ := fun h => hi (hab.2 h)
         simp only [hi, hl, decide_false, Bool.false_eq_true, if_false, Module.End.mul_apply,
-          LinearMap.mulLeft_apply, LinearMap.neg_apply,
-          MvPolynomial.totalDegree_neg]
+          LinearMap.mulLeft_apply, LinearMap.neg_apply, MvPolynomial.totalDegree_neg]
         exact deg_pderiv_X_mul _ _ _
     · split_ifs
       · exact Submodule.smul_mem _ _ (one_mem_nonRaising _)

@@ -19,8 +19,36 @@ theorem relEx_of (hA : RelAlg) (hS : SdEx) (hR : ThetaDictR.RelRealP) : RelEx :=
   obtain ⟨θ, fr, g, l, εs, Φg, Φf, Φv, hth, hfr, hg, hΦg, hεs, hchr, hpl, hfrm, hpf, hpr⟩ :=
     hR F E σ d R Φ P gf hP x t u hx η hη hherm
   obtain ⟨⟨μ, hμ⟩, ⟨ν, hν⟩⟩ := hS F E σ hcm d.m (Jd d η) hJ d.B.ψ hchr d.n
-  exact ⟨η, T₀, hOf, θ, fr, g, l, εs, Φg, Φf, Φv, μ, ν, ⟨hx, hrat, hη, hherm, hof, hth, hfr, hg⟩, hΦg, haniso, hεs,
-    hcm, hJ, hTdh, hTdd, hchr, hpl, hfrm, hpf, hpr, hμ, hν⟩
+  exact ⟨
+    η,
+    T₀,
+    hOf,
+    θ,
+    fr,
+    g,
+    l,
+    εs,
+    Φg,
+    Φf,
+    Φv,
+    μ,
+    ν,
+    ⟨hx, hrat, hη, hherm, hof, hth, hfr, hg⟩,
+    hΦg,
+    haniso,
+    hεs,
+    hcm,
+    hJ,
+    hTdh,
+    hTdd,
+    hchr,
+    hpl,
+    hfrm,
+    hpf,
+    hpr,
+    hμ,
+    hν
+  ⟩
 
 theorem relEx : RelEx := relEx_of relAlg_pf sdEx ThetaDictR.relReal
 

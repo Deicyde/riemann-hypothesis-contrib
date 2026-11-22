@@ -11,8 +11,7 @@ open UpperTheory.Gal.crystallineComparison (resPt twist PtId fn)
 open GlobalTheory.SS.FrobField (absFrob)
 open UpperTheory.Gal UpperTheory.Gal.Mod
 
-theorem UpperTheory.Gal.Mod.corrComm :
-    CorrComm := by
+theorem UpperTheory.Gal.Mod.corrComm : CorrComm := by
   intro l _ p Y S S' B B' O g s bS β hS i bS' γ hcomm hl T w c c' hc hc' k j
   obtain ⟨v, hv, hf, hb, hw⟩ := hc
   obtain ⟨v', hv', hf', hb', hw'⟩ := hc'
@@ -27,7 +26,9 @@ theorem UpperTheory.Gal.Mod.corrComm :
     apply hS.hom_ext
     · simp only [Category.assoc]
       rw [hf', hf, Category.assoc]
-    · calc (c'.f ≫ i) ≫ bS = (c'.f ≫ bS') ≫ γ := by rw [Category.assoc, hcomm, Category.assoc]
+    · calc
+        (c'.f ≫ i) ≫ bS
+          = (c'.f ≫ bS') ≫ γ := by rw [Category.assoc, hcomm, Category.assoc]
         _ = (c'.p ≫ bS') ≫ γ := by rw [hb']
         _ = c'.p ≫ i ≫ bS := by rw [Category.assoc, hcomm]
         _ = (u ≫ c.p) ≫ bS := by rw [hup, Category.assoc]

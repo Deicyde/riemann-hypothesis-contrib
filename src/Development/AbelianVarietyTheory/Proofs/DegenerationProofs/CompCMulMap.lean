@@ -10,7 +10,8 @@ namespace GlobalTheory.PowerSeriesCompositionMap
 
 variable {O O₁ K : Type} [CommRing O] [CommRing O₁] [CommRing K] [Algebra O O₁]
 
-noncomputable def comp {ι : Type} (b : Module.Basis ι O O₁) (j : ι) : PowerSeries O₁ →+ PowerSeries O where
+noncomputable def comp {ι : Type} (b : Module.Basis ι O O₁) (j : ι)
+    : PowerSeries O₁ →+ PowerSeries O where
   toFun f := PowerSeries.mk fun n => b.repr (coeff n f) j
   map_zero' := by ext n; simp
   map_add' f g := by ext n; simp
@@ -71,18 +72,21 @@ lemma ext_mul (h : ∀ a : O, io (algebraMap O O₁ a) = i (C a)) (f g : PowerSe
   rw [e, ext_C_mul_map h, ext_C_mul_map h, ext_C_mul_map h, map_mul, map_mul]
   ring
 
-theorem main (O O₁ K : Type) [CommRing O] [CommRing O₁] [CommRing K] [Algebra O O₁]
-    [Module.Free O O₁] [Module.Finite O O₁] (i : PowerSeries O →+* K) (io : O₁ →+* K)
-    (h : ∀ a : O, io (algebraMap O O₁ a) = i (C a)) :
-    ∃ Φ : PowerSeries O₁ →+* K, (∀ a : O₁, Φ (C a) = io a) ∧ Φ X = i X ∧
-      ∀ f : PowerSeries O₁, Φ f ∈ Subring.closure (Set.range i ∪ Set.range io) := by
+theorem main
+    (O O₁ K : Type)
+    [CommRing O] [CommRing O₁] [CommRing K] [Algebra O O₁] [Module.Free O O₁] [Module.Finite O O₁]
+    (i : PowerSeries O →+* K) (io : O₁ →+* K) (h : ∀ a : O, io (algebraMap O O₁ a) = i (C a))
+    : ∃ Φ : PowerSeries O₁ →+* K,
+      (∀ a : O₁, Φ (C a) = io a) ∧ Φ X = i X
+        ∧ ∀ f : PowerSeries O₁, Φ f ∈ Subring.closure (Set.range i ∪ Set.range io) := by
   let b := Module.Free.chooseBasis O O₁
   have hC : ∀ a : O₁, ext b i io (C a) = io a := fun a => by
     simpa using ext_C_mul_map (b := b) h a 1
-  let Φ : PowerSeries O₁ →+* K :=
-    { ext b i io with
-      map_one' := by simpa using hC 1
-      map_mul' := ext_mul h }
+  let Φ : PowerSeries O₁ →+* K := {
+    ext b i io with
+    map_one' := by simpa using hC 1
+    map_mul' := ext_mul h
+  }
   refine ⟨Φ, hC, ?_, fun f => ?_⟩
   · show ext b i io X = i X
     simpa using ext_C_mul_map (b := b) h 1 X

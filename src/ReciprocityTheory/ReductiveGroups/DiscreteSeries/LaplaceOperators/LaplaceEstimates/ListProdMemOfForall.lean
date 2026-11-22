@@ -13,17 +13,19 @@ namespace CapelliMinorMembership
 
 variable {M : Type*} [AddCommGroup M] [Module ℂ M]
 
-theorem list_prod_mem_of_forall {S : Submodule ℂ M} :
-    ∀ (l : List (Module.End ℂ M)), (∀ f ∈ l, ∀ x ∈ S, f x ∈ S) → ∀ x ∈ S, l.prod x ∈ S
+theorem list_prod_mem_of_forall {S : Submodule ℂ M}
+    : ∀ (l : List (Module.End ℂ M)), (∀ f ∈ l, ∀ x ∈ S, f x ∈ S) → ∀ x ∈ S, l.prod x ∈ S
   | [], _, x, hx => by simpa using hx
   | f :: l, h, x, hx => by
     rw [List.prod_cons, Module.End.mul_apply]
     exact h f List.mem_cons_self _
       (list_prod_mem_of_forall l (fun g hg => h g (List.mem_cons_of_mem _ hg)) x hx)
 
-theorem capEntry_mem {n : ℕ} {E : Fin n → Fin n → Module.End ℂ M} {S : Submodule ℂ M}
-    (hS : ∀ a b, ∀ x ∈ S, E a b x ∈ S) (t : ℂ) (a b : Fin n) :
-    ∀ x ∈ S, Capelli.capEntry E t a b x ∈ S := by
+theorem capEntry_mem
+    {n : ℕ} {E : Fin n → Fin n → Module.End ℂ M} {S : Submodule ℂ M}
+    (hS : ∀ a b, ∀ x ∈ S, E a b x ∈ S)
+    (t : ℂ) (a b : Fin n)
+    : ∀ x ∈ S, Capelli.capEntry E t a b x ∈ S := by
   intro x hx
   unfold Capelli.capEntry
   rw [LinearMap.add_apply]
@@ -32,9 +34,11 @@ theorem capEntry_mem {n : ℕ} {E : Fin n → Fin n → Module.End ℂ M} {S : S
   · simpa using S.smul_mem t hx
   · simp
 
-theorem cminor_mem {n p : ℕ} {E : Fin n → Fin n → Module.End ℂ M} {S : Submodule ℂ M}
-    (hS : ∀ a b, ∀ x ∈ S, E a b x ∈ S) (R C : Fin p → Fin n) (t : ℂ) :
-    ∀ x ∈ S, Capelli.cminor E R C t x ∈ S := by
+theorem cminor_mem
+    {n p : ℕ} {E : Fin n → Fin n → Module.End ℂ M} {S : Submodule ℂ M}
+    (hS : ∀ a b, ∀ x ∈ S, E a b x ∈ S) (R C : Fin p → Fin n)
+    (t : ℂ)
+    : ∀ x ∈ S, Capelli.cminor E R C t x ∈ S := by
   intro x hx
   unfold Capelli.cminor
   rw [LinearMap.sum_apply]
@@ -53,10 +57,8 @@ open CapelliMinorMembership
 theorem eig : EigStatement := by
   intro M _ _ m E S ω y β v hE hS hC hv
   have h0 : Capelli.capelliC E (ω : ℂ) v = 0 := hC v hv
-  have eV : Capelli.eeV E = LemK.eeV E := by
-    ext f d; simp [Capelli.eeV, LemK.eeV, LemK.prj]
-  have eVd : Capelli.eeVd E = LemK.eeVd E := by
-    ext f d; simp [Capelli.eeVd, LemK.eeVd, LemK.prj]
+  have eV : Capelli.eeV E = LemK.eeV E := by ext f d; simp [Capelli.eeV, LemK.eeV, LemK.prj]
+  have eVd : Capelli.eeVd E = LemK.eeVd E := by ext f d; simp [Capelli.eeVd, LemK.eeVd, LemK.prj]
   constructor
   · refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
     · rw [Submodule.mem_pi]

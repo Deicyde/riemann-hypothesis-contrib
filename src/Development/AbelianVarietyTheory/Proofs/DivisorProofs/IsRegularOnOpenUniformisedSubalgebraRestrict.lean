@@ -8,19 +8,39 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.TopLePreimag
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.CechDR GlobalTheory.CechPer
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham
+  GlobalTheory.CechDR GlobalTheory.CechPer
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.RegAlg
 
-theorem main : ∀ (A : Over (Sp ℂ)) [GrpObj A] (g : ℕ) (L : LB A.left) (u : HolUnif A L g), ∀ U : A.left.Opens, (∀ a : ℂ, IsReg u.ex U fun _ => a) ∧ (∀ k k', IsReg u.ex U k → IsReg u.ex U k' → IsReg u.ex U (k + k') ∧ IsReg u.ex U (k - k') ∧ IsReg u.ex U (k * k')) ∧ (∀ k k', IsReg u.ex U k → (∀ z ∈ pre u.ex U, k' z = k z) → IsReg u.ex U k') ∧ (∀ V, V ≤ U → ∀ k, IsReg u.ex U k → IsReg u.ex V k) ∧ (∀ k, IsReg u.ex U k → DifferentiableOn ℂ k (pre u.ex U)) ∧ ∀ (n : ℕ) (k : Fin n → (Fin g → ℂ) → ℂ), (∀ i, IsReg u.ex U (k i)) → IsReg u.ex U (fun z => ∑ i, k i z) := by
+theorem main
+    : ∀ (A : Over (Sp ℂ)) [GrpObj A] (g : ℕ) (L : LB A.left) (u : HolUnif A L g),
+      ∀ U : A.left.Opens,
+        (∀ a : ℂ, IsReg u.ex U fun _ => a)
+          ∧ (∀ k k',
+            IsReg u.ex U k → IsReg u.ex U k'
+              → IsReg u.ex U (k + k') ∧ IsReg u.ex U (k - k') ∧ IsReg u.ex U (k * k'))
+          ∧ (∀ k k', IsReg u.ex U k → (∀ z ∈ pre u.ex U, k' z = k z) → IsReg u.ex U k')
+          ∧ (∀ V, V ≤ U → ∀ k, IsReg u.ex U k → IsReg u.ex V k)
+          ∧ (∀ k, IsReg u.ex U k → DifferentiableOn ℂ k (pre u.ex U))
+          ∧ ∀ (n : ℕ) (k : Fin n → (Fin g → ℂ) → ℂ),
+            (∀ i, IsReg u.ex U (k i)) → IsReg u.ex U (fun z => ∑ i, k i z) := by
   intro A _ g L u U
-  refine ⟨fun a => ?_, fun k k' hk hk' => ?_, fun k k' hk he => ?_, fun V hV k hk => ?_, fun k hk => ?_, fun n k hk => ?_⟩
+  refine ⟨
+    fun a => ?_,
+    fun k k' hk hk' => ?_,
+    fun k k' hk he => ?_,
+    fun V hV k hk => ?_,
+    fun k hk => ?_,
+    fun n k hk => ?_
+  ⟩
   · refine ⟨constFn A.hom U a, fun z hz => ?_⟩
-    have hp : (u.ex z).left ≫ A.hom = 𝟙 _ := by
-      simpa using Over.w (u.ex z)
+    have hp : (u.ex z).left ≫ A.hom = 𝟙 _ := by simpa using Over.w (u.ex z)
     exact (GlobalTheory.valAt'_constFn (u.ex z).left A.hom hp U a hz).symm
   · obtain ⟨b, hb⟩ := hk
     obtain ⟨b', hb'⟩ := hk'

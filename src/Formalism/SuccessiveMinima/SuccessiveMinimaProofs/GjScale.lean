@@ -53,8 +53,8 @@ lemma fundamentalDomain_eq : ZSpan.fundamentalDomain (Pi.basisFun ℝ ι) = Qv �
   ext x
   simp only [ZSpan.mem_fundamentalDomain, Pi.basisFun_repr, Set.mem_Ico, Qv, Set.mem_setOf_eq]
 
-private theorem add_mem_add_intVectors_iff {T : Set (ι → ℝ)} {z : ι → ℝ} (hz : z ∈ Zv ι)
-    (x : ι → ℝ) : z + x ∈ T + Zv ι ↔ x ∈ T + Zv ι := by
+private theorem add_mem_add_intVectors_iff {T : Set (ι → ℝ)} {z : ι → ℝ} (hz : z ∈ Zv ι) (x : ι → ℝ)
+    : z + x ∈ T + Zv ι ↔ x ∈ T + Zv ι := by
   constructor
   · rintro ⟨a, ha, b, hb, hab⟩
     have hab' : a + b = z + x := hab
@@ -62,9 +62,15 @@ private theorem add_mem_add_intVectors_iff {T : Set (ι → ℝ)} {z : ι → �
     show a + (b + -z) = x
     rw [← add_assoc, hab', add_neg_cancel_comm]
   · rintro ⟨a, ha, b, hb, rfl⟩
-    exact ⟨a, ha, z + b, Zv_add hz hb, by
-      show a + (z + b) = z + (a + b)
-      exact add_left_comm a z b⟩
+    exact ⟨
+      a,
+      ha,
+      z + b,
+      Zv_add hz hb,
+      by
+        show a + (z + b) = z + (a + b)
+        exact add_left_comm a z b
+    ⟩
 
 lemma tm_add_singleton {B : Set (ι → ℝ)} (hB : IsOpen B) (c : ι → ℝ) :
     tm (B + {c}) = tm B := by
@@ -117,12 +123,11 @@ lemma lintegral_scale {κ : Type*} [Fintype κ] (h : (κ → ℝ) → ℝ≥0∞
 section decomp
 variable (n j : ℕ)
 
-def emb (u : {i : Fin n // (i : ℕ) < j} → ℝ) (y : {i : Fin n // ¬ (i : ℕ) < j} → ℝ) :
-    Fin n → ℝ :=
+def emb (u : {i : Fin n // (i : ℕ) < j} → ℝ) (y : {i : Fin n // ¬ (i : ℕ) < j} → ℝ) : Fin n → ℝ :=
   fun i => if h : (i : ℕ) < j then u ⟨i, h⟩ else y ⟨i, h⟩
 
-def fib (A : Set (Fin n → ℝ)) (y : {i : Fin n // ¬ (i : ℕ) < j} → ℝ) :
-    Set ({i : Fin n // (i : ℕ) < j} → ℝ) :=
+def fib (A : Set (Fin n → ℝ)) (y : {i : Fin n // ¬ (i : ℕ) < j} → ℝ)
+    : Set ({i : Fin n // (i : ℕ) < j} → ℝ) :=
   {u | emb n j u y ∈ A}
 
 lemma continuous_emb_left (y : {i : Fin n // ¬ (i : ℕ) < j} → ℝ) :
@@ -178,9 +183,12 @@ lemma fib_set_eq (A : Set (Fin n → ℝ)) (y : {i : Fin n // ¬ (i : ℕ) < j} 
       · simp only [emb, dif_pos hi, Pi.add_apply]
       · simp only [emb, dif_neg hi, Pi.add_apply, Pi.zero_apply, add_zero]
 
-private theorem measure_eq_of_measurePreserving_symm_preimage {α β : Type*} [MeasurableSpace α] [MeasurableSpace β]
-    {μ : Measure α} {ν : Measure β} (e : α ≃ᵐ β) (he : MeasurePreserving e μ ν) (S : Set α) :
-    μ S = ν (e.symm ⁻¹' S) := by
+private theorem measure_eq_of_measurePreserving_symm_preimage
+    {α β : Type*} [MeasurableSpace α] [MeasurableSpace β]
+    {μ : Measure α} {ν : Measure β}
+    (e : α ≃ᵐ β) (he : MeasurePreserving e μ ν)
+    (S : Set α)
+    : μ S = ν (e.symm ⁻¹' S) := by
   have h : Measure.map e μ (e.symm ⁻¹' S) = μ (e ⁻¹' (e.symm ⁻¹' S)) := e.map_apply _
   rw [he.map_eq] at h
   rw [h]
@@ -202,9 +210,11 @@ lemma Gj_eq (A : Set (Fin n → ℝ)) (hA : IsOpen A) :
     rfl
   · exact MeasurableEquiv.measurable _ hS
 
-private theorem torusImageVolume_fib_le_smul {D : Set (Fin n → ℝ)} (hDo : IsOpen D)
-    (hDc : Convex ℝ D) {s : ℝ} (hs : 1 ≤ s) (y : {i : Fin n // ¬ (i : ℕ) < j} → ℝ) :
-    tm (fib n j D y) ≤ tm (fib n j (s • D) (s • y)) := by
+private theorem torusImageVolume_fib_le_smul
+    {D : Set (Fin n → ℝ)} (hDo : IsOpen D) (hDc : Convex ℝ D)
+    {s : ℝ} (hs : 1 ≤ s)
+    (y : {i : Fin n // ¬ (i : ℕ) < j} → ℝ)
+    : tm (fib n j D y) ≤ tm (fib n j (s • D) (s • y)) := by
   have hs0 : s ≠ 0 := (lt_of_lt_of_le one_pos hs).ne'
   rcases (fib n j D y).eq_empty_or_nonempty with h | ⟨w, hw⟩
   · rw [h, tm_empty]
@@ -219,8 +229,11 @@ private theorem torusImageVolume_fib_le_smul {D : Set (Fin n → ℝ)} (hDo : Is
   have hw' : emb n j w y ∈ D := hw
   show emb n j (u + (s - 1) • w) (s • y) ∈ s • D
   rw [Set.mem_smul_set]
-  refine ⟨s⁻¹ • emb n j u y + (1 - s⁻¹) • emb n j w y,
-    hDc hu' hw' (inv_nonneg.2 (by linarith)) ?_ (by ring), ?_⟩
+  refine ⟨
+    s⁻¹ • emb n j u y + (1 - s⁻¹) • emb n j w y,
+    hDc hu' hw' (inv_nonneg.2 (by linarith)) ?_ (by ring),
+    ?_
+  ⟩
   · nlinarith [mul_nonneg (inv_nonneg.2 (zero_le_one.trans hs)) (sub_nonneg.2 hs),
       inv_mul_cancel₀ hs0]
   · have hinv : s * s⁻¹ = 1 := mul_inv_cancel₀ hs0
@@ -258,13 +271,17 @@ theorem partialBoxVolumeScaling : GjScale := by
   have hDc : Convex ℝ (t • C) := hCc.smul t
   have hsD : t' • C = (t' / t) • (t • C) := by
     rw [smul_smul, div_mul_eq_mul_div, mul_div_assoc, div_self ht.ne', mul_one]
-  have key := Formalism.FN.GjScaling.lintegral_scale
-    (fun y => Formalism.FN.GjScaling.tm (Formalism.FN.GjScaling.fib n j ((t' / t) • (t • C)) y)) hs
+  have key :=
+    Formalism.FN.GjScaling.lintegral_scale
+      (fun y => Formalism.FN.GjScaling.tm (Formalism.FN.GjScaling.fib n j ((t' / t) • (t • C)) y))
+      hs
   beta_reduce at key
   rw [Formalism.FN.GjScaling.card_compl n j hj] at key
   rw [hsD, Formalism.FN.GjScaling.Gj_eq n j _ hD,
     Formalism.FN.GjScaling.Gj_eq n j _ (hD.smul₀ hs.ne'), key]
   exact mul_le_mul_of_nonneg_left
-    (lintegral_mono fun y => _root_.Formalism.FN.GjScaling.torusImageVolume_fib_le_smul n j hD hDc hs1 y) (by positivity)
+    (lintegral_mono fun y =>
+      _root_.Formalism.FN.GjScaling.torusImageVolume_fib_le_smul n j hD hDc hs1 y)
+    (by positivity)
 
 end Formalism.FN

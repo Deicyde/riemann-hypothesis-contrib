@@ -35,8 +35,7 @@ theorem Chev_of : LateralTheory.EWeil.ContinCut.Chev := by
   have hε : 0 < ε := by
     have : (0 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).pos
     positivity
-  let U : Set (Fin r → ℤ_[l]) :=
-    {z | ∃ c w, π c = 0 ∧ (∀ i, ‖w i‖ ≤ ε) ∧ z = c + w}
+  let U : Set (Fin r → ℤ_[l]) := {z | ∃ c w, π c = 0 ∧ (∀ i, ‖w i‖ ≤ ε) ∧ z = c + w}
   have hU : ∀ x ∈ ⋂ i, V i, U ∈ 𝓝 x := by
     intro x hx
     have hx0 : π x = 0 := h0 _ (fun k => Set.mem_iInter.1 hx k)

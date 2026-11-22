@@ -40,8 +40,7 @@ theorem eBasis : ReciprocityTheory.ChartRestriction.G.TB.EBasisSt := by
       apply Subtype.ext
       exact hinj (congrArg Subtype.val hij)
     exact hbli.comp f hf
-  have hspan : Submodule.span E (Set.range fun i : s => v i) = ⊤ := by
-    rw [hrange, hbspan, hspanE]
+  have hspan : Submodule.span E (Set.range fun i : s => v i) = ⊤ := by rw [hrange, hbspan, hspanE]
   refine ⟨s, ?_, hli, hspan⟩
   have hfr := finrank_span_eq_card hli
   rw [hspan, finrank_top, Fintype.card_coe] at hfr

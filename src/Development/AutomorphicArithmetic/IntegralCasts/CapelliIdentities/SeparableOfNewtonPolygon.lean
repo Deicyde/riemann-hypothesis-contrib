@@ -117,10 +117,14 @@ private lemma tail_succ {Γ : Type} [CommMonoid Γ] {n : ℕ} (γ : Fin n → Γ
   simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Fin.ext_iff]
   omega
 
-theorem UpperTheory.separable_of_newton_polygon :
-    ∀ {K Γ : Type} [Field K] [LinearOrderedCommGroupWithZero Γ] (v : Valuation K Γ) (n : ℕ) (γ : Fin n → Γ),
-        StrictMono γ → (∀ i, γ i ≠ 0) → ∀ p : Polynomial K, p.Monic → p.natDegree = n →
-        (∀ k ≤ n, v (p.coeff k) = ∏ i ∈ Finset.univ.filter (fun i : Fin n => k ≤ i.val), γ i) → p.Separable := by
+theorem UpperTheory.separable_of_newton_polygon
+    : ∀ {K Γ : Type} [Field K] [LinearOrderedCommGroupWithZero Γ] (v : Valuation K Γ) (n : ℕ)
+        (γ : Fin n → Γ),
+      StrictMono γ → (∀ i, γ i ≠ 0)
+        → ∀ p : Polynomial K,
+          p.Monic → p.natDegree = n
+            → (∀ k ≤ n, v (p.coeff k) = ∏ i ∈ Finset.univ.filter (fun i : Fin n => k ≤ i.val), γ i)
+            → p.Separable := by
   intro K Γ _ _ v n γ hγ hγ0 p _ hn hv
   have hv0 : ∀ k ≤ n, v (p.coeff k) ≠ 0 := fun k hk => by
     rw [hv k hk]
@@ -128,21 +132,22 @@ theorem UpperTheory.separable_of_newton_polygon :
   have ha0 : ∀ k ≤ n, p.coeff k ≠ 0 := fun k hk => (map_ne_zero v).1 (hv0 k hk)
   have hstep : ∀ k (hk : k < n), v (p.coeff k) = γ ⟨k, hk⟩ * v (p.coeff (k + 1)) := fun k hk => by
     rw [hv k hk.le, hv (k + 1) hk, tail_succ γ k hk]
-  have hconc : ∀ k, k + 2 ≤ n →
-      v (p.coeff k * p.coeff (k + 2)) < v (p.coeff (k + 1) * p.coeff (k + 1)) := by
+  have hconc
+      : ∀ k,
+        k + 2 ≤ n → v (p.coeff k * p.coeff (k + 2)) < v (p.coeff (k + 1) * p.coeff (k + 1)) := by
     intro k hk
     have e1 := hstep k (by omega)
     have e2 := hstep (k + 1) (by omega)
     have hlt : γ ⟨k, by omega⟩ < γ ⟨k + 1, by omega⟩ := hγ (by simp [Fin.lt_def])
     have hp : 0 < v (p.coeff (k + 1)) * v (p.coeff (k + 2)) :=
       mul_pos (zero_lt_iff.2 (hv0 _ (by omega))) (zero_lt_iff.2 (hv0 _ hk))
-    calc v (p.coeff k * p.coeff (k + 2))
-        = γ ⟨k, by omega⟩ * (v (p.coeff (k + 1)) * v (p.coeff (k + 2))) := by
-          rw [map_mul, e1, mul_assoc]
+    calc
+      v (p.coeff k * p.coeff (k + 2))
+          = γ ⟨k, by omega⟩ * (v (p.coeff (k + 1)) * v (p.coeff (k + 2))) := by
+        rw [map_mul, e1, mul_assoc]
       _ < γ ⟨k + 1, by omega⟩ * (v (p.coeff (k + 1)) * v (p.coeff (k + 2))) :=
-          mul_lt_mul_of_pos_right hlt hp
-      _ = v (p.coeff (k + 1) * p.coeff (k + 1)) := by
-          rw [map_mul, mul_left_comm, ← e2]
+        mul_lt_mul_of_pos_right hlt hp
+      _ = v (p.coeff (k + 1) * p.coeff (k + 1)) := by rw [map_mul, mul_left_comm, ← e2]
   rw [Polynomial.separable_def,
     Polynomial.isCoprime_iff_aeval_ne_zero_of_isAlgClosed K (AlgebraicClosure K)]
   intro r
@@ -155,20 +160,28 @@ theorem UpperTheory.separable_of_newton_polygon :
     rintro rfl
     rw [← Polynomial.coeff_zero_eq_aeval_zero'] at hp
     exact ha0 0 (Nat.zero_le _) ((map_eq_zero _).1 hp)
-  refine no_double_zero A.valuation n (fun k => f (p.coeff k) * r ^ k)
-    (fun k hk => mul_ne_zero ((map_ne_zero f).2 (ha0 k hk)) (pow_ne_zero _ hr)) ?_ ?_ ?_
+  refine no_double_zero A.valuation n
+    (fun k => f (p.coeff k) * r ^ k)
+    (fun k hk => mul_ne_zero ((map_ne_zero f).2 (ha0 k hk)) (pow_ne_zero _ hr))
+    ?_ ?_ ?_
   · intro k hk
-    have e1 : f (p.coeff k) * r ^ k * (f (p.coeff (k + 2)) * r ^ (k + 2)) =
-        f (p.coeff k * p.coeff (k + 2)) * r ^ (2 * k + 2) := by rw [map_mul]; ring
-    have e2 : f (p.coeff (k + 1)) * r ^ (k + 1) * (f (p.coeff (k + 1)) * r ^ (k + 1)) =
-        f (p.coeff (k + 1) * p.coeff (k + 1)) * r ^ (2 * k + 2) := by rw [map_mul]; ring
+    have e1
+        : f (p.coeff k) * r ^ k * (f (p.coeff (k + 2)) * r ^ (k + 2))
+          = f (p.coeff k * p.coeff (k + 2)) * r ^ (2 * k + 2) := by
+      rw [map_mul]; ring
+    have e2
+        : f (p.coeff (k + 1)) * r ^ (k + 1) * (f (p.coeff (k + 1)) * r ^ (k + 1))
+          = f (p.coeff (k + 1) * p.coeff (k + 1)) * r ^ (2 * k + 2) := by
+      rw [map_mul]; ring
     rw [e1, e2, map_mul A.valuation, map_mul A.valuation]
     exact mul_lt_mul_of_pos_right (hA _ _ (hconc k hk))
       (zero_lt_iff.2 ((map_ne_zero _).2 (pow_ne_zero _ hr)))
   · rw [Polynomial.aeval_eq_sum_range, hn] at hp
     simpa only [Algebra.smul_def] using hp
-  · have hX : Polynomial.aeval r (Polynomial.derivative p * Polynomial.X) = 0 := by rw [map_mul, hd, zero_mul]
-    have hcoeff : ∀ k : ℕ, (Polynomial.derivative p * Polynomial.X).coeff k = (k : K) * p.coeff k := by
+  · have hX : Polynomial.aeval r (Polynomial.derivative p * Polynomial.X) = 0 := by
+      rw [map_mul, hd, zero_mul]
+    have hcoeff
+        : ∀ k : ℕ, (Polynomial.derivative p * Polynomial.X).coeff k = (k : K) * p.coeff k := by
       intro k
       cases k with
       | zero => simp

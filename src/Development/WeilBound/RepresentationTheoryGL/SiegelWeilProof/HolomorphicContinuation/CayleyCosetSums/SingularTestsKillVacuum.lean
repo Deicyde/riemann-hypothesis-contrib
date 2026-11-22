@@ -17,8 +17,9 @@ theorem lt3 : SingularTestsKillVacuum := by
   have mulG : ∀ {p q : M2 n}, InG p → InG q → InG (p * q) := by
     intro p q hp hq
     unfold InG at *
-    calc (p * q)ᴴ * JJ n * (p * q) = qᴴ * (pᴴ * JJ n * p) * q := by
-          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      (p * q)ᴴ * JJ n * (p * q)
+        = qᴴ * (pᴴ * JJ n * p) * q := by simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = JJ n := by rw [hp, hq]
   have hG : ∀ k, InG (ι k) := fun k => ((hK (ι k)).2 ⟨k, rfl⟩).1
   have h : ∀ k, ∫ t, fz m e 0 (x * ι k * a * nU (herm t) * b) * ψ t = 0 := fun k =>

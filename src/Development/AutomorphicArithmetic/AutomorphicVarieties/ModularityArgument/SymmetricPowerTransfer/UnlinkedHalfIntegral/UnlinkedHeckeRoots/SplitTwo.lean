@@ -5,21 +5,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.GalN.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial UpperTheory.V.Af UpperTheory.V.Sd
+  UpperTheory.GalN.V
 
-private theorem ratio_ne {A B q x y : ℝ} (hA : 0 < A) (hB : 0 < B) (hq : 1 < q) (h1 : A < q * B) (h2 : B < q * A)
-    (h3 : A ^ 2 ≠ q * B ^ 2) (h4 : B ^ 2 ≠ q * A ^ 2)
-    (hx : x = A / B ∨ x = 1 ∨ x = B / A) (hy : y = A / B ∨ y = 1 ∨ y = B / A) : x ≠ q * y := by
+private theorem ratio_ne
+    {A B q x y : ℝ} (hA : 0 < A) (hB : 0 < B) (hq : 1 < q) (h1 : A < q * B) (h2 : B < q * A)
+    (h3 : A ^ 2 ≠ q * B ^ 2) (h4 : B ^ 2 ≠ q * A ^ 2) (hx : x = A / B ∨ x = 1 ∨ x = B / A)
+    (hy : y = A / B ∨ y = 1 ∨ y = B / A)
+    : x ≠ q * y := by
   have hAn : A ≠ 0 := hA.ne'
   have hBn : B ≠ 0 := hB.ne'
   rcases hx with rfl | rfl | rfl <;> rcases hy with rfl | rfl | rfl <;> intro h <;> field_simp at h
-  all_goals first
-    | nlinarith
-    | exact h3 (by nlinarith)
-    | exact h4 (by nlinarith)
+  all_goals first | nlinarith | exact h3 (by nlinarith) | exact h4 (by nlinarith)
 
-private theorem split_two {K : Type} [Field K] [IsAlgClosed K] (g : GL (Fin 2) K) :
-    ∃ a b : Kˣ, (g : Matrix (Fin 2) (Fin 2) K).charpoly = (X - C (a : K)) * (X - C (b : K)) := by
+private theorem split_two {K : Type} [Field K] [IsAlgClosed K] (g : GL (Fin 2) K)
+    : ∃ a b : Kˣ, (g : Matrix (Fin 2) (Fin 2) K).charpoly = (X - C (a : K)) * (X - C (b : K)) := by
   set M : Matrix (Fin 2) (Fin 2) K := (g : Matrix (Fin 2) (Fin 2) K) with hM
   have hmon : M.charpoly.Monic := Matrix.charpoly_monic M
   have hsplit : M.charpoly.Splits := IsAlgClosed.splits _
@@ -41,8 +42,7 @@ private theorem split_two {K : Type} [Field K] [IsAlgClosed K] (g : GL (Fin 2) K
   rw [hprod, hab]
   simp
 
-theorem UpperTheory.V.Z.Sym.Unl.adUnl :
-    UpperTheory.V.Z.Sym.Unl.AdUnl := by
+theorem UpperTheory.V.Z.Sym.Unl.adUnl : UpperTheory.V.Z.Sym.Unl.AdUnl := by
   intro F Ω _ _ _ _ _ l _ ι r hR hN w hw A hA _
   obtain ⟨s, hs⟩ := exists_isFrob hA
   refine ⟨s, 1, le_rfl, by simpa using hs, ?_⟩
@@ -59,8 +59,11 @@ theorem UpperTheory.V.Z.Sym.Unl.adUnl :
     have := hR w hw A hA s hs _ _ ra ra
     by_contra h
     nlinarith [not_lt.mp h]
-  have root : ∀ x : Qbar l, (ad0 r s : Matrix (Fin 3) (Fin 3) (Qbar l)).charpoly.IsRoot x →
-      ‖ι x‖ = ‖ι (a : Qbar l)‖ / ‖ι (b : Qbar l)‖ ∨ ‖ι x‖ = 1 ∨ ‖ι x‖ = ‖ι (b : Qbar l)‖ / ‖ι (a : Qbar l)‖ := by
+  have root
+      : ∀ x : Qbar l,
+        (ad0 r s : Matrix (Fin 3) (Fin 3) (Qbar l)).charpoly.IsRoot x
+          → ‖ι x‖ = ‖ι (a : Qbar l)‖ / ‖ι (b : Qbar l)‖ ∨ ‖ι x‖ = 1
+            ∨ ‖ι x‖ = ‖ι (b : Qbar l)‖ / ‖ι (a : Qbar l)‖ := by
     intro x hx
     rw [hc] at hx
     simp only [IsRoot.def, eval_mul, eval_sub, eval_X, eval_C, mul_eq_zero, sub_eq_zero] at hx

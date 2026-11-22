@@ -7,15 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NumericalFami
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory
 
-theorem family_through_discreteSeries : Hyps → ∀ (k r : ℕ) (lam : Fin (2 * r + k + 1) → ℝ) (u : ℕ → ℝ)
-    (b bv ga h : ℝ) (q0 : ℕ) (R0 : Rep k r), Num k r lam u b bv ga h q0 →
-    R0.IsDS (PI.BesselPeriodGGP.eps48 k r) lam →
-    ∃ R : (Fin (2 * r + k + 1) → ℤ) → Rep k r, IsFam lam q0 R ∧ R 0 = R0 := by
+theorem family_through_discreteSeries
+    : Hyps
+      → ∀ (k r : ℕ) (lam : Fin (2 * r + k + 1) → ℝ) (u : ℕ → ℝ) (b bv ga h : ℝ) (q0 : ℕ)
+          (R0 : Rep k r),
+        Num k r lam u b bv ga h q0 → R0.IsDS (PI.BesselPeriodGGP.eps48 k r) lam
+          → ∃ R : (Fin (2 * r + k + 1) → ℤ) → Rep k r, IsFam lam q0 R ∧ R 0 = R0 := by
   intro hH k r lam u b bv ga h q0 R0 hN hR0
   classical
   have hex : DSExist := hH.2.2.2.1
@@ -23,9 +26,11 @@ theorem family_through_discreteSeries : Hyps → ∀ (k r : ℕ) (lam : Fin (2 *
     obtain ⟨P, hP, -⟩ := hR0.2
     exact ⟨P, hP⟩
   have hfam := (GlobalTheory.T.numericalFamily_shape_gaps k r lam u b bv ga h q0 hN).2
-  have key : ∀ ν : Fin (2 * r + k + 1) → ℤ, ∃ R : Rep k r,
-      (∑ a, (ν a).natAbs ≤ q0 → R.IsDS (PI.BesselPeriodGGP.eps48 k r) (fun a => lam a + (ν a : ℝ))) ∧
-      (ν = 0 → R = R0) := by
+  have key
+      : ∀ ν : Fin (2 * r + k + 1) → ℤ, ∃ R : Rep k r,
+        (∑ a, (ν a).natAbs ≤ q0
+            → R.IsDS (PI.BesselPeriodGGP.eps48 k r) (fun a => lam a + (ν a : ℝ)))
+          ∧ (ν = 0 → R = R0) := by
     intro ν
     by_cases h0 : ν = 0
     · refine ⟨R0, fun _ => ?_, fun _ => rfl⟩

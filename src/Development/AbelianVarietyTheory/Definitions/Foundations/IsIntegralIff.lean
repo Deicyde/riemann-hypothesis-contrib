@@ -14,20 +14,21 @@ namespace GlobalTheory.HL.Model
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem hf_add_left (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (a b y : Fin n → E) :
-    hf L H (a + b) y = hf L H a y + hf L H b y := by
+theorem hf_add_left (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (a b y : Fin n → E)
+    : hf L H (a + b) y = hf L H a y + hf L H b y := by
   simp [hf, add_mul, Finset.sum_add_distrib]
 
-theorem hf_smul_left (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (c : E) (a y : Fin n → E) :
-    hf L H (c • a) y = c * hf L H a y := by
+theorem hf_smul_left (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (c : E) (a y : Fin n → E)
+    : hf L H (c • a) y = c * hf L H a y := by
   simp [hf, Finset.mul_sum, mul_assoc]
 
-theorem hf_add_right (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (a b y : Fin n → E) :
-    hf L H y (a + b) = hf L H y a + hf L H y b := by
+theorem hf_add_right (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (a b y : Fin n → E)
+    : hf L H y (a + b) = hf L H y a + hf L H y b := by
   simp [hf, map_add (f := _), mul_add, Finset.sum_add_distrib]
 
-theorem hf_smul_right (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (c : E) (a y : Fin n → E) :
-    hf L H y (c • a) = L.cj c * hf L H y a := by
+theorem hf_smul_right
+    (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (c : E) (a y : Fin n → E)
+    : hf L H y (c • a) = L.cj c * hf L H y a := by
   unfold hf
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -36,8 +37,9 @@ theorem hf_smul_right (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (c
   rw [Pi.smul_apply, smul_eq_mul, map_mul]
   ring
 
-theorem hf_symm (L : LocE F E) {n : ℕ} {H : Matrix (Fin n) (Fin n) E} (h : IsHerm L H)
-    (x y : Fin n → E) : hf L H y x = L.cj (hf L H x y) := by
+theorem hf_symm
+    (L : LocE F E) {n : ℕ} {H : Matrix (Fin n) (Fin n) E} (h : IsHerm L H) (x y : Fin n → E)
+    : hf L H y x = L.cj (hf L H x y) := by
   have hH : ∀ i j, L.cj (H j i) = H i j := fun i j => congrFun (congrFun h i) j
   unfold hf
   set_option synthInstance.maxHeartbeats 100000 in

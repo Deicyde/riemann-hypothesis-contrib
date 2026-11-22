@@ -13,12 +13,14 @@ instance sch_preservesLimits : PreservesLimitsOfSize.{0, 0} sch := by
   unfold sch
   infer_instance
 
-theorem sch_isPullback {P X Y Z : Scheme.{0}} {fst : P ⟶ X} {snd : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z}
-    (h : IsPullback fst snd f g) : IsPullback (sch.map fst) (sch.map snd) (sch.map f) (sch.map g) :=
+theorem sch_isPullback
+    {P X Y Z : Scheme.{0}} {fst : P ⟶ X} {snd : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z}
+    (h : IsPullback fst snd f g)
+    : IsPullback (sch.map fst) (sch.map snd) (sch.map f) (sch.map g) :=
   h.map sch
 
-theorem isPullback_resLE {Y X : Scheme.{0}} (w : Y ⟶ X) (U : X.Opens) :
-    IsPullback (w ⁻¹ᵁ U).ι (w.resLE U (w ⁻¹ᵁ U) le_rfl) w U.ι := by
+theorem isPullback_resLE {Y X : Scheme.{0}} (w : Y ⟶ X) (U : X.Opens)
+    : IsPullback (w ⁻¹ᵁ U).ι (w.resLE U (w ⁻¹ᵁ U) le_rfl) w U.ι := by
   rw [Scheme.Hom.resLE_eq_morphismRestrict]
   exact (isPullback_morphismRestrict w U).flip
 

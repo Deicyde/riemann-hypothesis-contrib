@@ -16,20 +16,27 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcS.IntWittPf
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.LocVol NumberField IsDedekindDomain Filter
-  Matrix Formalism.L2.SG.Pf.NcS.KfOrbPf Formalism.L2.SG.Pf.NcS.IntWittAlg
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.LocVol NumberField IsDedekindDomain Filter Matrix
+  Formalism.L2.SG.Pf.NcS.KfOrbPf Formalism.L2.SG.Pf.NcS.IntWittAlg
 open scoped TensorProduct
 
 section Main
 
-theorem sigR_inclR' {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-    (σ : E →ₐ[F] E) (e : E) : sigR R σ (inclR R e) = inclR R (σ e) := by
+theorem sigR_inclR'
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R]
+    (σ : E →ₐ[F] E) (e : E)
+    : sigR R σ (inclR R e) = inclR R (σ e) := by
   simp [sigR, inclR]
 
-theorem hform_inclR {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-    (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (x y : Fin n → E) :
-    Formalism.UG.hform (sigR R σ) (JR R J) (fun i => inclR R (x i)) (fun i => inclR R (y i)) =
-      inclR R (Formalism.UG.hform (σ : E →+* E) J x y) := by
+theorem hform_inclR
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R]
+    (σ : E →ₐ[F] E)
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (x y : Fin n → E)
+    : Formalism.UG.hform (sigR R σ) (JR R J) (fun i => inclR R (x i)) (fun i => inclR R (y i))
+      = inclR R (Formalism.UG.hform (σ : E →+* E) J x y) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Formalism.UG.hform, map_sum, map_mul, JR, Matrix.map_apply, sigR_inclR']
   rfl
@@ -101,40 +108,55 @@ theorem intWittAE_of (hA : AlgWitt) (hD : HermDiag) (hL : LamAE) : LocSBPf.IntWi
     intro i k
     simp only [x, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
     exact O.sum_mem fun l _ => O.mul_mem (hPv i l) (hXO l k)
-  have hyy : ∀ i j, Formalism.UG.hform s Jv (y i) (y j) = if i = j then inclR (F := F) (Fv F v) (δ i) else 0 := by
+  have hyy
+      : ∀ i j,
+        Formalism.UG.hform s Jv (y i) (y j)
+          = if i = j then inclR (F := F) (Fv F v) (δ i) else 0 := by
     intro i j
-    rw [show Formalism.UG.hform s Jv (y i) (y j) = inclR (F := F) (Fv F v) (Formalism.UG.hform (σ : E →+* E) J (Z0 i) (Z0 j)) from
+    rw [show Formalism.UG.hform s Jv (y i) (y j)
+        = inclR (F := F) (Fv F v) (Formalism.UG.hform (σ : E →+* E) J (Z0 i) (Z0 j)) from
       hform_inclR _ σ J _ _]
     split_ifs with h
     · subst h; rfl
     · rw [hPo i j h, map_zero]
-  have hXX : ∀ l m, Formalism.UG.hform s Jv (X l) (X m) =
-      inclR (F := F) (Fv F v) (Formalism.UG.hform (σ : E →+* E) J (X0 l) (X0 m)) := by
+  have hXX
+      : ∀ l m,
+        Formalism.UG.hform s Jv (X l) (X m)
+          = inclR (F := F) (Fv F v) (Formalism.UG.hform (σ : E →+* E) J (X0 l) (X0 m)) := by
     intro l m
     exact congrFun (congrFun hgram l) m
-  have hxx : ∀ i j, Formalism.UG.hform s Jv (x i) (x j) = if i = j then inclR (F := F) (Fv F v) (δ i) else 0 := by
+  have hxx
+      : ∀ i j,
+        Formalism.UG.hform s Jv (x i) (x j)
+          = if i = j then inclR (F := F) (Fv F v) (δ i) else 0 := by
     intro i j
-    have e1 : Formalism.UG.hform s Jv (x i) (x j) = inclR (F := F) (Fv F v) (Formalism.UG.hform (σ : E →+* E) J (Z0 i) (Z0 j)) := by
-      calc Formalism.UG.hform s Jv (x i) (x j)
-          = ∑ l, inclR (F := F) (Fv F v) (σ (P i l)) * ∑ m, inclR (F := F) (Fv F v) (P j m) *
-              inclR (F := F) (Fv F v) (Formalism.UG.hform (σ : E →+* E) J (X0 l) (X0 m)) := by
-            simp only [x]
-            rw [hform_sum_left]
-            simp_rw [hform_sum_right, hXX, s, sigR_inclR']
+    have e1
+        : Formalism.UG.hform s Jv (x i) (x j)
+          = inclR (F := F) (Fv F v) (Formalism.UG.hform (σ : E →+* E) J (Z0 i) (Z0 j)) := by
+      calc
+        Formalism.UG.hform s Jv (x i) (x j)
+            = ∑ l, inclR (F := F) (Fv F v) (σ (P i l)) * ∑ m, inclR (F := F) (Fv F v) (P j m) *
+                inclR (F := F) (Fv F v) (Formalism.UG.hform (σ : E →+* E) J (X0 l) (X0 m)) := by
+          simp only [x]
+          rw [hform_sum_left]
+          simp_rw [hform_sum_right, hXX, s, sigR_inclR']
         _ = _ := by
-            rw [hZ0e i, hZ0e j, hform_sum_left]
-            simp_rw [hform_sum_right]
-            set_option synthInstance.maxHeartbeats 100000 in
-              simp only [map_sum, map_mul]
-            rfl
+          rw [hZ0e i, hZ0e j, hform_sum_left]
+          simp_rw [hform_sum_right]
+          set_option synthInstance.maxHeartbeats 100000 in
+            simp only [map_sum, map_mul]
+          rfl
     rw [e1]
     split_ifs with h
     · subst h; rfl
     · rw [hPo i j h, map_zero]
-  obtain ⟨g, hg, hgO, hgiO, hgy⟩ := hA (Fv F v ⊗[F] E) s O hs hsO n Jv Jv' hJvh hJJ hJv hJiv a
-    (fun i => inclR (F := F) (Fv F v) (δ i)) (fun i => inclR (F := F) (Fv F v) (δ i)⁻¹) hδv hδiv
-    (fun i => by rw [← map_mul, mul_inv_cancel₀ (hPd i), map_one])
-    hlam x y hxO hZv hxx hyy
+  obtain ⟨g, hg, hgO, hgiO, hgy⟩ :=
+    hA (Fv F v ⊗[F] E) s O hs hsO n Jv Jv' hJvh hJJ hJv hJiv a
+      (fun i => inclR (F := F) (Fv F v) (δ i))
+      (fun i => inclR (F := F) (Fv F v) (δ i)⁻¹)
+      hδv hδiv
+      (fun i => by rw [← map_mul, mul_inv_cancel₀ (hPd i), map_one])
+      hlam x y hxO hZv hxx hyy
   refine ⟨(⟨g, hg⟩ : HR (Fv F v) σ J), ?_, ?_⟩
   · show ∀ w, w ∈ latLoc (E := E) v (L : Set (Fin n → E)) ↔
       (g : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ w ∈ latLoc (E := E) v (L : Set (Fin n → E))
@@ -144,8 +166,10 @@ theorem intWittAE_of (hA : AlgWitt) (hD : HermDiag) (hL : LamAE) : LocSBPf.IntWi
     · intro hw
       exact mem_std_of_oev v _ fun i => mulVec_mem O _ hgO w (fun k => mem_oev_of_std v w hw k) i
     · intro hw
-      have e : w = ((g⁻¹ : GL (Fin n) (Fv F v ⊗[F] E)) : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ
-          ((g : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ w) := by
+      have e
+          : w
+            = ((g⁻¹ : GL (Fin n) (Fv F v ⊗[F] E)) : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))
+              *ᵥ ((g : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ w) := by
         rw [mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, one_mulVec]
       rw [e]
       exact mem_std_of_oev v _ fun i => mulVec_mem O _ hgiO _ (fun k => mem_oev_of_std v _ hw k) i
@@ -156,14 +180,16 @@ theorem intWittAE_of (hA : AlgWitt) (hD : HermDiag) (hL : LamAE) : LocSBPf.IntWi
       simp only [ratTup, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, y]
       rw [hX0e c]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [Finset.sum_apply, map_sum, map_mul]
+      simp [Finset.sum_apply, map_sum, map_mul]
     rw [e1, mulVec_sum]
     simp_rw [mulVec_smul, hgy]
     funext k
     simp only [x, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
-    have hm : ∀ m, ∑ l, inclR (F := F) (Fv F v) (Q c l) * (inclR (F := F) (Fv F v) (P l m) * X m k) =
-        (if c = m then 1 else 0) * X m k := by
+    have hm
+        : ∀ m,
+          ∑ l, inclR (F := F) (Fv F v) (Q c l) * (inclR (F := F) (Fv F v) (P l m) * X m k)
+            = (if c = m then 1 else 0) * X m k := by
       intro m
       set_option synthInstance.maxHeartbeats 100000 in
         simp_rw [← mul_assoc, ← Finset.sum_mul, ← map_mul, ← map_sum]

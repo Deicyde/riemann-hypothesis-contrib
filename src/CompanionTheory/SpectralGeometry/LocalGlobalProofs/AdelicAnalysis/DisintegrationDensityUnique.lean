@@ -12,11 +12,10 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.CompanionTheory.SW.FibreDensity
 
-variable {V X Y : Type}
-  [TopologicalSpace V] [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V]
-  [MeasurableSpace V] [BorelSpace V]
-  [TopologicalSpace X] [LocallyCompactSpace X] [SecondCountableTopology X] [T2Space X]
-  [MeasurableSpace X] [BorelSpace X]
+variable
+  {V X Y : Type} [TopologicalSpace V] [LocallyCompactSpace V] [SecondCountableTopology V]
+  [T2Space V] [MeasurableSpace V] [BorelSpace V] [TopologicalSpace X] [LocallyCompactSpace X]
+  [SecondCountableTopology X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
   {μ : Measure V} {ν : Measure X} {f : V → Y} {g : V → X} {ι : X → Y} {B : Set X}
   {fib : X → Measure V}
 
@@ -213,21 +212,30 @@ lemma exists_cutoff (hg : Continuous g) (hB : IsOpen B) {K : Set X} (hK : IsComp
     have : χ (g v) = 1 := h1 hv
     simp [this]
 
-theorem isContDensityOn_fibreIntegral : ∀ (V X Y : Type) [TopologicalSpace V]
-    [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V] [MeasurableSpace V]
-    [BorelSpace V] [TopologicalSpace X] [LocallyCompactSpace X] [SecondCountableTopology X]
-    [T2Space X] [MeasurableSpace X] [BorelSpace X] (μ : Measure V) (ν : Measure X)
-    [IsLocallyFiniteMeasure μ] [IsLocallyFiniteMeasure ν] [ν.IsOpenPosMeasure] (f : V → Y)
-    (g : V → X) (ι : X → Y), Function.Injective ι → Continuous g → (∀ v, f v = ι (g v)) →
-    ∀ (B : Set X), IsOpen B → ∀ fib : X → Measure V,
-    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι (g ⁻¹' B) ν B fib →
-    ∀ φ : V → ℂ, Continuous φ → HasCompactSupport φ →
-    HeckeCharacterZeroLocus.SiegelWeilU.IsContDensityOn μ f ι ν B φ (fun b => ∫ v, φ v ∂(fib b)) ∧
-      ∀ b, Integrable φ (fib b) := by
+theorem isContDensityOn_fibreIntegral
+    : ∀ (V X Y : Type) [TopologicalSpace V] [LocallyCompactSpace V] [SecondCountableTopology V]
+        [T2Space V] [MeasurableSpace V] [BorelSpace V] [TopologicalSpace X] [LocallyCompactSpace X]
+        [SecondCountableTopology X] [T2Space X] [MeasurableSpace X] [BorelSpace X] (μ : Measure V)
+        (ν : Measure X) [IsLocallyFiniteMeasure μ] [IsLocallyFiniteMeasure ν] [ν.IsOpenPosMeasure]
+        (f : V → Y) (g : V → X) (ι : X → Y),
+      Function.Injective ι → Continuous g → (∀ v, f v = ι (g v))
+        → ∀ (B : Set X),
+          IsOpen B
+            → ∀ fib : X → Measure V,
+              Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι
+                  (g ⁻¹' B) ν B fib
+                → ∀ φ : V → ℂ,
+                  Continuous φ → HasCompactSupport φ
+                    → HeckeCharacterZeroLocus.SiegelWeilU.IsContDensityOn μ f ι ν B φ
+                        (fun b => ∫ v, φ v ∂(fib b))
+                      ∧ ∀ b, Integrable φ (fib b) := by
   intro V X Y _ _ _ _ _ _ _ _ _ _ _ _ μ ν _ _ _ f g ι hι hg hf B hB fib h φ hc hs
-  have hfin := (GlobalTheory.T.fibre_family_locallyFinite_measurable_bdd_on_compact V X Y μ ν f g ι hι hg hf B hB fib h).1
-  have hcongr : ∀ {ψ : V → ℂ} {K : Set X}, (∀ v, g v ∈ K → ψ v = φ v) → ∀ b ∈ K,
-      ∫ v, ψ v ∂(fib b) = ∫ v, φ v ∂(fib b) := by
+  have hfin :=
+    (GlobalTheory.T.fibre_family_locallyFinite_measurable_bdd_on_compact V X Y μ ν f g ι hι hg hf B
+      hB fib h).1
+  have hcongr
+      : ∀ {ψ : V → ℂ} {K : Set X},
+        (∀ v, g v ∈ K → ψ v = φ v) → ∀ b ∈ K, ∫ v, ψ v ∂(fib b) = ∫ v, φ v ∂(fib b) := by
     intro ψ K hψ b hb
     refine integral_congr_ae ?_
     filter_upwards [ae_eq_point hι hf h b] with v hv
@@ -252,12 +260,12 @@ theorem isContDensityOn_fibreIntegral : ∀ (V X Y : Type) [TopologicalSpace V]
     have hSm : MeasurableSet S := hS.isClosed.measurableSet
     obtain ⟨ψ, c1, c2, c3, c4⟩ := exists_cutoff hg hB hS hSB hc hs
     rw [hpre]
-    calc ∫ v in g ⁻¹' S, φ v ∂μ = ∫ v in g ⁻¹' S, ψ v ∂μ :=
-          setIntegral_congr_fun (hg.measurable hSm) (fun v hv => (c4 v hv).symm)
+    calc
+      ∫ v in g ⁻¹' S, φ v ∂μ = ∫ v in g ⁻¹' S, ψ v ∂μ :=
+        setIntegral_congr_fun (hg.measurable hSm) (fun v hv => (c4 v hv).symm)
       _ = ∫ b in S, ∫ v, ψ v ∂(fib b) ∂ν :=
-          integral_preimage_complex hfin hι hf hg h hS hSB c1 c2 c3
-      _ = ∫ b in S, ∫ v, φ v ∂(fib b) ∂ν :=
-          setIntegral_congr_fun hSm (fun b hb => hcongr c4 b hb)
+        integral_preimage_complex hfin hι hf hg h hS hSB c1 c2 c3
+      _ = ∫ b in S, ∫ v, φ v ∂(fib b) ∂ν := setIntegral_congr_fun hSm (fun b hb => hcongr c4 b hb)
   · haveI := hfin b
     exact hc.integrable_of_hasCompactSupport hs
 

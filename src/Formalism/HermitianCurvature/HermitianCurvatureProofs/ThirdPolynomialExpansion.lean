@@ -10,8 +10,8 @@ namespace Formalism.FourierDecayAlt.P.SignAntidiagonal
 
 open Formalism.FourierDecayAlt.C3
 
-theorem succAbove_val {n : ℕ} (p : Fin (n + 1)) (l : Fin n) :
-    (p.succAbove l).val = if l.val < p.val then l.val else l.val + 1 := by
+theorem succAbove_val {n : ℕ} (p : Fin (n + 1)) (l : Fin n)
+    : (p.succAbove l).val = if l.val < p.val then l.val else l.val + 1 := by
   unfold Fin.succAbove
   split_ifs with h1 h2 h2 <;> simp_all [Fin.lt_def] <;> omega
 
@@ -28,8 +28,9 @@ private theorem sgnW_succ' (s : ℕ) : sgnW (s + 1) = (-1) ^ s * sgnW s := by
     rw [e, Nat.add_mul_div_left _ _ (by norm_num : 0 < 2)]
     ring
 
-theorem zb_det (i0 s : ℕ) (h : Matrix (Fin i0) (Fin i0) ℂ) (t : ℂ) :
-    (Matrix.of fun a b : Fin (i0 + s) => Zb i0 s h t a.val b.val).det = h.det * t ^ s * sgnW s := by
+theorem zb_det (i0 s : ℕ) (h : Matrix (Fin i0) (Fin i0) ℂ) (t : ℂ)
+    : (Matrix.of fun a b : Fin (i0 + s) => Zb i0 s h t a.val b.val).det
+      = h.det * t ^ s * sgnW s := by
   induction s with
   | zero =>
     have hs : sgnW 0 = 1 := by simp [sgnW]
@@ -39,10 +40,12 @@ theorem zb_det (i0 s : ℕ) (h : Matrix (Fin i0) (Fin i0) ℂ) (t : ℂ) :
     ext a b
     simp [Zb, a.isLt, b.isLt]
   | succ s ih =>
-    rw [Matrix.det_succ_row _ (⟨i0, by omega⟩ : Fin (i0 + s + 1)), Finset.sum_eq_single (Fin.last _)]
-    · have hsub : (Matrix.of fun a b : Fin (i0 + (s + 1)) => Zb i0 (s + 1) h t a.val b.val).submatrix
-          (⟨i0, by omega⟩ : Fin (i0 + s + 1)).succAbove (Fin.last (i0 + s)).succAbove =
-          Matrix.of fun a b : Fin (i0 + s) => Zb i0 s h t a.val b.val := by
+    rw [Matrix.det_succ_row _ (⟨i0, by omega⟩ : Fin (i0 + s + 1)),
+      Finset.sum_eq_single (Fin.last _)]
+    · have hsub
+          : (Matrix.of fun a b : Fin (i0 + (s + 1)) => Zb i0 (s + 1) h t a.val b.val).submatrix
+              (⟨i0, by omega⟩ : Fin (i0 + s + 1)).succAbove (Fin.last (i0 + s)).succAbove
+            = Matrix.of fun a b : Fin (i0 + s) => Zb i0 s h t a.val b.val := by
         ext a b
         simp only [Matrix.submatrix_apply, Matrix.of_apply, succAbove_val, Fin.succAbove_last,
           Fin.coe_castSucc]
@@ -115,8 +118,7 @@ theorem third_polynomial_expansion : MinorsThirdCase := by
   simp only [Matrix.of_apply, succAbove_val]
   have ha := a.isLt
   have hb := b.isLt
-  by_cases ha0 : (a : ℕ) < i0 <;> by_cases hb0 : (b : ℕ) < i0 <;>
-    simp only [ha0, hb0, if_true, if_false] <;>
-    unfold Zb <;> split_ifs <;> first | rfl | omega
+  by_cases ha0 : (a : ℕ) < i0 <;> by_cases hb0 : (b : ℕ) < i0
+    <;> simp only [ha0, hb0, if_true, if_false] <;> unfold Zb <;> split_ifs <;> first | rfl | omega
 
 end Formalism.FourierDecayAlt.P.SignAntidiagonal

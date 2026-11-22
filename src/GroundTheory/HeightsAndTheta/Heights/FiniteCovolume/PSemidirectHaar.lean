@@ -12,11 +12,12 @@ open scoped ENNReal NNReal
 
 noncomputable section
 
-theorem SemidirectHaar.proof (G T : Type*) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-    [Group T] [TopologicalSpace T] [IsTopologicalGroup T] [LocallyCompactSpace T]
-    [SecondCountableTopology T] [MeasurableSpace T] [BorelSpace T] :
-    SemidirectHaar.Statement G T := by
+theorem SemidirectHaar.proof
+    (G T : Type*) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [Group T] [TopologicalSpace T]
+    [IsTopologicalGroup T] [LocallyCompactSpace T] [SecondCountableTopology T] [MeasurableSpace T]
+    [BorelSpace T]
+    : SemidirectHaar.Statement G T := by
   intro P H hP hH hHP τ β δ hτ hβ hδc hτP _ hτH hβH μ _ ν _ ρ _ hδ
   have : LocallyCompactSpace H := hH.isClosedEmbedding_subtypeVal.locallyCompactSpace
   have : LocallyCompactSpace P := hP.isClosedEmbedding_subtypeVal.locallyCompactSpace
@@ -42,13 +43,16 @@ theorem SemidirectHaar.proof (G T : Type*) [Group G] [TopologicalSpace G] [IsTop
   have hmul : ∀ s t, δ (s * t) = δ s * δ t := by
     intro s t
     have e1 := hδ (s * t) f hfm
-    have e2 : ∫⁻ x : H, f (τ s * (τ t * x * (τ t)⁻¹) * (τ s)⁻¹) ∂ν =
-        δ t * ∫⁻ x : H, f (τ s * x * (τ s)⁻¹) ∂ν :=
-      hδ t (fun z => f (τ s * z * (τ s)⁻¹))
+    have e2
+        : ∫⁻ x : H, f (τ s * (τ t * x * (τ t)⁻¹) * (τ s)⁻¹) ∂ν
+          = δ t * ∫⁻ x : H, f (τ s * x * (τ s)⁻¹) ∂ν :=
+      hδ t
+        (fun z => f (τ s * z * (τ s)⁻¹))
         (hfm.comp ((continuous_const.mul continuous_id).mul continuous_const).measurable)
     have e3 := hδ s f hfm
-    have e : ∫⁻ x : H, f (τ (s * t) * x * (τ (s * t))⁻¹) ∂ν =
-        ∫⁻ x : H, f (τ s * (τ t * x * (τ t)⁻¹) * (τ s)⁻¹) ∂ν := by
+    have e
+        : ∫⁻ x : H, f (τ (s * t) * x * (τ (s * t))⁻¹) ∂ν
+          = ∫⁻ x : H, f (τ s * (τ t * x * (τ t)⁻¹) * (τ s)⁻¹) ∂ν := by
       congr 1
       funext x
       simp only [map_mul, mul_inv_rev]
@@ -72,16 +76,15 @@ theorem SemidirectHaar.proof (G T : Type*) [Group G] [TopologicalSpace G] [IsTop
   have hΦm : Measurable Φ := hΦc.measurable
   have hδm : Measurable fun t => (δ t : ℝ≥0∞) := (ENNReal.continuous_coe.comp hδc).measurable
   let m : Measure P := Measure.map Φ ((ρ.withDensity fun t => (δ t : ℝ≥0∞)).prod ν)
-  have hm : ∀ ψ : P → ℝ≥0∞, Measurable ψ →
-      ∫⁻ p, ψ p ∂m = ∫⁻ t, δ t * ∫⁻ x : H, ψ (Φ (t, x)) ∂ν ∂ρ := by
+  have hm
+      : ∀ ψ : P → ℝ≥0∞, Measurable ψ → ∫⁻ p, ψ p ∂m = ∫⁻ t, δ t * ∫⁻ x : H, ψ (Φ (t, x)) ∂ν ∂ρ := by
     intro ψ hψ
     rw [lintegral_map hψ hΦm, lintegral_prod (fun z => ψ (Φ z)) (hψ.comp hΦm).aemeasurable,
       lintegral_withDensity_eq_lintegral_mul _ hδm]
     · rfl
     · exact (hψ.comp hΦm).lintegral_prod_right'
 
-  have hinv : ∀ (p₀ : P) (ψ : P → ℝ≥0∞), Measurable ψ →
-      ∫⁻ p, ψ (p₀ * p) ∂m = ∫⁻ p, ψ p ∂m := by
+  have hinv : ∀ (p₀ : P) (ψ : P → ℝ≥0∞), Measurable ψ → ∫⁻ p, ψ (p₀ * p) ∂m = ∫⁻ p, ψ p ∂m := by
     intro p₀ ψ hψ
     rw [hm (fun p => ψ (p₀ * p)) (hψ.comp (measurable_const_mul p₀)), hm _ hψ]
     set s := β p₀ with hs
@@ -90,12 +93,13 @@ theorem SemidirectHaar.proof (G T : Type*) [Group G] [TopologicalSpace G] [IsTop
     have hψ' : Measurable ψ' :=
       (MeasurableEmbedding.subtype_coe hP.measurableSet).measurable_extend hψ measurable_const
     have hψ'e : ∀ p : P, ψ' p = ψ p := fun p => Subtype.val_injective.extend_apply ψ 0 p
-    have inner : ∀ t, ∫⁻ x : H, ψ (p₀ * Φ (t, x)) ∂ν =
-        δ s * ∫⁻ x : H, ψ (Φ (s * t, x)) ∂ν := by
+    have inner : ∀ t, ∫⁻ x : H, ψ (p₀ * Φ (t, x)) ∂ν = δ s * ∫⁻ x : H, ψ (Φ (s * t, x)) ∂ν := by
       intro t
-      have h1 : ∫⁻ x : H, ψ' ((y : G) * (τ s * x * (τ s)⁻¹) * τ (s * t)) ∂ν =
-          δ s * ∫⁻ x : H, ψ' ((y : G) * x * τ (s * t)) ∂ν :=
-        hδ s (fun z => ψ' ((y : G) * z * τ (s * t)))
+      have h1
+          : ∫⁻ x : H, ψ' ((y : G) * (τ s * x * (τ s)⁻¹) * τ (s * t)) ∂ν
+            = δ s * ∫⁻ x : H, ψ' ((y : G) * x * τ (s * t)) ∂ν :=
+        hδ s
+          (fun z => ψ' ((y : G) * z * τ (s * t)))
           (hψ'.comp ((continuous_const.mul continuous_id).mul continuous_const).measurable)
       have h2 : ∫⁻ x : H, ψ' ((y : G) * x * τ (s * t)) ∂ν = ∫⁻ x : H, ψ (Φ (s * t, x)) ∂ν := by
         rw [← lintegral_mul_left_eq_self (μ := ν) (fun x : H => ψ (Φ (s * t, x))) y]
@@ -110,8 +114,8 @@ theorem SemidirectHaar.proof (G T : Type*) [Group G] [TopologicalSpace G] [IsTop
       congr 1
       simp only [Φ, y, Subgroup.coe_mul, map_mul]
       group
-    refine Eq.trans ?_ (lintegral_mul_left_eq_self (μ := ρ)
-      (fun u => (δ u : ℝ≥0∞) * ∫⁻ x : H, ψ (Φ (u, x)) ∂ν) s)
+    refine Eq.trans ?_
+      (lintegral_mul_left_eq_self (μ := ρ) (fun u => (δ u : ℝ≥0∞) * ∫⁻ x : H, ψ (Φ (u, x)) ∂ν) s)
     congr 1
     funext t
     rw [inner, hmul, ENNReal.coe_mul]
@@ -127,12 +131,10 @@ theorem SemidirectHaar.proof (G T : Type*) [Group G] [TopologicalSpace G] [IsTop
   have hβΦ : ∀ t (x : H), β (Φ (t, x)) = t := by
     intro t x
     have h := H.mul_mem (H.inv_mem x.2) (hβH (Φ (t, x)))
-    have h' : τ (t * (β (Φ (t, x)))⁻¹) ∈ H := by
-      simpa [Φ, map_mul, map_inv, mul_assoc] using h
+    have h' : τ (t * (β (Φ (t, x)))⁻¹) ∈ H := by simpa [Φ, map_mul, map_inv, mul_assoc] using h
     exact (mul_inv_eq_one.1 (hτH _ h')).symm
   let α : P → H := fun p => ⟨(p : G) * (τ (β p))⁻¹, hβH p⟩
-  have hα : Continuous α :=
-    (continuous_subtype_val.mul (hτ.comp hβ).inv).subtype_mk _
+  have hα : Continuous α := (continuous_subtype_val.mul (hτ.comp hβ).inv).subtype_mk _
   have hαΦ : ∀ t (x : H), α (Φ (t, x)) = x := by
     intro t x
     apply Subtype.ext
@@ -146,31 +148,33 @@ theorem SemidirectHaar.proof (G T : Type*) [Group G] [TopologicalSpace G] [IsTop
     have hLm : MeasurableSet (closure K) := isClosed_closure.measurableSet
     obtain ⟨C, hC⟩ := (hL.image hβ).bddAbove_image hδc.continuousOn
     rw [← lintegral_indicator_one hLm, hm _ (measurable_one.indicator hLm)]
-    calc ∫⁻ t, δ t * ∫⁻ x : H, (closure K).indicator 1 (Φ (t, x)) ∂ν ∂ρ
-        ≤ ∫⁻ t, (β '' closure K).indicator (fun _ => (C : ℝ≥0∞) * ν (α '' closure K)) t ∂ρ := by
-          refine lintegral_mono fun t => ?_
-          by_cases ht : t ∈ β '' closure K
-          · rw [Set.indicator_of_mem ht]
-            gcongr
-            · exact_mod_cast hC ⟨t, ht, rfl⟩
-            · calc ∫⁻ x : H, (closure K).indicator 1 (Φ (t, x)) ∂ν
+    calc
+      ∫⁻ t, δ t * ∫⁻ x : H, (closure K).indicator 1 (Φ (t, x)) ∂ν ∂ρ
+          ≤ ∫⁻ t, (β '' closure K).indicator (fun _ => (C : ℝ≥0∞) * ν (α '' closure K)) t ∂ρ := by
+        refine lintegral_mono fun t => ?_
+        by_cases ht : t ∈ β '' closure K
+        · rw [Set.indicator_of_mem ht]
+          gcongr
+          · exact_mod_cast hC ⟨t, ht, rfl⟩
+          · calc
+              ∫⁻ x : H, (closure K).indicator 1 (Φ (t, x)) ∂ν
                   ≤ ∫⁻ x : H, (α '' closure K).indicator (fun _ => (1 : ℝ≥0∞)) x ∂ν := by
-                    refine lintegral_mono fun x => ?_
-                    by_cases hx : Φ (t, x) ∈ closure K
-                    · rw [Set.indicator_of_mem hx,
-                        Set.indicator_of_mem (show x ∈ α '' closure K from ⟨Φ (t, x), hx, hαΦ t x⟩)]
-                      rfl
-                    · rw [Set.indicator_of_notMem hx]
-                      exact bot_le
-                _ ≤ 1 * ν (α '' closure K) := lintegral_indicator_const_le _ _
-                _ = ν (α '' closure K) := one_mul _
-          · have h0 : ∀ x : H, (closure K).indicator (1 : P → ℝ≥0∞) (Φ (t, x)) = 0 :=
-              fun x => Set.indicator_of_notMem (fun hx => ht ⟨Φ (t, x), hx, hβΦ t x⟩) _
-            simp [h0]
-      _ ≤ (C : ℝ≥0∞) * ν (α '' closure K) * ρ (β '' closure K) :=
-          lintegral_indicator_const_le _ _
-      _ < ∞ := ENNReal.mul_lt_top (ENNReal.mul_lt_top ENNReal.coe_lt_top
-          (hL.image hα).measure_lt_top) (hL.image hβ).measure_lt_top
+                refine lintegral_mono fun x => ?_
+                by_cases hx : Φ (t, x) ∈ closure K
+                · rw [Set.indicator_of_mem hx,
+                    Set.indicator_of_mem (show x ∈ α '' closure K from ⟨Φ (t, x), hx, hαΦ t x⟩)]
+                  rfl
+                · rw [Set.indicator_of_notMem hx]
+                  exact bot_le
+              _ ≤ 1 * ν (α '' closure K) := lintegral_indicator_const_le _ _
+              _ = ν (α '' closure K) := one_mul _
+        · have h0 : ∀ x : H, (closure K).indicator (1 : P → ℝ≥0∞) (Φ (t, x)) = 0 := fun x =>
+            Set.indicator_of_notMem (fun hx => ht ⟨Φ (t, x), hx, hβΦ t x⟩) _
+          simp [h0]
+      _ ≤ (C : ℝ≥0∞) * ν (α '' closure K) * ρ (β '' closure K) := lintegral_indicator_const_le _ _
+      _ < ∞ :=
+        ENNReal.mul_lt_top (ENNReal.mul_lt_top ENNReal.coe_lt_top (hL.image hα).measure_lt_top)
+          (hL.image hβ).measure_lt_top
 
   have hm0 : m ≠ 0 := by
     intro h0

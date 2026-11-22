@@ -247,8 +247,7 @@ theorem hostThickExists : HostThickExists := by
   have hSne : (S : ℝ) ≠ 0 := hSpos.ne'
   obtain ⟨a, ha⟩ : ∃ a : ℝ, a = (x - y - 3) / S := ⟨_, rfl⟩
   have haS : a * S = x - y - 3 := by rw [ha]; field_simp
-  have h2Sy : s ≤ 2 * S * y := by
-    nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ S - 1) hy0.le]
+  have h2Sy : s ≤ 2 * S * y := by nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ S - 1) hy0.le]
   have hxle : x ≤ 2 * s * S := by
     have h : x * y ≤ (2 * s * S) * y := by nlinarith [mul_le_mul_of_nonneg_left h2Sy hs0]
     exact le_of_mul_le_mul_right h hy0
@@ -284,8 +283,7 @@ theorem hostThickExists : HostThickExists := by
   have hdS : Real.exp a ^ S ≤ (d : ℝ) ^ S * (8 * L) ^ S := by
     have h : (Real.exp a / (8 * L)) ^ S ≤ (d : ℝ) ^ S := by gcongr
     rwa [div_pow, div_le_iff₀ (by positivity)] at h
-  have hQS : Real.exp a ^ S = Real.exp (x - y - 3) := by
-    rw [← Real.exp_nat_mul, mul_comm, haS]
+  have hQS : Real.exp a ^ S = Real.exp (x - y - 3) := by rw [← Real.exp_nat_mul, mul_comm, haS]
   have hn_eq : (n : ℝ) = Real.exp a ^ S * L * Real.exp 3 := by
     rw [hQS, ← eL, ← Real.exp_add, ← Real.exp_add, ← en]
     congr 1
@@ -296,16 +294,16 @@ theorem hostThickExists : HostThickExists := by
       gcongr
     have hSe : (S : ℝ) ≤ Real.exp S := by linarith [Real.add_one_le_exp (S : ℝ)]
     have hQ2 : Real.exp a ^ 2 = Real.exp (2 * a) := by rw [sq, ← Real.exp_add, two_mul]
-    calc Real.exp 3 * (8 * L) ^ S * S * Real.exp a ^ 2
-        ≤ Real.exp 3 * Real.exp (S * (7 + y)) * Real.exp S * Real.exp (2 * a) := by
-          rw [hQ2]
-          gcongr
-      _ = Real.exp (3 + S * (7 + y) + S + 2 * a) := by
-          rw [Real.exp_add, Real.exp_add, Real.exp_add]
+    calc
+      Real.exp 3 * (8 * L) ^ S * S * Real.exp a ^ 2
+          ≤ Real.exp 3 * Real.exp (S * (7 + y)) * Real.exp S * Real.exp (2 * a) := by
+        rw [hQ2]
+        gcongr
+      _ = Real.exp (3 + S * (7 + y) + S + 2 * a) := by rw [Real.exp_add, Real.exp_add, Real.exp_add]
       _ ≤ Real.exp (32 * s) := Real.exp_le_exp.mpr hexpb
   obtain ⟨k, hk⟩ := Behrend.exists_large_sphere S d
-  refine ⟨(Behrend.sphere S d k).image (Behrend.map (4 * L * d)), ?_,
-    noRel_image L S d k (by omega), ?_⟩
+  refine
+    ⟨(Behrend.sphere S d k).image (Behrend.map (4 * L * d)), ?_, noRel_image L S d k (by omega), ?_⟩
   · intro m hm
     rw [Finset.mem_image] at hm
     obtain ⟨v, hv, rfl⟩ := hm
@@ -325,16 +323,19 @@ theorem hostThickExists : HostThickExists := by
     refine le_trans ?_ hk
     push_cast
     rw [div_le_iff₀ hLpos, div_mul_eq_mul_div, le_div_iff₀ (mul_pos hSpos (pow_pos hdpos 2))]
-    calc (n : ℝ) * Real.exp (-32 * s) * (S * d ^ 2)
+    calc
+      (n : ℝ) * Real.exp (-32 * s) * (S * d ^ 2)
         ≤ n * Real.exp (-32 * s) * (S * Real.exp a ^ 2) := by gcongr
       _ = (Real.exp a ^ S * L * Real.exp 3) * Real.exp (-32 * s) * (S * Real.exp a ^ 2) := by
-          rw [← hn_eq]
+        rw [← hn_eq]
       _ ≤ ((d : ℝ) ^ S * (8 * L) ^ S * L * Real.exp 3) * Real.exp (-32 * s)
-            * (S * Real.exp a ^ 2) := by gcongr
-      _ = (d : ℝ) ^ S * L * (Real.exp (-32 * s) * (Real.exp 3 * (8 * L) ^ S * S * Real.exp a ^ 2)) := by
-          ring
+          * (S * Real.exp a ^ 2) := by
+        gcongr
+      _ = (d : ℝ) ^ S * L
+          * (Real.exp (-32 * s) * (Real.exp 3 * (8 * L) ^ S * S * Real.exp a ^ 2)) := by
+        ring
       _ ≤ (d : ℝ) ^ S * L * (Real.exp (-32 * s) * Real.exp (32 * s)) := by gcongr
       _ = (d : ℝ) ^ S * L := by
-          rw [← Real.exp_add, show -32 * s + 32 * s = 0 by ring, Real.exp_zero, mul_one]
+        rw [← Real.exp_add, show -32 * s + 32 * s = 0 by ring, Real.exp_zero, mul_one]
 
 end Formalism.FrobeniusOrbits

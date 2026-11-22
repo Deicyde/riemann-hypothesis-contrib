@@ -11,9 +11,10 @@ open ValuativeRel
 
 namespace PI.ProdFormulaE.ROpen
 
-theorem isOpen_addSubgroup {G : Type*} [TopologicalSpace G] [AddCommGroup G] [ContinuousAdd G]
-    (H : AddSubgroup G) (U : Set G) (hU : IsOpen U) (h0 : (0 : G) ∈ U) (hUH : U ⊆ H) :
-    IsOpen (H : Set G) := by
+theorem isOpen_addSubgroup
+    {G : Type*} [TopologicalSpace G] [AddCommGroup G] [ContinuousAdd G]
+    (H : AddSubgroup G) (U : Set G) (hU : IsOpen U) (h0 : (0 : G) ∈ U) (hUH : U ⊆ H)
+    : IsOpen (H : Set G) := by
   exact H.isOpen_of_mem_nhds (Filter.mem_of_superset (hU.mem_nhds h0) hUH)
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
@@ -47,10 +48,13 @@ theorem isOpen_O (L : Formalism.MainNotions.S.Loc.LocE F E) : IsOpen (L.O : Set 
     exact (isIntegral_algebraMap).mul (hdi i)
   let f : E →ₗ[F] (Fin (Module.finrank F E) → F) := b.equivFun.toLinearMap
   have hf : Continuous f := IsModuleTopology.continuous_of_linearMap f
-  let U : Set E := f ⁻¹' Set.pi Set.univ (fun _ => (fun c : F => c * ((D : 𝒪[F]) : F)⁻¹) ⁻¹' (𝒪[F] : Set F))
-  have hcont : Continuous (fun c : F => c * ((D : 𝒪[F]) : F)⁻¹) := continuous_id.mul continuous_const
-  have hUo : IsOpen U := hf.isOpen_preimage _
-    (isOpen_set_pi Set.finite_univ fun _ _ => hcont.isOpen_preimage _ isOpen_integer)
+  let U : Set E :=
+    f ⁻¹' Set.pi Set.univ (fun _ => (fun c : F => c * ((D : 𝒪[F]) : F)⁻¹) ⁻¹' (𝒪[F] : Set F))
+  have hcont : Continuous (fun c : F => c * ((D : 𝒪[F]) : F)⁻¹) :=
+    continuous_id.mul continuous_const
+  have hUo : IsOpen U :=
+    hf.isOpen_preimage _
+      (isOpen_set_pi Set.finite_univ fun _ _ => hcont.isOpen_preimage _ isOpen_integer)
   refine isOpen_addSubgroup L.O.toAddSubgroup U hUo ?_ ?_
   · intro i _
     simp [U, f]
@@ -71,7 +75,8 @@ theorem isOpen_O (L : Formalism.MainNotions.S.Loc.LocE F E) : IsOpen (L.O : Set 
     rw [e]
     exact L.O.mul_mem ((L.O_def _).2 isIntegral_algebraMap) ((L.O_def _).2 (hDint i))
 
-theorem isOpen_R [MeasurableSpace E] (M : Formalism.MainNotions.S.Loc.Model F E) : IsOpen (M.R : Set E) := by
+theorem isOpen_R [MeasurableSpace E] (M : Formalism.MainNotions.S.Loc.Model F E)
+    : IsOpen (M.R : Set E) := by
   classical
   haveI := M.L.top
   haveI : ContinuousAdd E := by
@@ -79,8 +84,7 @@ theorem isOpen_R [MeasurableSpace E] (M : Formalism.MainNotions.S.Loc.Model F E)
       | exact IsModuleTopology.toContinuousAdd F E
       | exact inferInstance
   rcases hs : M.split with _ | g
-  · have hR : M.R = M.L.O := by
-      simp only [Formalism.MainNotions.S.Loc.Model.R, hs]
+  · have hR : M.R = M.L.O := by simp only [Formalism.MainNotions.S.Loc.Model.R, hs]
     rw [hR]
     exact isOpen_O M.L
   · have hq0 : ((g.q : 𝒪[F]) : F) ≠ 0 := by
@@ -89,8 +93,10 @@ theorem isOpen_R [MeasurableSpace E] (M : Formalism.MainNotions.S.Loc.Model F E)
     have he : Continuous g.e := IsModuleTopology.continuous_of_linearMap g.e.toLinearMap
     have hV : IsOpen ((fun c : F => c * ((g.q : 𝒪[F]) : F)⁻¹) ⁻¹' (𝒪[F] : Set F)) :=
       (continuous_id.mul continuous_const).isOpen_preimage _ isOpen_integer
-    have hU : IsOpen (g.e ⁻¹' (((fun c : F => c * ((g.q : 𝒪[F]) : F)⁻¹) ⁻¹' (𝒪[F] : Set F)) ×ˢ
-        ((fun c : F => c * ((g.q : 𝒪[F]) : F)⁻¹) ⁻¹' (𝒪[F] : Set F)))) :=
+    have hU : IsOpen
+        (g.e
+          ⁻¹' (((fun c : F => c * ((g.q : 𝒪[F]) : F)⁻¹) ⁻¹' (𝒪[F] : Set F))
+            ×ˢ ((fun c : F => c * ((g.q : 𝒪[F]) : F)⁻¹) ⁻¹' (𝒪[F] : Set F)))) :=
       he.isOpen_preimage _ (hV.prod hV)
     refine isOpen_addSubgroup M.R.toAddSubgroup _ hU ?_ ?_
     · simp
@@ -109,14 +115,20 @@ theorem isOpen_R [MeasurableSpace E] (M : Formalism.MainNotions.S.Loc.Model F E)
         exact Subring.mul_mem _ h2 (g.q).2
       have z1 : (⟨(g.e x).1, m1⟩ : 𝒪[F]) ∈ Ideal.span {g.q} := by
         rw [Ideal.mem_span_singleton']
-        exact ⟨⟨_, h1⟩, Subtype.ext (by
-          show (g.e x).1 * ((g.q : 𝒪[F]) : F)⁻¹ * ((g.q : 𝒪[F]) : F) = (g.e x).1
-          rw [mul_assoc, inv_mul_cancel₀ hq0, mul_one])⟩
+        exact ⟨
+          ⟨_, h1⟩,
+          Subtype.ext (by
+            show (g.e x).1 * ((g.q : 𝒪[F]) : F)⁻¹ * ((g.q : 𝒪[F]) : F) = (g.e x).1
+            rw [mul_assoc, inv_mul_cancel₀ hq0, mul_one])
+        ⟩
       have z2 : (⟨(g.e x).2, m2⟩ : 𝒪[F]) ∈ Ideal.span {g.q} := by
         rw [Ideal.mem_span_singleton']
-        exact ⟨⟨_, h2⟩, Subtype.ext (by
-          show (g.e x).2 * ((g.q : 𝒪[F]) : F)⁻¹ * ((g.q : 𝒪[F]) : F) = (g.e x).2
-          rw [mul_assoc, inv_mul_cancel₀ hq0, mul_one])⟩
+        exact ⟨
+          ⟨_, h2⟩,
+          Subtype.ext (by
+            show (g.e x).2 * ((g.q : 𝒪[F]) : F)⁻¹ * ((g.q : 𝒪[F]) : F) = (g.e x).2
+            rw [mul_assoc, inv_mul_cancel₀ hq0, mul_one])
+        ⟩
       show x ∈ (M.R : Set E)
       simp only [Formalism.MainNotions.S.Loc.Model.R, hs]
       rw [SetLike.mem_coe, Subring.mem_comap, Subring.mem_map]

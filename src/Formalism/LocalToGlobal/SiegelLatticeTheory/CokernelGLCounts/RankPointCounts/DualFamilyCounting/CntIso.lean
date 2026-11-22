@@ -6,7 +6,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.RepresentationIn
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
+open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
 open Classical
 
 noncomputable section
@@ -17,10 +18,12 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option maxHeartbeats 2000000 in
 open PI.RepsIndep.Tr in
-theorem ci_EZ_map {D : Formalism.BasicNotions.D7} {β : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hβ : β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
+theorem ci_EZ_map
+    {D : Formalism.BasicNotions.D7} {β : (VS D).V ≃ₗ[D.host.E] (VS D).V}
+    (hβ : β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
     {T T' : D.host.E} {F0 : FlagG (VS D) D.R.rS T} {Λ : Submodule (𝓞 D.host.E) (VS D).V}
-    {Z : MatZ D} {F' : LFlag (D.sp.Y 0) D.R.rS T'} (h : F' ∈ EZ T' F0 Λ Z) :
-    mapL β hβ F' ∈ EZ T' (mapF β hβ F0) (Formalism.HermitianLatticesTheory.gmap β Λ) Z := by
+    {Z : MatZ D} {F' : LFlag (D.sp.Y 0) D.R.rS T'} (h : F' ∈ EZ T' F0 Λ Z)
+    : mapL β hβ F' ∈ EZ T' (mapF β hβ F0) (Formalism.HermitianLatticesTheory.gmap β Λ) Z := by
   have hlf : lf D (mapF β hβ F0) = mapL β hβ (lf D F0) := lflag_ext rfl rfl
   unfold EZ at h ⊢
   rw [Set.mem_setOf_eq] at h ⊢
@@ -34,15 +37,23 @@ theorem ci_EZ_map {D : Formalism.BasicNotions.D7} {β : (VS D).V ≃ₗ[D.host.E
     show Formalism.MainNotions.S.Zhat (mapF β hβ F0) (mapF β hβ F'.fl) = Z
     rw [Zhat_mapF hβ]
     exact hZ
-  exact ⟨⟨IsLift_map hβ hL, ⟨ξ, AdmWit_map hβ hξ⟩, hG'⟩, AdmWit_map hβ hA, IsGeneric_map hβ hGen,
-    FrameOK_map hβ hF, hZ'⟩
+  exact ⟨
+    ⟨IsLift_map hβ hL, ⟨ξ, AdmWit_map hβ hξ⟩, hG'⟩,
+    AdmWit_map hβ hA,
+    IsGeneric_map hβ hGen,
+    FrameOK_map hβ hF,
+    hZ'
+  ⟩
 
 set_option maxHeartbeats 2000000 in
 open PI.RepsIndep.Tr in
-theorem ci_rel_map {D : Formalism.BasicNotions.D7} {β : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hβ : β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
+theorem ci_rel_map
+    {D : Formalism.BasicNotions.D7} {β : (VS D).V ≃ₗ[D.host.E] (VS D).V}
+    (hβ : β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
     {T T' : D.host.E} {F0 : FlagG (VS D) D.R.rS T} {Λ : Submodule (𝓞 D.host.E) (VS D).V}
-    {F' F'' : LFlag (D.sp.Y 0) D.R.rS T'} (h : NilradicalFlagMoved F0 Λ F' F'') :
-    NilradicalFlagMoved (mapF β hβ F0) (Formalism.HermitianLatticesTheory.gmap β Λ) (mapL β hβ F') (mapL β hβ F'') := by
+    {F' F'' : LFlag (D.sp.Y 0) D.R.rS T'} (h : NilradicalFlagMoved F0 Λ F' F'')
+    : NilradicalFlagMoved (mapF β hβ F0) (Formalism.HermitianLatticesTheory.gmap β Λ) (mapL β hβ F')
+      (mapL β hβ F'') := by
   have hlf : lf D (mapF β hβ F0) = mapL β hβ (lf D F0) := lflag_ext rfl rfl
   obtain ⟨n, ⟨hnL, hne, hnz⟩, h1, h2⟩ := h
   have hN : conj β n ∈ NLam (Formalism.HermitianLatticesTheory.gmap β Λ) (lf D (mapF β hβ F0)) := by
@@ -58,21 +69,29 @@ theorem ci_rel_map {D : Formalism.BasicNotions.D7} {β : (VS D).V ≃ₗ[D.host.
     rw [LinearEquiv.symm_apply_apply, h2]
 
 open PI.RepsIndep.Tr in
-theorem ci_mapF_symm {D : Formalism.BasicNotions.D7} {β : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hβ : β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
-    {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) : mapF β.symm (iso_symm hβ) (mapF β hβ F0) = F0 :=
-  flag_ext (funext fun a => LinearEquiv.symm_apply_apply β (F0.e a)) (LinearEquiv.symm_apply_apply β F0.z)
+theorem ci_mapF_symm
+    {D : Formalism.BasicNotions.D7} {β : (VS D).V ≃ₗ[D.host.E] (VS D).V}
+    (hβ : β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
+    {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
+    : mapF β.symm (iso_symm hβ) (mapF β hβ F0) = F0 :=
+  flag_ext (funext fun a => LinearEquiv.symm_apply_apply β (F0.e a))
+    (LinearEquiv.symm_apply_apply β F0.z)
 
 open PI.RepsIndep.Tr in
 theorem counting_iso_inverse : CntIsoInv := by
   intro D β hβ T T' F0 Λ Z
   have hβ' := iso_symm hβ
-  have hΛ : Formalism.HermitianLatticesTheory.gmap β.symm (Formalism.HermitianLatticesTheory.gmap β Λ) = Λ := gmap_symm_gmap β Λ
+  have hΛ
+      : Formalism.HermitianLatticesTheory.gmap β.symm (Formalism.HermitianLatticesTheory.gmap β Λ)
+        = Λ :=
+    gmap_symm_gmap β Λ
   have hF : Formalism.L2.SG.Saturated.mapFlag β hβ F0 = mapF β hβ F0 := flag_ext rfl rfl
   rw [hF]
   show Formalism.MainNotions.S.Cnt.cntCl (EZ T' (mapF β hβ F0) (Formalism.HermitianLatticesTheory.gmap β Λ) Z) (NilradicalFlagMoved (mapF β hβ F0) (Formalism.HermitianLatticesTheory.gmap β Λ)) =
     Formalism.MainNotions.S.Cnt.cntCl (EZ T' F0 Λ Z) (NilradicalFlagMoved F0 Λ)
   refine cntCl_equiv (mapL β hβ) (mapL β.symm hβ') (mapL_symm hβ) (mapL_symm' hβ hβ') _ _ _ _
-    (fun F' => ⟨fun h => ?_, fun h => ci_EZ_map hβ h⟩) (fun F' F'' => ⟨fun h => ?_, fun h => ci_rel_map hβ h⟩)
+    (fun F' => ⟨fun h => ?_, fun h => ci_EZ_map hβ h⟩)
+    (fun F' F'' => ⟨fun h => ?_, fun h => ci_rel_map hβ h⟩)
   · have e := ci_EZ_map hβ' h
     rw [mapL_symm hβ, ci_mapF_symm hβ, hΛ] at e
     exact e

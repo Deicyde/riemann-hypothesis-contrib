@@ -8,18 +8,22 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
 
 namespace GlobalTheory.PtExt
 
-theorem isSymCoc_of_isAdd : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A], IsAbelianScheme A →
-    ∀ (f : Fn1 A) (g : Fn2 A), IsAdd f g → IsSymCoc g := by
+theorem isSymCoc_of_isAdd
+    : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A],
+      IsAbelianScheme A → ∀ (f : Fn1 A) (g : Fn2 A), IsAdd f g → IsSymCoc g := by
   intro R _ A _ hA f g hfg
   have hc : IsCommMonObj A := hA.comm
   unfold IsSymCoc
@@ -36,9 +40,13 @@ theorem isSymCoc_of_isAdd : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpOb
       rw [mul_comm (w ≫ snd A A) (w ≫ fst A A)] at h2
       simp only [k, Fn1.zero, Category.assoc, map_sub]
       linear_combination h2 - h1
-    obtain ⟨r, hr⟩ := GlobalTheory.T.natural_pointwiseCochain_const_of_globalSections_base R (A ⊗ A) Unit (whole (A ⊗ A)) (by simp [whole])
-      (GlobalTheory.globalFns_holds (Sp R) (A ⊗ A)
-        (ReciprocityTheory.ChartRestriction.G.Geo.Tor.AbelianSchemeGerms.isAbelianScheme_tensor A A hA hA)).2 k hk
+    obtain ⟨r, hr⟩ :=
+      GlobalTheory.T.natural_pointwiseCochain_const_of_globalSections_base R (A ⊗ A) Unit
+        (whole (A ⊗ A)) (by simp [whole])
+        (GlobalTheory.globalFns_holds (Sp R) (A ⊗ A)
+          (ReciprocityTheory.ChartRestriction.G.Geo.Tor.AbelianSchemeGerms.isAbelianScheme_tensor A
+            A hA hA)).2
+        k hk
     intro x y
     have e1 := hr D (lift x y) (sm_whole _)
     have e0 := hr D (lift 1 1) (sm_whole _)
@@ -60,15 +68,21 @@ theorem isSymCoc_of_isAdd : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpOb
       simp only [MonObj.comp_mul] at h2 h3
       simp only [k, Fn1.zero, Category.assoc, map_sub, map_add (f := _), MonObj.comp_mul]
       linear_combination h2 - h1 - h3 + h4
-    obtain ⟨r, hr⟩ := GlobalTheory.T.natural_pointwiseCochain_const_of_globalSections_base R (A ⊗ (A ⊗ A)) Unit (whole _) (by simp [whole])
-      (GlobalTheory.globalFns_holds (Sp R) (A ⊗ (A ⊗ A))
-        (ReciprocityTheory.ChartRestriction.G.Geo.Tor.AbelianSchemeGerms.isAbelianScheme_tensor A (A ⊗ A) hA
-          (ReciprocityTheory.ChartRestriction.G.Geo.Tor.AbelianSchemeGerms.isAbelianScheme_tensor A A hA hA))).2 k hk
+    obtain ⟨r, hr⟩ :=
+      GlobalTheory.T.natural_pointwiseCochain_const_of_globalSections_base R (A ⊗ (A ⊗ A)) Unit
+        (whole _) (by simp [whole])
+        (GlobalTheory.globalFns_holds (Sp R) (A ⊗ (A ⊗ A))
+          (ReciprocityTheory.ChartRestriction.G.Geo.Tor.AbelianSchemeGerms.isAbelianScheme_tensor A
+            (A ⊗ A) hA
+            (ReciprocityTheory.ChartRestriction.G.Geo.Tor.AbelianSchemeGerms.isAbelianScheme_tensor
+              A A hA hA))).2
+        k hk
     intro x y z
     have e1 := hr D (lift x (lift y z)) (sm_whole _)
     have e0 := hr D (lift 1 (lift 1 1)) (sm_whole _)
-    simp only [k, lift_fst, lift_snd, lift_fst_assoc, lift_snd_assoc, _root_.mul_one, sub_self, add_sub_cancel_right,
-      sub_add_cancel] at e0 e1
+    simp only [k, lift_fst, lift_snd, lift_fst_assoc, lift_snd_assoc, _root_.mul_one, sub_self,
+        add_sub_cancel_right, sub_add_cancel]
+      at e0 e1
     rw [← e0] at e1
     exact e1
 

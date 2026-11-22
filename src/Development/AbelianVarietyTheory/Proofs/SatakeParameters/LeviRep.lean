@@ -15,7 +15,8 @@ open scoped TensorProduct
 
 namespace GlobalTheory.GodementJacquet
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {r t : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
 
 def eMat (k : Type) [Field k] (r t : ℕ) : Matrix (Fin (r + t)) (Fin r) k :=

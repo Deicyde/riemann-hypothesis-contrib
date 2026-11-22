@@ -17,53 +17,63 @@ open GlobalTheory.SplitFlip GlobalTheory.RankCoinv
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 variable {A D : Type}
 
-theorem val_unif_pow_le {ϖ : kˣ} (hϖ : IsUnif ϖ) {n m : ℕ} (h : n ≤ m) :
-    valuation k ((ϖ ^ m : kˣ) : k) ≤ valuation k ((ϖ ^ n : kˣ) : k) := by
+theorem val_unif_pow_le {ϖ : kˣ} (hϖ : IsUnif ϖ) {n m : ℕ} (h : n ≤ m)
+    : valuation k ((ϖ ^ m : kˣ) : k) ≤ valuation k ((ϖ ^ n : kˣ) : k) := by
   simp only [Units.val_pow_eq_pow_val, map_pow]
   exact pow_le_pow_right_of_le_one' (show valuation k (ϖ : k) ≤ 1 from hϖ ▸ uniformizer_lt_one.le) h
 
-theorem box_mono {ϖ : kˣ} (hϖ : IsUnif ϖ) (X : Matrix A D k) {n m : ℕ} (h : n ≤ m) :
-    box ϖ X (fun _ => m) ⊆ box ϖ X (fun _ => n) :=
-  fun _ hY i j => (hY i j).trans (val_unif_pow_le hϖ h)
+theorem box_mono {ϖ : kˣ} (hϖ : IsUnif ϖ) (X : Matrix A D k) {n m : ℕ} (h : n ≤ m)
+    : box ϖ X (fun _ => m) ⊆ box ϖ X (fun _ => n) := fun _ hY i j =>
+  (hY i j).trans (val_unif_pow_le hϖ h)
 
-theorem mem_box_self (ϖ : kˣ) (X : Matrix A D k) (e : A → ℕ) : X ∈ box ϖ X e :=
-  fun i j => by simp
+theorem mem_box_self (ϖ : kˣ) (X : Matrix A D k) (e : A → ℕ) : X ∈ box ϖ X e := fun i j => by simp
 
-theorem eq_of_forall_mem_box {ϖ : kˣ} (hϖ : IsUnif ϖ) {X Y : Matrix A D k}
-    (h : ∀ n : ℕ, Y ∈ box ϖ X (fun _ => n)) : Y = X := by
+theorem eq_of_forall_mem_box
+    {ϖ : kˣ} (hϖ : IsUnif ϖ) {X Y : Matrix A D k} (h : ∀ n : ℕ, Y ∈ box ϖ X (fun _ => n))
+    : Y = X := by
   ext i j
   by_contra hne
   have h0 : valuation k (Y i j - X i j) ≠ 0 := by simpa [sub_eq_zero] using hne
-  obtain ⟨n, hn⟩ := exists_pow_lt₀ (show valuation k (ϖ : k) < 1 from hϖ ▸ uniformizer_lt_one) (Units.mk0 _ h0)
+  obtain ⟨n, hn⟩ :=
+    exists_pow_lt₀ (show valuation k (ϖ : k) < 1 from hϖ ▸ uniformizer_lt_one) (Units.mk0 _ h0)
   have := h n i j
   simp only [Units.val_pow_eq_pow_val, map_pow] at this
   exact absurd this (not_le.2 hn)
 
 variable [Fintype A] [Fintype D]
 
-theorem exists_box_subset {ϖ : kˣ} (hϖ : IsUnif ϖ) {X : Matrix A D k} {U : Set (Matrix A D k)}
-    (hU : U ∈ nhds X) : ∃ n : ℕ, box ϖ X (fun _ => n) ⊆ U := by
-  refine exists_subset_nhds_of_isCompact' (V := fun n : ℕ => box ϖ X (fun _ => n))
-    (Antitone.directed_ge fun a b h => box_mono hϖ X h) (fun n => isCompact_box ϖ X _)
-    (fun n => (isClopen_box ϖ X _).isClosed) ?_
+theorem exists_box_subset
+    {ϖ : kˣ} (hϖ : IsUnif ϖ) {X : Matrix A D k} {U : Set (Matrix A D k)} (hU : U ∈ nhds X)
+    : ∃ n : ℕ, box ϖ X (fun _ => n) ⊆ U := by
+  refine exists_subset_nhds_of_isCompact'
+    (V := fun n : ℕ => box ϖ X (fun _ => n))
+    (Antitone.directed_ge fun a b h => box_mono hϖ X h)
+    (fun n => isCompact_box ϖ X _)
+    (fun n => (isClopen_box ϖ X _).isClosed)
+    ?_
   apply mem_nhdsSet_iff_forall.2
   intro Y hY
   have hYX : Y = X := eq_of_forall_mem_box hϖ (Set.mem_iInter.1 hY)
   simpa only [hYX] using hU
 
-theorem exists_sum_boxFn (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] (ϖ : kˣ) (hϖ : GlobalTheory.SplitFlip.IsUnif ϖ) :
-    ∀ Φ ∈ GlobalTheory.WeilM.SB (Matrix A D k), ∃ m₁ : ℕ, ∀ m ≥ m₁, ∃ s : Finset (Matrix A D k),
-      Φ = ∑ c ∈ s, Φ c • GlobalTheory.RankCoinv.boxFn ϖ c (fun _ => m) ∧
-      ∀ c ∈ s, ∀ X ∈ GlobalTheory.RankCoinv.box ϖ c (fun _ => m), Φ X = Φ c := by
+theorem exists_sum_boxFn
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D]
+    (ϖ : kˣ) (hϖ : GlobalTheory.SplitFlip.IsUnif ϖ)
+    : ∀ Φ ∈ GlobalTheory.WeilM.SB (Matrix A D k), ∃ m₁ : ℕ, ∀ m ≥ m₁, ∃ s : Finset (Matrix A D k),
+      Φ = ∑ c ∈ s, Φ c • GlobalTheory.RankCoinv.boxFn ϖ c (fun _ => m)
+        ∧ ∀ c ∈ s, ∀ X ∈ GlobalTheory.RankCoinv.box ϖ c (fun _ => m), Φ X = Φ c := by
   classical
   intro Φ hΦ
   obtain ⟨hlc, hcs⟩ := hΦ
   have hrad : ∀ X, ∃ n : ℕ, box ϖ X (fun _ => n) ⊆ {Y | Φ Y = Φ X} := fun X =>
     exists_box_subset hϖ ((hlc.isOpen_fiber (Φ X)).mem_nhds rfl)
   choose n hn using hrad
-  obtain ⟨t, ht⟩ := IsCompact.elim_finite_subcover hcs (fun X => box ϖ X (fun _ => n X))
-    (fun X => (isClopen_box ϖ X _).isOpen) (fun Y _ => Set.mem_iUnion.2 ⟨Y, mem_box_self ϖ Y _⟩)
+  obtain ⟨t, ht⟩ :=
+    IsCompact.elim_finite_subcover hcs
+      (fun X => box ϖ X (fun _ => n X))
+      (fun X => (isClopen_box ϖ X _).isOpen)
+      (fun Y _ => Set.mem_iUnion.2 ⟨Y, mem_box_self ϖ Y _⟩)
   refine ⟨t.sup n, fun m hm => ?_⟩
   have hconst : ∀ Y ∈ tsupport Φ, ∀ Z ∈ box ϖ Y (fun _ => m), Φ Z = Φ Y := by
     intro Y hY Z hZ
@@ -80,10 +90,13 @@ theorem exists_sum_boxFn (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace
     have h : ∃ Z, box ϖ Z (fun _ => m) = box ϖ Y (fun _ => m) := ⟨Y, rfl⟩
     rw [show rep (box ϖ Y (fun _ => m)) = h.choose from dif_pos h]
     exact h.choose_spec
-  obtain ⟨s₀, hs₀⟩ := IsCompact.elim_finite_subcover hcs
-    (fun Y : tsupport Φ => box ϖ (Y : Matrix A D k) (fun _ => m))
-    (fun Y => (isClopen_box ϖ _ _).isOpen) (fun Y hY => Set.mem_iUnion.2 ⟨⟨Y, hY⟩, mem_box_self ϖ Y _⟩)
-  let s : Finset (Matrix A D k) := s₀.image (fun Y : tsupport Φ => rep (box ϖ (Y : Matrix A D k) (fun _ => m)))
+  obtain ⟨s₀, hs₀⟩ :=
+    IsCompact.elim_finite_subcover hcs
+      (fun Y : tsupport Φ => box ϖ (Y : Matrix A D k) (fun _ => m))
+      (fun Y => (isClopen_box ϖ _ _).isOpen)
+      (fun Y hY => Set.mem_iUnion.2 ⟨⟨Y, hY⟩, mem_box_self ϖ Y _⟩)
+  let s : Finset (Matrix A D k) :=
+    s₀.image (fun Y : tsupport Φ => rep (box ϖ (Y : Matrix A D k) (fun _ => m)))
   have hs : ∀ c ∈ s, ∃ Y ∈ tsupport Φ, c = rep (box ϖ Y (fun _ => m)) := by
     intro c hc
     obtain ⟨Y, -, rfl⟩ := Finset.mem_image.1 hc
@@ -96,7 +109,8 @@ theorem exists_sum_boxFn (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace
       have := mem_box_self ϖ (rep (box ϖ Y (fun _ => m))) (fun _ => m)
       rwa [hrep] at this
     rw [hconst Y hY Z hZ, hconst Y hY _ hcY]
-  have huniq : ∀ c ∈ s, ∀ c' ∈ s, ∀ Z, Z ∈ box ϖ c (fun _ => m) → Z ∈ box ϖ c' (fun _ => m) → c = c' := by
+  have huniq
+      : ∀ c ∈ s, ∀ c' ∈ s, ∀ Z, Z ∈ box ϖ c (fun _ => m) → Z ∈ box ϖ c' (fun _ => m) → c = c' := by
     intro c hc c' hc' Z hZ hZ'
     obtain ⟨Y, -, rfl⟩ := hs c hc
     obtain ⟨Y', -, rfl⟩ := hs c' hc'
@@ -108,7 +122,8 @@ theorem exists_sum_boxFn (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace
     intro Z hZ
     obtain ⟨Y, hY, hZY⟩ := Set.mem_iUnion₂.1 (hs₀ (subset_tsupport Φ hZ))
     refine ⟨rep (box ϖ (Y : Matrix A D k) (fun _ => m)), Finset.mem_image_of_mem _ hY, ?_⟩
-    rw [hrep]; exact hZY
+    rw [hrep]
+    exact hZY
   refine ⟨s, ?_, hval⟩
   funext Z
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, boxFn]

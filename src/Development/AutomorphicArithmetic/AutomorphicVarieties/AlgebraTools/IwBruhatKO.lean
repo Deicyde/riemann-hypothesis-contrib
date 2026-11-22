@@ -4,7 +4,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools
+open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
 
 namespace UpperTheory.V.AlgebraTools.BruhatKO
 
@@ -62,8 +63,8 @@ private lemma perm_eq_one_of_forall_le (π : Equiv.Perm (Fin n)) (h : ∀ x, π 
   exact Equiv.ext fun x => by simpa using Fin.ext (heq x (Finset.mem_univ _))
 
 private def RowsReduced (M : Matrix (Fin n) (Fin n) k) (t : ℕ) : Prop :=
-  ∃ p : Fin n → Fin n, ∀ i : Fin n, t ≤ i.val →
-    M i (p i) ≠ 0 ∧ (∀ c, c ≠ p i → M i c = 0) ∧ (∀ r, r ≠ i → M r (p i) = 0)
+  ∃ p : Fin n → Fin n, ∀ i : Fin n,
+    t ≤ i.val → M i (p i) ≠ 0 ∧ (∀ c, c ≠ p i → M i c = 0) ∧ (∀ r, r ≠ i → M r (p i) = 0)
 
 private lemma rowsReduced_step (h : GL (Fin n) k) (t : ℕ) (ht : t < n)
     (hred : RowsReduced (h : Matrix (Fin n) (Fin n) k) (t + 1)) :
@@ -233,10 +234,13 @@ private lemma exists_eq_mul_pm_of_rowsReduced (g : GL (Fin n) k)
     rw [← hτ, e]
     simp
 
-private theorem exists_mem_doubleCoset_pm (g : GL (Fin n) k) :
-    ∃ σ : Equiv.Perm (Fin n), g ∈ doubleCoset (pm k n σ) (borel k (Fin n)) (borel k (Fin n)) := by
-  have key : ∀ d, d ≤ n → ∃ b₁ ∈ borel k (Fin n), ∃ b₂ ∈ borel k (Fin n),
-      RowsReduced ((b₁ * g * b₂ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) (n - d) := by
+private theorem exists_mem_doubleCoset_pm (g : GL (Fin n) k)
+    : ∃ σ : Equiv.Perm (Fin n), g ∈ doubleCoset (pm k n σ) (borel k (Fin n)) (borel k (Fin n)) := by
+  have key
+      : ∀ d,
+        d ≤ n
+          → ∃ b₁ ∈ borel k (Fin n), ∃ b₂ ∈ borel k (Fin n),
+            RowsReduced ((b₁ * g * b₂ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) (n - d) := by
     intro d
     induction d with
     | zero =>
@@ -250,22 +254,35 @@ private theorem exists_mem_doubleCoset_pm (g : GL (Fin n) k) :
       have ht : n - (d + 1) + 1 = n - d := by omega
       rw [← ht] at hred
       obtain ⟨c₁, hc₁, c₂, hc₂, hred'⟩ := rowsReduced_step _ (n - (d + 1)) (by omega) hred
-      refine ⟨c₁ * b₁, (borel k (Fin n)).mul_mem hc₁ hb₁, b₂ * c₂, (borel k (Fin n)).mul_mem hb₂ hc₂, ?_⟩
+      refine
+        ⟨c₁ * b₁, (borel k (Fin n)).mul_mem hc₁ hb₁, b₂ * c₂, (borel k (Fin n)).mul_mem hb₂ hc₂, ?_⟩
       simpa only [mul_assoc] using hred'
   obtain ⟨b₁, hb₁, b₂, hb₂, hred⟩ := key n le_rfl
   rw [Nat.sub_self] at hred
   obtain ⟨σ, b, hb, hgb⟩ := exists_eq_mul_pm_of_rowsReduced _ hred
-  refine ⟨σ, mem_doubleCoset.mpr ⟨b₁⁻¹ * b, (borel k (Fin n)).mul_mem ((borel k (Fin n)).inv_mem hb₁) hb,
-    b₂⁻¹, (borel k (Fin n)).inv_mem hb₂, ?_⟩⟩
+  refine ⟨
+    σ,
+    mem_doubleCoset.mpr ⟨
+      b₁⁻¹ * b,
+      (borel k (Fin n)).mul_mem ((borel k (Fin n)).inv_mem hb₁) hb,
+      b₂⁻¹,
+      (borel k (Fin n)).inv_mem hb₂,
+      ?_
+    ⟩
+  ⟩
   rw [mul_assoc b₁⁻¹, ← hgb]
   group
 
-private theorem eq_of_pm_mem_doubleCoset {σ τ : Equiv.Perm (Fin n)}
-    (h : pm k n τ ∈ doubleCoset (pm k n σ) (borel k (Fin n)) (borel k (Fin n))) : σ = τ := by
+private theorem eq_of_pm_mem_doubleCoset
+    {σ τ : Equiv.Perm (Fin n)}
+    (h : pm k n τ ∈ doubleCoset (pm k n σ) (borel k (Fin n)) (borel k (Fin n)))
+    : σ = τ := by
   obtain ⟨x, hx, y, hy, hxy⟩ := mem_doubleCoset.mp h
   have hy' : y⁻¹ ∈ borel k (Fin n) := (borel k (Fin n)).inv_mem hy
-  have hmat : (x : Matrix (Fin n) (Fin n) k) * (pm k n σ : Matrix (Fin n) (Fin n) k) =
-      (pm k n τ : Matrix (Fin n) (Fin n) k) * ((y⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
+  have hmat
+      : (x : Matrix (Fin n) (Fin n) k) * (pm k n σ : Matrix (Fin n) (Fin n) k)
+        = (pm k n τ : Matrix (Fin n) (Fin n) k)
+          * ((y⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
     rw [← Units.val_mul, ← Units.val_mul, hxy]
     congr 1
     group
@@ -278,30 +295,32 @@ private theorem eq_of_pm_mem_doubleCoset {σ τ : Equiv.Perm (Fin n)}
     have h0 := (mem_borel _).mp hx (τ a) (σ a) hlt
     rw [hent, show τ⁻¹ (τ a) = a from τ.symm_apply_apply a] at h0
     exact borel_diag_ne_zero hy' a h0
-  have hπ := perm_eq_one_of_forall_le (τ * σ⁻¹) (fun x => by
-    simpa using hle (σ⁻¹ x))
+  have hπ := perm_eq_one_of_forall_le (τ * σ⁻¹) (fun x => by simpa using hle (σ⁻¹ x))
   have := congrArg (· * σ) hπ
   simpa using this.symm
 
-private theorem doubleCoset_pm_injective {σ τ : Equiv.Perm (Fin n)} {g : GL (Fin n) k}
+private theorem doubleCoset_pm_injective
+    {σ τ : Equiv.Perm (Fin n)} {g : GL (Fin n) k}
     (hσ : g ∈ doubleCoset (pm k n σ) (borel k (Fin n)) (borel k (Fin n)))
-    (hτ : g ∈ doubleCoset (pm k n τ) (borel k (Fin n)) (borel k (Fin n))) : σ = τ := by
-  have e : doubleCoset (pm k n σ) (borel k (Fin n)) (borel k (Fin n)) =
-      doubleCoset (pm k n τ) (borel k (Fin n)) (borel k (Fin n)) :=
+    (hτ : g ∈ doubleCoset (pm k n τ) (borel k (Fin n)) (borel k (Fin n)))
+    : σ = τ := by
+  have e
+      : doubleCoset (pm k n σ) (borel k (Fin n)) (borel k (Fin n))
+        = doubleCoset (pm k n τ) (borel k (Fin n)) (borel k (Fin n)) :=
     (doubleCoset_eq_of_mem hσ).symm.trans (doubleCoset_eq_of_mem hτ)
   have hmem := mem_doubleCoset_self (borel k (Fin n)) (borel k (Fin n)) (pm k n τ)
   rw [← e] at hmem
   exact eq_of_pm_mem_doubleCoset hmem
 
-private theorem map_pm {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) (w : Equiv.Perm (Fin n)) :
-    GeneralLinearGroup.map (n := Fin n) f (pm R n w) = pm S n w := by
+private theorem map_pm {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) (w : Equiv.Perm (Fin n))
+    : GeneralLinearGroup.map (n := Fin n) f (pm R n w) = pm S n w := by
   ext i j
   show f ((pm R n w : Matrix (Fin n) (Fin n) R) i j) = _
   rw [pm_apply, pm_apply]
   split_ifs <;> simp
 
-private theorem red_surj {O : Type} [CommRing O] [IsLocalRing O] :
-    Function.Surjective (GeneralLinearGroup.map (n := Fin n) (IsLocalRing.residue O)) := by
+private theorem red_surj {O : Type} [CommRing O] [IsLocalRing O]
+    : Function.Surjective (GeneralLinearGroup.map (n := Fin n) (IsLocalRing.residue O)) := by
   intro g
   choose s hs using IsLocalRing.residue_surjective (R := O)
   let M : Matrix (Fin n) (Fin n) O := (g : Matrix (Fin n) (Fin n) _).map s
@@ -321,38 +340,46 @@ private theorem red_surj {O : Type} [CommRing O] [IsLocalRing O] :
 end UpperTheory.V.AlgebraTools.BruhatKO
 
 open UpperTheory.V.AlgebraTools.BruhatKO in
-theorem UpperTheory.V.AlgebraTools.bruhatKO :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ), (∀ w : Equiv.Perm (Fin n), pm k n w ∈ KO k (Fin n)) ∧ ∀ g ∈ KO k (Fin n), ∃! w : Equiv.Perm (Fin n), ∃ a ∈ iwahori k (Fin n), ∃ b ∈ iwahori k (Fin n), g = a * pm k n w * b := by
-  intro k _ _ _ _ n
-  refine ⟨fun w => ⟨pm 𝒪[k] n w, map_pm _ w⟩, ?_⟩
-  rintro _ ⟨g, rfl⟩
-  set ι := GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k) with hι
-  set r := GeneralLinearGroup.map (n := Fin n) (IsLocalRing.residue 𝒪[k]) with hr
-  have hinj : Function.Injective ι := by
-    intro x y h
-    ext i j
-    exact congrArg (fun z : GL (Fin n) k => (z : Matrix (Fin n) (Fin n) k) i j) h
-  have key : ∀ w : Equiv.Perm (Fin n),
-      (∃ a ∈ iwahori k (Fin n), ∃ b ∈ iwahori k (Fin n), ι g = a * pm k n w * b) ↔
-        r g ∈ DoubleCoset.doubleCoset (pm 𝓀[k] n w) (borel 𝓀[k] (Fin n)) (borel 𝓀[k] (Fin n)) := by
-    intro w
-    have e1 : ι (pm 𝒪[k] n w) = pm k n w := map_pm _ w
-    have e2 : r (pm 𝒪[k] n w) = pm 𝓀[k] n w := map_pm _ w
-    rw [DoubleCoset.mem_doubleCoset]
-    constructor
-    · rintro ⟨_, ⟨a, ha, rfl⟩, _, ⟨b, hb, rfl⟩, h⟩
-      have h' : g = a * pm 𝒪[k] n w * b := hinj (by rw [map_mul, map_mul, e1]; exact h)
-      exact ⟨r a, ha, r b, hb, by rw [h', map_mul, map_mul, e2]⟩
-    · rintro ⟨x, hx, y, hy, h⟩
-      obtain ⟨b, rfl⟩ := red_surj y
-      refine ⟨ι (g * b⁻¹ * (pm 𝒪[k] n w)⁻¹), ⟨_, ?_, rfl⟩, ι b, ⟨b, hy, rfl⟩, ?_⟩
-      · show r _ ∈ borel 𝓀[k] (Fin n)
-        have : r (g * b⁻¹ * (pm 𝒪[k] n w)⁻¹) = x := by
-          rw [map_mul, map_mul, map_inv, map_inv, h, e2]
-          exact (by group : x * pm 𝓀[k] n w * r b * (r b)⁻¹ * (pm 𝓀[k] n w)⁻¹ = x)
-        rw [this]; exact hx
-      · rw [← e1, ← map_mul, ← map_mul]
-        congr 1
-        group
-  obtain ⟨w, hw⟩ := exists_mem_doubleCoset_pm (r g)
-  exact ⟨w, (key w).2 hw, fun v hv => doubleCoset_pm_injective ((key v).1 hv) hw⟩
+theorem UpperTheory.V.AlgebraTools.bruhatKO
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ),
+      (∀ w : Equiv.Perm (Fin n), pm k n w ∈ KO k (Fin n))
+        ∧ ∀ g ∈ KO k (Fin n),
+          ∃! w : Equiv.Perm (Fin n), ∃ a ∈ iwahori k (Fin n), ∃ b ∈ iwahori k (Fin n), g = a * pm k n w * b :=
+  by
+    intro k _ _ _ _ n
+    refine ⟨fun w => ⟨pm 𝒪[k] n w, map_pm _ w⟩, ?_⟩
+    rintro _ ⟨g, rfl⟩
+    set ι := GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k) with hι
+    set r := GeneralLinearGroup.map (n := Fin n) (IsLocalRing.residue 𝒪[k]) with hr
+    have hinj : Function.Injective ι := by
+      intro x y h
+      ext i j
+      exact congrArg (fun z : GL (Fin n) k => (z : Matrix (Fin n) (Fin n) k) i j) h
+    have key
+        : ∀ w : Equiv.Perm (Fin n),
+          (∃ a ∈ iwahori k (Fin n), ∃ b ∈ iwahori k (Fin n), ι g = a * pm k n w * b)
+            ↔ r g ∈ DoubleCoset.doubleCoset (pm 𝓀[k] n w) (borel 𝓀[k] (Fin n))
+              (borel 𝓀[k] (Fin n)) := by
+      intro w
+      have e1 : ι (pm 𝒪[k] n w) = pm k n w := map_pm _ w
+      have e2 : r (pm 𝒪[k] n w) = pm 𝓀[k] n w := map_pm _ w
+      rw [DoubleCoset.mem_doubleCoset]
+      constructor
+      · rintro ⟨_, ⟨a, ha, rfl⟩, _, ⟨b, hb, rfl⟩, h⟩
+        have h' : g = a * pm 𝒪[k] n w * b := hinj (by rw [map_mul, map_mul, e1]; exact h)
+        exact ⟨r a, ha, r b, hb, by rw [h', map_mul, map_mul, e2]⟩
+      · rintro ⟨x, hx, y, hy, h⟩
+        obtain ⟨b, rfl⟩ := red_surj y
+        refine ⟨ι (g * b⁻¹ * (pm 𝒪[k] n w)⁻¹), ⟨_, ?_, rfl⟩, ι b, ⟨b, hy, rfl⟩, ?_⟩
+        · show r _ ∈ borel 𝓀[k] (Fin n)
+          have : r (g * b⁻¹ * (pm 𝒪[k] n w)⁻¹) = x := by
+            rw [map_mul, map_mul, map_inv, map_inv, h, e2]
+            exact (by group : x * pm 𝓀[k] n w * r b * (r b)⁻¹ * (pm 𝓀[k] n w)⁻¹ = x)
+          rw [this]
+          exact hx
+        · rw [← e1, ← map_mul, ← map_mul]
+          congr 1
+          group
+    obtain ⟨w, hw⟩ := exists_mem_doubleCoset_pm (r g)
+    exact ⟨w, (key w).2 hw, fun v hv => doubleCoset_pm_injective ((key v).1 hv) hw⟩

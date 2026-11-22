@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -19,18 +22,18 @@ namespace GlobalTheory.UMin
 
 open Polynomial
 
-private theorem symTup_mul_left {R : Type} [CommRing R] {N : ℕ} (c : Fin N → R) (a : R) (j : Fin N) :
-    symTup (fun b => a * c b) j = a ^ N.factorial * symTup c j := by
-  have h : (Finset.univ.val.map fun b => a * c b) = (Finset.univ.val.map c).map (fun x => a • x) := by
+private theorem symTup_mul_left {R : Type} [CommRing R] {N : ℕ} (c : Fin N → R) (a : R) (j : Fin N)
+    : symTup (fun b => a * c b) j = a ^ N.factorial * symTup c j := by
+  have h
+      : (Finset.univ.val.map fun b => a * c b) = (Finset.univ.val.map c).map (fun x => a • x) := by
     rw [Multiset.map_map]; rfl
   have hd : ((j : ℕ) + 1) ∣ N.factorial := Nat.dvd_factorial (Nat.succ_pos _) j.isLt
   unfold symTup
   rw [h, ← Multiset.pow_smul_esymm, smul_eq_mul, mul_pow, ← pow_mul, Nat.mul_div_cancel' hd]
 
-theorem symTup_eq_finite (K : Type) [Field K] (N : ℕ) (e : Fin N → K) :
-    {c : Fin N → K | symTup c = e}.Finite := by
+theorem symTup_eq_finite (K : Type) [Field K] (N : ℕ) (e : Fin N → K)
+    : {c : Fin N → K | symTup c = e}.Finite := by
   classical
-
   let A : Fin (N + 1) → Set K := fun k =>
     {x | ((k : ℕ) = 0 → x = 1) ∧ ∀ j : Fin N, (j : ℕ) + 1 = k → x ^ (N.factorial / ((j : ℕ) + 1)) = e j}
   have hA : ∀ k, (A k).Finite := by
@@ -66,15 +69,18 @@ theorem symTup_eq_finite (K : Type) [Field K] (N : ℕ) (e : Fin N → K) :
       simp only [s, ← hj]
       exact this
   have hpoly : poly s = (m.map fun t => X - C t).prod := by
-    rw [Multiset.prod_X_sub_X_eq_sum_esymm, hm, Finset.sum_range (fun j => (-1) ^ j * (C (m.esymm j) * X ^ (N - j)))]
+    rw [Multiset.prod_X_sub_X_eq_sum_esymm, hm,
+      Finset.sum_range (fun j => (-1) ^ j * (C (m.esymm j) * X ^ (N - j)))]
   intro a _
   simp only [R, Set.mem_iUnion, Set.mem_image]
   refine ⟨poly s, ⟨s, hs, rfl⟩, ?_⟩
   simp only [Set.mem_setOf_eq, hpoly, Polynomial.roots_multiset_prod_X_sub_C]
   exact Multiset.mem_map_of_mem c (Finset.mem_univ a)
 
-theorem symTup_scale_finite : ∀ (K : Type) [Field K] [IsAlgClosed K] (N : ℕ) (e : Fin N → K), ∃ T : Finset (Fin N → K),
-    ∀ (c : Fin N → K) (a : K), a ≠ 0 → (∀ j, symTup c j = a * e j) → ∃ mu : K, mu ≠ 0 ∧ (fun b => mu * c b) ∈ T := by
+theorem symTup_scale_finite
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (N : ℕ) (e : Fin N → K), ∃ T : Finset (Fin N → K),
+      ∀ (c : Fin N → K) (a : K),
+        a ≠ 0 → (∀ j, symTup c j = a * e j) → ∃ mu : K, mu ≠ 0 ∧ (fun b => mu * c b) ∈ T := by
   intro K _ _ N e
   refine ⟨(symTup_eq_finite K N e).toFinset, ?_⟩
   intro c a ha hc

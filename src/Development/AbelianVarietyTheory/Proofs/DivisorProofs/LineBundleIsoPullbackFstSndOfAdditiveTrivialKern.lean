@@ -5,15 +5,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ZbLeftWhiske
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open GlobalTheory.LBDescent GlobalTheory.DescNorm
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.DescIsoExists
 
-theorem lbIso_pull_fst_snd : ∀ (K : Type) [Field K] [IsAlgClosed K] (A A' B : Over (Sp K)) [GrpObj A] [GrpObj A'] [GrpObj B] (q : A ⟶ A') (P : LB (A ⊗ B).left), IsAbelianScheme A → IsAbelianScheme A' → IsAbelianScheme B → IsMonHom q → P.IsLB → IsAdditive P → (∀ (T : Over (Sp K)) (x : T ⟶ A), x ≫ q = 1 → Triv (ev P (fst T B ≫ x) (snd T B))) → LBIso (P.pull (pullback.fst (q ▷ B).left (q ▷ B).left)) (P.pull (pullback.snd (q ▷ B).left (q ▷ B).left)) := by
+theorem lbIso_pull_fst_snd
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (A A' B : Over (Sp K)) [GrpObj A] [GrpObj A']
+        [GrpObj B] (q : A ⟶ A') (P : LB (A ⊗ B).left),
+      IsAbelianScheme A → IsAbelianScheme A' → IsAbelianScheme B → IsMonHom q → P.IsLB
+        → IsAdditive P
+        → (∀ (T : Over (Sp K)) (x : T ⟶ A), x ≫ q = 1 → Triv (ev P (fst T B ≫ x) (snd T B)))
+        → LBIso (P.pull (pullback.fst (q ▷ B).left (q ▷ B).left))
+          (P.pull (pullback.snd (q ▷ B).left (q ▷ B).left)) := by
   intro K _ _ A A' B _ _ _ q P _ _ _ hq hP hadd hker
   let f := (q ▷ B).left
   have hw : f ≫ (A' ⊗ B).hom = (A ⊗ B).hom := Over.w (q ▷ B)
@@ -25,12 +35,15 @@ theorem lbIso_pull_fst_snd : ∀ (K : Type) [Field K] [IsAlgClosed K] (A A' B : 
   have hBl : f ≫ (snd A' B).left = (snd A B).left := by rw [← Over.comp_left, hB]
   have hAl : f ≫ (fst A' B).left = (fst A B).left ≫ q.left := by
     rw [← Over.comp_left, hA, Over.comp_left]
-  let a : Z ⟶ A := Over.homMk (pullback.fst f f ≫ (fst A B).left) (by
-    simp only [Z, Over.mk_hom, Category.assoc, Over.w])
-  let a' : Z ⟶ A := Over.homMk (pullback.snd f f ≫ (fst A B).left) (by
-    simp only [Z, Over.mk_hom, Category.assoc, Over.w]; exact hsnd)
-  let b : Z ⟶ B := Over.homMk (pullback.fst f f ≫ (snd A B).left) (by
-    simp only [Z, Over.mk_hom, Category.assoc, Over.w])
+  let a : Z ⟶ A :=
+    Over.homMk (pullback.fst f f ≫ (fst A B).left)
+      (by simp only [Z, Over.mk_hom, Category.assoc, Over.w])
+  let a' : Z ⟶ A :=
+    Over.homMk (pullback.snd f f ≫ (fst A B).left)
+      (by simp only [Z, Over.mk_hom, Category.assoc, Over.w]; exact hsnd)
+  let b : Z ⟶ B :=
+    Over.homMk (pullback.fst f f ≫ (snd A B).left)
+      (by simp only [Z, Over.mk_hom, Category.assoc, Over.w])
   let u : Z ⟶ A ⊗ B := Over.homMk (pullback.fst f f) rfl
   let u' : Z ⟶ A ⊗ B := Over.homMk (pullback.snd f f) hsnd
   have hu : lift a b = u := by

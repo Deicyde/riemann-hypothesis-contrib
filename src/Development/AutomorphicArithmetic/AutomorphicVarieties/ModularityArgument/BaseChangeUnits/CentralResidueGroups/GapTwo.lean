@@ -14,15 +14,18 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.SmoothVecto
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published UpperTheory.V.Z.Bc
 
 section SlopeTestRemainingChoices
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-private theorem lie_central {π : CuspSub E a} {ω : HChar E} (hω : π.HasCentral ω) (z : Cinf E) {ψ : Sm E a} (hψ : ψ ∈ π.V) :
-    ∑ i, lieS E a i i z ψ = dchi ω z • ψ := by
+private theorem lie_central
+    {π : CuspSub E a} {ω : HChar E} (hω : π.HasCentral ω) (z : Cinf E) {ψ : Sm E a} (hψ : ψ ∈ π.V)
+    : ∑ i, lieS E a i i z ψ = dchi ω z • ψ := by
   have e2 : lie E a (Central.scL a z) = ∑ i, lieS E a i i z := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [lieS_apply, ← map_sum]
@@ -30,8 +33,9 @@ private theorem lie_central {π : CuspSub E a} {ω : HChar E} (hω : π.HasCentr
   rw [← LinearMap.sum_apply, ← e2]
   refine Subtype.ext (funext fun g => ?_)
   have h1 := Central.hasDerivAt_scalar z ψ g
-  have h2 : (fun t : ℝ => ψ.1 (g * Matrix.GeneralLinearGroup.scalar (Fin a) (infId E (expU (t • z))))) =
-      fun t : ℝ => Complex.exp (t * dchi ω z) * ψ.1 g := by
+  have h2
+      : (fun t : ℝ => ψ.1 (g * Matrix.GeneralLinearGroup.scalar (Fin a) (infId E (expU (t • z)))))
+        = fun t : ℝ => Complex.exp (t * dchi ω z) * ψ.1 g := by
     funext t
     have h3 := congrFun (congrArg Subtype.val (hω (infId E (expU (t • z))) ψ hψ)) g
     have h4 := chiInf_expU ω (t • z)
@@ -45,32 +49,42 @@ private theorem lie_central {π : CuspSub E a} {ω : HChar E} (hω : π.HasCentr
   rw [h6]
   simp
 
-private theorem expo_central {π : CuspSub E a} {ω : HChar E} (hω : π.HasCentral ω) {τ : E →+* ℂ} {m : Multiset ℂ}
-    (hm : π.HasInfChar τ m) : expo ω τ = m.sum := by
+private theorem expo_central
+    {π : CuspSub E a} {ω : HChar E} (hω : π.HasCentral ω)
+    {τ : E →+* ℂ} {m : Multiset ℂ} (hm : π.HasInfChar τ m)
+    : expo ω τ = m.sum := by
   obtain ⟨φ, hφ, h0⟩ := (Submodule.ne_bot_iff _).1 π.ne_bot
   refine smul_left_injective ℂ h0 ?_
   beta_reduce
   rw [← GlobalTheory.trace_Eop_of_hasInfChar E a π τ m hm φ hφ]
   have h1 := lie_central hω (atEmb τ 1) hφ
   have h2 := lie_central hω (atEmb τ Complex.I) hφ
-  simp only [Eop, expo, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.sub_apply, ← Finset.smul_sum, Finset.sum_sub_distrib, h1, h2]
+  simp only [Eop, expo, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.sub_apply,
+    ← Finset.smul_sum, Finset.sum_sub_distrib, h1, h2]
   module
 
-private theorem det_algSat (M : Matrix (Fin 2) (Fin 2) ℂ) (q : ℕ) (x y : ℂˣ)
-    (h : M.charpoly = ((algSat 2 q {x, y}).map fun b => X - C b).prod) : M.det = (q : ℂ) * ((x * y : ℂˣ) : ℂ) := by
+private theorem det_algSat
+    (M : Matrix (Fin 2) (Fin 2) ℂ) (q : ℕ) (x y : ℂˣ)
+    (h : M.charpoly = ((algSat 2 q {x, y}).map fun b => X - C b).prod)
+    : M.det = (q : ℂ) * ((x * y : ℂˣ) : ℂ) := by
   have hq : ((q : ℝ) ^ ((((2 : ℕ) : ℝ) - 1) / 2)) * ((q : ℝ) ^ ((((2 : ℕ) : ℝ) - 1) / 2)) = q := by
     rw [← Real.rpow_add' (Nat.cast_nonneg q) (by norm_num)]
     norm_num
   have hq' := congrArg (fun x : ℝ => (x : ℂ)) hq
   simp only [Complex.ofReal_mul, Complex.ofReal_natCast] at hq'
-  have e : algSat 2 q {x, y} = {(((q : ℝ) ^ ((((2 : ℕ) : ℝ) - 1) / 2) : ℝ) : ℂ) * x,
-      (((q : ℝ) ^ ((((2 : ℕ) : ℝ) - 1) / 2) : ℝ) : ℂ) * y} := by
+  have e
+      : algSat 2 q {x, y}
+        = {
+          (((q : ℝ) ^ ((((2 : ℕ) : ℝ) - 1) / 2) : ℝ) : ℂ) * x,
+          (((q : ℝ) ^ ((((2 : ℕ) : ℝ) - 1) / 2) : ℝ) : ℂ) * y
+        } := by
     simp [algSat]
-  rw [Matrix.det_eq_prod_roots_charpoly, h, roots_multiset_prod_X_sub_C, e, Multiset.prod_pair, mul_mul_mul_comm, hq',
-    Units.val_mul]
+  rw [Matrix.det_eq_prod_roots_charpoly, h, roots_multiset_prod_X_sub_C, e, Multiset.prod_pair,
+    mul_mul_mul_comm, hq', Units.val_mul]
 
-private theorem gap_of_sum {x y : ℂ} (hne : x ≠ y) {i j : ℤ} (hi : x = i + 1 / 2) (hj : y = j + 1 / 2) (hs : x + y = 1) :
-    ∃ (c : ℂ) (k : ℕ), 2 ≤ k ∧ ({x, y} : Multiset ℂ) = {c, c + k} := by
+private theorem gap_of_sum
+    {x y : ℂ} (hne : x ≠ y) {i j : ℤ} (hi : x = i + 1 / 2) (hj : y = j + 1 / 2) (hs : x + y = 1)
+    : ∃ (c : ℂ) (k : ℕ), 2 ≤ k ∧ ({x, y} : Multiset ℂ) = {c, c + k} := by
   have h0 : i + j = 0 := by
     have : ((i + j : ℤ) : ℂ) = 0 := by push_cast; linear_combination hs - hi - hj
     exact_mod_cast this

@@ -11,12 +11,14 @@ namespace GlobalTheory.LocGL.ProjLine
 
 variable {k : Type} [Field k] [ValuativeRel k]
 
-theorem Stable.scale_mem {S : Submodule ℂ (OnePoint k → ℂ)} (hS : Stable S) {c : k} (hc : c ≠ 0)
-    (α β γ : ℂ) (a r b s : k)
-    (h : α • (fun _ => (1 : ℂ)) + β • ballFn a r + γ • ballFn b s ∈ S) :
-    α • (fun _ => (1 : ℂ)) + β • ballFn (c * a) (c * r) + γ • ballFn (c * b) (c * s) ∈ S := by
+theorem Stable.scale_mem
+    {S : Submodule ℂ (OnePoint k → ℂ)} (hS : Stable S)
+    {c : k} (hc : c ≠ 0)
+    (α β γ : ℂ) (a r b s : k) (h : α • (fun _ => (1 : ℂ)) + β • ballFn a r + γ • ballFn b s ∈ S)
+    : α • (fun _ => (1 : ℂ)) + β • ballFn (c * a) (c * r) + γ • ballFn (c * b) (c * s) ∈ S := by
   have hv : 0 < valuation k c := zero_lt_iff.2 (by simpa using hc)
-  have key : ∀ a r x : k, ballFn (c * a) (c * r) x = ballFn a r ((c⁻¹ * x + 0 : k) : OnePoint k) := by
+  have key
+      : ∀ a r x : k, ballFn (c * a) (c * r) x = ballFn a r ((c⁻¹ * x + 0 : k) : OnePoint k) := by
     intro a r x
     have h1 : x - c * a = c * (c⁻¹ * x + 0 - a) := by field_simp; ring
     rw [ballFn_coe, ballFn_coe, h1, map_mul, map_mul]
@@ -25,7 +27,8 @@ theorem Stable.scale_mem {S : Submodule ℂ (OnePoint k → ℂ)} (hS : Stable S
   refine hS.1 _ h c⁻¹ 0 (inv_ne_zero hc) _ (by simp [ballFn]) fun x => ?_
   simp only [Pi.add_apply, Pi.smul_apply, key]
 
-theorem ballFn_eq_ballFn_zero {a r : k} (h : valuation k a ≤ valuation k r) : ballFn a r = ballFn 0 r := by
+theorem ballFn_eq_ballFn_zero {a r : k} (h : valuation k a ≤ valuation k r)
+    : ballFn a r = ballFn 0 r := by
   funext x
   induction x using OnePoint.rec with
   | infty => rfl
@@ -36,16 +39,18 @@ theorem ballFn_eq_ballFn_zero {a r : k} (h : valuation k a ≤ valuation k r) : 
     have := (valuation k).map_add_le hx h
     rwa [sub_add_cancel] at this
 
-theorem ballFn_congr_radius (a : k) {r s : k} (h : valuation k r = valuation k s) : ballFn a r = ballFn a s := by
+theorem ballFn_congr_radius (a : k) {r s : k} (h : valuation k r = valuation k s)
+    : ballFn a r = ballFn a s := by
   funext x
   induction x using OnePoint.rec with
   | infty => rfl
   | coe x => rw [ballFn_coe, ballFn_coe, h]
 
-theorem Stable.ballFn_mem_and_one_mem_of_sub_mem (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (S : Submodule ℂ (OnePoint k → ℂ)) (hS : Stable S) (ϖ : k)
-    (hϖ : valuation k ϖ = uniformizer k) (h : ballFn 0 ϖ - ballFn 1 ϖ ∈ S) :
-    ballFn (0 : k) 1 ∈ S ∧ (fun _ => (1 : ℂ)) ∈ S := by
+theorem Stable.ballFn_mem_and_one_mem_of_sub_mem
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (S : Submodule ℂ (OnePoint k → ℂ)) (hS : Stable S)
+    (ϖ : k) (hϖ : valuation k ϖ = uniformizer k) (h : ballFn 0 ϖ - ballFn 1 ϖ ∈ S)
+    : ballFn (0 : k) 1 ∈ S ∧ (fun _ => (1 : ℂ)) ∈ S := by
   classical
   have hlt : valuation k ϖ < 1 := hϖ ▸ uniformizer_lt_one
   have hle : ∀ x : k, valuation k x ≤ valuation k ϖ ↔ valuation k x < 1 := fun x => by
@@ -67,7 +72,9 @@ theorem Stable.ballFn_mem_and_one_mem_of_sub_mem (k : Type) [Field k] [Valuative
   simp only [map_one] at hT1 hT2 hT3
   set q : ℂ := (T.card : ℂ) with hqdef
   have hsum : ballFn (0 : k) 1 = ∑ a ∈ T, ballFn a ϖ := by
-    rw [hT3 (ballFn 0 1) rfl (fun x hx => by rw [ballFn_coe, if_neg (by simpa using hx)]) (fun x b hb => ?_)]
+    rw [hT3 (ballFn 0 1) rfl
+      (fun x hx => by rw [ballFn_coe, if_neg (by simpa using hx)])
+      (fun x b hb => ?_)]
     · refine Finset.sum_congr rfl fun a ha => ?_
       rw [ballFn_coe, if_pos (by simpa using hT1 a ha), one_smul]
     · have hb1 : valuation k b ≤ 1 := hb.trans hlt.le
@@ -88,8 +95,8 @@ theorem Stable.ballFn_mem_and_one_mem_of_sub_mem (k : Type) [Field k] [Valuative
     · simp [ballFn_coe, ballFn, he]; ring
     · simp [ballFn_coe, ballFn, he]
     · have hx0 : 0 < valuation k x := zero_lt_iff.2 (by simpa using hx)
-      simp only [Pi.add_apply, Pi.smul_apply, ballFn_coe, sub_zero, map_one, hϖ, le_uniformizer_iff, map_inv₀, he, smul_eq_mul,
-        inv_le_one₀ hx0, inv_lt_one₀ hx0]
+      simp only [Pi.add_apply, Pi.smul_apply, ballFn_coe, sub_zero, map_one, hϖ, le_uniformizer_iff,
+        map_inv₀, he, smul_eq_mul, inv_le_one₀ hx0, inv_lt_one₀ hx0]
       rcases lt_trichotomy (valuation k x) 1 with h1 | h1 | h1
       · simp [h1, h1.le, h1.not_ge, h1.not_gt]
       · simp [h1]
@@ -104,8 +111,10 @@ theorem Stable.ballFn_mem_and_one_mem_of_sub_mem (k : Type) [Field k] [Valuative
     rw [hqdef]
     exact_mod_cast (by omega : 1 + T.card ≠ 0)
   have h2 : ballFn (0 : k) (ϖ * ϖ) ∈ S := by
-    have h3 := S.sub_mem (S.add_mem (S.sub_mem R4 R3) (S.smul_mem q R1)) (S.smul_mem (q + 1 - q ^ 2) R2)
-    have h4 : -((1 - q) * (1 - q) * (1 + q)) ≠ 0 := neg_ne_zero.2 (mul_ne_zero (mul_ne_zero hq1 hq1) hq2)
+    have h3 :=
+      S.sub_mem (S.add_mem (S.sub_mem R4 R3) (S.smul_mem q R1)) (S.smul_mem (q + 1 - q ^ 2) R2)
+    have h4 : -((1 - q) * (1 - q) * (1 + q)) ≠ 0 :=
+      neg_ne_zero.2 (mul_ne_zero (mul_ne_zero hq1 hq1) hq2)
     refine (S.smul_mem_iff h4).1 ?_
     convert h3 using 1
     module

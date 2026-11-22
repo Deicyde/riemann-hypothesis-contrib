@@ -9,9 +9,12 @@ open MvPolynomial
 
 namespace LateralTheory.EtaleTrace.Cov
 
-theorem homRel_aeval_scale (k K : Type) [Field k] [Field K] [Algebra k K] {n : ℕ} (v : Fin n → K)
-    (H : MvPolynomial (Fin n) k) (m : ℕ) (hH : H.IsHomogeneous m) :
-    aeval (fun j => Polynomial.C (v j) * Polynomial.X) H = Polynomial.C (aeval v H) * Polynomial.X ^ m := by
+theorem homRel_aeval_scale
+    (k K : Type) [Field k] [Field K] [Algebra k K]
+    {n : ℕ} (v : Fin n → K) (H : MvPolynomial (Fin n) k)
+    (m : ℕ) (hH : H.IsHomogeneous m)
+    : aeval (fun j => Polynomial.C (v j) * Polynomial.X) H
+      = Polynomial.C (aeval v H) * Polynomial.X ^ m := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     rw [aeval_def, eval₂_eq, aeval_def, eval₂_eq, map_sum, Finset.sum_mul]
@@ -46,8 +49,10 @@ theorem HomRel_of : HomRel := by
     rw [← sum_homogeneousComponent G]
     exact Finset.sum_eq_zero fun i _ => h i
   refine ⟨m, homogeneousComponent m G, hm, homogeneousComponent_isHomogeneous m G, ?_⟩
-  have hsum : aeval x G = ∑ i ∈ Finset.range (G.totalDegree + 1),
-      Polynomial.C (aeval v (homogeneousComponent i G)) * Polynomial.X ^ i := by
+  have hsum
+      : aeval x G
+        = ∑ i ∈ Finset.range (G.totalDegree + 1),
+          Polynomial.C (aeval v (homogeneousComponent i G)) * Polynomial.X ^ i := by
     conv_lhs => rw [← sum_homogeneousComponent G]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]

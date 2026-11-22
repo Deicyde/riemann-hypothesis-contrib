@@ -25,18 +25,24 @@ variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSp
 def preUnits (dτ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] (V →L[ℂ] V)) : Fin n → Fin n → Module.End ℂ V :=
   fun a b => ((dτ (Matrix.single a b 1) : V →L[ℂ] V) : Module.End ℂ V)
 
-variable [FiniteDimensional ℂ V] {ε : Fin n → Bool} (τ : KG ε →* unitary (V →L[ℂ] V)) (hcont : Continuous τ)
+variable
+  [FiniteDimensional ℂ V]
+  {ε : Fin n → Bool} (τ : KG ε →* unitary (V →L[ℂ] V)) (hcont : Continuous τ)
   (dτ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] (V →L[ℂ] V))
-  (hder : ∀ X, inK ε X → ∀ γ : ℝ → KG ε, (∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X)) →
-    HasDerivAt (fun t => ((τ (γ t) : unitary (V →L[ℂ] V)) : V →L[ℂ] V)) (dτ X) 0)
-
+  (hder : ∀ X,
+    inK ε X
+      → ∀ γ : ℝ → KG ε,
+        (∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
+          → HasDerivAt (fun t => ((τ (γ t) : unitary (V →L[ℂ] V)) : V →L[ℂ] V)) (dτ X) 0)
 
 include hcont hder in
 theorem pre_kRel : Formalism.REAL.KRel ε (preUnits dτ) := by
   intro a b c d hab hcd
   have hbr := pre_dτ_bracket_single τ dτ hder hab hcd
-  have hm : Matrix.single a b (1 : ℂ) * Matrix.single c d 1 - Matrix.single c d 1 * Matrix.single a b 1 =
-      (if b = c then Matrix.single a d 1 else 0) - (if d = a then Matrix.single c b 1 else 0) := by
+  have hm
+      : Matrix.single a b (1 : ℂ) * Matrix.single c d 1 - Matrix.single c d 1 * Matrix.single a b 1
+        = (if b = c then Matrix.single a d 1 else 0)
+          - (if d = a then Matrix.single c b 1 else 0) := by
     by_cases h1 : b = c <;> by_cases h2 : d = a
     · subst h1 h2; simp [Matrix.single_mul_single_same]
     · subst h1; simp [Matrix.single_mul_single_same, Matrix.single_mul_single_of_ne, h2]
@@ -59,8 +65,8 @@ theorem pre_kUnit : Formalism.REAL.KUnit ε (preUnits dτ) := by
   rw [← pre_star_dτ_single τ dτ hder hab, ContinuousLinearMap.star_eq_adjoint,
     ContinuousLinearMap.adjoint_inner_right]
 
-theorem pre_dτ_stable_of_kStable (W : Submodule ℂ V) (hW : Formalism.REAL.KStable ε (preUnits dτ) W) :
-    ∀ Y, inK ε Y → ∀ v ∈ W, dτ Y v ∈ W := by
+theorem pre_dτ_stable_of_kStable (W : Submodule ℂ V) (hW : Formalism.REAL.KStable ε (preUnits dτ) W)
+    : ∀ Y, inK ε Y → ∀ v ∈ W, dτ Y v ∈ W := by
   intro Y hY v hv
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Matrix.matrix_eq_sum_single Y, map_sum, _root_.sum_apply]
@@ -78,17 +84,17 @@ theorem pre_dτ_stable_of_kStable (W : Submodule ℂ V) (hW : Formalism.REAL.KSt
     rw [e, map_zero, _root_.zero_apply]
     exact W.zero_mem
 
-
 include hcont hder in
-theorem pre_kStable_of_stable (W : Submodule ℂ V)
-    (hW : ∀ k : KG ε, ∀ v ∈ W, ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) v ∈ W) :
-    Formalism.REAL.KStable ε (preUnits dτ) W := by
+theorem pre_kStable_of_stable
+    (W : Submodule ℂ V) (hW : ∀ k : KG ε, ∀ v ∈ W, ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) v ∈ W)
+    : Formalism.REAL.KStable ε (preUnits dτ) W := by
   have hK : ∀ X, inK ε X → ∀ v ∈ W, dτ X v ∈ W := by
     intro X hX v hv
     obtain ⟨γ, hγ⟩ := exists_curve ε hX
     have hd := hder X hX γ hγ
     have hdv : HasDerivAt (fun t : ℝ => preOp τ (γ t) v) (dτ X v) 0 := by
-      have := ((ContinuousLinearMap.apply ℂ V v).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt (0 : ℝ) hd
+      have :=
+        ((ContinuousLinearMap.apply ℂ V v).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt (0 : ℝ) hd
       simpa [Function.comp_def] using this
     rw [hasDerivAt_iff_tendsto_slope] at hdv
     have hcl : IsClosed (W : Set V) := W.closed_of_finiteDimensional
@@ -106,24 +112,26 @@ theorem pre_kStable_of_stable (W : Submodule ℂ V)
     simp only [A, B, Matrix.conjTranspose_apply, Matrix.single_apply]
     by_cases h1 : a = j <;> by_cases h2 : b = i <;> simp [h1, h2]
   have hBA : Bᴴ = A := by rw [← hAB, Matrix.conjTranspose_conjTranspose]
-  have h1 : inK ε (A - B) := inK_of_skew_comm (by rw [Matrix.conjTranspose_sub, hAB, hBA, neg_sub])
-    (by rw [sub_mul, mul_sub, hA, hB])
-  have h2 : inK ε (Complex.I • (A + B)) := inK_of_skew_comm
-    (by rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_add, hAB, hBA, Complex.star_def,
-      Complex.conj_I, add_comm, neg_smul])
-    (by rw [Matrix.smul_mul, Matrix.mul_smul, add_mul, mul_add, hA, hB])
+  have h1 : inK ε (A - B) :=
+    inK_of_skew_comm (by rw [Matrix.conjTranspose_sub, hAB, hBA, neg_sub])
+      (by rw [sub_mul, mul_sub, hA, hB])
+  have h2 : inK ε (Complex.I • (A + B)) :=
+    inK_of_skew_comm
+      (by
+        rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_add, hAB, hBA, Complex.star_def,
+          Complex.conj_I, add_comm, neg_smul])
+      (by rw [Matrix.smul_mul, Matrix.mul_smul, add_mul, mul_add, hA, hB])
   have e : A = (1 / 2 : ℂ) • (A - B) - (Complex.I / 2) • (Complex.I • (A + B)) := by
-    rw [smul_smul, show Complex.I / 2 * Complex.I = -(1 / 2 : ℂ) by
-      rw [div_mul_eq_mul_div, Complex.I_mul_I]; ring]
+    rw [smul_smul,
+      show Complex.I / 2 * Complex.I = -(1 / 2 : ℂ) by
+        rw [div_mul_eq_mul_div, Complex.I_mul_I]; ring]
     module
-  rw [e, map_sub, map_smul, map_smul, _root_.sub_apply, _root_.smul_apply,
-    _root_.smul_apply]
+  rw [e, map_sub, map_smul, map_smul, _root_.sub_apply, _root_.smul_apply, _root_.smul_apply]
   exact W.sub_mem (W.smul_mem _ (hK _ h1 v hv)) (W.smul_mem _ (hK _ h2 v hv))
 
-
 include hcont hder in
-theorem pre_kSpan_stable (x : V) (k : KG ε) :
-    ∀ v ∈ Formalism.REAL.kSpan ε (preUnits dτ) x,
+theorem pre_kSpan_stable (x : V) (k : KG ε)
+    : ∀ v ∈ Formalism.REAL.kSpan ε (preUnits dτ) x,
       ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) v ∈ Formalism.REAL.kSpan ε (preUnits dτ) x := by
   have hS : Formalism.REAL.KStable ε (preUnits dτ) (Formalism.REAL.kSpan ε (preUnits dτ) x) := by
     intro a b hab y hy
@@ -135,15 +143,14 @@ theorem pre_kSpan_stable (x : V) (k : KG ε) :
   rw [show ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) = NormedSpace.exp (dτ Y) from he]
   exact exp_mem_of_stable _ _ (pre_dτ_stable_of_kStable dτ _ hS Y hY)
 
-
 include hcont hder in
-theorem irred_of_gen {Λ : Fin n → ℝ} (w : V)
-    (hwt : ∀ a, dτ (Matrix.single a a 1) w = ((Λ a : ℝ) : ℂ) • w)
+theorem irred_of_gen
+    {Λ : Fin n → ℝ} (w : V) (hwt : ∀ a, dτ (Matrix.single a a 1) w = ((Λ a : ℝ) : ℂ) • w)
     (hhw : ∀ a b, a < b → ε a = ε b → dτ (Matrix.single a b 1) w = 0)
-    (hgen : ∀ W : Submodule ℂ V, (∀ k : KG ε, ∀ v ∈ W, ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) v ∈ W) →
-      w ∈ W → W = ⊤) :
-    ∀ W : Submodule ℂ V, (∀ k : KG ε, ∀ v ∈ W, ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) v ∈ W) →
-      W = ⊥ ∨ W = ⊤ := by
+    (hgen : ∀ W : Submodule ℂ V,
+      (∀ k : KG ε, ∀ v ∈ W, ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) v ∈ W) → w ∈ W → W = ⊤)
+    : ∀ W : Submodule ℂ V,
+      (∀ k : KG ε, ∀ v ∈ W, ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) v ∈ W) → W = ⊥ ∨ W = ⊤ := by
   intro W hW
   have hx : w ∈ Formalism.REAL.kSpan ε (preUnits dτ) w := by
     unfold Formalism.REAL.kSpan
@@ -154,21 +161,29 @@ theorem irred_of_gen {Λ : Fin n → ℝ} (w : V)
     hgen _ (pre_kSpan_stable τ hcont dτ hder w) hx
   have hhi : Formalism.REAL.KHighest ε (preUnits dτ) Λ w :=
     ⟨fun a => hwt a, fun a b hab he => hhw a b hab he⟩
-  have := Formalism.REAL.kIrr V n ε (preUnits dτ) Λ w inferInstance (pre_kRel τ hcont dτ hder)
-    (pre_kUnit τ hcont dτ hder) hhi W (htop ▸ le_top) (pre_kStable_of_stable τ hcont dτ hder W hW)
+  have :=
+    Formalism.REAL.kIrr V n ε (preUnits dτ) Λ w inferInstance (pre_kRel τ hcont dτ hder)
+      (pre_kUnit τ hcont dτ hder) hhi W (htop ▸ le_top) (pre_kStable_of_stable τ hcont dτ hder W hW)
   rwa [htop] at this
 
 end Pre
 
-def kTypeOfGen {ε : Fin n → Bool} {Λ : Fin n → ℝ} (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-    [FiniteDimensional ℂ V] [CompleteSpace V] (τ : KG ε →* unitary (V →L[ℂ] V)) (hcont : Continuous τ)
+def kTypeOfGen
+    {ε : Fin n → Bool} {Λ : Fin n → ℝ}
+    (V : Type)
+    [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] [CompleteSpace V]
+    (τ : KG ε →* unitary (V →L[ℂ] V)) (hcont : Continuous τ)
     (dτ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] (V →L[ℂ] V))
-    (hder : ∀ X, inK ε X → ∀ γ : ℝ → KG ε, (∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X)) →
-      HasDerivAt (fun t => ((τ (γ t) : unitary (V →L[ℂ] V)) : V →L[ℂ] V)) (dτ X) 0)
+    (hder : ∀ X,
+      inK ε X
+        → ∀ γ : ℝ → KG ε,
+          (∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
+            → HasDerivAt (fun t => ((τ (γ t) : unitary (V →L[ℂ] V)) : V →L[ℂ] V)) (dτ X) 0)
     (w : V) (hw : ‖w‖ = 1) (hwt : ∀ a, dτ (Matrix.single a a 1) w = ((Λ a : ℝ) : ℂ) • w)
     (hhw : ∀ a b, a < b → ε a = ε b → dτ (Matrix.single a b 1) w = 0)
-    (hgen : ∀ W : Submodule ℂ V, (∀ k : KG ε, ∀ v ∈ W, ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) v ∈ W) →
-      w ∈ W → W = ⊤) : KType ε Λ where
+    (hgen : ∀ W : Submodule ℂ V,
+      (∀ k : KG ε, ∀ v ∈ W, ((τ k : unitary (V →L[ℂ] V)) : V →L[ℂ] V) v ∈ W) → w ∈ W → W = ⊤)
+    : KType ε Λ where
   V := V
   τ := τ
   cont := hcont

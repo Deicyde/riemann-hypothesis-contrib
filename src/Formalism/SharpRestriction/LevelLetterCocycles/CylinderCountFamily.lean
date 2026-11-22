@@ -28,9 +28,9 @@ structure AllRowsAt (D : D7) (Dall Dgood : ℕ) : Type 1 where
   ReT_spec : ∀ S, B.I.IsRConvF B.μf B.fund B.R (eT S) (ReT S)
   eT_univ : eT Set.univ = B.e
   ReT_univ : ReT Set.univ = B.Re
-  eT_one : ∀ (k : Fin 2) (S : Finset (Tup D k)),
-    (eT (cyl D k (S : Set (Tup D k))) 1).re =
-      (B.e 1).re * ∑ t ∈ S, ∏ v, wtOf D k (eVec k v) (t v)
+  eT_one
+    : ∀ (k : Fin 2) (S : Finset (Tup D k)),
+      (eT (cyl D k (S : Set (Tup D k))) 1).re = (B.e 1).re * ∑ t ∈ S, ∏ v, wtOf D k (eVec k v) (t v)
 
 variable {D : D7} {Dall Dgood : ℕ}
 
@@ -40,14 +40,17 @@ def AllRowsAt.dimT (A : AllRowsAt D Dall Dgood) (S : Set (Tup2 D)) : ℕ :=
 def TieCountAt (A : AllRowsAt D Dall Dgood) (n₀ : ℕ) (Alev C₃ cb : ℝ) : Prop :=
   ∃ b h : ℝ,
     (∀ (k : Fin 2) (S : Set (Tup D k)),
-      Formalism.MainNotions.PlaceDegreeData.HidaSetting A.B.I n₀ Alev b A.B.lam A.B.μf A.B.g (D.host.g (1 - k)) (A.eT (cyl D k S)) ∧
-      Formalism.MainNotions.PlaceDegreeData.CountData A.B.I A.B.lam A.B.σ A.B.w A.B.σs A.B.tens A.B.μf A.B.fund A.B.R
-        (A.eT (cyl D k S)) (A.ReT (cyl D k S))) ∧
-    (∀ v, Formalism.QuantumDeterminants.GapAtLeast (A.B.I.ε v) (A.B.lam v) h) ∧
-    C₃ * (A.B.I.n : ℝ) ^ 19 * (A.B.I.f : ℝ) ^ 5 * Real.log (b * A.B.I.rd) ≤ h ∧
-    Real.log (A.B.I.f : ℝ) ≤ Real.sqrt (A.B.I.n : ℝ) ∧
-    Real.log (Real.log b) ≤ cb * (A.B.I.n : ℝ) * (A.B.I.f : ℝ) * Real.log (A.B.I.n : ℝ) ∧
-    0 < A.B.I.Dstar (Formalism.MainNotions.PlaceDegreeData.fdegAll A.B.I A.B.σ A.B.w) A.B.μf A.B.fund A.B.e
+        Formalism.MainNotions.PlaceDegreeData.HidaSetting A.B.I n₀ Alev b A.B.lam A.B.μf A.B.g
+            (D.host.g (1 - k)) (A.eT (cyl D k S))
+          ∧ Formalism.MainNotions.PlaceDegreeData.CountData A.B.I A.B.lam A.B.σ A.B.w A.B.σs
+            A.B.tens A.B.μf A.B.fund A.B.R (A.eT (cyl D k S)) (A.ReT (cyl D k S)))
+      ∧ (∀ v, Formalism.QuantumDeterminants.GapAtLeast (A.B.I.ε v) (A.B.lam v) h)
+      ∧ C₃ * (A.B.I.n : ℝ) ^ 19 * (A.B.I.f : ℝ) ^ 5 * Real.log (b * A.B.I.rd) ≤ h
+      ∧ Real.log (A.B.I.f : ℝ) ≤ Real.sqrt (A.B.I.n : ℝ)
+      ∧ Real.log (Real.log b) ≤ cb * (A.B.I.n : ℝ) * (A.B.I.f : ℝ) * Real.log (A.B.I.n : ℝ)
+      ∧ 0
+        < A.B.I.Dstar (Formalism.MainNotions.PlaceDegreeData.fdegAll A.B.I A.B.σ A.B.w) A.B.μf
+          A.B.fund A.B.e
 
 variable (D)
 
@@ -71,6 +74,7 @@ end Formalism.MainNotions.ArithmeticCylinders
 
 namespace Formalism.MainNotions.N.CylinderCountFamily
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders Formalism.MainNotions.FamilyNumericLemmas Filter Topology Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders
+  Formalism.MainNotions.FamilyNumericLemmas Filter Topology Polynomial
 
 end Formalism.MainNotions.N.CylinderCountFamily

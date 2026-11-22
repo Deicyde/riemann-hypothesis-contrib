@@ -10,7 +10,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 namespace PositivityTheory.KB
 
 theorem sCen_of (hEv : SEv) : SCen :=
-  CentralizerFixed.join (fun L _ _ => CentralizerFixed.span_units (L := L)) CentralizerFixed.tScal CentralizerFixed.tSimp
+  CentralizerFixed.join
+    (fun L _ _ => CentralizerFixed.span_units (L := L))
+    CentralizerFixed.tScal CentralizerFixed.tSimp
     (CentralizerFixed.tAv_of CentralizerFixed.tScal CentralizerFixed.tSimp) hEv
 
 end PositivityTheory.KB

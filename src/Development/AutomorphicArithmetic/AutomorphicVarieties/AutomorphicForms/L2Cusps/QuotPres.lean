@@ -6,18 +6,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.V.KernelIndexFullLattice
+open NumberField MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum
+  GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.CuspRep
+  GlobalTheory.CuspRep.CuspidalL2GL
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.V.KernelIndexFullLattice
 
-private theorem measurableSet_band' (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) :
-    MeasurableSet (band E a) := by
+private theorem measurableSet_band'
+    (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+    : MeasurableSet (band E a) := by
   have hc : Continuous fun g : GA E a => (detModule E a g : ℝ) :=
     continuous_subtype_val.comp continuous_detModule
-  have h := hc.measurable (measurableSet_Ico (a := (1 : ℝ)) (b := (detModule E a (splitCentre E a 1) : ℝ)))
+  have h :=
+    hc.measurable (measurableSet_Ico (a := (1 : ℝ)) (b := (detModule E a (splitCentre E a 1) : ℝ)))
   exact (MeasurableSet.const (a = 0)).union h
 
-theorem UpperTheory.V.KernelIndexFullLattice.quotPres_holds :
-    UpperTheory.V.KernelIndexFullLattice.QuotPres := by
+theorem UpperTheory.V.KernelIndexFullLattice.quotPres_holds
+    : UpperTheory.V.KernelIndexFullLattice.QuotPres := by
   intro E _ _ _ a μ _
   have hr : Measurable (retractOne : GA E a → G1 E a) := continuous_retractOne.measurable
   have hD := RightCosetSpace.measurableSet_fundamentalDomain (Γ1 E a)
@@ -34,5 +39,5 @@ theorem UpperTheory.V.KernelIndexFullLattice.quotPres_holds :
     IsFundamentalDomain.mk' ((hr hD).inter (measurableSet_band' E a)).nullMeasurableSet
       (bandDom_holds E a _ (RightCosetSpace.existsUnique_smul_mem_fundamentalDomain (Γ1 E a)))
   refine ⟨hq, ?_⟩
-  rw [quotMeasure_eq hF, Measure.map_map hq measurable_mk, hcomp, RightCosetSpace.quotientMeasure, muOne,
-    Measure.restrict_map hr hD, Measure.restrict_restrict (hr hD), Measure.map_map hmk hr]
+  rw [quotMeasure_eq hF, Measure.map_map hq measurable_mk, hcomp, RightCosetSpace.quotientMeasure,
+    muOne, Measure.restrict_map hr hD, Measure.restrict_restrict (hr hD), Measure.map_map hmk hr]

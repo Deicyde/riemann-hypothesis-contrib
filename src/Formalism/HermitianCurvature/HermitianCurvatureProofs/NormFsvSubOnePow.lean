@@ -12,38 +12,47 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.PBO
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.YangianSpanCharacter.T Formalism.FourierDecayAlt.P5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.YangianSpanCharacter.T
+  Formalism.FourierDecayAlt.P5
 
-theorem transform_diff3 {φ : ℂ → ℂ} (hφ : Continuous φ) (hi : Integrable φ) (σ s : ℂ) :
-    ∫ t, fsv s t * ((fsv σ t - 1) ^ 3 * φ t) =
-      (∫ t, fsv (s + 3 * σ) t * φ t) - 3 * (∫ t, fsv (s + 2 * σ) t * φ t) + 3 * (∫ t, fsv (s + σ) t * φ t) -
-        ∫ t, fsv s t * φ t := by
-  have e : ∀ t, fsv s t * ((fsv σ t - 1) ^ 3 * φ t) =
-      fsv (s + 3 * σ) t * φ t - 3 * (fsv (s + 2 * σ) t * φ t) + 3 * (fsv (s + σ) t * φ t) - fsv s t * φ t := by
+theorem transform_diff3 {φ : ℂ → ℂ} (hφ : Continuous φ) (hi : Integrable φ) (σ s : ℂ)
+    : ∫ t, fsv s t * ((fsv σ t - 1) ^ 3 * φ t)
+      = (∫ t, fsv (s + 3 * σ) t * φ t) - 3 * (∫ t, fsv (s + 2 * σ) t * φ t)
+        + 3 * (∫ t, fsv (s + σ) t * φ t) - ∫ t, fsv s t * φ t := by
+  have e
+      : ∀ t,
+        fsv s t * ((fsv σ t - 1) ^ 3 * φ t)
+          = fsv (s + 3 * σ) t * φ t - 3 * (fsv (s + 2 * σ) t * φ t) + 3 * (fsv (s + σ) t * φ t)
+            - fsv s t * φ t := by
     intro t
     have e1 : fsv (s + σ) t = fsv s t * fsv σ t := (fsv_mul_fsv s σ t).symm
     have e2 : fsv (s + 2 * σ) t = fsv s t * fsv σ t * fsv σ t := by
       rw [fsv_mul_fsv, fsv_mul_fsv]; congr 1; ring
     have e3 : fsv (s + 3 * σ) t = fsv s t * fsv σ t * fsv σ t * fsv σ t := by
       rw [fsv_mul_fsv, fsv_mul_fsv, fsv_mul_fsv]; congr 1; ring
-    rw [e1, e2, e3]; ring
+    rw [e1, e2, e3]
+    ring
   simp only [e]
   have i0 := integrable_fsv_mul hφ hi s
   have i1 := integrable_fsv_mul hφ hi (s + σ)
   have i2 := integrable_fsv_mul hφ hi (s + 2 * σ)
   have i3 := integrable_fsv_mul hφ hi (s + 3 * σ)
-  have j1 : Integrable (fun t => fsv (s + 3 * σ) t * φ t - 3 * (fsv (s + 2 * σ) t * φ t)) := i3.sub (i2.const_mul 3)
-  have j2 : Integrable (fun t => fsv (s + 3 * σ) t * φ t - 3 * (fsv (s + 2 * σ) t * φ t) +
-      3 * (fsv (s + σ) t * φ t)) := j1.add (i1.const_mul 3)
+  have j1 : Integrable (fun t => fsv (s + 3 * σ) t * φ t - 3 * (fsv (s + 2 * σ) t * φ t)) :=
+    i3.sub (i2.const_mul 3)
+  have j2 : Integrable (fun t =>
+      fsv (s + 3 * σ) t * φ t - 3 * (fsv (s + 2 * σ) t * φ t) + 3 * (fsv (s + σ) t * φ t)) :=
+    j1.add (i1.const_mul 3)
   rw [integral_sub j2 i0, integral_add j1 (i1.const_mul 3), integral_sub i3 (i2.const_mul 3),
     integral_const_mul, integral_const_mul]
 
 theorem norm_fsv_sub_one_pow (σ t : ℂ) : ‖(fsv σ t - 1) ^ 3‖ ≤ 8 := by
   rw [norm_pow]
   have : ‖fsv σ t - 1‖ ≤ 2 := (norm_sub_le _ _).trans (by rw [norm_fsv, norm_one]; norm_num)
-  calc ‖fsv σ t - 1‖ ^ 3 ≤ 2 ^ 3 := pow_le_pow_left₀ (norm_nonneg _) this 3
+  calc
+    ‖fsv σ t - 1‖ ^ 3
+      ≤ 2 ^ 3 := pow_le_pow_left₀ (norm_nonneg _) this 3
     _ = 8 := by norm_num
-
 
 set_option maxHeartbeats 1600000 in
 theorem decayUnif_of (hRH : KB.RadHead) (hHT : KB.HeadTop) (hWDF : WaveDiffForm) : DecayUnif := by

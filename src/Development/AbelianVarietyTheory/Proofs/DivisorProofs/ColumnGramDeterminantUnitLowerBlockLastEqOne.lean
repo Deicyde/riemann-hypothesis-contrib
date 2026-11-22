@@ -19,14 +19,13 @@ theorem blkW_det_eq_one (r p0 : ℕ) (w : Low r → ℂ) : (blkW p0 w).det = 1 :
     have hij' : (i : ℕ) < j := hij
     simp only [blkW, lowMat]
     split_ifs with h1 h2 h3 h4 h5 h6
-    all_goals first
-      | rfl
-      | (exfalso; simp only [Fin.lt_def, Fin.ext_iff] at *; omega)
+    all_goals first | rfl | (exfalso; simp only [Fin.lt_def, Fin.ext_iff] at *; omega)
 
-theorem colGram_blkW_last (r p0 : ℕ) (w : Low r → ℂ) :
-    colGram (blkW p0 w) (Fin.last (r - 1)) = 1 := by
+theorem colGram_blkW_last (r p0 : ℕ) (w : Low r → ℂ)
+    : colGram (blkW p0 w) (Fin.last (r - 1)) = 1 := by
   unfold colGram lminor
-  have : (Fin.castLE (Nat.le_of_lt_succ (Fin.last (r - 1)).isLt) : Fin (r - 1) → Fin (r - 1)) = id := by
+  have : (Fin.castLE (Nat.le_of_lt_succ (Fin.last (r - 1)).isLt) : Fin (r - 1) → Fin (r - 1))
+      = id := by
     funext i; ext; simp
   rw [this, Matrix.submatrix_id_id, Matrix.det_mul, Matrix.det_conjTranspose, blkW_det_eq_one]
   simp

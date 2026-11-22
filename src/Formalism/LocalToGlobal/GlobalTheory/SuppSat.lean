@@ -8,7 +8,9 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.Loss
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.LFunctionChainParameters.DeficitSplitLemmas Formalism.LFunctionChainParameters.PrimeWindowSizeBounds
+open Formalism.BasicNotions Formalism.MainNotions
+  Formalism.LFunctionChainParameters.DeficitSplitLemmas
+  Formalism.LFunctionChainParameters.PrimeWindowSizeBounds
 
 section AtRecord
 
@@ -17,26 +19,28 @@ variable {D : D7} {L : SizeData₂ D}
 def bndP (L : SizeData₂ D) : ℕ :=
   max ⌊L.sc.a + L.sc.a / ((D.R.k : ℝ) * L.sc.x ^ (Scale.A / 2))⌋₊ ⌊L.sc.X'' D.R.n⌋₊ + 1
 
+open Classical in
+def PsAt (L : SizeData₂ D) : Finset ℕ :=
+  (Finset.range (bndP L)).filter (fun p => p.Prime ∧ InertK D p)
 
 open Classical in
-def PsAt (L : SizeData₂ D) : Finset ℕ := (Finset.range (bndP L)).filter (fun p => p.Prime ∧ InertK D p)
-
-
-open Classical in
-def sAt (L : SizeData₂ D) (K : G.Consts) : Finset ℕ := (Finset.range ⌈L.sc.X'⌉₊).filter (fun p => G.Cand D L K p)
+def sAt (L : SizeData₂ D) (K : G.Consts) : Finset ℕ :=
+  (Finset.range ⌈L.sc.X'⌉₊).filter (fun p => G.Cand D L K p)
 
 def TTv (D : D7) : Finset ℕ := D.host.TT.image Formalism.HC.Frame.A.val
 
 def badAt (X : G.Inst D L) (p n : ℕ) : Prop := ¬ G.Good X p (X.bs (G.stepP D p) (D.R.ofNat n))
 
-
 open Classical in
 def clAt (X : G.Inst D L) (K : G.Consts) (p : ℕ) : PClass :=
-  if p ∉ L.drop then PClass.served
-  else if L.sc.X'' D.R.n < (p : ℝ) then PClass.high
-  else if G.Cand D L K p ∧ L.sc.x ^ (-L.sc.eps) < G.Sig X K (G.aL L) (G.bL L) p then PClass.second
-  else PClass.first
-
+  if p ∉ L.drop then
+    PClass.served
+  else if L.sc.X'' D.R.n < (p : ℝ) then
+    PClass.high
+  else if G.Cand D L K p ∧ L.sc.x ^ (-L.sc.eps) < G.Sig X K (G.aL L) (G.bL L) p then
+    PClass.second
+  else
+    PClass.first
 
 open Classical in
 def gainQ (X : G.Inst D L) (K : G.Consts) (j p : ℕ) : ℝ :=
@@ -52,7 +56,9 @@ def ldAt (X : G.Inst D L) (K : G.Consts) (C bo : ℝ) : LD ℕ ℕ ℕ where
   at_ := fun n => (G.aL L (D.R.ofNat n) : ℝ)
   wz := fun j n p e => G.fill X (G.bL L) j (G.partner D p (D.R.ofNat n) e)
   Id := fun _ n => Finset.Icc 1 (Nat.log D.host.d (G.aL L (D.R.ofNat n)).toNat + 1)
-  wd := fun j n i => LocalQuadraticParts.wAt D j (GlobalTheoryTheory.rho D (D.R.tau1 (D.R.ofNat n)) (ZetaZeroFreeRegion.gD D i))
+  wd := fun j n i =>
+    LocalQuadraticParts.wAt D j
+      (GlobalTheoryTheory.rho D (D.R.tau1 (D.R.ofNat n)) (ZetaZeroFreeRegion.gD D i))
   gainW := gainQ X K
   tauW := G.tauP X K (G.aL L) (G.bL L)
   gain := gainQ X K

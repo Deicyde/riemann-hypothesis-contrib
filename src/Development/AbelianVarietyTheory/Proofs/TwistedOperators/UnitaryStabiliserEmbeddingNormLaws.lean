@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 noncomputable section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Ell
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Ell
 open scoped InnerProductSpace
 
 namespace GlobalTheory.SepReal
@@ -19,24 +20,33 @@ section Entries
 
 variable (e : Option (Fin n) ≃ Fin (n + 1))
 
-@[simp] theorem embH_ss (h : Mat n) (i j : Fin n) : embH e h (e (some i)) (e (some j)) = h i j := by
+@[simp]
+theorem embH_ss (h : Mat n) (i j : Fin n) : embH e h (e (some i)) (e (some j)) = h i j := by
   simp only [embH, Equiv.symm_apply_apply]
-@[simp] theorem embH_nn (h : Mat n) : embH e h (e none) (e none) = 1 := by
+@[simp]
+theorem embH_nn (h : Mat n) : embH e h (e none) (e none) = 1 := by
   simp only [embH, Equiv.symm_apply_apply]
-@[simp] theorem embH_ns (h : Mat n) (j : Fin n) : embH e h (e none) (e (some j)) = 0 := by
+@[simp]
+theorem embH_ns (h : Mat n) (j : Fin n) : embH e h (e none) (e (some j)) = 0 := by
   simp only [embH, Equiv.symm_apply_apply]
-@[simp] theorem embH_sn (h : Mat n) (i : Fin n) : embH e h (e (some i)) (e none) = 0 := by
+@[simp]
+theorem embH_sn (h : Mat n) (i : Fin n) : embH e h (e (some i)) (e none) = 0 := by
   simp only [embH, Equiv.symm_apply_apply]
-@[simp] theorem embL_ss (h : Mat n) (i j : Fin n) : embL e h (e (some i)) (e (some j)) = h i j := by
+@[simp]
+theorem embL_ss (h : Mat n) (i j : Fin n) : embL e h (e (some i)) (e (some j)) = h i j := by
   simp only [embL, Equiv.symm_apply_apply]
-@[simp] theorem embL_nn (h : Mat n) : embL e h (e none) (e none) = 0 := by
+@[simp]
+theorem embL_nn (h : Mat n) : embL e h (e none) (e none) = 0 := by
   simp only [embL, Equiv.symm_apply_apply]
-@[simp] theorem embL_ns (h : Mat n) (j : Fin n) : embL e h (e none) (e (some j)) = 0 := by
+@[simp]
+theorem embL_ns (h : Mat n) (j : Fin n) : embL e h (e none) (e (some j)) = 0 := by
   simp only [embL, Equiv.symm_apply_apply]
-@[simp] theorem embL_sn (h : Mat n) (i : Fin n) : embL e h (e (some i)) (e none) = 0 := by
+@[simp]
+theorem embL_sn (h : Mat n) (i : Fin n) : embL e h (e (some i)) (e none) = 0 := by
   simp only [embL, Equiv.symm_apply_apply]
 
-theorem sum_e {M : Type} [AddCommMonoid M] (f : Fin (n + 1) → M) : ∑ a, f a = f (e none) + ∑ i, f (e (some i)) := by
+theorem sum_e {M : Type} [AddCommMonoid M] (f : Fin (n + 1) → M)
+    : ∑ a, f a = f (e none) + ∑ i, f (e (some i)) := by
   rw [← e.sum_comp, Fintype.sum_option]
 
 theorem ext_e {A B : Mat (n + 1)} (h : ∀ x y, A (e x) (e y) = B (e x) (e y)) : A = B := by
@@ -87,7 +97,8 @@ theorem embL_smul (t : ℝ) (X : Mat n) : embL e (t • X) = t • embL e X := b
   refine ext_e e fun x y => ?_
   cases x <;> cases y <;> simp
 
-theorem embH_jm {ε : Fin (n + 1) → Bool} {ε' : Fin n → Bool} (hs : Signs e ε ε') : Jm ε = embH e (Jm ε') := by
+theorem embH_jm {ε : Fin (n + 1) → Bool} {ε' : Fin n → Bool} (hs : Signs e ε ε')
+    : Jm ε = embH e (Jm ε') := by
   refine ext_e e fun x y => ?_
   cases x <;> cases y <;> simp [Jm, Matrix.diagonal_apply, hs.1, hs.2]
 
@@ -97,9 +108,12 @@ section Group
 
 theorem jm_mul_jm {m : ℕ} (ε : Fin m → Bool) : Jm ε * Jm ε = 1 := by
   rw [Jm, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-  congr 1; funext a; split_ifs <;> norm_num
+  congr 1
+  funext a
+  split_ifs <;> norm_num
 
-theorem inv_of_mem {m : ℕ} {ε : Fin m → Bool} {g : Mat m} (hg : g ∈ UJset ε) : g⁻¹ = Jm ε * gᴴ * Jm ε := by
+theorem inv_of_mem {m : ℕ} {ε : Fin m → Bool} {g : Mat m} (hg : g ∈ UJset ε)
+    : g⁻¹ = Jm ε * gᴴ * Jm ε := by
   apply Matrix.inv_eq_left_inv
   have h : gᴴ * Jm ε * g = Jm ε := hg
   rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc gᴴ, h, jm_mul_jm]
@@ -115,7 +129,8 @@ theorem embH_mem (hs : Signs e ε ε') {h : Mat n} (hh : h ∈ UJset ε') : embH
   show (embH e h)ᴴ * Jm ε * embH e h = Jm ε
   rw [embH_jm e hs, embH_conj, ← embH_mul, ← embH_mul, h1]
 
-theorem embH_inv (hh : ∀ h ∈ UJset ε', embH e h ∈ UJset ε) {h : Mat n} (hm : h ∈ UJset ε') : (embH e h)⁻¹ = embH e h⁻¹ := by
+theorem embH_inv (hh : ∀ h ∈ UJset ε', embH e h ∈ UJset ε) {h : Mat n} (hm : h ∈ UJset ε')
+    : (embH e h)⁻¹ = embH e h⁻¹ := by
   apply Matrix.inv_eq_left_inv
   rw [← embH_mul, inv_mul_of_mem hm, embH_one]
 
@@ -127,25 +142,31 @@ theorem colLen_mul (g : Mat (n + 1)) (h : Mat n) : colLen e (g * embH e h) = col
   rw [Matrix.mul_apply, sum_e e]
   simp
 
-theorem embL_lie (hs : Signs e ε ε') {X : Mat n} (hX : X ∈ lieOf (Jm ε')) : embL e X ∈ lieOf (Jm ε) := by
+theorem embL_lie (hs : Signs e ε ε') {X : Mat n} (hX : X ∈ lieOf (Jm ε'))
+    : embL e X ∈ lieOf (Jm ε) := by
   have h1 : Xᴴ * Jm ε' + Jm ε' * X = 0 := hX
   show (embL e X)ᴴ * Jm ε + Jm ε * embL e X = 0
-  rw [embH_jm e hs, embL_conj, embH_eq e (Jm ε'), Matrix.mul_add, Matrix.add_mul, ← embL_mul, ← embL_mul, embL_mul_q,
-    q_mul_embL, add_zero, add_zero]
+  rw [embH_jm e hs, embL_conj, embH_eq e (Jm ε'), Matrix.mul_add, Matrix.add_mul, ← embL_mul,
+    ← embL_mul, embL_mul_q, q_mul_embL, add_zero, add_zero]
   have h2 := (embLₗ e).map_add (Xᴴ * Jm ε') (Jm ε' * X)
   simp only [embLₗ, LinearMap.coe_mk, AddHom.coe_mk] at h2
   rw [← h2, h1]
   exact (embLₗ e).map_zero
 
-theorem stab (hs : Signs e ε ε') {g : Mat (n + 1)} (hg : g ∈ UJset ε) (hc : ∀ a, g a (e none) = if a = e none then 1 else 0) :
-    ∃ h ∈ UJset ε', g = embH e h := by
+theorem stab
+    (hs : Signs e ε ε')
+    {g : Mat (n + 1)} (hg : g ∈ UJset ε) (hc : ∀ a, g a (e none) = if a = e none then 1 else 0)
+    : ∃ h ∈ UJset ε', g = embH e h := by
   have hJ : gᴴ * Jm ε * g = Jm ε := hg
   have hr : ∀ b, g (e none) b = if b = e none then 1 else 0 := by
     intro b
     have h1 := congrFun (congrFun hJ b) (e none)
-    simp only [Matrix.mul_apply, hc, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] at h1
-    simp only [Jm, Matrix.mul_diagonal, Matrix.conjTranspose_apply, Matrix.diagonal_apply, mul_ite, mul_zero,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true, hs.1, mul_one] at h1
+    simp only [Matrix.mul_apply, hc, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
+        Finset.mem_univ, if_true]
+      at h1
+    simp only [Jm, Matrix.mul_diagonal, Matrix.conjTranspose_apply, Matrix.diagonal_apply, mul_ite,
+        mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true, hs.1, mul_one]
+      at h1
     have h2 := congrArg star h1
     simp only [star_star] at h2
     rw [h2]
@@ -188,15 +209,22 @@ theorem colLen_le (g : Mat (n + 1)) : colLen e g ≤ hsn g := by
   unfold colLen hsn
   apply Real.sqrt_le_sqrt
   refine Finset.sum_le_sum fun a _ => ?_
-  exact Finset.single_le_sum (f := fun b => ‖g a b‖ ^ 2) (fun _ _ => sq_nonneg _) (Finset.mem_univ _)
+  exact
+    Finset.single_le_sum (f := fun b => ‖g a b‖ ^ 2) (fun _ _ => sq_nonneg _) (Finset.mem_univ _)
 
-theorem one_le_colLen {ε : Fin (n + 1) → Bool} (h0 : ε (e none) = true) {g : Mat (n + 1)} (hg : g ∈ UJset ε) : 1 ≤ colLen e g := by
+theorem one_le_colLen
+    {ε : Fin (n + 1) → Bool} (h0 : ε (e none) = true) {g : Mat (n + 1)} (hg : g ∈ UJset ε)
+    : 1 ≤ colLen e g := by
   have hJ : gᴴ * Jm ε * g = Jm ε := hg
   have h1 := congrFun (congrFun hJ (e none)) (e none)
   rw [Matrix.mul_apply] at h1
-  simp only [Jm, Matrix.mul_diagonal, Matrix.conjTranspose_apply, Matrix.diagonal_apply, if_true, h0] at h1
-  have h2 : ∀ c, star (g c (e none)) * (if ε c = true then 1 else -1) * g c (e none) =
-      (((if ε c = true then 1 else -1 : ℝ) * ‖g c (e none)‖ ^ 2 : ℝ) : ℂ) := by
+  simp only [Jm, Matrix.mul_diagonal, Matrix.conjTranspose_apply, Matrix.diagonal_apply, if_true,
+      h0]
+    at h1
+  have h2
+      : ∀ c,
+        star (g c (e none)) * (if ε c = true then 1 else -1) * g c (e none)
+          = (((if ε c = true then 1 else -1 : ℝ) * ‖g c (e none)‖ ^ 2 : ℝ) : ℂ) := by
     intro c
     rw [mul_comm (star _), mul_assoc, Complex.star_def, Complex.conj_mul']
     split_ifs <;> push_cast <;> ring
@@ -219,11 +247,12 @@ theorem hsn_inv {m : ℕ} {ε : Fin m → Bool} {g : Mat m} (hg : g ∈ UJset ε
   congr 1
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
-  simp only [Jm, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.conjTranspose_apply, norm_mul, norm_star]
+  simp only [Jm, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.conjTranspose_apply, norm_mul,
+    norm_star]
   split_ifs <;> simp
 
-theorem hsn_eq_norm {m : ℕ} (g : Mat m) :
-    hsn g = @Norm.norm (Mat m) Matrix.frobeniusSeminormedAddCommGroup.toNorm g := by
+theorem hsn_eq_norm {m : ℕ} (g : Mat m)
+    : hsn g = @Norm.norm (Mat m) Matrix.frobeniusSeminormedAddCommGroup.toNorm g := by
   rw [@Matrix.frobenius_norm_def, hsn, Real.sqrt_eq_rpow]
   congr 1
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
@@ -246,8 +275,8 @@ def blkH : Mat n × ℂ →+* Mat (n + 1) where
   map_mul' p q := by
     show embL e (p.1 * q.1) + (p.2 * q.2) • embH e 0 = (embL e p.1 + p.2 • embH e 0) * (embL e q.1 + q.2 • embH e 0)
     have qq : embH e 0 * embH e 0 = embH e 0 := by rw [← embH_mul, mul_zero]
-    simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul, embL_mul, embL_mul_q, q_mul_embL, qq,
-      smul_zero, add_zero, zero_add, smul_smul, mul_comm]
+    simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul, embL_mul,
+      embL_mul_q, q_mul_embL, qq, smul_zero, add_zero, zero_add, smul_smul, mul_comm]
   map_zero' := by
     show embL e 0 + (0 : ℂ) • embH e 0 = 0
     rw [zero_smul, add_zero]
@@ -261,7 +290,8 @@ attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebr
 theorem exp_embL (X : Mat n) : NormedSpace.exp (embL e X) = embH e (NormedSpace.exp X) := by
   have hc : Continuous (blkH e) := by
     show Continuous fun p : Mat n × ℂ => embLₗ e p.1 + p.2 • embH e 0
-    exact ((LinearMap.continuous_of_finiteDimensional _).comp continuous_fst).add (continuous_snd.smul continuous_const)
+    exact ((LinearMap.continuous_of_finiteDimensional _).comp continuous_fst).add
+      (continuous_snd.smul continuous_const)
   have h := NormedSpace.map_exp (blkH e) hc (X, 0)
   have h1 : blkH e (X, 0) = embL e X := by
     show embL e X + (0 : ℂ) • embH e 0 = _
@@ -278,9 +308,21 @@ end Norms
 theorem embLaws : EmbLaws := by
   intro n e ε ε' hs
   have hmem : ∀ h ∈ UJset ε', embH e h ∈ UJset ε := fun h hh => embH_mem e hs hh
-  refine ⟨hmem, embH_mul e, embH_cont e, fun h hh => embH_inv e hmem hh, colLen_mul e, fun g hg hc => stab e hs hg hc,
-    fun X hX => embL_lie e hs hX, fun t X => ?_, hsn_embH e, hsn_embL e, colLen_le e,
-    fun g hg => ⟨one_le_colLen e hs.1 hg, hsn_inv hg⟩, hsn_mul⟩
+  refine ⟨
+    hmem,
+    embH_mul e,
+    embH_cont e,
+    fun h hh => embH_inv e hmem hh,
+    colLen_mul e,
+    fun g hg hc => stab e hs hg hc,
+    fun X hX => embL_lie e hs hX,
+    fun t X => ?_,
+    hsn_embH e,
+    hsn_embL e,
+    colLen_le e,
+    fun g hg => ⟨one_le_colLen e hs.1 hg, hsn_inv hg⟩,
+    hsn_mul
+  ⟩
   rw [← embL_smul, exp_embL]
 
 end GlobalTheory.SepReal

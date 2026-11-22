@@ -8,14 +8,17 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.SplitPrimeNormLemmas
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.SplitPrimeNormLemmas
 
 namespace GlobalTheory
 
-theorem covol_formalDegree_eq : ∀ (D : D7) (X : HidaSetting D), X.B.I = Formalism.L2.SG.InstExistsPf.instOf D →
-    Formalism.MainNotions.StandardLattice.VolTie D → cdScaleTie D → dsigTie D →
-    (∏ v, X.dv v) * X.B.I.vol X.B.μf X.B.fund / (X.B.μf X.B.I.Kset).toReal =
-      Formalism.MainNotions.StandardLattice.volY0 D * ∏ ρ, D.dsig ρ :=
+theorem covol_formalDegree_eq
+    : ∀ (D : D7) (X : HidaSetting D),
+      X.B.I = Formalism.L2.SG.InstExistsPf.instOf D → Formalism.MainNotions.StandardLattice.VolTie D
+        → cdScaleTie D → dsigTie D
+        → (∏ v, X.dv v) * X.B.I.vol X.B.μf X.B.fund / (X.B.μf X.B.I.Kset).toReal
+          = Formalism.MainNotions.StandardLattice.volY0 D * ∏ ρ, D.dsig ρ :=
   fun _D X h hVol hcd hT => Formalism.L2.SG.Pf.DstarVolPf.dstarVol_holds X h hVol hcd hT
 
 end GlobalTheory

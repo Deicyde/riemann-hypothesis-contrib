@@ -9,7 +9,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.IW
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology
 open scoped ContDiff ENNReal
 
 noncomputable section
@@ -20,16 +22,17 @@ def Wpsi {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (ψ : Frame X.Ψ r → ℝ) (
   classical
   exact if x ∈ X.dom then ENNReal.ofReal (Real.exp (-(phla X la x + ψ x))) else 0
 
-theorem metricW_of (hR : NfacRmulStatement (E := E)) (hLa : NfacLactStatement (E := E))
-    (hO : OrthoStatement (E := E)) (hLU : LUStatement (E := E)) {r : ℕ} (X : Data E r) (la : Wt X.Ψ r)
-    (ψ : Frame X.Ψ r → ℝ) (hψ : IsInvFn X ψ)
+theorem metricW_of
+    (hR : NfacRmulStatement (E := E)) (hLa : NfacLactStatement (E := E))
+    (hO : OrthoStatement (E := E)) (hLU : LUStatement (E := E))
+    {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (ψ : Frame X.Ψ r → ℝ) (hψ : IsInvFn X ψ)
     (hψs : ∀ x0, IsOrth X x0 → ContDiffOn ℝ ∞ (fun z => ψ (cpt X x0 z)) (OmF X x0))
-    (hψb : ∃ C : ℝ, ∀ x ∈ X.dom, ψ x ≤ C) :
-    IsMetricW X la (Wpsi X la ψ) ∧ WLower X la (Wpsi X la ψ) := by
+    (hψb : ∃ C : ℝ, ∀ x ∈ X.dom, ψ x ≤ C)
+    : IsMetricW X la (Wpsi X la ψ) ∧ WLower X la (Wpsi X la ψ) := by
   classical
-
   have hlact1 : ∀ y : Frame X.Ψ r, lact (1 : GL (Fin r) E) y = y := by
-    intro y; funext τ a c
+    intro y
+    funext τ a c
     simp [lact, mat]
   have hψr : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, ψ (rmul x b) = ψ x := by
     intro x hx b hb
@@ -44,12 +47,15 @@ theorem metricW_of (hR : NfacRmulStatement (E := E)) (hLa : NfacLactStatement (E
     intro x hx
     unfold ReciprocityTheory.ChartRestriction.G.FD.Data.nfac
     refine Finset.prod_pos fun τ _ => Finset.prod_pos fun i _ => Real.rpow_pos_of_pos ?_ _
-    exact norm_pos_iff.mpr (div_ne_zero (ReciprocityTheory.ChartRestriction.G.FD.FlowCoefficientBounds.dmin_ne (X := X) hx τ _)
+    exact norm_pos_iff.mpr (div_ne_zero
+      (ReciprocityTheory.ChartRestriction.G.FD.FlowCoefficientBounds.dmin_ne (X := X) hx τ _)
       (ReciprocityTheory.ChartRestriction.G.FD.FlowCoefficientBounds.dmin_ne (X := X) hx τ _))
-  have hopen : IsOpen X.dom := ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientDomain.isOpen_dom (X := X)
+  have hopen : IsOpen X.dom :=
+    ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientDomain.isOpen_dom (X := X)
 
-  have hphr : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r,
-      0 < ‖bchar la b‖ ∧ phla X la (rmul x b) = phla X la x + 2 * Real.log ‖bchar la b‖ := by
+  have hphr
+      : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r,
+        0 < ‖bchar la b‖ ∧ phla X la (rmul x b) = phla X la x + 2 * Real.log ‖bchar la b‖ := by
     intro x hx b hb
     have hn := hnpos x hx
     have h1 := hnpos (rmul x b) (OntoS.dom_rmul (X := X) hx hb)
@@ -83,8 +89,8 @@ theorem metricW_of (hR : NfacRmulStatement (E := E)) (hLa : NfacLactStatement (E
       rwa [hc0, ← hxe] at h
     have hUo : IsOpen {y | y ∈ X.dom ∧ Δ y ≠ 0} :=
       hopen.inter (isOpen_ne_fun hΔ.continuous continuous_const)
-    have hmap : Set.MapsTo zOf {y | y ∈ X.dom ∧ Δ y ≠ 0} (OmF X x1) :=
-      fun y hy => (hdec y hy.1 hy.2).1
+    have hmap : Set.MapsTo zOf {y | y ∈ X.dom ∧ Δ y ≠ 0} (OmF X x1) := fun y hy =>
+      (hdec y hy.1 hy.2).1
     have hcomp' : ContinuousOn ((fun z => ψ (cpt X x1 z)) ∘ zOf) {y | y ∈ X.dom ∧ Δ y ≠ 0} :=
       (hψs x1 ho).continuousOn.comp hz.continuousOn hmap
     have heq : Set.EqOn ψ ((fun z => ψ (cpt X x1 z)) ∘ zOf) {y | y ∈ X.dom ∧ Δ y ≠ 0} := by
@@ -96,16 +102,18 @@ theorem metricW_of (hR : NfacRmulStatement (E := E)) (hLa : NfacLactStatement (E
     exact ((hcomp'.congr heq).continuousAt (hUo.mem_nhds ⟨hx, hΔx⟩)).continuousWithinAt
   have hphc : ContinuousOn (phla X la) X.dom := by
     show ContinuousOn (fun x => -2 * Real.log (X.nfac la x)) X.dom
-    exact continuousOn_const.mul
-      ((ExtFPf.nfac_contOn (X := X) la).log fun x hx => (hnpos x hx).ne')
+    exact continuousOn_const.mul ((ExtFPf.nfac_contOn (X := X) la).log fun x hx => (hnpos x hx).ne')
   have hcont : ContinuousOn (fun x => ENNReal.ofReal (Real.exp (-(phla X la x + ψ x)))) X.dom :=
-    ENNReal.continuous_ofReal.comp_continuousOn
-      (Real.continuous_exp.comp_continuousOn (hphc.add hψc).neg)
+    ENNReal.continuous_ofReal.comp_continuousOn (Real.continuous_exp.comp_continuousOn (hphc.add
+      hψc).neg)
   have hW : ∀ x ∈ X.dom, Wpsi X la ψ x = ENNReal.ofReal (Real.exp (-(phla X la x + ψ x))) := by
     intro x hx
     simp [Wpsi, hx]
-  have hWeq : Wpsi X la ψ = X.dom.piecewise
-      (fun x => ENNReal.ofReal (Real.exp (-(phla X la x + ψ x)))) (fun _ => 0) := by
+  have hWeq
+      : Wpsi X la ψ
+        = X.dom.piecewise
+          (fun x => ENNReal.ofReal (Real.exp (-(phla X la x + ψ x))))
+          (fun _ => 0) := by
     funext x
     by_cases hx : x ∈ X.dom <;> simp [Wpsi, Set.piecewise, hx]
   unfold IsMetricW WLower
@@ -118,7 +126,8 @@ theorem metricW_of (hR : NfacRmulStatement (E := E)) (hLa : NfacLactStatement (E
       ← ENNReal.ofReal_div_of_pos (pow_pos hB 2)]
     congr 1
     rw [show -(phla X la x + 2 * Real.log ‖bchar la b‖ + ψ x)
-        = -(phla X la x + ψ x) - Real.log (‖bchar la b‖ ^ 2) by rw [Real.log_pow]; push_cast; ring,
+          = -(phla X la x + ψ x) - Real.log (‖bchar la b‖ ^ 2) by
+        rw [Real.log_pow]; push_cast; ring,
       Real.exp_sub, Real.exp_log (pow_pos hB 2)]
   · intro γ hγ x hx
     rw [hW _ (OntoS.dom_lact (X := X) hγ hx), hW x hx, hphl γ hγ x hx, hψl γ hγ x hx]

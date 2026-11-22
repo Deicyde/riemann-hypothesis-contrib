@@ -6,15 +6,17 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead GlobalTheory.PendOf GlobalTheory.LevelType
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead
+  GlobalTheory.PendOf GlobalTheory.LevelType
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
 
 namespace GlobalTheory.LevelType
 
-theorem StdBlock.mul {p r : ℕ} {a : ℕ} {x y : GL (Fin r) (ZMod p)} (hx : StdBlock a x) (hy : StdBlock a y) :
-    StdBlock a (x * y) := by
+theorem StdBlock.mul
+    {p r : ℕ} {a : ℕ} {x y : GL (Fin r) (ZMod p)} (hx : StdBlock a x) (hy : StdBlock a y)
+    : StdBlock a (x * y) := by
   intro i j hij
   rw [Units.val_mul, Matrix.mul_apply]
   by_cases hi : i.val ≤ a
@@ -30,7 +32,10 @@ theorem stdBlock_one {p r : ℕ} (a : ℕ) : StdBlock a (1 : GL (Fin r) (ZMod p)
   intro i j _
   simp [Matrix.one_apply]
 
-theorem stdTrace_ne_zero : ∀ (p : ℕ) [Fact p.Prime] (r a : ℕ) (θ : (ZMod p)ˣ →* ℂˣ) (ρ : FDRep ℂ (GL (Fin r) (ZMod p))) (v : ρ), v ≠ 0 → StdVec ρ.ρ a θ v → stdTrace a θ ρ.character ≠ 0 := by
+theorem stdTrace_ne_zero
+    : ∀ (p : ℕ) [Fact p.Prime] (r a : ℕ) (θ : (ZMod p)ˣ →* ℂˣ) (ρ : FDRep ℂ (GL (Fin r) (ZMod p)))
+        (v : ρ),
+      v ≠ 0 → StdVec ρ.ρ a θ v → stdTrace a θ ρ.character ≠ 0 := by
   intro p _ r a θ ρ v hv0 hv
   classical
   set S : Finset (GL (Fin r) (ZMod p)) := Finset.univ.filter (StdBlock a) with hS
@@ -57,11 +62,14 @@ theorem stdTrace_ne_zero : ∀ (p : ℕ) [Fact p.Prime] (r a : ℕ) (θ : (ZMod 
       rw [Finset.sum_image (fun y _ z _ h => mul_left_cancel h)]
       refine Finset.sum_congr rfl fun y _ => ?_
       rw [smul_mul_smul_comm, ← map_mul, hcm x y]
-    calc E * E = ∑ x ∈ S, (c x • ρ.ρ x) * E := by rw [hE, Finset.sum_mul]
+    calc
+      E * E
+        = ∑ x ∈ S, (c x • ρ.ρ x) * E := by rw [hE, Finset.sum_mul]
       _ = ∑ x ∈ S, E := Finset.sum_congr rfl this
       _ = (S.card : ℂ) • E := by rw [Finset.sum_const, Nat.cast_smul_eq_nsmul]
   have hEv : E v = (S.card : ℂ) • v := by
-    rw [hE, LinearMap.sum_apply, Finset.sum_congr rfl (g := fun _ => v), Finset.sum_const, Nat.cast_smul_eq_nsmul]
+    rw [hE, LinearMap.sum_apply, Finset.sum_congr rfl (g := fun _ => v), Finset.sum_const,
+      Nat.cast_smul_eq_nsmul]
     intro x hx
     rw [LinearMap.smul_apply, hv x (by simpa [hS] using hx), smul_smul]
     simp [hc]
@@ -76,7 +84,8 @@ theorem stdTrace_ne_zero : ∀ (p : ℕ) [Fact p.Prime] (r a : ℕ) (θ : (ZMod 
   have hPv : P v = v := by
     rw [hP, LinearMap.smul_apply, hEv, smul_smul, inv_mul_cancel₀ hcard, one_smul]
   have hP0 : P ≠ 0 := fun h => hv0 (by rw [← hPv, h, LinearMap.zero_apply])
-  have htP : LinearMap.trace ℂ ρ P ≠ 0 := fun h => hP0 ((LinearMap.IsIdempotentElem.trace_eq_zero_iff hPP).1 h)
+  have htP : LinearMap.trace ℂ ρ P ≠ 0 := fun h =>
+    hP0 ((LinearMap.IsIdempotentElem.trace_eq_zero_iff hPP).1 h)
   rw [htr]
   have : E = (S.card : ℂ) • P := by rw [hP, smul_smul, mul_inv_cancel₀ hcard, one_smul]
   rw [this, map_smul, smul_eq_mul]

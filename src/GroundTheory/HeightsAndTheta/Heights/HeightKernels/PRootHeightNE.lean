@@ -16,7 +16,10 @@ noncomputable section
 theorem anchor_homog (f j m : ℕ) : IsMultiHomog (rootAnchorSection f j m) (fun _ => 1) := by
   classical
   intro μ hμ k
-  have hdeg : rootAnchorSection f j m = monomial (∑ τ : Fin f, Finsupp.single (⟨τ, plAnchor j m⟩ : Σ _ : Fin f, PlIdx j m) 1) 1 := by
+  have hdeg
+      : rootAnchorSection f j m
+        = monomial (∑ τ : Fin f, Finsupp.single (⟨τ, plAnchor j m⟩ : Σ _ : Fin f, PlIdx j m) 1)
+          1 := by
     rw [MvPolynomial.monomial_sum_one]; rfl
   rw [hdeg] at hμ
   have := MvPolynomial.support_monomial_subset hμ
@@ -37,9 +40,12 @@ theorem anchor_homog (f j m : ℕ) : IsMultiHomog (rootAnchorSection f j m) (fun
     exact hτ (congrArg Sigma.fst h)
   · simp
 
-theorem RootHeight.proofNE (hA : RootArithVar.Statement) (hD : RootDivSuppEmpty.Statement)
-    (hL : RootLogNormBound.Statement) (hF : RootPointsFinite.Statement) (hP : PtsIntegralZeroLowerNE.Statement)
-    (hM : MultiHomogMemCoord.Statement) (hS : FsLineSmooth.Statement) : RootHeight.Statement := by
+theorem RootHeight.proofNE
+    (hA : RootArithVar.Statement) (hD : RootDivSuppEmpty.Statement)
+    (hL : RootLogNormBound.Statement) (hF : RootPointsFinite.Statement)
+    (hP : PtsIntegralZeroLowerNE.Statement) (hM : MultiHomogMemCoord.Statement)
+    (hS : FsLineSmooth.Statement)
+    : RootHeight.Statement := by
   intro f j m ζ hf hζ II hII
   have : Nonempty (Fin f) := ⟨⟨0, hf⟩⟩
   have hV := hA f j m ζ hf hζ
@@ -47,20 +53,31 @@ theorem RootHeight.proofNE (hA : RootArithVar.Statement) (hD : RootDivSuppEmpty.
     rw [rootPointIdeal, hM (Fin f) (plBlocks f j m) ℂ (rootCoord ζ) _ _ (anchor_homog f j m)]
     simp [rootAnchorSection, rootCoord, anchor_minor]
   have hsm : IsSmoothHerm (fsMulti (plBlocks f j m)) := hS _ _
-  have hR := (hII (Fin f) (plBlocks f j m)).2.2 (rootPointIdeal ζ) 0 Fin.elim0
-    (fsMulti (plBlocks f j m)) (rootAnchorSection f j m) (fun _ => 1) hV (fun j => j.elim0) hsm
-    (fun _ => by simp [fsMulti, HermLine.ofMetrics]) (anchor_homog f j m) hmem
-  have e1 : (Fin.snoc (Fin.elim0 : Fin 0 → HermLine (plBlocks f j m)) (fsMulti (plBlocks f j m)) :
-      Fin (0 + 1) → HermLine (plBlocks f j m)) = ![fsMulti (plBlocks f j m)] := by
+  have hR :=
+    (hII (Fin f) (plBlocks f j m)).2.2 (rootPointIdeal ζ) 0 Fin.elim0 (fsMulti (plBlocks f j m))
+      (rootAnchorSection f j m)
+      (fun _ => 1)
+      hV
+      (fun j => j.elim0)
+      hsm
+      (fun _ => by simp [fsMulti, HermLine.ofMetrics])
+      (anchor_homog f j m) hmem
+  have e1
+      : (Fin.snoc (Fin.elim0 : Fin 0 → HermLine (plBlocks f j m)) (fsMulti (plBlocks f j m))
+          : Fin (0 + 1) → HermLine (plBlocks f j m))
+        = ![fsMulti (plBlocks f j m)] := by
     funext i; fin_cases i; rfl
   rw [e1] at hR
-  have hlow := hP (Fin f) (plBlocks f j m) (rootPointIdeal ζ)
-    (fun i z => Real.log (((Fin.elim0 : Fin 0 → HermLine (plBlocks f j m)) i).h z))
-    (logNorm (fsMulti (plBlocks f j m)) (rootAnchorSection f j m)) (-grassConst f j m)
-    hV.2.1.2.1 (hF f j m ζ hζ) ?_ (hL f j m ζ hζ)
+  have hlow :=
+    hP (Fin f) (plBlocks f j m) (rootPointIdeal ζ)
+      (fun i z => Real.log (((Fin.elim0 : Fin 0 → HermLine (plBlocks f j m)) i).h z))
+      (logNorm (fsMulti (plBlocks f j m)) (rootAnchorSection f j m)) (- grassConst f j m) hV.2.1.2.1
+      (hF f j m ζ hζ) ?_ (hL f j m ζ hζ)
   · have : recR (II (Fin f) (plBlocks f j m)) (rootPointIdeal ζ)
-        (Fin.elim0 : Fin 0 → HermLine (plBlocks f j m)) (fsMulti (plBlocks f j m)) (rootAnchorSection f j m) =
-        - arInt (rootPointIdeal ζ) (rootAnchorSection f j m) (fsMulti (plBlocks f j m)) Fin.elim0 := by
+          (Fin.elim0 : Fin 0 → HermLine (plBlocks f j m)) (fsMulti (plBlocks f j m))
+          (rootAnchorSection f j m)
+        = - arInt (rootPointIdeal ζ) (rootAnchorSection f j m) (fsMulti (plBlocks f j m))
+          Fin.elim0 := by
       simp [recR, hD f j m ζ hζ]
     rw [this] at hR
     show II _ _ _ 1 _ ≤ _
@@ -73,10 +90,14 @@ theorem RootHeight.proofNE (hA : RootArithVar.Statement) (hD : RootDivSuppEmpty.
     have hpos := (fsMulti (plBlocks f j m)).pos z hz.1
     have hfa : (fsMulti (plBlocks f j m)).a = fun _ => 1 := rfl
     simp only [logNorm, hh, hfa, zpow_one]
-    have hs : eval (fun p : (Σ _ : Fin f, PlIdx j m) => u p.1 * z p) (map (Int.castRingHom ℂ) (rootAnchorSection f j m))
-        = (∏ k, u k) * eval z (map (Int.castRingHom ℂ) (rootAnchorSection f j m)) := by
+    have hs
+        : eval
+            (fun p : (Σ _ : Fin f, PlIdx j m) => u p.1 * z p)
+            (map (Int.castRingHom ℂ) (rootAnchorSection f j m))
+          = (∏ k, u k) * eval z (map (Int.castRingHom ℂ) (rootAnchorSection f j m)) := by
       simp [rootAnchorSection, Finset.prod_mul_distrib]
-    have hu0 : (∏ k, ‖u k‖) ≠ 0 := Finset.prod_ne_zero_iff.mpr fun k _ => norm_ne_zero_iff.mpr (hu k)
+    have hu0 : (∏ k, ‖u k‖) ≠ 0 :=
+      Finset.prod_ne_zero_iff.mpr fun k _ => norm_ne_zero_iff.mpr (hu k)
     congr 1
     erw [hs]
     rw [norm_mul, norm_prod]

@@ -10,11 +10,16 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.LetterSubstitution
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords Formalism.MainNotions.PairMembershipBlocks Formalism.MainNotions.TraceSpectra
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.PairMembershipBlocks Formalism.MainNotions.TraceSpectra
 
 section Ph
 
-variable {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {r J : ℕ} [NeZero J]
+variable
+  {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {r J : ℕ} [NeZero J]
   (Dt : SignedChainData p O r J)
 
 def phV : ML J Dt.nL r × Fin r → TL J Dt.nL r × Fin r
@@ -37,16 +42,17 @@ theorem phExp_zero : phExp Dt 0 = 0 := by
   · simp [phExp]
   · simp [phExp]
 
-theorem phExp_add (M N : ML J Dt.nL r × Fin r →₀ ℕ) : phExp Dt (M + N) = phExp Dt M + phExp Dt N := by
+theorem phExp_add (M N : ML J Dt.nL r × Fin r →₀ ℕ)
+    : phExp Dt (M + N) = phExp Dt M + phExp Dt N := by
   ext ⟨⟨j, l | m⟩, a⟩
   · simp [phExp]
   · simp only [phExp, Finsupp.coe_equivFunOnFinite_symm, Finsupp.coe_add, Pi.add_apply]
     split_ifs <;> ring
 
-theorem phExp_single (v : ML J Dt.nL r × Fin r) (k : ℕ) :
-    phExp Dt (Finsupp.single v k) = Finsupp.single (phV Dt v) (phW Dt v * k) := by
-  ext ⟨⟨j, l | m⟩, a⟩ <;> rcases v with ⟨⟨j', l'⟩ | ⟨j', m'⟩ | ⟨j', m'⟩ | ⟨j', m', h'⟩, b⟩ <;>
-    simp [phExp, phV, phW, Finsupp.single_apply]
+theorem phExp_single (v : ML J Dt.nL r × Fin r) (k : ℕ)
+    : phExp Dt (Finsupp.single v k) = Finsupp.single (phV Dt v) (phW Dt v * k) := by
+  ext ⟨⟨j, l | m⟩, a⟩ <;> rcases v with ⟨⟨j', l'⟩ | ⟨j', m'⟩ | ⟨j', m'⟩ | ⟨j', m', h'⟩, b⟩
+    <;> simp [phExp, phV, phW, Finsupp.single_apply]
   all_goals by_cases hj : j' = j
   all_goals first | (subst hj; simp_all) | simp_all
   all_goals (rintro h1 rfl rfl; omega)
@@ -58,34 +64,39 @@ theorem phMon : PhMon := by
   refine Finsupp.induction M ?_ ?_
   · simp [phExp_zero, SignedChainData.ph]
   · intro v k N _ _ ih
-    rw [monomial_single_add, map_mul, map_pow, ih, ph_X, phExp_add, phExp_single, monomial_single_add, pow_mul]
+    rw [monomial_single_add, map_mul, map_pow, ih, ph_X, phExp_add, phExp_single,
+      monomial_single_add, pow_mul]
 
 section Alg2
 
-variable {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {r J : ℕ} [NeZero J]
+variable
+  {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {r J : ℕ} [NeZero J]
   (Dt : SignedChainData p O r J)
 
-theorem ph_monomial_mul (β : TL J Dt.nL r × Fin r →₀ ℕ) (c : KK O) (M : ML J Dt.nL r × Fin r →₀ ℕ) (a : KK O) :
-    monomial β c * Dt.ph (monomial M a) = monomial (β + phExp Dt M) (c * a) := by
+theorem ph_monomial_mul
+    (β : TL J Dt.nL r × Fin r →₀ ℕ) (c : KK O) (M : ML J Dt.nL r × Fin r →₀ ℕ) (a : KK O)
+    : monomial β c * Dt.ph (monomial M a) = monomial (β + phExp Dt M) (c * a) := by
   have h := phMon p O r J Dt M a
   rw [h, monomial_mul]
 
-theorem multideg_add' {ι : Type} {n : ℕ} (a b : ι × Fin n →₀ ℕ) (x : ι) :
-    multideg (a + b) x = multideg a x + multideg b x := by
+theorem multideg_add' {ι : Type} {n : ℕ} (a b : ι × Fin n →₀ ℕ) (x : ι)
+    : multideg (a + b) x = multideg a x + multideg b x := by
   unfold multideg
   simp [Finset.sum_add_distrib]
 
-theorem phExp_inl (M : ML J Dt.nL r × Fin r →₀ ℕ) (j : ZMod J) (l : Fin (Dt.nL j)) (a : Fin r) :
-    phExp Dt M (⟨j, Sum.inl l⟩, a) = M (ML.ll j l, a) := by
+theorem phExp_inl (M : ML J Dt.nL r × Fin r →₀ ℕ) (j : ZMod J) (l : Fin (Dt.nL j)) (a : Fin r)
+    : phExp Dt M (⟨j, Sum.inl l⟩, a) = M (ML.ll j l, a) := by
   simp [phExp]
 
-theorem phExp_inr (M : ML J Dt.nL r × Fin r →₀ ℕ) (j : ZMod J) (m : Fin r) (a : Fin r) :
-    phExp Dt M (⟨j, Sum.inr m⟩, a) = M (ML.lab j m, a) + Dt.P j m * M (ML.wc j m, a) +
-      (if h : 1 ≤ m.val then M (ML.tp j m h, a) else 0) := by
+theorem phExp_inr (M : ML J Dt.nL r × Fin r →₀ ℕ) (j : ZMod J) (m : Fin r) (a : Fin r)
+    : phExp Dt M (⟨j, Sum.inr m⟩, a)
+      = M (ML.lab j m, a) + Dt.P j m * M (ML.wc j m, a)
+        + (if h : 1 ≤ m.val then M (ML.tp j m h, a) else 0) := by
   simp [phExp]
 
-theorem multideg_phExp (M : ML J Dt.nL r × Fin r →₀ ℕ) (x : TL J Dt.nL r) :
-    multideg (phExp Dt M) x = phDeg Dt (fun y => multideg M y) x := by
+theorem multideg_phExp (M : ML J Dt.nL r × Fin r →₀ ℕ) (x : TL J Dt.nL r)
+    : multideg (phExp Dt M) x = phDeg Dt (fun y => multideg M y) x := by
   rcases x with ⟨j, l | m⟩
   · simp only [multideg, phDeg, phExp_inl]
   · simp only [multideg, phDeg, phExp_inr, Finset.sum_add_distrib, Finset.mul_sum]
@@ -93,9 +104,11 @@ theorem multideg_phExp (M : ML J Dt.nL r × Fin r →₀ ℕ) (x : TL J Dt.nL r)
 
 end Alg2
 
-private theorem coeff_compD {Kf : Type} [Field Kf] {ι : Type} {s : ℕ} (d : ι → ℕ)
-    (H : MvPolynomial (ι × Fin s) Kf) (m : ι × Fin s →₀ ℕ) :
-    AddMonoidAlgebra.coeff (compD d H) m = if (∀ x, multideg m x = d x) then AddMonoidAlgebra.coeff H m else 0 := by
+private theorem coeff_compD
+    {Kf : Type} [Field Kf]
+    {ι : Type} {s : ℕ} (d : ι → ℕ) (H : MvPolynomial (ι × Fin s) Kf) (m : ι × Fin s →₀ ℕ)
+    : AddMonoidAlgebra.coeff (compD d H) m
+      = if (∀ x, multideg m x = d x) then AddMonoidAlgebra.coeff H m else 0 := by
   unfold compD
   rw [coeff_sum]
   simp only [coeff_monomial]
@@ -105,9 +118,9 @@ private theorem coeff_compD {Kf : Type} [Field Kf] {ι : Type} {s : ℕ} (d : ι
   · by_cases h0 : AddMonoidAlgebra.coeff H m = 0 <;> simp [h, h0]
   · simp [h]
 
-private theorem compD_monomial' {Kf : Type} [Field Kf] {ι : Type} {s : ℕ} (d : ι → ℕ)
-    (m : ι × Fin s →₀ ℕ) (b : Kf) :
-    compD d (monomial m b) = if (∀ x, multideg m x = d x) then monomial m b else 0 := by
+private theorem compD_monomial'
+    {Kf : Type} [Field Kf] {ι : Type} {s : ℕ} (d : ι → ℕ) (m : ι × Fin s →₀ ℕ) (b : Kf)
+    : compD d (monomial m b) = if (∀ x, multideg m x = d x) then monomial m b else 0 := by
   ext n
   rw [coeff_compD, coeff_monomial]
   by_cases h : m = n
@@ -115,16 +128,21 @@ private theorem compD_monomial' {Kf : Type} [Field Kf] {ι : Type} {s : ℕ} (d 
     by_cases h' : ∀ x, multideg m x = d x <;> simp [h']
   · by_cases h' : ∀ x, multideg m x = d x <;> simp [h, h']
 
-theorem compD_sum {Kf : Type} [Field Kf] {ι : Type} {s : ℕ} (d : ι → ℕ) {κ : Type*} (S : Finset κ)
-    (f : κ → MvPolynomial (ι × Fin s) Kf) : compD d (∑ k ∈ S, f k) = ∑ k ∈ S, compD d (f k) := by
+theorem compD_sum
+    {Kf : Type} [Field Kf]
+    {ι : Type} {s : ℕ} (d : ι → ℕ)
+    {κ : Type*} (S : Finset κ) (f : κ → MvPolynomial (ι × Fin s) Kf)
+    : compD d (∑ k ∈ S, f k) = ∑ k ∈ S, compD d (f k) := by
   ext m
   simp only [coeff_compD, coeff_sum]
   by_cases h : ∀ x, multideg m x = d x <;> simp [h]
 
 theorem compPh : CompPh := by
   intro p O _ _ _ r J _ Dt d β c F
-  have key : ∀ mo : ML J Dt.nL r × Fin r →₀ ℕ, ((∀ x, multideg (β + phExp Dt mo) x = d x) ↔
-      ∀ x, multideg β x + phDeg Dt (fun y => multideg mo y) x = d x) := by
+  have key
+      : ∀ mo : ML J Dt.nL r × Fin r →₀ ℕ,
+        ((∀ x, multideg (β + phExp Dt mo) x = d x)
+          ↔ ∀ x, multideg β x + phDeg Dt (fun y => multideg mo y) x = d x) := by
     intro mo
     simp only [multideg_add', multideg_phExp]
   unfold filtQ
@@ -136,12 +154,14 @@ theorem compPh : CompPh := by
   simp only [key]
   split_ifs <;> rfl
 
-private theorem fdig_eq_sum_C_coeff_mul_prod_of_support_subset {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {r J : ℕ}
-    (Dt : SignedChainData p O r J) (rho : (ZMod J × Fin r) × Fin r → ℕ)
+private theorem fdig_eq_sum_C_coeff_mul_prod_of_support_subset
+    {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {r J : ℕ} (Dt : SignedChainData p O r J) (rho : (ZMod J × Fin r) × Fin r → ℕ)
     (F : MvPolynomial (TL J Dt.nL r × Fin r) (KK O)) (S : Finset (TL J Dt.nL r × Fin r →₀ ℕ))
-    (hS : F.support ⊆ S) :
-    Dt.Fdig rho F = ∑ mo ∈ S with Dt.digOK rho mo,
-      C (AddMonoidAlgebra.coeff F mo) * ∏ v ∈ mo.support, X (Dt.liftVar v) ^ Dt.liftExp mo v := by
+    (hS : F.support ⊆ S)
+    : Dt.Fdig rho F
+      = ∑ mo ∈ S with Dt.digOK rho mo,
+        C (AddMonoidAlgebra.coeff F mo) * ∏ v ∈ mo.support, X (Dt.liftVar v) ^ Dt.liftExp mo v := by
   unfold SignedChainData.Fdig
   refine Finset.sum_subset (Finset.filter_subset_filter _ hS) ?_
   intro mo h1 h2
@@ -150,13 +170,17 @@ private theorem fdig_eq_sum_C_coeff_mul_prod_of_support_subset {p : ℕ} {O : Ty
     exact h2 (Finset.mem_filter.2 ⟨mem_support_iff.2 h, (Finset.mem_filter.1 h1).2⟩)
   simp [h0]
 
-private theorem signedChainData_fdig_add {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {r J : ℕ}
-    (Dt : SignedChainData p O r J) (rho : (ZMod J × Fin r) × Fin r → ℕ)
-    (F G : MvPolynomial (TL J Dt.nL r × Fin r) (KK O)) :
-    Dt.Fdig rho (F + G) = Dt.Fdig rho F + Dt.Fdig rho G := by
-  rw [fdig_eq_sum_C_coeff_mul_prod_of_support_subset Dt rho (F + G) (F.support ∪ G.support) support_add,
-    fdig_eq_sum_C_coeff_mul_prod_of_support_subset Dt rho F (F.support ∪ G.support) Finset.subset_union_left,
-    fdig_eq_sum_C_coeff_mul_prod_of_support_subset Dt rho G (F.support ∪ G.support) Finset.subset_union_right,
+private theorem signedChainData_fdig_add
+    {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {r J : ℕ} (Dt : SignedChainData p O r J) (rho : (ZMod J × Fin r) × Fin r → ℕ)
+    (F G : MvPolynomial (TL J Dt.nL r × Fin r) (KK O))
+    : Dt.Fdig rho (F + G) = Dt.Fdig rho F + Dt.Fdig rho G := by
+  rw [fdig_eq_sum_C_coeff_mul_prod_of_support_subset Dt rho (F + G) (F.support ∪ G.support)
+      support_add,
+    fdig_eq_sum_C_coeff_mul_prod_of_support_subset Dt rho F (F.support ∪ G.support)
+      Finset.subset_union_left,
+    fdig_eq_sum_C_coeff_mul_prod_of_support_subset Dt rho G (F.support ∪ G.support)
+      Finset.subset_union_right,
     ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl (fun mo _ => ?_)
   rw [MvPolynomial.coeff_add, map_add (f := _), add_mul]
@@ -171,20 +195,23 @@ theorem fdigSum : FdigSum := by
 
 section Dig
 
-variable {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {r J : ℕ} [NeZero J]
+variable
+  {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {r J : ℕ} [NeZero J]
   (Dt : SignedChainData p O r J)
 
-theorem lw_zero (M : ML J Dt.nL r × Fin r →₀ ℕ) (hM : ∀ v ∈ M.support, IsLW v.1) :
-    (∀ j m a, M (ML.lab j m, a) = 0) ∧ (∀ j m h a, M (ML.tp j m h, a) = 0) := by
+theorem lw_zero (M : ML J Dt.nL r × Fin r →₀ ℕ) (hM : ∀ v ∈ M.support, IsLW v.1)
+    : (∀ j m a, M (ML.lab j m, a) = 0) ∧ (∀ j m h a, M (ML.tp j m h, a) = 0) := by
   refine ⟨fun j m a => ?_, fun j m h a => ?_⟩
   · by_contra hne
     exact hM _ (Finsupp.mem_support_iff.2 hne)
   · by_contra hne
     exact hM _ (Finsupp.mem_support_iff.2 hne)
 
-theorem digOK_phExp (hP : ∀ j m, 0 < Dt.P j m) (rho : (ZMod J × Fin r) × Fin r → ℕ) (β : TL J Dt.nL r × Fin r →₀ ℕ)
-    (M : ML J Dt.nL r × Fin r →₀ ℕ) (hM : ∀ v ∈ M.support, IsLW v.1) :
-    Dt.digOK rho (β + phExp Dt M) ↔ Dt.digOK rho β := by
+theorem digOK_phExp
+    (hP : ∀ j m, 0 < Dt.P j m) (rho : (ZMod J × Fin r) × Fin r → ℕ) (β : TL J Dt.nL r × Fin r →₀ ℕ)
+    (M : ML J Dt.nL r × Fin r →₀ ℕ) (hM : ∀ v ∈ M.support, IsLW v.1)
+    : Dt.digOK rho (β + phExp Dt M) ↔ Dt.digOK rho β := by
   obtain ⟨h1, h2⟩ := lw_zero Dt M hM
   unfold SignedChainData.digOK
   refine forall_congr' (fun j => forall_congr' (fun m => forall_congr' (fun a => ?_)))
@@ -193,26 +220,35 @@ theorem digOK_phExp (hP : ∀ j m, 0 < Dt.P j m) (rho : (ZMod J × Fin r) × Fin
   · rw [h2, add_zero, Nat.add_mul_mod_self_left]
   · rw [add_zero, Nat.add_mul_mod_self_left]
 
-theorem liftMon_notin (mo : TL J Dt.nL r × Fin r →₀ ℕ) (w : ML J Dt.nL r × Fin r)
-    (hw : w ∉ Set.range Dt.liftVar) : liftMon Dt mo w = 0 :=
+theorem liftMon_notin
+    (mo : TL J Dt.nL r × Fin r →₀ ℕ) (w : ML J Dt.nL r × Fin r) (hw : w ∉ Set.range Dt.liftVar)
+    : liftMon Dt mo w = 0 :=
   Finsupp.mapDomain_notin_range _ _ hw
 
-private theorem liftVar_injective' {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {r J : ℕ} (Dt : SignedChainData p O r J) : Function.Injective Dt.liftVar := by
-  rintro ⟨⟨j, l | m⟩, a⟩ ⟨⟨j', l' | m'⟩, a'⟩ h <;> simp only [SignedChainData.liftVar] at h <;> cases h <;> rfl
+private theorem liftVar_injective'
+    {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {r J : ℕ} (Dt : SignedChainData p O r J)
+    : Function.Injective Dt.liftVar := by
+  rintro ⟨⟨j, l | m⟩, a⟩ ⟨⟨j', l' | m'⟩, a'⟩ h <;> simp only [SignedChainData.liftVar] at h
+    <;> cases h <;> rfl
 
-private theorem liftE_apply_eq_liftExp {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {r J : ℕ} (Dt : SignedChainData p O r J) (γ : TL J Dt.nL r × Fin r →₀ ℕ) (v : TL J Dt.nL r × Fin r) :
-    liftE Dt γ v = Dt.liftExp γ v := by
+private theorem liftE_apply_eq_liftExp
+    {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {r J : ℕ}
+    (Dt : SignedChainData p O r J) (γ : TL J Dt.nL r × Fin r →₀ ℕ) (v : TL J Dt.nL r × Fin r)
+    : liftE Dt γ v = Dt.liftExp γ v := by
   rcases v with ⟨⟨j, l | m⟩, a⟩ <;> simp [liftE, Pof, SignedChainData.liftExp]
 
-theorem liftMon_phExp (hP : ∀ j m, 0 < Dt.P j m) (β : TL J Dt.nL r × Fin r →₀ ℕ) (M : ML J Dt.nL r × Fin r →₀ ℕ)
-    (hM : ∀ v ∈ M.support, IsLW v.1) : liftMon Dt (β + phExp Dt M) = liftMon Dt β + M := by
+theorem liftMon_phExp
+    (hP : ∀ j m, 0 < Dt.P j m) (β : TL J Dt.nL r × Fin r →₀ ℕ)
+    (M : ML J Dt.nL r × Fin r →₀ ℕ) (hM : ∀ v ∈ M.support, IsLW v.1)
+    : liftMon Dt (β + phExp Dt M) = liftMon Dt β + M := by
   obtain ⟨h1, h2⟩ := lw_zero Dt M hM
   ext w
   by_cases hw : w ∈ Set.range Dt.liftVar
   · obtain ⟨x, rfl⟩ := hw
-    simp only [liftMon, Finsupp.add_apply, Finsupp.mapDomain_apply_of_injective (liftVar_injective' Dt)]
+    simp only [liftMon, Finsupp.add_apply,
+      Finsupp.mapDomain_apply_of_injective (liftVar_injective' Dt)]
     rcases x with ⟨⟨j, l | m⟩, a⟩
     · simp [liftE, Pof, phExp_inl, SignedChainData.liftVar]
     · simp only [liftE, Finsupp.onFinset_apply, Pof, Finsupp.add_apply, phExp_inr, h1, zero_add,
@@ -230,10 +266,12 @@ theorem liftMon_phExp (hP : ∀ j m, 0 < Dt.P j m) (β : TL J Dt.nL r × Fin r �
 
 end Dig
 
-private theorem fdig_monomial {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+private theorem fdig_monomial
+    {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     {r J : ℕ} (Dt : SignedChainData p O r J) (rho : (ZMod J × Fin r) × Fin r → ℕ)
-    (γ : TL J Dt.nL r × Fin r →₀ ℕ) (b : KK O) :
-    Dt.Fdig rho (monomial γ b) = if Dt.digOK rho γ then monomial (liftMon Dt γ) b else 0 := by
+    (γ : TL J Dt.nL r × Fin r →₀ ℕ)
+    (b : KK O)
+    : Dt.Fdig rho (monomial γ b) = if Dt.digOK rho γ then monomial (liftMon Dt γ) b else 0 := by
   by_cases hb : b = 0
   · simp [hb, SignedChainData.Fdig]
   unfold SignedChainData.Fdig
@@ -256,8 +294,9 @@ theorem fdigPh : FdigPh := by
   have hsupp : ∀ mo ∈ F.support, ∀ v ∈ mo.support, IsLW v.1 := by
     intro mo hmo v hv
     exact (mem_supported.1 hF) (Finset.mem_coe.2 ((mem_vars_iff_mem_support v).2 ⟨mo, hmo, hv⟩))
-  have hs := fdigSum p O r J Dt rho _ F.support
-    (fun mo => monomial β c * Dt.ph (monomial mo (AddMonoidAlgebra.coeff F mo)))
+  have hs :=
+    fdigSum p O r J Dt rho _ F.support
+      (fun mo => monomial β c * Dt.ph (monomial mo (AddMonoidAlgebra.coeff F mo)))
   conv_lhs => rw [F.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, Finset.mul_sum, hs]

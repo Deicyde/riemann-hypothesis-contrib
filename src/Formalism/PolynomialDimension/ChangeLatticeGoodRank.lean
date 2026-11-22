@@ -7,6 +7,7 @@ public import Formalism.PolynomialDimension.MultinomialDepth.SegmentBoundThreeHo
 
 namespace Formalism.CountingSumsFrames.Top
 
-theorem detLeadDiag : Formalism.CountingSumsFrames.DetLeadDiag := Formalism.CountingSumsFrames.det_leading_diagonal
+theorem detLeadDiag : Formalism.CountingSumsFrames.DetLeadDiag :=
+  Formalism.CountingSumsFrames.det_leading_diagonal
 
 end Formalism.CountingSumsFrames.Top

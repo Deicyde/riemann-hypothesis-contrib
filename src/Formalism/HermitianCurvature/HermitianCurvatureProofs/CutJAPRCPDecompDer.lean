@@ -4,12 +4,14 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJAPRCPDec
 
 @[expose] public section
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q NumberField
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q NumberField
 open scoped ComplexConjugate Matrix
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep.Core.TC.PR.CP.Dc
 
-open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2
+open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction
+  Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2
 
 noncomputable section
 
@@ -174,70 +176,96 @@ lemma sZ_d (T T' : ℝ) (hT : 0 < T) (hT' : 0 < T') (ζ : ℂ) (hζ : T * T' < C
     field_simp
     ring
 
-theorem dmu_both (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z') (ζ : ℂ)
-    (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ) :
-    (Matrix.of fun i j => NF.dZ (fun w => mu0 k r z z' w i j) ζ) =
-        e0 k r (gA k (wbPart k r z) (Tz k r z) *
-          dnu k 0 ((2 * kap (Tz k r z) (Tz k r z'))⁻¹ * conj ζ * (sig (Tz k r z * Tz k r z') ζ)⁻¹)
-            (-(kap (Tz k r z) (Tz k r z'))⁻¹) * gB k (wbPart k r z') (Tz k r z')) ∧
-      (Matrix.of fun i j => NF.dZb (fun w => mu0 k r z z' w i j) ζ) =
-        e0 k r (gA k (wbPart k r z) (Tz k r z) *
-          dnu k (-(kap (Tz k r z) (Tz k r z'))⁻¹) ((2 * kap (Tz k r z) (Tz k r z'))⁻¹ * ζ * (sig (Tz k r z * Tz k r z') ζ)⁻¹)
-            0 * gB k (wbPart k r z') (Tz k r z')) := by
-  have hR : ∀ a b c : ℂ, e0 k r (gA k (wbPart k r z) (Tz k r z) * dnu k a b c * gB k (wbPart k r z') (Tz k r z')) =
-      a • aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z')) (Matrix.single 0 0 1) +
-        b • aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
-            (Matrix.single 0 (Fin.last k) 1 + Matrix.single (Fin.last k) 0 1) +
-        c • aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
-            (Matrix.single (Fin.last k) (Fin.last k) 1) := by
+theorem dmu_both
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z')
+    (ζ : ℂ) (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ)
+    : (Matrix.of fun i j => NF.dZ (fun w => mu0 k r z z' w i j) ζ)
+        = e0 k r
+          (gA k (wbPart k r z) (Tz k r z)
+            * dnu k 0
+              ((2 * kap (Tz k r z) (Tz k r z'))⁻¹ * conj ζ * (sig (Tz k r z * Tz k r z') ζ)⁻¹)
+              (-(kap (Tz k r z) (Tz k r z'))⁻¹)
+            * gB k (wbPart k r z') (Tz k r z'))
+      ∧ (Matrix.of fun i j => NF.dZb (fun w => mu0 k r z z' w i j) ζ)
+        = e0 k r
+          (gA k (wbPart k r z) (Tz k r z)
+            * dnu k (-(kap (Tz k r z) (Tz k r z'))⁻¹)
+              ((2 * kap (Tz k r z) (Tz k r z'))⁻¹ * ζ * (sig (Tz k r z * Tz k r z') ζ)⁻¹) 0
+            * gB k (wbPart k r z') (Tz k r z')) := by
+  have hR
+      : ∀ a b c : ℂ,
+        e0 k r (gA k (wbPart k r z) (Tz k r z) * dnu k a b c * gB k (wbPart k r z') (Tz k r z'))
+          = a • aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
+              (Matrix.single 0 0 1)
+            + b • aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
+              (Matrix.single 0 (Fin.last k) 1 + Matrix.single (Fin.last k) 0 1)
+            + c • aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
+              (Matrix.single (Fin.last k) (Fin.last k) 1) := by
     intro a b c
     show aa r _ _ (dnu k a b c) = _
     unfold dnu
     rw [aa_add, aa_add, aa_smul, aa_smul, aa_smul]
-  have hL : ∀ i j, (fun w => mu0 k r z z' w i j) = fun w =>
-      (aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
-          (1 - Matrix.single 0 0 1 - Matrix.single (Fin.last k) (Fin.last k) 1) + (1 - Em k r * (Em k r)ᵀ) : Q.Mx k r) i j +
-        star (wZ (Tz k r z) (Tz k r z') w) *
-          aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z')) (Matrix.single 0 0 1) i j +
-        sZ (Tz k r z) (Tz k r z') w *
-          aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
-            (Matrix.single 0 (Fin.last k) 1 + Matrix.single (Fin.last k) 0 1) i j +
-        wZ (Tz k r z) (Tz k r z') w *
-          aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
-            (Matrix.single (Fin.last k) (Fin.last k) 1) i j := by
+  have hL
+      : ∀ i j,
+        (fun w => mu0 k r z z' w i j)
+          = fun w =>
+            (aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
+                      (1 - Matrix.single 0 0 1 - Matrix.single (Fin.last k) (Fin.last k) 1)
+                    + (1 - Em k r * (Em k r)ᵀ)
+                  : Q.Mx k r)
+                i j
+              + star (wZ (Tz k r z) (Tz k r z') w) * aa r (gA k (wbPart k r z) (Tz k r z))
+                (gB k (wbPart k r z') (Tz k r z')) (Matrix.single 0 0 1) i j
+              + sZ (Tz k r z) (Tz k r z') w
+                * aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
+                  (Matrix.single 0 (Fin.last k) 1 + Matrix.single (Fin.last k) 0 1) i j
+              + wZ (Tz k r z) (Tz k r z') w
+                * aa r (gA k (wbPart k r z) (Tz k r z)) (gB k (wbPart k r z') (Tz k r z'))
+                  (Matrix.single (Fin.last k) (Fin.last k) 1) i j := by
     intro i j
     funext w
     rw [mu0_eq_corner_entry_expansion]
     simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
-  have hd := fun a0 a1 a2 a3 => dZ_lin (fun w => star (wZ (Tz k r z) (Tz k r z') w)) (sZ (Tz k r z) (Tz k r z'))
-    (wZ (Tz k r z) (Tz k r z')) a0 a1 a2 a3 ζ (wZs_has _ _ ζ).differentiableAt
-    (sZ_has _ _ hT hT' ζ hζ).differentiableAt (wZ_has _ _ ζ).differentiableAt
+  have hd := fun a0 a1 a2 a3 =>
+    dZ_lin
+      (fun w => star (wZ (Tz k r z) (Tz k r z') w))
+      (sZ (Tz k r z) (Tz k r z')) (wZ (Tz k r z) (Tz k r z')) a0 a1 a2 a3 ζ
+      (wZs_has _ _ ζ).differentiableAt (sZ_has _ _ hT hT' ζ hζ).differentiableAt
+      (wZ_has _ _ ζ).differentiableAt
   constructor
   · ext i j
-    rw [Matrix.of_apply, hL, (hd _ _ _ _).1, hR, (wZs_d _ _ ζ).1, (sZ_d _ _ hT hT' ζ hζ).1, (wZ_d _ _ ζ).1]
+    rw [Matrix.of_apply, hL, (hd _ _ _ _).1, hR, (wZs_d _ _ ζ).1, (sZ_d _ _ hT hT' ζ hζ).1,
+      (wZ_d _ _ ζ).1]
     simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
   · ext i j
-    rw [Matrix.of_apply, hL, (hd _ _ _ _).2, hR, (wZs_d _ _ ζ).2, (sZ_d _ _ hT hT' ζ hζ).2, (wZ_d _ _ ζ).2]
+    rw [Matrix.of_apply, hL, (hd _ _ _ _).2, hR, (wZs_d _ _ ζ).2, (sZ_d _ _ hT hT' ζ hζ).2,
+      (wZ_d _ _ ζ).2]
     simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
 
-theorem dmu_eq (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z') (ζ : ℂ)
-    (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ) :
-    (Matrix.of fun i j => NF.dZ (fun w => mu0 k r z z' w i j) ζ) =
-        e0 k r (gA k (wbPart k r z) (Tz k r z) *
-          dnu k 0 ((2 * kap (Tz k r z) (Tz k r z'))⁻¹ * conj ζ * (sig (Tz k r z * Tz k r z') ζ)⁻¹)
-            (-(kap (Tz k r z) (Tz k r z'))⁻¹) * gB k (wbPart k r z') (Tz k r z')) :=
+theorem dmu_eq
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z')
+    (ζ : ℂ) (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ)
+    : (Matrix.of fun i j => NF.dZ (fun w => mu0 k r z z' w i j) ζ)
+      = e0 k r
+        (gA k (wbPart k r z) (Tz k r z)
+          * dnu k 0 ((2 * kap (Tz k r z) (Tz k r z'))⁻¹ * conj ζ * (sig (Tz k r z * Tz k r z') ζ)⁻¹)
+            (-(kap (Tz k r z) (Tz k r z'))⁻¹)
+          * gB k (wbPart k r z') (Tz k r z')) :=
   (dmu_both k r z z' hT hT' ζ hζ).1
 
-theorem dmub_eq (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z') (ζ : ℂ)
-    (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ) :
-    (Matrix.of fun i j => NF.dZb (fun w => mu0 k r z z' w i j) ζ) =
-        e0 k r (gA k (wbPart k r z) (Tz k r z) *
-          dnu k (-(kap (Tz k r z) (Tz k r z'))⁻¹) ((2 * kap (Tz k r z) (Tz k r z'))⁻¹ * ζ * (sig (Tz k r z * Tz k r z') ζ)⁻¹)
-            0 * gB k (wbPart k r z') (Tz k r z')) :=
+theorem dmub_eq
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z')
+    (ζ : ℂ) (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ)
+    : (Matrix.of fun i j => NF.dZb (fun w => mu0 k r z z' w i j) ζ)
+      = e0 k r
+        (gA k (wbPart k r z) (Tz k r z)
+          * dnu k (-(kap (Tz k r z) (Tz k r z'))⁻¹)
+            ((2 * kap (Tz k r z) (Tz k r z'))⁻¹ * ζ * (sig (Tz k r z * Tz k r z') ζ)⁻¹) 0
+          * gB k (wbPart k r z') (Tz k r z')) :=
   (dmu_both k r z z' hT hT' ζ hζ).2
 
-theorem sZ_eq (T T' : ℝ) (hT : 0 < T) (hT' : 0 < T') (ζ : ℂ) (hζ : T * T' < Complex.normSq ζ) :
-    sZ T T' ζ = (kap T T')⁻¹ * sig (T * T') ζ := by
+theorem sZ_eq (T T' : ℝ) (hT : 0 < T) (hT' : 0 < T') (ζ : ℂ) (hζ : T * T' < Complex.normSq ζ)
+    : sZ T T' ζ = (kap T T')⁻¹ * sig (T * T') ζ := by
   obtain ⟨_, h1, _, h3, _⟩ := sr_facts T T' hT hT' ζ hζ
   unfold sZ kap sig
   rw [← h1]

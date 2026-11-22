@@ -18,11 +18,15 @@ namespace GlobalTheory.MemPair
 section Blocks
 
 open scoped BigOperators
-open Classical Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj GlobalTheory.RowAt
+open Classical Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj
+  GlobalTheory.RowAt
 
-theorem prod_pow_single {R : Type} [CommMonoid R] {d : ℕ} [NeZero d] (f : Fin 2 → ZMod d → ℕ → R)
-    (M : Fin 2 → ZMod d → ℕ) (g : Fin 2) (a : ZMod d) (n e : ℕ) (h : e ≠ 0 → n ≤ M g a) :
-    ∏ g', ∏ a', ∏ k ∈ Finset.range (M g' a' + 1), f g' a' k ^ (if g' = g ∧ a' = a ∧ k = n then e else 0)
+theorem prod_pow_single
+    {R : Type} [CommMonoid R]
+    {d : ℕ} [NeZero d]
+    (f : Fin 2 → ZMod d → ℕ → R)
+    (M : Fin 2 → ZMod d → ℕ) (g : Fin 2) (a : ZMod d) (n e : ℕ) (h : e ≠ 0 → n ≤ M g a)
+    : ∏ g', ∏ a', ∏ k ∈ Finset.range (M g' a' + 1), f g' a' k ^ (if g' = g ∧ a' = a ∧ k = n then e else 0)
       = f g a n ^ e := by
   rw [Finset.prod_eq_single g, Finset.prod_eq_single a, Finset.prod_eq_single n]
   · simp
@@ -40,19 +44,30 @@ theorem prod_pow_single {R : Type} [CommMonoid R] {d : ℕ} [NeZero d] (f : Fin 
     simp [hg]
   · simp
 
-variable {C : Type} [Field C] {V : VF C} {d : ℕ} [NeZero d] {I J : Fin 2 → Type}
-  [∀ g, Fintype (I g)] [∀ g, Fintype (J g)] (X : RowData C V d I J) (F : RF.Flag X)
+variable
+  {C : Type} [Field C]
+  {V : VF C} {d : ℕ} [NeZero d]
+  {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
+  (X : RowData C V d I J) (F : RF.Flag X)
 
-theorem poly_eq (b : RF.GlobalTheory d) (M : Fin 2 → ZMod d → ℕ) (h : ∀ g a k, b.wt X g a k ≠ 0 → k ≤ M g a) :
-    b.poly X F = ∏ g, ∏ a, ∏ k ∈ Finset.range (M g a + 1),
-      MvPolynomial.rename (F.letter g a) (minorK C (b.what₂ X.n) (X.rkF g a) k) ^ b.wt X g a k := by
+theorem poly_eq
+    (b : RF.GlobalTheory d) (M : Fin 2 → ZMod d → ℕ) (h : ∀ g a k, b.wt X g a k ≠ 0 → k ≤ M g a)
+    : b.poly X F
+      = ∏ g, ∏ a, ∏ k ∈ Finset.range (M g a + 1),
+        MvPolynomial.rename (F.letter g a) (minorK C (b.what₂ X.n) (X.rkF g a) k) ^ b.wt X g a k := by
   cases b with
   | bi g a i y =>
     simp only [RF.GlobalTheory.wt, pow_add, Finset.prod_mul_distrib]
-    rw [prod_pow_single (fun g' a' k => MvPolynomial.rename (F.letter g' a')
-        (minorK C ((RF.GlobalTheory.bi g a i y).what₂ X.n) (X.rkF g' a') k)) M g a X.n,
-      prod_pow_single (fun g' a' k => MvPolynomial.rename (F.letter g' a')
-        (minorK C ((RF.GlobalTheory.bi g a i y).what₂ X.n) (X.rkF g' a') k)) M (1 - g) (a + (i : ZMod d)) X.n]
+    rw [prod_pow_single
+        (fun g' a' k =>
+          MvPolynomial.rename (F.letter g' a')
+            (minorK C ((RF.GlobalTheory.bi g a i y).what₂ X.n) (X.rkF g' a') k))
+        M g a X.n,
+      prod_pow_single
+        (fun g' a' k =>
+          MvPolynomial.rename (F.letter g' a')
+            (minorK C ((RF.GlobalTheory.bi g a i y).what₂ X.n) (X.rkF g' a') k))
+        M (1 - g) (a + (i : ZMod d)) X.n]
     · rfl
     · intro he
       refine h _ _ _ ?_
@@ -63,8 +78,11 @@ theorem poly_eq (b : RF.GlobalTheory d) (M : Fin 2 → ZMod d → ℕ) (h : ∀ 
       omega
   | ch g a u =>
     simp only [RF.GlobalTheory.wt]
-    rw [prod_pow_single (fun g' a' k => MvPolynomial.rename (F.letter g' a')
-        (minorK C ((RF.GlobalTheory.ch g a u).what₂ X.n) (X.rkF g' a') k)) M g a X.n]
+    rw [prod_pow_single
+      (fun g' a' k =>
+        MvPolynomial.rename (F.letter g' a')
+          (minorK C ((RF.GlobalTheory.ch g a u).what₂ X.n) (X.rkF g' a') k))
+      M g a X.n]
     · rfl
     · intro he
       refine h _ _ _ ?_
@@ -76,7 +94,9 @@ theorem poly_eq (b : RF.GlobalTheory d) (M : Fin 2 → ZMod d → ℕ) (h : ∀ 
           MvPolynomial.rename (F.letter g a) (minorK C N (X.rkF g a) k) ^ (RF.GlobalTheory.mon g e N).wt X g a k
       refine Finset.prod_congr rfl fun a _ => ?_
       rw [monP, map_prod]
-      have h1 : ∀ k ∈ Finset.Icc 1 (min N (X.rkF g a)), (RF.GlobalTheory.mon g e N).wt X g a k = e a k := by
+      have h1
+          : ∀ k ∈ Finset.Icc 1 (min N (X.rkF g a)),
+            (RF.GlobalTheory.mon g e N).wt X g a k = e a k := by
         intro k hk
         rw [Finset.mem_Icc] at hk
         simp only [RF.GlobalTheory.wt]
@@ -97,7 +117,8 @@ theorem poly_eq (b : RF.GlobalTheory d) (M : Fin 2 → ZMod d → ℕ) (h : ∀ 
       simp [RF.GlobalTheory.wt, hg]
     · simp
 
-theorem le_rows (b : RF.GlobalTheory d) (g : Fin 2) (a : ZMod d) (k : ℕ) (h : b.wt X g a k ≠ 0) : k ≤ b.what₂ X.n := by
+theorem le_rows (b : RF.GlobalTheory d) (g : Fin 2) (a : ZMod d) (k : ℕ) (h : b.wt X g a k ≠ 0)
+    : k ≤ b.what₂ X.n := by
   cases b with
   | bi g' a' i y =>
     simp only [RF.GlobalTheory.wt] at h
@@ -117,8 +138,10 @@ theorem le_rows (b : RF.GlobalTheory d) (g : Fin 2) (a : ZMod d) (k : ℕ) (h : 
     · rintro ⟨-, -, h3⟩
       exact hk (h3.trans (min_le_left _ _))
 
-theorem both_groups (b : RF.GlobalTheory d) (g : Fin 2) (a a' : ZMod d) (k k' : ℕ) (h : b.wt X g a k ≠ 0)
-    (h' : b.wt X (1 - g) a' k' ≠ 0) : k = X.n ∧ k' = X.n := by
+theorem both_groups
+    (b : RF.GlobalTheory d) (g : Fin 2) (a a' : ZMod d) (k k' : ℕ)
+    (h : b.wt X g a k ≠ 0) (h' : b.wt X (1 - g) a' k' ≠ 0)
+    : k = X.n ∧ k' = X.n := by
   have hg : ∀ g : Fin 2, 1 - g ≠ g := by decide
   cases b with
   | bi g' a'' i y =>
@@ -150,7 +173,8 @@ end Blocks
 section Letters
 
 open scoped BigOperators
-open Classical Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj GlobalTheory.RowAt
+open Classical Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj
+  GlobalTheory.RowAt
 
 variable {Ty : Type} (r : Ty → ℕ) {Orb : Type} {d : ℕ} (tau : Orb → Fin 2 → ZMod d → Ty)
 
@@ -161,8 +185,8 @@ def toRow (w : WVO (Ix r tau)) : Σ τ : Ty, Fin (r τ) := ⟨tau w.1 w.2.1 w.2.
 def toLet {n : ℕ} (x : Fin n × WVO (Ix r tau)) : Formalism.L2.Pj.Letter Ty r n :=
   ⟨tau x.2.1 x.2.2.1 x.2.2.2.1, x.2.2.2.2, x.1⟩
 
-theorem toRow_inj (inj : Function.Injective fun x : Orb × Fin 2 × ZMod d => tau x.1 x.2.1 x.2.2) :
-    Function.Injective (toRow r tau) := by
+theorem toRow_inj (inj : Function.Injective fun x : Orb × Fin 2 × ZMod d => tau x.1 x.2.1 x.2.2)
+    : Function.Injective (toRow r tau) := by
   rintro ⟨o, g, a, i⟩ ⟨o', g', a', i'⟩ h
   have h1 : ((o, g, a) : Orb × Fin 2 × ZMod d) = (o', g', a') := inj (congrArg Sigma.fst h)
   simp only [Prod.mk.injEq] at h1
@@ -170,23 +194,31 @@ theorem toRow_inj (inj : Function.Injective fun x : Orb × Fin 2 × ZMod d => ta
   have h2 : i = i' := eq_of_heq (Sigma.mk.inj h).2
   rw [h2]
 
-theorem sigma_eq {A : Type} {m : A → ℕ} (x : Σ s, Fin (m s)) (a : A) (c : Fin (m a)) (h1 : x.1 = a)
-    (h2 : (x.2 : ℕ) = c) : x = ⟨a, c⟩ := by
+theorem sigma_eq
+    {A : Type} {m : A → ℕ}
+    (x : Σ s, Fin (m s)) (a : A) (c : Fin (m a)) (h1 : x.1 = a) (h2 : (x.2 : ℕ) = c)
+    : x = ⟨a, c⟩ := by
   obtain ⟨s, i⟩ := x
   subst h1
   exact congrArg _ (Fin.ext h2)
 
 variable {C : Type} [Field C] {V : VF C} [NeZero d] [Fintype Orb]
 
-theorem isImgO {dd n : ℕ} (inj : Function.Injective fun x : Orb × Fin 2 × ZMod d => tau x.1 x.2.1 x.2.2)
+theorem isImgO
+    {dd n : ℕ}
+    (inj : Function.Injective fun x : Orb × Fin 2 × ZMod d => tau x.1 x.2.1 x.2.2)
     (X : ∀ o, RawChart C d (Ix r tau o) (Fin dd)) (U : (Σ τ : Ty, Fin (r τ)) → Fin dd → C)
     (hU : ∀ w : WVO (Ix r tau), (X w.1).u w.2.1 w.2.2 = U (toRow r tau w))
-    (Q : MvPolynomial (Fin n × WVO (Ix r tau)) C) :
-    IsImgO X (fun ℓ : Formalism.L2.Pj.Letter Ty r n => ℓ.2.2) (fun ℓ => U ⟨ℓ.1, ℓ.2.1⟩)
+    (Q : MvPolynomial (Fin n × WVO (Ix r tau)) C)
+    : IsImgO X
+      (fun ℓ : Formalism.L2.Pj.Letter Ty r n => ℓ.2.2)
+      (fun ℓ => U ⟨ℓ.1, ℓ.2.1⟩)
       (MvPolynomial.rename (toLet r tau) Q) Q := by
   have hi := toRow_inj r tau inj
-  have hx : ∀ x : Fin n × WVO (Ix r tau),
-      (⟨(toLet r tau x).1, (toLet r tau x).2.1⟩ : Σ τ : Ty, Fin (r τ)) = toRow r tau x.2 := fun _ => rfl
+  have hx
+      : ∀ x : Fin n × WVO (Ix r tau),
+        (⟨(toLet r tau x).1, (toLet r tau x).2.1⟩ : Σ τ : Ty, Fin (r τ)) = toRow r tau x.2 :=
+    fun _ => rfl
   refine ⟨fun ℓ w => if toRow r tau w = ⟨ℓ.1, ℓ.2.1⟩ then 1 else 0, ?_, ?_⟩
   · intro ℓ hℓ
     obtain ⟨x, -, rfl⟩ := Finset.mem_image.1 (MvPolynomial.vars_rename _ _ hℓ)
@@ -197,9 +229,11 @@ theorem isImgO {dd n : ℕ} (inj : Function.Injective fun x : Orb × Fin 2 × ZM
       rw [if_neg (fun h => hw (hi h)), zero_smul]
     · simp
   · rw [MvPolynomial.aeval_rename]
-    have : ((fun ℓ : Formalism.L2.Pj.Letter Ty r n => ∑ w : WVO (Ix r tau),
-        MvPolynomial.C (if toRow r tau w = ⟨ℓ.1, ℓ.2.1⟩ then (1 : C) else 0) * MvPolynomial.X (ℓ.2.2, w)) ∘
-          toLet r tau) = (MvPolynomial.X : _ → MvPolynomial (Fin n × WVO (Ix r tau)) C) := by
+    have : ((fun ℓ : Formalism.L2.Pj.Letter Ty r n =>
+            ∑ w : WVO (Ix r tau),
+              MvPolynomial.C (if toRow r tau w = ⟨ℓ.1, ℓ.2.1⟩ then (1 : C) else 0) * MvPolynomial.X (ℓ.2.2, w))
+          ∘ toLet r tau)
+        = (MvPolynomial.X : _ → MvPolynomial (Fin n × WVO (Ix r tau)) C) := by
       funext x
       simp only [Function.comp]
       rw [hx, Finset.sum_eq_single x.2]
@@ -213,14 +247,18 @@ theorem isImgO {dd n : ℕ} (inj : Function.Injective fun x : Orb × Fin 2 × ZM
 def ind (C : Type) [Field C] {N n : ℕ} (col : Fin N → Fin n) (k : ℕ) (ρ : Fin k) (b : Fin n) : C :=
   if h : ρ.val < N then (if b = col ⟨ρ.val, h⟩ then 1 else 0) else 0
 
-theorem rename_minor {J : Fin 2 → Type} [∀ g, Fintype (J g)] (o : Orb) (X : RowData C V d (Ix r tau o) J)
-    (F : RF.Flag X) (h1 : ∀ g a c, (F.en g a c).1 = a) (h2 : ∀ g a c, ((F.en g a c).2 : ℕ) = c)
-    {N n : ℕ} (col : Fin N → Fin n) (g : Fin 2) (a : ZMod d) (k : ℕ) (hk : k ≤ r (tau o g a)) (hN : k ≤ N)
-    (hr : k ≤ X.rkF g a) :
-    MvPolynomial.rename (toLet r tau) (toAll o (MvPolynomial.rename
-      (fun x : Fin N × WV (Ix r tau o) => (col x.1, x.2))
-        (MvPolynomial.rename (F.letter g a) (minorK C N (X.rkF g a) k)))) =
-      (GlobalTheory.CombMinor.cMat (tau o g a) k hk (ind C col k)).det := by
+theorem rename_minor
+    {J : Fin 2 → Type} [∀ g, Fintype (J g)]
+    (o : Orb) (X : RowData C V d (Ix r tau o) J) (F : RF.Flag X)
+    (h1 : ∀ g a c, (F.en g a c).1 = a) (h2 : ∀ g a c, ((F.en g a c).2 : ℕ) = c)
+    {N n : ℕ} (col : Fin N → Fin n)
+    (g : Fin 2) (a : ZMod d) (k : ℕ) (hk : k ≤ r (tau o g a)) (hN : k ≤ N) (hr : k ≤ X.rkF g a)
+    : MvPolynomial.rename (toLet r tau)
+        (toAll o
+          (MvPolynomial.rename
+            (fun x : Fin N × WV (Ix r tau o) => (col x.1, x.2))
+            (MvPolynomial.rename (F.letter g a) (minorK C N (X.rkF g a) k))))
+      = (GlobalTheory.CombMinor.cMat (tau o g a) k hk (ind C col k)).det := by
   rw [minorK, dite_eq_left ⟨hN, hr⟩, toAll, MvPolynomial.rename_rename, MvPolynomial.rename_rename,
     MvPolynomial.rename_rename, AlgHom.map_det]
   congr 1
@@ -238,31 +276,42 @@ theorem rename_minor {J : Fin 2 → Type} [∀ g, Fintype (J g)] (o : Orb) (X : 
     rw [ind, dite_eq_left hρ, if_neg hb, map_zero, zero_mul]
   · simp
 
-theorem sum_fin_gap (m i : ℕ) (f : ℕ → ℕ) :
-    ∑ k : Fin (m + 1), (if i < k.val then f k.val else 0) = ∑ k ∈ Finset.Icc (i + 1) m, f k := by
+theorem sum_fin_gap (m i : ℕ) (f : ℕ → ℕ)
+    : ∑ k : Fin (m + 1), (if i < k.val then f k.val else 0) = ∑ k ∈ Finset.Icc (i + 1) m, f k := by
   rw [Fin.sum_univ_eq_sum_range (fun k => if i < k then f k else 0) (m + 1), ← Finset.sum_filter]
   refine Finset.sum_congr ?_ fun _ _ => rfl
   ext k
   simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_Icc]
   omega
 
-theorem prod_mem [Fintype Ty] (O : Subring C) (cc : Ty → Ty) (isX : Ty → Prop) (a : Ty → ℕ → ℕ)
+theorem prod_mem
+    [Fintype Ty]
+    (O : Subring C)
+    (cc : Ty → Ty)
+    (isX : Ty → Prop)
+    (a : Ty → ℕ → ℕ)
     (inj : Function.Injective fun x : Orb × Fin 2 × ZMod d => tau x.1 x.2.1 x.2.2)
     (surj : Function.Surjective fun x : Orb × Fin 2 × ZMod d => tau x.1 x.2.1 x.2.2)
     (hcc : ∀ o g s, cc (tau o g s) = tau o (1 - g) s)
-    {J : Orb → Fin 2 → Type} [∀ o g, Fintype (J o g)] (X : ∀ o, RowData C V d (Ix r tau o) (J o))
-    (F : ∀ o, RF.Flag (X o)) (h1 : ∀ o g a c, ((F o).en g a c).1 = a)
-    (h2 : ∀ o g a c, (((F o).en g a c).2 : ℕ) = c) (hrk : ∀ o g s, (X o).rkF g s = r (tau o g s))
+    {J : Orb → Fin 2 → Type} [∀ o g, Fintype (J o g)]
+    (X : ∀ o, RowData C V d (Ix r tau o) (J o)) (F : ∀ o, RF.Flag (X o))
+    (h1 : ∀ o g a c, ((F o).en g a c).1 = a) (h2 : ∀ o g a c, (((F o).en g a c).2 : ℕ) = c)
+    (hrk : ∀ o g s, (X o).rkF g s = r (tau o g s))
     (hsm : ∀ o g s, r (tau o g s) < (X o).n ∨ r (tau o (1 - g) s) < (X o).n)
-    (hdom : ∀ τ i j, i ≤ j → j < r τ → a τ j ≤ a τ i) {n : ℕ} (L : Orb → List (RF.GlobalTheory d × ℝ))
-    (hL : ∀ o g s k, ((L o).map fun q => q.1.wt (X o) g s k).sum = gap (r (tau o g s)) (a (tau o g s)) k)
-    (pl : (Σ o, Σ i : Fin (L o).length, Fin (RF.rowsAt X L o i)) → Fin n) (hpl : Function.Injective pl) :
-    MvPolynomial.rename (toLet r tau)
-      (∏ o, toAll o (prodAll (RF.plAt n pl o) fun i => (RF.blkAt L o i).poly (X o) (F o))) ∈
-        HaO r n C O cc isX a := by
+    (hdom : ∀ τ i j, i ≤ j → j < r τ → a τ j ≤ a τ i)
+    {n : ℕ} (L : Orb → List (RF.GlobalTheory d × ℝ))
+    (hL : ∀ o g s k,
+      ((L o).map fun q => q.1.wt (X o) g s k).sum = gap (r (tau o g s)) (a (tau o g s)) k)
+    (pl : (Σ o, Σ i : Fin (L o).length, Fin (RF.rowsAt X L o i)) → Fin n)
+    (hpl : Function.Injective pl)
+    : MvPolynomial.rename (toLet r tau)
+        (∏ o, toAll o (prodAll (RF.plAt n pl o) fun i => (RF.blkAt L o i).poly (X o) (F o)))
+      ∈ HaO r n C O cc isX a := by
   have hg1 : ∀ g : Fin 2, 1 - g ≠ g := by decide
-  have hL' : ∀ o g s k, ∑ i : Fin (L o).length, (RF.blkAt L o i).wt (X o) g s k =
-      gap (r (tau o g s)) (a (tau o g s)) k := by
+  have hL'
+      : ∀ o g s k,
+        ∑ i : Fin (L o).length, (RF.blkAt L o i).wt (X o) g s k
+          = gap (r (tau o g s)) (a (tau o g s)) k := by
     intro o g s k
     rw [← hL]
     exact RF.sum_get (L o) fun q => q.1.wt (X o) g s k
@@ -272,16 +321,22 @@ theorem prod_mem [Fintype Ty] (O : Subring C) (cc : Ty → Ty) (isX : Ty → Pro
     rw [← hL']
     intro h0
     exact h ((Finset.sum_eq_zero_iff.1 h0) i (Finset.mem_univ _))
-  have key := GlobalTheory.CombMinor.prod_det_mem_HaO Ty r n C O cc isX a
-    (Σ o, Σ _i : Fin (L o).length, Σ g : Fin 2, Σ s : ZMod d, Fin (r (tau o g s) + 1))
-    (fun α => tau α.1 α.2.2.1 α.2.2.2.1) (fun α => α.2.2.2.2.val) (fun α => Nat.le_of_lt_succ α.2.2.2.2.2)
-    (fun α => ind C (fun ρ => pl ⟨α.1, α.2.1, ρ⟩) α.2.2.2.2.val)
-    (fun α => (RF.blkAt L α.1 α.2.1).wt (X α.1) α.2.2.1 α.2.2.2.1 α.2.2.2.2.val) ?_ ?_ ?_ ?_
+  have key :=
+    GlobalTheory.CombMinor.prod_det_mem_HaO Ty r n C O cc isX a
+      (Σ o, Σ _i : Fin (L o).length, Σ g : Fin 2, Σ s : ZMod d, Fin (r (tau o g s) + 1))
+      (fun α => tau α.1 α.2.2.1 α.2.2.2.1)
+      (fun α => α.2.2.2.2.val)
+      (fun α => Nat.le_of_lt_succ α.2.2.2.2.2)
+      (fun α => ind C (fun ρ => pl ⟨α.1, α.2.1, ρ⟩) α.2.2.2.2.val)
+      (fun α => (RF.blkAt L α.1 α.2.1).wt (X α.1) α.2.2.1 α.2.2.2.1 α.2.2.2.2.val)
+      ?_ ?_ ?_ ?_
   · convert key using 1
     rw [map_prod, Fintype.prod_sigma]
     refine Finset.prod_congr rfl fun o _ => ?_
-    have ht : ∀ (P : Fin (L o).length → MvPolynomial (Fin n × WV (Ix r tau o)) C),
-        toAll o (∏ i, P i) = ∏ i, toAll (I := Ix r tau) o (P i) := fun P => by unfold toAll; rw [map_prod]
+    have ht
+        : ∀ (P : Fin (L o).length → MvPolynomial (Fin n × WV (Ix r tau o)) C),
+          toAll o (∏ i, P i) = ∏ i, toAll (I := Ix r tau) o (P i) := fun P => by
+      unfold toAll; rw [map_prod]
     rw [prodAll, ht, map_prod, Fintype.prod_sigma]
     refine Finset.prod_congr rfl fun i _ => ?_
     rw [poly_eq (X o) (F o) _ (fun g s => r (tau o g s)) (hle o i), toAll, Fintype.prod_sigma]
@@ -294,8 +349,10 @@ theorem prod_mem [Fintype Ty] (O : Subring C) (cc : Ty → Ty) (isX : Ty → Pro
     by_cases he : (RF.blkAt L o i).wt (X o) g s k.val = 0
     · simp only [he, pow_zero]
     · congr 1
-      exact rename_minor r tau o (X o) (F o) (h1 o) (h2 o) (fun ρ => pl ⟨o, i, ρ⟩) g s k.val
-        (Nat.le_of_lt_succ k.2) (le_rows _ _ _ _ _ he) (by rw [hrk]; exact Nat.le_of_lt_succ k.2)
+      exact rename_minor r tau o (X o) (F o) (h1 o) (h2 o)
+        (fun ρ => pl ⟨o, i, ρ⟩)
+        g s k.val (Nat.le_of_lt_succ k.2) (le_rows _ _ _ _ _ he)
+        (by rw [hrk]; exact Nat.le_of_lt_succ k.2)
   · intro α ρ b
     unfold ind
     split_ifs
@@ -326,15 +383,19 @@ theorem prod_mem [Fintype Ty] (O : Subring C) (cc : Ty → Ty) (isX : Ty → Pro
   · intro τ i
     obtain ⟨⟨o, g, s⟩, rfl⟩ := surj τ
     simp only at i ⊢
-    rw [← (((gap_sums _ _ (hdom (tau o g s))).2 _ le_rfl).1 i.val i.2), ← sum_fin_gap, Finset.sum_filter,
-      Fintype.sum_sigma, Finset.sum_eq_single o]
+    rw [← (((gap_sums _ _ (hdom (tau o g s))).2 _ le_rfl).1 i.val i.2), ← sum_fin_gap,
+      Finset.sum_filter, Fintype.sum_sigma, Finset.sum_eq_single o]
     · rw [Fintype.sum_sigma]
       simp only [← hL']
-      have : ∀ k : Fin (r (tau o g s) + 1), (if i.val < k.val then
-          ∑ j : Fin (L o).length, (RF.blkAt L o j).wt (X o) g s k.val else 0) =
-          ∑ j : Fin (L o).length, if i.val < k.val then (RF.blkAt L o j).wt (X o) g s k.val else 0 := by
-        intro k
-        split_ifs <;> simp
+      have : ∀ k : Fin (r (tau o g s) + 1),
+          (if i.val < k.val then
+             ∑ j : Fin (L o).length, (RF.blkAt L o j).wt (X o) g s k.val
+           else
+             0)
+            = ∑ j : Fin (L o).length, if i.val < k.val then (RF.blkAt L o j).wt (X o) g s k.val else 0 :=
+        by
+          intro k
+          split_ifs <;> simp
       rw [Finset.sum_congr rfl fun k _ => this k]
       refine Eq.trans ?_ Finset.sum_comm
       refine Finset.sum_congr rfl fun j _ => ?_
@@ -364,16 +425,56 @@ end Letters
 section Main
 
 open scoped BigOperators TensorProduct
-open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt GlobalTheory.GoodDepth
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds
+  Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt
+  GlobalTheory.GoodDepth
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
-theorem blkMemSt_pair : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (lv : Level H) (Xo : Moduli Dw lv) (c : Coeff lv) [StarRing (𝓞 E)], (∀ x : 𝓞 E, star x = H.bar x) → ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C3 : IntChart T io y) (C : Type) [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C), EmbOK T V ι → ∀ (k : ℕ) (Y : FBChart C V (𝓞 E) (chD C3.ch)), IsBC C3 ι k Y → ∀ (Orb : Type) [Fintype Orb] (d : ℕ) [NeZero d] (lab : Lab E Orb d) (ha : LabArith V io ι lab) (hg : LabGeo C3 ι Y lab), Function.Surjective (fun x : Orb × Fin 2 × ZMod d => lab.tau x.1 x.2.1 x.2.2) → lab.RankOK Dw → lab.j' < lab.n → ∀ (Hy : ∀ o, (Y.raw (pairOfLab ha hg o)).Hyps V) (F : ∀ o, RF.Flag (RF.rd Y (pairOfLab ha hg) Hy o)), (∀ o g s q, (((F o).en g s q).2 : ℕ) = q) → ∀ (a : (E →+* ℂ) × ℕ → ℕ), DomW Dw a → ∀ n : ℕ, RF.BlockMembershipChart Y (pairOfLab ha hg) Hy (chartLetterSystem C3 V ι a) n F Finset.univ (fun o g s => gap (Dw.mult (lab.tau o g s)) fun i => a (lab.tau o g s, i)) := by
-  intro E _ _ _ H Dw lv Xo c _ _ T io y C3 C _ _ V ι _ k Y _ Orb _ d _ lab ha hg surj hrk hj Hy F hF a hdom n L _ hL pl hpl
-  refine ⟨_, ?_, isImgO Dw.mult lab.tau ha.inj (fun o => Y.raw (pairOfLab ha hg o))
-    (fun w i => ι (chartUnitVectors C3 w i)) (fun w => rfl) _⟩
-  refine prod_mem Dw.mult lab.tau V.RR _ _ (fun τ i => a (τ, i)) ha.inj surj ?_
-    (fun o => RF.rd Y (pairOfLab ha hg) Hy o) F (fun o g s q => (F o).en_ty g s q) hF ?_ ?_ ?_ L
-    (fun o => hL o (Finset.mem_univ o)) pl hpl
+theorem blkMemSt_pair
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (lv : Level H)
+        (Xo : Moduli Dw lv) (c : Coeff lv) [StarRing (𝓞 E)],
+      (∀ x : 𝓞 E, star x = H.bar x)
+        → ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C3 : IntChart T io y) (C : Type)
+            [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C),
+          EmbOK T V ι
+            → ∀ (k : ℕ) (Y : FBChart C V (𝓞 E) (chD C3.ch)),
+              IsBC C3 ι k Y
+                → ∀ (Orb : Type) [Fintype Orb] (d : ℕ) [NeZero d] (lab : Lab E Orb d)
+                    (ha : LabArith V io ι lab) (hg : LabGeo C3 ι Y lab),
+                  Function.Surjective (fun x : Orb × Fin 2 × ZMod d => lab.tau x.1 x.2.1 x.2.2)
+                    → lab.RankOK Dw → lab.j' < lab.n
+                    → ∀ (Hy : ∀ o, (Y.raw (pairOfLab ha hg o)).Hyps V)
+                        (F : ∀ o, RF.Flag (RF.rd Y (pairOfLab ha hg) Hy o)),
+                      (∀ o g s q, (((F o).en g s q).2 : ℕ) = q)
+                        → ∀ (a : (E →+* ℂ) × ℕ → ℕ),
+                          DomW Dw a
+                            → ∀ n : ℕ,
+                              RF.BlockMembershipChart Y (pairOfLab ha hg) Hy
+                                (chartLetterSystem C3 V ι a) n F Finset.univ
+                                (fun o g s =>
+                                  gap (Dw.mult (lab.tau o g s)) fun i => a (lab.tau o g s, i)) := by
+  intro E _ _ _ H Dw lv Xo c _ _ T io y C3 C _ _ V ι _ k Y _ Orb _ d _ lab ha hg surj hrk hj Hy F hF
+    a hdom n L _ hL pl hpl
+  refine ⟨
+    _,
+    ?_,
+    isImgO Dw.mult lab.tau ha.inj
+      (fun o => Y.raw (pairOfLab ha hg o))
+      (fun w i => ι (chartUnitVectors C3 w i))
+      (fun w => rfl)
+      _
+  ⟩
+  refine prod_mem Dw.mult lab.tau V.RR _ _
+    (fun τ i => a (τ, i))
+    ha.inj surj ?_
+    (fun o => RF.rd Y (pairOfLab ha hg) Hy o)
+    F
+    (fun o g s q => (F o).en_ty g s q)
+    hF ?_ ?_ ?_ L
+    (fun o => hL o (Finset.mem_univ o))
+    pl hpl
   · intro o g s
     fin_cases g
     · exact (ha.conj o s).symm
@@ -381,8 +482,12 @@ theorem blkMemSt_pair : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (
       rw [ha.conj]
       exact star_star _
   · intro o g s
-    exact (GlobalTheory.flag_of_numbering C V d (fun _ => ZMod d) (fun g s => Dw.mult (lab.tau o g s))
-      (fun _ => Equiv.refl _) _ (RF.rd Y (pairOfLab ha hg) Hy o) (fun _ _ => rfl)).1 g s
+    exact (GlobalTheory.flag_of_numbering C V d
+      (fun _ => ZMod d)
+      (fun g s => Dw.mult (lab.tau o g s))
+      (fun _ => Equiv.refl _)
+      _ (RF.rd Y (pairOfLab ha hg) Hy o)
+      (fun _ _ => rfl)).1 g s
   · intro o g s
     show _ < lab.n ∨ _ < lab.n
     by_cases hb : lab.big o g s

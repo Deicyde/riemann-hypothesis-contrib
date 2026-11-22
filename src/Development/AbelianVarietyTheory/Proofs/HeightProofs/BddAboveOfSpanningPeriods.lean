@@ -6,20 +6,22 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem bddAbove_of_spanning_periods (R : Type) [NormedAddCommGroup R] [NormedSpace ℝ R]
-    [FiniteDimensional ℝ R] (g : R → ℝ) (hg : Continuous g) (S : Set R)
-    (hS : Submodule.span ℝ S = ⊤)
-    (hper : ∀ s ∈ S, ∃ N : ℕ, 0 < N ∧ ∀ x, g (x + (N : ℝ) • s) = g x) :
-    ∃ C : ℝ, ∀ x, g x ≤ C := by
+theorem bddAbove_of_spanning_periods
+    (R : Type) [NormedAddCommGroup R] [NormedSpace ℝ R] [FiniteDimensional ℝ R]
+    (g : R → ℝ) (hg : Continuous g)
+    (S : Set R)
+    (hS : Submodule.span ℝ S = ⊤) (hper : ∀ s ∈ S, ∃ N : ℕ, 0 < N ∧ ∀ x, g (x + (N : ℝ) • s) = g x)
+    : ∃ C : ℝ, ∀ x, g x ≤ C := by
   classical
-  let P : AddSubgroup R :=
-    { carrier := {p | ∀ x, g (x + p) = g x}
-      zero_mem' := fun x => by simp
-      add_mem' := fun {a b} ha hb x => by
-        rw [← add_assoc, hb, ha]
-      neg_mem' := fun {a} ha x => by
-        have := ha (x + -a)
-        rw [← this]; simp }
+  let P : AddSubgroup R := {
+    carrier := {p | ∀ x, g (x + p) = g x}
+    zero_mem' := fun x => by simp
+    add_mem' := fun {a b} ha hb x => by rw [← add_assoc, hb, ha]
+    neg_mem' := fun {a} ha x => by
+      have := ha (x + -a)
+      rw [← this]
+      simp
+  }
   have hP : Submodule.span ℝ (P : Set R) = ⊤ := by
     rw [eq_top_iff, ← hS, Submodule.span_le]
     intro s hs
@@ -31,8 +33,7 @@ theorem bddAbove_of_spanning_periods (R : Type) [NormedAddCommGroup R] [NormedSp
   obtain ⟨t, htP, hspan, hli⟩ := exists_linearIndependent ℝ (P : Set R)
   have hfin : Finite t := hli.finite
   letI : Fintype t := Fintype.ofFinite t
-  let b : Module.Basis t ℝ R := Module.Basis.mk hli (by
-    rw [Subtype.range_coe, hspan, hP])
+  let b : Module.Basis t ℝ R := Module.Basis.mk hli (by rw [Subtype.range_coe, hspan, hP])
   have hb : Submodule.span ℤ (Set.range b) ≤ AddSubgroup.toIntSubmodule P := by
     rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩
@@ -45,7 +46,8 @@ theorem bddAbove_of_spanning_periods (R : Type) [NormedAddCommGroup R] [NormedSp
   have hfl : ((ZSpan.floor b x : R)) ∈ P := hb (ZSpan.floor b x).2
   have hx : g x = g (ZSpan.fract b x) := by
     have := hfl (ZSpan.fract b x)
-    rw [← this, ZSpan.fract_apply]; simp
+    rw [← this, ZSpan.fract_apply]
+    simp
   rw [hx]
   apply hC
   exact ⟨_, by simpa using ZSpan.norm_fract_le b x, rfl⟩

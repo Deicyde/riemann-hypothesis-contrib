@@ -9,10 +9,13 @@ open Formalism.BasicNotions
 
 namespace Formalism.L2
 
-theorem linkEtaTw_of_plain {eps : ℝ} (Fm : Formalism.MainNotions.FamP eps) (hP : HeckeStdPlain)
-    (h : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ (M : MtFam (Fm.D x i)) (T : NormalizedLocalCompatibility (Fm.D x i) M),
-      HeckeTied (Fm.D x i) M ∧ SplitEx (Fm.D x i)) :
-    LocsCoverTwF Fm := by
+theorem linkEtaTw_of_plain
+    {eps : ℝ} (Fm : Formalism.MainNotions.FamP eps)
+    (hP : HeckeStdPlain)
+    (h : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x,
+      ∃ (M : MtFam (Fm.D x i)) (T : NormalizedLocalCompatibility (Fm.D x i) M),
+        HeckeTied (Fm.D x i) M ∧ SplitEx (Fm.D x i))
+    : LocsCoverTwF Fm := by
   obtain ⟨x0, hx⟩ := h
   refine locsCoverTwF_of Fm ⟨x0, fun x hx' i => ?_⟩
   rcases hx x hx' i with ⟨M, T, HT, hex⟩

@@ -13,20 +13,24 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.T2
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Formalism.MainNotions.N
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Polynomial Formalism.MainNotions.N
 
 namespace SumRepresentations
 
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N)
 
 def StrongMultiplicityOneCuspidalSums : Prop :=
-  (∀ Pa Pa' : List (Part A.CG), (∀ p ∈ Pa, 1 ≤ p.a ∧ p.d = 1) → (∀ p ∈ Pa', 1 ≤ p.a ∧ p.d = 1) →
-    (∀ᶠ w in Filter.cofinite, isoLoc N A Pa w = isoLoc N A Pa' w) → Pa.Perm Pa')
+  (∀ Pa Pa' : List (Part A.CG),
+    (∀ p ∈ Pa, 1 ≤ p.a ∧ p.d = 1) → (∀ p ∈ Pa', 1 ≤ p.a ∧ p.d = 1)
+      → (∀ᶠ w in Filter.cofinite, isoLoc N A Pa w = isoLoc N A Pa' w)
+      → Pa.Perm Pa')
 
 def IsobaricMultiplicityOne : Prop :=
-  (∀ Pa Pa' : List (Part A.CG), (∀ p ∈ Pa, 1 ≤ p.a ∧ 1 ≤ p.d ∧ A.csd p.π) →
-    (∀ p ∈ Pa', 1 ≤ p.a ∧ 1 ≤ p.d ∧ A.csd p.π) →
-    (∀ᶠ w in Filter.cofinite, isoLoc N A Pa w = isoLoc N A Pa' w) → Pa.Perm Pa')
+  (∀ Pa Pa' : List (Part A.CG),
+    (∀ p ∈ Pa, 1 ≤ p.a ∧ 1 ≤ p.d ∧ A.csd p.π) → (∀ p ∈ Pa', 1 ≤ p.a ∧ 1 ≤ p.d ∧ A.csd p.π)
+      → (∀ᶠ w in Filter.cofinite, isoLoc N A Pa w = isoLoc N A Pa' w)
+      → Pa.Perm Pa')
 
 end SumRepresentations
 
@@ -38,8 +42,13 @@ open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibl
 theorem litGoodO : Formalism.MainNotions.N.LitGoodO := by
   intro l _ LL
   haveI : FiniteDimensional ℚ_[l] LL.1 := LL.2
-  refine ⟨⟨inferInstance, inferInstance, inferInstance⟩, LL.2, isModuleTopologyOfFiniteDimensional,
-    inferInstance, ?_⟩
+  refine ⟨
+    ⟨inferInstance, inferInstance, inferInstance⟩,
+    LL.2,
+    isModuleTopologyOfFiniteDimensional,
+    inferInstance,
+    ?_
+  ⟩
   have hr : Set.range (algebraMap (OL LL) LL.1) = ((OL LL).toSubring.toAddSubgroup : Set LL.1) := by
     ext x
     constructor

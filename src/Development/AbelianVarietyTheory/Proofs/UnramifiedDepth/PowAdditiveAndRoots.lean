@@ -21,11 +21,9 @@ def intRing (V : VF C) : Subring C where
   zero_mem' := VF.Ge.zero 0
   neg_mem' := fun ha => VF.Ge.neg ha
 
-theorem mm_add {a b : C} (ha : V.MM a) (hb : V.MM b) : V.MM (a + b) :=
-  V.v.map_lt_add ha hb
+theorem mm_add {a b : C} (ha : V.MM a) (hb : V.MM b) : V.MM (a + b) := V.v.map_lt_add ha hb
 
-theorem mm_zero : V.MM (0 : C) := by
-  unfold VF.MM; rw [V.v.map_zero]; exact WithTop.top_pos
+theorem mm_zero : V.MM (0 : C) := by unfold VF.MM; rw [V.v.map_zero]; exact WithTop.top_pos
 
 theorem mm_of_ge_one {a : C} (ha : V.Ge 1 a) : V.MM a := by
   refine lt_of_lt_of_le ?_ ha
@@ -43,21 +41,19 @@ theorem ge_of_pow {a : C} {n : ℕ} (hn : n ≠ 0) (ha : V.Ge 0 (a ^ n)) : V.Ge 
   by_contra h
   exact absurd ha (not_le.mpr (nsmul_neg (not_le.mp h) hn))
 
-theorem mm_add_pow (e : ℕ) {a b : C} (ha : V.Ge 0 a) (hb : V.Ge 0 b) :
-    V.MM ((a + b) ^ (V.l ^ e) - (a ^ (V.l ^ e) + b ^ (V.l ^ e))) := by
-  obtain ⟨r, hr⟩ := exists_add_pow_prime_pow_eq V.l_prime
-    (⟨a, ha⟩ : intRing V) (⟨b, hb⟩ : intRing V) e
+theorem mm_add_pow (e : ℕ) {a b : C} (ha : V.Ge 0 a) (hb : V.Ge 0 b)
+    : V.MM ((a + b) ^ (V.l ^ e) - (a ^ (V.l ^ e) + b ^ (V.l ^ e))) := by
+  obtain ⟨r, hr⟩ :=
+    exists_add_pow_prime_pow_eq V.l_prime (⟨a, ha⟩ : intRing V) (⟨b, hb⟩ : intRing V) e
   have h := congrArg (Subtype.val) hr
   push_cast at h
   rw [h, add_sub_cancel_left]
   apply mm_of_ge_one
   have hr0 : V.Ge 0 (r : C) := r.2
-  first
-    | simpa using hr0.l_mul
-    | simpa [mul_assoc] using (ha.mul_int (hb.mul_int hr0)).l_mul
+  first | simpa using hr0.l_mul | simpa [mul_assoc] using (ha.mul_int (hb.mul_int hr0)).l_mul
 
-theorem mm_sum_pow (e : ℕ) {ι : Type} (s : Finset ι) (x : ι → C) (hx : ∀ i ∈ s, V.Ge 0 (x i)) :
-    V.MM ((∑ i ∈ s, x i) ^ (V.l ^ e) - ∑ i ∈ s, x i ^ (V.l ^ e)) := by
+theorem mm_sum_pow (e : ℕ) {ι : Type} (s : Finset ι) (x : ι → C) (hx : ∀ i ∈ s, V.Ge 0 (x i))
+    : V.MM ((∑ i ∈ s, x i) ^ (V.l ^ e) - ∑ i ∈ s, x i ^ (V.l ^ e)) := by
   classical
   induction s using Finset.induction_on with
   | empty =>

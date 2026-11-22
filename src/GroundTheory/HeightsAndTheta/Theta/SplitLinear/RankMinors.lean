@@ -17,13 +17,14 @@ universe u
 
 variable {K : Type*} [Field K]
 
-theorem exists_rows_linearIndependent {r : Type u} {c : Type*} [Fintype r] [Fintype c]
-    (P : Matrix r c K) {k : ℕ}
-    (hk : k ≤ P.rank) : ∃ I : Fin k → r, LinearIndependent K (fun p => P (I p)) :=
+theorem exists_rows_linearIndependent
+    {r : Type u} {c : Type*} [Fintype r] [Fintype c] (P : Matrix r c K) {k : ℕ} (hk : k ≤ P.rank)
+    : ∃ I : Fin k → r, LinearIndependent K (fun p => P (I p)) :=
   _root_.UpperTheory.Reformulated.B.Qm10.exists_rows_linearIndependent P hk
 
-theorem exists_minor_ne_zero {r c : Type*} [Fintype r] [Fintype c] (P : Matrix r c K) {k : ℕ}
-    (hk : k ≤ P.rank) : ∃ (I : Fin k → r) (J : Fin k → c), (P.submatrix I J).det ≠ 0 := by
+theorem exists_minor_ne_zero
+    {r c : Type*} [Fintype r] [Fintype c] (P : Matrix r c K) {k : ℕ} (hk : k ≤ P.rank)
+    : ∃ (I : Fin k → r) (J : Fin k → c), (P.submatrix I J).det ≠ 0 := by
   classical
   obtain ⟨I, hI⟩ := exists_rows_linearIndependent P hk
   set N : Matrix (Fin k) c K := P.submatrix I id with hNdef

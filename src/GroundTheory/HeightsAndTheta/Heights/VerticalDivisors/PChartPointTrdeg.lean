@@ -14,8 +14,8 @@ open MvPolynomial
 
 noncomputable section
 
-theorem ChartPointTrdeg.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : AffineChartTrdeg.Statement) :
-    ChartPointTrdeg.Statement := by
+theorem ChartPointTrdeg.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : AffineChartTrdeg.Statement)
+    : ChartPointTrdeg.Statement := by
   intro k L _ _ _ n e Q g hQ hg x j₀ hx hj
   have := hQ.isPrime
   have hdim := h₁ k n (e + 1) Q g hQ hg
@@ -32,8 +32,7 @@ theorem ChartPointTrdeg.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : Affin
     (AlgHom.congr_fun (Ideal.Quotient.liftₐ_comp Q (aeval x) hx) (X m)).trans (aeval_X x m)
   have hπs : π s = x j₀ := hπX j₀
   have hπu : IsUnit (π s) := by rw [hπs]; exact hj.isUnit
-  have hKs : algebraMap R K s ≠ 0 :=
-    (map_ne_zero_iff _ (IsFractionRing.injective R K)).mpr hs
+  have hKs : algebraMap R K s ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective R K)).mpr hs
   let S := Localization.Away s
   let ρ : S →ₐ[k] L := IsLocalization.Away.liftAlgHom s hπu
   let ι : S →ₐ[k] K :=
@@ -44,9 +43,11 @@ theorem ChartPointTrdeg.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : Affin
     show Function.Injective (IsLocalization.Away.lift (g := algebraMap R K) s hKs.isUnit)
     refine (IsLocalization.lift_injective_iff _).mpr fun a b => ?_
     rw [hSinj.eq_iff, (IsFractionRing.injective R K).eq_iff]
-  let y : Fin n → S := fun m => algebraMap R S (Ideal.Quotient.mk Q (X m)) * IsLocalization.Away.invSelf s
-  have hinv : ∀ {B : Type} [Field B] [Algebra k B] (φ : S →ₐ[k] B),
-      φ (IsLocalization.Away.invSelf s) = (φ (algebraMap R S s))⁻¹ := by
+  let y : Fin n → S := fun m =>
+    algebraMap R S (Ideal.Quotient.mk Q (X m)) * IsLocalization.Away.invSelf s
+  have hinv
+      : ∀ {B : Type} [Field B] [Algebra k B] (φ : S →ₐ[k] B),
+        φ (IsLocalization.Away.invSelf s) = (φ (algebraMap R S s))⁻¹ := by
     intro B _ _ φ
     refine eq_inv_of_mul_eq_one_right ?_
     rw [← map_mul, IsLocalization.Away.mul_invSelf, map_one]
@@ -69,8 +70,7 @@ theorem ChartPointTrdeg.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : Affin
   have hTA : Algebra.trdeg k T = Algebra.trdeg k (T.map ι) :=
     (Subalgebra.equivMapOfInjective T ι hι).trdeg_eq
   have hBT : Algebra.trdeg k (T.map ρ) ≤ Algebra.trdeg k T := by
-    refine trdeg_le_of_surjective ((ρ.comp T.val).codRestrict (T.map ρ)
-      (fun t => ⟨t, t.2, rfl⟩)) ?_
+    refine trdeg_le_of_surjective ((ρ.comp T.val).codRestrict (T.map ρ) (fun t => ⟨t, t.2, rfl⟩)) ?_
     rintro ⟨b, t, ht, rfl⟩
     exact ⟨⟨t, ht⟩, rfl⟩
   rw [← hB]

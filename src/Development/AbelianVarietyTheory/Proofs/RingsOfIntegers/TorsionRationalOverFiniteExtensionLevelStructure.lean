@@ -10,8 +10,11 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie
 open ReciprocityTheory.ChartRestriction.G.TB (dAct dLin)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -21,24 +24,28 @@ namespace GlobalTheory
 
 namespace TorsionRat
 
-theorem sp_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C) :
-    spMap g ≫ spMap f = spMap (g.comp f) :=
+theorem sp_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap g ≫ spMap f = spMap (g.comp f) :=
   (Spec.map_comp (CommRingCat.ofHom f) (CommRingCat.ofHom g)).symm
 
 theorem sp_epi {K L : Type} [Field K] [Field L] (i : K →+* L) : Epi (spMap i) := by
   have : Flat (spMap i) := by
     letI := i.toAlgebra
     exact HasRingHomProperty.Spec_iff.2 (inferInstance : Module.Flat K L)
-  have : Surjective (spMap i) := ⟨fun x => ⟨(⊥ : PrimeSpectrum L), Subsingleton.elim (α := PrimeSpectrum K) _ _⟩⟩
+  have : Surjective (spMap i) :=
+    ⟨fun x => ⟨(⊥ : PrimeSpectrum L), Subsingleton.elim (α := PrimeSpectrum K) _ _⟩⟩
   exact Flat.epi_of_flat_of_surjective _
 
-theorem exists_finset_of_field {K F : Type} [Field K] [Field F] [Algebra K F] {Y : Scheme.{0}} (s : Y ⟶ Sp K)
-    [LocallyOfFiniteType s] (p : Sp F ⟶ Y) (hp : p ≫ s = spMap (algebraMap K F)) :
-    ∃ S : Finset F, ∀ L : IntermediateField K F, (S : Set F) ⊆ L →
-      ∃ q : Sp L ⟶ Y, spMap (algebraMap L F) ≫ q = p := by
+theorem exists_finset_of_field
+    {K F : Type} [Field K] [Field F] [Algebra K F]
+    {Y : Scheme.{0}} (s : Y ⟶ Sp K) [LocallyOfFiniteType s]
+    (p : Sp F ⟶ Y) (hp : p ≫ s = spMap (algebraMap K F))
+    : ∃ S : Finset F, ∀ L : IntermediateField K F,
+      (S : Set F) ⊆ L → ∃ q : Sp L ⟶ Y, spMap (algebraMap L F) ≫ q = p := by
   classical
-  obtain ⟨_, ⟨U, hU, rfl⟩, hpt, -⟩ := Y.isBasis_affineOpens.exists_subset_of_mem_open
-    (Set.mem_univ (p (IsLocalRing.closedPoint F))) isOpen_univ
+  obtain ⟨_, ⟨U, hU, rfl⟩, hpt, -⟩ :=
+    Y.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (p (IsLocalRing.closedPoint F)))
+      isOpen_univ
   have hU : IsAffineOpen U := hU
   obtain ⟨f, hf⟩ : ∃ f : Γ(Y, U) ⟶ CommRingCat.of F, Spec.map f ≫ hU.fromSpec = p := by
     refine ⟨Spec.preimage (IsOpenImmersion.lift hU.fromSpec p ?_), ?_⟩
@@ -72,12 +79,17 @@ theorem exists_finset_of_field {K F : Type} [Field K] [Field F] [Algebra K F] {Y
   rw [← hf, ← Spec.map_comp_assoc]
   rfl
 
-theorem exists_finset_over {K F : Type} [Field K] [Field F] [Algebra K F] {X : Scheme.{0}} (G : Over X)
-    [LocallyOfFiniteType G.hom] (x : Sp K ⟶ X) (p : Over.mk (spMap (algebraMap K F) ≫ x) ⟶ G) :
-    ∃ S : Finset F, ∀ L : IntermediateField K F, (S : Set F) ⊆ L →
-      ∃ q : Over.mk (spMap (algebraMap K L) ≫ x) ⟶ G, spMap (algebraMap L F) ≫ q.left = p.left := by
-  obtain ⟨S, hS⟩ := exists_finset_of_field (pullback.snd G.hom x)
-    (pullback.lift p.left (spMap (algebraMap K F)) (Over.w p)) (pullback.lift_snd _ _ _)
+theorem exists_finset_over
+    {K F : Type} [Field K] [Field F] [Algebra K F]
+    {X : Scheme.{0}} (G : Over X) [LocallyOfFiniteType G.hom]
+    (x : Sp K ⟶ X) (p : Over.mk (spMap (algebraMap K F) ≫ x) ⟶ G)
+    : ∃ S : Finset F, ∀ L : IntermediateField K F,
+      (S : Set F) ⊆ L
+        → ∃ q : Over.mk (spMap (algebraMap K L) ≫ x) ⟶ G,
+          spMap (algebraMap L F) ≫ q.left = p.left := by
+  obtain ⟨S, hS⟩ :=
+    exists_finset_of_field (pullback.snd G.hom x)
+      (pullback.lift p.left (spMap (algebraMap K F)) (Over.w p)) (pullback.lift_snd _ _ _)
   refine ⟨S, fun L hL => ?_⟩
   obtain ⟨q, hq⟩ := hS L hL
   have h1 : spMap (algebraMap L F) ≫ q ≫ pullback.fst G.hom x = p.left := by
@@ -85,32 +97,38 @@ theorem exists_finset_over {K F : Type} [Field K] [Field F] [Algebra K F] {X : S
   refine ⟨Over.homMk (q ≫ pullback.fst G.hom x) ?_, h1⟩
   haveI := sp_epi (algebraMap L F)
   rw [← cancel_epi (spMap (algebraMap L F))]
-  change spMap (algebraMap L F) ≫ (q ≫ pullback.fst G.hom x) ≫ G.hom =
-    spMap (algebraMap L F) ≫ spMap (algebraMap K L) ≫ x
+  change spMap (algebraMap L F) ≫ (q ≫ pullback.fst G.hom x) ≫ G.hom
+    = spMap (algebraMap L F) ≫ spMap (algebraMap K L) ≫ x
   rw [← Category.assoc, h1, ← Category.assoc, sp_comp]
   exact Over.w p
 
-theorem comp_injective {X : Scheme.{0}} {G : Over X} {K L : Type} [Field K] [Field L] {x : Sp K ⟶ X} {y : Sp L ⟶ X}
-    (ψ : K →+* L) (g : Over.mk y ⟶ Over.mk x) (hg : g.left = spMap ψ) {a b : Over.mk x ⟶ G}
-    (h : g ≫ a = g ≫ b) : a = b := by
+theorem comp_injective
+    {X : Scheme.{0}} {G : Over X} {K L : Type} [Field K] [Field L]
+    {x : Sp K ⟶ X} {y : Sp L ⟶ X}
+    (ψ : K →+* L) (g : Over.mk y ⟶ Over.mk x) (hg : g.left = spMap ψ)
+    {a b : Over.mk x ⟶ G} (h : g ≫ a = g ≫ b)
+    : a = b := by
   haveI := sp_epi ψ
   have h' : spMap ψ ≫ a.left = spMap ψ ≫ b.left := hg ▸ congrArg CommaMorphism.left h
   exact Over.OverMorphism.ext ((cancel_epi _).1 h')
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
-theorem exists_level_of_isAlgClosed (Xo : Moduli Dw l) {K : Type} [Field K] [IsAlgClosed K] (x : Sp K ⟶ Xo.X)
-    {M : ℕ} (hM : 0 < M) :
-    ∃ ev : Dw.La → (ptO Xo x ⟶ Xo.univ.t.G), (∀ a b, ev (a + b) = ev a * ev b) ∧
-      (∀ (o : 𝓞 E) a, ev (o • a) = ev a ≫ Xo.univ.t.act.act o) ∧ (∀ a, ev a = 1 ↔ Dw.ModN M a) ∧
-      ∀ w : ptO Xo x ⟶ Xo.univ.t.G, w ^ M = 1 ↔ ∃ a, ev a = w := by
+theorem exists_level_of_isAlgClosed
+    (Xo : Moduli Dw l) {K : Type} [Field K] [IsAlgClosed K] (x : Sp K ⟶ Xo.X) {M : ℕ} (hM : 0 < M)
+    : ∃ ev : Dw.La → (ptO Xo x ⟶ Xo.univ.t.G),
+      (∀ a b, ev (a + b) = ev a * ev b) ∧ (∀ (o : 𝓞 E) a, ev (o • a) = ev a ≫ Xo.univ.t.act.act o)
+        ∧ (∀ a, ev a = 1 ↔ Dw.ModN M a)
+        ∧ ∀ w : ptO Xo x ⟶ Xo.univ.t.G, w ^ M = 1 ↔ ∃ a, ev a = w := by
   obtain ⟨β, hβ⟩ := Spec.map_surjective (x ≫ Xo.s)
   obtain ⟨-, I, -⟩ := Xo.univ.geom K x β.hom hβ.symm
   exact ⟨I.ev M, I.add M, I.lin M, I.ker M hM, I.onto M hM⟩
 
-theorem exists_enum (Xo : Moduli Dw l) {M : ℕ} (hM : 0 < M) :
-    ∃ (J : Type) (_ : Finite J), ∀ (K : Type) [Field K] [IsAlgClosed K] (x : Sp K ⟶ Xo.X),
-      ∃ u : J → (ptO Xo x ⟶ Xo.univ.t.G), Function.Injective u ∧ ∀ w, w ^ M = 1 ↔ ∃ j, u j = w := by
+theorem exists_enum (Xo : Moduli Dw l) {M : ℕ} (hM : 0 < M)
+    : ∃ (J : Type) (_ : Finite J), ∀ (K : Type) [Field K] [IsAlgClosed K] (x : Sp K ⟶ Xo.X),
+      ∃ u : J → (ptO Xo x ⟶ Xo.univ.t.G),
+        Function.Injective u ∧ ∀ w, w ^ M = 1 ↔ ∃ j, u j = w := by
   obtain ⟨J, _, π, r, hr, hπ⟩ := LevelFlat.exists_finite_quotient Dw M hM
   refine ⟨J, inferInstance, fun K _ _ x => ?_⟩
   obtain ⟨ev, hadd, -, hker, honto⟩ := exists_level_of_isAlgClosed Xo x hM
@@ -125,10 +143,14 @@ theorem exists_enum (Xo : Moduli Dw l) {M : ℕ} (hM : 0 < M) :
   · rintro ⟨j, rfl⟩
     exact ⟨_, rfl⟩
 
-theorem exists_eq_comp_of_isAlgClosed (Xo : Moduli Dw l) {M : ℕ} (hM : 0 < M) {K L : Type} [Field K] [Field L]
-    [IsAlgClosed K] [IsAlgClosed L] {x : Sp K ⟶ Xo.X} {y : Sp L ⟶ Xo.X} (ψ : K →+* L) (g : ptO Xo y ⟶ ptO Xo x)
-    (hg : g.left = spMap ψ) (w : ptO Xo y ⟶ Xo.univ.t.G) (hw : w ^ M = 1) :
-    ∃ a : ptO Xo x ⟶ Xo.univ.t.G, a ^ M = 1 ∧ g ≫ a = w := by
+theorem exists_eq_comp_of_isAlgClosed
+    (Xo : Moduli Dw l)
+    {M : ℕ} (hM : 0 < M)
+    {K L : Type} [Field K] [Field L] [IsAlgClosed K] [IsAlgClosed L]
+    {x : Sp K ⟶ Xo.X} {y : Sp L ⟶ Xo.X}
+    (ψ : K →+* L) (g : ptO Xo y ⟶ ptO Xo x) (hg : g.left = spMap ψ)
+    (w : ptO Xo y ⟶ Xo.univ.t.G) (hw : w ^ M = 1)
+    : ∃ a : ptO Xo x ⟶ Xo.univ.t.G, a ^ M = 1 ∧ g ≫ a = w := by
   obtain ⟨J, _, hJ⟩ := exists_enum Xo hM
   obtain ⟨u, hu, hu'⟩ := hJ K x
   obtain ⟨v, -, hv'⟩ := hJ L y
@@ -140,27 +162,31 @@ theorem exists_eq_comp_of_isAlgClosed (Xo : Moduli Dw l) {M : ℕ} (hM : 0 < M) 
   obtain ⟨i, rfl⟩ := Finite.surjective_of_injective hτi j
   exact ⟨u i, hp i, (hτ i).symm⟩
 
-theorem allRat_of_isAlgClosure (Xo : Moduli Dw l) {M : ℕ} (hM : 0 < M) {L F : Type} [Field L] [Field F] [Algebra L F]
-    [IsAlgClosed F] [Algebra.IsAlgebraic L F] (x : Sp L ⟶ Xo.X) (y : Sp F ⟶ Xo.X)
-    (hy : spMap (algebraMap L F) ≫ x = y)
-    (h : ∀ w : ptO Xo y ⟶ Xo.univ.t.G, w ^ M = 1 →
-      ∃ a : ptO Xo x ⟶ Xo.univ.t.G, spMap (algebraMap L F) ≫ a.left = w.left) : AllRat Xo x M := by
+theorem allRat_of_isAlgClosure
+    (Xo : Moduli Dw l)
+    {M : ℕ} (hM : 0 < M)
+    {L F : Type} [Field L] [Field F] [Algebra L F] [IsAlgClosed F] [Algebra.IsAlgebraic L F]
+    (x : Sp L ⟶ Xo.X) (y : Sp F ⟶ Xo.X) (hy : spMap (algebraMap L F) ≫ x = y)
+    (h : ∀ w : ptO Xo y ⟶ Xo.univ.t.G,
+      w ^ M = 1 → ∃ a : ptO Xo x ⟶ Xo.univ.t.G, spMap (algebraMap L F) ≫ a.left = w.left)
+    : AllRat Xo x M := by
   intro Ω _ ψ w hw
   let Ω' := AlgebraicClosure Ω
   let i : Ω →+* Ω' := algebraMap Ω Ω'
   letI : Algebra L Ω' := (i.comp ψ).toAlgebra
   let σ : F →ₐ[L] Ω' := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hσ : (σ : F →+* Ω').comp (algebraMap L F) = i.comp ψ := σ.comp_algebraMap
   let g₁ : ptO Xo (spMap i ≫ spMap ψ ≫ x) ⟶ ptO Xo (spMap ψ ≫ x) := Over.homMk (spMap i) rfl
-  let g₂ : ptO Xo (spMap i ≫ spMap ψ ≫ x) ⟶ ptO Xo y := Over.homMk (spMap (σ : F →+* Ω')) (by
-    change spMap (σ : F →+* Ω') ≫ y = spMap i ≫ spMap ψ ≫ x
-    rw [← hy, ← Category.assoc, ← Category.assoc, sp_comp, sp_comp, hσ])
-  obtain ⟨b, hb, hb'⟩ := exists_eq_comp_of_isAlgClosed Xo hM (σ : F →+* Ω') g₂ rfl (g₁ ≫ w)
-    (by rw [← MonObj.comp_pow, hw, MonObj.comp_one])
+  let g₂ : ptO Xo (spMap i ≫ spMap ψ ≫ x) ⟶ ptO Xo y :=
+    Over.homMk (spMap (σ : F →+* Ω')) (by
+      change spMap (σ : F →+* Ω') ≫ y = spMap i ≫ spMap ψ ≫ x
+      rw [← hy, ← Category.assoc, ← Category.assoc, sp_comp, sp_comp, hσ])
+  obtain ⟨b, hb, hb'⟩ :=
+    exists_eq_comp_of_isAlgClosed Xo hM (σ : F →+* Ω') g₂ rfl (g₁ ≫ w)
+      (by rw [← MonObj.comp_pow, hw, MonObj.comp_one])
   obtain ⟨a, ha⟩ := h b hb
   refine ⟨a, ?_⟩
   haveI := sp_epi i
@@ -168,9 +194,10 @@ theorem allRat_of_isAlgClosure (Xo : Moduli Dw l) {M : ℕ} (hM : 0 < M) {L F : 
   refine (cancel_epi (spMap i)).1 (h1.symm.trans ?_)
   rw [← ha, ← Category.assoc, ← Category.assoc, sp_comp, sp_comp, hσ]
 
-theorem exists_finite_allRat (Xo : Moduli Dw l) {K : Type} [Field K] (x : Sp K ⟶ Xo.X) {M : ℕ} (hM : 0 < M) :
-    ∃ (L : Type) (_ : Field L) (_ : Algebra K L), FiniteDimensional K L ∧
-      AllRat Xo (spMap (algebraMap K L) ≫ x) M := by
+theorem exists_finite_allRat
+    (Xo : Moduli Dw l) {K : Type} [Field K] (x : Sp K ⟶ Xo.X) {M : ℕ} (hM : 0 < M)
+    : ∃ (L : Type) (_ : Field L) (_ : Algebra K L),
+      FiniteDimensional K L ∧ AllRat Xo (spMap (algebraMap K L) ≫ x) M := by
   let F := AlgebraicClosure K
   haveI := Xo.univ.proper
   obtain ⟨J, _, hJ⟩ := exists_enum Xo hM
@@ -179,18 +206,33 @@ theorem exists_finite_allRat (Xo : Moduli Dw l) {K : Type} [Field K] (x : Sp K �
   let s : Set F := ⋃ j, (S j : Set F)
   haveI : Finite s := (Set.finite_iUnion fun j => (S j).finite_toSet).to_subtype
   let L := IntermediateField.adjoin K s
-  refine ⟨L, inferInstance, inferInstance,
-    IntermediateField.finiteDimensional_adjoin fun x _ => (Algebra.IsAlgebraic.isAlgebraic x).isIntegral, ?_⟩
+  refine ⟨
+    L,
+    inferInstance,
+    inferInstance,
+    IntermediateField.finiteDimensional_adjoin fun x _ =>
+      (Algebra.IsAlgebraic.isAlgebraic x).isIntegral,
+    ?_
+  ⟩
   refine allRat_of_isAlgClosure Xo hM (F := F) _ (spMap (algebraMap K F) ≫ x) ?_ fun w hw => ?_
   · rw [← Category.assoc, sp_comp]
     rfl
   · obtain ⟨j, rfl⟩ := (hu w).1 hw
-    exact hS j L ((Set.subset_iUnion (fun j => (S j : Set F)) j).trans (IntermediateField.subset_adjoin _ _))
+    exact hS j L
+      ((Set.subset_iUnion (fun j => (S j : Set F)) j).trans (IntermediateField.subset_adjoin _ _))
 
-theorem allRat_baseChange (Xo : Moduli Dw l) {K : Type} [Field K] {x : Sp K ⟶ Xo.X} {M : ℕ} (h : AllRat Xo x M)
-    (L : Type) [Field L] (ψ : K →+* L) : AllRat Xo (spMap ψ ≫ x) M := by
-  have key : ∀ (Ω : Type) [Field Ω] (ψ : K →+* Ω) (y : Sp Ω ⟶ Xo.X), y = spMap ψ ≫ x →
-      ∀ w : ptO Xo y ⟶ Xo.univ.t.G, w ^ M = 1 → ∃ a : ptO Xo x ⟶ Xo.univ.t.G, w.left = spMap ψ ≫ a.left := by
+theorem allRat_baseChange
+    (Xo : Moduli Dw l)
+    {K : Type} [Field K]
+    {x : Sp K ⟶ Xo.X} {M : ℕ} (h : AllRat Xo x M)
+    (L : Type) [Field L]
+    (ψ : K →+* L)
+    : AllRat Xo (spMap ψ ≫ x) M := by
+  have key
+      : ∀ (Ω : Type) [Field Ω] (ψ : K →+* Ω) (y : Sp Ω ⟶ Xo.X),
+        y = spMap ψ ≫ x
+          → ∀ w : ptO Xo y ⟶ Xo.univ.t.G,
+            w ^ M = 1 → ∃ a : ptO Xo x ⟶ Xo.univ.t.G, w.left = spMap ψ ≫ a.left := by
     intro Ω _ ψ y hy
     subst hy
     exact h Ω ψ
@@ -202,15 +244,19 @@ theorem allRat_baseChange (Xo : Moduli Dw l) {K : Type} [Field K] {x : Sp K ⟶ 
   exact (congrArg (· ≫ a.left) (sp_comp ψ χ).symm).trans
     ((Category.assoc _ _ _).trans (congrArg (spMap χ ≫ ·) h1.symm))
 
-theorem exists_level_of_allRat (Xo : Moduli Dw l) {K : Type} [Field K] {x : Sp K ⟶ Xo.X} {M : ℕ} (hM : 0 < M)
-    (h : AllRat Xo x M) :
-    ∃ ev : Dw.La → (ptO Xo x ⟶ Xo.univ.t.G), (∀ a b, ev (a + b) = ev a * ev b) ∧
-      (∀ (o : 𝓞 E) a, ev (o • a) = ev a ≫ Xo.univ.t.act.act o) ∧ (∀ a, ev a = 1 ↔ Dw.ModN M a) ∧
-      ∀ w : ptO Xo x ⟶ Xo.univ.t.G, w ^ M = 1 → ∃ a, ev a = w := by
+theorem exists_level_of_allRat
+    (Xo : Moduli Dw l)
+    {K : Type} [Field K]
+    {x : Sp K ⟶ Xo.X} {M : ℕ} (hM : 0 < M) (h : AllRat Xo x M)
+    : ∃ ev : Dw.La → (ptO Xo x ⟶ Xo.univ.t.G),
+      (∀ a b, ev (a + b) = ev a * ev b) ∧ (∀ (o : 𝓞 E) a, ev (o • a) = ev a ≫ Xo.univ.t.act.act o)
+        ∧ (∀ a, ev a = 1 ↔ Dw.ModN M a)
+        ∧ ∀ w : ptO Xo x ⟶ Xo.univ.t.G, w ^ M = 1 → ∃ a, ev a = w := by
   let F := AlgebraicClosure K
   let ψ : K →+* F := algebraMap K F
   let g : ptO Xo (spMap ψ ≫ x) ⟶ ptO Xo x := Over.homMk (spMap ψ) rfl
-  have inj : ∀ {a b : ptO Xo x ⟶ Xo.univ.t.G}, g ≫ a = g ≫ b → a = b := fun h => comp_injective ψ g rfl h
+  have inj : ∀ {a b : ptO Xo x ⟶ Xo.univ.t.G}, g ≫ a = g ≫ b → a = b := fun h =>
+    comp_injective ψ g rfl h
   obtain ⟨ev, hadd, hlin, hker, honto⟩ := exists_level_of_isAlgClosed Xo (spMap ψ ≫ x) hM
   choose e he using fun a => h F ψ (ev a) ((honto _).2 ⟨a, rfl⟩)
   have he' : ∀ a, g ≫ e a = ev a := fun a => Over.OverMorphism.ext (he a).symm
@@ -224,11 +270,23 @@ theorem exists_level_of_allRat (Xo : Moduli Dw l) {K : Type} [Field K] {x : Sp K
 
 end TorsionRat
 
-
 open TorsionRat in
-theorem torsion_rational_over_finite_extension :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (K : Type) [Field K] (x : Sp K ⟶ Xo.X) (M : ℕ), 0 < M → (∃ (L : Type) (_ : Field L) (_ : Algebra K L), FiniteDimensional K L ∧ AllRat Xo (spMap (algebraMap K L) ≫ x) M) ∧ (AllRat Xo x M → (∀ (L : Type) [Field L] (ψ : K →+* L), AllRat Xo (spMap ψ ≫ x) M) ∧ ∃ ev : Dw.La → (ptO Xo x ⟶ Xo.univ.t.G), (∀ a b, ev (a + b) = ev a * ev b) ∧ (∀ (o : 𝓞 E) a, ev (o • a) = ev a ≫ Xo.univ.t.act.act o) ∧ (∀ a, ev a = 1 ↔ Dw.ModN M a) ∧ ∀ w : (ptO Xo x ⟶ Xo.univ.t.G), w ^ M = 1 → ∃ a, ev a = w) :=
-  fun _ _ _ _ _ _ _ Xo _ _ x _ hM =>
-    ⟨exists_finite_allRat Xo x hM, fun h => ⟨fun L _ ψ => allRat_baseChange Xo h L ψ, exists_level_of_allRat Xo hM h⟩⟩
+theorem torsion_rational_over_finite_extension
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (K : Type) [Field K] (x : Sp K ⟶ Xo.X) (M : ℕ),
+      0 < M
+        → (∃ (L : Type) (_ : Field L) (_ : Algebra K L),
+            FiniteDimensional K L ∧ AllRat Xo (spMap (algebraMap K L) ≫ x) M)
+          ∧ (AllRat Xo x M
+            → (∀ (L : Type) [Field L] (ψ : K →+* L), AllRat Xo (spMap ψ ≫ x) M)
+              ∧ ∃ ev : Dw.La → (ptO Xo x ⟶ Xo.univ.t.G),
+                (∀ a b, ev (a + b) = ev a * ev b)
+                  ∧ (∀ (o : 𝓞 E) a, ev (o • a) = ev a ≫ Xo.univ.t.act.act o)
+                  ∧ (∀ a, ev a = 1 ↔ Dw.ModN M a)
+                  ∧ ∀ w : (ptO Xo x ⟶ Xo.univ.t.G),
+                    w ^ M = 1 → ∃ a, ev a = w) := fun _ _ _ _ _ _ _ Xo _ _ x _ hM => ⟨
+  exists_finite_allRat Xo x hM,
+  fun h => ⟨fun L _ ψ => allRat_baseChange Xo h L ψ, exists_level_of_allRat Xo hM h⟩
+⟩
 
 end GlobalTheory

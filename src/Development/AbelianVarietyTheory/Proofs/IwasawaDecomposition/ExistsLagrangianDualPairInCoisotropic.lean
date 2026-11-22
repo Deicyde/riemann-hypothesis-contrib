@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanP
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+  GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -15,12 +18,17 @@ namespace GlobalTheory
 
 open Module
 
-theorem exists_lagrangian_dual_in_coisotropic : ∀ (r : ℕ) (M : Matrix (Fin r) (Fin r) ℝ) (W : Submodule ℝ (Fin r → ℝ)), Mᵀ = -M → M.det ≠ 0 → (∀ v : Fin r → ℝ, (∀ w ∈ W, v ⬝ᵥ M *ᵥ w = 0) → v ∈ W) → ∃ (d : ℕ) (e f : Fin d → Fin r → ℝ), (∀ i, e i ∈ W) ∧ (∀ i j, e i ⬝ᵥ M *ᵥ e j = 0) ∧ (∀ i j, f i ⬝ᵥ M *ᵥ e j = if i = j then 1 else 0) ∧ Submodule.span ℝ (Set.range (Sum.elim e f)) = ⊤ := by
+theorem exists_lagrangian_dual_in_coisotropic
+    : ∀ (r : ℕ) (M : Matrix (Fin r) (Fin r) ℝ) (W : Submodule ℝ (Fin r → ℝ)),
+      Mᵀ = -M → M.det ≠ 0 → (∀ v : Fin r → ℝ, (∀ w ∈ W, v ⬝ᵥ M *ᵥ w = 0) → v ∈ W)
+        → ∃ (d : ℕ) (e f : Fin d → Fin r → ℝ),
+          (∀ i, e i ∈ W) ∧ (∀ i j, e i ⬝ᵥ M *ᵥ e j = 0)
+            ∧ (∀ i j, f i ⬝ᵥ M *ᵥ e j = if i = j then 1 else 0)
+            ∧ Submodule.span ℝ (Set.range (Sum.elim e f)) = ⊤ := by
   classical
   intro r M W hskew hdet hW
   set B : LinearMap.BilinForm ℝ (Fin r → ℝ) := Matrix.toBilin' M with hBdef
-  have hB : ∀ v w, B v w = v ⬝ᵥ M *ᵥ w := fun v w => by
-    simp [hBdef, Matrix.toBilin'_apply']
+  have hB : ∀ v w, B v w = v ⬝ᵥ M *ᵥ w := fun v w => by simp [hBdef, Matrix.toBilin'_apply']
   have hskewB : ∀ v w, B v w = - B w v := by
     intro v w
     rw [hB, hB, Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose, hskew, Matrix.neg_mulVec,
@@ -28,15 +36,17 @@ theorem exists_lagrangian_dual_in_coisotropic : ∀ (r : ℕ) (M : Matrix (Fin r
   have hBalt : ∀ v, B v v = 0 := fun v => by have := hskewB v v; linarith
   have hrefl : B.IsRefl := fun x y h => by rw [hskewB, h, neg_zero]
   have hnd : B.Nondegenerate := LinearMap.BilinForm.nondegenerate_toBilin'_of_det_ne_zero' M hdet
-  let P : ℕ → Prop := fun n => ∃ L : Submodule ℝ (Fin r → ℝ), L ≤ W ∧
-    (∀ x ∈ L, ∀ y ∈ L, B x y = 0) ∧ finrank ℝ L = n
+  let P : ℕ → Prop := fun n =>
+    ∃ L : Submodule ℝ (Fin r → ℝ), L ≤ W ∧ (∀ x ∈ L, ∀ y ∈ L, B x y = 0) ∧ finrank ℝ L = n
   have P0 : P 0 := ⟨⊥, bot_le, by simp, finrank_bot ℝ _⟩
-  obtain ⟨L, hLW, hLiso, hLdim⟩ : P (Nat.findGreatest P r) := Nat.findGreatest_spec (Nat.zero_le _) P0
+  obtain ⟨L, hLW, hLiso, hLdim⟩ : P (Nat.findGreatest P r) :=
+    Nat.findGreatest_spec (Nat.zero_le _) P0
   have hmax : ∀ v ∈ W, (∀ l ∈ L, B v l = 0) → v ∈ L := by
     intro v hvW hvL
     by_contra hv
-    have hlt : L < L ⊔ Submodule.span ℝ {v} := lt_of_le_of_ne le_sup_left (fun h => hv (by
-      rw [h]; exact Submodule.mem_sup_right (Submodule.mem_span_singleton_self v)))
+    have hlt : L < L ⊔ Submodule.span ℝ {v} :=
+      lt_of_le_of_ne le_sup_left (fun h =>
+        hv (by rw [h]; exact Submodule.mem_sup_right (Submodule.mem_span_singleton_self v)))
     have hiso : ∀ x ∈ L ⊔ Submodule.span ℝ {v}, ∀ y ∈ L ⊔ Submodule.span ℝ {v}, B x y = 0 := by
       intro x hx y hy
       obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hx
@@ -51,7 +61,8 @@ theorem exists_lagrangian_dual_in_coisotropic : ∀ (r : ℕ) (M : Matrix (Fin r
     have hle : L ⊔ Submodule.span ℝ {v} ≤ W :=
       sup_le hLW (by rw [Submodule.span_le]; simpa using hvW)
     have hP : P (finrank ℝ ↥(L ⊔ Submodule.span ℝ {v})) := ⟨_, hle, hiso, rfl⟩
-    have h5 := Nat.le_findGreatest (by simpa using Submodule.finrank_le (L ⊔ Submodule.span ℝ {v})) hP
+    have h5 :=
+      Nat.le_findGreatest (by simpa using Submodule.finrank_le (L ⊔ Submodule.span ℝ {v})) hP
     have h6 := Submodule.finrank_lt_finrank_of_lt hlt
     omega
   have hWo : B.orthogonal W ≤ L := by
@@ -94,9 +105,15 @@ theorem exists_lagrangian_dual_in_coisotropic : ∀ (r : ℕ) (M : Matrix (Fin r
     rcases eq_or_ne i j with h | h
     · subst h; simp
     · simp [h, Ne.symm h]
-  refine ⟨finrank ℝ L, e, f, fun i => hLW (heL i),
+  refine ⟨
+    finrank ℝ L,
+    e,
+    f,
+    fun i => hLW (heL i),
     fun i j => by rw [← hB]; exact hLiso _ (heL i) _ (heL j),
-    fun i j => by rw [← hB]; exact hfe i j, ?_⟩
+    fun i j => by rw [← hB]; exact hfe i j,
+    ?_
+  ⟩
   set U := Submodule.span ℝ (Set.range (Sum.elim e f)) with hU
   have hUo : B.orthogonal U = ⊥ := by
     rw [Submodule.eq_bot_iff]

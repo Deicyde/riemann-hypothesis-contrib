@@ -9,11 +9,13 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.IteratedFiber
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
 open UpperTheory.Gal.Int.Geo
 
-private theorem relDim_pow {S : Scheme.{0}} (A : Over S) (g : ℕ) (hg : SmoothOfRelativeDimension g A.hom) (k : ℕ) :
-    SmoothOfRelativeDimension (k * g) (GlobalTheory.KS.pow A k).hom := by
+private theorem relDim_pow
+    {S : Scheme.{0}} (A : Over S) (g : ℕ) (hg : SmoothOfRelativeDimension g A.hom) (k : ℕ)
+    : SmoothOfRelativeDimension (k * g) (GlobalTheory.KS.pow A k).hom := by
   induction k with
   | zero =>
     obtain ⟨h0, -⟩ := UpperTheory.iteratedFiberPower_zero_isIso_and_succ_isPullback A
@@ -27,8 +29,7 @@ private theorem relDim_pow {S : Scheme.{0}} (A : Over S) (g : ℕ) (hg : SmoothO
     rw [← hcomp, Nat.succ_mul, Nat.add_comm]
     infer_instance
 
-theorem UpperTheory.power_projector_exists :
-    PowProj := by
+theorem UpperTheory.power_projector_exists : PowProj := by
   intro q _ D R _ _ b N _ _ X s o k
   letI := o.grp
   haveI := o.comm

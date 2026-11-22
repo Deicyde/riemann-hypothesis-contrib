@@ -4,10 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Yra1.main.{u_1} :
-    ∀ {F : Type u_1} [inst : Field F] {r a : ℕ} (M : Matrix (Fin r) (Fin a) F),
-      (∀ (z : Fin a → F), M.mulVec z = (0 : Fin r → F) → z = (0 : Fin a → F)) →
-        ∃ (e : Fin a → Fin r), (M.submatrix e id).det ≠ (0 : F) := by
+theorem UpperTheory.Reformulated.B.Yra1.main.{u_1}
+    : ∀ {F : Type u_1} [inst : Field F] {r a : ℕ} (M : Matrix (Fin r) (Fin a) F),
+      (∀ (z : Fin a → F), M.mulVec z = (0 : Fin r → F) → z = (0 : Fin a → F))
+        → ∃ (e : Fin a → Fin r), (M.submatrix e id).det ≠ (0 : F) := by
   intro F _ r a M hM
   have hinj : Function.Injective M.mulVecLin := by
     rw [← LinearMap.ker_eq_bot, Matrix.ker_mulVecLin_eq_bot_iff]
@@ -23,8 +23,8 @@ theorem UpperTheory.Reformulated.B.Yra1.main.{u_1} :
   refine ⟨f ∘ eqv.symm, ?_⟩
   have hli2 : LinearIndependent F (M.submatrix (f ∘ eqv.symm) id).row := by
     have := hli.comp eqv.symm eqv.symm.injective
-    have h : (M.submatrix (f ∘ eqv.symm) id).row = (M.row ∘ f) ∘ eqv.symm := by
-      ext i j; rfl
-    rw [h]; exact this
+    have h : (M.submatrix (f ∘ eqv.symm) id).row = (M.row ∘ f) ∘ eqv.symm := by ext i j; rfl
+    rw [h]
+    exact this
   have hu := Matrix.linearIndependent_rows_iff_isUnit.mp hli2
   exact ((Matrix.isUnit_iff_isUnit_det _).mp hu).ne_zero

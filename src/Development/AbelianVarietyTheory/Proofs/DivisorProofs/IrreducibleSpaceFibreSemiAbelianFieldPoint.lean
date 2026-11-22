@@ -6,15 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsOpenFarSet
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.SemiAbFibre
 
-theorem irreducibleSpace_fibre : ∀ (T : Scheme.{0}) (G : Over T) [GrpObj G], IsSemiAbelian G → ∀ (Ω : Type) [Field Ω] (x : Sp Ω ⟶ T), IrreducibleSpace (pullback G.hom x : Scheme.{0}) := by
+theorem irreducibleSpace_fibre
+    : ∀ (T : Scheme.{0}) (G : Over T) [GrpObj G],
+      IsSemiAbelian G
+        → ∀ (Ω : Type) [Field Ω] (x : Sp Ω ⟶ T),
+          IrreducibleSpace (pullback G.hom x : Scheme.{0}) := by
   intro T G _ hG Ω _ x
   have := hG.smooth
   have := hG.geomConnected

@@ -6,12 +6,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CMFieldExpo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-theorem UpperTheory.V.HV.bchiFacts :
-    ∀ (h : Host) (t : ℕ), h.Big t → (∀ l ∈ Bchi h.chi, l < h.q1 ∧ l < h.d) ∧ pK h.chi ∈ Bchi h.chi ∧ ¬ pK h.chi ∣ h.N ∧ ¬ pOne h.chi ∣ h.N ∧
-      ∀ l, l.Prime → l ≠ 2 → l ∉ Bchi h.chi → 5 ≤ l ∧ ¬ l ∣ h.o ∧ ¬ l ∣ h.q ∧ l ≠ pK h.chi ∧ ¬ l ∣ hStar h.chi ∧ l ≠ pOne h.chi ∧
-        ¬ l ∣ h.H.index ∧ ∀ e, 0 < e → e < t → l - 1 ∣ 2 * e → 2 ≤ e ∧ l ≤ 2 * t ∧ ¬ l ∣ h.N := by
+theorem UpperTheory.V.HV.bchiFacts
+    : ∀ (h : Host) (t : ℕ),
+      h.Big t
+        → (∀ l ∈ Bchi h.chi, l < h.q1 ∧ l < h.d) ∧ pK h.chi ∈ Bchi h.chi ∧ ¬ pK h.chi ∣ h.N
+          ∧ ¬ pOne h.chi ∣ h.N
+          ∧ ∀ l,
+            l.Prime → l ≠ 2 → l ∉ Bchi h.chi
+              → 5 ≤ l ∧ ¬ l ∣ h.o ∧ ¬ l ∣ h.q ∧ l ≠ pK h.chi ∧ ¬ l ∣ hStar h.chi ∧ l ≠ pOne h.chi
+                ∧ ¬ l ∣ h.H.index
+                ∧ ∀ e, 0 < e → e < t → l - 1 ∣ 2 * e → 2 ≤ e ∧ l ≤ 2 * t ∧ ¬ l ∣ h.N := by
   intro h t hB
   obtain ⟨ht1, ht2, hy⟩ := hB
   obtain ⟨hidx, -, -, ho, -, hNp, -⟩ := hostIndex h
@@ -28,8 +35,10 @@ theorem UpperTheory.V.HV.bchiFacts :
   have hP0 : ordC h.chi * h.chi.N * pK h.chi * hStar h.chi * pOne h.chi ≠ 0 := by
     simp only [ne_eq, mul_eq_zero, not_or]
     exact ⟨⟨⟨⟨ho.ne', hq0⟩, hKp.ne_zero⟩, hS0⟩, hOp.ne_zero⟩
-  have memB : ∀ l, l.Prime → l ≠ 2 → l ∣ ordC h.chi * h.chi.N * pK h.chi * hStar h.chi * pOne h.chi →
-      l ∈ Bchi h.chi := by
+  have memB
+      : ∀ l,
+        l.Prime → l ≠ 2 → l ∣ ordC h.chi * h.chi.N * pK h.chi * hStar h.chi * pOne h.chi
+          → l ∈ Bchi h.chi := by
     intro l hl hl2 hlP
     simp only [Bchi, Finset.mem_insert, Finset.mem_erase, Nat.mem_primeFactors]
     exact Or.inr ⟨hl2, hl, hlP, hP0⟩
@@ -48,7 +57,8 @@ theorem UpperTheory.V.HV.bchiFacts :
     simp only [Bchi, Finset.mem_insert, Finset.mem_erase, Nat.mem_primeFactors] at hl
     rcases hl with rfl | ⟨-, hlp, hlP, -⟩
     · exact ⟨by omega, by omega⟩
-    · have le : ∀ y, y ≠ 0 → l ∣ y → l ≤ y := fun y hy0 hly => Nat.le_of_dvd (Nat.pos_of_ne_zero hy0) hly
+    · have le : ∀ y, y ≠ 0 → l ∣ y → l ≤ y := fun y hy0 hly =>
+        Nat.le_of_dvd (Nat.pos_of_ne_zero hy0) hly
       rcases hlp.dvd_mul.mp hlP with h4 | h5
       · rcases hlp.dvd_mul.mp h4 with h3 | hS
         · rcases hlp.dvd_mul.mp h3 with h2 | hK
@@ -90,7 +100,16 @@ theorem UpperTheory.V.HV.bchiFacts :
       · norm_num at hl
     have nd : ∀ y, y ∣ ordC h.chi * h.chi.N * pK h.chi * hStar h.chi * pOne h.chi → ¬ l ∣ y :=
       fun y hy hly => hlB (memB l hl hl2 (hly.trans hy))
-    refine ⟨h5, nd _ dO, nd _ dq, fun e => nd _ dK (by rw [e]), nd _ dS, fun e => nd _ dO1 (by rw [e]), ?_, ?_⟩
+    refine ⟨
+      h5,
+      nd _ dO,
+      nd _ dq,
+      fun e => nd _ dK (by rw [e]),
+      nd _ dS,
+      fun e => nd _ dO1 (by rw [e]),
+      ?_,
+      ?_
+    ⟩
     · intro hi
       rcases hl.dvd_mul.mp (hi.trans hidx) with h2 | hO
       · exact hl2 ((Nat.prime_dvd_prime_iff_eq hl Nat.prime_two).mp (hl.dvd_of_dvd_pow h2))

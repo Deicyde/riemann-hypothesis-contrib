@@ -11,17 +11,36 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Unitary
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.TypeRec GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.SerSys Formalism.MainNotions.ArithmeticCylinders
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.TypeRec
+  GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.SerSys Formalism.MainNotions.ArithmeticCylinders
 attribute [local instance] GlobalTheory.TypeRec.factG GlobalTheory.LabPin.instCM
 open GlobalTheory.LabPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem GlobalTheory.SlocDich.translate_dichotomy : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (s : SplitPlace L) (τ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (s.w.adicCompletion L))) (i : s.v.adicCompletion (maximalRealSubfield L) ≃+* s.w.adicCompletion L) (T : τ.V →ₗ[ℂ] (GAf L n → ℂ)), Function.Injective T → (∀ x : GAf L n, TrivOutside {s.v} x → ∀ a, T (τ.ρ (Matrix.GeneralLinearGroup.map i.toRingHom (s.loc n x)) a) = NG.rt L n x (T a)) → ∀ y : GAf L n, TrivOutside {s.v}ᶜ y → ∀ P : Submodule ℂ (GAf L n → ℂ), (∀ x : GAf L n, TrivOutside {s.v} x → ∀ f ∈ P, NG.rt L n x f ∈ P) → Disjoint (LinearMap.range ((NG.rt L n y).comp T)) P ∨ LinearMap.range ((NG.rt L n y).comp T) ≤ P := by
+theorem GlobalTheory.SlocDich.translate_dichotomy
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (s : SplitPlace L)
+        (τ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (s.w.adicCompletion L)))
+        (i : s.v.adicCompletion (maximalRealSubfield L) ≃+* s.w.adicCompletion L)
+        (T : τ.V →ₗ[ℂ] (GAf L n → ℂ)),
+      Function.Injective T
+        → (∀ x : GAf L n,
+          TrivOutside {s.v} x
+            → ∀ a,
+              T (τ.ρ (Matrix.GeneralLinearGroup.map i.toRingHom (s.loc n x)) a) = NG.rt L n x (T a))
+        → ∀ y : GAf L n,
+          TrivOutside {s.v}ᶜ y
+            → ∀ P : Submodule ℂ (GAf L n → ℂ),
+              (∀ x : GAf L n, TrivOutside {s.v} x → ∀ f ∈ P, NG.rt L n x f ∈ P)
+                → Disjoint (LinearMap.range ((NG.rt L n y).comp T)) P
+                  ∨ LinearMap.range ((NG.rt L n y).comp T) ≤ P := by
   intro L _ _ _ n s τ i T _hTi hT y hy P hP
   have hpart := GlobalTheory.T.unitaryFiniteAdeles_splitPlace_decomposition L n s
 
-  have hstab : ∀ (g : GL (Fin n) (s.w.adicCompletion L)) (a : τ.V),
-      a ∈ P.comap ((NG.rt L n y).comp T) → τ.ρ g a ∈ P.comap ((NG.rt L n y).comp T) := by
+  have hstab
+      : ∀ (g : GL (Fin n) (s.w.adicCompletion L)) (a : τ.V),
+        a ∈ P.comap ((NG.rt L n y).comp T) → τ.ρ g a ∈ P.comap ((NG.rt L n y).comp T) := by
     intro g a ha
     obtain ⟨x, ⟨hx, hxA⟩, -⟩ := hpart.2.2 (Matrix.GeneralLinearGroup.map i.symm.toRingHom g)
     have hg : g = Matrix.GeneralLinearGroup.map i.toRingHom (s.loc n x) := by

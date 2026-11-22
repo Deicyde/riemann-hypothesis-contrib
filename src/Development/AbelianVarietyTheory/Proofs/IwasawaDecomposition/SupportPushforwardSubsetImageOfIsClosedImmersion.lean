@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Twist
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 
 set_option autoImplicit false
@@ -23,8 +24,8 @@ noncomputable section
 
 namespace GlobalTheory
 
-theorem support_pushforward_subset_image_of_isClosedImmersion :
-    ∀ {X Y : Scheme.{0}} (g : Y ⟶ X) [IsClosedImmersion g] (E : Y.Modules),
+theorem support_pushforward_subset_image_of_isClosedImmersion
+    : ∀ {X Y : Scheme.{0}} (g : Y ⟶ X) [IsClosedImmersion g] (E : Y.Modules),
       support ((Scheme.Modules.pushforward g).obj E) ⊆ g '' support E := by
   intro X Y g _ E y hy
   by_contra hyn
@@ -38,8 +39,8 @@ theorem support_pushforward_subset_image_of_isClosedImmersion :
   have hZ0 : IsOpen Z0 := by
     rw [isOpen_iff_forall_mem_open]
     rintro z ⟨hz, hzs⟩
-    obtain ⟨W, hzW, iU, iV, he⟩ := TopCat.Presheaf.germ_eq E.presheaf z hz hz s 0
-      (by rw [hzs, map_zero])
+    obtain ⟨W, hzW, iU, iV, he⟩ :=
+      TopCat.Presheaf.germ_eq E.presheaf z hz hz s 0 (by rw [hzs, map_zero])
     refine ⟨W, fun z' hz' => ⟨(leOfHom iU) hz', ?_⟩, W.2, hzW⟩
     have := TopCat.Presheaf.germ_res_apply E.presheaf iU z' hz' s
     rw [he, map_zero, map_zero] at this
@@ -65,7 +66,8 @@ theorem support_pushforward_subset_image_of_isClosedImmersion :
       · exact absurd ⟨z, rfl⟩ h
     obtain ⟨hzU, hzs⟩ := hz'
     rw [Scheme.Modules.pushforward_obj_presheaf_map]
-    exact (TopCat.Presheaf.germ_res_apply E.presheaf ((Opens.map g.base).map (homOfLE hVU)) z hz s).trans hzs
+    exact (TopCat.Presheaf.germ_res_apply E.presheaf ((Opens.map g.base).map (homOfLE hVU)) z hz
+      s).trans hzs
   rw [h0, map_zero]
 
 end GlobalTheory

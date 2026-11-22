@@ -6,14 +6,17 @@ public import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSe
 
 noncomputable section
 
-open ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real FockH1Action MvPolynomial Matrix
+open ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real
+  FockH1Action MvPolynomial Matrix
 open scoped InnerProductSpace
 
 namespace PositivityTheory.KReal
 
-theorem graph_orth_stable {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpace ℂ A]
-    (ρ : Mat p q →ₗ[ℂ] Module.End ℂ A) (aA : AdjG ρ) (K : Submodule ℂ A) (hK : ∀ W, ∀ v ∈ K, ρ W v ∈ K) :
-    ∀ W, ∀ u ∈ Kᗮ, ρ W u ∈ Kᗮ := by
+theorem graph_orth_stable
+    {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpace ℂ A]
+    (ρ : Mat p q →ₗ[ℂ] Module.End ℂ A) (aA : AdjG ρ)
+    (K : Submodule ℂ A) (hK : ∀ W, ∀ v ∈ K, ρ W v ∈ K)
+    : ∀ W, ∀ u ∈ Kᗮ, ρ W u ∈ Kᗮ := by
   intro W u hu
   rw [Submodule.mem_orthogonal']
   intro v hv
@@ -22,13 +25,14 @@ theorem graph_orth_stable {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerPr
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, LinearMap.sum_apply, sum_inner]
   refine Finset.sum_eq_zero fun a _ => Finset.sum_eq_zero fun b _ => ?_
-  have hs : Matrix.single a b (W a b) = W a b • Eab a b := by
-    simp [Eab, Matrix.smul_single]
-  rw [hs, map_smul, LinearMap.smul_apply, inner_smul_left, aA, hu' _ (hK _ _ hv), mul_zero, mul_zero]
+  have hs : Matrix.single a b (W a b) = W a b • Eab a b := by simp [Eab, Matrix.smul_single]
+  rw [hs, map_smul, LinearMap.smul_apply, inner_smul_left, aA, hu' _ (hK _ _ hv), mul_zero,
+    mul_zero]
 
-def prodAct {p q : ℕ} {A B : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B]
-    (ρA : Mat p q →ₗ[ℂ] Module.End ℂ A) (ρB : Mat p q →ₗ[ℂ] Module.End ℂ B) :
-    Mat p q →ₗ[ℂ] Module.End ℂ (A × B) where
+def prodAct
+    {p q : ℕ} {A B : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B]
+    (ρA : Mat p q →ₗ[ℂ] Module.End ℂ A) (ρB : Mat p q →ₗ[ℂ] Module.End ℂ B)
+    : Mat p q →ₗ[ℂ] Module.End ℂ (A × B) where
   toFun Z := (ρA Z).prodMap (ρB Z)
   map_add' Z Z' := by
     refine LinearMap.ext fun n => ?_
@@ -37,20 +41,24 @@ def prodAct {p q : ℕ} {A B : Type} [AddCommGroup A] [Module ℂ A] [AddCommGro
     refine LinearMap.ext fun n => ?_
     simp
 
-theorem prodAct_apply {p q : ℕ} {A B : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B]
-    (ρA : Mat p q →ₗ[ℂ] Module.End ℂ A) (ρB : Mat p q →ₗ[ℂ] Module.End ℂ B) (Z : Mat p q) (n : A × B) :
-    prodAct ρA ρB Z n = (ρA Z n.1, ρB Z n.2) := rfl
+theorem prodAct_apply
+    {p q : ℕ} {A B : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B]
+    (ρA : Mat p q →ₗ[ℂ] Module.End ℂ A) (ρB : Mat p q →ₗ[ℂ] Module.End ℂ B) (Z : Mat p q)
+    (n : A × B)
+    : prodAct ρA ρB Z n = (ρA Z n.1, ρB Z n.2) :=
+  rfl
 
-theorem graph_sub {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpace ℂ A]
+theorem graph_sub
+    {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpace ℂ A]
     {B : Type} [NormedAddCommGroup B] [InnerProductSpace ℂ B]
     (ρA : Mat p q →ₗ[ℂ] Module.End ℂ A) (ρB : Mat p q →ₗ[ℂ] Module.End ℂ B)
-    (hA : IsLie ρA) (hB : IsLie ρB) (aA : AdjG ρA) (aB : AdjG ρB) (lam : Ix p q → ℂ) (x : A) (y : B)
-    (hx0 : x ≠ 0)
-    (hxK : ∀ a b, sameBlock a b → ρA (Eab a b) x = (if a = b then lam a else 0) • x)
+    (hA : IsLie ρA) (hB : IsLie ρB) (aA : AdjG ρA) (aB : AdjG ρB)
+    (lam : Ix p q → ℂ) (x : A) (y : B)
+    (hx0 : x ≠ 0) (hxK : ∀ a b, sameBlock a b → ρA (Eab a b) x = (if a = b then lam a else 0) • x)
     (hyK : ∀ a b, sameBlock a b → ρB (Eab a b) y = (if a = b then lam a else 0) • y)
-    (hxP : ∀ i j, ρA (Eab (.inr j) (.inl i)) x = 0) (hyP : ∀ i j, ρB (Eab (.inr j) (.inl i)) y = 0) :
-    ∃ N : Submodule ℂ (A × B), (x, y) ∈ N ∧ (∀ W, ∀ n ∈ N, prodAct ρA ρB W n ∈ N) ∧
-      ∀ v, ((0 : A), v) ∈ N → v = 0 := by
+    (hxP : ∀ i j, ρA (Eab (.inr j) (.inl i)) x = 0) (hyP : ∀ i j, ρB (Eab (.inr j) (.inl i)) y = 0)
+    : ∃ N : Submodule ℂ (A × B),
+      (x, y) ∈ N ∧ (∀ W, ∀ n ∈ N, prodAct ρA ρB W n ∈ N) ∧ ∀ v, ((0 : A), v) ∈ N → v = 0 := by
   classical
   set P := prodAct ρA ρB with hPdef
   have hP : ∀ Z (n : A × B), P Z n = (ρA Z n.1, ρB Z n.2) := fun Z n => prodAct_apply ρA ρB Z n
@@ -66,8 +74,10 @@ theorem graph_sub {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
     · simp only [hP, Prod.snd_add]
       rw [← h2]
       abel
-  have hbr : ∀ a b c d : Ix p q, Eab a b * Eab c d - Eab c d * Eab a b =
-      (if b = c then Eab a d else 0) - (if d = a then Eab c b else 0) := by
+  have hbr
+      : ∀ a b c d : Ix p q,
+        Eab a b * Eab c d - Eab c d * Eab a b
+          = (if b = c then Eab a d else 0) - (if d = a then Eab c b else 0) := by
     intro a b c d
     simp only [Eab]
     split_ifs with h1 h2 h2
@@ -87,9 +97,11 @@ theorem graph_sub {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
   have hR_xy : (x, y) ∈ R := Submodule.mem_sInf.2 fun M hM => hM.1
   have hR_raise : ∀ (i : Fin p) (j : Fin q), ∀ n ∈ R, P (Eab (.inl i) (.inr j)) n ∈ R :=
     fun i j n hn => Submodule.mem_sInf.2 fun M hM => hM.2 i j n (Submodule.mem_sInf.1 hn M hM)
-  have hR_ind : ∀ M : Submodule ℂ (A × B), (x, y) ∈ M →
-      (∀ (i : Fin p) (j : Fin q), ∀ n ∈ M, P (Eab (.inl i) (.inr j)) n ∈ M) → R ≤ M :=
-    fun M h1 h2 => sInf_le ⟨h1, h2⟩
+  have hR_ind
+      : ∀ M : Submodule ℂ (A × B),
+        (x, y) ∈ M → (∀ (i : Fin p) (j : Fin q), ∀ n ∈ M, P (Eab (.inl i) (.inr j)) n ∈ M)
+          → R ≤ M := fun M h1 h2 =>
+    sInf_le ⟨h1, h2⟩
   have hK : ∀ a b : Ix p q, sameBlock a b → ∀ n ∈ R, P (Eab a b) n ∈ R := by
     let T : Submodule ℂ (A × B) :=
       R ⊓ ⨅ a : Ix p q, ⨅ b : Ix p q, ⨅ (_ : sameBlock a b), R.comap (P (Eab a b))
@@ -129,8 +141,7 @@ theorem graph_sub {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
     simp only [Submodule.mem_iInf, Submodule.mem_comap] at h
     exact h a b hab
   have hL : ∀ (i : Fin p) (j : Fin q), ∀ n ∈ R, P (Eab (.inr j) (.inl i)) n ∈ R := by
-    let T : Submodule ℂ (A × B) :=
-      R ⊓ ⨅ i : Fin p, ⨅ j : Fin q, R.comap (P (Eab (.inr j) (.inl i)))
+    let T : Submodule ℂ (A × B) := R ⊓ ⨅ i : Fin p, ⨅ j : Fin q, R.comap (P (Eab (.inr j) (.inl i)))
     have hT : R ≤ T := by
       apply hR_ind
       · refine Submodule.mem_inf.2 ⟨hR_xy, ?_⟩
@@ -164,8 +175,7 @@ theorem graph_sub {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, LinearMap.sum_apply]
     refine R.sum_mem fun a _ => R.sum_mem fun b _ => ?_
-    have hs : Matrix.single a b (W a b) = W a b • Eab a b := by
-      simp [Eab, Matrix.smul_single]
+    have hs : Matrix.single a b (W a b) = W a b • Eab a b := by simp [Eab, Matrix.smul_single]
     rw [hs, map_smul, LinearMap.smul_apply]
     refine R.smul_mem _ ?_
     rcases a with a | a <;> rcases b with b | b
@@ -173,17 +183,18 @@ theorem graph_sub {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
     · exact hR_raise a b n hn
     · exact hL b a n hn
     · exact hK _ _ (by simp [sameBlock]) n hn
-  let Q : Submodule ℂ (A × B) :=
-    { carrier := {m | ⟪x, x⟫_ℂ * ⟪m.2, y⟫_ℂ = ⟪y, y⟫_ℂ * ⟪m.1, x⟫_ℂ}
-      add_mem' := by
-        intro m m' hm hm'
-        simp only [Set.mem_setOf_eq, Prod.fst_add, Prod.snd_add, inner_add_left] at hm hm' ⊢
-        linear_combination hm + hm'
-      zero_mem' := by simp
-      smul_mem' := by
-        intro c m hm
-        simp only [Set.mem_setOf_eq, Prod.smul_fst, Prod.smul_snd, inner_smul_left] at hm ⊢
-        linear_combination (starRingEnd ℂ c) * hm }
+  let Q : Submodule ℂ (A × B) := {
+    carrier := {m | ⟪x, x⟫_ℂ * ⟪m.2, y⟫_ℂ = ⟪y, y⟫_ℂ * ⟪m.1, x⟫_ℂ}
+    add_mem' := by
+      intro m m' hm hm'
+      simp only [Set.mem_setOf_eq, Prod.fst_add, Prod.snd_add, inner_add_left] at hm hm' ⊢
+      linear_combination hm + hm'
+    zero_mem' := by simp
+    smul_mem' := by
+      intro c m hm
+      simp only [Set.mem_setOf_eq, Prod.smul_fst, Prod.smul_snd, inner_smul_left] at hm ⊢
+      linear_combination (starRingEnd ℂ c) * hm
+  }
   have hRQ : R ≤ Q := by
     apply hR_ind
     · show ⟪x, x⟫_ℂ * ⟪y, y⟫_ℂ = ⟪y, y⟫_ℂ * ⟪x, x⟫_ℂ
@@ -194,19 +205,20 @@ theorem graph_sub {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
       simp only
       rw [aB, hyP, aA, hxP, inner_zero_right, inner_zero_right]
       ring
-  let S : Submodule ℂ (A × B) :=
-    { carrier := {n | ∀ m ∈ R, ⟪x, x⟫_ℂ * ⟪m.2, n.2⟫_ℂ = ⟪y, y⟫_ℂ * ⟪m.1, n.1⟫_ℂ}
-      add_mem' := by
-        intro n n' hn hn' m hm
-        simp only [Prod.fst_add, Prod.snd_add, inner_add_right]
-        linear_combination hn m hm + hn' m hm
-      zero_mem' := by
-        intro m _
-        simp
-      smul_mem' := by
-        intro c n hn m hm
-        simp only [Prod.smul_fst, Prod.smul_snd, inner_smul_right]
-        linear_combination c * hn m hm }
+  let S : Submodule ℂ (A × B) := {
+    carrier := {n | ∀ m ∈ R, ⟪x, x⟫_ℂ * ⟪m.2, n.2⟫_ℂ = ⟪y, y⟫_ℂ * ⟪m.1, n.1⟫_ℂ}
+    add_mem' := by
+      intro n n' hn hn' m hm
+      simp only [Prod.fst_add, Prod.snd_add, inner_add_right]
+      linear_combination hn m hm + hn' m hm
+    zero_mem' := by
+      intro m _
+      simp
+    smul_mem' := by
+      intro c n hn m hm
+      simp only [Prod.smul_fst, Prod.smul_snd, inner_smul_right]
+      linear_combination c * hn m hm
+  }
   have hRS : R ≤ S := by
     apply hR_ind
     · intro m hm
@@ -216,8 +228,7 @@ theorem graph_sub {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
       rw [hP] at key
       simp only at key
       rw [aB, aA] at key
-      have he : epsB (Sum.inr j : Ix p q) (Sum.inl i) = -1 := by
-        simp [epsB, sameBlock]
+      have he : epsB (Sum.inr j : Ix p q) (Sum.inl i) = -1 := by simp [epsB, sameBlock]
       rw [he] at key
       show ⟪x, x⟫_ℂ * ⟪m.2, (P _ n).2⟫_ℂ = ⟪y, y⟫_ℂ * ⟪m.1, (P _ n).1⟫_ℂ
       rw [hP]
@@ -231,15 +242,17 @@ theorem graph_sub {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
   have hvv : ⟪v, v⟫_ℂ = 0 := (mul_eq_zero.1 h0).resolve_left hxx
   exact inner_self_eq_zero.1 hvv
 
-theorem graph_map {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpace ℂ A] {B : Type} [NormedAddCommGroup B] [InnerProductSpace ℂ B]
+theorem graph_map
+    {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpace ℂ A]
+    {B : Type} [NormedAddCommGroup B] [InnerProductSpace ℂ B]
     (ρA : Mat p q →ₗ[ℂ] Module.End ℂ A) (ρB : Mat p q →ₗ[ℂ] Module.End ℂ B)
-    (hA : IsLie ρA) (hB : IsLie ρB) (aA : AdjG ρA) (aB : AdjG ρB) (lam : Ix p q → ℂ) (x : A) (y : B)
-    (hx0 : x ≠ 0)
-    (hxK : ∀ a b, sameBlock a b → ρA (Eab a b) x = (if a = b then lam a else 0) • x)
+    (hA : IsLie ρA) (hB : IsLie ρB) (aA : AdjG ρA) (aB : AdjG ρB)
+    (lam : Ix p q → ℂ) (x : A) (y : B)
+    (hx0 : x ≠ 0) (hxK : ∀ a b, sameBlock a b → ρA (Eab a b) x = (if a = b then lam a else 0) • x)
     (hyK : ∀ a b, sameBlock a b → ρB (Eab a b) y = (if a = b then lam a else 0) • y)
     (hxP : ∀ i j, ρA (Eab (.inr j) (.inl i)) x = 0) (hyP : ∀ i j, ρB (Eab (.inr j) (.inl i)) y = 0)
-    (hproj : genG ρA (Submodule.span ℂ {x}) ⊔ (genG ρA (Submodule.span ℂ {x}))ᗮ = ⊤) :
-    ∃ Φ : A →ₗ[ℂ] B, (∀ Z u, Φ (ρA Z u) = ρB Z (Φ u)) ∧ Φ x = y := by
+    (hproj : genG ρA (Submodule.span ℂ {x}) ⊔ (genG ρA (Submodule.span ℂ {x}))ᗮ = ⊤)
+    : ∃ Φ : A →ₗ[ℂ] B, (∀ Z u, Φ (ρA Z u) = ρB Z (Φ u)) ∧ Φ x = y := by
   classical
   obtain ⟨N, hxyN, hNinv, hN0⟩ := graph_sub ρA ρB hA hB aA aB lam x y hx0 hxK hyK hxP hyP
   have hg : ∀ (z : A × B), z ∈ N → z.1 = 0 → z.2 = 0 := by
@@ -253,13 +266,16 @@ theorem graph_map {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
       have h2 := N.sub_mem h h'
       simpa using h2
     exact sub_eq_zero.1 (hN0 _ hd)
-  have hGinv : ∀ W, ∀ u ∈ genG ρA (Submodule.span ℂ {x}), ρA W u ∈ genG ρA (Submodule.span ℂ {x}) := by
+  have hGinv
+      : ∀ W, ∀ u ∈ genG ρA (Submodule.span ℂ {x}), ρA W u ∈ genG ρA (Submodule.span ℂ {x}) := by
     intro W u hu
     exact Submodule.mem_sInf.2 fun M hM => hM.2 W u (Submodule.mem_sInf.1 hu M hM)
   have hxG : x ∈ genG ρA (Submodule.span ℂ {x}) :=
     Submodule.mem_sInf.2 fun M hM => hM.1 (Submodule.mem_span_singleton_self x)
   have hGdom : genG ρA (Submodule.span ℂ {x}) ≤ N.map (LinearMap.fst ℂ A B) := by
-    refine sInf_le (show N.map (LinearMap.fst ℂ A B) ∈ {M : Submodule ℂ A | Submodule.span ℂ {x} ≤ M ∧ ∀ W, ∀ u ∈ M, ρA W u ∈ M} from ⟨?_, ?_⟩)
+    refine sInf_le (show N.map (LinearMap.fst ℂ A B)
+        ∈ {M : Submodule ℂ A | Submodule.span ℂ {x} ≤ M ∧ ∀ W, ∀ u ∈ M, ρA W u ∈ M} from
+      ⟨?_, ?_⟩)
     · rw [Submodule.span_le, Set.singleton_subset_iff]
       exact ⟨(x, y), hxyN, rfl⟩
     · rintro W u ⟨n, hn, rfl⟩
@@ -267,7 +283,8 @@ theorem graph_map {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
       simp [prodAct_apply]
   set G := genG ρA (Submodule.span ℂ {x}) with hGdef
   have hcompl : IsCompl G Gᗮ := ⟨Submodule.orthogonal_disjoint G, codisjoint_iff.2 hproj⟩
-  let Φ : A →ₗ[ℂ] B := N.toLinearPMap.toFun ∘ₗ Submodule.inclusion hGdom ∘ₗ Submodule.linearProjOfIsCompl G Gᗮ hcompl
+  let Φ : A →ₗ[ℂ] B :=
+    N.toLinearPMap.toFun ∘ₗ Submodule.inclusion hGdom ∘ₗ Submodule.linearProjOfIsCompl G Gᗮ hcompl
   have hΦG : ∀ u (hu : u ∈ G), (u, Φ u) ∈ N := by
     intro u hu
     have h := Submodule.mem_graph_toLinearPMap hg (Submodule.inclusion hGdom ⟨u, hu⟩)
@@ -287,7 +304,8 @@ theorem graph_map {p q : ℕ} {A : Type} [NormedAddCommGroup A] [InnerProductSpa
       rw [hproj]
       trivial
     obtain ⟨g, hgG, g', hgO, rfl⟩ := Submodule.mem_sup.1 hu
-    rw [map_add (f := _), map_add (f := _), map_add (f := _), hΦO g' hgO, hΦO _ (hOinv Z g' hgO), add_zero, add_zero]
+    rw [map_add (f := _), map_add (f := _), map_add (f := _), hΦO g' hgO, hΦO _ (hOinv Z g' hgO),
+      add_zero, add_zero]
     refine huniq (ρA Z g) _ _ (hΦG _ (hGinv Z g hgG)) ?_
     have h3 := hNinv Z _ (hΦG g hgG)
     rwa [prodAct_apply] at h3

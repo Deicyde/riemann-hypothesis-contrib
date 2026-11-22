@@ -10,12 +10,22 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-private theorem card_eq_of_iff {G G' : Type*} [Group G] [Group G'] (e : G ≃* G') {A : Subgroup G} {B : Subgroup G'}
-    (h : ∀ g, g ∈ A ↔ e g ∈ B) : Nat.card A = Nat.card B :=
+private theorem card_eq_of_iff
+    {G G' : Type*} [Group G] [Group G']
+    (e : G ≃* G')
+    {A : Subgroup G} {B : Subgroup G'} (h : ∀ g, g ∈ A ↔ e g ∈ B)
+    : Nat.card A = Nat.card B :=
   Nat.card_congr (e.toEquiv.subtypeEquiv h)
 
-theorem UpperTheory.HF.grp_bridge :
-    ∀ {φ : Frame} (H : HostAx φ) {l : ℕ}, l.Prime → ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})], (∀ σ : H.E ≃ₐ[ℚ] H.E, (∀ x : 𝓞 H.E, σ • x - x ∈ P) ↔ H.gal σ ∈ H.inertG l) ∧ (∀ σ : H.E ≃ₐ[ℚ] H.E, σ ∈ MulAction.stabilizer _ P ↔ H.gal σ ∈ H.decG l) ∧ P.ramificationIdx ℤ = H.el l ∧ P.inertiaDeg ℤ = H.nw l ∧ Nat.card (H.decG l) = H.el l * H.nw l ∧ (primesOver (span {(l : ℤ)}) (𝓞 H.E)).ncard * (H.el l * H.nw l) = 4 * φ.ord := by
+theorem UpperTheory.HF.grp_bridge
+    : ∀ {φ : Frame} (H : HostAx φ) {l : ℕ},
+      l.Prime
+        → ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})],
+          (∀ σ : H.E ≃ₐ[ℚ] H.E, (∀ x : 𝓞 H.E, σ • x - x ∈ P) ↔ H.gal σ ∈ H.inertG l)
+            ∧ (∀ σ : H.E ≃ₐ[ℚ] H.E, σ ∈ MulAction.stabilizer _ P ↔ H.gal σ ∈ H.decG l)
+            ∧ P.ramificationIdx ℤ = H.el l ∧ P.inertiaDeg ℤ = H.nw l
+            ∧ Nat.card (H.decG l) = H.el l * H.nw l
+            ∧ (primesOver (span {(l : ℤ)}) (𝓞 H.E)).ncard * (H.el l * H.nw l) = 4 * φ.ord := by
   intro φ H l hl P _ _
   haveI : Fact l.Prime := ⟨hl⟩
   haveI := H.galois
@@ -42,5 +52,6 @@ theorem UpperTheory.HF.grp_bridge :
   refine ⟨hI, hD, ?_, ?_, hmul, ?_⟩
   · rw [← he, ramificationIdxIn_eq_ramificationIdx (span {(l : ℤ)}) P Gal(H.E/ℚ)]
   · rw [← hf, inertiaDegIn_eq_inertiaDeg (span {(l : ℤ)}) P Gal(H.E/ℚ)]
-  · rw [← he, ← hf, ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (span {(l : ℤ)}) (𝓞 H.E) Gal(H.E/ℚ),
+  · rw [← he, ← hf,
+      ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (span {(l : ℤ)}) (𝓞 H.E) Gal(H.E/ℚ),
       IsGalois.card_aut_eq_finrank, H.der.finrank_E]

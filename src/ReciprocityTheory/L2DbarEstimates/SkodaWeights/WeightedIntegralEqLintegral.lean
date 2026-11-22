@@ -55,12 +55,17 @@ theorem l2w (n : ℕ) (M : Type*) [MeasurableSpace M] : WeightedL2Properties n M
       rw [eLpNorm_eq_eLpNorm' (by norm_num) (by norm_num) hfw, ENNReal.toReal_ofNat,
         eLpNorm_two_weighted_eq n z hψ f]
       exact ENNReal.rpow_lt_top_of_nonneg (by norm_num) hfin.ne
-    exact ⟨hmem.toLp f, (ae_weighted_iff_ae n z hψ (fun x => (hmem.toLp f : M → ℂ) x = f x)).mp
-      (MemLp.coeFn_toLp hmem)⟩
+    exact ⟨
+      hmem.toLp f,
+      (ae_weighted_iff_ae n z hψ (fun x => (hmem.toLp f : M → ℂ) x = f x)).mp
+        (MemLp.coeFn_toLp hmem)
+    ⟩
 
-theorem volOpenPos (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
-    [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] :
-    VolOpenPosStatement n M := by
+theorem volOpenPos
+    (n : ℕ)
+    (M : Type*)
+    [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
+    : VolOpenPosStatement n M := by
   intro z hz U hU ⟨x, hx⟩
   obtain ⟨e, he, hxe⟩ := exists_chart n z hz x
   have hW : IsOpen (U ∩ e.source) := hU.inter e.open_source
@@ -68,14 +73,13 @@ theorem volOpenPos (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
     intro a ha b hb hab
     rw [he ha, he hb] at hab
     exact e.injOn ha hb hab
-  have himg : z '' (U ∩ e.source) = e '' (U ∩ e.source) :=
-    Set.image_congr fun y hy => he hy.2
+  have himg : z '' (U ∩ e.source) = e '' (U ∩ e.source) := Set.image_congr fun y hy => he hy.2
   have hpos : 0 < volume (z '' (U ∩ e.source)) := by
     rw [himg]
     exact (e.isOpen_image_of_subset_source hW Set.inter_subset_right).measure_pos _
       ⟨e x, x, ⟨hx, hxe⟩, rfl⟩
-  rw [← vol_image n z hz e.source e.open_source hinj _ hW.measurableSet
-    Set.inter_subset_right] at hpos
+  rw [← vol_image n z hz e.source e.open_source hinj _ hW.measurableSet Set.inter_subset_right]
+    at hpos
   exact hpos.trans_le (measure_mono Set.inter_subset_left)
 
 end ReciprocityTheory.L2DbarEstimates.H

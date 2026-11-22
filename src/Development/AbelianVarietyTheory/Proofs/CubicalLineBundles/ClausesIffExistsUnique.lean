@@ -23,8 +23,10 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.FactPrincipalD
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.L2.Pj.abelian₂ Formalism.BasicNotions
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.L2.Pj.abelian₂ Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.FD (Data DataX Frame LamBasis fdeg)
 open GlobalTheory.SecTransport GlobalTheory.SecTieEx
 

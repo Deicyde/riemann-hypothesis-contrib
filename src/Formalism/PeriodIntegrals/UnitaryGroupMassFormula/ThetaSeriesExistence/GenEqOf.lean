@@ -55,16 +55,30 @@ theorem genEqOf : GenEqOf := by
     have h := hodd 0
     rw [neg_zero] at h
     linear_combination h / 2
-  refine ⟨fun z => v₁ / jacobiTheta₂' (1 / 2 + v₂ / v₁ / 2) (v₂ / v₁) *
-      (cexp (Real.pi * (starRingEnd ℂ) v₁ / (2 * (((starRingEnd ℂ) v₁ * v₂).im : ℂ) * v₁) * z ^ 2) *
-        th (v₂ / v₁) (z / v₁)), ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    fun z =>
+      v₁ / jacobiTheta₂' (1 / 2 + v₂ / v₁ / 2) (v₂ / v₁)
+        * (cexp
+            (Real.pi * (starRingEnd ℂ) v₁ / (2 * (((starRingEnd ℂ) v₁ * v₂).im : ℂ) * v₁) * z ^ 2)
+          * th (v₂ / v₁) (z / v₁)),
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact ((Differentiable.cexp (by fun_prop)).mul (hdiff.comp (by fun_prop))).const_mul _
-  · have hf : HasDerivAt (fun z : ℂ => cexp (Real.pi * (starRingEnd ℂ) v₁ /
-        (2 * (((starRingEnd ℂ) v₁ * v₂).im : ℂ) * v₁) * z ^ 2)) 0 0 := by
-      have h1 := ((hasDerivAt_pow 2 (0 : ℂ)).const_mul (Real.pi * (starRingEnd ℂ) v₁ /
-        (2 * (((starRingEnd ℂ) v₁ * v₂).im : ℂ) * v₁))).cexp
+  · have hf : HasDerivAt
+        (fun z : ℂ =>
+          cexp
+            (Real.pi * (starRingEnd ℂ) v₁ / (2 * (((starRingEnd ℂ) v₁ * v₂).im : ℂ) * v₁) * z ^ 2))
+        0 0 := by
+      have h1 :=
+        ((hasDerivAt_pow 2 (0 : ℂ)).const_mul
+          (Real.pi * (starRingEnd ℂ) v₁ / (2 * (((starRingEnd ℂ) v₁ * v₂).im : ℂ) * v₁))).cexp
       simpa using h1
-    have h1 : HasDerivAt (th (v₂ / v₁)) (jacobiTheta₂' (1 / 2 + v₂ / v₁ / 2) (v₂ / v₁)) (0 / v₁) := by
+    have h1
+        : HasDerivAt (th (v₂ / v₁)) (jacobiTheta₂' (1 / 2 + v₂ / v₁ / 2) (v₂ / v₁)) (0 / v₁) := by
       rw [zero_div, ← hder]
       exact (hdiff 0).hasDerivAt
     have h2 : HasDerivAt (fun z : ℂ => z / v₁) (1 / v₁) 0 := (hasDerivAt_id (0 : ℂ)).div_const v₁
@@ -87,11 +101,15 @@ theorem genEqOf : GenEqOf := by
     ring
   · intro z
     simp only
-    have key := expo2 v₁ v₂ ((starRingEnd ℂ) v₁) ((starRingEnd ℂ) v₂) _ z hv₁ hA0 (I_eq v₁ v₂ hAr.ne')
+    have key :=
+      expo2 v₁ v₂ ((starRingEnd ℂ) v₁) ((starRingEnd ℂ) v₂) _ z hv₁ hA0 (I_eq v₁ v₂ hAr.ne')
     rw [add_div, htau]
-    rw [show ∀ x y t : ℂ, v₁ / jacobiTheta₂' (1 / 2 + v₂ / v₁ / 2) (v₂ / v₁) * (cexp x * -(cexp y * t)) =
-        -(v₁ / jacobiTheta₂' (1 / 2 + v₂ / v₁ / 2) (v₂ / v₁) * (cexp (x + y) * t)) from
-        fun x y t => by rw [Complex.exp_add]; ring, key, Complex.exp_add]
+    rw [show ∀ x y t : ℂ,
+          v₁ / jacobiTheta₂' (1 / 2 + v₂ / v₁ / 2) (v₂ / v₁) * (cexp x * -(cexp y * t))
+            = -(v₁ / jacobiTheta₂' (1 / 2 + v₂ / v₁ / 2) (v₂ / v₁)
+              * (cexp (x + y) * t)) from fun x y t => by
+        rw [Complex.exp_add]; ring,
+      key, Complex.exp_add]
     unfold qf
     ring
 

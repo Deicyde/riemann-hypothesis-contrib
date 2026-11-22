@@ -13,32 +13,37 @@ noncomputable section
 
 namespace GlobalTheory.TripleUnramified
 
-open GlobalTheory.TripleGal Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain Polynomial
+open GlobalTheory.TripleGal Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  NumberField IsDedekindDomain Polynomial
 open scoped Pointwise
 
 section Galois
 
 variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
 
-theorem mem_smul_iff (A : ValuationSubring Ω) (g : Formalism.ConjugateSelfDual.G F Ω) (y : Ω) :
-    y ∈ g • A ↔ (g⁻¹ : Formalism.ConjugateSelfDual.G F Ω) y ∈ A := by
+theorem mem_smul_iff (A : ValuationSubring Ω) (g : Formalism.ConjugateSelfDual.G F Ω) (y : Ω)
+    : y ∈ g • A ↔ (g⁻¹ : Formalism.ConjugateSelfDual.G F Ω) y ∈ A := by
   simp only [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def]
 
-theorem valuation_smul_lt_one_iff (A : ValuationSubring Ω) (g : Formalism.ConjugateSelfDual.G F Ω) (y : Ω) :
-    (g • A).valuation y < 1 ↔ A.valuation ((g⁻¹ : Formalism.ConjugateSelfDual.G F Ω) y) < 1 := by
-  rw [ReciprocityTheory.Gal.valuation_lt_one_iff', ReciprocityTheory.Gal.valuation_lt_one_iff', mem_smul_iff, mem_smul_iff,
-    map_inv₀, map_eq_zero_iff _ (AlgEquiv.injective _)]
+theorem valuation_smul_lt_one_iff
+    (A : ValuationSubring Ω) (g : Formalism.ConjugateSelfDual.G F Ω) (y : Ω)
+    : (g • A).valuation y < 1 ↔ A.valuation ((g⁻¹ : Formalism.ConjugateSelfDual.G F Ω) y) < 1 := by
+  rw [ReciprocityTheory.Gal.valuation_lt_one_iff', ReciprocityTheory.Gal.valuation_lt_one_iff',
+    mem_smul_iff, mem_smul_iff, map_inv₀, map_eq_zero_iff _ (AlgEquiv.injective _)]
 
-theorem conj_mem_Ine_of_smul {A : ValuationSubring Ω} {g σ : Formalism.ConjugateSelfDual.G F Ω} (hσ : σ ∈ Ine (F := F) (g • A)) :
-    g⁻¹ * σ * g ∈ Ine (F := F) A := by
+theorem conj_mem_Ine_of_smul
+    {A : ValuationSubring Ω} {g σ : Formalism.ConjugateSelfDual.G F Ω}
+    (hσ : σ ∈ Ine (F := F) (g • A))
+    : g⁻¹ * σ * g ∈ Ine (F := F) A := by
   rw [mem_Ine] at hσ ⊢
   obtain ⟨hdec, hval⟩ := hσ
   refine ⟨?_, fun x hx => ?_⟩
   · have hdec' : σ • g • A = g • A := hdec
     show (g⁻¹ * σ * g) • A = A
     rw [mul_smul, mul_smul, hdec', inv_smul_smul]
-  ·
-    have hx' : (g • A).valuation (g x) ≤ 1 := by
+  · have hx' : (g • A).valuation (g x) ≤ 1 := by
       rw [ValuationSubring.valuation_le_one_iff, mem_smul_iff, ← AlgEquiv.mul_apply, inv_mul_cancel,
         AlgEquiv.one_apply]
       exact (ValuationSubring.valuation_le_one_iff _ _).1 hx

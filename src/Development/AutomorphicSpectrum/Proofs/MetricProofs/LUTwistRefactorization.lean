@@ -6,7 +6,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogPeriodState
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WMan
 
@@ -14,8 +18,8 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.WMan.Transv
 
-theorem lastCol_mem {N j : ℕ} {a ca : Fin N} (hj : j ≤ N) (hca : (ca : ℕ) = lastCol N j a) :
-    ca ∈ stepCols N j a ∧ ∀ r ∈ stepCols N j a, r ≤ ca := by
+theorem lastCol_mem {N j : ℕ} {a ca : Fin N} (hj : j ≤ N) (hca : (ca : ℕ) = lastCol N j a)
+    : ca ∈ stepCols N j a ∧ ∀ r ∈ stepCols N j a, r ≤ ca := by
   unfold lastCol at hca
   refine ⟨?_, ?_⟩
   · simp only [stepCols, Finset.mem_filter, Finset.mem_univ, true_and]
@@ -25,12 +29,20 @@ theorem lastCol_mem {N j : ℕ} {a ca : Fin N} (hj : j ≤ N) (hca : (ca : ℕ) 
     rw [Fin.le_iff_val_le_val]
     split_ifs at hca hr <;> omega
 
-theorem transv_mul_transv {N : ℕ} {ca cb : Fin N} (hne : ca ≠ cb) (s : ℂ) :
-    (1 + Matrix.single cb ca s) * (1 + Matrix.single cb ca (-s)) = (1 : Matrix (Fin N) (Fin N) ℂ) := by
-  rw [add_mul, one_mul, mul_add, mul_one, Matrix.single_mul_single_of_ne s cb ca cb hne (-s), add_zero,
-    add_assoc, ← Matrix.single_add, neg_add_cancel, Matrix.single_zero, add_zero]
+theorem transv_mul_transv {N : ℕ} {ca cb : Fin N} (hne : ca ≠ cb) (s : ℂ)
+    : (1 + Matrix.single cb ca s) * (1 + Matrix.single cb ca (-s))
+      = (1 : Matrix (Fin N) (Fin N) ℂ) := by
+  rw [add_mul, one_mul, mul_add, mul_one, Matrix.single_mul_single_of_ne s cb ca cb hne (-s),
+    add_zero, add_assoc, ← Matrix.single_add, neg_add_cancel, Matrix.single_zero, add_zero]
 
-theorem main : ∀ (N j : ℕ) (a ca cb : Fin N) (L U : Matrix (Fin N) (Fin N) ℂ) (t' : ℂ), j ≤ N → (ca : ℕ) = lastCol N j a → (cb : ℕ) = ca + 1 → ((ca : ℕ) < N - j ↔ (cb : ℕ) < N - j) → IsBlockDiag j L → IsLowerUni L → IsBlockDiag j U → U.BlockTriangular id → (∀ c, U c c ≠ 0) → minorIJ (L * U * (1 + Matrix.single cb ca t')) (stepCols N j a) (stepCols N j a) ≠ 0 → ∃ (t : ℂ) (V : Matrix (Fin N) (Fin N) ℂ), IsBlockDiag j V ∧ V.BlockTriangular id ∧ (∀ c ∈ stepCols N j a, V c c ≠ 0) ∧ U * (1 + Matrix.single cb ca t') = (1 + Matrix.single cb ca t) * V := by
+theorem main
+    : ∀ (N j : ℕ) (a ca cb : Fin N) (L U : Matrix (Fin N) (Fin N) ℂ) (t' : ℂ),
+      j ≤ N → (ca : ℕ) = lastCol N j a → (cb : ℕ) = ca + 1 → ((ca : ℕ) < N - j ↔ (cb : ℕ) < N - j)
+        → IsBlockDiag j L → IsLowerUni L → IsBlockDiag j U → U.BlockTriangular id → (∀ c, U c c ≠ 0)
+        → minorIJ (L * U * (1 + Matrix.single cb ca t')) (stepCols N j a) (stepCols N j a) ≠ 0
+        → ∃ (t : ℂ) (V : Matrix (Fin N) (Fin N) ℂ),
+          IsBlockDiag j V ∧ V.BlockTriangular id ∧ (∀ c ∈ stepCols N j a, V c c ≠ 0)
+            ∧ U * (1 + Matrix.single cb ca t') = (1 + Matrix.single cb ca t) * V := by
   intro N j a ca cb L U t' hj hca hcb hblk hL hLu hU hUt hUd hmin
   have hne : ca ≠ cb := by
     intro h
@@ -73,7 +85,9 @@ theorem main : ∀ (N j : ℕ) (a ca cb : Fin N) (L U : Matrix (Fin N) (Fin N) �
       ext p q
       simp only [Matrix.submatrix_apply, Matrix.mul_apply]
       have hfpS := hfmem p
-      have hz : ∀ i ∈ (Finset.univ : Finset (Fin N)), i ∉ stepCols N j a → L (f p) i * M i (f q) = 0 := by
+      have hz
+          : ∀ i ∈ (Finset.univ : Finset (Fin N)),
+            i ∉ stepCols N j a → L (f p) i * M i (f q) = 0 := by
         intro i _ hi
         by_cases hic : (ca : ℕ) < i
         · have hfp := hmax (f p) hfpS
@@ -123,7 +137,9 @@ theorem main : ∀ (N j : ℕ) (a ca cb : Fin N) (L U : Matrix (Fin N) (Fin N) �
       simp
     · simp
   set t := M cb ca / M ca ca with ht
-  have hVe : ∀ x y, ((1 + Matrix.single cb ca (-t)) * M) x y = M x y + if x = cb then -t * M ca y else 0 := by
+  have hVe
+      : ∀ x y,
+        ((1 + Matrix.single cb ca (-t)) * M) x y = M x y + if x = cb then -t * M ca y else 0 := by
     intro x y
     rw [Matrix.add_mul, Matrix.one_mul, Matrix.add_apply]
     split_ifs with hx

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FirstC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.Ker Formalism.L2.DIV GlobalTheory.TwU GlobalTheory.TwV Formalism.UG
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.Ker Formalism.L2.DIV GlobalTheory.TwU GlobalTheory.TwV Formalism.UG
 
 noncomputable section
 namespace GlobalTheory.PsiCosetInv
@@ -15,14 +16,17 @@ open GlobalTheory.TopInv
 
 variable {E K : Type} [Field E] [NumberField E] {P : HeightOneSpectrum (𝓞 E)} {n : ℕ}
 
-theorem core (Psi : Sp E n → K) [Zero K] (q : E) (hq : q ≠ 0) (hqi : IntAt P q) (e e' D : ℕ) (hD : e + e' ≤ D)
+theorem core
+    (Psi : Sp E n → K)
+    [Zero K]
+    (q : E) (hq : q ≠ 0) (hqi : IntAt P q)
+    (e e' D : ℕ) (hD : e + e' ≤ D)
     (hInv : ∀ y z : Sp E n, (∀ i, IntAt P ((q ^ e)⁻¹ * z i)) → Psi (y + z) = Psi y)
     (hSupp : ∀ y : Sp E n, Psi y ≠ 0 → ∀ i, IntAt P (q ^ e' * y i))
-    (k : Sp E n ≃ₗ[E] Sp E n)
-    (hkint : ∀ x : Sp E n, (∀ i, IntAt P (k x i)) → ∀ i, IntAt P (x i))
+    (k : Sp E n ≃ₗ[E] Sp E n) (hkint : ∀ x : Sp E n, (∀ i, IntAt P (k x i)) → ∀ i, IntAt P (x i))
     (hk : ∀ s l, IntAt P ((q ^ D)⁻¹ * (k (Pi.single s 1) l - (Pi.single s 1 : Sp E n) l)))
-    (w w₁ : Sp E n) (hc : ∀ l, IntAt P ((q ^ e)⁻¹ * (k.symm w₁ - w) l)) :
-    Psi w₁ = Psi w := by
+    (w w₁ : Sp E n) (hc : ∀ l, IntAt P ((q ^ e)⁻¹ * (k.symm w₁ - w) l))
+    : Psi w₁ = Psi w := by
   by_cases hboth : Psi w₁ = 0 ∧ Psi w = 0
   · rw [hboth.1, hboth.2]
   set u := k.symm w₁ with hu
@@ -56,10 +60,13 @@ theorem core (Psi : Sp E n → K) [Zero K] (q : E) (hq : q ≠ 0) (hqi : IntAt P
       simp [Finset.sum_apply, Pi.single_apply]
     have hw₁ : w₁ = k u := by rw [hu, LinearEquiv.apply_symm_apply]
     obtain ⟨t, ht⟩ : ∃ t, D = e + e' + t := ⟨D - (e + e'), by omega⟩
-    have e2 : (q ^ e)⁻¹ * (w₁ - w) l =
-        (∑ s, (q ^ e' * u s) * ((q ^ D)⁻¹ * (k (Pi.single s 1) l - (Pi.single s 1 : Sp E n) l)) * q ^ t) +
-          (q ^ e)⁻¹ * (u - w) l := by
-      have e3 : (w₁ - w) l = (∑ s, u s * (k (Pi.single s 1) l - (Pi.single s 1 : Sp E n) l)) + (u - w) l := by
+    have e2
+        : (q ^ e)⁻¹ * (w₁ - w) l
+          = (∑ s, (q ^ e' * u s) * ((q ^ D)⁻¹ * (k (Pi.single s 1) l - (Pi.single s 1 : Sp E n) l)) * q ^ t)
+            + (q ^ e)⁻¹ * (u - w) l := by
+      have e3
+          : (w₁ - w) l
+            = (∑ s, u s * (k (Pi.single s 1) l - (Pi.single s 1 : Sp E n) l)) + (u - w) l := by
         have e4 : (k u - u) l = ∑ s, u s * (k (Pi.single s 1) l - (Pi.single s 1 : Sp E n) l) := by
           conv_lhs => rw [hsum]
           set_option synthInstance.maxHeartbeats 100000 in
@@ -76,7 +83,8 @@ theorem core (Psi : Sp E n → K) [Zero K] (q : E) (hq : q ≠ 0) (hqi : IntAt P
       field_simp
     rw [e2]
     refine mem_intS.1 ((intS P).add_mem ((intS P).sum_mem fun s _ => ?_) (mem_intS.2 (hc l)))
-    exact (intS P).mul_mem ((intS P).mul_mem (mem_intS.2 (hU s)) (mem_intS.2 (hk s l))) (mem_intS.2 (hqpow t))
+    exact (intS P).mul_mem ((intS P).mul_mem (mem_intS.2 (hU s)) (mem_intS.2 (hk s l)))
+      (mem_intS.2 (hqpow t))
   have := hInv w (w₁ - w) hz
   rwa [add_sub_cancel] at this
 
@@ -86,13 +94,21 @@ namespace GlobalTheory.PsiCosetInv
 
 open GlobalTheory.TopInv
 
-theorem psiAt_coset : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) (S : Set ℕ)
-    (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu)) (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (m2 : ℕ),
-    ChIdx.Ok Ch sel mu cst L G m2 → ∀ (al : L.β m2) (P : rowSG Pr sel mu) (x₀ : HomE X.E (R.N m2) (R.N (m2 + 1))) (k : GLint X.E (R.N (m2 + 1)) P.1)
-    (w w₁ : Sp X.E (R.N (m2 + 1))),
-    (∀ s l, IntAt P.1 ((((qOf P.1 : ℕ) : X.E) ^ (cst.D P))⁻¹ * (k.1 (Pi.single s 1) l - (Pi.single s 1 : Sp X.E (R.N (m2 + 1))) l))) →
-    SameCoset sel mu cst P (k.1.symm w₁) w →
-    PsiAt Ch sel mu cst m2 P (L.h m2 al P) x₀ w₁ = PsiAt Ch sel mu cst m2 P (L.h m2 al P) x₀ w := by
+theorem psiAt_coset
+    : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Chars X Pr R.m)
+        (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) (S : Set ℕ)
+        (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu))
+        (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (m2 : ℕ),
+      ChIdx.Ok Ch sel mu cst L G m2
+        → ∀ (al : L.β m2) (P : rowSG Pr sel mu) (x₀ : HomE X.E (R.N m2) (R.N (m2 + 1)))
+            (k : GLint X.E (R.N (m2 + 1)) P.1) (w w₁ : Sp X.E (R.N (m2 + 1))),
+          (∀ s l,
+              IntAt P.1
+                ((((qOf P.1 : ℕ) : X.E) ^ (cst.D P))⁻¹
+                  * (k.1 (Pi.single s 1) l - (Pi.single s 1 : Sp X.E (R.N (m2 + 1))) l)))
+            → SameCoset sel mu cst P (k.1.symm w₁) w
+            → PsiAt Ch sel mu cst m2 P (L.h m2 al P) x₀ w₁
+              = PsiAt Ch sel mu cst m2 P (L.h m2 al P) x₀ w := by
   intro X Pr R Ch sel S mu cst L G m2 hL al P x₀ k w w₁ hk hc
   have hInv := hL.psiInv al P x₀
   have hSupp := hL.psiSupp al P x₀
@@ -107,6 +123,7 @@ theorem psiAt_coset : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Chars X
   · simp only [if_pos hP] at hInv hSupp hc
     exact core _ _ hq hqi 0 1 (cst.D P) (by rw [hL.depthG P hP]) hInv hSupp k.1 hkint hk w w₁ hc
   · simp only [if_neg hP] at hInv hSupp hc
-    exact core _ _ hq hqi cst.M cst.M (cst.D P) (by have := hL.depthQ P hP; omega) hInv hSupp k.1 hkint hk w w₁ hc
+    exact core _ _ hq hqi cst.M cst.M (cst.D P) (by have := hL.depthQ P hP; omega) hInv hSupp k.1
+      hkint hk w w₁ hc
 
 end GlobalTheory.PsiCosetInv

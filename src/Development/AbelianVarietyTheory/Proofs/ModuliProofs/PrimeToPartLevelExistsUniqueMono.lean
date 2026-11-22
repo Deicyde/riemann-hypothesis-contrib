@@ -10,26 +10,30 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.Auxiliar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
 namespace GlobalTheory.Models
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
-theorem _root_.GlobalTheory.Models.sup_mul_sup_eq_of_coprime {R : Type} [CommRing R] {I J N : Ideal R}
-    (h : I ⊔ J = ⊤) (hN : I * J ≤ N) : (I ⊔ N) * (J ⊔ N) = N := by
+theorem _root_.GlobalTheory.Models.sup_mul_sup_eq_of_coprime
+    {R : Type} [CommRing R] {I J N : Ideal R} (h : I ⊔ J = ⊤) (hN : I * J ≤ N)
+    : (I ⊔ N) * (J ⊔ N) = N := by
   apply le_antisymm
   · rw [Ideal.sup_mul, Ideal.mul_sup, Ideal.mul_sup]
     exact sup_le (sup_le hN (Ideal.mul_le_inf.trans inf_le_right))
       (sup_le (Ideal.mul_le_inf.trans inf_le_left) (Ideal.mul_le_inf.trans inf_le_left))
-  · calc N = N * (I ⊔ J) := by rw [h, Ideal.mul_top]
+  · calc
+      N = N * (I ⊔ J) := by rw [h, Ideal.mul_top]
       _ = N * I ⊔ N * J := Ideal.mul_sup _ _ _
-      _ ≤ (I ⊔ N) * (J ⊔ N) := sup_le
-          (by rw [mul_comm]; exact Ideal.mul_mono le_sup_left le_sup_right)
+      _ ≤ (I ⊔ N) * (J ⊔ N) :=
+        sup_le (by rw [mul_comm]; exact Ideal.mul_mono le_sup_left le_sup_right)
           (Ideal.mul_mono le_sup_right le_sup_left)
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
@@ -60,28 +64,45 @@ def divisorLevel (l : Level H) (m : ℕ) (hm : m ∣ l.M) (h3 : 3 ≤ m) : Level
   A := 1
   A_pos := one_pos
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
-private theorem level_ext' {a b : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H} (hM : a.M = b.M) (hMb : a.Mb = b.Mb)
-    (hA : a.A = b.A) : a = b := by
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
+private theorem level_ext'
+    {a b : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H}
+    (hM : a.M = b.M) (hMb : a.Mb = b.Mb) (hA : a.A = b.A)
+    : a = b := by
   cases a
   cases b
   simp only at hM hMb hA
   subst hM hMb hA
   rfl
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
-theorem _root_.GlobalTheory.Models.primeToPart_spec : ∀ (E : Type) [Field E] [NumberField E]
-    [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (p : ℕ), p.Prime →
-    (∀ l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H, l.GoodAt p → ∃ l₀ : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H, _root_.GlobalTheory.Models.IsPrimeToPart l₀ l p) ∧
-    (∀ l l₀ : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H, _root_.GlobalTheory.Models.IsPrimeToPart l₀ l p → l₀.Dvd l ∧ l₀.M.Coprime p ∧
-      ∀ l₀' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H, _root_.GlobalTheory.Models.IsPrimeToPart l₀' l p → l₀' = l₀) ∧
-    ∀ l l' l₀ l₀' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H, _root_.GlobalTheory.Models.IsPrimeToPart l₀ l p → _root_.GlobalTheory.Models.IsPrimeToPart l₀' l' p → l.Dvd l' →
-      l₀.Dvd l₀' := by
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
+theorem _root_.GlobalTheory.Models.primeToPart_spec
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (p : ℕ),
+      p.Prime
+        → (∀ l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H,
+            l.GoodAt p
+              → ∃ l₀ : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H,
+                _root_.GlobalTheory.Models.IsPrimeToPart l₀ l p)
+          ∧ (∀ l l₀ : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H,
+            _root_.GlobalTheory.Models.IsPrimeToPart l₀ l p
+              → l₀.Dvd l ∧ l₀.M.Coprime p
+                ∧ ∀ l₀' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H,
+                  _root_.GlobalTheory.Models.IsPrimeToPart l₀' l p → l₀' = l₀)
+          ∧ ∀ l l' l₀ l₀' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H,
+            _root_.GlobalTheory.Models.IsPrimeToPart l₀ l p
+              → _root_.GlobalTheory.Models.IsPrimeToPart l₀' l' p → l.Dvd l'
+              → l₀.Dvd l₀' := by
   intro E _ _ _ H p hp
   refine ⟨fun l hl => ?_, fun l l₀ h₀ => ?_, fun l l' l₀ l₀' h₀ h₀' hd => ?_⟩
   · unfold _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level.GoodAt at hl

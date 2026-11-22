@@ -10,10 +10,11 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem pow_card_le_index_iInf_of_prime :
-    ∀ (p : ℕ) (G ι : Type) [CommGroup G] [Fintype ι] (K : ι → Subgroup G), p.Prime →
-      (∀ (i : ι) (x : G), x ^ p ∈ K i) → (∀ i, ∃ x, x ∉ K i ∧ ∀ j, j ≠ i → x ∈ K j) →
-      (⨅ i, K i).index ≠ 0 → p ^ Fintype.card ι ≤ (⨅ i, K i).index := by
+theorem pow_card_le_index_iInf_of_prime
+    : ∀ (p : ℕ) (G ι : Type) [CommGroup G] [Fintype ι] (K : ι → Subgroup G),
+      p.Prime → (∀ (i : ι) (x : G), x ^ p ∈ K i) → (∀ i, ∃ x, x ∉ K i ∧ ∀ j, j ≠ i → x ∈ K j)
+        → (⨅ i, K i).index ≠ 0
+        → p ^ Fintype.card ι ≤ (⨅ i, K i).index := by
   intro p G ι _ _ K hp hpow hx hind
   classical
   choose x hx1 hx2 using hx
@@ -26,8 +27,10 @@ theorem pow_card_le_index_iInf_of_prime :
       exact hpow j _
     · rw [QuotientGroup.mk'_apply, Ne, QuotientGroup.eq_one_iff]
       exact hx1 j
-  have hprod : ∀ (n : ι → Fin p) (j : ι),
-      QuotientGroup.mk' (K j) (∏ i, x i ^ (n i : ℕ)) = (QuotientGroup.mk' (K j) (x j)) ^ (n j : ℕ) := by
+  have hprod
+      : ∀ (n : ι → Fin p) (j : ι),
+        QuotientGroup.mk' (K j) (∏ i, x i ^ (n i : ℕ))
+          = (QuotientGroup.mk' (K j) (x j)) ^ (n j : ℕ) := by
     intro n j
     rw [map_prod, Finset.prod_eq_single j]
     · rw [map_pow]
@@ -45,8 +48,10 @@ theorem pow_card_le_index_iInf_of_prime :
     have h1 := QuotientGroup.eq.1 h
     funext j
     have h2 := Subgroup.mem_iInf.1 h1 j
-    have h3 : QuotientGroup.mk' (K j) (∏ i, x i ^ (n i : ℕ))
-        = QuotientGroup.mk' (K j) (∏ i, x i ^ (m i : ℕ)) := QuotientGroup.eq.2 h2
+    have h3
+        : QuotientGroup.mk' (K j) (∏ i, x i ^ (n i : ℕ))
+          = QuotientGroup.mk' (K j) (∏ i, x i ^ (m i : ℕ)) :=
+      QuotientGroup.eq.2 h2
     rw [hprod, hprod] at h3
     apply Fin.ext
     refine pow_injOn_Iio_orderOf ?_ ?_ h3

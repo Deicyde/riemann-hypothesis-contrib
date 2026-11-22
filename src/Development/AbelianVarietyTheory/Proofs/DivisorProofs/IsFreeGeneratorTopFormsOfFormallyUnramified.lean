@@ -6,13 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NadelVanishi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
 
 namespace GlobalTheory.TopForm
 
-theorem isFreeGen_formMap_of_formallyUnramified :
-    ∀ {k A B : Type} [CommRing k] [CommRing A] [CommRing B] (α : k →+* A) (β : k →+* B) (ψ : A →+* B) (h : ψ.comp α = β) (n : ℕ), (letI := ψ.toAlgebra; Algebra.FormallyUnramified A B) → ∀ ω : Forms α n, IsFreeGen A ω → (∃ ω' : Forms β n, IsFreeGen B ω') → IsFreeGen B (TopForm.formMap n ψ h ω) := by
+theorem isFreeGen_formMap_of_formallyUnramified
+    : ∀ {k A B : Type} [CommRing k] [CommRing A] [CommRing B] (α : k →+* A) (β : k →+* B)
+        (ψ : A →+* B) (h : ψ.comp α = β) (n : ℕ),
+      (letI := ψ.toAlgebra; Algebra.FormallyUnramified A B)
+        → ∀ ω : Forms α n,
+          IsFreeGen A ω → (∃ ω' : Forms β n, IsFreeGen B ω')
+            → IsFreeGen B (TopForm.formMap n ψ h ω) := by
   intro k A B _ _ _ α β ψ h n hU ω hω hex
   obtain ⟨ω', hω'⟩ := hex
   letI := α.toAlgebra
@@ -37,8 +43,10 @@ theorem isFreeGen_formMap_of_formallyUnramified :
         obtain ⟨a, rfl⟩ := hx
         rw [KaehlerDifferential.map_D]
         exact Submodule.subset_span ⟨a, rfl⟩
-      | zero => simp
-      | add _ _ _ _ h1 h2 => simpa only [map_add] using add_mem h1 h2
+      | zero =>
+        simp
+      | add _ _ _ _ h1 h2 =>
+        simpa only [map_add] using add_mem h1 h2
       | smul a x _ hx =>
         rw [map_smul, ← algebraMap_smul B a]
         exact Submodule.smul_mem _ _ hx

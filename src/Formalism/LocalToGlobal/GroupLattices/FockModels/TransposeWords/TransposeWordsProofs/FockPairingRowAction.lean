@@ -174,7 +174,8 @@ theorem fock_pairing_row_action : FockRRowAct := by
     rw [map_add (f := _), tsact_add_left, tsact_add_left, hp, hq]
   | mul_X p v hp =>
     intro Q
-    rw [map_mul, tsact_rowAct_X, Finset.mul_sum, tsact_sum_left, tsact_X_mul, tsact_chain, tsact_sum_right]
+    rw [map_mul, tsact_rowAct_X, Finset.mul_sum, tsact_sum_left, tsact_X_mul, tsact_chain,
+      tsact_sum_right]
     refine Finset.sum_congr rfl fun b _ => ?_
     have e : rowAct R g p * (C (g v.1 b) * X (b, v.2)) = g v.1 b • (rowAct R g p * X (b, v.2)) := by
       rw [smul_eq_C_mul]; ring

@@ -23,16 +23,16 @@ variable {O : Type} [CommRing O]
 theorem it_eq (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) : (⇑f)^[k] = ⇑(f ^ k) :=
   (AlgHom.coe_pow f k).symm
 
-theorem it_mul (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) (a b : PowerSeries O) :
-    (⇑f)^[k] (a * b) = (⇑f)^[k] a * (⇑f)^[k] b := by
+theorem it_mul (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) (a b : PowerSeries O)
+    : (⇑f)^[k] (a * b) = (⇑f)^[k] a * (⇑f)^[k] b := by
   rw [it_eq, map_mul]
 
-theorem it_add (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) (a b : PowerSeries O) :
-    (⇑f)^[k] (a + b) = (⇑f)^[k] a + (⇑f)^[k] b := by
+theorem it_add (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) (a b : PowerSeries O)
+    : (⇑f)^[k] (a + b) = (⇑f)^[k] a + (⇑f)^[k] b := by
   rw [it_eq, map_add (f := _)]
 
-theorem it_dvd (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) {a b : PowerSeries O}
-    (h : a ∣ b) : (⇑f)^[k] a ∣ (⇑f)^[k] b := by
+theorem it_dvd (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) {a b : PowerSeries O} (h : a ∣ b)
+    : (⇑f)^[k] a ∣ (⇑f)^[k] b := by
   rw [it_eq]
   exact map_dvd _ h
 
@@ -47,14 +47,14 @@ theorem p_zero (B : Base O) : B.p 0 = B.q := rfl
 
 theorem it_q (B : Base O) (k : ℕ) : (⇑B.φ)^[k] B.q = B.p k := rfl
 
-theorem γ_it (B : Base O) (k : ℕ) (a : PowerSeries O) :
-    B.γ ((⇑B.φ)^[k] a) = (⇑B.φ)^[k] (B.γ a) := by
+theorem γ_it (B : Base O) (k : ℕ) (a : PowerSeries O)
+    : B.γ ((⇑B.φ)^[k] a) = (⇑B.φ)^[k] (B.γ a) := by
   induction k with
   | zero => rfl
   | succ k ih => rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ← B.comm, ih]
 
-theorem φ_prod_p (B : Base O) (k : ℕ) (e : ℕ → ℕ) :
-    B.φ (∏ s ∈ Finset.range k, B.p s ^ e s) = ∏ s ∈ Finset.range k, B.p (s + 1) ^ e s := by
+theorem φ_prod_p (B : Base O) (k : ℕ) (e : ℕ → ℕ)
+    : B.φ (∏ s ∈ Finset.range k, B.p s ^ e s) = ∏ s ∈ Finset.range k, B.p (s + 1) ^ e s := by
   rw [map_prod]
   exact Finset.prod_congr rfl fun s _ => by rw [map_pow, φ_p]
 
@@ -65,13 +65,13 @@ theorem e3it (B : Base O) (h : B.E3) (j : ℕ) : B.E3it j := by
   | succ j ih =>
     obtain ⟨u, hu⟩ := ih
     refine ⟨Units.map (B.φ : PowerSeries O →* PowerSeries O) u * u₀, ?_⟩
-    rw [Function.iterate_succ_apply', hu, map_mul, map_mul, hu₀, φ_prod_p,
-      Finset.prod_range_succ', p_zero]
+    rw [Function.iterate_succ_apply', hu, map_mul, map_mul, hu₀, φ_prod_p, Finset.prod_range_succ',
+      p_zero]
     simp only [Units.val_mul, Units.coe_map, MonoidHom.coe_coe]
     ring
 
-theorem pow_mem_pair {a t y : PowerSeries O} (h : y ∈ Ideal.span {a, t}) (N : ℕ) :
-    y ^ N ∈ Ideal.span {a, t ^ N} := by
+theorem pow_mem_pair {a t y : PowerSeries O} (h : y ∈ Ideal.span {a, t}) (N : ℕ)
+    : y ^ N ∈ Ideal.span {a, t ^ N} := by
   obtain ⟨c, d, rfl⟩ := Ideal.mem_span_pair.1 h
   obtain ⟨w, hw⟩ := sub_dvd_pow_sub_pow (c * a + d * t) (d * t) N
   refine Ideal.mem_span_pair.2 ⟨c * w, d ^ N, ?_⟩
@@ -79,8 +79,8 @@ theorem pow_mem_pair {a t y : PowerSeries O} (h : y ∈ Ideal.span {a, t}) (N : 
   rw [this, mul_pow]
   ring
 
-theorem φX_mem (B : Base O) (hl : 1 ≤ B.ℓ) (h : B.E3) :
-    B.φ X ∈ Ideal.span {B.lc, (X : PowerSeries O) ^ B.ℓ} := by
+theorem φX_mem (B : Base O) (hl : 1 ≤ B.ℓ) (h : B.E3)
+    : B.φ X ∈ Ideal.span {B.lc, (X : PowerSeries O) ^ B.ℓ} := by
   obtain ⟨u, hu⟩ := h
   have hq : B.q ∈ Ideal.span {B.lc, (X : PowerSeries O)} :=
     Ideal.mem_span_pair.2 ⟨1, 1, by simp [Base.q, Base.lc, add_comm]⟩
@@ -91,8 +91,8 @@ theorem φX_mem (B : Base O) (hl : 1 ≤ B.ℓ) (h : B.E3) :
   rw [hm, Nat.add_sub_cancel, pow_succ]
   ring
 
-theorem itX_mem (B : Base O) (hl : 1 ≤ B.ℓ) (h : B.E3) (s : ℕ) :
-    (⇑B.φ)^[s] X ∈ Ideal.span {B.lc, (X : PowerSeries O) ^ (B.ℓ ^ s)} := by
+theorem itX_mem (B : Base O) (hl : 1 ≤ B.ℓ) (h : B.E3) (s : ℕ)
+    : (⇑B.φ)^[s] X ∈ Ideal.span {B.lc, (X : PowerSeries O) ^ (B.ℓ ^ s)} := by
   induction s with
   | zero => exact Ideal.mem_span_pair.2 ⟨0, 1, by simp⟩
   | succ s ih =>
@@ -162,35 +162,40 @@ theorem base_ring_good_holds : BaseGoodOf := by
 namespace GoodPlacesAlt
 
 section lat
-variable {O : Type} [CommRing O] {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V]
-  [Module (PowerSeries O) V] (L : Lat B n V)
+variable
+  {O : Type} [CommRing O]
+  {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
+  (L : Lat B n V)
 
-theorem mem_dv {a : PowerSeries O} {S : Submodule (PowerSeries O) V} {v : V} :
-    v ∈ dv a S ↔ a • v ∈ S := Iff.rfl
+theorem mem_dv {a : PowerSeries O} {S : Submodule (PowerSeries O) V} {v : V}
+    : v ∈ dv a S ↔ a • v ∈ S :=
+  Iff.rfl
 
-theorem sm_le_of_le_dv {a : PowerSeries O} {S T : Submodule (PowerSeries O) V}
-    (h : S ≤ dv a T) : sm a S ≤ T := by
+theorem sm_le_of_le_dv {a : PowerSeries O} {S T : Submodule (PowerSeries O) V} (h : S ≤ dv a T)
+    : sm a S ≤ T := by
   intro v hv
   obtain ⟨u, hu, rfl⟩ := mem_sm.1 hv
   exact h hu
 
-theorem prod_split (p : ℕ → PowerSeries O) (k : ℕ) (e e' : ℕ → ℕ) (h : ∀ s < k, e s ≤ e' s) :
-    ∏ s ∈ Finset.range k, p s ^ e' s =
-      (∏ s ∈ Finset.range k, p s ^ (e' s - e s)) * ∏ s ∈ Finset.range k, p s ^ e s := by
+theorem prod_split (p : ℕ → PowerSeries O) (k : ℕ) (e e' : ℕ → ℕ) (h : ∀ s < k, e s ≤ e' s)
+    : ∏ s ∈ Finset.range k, p s ^ e' s
+      = (∏ s ∈ Finset.range k, p s ^ (e' s - e s)) * ∏ s ∈ Finset.range k, p s ^ e s := by
   rw [← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun s hs => ?_
   rw [← pow_add, Nat.sub_add_cancel (h s (Finset.mem_range.1 hs))]
 
-theorem lattice_exponent_property_mono {i : ZMod n} {m m' : ℕ} (h : L.P5M i m) (hm : m ≤ m') : L.P5M i m' := by
+theorem lattice_exponent_property_mono {i : ZMod n} {m m' : ℕ} (h : L.P5M i m) (hm : m ≤ m')
+    : L.P5M i m' := by
   intro v hv
   obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hm
   rw [add_comm, pow_add, mul_smul]
   exact (L.N i).smul_mem _ (h v hv)
 
-theorem phi_iterate_mem_lattice {c : ZMod n} {j G : ℕ}
-    (h : ∀ k : ℕ, 1 ≤ k → k ≤ j → L.P5M (c + (k : ZMod n)) G) (k : ℕ) (hk : k ≤ j) {v : V}
-    (hv : v ∈ L.N c) :
-    (∏ s ∈ Finset.range k, B.p s ^ G) • L.phiIt c k v ∈ L.N (c + (k : ZMod n)) := by
+theorem phi_iterate_mem_lattice
+    {c : ZMod n} {j G : ℕ} (h : ∀ k : ℕ, 1 ≤ k → k ≤ j → L.P5M (c + (k : ZMod n)) G)
+    (k : ℕ) (hk : k ≤ j)
+    {v : V} (hv : v ∈ L.N c)
+    : (∏ s ∈ Finset.range k, B.p s ^ G) • L.phiIt c k v ∈ L.N (c + (k : ZMod n)) := by
   induction k with
   | zero => simpa [Lat.phiIt] using hv
   | succ k ih =>
@@ -198,28 +203,32 @@ theorem phi_iterate_mem_lattice {c : ZMod n} {j G : ℕ}
     have e : c + ((k + 1 : ℕ) : ZMod n) - 1 = c + (k : ZMod n) := by
       push_cast
       ring
-    have h5 := h (k + 1) (by omega) hk ((∏ s ∈ Finset.range k, B.p s ^ G) • L.phiIt c k v)
-      (by rw [e]; exact ih')
+    have h5 :=
+      h (k + 1) (by omega) hk ((∏ s ∈ Finset.range k, B.p s ^ G) • L.phiIt c k v)
+        (by rw [e]; exact ih')
     rw [L.φ_semi, φ_prod_p, smul_smul] at h5
     rw [Finset.prod_range_succ', p_zero, mul_comm]
     exact h5
 
-theorem phiIt_succ' (i : ZMod n) (k : ℕ) (v : V) :
-    L.phiIt i (k + 1) v = L.phiIt (i + 1) k (L.φ (i + 1) v) := by
+theorem phiIt_succ' (i : ZMod n) (k : ℕ) (v : V)
+    : L.phiIt i (k + 1) v = L.phiIt (i + 1) k (L.φ (i + 1) v) := by
   induction k with
   | zero => simp [Lat.phiIt]
   | succ k ih =>
     have e : i + ((k + 1 + 1 : ℕ) : ZMod n) = i + 1 + ((k + 1 : ℕ) : ZMod n) := by
       push_cast
       ring
-    calc L.phiIt i (k + 1 + 1) v = L.φ (i + ((k + 1 + 1 : ℕ) : ZMod n)) (L.phiIt i (k + 1) v) := rfl
-      _ = L.φ (i + 1 + ((k + 1 : ℕ) : ZMod n)) (L.phiIt (i + 1) k (L.φ (i + 1) v)) := by
-        rw [e, ih]
+    calc
+      L.phiIt i (k + 1 + 1) v
+        = L.φ (i + ((k + 1 + 1 : ℕ) : ZMod n)) (L.phiIt i (k + 1) v) := rfl
+      _ = L.φ (i + 1 + ((k + 1 : ℕ) : ZMod n)) (L.phiIt (i + 1) k (L.φ (i + 1) v)) := by rw [e, ih]
       _ = L.phiIt (i + 1) (k + 1) (L.φ (i + 1) v) := rfl
 
-theorem phiIt_span (i : ZMod n) (k : ℕ) {t : V}
-    (ht : t ∈ Submodule.span (PowerSeries O) (L.φ (i + 1) '' (L.N i : Set V))) :
-    L.phiIt (i + 1) k t ∈ L.pull i (k + 1) := by
+theorem phiIt_span
+    (i : ZMod n)
+    (k : ℕ)
+    {t : V} (ht : t ∈ Submodule.span (PowerSeries O) (L.φ (i + 1) '' (L.N i : Set V)))
+    : L.phiIt (i + 1) k t ∈ L.pull i (k + 1) := by
   induction ht using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨w, hw, rfl⟩ := hx
@@ -229,8 +238,9 @@ theorem phiIt_span (i : ZMod n) (k : ℕ) {t : V}
   | add x y _ _ hx hy => rw [phiIt_add]; exact Submodule.add_mem _ hx hy
   | smul a x _ hx => rw [phiIt_smul]; exact Submodule.smul_mem _ _ hx
 
-theorem pullback_smul_mem_next (i : ZMod n) (k h : ℕ) (h5 : L.FrobeniusCobounded (i + 1) h) {y : V}
-    (hy : y ∈ L.pull (i + 1) k) : B.p k ^ h • y ∈ L.pull i (k + 1) := by
+theorem pullback_smul_mem_next
+    (i : ZMod n) (k h : ℕ) (h5 : L.FrobeniusCobounded (i + 1) h) {y : V} (hy : y ∈ L.pull (i + 1) k)
+    : B.p k ^ h • y ∈ L.pull i (k + 1) := by
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨w, hw, rfl⟩ := hx
@@ -242,10 +252,12 @@ theorem pullback_smul_mem_next (i : ZMod n) (k h : ℕ) (h5 : L.FrobeniusCobound
   | add x y _ _ hx hy => rw [smul_add]; exact Submodule.add_mem _ hx hy
   | smul a x _ hx => rw [smul_comm]; exact Submodule.smul_mem _ _ hx
 
-theorem product_smul_mem_pullback {c : ZMod n} {ell : ℕ} {hh : ℕ → ℕ}
-    (h : ∀ s < ell, L.FrobeniusCobounded (c - (s : ZMod n)) (hh s)) (k : ℕ) (hk : k ≤ ell) {x : V}
-    (hx : x ∈ L.N c) :
-    (∏ s ∈ Finset.range k, B.p s ^ hh s) • x ∈ L.pull (c - (k : ZMod n)) k := by
+theorem product_smul_mem_pullback
+    {c : ZMod n} {ell : ℕ} {hh : ℕ → ℕ}
+    (h : ∀ s < ell, L.FrobeniusCobounded (c - (s : ZMod n)) (hh s))
+    (k : ℕ) (hk : k ≤ ell)
+    {x : V} (hx : x ∈ L.N c)
+    : (∏ s ∈ Finset.range k, B.p s ^ hh s) • x ∈ L.pull (c - (k : ZMod n)) k := by
   induction k with
   | zero =>
     have : x ∈ L.N (c - ((0 : ℕ) : ZMod n)) := by simpa using hx
@@ -300,9 +312,11 @@ theorem pullback_lemma_holds : LatticeLeArcSpan := by
 
 namespace GoodPlacesAlt
 
-theorem tr_arithZ (lam D y M r a sg : ℤ) (hl : 2 ≤ lam) (hD : 1 ≤ D)
-    (hs : (y * D + M) * (lam + 1) ≤ sg * (D * lam ^ 2)) (ha : lam * a ≤ (lam + 1) * r)
-    (hsa : sg + 1 ≤ a) : M ≤ D * (lam * r - y - a + sg) := by
+theorem tr_arithZ
+    (lam D y M r a sg : ℤ)
+    (hl : 2 ≤ lam) (hD : 1 ≤ D) (hs : (y * D + M) * (lam + 1) ≤ sg * (D * lam ^ 2))
+    (ha : lam * a ≤ (lam + 1) * r) (hsa : sg + 1 ≤ a)
+    : M ≤ D * (lam * r - y - a + sg) := by
   have hlD : 0 ≤ lam * D := by positivity
   have h1 : lam * D * (lam * a) ≤ lam * D * ((lam + 1) * r) := mul_le_mul_of_nonneg_left ha hlD
   have h1' : D * lam ^ 2 * (sg + 1) ≤ D * lam ^ 2 * a :=
@@ -317,13 +331,15 @@ theorem tr_arithZ (lam D y M r a sg : ℤ) (hl : 2 ≤ lam) (hD : 1 ≤ D)
   have h5 : lam ^ 2 * M ≤ lam ^ 2 * (D * (lam * r - y - a + sg)) := by nlinarith
   exact le_of_mul_le_mul_left h5 (by positivity)
 
-theorem tr_arithN (l D y M r a sg : ℕ) (hl : 3 ≤ l) (hD : 1 ≤ D)
-    (hs : (y * D + M) * l ≤ sg * (D * (l - 1) ^ 2)) (ha : (l - 1) * a ≤ l * r) (hsa : sg < a) :
-    ∃ e : ℕ, (l - 1) * r = y + ((a - sg) + e) ∧ M ≤ D * e := by
+theorem tr_arithN
+    (l D y M r a sg : ℕ) (hl : 3 ≤ l) (hD : 1 ≤ D) (hs : (y * D + M) * l ≤ sg * (D * (l - 1) ^ 2))
+    (ha : (l - 1) * a ≤ l * r) (hsa : sg < a)
+    : ∃ e : ℕ, (l - 1) * r = y + ((a - sg) + e) ∧ M ≤ D * e := by
   obtain ⟨lam, rfl⟩ : ∃ lam, l = lam + 1 := ⟨l - 1, by omega⟩
   simp only [Nat.add_sub_cancel] at hs ha ⊢
-  have hz := tr_arithZ lam D y M r a sg (by exact_mod_cast (by omega : 2 ≤ lam))
-    (by exact_mod_cast hD) (by exact_mod_cast hs) (by exact_mod_cast ha) (by exact_mod_cast hsa)
+  have hz :=
+    tr_arithZ lam D y M r a sg (by exact_mod_cast (by omega : 2 ≤ lam)) (by exact_mod_cast hD)
+      (by exact_mod_cast hs) (by exact_mod_cast ha) (by exact_mod_cast hsa)
   have hZ : (0 : ℤ) ≤ (lam : ℤ) * r - y - a + sg := by
     by_contra hneg
     replace hneg := not_le.mp hneg
@@ -340,8 +356,8 @@ theorem tr_arithN (l D y M r a sg : ℕ) (hl : 3 ≤ l) (hD : 1 ≤ D)
   · rw [he] at hz
     exact_mod_cast hz
 
-theorem tr_split {A : Type} [CommRing A] (c x p : A) (hp : p ∈ Ideal.span {c, x}) (t e : ℕ) :
-    ∃ α β : A, p ^ (t + e) = c ^ t * α + x ^ e * β := by
+theorem tr_split {A : Type} [CommRing A] (c x p : A) (hp : p ∈ Ideal.span {c, x}) (t e : ℕ)
+    : ∃ α β : A, p ^ (t + e) = c ^ t * α + x ^ e * β := by
   have h1 : p ^ (t + e) ∈ (Ideal.span {c} ⊔ Ideal.span {x}) ^ (t + e) := by
     apply Ideal.pow_mem_pow
     rwa [← Ideal.span_insert]
@@ -352,9 +368,11 @@ theorem tr_split {A : Type} [CommRing A] (c x p : A) (hp : p ∈ Ideal.span {c, 
   obtain ⟨β, rfl⟩ := Ideal.mem_span_singleton'.1 hb
   exact ⟨α, β, by rw [← hab]; ring⟩
 
-theorem trunc_of {O : Type} [CommRing O] (B : Base O) (j M g sig : ℕ) (h3 : 3 ≤ B.ℓ)
-    (hj : 1 ≤ j) (hE3 : B.E3it j) (hE2 : B.E2 (j - 1)) (hs : SigOK B.ℓ j M g sig) :
-    B.Trunc j M g sig := by
+theorem trunc_of
+    {O : Type} [CommRing O]
+    (B : Base O) (j M g sig : ℕ)
+    (h3 : 3 ≤ B.ℓ) (hj : 1 ≤ j) (hE3 : B.E3it j) (hE2 : B.E2 (j - 1)) (hs : SigOK B.ℓ j M g sig)
+    : B.Trunc j M g sig := by
   intro r a ha
   by_cases hsa : a ≤ sig
   · refine ⟨B.lc ^ (sig - a) * ((⇑B.φ)^[j] X) ^ r, ?_⟩
@@ -364,8 +382,8 @@ theorem trunc_of {O : Type} [CommRing O] (B : Base O) (j M g sig : ℕ) (h3 : 3 
     rw [this]
     exact Ideal.zero_mem _
   · replace hsa := not_le.mp hsa
-    obtain ⟨e, he1, he2⟩ := tr_arithN B.ℓ (B.ℓ ^ (j - 1)) (3 * g) M r a sig h3
-      (Nat.one_le_pow _ _ (by omega)) hs ha hsa
+    obtain ⟨e, he1, he2⟩ :=
+      tr_arithN B.ℓ (B.ℓ ^ (j - 1)) (3 * g) M r a sig h3 (Nat.one_le_pow _ _ (by omega)) hs ha hsa
     obtain ⟨u, hu⟩ := hE3
     obtain ⟨α, β, hαβ⟩ := tr_split B.lc (X ^ (B.ℓ ^ (j - 1))) (B.p (j - 1)) hE2 (a - sig) e
     obtain ⟨e', he'⟩ := Nat.exists_eq_add_of_le he2
@@ -373,8 +391,9 @@ theorem trunc_of {O : Type} [CommRing O] (B : Base O) (j M g sig : ℕ) (h3 : 3 
     simp only [Nat.add_sub_cancel] at hαβ he'
     set P : PowerSeries O := ∏ k ∈ Finset.range (j' + 1), B.p k ^ (3 * g) with hP
     set Q : PowerSeries O := ∏ k ∈ Finset.range j', B.p k ^ ((a - sig) + e) with hQ
-    have hprod : (∏ k ∈ Finset.range (j' + 1), B.p k ^ (B.ℓ - 1)) ^ r
-        = P * (Q * B.p j' ^ ((a - sig) + e)) := by
+    have hprod
+        : (∏ k ∈ Finset.range (j' + 1), B.p k ^ (B.ℓ - 1)) ^ r
+          = P * (Q * B.p j' ^ ((a - sig) + e)) := by
       rw [hP, hQ, ← Finset.prod_range_succ (fun k => B.p k ^ ((a - sig) + e)),
         ← Finset.prod_mul_distrib, ← Finset.prod_pow]
       refine Finset.prod_congr rfl fun k _ => ?_
@@ -389,10 +408,13 @@ theorem trunc_of {O : Type} [CommRing O] (B : Base O) (j M g sig : ℕ) (h3 : 3 
     rw [hu, mul_pow, mul_pow, hprod, hαβ, hXe, hla, Base.ff, ← hP]
     ring
 
-theorem sa_sat {O : Type} [CommRing O] [IsDomain O] (ϖ : O) [(Ideal.span {ϖ}).IsMaximal]
-    (hϖ0 : ϖ ≠ 0) (f : PowerSeries O)
-    (hf : PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) f ≠ 0) (N : ℕ) :
-    ∀ z : PowerSeries O, C (ϖ ^ N) * z ∈ Ideal.span {f} → z ∈ Ideal.span {f} := by
+theorem sa_sat
+    {O : Type} [CommRing O] [IsDomain O]
+    (ϖ : O) [(Ideal.span {ϖ}).IsMaximal]
+    (hϖ0 : ϖ ≠ 0)
+    (f : PowerSeries O) (hf : PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) f ≠ 0)
+    (N : ℕ)
+    : ∀ z : PowerSeries O, C (ϖ ^ N) * z ∈ Ideal.span {f} → z ∈ Ideal.span {f} := by
   have hC0 : (C ϖ : PowerSeries O) ≠ 0 := by
     intro h0
     have := congrArg (coeff 0) h0
@@ -412,24 +434,30 @@ theorem sa_sat {O : Type} [CommRing O] [IsDomain O] (ϖ : O) [(Ideal.span {ϖ}).
     rw [pow_succ, map_mul] at hw
     linear_combination hw
 
-theorem sa_it_add {O : Type} [CommRing O] (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ)
-    (a b : PowerSeries O) : (⇑f)^[k] (a + b) = (⇑f)^[k] a + (⇑f)^[k] b := by
+theorem sa_it_add
+    {O : Type} [CommRing O] (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) (a b : PowerSeries O)
+    : (⇑f)^[k] (a + b) = (⇑f)^[k] a + (⇑f)^[k] b := by
   induction k with
   | zero => rfl
-  | succ k ih => rw [Function.iterate_succ_apply', Function.iterate_succ_apply',
-      Function.iterate_succ_apply', ih, map_add]
+  | succ k ih =>
+    rw [Function.iterate_succ_apply', Function.iterate_succ_apply', Function.iterate_succ_apply',
+      ih, map_add]
 
-theorem sa_p_ne {O : Type} [CommRing O] [IsDomain O] (ϖ : O) [(Ideal.span {ϖ}).IsMaximal]
-    (B : Base O) (hd : ϖ ∣ (B.ℓ : O)) (hE3 : ∀ s, B.E3it s) (s : ℕ) :
-    PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) (B.p s) ≠ 0 := by
+theorem sa_p_ne
+    {O : Type} [CommRing O] [IsDomain O]
+    (ϖ : O) [(Ideal.span {ϖ}).IsMaximal]
+    (B : Base O) (hd : ϖ ∣ (B.ℓ : O)) (hE3 : ∀ s, B.E3it s)
+    (s : ℕ)
+    : PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) (B.p s) ≠ 0 := by
   have : IsDomain (O ⧸ Ideal.span {ϖ}) := Ideal.Quotient.isDomain _
   induction s using Nat.strong_induction_on with
   | _ s ih =>
     obtain ⟨u, hu⟩ := hE3 s
     have hl : Ideal.Quotient.mk (Ideal.span {ϖ}) (B.ℓ : O) = 0 :=
       Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton.mpr hd)
-    have hp : B.p s = (u : PowerSeries O) * X * ∏ k ∈ Finset.range s, B.p k ^ (B.ℓ - 1)
-        + C (B.ℓ : O) := by
+    have hp
+        : B.p s
+          = (u : PowerSeries O) * X * ∏ k ∈ Finset.range s, B.p k ^ (B.ℓ - 1) + C (B.ℓ : O) := by
       rw [Base.p, Base.q, sa_it_add, IdempotentNormalFormsRhoFacts.it_C, hu]
     rw [hp, map_add (f := _), PowerSeries.map_C, hl, map_zero, add_zero, map_mul, map_mul, map_prod,
       PowerSeries.map_X]
@@ -439,9 +467,11 @@ theorem sa_p_ne {O : Type} [CommRing O] [IsDomain O] (ϖ : O) [(Ideal.span {ϖ})
       rw [map_pow]
       exact pow_ne_zero _ (ih k (Finset.mem_range.mp hk))
 
-theorem satA_of {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O)
-    (B : Base O) (j M g : ℕ) (hϖ : Irreducible ϖ) (hd : ϖ ∣ (B.ℓ : O)) (h0 : (B.ℓ : O) ≠ 0)
-    (hE3 : ∀ s, B.E3it s) : B.Sat (B.ff j M g) := by
+theorem satA_of
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (ϖ : O) (B : Base O)
+    (j M g : ℕ) (hϖ : Irreducible ϖ) (hd : ϖ ∣ (B.ℓ : O)) (h0 : (B.ℓ : O) ≠ 0) (hE3 : ∀ s, B.E3it s)
+    : B.Sat (B.ff j M g) := by
   have : (Ideal.span {ϖ}).IsMaximal := PrincipalIdealRing.isMaximal_of_irreducible hϖ
   have : IsDomain (O ⧸ Ideal.span {ϖ}) := Ideal.Quotient.isDomain _
   have hf : PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) (B.ff j M g) ≠ 0 := by
@@ -468,12 +498,15 @@ namespace GoodPlacesAlt
 open IdempotentNormalFormsRhoFacts
 
 section sat
-variable {O : Type} [CommRing O] {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V]
-  [Module (PowerSeries O) V] (L : Lat B n V)
+variable
+  {O : Type} [CommRing O]
+  {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
+  (L : Lat B n V)
 
-theorem sat_pull_eq {c : ZMod n} {k r : ℕ} {e : Fin r → V}
-    (he : Submodule.span (PowerSeries O) (Set.range e) = L.N c) :
-    L.pull c k = Submodule.span (PowerSeries O) (Set.range fun a => L.phiIt c k (e a)) := by
+theorem sat_pull_eq
+    {c : ZMod n} {k r : ℕ} {e : Fin r → V}
+    (he : Submodule.span (PowerSeries O) (Set.range e) = L.N c)
+    : L.pull c k = Submodule.span (PowerSeries O) (Set.range fun a => L.phiIt c k (e a)) := by
   apply le_antisymm
   · refine Submodule.span_le.2 ?_
     rintro _ ⟨v, hv, rfl⟩
@@ -482,7 +515,8 @@ theorem sat_pull_eq {c : ZMod n} {k r : ℕ} {e : Fin r → V}
     | mem x hx =>
       obtain ⟨a, rfl⟩ := hx
       exact Submodule.subset_span ⟨a, rfl⟩
-    | zero => rw [phiIt_zero]; exact Submodule.zero_mem _
+    | zero =>
+      rw [phiIt_zero]; exact Submodule.zero_mem _
     | add x y hx hy ihx ihy =>
       rw [phiIt_add]
       exact Submodule.add_mem _ (ihx (by rw [← he]; exact hx)) (ihy (by rw [← he]; exact hy))
@@ -496,44 +530,58 @@ theorem sat_pull_eq {c : ZMod n} {k r : ℕ} {e : Fin r → V}
 def satP (i : ZMod n) (k : ℕ) {r : ℕ} (b : Fin r → PowerSeries O) (x : V) : Prop :=
   ∃ m : Fin r → V, (∀ t, m t ∈ L.N i) ∧ x = ∑ t, b t • L.phiIt i k (m t)
 
-theorem isPhiCombination_zero (i : ZMod n) (k : ℕ) {r : ℕ} (b : Fin r → PowerSeries O) :
-    satP L i k b 0 :=
+theorem isPhiCombination_zero (i : ZMod n) (k : ℕ) {r : ℕ} (b : Fin r → PowerSeries O)
+    : satP L i k b 0 :=
   ⟨fun _ => 0, fun _ => Submodule.zero_mem _, by simp [phiIt_zero]⟩
 
-theorem isPhiCombination_add {i : ZMod n} {k : ℕ} {r : ℕ} {b : Fin r → PowerSeries O} {x y : V}
-    (hx : satP L i k b x) (hy : satP L i k b y) : satP L i k b (x + y) := by
+theorem isPhiCombination_add
+    {i : ZMod n} {k : ℕ} {r : ℕ} {b : Fin r → PowerSeries O} {x y : V}
+    (hx : satP L i k b x) (hy : satP L i k b y)
+    : satP L i k b (x + y) := by
   obtain ⟨m, hm, rfl⟩ := hx
   obtain ⟨m', hm', rfl⟩ := hy
   refine ⟨fun t => m t + m' t, fun t => Submodule.add_mem _ (hm t) (hm' t), ?_⟩
   simp only [phiIt_add, smul_add, Finset.sum_add_distrib]
 
-theorem isPhiCombination_smul_phiIterate {i : ZMod n} {k : ℕ} {r : ℕ} {b : Fin r → PowerSeries O}
+theorem isPhiCombination_smul_phiIterate
+    {i : ZMod n} {k : ℕ} {r : ℕ} {b : Fin r → PowerSeries O}
     (hb : ∀ a : PowerSeries O, ∃ a' : Fin r → PowerSeries O, a = ∑ t, b t * (⇑B.φ)^[k] (a' t))
-    (a : PowerSeries O) {v : V} (hv : v ∈ L.N i) : satP L i k b (a • L.phiIt i k v) := by
+    (a : PowerSeries O)
+    {v : V} (hv : v ∈ L.N i)
+    : satP L i k b (a • L.phiIt i k v) := by
   obtain ⟨a', ha'⟩ := hb a
   refine ⟨fun t => a' t • v, fun t => Submodule.smul_mem _ _ hv, ?_⟩
   conv_lhs => rw [ha']
   simp only [phiIt_smul, Finset.sum_smul, mul_smul]
 
-theorem isPhiCombination_of_mem_pull {i : ZMod n} {k : ℕ} {r : ℕ} {b : Fin r → PowerSeries O}
+theorem isPhiCombination_of_mem_pull
+    {i : ZMod n} {k : ℕ} {r : ℕ} {b : Fin r → PowerSeries O}
     (hb : ∀ a : PowerSeries O, ∃ a' : Fin r → PowerSeries O, a = ∑ t, b t * (⇑B.φ)^[k] (a' t))
-    {x : V} (hx : x ∈ L.pull i k) : satP L i k b x := by
+    {x : V} (hx : x ∈ L.pull i k)
+    : satP L i k b x := by
   induction hx using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨v, hv, rfl⟩ := hx
     simpa using isPhiCombination_smul_phiIterate L hb 1 hv
-  | zero => exact isPhiCombination_zero L i k b
-  | add x y _ _ hx hy => exact isPhiCombination_add L hx hy
+  | zero =>
+    exact isPhiCombination_zero L i k b
+  | add x y _ _ hx hy =>
+    exact isPhiCombination_add L hx hy
   | smul a x _ hx =>
     obtain ⟨m, hm, rfl⟩ := hx
     rw [Finset.smul_sum]
-    refine Finset.sum_induction _ (satP L i k b) (fun _ _ => isPhiCombination_add L) (isPhiCombination_zero L i k b) ?_
+    refine Finset.sum_induction _ (satP L i k b)
+      (fun _ _ => isPhiCombination_add L)
+      (isPhiCombination_zero L i k b) ?_
     intro t _
     rw [smul_smul]
     exact isPhiCombination_smul_phiIterate L hb _ (hm t)
 
-theorem sat_xreg_pow (h : L.XReg) (i : ZMod n) (k : ℕ) {v : V} (hv : v ∈ L.N i)
-    (h0 : (X : PowerSeries O) ^ k • v = 0) : v = 0 := by
+theorem sat_xreg_pow
+    (h : L.XReg)
+    (i : ZMod n) (k : ℕ)
+    {v : V} (hv : v ∈ L.N i) (h0 : (X : PowerSeries O) ^ k • v = 0)
+    : v = 0 := by
   induction k with
   | zero => simpa using h0
   | succ k ih =>
@@ -616,21 +664,27 @@ namespace GoodPlacesAlt
 open IdempotentNormalFormsRhoFacts
 
 section hh
-variable {O : Type} [CommRing O] {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V]
-  [Module (PowerSeries O) V] (L : Lat B n V)
+variable
+  {O : Type} [CommRing O]
+  {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
+  (L : Lat B n V)
 
-theorem hh_sm_pow_mono {S : Submodule (PowerSeries O) V} {m M : ℕ} (h : m ≤ M) :
-    sm ((X : PowerSeries O) ^ M) S ≤ sm (X ^ m) S := by
+theorem hh_sm_pow_mono {S : Submodule (PowerSeries O) V} {m M : ℕ} (h : m ≤ M)
+    : sm ((X : PowerSeries O) ^ M) S ≤ sm (X ^ m) S := by
   intro v hv
   obtain ⟨u, hu, rfl⟩ := mem_sm.1 hv
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
   rw [pow_add, mul_smul]
   exact smul_mem_sm _ (S.smul_mem _ hu)
 
-theorem hh_gr {u₁ : O} (hu : ∃ a : PowerSeries O, B.γ X = X * (C u₁ + X * a)) (h9 : L.P9)
-    (c : ZMod n) (r : ℕ) {x : V} (hx : x ∈ L.N c) :
-    L.γ c ((X : PowerSeries O) ^ r • x) - C (u₁ ^ r) • (X : PowerSeries O) ^ r • x ∈
-      sm (X ^ (r + 1)) (L.N c) := by
+theorem hh_gr
+    {u₁ : O} (hu : ∃ a : PowerSeries O, B.γ X = X * (C u₁ + X * a))
+    (h9 : L.P9)
+    (c : ZMod n)
+    (r : ℕ)
+    {x : V} (hx : x ∈ L.N c)
+    : L.γ c ((X : PowerSeries O) ^ r • x) - C (u₁ ^ r) • (X : PowerSeries O) ^ r • x
+      ∈ sm (X ^ (r + 1)) (L.N c) := by
   obtain ⟨a, ha⟩ := hu
   obtain ⟨x', hx', hxx⟩ := mem_sm.1 (h9 c x hx)
   have hγx : L.γ c x = x + (X : PowerSeries O) • x' := by rw [hxx]; abel
@@ -639,19 +693,25 @@ theorem hh_gr {u₁ : O} (hu : ∃ a : PowerSeries O, B.γ X = X * (C u₁ + X *
     refine ⟨a * d, ?_⟩
     rw [map_pow]
     linear_combination hd
-  have : L.γ c ((X : PowerSeries O) ^ r • x) - C (u₁ ^ r) • (X : PowerSeries O) ^ r • x =
-      (X : PowerSeries O) ^ (r + 1) • (b • x + C (u₁ ^ r) • x' + (X * b) • x') := by
+  have : L.γ c ((X : PowerSeries O) ^ r • x) - C (u₁ ^ r) • (X : PowerSeries O) ^ r • x
+      = (X : PowerSeries O) ^ (r + 1) • (b • x + C (u₁ ^ r) • x' + (X * b) • x') := by
     rw [L.γ_semi, map_pow, ha, mul_pow, hb, hγx]
-    have e1 : (X : PowerSeries O) ^ r * (C (u₁ ^ r) + X * b) = C (u₁ ^ r) * X ^ r + X ^ (r + 1) * b := by
+    have e1
+        : (X : PowerSeries O) ^ r * (C (u₁ ^ r) + X * b)
+          = C (u₁ ^ r) * X ^ r + X ^ (r + 1) * b := by
       ring
-    have e2 : (X : PowerSeries O) ^ r * (C (u₁ ^ r) + X * b) * X =
-        X ^ (r + 1) * C (u₁ ^ r) + X ^ (r + 1) * (X * b) := by ring
+    have e2
+        : (X : PowerSeries O) ^ r * (C (u₁ ^ r) + X * b) * X
+          = X ^ (r + 1) * C (u₁ ^ r) + X ^ (r + 1) * (X * b) := by
+      ring
     rw [smul_add, smul_smul _ X, e2, e1, add_smul, add_smul, smul_add, smul_add, smul_smul,
       smul_smul, smul_smul, smul_smul]
     abel
   rw [this]
-  exact smul_mem_sm _ (Submodule.add_mem _ (Submodule.add_mem _ (Submodule.smul_mem _ _ hx)
-    (Submodule.smul_mem _ _ hx')) (Submodule.smul_mem _ _ hx'))
+  exact smul_mem_sm _
+    (Submodule.add_mem _
+      (Submodule.add_mem _ (Submodule.smul_mem _ _ hx) (Submodule.smul_mem _ _ hx'))
+      (Submodule.smul_mem _ _ hx'))
 
 def hhA (ℓ : ℕ) : ℕ → ℕ
   | 0 => 0
@@ -661,33 +721,43 @@ theorem hhA_eq (ℓ : ℕ) [Fact ℓ.Prime] (r : ℕ) : hhA ℓ r = r + padicVal
   induction r with
   | zero => simp [hhA, Nat.padicValNat_def]
   | succ r ih =>
-    rw [hhA, ih, Nat.factorial_succ, (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (by omega) (Nat.factorial_ne_zero r)]
+    rw [hhA, ih, Nat.factorial_succ,
+      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+            a ≠ 0 → b ≠ 0
+              → _root_.padicValNat p (a * b)
+                = _root_.padicValNat p a + _root_.padicValNat p b from by
+          simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+        (by omega) (Nat.factorial_ne_zero r)]
     omega
 
 theorem hhA_le (ℓ : ℕ) (hℓ : ℓ.Prime) (r : ℕ) : (ℓ - 1) * hhA ℓ r ≤ ℓ * r := by
   have := Fact.mk hℓ
-  rw [hhA_eq, mul_add, Nat.padicValNat_def,
-    Nat.Prime.sub_one_mul_multiplicity_factorial hℓ]
+  rw [hhA_eq, mul_add, Nat.padicValNat_def, Nat.Prime.sub_one_mul_multiplicity_factorial hℓ]
   have h1 : 1 ≤ ℓ := hℓ.one_le
   obtain ⟨t, rfl⟩ : ∃ t, ℓ = t + 1 := ⟨ℓ - 1, by omega⟩
   simp only [Nat.add_sub_cancel]
   have h2 : (t + 1) * r = t * r + r := by ring
   omega
 
-theorem hh_phiIt_sum (i : ZMod n) (k : ℕ) {ι : Type} (s : Finset ι) (f : ι → V) :
-    L.phiIt i k (∑ r ∈ s, f r) = ∑ r ∈ s, L.phiIt i k (f r) := by
+theorem hh_phiIt_sum (i : ZMod n) (k : ℕ) {ι : Type} (s : Finset ι) (f : ι → V)
+    : L.phiIt i k (∑ r ∈ s, f r) = ∑ r ∈ s, L.phiIt i k (f r) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [phiIt_zero]
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, phiIt_add, ih]
 
-theorem hh_main {u₁ : O} (hE : B.GammaXUnitShape u₁) (h9 : L.P9) (c : ZMod n) {z : V}
-    (hz : z ∈ sm X (L.N c)) (k : ℕ) :
-    ∃ (b : ℕ → ℕ) (d : ℕ → V),
-      (∀ r, 1 ≤ r → r ≤ k → hhA B.ℓ r + b r = hhA B.ℓ k ∧ d r ∈ L.N c) ∧
-      (L.γ c (∑ r ∈ Finset.Ico 1 (k + 1), (B.lc ^ b r * X ^ r) • d r) -
-        ∑ r ∈ Finset.Ico 1 (k + 1), (B.lc ^ b r * X ^ r) • d r) - B.lc ^ hhA B.ℓ k • z ∈
-        sm (X ^ (k + 1)) (L.N c) := by
+theorem hh_main
+    {u₁ : O} (hE : B.GammaXUnitShape u₁)
+    (h9 : L.P9)
+    (c : ZMod n)
+    {z : V} (hz : z ∈ sm X (L.N c))
+    (k : ℕ)
+    : ∃ (b : ℕ → ℕ) (d : ℕ → V),
+      (∀ r, 1 ≤ r → r ≤ k → hhA B.ℓ r + b r = hhA B.ℓ k ∧ d r ∈ L.N c)
+        ∧ (L.γ c (∑ r ∈ Finset.Ico 1 (k + 1), (B.lc ^ b r * X ^ r) • d r)
+              - ∑ r ∈ Finset.Ico 1 (k + 1), (B.lc ^ b r * X ^ r) • d r)
+            - B.lc ^ hhA B.ℓ k • z
+          ∈ sm (X ^ (k + 1)) (L.N c) := by
   induction k with
   | zero =>
     refine ⟨fun _ => 0, fun _ => 0, fun r h1 h2 => by omega, ?_⟩
@@ -700,8 +770,12 @@ theorem hh_main {u₁ : O} (hE : B.GammaXUnitShape u₁) (h9 : L.P9) (c : ZMod n
     set e := 1 + padicValNat B.ℓ (k + 1) with he
     set εi : O := ((ε⁻¹ : Oˣ) : O) with hεi
     have hρ' : -(C εi • ρ) ∈ L.N c := Submodule.neg_mem _ (Submodule.smul_mem _ _ hρ)
-    refine ⟨fun r => if r = k + 1 then 0 else b r + e,
-      fun r => if r = k + 1 then -(C εi • ρ) else d r, ?_, ?_⟩
+    refine ⟨
+      fun r => if r = k + 1 then 0 else b r + e,
+      fun r => if r = k + 1 then -(C εi • ρ) else d r,
+      ?_,
+      ?_
+    ⟩
     · intro r h1 h2
       by_cases hr : r = k + 1
       · subst hr
@@ -711,10 +785,11 @@ theorem hh_main {u₁ : O} (hE : B.GammaXUnitShape u₁) (h9 : L.P9) (c : ZMod n
         refine ⟨?_, h4⟩
         rw [hhA]
         omega
-    · have hsum : ∑ r ∈ Finset.Ico 1 (k + 1 + 1),
-          (B.lc ^ (if r = k + 1 then 0 else b r + e) * X ^ r) •
-            (if r = k + 1 then -(C εi • ρ) else d r) =
-          B.lc ^ e • v + (X : PowerSeries O) ^ (k + 1) • (-(C εi • ρ)) := by
+    · have hsum
+          : ∑ r ∈ Finset.Ico 1 (k + 1 + 1),
+              (B.lc ^ (if r = k + 1 then 0 else b r + e) * X ^ r) •
+                (if r = k + 1 then -(C εi • ρ) else d r)
+            = B.lc ^ e • v + (X : PowerSeries O) ^ (k + 1) • (-(C εi • ρ)) := by
         rw [Finset.sum_Ico_succ_top (by omega)]
         congr 1
         · rw [hv, Finset.smul_sum]
@@ -730,28 +805,37 @@ theorem hh_main {u₁ : O} (hE : B.GammaXUnitShape u₁) (h9 : L.P9) (c : ZMod n
         · simp
       rw [hsum]
       obtain ⟨w, hw, hwe⟩ := mem_sm.1 (hh_gr L hE.1 h9 c (k + 1) hρ)
-      have hγ' : L.γ c ((X : PowerSeries O) ^ (k + 1) • (-(C εi • ρ))) =
-          -(C εi • L.γ c ((X : PowerSeries O) ^ (k + 1) • ρ)) := by
+      have hγ'
+          : L.γ c ((X : PowerSeries O) ^ (k + 1) • (-(C εi • ρ)))
+            = -(C εi • L.γ c ((X : PowerSeries O) ^ (k + 1) • ρ)) := by
         rw [smul_neg, map_neg, smul_comm, γ_C]
       have hc : (C εi : PowerSeries O) * (C (u₁ ^ (k + 1)) - 1) = B.lc ^ e := by
         rw [lc_pow, ← map_one (C (R := O)), ← map_sub, ← map_mul, hε, ← mul_assoc, hεi,
           Units.inv_mul, one_mul]
-      have hP : ((C εi : PowerSeries O) * (C (u₁ ^ (k + 1)) - 1)) • (X : PowerSeries O) ^ (k + 1) • ρ
-          = B.lc ^ e • (X : PowerSeries O) ^ (k + 1) • ρ := by rw [hc]
-      have hfin : (L.γ c (B.lc ^ e • v + (X : PowerSeries O) ^ (k + 1) • (-(C εi • ρ))) -
-          (B.lc ^ e • v + (X : PowerSeries O) ^ (k + 1) • (-(C εi • ρ)))) -
-          B.lc ^ hhA B.ℓ (k + 1) • z = (X : PowerSeries O) ^ (k + 1 + 1) • (-(C εi • w)) := by
-        have hG : L.γ c ((X : PowerSeries O) ^ (k + 1) • ρ) = (X : PowerSeries O) ^ (k + 1 + 1) • w +
-            C (u₁ ^ (k + 1)) • (X : PowerSeries O) ^ (k + 1) • ρ := by rw [hwe]; abel
+      have hP
+          : ((C εi : PowerSeries O) * (C (u₁ ^ (k + 1)) - 1)) • (X : PowerSeries O) ^ (k + 1) • ρ
+            = B.lc ^ e • (X : PowerSeries O) ^ (k + 1) • ρ := by
+        rw [hc]
+      have hfin
+          : (L.γ c (B.lc ^ e • v + (X : PowerSeries O) ^ (k + 1) • (-(C εi • ρ)))
+                - (B.lc ^ e • v + (X : PowerSeries O) ^ (k + 1) • (-(C εi • ρ))))
+              - B.lc ^ hhA B.ℓ (k + 1) • z
+            = (X : PowerSeries O) ^ (k + 1 + 1) • (-(C εi • w)) := by
+        have hG
+            : L.γ c ((X : PowerSeries O) ^ (k + 1) • ρ)
+              = (X : PowerSeries O) ^ (k + 1 + 1) • w
+                + C (u₁ ^ (k + 1)) • (X : PowerSeries O) ^ (k + 1) • ρ := by
+          rw [hwe]; abel
         have hγv : L.γ c v = (X : PowerSeries O) ^ (k + 1) • ρ + v + B.lc ^ hhA B.ℓ k • z := by
           rw [hρe]; abel
-        have hP' : B.lc ^ e • (X : PowerSeries O) ^ (k + 1) • ρ =
-            C εi • C (u₁ ^ (k + 1)) • (X : PowerSeries O) ^ (k + 1) • ρ -
-              C εi • (X : PowerSeries O) ^ (k + 1) • ρ := by
+        have hP'
+            : B.lc ^ e • (X : PowerSeries O) ^ (k + 1) • ρ
+              = C εi • C (u₁ ^ (k + 1)) • (X : PowerSeries O) ^ (k + 1) • ρ
+                - C εi • (X : PowerSeries O) ^ (k + 1) • ρ := by
           rw [← hP, mul_sub, mul_one, sub_smul, mul_smul]
         have hA : hhA B.ℓ (k + 1) = hhA B.ℓ k + e := rfl
-        rw [map_add (f := _), γ_lc, hγ', hA, pow_add B.lc (hhA B.ℓ k) e, hG, hγv, smul_neg, smul_comm _ (C εi) ρ, smul_add,
-          smul_add, hP']
+        rw [map_add (f := _), γ_lc, hγ', hA, pow_add B.lc (hhA B.ℓ k) e, hG, hγv, smul_neg,
+          smul_comm _ (C εi) ρ, smul_add, smul_add, hP']
         generalize (X : PowerSeries O) ^ (k + 1) • ρ = P
         simp only [smul_add, smul_neg, smul_smul, mul_comm]
         abel
@@ -779,8 +863,9 @@ theorem gamma_injective_holds : GamInjOf := by
       obtain ⟨x, hx, hxe⟩ := mem_sm.1 hK
       obtain ⟨ε, hε⟩ := hpow m hm0
       have h1 := hh_gr L hu h9 c m hx
-      have h2 : L.γ c ((X : PowerSeries O) ^ m • x) - (X : PowerSeries O) ^ m • x ∈
-          sm (X ^ (m + 1)) (L.N c) := by
+      have h2
+          : L.γ c ((X : PowerSeries O) ^ m • x) - (X : PowerSeries O) ^ m • x
+            ∈ sm (X ^ (m + 1)) (L.N c) := by
         rw [hxe, γ_lc, ← smul_sub]
         exact Submodule.smul_mem _ _ (hh_sm_pow_mono hm hγ)
       have h3 : C (u₁ ^ m - 1) • (X : PowerSeries O) ^ m • x ∈ sm (X ^ (m + 1)) (L.N c) := by
@@ -809,8 +894,9 @@ theorem height_bound_holds : HOf := by
 theorem second_rule_first_form : ExistsTransport := by
   intro O _ B n _ j M g sig V _ _ L c hT hH z hz
   obtain ⟨K, a, b, d, habd, hres⟩ := hH z hz
-  have hx : ∀ r, ∃ x y : PowerSeries O, 1 ≤ r → r < M →
-      B.lc ^ sig * ((⇑B.φ)^[j] X) ^ r - B.lc ^ a r * x = y * B.ff j M g := by
+  have hx
+      : ∀ r, ∃ x y : PowerSeries O,
+        1 ≤ r → r < M → B.lc ^ sig * ((⇑B.φ)^[j] X) ^ r - B.lc ^ a r * x = y * B.ff j M g := by
     intro r
     by_cases hr : 1 ≤ r ∧ r < M
     · obtain ⟨x, hx⟩ := hT r (a r) (habd r hr.1 hr.2).2.1
@@ -818,16 +904,23 @@ theorem second_rule_first_form : ExistsTransport := by
       exact ⟨x, y, fun _ _ => hy.symm⟩
     · exact ⟨0, 0, fun h1 h2 => absurd ⟨h1, h2⟩ hr⟩
   choose x y hxy using hx
-  refine ⟨∑ r ∈ Finset.Ico 1 M, x r • L.phiIt c j (d r), ?_, K,
-    ∑ r ∈ Finset.Ico 1 M, (B.lc ^ b r * X ^ r) • d r, ?_, hres, ?_⟩
+  refine ⟨
+    ∑ r ∈ Finset.Ico 1 M, x r • L.phiIt c j (d r),
+    ?_,
+    K,
+    ∑ r ∈ Finset.Ico 1 M, (B.lc ^ b r * X ^ r) • d r,
+    ?_,
+    hres,
+    ?_
+  ⟩
   · refine Submodule.sum_mem _ fun r hr => Submodule.smul_mem _ _ ?_
     obtain ⟨h1, h2⟩ := Finset.mem_Ico.1 hr
     exact phiIt_mem_pull L j (habd r h1 h2).2.2
   · refine Submodule.sum_mem _ fun r hr => ?_
     obtain ⟨h1, h2⟩ := Finset.mem_Ico.1 hr
     obtain ⟨t, rfl⟩ : ∃ t, r = t + 1 := ⟨r - 1, by omega⟩
-    have : (B.lc ^ b (t + 1) * X ^ (t + 1)) • d (t + 1) =
-        (X : PowerSeries O) • ((B.lc ^ b (t + 1) * X ^ t) • d (t + 1)) := by
+    have : (B.lc ^ b (t + 1) * X ^ (t + 1)) • d (t + 1)
+        = (X : PowerSeries O) • ((B.lc ^ b (t + 1) * X ^ t) • d (t + 1)) := by
       rw [smul_smul]
       congr 1
       ring
@@ -838,9 +931,9 @@ theorem second_rule_first_form : ExistsTransport := by
     obtain ⟨h1, h2⟩ := Finset.mem_Ico.1 hr
     obtain ⟨hK, -, hd⟩ := habd r h1 h2
     have h := hxy r h1 h2
-    have : B.lc ^ K • x r • L.phiIt c j (d r) -
-        B.lc ^ sig • L.phiIt c j ((B.lc ^ b r * X ^ r) • d r) =
-        B.ff j M g • ((-(B.lc ^ b r * y r)) • L.phiIt c j (d r)) := by
+    have : B.lc ^ K • x r • L.phiIt c j (d r)
+          - B.lc ^ sig • L.phiIt c j ((B.lc ^ b r * X ^ r) • d r)
+        = B.ff j M g • ((-(B.lc ^ b r * y r)) • L.phiIt c j (d r)) := by
       rw [mul_smul, phiIt_lc, phiIt_smul, it_pow, ← hK, smul_smul, smul_smul, smul_smul, smul_smul,
         ← sub_smul]
       congr 1
@@ -855,8 +948,8 @@ open IdempotentNormalFormsRhoFacts
 section f1b_abs
 variable {R : Type} [CommRing R] {V : Type} [AddCommGroup V] [Module R V]
 
-theorem mem_ideal_smul_top_iff (I : Ideal R) (S : Submodule R V) (x : S) :
-    x ∈ I • (⊤ : Submodule R S) ↔ (x : V) ∈ I • S := by
+theorem mem_ideal_smul_top_iff (I : Ideal R) (S : Submodule R V) (x : S)
+    : x ∈ I • (⊤ : Submodule R S) ↔ (x : V) ∈ I • S := by
   have e : (I • (⊤ : Submodule R S)).map S.subtype = I • S := by
     rw [Submodule.map_smul'', Submodule.map_subtype_top]
   constructor
@@ -869,10 +962,12 @@ theorem mem_ideal_smul_top_iff (I : Ideal R) (S : Submodule R V) (x : S) :
     have : y = x := Subtype.ext hxy
     exact this ▸ hy
 
-theorem ideal_smul_submodule_le (I : Ideal R) (S : Submodule R V) : I • S ≤ S := Submodule.smul_le_right
+theorem ideal_smul_submodule_le (I : Ideal R) (S : Submodule R V) : I • S ≤ S :=
+  Submodule.smul_le_right
 
-theorem hausdorff_mem_all_powers_zero (I : Ideal R) (S : Submodule R V) [IsHausdorff I S] {v : V}
-    (h : ∀ k : ℕ, v ∈ I ^ k • S) : v = 0 := by
+theorem hausdorff_mem_all_powers_zero
+    (I : Ideal R) (S : Submodule R V) [IsHausdorff I S] {v : V} (h : ∀ k : ℕ, v ∈ I ^ k • S)
+    : v = 0 := by
   have hv : v ∈ S := ideal_smul_submodule_le _ _ (h 0)
   have : (⟨v, hv⟩ : S) = 0 := by
     apply IsHausdorff.haus (I := I) inferInstance
@@ -881,11 +976,12 @@ theorem hausdorff_mem_all_powers_zero (I : Ideal R) (S : Submodule R V) [IsHausd
     exact h k
   exact congrArg Subtype.val this
 
-theorem precomplete_cauchy_limit_exists (I : Ideal R) (S : Submodule R V) [IsPrecomplete I S] (f : ℕ → V)
-    (hf : ∀ k, f k ∈ S) (hc : ∀ m n, m ≤ n → f m - f n ∈ I ^ m • S) :
-    ∃ y ∈ S, ∀ k, f k - y ∈ I ^ k • S := by
-  obtain ⟨y, hy⟩ := IsPrecomplete.prec (I := I) (M := S) inferInstance
-    (f := fun k => (⟨f k, hf k⟩ : S)) (by
+theorem precomplete_cauchy_limit_exists
+    (I : Ideal R) (S : Submodule R V) [IsPrecomplete I S]
+    (f : ℕ → V) (hf : ∀ k, f k ∈ S) (hc : ∀ m n, m ≤ n → f m - f n ∈ I ^ m • S)
+    : ∃ y ∈ S, ∀ k, f k - y ∈ I ^ k • S := by
+  obtain ⟨y, hy⟩ :=
+    IsPrecomplete.prec (I := I) (M := S) inferInstance (f := fun k => (⟨f k, hf k⟩ : S)) (by
       intro m n hmn
       rw [SModEq.sub_mem, mem_ideal_smul_top_iff]
       exact hc m n hmn)
@@ -897,15 +993,18 @@ theorem precomplete_cauchy_limit_exists (I : Ideal R) (S : Submodule R V) [IsPre
 end f1b_abs
 
 section f1b_lat
-variable {O : Type} [CommRing O] {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V]
-  [Module (PowerSeries O) V] (L : Lat B n V)
+variable
+  {O : Type} [CommRing O]
+  {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
+  (L : Lat B n V)
 
 theorem uniformizer_mem_maximal_ideal : B.q ∈ B.mm := by
   unfold Base.q Base.mm
   exact Ideal.add_mem _ (Ideal.subset_span (by simp)) (Ideal.subset_span (by simp [Base.lc]))
 
-theorem frobenius_preserves_maximal_power (h3 : B.E3) (k : ℕ) {a : PowerSeries O} (ha : a ∈ B.mm ^ k) :
-    B.φ a ∈ B.mm ^ k := by
+theorem frobenius_preserves_maximal_power
+    (h3 : B.E3) (k : ℕ) {a : PowerSeries O} (ha : a ∈ B.mm ^ k)
+    : B.φ a ∈ B.mm ^ k := by
   have h1 : B.mm ≤ Ideal.comap B.φ B.mm := by
     unfold Base.mm
     rw [Ideal.span_le]
@@ -923,14 +1022,18 @@ theorem frobenius_preserves_maximal_power (h3 : B.E3) (k : ℕ) {a : PowerSeries
     (Ideal.pow_right_mono h1 k).trans (Ideal.le_comap_pow _ _)
   exact h2 ha
 
-theorem phi_maps_filtered_lattice (h3 : B.E3) {M : ℕ} (hq : L.FrobeniusMapsXPow M) (i : ZMod n) (k : ℕ) {w : V}
-    (hw : w ∈ B.mm ^ k • L.N (i - 1)) :
-    L.φ i ((X : PowerSeries O) ^ M • w) ∈ sm (X ^ M) (B.mm ^ (k + 1) • L.N i) := by
+theorem phi_maps_filtered_lattice
+    (h3 : B.E3)
+    {M : ℕ} (hq : L.FrobeniusMapsXPow M)
+    (i : ZMod n) (k : ℕ)
+    {w : V} (hw : w ∈ B.mm ^ k • L.N (i - 1))
+    : L.φ i ((X : PowerSeries O) ^ M • w) ∈ sm (X ^ M) (B.mm ^ (k + 1) • L.N i) := by
   induction hw using Submodule.smul_induction_on' with
   | smul a ha x hx =>
     obtain ⟨y, hy, hyx⟩ := mem_sm.1 (hq i _ (smul_mem_sm (X ^ M) hx))
-    have e : L.φ i ((X : PowerSeries O) ^ M • a • x) =
-        (X : PowerSeries O) ^ M • (B.φ a * B.q) • y := by
+    have e
+        : L.φ i ((X : PowerSeries O) ^ M • a • x)
+          = (X : PowerSeries O) ^ M • (B.φ a * B.q) • y := by
       rw [smul_comm, L.φ_semi, ← hyx, ← mul_smul, ← mul_smul]
       congr 1
       ring
@@ -938,13 +1041,17 @@ theorem phi_maps_filtered_lattice (h3 : B.E3) {M : ℕ} (hq : L.FrobeniusMapsXPo
     apply smul_mem_sm
     apply Submodule.smul_mem_smul _ hy
     rw [pow_succ]
-    exact Ideal.mul_mem_mul (frobenius_preserves_maximal_power h3 k ha) uniformizer_mem_maximal_ideal
+    exact Ideal.mul_mem_mul (frobenius_preserves_maximal_power h3 k ha)
+      uniformizer_mem_maximal_ideal
   | add x _ y _ hx hy =>
     rw [smul_add, map_add (f := _)]
     exact Submodule.add_mem _ hx hy
 
-theorem power_series_X_cancel (hX : L.XReg) (i : ZMod n) (M : ℕ) {w : V} (hw : w ∈ L.N i)
-    (h : (X : PowerSeries O) ^ M • w = 0) : w = 0 := by
+theorem power_series_X_cancel
+    (hX : L.XReg)
+    (i : ZMod n) (M : ℕ)
+    {w : V} (hw : w ∈ L.N i) (h : (X : PowerSeries O) ^ M • w = 0)
+    : w = 0 := by
   induction M with
   | zero => simpa using h
   | succ M ih =>
@@ -953,8 +1060,11 @@ theorem power_series_X_cancel (hX : L.XReg) (i : ZMod n) (M : ℕ) {w : V} (hw :
     rw [← mul_smul, ← pow_succ']
     exact h
 
-theorem mem_all_filtered_powers_zero (hC : L.Complete) (hX : L.XReg) (i : ZMod n) (M : ℕ) {v : V}
-    (h : ∀ k : ℕ, v ∈ sm (X ^ M) (B.mm ^ k • L.N i)) : v = 0 := by
+theorem mem_all_filtered_powers_zero
+    (hC : L.Complete) (hX : L.XReg)
+    (i : ZMod n) (M : ℕ)
+    {v : V} (h : ∀ k : ℕ, v ∈ sm (X ^ M) (B.mm ^ k • L.N i))
+    : v = 0 := by
   obtain ⟨w, hw, rfl⟩ := mem_sm.1 (h 0)
   have hwN : w ∈ L.N i := ideal_smul_submodule_le _ _ hw
   have : IsAdicComplete B.mm (L.N i) := hC i
@@ -969,11 +1079,13 @@ theorem mem_all_filtered_powers_zero (hC : L.Complete) (hX : L.XReg) (i : ZMod n
     exact hw'
   rw [hw0, smul_zero]
 
-theorem power_series_smul_map_mono {a : PowerSeries O} {S T : Submodule (PowerSeries O) V} (h : S ≤ T) :
-    sm a S ≤ sm a T := Submodule.map_mono h
+theorem power_series_smul_map_mono
+    {a : PowerSeries O} {S T : Submodule (PowerSeries O) V} (h : S ≤ T)
+    : sm a S ≤ sm a T :=
+  Submodule.map_mono h
 
-theorem maximal_power_smul_antitone (i : ZMod n) {k m : ℕ} (h : k ≤ m) :
-    B.mm ^ m • L.N i ≤ B.mm ^ k • L.N i :=
+theorem maximal_power_smul_antitone (i : ZMod n) {k m : ℕ} (h : k ≤ m)
+    : B.mm ^ m • L.N i ≤ B.mm ^ k • L.N i :=
   Submodule.smul_mono_left (Ideal.pow_le_pow_right h)
 
 theorem maximal_power_zero_smul (i : ZMod n) : B.mm ^ 0 • L.N i = L.N i := by
@@ -983,9 +1095,12 @@ def f1bIt (t : ZMod n → V) : ℕ → ZMod n → V
   | 0 => t
   | k + 1 => fun i => L.φ i (f1bIt t k (i - 1))
 
-theorem iterate_mem_filtered_lattice (h3 : B.E3) {M : ℕ} (hq : L.FrobeniusMapsXPow M) {t : ZMod n → V}
-    (ht : ∀ i, t i ∈ sm (X ^ M) (L.N i)) (k : ℕ) :
-    ∀ i, f1bIt L t k i ∈ sm (X ^ M) (B.mm ^ k • L.N i) := by
+theorem iterate_mem_filtered_lattice
+    (h3 : B.E3)
+    {M : ℕ} (hq : L.FrobeniusMapsXPow M)
+    {t : ZMod n → V} (ht : ∀ i, t i ∈ sm (X ^ M) (L.N i))
+    (k : ℕ)
+    : ∀ i, f1bIt L t k i ∈ sm (X ^ M) (B.mm ^ k • L.N i) := by
   induction k with
   | zero => intro i; rw [maximal_power_zero_smul]; exact ht i
   | succ k ih =>
@@ -1042,26 +1157,30 @@ theorem lattice_filtration_second_form : FrobeniusDiffBijective := by
     apply mem_all_filtered_powers_zero L hC hX i M
     intro K
 
-    have e1 : L.φ i ((X : PowerSeries O) ^ M • y (i - 1)) =
-        (∑ k ∈ Finset.range K, f1bIt L t (k + 1) i) -
-          L.φ i ((X : PowerSeries O) ^ M • ((∑ k ∈ Finset.range K, w k (i - 1)) - y (i - 1))) := by
+    have e1
+        : L.φ i ((X : PowerSeries O) ^ M • y (i - 1))
+          = (∑ k ∈ Finset.range K, f1bIt L t (k + 1) i) - L.φ i
+            ((X : PowerSeries O) ^ M • ((∑ k ∈ Finset.range K, w k (i - 1)) - y (i - 1))) := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [smul_sub, map_sub, Finset.smul_sum, map_sum]
       simp only [hwe]
       simp [f1bIt]
-    have e2 : (X : PowerSeries O) ^ M • y i = (∑ k ∈ Finset.range K, f1bIt L t k i) -
-        (X : PowerSeries O) ^ M • ((∑ k ∈ Finset.range K, w k i) - y i) := by
+    have e2
+        : (X : PowerSeries O) ^ M • y i
+          = (∑ k ∈ Finset.range K, f1bIt L t k i)
+            - (X : PowerSeries O) ^ M • ((∑ k ∈ Finset.range K, w k i) - y i) := by
       rw [smul_sub, Finset.smul_sum]
       simp only [hwe]
       abel
-    have e3 : (∑ k ∈ Finset.range K, f1bIt L t (k + 1) i) =
-        (∑ k ∈ Finset.range K, f1bIt L t k i) + f1bIt L t K i - t i := by
+    have e3
+        : (∑ k ∈ Finset.range K, f1bIt L t (k + 1) i)
+          = (∑ k ∈ Finset.range K, f1bIt L t k i) + f1bIt L t K i - t i := by
       rw [← Finset.sum_range_succ, Finset.sum_range_succ']
       simp [f1bIt]
-    have e4 : L.dφ (fun i => -((X : PowerSeries O) ^ M • y i)) i - t i =
-        L.φ i ((X : PowerSeries O) ^ M • ((∑ k ∈ Finset.range K, w k (i - 1)) - y (i - 1))) -
-          f1bIt L t K i -
-          (X : PowerSeries O) ^ M • ((∑ k ∈ Finset.range K, w k i) - y i) := by
+    have e4
+        : L.dφ (fun i => -((X : PowerSeries O) ^ M • y i)) i - t i
+          = L.φ i ((X : PowerSeries O) ^ M • ((∑ k ∈ Finset.range K, w k (i - 1)) - y (i - 1)))
+            - f1bIt L t K i - (X : PowerSeries O) ^ M • ((∑ k ∈ Finset.range K, w k i) - y i) := by
       show L.φ i (-((X : PowerSeries O) ^ M • y (i - 1))) - -((X : PowerSeries O) ^ M • y i) - t i
         = _
       rw [map_neg, e1, e3]
@@ -1069,7 +1188,8 @@ theorem lattice_filtration_second_form : FrobeniusDiffBijective := by
       abel
     rw [e4]
     refine Submodule.sub_mem _ (Submodule.sub_mem _ ?_ (hit K i)) (smul_mem_sm _ (hyK i K))
-    exact power_series_smul_map_mono (maximal_power_smul_antitone L i (Nat.le_succ K)) (phi_maps_filtered_lattice L h3 hq i K (hyK (i - 1) K))
+    exact power_series_smul_map_mono (maximal_power_smul_antitone L i (Nat.le_succ K))
+      (phi_maps_filtered_lattice L h3 hq i K (hyK (i - 1) K))
   refine ⟨fun i => -((X : PowerSeries O) ^ M • y i), ⟨fun i => ?_, hex⟩, ?_⟩
   · exact Submodule.neg_mem _ (smul_mem_sm _ (hy i))
   · rintro z ⟨hz, hzt⟩
@@ -1084,7 +1204,8 @@ namespace GoodPlacesAlt
 section e4u
 variable {R : Type} [CommRing R]
 
-theorem one_add_pow_expansion (t : R) (i : ℕ) : ∃ c : R, (1 + t) ^ i = 1 + (i : R) * t + t ^ 2 * c := by
+theorem one_add_pow_expansion (t : R) (i : ℕ)
+    : ∃ c : R, (1 + t) ^ i = 1 + (i : R) * t + t ^ 2 * c := by
   induction i with
   | zero => exact ⟨0, by simp⟩
   | succ i ih =>
@@ -1094,8 +1215,10 @@ theorem one_add_pow_expansion (t : R) (i : ℕ) : ∃ c : R, (1 + t) ^ i = 1 + (
     push_cast
     ring
 
-theorem geom_sum_one_add_expansion (t : R) (n : ℕ) : ∃ c : R, ∑ i ∈ Finset.range n, (1 + t) ^ i =
-    (n : R) + ((∑ i ∈ Finset.range n, i : ℕ) : R) * t + t ^ 2 * c := by
+theorem geom_sum_one_add_expansion (t : R) (n : ℕ)
+    : ∃ c : R,
+      ∑ i ∈ Finset.range n, (1 + t) ^ i
+        = (n : R) + ((∑ i ∈ Finset.range n, i : ℕ) : R) * t + t ^ 2 * c := by
   induction n with
   | zero => exact ⟨0, by simp⟩
   | succ n ih =>
@@ -1106,8 +1229,8 @@ theorem geom_sum_one_add_expansion (t : R) (n : ℕ) : ∃ c : R, ∑ i ∈ Fins
     push_cast
     ring
 
-theorem one_add_pow_eq_geom_sum (t : R) (n : ℕ) :
-    (1 + t) ^ n = 1 + t * ∑ i ∈ Finset.range n, (1 + t) ^ i := by
+theorem one_add_pow_eq_geom_sum (t : R) (n : ℕ)
+    : (1 + t) ^ n = 1 + t * ∑ i ∈ Finset.range n, (1 + t) ^ i := by
   have := mul_geom_sum (1 + t) n
   rw [add_sub_cancel_left] at this
   rw [this]
@@ -1115,18 +1238,18 @@ theorem one_add_pow_eq_geom_sum (t : R) (n : ℕ) :
 
 variable [IsLocalRing R]
 
-theorem unit_add_nonunit_mul_isUnit {x l : R} (hx : IsUnit x) (hl : ¬IsUnit l) (y : R) :
-    IsUnit (x + l * y) := by
+theorem unit_add_nonunit_mul_isUnit {x l : R} (hx : IsUnit x) (hl : ¬ IsUnit l) (y : R)
+    : IsUnit (x + l * y) := by
   by_contra h
-  have h2 : ¬IsUnit (-(l * y)) := by
+  have h2 : ¬ IsUnit (-(l * y)) := by
     rw [IsUnit.neg_iff]
     exact not_isUnit_of_not_isUnit_dvd hl ⟨y, rfl⟩
   have := IsLocalRing.nonunits_add h h2
   rw [add_neg_cancel_right] at this
   exact this hx
 
-theorem cast_coprime_isUnit {ℓ r : ℕ} (hl : ¬IsUnit (ℓ : R)) (hr : Nat.Coprime r ℓ) :
-    IsUnit (r : R) := by
+theorem cast_coprime_isUnit {ℓ r : ℕ} (hl : ¬ IsUnit (ℓ : R)) (hr : Nat.Coprime r ℓ)
+    : IsUnit (r : R) := by
   have h1 : IsCoprime (r : ℤ) (ℓ : ℤ) := Nat.isCoprime_iff_coprime.2 hr
   obtain ⟨a, b, hab⟩ := h1
   have h2 : (a : R) * (r : R) + (b : R) * (ℓ : R) = 1 := by
@@ -1137,20 +1260,23 @@ theorem cast_coprime_isUnit {ℓ r : ℕ} (hl : ¬IsUnit (ℓ : R)) (hr : Nat.Co
     exact unit_add_nonunit_mul_isUnit isUnit_one hl _
   exact isUnit_of_mul_isUnit_right h4
 
-theorem one_add_pow_coprime_unit {ℓ r : ℕ} (hl : ¬IsUnit (ℓ : R)) (hr : Nat.Coprime r ℓ) (k : ℕ) {x : R}
-    (hx : IsUnit x) :
-    ∃ x' : R, IsUnit x' ∧ (1 + (ℓ : R) ^ (k + 1) * x) ^ r = 1 + (ℓ : R) ^ (k + 1) * x' := by
+theorem one_add_pow_coprime_unit
+    {ℓ r : ℕ} (hl : ¬ IsUnit (ℓ : R)) (hr : Nat.Coprime r ℓ) (k : ℕ) {x : R} (hx : IsUnit x)
+    : ∃ x' : R, IsUnit x' ∧ (1 + (ℓ : R) ^ (k + 1) * x) ^ r = 1 + (ℓ : R) ^ (k + 1) * x' := by
   obtain ⟨c, hc⟩ := geom_sum_one_add_expansion ((ℓ : R) ^ (k + 1) * x) r
   set S : R := ((∑ i ∈ Finset.range r, i : ℕ) : R) with hS
-  refine ⟨x * ((r : R) + (ℓ : R) * ((ℓ : R) ^ k * x * S +
-    (ℓ : R) ^ k * x * ((ℓ : R) ^ (k + 1) * x) * c)), ?_, ?_⟩
+  refine ⟨
+    x * ((r : R) + (ℓ : R) * ((ℓ : R) ^ k * x * S + (ℓ : R) ^ k * x * ((ℓ : R) ^ (k + 1) * x) * c)),
+    ?_,
+    ?_
+  ⟩
   · exact hx.mul (unit_add_nonunit_mul_isUnit (cast_coprime_isUnit hl hr) hl _)
   · rw [one_add_pow_eq_geom_sum, hc]
     ring
 
-theorem one_add_pow_prime_unit {ℓ : ℕ} (hl : ¬IsUnit (ℓ : R)) (hodd : Odd ℓ) (k : ℕ) {x : R}
-    (hx : IsUnit x) :
-    ∃ x' : R, IsUnit x' ∧ (1 + (ℓ : R) ^ (k + 1) * x) ^ ℓ = 1 + (ℓ : R) ^ (k + 2) * x' := by
+theorem one_add_pow_prime_unit
+    {ℓ : ℕ} (hl : ¬ IsUnit (ℓ : R)) (hodd : Odd ℓ) (k : ℕ) {x : R} (hx : IsUnit x)
+    : ∃ x' : R, IsUnit x' ∧ (1 + (ℓ : R) ^ (k + 1) * x) ^ ℓ = 1 + (ℓ : R) ^ (k + 2) * x' := by
   obtain ⟨m, hm⟩ := hodd
   obtain ⟨c, hc⟩ := geom_sum_one_add_expansion ((ℓ : R) ^ (k + 1) * x) ℓ
   have hsum : (∑ i ∈ Finset.range ℓ, i : ℕ) = ℓ * m := by
@@ -1159,16 +1285,19 @@ theorem one_add_pow_prime_unit {ℓ : ℕ} (hl : ¬IsUnit (ℓ : R)) (hodd : Odd
     rw [h3, ← mul_assoc] at h2
     exact Nat.eq_of_mul_eq_mul_right (by norm_num) h2
   rw [hsum] at hc
-  refine ⟨x * (1 + (ℓ : R) * ((m : R) * ((ℓ : R) ^ k * x) +
-    (ℓ : R) ^ k * x * ((ℓ : R) ^ k * x) * c)), ?_, ?_⟩
+  refine ⟨
+    x * (1 + (ℓ : R) * ((m : R) * ((ℓ : R) ^ k * x) + (ℓ : R) ^ k * x * ((ℓ : R) ^ k * x) * c)),
+    ?_,
+    ?_
+  ⟩
   · exact hx.mul (unit_add_nonunit_mul_isUnit isUnit_one hl _)
   · rw [one_add_pow_eq_geom_sum, hc]
     push_cast
     ring
 
-theorem one_add_pow_prime_power_unit {ℓ : ℕ} (hl : ¬IsUnit (ℓ : R)) (hodd : Odd ℓ) {x : R} (hx : IsUnit x)
-    (a : ℕ) :
-    ∃ x' : R, IsUnit x' ∧ (1 + (ℓ : R) * x) ^ (ℓ ^ a) = 1 + (ℓ : R) ^ (a + 1) * x' := by
+theorem one_add_pow_prime_power_unit
+    {ℓ : ℕ} (hl : ¬ IsUnit (ℓ : R)) (hodd : Odd ℓ) {x : R} (hx : IsUnit x) (a : ℕ)
+    : ∃ x' : R, IsUnit x' ∧ (1 + (ℓ : R) * x) ^ (ℓ ^ a) = 1 + (ℓ : R) ^ (a + 1) * x' := by
   induction a with
   | zero => exact ⟨x, hx, by simp⟩
   | succ a ih =>
@@ -1176,9 +1305,11 @@ theorem one_add_pow_prime_power_unit {ℓ : ℕ} (hl : ¬IsUnit (ℓ : R)) (hodd
     obtain ⟨z, hz, hza⟩ := one_add_pow_prime_unit hl hodd a hy
     exact ⟨z, hz, by rw [pow_succ, pow_mul, hya, hza]⟩
 
-theorem one_add_pow_sub_one_valuation {ℓ : ℕ} (hp : ℓ.Prime) (h3 : 3 ≤ ℓ) (hl : ¬IsUnit (ℓ : R)) {x : R}
-    (hx : IsUnit x) (r : ℕ) (hr : 1 ≤ r) :
-    ∃ ε : Rˣ, (1 + (ℓ : R) * x) ^ r - 1 = (ε : R) * (ℓ : R) ^ (1 + padicValNat ℓ r) := by
+theorem one_add_pow_sub_one_valuation
+    {ℓ : ℕ} (hp : ℓ.Prime) (h3 : 3 ≤ ℓ) (hl : ¬ IsUnit (ℓ : R))
+    {x : R} (hx : IsUnit x)
+    (r : ℕ) (hr : 1 ≤ r)
+    : ∃ ε : Rˣ, (1 + (ℓ : R) * x) ^ r - 1 = (ε : R) * (ℓ : R) ^ (1 + padicValNat ℓ r) := by
   have : Fact ℓ.Prime := ⟨hp⟩
   have hodd : Odd ℓ := hp.odd_of_ne_two (by omega)
   obtain ⟨a, r', hr', rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd (by omega : r ≠ 0) ℓ hp.ne_one
@@ -1186,7 +1317,12 @@ theorem one_add_pow_sub_one_valuation {ℓ : ℕ} (hp : ℓ.Prime) (h3 : 3 ≤ �
     rintro rfl
     exact hr' (dvd_zero _)
   have hv : padicValNat ℓ (ℓ ^ a * r') = a := by
-    rw [(show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (pow_ne_zero _ hp.ne_zero) hr0,
+    rw [(show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+            a ≠ 0 → b ≠ 0
+              → _root_.padicValNat p (a * b)
+                = _root_.padicValNat p a + _root_.padicValNat p b from by
+          simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+        (pow_ne_zero _ hp.ne_zero) hr0,
       Nat.padicValNat_def, Nat.multiplicity_prime_pow, Nat.padicValNat_def,
       multiplicity_eq_zero_of_not_dvd hr', add_zero]
   have hco : Nat.Coprime r' ℓ := ((Nat.Prime.coprime_iff_not_dvd hp).2 hr').symm
@@ -1205,9 +1341,13 @@ open GoodPlacesAlt IdempotentNormalFormsRhoFacts
 theorem one_add_unit_pow_formula : ExistsGammaXUnitShape := by
   intro O _ _ _ ϖ B hϖ hd hp h3 h4
   obtain ⟨e, he⟩ := h4
-  have hl : ¬IsUnit (B.ℓ : O) := not_isUnit_of_not_isUnit_dvd hϖ.not_isUnit hd
+  have hl : ¬ IsUnit (B.ℓ : O) := not_isUnit_of_not_isUnit_dvd hϖ.not_isUnit hd
   have he0 : IsUnit (constantCoeff (e : PowerSeries O)) := e.isUnit.map constantCoeff
-  refine ⟨1 + (B.ℓ : O) * constantCoeff (e : PowerSeries O), ?_, one_add_pow_sub_one_valuation hp h3 hl he0⟩
+  refine ⟨
+    1 + (B.ℓ : O) * constantCoeff (e : PowerSeries O),
+    ?_,
+    one_add_pow_sub_one_valuation hp h3 hl he0
+  ⟩
   have hX : (X : PowerSeries O) ∣ (e : PowerSeries O) - C (constantCoeff (e : PowerSeries O)) := by
     rw [X_dvd_iff]
     simp
@@ -1238,8 +1378,8 @@ def cpI (l : O) (m : ℕ) : Ideal (PowerSeries O) where
       omega
     exact Dvd.dvd.mul_left ((pow_dvd_pow l (by omega)).trans (hf p.2 (by omega))) _
 
-theorem cp_C_mul {l : O} {m : ℕ} {s : PowerSeries O} (hs : s ∈ cpI l m) :
-    C l * s ∈ cpI l (m + 1) := by
+theorem cp_C_mul {l : O} {m : ℕ} {s : PowerSeries O} (hs : s ∈ cpI l m)
+    : C l * s ∈ cpI l (m + 1) := by
   intro k hk
   rw [coeff_C_mul]
   by_cases hkm : k < m
@@ -1250,8 +1390,8 @@ theorem cp_C_mul {l : O} {m : ℕ} {s : PowerSeries O} (hs : s ∈ cpI l m) :
     rw [this, pow_one]
     exact Dvd.intro _ rfl
 
-theorem cp_X_mul {l : O} {m : ℕ} {s : PowerSeries O} (hs : s ∈ cpI l m) :
-    X * s ∈ cpI l (m + 1) := by
+theorem cp_X_mul {l : O} {m : ℕ} {s : PowerSeries O} (hs : s ∈ cpI l m)
+    : X * s ∈ cpI l (m + 1) := by
   intro k hk
   cases k with
   | zero => rw [coeff_zero_X_mul]; exact dvd_zero _
@@ -1259,8 +1399,8 @@ theorem cp_X_mul {l : O} {m : ℕ} {s : PowerSeries O} (hs : s ∈ cpI l m) :
     rw [coeff_succ_X_mul, Nat.add_sub_add_right]
     exact hs k (by omega)
 
-theorem cp_pow_le (l : O) (m : ℕ) :
-    (Ideal.span {C l, X} : Ideal (PowerSeries O)) ^ m ≤ cpI l m := by
+theorem cp_pow_le (l : O) (m : ℕ)
+    : (Ideal.span {C l, X} : Ideal (PowerSeries O)) ^ m ≤ cpI l m := by
   induction m with
   | zero => intro f _ k hk; omega
   | succ m ih =>
@@ -1272,8 +1412,8 @@ theorem cp_pow_le (l : O) (m : ℕ) :
     exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (cp_C_mul (ih hs)))
       (Ideal.mul_mem_left _ _ (cp_X_mul (ih hs)))
 
-theorem cp_le_pow (l : O) (m : ℕ) :
-    cpI l m ≤ (Ideal.span {C l, X} : Ideal (PowerSeries O)) ^ m := by
+theorem cp_le_pow (l : O) (m : ℕ)
+    : cpI l m ≤ (Ideal.span {C l, X} : Ideal (PowerSeries O)) ^ m := by
   induction m with
   | zero => intro f _; simp
   | succ m ih =>
@@ -1295,14 +1435,17 @@ theorem cp_le_pow (l : O) (m : ℕ) :
       rw [hc, map_mul, map_pow]
       exact Ideal.mul_mem_right _ _ (Ideal.pow_mem_pow hC _)
 
-theorem cp_mem_pow_iff (l : O) (m : ℕ) (f : PowerSeries O) :
-    f ∈ (Ideal.span {C l, X} : Ideal (PowerSeries O)) ^ m ↔
-      ∀ k, k < m → l ^ (m - k) ∣ coeff k f :=
+theorem cp_mem_pow_iff (l : O) (m : ℕ) (f : PowerSeries O)
+    : f ∈ (Ideal.span {C l, X} : Ideal (PowerSeries O)) ^ m
+      ↔ ∀ k, k < m → l ^ (m - k) ∣ coeff k f :=
   ⟨fun h => cp_pow_le l m h, fun h => cp_le_pow l m h⟩
 
-theorem cp_mem_equiv {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] (J : Ideal R)
-    {r : ℕ} (Φ : M ≃ₗ[R] (Fin r → R)) (x : M) :
-    x ∈ (J • ⊤ : Submodule R M) ↔ ∀ t, Φ x t ∈ J := by
+theorem cp_mem_equiv
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
+    (J : Ideal R)
+    {r : ℕ} (Φ : M ≃ₗ[R] (Fin r → R))
+    (x : M)
+    : x ∈ (J • ⊤ : Submodule R M) ↔ ∀ t, Φ x t ∈ J := by
   constructor
   · intro hx
     induction hx using Submodule.smul_induction_on' with
@@ -1326,29 +1469,33 @@ theorem cp_mem_equiv {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] (J 
     rw [h2]
     exact Submodule.sum_mem _ fun t _ => Submodule.smul_mem_smul (h t) trivial
 
-theorem cp_O_mem (l : O) (n : ℕ) (x : O) :
-    x ∈ ((Ideal.span {l}) ^ n • ⊤ : Submodule O O) ↔ l ^ n ∣ x := by
+theorem cp_O_mem (l : O) (n : ℕ) (x : O)
+    : x ∈ ((Ideal.span {l}) ^ n • ⊤ : Submodule O O) ↔ l ^ n ∣ x := by
   rw [smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
 
-theorem cp_O_haus {l : O} (hO : IsAdicComplete (Ideal.span {l}) O) {x : O}
-    (h : ∀ n, l ^ n ∣ x) : x = 0 :=
+theorem cp_O_haus {l : O} (hO : IsAdicComplete (Ideal.span {l}) O) {x : O} (h : ∀ n, l ^ n ∣ x)
+    : x = 0 :=
   hO.toIsHausdorff.haus' x fun n => by
     rw [SModEq.zero, cp_O_mem]
     exact h n
 
-theorem cp_O_prec {l : O} (hO : IsAdicComplete (Ideal.span {l}) O) (g : ℕ → O)
-    (h : ∀ m n, m ≤ n → l ^ m ∣ g m - g n) : ∃ a : O, ∀ n, l ^ n ∣ g n - a := by
-  obtain ⟨a, ha⟩ := hO.toIsPrecomplete.prec' g (fun {m n} hmn => by
-    rw [SModEq.sub_mem, cp_O_mem]
-    exact h m n hmn)
+theorem cp_O_prec
+    {l : O} (hO : IsAdicComplete (Ideal.span {l}) O)
+    (g : ℕ → O) (h : ∀ m n, m ≤ n → l ^ m ∣ g m - g n)
+    : ∃ a : O, ∀ n, l ^ n ∣ g n - a := by
+  obtain ⟨a, ha⟩ :=
+    hO.toIsPrecomplete.prec' g (fun {m n} hmn => by
+      rw [SModEq.sub_mem, cp_O_mem]
+      exact h m n hmn)
   refine ⟨a, fun n => ?_⟩
   have := ha n
   rwa [SModEq.sub_mem, cp_O_mem] at this
 
-theorem cp_complete (l : O) (hO : IsAdicComplete (Ideal.span {l}) O) {M : Type}
-    [AddCommGroup M] [Module (PowerSeries O) M] {r : ℕ}
-    (Φ : M ≃ₗ[PowerSeries O] (Fin r → PowerSeries O)) :
-    IsAdicComplete (Ideal.span {C l, X} : Ideal (PowerSeries O)) M := by
+theorem cp_complete
+    (l : O) (hO : IsAdicComplete (Ideal.span {l}) O)
+    {M : Type} [AddCommGroup M] [Module (PowerSeries O) M]
+    {r : ℕ} (Φ : M ≃ₗ[PowerSeries O] (Fin r → PowerSeries O))
+    : IsAdicComplete (Ideal.span {C l, X} : Ideal (PowerSeries O)) M := by
   refine { toIsHausdorff := ⟨?_⟩, toIsPrecomplete := ⟨?_⟩ }
   · intro x hx
     apply Φ.injective
@@ -1363,8 +1510,9 @@ theorem cp_complete (l : O) (hO : IsAdicComplete (Ideal.span {l}) O) {M : Type}
     have h2 := (cp_mem_pow_iff l _ _).1 (h1 t) k (by omega)
     exact (pow_dvd_pow l (by omega)).trans h2
   · intro f hf
-    have hc : ∀ (t : Fin r) (k m n : ℕ), m ≤ n → k < m →
-        l ^ (m - k) ∣ coeff k (Φ (f m) t) - coeff k (Φ (f n) t) := by
+    have hc
+        : ∀ (t : Fin r) (k m n : ℕ),
+          m ≤ n → k < m → l ^ (m - k) ∣ coeff k (Φ (f m) t) - coeff k (Φ (f n) t) := by
       intro t k m n hmn hk
       have h1 := hf hmn
       rw [SModEq.sub_mem, cp_mem_equiv _ Φ] at h1
@@ -1392,11 +1540,12 @@ theorem cp_complete (l : O) (hO : IsAdicComplete (Ideal.span {l}) O) {M : Type}
 end cp
 
 section cplat
-variable {O : Type} [CommRing O] {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V]
-  [Module (PowerSeries O) V]
+variable
+  {O : Type} [CommRing O]
+  {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
 
-theorem cp_coord (L : Lat B n V) {i : ZMod n} (h : L.Free i) :
-    ∃ r : ℕ, Nonempty ((L.N i) ≃ₗ[PowerSeries O] (Fin r → PowerSeries O)) := by
+theorem cp_coord (L : Lat B n V) {i : ZMod n} (h : L.Free i)
+    : ∃ r : ℕ, Nonempty ((L.N i) ≃ₗ[PowerSeries O] (Fin r → PowerSeries O)) := by
   obtain ⟨r, e, hLI, he⟩ := h
   exact ⟨r, ⟨(LinearEquiv.ofEq _ _ he.symm).trans (Module.Basis.span hLI).equivFun⟩⟩
 
@@ -1428,12 +1577,11 @@ theorem X_regular_on_lattice : XRegOf := by
 
 open GoodPlacesAlt IdempotentNormalFormsRhoFacts
 
-theorem saturation_first_form_holds : SatAOf :=
-  fun _ _ _ _ ϖ B j M g hϖ hd h0 h3 => satA_of ϖ B j M g hϖ hd h0 (e3it B h3)
+theorem saturation_first_form_holds : SatAOf := fun _ _ _ _ ϖ B j M g hϖ hd h0 h3 =>
+  satA_of ϖ B j M g hϖ hd h0 (e3it B h3)
 
-theorem truncation_holds : TruncOf :=
-  fun _ _ B j M g sig hl hj h3 hs =>
-    trunc_of B j M g sig hl hj (e3it B h3 j) (e2 B (by omega) h3 (j - 1)) hs
+theorem truncation_holds : TruncOf := fun _ _ B j M g sig hl hj h3 hs =>
+  trunc_of B j M g sig hl hj (e3it B h3 j) (e2 B (by omega) h3 (j - 1)) hs
 
 theorem good_lattice_holds : LatGoodOf := by
   intro O _ _ _ ϖ B u₁ n _ Cu j M g G sig Mi V _ _ L hϖ hd h0 hp hl hj h3 h4u hG hs hP9 hP5 hMi
@@ -1441,11 +1589,19 @@ theorem good_lattice_holds : LatGoodOf := by
   have hF1 := lattice_filtration_first_form O B n M V L Mi h3 hP5 hMi
   have hsat := saturation_first_form_holds O ϖ B j M g hϖ hd h0 h3
   have htr := truncation_holds O B j M g sig hl hj h3 hs
-  exact ⟨hP9, hF1.2, lattice_filtration_second_form O B n M V L h3 hF1.1 hcomp hxreg,
-    fun c hc => lattice_induction_lemma_holds O B n j M g G V L c (by omega)
-      (fun k h1 h2 => lattice_exponent_property_mono L (hP5 _) (hthin c hc k h1 h2)),
-    fun c _ => second_rule_first_form O B n j M g sig V L c htr (height_bound_holds O B u₁ n M V L c hp h4u hP9),
+  exact ⟨
+    hP9,
+    hF1.2,
+    lattice_filtration_second_form O B n M V L h3 hF1.1 hcomp hxreg,
+    fun c hc =>
+      lattice_induction_lemma_holds O B n j M g G V L c (by omega)
+        (fun k h1 h2 => lattice_exponent_property_mono L (hP5 _) (hthin c hc k h1 h2)),
+    fun c _ =>
+      second_rule_first_form O B n j M g sig V L c htr
+        (height_bound_holds O B u₁ n M V L c hp h4u hP9),
     fun c _ => gamma_injective_holds O B u₁ n M V L c h4u hP9,
-    fun c hc => saturation_holds_alt O B n j _ V L c hsat (hfree c hc), hlt⟩
+    fun c hc => saturation_holds_alt O B n j _ V L c hsat (hfree c hc),
+    hlt
+  ⟩
 
 end Formalism.ExponentWindows.E

@@ -6,15 +6,28 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrthogonalCan
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 namespace GlobalTheory.RadCov.FullFlag
 
-theorem rkK_mono {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [FiniteDimensional K V] {M N : Submodule (𝓞 K) V} (h : M ≤ N) : Formalism.HN.rkK M ≤ Formalism.HN.rkK N :=
+theorem rkK_mono
+    {K V : Type}
+    [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [FiniteDimensional K V]
+    {M N : Submodule (𝓞 K) V} (h : M ≤ N)
+    : Formalism.HN.rkK M ≤ Formalism.HN.rkK N :=
   Submodule.finrank_mono (Submodule.span_mono h)
 
-theorem main : ∀ (I : AutInst) (xf : I.Gf) (a : ℕ) (j : Fin a → ℕ) (S : Fin (a + 1) → Submodule (𝓞 I.E) (Fin I.n → I.E)), IsSatFlag I (lamX I (1, xf)) j S → ∃ (F : ℕ → Submodule (𝓞 I.E) (Fin I.n → I.E)) (r : ℕ → ℕ), IsDualFlag I.J F (2 * a + 1) ∧ F (2 * a + 1) = lamX I (1, xf) ∧ (∀ i : Fin (a + 1), F i = S i) ∧ (∀ b, Formalism.HN.rkK (F (b + 1)) = Formalism.HN.rkK (F b) + r b) ∧ (∀ i : Fin a, r i = j i ∧ r (2 * a - i) = j i) ∧ r a = I.n - 2 * ∑ i, j i ∧ ∀ b, 2 * a + 1 ≤ b → r b = 0 := by
+theorem main
+    : ∀ (I : AutInst) (xf : I.Gf) (a : ℕ) (j : Fin a → ℕ)
+        (S : Fin (a + 1) → Submodule (𝓞 I.E) (Fin I.n → I.E)),
+      IsSatFlag I (lamX I (1, xf)) j S
+        → ∃ (F : ℕ → Submodule (𝓞 I.E) (Fin I.n → I.E)) (r : ℕ → ℕ),
+          IsDualFlag I.J F (2 * a + 1) ∧ F (2 * a + 1) = lamX I (1, xf)
+            ∧ (∀ i : Fin (a + 1), F i = S i)
+            ∧ (∀ b, Formalism.HN.rkK (F (b + 1)) = Formalism.HN.rkK (F b) + r b)
+            ∧ (∀ i : Fin a, r i = j i ∧ r (2 * a - i) = j i) ∧ r a = I.n - 2 * ∑ i, j i
+            ∧ ∀ b, 2 * a + 1 ≤ b → r b = 0 := by
   intro I xf a j S hS
   obtain ⟨h0, hmono, hrk, hsat, hiso⟩ := hS
   set x : I.GA := (1, xf) with hx
@@ -22,24 +35,33 @@ theorem main : ∀ (I : AutInst) (xf : I.Gf) (a : ℕ) (j : Fin a → ℕ) (S : 
   obtain ⟨-, -, -, -, hw⟩ := GlobalTheory.Count.FrameMajorant.frames_give_majorants I x
   have hX : ∀ v, IsUnit (frm I x v).det := fun v => (hw v).1
   obtain ⟨-, -, -, hmain⟩ := PerpStep.main I x
-  have hform : ∀ s y : Fin I.n → I.E,
-      star s ⬝ᵥ (I.J *ᵥ y) = Formalism.UG.hform (starRingEnd I.E) I.J s y := by
+  have hform
+      : ∀ s y : Fin I.n → I.E,
+        star s ⬝ᵥ (I.J *ᵥ y) = Formalism.UG.hform (starRingEnd I.E) I.J s y := by
     intro s y
-    simp [Formalism.UG.hform, dotProduct, Matrix.mulVec, Finset.mul_sum, mul_assoc, starRingEnd_apply,
-      -star_trivial]
+    simp [Formalism.UG.hform, dotProduct, Matrix.mulVec, Finset.mul_sum, mul_assoc,
+      starRingEnd_apply, -star_trivial]
   have hmem : ∀ N y, y ∈ perpIn I x N ↔ y ∈ lamX I x ∧ ∀ s ∈ N, star s ⬝ᵥ (I.J *ᵥ y) = 0 := by
     intro N y
     rw [PerpStep.perpIn_eq, PerpStep.mem_perp]
     simp only [hform]
-  have hsatS : ∀ i, Formalism.HN.IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x) (S i) := by
+  have hsatS
+      : ∀ i,
+        Formalism.HN.IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x)
+          (S i) := by
     intro i
-    have e : S i = lamX I x ⊓ (Submodule.span I.E (S i : Set (Fin I.n → I.E))).restrictScalars (𝓞 I.E) := by
+    have e
+        : S i
+          = lamX I x
+            ⊓ (Submodule.span I.E (S i : Set (Fin I.n → I.E))).restrictScalars (𝓞 I.E) := by
       ext y
       exact hsat i y
     rw [e]
     exact PerpStep.sat_inf (bas I) (frm I x) hX _ hA _
-  obtain ⟨G, hG⟩ : ∃ G : ℕ → Submodule (𝓞 I.E) (Fin I.n → I.E),
-      ∀ b, G b = S ⟨min b a, Nat.lt_succ_of_le (min_le_right _ _)⟩ := ⟨_, fun _ => rfl⟩
+  obtain ⟨G, hG⟩
+      : ∃ G : ℕ → Submodule (𝓞 I.E) (Fin I.n → I.E), ∀ b,
+        G b = S ⟨min b a, Nat.lt_succ_of_le (min_le_right _ _)⟩ :=
+    ⟨_, fun _ => rfl⟩
   have hGS : ∀ i : Fin (a + 1), G i = S i := by
     intro i
     rw [hG]
@@ -53,7 +75,10 @@ theorem main : ∀ (I : AutInst) (xf : I.Gf) (a : ℕ) (j : Fin a → ℕ) (S : 
     intro b c h
     rw [hG, hG]
     exact hmono (Fin.mk_le_mk.2 (min_le_min_right _ h))
-  have hGsat : ∀ b, Formalism.HN.IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x) (G b) := by
+  have hGsat
+      : ∀ b,
+        Formalism.HN.IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x)
+          (G b) := by
     intro b
     rw [hG]
     exact hsatS _
@@ -75,14 +100,13 @@ theorem main : ∀ (I : AutInst) (xf : I.Gf) (a : ℕ) (j : Fin a → ℕ) (S : 
       simp only at this
       rw [this, ih (by omega)]
       rfl
-  have hGa : Formalism.HN.rkK (G a) = ∑ i, j i := by
-    rw [hGsum a le_rfl]; rfl
-  have hPr : ∀ b, Formalism.HN.rkK (perpIn I x (G b)) + Formalism.HN.rkK (G b) = I.n :=
-    fun b => (hmain _ _ (hGsat b) (hGsat b) le_rfl).2.1
-  have hPP : ∀ b, perpIn I x (perpIn I x (G b)) = G b :=
-    fun b => (hmain _ _ (hGsat b) (hGsat b) le_rfl).2.2.1
-  have hPa : ∀ b c, b ≤ c → perpIn I x (G c) ≤ perpIn I x (G b) :=
-    fun b c h => (hmain _ _ (hGsat b) (hGsat c) (hGm h)).2.2.2.1
+  have hGa : Formalism.HN.rkK (G a) = ∑ i, j i := by rw [hGsum a le_rfl]; rfl
+  have hPr : ∀ b, Formalism.HN.rkK (perpIn I x (G b)) + Formalism.HN.rkK (G b) = I.n := fun b =>
+    (hmain _ _ (hGsat b) (hGsat b) le_rfl).2.1
+  have hPP : ∀ b, perpIn I x (perpIn I x (G b)) = G b := fun b =>
+    (hmain _ _ (hGsat b) (hGsat b) le_rfl).2.2.1
+  have hPa : ∀ b c, b ≤ c → perpIn I x (G c) ≤ perpIn I x (G b) := fun b c h =>
+    (hmain _ _ (hGsat b) (hGsat c) (hGm h)).2.2.2.1
   have hP0 : perpIn I x (G 0) = lamX I x := by
     ext y
     rw [hmem, hG0]
@@ -97,10 +121,13 @@ theorem main : ∀ (I : AutInst) (xf : I.Gf) (a : ℕ) (j : Fin a → ℕ) (S : 
     rw [hform]
     rw [e] at hs hy
     exact hiso s hs y hy
-  obtain ⟨F, hF1, hF2⟩ : ∃ F : ℕ → Submodule (𝓞 I.E) (Fin I.n → I.E),
-      (∀ b, b ≤ a → F b = G b) ∧ ∀ b c, a < b → c = 2 * a + 1 - b → F b = perpIn I x (G c) :=
-    ⟨fun b => if b ≤ a then G b else perpIn I x (G (2 * a + 1 - b)), fun b hb => if_pos hb,
-      fun b c hb hc => hc ▸ if_neg (by omega)⟩
+  obtain ⟨F, hF1, hF2⟩
+      : ∃ F : ℕ → Submodule (𝓞 I.E) (Fin I.n → I.E),
+        (∀ b, b ≤ a → F b = G b) ∧ ∀ b c, a < b → c = 2 * a + 1 - b → F b = perpIn I x (G c) := ⟨
+    fun b => if b ≤ a then G b else perpIn I x (G (2 * a + 1 - b)),
+    fun b hb => if_pos hb,
+    fun b c hb hc => hc ▸ if_neg (by omega)
+  ⟩
   have hFm : Monotone F := by
     refine monotone_nat_of_le_succ fun b => ?_
     rcases lt_trichotomy b a with h | rfl | h
@@ -112,8 +139,17 @@ theorem main : ∀ (I : AutInst) (xf : I.Gf) (a : ℕ) (j : Fin a → ℕ) (S : 
       exact hPa _ _ (by omega)
   have hFtop : ∀ b, 2 * a + 1 ≤ b → F b = lamX I x := fun b hb => by
     rw [hF2 b 0 (by omega) (by omega), hP0]
-  refine ⟨F, fun b => Formalism.HN.rkK (F (b + 1)) - Formalism.HN.rkK (F b), ⟨hFm, ?_, ?_, ?_⟩, hFtop _ le_rfl,
-    ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    F,
+    fun b => Formalism.HN.rkK (F (b + 1)) - Formalism.HN.rkK (F b),
+    ⟨hFm, ?_, ?_, ?_⟩,
+    hFtop _ le_rfl,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [hF1 0 (by omega), hG0]
   · intro b hb
     rw [hFtop b hb, hFtop _ le_rfl]

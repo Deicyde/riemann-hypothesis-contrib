@@ -98,18 +98,23 @@ private lemma det_submatrix_mul_diagonal {R : Type} [CommRing R] {N t : ℕ}
     simp [Matrix.mul_diagonal]
   rw [hsub, det_mul, det_diagonal]
 
-
 open NumberField Module Matrix in
 open scoped Classical in
-theorem _root_.GlobalTheory.ReducedGram.exists_reduced : ∀ (K : Type) [Field K] [NumberField K],
-    (∀ w : InfinitePlace K, w.IsComplex) → ∀ (r : ℕ) (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K)
-    (p : _root_.Formalism.MainNotions.S.Point K (r + 1)), _root_.Formalism.MainNotions.S.IsInCell (_root_.Formalism.MainNotions.S.ZhatOM Z) p →
-    ∃ Z₂ : Matrix (Fin (r + 1)) (Fin (r + 1)) K, _root_.Formalism.MainNotions.S.Lat.ZEquiv Z Z₂ ∧
-      ∀ (τ : K →+* ℂ) (t : ℕ) (I J : Fin t → Fin (r + 1)),
-        ‖τ (Z₂.submatrix I J).det‖ ≤ 4 ^ (r + 1) * (((r + 1).factorial : ℕ) : ℝ) ^ 2 *
-          (Real.sqrt (finrank ℚ K) * |(discr K : ℝ)| ^ (1 / (finrank ℚ K : ℝ))) ^ (2 * (r + 1)) *
-          ∏ l ∈ Finset.Icc 1 (r + 1),
-            (max 1 ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖ * max 1 ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖⁻¹) := by
+theorem _root_.GlobalTheory.ReducedGram.exists_reduced
+    : ∀ (K : Type) [Field K] [NumberField K],
+      (∀ w : InfinitePlace K, w.IsComplex)
+        → ∀ (r : ℕ) (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K)
+            (p : _root_.Formalism.MainNotions.S.Point K (r + 1)),
+          _root_.Formalism.MainNotions.S.IsInCell (_root_.Formalism.MainNotions.S.ZhatOM Z) p
+            → ∃ Z₂ : Matrix (Fin (r + 1)) (Fin (r + 1)) K,
+              _root_.Formalism.MainNotions.S.Lat.ZEquiv Z Z₂
+                ∧ ∀ (τ : K →+* ℂ) (t : ℕ) (I J : Fin t → Fin (r + 1)),
+                  ‖τ (Z₂.submatrix I J).det‖
+                    ≤ 4 ^ (r + 1) * (((r + 1).factorial : ℕ) : ℝ) ^ 2
+                      * (Real.sqrt (finrank ℚ K) * |(discr K : ℝ)| ^ (1 / (finrank ℚ K : ℝ)))
+                        ^ (2 * (r + 1))
+                      * ∏ l ∈ Finset.Icc 1 (r + 1),
+                          (max 1 ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖ * max 1 ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖⁻¹) := by
   intro K _ _ hK r Z p hcell
   set c := Real.sqrt (finrank ℚ K) * |(discr K : ℝ)| ^ (1 / (finrank ℚ K : ℝ)) with hc_def
   have hc : 1 ≤ c := by
@@ -149,17 +154,18 @@ theorem _root_.GlobalTheory.ReducedGram.exists_reduced : ∀ (K : Type) [Field K
     intro i j
     simp [V, mul_diagonal, diagonal_mul]
   have hV0 : ∀ i j, j < i → V i j = 0 := fun i j h => by rw [hVapp, (hU i j).1 h]; ring
-  have hV1 : ∀ i, V i i = 1 := fun i => by
-    rw [hVapp, (hU i i).2 rfl, mul_one, hss]
+  have hV1 : ∀ i, V i i = 1 := fun i => by rw [hVapp, (hU i i).2 rfl, mul_one, hss]
   have hZeq : Z = L * (P * diagonal s) * V := by
     rw [hZD']
-    calc L * P * U * diagonal s = L * P * (diagonal s * diagonal s) * U * diagonal s := by
-          rw [hDD, Matrix.mul_one]
+    calc
+      L * P * U * diagonal s
+        = L * P * (diagonal s * diagonal s) * U * diagonal s := by rw [hDD, Matrix.mul_one]
       _ = L * (P * diagonal s) * V := by simp only [V, Matrix.mul_assoc]
   obtain ⟨m, hm0, hm1, hmb⟩ := exists_integral_unitriangular_reduction hK V hV0 hV1
-  obtain ⟨m', hm'0, hm'1, hm'b⟩ := exists_integral_unitriangular_reduction hK Lᵀ
-    (fun i j h => by rw [transpose_apply]; exact (hL j i).1 h)
-    (fun i => by rw [transpose_apply]; exact (hL i i).2 rfl)
+  obtain ⟨m', hm'0, hm'1, hm'b⟩ :=
+    exists_integral_unitriangular_reduction hK Lᵀ
+      (fun i j h => by rw [transpose_apply]; exact (hL j i).1 h)
+      (fun i => by rw [transpose_apply]; exact (hL i i).2 rfl)
   rw [hmax] at hmb hm'b
   let A := m'ᵀ.map (fun x : 𝓞 K => (x : K)) * L
   let B := V * m.map (fun x : 𝓞 K => (x : K))
@@ -169,8 +175,9 @@ theorem _root_.GlobalTheory.ReducedGram.exists_reduced : ∀ (K : Type) [Field K
     rw [hZeq]
     simp only [Matrix.mul_assoc, transpose_map]
   intro τ t I J
-  have hmin : ∀ (X : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (t : ℕ) (I J : Fin t → Fin (r + 1)),
-      ((X.map τ).submatrix I J).det = τ ((X.submatrix I J).det) := by
+  have hmin
+      : ∀ (X : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (t : ℕ) (I J : Fin t → Fin (r + 1)),
+        ((X.map τ).submatrix I J).det = τ ((X.submatrix I J).det) := by
     intro X t I J
     rw [RingHom.map_det]
     rfl
@@ -190,23 +197,39 @@ theorem _root_.GlobalTheory.ReducedGram.exists_reduced : ∀ (K : Type) [Field K
     intro t I J
     rw [hmin, det_submatrix_mul_diagonal, map_mul, norm_mul, hsign, mul_one, ← hmin]
     exact _root_.GlobalTheory.LoopC.CovTerm.minor_pt_le τ p t I J
-  have hbound := _root_.Formalism.HermitianLatticeCounting.Final.LatticeSumBounds.minorBound (r + 1) (A.map τ) (W.map τ) (B.map τ) c Pb hc hA hB hW t I J
-  have hlead : ∀ l, ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖ = ‖τ (_root_.Formalism.MainNotions.S.leadMinorE P l)‖ := by
+  have hbound :=
+    _root_.Formalism.HermitianLatticeCounting.Final.LatticeSumBounds.minorBound (r + 1) (A.map τ)
+      (W.map τ) (B.map τ) c Pb hc hA hB hW t I J
+  have hlead
+      : ∀ l,
+        ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖
+          = ‖τ (_root_.Formalism.MainNotions.S.leadMinorE P l)‖ := by
     intro l
     unfold _root_.Formalism.MainNotions.S.leadMinorE
     split_ifs with hl
     · rw [hZD', det_submatrix_mul_diagonal, map_mul, norm_mul, hsign, mul_one,
-        _root_.Formalism.HermitianLatticeCounting.P.leadingMinorTriangularInvariant K (r + 1) l hl L P U (fun i => (hL i i).2 rfl) (fun i j h => (hL i j).1 h)
-          (fun i => (hU i i).2 rfl) (fun i j h => (hU i j).1 h)]
+        _root_.Formalism.HermitianLatticeCounting.P.leadingMinorTriangularInvariant K (r + 1) l hl L
+          P U
+          (fun i => (hL i i).2 rfl)
+          (fun i j h => (hL i j).1 h)
+          (fun i => (hU i i).2 rfl)
+          (fun i j h => (hU i j).1 h)]
     · rfl
-  have hPbeq : Pb = ∏ l ∈ Finset.Icc 1 (r + 1),
-      (max 1 ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖ * max 1 ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖⁻¹) := by
-    rw [hPb, Finset.range_eq_Ico,
-      Finset.prod_Ico_add' (fun l => _root_.GlobalTheory.LoopC.CovTerm.gg2 ‖τ (_root_.Formalism.MainNotions.S.leadMinorE P l)‖) 0 (r + 1) 1,
-      zero_add, Finset.Ico_add_one_right_eq_Icc]
-    refine Finset.prod_congr rfl (fun l _ => ?_)
-    rw [hlead]
-    rfl
+  have hPbeq
+      : Pb
+        = ∏ l ∈ Finset.Icc 1 (r + 1),
+          (max 1 ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖ * max 1 ‖τ (_root_.Formalism.MainNotions.S.leadMinorE Z l)‖⁻¹) :=
+    by
+      rw [hPb, Finset.range_eq_Ico,
+        Finset.prod_Ico_add'
+          (fun l =>
+            _root_.GlobalTheory.LoopC.CovTerm.gg2
+              ‖τ (_root_.Formalism.MainNotions.S.leadMinorE P l)‖)
+          0 (r + 1) 1,
+        zero_add, Finset.Ico_add_one_right_eq_Icc]
+      refine Finset.prod_congr rfl (fun l _ => ?_)
+      rw [hlead]
+      rfl
   rw [← hmin, Matrix.map_mul, Matrix.map_mul, ← hPbeq]
   exact hbound
 

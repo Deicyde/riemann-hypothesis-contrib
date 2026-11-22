@@ -46,13 +46,13 @@ theorem logDerivBoundedHeight : SmallHeightLogDeriv := by
         obtain ⟨h3, h4⟩ := abs_le.mp him
         refine ⟨⟨?_, ?_⟩, ?_, ?_⟩ <;> simp <;> linarith
       · rw [Complex.dist_eq]
-        have hd : s - (1 + s.im * I) = ((s.re - 1 : ℝ) : ℂ) := by
-          apply Complex.ext <;> simp
+        have hd : s - (1 + s.im * I) = ((s.re - 1 : ℝ) : ℂ) := by apply Complex.ext <;> simp
         rw [hd, Complex.norm_real, Real.norm_eq_abs, abs_lt]
         constructor <;> linarith
   refine ⟨δ / 2, ?_⟩
   have hKc : IsCompact (Icc (1 - δ / 2) 3 ×ℂ Icc (-T) T) := isCompact_Icc.reProdIm isCompact_Icc
-  have hcont : ContinuousOn (fun s => deriv riemannZeta₁ s / riemannZeta₁ s)
+  have hcont : ContinuousOn
+      (fun s => deriv riemannZeta₁ s / riemannZeta₁ s)
       (Icc (1 - δ / 2) 3 ×ℂ Icc (-T) T) := by
     apply ContinuousOn.div
     · exact ((differentiable_riemannZeta₁.differentiableOn.deriv isOpen_univ).continuousOn).mono

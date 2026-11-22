@@ -63,16 +63,17 @@ private lemma isAdicComplete_of_linearEquiv_pi {V M ι : Type*} [CommRing V] [Ad
     refine ⟨e.symm L, fun n => (key n _ _).2 fun i => ?_⟩
     simpa using hL i n
 
-
 open Polynomial IsLocalRing in
-theorem _root_.GlobalTheory.unramExt : _root_.ReciprocityTheory.ChartRestriction.G.Out.UnramExtSt := by
+theorem _root_.GlobalTheory.unramExt
+    : _root_.ReciprocityTheory.ChartRestriction.G.Out.UnramExtSt := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.Out.UnramExtSt
   intro V _ _ _ _ k' _ _ _ _
   obtain ⟨θ, hθ⟩ := Field.exists_primitive_element (ResidueField V) k'
   have hint : IsIntegral (ResidueField V) θ := .of_finite _ _
-  obtain ⟨μ, hμmap, hμdeg, hμ⟩ := lifts_and_degree_eq_and_monic
-    (map_surjective _ (residue_surjective (R := V)) (minpoly (ResidueField V) θ))
-    (minpoly.monic hint)
+  obtain ⟨μ, hμmap, hμdeg, hμ⟩ :=
+    lifts_and_degree_eq_and_monic
+      (map_surjective _ (residue_surjective (R := V)) (minpoly (ResidueField V) θ))
+      (minpoly.monic hint)
   letI : Algebra V k' := ((algebraMap (ResidueField V) k').comp (residue V)).toAlgebra
   haveI : IsScalarTower V (ResidueField V) k' := IsScalarTower.of_algebraMap_eq fun _ => rfl
   have hroot : eval₂ (algebraMap V k') θ μ = 0 := by
@@ -121,10 +122,9 @@ theorem _root_.GlobalTheory.unramExt : _root_.ReciprocityTheory.ChartRestriction
       obtain ⟨h, rfl⟩ := map_surjective _ (residue_surjective (R := V)) h'
       have hcoeff : ∀ n, (g - μ * h).coeff n ∈ maximalIdeal V := by
         intro n
-        rw [← residue_eq_zero_iff, ← coeff_map, Polynomial.map_sub, Polynomial.map_mul, hμmap,
-          hh', sub_self, coeff_zero]
-      have hmk : AdjoinRoot.mk μ g = AdjoinRoot.mk μ (g - μ * h) := by
-        simp [AdjoinRoot.mk_self]
+        rw [← residue_eq_zero_iff, ← coeff_map, Polynomial.map_sub, Polynomial.map_mul, hμmap, hh',
+          sub_self, coeff_zero]
+      have hmk : AdjoinRoot.mk μ g = AdjoinRoot.mk μ (g - μ * h) := by simp [AdjoinRoot.mk_self]
       rw [hmk, ← hCm, ← Ideal.map_map]
       exact Ideal.mem_map_of_mem _ (Ideal.mem_map_C_iff.2 hcoeff)
     · rw [Ideal.map_le_iff_le_comap]
@@ -139,7 +139,8 @@ theorem _root_.GlobalTheory.unramExt : _root_.ReciprocityTheory.ChartRestriction
   haveI : Module.Free V (AdjoinRoot μ) := Module.Free.of_basis pb.basis
   haveI : IsNoetherianRing (AdjoinRoot μ) := inferInstance
   have hinj : Function.Injective (algebraMap V (AdjoinRoot μ)) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro v hv
     rw [← hCm, RingHom.comp_apply, AdjoinRoot.mk_eq_zero] at hv
     by_contra hne
@@ -156,26 +157,42 @@ theorem _root_.GlobalTheory.unramExt : _root_.ReciprocityTheory.ChartRestriction
   let e : ResidueField (AdjoinRoot μ) ≃+* k' :=
     (Ideal.quotEquivOfEq hmax).trans (RingHom.quotientKerEquivOfSurjective hsurj)
   have he : ∀ w, e (residue (AdjoinRoot μ) w) = φ w := fun w => rfl
-  have he' : ∀ v : V, e (residue (AdjoinRoot μ) (algebraMap V (AdjoinRoot μ) v)) =
-      algebraMap (ResidueField V) k' (residue V v) := by
+  have he'
+      : ∀ v : V,
+        e (residue (AdjoinRoot μ) (algebraMap V (AdjoinRoot μ) v))
+          = algebraMap (ResidueField V) k' (residue V v) := by
     intro v
     rw [he, ← hCm, RingHom.comp_apply, hφ, aeval_C]
     rfl
-  let eAlg : ResidueField (AdjoinRoot μ) →ₐ[ResidueField V] k' :=
-    { e.toRingHom with
-      commutes' := fun r => by
-        obtain ⟨v, rfl⟩ := residue_surjective r
-        simpa using he' v }
+  let eAlg : ResidueField (AdjoinRoot μ) →ₐ[ResidueField V] k' := {
+    e.toRingHom with
+    commutes' := fun r => by
+      obtain ⟨v, rfl⟩ := residue_surjective r
+      simpa using he' v
+  }
   haveI : Algebra.IsSeparable (ResidueField V) (ResidueField (AdjoinRoot μ)) :=
     Algebra.IsSeparable.of_algHom _ _ eAlg
   haveI : Algebra.FormallyUnramified V (AdjoinRoot μ) :=
     Algebra.FormallyUnramified.of_map_maximalIdeal hmW.symm
-  obtain ⟨hdom, hdvr⟩ := _root_.GlobalTheory.exists_isDiscreteValuationRing_of_flat V (AdjoinRoot μ) hmW.symm
-    (Ideal.iInf_pow_eq_bot_of_isLocalRing _ (maximalIdeal.isMaximal _).ne_top)
+  obtain ⟨hdom, hdvr⟩ :=
+    _root_.GlobalTheory.exists_isDiscreteValuationRing_of_flat V (AdjoinRoot μ) hmW.symm
+      (Ideal.iInf_pow_eq_bot_of_isLocalRing _ (maximalIdeal.isMaximal _).ne_top)
   have hcompl : IsAdicComplete (maximalIdeal (AdjoinRoot μ)) (AdjoinRoot μ) := by
     rw [hmW, IsAdicComplete.map_algebraMap_iff]
     exact isAdicComplete_of_linearEquiv_pi pb.basis.equivFun _
-  exact ⟨AdjoinRoot μ, inferInstance, hdom, hdvr, hcompl, inferInstance, pb.finite, hinj, hlh,
-    inferInstance, e, he'⟩
+  exact ⟨
+    AdjoinRoot μ,
+    inferInstance,
+    hdom,
+    hdvr,
+    hcompl,
+    inferInstance,
+    pb.finite,
+    hinj,
+    hlh,
+    inferInstance,
+    e,
+    he'
+  ⟩
 
 end GlobalTheory

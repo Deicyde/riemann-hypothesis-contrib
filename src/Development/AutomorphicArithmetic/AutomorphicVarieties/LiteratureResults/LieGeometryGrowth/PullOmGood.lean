@@ -11,27 +11,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Dr
 
-theorem UpperTheory.V.Lit.Geo.omGood :
-    OmGood := by
+theorem UpperTheory.V.Lit.Geo.omGood : OmGood := by
   intro Γ V S _ _ _ _ d G W hW q
-  have hsub : ∀ (q : ℕ) (w w' : G.Om q), (∀ s, RadBasic G.Y (w.1 s)) → (∀ s, RadBasic G.Y (w'.1 s)) →
-      ∀ s, RadBasic G.Y ((w - w').1 s) := by
+  have hsub
+      : ∀ (q : ℕ) (w w' : G.Om q),
+        (∀ s, RadBasic G.Y (w.1 s)) → (∀ s, RadBasic G.Y (w'.1 s))
+          → ∀ s, RadBasic G.Y ((w - w').1 s) := by
     intro q w w' h h' s p hp v i hi
     have e : (w - w').1 s p v = w.1 s p v - w'.1 s p v := rfl
     rw [e, h s p hp v i hi, h' s p hp v i hi, sub_self]
-  have hpb : ∀ (q : ℕ) (w : G.Om q), (∀ s, RadBasic G.Y (w.1 s)) → ∀ s, RadBasic G.Y ((pbOm G W w).1 s) := by
+  have hpb
+      : ∀ (q : ℕ) (w : G.Om q),
+        (∀ s, RadBasic G.Y (w.1 s)) → ∀ s, RadBasic G.Y ((pbOm G W w).1 s) := by
     intro q w h s p hp v i hi
     rw [(omApply Γ V S d G W hW q).1 w s p hp]
     exact (pbBasic V _ G.Y G.isOpen (W s) (hW.field s) (hW.homog s) q).1 _ (h s) p hp v i hi
-  have hhom : ∀ (q : ℕ) (w : G.Om (q + 1)), (∀ s, RadBasic G.Y (w.1 s)) →
-      ∀ s, RadBasic G.Y ((homOm G W w).1 s) := by
+  have hhom
+      : ∀ (q : ℕ) (w : G.Om (q + 1)),
+        (∀ s, RadBasic G.Y (w.1 s)) → ∀ s, RadBasic G.Y ((homOm G W w).1 s) := by
     intro q w h s p hp v i hi
     rw [(omApply Γ V S d G W hW q).2 w s p hp]
-    exact (pbBasic V _ G.Y G.isOpen (W s) (hW.field s) (hW.homog s) q).2 _ (w.2 s).1 (h s) p hp v i hi
+    exact (pbBasic V _ G.Y G.isOpen (W s) (hW.field s) (hW.homog s) q).2 _ (w.2 s).1 (h s) p hp v i
+      hi
   obtain ⟨h1, h2, -, h4⟩ := omHom Γ V S d G W hW
-  refine ⟨fun w hw => ⟨⟨fun γ => ?_, hpb q w hw.basic, ?_⟩, ⟨fun γ => ?_, hw.dbasic, ?_⟩⟩,
+  refine ⟨
+    fun w hw => ⟨⟨fun γ => ?_, hpb q w hw.basic, ?_⟩, ⟨fun γ => ?_, hw.dbasic, ?_⟩⟩,
     fun w w' hw hw' => ⟨fun γ => ?_, hsub q w w' hw.basic hw'.basic, ?_⟩,
-    fun w hw => ⟨fun γ => ?_, hhom q w hw.basic, ?_⟩⟩
+    fun w hw => ⟨fun γ => ?_, hhom q w hw.basic, ?_⟩
+  ⟩
   · rw [(omEquiv Γ V S d G W hW q γ).1 w, hw.inv γ]
   · rw [h1]
     exact hpb _ _ hw.dbasic

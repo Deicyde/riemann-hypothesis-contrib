@@ -21,16 +21,16 @@ variable {L : LocE F E} {r k : ℕ} (S : Frames L r k)
 def Ysp (J : ℕ) : Submodule E S.V := S.spanTo S.f J ⊔ S.spanTo S.f' J
 
 def refB (J : ℕ) (Λ : Submodule L.O S.V) : AddSubgroup (S.V × S.V) :=
-  ((S.spanTo S.f J).toAddSubgroup.prod (S.spanTo S.f' J).toAddSubgroup) ⊓
-    (Λ.toAddSubgroup.map (algebraMap F E S.th • (LinearMap.id : S.V →ₗ[E] S.V)).toAddMonoidHom).comap
-      (AddMonoidHom.fst S.V S.V + AddMonoidHom.snd S.V S.V)
+  ((S.spanTo S.f J).toAddSubgroup.prod (S.spanTo S.f' J).toAddSubgroup) ⊓ (Λ.toAddSubgroup.map
+      (algebraMap F E S.th • (LinearMap.id : S.V →ₗ[E] S.V)).toAddMonoidHom).comap
+    (AddMonoidHom.fst S.V S.V + AddMonoidHom.snd S.V S.V)
 
 def refU (J : ℕ) (Λ : Submodule L.O S.V) : AddSubgroup S.V :=
   Λ.toAddSubgroup ⊓ (perp L S.Hm (S.Ysp J)).toAddSubgroup
 
 def refT : AddSubgroup E :=
-  (AddMonoidHom.id E + (L.cj : E →+* E).toAddMonoidHom).ker ⊓
-    L.O.toAddSubgroup.map (AddMonoidHom.mulLeft (algebraMap F E ((S.ϖ : F) ^ S.a)))
+  (AddMonoidHom.id E + (L.cj : E →+* E).toAddMonoidHom).ker
+    ⊓ L.O.toAddSubgroup.map (AddMonoidHom.mulLeft (algebraMap F E ((S.ϖ : F) ^ S.a)))
 
 abbrev MW : Type := (S.V × S.V) × S.V × E
 
@@ -50,8 +50,8 @@ def NoLeak (Λ : Submodule L.O S.V) (u : S.V) : Prop := ∃ y ∈ Λ, y ∈ S.W0
 def InZ (u : S.V) : Prop := ∃ c : 𝒪[F], S.h u u = algebraMap F E ((S.ϖ : F) ^ S.a * c)
 
 def chiM (j : Fin r) (d : S.Datum) (Λ : Submodule L.O S.V) (b : S.V × S.V) (u : S.V) : ℂ :=
-  L.psi0 (-(algebraMap F E S.th⁻¹ *
-    S.h (S.h b.1 (S.es j) • S.fr d Λ j.succ + S.h b.2 (S.es' j) • S.fr' d Λ j.succ) u))
+  L.psi0 (-(algebraMap F E S.th⁻¹
+    * S.h (S.h b.1 (S.es j) • S.fr d Λ j.succ + S.h b.2 (S.es' j) • S.fr' d Λ j.succ) u))
 
 def cK (β βJ : ℕ) : ℝ := (S.q : ℝ) ^ S.a * β / βJ
 

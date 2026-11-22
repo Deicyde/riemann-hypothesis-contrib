@@ -29,7 +29,8 @@ public import Development.AutomorphicArithmetic.WeightCongruences.IffNum
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
@@ -41,82 +42,176 @@ theorem Std.parConsts_pos {C : FC} (hC : Std C) : ∀ c ∈ C.P.list, 0 < c := b
   obtain ⟨a1, a2, a3, a4, a5, -, a6, a7, a8, a9, a10, a11, a12, a13, a14, -⟩ := hL
   have a4' : 0 < C.P.cLL := inv_pos.mp (lt_of_lt_of_le one_pos a4)
   simp only [PC.list, List.forall_mem_cons]
-  refine ⟨?_, ?_, ?_, a4', ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, by simp⟩ <;>
-    linarith
+  refine ⟨
+      ?_,
+      ?_,
+      ?_,
+      a4',
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      by simp
+    ⟩
+    <;> linarith
 
-theorem explicitConstants_parameterConditions_large :
-    SzRow (fun C D L => HostArith D.host → ∃ P : ParameterChoice' D L, parConsts P = C.PK ∧ P.CnW = C.P.CnW) := by
-  refine SzRow.imp (
-    SzRow.and GlobalTheory.T.sizes_host_degree_and_log_q_and_conductor_bounds <|
-    SzRow.and GlobalTheory.EX.explicitChoice_rankK_lower_upper_bounds <|
-    SzRow.and GlobalTheory.EX.szRow_rank_lower_bounds <|
-    SzRow.and GlobalTheory.EX.szRow_logf <|
-    SzRow.and GlobalTheory.T.sizes_etaSz_le_b_div_and_log_etaSz_le_and_t_le <|
-    SzRow.and GlobalTheory.T.sizes_m_mul_Sc_add_etaSz_le_w_mul_L_and_bounds <|
-    SzRow.and GlobalTheory.T.sizes_card_TT_le_Nstar_and_rhoP_le_and_bT_le <|
-    SzRow.and GlobalTheory.EX.szRow_cloud_le <|
-    SzRow.and GlobalTheory.EX.szRow_windowLength <|
-    SzRow.and GlobalTheory.EX.szRow_exact <|
-    SzRow.and GlobalTheory.EX.szRow_lowsFar <|
-    SzRow.and GlobalTheory.T.explicitChoice_rowWeight_ratio_and_lastCloud_le_twice_first <|
-    SzRow.and GlobalTheory.EX.szRow_thinSize_ge <|
-    SzRow.and GlobalTheory.T.sizes_del_ge_cloudUnit_and_count_bounds <|
-    SzRow.and GlobalTheory.T.sizes_node_bounds_le_h0 <|
-    SzRow.and GlobalTheory.T.sizes_t_add_cube_le_h0_and_f_mul_N_pow_le_h0 <|
-    SzRow.and GlobalTheory.EX.szRow_sig_gaps <|
-    SzRow.and GlobalTheory.EX.szRow_rbS <|
-    SzRow.and GlobalTheory.T.sizes_b_add_Sc_add_etaSz_add_div_lt_lStar <|
-    SzRow.and GlobalTheory.EX.szRow_card_words_le <|
-    GlobalTheory.T.sizes_exists_Y_bounds_host_g_mem_Icc_Y_two_mul_Y) ?_
+theorem explicitConstants_parameterConditions_large
+    : SzRow (fun C D L =>
+      HostArith D.host → ∃ P : ParameterChoice' D L, parConsts P = C.PK ∧ P.CnW = C.P.CnW) := by
+  refine SzRow.imp
+    (SzRow.and GlobalTheory.T.sizes_host_degree_and_log_q_and_conductor_bounds <|
+      SzRow.and GlobalTheory.EX.explicitChoice_rankK_lower_upper_bounds <|
+        SzRow.and GlobalTheory.EX.szRow_rank_lower_bounds <| SzRow.and GlobalTheory.EX.szRow_logf <|
+          SzRow.and GlobalTheory.T.sizes_etaSz_le_b_div_and_log_etaSz_le_and_t_le <|
+            SzRow.and GlobalTheory.T.sizes_m_mul_Sc_add_etaSz_le_w_mul_L_and_bounds <|
+              SzRow.and GlobalTheory.T.sizes_card_TT_le_Nstar_and_rhoP_le_and_bT_le <|
+                SzRow.and GlobalTheory.EX.szRow_cloud_le <|
+                  SzRow.and GlobalTheory.EX.szRow_windowLength <|
+                    SzRow.and GlobalTheory.EX.szRow_exact <| SzRow.and GlobalTheory.EX.szRow_lowsFar <|
+                      SzRow.and
+                          GlobalTheory.T.explicitChoice_rowWeight_ratio_and_lastCloud_le_twice_first <|
+                        SzRow.and GlobalTheory.EX.szRow_thinSize_ge <|
+                          SzRow.and GlobalTheory.T.sizes_del_ge_cloudUnit_and_count_bounds <|
+                            SzRow.and GlobalTheory.T.sizes_node_bounds_le_h0 <|
+                              SzRow.and
+                                  GlobalTheory.T.sizes_t_add_cube_le_h0_and_f_mul_N_pow_le_h0 <|
+                                SzRow.and GlobalTheory.EX.szRow_sig_gaps <|
+                                  SzRow.and GlobalTheory.EX.szRow_rbS <|
+                                    SzRow.and
+                                        GlobalTheory.T.sizes_b_add_Sc_add_etaSz_add_div_lt_lStar <|
+                                      SzRow.and GlobalTheory.EX.szRow_card_words_le <|
+                                        GlobalTheory.T.sizes_exists_Y_bounds_host_g_mem_Icc_Y_two_mul_Y)
+    ?_
   intro C cD ch D L hC _ h hA
-  obtain ⟨⟨h_qd_pow, h_logq_ge, h_dlogL1_le, h_condE_le, h_pde_log⟩,
-    ⟨h_k_low, h_k_up, h_R0_ge⟩,
-    ⟨h_k_ge_m2L, h_k_ge_mx, h_klogk, h_flogk⟩,
-    ⟨h_logf_le, h_log2f_le, h_loglogb, h_nW_ge⟩,
-    ⟨h_eta_le, h_logeta, h_t_le_eta, h_teta, h_mteta⟩,
-    ⟨h_mSeta, h_Neta, h_eta2, h_kS_le⟩,
-    ⟨h_TT_card_le, h_rho_le, h_bT_le⟩,
-    ⟨h_S_le, h_Del_le, h_logDel⟩,
-    ⟨h_Lw_j, h_Lw_le, h_j0_le⟩,
-    ⟨h_top_b1, h_cloud_le2, h_uk_extreme, h_em_win, h_nodes_gap, h_e_centred, h_e_parity, h_etaF_eq, h_pde_mod, h_pde_ne, h_ccK_log, h_ccK_le⟩,
-    h_lows_far,
-    ⟨h_X''_ratio, h_bm_le⟩,
-    h_w''_ge,
-    ⟨h_Del_ge, h_Del_count⟩,
-    h_h0_ge,
-    ⟨h_h0_fun, h_h0_fN⟩,
-    h_sig_gaps,
-    h_rbS,
-    ⟨h_lstar1, h_lstar2⟩,
-    h_words_le,
-    h_g_Y⟩ := h
+  obtain ⟨
+      ⟨h_qd_pow, h_logq_ge, h_dlogL1_le, h_condE_le, h_pde_log⟩,
+      ⟨h_k_low, h_k_up, h_R0_ge⟩,
+      ⟨h_k_ge_m2L, h_k_ge_mx, h_klogk, h_flogk⟩,
+      ⟨h_logf_le, h_log2f_le, h_loglogb, h_nW_ge⟩,
+      ⟨h_eta_le, h_logeta, h_t_le_eta, h_teta, h_mteta⟩,
+      ⟨h_mSeta, h_Neta, h_eta2, h_kS_le⟩,
+      ⟨h_TT_card_le, h_rho_le, h_bT_le⟩,
+      ⟨h_S_le, h_Del_le, h_logDel⟩,
+      ⟨h_Lw_j, h_Lw_le, h_j0_le⟩,
+      ⟨
+        h_top_b1,
+        h_cloud_le2,
+        h_uk_extreme,
+        h_em_win,
+        h_nodes_gap,
+        h_e_centred,
+        h_e_parity,
+        h_etaF_eq,
+        h_pde_mod,
+        h_pde_ne,
+        h_ccK_log,
+        h_ccK_le
+      ⟩,
+      h_lows_far,
+      ⟨h_X''_ratio, h_bm_le⟩,
+      h_w''_ge,
+      ⟨h_Del_ge, h_Del_count⟩,
+      h_h0_ge,
+      ⟨h_h0_fun, h_h0_fN⟩,
+      h_sig_gaps,
+      h_rbS,
+      ⟨h_lstar1, h_lstar2⟩,
+      h_words_le,
+      h_g_Y
+    ⟩ :=
+    h
   have hp := hC.parConsts_pos
   simp only [PC.list, List.forall_mem_cons] at hp
-  obtain ⟨p_CkLow, p_Ck6, p_CfL, p_cLL, p_CnW, p_Crho, p_CDelG, p_CLw, p_Cj0, p_Cw, p_cw, p_CDel, p_CCount, p_Ch0r, p_Ch0k, p_Ch0N, p_Cgap, p_CetaF, p_CY, p_CYL, p_Cpde, p_CccK, p_CF, -⟩ := hp
+  obtain ⟨
+      p_CkLow,
+      p_Ck6,
+      p_CfL,
+      p_cLL,
+      p_CnW,
+      p_Crho,
+      p_CDelG,
+      p_CLw,
+      p_Cj0,
+      p_Cw,
+      p_cw,
+      p_CDel,
+      p_CCount,
+      p_Ch0r,
+      p_Ch0k,
+      p_Ch0N,
+      p_Cgap,
+      p_CetaF,
+      p_CY,
+      p_CYL,
+      p_Cpde,
+      p_CccK,
+      p_CF,
+      -
+    ⟩ :=
+    hp
   exact ⟨
-    { CkLow := C.P.CkLow, CkLow_pos := p_CkLow
-      Ck6 := C.P.Ck6, Ck6_pos := p_Ck6
-      CfL := C.P.CfL, CfL_pos := p_CfL
-      cLL := C.P.cLL, cLL_pos := p_cLL
-      CnW := C.P.CnW, CnW_pos := p_CnW
-      Crho := C.P.Crho, Crho_pos := p_Crho
-      CDelG := C.P.CDelG, CDelG_pos := p_CDelG
-      CLw := C.P.CLw, CLw_pos := p_CLw
-      Cj0 := C.P.Cj0, Cj0_pos := p_Cj0
-      Cw := C.P.Cw, Cw_pos := p_Cw
-      cw := C.P.cw, cw_pos := p_cw
-      CDel := C.P.CDel, CDel_pos := p_CDel
-      CCount := C.P.CCount, CCount_pos := p_CCount
-      Ch0r := C.P.Ch0r, Ch0r_pos := p_Ch0r
-      Ch0k := C.P.Ch0k, Ch0k_pos := p_Ch0k
-      Ch0N := C.P.Ch0N, Ch0N_pos := p_Ch0N
-      Cgap := C.P.Cgap, Cgap_pos := p_Cgap
-      CetaF := C.P.CetaF, CetaF_pos := p_CetaF
-      CY := C.P.CY, CY_pos := p_CY
-      CYL := C.P.CYL, CYL_pos := p_CYL
-      Cpde := C.P.Cpde, Cpde_pos := p_Cpde
-      CccK := C.P.CccK, CccK_pos := p_CccK
-      CF := C.P.CF, CF_pos := p_CF
+    {
+      CkLow := C.P.CkLow
+      CkLow_pos := p_CkLow
+      Ck6 := C.P.Ck6
+      Ck6_pos := p_Ck6
+      CfL := C.P.CfL
+      CfL_pos := p_CfL
+      cLL := C.P.cLL
+      cLL_pos := p_cLL
+      CnW := C.P.CnW
+      CnW_pos := p_CnW
+      Crho := C.P.Crho
+      Crho_pos := p_Crho
+      CDelG := C.P.CDelG
+      CDelG_pos := p_CDelG
+      CLw := C.P.CLw
+      CLw_pos := p_CLw
+      Cj0 := C.P.Cj0
+      Cj0_pos := p_Cj0
+      Cw := C.P.Cw
+      Cw_pos := p_Cw
+      cw := C.P.cw
+      cw_pos := p_cw
+      CDel := C.P.CDel
+      CDel_pos := p_CDel
+      CCount := C.P.CCount
+      CCount_pos := p_CCount
+      Ch0r := C.P.Ch0r
+      Ch0r_pos := p_Ch0r
+      Ch0k := C.P.Ch0k
+      Ch0k_pos := p_Ch0k
+      Ch0N := C.P.Ch0N
+      Ch0N_pos := p_Ch0N
+      Cgap := C.P.Cgap
+      Cgap_pos := p_Cgap
+      CetaF := C.P.CetaF
+      CetaF_pos := p_CetaF
+      CY := C.P.CY
+      CY_pos := p_CY
+      CYL := C.P.CYL
+      CYL_pos := p_CYL
+      Cpde := C.P.Cpde
+      Cpde_pos := p_Cpde
+      CccK := C.P.CccK
+      CccK_pos := p_CccK
+      CF := C.P.CF
+      CF_pos := p_CF
       qd_pow := h_qd_pow
       logq_ge := h_logq_ge
       logDerivative_le_power := h_dlogL1_le
@@ -181,6 +276,10 @@ theorem explicitConstants_parameterConditions_large :
       g_norm := hA.1
       g_mod := hA.2.1
       pde_split := hA.2.2.1
-      level_split := hA.2.2.2 }, rfl, rfl⟩
+      level_split := hA.2.2.2
+    },
+    rfl,
+    rfl
+  ⟩
 
 end GlobalTheory.EX

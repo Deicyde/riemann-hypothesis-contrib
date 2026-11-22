@@ -5,15 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-theorem UpperTheory.V.Af.Smo.avgChar :
-    UpperTheory.V.Af.Smo.AvgChar := by
+theorem UpperTheory.V.Af.Smo.avgChar : UpperTheory.V.Af.Smo.AvgChar := by
   intro A _ L₀ L _ hidx
   classical
   let H : AddSubgroup L := L₀.addSubgroupOf L
@@ -36,18 +36,20 @@ theorem UpperTheory.V.Af.Smo.avgChar :
     let xL : L := ⟨x, hxL⟩
     have hshift : ∀ q : L ⧸ H, χ (r (q + (xL : L ⧸ H))) = χ (r q) * χ x := by
       intro q
-      have h3 : ((Quotient.out (q + (xL : L ⧸ H)) : L) : L ⧸ H) = ((Quotient.out q + xL : L) : L ⧸ H) := by
+      have h3
+          : ((Quotient.out (q + (xL : L ⧸ H)) : L) : L ⧸ H)
+            = ((Quotient.out q + xL : L) : L ⧸ H) := by
         rw [QuotientAddGroup.mk_add, QuotientAddGroup.out_eq', QuotientAddGroup.out_eq']
       have h4 := hχeq _ _ h3
       simp only [r]
       rw [h4, AddSubgroup.coe_add, AddChar.map_add_eq_mul]
     have hS : ∑ q : L ⧸ H, χ (r q) = (∑ q : L ⧸ H, χ (r q)) * χ x := by
-      calc ∑ q : L ⧸ H, χ (r q) = ∑ q : L ⧸ H, χ (r (q + (xL : L ⧸ H))) :=
-            (Equiv.sum_comp (Equiv.addRight (xL : L ⧸ H)) (fun q => χ (r q))).symm
+      calc
+        ∑ q : L ⧸ H, χ (r q) = ∑ q : L ⧸ H, χ (r (q + (xL : L ⧸ H))) :=
+          (Equiv.sum_comp (Equiv.addRight (xL : L ⧸ H)) (fun q => χ (r q))).symm
         _ = ∑ q : L ⧸ H, χ (r q) * χ x := Finset.sum_congr rfl (fun q _ => hshift q)
         _ = (∑ q : L ⧸ H, χ (r q)) * χ x := (Finset.sum_mul _ _ _).symm
-    have h5 : (∑ q : L ⧸ H, χ (r q)) * (χ x - 1) = 0 := by
-      rw [mul_sub, mul_one, ← hS, sub_self]
+    have h5 : (∑ q : L ⧸ H, χ (r q)) * (χ x - 1) = 0 := by rw [mul_sub, mul_one, ← hS, sub_self]
     rcases mul_eq_zero.mp h5 with h6 | h6
     · exact h6
     · exact absurd (sub_eq_zero.mp h6) hx

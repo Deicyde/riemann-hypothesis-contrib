@@ -32,7 +32,11 @@ theorem ListMonoDens.proof : ListMonoDens.Statement := by
   have hopen : IsOpen ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Yo) :=
     (A.chart j).isOpen_inter_preimage_symm hYo
   have hvC : ∀ i, ContDiffAt ℝ 2 (v i) y := fun i =>
-    ((hu i j).contDiffAt (hopen.mem_nhds ⟨hy, hyY⟩)).of_le (by first | simp | exact_mod_cast (le_top : ((2 : ℕ) : ℕ∞) ≤ ⊤) | exact WithTop.coe_le_coe.mpr le_top)
+    ((hu i j).contDiffAt (hopen.mem_nhds ⟨hy, hyY⟩)).of_le (by
+      first
+      | simp
+      | exact_mod_cast (le_top : ((2 : ℕ) : ℕ∞) ≤ ⊤)
+      | exact WithTop.coe_le_coe.mpr le_top)
   have hgC : ∀ i, ContDiffAt ℝ 2 (fun y' => o y' + (-1) * f i y') y := fun i =>
     hoC.add (contDiffAt_const.mul (hfC i))
 
@@ -41,27 +45,30 @@ theorem ListMonoDens.proof : ListMonoDens.Statement := by
       hnn i p j y ⟨hy, hyY, (th i).mem_U p, Set.mem_univ _⟩ w
 
   have hB : ∀ i, (hessC (fun y' => o y' + (-1) * f i y') y).PosSemidef := fun i => by
-    refine ReciprocityTheory.AnForm.M.hessC_posSemidef_of_levi _ y (hgC i)
-      fun w => ?_
+    refine ReciprocityTheory.AnForm.M.hessC_posSemidef_of_levi _ y (hgC i) fun w => ?_
     rw [ReciprocityTheory.AnForm.levi_add_smul (-1) hoC (hfC i) w]
     have h := hle i p j y ⟨hy, ⟨⟨Set.mem_univ _, (th i).mem_U p⟩, Om.mem_U p⟩⟩ w
     have h' : 1 * levi (f i) y w ≤ 1 * levi o y w := h
     linarith
 
-  have hsum : ∀ i, hessC (fun y' => o y' + v i y') y =
-      hessC (fun y' => f i y' + v i y') y + hessC (fun y' => o y' + (-1) * f i y') y := fun i => by
-    rw [← ReciprocityTheory.AnForm.A.hessC_add _ _ y ((hfC i).add (hvC i))
-      (hgC i)]
+  have hsum
+      : ∀ i,
+        hessC (fun y' => o y' + v i y') y
+          = hessC (fun y' => f i y' + v i y') y
+            + hessC (fun y' => o y' + (-1) * f i y') y := fun i => by
+    rw [← ReciprocityTheory.AnForm.A.hessC_add _ _ y ((hfC i).add (hvC i)) (hgC i)]
     congr 1
     funext y'
     ring
-  have e1 : locDens A (fun i => potForm (th i) (u i)) j y =
-      maDens (fun i y' => f i y' + v i y') y := rfl
+  have e1
+      : locDens A (fun i => potForm (th i) (u i)) j y = maDens (fun i y' => f i y' + v i y') y :=
+    rfl
   have e2 : locDens A (fun i => potForm Om (u i)) j y = maDens (fun i y' => o y' + v i y') y := rfl
   rw [e1, e2]
   refine ⟨ReciprocityTheory.AnForm.A.maDens_nonneg_of_posSemidef _ y hA, ?_⟩
   unfold maDens
-  refine mul_le_mul_of_nonneg_left (ReciprocityTheory.AnForm.A.mdisc_re_mono _ _ hA fun i => ?_) (by positivity)
+  refine mul_le_mul_of_nonneg_left (ReciprocityTheory.AnForm.A.mdisc_re_mono _ _ hA fun i => ?_)
+    (by positivity)
   simpa [hsum i] using hB i
 
 end GroundTheory.Heights₂.Heights.AnalyticLimit

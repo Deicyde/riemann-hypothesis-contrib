@@ -11,36 +11,47 @@ noncomputable section
 
 namespace PI.VolStabSW.OmFibG
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain Topology Filter
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain Topology Filter
 open scoped TensorProduct
 
-def FiltConcl {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    (hJ : ∀ i j, σ (J j i) = J i j) (a : ℕ) (v : HeightOneSpectrum (𝓞 F)) (d : ℕ)
-    (b : Module.Basis (Fin d) F E) (x : Fin a → Fin M → Fv F v ⊗[F] E) : Prop :=
-  ∃ N ∈ 𝓝 (0 : Fin a → Fin M → Fv F v ⊗[F] E), ∀ y, y - x ∈ N →
-    ∀ Λ0, scaledB (Fv F v) (latSub b v a M) Λ0 →
-      (Λ0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) ⊆ N →
-    ∃ (Λ : ℕ → AddSubgroup (Fin a → Fin M → Fv F v ⊗[F] E))
-      (H : ℕ → AddSubgroup (HermR (Fv F v) σ a))
-      (D : (Fin a → Fin M → Fv F v ⊗[F] E) →+ HermR (Fv F v) σ a),
-      Λ 0 = Λ0 ∧ (∀ n, IsOpen (Λ n : Set (Fin a → Fin M → Fv F v ⊗[F] E))) ∧
-      (∀ n, IsCompact (Λ n : Set (Fin a → Fin M → Fv F v ⊗[F] E))) ∧ Antitone Λ ∧
-      (∀ n, IsOpen (H n : Set (HermR (Fv F v) σ a))) ∧
-      (∀ n, IsCompact (H n : Set (HermR (Fv F v) σ a))) ∧
-      (∀ N' ∈ 𝓝 (0 : HermR (Fv F v) σ a), ∃ n, (H n : Set (HermR (Fv F v) σ a)) ⊆ N') ∧
-      (∀ n, (Λ n).map D = H n) ∧
-      ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n,
-        gramH (Fv F v) σ hσ J hJ (y + Z + W) - gramH (Fv F v) σ hσ J hJ (y + Z) - D W ∈
-          H (n + 1)
+def FiltConcl
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x)
+    (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : ∀ i j, σ (J j i) = J i j)
+    (a : ℕ) (v : HeightOneSpectrum (𝓞 F))
+    (d : ℕ) (b : Module.Basis (Fin d) F E)
+    (x : Fin a → Fin M → Fv F v ⊗[F] E)
+    : Prop :=
+  ∃ N ∈ 𝓝 (0 : Fin a → Fin M → Fv F v ⊗[F] E), ∀ y,
+    y - x ∈ N
+      → ∀ Λ0,
+        scaledB (Fv F v) (latSub b v a M) Λ0 → (Λ0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) ⊆ N
+          → ∃ (Λ : ℕ → AddSubgroup (Fin a → Fin M → Fv F v ⊗[F] E))
+              (H : ℕ → AddSubgroup (HermR (Fv F v) σ a))
+              (D : (Fin a → Fin M → Fv F v ⊗[F] E) →+ HermR (Fv F v) σ a),
+            Λ 0 = Λ0 ∧ (∀ n, IsOpen (Λ n : Set (Fin a → Fin M → Fv F v ⊗[F] E)))
+              ∧ (∀ n, IsCompact (Λ n : Set (Fin a → Fin M → Fv F v ⊗[F] E))) ∧ Antitone Λ
+              ∧ (∀ n, IsOpen (H n : Set (HermR (Fv F v) σ a)))
+              ∧ (∀ n, IsCompact (H n : Set (HermR (Fv F v) σ a)))
+              ∧ (∀ N' ∈ 𝓝 (0 : HermR (Fv F v) σ a), ∃ n, (H n : Set (HermR (Fv F v) σ a)) ⊆ N')
+              ∧ (∀ n, (Λ n).map D = H n)
+              ∧ ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n,
+                gramH (Fv F v) σ hσ J hJ (y + Z + W) - gramH (Fv F v) σ hσ J hJ (y + Z) - D W
+                  ∈ H (n + 1)
 
-theorem dxOpen_gen {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    (hJ : ∀ i j, σ (J j i) = J i j) (hdet : J.det ≠ 0) (a : ℕ) (v : HeightOneSpectrum (𝓞 F))
-    (d : ℕ) (b : Module.Basis (Fin d) F E) (x : Fin a → Fin M → Fv F v ⊗[F] E)
-    (hx : LinearIndependent (Fv F v ⊗[F] E) x) :
-    IsOpen ((fun W => gramH (Fv F v) σ hσ J hJ (x + W) - gramH (Fv F v) σ hσ J hJ x -
-      gramH (Fv F v) σ hσ J hJ W) '' (latSub b v a M : Set (Fin a → Fin M → Fv F v ⊗[F] E))) := by
+theorem dxOpen_gen
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x)
+    (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : ∀ i j, σ (J j i) = J i j) (hdet : J.det ≠ 0)
+    (a : ℕ) (v : HeightOneSpectrum (𝓞 F))
+    (d : ℕ) (b : Module.Basis (Fin d) F E)
+    (x : Fin a → Fin M → Fv F v ⊗[F] E) (hx : LinearIndependent (Fv F v ⊗[F] E) x)
+    : IsOpen
+      ((fun W =>
+          gramH (Fv F v) σ hσ J hJ (x + W) - gramH (Fv F v) σ hσ J hJ x
+            - gramH (Fv F v) σ hσ J hJ W)
+        '' (latSub b v a M : Set (Fin a → Fin M → Fv F v ⊗[F] E))) := by
   have : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   have : IsArtinianRing (Fv F v ⊗[F] E) := IsArtinianRing.of_finite (Fv F v) (Fv F v ⊗[F] E)
   have : IsReduced (Fv F v ⊗[F] E) := isReduced_tens_field F E (Fv F v)
@@ -78,32 +89,40 @@ theorem dxOpen_gen {F E : Type} [Field F] [NumberField F] [Field E] [NumberField
   show IsOpen (Dx '' (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)))
   rw [isOpen_iff_mem_nhds]
   rintro _ ⟨l, hl, rfl⟩
-  have hU : IsOpen {S : HermR (Fv F v) σ a | T ((S - Dx l : HermR (Fv F v) σ a) :
-      Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) ∈ L} :=
+  have hU : IsOpen
+      {S : HermR (Fv F v) σ a | T ((S - Dx l : HermR (Fv F v) σ a) :
+        Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) ∈ L} :=
     hLo.preimage (hTc.comp (continuous_subtype_val.comp (continuous_id.sub continuous_const)))
   refine Filter.mem_of_superset (hU.mem_nhds ?_) ?_
   · show T ((Dx l - Dx l : HermR (Fv F v) σ a) : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) ∈ L
     rw [sub_self, AddSubgroup.coe_zero, hT0]
     exact L.zero_mem
   · intro S hS
-    refine ⟨l + T ((S - Dx l : HermR (Fv F v) σ a) : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)),
-      L.add_mem hl hS, ?_⟩
+    refine ⟨
+      l + T ((S - Dx l : HermR (Fv F v) σ a) : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)),
+      L.add_mem hl hS,
+      ?_
+    ⟩
     rw [hDadd, hDT]
     abel
 
-theorem gramFilt_gen {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    (hJ : ∀ i j, σ (J j i) = J i j) (hdet : J.det ≠ 0) (a : ℕ) (ha1 : 1 ≤ a)
-    (v : HeightOneSpectrum (𝓞 F)) (d : ℕ) (b : Module.Basis (Fin d) F E)
-    (x : Fin a → Fin M → Fv F v ⊗[F] E) (hx : LinearIndependent (Fv F v ⊗[F] E) x) :
-    FiltConcl σ hσ M J hJ a v d b x := by
+theorem gramFilt_gen
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x)
+    (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : ∀ i j, σ (J j i) = J i j) (hdet : J.det ≠ 0)
+    (a : ℕ) (ha1 : 1 ≤ a)
+    (v : HeightOneSpectrum (𝓞 F))
+    (d : ℕ) (b : Module.Basis (Fin d) F E)
+    (x : Fin a → Fin M → Fv F v ⊗[F] E) (hx : LinearIndependent (Fv F v ⊗[F] E) x)
+    : FiltConcl σ hσ M J hJ a v d b x := by
   have : FiniteDimensional F E := Module.Finite.of_basis b
   have := locallyCompact_Fv F v
   have : IsModuleTopology (Fv F v) (Fv F v ⊗[F] E) := ⟨rfl⟩
   have : IsTopologicalAddGroup (Fv F v ⊗[F] E) :=
     IsModuleTopology.topologicalAddGroup (Fv F v) (Fv F v ⊗[F] E)
   have : T2Space (Fv F v ⊗[F] E) := by
-    obtain ⟨ι, _, ⟨h⟩⟩ := PI.AdicCompletionValuation.exists_homeomorph_tens (F := F) (E := E) (Fv F v)
+    obtain ⟨ι, _, ⟨h⟩⟩ :=
+      PI.AdicCompletionValuation.exists_homeomorph_tens (F := F) (E := E) (Fv F v)
     exact h.isEmbedding.t2Space
   have : ContinuousSMul (Fv F v) (Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) :=
     inferInstanceAs (ContinuousSMul (Fv F v) (Fin a → Fin a → Fv F v ⊗[F] E))
@@ -126,10 +145,11 @@ theorem gramFilt_gen {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
     show (Algebra.TensorProduct.basis (Fv F v) b).repr (π • w i j) k ∈ v.adicCompletionIntegers F
     rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
     exact mul_mem hπO h
-  let β : (Fin a → Fin M → Fv F v ⊗[F] E) → (Fin a → Fin M → Fv F v ⊗[F] E) →
-      HermR (Fv F v) σ a := fun u w => ⟨gramB (Fv F v) σ J u w, gramB_mem (Fv F v) σ hσ J hJ u w⟩
+  let β : (Fin a → Fin M → Fv F v ⊗[F] E) → (Fin a → Fin M → Fv F v ⊗[F] E) → HermR (Fv F v) σ a :=
+    fun u w => ⟨gramB (Fv F v) σ J u w, gramB_mem (Fv F v) σ hσ J hJ u w⟩
   have hβc : Continuous fun q : (Fin a → Fin M → Fv F v ⊗[F] E) × (Fin a → Fin M → Fv F v ⊗[F] E) =>
-      β q.1 q.2 := (continuous_gramB (Fv F v) σ J).subtype_mk _
+      β q.1 q.2 :=
+    (continuous_gramB (Fv F v) σ J).subtype_mk _
   have hβ1 : ∀ u u' w, β (u + u') w = β u w + β u' w := by
     intro u u' w
     apply Subtype.ext
@@ -168,8 +188,11 @@ theorem gramFilt_gen {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   have hGc : Continuous G := continuous_gramH (Fv F v) σ hσ J hJ
   have hxo : IsOpen (β x '' (L : Set (Fin a → Fin M → Fv F v ⊗[F] E))) := by
     have h := dxOpen_gen σ hσ M J hJ hdet a v d b x hx
-    have e : (fun W => gramH (Fv F v) σ hσ J hJ (x + W) - gramH (Fv F v) σ hσ J hJ x -
-        gramH (Fv F v) σ hσ J hJ W) = β x := by
+    have e
+        : (fun W =>
+            gramH (Fv F v) σ hσ J hJ (x + W) - gramH (Fv F v) σ hσ J hJ x
+              - gramH (Fv F v) σ hσ J hJ W)
+          = β x := by
       funext W
       rw [← hGdef, hG]
       abel
@@ -194,9 +217,11 @@ theorem gramFilt_gen {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   let i0 : Fin a := ⟨0, ha1⟩
   let j0 : Fin M := ⟨0, hM⟩
   let k0 : Fin d := ⟨0, hd⟩
-  let φ : (Fin a → Fin M → Fv F v ⊗[F] E) → Fv F v := fun Y => PositiveNearLattice.crd b (Fv F v) (Y i0 j0) k0
+  let φ : (Fin a → Fin M → Fv F v ⊗[F] E) → Fv F v := fun Y =>
+    PositiveNearLattice.crd b (Fv F v) (Y i0 j0) k0
   have hφc : Continuous φ :=
-    (PositiveNearLattice.continuous_crd b (Fv F v) k0).comp ((continuous_apply j0).comp (continuous_apply i0))
+    (PositiveNearLattice.continuous_crd b (Fv F v) k0).comp
+      ((continuous_apply j0).comp (continuous_apply i0))
   have hφs : ∀ (t : Fv F v) Y, φ (t • Y) = t * φ Y := by
     intro t Y
     show (Algebra.TensorProduct.basis (Fv F v) b).repr (t • Y i0 j0) k0 =
@@ -217,23 +242,31 @@ theorem gramFilt_gen {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   have hφe : φ e0 = 1 := by
     show PositiveNearLattice.crd b (Fv F v) (e0 i0 j0) k0 = 1
     simp [e0, PositiveNearLattice.crd_incl, b.repr_self]
-  have hsmall : ∀ U ∈ 𝓝 (0 : HermR (Fv F v) σ a), ∃ N2 ∈ 𝓝 (0 : Fin a → Fin M → Fv F v ⊗[F] E),
-      ∀ c : Fv F v, (∀ w ∈ L, c • w ∈ N2) → ∀ w ∈ L, c • G w ∈ U := by
+  have hsmall
+      : ∀ U ∈ 𝓝 (0 : HermR (Fv F v) σ a), ∃ N2 ∈ 𝓝 (0 : Fin a → Fin M → Fv F v ⊗[F] E),
+        ∀ c : Fv F v,
+          (∀ w ∈ L, c • w ∈ N2) → ∀ w ∈ L, c • G w ∈ U := by
     intro U hU
-    have hT : ∀ᶠ t in 𝓝 (0 : Fv F v), ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)),
-        t • G w ∈ U := by
-      have hP : ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)),
-          ∀ᶠ q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) in 𝓝 ((0 : Fv F v), w), q.1 • G q.2 ∈ U := by
-        intro w _
-        have h : Tendsto (fun q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) => q.1 • G q.2)
-            (𝓝 ((0 : Fv F v), w)) (𝓝 (0 : HermR (Fv F v) σ a)) := by
-          have hc : Continuous (fun q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) => q.1 • G q.2) :=
-            continuous_fst.smul (hGc.comp continuous_snd)
-          have := hc.tendsto ((0 : Fv F v), w)
-          simpa using this
-        exact h hU
+    have hT
+        : ∀ᶠ t in 𝓝 (0 : Fv F v), ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)),
+          t • G w ∈ U := by
+      have hP
+          : ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)),
+            ∀ᶠ q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) in 𝓝 ((0 : Fv F v), w), q.1 • G q.2 ∈ U :=
+        by
+          intro w _
+          have h : Tendsto
+              (fun q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) => q.1 • G q.2)
+              (𝓝 ((0 : Fv F v), w)) (𝓝 (0 : HermR (Fv F v) σ a)) := by
+            have hc
+                : Continuous (fun q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) => q.1 • G q.2) :=
+              continuous_fst.smul (hGc.comp continuous_snd)
+            have := hc.tendsto ((0 : Fv F v), w)
+            simpa using this
+          exact h hU
       exact hLc.eventually_forall_of_forall_eventually
-        (P := fun (t : Fv F v) (w : Fin a → Fin M → Fv F v ⊗[F] E) => t • G w ∈ U) hP
+        (P := fun (t : Fv F v) (w : Fin a → Fin M → Fv F v ⊗[F] E) => t • G w ∈ U)
+        hP
     refine ⟨φ ⁻¹' {t | ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)), t • G w ∈ U}, ?_, ?_⟩
     · have h0 : φ 0 = 0 := by
         have := hφs 0 0
@@ -245,11 +278,14 @@ theorem gramFilt_gen {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
       exact h w hw
   exact filt_abstract π hπ0 hπ L hLo hLc hπL β hβc hβ1 hβ2 hβs G hG hGs x hxo hsmall
 
-theorem gramFilt_zero {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    (hJ : ∀ i j, σ (J j i) = J i j) (v : HeightOneSpectrum (𝓞 F)) (d : ℕ)
-    (b : Module.Basis (Fin d) F E) (x : Fin 0 → Fin M → Fv F v ⊗[F] E) :
-    FiltConcl σ hσ M J hJ 0 v d b x := by
+theorem gramFilt_zero
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x)
+    (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : ∀ i j, σ (J j i) = J i j)
+    (v : HeightOneSpectrum (𝓞 F))
+    (d : ℕ) (b : Module.Basis (Fin d) F E)
+    (x : Fin 0 → Fin M → Fv F v ⊗[F] E)
+    : FiltConcl σ hσ M J hJ 0 v d b x := by
   haveI hH : Subsingleton (HermR (Fv F v) σ 0) := by
     unfold HermR
     infer_instance
@@ -264,8 +300,20 @@ theorem gramFilt_zero {F E : Type} [Field F] [NumberField F] [Field E] [NumberFi
     rw [Subsingleton.elim w 0]
     exact S.zero_mem
   refine ⟨Set.univ, Filter.univ_mem, fun y _ Λ0 _ _ => ?_⟩
-  refine ⟨fun _ => Λ0, fun _ => ⊤, 0, rfl, fun _ => ?_, fun _ => ?_, antitone_const,
-    fun _ => isOpen_univ, fun _ => ?_, fun N' hN' => ⟨0, ?_⟩, fun _ => hsubH _, ?_⟩
+  refine ⟨
+    fun _ => Λ0,
+    fun _ => ⊤,
+    0,
+    rfl,
+    fun _ => ?_,
+    fun _ => ?_,
+    antitone_const,
+    fun _ => isOpen_univ,
+    fun _ => ?_,
+    fun N' hN' => ⟨0, ?_⟩,
+    fun _ => hsubH _,
+    ?_
+  ⟩
   · rw [hsub Λ0]; exact isOpen_univ
   · exact Set.subsingleton_of_subsingleton.isCompact
   · exact Set.subsingleton_of_subsingleton.isCompact
@@ -276,12 +324,14 @@ theorem gramFilt_zero {F E : Type} [Field F] [NumberField F] [Field E] [NumberFi
     rw [hsubH (⊤ : AddSubgroup (HermR (Fv F v) σ 0))]
     exact AddSubgroup.mem_top _
 
-theorem gramFilt_all {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    (hJ : ∀ i j, σ (J j i) = J i j) (hdet : J.det ≠ 0) (a : ℕ)
-    (v : HeightOneSpectrum (𝓞 F)) (d : ℕ) (b : Module.Basis (Fin d) F E)
-    (x : Fin a → Fin M → Fv F v ⊗[F] E) (hx : LinearIndependent (Fv F v ⊗[F] E) x) :
-    FiltConcl σ hσ M J hJ a v d b x := by
+theorem gramFilt_all
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x)
+    (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : ∀ i j, σ (J j i) = J i j) (hdet : J.det ≠ 0)
+    (a : ℕ) (v : HeightOneSpectrum (𝓞 F))
+    (d : ℕ) (b : Module.Basis (Fin d) F E)
+    (x : Fin a → Fin M → Fv F v ⊗[F] E) (hx : LinearIndependent (Fv F v ⊗[F] E) x)
+    : FiltConcl σ hσ M J hJ a v d b x := by
   rcases Nat.eq_zero_or_pos a with rfl | ha
   · exact gramFilt_zero σ hσ M J hJ v d b x
   · exact gramFilt_gen σ hσ M J hJ hdet a ha v d b x hx

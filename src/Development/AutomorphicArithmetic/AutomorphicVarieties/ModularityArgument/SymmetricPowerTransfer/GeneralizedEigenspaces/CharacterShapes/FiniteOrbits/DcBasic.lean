@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -17,8 +19,8 @@ section SlopeTestRemainingChoices
 
 variable {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
 
-private theorem coe_mem_orbit (U : Subgroup G) (a g : G) :
-    (g : G ⧸ U) ∈ MulAction.orbit U (a : G ⧸ U) ↔ g ∈ DC U a := by
+private theorem coe_mem_orbit (U : Subgroup G) (a g : G)
+    : (g : G ⧸ U) ∈ MulAction.orbit U (a : G ⧸ U) ↔ g ∈ DC U a := by
   constructor
   · rintro ⟨u, hu⟩
     have h : ((u.1 * a : G) : G ⧸ U) = g := by rw [← hu]; rfl
@@ -30,12 +32,15 @@ private theorem coe_mem_orbit (U : Subgroup G) (a g : G) :
     rw [QuotientGroup.eq, show (u * a)⁻¹ * (u * a * u') = u' by group]
     exact hu'
 
-private theorem out_mem_orbit (U : Subgroup G) (a : G) (y : G ⧸ U) :
-    y ∈ MulAction.orbit U (a : G ⧸ U) ↔ y.out ∈ DC U a := by
+private theorem out_mem_orbit (U : Subgroup G) (a : G) (y : G ⧸ U)
+    : y ∈ MulAction.orbit U (a : G ⧸ U) ↔ y.out ∈ DC U a := by
   rw [← coe_mem_orbit, QuotientGroup.out_eq']
 
-private theorem val_out (U : Subgroup G) {φ : G → V} (hφ : ∀ u ∈ U, ∀ g, φ (g * u) = φ g)
-    (g y : G) (q : G ⧸ U) (h : (y : G ⧸ U) = q) : φ (g * q.out) = φ (g * y) := by
+private theorem val_out
+    (U : Subgroup G)
+    {φ : G → V} (hφ : ∀ u ∈ U, ∀ g, φ (g * u) = φ g)
+    (g y : G) (q : G ⧸ U) (h : (y : G ⧸ U) = q)
+    : φ (g * q.out) = φ (g * y) := by
   have hm : y⁻¹ * q.out ∈ U := by
     rw [← QuotientGroup.eq, QuotientGroup.out_eq']
     exact h
@@ -43,14 +48,14 @@ private theorem val_out (U : Subgroup G) {φ : G → V} (hφ : ∀ u ∈ U, ∀ 
   rw [show g * y * (y⁻¹ * q.out) = g * q.out by group] at e
   exact e
 
-private theorem dcF_eq_mem (U : Subgroup G) (a : G) (φ : G → V) :
-    dcF U a φ = (∑ᶠ q ∈ MulAction.orbit U (a : G ⧸ U), rightReg ℂ G V q.out) φ := by
+private theorem dcF_eq_mem (U : Subgroup G) (a : G) (φ : G → V)
+    : dcF U a φ = (∑ᶠ q ∈ MulAction.orbit U (a : G ⧸ U), rightReg ℂ G V q.out) φ := by
   show (∑ᶠ q : ↑(MulAction.orbit U (a : G ⧸ U)), rightReg ℂ G V (Quotient.out (q : G ⧸ U))) φ = _
   rw [finsum_set_coe_eq_finsum_mem (f := fun q : G ⧸ U => rightReg ℂ G V q.out)]
 
-private theorem dcF_apply (U : Subgroup G) (a : G) (h : (MulAction.orbit U (a : G ⧸ U)).Finite)
-    (φ : G → V) (g : G) :
-    dcF U a φ g = ∑ y ∈ Set.Finite.toFinset h, φ (g * y.out) := by
+private theorem dcF_apply
+    (U : Subgroup G) (a : G) (h : (MulAction.orbit U (a : G ⧸ U)).Finite) (φ : G → V) (g : G)
+    : dcF U a φ g = ∑ y ∈ Set.Finite.toFinset h, φ (g * y.out) := by
   rw [dcF_eq_mem, finsum_mem_eq_finite_toFinset_sum _ h]
   simp [LinearMap.sum_apply, Finset.sum_apply, rightReg, LinearMap.funLeft]
 
@@ -58,17 +63,19 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.V.Z.Sym.So
 
-theorem UpperTheory.V.Z.Sym.So.dcBasic :
-    UpperTheory.V.Z.Sym.So.DcBasic := by
+theorem UpperTheory.V.Z.Sym.So.dcBasic : UpperTheory.V.Z.Sym.So.DcBasic := by
   intro G V _ _ _ U a hfin0 φ hφ
   classical
   have hfin : (MulAction.orbit U (a : G ⧸ U)).Finite := hfin0
-  have hO : ∀ (v : U) (y : G ⧸ U), y ∈ MulAction.orbit U (a : G ⧸ U) →
-      v • y ∈ MulAction.orbit U (a : G ⧸ U) := by
+  have hO
+      : ∀ (v : U) (y : G ⧸ U),
+        y ∈ MulAction.orbit U (a : G ⧸ U) → v • y ∈ MulAction.orbit U (a : G ⧸ U) := by
     rintro v y ⟨w, rfl⟩
     exact ⟨v * w, mul_smul v w _⟩
-  have h5 : ∀ (R : Finset G), (∀ y ∈ R, y ∈ DC U a) →
-      (∀ y ∈ DC U a, ∃! r, r ∈ R ∧ r⁻¹ * y ∈ U) → ∀ g, dcF U a φ g = ∑ r ∈ R, φ (g * r) := by
+  have h5
+      : ∀ (R : Finset G),
+        (∀ y ∈ R, y ∈ DC U a) → (∀ y ∈ DC U a, ∃! r, r ∈ R ∧ r⁻¹ * y ∈ U)
+          → ∀ g, dcF U a φ g = ∑ r ∈ R, φ (g * r) := by
     intro R hR hu g
     rw [dcF_apply U a hfin φ g]
     symm

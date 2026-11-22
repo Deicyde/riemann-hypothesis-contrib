@@ -8,27 +8,30 @@ open MeasureTheory
 
 namespace GlobalTheory.Twist
 
-theorem lintegral_haar_eq_transversal (G E : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-    [MeasurableSpace E] (μ mK : Measure G) [μ.IsHaarMeasure] [μ.IsInvInvariant]
-    [IsProbabilityMeasure mK] (lam : Measure E) [SFinite lam] (K : Set G) (e : E → G)
-    (he : Measurable e) (hK : mK Kᶜ = 0)
-    (hinv : ∀ k ∈ K, Measure.map (fun x => x * k) mK = mK) (hlam : lam ≠ 0)
+theorem lintegral_haar_eq_transversal
+    (G E : Type)
+    [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [MeasurableSpace E]
+    (μ mK : Measure G) [μ.IsHaarMeasure] [μ.IsInvInvariant] [IsProbabilityMeasure mK]
+    (lam : Measure E) [SFinite lam]
+    (K : Set G)
+    (e : E → G) (he : Measurable e)
+    (hK : mK Kᶜ = 0) (hinv : ∀ k ∈ K, Measure.map (fun x => x * k) mK = mK) (hlam : lam ≠ 0)
     (hfin : ∀ C : Set G, IsCompact C → lam {B | ∃ k ∈ K, k * e B ∈ C} < ⊤)
-    (hact : ∀ g : G, ∃ ψ : E → E, Measurable ψ ∧ Measure.map ψ lam = lam ∧
-      ∀ B, ∃ κ ∈ K, e B * g = κ * e (ψ B)) :
-    ∃ c : ℝ, 0 < c ∧ ∀ f : G → ENNReal, Measurable f →
-      ∫⁻ g, f g ∂μ = ENNReal.ofReal c * ∫⁻ B, ∫⁻ k, f (k * e B) ∂mK ∂lam := by
-  have hm : Measurable (fun z : E × G => z.2 * e z.1) :=
-    measurable_snd.mul (he.comp measurable_fst)
+    (hact : ∀ g : G, ∃ ψ : E → E,
+      Measurable ψ ∧ Measure.map ψ lam = lam ∧ ∀ B, ∃ κ ∈ K, e B * g = κ * e (ψ B))
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ f : G → ENNReal,
+          Measurable f → ∫⁻ g, f g ∂μ = ENNReal.ofReal c * ∫⁻ B, ∫⁻ k, f (k * e B) ∂mK ∂lam := by
+  have hm : Measurable (fun z : E × G => z.2 * e z.1) := measurable_snd.mul (he.comp measurable_fst)
   set ν : Measure G := Measure.map (fun z : E × G => z.2 * e z.1) (lam.prod mK) with hν
-  have hint : ∀ f : G → ENNReal, Measurable f →
-      ∫⁻ g, f g ∂ν = ∫⁻ B, ∫⁻ k, f (k * e B) ∂mK ∂lam := by
+  have hint
+      : ∀ f : G → ENNReal, Measurable f → ∫⁻ g, f g ∂ν = ∫⁻ B, ∫⁻ k, f (k * e B) ∂mK ∂lam := by
     intro f hf
     rw [hν, lintegral_map hf hm]
     exact lintegral_prod (fun z : E × G => f (z.2 * e z.1)) (hf.comp hm).aemeasurable
-  have hH : ∀ f : G → ENNReal, Measurable f →
-      Measurable (fun B => ∫⁻ k, f (k * e B) ∂mK) := by
+  have hH : ∀ f : G → ENNReal, Measurable f → Measurable (fun B => ∫⁻ k, f (k * e B) ∂mK) := by
     intro f hf
     exact Measurable.lintegral_prod_right' (f := fun z : E × G => f (z.2 * e z.1)) (hf.comp hm)
   have hR : ν.IsMulRightInvariant := by
@@ -40,8 +43,11 @@ theorem lintegral_haar_eq_transversal (G E : Type) [Group G] [TopologicalSpace G
     have h1 : ∀ B, ∫⁻ k, f (k * e B * g) ∂mK = ∫⁻ k, f (k * e (ψ B)) ∂mK := by
       intro B
       obtain ⟨κ, hκ, hk⟩ := hψe B
-      have h2 := lintegral_map (μ := mK) (f := fun x => f (x * e (ψ B))) (g := fun x => x * κ)
-        (hf.comp (measurable_mul_const _)) (measurable_mul_const κ)
+      have h2 :=
+        lintegral_map (μ := mK)
+          (f := fun x => f (x * e (ψ B)))
+          (g := fun x => x * κ)
+          (hf.comp (measurable_mul_const _)) (measurable_mul_const κ)
       rw [hinv κ hκ] at h2
       rw [h2]
       simp only [mul_assoc, hk]
@@ -61,8 +67,9 @@ theorem lintegral_haar_eq_transversal (G E : Type) [Group G] [TopologicalSpace G
     refine lintegral_mono (fun B => ?_)
     by_cases hB : B ∈ toMeasurable lam S
     · rw [Set.indicator_of_mem hB]
-      calc ∫⁻ k, C.indicator (1 : G → ENNReal) (k * e B) ∂mK ≤ ∫⁻ _k, 1 ∂mK :=
-            lintegral_mono (fun k => Set.indicator_le_self' (fun _ _ => zero_le_one) _)
+      calc
+        ∫⁻ k, C.indicator (1 : G → ENNReal) (k * e B) ∂mK ≤ ∫⁻ _k, 1 ∂mK :=
+          lintegral_mono (fun k => Set.indicator_le_self' (fun _ _ => zero_le_one) _)
         _ = 1 := by simp
     · rw [Set.indicator_of_notMem hB]
       have hB' : B ∉ S := fun h => hB (subset_toMeasurable _ _ h)
@@ -85,14 +92,16 @@ theorem lintegral_haar_eq_transversal (G E : Type) [Group G] [TopologicalSpace G
     rw [this]
     change Measure.map _ (c • μ) = _
     rw [Measure.map_smul (c := c) (f := Inv.inv)
-      (measurable_inv.aemeasurable : AEMeasurable Inv.inv μ), Measure.map_inv_eq_self μ]
+        (measurable_inv.aemeasurable : AEMeasurable Inv.inv μ),
+      Measure.map_inv_eq_self μ]
   have hc0 : c ≠ 0 := by
     intro h
     apply hν0
     rw [hνc, h, zero_smul]
-  refine ⟨((c⁻¹ : NNReal) : ℝ), by exact_mod_cast inv_pos.mpr (pos_iff_ne_zero.mpr hc0), fun f hf => ?_⟩
-  rw [← hint f hf, hνc, lintegral_smul_measure, ENNReal.ofReal_coe_nnreal, ENNReal.smul_def, smul_eq_mul,
-    ← mul_assoc, ← ENNReal.coe_mul, inv_mul_cancel₀ hc0]
+  refine
+    ⟨((c⁻¹ : NNReal) : ℝ), by exact_mod_cast inv_pos.mpr (pos_iff_ne_zero.mpr hc0), fun f hf => ?_⟩
+  rw [← hint f hf, hνc, lintegral_smul_measure, ENNReal.ofReal_coe_nnreal, ENNReal.smul_def,
+    smul_eq_mul, ← mul_assoc, ← ENNReal.coe_mul, inv_mul_cancel₀ hc0]
   simp
 
 end GlobalTheory.Twist

@@ -15,8 +15,8 @@ namespace GlobalTheory.MemLoc
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem exists_isTiltOf (c : Om l) (m : ℕ) (hm : 0 < m) (hl : ¬ l ∣ m) (hc : c ^ m = 1) :
-    ∃ xb : Per.Fl l, IsTiltOf c m xb := by
+theorem exists_isTiltOf (c : Om l) (m : ℕ) (hm : 0 < m) (hl : ¬ l ∣ m) (hc : c ^ m = 1)
+    : ∃ xb : Per.Fl l, IsTiltOf c m xb := by
   have hcC : (c : ℂ_[l]) ^ m = 1 := by
     have := congrArg (algebraMap (Om l) ℂ_[l]) hc
     rw [map_pow, map_one] at this
@@ -45,21 +45,25 @@ theorem exists_isTiltOf (c : Om l) (m : ℕ) (hm : 0 < m) (hl : ¬ l ∣ m) (hc 
     induction k with
     | zero => simp [y]
     | succ k ih => rw [pow_succ', pow_mul, hy, ih]
-  refine ⟨(⟨fun k => Ideal.Quotient.mk _ (y k), fun k => ?_⟩ : Perfection (ModP (Per.OC l) l) l), fun k => ⟨y k, ?_, ?_, rfl⟩⟩
+  refine ⟨
+    (⟨fun k => Ideal.Quotient.mk _ (y k), fun k => ?_⟩ : Perfection (ModP (Per.OC l) l) l),
+    fun k => ⟨y k, ?_, ?_, rfl⟩
+  ⟩
   · rw [← map_pow, hy]
   · have := congrArg Subtype.val (hy0 k)
     simpa using this
   · simp only [y]
     rw [← pow_mul, mul_comm, pow_mul, hC, one_pow]
 
-theorem IsTiltOf.pow_eq_one {c : Om l} {m : ℕ} {xb : Per.Fl l} (h : IsTiltOf c m xb) : xb ^ m = 1 := by
+theorem IsTiltOf.pow_eq_one {c : Om l} {m : ℕ} {xb : Per.Fl l} (h : IsTiltOf c m xb)
+    : xb ^ m = 1 := by
   refine Perfection.ext fun k => ?_
   obtain ⟨y, -, h2, h3⟩ := h k
   change PreTilt.coeff k (xb ^ m) = PreTilt.coeff k (1 : Per.Fl l)
   rw [map_pow, map_one, h3, ← map_pow, h2, map_one]
 
-theorem IsTiltOf.untilt_eq {c : Om l} {m : ℕ} {xb : Per.Fl l} (h : IsTiltOf c m xb) :
-    ((xb.untilt : Per.OC l) : ℂ_[l]) = (c : ℂ_[l]) := by
+theorem IsTiltOf.untilt_eq {c : Om l} {m : ℕ} {xb : Per.Fl l} (h : IsTiltOf c m xb)
+    : ((xb.untilt : Per.OC l) : ℂ_[l]) = (c : ℂ_[l]) := by
   obtain ⟨y0, h0, -, -⟩ := h 0
   rw [pow_zero, pow_one] at h0
   have : xb.untilt = y0 := by
@@ -70,9 +74,19 @@ theorem IsTiltOf.untilt_eq {c : Om l} {m : ℕ} {xb : Per.Fl l} (h : IsTiltOf c 
     rw [this]
   rw [this, h0]
 
-theorem rootOfUnity_teichmuller : ∀ (l : ℕ) [Fact l.Prime], ∀ o : Om l →+* Per.BdRp l, IsSec o → ∀ (c : Om l) (m : ℕ), 0 < m → ¬ l ∣ m → c ^ m = 1 → (∃ xb : Per.Fl l, IsTiltOf c m xb) ∧ ∀ xb : Per.Fl l, IsTiltOf c m xb → xb ^ m = 1 ∧ ((xb.untilt : Per.OC l) : ℂ_[l]) = (c : ℂ_[l]) ∧ aDp l (Per.tm xb) = o c := by
+theorem rootOfUnity_teichmuller
+    : ∀ (l : ℕ) [Fact l.Prime], ∀ o : Om l →+* Per.BdRp l,
+      IsSec o
+        → ∀ (c : Om l) (m : ℕ),
+          0 < m → ¬ l ∣ m → c ^ m = 1
+            → (∃ xb : Per.Fl l, IsTiltOf c m xb)
+              ∧ ∀ xb : Per.Fl l,
+                IsTiltOf c m xb
+                  → xb ^ m = 1 ∧ ((xb.untilt : Per.OC l) : ℂ_[l]) = (c : ℂ_[l])
+                    ∧ aDp l (Per.tm xb) = o c := by
   intro l _ o ho c m hm hl hc
-  refine ⟨exists_isTiltOf c m hm hl hc, fun xb h => ⟨IsTiltOf.pow_eq_one h, IsTiltOf.untilt_eq h, ?_⟩⟩
+  refine
+    ⟨exists_isTiltOf c m hm hl hc, fun xb h => ⟨IsTiltOf.pow_eq_one h, IsTiltOf.untilt_eq h, ?_⟩⟩
   obtain ⟨-, -, hu, hθ, -⟩ := GlobalTheory.T.thetaBdRPlus_surjective_ker_units_equivariant l
   have h1 : aDp l (Per.tm xb) ^ m = 1 := by
     rw [← map_pow, ← map_pow, IsTiltOf.pow_eq_one h, map_one, map_one]

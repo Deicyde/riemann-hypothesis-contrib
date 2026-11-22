@@ -13,8 +13,11 @@ namespace GlobalTheory.WeightSubst
 
 open MvPowerSeries
 
-variable {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) {σ : Type} [Fintype σ]
-  [DecidableEq σ] (ρ : σ → ℝ)
+variable
+  {C : Type} [Field C]
+  (v : AddValuation C (WithTop ℝ))
+  {σ : Type} [Fintype σ] [DecidableEq σ]
+  (ρ : σ → ℝ)
 
 def WtNonneg (g : MvPowerSeries σ C) : Prop :=
   ∀ α : σ →₀ ℕ, ((0 - α.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ) ≤ v (coeff α g)
@@ -29,17 +32,18 @@ theorem wtNonneg_one : WtNonneg v ρ (1 : MvPowerSeries σ C) := by
   · simp
 
 omit [Fintype σ] in
-theorem wtNonneg_mul {f g : MvPowerSeries σ C} (hf : WtNonneg v ρ f) (hg : WtNonneg v ρ g) :
-    WtNonneg v ρ (f * g) := by
+theorem wtNonneg_mul {f g : MvPowerSeries σ C} (hf : WtNonneg v ρ f) (hg : WtNonneg v ρ g)
+    : WtNonneg v ρ (f * g) := by
   intro α
   rw [coeff_mul]
   apply AddValuation.map_le_sum
   intro p hp
   rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
   rw [AddValuation.map_mul]
-  have e : ((0 - α.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ) =
-      ((0 - p.1.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ) +
-        ((0 - p.2.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ) := by
+  have e
+      : ((0 - α.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ)
+        = ((0 - p.1.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ)
+          + ((0 - p.2.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ) := by
     rw [← WithTop.coe_add, ← hp, Finsupp.sum_add_index' (by simp) (by intros; push_cast; ring)]
     congr 1
     ring
@@ -47,8 +51,9 @@ theorem wtNonneg_mul {f g : MvPowerSeries σ C} (hf : WtNonneg v ρ f) (hg : WtN
   exact add_le_add (hf p.1) (hg p.2)
 
 omit [Fintype σ] in
-theorem wtNonneg_prod {ι : Type*} (s : Finset ι) (f : ι → MvPowerSeries σ C)
-    (h : ∀ i ∈ s, WtNonneg v ρ (f i)) : WtNonneg v ρ (∏ i ∈ s, f i) := by
+theorem wtNonneg_prod
+    {ι : Type*} (s : Finset ι) (f : ι → MvPowerSeries σ C) (h : ∀ i ∈ s, WtNonneg v ρ (f i))
+    : WtNonneg v ρ (∏ i ∈ s, f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using wtNonneg_one v ρ
@@ -58,17 +63,25 @@ theorem wtNonneg_prod {ι : Type*} (s : Finset ι) (f : ι → MvPowerSeries σ 
       (ih fun j hj => h j (Finset.mem_insert_of_mem hj))
 
 omit [Fintype σ] in
-theorem wtNonneg_pow {f : MvPowerSeries σ C} (hf : WtNonneg v ρ f) (n : ℕ) :
-    WtNonneg v ρ (f ^ n) := by
+theorem wtNonneg_pow {f : MvPowerSeries σ C} (hf : WtNonneg v ρ f) (n : ℕ)
+    : WtNonneg v ρ (f ^ n) := by
   induction n with
   | zero => simpa using wtNonneg_one v ρ
   | succ k ih =>
     rw [pow_succ]
     exact wtNonneg_mul v ρ ih hf
 
-theorem weight_subst_nonneg :
-  (∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (σ τ : Type) [Fintype σ] [DecidableEq σ] [Fintype τ] (ρ : σ → ℝ) (K : MvPowerSeries τ C) (t : τ → MvPowerSeries σ C),
-    MvIsInt v K → (∀ c, MvPowerSeries.constantCoeff (t c) = 0) → (∀ c, (∀ α, (((0) - α.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ) ≤ v (MvPowerSeries.coeff α (t c)))) → (∀ α, (((0) - α.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ) ≤ v (MvPowerSeries.coeff α (MvPowerSeries.subst t K)))) := by
+theorem weight_subst_nonneg
+    : (∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (σ τ : Type) [Fintype σ]
+        [DecidableEq σ] [Fintype τ] (ρ : σ → ℝ) (K : MvPowerSeries τ C) (t : τ → MvPowerSeries σ C),
+      MvIsInt v K → (∀ c, MvPowerSeries.constantCoeff (t c) = 0)
+        → (∀ c,
+          (∀ α,
+            (((0) - α.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ)
+              ≤ v (MvPowerSeries.coeff α (t c))))
+        → (∀ α,
+          (((0) - α.sum (fun j e => ρ j * (e : ℝ)) : ℝ) : WithTop ℝ)
+            ≤ v (MvPowerSeries.coeff α (MvPowerSeries.subst t K)))) := by
   intro C _ v σ τ _ _ _ ρ K t hK ht0 ht α
   have hs : MvPowerSeries.HasSubst t := MvPowerSeries.hasSubst_of_constantCoeff_zero ht0
   rw [MvPowerSeries.coeff_subst hs, finsum_eq_sum _ (MvPowerSeries.coeff_subst_finite hs K α)]

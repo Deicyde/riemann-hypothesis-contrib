@@ -9,21 +9,24 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcS.BoxVolPf
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.Volumes Formalism.L2.SG.LocVol
-  NumberField IsDedekindDomain MeasureTheory
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.Volumes Formalism.L2.SG.LocVol NumberField
+  IsDedekindDomain MeasureTheory
 open Formalism.L2.SG.Pf.NcS.BoxVolSk Formalism.L2.SG.Pf.NcS.BoxSteps Formalism.L2.SG.Pf.NcS.FinVolSk
 open scoped TensorProduct
 
-theorem finprod_box {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+theorem finprod_box
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     {n a d : ℕ} (b : Module.Basis (Fin d) F E)
     (C : ∀ v : HeightOneSpectrum (𝓞 F), Set (Fin a → Fin n → Fv F v ⊗[F] E))
-    (hCa : ∀ᶠ v in Filter.cofinite, C v = latV b v) (x : Fin a → Fin n → Af F ⊗[F] E) :
-    (∏ᶠ v, (C v).indicator (1 : (Fin a → Fin n → Fv F v ⊗[F] E) → ℂ) (projV v x)) =
-      ({x : Fin a → Fin n → Af F ⊗[F] E | ∀ v, projV v x ∈ C v}.indicator 1 x : ℂ) := by
+    (hCa : ∀ᶠ v in Filter.cofinite, C v = latV b v) (x : Fin a → Fin n → Af F ⊗[F] E)
+    : (∏ᶠ v, (C v).indicator (1 : (Fin a → Fin n → Fv F v ⊗[F] E) → ℂ) (projV v x))
+      = ({x : Fin a → Fin n → Af F ⊗[F] E | ∀ v, projV v x ∈ C v}.indicator 1 x : ℂ) := by
   classical
   have hev : ∀ᶠ v in Filter.cofinite, projV v x ∈ C v := by
     filter_upwards [finite_integral_holds F E n a d b x, hCa] with v h1 h2
-    rw [h2]; exact h1
+    rw [h2]
+    exact h1
   have hfin : (Function.mulSupport fun v =>
       (C v).indicator (1 : (Fin a → Fin n → Fv F v ⊗[F] E) → ℂ) (projV v x)).Finite := by
     refine (Filter.eventually_cofinite.1 hev).subset fun v hv => ?_
@@ -31,21 +34,24 @@ theorem finprod_box {F E : Type} [Field F] [NumberField F] [Field E] [NumberFiel
     apply hv
     simp [Set.indicator_of_mem hm]
   by_cases hx : ∀ v, projV v x ∈ C v
-  · rw [Set.indicator_of_mem (show x ∈ {x : Fin a → Fin n → Af F ⊗[F] E | ∀ v, projV v x ∈ C v} from hx)]
+  · rw [Set.indicator_of_mem (show x ∈ {x : Fin a → Fin n → Af F ⊗[F] E | ∀ v, projV v x ∈ C v} from
+      hx)]
     refine finprod_eq_one_of_forall_eq_one fun v => ?_
     simp [Set.indicator_of_mem (hx v)]
-  · rw [Set.indicator_of_notMem (show x ∉ {x : Fin a → Fin n → Af F ⊗[F] E | ∀ v, projV v x ∈ C v} from hx)]
+  · rw [Set.indicator_of_notMem
+      (show x ∉ {x : Fin a → Fin n → Af F ⊗[F] E | ∀ v, projV v x ∈ C v} from hx)]
     push Not at hx
     obtain ⟨v0, hv0⟩ := hx
     exact finprod_eq_zero _ v0 (Set.indicator_of_notMem hv0 _) hfin
 
 theorem box_volume_holds : BoxVol := by
-  intro F E _ _ _ _ _ σ n J ψ a X0 hT νX hStd hdet ha hn hSWa hSWc hOm μinf νinf fibInf hμ hν hfib hne
-    ωf hdec
+  intro F E _ _ _ _ _ σ n J ψ a X0 hT νX hStd hdet ha hn hSWa hSWc hOm μinf νinf fibInf hμ hν hfib
+    hne ωf hdec
   classical
   have : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   set TI := hermOf (Ainf F) σ (gramE σ J X0) hT with hTI
-  obtain ⟨Φi, hΦc, hΦs, hΦ0, hΦint, hΦpos⟩ := positivity_test_holds F E σ n J a μinf νinf fibInf TI hfib hne
+  obtain ⟨Φi, hΦc, hΦs, hΦ0, hΦint, hΦpos⟩ :=
+    positivity_test_holds F E σ n J a μinf νinf fibInf TI hfib hne
   set c : ENNReal := ∫⁻ z, ENNReal.ofReal (Φi z) ∂(fibInf TI) with hcdef
   have hc : c = ENNReal.ofReal (∫ z, Φi z ∂(fibInf TI)) :=
     (ofReal_integral_eq_lintegral_ofReal hΦint (Filter.Eventually.of_forall hΦ0)).symm
@@ -102,15 +108,15 @@ theorem box_volume_holds : BoxVol := by
       exact hex.choose_spec
     have hQ := hA5.2 (fun v => omFam σ J ψ v a) hOmF
 
-    let Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin n → Fv F v ⊗[F] E) → ℂ :=
-      fun v => (C v).indicator 1
+    let Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin n → Fv F v ⊗[F] E) → ℂ := fun v =>
+      (C v).indicator 1
     let Φf : (Fin a → Fin n → Af F ⊗[F] E) → ℂ := fun x => ∏ᶠ v, Φv v (projV v x)
     let Φinf : (Fin a → Fin n → Ainf F ⊗[F] E) → ℂ := fun z => (Φi z : ℂ)
     let Φ : (Fin a → Fin n → AF F ⊗[F] E) → ℂ := fun y => Φinf (projInf y) * Φf (projFin y)
-    have hpure : IsPureFin b Φf Φv :=
-      ⟨hSB, hCa.mono fun v h => by simp only [Φv, h], fun X => rfl⟩
-    obtain ⟨hInt, hMult, hEq⟩ := hQ d b Φ Φinf Φf Φv (Complex.continuous_ofReal.comp hΦc)
-      (hΦs.comp_left Complex.ofReal_zero) hpure (fun X => rfl)
+    have hpure : IsPureFin b Φf Φv := ⟨hSB, hCa.mono fun v h => by simp only [Φv, h], fun X => rfl⟩
+    obtain ⟨hInt, hMult, hEq⟩ :=
+      hQ d b Φ Φinf Φf Φv (Complex.continuous_ofReal.comp hΦc) (hΦs.comp_left Complex.ofReal_zero)
+        hpure (fun X => rfl)
 
     let g : (Fin a → Fin n → AF F ⊗[F] E) → ℝ := fun y => Φi (projInf y) * B.indicator 1 (projFin y)
     have hΦg : ∀ y, Φ y = (g y : ℂ) := by
@@ -120,38 +126,47 @@ theorem box_volume_holds : BoxVol := by
       by_cases hy : projFin y ∈ B
       · simp [Set.indicator_of_mem hy]
       · simp [Set.indicator_of_notMem hy]
-    have hg0 : ∀ y, 0 ≤ g y := fun y => mul_nonneg (hΦ0 _) (Set.indicator_nonneg (fun _ _ => zero_le_one) _)
+    have hg0 : ∀ y, 0 ≤ g y := fun y =>
+      mul_nonneg (hΦ0 _) (Set.indicator_nonneg (fun _ _ => zero_le_one) _)
     have hgInt : Integrable g νX := by
       have : Integrable (fun y => (g y : ℂ)) νX := hInt.congr (Filter.Eventually.of_forall hΦg)
       exact this.re
-    have hlin : ∫⁻ y, ENNReal.ofReal (g y) ∂νX =
-        ∫⁻ y, ENNReal.ofReal (Φi (projInf y)) * B.indicator 1 (projFin y) ∂νX := by
+    have hlin
+        : ∫⁻ y, ENNReal.ofReal (g y) ∂νX
+          = ∫⁻ y, ENNReal.ofReal (Φi (projInf y)) * B.indicator 1 (projFin y) ∂νX := by
       refine lintegral_congr fun y => ?_
       by_cases hy : projFin y ∈ B
       · simp [g, Set.indicator_of_mem hy]
       · simp [g, Set.indicator_of_notMem hy]
     have hLHS : ∫ y, Φ y ∂νX = ((ωf B * c).toReal : ℂ) := by
       rw [integral_congr_ae (Filter.Eventually.of_forall hΦg), integral_complex_ofReal,
-        integral_eq_lintegral_of_nonneg_ae (Filter.Eventually.of_forall hg0) hgInt.aestronglyMeasurable,
+        integral_eq_lintegral_of_nonneg_ae (Filter.Eventually.of_forall hg0)
+          hgInt.aestronglyMeasurable,
         hlin, h2]
-    have hfinB : ωf B * c ≠ ⊤ := by
-      rw [← h2, ← hlin]; exact (hgInt.lintegral_lt_top).ne
-    have hωT : ωf B ≠ ⊤ := by
-      intro h; apply hfinB; rw [h]; exact ENNReal.top_mul hc0
+    have hfinB : ωf B * c ≠ ⊤ := by rw [← h2, ← hlin]; exact (hgInt.lintegral_lt_top).ne
+    have hωT : ωf B ≠ ⊤ := by intro h; apply hfinB; rw [h]; exact ENNReal.top_mul hc0
 
-    have hloc : ∀ v, (∫ X, Φv v X ∂(omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT))) =
-        (((omAt σ J ψ v ((gramE σ J X0).map (inclR (Fv F v))))
-          (C v ∩ {X | gramR (Fv F v) σ J X = (gramE σ J X0).map (inclR (Fv F v))})).toReal : ℂ) := by
+    have hloc
+        : ∀ v,
+          (∫ X, Φv v X ∂(omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT)))
+            = (((omAt σ J ψ v ((gramE σ J X0).map (inclR (Fv F v))))
+                (C v ∩ {X | gramR (Fv F v) σ J X = (gramE σ J X0).map (inclR (Fv F v))})).toReal
+              : ℂ) := by
       intro v
-      have hom : omAt σ J ψ v ((gramE σ J X0).map (inclR (Fv F v))) =
-          omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT) := by
+      have hom
+          : omAt σ J ψ v ((gramE σ J X0).map (inclR (Fv F v)))
+            = omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT) := by
         simp only [omAt, dif_pos (map_mem_HermR (Fv F v) σ (gramE σ J X0) hT)]
         rfl
-      have hnull : omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT)
-          {X | gramR (Fv F v) σ J X = (gramE σ J X0).map (inclR (Fv F v))}ᶜ = 0 :=
+      have hnull
+          : omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT)
+              {X | gramR (Fv F v) σ J X = (gramE σ J X0).map (inclR (Fv F v))}ᶜ
+            = 0 :=
         measure_mono_null (Set.compl_subset_compl.2 Set.inter_subset_left) ((hOmF v).1 _)
       rw [hom, measure_inter_conull hnull]
-      have e : Φv v = fun X => (((C v).indicator (1 : (Fin a → Fin n → Fv F v ⊗[F] E) → ℝ) X : ℝ) : ℂ) := by
+      have e
+          : Φv v
+            = fun X => (((C v).indicator (1 : (Fin a → Fin n → Fv F v ⊗[F] E) → ℝ) X : ℝ) : ℂ) := by
         funext X
         by_cases hX : X ∈ C v
         · simp [Φv, Set.indicator_of_mem hX]
@@ -161,12 +176,15 @@ theorem box_volume_holds : BoxVol := by
       ((omAt σ J ψ v ((gramE σ J X0).map (inclR (Fv F v))))
         (C v ∩ {X | gramR (Fv F v) σ J X = (gramE σ J X0).map (inclR (Fv F v))})).toReal
     have hMult' : Multipliable (fun v => (r v : ℂ)) := by
-      have : (fun v => ∫ X, Φv v X ∂(omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT))) =
-        fun v => (r v : ℂ) := funext hloc
-      rw [← this]; exact hMult
-    have hRHS : (∫ X, Φinf X ∂(fibInf (hermOf (Ainf F) σ (gramE σ J X0) hT))) *
-        ∏' v, ∫ X, Φv v X ∂(omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT)) =
-        (((∫ z, Φi z ∂(fibInf TI)) * ∏' v, r v : ℝ) : ℂ) := by
+      have : (fun v => ∫ X, Φv v X ∂(omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT)))
+          = fun v => (r v : ℂ) :=
+        funext hloc
+      rw [← this]
+      exact hMult
+    have hRHS
+        : (∫ X, Φinf X ∂(fibInf (hermOf (Ainf F) σ (gramE σ J X0) hT)))
+            * ∏' v, ∫ X, Φv v X ∂(omFam σ J ψ v a (hermOf (Fv F v) σ (gramE σ J X0) hT))
+          = (((∫ z, Φi z ∂(fibInf TI)) * ∏' v, r v : ℝ) : ℂ) := by
       rw [tprod_congr hloc, BoxVolSk_tprod_ofReal r hMult']
       simp only [Φinf]
       rw [integral_complex_ofReal, Complex.ofReal_mul]

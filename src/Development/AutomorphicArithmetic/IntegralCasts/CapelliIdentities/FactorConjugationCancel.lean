@@ -6,10 +6,12 @@ public import Mathlib
 
 open MeasureTheory
 
-private theorem UpperTheory.Reformulated.B.FactorConjugationCancel.smul_cancel {G : Type} [AddCommGroup G] [TopologicalSpace G]
-    [IsTopologicalAddGroup G] [LocallyCompactSpace G] [MeasurableSpace G]
-    [BorelSpace G] (ν : Measure G) [ν.IsAddHaarMeasure] {a b : NNReal}
-    (h : a • ν = b • ν) : a = b := by
+private theorem UpperTheory.Reformulated.B.FactorConjugationCancel.smul_cancel
+    {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+    [LocallyCompactSpace G] [MeasurableSpace G] [BorelSpace G]
+    (ν : Measure G) [ν.IsAddHaarMeasure]
+    {a b : NNReal} (h : a • ν = b • ν)
+    : a = b := by
   obtain ⟨K, hK, hK0⟩ := exists_compact_mem_nhds (0 : G)
   have h0 : ν K ≠ 0 := (Measure.measure_pos_of_mem_nhds ν hK0).ne'
   have h1 : ν K ≠ ⊤ := hK.measure_lt_top.ne
@@ -18,20 +20,26 @@ private theorem UpperTheory.Reformulated.B.FactorConjugationCancel.smul_cancel {
     simpa using this
   exact_mod_cast (ENNReal.mul_left_inj h0 h1).1 h2
 
-private theorem UpperTheory.Reformulated.B.FactorConjugationCancel.exists_factor {G : Type} [AddCommGroup G] [TopologicalSpace G]
-    [IsTopologicalAddGroup G] [LocallyCompactSpace G] [SecondCountableTopology G]
-    [MeasurableSpace G] [BorelSpace G] (m : G ≃ₜ+ G) (ν : Measure G) [ν.IsAddHaarMeasure] :
-    ∃ a : NNReal, Measure.map (⇑m : G → G) ν = a • ν := by
+private theorem UpperTheory.Reformulated.B.FactorConjugationCancel.exists_factor
+    {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+    [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+    (m : G ≃ₜ+ G)
+    (ν : Measure G) [ν.IsAddHaarMeasure]
+    : ∃ a : NNReal, Measure.map (⇑m : G → G) ν = a • ν := by
   haveI : (Measure.map (⇑m : G → G) ν).IsAddHaarMeasure := m.isAddHaarMeasure_map ν
   exact ⟨_, Measure.isAddLeftInvariant_eq_smul _ ν⟩
 
-theorem UpperTheory.Reformulated.B.FactorConjugationCancel.map_eq_of_conj :
-    ∀ {G : Type} [inst : AddCommGroup G] [inst_1 : TopologicalSpace G]
-    [IsTopologicalAddGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [inst_5 : MeasurableSpace G]
-    [BorelSpace G] (m s : G ≃ₜ+ G) (ν : MeasureTheory.Measure G) [ν.IsAddHaarMeasure] (c : NNReal),
-    (∀ (x : G), (s : G → G) ((s : G → G) x) = x) →
-      MeasureTheory.Measure.map (fun (x : G) ↦ (s : G → G) ((m : G → G) ((s : G → G) ((m : G → G) x)))) ν = (c * c) • ν →
-        MeasureTheory.Measure.map (⇑m : G → G) ν = c • ν := by
+theorem UpperTheory.Reformulated.B.FactorConjugationCancel.map_eq_of_conj
+    : ∀ {G : Type} [inst : AddCommGroup G] [inst_1 : TopologicalSpace G] [IsTopologicalAddGroup G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] [inst_5 : MeasurableSpace G]
+        [BorelSpace G] (m s : G ≃ₜ+ G) (ν : MeasureTheory.Measure G) [ν.IsAddHaarMeasure]
+        (c : NNReal),
+      (∀ (x : G), (s : G → G) ((s : G → G) x) = x)
+        → MeasureTheory.Measure.map
+            (fun (x : G) ↦ (s : G → G) ((m : G → G) ((s : G → G) ((m : G → G) x))))
+            ν
+          = (c * c) • ν
+        → MeasureTheory.Measure.map (⇑m : G → G) ν = c • ν := by
   intro G _ _ _ _ _ _ _ m s ν _ c hs h
   obtain ⟨a, ha⟩ := UpperTheory.Reformulated.B.FactorConjugationCancel.exists_factor m ν
   obtain ⟨b, hb⟩ := UpperTheory.Reformulated.B.FactorConjugationCancel.exists_factor s ν
@@ -48,14 +56,19 @@ theorem UpperTheory.Reformulated.B.FactorConjugationCancel.map_eq_of_conj :
     rw [← hs', ← hb, Measure.map_map ms ms, one_smul]
     have : (⇑s ∘ ⇑s : G → G) = id := funext hs
     rw [this, Measure.map_id]
-  have hcomp : (fun (x : G) ↦ (s : G → G) ((m : G → G) ((s : G → G) ((m : G → G) x))))
-      = (⇑s : G → G) ∘ ((⇑m : G → G) ∘ ((⇑s : G → G) ∘ (⇑m : G → G))) := rfl
+  have hcomp
+      : (fun (x : G) ↦ (s : G → G) ((m : G → G) ((s : G → G) ((m : G → G) x))))
+        = (⇑s : G → G) ∘ ((⇑m : G → G) ∘ ((⇑s : G → G) ∘ (⇑m : G → G))) :=
+    rfl
   rw [hcomp, ← Measure.map_map ms (mm.comp (ms.comp mm)), ← Measure.map_map mm (ms.comp mm),
-    ← Measure.map_map ms mm, ha, hs', hm', hs'] at h
+      ← Measure.map_map ms mm, ha, hs', hm', hs']
+    at h
   have h2 := UpperTheory.Reformulated.B.FactorConjugationCancel.smul_cancel ν h
   have h3 : a * a = c * c := by
     rw [← h2]
-    calc a * a = a * a * (b * b) := by rw [hbb, mul_one]
+    calc
+      a * a
+        = a * a * (b * b) := by rw [hbb, mul_one]
       _ = _ := by ring
   have h5 : (a : ℝ) * a = (c : ℝ) * c := by rw [← NNReal.coe_mul, ← NNReal.coe_mul, h3]
   have h4 : a = c := NNReal.eq ((mul_self_inj_of_nonneg a.coe_nonneg c.coe_nonneg).1 h5)

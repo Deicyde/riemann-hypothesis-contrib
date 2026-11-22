@@ -42,7 +42,8 @@ theorem SchurYOffClr_holds : SchurYOffClr := (schurYClr_of tie mixDet).2
 theorem VdmSplit_holds : VdmSplit := vdmSplit_of pairSplit
 theorem SchurY_holds : SchurY := schurY_of SchurYClr_holds VdmSplit_holds
 theorem SchurYOff_holds : SchurYOff :=
-  schurYOff_of (offClrRed_of (offClrPow_of SchurYOffClr_holds VdmSplit_holds (pairCount_of pairSplit)))
+  schurYOff_of
+    (offClrRed_of (offClrPow_of SchurYOffClr_holds VdmSplit_holds (pairCount_of pairSplit)))
     VdmSplit_holds
 theorem SchurHomog_holds : SchurHomog := schurHomog
 theorem SchurDet_holds : SchurDet := schurDet_of tie

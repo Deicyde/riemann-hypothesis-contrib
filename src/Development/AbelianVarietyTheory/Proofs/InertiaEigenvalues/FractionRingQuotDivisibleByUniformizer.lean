@@ -12,8 +12,9 @@ open ReciprocityTheory.Gal
 
 namespace GlobalTheory
 
-theorem KO_divisible_by_uniformiser : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O}, Irreducible ϖ →
-    ∀ x : Formalism.NG.KO O, ∃ y : Formalism.NG.KO O, ϖ • y = x := by
+theorem KO_divisible_by_uniformiser
+    : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O},
+      Irreducible ϖ → ∀ x : Formalism.NG.KO O, ∃ y : Formalism.NG.KO O, ϖ • y = x := by
   intro O _ _ _ ϖ hϖ x
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   have h0 : algebraMap O (FractionRing O) ϖ ≠ 0 :=

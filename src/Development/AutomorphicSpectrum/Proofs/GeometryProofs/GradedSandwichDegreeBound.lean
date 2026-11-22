@@ -6,24 +6,32 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GrGenOfIsFla
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.CompanionTheory.Ar.RootHt GroundTheory.Heights₂.Heights
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.RootHt
 
-theorem cls_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K : Type) [Fintype K] (J : K → Type)
-    (y : (Σ k, J k) → Ω) (G : Over X) [GrpObj G]
-    (Li : Type) [AddCommGroup Li] [Module Ω Li] (M : LieModel G ξ Li) (V : Lat ξ Li) (r : ℕ) (b₀ : Fin r → Li)
-    (m : ℕ) (i : Fin r) (a : K → ℤ) (e₀ : Ω),
-    LinearIndependent Ω b₀ → Sandwich M V b₀ m → (V.gr b₀ i).IsDegOn Set.univ y a e₀ →
-    ∀ (p : Cpt ξ) (c : (k : K) → J k), InChart ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) c p →
-    ∃ (b : Fin r → Li) (π : Fin r → Module.Dual Ω Li) (κ : Ω), (∀ n : ℕ, flagStep Ω b n = flagStep Ω b₀ n) ∧
-      V.IsFrameAt b p ∧ (∀ j, (m : Ω) • b j ∈ M.lat p) ∧ (∀ j l, π j (b l) = if j = l then 1 else 0) ∧
-      (∀ j, ∀ e ∈ M.lat p, (m : Ω) * π j e ∈ regAt ξ p) ∧ κ ≠ 0 ∧ κ ∈ regAt ξ p ∧ κ⁻¹ ∈ regAt ξ p ∧
-      ∀ (e : Li) (t : Ω), e ∈ flagStep Ω b₀ (i + 1) → IsCls b₀ i e t → t / gen y a e₀ c = π i e * κ := by
+theorem cls_frame
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K : Type) [Fintype K] (J : K → Type)
+        (y : (Σ k, J k) → Ω) (G : Over X) [GrpObj G] (Li : Type) [AddCommGroup Li] [Module Ω Li]
+        (M : LieModel G ξ Li) (V : Lat ξ Li) (r : ℕ) (b₀ : Fin r → Li) (m : ℕ) (i : Fin r)
+        (a : K → ℤ) (e₀ : Ω),
+      LinearIndependent Ω b₀ → Sandwich M V b₀ m → (V.gr b₀ i).IsDegOn Set.univ y a e₀
+        → ∀ (p : Cpt ξ) (c : (k : K) → J k),
+          InChart ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) c p
+            → ∃ (b : Fin r → Li) (π : Fin r → Module.Dual Ω Li) (κ : Ω),
+              (∀ n : ℕ, flagStep Ω b n = flagStep Ω b₀ n) ∧ V.IsFrameAt b p
+                ∧ (∀ j, (m : Ω) • b j ∈ M.lat p) ∧ (∀ j l, π j (b l) = if j = l then 1 else 0)
+                ∧ (∀ j, ∀ e ∈ M.lat p, (m : Ω) * π j e ∈ regAt ξ p) ∧ κ ≠ 0 ∧ κ ∈ regAt ξ p
+                ∧ κ⁻¹ ∈ regAt ξ p
+                ∧ ∀ (e : Li) (t : Ω),
+                  e ∈ flagStep Ω b₀ (i + 1) → IsCls b₀ i e t → t / gen y a e₀ c = π i e * κ := by
   intro X Ω _ ξ K _ J y G _ Li _ _ M V r b₀ m i a e₀ _hb₀ hS hD p c hc
   obtain ⟨b, π, hf, hfr, hm, hπ, hr⟩ := hS p
 
@@ -55,7 +63,8 @@ theorem cls_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ 
   have hw0 : π i (b₀ i) ≠ 0 := right_ne_zero_of_mul_eq_one hone
   have hcls : b i - u' • b₀ i ∈ flagStep Ω b₀ i := by
     have : b i - u' • b₀ i = z := by rw [← hzw]; abel
-    rw [this]; exact hz
+    rw [this]
+    exact hz
 
   have hreg : ∀ e ∈ V p, π i e ∈ regAt ξ p := by
     intro e he
@@ -67,8 +76,10 @@ theorem cls_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ 
       split_ifs
       · exact one_mem _
       · exact zero_mem _
-    | zero => simp [zero_mem]
-    | add x y _ _ hx hy => simpa using add_mem hx hy
+    | zero =>
+      simp [zero_mem]
+    | add x y _ _ hx hy =>
+      simpa using add_mem hx hy
     | smul s x _ hx =>
       have : π i (s • x) = (s : Ω) * π i x := (π i).map_smul (s : Ω) x
       rw [this]
@@ -101,10 +112,8 @@ theorem cls_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ 
     intro h0
     rw [h0, mul_zero] at hα'
     exact hu' hα'.symm
-  have hκ : u' / gen y a e₀ c = α := by
-    rw [← hα']; field_simp
-  have hκi : (u' / gen y a e₀ c)⁻¹ = β := by
-    rw [inv_div, ← hβ']; field_simp
+  have hκ : u' / gen y a e₀ c = α := by rw [← hα']; field_simp
+  have hκi : (u' / gen y a e₀ c)⁻¹ = β := by rw [inv_div, ← hβ']; field_simp
   refine ⟨b, π, u' / gen y a e₀ c, hf, hfr, hm, hπ, hr, div_ne_zero hu' hg0, ?_, ?_, ?_⟩
   · rw [hκ]; exact α.2
   · rw [hκi]; exact β.2

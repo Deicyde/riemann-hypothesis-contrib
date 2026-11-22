@@ -7,21 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Unramif
 
 open Module Topology
 
-private theorem span_padicInt_fg_of_bounded {l : ℕ} [Fact (Nat.Prime l)] {n : ℕ} (S : Set (Fin n → ℚ_[l])) (C : ℝ)
-    (hS : ∀ v ∈ S, ‖v‖ ≤ C) : (Submodule.span ℤ_[l] S).FG := by
+private theorem span_padicInt_fg_of_bounded
+    {l : ℕ} [Fact (Nat.Prime l)] {n : ℕ} (S : Set (Fin n → ℚ_[l])) (C : ℝ) (hS : ∀ v ∈ S, ‖v‖ ≤ C)
+    : (Submodule.span ℤ_[l] S).FG := by
   have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : Nat.Prime l).one_lt
   obtain ⟨k, hk⟩ := pow_unbounded_of_one_lt C hl
-  let φ : (Fin n → ℤ_[l]) →ₗ[ℤ_[l]] (Fin n → ℚ_[l]) :=
-    { toFun := fun c i => ((l : ℚ_[l]) ^ (-(k : ℤ))) * (c i : ℚ_[l])
-      map_add' := by
-        intro a b
-        ext i
-        simp [mul_add]
-      map_smul' := by
-        intro r a
-        ext i
-        simp [Algebra.smul_def]
-        ring }
+  let φ : (Fin n → ℤ_[l]) →ₗ[ℤ_[l]] (Fin n → ℚ_[l]) := {
+    toFun := fun c i => ((l : ℚ_[l]) ^ (-(k : ℤ))) * (c i : ℚ_[l])
+    map_add' := by
+      intro a b
+      ext i
+      simp [mul_add]
+    map_smul' := by
+      intro r a
+      ext i
+      simp [Algebra.smul_def]
+      ring
+  }
   refine Submodule.FG.of_le (Submodule.fg_range φ) ?_
   rw [Submodule.span_le]
   intro v hv
@@ -29,7 +31,9 @@ private theorem span_padicInt_fg_of_bounded {l : ℕ} [Fact (Nat.Prime l)] {n : 
     intro i
     rw [norm_mul, Padic.norm_p_zpow]
     have h1 : ‖v i‖ ≤ (l : ℝ) ^ k := (norm_le_pi_norm v i).trans ((hS v hv).trans hk.le)
-    calc (l : ℝ) ^ (-(k : ℤ)) * ‖v i‖ ≤ (l : ℝ) ^ (-(k : ℤ)) * (l : ℝ) ^ k := by gcongr
+    calc
+      (l : ℝ) ^ (-(k : ℤ)) * ‖v i‖
+        ≤ (l : ℝ) ^ (-(k : ℤ)) * (l : ℝ) ^ k := by gcongr
       _ = 1 := by
         rw [zpow_neg, ← zpow_natCast, inv_mul_cancel₀]
         exact (zpow_pos (by linarith) _).ne'
@@ -40,23 +44,26 @@ private theorem span_padicInt_fg_of_bounded {l : ℕ} [Fact (Nat.Prime l)] {n : 
   rw [← mul_assoc, ← zpow_add₀ hne]
   simp
 
-private theorem extendOfIsLattice_repr_eq_repr {l : ℕ} [Fact (Nat.Prime l)] {n m : ℕ}
-    (L : Submodule ℤ_[l] (Fin n → ℚ_[l])) [Submodule.IsFullLattice ℚ_[l] L]
-    (b : Module.Basis (Fin m) ℤ_[l] L) (y : L) (i : Fin m) :
-    (b.extendOfIsFullLattice ℚ_[l]).repr (y : Fin n → ℚ_[l]) i = (b.repr y i : ℚ_[l]) := by
+private theorem extendOfIsLattice_repr_eq_repr
+    {l : ℕ} [Fact (Nat.Prime l)]
+    {n m : ℕ} (L : Submodule ℤ_[l] (Fin n → ℚ_[l])) [Submodule.IsFullLattice ℚ_[l] L]
+    (b : Module.Basis (Fin m) ℤ_[l] L) (y : L) (i : Fin m)
+    : (b.extendOfIsFullLattice ℚ_[l]).repr (y : Fin n → ℚ_[l]) i = (b.repr y i : ℚ_[l]) := by
   conv_lhs => rw [← b.sum_repr y]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Submodule.coe_sum, map_sum, Finset.sum_apply']
   simp_rw [Submodule.coe_smul_of_tower]
-  have h : ∀ j, (b.repr y j • (b j : Fin n → ℚ_[l])) = ((b.repr y j : ℚ_[l]) • b.extendOfIsFullLattice ℚ_[l] j) := by
+  have h
+      : ∀ j,
+        (b.repr y j • (b j : Fin n → ℚ_[l]))
+          = ((b.repr y j : ℚ_[l]) • b.extendOfIsFullLattice ℚ_[l] j) := by
     intro j
     rw [Module.Basis.extendOfIsFullLattice_apply, algebra_compatible_smul ℚ_[l]]
     rfl
   simp_rw [h, map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_apply, smul_eq_mul]
   simp
 
-theorem UpperTheory.galois_representation_integral_lattice :
-    UpperTheory.V.Af.Wd.IntBasis := by
+theorem UpperTheory.galois_representation_integral_lattice : UpperTheory.V.Af.Wd.IntBasis := by
   intro l _ Γ _ _ _ V _ _ _ _ _ ρ hρ
   set n := Module.finrank ℚ_[l] V
   let e0 : Module.Basis (Fin n) ℚ_[l] V := Module.finBasis ℚ_[l] V
@@ -111,20 +118,20 @@ theorem UpperTheory.galois_representation_integral_lattice :
     b0.reindex (Fintype.equivFin _)
   let e' := b.extendOfIsFullLattice ℚ_[l]
   let e := e'.map E.symm
-  let R : Γ →* Module.End ℤ_[l] L :=
-    { toFun := fun g => ((A g).restrictScalars ℤ_[l]).restrict (hstab g)
-      map_one' := by
-        ext x
-        simp [LinearMap.restrict_apply, hA1]
-      map_mul' := by
-        intro g h
-        ext x
-        simp [LinearMap.restrict_apply, hAmul] }
+  let R : Γ →* Module.End ℤ_[l] L := {
+    toFun := fun g => ((A g).restrictScalars ℤ_[l]).restrict (hstab g)
+    map_one' := by
+      ext x
+      simp [LinearMap.restrict_apply, hA1]
+    map_mul' := by
+      intro g h
+      ext x
+      simp [LinearMap.restrict_apply, hAmul]
+  }
   let M : Γ →* Matrix _ _ ℤ_[l] := (LinearMap.toMatrixAlgEquiv b).toMonoidHom.comp R
   have key : ∀ (g : Γ) (i j), ((M g i j : ℤ_[l]) : ℚ_[l]) = (e.repr ((ρ g) (e j))) i := by
     intro g i j
-    have h1 : M g i j = b.repr (R g (b j)) i := by
-      simp [M, LinearMap.toMatrixAlgEquiv_apply]
+    have h1 : M g i j = b.repr (R g (b j)) i := by simp [M, LinearMap.toMatrixAlgEquiv_apply]
     have h2 : e.repr ((ρ g) (e j)) i = e'.repr (A g (b j)) i := by
       simp [e, e', A, Module.Basis.map_repr, Module.Basis.map_apply]
     have h3 : (A g (b j : Fin n → ℚ_[l])) = ((R g (b j) : L) : Fin n → ℚ_[l]) := rfl

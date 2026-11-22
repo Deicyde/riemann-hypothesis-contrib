@@ -99,7 +99,12 @@ lemma gamma_inj {K : Type} [Field K] (ι : ℂ ≃+* K) {Wt : Type} [Fintype Wt]
   have h2 := congrArg (fun f => f w) (g.symm.injective (hz.trans (map_zero g.symm).symm))
   simpa using h2
 
-def cf {K : Type} [Field K] (ι : ℂ ≃+* K) (L : PeriodPair) {n : Type} [Fintype n] (h : Matrix n n ℂ) (y : n → ℂ) (i : n) : K :=
+def cf
+    {K : Type} [Field K]
+    (ι : ℂ ≃+* K) (L : PeriodPair)
+    {n : Type} [Fintype n]
+    (h : Matrix n n ℂ) (y : n → ℂ) (i : n)
+    : K :=
   ι (((Formalism.L2.Th1.F.area L : ℝ) : ℂ) * ∑ i', h i i' * conj (y i'))
 
 lemma iota_hOK {K : Type} [Field K] (ι : ℂ ≃+* K) (L : PeriodPair) {n : Type} [Fintype n] (h : Matrix n n ℂ) (x y : n → ℂ) :
@@ -145,7 +150,8 @@ theorem GramBasic_of (hG : GramTransfer) (hI : IotaOK) : GramBasic := by
     exact Real.rpow_le_one (norm_nonneg _) (IsUltrametricDist.norm_natCast_le_one _ _) (by norm_num)
   let W : Fin 4 × J → Fin 4 × J → ℂ_[p] := fun x y =>
     if x.1 = y.1 then ι (hOK (cmL a b d ha hd lam hlam) h (v x.2) (v y.2)) else 0
-  have hQ : ∀ x y, ∑ w, D w x * D w y = W x y + ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * q0 x y := hDD
+  have hQ : ∀ x y, ∑ w, D w x * D w y = W x y + ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * q0 x y :=
+    hDD
   let ext : (J → ℂ_[p]) → Fin 4 × J → ℂ_[p] := fun B0 x => if x.1 = 0 then B0 x.2 else 0
   have hext : ∀ B0 : J → ℂ_[p], (∀ j, ‖B0 j‖ ≤ 1) → ∀ x, ‖ext B0 x‖ ≤ 1 := by
     intro B0 hB0 x
@@ -153,38 +159,47 @@ theorem GramBasic_of (hG : GramTransfer) (hI : IotaOK) : GramBasic := by
     split_ifs
     · exact hB0 _
     · simp
-  have hS : ∀ B1 B2 : J → ℂ_[p], ∑ x, ∑ y, ext B1 x * W x y * ext B2 y =
-      ∑ j, ∑ k, B1 j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * B2 k := by
+  have hS
+      : ∀ B1 B2 : J → ℂ_[p],
+        ∑ x, ∑ y, ext B1 x * W x y * ext B2 y
+          = ∑ j, ∑ k, B1 j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * B2 k := by
     intro B1 B2
     simp [ext, W, Fintype.sum_prod_type, Fin.sum_univ_four]
-  have hbb := fun B1 B2 => bb_eq W q0 D (ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ))) hQ (ext B1) (ext B2)
-  have hPn : ∀ B1 B2 : J → ℂ_[p], (∀ j, ‖B1 j‖ ≤ 1) → (∀ j, ‖B2 j‖ ≤ 1) →
-      ‖∑ w, (∑ x, ext B1 x * D w x) * (∑ y, ext B2 y * D w y)‖ ≤ 1 := fun B1 B2 h1 h2 =>
-    nsum _ _ fun w _ => nmul (nsum _ _ fun x _ => nmul (hext B1 h1 x) (hD w x))
-      (nsum _ _ fun y _ => nmul (hext B2 h2 y) (hD w y))
-  have hu : ∀ B0 : J → ℂ_[p], (∀ i, ∑ k, B0 k * ι (v k i) = 0) → ∀ w, ∑ y, ext B0 y * D w y = 0 := by
+  have hbb := fun B1 B2 =>
+    bb_eq W q0 D (ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ))) hQ (ext B1) (ext B2)
+  have hPn
+      : ∀ B1 B2 : J → ℂ_[p],
+        (∀ j, ‖B1 j‖ ≤ 1) → (∀ j, ‖B2 j‖ ≤ 1)
+          → ‖∑ w, (∑ x, ext B1 x * D w x) * (∑ y, ext B2 y * D w y)‖ ≤ 1 := fun B1 B2 h1 h2 =>
+    nsum _ _ fun w _ =>
+      nmul (nsum _ _ fun x _ => nmul (hext B1 h1 x) (hD w x))
+        (nsum _ _ fun y _ => nmul (hext B2 h2 y) (hD w y))
+  have hu
+      : ∀ B0 : J → ℂ_[p], (∀ i, ∑ k, B0 k * ι (v k i) = 0) → ∀ w, ∑ y, ext B0 y * D w y = 0 := by
     intro B0 h0 w
     refine gamma_inj ι g (fun w => ∑ y, ext B0 y * D w y) (fun w' => ?_) w
     obtain ⟨a', i⟩ := w'
-    calc ∑ w, ι (g.symm (Pi.single w 1) (a', i)) * ∑ y, ext B0 y * D w y
-        = ∑ y, ext B0 y * ∑ w, ι (g.symm (Pi.single w 1) (a', i)) * D w y := by
-          simp only [Finset.mul_sum]
-          rw [Finset.sum_comm]
-          exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
+    calc
+      ∑ w, ι (g.symm (Pi.single w 1) (a', i)) * ∑ y, ext B0 y * D w y
+          = ∑ y, ext B0 y * ∑ w, ι (g.symm (Pi.single w 1) (a', i)) * D w y := by
+        simp only [Finset.mul_sum]
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
       _ = 0 := by
-          rw [Fintype.sum_prod_type, Finset.sum_eq_single (0 : Fin 4)]
-          · simp only [ext, hDg]
-            by_cases ha' : a' = 0
-            · simp [ha', h0 i]
-            · simp [ha']
-          · intro b' _ hb'
-            simp [ext, hb']
-          · simp
+        rw [Fintype.sum_prod_type, Finset.sum_eq_single (0 : Fin 4)]
+        · simp only [ext, hDg]
+          by_cases ha' : a' = 0
+          · simp [ha', h0 i]
+          · simp [ha']
+        · intro b' _ hb'
+          simp [ext, hb']
+        · simp
   refine ⟨?_, ?_, ?_, ?_⟩
   · rw [← hS B' B, hbb]
     exact nsub (hPn B' B hB' hB) (nmul hθ (nbil hq0 (hext B' hB') (hext B hB)))
-  · have hP : ∑ w, (∑ x, ext B' x * D w x) * (∑ y, ext B y * D w y) =
-        ∑ w, (∑ x, ext B x * D w x) * (∑ y, ext B' y * D w y) :=
+  · have hP
+        : ∑ w, (∑ x, ext B' x * D w x) * (∑ y, ext B y * D w y)
+          = ∑ w, (∑ x, ext B x * D w x) * (∑ y, ext B' y * D w y) :=
       Finset.sum_congr rfl fun w _ => mul_comm _ _
     refine ⟨_, nsub (nbil hq0 (hext B hB) (hext B' hB')) (nbil hq0 (hext B' hB') (hext B hB)), ?_⟩
     rw [← hS B' B, ← hS B B', hbb, hbb]
@@ -200,8 +215,8 @@ theorem GramBasic_of (hG : GramTransfer) (hI : IotaOK) : GramBasic := by
     simp [h0]
 
 theorem EigenCompat_of (hB : GramBasic) : EigenCompat := by
-  intro a b c d ha hd lam hlam hcm n _ _ h Λ g hg p _ ι hp J _ v hv T T' hTT' hΛ B' B χ χ' hB'n hBn hχ'
-    hT hT'
+  intro a b c d ha hd lam hlam hcm n _ _ h Λ g hg p _ ι hp J _ v hv T T' hTT' hΛ B' B χ χ' hB'n hBn
+    hχ' hT hT'
   let v2 : J ⊕ J → n → ℂ := Sum.elim v fun k => T' (v k)
   have hv2 : ∀ x, InMul (cmL a b d ha hd lam hlam) Λ (v2 x) := by
     rintro (j | k)
@@ -235,33 +250,43 @@ theorem EigenCompat_of (hB : GramBasic) : EigenCompat := by
   obtain ⟨e, he, hSe⟩ := h3 hCz
   refine ⟨e, he, ?_⟩
   rw [← hSe]
-  have key : ∀ k, ∑ j, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (T' (v k))) =
-      χ * ∑ j, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) := by
+  have key
+      : ∀ k,
+        ∑ j, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (T' (v k)))
+          = χ * ∑ j, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) := by
     intro k
-    have hadj : ∀ j, hOK (cmL a b d ha hd lam hlam) h (v j) (T' (v k)) =
-        hOK (cmL a b d ha hd lam hlam) h (T (v j)) (v k) := fun j => by
+    have hadj
+        : ∀ j,
+          hOK (cmL a b d ha hd lam hlam) h (v j) (T' (v k))
+            = hOK (cmL a b d ha hd lam hlam) h (T (v j)) (v k) := fun j => by
       simp only [hOK, hTT']
     simp only [hadj]
-    rw [first_position ι _ h (fun j => T (v j)) B' (v k), first_position ι _ h v B' (v k), Finset.mul_sum]
+    rw [first_position ι _ h (fun j => T (v j)) B' (v k), first_position ι _ h v B' (v k),
+      Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     have h1 := hT i
     rw [mapVec_comb] at h1
     rw [← mul_assoc]
     congr 1
     simpa only [mul_comm (B' _)] using h1
-  have key2 : ∑ j, ∑ k, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (T' (v k))) * B k =
-      χ * ∑ j, ∑ k, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * B k := by
-    have hk : ∀ k, ∑ j, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (T' (v k))) * B k =
-        χ * ∑ j, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * B k := fun k => by
+  have key2
+      : ∑ j, ∑ k, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (T' (v k))) * B k
+        = χ * ∑ j, ∑ k, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * B k := by
+    have hk
+        : ∀ k,
+          ∑ j, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (T' (v k))) * B k
+            = χ * ∑ j, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * B k := fun k => by
       rw [← Finset.sum_mul, key, ← Finset.sum_mul, mul_assoc]
     rw [Finset.sum_comm, Finset.sum_congr rfl fun k _ => hk k, ← Finset.mul_sum, Finset.sum_comm]
   simp only [Fintype.sum_sum_type, B1, C, v2, Sum.elim_inl, Sum.elim_inr, Pi.zero_apply, zero_mul,
     Finset.sum_const_zero, add_zero, Finset.sum_add_distrib]
   rw [key2, sub_mul]
-  have key3 : ∑ j, ∑ k, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * (-χ' * B k) =
-      -(χ' * ∑ j, ∑ k, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * B k) := by
+  have key3
+      : ∑ j, ∑ k, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * (-χ' * B k)
+        = -(χ' * ∑ j, ∑ k, B' j * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * B k) := by
     rw [← neg_mul, Finset.mul_sum]
-    exact Finset.sum_congr rfl fun j _ => by rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun k _ => by ring
+    exact Finset.sum_congr rfl fun j _ => by
+      rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun k _ => by ring
   rw [key3]
   ring
 

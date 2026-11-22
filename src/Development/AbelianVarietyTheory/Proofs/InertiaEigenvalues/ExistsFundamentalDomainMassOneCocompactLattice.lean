@@ -9,7 +9,12 @@ open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.CuspRep Glob
 
 namespace GlobalTheory.CuspGeneric
 
-theorem exists_fundamentalDomain_mass_one : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] (Γ : AddSubgroup G), IsCoLat Γ → ∀ [MeasurableSpace G] [BorelSpace G], ∃ (μ : Measure G) (𝓕 : Set G), μ.IsAddHaarMeasure ∧ IsAddFundamentalDomain Γ 𝓕 μ ∧ μ 𝓕 = 1 := by
+theorem exists_fundamentalDomain_mass_one
+    : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] (Γ : AddSubgroup G),
+      IsCoLat Γ
+        → ∀ [MeasurableSpace G] [BorelSpace G], ∃ (μ : Measure G) (𝓕 : Set G),
+          μ.IsAddHaarMeasure ∧ IsAddFundamentalDomain Γ 𝓕 μ ∧ μ 𝓕 = 1 := by
   intro G _ _ _ _ _ _ Γ hΓ _ _
   obtain ⟨hdisc, K, hK, hKc⟩ := hΓ
   have : DiscreteTopology Γ := hdisc
@@ -39,9 +44,11 @@ theorem exists_fundamentalDomain_mass_one : ∀ (G : Type) [AddCommGroup G] [Top
     rw [sub_eq_add_neg]
     exact hVU a ha' (-b) hb'
 
-  obtain ⟨t, ht⟩ := hK.elim_finite_subcover (fun k : G => (fun x => x - k) ⁻¹' V₀)
-    (fun k => hV₀o.preimage (continuous_id.sub continuous_const))
-    (fun x _ => Set.mem_iUnion.2 ⟨x, by simpa using hV₀0⟩)
+  obtain ⟨t, ht⟩ :=
+    hK.elim_finite_subcover
+      (fun k : G => (fun x => x - k) ⁻¹' V₀)
+      (fun k => hV₀o.preimage (continuous_id.sub continuous_const))
+      (fun x _ => Set.mem_iUnion.2 ⟨x, by simpa using hV₀0⟩)
   set l := t.toList with hl
   let c : ℕ → G := fun n => l.getD n 0
   let W : ℕ → Set G := fun n => (fun x => x - c n) ⁻¹' V₀ ∩ K ∩ {_x | n < l.length}
@@ -53,8 +60,8 @@ theorem exists_fundamentalDomain_mass_one : ∀ (G : Type) [AddCommGroup G] [Top
   have hSm : ∀ n, MeasurableSet (S n) := fun n =>
     MeasurableSet.iUnion fun γ => (hWm n).preimage (measurable_const_add _)
   have hFm : MeasurableSet F :=
-    MeasurableSet.iUnion fun n => (hWm n).inter
-      (MeasurableSet.iInter fun m => MeasurableSet.iInter fun _ => (hSm m).compl)
+    MeasurableSet.iUnion fun n =>
+      (hWm n).inter (MeasurableSet.iInter fun m => MeasurableSet.iInter fun _ => (hSm m).compl)
   have hFK : F ⊆ K := by
     intro x hx
     obtain ⟨n, hn, -⟩ := Set.mem_iUnion.1 hx
@@ -91,7 +98,7 @@ theorem exists_fundamentalDomain_mass_one : ∀ (G : Type) [AddCommGroup G] [Top
       refine Set.mem_iUnion.2 ⟨Nat.find hne, hδ, ?_⟩
       simp only [Set.mem_iInter, Set.mem_compl_iff]
       intro m hm
-      change ¬ ((δ : G) + x ∈ S m)
+      change ¬((δ : G) + x ∈ S m)
       rw [hSinv m δ δ.2 x]
       exact Nat.find_min hne hm
     refine ⟨δ, hδF, ?_⟩
@@ -115,8 +122,13 @@ theorem exists_fundamentalDomain_mass_one : ∀ (G : Type) [AddCommGroup G] [Top
   have hF₀ : IsAddFundamentalDomain Γ F μ₀ := IsAddFundamentalDomain.mk' hFm.nullMeasurableSet hex
   have h0 : μ₀ F ≠ 0 := hF₀.measure_ne_zero (NeZero.ne μ₀)
   have htop : μ₀ F ≠ ⊤ := ((measure_mono hFK).trans_lt hK.measure_lt_top).ne
-  refine ⟨(μ₀ F)⁻¹ • μ₀, F, Measure.IsAddHaarMeasure.smul μ₀ (ENNReal.inv_ne_zero.2 htop) (ENNReal.inv_ne_top.2 h0),
-    IsAddFundamentalDomain.mk' hFm.nullMeasurableSet hex, ?_⟩
+  refine ⟨
+    (μ₀ F)⁻¹ • μ₀,
+    F,
+    Measure.IsAddHaarMeasure.smul μ₀ (ENNReal.inv_ne_zero.2 htop) (ENNReal.inv_ne_top.2 h0),
+    IsAddFundamentalDomain.mk' hFm.nullMeasurableSet hex,
+    ?_
+  ⟩
   rw [Measure.smul_apply, smul_eq_mul, ENNReal.inv_mul_cancel h0 htop]
 
 end GlobalTheory.CuspGeneric

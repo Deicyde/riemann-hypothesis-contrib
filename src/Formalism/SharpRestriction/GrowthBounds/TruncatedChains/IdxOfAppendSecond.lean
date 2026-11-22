@@ -12,8 +12,8 @@ section Pos
 
 variable {α : Type*} [BEq α] [LawfulBEq α]
 
-private theorem idxOf_append_eq_length_add_of_not_mem (l1 l : List α) (x : α) (hx : x ∉ l1) :
-    (l1 ++ l).idxOf x = l1.length + l.idxOf x := by
+private theorem idxOf_append_eq_length_add_of_not_mem (l1 l : List α) (x : α) (hx : x ∉ l1)
+    : (l1 ++ l).idxOf x = l1.length + l.idxOf x := by
   induction l1 with
   | nil => simp
   | cons a t ih =>
@@ -23,17 +23,18 @@ private theorem idxOf_append_eq_length_add_of_not_mem (l1 l : List α) (x : α) 
     have ht : x ∉ t := fun h => hx (by simp [h])
     simp [List.idxOf_cons, hax, ih ht] <;> omega
 
-theorem idxOf_append_first (l1 l2 : List α) (x : α) (hx : x ∉ l1) : (l1 ++ x :: l2).idxOf x = l1.length := by
+theorem idxOf_append_first (l1 l2 : List α) (x : α) (hx : x ∉ l1)
+    : (l1 ++ x :: l2).idxOf x = l1.length := by
   rw [idxOf_append_eq_length_add_of_not_mem l1 _ x hx]
   simp
 
-theorem idxOf_append_second (l1 l2 : List α) (x y : α) (hxy : x ≠ y) (hy : y ∉ l1) :
-    (l1 ++ x :: y :: l2).idxOf y = l1.length + 1 := by
+theorem idxOf_append_second (l1 l2 : List α) (x y : α) (hxy : x ≠ y) (hy : y ∉ l1)
+    : (l1 ++ x :: y :: l2).idxOf y = l1.length + 1 := by
   rw [idxOf_append_eq_length_add_of_not_mem l1 _ y hy]
   simp [List.idxOf_cons, hxy]
 
-theorem idxOf_append_third (l1 l2 : List α) (x y z : α) (hxz : x ≠ z) (hyz : y ≠ z) (hz : z ∉ l1) :
-    (l1 ++ x :: y :: z :: l2).idxOf z = l1.length + 2 := by
+theorem idxOf_append_third (l1 l2 : List α) (x y z : α) (hxz : x ≠ z) (hyz : y ≠ z) (hz : z ∉ l1)
+    : (l1 ++ x :: y :: z :: l2).idxOf z = l1.length + 2 := by
   rw [idxOf_append_eq_length_add_of_not_mem l1 _ z hz]
   simp [List.idxOf_cons, hxz, hyz]
 
@@ -56,8 +57,10 @@ end Pos
 
 variable {n : ℕ}
 
-private theorem eq_of_idxOf_eq_of_mem {β : Type*} [BEq β] [LawfulBEq β] (l : List β) (u v : β) (hu : u ∈ l)
-    (hv : v ∈ l) (h : l.idxOf u = l.idxOf v) : u = v := by
+private theorem eq_of_idxOf_eq_of_mem
+    {β : Type*} [BEq β] [LawfulBEq β]
+    (l : List β) (u v : β) (hu : u ∈ l) (hv : v ∈ l) (h : l.idxOf u = l.idxOf v)
+    : u = v := by
   induction l with
   | nil => simp at hu
   | cons a t ih =>
@@ -74,9 +77,11 @@ private theorem eq_of_idxOf_eq_of_mem {β : Type*} [BEq β] [LawfulBEq β] (l : 
         have hv' : v ∈ t := (List.mem_cons.mp hv).resolve_left (fun h' => hav h'.symm)
         exact ih hu' hv' h
 
-theorem cn_key {j : ℕ} (l1 l2 : List (Fin n × Fin n)) (b c j' e : Fin n)
+theorem cn_key
+    {j : ℕ} (l1 l2 : List (Fin n × Fin n)) (b c j' e : Fin n)
     (h : NO n j (l1 ++ (b, c) :: (j', c) :: (j', e) :: l2)) (hj : j'.val = j) (hjb : j < b.val)
-    (hbc : b.val < c.val) : e = b := by
+    (hbc : b.val < c.val)
+    : e = b := by
   unfold NO at h
   obtain ⟨hnd, hall, hcomp, hord⟩ := h
   set L := l1 ++ (b, c) :: (j', c) :: (j', e) :: l2 with hL
@@ -96,8 +101,10 @@ theorem cn_key {j : ℕ} (l1 l2 : List (Fin n × Fin n)) (b c j' e : Fin n)
   have hbj : (b, c) ≠ (j', c) := fun h' => hnb (congrArg Prod.fst h').symm
   have hbje : (b, c) ≠ (j', e) := fun h' => hnb (congrArg Prod.fst h').symm
   have i0 : L.idxOf (b, c) = l1.length := idxOf_append_first l1 _ (b, c) n0
-  have i1 : L.idxOf (j', c) = l1.length + 1 := idxOf_append_second l1 ((j', e) :: l2) (b, c) (j', c) hbj n1
-  have i2 : L.idxOf (j', e) = l1.length + 2 := idxOf_append_third l1 l2 (b, c) (j', c) (j', e) hbje hce n2
+  have i1 : L.idxOf (j', c) = l1.length + 1 :=
+    idxOf_append_second l1 ((j', e) :: l2) (b, c) (j', c) hbj n1
+  have i2 : L.idxOf (j', e) = l1.length + 2 :=
+    idxOf_append_third l1 l2 (b, c) (j', c) (j', e) hbje hce n2
   have inj : ∀ u v, u ∈ L → v ∈ L → L.idxOf u = L.idxOf v → u = v := by
     intro u v hu hv h'
     exact eq_of_idxOf_eq_of_mem L u v hu hv h'
@@ -145,11 +152,14 @@ theorem cn_key {j : ℕ} (l1 l2 : List (Fin n × Fin n)) (b c j' e : Fin n)
       rw [i0] at o4
       omega
 
-def meas (j : ℕ) (l : List (Fin n × Fin n)) : ℕ := ∑ r : Fin n × Fin n, if r.1.val = j then l.idxOf r else 0
+def meas (j : ℕ) (l : List (Fin n × Fin n)) : ℕ :=
+  ∑ r : Fin n × Fin n, if r.1.val = j then l.idxOf r else 0
 
-theorem cn_meas_lt {j : ℕ} {l l' : List (Fin n × Fin n)}
-    (h1 : ∀ r : Fin n × Fin n, r.1.val = j → l'.idxOf r ≤ l.idxOf r) (r0 : Fin n × Fin n) (h0 : r0.1.val = j)
-    (h2 : l'.idxOf r0 < l.idxOf r0) : meas j l' < meas j l := by
+theorem cn_meas_lt
+    {j : ℕ} {l l' : List (Fin n × Fin n)}
+    (h1 : ∀ r : Fin n × Fin n, r.1.val = j → l'.idxOf r ≤ l.idxOf r)
+    (r0 : Fin n × Fin n) (h0 : r0.1.val = j) (h2 : l'.idxOf r0 < l.idxOf r0)
+    : meas j l' < meas j l := by
   unfold meas
   apply Finset.sum_lt_sum
   · intro r _
@@ -160,8 +170,12 @@ theorem cn_meas_lt {j : ℕ} {l l' : List (Fin n × Fin n)}
     rw [if_pos h0, if_pos h0]
     exact h2
 
-theorem cn_sort {j : ℕ} : ∀ (m : ℕ) (l : List (Fin n × Fin n)), NO n j l → meas j l < m →
-    ∃ lF lG, Steps n l (lF ++ lG) ∧ NO n j (lF ++ lG) ∧ (∀ r ∈ lF, r.1.val = j) ∧ (∀ r ∈ lG, r.1.val ≠ j) := by
+theorem cn_sort {j : ℕ}
+    : ∀ (m : ℕ) (l : List (Fin n × Fin n)),
+      NO n j l → meas j l < m
+        → ∃ lF lG,
+          Steps n l (lF ++ lG) ∧ NO n j (lF ++ lG) ∧ (∀ r ∈ lF, r.1.val = j)
+            ∧ (∀ r ∈ lG, r.1.val ≠ j) := by
   intro m
   induction m with
   | zero => intro l _ h; exact absurd h (Nat.not_lt_zero _)
@@ -216,8 +230,9 @@ theorem cn_sort {j : ℕ} : ∀ (m : ℕ) (l : List (Fin n × Fin n)), NO n j l 
           have hz : (j'', e) ∉ l1 := cn_notMem hNO.1 (by simp)
           have hxz : (e, d) ≠ (j'', e) := cn_ne (by omega)
           have hyz : (j'', d) ≠ (j'', e) := cn_ne (by omega)
-          have hlt : meas j (l1 ++ (j'', e) :: (j'', d) :: (e, d) :: (lF' ++ lG)) <
-              meas j (l1 ++ (e, d) :: (j'', d) :: (j'', e) :: (lF' ++ lG)) := by
+          have hlt
+              : meas j (l1 ++ (j'', e) :: (j'', d) :: (e, d) :: (lF' ++ lG))
+                < meas j (l1 ++ (e, d) :: (j'', d) :: (j'', e) :: (lF' ++ lG)) := by
             refine cn_meas_lt ?_ (j'', e) hf ?_
             · rintro ⟨u1, u2⟩ hu
               simp only at hu
@@ -230,12 +245,18 @@ theorem cn_sort {j : ℕ} : ∀ (m : ℕ) (l : List (Fin n × Fin n)), NO n j l 
             · rw [idxOf_append_first l1 _ _ hz, idxOf_append_third l1 _ _ _ _ hxz hyz hz]
               omega
           obtain ⟨lF2, lG2, hs, hr⟩ := ih _ hNO' (by omega)
-          exact ⟨lF2, lG2, Relation.ReflTransGen.head (Step.braid' l1 (lF' ++ lG) j'' e d hab hbc) hs, hr⟩
+          exact ⟨
+            lF2,
+            lG2,
+            Relation.ReflTransGen.head (Step.braid' l1 (lF' ++ lG) j'' e d hab hbc) hs,
+            hr
+          ⟩
       · have h1 : b ≠ j' := fun h' => by rw [h'] at hg; exact hg hf
         have h3 : c ≠ j' := fun h' => by rw [h'] at hgm; omega
         have hNO' := cn_NO_swap l1 (lF ++ lG) b c j' d h1 (Ne.symm hdb) h3 (Ne.symm hdc) hNO
-        have hlt : meas j (l1 ++ (j', d) :: (b, c) :: (lF ++ lG)) <
-            meas j (l1 ++ (b, c) :: (j', d) :: (lF ++ lG)) := by
+        have hlt
+            : meas j (l1 ++ (j', d) :: (b, c) :: (lF ++ lG))
+              < meas j (l1 ++ (b, c) :: (j', d) :: (lF ++ lG)) := by
           refine cn_meas_lt ?_ (j', d) hf ?_
           · rintro ⟨u1, u2⟩ hu
             simp only at hu
@@ -247,7 +268,12 @@ theorem cn_sort {j : ℕ} : ∀ (m : ℕ) (l : List (Fin n × Fin n)), NO n j l 
           · rw [idxOf_append_first l1 _ _ hy, Pf]
             omega
         obtain ⟨lF2, lG2, hs, hr⟩ := ih _ hNO' (by omega)
-        exact ⟨lF2, lG2, Relation.ReflTransGen.head
-          (Step.swap l1 (lF ++ lG) b c j' d h1 (Ne.symm hdb) h3 (Ne.symm hdc)) hs, hr⟩
+        exact ⟨
+          lF2,
+          lG2,
+          Relation.ReflTransGen.head
+            (Step.swap l1 (lF ++ lG) b c j' d h1 (Ne.symm hdb) h3 (Ne.symm hdc)) hs,
+          hr
+        ⟩
 
 end Formalism.MainNotions.G.ExtremalProjector

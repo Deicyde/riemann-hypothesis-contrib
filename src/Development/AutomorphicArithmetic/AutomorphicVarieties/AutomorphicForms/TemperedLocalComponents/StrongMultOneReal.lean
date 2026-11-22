@@ -58,8 +58,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open UpperTheory.V.Af.Smo in
-theorem UpperTheory.V.Af.strongMultOneReal :
-    UpperTheory.V.Published.StrongMultOneReal := by
+theorem UpperTheory.V.Af.strongMultOneReal : UpperTheory.V.Published.StrongMultOneReal := by
   have hTwistRed : TwistRed := twistRed
   have hCentLoc : CentLoc := centLoc
   have hAwayInd : AwayInd := awayInd

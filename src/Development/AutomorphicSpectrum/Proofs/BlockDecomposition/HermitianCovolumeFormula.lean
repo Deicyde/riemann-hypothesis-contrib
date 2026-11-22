@@ -20,27 +20,40 @@ section Alg
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
-def ratVec {d : ℕ} (b : Module.Basis (Fin d) F E) (n : ℕ) [FiniteDimensional F E]
-    (A : Matrix (Fin n) (Fin n) E) : Idx n d → F :=
+def ratVec
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (n : ℕ)
+    [FiniteDimensional F E]
+    (A : Matrix (Fin n) (Fin n) E)
+    : Idx n d → F :=
   Sum.elim (fun a => 1 / 2 * Algebra.trace F E (A a a)) fun q => b.repr (A q.1.1.1 q.1.1.2) q.2
 
-def ofVec (σ : E →ₐ[F] E) {d : ℕ} (b : Module.Basis (Fin d) F E) (n : ℕ) (k : Idx n d → F) :
-    Matrix (Fin n) (Fin n) E := fun a c =>
-  if h : a < c then ∑ l, k (Sum.inr (⟨(a, c), h⟩, l)) • b l
-  else if h' : c < a then σ (∑ l, k (Sum.inr (⟨(c, a), h'⟩, l)) • b l)
-  else algebraMap F E (k (Sum.inl a))
+def ofVec (σ : E →ₐ[F] E) {d : ℕ} (b : Module.Basis (Fin d) F E) (n : ℕ) (k : Idx n d → F)
+    : Matrix (Fin n) (Fin n) E := fun a c =>
+  if h : a < c then
+    ∑ l, k (Sum.inr (⟨(a, c), h⟩, l)) • b l
+  else if h' : c < a then
+    σ (∑ l, k (Sum.inr (⟨(c, a), h'⟩, l)) • b l)
+  else
+    algebraMap F E (k (Sum.inl a))
 
-theorem ofVec_herm {σ : E →ₐ[F] E} (hinv : ∀ x, σ (σ x) = x) {d : ℕ} (b : Module.Basis (Fin d) F E)
-    (n : ℕ) (k : Idx n d → F) (a c : Fin n) : σ (ofVec σ b n k c a) = ofVec σ b n k a c := by
+theorem ofVec_herm
+    {σ : E →ₐ[F] E} (hinv : ∀ x, σ (σ x) = x)
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (n : ℕ) (k : Idx n d → F) (a c : Fin n)
+    : σ (ofVec σ b n k c a) = ofVec σ b n k a c := by
   rcases lt_trichotomy a c with h | h | h
   · simp only [ofVec, dif_pos h, dif_neg (not_lt_of_gt h), hinv]
   · subst h
     simp only [ofVec, lt_irrefl, dite_false, AlgHom.commutes]
   · simp only [ofVec, dif_pos h, dif_neg (not_lt_of_gt h)]
 
-theorem ratVec_ofVec [FiniteDimensional F E] [CharZero F] (h2 : Module.finrank F E = 2)
-    (σ : E →ₐ[F] E) {d : ℕ} (b : Module.Basis (Fin d) F E) (n : ℕ) (k : Idx n d → F) :
-    ratVec b n (ofVec σ b n k) = k := by
+theorem ratVec_ofVec
+    [FiniteDimensional F E] [CharZero F]
+    (h2 : Module.finrank F E = 2) (σ : E →ₐ[F] E)
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (n : ℕ) (k : Idx n d → F)
+    : ratVec b n (ofVec σ b n k) = k := by
   funext i
   cases i with
   | inl a =>
@@ -53,18 +66,21 @@ theorem ratVec_ofVec [FiniteDimensional F E] [CharZero F] (h2 : Module.finrank F
 
 variable (R : Type) [CommRing R] [Algebra F R]
 
-theorem repr_inclR {d : ℕ} (b : Module.Basis (Fin d) F E) (x : E) (k : Fin d) :
-    (Algebra.TensorProduct.basis R b).repr (inclR R x) k = algebraMap F R (b.repr x k) := by
+theorem repr_inclR {d : ℕ} (b : Module.Basis (Fin d) F E) (x : E) (k : Fin d)
+    : (Algebra.TensorProduct.basis R b).repr (inclR R x) k = algebraMap F R (b.repr x k) := by
   change (Algebra.TensorProduct.basis R b).repr ((1 : R) ⊗ₜ[F] x) k = _
   rw [Algebra.TensorProduct.basis_repr_tmul]
   simp
 
 variable [TopologicalSpace R]
 
-theorem hermVec_map [FiniteDimensional F E] (σ : E →ₐ[F] E) {d : ℕ} (b : Module.Basis (Fin d) F E)
+theorem hermVec_map
+    [FiniteDimensional F E]
+    (σ : E →ₐ[F] E)
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
     (n : ℕ) (A : Matrix (Fin n) (Fin n) E) (S : HermR R σ n)
-    (hS : (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) = A.map (inclR R)) (i : Idx n d) :
-    hermVec R σ b n S i = algebraMap F R (ratVec b n A i) := by
+    (hS : (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) = A.map (inclR R)) (i : Idx n d)
+    : hermVec R σ b n S i = algebraMap F R (ratVec b n A i) := by
   cases i with
   | inl a =>
     simp only [hermVec, toVec, HaarCoord.hermCoord, Sum.elim_inl, ratVec, hS, Matrix.map_apply]
@@ -78,15 +94,20 @@ end Alg
 
 section Main
 
-open GroundTheory.Global GroundTheory.Automorphic.GJMatrix GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Fth PositivityTheory.SiegelWeilFormula.KWhit.MeasP
+open GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+  GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Fth PositivityTheory.SiegelWeilFormula.KWhit.MeasP
 attribute [local instance 100000] GroundTheory.Global.measurableSpace_adeleRing
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem mem_ratHerm_iff {σ : E →ₐ[F] E} (hinv : ∀ x, σ (σ x) = x) (h2 : Module.finrank F E = 2)
-    [FiniteDimensional F E] {d : ℕ} (b : Module.Basis (Fin d) F E) (n : ℕ)
-    (hinj : Function.Injective (hermVec (AF F) σ b n)) (S : HermR (AF F) σ n) :
-    S ∈ ratHerm F E σ n ↔ ∃ k : Idx n d → F, ∀ i, hermVec (AF F) σ b n S i = algebraMap F (AF F) (k i) := by
+theorem mem_ratHerm_iff
+    {σ : E →ₐ[F] E} (hinv : ∀ x, σ (σ x) = x)
+    (h2 : Module.finrank F E = 2)
+    [FiniteDimensional F E]
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (n : ℕ) (hinj : Function.Injective (hermVec (AF F) σ b n)) (S : HermR (AF F) σ n)
+    : S ∈ ratHerm F E σ n
+      ↔ ∃ k : Idx n d → F, ∀ i, hermVec (AF F) σ b n S i = algebraMap F (AF F) (k i) := by
   constructor
   · rintro ⟨A, hA⟩
     exact ⟨ratVec b n A, hermVec_map (AF F) σ b n A S hA.symm⟩
@@ -105,9 +126,9 @@ theorem mem_ratHerm_iff {σ : E →ₐ[F] E} (hinv : ∀ x, σ (σ x) = x) (h2 :
     rw [← hT]
     rfl
 
-theorem existsUnique_sub_mem_pi {ι : Type} (x : ι → AF F) :
-    ∃! k : ι → F, (fun i => x i - algebraMap F (AF F) (k i)) ∈
-      Set.univ.pi fun _ : ι => fundamentalSet F := by
+theorem existsUnique_sub_mem_pi {ι : Type} (x : ι → AF F)
+    : ∃! k : ι → F, (fun i => x i - algebraMap F (AF F) (k i)) ∈
+        Set.univ.pi fun _ : ι => fundamentalSet F := by
   choose k hk huniq using fun i => existsUnique_sub_mem_fundamentalSet F (x i)
   refine ⟨k, fun i _ => hk i, fun k' hk' => funext fun i => huniq i _ (hk' i (Set.mem_univ i))⟩
 
@@ -140,8 +161,9 @@ theorem hermCovol : HermCovol := by
     · intro x y
       exact hermVec_add (AF F) b n x y
     · intro S T
-      have h3 : (ξ • formB σ b n).map (algebraMap F (AF F)) =
-          algebraMap F (AF F) ξ • (formB σ b n).map (algebraMap F (AF F)) := by
+      have h3
+          : (ξ • formB σ b n).map (algebraMap F (AF F))
+            = algebraMap F (AF F) ξ • (formB σ b n).map (algebraMap F (AF F)) := by
         ext p q
         exact map_mul (algebraMap F (AF F)) ξ (formB σ b n p q)
       rw [hξ, pair_eq (AF F) hinv h2 hδ hσδ b n S T, chiG, h3, Matrix.smul_mulVec, dotProduct_smul,
@@ -153,9 +175,9 @@ theorem hermCovol : HermCovol := by
   refine ⟨e ⁻¹' D, IsAddFundamentalDomain.mk' (hDm.preimage e.measurable).nullMeasurableSet ?_, ?_⟩
   · intro S
     obtain ⟨k, hk, huniq⟩ := existsUnique_sub_mem_pi (e S)
-    have hg : e.symm (fun i => algebraMap F (AF F) (-k i)) ∈ ratHerm F E σ n :=
-      (mem_ratHerm_iff hinv h2 b n hinj _).2 ⟨fun i => -k i, fun i => by
-        rw [← he, e.apply_symm_apply]⟩
+    have hg : e.symm (fun i => algebraMap F (AF F) (- k i)) ∈ ratHerm F E σ n :=
+      (mem_ratHerm_iff hinv h2 b n hinj _).2
+        ⟨fun i => - k i, fun i => by rw [← he, e.apply_symm_apply]⟩
     refine ⟨⟨_, hg⟩, ?_, ?_⟩
     · change e (e.symm _ + S) ∈ D
       rw [he, hermVec_add, ← he, ← he, e.apply_symm_apply]
@@ -165,9 +187,10 @@ theorem hermCovol : HermCovol := by
       obtain ⟨k', hk'⟩ := (mem_ratHerm_iff hinv h2 b n hinj _).1 hgm
       change e (g + S) ∈ D at hg'
       rw [he, hermVec_add, ← he] at hg'
-      have hkk : (fun i => -k' i) = k := huniq _ (by
-        convert hg' using 2 with i
-        simp [he, hk', sub_eq_add_neg, add_comm])
+      have hkk : (fun i => - k' i) = k :=
+        huniq _ (by
+          convert hg' using 2 with i
+          simp [he, hk', sub_eq_add_neg, add_comm])
       refine Subtype.ext (e.injective ?_)
       rw [e.apply_symm_apply]
       funext i

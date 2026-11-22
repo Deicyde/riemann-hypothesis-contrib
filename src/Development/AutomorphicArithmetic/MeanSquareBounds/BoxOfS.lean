@@ -12,7 +12,8 @@ public import Formalism.GL3MeanSquares.HookFormulaTorsion.WeightedVonMangoldtSum
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
@@ -34,10 +35,17 @@ private lemma num_box {ε τ Y y : ℝ} (hε : ε ≤ 1 / 4) (hτ : 0 < τ) (hY 
     Real.rpow_le_rpow_of_exponent_le (by linarith) (by linarith)
   nlinarith
 
-theorem box_of_S :
-    ∃ C : ℝ, 0 < C ∧ ∀ ε τ K : ℝ, 0 < ε → ε ≤ 1 / 4 → 0 < τ → 1 ≤ K → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀, ∀ (Q : ℝ) (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N) (q : ℕ) (κ : ℕ → ℂ),
-      Y ^ (ε / 6) ≤ Real.log Q → Real.log Q ≤ Y ^ (ε / 4) → GoodC Q χ → (∀ n : ℕ, χ (n : ZMod N) = κ n * J q n) →
-      (∀ y ∈ Set.Icc Y (Y ^ K), ‖S ((Y ^ K) ^ 400) y q κ‖ ≤ y ^ (1 / 2 + τ) / 2) → Box Q C τ Y (Y ^ K) χ := by
+theorem box_of_S
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ ε τ K : ℝ,
+          0 < ε → ε ≤ 1 / 4 → 0 < τ → 1 ≤ K
+            → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀,
+              ∀ (Q : ℝ) (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N) (q : ℕ) (κ : ℕ → ℂ),
+                Y ^ (ε / 6) ≤ Real.log Q → Real.log Q ≤ Y ^ (ε / 4) → GoodC Q χ
+                  → (∀ n : ℕ, χ (n : ZMod N) = κ n * J q n)
+                  → (∀ y ∈ Set.Icc Y (Y ^ K), ‖S ((Y ^ K) ^ 400) y q κ‖ ≤ y ^ (1 / 2 + τ) / 2)
+                  → Box Q C τ Y (Y ^ K) χ := by
   obtain ⟨C, hC, hk⟩ := kappaC
   refine ⟨C, hC, fun ε τ K hε hε4 hτ hK => ?_⟩
   obtain ⟨Y₁, h1⟩ := hk ε hε (by linarith)
@@ -64,7 +72,8 @@ theorem box_of_S :
     exact mul_le_mul_of_nonneg_right hy.2 (norm_nonneg _)
   have hn := num_box hε4 hτ hY16 hy.1
   have hs := hS y hy
-  calc ‖- Sz χ y ((Y ^ K) ^ 400) - (y : ℂ) * tailL χ ((Y ^ K) ^ 400)‖
+  calc
+    ‖- Sz χ y ((Y ^ K) ^ 400) - (y : ℂ) * tailL χ ((Y ^ K) ^ 400)‖
       ≤ ‖- Sz χ y ((Y ^ K) ^ 400)‖ + ‖(y : ℂ) * tailL χ ((Y ^ K) ^ 400)‖ := norm_sub_le _ _
     _ ≤ y ^ (1 / 2 + τ) := by rw [norm_neg, hSz]; linarith
 

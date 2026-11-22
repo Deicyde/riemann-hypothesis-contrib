@@ -7,51 +7,67 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools GlobalTheory.PRep
+open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools GlobalTheory.PRep
 
 section General
 
 variable {G V : Type} [CommGroup G] [AddCommGroup V] [Module ℂ V]
 
-private theorem pow_comm_rep (ρ : Representation ℂ G V) (t g : G) (c : ℂ) (m : ℕ) (v : V) :
-    ((ρ t - algebraMap ℂ (Module.End ℂ V) c) ^ m) (ρ g v) =
-      ρ g (((ρ t - algebraMap ℂ (Module.End ℂ V) c) ^ m) v) := by
+private theorem pow_comm_rep (ρ : Representation ℂ G V) (t g : G) (c : ℂ) (m : ℕ) (v : V)
+    : ((ρ t - algebraMap ℂ (Module.End ℂ V) c) ^ m) (ρ g v)
+      = ρ g (((ρ t - algebraMap ℂ (Module.End ℂ V) c) ^ m) v) := by
   have h : Commute (ρ t - algebraMap ℂ (Module.End ℂ V) c) (ρ g) :=
     Commute.sub_left ((Commute.all t g).map ρ) (Algebra.commutes c (ρ g))
   exact LinearMap.congr_fun (h.pow_left m).eq v
 
-private theorem pow_mem_sub (ρ : Representation ℂ G V) (N : Subrepresentation ρ) (t : G) (c : ℂ) (m : ℕ)
-    (v : V) (hv : v ∈ N.toSubmodule) : ((ρ t - algebraMap ℂ (Module.End ℂ V) c) ^ m) v ∈ N.toSubmodule := by
+private theorem pow_mem_sub
+    (ρ : Representation ℂ G V) (N : Subrepresentation ρ)
+    (t : G) (c : ℂ) (m : ℕ)
+    (v : V) (hv : v ∈ N.toSubmodule)
+    : ((ρ t - algebraMap ℂ (Module.End ℂ V) c) ^ m) v ∈ N.toSubmodule := by
   induction m with
   | zero => simpa using hv
   | succ m ih =>
     rw [pow_succ', Module.End.mul_apply, LinearMap.sub_apply, Module.algebraMap_end_apply]
     exact sub_mem (N.apply_mem_toSubmodule t ih) (N.toSubmodule.smul_mem c ih)
 
-private theorem exists_nil {ρ : Representation ℂ G V} (hl : HasFiniteLength ρ) {c : G → ℂ} {x : V} (hx : x ≠ 0)
-    (hxc : ∀ t, ∃ m : ℕ, ((ρ t - algebraMap ℂ (Module.End ℂ V) (c t)) ^ m) x = 0) :
-    ∃ N : Subrepresentation ρ, N ≠ ⊤ ∧
-      ∀ t, ∃ m : ℕ, ∀ v, ((ρ t - algebraMap ℂ (Module.End ℂ V) (c t)) ^ m) v ∈ N.toSubmodule := by
+private theorem exists_nil
+    {ρ : Representation ℂ G V} (hl : HasFiniteLength ρ)
+    {c : G → ℂ} {x : V}
+    (hx : x ≠ 0) (hxc : ∀ t, ∃ m : ℕ, ((ρ t - algebraMap ℂ (Module.End ℂ V) (c t)) ^ m) x = 0)
+    : ∃ N : Subrepresentation ρ,
+      N ≠ ⊤
+        ∧ ∀ t, ∃ m : ℕ, ∀ v,
+          ((ρ t - algebraMap ℂ (Module.End ℂ V) (c t)) ^ m) v ∈ N.toSubmodule := by
   haveI := ((hasFiniteLength_iff_wellFounded ρ).1 hl).1
-  obtain ⟨N, hN, hmax⟩ := (wellFounded_gt (α := Subrepresentation ρ)).has_min {N | x ∉ N.toSubmodule}
-    ⟨⊥, fun h => hx ((Submodule.mem_bot ℂ).1 h)⟩
+  obtain ⟨N, hN, hmax⟩ :=
+    (wellFounded_gt (α := Subrepresentation ρ)).has_min {N | x ∉ N.toSubmodule}
+      ⟨⊥, fun h => hx ((Submodule.mem_bot ℂ).1 h)⟩
   refine ⟨N, fun h => hN (by rw [h]; trivial), fun t => ?_⟩
   set f := ρ t - algebraMap ℂ (Module.End ℂ V) (c t) with hf
-  let K : ℕ →o Subrepresentation ρ :=
-    ⟨fun m => ⟨N.toSubmodule.comap (f ^ m), fun g v hv => by
+  let K : ℕ →o Subrepresentation ρ := ⟨
+    fun m => ⟨
+      N.toSubmodule.comap (f ^ m),
+      fun g v hv => by
         show (f ^ m) (ρ g v) ∈ N.toSubmodule
         rw [hf, pow_comm_rep]
-        exact N.apply_mem_toSubmodule g hv⟩,
-      monotone_nat_of_le_succ fun m v hv => by
-        show (f ^ (m + 1)) v ∈ N.toSubmodule
-        rw [add_comm, pow_add, Module.End.mul_apply]
-        exact pow_mem_sub ρ N t _ 1 _ hv⟩
+        exact N.apply_mem_toSubmodule g hv
+    ⟩,
+    monotone_nat_of_le_succ fun m v hv => by
+      show (f ^ (m + 1)) v ∈ N.toSubmodule
+      rw [add_comm, pow_add, Module.End.mul_apply]
+      exact pow_mem_sub ρ N t _ 1 _ hv
+  ⟩
   obtain ⟨a, ha⟩ := WellFoundedGT.monotone_chain_condition K
   obtain ⟨b, hb⟩ := hxc t
-  let R : Subrepresentation ρ := ⟨N.toSubmodule ⊔ LinearMap.range (f ^ (a + b)), fun g v hv => by
-    obtain ⟨y, hy, _, ⟨z, rfl⟩, rfl⟩ := Submodule.mem_sup.1 hv
-    rw [map_add (f := _)]
-    exact Submodule.add_mem_sup (N.apply_mem_toSubmodule g hy) ⟨ρ g z, by rw [hf, pow_comm_rep]⟩⟩
+  let R : Subrepresentation ρ := ⟨
+    N.toSubmodule ⊔ LinearMap.range (f ^ (a + b)),
+    fun g v hv => by
+      obtain ⟨y, hy, _, ⟨z, rfl⟩, rfl⟩ := Submodule.mem_sup.1 hv
+      rw [map_add (f := _)]
+      exact Submodule.add_mem_sup (N.apply_mem_toSubmodule g hy) ⟨ρ g z, by rw [hf, pow_comm_rep]⟩
+  ⟩
   have hR : x ∉ R.toSubmodule := fun hv => by
     obtain ⟨y, hy, _, ⟨z, rfl⟩, h⟩ := Submodule.mem_sup.1 hv
     have h1 : z ∈ (K (b + (a + b))).toSubmodule := by
@@ -70,10 +86,11 @@ private theorem exists_nil {ρ : Representation ℂ G V} (hl : HasFiniteLength �
 
 variable [TopologicalSpace G] [IsTopologicalGroup G] [TopologicalSpace.SeparableSpace G]
 
-private theorem exists_form {ρ : Representation ℂ G V} (hρ : IsSmooth ρ) (hl : HasFiniteLength ρ) {χ : G →* ℂˣ}
-    {x : V} (hx : x ≠ 0)
-    (hxc : ∀ t, ∃ m : ℕ, ((ρ t - algebraMap ℂ (Module.End ℂ V) (χ t : ℂ)) ^ m) x = 0) :
-    IsSmoothChar χ ∧ ∃ l : V →ₗ[ℂ] ℂ, l ≠ 0 ∧ ∀ g v, l (ρ g v) = (χ g : ℂ) * l v := by
+private theorem exists_form
+    {ρ : Representation ℂ G V} (hρ : IsSmooth ρ) (hl : HasFiniteLength ρ)
+    {χ : G →* ℂˣ} {x : V}
+    (hx : x ≠ 0) (hxc : ∀ t, ∃ m : ℕ, ((ρ t - algebraMap ℂ (Module.End ℂ V) (χ t : ℂ)) ^ m) x = 0)
+    : IsSmoothChar χ ∧ ∃ l : V →ₗ[ℂ] ℂ, l ≠ 0 ∧ ∀ g v, l (ρ g v) = (χ g : ℂ) * l v := by
   obtain ⟨T, hT, hnil⟩ := exists_nil hl hx hxc
   haveI := ((hasFiniteLength_iff_wellFounded ρ).1 hl).1
   obtain ⟨M, hM, hTM⟩ := (eq_top_or_exists_le_coatom T).resolve_left hT
@@ -87,8 +104,8 @@ private theorem exists_form {ρ : Representation ℂ G V} (hρ : IsSmooth ρ) (h
     have := hμ g (Submodule.Quotient.mk ⟨v, trivial⟩)
     exact (Submodule.Quotient.eq (M.toSubmodule.comap (⊤ : Subrepresentation ρ).toSubmodule.subtype)
       (x := ⟨ρ g v, trivial⟩) (y := ⟨(μ g : ℂ) • v, trivial⟩)).1 this
-  have hM' : M.toSubmodule < ⊤ := lt_top_iff_ne_top.2 fun h =>
-    hM.1 (Subrepresentation.toSubmodule_injective h)
+  have hM' : M.toSubmodule < ⊤ :=
+    lt_top_iff_ne_top.2 fun h => hM.1 (Subrepresentation.toSubmodule_injective h)
   obtain ⟨l, hl0, hlM⟩ := Submodule.exists_le_ker_of_lt_top _ hM'
   have hle : ∀ g v, l (ρ g v) = (μ g : ℂ) * l v := fun g v => by
     have := hlM (hμM g v)
@@ -97,22 +114,26 @@ private theorem exists_form {ρ : Representation ℂ G V} (hρ : IsSmooth ρ) (h
     by_contra hn
     push Not at hn
     exact hl0 (LinearMap.ext hn)
-  have hμχ : μ = χ := MonoidHom.ext fun t => by
-    obtain ⟨m, hm⟩ := hnil t
-    have h1 : ∀ m : ℕ, l (((ρ t - algebraMap ℂ (Module.End ℂ V) (χ t : ℂ)) ^ m) v) =
-        ((μ t : ℂ) - χ t) ^ m * l v := fun m => by
-      induction m with
-      | zero => simp
-      | succ m ih =>
-        rw [pow_succ', Module.End.mul_apply, LinearMap.sub_apply, Module.algebraMap_end_apply, map_sub, hle,
-          map_smul, ih, smul_eq_mul]
-        ring
-    have h2 := hlM (hTM (hm v))
-    rw [LinearMap.mem_ker, h1] at h2
-    exact Units.ext (sub_eq_zero.1 (pow_eq_zero_iff'.1 ((mul_eq_zero.1 h2).resolve_right hv)).1)
+  have hμχ : μ = χ :=
+    MonoidHom.ext fun t => by
+      obtain ⟨m, hm⟩ := hnil t
+      have h1
+          : ∀ m : ℕ,
+            l (((ρ t - algebraMap ℂ (Module.End ℂ V) (χ t : ℂ)) ^ m) v)
+              = ((μ t : ℂ) - χ t) ^ m * l v := fun m => by
+        induction m with
+        | zero => simp
+        | succ m ih =>
+          rw [pow_succ', Module.End.mul_apply, LinearMap.sub_apply, Module.algebraMap_end_apply,
+            map_sub, hle, map_smul, ih, smul_eq_mul]
+          ring
+      have h2 := hlM (hTM (hm v))
+      rw [LinearMap.mem_ker, h1] at h2
+      exact Units.ext (sub_eq_zero.1 (pow_eq_zero_iff'.1 ((mul_eq_zero.1 h2).resolve_right hv)).1)
   subst hμχ
   refine ⟨?_, l, hl0, hle⟩
-  refine Subgroup.isOpen_of_mem_nhds _ (g := 1) (Filter.mem_of_superset ((hρ v).mem_nhds (by simp)) ?_)
+  refine Subgroup.isOpen_of_mem_nhds _ (g := 1)
+    (Filter.mem_of_superset ((hρ v).mem_nhds (by simp)) ?_)
   intro g hg
   have hg' : ρ g v = v := hg
   have h := hle g v
@@ -121,8 +142,26 @@ private theorem exists_form {ρ : Representation ℂ G V} (hρ : IsSmooth ρ) (h
 
 end General
 
-theorem UpperTheory.V.AlgebraTools.jqEmbed :
-    GlobalTheory.Published.BernsteinZelevinskyFiniteness → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (C : Subgroup 𝓀[k]ˣ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V), IsSmooth π → π.IsIrreducible → ∀ θ : (Fin n → kˣ) →* (Module.End ℂ (fixd π (iwC k n C)))ˣ, (∀ t, Dom t → (θ t : Module.End ℂ (fixd π (iwC k n C))) = hk π (iwC k n C) (diagT k (Fin n) t)) → ∀ χ : (Fin n → kˣ) →* ℂˣ, (⨅ t, Module.End.maxGenEigenspace (θ t : Module.End ℂ (fixd π (iwC k n C))) (χ t : ℂ)) ≠ ⊥ → ∃ ψ : Fin n → kˣ →* ℂˣ, (∀ i, IsSmoothChar (ψ i)) ∧ (∀ i, ∀ x ∈ unitsC k C, ψ i x = 1) ∧ torusChar ψ = χ * ((deltaHalf k fun _ : Fin n => Unit).comp (leviTorus k (Fin n)).toMonoidHom) ∧ IsSubquotient π (prinSeries ψ) := by
+theorem UpperTheory.V.AlgebraTools.jqEmbed
+    : GlobalTheory.Published.BernsteinZelevinskyFiniteness
+      → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+          (n : ℕ) (C : Subgroup 𝓀[k]ˣ) (V : Type) [AddCommGroup V] [Module ℂ V]
+          (π : Representation ℂ (GL (Fin n) k) V),
+        IsSmooth π → π.IsIrreducible
+          → ∀ θ : (Fin n → kˣ) →* (Module.End ℂ (fixd π (iwC k n C)))ˣ,
+            (∀ t,
+                Dom t
+                  → (θ t : Module.End ℂ (fixd π (iwC k n C)))
+                    = hk π (iwC k n C) (diagT k (Fin n) t))
+              → ∀ χ : (Fin n → kˣ) →* ℂˣ,
+                (⨅ t, Module.End.maxGenEigenspace (θ t : Module.End ℂ (fixd π (iwC k n C))) (χ t : ℂ))
+                    ≠ ⊥
+                  → ∃ ψ : Fin n → kˣ →* ℂˣ,
+                    (∀ i, IsSmoothChar (ψ i)) ∧ (∀ i, ∀ x ∈ unitsC k C, ψ i x = 1)
+                      ∧ torusChar ψ
+                        = χ * ((deltaHalf k fun _ : Fin n => Unit).comp
+                          (leviTorus k (Fin n)).toMonoidHom)
+                      ∧ IsSubquotient π (prinSeries ψ) := by
   intro hBZ k _ _ _ _ n C V _ _ π hπ hirr θ hθ χ hne
   obtain ⟨v, hv, hv0⟩ := (Submodule.ne_bot_iff _).1 hne
   set δ : (Fin n → kˣ) →* ℂˣ := (deltaHalf k fun _ : Fin n => Unit).comp (leviTorus k (Fin n)).toMonoidHom
@@ -132,15 +171,28 @@ theorem UpperTheory.V.AlgebraTools.jqEmbed :
       ((hBZ k).2.1 _ _ _ (points (Fin n)) _ π hπ (hasFiniteLength_of_isIrreducible hirr))
   let q : fixd π (iwC k n C) →ₗ[ℂ] Jacquet π (unipB k (Fin n)) :=
     (Submodule.mkQ _) ∘ₗ (fixd π (iwC k n C)).subtype
-  have hq : ∀ t w, jacB π t (q w) = (δ t : ℂ) • q ((θ t : Module.End ℂ (fixd π (iwC k n C))) w) := fun t w => by
-    have h : q ((θ t : Module.End ℂ (fixd π (iwC k n C))) w) = (((δ t)⁻¹ : ℂˣ) : ℂ) • jacB π t (q w) :=
+  have hq
+      : ∀ t w,
+        jacB π t (q w)
+          = (δ t : ℂ) • q ((θ t : Module.End ℂ (fixd π (iwC k n C))) w) := fun t w => by
+    have h
+        : q ((θ t : Module.End ℂ (fixd π (iwC k n C))) w) = (((δ t)⁻¹ : ℂˣ) : ℂ) • jacB π t (q w) :=
       jqTheta k n C V π θ hθ t w
     rw [h, smul_smul, Units.mul_inv, one_smul]
   have hx : q v ≠ 0 := fun h => hv0 (jqInj k n C V π hπ v h)
-  have hxc : ∀ t, ∃ m : ℕ, ((jacB π t - algebraMap ℂ (Module.End ℂ (Jacquet π (unipB k (Fin n)))) ((χ * δ) t : ℂ)) ^ m) (q v) = 0 := fun t => by
+  have hxc
+      : ∀ t, ∃ m : ℕ,
+        ((jacB π t - algebraMap ℂ (Module.End ℂ (Jacquet π (unipB k (Fin n)))) ((χ * δ) t : ℂ)) ^ m)
+            (q v)
+          = 0 := fun t => by
     obtain ⟨m, hm⟩ := (Module.End.mem_maxGenEigenspace _ _ _).1 ((Submodule.mem_iInf _).1 hv t)
-    have h1 : ∀ m : ℕ, ((jacB π t - algebraMap ℂ (Module.End ℂ (Jacquet π (unipB k (Fin n)))) ((χ * δ) t : ℂ)) ^ m) (q v) =
-        (δ t : ℂ) ^ m • q ((((θ t : Module.End ℂ (fixd π (iwC k n C))) - (χ t : ℂ) • 1) ^ m) v) := fun m => by
+    have h1
+        : ∀ m : ℕ,
+          ((jacB π t - algebraMap ℂ (Module.End ℂ (Jacquet π (unipB k (Fin n)))) ((χ * δ) t : ℂ))
+                ^ m)
+              (q v)
+            = (δ t : ℂ) ^ m • q
+              ((((θ t : Module.End ℂ (fixd π (iwC k n C))) - (χ t : ℂ) • 1) ^ m) v) := fun m => by
       induction m with
       | zero => simp
       | succ m ih =>
@@ -156,8 +208,13 @@ theorem UpperTheory.V.AlgebraTools.jqEmbed :
       rw [torusChar_apply]
       conv_rhs => rw [← Finset.univ_prod_mulSingle t, map_prod]
       rfl
-  refine ⟨fun i => (χ * δ).comp (MonoidHom.mulSingle (fun _ => kˣ) i), fun i => hs.comp _ (continuous_mulSingle (A := fun _ => kˣ) i),
-    fun i x hxC => ?_, htc, ?_⟩
+  refine ⟨
+    fun i => (χ * δ).comp (MonoidHom.mulSingle (fun _ => kˣ) i),
+    fun i => hs.comp _ (continuous_mulSingle (A := fun _ => kˣ) i),
+    fun i x hxC => ?_,
+    htc,
+    ?_
+  ⟩
   · have ht : Pi.mulSingle i x ∈ torC k n C := fun j _ => by
       by_cases h : j = i
       · subst h; simpa using hxC
@@ -175,15 +232,20 @@ theorem UpperTheory.V.AlgebraTools.jqEmbed :
       rw [UnramFixed.jacB_apply, jacBU_mk, h2, ← hδ, h1]
       simp
     obtain ⟨m, hm⟩ := hxc t
-    have h1 : ∀ m : ℕ, ((jacB π t - algebraMap ℂ (Module.End ℂ (Jacquet π (unipB k (Fin n)))) ((χ * δ) t : ℂ)) ^ m) (q v) =
-        (1 - ((χ * δ) t : ℂ)) ^ m • q v := fun m => by
+    have h1
+        : ∀ m : ℕ,
+          ((jacB π t - algebraMap ℂ (Module.End ℂ (Jacquet π (unipB k (Fin n)))) ((χ * δ) t : ℂ))
+                ^ m)
+              (q v)
+            = (1 - ((χ * δ) t : ℂ)) ^ m • q v := fun m => by
       induction m with
       | zero => simp
       | succ m ih =>
         rw [pow_succ', Module.End.mul_apply, ih, map_smul, LinearMap.sub_apply, hfix,
           Module.algebraMap_end_apply, pow_succ, mul_smul, sub_smul, one_smul]
     rw [h1] at hm
-    exact Units.ext (sub_eq_zero.1 (pow_eq_zero_iff'.1 ((smul_eq_zero.1 hm).resolve_right hx)).1).symm
+    exact Units.ext (sub_eq_zero.1 (pow_eq_zero_iff'.1 ((smul_eq_zero.1 hm).resolve_right
+      hx)).1).symm
   · have key := GlobalTheory.SatakeExists.isSubquotient_of_eigenform hπ hirr (χ * δ) l hl0 hle
     rw [← htc] at key
     exact key

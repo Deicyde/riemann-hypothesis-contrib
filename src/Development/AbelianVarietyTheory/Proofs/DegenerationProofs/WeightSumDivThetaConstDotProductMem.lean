@@ -10,15 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsB
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 
 namespace GlobalTheory.ZH.DualSection
 
-theorem proj_mul_proj_eq_zero {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] [hA : ArithBase o Ω]
-    (S : ThetaSys o Ω) {T T' : AddSubgroup S.Gam} (h : T' ≤ T) (hT : S.IsoFree T) (hT' : S.IsoFree T')
-    (c : T →+ ZMod S.N) (c' : T' →+ ZMod S.N) (hc : c.comp (AddSubgroup.inclusion h) ≠ c') :
-    S.proj T c * S.proj T' c' = 0 := by
+theorem proj_mul_proj_eq_zero
+    {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] [hA : ArithBase o Ω]
+    (S : ThetaSys o Ω)
+    {T T' : AddSubgroup S.Gam} (h : T' ≤ T) (hT : S.IsoFree T) (hT' : S.IsoFree T')
+    (c : T →+ ZMod S.N) (c' : T' →+ ZMod S.N) (hc : c.comp (AddSubgroup.inclusion h) ≠ c')
+    : S.proj T c * S.proj T' c' = 0 := by
   haveI : IsDomain o := hA.inj.isDomain
   haveI := FreeNear.finite_char S T
   haveI := Fintype.ofFinite (T →+ ZMod S.N)
@@ -30,9 +33,10 @@ theorem proj_mul_proj_eq_zero {o Ω : Type} [CommRing o] [Field Ω] [Algebra o �
   rw [Set.Finite.mem_toFinset] at hc''
   exact hc hc''
 
-theorem mul_dotProduct_mem_of_mem_span {o Ω J : Type} [CommRing o] [Field Ω] [Algebra o Ω] [Fintype J]
-    (O : Subalgebra o Ω) (a : Ω) (u : J → Ω) (V : Set (J → Ω)) (hV : ∀ v ∈ V, a * (u ⬝ᵥ v) ∈ O) :
-    ∀ v ∈ Submodule.span O V, a * (u ⬝ᵥ v) ∈ O := by
+theorem mul_dotProduct_mem_of_mem_span
+    {o Ω J : Type} [CommRing o] [Field Ω] [Algebra o Ω] [Fintype J]
+    (O : Subalgebra o Ω) (a : Ω) (u : J → Ω) (V : Set (J → Ω)) (hV : ∀ v ∈ V, a * (u ⬝ᵥ v) ∈ O)
+    : ∀ v ∈ Submodule.span O V, a * (u ⬝ᵥ v) ∈ O := by
   intro v hv
   induction hv using Submodule.span_induction with
   | mem _ h' => exact hV _ h'

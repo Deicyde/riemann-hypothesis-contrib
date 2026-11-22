@@ -10,21 +10,23 @@ noncomputable section
 
 namespace Formalism.MainNotions.Inhab
 
-open Formalism.BasicNotions Formalism.BasicNotions.Examples₂ Formalism.FrobeniusOrbits Formalism.TwoAdicCyclotomicDecomposition NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.Examples₂ Formalism.FrobeniusOrbits
+  Formalism.TwoAdicCyclotomicDecomposition NumberField IsDedekindDomain
 open scoped Pointwise
 
 section General
 
 variable {R : Ranks} (H : Host R)
 
-theorem primesOver_ncard (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p.Prime) :
-    (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = (placesOver E p).ncard := by
+theorem primesOver_ncard (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p.Prime)
+    : (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = (placesOver E p).ncard := by
   have hpZ : Prime (p : ℤ) := Nat.prime_iff_prime_int.1 hp
   have hpI : (Ideal.span {(p : ℤ)}).IsPrime := (Ideal.span_singleton_prime hpZ.ne_zero).2 hpZ
   have hpM : (Ideal.span {(p : ℤ)}).IsMaximal :=
     hpI.isMaximal (by rw [Ne, Ideal.span_singleton_eq_bot]; exact hpZ.ne_zero)
-  have himg : (fun v : HeightOneSpectrum (𝓞 E) => v.asIdeal) '' placesOver E p =
-      (Ideal.span {(p : ℤ)}).primesOver (𝓞 E) := by
+  have himg
+      : (fun v : HeightOneSpectrum (𝓞 E) => v.asIdeal) '' placesOver E p
+        = (Ideal.span {(p : ℤ)}).primesOver (𝓞 E) := by
     ext I
     constructor
     · rintro ⟨v, hv, rfl⟩
@@ -73,8 +75,10 @@ structure Base (R : Ranks) (x eps Cp CT : ℝ) extends Fld R x eps where
   g_ne : g0 ≠ g1
   first_prime_in_window : Yof R x eps ≤ g0 ∧ (g0 : ℝ) ≤ 2 * Yof R x eps
   second_prime_in_window : Yof R x eps ≤ g1 ∧ (g1 : ℝ) ≤ 2 * Yof R x eps
-  first_prime_norm_form : ∃ u v : ℤ, (g0 : ℤ) = (1 + (QS * q * d : ℕ) * u) ^ 2 + d * ((QS * q * d : ℕ) * v) ^ 2
-  second_prime_norm_form : ∃ u v : ℤ, (g1 : ℤ) = (1 + (QS * q * d : ℕ) * u) ^ 2 + d * ((QS * q * d : ℕ) * v) ^ 2
+  first_prime_norm_form
+    : ∃ u v : ℤ, (g0 : ℤ) = (1 + (QS * q * d : ℕ) * u) ^ 2 + d * ((QS * q * d : ℕ) * v) ^ 2
+  second_prime_norm_form
+    : ∃ u v : ℤ, (g1 : ℤ) = (1 + (QS * q * d : ℕ) * u) ^ 2 + d * ((QS * q * d : ℕ) * v) ^ 2
   bb : Disjoint (Formalism.CyclotomicNorms.BB R.r g0) (Formalism.CyclotomicNorms.BB R.r g1)
   pde : ℕ
   pde' : ℕ
@@ -91,7 +95,8 @@ structure Base (R : Ranks) (x eps Cp CT : ℝ) extends Fld R x eps where
   T2 : Finset ℕ
   second_set_range : ∀ s ∈ T2, 4 * Lw * s < R.n0
   second_set_no_relation : NoRel T2 Lw
-  T2_card : (R.n0 : ℝ) * Real.exp (-(CT * Real.sqrt (Real.log (R.n0 : ℝ) * Real.log Lw))) / Lw ≤ T2.card
+  T2_card
+    : (R.n0 : ℝ) * Real.exp (-(CT * Real.sqrt (Real.log (R.n0 : ℝ) * Real.log Lw))) / Lw ≤ T2.card
   TT : Finset (R.A)
 
 variable {R : Ranks} {x eps Cp CT : ℝ} (B : Base R x eps Cp CT)

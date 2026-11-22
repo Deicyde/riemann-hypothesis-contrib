@@ -11,9 +11,9 @@ open scoped ENNReal
 
 namespace GlobalTheory
 
-theorem exists_denominator_of_fg {V : Type} [AddCommGroup V] (B : V →ₗ[ℤ] V →ₗ[ℤ] ℚ)
-    (M : Submodule ℤ V) (hM : M.FG) :
-    ∃ d : ℕ, 0 < d ∧ ∀ x ∈ M, ∀ y ∈ M, ∃ n : ℤ, (d : ℚ) * B x y = n := by
+theorem exists_denominator_of_fg
+    {V : Type} [AddCommGroup V] (B : V →ₗ[ℤ] V →ₗ[ℤ] ℚ) (M : Submodule ℤ V) (hM : M.FG)
+    : ∃ d : ℕ, 0 < d ∧ ∀ x ∈ M, ∀ y ∈ M, ∃ n : ℤ, (d : ℚ) * B x y = n := by
   obtain ⟨s, hs⟩ := Submodule.FG.map₂ B hM hM
   refine ⟨∏ a ∈ s, a.den, Finset.prod_pos fun a _ => a.den_pos, ?_⟩
   have key : ∀ r ∈ Submodule.span ℤ (s : Set ℚ), ∃ n : ℤ, ((∏ a ∈ s, a.den : ℕ) : ℚ) * r = n := by
@@ -24,8 +24,10 @@ theorem exists_denominator_of_fg {V : Type} [AddCommGroup V] (B : V →ₗ[ℤ] 
       refine ⟨c * a.num, ?_⟩
       rw [hc]
       push_cast
-      rw [← Rat.den_mul_eq_num]; ring
-    | zero => exact ⟨0, by simp⟩
+      rw [← Rat.den_mul_eq_num]
+      ring
+    | zero =>
+      exact ⟨0, by simp⟩
     | add a b _ _ ha hb =>
       obtain ⟨m, hm⟩ := ha
       obtain ⟨n, hn⟩ := hb
@@ -36,15 +38,26 @@ theorem exists_denominator_of_fg {V : Type} [AddCommGroup V] (B : V →ₗ[ℤ] 
   intro x hx y hy
   exact key _ (hs ▸ Submodule.apply_mem_map₂ B hx hy)
 
-theorem isom_sub_mem_of_congr : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (U X : Submodule K V) (M : Submodule (𝓞 K) V) (γ : V ≃ₗ[K] V) (g : ℕ), h.IsSymm → X ≤ U → (∀ x ∈ X, ∀ y ∈ U, h x y = 0) → (∀ x ∈ U, x ∉ X → 0 < Algebra.trace ℚ K (h x x)) → M.FG → (∀ x ∈ M, x ∈ U) → γ ∈ Formalism.HermitianLatticesTheory.isom h → (∀ x ∈ X, γ x ∈ X) → 3 ≤ g → (∀ x ∈ M, ∃ y ∈ M, γ x - x - (g : K) • y ∈ X) → ∀ x ∈ M, γ x - x ∈ X := by
+theorem isom_sub_mem_of_congr
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K)
+        (U X : Submodule K V) (M : Submodule (𝓞 K) V) (γ : V ≃ₗ[K] V) (g : ℕ),
+      h.IsSymm → X ≤ U → (∀ x ∈ X, ∀ y ∈ U, h x y = 0)
+        → (∀ x ∈ U, x ∉ X → 0 < Algebra.trace ℚ K (h x x)) → M.FG → (∀ x ∈ M, x ∈ U)
+        → γ ∈ Formalism.HermitianLatticesTheory.isom h → (∀ x ∈ X, γ x ∈ X) → 3 ≤ g
+        → (∀ x ∈ M, ∃ y ∈ M, γ x - x - (g : K) • y ∈ X)
+        → ∀ x ∈ M, γ x - x ∈ X := by
   intro K V _ _ _ _ _ _ _ _ h U X M γ g hs hXU hrad hpos hM hMU hγ hγX hg hcong
   have hiso : ∀ x y, h (γ x) (γ y) = h x y := hγ
   have hrad' : ∀ y ∈ U, ∀ x ∈ X, h y x = 0 := fun y hy x hx => by
     rw [← hs.eq x y, hrad x hx y hy, map_zero]
-  let B : V →ₗ[ℤ] V →ₗ[ℤ] ℚ := LinearMap.mk₂ ℤ (fun x y => Algebra.trace ℚ K (h x y))
-    (fun a b c => by simp) (fun c a b => by rw [map_zsmul h, LinearMap.smul_apply, map_zsmul])
-    (fun a b c => by simp)
-    (fun c a b => by rw [map_zsmul (h a), map_zsmul])
+  let B : V →ₗ[ℤ] V →ₗ[ℤ] ℚ :=
+    LinearMap.mk₂ ℤ
+      (fun x y => Algebra.trace ℚ K (h x y))
+      (fun a b c => by simp)
+      (fun c a b => by rw [map_zsmul h, LinearMap.smul_apply, map_zsmul])
+      (fun a b c => by simp)
+      (fun c a b => by rw [map_zsmul (h a), map_zsmul])
   have hB : ∀ x y, B x y = Algebra.trace ℚ K (h x y) := fun _ _ => rfl
   obtain ⟨d, hd, hden⟩ := exists_denominator_of_fg B (M.restrictScalars ℤ) (hM.restrictScalars)
   have hnn : ∀ x ∈ U, 0 ≤ B x x := fun x hx => by
@@ -77,7 +90,9 @@ theorem isom_sub_mem_of_congr : ∀ (K V : Type) [Field K] [NumberField K] [Star
         have e1 : B u z = 0 := by rw [hB, hrad u hu z hzU, map_zero]
         have e2 : B y u = 0 := by rw [hB, hrad' y hyU u hu, map_zero]
         have hz' : z = (g : ℤ) • y + u := by rw [hz, natCast_zsmul, Nat.cast_smul_eq_nsmul]
-        calc B z z = B ((g : ℤ) • y + u) z := by rw [← hz']
+        calc
+          B z z
+            = B ((g : ℤ) • y + u) z := by rw [← hz']
           _ = (g : ℤ) • B y z := by rw [map_add (f := _), LinearMap.add_apply, e1, map_smul]; simp
           _ = (g : ℤ) • B y ((g : ℤ) • y + u) := by rw [← hz']
           _ = _ := by rw [map_add (f := _), e2, map_smul]; simp; ring
@@ -102,10 +117,11 @@ theorem isom_sub_mem_of_congr : ∀ (K V : Type) [Field K] [NumberField K] [Star
       have han : a < n + 1 := by
         rw [ha] at hlt
         exact_mod_cast hlt
-      have hyX : γ y - y ∈ X := ih y hy (by
-        rw [hb]
-        have : b < n := by omega
-        exact_mod_cast this)
+      have hyX : γ y - y ∈ X :=
+        ih y hy (by
+          rw [hb]
+          have : b < n := by omega
+          exact_mod_cast this)
       have hw : γ z - z ∈ X := by
         have : γ z - z = (g : K) • (γ y - y) + (γ u - u) := by
           rw [hz, map_add (f := _), map_smul, smul_sub]; abel

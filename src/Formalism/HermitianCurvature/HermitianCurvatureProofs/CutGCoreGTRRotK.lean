@@ -12,6 +12,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGCoreGTRR
 namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
 theorem rotation_K_invariance_holds : GTRRotK :=
-  gTRRotK_of_mat_fin_centre_sec_ode_wirt rotation_matrix_form_holds rotation_finite_from_matrix rotation_centre_condition rotation_section_holds rotation_ode_holds rotation_wirtinger_holds
+  gTRRotK_of_mat_fin_centre_sec_ode_wirt rotation_matrix_form_holds rotation_finite_from_matrix
+    rotation_centre_condition rotation_section_holds rotation_ode_holds rotation_wirtinger_holds
 
 end Formalism.FourierDecayAlt.P.CutMP.Gauge.GC

@@ -5,29 +5,41 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ArchBet
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top GlobalTheory.CompanionTheory.Ar.Small GlobalTheory.CompanionTheory.Ar.Cmp GlobalTheory.CompanionTheory.Ar.Ht
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo NumberField
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+  GlobalTheory.CompanionTheory.Ar.Small GlobalTheory.CompanionTheory.Ar.Cmp
+  GlobalTheory.CompanionTheory.Ar.Ht
 
 namespace GlobalTheory.CompanionTheory.Ar.CancelBound
 
-theorem log_h_scale {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (A : HermLine ι) (c : K → ℂ)
-    (z : (Σ k, ι k) → ℂ) (hc : ∀ k, c k ≠ 0) (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) :
-    Real.log (A.h fun p => c p.1 * z p) = (∑ k, (A.a k : ℝ) * Real.log ‖c k‖) + Real.log (A.h z) := by
+theorem log_h_scale
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (A : HermLine ι)
+    (c : K → ℂ) (z : (Σ k, ι k) → ℂ) (hc : ∀ k, c k ≠ 0) (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+    : Real.log (A.h fun p => c p.1 * z p)
+      = (∑ k, (A.a k : ℝ) * Real.log ‖c k‖) + Real.log (A.h z) := by
   have hne : ∀ k, ‖c k‖ ^ A.a k ≠ 0 := fun k => zpow_ne_zero _ (norm_ne_zero_iff.mpr (hc k))
   rw [A.smul c z hc, Real.log_mul (Finset.prod_ne_zero_iff.mpr fun k _ => hne k) (A.pos z hz).ne',
     Real.log_prod (fun k _ => hne k)]
   congr 1
   exact Finset.sum_congr rfl fun k _ => Real.log_zpow _ _
 
-theorem continuousOn_log_h {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (A : HermLine ι)
-    (hA : IsSmoothHerm A) :
-    ContinuousOn (fun z => Real.log (A.h z)) {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} :=
+theorem continuousOn_log_h
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (A : HermLine ι) (hA : IsSmoothHerm A)
+    : ContinuousOn (fun z => Real.log (A.h z)) {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} :=
   ContinuousOn.log (ContDiffOn.continuousOn hA) fun z hz => (A.pos z hz).ne'
 
-theorem log_metrics_bounded (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (J : Type) (A : HermLine ι)
-    (B : J → HermLine ι) (T : Finset J) (hA : IsSmoothHerm A) (hB : ∀ j, IsSmoothHerm (B j))
-    (hdeg : A.a = -∑ j ∈ T, (B j).a) :
-    ∃ C : ℝ, ∀ z : (Σ k, ι k) → ℂ, (∀ k, ∃ a, z ⟨k, a⟩ ≠ 0) →
-      |Real.log (A.h z) + ∑ j ∈ T, Real.log ((B j).h z)| ≤ C := by
+theorem log_metrics_bounded
+    (K : Type) [Fintype K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    (J : Type)
+    (A : HermLine ι) (B : J → HermLine ι) (T : Finset J)
+    (hA : IsSmoothHerm A) (hB : ∀ j, IsSmoothHerm (B j)) (hdeg : A.a = - ∑ j ∈ T, (B j).a)
+    : ∃ C : ℝ, ∀ z : (Σ k, ι k) → ℂ,
+      (∀ k, ∃ a, z ⟨k, a⟩ ≠ 0) → |Real.log (A.h z) + ∑ j ∈ T, Real.log ((B j).h z)| ≤ C := by
   classical
   let f : ((Σ k, ι k) → ℂ) → ℝ := fun z => Real.log (A.h z) + ∑ j ∈ T, Real.log ((B j).h z)
   let n : K → ((Σ k, ι k) → ℂ) → ℝ := fun k z => ∑ i, ‖z ⟨k, i⟩‖
@@ -57,8 +69,12 @@ theorem log_metrics_bounded (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fin
     intro z hz
     rw [mem_closedBall_zero_iff, pi_norm_le_iff_of_nonneg zero_le_one]
     rintro ⟨k, i⟩
-    calc ‖z ⟨k, i⟩‖ ≤ n k z :=
-          Finset.single_le_sum (f := fun i => ‖z ⟨k, i⟩‖) (fun _ _ => norm_nonneg _) (Finset.mem_univ i)
+    calc
+      ‖z ⟨k, i⟩‖ ≤ n k z :=
+        Finset.single_le_sum
+          (f := fun i => ‖z ⟨k, i⟩‖)
+          (fun _ _ => norm_nonneg _)
+          (Finset.mem_univ i)
       _ = 1 := hz k
   have hScpt : IsCompact S := Metric.isCompact_of_isClosed_isBounded hScl hSb
   have hfc : ContinuousOn f S := by
@@ -69,8 +85,7 @@ theorem log_metrics_bounded (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fin
   refine ⟨C, fun z hz => ?_⟩
   let c : K → ℂ := fun k => (((n k z)⁻¹ : ℝ) : ℂ)
   let w : (Σ k, ι k) → ℂ := fun p => c p.1 * z p
-  have hc : ∀ k, c k ≠ 0 := fun k =>
-    Complex.ofReal_ne_zero.mpr (inv_ne_zero (hnpos z hz k).ne')
+  have hc : ∀ k, c k ≠ 0 := fun k => Complex.ofReal_ne_zero.mpr (inv_ne_zero (hnpos z hz k).ne')
   have hwS : w ∈ S := by
     intro k
     have hn := (hnpos z hz k).ne'
@@ -84,7 +99,7 @@ theorem log_metrics_bounded (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fin
     exact inv_mul_cancel₀ hn
   have hdegk : ∀ k, (A.a k : ℝ) + ∑ j ∈ T, ((B j).a k : ℝ) = 0 := by
     intro k
-    have hk : A.a k = -∑ j ∈ T, (B j).a k := by
+    have hk : A.a k = - ∑ j ∈ T, (B j).a k := by
       rw [hdeg]
       simp [Finset.sum_apply]
     rw [hk]
@@ -92,10 +107,11 @@ theorem log_metrics_bounded (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fin
     ring
   have hfw : f w = f z := by
     simp only [f, w]
-    rw [log_h_scale A c z hc hz,
-      Finset.sum_congr rfl fun j _ => log_h_scale (B j) c z hc hz, Finset.sum_add_distrib,
-      Finset.sum_comm]
-    have hz0 : (∑ k, (A.a k : ℝ) * Real.log ‖c k‖) + ∑ k, ∑ j ∈ T, ((B j).a k : ℝ) * Real.log ‖c k‖ = 0 := by
+    rw [log_h_scale A c z hc hz, Finset.sum_congr rfl fun j _ => log_h_scale (B j) c z hc hz,
+      Finset.sum_add_distrib, Finset.sum_comm]
+    have hz0
+        : (∑ k, (A.a k : ℝ) * Real.log ‖c k‖) + ∑ k, ∑ j ∈ T, ((B j).a k : ℝ) * Real.log ‖c k‖
+          = 0 := by
       rw [← Finset.sum_add_distrib]
       refine Finset.sum_eq_zero fun k _ => ?_
       rw [← Finset.sum_mul, ← add_mul, hdegk k, zero_mul]

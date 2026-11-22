@@ -12,23 +12,28 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW
 
-private theorem cast_succ_div_two_of_odd {t : ℕ} (ht : Odd t) :
-    (((t + 1) / 2 : ℕ) : ℝ) = ((t : ℝ) + 1) / 2 := by
+private theorem cast_succ_div_two_of_odd {t : ℕ} (ht : Odd t)
+    : (((t + 1) / 2 : ℕ) : ℝ) = ((t : ℝ) + 1) / 2 := by
   obtain ⟨k, rfl⟩ := ht
   have h : (2 * k + 1 + 1) / 2 = k + 1 := by omega
   rw [h]
   push_cast
   ring
 
-theorem _root_.GlobalTheory.HTW.wHat_le : ∀ {D : _root_.Formalism.BasicNotions.D7} (L : _root_.Formalism.BasicNotions.SizeData₂ D) (C : ℝ),
-    _root_.GlobalTheory.HTW.Roomy L C →
-    (_root_.GlobalTheory.HTW.wHat D : ℝ) = _root_.GlobalTheory.HTW.wMax D + ((D.R.t : ℝ) + 1) / 2 ∧
-    (_root_.GlobalTheory.HTW.wHat D : ℝ) + (L.etaSz + D.R.t + 2) ≤ 2 * L.sc.b' ∧
-    (_root_.GlobalTheory.HTW.wHat D : ℝ) + _root_.GlobalTheory.HTW.sHat L + _root_.GlobalTheory.HTW.etaHat L + 1
-      ≤ 2 * L.sc.b' := by
+theorem _root_.GlobalTheory.HTW.wHat_le
+    : ∀ {D : _root_.Formalism.BasicNotions.D7} (L : _root_.Formalism.BasicNotions.SizeData₂ D)
+        (C : ℝ),
+      _root_.GlobalTheory.HTW.Roomy L C
+        → (_root_.GlobalTheory.HTW.wHat D : ℝ)
+            = _root_.GlobalTheory.HTW.wMax D + ((D.R.t : ℝ) + 1) / 2
+          ∧ (_root_.GlobalTheory.HTW.wHat D : ℝ) + (L.etaSz + D.R.t + 2) ≤ 2 * L.sc.b'
+          ∧ (_root_.GlobalTheory.HTW.wHat D : ℝ) + _root_.GlobalTheory.HTW.sHat L
+              + _root_.GlobalTheory.HTW.etaHat L + 1
+            ≤ 2 * L.sc.b' := by
   intro D L C hL
-  have hw : (_root_.GlobalTheory.HTW.wHat D : ℝ) =
-      _root_.GlobalTheory.HTW.wMax D + ((D.R.t : ℝ) + 1) / 2 := by
+  have hw
+      : (_root_.GlobalTheory.HTW.wHat D : ℝ)
+        = _root_.GlobalTheory.HTW.wMax D + ((D.R.t : ℝ) + 1) / 2 := by
     unfold _root_.GlobalTheory.HTW.wHat
     push_cast [cast_succ_div_two_of_odd D.R.t_odd]
     rfl

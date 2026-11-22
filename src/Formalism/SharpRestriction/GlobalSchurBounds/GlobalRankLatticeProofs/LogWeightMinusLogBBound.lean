@@ -8,8 +8,11 @@ noncomputable section
 namespace Formalism.MainNotions.StandardLattice
 open NumberField Formalism.BasicNotions Finset
 
-theorem b_ge_one_section_B (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : DataB D sc C0 Δ w)
-    (ρ : D.what₂.Tau) (j : ℕ) (hj : j < D.R.m) : 1 ≤ bN D ρ j := by
+theorem b_ge_one_section_B
+    (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : DataB D sc C0 Δ w)
+    (ρ : D.what₂.Tau)
+    (j : ℕ) (hj : j < D.R.m)
+    : 1 ≤ bN D ρ j := by
   unfold DataB at hB
   obtain ⟨hpi, hlogv, hf, hmk, hk, hg, hΔ, hv1, hv2, hu1, hu2, hu3, hw, hinc, hb0, hgap⟩ := hB
   have hL := scale_one_le_L sc
@@ -37,8 +40,11 @@ theorem b_ge_one_section_B (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.wh
       linarith
   exact hpos j hj
 
-theorem weights_le_two_b (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : DataB D sc C0 Δ w)
-    (ρ : D.what₂.Tau) (j : ℕ) (hj : j < D.R.m) : w j ρ ≤ 2 * sc.b := by
+theorem weights_le_two_b
+    (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : DataB D sc C0 Δ w)
+    (ρ : D.what₂.Tau)
+    (j : ℕ) (hj : j < D.R.m)
+    : w j ρ ≤ 2 * sc.b := by
   unfold DataB at hB
   obtain ⟨hpi, hlogv, hf, hmk, hk, hg, hΔ, hv1, hv2, hu1, hu2, hu3, hw, hinc, hb0, hgap⟩ := hB
   have hstep : ∀ i, i + 1 < D.R.m → w i ρ ≤ w (i + 1) ρ := fun i hi =>
@@ -55,9 +61,12 @@ theorem weights_le_two_b (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.what
       exact le_trans (hstep i (by omega)) (ih (i + 1) (by omega))
   exact le_trans (hmono (D.R.m - 1 - j) j (by omega)) (hb0 ρ).2
 
-theorem log_weight_minus_log_b_bound (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : DataB D sc C0 Δ w)
-    (ρ : D.what₂.Tau) (j : ℕ) (hj : j < D.R.m) :
-    (D.R.k : ℝ) * Real.log (w j ρ) - ((D.R.k : ℝ) - 1) * Real.log (bN D ρ j) ≤ (D.R.k : ℝ) / sc.x + 2 * sc.L := by
+theorem log_weight_minus_log_b_bound
+    (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : DataB D sc C0 Δ w)
+    (ρ : D.what₂.Tau)
+    (j : ℕ) (hj : j < D.R.m)
+    : (D.R.k : ℝ) * Real.log (w j ρ) - ((D.R.k : ℝ) - 1) * Real.log (bN D ρ j)
+      ≤ (D.R.k : ℝ) / sc.x + 2 * sc.L := by
   have hb1 := b_ge_one_section_B D sc C0 Δ w hB ρ j hj
   have hwl := weights_le_two_b D sc C0 Δ w hB ρ j hj
   unfold DataB at hB
@@ -94,17 +103,20 @@ theorem log_weight_minus_log_b_bound (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : �
   have hkx : ((D.R.k : ℝ) - 1) * (1 / sc.x) ≤ (D.R.k : ℝ) / sc.x := by
     have e : ((D.R.k : ℝ) - 1) * (1 / sc.x) = (D.R.k : ℝ) / sc.x - 1 / sc.x := by ring
     linarith
-  have hmul : ((D.R.k : ℝ) - 1) * (Real.log (w j ρ) - Real.log (bN D ρ j)) ≤
-      ((D.R.k : ℝ) - 1) * (1 / sc.x) :=
+  have hmul
+      : ((D.R.k : ℝ) - 1) * (Real.log (w j ρ) - Real.log (bN D ρ j))
+        ≤ ((D.R.k : ℝ) - 1) * (1 / sc.x) :=
     mul_le_mul_of_nonneg_left hratio (by linarith)
   nlinarith
 
-theorem place_dimension_lower_bound (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : DataB D sc C0 Δ w)
-    (h2k : Real.log (2 * (D.R.k : ℝ)) ≤ sc.L)
-    (hx : 2 * (Real.log 8 + 1 + Real.log sc.x) ≤ sc.L) (u : D.what₂.Word) (ρ : D.what₂.Tau)
-    (h3 : (2 / 3 : ℝ) * dimV (rowLam D ρ) ≤ D.dsig ρ) :
-    Real.log (2 / 3) + ((D.R.k : ℝ) - 1) * ∑ j ∈ range D.R.m, Real.log (bN D ρ j) - 5 * D.R.k * sc.L ≤
-      Real.log (D.dsig ρ * facProd D.R.r / vand (uColR D u ρ)) := by
+theorem place_dimension_lower_bound
+    (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : DataB D sc C0 Δ w)
+    (h2k : Real.log (2 * (D.R.k : ℝ)) ≤ sc.L) (hx : 2 * (Real.log 8 + 1 + Real.log sc.x) ≤ sc.L)
+    (u : D.what₂.Word)
+    (ρ : D.what₂.Tau) (h3 : (2 / 3 : ℝ) * dimV (rowLam D ρ) ≤ D.dsig ρ)
+    : Real.log (2 / 3) + ((D.R.k : ℝ) - 1) * ∑ j ∈ range D.R.m, Real.log (bN D ρ j)
+        - 5 * D.R.k * sc.L
+      ≤ Real.log (D.dsig ρ * facProd D.R.r / vand (uColR D u ρ)) := by
   have hP := place_data_under_section_B D sc C0 Δ w hB u ρ
   have hm2 := D.R.two_le_m
   have hk5 := D.R.m_add_three_le_k
@@ -112,14 +124,22 @@ theorem place_dimension_lower_bound (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ
     unfold DataB at hB
     exact hB.2.2.2.2.2.2.1
   have hx1 : (1 : ℝ) ≤ sc.x := sc.one_lt_alt.le
-  obtain ⟨hvu, hvr, hVV⟩ := Formalism.LogVandermondeBounds.StandardLattice.VandPlace_holds sc.eps sc.x sc.eps_pos hx1 D.R.k D.R.m Δ
-    (uN D u ρ) (vN D ρ) (bN D ρ) (fun j => w j ρ) (by omega) (by omega) hΔ hP
+  obtain ⟨hvu, hvr, hVV⟩ :=
+    Formalism.LogVandermondeBounds.StandardLattice.VandPlace_holds sc.eps sc.x sc.eps_pos hx1 D.R.k
+      D.R.m Δ (uN D u ρ) (vN D ρ) (bN D ρ)
+      (fun j => w j ρ)
+      (by omega) (by omega) hΔ hP
   have hfac : 0 < facProd D.R.r := Finset.prod_pos fun i _ => by exact_mod_cast Nat.factorial_pos i
-  have hvandu : vand (uColR D u ρ) = Formalism.LogVandermondeBounds.StandardLattice.vandN (uN D u ρ) D.R.k := by
+  have hvandu
+      : vand (uColR D u ρ)
+        = Formalism.LogVandermondeBounds.StandardLattice.vandN (uN D u ρ) D.R.k := by
     rw [column_param_eq_fun, vandermonde_fin_eq_nat]
-  have hdimrow : dimV (rowLam D ρ) =
-      Formalism.LogVandermondeBounds.StandardLattice.vandN (Formalism.LogVandermondeBounds.StandardLattice.rowPar D.R.k (vN D ρ) (bN D ρ)) (D.R.k - 1 + D.R.m) /
-        facProd D.R.r := by
+  have hdimrow
+      : dimV (rowLam D ρ)
+        = Formalism.LogVandermondeBounds.StandardLattice.vandN
+            (Formalism.LogVandermondeBounds.StandardLattice.rowPar D.R.k (vN D ρ) (bN D ρ))
+            (D.R.k - 1 + D.R.m)
+          / facProd D.R.r := by
     rw [dim_weyl_line_eq, rank_eq_sum]
     rfl
   set A := Formalism.LogVandermondeBounds.StandardLattice.vandN (Formalism.LogVandermondeBounds.StandardLattice.rowPar D.R.k (vN D ρ) (bN D ρ)) (D.R.k - 1 + D.R.m) with hAdef
@@ -134,9 +154,11 @@ theorem place_dimension_lower_bound (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ
     rw [div_eq_mul_inv, div_eq_mul_inv]
     exact mul_le_mul_of_nonneg_right hA' (inv_nonneg.mpr hvu.le)
   have hlog1 := Real.log_le_log (div_pos (mul_pos (by norm_num) hvr) hvu) hdivle
-  rw [Real.log_div (mul_pos (by norm_num) hvr).ne' hvu.ne', Real.log_mul (by norm_num) hvr.ne'] at hlog1
+  rw [Real.log_div (mul_pos (by norm_num) hvr).ne' hvu.ne', Real.log_mul (by norm_num) hvr.ne']
+    at hlog1
   have hLd : sc.L = sc.x ^ sc.eps := rfl
-  have h8 : Real.log (8 * (sc.x * Real.exp (sc.x ^ sc.eps))) = Real.log 8 + Real.log sc.x + sc.L := by
+  have h8
+      : Real.log (8 * (sc.x * Real.exp (sc.x ^ sc.eps))) = Real.log 8 + Real.log sc.x + sc.L := by
     rw [Real.log_mul (by norm_num) (mul_pos (by linarith) (Real.exp_pos _)).ne',
       Real.log_mul (by linarith) (Real.exp_pos _).ne', Real.log_exp, hLd]
     ring
@@ -148,19 +170,24 @@ theorem place_dimension_lower_bound (D : D7) (sc : Scale) (C0 Δ : ℝ) (w : ℕ
   rw [hvandu]
   linarith
 
-theorem log_X_lower_arithmetic (F K Mm Lr lv l2v G SL SG SP SW X lo : ℝ)
-    (hF : 1 ≤ F) (hM : 44 ≤ Mm) (hMK : Mm ≤ K) (hL : 1 ≤ Lr) (hlv0 : 0 ≤ lv) (hlv : lv ≤ Lr) (hl2v : l2v ≤ Lr)
-    (hG : 0 ≤ G) (hSL : -(F * (Mm - 1)) ≤ SL) (hSG : -2 ≤ SG)
+theorem log_X_lower_arithmetic
+    (F K Mm Lr lv l2v G SL SG SP SW X lo : ℝ)
+    (hF : 1 ≤ F) (hM : 44 ≤ Mm) (hMK : Mm ≤ K) (hL : 1 ≤ Lr) (hlv0 : 0 ≤ lv) (hlv : lv ≤ Lr)
+    (hl2v : l2v ≤ Lr) (hG : 0 ≤ G) (hSL : -(F * (Mm - 1)) ≤ SL) (hSG : -2 ≤ SG)
     (hSPW : F * (-1 - 5 * K * Lr - (K + 2 * K * Lr)) ≤ SP - K * SW)
-    (hid : F * K * X = F * ((Mm - 1) * K + Mm * (Mm - 1) / 2) * lv - F * ((Mm - 1) / 2) * l2v + SL +
-      F * (Mm * (2 * K + Mm - 1) / 2) * G + F * SG + SP)
-    (hlo : F * K * lo = K * SW + F * K * Mm * lv + F * K * Mm * G - 11 * F * K * Lr) : lo ≤ X := by
+    (hid : F * K * X
+      = F * ((Mm - 1) * K + Mm * (Mm - 1) / 2) * lv - F * ((Mm - 1) / 2) * l2v + SL
+        + F * (Mm * (2 * K + Mm - 1) / 2) * G + F * SG + SP)
+    (hlo : F * K * lo = K * SW + F * K * Mm * lv + F * K * Mm * G - 11 * F * K * Lr)
+    : lo ≤ X := by
   have hK : 0 < K := by linarith
   have hF0 : 0 ≤ F := by linarith
   have hFK : 0 < F * K := mul_pos (by linarith) hK
   have hMM : 0 ≤ Mm * (Mm - 1) / 2 := by nlinarith
-  have key : F * K * (X - lo) = F * (Mm * (Mm - 1) / 2) * lv - F * K * lv - F * ((Mm - 1) / 2) * l2v +
-      SL + F * (Mm * (Mm - 1) / 2) * G + F * SG + (SP - K * SW) + 11 * F * K * Lr := by
+  have key
+      : F * K * (X - lo)
+        = F * (Mm * (Mm - 1) / 2) * lv - F * K * lv - F * ((Mm - 1) / 2) * l2v + SL
+          + F * (Mm * (Mm - 1) / 2) * G + F * SG + (SP - K * SW) + 11 * F * K * Lr := by
     linear_combination hid - hlo
   have hQ : 0 ≤ 3 * K * Lr - (Mm - 1) / 2 * Lr - Mm - 2 - K := by
     nlinarith [mul_le_mul_of_nonneg_right hMK (by linarith : (0 : ℝ) ≤ Lr),

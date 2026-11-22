@@ -14,15 +14,14 @@ namespace Formalism.UG.P
 theorem sigma_involution_holds : Formalism.UG.CS.SigmaInvol := by
   intro F E _ _ _ _ _ σ hσ e
   let τ : E →+* ℂ := (IsAlgClosed.lift : E →ₐ[ℚ] ℂ).toRingHom
-  have h : ∀ x, τ (σ x) = starRingEnd ℂ (τ x) := fun x => by
-    simpa using RingHom.congr_fun (hσ τ) x
+  have h : ∀ x, τ (σ x) = starRingEnd ℂ (τ x) := fun x => by simpa using RingHom.congr_fun (hσ τ) x
   apply τ.injective
   rw [h, h, Complex.conj_conj]
 
-theorem csEasy_stdLat_eq_range (E : Type) [Field E] [NumberField E] (n : Type) [Fintype n]
-    [DecidableEq n] :
-    Formalism.UG.stdLat (n := n) (A := E) (𝓞 E) =
-      LinearMap.range (LinearMap.pi (fun i : n =>
+theorem csEasy_stdLat_eq_range
+    (E : Type) [Field E] [NumberField E] (n : Type) [Fintype n] [DecidableEq n]
+    : Formalism.UG.stdLat (n := n) (A := E) (𝓞 E)
+      = LinearMap.range (LinearMap.pi (fun i : n =>
         (Algebra.linearMap (𝓞 E) E).comp (LinearMap.proj i))) := by
   ext x
   simp only [Formalism.UG.stdLat, Submodule.mem_pi, Set.mem_univ, true_implies, LinearMap.mem_range]
@@ -42,17 +41,20 @@ theorem standard_lattice_full_holds : Formalism.UG.CS.StdLatFull := by
     rintro _ ⟨i, rfl⟩
     apply Submodule.subset_span
     show Pi.basisFun E n i ∈ Formalism.UG.stdLat (n := n) (A := E) (𝓞 E)
-    simp only [Formalism.UG.stdLat, Submodule.mem_pi, Set.mem_univ, true_implies, LinearMap.mem_range,
-      Pi.basisFun_apply]
+    simp only [Formalism.UG.stdLat, Submodule.mem_pi, Set.mem_univ, true_implies,
+      LinearMap.mem_range, Pi.basisFun_apply]
     intro j
     rw [Pi.single_apply]
     split_ifs
     · exact ⟨1, by simp⟩
     · exact ⟨0, by simp⟩
 
-theorem csEasy_formJ_apply {E : Type} [Field E] (σ : E →+* E) (hσ : ∀ e, σ (σ e) = e)
-    {n : Type} [Fintype n] [DecidableEq n] (J : Matrix n n E) (c : E) (x y : n → E) :
-    Formalism.UG.CS.formJ σ hσ J c x y = c * Formalism.UG.hform σ J x y := by
+theorem csEasy_formJ_apply
+    {E : Type} [Field E]
+    (σ : E →+* E) (hσ : ∀ e, σ (σ e) = e)
+    {n : Type} [Fintype n] [DecidableEq n]
+    (J : Matrix n n E) (c : E) (x y : n → E)
+    : Formalism.UG.CS.formJ σ hσ J c x y = c * Formalism.UG.hform σ J x y := by
   unfold Formalism.UG.CS.formJ Formalism.UG.hform
   rw [Matrix.toLinearMapₛₗ₂'_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -112,6 +114,7 @@ theorem unitary_isometry_lattice_holds : Formalism.UG.CS.IsomUJ := by
   · intro h
     ext i j
     have := h (Pi.single i 1) (Pi.single j 1)
-    rwa [hform_single_single_stabilizer_orbit_volume, hform_single_single_stabilizer_orbit_volume] at this
+    rwa [hform_single_single_stabilizer_orbit_volume, hform_single_single_stabilizer_orbit_volume]
+      at this
 
 end Formalism.UG.P

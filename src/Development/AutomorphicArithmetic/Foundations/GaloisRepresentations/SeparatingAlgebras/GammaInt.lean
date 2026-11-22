@@ -7,16 +7,17 @@ public import GroundTheory.AutomorphicForms.Cartan
 
 open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical UpperTheory.Gal.Gen
 
-private theorem qInv_props (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] : 0 ≤ ((qF F : ℝ))⁻¹ ∧ ((qF F : ℝ))⁻¹ < 1 := by
+private theorem qInv_props
+    (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    : 0 ≤ ((qF F : ℝ))⁻¹ ∧ ((qF F : ℝ))⁻¹ < 1 := by
   have h : 1 < qF F := by
     haveI := fintypeResidue' (F := F)
     exact Finite.one_lt_card
   have h' : (1 : ℝ) < (qF F : ℝ) := by exact_mod_cast h
   exact ⟨by positivity, inv_lt_one_of_one_lt₀ h'⟩
 
-theorem UpperTheory.Gal.Gen.gammaInt_pf :
-    UpperTheory.Gal.Gen.RInt → UpperTheory.Gal.Gen.DensCont → UpperTheory.Gal.Gen.GammaInt := by
+theorem UpperTheory.Gal.Gen.gammaInt_pf
+    : UpperTheory.Gal.Gen.RInt → UpperTheory.Gal.Gen.DensCont → UpperTheory.Gal.Gen.GammaInt := by
   intro hR hD F _ _ _ _ n _ _ μ _ g
   obtain ⟨ht0, ht1⟩ := qInv_props F
   have htc : (((((qF F : ℝ))⁻¹ : ℝ)) : ℂ) = ((qF F : ℂ))⁻¹ := by push_cast; rfl
@@ -28,8 +29,10 @@ theorem UpperTheory.Gal.Gen.gammaInt_pf :
   have hdt : Cartan.diagPow F n l = Iwasawa.torusPow F n l := by
     apply Units.ext
     rw [Cartan.coe_diagPow, Iwasawa.coe_torusPow]
-  have hΓ : ∀ z : Fin n → ℂˣ, zonalSpherical μ z (k₁ * Cartan.diagPow F n l * k₂) =
-      (vPoly n ((qF F : ℂ))⁻¹)⁻¹ * (halfModulus F l * evalAt z (hlR ((qF F : ℂ))⁻¹ l)) := by
+  have hΓ
+      : ∀ z : Fin n → ℂˣ,
+        zonalSpherical μ z (k₁ * Cartan.diagPow F n l * k₂)
+          = (vPoly n ((qF F : ℂ))⁻¹)⁻¹ * (halfModulus F l * evalAt z (hlR ((qF F : ℂ))⁻¹ l)) := by
     intro z
     rw [zonalSpherical_mul_right z _ hk₂, zonalSpherical_mul_left z hk₁, hdt,
       eq_inv_mul_iff_mul_eq₀ hv]
@@ -37,14 +40,16 @@ theorem UpperTheory.Gal.Gen.gammaInt_pf :
   refine ⟨?_, ?_⟩
   · simp only [hΓ]
     exact continuous_const.mul (continuous_const.mul (hcont _))
-  · have hI : ∫ θ : Fin n → UnitAddCircle,
-        zonalSpherical μ (pt θ) (k₁ * Cartan.diagPow F n l * k₂) * dens ((qF F : ℂ))⁻¹ (pt θ) =
-        (vPoly n ((qF F : ℂ))⁻¹)⁻¹ * halfModulus F l *
-          ∫ θ : Fin n → UnitAddCircle, evalAt (pt θ) (hlR ((qF F : ℂ))⁻¹ l) * dens ((qF F : ℂ))⁻¹ (pt θ) := by
-      rw [← integral_const_mul]
-      refine integral_congr_ae (Filter.Eventually.of_forall fun θ => ?_)
-      simp only [hΓ]
-      ring
+  · have hI
+        : ∫ θ : Fin n → UnitAddCircle,
+            zonalSpherical μ (pt θ) (k₁ * Cartan.diagPow F n l * k₂) * dens ((qF F : ℂ))⁻¹ (pt θ)
+          = (vPoly n ((qF F : ℂ))⁻¹)⁻¹ * halfModulus F l
+            * ∫ θ : Fin n → UnitAddCircle, evalAt (pt θ) (hlR ((qF F : ℂ))⁻¹ l) * dens ((qF F : ℂ))⁻¹ (pt θ) :=
+      by
+        rw [← integral_const_mul]
+        refine integral_congr_ae (Filter.Eventually.of_forall fun θ => ?_)
+        simp only [hΓ]
+        ring
     rw [hI, hint l hl, ← mul_assoc, ← mul_assoc, mul_inv_cancel₀ hv, one_mul]
     have hdom0 : Cartan.IsDominant (0 : Fin n → ℤ) := fun _ _ _ => le_rfl
     have hd0 : Cartan.diagPow F n 0 = 1 := by

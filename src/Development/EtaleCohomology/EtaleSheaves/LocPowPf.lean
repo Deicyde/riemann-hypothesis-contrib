@@ -9,14 +9,16 @@ open Polynomial IsLocalRing
 
 namespace LateralTheory.E.LocPowPf
 
-theorem pow_eq_one_of_aeval {q : ℕ} {A : Type} [CommRing A] (ξ : A) (h : aeval ξ (cyclotomic q ℤ) = 0) : ξ ^ q = 1 := by
+theorem pow_eq_one_of_aeval
+    {q : ℕ} {A : Type} [CommRing A] (ξ : A) (h : aeval ξ (cyclotomic q ℤ) = 0)
+    : ξ ^ q = 1 := by
   obtain ⟨p, hp⟩ := cyclotomic.dvd_X_pow_sub_one q ℤ
   have := congrArg (aeval ξ) hp
   rw [map_mul, h, zero_mul, map_sub, map_pow, aeval_X, map_one] at this
   exact sub_eq_zero.1 this
 
-theorem prim_res {q : ℕ} {A : Type} [CommRing A] [IsLocalRing A] (ξ : GlobalTheory.EtC.Prim q A) :
-    IsPrimitiveRoot (residue A ξ.1) q := by
+theorem prim_res {q : ℕ} {A : Type} [CommRing A] [IsLocalRing A] (ξ : GlobalTheory.EtC.Prim q A)
+    : IsPrimitiveRoot (residue A ξ.1) q := by
   have hu : IsUnit ((q : ResidueField A)) := by simpa using ξ.2.1.map (residue A)
   have : NeZero (q : ResidueField A) := ⟨hu.ne_zero⟩
   obtain ⟨x, -, hx⟩ := ξ
@@ -39,7 +41,8 @@ theorem LocPow_of : LateralTheory.E.AugBijPf.LocPow := by
   rw [hval]
   set η := ζ.1 ^ i with hη
   have h1 : ξ.1 ^ q = 1 := pow_eq_one_of_aeval ξ.1 ξ.2.2
-  have h2 : η ^ q = 1 := by rw [hη, ← pow_mul, mul_comm, pow_mul, pow_eq_one_of_aeval ζ.1 ζ.2.2, one_pow]
+  have h2 : η ^ q = 1 := by
+    rw [hη, ← pow_mul, mul_comm, pow_mul, pow_eq_one_of_aeval ζ.1 ζ.2.2, one_pow]
   have hres : residue A ξ.1 = residue A η := by rw [hη, map_pow]; exact he.symm
   have hηu : residue A η ≠ 0 := hres ▸ hx.ne_zero (NeZero.ne q)
   have hS : IsUnit (∑ j ∈ Finset.range q, ξ.1 ^ j * η ^ (q - 1 - j)) := by

@@ -13,8 +13,8 @@ open Matrix
 
 namespace PGaussLatticeCoords
 
-theorem toLp_mulVec_intVec {g : ℕ} (B : Matrix (Fin g) (Fin g) ℝ) (k : Fin g → ℤ) :
-    WithLp.toLp 2 (B *ᵥ intVec k) = ∑ i, k i • WithLp.toLp 2 (B *ᵥ Pi.single i 1) := by
+theorem toLp_mulVec_intVec {g : ℕ} (B : Matrix (Fin g) (Fin g) ℝ) (k : Fin g → ℤ)
+    : WithLp.toLp 2 (B *ᵥ intVec k) = ∑ i, k i • WithLp.toLp 2 (B *ᵥ Pi.single i 1) := by
   have h : intVec k = ∑ i, (k i : ℝ) • (Pi.single i 1 : Fin g → ℝ) := by
     ext j
     simp [intVec, Finset.sum_apply, Pi.single_apply]
@@ -24,14 +24,12 @@ theorem toLp_mulVec_intVec {g : ℕ} (B : Matrix (Fin g) (Fin g) ℝ) (k : Fin g
 
 end PGaussLatticeCoords
 
-
 open PGaussLatticeCoords in
 theorem GaussLatticeCoords.proof : GaussLatticeCoords.Statement := by
   intro g B hB
   refine ⟨fun k => ?_, fun x hx => ?_, fun k k' hkk' => ?_⟩
   · rw [toLp_mulVec_intVec]
-    exact Submodule.sum_mem _ fun i _ =>
-      Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+    exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
   · obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).mp hx
     exact ⟨c, by rw [toLp_mulVec_intVec, hc]⟩
   · have hk : B *ᵥ intVec k = B *ᵥ intVec k' := hkk'

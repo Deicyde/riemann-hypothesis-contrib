@@ -7,6 +7,7 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 namespace PositivityTheory.Rg.BcB.F.F0
 
-theorem chainEx_holds : PositivityTheory.Rg.BcB.F.ChainEx := chain_existence_of_global_character PositivityTheory.Rg.BcB.G8.global_character_holds
+theorem chainEx_holds : PositivityTheory.Rg.BcB.F.ChainEx :=
+  chain_existence_of_global_character PositivityTheory.Rg.BcB.G8.global_character_holds
 
 end PositivityTheory.Rg.BcB.F.F0

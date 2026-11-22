@@ -57,10 +57,11 @@ theorem norm_lt_one_of_posDef {Z : Matrix m n ℂ} (hP : (1 - Zᴴ * Z).PosDef) 
   rcases isEmpty_or_nonempty n with hn | hn
   · have : Z = 0 := by ext i j; exact hn.elim j
     simp [this]
-  obtain ⟨x, hx, hmax⟩ := (isCompact_sphere (0 : EuclideanSpace ℂ n) 1).exists_isMaxOn
-    (NormedSpace.sphere_nonempty.2 zero_le_one)
-    (f := fun x => ‖toEuclideanLin Z x‖)
-    ((toEuclideanLin Z).continuous_of_finiteDimensional.norm.continuousOn)
+  obtain ⟨x, hx, hmax⟩ :=
+    (isCompact_sphere (0 : EuclideanSpace ℂ n) 1).exists_isMaxOn
+      (NormedSpace.sphere_nonempty.2 zero_le_one)
+      (f := fun x => ‖toEuclideanLin Z x‖)
+      ((toEuclideanLin Z).continuous_of_finiteDimensional.norm.continuousOn)
   have hx1 : ‖x‖ = 1 := by simpa using hx
   have hx0 : ofLp x ≠ 0 := by
     intro h
@@ -95,8 +96,8 @@ def invSqrt {n : Type*} [Fintype n] [DecidableEq n] (M : Matrix n n ℂ) : Matri
   (CFC.sqrt M)⁻¹
 
 def boost (Z : Matrix p q ℂ) : Matrix (p ⊕ q) (p ⊕ q) ℂ :=
-  fromBlocks (invSqrt (1 - Z * Zᴴ)) (Z * invSqrt (1 - Zᴴ * Z))
-    (Zᴴ * invSqrt (1 - Z * Zᴴ)) (invSqrt (1 - Zᴴ * Z))
+  fromBlocks (invSqrt (1 - Z * Zᴴ)) (Z * invSqrt (1 - Zᴴ * Z)) (Zᴴ * invSqrt (1 - Z * Zᴴ))
+    (invSqrt (1 - Zᴴ * Z))
 
 section invSqrt
 

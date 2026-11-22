@@ -5,13 +5,14 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-private noncomputable def wSum {Z : Scheme.{0}} {ι : Type} (w : ι → Wt Z) (m : ι → ℤ) (s : Finset ι) : Wt Z :=
-  fun Ω _ _ z => ∑ a ∈ s, m a * w a Ω z
+private noncomputable def wSum {Z : Scheme.{0}} {ι : Type} (w : ι → Wt Z) (m : ι → ℤ) (s : Finset ι)
+    : Wt Z := fun Ω _ _ z =>
+  ∑ a ∈ s, m a * w a Ω z
 
-theorem UpperTheory.Gal.TranscendenceTraces.trRel_of :
-    TrLin → WtLin → WtVanish → TrRel := by
+theorem UpperTheory.Gal.TranscendenceTraces.trRel_of : TrLin → WtLin → WtVanish → TrRel := by
   intro hT hW hV q _ n i Z S p _ ι _ w m hw hq D hD hz x
   classical
   obtain ⟨hTa, hTs, -⟩ := hT q n i
@@ -25,13 +26,16 @@ theorem UpperTheory.Gal.TranscendenceTraces.trRel_of :
       funext Ω _ _ z
       simp [Wt.smul, Wt.const]
     rw [← hs, hTs p 0 _ (isWt_zero p) hq y, zero_smul]
-  have hins : ∀ (a : ι) (s : Finset ι), a ∉ s →
-      wSum w m (insert a s) = (Wt.smul (m a) (w a)).add (wSum w m s) := by
+  have hins
+      : ∀ (a : ι) (s : Finset ι),
+        a ∉ s → wSum w m (insert a s) = (Wt.smul (m a) (w a)).add (wSum w m s) := by
     intro a s ha
     funext Ω _ _ z
     simp [wSum, Wt.add, Wt.smul, Finset.sum_insert ha]
-  have key : ∀ s : Finset ι, IsWt p (wSum w m s) ∧
-      ∀ y, tr p (wSum w m s) q n i y = ∑ a ∈ s, m a • tr p (w a) q n i y := by
+  have key
+      : ∀ s : Finset ι,
+        IsWt p (wSum w m s)
+          ∧ ∀ y, tr p (wSum w m s) q n i y = ∑ a ∈ s, m a • tr p (w a) q n i y := by
     intro s
     induction s using Finset.induction_on with
     | empty =>

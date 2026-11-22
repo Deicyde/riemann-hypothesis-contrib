@@ -8,10 +8,11 @@ namespace GlobalTheory.NonzeroSmulMem
 
 open NumberField
 
-theorem exists_ne_zero_smul_mem {K V : Type} [Field K] [NumberField K] [AddCommGroup V]
-    [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-    {M : Submodule (𝓞 K) V} {x : V} (hx : x ∈ Submodule.span K (M : Set V)) :
-    ∃ d : 𝓞 K, d ≠ 0 ∧ d • x ∈ M := by
+theorem exists_ne_zero_smul_mem
+    {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+    [IsScalarTower (𝓞 K) K V]
+    {M : Submodule (𝓞 K) V} {x : V} (hx : x ∈ Submodule.span K (M : Set V))
+    : ∃ d : 𝓞 K, d ≠ 0 ∧ d • x ∈ M := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -34,8 +35,7 @@ theorem exists_ne_zero_smul_mem {K V : Type} [Field K] [NumberField K] [AddCommG
       exact hq0 ((IsFractionRing.injective (𝓞 K) K) (by rw [h, map_zero]))
     refine ⟨a * q, mul_ne_zero ha hq0, ?_⟩
     have h1 : q • (c • y) = p • y := by
-      rw [← algebraMap_smul K q, ← algebraMap_smul K p, smul_smul, ← hc,
-        mul_div_cancel₀ _ hqK]
+      rw [← algebraMap_smul K q, ← algebraMap_smul K p, smul_smul, ← hc, mul_div_cancel₀ _ hqK]
     rw [mul_smul, h1, smul_smul, mul_comm, mul_smul]
     exact M.smul_mem p hay
 

@@ -19,18 +19,23 @@ local instance measurableSpaceFourthLift : MeasurableSpace k := borel k
 local instance borelSpaceOnK : BorelSpace k := ⟨rfl⟩
 local instance instSCK4 : SecondCountableTopology k := GlobalTheory.SplitWeil.secondCountable k
 
-variable {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1) {m : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-  {col : (Fin (m + 1) → k) → V →ₗ[ℂ] V} {gl : GL (Fin (m + 1)) k →* (V →ₗ[ℂ] V)} (hS : Setup col gl) {s : ℝ}
-  {B B' C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} {A₀ : AddSubgroup (Fin (m + 1) → k)} (hA₀ : Lat A₀)
-  (hBp : Psd B) (hBc : ∀ x v w, B (col x v) (col x w) = B v w)
-  (hBg : ∀ g v w, B (gl g v) (gl g w) = ((md g ^ s : ℝ) : ℂ) * B v w)
-  (hD : IsD ψ col A₀ B B') (hCp : Psd C) (hCc : ∀ x v w, C (col x v) w = ((ψ (xz m ⬝ᵥ x) : Circle) : ℂ) * C v w)
+variable
+  {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
+  {m : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+  {col : (Fin (m + 1) → k) → V →ₗ[ℂ] V} {gl : GL (Fin (m + 1)) k →* (V →ₗ[ℂ] V)} (hS : Setup col gl)
+  {s : ℝ} {B B' C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} {A₀ : AddSubgroup (Fin (m + 1) → k)}
+  (hA₀ : Lat A₀) (hBp : Psd B) (hBc : ∀ x v w, B (col x v) (col x w) = B v w)
+  (hBg : ∀ g v w, B (gl g v) (gl g w) = ((md g ^ s : ℝ) : ℂ) * B v w) (hD : IsD ψ col A₀ B B')
+  (hCp : Psd C) (hCc : ∀ x v w, C (col x v) w = ((ψ (xz m ⬝ᵥ x) : Circle) : ℂ) * C v w)
   (hC : ∀ p ∈ Mir k m, ∀ v w, C (gl p v) (gl p w) = ((md p ^ (s + 1) : ℝ) : ℂ) * C v w)
   (hCB : ∀ v, (C v v).re ≤ (B' v v).re)
-  {ν : Measure (Fin (m + 1) → k)} [ν.IsAddHaarMeasure] (hν : ν (perp ψ A₀) = 1)
+  {ν : Measure (Fin (m + 1) → k)} [ν.IsAddHaarMeasure]
+  (hν : ν (perp ψ A₀) = 1)
 
-private theorem addHaar_singleton_zero_eq_zero {m : ℕ} {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
-    (ν : Measure (Fin (m + 1) → k)) [ν.IsAddHaarMeasure] : ν {0} = 0 := by
+private theorem addHaar_singleton_zero_eq_zero
+    {m : ℕ} {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1) (ν : Measure (Fin (m + 1) → k))
+    [ν.IsAddHaarMeasure]
+    : ν {0} = 0 := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible (ValuativeRel.valuation k).integer
   have hϖ0 : (ϖ : k) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   set x : kˣ := Units.mk0 (ϖ : k) hϖ0 with hxdef
@@ -39,8 +44,8 @@ private theorem addHaar_singleton_zero_eq_zero {m : ℕ} {ψ : AddChar k Circle}
     exact inv_lt_one_of_one_lt₀ (by exact_mod_cast one_lt_resCard k)
   have hx0 : 0 < nabs k x := nabs_pos k x
   let g : GL (Fin (m + 1)) k :=
-    Matrix.GeneralLinearGroup.mkOfDetNeZero (((x⁻¹ : kˣ) : k) • (1 : Matrix (Fin (m + 1)) (Fin (m + 1)) k))
-      (by simp [Matrix.det_smul])
+    Matrix.GeneralLinearGroup.mkOfDetNeZero
+      (((x⁻¹ : kˣ) : k) • (1 : Matrix (Fin (m + 1)) (Fin (m + 1)) k)) (by simp [Matrix.det_smul])
   have hdet : Matrix.GeneralLinearGroup.det g = x⁻¹ ^ (m + 1) := by
     ext
     simp [g, Matrix.GeneralLinearGroup.val_det_apply, Matrix.det_smul]
@@ -61,11 +66,13 @@ private theorem addHaar_singleton_zero_eq_zero {m : ℕ} {ψ : AddChar k Circle}
     intro j
     have h0 : ({0} : Set (Fin (m + 1) → k)) ⊆ (perp ψ (gmap (g ^ j) A) : Set _) := by
       simp [(perp ψ (gmap (g ^ j) A)).zero_mem]
-    calc (ν {0}).toReal ≤ (ν (perp ψ (gmap (g ^ j) A))).toReal :=
-          ENNReal.toReal_mono (meas_perp_lt_top ψ ν hψ hψ1 (lat_gmap _ _ hA)).ne (measure_mono h0)
+    calc
+      (ν {0}).toReal ≤ (ν (perp ψ (gmap (g ^ j) A))).toReal :=
+        ENNReal.toReal_mono (meas_perp_lt_top ψ ν hψ hψ1 (lat_gmap _ _ hA)).ne (measure_mono h0)
       _ = _ := by rw [meas_perp_gmap ψ ν hψ hψ1 _ hA, hpow, inv_pow]
   have hlim : Tendsto (fun j : ℕ => ((md g)⁻¹) ^ j * (ν (perp ψ A)).toReal) atTop (𝓝 0) := by
-    have := tendsto_pow_atTop_nhds_zero_of_lt_one (inv_nonneg.2 (md_pos g).le) (inv_lt_one_of_one_lt₀ hg1)
+    have :=
+      tendsto_pow_atTop_nhds_zero_of_lt_one (inv_nonneg.2 (md_pos g).le) (inv_lt_one_of_one_lt₀ hg1)
     simpa using this.mul_const (ν (perp ψ A)).toReal
   have hle : (ν {0}).toReal ≤ 0 := ge_of_tendsto' hlim hbound
   have hfin : ν {0} ≠ ⊤ := by
@@ -76,29 +83,33 @@ private theorem addHaar_singleton_zero_eq_zero {m : ℕ} {ψ : AddChar k Circle}
   · exact h
   · exact absurd h hfin
 
-
 include hψ hψ1 hS hA₀ hBp hBc hBg hD hCp hCc hC hCB hν in
-theorem lift_form : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, Psd I ∧ (∀ x v w, I (col x v) (col x w) = I v w) ∧
-      (∀ g v w, I (gl g v) (gl g w) = ((nabs k (Matrix.GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * I v w) ∧
-      (∀ v, (I v v).re ≤ (B v v).re) ∧ IsD ψ col A₀ I C ∧ IsA col I 0 ∧
-      ∀ Y : Submodule ℂ V, (∀ g, ∀ y ∈ Y, gl g y ∈ Y) → (∀ y ∈ Y, ∀ w, C y w = 0) → ∀ y ∈ Y, ∀ w, I y w = 0 := by
+theorem lift_form
+    : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ,
+      Psd I ∧ (∀ x v w, I (col x v) (col x w) = I v w)
+        ∧ (∀ g v w,
+          I (gl g v) (gl g w) = ((nabs k (Matrix.GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * I v w)
+        ∧ (∀ v, (I v v).re ≤ (B v v).re) ∧ IsD ψ col A₀ I C ∧ IsA col I 0
+        ∧ ∀ Y : Submodule ℂ V,
+          (∀ g, ∀ y ∈ Y, gl g y ∈ Y) → (∀ y ∈ Y, ∀ w, C y w = 0) → ∀ y ∈ Y, ∀ w, I y w = 0 := by
   have hC' : ∀ p ∈ Mir k m, ∀ v w, C (gl p v) (gl p w) = ((md p ^ (s + 1) : ℝ) : ℂ) * C v w := hC
   have hint : ∀ v w, Integrable (fun ξ => Df gl s C ξ v w) ν :=
     integrable_Df hψ hψ1 hS hA₀ hBp hBc hBg hD hCp hC' hCB hν
-  let I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ := LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
-    (fun v w => ∫ ξ, Df gl s C ξ v w ∂ν)
-    (fun v₁ v₂ w => by
-      simp only [map_add (f := _), LinearMap.add_apply]
-      exact integral_add (hint _ _) (hint _ _))
-    (fun c v w => by
-      simp only [map_smul, LinearMap.smul_apply, smul_eq_mul, RingHom.id_apply]
-      exact integral_const_mul c _)
-    (fun v w₁ w₂ => by
-      simp only [map_add (f := _)]
-      exact integral_add (hint _ _) (hint _ _))
-    (fun c v w => by
-      simp only [LinearMap.map_smulₛₗ, smul_eq_mul]
-      exact integral_const_mul _ _)
+  let I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ :=
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun v w => ∫ ξ, Df gl s C ξ v w ∂ν)
+      (fun v₁ v₂ w => by
+        simp only [map_add (f := _), LinearMap.add_apply]
+        exact integral_add (hint _ _) (hint _ _))
+      (fun c v w => by
+        simp only [map_smul, LinearMap.smul_apply, smul_eq_mul, RingHom.id_apply]
+        exact integral_const_mul c _)
+      (fun v w₁ w₂ => by
+        simp only [map_add (f := _)]
+        exact integral_add (hint _ _) (hint _ _))
+      (fun c v w => by
+        simp only [LinearMap.map_smulₛₗ, smul_eq_mul]
+        exact integral_const_mul _ _)
   have hI : ∀ v w, I v w = ∫ ξ, Df gl s C ξ v w ∂ν := fun _ _ => rfl
   refine ⟨I, ⟨?_, ?_⟩, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro v w
@@ -112,11 +123,15 @@ theorem lift_form : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, Psd I ∧ (∀ x
     exact integral_nonneg fun ξ => Df_re_nonneg hCp ξ v
   · intro x v w
     rw [hI, hI]
-    exact integral_congr_ae (Filter.Eventually.of_forall fun ξ => form_column_invariant hS hCp hCc hC' ξ x v w)
+    exact integral_congr_ae (Filter.Eventually.of_forall fun ξ =>
+      form_column_invariant hS hCp hCc hC' ξ x v w)
   · intro g v w
     rw [hI, hI]
-    have h1 : ∀ ξ, Df gl s C ξ (gl g v) (gl g w) =
-        ((md g ^ (s + 1) : ℝ) : ℂ) * Df gl s C (ξ ᵥ* (g : Matrix (Fin (m + 1)) (Fin (m + 1)) k)) v w := by
+    have h1
+        : ∀ ξ,
+          Df gl s C ξ (gl g v) (gl g w)
+            = ((md g ^ (s + 1) : ℝ) : ℂ)
+              * Df gl s C (ξ ᵥ* (g : Matrix (Fin (m + 1)) (Fin (m + 1)) k)) v w := by
       intro ξ
       by_cases hξ : ξ = 0
       · subst hξ
@@ -135,9 +150,11 @@ theorem lift_form : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, Psd I ∧ (∀ x
     simp only [RCLike.re_to_complex] at this
     rw [← this]
     have hb := bessel hψ hψ1 hS hA₀ hBp hBc hBg hD hCp hC' hCB hν v
-    rw [integral_eq_lintegral_of_nonneg_ae (Filter.Eventually.of_forall fun ξ => Df_re_nonneg hCp ξ v)
+    rw [integral_eq_lintegral_of_nonneg_ae
+      (Filter.Eventually.of_forall fun ξ => Df_re_nonneg hCp ξ v)
       (integrable_re hψ hψ1 hS hA₀ hBp hBc hBg hD hCp hC' hCB hν v).aestronglyMeasurable]
-    calc _ ≤ (ENNReal.ofReal (B v v).re).toReal := ENNReal.toReal_mono ENNReal.ofReal_ne_top hb
+    calc
+      _ ≤ (ENNReal.ofReal (B v v).re).toReal := ENNReal.toReal_mono ENNReal.ofReal_ne_top hb
       _ = _ := ENNReal.toReal_ofReal (hBp.2 v)
   · intro v w
     have hxz : xz m ≠ (0 : Fin (m + 1) → k) := by
@@ -157,8 +174,10 @@ theorem lift_form : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, Psd I ∧ (∀ x
     obtain ⟨A₁, hA₁, h01, h21⟩ := lat_sup hA₀ hA₂
     refine ⟨A₁, hA₁, h01, fun A hA hA1 => ?_⟩
     rw [hI]
-    have hav : ∀ ξ, Df gl s C ξ (av ψ col (xz m) A v) w =
-        Set.indicator {ξ | ξ - xz m ∈ perp ψ A} (fun _ => C v w) ξ := by
+    have hav
+        : ∀ ξ,
+          Df gl s C ξ (av ψ col (xz m) A v) w
+            = Set.indicator {ξ | ξ - xz m ∈ perp ψ A} (fun _ => C v w) ξ := by
       intro ξ
       rw [AvA.av_eigen' ψ hψ col hS.col_zero hS.col_add hS.smooth_col (Df gl s C ξ) ψ ξ
         (Df_col hS hCc hC' ξ) A hA (xz m) v w]
@@ -177,7 +196,9 @@ theorem lift_form : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, Psd I ∧ (∀ x
         rw [mem_perp]
         intro a ha
         rw [sub_dotProduct, AddChar.map_sub_eq_div, hall a ha, div_self']
-    have hset : {ξ | ξ - xz m ∈ perp ψ A} = (fun ξ => ξ + -xz m) ⁻¹' (perp ψ A : Set (Fin (m + 1) → k)) := by
+    have hset
+        : {ξ | ξ - xz m ∈ perp ψ A}
+          = (fun ξ => ξ + - xz m) ⁻¹' (perp ψ A : Set (Fin (m + 1) → k)) := by
       ext ξ
       simp [sub_eq_add_neg]
     have hmeas : MeasurableSet {ξ | ξ - xz m ∈ perp ψ A} := by
@@ -191,8 +212,7 @@ theorem lift_form : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, Psd I ∧ (∀ x
       have := congrArg ENNReal.toReal this
       rw [ENNReal.toReal_mul, ENNReal.toReal_natCast] at this
       simpa using this.symm
-    have h2 : ((A₀.relIndex A : ℂ)) * (((ν (perp ψ A)).toReal : ℝ) : ℂ) = 1 := by
-      exact_mod_cast h1
+    have h2 : ((A₀.relIndex A : ℂ)) * (((ν (perp ψ A)).toReal : ℝ) : ℂ) = 1 := by exact_mod_cast h1
     rw [Complex.real_smul, ← mul_assoc, h2, one_mul]
   · intro v w
     simp only [LinearMap.zero_apply]
@@ -202,8 +222,10 @@ theorem lift_form : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, Psd I ∧ (∀ x
         exact AddChar.one_apply x
       rw [this]
       exact continuous_const
-    have hav : ∀ A : {A : AddSubgroup (Fin (m + 1) → k) // Lat A},
-        I (av 1 col 0 A.1 v) w = ∫ ξ in (perp ψ A.1 : Set (Fin (m + 1) → k)), Df gl s C ξ v w ∂ν := by
+    have hav
+        : ∀ A : {A : AddSubgroup (Fin (m + 1) → k) // Lat A},
+          I (av 1 col 0 A.1 v) w
+            = ∫ ξ in (perp ψ A.1 : Set (Fin (m + 1) → k)), Df gl s C ξ v w ∂ν := by
       intro A
       rw [hI, ← integral_indicator (perp_open ψ hψ hψ1 A.2).measurableSet]
       congr 1
@@ -220,8 +242,10 @@ theorem lift_form : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, Psd I ∧ (∀ x
         rw [mem_perp]
         intro a ha
         rw [hall a ha, AddChar.one_apply]
-    have hfun : (fun A : {A : AddSubgroup (Fin (m + 1) → k) // Lat A} => I (av 1 col 0 A.1 v) w) =
-        fun A => ∫ ξ in (perp ψ A.1 : Set (Fin (m + 1) → k)), Df gl s C ξ v w ∂ν := funext hav
+    have hfun
+        : (fun A : {A : AddSubgroup (Fin (m + 1) → k) // Lat A} => I (av 1 col 0 A.1 v) w)
+          = fun A => ∫ ξ in (perp ψ A.1 : Set (Fin (m + 1) → k)), Df gl s C ξ v w ∂ν :=
+      funext hav
     rw [hfun]
     apply (hint v w).tendsto_setIntegral_nhds_zero
     rw [ENNReal.tendsto_nhds_zero]
@@ -237,7 +261,8 @@ theorem lift_form : ∃ I : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, Psd I ∧ (∀ x
     exact (measure_mono hsub2).trans hUε.le
   · intro Y hY hCY y hy w
     rw [hI]
-    have : (fun ξ => Df gl s C ξ y w) = fun _ => (0 : ℂ) := funext fun ξ => Df_ker hCp hC' Y hY hCY ξ hy w
+    have : (fun ξ => Df gl s C ξ y w) = fun _ => (0 : ℂ) :=
+      funext fun ξ => Df_ker hCp hC' Y hY hCY ξ hy w
     rw [this, integral_zero]
 
 end Main

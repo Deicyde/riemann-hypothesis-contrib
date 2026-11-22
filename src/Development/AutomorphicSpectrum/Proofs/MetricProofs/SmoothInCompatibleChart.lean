@@ -11,11 +11,11 @@ open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Metric
 
-theorem contDiffAt_comp_compatChart_symm :
-    ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : FinHolAtlas e X)
-      (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (U : Set X) (g : X → ℝ),
-      IsCompatChart A ψ → IsOpen U → A.SmoothOn U g →
-        ∀ z ∈ ψ.target, ψ.symm z ∈ U → ContDiffAt ℝ ∞ (g ∘ ψ.symm) z := by
+theorem contDiffAt_comp_compatChart_symm
+    : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : FinHolAtlas e X)
+        (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (U : Set X) (g : X → ℝ),
+      IsCompatChart A ψ → IsOpen U → A.SmoothOn U g
+        → ∀ z ∈ ψ.target, ψ.symm z ∈ U → ContDiffAt ℝ ∞ (g ∘ ψ.symm) z := by
   intro e X _ A ψ U g hψ hU hg z hz hzU
   obtain ⟨j, hj⟩ := A.cover (ψ.symm z)
   have hτ : ContDiffAt ℝ ∞ (⇑(A.chart j) ∘ ⇑ψ.symm) z :=

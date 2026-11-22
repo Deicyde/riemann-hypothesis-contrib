@@ -12,12 +12,20 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.PairMembershipBlocks
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords Formalism.MainNotions.Proposition5Numerics Formalism.MainNotions.TraceSpectra
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.Proposition5Numerics Formalism.MainNotions.TraceSpectra
   Formalism.MainNotions.NormalSetCounting
-open Formalism.MainNotions.TestSideWords.TwistedFiltration.G3 Formalism.MainNotions.TestSideWords.TwistedFiltration.G1
+open Formalism.MainNotions.TestSideWords.TwistedFiltration.G3
+  Formalism.MainNotions.TestSideWords.TwistedFiltration.G1
 
-theorem valS_off {R : Type} [CommRing R] {ι : Type} {n : ℕ} [NeZero n] (LL : Letters ι) (S : Set ι)
-    (F : MvPolynomial (ι × Fin n) R) (h : ∀ v ∈ F.vars, v.1 ∉ S) : 0 ≤ valS LL S F := by
+theorem valS_off
+    {R : Type} [CommRing R]
+    {ι : Type} {n : ℕ} [NeZero n]
+    (LL : Letters ι)
+    (S : Set ι) (F : MvPolynomial (ι × Fin n) R) (h : ∀ v ∈ F.vars, v.1 ∉ S)
+    : 0 ≤ valS LL S F := by
   have e : valS LL S F = valS LL ∅ F := by
     unfold valS sDegs
     rw [twistSub_congr LL LL S ∅ _ F fun v hv =>
@@ -25,33 +33,53 @@ theorem valS_off {R : Type} [CommRing R] {ι : Type} {n : ℕ} [NeZero n] (LL : 
   rw [e]
   unfold valS
   refine Finset.le_inf fun k hk => ?_
-  have := Formalism.MainNotions.G.Joints.StandardMonomialSpace.sDegs_empty_subset LL (lastIdx n) F k hk
+  have :=
+    Formalism.MainNotions.G.Joints.StandardMonomialSpace.sDegs_empty_subset LL (lastIdx n) F k hk
   rw [Set.mem_singleton_iff] at this
   rw [this]
   rfl
 
 section Phi
 
-variable {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {n' r : ℕ} [NeZero n'] [NeZero r]
-  {Fr : Frames n' r} {L₁ N₁ : ℕ} {J : ℕ} [NeZero J] (Dt : SignedChainData p O r J)
+variable
+  {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {n' r : ℕ} [NeZero n'] [NeZero r]
+  {Fr : Frames n' r} {L₁ N₁ : ℕ} {J : ℕ} [NeZero J]
+  (Dt : SignedChainData p O r J)
 
-theorem PhiJ_nonW (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card) (j : ZMod J) (y : ℤ)
-    (hy : y ∈ Fr.letters (segZ j)) (hw : y ∉ wSet Fr (segZ j)) :
-    ∃ s, posTL Fr (⟨j, s⟩ : TL J Dt.nL r) = y ∧ ∀ a : Fin r, PhiJ Fr Dt j (X (y, a)) = X (⟨j, s⟩, a) := by
-  rcases restSpec n' r Fr L₁ N₁ hV J Dt.nL hnL j y hy with ⟨l, hyl, hml⟩ | ⟨m, hym, hml⟩ | ⟨m, hym, _⟩
-  · exact ⟨Sum.inl l, hyl.symm, fun a => by
-      simp only [PhiJ, AlgHom.comp_apply, chi, aeval_X, if_pos hy, hml, SignedChainData.ph]⟩
-  · exact ⟨Sum.inr m, hym.symm, fun a => by
-      simp only [PhiJ, AlgHom.comp_apply, chi, aeval_X, if_pos hy, hml, SignedChainData.ph]⟩
+theorem PhiJ_nonW
+    (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card)
+    (j : ZMod J) (y : ℤ) (hy : y ∈ Fr.letters (segZ j)) (hw : y ∉ wSet Fr (segZ j))
+    : ∃ s,
+      posTL Fr (⟨j, s⟩ : TL J Dt.nL r) = y
+        ∧ ∀ a : Fin r, PhiJ Fr Dt j (X (y, a)) = X (⟨j, s⟩, a) := by
+  rcases restSpec n' r Fr L₁ N₁ hV J Dt.nL hnL j y hy with
+    ⟨l, hyl, hml⟩ | ⟨m, hym, hml⟩ | ⟨m, hym, _⟩
+  · exact ⟨
+      Sum.inl l,
+      hyl.symm,
+      fun a => by
+        simp only [PhiJ, AlgHom.comp_apply, chi, aeval_X, if_pos hy, hml, SignedChainData.ph]
+    ⟩
+  · exact ⟨
+      Sum.inr m,
+      hym.symm,
+      fun a => by
+        simp only [PhiJ, AlgHom.comp_apply, chi, aeval_X, if_pos hy, hml, SignedChainData.ph]
+    ⟩
   · exact absurd ⟨m, hym⟩ hw
 
-theorem PhiJ_w (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card) (j : ZMod J) (y : ℤ)
-    (hw : y ∈ wSet Fr (segZ j)) (a : Fin r) :
-    PhiJ Fr Dt j (X (y, a)) ∈ supported (KK O) {u : TL J Dt.nL r × Fin r | u.1.1 = j - 1} := by
+theorem PhiJ_w
+    (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card)
+    (j : ZMod J) (y : ℤ) (hw : y ∈ wSet Fr (segZ j))
+    (a : Fin r)
+    : PhiJ Fr Dt j (X (y, a)) ∈ supported (KK O) {u : TL J Dt.nL r × Fin r | u.1.1 = j - 1} := by
   obtain ⟨m, rfl⟩ := hw
   by_cases hy : Fr.fr (segZ j - 1) (r - 1 - m.val) ∈ Fr.letters (segZ j)
-  · have : PhiJ Fr Dt j (X (Fr.fr (segZ j - 1) (r - 1 - m.val), a)) = X (⟨j - 1, Sum.inr m⟩, a) ^ Dt.P (j - 1) m := by
-      simp only [PhiJ, AlgHom.comp_apply, chi, aeval_X, if_pos hy, mlOf_wc hV hnL j m, SignedChainData.ph]
+  · have : PhiJ Fr Dt j (X (Fr.fr (segZ j - 1) (r - 1 - m.val), a))
+        = X (⟨j - 1, Sum.inr m⟩, a) ^ Dt.P (j - 1) m := by
+      simp only [PhiJ, AlgHom.comp_apply, chi, aeval_X, if_pos hy, mlOf_wc hV hnL j m,
+        SignedChainData.ph]
     rw [this]
     refine Subalgebra.pow_mem _ ?_ _
     rw [X_mem_supported, Set.mem_ofPred_eq]
@@ -60,8 +88,9 @@ theorem PhiJ_w (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ
     rw [this]
     exact Subalgebra.zero_mem _
 
-theorem mem_TSet_iff (j : ZMod J) (mm : Fin r) (s : Fin (Dt.nL j) ⊕ Fin r) :
-    (⟨j, s⟩ : TL J Dt.nL r) ∈ Dt.TSet j mm ↔ (⟨j, s⟩ : TL J Dt.nL r) ∈ NSet Dt.nL j (Dt.nL j + (r - 1 - mm.val)) := by
+theorem mem_TSet_iff (j : ZMod J) (mm : Fin r) (s : Fin (Dt.nL j) ⊕ Fin r)
+    : (⟨j, s⟩ : TL J Dt.nL r) ∈ Dt.TSet j mm
+      ↔ (⟨j, s⟩ : TL J Dt.nL r) ∈ NSet Dt.nL j (Dt.nL j + (r - 1 - mm.val)) := by
   rcases s with l | m
   · rw [mem_NSet_inl]
     constructor
@@ -122,9 +151,13 @@ theorem linkL : LinkL := by
   simp only [Finset.mem_image] at hM
   obtain ⟨μ0, hμ0, rfl⟩ := hM
 
-  have h0 : 0 ≤ valS Dt.trueLet (Dt.TSet j mm) (PhiJ Fr Dt j (monomial (μ0.filter (fun v => v.1 ∈ w)) 1)) := by
-    have hs : PhiJ Fr Dt j (monomial (μ0.filter (fun v => v.1 ∈ w)) 1) ∈
-        supported (KK O) {u : TL J Dt.nL r × Fin r | u.1.1 = j - 1} := by
+  have h0
+      : 0
+        ≤ valS Dt.trueLet (Dt.TSet j mm)
+          (PhiJ Fr Dt j (monomial (μ0.filter (fun v => v.1 ∈ w)) 1)) := by
+    have hs
+        : PhiJ Fr Dt j (monomial (μ0.filter (fun v => v.1 ∈ w)) 1)
+          ∈ supported (KK O) {u : TL J Dt.nL r × Fin r | u.1.1 = j - 1} := by
       rw [hPhi, aeval_monomial, map_one, one_mul]
       refine Subalgebra.prod_mem _ fun v hv => Subalgebra.pow_mem _ ?_ _
       have hv' := (Finsupp.mem_support_iff.1 hv)
@@ -138,10 +171,12 @@ theorem linkL : LinkL := by
     have h1 : v.1.1 = j - 1 := (mem_supported.1 hs) (Finset.mem_coe.2 hv)
     exact hne (h1.symm.trans (TSet_fst Dt hvT))
 
-  have h1 := valS_wCoeff_ge LZ (Sz \ w) w hwv Set.disjoint_sdiff_left F dw hdeg th (by rw [hun]; exact hth)
-    (μ0.filter (fun v => v.1 ∈ w))
-  have hsup : wCoeff w (μ0.filter (fun v => v.1 ∈ w)) F ∈
-      supported (KK O) {v : ℤ × Fin r | v.1 ∈ {y | y ∈ Fr.letters (segZ j) ∧ y ∉ w}} := by
+  have h1 :=
+    valS_wCoeff_ge LZ (Sz \ w) w hwv Set.disjoint_sdiff_left F dw hdeg th (by rw [hun]; exact hth)
+      (μ0.filter (fun v => v.1 ∈ w))
+  have hsup
+      : wCoeff w (μ0.filter (fun v => v.1 ∈ w)) F
+        ∈ supported (KK O) {v : ℤ × Fin r | v.1 ∈ {y | y ∈ Fr.letters (segZ j) ∧ y ∉ w}} := by
     rw [mem_supported]
     intro v hv
     obtain ⟨ν, hν, hvν⟩ := (mem_vars_iff_mem_support v).1 (Finset.mem_coe.1 hv)
@@ -154,15 +189,18 @@ theorem linkL : LinkL := by
         have h5 : (ν.filter (fun v => v.1 ∈ w)) v = 0 := by rw [hcond.1]; rfl
         rw [Finsupp.filter_apply, if_pos hvw] at h5
         exact hv' h5
-      have hvF : v ∈ F.vars := (mem_vars_iff_mem_support v).2 ⟨_, mem_support_iff.2 hc, by
-        rw [Finsupp.mem_support_iff, Finsupp.add_apply]; omega⟩
+      have hvF : v ∈ F.vars :=
+        (mem_vars_iff_mem_support v).2
+          ⟨_, mem_support_iff.2 hc, by rw [Finsupp.mem_support_iff, Finsupp.add_apply]; omega⟩
       exact ⟨(mem_supported.1 hF) (Finset.mem_coe.2 hvF), hvw⟩
     · exact absurd rfl hc
-  have h2 : valS LZ (Sz \ w) (wCoeff w (μ0.filter (fun v => v.1 ∈ w)) F) ≤
-      valS Dt.trueLet (Dt.TSet j mm) (PhiJ Fr Dt j (wCoeff w (μ0.filter (fun v => v.1 ∈ w)) F)) := by
+  have h2
+      : valS LZ (Sz \ w) (wCoeff w (μ0.filter (fun v => v.1 ∈ w)) F)
+        ≤ valS Dt.trueLet (Dt.TSet j mm)
+          (PhiJ Fr Dt j (wCoeff w (μ0.filter (fun v => v.1 ∈ w)) F)) := by
     rw [hPhi]
-    refine valAeval (KK O) ℤ (TL J Dt.nL r) r LZ Dt.trueLet (Sz \ w) {y | y ∈ Fr.letters (segZ j) ∧ y ∉ w}
-      (Dt.TSet j mm) (gT Fr Dt.nL) _ _ hsup ?_ ?_
+    refine valAeval (KK O) ℤ (TL J Dt.nL r) r LZ Dt.trueLet (Sz \ w)
+      {y | y ∈ Fr.letters (segZ j) ∧ y ∉ w} (Dt.TSet j mm) (gT Fr Dt.nL) _ _ hsup ?_ ?_
     · rintro ⟨y, a⟩ ⟨hy, hyw⟩ hyS
       obtain ⟨s, hs, hX⟩ := PhiJ_nonW Dt hV hnL j y hy hyw
       have hg : gT Fr Dt.nL y = ⟨j, s⟩ := by rw [← hs, gT_posTL hV hnL]
@@ -180,10 +218,14 @@ theorem linkL : LinkL := by
       rw [mem_TSet_iff, NSet_lt hV hnL j u hul s, hs]
       intro hlt
       exact hyS ⟨hlt, hyw⟩
-  have h3 := flt_valS_mul_ge Dt.trueLet (Dt.TSet j mm) (PhiJ Fr Dt j (monomial (μ0.filter (fun v => v.1 ∈ w)) 1))
-    (PhiJ Fr Dt j (wCoeff w (μ0.filter (fun v => v.1 ∈ w)) F))
+  have h3 :=
+    flt_valS_mul_ge Dt.trueLet (Dt.TSet j mm)
+      (PhiJ Fr Dt j (monomial (μ0.filter (fun v => v.1 ∈ w)) 1))
+      (PhiJ Fr Dt j (wCoeff w (μ0.filter (fun v => v.1 ∈ w)) F))
   refine le_trans ?_ h3
-  calc ((th - dw : ℤ) : WithTop ℤ) = 0 + ((th - dw : ℤ) : WithTop ℤ) := (zero_add _).symm
+  calc
+    ((th - dw : ℤ) : WithTop ℤ)
+      = 0 + ((th - dw : ℤ) : WithTop ℤ) := (zero_add _).symm
     _ ≤ _ := add_le_add h0 (le_trans h1 h2)
 
 end Formalism.MainNotions.PairMembershipBlocks

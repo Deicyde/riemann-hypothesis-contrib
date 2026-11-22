@@ -10,8 +10,11 @@ open IsLocalRing
 
 namespace GlobalTheory.FiniteLocalCompleteness
 
-theorem precomplete_of_finite {R : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (M : Type) [AddCommGroup M]
-    [Module R M] [Module.Finite R M] : IsPrecomplete I M := by
+theorem precomplete_of_finite
+    {R : Type} [CommRing R]
+    (I : Ideal R) [IsPrecomplete I R]
+    (M : Type) [AddCommGroup M] [Module R M] [Module.Finite R M]
+    : IsPrecomplete I M := by
   rw [← AdicCompletion.of_surjective_iff]
   intro y
   obtain ⟨t, rfl⟩ := AdicCompletion.ofTensorProduct_surjective_of_finite I M y
@@ -28,21 +31,28 @@ theorem precomplete_of_finite {R : Type} [CommRing R] (I : Ideal R) [IsPrecomple
     obtain ⟨b, hb⟩ := ht
     exact ⟨a + b, by rw [map_add (f := _), map_add (f := _), ha, hb]⟩
 
-theorem precomplete_of_pow_le {S : Type} [CommRing S] (I J : Ideal S) [hI : IsPrecomplete I S] (hIJ : I ≤ J) (k : ℕ)
-    (hk : J ^ (k + 1) ≤ I) : IsPrecomplete J S := by
+theorem precomplete_of_pow_le
+    {S : Type} [CommRing S]
+    (I J : Ideal S) [hI : IsPrecomplete I S]
+    (hIJ : I ≤ J)
+    (k : ℕ) (hk : J ^ (k + 1) ≤ I)
+    : IsPrecomplete J S := by
   refine ⟨fun f hf => ?_⟩
   have h1 : ∀ n, (J ^ ((k + 1) * n) • ⊤ : Submodule S S) ≤ I ^ n • ⊤ := fun n => by
     refine Submodule.smul_mono_left ?_
     rw [pow_mul]
     exact Ideal.pow_right_mono hk n
-  obtain ⟨L, hL⟩ := hI.prec (f := fun n => f ((k + 1) * n))
-    (fun {m n} h => (hf (Nat.mul_le_mul_left _ h)).mono (h1 m))
+  obtain ⟨L, hL⟩ :=
+    hI.prec
+      (f := fun n => f ((k + 1) * n))
+      (fun {m n} h => (hf (Nat.mul_le_mul_left _ h)).mono (h1 m))
   refine ⟨L, fun n => ?_⟩
   refine (hf (show n ≤ (k + 1) * n by nlinarith)).trans ((hL n).mono ?_)
   exact Submodule.smul_mono_left (Ideal.pow_right_mono hIJ n)
 
-theorem isLocalRing_of_complete {S : Type} [CommRing S] [IsDomain S] (I : Ideal S) [IsAdicComplete I S]
-    [IsArtinianRing (S ⧸ I)] : IsLocalRing S := by
+theorem isLocalRing_of_complete
+    {S : Type} [CommRing S] [IsDomain S] (I : Ideal S) [IsAdicComplete I S] [IsArtinianRing (S ⧸ I)]
+    : IsLocalRing S := by
   have hjac := IsAdicComplete.le_jacobson_bot I
   have hu : ∀ z ∈ I, IsUnit (1 - z) := fun z hz => by
     have := Ideal.mem_jacobson_bot.1 (hjac (I.neg_mem hz)) 1
@@ -57,25 +67,32 @@ theorem isLocalRing_of_complete {S : Type} [CommRing S] [IsDomain S] (I : Ideal 
     induction k with
     | zero => simp
     | succ k ih =>
-      calc X ^ n * (X * Y) ^ (k + 1) = (X ^ (n + 1) * Y) * (X * Y) ^ k := by ring
+      calc
+        X ^ n * (X * Y) ^ (k + 1)
+          = (X ^ (n + 1) * Y) * (X * Y) ^ k := by ring
         _ = X ^ n := by rw [Nat.succ_eq_add_one] at hy; rw [hy, ih]
   have he : ((X * Y) ^ n) ^ 2 = (X * Y) ^ n := by
-    calc ((X * Y) ^ n) ^ 2 = (X ^ n * (X * Y) ^ n) * Y ^ n := by ring
+    calc
+      ((X * Y) ^ n) ^ 2
+        = (X ^ n * (X * Y) ^ n) * Y ^ n := by ring
       _ = (X * Y) ^ n := by rw [hk]; ring
   have hE : Ideal.Quotient.mk I ((x * y) ^ n) = (X * Y) ^ n := by simp [hX, hY]
-  obtain ⟨a, ha, hae⟩ := HenselianRing.is_henselian (I := I) (Polynomial.X ^ 2 - Polynomial.X : Polynomial S)
-    (by monicity!) ((x * y) ^ n)
-    (by
-      rw [← Ideal.Quotient.eq_zero_iff_mem]
-      simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, map_sub]
-      rw [map_pow, hE, he, sub_self])
-    (by
-      have : Ideal.Quotient.mk I (Polynomial.eval ((x * y) ^ n)
-          (Polynomial.derivative (Polynomial.X ^ 2 - Polynomial.X : Polynomial S))) = 2 * (X * Y) ^ n - 1 := by
-        rw [← hE]
-        simp [one_add_one_eq_two, map_ofNat]
-      rw [this]
-      exact IsUnit.of_mul_eq_one (2 * (X * Y) ^ n - 1) (by linear_combination 4 * he))
+  obtain ⟨a, ha, hae⟩ :=
+    HenselianRing.is_henselian (I := I) (Polynomial.X ^ 2 - Polynomial.X : Polynomial S)
+      (by monicity!) ((x * y) ^ n)
+      (by
+        rw [← Ideal.Quotient.eq_zero_iff_mem]
+        simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, map_sub]
+        rw [map_pow, hE, he, sub_self])
+      (by
+        have : Ideal.Quotient.mk I
+              (Polynomial.eval ((x * y) ^ n)
+                (Polynomial.derivative (Polynomial.X ^ 2 - Polynomial.X : Polynomial S)))
+            = 2 * (X * Y) ^ n - 1 := by
+          rw [← hE]
+          simp [one_add_one_eq_two, map_ofNat]
+        rw [this]
+        exact IsUnit.of_mul_eq_one (2 * (X * Y) ^ n - 1) (by linear_combination 4 * he))
   have ha' : a * (a - 1) = 0 := by
     have : a ^ 2 - a = 0 := by simpa using ha
     linear_combination this
@@ -104,9 +121,10 @@ theorem isLocalRing_of_complete {S : Type} [CommRing S] [IsDomain S] (I : Ideal 
     · left
       exact isUnit_of_mul_isUnit_left ((isUnit_pow_iff hn.ne').1 h2)
 
-theorem local_complete_of_finite (R S : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    [IsAdicComplete (maximalIdeal R) R] [CommRing S] [IsDomain S] [Algebra R S] [Module.Finite R S] :
-    ∃ _ : IsLocalRing S, IsAdicComplete (maximalIdeal S) S := by
+theorem local_complete_of_finite
+    (R S : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    [IsAdicComplete (maximalIdeal R) R] [CommRing S] [IsDomain S] [Algebra R S] [Module.Finite R S]
+    : ∃ _ : IsLocalRing S, IsAdicComplete (maximalIdeal S) S := by
   haveI : IsNoetherianRing S := IsNoetherianRing.of_finite R S
   haveI : IsPrecomplete (maximalIdeal R) S := precomplete_of_finite _ S
   haveI : IsAdicComplete (maximalIdeal R) S := ⟨⟩
@@ -139,10 +157,14 @@ theorem local_complete_of_finite (R S : Type) [CommRing R] [IsLocalRing R] [IsNo
     precomplete_of_pow_le I _ (le_maximalIdeal hne) k ((Ideal.pow_le_pow_right (Nat.le_succ k)).trans hk)
   exact ⟨⟩
 
-theorem exists_normal (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (D : Type) [CommRing D] [IsDomain D]
-    [Algebra R D] [Module.Finite R D] [FaithfulSMul R D] (hR : GlobalTheory.TorRef.IsCN R) :
-    ∃ (R' : Type) (_ : CommRing R') (_ : IsDomain R') (_ : IsLocalRing R') (ρ : R →+* R') (σ : D →+* R'),
-      GlobalTheory.TorRef.IsCN R' ∧ Function.Injective ρ ∧ ρ.Finite ∧ IsLocalHom ρ ∧ σ.comp (algebraMap R D) = ρ := by
+theorem exists_normal
+    (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
+    (D : Type) [CommRing D] [IsDomain D] [Algebra R D] [Module.Finite R D] [FaithfulSMul R D]
+    (hR : GlobalTheory.TorRef.IsCN R)
+    : ∃ (R' : Type) (_ : CommRing R') (_ : IsDomain R') (_ : IsLocalRing R') (ρ : R →+* R')
+        (σ : D →+* R'),
+      GlobalTheory.TorRef.IsCN R' ∧ Function.Injective ρ ∧ ρ.Finite ∧ IsLocalHom ρ
+        ∧ σ.comp (algebraMap R D) = ρ := by
   obtain ⟨h1, h2, h3, h4⟩ := hR
   letI : Algebra (FractionRing R) (FractionRing D) := FractionRing.liftAlgebra R (FractionRing D)
   haveI : IsScalarTower R (FractionRing R) (FractionRing D) := FractionRing.isScalarTower_liftAlgebra R _
@@ -154,27 +176,46 @@ theorem exists_normal (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (D : 
   let S := integralClosure R (FractionRing D)
   haveI : Module.Finite R S := IsIntegralClosure.finite R (FractionRing R) (FractionRing D) S
   haveI : IsIntegrallyClosed S := integralClosure.isIntegrallyClosedOfFiniteExtension (FractionRing R)
-  have hL : Function.Injective (algebraMap R (FractionRing D)) := FaithfulSMul.algebraMap_injective R _
+  have hL : Function.Injective (algebraMap R (FractionRing D)) :=
+    FaithfulSMul.algebraMap_injective R _
   have hS : Function.Injective (algebraMap R S) := fun a b h => hL (congrArg Subtype.val h)
   haveI : FaithfulSMul R S := (faithfulSMul_iff_algebraMap_injective _ _).2 hS
   obtain ⟨hl, hc⟩ := local_complete_of_finite R S
   let ψ : D →ₐ[R] FractionRing D := IsScalarTower.toAlgHom R D _
   let σ : D →ₐ[R] S := ψ.codRestrict S fun c => (Algebra.IsIntegral.isIntegral c).map ψ
   haveI : Algebra.IsIntegral R S := Algebra.IsIntegral.of_finite _ _
-  refine ⟨S, inferInstance, inferInstance, hl, algebraMap R S, σ.toRingHom,
-    ⟨IsNoetherianRing.of_finite R S, inferInstance, hc, charZero_of_injective_algebraMap hS⟩, hS,
-    RingHom.finite_algebraMap.2 inferInstance, Algebra.IsIntegral.isLocalHom R S, σ.comp_algebraMap⟩
+  refine ⟨
+    S,
+    inferInstance,
+    inferInstance,
+    hl,
+    algebraMap R S,
+    σ.toRingHom,
+    ⟨IsNoetherianRing.of_finite R S, inferInstance, hc, charZero_of_injective_algebraMap hS⟩,
+    hS,
+    RingHom.finite_algebraMap.2 inferInstance,
+    Algebra.IsIntegral.isLocalHom R S,
+    σ.comp_algebraMap
+  ⟩
 
-theorem main (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (C : Type) [CommRing C] (φ : R →+* C)
-    (hR : GlobalTheory.TorRef.IsCN R) (hφ : Function.Injective φ) (hfin : φ.Finite) :
-    ∃ (R' : Type) (_ : CommRing R') (_ : IsDomain R') (_ : IsLocalRing R') (ρ : R →+* R') (σ : C →+* R'),
-      GlobalTheory.TorRef.IsCN R' ∧ Function.Injective ρ ∧ ρ.Finite ∧ IsLocalHom ρ ∧ σ.comp φ = ρ := by
+theorem main
+    (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
+    (C : Type) [CommRing C]
+    (φ : R →+* C)
+    (hR : GlobalTheory.TorRef.IsCN R) (hφ : Function.Injective φ) (hfin : φ.Finite)
+    : ∃ (R' : Type) (_ : CommRing R') (_ : IsDomain R') (_ : IsLocalRing R') (ρ : R →+* R')
+        (σ : C →+* R'),
+      GlobalTheory.TorRef.IsCN R' ∧ Function.Injective ρ ∧ ρ.Finite ∧ IsLocalHom ρ
+        ∧ σ.comp φ = ρ := by
   letI : Algebra R C := φ.toAlgebra
   haveI : Module.Finite R C := hfin
-  obtain ⟨P, -, hP, hPc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (R := R) (S := C) (⊥ : Ideal R) ⊥
-    (by rw [Ideal.under_def, ← RingHom.ker_eq_comap_bot]; exact ((RingHom.injective_iff_ker_eq_bot _).1 hφ).le)
+  obtain ⟨P, -, hP, hPc⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (R := R) (S := C) (⊥ : Ideal R) ⊥ (by
+      rw [Ideal.under_def, ← RingHom.ker_eq_comap_bot]
+      exact ((RingHom.injective_iff_ker_eq_bot _).1 hφ).le)
   have hD : Function.Injective (algebraMap R (C ⧸ P)) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     have : a ∈ P.comap (algebraMap R C) := by
       rw [Ideal.mem_comap, ← Ideal.Quotient.eq_zero_iff_mem]

@@ -9,13 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsAutFunO
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim MeasureTheory
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.RowSizes
 
-theorem sizes_of_sizeRows : ∀ {D : D7} (large₂ : SizeData₂ D), GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows large₂ → GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.Sizes D := by
+theorem sizes_of_sizeRows
+    : ∀ {D : D7} (large₂ : SizeData₂ D),
+      GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows large₂
+        → GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.Sizes D := by
   intro D large₂ h
   obtain ⟨⟨Pm, _, _⟩, _, hmf, hm44, _⟩ := h
   refine ⟨?_, ?_⟩
@@ -27,11 +33,14 @@ theorem sizes_of_sizeRows : ∀ {D : D7} (large₂ : SizeData₂ D), GlobalTheor
   · intro τ j hj
     have hg := (Pm.nodes_gap τ j hj).1
     have hf := Pm.heightBound_ge_rank_cubic
-    have hN : ((GlobalTheory.Grid.bigN D : ℕ) : ℝ) = (D.R.k : ℝ) + D.R.m * (D.R.t + (D.R.r + 6) + 1) := by
+    have hN
+        : ((GlobalTheory.Grid.bigN D : ℕ) : ℝ)
+          = (D.R.k : ℝ) + D.R.m * (D.R.t + (D.R.r + 6) + 1) := by
       unfold GlobalTheory.Grid.bigN GlobalTheory.Grid.sLen; push_cast; ring
     have ht : (0 : ℝ) ≤ D.R.t := Nat.cast_nonneg _
-    have key : ((2 * (GlobalTheory.Grid.bigN D : ℚ) ^ 3 : ℚ) : ℝ) <
-        (((D.hc τ).b ⟨j + 1, hj⟩ - (D.hc τ).b ⟨j, by omega⟩ : ℚ) : ℝ) := by
+    have key
+        : ((2 * (GlobalTheory.Grid.bigN D : ℚ) ^ 3 : ℚ) : ℝ)
+          < (((D.hc τ).b ⟨j + 1, hj⟩ - (D.hc τ).b ⟨j, by omega⟩ : ℚ) : ℝ) := by
       push_cast at hg ⊢
       rw [hN]
       linarith

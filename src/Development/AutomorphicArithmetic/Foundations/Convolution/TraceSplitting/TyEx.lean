@@ -12,6 +12,5 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Integrab
 @[expose] public section
 
 open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.T in
-theorem UpperTheory.ConvolutionTheory.T.tyEx :
-    UpperTheory.ConvolutionTheory.T.TyEx :=
+theorem UpperTheory.ConvolutionTheory.T.tyEx : UpperTheory.ConvolutionTheory.T.TyEx :=
   tyEx_of splitLev splitStable splitMatch inertData offStable L1.typedEx L1.eigBasic

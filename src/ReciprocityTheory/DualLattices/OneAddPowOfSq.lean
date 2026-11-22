@@ -33,8 +33,10 @@ private lemma one_add_pow_of_sq {S : Type*} [CommRing S] (a : S) (ha : a * a = 0
     push_cast
     linear_combination (k : S) * ha
 
-theorem b4 (B : BX R₀) (hB1 : PairingPropertiesStatement B) (hB3 : TangentPairingStatement B) {p : ℕ}
-    (Tw : ATower R₀ p) : NsetExpInjectiveSurjective B Tw := by
+theorem b4
+    (B : BX R₀) (hB1 : PairingPropertiesStatement B) (hB3 : TangentPairingStatement B)
+    {p : ℕ} (Tw : ATower R₀ p)
+    : NsetExpInjectiveSurjective B Tw := by
   intro Dp ι τ E ht bt h1 h2 h3 i j
   apply sub_eq_zero.mp
   apply Tw.sep
@@ -43,23 +45,26 @@ theorem b4 (B : BX R₀) (hB1 : PairingPropertiesStatement B) (hB3 : TangentPair
   obtain ⟨thi, wi, hmi, hNi, hwi⟩ := h3 i n
   obtain ⟨thj, wj, hmj, hNj, hwj⟩ := h3 j n
   have hsurjL : Function.Surjective (Tw.π n).1.toLinearMap := Tw.surj n
-  obtain ⟨hsi, hsi_spec⟩ := Module.projective_lifting_property (Tw.π n).1.toLinearMap
-    ((Tw.q n).1.toLinearMap ∘ₗ ht i) hsurjL
-  obtain ⟨hsj, hsj_spec⟩ := Module.projective_lifting_property (Tw.π n).1.toLinearMap
-    ((Tw.q n).1.toLinearMap ∘ₗ ht j) hsurjL
+  obtain ⟨hsi, hsi_spec⟩ :=
+    Module.projective_lifting_property (Tw.π n).1.toLinearMap ((Tw.q n).1.toLinearMap ∘ₗ ht i)
+      hsurjL
+  obtain ⟨hsj, hsj_spec⟩ :=
+    Module.projective_lifting_property (Tw.π n).1.toLinearMap ((Tw.q n).1.toLinearMap ∘ₗ ht j)
+      hsurjL
   obtain ⟨-, -, -, -, -, -, hnat, -⟩ := hB1
   have hpq := hnat _ _ (Tw.q n) _ _ _ _ hpair
   rw [← hmi, ← hmj] at hpq
-  have hB3' := hB3 (Tw.R' n) (Tw.R n) (Tw.π n) (Tw.ξ n) (Dp n) (p ^ (n + 1)) (Tw.surj n)
-    (Tw.ker_eq n) (Tw.ξ_sq n) (Tw.ann n) (Tw.char n) thi thj
-    (TensorProduct.map LinearMap.id (ξmul (Tw.π n) (Tw.ξ n) (Tw.ξ_mem n)) wi)
-    (TensorProduct.map LinearMap.id (ξmul (Tw.π n) (Tw.ξ n) (Tw.ξ_mem n)) wj)
-    hsi hsj (Tw.zh n ^ k) _ hNi hNj
-    (by rw [hmi, hsi_spec]; exact h2 i n) (by rw [hmj, hsj_spec]; exact h2 j n) hpq
-    (Units.ext (by simp [Tw.ζ_spec]))
-  have hev : ∀ (h : B.gg →ₗ[R₀] (Tw.R' n : Type u)) (w : B.gg ⊗[R₀] (Tw.R' n : Type u)),
-      B.evK (Tw.π n) h (TensorProduct.map LinearMap.id (ξmul (Tw.π n) (Tw.ξ n) (Tw.ξ_mem n)) w) =
-        Tw.ξ n * B.ev h w := by
+  have hB3' :=
+    hB3 (Tw.R' n) (Tw.R n) (Tw.π n) (Tw.ξ n) (Dp n) (p ^ (n + 1)) (Tw.surj n) (Tw.ker_eq n)
+      (Tw.ξ_sq n) (Tw.ann n) (Tw.char n) thi thj
+      (TensorProduct.map LinearMap.id (ξmul (Tw.π n) (Tw.ξ n) (Tw.ξ_mem n)) wi)
+      (TensorProduct.map LinearMap.id (ξmul (Tw.π n) (Tw.ξ n) (Tw.ξ_mem n)) wj) hsi hsj
+      (Tw.zh n ^ k) _ hNi hNj (by rw [hmi, hsi_spec]; exact h2 i n)
+      (by rw [hmj, hsj_spec]; exact h2 j n) hpq (Units.ext (by simp [Tw.ζ_spec]))
+  have hev
+      : ∀ (h : B.gg →ₗ[R₀] (Tw.R' n : Type u)) (w : B.gg ⊗[R₀] (Tw.R' n : Type u)),
+        B.evK (Tw.π n) h (TensorProduct.map LinearMap.id (ξmul (Tw.π n) (Tw.ξ n) (Tw.ξ_mem n)) w)
+          = Tw.ξ n * B.ev h w := by
     intro h w
     induction w using TensorProduct.induction_on with
     | zero => simp [BX.evK, BX.ev]
@@ -70,11 +75,14 @@ theorem b4 (B : BX R₀) (hB1 : PairingPropertiesStatement B) (hB3 : TangentPair
       simp only [BX.evK, BX.ev, map_add (f := _)] at ha hb ⊢
       rw [ha, hb, mul_add]
   rw [hev, hev] at hB3'
-  have hpow : ((Tw.zh n ^ k : (Tw.R' n : Type u)ˣ) : (Tw.R' n : Type u)) ^ (p ^ (n + 1)) =
-      1 + (k : (Tw.R' n : Type u)) * (Tw.cp n * Tw.ξ n) := by
+  have hpow
+      : ((Tw.zh n ^ k : (Tw.R' n : Type u)ˣ) : (Tw.R' n : Type u)) ^ (p ^ (n + 1))
+        = 1 + (k : (Tw.R' n : Type u)) * (Tw.cp n * Tw.ξ n) := by
     rw [Units.val_pow_eq_pow_val, pow_right_comm, Tw.zh_pow n]
     apply one_add_pow_of_sq
-    calc Tw.cp n * Tw.ξ n * (Tw.cp n * Tw.ξ n) = Tw.cp n * Tw.cp n * (Tw.ξ n * Tw.ξ n) := by ring
+    calc
+      Tw.cp n * Tw.ξ n * (Tw.cp n * Tw.ξ n)
+        = Tw.cp n * Tw.cp n * (Tw.ξ n * Tw.ξ n) := by ring
       _ = 0 := by rw [Tw.ξ_sq n, mul_zero]
   have hξ : ((k : (Tw.R' n : Type u)) * Tw.cp n - (B.ev hsj wi - B.ev hsi wj)) * Tw.ξ n = 0 := by
     have hh := hB3'.symm.trans hpow

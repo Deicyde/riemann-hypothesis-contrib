@@ -7,13 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoC
 @[expose] public section
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.UnipDom
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.UnipDom
 
 namespace GlobalTheory.AdelicUnitaryTop
 
-theorem lcsc_UA : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
-    LocallyCompactSpace (UA σ J) ∧ SecondCountableTopology (UA σ J) ∧ T2Space (UA σ J) := by
+theorem lcsc_UA
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
+      LocallyCompactSpace (UA σ J) ∧ SecondCountableTopology (UA σ J) ∧ T2Space (UA σ J) := by
   intro F E _ _ _ _ _ σ n J
   haveI := locallyCompact_adele F
   haveI := secondCountable_adele F
@@ -41,10 +44,13 @@ theorem lcsc_UA : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberFi
   have hc : IsClosed (UG (cA σ) (incM F J) : Set (GL (Fin n) (AE F E))) := by
     have hv : Continuous fun g : GL (Fin n) (AE F E) => (g : Matrix (Fin n) (Fin n) (AE F E)) :=
       Units.continuous_val
-    exact isClosed_eq ((hv.matrix_transpose.matrix_mul continuous_const).matrix_mul
-      (hv.matrix_map hσ)) continuous_const
-  exact ⟨hc.isClosedEmbedding_subtypeVal.locallyCompactSpace,
+    exact isClosed_eq
+      ((hv.matrix_transpose.matrix_mul continuous_const).matrix_mul (hv.matrix_map hσ))
+      continuous_const
+  exact ⟨
+    hc.isClosedEmbedding_subtypeVal.locallyCompactSpace,
     hc.isClosedEmbedding_subtypeVal.isEmbedding.secondCountableTopology,
-    inferInstanceAs (T2Space (UG (cA σ) (incM F J)))⟩
+    inferInstanceAs (T2Space (UG (cA σ) (incM F J)))
+  ⟩
 
 end GlobalTheory.AdelicUnitaryTop

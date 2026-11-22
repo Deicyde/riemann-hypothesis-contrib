@@ -16,8 +16,7 @@ variable {O : Type*} [CommRing O] {X' : Type*}
 def liftHom : (X' → O) →+* (X' → FractionRing O) :=
   RingHom.pi fun x' => (algebraMap O (FractionRing O)).comp (Pi.evalRingHom (fun _ : X' => O) x')
 
-def Fr (T' : Subalgebra O (X' → O)) : Subring (X' → FractionRing O) :=
-  T'.toSubring.map liftHom
+def Fr (T' : Subalgebra O (X' → O)) : Subring (X' → FractionRing O) := T'.toSubring.map liftHom
 
 lemma mem_Fr {T' : Subalgebra O (X' → O)} {φ : X' → FractionRing O} :
     φ ∈ Fr T' ↔ ∃ f ∈ T', ∀ x', algebraMap O (FractionRing O) (f x') = φ x' := by
@@ -50,9 +49,9 @@ def goodS (T' : Subalgebra O (X' → O)) : Subring (PowerSeries (X' → Fraction
 
 variable {d : Type} [Fintype d] [DecidableEq d]
 
-def coefMat (n : ℕ) (a : Matrix d d (PowerSeries (X' → FractionRing O))) :
-    X' → Matrix d d (FractionRing O) :=
-  fun x' i j => PowerSeries.coeff n (a i j) x'
+def coefMat (n : ℕ) (a : Matrix d d (PowerSeries (X' → FractionRing O)))
+    : X' → Matrix d d (FractionRing O) := fun x' i j =>
+  PowerSeries.coeff n (a i j) x'
 
 lemma coefMat_mul (n : ℕ) (a b : Matrix d d (PowerSeries (X' → FractionRing O))) :
     coefMat n (a * b) = ∑ p ∈ antidiagonal n, coefMat p.1 a * coefMat p.2 b := by
@@ -83,8 +82,8 @@ lemma coefMat_one (n : ℕ) :
   by_cases hn : n = 0 <;> by_cases hij : i = j <;>
     simp [coefMat, Matrix.one_apply, hn, hij, PowerSeries.coeff_one]
 
-def goodM (R' : Subalgebra O (X' → Matrix d d (FractionRing O))) :
-    Subring (Matrix d d (PowerSeries (X' → FractionRing O))) where
+def goodM (R' : Subalgebra O (X' → Matrix d d (FractionRing O)))
+    : Subring (Matrix d d (PowerSeries (X' → FractionRing O))) where
   carrier := {a | ∀ n, coefMat n a ∈ R'}
   mul_mem' {a b} ha hb n := by
     rw [coefMat_mul]
@@ -175,12 +174,15 @@ end Trunc
 section Good
 variable {d : Type} [Fintype d] [DecidableEq d]
 
-def HypDet (T' : Subalgebra O (X' → O)) (R' : Subalgebra O (X' → Matrix d d (FractionRing O))) :
-    Prop :=
+def HypDet (T' : Subalgebra O (X' → O)) (R' : Subalgebra O (X' → Matrix d d (FractionRing O)))
+    : Prop :=
   ∀ (m : ℕ) (r : Fin m → R') (s : Fin m →₀ ℕ), ∃ f ∈ T', ∀ x',
-    algebraMap O (FractionRing O) (f x') =
-      AddMonoidAlgebra.coeff (Matrix.det (∑ i, (MvPolynomial.X i : MvPolynomial (Fin m) (FractionRing O)) •
-        ((r i : X' → Matrix d d (FractionRing O)) x').map MvPolynomial.C)) s
+    algebraMap O (FractionRing O) (f x')
+      = AddMonoidAlgebra.coeff
+        (Matrix.det
+          (∑ i, (MvPolynomial.X i : MvPolynomial (Fin m) (FractionRing O)) •
+            ((r i : X' → Matrix d d (FractionRing O)) x').map MvPolynomial.C))
+        s
 
 lemma coeff_det_eq (R' : Subalgebra O (X' → Matrix d d (FractionRing O)))
     (a : Matrix d d (PowerSeries (X' → FractionRing O))) (ha : a ∈ goodM R') (n : ℕ) (x' : X') :
@@ -298,20 +300,25 @@ section Schur
 variable {d : Type} [Fintype d] [DecidableEq d]
 
 def optEquiv (g d : Type) : Option g × d ≃ d ⊕ (g × d) where
-  toFun x := match x with
+  toFun x :=
+    match x with
     | (none, i) => Sum.inl i
     | (some p, i) => Sum.inr (p, i)
-  invFun y := match y with
+  invFun y :=
+    match y with
     | Sum.inl i => (none, i)
     | Sum.inr (p, i) => (some p, i)
   left_inv := by rintro ⟨_ | p, i⟩ <;> rfl
   right_inv := by rintro (i | ⟨p, i⟩) <;> rfl
 
-def SchurP (T' : Subalgebra O (X' → O)) (R' : Subalgebra O (X' → Matrix d d (FractionRing O)))
-    (g : Type) [Fintype g] : Prop :=
+def SchurP
+    (T' : Subalgebra O (X' → O)) (R' : Subalgebra O (X' → Matrix d d (FractionRing O)))
+    (g : Type) [Fintype g]
+    : Prop :=
   ∀ [DecidableEq g] (Φ : Matrix (g × d) (g × d) (PowerSeries (X' → FractionRing O))),
-    (∀ p q, (Matrix.of fun i j => Φ (p, i) (q, j)) ∈ goodM R') →
-    (PowerSeries.constantCoeff).mapMatrix Φ = 1 → Φ.det ∈ goodS T'
+    (∀ p q, (Matrix.of fun i j => Φ (p, i) (q, j)) ∈ goodM R')
+      → (PowerSeries.constantCoeff).mapMatrix Φ = 1
+      → Φ.det ∈ goodS T'
 
 lemma schur (T' : Subalgebra O (X' → O)) (R' : Subalgebra O (X' → Matrix d d (FractionRing O)))
     (hyp : HypDet T' R') (g : Type) [Fintype g] : SchurP T' R' g := by
@@ -381,10 +388,13 @@ end Schur
 section Final
 variable {d : Type} [Fintype d] [DecidableEq d]
 
-def phiMat (R' : Subalgebra O (X' → Matrix d d (FractionRing O))) {g : Type} [Fintype g]
-    [DecidableEq g] (Θ : Matrix g g R') : Matrix (g × d) (g × d) (PowerSeries (X' → FractionRing O)) :=
-  1 - (PowerSeries.X : PowerSeries (X' → FractionRing O)) •
-    Matrix.of fun P Q => PowerSeries.C (fun x' => (Θ P.1 Q.1 : X' → Matrix d d (FractionRing O)) x' P.2 Q.2)
+def phiMat
+    (R' : Subalgebra O (X' → Matrix d d (FractionRing O)))
+    {g : Type} [Fintype g] [DecidableEq g]
+    (Θ : Matrix g g R')
+    : Matrix (g × d) (g × d) (PowerSeries (X' → FractionRing O)) :=
+  1 - (PowerSeries.X : PowerSeries (X' → FractionRing O)) • Matrix.of fun P Q =>
+    PowerSeries.C (fun x' => (Θ P.1 Q.1 : X' → Matrix d d (FractionRing O)) x' P.2 Q.2)
 
 lemma phiMat_block (R' : Subalgebra O (X' → Matrix d d (FractionRing O))) {g : Type} [Fintype g]
     [DecidableEq g] (Θ : Matrix g g R') (p q : g) (n : ℕ) :
@@ -457,7 +467,11 @@ theorem blockDet : StatBlockDet := by
   intro O _ _ X' T' d _ _ R' hyp g _ _ Θ
   have hS := schur T' R' hyp g (phiMat R' Θ) (fun p q => phiMat_good R' Θ p q) (phiMat_const R' Θ)
   obtain ⟨f, hf, hfx⟩ := mem_Fr.1 (hS (Fintype.card (g × d)))
-  refine ⟨(-1) ^ Fintype.card (g × d) * f, T'.mul_mem (T'.pow_mem (T'.neg_mem T'.one_mem) _) hf, fun x' => ?_⟩
+  refine ⟨
+    (-1) ^ Fintype.card (g × d) * f,
+    T'.mul_mem (T'.pow_mem (T'.neg_mem T'.one_mem) _) hf,
+    fun x' => ?_
+  ⟩
   rw [phiMat_eval R' Θ x', ← hfx x']
   simp
 

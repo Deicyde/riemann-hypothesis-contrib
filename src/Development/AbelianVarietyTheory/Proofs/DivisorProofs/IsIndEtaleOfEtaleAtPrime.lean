@@ -16,19 +16,22 @@ noncomputable section
 
 namespace GlobalTheory.IndEtaleAtPrime
 
-theorem isIndEtale_of_etale_atPrime (R C : Type) [CommRing R] [CommRing C] (P : Ideal R) [P.IsPrime]
-    [Algebra (Localization.AtPrime P) C] [Algebra.Etale (Localization.AtPrime P) C] :
-    GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale ((algebraMap (Localization.AtPrime P) C).comp
-      (algebraMap R (Localization.AtPrime P))) := by
+theorem isIndEtale_of_etale_atPrime
+    (R C : Type) [CommRing R] [CommRing C]
+    (P : Ideal R)
+    [P.IsPrime] [Algebra (Localization.AtPrime P) C] [Algebra.Etale (Localization.AtPrime P) C]
+    : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale
+      ((algebraMap (Localization.AtPrime P) C).comp (algebraMap R (Localization.AtPrime P))) := by
   let L := Localization.AtPrime P
   let M := P.primeCompl
   let D0 := (Functor.const (Discrete PUnit.{1})).obj (CommRingCat.of R)
   let s0 : D0 ⟶ (Functor.const _).obj (CommRingCat.of R) := 𝟙 _
   have hs0 : IsColimit (Cocone.mk _ s0) := GlobalTheory.IndEtFactorLoc.constColim R
-  obtain ⟨j, Aj, _, instA, hAj, ⟨e⟩⟩ := GlobalTheory.EtaleDescent.exists_etale_model_of_isColimit
-    (GlobalTheory.IndEtaleLoc.Idx D0 s0 M) (GlobalTheory.IndEtaleLoc.diag D0 s0 M)
-    (Cocone.mk _ (GlobalTheory.IndEtaleLoc.toLoc (s := s0) (M := M) L))
-    (GlobalTheory.IndEtaleLoc.isColimitToLoc L hs0) C
+  obtain ⟨j, Aj, _, instA, hAj, ⟨e⟩⟩ :=
+    GlobalTheory.EtaleDescent.exists_etale_model_of_isColimit (GlobalTheory.IndEtaleLoc.Idx D0 s0 M)
+      (GlobalTheory.IndEtaleLoc.diag D0 s0 M)
+      (Cocone.mk _ (GlobalTheory.IndEtaleLoc.toLoc (s := s0) (M := M) L))
+      (GlobalTheory.IndEtaleLoc.isColimitToLoc L hs0) C
   let Re : Type := Localization.Away j.e
   letI : Algebra R Re := (inferInstance : Algebra (D0.obj j.j) (Localization.Away j.e))
   letI : Algebra Re L := (GlobalTheory.IndEtaleLoc.leg L j).toAlgebra
@@ -69,14 +72,18 @@ theorem isIndEtale_of_etale_atPrime (R C : Type) [CommRing R] [CommRing C] (P : 
     show algebraMap L C (algebraMap R L r) = e' ((1 : L) ⊗ₜ[Re] algebraMap Re Aj (algebraMap R Re r))
     rw [key, AlgEquiv.commutes])
   exact GlobalTheory.IndEtaleLoc.isIndEtale_of_isLocalization R Aj C
-      (Algebra.algebraMapSubmonoid Aj (M.map (algebraMap R Re))) (GlobalTheory.EtC.indEt_of_etale R Aj)
+    (Algebra.algebraMapSubmonoid Aj (M.map (algebraMap R Re)))
+    (GlobalTheory.EtC.indEt_of_etale R Aj)
 
-theorem indEt_of_indEt_atPrime : ∀ (B O : Type) [CommRing B] [CommRing O] (P : Ideal B) [P.IsPrime]
-    [Algebra (Localization.AtPrime P) O] [Algebra B O] [IsScalarTower B (Localization.AtPrime P) O],
-    IndEt (Localization.AtPrime P) O → IndEt B O := by
+theorem indEt_of_indEt_atPrime
+    : ∀ (B O : Type) [CommRing B] [CommRing O] (P : Ideal B) [P.IsPrime]
+        [Algebra (Localization.AtPrime P) O] [Algebra B O]
+        [IsScalarTower B (Localization.AtPrime P) O],
+      IndEt (Localization.AtPrime P) O → IndEt B O := by
   intro B O _ _ P _ _ _ _ h
-  have hp : RingHom.toMorphismProperty @RingHom.Etale ≤
-      MorphismProperty.isFinitelyPresentable.{0} CommRingCat.{0} := by
+  have hp
+      : RingHom.toMorphismProperty @RingHom.Etale
+        ≤ MorphismProperty.isFinitelyPresentable.{0} CommRingCat.{0} := by
     intro X Y f hf
     refine CommRingCat.isFinitelyPresentable_hom f ?_
     letI := f.hom.toAlgebra
@@ -85,9 +92,16 @@ theorem indEt_of_indEt_atPrime : ∀ (B O : Type) [CommRing B] [CommRing O] (P :
   unfold IndEt GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale
   rw [← MorphismProperty.ind_ind hp]
   obtain ⟨J, _, _, D, t, s, hs, hj⟩ := h
-  refine ⟨J, inferInstance, inferInstance, D,
-    (Functor.const J).map (CommRingCat.ofHom (algebraMap B (Localization.AtPrime P))) ≫ t, s, hs,
-    fun i => ⟨?_, ?_⟩⟩
+  refine ⟨
+    J,
+    inferInstance,
+    inferInstance,
+    D,
+    (Functor.const J).map (CommRingCat.ofHom (algebraMap B (Localization.AtPrime P))) ≫ t,
+    s,
+    hs,
+    fun i => ⟨?_, ?_⟩
+  ⟩
   · letI : Algebra (Localization.AtPrime P) (D.obj i) := (t.app i).hom.toAlgebra
     haveI : Algebra.Etale (Localization.AtPrime P) (D.obj i) := (hj i).1
     exact isIndEtale_of_etale_atPrime B (D.obj i) P

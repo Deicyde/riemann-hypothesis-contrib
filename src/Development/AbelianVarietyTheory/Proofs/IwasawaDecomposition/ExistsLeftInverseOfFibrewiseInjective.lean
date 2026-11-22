@@ -7,9 +7,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 namespace GlobalTheory
 
-theorem matrix_exists_left_inverse_of_field {K : Type} [Field K] {m n : ℕ}
-    (Q : Matrix (Fin m) (Fin n) K) (h : Function.Injective Q.mulVec) :
-    ∃ Q' : Matrix (Fin n) (Fin m) K, Q' * Q = 1 := by
+theorem matrix_exists_left_inverse_of_field
+    {K : Type} [Field K] {m n : ℕ} (Q : Matrix (Fin m) (Fin n) K) (h : Function.Injective Q.mulVec)
+    : ∃ Q' : Matrix (Fin n) (Fin m) K, Q' * Q = 1 := by
   have hk : LinearMap.ker (Matrix.toLin' Q) = ⊥ := by
     rw [LinearMap.ker_eq_bot]
     intro x y hxy

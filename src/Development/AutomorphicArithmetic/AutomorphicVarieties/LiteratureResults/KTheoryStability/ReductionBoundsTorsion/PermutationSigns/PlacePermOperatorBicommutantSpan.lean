@@ -15,20 +15,22 @@ namespace WeightOneEmbedding
 variable {Ω : Type} [Fintype Ω] [DecidableEq Ω]
 
 def embE : Matrix Ω Ω ℂ ≃ₗ[ℂ] EuclideanSpace ℂ (Ω × Ω) :=
-  (Matrix.ofLinearEquiv ℂ).symm ≪≫ₗ (LinearEquiv.curry ℂ ℂ Ω Ω).symm ≪≫ₗ
-    (WithLp.linearEquiv 2 ℂ (Ω × Ω → ℂ)).symm
+  (Matrix.ofLinearEquiv ℂ).symm ≪≫ₗ (LinearEquiv.curry ℂ ℂ Ω Ω).symm
+    ≪≫ₗ (WithLp.linearEquiv 2 ℂ (Ω × Ω → ℂ)).symm
 
-theorem inner_embE (x y : Matrix Ω Ω ℂ) :
-    inner ℂ (embE x) (embE y) = trace (xᴴ * y) := by
+theorem inner_embE (x y : Matrix Ω Ω ℂ) : inner ℂ (embE x) (embE y) = trace (xᴴ * y) := by
   rw [EuclideanSpace.inner_eq_star_dotProduct]
-  simp only [embE, LinearEquiv.trans_apply, dotProduct, trace, diag, Matrix.mul_apply, conjTranspose_apply]
+  simp only [embE, LinearEquiv.trans_apply, dotProduct, trace, diag, Matrix.mul_apply,
+    conjTranspose_apply]
   rw [Fintype.sum_prod_type, Finset.sum_comm]
   exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => mul_comm _ _
 
-theorem comm_left (A : Submodule ℂ (Matrix Ω Ω ℂ)) (T : Matrix Ω Ω ℂ)
+theorem comm_left
+    (A : Submodule ℂ (Matrix Ω Ω ℂ)) (T : Matrix Ω Ω ℂ)
     (hT : ∀ Z : Matrix Ω Ω ℂ, (∀ a ∈ A, Z * a = a * Z) → T * Z = Z * T)
     (S : Matrix Ω Ω ℂ →ₗ[ℂ] Matrix Ω Ω ℂ) (hS : ∀ a ∈ A, ∀ y, S (a * y) = a * S y)
-    (y : Matrix Ω Ω ℂ) : S (T * y) = T * S y := by
+    (y : Matrix Ω Ω ℂ)
+    : S (T * y) = T * S y := by
   have key : ∀ (a : Matrix Ω Ω ℂ) (c j : Ω), a * single c j 1 = ∑ b, a b c • single b j 1 := by
     intro a c j
     ext x z
@@ -44,8 +46,8 @@ theorem comm_left (A : Submodule ℂ (Matrix Ω Ω ℂ)) (T : Matrix Ω Ω ℂ)
   have hZl : ∀ (a : Matrix Ω Ω ℂ) (j k x c : Ω), (a * Z j k) x c = (a * S (single c j 1)) x k := by
     intro a j k x c
     simp only [Z, Matrix.mul_apply, of_apply]
-  have hZ : ∀ j k, T * Z j k = Z j k * T := fun j k => hT _ fun a ha => by
-    ext x c; rw [hZr, hZl, hS a ha]
+  have hZ : ∀ j k, T * Z j k = Z j k * T := fun j k =>
+    hT _ fun a ha => by ext x c; rw [hZr, hZl, hS a ha]
   have hsingle : ∀ c j, S (T * single c j 1) = T * S (single c j 1) := by
     intro c j
     ext x k
@@ -58,22 +60,25 @@ theorem comm_left (A : Submodule ℂ (Matrix Ω Ω ℂ)) (T : Matrix Ω Ω ℂ)
     rw [smul_single, smul_eq_mul, mul_one]
   rw [this, mul_smul_comm, map_smul, hsingle, map_smul, mul_smul_comm]
 
-theorem bic (A : Submodule ℂ (Matrix Ω Ω ℂ)) (h1 : (1 : Matrix Ω Ω ℂ) ∈ A)
-    (hmul : ∀ a ∈ A, ∀ b ∈ A, a * b ∈ A) (hstar : ∀ a ∈ A, aᴴ ∈ A) (T : Matrix Ω Ω ℂ)
-    (hT : ∀ Z : Matrix Ω Ω ℂ, (∀ a ∈ A, Z * a = a * Z) → T * Z = Z * T) : T ∈ A := by
+theorem bic
+    (A : Submodule ℂ (Matrix Ω Ω ℂ))
+    (h1 : (1 : Matrix Ω Ω ℂ) ∈ A) (hmul : ∀ a ∈ A, ∀ b ∈ A, a * b ∈ A) (hstar : ∀ a ∈ A, aᴴ ∈ A)
+    (T : Matrix Ω Ω ℂ) (hT : ∀ Z : Matrix Ω Ω ℂ, (∀ a ∈ A, Z * a = a * Z) → T * Z = Z * T)
+    : T ∈ A := by
   let K : Submodule ℂ (EuclideanSpace ℂ (Ω × Ω)) := A.map (embE : Matrix Ω Ω ℂ ≃ₗ[ℂ] _).toLinearMap
   let P : Matrix Ω Ω ℂ →ₗ[ℂ] Matrix Ω Ω ℂ :=
-    (embE : Matrix Ω Ω ℂ ≃ₗ[ℂ] _).symm.toLinearMap ∘ₗ K.starProjection.toLinearMap ∘ₗ
-      (embE : Matrix Ω Ω ℂ ≃ₗ[ℂ] _).toLinearMap
-  have hPe : ∀ y, embE (P y) = K.starProjection (embE y) := fun y => by
-    simp [P]
+    (embE : Matrix Ω Ω ℂ ≃ₗ[ℂ] _).symm.toLinearMap ∘ₗ K.starProjection.toLinearMap
+      ∘ₗ (embE : Matrix Ω Ω ℂ ≃ₗ[ℂ] _).toLinearMap
+  have hPe : ∀ y, embE (P y) = K.starProjection (embE y) := fun y => by simp [P]
   have P1 : ∀ y, P y ∈ A := by
     intro y
     obtain ⟨a, ha, e⟩ := Submodule.mem_map.1 (K.starProjection_apply_mem (embE y))
     have : P y = a := by
       apply (embE : Matrix Ω Ω ℂ ≃ₗ[ℂ] _).injective
-      rw [hPe]; exact e.symm
-    rw [this]; exact ha
+      rw [hPe]
+      exact e.symm
+    rw [this]
+    exact ha
   have P2 : ∀ a ∈ A, P a = a := by
     intro a ha
     apply (embE : Matrix Ω Ω ℂ ≃ₗ[ℂ] _).injective
@@ -87,8 +92,9 @@ theorem bic (A : Submodule ℂ (Matrix Ω Ω ℂ)) (h1 : (1 : Matrix Ω Ω ℂ) 
     · exact Submodule.mem_map_of_mem (hmul a ha _ (P1 y))
     · intro w hw
       obtain ⟨b, hb, rfl⟩ := Submodule.mem_map.1 hw
-      have h0 := Submodule.starProjection_inner_eq_zero (K := K) (embE y)
-        (embE (aᴴ * b)) (Submodule.mem_map_of_mem (hmul _ (hstar a ha) b hb))
+      have h0 :=
+        Submodule.starProjection_inner_eq_zero (K := K) (embE y) (embE (aᴴ * b))
+          (Submodule.mem_map_of_mem (hmul _ (hstar a ha) b hb))
       rw [← hPe, ← map_sub, inner_embE] at h0
       change inner ℂ (embE (a * y) - embE (a * P y)) (embE b) = 0
       rw [← map_sub, inner_embE, ← mul_sub, conjTranspose_mul, Matrix.mul_assoc]
@@ -104,8 +110,8 @@ open WeightOneEmbedding
 
 variable {W : Type} [Fintype W] [DecidableEq W] {m q : ℕ}
 
-theorem perm'_mul (σ τ : Equiv.Perm (Fin q)) (w v : Fin q → W) :
-    (perm' (m := m) σ w) * perm' τ v = if v = w ∘ σ then perm' (σ * τ) w else 0 := by
+theorem perm'_mul (σ τ : Equiv.Perm (Fin q)) (w v : Fin q → W)
+    : (perm' (m := m) σ w) * perm' τ v = if v = w ∘ σ then perm' (σ * τ) w else 0 := by
   ext I K
   rw [Matrix.mul_apply, Finset.sum_eq_single (I ∘ σ)]
   · simp only [perm', of_apply, Equiv.Perm.coe_mul]
@@ -117,8 +123,8 @@ theorem perm'_mul (σ τ : Equiv.Perm (Fin q)) (w v : Fin q → W) :
       · simp [hI]
     · rw [if_neg hv, Matrix.zero_apply]
       by_cases hI : ∀ i, (I i).1 = w i
-      · have : ¬ ∀ i, ((I ∘ σ) i).1 = v i := fun h => hv (funext fun i => by
-          rw [← h i]; exact hI (σ i))
+      · have : ¬ ∀ i, ((I ∘ σ) i).1 = v i := fun h =>
+          hv (funext fun i => by rw [← h i]; exact hI (σ i))
         simp only [this, false_and, if_false, mul_zero]
       · simp [hI]
   · intro J _ hJ
@@ -126,15 +132,16 @@ theorem perm'_mul (σ τ : Equiv.Perm (Fin q)) (w v : Fin q → W) :
     rw [if_neg (fun h => hJ h.2), zero_mul]
   · simp
 
-theorem perm'_star (σ : Equiv.Perm (Fin q)) (w : Fin q → W) :
-    (perm' (m := m) σ w)ᴴ = perm' σ⁻¹ (w ∘ σ) := by
+theorem perm'_star (σ : Equiv.Perm (Fin q)) (w : Fin q → W)
+    : (perm' (m := m) σ w)ᴴ = perm' σ⁻¹ (w ∘ σ) := by
   ext I J
   simp only [perm', conjTranspose_apply, of_apply]
   have e : (∀ i, (J i).1 = w i) ∧ I = J ∘ σ ↔ (∀ i, (I i).1 = (w ∘ σ) i) ∧ J = I ∘ ⇑(σ⁻¹) := by
     constructor
     · rintro ⟨h1, rfl⟩
       refine ⟨fun i => h1 (σ i), ?_⟩
-      funext i; simp
+      funext i
+      simp
     · rintro ⟨h1, rfl⟩
       refine ⟨fun i => ?_, ?_⟩
       · have := h1 (σ⁻¹ i); simpa using this

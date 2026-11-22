@@ -14,10 +14,11 @@ section
 universe u
 variable {W V : Type} {I : V → Type}
 
-private theorem exists_fam (ι : ∀ v, I v → W) (b : W → V) (hb : ∀ v i, b (ι v i) = v)
+private theorem exists_fam
+    (ι : ∀ v, I v → W) (b : W → V) (hb : ∀ v i, b (ι v i) = v)
     (hinj : ∀ v, Function.Injective (ι v)) (hs : ∀ w, ∃ v i, ι v i = w)
-    {X : W → Type u} (T : ∀ v (i : I v), X (ι v i)) :
-    ∃ f : ∀ w, X w, ∀ v i, f (ι v i) = T v i := by
+    {X : W → Type u} (T : ∀ v (i : I v), X (ι v i))
+    : ∃ f : ∀ w, X w, ∀ v i, f (ι v i) = T v i := by
   have h : ∀ w, ∃ x : X w, ∀ v i (h : ι v i = w), h ▸ T v i = x := by
     intro w
     obtain ⟨v, i, rfl⟩ := hs w
@@ -30,33 +31,42 @@ private theorem exists_fam (ι : ∀ v, I v → W) (b : W → V) (hb : ∀ v i, 
   choose f hf using h
   exact ⟨f, fun v i => (hf _ v i rfl).symm⟩
 
-private theorem ev_up [∀ v, Finite (I v)] (ι : ∀ v, I v → W) (b : W → V) (hb : ∀ v i, b (ι v i) = v)
-    {P : W → Prop} (h : ∀ᶠ w in cofinite, P w) : ∀ᶠ v in cofinite, ∀ i, P (ι v i) := by
+private theorem ev_up
+    [∀ v, Finite (I v)]
+    (ι : ∀ v, I v → W) (b : W → V) (hb : ∀ v i, b (ι v i) = v)
+    {P : W → Prop} (h : ∀ᶠ w in cofinite, P w)
+    : ∀ᶠ v in cofinite, ∀ i, P (ι v i) := by
   rw [eventually_cofinite] at h ⊢
   refine (h.image b).subset fun v hv => ?_
   simp only [Set.mem_setOf_eq, not_forall] at hv
   obtain ⟨i, hi⟩ := hv
   exact ⟨ι v i, hi, hb v i⟩
 
-private theorem ev_down [∀ v, Finite (I v)] (ι : ∀ v, I v → W) (b : W → V) (hb : ∀ v i, b (ι v i) = v)
-    (hs : ∀ w, ∃ v i, ι v i = w) {P : V → Prop} (h : ∀ᶠ v in cofinite, P v) :
-    ∀ᶠ w in cofinite, P (b w) := by
+private theorem ev_down
+    [∀ v, Finite (I v)]
+    (ι : ∀ v, I v → W) (b : W → V) (hb : ∀ v i, b (ι v i) = v)
+    (hs : ∀ w, ∃ v i, ι v i = w)
+    {P : V → Prop} (h : ∀ᶠ v in cofinite, P v)
+    : ∀ᶠ w in cofinite, P (b w) := by
   rw [eventually_cofinite] at h ⊢
   refine (h.biUnion fun v _ => Set.finite_range (ι v)).subset fun w hw => ?_
   obtain ⟨v, i, rfl⟩ := hs w
   simp only [Set.mem_setOf_eq, hb] at hw
   exact Set.mem_biUnion hw ⟨i, rfl⟩
 
-variable {G Gi : Type} {H : W → Type} {Gv : V → Type} [Group G] [Group Gi] [∀ w, Group (H w)]
+variable
+  {G Gi : Type} {H : W → Type} {Gv : V → Type} [Group G] [Group Gi] [∀ w, Group (H w)]
   [∀ v, Group (Gv v)] [TopologicalSpace G] [TopologicalSpace Gi] [∀ w, TopologicalSpace (H w)]
   [∀ v, TopologicalSpace (Gv v)] [T2Space Gi] [∀ v, T2Space (Gv v)]
 
-private theorem rp_group [∀ v, Finite (I v)] {q : G →* Gi} {p : ∀ w, G →* H w} {K : ∀ w, Subgroup (H w)}
-    (hRP : RP q p K) (ι : ∀ v, I v → W) (b : W → V) (hb : ∀ v i, b (ι v i) = v)
+private theorem rp_group
+    [∀ v, Finite (I v)]
+    {q : G →* Gi} {p : ∀ w, G →* H w} {K : ∀ w, Subgroup (H w)} (hRP : RP q p K)
+    (ι : ∀ v, I v → W) (b : W → V) (hb : ∀ v i, b (ι v i) = v)
     (hinj : ∀ v, Function.Injective (ι v)) (hs : ∀ w, ∃ v i, ι v i = w)
     (e : ∀ v, Gv v ≃ₜ* ∀ i : I v, H (ι v i)) (p' : ∀ v, G →* Gv v) (K' : ∀ v, Subgroup (Gv v))
-    (hp : ∀ v i g, e v (p' v g) i = p (ι v i) g)
-    (hK : ∀ v x, x ∈ K' v ↔ ∀ i, e v x i ∈ K (ι v i)) : RP q p' K' := by
+    (hp : ∀ v i g, e v (p' v g) i = p (ι v i) g) (hK : ∀ v x, x ∈ K' v ↔ ∀ i, e v x i ∈ K (ι v i))
+    : RP q p' K' := by
   have hcp : ∀ v, Continuous (p' v) := by
     intro v
     have h : ⇑(p' v) = fun g => (e v).symm (fun i => p (ι v i) g) := by
@@ -70,8 +80,17 @@ private theorem rp_group [∀ v, Finite (I v)] {q : G →* Gi} {p : ∀ w, G →
     intro v
     ext x
     simp only [SetLike.mem_coe, hK, Set.mem_preimage, Set.mem_pi, Set.mem_univ, true_imp_iff]
-  refine ⟨hRP.cq, hcp, fun v => ?_, fun v => ?_, fun g => ?_, fun S => ?_, fun g g' hq h => ?_,
-    fun gi gv hgv => ?_, fun Ci C hCi hC hev => ?_⟩
+  refine ⟨
+    hRP.cq,
+    hcp,
+    fun v => ?_,
+    fun v => ?_,
+    fun g => ?_,
+    fun S => ?_,
+    fun g g' hq h => ?_,
+    fun gi gv hgv => ?_,
+    fun Ci C hCi hC hev => ?_
+  ⟩
   · rw [hKset]
     exact (isOpen_set_pi Set.finite_univ fun i _ => hRP.opn _).preimage (e v).continuous
   · have h : (K' v : Set (Gv v)) = (e v).symm '' Set.pi Set.univ fun i => (K (ι v i) : Set _) := by
@@ -134,8 +153,8 @@ private theorem rp_group [∀ v, Finite (I v)] {q : G →* Gi} {p : ∀ w, G →
     obtain ⟨g, hq, hpg⟩ := hRP.surj gi gw hae
     refine ⟨g, hq, fun v => (e v).injective (funext fun i => ?_)⟩
     rw [hp, hpg, hgw]
-  · obtain ⟨D, hD⟩ := exists_fam ι b hb hinj hs (X := fun w => Set (H w))
-      fun v i => (fun x => e v x i) '' C v
+  · obtain ⟨D, hD⟩ :=
+      exists_fam ι b hb hinj hs (X := fun w => Set (H w)) fun v i => (fun x => e v x i) '' C v
     have hDc : ∀ w, IsCompact (D w) := by
       intro w
       obtain ⟨v, i, rfl⟩ := hs w
@@ -167,24 +186,31 @@ end
 
 end UpperTheory.ConvolutionTheory.T4.RPGroup
 
-open GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Global.AdeleBaseChange GroundTheory.Automorphic in
-theorem UpperTheory.restrictedProduct_extension_of_base_regroup :
-    RPF → RPE := by
+open GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Global.AdeleBaseChange
+  GroundTheory.Automorphic in
+theorem UpperTheory.restrictedProduct_extension_of_base_regroup : RPF → RPE := by
   intro hF F E _ _ _ _ _ n
-  refine UpperTheory.ConvolutionTheory.T4.RPGroup.rp_group (I := fun v : Pl F => PlacesOver E v) (hF E n)
-    (fun v i => i.1) (below F) (fun v i => (below_eq_iff i.1 v).2 i.2)
+  refine UpperTheory.ConvolutionTheory.T4.RPGroup.rp_group
+    (I := fun v : Pl F => PlacesOver E v)
+    (hF E n)
+    (fun v i => i.1)
+    (below F)
+    (fun v i => (below_eq_iff i.1 v).2 i.2)
     (fun v => Subtype.val_injective)
     (fun w => ⟨below F w, ⟨w, (below_eq_iff w _).1 rfl⟩, rfl⟩)
     (fun v => glPiEquiv (Fin n) fun w : PlacesOver E v => w.1.adicCompletion E)
-    (fun v => pE E n v) (fun v => KE E n v) ?_ ?_
+    (fun v => pE E n v)
+    (fun v => KE E n v)
+    ?_ ?_
   · intro v i g
     refine Units.ext ?_
     ext a b
     rfl
   · intro v x
-    have h : ∀ w : PlacesOver E v,
-        mapGL n (Pi.evalRingHom (fun w : PlacesOver E v => w.1.adicCompletion E) w) x =
-          glPiEquiv (Fin n) (fun w : PlacesOver E v => w.1.adicCompletion E) x w := by
+    have h
+        : ∀ w : PlacesOver E v,
+          mapGL n (Pi.evalRingHom (fun w : PlacesOver E v => w.1.adicCompletion E) w) x
+            = glPiEquiv (Fin n) (fun w : PlacesOver E v => w.1.adicCompletion E) x w := by
       intro w
       refine Units.ext ?_
       ext a b

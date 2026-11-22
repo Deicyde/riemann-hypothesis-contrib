@@ -6,17 +6,25 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsIsLogM
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 set_option autoImplicit false
 noncomputable section
 
 namespace GlobalTheory.Discrepancy
 
-theorem regAt_of_isIntegrallyClosed_stalk : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ), IsProjOver p → ∀ y : X, IsIntegrallyClosed (X.presheaf.stalk y) → ∀ f : X.functionField, (∀ z, z ⤳ y → ∀ E : DivOver p, E.IsAt z → f ∈ E.ring) → RegAt y f := by
+theorem regAt_of_isIntegrallyClosed_stalk
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ),
+      IsProjOver p
+        → ∀ y : X,
+          IsIntegrallyClosed (X.presheaf.stalk y)
+            → ∀ f : X.functionField,
+              (∀ z, z ⤳ y → ∀ E : DivOver p, E.IsAt z → f ∈ E.ring) → RegAt y f := by
   intro X _ _ p hp y hy f hf
   haveI : IsProper p := ((isProjOver_iff_isProper_and_exists_isAmpleLB p).1 hp).1
   obtain ⟨U, hU, hx, -⟩ := exists_isAffineOpen_mem_and_subset (x := y) (U := ⊤) trivial
@@ -28,9 +36,11 @@ theorem regAt_of_isIntegrallyClosed_stalk : ∀ (X : Scheme.{0}) [IsIntegral X] 
   let P : PrimeSpectrum Γ(X, U) := ⟨q.comap (algebraMap _ (X.presheaf.stalk y)), inferInstance⟩
   have hP1 : P.asIdeal.height = 1 :=
     (IsLocalization.height_under (hU.primeIdealOf ⟨y, hx⟩).asIdeal.primeCompl q).trans h1
-  have hPQ : P ≤ hU.primeIdealOf ⟨y, hx⟩ := fun s hs => by_contra fun hs' =>
-    hq.ne_top (q.eq_top_of_isUnit_mem hs (IsLocalization.map_units (X.presheaf.stalk y)
-      (⟨s, hs'⟩ : (hU.primeIdealOf ⟨y, hx⟩).asIdeal.primeCompl)))
+  have hPQ : P ≤ hU.primeIdealOf ⟨y, hx⟩ := fun s hs =>
+    by_contra fun hs' =>
+      hq.ne_top (q.eq_top_of_isUnit_mem hs
+        (IsLocalization.map_units (X.presheaf.stalk y)
+          (⟨s, hs'⟩ : (hU.primeIdealOf ⟨y, hx⟩).asIdeal.primeCompl)))
   have hz : hU.fromSpec P ∈ U := by
     have : hU.fromSpec P ∈ Set.range hU.fromSpec := ⟨P, rfl⟩
     rwa [hU.range_fromSpec] at this
@@ -38,14 +48,16 @@ theorem regAt_of_isIntegrallyClosed_stalk : ∀ (X : Scheme.{0}) [IsIntegral X] 
   have hP : hU.primeIdealOf z = P :=
     hU.fromSpec.isOpenEmbedding.injective (hU.fromSpec_primeIdealOf z)
   have hzx : (z : X) ⤳ y := by
-    have h := ((PrimeSpectrum.le_iff_specializes P (hU.primeIdealOf ⟨y, hx⟩)).mp hPQ).map
-      hU.fromSpec.continuous
+    have h :=
+      ((PrimeSpectrum.le_iff_specializes P (hU.primeIdealOf ⟨y, hx⟩)).mp hPQ).map
+        hU.fromSpec.continuous
     rwa [hU.fromSpec_primeIdealOf ⟨y, hx⟩] at h
   clear_value z
   haveI := hU.isLocalization_stalk z
   have hc : Order.coheight (z : X) = 1 := by
-    have := IsLocalization.AtPrime.ringKrullDim_eq_height (hU.primeIdealOf z).asIdeal
-      (X.presheaf.stalk (z : X))
+    have :=
+      IsLocalization.AtPrime.ringKrullDim_eq_height (hU.primeIdealOf z).asIdeal
+        (X.presheaf.stalk (z : X))
     rw [ringKrullDim_stalk_eq_coheight, hP, hP1] at this
     exact_mod_cast this
 

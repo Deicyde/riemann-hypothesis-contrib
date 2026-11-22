@@ -12,10 +12,12 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.HaarScaling
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
-theorem haar_smul {k r : ℕ} {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ) (c : ℝ≥0) (hc : 0 < c) :
-    IsHaarOn U (c • μ) := by
+theorem haar_smul
+    {k r : ℕ} {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ) (c : ℝ≥0) (hc : 0 < c)
+    : IsHaarOn U (c • μ) := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rw [smul_apply, h.conc, smul_zero]
   · intro a ha
@@ -40,36 +42,45 @@ theorem haar_smul {k r : ℕ} {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : I
     · exact Measure.measure_univ_eq_zero.mp h2
 
 section
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
-def scaleG (D : RealPlaceData k r Wp Wq) (c : ℝ≥0) (hc : 0 < c) : RealPlaceData k r Wp Wq :=
-  { D with μG := c • D.μG, haarG := haar_smul D.haarG c hc }
+def scaleG (D : RealPlaceData k r Wp Wq) (c : ℝ≥0) (hc : 0 < c) : RealPlaceData k r Wp Wq := {
+  D with
+  μG := c • D.μG
+  haarG := haar_smul D.haarG c hc
+}
 
-theorem iteratedDeriv_two_const_mul (c : ℂ) (f : ℝ → ℂ) :
-    iteratedDeriv 2 (fun x => c * f x) = fun x => c * iteratedDeriv 2 f x := by
+theorem iteratedDeriv_two_const_mul (c : ℂ) (f : ℝ → ℂ)
+    : iteratedDeriv 2 (fun x => c * f x) = fun x => c * iteratedDeriv 2 f x := by
   have h2 : ∀ g : ℝ → ℂ, iteratedDeriv 2 g = deriv (deriv g) := by
     intro g
     rw [iteratedDeriv_succ, iteratedDeriv_one]
   rw [h2, h2, deriv_const_mul_field', deriv_const_mul_field']
 
-theorem oneMinusDD_const_mul (c : ℂ) (h : ℝ → ℝ → ℂ) (t₁ t₂ : ℝ) :
-    oneMinusDD (fun a b => c * h a b) t₁ t₂ = c * oneMinusDD h t₁ t₂ := by
+theorem oneMinusDD_const_mul (c : ℂ) (h : ℝ → ℝ → ℂ) (t₁ t₂ : ℝ)
+    : oneMinusDD (fun a b => c * h a b) t₁ t₂ = c * oneMinusDD h t₁ t₂ := by
   simp only [oneMinusDD, iteratedDeriv_two_const_mul, ← mul_sub]
 
 variable [FiniteDimensional ℂ Wq]
 
-theorem ph_scale (D : RealPlaceData k r Wp Wq) (c : ℝ≥0) (hc : 0 < c) (F F' : Mat k r → (Wq →L[ℂ] Wp)) (p : SS k r) :
-    Ph (scaleG D c hc) F F' p = ((c : ℝ) : ℂ) * Ph D F F' p := by
+theorem ph_scale
+    (D : RealPlaceData k r Wp Wq)
+    (c : ℝ≥0) (hc : 0 < c)
+    (F F' : Mat k r → (Wq →L[ℂ] Wp)) (p : SS k r)
+    : Ph (scaleG D c hc) F F' p = ((c : ℝ) : ℂ) * Ph D F F' p := by
   have hμ : (scaleG D c hc).μG = c • D.μG := rfl
   unfold Ph
   rw [hμ, integral_smul_nnreal_measure, NNReal.smul_def, Complex.real_smul]
   rfl
 
-theorem betaInf_scale (D : RealPlaceData k r Wp Wq) (c : ℝ≥0) (hc : 0 < c) (F F' : Mat k r → (Wq →L[ℂ] Wp)) :
-    betaInf (scaleG D c hc) F F' = ((c : ℝ) : ℂ) * betaInf D F F' := by
-  have hreg : ∀ p, regBracket (scaleG D c hc) F F' p =
-      fun a b => ((c : ℝ) : ℂ) * regBracket D F F' p a b := by
+theorem betaInf_scale
+    (D : RealPlaceData k r Wp Wq) (c : ℝ≥0) (hc : 0 < c) (F F' : Mat k r → (Wq →L[ℂ] Wp))
+    : betaInf (scaleG D c hc) F F' = ((c : ℝ) : ℂ) * betaInf D F F' := by
+  have hreg
+      : ∀ p,
+        regBracket (scaleG D c hc) F F' p = fun a b => ((c : ℝ) : ℂ) * regBracket D F F' p a b := by
     intro p
     funext a b
     have hχ : (scaleG D c hc).χ = D.χ := rfl
@@ -86,8 +97,10 @@ theorem betaInf_scale (D : RealPlaceData k r Wp Wq) (c : ℝ≥0) (hc : 0 < c) (
   funext p
   ring
 
-theorem beta_scale (D : RealPlaceData k r Wp Wq) (c : ℝ≥0) (hc : 0 < c) (F F' : Mat k r → (Wq →L[ℂ] Wp)) :
-    beta (scaleG D c hc) F F' = beta D F F' := rfl
+theorem beta_scale
+    (D : RealPlaceData k r Wp Wq) (c : ℝ≥0) (hc : 0 < c) (F F' : Mat k r → (Wq →L[ℂ] Wp))
+    : beta (scaleG D c hc) F F' = beta D F F' :=
+  rfl
 
 end
 
@@ -95,7 +108,8 @@ end Formalism.FourierDecayAlt.P.HaarScaling
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.HaarScaling
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.HaarScaling
 
 theorem lemma_b_normalised_of_parts : Formalism.FourierDecayAlt.B2.LemmaBNormFromParts := by
   intro hC hJ hD hI k r Wp Wq _ _ _ _ _ _ D A hA hF

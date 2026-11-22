@@ -127,13 +127,18 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.EventuallyCon
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.RT GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Fc
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.RT GlobalTheory.EX
+  GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Fc
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Fc.RL.LamLinked
 
 theorem evP_params : EvP fun _ K => ∀ β : BPt K, Nonempty (ParameterChoice' β.D β.O.L) := by
-  refine EvP.of_ev ⟨1, one_pos, fun eps C8 he _ he52 _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun C hStd _ _ => ?_⟩⟩
+  refine EvP.of_ev ⟨
+    1,
+    one_pos,
+    fun eps C8 he _ he52 _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun C hStd _ _ => ?_⟩
+  ⟩
   obtain ⟨c1, hN⟩ := szRow_numAt eps he he52 C hStd
   refine ⟨c1, fun cD hcD => ?_⟩
   obtain ⟨c2, hN⟩ := hN cD hcD
@@ -144,13 +149,12 @@ theorem evP_params : EvP fun _ K => ∀ β : BPt K, Nonempty (ParameterChoice' �
   have hv : Val C cD ch β.O.L := by
     rw [← h1, ← h2, ← h3]
     exact β.p.pt_val β.val
-  obtain ⟨⟨N⟩, -, -⟩ := hN _ _ (by rw [hsc, h4]) (by rw [hsc]; exact hx) hv (GlobalTheory.Plug.hostArith_bpt β)
+  obtain ⟨⟨N⟩, -, -⟩ :=
+    hN _ _ (by rw [hsc, h4]) (by rw [hsc]; exact hx) hv (GlobalTheory.Plug.hostArith_bpt β)
   exact ⟨N.params⟩
-
 
 end GlobalTheory.Fc.RL.LamLinked
 
 namespace GlobalTheory.Fc.RL
-
 
 end GlobalTheory.Fc.RL

@@ -19,16 +19,20 @@ def gK (v : E n) : ℝ := ∏ a, ∏ b, (Real.sqrt Real.pi)⁻¹ * Real.exp (-(v
 
 theorem gK_nonneg (v : E n) : 0 ≤ gK v := by
   unfold gK
-  exact Finset.prod_nonneg fun a _ => Finset.prod_nonneg fun b _ =>
-    mul_nonneg (inv_nonneg.mpr (Real.sqrt_nonneg _)) (Real.exp_pos _).le
+  exact Finset.prod_nonneg fun a _ =>
+    Finset.prod_nonneg fun b _ =>
+      mul_nonneg (inv_nonneg.mpr (Real.sqrt_nonneg _)) (Real.exp_pos _).le
 
 theorem integrable_gK : Integrable (gK (n := n)) := by
-  have h1 : Integrable (fun s : ℝ => (Real.sqrt Real.pi)⁻¹ * Real.exp (-s ^ 2)) := by
+  have h1 : Integrable (fun s : ℝ => (Real.sqrt Real.pi)⁻¹ * Real.exp (- s ^ 2)) := by
     have := (integrable_exp_neg_mul_sq (b := 1) one_pos).const_mul (Real.sqrt Real.pi)⁻¹
     simpa using this
   have h2 : Integrable (fun w : Fin n → ℝ => ∏ b, (Real.sqrt Real.pi)⁻¹ * Real.exp (-(w b) ^ 2)) :=
-    Integrable.fintype_prod (f := fun _ (s : ℝ) => (Real.sqrt Real.pi)⁻¹ * Real.exp (-s ^ 2)) (fun _ => h1)
-  exact Integrable.fintype_prod (f := fun _ (w : Fin n → ℝ) => ∏ b, (Real.sqrt Real.pi)⁻¹ * Real.exp (-(w b) ^ 2))
+    Integrable.fintype_prod
+      (f := fun _ (s : ℝ) => (Real.sqrt Real.pi)⁻¹ * Real.exp (- s ^ 2))
+      (fun _ => h1)
+  exact Integrable.fintype_prod
+    (f := fun _ (w : Fin n → ℝ) => ∏ b, (Real.sqrt Real.pi)⁻¹ * Real.exp (-(w b) ^ 2))
     (fun _ => h2)
 
 theorem integral_gK : ∫ v, gK (n := n) v = 1 := by
@@ -39,13 +43,14 @@ theorem integral_gK : ∫ v, gK (n := n) v = 1 := by
     rw [this]
     exact inv_mul_cancel₀ (Real.sqrt_ne_zero'.mpr Real.pi_pos)
   unfold gK
-  rw [integral_fintype_prod_volume_eq_prod (f := fun _ (w : Fin n → ℝ) =>
-    ∏ b, (Real.sqrt Real.pi)⁻¹ * Real.exp (-(w b) ^ 2))]
+  rw [integral_fintype_prod_volume_eq_prod
+    (f := fun _ (w : Fin n → ℝ) => ∏ b, (Real.sqrt Real.pi)⁻¹ * Real.exp (-(w b) ^ 2))]
   simp_rw [integral_fintype_prod_volume_eq_prod (f := fun _ (s : ℝ) => (Real.sqrt Real.pi)⁻¹ * Real.exp (-s ^ 2)), h1,
     Finset.prod_const_one]
 
-theorem gauss_prod (ε : ℝ) (y : E n) :
-    Complex.exp (-((ε * ip y y : ℝ) : ℂ)) = ∏ a, ∏ b, Complex.exp (-(ε : ℂ) * ((y a b : ℝ) : ℂ) ^ 2) := by
+theorem gauss_prod (ε : ℝ) (y : E n)
+    : Complex.exp (-((ε * ip y y : ℝ) : ℂ))
+      = ∏ a, ∏ b, Complex.exp (-(ε : ℂ) * ((y a b : ℝ) : ℂ) ^ 2) := by
   simp_rw [← Complex.exp_sum]
   congr 1
   unfold ip
@@ -56,17 +61,21 @@ theorem gauss_prod (ε : ℝ) (y : E n) :
   refine Finset.sum_congr rfl fun b _ => ?_
   ring
 
-theorem integrable_gauss (ε : ℝ) (hε : 0 < ε) :
-    Integrable (fun y : E n => Complex.exp (-((ε * ip y y : ℝ) : ℂ))) := by
+theorem integrable_gauss (ε : ℝ) (hε : 0 < ε)
+    : Integrable (fun y : E n => Complex.exp (-((ε * ip y y : ℝ) : ℂ))) := by
   simp_rw [gauss_prod]
   have h1 : Integrable (fun s : ℝ => Complex.exp (-(ε : ℂ) * (s : ℂ) ^ 2)) :=
     integrable_cexp_neg_mul_sq (by simpa using hε)
   have h2 : Integrable (fun w : Fin n → ℝ => ∏ b, Complex.exp (-(ε : ℂ) * ((w b : ℝ) : ℂ) ^ 2)) :=
-    Integrable.fintype_prod (f := fun _ (s : ℝ) => Complex.exp (-(ε : ℂ) * (s : ℂ) ^ 2)) (fun _ => h1)
-  exact Integrable.fintype_prod (f := fun _ (w : Fin n → ℝ) => ∏ b, Complex.exp (-(ε : ℂ) * ((w b : ℝ) : ℂ) ^ 2))
+    Integrable.fintype_prod
+      (f := fun _ (s : ℝ) => Complex.exp (-(ε : ℂ) * (s : ℂ) ^ 2))
+      (fun _ => h1)
+  exact Integrable.fintype_prod
+    (f := fun _ (w : Fin n → ℝ) => ∏ b, Complex.exp (-(ε : ℂ) * ((w b : ℝ) : ℂ) ^ 2))
     (fun _ => h2)
 
-theorem norm_gauss_le (ε : ℝ) (hε : 0 < ε) (y : E n) : ‖Complex.exp (-((ε * ip y y : ℝ) : ℂ))‖ ≤ 1 := by
+theorem norm_gauss_le (ε : ℝ) (hε : 0 < ε) (y : E n)
+    : ‖Complex.exp (-((ε * ip y y : ℝ) : ℂ))‖ ≤ 1 := by
   rw [Complex.norm_exp]
   have h : 0 ≤ ip y y := by
     unfold ip
@@ -75,16 +84,18 @@ theorem norm_gauss_le (ε : ℝ) (hε : 0 < ε) (y : E n) : ‖Complex.exp (-((�
   rw [this, Real.exp_le_one_iff]
   nlinarith
 
-theorem kraw_eq (ε : ℝ) (hε : 0 < ε) (t : ℝ) (ht : t ≠ 0) (u : E n) :
-    (((|t| / (2 * Real.pi)) ^ (n ^ 2) : ℝ) : ℂ) *
-        ∫ y : E n, Complex.exp (-((ε * ip y y : ℝ) : ℂ)) * Complex.exp (Complex.I * t * ip y u) =
-      (((|t| / (2 * Real.sqrt ε)) ^ (n ^ 2) * gK ((|t| / (2 * Real.sqrt ε)) • u) : ℝ) : ℂ) := by
+theorem kraw_eq (ε : ℝ) (hε : 0 < ε) (t : ℝ) (ht : t ≠ 0) (u : E n)
+    : (((|t| / (2 * Real.pi)) ^ (n ^ 2) : ℝ) : ℂ)
+        * ∫ y : E n, Complex.exp (-((ε * ip y y : ℝ) : ℂ)) * Complex.exp (Complex.I * t * ip y u)
+      = (((|t| / (2 * Real.sqrt ε)) ^ (n ^ 2) * gK ((|t| / (2 * Real.sqrt ε)) • u) : ℝ) : ℂ) := by
   set lam : ℝ := |t| / (2 * Real.sqrt ε) with hlam
   have hε' : 0 < (ε : ℂ).re := by simpa using hε
 
-  have hprod : ∀ y : E n, Complex.exp (-((ε * ip y y : ℝ) : ℂ)) * Complex.exp (Complex.I * t * ip y u) =
-      ∏ a, ∏ b, (Complex.exp (Complex.I * ((t * u a b : ℝ) : ℂ) * ((y a b : ℝ) : ℂ)) *
-        Complex.exp (-(ε : ℂ) * ((y a b : ℝ) : ℂ) ^ 2)) := by
+  have hprod
+      : ∀ y : E n,
+        Complex.exp (-((ε * ip y y : ℝ) : ℂ)) * Complex.exp (Complex.I * t * ip y u)
+          = ∏ a, ∏ b, (Complex.exp (Complex.I * ((t * u a b : ℝ) : ℂ) * ((y a b : ℝ) : ℂ)) *
+              Complex.exp (-(ε : ℂ) * ((y a b : ℝ) : ℂ) ^ 2)) := by
     intro y
     simp_rw [Finset.prod_mul_distrib, ← gauss_prod, ← Complex.exp_sum]
     rw [mul_comm]
@@ -96,32 +107,40 @@ theorem kraw_eq (ε : ℝ) (hε : 0 < ε) (t : ℝ) (ht : t ≠ 0) (u : E n) :
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     ring
-  have hint : ∫ y : E n, Complex.exp (-((ε * ip y y : ℝ) : ℂ)) * Complex.exp (Complex.I * t * ip y u) =
-      ∏ a, ∏ b, ((Real.pi : ℂ) / ε) ^ (1 / 2 : ℂ) * Complex.exp (-((t * u a b : ℝ) : ℂ) ^ 2 / (4 * ε)) := by
-    simp_rw [hprod]
-    rw [integral_fintype_prod_volume_eq_prod (f := fun a (w : Fin n → ℝ) =>
-      ∏ b, (Complex.exp (Complex.I * ((t * u a b : ℝ) : ℂ) * ((w b : ℝ) : ℂ)) *
-        Complex.exp (-(ε : ℂ) * ((w b : ℝ) : ℂ) ^ 2)))]
-    refine Finset.prod_congr rfl fun a _ => ?_
-    rw [integral_fintype_prod_volume_eq_prod (f := fun b (s : ℝ) =>
-      Complex.exp (Complex.I * ((t * u a b : ℝ) : ℂ) * (s : ℂ)) * Complex.exp (-(ε : ℂ) * (s : ℂ) ^ 2))]
-    refine Finset.prod_congr rfl fun b _ => ?_
-    exact fourierIntegral_gaussian hε' _
+  have hint
+      : ∫ y : E n, Complex.exp (-((ε * ip y y : ℝ) : ℂ)) * Complex.exp (Complex.I * t * ip y u)
+        = ∏ a, ∏ b, ((Real.pi : ℂ) / ε) ^ (1 / 2 : ℂ) * Complex.exp (-((t * u a b : ℝ) : ℂ) ^ 2 / (4 * ε)) :=
+    by
+      simp_rw [hprod]
+      rw [integral_fintype_prod_volume_eq_prod
+        (f := fun a (w : Fin n → ℝ) =>
+          ∏ b, (Complex.exp (Complex.I * ((t * u a b : ℝ) : ℂ) * ((w b : ℝ) : ℂ)) *
+            Complex.exp (-(ε : ℂ) * ((w b : ℝ) : ℂ) ^ 2)))]
+      refine Finset.prod_congr rfl fun a _ => ?_
+      rw [integral_fintype_prod_volume_eq_prod
+        (f := fun b (s : ℝ) =>
+          Complex.exp (Complex.I * ((t * u a b : ℝ) : ℂ) * (s : ℂ))
+            * Complex.exp (-(ε : ℂ) * (s : ℂ) ^ 2))]
+      refine Finset.prod_congr rfl fun b _ => ?_
+      exact fourierIntegral_gaussian hε' _
 
   have hsq : ((Real.pi : ℂ) / ε) ^ (1 / 2 : ℂ) = ((Real.sqrt Real.pi / Real.sqrt ε : ℝ) : ℂ) := by
-    rw [← Real.sqrt_div' _ hε.le, Real.sqrt_eq_rpow, Complex.ofReal_cpow (div_nonneg Real.pi_pos.le hε.le)]
+    rw [← Real.sqrt_div' _ hε.le, Real.sqrt_eq_rpow,
+      Complex.ofReal_cpow (div_nonneg Real.pi_pos.le hε.le)]
     push_cast
     ring_nf
-  have hcoord : ∀ s : ℝ, (((|t| / (2 * Real.pi)) : ℝ) : ℂ) * (((Real.pi : ℂ) / ε) ^ (1 / 2 : ℂ) *
-      Complex.exp (-((t * s : ℝ) : ℂ) ^ 2 / (4 * ε))) =
-      ((lam * ((Real.sqrt Real.pi)⁻¹ * Real.exp (-(lam * s) ^ 2)) : ℝ) : ℂ) := by
+  have hcoord
+      : ∀ s : ℝ,
+        (((|t| / (2 * Real.pi)) : ℝ) : ℂ)
+            * (((Real.pi : ℂ) / ε) ^ (1 / 2 : ℂ) * Complex.exp (- ((t * s : ℝ) : ℂ) ^ 2 / (4 * ε)))
+          = ((lam * ((Real.sqrt Real.pi)⁻¹ * Real.exp (- (lam * s) ^ 2)) : ℝ) : ℂ) := by
     intro s
     have hpi : 0 < Real.sqrt Real.pi := Real.sqrt_pos.mpr Real.pi_pos
     have hse : 0 < Real.sqrt ε := Real.sqrt_pos.mpr hε
     have hee : Real.sqrt ε ^ 2 = ε := Real.sq_sqrt hε.le
     have hpp : Real.sqrt Real.pi ^ 2 = Real.pi := Real.sq_sqrt Real.pi_pos.le
     rw [hsq]
-    have hexp : (-((t * s : ℝ) : ℂ) ^ 2 / (4 * ε)) = ((-(lam * s) ^ 2 : ℝ) : ℂ) := by
+    have hexp : (- ((t * s : ℝ) : ℂ) ^ 2 / (4 * ε)) = ((- (lam * s) ^ 2 : ℝ) : ℂ) := by
       rw [hlam]
       push_cast
       have : ((|t| : ℝ) : ℂ) ^ 2 = (t : ℂ) ^ 2 := by
@@ -143,7 +162,9 @@ theorem kraw_eq (ε : ℝ) (hε : 0 < ε) (t : ℝ) (ht : t ≠ 0) (u : E n) :
     field_simp
     rw [← hpp']
   rw [hint]
-  have hC : (((|t| / (2 * Real.pi)) ^ (n ^ 2) : ℝ) : ℂ) = ∏ _a : Fin n, ∏ _b : Fin n, (((|t| / (2 * Real.pi)) : ℝ) : ℂ) := by
+  have hC
+      : (((|t| / (2 * Real.pi)) ^ (n ^ 2) : ℝ) : ℂ)
+        = ∏ _a : Fin n, ∏ _b : Fin n, (((|t| / (2 * Real.pi)) : ℝ) : ℂ) := by
     simp only [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
     push_cast
     rw [← pow_mul, sq]

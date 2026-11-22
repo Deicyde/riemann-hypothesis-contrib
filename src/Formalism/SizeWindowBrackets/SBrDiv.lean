@@ -13,7 +13,10 @@ noncomputable section
 
 namespace Formalism.LFunctionChainParameters.LBrDiv
 
-open Formalism Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.LErr Formalism.LFunctionChainParameters.LChain2
+open Formalism Formalism.D5 Formalism.RankGapBounds.WeightedMeanData
+  Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.LErr
+  Formalism.LFunctionChainParameters.LChain2
 
 section Defs1
 variable {U0 : Type} {W : U0 → Type} {Top : Type} [Fintype Top] {m f : ℕ}

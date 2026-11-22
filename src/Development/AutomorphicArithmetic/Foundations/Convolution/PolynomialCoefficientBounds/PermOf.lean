@@ -6,23 +6,25 @@ public import Mathlib
 
 open MvPolynomial Filter Topology
 
-private theorem UpperTheory.ConvolutionTheory.FX.eval_esymm_eq {n : ℕ} (x : Fin n → ℂ) (k : ℕ) :
-    eval x (esymm (Fin n) ℂ k) = (Finset.univ.val.map x).esymm k := by
+private theorem UpperTheory.ConvolutionTheory.FX.eval_esymm_eq {n : ℕ} (x : Fin n → ℂ) (k : ℕ)
+    : eval x (esymm (Fin n) ℂ k) = (Finset.univ.val.map x).esymm k := by
   have := MvPolynomial.aeval_esymm_eq_multiset_esymm (Fin n) ℂ k x
   rw [← this]
   rfl
 
-private theorem UpperTheory.ConvolutionTheory.FX.perm_of_multiset {n : ℕ} (x y : Fin n → ℂ)
-    (h : Finset.univ.val.map x = Finset.univ.val.map y) :
-    ∃ w : Equiv.Perm (Fin n), y = x ∘ w := by
+private theorem UpperTheory.ConvolutionTheory.FX.perm_of_multiset
+    {n : ℕ} (x y : Fin n → ℂ) (h : Finset.univ.val.map x = Finset.univ.val.map y)
+    : ∃ w : Equiv.Perm (Fin n), y = x ∘ w := by
   classical
   have hc : ∀ c : ℂ, Fintype.card {i // y i = c} = Fintype.card {i // x i = c} := by
     intro c
     have h1 := congrArg (Multiset.count c) h
     rw [Multiset.count_map, Multiset.count_map] at h1
     rw [Fintype.card_subtype, Fintype.card_subtype]
-    have e1 : ∀ z : Fin n → ℂ, (Finset.univ.filter (fun i => z i = c)).card
-        = (Multiset.filter (fun a => c = z a) Finset.univ.val).card := by
+    have e1
+        : ∀ z : Fin n → ℂ,
+          (Finset.univ.filter (fun i => z i = c)).card
+            = (Multiset.filter (fun a => c = z a) Finset.univ.val).card := by
       intro z
       simp only [Finset.card, Finset.filter_val, eq_comm]
     rw [e1, e1, h1]
@@ -31,8 +33,10 @@ private theorem UpperTheory.ConvolutionTheory.FX.perm_of_multiset {n : ℕ} (x y
   funext i
   exact (Equiv.ofFiberEquiv_map e i).symm
 
-theorem UpperTheory.ConvolutionTheory.FX.perm_of_esymm :
-    ∀ (n : ℕ) (x y : Fin n → ℂ), (∀ i : Fin n, eval x (esymm (Fin n) ℂ (i + 1)) = eval y (esymm (Fin n) ℂ (i + 1))) ↔ ∃ w : Equiv.Perm (Fin n), y = x ∘ w := by
+theorem UpperTheory.ConvolutionTheory.FX.perm_of_esymm
+    : ∀ (n : ℕ) (x y : Fin n → ℂ),
+      (∀ i : Fin n, eval x (esymm (Fin n) ℂ (i + 1)) = eval y (esymm (Fin n) ℂ (i + 1)))
+        ↔ ∃ w : Equiv.Perm (Fin n), y = x ∘ w := by
   intro n x y
   constructor
   · intro h
@@ -46,10 +50,13 @@ theorem UpperTheory.ConvolutionTheory.FX.perm_of_esymm :
       rcases k with _ | k
       · simp [Multiset.esymm]
       · have := h ⟨k, hk⟩
-        rw [UpperTheory.ConvolutionTheory.FX.eval_esymm_eq, UpperTheory.ConvolutionTheory.FX.eval_esymm_eq] at this
+        rw [UpperTheory.ConvolutionTheory.FX.eval_esymm_eq,
+            UpperTheory.ConvolutionTheory.FX.eval_esymm_eq]
+          at this
         exact this
-    have hp : (s.map fun a => Polynomial.X - Polynomial.C a).prod
-        = (t.map fun a => Polynomial.X - Polynomial.C a).prod := by
+    have hp
+        : (s.map fun a => Polynomial.X - Polynomial.C a).prod
+          = (t.map fun a => Polynomial.X - Polynomial.C a).prod := by
       rw [Multiset.prod_X_sub_X_eq_sum_esymm, Multiset.prod_X_sub_X_eq_sum_esymm, hsc, htc]
       refine Finset.sum_congr rfl ?_
       intro j hj
@@ -57,7 +64,8 @@ theorem UpperTheory.ConvolutionTheory.FX.perm_of_esymm :
     have := congrArg Polynomial.roots hp
     rwa [Polynomial.roots_multiset_prod_X_sub_C, Polynomial.roots_multiset_prod_X_sub_C] at this
   · rintro ⟨w, rfl⟩ i
-    rw [UpperTheory.ConvolutionTheory.FX.eval_esymm_eq, UpperTheory.ConvolutionTheory.FX.eval_esymm_eq]
+    rw [UpperTheory.ConvolutionTheory.FX.eval_esymm_eq,
+      UpperTheory.ConvolutionTheory.FX.eval_esymm_eq]
     congr 1
     rw [← Multiset.map_map]
     congr 1

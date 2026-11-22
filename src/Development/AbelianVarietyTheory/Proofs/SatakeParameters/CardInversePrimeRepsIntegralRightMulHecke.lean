@@ -25,7 +25,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CardSubsp
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum Formalism.IndefR.Mult IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum Formalism.IndefR.Mult
+  IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -35,12 +38,21 @@ section Pure
 
 open IsLocalRing
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
-  [IsFractionRing O K] {p : O}
+variable
+  {O K : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] [IsFractionRing O K]
+  {p : O}
 
-def tr {n : ℕ} (g : GL (Fin n) K) : GL (Fin n) K :=
-  ⟨g.1ᵀ, (g⁻¹).1ᵀ, by rw [← Matrix.transpose_mul, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.transpose_one],
-    by rw [← Matrix.transpose_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.transpose_one]⟩
+def tr {n : ℕ} (g : GL (Fin n) K) : GL (Fin n) K := ⟨
+  g.1ᵀ,
+  (g⁻¹).1ᵀ,
+  by
+    rw [← Matrix.transpose_mul, ← Units.val_mul, inv_mul_cancel, Units.val_one,
+      Matrix.transpose_one],
+  by
+    rw [← Matrix.transpose_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+      Matrix.transpose_one]
+⟩
 
 theorem tr_mul {n : ℕ} (g h : GL (Fin n) K) : tr (g * h) = tr h * tr g :=
   Units.ext (Matrix.transpose_mul _ _)
@@ -56,14 +68,18 @@ theorem gInt_inv {n : ℕ} {g : GL (Fin n) K} : GInt O g⁻¹ ↔ GInt O g :=
   ⟨fun h => inv_inv g ▸ h.inv, fun h => h.inv⟩
 
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] in
-theorem Hk.tr {n j : ℕ} {g : GL (Fin n) K} (h : Hk O p j g) : Hk O p j (tr g) :=
-  ⟨h.1.transpose, h.2.1.transpose, by
+theorem Hk.tr {n j : ℕ} {g : GL (Fin n) K} (h : Hk O p j g) : Hk O p j (tr g) := ⟨
+  h.1.transpose,
+  h.2.1.transpose,
+  by
     obtain ⟨u, hu⟩ := h.2.2
-    exact ⟨u, (Matrix.det_transpose _).trans hu⟩⟩
+    exact ⟨u, (Matrix.det_transpose _).trans hu⟩
+⟩
 
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] in
-theorem Reps.tr {n : ℕ} {ι : Type} {α : GL (Fin n) K} {R : Finset ι} {ρ : ι → GL (Fin n) K} (h : Reps O α⁻¹ R ρ) :
-    Reps O (tr α) R fun γ => tr (ρ γ)⁻¹ := by
+theorem Reps.tr
+    {n : ℕ} {ι : Type} {α : GL (Fin n) K} {R : Finset ι} {ρ : ι → GL (Fin n) K} (h : Reps O α⁻¹ R ρ)
+    : Reps O (tr α) R fun γ => tr (ρ γ)⁻¹ := by
   refine ⟨fun γ hγ => ?_, fun k₁ k₂ h₁ h₂ => ?_⟩
   · obtain ⟨k₁, k₂, h₁, h₂, h⟩ := h.1 γ hγ
     refine ⟨_, _, gInt_tr.2 h₁.inv, gInt_tr.2 h₂.inv, ?_⟩
@@ -77,20 +93,21 @@ theorem Reps.tr {n : ℕ} {ι : Type} {α : GL (Fin n) K} {R : Finset ι} {ρ : 
     congr! 1
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
-theorem GInt.det {n : ℕ} {g : GL (Fin n) K} (h : GInt O g) : ∃ u : Oˣ, g.1.det = algebraMap O K u := by
+theorem GInt.det {n : ℕ} {g : GL (Fin n) K} (h : GInt O g)
+    : ∃ u : Oˣ, g.1.det = algebraMap O K u := by
   obtain ⟨A, hA⟩ := intM_iff.1 h.1
   obtain ⟨B, hB⟩ := intM_iff.1 h.2
   have e : ∀ C : Matrix (Fin n) (Fin n) O, (C.map (algebraMap O K)).det = algebraMap O K C.det :=
     fun C => (RingHom.map_det _ C).symm
   have h1 : A.det * B.det = 1 := by
     apply IsFractionRing.injective O K
-    rw [map_mul, ← e, ← e, hA, hB, ← Matrix.det_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.det_one,
-      map_one]
+    rw [map_mul, ← e, ← e, hA, hB, ← Matrix.det_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+      Matrix.det_one, map_one]
   exact ⟨Units.mkOfMulEqOne _ _ h1, by rw [← hA, e]; rfl⟩
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
-theorem Hk.mul {n j : ℕ} {g k₁ k₂ : GL (Fin n) K} (h : Hk O p j g) (h₁ : GInt O k₁) (h₂ : GInt O k₂) :
-    Hk O p j (k₁ * g * k₂) := by
+theorem Hk.mul {n j : ℕ} {g k₁ k₂ : GL (Fin n) K} (h : Hk O p j g) (h₁ : GInt O k₁) (h₂ : GInt O k₂)
+    : Hk O p j (k₁ * g * k₂) := by
   refine ⟨(h₁.1.mul h.1).mul h₂.1, ?_, ?_⟩
   · have := (h₂.2.mul h.2.1).mul h₁.2
     rw [Matrix.mul_smul, Matrix.smul_mul] at this
@@ -99,37 +116,39 @@ theorem Hk.mul {n j : ℕ} {g k₁ k₂ : GL (Fin n) K} (h : Hk O p j g) (h₁ :
     obtain ⟨u₁, hu₁⟩ := h₁.det
     obtain ⟨u₂, hu₂⟩ := h₂.det
     refine ⟨u₁ * u * u₂, ?_⟩
-    rw [Units.val_mul, Units.val_mul, Matrix.det_mul, Matrix.det_mul, hu, hu₁, hu₂, ← map_mul, ← map_mul,
-      Units.val_mul, Units.val_mul]
+    rw [Units.val_mul, Units.val_mul, Matrix.det_mul, Matrix.det_mul, hu, hu₁, hu₂, ← map_mul,
+      ← map_mul, Units.val_mul, Units.val_mul]
     congr 1
     ring
 
-theorem intM_div_iff (hp : Irreducible p) {m n : ℕ} (z : Matrix (Fin m) (Fin n) O) :
-    IntM O ((algebraMap O K p)⁻¹ • z.map (algebraMap O K)) ↔ z.map (residue O) = 0 := by
+theorem intM_div_iff (hp : Irreducible p) {m n : ℕ} (z : Matrix (Fin m) (Fin n) O)
+    : IntM O ((algebraMap O K p)⁻¹ • z.map (algebraMap O K)) ↔ z.map (residue O) = 0 := by
   have h0 : algebraMap O K p ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective O K)).2 hp.ne_zero
   rw [← Matrix.ext_iff]
   refine forall₂_congr fun i j => ?_
-  rw [Matrix.map_apply, Matrix.zero_apply, residue_eq_zero_iff, hp.maximalIdeal_eq, Ideal.mem_span_singleton',
-    Matrix.smul_apply, Matrix.map_apply, smul_eq_mul]
+  rw [Matrix.map_apply, Matrix.zero_apply, residue_eq_zero_iff, hp.maximalIdeal_eq,
+    Ideal.mem_span_singleton', Matrix.smul_apply, Matrix.map_apply, smul_eq_mul]
   refine exists_congr fun a => ?_
   rw [eq_inv_mul_iff_mul_eq₀ h0, ← map_mul, (IsFractionRing.injective O K).eq_iff, mul_comm]
-
 
 variable (O) in
 def sec (a : ResidueField O) : O := (residue_surjective a).choose
 
-theorem residue_sec (a : ResidueField O) : residue O (sec O a) = a := (residue_surjective a).choose_spec
-
+theorem residue_sec (a : ResidueField O) : residue O (sec O a) = a :=
+  (residue_surjective a).choose_spec
 
 variable (K p) in
 def yw {m n : ℕ} (w : Matrix (Fin m) (Fin n) (ResidueField O)) : Matrix (Fin m) (Fin n) K :=
   (algebraMap O K p)⁻¹ • (w.map (sec O)).map (algebraMap O K)
 
-theorem map_sec {m n : ℕ} (w : Matrix (Fin m) (Fin n) (ResidueField O)) : (w.map (sec O)).map (residue O) = w :=
+theorem map_sec {m n : ℕ} (w : Matrix (Fin m) (Fin n) (ResidueField O))
+    : (w.map (sec O)).map (residue O) = w :=
   Matrix.ext fun i j => residue_sec (w i j)
 
-theorem existsUnique_yw (hp : Irreducible p) {m n : ℕ} {y : Matrix (Fin m) (Fin n) K}
-    (hy : IntM O (algebraMap O K p • y)) : ∃! w, IntM O (y - yw K p w) := by
+theorem existsUnique_yw
+    (hp : Irreducible p)
+    {m n : ℕ} {y : Matrix (Fin m) (Fin n) K} (hy : IntM O (algebraMap O K p • y))
+    : ∃! w, IntM O (y - yw K p w) := by
   have h0 : algebraMap O K p ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective O K)).2 hp.ne_zero
   obtain ⟨z, hz⟩ := intM_iff.1 hy
   have e : ∀ w, IntM O (y - yw K p w) ↔ w = z.map (residue O) := fun w => by
@@ -138,58 +157,84 @@ theorem existsUnique_yw (hp : Irreducible p) {m n : ℕ} {y : Matrix (Fin m) (Fi
     rw [this, intM_div_iff hp, Matrix.map_sub _ (map_sub _), map_sec, sub_eq_zero, eq_comm]
   simp only [e, existsUnique_eq]
 
-theorem card_inversePrimeReps_integral_right_mul_hecke [Finite (ResidueField O)] (hp : Irreducible p) {m n j : ℕ} (hj : j ≤ n) {a : GL (Fin n) K}
-    (ha : Hk O p j a) : Nat.card {w : Matrix (Fin m) (Fin n) (ResidueField O) // IntM O (yw K p w * a.1)} =
-      Nat.card (ResidueField O) ^ (j * m) := by
+theorem card_inversePrimeReps_integral_right_mul_hecke
+    [Finite (ResidueField O)]
+    (hp : Irreducible p)
+    {m n j : ℕ} (hj : j ≤ n)
+    {a : GL (Fin n) K} (ha : Hk O p j a)
+    : Nat.card {w : Matrix (Fin m) (Fin n) (ResidueField O) // IntM O (yw K p w * a.1)}
+      = Nat.card (ResidueField O) ^ (j * m) := by
   obtain ⟨A, hA⟩ := intM_iff.1 ha.1
-  rw [← GlobalTheory.T.natCard_left_kernel_matrices_eq_pow _ m n j _ (GlobalTheory.T.finrank_reduction_range_add_corank O K p hp n j a A hj ha hA)]
+  rw [← GlobalTheory.T.natCard_left_kernel_matrices_eq_pow _ m n j _
+    (GlobalTheory.T.finrank_reduction_range_add_corank O K p hp n j a A hj ha hA)]
   refine Nat.card_congr (Equiv.subtypeEquivRight fun w => ?_)
   rw [yw, ← hA, Matrix.smul_mul, ← Matrix.map_mul, intM_div_iff hp, Matrix.map_mul, map_sec]
 
-theorem intM_tr {m n : ℕ} (w : Matrix (Fin m) (Fin n) (ResidueField O)) (a : GL (Fin m) K) :
-    IntM O (a.1 * yw K p w) ↔ IntM O (yw K p wᵀ * (tr a).1) := by
+theorem intM_tr {m n : ℕ} (w : Matrix (Fin m) (Fin n) (ResidueField O)) (a : GL (Fin m) K)
+    : IntM O (a.1 * yw K p w) ↔ IntM O (yw K p wᵀ * (tr a).1) := by
   have : yw K p wᵀ * (tr a).1 = (a.1 * yw K p w)ᵀ := by
     rw [Matrix.transpose_mul]
     rfl
   rw [this]
   exact ⟨fun h => h.transpose, fun h => h.transpose⟩
 
-theorem card_tgt [Finite (ResidueField O)] (hp : Irreducible p) {m n j : ℕ} (hj : j ≤ m) {a : GL (Fin m) K}
-    (ha : Hk O p j a) : Nat.card {w : Matrix (Fin m) (Fin n) (ResidueField O) // IntM O (a.1 * yw K p w)} =
-      Nat.card (ResidueField O) ^ (j * n) := by
+theorem card_tgt
+    [Finite (ResidueField O)]
+    (hp : Irreducible p)
+    {m n j : ℕ} (hj : j ≤ m)
+    {a : GL (Fin m) K} (ha : Hk O p j a)
+    : Nat.card {w : Matrix (Fin m) (Fin n) (ResidueField O) // IntM O (a.1 * yw K p w)}
+      = Nat.card (ResidueField O) ^ (j * n) := by
   rw [← card_inversePrimeReps_integral_right_mul_hecke hp hj ha.tr]
   exact Nat.card_congr ((Matrix.transposeAddEquiv _ _ _).toEquiv.subtypeEquiv fun w => intM_tr w a)
 
 def nKer {k : Type} [Field k] {m n : ℕ} (j : ℕ) (w : Matrix (Fin m) (Fin n) k) : ℕ :=
-  Nat.card {W : Submodule k (Fin n → k) // Module.finrank k W + j = n ∧ W ≤ LinearMap.ker w.mulVecLin}
+  Nat.card
+    {W : Submodule k (Fin n → k) // Module.finrank k W + j = n ∧ W ≤ LinearMap.ker w.mulVecLin}
 
-theorem card_heckeCosetReps_integral_right_inversePrime (hp : Irreducible p) {m n j : ℕ} (hj : j ≤ n) {ι : Type} {α : GL (Fin n) K} {R : Finset ι}
-    {ρ : ι → GL (Fin n) K} (hα : Hk O p j α) (hR : Reps O α R ρ) (w : Matrix (Fin m) (Fin n) (ResidueField O)) :
-    Nat.card {γ : ι // γ ∈ R ∧ IntM O (yw K p w * (ρ γ).1)} = nKer j w := by
-  have := GlobalTheory.T.card_cosets_eq_subspaces_kernel_residue O K p hp m n j ι α R ρ (w.map (sec O)) hj hα hR
+theorem card_heckeCosetReps_integral_right_inversePrime
+    (hp : Irreducible p)
+    {m n j : ℕ} (hj : j ≤ n)
+    {ι : Type} {α : GL (Fin n) K} {R : Finset ι} {ρ : ι → GL (Fin n) K}
+    (hα : Hk O p j α) (hR : Reps O α R ρ)
+    (w : Matrix (Fin m) (Fin n) (ResidueField O))
+    : Nat.card {γ : ι // γ ∈ R ∧ IntM O (yw K p w * (ρ γ).1)} = nKer j w := by
+  have :=
+    GlobalTheory.T.card_cosets_eq_subspaces_kernel_residue O K p hp m n j ι α R ρ (w.map (sec O)) hj
+      hα hR
   rwa [map_sec] at this
 
-theorem count_tgt (hp : Irreducible p) {m n j : ℕ} (hj : j ≤ m) {ι : Type} {α : GL (Fin m) K} {R : Finset ι}
-    {ρ : ι → GL (Fin m) K} (hα : Hk O p j α) (hR : Reps O α⁻¹ R ρ) (w : Matrix (Fin m) (Fin n) (ResidueField O)) :
-    Nat.card {γ : ι // γ ∈ R ∧ IntM O (((ρ γ)⁻¹).1 * yw K p w)} = nKer j wᵀ := by
+theorem count_tgt
+    (hp : Irreducible p)
+    {m n j : ℕ} (hj : j ≤ m)
+    {ι : Type} {α : GL (Fin m) K} {R : Finset ι} {ρ : ι → GL (Fin m) K}
+    (hα : Hk O p j α) (hR : Reps O α⁻¹ R ρ)
+    (w : Matrix (Fin m) (Fin n) (ResidueField O))
+    : Nat.card {γ : ι // γ ∈ R ∧ IntM O (((ρ γ)⁻¹).1 * yw K p w)} = nKer j wᵀ := by
   rw [← card_heckeCosetReps_integral_right_inversePrime hp hj hα.tr hR.tr wᵀ]
   exact Nat.card_congr (Equiv.subtypeEquivRight fun γ => and_congr_right fun _ => intM_tr w _)
 
-theorem nKer_eq_sum {k : Type} [Field k] [Finite k] {m n t d : ℕ} (h : n = m + t) (w : Matrix (Fin m) (Fin n) k) :
-    nKer d w = ∑ j ∈ Finset.range (min d m + 1),
-      Nat.card k ^ ((m - j) * (d - j)) * Formalism.L2.Col.gaussBin (Nat.card k) t (d - j) * nKer j wᵀ := by
-  letI := Fintype.ofFinite k
-  have h1 := GlobalTheory.T.card_ker_subspaces_and_heckePolyOf_convolution.1 k (Fin n → k) (Fin m → k) m t d w.mulVecLin (by rw [Module.finrank_fin_fun, h])
-    (Module.finrank_fin_fun k)
-  rw [← h] at h1
-  rw [nKer, h1, Nat.card_eq_fintype_card (α := k)]
-  symm
-  simp only [← GlobalTheory.T.card_subspaces_ker_transpose_eq_card_range k m n]
-  refine Finset.sum_subset (Finset.range_subset_range.2 (by omega)) fun j hj hj' => ?_
-  rw [Finset.mem_range] at hj hj'
-  have : IsEmpty {W : Submodule k (Fin m → k) // Module.finrank k W + j = m ∧ W ≤ LinearMap.ker wᵀ.mulVecLin} :=
-    ⟨fun W => by have := W.2.1; omega⟩
-  rw [nKer, Nat.card_of_isEmpty, mul_zero]
+theorem nKer_eq_sum
+    {k : Type} [Field k] [Finite k] {m n t d : ℕ} (h : n = m + t) (w : Matrix (Fin m) (Fin n) k)
+    : nKer d w
+      = ∑ j ∈ Finset.range (min d m + 1),
+        Nat.card k ^ ((m - j) * (d - j)) * Formalism.L2.Col.gaussBin (Nat.card k) t (d - j) * nKer j wᵀ :=
+  by
+    letI := Fintype.ofFinite k
+    have h1 :=
+      GlobalTheory.T.card_ker_subspaces_and_heckePolyOf_convolution.1 k (Fin n → k) (Fin m → k) m t
+        d w.mulVecLin (by rw [Module.finrank_fin_fun, h]) (Module.finrank_fin_fun k)
+    rw [← h] at h1
+    rw [nKer, h1, Nat.card_eq_fintype_card (α := k)]
+    symm
+    simp only [← GlobalTheory.T.card_subspaces_ker_transpose_eq_card_range k m n]
+    refine Finset.sum_subset (Finset.range_subset_range.2 (by omega)) fun j hj hj' => ?_
+    rw [Finset.mem_range] at hj hj'
+    have : IsEmpty
+        {W : Submodule k (Fin m → k)
+          // Module.finrank k W + j = m ∧ W ≤ LinearMap.ker wᵀ.mulVecLin} :=
+      ⟨fun W => by have := W.2.1; omega⟩
+    rw [nKer, Nat.card_of_isEmpty, mul_zero]
 
 end Pure
 
@@ -199,36 +244,47 @@ open IsLocalRing GlobalTheory.SplitScalar GlobalTheory.AdelicLatMove
 
 variable {D : D7} {e : AE D} {v : HeightOneSpectrum (𝓞 D.host.F)} {π : AE D →+* Fv D.host.F v}
 
-theorem one_sub_mul_idem {A : Type} [CommRing A] {a : A} (ha : a * a = a) (d : A) :
-    (1 - a) * (a * d + (1 - a)) = 1 - a := by
+theorem one_sub_mul_idem {A : Type} [CommRing A] {a : A} (ha : a * a = a) (d : A)
+    : (1 - a) * (a * d + (1 - a)) = 1 - a := by
   linear_combination (1 - d) * ha
 
-theorem idem_mul_inv {A : Type} [CommRing A] {a d d' : A} (ha : a * a = a) (h : d * d' = 1) :
-    (a * d + (1 - a)) * (a * d' + (1 - a)) = 1 := by
+theorem idem_mul_inv {A : Type} [CommRing A] {a d d' : A} (ha : a * a = a) (h : d * d' = 1)
+    : (a * d + (1 - a)) * (a * d' + (1 - a)) = 1 := by
   linear_combination a * a * h + (2 - d - d') * ha
 
-theorem suppAt_of {V : HSp D} {g : GA D V}
-    (h : (1 - (e + cA D e)) • mt V g = (1 - (e + cA D e)) • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D))) :
-    SuppAt e V g := by
+theorem suppAt_of
+    {V : HSp D} {g : GA D V}
+    (h : (1 - (e + cA D e)) • mt V g
+      = (1 - (e + cA D e)) • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)))
+    : SuppAt e V g := by
   rw [← sub_eq_zero, ← smul_sub, sub_smul, one_smul, sub_eq_zero] at h
   exact fun i j => (congrFun (congrFun h i) j).symm
 
 theorem suppAt_one (V : HSp D) : SuppAt e V 1 := suppAt_of (by rw [mt_one])
 
-theorem suppAt_inv {V : HSp D} {g : GA D V} (h : SuppAt e V g) : SuppAt e V g⁻¹ := suppAt_of (off_smul_mt_inv h)
+theorem suppAt_inv {V : HSp D} {g : GA D V} (h : SuppAt e V g) : SuppAt e V g⁻¹ :=
+  suppAt_of (off_smul_mt_inv h)
 
-theorem suppAt_mul {V : HSp D} {g g' : GA D V} (h : SuppAt e V g) (h' : SuppAt e V g') : SuppAt e V (g * g') :=
-  suppAt_of (by rw [mt_mul, ← Matrix.smul_mul, off_smul_mt h, Matrix.smul_mul, Matrix.one_mul, off_smul_mt h'])
+theorem suppAt_mul {V : HSp D} {g g' : GA D V} (h : SuppAt e V g) (h' : SuppAt e V g')
+    : SuppAt e V (g * g') :=
+  suppAt_of (by
+    rw [mt_mul, ← Matrix.smul_mul, off_smul_mt h, Matrix.smul_mul, Matrix.one_mul, off_smul_mt h'])
 
-theorem reps_of (he : IsSplitIdem D e) (hπ : Chart e v π) {V : HSp D} {β : GL (Fin V.rank) (Fv D.host.F v)}
-    (hβ : Frame V e π β) {α : GA D V} (hα : SuppAt e V α) {R : Finset (GA D V)} (hR : ∀ γ ∈ R, SuppAt e V γ)
-    (h : IsCosetRep V (locPart V (KsphC V ∅) e) α R) : Reps (Ov D v) (rho V π β α) R (rho V π β) := by
+theorem reps_of
+    (he : IsSplitIdem D e) (hπ : Chart e v π)
+    {V : HSp D} {β : GL (Fin V.rank) (Fv D.host.F v)} (hβ : Frame V e π β)
+    {α : GA D V} (hα : SuppAt e V α)
+    {R : Finset (GA D V)}
+    (hR : ∀ γ ∈ R, SuppAt e V γ) (h : IsCosetRep V (locPart V (KsphC V ∅) e) α R)
+    : Reps (Ov D v) (rho V π β α) R (rho V π β) := by
   have st := GlobalTheory.T.mem_hyperspecial_iff_gInt_of_suppAt_split e v π he hπ V β hβ
   refine ⟨fun γ hγ => ?_, fun k₁ k₂ h₁ h₂ => ?_⟩
   · obtain ⟨-, k₁, h₁, k₂, h₂, rfl⟩ := h.1 γ hγ
     exact ⟨_, _, (st _ h₁.2).1 h₁.1, (st _ h₂.2).1 h₂.1, by rw [map_mul, map_mul]⟩
-  · obtain ⟨g₁, s₁, rfl⟩ := GlobalTheory.T.exists_splitSupported_unitary_component e v π he hπ V β k₁
-    obtain ⟨g₂, s₂, rfl⟩ := GlobalTheory.T.exists_splitSupported_unitary_component e v π he hπ V β k₂
+  · obtain ⟨g₁, s₁, rfl⟩ :=
+      GlobalTheory.T.exists_splitSupported_unitary_component e v π he hπ V β k₁
+    obtain ⟨g₂, s₂, rfl⟩ :=
+      GlobalTheory.T.exists_splitSupported_unitary_component e v π he hπ V β k₂
     refine (existsUnique_congr fun γ => and_congr_right fun hγ => ?_).1
       (h.2 _ ⟨g₁, ⟨(st _ s₁).2 h₁, s₁⟩, g₂, ⟨(st _ s₂).2 h₂, s₂⟩, rfl⟩)
     have s := suppAt_mul (suppAt_inv (hR γ hγ)) (suppAt_mul (suppAt_mul s₁ hα) s₂)
@@ -238,23 +294,32 @@ theorem reps_of (he : IsSplitIdem D e) (hπ : Chart e v π) {V : HSp D} {β : GL
 theorem det_mul_det_inv {V : HSp D} (g : GA D V) : (mt V g).det * (mt V g⁻¹).det = 1 := by
   rw [← Matrix.det_mul, ← mt_mul, mul_inv_cancel, mt_one, Matrix.det_one]
 
-def detU (he : e * e = e) (V : HSp D) (g : GA D V) : (AE D)ˣ :=
-  ⟨e * (mt V g).det + (1 - e), e * (mt V g⁻¹).det + (1 - e),
-    idem_mul_inv he (det_mul_det_inv g), (mul_comm _ _).trans (idem_mul_inv he (det_mul_det_inv g))⟩
+def detU (he : e * e = e) (V : HSp D) (g : GA D V) : (AE D)ˣ := ⟨
+  e * (mt V g).det + (1 - e),
+  e * (mt V g⁻¹).det + (1 - e),
+  idem_mul_inv he (det_mul_det_inv g),
+  (mul_comm _ _).trans (idem_mul_inv he (det_mul_det_inv g))
+⟩
 
 theorem isDetAt_detU (he : e * e = e) (V : HSp D) (g : GA D V) : IsDetAt e V g (detU he V g) := rfl
 
-theorem detU_inv (he : e * e = e) (V : HSp D) (g : GA D V) : detU he V g⁻¹ = (detU he V g)⁻¹ := Units.ext rfl
+theorem detU_inv (he : e * e = e) (V : HSp D) (g : GA D V) : detU he V g⁻¹ = (detU he V g)⁻¹ :=
+  Units.ext rfl
 
 theorem Chart.map_e (hπ : Chart e v π) (he : e * e = e) : π e = 1 := by
   have := (hπ.2.1 (1 - e)).2 (by rw [mul_sub, mul_one, he, sub_self])
   rwa [map_sub, map_one, sub_eq_zero, eq_comm] at this
 
-theorem chi_of_unit (hπ : Chart e v π) {x d : (AE D)ˣ} (hx1 : (1 - e) * (x : AE D) = 1 - e)
-    (hd1 : (1 - e) * (d : AE D) = 1 - e) {χ : (AE D)ˣ →* Circle}
-    (hχ : ∀ y : (AE D)ˣ, (1 - e) * (y : AE D) = 1 - e → finPart D (e * (y : AE D)) ∈ intAE D →
-      finPart D (e * ((y⁻¹ : (AE D)ˣ) : AE D)) ∈ intAE D → χ y = 1) {u : (Ov D v)ˣ}
-    (h1 : π (d : AE D) = π (x : AE D) * algebraMap (Ov D v) (Fv D.host.F v) u) : χ d = χ x := by
+theorem chi_of_unit
+    (hπ : Chart e v π)
+    {x d : (AE D)ˣ} (hx1 : (1 - e) * (x : AE D) = 1 - e) (hd1 : (1 - e) * (d : AE D) = 1 - e)
+    {χ : (AE D)ˣ →* Circle}
+    (hχ : ∀ y : (AE D)ˣ,
+      (1 - e) * (y : AE D) = 1 - e → finPart D (e * (y : AE D)) ∈ intAE D
+        → finPart D (e * ((y⁻¹ : (AE D)ˣ) : AE D)) ∈ intAE D
+        → χ y = 1)
+    {u : (Ov D v)ˣ} (h1 : π (d : AE D) = π (x : AE D) * algebraMap (Ov D v) (Fv D.host.F v) u)
+    : χ d = χ x := by
   have h3 : π ((x⁻¹ * d : (AE D)ˣ) : AE D) = algebraMap (Ov D v) (Fv D.host.F v) u := by
     rw [Units.val_mul, π.map_mul, h1, ← mul_assoc, ← π.map_mul, Units.inv_mul, π.map_one, one_mul]
   have h4 := hχ (x⁻¹ * d) ?_ ((hπ.2.2.2 _).2 ⟨u, h3.symm⟩) ((hπ.2.2.2 _).2 ⟨(u⁻¹ : (Ov D v)ˣ), ?_⟩)
@@ -264,20 +329,28 @@ theorem chi_of_unit (hπ : Chart e v π) {x d : (AE D)ˣ} (hx1 : (1 - e) * (x : 
     rw [Units.val_mul, ← mul_assoc, h5, hd1]
   · rw [map_units_inv, map_units_inv, h3]
 
-theorem chi_detU (he : e * e = e) (hπ : Chart e v π) {V : HSp D} (β : GL (Fin V.rank) (Fv D.host.F v))
-    {p : Ov D v} {x : (AE D)ˣ} (hx1 : (1 - e) * (x : AE D) = 1 - e)
-    (hx2 : π x = algebraMap (Ov D v) (Fv D.host.F v) p) {χ : (AE D)ˣ →* Circle}
-    (hχ : ∀ y : (AE D)ˣ, (1 - e) * (y : AE D) = 1 - e → finPart D (e * (y : AE D)) ∈ intAE D →
-      finPart D (e * ((y⁻¹ : (AE D)ˣ) : AE D)) ∈ intAE D → χ y = 1)
+theorem chi_detU
+    (he : e * e = e) (hπ : Chart e v π)
+    {V : HSp D} (β : GL (Fin V.rank) (Fv D.host.F v))
+    {p : Ov D v} {x : (AE D)ˣ}
+    (hx1 : (1 - e) * (x : AE D) = 1 - e) (hx2 : π x = algebraMap (Ov D v) (Fv D.host.F v) p)
+    {χ : (AE D)ˣ →* Circle}
+    (hχ : ∀ y : (AE D)ˣ,
+      (1 - e) * (y : AE D) = 1 - e → finPart D (e * (y : AE D)) ∈ intAE D
+        → finPart D (e * ((y⁻¹ : (AE D)ˣ) : AE D)) ∈ intAE D
+        → χ y = 1)
     {g : GA D V} {j : ℕ} {u : (Ov D v)ˣ}
-    (hu : (rho V π β g).1.det = algebraMap (Ov D v) (Fv D.host.F v) (p ^ j * u)) :
-    χ (detU he V g) = χ x ^ j := by
-  have h1 : π (detU he V g : AE D) = π (x ^ j : (AE D)ˣ) * algebraMap (Ov D v) (Fv D.host.F v) u := by
-    rw [rho_val, Matrix.det_mul_comm, ← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one,
-      Matrix.one_mul] at hu
+    (hu : (rho V π β g).1.det = algebraMap (Ov D v) (Fv D.host.F v) (p ^ j * u))
+    : χ (detU he V g) = χ x ^ j := by
+  have h1
+      : π (detU he V g : AE D) = π (x ^ j : (AE D)ˣ) * algebraMap (Ov D v) (Fv D.host.F v) u := by
+    rw [rho_val, Matrix.det_mul_comm, ← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel,
+        Units.val_one, Matrix.one_mul]
+      at hu
     change π (e * (mt V g).det + (1 - e)) = _
-    rw [map_add π, π.map_mul, π.map_sub, π.map_one, hπ.map_e he, one_mul, sub_self, add_zero, RingHom.map_det,
-      Units.val_pow_eq_pow_val, π.map_pow, hx2, ← RingHom.map_pow, ← RingHom.map_mul, ← hu]
+    rw [map_add π, π.map_mul, π.map_sub, π.map_one, hπ.map_e he, one_mul, sub_self, add_zero,
+      RingHom.map_det, Units.val_pow_eq_pow_val, π.map_pow, hx2, ← RingHom.map_pow,
+      ← RingHom.map_mul, ← hu]
     rfl
   have h2 : ∀ j : ℕ, (1 - e) * ((x ^ j : (AE D)ˣ) : AE D) = 1 - e := fun j => by
     induction j with
@@ -288,71 +361,92 @@ theorem chi_detU (he : e * e = e) (hπ : Chart e v π) {V : HSp D} (β : GL (Fin
 
 variable {S T : HSp D}
 
-def phi (π : AE D →+* Fv D.host.F v) (βS : GL (Fin S.rank) (Fv D.host.F v)) (βT : GL (Fin T.rank) (Fv D.host.F v))
-    (c : Fv D.host.F v) (u : WO S T) : Matrix (Fin T.rank) (Fin S.rank) (Fv D.host.F v) :=
+def phi
+    (π : AE D →+* Fv D.host.F v) (βS : GL (Fin S.rank) (Fv D.host.F v))
+    (βT : GL (Fin T.rank) (Fv D.host.F v)) (c : Fv D.host.F v) (u : WO S T)
+    : Matrix (Fin T.rank) (Fin S.rank) (Fv D.host.F v) :=
   c • ((βT⁻¹).1 * Matrix.map u π * βS.1)
 
-variable {βS : GL (Fin S.rank) (Fv D.host.F v)} {βT : GL (Fin T.rank) (Fv D.host.F v)} {c : Fv D.host.F v}
+variable
+  {βS : GL (Fin S.rank) (Fv D.host.F v)} {βT : GL (Fin T.rank) (Fv D.host.F v)} {c : Fv D.host.F v}
 
 theorem phi_sub (u u' : WO S T) : phi π βS βT c (u - u') = phi π βS βT c u - phi π βS βT c u' := by
   rw [phi, phi, phi, Matrix.map_sub _ (map_sub _), Matrix.mul_sub, Matrix.sub_mul, smul_sub]
 
-theorem phi_actO (g : GA D S) (h : GA D T) (u : WO S T) :
-    phi π βS βT c (actO S T g⁻¹ h⁻¹ u) = ((rho T π βT h)⁻¹).1 * phi π βS βT c u * (rho S π βS g).1 := by
-  rw [← map_inv, rho_val, rho_val, phi, phi, actO, inv_inv, Matrix.map_mul, Matrix.map_mul, Matrix.mul_smul,
-    Matrix.smul_mul]
+theorem phi_actO (g : GA D S) (h : GA D T) (u : WO S T)
+    : phi π βS βT c (actO S T g⁻¹ h⁻¹ u)
+      = ((rho T π βT h)⁻¹).1 * phi π βS βT c u * (rho S π βS g).1 := by
+  rw [← map_inv, rho_val, rho_val, phi, phi, actO, inv_inv, Matrix.map_mul, Matrix.map_mul,
+    Matrix.mul_smul, Matrix.smul_mul]
   congr 1
   simp only [Matrix.mul_assoc]
-  rw [← Matrix.mul_assoc βT.1, ← Matrix.mul_assoc βS.1, ← Units.val_mul, ← Units.val_mul, mul_inv_cancel,
-    mul_inv_cancel, Units.val_one, Units.val_one, Matrix.one_mul, Matrix.one_mul]
+  rw [← Matrix.mul_assoc βT.1, ← Matrix.mul_assoc βS.1, ← Units.val_mul, ← Units.val_mul,
+    mul_inv_cancel, mul_inv_cancel, Units.val_one, Units.val_one, Matrix.one_mul, Matrix.one_mul]
 
-theorem phi_onto (he : e * e = e) (hπ : Chart e v π) (hc : c ≠ 0)
-    (y : Matrix (Fin T.rank) (Fin S.rank) (Fv D.host.F v)) : ∃ u : WO S T, IsHalf e u ∧ phi π βS βT c u = y := by
+theorem phi_onto
+    (he : e * e = e) (hπ : Chart e v π) (hc : c ≠ 0)
+    (y : Matrix (Fin T.rank) (Fin S.rank) (Fv D.host.F v))
+    : ∃ u : WO S T, IsHalf e u ∧ phi π βS βT c u = y := by
   choose s hs using hπ.1
   refine ⟨e • (βT.1 * (c⁻¹ • y) * (βS⁻¹).1).map s, isHalf_smul he _, ?_⟩
   have : Matrix.map (e • (βT.1 * (c⁻¹ • y) * (βS⁻¹).1).map s) π = βT.1 * (c⁻¹ • y) * (βS⁻¹).1 := by
     ext i j
-    rw [Matrix.map_apply, Matrix.smul_apply, smul_eq_mul, map_mul, hπ.map_e he, one_mul, Matrix.map_apply, hs]
+    rw [Matrix.map_apply, Matrix.smul_apply, smul_eq_mul, map_mul, hπ.map_e he, one_mul,
+      Matrix.map_apply, hs]
   rw [phi, this]
   simp only [Matrix.mul_assoc]
-  rw [← Matrix.mul_assoc (βT⁻¹).1, ← Units.val_mul, ← Units.val_mul, inv_mul_cancel,
-    inv_mul_cancel, Units.val_one, Units.val_one, Matrix.one_mul, Matrix.mul_one, smul_smul, mul_inv_cancel₀ hc,
+  rw [← Matrix.mul_assoc (βT⁻¹).1, ← Units.val_mul, ← Units.val_mul, inv_mul_cancel, inv_mul_cancel,
+    Units.val_one, Units.val_one, Matrix.one_mul, Matrix.mul_one, smul_smul, mul_inv_cancel₀ hc,
     one_smul]
 
-variable {ψ : AddChar (AF D.host.F) ℂ} {χS χT : (AE D)ˣ →* Circle}
+variable
+  {ψ : AddChar (AF D.host.F) ℂ} {χS χT : (AE D)ˣ →* Circle}
   {om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)}
 
-
 open Classical in
-theorem om_pair [Fintype (ResidueField (Ov D v))] (hW : IsWeilDatumO ψ S T χS χT om) (he : IsSplitIdem D e)
+theorem om_pair
+    [Fintype (ResidueField (Ov D v))]
+    (hW : IsWeilDatumO ψ S T χS χT om) (he : IsSplitIdem D e)
     {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f)
-    (hfix : ∀ u ∈ latO S T (L0c D S) (L0c D T) (fun _ => True), IsHalf e u ∨ IsHalf (cA D e) u → heisO ψ S T u f = f)
-    (hΛ : ∀ u : WO S T, IsHalf e u →
-      (u ∈ latO S T (L0c D S) (L0c D T) (fun _ => True) ↔ IntM (Ov D v) (phi π βS βT c u)))
+    (hfix : ∀ u ∈ latO S T (L0c D S) (L0c D T) (fun _ => True),
+      IsHalf e u ∨ IsHalf (cA D e) u → heisO ψ S T u f = f)
+    (hΛ : ∀ u : WO S T,
+      IsHalf e u
+        → (u ∈ latO S T (L0c D S) (L0c D T) (fun _ => True) ↔ IntM (Ov D v) (phi π βS βT c u)))
     {p : Ov D v} (hp : Irreducible p)
-    {U : Matrix (Fin T.rank) (Fin S.rank) (ResidueField (Ov D v)) → WO S T} (hU1 : ∀ w, IsHalf e (U w))
-    (hU2 : ∀ w, phi π βS βT c (U w) = yw (Fv D.host.F v) p w)
+    {U : Matrix (Fin T.rank) (Fin S.rank) (ResidueField (Ov D v)) → WO S T}
+    (hU1 : ∀ w, IsHalf e (U w)) (hU2 : ∀ w, phi π βS βT c (U w) = yw (Fv D.host.F v) p w)
     {g : GA D S} {h : GA D T} (hg : SuppAt e S g) (hh : SuppAt e T h)
     (Q : Matrix (Fin T.rank) (Fin S.rank) (Fv D.host.F v) → Prop)
     (hQ : ∀ y, IntM (Ov D v) (((rho T π βT h)⁻¹).1 * y * (rho S π βS g).1) ↔ Q y)
     (h1 : ∀ y, IntM (Ov D v) y → Q y)
-    (h2 : ∀ y, Q y → IntM (Ov D v) (algebraMap (Ov D v) (Fv D.host.F v) p • y)) :
-    om (g, h) f = ((splitFacO χS χT (detU he.1 S g) (detU he.1 T h) : ℂ) *
-      ((Real.sqrt (Nat.card {w // Q (yw (Fv D.host.F v) p w)} : ℝ) : ℝ) : ℂ)⁻¹) •
-        ∑ w, if Q (yw (Fv D.host.F v) p w) then heisO ψ S T (U w) f else 0 := by
-  have hact : ∀ u, IsHalf e u → (actO S T g⁻¹ h⁻¹ u ∈ latO S T (L0c D S) (L0c D T) (fun _ => True) ↔
-      Q (phi π βS βT c u)) := fun u hu => by rw [hΛ _ (isHalf_actO _ _ hu), phi_actO, hQ]
+    (h2 : ∀ y, Q y → IntM (Ov D v) (algebraMap (Ov D v) (Fv D.host.F v) p • y))
+    : om (g, h) f
+      = ((splitFacO χS χT (detU he.1 S g) (detU he.1 T h) : ℂ)
+          * ((Real.sqrt (Nat.card {w // Q (yw (Fv D.host.F v) p w)} : ℝ) : ℝ) : ℂ)⁻¹)
+        • ∑ w, if Q (yw (Fv D.host.F v) p w) then heisO ψ S T (U w) f else 0 := by
+  have hact
+      : ∀ u,
+        IsHalf e u
+          → (actO S T g⁻¹ h⁻¹ u ∈ latO S T (L0c D S) (L0c D T) (fun _ => True)
+            ↔ Q (phi π βS βT c u)) := fun u hu => by
+    rw [hΛ _ (isHalf_actO _ _ hu), phi_actO, hQ]
   have hinj : Function.Injective U := fun w w' hw => by
     have e1 : IntM (Ov D v) (algebraMap (Ov D v) (Fv D.host.F v) p • yw (Fv D.host.F v) p w) := by
-      rw [yw, smul_smul, mul_inv_cancel₀ ((map_ne_zero_iff _ (IsFractionRing.injective _ _)).2 hp.ne_zero), one_smul]
+      rw [yw, smul_smul,
+        mul_inv_cancel₀ ((map_ne_zero_iff _ (IsFractionRing.injective _ _)).2 hp.ne_zero), one_smul]
       exact intM_iff.2 ⟨_, rfl⟩
-    have e0 : IntM (Ov D v) (0 : Matrix (Fin T.rank) (Fin S.rank) (Fv D.host.F v)) := fun _ _ => ⟨0, map_zero _⟩
+    have e0 : IntM (Ov D v) (0 : Matrix (Fin T.rank) (Fin S.rank) (Fv D.host.F v)) := fun _ _ =>
+      ⟨0, map_zero _⟩
     exact (existsUnique_yw hp e1).unique (by rwa [sub_self]) (by rwa [← hU2, ← hU2, hw, sub_self])
-  have := om_eq_sum hW he hf hfix hg hh (isDetAt_detU he.1 S g) (isDetAt_detU he.1 T h)
-    (R := (Finset.univ.filter fun w => Q (yw (Fv D.host.F v) p w)).image U) (fun u hu => ?_) (fun u hu hue => ?_)
-    fun u hu hue => (hact u hue).2 (h1 _ ((hΛ u hue).1 hu))
-  · rw [this, Finset.card_image_of_injective _ hinj, Finset.sum_image fun _ _ _ _ h => hinj h, Finset.sum_filter,
-      Nat.card_eq_fintype_card, Fintype.card_subtype]
+  have :=
+    om_eq_sum hW he hf hfix hg hh (isDetAt_detU he.1 S g) (isDetAt_detU he.1 T h)
+      (R := (Finset.univ.filter fun w => Q (yw (Fv D.host.F v) p w)).image U)
+      (fun u hu => ?_)
+      (fun u hu hue => ?_)
+      fun u hu hue => (hact u hue).2 (h1 _ ((hΛ u hue).1 hu))
+  · rw [this, Finset.card_image_of_injective _ hinj, Finset.sum_image fun _ _ _ _ h => hinj h,
+      Finset.sum_filter, Nat.card_eq_fintype_card, Fintype.card_subtype]
   · obtain ⟨w, hw, rfl⟩ := Finset.mem_image.1 hu
     exact ⟨(hact _ (hU1 w)).2 (by rw [hU2]; exact (Finset.mem_filter.1 hw).2), hU1 w⟩
   · have hq := (hact u hue).1 hu
@@ -368,9 +462,13 @@ theorem om_pair [Fintype (ResidueField (Ov D v))] (hW : IsWeilDatumO ψ S T χS 
 
 end Chart
 
-theorem sum_ite_eq {ι X M : Type} [Fintype X] [AddCommGroup M] [Module ℂ M] (R : Finset ι) (Q : ι → X → Prop)
-    [∀ i x, Decidable (Q i x)] (F : X → M) (c : ℂ) :
-    ∑ i ∈ R, c • ∑ x, (if Q i x then F x else 0) = c • ∑ x, (Nat.card {i // i ∈ R ∧ Q i x} : ℂ) • F x := by
+theorem sum_ite_eq
+    {ι X M : Type} [Fintype X] [AddCommGroup M] [Module ℂ M]
+    (R : Finset ι)
+    (Q : ι → X → Prop) [∀ i x, Decidable (Q i x)]
+    (F : X → M) (c : ℂ)
+    : ∑ i ∈ R, c • ∑ x, (if Q i x then F x else 0)
+      = c • ∑ x, (Nat.card {i // i ∈ R ∧ Q i x} : ℂ) • F x := by
   rw [← Finset.smul_sum, Finset.sum_comm]
   congr 1
   refine Finset.sum_congr rfl fun x _ => ?_
@@ -378,10 +476,19 @@ theorem sum_ite_eq {ι X M : Type} [Fintype X] [AddCommGroup M] [Module ℂ M] (
   congr 2
   exact Nat.card_congr (Equiv.subtypeEquivRight fun i => Finset.mem_filter)
 
-theorem sum_combine {X M : Type} [Fintype X] [AddCommGroup M] [Module ℂ M] (F : X → M) (A B : ℂ) (hB : B ≠ 0)
-    (k : ℕ) (s : Finset ℕ) (N : X → ℕ) (N' : ℕ → X → ℕ) (a b : ℕ → ℕ) (G : ℕ → M)
-    (hG : ∀ j ∈ s, G j = B⁻¹ ^ j • ∑ x, (N' j x : ℂ) • F x) (hN : ∀ x, N x = ∑ j ∈ s, a j * b j * N' j x) :
-    A⁻¹ ^ k • ∑ x, (N x : ℂ) • F x = ∑ j ∈ s, ((a j : ℂ) * (b j : ℂ) * A⁻¹ ^ k * B ^ j) • G j := by
+theorem sum_combine
+    {X M : Type} [Fintype X] [AddCommGroup M] [Module ℂ M]
+    (F : X → M)
+    (A B : ℂ) (hB : B ≠ 0)
+    (k : ℕ)
+    (s : Finset ℕ)
+    (N : X → ℕ)
+    (N' : ℕ → X → ℕ)
+    (a b : ℕ → ℕ)
+    (G : ℕ → M) (hG : ∀ j ∈ s, G j = B⁻¹ ^ j • ∑ x, (N' j x : ℂ) • F x)
+    (hN : ∀ x, N x = ∑ j ∈ s, a j * b j * N' j x)
+    : A⁻¹ ^ k • ∑ x, (N x : ℂ) • F x
+      = ∑ j ∈ s, ((a j : ℂ) * (b j : ℂ) * A⁻¹ ^ k * B ^ j) • G j := by
   conv_rhs => rw [Finset.sum_congr rfl fun j hj => congrArg _ (hG j hj)]
   simp only [hN, Finset.smul_sum, smul_smul, Nat.cast_sum, Nat.cast_mul, Finset.sum_smul]
   rw [Finset.sum_comm]
@@ -390,14 +497,14 @@ theorem sum_combine {X M : Type} [Fintype X] [AddCommGroup M] [Module ℂ M] (F 
   have : B ^ j * B⁻¹ ^ j = 1 := by rw [← mul_pow, mul_inv_cancel₀ hB, one_pow]
   linear_combination (-((a j : ℂ) * b j * A⁻¹ ^ k * N' j x)) * this
 
-theorem const_eq (z : Circle) (q j m : ℕ) :
-    (((z ^ j)⁻¹ : Circle) : ℂ) * ((Real.sqrt ((q ^ (j * m) : ℕ) : ℝ) : ℝ) : ℂ)⁻¹ =
-      ((z : ℂ) * (Real.sqrt q : ℂ) ^ m)⁻¹ ^ j := by
+theorem const_eq (z : Circle) (q j m : ℕ)
+    : (((z ^ j)⁻¹ : Circle) : ℂ) * ((Real.sqrt ((q ^ (j * m) : ℕ) : ℝ) : ℝ) : ℂ)⁻¹
+      = ((z : ℂ) * (Real.sqrt q : ℂ) ^ m)⁻¹ ^ j := by
   have : Real.sqrt ((q ^ (j * m) : ℕ) : ℝ) = Real.sqrt q ^ (j * m) := by
     rw [Real.sqrt_eq_iff_mul_self_eq (Nat.cast_nonneg _) (by positivity), ← mul_pow,
       Real.mul_self_sqrt (Nat.cast_nonneg _), Nat.cast_pow]
-  rw [this, Circle.coe_inv, Circle.coe_pow, Complex.ofReal_pow, inv_pow, mul_pow, mul_inv, ← pow_mul, mul_comm m j]
-
+  rw [this, Circle.coe_inv, Circle.coe_pow, Complex.ofReal_pow, inv_pow, mul_pow, mul_inv,
+    ← pow_mul, mul_comm m j]
 
 set_option maxHeartbeats 1000000 in
 open IsLocalRing MeasureTheory in

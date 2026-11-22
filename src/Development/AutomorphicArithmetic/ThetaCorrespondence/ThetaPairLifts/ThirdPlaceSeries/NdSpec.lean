@@ -11,7 +11,9 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top
+  GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl NumberField IsDedekindDomain
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.HeightCounting.Up GlobalTheory.Mem.SRe GlobalTheory.Mem.R3.Rw
 open GlobalTheory.HeightCounting GlobalTheory.Mem.R3.Tr
@@ -20,34 +22,39 @@ namespace GlobalTheory.LayerMove
 set_option maxHeartbeats 4000000
 variable {D : D7} (m : Mv D) {hL : _root_.UpperTheory.Zero.LLC.RecTExists}
 section
-variable {cf : CharFrame D} {jE : D.host.E →+* Qb} {A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE} {M : Formalism.L2.MtFam D} {C : NChoice D} {tp : TupTied D cf C}
-def Mv.ndSpec_alt {big} {L : LocAll (lay0 D)} (x : NdSpec A.pl M C big L.X L.T) : NdSpec (m.sideA_alt A).pl (m.mt M) (m.ch C) big (m.loc L).X (m.loc L).T := @_root_.GlobalTheory.HeightCounting.NdSpec.mk (_) (_) (_) (_) (_) (_) (_)
+variable
+  {cf : CharFrame D} {jE : D.host.E →+* Qb}
+  {A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE} {M : Formalism.L2.MtFam D}
+  {C : NChoice D} {tp : TupTied D cf C}
+def Mv.ndSpec_alt {big} {L : LocAll (lay0 D)} (x : NdSpec A.pl M C big L.X L.T)
+    : NdSpec (m.sideA_alt A).pl (m.mt M) (m.ch C) big (m.loc L).X (m.loc L).T :=
+  @_root_.GlobalTheory.HeightCounting.NdSpec.mk (_) (_) (_) (_) (_) (_) (_)
     (iq := (by with_unfolding_all exact (x.iq :)))
     (iq_alg := (by with_unfolding_all exact (x.iq_alg :)))
     (iq_LL := (by with_unfolding_all exact (x.iq_LL :)))
     (iq_big := (by with_unfolding_all exact (x.iq_big :)))
-    (B := @_root_.Formalism.L2.NLocBase.mk (_) (_)
-      (Oc := (by with_unfolding_all exact (x.B.Oc :)))
-      (ringOc := (by with_unfolding_all exact (x.B.ringOc :)))
-      (domOc := (by with_unfolding_all exact (x.B.domOc :)))
-      (dvrOc := (by with_unfolding_all exact (x.B.dvrOc :)))
-      (ec := (by with_unfolding_all exact (x.B.ec :)))
-      (ec_w := (by with_unfolding_all exact (x.B.ec_w :)))
-      (V := (by with_unfolding_all exact (x.B.V :)))
-      (acgV := (by with_unfolding_all exact (x.B.acgV :)))
-      (modV := (by with_unfolding_all exact (x.B.modV :)))
-      (modVO := (by with_unfolding_all exact (x.B.modVO :)))
-      (towV := (by with_unfolding_all exact (x.B.towV :)))
-      (iV := (by with_unfolding_all exact (x.B.iV :)))
-      (iV_basis := (by with_unfolding_all exact (x.B.iV_basis :)))
-      (Qc := (by with_unfolding_all exact (x.B.Qc :)))
-      (hL := (by with_unfolding_all exact (x.B.hL :)))
-      (hL_def := (by with_unfolding_all exact (x.B.hL_def :)))
-      (hK := (by with_unfolding_all exact (x.B.hK :)))
-      (hK_def := (by with_unfolding_all exact (x.B.hK_def :)))
-      (split := (by with_unfolding_all exact (x.B.split :)))
-      (Qc_over := (by with_unfolding_all exact (x.B.Qc_over :)))
-      (Qc_conj := (by with_unfolding_all exact (x.B.Qc_conj :))))
+    (B :=
+      @_root_.Formalism.L2.NLocBase.mk (_) (_) (Oc := (by with_unfolding_all exact (x.B.Oc :)))
+        (ringOc := (by with_unfolding_all exact (x.B.ringOc :)))
+        (domOc := (by with_unfolding_all exact (x.B.domOc :)))
+        (dvrOc := (by with_unfolding_all exact (x.B.dvrOc :)))
+        (ec := (by with_unfolding_all exact (x.B.ec :)))
+        (ec_w := (by with_unfolding_all exact (x.B.ec_w :)))
+        (V := (by with_unfolding_all exact (x.B.V :)))
+        (acgV := (by with_unfolding_all exact (x.B.acgV :)))
+        (modV := (by with_unfolding_all exact (x.B.modV :)))
+        (modVO := (by with_unfolding_all exact (x.B.modVO :)))
+        (towV := (by with_unfolding_all exact (x.B.towV :)))
+        (iV := (by with_unfolding_all exact (x.B.iV :)))
+        (iV_basis := (by with_unfolding_all exact (x.B.iV_basis :)))
+        (Qc := (by with_unfolding_all exact (x.B.Qc :)))
+        (hL := (by with_unfolding_all exact (x.B.hL :)))
+        (hL_def := (by with_unfolding_all exact (x.B.hL_def :)))
+        (hK := (by with_unfolding_all exact (x.B.hK :)))
+        (hK_def := (by with_unfolding_all exact (x.B.hK_def :)))
+        (split := (by with_unfolding_all exact (x.B.split :)))
+        (Qc_over := (by with_unfolding_all exact (x.B.Qc_over :)))
+        (Qc_conj := (by with_unfolding_all exact (x.B.Qc_conj :))))
     (Q_eq := (by with_unfolding_all exact (x.Q_eq :)))
     (mx := (by with_unfolding_all exact (x.mx :)))
     (mx_max := (by with_unfolding_all exact (x.mx_max :)))

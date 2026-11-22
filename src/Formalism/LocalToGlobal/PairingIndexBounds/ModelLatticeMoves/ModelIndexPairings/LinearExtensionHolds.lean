@@ -28,7 +28,9 @@ theorem linear_extension_holds : ExtendLin := by
   refine ⟨ψ'.comp L, fun i => ?_⟩
   have hfi : f i = φ' (Submodule.Quotient.mk (Finsupp.single i 1)) := by
     simp [φ', φ, Finsupp.linearCombination_single]
-  have h2 : L (φ' (Submodule.Quotient.mk (Finsupp.single i 1))) = Submodule.Quotient.mk (Finsupp.single i 1) := by
+  have h2
+      : L (φ' (Submodule.Quotient.mk (Finsupp.single i 1)))
+        = Submodule.Quotient.mk (Finsupp.single i 1) := by
     rw [← LinearMap.comp_apply, hL, LinearMap.id_apply]
   rw [LinearMap.comp_apply, hfi, h2]
   simp [ψ', ψ, Finsupp.linearCombination_single]

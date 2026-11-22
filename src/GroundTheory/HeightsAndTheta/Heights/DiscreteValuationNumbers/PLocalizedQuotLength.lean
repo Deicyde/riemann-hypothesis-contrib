@@ -11,26 +11,29 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
 universe u
 
-private theorem length_self_eq_of_ringEquiv' {S T : Type*} [CommRing S] [CommRing T] (e : S ≃+* T) :
-    Module.length S S = Module.length T T := by
+private theorem length_self_eq_of_ringEquiv' {S T : Type*} [CommRing S] [CommRing T] (e : S ≃+* T)
+    : Module.length S S = Module.length T T := by
   rw [Module.length_eq_coheight, Module.length_eq_coheight]
   have := Ideal.coheight_comap_of_surjective (e : S →+* T) e.surjective ⊥
   have hb : Ideal.comap (e : S →+* T) ⊥ = ⊥ := Ideal.comap_bot_of_injective _ e.injective
   rw [hb] at this
   exact this
 
-private theorem length_localizedModule_quot' {R : Type*} [CommRing R] (J W : Ideal R) [W.IsPrime] :
-    Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (R ⧸ J)) =
-      Module.length (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W)))
+private theorem length_localizedModule_quot' {R : Type*} [CommRing R] (J W : Ideal R) [W.IsPrime]
+    : Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (R ⧸ J))
+      = Module.length (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W)))
         (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) := by
   let S := Localization.AtPrime W
-  have hJ : (J : Submodule R R).localized' S W.primeCompl (Algebra.linearMap R S) =
-      J.map (algebraMap R S) := by
+  have hJ
+      : (J : Submodule R R).localized' S W.primeCompl (Algebra.linearMap R S)
+        = J.map (algebraMap R S) := by
     rw [Submodule.localized'_eq_span, Ideal.map]
     rfl
-  let e := (IsLocalizedModule.linearEquiv W.primeCompl
-    ((J : Submodule R R).toLocalizedQuotient' S W.primeCompl (Algebra.linearMap R S))
-    (LocalizedModule.mkLinearMap W.primeCompl (R ⧸ J))).extendScalarsOfIsLocalization W.primeCompl S
+  let e :=
+    (IsLocalizedModule.linearEquiv W.primeCompl
+        ((J : Submodule R R).toLocalizedQuotient' S W.primeCompl (Algebra.linearMap R S))
+        (LocalizedModule.mkLinearMap W.primeCompl (R ⧸ J))).extendScalarsOfIsLocalization
+      W.primeCompl S
   rw [← e.length_eq, (Submodule.quotEquivOfEq _ _ hJ).length_eq]
   exact Module.length_eq_of_surjective Ideal.Quotient.mk_surjective
 
@@ -67,29 +70,37 @@ theorem LocalizedQuotLength.proof : LocalizedQuotLength.Statement.{u} := by
     have hmemP : t' * r ∈ P := by
       rw [← Ideal.Quotient.eq_zero_iff_mem, map_mul]
       exact htr
-    have hrJ : algebraMap S (Localization.AtPrime W) r ∈ J.map (algebraMap S (Localization.AtPrime W)) := by
-      rw [← Ideal.unit_mul_mem_iff_mem _ (IsLocalization.map_units (Localization.AtPrime W) ⟨_, ht'W⟩),
+    have hrJ
+        : algebraMap S (Localization.AtPrime W) r
+          ∈ J.map (algebraMap S (Localization.AtPrime W)) := by
+      rw [← Ideal.unit_mul_mem_iff_mem _
+          (IsLocalization.map_units (Localization.AtPrime W) ⟨_, ht'W⟩),
         ← map_mul]
       exact Ideal.mem_map_of_mem _ (Ideal.mem_sup_left hmemP)
     show IsLocalization.mk' (Localization.AtPrime W) r s ∈ _
     rw [IsLocalization.mk'_eq_mul_mk'_one]
     exact Ideal.mul_mem_right _ _ hrJ
 
-  have hcomp : ψ.comp (algebraMap S (Localization.AtPrime W)) =
-      (algebraMap (S ⧸ P) A).comp (Ideal.Quotient.mk P) :=
+  have hcomp
+      : ψ.comp (algebraMap S (Localization.AtPrime W))
+        = (algebraMap (S ⧸ P) A).comp (Ideal.Quotient.mk P) :=
     RingHom.ext fun x => Localization.localRingHom_to_map W W₀ (Ideal.Quotient.mk P) rfl x
   have hJmk : J.map (Ideal.Quotient.mk P) = Ideal.span {Ideal.Quotient.mk P z} := by
-    rw [hJdef, Ideal.map_sup, Ideal.map_quotient_self, bot_sup_eq, Ideal.map_span, Set.image_singleton]
-  have hI : (J.map (algebraMap S (Localization.AtPrime W))).map ψ =
-      Ideal.span {algebraMap (S ⧸ P) A (Ideal.Quotient.mk P z)} := by
+    rw [hJdef, Ideal.map_sup, Ideal.map_quotient_self, bot_sup_eq, Ideal.map_span,
+      Set.image_singleton]
+  have hI
+      : (J.map (algebraMap S (Localization.AtPrime W))).map ψ
+        = Ideal.span {algebraMap (S ⧸ P) A (Ideal.Quotient.mk P z)} := by
     rw [Ideal.map_map, hcomp, ← Ideal.map_map, hJmk, Ideal.map_span, Set.image_singleton]
   let : CommRing A := inferInstance
   let g := (Ideal.Quotient.mk (Ideal.span {algebraMap (S ⧸ P) A (Ideal.Quotient.mk P z)})).comp ψ
   have hg : Function.Surjective g := Ideal.Quotient.mk_surjective.comp hψ
   have hgk : J.map (algebraMap S (Localization.AtPrime W)) = RingHom.ker g := by
-    rw [← RingHom.comap_ker, Ideal.mk_ker, ← hI, Ideal.comap_map_of_surjective _ hψ, sup_eq_left.mpr hker]
-  have key := length_self_eq_of_ringEquiv'
-    ((Ideal.quotEquivOfEq hgk).trans (RingHom.quotientKerEquivOfSurjective hg))
+    rw [← RingHom.comap_ker, Ideal.mk_ker, ← hI, Ideal.comap_map_of_surjective _ hψ,
+      sup_eq_left.mpr hker]
+  have key :=
+    length_self_eq_of_ringEquiv' ((Ideal.quotEquivOfEq hgk).trans
+      (RingHom.quotientKerEquivOfSurjective hg))
   rw [length_localizedModule_quot', key]
   exact (Module.length_eq_of_surjective Ideal.Quotient.mk_surjective).symm
 

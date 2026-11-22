@@ -11,36 +11,45 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 open NumberField IsDedekindDomain Matrix UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Glob
 
-private theorem mk_el {K : Type} [Field K] {Δ : K} (a b : Lsq K Δ) (h : a * star a + b * star b = 1) :
-    ∃ γ : DX Δ, mt γ = !![a, b; -star b, star a] := by
-  let g : GL (Fin 2) (Lsq K Δ) := ⟨!![a, b; -star b, star a], !![star a, -b; star b, a], by
-    rw [Matrix.mul_fin_two, Matrix.one_fin_two]
-    congr 1
-    ext1 i; fin_cases i <;> (ext1 j; fin_cases j) <;> simp <;> first | ring1 | linear_combination h, by
-    rw [Matrix.mul_fin_two, Matrix.one_fin_two]
-    congr 1
-    ext1 i; fin_cases i <;> (ext1 j; fin_cases j) <;> simp <;> first | ring1 | linear_combination h⟩
+private theorem mk_el {K : Type} [Field K] {Δ : K} (a b : Lsq K Δ) (h : a * star a + b * star b = 1)
+    : ∃ γ : DX Δ, mt γ = !![a, b; -star b, star a] := by
+  let g : GL (Fin 2) (Lsq K Δ) := ⟨
+    !![a, b; -star b, star a],
+    !![star a, -b; star b, a],
+    by
+      rw [Matrix.mul_fin_two, Matrix.one_fin_two]
+      congr 1
+      ext1 i
+      fin_cases i <;> (ext1 j; fin_cases j) <;> simp <;> first | ring1 | linear_combination h,
+    by
+      rw [Matrix.mul_fin_two, Matrix.one_fin_two]
+      congr 1
+      ext1 i
+      fin_cases i <;> (ext1 j; fin_cases j) <;> simp <;> first | ring1 | linear_combination h
+  ⟩
   refine ⟨⟨g, ?_⟩, rfl⟩
   change GeneralLinearGroup.map (starRingEnd (Lsq K Δ)) g = (wJ Δ)⁻¹ * g * ((wJ Δ)⁻¹)⁻¹
   rw [inv_inv]
   refine Units.ext ?_
-  change (!![a, b; -star b, star a] : Matrix (Fin 2) (Fin 2) (Lsq K Δ)).map (starRingEnd _) =
-    !![0, -1; 1, 0] * !![a, b; -star b, star a] * !![0, 1; -1, 0]
+  change (!![a, b; -star b, star a] : Matrix (Fin 2) (Fin 2) (Lsq K Δ)).map (starRingEnd _)
+    = !![0, -1; 1, 0] * !![a, b; -star b, star a] * !![0, 1; -1, 0]
   ext1 i j
   fin_cases i <;> fin_cases j <;> simp [starRingEnd_apply]
 
-private theorem el_shape {K : Type} [Field K] {Δ : K} (γ : DX Δ) :
-    mt γ 1 1 = star (mt γ 0 0) ∧ mt γ 1 0 = -star (mt γ 0 1) := by
+private theorem el_shape {K : Type} [Field K] {Δ : K} (γ : DX Δ)
+    : mt γ 1 1 = star (mt γ 0 0) ∧ mt γ 1 0 = - star (mt γ 0 1) := by
   have h : GeneralLinearGroup.map (starRingEnd (Lsq K Δ)) γ.1 = (wJ Δ)⁻¹ * γ.1 * ((wJ Δ)⁻¹)⁻¹ := γ.2
   rw [inv_inv] at h
-  have h' : (mt γ).map (starRingEnd _) = !![0, -1; 1, 0] * mt γ * !![0, 1; -1, 0] := congrArg Units.val h
+  have h' : (mt γ).map (starRingEnd _) = !![0, -1; 1, 0] * mt γ * !![0, 1; -1, 0] :=
+    congrArg Units.val h
   have h0 := congrFun (congrFun h' 0) 0
   have h1 := congrFun (congrFun h' 0) 1
   simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.vecMul, dotProduct, starRingEnd_apply] at h0 h1
   exact ⟨h0.symm, by rw [h1, neg_neg]⟩
 
-private theorem loc_neg_one {F : Type} [Field F] [NumberField F] {Δ : F} (D : Dat Δ) (hD : D.Ok) (h0 : Δ ≠ 0) (v : Pl F) :
-    ∃ a b : Kv v, -1 = a ^ 2 - cv v Δ * b ^ 2 := by
+private theorem loc_neg_one
+    {F : Type} [Field F] [NumberField F] {Δ : F} (D : Dat Δ) (hD : D.Ok) (h0 : Δ ≠ 0) (v : Pl F)
+    : ∃ a b : Kv v, -1 = a ^ 2 - cv v Δ * b ^ 2 := by
   by_cases hv : v ∈ D.Sg
   · have : CharZero (Kv v) := charZero_of_injective_algebraMap (cv v).injective
     exact GlobalTheory.Published.HasseNormSt.of_isSquare ((map_ne_zero _).2 h0) (hD.split v hv) _
@@ -50,13 +59,15 @@ private theorem loc_neg_one {F : Type} [Field F] [NumberField F] {Δ : F} (D : D
     simp only [Units.val_neg, Units.val_one, map_neg, map_one] at hν
     linear_combination -hν
 
-private theorem glob_neg_one {F : Type} [Field F] [NumberField F] {Δ d : F} (h0 : Δ ≠ 0)
-    (hl : ∀ v : Pl F, ∃ a b : Kv v, -1 = a ^ 2 - cv v Δ * b ^ 2) (σ₀ : F →+* ℝ) (hd : ∀ σ : F →+* ℝ, σ d < 0) :
-    ∃ p₀ p₁ q₀ q₁ : F, p₀ ^ 2 + d * p₁ ^ 2 - Δ * (q₀ ^ 2 + d * q₁ ^ 2) = -1 ∧ p₀ * p₁ = Δ * q₀ * q₁ :=
+private theorem glob_neg_one
+    {F : Type} [Field F] [NumberField F]
+    {Δ d : F} (h0 : Δ ≠ 0) (hl : ∀ v : Pl F, ∃ a b : Kv v, -1 = a ^ 2 - cv v Δ * b ^ 2)
+    (σ₀ : F →+* ℝ) (hd : ∀ σ : F →+* ℝ, σ d < 0)
+    : ∃ p₀ p₁ q₀ q₁ : F,
+      p₀ ^ 2 + d * p₁ ^ 2 - Δ * (q₀ ^ 2 + d * q₁ ^ 2) = -1 ∧ p₀ * p₁ = Δ * q₀ * q₁ :=
   _root_.UpperTheory.Reformulated.B.NormIndexQuadratic.glob_neg_one h0 hl σ₀ hd
 
-theorem UpperTheory.V.Z.Sym.Glob.embEx :
-    UpperTheory.V.Z.Sym.Glob.EmbEx := by
+theorem UpperTheory.V.Z.Sym.Glob.embEx : UpperTheory.V.Z.Sym.Glob.EmbEx := by
   intro F _ _ Δ D hD τ
   have := hD.real
   obtain ⟨σ₀⟩ : Nonempty (F →+* ℝ) := by

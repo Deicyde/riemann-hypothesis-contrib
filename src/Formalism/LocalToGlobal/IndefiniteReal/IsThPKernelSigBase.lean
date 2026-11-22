@@ -7,7 +7,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.OrthogonalComplementCharact
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory IsDedekindDomain NumberField Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory IsDedekindDomain NumberField Formalism.L2.Theta
 open scoped TensorProduct
 
 namespace Formalism.IndefR.Conj
@@ -15,7 +17,6 @@ namespace Formalism.IndefR.Conj
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
-
 
 variable (D) in
 def labLL (τ : D.what₂.Tau) : D.host.E →+* D.what₂.LL :=
@@ -37,13 +38,8 @@ def ArchLab.emb (A : ArchLab D) (τ : D.what₂.Tau) : D.host.E →+* ℂ :=
 
 def IsLabOf (σ : D.what₂.LL →+* ℂ) (A : ArchLab D) : Prop := ∀ τ, labE σ τ = A.emb τ
 
-
-
 variable (D) in
 def LabExists : Prop := ∀ σ : D.what₂.LL →+* ℂ, ∃ A : ArchLab D, IsLabOf σ A
-
-
-
 
 end Formalism.IndefR.Conj
 

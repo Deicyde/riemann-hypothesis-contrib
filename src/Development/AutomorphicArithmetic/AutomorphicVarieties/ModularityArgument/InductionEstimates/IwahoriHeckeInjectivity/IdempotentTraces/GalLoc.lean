@@ -13,30 +13,41 @@ public import Development.AutomorphicArithmetic.AdelicQuotients.CentralSectionBa
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Global GroundTheory.Global.SemiLocal
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  GroundTheory.Global GroundTheory.Global.SemiLocal
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1
+  PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open GlobalTheory.CuspRep UpperTheory.V.Published
 open scoped ComplexConjugate Classical
 
-open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
 
 section SlopeTestRemainingChoices
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-private theorem ad_ext (F : Type) [Field F] [NumberField F] [Algebra F E] {g g' : AdelicGLn.AdelicGL E n}
-    (h1 : T4.pI E n g = T4.pI E n g') (h2 : ∀ v : Pl F, T4.pE E n v g = T4.pE E n v g') : g = g' := by
+private theorem ad_ext
+    (F : Type) [Field F] [NumberField F] [Algebra F E]
+    {g g' : AdelicGLn.AdelicGL E n}
+    (h1 : T4.pI E n g = T4.pI E n g') (h2 : ∀ v : Pl F, T4.pE E n v g = T4.pE E n v g')
+    : g = g' := by
   refine Units.ext (Matrix.ext fun a b => Prod.ext ?_ (FiniteAdeleRing.ext E fun w => ?_))
   · exact congrArg (fun x : GL (Fin n) (InfiniteAdeleRing E) => x.val a b) h1
-  · exact congrArg (fun x : GL (Fin n) (CompletionsOver E (AdeleBaseChange.below F w)) =>
-      x.val a b ⟨w, AdeleBaseChange.liesOver_below w⟩) (h2 _)
+  · exact congrArg
+      (fun x : GL (Fin n) (CompletionsOver E (AdeleBaseChange.below F w)) =>
+        x.val a b ⟨w, AdeleBaseChange.liesOver_below w⟩)
+      (h2 _)
 
 private theorem pI_eq (g : AdelicGLn.AdelicGL E n) : T4.pI E n g = (AdelicGLn.prodEquiv E n g).1 :=
   Units.ext (Matrix.ext fun a b => (AdelicGLn.prodEquiv_apply_fst E n g a b).symm)
 
-private theorem pE_ext {v : Pl F} {g : AdelicGLn.AdelicGL E n} (h : ∀ w : PlacesOver E v, finAt w.1 g = 1) :
-    T4.pE E n v g = 1 := by
+private theorem pE_ext
+    {v : Pl F} {g : AdelicGLn.AdelicGL E n} (h : ∀ w : PlacesOver E v, finAt w.1 g = 1)
+    : T4.pE E n v g = 1 := by
   refine Units.ext (Matrix.ext fun a b => funext fun w => ?_)
   have h1 : (g.val a b).2 w.1 = (1 : GL (Fin n) (w.1.adicCompletion E)).val a b := by
     rw [← h w, finAt_apply]
@@ -44,68 +55,83 @@ private theorem pE_ext {v : Pl F} {g : AdelicGLn.AdelicGL E n} (h : ∀ w : Plac
   simp only [Units.val_one, Matrix.one_apply]
   split_ifs <;> rfl
 
-private theorem gal_cent (σ : E ≃ₐ[F] E) (s : {r : ℝ // 0 < r}) :
-    mapGL n (galAd σ) (centralSection E n s) = centralSection E n s := by
+private theorem gal_cent (σ : E ≃ₐ[F] E) (s : {r : ℝ // 0 < r})
+    : mapGL n (galAd σ) (centralSection E n s) = centralSection E n s := by
   have hl : Module.finrank F E ≠ 0 := Module.finrank_pos.ne'
-  have e : (⟨(s : ℝ) ^ ((Module.finrank F E : ℝ))⁻¹, Real.rpow_pos_of_pos s.2 _⟩ : {r : ℝ // 0 < r}) ^
-      Module.finrank F E = s := by
+  have e
+      : (⟨(s : ℝ) ^ ((Module.finrank F E : ℝ))⁻¹, Real.rpow_pos_of_pos s.2 _⟩ : {r : ℝ // 0 < r})
+          ^ Module.finrank F E
+        = s := by
     apply Subtype.ext
     rw [Positive.val_pow]
     exact Real.rpow_inv_natCast_pow s.2.le hl
   rw [← e, ← UpperTheory.centralSection_baseChange F E n]
   exact (UpperTheory.adele_galois_action_baseChange_compat F E σ n).2.2.2.2.1 _
 
-private theorem gal_retract (σ : E ≃ₐ[F] E) (hn : 0 < n) {μ : Measure (G1 E n)} [μ.IsHaarMeasure] {θ : Twist μ}
-    (hθ : IsGalTwist σ θ) (x : AdelicGLn.AdelicGL E n) :
-    θ.e (retractOne x) = retractOne (mapGL n (galAd σ) x) := by
-  have h1 : ((θ.e (retractOne x) : G1 E n) : AdelicGLn.AdelicGL E n) * centralSection E n (detModule E n x) =
-      mapGL n (galAd σ) x := by
+private theorem gal_retract
+    (σ : E ≃ₐ[F] E)
+    (hn : 0 < n)
+    {μ : Measure (G1 E n)} [μ.IsHaarMeasure]
+    {θ : Twist μ} (hθ : IsGalTwist σ θ)
+    (x : AdelicGLn.AdelicGL E n)
+    : θ.e (retractOne x) = retractOne (mapGL n (galAd σ) x) := by
+  have h1
+      : ((θ.e (retractOne x) : G1 E n) : AdelicGLn.AdelicGL E n)
+          * centralSection E n (detModule E n x)
+        = mapGL n (galAd σ) x := by
     rw [hθ, coe_retractOne, map_mul, map_inv, gal_cent, inv_mul_cancel_right]
   rw [← h1, retractOne_mul, retractOne_coe, retractOne_centralSection, mul_one]
 
-private theorem gal_infEmb (σ : E ≃ₐ[F] E) (a : archGroup E n) :
-    mapGL n (galAd σ) (infEmb E n a) =
-      infEmb E n (archEquiv E n (mapGL n (galInf σ) ((archEquiv E n).symm a))) := by
+private theorem gal_infEmb (σ : E ≃ₐ[F] E) (a : archGroup E n)
+    : mapGL n (galAd σ) (infEmb E n a)
+      = infEmb E n (archEquiv E n (mapGL n (galInf σ) ((archEquiv E n).symm a))) := by
   obtain ⟨c1, c2, -⟩ := UpperTheory.adele_galois_action_baseChange_compat F E σ n
   refine ad_ext F ?_ fun v => ?_
   · rw [c1, pI_eq, pI_eq, prodEquiv_infEmb, prodEquiv_infEmb, ContinuousMulEquiv.symm_apply_apply]
   · rw [c2, pE_ext fun w => finAt_infEmb w.1 _, pE_ext fun w => finAt_infEmb w.1 _, map_one]
 
-private theorem arch_shift {σ : E ≃ₐ[F] E} {m : ℕ} (D : InfD σ m) (k : archGroup E n) :
-    ∃ k' : archGroup E n, (∀ i, compA D n i k' = compA D n (i + 1) k) ∧
-      mapGL n (galAd σ) (infEmb E n k) = infEmb E n k' := by
+private theorem arch_shift {σ : E ≃ₐ[F] E} {m : ℕ} (D : InfD σ m) (k : archGroup E n)
+    : ∃ k' : archGroup E n,
+      (∀ i, compA D n i k' = compA D n (i + 1) k)
+        ∧ mapGL n (galAd σ) (infEmb E n k) = infEmb E n k' := by
   refine ⟨_, fun i => ?_, gal_infEmb σ k⟩
   have hsh := (UpperTheory.ConvolutionTheory.L1.glueBasic _ _ _ _ m D n).2.2.2.2.2.2.1
-  have h : ∀ i x, compA D n i x = archEquiv F n (D.comp n i ((archEquiv E n).symm x)) := fun _ _ => rfl
+  have h : ∀ i x, compA D n i x = archEquiv F n (D.comp n i ((archEquiv E n).symm x)) := fun _ _ =>
+    rfl
   rw [h, h, ContinuousMulEquiv.symm_apply_apply, hsh]
 
-private theorem comp_loc {σ : E ≃ₐ[F] E} {v : Pl F} (D : Split (incFin E v) (galFin σ v) 1)
-    (w : Fin 2 ≃ PlacesOver E v)
+private theorem comp_loc
+    {σ : E ≃ₐ[F] E} {v : Pl F} (D : Split (incFin E v) (galFin σ v) 1) (w : Fin 2 ≃ PlacesOver E v)
     (hD : ∀ (b : CompletionsOver E v) i, completionMap v (w i).1 (D.e b i) = b (w i))
-    (i j : Fin 2) (g : Gw n v) :
-    D.comp n j (T4.pE E n v (finEmb E n (AdelicGLn.localEmbedding (w i).1 (mapGL n (completionMap v (w i).1) g)))) =
-      if j = i then g else 1 := by
+    (i j : Fin 2) (g : Gw n v)
+    : D.comp n j
+        (T4.pE E n v
+          (finEmb E n (AdelicGLn.localEmbedding (w i).1 (mapGL n (completionMap v (w i).1) g))))
+      = if j = i then g else 1 := by
   refine Units.ext (Matrix.ext fun a b => (completionMap v (w j).1).injective ?_)
   refine (hD _ j).trans ?_
-  change (finAt (w j).1 (finEmb E n (AdelicGLn.localEmbedding (w i).1 (mapGL n (completionMap v (w i).1) g)))).val a b = _
+  change (finAt (w j).1
+      (finEmb E n (AdelicGLn.localEmbedding (w i).1 (mapGL n (completionMap v (w i).1) g)))).val a b
+    = _
   split_ifs with h
   · subst h
     rw [(UpperTheory.ConvolutionTheory.Tf.locEmb E n (w j).1).2.1]
     rfl
-  · rw [(UpperTheory.ConvolutionTheory.Tf.locEmb E n (w i).1).2.2.1 (w j).1 (fun h' => h (w.injective (Subtype.ext h')))]
+  · rw [(UpperTheory.ConvolutionTheory.Tf.locEmb E n (w i).1).2.2.1 (w j).1
+      (fun h' => h (w.injective (Subtype.ext h')))]
     simp only [Units.val_one, Matrix.one_apply]
     split_ifs <;> simp
 
-private theorem pE_loc {v v' : Pl F} (h : v' ≠ v) (w : PlacesOver E v) (x : Gw n w.1) :
-    T4.pE E n v' (finEmb E n (AdelicGLn.localEmbedding w.1 x)) = 1 := by
-  refine pE_ext fun u => (UpperTheory.ConvolutionTheory.Tf.locEmb E n w.1).2.2.1 u.1 (fun h' => h ?_) x
+private theorem pE_loc {v v' : Pl F} (h : v' ≠ v) (w : PlacesOver E v) (x : Gw n w.1)
+    : T4.pE E n v' (finEmb E n (AdelicGLn.localEmbedding w.1 x)) = 1 := by
+  refine pE_ext fun u =>
+    (UpperTheory.ConvolutionTheory.Tf.locEmb E n w.1).2.2.1 u.1 (fun h' => h ?_) x
   apply HeightOneSpectrum.ext
   rw [u.2.over, w.2.over, h']
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.galLoc :
-    GalLoc := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.galLoc : GalLoc := by
   intro F E _ _ _ _ _ _ _ _ σ h2 hσ n hn μ _ θ
   refine ⟨?_, fun hθ => ⟨fun g => ?_, fun D eF e he k => ?_, fun v hv => ?_⟩⟩
   · unfold IsGalTwist UpperTheory.ConvolutionTheory.K.IsGal
@@ -129,8 +155,9 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.galLoc :
     refine ⟨⟨k', hm⟩, ?_, ?_⟩
     · change θ.e (archP E n k) = archP E n k'
       rw [← retract_infEmb, ← retract_infEmb, gal_retract σ hn hθ, hk']
-    · rw [he k (fun i => ⟨_, hk i⟩) fun _ => rfl, he ⟨k', hm⟩ (fun i => ⟨_, hk (i + 1)⟩) fun i => (key i).symm,
-        Fin.prod_univ_two, Fin.prod_univ_two, mul_comm]
+    · rw [he k (fun i => ⟨_, hk i⟩) fun _ => rfl,
+        he ⟨k', hm⟩ (fun i => ⟨_, hk (i + 1)⟩) fun i => (key i).symm, Fin.prod_univ_two,
+        Fin.prod_univ_two, mul_comm]
       rfl
   · obtain ⟨w₀⟩ : Nonempty (PlacesOver E v) := by
       obtain ⟨⟨P, hP, hl⟩⟩ : Nonempty (v.asIdeal.primesOver (𝓞 E)) := inferInstance
@@ -147,7 +174,8 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.galLoc :
     · rw [c2]
       by_cases h : v' = v
       · subst h
-        rw [← g2 (mapGL n (galFin σ v') _), ← g2 (T4.pE E n v' (finEmb E n (AdelicGLn.localEmbedding (w (i + 1)).1 _)))]
+        rw [← g2 (mapGL n (galFin σ v') _),
+          ← g2 (T4.pE E n v' (finEmb E n (AdelicGLn.localEmbedding (w (i + 1)).1 _)))]
         congr 1
         funext j
         rw [hsh, comp_loc D w hD, comp_loc D w hD]

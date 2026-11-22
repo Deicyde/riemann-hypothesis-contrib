@@ -8,11 +8,11 @@ namespace ReciprocityTheory.ChartRestriction.G.Geo
 
 open MvPolynomial
 
-theorem succ_le_ringKrullDim_of_algebraicIndependent {σ : Type} [Finite σ]
-    (P : Ideal (MvPolynomial σ ℤ)) (hP : P.IsPrime)
-    (hH : P.comap (C : ℤ →+* MvPolynomial σ ℤ) = ⊥) {n : ℕ}
-    (x : Fin n → MvPolynomial σ ℚ ⧸ qIdeal P) (hx : AlgebraicIndependent ℚ x) :
-    ((n + 1 : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (MvPolynomial σ ℤ ⧸ P) := by
+theorem succ_le_ringKrullDim_of_algebraicIndependent
+    {σ : Type} [Finite σ]
+    (P : Ideal (MvPolynomial σ ℤ)) (hP : P.IsPrime) (hH : P.comap (C : ℤ →+* MvPolynomial σ ℤ) = ⊥)
+    {n : ℕ} (x : Fin n → MvPolynomial σ ℚ ⧸ qIdeal P) (hx : AlgebraicIndependent ℚ x)
+    : ((n + 1 : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (MvPolynomial σ ℤ ⧸ P) := by
   have hdom := isDomain_qQuot P hP hH
   obtain ⟨s, g, hinj, hint⟩ := exists_integral_inj_algHom_of_fg ℚ (MvPolynomial σ ℚ ⧸ qIdeal P)
   have hns : n ≤ s := by

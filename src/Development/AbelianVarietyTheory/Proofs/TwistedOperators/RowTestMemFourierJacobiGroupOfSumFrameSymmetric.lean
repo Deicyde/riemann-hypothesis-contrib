@@ -10,9 +10,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Represent
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.RowUnf GlobalTheory.RowChain GlobalTheory.SeeSaw GlobalTheory.RowVal GlobalTheory.RowReal
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.RowUnf
+  GlobalTheory.RowChain GlobalTheory.SeeSaw GlobalTheory.RowVal GlobalTheory.RowReal
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 open GlobalTheory.RootEx GlobalTheory.RowRep
@@ -36,17 +40,24 @@ private lemma mul_apply_eq_of_mul_eq_of_col_eq {K : Type} [Field K] {m n n' : Ty
   simp only [Matrix.mul_apply, hc] at h ⊢
   exact h
 
-theorem mem_jac {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (p : Place D k)
+theorem mem_jac
+    {D : D7} {k : Type}
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (p : Place D k)
     {A B : HSp D} {σ : ℕ} {ε : D.host.E} (d : HermitianOrthogonalExtensionData A B (2 * σ) ε)
-    {b b' : Matrix (Fin A.rank) (Fin A.rank) k} (hb : b * b' = 1) (hb' : b' * b = 1) {u : Fin (2 * σ) → k}
-    {Γ : Matrix (Fin A.rank ⊕ Fin (2 * σ)) (Fin B.rank) k} (h1 : Γ * sumCols d p.π b u = 1) (h2 : sumCols d p.π b u * Γ = 1)
-    {g : GA D B} (hg : SuppAt p.e B g) {x : GL (Fin A.rank ⊕ Fin (2 * σ)) k}
-    (e : x.val = Γ * ((mt B g).map p.π * sumCols d p.π b u)) (hx : x ∈ symR k (Fin A.rank) (2 * σ)) :
-    g ∈ jacGrp (jacDec d rfl) := by
+    {b b' : Matrix (Fin A.rank) (Fin A.rank) k} (hb : b * b' = 1) (hb' : b' * b = 1)
+    {u : Fin (2 * σ) → k} {Γ : Matrix (Fin A.rank ⊕ Fin (2 * σ)) (Fin B.rank) k}
+    (h1 : Γ * sumCols d p.π b u = 1) (h2 : sumCols d p.π b u * Γ = 1)
+    {g : GA D B} (hg : SuppAt p.e B g)
+    {x : GL (Fin A.rank ⊕ Fin (2 * σ)) k}
+    (e : x.val = Γ * ((mt B g).map p.π * sumCols d p.π b u)) (hx : x ∈ symR k (Fin A.rank) (2 * σ))
+    : g ∈ jacGrp (jacDec d rfl) := by
   classical
-  have hS : ∀ r (j : Fin (2 * σ)), sumCols d p.π b u r (Sum.inr j) = p.π (incA D (d.a r j)) * u j := by
+  have hS
+      : ∀ r (j : Fin (2 * σ)), sumCols d p.π b u r (Sum.inr j) = p.π (incA D (d.a r j)) * u j := by
     intro r j
-    simp only [sumCols, Matrix.fromCols_apply_inr, Matrix.mul_diagonal, Matrix.map_apply, RingHom.comp_apply]
+    simp only [sumCols, Matrix.fromCols_apply_inr, Matrix.mul_diagonal, Matrix.map_apply,
+      RingHom.comp_apply]
   let F : Frame k B.rank (Fin A.rank ⊕ Fin (2 * σ)) := ⟨sumCols d p.π b u, Γ, h2, h1⟩
   let FA : Frame k A.rank (Fin A.rank) := ⟨b, b', hb, hb'⟩
   obtain ⟨φ, hφ⟩ := exists_hom p F
@@ -58,33 +69,52 @@ theorem mem_jac {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace
     rw [h2, Matrix.mul_one, ← Matrix.mul_assoc, h2, Matrix.one_mul]
   rw [isLoc_unique p hgx (hφ x)]
 
-  have hfix : ∀ g₀ : GA D A, (mt B ((jacDec d rfl).emb0 g₀)).map p.π * d.a.map (p.π.comp (incA D)) =
-      d.a.map (p.π.comp (incA D)) := by
+  have hfix
+      : ∀ g₀ : GA D A,
+        (mt B ((jacDec d rfl).emb0 g₀)).map p.π * d.a.map (p.π.comp (incA D))
+          = d.a.map (p.π.comp (incA D)) := by
     intro g₀
-    have hX := map_fix p (HypDec.wittDecomp_anisotropicEmbedding_inclX (d := jacDec d rfl) (g := g₀))
-    have hY := map_fix p (HypDec.wittDecomp_anisotropicEmbedding_inclY (d := jacDec d rfl) (g := g₀))
+    have hX :=
+      map_fix p (HypDec.wittDecomp_anisotropicEmbedding_inclX (d := jacDec d rfl) (g := g₀))
+    have hY :=
+      map_fix p (HypDec.wittDecomp_anisotropicEmbedding_inclY (d := jacDec d rfl) (g := g₀))
     ext r j
     by_cases hj : j.val < σ
     · exact mul_apply_eq_of_mul_eq_of_col_eq _ _ _ hX ⟨j.val, hj⟩ j (fun t => rfl) r
-    · refine mul_apply_eq_of_mul_eq_of_col_eq _ _ _ hY ⟨2 * σ - 1 - j.val, by omega⟩ j (fun t => ?_) r
+    · refine
+        mul_apply_eq_of_mul_eq_of_col_eq _ _ _ hY ⟨2 * σ - 1 - j.val, by omega⟩ j (fun t => ?_) r
       show p.π (incA D ((jacDec d rfl).e' t ⟨2 * σ - 1 - j.val, by omega⟩)) = p.π (incA D (d.a t j))
       dsimp only [jacDec, Matrix.submatrix_apply, id]
       congr 3
       apply Fin.ext
       simp
       omega
-  have hN : ∀ p', (p' = σ ∨ p' = σ + 1) → GlobalTheory.RootEx.N k (Fin A.rank) (2 * σ) p' ≤ (jacGrp (jacDec d rfl)).comap φ := by
+  have hN
+      : ∀ p',
+        (p' = σ ∨ p' = σ + 1)
+          → GlobalTheory.RootEx.N k (Fin A.rank) (2 * σ) p' ≤ (jacGrp (jacDec d rfl)).comap φ := by
     intro p' hp'
     unfold GlobalTheory.RootEx.N
     rw [Subgroup.closure_le]
     intro q hq
     show φ q ∈ flagN (jacDec d rfl) ⊔ (jacDec d rfl).emb0.range
     refine Subgroup.mem_sup_left (flag_of_strict p (jacDec d rfl) FA F
-      (Sum.elim (fun a => Sum.inl a) (Sum.elim (fun i : Fin σ => Sum.inr ⟨i.val, by omega⟩)
-        (fun i : Fin σ => Sum.inr ⟨2 * σ - 1 - i.val, by omega⟩))) ?_
-      (Sum.elim (fun _ => (1 : k)) (Sum.elim (fun i : Fin σ => u ⟨i.val, by omega⟩)
-        (fun i : Fin σ => u ⟨2 * σ - 1 - i.val, by omega⟩))) ?_
-      (Sum.elim (fun _ => σ + 1) (fun j : Fin (2 * σ) => if j.val < σ then j.val + 1 else j.val + 2)) ?_ (hφ q) ?_)
+      (Sum.elim
+        (fun a => Sum.inl a)
+        (Sum.elim
+          (fun i : Fin σ => Sum.inr ⟨i.val, by omega⟩)
+          (fun i : Fin σ => Sum.inr ⟨2 * σ - 1 - i.val, by omega⟩)))
+      ?_
+      (Sum.elim
+        (fun _ => (1 : k))
+        (Sum.elim
+          (fun i : Fin σ => u ⟨i.val, by omega⟩)
+          (fun i : Fin σ => u ⟨2 * σ - 1 - i.val, by omega⟩)))
+      ?_
+      (Sum.elim
+        (fun _ => σ + 1)
+        (fun j : Fin (2 * σ) => if j.val < σ then j.val + 1 else j.val + 2))
+      ?_ (hφ q) ?_)
     · rintro (a | j)
       · exact ⟨Sum.inl a, rfl⟩
       · by_cases hj : j.val < σ
@@ -128,7 +158,9 @@ theorem mem_jac {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace
     have hloc : p.IsLoc F ((jacDec d rfl).emb0 (ψ g₀)) (embX (2 * σ) g₀) := by
       refine ⟨suppAt_wittLeviEmbedding _ (hψ g₀).1, ?_⟩
       refine eq_embX F _ g₀ ((frameMat B A d.ι).map (p.π.comp (incA D)) * b) (fun r a => rfl) ?_ ?_
-      · exact intertwine p (HypDec.wittDecomp_anisotropicEmbedding_inclAnisotropic (d := jacDec d rfl) (g := ψ g₀)) (hψ g₀)
+      · exact intertwine p
+          (HypDec.wittDecomp_anisotropicEmbedding_inclAnisotropic (d := jacDec d rfl) (g := ψ g₀))
+          (hψ g₀)
       · intro j
         refine fix_col (hfix (ψ g₀)) (u j) j (fun r => ?_)
         show sumCols d p.π b u r (Sum.inr j) = u j * (d.a.map (p.π.comp (incA D))) r j
@@ -141,13 +173,27 @@ theorem mem_jac {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace
 
 end GlobalTheory.RowRepLoc
 
-theorem GlobalTheory.RowRepLoc.mem_jacGrp_of_symR : ∀ {D : D7} {A B : HSp D} {c σ : ℕ} {ε : D.host.E} (d : HermitianOrthogonalExtensionData A B c ε) (h : c = 2 * σ), 1 ≤ σ → ∀ (w : Pl D.host.E) (β : GL (Fin A.rank) (Lev.EAf D)) (β' : GL (Fin B.rank) (Lev.EAf D)) (u : Fin c → Kw w), IsSumFrame d w β β' u → (∀ p, u p ≠ 0) → ∀ {a b : ℕ} (_ : a = A.rank) (hb : b = B.rank) (hab : a + c = b) (q : GlobalTheory.FinPl.SplitPt D (Kw w)), (∀ x, q.pr x = GlobalTheory.RowRep.piAt w x) → ∀ g : GA D B, SuppAt q.e B g → frameGL hab (inBasis hb β' w (Lev.finE B g)) ∈ symR (Kw w) (Fin a) c → g ∈ jacGrp (jacDec d h) := by
+theorem GlobalTheory.RowRepLoc.mem_jacGrp_of_symR
+    : ∀ {D : D7} {A B : HSp D} {c σ : ℕ} {ε : D.host.E}
+        (d : HermitianOrthogonalExtensionData A B c ε) (h : c = 2 * σ),
+      1 ≤ σ
+        → ∀ (w : Pl D.host.E) (β : GL (Fin A.rank) (Lev.EAf D)) (β' : GL (Fin B.rank) (Lev.EAf D))
+            (u : Fin c → Kw w),
+          IsSumFrame d w β β' u → (∀ p, u p ≠ 0)
+            → ∀ {a b : ℕ} (_ : a = A.rank) (hb : b = B.rank) (hab : a + c = b)
+                (q : GlobalTheory.FinPl.SplitPt D (Kw w)),
+              (∀ x, q.pr x = GlobalTheory.RowRep.piAt w x)
+                → ∀ g : GA D B,
+                  SuppAt q.e B g
+                    → frameGL hab (inBasis hb β' w (Lev.finE B g)) ∈ symR (Kw w) (Fin a) c
+                    → g ∈ jacGrp (jacDec d h) := by
   intro D A B c σ ε d h _ w β β' u hF _ a b ha hb hab q hq g hg hx
   subst h ha hb
   obtain ⟨Γ, hΓ1, hΓ2, hΓ⟩ := frame_val d w hF
   have hπ : (GlobalTheory.LocMod.Place.ofSplitPt q).π = piAt w := RingHom.ext hq
-  refine GlobalTheory.RowRepLoc.mem_jac (GlobalTheory.LocMod.Place.ofSplitPt q) d (b' := (GlobalTheory.StdFrames.loc w β)⁻¹.val)
-    (Units.mul_inv _) (Units.inv_mul _) (u := u) (Γ := Γ) ?_ ?_ hg (x := frameGL hab (inBasis rfl β' w (Lev.finE B g))) ?_ hx
+  refine GlobalTheory.RowRepLoc.mem_jac (GlobalTheory.LocMod.Place.ofSplitPt q) d
+    (b' := (GlobalTheory.StdFrames.loc w β)⁻¹.val) (Units.mul_inv _) (Units.inv_mul _) (u := u)
+    (Γ := Γ) ?_ ?_ hg (x := frameGL hab (inBasis rfl β' w (Lev.finE B g))) ?_ hx
   · rw [hπ]; exact hΓ1
   · rw [hπ]; exact hΓ2
   · rw [hπ]; exact hΓ g

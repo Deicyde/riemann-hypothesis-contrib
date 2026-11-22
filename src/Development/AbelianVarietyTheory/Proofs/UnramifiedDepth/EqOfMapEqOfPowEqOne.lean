@@ -6,9 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.RootsOfUnityInjective
 
-theorem eq_of_map_eq_of_pow_eq_one {R k : Type} [CommRing R] [IsDomain R] [CommRing k] [IsDomain k]
-    (π : R →+* k) {N : ℕ} (hN : (N : k) ≠ 0) {u w : R} (hu : u ^ N = 1) (hw : w ^ N = 1)
-    (h : π u = π w) : u = w := by
+theorem eq_of_map_eq_of_pow_eq_one
+    {R k : Type} [CommRing R] [IsDomain R] [CommRing k] [IsDomain k]
+    (π : R →+* k)
+    {N : ℕ} (hN : (N : k) ≠ 0)
+    {u w : R} (hu : u ^ N = 1) (hw : w ^ N = 1) (h : π u = π w)
+    : u = w := by
   have hN0 : N ≠ 0 := by
     rintro rfl
     exact hN Nat.cast_zero

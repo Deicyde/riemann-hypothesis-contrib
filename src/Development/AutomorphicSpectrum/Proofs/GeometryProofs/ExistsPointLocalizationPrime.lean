@@ -5,14 +5,17 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsCptGe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-theorem germ_isUnit_and_surj {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (y : X) (hy : y ∈ U) :
-    (∀ a : Γ(X, U), IsUnit (X.presheaf.germ U y hy a) ↔ a ∉ (hU.primeIdealOf ⟨y, hy⟩).asIdeal) ∧
-    ∀ g : X.presheaf.stalk y, ∃ b c : Γ(X, U), b ∉ (hU.primeIdealOf ⟨y, hy⟩).asIdeal ∧
-      g * X.presheaf.germ U y hy b = X.presheaf.germ U y hy c := by
+theorem germ_isUnit_and_surj
+    {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (y : X) (hy : y ∈ U)
+    : (∀ a : Γ(X, U), IsUnit (X.presheaf.germ U y hy a) ↔ a ∉ (hU.primeIdealOf ⟨y, hy⟩).asIdeal)
+      ∧ ∀ g : X.presheaf.stalk y, ∃ b c : Γ(X, U),
+        b ∉ (hU.primeIdealOf ⟨y, hy⟩).asIdeal
+          ∧ g * X.presheaf.germ U y hy b = X.presheaf.germ U y hy c := by
   let _ : Algebra Γ(X, U) (X.presheaf.stalk y) :=
     TopCat.Presheaf.algebra_section_stalk X.presheaf (⟨y, hy⟩ : U)
   have hl : IsLocalization.AtPrime (X.presheaf.stalk y) (hU.primeIdealOf ⟨y, hy⟩).asIdeal :=
@@ -25,19 +28,23 @@ theorem germ_isUnit_and_surj {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X)
 
-theorem genMap_germ {U : X.Opens} (p : Cpt ξ) (hp : p.1 ∈ U) (hg : genPt ξ ∈ U) (a : Γ(X, U)) :
-    genMap ξ p (X.presheaf.germ U p.1 hp a) =
-      (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ U (genPt ξ) hg a) := by
-  have h : X.presheaf.germ U p.1 hp ≫ X.presheaf.stalkSpecializes p.2 = X.presheaf.germ U (genPt ξ) hg :=
+theorem genMap_germ {U : X.Opens} (p : Cpt ξ) (hp : p.1 ∈ U) (hg : genPt ξ ∈ U) (a : Γ(X, U))
+    : genMap ξ p (X.presheaf.germ U p.1 hp a)
+      = (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ U (genPt ξ) hg a) := by
+  have h
+      : X.presheaf.germ U p.1 hp ≫ X.presheaf.stalkSpecializes p.2
+        = X.presheaf.germ U (genPt ξ) hg :=
     TopCat.Presheaf.germ_stalkSpecializes _ _ _
   simp only [genMap, CommRingCat.hom_comp, RingHom.comp_apply]
   rw [← h]
   rfl
 
-theorem genMap_stalkSpecializes (p q : Cpt ξ) (h : q.1 ⤳ p.1) (g : X.presheaf.stalk p.1) :
-    genMap ξ q ((X.presheaf.stalkSpecializes h).hom g) = genMap ξ p g := by
-  have h2 : X.presheaf.stalkSpecializes h ≫ X.presheaf.stalkSpecializes q.2 =
-      X.presheaf.stalkSpecializes p.2 := TopCat.Presheaf.stalkSpecializes_comp _ _ _
+theorem genMap_stalkSpecializes (p q : Cpt ξ) (h : q.1 ⤳ p.1) (g : X.presheaf.stalk p.1)
+    : genMap ξ q ((X.presheaf.stalkSpecializes h).hom g) = genMap ξ p g := by
+  have h2
+      : X.presheaf.stalkSpecializes h ≫ X.presheaf.stalkSpecializes q.2
+        = X.presheaf.stalkSpecializes p.2 :=
+    TopCat.Presheaf.stalkSpecializes_comp _ _ _
   simp only [genMap]
   rw [← h2]
   rfl
@@ -46,7 +53,14 @@ end GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-theorem regAt_prime_generisation : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X), IsCptGen ξ → ∀ (p : Cpt ξ) (I : Ideal (regAt ξ p)), I.IsPrime → ∃ q : Cpt ξ, q.1 ⤳ p.1 ∧ ∀ a : Ω, a ∈ regAt ξ q ↔ ∃ s : regAt ξ p, s ∉ I ∧ (s : Ω) * a ∈ regAt ξ p := by
+theorem regAt_prime_generisation
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X),
+      IsCptGen ξ
+        → ∀ (p : Cpt ξ) (I : Ideal (regAt ξ p)),
+          I.IsPrime
+            → ∃ q : Cpt ξ,
+              q.1 ⤳ p.1
+                ∧ ∀ a : Ω, a ∈ regAt ξ q ↔ ∃ s : regAt ξ p, s ∉ I ∧ (s : Ω) * a ∈ regAt ξ p := by
   intro X Ω _ ξ hξ p I hI
   obtain ⟨U, hU, hpU, -⟩ := exists_isAffineOpen_mem_and_subset (X := X) (x := p.1) (U := ⊤) trivial
   have hgU : genPt ξ ∈ U := p.2.mem_open U.isOpen hpU
@@ -72,7 +86,8 @@ theorem regAt_prime_generisation : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (
   obtain ⟨hGu, -⟩ := germ_isUnit_and_surj hU (genPt ξ) hgU
   obtain ⟨hQu, hQs⟩ := germ_isUnit_and_surj hU _ hqU
   rw [hQ0] at hQu hQs
-  have hunitJ : ∀ r, IsUnit r → r ∉ J := fun r hr hrJ => hJ.ne_top (Ideal.eq_top_of_isUnit_mem _ hrJ hr)
+  have hunitJ : ∀ r, IsUnit r → r ∉ J := fun r hr hrJ =>
+    hJ.ne_top (Ideal.eq_top_of_isUnit_mem _ hrJ hr)
 
   have hGQ : hU.primeIdealOf ⟨genPt ξ, hgU⟩ ≤ Q0 := by
     intro a ha
@@ -129,6 +144,7 @@ theorem regAt_prime_generisation : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (
     refine ⟨(↑u⁻¹ : X.presheaf.stalk q.1) * σ t, ?_⟩
     have hne : genMap ξ q (σ r) * genMap ξ q (↑u⁻¹ : X.presheaf.stalk q.1) = 1 := by
       rw [← map_mul, ← hu, Units.mul_inv, map_one]
-    rw [map_mul, hσ, ht, hρ, ← hσ r, ← _root_.mul_assoc, mul_comm (genMap ξ q _), hne, _root_.one_mul]
+    rw [map_mul, hσ, ht, hρ, ← hσ r, ← _root_.mul_assoc, mul_comm (genMap ξ q _), hne,
+      _root_.one_mul]
 
 end GlobalTheory.CompanionTheory.Ar

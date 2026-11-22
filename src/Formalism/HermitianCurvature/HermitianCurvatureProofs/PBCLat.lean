@@ -33,8 +33,7 @@ theorem sizesSup : PBC.SizesSup := by
   refine ⟨Cs, hCs, ?_⟩
   intro E _ _ _ Wp Wq _ _ _ _ S hg1 hg2 hU b n hb hn hthr
   obtain ⟨-, hcard, hdeg⟩ := Formalism.FourierDecayAlt.P.degreeFacts_statement E
-  have hf : S.f = S6.deg E := by
-    rw [← hcard, ← Fintype.card_fin S.f]; exact Fintype.card_congr S.pl
+  have hf : S.f = S6.deg E := by rw [← hcard, ← Fintype.card_fin S.f]; exact Fintype.card_congr S.pl
   have hfpos : 0 < S.f := hf ▸ hdeg
   have : Nonempty (Fin S.f) := ⟨⟨0, hfpos⟩⟩
   have hgN : 0 < S.g := Nat.mul_pos hg1 hg2
@@ -42,20 +41,20 @@ theorem sizesSup : PBC.SizesSup := by
   have hgR : (0 : ℝ) < S.g := by linarith
   have hrd1 := rd_ge_one E
   have hrd : 0 < S6.rd E := by linarith
-  have hN' := Formalism.FourierDecayAlt.P.Jx2.sqrt_idl
-    Formalism.FourierDecayAlt.P.scaledIdealNorm E S.g (S6.nuBlock S.G.r b n + 1) hgN
-  have hN : √(FractionalIdeal.absNorm (S6.dualIdl E S.g (S6.nuBlock S.G.r b n)) : ℝ) =
-      (((S.g : ℝ) * S6.rd E ^ (S6.nuBlock S.G.r b n + 1)) ^ S6.deg E)⁻¹ := by
+  have hN' :=
+    Formalism.FourierDecayAlt.P.Jx2.sqrt_idl Formalism.FourierDecayAlt.P.scaledIdealNorm E S.g
+      (S6.nuBlock S.G.r b n + 1) hgN
+  have hN
+      : √(FractionalIdeal.absNorm (S6.dualIdl E S.g (S6.nuBlock S.G.r b n)) : ℝ)
+        = (((S.g : ℝ) * S6.rd E ^ (S6.nuBlock S.G.r b n + 1)) ^ S6.deg E)⁻¹ := by
     simpa only [S6.dualIdl] using hN'
   set ν : ℤ := S6.nuBlock S.G.r b n with hν
   set x : ℝ := S6.rd E ^ ν with hx
   have hxpos : 0 < x := zpow_pos hrd _
-  have hexp : ((2 * S.G.r + 4 : ℤ) - 2 * b - n) = ν + 1 := by
-    simp only [hν, S6.nuBlock]; ring
+  have hexp : ((2 * S.G.r + 4 : ℤ) - 2 * b - n) = ν + 1 := by simp only [hν, S6.nuBlock]; ring
   rw [zpow_add₀ hrd.ne', zpow_one] at hN
   set m : ℝ := Finset.univ.inf' Finset.univ_nonempty (thr S b n) with hm
-  have hmpos : 0 < m := by
-    rw [hm, Finset.lt_inf'_iff]; exact fun v _ => hthr v
+  have hmpos : 0 < m := by rw [hm, Finset.lt_inf'_iff]; exact fun v _ => hthr v
   have hmle : ∀ v, m ≤ thr S b n v := fun v => Finset.inf'_le _ (Finset.mem_univ v)
   refine ⟨S.g / m, div_pos hgR hmpos, ?_⟩
   set R : ℝ := S.g / m with hR
@@ -82,43 +81,54 @@ theorem sizesSup : PBC.SizesSup := by
     field_simp
   rw [hvol, hNinv, hdlB]
 
-  have key : ∀ v, x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2) * (Cs * (1 + (R * thr S b n v / S.g) ^ 2)) / R ^ 2 ≤
-      Cs * (thr S b n v ^ 2 * ((S.g : ℝ) * (x * S6.rd E)) ^ 2) := by
+  have key
+      : ∀ v,
+        x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2) * (Cs * (1 + (R * thr S b n v / S.g) ^ 2)) / R ^ 2
+          ≤ Cs * (thr S b n v ^ 2 * ((S.g : ℝ) * (x * S6.rd E)) ^ 2) := by
     intro v
     have ht := hthr v
     have h1 : (1 + (R * thr S b n v / S.g) ^ 2) / R ^ 2 ≤ 2 * thr S b n v ^ 2 / (S.g : ℝ) ^ 2 := by
       rw [div_le_div_iff₀ (by positivity) (by positivity)]
       have hR' : R * m = S.g := by rw [hR]; field_simp
       have hmt : m ^ 2 ≤ thr S b n v ^ 2 := pow_le_pow_left₀ hmpos.le (hmle v) 2
-      have : (S.g : ℝ) ^ 2 ≤ R ^ 2 * thr S b n v ^ 2 := by
-        rw [← hR']; nlinarith [sq_nonneg R]
-      have e : (1 + (R * thr S b n v / S.g) ^ 2) * (S.g : ℝ) ^ 2 =
-          (S.g : ℝ) ^ 2 + R ^ 2 * thr S b n v ^ 2 := by field_simp
+      have : (S.g : ℝ) ^ 2 ≤ R ^ 2 * thr S b n v ^ 2 := by rw [← hR']; nlinarith [sq_nonneg R]
+      have e
+          : (1 + (R * thr S b n v / S.g) ^ 2) * (S.g : ℝ) ^ 2
+            = (S.g : ℝ) ^ 2 + R ^ 2 * thr S b n v ^ 2 := by
+        field_simp
       rw [e] <;> nlinarith
-    calc x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2) * (Cs * (1 + (R * thr S b n v / S.g) ^ 2)) / R ^ 2
-        = x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2) * Cs * ((1 + (R * thr S b n v / S.g) ^ 2) / R ^ 2) := by ring
+    calc
+      x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2) * (Cs * (1 + (R * thr S b n v / S.g) ^ 2)) / R ^ 2
+          = x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2) * Cs
+            * ((1 + (R * thr S b n v / S.g) ^ 2) / R ^ 2) := by
+        ring
       _ ≤ x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2) * Cs * (2 * thr S b n v ^ 2 / (S.g : ℝ) ^ 2) :=
-          mul_le_mul_of_nonneg_left h1 (by positivity)
-      _ = Cs * (thr S b n v ^ 2 * ((S.g : ℝ) * (x * S6.rd E)) ^ 2) * (1 / ((S.g : ℝ) * S6.rd E)) := by
-          field_simp
+        mul_le_mul_of_nonneg_left h1 (by positivity)
+      _ = Cs * (thr S b n v ^ 2 * ((S.g : ℝ) * (x * S6.rd E)) ^ 2)
+          * (1 / ((S.g : ℝ) * S6.rd E)) := by
+        field_simp
       _ ≤ Cs * (thr S b n v ^ 2 * ((S.g : ℝ) * (x * S6.rd E)) ^ 2) * 1 := by
-          apply mul_le_mul_of_nonneg_left _ (by positivity)
-          rw [div_le_one (by positivity)] <;> nlinarith
+        apply mul_le_mul_of_nonneg_left _ (by positivity)
+        rw [div_le_one (by positivity)] <;> nlinarith
       _ = _ := mul_one _
-  calc (∏ _v : Fin S.f, x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2)) *
-        (∏ v, Cs * (1 + (R * thr S b n v / S.g) ^ 2)) / R ^ (2 * S.f)
-      = ∏ v, x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2) * (Cs * (1 + (R * thr S b n v / S.g) ^ 2)) / R ^ 2 := by
+  calc
+    (∏ _v : Fin S.f, x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2))
+          * (∏ v, Cs * (1 + (R * thr S b n v / S.g) ^ 2)) / R ^ (2 * S.f)
+        = ∏ v, x ^ 2 * (S6.rd E * (S.g : ℝ) ^ 3 / 2) * (Cs * (1 + (R * thr S b n v / S.g) ^ 2)) / R ^ 2 :=
+      by
         conv_rhs => rw [Finset.prod_div_distrib, Finset.prod_mul_distrib]
         simp only [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
         rw [pow_mul]
     _ ≤ ∏ v, Cs * (thr S b n v ^ 2 * ((S.g : ℝ) * (x * S6.rd E)) ^ 2) :=
-        Finset.prod_le_prod₀ (fun v _ => by have := hthr v; positivity) (fun v _ => key v)
+      Finset.prod_le_prod₀ (fun v _ => by have := hthr v; positivity) (fun v _ => key v)
     _ = Cs ^ S.f * ((∏ v, thr S b n v) ^ 2 * ((S.g : ℝ) * (x * S6.rd E)) ^ (2 * S.f)) := by
-        rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
-          Finset.prod_mul_distrib, Finset.prod_pow, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
-          ← pow_mul, mul_comm 2 S.f]
+      rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
+        Finset.prod_mul_distrib, Finset.prod_pow, Finset.prod_const, Finset.card_univ,
+        Fintype.card_fin, ← pow_mul, mul_comm 2 S.f]
 
-theorem psi_add {f : ℕ} (a b : crystallineComparison.V f) : crystallineComparison.psi (a + b) = crystallineComparison.psi a * crystallineComparison.psi b := by
+theorem psi_add {f : ℕ} (a b : crystallineComparison.V f)
+    : crystallineComparison.psi (a + b)
+      = crystallineComparison.psi a * crystallineComparison.psi b := by
   unfold crystallineComparison.psi
   rw [← Complex.exp_add, ← mul_add, ← Finset.sum_add_distrib]
   congr 2
@@ -126,10 +136,12 @@ theorem psi_add {f : ℕ} (a b : crystallineComparison.V f) : crystallineCompari
   simp only [Pi.add_apply, map_add (f := _)]
   ring
 
-theorem psi_zero {f : ℕ} : crystallineComparison.psi (0 : crystallineComparison.V f) = 1 := by simp [crystallineComparison.psi]
+theorem psi_zero {f : ℕ} : crystallineComparison.psi (0 : crystallineComparison.V f) = 1 := by
+  simp [crystallineComparison.psi]
 
-theorem psi_single {f : ℕ} (v : Fin f) (w : ℂ) :
-    crystallineComparison.psi (Pi.single v w : crystallineComparison.V f) = Complex.exp (2 * Real.pi * Complex.I * (w + (starRingEnd ℂ) w)) := by
+theorem psi_single {f : ℕ} (v : Fin f) (w : ℂ)
+    : crystallineComparison.psi (Pi.single v w : crystallineComparison.V f)
+      = Complex.exp (2 * Real.pi * Complex.I * (w + (starRingEnd ℂ) w)) := by
   unfold crystallineComparison.psi
   congr 2
   rw [Finset.sum_eq_single v]
@@ -137,16 +149,23 @@ theorem psi_single {f : ℕ} (v : Fin f) (w : ℂ) :
   · intro u _ hu; simp [hu]
   · simp
 
-theorem mul_single {f : ℕ} (σ : crystallineComparison.V f) (v : Fin f) (w : ℂ) :
-    σ * (Pi.single v w : crystallineComparison.V f) = Pi.single v (σ v * w) := by
+theorem mul_single {f : ℕ} (σ : crystallineComparison.V f) (v : Fin f) (w : ℂ)
+    : σ * (Pi.single v w : crystallineComparison.V f) = Pi.single v (σ v * w) := by
   funext u
   by_cases h : u = v
   · subst h; simp
   · simp [h]
 
-theorem exp_eq_one_iff_int (x : ℝ) :
-    Complex.exp (2 * Real.pi * Complex.I * (x : ℂ)) = 1 ↔ ∃ n : ℤ, x = n := by
-  first | exact Bl.general_b_fact_right_side.goal1 .. | (apply Bl.general_b_fact_right_side.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_right_side.goal1 <;> assumption) | (apply @Bl.general_b_fact_right_side.goal1 <;> assumption) | (intros; apply @Bl.general_b_fact_right_side.goal1 <;> assumption) | (apply @Bl.general_b_fact_right_side.goal1 <;> first | assumption | infer_instance) | exact @Bl.general_b_fact_right_side.goal1 x
+theorem exp_eq_one_iff_int (x : ℝ)
+    : Complex.exp (2 * Real.pi * Complex.I * (x : ℂ)) = 1 ↔ ∃ n : ℤ, x = n := by
+  first
+  | exact Bl.general_b_fact_right_side.goal1 ..
+  | (apply Bl.general_b_fact_right_side.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_right_side.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_right_side.goal1 <;> assumption)
+  | (intros; apply @Bl.general_b_fact_right_side.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_right_side.goal1 <;> first | assumption | infer_instance)
+  | exact @Bl.general_b_fact_right_side.goal1 x
 
 theorem add_conj (w : ℂ) : w + (starRingEnd ℂ) w = ((2 * w.re : ℝ) : ℂ) := by
   apply Complex.ext <;> simp; ring
@@ -168,12 +187,14 @@ def kerPsi {f : ℕ} (σ : crystallineComparison.V f) : AddSubgroup (crystalline
     rw [← mul_add, neg_add_cancel, mul_zero, psi_zero, ha, mul_one] at h
     exact h.symm
 
-theorem mem_dual_iff (f : ℕ) (R : ℝ) (hR : 0 < R) (σ : crystallineComparison.V f) :
-    σ ∈ crystallineComparison.dualSet (Lstd f R) ↔
-      ∀ v, ∃ a b : ℤ, σ v = ((a : ℂ) + (b : ℂ) * Complex.I) / (2 * (R : ℂ)) := by
+theorem mem_dual_iff (f : ℕ) (R : ℝ) (hR : 0 < R) (σ : crystallineComparison.V f)
+    : σ ∈ crystallineComparison.dualSet (Lstd f R)
+      ↔ ∀ v, ∃ a b : ℤ, σ v = ((a : ℂ) + (b : ℂ) * Complex.I) / (2 * (R : ℂ)) := by
   have hR' : (R : ℂ) ≠ 0 := by exact_mod_cast hR.ne'
-  have hgen : ∀ v (β : Bool), crystallineComparison.psi (σ * gen f R (v, β)) = 1 ↔
-      ∃ n : ℤ, (if β then -(2 * R * (σ v).im) else 2 * R * (σ v).re) = n := by
+  have hgen
+      : ∀ v (β : Bool),
+        crystallineComparison.psi (σ * gen f R (v, β)) = 1
+          ↔ ∃ n : ℤ, (if β then -(2 * R * (σ v).im) else 2 * R * (σ v).re) = n := by
     intro v β
     rw [gen, mul_single, psi_single, add_conj, ← exp_eq_one_iff_int]
     congr! 4
@@ -195,14 +216,15 @@ theorem mem_dual_iff (f : ℕ) (R : ℝ) (hR : 0 < R) (σ : crystallineCompariso
       show crystallineComparison.psi (σ * gen f R (v, β)) = 1
       rw [hgen]
       obtain ⟨a, b, hab⟩ := h v
-      have h2 : σ v * (2 * (R : ℂ)) = (a : ℂ) + (b : ℂ) * Complex.I := by
-        rw [hab]; field_simp
+      have h2 : σ v * (2 * (R : ℂ)) = (a : ℂ) + (b : ℂ) * Complex.I := by rw [hab]; field_simp
       have hre : 2 * R * (σ v).re = a := by
         have := congrArg Complex.re h2
-        simp [Complex.mul_re] at this; linarith
+        simp [Complex.mul_re] at this
+        linarith
       have him : 2 * R * (σ v).im = b := by
         have := congrArg Complex.im h2
-        simp [Complex.mul_im] at this; linarith
+        simp [Complex.mul_im] at this
+        linarith
       cases β
       · exact ⟨a, by simpa using hre⟩
       · exact ⟨-b, by simp [him]⟩
@@ -214,12 +236,12 @@ def eqv (f : ℕ) : (Σ _ : Fin f, Fin 2) ≃ Fin f × Bool :=
 def b0 (f : ℕ) : Module.Basis (Fin f × Bool) ℝ (crystallineComparison.V f) :=
   (Pi.basis fun _ : Fin f => Complex.basisOneI).reindex (eqv f)
 
-theorem standard_lattice_basis_apply (f : ℕ) (v : Fin f) (β : Bool) :
-    b0 f (v, β) = (Pi.single v (if β then Complex.I else 1) : crystallineComparison.V f) := by
+theorem standard_lattice_basis_apply (f : ℕ) (v : Fin f) (β : Bool)
+    : b0 f (v, β) = (Pi.single v (if β then Complex.I else 1) : crystallineComparison.V f) := by
   cases β <;> simp [b0, eqv, Pi.basis_apply] <;> rfl
 
-theorem standard_lattice_basis_repr (f : ℕ) (m : crystallineComparison.V f) (v : Fin f) (β : Bool) :
-    (b0 f).repr m (v, β) = if β then (m v).im else (m v).re := by
+theorem standard_lattice_basis_repr (f : ℕ) (m : crystallineComparison.V f) (v : Fin f) (β : Bool)
+    : (b0 f).repr m (v, β) = if β then (m v).im else (m v).re := by
   rw [b0, Module.Basis.repr_reindex_apply]
   cases β <;> simp [eqv, Pi.basis_repr] <;> rfl
 
@@ -232,31 +254,39 @@ theorem bR_eq (f : ℕ) (R : ℝ) (hR : 0 < R) : ⇑(bR f R hR) = gen f R := by
   rw [bR, Module.Basis.isUnitSMul_apply, standard_lattice_basis_apply, gen]
   cases β <;> funext u <;> by_cases h : u = v <;> simp_all [Complex.real_smul]
 
-theorem fundamentalDomain_standard_basis_eq (f : ℕ) : ZSpan.fundamentalDomain (b0 f) =
-    Set.pi Set.univ (fun _ : Fin f => {z : ℂ | z.re ∈ Set.Ico (0 : ℝ) 1 ∧ z.im ∈ Set.Ico (0 : ℝ) 1}) := by
+theorem fundamentalDomain_standard_basis_eq (f : ℕ)
+    : ZSpan.fundamentalDomain (b0 f)
+      = Set.pi Set.univ
+        (fun _ : Fin f => {z : ℂ | z.re ∈ Set.Ico (0 : ℝ) 1 ∧ z.im ∈ Set.Ico (0 : ℝ) 1}) := by
   ext m
-  simp only [ZSpan.fundamentalDomain, Set.mem_ofPred_eq, Set.mem_pi, Set.mem_univ, true_implies, Prod.forall,
-    standard_lattice_basis_repr, Bool.forall_bool, if_false, if_true, Bool.false_eq_true]
+  simp only [ZSpan.fundamentalDomain, Set.mem_ofPred_eq, Set.mem_pi, Set.mem_univ, true_implies,
+    Prod.forall, standard_lattice_basis_repr, Bool.forall_bool, if_false, if_true,
+    Bool.false_eq_true]
 
-theorem vol_square : (volume : Measure ℂ) {z : ℂ | z.re ∈ Set.Ico (0 : ℝ) 1 ∧ z.im ∈ Set.Ico (0 : ℝ) 1} = 1 := by
-  have h : {z : ℂ | z.re ∈ Set.Ico (0 : ℝ) 1 ∧ z.im ∈ Set.Ico (0 : ℝ) 1} =
-      Complex.measurableEquivRealProd ⁻¹' (Set.Ico (0 : ℝ) 1 ×ˢ Set.Ico (0 : ℝ) 1) := by
+theorem vol_square
+    : (volume : Measure ℂ) {z : ℂ | z.re ∈ Set.Ico (0 : ℝ) 1 ∧ z.im ∈ Set.Ico (0 : ℝ) 1} = 1 := by
+  have h
+      : {z : ℂ | z.re ∈ Set.Ico (0 : ℝ) 1 ∧ z.im ∈ Set.Ico (0 : ℝ) 1}
+        = Complex.measurableEquivRealProd ⁻¹' (Set.Ico (0 : ℝ) 1 ×ˢ Set.Ico (0 : ℝ) 1) := by
     ext z; simp [Complex.measurableEquivRealProd]
-  rw [h, Complex.volume_preserving_equiv_real_prod.measure_preimage
-    ((measurableSet_Ico.prod measurableSet_Ico).nullMeasurableSet), Measure.volume_eq_prod,
-    Measure.prod_prod, Real.volume_Ico]
+  rw [h,
+    Complex.volume_preserving_equiv_real_prod.measure_preimage ((measurableSet_Ico.prod
+      measurableSet_Ico).nullMeasurableSet),
+    Measure.volume_eq_prod, Measure.prod_prod, Real.volume_Ico]
   simp
 
-theorem volume_fundamentalDomain_standard_basis (f : ℕ) : (volume : Measure (crystallineComparison.V f)) (ZSpan.fundamentalDomain (b0 f)) = 1 := by
+theorem volume_fundamentalDomain_standard_basis (f : ℕ)
+    : (volume : Measure (crystallineComparison.V f)) (ZSpan.fundamentalDomain (b0 f)) = 1 := by
   rw [fundamentalDomain_standard_basis_eq, volume_pi_pi, Finset.prod_eq_one (fun _ _ => vol_square)]
 
-theorem fd_bR (f : ℕ) (R : ℝ) (hR : 0 < R) :
-    ZSpan.fundamentalDomain (bR f R hR) = R • ZSpan.fundamentalDomain (b0 f) := by
+theorem fd_bR (f : ℕ) (R : ℝ) (hR : 0 < R)
+    : ZSpan.fundamentalDomain (bR f R hR) = R • ZSpan.fundamentalDomain (b0 f) := by
   ext m
   rw [Set.mem_smul_set_iff_inv_smul_mem₀ hR.ne']
   simp only [ZSpan.fundamentalDomain, Set.mem_ofPred_eq, bR, Module.Basis.repr_isUnitSMul, map_smul,
     Finsupp.smul_apply, smul_eq_mul]
-  constructor <;> intro h i <;> simpa [Units.smul_def, Units.val_inv_eq_inv_val, IsUnit.unit_spec] using h i
+  constructor <;> intro h i
+    <;> simpa [Units.smul_def, Units.val_inv_eq_inv_val, IsUnit.unit_spec] using h i
 
 theorem finrank_V (f : ℕ) : Module.finrank ℝ (crystallineComparison.V f) = 2 * f := by
   rw [Module.finrank_pi_fintype]
@@ -266,15 +296,16 @@ theorem lstdFacts : PBC.LstdFacts := by
   intro f R hR
   rw [lstd_eq, ← bR_eq f R hR]
   refine ⟨inferInstance, inferInstance, ?_, ?_⟩
-  · rw [ZLattice.covolume_eq_measure_fundamentalDomain _ _ (ZSpan.isAddFundamentalDomain (bR f R hR) volume),
+  · rw [ZLattice.covolume_eq_measure_fundamentalDomain _ _
+        (ZSpan.isAddFundamentalDomain (bR f R hR) volume),
       fd_bR, Measure.real, Measure.addHaar_smul, volume_fundamentalDomain_standard_basis, finrank_V]
     simp [abs_of_pos hR, hR.le]
   · intro σ
     rw [bR_eq, ← lstd_eq]
     exact mem_dual_iff f R hR σ
 
-theorem mfac_scale (K : ℕ) (L g a : ℝ) (hg : 0 < g) :
-    crystallineComparison.mfac K L (g * a) = crystallineComparison.mfac K (L / g) a := by
+theorem mfac_scale (K : ℕ) (L g a : ℝ) (hg : 0 < g)
+    : crystallineComparison.mfac K L (g * a) = crystallineComparison.mfac K (L / g) a := by
   unfold crystallineComparison.mfac
   by_cases h : a = 0
   · simp [h]
@@ -282,14 +313,15 @@ theorem mfac_scale (K : ℕ) (L g a : ℝ) (hg : 0 < g) :
     congr 2
     field_simp
 
-theorem mL_scale {f : ℕ} (K : ℕ) (L : Fin f → ℝ) (g : ℝ) (hg : 0 < g) (σ : crystallineComparison.V f) :
-    crystallineComparison.mL K L (g • σ) = crystallineComparison.mL K (fun v => L v / g) σ := by
+theorem mL_scale
+    {f : ℕ} (K : ℕ) (L : Fin f → ℝ) (g : ℝ) (hg : 0 < g) (σ : crystallineComparison.V f)
+    : crystallineComparison.mL K L (g • σ) = crystallineComparison.mL K (fun v => L v / g) σ := by
   unfold crystallineComparison.mL
   refine Finset.prod_congr rfl (fun v _ => ?_)
   rw [Pi.smul_apply, norm_smul, Real.norm_eq_abs, abs_of_pos hg, mfac_scale K _ g _ hg]
 
-theorem mfac_shift0 (K : ℕ) {L δ : ℝ} (hL : 0 ≤ L) (hδ : 0 < δ) {a : ℝ} (ha : 0 ≤ a) :
-    crystallineComparison.mfac K L a ≤ crystallineComparison.mfac K (L + δ) (a + δ) := by
+theorem mfac_shift0 (K : ℕ) {L δ : ℝ} (hL : 0 ≤ L) (hδ : 0 < δ) {a : ℝ} (ha : 0 ≤ a)
+    : crystallineComparison.mfac K L a ≤ crystallineComparison.mfac K (L + δ) (a + δ) := by
   have had : 0 < a + δ := by linarith
   unfold crystallineComparison.mfac
   rw [if_neg had.ne']
@@ -305,10 +337,9 @@ theorem mfac_shift0 (K : ℕ) {L δ : ℝ} (hL : 0 ≤ L) (hδ : 0 < δ) {a : �
       rw [div_le_div_iff₀ hapos had]
       nlinarith
 
-theorem gauss_norm (m n : ℤ) (h : (m : ℂ) + (n : ℂ) * Complex.I ≠ 0) :
-    1 ≤ ‖(m : ℂ) + (n : ℂ) * Complex.I‖ := by
-  have hmn : m ≠ 0 ∨ n ≠ 0 := by
-    by_contra hc; push Not at hc; apply h; simp [hc.1, hc.2]
+theorem gauss_norm (m n : ℤ) (h : (m : ℂ) + (n : ℂ) * Complex.I ≠ 0)
+    : 1 ≤ ‖(m : ℂ) + (n : ℂ) * Complex.I‖ := by
+  have hmn : m ≠ 0 ∨ n ≠ 0 := by by_contra hc; push Not at hc; apply h; simp [hc.1, hc.2]
   have hsq : (1 : ℝ) ≤ (m : ℝ) ^ 2 + (n : ℝ) ^ 2 := by
     rcases hmn with hm | hn
     · have : (1 : ℤ) ≤ m ^ 2 := by nlinarith [Int.one_le_abs hm, sq_abs m]
@@ -319,12 +350,16 @@ theorem gauss_norm (m n : ℤ) (h : (m : ℂ) + (n : ℂ) * Complex.I ≠ 0) :
       nlinarith [sq_nonneg (m : ℝ)]
   rw [← Real.sqrt_one, Complex.norm_def, Complex.normSq_apply]
   apply Real.sqrt_le_sqrt
-  simp; nlinarith
+  simp
+  nlinarith
 
-theorem dual_sep (f : ℕ) (R : ℝ) (hR : 0 < R) (σ σ' : crystallineComparison.V f) (hσ : σ ∈ crystallineComparison.dualSet (Lstd f R))
-    (hσ' : σ' ∈ crystallineComparison.dualSet (Lstd f R)) (hne : σ ≠ σ') : 1 / (2 * R) ≤ ‖σ - σ'‖ := by
-  obtain ⟨v, hv⟩ : ∃ v, σ v ≠ σ' v := by
-    by_contra h; push Not at h; exact hne (funext h)
+theorem dual_sep
+    (f : ℕ)
+    (R : ℝ) (hR : 0 < R)
+    (σ σ' : crystallineComparison.V f) (hσ : σ ∈ crystallineComparison.dualSet (Lstd f R))
+    (hσ' : σ' ∈ crystallineComparison.dualSet (Lstd f R)) (hne : σ ≠ σ')
+    : 1 / (2 * R) ≤ ‖σ - σ'‖ := by
+  obtain ⟨v, hv⟩ : ∃ v, σ v ≠ σ' v := by by_contra h; push Not at h; exact hne (funext h)
   obtain ⟨a, b, hab⟩ := (mem_dual_iff f R hR σ).1 hσ v
   obtain ⟨a', b', hab'⟩ := (mem_dual_iff f R hR σ').1 hσ' v
   have hR' : (2 * (R : ℂ)) ≠ 0 := by simp [hR.ne']
@@ -332,17 +367,19 @@ theorem dual_sep (f : ℕ) (R : ℝ) (hR : 0 < R) (σ σ' : crystallineCompariso
     rw [hab, hab']; push_cast; field_simp; ring
   have hnz : (((a - a' : ℤ) : ℂ) + ((b - b' : ℤ) : ℂ) * Complex.I) ≠ 0 := by
     intro h0; apply hv; rw [← sub_eq_zero, hd, h0, zero_div]
-  calc 1 / (2 * R) ≤ ‖(((a - a' : ℤ) : ℂ) + ((b - b' : ℤ) : ℂ) * Complex.I)‖ / (2 * R) :=
-        div_le_div_of_nonneg_right (gauss_norm _ _ hnz) (by positivity)
-    _ = ‖σ v - σ' v‖ := by
-        rw [hd, norm_div]; congr 1; simp [abs_of_pos hR]
+  calc
+    1 / (2 * R) ≤ ‖(((a - a' : ℤ) : ℂ) + ((b - b' : ℤ) : ℂ) * Complex.I)‖ / (2 * R) :=
+      div_le_div_of_nonneg_right (gauss_norm _ _ hnz) (by positivity)
+    _ = ‖σ v - σ' v‖ := by rw [hd, norm_div]; congr 1; simp [abs_of_pos hR]
     _ = ‖(σ - σ') v‖ := rfl
     _ ≤ ‖σ - σ'‖ := norm_le_pi_norm (σ - σ') v
 
-theorem vol_ball_V (f : ℕ) (δ : ℝ) (hδ : 0 < δ) :
-    (volume : Measure (crystallineComparison.V f)).real (Metric.ball 0 δ) = (Real.pi * δ ^ 2) ^ f := by
+theorem vol_ball_V (f : ℕ) (δ : ℝ) (hδ : 0 < δ)
+    : (volume : Measure (crystallineComparison.V f)).real (Metric.ball 0 δ)
+      = (Real.pi * δ ^ 2) ^ f := by
   rw [Measure.real, volume_pi_ball _ hδ]
-  simp only [Pi.zero_apply, Complex.volume_ball, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+  simp only [Pi.zero_apply, Complex.volume_ball, Finset.prod_const, Finset.card_univ,
+    Fintype.card_fin]
   rw [ENNReal.toReal_pow, ENNReal.toReal_mul, ENNReal.toReal_pow, ENNReal.toReal_ofReal hδ.le]
   simp [mul_comm]
 
@@ -360,58 +397,82 @@ theorem lstdSum : PBC.LstdSum := by
   have hmaj := Formalism.FourierDecayAlt.P.MajorantIntegrals.majIntegralProd_ok f K L' hK hL'pos
   have hint := hmaj.1
   have hnn : ∀ y : crystallineComparison.V f, 0 ≤ crystallineComparison.mL K L' y := fun y =>
-    Finset.prod_nonneg (fun v _ => Formalism.FourierDecayAlt.P.LatticeSummability.mfac_nonneg K (hL'pos v).le _ (norm_nonneg _))
+    Finset.prod_nonneg (fun v _ =>
+      Formalism.FourierDecayAlt.P.LatticeSummability.mfac_nonneg K (hL'pos v).le _ (norm_nonneg _))
   have hnn0 : ∀ y : crystallineComparison.V f, 0 ≤ crystallineComparison.mL K large₂ y := fun y =>
-    Finset.prod_nonneg (fun v _ => Formalism.FourierDecayAlt.P.LatticeSummability.mfac_nonneg K (hLg0 v) _ (norm_nonneg _))
+    Finset.prod_nonneg (fun v _ =>
+      Formalism.FourierDecayAlt.P.LatticeSummability.mfac_nonneg K (hLg0 v) _ (norm_nonneg _))
   set vb := (volume : Measure (crystallineComparison.V f)).real (Metric.ball 0 δ) with hvb
   have hvb0 : 0 < vb := by rw [hvb, vol_ball_V f δ hδ]; positivity
-  have hvbσ : ∀ σ : crystallineComparison.V f, (volume : Measure (crystallineComparison.V f)).real (Metric.ball σ δ) = vb := by
+  have hvbσ
+      : ∀ σ : crystallineComparison.V f,
+        (volume : Measure (crystallineComparison.V f)).real (Metric.ball σ δ) = vb := by
     intro σ; rw [hvb, Measure.real, Measure.real, Measure.addHaar_ball_center]
-  have hpt : ∀ σ : crystallineComparison.V f, ∀ y ∈ Metric.ball σ δ, crystallineComparison.mL K large₂ σ ≤ crystallineComparison.mL K L' y := by
+  have hpt
+      : ∀ σ : crystallineComparison.V f, ∀ y ∈ Metric.ball σ δ,
+        crystallineComparison.mL K large₂ σ ≤ crystallineComparison.mL K L' y := by
     intro σ y hy
-    apply Finset.prod_le_prod₀ (fun v _ => Formalism.FourierDecayAlt.P.LatticeSummability.mfac_nonneg K (hLg0 v) _ (norm_nonneg _))
+    apply Finset.prod_le_prod₀ (fun v _ =>
+      Formalism.FourierDecayAlt.P.LatticeSummability.mfac_nonneg K (hLg0 v) _ (norm_nonneg _))
     intro v _
     have hyv : ‖y v‖ ≤ ‖σ v‖ + δ := by
       have h1 : ‖y v - σ v‖ ≤ ‖y - σ‖ := norm_le_pi_norm (y - σ) v
       have h2 : ‖y - σ‖ < δ := by rw [← dist_eq_norm]; exact hy
       have h3 : ‖y v‖ ≤ ‖σ v‖ + ‖y v - σ v‖ := by
-        calc ‖y v‖ = ‖σ v + (y v - σ v)‖ := by ring_nf
+        calc
+          ‖y v‖
+            = ‖σ v + (y v - σ v)‖ := by ring_nf
           _ ≤ _ := norm_add_le _ _
       linarith
     exact (mfac_shift0 K (hLg0 v) hδ (norm_nonneg _)).trans
       (Formalism.FourierDecayAlt.P.LatticeSummability.mfac_anti K (hL'pos v) (norm_nonneg _) hyv)
-  have hloc : ∀ σ : crystallineComparison.V f, crystallineComparison.mL K large₂ σ * vb ≤ ∫ y in Metric.ball σ δ, crystallineComparison.mL K L' y := by
+  have hloc
+      : ∀ σ : crystallineComparison.V f,
+        crystallineComparison.mL K large₂ σ * vb
+          ≤ ∫ y in Metric.ball σ δ, crystallineComparison.mL K L' y := by
     intro σ
     rw [← hvbσ σ, mul_comm, ← smul_eq_mul, ← setIntegral_const]
     exact setIntegral_mono_on (integrableOn_const (measure_ball_lt_top).ne) hint.integrableOn
       measurableSet_ball (fun y hy => hpt σ y hy)
-  have hsum : ∀ u : Finset (crystallineComparison.dualSet (Lstd f R)),
-      ∑ σ ∈ u, crystallineComparison.mL K L (g • (σ : crystallineComparison.V f)) ≤ (∫ y, crystallineComparison.mL K L' y) / vb := by
+  have hsum
+      : ∀ u : Finset (crystallineComparison.dualSet (Lstd f R)),
+        ∑ σ ∈ u, crystallineComparison.mL K L (g • (σ : crystallineComparison.V f))
+          ≤ (∫ y, crystallineComparison.mL K L' y) / vb := by
     intro u
     simp only [mL_scale K L g hg]
     rw [le_div_iff₀ hvb0, Finset.sum_mul]
     have hdisj : Set.Pairwise (↑u : Set (crystallineComparison.dualSet (Lstd f R)))
-        (Function.onFun Disjoint fun σ : crystallineComparison.dualSet (Lstd f R) => Metric.ball (σ : crystallineComparison.V f) δ) := by
+        (Function.onFun Disjoint fun σ : crystallineComparison.dualSet (Lstd f R) =>
+          Metric.ball (σ : crystallineComparison.V f) δ) := by
       intro σ _ σ' _ hne
       apply Metric.ball_disjoint_ball
       have := dual_sep f R hR σ σ' σ.2 σ'.2 (fun h => hne (Subtype.ext h))
       rw [dist_eq_norm]
       have e : δ + δ = 1 / (2 * R) := by rw [hδdef]; field_simp; ring
       linarith
-    calc ∑ σ ∈ u, crystallineComparison.mL K large₂ (σ : crystallineComparison.V f) * vb
-        ≤ ∑ σ ∈ u, ∫ y in Metric.ball (σ : crystallineComparison.V f) δ, crystallineComparison.mL K L' y :=
-          Finset.sum_le_sum (fun σ _ => hloc σ)
+    calc
+      ∑ σ ∈ u, crystallineComparison.mL K large₂ (σ : crystallineComparison.V f) * vb
+          ≤ ∑ σ ∈ u, ∫ y in Metric.ball (σ : crystallineComparison.V f) δ, crystallineComparison.mL K L' y :=
+        Finset.sum_le_sum (fun σ _ => hloc σ)
       _ = ∫ y in ⋃ σ ∈ u, Metric.ball (σ : crystallineComparison.V f) δ, crystallineComparison.mL K L' y :=
-          (integral_biUnion_finset u (fun σ _ => measurableSet_ball) hdisj
-            (fun σ _ => hint.integrableOn)).symm
-      _ ≤ ∫ y, crystallineComparison.mL K L' y := setIntegral_le_integral hint (Filter.Eventually.of_forall hnn)
-  have hnng : ∀ σ : crystallineComparison.dualSet (Lstd f R), 0 ≤ crystallineComparison.mL K L (g • (σ : crystallineComparison.V f)) := fun σ =>
-    Finset.prod_nonneg (fun v _ => Formalism.FourierDecayAlt.P.LatticeSummability.mfac_nonneg K (hL v) _ (norm_nonneg _))
-  have hS : Summable (fun σ : crystallineComparison.dualSet (Lstd f R) => crystallineComparison.mL K L (g • (σ : crystallineComparison.V f))) :=
+        (integral_biUnion_finset u
+          (fun σ _ => measurableSet_ball)
+          hdisj
+          (fun σ _ => hint.integrableOn)).symm
+      _ ≤ ∫ y, crystallineComparison.mL K L' y :=
+        setIntegral_le_integral hint (Filter.Eventually.of_forall hnn)
+  have hnng
+      : ∀ σ : crystallineComparison.dualSet (Lstd f R),
+        0 ≤ crystallineComparison.mL K L (g • (σ : crystallineComparison.V f)) := fun σ =>
+    Finset.prod_nonneg (fun v _ =>
+      Formalism.FourierDecayAlt.P.LatticeSummability.mfac_nonneg K (hL v) _ (norm_nonneg _))
+  have hS : Summable (fun σ : crystallineComparison.dualSet (Lstd f R) =>
+      crystallineComparison.mL K L (g • (σ : crystallineComparison.V f))) :=
     summable_of_sum_le hnng hsum
   refine ⟨hS, (hS.tsum_le_of_sum_le hsum).trans ?_⟩
 
-  rw [hmaj.2, hvb, vol_ball_V f δ hδ, show (Real.pi * δ ^ 2) ^ f = ∏ _v : Fin f, (Real.pi * δ ^ 2) by simp]
+  rw [hmaj.2, hvb, vol_ball_V f δ hδ,
+    show (Real.pi * δ ^ 2) ^ f = ∏ _v : Fin f, (Real.pi * δ ^ 2) by simp]
   rw [← Finset.prod_div_distrib]
   apply Finset.prod_le_prod₀
   · intro v _
@@ -425,10 +486,13 @@ theorem lstdSum : PBC.LstdSum := by
   have hx0 : 0 ≤ x := by have := hL v; positivity
   have hx : L' v = 4 * δ * x + δ := by
     show L v / g + δ = _
-    rw [hxdef, hδdef]; field_simp
+    rw [hxdef, hδdef]
+    field_simp
   rw [hx]
   have ht : 0 < Real.pi * δ ^ 2 := by positivity
-  have e : Real.pi * (4 * δ * x + δ) ^ 2 * 5 / (5 - 2) / (Real.pi * δ ^ 2) = (4 * x + 1) ^ 2 * 5 / 3 := by
+  have e
+      : Real.pi * (4 * δ * x + δ) ^ 2 * 5 / (5 - 2) / (Real.pi * δ ^ 2)
+        = (4 * x + 1) ^ 2 * 5 / 3 := by
     field_simp; ring
   rw [e]
   nlinarith [sq_nonneg (x - 1)]

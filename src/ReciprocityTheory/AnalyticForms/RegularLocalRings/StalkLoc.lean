@@ -16,19 +16,14 @@ noncomputable section
 
 variable {W : Scheme.{0}} {s : W ⟶ Spec (.of ℂ)}
 
-
 variable (s) in
 structure AffPres where
-
   V : W.Opens
-
   n : ℕ
-
   K : Ideal (MvPolynomial (Fin n) ℂ)
-
   iso : V.toScheme ≅ Spec (.of (MvPolynomial (Fin n) ℂ ⧸ K))
-  hover : iso.hom ≫ Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin n) ℂ ⧸ K))) =
-    V.ι ≫ s
+  hover
+    : iso.hom ≫ Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin n) ℂ ⧸ K))) = V.ι ≫ s
 
 namespace AffPres
 
@@ -41,11 +36,11 @@ def secHom : MvPolynomial (Fin P.n) ℂ →+* Γ(W, P.V) :=
 def ptOf (x : W) (hx : x ∈ P.V) : Ideal (MvPolynomial (Fin P.n) ℂ) :=
   (P.iso.hom.base ⟨x, hx⟩).asIdeal.comap (Ideal.Quotient.mk P.K)
 
-def coord (x : W) (hx : x ∈ P.V) : Fin P.n → ℂ :=
-  fun j => Classical.epsilon fun c : ℂ => X j - C c ∈ P.ptOf x hx
+def coord (x : W) (hx : x ∈ P.V) : Fin P.n → ℂ := fun j =>
+  Classical.epsilon fun c : ℂ => X j - C c ∈ P.ptOf x hx
 
-theorem ptOf_eq_ptIdeal (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
-    P.ptOf x hx = ptIdeal (P.coord x hx) := by
+theorem ptOf_eq_ptIdeal (x : W) (hx : x ∈ P.V) (hc : IsClosed {x})
+    : P.ptOf x hx = ptIdeal (P.coord x hx) := by
   classical
   have hcV : IsClosed ({⟨x, hx⟩} : Set P.V) := by
     have h1 : ({⟨x, hx⟩} : Set P.V) = Subtype.val ⁻¹' {x} := by
@@ -55,11 +50,12 @@ theorem ptOf_eq_ptIdeal (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
         rw [Set.mem_singleton_iff.mp h]
         exact Set.mem_singleton x
       · intro h
-        exact Set.mem_singleton_iff.mpr (Subtype.ext (Set.mem_singleton_iff.mp (Set.mem_preimage.mp h)))
+        exact Set.mem_singleton_iff.mpr (Subtype.ext (Set.mem_singleton_iff.mp (Set.mem_preimage.mp
+          h)))
     rw [h1]
     exact hc.preimage continuous_subtype_val
-  have hcy : IsClosed ({P.iso.hom.base ⟨x, hx⟩} :
-      Set (Spec (.of (MvPolynomial (Fin P.n) ℂ ⧸ P.K)))) := by
+  have hcy : IsClosed
+      ({P.iso.hom.base ⟨x, hx⟩} : Set (Spec (.of (MvPolynomial (Fin P.n) ℂ ⧸ P.K)))) := by
     have h := (Scheme.homeoOfIso P.iso).isClosedMap _ hcV
     first
     | (convert h using 1; exact Set.image_singleton.symm)
@@ -75,10 +71,7 @@ theorem ptOf_eq_ptIdeal (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
     ext h
     rw [MvPolynomial.mem_vanishingIdeal_singleton_iff]
     simp only [ptIdeal, RingHom.mem_ker]
-    first
-    | rw [MvPolynomial.coe_aeval_eq_eval]
-    | exact Iff.rfl
-    | simp [MvPolynomial.aeval_eq_eval]
+    first | rw [MvPolynomial.coe_aeval_eq_eval] | exact Iff.rfl | simp [MvPolynomial.aeval_eq_eval]
   have hcoord : P.coord x hx = q := by
     funext j
     have hex : ∃ c : ℂ, X j - C c ∈ P.ptOf x hx := by
@@ -92,8 +85,8 @@ theorem ptOf_eq_ptIdeal (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
     exact (sub_eq_zero.mp h2).symm
   rw [hq', hcoord]
 
-theorem eval_coord_eq_zero (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
-    ∀ h ∈ P.K, eval (P.coord x hx) h = 0 := by
+theorem eval_coord_eq_zero (x : W) (hx : x ∈ P.V) (hc : IsClosed {x})
+    : ∀ h ∈ P.K, eval (P.coord x hx) h = 0 := by
   intro h hh
   have hmem : h ∈ P.ptOf x hx := by
     show Ideal.Quotient.mk P.K h ∈ (P.iso.hom.base ⟨x, hx⟩).asIdeal
@@ -103,8 +96,8 @@ theorem eval_coord_eq_zero (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
   simp only [ptIdeal, RingHom.mem_ker] at hmem
   exact hmem
 
-theorem existsUnique_closed_coord (p : Fin P.n → ℂ) (hp : ∀ h ∈ P.K, eval p h = 0) :
-    ∃! x : W, ∃ hx : x ∈ P.V, IsClosed {x} ∧ P.coord x hx = p := by
+theorem existsUnique_closed_coord (p : Fin P.n → ℂ) (hp : ∀ h ∈ P.K, eval p h = 0)
+    : ∃! x : W, ∃ hx : x ∈ P.V, IsClosed {x} ∧ P.coord x hx = p := by
   classical
   have hK : P.K ≤ ptIdeal p := by
     intro h hh
@@ -114,8 +107,8 @@ theorem existsUnique_closed_coord (p : Fin P.n → ℂ) (hp : ∀ h ∈ P.K, eva
     (⟨ptQ P.K p, ptQ_isPrime hK⟩ : PrimeSpectrum (MvPolynomial (Fin P.n) ℂ ⧸ P.K))
   let v : P.V := (Scheme.homeoOfIso P.iso).symm y
   have hv : P.iso.hom.base v = y := (Scheme.homeoOfIso P.iso).apply_symm_apply y
-  have hcoordEq : ∀ (z : W) (hz : z ∈ P.V), IsClosed {z} → P.ptOf z hz = ptIdeal p →
-      P.coord z hz = p := by
+  have hcoordEq
+      : ∀ (z : W) (hz : z ∈ P.V), IsClosed {z} → P.ptOf z hz = ptIdeal p → P.coord z hz = p := by
     intro z hz hzc h
     have h' : ptIdeal (P.coord z hz) = ptIdeal p := (P.ptOf_eq_ptIdeal z hz hzc).symm.trans h
     funext j
@@ -144,8 +137,8 @@ theorem existsUnique_closed_coord (p : Fin P.n → ℂ) (hp : ∀ h ∈ P.K, eva
   have h3 : (⟨x', hx'⟩ : P.V) = v := (Scheme.homeoOfIso P.iso).injective (h2.trans hv.symm)
   exact congrArg Subtype.val h3
 
-theorem exists_stalkEquiv (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
-    ∃ ψ : W.presheaf.stalk x ≃+* locRing P.K (P.coord x hx), ∀ f : MvPolynomial (Fin P.n) ℂ,
+theorem exists_stalkEquiv (x : W) (hx : x ∈ P.V) (hc : IsClosed {x})
+    : ∃ ψ : W.presheaf.stalk x ≃+* locRing P.K (P.coord x hx), ∀ f : MvPolynomial (Fin P.n) ℂ,
       ψ (W.presheaf.germ P.V x hx (P.secHom f)) = algebraMap _ (locRing P.K (P.coord x hx)) f := by
   set p := P.coord x hx
   have hpt := P.ptOf_eq_ptIdeal x hx hc
@@ -183,21 +176,24 @@ theorem exists_stalkEquiv (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
       rw [hQ, ← mk_mem_ptQ hK]
       exact hy
   refine ⟨IsLocalization.ringEquivOfRingEquiv (W.presheaf.stalk x) (locRing P.K p) e H, fun f => ?_⟩
-  have h1 := IsLocalization.ringEquivOfRingEquiv_eq (S := W.presheaf.stalk x) (Q := locRing P.K p) H
-    (P.secHom f)
+  have h1 :=
+    IsLocalization.ringEquivOfRingEquiv_eq (S := W.presheaf.stalk x) (Q := locRing P.K p) H
+      (P.secHom f)
   rw [he, algebraMap_quot_mk] at h1
   exact h1
 
-def stalkEquiv (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
-    W.presheaf.stalk x ≃+* locRing P.K (P.coord x hx) :=
+def stalkEquiv (x : W) (hx : x ∈ P.V) (hc : IsClosed {x})
+    : W.presheaf.stalk x ≃+* locRing P.K (P.coord x hx) :=
   Classical.choose (P.exists_stalkEquiv x hx hc)
 
-theorem stalkEquiv_germ (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) (f : MvPolynomial (Fin P.n) ℂ) :
-    P.stalkEquiv x hx hc (W.presheaf.germ P.V x hx (P.secHom f)) =
-      algebraMap _ (locRing P.K (P.coord x hx)) f := Classical.choose_spec (P.exists_stalkEquiv x hx hc) f
+theorem stalkEquiv_germ (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) (f : MvPolynomial (Fin P.n) ℂ)
+    : P.stalkEquiv x hx hc (W.presheaf.germ P.V x hx (P.secHom f))
+      = algebraMap _ (locRing P.K (P.coord x hx)) f :=
+  Classical.choose_spec (P.exists_stalkEquiv x hx hc) f
 
-theorem isRegularLocalRing_stalk_iff (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
-    IsRegularLocalRing (W.presheaf.stalk x) ↔ IsRegularLocalRing (locRing P.K (P.coord x hx)) := by
+theorem isRegularLocalRing_stalk_iff (x : W) (hx : x ∈ P.V) (hc : IsClosed {x})
+    : IsRegularLocalRing (W.presheaf.stalk x)
+      ↔ IsRegularLocalRing (locRing P.K (P.coord x hx)) := by
   constructor
   · intro h
     haveI := h
@@ -210,13 +206,13 @@ theorem isRegularLocalRing_stalk_iff (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}
     | exact IsRegularLocalRing.of_ringEquiv (P.stalkEquiv x hx hc).symm
     | exact IsRegularLocalRing.of_ringEquiv (e := (P.stalkEquiv x hx hc).symm)
 
-theorem ringKrullDim_stalk (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
-    ringKrullDim (W.presheaf.stalk x) = ringKrullDim (locRing P.K (P.coord x hx)) := by
+theorem ringKrullDim_stalk (x : W) (hx : x ∈ P.V) (hc : IsClosed {x})
+    : ringKrullDim (W.presheaf.stalk x) = ringKrullDim (locRing P.K (P.coord x hx)) := by
   exact ringKrullDim_eq_of_ringEquiv (P.stalkEquiv x hx hc)
 
-theorem map_maximalIdeal_stalk (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
-    (IsLocalRing.maximalIdeal (W.presheaf.stalk x)).map (P.stalkEquiv x hx hc) =
-      Ideal.map (algebraMap _ (locRing P.K (P.coord x hx))) (ptIdeal (P.coord x hx)) := by
+theorem map_maximalIdeal_stalk (x : W) (hx : x ∈ P.V) (hc : IsClosed {x})
+    : (IsLocalRing.maximalIdeal (W.presheaf.stalk x)).map (P.stalkEquiv x hx hc)
+      = Ideal.map (algebraMap _ (locRing P.K (P.coord x hx))) (ptIdeal (P.coord x hx)) := by
   have hK : P.K ≤ ptIdeal (P.coord x hx) := by
     rw [← P.ptOf_eq_ptIdeal x hx hc]
     intro h hh
@@ -227,15 +223,16 @@ theorem map_maximalIdeal_stalk (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) :
   rw [← maximalIdeal_locRing hK]
   exact IsLocalRing.eq_maximalIdeal (Ideal.map_isMaximal_of_equiv _)
 
-theorem rsp_iff (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) {e : ℕ} (r : Fin e → W.presheaf.stalk x) :
-    FinalTheorems.Rsp (W.presheaf.stalk x) e r ↔
-      Ideal.span (Set.range fun l => P.stalkEquiv x hx hc (r l)) =
-        Ideal.map (algebraMap _ (locRing P.K (P.coord x hx))) (ptIdeal (P.coord x hx)) ∧
-      (e : WithBot ℕ∞) = ringKrullDim (locRing P.K (P.coord x hx)) := by
+theorem rsp_iff (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) {e : ℕ} (r : Fin e → W.presheaf.stalk x)
+    : FinalTheorems.Rsp (W.presheaf.stalk x) e r
+      ↔ Ideal.span (Set.range fun l => P.stalkEquiv x hx hc (r l))
+          = Ideal.map (algebraMap _ (locRing P.K (P.coord x hx))) (ptIdeal (P.coord x hx))
+        ∧ (e : WithBot ℕ∞) = ringKrullDim (locRing P.K (P.coord x hx)) := by
   unfold FinalTheorems.Rsp
   rw [← P.ringKrullDim_stalk x hx hc, ← P.map_maximalIdeal_stalk x hx hc]
-  have hspan : Ideal.span (Set.range fun l => P.stalkEquiv x hx hc (r l)) =
-      (Ideal.span (Set.range r)).map (P.stalkEquiv x hx hc) := by
+  have hspan
+      : Ideal.span (Set.range fun l => P.stalkEquiv x hx hc (r l))
+        = (Ideal.span (Set.range r)).map (P.stalkEquiv x hx hc) := by
     rw [Ideal.map_span, ← Set.range_comp]
     rfl
   rw [hspan]
@@ -246,13 +243,15 @@ theorem rsp_iff (x : W) (hx : x ∈ P.V) (hc : IsClosed {x}) {e : ℕ} (r : Fin 
     refine ⟨?_, h2⟩
     have h3 := congrArg (Ideal.comap (P.stalkEquiv x hx hc)) h1
     rwa [Ideal.comap_map_of_bijective _ (P.stalkEquiv x hx hc).bijective,
-      Ideal.comap_map_of_bijective _ (P.stalkEquiv x hx hc).bijective] at h3
+        Ideal.comap_map_of_bijective _ (P.stalkEquiv x hx hc).bijective]
+      at h3
 
 end AffPres
 
-theorem exists_mk_locRing {n : ℕ} (K : Ideal (MvPolynomial (Fin n) ℂ)) (p : Fin n → ℂ)
-    (t : locRing K p) : ∃ a b : MvPolynomial (Fin n) ℂ, eval p b ≠ 0 ∧
-      t * algebraMap _ (locRing K p) b = algebraMap _ (locRing K p) a := by
+theorem exists_mk_locRing
+    {n : ℕ} (K : Ideal (MvPolynomial (Fin n) ℂ)) (p : Fin n → ℂ) (t : locRing K p)
+    : ∃ a b : MvPolynomial (Fin n) ℂ,
+      eval p b ≠ 0 ∧ t * algebraMap _ (locRing K p) b = algebraMap _ (locRing K p) a := by
   obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective t
   obtain ⟨⟨a, ⟨b, hb⟩⟩, rfl⟩ := IsLocalization.mk'_surjective (ptIdeal p).primeCompl y
   have hb' : b ∉ ptIdeal p := hb
@@ -264,9 +263,11 @@ theorem exists_mk_locRing {n : ℕ} (K : Ideal (MvPolynomial (Fin n) ℂ)) (p : 
   · first
     | rw [← Ideal.Quotient.mk_algebraMap, ← Ideal.Quotient.mk_algebraMap, ← map_mul,
         IsLocalization.mk'_spec]
-    | (show Ideal.Quotient.mk _ (IsLocalization.mk' _ a ⟨b, hb⟩) *
-          Ideal.Quotient.mk _ (algebraMap _ _ b) = Ideal.Quotient.mk _ (algebraMap _ _ a)
-       rw [← map_mul, IsLocalization.mk'_spec])
+    | (
+        show Ideal.Quotient.mk _ (IsLocalization.mk' _ a ⟨b, hb⟩) *
+           Ideal.Quotient.mk _ (algebraMap _ _ b) = Ideal.Quotient.mk _ (algebraMap _ _ a)
+        rw [← map_mul, IsLocalization.mk'_spec]
+      )
 
 end
 

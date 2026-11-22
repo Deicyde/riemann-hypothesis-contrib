@@ -26,7 +26,8 @@ variable (l : ℕ) [Fact l.Prime]
 
 abbrev Bk (k : ℕ) : Type := BdRp l ⧸ Ideal.span {tBdR l ^ k}
 
-def fk (k : ℕ) : Ainf l →+* Bk l k := (Ideal.Quotient.mk _).comp (wittToBDeRhamPlus (normInteger ℂ_[l]) l)
+def fk (k : ℕ) : Ainf l →+* Bk l k :=
+  (Ideal.Quotient.mk _).comp (wittToBDeRhamPlus (normInteger ℂ_[l]) l)
 
 def dk (k : ℕ) : Bk l (k + 1) →+* Bk l k :=
   Ideal.Quotient.factor (Ideal.span_singleton_le_span_singleton.2 (pow_dvd_pow _ (Nat.le_succ k)))
@@ -34,20 +35,28 @@ def dk (k : ℕ) : Bk l (k + 1) →+* Bk l k :=
 def pk (k : ℕ) : BdRp l →+* Bk l k := Ideal.Quotient.mk _
 
 def pInv : ↥(algebraMap (BdRp l) (BdR l)).range →+* BdRp l :=
-  (RingEquiv.ofBijective (algebraMap (BdRp l) (BdR l)).rangeRestrict
-    ⟨fun x y h => IsPerfectoidField.algebraMap_bDeRham_injective (K := ℂ_[l]) (p := l) (congrArg Subtype.val h), RingHom.rangeRestrict_surjective _⟩).symm.toRingHom
+  (RingEquiv.ofBijective (algebraMap (BdRp l) (BdR l)).rangeRestrict ⟨
+    fun x y h =>
+      IsPerfectoidField.algebraMap_bDeRham_injective (K := ℂ_[l]) (p := l) (congrArg Subtype.val h),
+    RingHom.rangeRestrict_surjective _
+  ⟩).symm.toRingHom
 
-def kP (K : IntermediateField ℚ_[l] (PadicAlgCl l)) : K →+* BdRp l := (algClToBdR l).toRingHom.comp K.val.toRingHom
+def kP (K : IntermediateField ℚ_[l] (PadicAlgCl l)) : K →+* BdRp l :=
+  (algClToBdR l).toRingHom.comp K.val.toRingHom
 
-def gP {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (g : K.fixingSubgroup) : BdRp l →+* BdRp l := galBdRHom (toBot g.1)
+def gP {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (g : K.fixingSubgroup) : BdRp l →+* BdRp l :=
+  galBdRHom (toBot g.1)
 
 structure LevHyp (K : IntermediateField ℚ_[l] (PadicAlgCl l)) (M : ℕ) : Prop where
   ok : ∀ (k : ℕ) (a : OK l K), pk l k (kP l K a) ∈ sub (fk l k) (xi0 l) l M
   cris : ∀ (k : ℕ) (c : Acris l), pk l k (ACris.iota ℂ_[l] l c) ∈ sub (fk l k) (xi0 l) l M
   hc : ∀ k : ℕ, DPClosed (ι (fk l k) (xi0 l) l M) (γB (fk l k) (xi0 l))
-  galT : ∀ (k : ℕ) (g : K.fixingSubgroup), Ideal.span {tBdR l ^ k} ≤ (Ideal.span {tBdR l ^ k}).comap (gP l g)
-  gal : ∀ (k : ℕ) (g : K.fixingSubgroup), ∀ x ∈ sub (fk l k) (xi0 l) l M,
-    Ideal.quotientMap _ (gP l g) (galT k g) x ∈ sub (fk l k) (xi0 l) l M
+  galT
+    : ∀ (k : ℕ) (g : K.fixingSubgroup),
+      Ideal.span {tBdR l ^ k} ≤ (Ideal.span {tBdR l ^ k}).comap (gP l g)
+  gal
+    : ∀ (k : ℕ) (g : K.fixingSubgroup), ∀ x ∈ sub (fk l k) (xi0 l) l M,
+      Ideal.quotientMap _ (gP l g) (galT k g) x ∈ sub (fk l k) (xi0 l) l M
   dIn : ∀ k : ℕ, ∀ x ∈ sub (fk l (k + 1)) (xi0 l) l M, dk l k x ∈ sub (fk l k) (xi0 l) l M
 
 variable {l} {K : IntermediateField ℚ_[l] (PadicAlgCl l)} {M : ℕ}

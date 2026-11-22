@@ -11,11 +11,15 @@ open Classical
 
 namespace Formalism.MainNotions.N.Ln17
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup
 
-theorem isAdicComplete_of_ideal_pow_le {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    (I J : Ideal R) [hJ : IsAdicComplete J M] (e : ℕ) (he : 1 ≤ e) (hJI : J ≤ I) (hIJ : I ^ e ≤ J) :
-    IsAdicComplete I M := by
+theorem isAdicComplete_of_ideal_pow_le
+    {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+    (I J : Ideal R) [hJ : IsAdicComplete J M]
+    (e : ℕ) (he : 1 ≤ e)
+    (hJI : J ≤ I) (hIJ : I ^ e ≤ J)
+    : IsAdicComplete I M := by
   have mono : ∀ {A B : Ideal R}, A ≤ B → ∀ n : ℕ, A ^ n ≤ B ^ n := by
     intro A B h n
     induction n with
@@ -32,14 +36,18 @@ theorem isAdicComplete_of_ideal_pow_le {R M : Type*} [CommRing R] [AddCommGroup 
   · intro x hx
     exact hJ.haus' x fun n => (hx (e * n)).mono (Submodule.smul_mono_left (hIJn n))
   · intro f hf
-    obtain ⟨L, hL⟩ := hJ.prec' (fun k => f (e * k)) (fun {m n} hmn =>
-      (hf (Nat.mul_le_mul le_rfl hmn)).mono (Submodule.smul_mono_left (hIJn m)))
+    obtain ⟨L, hL⟩ :=
+      hJ.prec'
+        (fun k => f (e * k))
+        (fun {m n} hmn => (hf (Nat.mul_le_mul le_rfl hmn)).mono (Submodule.smul_mono_left (hIJn m)))
     refine ⟨L, fun n => ?_⟩
     exact (hf (hle n)).trans ((hL n).mono (Submodule.smul_mono_left (hJIn n)))
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.N.Ln17 in
-theorem isAdicComplete_integers_local : ∀ (l : ℕ) [Fact l.Prime] (LL : FinExt l),
-    IsAdicComplete (IsLocalRing.maximalIdeal ↥(OL LL)) ↥(OL LL) := by
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.N.Ln17 in
+theorem isAdicComplete_integers_local
+    : ∀ (l : ℕ) [Fact l.Prime] (LL : FinExt l),
+      IsAdicComplete (IsLocalRing.maximalIdeal ↥(OL LL)) ↥(OL LL) := by
   intro l _ LL
   have hc : IsAdicComplete (Ideal.span {((l : ℕ) : ↥(OL LL))}) ↥(OL LL) :=
     Formalism.MainNotions.LiftingTheory.phib_OL_complete LL
@@ -71,8 +79,9 @@ theorem isAdicComplete_integers_local : ∀ (l : ℕ) [Fact l.Prime] (LL : FinEx
   refine isAdicComplete_of_ideal_pow_le (IsLocalRing.maximalIdeal ↥(OL LL))
     (Ideal.span {((l : ℕ) : ↥(OL LL))}) k hk1 ?_ ?_
   · rw [hspan]
-    calc IsLocalRing.maximalIdeal ↥(OL LL) ^ k ≤ IsLocalRing.maximalIdeal ↥(OL LL) ^ 1 :=
-          Ideal.pow_le_pow_right hk1
+    calc
+      IsLocalRing.maximalIdeal ↥(OL LL) ^ k
+        ≤ IsLocalRing.maximalIdeal ↥(OL LL) ^ 1 := Ideal.pow_le_pow_right hk1
       _ = IsLocalRing.maximalIdeal ↥(OL LL) := pow_one _
   · rw [hspan]
 

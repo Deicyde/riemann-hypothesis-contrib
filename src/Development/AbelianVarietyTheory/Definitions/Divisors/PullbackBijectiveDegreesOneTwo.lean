@@ -16,17 +16,17 @@ namespace GlobalTheory.CxCoh
 universe u u' u''
 
 structure Coef (C : Type u) [Category.{0} C] where
-
   obj : C → Type
   [grp : ∀ T, AddCommGroup (obj T)]
-
   map : ∀ {T T' : C}, (T ⟶ T') → obj T →+ obj T'
   map_id : ∀ (T : C) (x : obj T), map (𝟙 T) x = x
-  map_comp : ∀ {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') (x : obj T), map (φ ≫ ψ) x = map ψ (map φ x)
+  map_comp
+    : ∀ {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') (x : obj T), map (φ ≫ ψ) x = map ψ (map φ x)
 
 attribute [instance] Coef.grp
 
-variable {C : Type u} [Category.{0} C] {C' : Type u'} [Category.{0} C'] {C'' : Type u''} [Category.{0} C'']
+variable
+  {C : Type u} [Category.{0} C] {C' : Type u'} [Category.{0} C'] {C'' : Type u''} [Category.{0} C'']
 
 namespace Coef
 
@@ -40,23 +40,28 @@ abbrev c2 := ∀ (T T' T'' : C) (_ : T ⟶ T') (_ : T' ⟶ T''), M.obj T''
 
 def Ac0 : Prop := ∀ g : M.c0, (∀ T T' (φ : T ⟶ T'), g T' = M.map φ (g T)) → g = 0
 
-def Ac1 : Prop := ∀ f : M.c1,
-  (∀ T T' T'' (φ : T ⟶ T') (ψ : T' ⟶ T''), f T T'' (φ ≫ ψ) = M.map ψ (f T T' φ) + f T' T'' ψ) →
-  ∃ g : M.c0, ∀ T T' (φ : T ⟶ T'), f T T' φ = g T' - M.map φ (g T)
+def Ac1 : Prop :=
+  ∀ f : M.c1,
+    (∀ T T' T'' (φ : T ⟶ T') (ψ : T' ⟶ T''), f T T'' (φ ≫ ψ) = M.map ψ (f T T' φ) + f T' T'' ψ)
+      → ∃ g : M.c0, ∀ T T' (φ : T ⟶ T'), f T T' φ = g T' - M.map φ (g T)
 
-def Ac2 : Prop := ∀ z : M.c2,
-  (∀ T T' T'' T''' (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T'''),
-    M.map χ (z T T' T'' φ ψ) + z T T'' T''' (φ ≫ ψ) χ = z T T' T''' φ (ψ ≫ χ) + z T' T'' T''' ψ χ) →
-  ∃ f : M.c1, ∀ T T' T'' (φ : T ⟶ T') (ψ : T' ⟶ T''),
-    z T T' T'' φ ψ = M.map ψ (f T T' φ) - f T T'' (φ ≫ ψ) + f T' T'' ψ
+def Ac2 : Prop :=
+  ∀ z : M.c2,
+    (∀ T T' T'' T''' (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T'''),
+        M.map χ (z T T' T'' φ ψ) + z T T'' T''' (φ ≫ ψ) χ
+          = z T T' T''' φ (ψ ≫ χ) + z T' T'' T''' ψ χ)
+      → ∃ f : M.c1, ∀ T T' T'' (φ : T ⟶ T') (ψ : T' ⟶ T''),
+        z T T' T'' φ ψ = M.map ψ (f T T' φ) - f T T'' (φ ≫ ψ) + f T' T'' ψ
 
-@[reducible] def res (G : C' ⥤ C) : Coef C' where
+@[reducible]
+def res (G : C' ⥤ C) : Coef C' where
   obj T := M.obj (G.obj T)
   map φ := M.map (G.map φ)
   map_id T x := by rw [G.map_id, M.map_id]
   map_comp φ ψ x := by rw [G.map_comp, M.map_comp]
 
-@[reducible] def zero (C : Type u) [Category.{0} C] : Coef C where
+@[reducible]
+def zero (C : Type u) [Category.{0} C] : Coef C where
   obj _ := PUnit
   map _ := 0
   map_id _ _ := rfl
@@ -64,10 +69,12 @@ def Ac2 : Prop := ∀ z : M.c2,
 
 end Coef
 
-structure IsQ {A0 A1 A2 A3 B0 B1 B2 B3 : Type} [AddCommGroup A0] [AddCommGroup A1] [AddCommGroup A2]
+structure IsQ
+    {A0 A1 A2 A3 B0 B1 B2 B3 : Type} [AddCommGroup A0] [AddCommGroup A1] [AddCommGroup A2]
     [AddCommGroup A3] [AddCommGroup B0] [AddCommGroup B1] [AddCommGroup B2] [AddCommGroup B3]
     (d0 : A0 →+ A1) (d1 : A1 →+ A2) (d2 : A2 →+ A3) (e0 : B0 →+ B1) (e1 : B1 →+ B2) (e2 : B2 →+ B3)
-    (a0 : A0 →+ B0) (a1 : A1 →+ B1) (a2 : A2 →+ B2) : Prop where
+    (a0 : A0 →+ B0) (a1 : A1 →+ B1) (a2 : A2 →+ B2)
+    : Prop where
   inj0 : ∀ x, d0 x = 0 → a0 x = 0 → x = 0
   surj0 : ∀ y, e0 y = 0 → ∃ x, d0 x = 0 ∧ a0 x = y
   inj1 : ∀ x y, d1 x = 0 → a1 x = e0 y → ∃ w, d0 w = x
@@ -76,19 +83,12 @@ structure IsQ {A0 A1 A2 A3 B0 B1 B2 B3 : Type} [AddCommGroup A0] [AddCommGroup A
   surj2 : ∀ y, e2 y = 0 → ∃ x w, d2 x = 0 ∧ y = a2 x + e1 w
 
 structure Cx (C : Type u) [Category.{0} C] where
-
   M0 : Coef C
-
   M1 : Coef C
-
   M2 : Coef C
-
   M3 : Coef C
-
   d0 : ∀ T, M0.obj T →+ M1.obj T
-
   d1 : ∀ T, M1.obj T →+ M2.obj T
-
   d2 : ∀ T, M2.obj T →+ M3.obj T
   diffZero_natural : ∀ {T T' : C} (φ : T ⟶ T') x, d0 T' (M0.map φ x) = M1.map φ (d0 T x)
   diffOne_natural : ∀ {T T' : C} (φ : T ⟶ T') x, d1 T' (M1.map φ x) = M2.map φ (d1 T x)
@@ -110,8 +110,11 @@ def D0 : K.M0.c0 →+ K.T1 where
   map_add' a b := by ext <;> simp; abel
 
 def D1 : K.T1 →+ K.T2 where
-  toFun c := (fun T T' T'' φ ψ ↦ K.M0.map ψ (c.1 T T' φ) - c.1 T T'' (φ ≫ ψ) + c.1 T' T'' ψ,
-    fun T T' φ ↦ c.2 T' - K.M1.map φ (c.2 T) - K.d0 T' (c.1 T T' φ), fun T ↦ K.d1 T (c.2 T))
+  toFun c := (
+    fun T T' T'' φ ψ ↦ K.M0.map ψ (c.1 T T' φ) - c.1 T T'' (φ ≫ ψ) + c.1 T' T'' ψ,
+    fun T T' φ ↦ c.2 T' - K.M1.map φ (c.2 T) - K.d0 T' (c.1 T T' φ),
+    fun T ↦ K.d1 T (c.2 T)
+  )
   map_zero' := by ext <;> simp
   map_add' a b := by ext <;> simp <;> abel
 
@@ -120,37 +123,53 @@ def H0 : AddSubgroup K.M0.c0 := K.D0.ker
 def Z1 : AddSubgroup K.T1 := K.D1.ker
 
 def Z2 : AddSubgroup K.T2 where
-  carrier := {c | (∀ T T' T'' T''' (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T'''),
-      K.M0.map χ (c.1 T T' T'' φ ψ) + c.1 T T'' T''' (φ ≫ ψ) χ = c.1 T T' T''' φ (ψ ≫ χ) + c.1 T' T'' T''' ψ χ) ∧
-    (∀ T T' T'' (φ : T ⟶ T') (ψ : T' ⟶ T''), c.2.1 T T'' (φ ≫ ψ) =
-      K.M1.map ψ (c.2.1 T T' φ) + c.2.1 T' T'' ψ + K.d0 T'' (c.1 T T' T'' φ ψ)) ∧
-    (∀ T T' (φ : T ⟶ T'), c.2.2 T' = K.M2.map φ (c.2.2 T) + K.d1 T' (c.2.1 T T' φ)) ∧
-    ∀ T, K.d2 T (c.2.2 T) = 0}
+  carrier :=
+    {c | (∀ T T' T'' T''' (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T'''),
+        K.M0.map χ (c.1 T T' T'' φ ψ) + c.1 T T'' T''' (φ ≫ ψ) χ = c.1 T T' T''' φ (ψ ≫ χ) + c.1 T' T'' T''' ψ χ) ∧
+      (∀ T T' T'' (φ : T ⟶ T') (ψ : T' ⟶ T''), c.2.1 T T'' (φ ≫ ψ) =
+        K.M1.map ψ (c.2.1 T T' φ) + c.2.1 T' T'' ψ + K.d0 T'' (c.1 T T' T'' φ ψ)) ∧
+      (∀ T T' (φ : T ⟶ T'), c.2.2 T' = K.M2.map φ (c.2.2 T) + K.d1 T' (c.2.1 T T' φ)) ∧
+      ∀ T, K.d2 T (c.2.2 T) = 0}
   zero_mem' := by simp
-  add_mem' {a b} ha hb := ⟨fun T T' T'' T''' φ ψ χ ↦ by
+  add_mem' {a b} ha hb := ⟨
+    fun T T' T'' T''' φ ψ χ ↦ by
       have h1 := ha.1 T T' T'' T''' φ ψ χ
       have h2 := hb.1 T T' T'' T''' φ ψ χ
       simp only [Prod.fst_add, Pi.add_apply, map_add (f := _)]
       linear_combination (norm := abel1) h1 + h2,
-    fun T T' T'' φ ψ ↦ by simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, map_add (f := _), ha.2.1 T T' T'', hb.2.1 T T' T'']; abel,
-    fun T T' φ ↦ by simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, map_add (f := _), ha.2.2.1 T T' φ, hb.2.2.1 T T' φ]; abel,
-    fun T ↦ by simp only [Prod.snd_add, Pi.add_apply, map_add (f := _), ha.2.2.2 T, hb.2.2.2 T, add_zero]⟩
-  neg_mem' {a} ha := ⟨fun T T' T'' T''' φ ψ χ ↦ by
+    fun T T' T'' φ ψ ↦ by
+      simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, map_add (f := _), ha.2.1 T T' T'',
+        hb.2.1 T T' T'']
+      abel,
+    fun T T' φ ↦ by
+      simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, map_add (f := _), ha.2.2.1 T T' φ,
+        hb.2.2.1 T T' φ]
+      abel,
+    fun T ↦ by
+      simp only [Prod.snd_add, Pi.add_apply, map_add (f := _), ha.2.2.2 T, hb.2.2.2 T, add_zero]
+  ⟩
+  neg_mem' {a} ha := ⟨
+    fun T T' T'' T''' φ ψ χ ↦ by
       have h1 := ha.1 T T' T'' T''' φ ψ χ
       simp only [Prod.fst_neg, Pi.neg_apply, map_neg]
       linear_combination (norm := abel1) -h1,
-    fun T T' T'' φ ψ ↦ by simp only [Prod.fst_neg, Prod.snd_neg, Pi.neg_apply, map_neg, ha.2.1 T T' T'']; abel,
-    fun T T' φ ↦ by simp only [Prod.fst_neg, Prod.snd_neg, Pi.neg_apply, map_neg, ha.2.2.1 T T' φ]; abel,
-    fun T ↦ by simp only [Prod.snd_neg, Pi.neg_apply, map_neg, ha.2.2.2 T, neg_zero]⟩
+    fun T T' T'' φ ψ ↦ by
+      simp only [Prod.fst_neg, Prod.snd_neg, Pi.neg_apply, map_neg, ha.2.1 T T' T'']; abel,
+    fun T T' φ ↦ by
+      simp only [Prod.fst_neg, Prod.snd_neg, Pi.neg_apply, map_neg, ha.2.2.1 T T' φ]; abel,
+    fun T ↦ by simp only [Prod.snd_neg, Pi.neg_apply, map_neg, ha.2.2.2 T, neg_zero]
+  ⟩
 
 abbrev H1 := K.Z1 ⧸ K.D0.range.addSubgroupOf K.Z1
 
 abbrev H2 := K.Z2 ⧸ K.D1.range.addSubgroupOf K.Z2
 
 def QAt {T T' : C} (φ : T ⟶ T') : Prop :=
-  IsQ (K.d0 T) (K.d1 T) (K.d2 T) (K.d0 T') (K.d1 T') (K.d2 T') (K.M0.map φ) (K.M1.map φ) (K.M2.map φ)
+  IsQ (K.d0 T) (K.d1 T) (K.d2 T) (K.d0 T') (K.d1 T') (K.d2 T') (K.M0.map φ) (K.M1.map φ)
+    (K.M2.map φ)
 
-@[reducible] def res (G : C' ⥤ C) : Cx C' where
+@[reducible]
+def res (G : C' ⥤ C) : Cx C' where
   M0 := K.M0.res G
   M1 := K.M1.res G
   M2 := K.M2.res G
@@ -164,7 +183,8 @@ def QAt {T T' : C} (φ : T ⟶ T') : Prop :=
   diffOne_diffZero _ := K.diffOne_diffZero _
   diffTwo_comp_diffOne _ := K.diffTwo_comp_diffOne _
 
-@[reducible] def single (M : Coef C) : Cx C where
+@[reducible]
+def single (M : Coef C) : Cx C where
   M0 := M
   M1 := Coef.zero C
   M2 := Coef.zero C
@@ -181,19 +201,17 @@ def QAt {T T' : C} (φ : T ⟶ T') : Prop :=
 end Cx
 
 structure CxMap (K : Cx C) (K' : Cx C') where
-
   G : C' ⥤ C
-
   a0 : ∀ T, K.M0.obj (G.obj T) →+ K'.M0.obj T
-
   a1 : ∀ T, K.M1.obj (G.obj T) →+ K'.M1.obj T
-
   a2 : ∀ T, K.M2.obj (G.obj T) →+ K'.M2.obj T
-
   a3 : ∀ T, K.M3.obj (G.obj T) →+ K'.M3.obj T
-  compDegreeZero_natural : ∀ {T T' : C'} (φ : T ⟶ T') x, a0 T' (K.M0.map (G.map φ) x) = K'.M0.map φ (a0 T x)
-  compDegreeOne_natural : ∀ {T T' : C'} (φ : T ⟶ T') x, a1 T' (K.M1.map (G.map φ) x) = K'.M1.map φ (a1 T x)
-  compDegreeTwo_natural : ∀ {T T' : C'} (φ : T ⟶ T') x, a2 T' (K.M2.map (G.map φ) x) = K'.M2.map φ (a2 T x)
+  compDegreeZero_natural
+    : ∀ {T T' : C'} (φ : T ⟶ T') x, a0 T' (K.M0.map (G.map φ) x) = K'.M0.map φ (a0 T x)
+  compDegreeOne_natural
+    : ∀ {T T' : C'} (φ : T ⟶ T') x, a1 T' (K.M1.map (G.map φ) x) = K'.M1.map φ (a1 T x)
+  compDegreeTwo_natural
+    : ∀ {T T' : C'} (φ : T ⟶ T') x, a2 T' (K.M2.map (G.map φ) x) = K'.M2.map φ (a2 T x)
   comp_commutes_diffZero : ∀ T x, a1 T (K.d0 _ x) = K'.d0 T (a0 T x)
   comp_commutes_diffOne : ∀ T x, a2 T (K.d1 _ x) = K'.d1 T (a1 T x)
   comp_commutes_diffTwo : ∀ T x, a3 T (K.d2 _ x) = K'.d2 T (a2 T x)
@@ -213,8 +231,11 @@ def p1 : K.T1 →+ K'.T1 where
   map_add' a b := by ext <;> simp
 
 def p2 : K.T2 →+ K'.T2 where
-  toFun c := (fun _ _ T'' φ ψ ↦ m.a0 T'' (c.1 _ _ _ (m.G.map φ) (m.G.map ψ)),
-    fun _ T' φ ↦ m.a1 T' (c.2.1 _ _ (m.G.map φ)), fun T ↦ m.a2 T (c.2.2 _))
+  toFun c := (
+    fun _ _ T'' φ ψ ↦ m.a0 T'' (c.1 _ _ _ (m.G.map φ) (m.G.map ψ)),
+    fun _ T' φ ↦ m.a1 T' (c.2.1 _ _ (m.G.map φ)),
+    fun T ↦ m.a2 T (c.2.2 _)
+  )
   map_zero' := by ext <;> simp
   map_add' a b := by ext <;> simp
 
@@ -222,7 +243,8 @@ theorem pullback_firstDifferential (g : K.M0.c0) : m.p1 (K.D0 g) = K'.D0 (m.p0 g
   ext <;> simp [p0, p1, Cx.D0, m.compDegreeZero_natural, m.comp_commutes_diffZero]
 
 theorem pullback_secondDifferential (c : K.T1) : m.p2 (K.D1 c) = K'.D1 (m.p1 c) := by
-  ext <;> simp [p1, p2, Cx.D1, m.compDegreeZero_natural, m.compDegreeOne_natural, m.comp_commutes_diffZero, m.comp_commutes_diffOne]
+  ext <;> simp [p1, p2, Cx.D1, m.compDegreeZero_natural, m.compDegreeOne_natural,
+    m.comp_commutes_diffZero, m.comp_commutes_diffOne]
 
 theorem p2_mem_Z2_of_mem_Z2 {c : K.T2} (h : c ∈ K.Z2) : m.p2 c ∈ K'.Z2 := by
   refine ⟨fun T T' T'' T''' φ ψ χ ↦ ?_, fun T T' T'' φ ψ ↦ ?_, fun T T' φ ↦ ?_, fun T ↦ ?_⟩
@@ -235,25 +257,29 @@ theorem p2_mem_Z2_of_mem_Z2 {c : K.T2} (h : c ∈ K.Z2) : m.p2 c ∈ K'.Z2 := by
   · have := congrArg (m.a3 T) (h.2.2.2 (m.G.obj T))
     simpa [p2, m.comp_commutes_diffTwo] using this
 
-def h0 : K.H0 →+ K'.H0 := (m.p0.comp K.H0.subtype).codRestrict _ fun c ↦ by
-  have h : K.D0 c.1 = 0 := c.2
-  change K'.D0 (m.p0 c.1) = 0
-  rw [← pullback_firstDifferential, h, map_zero]
+def h0 : K.H0 →+ K'.H0 :=
+  (m.p0.comp K.H0.subtype).codRestrict _ fun c ↦ by
+    have h : K.D0 c.1 = 0 := c.2
+    change K'.D0 (m.p0 c.1) = 0
+    rw [← pullback_firstDifferential, h, map_zero]
 
-def z1 : K.Z1 →+ K'.Z1 := (m.p1.comp K.Z1.subtype).codRestrict _ fun c ↦ by
-  have h : K.D1 c.1 = 0 := c.2
-  change K'.D1 (m.p1 c.1) = 0
-  rw [← pullback_secondDifferential, h, map_zero]
+def z1 : K.Z1 →+ K'.Z1 :=
+  (m.p1.comp K.Z1.subtype).codRestrict _ fun c ↦ by
+    have h : K.D1 c.1 = 0 := c.2
+    change K'.D1 (m.p1 c.1) = 0
+    rw [← pullback_secondDifferential, h, map_zero]
 
 def z2 : K.Z2 →+ K'.Z2 := (m.p2.comp K.Z2.subtype).codRestrict _ fun c ↦ m.p2_mem_Z2_of_mem_Z2 c.2
 
-def h1 : K.H1 →+ K'.H1 := QuotientAddGroup.map _ _ m.z1 (by
-  rintro c ⟨g, hg⟩
-  exact ⟨m.p0 g, (m.pullback_firstDifferential g).symm.trans (congrArg m.p1 hg)⟩)
+def h1 : K.H1 →+ K'.H1 :=
+  QuotientAddGroup.map _ _ m.z1 (by
+    rintro c ⟨g, hg⟩
+    exact ⟨m.p0 g, (m.pullback_firstDifferential g).symm.trans (congrArg m.p1 hg)⟩)
 
-def h2 : K.H2 →+ K'.H2 := QuotientAddGroup.map _ _ m.z2 (by
-  rintro c ⟨g, hg⟩
-  exact ⟨m.p1 g, (m.pullback_secondDifferential g).symm.trans (congrArg m.p2 hg)⟩)
+def h2 : K.H2 →+ K'.H2 :=
+  QuotientAddGroup.map _ _ m.z2 (by
+    rintro c ⟨g, hg⟩
+    exact ⟨m.p1 g, (m.pullback_secondDifferential g).symm.trans (congrArg m.p2 hg)⟩)
 
 def comp (n : CxMap K' K'') : CxMap K K'' where
   G := n.G ⋙ m.G
@@ -261,14 +287,22 @@ def comp (n : CxMap K' K'') : CxMap K K'' where
   a1 T := (n.a1 T).comp (m.a1 _)
   a2 T := (n.a2 T).comp (m.a2 _)
   a3 T := (n.a3 T).comp (m.a3 _)
-  compDegreeZero_natural φ x := (congrArg (n.a0 _) (m.compDegreeZero_natural (n.G.map φ) x)).trans (n.compDegreeZero_natural φ _)
-  compDegreeOne_natural φ x := (congrArg (n.a1 _) (m.compDegreeOne_natural (n.G.map φ) x)).trans (n.compDegreeOne_natural φ _)
-  compDegreeTwo_natural φ x := (congrArg (n.a2 _) (m.compDegreeTwo_natural (n.G.map φ) x)).trans (n.compDegreeTwo_natural φ _)
-  comp_commutes_diffZero T x := (congrArg (n.a1 _) (m.comp_commutes_diffZero _ x)).trans (n.comp_commutes_diffZero T _)
-  comp_commutes_diffOne T x := (congrArg (n.a2 _) (m.comp_commutes_diffOne _ x)).trans (n.comp_commutes_diffOne T _)
-  comp_commutes_diffTwo T x := (congrArg (n.a3 _) (m.comp_commutes_diffTwo _ x)).trans (n.comp_commutes_diffTwo T _)
+  compDegreeZero_natural φ x :=
+    (congrArg (n.a0 _) (m.compDegreeZero_natural (n.G.map φ) x)).trans
+      (n.compDegreeZero_natural φ _)
+  compDegreeOne_natural φ x :=
+    (congrArg (n.a1 _) (m.compDegreeOne_natural (n.G.map φ) x)).trans (n.compDegreeOne_natural φ _)
+  compDegreeTwo_natural φ x :=
+    (congrArg (n.a2 _) (m.compDegreeTwo_natural (n.G.map φ) x)).trans (n.compDegreeTwo_natural φ _)
+  comp_commutes_diffZero T x :=
+    (congrArg (n.a1 _) (m.comp_commutes_diffZero _ x)).trans (n.comp_commutes_diffZero T _)
+  comp_commutes_diffOne T x :=
+    (congrArg (n.a2 _) (m.comp_commutes_diffOne _ x)).trans (n.comp_commutes_diffOne T _)
+  comp_commutes_diffTwo T x :=
+    (congrArg (n.a3 _) (m.comp_commutes_diffTwo _ x)).trans (n.comp_commutes_diffTwo T _)
 
-theorem cohomZero_pullback_comp (n : CxMap K' K'') (c : K.H0) : (m.comp n).h0 c = n.h0 (m.h0 c) := rfl
+theorem cohomZero_pullback_comp (n : CxMap K' K'') (c : K.H0) : (m.comp n).h0 c = n.h0 (m.h0 c) :=
+  rfl
 
 theorem cohomOne_pullback_comp (n : CxMap K' K'') (c : K.H1) : (m.comp n).h1 c = n.h1 (m.h1 c) := by
   obtain ⟨a, rfl⟩ := QuotientAddGroup.mk_surjective c; rfl
@@ -276,7 +310,8 @@ theorem cohomOne_pullback_comp (n : CxMap K' K'') (c : K.H1) : (m.comp n).h1 c =
 theorem cohomTwo_pullback_comp (n : CxMap K' K'') (c : K.H2) : (m.comp n).h2 c = n.h2 (m.h2 c) := by
   obtain ⟨a, rfl⟩ := QuotientAddGroup.mk_surjective c; rfl
 
-def QAll : Prop := ∀ T, IsQ (K.d0 _) (K.d1 _) (K.d2 _) (K'.d0 T) (K'.d1 T) (K'.d2 T) (m.a0 T) (m.a1 T) (m.a2 T)
+def QAll : Prop :=
+  ∀ T, IsQ (K.d0 _) (K.d1 _) (K.d2 _) (K'.d0 T) (K'.d1 T) (K'.d2 T) (m.a0 T) (m.a1 T) (m.a2 T)
 
 def PullbackBijectiveDegreesOneTwo : Prop := Function.Bijective m.h1 ∧ Function.Bijective m.h2
 
@@ -323,7 +358,8 @@ open GlobalTheory.CatCoh GlobalTheory.CechDR KaehlerDifferential
 
 variable {R : Type} [CommRing R] (F : C ⥤ CommAlgCat.{0} R)
 
-@[reducible] def Coef.ofAlg : Coef C where
+@[reducible]
+def Coef.ofAlg : Coef C where
   obj T := F.obj T
   map φ := (mp F φ : F.obj _ →+* F.obj _).toAddMonoidHom
   map_id := mp_id F
@@ -331,14 +367,20 @@ variable {R : Type} [CommRing R] (F : C ⥤ CommAlgCat.{0} R)
 
 end Alg
 
-def JoinedOne.{a, b} : Prop := ∀ {C : Type a} [Category.{0} C] {C' : Type b} [Category.{0} C'] {K : Cx C} {K' : Cx C'}
-  (m m' : CxMap K K') (θ : m.G ⟶ m'.G), m.Joined m' θ → (∀ c, m.h0 c = m'.h0 c) ∧ ∀ c, m.h1 c = m'.h1 c
+def JoinedOne.{a, b} : Prop :=
+  ∀ {C : Type a} [Category.{0} C] {C' : Type b} [Category.{0} C'] {K : Cx C} {K' : Cx C'}
+      (m m' : CxMap K K') (θ : m.G ⟶ m'.G),
+    m.Joined m' θ → (∀ c, m.h0 c = m'.h0 c) ∧ ∀ c, m.h1 c = m'.h1 c
 
-def JoinedTwo.{a, b} : Prop := ∀ {C : Type a} [Category.{0} C] {C' : Type b} [Category.{0} C'] {K : Cx C} {K' : Cx C'}
-  (m m' : CxMap K K') (θ : m.G ⟶ m'.G), m.Joined m' θ → ∀ c, m.h2 c = m'.h2 c
+def JoinedTwo.{a, b} : Prop :=
+  ∀ {C : Type a} [Category.{0} C] {C' : Type b} [Category.{0} C'] {K : Cx C} {K' : Cx C'}
+      (m m' : CxMap K K') (θ : m.G ⟶ m'.G),
+    m.Joined m' θ → ∀ c, m.h2 c = m'.h2 c
 
-def VertHas.{a, b} (p : ∀ {C' : Type b} [Category.{0} C'] {K K' : Cx C'}, CxMap K K' → Prop) : Prop :=
-  ∀ {C : Type a} [Category.{0} C] {C' : Type b} [Category.{0} C'] {K : Cx C} {K' : Cx C'} (m : CxMap K K'),
+def VertHas.{a, b} (p : ∀ {C' : Type b} [Category.{0} C'] {K K' : Cx C'}, CxMap K K' → Prop)
+    : Prop :=
+  ∀ {C : Type a} [Category.{0} C] {C' : Type b} [Category.{0} C'] {K : Cx C} {K' : Cx C'}
+      (m : CxMap K K'),
     m.QAll → p m.vert
 
 end GlobalTheory.CxCoh

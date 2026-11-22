@@ -8,9 +8,11 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem eq_pow_mul_unit_of_maximalIdeal_eq_span {V : Type} [CommRing V] [IsLocalRing V]
-    [IsNoetherianRing V] (T : V) (hm : maximalIdeal V = Ideal.span {T}) (v : V) (hv : v ≠ 0) :
-    ∃ (a : ℕ) (c : V), IsUnit c ∧ v = T ^ a * c := by
+theorem eq_pow_mul_unit_of_maximalIdeal_eq_span
+    {V : Type} [CommRing V] [IsLocalRing V] [IsNoetherianRing V]
+    (T : V) (hm : maximalIdeal V = Ideal.span {T})
+    (v : V) (hv : v ≠ 0)
+    : ∃ (a : ℕ) (c : V), IsUnit c ∧ v = T ^ a * c := by
   have hK := Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal V) (maximalIdeal.isMaximal V).ne_top
   have hex : ∃ n : ℕ, v ∉ Ideal.span {T ^ n} := by
     by_contra h
@@ -37,20 +39,19 @@ theorem eq_pow_mul_unit_of_maximalIdeal_eq_span {V : Type} [CommRing V] [IsLocal
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp hmem
   refine ⟨a, c, ?_, by rw [← hc, mul_comm]⟩
   by_contra hcu
-  have hcm : c ∈ maximalIdeal V := by
-    rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]; exact hcu
+  have hcm : c ∈ maximalIdeal V := by rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]; exact hcu
   rw [hm] at hcm
   obtain ⟨d, hd⟩ := Ideal.mem_span_singleton'.mp hcm
   apply hn₀
   rw [ha, Ideal.mem_span_singleton']
   exact ⟨d, by rw [← hc, ← hd, pow_succ]; ring⟩
 
-theorem maximalIdeal_eq_span_map_of_fractions (V W : Type) [CommRing V] [IsLocalRing V]
-    [IsNoetherianRing V] [CommRing W] [IsLocalRing W] (φ : V →+* W) (T : V)
-    (hm : IsLocalRing.maximalIdeal V = Ideal.span {T})
+theorem maximalIdeal_eq_span_map_of_fractions
+    (V W : Type) [CommRing V] [IsLocalRing V] [IsNoetherianRing V] [CommRing W] [IsLocalRing W]
+    (φ : V →+* W) (T : V) (hm : IsLocalRing.maximalIdeal V = Ideal.span {T})
     (hTm : φ T ∈ IsLocalRing.maximalIdeal W) (hTn : φ T ∈ nonZeroDivisors W)
-    (hfrac : ∀ w : W, ∃ x z : V, φ z ∈ nonZeroDivisors W ∧ φ z * w = φ x) :
-    IsLocalRing.maximalIdeal W = Ideal.span {φ T} := by
+    (hfrac : ∀ w : W, ∃ x z : V, φ z ∈ nonZeroDivisors W ∧ φ z * w = φ x)
+    : IsLocalRing.maximalIdeal W = Ideal.span {φ T} := by
   have cancel : ∀ (n : ℕ) (y : W), φ T ^ n * y = 0 → y = 0 := fun n y h =>
     (mul_left_mem_nonZeroDivisors_eq_zero_iff (pow_mem hTn n)).mp h
   have surj : ∀ w : W, ∃ v : V, φ v = w := by
@@ -59,8 +60,7 @@ theorem maximalIdeal_eq_span_map_of_fractions (V W : Type) [CommRing V] [IsLocal
     have hz0 : z ≠ 0 := by
       rintro rfl
       rw [map_zero] at hz
-      have h1 : (1 : W) = 0 :=
-        (mul_left_mem_nonZeroDivisors_eq_zero_iff hz).mp (zero_mul 1)
+      have h1 : (1 : W) = 0 := (mul_left_mem_nonZeroDivisors_eq_zero_iff hz).mp (zero_mul 1)
       exact one_ne_zero h1
     by_cases hx : x = 0
     · refine ⟨0, ?_⟩
@@ -79,7 +79,9 @@ theorem maximalIdeal_eq_span_map_of_fractions (V W : Type) [CommRing V] [IsLocal
         apply cancel c
         linear_combination hzw
       have h2 : φ βi * φ β = 1 := by rw [← map_mul, mul_comm, hβi, map_one]
-      calc φ (βi * T ^ d * α) = φ βi * (φ T ^ d * φ α) := by simp only [map_mul, map_pow]; ring
+      calc
+        φ (βi * T ^ d * α)
+          = φ βi * (φ T ^ d * φ α) := by simp only [map_mul, map_pow]; ring
         _ = φ βi * (φ β * w) := by rw [h1]
         _ = w := by rw [← mul_assoc, h2, one_mul]
     · exfalso

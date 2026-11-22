@@ -12,9 +12,11 @@ namespace Kummer
 
 variable {K : Type*} [Field K] [NumberField K]
 
-theorem exists_mul_pow_integral_notMem (v : HeightOneSpectrum (𝓞 K)) {n : ℕ} (hn : n ≠ 0)
-    (a : Kˣ) (hav : (n : ℤ) ∣ WithZero.log (v.valuation K (a : K))) :
-    ∃ c : K, c ≠ 0 ∧ ∃ b : 𝓞 K, algebraMap (𝓞 K) K b = a * c ^ n ∧ b ∉ v.asIdeal := by
+theorem exists_mul_pow_integral_notMem
+    (v : HeightOneSpectrum (𝓞 K))
+    {n : ℕ} (hn : n ≠ 0)
+    (a : Kˣ) (hav : (n : ℤ) ∣ WithZero.log (v.valuation K (a : K)))
+    : ∃ c : K, c ≠ 0 ∧ ∃ b : 𝓞 K, algebraMap (𝓞 K) K b = a * c ^ n ∧ b ∉ v.asIdeal := by
   obtain ⟨m, hm⟩ := hav
   obtain ⟨π, hπ⟩ := v.valuation_exists_uniformizer K
   have hπ0 : π ≠ 0 := by
@@ -34,8 +36,8 @@ theorem exists_mul_pow_integral_notMem (v : HeightOneSpectrum (𝓞 K)) {n : ℕ
     apply hd
     rw [(map_eq_zero_iff _ (IsFractionRing.injective (𝓞 K) K)).mp h]
     exact zero_mem _
-  refine ⟨π ^ m * algebraMap (𝓞 K) K d, mul_ne_zero (zpow_ne_zero _ hπ0) hdK,
-    r * d ^ (n - 1), ?_, ?_⟩
+  refine
+    ⟨π ^ m * algebraMap (𝓞 K) K d, mul_ne_zero (zpow_ne_zero _ hπ0) hdK, r * d ^ (n - 1), ?_, ?_⟩
   · obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := ⟨n - 1, by omega⟩
     rw [Nat.add_sub_cancel, map_mul, map_pow, ← hrd, ha']
     ring
@@ -48,11 +50,14 @@ theorem exists_mul_pow_integral_notMem (v : HeightOneSpectrum (𝓞 K)) {n : ℕ
 
 variable {M : Type*} [Field M] [NumberField M] [Algebra K M]
 
-theorem isUnramifiedAt_of_pow_eq {n : ℕ} (a : Kˣ) {α : M} (hα : α ^ n = algebraMap K M a)
-    (hgen : IntermediateField.adjoin K {α} = ⊤) (v : HeightOneSpectrum (𝓞 K))
+theorem isUnramifiedAt_of_pow_eq
+    {n : ℕ}
+    (a : Kˣ)
+    {α : M} (hα : α ^ n = algebraMap K M a) (hgen : IntermediateField.adjoin K {α} = ⊤)
+    (v : HeightOneSpectrum (𝓞 K))
     (hnv : (n : 𝓞 K) ∉ v.asIdeal) (hav : (n : ℤ) ∣ WithZero.log (v.valuation K (a : K)))
-    (P : Ideal (𝓞 M)) [P.IsPrime] [P.LiesOver v.asIdeal] :
-    Algebra.IsUnramifiedAt (𝓞 K) P := by
+    (P : Ideal (𝓞 M)) [P.IsPrime] [P.LiesOver v.asIdeal]
+    : Algebra.IsUnramifiedAt (𝓞 K) P := by
   have hn : n ≠ 0 := by
     rintro rfl
     exact hnv (by simp)
@@ -79,15 +84,18 @@ theorem isUnramifiedAt_of_pow_eq {n : ℕ} (a : Kˣ) {α : M} (hα : α ^ n = al
     exact mul_mem (IntermediateField.algebraMap_mem _ _)
       (IntermediateField.mem_adjoin_simple_self K x)
   have hgen' : Algebra.adjoin K {algebraMap (𝓞 M) M y} = ⊤ := by
-    rw [hyx, ← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic
-      (Algebra.IsAlgebraic.isAlgebraic x), hKx, IntermediateField.top_toSubalgebra]
+    rw [hyx,
+      ← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (Algebra.IsAlgebraic.isAlgebraic
+        x),
+      hKx, IntermediateField.top_toSubalgebra]
   have hyint : IsIntegral (𝓞 K) y := Algebra.IsIntegral.isIntegral y
   obtain ⟨g, hg⟩ : minpoly (𝓞 K) y ∣ X ^ n - C b :=
     minpoly.isIntegrallyClosed_dvd hyint (by simp [hyb])
   have hder : aeval y (derivative (minpoly (𝓞 K) y)) * aeval y g = (n : 𝓞 M) * y ^ (n - 1) := by
     have := congrArg (fun p => aeval y (derivative p)) hg
-    simp only [derivative_mul, derivative_sub, derivative_X_pow, derivative_C, sub_zero, map_add (f := _),
-      map_mul, minpoly.aeval, zero_mul, add_zero] at this
+    simp only [derivative_mul, derivative_sub, derivative_X_pow, derivative_C, sub_zero,
+        map_add (f := _), map_mul, minpoly.aeval, zero_mul, add_zero]
+      at this
     rw [← this]
     simp
   have hnP : (n : 𝓞 M) ∉ P := by
@@ -98,8 +106,7 @@ theorem isUnramifiedAt_of_pow_eq {n : ℕ} (a : Kˣ) {α : M} (hα : α ^ n = al
   have hyP : y ∉ P := by
     intro h
     apply hbv
-    have : algebraMap (𝓞 K) (𝓞 M) b ∈ P :=
-      hyb ▸ Ideal.pow_mem_of_mem P h n (Nat.pos_of_ne_zero hn)
+    have : algebraMap (𝓞 K) (𝓞 M) b ∈ P := hyb ▸ Ideal.pow_mem_of_mem P h n (Nat.pos_of_ne_zero hn)
     rw [Ideal.LiesOver.over (P := P) (p := v.asIdeal), Ideal.under, Ideal.mem_comap]
     exact this
   have hfP : aeval y (derivative (minpoly (𝓞 K) y)) ∉ P := by
@@ -113,20 +120,24 @@ theorem isUnramifiedAt_of_pow_eq {n : ℕ} (a : Kˣ) {α : M} (hα : α ^ n = al
   intro hdvd
   exact hfP (Ideal.le_of_dvd hdvd hmem)
 
-theorem ramificationIdx_eq_one_of_pow_eq {n : ℕ} (a : Kˣ) {α : M}
-    (hα : α ^ n = algebraMap K M a) (hgen : IntermediateField.adjoin K {α} = ⊤)
-    (v : HeightOneSpectrum (𝓞 K)) (hnv : (n : 𝓞 K) ∉ v.asIdeal)
-    (hav : (n : ℤ) ∣ WithZero.log (v.valuation K (a : K)))
-    (P : Ideal (𝓞 M)) [P.IsPrime] [P.LiesOver v.asIdeal] :
-    P.ramificationIdx (𝓞 K) = 1 := by
+theorem ramificationIdx_eq_one_of_pow_eq
+    {n : ℕ}
+    (a : Kˣ)
+    {α : M} (hα : α ^ n = algebraMap K M a) (hgen : IntermediateField.adjoin K {α} = ⊤)
+    (v : HeightOneSpectrum (𝓞 K))
+    (hnv : (n : 𝓞 K) ∉ v.asIdeal) (hav : (n : ℤ) ∣ WithZero.log (v.valuation K (a : K)))
+    (P : Ideal (𝓞 M)) [P.IsPrime] [P.LiesOver v.asIdeal]
+    : P.ramificationIdx (𝓞 K) = 1 := by
   have := isUnramifiedAt_of_pow_eq a hα hgen v hnv hav P
   exact Ideal.ramificationIdx_eq_one_of_isUnramifiedAt
 
-theorem isUnramifiedIn_of_pow_eq {n : ℕ} (a : Kˣ) {α : M}
-    (hα : α ^ n = algebraMap K M a) (hgen : IntermediateField.adjoin K {α} = ⊤)
-    (v : HeightOneSpectrum (𝓞 K)) (hnv : (n : 𝓞 K) ∉ v.asIdeal)
-    (hav : (n : ℤ) ∣ WithZero.log (v.valuation K (a : K))) :
-    Algebra.IsUnramifiedIn (𝓞 M) v.asIdeal := fun P _ _ =>
+theorem isUnramifiedIn_of_pow_eq
+    {n : ℕ}
+    (a : Kˣ)
+    {α : M} (hα : α ^ n = algebraMap K M a) (hgen : IntermediateField.adjoin K {α} = ⊤)
+    (v : HeightOneSpectrum (𝓞 K))
+    (hnv : (n : 𝓞 K) ∉ v.asIdeal) (hav : (n : ℤ) ∣ WithZero.log (v.valuation K (a : K)))
+    : Algebra.IsUnramifiedIn (𝓞 M) v.asIdeal := fun P _ _ =>
   isUnramifiedAt_of_pow_eq a hα hgen v hnv hav P
 
 end Kummer

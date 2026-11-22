@@ -17,10 +17,12 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem zhat_int {Λ : Submodule (𝓞 D.host.E) (VS D).V} (hun : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ)
+theorem zhat_int
+    {Λ : Submodule (𝓞 D.host.E) (VS D).V}
+    (hun : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ)
     {T T' : D.host.E} (F : FlagG (VS D) D.R.rS T) (F' : FlagG (VS D) D.R.rS T')
-    (hF : ∀ b, F.fvec b ∈ Λ) (hF' : ∀ b, F'.fvec b ∈ Λ) :
-    ∃ FinalForm : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) (𝓞 D.host.E),
+    (hF : ∀ b, F.fvec b ∈ Λ) (hF' : ∀ b, F'.fvec b ∈ Λ)
+    : ∃ FinalForm : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) (𝓞 D.host.E),
       Zhat F F' = FinalForm.map (algebraMap (𝓞 D.host.E) D.host.E) := by
   have hmem : ∀ a b, ∃ o : 𝓞 D.host.E, algebraMap (𝓞 D.host.E) D.host.E o = Zhat F F' a b := by
     intro a b
@@ -35,15 +37,22 @@ theorem zhat_int {Λ : Submodule (𝓞 D.host.E) (VS D).V} (hun : Formalism.Herm
   choose FinalForm hZo using hmem
   exact ⟨Matrix.of FinalForm, by ext a b; exact (hZo a b).symm⟩
 
-theorem yv_mem {Λ : Submodule (𝓞 D.host.E) (VS D).V} (hun : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ)
-    (n : ℕ) {T' : D.host.E} (F : FlagG (VS D) D.R.rS (n : D.host.E)) (F' : FlagG (VS D) D.R.rS T')
-    (hF : ∀ b, F.fvec b ∈ Λ) (hF' : ∀ b, F'.fvec b ∈ Λ) : NormalVectorPairings.yv F F' ∈ Λ := by
+theorem yv_mem
+    {Λ : Submodule (𝓞 D.host.E) (VS D).V}
+    (hun : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ)
+    (n : ℕ)
+    {T' : D.host.E}
+    (F : FlagG (VS D) D.R.rS (n : D.host.E)) (F' : FlagG (VS D) D.R.rS T')
+    (hF : ∀ b, F.fvec b ∈ Λ) (hF' : ∀ b, F'.fvec b ∈ Λ)
+    : NormalVectorPairings.yv F F' ∈ Λ := by
   obtain ⟨FinalForm, hZo⟩ := zhat_int hun F F' hF hF'
   have hadj : (Zhat F F').adjugate = FinalForm.adjugate.map (algebraMap (𝓞 D.host.E) D.host.E) := by
     rw [hZo]
     exact (RingHom.map_adjugate _ _).symm
-  have hD : Dl F F' (D.R.rS + 1) = algebraMap (𝓞 D.host.E) D.host.E
-      ((FinalForm.submatrix (Fin.castLE le_rfl) (Fin.castLE le_rfl)).det) := by
+  have hD
+      : Dl F F' (D.R.rS + 1)
+        = algebraMap (𝓞 D.host.E) D.host.E
+          ((FinalForm.submatrix (Fin.castLE le_rfl) (Fin.castLE le_rfl)).det) := by
     unfold Dl leadMinorE
     rw [dite_eq_left le_rfl, hZo, Matrix.submatrix_map, RingHom.map_det]
     rfl
@@ -58,8 +67,8 @@ theorem yv_mem {Λ : Submodule (𝓞 D.host.E) (VS D).V} (hun : Formalism.Hermit
     rw [hz]
     exact Λ.smul_mem _ (hF _)
 
-theorem yv_orth_X {T T' : D.host.E} (F : FlagG (VS D) D.R.rS T) (F' : FlagG (VS D) D.R.rS T') :
-    ∀ x ∈ F.X, brS (VS D) (NormalVectorPairings.yv F F') x = 0 := by
+theorem yv_orth_X {T T' : D.host.E} (F : FlagG (VS D) D.R.rS T) (F' : FlagG (VS D) D.R.rS T')
+    : ∀ x ∈ F.X, brS (VS D) (NormalVectorPairings.yv F F') x = 0 := by
   have key : ∀ a : Fin D.R.rS, (VS D).hT (F.e a) (NormalVectorPairings.yv F F') = 0 := by
     intro a
     have hz : ∀ b, (VS D).hT (F.e a) (F'.fvec b) = Zhat F F' a.castSucc b := by
@@ -72,12 +81,15 @@ theorem yv_orth_X {T T' : D.host.E} (F : FlagG (VS D) D.R.rS T) (F' : FlagG (VS 
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_add (f := _), map_smul, map_smul, F.z_orth a, smul_zero, add_zero, map_sum]
     simp only [map_smul, smul_eq_mul, hz]
-    rw [show ∑ b, (Zhat F F').adjugate b (Fin.last D.R.rS) * Zhat F F' a.castSucc b =
-        ∑ b, Zhat F F' a.castSucc b * (Zhat F F').adjugate b (Fin.last D.R.rS) from
-      Finset.sum_congr rfl fun b _ => mul_comm _ _, hm, mul_zero]
+    rw [show ∑ b, (Zhat F F').adjugate b (Fin.last D.R.rS) * Zhat F F' a.castSucc b
+          = ∑ b, Zhat F F' a.castSucc b * (Zhat F F').adjugate b (Fin.last D.R.rS) from
+        Finset.sum_congr rfl fun b _ => mul_comm _ _,
+      hm, mul_zero]
   intro x hx
   simp only [brS]
-  refine Submodule.span_induction (p := fun y _ => (VS D).hT y (NormalVectorPairings.yv F F') = 0) ?_ ?_ ?_ ?_ hx
+  refine Submodule.span_induction
+    (p := fun y _ => (VS D).hT y (NormalVectorPairings.yv F F') = 0)
+    ?_ ?_ ?_ ?_ hx
   · rintro _ ⟨a, rfl⟩
     exact key a
   · simp
@@ -86,7 +98,8 @@ theorem yv_orth_X {T T' : D.host.E} (F : FlagG (VS D) D.R.rS T) (F' : FlagG (VS 
   · intro c y _ hy
     simp [hy]
 
-theorem X_iso {T : D.host.E} (F : FlagG (VS D) D.R.rS T) : ∀ x ∈ F.X, ∀ x' ∈ F.X, brS (VS D) x x' = 0 := by
+theorem X_iso {T : D.host.E} (F : FlagG (VS D) D.R.rS T)
+    : ∀ x ∈ F.X, ∀ x' ∈ F.X, brS (VS D) x x' = 0 := by
   intro x hx x' hx'
   simp only [brS]
   refine Submodule.span_induction (p := fun y _ => (VS D).hT y x = 0) ?_ ?_ ?_ ?_ hx'
@@ -105,12 +118,12 @@ theorem X_iso {T : D.host.E} (F : FlagG (VS D) D.R.rS T) : ∀ x ∈ F.X, ∀ x'
   · intro c y _ hy
     simp [hy]
 
-theorem abs_norm_TG (n : ℕ) (g : D.host.E) :
-    |((Algebra.norm ℚ ((n : D.host.E) * g) : ℚ) : ℝ)| =
-      (n : ℝ) ^ (2 * D.R.f) * (∏ w : InfinitePlace D.host.E, w g) ^ 2 := by
+theorem abs_norm_TG (n : ℕ) (g : D.host.E)
+    : |((Algebra.norm ℚ ((n : D.host.E) * g) : ℚ) : ℝ)|
+      = (n : ℝ) ^ (2 * D.R.f) * (∏ w : InfinitePlace D.host.E, w g) ^ 2 := by
   have hc : ∀ w : InfinitePlace D.host.E, w.mult = 2 := by
     intro w
-    have hnr : ¬ w.IsReal := by
+    have hnr : ¬w.IsReal := by
       intro hw
       have hr := InfinitePlace.isReal_iff.mp hw
       have h2 : starRingEnd ℂ (w.embedding D.host.sqq) = w.embedding D.host.sqq :=
@@ -121,7 +134,8 @@ theorem abs_norm_TG (n : ℕ) (g : D.host.E) :
       rw [← h3, map_neg, map_natCast] at h1
       have h4 := congrArg Complex.re h1
       simp only [pow_two, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, mul_zero, sub_zero,
-        Complex.neg_re, Complex.natCast_re] at h4
+          Complex.neg_re, Complex.natCast_re]
+        at h4
       have hq0 : 0 < D.host.q := by have := D.host.qd_big.1; omega
       have hq : (0 : ℝ) < D.host.q := by exact_mod_cast hq0
       nlinarith [mul_self_nonneg (w.embedding D.host.sqq).re]

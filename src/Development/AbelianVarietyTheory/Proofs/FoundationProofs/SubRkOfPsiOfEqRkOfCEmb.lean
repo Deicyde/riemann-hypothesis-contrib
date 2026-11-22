@@ -29,12 +29,11 @@ def trivialFlagPair (d r : ℕ) : DV.FPair (trivialIntersectionTheory d) r where
   x := fun _ => ()
   x' := fun _ => ()
   Dv := fun _ => 0
-  hx := fun _ => by
-    rw [map_zero, sub_zero]
+  hx := fun _ => by rw [map_zero, sub_zero]
 
-theorem sub_rkOf_psiOf_eq_rkOf_cEmb (D : D7) (p : ℕ) [Fact p.Prime] (jc : DV.KW p →+* ℂ)
-    (N j : ℕ) (hj : j ≤ N) (τ : DV.Emb D p) :
-    N - DV.rkOf (DV.PsiOf D jc) N j τ = DV.rkOf (DV.PsiOf D jc) N j (DV.cEmb D τ) := by
+theorem sub_rkOf_psiOf_eq_rkOf_cEmb
+    (D : D7) (p : ℕ) [Fact p.Prime] (jc : DV.KW p →+* ℂ) (N j : ℕ) (hj : j ≤ N) (τ : DV.Emb D p)
+    : N - DV.rkOf (DV.PsiOf D jc) N j τ = DV.rkOf (DV.PsiOf D jc) N j (DV.cEmb D τ) := by
   have h := Formalism.L2.Geo.cm_type_meets_conjugate_pair p jc τ
   unfold DV.rkOf
   by_cases hτ : τ ∈ DV.PsiOf D jc
@@ -45,8 +44,9 @@ theorem sub_rkOf_psiOf_eq_rkOf_cEmb (D : D7) (p : ℕ) [Fact p.Prime] (jc : DV.K
     rw [if_neg hτ, if_pos hc]
     omega
 
-def trivialAdmissibleModel (D : D7) (p : ℕ) [Fact p.Prime] (jc : DV.KW p →+* ℂ)
-    (N j : ℕ) (hj : j ≤ N) : DV.Mdl D p N (DV.rkOf (DV.PsiOf D jc) N j) where
+def trivialAdmissibleModel
+    (D : D7) (p : ℕ) [Fact p.Prime] (jc : DV.KW p →+* ℂ) (N j : ℕ) (hj : j ≤ N)
+    : DV.Mdl D p N (DV.rkOf (DV.PsiOf D jc) N j) where
   Z := trivialIntersectionTheory (Formalism.DegreeFormula.dimFl D.what₂.Tau N + 1)
   cov := 1
   cov_pos := Nat.one_pos
@@ -60,10 +60,10 @@ def trivialAdmissibleModel (D : D7) (p : ℕ) [Fact p.Prime] (jc : DV.KW p →+*
   dim_eq := rfl
   omW_dual := ⟨Equiv.refl _, fun _ => neg_zero.symm⟩
 
-theorem nonempty_admissibleModel :
-    ∀ (D : D7) (p : ℕ) [Fact p.Prime] (jc : DV.KW p →+* ℂ) (N j : ℕ), j ≤ N →
-      Nonempty (DV.Mdl D p N (DV.rkOf (DV.PsiOf D jc) N j)) :=
-  fun D p _ jc N j hj => ⟨trivialAdmissibleModel D p jc N j hj⟩
+theorem nonempty_admissibleModel
+    : ∀ (D : D7) (p : ℕ) [Fact p.Prime] (jc : DV.KW p →+* ℂ) (N j : ℕ),
+      j ≤ N → Nonempty (DV.Mdl D p N (DV.rkOf (DV.PsiOf D jc) N j)) := fun D p _ jc N j hj =>
+  ⟨trivialAdmissibleModel D p jc N j hj⟩
 
 end GlobalTheory
 

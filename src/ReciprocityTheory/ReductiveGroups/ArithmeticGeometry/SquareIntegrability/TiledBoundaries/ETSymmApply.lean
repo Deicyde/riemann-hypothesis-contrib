@@ -20,33 +20,34 @@ def eT (X : PT E) (n : ℕ) : (Fin n → Vsp X.dim) ≃ₗ[ℂ] EuclideanSpace �
   left_inv v := rfl
   right_inv w := rfl
 
-theorem eT_apply (X : PT E) (n : ℕ) (v : Fin n → Vsp X.dim) (p : Fin n × Idx X.dim) :
-    eT X n v p = v p.1 p.2 := rfl
+theorem eT_apply (X : PT E) (n : ℕ) (v : Fin n → Vsp X.dim) (p : Fin n × Idx X.dim)
+    : eT X n v p = v p.1 p.2 :=
+  rfl
 
-theorem Hf_eT (X : PT E) (n : ℕ) (v w : Fin n → Vsp X.dim) :
-    Hf (eT X n v) (eT X n w) = HC v w := by
+theorem Hf_eT (X : PT E) (n : ℕ) (v w : Fin n → Vsp X.dim) : Hf (eT X n v) (eT X n w) = HC v w := by
   simp only [Hf, HC, eT_apply]
   rw [Fintype.sum_prod_type]
 
-theorem card_eq (X : PT E) (n : ℕ) :
-    Fintype.card (Σ _ : Fin n, Fin (2 * Fintype.card (Idx X.dim))) =
-      2 * Fintype.card (Fin n × Idx X.dim) := by
+theorem card_eq (X : PT E) (n : ℕ)
+    : Fintype.card (Σ _ : Fin n, Fin (2 * Fintype.card (Idx X.dim)))
+      = 2 * Fintype.card (Fin n × Idx X.dim) := by
   simp only [Fintype.card_sigma, Fintype.card_prod, Fintype.card_fin, Finset.sum_const,
     Finset.card_univ, smul_eq_mul]
   ring
 
-def bT (X : PT E) (n : ℕ) :
-    Basis (Fin (2 * Fintype.card (Fin n × Idx X.dim))) ℝ (EuclideanSpace ℂ (Fin n × Idx X.dim)) :=
+def bT (X : PT E) (n : ℕ)
+    : Basis (Fin (2 * Fintype.card (Fin n × Idx X.dim))) ℝ (EuclideanSpace ℂ (Fin n × Idx X.dim)) :=
   ((Bn X n).map ((eT X n).restrictScalars ℝ)).reindex (Fintype.equivFinOfCardEq (card_eq X n))
 
-theorem bT_repr (X : PT E) (n : ℕ) (w : EuclideanSpace ℂ (Fin n × Idx X.dim))
-    (j : Fin (2 * Fintype.card (Fin n × Idx X.dim))) :
-    (bT X n).repr w j =
-      (Bn X n).repr ((eT X n).symm w) ((Fintype.equivFinOfCardEq (card_eq X n)).symm j) := by
+theorem bT_repr
+    (X : PT E) (n : ℕ)
+    (w : EuclideanSpace ℂ (Fin n × Idx X.dim)) (j : Fin (2 * Fintype.card (Fin n × Idx X.dim)))
+    : (bT X n).repr w j
+      = (Bn X n).repr ((eT X n).symm w) ((Fintype.equivFinOfCardEq (card_eq X n)).symm j) := by
   simp [bT, Basis.map_repr]
 
-theorem mem_latT (X : PT E) (n : ℕ) (w : EuclideanSpace ℂ (Fin n × Idx X.dim)) :
-    w ∈ lat (bT X n) ↔ ∀ k, (eT X n).symm w k ∈ X.L := by
+theorem mem_latT (X : PT E) (n : ℕ) (w : EuclideanSpace ℂ (Fin n × Idx X.dim))
+    : w ∈ lat (bT X n) ↔ ∀ k, (eT X n).symm w k ∈ X.L := by
   rw [lat, Basis.mem_span_iff_repr_mem]
   simp only [bT_repr]
   constructor
@@ -62,8 +63,8 @@ theorem mem_latT (X : PT E) (n : ℕ) (w : EuclideanSpace ℂ (Fin n × Idx X.di
     rw [PT.L, lat, Basis.mem_span_iff_repr_mem] at hk
     simpa [Bn, Pi.basis_repr] using hk i
 
-theorem single_mem (X : PT E) (n : ℕ) (k : Fin n) {l : Vsp X.dim} (hl : l ∈ X.L) :
-    eT X n (Pi.single k l) ∈ lat (bT X n) := by
+theorem single_mem (X : PT E) (n : ℕ) (k : Fin n) {l : Vsp X.dim} (hl : l ∈ X.L)
+    : eT X n (Pi.single k l) ∈ lat (bT X n) := by
   rw [mem_latT, LinearEquiv.symm_apply_apply]
   intro k'
   by_cases h : k' = k
@@ -85,9 +86,11 @@ def YT (X : PT E) (n q : ℕ) : GT (Fin n × Idx X.dim) where
   perfect := by
     intro φ
     let incl : Fin n → (X.L →+ lat (bT X n)) := fun k =>
-      AddMonoidHom.mk' (fun l => ⟨eT X n (Pi.single k l), single_mem X n k l.2⟩) (fun a b => by
-        apply Subtype.ext
-        simp [Pi.single_add])
+      AddMonoidHom.mk'
+        (fun l => ⟨eT X n (Pi.single k l), single_mem X n k l.2⟩)
+        (fun a b => by
+          apply Subtype.ext
+          simp [Pi.single_add])
     choose x hxL hx using fun k => X.perfect (φ.comp (incl k))
     refine ⟨eT X n x, ?_, ?_⟩
     · rw [mem_latT, LinearEquiv.symm_apply_apply]
@@ -98,14 +101,15 @@ def YT (X : PT E) (n q : ℕ) : GT (Fin n × Idx X.dim) where
         apply Subtype.ext
         simp only [incl, AddMonoidHom.mk'_apply, Submodule.coe_sum]
         set_option synthInstance.maxHeartbeats 100000 in
-          rw [← map_sum, Finset.univ_sum_single, LinearEquiv.apply_symm_apply]
+        rw [← map_sum, Finset.univ_sum_single, LinearEquiv.apply_symm_apply]
       have hL : ((φ y : ℤ) : ℝ) = ∑ k, (((φ.comp (incl k)) ⟨(eT X n).symm y k, hy k⟩ : ℤ) : ℝ) := by
         conv_lhs => rw [hdec]
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_sum, Int.cast_sum]
         rfl
-      have hR : (Hf (eT X n x) (y : EuclideanSpace ℂ (Fin n × Idx X.dim))).im =
-          ∑ k, (Hf (x k) ((eT X n).symm y k)).im := by
+      have hR
+          : (Hf (eT X n x) (y : EuclideanSpace ℂ (Fin n × Idx X.dim))).im
+            = ∑ k, (Hf (x k) ((eT X n).symm y k)).im := by
         conv_lhs => rw [← (eT X n).apply_symm_apply (y : EuclideanSpace ℂ (Fin n × Idx X.dim))]
         rw [Hf_eT, HC, Complex.im_sum]
       rw [hL, hR]
@@ -113,11 +117,14 @@ def YT (X : PT E) (n q : ℕ) : GT (Fin n × Idx X.dim) where
   ka := fun γ => (∏ k, (X.eps ((eT X n).symm γ k) : ℂ)) ^ q
   ka_abs := fun x hx => by rw [norm_pow, nA_epsprod_norm X ((mem_latT X n x).mp hx), one_pow]
 
-theorem sec_map (X : PT E) {q n : ℕ} {F : (Fin n → Vsp X.dim) → ℂ} (hF : F ∈ X.Sec q n) :
-    (fun w => F ((eT X n).symm w)) ∈ (YT X n q).Sec q := by
-  refine ⟨hF.1.comp (LinearMap.toContinuousLinearMap
-    ((eT X n).symm : EuclideanSpace ℂ (Fin n × Idx X.dim) →ₗ[ℂ] (Fin n → Vsp X.dim))).differentiable,
-    fun γ hγ v => ?_⟩
+theorem sec_map (X : PT E) {q n : ℕ} {F : (Fin n → Vsp X.dim) → ℂ} (hF : F ∈ X.Sec q n)
+    : (fun w => F ((eT X n).symm w)) ∈ (YT X n q).Sec q := by
+  refine ⟨
+    hF.1.comp (LinearMap.toContinuousLinearMap
+      ((eT X n).symm
+        : EuclideanSpace ℂ (Fin n × Idx X.dim) →ₗ[ℂ] (Fin n → Vsp X.dim))).differentiable,
+    fun γ hγ v => ?_
+  ⟩
   have hγ' := (mem_latT X n γ).mp hγ
   show F ((eT X n).symm (v + γ)) = (∏ k, (X.eps ((eT X n).symm γ k) : ℂ)) ^ q *
     cexp (q * Real.pi * Hf v γ + q * Real.pi * Hf γ γ / 2) * F ((eT X n).symm v)
@@ -145,11 +152,11 @@ theorem stepD : StepD := by
   obtain ⟨hfd, hr⟩ := dim (Fin n × Idx X.dim) (YT X n q) q hq
   have hinj := secMap_inj X q n
   refine ⟨Module.Finite.of_injective (secMap X q n) hinj, ?_⟩
-  calc Module.finrank ℂ (X.Sec q n) ≤ Module.finrank ℂ ((YT X n q).Sec q) :=
-        LinearMap.finrank_le_finrank_of_injective hinj
+  calc
+    Module.finrank ℂ (X.Sec q n)
+      ≤ Module.finrank ℂ ((YT X n q).Sec q) := LinearMap.finrank_le_finrank_of_injective hinj
     _ ≤ q ^ Fintype.card (Fin n × Idx X.dim) := hr
-    _ = q ^ (Fintype.card (Idx X.dim) * n) := by
-        rw [Fintype.card_prod, Fintype.card_fin, mul_comm]
+    _ = q ^ (Fintype.card (Idx X.dim) * n) := by rw [Fintype.card_prod, Fintype.card_fin, mul_comm]
 
 end
 

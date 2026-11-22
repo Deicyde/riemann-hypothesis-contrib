@@ -8,13 +8,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Matched
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory.PinchLift
 
-theorem exists_gen_away_of_closed : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z), IsPullback i' p' p i → IsAffineHom p → IsClosedImmersion i → GlobalTheory.PinchLift.Glues p i i' p' → ∀ (L' : LB X'), L'.IsLB → ∀ x : X, (∀ z : Z, i z ≠ x) → ∃ (W : X.Opens) (s' : ∀ k, Γ(X', L'.U k ⊓ p ⁻¹ᵁ W)ˣ), x ∈ W ∧ i ⁻¹ᵁ W = ⊥ ∧ GlobalTheory.PinchLift.GenOn L' (p ⁻¹ᵁ W) s' := by
+theorem exists_gen_away_of_closed
+    : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z),
+      IsPullback i' p' p i → IsAffineHom p → IsClosedImmersion i
+        → GlobalTheory.PinchLift.Glues p i i' p'
+        → ∀ (L' : LB X'),
+          L'.IsLB
+            → ∀ x : X,
+              (∀ z : Z, i z ≠ x)
+                → ∃ (W : X.Opens) (s' : ∀ k, Γ(X', L'.U k ⊓ p ⁻¹ᵁ W)ˣ),
+                  x ∈ W ∧ i ⁻¹ᵁ W = ⊥ ∧ GlobalTheory.PinchLift.GenOn L' (p ⁻¹ᵁ W) s' := by
   intro X X' Z Z' p i i' p' _ hp hi hG L' hL x hx
   let U : X.Opens := ⟨(Set.range i)ᶜ, i.isClosedEmbedding.isClosed_range.isOpen_compl⟩
   have hxU : x ∈ U := by rintro ⟨z, rfl⟩; exact hx z rfl
@@ -25,7 +37,8 @@ theorem exists_gen_away_of_closed : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) 
   have hsZ : Subsingleton Γ(Z, i ⁻¹ᵁ V) := by rw [hbot]; infer_instance
   have hbot' : i' ⁻¹ᵁ (p ⁻¹ᵁ V) ⊓ p' ⁻¹ᵁ (i ⁻¹ᵁ V) = ⊥ :=
     eq_bot_iff.2 fun z hz => (hVU (show i (p' z) ∈ V from hz.2) ⟨p' z, rfl⟩).elim
-  have hsZ' : Subsingleton Γ(Z', i' ⁻¹ᵁ (p ⁻¹ᵁ V) ⊓ p' ⁻¹ᵁ (i ⁻¹ᵁ V)) := by rw [hbot']; infer_instance
+  have hsZ' : Subsingleton Γ(Z', i' ⁻¹ᵁ (p ⁻¹ᵁ V) ⊓ p' ⁻¹ᵁ (i ⁻¹ᵁ V)) := by
+    rw [hbot']; infer_instance
   have hbij : Function.Bijective (p.app V).hom := by
     constructor
     · intro s t hst
@@ -47,15 +60,18 @@ theorem exists_gen_away_of_closed : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) 
   have hWV : W ≤ V := by
     intro z hz
     obtain ⟨w, -, rfl⟩ := (hmemW z).1 hz
-    rw [hg]; exact w.2
+    rw [hg]
+    exact w.2
   have hWk : p ⁻¹ᵁ W ≤ L'.U k₀ := by
     intro x'' hx''
     obtain ⟨w, hw, hwe⟩ := (hmemW _).1 hx''
     have hv : x'' ∈ p ⁻¹ᵁ V := hWV hx''
     have : (⟨x'', hv⟩ : (p ⁻¹ᵁ V).toScheme) = w :=
       (p ∣_ V ≫ V.ι).isOpenEmbedding.injective (by rw [hwe]; exact hg _)
-    rw [← this] at hw; exact hw
-  refine ⟨W, fun k => res (le_inf inf_le_left (inf_le_right.trans hWk)) (L'.g k k₀), hxW, hiV hWV, ?_⟩
+    rw [← this] at hw
+    exact hw
+  refine
+    ⟨W, fun k => res (le_inf inf_le_left (inf_le_right.trans hWk)) (L'.g k k₀), hxW, hiV hWV, ?_⟩
   intro k l z hk hl hz
   have hz0 : z ∈ L'.U k₀ := hWk hz
   rw [gm_res (𝟙 X') z _ (show z ∈ L'.U k ⊓ p ⁻¹ᵁ W from ⟨hk, hz⟩),

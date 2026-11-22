@@ -18,9 +18,11 @@ namespace GlobalTheory.SemiAbelianCompare
 
 section General
 
-theorem geometricallyConnected_of_isAlgClosed {X S : Scheme.{u}} (f : X ⟶ S)
+theorem geometricallyConnected_of_isAlgClosed
+    {X S : Scheme.{u}} (f : X ⟶ S)
     (h : ∀ (k : Type u) [Field k] [IsAlgClosed k] (s : Spec (CommRingCat.of k) ⟶ S),
-      ConnectedSpace ↥(pullback f s)) : GeometricallyConnected f := by
+      ConnectedSpace ↥(pullback f s))
+    : GeometricallyConnected f := by
   refine ⟨geometrically_iff_of_isClosedUnderIsomorphisms.mpr fun K _ y => ?_⟩
   let b : Spec (CommRingCat.of (AlgebraicClosure K)) ⟶ Spec (CommRingCat.of K) :=
     Spec.map (CommRingCat.ofHom (algebraMap K (AlgebraicClosure K)))
@@ -33,7 +35,9 @@ end General
 
 section Exact
 
-variable {S : Scheme.{u}} {X : Type u} [AddCommGroup X] {G B : Over S} [GrpObj G] [GrpObj B]
+variable
+  {S : Scheme.{u}} {X : Type u} [AddCommGroup X]
+  {G B : Over S} [GrpObj G] [GrpObj B]
   {i : Semi.splitTorus S X ⟶ G} {q : G ⟶ B}
 
 end Exact
@@ -41,7 +45,6 @@ end Exact
 section Field
 
 variable {k : Type u} [Field k] {G : Over (Spec (CommRingCat.of k))} [GrpObj G]
-
 
 end Field
 

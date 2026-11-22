@@ -8,27 +8,26 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.RingOfI
 
 @[expose] public section
 
-open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk GlobalTheory.Mem
+open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk
+  GlobalTheory.Mem
 open scoped Classical
 
 namespace GlobalTheory.Hk.RayForm
 
 open GlobalTheory.Mem.PartialZeta
 
-theorem exists_qForm (f₁ f₂ x₀ : ℂ) (N : ℝ) (hN : N ≠ 0) (hA : ((starRingEnd ℂ) f₁ * f₂).im ≠ 0) :
-    ∃ l θ₁ θ₂ : ℝ, ∀ v : ℤ × ℤ,
-      qForm (‖f₁‖ ^ 2 / N) (((starRingEnd ℂ) f₁ * f₂).im ^ 2 / (‖f₁‖ ^ 2 * N)) l θ₁ θ₂ v =
-        ‖x₀ + (v.1 * f₁ + v.2 * f₂)‖ ^ 2 / N := by
+theorem exists_qForm (f₁ f₂ x₀ : ℂ) (N : ℝ) (hN : N ≠ 0) (hA : ((starRingEnd ℂ) f₁ * f₂).im ≠ 0)
+    : ∃ l θ₁ θ₂ : ℝ, ∀ v : ℤ × ℤ,
+      qForm (‖f₁‖ ^ 2 / N) (((starRingEnd ℂ) f₁ * f₂).im ^ 2 / (‖f₁‖ ^ 2 * N)) l θ₁ θ₂ v
+        = ‖x₀ + (v.1 * f₁ + v.2 * f₂)‖ ^ 2 / N := by
   have hf : f₁ ≠ 0 := by
     rintro rfl
     simp at hA
-  have e1 : ((starRingEnd ℂ) f₁ * f₂).re = f₁.re * f₂.re + f₁.im * f₂.im := by
-    simp [Complex.mul_re]
+  have e1 : ((starRingEnd ℂ) f₁ * f₂).re = f₁.re * f₂.re + f₁.im * f₂.im := by simp [Complex.mul_re]
   have e2 : ((starRingEnd ℂ) f₁ * f₂).im = f₁.re * f₂.im - f₁.im * f₂.re := by
     simp [Complex.mul_im]
     ring
-  have e3 : ((starRingEnd ℂ) f₁ * x₀).re = f₁.re * x₀.re + f₁.im * x₀.im := by
-    simp [Complex.mul_re]
+  have e3 : ((starRingEnd ℂ) f₁ * x₀).re = f₁.re * x₀.re + f₁.im * x₀.im := by simp [Complex.mul_re]
   have e4 : ((starRingEnd ℂ) f₁ * x₀).im = f₁.re * x₀.im - f₁.im * x₀.re := by
     simp [Complex.mul_im]
     ring
@@ -38,10 +37,15 @@ theorem exists_qForm (f₁ f₂ x₀ : ℂ) (N : ℝ) (hN : N ≠ 0) (hA : ((sta
   have hS : f₁.re ^ 2 + f₁.im ^ 2 ≠ 0 := by
     rw [← e5]
     exact pow_ne_zero 2 (norm_ne_zero_iff.mpr hf)
-  refine ⟨((starRingEnd ℂ) f₁ * f₂).re / ‖f₁‖ ^ 2, ((starRingEnd ℂ) f₁ * x₀).re / ‖f₁‖ ^ 2,
-    ((starRingEnd ℂ) f₁ * x₀).im / ((starRingEnd ℂ) f₁ * f₂).im, fun v => ?_⟩
-  have e6 : ‖x₀ + ((v.1 : ℂ) * f₁ + (v.2 : ℂ) * f₂)‖ ^ 2 =
-      (x₀.re + v.1 * f₁.re + v.2 * f₂.re) ^ 2 + (x₀.im + v.1 * f₁.im + v.2 * f₂.im) ^ 2 := by
+  refine ⟨
+    ((starRingEnd ℂ) f₁ * f₂).re / ‖f₁‖ ^ 2,
+    ((starRingEnd ℂ) f₁ * x₀).re / ‖f₁‖ ^ 2,
+    ((starRingEnd ℂ) f₁ * x₀).im / ((starRingEnd ℂ) f₁ * f₂).im,
+    fun v => ?_
+  ⟩
+  have e6
+      : ‖x₀ + ((v.1 : ℂ) * f₁ + (v.2 : ℂ) * f₂)‖ ^ 2
+        = (x₀.re + v.1 * f₁.re + v.2 * f₂.re) ^ 2 + (x₀.im + v.1 * f₁.im + v.2 * f₂.im) ^ 2 := by
     rw [Complex.sq_norm, Complex.normSq_apply]
     simp
     ring
@@ -51,17 +55,17 @@ theorem exists_qForm (f₁ f₂ x₀ : ℂ) (N : ℝ) (hN : N ≠ 0) (hA : ((sta
   field_simp
   ring
 
-theorem comb_injective (f₁ f₂ : ℂ) (hA : ((starRingEnd ℂ) f₁ * f₂).im ≠ 0) :
-    Function.Injective (fun v : ℤ × ℤ => (v.1 : ℂ) * f₁ + v.2 * f₂) := by
+theorem comb_injective (f₁ f₂ : ℂ) (hA : ((starRingEnd ℂ) f₁ * f₂).im ≠ 0)
+    : Function.Injective (fun v : ℤ × ℤ => (v.1 : ℂ) * f₁ + v.2 * f₂) := by
   have hf : f₁ ≠ 0 := by
     rintro rfl
     simp at hA
   have key : ∀ x y : ℤ, (x : ℂ) * f₁ + y * f₂ = 0 → x = 0 ∧ y = 0 := by
     intro x y h
-    have him : ((starRingEnd ℂ) f₁ * ((x : ℂ) * f₁ + y * f₂)).im =
-        y * ((starRingEnd ℂ) f₁ * f₂).im := by
-      simp only [Complex.mul_im, Complex.mul_re, Complex.add_re, Complex.add_im,
-        Complex.conj_re, Complex.conj_im, Complex.intCast_re, Complex.intCast_im]
+    have him
+        : ((starRingEnd ℂ) f₁ * ((x : ℂ) * f₁ + y * f₂)).im = y * ((starRingEnd ℂ) f₁ * f₂).im := by
+      simp only [Complex.mul_im, Complex.mul_re, Complex.add_re, Complex.add_im, Complex.conj_re,
+        Complex.conj_im, Complex.intCast_re, Complex.intCast_im]
       ring
     rw [h, mul_zero, Complex.zero_im] at him
     have hy : y = 0 := by
@@ -78,30 +82,41 @@ theorem comb_injective (f₁ f₂ : ℂ) (hA : ((starRingEnd ℂ) f₁ * f₂).i
   have := key (v.1 - w.1) (v.2 - w.2) (by push_cast; linear_combination hvw)
   exact Prod.ext (sub_eq_zero.mp this.1) (sub_eq_zero.mp this.2)
 
-theorem range_comb (f₁ f₂ : ℂ) :
-    Set.range (fun v : ℤ × ℤ => (v.1 : ℂ) * f₁ + v.2 * f₂) = (Submodule.span ℤ {f₁, f₂} : Submodule ℤ ℂ) := by
+theorem range_comb (f₁ f₂ : ℂ)
+    : Set.range (fun v : ℤ × ℤ => (v.1 : ℂ) * f₁ + v.2 * f₂)
+      = (Submodule.span ℤ {f₁, f₂} : Submodule ℤ ℂ) := by
   ext z
   simp only [Set.mem_range, SetLike.mem_coe, Submodule.mem_span_pair, zsmul_eq_mul, Prod.exists]
 
-theorem exists_equiv (f₁ f₂ e₁ e₂ : ℂ) (hf : ((starRingEnd ℂ) f₁ * f₂).im ≠ 0)
-    (he : ((starRingEnd ℂ) e₁ * e₂).im ≠ 0)
-    (h : Submodule.span ℤ {f₁, f₂} = Submodule.span ℤ {e₁, e₂}) :
-    ∃ σ : ℤ × ℤ ≃ ℤ × ℤ, ∀ v, (v.1 : ℂ) * f₁ + v.2 * f₂ = (σ v).1 * e₁ + (σ v).2 * e₂ := by
-  have hr : Set.range (fun v : ℤ × ℤ => (v.1 : ℂ) * f₁ + v.2 * f₂) =
-      Set.range (fun v : ℤ × ℤ => (v.1 : ℂ) * e₁ + v.2 * e₂) := by
+theorem exists_equiv
+    (f₁ f₂ e₁ e₂ : ℂ)
+    (hf : ((starRingEnd ℂ) f₁ * f₂).im ≠ 0) (he : ((starRingEnd ℂ) e₁ * e₂).im ≠ 0)
+    (h : Submodule.span ℤ {f₁, f₂} = Submodule.span ℤ {e₁, e₂})
+    : ∃ σ : ℤ × ℤ ≃ ℤ × ℤ, ∀ v, (v.1 : ℂ) * f₁ + v.2 * f₂ = (σ v).1 * e₁ + (σ v).2 * e₂ := by
+  have hr
+      : Set.range (fun v : ℤ × ℤ => (v.1 : ℂ) * f₁ + v.2 * f₂)
+        = Set.range (fun v : ℤ × ℤ => (v.1 : ℂ) * e₁ + v.2 * e₂) := by
     rw [range_comb, range_comb, h]
-  refine ⟨(Equiv.ofInjective _ (comb_injective f₁ f₂ hf)).trans
-    ((Set.equivOfEq hr).trans (Equiv.ofInjective _ (comb_injective e₁ e₂ he)).symm), fun v => ?_⟩
-  have key := Equiv.apply_ofInjective_symm (comb_injective e₁ e₂ he)
-    (Set.equivOfEq hr (Equiv.ofInjective _ (comb_injective f₁ f₂ hf) v))
+  refine ⟨
+    (Equiv.ofInjective _ (comb_injective f₁ f₂ hf)).trans
+      ((Set.equivOfEq hr).trans (Equiv.ofInjective _ (comb_injective e₁ e₂ he)).symm),
+    fun v => ?_
+  ⟩
+  have key :=
+    Equiv.apply_ofInjective_symm (comb_injective e₁ e₂ he)
+      (Set.equivOfEq hr (Equiv.ofInjective _ (comb_injective f₁ f₂ hf) v))
   simp only [Set.equivOfEq_apply, Equiv.ofInjective_apply] at key
   simp only [Equiv.trans_apply, Set.equivOfEq_apply, Equiv.ofInjective_apply]
   exact key.symm
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem unit_eq_one [_root_.NumberField.IsTotallyComplex K] (h2 : Module.finrank ℚ K = 2) {M : ℕ} (hM : 3 ≤ M)
-    (u : (𝓞 K)ˣ) (hu : (u : 𝓞 K) - 1 ∈ Ideal.span {(M : 𝓞 K)}) : u = 1 := by
+theorem unit_eq_one
+    [_root_.NumberField.IsTotallyComplex K]
+    (h2 : Module.finrank ℚ K = 2)
+    {M : ℕ} (hM : 3 ≤ M)
+    (u : (𝓞 K)ˣ) (hu : (u : 𝓞 K) - 1 ∈ Ideal.span {(M : 𝓞 K)})
+    : u = 1 := by
   let φ : K →+* ℂ := (Classical.arbitrary (InfinitePlace K)).embedding
   by_contra hne
   obtain ⟨t, ht⟩ := Ideal.mem_span_singleton'.mp hu
@@ -126,19 +141,23 @@ theorem unit_eq_one [_root_.NumberField.IsTotallyComplex K] (h2 : Module.finrank
     have h1 : ‖φ ((u : 𝓞 K) : K)‖ = 1 := by
       have := norm_nonneg (φ ((u : 𝓞 K) : K))
       nlinarith
-    calc ‖φ ((t : 𝓞 K) : K)‖ * M = ‖φ ((u : 𝓞 K) : K) - 1‖ := by
-          rw [he, norm_mul, Complex.norm_natCast]
+    calc
+      ‖φ ((t : 𝓞 K) : K)‖ * M
+        = ‖φ ((u : 𝓞 K) : K) - 1‖ := by rw [he, norm_mul, Complex.norm_natCast]
       _ ≤ ‖φ ((u : 𝓞 K) : K)‖ + ‖(1 : ℂ)‖ := norm_sub_le _ _
       _ = 2 := by rw [h1, norm_one]; norm_num
   have hM' : (3 : ℝ) ≤ M := by exact_mod_cast hM
   have hn := norm_nonneg (φ ((t : 𝓞 K) : K))
   nlinarith
 
-theorem exists_basis_im {d : ℕ} (hp : d.Prime) (hd : d % 4 = 3) {x : K} (hx : x ^ 2 = -(d : K))
-    (h2 : Module.finrank ℚ K = 2) (φ : K →+* ℂ) :
-    ∃ b : Module.Basis (Fin 2) ℤ (𝓞 K),
+theorem exists_basis_im
+    {d : ℕ} (hp : d.Prime) (hd : d % 4 = 3)
+    {x : K} (hx : x ^ 2 = -(d : K))
+    (h2 : Module.finrank ℚ K = 2) (φ : K →+* ℂ)
+    : ∃ b : Module.Basis (Fin 2) ℤ (𝓞 K),
       (starRingEnd ℂ (φ (b 0 : K)) * φ (b 1 : K)).im ^ 2 = d / 4 := by
-  obtain ⟨w, hw, hall⟩ := GlobalTheory.exists_integer_generator_of_sq_eq_neg h2 (Irreducible.squarefree hp) hd hx
+  obtain ⟨w, hw, hall⟩ :=
+    GlobalTheory.exists_integer_generator_of_sq_eq_neg h2 (Irreducible.squarefree hp) hd hx
   have hφx : φ x ^ 2 = -(d : ℂ) := by rw [← map_pow, hx]; simp
   have hφw : φ (w : K) = (1 + φ x) / 2 := by
     have := congrArg φ hw
@@ -171,25 +190,31 @@ theorem exists_basis_im {d : ℕ} (hp : d.Prime) (hd : d % 4 = 3) {x : K} (hx : 
     obtain ⟨m, n, hc⟩ := hall c
     have h1 : (1 : 𝓞 K) ∈ Submodule.span ℤ (Set.range ![(1 : 𝓞 K), w]) :=
       Submodule.subset_span ⟨0, rfl⟩
-    have h2' : w ∈ Submodule.span ℤ (Set.range ![(1 : 𝓞 K), w]) :=
-      Submodule.subset_span ⟨1, rfl⟩
+    have h2' : w ∈ Submodule.span ℤ (Set.range ![(1 : 𝓞 K), w]) := Submodule.subset_span ⟨1, rfl⟩
     have := Submodule.add_mem _ (Submodule.smul_mem _ m h1) (Submodule.smul_mem _ n h2')
     rw [hc]
     simpa [zsmul_eq_mul] using this
   refine ⟨Module.Basis.mk hli hsp, ?_⟩
-  have hbw : ((starRingEnd ℂ) (φ (((Module.Basis.mk hli hsp) 0 : 𝓞 K) : K)) *
-      φ (((Module.Basis.mk hli hsp) 1 : 𝓞 K) : K)).im = (φ (w : K)).im := by
+  have hbw
+      : ((starRingEnd ℂ) (φ (((Module.Basis.mk hli hsp) 0 : 𝓞 K) : K))
+          * φ (((Module.Basis.mk hli hsp) 1 : 𝓞 K) : K)).im
+        = (φ (w : K)).im := by
     simp [Module.Basis.mk_apply]
   rw [hbw]
   have hsq : (√(d : ℝ)) ^ 2 = d := Real.sq_sqrt (Nat.cast_nonneg _)
   rcases him with h | h <;> rw [h] <;> [skip; rw [neg_sq]] <;> rw [div_pow, hsq] <;> norm_num
 
-theorem aRay_eq_ncard_qForm : ∀ (K : Type) [Field K] [NumberField K] (d M : ℕ) (x : K), d.Prime → d % 4 = 3 → 100 ≤ d → x ^ 2 = -(d : K) → Module.finrank ℚ K = 2 → 3 ≤ M → ∀ D : RayData K M, ∀ g : D.G, ∃ α γ l θ₁ θ₂ : ℝ, 1 ≤ α ∧ 1 ≤ γ ∧ α * γ = d * (M : ℝ) ^ 4 / 4 ∧ (∀ v : ℤ × ℤ, ∃ n : ℕ, 1 ≤ n ∧ qForm α γ l θ₁ θ₂ v = n) ∧ ∀ n : ℕ, aRay D g n = (({v : ℤ × ℤ | qForm α γ l θ₁ θ₂ v = n}.ncard : ℕ) : ℝ) := by
+theorem aRay_eq_ncard_qForm
+    : ∀ (K : Type) [Field K] [NumberField K] (d M : ℕ) (x : K),
+      d.Prime → d % 4 = 3 → 100 ≤ d → x ^ 2 = -(d : K) → Module.finrank ℚ K = 2 → 3 ≤ M
+        → ∀ D : RayData K M, ∀ g : D.G, ∃ α γ l θ₁ θ₂ : ℝ,
+          1 ≤ α ∧ 1 ≤ γ ∧ α * γ = d * (M : ℝ) ^ 4 / 4
+            ∧ (∀ v : ℤ × ℤ, ∃ n : ℕ, 1 ≤ n ∧ qForm α γ l θ₁ θ₂ v = n)
+            ∧ ∀ n : ℕ, aRay D g n = (({v : ℤ × ℤ | qForm α γ l θ₁ θ₂ v = n}.ncard : ℕ) : ℝ) := by
   intro K _ _ d M x hp hd hd100 hx h2 hM D g
   obtain ⟨w, bar, hw, hwb, hall, hemb, φ, hφ⟩ :=
     GlobalTheory.ringOfIntegers_sqrt_neg_three_mod_four d (Irreducible.squarefree hp) hd K h2 x hx
-  have : IsTotallyComplex K :=
-    ⟨fun v => InfinitePlace.isComplex_iff.mpr (hemb v.embedding).1⟩
+  have : IsTotallyComplex K := ⟨fun v => InfinitePlace.isComplex_iff.mpr (hemb v.embedding).1⟩
   obtain ⟨b, hb⟩ := exists_basis_im hp hd hx h2 φ
   have hNnorm : Ideal.absNorm (Ideal.span {(M : 𝓞 K)}) = M ^ 2 := by
     have := normSq_eq h2 φ (M : 𝓞 K)
@@ -217,8 +242,8 @@ theorem aRay_eq_ncard_qForm : ∀ (K : Type) [Field K] [NumberField K] (d M : �
   have hNB0 : Ideal.span {(M : 𝓞 K)} * B ≠ ⊥ := by
     rw [Ne, Ideal.mul_eq_bot, not_or]
     exact ⟨hN0, hB0⟩
-  obtain ⟨E1, hE1⟩ := lattice_bij (Ideal.span {(M : 𝓞 K)}) B hBc
-    (Ideal.selfBasis b _ hNB0) x₀ hx₀B hx₀N
+  obtain ⟨E1, hE1⟩ :=
+    lattice_bij (Ideal.span {(M : 𝓞 K)}) B hBc (Ideal.selfBasis b _ hNB0) x₀ hx₀B hx₀N
   have hIm := abs_im_eq φ b _ (Ideal.selfBasis b _ hNB0)
   set e := Ideal.selfBasis b _ hNB0 with he_def
   set e₁ : ℂ := φ (((e 0 : 𝓞 K)) : K) with he₁
@@ -235,7 +260,8 @@ theorem aRay_eq_ncard_qForm : ∀ (K : Type) [Field K] [NumberField K] (d M : �
       rw [show (100 : ℝ) = 10 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]]
     exact Real.sqrt_le_sqrt (by exact_mod_cast hd100)
   have hsq : (√(d : ℝ)) ^ 2 = d := Real.sq_sqrt (Nat.cast_nonneg _)
-  have hImb : |((starRingEnd ℂ) (φ ((b 0 : 𝓞 K) : K)) * φ ((b 1 : 𝓞 K) : K)).im| = √(d : ℝ) / 2 := by
+  have hImb
+      : |((starRingEnd ℂ) (φ ((b 0 : 𝓞 K) : K)) * φ ((b 1 : 𝓞 K) : K)).im| = √(d : ℝ) / 2 := by
     rw [← Real.sqrt_sq_eq_abs, hb, Real.sqrt_div' _ (by norm_num : (0 : ℝ) ≤ 4),
       show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
   have hMr : (3 : ℝ) ≤ M := by exact_mod_cast hM
@@ -276,8 +302,7 @@ theorem aRay_eq_ncard_qForm : ∀ (K : Type) [Field K] [NumberField K] (d M : �
       rw [h0] at hyf
       simp at hyf
       exact hf₁ hyf.symm
-    have hdvd := Ideal.absNorm_dvd_absNorm_of_le
-      ((Ideal.span_singleton_le_iff_mem _).mpr hyB)
+    have hdvd := Ideal.absNorm_dvd_absNorm_of_le ((Ideal.span_singleton_le_iff_mem _).mpr hyB)
     have hne : Ideal.absNorm (Ideal.span {y}) ≠ 0 := by
       rw [Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]
       exact hy0
@@ -285,10 +310,13 @@ theorem aRay_eq_ncard_qForm : ∀ (K : Type) [Field K] [NumberField K] (d M : �
     rw [map_mul, hNnorm] at hle
     rw [← hyf, normSq_eq h2 φ y, hNr]
     exact_mod_cast hle
-  let E0 := (Equiv.prodUnique _ {u : (𝓞 K)ˣ // (u : 𝓞 K) - 1 ∈ Ideal.span {(M : 𝓞 K)}}).symm.trans E0'
+  let E0 :=
+    (Equiv.prodUnique _ {u : (𝓞 K)ˣ // (u : 𝓞 K) - 1 ∈ Ideal.span {(M : 𝓞 K)}}).symm.trans E0'
   let Φ := σ.trans (E1.trans E0.symm)
-  have key : ∀ v, qForm (‖f₁‖ ^ 2 / Nr) (((starRingEnd ℂ) f₁ * f₂).im ^ 2 / (‖f₁‖ ^ 2 * Nr)) l θ₁ θ₂ v =
-      (Ideal.absNorm (Φ v).1 : ℝ) := by
+  have key
+      : ∀ v,
+        qForm (‖f₁‖ ^ 2 / Nr) (((starRingEnd ℂ) f₁ * f₂).im ^ 2 / (‖f₁‖ ^ 2 * Nr)) l θ₁ θ₂ v
+          = (Ideal.absNorm (Φ v).1 : ℝ) := by
     intro v
     rw [hq v, hσ v]
     have hE : (E0 (Φ v) : 𝓞 K) = E1 (σ v) := by
@@ -296,16 +324,26 @@ theorem aRay_eq_ncard_qForm : ∀ (K : Type) [Field K] [NumberField K] (d M : �
     have hspanv : Ideal.span {((E1 (σ v)) : 𝓞 K)} = (Φ v).1 * B := by
       rw [← hE]
       exact hE0' _
-    have hval : φ (x₀ : K) + (((σ v).1 : ℂ) * e₁ + ((σ v).2 : ℂ) * e₂) =
-        φ (((E1 (σ v) : 𝓞 K)) : K) := by
+    have hval
+        : φ (x₀ : K) + (((σ v).1 : ℂ) * e₁ + ((σ v).2 : ℂ) * e₂) = φ (((E1 (σ v) : 𝓞 K)) : K) := by
       rw [hE1, he₁, he₂]
       simp
       ring
     rw [hval, normSq_eq h2 φ, hspanv, map_mul, hNr]
     push_cast
     field_simp
-  refine ⟨‖f₁‖ ^ 2 / Nr, ((starRingEnd ℂ) f₁ * f₂).im ^ 2 / (‖f₁‖ ^ 2 * Nr), l, θ₁, θ₂,
-    ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    ‖f₁‖ ^ 2 / Nr,
+    ((starRingEnd ℂ) f₁ * f₂).im ^ 2 / (‖f₁‖ ^ 2 * Nr),
+    l,
+    θ₁,
+    θ₂,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [le_div_iff₀ hNrpos, one_mul]
     have hM2 : (1 : ℝ) ≤ (M : ℝ) ^ 2 := by nlinarith
     nlinarith [mul_le_mul_of_nonneg_right hM2 hNrpos.le]
@@ -316,7 +354,9 @@ theorem aRay_eq_ncard_qForm : ∀ (K : Type) [Field K] [NumberField K] (d M : �
       have hM2 : (9 : ℝ) ≤ (M : ℝ) ^ 2 := by nlinarith
       have hk : (2 : ℝ) ≤ (M : ℝ) ^ 2 * (√(d : ℝ) / 2) := by nlinarith
       rw [hIv']
-      calc 2 * Nr ≤ (M : ℝ) ^ 2 * (√(d : ℝ) / 2) * Nr := mul_le_mul_of_nonneg_right hk hNrpos.le
+      calc
+        2 * Nr
+          ≤ (M : ℝ) ^ 2 * (√(d : ℝ) / 2) * Nr := mul_le_mul_of_nonneg_right hk hNrpos.le
         _ = (M : ℝ) ^ 2 * Nr * (√(d : ℝ) / 2) := by ring
     have hIv0 : 0 ≤ Iv := abs_nonneg _
     nlinarith
@@ -331,9 +371,11 @@ theorem aRay_eq_ncard_qForm : ∀ (K : Type) [Field K] [NumberField K] (d M : �
     rw [Ne, Ideal.absNorm_eq_zero_iff]
     exact ne_bot_of_coprime hNtop (Φ v).2.1
   · intro n
-    have hset : idealsIn D g n = (Subtype.val ∘ Φ) ''
-        {v : ℤ × ℤ | qForm (‖f₁‖ ^ 2 / Nr) (((starRingEnd ℂ) f₁ * f₂).im ^ 2 / (‖f₁‖ ^ 2 * Nr))
-          l θ₁ θ₂ v = n} := by
+    have hset
+        : idealsIn D g n
+          = (Subtype.val ∘ Φ)
+            '' {v : ℤ × ℤ | qForm (‖f₁‖ ^ 2 / Nr) (((starRingEnd ℂ) f₁ * f₂).im ^ 2 / (‖f₁‖ ^ 2 * Nr))
+                 l θ₁ θ₂ v = n} := by
       ext I
       simp only [idealsIn, Set.mem_setOf_eq, Set.mem_image, Function.comp_apply]
       constructor

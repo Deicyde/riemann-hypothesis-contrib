@@ -7,20 +7,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem res_dual (O : Type) [CommRing O] [IsLocalRing O] [IsCO O (DualNumber (ResidueField O))]
-    (x : DualNumber (ResidueField O)) : res O _ x = x.fst := by
+private theorem res_dual
+    (O : Type) [CommRing O] [IsLocalRing O] [IsCO O (DualNumber (ResidueField O))]
+    (x : DualNumber (ResidueField O))
+    : res O _ x = x.fst := by
   obtain ⟨o, ho⟩ := IsLocalRing.residue_surjective x.fst
   have ha : (algebraMap O (DualNumber (ResidueField O)) o).fst = x.fst := by
     rw [← ho]
     first
-      | rfl
-      | rw [TrivSqZeroExt.algebraMap_eq_inl, TrivSqZeroExt.fst_inl, IsLocalRing.ResidueField.algebraMap_eq]
-  have hfst : (x - algebraMap O _ o).fst = 0 := by
-    rw [TrivSqZeroExt.fst_sub, ha, sub_self]
+    | rfl
+    | rw [TrivSqZeroExt.algebraMap_eq_inl, TrivSqZeroExt.fst_inl,
+        IsLocalRing.ResidueField.algebraMap_eq]
+  have hfst : (x - algebraMap O _ o).fst = 0 := by rw [TrivSqZeroExt.fst_sub, ha, sub_self]
   have hsq : (x - algebraMap O _ o) * (x - algebraMap O _ o) = 0 := by
     ext
     · rw [TrivSqZeroExt.fst_mul, hfst, mul_zero, TrivSqZeroExt.fst_zero]
-    · rw [TrivSqZeroExt.snd_mul, hfst, zero_smul, MulOpposite.op_zero, zero_smul, add_zero, TrivSqZeroExt.snd_zero]
+    · rw [TrivSqZeroExt.snd_mul, hfst, zero_smul, MulOpposite.op_zero, zero_smul, add_zero,
+        TrivSqZeroExt.snd_zero]
   have hmem : x - algebraMap O _ o ∈ maximalIdeal (DualNumber (ResidueField O)) := by
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
     intro hu
@@ -30,9 +33,7 @@ private theorem res_dual (O : Type) [CommRing O] [IsLocalRing O] [IsCO O (DualNu
   have h0 := (res_eq_zero_iff O _ _).2 hmem
   rw [map_sub, AlgHom.commutes, sub_eq_zero] at h0
   rw [h0, ← ha]
-  first
-    | rfl
-    | rw [TrivSqZeroExt.algebraMap_eq_inl, TrivSqZeroExt.fst_inl]
+  first | rfl | rw [TrivSqZeroExt.algebraMap_eq_inl, TrivSqZeroExt.fst_inl]
 
 theorem UpperTheory.V.Fr.pr_dof :
     ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ n : ℕ}, F.Ok C₀ → ∀ (O : Type) [CommRing O] [IsLocalRing O], ∀ [IsCO O (DualNumber (ResidueField O))] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (ρ : NRep F n R) (B : Box F n R), ρ.Univ O → B.Of ρ → ∀ (ρ' : NRep F n (DualNumber (ResidueField O))) (r' : F.Γ →* GG (m := n) (R := DualNumber (ResidueField O))), ρ'.Cont (maximalIdeal _) → ρ'.bar O = ρ.bar O → (∀ s, (r' s).right = F.del s) → (r' F.c).mat = 1 → (∀ s : F.G0, (r' s).mat = ρ'.r s) → ∃ D ∈ Tan O R, ∀ s, (r' s).mat.map TrivSqZeroExt.snd = B.tanCo O D s * ((B.bar O).r s).mat := by

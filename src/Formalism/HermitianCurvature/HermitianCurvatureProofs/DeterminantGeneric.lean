@@ -17,7 +17,8 @@ namespace Formalism.FourierDecayAlt.P
 open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
 
 theorem algebraic_quantum_determinant : Qr.AlgDet :=
-  qr_algDet_of (qr_algDetBasis_of quantum_jacobi_identity quantum_determinant_vector quantum_minor_covariance)
+  qr_algDet_of (qr_algDetBasis_of quantum_jacobi_identity quantum_determinant_vector
+    quantum_minor_covariance)
 
 theorem capelli_hat_frame : Qr.ChatFrame := qr_chatFrame_of frame_minor
 

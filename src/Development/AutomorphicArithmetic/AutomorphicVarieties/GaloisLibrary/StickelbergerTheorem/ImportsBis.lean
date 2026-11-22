@@ -7,10 +7,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain UpperTheory.V.Kum UpperTheory.V.Stick
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.Stick.red :
-    ∀ (K : Type) [Field K] [NumberField K] (p : ℕ) [Fact p.Prime] (P : Ideal (𝓞 K)),
-    (Ideal.absNorm P = p → ∃ π : 𝓞 K →+* ZMod p, RingHom.ker π = P) ∧
-    ∀ π : 𝓞 K →+* ZMod p, RingHom.ker π = P → Ideal.absNorm P = p ∧ P.IsMaximal ∧ Prime P ∧ (p : 𝓞 K) ∈ P := by
+theorem UpperTheory.V.Stick.red
+    : ∀ (K : Type) [Field K] [NumberField K] (p : ℕ) [Fact p.Prime] (P : Ideal (𝓞 K)),
+      (Ideal.absNorm P = p → ∃ π : 𝓞 K →+* ZMod p, RingHom.ker π = P)
+        ∧ ∀ π : 𝓞 K →+* ZMod p,
+          RingHom.ker π = P → Ideal.absNorm P = p ∧ P.IsMaximal ∧ Prime P ∧ (p : 𝓞 K) ∈ P := by
   intro K _ _ p hp P
   have hpp : p.Prime := hp.out
   have hcard : ∀ π : 𝓞 K →+* ZMod p, Function.Surjective π := fun π x => by

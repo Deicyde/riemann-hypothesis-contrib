@@ -9,44 +9,58 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsPol
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ
 open scoped Matrix
 
 namespace GlobalTheory.HTTrace
 
-theorem apply_pow (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (r : ℕ) (σ : G ℚ Ω)
-    {ζ : Ω} (hζ : ζ ^ (l ^ r) = 1) :
-    σ ζ = ζ ^ ((cycMod ℚ Ω l r σ : (ZMod (l ^ r))ˣ) : ZMod (l ^ r)).val := by
+theorem apply_pow
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    (r : ℕ)
+    (σ : G ℚ Ω)
+    {ζ : Ω} (hζ : ζ ^ (l ^ r) = 1)
+    : σ ζ = ζ ^ ((cycMod ℚ Ω l r σ : (ZMod (l ^ r))ˣ) : ZMod (l ^ r)).val := by
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   have : NeZero ((l : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero⟩
   exact cyclotomicCharacter.spec (L := Ω) l (MulSemiringAction.toRingAut (G ℚ Ω) Ω σ) ζ hζ
 
-theorem cycMod_eq_one (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m : ℕ) (hm : 1 ≤ m)
-    (ζ : Ω) (hζ : IsPrimitiveRoot ζ (l ^ m)) (s : G ℚ Ω) (hsζ : s ζ = ζ) : cycMod ℚ Ω l m s = 1 := by
+theorem cycMod_eq_one
+    (l : ℕ) [Fact l.Prime]
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (m : ℕ) (hm : 1 ≤ m)
+    (ζ : Ω) (hζ : IsPrimitiveRoot ζ (l ^ m))
+    (s : G ℚ Ω) (hsζ : s ζ = ζ)
+    : cycMod ℚ Ω l m s = 1 := by
   have hlm : 1 < l ^ m := Nat.one_lt_pow (by omega) (Fact.out : l.Prime).one_lt
   haveI : Fact (1 < l ^ m) := ⟨hlm⟩
   have h1 := apply_pow Ω l m s hζ.pow_eq_one
   rw [hsζ] at h1
   have hv1 : ((cycMod ℚ Ω l m s : (ZMod (l ^ m))ˣ) : ZMod (l ^ m)).val = 1 := by
-    have := hζ.pow_inj (i := 1) (j := ((cycMod ℚ Ω l m s : (ZMod (l ^ m))ˣ) : ZMod (l ^ m)).val) hlm (ZMod.val_lt _)
-      (by rw [pow_one]; exact h1)
+    have :=
+      hζ.pow_inj (i := 1) (j := ((cycMod ℚ Ω l m s : (ZMod (l ^ m))ˣ) : ZMod (l ^ m)).val) hlm
+        (ZMod.val_lt _) (by rw [pow_one]; exact h1)
     exact this.symm
   ext
   rw [Units.val_one]
   apply ZMod.val_injective
   rw [hv1, ZMod.val_one]
 
-theorem exists_gen (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
-    (A : ValuationSubring Ω) (hA : OverL l A) (m : ℕ) (hm : 1 ≤ m) (ζ ζ' : Ω) (hζ : IsPrimitiveRoot ζ (l ^ m))
-    (hζ' : ζ' ^ (l ^ m) = ζ) :
-    ∃ s ∈ Ine (F := ℚ) A, s ζ' = ζ * ζ' := by
+theorem exists_gen
+    (l : ℕ) [Fact l.Prime]
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (A : ValuationSubring Ω) (hA : OverL l A)
+    (m : ℕ) (hm : 1 ≤ m)
+    (ζ ζ' : Ω) (hζ : IsPrimitiveRoot ζ (l ^ m)) (hζ' : ζ' ^ (l ^ m) = ζ)
+    : ∃ s ∈ Ine (F := ℚ) A, s ζ' = ζ * ζ' := by
   obtain ⟨v, hv, hlv⟩ := hA
   have hAl : A.valuation (l : Ω) < 1 := by simpa using (hv (l : 𝓞 ℚ)).2 hlv
   have hl1 : 1 < l := (Fact.out : l.Prime).one_lt
   have hlm : 1 < l ^ m := Nat.one_lt_pow (by omega) hl1
-  have hlt : 1 + l ^ m < l ^ (2 * m) := by
-    rw [two_mul, pow_add]; nlinarith
+  have hlt : 1 + l ^ m < l ^ (2 * m) := by rw [two_mul, pow_add]; nlinarith
   have hu : IsUnit ((1 + l ^ m : ℕ) : ZMod (l ^ (2 * m))) := by
     rw [ZMod.isUnit_iff_coprime]
     apply Nat.Coprime.pow_right
@@ -56,28 +70,35 @@ theorem exists_gen (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ 
     have h3 : l ∣ 1 := (Nat.dvd_add_left h2).mp h
     have := Nat.le_of_dvd one_pos h3
     omega
-  obtain ⟨⟨s, hs⟩, hsu⟩ := GlobalTheory.InertiaPowers.cycMod_Ine_surjective l Ω A hAl (2 * m) hu.unit
-  have hsu' : ((cycMod ℚ Ω l (2 * m) s : (ZMod (l ^ (2 * m)))ˣ) : ZMod (l ^ (2 * m)))
-      = ((1 + l ^ m : ℕ) : ZMod (l ^ (2 * m))) := by
+  obtain ⟨⟨s, hs⟩, hsu⟩ :=
+    GlobalTheory.InertiaPowers.cycMod_Ine_surjective l Ω A hAl (2 * m) hu.unit
+  have hsu'
+      : ((cycMod ℚ Ω l (2 * m) s : (ZMod (l ^ (2 * m)))ˣ) : ZMod (l ^ (2 * m)))
+        = ((1 + l ^ m : ℕ) : ZMod (l ^ (2 * m))) := by
     have := congrArg Units.val hsu
     simpa using this
-  have hpow2 : ζ' ^ (l ^ (2 * m)) = 1 := by
-    rw [two_mul, pow_add, pow_mul, hζ', hζ.pow_eq_one]
+  have hpow2 : ζ' ^ (l ^ (2 * m)) = 1 := by rw [two_mul, pow_add, pow_mul, hζ', hζ.pow_eq_one]
   refine ⟨s, hs, ?_⟩
-  rw [apply_pow Ω l (2 * m) s hpow2, hsu', ZMod.val_natCast, Nat.mod_eq_of_lt hlt, pow_add, pow_one, hζ', mul_comm]
+  rw [apply_pow Ω l (2 * m) s hpow2, hsu', ZMod.val_natCast, Nat.mod_eq_of_lt hlt, pow_add, pow_one,
+    hζ', mul_comm]
 
-theorem isPrimitiveRoot_root {Ω : Type} [Field Ω] (l : ℕ) [Fact l.Prime] (m : ℕ) (hm : 1 ≤ m) (ζ ζ' : Ω)
-    (hζ : IsPrimitiveRoot ζ (l ^ m)) (hζ' : ζ' ^ (l ^ m) = ζ) : IsPrimitiveRoot ζ' (l ^ (2 * m)) := by
+theorem isPrimitiveRoot_root
+    {Ω : Type} [Field Ω]
+    (l : ℕ) [Fact l.Prime]
+    (m : ℕ) (hm : 1 ≤ m)
+    (ζ ζ' : Ω) (hζ : IsPrimitiveRoot ζ (l ^ m)) (hζ' : ζ' ^ (l ^ m) = ζ)
+    : IsPrimitiveRoot ζ' (l ^ (2 * m)) := by
   obtain ⟨n, rfl⟩ : ∃ n, m = n + 1 := ⟨m - 1, by omega⟩
   rw [IsPrimitiveRoot.iff_orderOf, show 2 * (n + 1) = (n + 1 + n) + 1 by ring]
   apply orderOf_eq_prime_pow
   · rw [pow_add, pow_mul, hζ']
     exact hζ.pow_ne_one_of_pos_of_lt (pow_pos (Fact.out : l.Prime).pos n).ne'
       (Nat.pow_lt_pow_right (Fact.out : l.Prime).one_lt (by omega))
-  · rw [show (n + 1 + n) + 1 = (n + 1) + (n + 1) by ring, pow_add l (n + 1) (n + 1), pow_mul, hζ', hζ.pow_eq_one]
+  · rw [show (n + 1 + n) + 1 = (n + 1) + (n + 1) by ring, pow_add l (n + 1) (n + 1), pow_mul, hζ',
+      hζ.pow_eq_one]
 
-theorem geom_sum_root {Ω : Type} [Field Ω] (N : ℕ) (u : Ω) (hu : u ^ N = 1) :
-    ∃ e : ℕ, ∑ j ∈ Finset.range N, u ^ j = (N : Ω) * e := by
+theorem geom_sum_root {Ω : Type} [Field Ω] (N : ℕ) (u : Ω) (hu : u ^ N = 1)
+    : ∃ e : ℕ, ∑ j ∈ Finset.range N, u ^ j = (N : Ω) * e := by
   by_cases h : u = 1
   · exact ⟨1, by simp [h]⟩
   · refine ⟨0, ?_⟩
@@ -85,10 +106,12 @@ theorem geom_sum_root {Ω : Type} [Field Ω] (N : ℕ) (u : Ω) (hu : u ^ N = 1)
     rw [hu, sub_self] at h1
     simpa using (mul_eq_zero.1 h1).resolve_right (sub_ne_zero.2 h)
 
-theorem trace_mem {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring Ω) (N : ℕ) (ζ ζ' : Ω) (hζ : ζ ^ N = 1)
-    (hζ'A : ζ' ∈ A) (γ : G ℚ Ω) (h1 : γ ζ = ζ) (h2 : γ ζ' = ζ * ζ') (Q : Polynomial Ω)
-    (hQ : ∀ d, Q.coeff d ∈ A ∧ γ (Q.coeff d) = Q.coeff d) :
-    ∃ v ∈ A, ∑ j ∈ Finset.range N, (γ ^ j) (Q.eval ζ') = (N : Ω) * v := by
+theorem trace_mem
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    (A : ValuationSubring Ω) (N : ℕ) (ζ ζ' : Ω) (hζ : ζ ^ N = 1) (hζ'A : ζ' ∈ A)
+    (γ : G ℚ Ω) (h1 : γ ζ = ζ) (h2 : γ ζ' = ζ * ζ')
+    (Q : Polynomial Ω) (hQ : ∀ d, Q.coeff d ∈ A ∧ γ (Q.coeff d) = Q.coeff d)
+    : ∃ v ∈ A, ∑ j ∈ Finset.range N, (γ ^ j) (Q.eval ζ') = (N : Ω) * v := by
   have hfix : ∀ a : Ω, γ a = a → ∀ j : ℕ, (γ ^ j) a = a := by
     intro a ha j
     induction j with
@@ -100,22 +123,38 @@ theorem trace_mem {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring 
     | zero => simp
     | succ j ih => rw [pow_succ, AlgEquiv.mul_apply, h2, map_mul, hfix ζ h1, ih]; ring
   choose e he using fun d : ℕ => geom_sum_root N (ζ ^ d) (by rw [← pow_mul, mul_comm, pow_mul, hζ, one_pow])
-  refine ⟨∑ d ∈ Finset.range (Q.natDegree + 1), Q.coeff d * ζ' ^ d * e d,
-    sum_mem fun d _ => mul_mem (mul_mem (hQ d).1 (pow_mem hζ'A d)) (natCast_mem A _), ?_⟩
+  refine ⟨
+    ∑ d ∈ Finset.range (Q.natDegree + 1), Q.coeff d * ζ' ^ d * e d,
+    sum_mem fun d _ => mul_mem (mul_mem (hQ d).1 (pow_mem hζ'A d)) (natCast_mem A _),
+    ?_
+  ⟩
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Polynomial.eval_eq_sum_range, map_sum, map_mul, map_pow, hj, hfix _ (hQ _).2]
   rw [Finset.sum_comm, Finset.mul_sum]
   refine Finset.sum_congr rfl fun d _ => ?_
-  have : ∀ j : ℕ, Q.coeff d * (ζ ^ j * ζ') ^ d = Q.coeff d * ζ' ^ d * (ζ ^ d) ^ j := fun j => by ring
+  have : ∀ j : ℕ, Q.coeff d * (ζ ^ j * ζ') ^ d = Q.coeff d * ζ' ^ d * (ζ ^ d) ^ j := fun j => by
+    ring
   simp only [this]
-  rw [← Finset.mul_sum, he d]; ring
+  rw [← Finset.mul_sum, he d]
+  ring
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∃ c : ℕ, ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω), OverL l A →
-  ∀ (m k : ℕ), k ≤ m → ∀ (ζ ζ' : Ω), IsPrimitiveRoot ζ (l ^ m) → ζ' ^ (l ^ m) = ζ → ∀ o x : Ω, o ∈ A → x ∈ A →
-  (∀ s ∈ Ine (F := ℚ) A, cycMod ℚ Ω l m s = 1 → s o = o) →
-  (∀ s, s ∈ Ine (F := ℚ) A → cycMod ℚ Ω l m s = 1 → ∀ t : ZMod (l ^ m), s ζ' = ζ ^ t.val * ζ' →
-    GlobalTheory.Glue.CgA A l k ((t.val : Ω) * o) (s x - x)) →
-  GlobalTheory.Glue.CgA A l k ((l : Ω) ^ c * o) 0 := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime],
+      l ≠ 2
+        → ∃ c : ℕ, ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω),
+          OverL l A
+            → ∀ (m k : ℕ),
+              k ≤ m
+                → ∀ (ζ ζ' : Ω),
+                  IsPrimitiveRoot ζ (l ^ m) → ζ' ^ (l ^ m) = ζ
+                    → ∀ o x : Ω,
+                      o ∈ A → x ∈ A → (∀ s ∈ Ine (F := ℚ) A, cycMod ℚ Ω l m s = 1 → s o = o)
+                        → (∀ s,
+                          s ∈ Ine (F := ℚ) A → cycMod ℚ Ω l m s = 1
+                            → ∀ t : ZMod (l ^ m),
+                              s ζ' = ζ ^ t.val * ζ'
+                                → GlobalTheory.Glue.CgA A l k ((t.val : Ω) * o) (s x - x))
+                        → GlobalTheory.Glue.CgA A l k ((l : Ω) ^ c * o) 0 := by
   intro l _ hl2
   refine ⟨1, ?_⟩
   intro Ω _ _ _ A hA m k hkm ζ ζ' hζ hζ' o x ho hx hofix hyp
@@ -138,13 +177,16 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∃ c : ℕ, ∀ (Ω : 
   have hHζ : ∀ s : G ℚ Ω, s ζ' = ζ' → s ζ = ζ := fun s hs => by rw [← hζ', map_pow, hs]
   have hHc : ∀ s : G ℚ Ω, s ζ' = ζ' → cycMod ℚ Ω l m s = 1 := fun s hs =>
     cycMod_eq_one l Ω m hm ζ hζ s (hHζ s hs)
-  obtain ⟨y, hyA, hyfix, e, heA, he⟩ := GlobalTheory.T.exists_fixed_congr_axLemma_oddPrime l hl2 Ω A hA H (inf_le_left.trans (Ine_le_Dec A)) k x hx (by
-    intro h hh
-    obtain ⟨hh1, hh2⟩ := (hHmem h).1 hh
-    obtain ⟨z, hz, hze⟩ := hyp h hh1 (hHc h hh2) 0 (by simpa using hh2)
-    refine ⟨-z, neg_mem hz, ?_⟩
-    simp only [ZMod.val_zero, Nat.cast_zero, zero_mul] at hze
-    linear_combination -hze)
+  obtain ⟨y, hyA, hyfix, e, heA, he⟩ :=
+    GlobalTheory.T.exists_fixed_congr_axLemma_oddPrime l hl2 Ω A hA H
+      (inf_le_left.trans (Ine_le_Dec A)) k x hx
+      (by
+        intro h hh
+        obtain ⟨hh1, hh2⟩ := (hHmem h).1 hh
+        obtain ⟨z, hz, hze⟩ := hyp h hh1 (hHc h hh2) 0 (by simpa using hh2)
+        refine ⟨-z, neg_mem hz, ?_⟩
+        simp only [ZMod.val_zero, Nat.cast_zero, zero_mul] at hze
+        linear_combination -hze)
   obtain ⟨γ, hγI, hγ⟩ := exists_gen l Ω A hA m hm ζ ζ' hζ hζ'
   have hγζ : γ ζ = ζ := by
     conv_lhs => rw [← hζ']
@@ -173,10 +215,14 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∃ c : ℕ, ∀ (Ω : 
       exact h3
     have h4 := congrArg s hweq
     rw [map_mul, map_pow, map_natCast, map_sub, map_sub, h2, hyfix s ((hHmem s).2 ⟨hs, hsζ⟩),
-      hofix s hs (hHc s hsζ), ← hweq] at h4
+        hofix s hs (hHc s hsζ), ← hweq]
+      at h4
     exact mul_left_cancel₀ (pow_ne_zero k hl0) h4
-  obtain ⟨Q, hQ, hQw⟩ := GlobalTheory.T.exists_polynomial_in_primitiveRoot_of_inertia_fixed l Ω A hA (2 * m) ζ' hprim w hwA hwfix
-  obtain ⟨v, hvA, hv⟩ := trace_mem A (l ^ m) ζ ζ' hζ.pow_eq_one hζ'A γ hγζ hγ Q fun d => ⟨(hQ d).1, (hQ d).2 γ hγI⟩
+  obtain ⟨Q, hQ, hQw⟩ :=
+    GlobalTheory.T.exists_polynomial_in_primitiveRoot_of_inertia_fixed l Ω A hA (2 * m) ζ' hprim w
+      hwA hwfix
+  obtain ⟨v, hvA, hv⟩ :=
+    trace_mem A (l ^ m) ζ ζ' hζ.pow_eq_one hζ'A γ hγζ hγ Q fun d => ⟨(hQ d).1, (hQ d).2 γ hγI⟩
   rw [hQw] at hv
   have hfix : ∀ a : Ω, γ a = a → ∀ j : ℕ, (γ ^ j) a = a := by
     intro a ha j

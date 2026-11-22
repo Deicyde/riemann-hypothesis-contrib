@@ -11,6 +11,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.TranscendenceTraces
 
-theorem phiEx_of : LocFinSec → PhiEx := fun h => phiEx_of_parts phiUniv_of (phiExact_of (dSLoc_of (dSOne_of h)))
+theorem phiEx_of : LocFinSec → PhiEx := fun h =>
+  phiEx_of_parts phiUniv_of (phiExact_of (dSLoc_of (dSOne_of h)))
 
 end UpperTheory.Gal.TranscendenceTraces

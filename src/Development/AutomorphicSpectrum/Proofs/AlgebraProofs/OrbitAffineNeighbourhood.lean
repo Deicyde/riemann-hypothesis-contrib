@@ -19,15 +19,16 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.BasicOpenNorm
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry Opposite
 open scoped CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
-open GlobalTheory.CompanionTheory.FreeQuotProof GlobalTheory.CompanionTheory.Hypotheses₂ GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot
+open GlobalTheory.CompanionTheory.FreeQuotProof GlobalTheory.CompanionTheory.Hypotheses₂
+  GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.FreeQuotProof.Nbhd
 
 variable {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X]
 
-theorem mem_orbit_iff {x y : X.left} : y ∈ orbit G X x ↔
-    ∃ z, (snd G X).left z = x ∧ (γ[G, X] : G ⊗ X ⟶ X).left z = y := by
+theorem mem_orbit_iff {x y : X.left}
+    : y ∈ orbit G X x ↔ ∃ z, (snd G X).left z = x ∧ (γ[G, X] : G ⊗ X ⟶ X).left z = y := by
   constructor
   · rintro ⟨z, hz, rfl⟩; exact ⟨z, hz, rfl⟩
   · rintro ⟨z, hz, rfl⟩; exact ⟨z, hz, rfl⟩
@@ -41,11 +42,12 @@ theorem orbit_symm {x y : X.left} (h : y ∈ orbit G X x) : x ∈ orbit G X y :=
 
 theorem orbit_hom {x y : X.left} (h : y ∈ orbit G X x) : X.hom y = X.hom x := by
   obtain ⟨z, rfl, rfl⟩ := (mem_orbit_iff G X).1 h
-  have e : (γ[G, X] : G ⊗ X ⟶ X).left ≫ X.hom = (snd G X).left ≫ X.hom := (Over.w _).trans (Over.w _).symm
+  have e : (γ[G, X] : G ⊗ X ⟶ X).left ≫ X.hom = (snd G X).left ≫ X.hom :=
+    (Over.w _).trans (Over.w _).symm
   rw [← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, e]
 
-theorem stable_of_forall (V : X.left.Opens) (h : ∀ y ∈ V, orbit G X y ⊆ V) :
-    (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V := by
+theorem stable_of_forall (V : X.left.Opens) (h : ∀ y ∈ V, orbit G X y ⊆ V)
+    : (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V := by
   ext z
   constructor
   · intro hz
@@ -65,14 +67,16 @@ theorem orbit_finite (hG : IsFiniteLocallyFree G.hom) (x : X.left) : (orbit G X 
   exact ((snd G X).left.finite_preimage_singleton x).image _
 
 variable {G X} in
-theorem isOpen_saturated (hG : IsFiniteLocallyFree G.hom) (O : X.left.Opens) :
-    IsOpen {y : X.left | orbit G X y ⊆ O} := by
+theorem isOpen_saturated (hG : IsFiniteLocallyFree G.hom) (O : X.left.Opens)
+    : IsOpen {y : X.left | orbit G X y ⊆ O} := by
   have := isFinite_snd (X := X) hG
   have hc : IsClosed ((snd G X).left '' ((γ[G, X] : G ⊗ X ⟶ X).left ⁻¹' (O : Set X.left)ᶜ)) :=
-    (snd G X).left.isClosedMap _ (O.isOpen.isClosed_compl.preimage (γ[G, X] : G ⊗ X ⟶ X).left.continuous)
+    (snd G X).left.isClosedMap _
+      (O.isOpen.isClosed_compl.preimage (γ[G, X] : G ⊗ X ⟶ X).left.continuous)
   convert hc.isOpen_compl using 1
   ext y
-  simp only [Set.mem_setOf_eq, Set.mem_compl_iff, Set.mem_image, Set.mem_preimage, not_exists, not_and]
+  simp only [Set.mem_setOf_eq, Set.mem_compl_iff, Set.mem_image, Set.mem_preimage, not_exists,
+    not_and]
   constructor
   · intro h z hz hy
     exact hz (h ((mem_orbit_iff G X).2 ⟨z, hy, rfl⟩))
@@ -81,16 +85,20 @@ theorem isOpen_saturated (hG : IsFiniteLocallyFree G.hom) (O : X.left.Opens) :
     by_contra hn
     exact h z hn hz
 
-theorem mem_basicOpen_appLE' {P Y : Scheme.{0}} (c : P ⟶ Y) (U : Y.Opens) (hc : ⊤ ≤ c ⁻¹ᵁ U) (f : Γ(Y, U)) (z : P) :
-    z ∈ P.basicOpen ((c.appLE U ⊤ hc).hom f) ↔ c z ∈ Y.basicOpen f := by
+theorem mem_basicOpen_appLE'
+    {P Y : Scheme.{0}} (c : P ⟶ Y) (U : Y.Opens) (hc : ⊤ ≤ c ⁻¹ᵁ U) (f : Γ(Y, U)) (z : P)
+    : z ∈ P.basicOpen ((c.appLE U ⊤ hc).hom f) ↔ c z ∈ Y.basicOpen f := by
   have key : P.basicOpen ((c.appLE U ⊤ hc).hom f) = c ⁻¹ᵁ Y.basicOpen f := by
-    rw [Scheme.preimage_basicOpen, Scheme.Hom.appLE, CommRingCat.comp_apply, Scheme.basicOpen_res, top_inf_eq]
+    rw [Scheme.preimage_basicOpen, Scheme.Hom.appLE, CommRingCat.comp_apply, Scheme.basicOpen_res,
+      top_inf_eq]
   rw [key]
   rfl
 
-theorem exists_norm {P D : Scheme.{0}} [IsAffine P] [IsAffine D] (v : P ⟶ D)
-    (hv : FiniteFreeHom v.appTop.hom) (e : Γ(P, ⊤)) :
-    ∃ N : Γ(D, ⊤), ∀ y : D, y ∈ D.basicOpen N ↔ ∀ z : P, v z = y → z ∈ P.basicOpen e := by
+theorem exists_norm
+    {P D : Scheme.{0}} [IsAffine P] [IsAffine D]
+    (v : P ⟶ D) (hv : FiniteFreeHom v.appTop.hom)
+    (e : Γ(P, ⊤))
+    : ∃ N : Γ(D, ⊤), ∀ y : D, y ∈ D.basicOpen N ↔ ∀ z : P, v z = y → z ∈ P.basicOpen e := by
   letI := v.appTop.hom.toAlgebra
   have h1 : Module.Free Γ(D, ⊤) Γ(P, ⊤) := hv.1
   have h2 : Module.Finite Γ(D, ⊤) Γ(P, ⊤) := hv.2
@@ -102,7 +110,14 @@ theorem exists_norm {P D : Scheme.{0}} [IsAffine P] [IsAffine D] (v : P ⟶ D)
   · intro h q hq hq'
     exact h ⟨q, hq⟩ hq'
 
-theorem exists_stable_affine_nbhd : ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X], IsFiniteLocallyFree G.hom → ∀ (x : X.left) (U : X.left.Opens), IsAffineOpen U → orbit G X x ⊆ U → ∃ (V : X.left.Opens) (W : S.Opens), x ∈ V ∧ IsAffineOpen V ∧ IsAffineOpen W ∧ V ≤ X.hom ⁻¹ᵁ W ∧ (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V := by
+theorem exists_stable_affine_nbhd
+    : ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X],
+      IsFiniteLocallyFree G.hom
+        → ∀ (x : X.left) (U : X.left.Opens),
+          IsAffineOpen U → orbit G X x ⊆ U
+            → ∃ (V : X.left.Opens) (W : S.Opens),
+              x ∈ V ∧ IsAffineOpen V ∧ IsAffineOpen W ∧ V ≤ X.hom ⁻¹ᵁ W
+                ∧ (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V := by
   intro S G X _ _ hG x U hU hxU
   have hfl := hG.1
   have hfl2 := hG.2.1
@@ -111,14 +126,19 @@ theorem exists_stable_affine_nbhd : ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj 
   have htrans : ∀ {y w : X.left}, y ∈ orbit G X x → w ∈ orbit G X y → w ∈ orbit G X x :=
     fun {y w} => GlobalTheory.T.mem_orbit_trans G X x y w
   let O : X.left.Opens := U ⊓ X.hom ⁻¹ᵁ W
-  have hxO : orbit G X x ⊆ O := fun y hy => ⟨hxU hy, by
-    show X.hom y ∈ W
-    rw [orbit_hom G X hy]; exact hsW⟩
+  have hxO : orbit G X x ⊆ O := fun y hy => ⟨
+    hxU hy,
+    by
+      show X.hom y ∈ W
+      rw [orbit_hom G X hy]
+      exact hsW
+  ⟩
   let V₀ : X.left.Opens := ⟨{y | orbit G X y ⊆ O}, isOpen_saturated hG O⟩
   have hV₀O : V₀ ≤ O := fun y hy => hy (GlobalTheory.T.mem_orbit_self' G X y)
   have hV₀U : V₀ ≤ U := hV₀O.trans inf_le_left
   have hxV₀ : orbit G X x ⊆ V₀ := fun y hy w hw => hxO (htrans hy hw)
-  obtain ⟨f, hKf, hfV⟩ := GlobalTheory.T.finite_set_basic_open_affine U V₀ hU hV₀U _ (orbit_finite hG x) hxV₀
+  obtain ⟨f, hKf, hfV⟩ :=
+    GlobalTheory.T.finite_set_basic_open_affine U V₀ hU hV₀U _ (orbit_finite hG x) hxV₀
   let D : X.left.Opens := X.left.basicOpen f
   have hD : IsAffineOpen D := hU.basicOpen f
   have hDW : D ≤ X.hom ⁻¹ᵁ W := (hfV.trans hV₀O).trans inf_le_right
@@ -150,7 +170,8 @@ theorem exists_stable_affine_nbhd : ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj 
       obtain ⟨z, hz, rfl⟩ := (mem_orbit_iff G X).1 hw
       have hzP : z ∈ P' := by
         show (snd G X).left z ∈ D
-        rw [hz]; exact y'.2
+        rw [hz]
+        exact y'.2
       have h1 := (hN y').1 hy' ⟨z, hzP⟩ (Subtype.ext ((morphismRestrict_base_coe _ _ _).trans hz))
       exact (mem_basicOpen_appLE' c U hc f _).1 h1
     · rintro ⟨hyD, ho⟩
@@ -159,10 +180,19 @@ theorem exists_stable_affine_nbhd : ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj 
       have h2 : (snd G X).left z.1 = y :=
         (morphismRestrict_base_coe _ _ z).symm.trans (congrArg Subtype.val hz)
       exact ho ((mem_orbit_iff G X).2 ⟨z.1, h2, rfl⟩)
-  refine ⟨V, W, (hVmem x).2 ⟨hKf (GlobalTheory.T.mem_orbit_self' G X x), fun y hy => hKf hy⟩, ?_, hW, ?_, ?_⟩
+  refine ⟨
+    V,
+    W,
+    (hVmem x).2 ⟨hKf (GlobalTheory.T.mem_orbit_self' G X x), fun y hy => hKf hy⟩,
+    ?_,
+    hW,
+    ?_,
+    ?_
+  ⟩
   · exact ((isAffineOpen_top D.toScheme).basicOpen N).image_of_isOpenImmersion D.ι
   · exact fun y hy => hDW ((hVmem y).1 hy).1
-  · refine stable_of_forall G X V fun y hy w hw => (hVmem w).2 ⟨((hVmem y).1 hy).2 hw, fun t ht => ?_⟩
+  · refine stable_of_forall G X V fun y hy w hw =>
+      (hVmem w).2 ⟨((hVmem y).1 hy).2 hw, fun t ht => ?_⟩
     exact ((hVmem y).1 hy).2 (GlobalTheory.T.mem_orbit_trans G X y w t hw ht)
 
 end GlobalTheory.CompanionTheory.FreeQuotProof.Nbhd

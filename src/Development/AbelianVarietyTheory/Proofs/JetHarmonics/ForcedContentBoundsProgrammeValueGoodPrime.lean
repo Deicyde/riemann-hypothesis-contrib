@@ -7,7 +7,9 @@ public import Development.AutomorphicArithmetic.OrbitLabellings.FnumEqRhoMulSumO
 
 @[expose] public section
 
-open Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.UnitaryBoundIntegral Formalism.L2.DIV Formalism.L2.Pj Formalism.BasicNotions GlobalTheory.GoodDepth NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.UnitaryBoundIntegral
+  Formalism.L2.DIV Formalism.L2.Pj Formalism.BasicNotions GlobalTheory.GoodDepth NumberField
+  IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.ContentValue
 
@@ -49,11 +51,27 @@ lemma rho_bound (k w l : ℝ) (hk : 1 ≤ k) (hw : 0 ≤ w) (hl : 2 ≤ l) :
   have h1 : 0 ≤ k * w := by positivity
   nlinarith [mul_nonneg h1 (show 0 ≤ l ^ 2 - 2 by linarith), mul_nonneg hw (show 0 ≤ l ^ 2 by linarith)]
 
-theorem main : ∀ (N : NumDatum) (j l : ℕ), l.Prime → l ∉ N.H.small → l ≠ N.q → l ≠ N.d → l ≠ N.g 0 → l ≠ N.g 1 → (∀ z, 0 ≤ N.w j z) → (∀ z z', N.w j z' ≤ N.sc.X'' N.R.n * N.w j z) →
-  0 ≤ N.FjP j l ∧ (Inert N l ∨ N.cls l = PrimeClass.splitK) ∧ ParOK (parOf N j l) ∧
-  (PhiC N l → ((N.R.k : ℝ) - 1) * (∑ z, N.w j z) / ((l : ℝ) ^ 2 - 1) ≤ N.FjP j l + if N.sc.X'' N.R.n < (l : ℝ) then 2 * (N.R.k * (∑ z, N.w j z) / (l : ℝ) ^ 2) else 0) ∧
-  (Inert N l → ¬ PhiC N l → ∀ Z : Finset (RPl N.R), RF.IsReps (parOf N j l) Z →
-    (∑ z ∈ Z, Fnum l (N.ordP l) fun s => ((N.R.k : ℝ) - 1) * N.w j (N.pos l z s.val)) ≤ N.FjP j l + if N.sc.X'' N.R.n < (l : ℝ) then 2 * (N.R.k * (∑ z, N.w j z) / (l : ℝ) ^ 2) else 0) := by
+theorem main
+    : ∀ (N : NumDatum) (j l : ℕ),
+      l.Prime → l ∉ N.H.small → l ≠ N.q → l ≠ N.d → l ≠ N.g 0 → l ≠ N.g 1 → (∀ z, 0 ≤ N.w j z)
+        → (∀ z z', N.w j z' ≤ N.sc.X'' N.R.n * N.w j z)
+        → 0 ≤ N.FjP j l ∧ (Inert N l ∨ N.cls l = PrimeClass.splitK) ∧ ParOK (parOf N j l)
+          ∧ (PhiC N l
+            → ((N.R.k : ℝ) - 1) * (∑ z, N.w j z) / ((l : ℝ) ^ 2 - 1)
+              ≤ N.FjP j l
+                + if N.sc.X'' N.R.n < (l : ℝ) then
+                    2 * (N.R.k * (∑ z, N.w j z) / (l : ℝ) ^ 2)
+                  else
+                    0)
+          ∧ (Inert N l → ¬ PhiC N l
+            → ∀ Z : Finset (RPl N.R),
+              RF.IsReps (parOf N j l) Z
+                → (∑ z ∈ Z, Fnum l (N.ordP l) fun s => ((N.R.k : ℝ) - 1) * N.w j (N.pos l z s.val))
+                  ≤ N.FjP j l
+                    + if N.sc.X'' N.R.n < (l : ℝ) then
+                        2 * (N.R.k * (∑ z, N.w j z) / (l : ℝ) ^ 2)
+                      else
+                        0) := by
   classical
   intro N j l hp h2 hq hd hg0 hg1 hw hr
   have hl : 2 ≤ l := hp.two_le
@@ -67,8 +85,7 @@ theorem main : ∀ (N : NumDatum) (j l : ℕ), l.Prime → l ∉ N.H.small → l
     unfold Inert NumDatum.cls primeClass
     rw [if_neg h2, if_neg hq, if_neg hd]
     split_ifs <;> simp
-  have hnd : N.cls l ≠ PrimeClass.ramD := by
-    rcases hcls with (h | h) | h <;> rw [h] <;> simp
+  have hnd : N.cls l ≠ PrimeClass.ramD := by rcases hcls with (h | h) | h <;> rw [h] <;> simp
   have hF : N.FjP j l = if Inert N l ∧ (l : ℝ) ≤ N.sc.X'' N.R.n then N.FInert j l else 0 := by
     unfold NumDatum.FjP
     rw [if_neg (by tauto), if_neg hnd]
@@ -80,7 +97,8 @@ theorem main : ∀ (N : NumDatum) (j l : ℕ), l.Prime → l ∉ N.H.small → l
     unfold NumDatum.FInert
     split_ifs
     · exact Finset.sum_nonneg fun z _ => div_nonneg (hD z) hq2.le
-    · exact div_nonneg (Finset.sum_nonneg fun z _ => lpF_nonneg _ _ _ hl fun a => hD _) (Nat.cast_nonneg _)
+    · exact div_nonneg (Finset.sum_nonneg fun z _ => lpF_nonneg _ _ _ hl fun a => hD _)
+        (Nat.cast_nonneg _)
   have hb := rho_bound N.R.k _ l hk hS hl'
   refine ⟨?_, hcls, ?_, ?_, ?_⟩
   · rw [hF]
@@ -106,7 +124,8 @@ theorem main : ∀ (N : NumDatum) (j l : ℕ), l.Prime → l ∉ N.H.small → l
     by_cases hX : (l : ℝ) ≤ N.sc.X'' N.R.n
     · rw [hF, if_pos ⟨hi, hX⟩, if_neg (not_lt.2 hX), add_zero]
       unfold NumDatum.FInert
-      rw [if_pos (show N.cls l = PrimeClass.inertClass ∧ N.hP l = 0 from hc), ← Finset.sum_div, ← Finset.mul_sum]
+      rw [if_pos (show N.cls l = PrimeClass.inertClass ∧ N.hP l = 0 from hc), ← Finset.sum_div,
+        ← Finset.mul_sum]
     · rw [hF, if_neg (fun h => hX h.2), if_pos (not_le.1 hX), zero_add]
       exact hb
   · intro hi hc Z hZ
@@ -124,11 +143,15 @@ theorem main : ∀ (N : NumDatum) (j l : ℕ), l.Prime → l ∉ N.H.small → l
         (hr z z').trans (mul_le_mul_of_nonneg_right (not_le.1 hX).le (hw z))
       rw [GlobalTheory.LevelsOrbits.sum_reps N l Z hZ' (N.w j), Finset.mul_sum, Finset.sum_div]
       refine Finset.sum_congr rfl fun z _ => ?_
-      rw [UpperTheory.fnum_eq_rho_mul_sum_of_demand_ratio_le l (N.ordP l) hl3 ho2 _ (fun a => hD _) (fun a a' => ?_), ← Finset.mul_sum]
+      rw [UpperTheory.fnum_eq_rho_mul_sum_of_demand_ratio_le l (N.ordP l) hl3 ho2 _
+          (fun a => hD _)
+          (fun a a' => ?_),
+        ← Finset.mul_sum]
       · unfold Formalism.IncomingBounds.rho
         ring
-      · have := mul_le_mul_of_nonneg_left (hbal (N.pos l z a.val) (N.pos l z a'.val))
-          (show (0 : ℝ) ≤ N.R.k - 1 by linarith)
+      · have :=
+          mul_le_mul_of_nonneg_left (hbal (N.pos l z a.val) (N.pos l z a'.val))
+            (show (0 : ℝ) ≤ N.R.k - 1 by linarith)
         linarith
 
 end GlobalTheory.ContentValue

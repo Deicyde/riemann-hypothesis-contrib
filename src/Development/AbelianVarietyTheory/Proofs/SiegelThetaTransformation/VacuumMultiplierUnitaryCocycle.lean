@@ -8,8 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
 open GlobalTheory.SW hiding Level
 open Formalism.L2.Pj Formalism.L2.PjFree
@@ -38,13 +41,25 @@ private lemma smul_left_cancel_of_ip_self_eq_one {n g : ℕ} {v : TF n g} (hv : 
   rw [h1, _root_.mul_one] at ha hb
   rw [← ha, ← hb, h]
 
-theorem vac_multiplier_cocycle : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g : ℕ) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → ∀ D : SW.Level X, ∀ v₀ : Lt E r → TF n g, (∀ L ∈ D.lats, IsVac X bas D.w (tens (stdL E n) (D.sh L)) (v₀ L)) → ∀ mu : GL (Fin r) E → Lt E r → ℂ, (∀ ga ∈ D.grp, ∀ L ∈ D.lats, ∀ k : D.J, D.Red (fun i => (ga : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k → wG X bas idx ga (v₀ L) = (mu ga L * (D.lam k : ℂˣ)) • v₀ (mapL ga L)) → (∀ ga ∈ D.grp, ∀ L ∈ D.lats, ‖mu ga L‖ = 1) ∧ (∀ L ∈ D.lats, mu 1 L = 1) ∧ ∀ ga ∈ D.grp, ∀ ga' ∈ D.grp, ∀ L ∈ D.lats, mu (ga * ga') L = mu ga (mapL ga' L) * mu ga' L := by
+theorem vac_multiplier_cocycle
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g : ℕ)
+        (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ),
+      IsSympl X bas → Even n
+        → ∀ D : SW.Level X, ∀ v₀ : Lt E r → TF n g,
+          (∀ L ∈ D.lats, IsVac X bas D.w (tens (stdL E n) (D.sh L)) (v₀ L))
+            → ∀ mu : GL (Fin r) E → Lt E r → ℂ,
+              (∀ ga ∈ D.grp, ∀ L ∈ D.lats, ∀ k : D.J,
+                  D.Red (fun i => (ga : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k
+                    → wG X bas idx ga (v₀ L) = (mu ga L * (D.lam k : ℂˣ)) • v₀ (mapL ga L))
+                → (∀ ga ∈ D.grp, ∀ L ∈ D.lats, ‖mu ga L‖ = 1) ∧ (∀ L ∈ D.lats, mu 1 L = 1)
+                  ∧ ∀ ga ∈ D.grp, ∀ ga' ∈ D.grp, ∀ L ∈ D.lats,
+                    mu (ga * ga') L = mu ga (mapL ga' L) * mu ga' L := by
   intro E _ _ _ r X g bas idx n hs hn D v₀ hvac mu hmu
   have hsd : SelfD X X.Λ := Lev.selfD_of_sympl hs
   have hlat : ∀ L ∈ D.lats, ∀ ga ∈ D.grp, mapL ga L ∈ D.lats := fun L hL ga hga =>
     Lev.mapL_mem_lats hsd hga hL
-  have hred : ∀ ga ∈ D.grp, ∃ k : D.J,
-      D.Red (fun i => (ga : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k := by
+  have hred
+      : ∀ ga ∈ D.grp, ∃ k : D.J, D.Red (fun i => (ga : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k := by
     intro ga hga
     obtain ⟨-, k, hk, h⟩ := (Lev.mem_grp ga).mp hga
     exact ⟨⟨k, hk⟩, h⟩
@@ -62,21 +77,24 @@ theorem vac_multiplier_cocycle : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     intro ga hga L hL
     obtain ⟨k, hk⟩ := hred ga hga
     have hL' := hlat L hL ga hga
-    have hip := ((wG_laws E r X g bas idx n hs hn ga (hun ga hga) (v₀ L) (hvsb L hL)).2.2.1
-      (v₀ L) (hvsb L hL)).1
+    have hip :=
+      ((wG_laws E r X g bas idx n hs hn ga (hun ga hga) (v₀ L) (hvsb L hL)).2.2.1 (v₀ L)
+        (hvsb L hL)).1
     rw [hmu ga hga L hL k hk, hvone L hL,
-      TensVac.ip_smul_left _ (hvsb _ hL') (TensVac.sb_smul _ (hvsb _ hL')),
-      TensVac.ip_smul_right _ (hvsb _ hL') (hvsb _ hL'), hvone _ hL', _root_.mul_one,
-      Complex.mul_conj, Complex.normSq_eq_norm_sq] at hip
+        TensVac.ip_smul_left _ (hvsb _ hL') (TensVac.sb_smul _ (hvsb _ hL')),
+        TensVac.ip_smul_right _ (hvsb _ hL') (hvsb _ hL'), hvone _ hL', _root_.mul_one,
+        Complex.mul_conj, Complex.normSq_eq_norm_sq]
+      at hip
     have h2 : ‖mu ga L * ((D.lam k : ℂˣ) : ℂ)‖ ^ 2 = 1 := by exact_mod_cast hip
     rw [norm_mul, Lev.norm_lam k, _root_.mul_one] at h2
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).mp h2
 
-  have hlam : ∀ ga ∈ D.grp, ∀ ga' ∈ D.grp, ∀ k k' k'' : D.J,
-      D.Red (fun i => (ga : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k →
-      D.Red (fun i => (ga' : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k' →
-      D.Red (fun i => ((ga * ga' : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k'' →
-      ((D.lam k'' : ℂˣ) : ℂ) = (D.lam k : ℂˣ) * (D.lam k' : ℂˣ) := by
+  have hlam
+      : ∀ ga ∈ D.grp, ∀ ga' ∈ D.grp, ∀ k k' k'' : D.J,
+        D.Red (fun i => (ga : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k
+          → D.Red (fun i => (ga' : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k'
+          → D.Red (fun i => ((ga * ga' : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k''
+          → ((D.lam k'' : ℂˣ) : ℂ) = (D.lam k : ℂˣ) * (D.lam k' : ℂˣ) := by
     intro ga _ ga' _ k k' k'' hk hk' hk''
     let y0 : Matrix (Fin r) (Fin r) E := Matrix.of fun i => D.β i
     have hy : ∀ M : Matrix (Fin r) (Fin r) E, y0 * Mᵀ = Matrix.of fun i => M *ᵥ D.β i := by
@@ -97,16 +115,18 @@ theorem vac_multiplier_cocycle : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
       apply hne
       rw [e3, h0]
       simp
-    have hm : y0 * ((ga * ga' : GL (Fin r) E) : Matrix (Fin r) (Fin r) E)ᵀ =
-        y0 * (ga' : Matrix (Fin r) (Fin r) E)ᵀ * (ga : Matrix (Fin r) (Fin r) E)ᵀ := by
+    have hm
+        : y0 * ((ga * ga' : GL (Fin r) E) : Matrix (Fin r) (Fin r) E)ᵀ
+          = y0 * (ga' : Matrix (Fin r) (Fin r) E)ᵀ * (ga : Matrix (Fin r) (Fin r) E)ᵀ := by
       rw [Units.val_mul, Matrix.transpose_mul, Matrix.mul_assoc]
     rw [hm, e2, e3] at e1
     apply mul_right_cancel₀ hd0
     rw [← e1]
     ring
 
-  have hcoc : ∀ ga ∈ D.grp, ∀ ga' ∈ D.grp, ∀ L ∈ D.lats,
-      mu (ga * ga') L = mu ga (mapL ga' L) * mu ga' L := by
+  have hcoc
+      : ∀ ga ∈ D.grp, ∀ ga' ∈ D.grp, ∀ L ∈ D.lats,
+        mu (ga * ga') L = mu ga (mapL ga' L) * mu ga' L := by
     intro ga hga ga' hga' L hL
     obtain ⟨k, hk⟩ := hred ga hga
     obtain ⟨k', hk'⟩ := hred ga' hga'
@@ -114,12 +134,15 @@ theorem vac_multiplier_cocycle : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     obtain ⟨k'', hk''⟩ := hred _ hgg
     have hL' := hlat L hL ga' hga'
     have hL'' := hlat _ hL' ga hga
-    have hcomp := (wG_laws E r X g bas idx n hs hn ga' (hun ga' hga') (v₀ L)
-      (hvsb L hL)).2.2.2.2.2.1 ga (hun ga hga)
-    have hsm := (wG_laws E r X g bas idx n hs hn ga (hun ga hga) (v₀ (mapL ga' L))
-      (hvsb _ hL')).2.2.2.1 (mu ga' L * ((D.lam k' : ℂˣ) : ℂ))
+    have hcomp :=
+      (wG_laws E r X g bas idx n hs hn ga' (hun ga' hga') (v₀ L) (hvsb L hL)).2.2.2.2.2.1 ga
+        (hun ga hga)
+    have hsm :=
+      (wG_laws E r X g bas idx n hs hn ga (hun ga hga) (v₀ (mapL ga' L)) (hvsb _ hL')).2.2.2.1
+        (mu ga' L * ((D.lam k' : ℂˣ) : ℂ))
     rw [hmu _ hgg L hL k'' hk'', hmu ga' hga' L hL k' hk', hsm, hmu ga hga _ hL' k hk, smul_smul,
-      mapL_mul'] at hcomp
+        mapL_mul']
+      at hcomp
     have hc := smul_left_cancel_of_ip_self_eq_one (hvsb _ hL'') (hvone _ hL'') hcomp
     rw [hlam ga hga ga' hga' k k' k'' hk hk' hk''] at hc
     have hk0 : ((D.lam k : ℂˣ) : ℂ) * (D.lam k' : ℂˣ) ≠ 0 :=

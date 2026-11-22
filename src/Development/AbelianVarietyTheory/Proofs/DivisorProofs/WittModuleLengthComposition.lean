@@ -7,16 +7,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobKerIdeal
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu
 
 namespace GlobalTheory.Dieu.ColengthLemmas
 
 variable {R : Type} [CommRing R]
 
-theorem length_comp_range {A B C : Type} [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B]
-    [AddCommGroup C] [Module R C] (u : B →ₗ[R] A) (v : C →ₗ[R] B) (hu : Function.Injective u) :
-    Module.length R (A ⧸ LinearMap.range (u ∘ₗ v)) =
-      Module.length R (A ⧸ LinearMap.range u) + Module.length R (B ⧸ LinearMap.range v) := by
+theorem length_comp_range
+    {A B C : Type}
+    [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B] [AddCommGroup C] [Module R C]
+    (u : B →ₗ[R] A)
+    (v : C →ₗ[R] B) (hu : Function.Injective u)
+    : Module.length R (A ⧸ LinearMap.range (u ∘ₗ v))
+      = Module.length R (A ⧸ LinearMap.range u) + Module.length R (B ⧸ LinearMap.range v) := by
   have hle : LinearMap.range v ≤ (LinearMap.range (u ∘ₗ v)).comap u := by
     rintro _ ⟨c, rfl⟩
     exact ⟨c, rfl⟩
@@ -49,13 +53,15 @@ theorem length_comp_range {A B C : Type} [AddCommGroup A] [Module R A] [AddCommG
       exact (Submodule.Quotient.mk_eq_zero _).2 ⟨b, rfl⟩
   rw [Module.length_eq_add_of_exact f g hf hg hex, add_comm]
 
-theorem eq_of_le_of_length_eq {A : Type} [AddCommGroup A] [Module R A] (L L' : Submodule R A)
-    (h : L ≤ L') (hl : Module.length R (A ⧸ L) = Module.length R (A ⧸ L'))
-    (ht : Module.length R (A ⧸ L) ≠ ⊤) : L = L' := by
+theorem eq_of_le_of_length_eq
+    {A : Type} [AddCommGroup A] [Module R A]
+    (L L' : Submodule R A) (h : L ≤ L') (hl : Module.length R (A ⧸ L) = Module.length R (A ⧸ L'))
+    (ht : Module.length R (A ⧸ L) ≠ ⊤)
+    : L = L' := by
   let g := Submodule.factor h
-  have e := Module.length_eq_add_of_exact (LinearMap.ker g).subtype g
-    (LinearMap.ker g).injective_subtype (Submodule.factor_surjective h)
-    (LinearMap.exact_subtype_ker_map g)
+  have e :=
+    Module.length_eq_add_of_exact (LinearMap.ker g).subtype g (LinearMap.ker g).injective_subtype
+      (Submodule.factor_surjective h) (LinearMap.exact_subtype_ker_map g)
   have h0 : Module.length R (LinearMap.ker g) = 0 := by
     rw [← hl] at e
     obtain ⟨n, hn⟩ := ENat.ne_top_iff_exists.1 ht
@@ -75,15 +81,18 @@ theorem eq_of_le_of_length_eq {A : Type} [AddCommGroup A] [Module R A] (L L' : S
   have h2 : (Submodule.Quotient.mk x : A ⧸ L) = 0 := congrArg Subtype.val h1
   exact (Submodule.Quotient.mk_eq_zero _).1 h2
 
-theorem length_quot_smul_range_free (O M : Type) [CommRing O] [Nontrivial O] [AddCommGroup M]
-    [Module O M] [Module.Free O M] [Module.Finite O M] (a : O) :
-    Module.length O (M ⧸ LinearMap.range (a • (LinearMap.id : M →ₗ[O] M))) =
-      (Module.finrank O M : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
+theorem length_quot_smul_range_free
+    (O M : Type)
+    [CommRing O] [Nontrivial O] [AddCommGroup M] [Module O M] [Module.Free O M] [Module.Finite O M]
+    (a : O)
+    : Module.length O (M ⧸ LinearMap.range (a • (LinearMap.id : M →ₗ[O] M)))
+      = (Module.finrank O M : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
   classical
   set d := Module.finrank O M
   let e : M ≃ₗ[O] (Fin d → O) := (Module.finBasis O M).equivFun
-  have hmap : (LinearMap.range (a • (LinearMap.id : M →ₗ[O] M))).map (e : M →ₗ[O] (Fin d → O))
-      = Submodule.pi Set.univ (fun _ : Fin d => (Ideal.span {a} : Submodule O O)) := by
+  have hmap
+      : (LinearMap.range (a • (LinearMap.id : M →ₗ[O] M))).map (e : M →ₗ[O] (Fin d → O))
+        = Submodule.pi Set.univ (fun _ : Fin d => (Ideal.span {a} : Submodule O O)) := by
     ext x
     simp only [Submodule.mem_map, LinearMap.mem_range, Submodule.mem_pi, Set.mem_univ, true_implies,
       LinearMap.smul_apply, LinearMap.id_apply]
@@ -97,13 +106,16 @@ theorem length_quot_smul_range_free (O M : Type) [CommRing O] [Nontrivial O] [Ad
       rw [LinearEquiv.coe_coe, map_smul, LinearEquiv.apply_symm_apply]
       funext i
       simp [← hc i, mul_comm]
-  let f := (Submodule.Quotient.equiv _ _ e hmap).trans
-    (Submodule.quotientPi (fun _ : Fin d => (Ideal.span {a} : Submodule O O)))
-  rw [f.length_eq, Module.length_pi_of_fintype, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
-    nsmul_eq_mul]
+  let f :=
+    (Submodule.Quotient.equiv _ _ e hmap).trans
+      (Submodule.quotientPi (fun _ : Fin d => (Ideal.span {a} : Submodule O O)))
+  rw [f.length_eq, Module.length_pi_of_fintype, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul]
 
-theorem length_quot_p_pow (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p]
-    (n : ℕ) : Module.length (WittVector p k) (WittVector p k ⧸ Ideal.span {(p : WittVector p k) ^ n}) = n := by
+theorem length_quot_p_pow
+    (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (n : ℕ)
+    : Module.length (WittVector p k) (WittVector p k ⧸ Ideal.span {(p : WittVector p k) ^ n})
+      = n := by
   rw [← Ideal.span_singleton_pow, ← (WittVector.irreducible p).maximalIdeal_eq]
   exact IsDiscreteValuationRing.length_quotient_pow_maximalIdeal _ n
 
@@ -112,10 +124,30 @@ end GlobalTheory.Dieu.ColengthLemmas
 namespace GlobalTheory.Dieu
 
 open GlobalTheory.Dieu.ColengthLemmas in
-theorem colength_add_and_pow_and_eq : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (A B C : Type) [AddCommGroup A] [Module (WittVector p k) A] [AddCommGroup B] [Module (WittVector p k) B] [AddCommGroup C] [Module (WittVector p k) C], (∀ (u : B →ₗ[(WittVector p k)] A) (v : C →ₗ[(WittVector p k)] B), Function.Injective u → Module.length (WittVector p k) (A ⧸ LinearMap.range (u ∘ₗ v)) = Module.length (WittVector p k) (A ⧸ LinearMap.range u) + Module.length (WittVector p k) (B ⧸ LinearMap.range v)) ∧ (Module.Free (WittVector p k) A → Module.Finite (WittVector p k) A → ∀ (n : ℕ) (u : A →ₗ[(WittVector p k)] A), (∀ a, u a = p ^ n • a) → Module.length (WittVector p k) (A ⧸ LinearMap.range u) = (n * Module.finrank (WittVector p k) A : ℕ)) ∧ ∀ L L' : Submodule (WittVector p k) A, L ≤ L' → Module.length (WittVector p k) (A ⧸ L) = Module.length (WittVector p k) (A ⧸ L') → Module.length (WittVector p k) (A ⧸ L) ≠ ⊤ → L = L' := by
+theorem colength_add_and_pow_and_eq
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (A B C : Type)
+        [AddCommGroup A] [Module (WittVector p k) A] [AddCommGroup B] [Module (WittVector p k) B]
+        [AddCommGroup C] [Module (WittVector p k) C],
+      (∀ (u : B →ₗ[(WittVector p k)] A) (v : C →ₗ[(WittVector p k)] B),
+          Function.Injective u
+            → Module.length (WittVector p k) (A ⧸ LinearMap.range (u ∘ₗ v))
+              = Module.length (WittVector p k) (A ⧸ LinearMap.range u)
+                + Module.length (WittVector p k) (B ⧸ LinearMap.range v))
+        ∧ (Module.Free (WittVector p k) A → Module.Finite (WittVector p k) A
+          → ∀ (n : ℕ) (u : A →ₗ[(WittVector p k)] A),
+            (∀ a, u a = p ^ n • a)
+              → Module.length (WittVector p k) (A ⧸ LinearMap.range u)
+                = (n * Module.finrank (WittVector p k) A : ℕ))
+        ∧ ∀ L L' : Submodule (WittVector p k) A,
+          L ≤ L' → Module.length (WittVector p k) (A ⧸ L) = Module.length (WittVector p k) (A ⧸ L')
+            → Module.length (WittVector p k) (A ⧸ L) ≠ ⊤
+            → L = L' := by
   intro p _ k _ _ _ A B C _ _ _ _ _ _
-  refine ⟨fun u v hu => length_comp_range u v hu, fun _ _ n u hu => ?_,
-    fun L L' h hl ht => eq_of_le_of_length_eq L L' h hl ht⟩
+  refine ⟨
+    fun u v hu => length_comp_range u v hu,
+    fun _ _ n u hu => ?_,
+    fun L L' h hl ht => eq_of_le_of_length_eq L L' h hl ht
+  ⟩
   have hu' : u = ((p : WittVector p k) ^ n) • (LinearMap.id : A →ₗ[WittVector p k] A) := by
     ext a
     rw [hu a, LinearMap.smul_apply, LinearMap.id_apply, ← Nat.cast_pow, Nat.cast_smul_eq_nsmul]

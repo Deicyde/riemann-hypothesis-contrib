@@ -57,11 +57,27 @@ theorem vge_mul' {a b : ℝ} {x y : K} (hx : vge v a x) (hy : vge v b y) : vge v
       rw [h1, h2, ← WithTop.coe_add, WithTop.coe_inj] at hn
       have := hx m h1
       have := hy k h2
-      rw [← hn]; push_cast; linarith
+      rw [← hn]
+      push_cast
+      linarith
 
-theorem vge_sum' {ι : Type} {a : ℝ} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, vge v a (f i)) :
-    vge v a (∑ i ∈ s, f i) := by
-  first | exact UpperTheory.Reformulated.B.Qh31.vge_sum .. | (apply UpperTheory.Reformulated.B.Qh31.vge_sum <;> assumption) | (intros; apply UpperTheory.Reformulated.B.Qh31.vge_sum <;> assumption) | (apply @UpperTheory.Reformulated.B.Qh31.vge_sum <;> assumption) | (intros; apply @UpperTheory.Reformulated.B.Qh31.vge_sum <;> assumption) | (apply @UpperTheory.Reformulated.B.Qh31.vge_sum <;> first | assumption | infer_instance) | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι a s f h | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι a s f | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι a s | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι a | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K
+theorem vge_sum' {ι : Type} {a : ℝ} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, vge v a (f i))
+    : vge v a (∑ i ∈ s, f i) := by
+  first
+  | exact UpperTheory.Reformulated.B.Qh31.vge_sum ..
+  | (apply UpperTheory.Reformulated.B.Qh31.vge_sum <;> assumption)
+  | (intros; apply UpperTheory.Reformulated.B.Qh31.vge_sum <;> assumption)
+  | (apply @UpperTheory.Reformulated.B.Qh31.vge_sum <;> assumption)
+  | (intros; apply @UpperTheory.Reformulated.B.Qh31.vge_sum <;> assumption)
+  | (apply @UpperTheory.Reformulated.B.Qh31.vge_sum <;> first | assumption | infer_instance)
+  | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι a s f h
+  | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι a s f
+  | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι a s
+  | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι a
+  | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v ι
+  | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_› v
+  | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K ‹_›
+  | exact @UpperTheory.Reformulated.B.Qh31.vge_sum K
 
 theorem fact_ne_zero' {σ : Type} (α : σ →₀ ℕ) : fact α ≠ 0 := by
   unfold fact Finsupp.prod
@@ -71,7 +87,8 @@ theorem vge_vN' (n : ℕ) : vge v (vN v n) (n : K) := by
   rw [vge_iff']
   intro m hm
   unfold vN
-  rw [hm]; simp
+  rw [hm]
+  simp
 
 end Elem
 
@@ -79,18 +96,21 @@ section Fock
 
 variable {σ : Type}
 
-theorem fock_eq_sum_of (F G : MvPolynomial σ K) (s : Finset (σ →₀ ℕ))
-    (h : ∀ α, F.coeff α ≠ 0 → G.coeff α ≠ 0 → α ∈ s) :
-    fock F G = ∑ α ∈ s, F.coeff α * G.coeff α * (fact α : K) := by
+theorem fock_eq_sum_of
+    (F G : MvPolynomial σ K) (s : Finset (σ →₀ ℕ)) (h : ∀ α, F.coeff α ≠ 0 → G.coeff α ≠ 0 → α ∈ s)
+    : fock F G = ∑ α ∈ s, F.coeff α * G.coeff α * (fact α : K) := by
   classical
   unfold fock
-  have h1 : ∑ α ∈ F.support, F.coeff α * G.coeff α * (fact α : K) =
-      ∑ α ∈ F.support ∪ s, F.coeff α * G.coeff α * (fact α : K) := by
+  have h1
+      : ∑ α ∈ F.support, F.coeff α * G.coeff α * (fact α : K)
+        = ∑ α ∈ F.support ∪ s, F.coeff α * G.coeff α * (fact α : K) := by
     apply Finset.sum_subset Finset.subset_union_left
     intro α _ hα
-    rw [notMem_support_iff.mp hα]; simp
-  have h2 : ∑ α ∈ s, F.coeff α * G.coeff α * (fact α : K) =
-      ∑ α ∈ F.support ∪ s, F.coeff α * G.coeff α * (fact α : K) := by
+    rw [notMem_support_iff.mp hα]
+    simp
+  have h2
+      : ∑ α ∈ s, F.coeff α * G.coeff α * (fact α : K)
+        = ∑ α ∈ F.support ∪ s, F.coeff α * G.coeff α * (fact α : K) := by
     apply Finset.sum_subset Finset.subset_union_right
     intro α _ hα
     by_cases hF : F.coeff α = 0
@@ -100,9 +120,9 @@ theorem fock_eq_sum_of (F G : MvPolynomial σ K) (s : Finset (σ →₀ ℕ))
       · exact absurd (h α hF hG) hα
   rw [h1, h2]
 
-theorem fock_eq_sum (F G : MvPolynomial σ K) (s : Finset (σ →₀ ℕ))
-    (h : F.support ⊆ s ∨ G.support ⊆ s) :
-    fock F G = ∑ α ∈ s, F.coeff α * G.coeff α * (fact α : K) := by
+theorem fock_eq_sum
+    (F G : MvPolynomial σ K) (s : Finset (σ →₀ ℕ)) (h : F.support ⊆ s ∨ G.support ⊆ s)
+    : fock F G = ∑ α ∈ s, F.coeff α * G.coeff α * (fact α : K) := by
   apply fock_eq_sum_of
   intro α hF hG
   rcases h with h | h
@@ -131,53 +151,52 @@ theorem fock_smul_left (c : K) (F G : MvPolynomial σ K) : fock (c • F) G = c 
 theorem fock_smul_right (c : K) (F G : MvPolynomial σ K) : fock F (c • G) = c * fock F G := by
   rw [fock_comm, fock_smul_left, fock_comm]
 
-theorem fock_zero_left (G : MvPolynomial σ K) : fock 0 G = 0 := by
-  unfold fock; simp
+theorem fock_zero_left (G : MvPolynomial σ K) : fock 0 G = 0 := by unfold fock; simp
 
-theorem fock_neg_left (F G : MvPolynomial σ K) : fock (-F) G = -fock F G := by
+theorem fock_neg_left (F G : MvPolynomial σ K) : fock (-F) G = - fock F G := by
   have := fock_smul_left (-1 : K) F G
   simpa using this
 
 theorem fock_sub_left (F F' G : MvPolynomial σ K) : fock (F - F') G = fock F G - fock F' G := by
   rw [sub_eq_add_neg, fock_add_left, fock_neg_left, ← sub_eq_add_neg]
 
-theorem fock_sum_left {ι : Type} (s : Finset ι) (f : ι → MvPolynomial σ K) (G : MvPolynomial σ K) :
-    fock (∑ i ∈ s, f i) G = ∑ i ∈ s, fock (f i) G := by
+theorem fock_sum_left {ι : Type} (s : Finset ι) (f : ι → MvPolynomial σ K) (G : MvPolynomial σ K)
+    : fock (∑ i ∈ s, f i) G = ∑ i ∈ s, fock (f i) G := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [fock_zero_left]
   | insert i s hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, fock_add_left, ih]
 
-theorem fock_sum_right {ι : Type} (s : Finset ι) (F : MvPolynomial σ K) (f : ι → MvPolynomial σ K) :
-    fock F (∑ i ∈ s, f i) = ∑ i ∈ s, fock F (f i) := by
+theorem fock_sum_right {ι : Type} (s : Finset ι) (F : MvPolynomial σ K) (f : ι → MvPolynomial σ K)
+    : fock F (∑ i ∈ s, f i) = ∑ i ∈ s, fock F (f i) := by
   rw [fock_comm, fock_sum_left]
   exact Finset.sum_congr rfl fun i _ => fock_comm _ _
 
-theorem fock_monomial_right (F : MvPolynomial σ K) (α : σ →₀ ℕ) (c : K) :
-    fock F (monomial α c) = F.coeff α * c * (fact α : K) := by
+theorem fock_monomial_right (F : MvPolynomial σ K) (α : σ →₀ ℕ) (c : K)
+    : fock F (monomial α c) = F.coeff α * c * (fact α : K) := by
   classical
   rw [fock_eq_sum F (monomial α c) {α} (Or.inr (support_monomial_subset)), Finset.sum_singleton,
     coeff_monomial, if_pos rfl]
 
-theorem fock_eq_sum_right (F G : MvPolynomial σ K) :
-    fock F G = ∑ α ∈ G.support, F.coeff α * G.coeff α * (fact α : K) :=
+theorem fock_eq_sum_right (F G : MvPolynomial σ K)
+    : fock F G = ∑ α ∈ G.support, F.coeff α * G.coeff α * (fact α : K) :=
   fock_eq_sum F G G.support (Or.inr (Finset.Subset.refl _))
 
-theorem dg_eq_sum_f (f : (σ →₀ ℕ) → K) (F : MvPolynomial σ K) :
-    dg f F = ∑ α ∈ F.support, monomial α (f α * F.coeff α) := by
+theorem dg_eq_sum_f (f : (σ →₀ ℕ) → K) (F : MvPolynomial σ K)
+    : dg f F = ∑ α ∈ F.support, monomial α (f α * F.coeff α) := by
   conv_lhs => rw [← support_sum_monomial_coeff F]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   exact Finset.sum_congr rfl fun α _ => dg_monomial f α _
 
-theorem support_dg_subset (f : (σ →₀ ℕ) → K) (F : MvPolynomial σ K) :
-    (dg f F).support ⊆ F.support := by
+theorem support_dg_subset (f : (σ →₀ ℕ) → K) (F : MvPolynomial σ K)
+    : (dg f F).support ⊆ F.support := by
   intro α hα
   rw [mem_support_iff, coeff_dg] at hα
   exact mem_support_iff.mpr (right_ne_zero_of_mul hα)
 
-theorem gaAct_eq_dg (D : TwistData K) (G : MvPolynomial (D.OL × Fin D.r) K) :
-    D.gaAct G = dg D.ga G := by
+theorem gaAct_eq_dg (D : TwistData K) (G : MvPolynomial (D.OL × Fin D.r) K)
+    : D.gaAct G = dg D.ga G := by
   rw [dg_eq_sum_f]; rfl
 
 end Fock
@@ -186,16 +205,14 @@ section BB
 
 variable (v : AddValuation K (WithTop ℚ)) {σ : Type}
 
-theorem vge_sub_iff (a w : ℝ) (x : K) :
-    vge v (a - w) x ↔ ((a : ℝ) : WithTop ℝ) ≤ vR v x + ((w : ℝ) : WithTop ℝ) := by
+theorem vge_sub_iff (a w : ℝ) (x : K)
+    : vge v (a - w) x ↔ ((a : ℝ) : WithTop ℝ) ≤ vR v x + ((w : ℝ) : WithTop ℝ) := by
   unfold vge
   cases vR v x with
   | top => simp
-  | coe y =>
-    rw [← WithTop.coe_add, WithTop.coe_le_coe, WithTop.coe_le_coe, sub_le_iff_le_add]
+  | coe y => rw [← WithTop.coe_add, WithTop.coe_le_coe, WithTop.coe_le_coe, sub_le_iff_le_add]
 
-theorem bge_iff (a : ℝ) (F : MvPolynomial σ K) :
-    bge v a F ↔ ((a : ℝ) : WithTop ℝ) ≤ vBB v F := by
+theorem bge_iff (a : ℝ) (F : MvPolynomial σ K) : bge v a F ↔ ((a : ℝ) : WithTop ℝ) ≤ vBB v F := by
   unfold bge vBB
   rw [Finset.le_inf_iff]
   constructor
@@ -209,22 +226,24 @@ theorem bge_iff (a : ℝ) (F : MvPolynomial σ K) :
 theorem bge_mono {a b : ℝ} {F : MvPolynomial σ K} (hab : b ≤ a) (h : bge v a F) : bge v b F :=
   fun α => vge_mono' v (by linarith) (h α)
 
-theorem bge_monomial {a : ℝ} (α : σ →₀ ℕ) {c : K} (hc : vge v a c) :
-    bge v (a + vN v (fact α) / 2) (monomial α c) := fun β => by
+theorem bge_monomial {a : ℝ} (α : σ →₀ ℕ) {c : K} (hc : vge v a c)
+    : bge v (a + vN v (fact α) / 2) (monomial α c) := fun β => by
   classical
   rw [coeff_monomial]
   split_ifs with h
   · rw [← h]; exact vge_mono' v (by linarith) hc
   · exact vge_zero' v _
 
-theorem bge_dg {a b : ℝ} {f : (σ →₀ ℕ) → K} {F : MvPolynomial σ K} (hf : ∀ α, vge v a (f α))
-    (hF : bge v b F) : bge v (a + b) (dg f F) := fun α => by
+theorem bge_dg
+    {a b : ℝ} {f : (σ →₀ ℕ) → K} {F : MvPolynomial σ K} (hf : ∀ α, vge v a (f α)) (hF : bge v b F)
+    : bge v (a + b) (dg f F) := fun α => by
   rw [coeff_dg]
   exact vge_mono' v (by linarith) (vge_mul' v (hf α) (hF α))
 
-theorem exists_of_vBB_zero (F : MvPolynomial σ K) (h : vBB v F = 0) :
-    (∃ α ∈ F.support, vge v (-(vN v (fact α)) / 2) (F.coeff α) ∧
-      vle v (-(vN v (fact α)) / 2) (F.coeff α)) ∧ bge v 0 F := by
+theorem exists_of_vBB_zero (F : MvPolynomial σ K) (h : vBB v F = 0)
+    : (∃ α ∈ F.support,
+        vge v (-(vN v (fact α)) / 2) (F.coeff α) ∧ vle v (-(vN v (fact α)) / 2) (F.coeff α))
+      ∧ bge v 0 F := by
   refine ⟨?_, (bge_iff v 0 F).mpr (by rw [h]; rfl)⟩
   have hne : F.support.Nonempty := by
     by_contra hc
@@ -232,8 +251,9 @@ theorem exists_of_vBB_zero (F : MvPolynomial σ K) (h : vBB v F = 0) :
     unfold vBB at h
     rw [hc, Finset.inf_empty] at h
     exact absurd h (by simp)
-  obtain ⟨α, hα, hinf⟩ := Finset.exists_mem_eq_inf F.support hne
-    (fun α => vR v (F.coeff α) + ((((v (fact α : K)).untopD 0 : ℚ) : ℝ) / 2 : ℝ))
+  obtain ⟨α, hα, hinf⟩ :=
+    Finset.exists_mem_eq_inf F.support hne
+      (fun α => vR v (F.coeff α) + ((((v (fact α : K)).untopD 0 : ℚ) : ℝ) / 2 : ℝ))
   refine ⟨α, hα, ?_⟩
   have h0 : vR v (F.coeff α) + ((vN v (fact α) / 2 : ℝ) : WithTop ℝ) = 0 := by
     rw [← h]; exact hinf.symm
@@ -247,8 +267,8 @@ theorem exists_of_vBB_zero (F : MvPolynomial σ K) (h : vBB v F = 0) :
     rw [h2]
     exact ⟨le_refl _, le_refl _⟩
 
-theorem vge_fock {a b : ℝ} {F G : MvPolynomial σ K} (hF : bge v a F) (hG : bge v b G) :
-    vge v (a + b) (fock F G) := by
+theorem vge_fock {a b : ℝ} {F G : MvPolynomial σ K} (hF : bge v a F) (hG : bge v b G)
+    : vge v (a + b) (fock F G) := by
   unfold fock
   apply vge_sum'
   intro α _

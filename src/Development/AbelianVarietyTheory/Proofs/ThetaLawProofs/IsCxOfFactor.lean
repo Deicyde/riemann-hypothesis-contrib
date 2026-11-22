@@ -37,25 +37,34 @@ private lemma map_kosD_inl_inl {S : Type} [CommRing S] (f : R →+* S)
   set_option synthInstance.maxHeartbeats 100000 in
     simp [_root_.GlobalTheory.KeyKa.kosD, map_sum, apply_ite]
 
-theorem _root_.GlobalTheory.KeyKa.KoszulTors.koszul_tors : ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O]
-    (g d : ℕ) (N : ℕ → ℕ) (m : Fin g → ∀ j j', Matrix (Fin (N j)) (Fin (N j')) O)
-    (ev ev₀ : ∀ j, Matrix (Fin d) (Fin (N j)) O) (Pm : Matrix (Fin d) (Fin d) O),
-    _root_.GlobalTheory.KeyKa.IsCx _root_.GlobalTheory.KeyKa.kdeg (_root_.GlobalTheory.KeyKa.kosD m ev) →
-    ev 0 = Pm * ev₀ 0 → Pm.det ≠ 0 → Function.Surjective (ev₀ 0).mulVec →
-    (∀ v, (ev 0).mulVec v = 0 → ∃ w : Fin g → Fin (N 1) → O, v = ∑ i, (m i 0 1).mulVec (w i)) →
-    (∀ v : _root_.GlobalTheory.KeyKa.KIx g 0 N → IsLocalRing.ResidueField O,
-      (_root_.GlobalTheory.KeyKa.kosD (fun i j j' => (m i j j').map (IsLocalRing.residue O))
-        (fun _ => 0)).mulVec v = 0 →
-      ∃ w, ∀ p, p.1 ≠ ∅ → v (.inl p) = (_root_.GlobalTheory.KeyKa.kosD (d := 0)
-        (fun i j j' => (m i j j').map (IsLocalRing.residue O)) (fun _ => 0)).mulVec w (.inl p)) →
-    _root_.GlobalTheory.KeyKa.IsCx _root_.GlobalTheory.KeyKa.kdeg (_root_.GlobalTheory.KeyKa.kosD m ev₀) ∧
-      ∃ t, _root_.GlobalTheory.KeyKa.TorsSq _root_.GlobalTheory.KeyKa.kdeg
-        (_root_.GlobalTheory.KeyKa.kosD m ev₀) t := by
+theorem _root_.GlobalTheory.KeyKa.KoszulTors.koszul_tors
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] (g d : ℕ) (N : ℕ → ℕ)
+        (m : Fin g → ∀ j j', Matrix (Fin (N j)) (Fin (N j')) O)
+        (ev ev₀ : ∀ j, Matrix (Fin d) (Fin (N j)) O) (Pm : Matrix (Fin d) (Fin d) O),
+      _root_.GlobalTheory.KeyKa.IsCx _root_.GlobalTheory.KeyKa.kdeg
+          (_root_.GlobalTheory.KeyKa.kosD m ev)
+        → ev 0 = Pm * ev₀ 0 → Pm.det ≠ 0 → Function.Surjective (ev₀ 0).mulVec
+        → (∀ v, (ev 0).mulVec v = 0 → ∃ w : Fin g → Fin (N 1) → O, v = ∑ i, (m i 0 1).mulVec (w i))
+        → (∀ v : _root_.GlobalTheory.KeyKa.KIx g 0 N → IsLocalRing.ResidueField O,
+          (_root_.GlobalTheory.KeyKa.kosD
+                (fun i j j' => (m i j j').map (IsLocalRing.residue O))
+                (fun _ => 0)).mulVec v
+              = 0
+            → ∃ w, ∀ p,
+              p.1 ≠ ∅
+                → v (.inl p)
+                  = (_root_.GlobalTheory.KeyKa.kosD (d := 0)
+                    (fun i j j' => (m i j j').map (IsLocalRing.residue O))
+                    (fun _ => 0)).mulVec w (.inl p))
+        → _root_.GlobalTheory.KeyKa.IsCx _root_.GlobalTheory.KeyKa.kdeg
+            (_root_.GlobalTheory.KeyKa.kosD m ev₀)
+          ∧ ∃ t,
+            _root_.GlobalTheory.KeyKa.TorsSq _root_.GlobalTheory.KeyKa.kdeg
+              (_root_.GlobalTheory.KeyKa.kosD m ev₀) t := by
   intro O _ _ _ g d N m ev ev₀ Pm hcx hev hdet hsurj hker hres
   set K := _root_.GlobalTheory.KeyKa.kosD m ev with hK
   set K₀ := _root_.GlobalTheory.KeyKa.kosD m ev₀ with hK₀
-  have hrow : ∀ p y, K (.inl p) y = K₀ (.inl p) y := fun p y =>
-    kosD_inl_indep_ev m ev ev₀ p y
+  have hrow : ∀ p y, K (.inl p) y = K₀ (.inl p) y := fun p y => kosD_inl_indep_ev m ev ev₀ p y
   have haug : ∀ a y, K (.inr a) y = ∑ b, Pm a b * K₀ (.inr b) y := by
     intro a y
     rcases y with ⟨I, l⟩ | c
@@ -101,27 +110,38 @@ theorem _root_.GlobalTheory.KeyKa.KoszulTors.koszul_tors : ∀ (O : Type) [CommR
           refine Fintype.sum_congr _ _ fun c => Fintype.sum_congr _ _ fun b => ?_
           rw [mul_assoc, hmid]
         exact congrFun (Matrix.eq_zero_of_mulVec_eq_zero hdet hvec) a
-  refine ⟨hcx₀, _root_.GlobalTheory.TorsExists.exists_torsSq O _ _root_.GlobalTheory.KeyKa.kdeg K₀ hcx₀ ?_⟩
+  refine ⟨
+    hcx₀,
+    _root_.GlobalTheory.TorsExists.exists_torsSq O _ _root_.GlobalTheory.KeyKa.kdeg K₀ hcx₀ ?_
+  ⟩
   intro v hv
   have hz : ∀ x c, K₀ x (.inr c) = 0 := fun x c => kosD_inr_eq_zero m ev₀ x c
-  have hmv : ∀ (u : _root_.GlobalTheory.KeyKa.KIx g d N → IsLocalRing.ResidueField O) y,
-      (K₀.map (IsLocalRing.residue O)).mulVec u y = ∑ I : Finset (Fin g), ∑ l : Fin (N I.card),
-        IsLocalRing.residue O (K₀ y (.inl ⟨I, l⟩)) * u (.inl ⟨I, l⟩) := by
+  have hmv
+      : ∀ (u : _root_.GlobalTheory.KeyKa.KIx g d N → IsLocalRing.ResidueField O) y,
+        (K₀.map (IsLocalRing.residue O)).mulVec u y
+          = ∑ I : Finset (Fin g), ∑ l : Fin (N I.card),
+            IsLocalRing.residue O (K₀ y (.inl ⟨I, l⟩)) * u (.inl ⟨I, l⟩) := by
     intro u y
     rw [Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Fintype.sum_sigma]
     simp [Matrix.map_apply, hz]
-  have hmv₀ : ∀ (u : _root_.GlobalTheory.KeyKa.KIx g 0 N → IsLocalRing.ResidueField O) y,
-      (_root_.GlobalTheory.KeyKa.kosD (fun i j j' => (m i j j').map (IsLocalRing.residue O))
-        (fun _ => 0)).mulVec u y = ∑ I : Finset (Fin g), ∑ l : Fin (N I.card),
-        _root_.GlobalTheory.KeyKa.kosD (fun i j j' => (m i j j').map (IsLocalRing.residue O))
-          (fun _ => 0) y (.inl ⟨I, l⟩) * u (.inl ⟨I, l⟩) := by
+  have hmv₀
+      : ∀ (u : _root_.GlobalTheory.KeyKa.KIx g 0 N → IsLocalRing.ResidueField O) y,
+        (_root_.GlobalTheory.KeyKa.kosD
+            (fun i j j' => (m i j j').map (IsLocalRing.residue O))
+            (fun _ => 0)).mulVec u y
+          = ∑ I : Finset (Fin g), ∑ l : Fin (N I.card),
+            _root_.GlobalTheory.KeyKa.kosD (fun i j j' => (m i j j').map (IsLocalRing.residue O))
+              (fun _ => 0) y (.inl ⟨I, l⟩) * u (.inl ⟨I, l⟩) := by
     intro u y
     rw [Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Fintype.sum_sigma]
     simp
-  have hent : ∀ (p q : (I : Finset (Fin g)) × Fin (N I.card)),
-      IsLocalRing.residue O (K₀ (.inl p) (.inl q)) =
-        _root_.GlobalTheory.KeyKa.kosD (fun i j j' => (m i j j').map (IsLocalRing.residue O))
-          (fun _ => (0 : Matrix (Fin 0) _ _)) (.inl p) (.inl q) := fun p q =>
+  have hent
+      : ∀ (p q : (I : Finset (Fin g)) × Fin (N I.card)),
+        IsLocalRing.residue O (K₀ (.inl p) (.inl q))
+          = _root_.GlobalTheory.KeyKa.kosD
+            (fun i j j' => (m i j j').map (IsLocalRing.residue O))
+            (fun _ => (0 : Matrix (Fin 0) _ _))
+            (.inl p) (.inl q) := fun p q =>
     map_kosD_inl_inl _ m ev₀ _ p q
 
   choose u0 hu0 using fun a : Fin d => IsLocalRing.residue_surjective (v (.inr a))
@@ -156,62 +176,71 @@ theorem _root_.GlobalTheory.KeyKa.KoszulTors.koszul_tors : ∀ (O : Type) [CommR
     rw [hev, ← Matrix.mulVec_mulVec, Matrix.mulVec_sub, hs'ev, sub_self, Matrix.mulVec_zero]
   obtain ⟨w1, hw1⟩ := hker (x - s') hx'0
 
-  obtain ⟨w', hw'⟩ := hres (Sum.elim (fun p => v (.inl p)) (fun e => Fin.elim0 e)) (by
-    ext z
-    rcases z with ⟨I, l⟩ | e
-    · have h := congrFun hv (.inl ⟨I, l⟩)
-      rw [Pi.zero_apply, hmv] at h
-      rw [hmv₀, Pi.zero_apply, ← h]
-      refine Finset.sum_congr rfl fun J _ => Finset.sum_congr rfl fun l' _ => ?_
-      rw [hent]
-      rfl
-    · exact Fin.elim0 e)
+  obtain ⟨w', hw'⟩ :=
+    hres (Sum.elim (fun p => v (.inl p)) (fun e => Fin.elim0 e)) (by
+      ext z
+      rcases z with ⟨I, l⟩ | e
+      · have h := congrFun hv (.inl ⟨I, l⟩)
+        rw [Pi.zero_apply, hmv] at h
+        rw [hmv₀, Pi.zero_apply, ← h]
+        refine Finset.sum_congr rfl fun J _ => Finset.sum_congr rfl fun l' _ => ?_
+        rw [hent]
+        rfl
+      · exact Fin.elim0 e)
   let wf : (I : Finset (Fin g)) → Fin (N I.card) → IsLocalRing.ResidueField O := fun I l =>
-    if hI : I = ∅ then IsLocalRing.residue O (s (Fin.cast (by simp [hI]) l))
+    if hI : I = ∅ then
+      IsLocalRing.residue O (s (Fin.cast (by simp [hI]) l))
     else if I.card = 1 then
       ∑ i, (if h : I = {i} then IsLocalRing.residue O (w1 i (Fin.cast (by simp [h]) l)) else 0)
-    else w' (.inl ⟨I, l⟩)
+    else
+      w' (.inl ⟨I, l⟩)
   refine ⟨Sum.elim (fun p => wf p.1 p.2) (fun _ => 0), ?_⟩
   ext y
   rcases y with ⟨I, l⟩ | a
   · by_cases hI : I = ∅
     · subst hI
       obtain ⟨l, rfl⟩ : ∃ l' : Fin (N 0), l' = l := ⟨l, rfl⟩
-      have hxl : IsLocalRing.residue O (x l) = ∑ i, ∑ l'' : Fin (N 1),
-          IsLocalRing.residue O (m i 0 1 l l'') * IsLocalRing.residue O (w1 i l'') := by
-        calc IsLocalRing.residue O (x l)
-            = IsLocalRing.residue O ((∑ i, (m i 0 1).mulVec (w1 i)) l) := by
-              rw [← hw1]
-              show _ = IsLocalRing.residue O (x l - s' l)
-              simp [hs'res]
+      have hxl
+          : IsLocalRing.residue O (x l)
+            = ∑ i, ∑ l'' : Fin (N 1),
+              IsLocalRing.residue O (m i 0 1 l l'') * IsLocalRing.residue O (w1 i l'') := by
+        calc
+          IsLocalRing.residue O (x l)
+              = IsLocalRing.residue O ((∑ i, (m i 0 1).mulVec (w1 i)) l) := by
+            rw [← hw1]
+            show _ = IsLocalRing.residue O (x l - s' l)
+            simp [hs'res]
           _ = _ := by simp [Finset.sum_apply, Matrix.mulVec, dotProduct, map_sum]
       refine Eq.trans ?_ (hx l)
       rw [hmv, hxl]
-      have hJ : ∀ J : Finset (Fin g), ∑ l' : Fin (N J.card),
-          IsLocalRing.residue O (K₀ (.inl ⟨∅, l⟩) (.inl ⟨J, l'⟩)) *
-            Sum.elim (fun p : (I : Finset (Fin g)) × Fin (N I.card) => wf p.1 p.2)
-              (fun _ : Fin d => (0 : IsLocalRing.ResidueField O)) (.inl ⟨J, l'⟩) =
-          ∑ i, if J = {i} then ∑ l'' : Fin (N 1),
-            IsLocalRing.residue O (m i 0 1 l l'') * IsLocalRing.residue O (w1 i l'') else 0 := by
-        intro J
-        by_cases h : ∃ i, J = {i}
-        · obtain ⟨i, rfl⟩ := h
-          rw [Finset.sum_eq_single i (fun j _ hj => if_neg fun h' => hj (Finset.singleton_inj.mp h').symm)
-            (fun h' => absurd (Finset.mem_univ _) h'), if_pos rfl]
-          refine Finset.sum_congr rfl fun l' _ => ?_
-          congr 1
-          · rw [hK₀]
-            first
+      have hJ
+          : ∀ J : Finset (Fin g),
+            ∑ l' : Fin (N J.card),
+                IsLocalRing.residue O (K₀ (.inl ⟨∅, l⟩) (.inl ⟨J, l'⟩)) *
+                  Sum.elim (fun p : (I : Finset (Fin g)) × Fin (N I.card) => wf p.1 p.2)
+                    (fun _ : Fin d => (0 : IsLocalRing.ResidueField O)) (.inl ⟨J, l'⟩)
+              = ∑ i, if J = {i} then ∑ l'' : Fin (N 1),
+                  IsLocalRing.residue O (m i 0 1 l l'') * IsLocalRing.residue O (w1 i l'') else 0 :=
+        by
+          intro J
+          by_cases h : ∃ i, J = {i}
+          · obtain ⟨i, rfl⟩ := h
+            rw [Finset.sum_eq_single i
+                (fun j _ hj => if_neg fun h' => hj (Finset.singleton_inj.mp h').symm)
+                (fun h' => absurd (Finset.mem_univ _) h'),
+              if_pos rfl]
+            refine Finset.sum_congr rfl fun l' _ => ?_
+            congr 1
+            · rw [hK₀]
+              first
               | (simp [_root_.GlobalTheory.KeyKa.kosD]; done)
               | (simp [_root_.GlobalTheory.KeyKa.kosD]; rfl)
-          · first
-              | (simp [wf]; done)
-              | (simp [wf]; rfl)
-        · push_neg at h
-          rw [Finset.sum_eq_zero fun i _ => if_neg (h i)]
-          refine Finset.sum_eq_zero fun l' _ => ?_
-          rw [hK₀]
-          simp [_root_.GlobalTheory.KeyKa.kosD, h]
+            · first | (simp [wf]; done) | (simp [wf]; rfl)
+          · push_neg at h
+            rw [Finset.sum_eq_zero fun i _ => if_neg (h i)]
+            refine Finset.sum_eq_zero fun l' _ => ?_
+            rw [hK₀]
+            simp [_root_.GlobalTheory.KeyKa.kosD, h]
       rw [Finset.sum_congr rfl fun J _ => hJ J, Finset.sum_comm]
       simp
     · refine Eq.trans ?_ (hw' ⟨I, l⟩ hI).symm
@@ -237,10 +266,10 @@ theorem _root_.GlobalTheory.KeyKa.KoszulTors.koszul_tors : ∀ (O : Type) [CommR
       refine Finset.sum_congr rfl fun l _ => ?_
       show IsLocalRing.residue O (if (∅ : Finset (Fin g)) = ∅ then ev₀ 0 a l else 0) * wf ∅ l = _
       first
-        | (simp [wf]; done)
-        | (simp [wf]; rfl)
-        | rfl
-        | (simp only [wf, ↓reduceDIte, ↓reduceIte]; rfl)
+      | (simp [wf]; done)
+      | (simp [wf]; rfl)
+      | rfl
+      | (simp only [wf, ↓ reduceDIte, ↓ reduceIte]; rfl)
     · intro I _ hI
       refine Finset.sum_eq_zero fun l _ => ?_
       show IsLocalRing.residue O (if I = ∅ then ev₀ I.card a l else 0) * _ = 0

@@ -8,10 +8,12 @@ open CategoryTheory AlgebraicGeometry Limits
 
 namespace GlobalTheory.EqualityOnPoints
 
-theorem eq_on_points {W X Y Z : Scheme.{0}} {a b : X ⟶ Y} (s : Y ⟶ Z) [IsSeparated s]
-    (h : a ≫ s = b ≫ s) (i : W ⟶ X) [IsDominant i] (hi : i ≫ a = i ≫ b) (x : X) :
-    (a x : Y) = b x := by
-
+theorem eq_on_points
+    {W X Y Z : Scheme.{0}} {a b : X ⟶ Y} (s : Y ⟶ Z) [IsSeparated s]
+    (h : a ≫ s = b ≫ s)
+    (i : W ⟶ X) [IsDominant i]
+    (hi : i ≫ a = i ≫ b) (x : X)
+    : (a x : Y) = b x := by
   set l := pullback.lift a b h with hl
   have hcl : IsClosed (l ⁻¹' Set.range (pullback.diagonal s)) :=
     (pullback.diagonal s).isClosedEmbedding.isClosed_range.preimage l.continuous

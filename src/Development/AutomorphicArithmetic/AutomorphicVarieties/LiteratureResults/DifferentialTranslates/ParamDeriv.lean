@@ -30,8 +30,8 @@ theorem paramDeriv : ParamDeriv := by
     exact Ioc_subset_Icc_self ht
   have hline : ∀ x : V, Continuous (fun t : ℝ => (x, t)) := fun x =>
     continuous_const.prodMk continuous_id
-  obtain ⟨u, v, hu, hv, hpu, hIv, huv⟩ := generalized_tube_lemma isCompact_singleton
-    isCompact_Icc hW (by
+  obtain ⟨u, v, hu, hv, hpu, hIv, huv⟩ :=
+    generalized_tube_lemma isCompact_singleton isCompact_Icc hW (by
       rintro ⟨x, t⟩ ⟨hx, ht⟩
       simp only [mem_singleton_iff] at hx
       subst hx
@@ -53,22 +53,23 @@ theorem paramDeriv : ParamDeriv := by
     exact (hpart (p, t) (hpW t ht)).fderiv
   · have hxW : ∀ x ∈ Metric.closedBall p (ε / 2), ∀ t ∈ Set.uIoc (0 : ℝ) 1, (x, t) ∈ W :=
       fun x hx t ht => hKW ⟨hx, hI t ht⟩
-    have main := intervalIntegral.hasFDerivAt_integral_of_dominated_of_fderiv_le
-      (μ := volume) (F := fun x t => Φ (x, t)) (F' := fun x t => G (x, t))
-      (bound := fun _ => C) (s := Metric.closedBall p (ε / 2)) (a := 0) (b := 1)
-      (Metric.closedBall_mem_nhds p hε)
-      (by
-        filter_upwards [Metric.closedBall_mem_nhds p hε] with x hx
-        exact (hΦ.continuousOn.comp (hline x).continuousOn
-          (fun t ht => hxW x hx t ht)).aestronglyMeasurable measurableSet_uIoc)
-      (by
-        apply ContinuousOn.intervalIntegrable
-        rw [Set.uIcc_of_le zero_le_one]
-        exact hΦ.continuousOn.comp (hline p).continuousOn (fun t ht => hpW t ht))
-      ((hcont1.mono (fun t ht => hI t ht)).aestronglyMeasurable measurableSet_uIoc)
-      (Filter.Eventually.of_forall fun t ht x hx => hC _ ⟨hx, hI t ht⟩)
-      intervalIntegrable_const
-      (Filter.Eventually.of_forall fun t ht x hx => hpart (x, t) (hxW x hx t ht))
+    have main :=
+      intervalIntegral.hasFDerivAt_integral_of_dominated_of_fderiv_le (μ := volume)
+        (F := fun x t => Φ (x, t))
+        (F' := fun x t => G (x, t))
+        (bound := fun _ => C)
+        (s := Metric.closedBall p (ε / 2)) (a := 0) (b := 1) (Metric.closedBall_mem_nhds p hε)
+        (by
+          filter_upwards [Metric.closedBall_mem_nhds p hε] with x hx
+          exact (hΦ.continuousOn.comp (hline x).continuousOn
+            (fun t ht => hxW x hx t ht)).aestronglyMeasurable measurableSet_uIoc)
+        (by
+          apply ContinuousOn.intervalIntegrable
+          rw [Set.uIcc_of_le zero_le_one]
+          exact hΦ.continuousOn.comp (hline p).continuousOn (fun t ht => hpW t ht))
+        ((hcont1.mono (fun t ht => hI t ht)).aestronglyMeasurable measurableSet_uIoc)
+        (Filter.Eventually.of_forall fun t ht x hx => hC _ ⟨hx, hI t ht⟩) intervalIntegrable_const
+        (Filter.Eventually.of_forall fun t ht x hx => hpart (x, t) (hxW x hx t ht))
     refine main.congr_fderiv ?_
     apply intervalIntegral.integral_congr
     intro t ht

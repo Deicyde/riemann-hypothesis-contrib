@@ -11,8 +11,9 @@ open GlobalTheory.QFam
 
 namespace GlobalTheory.QFam
 
-theorem QAll.of_dvd {N N' : ℕ} (h : 0 < N') (hd : N ∣ N') {p : ℂ → Prop} {f : ℍ → ℂ}
-    (h0 : p 0) (hf : QAll p N f) : QAll p N' f := by
+theorem QAll.of_dvd
+    {N N' : ℕ} (h : 0 < N') (hd : N ∣ N') {p : ℂ → Prop} {f : ℍ → ℂ} (h0 : p 0) (hf : QAll p N f)
+    : QAll p N' f := by
   obtain ⟨M, rfl⟩ := hd
   have hN : 0 < N := Nat.pos_of_mul_pos_right h
   have hM : 0 < M := Nat.pos_of_mul_pos_left h
@@ -23,8 +24,9 @@ theorem QAll.of_dvd {N N' : ℕ} (h : 0 < N') (hd : N ∣ N') {p : ℂ → Prop}
   · exact hpa _
   · exact h0
 
-theorem QConj.of_dvd {N N' : ℕ} (h : 0 < N') (hd : N ∣ N') {g : ℂ ≃+* ℂ} {f f' : ℍ → ℂ}
-    (hf : QConj g N f f') : QConj g N' f f' := by
+theorem QConj.of_dvd
+    {N N' : ℕ} (h : 0 < N') (hd : N ∣ N') {g : ℂ ≃+* ℂ} {f f' : ℍ → ℂ} (hf : QConj g N f f')
+    : QConj g N' f f' := by
   obtain ⟨M, rfl⟩ := hd
   have hN : 0 < N := Nat.pos_of_mul_pos_right h
   have hM : 0 < M := Nat.pos_of_mul_pos_left h

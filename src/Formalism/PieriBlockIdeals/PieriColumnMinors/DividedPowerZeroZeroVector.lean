@@ -54,28 +54,39 @@ theorem expLeMono : ExpLeMono := by
   rw [e1, mul_smul]
   exact Submodule.smul_mem _ _ hmx
 
-theorem ld_boxes_le (p w i q : ℕ) (lam2 tau : Fin q → ℕ) (htau : tau ∈ shapes p w i lam2) (c : ℤ) :
-    boxesOfContent lam2 tau c ≤ p := by
+theorem ld_boxes_le (p w i q : ℕ) (lam2 tau : Fin q → ℕ) (htau : tau ∈ shapes p w i lam2) (c : ℤ)
+    : boxesOfContent lam2 tau c ≤ p := by
   simp only [shapes, Finset.mem_filter, Fintype.mem_piFinset] at htau
   obtain ⟨-, hanti, -, hcol, -⟩ := htau
   unfold boxesOfContent
   rcases (Finset.univ.filter fun a : Fin q =>
-      (lam2 a : ℤ) ≤ c + (a.val : ℤ) ∧ c + (a.val : ℤ) < (tau a : ℤ)).eq_empty_or_nonempty with hS | hS
+      (lam2 a : ℤ) ≤ c + (a.val : ℤ) ∧ c + (a.val : ℤ) < (tau a : ℤ)).eq_empty_or_nonempty
+    with hS | hS
   · rw [hS]; simp
   · have hb := Finset.max'_mem _ hS
     have hb' := (Finset.mem_filter.mp hb).2
-    have hj0 : 0 ≤ c + (((Finset.univ.filter fun a : Fin q =>
-        (lam2 a : ℤ) ≤ c + (a.val : ℤ) ∧ c + (a.val : ℤ) < (tau a : ℤ)).max' hS).val : ℤ) :=
+    have hj0
+        : 0
+          ≤ c
+            + (((Finset.univ.filter fun a : Fin q =>
+                (lam2 a : ℤ) ≤ c + (a.val : ℤ) ∧ c + (a.val : ℤ) < (tau a : ℤ)).max' hS).val
+              : ℤ) :=
       le_trans (Int.natCast_nonneg _) hb'.1
     obtain ⟨j, hj⟩ := Int.eq_ofNat_of_zero_le hj0
-    have hjt : j < tau ((Finset.univ.filter fun a : Fin q =>
-        (lam2 a : ℤ) ≤ c + (a.val : ℤ) ∧ c + (a.val : ℤ) < (tau a : ℤ)).max' hS) := by omega
+    have hjt
+        : j
+          < tau ((Finset.univ.filter fun a : Fin q =>
+            (lam2 a : ℤ) ≤ c + (a.val : ℤ) ∧ c + (a.val : ℤ) < (tau a : ℤ)).max' hS) := by
+      omega
     refine le_trans (Finset.card_le_card ?_) (hcol _ j hjt)
     intro a ha
     have ha' := (Finset.mem_filter.mp ha).2
     have hab := Finset.le_max' _ a ha
-    have hab' : (a.val : ℤ) ≤ (((Finset.univ.filter fun a : Fin q =>
-        (lam2 a : ℤ) ≤ c + (a.val : ℤ) ∧ c + (a.val : ℤ) < (tau a : ℤ)).max' hS).val : ℤ) := by
+    have hab'
+        : (a.val : ℤ)
+          ≤ (((Finset.univ.filter fun a : Fin q =>
+              (lam2 a : ℤ) ≤ c + (a.val : ℤ) ∧ c + (a.val : ℤ) < (tau a : ℤ)).max' hS).val
+            : ℤ) := by
       exact_mod_cast hab
     have htb := hanti a _ hab
     simp only [colLen, Finset.mem_filter, Finset.mem_univ, true_and]
@@ -112,9 +123,10 @@ theorem muRange : MuRange := by
 theorem dnDvd : DnDvd := by
   intro p w i q m lam2 hb
   unfold Dn
-  have hfac : ∀ k ∈ Finset.range (q + w + i),
-      ((w : ℤ) - ((k : ℤ) - (q : ℤ))) ^ mu p w i lam2 ((k : ℤ) - (q : ℤ)) ∣
-        (((if k ∈ Finset.Ico (m + 1) (w + q) then (w + q - k) ^ p else 1 : ℕ)) : ℤ) := by
+  have hfac
+      : ∀ k ∈ Finset.range (q + w + i),
+        ((w : ℤ) - ((k : ℤ) - (q : ℤ))) ^ mu p w i lam2 ((k : ℤ) - (q : ℤ))
+          ∣ (((if k ∈ Finset.Ico (m + 1) (w + q) then (w + q - k) ^ p else 1 : ℕ)) : ℤ) := by
     intro k _
     by_cases hmu : mu p w i lam2 ((k : ℤ) - (q : ℤ)) = 0
     · rw [hmu, pow_zero]
@@ -127,14 +139,17 @@ theorem dnDvd : DnDvd := by
       exact pow_dvd_pow _ (muLe p w i q lam2 _)
   refine dvd_trans (Finset.prod_dvd_prod_of_dvd _ _ hfac) ?_
   rw [← Nat.cast_prod, Finset.prod_ite_mem]
-  have hsub : Finset.range (q + w + i) ∩ Finset.Ico (m + 1) (w + q) = Finset.Ico (m + 1) (w + q) := by
+  have hsub
+      : Finset.range (q + w + i) ∩ Finset.Ico (m + 1) (w + q) = Finset.Ico (m + 1) (w + q) := by
     refine Finset.inter_eq_right.mpr ?_
     intro k hk
     have hk' := Finset.mem_Ico.mp hk
     exact Finset.mem_range.mpr (by omega)
   rw [hsub, Finset.prod_pow, Finset.prod_Ico_eq_prod_range]
   have hH : w + q - (m + 1) = w + q - m - 1 := by omega
-  have hprod : ∏ j ∈ Finset.range (w + q - (m + 1)), (w + q - (m + 1 + j)) = (w + q - m - 1).factorial := by
+  have hprod
+      : ∏ j ∈ Finset.range (w + q - (m + 1)), (w + q - (m + 1 + j))
+        = (w + q - m - 1).factorial := by
     rw [hH, ← Nat.descFactorial_self, Nat.descFactorial_eq_prod_range]
     refine Finset.prod_congr rfl ?_
     intro j _
@@ -149,19 +164,22 @@ theorem dnVal : DnVal := by
     dvd_trans (padicValInt_dvd _) hdvd
   have hF : (((w + q - m - 1).factorial ^ p : ℕ) : ℤ) ≠ 0 := by
     exact_mod_cast pow_ne_zero p (Nat.factorial_ne_zero _)
-  have h2 : padicValInt l (Dn p w i lam2) ≤ padicValInt l (((w + q - m - 1).factorial ^ p : ℕ) : ℤ) := by
+  have h2
+      : padicValInt l (Dn p w i lam2)
+        ≤ padicValInt l (((w + q - m - 1).factorial ^ p : ℕ) : ℤ) := by
     rcases (padicValInt_dvd_iff _ _).mp h1 with h | h
     · exact absurd h hF
     · exact h
   rw [padicValInt.of_nat, padicValNat.pow] at h2
   have h3 := Nat.Prime.sub_one_mul_multiplicity_factorial (n := w + q - m - 1) hl
-  calc (l - 1) * padicValInt l (Dn p w i lam2)
+  calc
+    (l - 1) * padicValInt l (Dn p w i lam2)
       ≤ (l - 1) * (p * multiplicity l (w + q - m - 1).factorial) := Nat.mul_le_mul_left _ h2
     _ = p * ((l - 1) * multiplicity l (w + q - m - 1).factorial) := by ring
     _ ≤ p * (w + q - m - 1) := Nat.mul_le_mul_left _ (by rw [h3]; exact Nat.sub_le _ _)
 
-theorem ld_blockWt_anti (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : ∀ b, lam2 b ≤ w) :
-    Antitone (blockWt p q w lam2) := by
+theorem ld_blockWt_anti (p q w : ℕ) (lam2 : Fin q → ℕ) (ha : Antitone lam2) (hb : ∀ b, lam2 b ≤ w)
+    : Antitone (blockWt p q w lam2) := by
   intro i j hij
   induction i using Fin.addCases with
   | left i =>

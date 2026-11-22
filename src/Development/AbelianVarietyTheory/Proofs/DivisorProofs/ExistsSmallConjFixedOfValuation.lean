@@ -15,20 +15,26 @@ noncomputable def UQ.cInt (K : UQ) : K.O ≃+* K.O :=
   let d : K.O → K.O := fun x => Classical.choose (K.c_int x)
   have hd : ∀ x, f (d x) = K.c (f x) := fun x => (Classical.choose_spec (K.c_int x)).symm
   have hdd : ∀ x, d (d x) = x := fun x => hf (by rw [hd, hd, K.c_c])
-  { toFun := d
+  {
+    toFun := d
     invFun := d
     left_inv := hdd
     right_inv := hdd
     map_mul' := fun a b => hf (by rw [hd, map_mul, map_mul, map_mul, hd, hd])
-    map_add' := fun a b => hf (by rw [hd, map_add (f := _), map_add (f := _), map_add (f := _), hd, hd]) }
+    map_add' := fun a b =>
+      hf (by rw [hd, map_add (f := _), map_add (f := _), map_add (f := _), hd, hd])
+  }
 
-theorem UQ.cInt_spec (K : UQ) (x : K.O) :
-    algebraMap K.O K.E (K.cInt x) = K.c (algebraMap K.O K.E x) :=
+theorem UQ.cInt_spec (K : UQ) (x : K.O)
+    : algebraMap K.O K.E (K.cInt x) = K.c (algebraMap K.O K.E x) :=
   (Classical.choose_spec (K.c_int x)).symm
 
-theorem val_algebraMap_irreducible_pow (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {E : Type} [Field E]
-    [Algebra O E] [IsFractionRing O E] {s : O} (hs : Irreducible s) (n : ℕ) :
-    val O (algebraMap O E (s ^ n)) = n := by
+theorem val_algebraMap_irreducible_pow
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {E : Type} [Field E] [Algebra O E] [IsFractionRing O E]
+    {s : O} (hs : Irreducible s)
+    (n : ℕ)
+    : val O (algebraMap O E (s ^ n)) = n := by
   have h1 : (IsDiscreteValuationRing.maximalIdeal O).intValuation s = WithZero.exp (-1 : ℤ) :=
     IsDedekindDomain.HeightOneSpectrum.intValuation_singleton _ hs.ne_zero
       ((IsDiscreteValuationRing.irreducible_iff_uniformizer s).mp hs)
@@ -36,16 +42,15 @@ theorem val_algebraMap_irreducible_pow (O : Type) [CommRing O] [IsDomain O] [IsD
   rw [map_pow, map_pow, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap, h1]
   simp
 
-theorem exists_small_val (K : UQ) (k : ℕ) (hk : 1 ≤ k) :
-    ∃ t : K.O, K.Small t ∧ val K.O (algebraMap K.O K.E t) = k := by
+theorem exists_small_val (K : UQ) (k : ℕ) (hk : 1 ≤ k)
+    : ∃ t : K.O, K.Small t ∧ val K.O (algebraMap K.O K.E t) = k := by
   have hm : ∀ a : K.O, a ∈ IsLocalRing.maximalIdeal K.O ↔ ¬ IsUnit a := fun a =>
     IsLocalRing.mem_maximalIdeal a
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible K.O
   have hcϖ : Irreducible (K.cInt ϖ) := (MulEquiv.irreducible_iff (K.cInt : K.O ≃* K.O)).mpr hϖ
   obtain ⟨ε, hε⟩ := IsDiscreteValuationRing.associated_of_irreducible K.O hϖ hcϖ
   obtain ⟨x, y, hxy, hunit⟩ := K.c_res
-  have hcx : K.cInt x = y :=
-    IsFractionRing.injective K.O K.E (by rw [K.cInt_spec, hxy])
+  have hcx : K.cInt x = y := IsFractionRing.injective K.O K.E (by rw [K.cInt_spec, hxy])
   have hcc : ∀ a, K.cInt (K.cInt a) = a := fun a => K.cInt.symm_apply_apply a
 
   obtain ⟨s, hs, hsc⟩ : ∃ s : K.O, Irreducible s ∧ K.cInt s = s := by
@@ -57,8 +62,7 @@ theorem exists_small_val (K : UQ) (k : ℕ) (hk : 1 ≤ k) :
       · rw [map_add (f := _), hcc, add_comm]
     · by_cases h2 : IsUnit (x + y * (ε : K.O))
       · refine ⟨x * ϖ + K.cInt (x * ϖ), ?_, ?_⟩
-        · have : x * ϖ + K.cInt (x * ϖ) = ϖ * h2.unit := by
-            rw [map_mul, hcx, ← hε]; simp; ring
+        · have : x * ϖ + K.cInt (x * ϖ) = ϖ * h2.unit := by rw [map_mul, hcx, ← hε]; simp; ring
           rw [this]
           exact (associated_mul_unit_right ϖ _ h2.unit.isUnit).irreducible hϖ
         · rw [map_add (f := _), hcc, add_comm]

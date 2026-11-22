@@ -6,20 +6,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIntBTmulBa
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount IsDedekindDomain GlobalTheory.AdicSpan
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount IsDedekindDomain GlobalTheory.AdicSpan
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.AdicSpan
 
-theorem exists_int_smul_mem_adicCompletionIntegers_of_elt (v : HeightOneSpectrum ℤ) (a : v.adicCompletion ℚ) :
-    ∃ d : ℤ, d ≠ 0 ∧ (d : v.adicCompletion ℚ) * a ∈ v.adicCompletionIntegers ℚ := by
-  obtain ⟨d, hd, h⟩ := HeightOneSpectrum.adicCompletion.mul_nonZeroDivisor_mem_adicCompletionIntegers v a
+theorem exists_int_smul_mem_adicCompletionIntegers_of_elt
+    (v : HeightOneSpectrum ℤ) (a : v.adicCompletion ℚ)
+    : ∃ d : ℤ, d ≠ 0 ∧ (d : v.adicCompletion ℚ) * a ∈ v.adicCompletionIntegers ℚ := by
+  obtain ⟨d, hd, h⟩ :=
+    HeightOneSpectrum.adicCompletion.mul_nonZeroDivisor_mem_adicCompletionIntegers v a
   refine ⟨d, nonZeroDivisors.ne_zero hd, ?_⟩
   rw [mul_comm]
   simpa using h
 
-theorem exists_int_smul_isIntB : ∀ (M : Type) [AddCommGroup M] [Module ℚ M] (κ : Type) (b : Module.Basis κ ℚ M)
-    (v : HeightOneSpectrum ℤ) (y : v.adicCompletion ℚ ⊗[ℚ] M), ∃ D : ℤ, D ≠ 0 ∧ IsIntB v b (D • y) := by
+theorem exists_int_smul_isIntB
+    : ∀ (M : Type) [AddCommGroup M] [Module ℚ M] (κ : Type) (b : Module.Basis κ ℚ M)
+        (v : HeightOneSpectrum ℤ) (y : v.adicCompletion ℚ ⊗[ℚ] M),
+      ∃ D : ℤ,
+        D ≠ 0 ∧ IsIntB v b (D • y) := by
   intro M _ _ κ b v y
   choose d hd0 hd using exists_int_smul_mem_adicCompletionIntegers_of_elt v
   set c := (Algebra.TensorProduct.basis (v.adicCompletion ℚ) b).repr y with hc

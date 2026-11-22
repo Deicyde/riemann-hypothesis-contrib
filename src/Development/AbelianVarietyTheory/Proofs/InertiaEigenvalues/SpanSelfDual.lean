@@ -20,10 +20,12 @@ noncomputable def hermLeft {K : UQ} (B : InvAlg K) (x z : B.A) : B.A →ₗ[K.E]
     unfold InvAlg.herm
     rw [mul_smul_comm, smul_mul_assoc, map_smul, RingHom.id_apply]
 
-theorem herm_basis {K : UQ} (B : InvAlg K) (x : B.A) (n : ℕ) (e : Module.Basis (Fin n) K.E B.A)
-    (h : ∀ i j, B.herm x (e i) (e j) = if i = j then 1 else 0) (y : B.A) (j : Fin n) :
-    B.herm x y (e j) = e.repr y j := by
-
+theorem herm_basis
+    {K : UQ} (B : InvAlg K) (x : B.A)
+    (n : ℕ) (e : Module.Basis (Fin n) K.E B.A)
+    (h : ∀ i j, B.herm x (e i) (e j) = if i = j then 1 else 0)
+    (y : B.A) (j : Fin n)
+    : B.herm x y (e j) = e.repr y j := by
   have hlin : hermLeft B x (e j) = e.coord j := by
     refine e.ext fun i => ?_
     rw [Module.Basis.coord_apply, e.repr_self, Finsupp.single_apply]
@@ -63,10 +65,13 @@ private lemma coord_lemma {K : UQ} (B : InvAlg K) (n : ℕ) (e : Module.Basis (F
     rw [← ho, algebraMap_smul]
     exact Submodule.smul_mem _ o (Submodule.subset_span ⟨j, rfl⟩)
 
-theorem span_selfDual (K : UQ) (B : InvAlg K) (x : B.A) (n : ℕ) (e : Module.Basis (Fin n) K.E B.A)
-    (h : ∀ i j, B.herm x (e i) (e j) = if i = j then 1 else 0) (y : B.A) :
-    y ∈ Submodule.span K.O (Set.range e) ↔
-      ∀ z ∈ Submodule.span K.O (Set.range e), B.herm x y z ∈ (algebraMap K.O K.E).range := by
+theorem span_selfDual
+    (K : UQ) (B : InvAlg K) (x : B.A)
+    (n : ℕ) (e : Module.Basis (Fin n) K.E B.A)
+    (h : ∀ i j, B.herm x (e i) (e j) = if i = j then 1 else 0)
+    (y : B.A)
+    : y ∈ Submodule.span K.O (Set.range e)
+      ↔ ∀ z ∈ Submodule.span K.O (Set.range e), B.herm x y z ∈ (algebraMap K.O K.E).range := by
   rw [coord_lemma B n e y]
   constructor
   · intro hy z hz
@@ -76,7 +81,8 @@ theorem span_selfDual (K : UQ) (B : InvAlg K) (x : B.A) (n : ℕ) (e : Module.Ba
       obtain ⟨j, rfl⟩ := hw
       rw [herm_basis B x n e h y j]
       exact hy j
-    | zero => simp [InvAlg.herm]
+    | zero =>
+      simp [InvAlg.herm]
     | add a b _ _ ha hb =>
       have hadd : B.herm x y (a + b) = B.herm x y a + B.herm x y b := by
         unfold InvAlg.herm

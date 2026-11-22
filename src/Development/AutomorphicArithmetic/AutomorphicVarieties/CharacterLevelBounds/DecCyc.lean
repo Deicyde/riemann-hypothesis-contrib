@@ -7,7 +7,8 @@ public import Mathlib.Topology.Algebra.ClopenNhdofOne
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
 
 namespace UpperTheory.V.Chr.DecompositionCyclotomic
 
@@ -27,7 +28,9 @@ private noncomputable def vQ : HeightOneSpectrum (𝓞 ℚ) where
 private theorem normV_vQ : normV (vQ l) = l := by
   haveI : NeZero l := ⟨hl.out.ne_zero⟩
   unfold normV
-  have hJ : Ideal.span {((l : ℕ) : ℤ)} = Ideal.map (Rat.ringOfIntegersEquiv : 𝓞 ℚ →+* ℤ) (vQ l).asIdeal := by
+  have hJ
+      : Ideal.span {((l : ℕ) : ℤ)}
+        = Ideal.map (Rat.ringOfIntegersEquiv : 𝓞 ℚ →+* ℤ) (vQ l).asIdeal := by
     show _ = Ideal.map (Rat.ringOfIntegersEquiv : 𝓞 ℚ →+* ℤ) (Ideal.span {((l : ℕ) : 𝓞 ℚ)})
     rw [Ideal.map_span, Set.image_singleton, map_natCast]
   have e : (𝓞 ℚ ⧸ (vQ l).asIdeal) ≃+* ZMod l :=
@@ -45,8 +48,9 @@ private theorem val_intCast_le_one (A : ValuationSubring Ω) (n : ℤ) : A.valua
   have h := A.valuation_le_one (n : A)
   simpa using h
 
-private theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) (n : ℤ) :
-    A.valuation (n : Ω) < 1 ↔ ((l : ℕ) : ℤ) ∣ n := by
+private theorem val_intCast_lt_one_iff
+    (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) (n : ℤ)
+    : A.valuation (n : Ω) < 1 ↔ ((l : ℕ) : ℤ) ∣ n := by
   have hlp : Prime ((l : ℕ) : ℤ) := Nat.prime_iff_prime_int.mp hl.out
   constructor
   · intro h
@@ -66,37 +70,50 @@ private theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuati
     rw [map_mul]
     exact lt_of_le_of_lt (mul_le_of_le_one_right' (val_intCast_le_one A k)) hA
 
-private theorem isPlaceOver_vQ [Algebra ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) :
-    IsPlaceOver (F := ℚ) A (vQ l) := by
+private theorem isPlaceOver_vQ
+    [Algebra ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1)
+    : IsPlaceOver (F := ℚ) A (vQ l) := by
   intro x
-  obtain ⟨m, rfl⟩ : ∃ m : ℤ, (m : 𝓞 ℚ) = x :=
-    ⟨Rat.ringOfIntegersEquiv x,
-      (eq_intCast (Rat.ringOfIntegersEquiv.symm : ℤ →+* 𝓞 ℚ) _).symm.trans
-        (Rat.ringOfIntegersEquiv.symm_apply_apply x)⟩
+  obtain ⟨m, rfl⟩ : ∃ m : ℤ, (m : 𝓞 ℚ) = x := ⟨
+    Rat.ringOfIntegersEquiv x,
+    (eq_intCast (Rat.ringOfIntegersEquiv.symm : ℤ →+* 𝓞 ℚ) _).symm.trans
+      (Rat.ringOfIntegersEquiv.symm_apply_apply x)
+  ⟩
   rw [intCast_mem_vQ, ← val_intCast_lt_one_iff A hA m]
   simp
 
 end UpperTheory.V.Chr.DecompositionCyclotomic
 
-private theorem decomposition_cyclotomic_of_mem_dec {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring Ω) (τ : G ℚ Ω)
-    (hτ : τ ∈ Dec (F := ℚ) A) (x : Ω) : A.valuation x ≤ 1 → A.valuation (τ x) ≤ 1 := by
+private theorem decomposition_cyclotomic_of_mem_dec
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    (A : ValuationSubring Ω) (τ : G ℚ Ω) (hτ : τ ∈ Dec (F := ℚ) A)
+    (x : Ω)
+    : A.valuation x ≤ 1 → A.valuation (τ x) ≤ 1 := by
   intro hx
   rw [ValuationSubring.valuation_le_one_iff] at hx ⊢
   open scoped Pointwise in
-    (have h1 := MulAction.mem_stabilizer_iff.mp hτ
-     rw [← h1, ← SetLike.mem_coe, ValuationSubring.coe_pointwise_smul]
-     exact Set.smul_mem_smul_set hx)
+  (
+    have h1 := MulAction.mem_stabilizer_iff.mp hτ
+    rw [← h1, ← SetLike.mem_coe, ValuationSubring.coe_pointwise_smul]
+    exact Set.smul_mem_smul_set hx
+  )
 
-private theorem decomposition_cyclotomic_of_mem_dec_second {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring Ω) (τ : G ℚ Ω)
-    (hτ : τ ∈ Dec (F := ℚ) A) (x : Ω) : A.valuation (τ x) ≤ 1 ↔ A.valuation x ≤ 1 := by
+private theorem decomposition_cyclotomic_of_mem_dec_second
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    (A : ValuationSubring Ω) (τ : G ℚ Ω) (hτ : τ ∈ Dec (F := ℚ) A)
+    (x : Ω)
+    : A.valuation (τ x) ≤ 1 ↔ A.valuation x ≤ 1 := by
   constructor
   · intro h
     have h' := decomposition_cyclotomic_of_mem_dec A τ⁻¹ ((Dec (F := ℚ) A).inv_mem hτ) _ h
     simpa [AlgEquiv.aut_inv] using h'
   · exact decomposition_cyclotomic_of_mem_dec A τ hτ x
 
-private theorem decomposition_cyclotomic_of_mem_dec_third {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring Ω) (τ : G ℚ Ω)
-    (hτ : τ ∈ Dec (F := ℚ) A) (x : Ω) : A.valuation (τ x) < 1 ↔ A.valuation x < 1 := by
+private theorem decomposition_cyclotomic_of_mem_dec_third
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    (A : ValuationSubring Ω) (τ : G ℚ Ω) (hτ : τ ∈ Dec (F := ℚ) A)
+    (x : Ω)
+    : A.valuation (τ x) < 1 ↔ A.valuation x < 1 := by
   have key : ∀ z : Ω, A.valuation z < 1 ↔ z = 0 ∨ (A.valuation z ≤ 1 ∧ ¬ A.valuation z⁻¹ ≤ 1) := by
     intro z
     by_cases hz : z = 0
@@ -104,14 +121,18 @@ private theorem decomposition_cyclotomic_of_mem_dec_third {Ω : Type} [Field Ω]
     · have hv0 : A.valuation z ≠ 0 := by simpa using hz
       rw [map_inv₀, inv_le_one₀ (zero_lt_iff.mpr hv0), ← lt_iff_le_not_ge]
       simp [hz]
-  rw [key, key, ← map_inv₀ τ x, decomposition_cyclotomic_of_mem_dec_second A τ hτ, decomposition_cyclotomic_of_mem_dec_second A τ hτ, EmbeddingLike.map_eq_zero_iff]
+  rw [key, key, ← map_inv₀ τ x, decomposition_cyclotomic_of_mem_dec_second A τ hτ,
+    decomposition_cyclotomic_of_mem_dec_second A τ hτ, EmbeddingLike.map_eq_zero_iff]
 
 open UpperTheory.V.Chr.DecompositionCyclotomic in
-theorem UpperTheory.V.Chr.decCyc :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (p : ℕ) (A : ValuationSubring Ω), p.Prime → A.valuation (p : Ω) < 1 →
-          ((Ine (F := ℚ) A).subgroupOf (Dec (F := ℚ) A)).Normal ∧ Ine (F := ℚ) A ≤ Dec (F := ℚ) A ∧
-          ∃ γ ∈ Dec (F := ℚ) A, Dec (F := ℚ) A ≤ (Subgroup.zpowers γ ⊔ Ine (F := ℚ) A).topologicalClosure ∧
-            ∀ (l : ℕ) [Fact l.Prime], l ≠ p → ((cycZ ℚ Ω l γ : ℤ_[l]ˣ) : ℤ_[l]) = (p : ℤ_[l]) := by
+theorem UpperTheory.V.Chr.decCyc
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (p : ℕ) (A : ValuationSubring Ω),
+      p.Prime → A.valuation (p : Ω) < 1
+        → ((Ine (F := ℚ) A).subgroupOf (Dec (F := ℚ) A)).Normal ∧ Ine (F := ℚ) A ≤ Dec (F := ℚ) A
+          ∧ ∃ γ ∈ Dec (F := ℚ) A,
+            Dec (F := ℚ) A ≤ (Subgroup.zpowers γ ⊔ Ine (F := ℚ) A).topologicalClosure
+              ∧ ∀ (l : ℕ) [Fact l.Prime],
+                l ≠ p → ((cycZ ℚ Ω l γ : ℤ_[l]ˣ) : ℤ_[l]) = (p : ℤ_[l]) := by
   intro Ω _ _ _ p A hp hA
   haveI : Fact p.Prime := ⟨hp⟩
   have hPO := isPlaceOver_vQ (l := p) A hA
@@ -123,7 +144,8 @@ theorem UpperTheory.V.Chr.decCyc :
     rw [Subgroup.mem_subgroupOf] at hi ⊢
     have hi2 : ∀ x : Ω, A.valuation x ≤ 1 → A.valuation (i x - x) < 1 := hi.2
     simp only [Subgroup.coe_mul, Subgroup.coe_inv]
-    refine ⟨(Dec (F := ℚ) A).mul_mem ((Dec (F := ℚ) A).mul_mem hτ hiD) ((Dec (F := ℚ) A).inv_mem hτ), ?_⟩
+    refine
+      ⟨(Dec (F := ℚ) A).mul_mem ((Dec (F := ℚ) A).mul_mem hτ hiD) ((Dec (F := ℚ) A).inv_mem hτ), ?_⟩
     intro x hx
     have hτi : τ⁻¹ ∈ Dec (F := ℚ) A := (Dec (F := ℚ) A).inv_mem hτ
     have hy : A.valuation (τ⁻¹ x) ≤ 1 := decomposition_cyclotomic_of_mem_dec A τ⁻¹ hτi x hx

@@ -16,8 +16,9 @@ theorem norm_natCast_pos (l : ℕ) [hl : Fact l.Prime] : 0 < ‖((l : ℕ) : Om 
   rw [← map_natCast (algebraMap ℚ_[l] (PadicAlgCl l)), PadicAlgCl.norm_extends, Padic.norm_p]
   exact inv_pos.2 (by exact_mod_cast hl.out.pos)
 
-theorem norm_le_one_of_integer {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E]
-    (φ : E →+* Om l) (x : 𝓞 E) : ‖φ (x : E)‖ ≤ 1 := by
+theorem norm_le_one_of_integer
+    {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l) (x : 𝓞 E)
+    : ‖φ (x : E)‖ ≤ 1 := by
   have hv := Valuation.integer.integers (Valued.v : Valuation (Om l) NNReal)
   have h1 : IsIntegral ℤ (φ (x : E)) := (RingOfIntegers.isIntegral_coe x).map φ.toIntAlgHom
   have h2 : IsIntegral (Valued.v : Valuation (Om l) NNReal).integer (φ (x : E)) := h1.tower_top
@@ -25,8 +26,8 @@ theorem norm_le_one_of_integer {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [Nu
   rw [PadicAlgCl.valuation_def] at h3
   exact_mod_cast h3
 
-def plIdeal {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l) :
-    Ideal (𝓞 E) where
+def plIdeal {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l)
+    : Ideal (𝓞 E) where
   carrier := {x | ‖φ (x : E)‖ < 1}
   zero_mem' := by simp
   add_mem' {a b} ha hb := by
@@ -41,16 +42,19 @@ def plIdeal {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : 
     rw [map_mul, map_mul, norm_mul]
     exact lt_of_le_of_lt (mul_le_of_le_one_left (norm_nonneg _) (norm_le_one_of_integer φ c)) ha
 
-theorem mem_plIdeal {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l)
-    (x : 𝓞 E) : x ∈ plIdeal φ ↔ ‖φ (x : E)‖ < 1 := Iff.rfl
+theorem mem_plIdeal
+    {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l) (x : 𝓞 E)
+    : x ∈ plIdeal φ ↔ ‖φ (x : E)‖ < 1 :=
+  Iff.rfl
 
-theorem natCast_mem_plIdeal {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E]
-    (φ : E →+* Om l) : ((l : ℕ) : 𝓞 E) ∈ plIdeal φ := by
+theorem natCast_mem_plIdeal
+    {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l)
+    : ((l : ℕ) : 𝓞 E) ∈ plIdeal φ := by
   rw [mem_plIdeal]
   simpa using norm_natCast_lt_one l
 
-theorem plIdeal_isPrime {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E]
-    (φ : E →+* Om l) : (plIdeal φ).IsPrime := by
+theorem plIdeal_isPrime {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l)
+    : (plIdeal φ).IsPrime := by
   refine ⟨?_, ?_⟩
   · intro h
     have : (1 : 𝓞 E) ∈ plIdeal φ := h ▸ Submodule.mem_top
@@ -62,16 +66,17 @@ theorem plIdeal_isPrime {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberFie
     exact (not_le_of_gt hab) (by
       simpa only [one_mul] using mul_le_mul h.1 h.2 zero_le_one (norm_nonneg _))
 
-theorem plIdeal_ne_bot {l : ℕ} [hl : Fact l.Prime] {E : Type} [Field E] [NumberField E]
-    (φ : E →+* Om l) : plIdeal φ ≠ ⊥ := by
+theorem plIdeal_ne_bot
+    {l : ℕ} [hl : Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l)
+    : plIdeal φ ≠ ⊥ := by
   intro h
   have h1 := natCast_mem_plIdeal (E := E) φ
   rw [h, Ideal.mem_bot] at h1
   have : ((l : ℕ) : E) = 0 := by exact_mod_cast congrArg (fun y : 𝓞 E => (y : E)) h1
   exact hl.out.ne_zero (by exact_mod_cast this)
 
-def plOf {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l) :
-    HeightOneSpectrum (𝓞 E) :=
+def plOf {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E] (φ : E →+* Om l)
+    : HeightOneSpectrum (𝓞 E) :=
   ⟨plIdeal φ, plIdeal_isPrime φ, plIdeal_ne_bot φ⟩
 
 theorem placeProp : PlaceProp := by

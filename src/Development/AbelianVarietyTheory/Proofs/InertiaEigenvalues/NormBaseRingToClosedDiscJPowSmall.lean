@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
@@ -15,17 +17,21 @@ namespace GlobalTheory.BSP.DiscSmall
 def ballIdeal (l : ℕ) {A : Type} [CommRing A] (u : A) (ρ : ℝ≥0) (r : ℝ) : Ideal A :=
   Submodule.comap (Algebra.linearMap A (PreDisc l u ρ)) (ball l u ρ r)
 
-theorem mem_ballIdeal {l : ℕ} {A : Type} [CommRing A] {u : A} {ρ : ℝ≥0} {r : ℝ} {x : A} :
-    x ∈ ballIdeal l u ρ r ↔ algebraMap A (PreDisc l u ρ) x ∈ ball l u ρ r := Iff.rfl
+theorem mem_ballIdeal {l : ℕ} {A : Type} [CommRing A] {u : A} {ρ : ℝ≥0} {r : ℝ} {x : A}
+    : x ∈ ballIdeal l u ρ r ↔ algebraMap A (PreDisc l u ρ) x ∈ ball l u ρ r :=
+  Iff.rfl
 
-theorem ballIdeal_mul_le {l : ℕ} {A : Type} [CommRing A] {u : A} {ρ : ℝ≥0} {r s : ℝ} (hr : 0 ≤ r) :
-    ballIdeal l u ρ r * ballIdeal l u ρ s ≤ ballIdeal l u ρ (r * s) :=
+theorem ballIdeal_mul_le {l : ℕ} {A : Type} [CommRing A] {u : A} {ρ : ℝ≥0} {r s : ℝ} (hr : 0 ≤ r)
+    : ballIdeal l u ρ r * ballIdeal l u ρ s ≤ ballIdeal l u ρ (r * s) :=
   Ideal.mul_le.2 fun x hx y hy => by
     rw [mem_ballIdeal, map_mul]
     exact mul_mem_ball l u ρ hr hx hy
 
-theorem pow_le_ballIdeal {l : ℕ} {A : Type} [CommRing A] {u : A} {ρ : ℝ≥0} {r : ℝ} (hr : 0 ≤ r)
-    {I : Ideal A} (hI : I ≤ ballIdeal l u ρ r) : ∀ n : ℕ, I ^ n ≤ ballIdeal l u ρ (r ^ n)
+theorem pow_le_ballIdeal
+    {l : ℕ} {A : Type} [CommRing A]
+    {u : A} {ρ : ℝ≥0} {r : ℝ} (hr : 0 ≤ r)
+    {I : Ideal A} (hI : I ≤ ballIdeal l u ρ r)
+    : ∀ n : ℕ, I ^ n ≤ ballIdeal l u ρ (r ^ n)
   | 0 => by
     rw [pow_zero, pow_zero, Ideal.one_eq_top]
     refine (Ideal.eq_top_of_isUnit_mem _ ?_ isUnit_one).ge
@@ -35,8 +41,8 @@ theorem pow_le_ballIdeal {l : ℕ} {A : Type} [CommRing A] {u : A} {ρ : ℝ≥0
     rw [pow_succ, pow_succ]
     exact (Ideal.mul_mono (pow_le_ballIdeal hr hI n) hI).trans (ballIdeal_mul_le (pow_nonneg hr n))
 
-theorem exists_E_eq {l : ℕ} [Fact l.Prime] {K : FinExt l} (bk : BK K) :
-    ∃ q : bk.S, bk.E = (X : bk.S) ^ bk.Ep.natDegree + (l : bk.S) * q := by
+theorem exists_E_eq {l : ℕ} [Fact l.Prime] {K : FinExt l} (bk : BK K)
+    : ∃ q : bk.S, bk.E = (X : bk.S) ^ bk.Ep.natDegree + (l : bk.S) * q := by
   have hd : Polynomial.C (l : Wq l bk.a) ∣ bk.Ep - Polynomial.X ^ bk.Ep.natDegree := by
     refine (Polynomial.C_dvd_iff_dvd_coeff _ _).2 fun i => ?_
     rw [Polynomial.coeff_sub, Polynomial.coeff_X_pow]
@@ -50,17 +56,19 @@ theorem exists_E_eq {l : ℕ} [Fact l.Prime] {K : FinExt l} (bk : BK K) :
   refine ⟨(q : bk.S), ?_⟩
   show ((bk.Ep : Polynomial (Wq l bk.a)) : (Wq l bk.a)⟦X⟧) = _
   nth_rewrite 1 [h2]
-  simp [Polynomial.coe_add, Polynomial.coe_pow, Polynomial.coe_X, Polynomial.coe_mul, Polynomial.coe_C]
+  simp [Polynomial.coe_add, Polynomial.coe_pow, Polynomial.coe_X, Polynomial.coe_mul,
+    Polynomial.coe_C]
   left
   exact map_natCast (Polynomial.coeToPowerSeries.ringHom (R := Wq l bk.a)) l
 
 end GlobalTheory.BSP.DiscSmall
 
-
 open GlobalTheory.BSP.DiscSmall in
-theorem GlobalTheory.BSP.norm_toDisc_J_pow_small : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (A : Type) [CommRing A]
-    (s : bk.S →+* A) (ρ : ℝ≥0), 0 < ρ → ρ < 1 → ∀ r : ℝ, 0 < r → ∃ n : ℕ, ∀ x ∈ (bk.J ^ n).map s,
-    ‖toDisc l (s X) ρ x‖ ≤ r := by
+theorem GlobalTheory.BSP.norm_toDisc_J_pow_small
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (A : Type) [CommRing A] (s : bk.S →+* A)
+        (ρ : ℝ≥0),
+      0 < ρ → ρ < 1
+        → ∀ r : ℝ, 0 < r → ∃ n : ℕ, ∀ x ∈ (bk.J ^ n).map s, ‖toDisc l (s X) ρ x‖ ≤ r := by
   intro l hl K bk A _ s ρ hρ0 hρ1 r hr
   have hl0 : (0 : ℝ) < l := Nat.cast_pos.2 hl.out.pos
   have hl1 : (1 : ℝ) < l := Nat.one_lt_cast.2 hl.out.one_lt
@@ -75,16 +83,18 @@ theorem GlobalTheory.BSP.norm_toDisc_J_pow_small : ∀ (l : ℕ) [Fact l.Prime] 
     rw [one_div_mul_cancel hl0.ne'] at this
     simpa using this
   have hJ : bk.J.map s ≤ ballIdeal l (s X) ρ t := by
-    rw [Ideal.map_sup, Ideal.map_span, Ideal.map_span, Set.image_singleton, Set.image_singleton, sup_le_iff,
-      Ideal.span_le, Ideal.span_le, Set.singleton_subset_iff, Set.singleton_subset_iff]
+    rw [Ideal.map_sup, Ideal.map_span, Ideal.map_span, Set.image_singleton, Set.image_singleton,
+      sup_le_iff, Ideal.span_le, Ideal.span_le, Set.singleton_subset_iff, Set.singleton_subset_iff]
     constructor
     · show s (l : bk.S) ∈ ballIdeal l (s X) ρ t
       rw [map_natCast, mem_ballIdeal]
       exact hlmem
     · show s bk.E ∈ ballIdeal l (s X) ρ t
       obtain ⟨q, hq⟩ := exists_E_eq bk
-      rw [hq, map_add (f := _), map_mul, map_pow, map_natCast, mem_ballIdeal, map_add (f := _), map_mul, mul_comm, ← Algebra.smul_def]
-      refine add_mem (Submodule.subset_span ⟨0, bk.Ep.natDegree, 0, ?_, by simp⟩) (Submodule.smul_mem _ _ hlmem)
+      rw [hq, map_add (f := _), map_mul, map_pow, map_natCast, mem_ballIdeal, map_add (f := _),
+        map_mul, mul_comm, ← Algebra.smul_def]
+      refine add_mem (Submodule.subset_span ⟨0, bk.Ep.natDegree, 0, ?_, by simp⟩)
+        (Submodule.smul_mem _ _ hlmem)
       show (l:ℝ)^0 * (ρ:ℝ)^bk.Ep.natDegree ≤ t * (l:ℝ)^0
       simp only [pow_zero, one_mul, mul_one]
       exact le_max_right _ _

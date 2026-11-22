@@ -61,8 +61,7 @@ theorem reducedBasis_holds : ReducedBasisStatement := by
     rw [← hyx']
     exact hy
   let B := Basis.mk hliX hspX
-  have hBj : ∀ j, (B j : E) = b j := fun j => by
-    simp only [B, Basis.mk_apply, bX]
+  have hBj : ∀ j, (B j : E) = b j := fun j => by simp only [B, Basis.mk_apply, bX]
   refine ⟨B, ?_, ?_⟩
   · intro j
     rw [hBj]
@@ -77,10 +76,12 @@ theorem reducedBasis_holds : ReducedBasisStatement := by
     by_cases hzV : z ∈ RB.V u j.val
     · have hzV1 : z ∈ RB.V u (j.val + 1) := RB.V_mono u (Nat.le_succ _) hzV
       have hphz : RB.phi u j z = 0 := RB.phi_V u j hzV
-      have hp : ‖b j‖ ≤ ‖b j + z‖ := hbnrm j (b j + z) (X.add_mem (hbX j) hz)
-        (Submodule.add_mem _ (hbV j) hzV1) (by rw [RB.phi_add, hphz, add_zero])
-      have hm : ‖b j‖ ≤ ‖b j - z‖ := hbnrm j (b j - z) (X.sub_mem (hbX j) hz)
-        (Submodule.sub_mem _ (hbV j) hzV1) (by rw [RB.phi_sub, hphz, sub_zero])
+      have hp : ‖b j‖ ≤ ‖b j + z‖ :=
+        hbnrm j (b j + z) (X.add_mem (hbX j) hz) (Submodule.add_mem _ (hbV j) hzV1)
+          (by rw [RB.phi_add, hphz, add_zero])
+      have hm : ‖b j‖ ≤ ‖b j - z‖ :=
+        hbnrm j (b j - z) (X.sub_mem (hbX j) hz) (Submodule.sub_mem _ (hbV j) hzV1)
+          (by rw [RB.phi_sub, hphz, sub_zero])
       have hp2 := pow_le_pow_left₀ (norm_nonneg _) hp 2
       have hm2 := pow_le_pow_left₀ (norm_nonneg _) hm 2
       rw [norm_add_sq_real] at hp2
@@ -93,11 +94,15 @@ theorem reducedBasis_holds : ReducedBasisStatement := by
       constructor <;> nlinarith [mul_le_mul_of_nonneg_right hd1 hz0]
     · have hle : ‖u j‖ ≤ ‖z‖ := (hu j).2.2.2 z hz hzV
       have hb' : ‖b j‖ ≤ Real.sqrt (finrank ℝ E) * ‖u j‖ := by
-        calc ‖b j‖ = Real.sqrt (‖b j‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
+        calc
+          ‖b j‖
+            = Real.sqrt (‖b j‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
           _ ≤ Real.sqrt ((finrank ℝ E : ℝ) * ‖u j‖ ^ 2) := Real.sqrt_le_sqrt (hbd j)
           _ = Real.sqrt (finrank ℝ E) * ‖u j‖ := by
             rw [Real.sqrt_mul (Nat.cast_nonneg _), Real.sqrt_sq (norm_nonneg _)]
-      calc |inner ℝ (b j) z| ≤ ‖b j‖ * ‖z‖ := abs_real_inner_le_norm _ _
+      calc
+        |inner ℝ (b j) z|
+          ≤ ‖b j‖ * ‖z‖ := abs_real_inner_le_norm _ _
         _ ≤ (Real.sqrt (finrank ℝ E) * ‖u j‖) * ‖z‖ :=
           mul_le_mul_of_nonneg_right hb' (norm_nonneg _)
         _ ≤ (Real.sqrt (finrank ℝ E) * ‖z‖) * ‖z‖ :=

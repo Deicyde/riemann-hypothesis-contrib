@@ -4,8 +4,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.QuasiCompact
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -48,21 +50,23 @@ instance : closedRange.DescendsAlong (@UniversallyClosed ⊓ @Surjective) := by
   rw [e]
   exact f.isClosedMap _ hfst
 
-instance : (@UniversallyClosed ⊓ @Surjective : MorphismProperty Scheme.{0}).IsStableUnderBaseChange :=
+instance
+    : (@UniversallyClosed ⊓ @Surjective : MorphismProperty Scheme.{0}).IsStableUnderBaseChange :=
   @MorphismProperty.IsStableUnderBaseChange.inf _ _ _ _ inferInstance inferInstance
 
-instance : (MorphismProperty.diagonal closedRange).DescendsAlong
-    (@UniversallyClosed ⊓ @Surjective : MorphismProperty Scheme.{0}) :=
+instance
+    : (MorphismProperty.diagonal closedRange).DescendsAlong
+      (@UniversallyClosed ⊓ @Surjective : MorphismProperty Scheme.{0}) :=
   inferInstance
 
 end GlobalTheory.SepDescent
 
-
 open GlobalTheory.SepDescent in
-theorem GlobalTheory.isSeparated_of_isPullback_universallyClosed_surjective :
-    ∀ (R : Type) [CommRing R] (S : Scheme.{0}) (π : S ⟶ Sp R), UniversallyClosed π → Surjective π →
-    ∀ (G' : Over S) (G : Over (Sp R)) (β : G'.left ⟶ G.left),
-    IsPullback β G'.hom G.hom π → IsSeparated G'.hom → IsSeparated G.hom := by
+theorem GlobalTheory.isSeparated_of_isPullback_universallyClosed_surjective
+    : ∀ (R : Type) [CommRing R] (S : Scheme.{0}) (π : S ⟶ Sp R),
+      UniversallyClosed π → Surjective π
+        → ∀ (G' : Over S) (G : Over (Sp R)) (β : G'.left ⟶ G.left),
+          IsPullback β G'.hom G.hom π → IsSeparated G'.hom → IsSeparated G.hom := by
   intro R _ S π h1 h2 G' G β hp hs
   have hd : (MorphismProperty.diagonal closedRange) G.hom :=
     MorphismProperty.of_isPullback_of_descendsAlong (P := MorphismProperty.diagonal closedRange)

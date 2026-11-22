@@ -9,13 +9,14 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsVa
 
 namespace GlobalTheory
 
-theorem exists_prime_notMem_ringKrullDim_quotient_eq_one :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R] (h : R),
-      h ≠ 0 → h ∈ IsLocalRing.maximalIdeal R →
-      ∃ q : Ideal R, q.IsPrime ∧ h ∉ q ∧ ringKrullDim (R ⧸ q) = 1 := by
+theorem exists_prime_notMem_ringKrullDim_quotient_eq_one
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R] (h : R),
+      h ≠ 0 → h ∈ IsLocalRing.maximalIdeal R
+        → ∃ q : Ideal R, q.IsPrime ∧ h ∉ q ∧ ringKrullDim (R ⧸ q) = 1 := by
   intro R _ _ _ _ h h0 hhm
-  obtain ⟨q, hq, -, h1⟩ := exists_mem_height_map_le_one (IsLocalRing.maximalIdeal R)
-    (PrimeSpectrum.basicOpen h).isOpen ⟨⟨⊥, inferInstance⟩, by simpa using h0, bot_le⟩
+  obtain ⟨q, hq, -, h1⟩ :=
+    exists_mem_height_map_le_one (IsLocalRing.maximalIdeal R) (PrimeSpectrum.basicOpen h).isOpen
+      ⟨⟨⊥, inferInstance⟩, by simpa using h0, bot_le⟩
   have hq' : h ∉ q.asIdeal := hq
   refine ⟨q.asIdeal, q.isPrime, hq', ?_⟩
   have hsurj := Ideal.Quotient.mk_surjective (I := q.asIdeal)
@@ -31,8 +32,10 @@ theorem exists_prime_notMem_ringKrullDim_quotient_eq_one :
     exact hq' this
   have h3 := le_antisymm h1 (Order.one_le_iff_ne_zero.2 h2)
   have : IsLocalRing (R ⧸ q.asIdeal) := IsLocalRing.of_surjective' _ hsurj
-  have he : (IsLocalRing.maximalIdeal R).map (Ideal.Quotient.mk q.asIdeal) =
-      IsLocalRing.maximalIdeal (R ⧸ q.asIdeal) := IsLocalRing.eq_maximalIdeal hmax
+  have he
+      : (IsLocalRing.maximalIdeal R).map (Ideal.Quotient.mk q.asIdeal)
+        = IsLocalRing.maximalIdeal (R ⧸ q.asIdeal) :=
+    IsLocalRing.eq_maximalIdeal hmax
   rw [he] at h3
   rw [← IsLocalRing.maximalIdeal_height_eq_ringKrullDim, h3]
   rfl

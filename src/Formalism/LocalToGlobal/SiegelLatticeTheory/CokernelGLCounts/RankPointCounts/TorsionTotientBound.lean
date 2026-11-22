@@ -34,30 +34,38 @@ theorem le_mul_totient_sq (n : ℕ) : n ≤ (if Even n then 2 else 1) * n.totien
       simp only [Nat.add_sub_cancel]
       have hP : 1 ≤ (q + 1) ^ m := Nat.one_le_pow _ _ (by omega)
       have hq : q + 1 ≤ q ^ 2 := by nlinarith
-      calc (q + 1) ^ (m + 1) = (q + 1) ^ m * (q + 1) := pow_succ _ _
+      calc
+        (q + 1) ^ (m + 1)
+          = (q + 1) ^ m * (q + 1) := pow_succ _ _
         _ ≤ (q + 1) ^ m * q ^ 2 := Nat.mul_le_mul_left _ hq
         _ ≤ ((q + 1) ^ m) ^ 2 * q ^ 2 := Nat.mul_le_mul_right _ (by nlinarith)
         _ = ((q + 1) ^ m * q) ^ 2 := by ring
-  | zero => simp
-  | one => simp
+  | zero =>
+    simp
+  | one =>
+    simp
   | coprime a b ha hb hab iha ihb =>
     rw [Nat.totient_mul hab, mul_pow]
-    have hce : (if Even (a * b) then 2 else 1) =
-        (if Even a then 2 else 1) * (if Even b then 2 else 1) := by
+    have hce
+        : (if Even (a * b) then 2 else 1)
+          = (if Even a then 2 else 1) * (if Even b then 2 else 1) := by
       by_cases ea : Even a <;> by_cases eb : Even b <;> simp [ea, eb, Nat.even_mul]
       have h2 : 2 ∣ Nat.gcd a b := Nat.dvd_gcd (even_iff_two_dvd.mp ea) (even_iff_two_dvd.mp eb)
       rw [hab.gcd_eq_one] at h2
       norm_num at h2
-    calc a * b ≤ ((if Even a then 2 else 1) * a.totient ^ 2) *
-          ((if Even b then 2 else 1) * b.totient ^ 2) := Nat.mul_le_mul iha ihb
+    calc
+      a * b
+          ≤ ((if Even a then 2 else 1) * a.totient ^ 2)
+            * ((if Even b then 2 else 1) * b.totient ^ 2) :=
+        Nat.mul_le_mul iha ihb
       _ = _ := by rw [hce]; ring
 
 theorem le_two_totient_sq (n : ℕ) : n ≤ 2 * n.totient ^ 2 := by
   have := le_mul_totient_sq n
   split_ifs at this <;> nlinarith [Nat.zero_le (n.totient ^ 2)]
 
-theorem torsionOrder_le (E : Type) [Field E] [NumberField E] :
-    Units.torsionOrder E ≤ 2 * (Module.finrank ℚ E) ^ 2 := by
+theorem torsionOrder_le (E : Type) [Field E] [NumberField E]
+    : Units.torsionOrder E ≤ 2 * (Module.finrank ℚ E) ^ 2 := by
   classical
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := NumberField.Units.torsion E)
   have hord : orderOf g = Units.torsionOrder E := by
@@ -78,7 +86,9 @@ theorem torsionOrder_le (E : Type) [Field E] [NumberField E] :
     rw [← Polynomial.natDegree_cyclotomic (Units.torsionOrder E) ℚ,
       Polynomial.cyclotomic_eq_minpoly_rat hζ hpos]
     exact minpoly.natDegree_le _
-  calc Units.torsionOrder E ≤ 2 * (Units.torsionOrder E).totient ^ 2 := le_two_totient_sq _
+  calc
+    Units.torsionOrder E
+      ≤ 2 * (Units.torsionOrder E).totient ^ 2 := le_two_totient_sq _
     _ ≤ 2 * (Module.finrank ℚ E) ^ 2 := by gcongr
 
 end Formalism.L2.SG.NGCut.TorsionTotientBound

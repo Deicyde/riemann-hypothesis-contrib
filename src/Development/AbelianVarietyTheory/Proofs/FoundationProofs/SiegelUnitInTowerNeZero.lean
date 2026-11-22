@@ -29,8 +29,10 @@ theorem codiscreteWithin_Hs_neBot : (Filter.codiscreteWithin Hs).NeBot := by
     exact disjoint_self.1 this
   exact (NormedField.nhdsNE_neBot Complex.I).ne hbot
 
-theorem siegel_ne_zero : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε)
-    (c : ℕ) (x : Fin 2 → ℚ), admitted c x → siegel T c x ≠ 0 := by
+theorem siegel_ne_zero
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε) (c : ℕ)
+        (x : Fin 2 → ℚ),
+      admitted c x → siegel T c x ≠ 0 := by
   intro Ω _ _ _ ε T c x hx h0
   have han := GlobalTheory.T.siegelUnitInTower_an_eq_siegelUnitOnComplex Ω ε T c x hx
   rw [h0, map_zero] at han

@@ -19,23 +19,26 @@ variable {n : ℕ} {ε : Fin n → Bool} {r k : ℕ}
 theorem norm_sq_star (z : ℂ) : star z * z = ((‖z‖ ^ 2 : ℝ) : ℂ) := by
   rw [Complex.star_def, Complex.conj_mul']; push_cast; rfl
 
-theorem dframe (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
-    (hZ : IsUnit Z.det)
-    (hlt : A.T * B.T * ‖(Z⁻¹ *ᵥ Pi.single (Fin.last r) 1) (Fin.last r)‖ ^ 2 < 1)
-    (g : Formalism.REAL.UJ ε) (y : Fin (r + 1) → Fin n → ℂ) (t : Fin (r + 1) → ℂ) (σ : ℝ) (hσ : 0 < σ)
-    (htc : t ⬝ᵥ (Z⁻¹ *ᵥ Pi.single (Fin.last r) 1) = σ)
+theorem dframe
+    (A B : Fr ε r k) (he : B.e = A.e)
+    (i0 : Fin k)
+    (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
+    (hZ : IsUnit Z.det) (hlt : A.T * B.T * ‖(Z⁻¹ *ᵥ Pi.single (Fin.last r) 1) (Fin.last r)‖ ^ 2 < 1)
+    (g : Formalism.REAL.UJ ε) (y : Fin (r + 1) → Fin n → ℂ)
+    (t : Fin (r + 1) → ℂ) (σ : ℝ) (hσ : 0 < σ) (htc : t ⬝ᵥ (Z⁻¹ *ᵥ Pi.single (Fin.last r) 1) = σ)
     (hgf : ∀ b, uMat g *ᵥ fam B.e B.z b = y b) (hgw : ∀ i, i ≠ i0 → uMat g *ᵥ B.wb i = A.wb i)
     (hp1 : ∀ a b, hJ ε (fam A.e A.z a) (y b) = Z a b)
     (hp4 : ∀ i b, hJ ε (A.wb i) (y b) = if i = i0 then t b else 0)
-    (sc : ℝ) (hsc : 0 < sc) :
-    ∃ φ : ℂ, star φ * φ = 1 ∧
-      IsDFrame ε (famSc sc A.e A.z) (famSc sc A.e B.z) (uMat g) (uMat g⁻¹) A.wb B.wb i0 i0 1
-        (Matrix.diagonal fun i => if i = i0 then φ else 1) := by
+    (sc : ℝ) (hsc : 0 < sc)
+    : ∃ φ : ℂ,
+      star φ * φ = 1 ∧ IsDFrame ε (famSc sc A.e A.z) (famSc sc A.e B.z) (uMat g) (uMat g⁻¹) A.wb
+        B.wb i0 i0 1 (Matrix.diagonal fun i => if i = i0 then φ else 1) := by
   classical
   unfold IsDFrame
   set L := Fin.last r with hL
   set c := Z⁻¹ *ᵥ Pi.single L 1 with hcdef
-  have hZc : Z *ᵥ c = Pi.single L 1 := by rw [hcdef, mulVec_mulVec, mul_nonsing_inv _ hZ, one_mulVec]
+  have hZc : Z *ᵥ c = Pi.single L 1 := by
+    rw [hcdef, mulVec_mulVec, mul_nonsing_inv _ hZ, one_mulVec]
   obtain ⟨lam, hlam⟩ : ∃ lam : Fin (r + 1) → ℂ, lam = fun a => ((sc : ℂ) ^ (r - a.1))⁻¹ := ⟨_, rfl⟩
   have hscC : (sc : ℂ) ≠ 0 := by exact_mod_cast hsc.ne'
   have hl0 : ∀ a, lam a ≠ 0 := fun a => by rw [hlam]; exact inv_ne_zero (pow_ne_zero _ hscC)
@@ -57,7 +60,8 @@ theorem dframe (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin 
     ext a b; rw [hZs, mul_diagonal, diagonal_mul]; ring
   have hDs : Zs.det ≠ 0 := by
     rw [hZsd, det_mul, det_mul, det_diagonal]
-    exact mul_ne_zero (mul_ne_zero (Finset.prod_ne_zero_iff.2 fun a _ => hl0 a) (isUnit_iff_ne_zero.1 hZ))
+    exact mul_ne_zero
+      (mul_ne_zero (Finset.prod_ne_zero_iff.2 fun a _ => hl0 a) (isUnit_iff_ne_zero.1 hZ))
       (Finset.prod_ne_zero_iff.2 fun a _ => hl0 a)
   have hDl : Dl Zs (r + 1) = Zs.det := dl_top Zs
   rw [hDl]
@@ -131,7 +135,8 @@ theorem dframe (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin 
       rw [Pi.single_eq_of_ne hb]
       exact (mul_eq_zero.1 h2).resolve_left (hl0 b)
   have hρL : ρ L = Zs.det * c L := by
-    have : ρ = Pi.single L Zs.det ᵥ* Z⁻¹ := by rw [← hρZ, vecMul_vecMul, mul_nonsing_inv _ hZ, vecMul_one]
+    have : ρ = Pi.single L Zs.det ᵥ* Z⁻¹ := by
+      rw [← hρZ, vecMul_vecMul, mul_nonsing_inv _ hZ, vecMul_one]
     rw [this, single_vecMul, hcdef, mulVec_single_one]
     simp [Matrix.row, Matrix.col]
   have hxy : ∀ b, hJ ε x (y b) = if b = L then Zs.det else 0 := by
@@ -150,11 +155,13 @@ theorem dframe (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin 
       ring
     · simp [ha]
   have hxx : hJ ε x x = -(A.T : ℂ) * (ρ L * star (ρ L)) := by
-    calc hJ ε x x = hJ ε (∑ a, star (ρ a) • fam A.e A.z a) x := by rw [← hxdef]
+    calc
+      hJ ε x x
+        = hJ ε (∑ a, star (ρ a) • fam A.e A.z a) x := by rw [← hxdef]
       _ = -(A.T : ℂ) * (ρ L * star (ρ L)) := by
         rw [hJ_sum_left]
-        simp only [hJ_smul_left, star_star, hfx, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
-          if_true]
+        simp only [hJ_smul_left, star_star, hfx, mul_ite, mul_zero, Finset.sum_ite_eq',
+          Finset.mem_univ, if_true]
         ring
 
   have hwx : ∀ i, hJ ε (A.wb i) x = 0 := fun i => by
@@ -166,8 +173,10 @@ theorem dframe (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin 
   have hwv : ∀ i, i ≠ i0 → hJ ε (B.wb i) (uMat g⁻¹ *ᵥ x) = 0 := fun i hi => by
     rw [hpv, hgw i hi, hwx]
   obtain ⟨κ, hκdef⟩ : ∃ κ, hJ ε (B.wb i0) (uMat g⁻¹ *ᵥ x) = κ := ⟨_, rfl⟩
-  have hsumv : ∑ i, hJ ε (B.wb i) (uMat g⁻¹ *ᵥ x) * star (hJ ε (B.wb i) (uMat g⁻¹ *ᵥ x)) = κ * star κ := by
-    rw [Finset.sum_eq_single i0 (fun j _ hj => by rw [hwv j hj, star_zero, mul_zero]) (by simp), hκdef]
+  have hsumv
+      : ∑ i, hJ ε (B.wb i) (uMat g⁻¹ *ᵥ x) * star (hJ ε (B.wb i) (uMat g⁻¹ *ᵥ x)) = κ * star κ := by
+    rw [Finset.sum_eq_single i0 (fun j _ hj => by rw [hwv j hj, star_zero, mul_zero]) (by simp),
+      hκdef]
   have key := B.pair (uMat g⁻¹ *ᵥ x) (uMat g⁻¹ *ᵥ x) hev hev
   rw [hJ_UJ, hxx, hsumv, hzv, star_star, hρL] at key
   have hκ : κ ≠ 0 := by
@@ -213,8 +222,10 @@ theorem dframe (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin 
   · rw [hnn', eN_single, diagonal_mulVec_single]
     funext j
     by_cases hj : j = i0
-    · subst hj; simp only [if_true, mul_one, Pi.single_eq_same, Pi.smul_apply, smul_eq_mul, hφdef]
-      push_cast; ring
+    · subst hj
+      simp only [if_true, mul_one, Pi.single_eq_same, Pi.smul_apply, smul_eq_mul, hφdef]
+      push_cast
+      ring
     · simp [hj]
   · intro y' hf hgF
     have hf1 : ∀ a, hJ ε (fam A.e A.z a) y' = 0 := fun a => by
@@ -232,15 +243,17 @@ theorem dframe (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin 
       have := congrFun hZν (Fin.castSucc a)
       simp only [mulVec, dotProduct] at this
       rw [show ∑ b, ν b * Z (Fin.castSucc a) b = ∑ b, Z (Fin.castSucc a) b * ν b from
-        Finset.sum_congr rfl fun b _ => mul_comm _ _, this, Pi.single_eq_of_ne (Fin.castSucc_ne_last a)]
+          Finset.sum_congr rfl fun b _ => mul_comm _ _,
+        this, Pi.single_eq_of_ne (Fin.castSucc_ne_last a)]
     have hey' : ∀ a, hJ ε (A.e a) y' = 0 := fun a => by rw [← fam_cs A.e A.z a]; exact hf1 _
     have hzy : hJ ε A.z y' = 0 := by rw [← fam_last A.e A.z]; exact hf1 _
-    have hx'y : hJ ε x' y' = 0 := by
-      rw [hx'def, hJ_sum_left]; simp [hJ_smul_left, hy1]
+    have hx'y : hJ ε x' y' = 0 := by rw [hx'def, hJ_sum_left]; simp [hJ_smul_left, hy1]
     have hpr := A.pair x' y' hex' hey'
-    have hsum : ∑ i, hJ ε (A.wb i) y' * star (hJ ε (A.wb i) x') =
-        hJ ε (A.wb i0) y' * star (Zs.det * σ) := by
-      rw [Finset.sum_eq_single i0 (fun j _ hj => by rw [hPx', if_neg hj, star_zero, mul_zero]) (by simp),
+    have hsum
+        : ∑ i, hJ ε (A.wb i) y' * star (hJ ε (A.wb i) x')
+          = hJ ε (A.wb i0) y' * star (Zs.det * σ) := by
+      rw [Finset.sum_eq_single i0 (fun j _ hj => by rw [hPx', if_neg hj, star_zero, mul_zero]) (by
+          simp),
         hPx', if_pos rfl]
     rw [hsum, hx'y, hzy] at hpr
     simp only [mul_zero, zero_mul, zero_add] at hpr
@@ -250,14 +263,15 @@ theorem dframe (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin 
 
     have hev' : ∀ a, hJ ε (B.e a) (uMat g⁻¹ *ᵥ y') = 0 := fun a => by
       rw [hpv, ← fam_cs B.e B.z a, hgf]; exact hy1 _
-    have hzv' : hJ ε B.z (uMat g⁻¹ *ᵥ y') = 0 := by
-      rw [hpv, ← fam_last B.e B.z, hgf]; exact hy1 _
+    have hzv' : hJ ε B.z (uMat g⁻¹ *ᵥ y') = 0 := by rw [hpv, ← fam_last B.e B.z, hgf]; exact hy1 _
     have hvv' : hJ ε (uMat g⁻¹ *ᵥ x) (uMat g⁻¹ *ᵥ y') = 0 := by
       rw [hJ_UJ, hxdef, hJ_sum_left]; simp [hJ_smul_left, hf1]
     have hpr2 := B.pair (uMat g⁻¹ *ᵥ x) (uMat g⁻¹ *ᵥ y') hev hev'
-    have hsum2 : ∑ i, hJ ε (B.wb i) (uMat g⁻¹ *ᵥ y') * star (hJ ε (B.wb i) (uMat g⁻¹ *ᵥ x)) =
-        hJ ε (B.wb i0) (uMat g⁻¹ *ᵥ y') * star κ := by
-      rw [Finset.sum_eq_single i0 (fun j _ hj => by rw [hwv j hj, star_zero, mul_zero]) (by simp), hκdef]
+    have hsum2
+        : ∑ i, hJ ε (B.wb i) (uMat g⁻¹ *ᵥ y') * star (hJ ε (B.wb i) (uMat g⁻¹ *ᵥ x))
+          = hJ ε (B.wb i0) (uMat g⁻¹ *ᵥ y') * star κ := by
+      rw [Finset.sum_eq_single i0 (fun j _ hj => by rw [hwv j hj, star_zero, mul_zero]) (by simp),
+        hκdef]
     rw [hsum2, hvv', hzv'] at hpr2
     simp only [mul_zero, zero_mul, zero_add] at hpr2
     have hPv0 := (mul_eq_zero.1 hpr2.symm).resolve_right (star_ne_zero.2 hκ)
@@ -269,12 +283,16 @@ theorem dframe (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin 
     · rw [hi, hPv0, hPy0, mul_zero]
     · rw [hpv, hgw i hi]; simp [hi]
 
-theorem locMain (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
-    (hG : 0 < Gv A.T B.T Z) (sc : ℝ) (hsc : 0 < sc) :
-    ∃ g : Formalism.REAL.UJ ε, Zhat ε (fam A.e A.z) (fam A.e B.z) (uMat g) = Z ∧
-      ∃ φ : ℂ, star φ * φ = 1 ∧
-        IsDFrame ε (famSc sc A.e A.z) (famSc sc A.e B.z) (uMat g) (uMat g⁻¹) A.wb B.wb i0 i0 1
-          (Matrix.diagonal fun i => if i = i0 then φ else 1) := by
+theorem locMain
+    (A B : Fr ε r k) (he : B.e = A.e)
+    (i0 : Fin k)
+    (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) (hG : 0 < Gv A.T B.T Z)
+    (sc : ℝ) (hsc : 0 < sc)
+    : ∃ g : Formalism.REAL.UJ ε,
+      Zhat ε (fam A.e A.z) (fam A.e B.z) (uMat g) = Z
+        ∧ ∃ φ : ℂ,
+          star φ * φ = 1 ∧ IsDFrame ε (famSc sc A.e A.z) (famSc sc A.e B.z) (uMat g) (uMat g⁻¹) A.wb
+            B.wb i0 i0 1 (Matrix.diagonal fun i => if i = i0 then φ else 1) := by
   obtain ⟨hZ, hlt⟩ := gv_facts A.T_pos B.T_pos Z hG
   have hcL : (Z⁻¹ *ᵥ Pi.single (Fin.last r) 1) (Fin.last r) = Z⁻¹ (Fin.last r) (Fin.last r) := by
     simp [mulVec_single_one]
@@ -285,8 +303,13 @@ theorem locMain (A B : Fr ε r k) (he : B.e = A.e) (i0 : Fin k) (Z : Matrix (Fin
       rw [hqdef, mul_sub, mul_inv_cancel₀ A.T_pos.ne', ← mul_assoc]
     have h2 : 0 < A.T * q := by rw [h1]; linarith
     exact pos_of_mul_pos_right h2 A.T_pos.le
-  obtain ⟨g, y, t, htc, hgf, hgw, hp1, hp4⟩ := realize A B i0 Z hZ (Real.sqrt q) (Real.sq_sqrt hq.le)
-  refine ⟨g, ?_, dframe A B he i0 Z hZ hlt g y t (Real.sqrt q) (Real.sqrt_pos.2 hq) htc hgf hgw hp1 hp4 sc hsc⟩
+  obtain ⟨g, y, t, htc, hgf, hgw, hp1, hp4⟩ :=
+    realize A B i0 Z hZ (Real.sqrt q) (Real.sq_sqrt hq.le)
+  refine ⟨
+    g,
+    ?_,
+    dframe A B he i0 Z hZ hlt g y t (Real.sqrt q) (Real.sqrt_pos.2 hq) htc hgf hgw hp1 hp4 sc hsc
+  ⟩
   ext a b
   show hJ ε (fam A.e A.z a) (uMat g *ᵥ fam A.e B.z b) = Z a b
   rw [show fam A.e B.z = fam B.e B.z by rw [he], hgf, hp1]

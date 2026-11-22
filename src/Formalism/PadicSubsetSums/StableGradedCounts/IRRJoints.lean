@@ -12,10 +12,12 @@ theorem cycleProbSum_of_cycleProbPrime : CycleProbPrime → CycleProbSum := by
   unfold CycleProbPrime CycleProbSum
   intro h N
   classical
-  have hdisj : ∀ p ∈ (range (N + 1)).filter (fun p => Nat.Prime p ∧ N < 2 * p ∧ p + 3 ≤ N),
-      ∀ q ∈ (range (N + 1)).filter (fun p => Nat.Prime p ∧ N < 2 * p ∧ p + 3 ≤ N), p ≠ q →
-      Disjoint (univ.filter fun σ : Equiv.Perm (Fin N) => p ∈ σ.cycleType)
-        (univ.filter fun σ : Equiv.Perm (Fin N) => q ∈ σ.cycleType) := by
+  have hdisj
+      : ∀ p ∈ (range (N + 1)).filter (fun p => Nat.Prime p ∧ N < 2 * p ∧ p + 3 ≤ N),
+        ∀ q ∈ (range (N + 1)).filter (fun p => Nat.Prime p ∧ N < 2 * p ∧ p + 3 ≤ N),
+          p ≠ q
+            → Disjoint (univ.filter fun σ : Equiv.Perm (Fin N) => p ∈ σ.cycleType)
+              (univ.filter fun σ : Equiv.Perm (Fin N) => q ∈ σ.cycleType) := by
     intro p hp q hq hpq
     simp only [mem_filter, mem_range] at hp hq
     rw [Finset.disjoint_left]
@@ -30,9 +32,11 @@ theorem cycleProbSum_of_cycleProbPrime : CycleProbPrime → CycleProbSum := by
       rw [Multiset.sum_cons]
     have hle : q ≤ (σ.cycleType.erase p).sum := Multiset.le_sum_of_mem hq'
     omega
-  have hset : (univ.filter fun σ : Equiv.Perm (Fin N) => ∃ p ∈ σ.cycleType, Nat.Prime p ∧ N < 2 * p ∧ p + 3 ≤ N) =
-      ((range (N + 1)).filter fun p => Nat.Prime p ∧ N < 2 * p ∧ p + 3 ≤ N).biUnion
-        (fun p => univ.filter fun σ : Equiv.Perm (Fin N) => p ∈ σ.cycleType) := by
+  have hset
+      : (univ.filter fun σ : Equiv.Perm (Fin N) =>
+          ∃ p ∈ σ.cycleType, Nat.Prime p ∧ N < 2 * p ∧ p + 3 ≤ N)
+        = ((range (N + 1)).filter fun p => Nat.Prime p ∧ N < 2 * p ∧ p + 3 ≤ N).biUnion
+          (fun p => univ.filter fun σ : Equiv.Perm (Fin N) => p ∈ σ.cycleType) := by
     ext σ
     simp only [mem_filter, mem_univ, true_and, mem_biUnion, mem_range]
     constructor

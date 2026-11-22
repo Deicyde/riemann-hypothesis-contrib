@@ -6,13 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix Filter ReciprocityTheory.Gal UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.Pa.B2
 
-private theorem quotient_multiplication_exact {R : Type} [CommRing R] [IsDomain R] (u v w : R) (hv : v ≠ 0)
-    (hw : w = v * u) :
-    ∃ (f : (R ⧸ Ideal.span {u}) →ₗ[R] (R ⧸ Ideal.span {w}))
-      (g : (R ⧸ Ideal.span {w}) →ₗ[R] (R ⧸ Ideal.span {v})),
-      Function.Injective f ∧ Function.Exact f g ∧ Function.Surjective g ∧
-      (∀ x, f (Ideal.Quotient.mk _ x) = Ideal.Quotient.mk _ (v * x)) ∧
-      (∀ x, g (Ideal.Quotient.mk _ x) = Ideal.Quotient.mk _ x) := by
+private theorem quotient_multiplication_exact
+    {R : Type} [CommRing R] [IsDomain R] (u v w : R) (hv : v ≠ 0) (hw : w = v * u)
+    : ∃ (f : (R ⧸ Ideal.span {u}) →ₗ[R] (R ⧸ Ideal.span {w}))
+        (g : (R ⧸ Ideal.span {w}) →ₗ[R] (R ⧸ Ideal.span {v})),
+      Function.Injective f ∧ Function.Exact f g ∧ Function.Surjective g
+        ∧ (∀ x, f (Ideal.Quotient.mk _ x) = Ideal.Quotient.mk _ (v * x))
+        ∧ (∀ x, g (Ideal.Quotient.mk _ x) = Ideal.Quotient.mk _ x) := by
   subst hw
   have h1 : Ideal.span {u} ≤ Submodule.comap (LinearMap.mulLeft R v) (Ideal.span {v * u}) := by
     intro x hx
@@ -52,16 +52,28 @@ private theorem quotient_multiplication_exact {R : Type} [CommRing R] [IsDomain 
     induction y using Submodule.Quotient.induction_on with
     | H x => exact ⟨Submodule.Quotient.mk x, hg x⟩
 
-theorem UpperTheory.V.Pa.B2.amMaps :
-    ∀ (K : Type) [Field K] (e m : ℕ), e ≤ m → ∃ (f : (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ (m - e)}) →ₗ[PowerSeries K] (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ m})) (g : (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ m}) →ₗ[PowerSeries K] (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ e})) (k : (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ e}) →ₗ[PowerSeries K] (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ m})) (r : (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ m}) →ₗ[PowerSeries K] (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ (m - e)})), Function.Injective f ∧ Function.Exact f g ∧ Function.Surjective g ∧ Function.Injective k ∧ Function.Exact k r ∧ Function.Surjective r ∧ ∀ y, f (r y) = (PowerSeries.X : PowerSeries K) ^ e • y := by
+theorem UpperTheory.V.Pa.B2.amMaps
+    : ∀ (K : Type) [Field K] (e m : ℕ),
+      e ≤ m
+        → ∃ (f
+            : (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ (m - e)}) →ₗ[PowerSeries K] (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ m}))
+            (g
+              : (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ m}) →ₗ[PowerSeries K] (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ e}))
+            (k
+              : (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ e}) →ₗ[PowerSeries K] (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ m}))
+            (r
+              : (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ m}) →ₗ[PowerSeries K] (PowerSeries K ⧸ Ideal.span {(PowerSeries.X : PowerSeries K) ^ (m - e)})),
+          Function.Injective f ∧ Function.Exact f g ∧ Function.Surjective g ∧ Function.Injective k
+            ∧ Function.Exact k r ∧ Function.Surjective r
+            ∧ ∀ y, f (r y) = (PowerSeries.X : PowerSeries K) ^ e • y := by
   intro K _ e m h
   have hX : (PowerSeries.X : PowerSeries K) ≠ 0 := PowerSeries.X_ne_zero
   obtain ⟨f, g, hfi, hfg, hgs, hf, -⟩ :=
-    quotient_multiplication_exact ((PowerSeries.X : PowerSeries K) ^ (m - e)) (PowerSeries.X ^ e) (PowerSeries.X ^ m)
-      (pow_ne_zero _ hX) (by rw [← pow_add, Nat.add_sub_cancel' h])
+    quotient_multiplication_exact ((PowerSeries.X : PowerSeries K) ^ (m - e)) (PowerSeries.X ^ e)
+      (PowerSeries.X ^ m) (pow_ne_zero _ hX) (by rw [← pow_add, Nat.add_sub_cancel' h])
   obtain ⟨k, r, hki, hkr, hrs, -, hr⟩ :=
-    quotient_multiplication_exact ((PowerSeries.X : PowerSeries K) ^ e) (PowerSeries.X ^ (m - e)) (PowerSeries.X ^ m)
-      (pow_ne_zero _ hX) (by rw [← pow_add, Nat.sub_add_cancel h])
+    quotient_multiplication_exact ((PowerSeries.X : PowerSeries K) ^ e) (PowerSeries.X ^ (m - e))
+      (PowerSeries.X ^ m) (pow_ne_zero _ hX) (by rw [← pow_add, Nat.sub_add_cancel h])
   refine ⟨f, g, k, r, hfi, hfg, hgs, hki, hkr, hrs, fun y => ?_⟩
   induction y using Submodule.Quotient.induction_on with
   | H x => exact (congrArg f (hr x)).trans (hf x)

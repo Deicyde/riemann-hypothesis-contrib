@@ -4,14 +4,18 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsVolData
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass GlobalTheory.SnMass.VolN
+open NumberField IsDedekindDomain MeasureTheory Matrix
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants
+  Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass
+  GlobalTheory.SnMass.VolN
 open scoped TensorProduct ENNReal nonZeroDivisors
 
 namespace GlobalTheory.SnMass.VolN
 
-theorem re_corner_eq_zero (k r : ℕ) (x : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (a : Fin r)
-    (hx : x ∈ Nset k r) (hd : Dep k r (2 * r - 2 * a.val) (x - 1)) :
-    (x (eI k r a) (esI k r a)).re = 0 := by
+theorem re_corner_eq_zero
+    (k r : ℕ) (x : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (a : Fin r)
+    (hx : x ∈ Nset k r) (hd : Dep k r (2 * r - 2 * a.val) (x - 1))
+    : (x (eI k r a) (esI k r a)).re = 0 := by
   have hsv : (esI k r a).val = 2 * r + k - a.val := rfl
   have hev : (eI k r a).val = a.val := rfl
   generalize esI k r a = s at *
@@ -20,30 +24,37 @@ theorem re_corner_eq_zero (k r : ℕ) (x : Matrix (Fin (2 * r + k + 1)) (Fin (2 
 
   have hcol : ∀ i : Fin (2 * r + k + 1), a.val < i.val → i ≠ s → x i s = 0 := by
     intro i hi hne
-    have h0 := hd i s (by
-      simp only [pos]
-      split_ifs <;> first | rfl | omega | (exfalso; omega))
-    rw [Matrix.sub_apply, Matrix.one_apply_ne hne, sub_zero] at h0; exact h0
+    have h0 :=
+      hd i s (by
+        simp only [pos]
+        split_ifs <;> first | rfl | omega | (exfalso; omega))
+    rw [Matrix.sub_apply, Matrix.one_apply_ne hne, sub_zero] at h0
+    exact h0
   have hss : x s s = 1 := by
     have h0 := hd s s (by simp only [pos]; split_ifs <;> first | rfl | omega | (exfalso; omega))
-    rw [Matrix.sub_apply, Matrix.one_apply_eq, sub_eq_zero] at h0; exact h0
+    rw [Matrix.sub_apply, Matrix.one_apply_eq, sub_eq_zero] at h0
+    exact h0
   have hU := congrFun (congrFun hx.1 s) s
   have hH : Hpk k r s s = 0 := by
     simp only [Hpk, Fin.ext_iff, and_true]
     split_ifs <;> first | rfl | omega | (exfalso; omega)
   rw [hH] at hU
-  have key : ∀ i j : Fin (2 * r + k + 1), star (x i s) * Hpk k r i j * x j s =
-      (if i = s ∧ j = e then x j s else 0) + (if i = e ∧ j = s then star (x i s) else 0) := by
+  have key
+      : ∀ i j : Fin (2 * r + k + 1),
+        star (x i s) * Hpk k r i j * x j s
+          = (if i = s ∧ j = e then x j s else 0) + (if i = e ∧ j = s then star (x i s) else 0) := by
     intro i j
     by_cases h1 : i = s ∧ j = e
     · rw [h1.1, h1.2]
       have hes : e ≠ s := fun h => by have := congrArg Fin.val h; omega
-      have : Hpk k r s e = 1 := by simp only [Hpk, Fin.ext_iff, and_true]; split_ifs <;> first | rfl | omega | (exfalso; omega)
+      have : Hpk k r s e = 1 := by
+        simp only [Hpk, Fin.ext_iff, and_true]; split_ifs <;> first | rfl | omega | (exfalso; omega)
       simp [hes, hes.symm, this, hss]
     by_cases h2 : i = e ∧ j = s
     · rw [h2.1, h2.2]
       have hes : e ≠ s := fun h => by have := congrArg Fin.val h; omega
-      have : Hpk k r e s = 1 := by simp only [Hpk, Fin.ext_iff, and_true]; split_ifs <;> first | rfl | omega | (exfalso; omega)
+      have : Hpk k r e s = 1 := by
+        simp only [Hpk, Fin.ext_iff, and_true]; split_ifs <;> first | rfl | omega | (exfalso; omega)
       simp [hes, hes.symm, this, hss]
     rw [if_neg h1, if_neg h2, add_zero]
     have hi : i = s ∨ i.val ≤ a.val ∨ x i s = 0 := by
@@ -68,16 +79,19 @@ theorem re_corner_eq_zero (k r : ℕ) (x : Matrix (Fin (2 * r + k + 1)) (Fin (2 
       · subst hi; subst hj; simp [hH]
       · have : Hpk k r i j = 0 := by
           rw [hI] at hi
-          simp only [Hpk, Fin.ext_iff, and_true]; split_ifs <;> first | rfl | omega | (exfalso; omega)
+          simp only [Hpk, Fin.ext_iff, and_true]
+          split_ifs <;> first | rfl | omega | (exfalso; omega)
         simp [this]
       · simp [hj]
     · rcases hj with hj | hj | hj
       · have : Hpk k r i j = 0 := by
           rw [hI] at hj
-          simp only [Hpk, Fin.ext_iff, and_true]; split_ifs <;> first | rfl | omega | (exfalso; omega)
+          simp only [Hpk, Fin.ext_iff, and_true]
+          split_ifs <;> first | rfl | omega | (exfalso; omega)
         simp [this]
       · have : Hpk k r i j = 0 := by
-          simp only [Hpk, Fin.ext_iff, and_true]; split_ifs <;> first | rfl | omega | (exfalso; omega)
+          simp only [Hpk, Fin.ext_iff, and_true]
+          split_ifs <;> first | rfl | omega | (exfalso; omega)
         simp [this]
       · simp [hj]
     · simp [hi]

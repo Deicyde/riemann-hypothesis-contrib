@@ -43,10 +43,12 @@ def swIx {w : ℤ} (p : {p : ℤ × ℤ // p.1 + p.2 = w}) : {p : ℤ × ℤ // 
 
 def sw (I J : Cx R) (U : Scheme.{0}) (w : ℤ) : Tens I J U w →ₗ[ULift.{1} R] Tens J I U w :=
   DirectSum.toModule _ _ _ fun p =>
-    ((p.1.1 * p.1.2).negOnePow : ℤ) •
-      ((DirectSum.lof (ULift.{1} R) _
-        (fun q : {q : ℤ × ℤ // q.1 + q.2 = w} => Sec (J.X q.1.1) U ⊗[ULift.{1} R] Sec (I.X q.1.2) U) (swIx p)) ∘ₗ
-        (TensorProduct.comm (ULift.{1} R) _ _).toLinearMap)
+    ((p.1.1 * p.1.2).negOnePow : ℤ)
+      • ((DirectSum.lof (ULift.{1} R) _
+          (fun q : {q : ℤ × ℤ // q.1 + q.2 = w} =>
+            Sec (J.X q.1.1) U ⊗[ULift.{1} R] Sec (I.X q.1.2) U)
+          (swIx p))
+        ∘ₗ (TensorProduct.comm (ULift.{1} R) _ _).toLinearMap)
 
 lemma sw_lof (I J : Cx R) (U : Scheme.{0}) (w : ℤ) (p : {p : ℤ × ℤ // p.1 + p.2 = w})
     (a : Sec (I.X p.1.1) U) (b : Sec (J.X p.1.2) U) :
@@ -124,12 +126,20 @@ lemma isTensor_flip {I J K : Cx R} (μ : Pair I J K) (hμ : μ.IsTensor) : (flip
 
 end LateralTheory.EtaleFoundations.FlipPf
 
-theorem LateralTheory.EtaleFoundations.etale_complex_pairing_flip_exists : LateralTheory.EtaleFoundations.EtaleComplexPairingFlipExists := by
+theorem LateralTheory.EtaleFoundations.etale_complex_pairing_flip_exists
+    : LateralTheory.EtaleFoundations.EtaleComplexPairingFlipExists := by
   intro R _ I J K μ
-  refine ⟨LateralTheory.EtaleFoundations.FlipPf.flipPair μ, ?_, ?_, LateralTheory.EtaleFoundations.FlipPf.isTensor_flip μ⟩
+  refine ⟨
+    LateralTheory.EtaleFoundations.FlipPf.flipPair μ,
+    ?_,
+    ?_,
+    LateralTheory.EtaleFoundations.FlipPf.isTensor_flip μ
+  ⟩
   · intro U s t w h a b
-    simp only [LateralTheory.EtaleFoundations.FlipPf.flipPair, LinearMap.smul_apply, LinearMap.flip_apply, Units.smul_def]
+    simp only [LateralTheory.EtaleFoundations.FlipPf.flipPair, LinearMap.smul_apply,
+      LinearMap.flip_apply, Units.smul_def]
   · intro U s t w h b a
-    simp only [LateralTheory.EtaleFoundations.FlipPf.flipPair, LinearMap.smul_apply, LinearMap.flip_apply, Units.smul_def]
+    simp only [LateralTheory.EtaleFoundations.FlipPf.flipPair, LinearMap.smul_apply,
+      LinearMap.flip_apply, Units.smul_def]
     rw [mul_comm s t]
     exact (LateralTheory.EtaleFoundations.FlipPf.negOnePow_smul_smul _ _).symm

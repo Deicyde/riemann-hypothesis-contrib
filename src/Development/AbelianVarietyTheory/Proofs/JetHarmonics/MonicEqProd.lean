@@ -8,9 +8,9 @@ namespace GlobalTheory.MonicSeparableProduct
 
 open Polynomial
 
-theorem monic_eq_prod {F : Type} [Field F] [IsAlgClosed F] (W : ValuationSubring F) :
-    ∀ (n : ℕ) (f : W[X]), f.Monic → f.natDegree = n →
-      ∃ M : Multiset W, f = (M.map (fun r => X - C r)).prod := by
+theorem monic_eq_prod {F : Type} [Field F] [IsAlgClosed F] (W : ValuationSubring F)
+    : ∀ (n : ℕ) (f : W[X]),
+      f.Monic → f.natDegree = n → ∃ M : Multiset W, f = (M.map (fun r => X - C r)).prod := by
   intro n
   induction n with
   | zero =>
@@ -31,7 +31,8 @@ theorem monic_eq_prod {F : Type} [Field F] [IsAlgClosed F] (W : ValuationSubring
     have hfac := mul_divByMonic_eq_iff_isRoot.2 hroot
     have hq : (f /ₘ (X - C r)).Monic := by
       apply Monic.of_mul_monic_left (monic_X_sub_C r)
-      rw [hfac]; exact hf
+      rw [hfac]
+      exact hf
     have hqd : (f /ₘ (X - C r)).natDegree = n := by
       rw [natDegree_divByMonic f (monic_X_sub_C r), hn, natDegree_X_sub_C]
       simp
@@ -39,12 +40,14 @@ theorem monic_eq_prod {F : Type} [Field F] [IsAlgClosed F] (W : ValuationSubring
     refine ⟨r ::ₘ M, ?_⟩
     rw [Multiset.map_cons, Multiset.prod_cons, ← hM, hfac]
 
-theorem exists_sep {F : Type} [Field F] [IsAlgClosed F] (W : ValuationSubring F) (p : W)
-    (hp : ∀ a : W, ¬IsUnit a → ∃ n : ℕ, a ^ n ∈ Ideal.span {p})
-    (A : Type) [CommRing A] [Algebra W A] [Module.Finite W A] (aug : A →ₐ[W] W)
-    (t : A) (ht : aug t = 0) :
-    ∃ s b : A, IsUnit (aug s) ∧ s = b * s ^ 2 ∧
-      ∀ P : Ideal A, P.IsPrime → algebraMap W A p ∈ P → s ∉ P → t ∈ P := by
+theorem exists_sep
+    {F : Type} [Field F] [IsAlgClosed F]
+    (W : ValuationSubring F) (p : W) (hp : ∀ a : W, ¬ IsUnit a → ∃ n : ℕ, a ^ n ∈ Ideal.span {p})
+    (A : Type) [CommRing A] [Algebra W A] [Module.Finite W A]
+    (aug : A →ₐ[W] W) (t : A) (ht : aug t = 0)
+    : ∃ s b : A,
+      IsUnit (aug s) ∧ s = b * s ^ 2
+        ∧ ∀ P : Ideal A, P.IsPrime → algebraMap W A p ∈ P → s ∉ P → t ∈ P := by
   classical
   obtain ⟨f, hf, hft⟩ : IsIntegral W t := Algebra.IsIntegral.isIntegral t
   obtain ⟨M, hM⟩ := monic_eq_prod W _ f hf rfl
@@ -58,14 +61,20 @@ theorem exists_sep {F : Type} [Field F] [IsAlgClosed F] (W : ValuationSubring F)
     rw [hs, hg, ← Multiset.prod_add, ← Multiset.map_add (f := _), Multiset.filter_add_not, h0]
   have hcop : IsCoprime s g := by
     rw [hs]
-    refine Multiset.prod_induction (fun x => IsCoprime x g) _
-      (fun a b ha hb => ha.mul_left hb) isCoprime_one_left ?_
+    refine Multiset.prod_induction
+      (fun x => IsCoprime x g)
+      _
+      (fun a b ha hb => ha.mul_left hb)
+      isCoprime_one_left ?_
     intro x hx
     obtain ⟨r, hr, rfl⟩ := Multiset.mem_map.1 hx
     have hru : IsUnit r := (Multiset.mem_filter.1 hr).2
     rw [hg]
-    refine Multiset.prod_induction (fun y => IsCoprime (t - algebraMap W A r) y) _
-      (fun a b ha hb => ha.mul_right hb) isCoprime_one_right ?_
+    refine Multiset.prod_induction
+      (fun y => IsCoprime (t - algebraMap W A r) y)
+      _
+      (fun a b ha hb => ha.mul_right hb)
+      isCoprime_one_right ?_
     intro y hy
     obtain ⟨r', hr', rfl⟩ := Multiset.mem_map.1 hy
     have hru' : ¬ IsUnit r' := (Multiset.mem_filter.1 hr').2
@@ -73,11 +82,10 @@ theorem exists_sep {F : Type} [Field F] [IsAlgClosed F] (W : ValuationSubring F)
       by_contra hnu
       have h1 : r - r' ∈ IsLocalRing.maximalIdeal W := hnu
       have h2 : r' ∈ IsLocalRing.maximalIdeal W := hru'
-      have h3 : r ∈ IsLocalRing.maximalIdeal W := by
-        simpa using add_mem h1 h2
+      have h3 : r ∈ IsLocalRing.maximalIdeal W := by simpa using add_mem h1 h2
       exact h3 hru
     obtain ⟨u, hu⟩ := hd.exists_left_inv
-    refine ⟨-algebraMap W A u, algebraMap W A u, ?_⟩
+    refine ⟨- algebraMap W A u, algebraMap W A u, ?_⟩
     have := congrArg (algebraMap W A) hu
     rw [map_mul, map_sub, map_one] at this
     linear_combination this
@@ -89,10 +97,10 @@ theorem exists_sep {F : Type} [Field F] [IsAlgClosed F] (W : ValuationSubring F)
     rw [Multiset.map_map] at hx
     obtain ⟨r, hr, rfl⟩ := Multiset.mem_map.1 hx
     have hru : IsUnit r := (Multiset.mem_filter.1 hr).2
-    have : aug (t - algebraMap W A r) = -r := by
-      rw [map_sub, ht, AlgHom.commutes]; simp
+    have : aug (t - algebraMap W A r) = -r := by rw [map_sub, ht, AlgHom.commutes]; simp
     show IsUnit (aug (t - algebraMap W A r))
-    rw [this]; exact hru.neg
+    rw [this]
+    exact hru.neg
   · linear_combination (-s) * hab + a * hsg
   · intro P hP hpP hsP
     have hgP : g ∈ P := by
@@ -109,7 +117,20 @@ theorem exists_sep {F : Type} [Field F] [IsAlgClosed F] (W : ValuationSubring F)
     have h2 := hP.mem_of_pow_mem n this
     simpa using add_mem hyP h2
 
-theorem main : ∀ (F : Type) [inst : Field F] [IsAlgClosed F] (W : ValuationSubring F) (p : ↥W), (∀ (a : ↥W), ¬IsUnit a → ∃ (n : ℕ), a ^ n ∈ Ideal.span {p}) → ∀ (A : Type) [inst_2 : CommRing A] [inst_3 : Algebra (↥W) A] [Module.Finite (↥W) A] (aug : A →ₐ[↥W] ↥W), ∃ (s : A), Function.Surjective (⇑(Algebra.algebraMap A (Localization.Away s)) : A → Localization.Away s) ∧ (∃ (m : ℕ), Ideal.map (Algebra.algebraMap A (Localization.Away s)) (RingHom.ker aug) ^ m ≤ Ideal.span {(Algebra.algebraMap (↥W) (Localization.Away s) : ↥W → Localization.Away s) p}) ∧ ∀ (R : Type) [inst_5 : CommRing R] [inst_6 : Algebra (↥W) R] (w : A →ₐ[↥W] R), (∀ t ∈ RingHom.ker aug, IsNilpotent ((w : A → R) t)) → IsUnit ((w : A → R) s) := by
+theorem main
+    : ∀ (F : Type) [inst : Field F] [IsAlgClosed F] (W : ValuationSubring F) (p : ↥W),
+      (∀ (a : ↥W), ¬ IsUnit a → ∃ (n : ℕ), a ^ n ∈ Ideal.span {p})
+        → ∀ (A : Type) [inst_2 : CommRing A] [inst_3 : Algebra (↥W) A] [Module.Finite (↥W) A]
+            (aug : A →ₐ[↥W] ↥W),
+          ∃ (s : A),
+            Function.Surjective
+                (⇑(Algebra.algebraMap A (Localization.Away s)) : A → Localization.Away s)
+              ∧ (∃ (m : ℕ),
+                Ideal.map (Algebra.algebraMap A (Localization.Away s)) (RingHom.ker aug) ^ m
+                  ≤ Ideal.span
+                    {(Algebra.algebraMap (↥W) (Localization.Away s) : ↥W → Localization.Away s) p})
+              ∧ ∀ (R : Type) [inst_5 : CommRing R] [inst_6 : Algebra (↥W) R] (w : A →ₐ[↥W] R),
+                (∀ t ∈ RingHom.ker aug, IsNilpotent ((w : A → R) t)) → IsUnit ((w : A → R) s) := by
   intro F _ _ W p hp A _ _ _ aug
   classical
   obtain ⟨S, hS⟩ : (⊤ : Submodule W A).FG := Module.Finite.fg_top
@@ -117,28 +138,34 @@ theorem main : ∀ (F : Type) [inst : Field F] [IsAlgClosed F] (W : ValuationSub
   have hτ : ∀ a, aug (τ a) = 0 := by
     intro a
     simp only [τ]
-    rw [map_sub, AlgHom.commutes]; simp
+    rw [map_sub, AlgHom.commutes]
+    simp
   choose σ β h1 h2 h3 using fun a => exists_sep W p hp A aug (τ a) (hτ a)
   have hker : RingHom.ker aug = Ideal.span ((S.image τ : Finset A) : Set A) := by
     apply le_antisymm
     · intro x hx
-      have key : ∀ y ∈ Submodule.span W (S : Set A),
-          τ y ∈ Ideal.span ((S.image τ : Finset A) : Set A) := by
+      have key
+          : ∀ y ∈ Submodule.span W (S : Set A),
+            τ y ∈ Ideal.span ((S.image τ : Finset A) : Set A) := by
         intro y hy
         induction hy using Submodule.span_induction with
         | mem y hy =>
           apply Ideal.subset_span
           simp only [Finset.coe_image]
           exact ⟨y, hy, rfl⟩
-        | zero => simp [τ]
+        | zero =>
+          simp [τ]
         | add y z _ _ hy hz =>
           have : τ (y + z) = τ y + τ z := by simp only [τ, map_add (f := _)]; ring
-          rw [this]; exact add_mem hy hz
+          rw [this]
+          exact add_mem hy hz
         | smul c y _ hy =>
           have : τ (c • y) = algebraMap W A c * τ y := by
             simp only [τ]
-            rw [map_smul, smul_eq_mul, map_mul, Algebra.smul_def]; ring
-          rw [this]; exact Ideal.mul_mem_left _ _ hy
+            rw [map_smul, smul_eq_mul, map_mul, Algebra.smul_def]
+            ring
+          rw [this]
+          exact Ideal.mul_mem_left _ _ hy
       have := key x (by rw [hS]; trivial)
       have hx0 : aug x = 0 := hx
       simpa [τ, hx0] using this
@@ -155,9 +182,11 @@ theorem main : ∀ (F : Type) [inst : Field F] [IsAlgClosed F] (W : ValuationSub
     rw [hs, ← Finset.prod_pow, ← Finset.prod_mul_distrib]
     exact Finset.prod_congr rfl (fun a _ => h2 a)
   set b : A := ∏ a ∈ S, β a with hb
-  have hLu : IsUnit (algebraMap A (Localization.Away s) s) := IsLocalization.Away.algebraMap_isUnit s
+  have hLu : IsUnit (algebraMap A (Localization.Away s) s) :=
+    IsLocalization.Away.algebraMap_isUnit s
   refine ⟨s, ?_, ?_, ?_⟩
-  · have hinv : algebraMap A (Localization.Away s) s * algebraMap A (Localization.Away s) b = 1 := by
+  · have hinv
+        : algebraMap A (Localization.Away s) s * algebraMap A (Localization.Away s) b = 1 := by
       apply hLu.mul_left_cancel
       have := congrArg (algebraMap A (Localization.Away s)) hsb
       rw [map_mul, map_pow] at this
@@ -189,7 +218,8 @@ theorem main : ∀ (F : Type) [inst : Field F] [IsAlgClosed F] (W : ValuationSub
     have hu : IsUnit (algebraMap W R (aug s)) := hsu.map _
     have : w s = algebraMap W R (aug s) + w (τ s) := by
       simp only [τ]
-      rw [map_sub, AlgHom.commutes]; ring
+      rw [map_sub, AlgHom.commutes]
+      ring
     rw [this]
     exact hn.isUnit_add_left_of_commute hu (Commute.all _ _)
 

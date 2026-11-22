@@ -13,15 +13,20 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Cry
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
+open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
+  GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.Ord.point :
-    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ), 3 ≤ N → N.Coprime p → D.m = 1 →
-      ∀ (k : Type) [Field k] [IsAlgClosed k] (hk : (p : k) = 0) (β : R →+* k) (o : Obj b N (spMap β)) (i : Fin D.a) (w : Ideal (𝓞 D.F)) (f : ℕ),
-      RingHom.ker (β.comp (b.t i)) = w → Ideal.absNorm w = p ^ f → 0 < f → ∀ π : Par p w f,
-      IsWOrd o w (𝟙 (Sp k)) ∨ NOo hk o π := by
+theorem UpperTheory.Gal.Ord.point
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ),
+      3 ≤ N → N.Coprime p → D.m = 1
+        → ∀ (k : Type) [Field k] [IsAlgClosed k] (hk : (p : k) = 0) (β : R →+* k)
+            (o : Obj b N (spMap β)) (i : Fin D.a) (w : Ideal (𝓞 D.F)) (f : ℕ),
+          RingHom.ker (β.comp (b.t i)) = w → Ideal.absNorm w = p ^ f → 0 < f
+            → ∀ π : Par p w f, IsWOrd o w (𝟙 (Sp k)) ∨ NOo hk o π := by
   intro p _ D R _ b N hN hNp hm k _ _ hk β o i w f hw hnorm hf π
   rcases cnt p D R b N hN hNp hm k hk β o i w f hw hnorm hf π with h | ⟨v, hv1, hv2, hv3⟩
   · exact Or.inl h
@@ -60,9 +65,10 @@ theorem UpperTheory.Gal.Ord.point :
   have mp : SMor o.A (RingHom.id k) (Over.Hom.left (o.act.act ((p : D.O)))) := by
     have := homMor (dp0 k) (𝟙 (Sp k)) (o.act.act ((p : D.O)))
     simpa [SMor, spMap_id] using this
-  obtain ⟨τ, V, hτ, n, hτp, hV⟩ := root p k hk o.A o.ab (RingHom.id k) Function.bijective_id _ mp (by
-    intro x _
-    exact hp0 x)
+  obtain ⟨τ, V, hτ, n, hτp, hV⟩ :=
+    root p k hk o.A o.ab (RingHom.id k) Function.bijective_id _ mp (by
+      intro x _
+      exact hp0 x)
   have hV' := hV
   rw [hpow] at hV'
   have hrel := rel p D R b N hN hNp hm k hk β o i w f hw hnorm hf π σ τ ψ V m n hψ hV'
@@ -70,7 +76,12 @@ theorem UpperTheory.Gal.Ord.point :
   have hcard : Nat.card (𝓞 D.F ⧸ w) = p ^ f := by
     rw [← Submodule.cardQuot_apply, ← Ideal.absNorm_apply]; exact hnorm
   intro x hx
-  obtain ⟨z, hz⟩ := alg1 p k (𝓞 D.F) w f hf hcard π (β.comp (b.t i)) ↥(primDR o.A) (coh o) (PrimitiveSubmodule o.A)
-    (frobDR p k hk o.A).toAddMonoidHom hL (GrpMor.pull n).toAddMonoidHom (GrpMor.pull m).toAddMonoidHom
-    (fun y hy => hrk y hy) (fun y => hrel y) (fun x hx => hH x hx) x hx
+  obtain ⟨z, hz⟩ :=
+    alg1 p k (𝓞 D.F) w f hf hcard π (β.comp (b.t i)) ↥(primDR o.A) (coh o) (PrimitiveSubmodule o.A)
+      (frobDR p k hk o.A).toAddMonoidHom hL (GrpMor.pull n).toAddMonoidHom
+      (GrpMor.pull m).toAddMonoidHom
+      (fun y hy => hrk y hy)
+      (fun y => hrel y)
+      (fun x hx => hH x hx)
+      x hx
   exact Submodule.subset_span ⟨z, hz.symm⟩

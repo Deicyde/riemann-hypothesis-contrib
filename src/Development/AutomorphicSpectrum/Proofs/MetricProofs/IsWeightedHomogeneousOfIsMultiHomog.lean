@@ -41,8 +41,8 @@ open ReciprocityTheory.ChartRestriction.G.Geo (MRingOver segre scaleBlock)
 open ReciprocityTheory.AnForm.R (conePts)
 
 open GoodChartModel Matrix
-open ReciprocityTheory.ChartRestriction.G.Geo (blkW weight_blkW segMono eval_segMono psiPoly eval_psiPoly
-  comp_mul_homog diag_of_homog)
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (blkW weight_blkW segMono eval_segMono psiPoly eval_psiPoly comp_mul_homog diag_of_homog)
 
 section Rel
 
@@ -50,32 +50,43 @@ attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem isWeightedHomogeneous_of_isMultiHomog [DecidableEq K] {s : MRingOver ℂ ι} {a : K → ℕ}
-    (hs : ReciprocityTheory.ChartRestriction.G.Geo.IsMultiHomog s a) : IsWeightedHomogeneous (blkW ι) s a := by
+theorem isWeightedHomogeneous_of_isMultiHomog
+    [DecidableEq K]
+    {s : MRingOver ℂ ι} {a : K → ℕ} (hs : ReciprocityTheory.ChartRestriction.G.Geo.IsMultiHomog s a)
+    : IsWeightedHomogeneous (blkW ι) s a := by
   intro d hd
   funext k
   rw [weight_blkW]
   exact hs d (mem_support_iff.2 hd) k
 
-theorem cone_homog [DecidableEq K] {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q) :
-    Q.IsHomogeneous (weightedHomogeneousSubmodule ℂ (blkW ι)) := by
+theorem cone_homog
+    [DecidableEq K]
+    {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
+    : Q.IsHomogeneous (weightedHomogeneousSubmodule ℂ (blkW ι)) := by
   obtain ⟨S, hS, rfl⟩ := hQ
   refine Ideal.homogeneous_span _ _ ?_
   intro f hf
   obtain ⟨a, ha⟩ := hS f hf
-  exact ⟨a, (mem_weightedHomogeneousSubmodule _ _ _ _).mpr (isWeightedHomogeneous_of_isMultiHomog ha)⟩
+  exact
+    ⟨a, (mem_weightedHomogeneousSubmodule _ _ _ _).mpr (isWeightedHomogeneous_of_isMultiHomog ha)⟩
 
-theorem cone_segre_rel {e : ℕ} {Q : Ideal (MRingOver ℂ ι)} (hP : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
+theorem cone_segre_rel
+    {e : ℕ} {Q : Ideal (MRingOver ℂ ι)} (hP : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
     (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : CxInt.IsSetGoodProj (conePts Q) Ψ)
-    (i : (k : K) → ι k) :
-    ∃ r : ℕ, 0 < r ∧ ∃ G : Fin (e + 1) → MvPolynomial ((k : K) → ι k) ℂ,
-      (∀ j, (G j).totalDegree ≤ r - 1) ∧
-      ∀ z ∈ conePts Q, segre z i ^ r = ∑ j, Ψ (segre z) j * eval (segre z) (G j) := by
+    (i : (k : K) → ι k)
+    : ∃ r : ℕ,
+      0 < r
+        ∧ ∃ G : Fin (e + 1) → MvPolynomial ((k : K) → ι k) ℂ,
+          (∀ j, (G j).totalDegree ≤ r - 1)
+            ∧ ∀ z ∈ conePts Q, segre z i ^ r = ∑ j, Ψ (segre z) j * eval (segre z) (G j) := by
   classical
-  have hsegMono (a : (k : K) → ι k) : IsWeightedHomogeneous (blkW ι) (segMono ι a) (fun _ => 1) := by
-    have hprod := IsWeightedHomogeneous.prod (w := blkW ι) Finset.univ
-      (fun k => (X ⟨k, a k⟩ : MvPolynomial (Σ k, ι k) ℂ))
-      (fun k => blkW ι ⟨k, a k⟩) (fun k _ => isWeightedHomogeneous_X ℂ _ _)
+  have hsegMono (a : (k : K) → ι k)
+      : IsWeightedHomogeneous (blkW ι) (segMono ι a) (fun _ => 1) := by
+    have hprod :=
+      IsWeightedHomogeneous.prod (w := blkW ι) Finset.univ
+        (fun k => (X ⟨k, a k⟩ : MvPolynomial (Σ k, ι k) ℂ))
+        (fun k => blkW ι ⟨k, a k⟩)
+        (fun k _ => isWeightedHomogeneous_X ℂ _ _)
     unfold segMono
     convert hprod using 1
     funext k
@@ -87,20 +98,23 @@ theorem cone_segre_rel {e : ℕ} {Q : Ideal (MRingOver ℂ ι)} (hP : Reciprocit
   have hrad : segMono ι i ∈ I.radical := by
     rw [← vanishingIdeal_zeroLocus_eq_radical (K := ℂ), mem_vanishingIdeal_iff]
     intro x hx
-    have hae : ∀ p : MvPolynomial (Σ k, ι k) ℂ, aeval x p = eval x p :=
-      fun _ => rfl
+    have hae : ∀ p : MvPolynomial (Σ k, ι k) ℂ, aeval x p = eval x p := fun _ => rfl
     rw [hae]
     by_contra h
-    rw [eval_segMono, ReciprocityTheory.ChartRestriction.G.Geo.segre, ← ne_eq, Finset.prod_ne_zero_iff] at h
-    have hxm : x ∈ conePts Q := ⟨fun k => ⟨i k, h k (Finset.mem_univ _)⟩, fun f hf => by
-      have := hx _ (Ideal.mem_sup_left hf : f ∈ I)
-      rwa [hae] at this⟩
+    rw [eval_segMono, ReciprocityTheory.ChartRestriction.G.Geo.segre, ← ne_eq,
+        Finset.prod_ne_zero_iff]
+      at h
+    have hxm : x ∈ conePts Q := ⟨
+      fun k => ⟨i k, h k (Finset.mem_univ _)⟩,
+      fun f hf => by
+        have := hx _ (Ideal.mem_sup_left hf : f ∈ I)
+        rwa [hae] at this
+    ⟩
     refine hΨ x hxm (funext fun j => ?_)
     have := hx _ (Ideal.mem_sup_right (Ideal.subset_span ⟨j, rfl⟩) : psiPoly Ψ j ∈ I)
     rwa [hae, eval_psiPoly] at this
   obtain ⟨r0, hr0⟩ := hrad
-  have hmem : segMono ι i ^ (r0 + 1) ∈ I := by
-    rw [pow_succ]; exact Ideal.mul_mem_right _ _ hr0
+  have hmem : segMono ι i ^ (r0 + 1) ∈ I := by rw [pow_succ]; exact Ideal.mul_mem_right _ _ hr0
   obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.mp hmem
   obtain ⟨c, rfl⟩ := Ideal.mem_span_range_iff_exists_fun.mp hb
   let D : K → ℕ := fun _ => r0
@@ -108,30 +122,37 @@ theorem cone_segre_rel {e : ℕ} {Q : Ideal (MRingOver ℂ ι)} (hP : Reciprocit
   have hpow : IsWeightedHomogeneous (blkW ι) (segMono ι i ^ (r0 + 1)) (D + fun _ => 1) := by
     have := (hsegMono i).pow (r0 + 1)
     convert this using 1
-    funext k; simp [D]
+    funext k
+    simp [D]
   have hcomp := congrArg comp hab
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_add (f := _), map_sum, weightedHomogeneousComponent_eq_self hpow] at hcomp
   simp only [comp, comp_mul_homog (hpsiPoly _)] at hcomp
-  have hcd : ∀ j, ∃ G : MvPolynomial ((k : K) → ι k) ℂ, G.totalDegree ≤ r0 ∧
-      ∀ z : (Σ k, ι k) → ℂ, eval z (weightedHomogeneousComponent (blkW ι) D (c j)) =
-        eval (segre z) G :=
-    fun j => diag_of_homog r0 (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
+  have hcd
+      : ∀ j, ∃ G : MvPolynomial ((k : K) → ι k) ℂ,
+        G.totalDegree ≤ r0
+          ∧ ∀ z : (Σ k, ι k) → ℂ,
+            eval z (weightedHomogeneousComponent (blkW ι) D (c j)) = eval (segre z) G := fun j =>
+    diag_of_homog r0 (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
   choose G hG hGz using hcd
   refine ⟨r0 + 1, Nat.succ_pos _, G, fun j => by simpa using hG j, fun z hz => ?_⟩
   have h0 := congrArg (eval z) hcomp
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_add (f := _), hz.2 _ (weightedHomogeneousComponent_mem_of_mem _ _ (cone_homog hP) ha _),
-    zero_add, map_sum, map_pow, eval_segMono] at h0
+        zero_add, map_sum, map_pow, eval_segMono]
+      at h0
   rw [← h0]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, hGz, eval_psiPoly, mul_comm]
 
-theorem cone_pow_mem {Q : Ideal (MRingOver ℂ ι)} {e m : ℕ} {σ : Fin m ≃ ((k : K) → ι k)}
+theorem cone_pow_mem
+    {Q : Ideal (MRingOver ℂ ι)} {e m : ℕ} {σ : Fin m ≃ ((k : K) → ι k)}
     {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
     (hP : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q) (hΨ : CxInt.IsSetGoodProj (conePts Q) Ψ)
-    {J : Ideal (MvPolynomial (Fin m) ℂ)} (hJ : setChartIdeal (conePts Q) σ Ψ ≤ J) (a : Fin m) :
-    ∃ r : ℕ, (X a ^ r : MvPolynomial (Fin m) ℂ) ∈ leadIdeal J ⊔ linIdeal (chartProjMatrix σ Ψ) := by
+    {J : Ideal (MvPolynomial (Fin m) ℂ)} (hJ : setChartIdeal (conePts Q) σ Ψ ≤ J)
+    (a : Fin m)
+    : ∃ r : ℕ,
+      (X a ^ r : MvPolynomial (Fin m) ℂ) ∈ leadIdeal J ⊔ linIdeal (chartProjMatrix σ Ψ) := by
   classical
   obtain ⟨r, hr, G, hG, hrel⟩ := cone_segre_rel hP Ψ hΨ (σ a)
   set A := chartProjMatrix σ Ψ with hA
@@ -149,8 +170,8 @@ theorem cone_pow_mem {Q : Ideal (MRingOver ℂ ι)} {e m : ℕ} {σ : Fin m ≃ 
     rw [Fin.sum_univ_succ, hz1, one_mul] at h
     change eval (fun a => segre z (σ a)) f = 0
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [f, Gx, map_sub, map_add (f := _), map_pow, map_sum, map_mul, eval_X, eval_rename, hw,
-      eval_linPoly, hA, chartProjMatrix_mulVec]
+      simp only [f, Gx, map_sub, map_add (f := _), map_pow, map_sum, map_mul, eval_X, eval_rename,
+        hw, eval_linPoly, hA, chartProjMatrix_mulVec]
     rw [h]
     simp [Equiv.apply_symm_apply, mul_comm]
   have hdeg : f.totalDegree ≤ r := by
@@ -167,24 +188,30 @@ theorem cone_pow_mem {Q : Ideal (MRingOver ℂ ι)} {e m : ℕ} {σ : Fin m ≃ 
       if_pos rfl]
   have h0 : homogeneousComponent r (Gx 0) = 0 :=
     homogeneousComponent_eq_zero (n := r) (φ := Gx 0) (by have := hGx 0; omega)
-  have hcomp : homogeneousComponent r f =
-      X a ^ r - ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j := by
+  have hcomp
+      : homogeneousComponent r f
+        = X a ^ r - ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [f, map_sub, map_add (f := _), map_sum, hX, h0, zero_add,
+    simp only [f, map_sub, map_add (f := _), map_sum, hX, h0, zero_add,
       homogeneousComponent_mul_of_isHomogeneous_right _ _ (isHomogeneous_linPoly A _), h1, if_true]
-  have hmem : homogeneousComponent r f + ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j ∈
-      leadIdeal J ⊔ linIdeal A :=
+  have hmem
+      : homogeneousComponent r f
+          + ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j
+        ∈ leadIdeal J ⊔ linIdeal A :=
     add_mem (Ideal.mem_sup_left (homogeneousComponent_mem_leadIdeal hfJ hdeg))
-      (Ideal.mem_sup_right (Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨j, rfl⟩)))
+      (Ideal.mem_sup_right (Ideal.sum_mem _ fun j _ =>
+        Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨j, rfl⟩)))
   rw [hcomp, sub_add_cancel] at hmem
   exact ⟨r, hmem⟩
 
-theorem cxChartModel {Q : Ideal (MRingOver ℂ ι)} {e : ℕ} (hQ : CxInt.IsCxVar Q e) {m : ℕ}
-    (σ : Fin m ≃ ((k : K) → ι k)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
-    (hΨ : CxInt.IsSetGoodProj (conePts Q) Ψ) :
-    zeroSet (setChartIdeal (conePts Q) σ Ψ) = setChartSet (conePts Q) σ Ψ ∧
-      ∀ J ∈ (setChartIdeal (conePts Q) σ Ψ).minimalPrimes,
-        ringKrullDim (MvPolynomial (Fin m) ℂ ⧸ J) = (e : ℕ) ∧ IsFiniteProjection J (chartProjMatrix σ Ψ) := by
+theorem cxChartModel
+    {Q : Ideal (MRingOver ℂ ι)} {e : ℕ} (hQ : CxInt.IsCxVar Q e)
+    {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : CxInt.IsSetGoodProj (conePts Q) Ψ)
+    : zeroSet (setChartIdeal (conePts Q) σ Ψ) = setChartSet (conePts Q) σ Ψ
+      ∧ ∀ J ∈ (setChartIdeal (conePts Q) σ Ψ).minimalPrimes,
+        ringKrullDim (MvPolynomial (Fin m) ℂ ⧸ J) = (e : ℕ)
+          ∧ IsFiniteProjection J (chartProjMatrix σ Ψ) := by
   obtain ⟨hK, ⟨hQp, hQh, -⟩, hdimQ⟩ := hQ
   have hR : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q := hQh
   refine ⟨chart_zeroSet hR σ Ψ, fun J hJ => ?_⟩
@@ -194,7 +221,8 @@ theorem cxChartModel {Q : Ideal (MRingOver ℂ ι)} {e : ℕ} (hQ : CxInt.IsCxVa
       refine Ideal.span_le.2 (Set.range_subset_iff.2 fun a => ?_)
       obtain ⟨r, hr⟩ := cone_pow_mem hR hΨ hJ.1.2 a
       exact ⟨r, hr⟩
-    obtain ⟨N, hN⟩ := Ideal.exists_pow_le_of_le_radical_of_fg_radical hrad (IsNoetherian.noetherian _)
+    obtain ⟨N, hN⟩ :=
+      Ideal.exists_pow_le_of_le_radical_of_fg_radical hrad (IsNoetherian.noetherian _)
     exact ConeAvoidsFinite.proof m e N J _ hN
   exact ⟨hdim, ⟨FiniteProjHomInjective.proof m e J _ hJ.1.1 hdim hfin, hfin⟩⟩
 

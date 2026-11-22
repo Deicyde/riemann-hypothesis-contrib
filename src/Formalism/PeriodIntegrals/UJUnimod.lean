@@ -11,7 +11,6 @@ open MeasureTheory
 
 namespace PI.UJUnimod
 
-def UJRightInv : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool), (Formalism.REAL.muG ε).IsMulRightInvariant
+def UJRightInv : Prop := ∀ (n : ℕ) (ε : Fin n → Bool), (Formalism.REAL.muG ε).IsMulRightInvariant
 
 end PI.UJUnimod

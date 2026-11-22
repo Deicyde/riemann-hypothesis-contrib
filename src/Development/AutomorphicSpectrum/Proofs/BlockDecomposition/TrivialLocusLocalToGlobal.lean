@@ -11,24 +11,32 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual PositivityTheory.ObstructionTrivialLocus GlobalTheory.CompanionTheory.TrivLoc
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual PositivityTheory.ObstructionTrivialLocus GlobalTheory.CompanionTheory.TrivLoc
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CompanionTheory.TrivLoc
 
-theorem locus_of_locally : ∀ (S : Scheme.{0}) (A Y : Over S) [GrpObj A], IsAbelianScheme A → ∀ N : LB (A ⊗ Y).left, N.IsLB →
-    Triv (ev N (1 : Y ⟶ A) (𝟙 Y)) → ∀ (T : Scheme.{0}) (t : T ⟶ Y.left),
-    (∀ x : T, ∃ W : T.Opens, x ∈ W ∧ Locus N (W.ι ≫ t)) → Locus N t := by
+theorem locus_of_locally
+    : ∀ (S : Scheme.{0}) (A Y : Over S) [GrpObj A],
+      IsAbelianScheme A
+        → ∀ N : LB (A ⊗ Y).left,
+          N.IsLB → Triv (ev N (1 : Y ⟶ A) (𝟙 Y))
+            → ∀ (T : Scheme.{0}) (t : T ⟶ Y.left),
+              (∀ x : T, ∃ W : T.Opens, x ∈ W ∧ Locus N (W.ι ≫ t)) → Locus N t := by
   intro S A Y _ hA N hN h0 T t hloc
   let T₀ : Over S := Over.mk (t ≫ Y.hom)
   let y : T₀ ⟶ Y := Over.homMk t rfl
   let M : LB (A ⊗ T₀).left := ev N (fst A T₀) (snd A T₀ ≫ y)
   have hM : M.IsLB := pull_isLB hN _
-  have key : ∀ (Z : Over S) (u : Z ⟶ A ⊗ T₀), evc hN (u ≫ fst A T₀) (u ≫ snd A T₀ ≫ y) = 0 →
-      Triv (M.pull u.left) := by
+  have key
+      : ∀ (Z : Over S) (u : Z ⟶ A ⊗ T₀),
+        evc hN (u ≫ fst A T₀) (u ≫ snd A T₀ ≫ y) = 0 → Triv (M.pull u.left) := by
     intro Z u h
     refine (cls_eq_zero_iff (pull_isLB hM _)).1 ?_
     rw [cls_pull hM]
@@ -36,12 +44,12 @@ theorem locus_of_locally : ∀ (S : Scheme.{0}) (A Y : Over S) [GrpObj A], IsAbe
     rw [h] at e
     exact e
   show Triv M
-  refine GlobalTheory.CompanionTheory.Ar.Approx.triv_of_section_of_locally_triv (A ⊗ T₀).left T (snd A T₀).left
-    (lift (1 : T₀ ⟶ A) (𝟙 T₀)).left ?_ ?_ M hM ?_ ?_
+  refine GlobalTheory.CompanionTheory.Ar.Approx.triv_of_section_of_locally_triv (A ⊗ T₀).left T
+    (snd A T₀).left (lift (1 : T₀ ⟶ A) (𝟙 T₀)).left ?_ ?_ M hM ?_ ?_
   · rw [← Over.comp_left, lift_snd]; rfl
   · intro U
-    exact GlobalTheory.CompanionTheory.Ar.Approx.isIso_app_of_isAbelianScheme T ((Over.pullback T₀.hom).obj A)
-      (CubeGen.isAb_baseChange hA T₀.hom) U
+    exact GlobalTheory.CompanionTheory.Ar.Approx.isIso_app_of_isAbelianScheme T
+      ((Over.pullback T₀.hom).obj A) (CubeGen.isAb_baseChange hA T₀.hom) U
   · refine key T₀ _ ?_
     rw [lift_fst, lift_snd_assoc, Category.id_comp]
     have e := congrArg (CechPic.pull y.left) ((triv_ev_iff hN _ _).1 h0)

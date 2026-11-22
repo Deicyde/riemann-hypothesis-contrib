@@ -10,29 +10,36 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 namespace GlobalTheory.ZM.FullLevel
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-theorem _root_.GlobalTheory.ZM.FullLevel.lft_of_qproj {R : Type} [CommRing R] {X : Scheme.{0}}
-    {f : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R} (h : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsQProjOver f) :
-    LocallyOfFiniteType f := by
+theorem _root_.GlobalTheory.ZM.FullLevel.lft_of_qproj
+    {R : Type} [CommRing R]
+    {X : Scheme.{0}} {f : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R}
+    (h : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsQProjOver f)
+    : LocallyOfFiniteType f := by
   obtain ⟨N, i, hi, hq, rfl⟩ := h
   have := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.isProper_str R N
   infer_instance
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-private theorem krullDim_zeroLocus_le_of_isEmbedding {S T : Type} [CommRing S] [CommRing T]
-    (f : PrimeSpectrum S → PrimeSpectrum T) (hf : Topology.IsEmbedding f) (p : PrimeSpectrum S) :
-    Order.krullDim (PrimeSpectrum.zeroLocus (p.asIdeal : Set S)) ≤
-      Order.krullDim (PrimeSpectrum.zeroLocus ((f p).asIdeal : Set T)) := by
+private theorem krullDim_zeroLocus_le_of_isEmbedding
+    {S T : Type} [CommRing S] [CommRing T]
+    (f : PrimeSpectrum S → PrimeSpectrum T) (hf : Topology.IsEmbedding f)
+    (p : PrimeSpectrum S)
+    : Order.krullDim (PrimeSpectrum.zeroLocus (p.asIdeal : Set S))
+      ≤ Order.krullDim (PrimeSpectrum.zeroLocus ((f p).asIdeal : Set T)) := by
   have hle : ∀ a b, f a ≤ f b ↔ a ≤ b := fun a b => by
     rw [PrimeSpectrum.le_iff_specializes, PrimeSpectrum.le_iff_specializes,
       hf.isInducing.specializes_iff]
@@ -47,36 +54,47 @@ private theorem krullDim_zeroLocus_le_of_isEmbedding {S T : Type} [CommRing S] [
     · exact (hle a.1 b.1).2 hab
     · exact Subtype.ext (hf.injective (congrArg Subtype.val hab))
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-theorem _root_.GlobalTheory.ZM.FullLevel.dim_generic_chart {o K : Type} [CommRing o] [IsDomain o] [Field K]
-    [Algebra o K] [IsFractionRing o K]
-    {U : Scheme.{0}} (s : U ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp o) (d : WithBot ℕ∞)
-    (h : ∀ (R : Type) [CommRing R] [Algebra o R] (x : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R ⟶ U), IsOpenImmersion x →
-      x ≫ s = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o R) →
-      ∀ q ∈ minimalPrimes (FractionRing o ⊗[o] R), d ≤ ringKrullDim ((FractionRing o ⊗[o] R) ⧸ q))
-    (R : Type) [CommRing R] (x : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R ⟶ pullback s (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o K)))
+theorem _root_.GlobalTheory.ZM.FullLevel.dim_generic_chart
+    {o K : Type} [CommRing o] [IsDomain o] [Field K] [Algebra o K] [IsFractionRing o K]
+    {U : Scheme.{0}} (s : U ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp o)
+    (d : WithBot ℕ∞)
+    (h : ∀ (R : Type) [CommRing R] [Algebra o R]
+        (x : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R ⟶ U),
+      IsOpenImmersion x
+        → x ≫ s = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o R)
+        → ∀ q ∈ minimalPrimes (FractionRing o ⊗[o] R),
+          d ≤ ringKrullDim ((FractionRing o ⊗[o] R) ⧸ q))
+    (R : Type) [CommRing R]
+    (x : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R
+      ⟶ pullback s (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o K)))
     [IsOpenImmersion x]
-    (q : Ideal R) (hq : q ∈ minimalPrimes R) : d ≤ ringKrullDim (R ⧸ q) := by
+    (q : Ideal R) (hq : q ∈ minimalPrimes R)
+    : d ≤ ringKrullDim (R ⧸ q) := by
   classical
-  have hpre : IsPreimmersion (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o K)) :=
+  have hpre : IsPreimmersion (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap
+      o K)) :=
     IsPreimmersion.of_isLocalization (nonZeroDivisors o)
-  let pr := pullback.fst s (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o K))
+  let pr :=
+    pullback.fst s (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o K))
   have hpr : Topology.IsEmbedding pr := IsPreimmersion.isEmbedding pr
   let y₀ : PrimeSpectrum R := ⟨q, hq.1.1⟩
   obtain ⟨O, hO, hOx⟩ := hpr.isInducing.isOpen_iff.1 x.isOpenEmbedding.isOpen_range
   have hyO : pr (x y₀) ∈ O := by
     have : x y₀ ∈ pr ⁻¹' O := hOx ▸ ⟨y₀, rfl⟩
     exact this
-  obtain ⟨V, hV, hyV, hVO⟩ := TopologicalSpace.Opens.isBasis_iff_nbhd.1 U.isBasis_affineOpens
-    (show pr (x y₀) ∈ (⟨O, hO⟩ : TopologicalSpace.Opens U) from hyO)
+  obtain ⟨V, hV, hyV, hVO⟩ :=
+    TopologicalSpace.Opens.isBasis_iff_nbhd.1 U.isBasis_affineOpens
+      (show pr (x y₀) ∈ (⟨O, hO⟩ : TopologicalSpace.Opens U) from hyO)
   have hVa : IsAffineOpen V := hV
   let A : Type := Γ(U, V)
   let j : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp A ⟶ U := hVa.fromSpec
   haveI : IsOpenImmersion j := hVa.isOpenImmersion_fromSpec
   letI : Algebra o A := (Spec.preimage (j ≫ s)).hom.toAlgebra
-  have hjs : j ≫ s = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o A) := by
+  have hjs
+      : j ≫ s = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o A) := by
     rw [RingHom.algebraMap_toAlgebra]
     simp [_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap]
   have hbound := h A j inferInstance hjs
@@ -84,9 +102,13 @@ theorem _root_.GlobalTheory.ZM.FullLevel.dim_generic_chart {o K : Type} [CommRin
     (Algebra.TensorProduct.comm o A K).trans
       (Algebra.TensorProduct.congr (IsLocalization.algEquiv (nonZeroDivisors o) K (FractionRing o))
         AlgEquiv.refl)
-  let I : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (FractionRing o ⊗[o] A) ≅ pullback j pr :=
-    asIso (Spec.map e.toRingEquiv.toCommRingCatIso.hom) ≪≫ (pullbackSpecIso o A K).symm ≪≫
-      (pullback.congrHom hjs rfl).symm ≪≫ (pullbackRightPullbackFstIso s (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o K)) j).symm
+  let I
+      : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (FractionRing o ⊗[o] A)
+        ≅ pullback j pr :=
+    asIso (Spec.map e.toRingEquiv.toCommRingCatIso.hom) ≪≫ (pullbackSpecIso o A K).symm
+      ≪≫ (pullback.congrHom hjs rfl).symm
+      ≪≫ (pullbackRightPullbackFstIso s
+        (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap o K)) j).symm
   let F := I.hom ≫ pullback.snd j pr
   have hF : ∀ w, F w = pullback.snd j pr (I.hom w) := fun w => rfl
   have hrange : Set.range F ⊆ Set.range x := by
@@ -117,9 +139,10 @@ theorem _root_.GlobalTheory.ZM.FullLevel.dim_generic_chart {o K : Type} [CommRin
     exact IsOpenImmersion.of_comp g x
   let gf : PrimeSpectrum (FractionRing o ⊗[o] A) → PrimeSpectrum R := fun a => g a
   have hgemb : Topology.IsEmbedding gf := g.isOpenEmbedding.isEmbedding
-  have hgz : gf z = y₀ := x.isOpenEmbedding.injective (by
-    show x (g z) = x y₀
-    rw [← Scheme.Hom.comp_apply, hg, hz])
+  have hgz : gf z = y₀ :=
+    x.isOpenEmbedding.injective (by
+      show x (g z) = x y₀
+      rw [← Scheme.Hom.comp_apply, hg, hz])
   have hle : ∀ a b, gf a ≤ gf b ↔ a ≤ b := fun a b => by
     rw [PrimeSpectrum.le_iff_specializes, PrimeSpectrum.le_iff_specializes,
       hgemb.isInducing.specializes_iff]
@@ -131,24 +154,29 @@ theorem _root_.GlobalTheory.ZM.FullLevel.dim_generic_chart {o K : Type} [CommRin
     have h2 : y₀ ≤ gf w := hq.2 ⟨(gf w).isPrime, bot_le⟩ h1
     exact (hle z w).1 (hgz ▸ h2)
   have hq' : (gf z).asIdeal = q := congrArg PrimeSpectrum.asIdeal hgz
-  calc d ≤ ringKrullDim ((FractionRing o ⊗[o] A) ⧸ z.asIdeal) := hbound _ hzmin
+  calc
+    d ≤ ringKrullDim ((FractionRing o ⊗[o] A) ⧸ z.asIdeal) := hbound _ hzmin
     _ = Order.krullDim (PrimeSpectrum.zeroLocus (z.asIdeal : Set (FractionRing o ⊗[o] A))) :=
       ringKrullDim_quotient _
     _ ≤ Order.krullDim (PrimeSpectrum.zeroLocus ((gf z).asIdeal : Set R)) :=
       krullDim_zeroLocus_le_of_isEmbedding gf hgemb z
     _ = ringKrullDim (R ⧸ q) := by rw [hq', ringKrullDim_quotient]
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-theorem _root_.GlobalTheory.ZM.FullLevel.charZero_of_hom {k K : Type} [Field k] [CharZero k] [Field K]
-    (x : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp k) : CharZero K :=
+theorem _root_.GlobalTheory.ZM.FullLevel.charZero_of_hom
+    {k K : Type} [Field k] [CharZero k] [Field K]
+    (x : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K
+      ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp k)
+    : CharZero K :=
   (RingHom.charZero_iff (Spec.preimage x).hom.injective).1 inferInstance
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-private theorem isNilpotent_ker_fstHom_dualNumber {K : Type} [Field K] :
-    IsNilpotent (RingHom.ker (TrivSqZeroExt.fstHom K K K).toRingHom) := by
+private theorem isNilpotent_ker_fstHom_dualNumber {K : Type} [Field K]
+    : IsNilpotent (RingHom.ker (TrivSqZeroExt.fstHom K K K).toRingHom) := by
   refine ⟨2, le_bot_iff.1 ?_⟩
   rw [pow_two, Ideal.mul_le]
   intro r hr s hs
@@ -157,27 +185,39 @@ private theorem isNilpotent_ker_fstHom_dualNumber {K : Type} [Field K] :
   rw [Ideal.mem_bot]
   ext <;> simp [hr, hs]
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-theorem _root_.GlobalTheory.ZM.FullLevel.eq_constPt {k K : Type} [Field k] [CharZero k]
-    [Algebra.IsAlgebraic ℚ k] [Field K]
-    (x : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (DualNumber K) ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp k) : x = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.constPt x := by
+theorem _root_.GlobalTheory.ZM.FullLevel.eq_constPt
+    {k K : Type} [Field k] [CharZero k] [Algebra.IsAlgebraic ℚ k] [Field K]
+    (x : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (DualNumber K)
+      ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp k)
+    : x = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.constPt x := by
   have hK : CharZero K :=
-    _root_.GlobalTheory.ZM.FullLevel.charZero_of_hom (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (TrivSqZeroExt.fstHom K K K).toRingHom ≫ x)
+    _root_.GlobalTheory.ZM.FullLevel.charZero_of_hom
+      (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (TrivSqZeroExt.fstHom K K
+          K).toRingHom
+        ≫ x)
   haveI : Algebra.IsSeparable ℚ k := Algebra.IsAlgebraic.isSeparable_of_perfectField
   haveI : Algebra.FormallyUnramified ℚ k := Algebra.FormallyUnramified.of_isSeparable ℚ k
-  obtain ⟨φ, rfl⟩ : ∃ φ : k →+* DualNumber K, x = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap φ :=
+  obtain ⟨φ, rfl⟩
+      : ∃ φ : k →+* DualNumber K, x = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap φ :=
     ⟨(Spec.preimage x).hom, by simp [_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap]⟩
   let ψ : k →+* DualNumber K :=
     (algebraMap K (DualNumber K)).comp ((TrivSqZeroExt.fstHom K K K).toRingHom.comp φ)
-  have hψ : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.constPt (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap φ) = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap ψ := by
-    simp only [_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.constPt, _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap, ψ, ← Spec.map_comp]; rfl
+  have hψ
+      : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.constPt
+          (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap φ)
+        = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap ψ := by
+    simp only [_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.constPt,
+      _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap, ψ, ← Spec.map_comp]
+    rfl
   rw [hψ]
   congr 1
-  have key := Algebra.FormallyUnramified.ext (R := ℚ) (A := k) (B := DualNumber K)
-    (RingHom.ker (TrivSqZeroExt.fstHom K K K).toRingHom) isNilpotent_ker_fstHom_dualNumber
-    (g₁ := φ.toRatAlgHom) (g₂ := ψ.toRatAlgHom) ?_
+  have key :=
+    Algebra.FormallyUnramified.ext (R := ℚ) (A := k) (B := DualNumber K)
+      (RingHom.ker (TrivSqZeroExt.fstHom K K K).toRingHom) isNilpotent_ker_fstHom_dualNumber
+      (g₁ := φ.toRatAlgHom) (g₂ := ψ.toRatAlgHom) ?_
   · exact congrArg AlgHom.toRingHom key
   · intro a
     rw [Ideal.Quotient.eq, RingHom.mem_ker]

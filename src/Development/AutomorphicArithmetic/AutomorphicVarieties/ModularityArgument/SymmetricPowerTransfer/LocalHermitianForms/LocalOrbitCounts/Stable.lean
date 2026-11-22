@@ -36,8 +36,12 @@ theorem UpperTheory.V.Z.Sym.Loc.stable : UpperTheory.V.Z.Sym.Loc.Stable := by
     have h := hL.two.map (algebraMap O K)
     rw [map_ofNat] at h
     exact h.ne_zero
-  have hshift : ∀ (f : Kˣ → ℂ), (∀ t ∈ NE τ, ∀ x : Kˣ, f (t * x) = f x) → ∀ g : Kˣ,
-      (∀ k : Kˣ, lcount O c d ((k : K) • m) = f (k * g)) → stabSum O c d m = ∑ᶠ t : Kˣ ⧸ NE τ, f (Quotient.out t) := by
+  have hshift
+      : ∀ (f : Kˣ → ℂ),
+        (∀ t ∈ NE τ, ∀ x : Kˣ, f (t * x) = f x)
+          → ∀ g : Kˣ,
+            (∀ k : Kˣ, lcount O c d ((k : K) • m) = f (k * g))
+              → stabSum O c d m = ∑ᶠ t : Kˣ ⧸ NE τ, f (Quotient.out t) := by
     intro f hf g hk
     unfold stabSum
     rw [finsum_congr (fun t => hk _)]
@@ -70,7 +74,8 @@ theorem UpperTheory.V.Z.Sym.Loc.stable : UpperTheory.V.Z.Sym.Loc.Stable := by
     obtain ⟨m', hm', hmove⟩ := dat_move hL hD hD0.d_norm
     obtain ⟨t₁, rfl⟩ := datForm O K Δ τ hL c _ hlam z hz m' hm'
     have hP := caseP O K Δ τ hL hreg r hrm hrK c hev j χ hj hχ a ha z hz
-    let f : Kˣ → ℂ := fun y => lcount O c (dLam ((algebraMap K (Lsq K Δ)) ((algebraMap O K) r)) z) ((y : K) • 1)
+    let f : Kˣ → ℂ := fun y =>
+      lcount O c (dLam ((algebraMap K (Lsq K Δ)) ((algebraMap O K) r)) z) ((y : K) • 1)
     have hf : ∀ t ∈ NE τ, ∀ x : Kˣ, f (t * x) = f x := fun t ht x => lcount_inv hL hD0 t ht x
     have hk : ∀ k : Kˣ, lcount O c d ((k : K) • m) = f (k * t₁) := by
       intro k
@@ -122,8 +127,8 @@ theorem UpperTheory.V.Z.Sym.Loc.stable : UpperTheory.V.Z.Sym.Loc.Stable := by
       rw [map_sub, map_ofNat, hτ₀]
       exact hev
     have hU : (algebraMap O K) ↑(-(hu1.unit * hu2.unit)) = τ ^ 2 - 4 := by
-      rw [Units.val_neg, Units.val_mul, IsUnit.unit_spec, IsUnit.unit_spec, map_neg, map_mul, map_add (f := _), map_sub,
-        map_ofNat, hτ₀]
+      rw [Units.val_neg, Units.val_mul, IsUnit.unit_spec, IsUnit.unit_spec, map_neg, map_mul,
+        map_add (f := _), map_sub, map_ofNat, hτ₀]
       ring
     obtain ⟨lam, hlamI, hlamN⟩ := normEx O K Δ hL hu1.unit
     have hlam : QuadraticAlgebra.norm lam = 2 + τ := by

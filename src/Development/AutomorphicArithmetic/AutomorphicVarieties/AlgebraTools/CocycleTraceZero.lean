@@ -7,8 +7,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.cocycle_trace_zero :
-    ∀ {K G : Type} [CommRing K] [Group G] {σ : Type} [Fintype σ] [DecidableEq σ] (d : σ → Type) [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)] (r : G →* (∀ s, Matrix (d s) (d s) K)) (φ : G → ∀ s, Matrix (d s) (d s) K), Submodule.span K (Set.range r) = ⊤ → (∀ g h, φ (g * h) = φ g + r g * φ h * r g⁻¹) → (∀ g, ∑ s, ((φ g * r g) s).trace = 0) → ∃ Y, ∀ g, φ g = Y - r g * Y * r g⁻¹ := by
+theorem UpperTheory.V.AlgebraTools.cocycle_trace_zero
+    : ∀ {K G : Type} [CommRing K] [Group G] {σ : Type} [Fintype σ] [DecidableEq σ] (d : σ → Type)
+        [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)]
+        (r : G →* (∀ s, Matrix (d s) (d s) K)) (φ : G → ∀ s, Matrix (d s) (d s) K),
+      Submodule.span K (Set.range r) = ⊤ → (∀ g h, φ (g * h) = φ g + r g * φ h * r g⁻¹)
+        → (∀ g, ∑ s, ((φ g * r g) s).trace = 0)
+        → ∃ Y, ∀ g, φ g = Y - r g * Y * r g⁻¹ := by
   intro K G _ _ σ _ _ d _ _ _ r φ hspan hφ htr
   classical
   let m : G → ∀ s, Matrix (d s) (d s) K := fun g => φ g * r g
@@ -60,7 +65,8 @@ theorem UpperTheory.V.AlgebraTools.cocycle_trace_zero :
     induction hy using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨h, rfl⟩ := hx
-      rw [hkey2, hf]; simp
+      rw [hkey2, hf]
+      simp
     | zero => simp
     | add x y _ _ h₁ h₂ => rw [mul_add, map_add (f := _), h₁, h₂, add_zero]
     | smul a x _ h₁ => rw [mul_smul_comm, map_smul, h₁, smul_zero]

@@ -10,13 +10,13 @@ open IsLocalRing ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 
 namespace GlobalTheory.tau_basis_unit_determinant
 
-theorem exists_basis_isUnit_det : ∀ (p : ℕ) [Fact p.Prime] (OE : Type) [CommRing OE]
-    [Module.Free ℤ OE] [Module.Finite ℤ OE] (O : Type) [CommRing O] [IsLocalRing O]
-    [Algebra ℤ_[p] O] (w : PlaceU p OE) (t : Fin w.n → (OE →+* O)),
-    (∀ j, t j ∈ Emb (O := O) w.e) →
-    (∀ j j', (∀ x, t j x - t j' x ∈ maximalIdeal O) → j = j') →
-    ∃ b : Module.Basis (Fin w.n) ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)),
-      IsUnit (Matrix.det (Matrix.of fun i j => tauExt (t j) (b i : ℤ_[p] ⊗[ℤ] OE))) := by
+theorem exists_basis_isUnit_det
+    : ∀ (p : ℕ) [Fact p.Prime] (OE : Type) [CommRing OE] [Module.Free ℤ OE] [Module.Finite ℤ OE]
+        (O : Type) [CommRing O] [IsLocalRing O] [Algebra ℤ_[p] O] (w : PlaceU p OE)
+        (t : Fin w.n → (OE →+* O)),
+      (∀ j, t j ∈ Emb (O := O) w.e) → (∀ j j', (∀ x, t j x - t j' x ∈ maximalIdeal O) → j = j')
+        → ∃ b : Module.Basis (Fin w.n) ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)),
+          IsUnit (Matrix.det (Matrix.of fun i j => tauExt (t j) (b i : ℤ_[p] ⊗[ℤ] OE))) := by
   intro p _ OE _ _ _ O _ _ _ w t ht hsep
   let b : Module.Basis (Fin w.n) ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)) :=
     Module.finBasisOfFinrankEq _ _ rfl

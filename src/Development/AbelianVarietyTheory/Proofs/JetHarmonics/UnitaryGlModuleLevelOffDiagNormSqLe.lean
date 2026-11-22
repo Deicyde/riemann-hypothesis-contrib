@@ -146,15 +146,14 @@ private lemma mul_sq_sqrt_sub_le_sq_div_sixteen {n : ℕ} (μ U T ρ L : Fin n �
         + 800 * (n : ℝ) ^ 7 := by ring
     _ ≤ (bv / 16) ^ 2 := by linarith
 
-
 open Finset in
 open scoped InnerProductSpace in
-theorem _root_.GlobalTheory.lev_offDiag_normSq_le : ∀ (M : Type) [NormedAddCommGroup M]
-    [InnerProductSpace ℂ M] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M)
-    (μ : Fin n → ℝ) (kk j : ℕ) (bv : ℝ) (w : M), _root_.BranchingSupport.IsMod ε E μ →
-    _root_.BranchingSupport.Shape ε kk μ bv → j ≤ 4 * n ^ 2 + 2 →
-    _root_.BranchingSupport.Lev ε E μ j w →
-    (n : ℝ) * ∑ a, ∑ b ∈ univ.erase a, ‖E a b w‖ ^ 2 ≤ (bv / 16) ^ 2 * ‖w‖ ^ 2 := by
+theorem _root_.GlobalTheory.lev_offDiag_normSq_le
+    : ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (n : ℕ) (ε : Fin n → Bool)
+        (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (kk j : ℕ) (bv : ℝ) (w : M),
+      _root_.BranchingSupport.IsMod ε E μ → _root_.BranchingSupport.Shape ε kk μ bv
+        → j ≤ 4 * n ^ 2 + 2 → _root_.BranchingSupport.Lev ε E μ j w
+        → (n : ℝ) * ∑ a, ∑ b ∈ univ.erase a, ‖E a b w‖ ^ 2 ≤ (bv / 16) ^ 2 * ‖w‖ ^ 2 := by
   intro M _ _ n ε E μ kk j bv w hmod hshape hj hlev
   unfold _root_.BranchingSupport.IsMod at hmod
   obtain ⟨-, hE, hcas⟩ := hmod
@@ -168,16 +167,20 @@ theorem _root_.GlobalTheory.lev_offDiag_normSq_le : ∀ (M : Type) [NormedAddCom
   have hbv0 : 0 ≤ bv := by linarith
   have hnb : 2 * (n : ℝ) ≤ bv := by
     have : (n : ℝ) ≤ (n : ℝ) ^ 7 := by
-      calc (n : ℝ) = (n : ℝ) ^ 1 := (pow_one _).symm
+      calc
+        (n : ℝ)
+          = (n : ℝ) ^ 1 := (pow_one _).symm
         _ ≤ (n : ℝ) ^ 7 := pow_le_pow_right₀ (by linarith) (by norm_num)
     linarith
   have hμ : ∀ a, |μ a| ≤ 3 * bv := by
     intro a
     rcases lt_or_ge ((a : ℕ) + 1) kk with h | h
     · obtain ⟨-, h1, h2⟩ := hlow a h
-      rw [abs_le]; constructor <;> linarith
+      rw [abs_le]
+      constructor <;> linarith
     · obtain ⟨h1, h2⟩ := hhigh a h
-      rw [abs_le]; constructor <;> linarith
+      rw [abs_le]
+      constructor <;> linarith
   have hU : ∀ a, |_root_.Formalism.REAL.rhoN ε a| ≤ n := fun a => by
     unfold _root_.Formalism.REAL.rhoN; exact abs_half_card_sub_le _ _
   have hT : ∀ a, |_root_.Formalism.REAL.rhoC ε a| ≤ n := fun a => by
@@ -187,40 +190,69 @@ theorem _root_.GlobalTheory.lev_offDiag_normSq_le : ∀ (M : Type) [NormedAddCom
     unfold _root_.Formalism.QuantumDeterminants.rhoStd
     have ha : ((a : ℕ) : ℝ) + 1 ≤ n := by exact_mod_cast a.isLt
     have ha0 : (0 : ℝ) ≤ ((a : ℕ) : ℝ) := Nat.cast_nonneg _
-    rw [abs_le]; constructor <;> linarith
-  have hLeq : ∀ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a = μ a + _root_.Formalism.REAL.rhoN ε a - _root_.Formalism.REAL.rhoC ε a := fun a => by
+    rw [abs_le]
+    constructor <;> linarith
+  have hLeq
+      : ∀ a,
+        _root_.Formalism.QuantumDeterminants.lowK ε μ a
+          = μ a + _root_.Formalism.REAL.rhoN ε a - _root_.Formalism.REAL.rhoC ε a := fun a => by
     unfold _root_.Formalism.QuantumDeterminants.lowK; simp
   have hLb : ∀ a, |_root_.Formalism.QuantumDeterminants.lowK ε μ a| ≤ 4 * bv := by
     intro a
-    have h1 := hμ a; have h2 := hU a; have h3 := hT a
-    rw [hLeq]; rw [abs_le] at h1 h2 h3 ⊢; constructor <;> linarith
-  have hm : ∀ ω : Fin n → ℝ, ∑ a, |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a| ≤ (j : ℝ) →
-      ∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j ≤ ∑ a, ω a ^ 2 := by
+    have h1 := hμ a
+    have h2 := hU a
+    have h3 := hT a
+    rw [hLeq]
+    rw [abs_le] at h1 h2 h3 ⊢
+    constructor <;> linarith
+  have hm
+      : ∀ ω : Fin n → ℝ,
+        ∑ a, |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a| ≤ (j : ℝ)
+          → ∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j
+            ≤ ∑ a, ω a ^ 2 := by
     intro ω hω
-    have hpt : ∀ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a| ≤ ω a ^ 2 := by
+    have hpt
+        : ∀ a,
+          _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2
+              - 8 * bv * |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a|
+            ≤ ω a ^ 2 := by
       intro a
-      have h1 := neg_abs_le (_root_.Formalism.QuantumDeterminants.lowK ε μ a * (ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a))
+      have h1 :=
+        neg_abs_le
+          (_root_.Formalism.QuantumDeterminants.lowK ε μ a
+            * (ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a))
       rw [abs_mul] at h1
-      have h2 : |_root_.Formalism.QuantumDeterminants.lowK ε μ a| * |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a| ≤ 4 * bv * |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a| :=
+      have h2
+          : |_root_.Formalism.QuantumDeterminants.lowK ε μ a|
+              * |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a|
+            ≤ 4 * bv * |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a| :=
         mul_le_mul_of_nonneg_right (hLb a) (abs_nonneg _)
       linarith [sq_nonneg (ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a)]
-    calc ∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j
-        ≤ ∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * ∑ a, |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a| := by
-          have := mul_le_mul_of_nonneg_left hω hbv0
-          linarith
-      _ = ∑ a, (_root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a|) := by
-          rw [Finset.mul_sum, Finset.sum_sub_distrib]
+    calc
+      ∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j
+          ≤ ∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2
+            - 8 * bv * ∑ a, |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a| := by
+        have := mul_le_mul_of_nonneg_left hω hbv0
+        linarith
+      _ = ∑ a, (_root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * |ω a - _root_.Formalism.QuantumDeterminants.lowK ε μ a|) :=
+        by rw [Finset.mul_sum, Finset.sum_sub_distrib]
       _ ≤ ∑ a, ω a ^ 2 := Finset.sum_le_sum fun a _ => hpt a
-  have hdiag : (∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j) * ‖w‖ ^ 2 ≤ ∑ a, ‖E a a w‖ ^ 2 :=
-    (_root_.GlobalTheory.wtNear_diag_bounds M n ε E (_root_.Formalism.QuantumDeterminants.lowK ε μ) (j : ℝ) w hE hnear).1 _ hm
-  have hΩ : (⟪w, _root_.Formalism.REAL.Cas E w⟫_ℂ).re = _root_.BranchingSupport.casG μ * ‖w‖ ^ 2 := by
+  have hdiag
+      : (∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j) * ‖w‖ ^ 2
+        ≤ ∑ a, ‖E a a w‖ ^ 2 :=
+    (_root_.GlobalTheory.wtNear_diag_bounds M n ε E (_root_.Formalism.QuantumDeterminants.lowK ε μ)
+      (j : ℝ) w hE hnear).1 _ hm
+  have hΩ
+      : (⟪w, _root_.Formalism.REAL.Cas E w⟫_ℂ).re = _root_.BranchingSupport.casG μ * ‖w‖ ^ 2 := by
     rw [hcas w, inner_smul_right, inner_self_eq_norm_sq_to_K]
     norm_cast
     rw [Complex.re_ofReal_mul]
     congr 1
   have hKc := hS w hwS
-  have hsum : ∑ a, ∑ b, ‖E a b w‖ ^ 2
-      = 2 * (⟪w, _root_.Formalism.REAL.CasK ε E w⟫_ℂ).re - (⟪w, _root_.Formalism.REAL.Cas E w⟫_ℂ).re := by
+  have hsum
+      : ∑ a, ∑ b, ‖E a b w‖ ^ 2
+        = 2 * (⟪w, _root_.Formalism.REAL.CasK ε E w⟫_ℂ).re
+          - (⟪w, _root_.Formalism.REAL.Cas E w⟫_ℂ).re := by
     rw [Finset.sum_comm]
     unfold _root_.Formalism.REAL.CasK _root_.Formalism.REAL.Cas
     rw [re_inner_double_sum_apply, re_inner_double_sum_apply, Finset.mul_sum,
@@ -230,33 +262,59 @@ theorem _root_.GlobalTheory.lev_offDiag_normSq_le : ∀ (M : Type) [NormedAddCom
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [norm_sq_apply_eq_re_inner_of_isUnitary hE a b w]
     split_ifs <;> simp
-  have hoff : ∑ a, ∑ b ∈ univ.erase a, ‖E a b w‖ ^ 2
-      = ∑ a, ∑ b, ‖E a b w‖ ^ 2 - ∑ a, ‖E a a w‖ ^ 2 := by
+  have hoff
+      : ∑ a, ∑ b ∈ univ.erase a, ‖E a b w‖ ^ 2 = ∑ a, ∑ b, ‖E a b w‖ ^ 2 - ∑ a, ‖E a a w‖ ^ 2 := by
     rw [← Finset.sum_sub_distrib]
     exact Finset.sum_congr rfl fun a _ => Finset.sum_erase_eq_sub (Finset.mem_univ a)
-  have hKeq : _root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ)
-      = ∑ a, (μ a + _root_.Formalism.REAL.rhoN ε a) ^ 2 - ∑ a, _root_.Formalism.REAL.rhoC ε a ^ 2 := by
-    unfold _root_.Formalism.REAL.ckv _root_.Formalism.REAL.nsq _root_.Formalism.REAL.dot _root_.Formalism.QuantumDeterminants.lowK
+  have hKeq
+      : _root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ)
+        = ∑ a, (μ a + _root_.Formalism.REAL.rhoN ε a) ^ 2
+          - ∑ a, _root_.Formalism.REAL.rhoC ε a ^ 2 := by
+    unfold _root_.Formalism.REAL.ckv _root_.Formalism.REAL.nsq _root_.Formalism.REAL.dot
+      _root_.Formalism.QuantumDeterminants.lowK
     simp only [Pi.add_apply, Pi.sub_apply, sub_add_cancel, sq]
-  have hceq : _root_.BranchingSupport.casG μ = ∑ a, μ a ^ 2 - ∑ a, _root_.Formalism.QuantumDeterminants.rhoStd n a ^ 2 := by
+  have hceq
+      : _root_.BranchingSupport.casG μ
+        = ∑ a, μ a ^ 2 - ∑ a, _root_.Formalism.QuantumDeterminants.rhoStd n a ^ 2 := by
     unfold _root_.BranchingSupport.casG; rfl
   have hj' : (j : ℝ) ≤ 4 * (n : ℝ) ^ 2 + 2 := by exact_mod_cast hj
-  have hnum := mul_sq_sqrt_sub_le_sq_div_sixteen μ (_root_.Formalism.REAL.rhoN ε) (_root_.Formalism.REAL.rhoC ε) (fun a => _root_.Formalism.QuantumDeterminants.rhoStd n a)
-    (_root_.Formalism.QuantumDeterminants.lowK ε μ) (_root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ)) (_root_.BranchingSupport.casG μ) bv j hμ hU hT hρ
-    hLeq hKeq hceq hNR hbv hj'
+  have hnum :=
+    mul_sq_sqrt_sub_le_sq_div_sixteen μ (_root_.Formalism.REAL.rhoN ε)
+      (_root_.Formalism.REAL.rhoC ε)
+      (fun a => _root_.Formalism.QuantumDeterminants.rhoStd n a)
+      (_root_.Formalism.QuantumDeterminants.lowK ε μ)
+      (_root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ))
+      (_root_.BranchingSupport.casG μ) bv j hμ hU hT hρ hLeq hKeq hceq hNR hbv hj'
   have hw2 : 0 ≤ ‖w‖ ^ 2 := by positivity
-  have hoff_le : ∑ a, ∑ b ∈ univ.erase a, ‖E a b w‖ ^ 2
-      ≤ (2 * (√(_root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ)) + 4 * n * j) ^ 2 - _root_.BranchingSupport.casG μ
-        - (∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j)) * ‖w‖ ^ 2 := by
+  have hoff_le
+      : ∑ a, ∑ b ∈ univ.erase a, ‖E a b w‖ ^ 2
+        ≤ (2 * (√(_root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ))
+                + 4 * n * j)
+              ^ 2
+            - _root_.BranchingSupport.casG μ
+            - (∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j))
+          * ‖w‖ ^ 2 := by
     rw [hoff, hsum, hΩ]
     linarith [hKc, hdiag]
-  calc (n : ℝ) * ∑ a, ∑ b ∈ univ.erase a, ‖E a b w‖ ^ 2
-      ≤ (n : ℝ) * ((2 * (√(_root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ)) + 4 * n * j) ^ 2
-        - _root_.BranchingSupport.casG μ - (∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j)) * ‖w‖ ^ 2) :=
-        mul_le_mul_of_nonneg_left hoff_le (Nat.cast_nonneg n)
-    _ = (n : ℝ) * (2 * (√(_root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ)) + 4 * n * j) ^ 2
-        - _root_.BranchingSupport.casG μ - (∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j)) * ‖w‖ ^ 2 := by
-        ring
+  calc
+    (n : ℝ) * ∑ a, ∑ b ∈ univ.erase a, ‖E a b w‖ ^ 2
+        ≤ (n : ℝ)
+          * ((2 * (√(_root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ))
+                  + 4 * n * j)
+                ^ 2
+              - _root_.BranchingSupport.casG μ
+              - (∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j))
+            * ‖w‖ ^ 2) :=
+      mul_le_mul_of_nonneg_left hoff_le (Nat.cast_nonneg n)
+    _ = (n : ℝ)
+        * (2
+            * (√(_root_.Formalism.REAL.ckv ε (_root_.Formalism.QuantumDeterminants.lowK ε μ))
+                + 4 * n * j)
+              ^ 2
+          - _root_.BranchingSupport.casG μ
+          - (∑ a, _root_.Formalism.QuantumDeterminants.lowK ε μ a ^ 2 - 8 * bv * j))
+        * ‖w‖ ^ 2 := by
+      ring
     _ ≤ (bv / 16) ^ 2 * ‖w‖ ^ 2 := mul_le_mul_of_nonneg_right hnum hw2
 
 end GlobalTheory

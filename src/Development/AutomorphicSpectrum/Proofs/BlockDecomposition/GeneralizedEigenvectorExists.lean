@@ -12,16 +12,19 @@ namespace GlobalTheory.CompanionTheory.TorusQuot
 
 open Module Polynomial
 
-theorem exists_functional_of_commuting_nilpotent {ι V : Type} [AddCommGroup V] [Module ℂ V]
-    [FiniteDimensional ℂ V] [Nontrivial V] (A : ι → End ℂ V)
-    (hc : ∀ i j, A i * A j = A j * A i) (hn : ∀ i x, ∃ k : ℕ, (A i ^ k) x = 0) :
-    ∃ φ : V →ₗ[ℂ] ℂ, φ ≠ 0 ∧ ∀ i x, φ (A i x) = 0 := by
+theorem exists_functional_of_commuting_nilpotent
+    {ι V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V]
+    (A : ι → End ℂ V) (hc : ∀ i j, A i * A j = A j * A i) (hn : ∀ i x, ∃ k : ℕ, (A i ^ k) x = 0)
+    : ∃ φ : V →ₗ[ℂ] ℂ, φ ≠ 0 ∧ ∀ i x, φ (A i x) = 0 := by
   let S : Set (Submodule ℂ V) := {K | K ≠ ⊤ ∧ ∀ i, ∀ x ∈ K, A i x ∈ K}
-  have hS : S.Nonempty := ⟨⊥, bot_ne_top, fun i x hx => by
-    rw [Submodule.mem_bot] at hx ⊢
-    rw [hx, map_zero]⟩
-  obtain ⟨K, ⟨hK, hKs⟩, hmax⟩ :=
-    (wellFounded_gt (α := Submodule ℂ V)).has_min S hS
+  have hS : S.Nonempty := ⟨
+    ⊥,
+    bot_ne_top,
+    fun i x hx => by
+      rw [Submodule.mem_bot] at hx ⊢
+      rw [hx, map_zero]
+  ⟩
+  obtain ⟨K, ⟨hK, hKs⟩, hmax⟩ := (wellFounded_gt (α := Submodule ℂ V)).has_min S hS
   have hrange : ∀ i, LinearMap.range (A i) ≤ K := by
     intro i
     have hstable : ∀ j, ∀ x ∈ K ⊔ LinearMap.range (A i), A j x ∈ K ⊔ LinearMap.range (A i) := by
@@ -57,8 +60,7 @@ theorem exists_functional_of_commuting_nilpotent {ι V : Type} [AddCommGroup V] 
           have hz : z ∈ K ⊔ LinearMap.range (A i) := by rw [htop]; trivial
           obtain ⟨k', hk', y', ⟨a, rfl⟩, rfl⟩ := Submodule.mem_sup.1 hz
           rw [map_add (f := _), ← add_assoc]
-          refine Submodule.add_mem _
-            (Submodule.mem_sup_left (K.add_mem hk (hpow n _ hk')))
+          refine Submodule.add_mem _ (Submodule.mem_sup_left (K.add_mem hk (hpow n _ hk')))
             (Submodule.mem_sup_right ⟨a, ?_⟩)
           rw [pow_succ, Module.End.mul_apply]
       have hnil : IsNilpotent (A i) := Module.End.isNilpotent_iff_of_finite.2 (hn i)
@@ -76,14 +78,15 @@ theorem exists_functional_of_commuting_nilpotent {ι V : Type} [AddCommGroup V] 
   obtain ⟨φ, hφ0, hφ⟩ := Submodule.exists_le_ker_of_lt_top K (lt_top_iff_ne_top.2 hK)
   exact ⟨φ, hφ0, fun i x => hφ (hrange i ⟨x, rfl⟩)⟩
 
-theorem fixed_of_pow_fixed_of_gen {V : Type} [AddCommGroup V] [Module ℂ V] (T : End ℂ V) (w : V)
-    (K r : ℕ) (hK : 0 < K) (h1 : (T ^ K) w = w) (h2 : ((T - 1) ^ r) w = 0) : T w = w := by
+theorem fixed_of_pow_fixed_of_gen
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (T : End ℂ V) (w : V) (K r : ℕ) (hK : 0 < K) (h1 : (T ^ K) w = w) (h2 : ((T - 1) ^ r) w = 0)
+    : T w = w := by
   let g : ℂ[X] := ∑ i ∈ Finset.range K, X ^ i
   have hg : (X - 1 : ℂ[X]) * g = X ^ K - 1 := by
     rw [mul_comm]
     exact geom_sum_mul X K
-  have hirr : Irreducible (X - 1 : ℂ[X]) := by
-    simpa using irreducible_X_sub_C (1 : ℂ)
+  have hirr : Irreducible (X - 1 : ℂ[X]) := by simpa using irreducible_X_sub_C (1 : ℂ)
   have hnd : ¬ (X - 1 : ℂ[X]) ∣ g := by
     intro hd
     have hroot : IsRoot g 1 := by
@@ -99,38 +102,46 @@ theorem fixed_of_pow_fixed_of_gen {V : Type} [AddCommGroup V] [Module ℂ V] (T 
   have hkey := congrArg (aeval T) hpoly
   simp only [map_add (f := _), map_mul, map_pow, map_sub, aeval_X, map_one] at hkey
   have happ := LinearMap.congr_fun hkey w
-  simp only [LinearMap.add_apply, Module.End.mul_apply, LinearMap.sub_apply,
-    Module.End.one_apply, h1, h2, map_zero, sub_self, zero_add] at happ
+  simp only [LinearMap.add_apply, Module.End.mul_apply, LinearMap.sub_apply, Module.End.one_apply,
+      h1, h2, map_zero, sub_self, zero_add]
+    at happ
   have := sub_eq_zero.1 happ.symm
   exact this
 
-theorem coe_restrict_sub_pow {V : Type} [AddCommGroup V] [Module ℂ V] (p : Submodule ℂ V)
-    (f : End ℂ V) (hf : ∀ x ∈ p, f x ∈ p) (μ : ℂ) (k : ℕ) (y : p) :
-    (((f.restrict hf - μ • (1 : End ℂ p)) ^ k) y : V) = ((f - μ • (1 : End ℂ V)) ^ k) (y : V) := by
+theorem coe_restrict_sub_pow
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (p : Submodule ℂ V) (f : End ℂ V) (hf : ∀ x ∈ p, f x ∈ p)
+    (μ : ℂ) (k : ℕ) (y : p)
+    : (((f.restrict hf - μ • (1 : End ℂ p)) ^ k) y : V)
+      = ((f - μ • (1 : End ℂ V)) ^ k) (y : V) := by
   induction k generalizing y with
   | zero => simp
   | succ k ih =>
     rw [pow_succ, pow_succ, Module.End.mul_apply, Module.End.mul_apply, ih]
     congr 1
 
-theorem mem_iSup_iInf_of_finite {Λ M : Type} [Group Λ] [AddCommGroup M] [Module ℂ M]
+theorem mem_iSup_iInf_of_finite
+    {Λ M : Type} [Group Λ] [AddCommGroup M] [Module ℂ M]
     (ρ : Representation ℂ Λ M) (hc : ∀ l l', ρ l * ρ l' = ρ l' * ρ l)
-    (E : Submodule ℂ M) [FiniteDimensional ℂ E] (hE : ∀ l, ∀ x ∈ E, ρ l x ∈ E) (w : M)
-    (hw : w ∈ E) :
-    w ∈ ⨆ χ : Λ → ℂ, ⨅ l, End.maxGenEigenspace (ρ l : End ℂ M) (χ l) := by
+    (E : Submodule ℂ M) [FiniteDimensional ℂ E]
+    (hE : ∀ l, ∀ x ∈ E, ρ l x ∈ E)
+    (w : M) (hw : w ∈ E)
+    : w ∈ ⨆ χ : Λ → ℂ, ⨅ l, End.maxGenEigenspace (ρ l : End ℂ M) (χ l) := by
   let T : Λ → End ℂ E := fun l => (ρ l : End ℂ M).restrict (hE l)
   have hT : ∀ i j, Commute (T i) (T j) := by
     intro i j
     ext x
     have := LinearMap.congr_fun (hc i j) (x : M)
     simpa [T, Module.End.mul_apply] using this
-  have hmaps : ∀ i j φ, Set.MapsTo (T i) (End.maxGenEigenspace (T j) φ)
-      (End.maxGenEigenspace (T j) φ) :=
+  have hmaps
+      : ∀ i j φ, Set.MapsTo (T i) (End.maxGenEigenspace (T j) φ) (End.maxGenEigenspace (T j) φ) :=
     fun i j φ => End.mapsTo_maxGenEigenspace_of_comm (hT j i) φ
-  have htop := End.iSup_iInf_maxGenEigenspace_eq_top_of_forall_mapsTo T hmaps
-    (fun i => End.iSup_maxGenEigenspace_eq_top (T i))
-  have hle : (⊤ : Submodule ℂ E).map E.subtype ≤
-      ⨆ χ : Λ → ℂ, ⨅ l, End.maxGenEigenspace (ρ l : End ℂ M) (χ l) := by
+  have htop :=
+    End.iSup_iInf_maxGenEigenspace_eq_top_of_forall_mapsTo T hmaps
+      (fun i => End.iSup_maxGenEigenspace_eq_top (T i))
+  have hle
+      : (⊤ : Submodule ℂ E).map E.subtype
+        ≤ ⨆ χ : Λ → ℂ, ⨅ l, End.maxGenEigenspace (ρ l : End ℂ M) (χ l) := by
     rw [← htop, Submodule.map_iSup]
     refine iSup_mono fun χ => ?_
     rw [Submodule.map_le_iff_le_comap]
@@ -145,11 +156,21 @@ theorem mem_iSup_iInf_of_finite {Λ M : Type} [Group Λ] [AddCommGroup M] [Modul
     exact this.symm
   exact hle ⟨⟨w, hw⟩, trivial, rfl⟩
 
-theorem exists_quotient_character : ∀ (Λ : Type) [Group Λ] (M : Type) [AddCommGroup M] [Module ℂ M] (ρ : Representation ℂ Λ M), (∀ l l', ρ l * ρ l' = ρ l' * ρ l) → ∀ (U : ℕ → Subgroup Λ), Antitone U → (∀ m m', m ≤ m' → ∀ u ∈ U m, ∃ N : ℕ, 0 < N ∧ u ^ N ∈ U m') → (∀ w : M, ∃ m, ∀ u ∈ U m, ρ u w = w) → (∀ m, FiniteDimensional ℂ ↥(⨅ u : U m, LinearMap.ker (ρ (u : Λ) - 1))) → ∀ (ξ : Λ →* ℂ) (v : M), v ≠ 0 → (∀ l, v ∈ Module.End.maxGenEigenspace (ρ l) (ξ l)) → ∃ f : M →ₗ[ℂ] ℂ, f ≠ 0 ∧ ∀ l w, f (ρ l w) = ξ l * f w := by
+theorem exists_quotient_character
+    : ∀ (Λ : Type) [Group Λ] (M : Type) [AddCommGroup M] [Module ℂ M] (ρ : Representation ℂ Λ M),
+      (∀ l l', ρ l * ρ l' = ρ l' * ρ l)
+        → ∀ (U : ℕ → Subgroup Λ),
+          Antitone U → (∀ m m', m ≤ m' → ∀ u ∈ U m, ∃ N : ℕ, 0 < N ∧ u ^ N ∈ U m')
+            → (∀ w : M, ∃ m, ∀ u ∈ U m, ρ u w = w)
+            → (∀ m, FiniteDimensional ℂ ↥(⨅ u : U m, LinearMap.ker (ρ (u : Λ) - 1)))
+            → ∀ (ξ : Λ →* ℂ) (v : M),
+              v ≠ 0 → (∀ l, v ∈ Module.End.maxGenEigenspace (ρ l) (ξ l))
+                → ∃ f : M →ₗ[ℂ] ℂ, f ≠ 0 ∧ ∀ l w, f (ρ l w) = ξ l * f w := by
   classical
   intro Λ _ M _ _ ρ hc U hU hpow hex hfd ξ v hv0 hv
-  have hmem : ∀ (m : ℕ) (w : M), w ∈ (⨅ u : U m, LinearMap.ker (ρ (u : Λ) - 1)) ↔
-      ∀ u ∈ U m, ρ u w = w := by
+  have hmem
+      : ∀ (m : ℕ) (w : M),
+        w ∈ (⨅ u : U m, LinearMap.ker (ρ (u : Λ) - 1)) ↔ ∀ u ∈ U m, ρ u w = w := by
     intro m w
     rw [Submodule.mem_iInf]
     constructor
@@ -172,16 +193,19 @@ theorem exists_quotient_character : ∀ (Λ : Type) [Group Λ] (M : Type) [AddCo
   let ξ' : Λ → ℂ := ξ
   let N : Submodule ℂ M := t ξ'
   let C : Submodule ℂ M := ⨆ χ, ⨆ (_ : χ ≠ ξ'), t χ
-  have hind : iSupIndep t := End.independent_iInf_maxGenEigenspace_of_forall_mapsTo
-    (fun l => (ρ l : End ℂ M))
-    (fun i j φ => End.mapsTo_maxGenEigenspace_of_comm (show Commute (ρ j : End ℂ M) (ρ i) from hc j i) φ)
+  have hind : iSupIndep t :=
+    End.independent_iInf_maxGenEigenspace_of_forall_mapsTo
+      (fun l => (ρ l : End ℂ M))
+      (fun i j φ =>
+        End.mapsTo_maxGenEigenspace_of_comm (show Commute (ρ j : End ℂ M) (ρ i) from hc j i) φ)
   have hsup : N ⊔ C = ⊤ := by
     rw [eq_top_iff]
     intro w _
     obtain ⟨m, hm⟩ := hex w
     haveI := hfd m
-    have hst : ∀ l, ∀ x ∈ (⨅ u : U m, LinearMap.ker (ρ (u : Λ) - 1)), ρ l x ∈
-        (⨅ u : U m, LinearMap.ker (ρ (u : Λ) - 1)) := by
+    have hst
+        : ∀ l, ∀ x ∈ (⨅ u : U m, LinearMap.ker (ρ (u : Λ) - 1)),
+          ρ l x ∈ (⨅ u : U m, LinearMap.ker (ρ (u : Λ) - 1)) := by
       intro l x hx
       refine (hmem m _).2 fun u hu => ?_
       rw [hcomm, (hmem m x).1 hx u hu]
@@ -241,8 +265,8 @@ theorem exists_quotient_character : ∀ (Λ : Type) [Group Λ] (M : Type) [AddCo
     intro i j
     ext x
     simpa [T, Module.End.mul_apply] using hcomm i j (x : M)
-  have hs : ∀ (a : ℂ) (B : End ℂ N), Commute (a • (1 : End ℂ N)) B :=
-    fun a B => (Commute.one_left B).smul_left a
+  have hs : ∀ (a : ℂ) (B : End ℂ N), Commute (a • (1 : End ℂ N)) B := fun a B =>
+    (Commute.one_left B).smul_left a
   have hAc : ∀ i j, A i * A j = A j * A i := fun i j =>
     Commute.sub_left (Commute.sub_right (hT i j) (hs _ _).symm) (hs _ _)
   have hAn : ∀ i x, ∃ k : ℕ, (A i ^ k) x = 0 := by
@@ -274,7 +298,7 @@ theorem exists_quotient_character : ∀ (Λ : Type) [Group Λ] (M : Type) [AddCo
       exact h0
     have h1 : P (ρ l n) = T l ⟨n, hn⟩ := hPN ⟨ρ l n, hNS l n hn⟩
     have h2 : P n = ⟨n, hn⟩ := hPN ⟨n, hn⟩
-    simp only [LinearMap.comp_apply, map_add (f := _), hPC c hc', hPC _ (hCS l c hc'), h1, h2, add_zero,
-      map_zero, hφT]
+    simp only [LinearMap.comp_apply, map_add (f := _), hPC c hc', hPC _ (hCS l c hc'), h1, h2,
+      add_zero, map_zero, hφT]
 
 end GlobalTheory.CompanionTheory.TorusQuot

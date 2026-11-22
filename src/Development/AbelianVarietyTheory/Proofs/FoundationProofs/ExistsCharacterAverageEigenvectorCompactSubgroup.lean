@@ -8,35 +8,42 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Glo
 
 namespace GlobalTheory.PsType
 
-theorem avg_eig : ∀ (G V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ G V), IsSmooth π → ∀ (H : Set G) (θ : G → ℂ), Datum H θ → ∀ w : V,
-    ∃ R : Finset G, (1 : G) ∈ R ∧ (∀ j ∈ R, j ∈ H) ∧ IsEig π H θ (∑ j ∈ R, (θ j)⁻¹ • π j w) := by
+theorem avg_eig
+    : ∀ (G V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+        [Module ℂ V] (π : Representation ℂ G V),
+      IsSmooth π
+        → ∀ (H : Set G) (θ : G → ℂ),
+          Datum H θ
+            → ∀ w : V, ∃ R : Finset G,
+              (1 : G) ∈ R ∧ (∀ j ∈ R, j ∈ H) ∧ IsEig π H θ (∑ j ∈ R, (θ j)⁻¹ • π j w) := by
   intro G V _ _ _ _ _ π hπ H θ hD w
   classical
-  let Hs : Subgroup G :=
-    { carrier := H
-      mul_mem' := fun {a b} ha hb => hD.mul a ha b hb
-      one_mem' := hD.one
-      inv_mem' := fun {a} ha => hD.inv a ha }
+  let Hs : Subgroup G := {
+    carrier := H
+    mul_mem' := fun {a b} ha hb => hD.mul a ha b hb
+    one_mem' := hD.one
+    inv_mem' := fun {a} ha => hD.inv a ha
+  }
   have hθinv : ∀ a ∈ H, θ a⁻¹ * θ a = 1 := fun a ha => by
     rw [← hD.val_mul _ (hD.inv a ha) _ ha, inv_mul_cancel, hD.val_one]
   have hθ0 : ∀ a ∈ H, θ a ≠ 0 := fun a ha h0 => by
     have := hθinv a ha; rw [h0, mul_zero] at this; exact zero_ne_one this
   have hπmul : ∀ a b : G, π (a * b) w = π a (π b w) := fun a b => by rw [map_mul]; rfl
-  let T : Subgroup Hs :=
-    { carrier := {j | π j w = θ j • w}
-      one_mem' := by simp [hD.val_one]
-      mul_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq, Subgroup.coe_mul] at ha hb ⊢
-        rw [hπmul, hb, map_smul, ha, smul_smul, hD.val_mul _ a.2 _ b.2, mul_comm]
-      inv_mem' := fun {a} ha => by
-        simp only [Set.mem_setOf_eq, InvMemClass.coe_inv] at ha ⊢
-        have h1 : w = θ a • π (a : G)⁻¹ w := by
-          rw [← map_smul, ← ha, ← hπmul, inv_mul_cancel, map_one]; rfl
-        have h2 : θ (a : G)⁻¹ = (θ a)⁻¹ := eq_inv_of_mul_eq_one_left (hθinv a a.2)
-        rw [h2]
-        conv_rhs => rw [h1]
-        rw [smul_smul, inv_mul_cancel₀ (hθ0 a a.2), one_smul] }
+  let T : Subgroup Hs := {
+    carrier := {j | π j w = θ j • w}
+    one_mem' := by simp [hD.val_one]
+    mul_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq, Subgroup.coe_mul] at ha hb ⊢
+      rw [hπmul, hb, map_smul, ha, smul_smul, hD.val_mul _ a.2 _ b.2, mul_comm]
+    inv_mem' := fun {a} ha => by
+      simp only [Set.mem_setOf_eq, InvMemClass.coe_inv] at ha ⊢
+      have h1 : w = θ a • π (a : G)⁻¹ w := by
+        rw [← map_smul, ← ha, ← hπmul, inv_mul_cancel, map_one]; rfl
+      have h2 : θ (a : G)⁻¹ = (θ a)⁻¹ := eq_inv_of_mul_eq_one_left (hθinv a a.2)
+      rw [h2]
+      conv_rhs => rw [h1]
+      rw [smul_smul, inv_mul_cancel₀ (hθ0 a a.2), one_smul]
+  }
   haveI : CompactSpace Hs := isCompact_iff_compactSpace.mp hD.compact
   have hopen : IsOpen (T : Set Hs) := by
     apply Subgroup.isOpen_of_mem_nhds T (g := 1)

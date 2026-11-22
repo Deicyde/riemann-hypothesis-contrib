@@ -12,17 +12,27 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.JointCond
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.ValInert
 
-theorem conjSelf (D : D7) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (hI : Formalism.UG.IsInertAt D.host.F D.host.E (w.under (𝓞 D.host.F)) w) : IsConjPl D.host w w := by
+theorem conjSelf
+    (D : D7) (w : HeightOneSpectrum (𝓞 D.host.E))
+    (hI : Formalism.UG.IsInertAt D.host.F D.host.E (w.under (𝓞 D.host.F)) w)
+    : IsConjPl D.host w w := by
   intro x y hxy
-  have hw : Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (w.under (𝓞 D.host.F)).asIdeal = w.asIdeal := hI
-  let σ : 𝓞 D.host.E →+* 𝓞 D.host.E := RingOfIntegers.mapRingHom (D.host.conj : D.host.E →+* D.host.E)
-  have hσ : ∀ z : 𝓞 D.host.E, ((σ z : 𝓞 D.host.E) : D.host.E) = D.host.conj (z : D.host.E) := fun z => rfl
+  have hw
+      : Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (w.under (𝓞 D.host.F)).asIdeal
+        = w.asIdeal :=
+    hI
+  let σ : 𝓞 D.host.E →+* 𝓞 D.host.E :=
+    RingOfIntegers.mapRingHom (D.host.conj : D.host.E →+* D.host.E)
+  have hσ : ∀ z : 𝓞 D.host.E, ((σ z : 𝓞 D.host.E) : D.host.E) = D.host.conj (z : D.host.E) :=
+    fun z => rfl
   have key : w.asIdeal ≤ Ideal.comap σ w.asIdeal := by
     conv_lhs => rw [← hw]
     rw [Ideal.map_le_iff_le_comap]
@@ -41,14 +51,17 @@ theorem conjSelf (D : D7) (w : HeightOneSpectrum (𝓞 D.host.E))
   have hx : x = σ y := RingOfIntegers.ext (by rw [hσ, hxy, GlobalTheory.DesignBC.conj_conj])
   exact ⟨fun h => hy ▸ key h, fun h => hx ▸ key h⟩
 
-theorem notSplit (D : D7) (w : HeightOneSpectrum (𝓞 D.host.E)) (h : IsConjPl D.host w w) : ¬ IsSplitPl D.host w := by
+theorem notSplit (D : D7) (w : HeightOneSpectrum (𝓞 D.host.E)) (h : IsConjPl D.host w w)
+    : ¬ IsSplitPl D.host w := by
   rintro ⟨x, hx, hy⟩
   obtain ⟨y, hy'⟩ : ∃ y : 𝓞 D.host.E, (y : D.host.E) = D.host.conj (x : D.host.E) :=
     ⟨RingOfIntegers.mapRingHom (D.host.conj : D.host.E →+* D.host.E) x, rfl⟩
   exact hy y hy' ((h x y hy').1 hx)
 
-theorem xi_eq {D : D7} {nch : NChoice D} {C C' : CharFrame D} (h : C = C') (T : TupTied D C nch) (T' : TupTied D C' nch)
-    (h' : HEq T T') : T.xi = T'.xi := by
+theorem xi_eq
+    {D : D7} {nch : NChoice D} {C C' : CharFrame D}
+    (h : C = C') (T : TupTied D C nch) (T' : TupTied D C' nch) (h' : HEq T T')
+    : T.xi = T'.xi := by
   subst h
   cases h'
   rfl

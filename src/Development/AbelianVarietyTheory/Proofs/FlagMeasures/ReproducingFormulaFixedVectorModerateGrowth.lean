@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicUnitary
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 namespace GlobalTheory.ReproducingFixed
@@ -34,9 +35,10 @@ theorem two_mul_rank_le {n : ℕ} (ε : Fin n → Bool) : 2 * rkR ε ≤ n := by
   rw [Fintype.card_fin] at h3
   omega
 
-theorem weight_condition (B : RowsAut) (h s : ℝ) (hn : 1 ≤ B.I.n) (hb : HBig B 40 h)
-    (hs : s ≤ 2 * (B.I.n : ℝ) ^ 2) (v : InfinitePlace B.I.F) :
-    rkR (B.I.ε v) = 0 ∨ 8 * Real.sqrt (rkR (B.I.ε v)) * (s + 4 * B.I.n * rkR (B.I.ε v)) < h := by
+theorem weight_condition
+    (B : RowsAut) (h s : ℝ)
+    (hn : 1 ≤ B.I.n) (hb : HBig B 40 h) (hs : s ≤ 2 * (B.I.n : ℝ) ^ 2) (v : InfinitePlace B.I.F)
+    : rkR (B.I.ε v) = 0 ∨ 8 * Real.sqrt (rkR (B.I.ε v)) * (s + 4 * B.I.n * rkR (B.I.ε v)) < h := by
   by_cases hq : rkR (B.I.ε v) = 0
   · exact Or.inl hq
   right
@@ -48,14 +50,16 @@ theorem weight_condition (B : RowsAut) (h s : ℝ) (hn : 1 ≤ B.I.n) (hb : HBig
   have hbv := hb v
   unfold HBig at hbv
   have key : s + 4 * B.I.n * rkR (B.I.ε v) ≤ 4 * (B.I.n : ℝ) ^ 2 := by nlinarith
-  have hle : 8 * Real.sqrt (rkR (B.I.ε v)) * (s + 4 * B.I.n * rkR (B.I.ε v)) ≤
-      32 * (B.I.n : ℝ) ^ 2 * Real.sqrt (rkR (B.I.ε v)) := by nlinarith
+  have hle
+      : 8 * Real.sqrt (rkR (B.I.ε v)) * (s + 4 * B.I.n * rkR (B.I.ε v))
+        ≤ 32 * (B.I.n : ℝ) ^ 2 * Real.sqrt (rkR (B.I.ε v)) := by
+    nlinarith
   have hpos : 0 < (B.I.n : ℝ) ^ 2 * Real.sqrt (rkR (B.I.ε v)) := by positivity
   linarith
 
-theorem inv_tau_pow_le (I : AutInst) (hn : 1 ≤ I.n) (x g : I.GA) (hg : g.2 ∈ I.Kset) :
-    (tau1 I (x * g))⁻¹ ^ (2 * I.n ^ 2 * I.f) ≤
-      (tau1 I x)⁻¹ ^ (2 * I.n ^ 2 * I.f) * Real.exp (2 * (I.n : ℝ) ^ 2 * dSum I g.1) := by
+theorem inv_tau_pow_le (I : AutInst) (hn : 1 ≤ I.n) (x g : I.GA) (hg : g.2 ∈ I.Kset)
+    : (tau1 I (x * g))⁻¹ ^ (2 * I.n ^ 2 * I.f)
+      ≤ (tau1 I x)⁻¹ ^ (2 * I.n ^ 2 * I.f) * Real.exp (2 * (I.n : ℝ) ^ 2 * dSum I g.1) := by
   have ha := GlobalTheory.TauLipschitz.trunc_pos I hn x
   have hb := GlobalTheory.TauLipschitz.trunc_pos I hn (x * g)
   have hl := GlobalTheory.TauLipschitz.log_trunc_le I hn x g hg
@@ -72,24 +76,41 @@ theorem inv_tau_pow_le (I : AutInst) (hn : 1 ≤ I.n) (x g : I.GA) (hg : g.2 ∈
     exact this
   have h2 : (tau1 I (x * g))⁻¹ ≤ (tau1 I x)⁻¹ * Real.exp (D / I.f) := by
     have hpos : 0 < tau1 I x * Real.exp (-(D / I.f)) := mul_pos ha (Real.exp_pos _)
-    calc (tau1 I (x * g))⁻¹ ≤ (tau1 I x * Real.exp (-(D / I.f)))⁻¹ := inv_anti₀ hpos h1
+    calc
+      (tau1 I (x * g))⁻¹
+        ≤ (tau1 I x * Real.exp (-(D / I.f)))⁻¹ := inv_anti₀ hpos h1
       _ = (tau1 I x)⁻¹ * Real.exp (D / I.f) := by rw [mul_inv, Real.exp_neg, inv_inv]
   have h3 := pow_le_pow_left₀ (inv_nonneg.mpr hb.le) h2 (2 * I.n ^ 2 * I.f)
   have h4 : ((2 * I.n ^ 2 * I.f : ℕ) : ℝ) * (D / I.f) = 2 * (I.n : ℝ) ^ 2 * D := by
     push_cast
     field_simp
-  calc _ ≤ _ := h3
+  calc
+    _ ≤ _ := h3
     _ = (tau1 I x)⁻¹ ^ (2 * I.n ^ 2 * I.f) * Real.exp (2 * (I.n : ℝ) ^ 2 * D) := by
       rw [mul_pow, ← Real.exp_nat_mul, h4]
 
-theorem reproducing_fixed : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (h : ℝ), IsDSData B d → 1 ≤ B.I.n → LocDec B h → HBig B 40 h → ∀ T, B.I.IsRConv B.μf B.fund B.R (phe B d) T → ∀ (y : B.I.L2 B.μf B.fund) (f : B.I.GA → ℂ) (C : ℝ), T y = y → IsContRep B y f → (∀ x, ‖f x‖ ≤ C * (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f)) → (∃ Φ : B.I.GA → ℝ, Integrable Φ (B.I.muA B.μf) ∧ ∀ x g, ‖phe B d g * f (x * g)‖ ≤ (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) * Φ g) ∧ ∀ x, f x = ∫ g, phe B d g * f (x * g) ∂(B.I.muA B.μf) := by
+theorem reproducing_fixed
+    : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (h : ℝ),
+      IsDSData B d → 1 ≤ B.I.n → LocDec B h → HBig B 40 h
+        → ∀ T,
+          B.I.IsRConv B.μf B.fund B.R (phe B d) T
+            → ∀ (y : B.I.L2 B.μf B.fund) (f : B.I.GA → ℂ) (C : ℝ),
+              T y = y → IsContRep B y f
+                → (∀ x, ‖f x‖ ≤ C * (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f))
+                → (∃ Φ : B.I.GA → ℝ,
+                    Integrable Φ (B.I.muA B.μf)
+                      ∧ ∀ x g,
+                        ‖phe B d g * f (x * g)‖ ≤ (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) * Φ g)
+                  ∧ ∀ x, f x = ∫ g, phe B d g * f (x * g) ∂(B.I.muA B.μf) := by
   intro B d h hd hn hl hb T hT y f C hy hf hC
   have hcr := hf
   unfold IsContRep at hf
   obtain ⟨hfc, hfinv, -⟩ := hf
   obtain ⟨hphc, hphle, hphint⟩ := GlobalTheory.Dec.PhMajProof.phMaj B d h hd hl
   have hwc := fun v => weight_condition B h (2 * (B.I.n : ℝ) ^ 2) hn hb le_rfl v
-  have hint1 : Integrable (fun g => majPh B d h g * Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g)) (muInf B.I) :=
+  have hint1 : Integrable
+      (fun g => majPh B d h g * Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g))
+      (muInf B.I) :=
     hphint (2 * (B.I.n : ℝ) ^ 2) (by positivity) hwc
   obtain ⟨hτpos, hτc, -, -⟩ := GlobalTheory.TauLipschitz.tauLip B.I hn
   have hadm := B.e_adm
@@ -99,10 +120,18 @@ theorem reproducing_fixed : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) 
   unfold AutInst.IsRConvF at hre
   have hmu : B.I.muA B.μf = (muInf B.I).prod B.μf := rfl
   have hmaj0 : ∀ g, 0 ≤ majPh B d h g := fun g => (norm_nonneg _).trans (hphle g)
-  obtain ⟨Φ, hΦdef⟩ : ∃ Φ : B.I.GA → ℝ, Φ = fun g => max C 0 *
-      (majPh B d h g.1 * Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g.1) * ‖B.e g.2‖) := ⟨_, rfl⟩
-  have hΦg : ∀ g, Φ g = max C 0 *
-      (majPh B d h g.1 * Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g.1) * ‖B.e g.2‖) := fun g => by rw [hΦdef]
+  obtain ⟨Φ, hΦdef⟩
+      : ∃ Φ : B.I.GA → ℝ,
+        Φ = fun g =>
+          max C 0 * (majPh B d h g.1 * Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g.1) * ‖B.e g.2‖) :=
+    ⟨_, rfl⟩
+  have hΦg
+      : ∀ g,
+        Φ g
+          = max C 0
+            * (majPh B d h g.1 * Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g.1)
+              * ‖B.e g.2‖) := fun g => by
+    rw [hΦdef]
   have hΦ0 : ∀ g, 0 ≤ Φ g := fun g => by
     rw [hΦg]
     exact mul_nonneg (le_max_right _ _)
@@ -111,24 +140,33 @@ theorem reproducing_fixed : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) 
     rw [hΦdef, hmu]
     have hre1 : Integrable B.e B.μf := hre.1
     exact (hint1.mul_prod hre1.norm).const_mul _
-  have hW0 : ∀ x, 0 ≤ (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) := fun x => pow_nonneg (inv_nonneg.mpr (hτpos x).le) _
-  have hbound : ∀ x g, ‖phe B d g * f (x * g)‖ ≤ (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) * Φ g := by
+  have hW0 : ∀ x, 0 ≤ (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) := fun x =>
+    pow_nonneg (inv_nonneg.mpr (hτpos x).le) _
+  have hbound
+      : ∀ x g, ‖phe B d g * f (x * g)‖ ≤ (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) * Φ g := by
     intro x g
     rw [show phe B d g = ph B d g.1 * B.e g.2 from rfl]
     by_cases he : B.e g.2 = 0
     · rw [he, mul_zero, zero_mul, norm_zero]
       exact mul_nonneg (hW0 x) (hΦ0 g)
     · have h2 := inv_tau_pow_le B.I hn x g (he_supp g.2 he)
-      have h3 : ‖f (x * g)‖ ≤ max C 0 * ((tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) *
-          Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g.1)) :=
-        (hC (x * g)).trans ((mul_le_mul_of_nonneg_right (le_max_left C 0) (hW0 _)).trans
-          (mul_le_mul_of_nonneg_left h2 (le_max_right C 0)))
+      have h3
+          : ‖f (x * g)‖
+            ≤ max C 0
+              * ((tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f)
+                * Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g.1)) :=
+        (hC (x * g)).trans
+          ((mul_le_mul_of_nonneg_right (le_max_left C 0) (hW0 _)).trans
+            (mul_le_mul_of_nonneg_left h2 (le_max_right C 0)))
       rw [norm_mul, norm_mul, hΦg]
-      calc ‖ph B d g.1‖ * ‖B.e g.2‖ * ‖f (x * g)‖
-          ≤ majPh B d h g.1 * ‖B.e g.2‖ * (max C 0 * ((tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) *
-              Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g.1))) :=
-            mul_le_mul (mul_le_mul_of_nonneg_right (hphle g.1) (norm_nonneg _)) h3 (norm_nonneg _)
-              (mul_nonneg (hmaj0 _) (norm_nonneg _))
+      calc
+        ‖ph B d g.1‖ * ‖B.e g.2‖ * ‖f (x * g)‖
+            ≤ majPh B d h g.1 * ‖B.e g.2‖
+              * (max C 0
+                * ((tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f)
+                  * Real.exp (2 * (B.I.n : ℝ) ^ 2 * dSum B.I g.1))) :=
+          mul_le_mul (mul_le_mul_of_nonneg_right (hphle g.1) (norm_nonneg _)) h3 (norm_nonneg _)
+            (mul_nonneg (hmaj0 _) (norm_nonneg _))
         _ = _ := by ring
   obtain ⟨hext1, hext2, -, -⟩ := GlobalTheory.ExtContRep.ext_ae_eq_contRep B y f hcr
   have hrc := (GlobalTheory.ConvKernel.rconv_eq_integral B (phe B d) T hT y).2
@@ -142,8 +180,9 @@ theorem reproducing_fixed : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) 
       (continuous_const.mul continuous_id).aemeasurable
     rw [← hmap] at hext1
     exact ae_of_ae_map hm hext1
-  have hyF : (y : B.I.GA → ℂ) =ᵐ[(B.I.muA B.μf).restrict B.fund]
-      fun x => ∫ g, phe B d g * f (x * g) ∂(B.I.muA B.μf) := by
+  have hyF
+      : (y : B.I.GA → ℂ) =ᵐ[(B.I.muA B.μf).restrict B.fund]
+        fun x => ∫ g, phe B d g * f (x * g) ∂(B.I.muA B.μf) := by
     refine hrc.trans (Filter.Eventually.of_forall fun x => ?_)
     exact integral_congr_ae ((hshift x).mono fun g hg => by simp only [hg])
   have hFc : Continuous fun x => ∫ g, phe B d g * f (x * g) ∂(B.I.muA B.μf) := by
@@ -151,12 +190,15 @@ theorem reproducing_fixed : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) 
     intro x0
     have hcw : Continuous fun x => (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) :=
       (hτc.inv₀ fun x => (hτpos x).ne').pow _
-    have hev : ∀ᶠ x in nhds x0, (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) < (tau1 B.I x0)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) + 1 :=
+    have hev
+        : ∀ᶠ x in nhds x0, (tau1 B.I x)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) < (tau1 B.I x0)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) + 1 :=
       hcw.continuousAt.eventually_lt continuousAt_const (lt_add_one _)
-    refine continuousAt_of_dominated (bound := fun g => ((tau1 B.I x0)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) + 1) * Φ g)
+    refine continuousAt_of_dominated
+      (bound := fun g => ((tau1 B.I x0)⁻¹ ^ (2 * B.I.n ^ 2 * B.I.f) + 1) * Φ g)
       ?_ ?_ (hΦint.const_mul _) ?_
     · exact Filter.Eventually.of_forall fun x =>
-        hT.1.aestronglyMeasurable.mul (hfc.comp (continuous_const.mul continuous_id)).aestronglyMeasurable
+        hT.1.aestronglyMeasurable.mul (hfc.comp (continuous_const.mul
+          continuous_id)).aestronglyMeasurable
     · filter_upwards [hev] with x hx
       exact Filter.Eventually.of_forall fun g =>
         (hbound x g).trans (mul_le_mul_of_nonneg_right hx.le (hΦ0 g))

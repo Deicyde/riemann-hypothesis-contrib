@@ -11,17 +11,24 @@ open UpperTheory.ConvolutionTheory.R
 
 open GlobalTheory.CuspRep Formalism.L2.Host
 
-theorem UpperTheory.ConvolutionTheory.R.fibreCG :
-    ClassChar → Count → NormCharPow → FibreCG := by
+theorem UpperTheory.ConvolutionTheory.R.fibreCG : ClassChar → Count → NormCharPow → FibreCG := by
   intro hC hN hP K M _ _ _ _ _ _ _ _ hl n π P hn hπ
   classical
   obtain ⟨η, hη⟩ := hC K M hl
   obtain ⟨hp1, hp2⟩ := hP K M hl η hη
-  have key : ∀ π₁ : CG K n, UpperTheory.V.Published.WeakBC π₁.HasSat P.HasSat →
-      ((Finset.range (Module.finrank K M)).filter fun j => π₁ = π.twist (η ^ j)).card = 1 := by
+  have key
+      : ∀ π₁ : CG K n,
+        UpperTheory.V.Published.WeakBC π₁.HasSat P.HasSat
+          → ((Finset.range (Module.finrank K M)).filter fun j => π₁ = π.twist (η ^ j)).card
+            = 1 := by
     intro π₁ h₁
-    have := hN K M hl η hη n π π₁ Unit (fun _ => n) (fun _ => P) hn (fun _ => hn)
-      (by rw [sumSat_unit]; exact hπ) (by rw [sumSat_unit]; exact h₁)
+    have :=
+      hN K M hl η hη n π π₁ Unit
+        (fun _ => n)
+        (fun _ => P)
+        hn
+        (fun _ => hn)
+        (by rw [sumSat_unit]; exact hπ) (by rw [sumSat_unit]; exact h₁)
     convert this using 1
     simp
   refine ⟨fun χ hχ he => ?_, fun π₁ h₁ => ?_⟩

@@ -15,16 +15,20 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.FibreProj
+open CategoryTheory AlgebraicGeometry TopologicalSpace ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points
+  GlobalTheory.FibreProj
 
 namespace GlobalTheory.MultPull
 
 open GlobalTheory.TrueGeo.SmallSec GlobalTheory.FrameGlue.Pull
 
-theorem isRatSec_pull_map {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] (j : Y ⟶ X)
-    (hη : j (genericPoint Y) ⤳ genericPoint X) {L : LB X} {r : L.ι → X.functionFieldˣ}
-    (hr : IsRatSec L r) :
-    IsRatSec (L.pull j) fun c => Units.map (fnMap j hη).toMonoidHom (r (c PUnit.unit)) := by
+theorem isRatSec_pull_map
+    {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y]
+    (j : Y ⟶ X) (hη : j (genericPoint Y) ⤳ genericPoint X)
+    {L : LB X} {r : L.ι → X.functionFieldˣ} (hr : IsRatSec L r)
+    : IsRatSec (L.pull j) fun c => Units.map (fnMap j hη).toMonoidHom (r (c PUnit.unit)) := by
   intro c c' h
   have l : (L.pull j).U c ⊓ (L.pull j).U c' ≤ j ⁻¹ᵁ (L.U (c PUnit.unit) ⊓ L.U (c' PUnit.unit)) :=
     fun x hx => ⟨Set.mem_iInter.1 hx.1 PUnit.unit, Set.mem_iInter.1 hx.2 PUnit.unit⟩
@@ -34,18 +38,18 @@ theorem isRatSec_pull_map {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] (j : 
   have e : (L.pull j).g c c' = res l (pullU j _ (L.g (c PUnit.unit) (c' PUnit.unit))) := by
     change ∏ _k : PUnit, _ = _
     exact (Fintype.prod_unique _).trans (zpow_one _)
-  change fnMap j hη (r (c PUnit.unit) : X.functionField) =
-    fnOf _ h ((L.pull j).g c c' : Γ(Y, (L.pull j).U c ⊓ (L.pull j).U c')) *
-      fnMap j hη (r (c' PUnit.unit) : X.functionField)
+  change fnMap j hη (r (c PUnit.unit) : X.functionField)
+    = fnOf _ h ((L.pull j).g c c' : Γ(Y, (L.pull j).U c ⊓ (L.pull j).U c'))
+      * fnMap j hη (r (c' PUnit.unit) : X.functionField)
   rw [hr _ _ h₀, map_mul, fnMap_fnOf j hη h₀ h₁, e]
-  first
-    | exact congrArg (· * _) (fnOf_resG l h _)
-    | exact congrArg (· * _) (fnOf_resG l h _).symm
+  first | exact congrArg (· * _) (fnOf_resG l h _) | exact congrArg (· * _) (fnOf_resG l h _).symm
 
-theorem ord_fnMap {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] [IsLocallyNoetherian X]
-    [IsLocallyNoetherian Y] (j : Y ⟶ X) (hη : j (genericPoint Y) ⤳ genericPoint X) (y : Y)
-    [IsIso (j.stalkMap y)] (f : X.functionField) :
-    Scheme.ord (fnMap j hη f) y = Scheme.ord f (j y) := by
+theorem ord_fnMap
+    {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] [IsLocallyNoetherian X] [IsLocallyNoetherian Y]
+    (j : Y ⟶ X) (hη : j (genericPoint Y) ⤳ genericPoint X)
+    (y : Y) [IsIso (j.stalkMap y)]
+    (f : X.functionField)
+    : Scheme.ord (fnMap j hη f) y = Scheme.ord f (j y) := by
   let e : X.presheaf.stalk (j y) ≃+* Y.presheaf.stalk y :=
     (asIso (j.stalkMap y)).commRingCatIsoToRingEquiv
   have he (a : X.presheaf.stalk (j y)) : e a = j.stalkMap y a := rfl
@@ -57,9 +61,9 @@ theorem ord_fnMap {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] [IsLocallyNoe
   swap
   · rw [Scheme.ord_eq_zero_of_coheight_neq_one (hc ▸ hz), Scheme.ord_eq_zero_of_coheight_neq_one hz]
   have hz' : Order.coheight y = 1 := hc.trans hz
-  have key (a : X.presheaf.stalk (j y)) (ha : a ≠ 0) :
-      Scheme.ord (fnMap j hη (algebraMap _ X.functionField a)) y =
-        Scheme.ord (algebraMap _ X.functionField a) (j y) := by
+  have key (a : X.presheaf.stalk (j y)) (ha : a ≠ 0)
+      : Scheme.ord (fnMap j hη (algebraMap _ X.functionField a)) y
+        = Scheme.ord (algebraMap _ X.functionField a) (j y) := by
     have ha' : j.stalkMap y a ≠ 0 := by rw [← he]; exact (map_ne_zero_iff _ e.injective).2 ha
     rw [fnMap_algebraMap, ord_algebraMap hz' ha', ord_algebraMap hz ha, ← he]
     exact congrArg (fun n : ℕ∞ => ((n.toNat : ℕ) : ℤ)) (ord_map_ringEquiv e a)
@@ -85,4 +89,3 @@ theorem ord_fnMap {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] [IsLocallyNoe
   omega
 
 end GlobalTheory.MultPull
-

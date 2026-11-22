@@ -16,42 +16,50 @@ open scoped ComplexOrder
 
 namespace PositivityTheory.KB.SmoothPartitionUnityBasic
 
-private def thB {L : Type} [Field L] [NumberField L] {N : ℕ} (h : HS L N) :
-    VR L N →ₗ[ℝ] VR L N →ₗ[ℝ] ℝ :=
-  LinearMap.mk₂ ℝ (fun x y => ∑ w, (star (x w) ⬝ᵥ (mat h w *ᵥ y w)).re)
+private def thB {L : Type} [Field L] [NumberField L] {N : ℕ} (h : HS L N)
+    : VR L N →ₗ[ℝ] VR L N →ₗ[ℝ] ℝ :=
+  LinearMap.mk₂ ℝ
+    (fun x y => ∑ w, (star (x w) ⬝ᵥ (mat h w *ᵥ y w)).re)
     (fun x x' y => by simp [add_dotProduct, Finset.sum_add_distrib])
     (fun c x y => by simp [smul_dotProduct, Finset.mul_sum])
     (fun x y y' => by simp [mulVec_add, dotProduct_add, Finset.sum_add_distrib])
     (fun c x y => by simp [mulVec_smul, dotProduct_smul, Finset.mul_sum])
 
-private theorem thB_self {L : Type} [Field L] [NumberField L] {N : ℕ} (h : HS L N) (x : VR L N) :
-    thB h x x = qR h x := rfl
+private theorem thB_self {L : Type} [Field L] [NumberField L] {N : ℕ} (h : HS L N) (x : VR L N)
+    : thB h x x = qR h x :=
+  rfl
 
-private theorem th_qsmul {L : Type} [Field L] [NumberField L] {N : ℕ} (t : ℝ) (k : HS L N)
-    (v : Lat L N) : q (t • k) v = t * q k v :=
+private theorem th_qsmul
+    {L : Type} [Field L] [NumberField L] {N : ℕ} (t : ℝ) (k : HS L N) (v : Lat L N)
+    : q (t • k) v = t * q k v :=
   (UpperTheory.V.KT.ev v).map_smul t k
 
-private def thKB {L : Type} [Field L] [NumberField L] {N : ℕ} (c C' : ℝ)
-    (B : Matrix (Fin N) (Fin N) (𝓞 L)) : Set (HS L N) :=
+private def thKB
+    {L : Type} [Field L] [NumberField L] {N : ℕ} (c C' : ℝ) (B : Matrix (Fin N) (Fin N) (𝓞 L))
+    : Set (HS L N) :=
   {k | (∀ v : Lat L N, v ≠ 0 → c ≤ q k v) ∧ ∀ a, q k (fun i => B i a) ≤ C'}
 
-private theorem star_dotProduct_mulVec_swap_of_isHermitian {N : ℕ} {K : Matrix (Fin N) (Fin N) ℂ} (hK : K.IsHermitian) (x y : Fin N → ℂ) :
-    star y ⬝ᵥ (K *ᵥ x) = star (star x ⬝ᵥ (K *ᵥ y)) := by
+private theorem star_dotProduct_mulVec_swap_of_isHermitian
+    {N : ℕ} {K : Matrix (Fin N) (Fin N) ℂ} (hK : K.IsHermitian) (x y : Fin N → ℂ)
+    : star y ⬝ᵥ (K *ᵥ x) = star (star x ⬝ᵥ (K *ᵥ y)) := by
   rw [star_dotProduct, star_mulVec, ← dotProduct_mulVec]
   congr 2
   exact congrArg (· *ᵥ y) hK.eq
 
-private theorem norm_dotProduct_mulVec_le_re_add_re_of_posSemidef {N : ℕ} {K : Matrix (Fin N) (Fin N) ℂ} (hK : K.PosSemidef) (x y : Fin N → ℂ) :
-    ‖star x ⬝ᵥ (K *ᵥ y)‖ ≤ (star x ⬝ᵥ (K *ᵥ x)).re + (star y ⬝ᵥ (K *ᵥ y)).re := by
+private theorem norm_dotProduct_mulVec_le_re_add_re_of_posSemidef
+    {N : ℕ} {K : Matrix (Fin N) (Fin N) ℂ} (hK : K.PosSemidef) (x y : Fin N → ℂ)
+    : ‖star x ⬝ᵥ (K *ᵥ y)‖ ≤ (star x ⬝ᵥ (K *ᵥ x)).re + (star y ⬝ᵥ (K *ᵥ y)).re := by
   have h1 := hK.re_dotProduct_nonneg (x + y)
   have h2 := hK.re_dotProduct_nonneg (x - y)
   have h3 := hK.re_dotProduct_nonneg (x + Complex.I • y)
   have h4 := hK.re_dotProduct_nonneg (x - Complex.I • y)
   have hs := star_dotProduct_mulVec_swap_of_isHermitian hK.1 x y
-  simp only [RCLike.re_to_complex, star_add, star_sub, star_smul, mulVec_add, mulVec_sub, mulVec_smul,
-    add_dotProduct, sub_dotProduct, dotProduct_add, dotProduct_sub, smul_dotProduct, dotProduct_smul,
-    smul_eq_mul, hs] at h1 h2 h3 h4
-  simp [Complex.add_re, Complex.sub_re, Complex.mul_re, Complex.conj_re, Complex.conj_im] at h1 h2 h3 h4
+  simp only [RCLike.re_to_complex, star_add, star_sub, star_smul, mulVec_add, mulVec_sub,
+      mulVec_smul, add_dotProduct, sub_dotProduct, dotProduct_add, dotProduct_sub, smul_dotProduct,
+      dotProduct_smul, smul_eq_mul, hs]
+    at h1 h2 h3 h4
+  simp [Complex.add_re, Complex.sub_re, Complex.mul_re, Complex.conj_re, Complex.conj_im]
+    at h1 h2 h3 h4
   refine (Complex.norm_le_abs_re_add_abs_im _).trans ?_
   have e1 : |(star x ⬝ᵥ (K *ᵥ y)).re| ≤ ((star x ⬝ᵥ (K *ᵥ x)).re + (star y ⬝ᵥ (K *ᵥ y)).re) / 2 :=
     abs_le.mpr ⟨by linarith, by linarith⟩
@@ -59,26 +67,36 @@ private theorem norm_dotProduct_mulVec_le_re_add_re_of_posSemidef {N : ℕ} {K :
     abs_le.mpr ⟨by linarith, by linarith⟩
   linarith
 
-private theorem smul_mem_pos_of_pos {L : Type} [Field L] [NumberField L] {N : ℕ} {k : HS L N}
-    (hk : k ∈ Pos L N) {t : ℝ} (ht : 0 < t) : t • k ∈ Pos L N := by
+private theorem smul_mem_pos_of_pos
+    {L : Type} [Field L] [NumberField L]
+    {N : ℕ} {k : HS L N} (hk : k ∈ Pos L N)
+    {t : ℝ} (ht : 0 < t)
+    : t • k ∈ Pos L N := by
   intro w
   have : mat (t • k) w = t • mat k w := by ext i j; simp [mat]
   rw [this]
   exact (hk w).smul ht
 
-private theorem re_dotProduct_mat_mulVec_le_qR {L : Type} [Field L] [NumberField L] {N : ℕ} {k : HS L N}
-    (hk : k ∈ Pos L N) (z : VR L N) (w : InfinitePlace L) :
-    (star (z w) ⬝ᵥ (mat k w *ᵥ z w)).re ≤ qR k z := by
+private theorem re_dotProduct_mat_mulVec_le_qR
+    {L : Type} [Field L] [NumberField L]
+    {N : ℕ} {k : HS L N} (hk : k ∈ Pos L N) (z : VR L N)
+    (w : InfinitePlace L)
+    : (star (z w) ⬝ᵥ (mat k w *ᵥ z w)).re ≤ qR k z := by
   unfold qR
-  exact Finset.single_le_sum (f := fun w => (star (z w) ⬝ᵥ (mat k w *ᵥ z w)).re)
-    (fun w _ => (hk w).posSemidef.re_dotProduct_nonneg (z w)) (Finset.mem_univ w)
+  exact Finset.single_le_sum
+    (f := fun w => (star (z w) ⬝ᵥ (mat k w *ᵥ z w)).re)
+    (fun w _ => (hk w).posSemidef.re_dotProduct_nonneg (z w))
+    (Finset.mem_univ w)
 
-private theorem qR_nonneg_of_mem_pos {L : Type} [Field L] [NumberField L] {N : ℕ} {k : HS L N}
-    (hk : k ∈ Pos L N) (z : VR L N) : 0 ≤ qR k z :=
+private theorem qR_nonneg_of_mem_pos
+    {L : Type} [Field L] [NumberField L] {N : ℕ} {k : HS L N} (hk : k ∈ Pos L N) (z : VR L N)
+    : 0 ≤ qR k z :=
   Finset.sum_nonneg fun w _ => (hk w).posSemidef.re_dotProduct_nonneg (z w)
 
-private theorem thKB_subset_pos {L : Type} [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] {N : ℕ}
-    {c C' : ℝ} (hc : 0 < c) (B : Matrix (Fin N) (Fin N) (𝓞 L)) : thKB c C' B ⊆ Pos L N := by
+private theorem thKB_subset_pos
+    {L : Type} [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L]
+    {N : ℕ} {c C' : ℝ} (hc : 0 < c) (B : Matrix (Fin N) (Fin N) (𝓞 L))
+    : thKB c C' B ⊆ Pos L N := by
   intro k hk
   have hR : c⁻¹ • k ∈ Ry L N := by
     intro y hy
@@ -89,21 +107,24 @@ private theorem thKB_subset_pos {L : Type} [Field L] [NumberField L] [_root_.Num
   have := smul_mem_pos_of_pos (rypos L N hR) hc
   rwa [smul_smul, mul_inv_cancel₀ hc.ne', one_smul] at this
 
-private theorem exists_injective_linearMap_gram_of_det_ne_zero {L : Type} [Field L] [NumberField L] {N : ℕ}
-    (B : Matrix (Fin N) (Fin N) (𝓞 L)) (hB : B.det ≠ 0) :
-    ∃ Φ : HS L N →ₗ[ℝ] (InfinitePlace L → Fin N → Fin N → ℂ), Function.Injective Φ ∧
-      ∀ k w a b, Φ k w a b = star (toR (fun i => B i a) w) ⬝ᵥ (mat k w *ᵥ toR (fun i => B i b) w) := by
-  let Φ : HS L N →ₗ[ℝ] (InfinitePlace L → Fin N → Fin N → ℂ) :=
-    { toFun := fun k w a b => star (toR (fun i => B i a) w) ⬝ᵥ (mat k w *ᵥ toR (fun i => B i b) w)
-      map_add' := fun k k' => by
-        ext w a b
-        have : mat (k + k') w = mat k w + mat k' w := rfl
-        simp only [this, add_mulVec, dotProduct_add, Pi.add_apply]
-      map_smul' := fun t k => by
-        ext w a b
-        have : mat (t • k) w = (t : ℂ) • mat k w := by ext i j; simp [mat]
-        simp only [this, smul_mulVec, dotProduct_smul, Pi.smul_apply, RingHom.id_apply]
-        simp [Complex.real_smul] }
+private theorem exists_injective_linearMap_gram_of_det_ne_zero
+    {L : Type} [Field L] [NumberField L] {N : ℕ} (B : Matrix (Fin N) (Fin N) (𝓞 L)) (hB : B.det ≠ 0)
+    : ∃ Φ : HS L N →ₗ[ℝ] (InfinitePlace L → Fin N → Fin N → ℂ),
+      Function.Injective Φ
+        ∧ ∀ k w a b,
+          Φ k w a b = star (toR (fun i => B i a) w) ⬝ᵥ (mat k w *ᵥ toR (fun i => B i b) w) := by
+  let Φ : HS L N →ₗ[ℝ] (InfinitePlace L → Fin N → Fin N → ℂ) := {
+    toFun := fun k w a b => star (toR (fun i => B i a) w) ⬝ᵥ (mat k w *ᵥ toR (fun i => B i b) w)
+    map_add' := fun k k' => by
+      ext w a b
+      have : mat (k + k') w = mat k w + mat k' w := rfl
+      simp only [this, add_mulVec, dotProduct_add, Pi.add_apply]
+    map_smul' := fun t k => by
+      ext w a b
+      have : mat (t • k) w = (t : ℂ) • mat k w := by ext i j; simp [mat]
+      simp only [this, smul_mulVec, dotProduct_smul, Pi.smul_apply, RingHom.id_apply]
+      simp [Complex.real_smul]
+  }
   refine ⟨Φ, ?_, fun _ _ _ _ => rfl⟩
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro k hk
@@ -116,27 +137,28 @@ private theorem exists_injective_linearMap_gram_of_det_ne_zero {L : Type} [Field
       have hinj : Function.Injective (embO (L := L) w) := fun x y hxy =>
         RingOfIntegers.coe_injective (w.embedding.injective hxy)
       exact hinj (by rw [h0, map_zero])
-    have hdetH : IsUnit Pᴴ.det := by
-      rw [det_conjTranspose]; exact hdet.star
+    have hdetH : IsUnit Pᴴ.det := by rw [det_conjTranspose]; exact hdet.star
     have h0 : Pᴴ * mat k w * P = 0 := by
       ext a b
       have := congrFun (congrFun (congrFun hk w) a) b
-      simp only [Matrix.mul_apply, Matrix.mulVec, dotProduct, Finset.mul_sum, Finset.sum_mul, mul_assoc,
-        conjTranspose_apply, Matrix.zero_apply]
+      simp only [Matrix.mul_apply, Matrix.mulVec, dotProduct, Finset.mul_sum, Finset.sum_mul,
+        mul_assoc, conjTranspose_apply, Matrix.zero_apply]
       rw [Finset.sum_comm]
       simpa [Φ, toR, hP, Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc] using this
-    calc mat k w = (Pᴴ)⁻¹ * (Pᴴ * mat k w * P) * P⁻¹ := by
-          rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hdetH, Matrix.one_mul,
-            Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hdet, Matrix.mul_one]
+    calc
+      mat k w = (Pᴴ)⁻¹ * (Pᴴ * mat k w * P) * P⁻¹ := by
+        rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hdetH, Matrix.one_mul,
+          Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hdet, Matrix.mul_one]
       _ = 0 := by rw [h0]; simp
   apply Subtype.ext
   funext w i j
   have := congrFun (congrFun (hw w) i) j
   simpa [mat] using this
 
-private theorem isCompact_thKB_of_det_ne_zero {L : Type} [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] {N : ℕ}
-    {c D : ℝ} (hc : 0 < c) (hD : 0 ≤ D) (B : Matrix (Fin N) (Fin N) (𝓞 L)) (hB : B.det ≠ 0) :
-    IsCompact (thKB c D B) := by
+private theorem isCompact_thKB_of_det_ne_zero
+    {L : Type} [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L]
+    {N : ℕ} {c D : ℝ} (hc : 0 < c) (hD : 0 ≤ D) (B : Matrix (Fin N) (Fin N) (𝓞 L)) (hB : B.det ≠ 0)
+    : IsCompact (thKB c D B) := by
   obtain ⟨Φ, hinj, hΦ⟩ := exists_injective_linearMap_gram_of_det_ne_zero B hB
   let e := LinearEquiv.ofInjective Φ hinj
   have hcont : Continuous e.symm :=
@@ -145,17 +167,20 @@ private theorem isCompact_thKB_of_det_ne_zero {L : Type} [Field L] [NumberField 
     (UpperTheory.V.KT.ev v).continuous_of_finiteDimensional
   have hcl : IsClosed (thKB c D B) := by
     have h1 : IsClosed {k : HS L N | ∀ v : Lat L N, v ≠ 0 → c ≤ q k v} := by
-      have : {k : HS L N | ∀ v : Lat L N, v ≠ 0 → c ≤ q k v} = ⋂ v : Lat L N, ⋂ (_ : v ≠ 0), {k | c ≤ q k v} := by
+      have : {k : HS L N | ∀ v : Lat L N, v ≠ 0 → c ≤ q k v}
+          = ⋂ v : Lat L N, ⋂ (_ : v ≠ 0), {k | c ≤ q k v} := by
         ext; simp
       rw [this]
       exact isClosed_iInter fun v => isClosed_iInter fun _ => isClosed_le continuous_const (hq v)
     have h2 : IsClosed {k : HS L N | ∀ a, q k (fun i => B i a) ≤ D} := by
-      have : {k : HS L N | ∀ a, q k (fun i => B i a) ≤ D} = ⋂ a, {k | q k (fun i => B i a) ≤ D} := by
+      have : {k : HS L N | ∀ a, q k (fun i => B i a) ≤ D}
+          = ⋂ a, {k | q k (fun i => B i a) ≤ D} := by
         ext; simp
       rw [this]
       exact isClosed_iInter fun a => isClosed_le (hq _) continuous_const
     exact h1.inter h2
-  refine ((isCompact_closedBall (0 : LinearMap.range Φ) (2 * D)).image hcont).of_isClosed_subset hcl ?_
+  refine ((isCompact_closedBall (0 : LinearMap.range Φ) (2 * D)).image hcont).of_isClosed_subset hcl
+    ?_
   intro k hk
   have hkP := thKB_subset_pos (C' := D) hc B hk
   refine ⟨e k, ?_, e.symm_apply_apply k⟩
@@ -173,17 +198,20 @@ private theorem isCompact_thKB_of_det_ne_zero {L : Type} [Field L] [NumberField 
   change qR k _ ≤ D at ha hb
   linarith
 
-private theorem star_dotProduct_mulVec_inv_mulVec_of_posDef {N : ℕ} {K : Matrix (Fin N) (Fin N) ℂ} (hK : K.PosDef) (b x : Fin N → ℂ) :
-    star (K⁻¹ *ᵥ b) ⬝ᵥ (K *ᵥ x) = star b ⬝ᵥ x ∧ star x ⬝ᵥ (K *ᵥ (K⁻¹ *ᵥ b)) = star x ⬝ᵥ b := by
+private theorem star_dotProduct_mulVec_inv_mulVec_of_posDef
+    {N : ℕ} {K : Matrix (Fin N) (Fin N) ℂ} (hK : K.PosDef) (b x : Fin N → ℂ)
+    : star (K⁻¹ *ᵥ b) ⬝ᵥ (K *ᵥ x) = star b ⬝ᵥ x ∧ star x ⬝ᵥ (K *ᵥ (K⁻¹ *ᵥ b)) = star x ⬝ᵥ b := by
   have hu : IsUnit K.det := (isUnit_iff_isUnit_det K).mp hK.isUnit
   constructor
-  · rw [star_mulVec, hK.isHermitian.inv.eq, ← dotProduct_mulVec, mulVec_mulVec, nonsing_inv_mul _ hu,
-      one_mulVec]
+  · rw [star_mulVec, hK.isHermitian.inv.eq, ← dotProduct_mulVec, mulVec_mulVec,
+      nonsing_inv_mul _ hu, one_mulVec]
   · rw [mulVec_mulVec, mul_nonsing_inv _ hu, one_mulVec]
 
-private theorem spans_setOf_q_le_ten_mul_of_covering {L : Type} [Field L] [NumberField L] {N : ℕ} (h : HS L N)
-    (hh : h ∈ Pos L N) {ρ : ℝ} (hρ : 0 < ρ) (hT : ∀ z : VR L N, ∃ v : Lat L N, qR h (z - toR v) ≤ ρ) :
-    Spans {v : Lat L N | q h v ≤ 10 * ρ} := by
+private theorem spans_setOf_q_le_ten_mul_of_covering
+    {L : Type} [Field L] [NumberField L]
+    {N : ℕ} (h : HS L N) (hh : h ∈ Pos L N)
+    {ρ : ℝ} (hρ : 0 < ρ) (hT : ∀ z : VR L N, ∃ v : Lat L N, qR h (z - toR v) ≤ ρ)
+    : Spans {v : Lat L N | q h v ≤ 10 * ρ} := by
   by_contra hne
   unfold Spans at hne
   obtain ⟨f, hf0, hfk⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hne)
@@ -260,8 +288,9 @@ private theorem spans_setOf_q_le_ten_mul_of_covering {L : Type} [Field L] [Numbe
     apply Submodule.subset_span
     refine ⟨v, ?_, rfl⟩
     show qR h (toR v) ≤ 10 * ρ
-    have hpar : qR h (toR v) + qR h (t • z + (t • z - toR v)) =
-        2 * (t * t * R) + 2 * qR h (t • z - toR v) := by
+    have hpar
+        : qR h (toR v) + qR h (t • z + (t • z - toR v))
+          = 2 * (t * t * R) + 2 * qR h (t • z - toR v) := by
       rw [← thB_self, ← thB_self, ← thB_self, hRdef]
       simp only [map_sub, map_add (f := _), map_smul, LinearMap.sub_apply, LinearMap.add_apply,
         LinearMap.smul_apply, smul_eq_mul]
@@ -270,10 +299,10 @@ private theorem spans_setOf_q_le_ten_mul_of_covering {L : Type} [Field L] [Numbe
     linarith
   exact hfk hmem
 
-private theorem normSq_det_mul_re_det_le_pow_of_posDef {N : ℕ} {K : Matrix (Fin N) (Fin N) ℂ} (hK : K.PosDef)
-    (P : Matrix (Fin N) (Fin N) ℂ) {D : ℝ} (hD : 0 < D)
-    (hdiag : ∀ a, (star (fun i => P i a) ⬝ᵥ (K *ᵥ fun i => P i a)).re ≤ D) :
-    Complex.normSq P.det * K.det.re ≤ D ^ N := by
+private theorem normSq_det_mul_re_det_le_pow_of_posDef
+    {N : ℕ} {K : Matrix (Fin N) (Fin N) ℂ} (hK : K.PosDef) (P : Matrix (Fin N) (Fin N) ℂ)
+    {D : ℝ} (hD : 0 < D) (hdiag : ∀ a, (star (fun i => P i a) ⬝ᵥ (K *ᵥ fun i => P i a)).re ≤ D)
+    : Complex.normSq P.det * K.det.re ≤ D ^ N := by
   have hG : (Pᴴ * K * P).PosSemidef := hK.posSemidef.conjTranspose_mul_mul_same P
   have hentry : ∀ a b, (Pᴴ * K * P) a b = star (fun i => P i a) ⬝ᵥ (K *ᵥ fun i => P i b) := by
     intro a b
@@ -297,8 +326,9 @@ private theorem normSq_det_mul_re_det_le_pow_of_posDef {N : ℕ} {K : Matrix (Fi
   rw [inv_pow, mul_assoc, inv_mul_le_iff₀ (by positivity), mul_one] at h1
   exact h1
 
-private theorem prod_normSq_embedding_eq_abs_norm_of_isTotallyComplex {L : Type} [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] (x : L) :
-    ∏ w : InfinitePlace L, Complex.normSq (w.embedding x) = |(Algebra.norm ℚ x : ℝ)| := by
+private theorem prod_normSq_embedding_eq_abs_norm_of_isTotallyComplex
+    {L : Type} [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] (x : L)
+    : ∏ w : InfinitePlace L, Complex.normSq (w.embedding x) = |(Algebra.norm ℚ x : ℝ)| := by
   have := InfinitePlace.prod_eq_abs_norm x
   have h2 : ∀ w : InfinitePlace L, w.mult = 2 := fun w =>
     InfinitePlace.mult_isComplex ⟨w, IsTotallyComplex.isComplex w⟩
@@ -307,24 +337,30 @@ private theorem prod_normSq_embedding_eq_abs_norm_of_isTotallyComplex {L : Type}
   refine Finset.prod_congr rfl fun w _ => ?_
   rw [Complex.normSq_eq_norm_sq, InfinitePlace.norm_embedding_eq]
 
-private theorem nrmDet_le_mul_div_pow_of_q_le {L : Type} [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] {N : ℕ}
-    (h : HS L N) (hh : h ∈ Pos L N) {c D : ℝ} (hc : 0 < c) (hD : 0 < D)
-    (hlam : ∀ v : Lat L N, v ≠ 0 → c ≤ q h v) (A : Matrix (Fin N) (Fin N) (𝓞 L))
-    (hA : ∀ a, q h (fun i => A i a) ≤ D) :
-    (nrmDet A : ℝ) ≤ I0 L N * (D / c) ^ (N * Fintype.card (InfinitePlace L)) := by
+private theorem nrmDet_le_mul_div_pow_of_q_le
+    {L : Type} [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L]
+    {N : ℕ} (h : HS L N) (hh : h ∈ Pos L N)
+    {c D : ℝ} (hc : 0 < c) (hD : 0 < D) (hlam : ∀ v : Lat L N, v ≠ 0 → c ≤ q h v)
+    (A : Matrix (Fin N) (Fin N) (𝓞 L)) (hA : ∀ a, q h (fun i => A i a) ≤ D)
+    : (nrmDet A : ℝ) ≤ I0 L N * (D / c) ^ (N * Fintype.card (InfinitePlace L)) := by
   set r := Fintype.card (InfinitePlace L) with hr
-  have hw : ∀ w : InfinitePlace L,
-      Complex.normSq (w.embedding (A.det : L)) * (mat h w).det.re ≤ D ^ N := by
+  have hw
+      : ∀ w : InfinitePlace L,
+        Complex.normSq (w.embedding (A.det : L)) * (mat h w).det.re ≤ D ^ N := by
     intro w
     have hdet : (A.map (embO w)).det = w.embedding (A.det : L) := by
       rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]; rfl
-    have := normSq_det_mul_re_det_le_pow_of_posDef (hh w) (A.map (embO w)) hD (fun a =>
-      (re_dotProduct_mat_mulVec_le_qR hh (toR fun i => A i a) w).trans (hA a))
+    have :=
+      normSq_det_mul_re_det_le_pow_of_posDef (hh w) (A.map (embO w)) hD
+        (fun a => (re_dotProduct_mat_mulVec_le_qR hh (toR fun i => A i a) w).trans (hA a))
     rwa [hdet] at this
   have hpos : ∀ w, 0 < (mat h w).det.re := fun w => (Complex.pos_iff.mp (hh w).det_pos).1
-  have hprod : (∏ w : InfinitePlace L, Complex.normSq (w.embedding (A.det : L))) * ∏ w, (mat h w).det.re ≤ (D ^ N) ^ r := by
+  have hprod
+      : (∏ w : InfinitePlace L, Complex.normSq (w.embedding (A.det : L))) * ∏ w, (mat h w).det.re
+        ≤ (D ^ N) ^ r := by
     rw [← Finset.prod_mul_distrib, hr, ← Finset.card_univ, ← Finset.prod_const]
-    exact Finset.prod_le_prod₀ (fun w _ => mul_nonneg (Complex.normSq_nonneg _) (hpos w).le)
+    exact Finset.prod_le_prod₀
+      (fun w _ => mul_nonneg (Complex.normSq_nonneg _) (hpos w).le)
       (fun w _ => hw w)
   have hRy : c⁻¹ • h ∈ Ry L N := by
     intro y hy
@@ -351,7 +387,8 @@ private theorem nrmDet_le_mul_div_pow_of_q_le {L : Type} [Field L] [NumberField 
   set Y := (I0 L N : ℝ) * ((c⁻¹) ^ N) ^ r
   have hY : 0 ≤ Y := by positivity
   have h1 : 1 ≤ Y * PK := by simp only [Y, mul_assoc]; exact hdl
-  calc X ≤ X * (Y * PK) := le_mul_of_one_le_right hX h1
+  calc
+    X ≤ X * (Y * PK) := le_mul_of_one_le_right hX h1
     _ = Y * (X * PK) := by ring
     _ ≤ Y * (D ^ N) ^ r := mul_le_mul_of_nonneg_left hprod hY
     _ = I0 L N * (D / c) ^ (N * r) := by
@@ -383,10 +420,11 @@ theorem pf_GThick : GThick := by
       have := hAn.trans (Nat.le_ceil _)
       exact_mod_cast this
     obtain ⟨g, hg⟩ := hS A hA0 hJ
-    have hcol : ∀ a, g⁻¹ • (fun i => ((g : Matrix (Fin N) (Fin N) (𝓞 L)) * A) i a) = fun i => A i a := by
+    have hcol
+        : ∀ a, g⁻¹ • (fun i => ((g : Matrix (Fin N) (Fin N) (𝓞 L)) * A) i a) = fun i => A i a := by
       intro a
-      have : (fun i => ((g : Matrix (Fin N) (Fin N) (𝓞 L)) * A) i a) =
-          (g : Matrix (Fin N) (Fin N) (𝓞 L)) *ᵥ (fun i => A i a) := by
+      have : (fun i => ((g : Matrix (Fin N) (Fin N) (𝓞 L)) * A) i a)
+          = (g : Matrix (Fin N) (Fin N) (𝓞 L)) *ᵥ (fun i => A i a) := by
         ext i; simp [Matrix.mul_apply, Matrix.mulVec, dotProduct]
       rw [this]
       show ((g⁻¹ : Gm L N) : Matrix (Fin N) (Fin N) (𝓞 L)) *ᵥ ((g : Matrix (Fin N) (Fin N) (𝓞 L)) *ᵥ _) = _

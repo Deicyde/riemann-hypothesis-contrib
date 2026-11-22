@@ -10,12 +10,13 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Coordina
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 noncomputable section
 namespace GlobalTheory.CompanionTheory.GrForm.FrameEx
 
-theorem dividedPowerFiltration_dividedPowersBot (O : Type) [CommRing O] {n : ℕ} (hn : n ≠ 0) :
-    pdP (dividedPowersBot O) n = ⊥ := by
+theorem dividedPowerFiltration_dividedPowersBot (O : Type) [CommRing O] {n : ℕ} (hn : n ≠ 0)
+    : pdP (dividedPowersBot O) n = ⊥ := by
   refine le_bot_iff.1 (Ideal.span_le.2 ?_)
   rintro _ ⟨l, hl, hr, rfl⟩
   have hpos : ∃ p ∈ l, p.1 ≠ 0 := by
@@ -47,40 +48,50 @@ end GlobalTheory.CompanionTheory.GrForm.FrameEx
 
 namespace GlobalTheory.CompanionTheory.GrForm
 
-
 open FrameEx in
 theorem stFrame : StFrame := by
   intro O _ l s hb X q W d c u hu
   letI := (strV q W).toAlgebra
-  obtain ⟨c', e, hTF, he1, het, hev⟩ := GlobalTheory.T.exists_chart_from_coordinates (O := O) (R := O) (I := ⊥) (dividedPowersBot O) l s hb q
-    (Ideal.Quotient.mk ⊥) (fun a => rfl) c
+  obtain ⟨c', e, hTF, he1, het, hev⟩ :=
+    GlobalTheory.T.exists_chart_from_coordinates (O := O) (R := O) (I := ⊥) (dividedPowersBot O) l s
+      hb q (Ideal.Quotient.mk ⊥)
+      (fun a => rfl)
+      c
   have good := GlobalTheory.T.chart_is_good c'
   have hQ : ∀ T, SS q l s W T → InU W T := inU_of_SS
   have hD : SS q l s W c'.D := ⟨hTF, W, rfl, c'.inV⟩
-  obtain ⟨hpow, hgr⟩ := GlobalTheory.T.chart_divided_powers_graded_constant c' good (SS q l s W) hQ hD
-  have hval : ∀ (T : Thick (LL q)) (h : InU W T) (σ : c'.D ⟶ T) (f : Γ(X, W)),
-      Ideal.Quotient.mk T.J (σ.φ (e (1 ⊗ₜ f))) = ev T h f := by
+  obtain ⟨hpow, hgr⟩ :=
+    GlobalTheory.T.chart_divided_powers_graded_constant c' good (SS q l s W) hQ hD
+  have hval
+      : ∀ (T : Thick (LL q)) (h : InU W T) (σ : c'.D ⟶ T) (f : Γ(X, W)),
+        Ideal.Quotient.mk T.J (σ.φ (e (1 ⊗ₜ f))) = ev T h f := by
     intro T h σ f
     rw [ev_nat σ c'.inV h f, hev f]
     rfl
-  have hσ : ∀ T : (SS q l s W).FullSubcategory, ∃ σ : c'.D ⟶ T.obj, ∀ i, σ.φ (c'.t i) = u i T.obj := by
+  have hσ
+      : ∀ T : (SS q l s W).FullSubcategory, ∃ σ : c'.D ⟶ T.obj, ∀ i, σ.φ (c'.t i) = u i T.obj := by
     intro T
     have hT := hQ _ T.property
     obtain ⟨σ₀⟩ := good.1 T.obj hT
-    obtain ⟨σ, h1, -⟩ := good.2 T.obj σ₀ (fun i => u i T.obj - σ₀.φ (c'.t i)) (fun i => by
-      refine Ideal.Quotient.eq.1 ?_
-      rw [hu i T.obj hT, ← het i, hval T.obj hT σ₀])
+    obtain ⟨σ, h1, -⟩ :=
+      good.2 T.obj σ₀
+        (fun i => u i T.obj - σ₀.φ (c'.t i))
+        (fun i => by
+          refine Ideal.Quotient.eq.1 ?_
+          rw [hu i T.obj hT, ← het i, hval T.obj hT σ₀])
     exact ⟨σ, fun i => by simpa using h1 i⟩
   choose σ hσ using hσ
   let θ : Γ(X, W) ≃+* (sP (SS q l s W)).A.obj (c'.frame good (SS q l s W) hQ hD).D :=
     ((Algebra.TensorProduct.lid O Γ(X, W)).symm.toRingEquiv).trans e
   have hθ : ∀ f, θ f = e (1 ⊗ₜ f) := fun f => rfl
-  refine ⟨c'.frame good (SS q l s W) hQ hD, fun T => ObjectProperty.homMk (σ T), θ, hgr, ?_, ?_, ?_, ?_⟩
+  refine
+    ⟨c'.frame good (SS q l s W) hQ hD, fun T => ObjectProperty.homMk (σ T), θ, hgr, ?_, ?_, ?_, ?_⟩
   · intro n hn
     change c'.D.pdPow ((n : ℤ).toNat) = ⊥
     rw [Int.toNat_natCast, hpow, dividedPowerFiltration_dividedPowersBot O hn, Ideal.map_bot]
   · intro i T s s'
-    change (s'.hom.φ (c'.t i) - s.hom.φ (c'.t i) : T.obj.B) = s'.hom.φ (θ (c.t i)) - s.hom.φ (θ (c.t i))
+    change (s'.hom.φ (c'.t i) - s.hom.φ (c'.t i) : T.obj.B)
+      = s'.hom.φ (θ (c.t i)) - s.hom.φ (θ (c.t i))
     rw [hθ, het]
   · intro i T
     change (σ T).φ (θ (c.t i)) = u i T.obj

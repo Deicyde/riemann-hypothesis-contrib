@@ -10,8 +10,28 @@ open Formalism.MainNotions.N
 
 namespace GlobalTheory
 
-theorem _root_.GlobalTheory.commute_on_ker_of_commute_on_ker_inter :
-    ∀ (Γ k : Type) [Group Γ] [Field k] [CharZero k] (n : ℕ) (ρ₀ : Γ →* GL (Fin n) k) (η₀ η : Γ →* ℤˣ), (∀ X : Matrix (Fin n) (Fin n) k, (∀ g, ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * X = ((η g : ℤ) : k) • (X * ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k))) → X = 0) → (∀ X : Matrix (Fin n) (Fin n) k, (∀ g, ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * X = (((η * η₀) g : ℤ) : k) • (X * ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k))) → X = 0) → ∀ Y : Matrix (Fin n) (Fin n) k, (∀ g, η₀ g = 1 → η g = 1 → ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * Y = Y * ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)) → ∀ g, η₀ g = 1 → ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * Y = Y * ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
+theorem _root_.GlobalTheory.commute_on_ker_of_commute_on_ker_inter
+    : ∀ (Γ k : Type) [Group Γ] [Field k] [CharZero k] (n : ℕ) (ρ₀ : Γ →* GL (Fin n) k)
+        (η₀ η : Γ →* ℤˣ),
+      (∀ X : Matrix (Fin n) (Fin n) k,
+          (∀ g,
+              ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * X
+                = ((η g : ℤ) : k) • (X * ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)))
+            → X = 0)
+        → (∀ X : Matrix (Fin n) (Fin n) k,
+          (∀ g,
+              ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * X
+                = (((η * η₀) g : ℤ) : k) • (X * ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)))
+            → X = 0)
+        → ∀ Y : Matrix (Fin n) (Fin n) k,
+          (∀ g,
+              η₀ g = 1 → η g = 1
+                → ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * Y
+                  = Y * ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k))
+            → ∀ g,
+              η₀ g = 1
+                → ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) * Y
+                  = Y * ((ρ₀ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
   intro Γ k _ _ _ n ρ₀ η₀ η hη hηη₀ Y hY g hg
   obtain ⟨Y₁, Y₂, rfl, h₁, h₂⟩ :=
     _root_.GlobalTheory.twistedIntertwiner_decomp_of_quadraticKernel Γ k n ρ₀ ρ₀ η₀.ker 1 η Y

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Prime
 
 @[expose] public section
 
-open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk GlobalTheory.Mem
+open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk
+  GlobalTheory.Mem
 open scoped Classical
 
 namespace GlobalTheory.Hk.LamRay
@@ -20,9 +21,11 @@ theorem lamIdeal_nonneg (I : Ideal (𝓞 K)) : 0 ≤ lamIdeal I := by
   · exact Real.log_natCast_nonneg _
   · exact le_rfl
 
-theorem pow_prime_norm (hK : Module.finrank ℚ K = 2) {P : Ideal (𝓞 K)} {k : ℕ} (hP : P.IsPrime) (h0 : P ≠ ⊥)
-    (hk : 1 ≤ k) : IsPrimePow (Ideal.absNorm (P ^ k)) ∧
-      P ∣ Ideal.span {((Ideal.absNorm (P ^ k)).minFac : 𝓞 K)} ∧ 1 < Ideal.absNorm P := by
+theorem pow_prime_norm
+    (hK : Module.finrank ℚ K = 2)
+    {P : Ideal (𝓞 K)} {k : ℕ} (hP : P.IsPrime) (h0 : P ≠ ⊥) (hk : 1 ≤ k)
+    : IsPrimePow (Ideal.absNorm (P ^ k)) ∧ P ∣ Ideal.span {((Ideal.absNorm (P ^ k)).minFac : 𝓞 K)}
+      ∧ 1 < Ideal.absNorm P := by
   let v : IsDedekindDomain.HeightOneSpectrum (𝓞 K) := ⟨P, hP, h0⟩
   obtain ⟨p, hp, hm⟩ := GlobalTheory.Mem.FewPrimes.exists_prime_mem v
   have hd : P ∣ Ideal.span {(p : 𝓞 K)} := Ideal.dvd_span_singleton.2 hm
@@ -39,8 +42,10 @@ theorem pow_prime_norm (hK : Module.finrank ℚ K = 2) {P : Ideal (𝓞 K)} {k :
   rw [map_pow, he, ← pow_mul, hp.pow_minFac hik]
   exact ⟨(isPrimePow_nat_iff _).2 ⟨p, i * k, hp, Nat.pos_of_ne_zero hik, rfl⟩, hd, he ▸ h1⟩
 
-theorem sum_lamIdeal_le (hK : Module.finrank ℚ K = 2) (n : ℕ) (S : Finset (Ideal (𝓞 K)))
-    (hS : ∀ I ∈ S, Ideal.absNorm I = n) : ∑ I ∈ S, lamIdeal I ≤ 2 * Λ n := by
+theorem sum_lamIdeal_le
+    (hK : Module.finrank ℚ K = 2)
+    (n : ℕ) (S : Finset (Ideal (𝓞 K))) (hS : ∀ I ∈ S, Ideal.absNorm I = n)
+    : ∑ I ∈ S, lamIdeal I ≤ 2 * Λ n := by
   set T := S.filter (fun I => ∃ (P : Ideal (𝓞 K)) (k : ℕ), P.IsPrime ∧ P ≠ ⊥ ∧ 1 ≤ k ∧ I = P ^ k) with hT
   have e : ∑ I ∈ S, lamIdeal I = ∑ I ∈ T, Real.log (Ideal.absNorm I.radical) := by
     rw [hT, Finset.sum_filter]
@@ -49,8 +54,10 @@ theorem sum_lamIdeal_le (hK : Module.finrank ℚ K = 2) (n : ℕ) (S : Finset (I
   rcases T.eq_empty_or_nonempty with h | ⟨I₀, hI₀⟩
   · rw [h, Finset.sum_empty]
     exact mul_nonneg zero_le_two vonMangoldt_nonneg
-  have key : ∀ I ∈ T, IsPrimePow n ∧ I.radical.IsPrime ∧ I.radical ≠ ⊥ ∧
-      I.radical ∣ Ideal.span {(n.minFac : 𝓞 K)} ∧ 1 < Ideal.absNorm I.radical ∧ ∃ k, I = I.radical ^ k := by
+  have key
+      : ∀ I ∈ T,
+        IsPrimePow n ∧ I.radical.IsPrime ∧ I.radical ≠ ⊥ ∧ I.radical ∣ Ideal.span {(n.minFac : 𝓞 K)}
+          ∧ 1 < Ideal.absNorm I.radical ∧ ∃ k, I = I.radical ^ k := by
     intro I hI
     obtain ⟨hIS, P, k, hP, h0, hk, rfl⟩ := Finset.mem_filter.1 hI
     have h := pow_prime_norm hK hP h0 hk
@@ -63,7 +70,8 @@ theorem sum_lamIdeal_le (hK : Module.finrank ℚ K = 2) (n : ℕ) (S : Finset (I
     refine Finset.prod_dvd_of_coprime (fun I hI J hJ hIJ => ?_) (fun I hI => (key I hI).2.2.2.1)
     obtain ⟨-, a1, a2, -, a3, k, a4⟩ := key I hI
     obtain ⟨-, b1, b2, -, -, l, b4⟩ := key J hJ
-    refine Ideal.isCoprime_iff_sup_eq.2 ((a1.isMaximal a2).coprime_of_ne (b1.isMaximal b2) fun h => hIJ ?_)
+    refine Ideal.isCoprime_iff_sup_eq.2 ((a1.isMaximal a2).coprime_of_ne (b1.isMaximal b2) fun h =>
+      hIJ ?_)
     have c1 := hS I (Finset.mem_filter.1 hI).1
     have c2 := hS J (Finset.mem_filter.1 hJ).1
     rw [a4, map_pow] at c1
@@ -83,11 +91,14 @@ theorem sum_lamIdeal_le (hK : Module.finrank ℚ K = 2) (n : ℕ) (S : Finset (I
   rw [Real.log_pow] at h4
   exact_mod_cast h4
 
-
 open QuadraticZeta in
-theorem exists_gen {d : ℕ} (hp : d.Prime) (hd : d % 4 = 3) {r : K} (hr : r ^ 2 = -(d : K))
-    (h2 : Module.finrank ℚ K = 2) : ∃ ω : 𝓞 K, (∀ z : 𝓞 K, ∃ a b : ℤ, z = a + b * ω) ∧
-      ∀ a b : ℤ, Algebra.norm ℤ ((a : 𝓞 K) + b * ω) * 4 = (2 * a + b) ^ 2 + d * b ^ 2 := by
+theorem exists_gen
+    {d : ℕ} (hp : d.Prime) (hd : d % 4 = 3)
+    {r : K} (hr : r ^ 2 = -(d : K))
+    (h2 : Module.finrank ℚ K = 2)
+    : ∃ ω : 𝓞 K,
+      (∀ z : 𝓞 K, ∃ a b : ℤ, z = a + b * ω)
+        ∧ ∀ a b : ℤ, Algebra.norm ℤ ((a : 𝓞 K) + b * ω) * 4 = (2 * a + b) ^ 2 + d * b ^ 2 := by
   have hsq : Squarefree d := hp.squarefree
   have hD := discr_eq_neg_of_sq_eq h2 hsq hd hr
   obtain ⟨w, bar, hw, -, hgen, hσ, σ, hσr⟩ :=
@@ -99,26 +110,26 @@ theorem exists_gen {d : ℕ} (hp : d.Prime) (hd : d % 4 = 3) {r : K} (hr : r ^ 2
     have := congrArg σ hw
     rw [map_mul, map_add (f := _), map_one, map_ofNat, hσr] at this
     linear_combination this / 2
-  have h4 : σ (((a : 𝓞 K) + b * w : 𝓞 K) : K)
-      = ((a + b / 2 : ℝ) : ℂ) + ((b * √d / 2 : ℝ) : ℂ) * Complex.I := by
+  have h4
+      : σ (((a : 𝓞 K) + b * w : 𝓞 K) : K)
+        = ((a + b / 2 : ℝ) : ℂ) + ((b * √d / 2 : ℝ) : ℂ) * Complex.I := by
     have h7 : (((a : 𝓞 K) + b * w : 𝓞 K) : K) = a + b * (w : K) := by simp
     rw [h7, map_add (f := _), map_mul, map_intCast, map_intCast, h3]
     push_cast
     ring
   rw [h4, Complex.sq_norm, Complex.normSq_add_mul_I] at h1
   have h5 : √(d : ℝ) ^ 2 = d := Real.sq_sqrt (Nat.cast_nonneg d)
-  have h6 : ((Algebra.norm ℤ ((a : 𝓞 K) + b * w) : ℤ) : ℝ) * 4
-      = (2 * a + b) ^ 2 + d * b ^ 2 := by
+  have h6 : ((Algebra.norm ℤ ((a : 𝓞 K) + b * w) : ℤ) : ℝ) * 4 = (2 * a + b) ^ 2 + d * b ^ 2 := by
     push_cast at h1
     rw [h1]
     linear_combination (b : ℝ) ^ 2 * h5
   exact_mod_cast h6
 
-theorem normOne_span {d M : ℕ} {ω : 𝓞 K} (hgen : ∀ z : 𝓞 K, ∃ a b : ℤ, z = a + b * ω)
-    (hnorm : ∀ a b : ℤ,
-      Algebra.norm ℤ ((a : 𝓞 K) + b * ω) * 4 = (2 * a + b) ^ 2 + d * b ^ 2)
-    {π : 𝓞 K} (hπ : π - 1 ∈ Ideal.span {(M : 𝓞 K)}) :
-    GlobalTheory.Mem.An.NormOne d M (Ideal.absNorm (Ideal.span {π})) := by
+theorem normOne_span
+    {d M : ℕ} {ω : 𝓞 K} (hgen : ∀ z : 𝓞 K, ∃ a b : ℤ, z = a + b * ω)
+    (hnorm : ∀ a b : ℤ, Algebra.norm ℤ ((a : 𝓞 K) + b * ω) * 4 = (2 * a + b) ^ 2 + d * b ^ 2)
+    {π : 𝓞 K} (hπ : π - 1 ∈ Ideal.span {(M : 𝓞 K)})
+    : GlobalTheory.Mem.An.NormOne d M (Ideal.absNorm (Ideal.span {π})) := by
   obtain ⟨z, hz⟩ := Ideal.mem_span_singleton'.1 hπ
   obtain ⟨a, b, rfl⟩ := hgen z
   have e : π = ((1 + M * a : ℤ) : 𝓞 K) + ((M * b : ℤ) : 𝓞 K) * ω := by
@@ -136,7 +147,12 @@ theorem normOne_span {d M : ℕ} {ω : 𝓞 K} (hgen : ∀ z : 𝓞 K, ∃ a b :
 theorem finite_idealsIn {M : ℕ} (D : RayData K M) (g : D.G) (n : ℕ) : (idealsIn D g n).Finite :=
   (Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) n).subset fun _ h => h.2.2.1
 
-theorem lamRay_props : ∀ (K : Type) [Field K] [NumberField K] (d M : ℕ) (x : K), d.Prime → d % 4 = 3 → 100 ≤ d → x ^ 2 = -(d : K) → Module.finrank ℚ K = 2 → 3 ≤ M → ∀ D : RayData K M, (∀ g n, 0 ≤ lamRay D g n) ∧ (∀ n : ℕ, ∑ g : D.G, lamRay D g n ≤ 2 * Λ n) ∧ ∀ p : ℕ, p.Prime → lamRay D 1 p ≠ 0 → GlobalTheory.Mem.An.NormOne d M p := by
+theorem lamRay_props
+    : ∀ (K : Type) [Field K] [NumberField K] (d M : ℕ) (x : K),
+      d.Prime → d % 4 = 3 → 100 ≤ d → x ^ 2 = -(d : K) → Module.finrank ℚ K = 2 → 3 ≤ M
+        → ∀ D : RayData K M,
+          (∀ g n, 0 ≤ lamRay D g n) ∧ (∀ n : ℕ, ∑ g : D.G, lamRay D g n ≤ 2 * Λ n)
+            ∧ ∀ p : ℕ, p.Prime → lamRay D 1 p ≠ 0 → GlobalTheory.Mem.An.NormOne d M p := by
   intro K _ _ d M x hp hd _ hx hK _ D
   refine ⟨fun g n => ?_, fun n => ?_, fun p _ h => ?_⟩
   · exact finsum_nonneg fun I => finsum_nonneg fun _ => lamIdeal_nonneg I
@@ -149,7 +165,8 @@ theorem lamRay_props : ∀ (K : Type) [Field K] [NumberField K] (d M : ℕ) (x :
       exact ((Set.Finite.mem_toFinset _).1 hg).2.2.1
     · intro g _ g' _ hgg
       refine Finset.disjoint_left.2 fun I h1 h2 => hgg ?_
-      exact ((Set.Finite.mem_toFinset _).1 h1).2.2.2.symm.trans ((Set.Finite.mem_toFinset _).1 h2).2.2.2
+      exact ((Set.Finite.mem_toFinset _).1 h1).2.2.2.symm.trans ((Set.Finite.mem_toFinset _).1
+        h2).2.2.2
   · have hne : (idealsIn D 1 p).Nonempty := by
       rw [Set.nonempty_iff_ne_empty]
       intro h0

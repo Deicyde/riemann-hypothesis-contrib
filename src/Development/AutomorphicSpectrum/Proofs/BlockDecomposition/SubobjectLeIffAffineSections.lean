@@ -9,12 +9,15 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 namespace GlobalTheory.CompanionTheory.GE
 
-theorem hom_eq_zero_of_affineOpens {X : Scheme.{0}} {M N : X.Modules} (φ : M ⟶ N)
-    (h : ∀ (U : X.affineOpens) (s : Γ(M, (U : X.Opens))), φ.app (U : X.Opens) s = 0) : φ = 0 := by
+theorem hom_eq_zero_of_affineOpens
+    {X : Scheme.{0}} {M N : X.Modules}
+    (φ : M ⟶ N) (h : ∀ (U : X.affineOpens) (s : Γ(M, (U : X.Opens))), φ.app (U : X.Opens) s = 0)
+    : φ = 0 := by
   apply Scheme.Modules.hom_ext
   intro U
   rw [Scheme.Modules.Hom.zero_app]
@@ -22,14 +25,17 @@ theorem hom_eq_zero_of_affineOpens {X : Scheme.{0}} {M N : X.Modules} (φ : M �
   have key : ∀ s : Γ(M, U), φ.app U s = 0 := by
     intro s
     refine TopCat.Sheaf.eq_of_locally_eq' F
-      (fun i : {V : X.affineOpens // (V : X.Opens) ≤ U} => (i.1 : X.Opens)) U
-      (fun i => homOfLE i.2) ?_ _ _ ?_
+      (fun i : {V : X.affineOpens // (V : X.Opens) ≤ U} => (i.1 : X.Opens))
+      U
+      (fun i => homOfLE i.2)
+      ?_ _ _ ?_
     · refine fun x (hx : x ∈ U) => ?_
       obtain ⟨W, hW, hxW, hWU⟩ := exists_isAffineOpen_mem_and_subset hx
       exact TopologicalSpace.Opens.mem_iSup.mpr ⟨⟨⟨W, hW⟩, hWU⟩, hxW⟩
     · intro i
-      have hnat := ConcreteCategory.congr_hom
-        ((Scheme.Modules.Hom.mapPresheaf φ).naturality (homOfLE i.2).op) s
+      have hnat :=
+        ConcreteCategory.congr_hom ((Scheme.Modules.Hom.mapPresheaf φ).naturality (homOfLE i.2).op)
+          s
       simp only [ConcreteCategory.comp_apply] at hnat
       have h2 : N.presheaf.map (homOfLE i.2).op (φ.app U s) = 0 := by
         rw [← h i.1 (M.presheaf.map (homOfLE i.2).op s)]
@@ -38,8 +44,8 @@ theorem hom_eq_zero_of_affineOpens {X : Scheme.{0}} {M N : X.Modules} (φ : M �
   ext s
   simp [key s]
 
-theorem le_iff_secs_subset {X : Scheme.{0}} {E : X.Modules} (S T : Subobject E) :
-    S ≤ T ↔ ∀ U : X.affineOpens, secs S (U : X.Opens) ⊆ secs T (U : X.Opens) := by
+theorem le_iff_secs_subset {X : Scheme.{0}} {E : X.Modules} (S T : Subobject E)
+    : S ≤ T ↔ ∀ U : X.affineOpens, secs S (U : X.Opens) ⊆ secs T (U : X.Opens) := by
   unfold GlobalTheory.CompanionTheory.GE.secs
   constructor
   · intro hST U x hx

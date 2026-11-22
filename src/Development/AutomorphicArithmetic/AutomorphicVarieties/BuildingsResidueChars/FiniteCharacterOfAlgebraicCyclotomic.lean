@@ -5,10 +5,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published UpperTheory.V.Af.Sol
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published UpperTheory.V.Af.Sol
 
-theorem UpperTheory.finiteCharacter_of_algebraic_cyclotomic :
-    UpperTheory.V.Af.AlgOfCyc → UpperTheory.V.Af.Sol.FinChar := by
+theorem UpperTheory.finiteCharacter_of_algebraic_cyclotomic
+    : UpperTheory.V.Af.AlgOfCyc → UpperTheory.V.Af.Sol.FinChar := by
   intro hA
   refine ⟨?_, ?_⟩
   · intro F Ω _ _ _ _ _ l _ ι δ hopen
@@ -23,7 +26,8 @@ theorem UpperTheory.finiteCharacter_of_algebraic_cyclotomic :
     haveI : δ.ker.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
     refine h1 δ hcont fun w _ => ?_
     obtain ⟨A, hAw⟩ := exists_isPlaceOver Ω w
-    refine ⟨A, hAw, 0, δ.ker.index, Nat.pos_of_ne_zero Subgroup.FiniteIndex.index_ne_zero, fun s _ => ?_⟩
+    refine
+      ⟨A, hAw, 0, δ.ker.index, Nat.pos_of_ne_zero Subgroup.FiniteIndex.index_ne_zero, fun s _ => ?_⟩
     rw [neg_zero, zpow_zero, mul_one, ← map_pow]
     exact Subgroup.pow_index_mem δ.ker s
   · intro K M Ω _ _ _ _ _ _ _ _ _ _ _ l _ δ hδ
@@ -37,6 +41,5 @@ theorem UpperTheory.finiteCharacter_of_algebraic_cyclotomic :
       intro m
       exact (IntermediateField.mem_fixingSubgroup_iff E g).mp hg _ ⟨m, rfl⟩
     let g' : Formalism.ConjugateSelfDual.G M Ω := { g.toRingEquiv with commutes' := hfix }
-    have hres : UpperTheory.V.Af.resG K M Ω g' = g := by
-      ext x; rfl
+    have hres : UpperTheory.V.Af.resG K M Ω g' = g := by ext x; rfl
     rw [MonoidHom.mem_ker, ← hres, ← MonoidHom.comp_apply, hδ, MonoidHom.one_apply]

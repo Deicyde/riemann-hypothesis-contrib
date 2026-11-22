@@ -14,8 +14,8 @@ open Metric
 
 noncomputable section
 
-theorem PolyMaxOscillation.proof (h0 : ReciprocityTheory.AnForm.A.PolyMaxLogConvexStatement) :
-    PolyMaxOscillation.Statement := by
+theorem PolyMaxOscillation.proof (h0 : ReciprocityTheory.AnForm.A.PolyMaxLogConvexStatement)
+    : PolyMaxOscillation.Statement := by
   intro D U u z δ t C₁ hU hu hδ ht hC hCt
   have hC0 : 0 < C₁ := by linarith
   have hb0 : 0 < C₁ * t := mul_pos hC0 ht
@@ -25,9 +25,9 @@ theorem PolyMaxOscillation.proof (h0 : ReciprocityTheory.AnForm.A.PolyMaxLogConv
   have hab : t / (4 * C₁) < C₁ * t := by
     rw [div_lt_iff₀ (by positivity)]
     nlinarith
-  have key := hconv.slope_mono_adjacent
-    (Set.mem_Iic.2 (Real.log_le_log ha0 (hab.trans hCt).le)) (Set.mem_Iic.2 le_rfl)
-    (Real.log_lt_log ha0 hab) (Real.log_lt_log hb0 hCt)
+  have key :=
+    hconv.slope_mono_adjacent (Set.mem_Iic.2 (Real.log_le_log ha0 (hab.trans hCt).le))
+      (Set.mem_Iic.2 le_rfl) (Real.log_lt_log ha0 hab) (Real.log_lt_log hb0 hCt)
   simp only [Real.exp_log ha0, Real.exp_log hb0, Real.exp_log hδ0] at key
   have h1 : Real.log (C₁ * t) - Real.log (t / (4 * C₁)) = Real.log (4 * C₁ ^ 2) := by
     rw [← Real.log_div hb0.ne' ha0.ne']

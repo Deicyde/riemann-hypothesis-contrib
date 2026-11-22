@@ -11,8 +11,9 @@ namespace LateralTheory.E.QAClosedPf
 
 open LateralTheory.E.t_E1Cut
 
-theorem aic_of_surj {T S : Type} [CommRing T] [CommRing S] (π : T →+* S) (hT : AIC T)
-    (hπ : Function.Surjective π) : AIC S := by
+theorem aic_of_surj
+    {T S : Type} [CommRing T] [CommRing S] (π : T →+* S) (hT : AIC T) (hπ : Function.Surjective π)
+    : AIC S := by
   intro p hp hdeg
   have hl : p ∈ lifts π := (lifts_iff_coeff_lifts p).2 fun n => hπ _
   obtain ⟨q, hq, hqd, hqm⟩ := lifts_and_natDegree_eq_and_monic hl hp
@@ -20,14 +21,14 @@ theorem aic_of_surj {T S : Type} [CommRing T] [CommRing S] (π : T →+* S) (hT 
   refine ⟨π a, ?_⟩
   rw [← hq, eval_map, eval₂_at_apply, ha, map_zero]
 
-theorem aic_away {T : Type} [CommRing T] [IsDomain T] (hT : AIC T) (t : T) (ht : t ≠ 0) :
-    AIC (Localization.Away t) := by
+theorem aic_away {T : Type} [CommRing T] [IsDomain T] (hT : AIC T) (t : T) (ht : t ≠ 0)
+    : AIC (Localization.Away t) := by
   classical
   have : IsDomain (Localization.Away t) :=
     IsLocalization.isDomain_localization (powers_le_nonZeroDivisors_of_noZeroDivisors ht)
   intro p hp hdeg
-  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finset (Submonoid.powers t)
-    (p.support.image p.coeff)
+  obtain ⟨b, hb⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (Submonoid.powers t) (p.support.image p.coeff)
   set c : Localization.Away t := algebraMap T _ b
   have hcu : IsUnit c := IsLocalization.map_units _ b
   have hl : p.scaleRoots c ∈ lifts (algebraMap T (Localization.Away t)) := by
@@ -54,7 +55,9 @@ theorem aic_away {T : Type} [CommRing T] [IsDomain T] (hT : AIC T) (t : T) (ht :
   refine ⟨hcu.unit⁻¹ * algebraMap T _ a, ?_⟩
   have h1 : eval (algebraMap T _ a) (p.scaleRoots c) = 0 := by
     rw [← hq, eval_map, eval₂_at_apply, ha, map_zero]
-  have h2 : algebraMap T (Localization.Away t) a = (RingHom.id _) c * (hcu.unit⁻¹ * algebraMap T _ a) := by
+  have h2
+      : algebraMap T (Localization.Away t) a
+        = (RingHom.id _) c * (hcu.unit⁻¹ * algebraMap T _ a) := by
     rw [RingHom.id_apply, ← mul_assoc, IsUnit.mul_val_inv, one_mul]
   rw [eval, h2, scaleRoots_eval₂_mul] at h1
   rw [eval]
@@ -69,18 +72,39 @@ theorem QAClosed_of : QAClosed := by
     by_cases ht : t = 0
     · have hu : IsUnit (algebraMap S (Localization.Away (π t)) (π t)) :=
         IsLocalization.Away.algebraMap_isUnit _
-      rw [show algebraMap S (Localization.Away (π t)) (π t) = 0 by rw [ht, map_zero, map_zero]] at hu
-      have : Subsingleton (Localization.Away (π t)) := subsingleton_of_zero_eq_one (isUnit_zero_iff.1 hu)
-      exact ⟨T, inferInstance, inferInstance, (algebraMap S _).comp π, hT, fun y => ⟨0, Subsingleton.elim _ _⟩⟩
+      rw [show algebraMap S (Localization.Away (π t)) (π t) = 0 by rw [ht, map_zero, map_zero]]
+        at hu
+      have : Subsingleton (Localization.Away (π t)) :=
+        subsingleton_of_zero_eq_one (isUnit_zero_iff.1 hu)
+      exact ⟨
+        T,
+        inferInstance,
+        inferInstance,
+        (algebraMap S _).comp π,
+        hT,
+        fun y => ⟨0, Subsingleton.elim _ _⟩
+      ⟩
     · have : IsDomain (Localization.Away t) :=
         IsLocalization.isDomain_localization (powers_le_nonZeroDivisors_of_noZeroDivisors ht)
       have : IsLocalization (Submonoid.map π (Submonoid.powers t)) (Localization.Away (π t)) := by
         rw [Submonoid.map_powers]; infer_instance
-      exact ⟨Localization.Away t, inferInstance, inferInstance, _, aic_away hT t ht,
+      exact ⟨
+        Localization.Away t,
+        inferInstance,
+        inferInstance,
+        _,
+        aic_away hT t ht,
         IsLocalization.map_surjective_of_surjective (Submonoid.powers t) (Localization.Away t)
-          (Localization.Away (π t)) hπ⟩
+          (Localization.Away (π t)) hπ
+      ⟩
   · intro J
-    exact ⟨T, inferInstance, inferInstance, (Ideal.Quotient.mk J).comp π, hT,
-      (Ideal.Quotient.mk_surjective).comp hπ⟩
+    exact ⟨
+      T,
+      inferInstance,
+      inferInstance,
+      (Ideal.Quotient.mk J).comp π,
+      hT,
+      (Ideal.Quotient.mk_surjective).comp hπ
+    ⟩
 
 end LateralTheory.E.QAClosedPf

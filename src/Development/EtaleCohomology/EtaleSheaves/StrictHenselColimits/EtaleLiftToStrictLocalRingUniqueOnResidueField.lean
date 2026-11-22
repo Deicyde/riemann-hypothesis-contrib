@@ -9,7 +9,8 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.E.t_
 
 namespace LateralTheory.E.ColimPf.RigidPf
 
-theorem etale_lift_to_strict_local_ring_unique_on_residue_field : LateralTheory.E.ColimPf.Rigid := by
+theorem etale_lift_to_strict_local_ring_unique_on_residue_field
+    : LateralTheory.E.ColimPf.Rigid := by
   intro A B O Ω _ ψ g hg hloc u v huv hψ
   let : Algebra A B := g.hom.toAlgebra
   let : Algebra A O := (g ≫ u).hom.toAlgebra
@@ -27,17 +28,20 @@ theorem etale_lift_to_strict_local_ring_unique_on_residue_field : LateralTheory.
     induction t using TensorProduct.induction_on with
     | zero => simp
     | tmul x y =>
-      simp only [w, Algebra.TensorProduct.productMap_apply_tmul, Algebra.TensorProduct.lmul'_apply_tmul, map_mul]
+      simp only [w, Algebra.TensorProduct.productMap_apply_tmul,
+        Algebra.TensorProduct.lmul'_apply_tmul, map_mul]
       change ψ (u.hom x) * ψ (v.hom y) = ψ (u.hom x) * ψ (u.hom y)
       rw [hψu]
     | add x y hx hy => simp only [map_add (f := _), hx, hy]
-  have he0 : e ∈ KaehlerDifferential.ideal A B := by rw [hsp]; exact Submodule.mem_span_singleton_self e
+  have he0 : e ∈ KaehlerDifferential.ideal A B := by
+    rw [hsp]; exact Submodule.mem_span_singleton_self e
   have hwe : ψ (w e) = 0 := by
     rw [hpt]
     have : Algebra.TensorProduct.lmul' A e = 0 := he0
     rw [this, map_zero, map_zero]
   have hwe0 : w e = 0 := by
-    have hu : IsUnit (1 - w e) := hloc _ (by rw [map_sub, map_one, hwe, sub_zero]; exact one_ne_zero)
+    have hu : IsUnit (1 - w e) :=
+      hloc _ (by rw [map_sub, map_one, hwe, sub_zero]; exact one_ne_zero)
     have hid : w e * (1 - w e) = 0 := by
       have := (he.map w).eq
       rw [mul_sub, mul_one, this, sub_self]

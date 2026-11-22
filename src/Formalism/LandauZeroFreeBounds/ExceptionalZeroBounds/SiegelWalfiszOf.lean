@@ -189,20 +189,24 @@ theorem siegel_walfisz_character_of : SiegelWalfiszOf := by
     mul_nonneg (by linarith) (Real.exp_pos _).le
   refine ⟨cf, (max C 0 + 2) + (U + 1) * Real.exp (cf * Real.sqrt U), hcf0, ?_⟩
   intro q _ χ x hx hqL
-  have hx0 : (0:ℝ) ≤ x := by linarith
-  have hx1 : (1:ℝ) ≤ x := by linarith
+  have hx0 : (0 : ℝ) ≤ x := by linarith
+  have hx1 : (1 : ℝ) ≤ x := by linarith
   have hlx : 0 < Real.log x := Real.log_pos (by linarith)
-  have hq1 : (1:ℝ) ≤ q := by
+  have hq1 : (1 : ℝ) ≤ q := by
     have h1 : 1 ≤ q := Nat.one_le_iff_ne_zero.mpr (NeZero.ne q)
     exact_mod_cast h1
   have hM0 : 0 ≤ (max C 0 + 2) * x * Real.exp (-cf * Real.sqrt (Real.log x)) :=
     mul_nonneg (mul_nonneg (by linarith [le_max_right C 0]) hx0) (Real.exp_pos _).le
-  have hK : 0 ≤ (U + 1) * Real.exp (cf * Real.sqrt U) * x * Real.exp (-cf * Real.sqrt (Real.log x)) :=
+  have hK
+      : 0 ≤ (U + 1) * Real.exp (cf * Real.sqrt U) * x * Real.exp (-cf * Real.sqrt (Real.log x)) :=
     mul_nonneg (mul_nonneg hK0 hx0) (Real.exp_pos _).le
-  have hfin : ((max C 0 + 2) + (U + 1) * Real.exp (cf * Real.sqrt U)) * x *
-      Real.exp (-cf * Real.sqrt (Real.log x)) =
-      (max C 0 + 2) * x * Real.exp (-cf * Real.sqrt (Real.log x)) +
-      (U + 1) * Real.exp (cf * Real.sqrt U) * x * Real.exp (-cf * Real.sqrt (Real.log x)) := by ring
+  have hfin
+      : ((max C 0 + 2) + (U + 1) * Real.exp (cf * Real.sqrt U)) * x
+          * Real.exp (-cf * Real.sqrt (Real.log x))
+        = (max C 0 + 2) * x * Real.exp (-cf * Real.sqrt (Real.log x))
+          + (U + 1) * Real.exp (cf * Real.sqrt U) * x
+            * Real.exp (-cf * Real.sqrt (Real.log x)) := by
+    ring
   rw [hfin]
   by_cases hsmall : Real.exp (c * Real.sqrt (Real.log x)) < Real.log x ^ A
   · have hLU : Real.log x ≤ U := hU (Real.log x) hlx hsmall
@@ -214,27 +218,35 @@ theorem siegel_walfisz_character_of : SiegelWalfiszOf := by
       nlinarith
     have hxU : 0 ≤ x * (U + 1) := mul_nonneg hx0 (by linarith)
     have s1 : x * (Real.log x + 1) ≤ x * (U + 1) := mul_le_mul_of_nonneg_left (by linarith) hx0
-    have s2 : x * (U + 1) ≤ x * (U + 1) * (Real.exp (cf * Real.sqrt U) * Real.exp (-cf * Real.sqrt (Real.log x))) :=
+    have s2
+        : x * (U + 1)
+          ≤ x * (U + 1) * (Real.exp (cf * Real.sqrt U) * Real.exp (-cf * Real.sqrt (Real.log x))) :=
       le_mul_of_one_le_right hxU he
-    have s3 : x * (U + 1) * (Real.exp (cf * Real.sqrt U) * Real.exp (-cf * Real.sqrt (Real.log x))) =
-        (U + 1) * Real.exp (cf * Real.sqrt U) * x * Real.exp (-cf * Real.sqrt (Real.log x)) := by ring
+    have s3
+        : x * (U + 1) * (Real.exp (cf * Real.sqrt U) * Real.exp (-cf * Real.sqrt (Real.log x)))
+          = (U + 1) * Real.exp (cf * Real.sqrt U) * x
+            * Real.exp (-cf * Real.sqrt (Real.log x)) := by
+      ring
     linarith
   · push_neg at hsmall
-    have hqexp : (q:ℝ) ≤ Real.exp (c * Real.sqrt (Real.log x)) := le_trans hqL hsmall
+    have hqexp : (q : ℝ) ≤ Real.exp (c * Real.sqrt (Real.log x)) := le_trans hqL hsmall
     obtain ⟨B, hB⟩ := exists_exceptional_zero_set cZ c₁ hc₁Z hZ' q χ
     have hmain := hPC q χ B x hB hx hqexp
-    have hsumB : ‖∑ β ∈ B, (x : ℂ) ^ (β : ℂ) / (β : ℂ)‖ ≤
-        2 * x * Real.exp (-cE * Real.sqrt (Real.log x)) := by
+    have hsumB
+        : ‖∑ β ∈ B, (x : ℂ) ^ (β : ℂ) / (β : ℂ)‖
+          ≤ 2 * x * Real.exp (-cE * Real.sqrt (Real.log x)) := by
       obtain ⟨hcard, hmem, -⟩ := hB
       rcases B.eq_empty_or_nonempty with hBe | ⟨β, hβ⟩
       · rw [hBe, Finset.sum_empty, norm_zero]
         exact mul_nonneg (by linarith) (Real.exp_pos _).le
-      · have hBs : B = {β} := Finset.eq_singleton_iff_unique_mem.mpr
-          ⟨hβ, fun b hb => Finset.card_le_one.mp hcard b hb β hβ⟩
+      · have hBs : B = {β} :=
+          Finset.eq_singleton_iff_unique_mem.mpr
+            ⟨hβ, fun b hb => Finset.card_le_one.mp hcard b hb β hβ⟩
         rw [hBs, Finset.sum_singleton]
         obtain ⟨hχ1, hreg, hL0, -⟩ := hmem β hβ
         have hβ1 : 1 / 2 ≤ β := half_le_of_real_in_region hc₁20 hreg
-        have hχ2 : χ ^ 2 = 1 := (hZ' q χ (β:ℂ) (zero_free_region_mono hc₁Z hreg) ⟨Or.inl hχ1, hL0⟩).1
+        have hχ2 : χ ^ 2 = 1 :=
+          (hZ' q χ (β : ℂ) (zero_free_region_mono hc₁Z hreg) ⟨Or.inl hχ1, hL0⟩).1
         have hβ2 := hEB q χ β hχ2 hχ1 hL0
         exact exceptional_zero_term_bound x A q cE β hx hA hq1 hqL hcE hβ1 hβ2
     have e1 : Real.exp (-c * Real.sqrt (Real.log x)) ≤ Real.exp (-cf * Real.sqrt (Real.log x)) := by
@@ -242,29 +254,38 @@ theorem siegel_walfisz_character_of : SiegelWalfiszOf := by
       have h1 : cf ≤ c := min_le_left _ _
       have h2 := Real.sqrt_nonneg (Real.log x)
       nlinarith
-    have e2 : Real.exp (-cE * Real.sqrt (Real.log x)) ≤ Real.exp (-cf * Real.sqrt (Real.log x)) := by
+    have e2
+        : Real.exp (-cE * Real.sqrt (Real.log x)) ≤ Real.exp (-cf * Real.sqrt (Real.log x)) := by
       apply Real.exp_le_exp.mpr
       have h1 : cf ≤ cE := min_le_right _ _
       have h2 := Real.sqrt_nonneg (Real.log x)
       nlinarith
-    have hC : C * x * Real.exp (-c * Real.sqrt (Real.log x)) ≤
-        max C 0 * x * Real.exp (-cf * Real.sqrt (Real.log x)) := by
-      calc C * x * Real.exp (-c * Real.sqrt (Real.log x))
-          ≤ max C 0 * x * Real.exp (-c * Real.sqrt (Real.log x)) :=
-            mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_max_left _ _) hx0) (Real.exp_pos _).le
+    have hC
+        : C * x * Real.exp (-c * Real.sqrt (Real.log x))
+          ≤ max C 0 * x * Real.exp (-cf * Real.sqrt (Real.log x)) := by
+      calc
+        C * x * Real.exp (-c * Real.sqrt (Real.log x))
+            ≤ max C 0 * x * Real.exp (-c * Real.sqrt (Real.log x)) :=
+          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_max_left _ _) hx0)
+            (Real.exp_pos _).le
         _ ≤ max C 0 * x * Real.exp (-cf * Real.sqrt (Real.log x)) :=
-            mul_le_mul_of_nonneg_left e1 (mul_nonneg (le_max_right _ _) hx0)
-    have hE2 : 2 * x * Real.exp (-cE * Real.sqrt (Real.log x)) ≤
-        2 * x * Real.exp (-cf * Real.sqrt (Real.log x)) :=
+          mul_le_mul_of_nonneg_left e1 (mul_nonneg (le_max_right _ _) hx0)
+    have hE2
+        : 2 * x * Real.exp (-cE * Real.sqrt (Real.log x))
+          ≤ 2 * x * Real.exp (-cf * Real.sqrt (Real.log x)) :=
       mul_le_mul_of_nonneg_left e2 (by linarith)
     set S : ℂ := ∑ β ∈ B, (x : ℂ) ^ (β : ℂ) / (β : ℂ) with hS
     set a : ℂ := psiChi χ x - (if χ = 1 then (x : ℂ) else 0) with ha
     have htri : ‖a‖ ≤ ‖a + S‖ + ‖S‖ := by
-      calc ‖a‖ = ‖(a + S) - S‖ := by rw [add_sub_cancel_right]
+      calc
+        ‖a‖
+          = ‖(a + S) - S‖ := by rw [add_sub_cancel_right]
         _ ≤ ‖a + S‖ + ‖S‖ := norm_sub_le _ _
-    have hsplit : (max C 0 + 2) * x * Real.exp (-cf * Real.sqrt (Real.log x)) =
-        max C 0 * x * Real.exp (-cf * Real.sqrt (Real.log x)) +
-        2 * x * Real.exp (-cf * Real.sqrt (Real.log x)) := by ring
+    have hsplit
+        : (max C 0 + 2) * x * Real.exp (-cf * Real.sqrt (Real.log x))
+          = max C 0 * x * Real.exp (-cf * Real.sqrt (Real.log x))
+            + 2 * x * Real.exp (-cf * Real.sqrt (Real.log x)) := by
+      ring
     linarith
 
 end Formalism.ZeroFreeDirichlet

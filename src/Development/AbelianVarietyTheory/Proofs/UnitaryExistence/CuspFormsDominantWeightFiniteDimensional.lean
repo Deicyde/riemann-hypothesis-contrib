@@ -15,30 +15,41 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ReadingLi
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Frames GlobalTheory.FrameUnif
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.Frames GlobalTheory.FrameUnif
 open scoped Matrix nonZeroDivisors
 
 set_option synthInstance.maxHeartbeats 400000
 
 namespace GlobalTheory
 
-
 open NumberField AlgebraicGeometry CategoryTheory Limits in
 open scoped Matrix nonZeroDivisors in
 set_option synthInstance.maxHeartbeats 400000 in
-theorem _root_.GlobalTheory.cuspForms_finiteDimensional_of_isUnf : _root_.ReciprocityTheory.ChartRestriction.G.Out.SecBaseChangeSt → ∀ (E : Type) [Field E]
-    [NumberField E] [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H)
-    (Xo : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Moduli Dw l) (c : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l) (r : ℕ) (U : ∀ σ : c.F →+* ℂ, _root_.Formalism.L2.PjFree.Unf Xo c σ r)
-    (σ : c.F →+* ℂ), _root_.Formalism.L2.PjFree.GoodEmb c σ → _root_.Formalism.L2.PjFree.IsUnf (U σ) → _root_.Formalism.L2.PjFree.CuspFD Xo c U := by
+theorem _root_.GlobalTheory.cuspForms_finiteDimensional_of_isUnf
+    : _root_.ReciprocityTheory.ChartRestriction.G.Out.SecBaseChangeSt
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+          (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+          (Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H)
+          (l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H)
+          (Xo : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Moduli Dw l)
+          (c : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l) (r : ℕ)
+          (U : ∀ σ : c.F →+* ℂ, _root_.Formalism.L2.PjFree.Unf Xo c σ r) (σ : c.F →+* ℂ),
+        _root_.Formalism.L2.PjFree.GoodEmb c σ → _root_.Formalism.L2.PjFree.IsUnf (U σ)
+          → _root_.Formalism.L2.PjFree.CuspFD Xo c U := by
   intro hB E _ _ _ H Dw l Xo c r U σ hgood hunf
   unfold _root_.Formalism.L2.PjFree.CuspFD
   intro a n _
-  obtain ⟨hind, -⟩ := _root_.GlobalTheory.reading_linearIndependent_and_injective hB E H Dw l Xo c σ r (U σ) hunf a n
+  obtain ⟨hind, -⟩ :=
+    _root_.GlobalTheory.reading_linearIndependent_and_injective hB E H Dw l Xo c σ r (U σ) hunf a n
   set V := _root_.Formalism.L2.PjFree.cusp Xo c U a n with hV
   set W : Submodule ℂ (_root_.Formalism.L2.PjFree.FDSec (U σ).X) :=
     Submodule.span ℂ ((_root_.Formalism.L2.PjFree.rdU (U σ)) '' (V : Set (_root_.Formalism.L2.Pj.Rul Xo c))) with hWdef
-  have hWle : W ≤ _root_.Formalism.L2.PjFree.holSub (U σ).X (_root_.Formalism.L2.PjFree.laU (U σ) a n) := by
+  have hWle
+      : W
+        ≤ _root_.Formalism.L2.PjFree.holSub (U σ).X (_root_.Formalism.L2.PjFree.laU (U σ) a n) := by
     refine Submodule.span_le.mpr ?_
     rintro _ ⟨f, hf, rfl⟩
     exact ((_root_.Formalism.L2.PjFree.mem_cusp Xo c U a n f).mp hf).2 σ hgood
@@ -48,7 +59,8 @@ theorem _root_.GlobalTheory.cuspForms_finiteDimensional_of_isUnf : _root_.Recipr
     | mem g hg =>
       obtain ⟨f, -, rfl⟩ := hg
       simp [_root_.Formalism.L2.PjFree.rdU, hx]
-    | zero => rfl
+    | zero =>
+      rfl
     | add g h _ _ hg hh =>
       show g k x + h k x = 0
       rw [hg, hh, add_zero]
@@ -68,8 +80,10 @@ theorem _root_.GlobalTheory.cuspForms_finiteDimensional_of_isUnf : _root_.Recipr
     have hbind : LinearIndependent c.F b :=
       (hs.comp e.symm e.symm.injective).map' V.subtype V.ker_subtype
     have himg := hind s.card b hbV hbind
-    let b' : Fin s.card → W := fun i =>
-      ⟨_root_.Formalism.L2.PjFree.rdU (U σ) (b i), Submodule.subset_span ⟨b i, ((e.symm i : s) : V).2, rfl⟩⟩
+    let b' : Fin s.card → W := fun i => ⟨
+      _root_.Formalism.L2.PjFree.rdU (U σ) (b i),
+      Submodule.subset_span ⟨b i, ((e.symm i : s) : V).2, rfl⟩
+    ⟩
     have hb' : LinearIndependent ℂ b' := LinearIndependent.of_comp W.subtype himg
     simpa using hb'.fintype_card_le_finrank
   exact Module.rank_lt_aleph0_iff.mp (lt_of_le_of_lt hrank Cardinal.natCast_lt_aleph0)

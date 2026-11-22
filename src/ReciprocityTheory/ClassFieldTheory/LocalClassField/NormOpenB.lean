@@ -36,19 +36,21 @@ theorem isCompact_UK' (hK : FiniteDimensional ℚ_[p] K) : IsCompact (UK p K : S
 theorem mem_UK_of_norm_sub_one_lt (x : Kˣ) (hx : ‖(x : K) - 1‖ < 1) : x ∈ UK p K := by
   show ‖((x : K) : PadicAlgCl p)‖ = 1
   rw [norm_coe_K]
-  have h := IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (x := (x : K) - 1) (y := 1)
-    (by rw [norm_one]; exact hx.ne)
+  have h :=
+    IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (x := (x : K) - 1) (y := 1)
+      (by rw [norm_one]; exact hx.ne)
   rw [sub_add_cancel, norm_one, max_eq_right hx.le] at h
   exact h
 
-theorem mem_nhds_one_iff (S : Set Kˣ) :
-    S ∈ nhds (1 : Kˣ) ↔ ∃ ε > 0, ∀ x : Kˣ, ‖(x : K) - 1‖ < ε → x ∈ S := by
+theorem mem_nhds_one_iff (S : Set Kˣ)
+    : S ∈ nhds (1 : Kˣ) ↔ ∃ ε > 0, ∀ x : Kˣ, ‖(x : K) - 1‖ < ε → x ∈ S := by
   rw [Units.isEmbedding_val₀.isInducing.nhds_eq_comap, Filter.mem_comap, Units.val_one]
   constructor
   · rintro ⟨t, ht, hts⟩
     obtain ⟨ε, hε, hb⟩ := Metric.mem_nhds_iff.1 ht
     refine ⟨ε, hε, fun x hx => hts (hb ?_)⟩
-    rw [Metric.mem_ball, dist_eq_norm]; exact hx
+    rw [Metric.mem_ball, dist_eq_norm]
+    exact hx
   · rintro ⟨ε, hε, h⟩
     refine ⟨Metric.ball 1 ε, Metric.ball_mem_nhds _ hε, fun x hx => h x ?_⟩
     have : (x : K) ∈ Metric.ball (1 : K) ε := hx
@@ -58,17 +60,23 @@ theorem isOpen_UKi (i : ℕ) : IsOpen (UKi p K i : Set Kˣ) := by
   apply Subgroup.isOpen_of_mem_nhds (g := 1)
   rw [mem_nhds_one_iff]
   have hp : (0 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).pos
-  refine ⟨min 1 ((p : ℝ) ^ (- (i : ℝ) / eK p K)), lt_min one_pos (Real.rpow_pos_of_pos hp _), fun x hx => ?_⟩
-  exact (mem_UKi_iff p K i x).2 ⟨mem_UK_of_norm_sub_one_lt x (hx.trans_le (min_le_left _ _)),
-    (hx.trans_le (min_le_right _ _)).le⟩
+  refine ⟨
+    min 1 ((p : ℝ) ^ (-(i : ℝ) / eK p K)),
+    lt_min one_pos (Real.rpow_pos_of_pos hp _),
+    fun x hx => ?_
+  ⟩
+  exact (mem_UKi_iff p K i x).2 ⟨
+    mem_UK_of_norm_sub_one_lt x (hx.trans_le (min_le_left _ _)),
+    (hx.trans_le (min_le_right _ _)).le
+  ⟩
 
-theorem isOpen_range_pow' (hK : FiniteDimensional ℚ_[p] K) {n : ℕ} (hn : 0 < n) :
-    IsOpen ((powMonoidHom n : Kˣ →* Kˣ).range : Set Kˣ) := by
+theorem isOpen_range_pow' (hK : FiniteDimensional ℚ_[p] K) {n : ℕ} (hn : 0 < n)
+    : IsOpen ((powMonoidHom n : Kˣ →* Kˣ).range : Set Kˣ) := by
   have : CompleteSpace K := FiniteDimensional.complete ℚ_[p] K
   apply Subgroup.isOpen_of_mem_nhds (g := 1)
-  have hd : HasStrictDerivAt (fun x : K => x ^ n) ((n : K) * 1 ^ (n - 1)) 1 := hasStrictDerivAt_pow n 1
-  have hne : ((n : K) * 1 ^ (n - 1)) ≠ 0 := by
-    rw [one_pow, mul_one]; exact_mod_cast hn.ne'
+  have hd : HasStrictDerivAt (fun x : K => x ^ n) ((n : K) * 1 ^ (n - 1)) 1 :=
+    hasStrictDerivAt_pow n 1
+  have hne : ((n : K) * 1 ^ (n - 1)) ≠ 0 := by rw [one_pow, mul_one]; exact_mod_cast hn.ne'
   have hm := hd.map_nhds_eq hne
   simp only [one_pow] at hm
   have hr : Set.range (fun x : K => x ^ n) ∈ nhds (1 : K) := by
@@ -83,8 +91,11 @@ theorem isOpen_range_pow' (hK : FiniteDimensional ℚ_[p] K) {n : ℕ} (hn : 0 <
     exact y.ne_zero hx'.symm
   exact ⟨Units.mk0 x h0, Units.ext (by simpa using hx')⟩
 
-theorem finiteIndex_of_isOpen_of_vK (hK : FiniteDimensional ℚ_[p] K) (H : Subgroup Kˣ)
-    (hH : IsOpen (H : Set Kˣ)) {x : Kˣ} (hx : x ∈ H) (hv : vK p K x ≠ 0) : H.FiniteIndex := by
+theorem finiteIndex_of_isOpen_of_vK
+    (hK : FiniteDimensional ℚ_[p] K)
+    (H : Subgroup Kˣ) (hH : IsOpen (H : Set Kˣ))
+    {x : Kˣ} (hx : x ∈ H) (hv : vK p K x ≠ 0)
+    : H.FiniteIndex := by
   obtain ⟨π, hπ⟩ := exists_vK_eq_one p K hK
   have : DiscreteTopology (Kˣ ⧸ H) := QuotientGroup.discreteTopology hH
   set m := vK p K x with hm
@@ -117,12 +128,11 @@ theorem finiteIndex_of_isOpen_of_vK (hK : FiniteDimensional ℚ_[p] K) (H : Subg
       have : (π ^ j * ((π ^ j)⁻¹ * y * (x ^ k)⁻¹))⁻¹ * y = x ^ k := by group
       rw [this]
       exact H.zpow_mem hx k
-  have : Finite (Kˣ ⧸ H) := by
-    rw [← Set.finite_univ_iff, ← hall]; exact hfin
+  have : Finite (Kˣ ⧸ H) := by rw [← Set.finite_univ_iff, ← hall]; exact hfin
   exact Subgroup.finiteIndex_of_finite_quotient
 
-theorem finiteIndex_range_pow' (hK : FiniteDimensional ℚ_[p] K) {n : ℕ} (hn : 0 < n) :
-    (powMonoidHom n : Kˣ →* Kˣ).range.FiniteIndex := by
+theorem finiteIndex_range_pow' (hK : FiniteDimensional ℚ_[p] K) {n : ℕ} (hn : 0 < n)
+    : (powMonoidHom n : Kˣ →* Kˣ).range.FiniteIndex := by
   obtain ⟨π, hπ⟩ := exists_vK_eq_one p K hK
   refine finiteIndex_of_isOpen_of_vK hK _ (isOpen_range_pow' hK hn) (x := π ^ n) ⟨π, rfl⟩ ?_
   rw [vK_pow, hπ, mul_one]

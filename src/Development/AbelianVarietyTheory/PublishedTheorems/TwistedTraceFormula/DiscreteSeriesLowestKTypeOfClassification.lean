@@ -5,26 +5,33 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants
 
 noncomputable section
 
 namespace GlobalTheory.Published
 
 def DiscreteSeriesLowestKType : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ), Formalism.QuantumDeterminants.IsHCParam lam →
-    (∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-      (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), Formalism.MainNotions.S.IsDS ε lam σ →
-      Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) (Formalism.MainNotions.S.lowKSub ε lam σ)) ∧
-    ∀ (H H' : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-      [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
-      (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')),
-      Formalism.MainNotions.S.IsDS ε lam σ → Formalism.MainNotions.S.IsDS ε lam σ' →
-      ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ Formalism.MainNotions.S.UJset ε, ∀ v, U (σ g v) = σ' g (U v)
+  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ),
+    Formalism.QuantumDeterminants.IsHCParam lam
+      → (∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+            (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+          Formalism.MainNotions.S.IsDS ε lam σ
+            → Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam)
+              (Formalism.MainNotions.S.lowKSub ε lam σ))
+        ∧ ∀ (H H' : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup H']
+            [InnerProductSpace ℂ H'] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+            (σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')),
+          Formalism.MainNotions.S.IsDS ε lam σ → Formalism.MainNotions.S.IsDS ε lam σ'
+            → ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ Formalism.MainNotions.S.UJset ε, ∀ v, U (σ g v) = σ' g (U v)
 
-theorem isKTypeOf_lowKSub_iff {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} {H : Type} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} :
-    IsKTypeOf ε σ (lowK ε lam) (lowKSub ε lam σ) ↔ ∃! S : Submodule ℂ H, IsKTypeOf ε σ (lowK ε lam) S := by
+theorem isKTypeOf_lowKSub_iff
+    {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} {H : Type}
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+    : IsKTypeOf ε σ (lowK ε lam) (lowKSub ε lam σ)
+      ↔ ∃! S : Submodule ℂ H, IsKTypeOf ε σ (lowK ε lam) S := by
   constructor
   · intro hT
     refine ⟨lowKSub ε lam σ, hT, fun S hS => ?_⟩
@@ -46,8 +53,8 @@ theorem isKTypeOf_lowKSub_iff {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → �
     rw [hEq]
     exact hS
 
-theorem discreteSeriesLowestKType_iff :
-    DiscreteSeriesLowestKType ↔ GlobalTheory.Dec.LowKMultOne ∧ DiscreteSeriesUpqUnique := by
+theorem discreteSeriesLowestKType_iff
+    : DiscreteSeriesLowestKType ↔ GlobalTheory.Dec.LowKMultOne ∧ DiscreteSeriesUpqUnique := by
   constructor
   · intro h
     refine ⟨?_, fun n ε lam hp => (h n ε lam hp).2⟩

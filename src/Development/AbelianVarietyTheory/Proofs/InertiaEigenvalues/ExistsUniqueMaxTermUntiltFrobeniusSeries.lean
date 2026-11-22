@@ -11,15 +11,19 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.PSer.Uniq
 
-theorem exists_strict_max (f d : ℤ → ℝ) (hd : ∀ n, f (n + 1) = f n + d n) (hanti : StrictAnti d)
-    (hne : ∀ n, d n ≠ 0) (hpos : ∃ m, 0 < d m) (hneg : ∃ m, d m < 0) :
-    ∃ n₀ : ℤ, ∀ n : ℤ, n ≠ n₀ → f n < f n₀ := by
+theorem exists_strict_max
+    (f d : ℤ → ℝ) (hd : ∀ n, f (n + 1) = f n + d n) (hanti : StrictAnti d) (hne : ∀ n, d n ≠ 0)
+    (hpos : ∃ m, 0 < d m) (hneg : ∃ m, d m < 0)
+    : ∃ n₀ : ℤ, ∀ n : ℤ, n ≠ n₀ → f n < f n₀ := by
   obtain ⟨m, hm⟩ := hpos
-  have hbdd : ∃ b : ℤ, ∀ z : ℤ, d z < 0 → b ≤ z := ⟨m, fun z hz => by
-    by_contra hc
-    push_neg at hc
-    have := hanti hc
-    linarith⟩
+  have hbdd : ∃ b : ℤ, ∀ z : ℤ, d z < 0 → b ≤ z := ⟨
+    m,
+    fun z hz => by
+      by_contra hc
+      push_neg at hc
+      have := hanti hc
+      linarith
+  ⟩
   obtain ⟨n₀, hn₀, hmin⟩ := Int.exists_least_of_bdd hbdd hneg
   have hafter : ∀ k, n₀ ≤ k → d k < 0 := fun k hk => by
     rcases hk.lt_or_eq with h | h
@@ -67,10 +71,15 @@ end GlobalTheory.PSer.Uniq
 
 namespace GlobalTheory.PSer.Uniq
 
-theorem exists_unique_max_term : ∀ (l : ℕ) [Fact l.Prime] (h : ℕ) (s : ℝ), 2 ≤ h → 0 < s → s < 1 →
-    ∃ j : ℕ, j < 2 ∧ ∃ n₀ : ℤ, ∀ n : ℤ, n ≠ n₀ →
-      ‖(l : ℂ_[l])‖ ^ (-n) * s ^ ((l : ℝ) ^ (n * h + j : ℤ)) <
-        ‖(l : ℂ_[l])‖ ^ (-n₀) * s ^ ((l : ℝ) ^ (n₀ * h + j : ℤ)) := by
+theorem exists_unique_max_term
+    : ∀ (l : ℕ) [Fact l.Prime] (h : ℕ) (s : ℝ),
+      2 ≤ h → 0 < s → s < 1
+        → ∃ j : ℕ,
+          j < 2
+            ∧ ∃ n₀ : ℤ, ∀ n : ℤ,
+              n ≠ n₀
+                → ‖(l : ℂ_[l])‖ ^ (-n) * s ^ ((l : ℝ) ^ (n * h + j : ℤ))
+                  < ‖(l : ℂ_[l])‖ ^ (-n₀) * s ^ ((l : ℝ) ^ (n₀ * h + j : ℤ)) := by
   intro l _ h s hh hs0 hs1
   have hlp : l.Prime := Fact.out
   have hν1 : ‖(l : ℂ_[l])‖ < 1 := GlobalTheory.RingBasics.norm_p_lt
@@ -85,11 +94,11 @@ theorem exists_unique_max_term : ∀ (l : ℕ) [Fact l.Prime] (h : ℕ) (s : ℝ
   have hc : c < 0 := mul_neg_of_pos_of_neg (by linarith) hls
   let u : ℕ → ℤ → ℝ := fun j n => (l : ℝ) ^ (n * h + j : ℤ)
   let f : ℕ → ℤ → ℝ := fun j n => -(n : ℝ) * Real.log ν + u j n * Real.log s
-  let d : ℕ → ℤ → ℝ := fun j n => -Real.log ν + u j n * c
+  let d : ℕ → ℤ → ℝ := fun j n => - Real.log ν + u j n * c
   have hu_succ : ∀ j n, u j (n + 1) = u j n * (l : ℝ) ^ h := fun j n => by
     simp only [u]
-    rw [show ((n + 1) * (h : ℤ) + (j : ℤ)) = (n * h + j) + ((h : ℕ) : ℤ) by ring,
-      zpow_add₀ hL0.ne', zpow_natCast]
+    rw [show ((n + 1) * (h : ℤ) + (j : ℤ)) = (n * h + j) + ((h : ℕ) : ℤ) by ring, zpow_add₀ hL0.ne',
+      zpow_natCast]
   have hd : ∀ j n, f j (n + 1) = f j n + d j n := by
     intro j n
     simp only [f, d, hc_def]
@@ -141,8 +150,10 @@ theorem exists_unique_max_term : ∀ (l : ℕ) [Fact l.Prime] (h : ℕ) (s : ℝ
     have hdvd : (h : ℤ) ∣ 1 := ⟨n - n', by linear_combination -e2⟩
     have := Int.eq_one_of_dvd_one (by positivity) hdvd
     omega
-  have hfin : ∀ j, (∀ n, d j n ≠ 0) → ∃ n₀ : ℤ, ∀ n, n ≠ n₀ →
-      ν ^ (-n) * s ^ (u j n) < ν ^ (-n₀) * s ^ (u j n₀) := by
+  have hfin
+      : ∀ j,
+        (∀ n, d j n ≠ 0)
+          → ∃ n₀ : ℤ, ∀ n, n ≠ n₀ → ν ^ (-n) * s ^ (u j n) < ν ^ (-n₀) * s ^ (u j n₀) := by
     intro j hne
     obtain ⟨n₀, hn₀⟩ := exists_strict_max (f j) (d j) (hd j) (hanti j) hne (hpos j) (hneg j)
     refine ⟨n₀, fun n hn => ?_⟩
@@ -153,7 +164,8 @@ theorem exists_unique_max_term : ∀ (l : ℕ) [Fact l.Prime] (h : ℕ) (s : ℝ
       push_cast
       ring
     rw [← Real.log_lt_log_iff (mul_pos (zpow_pos hν0 _) (Real.rpow_pos_of_pos hs0 _))
-      (mul_pos (zpow_pos hν0 _) (Real.rpow_pos_of_pos hs0 _)), hT, hT]
+        (mul_pos (zpow_pos hν0 _) (Real.rpow_pos_of_pos hs0 _)),
+      hT, hT]
     exact hn₀ n hn
   by_cases H : ∀ n, d 0 n ≠ 0
   · exact ⟨0, by norm_num, hfin 0 H⟩

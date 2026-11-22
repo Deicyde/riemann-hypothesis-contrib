@@ -34,7 +34,6 @@ theorem exp_neg_nat (m : ℕ) : Real.exp (-(m : ℝ)) = Real.exp (-1) ^ m := by
 
 end PGaussShellSum
 
-
 open PGaussShellSum in
 theorem GaussShellSum.proof (hS : GaussShell.Statement) : GaussShellSum.Statement := by
   intro n hn Λ δ hδ hmin
@@ -46,24 +45,22 @@ theorem GaussShellSum.proof (hS : GaussShell.Statement) : GaussShellSum.Statemen
     have : 0 ≤ 1 + 1 / δ := by positivity
     positivity
   have hr0 : 0 ≤ Real.exp (-1) := (Real.exp_pos _).le
-  have hr1 : Real.exp (-1) < 1 := by
-    exact Real.exp_lt_one_iff.2 (by norm_num)
+  have hr1 : Real.exp (-1) < 1 := by exact Real.exp_lt_one_iff.2 (by norm_num)
   have hgeo : Summable fun j : ℕ => K * Real.exp (-1) ^ j :=
     (summable_geometric_of_lt_one hr0 hr1).mul_left K
   have hbound : ∀ u : Finset Λ, ∑ μ ∈ u, f μ ≤ 2 * gaussShellConst n * (1 + 1 / δ) ^ n := by
     intro u
     let fl : Λ → ℕ := fun μ => ⌊‖(μ : EuclideanSpace ℝ (Fin n))‖⌋₊
     rw [← Finset.sum_fiberwise_of_maps_to (g := fl) (t := u.image fl)
-      (fun μ hμ => Finset.mem_image_of_mem fl hμ) f]
-    calc ∑ j ∈ u.image fl, ∑ μ ∈ u with fl μ = j, f μ
-        ≤ ∑ j ∈ u.image fl, K * Real.exp (-1) ^ j := by
-          refine Finset.sum_le_sum fun j _ => ?_
-          rw [← exp_neg_nat]
-          exact hS n hn Λ δ hδ hmin u j
-      _ ≤ ∑' j : ℕ, K * Real.exp (-1) ^ j :=
-          hgeo.sum_le_tsum _ (fun j _ => by positivity)
-      _ = K * (1 - Real.exp (-1))⁻¹ := by
-          rw [tsum_mul_left, tsum_geometric_of_lt_one hr0 hr1]
+      (fun μ hμ => Finset.mem_image_of_mem fl hμ)
+      f]
+    calc
+      ∑ j ∈ u.image fl, ∑ μ ∈ u with fl μ = j, f μ ≤ ∑ j ∈ u.image fl, K * Real.exp (-1) ^ j := by
+        refine Finset.sum_le_sum fun j _ => ?_
+        rw [← exp_neg_nat]
+        exact hS n hn Λ δ hδ hmin u j
+      _ ≤ ∑' j : ℕ, K * Real.exp (-1) ^ j := hgeo.sum_le_tsum _ (fun j _ => by positivity)
+      _ = K * (1 - Real.exp (-1))⁻¹ := by rw [tsum_mul_left, tsum_geometric_of_lt_one hr0 hr1]
       _ ≤ K * 2 := mul_le_mul_of_nonneg_left inv_one_sub_exp_neg_one_le_two hK0
       _ = 2 * gaussShellConst n * (1 + 1 / δ) ^ n := by rw [hK]; ring
   exact ⟨summable_of_sum_le hf hbound, Real.tsum_le_of_sum_le hf hbound⟩

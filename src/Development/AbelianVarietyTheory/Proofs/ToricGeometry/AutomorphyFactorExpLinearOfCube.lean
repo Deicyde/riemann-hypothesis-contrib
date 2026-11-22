@@ -9,17 +9,20 @@ open scoped BigOperators Real
 
 namespace GlobalTheory
 
-theorem entire_hom_eq_cexp_fderiv {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+theorem entire_hom_eq_cexp_fderiv
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
     (h : V → ℂ) (hd : Differentiable ℂ h) (h0 : h 0 = 1) (hadd : ∀ y z, h (y + z) = h y * h z)
-    (z : V) : h z = cexp (fderiv ℂ h 0 z) := by
+    (z : V)
+    : h z = cexp (fderiv ℂ h 0 z) := by
   set B : V →L[ℂ] ℂ := fderiv ℂ h 0 with hB
   have hder : ∀ w, HasFDerivAt h (h w • B) w := by
     intro w
     have e : h = fun u => h w * h (u - w) := by
       funext u
-      rw [← hadd]; congr 1; abel
-    have h1 : HasFDerivAt h B (w - w) := by
-      rw [sub_self]; exact (hd 0).hasFDerivAt
+      rw [← hadd]
+      congr 1
+      abel
+    have h1 : HasFDerivAt h B (w - w) := by rw [sub_self]; exact (hd 0).hasFDerivAt
     have h2 : HasFDerivAt (fun u => h (u - w)) B w := by
       have := HasFDerivAt.comp (f := fun u => u - w) w h1 ((hasFDerivAt_id w).sub_const w)
       simpa [Function.comp_def] using this
@@ -31,37 +34,74 @@ theorem entire_hom_eq_cexp_fderiv {V : Type*} [NormedAddCommGroup V] [NormedSpac
     have h1 : HasFDerivAt (fun u => cexp (-(B u))) (cexp (-(B w)) • (-B)) w :=
       (B.hasFDerivAt.neg).cexp
     have h2 := (hder w).mul h1
-    have e : h w • cexp (-B w) • -B + cexp (-B w) • h w • B = 0 := by
-      rw [smul_comm (h w) (cexp (-B w)), smul_neg, smul_neg, neg_add_cancel]
+    have e : h w • cexp (- B w) • -B + cexp (- B w) • h w • B = 0 := by
+      rw [smul_comm (h w) (cexp (- B w)), smul_neg, smul_neg, neg_add_cancel]
     rw [e] at h2
     exact h2
-  have hc := is_const_of_fderiv_eq_zero (𝕜 := ℂ) (f := fun u => h u * cexp (-(B u)))
-    (fun w => (hφ w).differentiableAt) (fun w => (hφ w).fderiv) z 0
+  have hc :=
+    is_const_of_fderiv_eq_zero (𝕜 := ℂ)
+      (f := fun u => h u * cexp (-(B u)))
+      (fun w => (hφ w).differentiableAt)
+      (fun w => (hφ w).fderiv)
+      z 0
   simp only [h0, map_zero, neg_zero, Complex.exp_zero, mul_one] at hc
   rw [Complex.exp_neg] at hc
   have := Complex.exp_ne_zero (B z)
   field_simp at hc
   exact hc
 
-theorem clm_eq_of_cexp_eq {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
-    (B C : V →L[ℂ] ℂ) (h : ∀ z, cexp (B z) = cexp (C z)) : B = C := by
+theorem clm_eq_of_cexp_eq
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    (B C : V →L[ℂ] ℂ) (h : ∀ z, cexp (B z) = cexp (C z))
+    : B = C := by
   have h1 : HasFDerivAt (fun u => cexp (B u)) (cexp (B 0) • B) 0 := B.hasFDerivAt.cexp
   have h2 : HasFDerivAt (fun u => cexp (C u)) (cexp (C 0) • C) 0 := C.hasFDerivAt.cexp
   have e : (fun u => cexp (B u)) = fun u => cexp (C u) := funext h
   rw [e] at h1
   simpa using h1.unique h2
 
-theorem prod_finset_fin_three {M : Type*} [CommMonoid M] (f : Finset (Fin 3) → M) :
-    ∏ I, f I = f ∅ * (f {0} * (f {1} * (f {2} * (f {0, 1} * (f {0, 2} * (f {1, 2} *
-      f {0, 1, 2})))))) := by
-  have e : (Finset.univ : Finset (Finset (Fin 3))) =
-      {∅, {0}, {1}, {2}, {0, 1}, {0, 2}, {1, 2}, {0, 1, 2}} := by decide
+theorem prod_finset_fin_three {M : Type*} [CommMonoid M] (f : Finset (Fin 3) → M)
+    : ∏ I, f I
+      = f ∅ * (f {0} * (f {1} * (f {2} * (f {0, 1} * (f {0, 2} * (f {1, 2} * f {0, 1, 2})))))) := by
+  have e
+      : (Finset.univ : Finset (Finset (Fin 3)))
+        = {∅, {0}, {1}, {2}, {0, 1}, {0, 2}, {1, 2}, {0, 1, 2}} := by
+    decide
   rw [e]
   repeat rw [Finset.prod_insert (by decide)]
   rw [Finset.prod_singleton]
 
-theorem automorphyFactor_exp_linear_of_cube :
-    (∀ (g : ℕ) {ι : Type} (W : ι → Set (Fin g → ℂ)) (c : ι → ι → (Fin g → ℂ) → ℂ), (∀ i, IsOpen (W i)) → (∀ z, ∃ i, z ∈ W i) → (∀ i j, DifferentiableOn ℂ (c i j) (W i ∩ W j)) → (∀ i j z, z ∈ W i → z ∈ W j → c i j z ≠ 0) → (∀ i j k z, z ∈ W i → z ∈ W j → z ∈ W k → c i j z * c j k z = c i k z) → ∀ (T : (Finset (Fin 3) → ι) → (Fin 3 → Fin g → ℂ) → ℂ), (∀ j, DifferentiableOn ℂ (T j) {x | (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j I))}) → (∀ j x, (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j I)) → T j x ≠ 0) → (∀ j j' x, (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j I)) → (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j' I)) → T j x = (∏ I : Finset (Fin 3), c (j I) (j' I) (∑ a ∈ I, x a) ^ ((-1 : ℤ) ^ (3 - I.card))) * T j' x) → ∀ (Λ : Submodule ℤ (Fin g → ℂ)), DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ → (∀ i z, ∀ l ∈ Λ, z + l ∈ W i ↔ z ∈ W i) → (∀ i j z, ∀ l ∈ Λ, c i j (z + l) = c i j z) → (∀ j x (l : Fin 3 → Fin g → ℂ), (∀ a, l a ∈ Λ) → T j (x + l) = T j x) → ∀ (fr : ι → (Fin g → ℂ) → ℂ) (κ : ℂ), ((∀ i, DifferentiableOn ℂ (fr i) (W i ∩ Set.univ)) ∧ (∀ i z, z ∈ W i → z ∈ Set.univ → fr i z ≠ 0) ∧ (∀ i j z, z ∈ W i → z ∈ W j → z ∈ Set.univ → fr i z = c i j z * fr j z)) → (∀ j x, (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j I)) → T j x = κ * ∏ I : Finset (Fin 3), fr (j I) (∑ a ∈ I, x a) ^ ((-1 : ℤ) ^ (3 - I.card))) → ∃ (a : Λ → ℂ) (B : Λ →+ ((Fin g → ℂ) →ₗ[ℂ] ℂ)), (∀ l, a l ≠ 0) ∧ (∀ l m : Λ, a (l + m) = a l * a m * cexp (B l m)) ∧ ∀ (l : Λ) i z, z ∈ W i → fr i z = a l * cexp (B l z) * fr i (z + l)) := by
+theorem automorphyFactor_exp_linear_of_cube
+    : (∀ (g : ℕ) {ι : Type} (W : ι → Set (Fin g → ℂ)) (c : ι → ι → (Fin g → ℂ) → ℂ),
+      (∀ i, IsOpen (W i)) → (∀ z, ∃ i, z ∈ W i) → (∀ i j, DifferentiableOn ℂ (c i j) (W i ∩ W j))
+        → (∀ i j z, z ∈ W i → z ∈ W j → c i j z ≠ 0)
+        → (∀ i j k z, z ∈ W i → z ∈ W j → z ∈ W k → c i j z * c j k z = c i k z)
+        → ∀ (T : (Finset (Fin 3) → ι) → (Fin 3 → Fin g → ℂ) → ℂ),
+          (∀ j, DifferentiableOn ℂ (T j) {x | (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j I))})
+            → (∀ j x, (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j I)) → T j x ≠ 0)
+            → (∀ j j' x,
+              (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j I))
+                → (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j' I))
+                → T j x
+                  = (∏ I : Finset (Fin 3), c (j I) (j' I) (∑ a ∈ I, x a) ^ ((-1 : ℤ) ^ (3 - I.card)))
+                    * T j' x)
+            → ∀ (Λ : Submodule ℤ (Fin g → ℂ)),
+              DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤
+                → (∀ i z, ∀ l ∈ Λ, z + l ∈ W i ↔ z ∈ W i)
+                → (∀ i j z, ∀ l ∈ Λ, c i j (z + l) = c i j z)
+                → (∀ j x (l : Fin 3 → Fin g → ℂ), (∀ a, l a ∈ Λ) → T j (x + l) = T j x)
+                → ∀ (fr : ι → (Fin g → ℂ) → ℂ) (κ : ℂ),
+                  ((∀ i, DifferentiableOn ℂ (fr i) (W i ∩ Set.univ))
+                      ∧ (∀ i z, z ∈ W i → z ∈ Set.univ → fr i z ≠ 0)
+                      ∧ (∀ i j z, z ∈ W i → z ∈ W j → z ∈ Set.univ → fr i z = c i j z * fr j z))
+                    → (∀ j x,
+                      (∀ I : Finset (Fin 3), ∑ a ∈ I, x a ∈ W (j I))
+                        → T j x
+                          = κ
+                            * ∏ I : Finset (Fin 3), fr (j I) (∑ a ∈ I, x a) ^ ((-1 : ℤ) ^ (3 - I.card)))
+                    → ∃ (a : Λ → ℂ) (B : Λ →+ ((Fin g → ℂ) →ₗ[ℂ] ℂ)),
+                      (∀ l, a l ≠ 0) ∧ (∀ l m : Λ, a (l + m) = a l * a m * cexp (B l m))
+                        ∧ ∀ (l : Λ) i z, z ∈ W i → fr i z = a l * cexp (B l z) * fr i (z + l)) := by
   intro g ι W c hWo hcov _ _ _ T _ hT0 _ Λ _ _ hWp hcp hTp fr κ ⟨hfd, hf0, hfc⟩ hcube
   choose σ hσ using hcov
   have hf0' : ∀ i z, z ∈ W i → fr i z ≠ 0 := fun i z hz => hf0 i z hz (Set.mem_univ _)
@@ -99,8 +139,7 @@ theorem automorphyFactor_exp_linear_of_cube :
   have hαc : ∀ (l m : Λ) z, α (l + m) z = α l z * α m (z + l) := by
     intro l m z
     have hzl' : z + l ∈ W (σ z) := (hWp _ z l l.2).2 (hσ z)
-    rw [hα (l + m) _ z (hσ z), hα l _ z (hσ z), hα m _ (z + l) hzl', Submodule.coe_add,
-      ← add_assoc]
+    rw [hα (l + m) _ z (hσ z), hα l _ z (hσ z), hα m _ (z + l) hzl', Submodule.coe_add, ← add_assoc]
     have := hf0' _ _ hzl'
     field_simp
   have hcubeα : ∀ (l : Λ) y z, α l (y + z) * α l 0 = α l y * α l z := by
@@ -130,8 +169,10 @@ theorem automorphyFactor_exp_linear_of_cube :
       exact hT0 j x hj e1
     rw [hTp j x L hL, e1] at e2
     have e3 := mul_left_cancel₀ hκ e2
-    have e4 : ∏ I : Finset (Fin 3), (fr (j I) (∑ a ∈ I, x a) /
-        fr (j I) (∑ a ∈ I, x a + ∑ a ∈ I, L a)) ^ ((-1 : ℤ) ^ (3 - I.card)) = 1 := by
+    have e4
+        : ∏ I : Finset (Fin 3), (fr (j I) (∑ a ∈ I, x a) /
+            fr (j I) (∑ a ∈ I, x a + ∑ a ∈ I, L a)) ^ ((-1 : ℤ) ^ (3 - I.card))
+          = 1 := by
       simp only [div_zpow, Finset.prod_div_distrib]
       simp only [hs] at e3
       rw [← e3]
@@ -172,12 +213,15 @@ theorem automorphyFactor_exp_linear_of_cube :
   have hexp : ∀ (l : Λ) z, α l z = α l 0 * cexp (B₀ l z) := by
     intro l z
     have h0 := hα0 l 0
-    have := entire_hom_eq_cexp_fderiv (fun z => α l z / α l 0)
-      (by simp only [div_eq_mul_inv]; exact (hαd l).mul_const _)
-      (div_self h0) (fun y z => by
-        have := hcubeα l y z
-        field_simp
-        linear_combination this) z
+    have :=
+      entire_hom_eq_cexp_fderiv
+        (fun z => α l z / α l 0)
+        (by simp only [div_eq_mul_inv]; exact (hαd l).mul_const _) (div_self h0)
+        (fun y z => by
+          have := hcubeα l y z
+          field_simp
+          linear_combination this)
+        z
     show _ = _ * cexp (fderiv ℂ (fun z => α l z / α l 0) 0 z)
     rw [← this]
     field_simp
@@ -196,10 +240,11 @@ theorem automorphyFactor_exp_linear_of_cube :
       mul_ne_zero (mul_ne_zero (hα0 _ _) (hα0 _ _)) (Complex.exp_ne_zero _)
     apply mul_left_cancel₀ h1
     linear_combination e
-  refine ⟨fun l => α l 0, AddMonoidHom.mk' (fun l => (B₀ l).toLinearMap) ?_, fun l => hα0 l 0,
-    ha, ?_⟩
+  refine
+    ⟨fun l => α l 0, AddMonoidHom.mk' (fun l => (B₀ l).toLinearMap) ?_, fun l => hα0 l 0, ha, ?_⟩
   · intro l m
-    rw [hBadd]; rfl
+    rw [hBadd]
+    rfl
   · intro l i z hz
     have e := hexp l z
     rw [hα l i z hz, div_eq_iff (hf0' _ _ ((hWp _ z l l.2).2 hz))] at e

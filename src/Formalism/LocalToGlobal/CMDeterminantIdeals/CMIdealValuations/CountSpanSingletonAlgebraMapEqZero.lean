@@ -233,26 +233,31 @@ theorem nondegenerate_base_change : NdegBaseChange := by
   unfold MLine.ndeg MLine.deg
   rw [hI, absNorm_bcI]
   simp only [hn]
-  rw [show (∑ σ : K1 →+* ℂ, Real.log (L.n (σ.comp (algebraMap K K1)))) =
-      (Module.finrank K K1 : ℝ) * ∑ σ : K →+* ℂ, Real.log (L.n σ) from
-      sum_comp_algebraMap (fun σ => Real.log (L.n σ))]
+  rw [show (∑ σ : K1 →+* ℂ, Real.log (L.n (σ.comp (algebraMap K K1))))
+      = (Module.finrank K K1 : ℝ) * ∑ σ : K →+* ℂ, Real.log (L.n σ) from
+    sum_comp_algebraMap (fun σ => Real.log (L.n σ))]
   have hd : Module.finrank ℚ K1 = Module.finrank ℚ K * Module.finrank K K1 :=
     (Module.finrank_mul_finrank ℚ K K1).symm
-  have hpos : (0:ℝ) < Module.finrank K K1 := by exact_mod_cast Module.finrank_pos
-  have hpos2 : (0:ℝ) < Module.finrank ℚ K := by exact_mod_cast Module.finrank_pos
-  rw [Rat.cast_pow, Real.log_pow, hd, Nat.cast_mul, div_eq_div_iff (mul_pos hpos2 hpos).ne' hpos2.ne']
+  have hpos : (0 : ℝ) < Module.finrank K K1 := by exact_mod_cast Module.finrank_pos
+  have hpos2 : (0 : ℝ) < Module.finrank ℚ K := by exact_mod_cast Module.finrank_pos
+  rw [Rat.cast_pow, Real.log_pow, hd, Nat.cast_mul,
+    div_eq_div_iff (mul_pos hpos2 hpos).ne' hpos2.ne']
   ring
 
 theorem local_generator_base_change : LocGenBaseChange := by
   intro K K1 _ _ _ _ _ L L1 p p1 c hI hB hp hc
   obtain ⟨A, B, hA, hB', hAB⟩ := exists_split_of_isLocGen p hI hc
   have hc1 : algebraMap K K1 c ≠ 0 := (map_ne_zero _).mpr hc.1
-  have hmap : ∀ X : Ideal (𝓞 K), ¬ X ≤ p.asIdeal → ¬ X.map (algebraMap (𝓞 K) (𝓞 K1)) ≤ p1.asIdeal := by
+  have hmap
+      : ∀ X : Ideal (𝓞 K), ¬ X ≤ p.asIdeal → ¬ X.map (algebraMap (𝓞 K) (𝓞 K1)) ≤ p1.asIdeal := by
     intro X hX hle
     obtain ⟨x, hxX, hxp⟩ := SetLike.not_le_iff_exists.mp hX
     exact hxp ((hp x).mpr (hle (Ideal.mem_map_of_mem _ hxX)))
-  have hne : ∀ X : Ideal (𝓞 K), ¬ X ≤ p.asIdeal →
-      ((X.map (algebraMap (𝓞 K) (𝓞 K1)) : Ideal (𝓞 K1)) : FractionalIdeal (𝓞 K1)⁰ K1) ≠ 0 := by
+  have hne
+      : ∀ X : Ideal (𝓞 K),
+        ¬ X ≤ p.asIdeal
+          → ((X.map (algebraMap (𝓞 K) (𝓞 K1)) : Ideal (𝓞 K1)) : FractionalIdeal (𝓞 K1)⁰ K1)
+            ≠ 0 := by
     intro X hX h0
     rw [FractionalIdeal.coeIdeal_eq_zero] at h0
     exact hmap X hX (h0 ▸ bot_le)
@@ -260,8 +265,9 @@ theorem local_generator_base_change : LocGenBaseChange := by
   rw [bcI_mul, bcI_mul, bcI_spanSingleton, bcI_coeIdeal, bcI_coeIdeal, ← eq_bcI hB] at h1
   have h2 := congrArg (FractionalIdeal.count K1 p1) h1
   rw [FractionalIdeal.count_mul K1 p1 (by rw [eq_bcI hB]; exact bcI_ne_zero hI) (hne B hB'),
-    FractionalIdeal.count_mul K1 p1 (spanSingleton_ne_zero' hc1) (hne A hA),
-    count_coeIdeal_eq_zero p1 (hmap A hA), count_coeIdeal_eq_zero p1 (hmap B hB')] at h2
+      FractionalIdeal.count_mul K1 p1 (spanSingleton_ne_zero' hc1) (hne A hA),
+      count_coeIdeal_eq_zero p1 (hmap A hA), count_coeIdeal_eq_zero p1 (hmap B hB')]
+    at h2
   exact ⟨hc1, by omega⟩
 
 end Formalism.L2.LamCM

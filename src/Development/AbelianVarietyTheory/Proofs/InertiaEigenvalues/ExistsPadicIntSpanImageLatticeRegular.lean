@@ -10,14 +10,24 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZlSpanI
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 noncomputable section
 
 namespace GlobalTheory.BKLim
 
-theorem exists_zl_span_lattice_reads : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] (a : ℕ) (r : Γ →* GL (Fin a) (Om l)), Continuous r → ∃ (d : ℕ) (ρ : Γ →* GL (Fin d) ℤ_[l]) (b : Fin d → Matrix (Fin a) (Fin a) (Om l)) (e : Fin d → ℤ_[l]), Continuous ρ ∧ Reads ρ r b e ∧ LinearIndependent ℚ_[l] b ∧ ∀ i, ∃ f : Γ →₀ ℤ_[l], b i = f.sum fun h c => zOm l c • (r h).val := by
+theorem exists_zl_span_lattice_reads
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] (a : ℕ) (r : Γ →* GL (Fin a) (Om l)),
+      Continuous r
+        → ∃ (d : ℕ) (ρ : Γ →* GL (Fin d) ℤ_[l]) (b : Fin d → Matrix (Fin a) (Fin a) (Om l))
+            (e : Fin d → ℤ_[l]),
+          Continuous ρ ∧ Reads ρ r b e ∧ LinearIndependent ℚ_[l] b
+            ∧ ∀ i, ∃ f : Γ →₀ ℤ_[l], b i = f.sum fun h c => zOm l c • (r h).val := by
   intro l _ Γ _ _ _ _ a r hr
   classical
   have hz : ∀ c : ℤ_[l], zOm l c = algebraMap ℤ_[l] (Om l) c := fun c =>
@@ -36,19 +46,24 @@ theorem exists_zl_span_lattice_reads : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) 
     · rw [Submodule.span_le]
       rintro _ ⟨h, rfl⟩
       obtain ⟨f', hf't, hf'⟩ := ht (Finsupp.single h 1)
-      have hvh : v h = f'.sum fun h c => ((algebraMap ℚ_[l] (PadicAlgCl l)) (c : ℚ_[l])) •
-          ((r h : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l)) := by
+      have hvh
+          : v h
+            = f'.sum fun h c =>
+              ((algebraMap ℚ_[l] (PadicAlgCl l)) (c : ℚ_[l]))
+                • ((r h : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l)) := by
         rw [← hf', Finsupp.sum_single_index (by simp)]
         simp [v]
       rw [SetLike.mem_coe, hvh]
       refine Submodule.sum_mem _ fun k hk => ?_
-      have : ((algebraMap ℚ_[l] (PadicAlgCl l)) (f' k : ℚ_[l])) •
-          ((r k : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l)) = f' k • v k := by
+      have : ((algebraMap ℚ_[l] (PadicAlgCl l)) (f' k : ℚ_[l]))
+            • ((r k : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l))
+          = f' k • v k := by
         rw [hsm]; rfl
       refine (show _ ∈ _ from ?_)
       beta_reduce
       rw [this]
-      exact Submodule.smul_mem _ _ (Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_image_of_mem v (hf't hk))))
+      exact Submodule.smul_mem _ _
+        (Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_image_of_mem v (hf't hk))))
   haveI : Module.Finite ℤ_[l] M := Module.Finite.iff_fg.mpr hfg
   haveI : Module.IsTorsionFree ℤ_[l] M := Module.IsTorsionFree.of_smul_eq_zero fun c m h => by
     have h' : (c : ℚ_[l]) • (m : Matrix (Fin a) (Fin a) (Om l)) = 0 := by
@@ -69,14 +84,17 @@ theorem exists_zl_span_lattice_reads : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) 
     | zero => simp
     | add y z _ _ hy hz => rw [Matrix.mul_add]; exact M.add_mem hy hz
     | smul c y _ hy => rw [Matrix.mul_smul]; exact M.smul_mem c hy
-  let Lm : Γ → Module.End ℤ_[l] M := fun g =>
-    { toFun := fun x => ⟨v g * x, hstab g x x.2⟩
-      map_add' := fun x y => Subtype.ext (Matrix.mul_add _ _ _)
-      map_smul' := fun c x => Subtype.ext (Matrix.mul_smul _ _ _) }
-  let L : Γ →* Module.End ℤ_[l] M :=
-    { toFun := Lm
-      map_one' := LinearMap.ext fun x => Subtype.ext (by simp [Lm, v])
-      map_mul' := fun g h => LinearMap.ext fun x => Subtype.ext (by simp [Lm, v, map_mul, Matrix.mul_assoc]) }
+  let Lm : Γ → Module.End ℤ_[l] M := fun g => {
+    toFun := fun x => ⟨v g * x, hstab g x x.2⟩
+    map_add' := fun x y => Subtype.ext (Matrix.mul_add _ _ _)
+    map_smul' := fun c x => Subtype.ext (Matrix.mul_smul _ _ _)
+  }
+  let L : Γ →* Module.End ℤ_[l] M := {
+    toFun := Lm
+    map_one' := LinearMap.ext fun x => Subtype.ext (by simp [Lm, v])
+    map_mul' := fun g h =>
+      LinearMap.ext fun x => Subtype.ext (by simp [Lm, v, map_mul, Matrix.mul_assoc])
+  }
   let ρ₀ : Γ →* Matrix (Fin d) (Fin d) ℤ_[l] :=
     (LinearMap.toMatrixAlgEquiv B).toAlgHom.toRingHom.toMonoidHom.comp L
   let ρ : Γ →* GL (Fin d) ℤ_[l] := ρ₀.toHomUnits
@@ -98,7 +116,8 @@ theorem exists_zl_span_lattice_reads : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) 
       rfl
     · exact hrepr ⟨1, h1M⟩
 
-  have hliZ : LinearIndependent ℤ_[l] b := B.linearIndependent.map' M.subtype (Submodule.ker_subtype M)
+  have hliZ : LinearIndependent ℤ_[l] b :=
+    B.linearIndependent.map' M.subtype (Submodule.ker_subtype M)
   have hli : LinearIndependent ℚ_[l] b := (LinearIndependent.iff_fractionRing ℤ_[l] ℚ_[l]).1 hliZ
   refine ⟨d, ρ, b, e, ?_, hreads, hli, fun i => ?_⟩
   rotate_left
@@ -129,7 +148,8 @@ theorem exists_zl_span_lattice_reads : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) 
   have hcv : Continuous v := Units.continuous_val.comp hr
   have hval : Continuous fun g => (ρ g).val := by
     refine continuous_matrix fun i j => ?_
-    have : (fun g => (((ρ g).val i j : ℤ_[l]) : ℚ_[l])) = fun g => Bq.coord i ⟨v g * b j, hmemW (Lm g (B j))⟩ := by
+    have : (fun g => (((ρ g).val i j : ℤ_[l]) : ℚ_[l]))
+        = fun g => Bq.coord i ⟨v g * b j, hmemW (Lm g (B j))⟩ := by
       funext g
       rw [hρ, hcoord]
       rfl

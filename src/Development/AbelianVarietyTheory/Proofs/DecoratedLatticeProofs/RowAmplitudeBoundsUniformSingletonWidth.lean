@@ -58,12 +58,15 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Sch
 @[expose] public section
 
 open scoped Classical
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf GlobalTheory.Core.Deg
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.RowsConc
+  Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf GlobalTheory.Core.Deg
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.AmpRecordGap
 
-theorem isHCParam_u (R : Ranks) (P : HCParam R) : Formalism.QuantumDeterminants.IsHCParam (fun i => ((P.u i : ℚ) : ℝ)) := by
+theorem isHCParam_u (R : Ranks) (P : HCParam R)
+    : Formalism.QuantumDeterminants.IsHCParam (fun i => ((P.u i : ℚ) : ℝ)) := by
   have hk := R.m_add_three_le_k
   obtain ⟨c, hc⟩ := R.k_even
   have step : ∀ (i : ℕ) (h : i + 1 < R.k), P.u ⟨i + 1, h⟩ < P.u ⟨i, by omega⟩ := fun i h =>
@@ -77,16 +80,20 @@ theorem isHCParam_u (R : Ranks) (P : HCParam R) : Formalism.QuantumDeterminants.
     intro i j hij
     have hlt : i.val < j.val := hij
     have := key (j.val - i.val - 1) i.val (by omega)
-    have e : P.u ⟨i.val + (j.val - i.val - 1) + 1, by omega⟩ = P.u j := congrArg P.u (Fin.ext (by simp; omega))
+    have e : P.u ⟨i.val + (j.val - i.val - 1) + 1, by omega⟩ = P.u j :=
+      congrArg P.u (Fin.ext (by simp; omega))
     rw [e] at this
     beta_reduce
     exact_mod_cast this
   · obtain ⟨z, hz⟩ := P.u_half a
     refine ⟨z - c + 1, ?_⟩
     simp only
-    rw [hz, hc]; push_cast; ring
+    rw [hz, hc]
+    push_cast
+    ring
 
-theorem isHCParam_uS (D : D7) (w : D.what₂.Word) (τ : D.what₂.Tau) : Formalism.QuantumDeterminants.IsHCParam (uS D w τ) :=
+theorem isHCParam_uS (D : D7) (w : D.what₂.Word) (τ : D.what₂.Tau)
+    : Formalism.QuantumDeterminants.IsHCParam (uS D w τ) :=
   isHCParam_u D.R (D.hcW w τ)
 
 theorem weyl_at (D : D7) : VanishingOnXAndXPlusBranching.adm12 D := by
@@ -102,32 +109,33 @@ theorem ampOn_singleton : ∀ c : ℝ, AmpOn {c} := by
   obtain ⟨CS, tS, hS⟩ := GlobalTheory.Amp.schur_at_record_gap Cg cb Cu cT CT c
   obtain ⟨tL, hL⟩ := GlobalTheory.T.exists_threshold_criticalLevel_lower_bound cb Cu hcb
   obtain ⟨tV, hV⟩ := GlobalTheory.T.normalizedFormalDegree_eq_vandermonde_of_sizes
-  obtain ⟨C, C2, Ch, hC, hCh, H⟩ := GlobalTheory.T.ampAt_of_admitted_bounds Cg CPT CDl 1 Ca CS zero_le_one hCa
+  obtain ⟨C, C2, Ch, hC, hCh, H⟩ :=
+    GlobalTheory.T.ampAt_of_admitted_bounds Cg CPT CDl 1 Ca CS zero_le_one hCa
   refine ⟨C, C2, Ch, hC, hCh, fun Cpr δ hδ => ?_⟩
   obtain ⟨t0, H0⟩ := H Cpr δ hδ
   obtain ⟨t1, h1⟩ := hPT (max Cpr 0)
   obtain ⟨t2, h2⟩ := hDl (max Cpr 0)
-  obtain ⟨t3, h3⟩ := GlobalTheory.T.realPlaceAmplitude_norm_le_const_div_formalDegree Cg cb Cu cT CT c (max Cpr 0)
+  obtain ⟨t3, h3⟩ :=
+    GlobalTheory.T.realPlaceAmplitude_norm_le_const_div_formalDegree Cg cb Cu cT CT c (max Cpr 0)
   obtain ⟨t4, h4⟩ := hAbs (max Cpr 0)
   obtain ⟨t5, h5⟩ := GlobalTheory.T.formalDegree_ratio_eq_vandermonde_ratio_along_line (max Cpr 0)
-  refine ⟨max t0 (max t1 (max t2 (max t3 (max t4 (max tS (max tL (max tV t5))))))),
-    fun C0 hC0 C' Cl hC' hCl D large₂ hG hT _ hTF => ?_⟩
+  refine ⟨
+    max t0 (max t1 (max t2 (max t3 (max t4 (max tS (max tL (max tV t5))))))),
+    fun C0 hC0 C' Cl hC' hCl D large₂ hG hT _ hTF => ?_
+  ⟩
   obtain rfl : C0 = c := hC0
   simp only [max_le_iff] at hC' hCl
   obtain ⟨a0, a1, a2, a3, a4, aS, -, aV, a5⟩ := hC'
   obtain ⟨b0, b1, b2, b3, b4, bS, bL, bV, b5⟩ := hCl
   have hLow : VanishingOnXAndXPlusBranching.adm5 D large₂ C' Cl Cg cb Cu cT CT C0 := fun h0 =>
     hL D large₂ C' Cl Cg cT CT C0 bL
-      (hV D large₂ C' Cl Cg cb Cu cT CT aV bV hT h0.1 (GlobalTheory.T.dataNW_of_standingNumericalData D C0 h0.2.2 h0.2.1)) h0
-  exact H0 D large₂ C' Cl cb Cu cT CT C0 a0 b0 hG
-    (h1 D large₂ C' Cl a1 b1 hT hTF)
-    (h2 D large₂ C' Cl a2 b2 hT)
-    hLow
-    (h3 D large₂ C' Cl a3 b3 hT)
+      (hV D large₂ C' Cl Cg cb Cu cT CT aV bV hT h0.1
+        (GlobalTheory.T.dataNW_of_standingNumericalData D C0 h0.2.2 h0.2.1))
+      h0
+  exact H0 D large₂ C' Cl cb Cu cT CT C0 a0 b0 hG (h1 D large₂ C' Cl a1 b1 hT hTF)
+    (h2 D large₂ C' Cl a2 b2 hT) hLow (h3 D large₂ C' Cl a3 b3 hT)
     (Formalism.MainNotions.BridgeLemma₂.degree_ratio_one_of_vandermonde _ _ _ _ _ _ _ _ _ _ _ _
       (h5 D large₂ C' Cl Cg cb Cu cT CT C0 1 a5 b5 hT))
-    (h4 D large₂ C' Cl a4 b4)
-    (hS D large₂ C' Cl aS bS hT)
-    (weyl_at D)
+    (h4 D large₂ C' Cl a4 b4) (hS D large₂ C' Cl aS bS hT) (weyl_at D)
 
 end GlobalTheory.AmpRecordGap

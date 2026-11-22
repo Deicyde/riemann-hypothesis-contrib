@@ -12,12 +12,19 @@ open Finset
 
 def fac {σ : Type} (κ : σ →₀ ℕ) : ℕ := ∏ x ∈ κ.support, (κ x).factorial
 
-def jp {K A σ : Type} [CommRing K] [CommRing A] [Algebra K A] (P : MvPolynomial σ A) (f : MvPowerSeries σ K) : A :=
+def jp
+    {K A σ : Type} [CommRing K] [CommRing A] [Algebra K A]
+    (P : MvPolynomial σ A) (f : MvPowerSeries σ K)
+    : A :=
   ∑ κ ∈ P.support, (((fac κ : ℕ) : K) * MvPowerSeries.coeff κ f) • AddMonoidAlgebra.coeff P κ
 
-theorem jp_eq_sum {K A σ : Type} [CommRing K] [CommRing A] [Algebra K A] (P : MvPolynomial σ A)
-    (f : MvPowerSeries σ K) (S : Finset (σ →₀ ℕ)) (hS : P.support ⊆ S) :
-    jp P f = ∑ κ ∈ S, (((fac κ : ℕ) : K) * MvPowerSeries.coeff κ f) • AddMonoidAlgebra.coeff P κ := by
+theorem jp_eq_sum
+    {K A σ : Type} [CommRing K] [CommRing A] [Algebra K A]
+    (P : MvPolynomial σ A)
+    (f : MvPowerSeries σ K)
+    (S : Finset (σ →₀ ℕ)) (hS : P.support ⊆ S)
+    : jp P f
+      = ∑ κ ∈ S, (((fac κ : ℕ) : K) * MvPowerSeries.coeff κ f) • AddMonoidAlgebra.coeff P κ := by
   unfold jp
   refine Finset.sum_subset hS ?_
   intro κ _ hκ
@@ -37,8 +44,8 @@ abbrev eqv : ((Σ v, ι v) →₀ ℕ) ≃+ (∀ v, ι v →₀ ℕ) := Finsupp.
 
 variable [DecidableEq Pl]
 
-theorem eqv_embDomain (v : Pl) (m : ι v →₀ ℕ) :
-    eqv (Finsupp.embDomain (Function.Embedding.sigmaMk v) m) = Pi.single v m := by
+theorem eqv_embDomain (v : Pl) (m : ι v →₀ ℕ)
+    : eqv (Finsupp.embDomain (Function.Embedding.sigmaMk v) m) = Pi.single v m := by
   funext w
   ext i
   rw [Finsupp.sigmaFinsuppAddEquivPiFinsupp_apply]
@@ -50,23 +57,25 @@ theorem eqv_embDomain (v : Pl) (m : ι v →₀ ℕ) :
     rintro ⟨j, hj⟩
     exact h (congrArg Sigma.fst hj).symm
 
-theorem coeff_atP_single (v : Pl) (f : MvPowerSeries (ι v) K) (m : ι v →₀ ℕ) :
-    MvPowerSeries.coeff (eqv.symm (Pi.single v m)) (atP v f) = MvPowerSeries.coeff m f := by
+theorem coeff_atP_single (v : Pl) (f : MvPowerSeries (ι v) K) (m : ι v →₀ ℕ)
+    : MvPowerSeries.coeff (eqv.symm (Pi.single v m)) (atP v f) = MvPowerSeries.coeff m f := by
   have h : eqv.symm (Pi.single v m) = Finsupp.embDomain (Function.Embedding.sigmaMk v) m := by
     rw [AddEquiv.symm_apply_eq, eqv_embDomain]
   rw [h]
   exact MvPowerSeries.coeff_embDomain_rename _ _ _
 
-theorem coeff_atP_eq_zero (v : Pl) (f : MvPowerSeries (ι v) K) (n : (Σ v, ι v) →₀ ℕ)
-    (h : ∀ m, n ≠ eqv.symm (Pi.single v m)) : MvPowerSeries.coeff n (atP v f) = 0 := by
+theorem coeff_atP_eq_zero
+    (v : Pl) (f : MvPowerSeries (ι v) K) (n : (Σ v, ι v) →₀ ℕ)
+    (h : ∀ m, n ≠ eqv.symm (Pi.single v m))
+    : MvPowerSeries.coeff n (atP v f) = 0 := by
   apply MvPowerSeries.coeff_rename_eq_zero
   rintro ⟨u, hu⟩
   refine h u ?_
   rw [← hu, eq_comm, AddEquiv.symm_apply_eq, ← eqv_embDomain v u]
   exact congrArg eqv (Finsupp.embDomain_eq_mapDomain (Function.Embedding.sigmaMk v) u)
 
-theorem coeff_prod_atP (g : ∀ v, MvPowerSeries (ι v) K) (n : (Σ v, ι v) →₀ ℕ) :
-    MvPowerSeries.coeff n (∏ v, atP v (g v)) = ∏ v, MvPowerSeries.coeff (eqv n v) (g v) := by
+theorem coeff_prod_atP (g : ∀ v, MvPowerSeries (ι v) K) (n : (Σ v, ι v) →₀ ℕ)
+    : MvPowerSeries.coeff n (∏ v, atP v (g v)) = ∏ v, MvPowerSeries.coeff (eqv n v) (g v) := by
   classical
   rw [MvPowerSeries.coeff_prod]
   let l0 : Pl →₀ ((Σ v, ι v) →₀ ℕ) :=
@@ -75,8 +84,9 @@ theorem coeff_prod_atP (g : ∀ v, MvPowerSeries (ι v) K) (n : (Σ v, ι v) →
   have hmem : l0 ∈ Finset.finsuppAntidiag Finset.univ n := by
     rw [Finset.mem_finsuppAntidiag]
     refine ⟨?_, Finset.subset_univ _⟩
-    calc ∑ v ∈ Finset.univ, l0 v = ∑ v, eqv.symm (Pi.single v (eqv n v)) :=
-          Finset.sum_congr rfl fun v _ => hl0 v
+    calc
+      ∑ v ∈ Finset.univ, l0 v
+        = ∑ v, eqv.symm (Pi.single v (eqv n v)) := Finset.sum_congr rfl fun v _ => hl0 v
       _ = n := by rw [← map_sum, Finset.univ_sum_single, AddEquiv.symm_apply_apply]
   rw [Finset.sum_eq_single_of_mem l0 hmem]
   · exact Finset.prod_congr rfl fun v _ => by rw [hl0]; exact coeff_atP_single v (g v) (eqv n v)
@@ -92,15 +102,17 @@ theorem coeff_prod_atP (g : ∀ v, MvPowerSeries (ι v) K) (n : (Σ v, ι v) →
     choose m hm using hall
     have hn : n = eqv.symm m := by
       rw [← hl.1]
-      calc ∑ v ∈ Finset.univ, l v = ∑ v, eqv.symm (Pi.single v (m v)) :=
-            Finset.sum_congr rfl fun v _ => hm v
+      calc
+        ∑ v ∈ Finset.univ, l v
+          = ∑ v, eqv.symm (Pi.single v (m v)) := Finset.sum_congr rfl fun v _ => hm v
         _ = eqv.symm m := by rw [← map_sum, Finset.univ_sum_single]
     ext1 v
     rw [hm v, hl0, hn, AddEquiv.apply_symm_apply]
 
-private theorem coe_rename_sigma_mk_eq_atP (v : Pl) (p : MvPolynomial (ι v) K) :
-    ((MvPolynomial.rename (Sigma.mk v) p : MvPolynomial (Σ v, ι v) K) : MvPowerSeries (Σ v, ι v) K) =
-      atP v (p : MvPowerSeries (ι v) K) := by
+private theorem coe_rename_sigma_mk_eq_atP (v : Pl) (p : MvPolynomial (ι v) K)
+    : ((MvPolynomial.rename (Sigma.mk v) p : MvPolynomial (Σ v, ι v) K)
+        : MvPowerSeries (Σ v, ι v) K)
+      = atP v (p : MvPowerSeries (ι v) K) := by
   ext d
   rw [MvPolynomial.coeff_coe]
   by_cases h : ∃ m, d = eqv.symm (Pi.single v m)
@@ -119,11 +131,13 @@ private theorem coe_rename_sigma_mk_eq_atP (v : Pl) (p : MvPolynomial (ι v) K) 
     rw [← hu, eq_comm, AddEquiv.symm_apply_eq, ← eqv_embDomain v u]
     exact congrArg eqv (Finsupp.embDomain_eq_mapDomain (Function.Embedding.sigmaMk v) u)
 
-theorem coeff_prod_rename (P : ∀ v, MvPolynomial (ι v) K) (n : (Σ v, ι v) →₀ ℕ) :
-    AddMonoidAlgebra.coeff (∏ v, MvPolynomial.rename (Sigma.mk v) (P v)) n =
-      ∏ v, AddMonoidAlgebra.coeff (P v) (eqv n v) := by
-  have h1 : ((∏ v, MvPolynomial.rename (Sigma.mk v) (P v) : MvPolynomial (Σ v, ι v) K) :
-      MvPowerSeries (Σ v, ι v) K) = ∏ v, atP v (P v : MvPowerSeries (ι v) K) := by
+theorem coeff_prod_rename (P : ∀ v, MvPolynomial (ι v) K) (n : (Σ v, ι v) →₀ ℕ)
+    : AddMonoidAlgebra.coeff (∏ v, MvPolynomial.rename (Sigma.mk v) (P v)) n
+      = ∏ v, AddMonoidAlgebra.coeff (P v) (eqv n v) := by
+  have h1
+      : ((∏ v, MvPolynomial.rename (Sigma.mk v) (P v) : MvPolynomial (Σ v, ι v) K)
+          : MvPowerSeries (Σ v, ι v) K)
+        = ∏ v, atP v (P v : MvPowerSeries (ι v) K) := by
     rw [← Finset.prod_congr rfl fun v _ => coe_rename_sigma_mk_eq_atP v (P v)]
     exact map_prod (MvPolynomial.coeToMvPowerSeries.ringHom (R := K)) _ _
   rw [← MvPolynomial.coeff_coe, h1, coeff_prod_atP]
@@ -145,12 +159,16 @@ theorem fac_eq [∀ v, Fintype (ι v)] (n : (Σ v, ι v) →₀ ℕ) : fac n = �
 
 end Alg
 
-theorem jp_prod {K A Pl : Type} [CommRing K] [CommRing A] [Algebra K A] [Fintype Pl] [DecidableEq Pl] {ι : Pl → Type}
-    [∀ v, Fintype (ι v)] (P : ∀ v, MvPolynomial (ι v) A) (g : ∀ v, MvPowerSeries (ι v) K) :
-    jp (∏ v, MvPolynomial.rename (Sigma.mk v) (P v)) (∏ v, atP v (g v)) = ∏ v, jp (P v) (g v) := by
+theorem jp_prod
+    {K A Pl : Type} [CommRing K] [CommRing A] [Algebra K A] [Fintype Pl] [DecidableEq Pl]
+    {ι : Pl → Type} [∀ v, Fintype (ι v)]
+    (P : ∀ v, MvPolynomial (ι v) A) (g : ∀ v, MvPowerSeries (ι v) K)
+    : jp (∏ v, MvPolynomial.rename (Sigma.mk v) (P v)) (∏ v, atP v (g v))
+      = ∏ v, jp (P v) (g v) := by
   classical
-  have hsub : (∏ v, MvPolynomial.rename (Sigma.mk v) (P v)).support ⊆
-      (Fintype.piFinset fun v => (P v).support).image eqv.symm := by
+  have hsub
+      : (∏ v, MvPolynomial.rename (Sigma.mk v) (P v)).support
+        ⊆ (Fintype.piFinset fun v => (P v).support).image eqv.symm := by
     intro n hn
     rw [MvPolynomial.mem_support_iff, coeff_prod_rename] at hn
     rw [Finset.mem_image]

@@ -15,15 +15,17 @@ open ReciprocityTheory.ChartRestriction.DS PositivityTheory.RgDs PositivityTheor
 
 variable {n : ℕ}
 
-theorem isKTypeOf_map_of_injOn {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {Λ : Fin n → ℝ} {S : Submodule ℂ H}
-    (hS : Formalism.MainNotions.S.IsKTypeOf ε σ Λ S) (A : H →ₗ[ℂ] H)
-    (hcomm : ∀ k ∈ Kset ε, ∀ v, σ k (A v) = A (σ k v))
-    (hinj : ∀ w ∈ S, A w = 0 → w = 0) :
-    Formalism.MainNotions.S.IsKTypeOf ε σ Λ (S.map A) := by
+theorem isKTypeOf_map_of_injOn
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {Λ : Fin n → ℝ}
+    {S : Submodule ℂ H} (hS : Formalism.MainNotions.S.IsKTypeOf ε σ Λ S)
+    (A : H →ₗ[ℂ] H)
+    (hcomm : ∀ k ∈ Kset ε, ∀ v, σ k (A v) = A (σ k v)) (hinj : ∀ w ∈ S, A w = 0 → w = 0)
+    : Formalism.MainNotions.S.IsKTypeOf ε σ Λ (S.map A) := by
   haveI : FiniteDimensional ℂ S := hS.1
-  have hirr : ∀ S' : Submodule ℂ H, S' ≤ S.map A → Formalism.MainNotions.S.IsKStableOn ε σ S' →
-      S' = ⊥ ∨ S' = S.map A := by
+  have hirr
+      : ∀ S' : Submodule ℂ H,
+        S' ≤ S.map A → Formalism.MainNotions.S.IsKStableOn ε σ S' → S' = ⊥ ∨ S' = S.map A := by
     intro S' hS' hK'
     have hTK : Formalism.MainNotions.S.IsKStableOn ε σ (S ⊓ S'.comap A) := by
       intro g hg v hv
@@ -56,8 +58,11 @@ theorem isKTypeOf_map_of_injOn {H : Type*} [NormedAddCommGroup H] [InnerProductS
   · rintro μ _ ⟨w, hw, rfl⟩ hne hwt
     refine hS.2.2.2.2 μ w hw (fun h => hne (by rw [h, map_zero])) ?_
     intro θ hθ
-    have h1 : A (σ (Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I))) w -
-        Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • w) = 0 := by
+    have h1
+        : A
+            (σ (Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I))) w
+              - Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • w)
+          = 0 := by
       rw [map_sub, map_smul, ← hcomm _ hθ, hwt θ hθ, sub_self]
     have h2 := hinj _ (Submodule.sub_mem _ (hS.2.1 _ hθ w hw) (Submodule.smul_mem _ _ hw)) h1
     exact sub_eq_zero.1 h2
@@ -67,7 +72,8 @@ theorem stepIrred_of_stepDatum : StepDatum → StepIrred := by
   classical
   have hσ := rreg_isURepOn ε
   have hD := isDerivedOn_smE hσ
-  have hV1 : Formalism.MainNotions.S.IsKTypeOf ε (rreg ε) (lowK ε lam) (V1 ε Ψ) := hDatum n ε lam T Ψ hP
+  have hV1 : Formalism.MainNotions.S.IsKTypeOf ε (rreg ε) (lowK ε lam) (V1 ε Ψ) :=
+    hDatum n ε lam T Ψ hP
   have : CompleteSpace W := hWc.completeSpace_coe
   have hWo : ∀ g ∈ UJset ε, ∀ x ∈ Wᗮ, rreg ε g x ∈ Wᗮ := by
     intro g hg
@@ -76,13 +82,15 @@ theorem stepIrred_of_stepDatum : StepDatum → StepIrred := by
   have hK : Formalism.MainNotions.S.IsKStableOn ε (rreg ε) (V1 ε Ψ ⊓ Wᗮ) := by
     intro k hk x hx
     exact ⟨hV1.2.1 k hk x hx.1, hWo k (UnitaryGroupOfForm.K_mem_UJ hk) x hx.2⟩
-  have hmem : ∀ v ∈ datumV ε Ψ T.w, ((v : smD ε (rreg ε)) : L2 ε) ∈ V1 ε Ψ :=
-    fun v hv => Submodule.mem_map_of_mem hv
+  have hmem : ∀ v ∈ datumV ε Ψ T.w, ((v : smD ε (rreg ε)) : L2 ε) ∈ V1 ε Ψ := fun v hv =>
+    Submodule.mem_map_of_mem hv
   rcases hV1.2.2.1 (V1 ε Ψ ⊓ Wᗮ) inf_le_left hK with h0 | hV'
   · right
     refine le_antisymm hWle (UnitaryGroupOfForm.closGen_le hD W hWc hWG _ ?_)
-    have hcomm : ∀ k ∈ Kset ε, ∀ v, rreg ε k (W.starProjection.toLinearMap v) =
-        W.starProjection.toLinearMap (rreg ε k v) := by
+    have hcomm
+        : ∀ k ∈ Kset ε, ∀ v,
+          rreg ε k (W.starProjection.toLinearMap v)
+            = W.starProjection.toLinearMap (rreg ε k v) := by
       intro k hk v
       have hkU := UnitaryGroupOfForm.K_mem_UJ hk
       exact (UnitaryGroupOfForm.proj_comm W (rreg ε k) (hWG k hkU) (hWo k hkU) v).symm
@@ -105,9 +113,8 @@ theorem stepIrred_of_stepDatum : StepDatum → StepIrred := by
     exact hle hv'
   · left
     have hle : Hlam ε Ψ T.w ≤ Wᗮ :=
-      UnitaryGroupOfForm.closGen_le hD Wᗮ (Submodule.isClosed_orthogonal W) hWo _
-        (fun v hv => (show ((v : smD ε (rreg ε)) : L2 ε) ∈ V1 ε Ψ ⊓ Wᗮ by
-          rw [hV']; exact hmem v hv).2)
+      UnitaryGroupOfForm.closGen_le hD Wᗮ (Submodule.isClosed_orthogonal W) hWo _ (fun v hv =>
+        (show ((v : smD ε (rreg ε)) : L2 ε) ∈ V1 ε Ψ ⊓ Wᗮ by rw [hV']; exact hmem v hv).2)
     rw [eq_bot_iff, ← Submodule.inf_orthogonal_eq_bot W]
     exact le_inf le_rfl (hWle.trans hle)
 

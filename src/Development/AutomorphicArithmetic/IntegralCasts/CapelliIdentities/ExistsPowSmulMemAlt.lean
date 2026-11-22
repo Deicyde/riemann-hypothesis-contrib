@@ -4,13 +4,14 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.pow_mul_isIntegral {l : ℕ} [Fact l.Prime] {K : Type} [Field K]
-    [Algebra ℚ_[l] K] [Algebra ℤ_[l] K] [IsScalarTower ℤ_[l] ℚ_[l] K]
-    [FiniteDimensional ℚ_[l] K] (c : K) :
-    ∃ n : ℕ, IsIntegral ℤ_[l] ((l : K) ^ n * c) := by
+private theorem UpperTheory.pow_mul_isIntegral
+    {l : ℕ} [Fact l.Prime]
+    {K : Type} [Field K] [Algebra ℚ_[l] K] [Algebra ℤ_[l] K] [IsScalarTower ℤ_[l] ℚ_[l] K]
+    [FiniteDimensional ℚ_[l] K]
+    (c : K)
+    : ∃ n : ℕ, IsIntegral ℤ_[l] ((l : K) ^ n * c) := by
   have h1 : IsAlgebraic ℚ_[l] c := Algebra.IsAlgebraic.isAlgebraic c
-  have h2 : IsAlgebraic ℤ_[l] c :=
-    (IsFractionRing.isAlgebraic_iff ℤ_[l] ℚ_[l] K).mpr h1
+  have h2 : IsAlgebraic ℤ_[l] c := (IsFractionRing.isAlgebraic_iff ℤ_[l] ℚ_[l] K).mpr h1
   obtain ⟨y, hy, hint⟩ := h2.exists_integral_multiple
   refine ⟨y.valuation, ?_⟩
   have hspec := PadicInt.unitCoeff_spec hy
@@ -23,13 +24,18 @@ private theorem UpperTheory.pow_mul_isIntegral {l : ℕ} [Fact l.Prime] {K : Typ
   rw [h4]
   exact hint.smul _
 
-theorem UpperTheory.exists_pow_smul_mem_alt :
-    ∀ {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Algebra ℚ_[l] K] [Algebra ℤ_[l] K] [IsScalarTower ℤ_[l] ℚ_[l] K] [FiniteDimensional ℚ_[l] K] {O : Type} [CommRing O] [Algebra O K] {V : Type} [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V] (T : Submodule O V), (∀ c : K, IsIntegral ℤ_[l] c → ∃ o : O, algebraMap O K o = c) → Submodule.span K (T : Set V) = ⊤ → ∀ v : V, ∃ n : ℕ, (l : K) ^ n • v ∈ T := by
+theorem UpperTheory.exists_pow_smul_mem_alt
+    : ∀ {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Algebra ℚ_[l] K] [Algebra ℤ_[l] K]
+        [IsScalarTower ℤ_[l] ℚ_[l] K] [FiniteDimensional ℚ_[l] K] {O : Type} [CommRing O]
+        [Algebra O K] {V : Type} [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
+        (T : Submodule O V),
+      (∀ c : K, IsIntegral ℤ_[l] c → ∃ o : O, algebraMap O K o = c)
+        → Submodule.span K (T : Set V) = ⊤
+        → ∀ v : V, ∃ n : ℕ, (l : K) ^ n • v ∈ T := by
   intro l _ K _ _ _ _ _ O _ _ V _ _ _ _ T hO hT v
   have hpow : ∀ (m : ℕ) (w : V), w ∈ T → (l : K) ^ m • w ∈ T := by
     intro m w hw
-    have h : (l : K) ^ m = algebraMap O K ((l : O) ^ m) := by
-      rw [map_pow, map_natCast]
+    have h : (l : K) ^ m = algebraMap O K ((l : O) ^ m) := by rw [map_pow, map_natCast]
     rw [h, algebraMap_smul]
     exact T.smul_mem _ hw
   have hv : v ∈ Submodule.span K (T : Set V) := hT ▸ Submodule.mem_top

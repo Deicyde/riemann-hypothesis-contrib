@@ -29,8 +29,8 @@ theorem det_dg {i : ι} (hi : ∀ y, y = i) (x : Rˣ) : Matrix.GeneralLinearGrou
   rw [Matrix.det_diagonal, Fintype.prod_sum_type]
   simp
 
-theorem map_dg {S : Type} [CommRing S] (f : R →+* S) (x : Rˣ) :
-    Matrix.GeneralLinearGroup.map f (dg ι x) = dg ι (Units.map f.toMonoidHom x) := by
+theorem map_dg {S : Type} [CommRing S] (f : R →+* S) (x : Rˣ)
+    : Matrix.GeneralLinearGroup.map f (dg ι x) = dg ι (Units.map f.toMonoidHom x) := by
   apply Units.ext
   show (Matrix.diagonal _).map f = Matrix.diagonal _
   rw [Matrix.diagonal_map (map_zero f)]
@@ -52,8 +52,10 @@ section Ad
 
 variable {E R : Type} [Field E] [CommRing R] (A : Ad E R)
 
-theorem dg_mem_kGL {ι : Type} [Fintype ι] [DecidableEq ι] (x : Rˣ) (h1 : (x : R) ∈ A.O)
-    (h2 : ((x⁻¹ : Rˣ) : R) ∈ A.O) (h3 : ∀ w, ‖A.φ w x‖ = 1) : dg ι x ∈ A.kGL (ι ⊕ ι) := by
+theorem dg_mem_kGL
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (x : Rˣ) (h1 : (x : R) ∈ A.O) (h2 : ((x⁻¹ : Rˣ) : R) ∈ A.O) (h3 : ∀ w, ‖A.φ w x‖ = 1)
+    : dg ι x ∈ A.kGL (ι ⊕ ι) := by
   refine ⟨fun r c => ⟨?_, ?_⟩, fun w => ?_⟩
   · show Matrix.diagonal _ r c ∈ A.O
     by_cases h : r = c
@@ -87,10 +89,10 @@ theorem det_mem_O {M : Matrix n n R} (h : ∀ r c, M r c ∈ A.O) : M.det ∈ A.
   rw [Matrix.det_apply']
   exact A.O.sum_mem fun s _ => A.O.mul_mem (intCast_mem _ _) (A.O.prod_mem fun m _ => h _ _)
 
-theorem det_kGL {k : GL n R} (hk : k ∈ A.kGL n) :
-    ((Matrix.GeneralLinearGroup.det k : Rˣ) : R) ∈ A.O ∧
-      (((Matrix.GeneralLinearGroup.det k)⁻¹ : Rˣ) : R) ∈ A.O ∧
-      ∀ w, ‖A.φ w (Matrix.GeneralLinearGroup.det k : Rˣ)‖ = 1 := by
+theorem det_kGL {k : GL n R} (hk : k ∈ A.kGL n)
+    : ((Matrix.GeneralLinearGroup.det k : Rˣ) : R) ∈ A.O
+      ∧ (((Matrix.GeneralLinearGroup.det k)⁻¹ : Rˣ) : R) ∈ A.O
+      ∧ ∀ w, ‖A.φ w (Matrix.GeneralLinearGroup.det k : Rˣ)‖ = 1 := by
   refine ⟨?_, ?_, fun w => ?_⟩
   · rw [Matrix.GeneralLinearGroup.val_det_apply]
     exact det_mem_O A fun r c => (hk.1 r c).1
@@ -98,7 +100,10 @@ theorem det_kGL {k : GL n R} (hk : k ∈ A.kGL n) :
     exact det_mem_O A fun r c => (hk.1 r c).2
   · have h := Matrix.det_of_mem_unitary (hk.2 w)
     rw [Matrix.GeneralLinearGroup.val_det_apply, RingHom.map_det]
-    have h' : star (RingHom.mapMatrix (A.φ w) (k : Matrix n n R)).det * (RingHom.mapMatrix (A.φ w) (k : Matrix n n R)).det = 1 :=
+    have h'
+        : star (RingHom.mapMatrix (A.φ w) (k : Matrix n n R)).det
+            * (RingHom.mapMatrix (A.φ w) (k : Matrix n n R)).det
+          = 1 :=
       Unitary.star_mul_self_of_mem h
     have h2 : ‖(RingHom.mapMatrix (A.φ w) (k : Matrix n n R)).det‖ ^ 2 = 1 := by
       have := congrArg norm h'
@@ -111,17 +116,22 @@ section Main
 
 open GroundTheory.Global
 
-variable {F E R : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [CommRing R] [TopologicalSpace R]
+variable
+  {F E R : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [CommRing R] [TopologicalSpace R]
 
-theorem map_mem_kGL {A : Ad E R} {ε : ℤˣ} {ν : 𝔸[F] →+* R} {r : R → 𝔸[F]} {δ : Eˣ} {α : IdeleGroup F}
-    {ω : HeckeCharacter F} (hB : Base A ε ν r δ α ω) {n : Type} [Fintype n] [DecidableEq n]
-    {k : GL n 𝔸[F]} (hk : k ∈ (adStd F).kGL n) : Matrix.GeneralLinearGroup.map ν k ∈ A.kGL n := by
+theorem map_mem_kGL
+    {A : Ad E R} {ε : ℤˣ} {ν : 𝔸[F] →+* R} {r : R → 𝔸[F]} {δ : Eˣ} {α : IdeleGroup F}
+    {ω : HeckeCharacter F} (hB : Base A ε ν r δ α ω)
+    {n : Type} [Fintype n] [DecidableEq n]
+    {k : GL n 𝔸[F]} (hk : k ∈ (adStd F).kGL n)
+    : Matrix.GeneralLinearGroup.map ν k ∈ A.kGL n := by
   refine ⟨fun a b => ⟨(hB.int _).2 (hk.1 a b).1, ?_⟩, fun w => ?_⟩
   · rw [← map_inv]
     exact (hB.int _).2 (hk.1 a b).2
   · obtain ⟨v, hv⟩ := hB.inf w
-    have e : ((Matrix.GeneralLinearGroup.map ν k : GL n R) : Matrix n n R).map (A.φ w) =
-        (k : Matrix n n 𝔸[F]).map ((adStd F).φ v) := by
+    have e
+        : ((Matrix.GeneralLinearGroup.map ν k : GL n R) : Matrix n n R).map (A.φ w)
+          = (k : Matrix n n 𝔸[F]).map ((adStd F).φ v) := by
       ext a b
       simp [hv]
     rw [e]
@@ -138,24 +148,27 @@ theorem jiwa : StdGood → JIwa := by
   have hdet : Matrix.GeneralLinearGroup.det κ' = 1 := by
     rw [hκ', map_mul, map_inv, det_dg hi, ← hc, inv_mul_cancel]
   set d : GL (ι ⊕ ι) 𝔸[F] := dg ι α with hd
-  have hdet2 : Matrix.GeneralLinearGroup.det (d * κ' * d⁻¹) = 1 := by
-    simp [map_mul, hdet, mul_comm]
-  have hkc : ((1 : Rˣ), d * κ' * d⁻¹) ∈ cover A ν ι := by
-    simp [cover, MonoidHom.mem_ker, hdet2]
+  have hdet2 : Matrix.GeneralLinearGroup.det (d * κ' * d⁻¹) = 1 := by simp [map_mul, hdet, mul_comm]
+  have hkc : ((1 : Rˣ), d * κ' * d⁻¹) ∈ cover A ν ι := by simp [cover, MonoidHom.mem_ker, hdet2]
   let k : cover A ν ι := ⟨_, hkc⟩
   have hjk : (j k).1 ∈ A.kGL (ι ⊕ ι) := by
     obtain ⟨u, hu, u1, u2, u3⟩ := hB.δα
     have hδ : Units.map A.i.toMonoidHom δ = Units.map ν.toMonoidHom α * u := Units.ext hu
-    have e : (j k).1 = (dg ι (Units.map A.i.toMonoidHom δ))⁻¹ * Matrix.GeneralLinearGroup.map ν k.1.2 *
-        dg ι (Units.map A.i.toMonoidHom δ) := by
+    have e
+        : (j k).1
+          = (dg ι (Units.map A.i.toMonoidHom δ))⁻¹ * Matrix.GeneralLinearGroup.map ν k.1.2
+            * dg ι (Units.map A.i.toMonoidHom δ) := by
       apply Units.ext
       rw [hJ k]
       show ((1 : Rˣ) : R) • _ = _
       rw [Units.val_one, one_smul]
     have e2 : (j k).1 = (dg ι u)⁻¹ * Matrix.GeneralLinearGroup.map ν κ' * dg ι u := by
-      have hD : dg ι (Units.map ν.toMonoidHom α) = Matrix.GeneralLinearGroup.map ν d := (map_dg ν α).symm
-      have hk2 : Matrix.GeneralLinearGroup.map ν k.1.2 = Matrix.GeneralLinearGroup.map ν d *
-          Matrix.GeneralLinearGroup.map ν κ' * (Matrix.GeneralLinearGroup.map ν d)⁻¹ := by
+      have hD : dg ι (Units.map ν.toMonoidHom α) = Matrix.GeneralLinearGroup.map ν d :=
+        (map_dg ν α).symm
+      have hk2
+          : Matrix.GeneralLinearGroup.map ν k.1.2
+            = Matrix.GeneralLinearGroup.map ν d * Matrix.GeneralLinearGroup.map ν κ'
+              * (Matrix.GeneralLinearGroup.map ν d)⁻¹ := by
         show Matrix.GeneralLinearGroup.map ν (d * κ' * d⁻¹) = _
         rw [map_mul, map_mul, map_inv]
       rw [e, hδ, dg_mul, hD, hk2]

@@ -56,62 +56,71 @@ private def SomosAt {R : Type*} [CommRing R] (w : ℤ → R) (b c : R) (n : ℤ)
   w (n + 2) * w (n - 2) = b ^ 2 * w (n + 1) * w (n - 1) - c * w n ^ 2
 
 private def InvAt {R : Type*} [CommRing R] (w : ℤ → R) (b c d : R) (n : ℤ) : Prop :=
-  c * (w (n + 2) * w (n - 1) ^ 2 + w (n - 2) * w (n + 1) ^ 2) =
-    (b ^ 4 + d) * w (n - 1) * w n * w (n + 1) - b ^ 2 * c * w n ^ 3
+  c * (w (n + 2) * w (n - 1) ^ 2 + w (n - 2) * w (n + 1) ^ 2)
+    = (b ^ 4 + d) * w (n - 1) * w n * w (n + 1) - b ^ 2 * c * w n ^ 3
 
 section Induction
 
 variable {R : Type*} [CommRing R] [IsDomain R] (b c d : R)
 
-private theorem step_seq (hb : b ≠ 0) (hc : c ≠ 0) (h : ℤ)
-    (hne : ∀ k, h - 1 ≤ k → k ≤ h + 2 → normEDS b c d k ≠ 0)
+private theorem step_seq
+    (hb : b ≠ 0) (hc : c ≠ 0)
+    (h : ℤ) (hne : ∀ k, h - 1 ≤ k → k ≤ h + 2 → normEDS b c d k ≠ 0)
     (hS : ∀ k, h - 1 ≤ k → k ≤ h + 1 → SomosAt (normEDS b c d) b c k)
-    (hI : InvAt (normEDS b c d) b c d h) :
-    (SomosAt (normEDS b c d) b c (2 * h) ∧ InvAt (normEDS b c d) b c d (2 * h)) ∧
-      (SomosAt (normEDS b c d) b c (2 * h + 1) ∧ InvAt (normEDS b c d) b c d (2 * h + 1)) := by
+    (hI : InvAt (normEDS b c d) b c d h)
+    : (SomosAt (normEDS b c d) b c (2 * h) ∧ InvAt (normEDS b c d) b c d (2 * h))
+      ∧ (SomosAt (normEDS b c d) b c (2 * h + 1) ∧ InvAt (normEDS b c d) b c d (2 * h + 1)) := by
   have sm1 := hS (h - 1) le_rfl (by omega)
   have s0 := hS h (by omega) (by omega)
   have s1 := hS (h + 1) (by omega) le_rfl
   simp only [SomosAt, InvAt] at sm1 s0 s1 hI ⊢
   rw [show h - 1 + 2 = h + 1 by ring, show h - 1 - 2 = h - 3 by ring, show h - 1 + 1 = h by ring,
-    show h - 1 - 1 = h - 2 by ring] at sm1
+      show h - 1 - 1 = h - 2 by ring]
+    at sm1
   rw [show h + 1 + 2 = h + 3 by ring, show h + 1 - 2 = h - 1 by ring,
-    show h + 1 + 1 = h + 2 by ring, show h + 1 - 1 = h by ring] at s1
+      show h + 1 + 1 = h + 2 by ring, show h + 1 - 1 = h by ring]
+    at s1
   set w := normEDS b c d with hw
   have hE0 : w (2 * h) * b = w (h - 1) ^ 2 * w h * w (h + 2) - w (h - 2) * w h * w (h + 1) ^ 2 :=
     normEDS_even b c d h
-  have hE2 : w (2 * h + 2) * b =
-      w h ^ 2 * w (h + 1) * w (h + 3) - w (h - 1) * w (h + 1) * w (h + 2) ^ 2 := by
+  have hE2
+      : w (2 * h + 2) * b
+        = w h ^ 2 * w (h + 1) * w (h + 3) - w (h - 1) * w (h + 1) * w (h + 2) ^ 2 := by
     have := normEDS_even b c d (h + 1)
     rwa [show 2 * (h + 1) = 2 * h + 2 by ring, show h + 1 - 1 = h by ring,
-      show h + 1 + 2 = h + 3 by ring, show h + 1 - 2 = h - 1 by ring,
-      show h + 1 + 1 = h + 2 by ring] at this
-  have hEm2 : w (2 * h - 2) * b =
-      w (h - 2) ^ 2 * w (h - 1) * w (h + 1) - w (h - 3) * w (h - 1) * w h ^ 2 := by
+        show h + 1 + 2 = h + 3 by ring, show h + 1 - 2 = h - 1 by ring,
+        show h + 1 + 1 = h + 2 by ring]
+      at this
+  have hEm2
+      : w (2 * h - 2) * b
+        = w (h - 2) ^ 2 * w (h - 1) * w (h + 1) - w (h - 3) * w (h - 1) * w h ^ 2 := by
     have := normEDS_even b c d (h - 1)
     rwa [show 2 * (h - 1) = 2 * h - 2 by ring, show h - 1 - 1 = h - 2 by ring,
-      show h - 1 + 2 = h + 1 by ring, show h - 1 - 2 = h - 3 by ring,
-      show h - 1 + 1 = h by ring] at this
-  have hO1 : w (2 * h + 1) = w (h + 2) * w h ^ 3 - w (h - 1) * w (h + 1) ^ 3 :=
-    normEDS_odd b c d h
+        show h - 1 + 2 = h + 1 by ring, show h - 1 - 2 = h - 3 by ring, show h - 1 + 1 = h by ring]
+      at this
+  have hO1 : w (2 * h + 1) = w (h + 2) * w h ^ 3 - w (h - 1) * w (h + 1) ^ 3 := normEDS_odd b c d h
   have hOm1 : w (2 * h - 1) = w (h + 1) * w (h - 1) ^ 3 - w (h - 2) * w h ^ 3 := by
     have := normEDS_odd b c d (h - 1)
     rwa [show 2 * (h - 1) + 1 = 2 * h - 1 by ring, show h - 1 + 2 = h + 1 by ring,
-      show h - 1 - 1 = h - 2 by ring, show h - 1 + 1 = h by ring] at this
+        show h - 1 - 1 = h - 2 by ring, show h - 1 + 1 = h by ring]
+      at this
   have hO3 : w (2 * h + 3) = w (h + 3) * w (h + 1) ^ 3 - w h * w (h + 2) ^ 3 := by
     have := normEDS_odd b c d (h + 1)
     rwa [show 2 * (h + 1) + 1 = 2 * h + 3 by ring, show h + 1 + 2 = h + 3 by ring,
-      show h + 1 - 1 = h by ring, show h + 1 + 1 = h + 2 by ring] at this
+        show h + 1 - 1 = h by ring, show h + 1 + 1 = h + 2 by ring]
+      at this
   have ne1 := hne (h - 1) le_rfl (by omega)
   have ne2 := hne (h + 1) (by omega) (by omega)
   have ne3 := hne (h + 2) (by omega) le_rfl
-  obtain ⟨e1, e2⟩ := step_even b c d (w (h - 3)) (w (h - 2)) (w (h - 1)) (w h) (w (h + 1))
-    (w (h + 2)) (w (h + 3)) (w (2 * h)) (w (2 * h + 2)) (w (2 * h - 2)) (w (2 * h + 1))
-    (w (2 * h - 1)) hb hc ne1 ne2 ne3 hE0 hE2 hEm2 hO1 hOm1 (by linear_combination sm1)
-    (by linear_combination s0) (by linear_combination s1) hI
-  obtain ⟨o1, o2⟩ := step_odd b c d (w (h - 2)) (w (h - 1)) (w h) (w (h + 1)) (w (h + 2))
-    (w (h + 3)) (w (2 * h)) (w (2 * h + 2)) (w (2 * h + 1)) (w (2 * h - 1)) (w (2 * h + 3))
-    hb hc ne1 ne3 hE0 hE2 hO1 hOm1 hO3 (by linear_combination s0) (by linear_combination s1) hI
+  obtain ⟨e1, e2⟩ :=
+    step_even b c d (w (h - 3)) (w (h - 2)) (w (h - 1)) (w h) (w (h + 1)) (w (h + 2)) (w (h + 3))
+      (w (2 * h)) (w (2 * h + 2)) (w (2 * h - 2)) (w (2 * h + 1)) (w (2 * h - 1)) hb hc ne1 ne2 ne3
+      hE0 hE2 hEm2 hO1 hOm1 (by linear_combination sm1) (by linear_combination s0)
+      (by linear_combination s1) hI
+  obtain ⟨o1, o2⟩ :=
+    step_odd b c d (w (h - 2)) (w (h - 1)) (w h) (w (h + 1)) (w (h + 2)) (w (h + 3)) (w (2 * h))
+      (w (2 * h + 2)) (w (2 * h + 1)) (w (2 * h - 1)) (w (2 * h + 3)) hb hc ne1 ne3 hE0 hE2 hO1 hOm1
+      hO3 (by linear_combination s0) (by linear_combination s1) hI
   refine ⟨⟨e1, e2⟩, ?_, ?_⟩
   · rw [show 2 * h + 1 + 2 = 2 * h + 3 by ring, show 2 * h + 1 - 2 = 2 * h - 1 by ring,
       show 2 * h + 1 + 1 = 2 * h + 2 by ring, show 2 * h + 1 - 1 = 2 * h by ring]
@@ -142,8 +151,9 @@ private theorem normEDS_two_three_two_nat (n : ℕ) : normEDS (2 : ℤ) 3 2 n = 
     have e5 := ih (m + 4) (by omega)
     push_cast at e1 e2 e3 e4 e5 ⊢
     rw [show (m : ℤ) + 3 - 1 = m + 2 by ring, show (m : ℤ) + 3 + 2 = m + 5 by ring,
-      show (m : ℤ) + 3 - 2 = m + 1 by ring, show (m : ℤ) + 3 + 1 = m + 4 by ring,
-      e1, e2, e3, e4, e5] at h
+        show (m : ℤ) + 3 - 2 = m + 1 by ring, show (m : ℤ) + 3 + 1 = m + 4 by ring, e1, e2, e3, e4,
+        e5]
+      at h
     have key : normEDS (2 : ℤ) 3 2 (2 * ((m : ℤ) + 3)) * 2 = 2 * (2 * ((m : ℤ) + 3)) := by
       rw [h]; ring
     linarith
@@ -155,16 +165,17 @@ private theorem normEDS_two_three_two_nat (n : ℕ) : normEDS (2 : ℤ) 3 2 n = 
     have e4 := ih (m + 3) (by omega)
     push_cast at e1 e2 e3 e4 ⊢
     rw [show (m : ℤ) + 2 + 2 = m + 4 by ring, show (m : ℤ) + 2 - 1 = m + 1 by ring,
-      show (m : ℤ) + 2 + 1 = m + 3 by ring, e1, e2, e3, e4] at h
-    rw [h]; ring
+        show (m : ℤ) + 2 + 1 = m + 3 by ring, e1, e2, e3, e4]
+      at h
+    rw [h]
+    ring
 
 private theorem normEDS_two_three_two (n : ℤ) : normEDS (2 : ℤ) 3 2 n = n := by
   rcases Int.eq_nat_or_neg n with ⟨k, rfl | rfl⟩
   · exact normEDS_two_three_two_nat k
   · rw [normEDS_neg, normEDS_two_three_two_nat]
 
-private noncomputable def uw (n : ℤ) : MvPolynomial (Fin 3) ℤ :=
-  normEDS (X 0) (X 1) (X 2) n
+private noncomputable def uw (n : ℤ) : MvPolynomial (Fin 3) ℤ := normEDS (X 0) (X 1) (X 2) n
 
 private theorem eval_uw (n : ℤ) : eval ![2, 3, 2] (uw n) = n := by
   rw [uw, map_normEDS]
@@ -179,49 +190,51 @@ private theorem uw_ne_zero {n : ℤ} (hn : n ≠ 0) : uw n ≠ 0 := by
 private theorem X0_ne_zero : (X 0 : MvPolynomial (Fin 3) ℤ) ≠ 0 := X_ne_zero 0
 private theorem X1_ne_zero : (X 1 : MvPolynomial (Fin 3) ℤ) ≠ 0 := X_ne_zero 1
 
-private theorem uw_base (k : ℕ) (hk : k ≤ 4) :
-    SomosAt uw (X 0) (X 1) k ∧ InvAt uw (X 0) (X 1) (X 2) k := by
+private theorem uw_base (k : ℕ) (hk : k ≤ 4)
+    : SomosAt uw (X 0) (X 1) k ∧ InvAt uw (X 0) (X 1) (X 2) k := by
   have w0 : uw 0 = 0 := normEDS_zero ..
   have w1 : uw 1 = 1 := normEDS_one ..
   have w2 : uw 2 = X 0 := normEDS_two ..
   have w3 : uw 3 = X 1 := normEDS_three ..
   have w4 : uw 4 = X 2 * X 0 := normEDS_four ..
   have wm1 : uw (-1) = -1 := by rw [uw, normEDS_neg, ← uw, w1]
-  have wm2 : uw (-2) = -X 0 := by rw [uw, normEDS_neg, ← uw, w2]
+  have wm2 : uw (-2) = - X 0 := by rw [uw, normEDS_neg, ← uw, w2]
   have w5 : uw 5 = X 2 * X 0 ^ 4 - X 1 ^ 3 := by
     have h5 : uw (2 * 2 + 1) = uw (2 + 2) * uw 2 ^ 3 - uw (2 - 1) * uw (2 + 1) ^ 3 :=
       normEDS_odd _ _ _ 2
     norm_num at h5
-    rw [h5, w4, w2, w1, w3]; ring
+    rw [h5, w4, w2, w1, w3]
+    ring
   have w6 : uw 6 = X 0 * X 1 * (X 2 * X 0 ^ 4 - X 1 ^ 3) - X 1 * X 2 ^ 2 * X 0 := by
-    have h6 : uw (2 * 3) * X 0 =
-        uw (3 - 1) ^ 2 * uw 3 * uw (3 + 2) - uw (3 - 2) * uw 3 * uw (3 + 1) ^ 2 :=
+    have h6
+        : uw (2 * 3) * X 0
+          = uw (3 - 1) ^ 2 * uw 3 * uw (3 + 2) - uw (3 - 2) * uw 3 * uw (3 + 1) ^ 2 :=
       normEDS_even _ _ _ 3
     norm_num at h6
     apply mul_right_cancel₀ X0_ne_zero
-    rw [h6, w2, w3, w5, w1, w4]; ring
-  interval_cases k <;> constructor <;> simp only [SomosAt, InvAt] <;> norm_num <;>
-    simp only [w0, w1, w2, w3, w4, w5, w6, wm1, wm2] <;> ring
+    rw [h6, w2, w3, w5, w1, w4]
+    ring
+  interval_cases k <;> constructor <;> simp only [SomosAt, InvAt] <;> norm_num
+    <;> simp only [w0, w1, w2, w3, w4, w5, w6, wm1, wm2] <;> ring
 
-private theorem uw_rel_nat (N : ℕ) :
-    SomosAt uw (X 0) (X 1) N ∧ InvAt uw (X 0) (X 1) (X 2) N := by
+private theorem uw_rel_nat (N : ℕ) : SomosAt uw (X 0) (X 1) N ∧ InvAt uw (X 0) (X 1) (X 2) N := by
   induction N using Nat.strong_induction_on with
   | _ N ih =>
-  rcases le_or_gt N 4 with hN | hN
-  · exact uw_base N hN
-  obtain ⟨h, hh⟩ : ∃ h : ℕ, N = 2 * h ∨ N = 2 * h + 1 := ⟨N / 2, by omega⟩
-  have key := step_seq (X 0 : MvPolynomial (Fin 3) ℤ) (X 1) (X 2) X0_ne_zero X1_ne_zero (h : ℤ)
-    (fun k hk1 hk2 => uw_ne_zero (by omega))
-    (fun k hk1 hk2 => by
-      have := (ih k.toNat (by omega)).1
-      rwa [Int.toNat_of_nonneg (by omega)] at this)
-    (ih h (by omega)).2
-  rcases hh with rfl | rfl
-  · push_cast; exact key.1
-  · push_cast; exact key.2
+    rcases le_or_gt N 4 with hN | hN
+    · exact uw_base N hN
+    obtain ⟨h, hh⟩ : ∃ h : ℕ, N = 2 * h ∨ N = 2 * h + 1 := ⟨N / 2, by omega⟩
+    have key :=
+      step_seq (X 0 : MvPolynomial (Fin 3) ℤ) (X 1) (X 2) X0_ne_zero X1_ne_zero (h : ℤ)
+        (fun k hk1 hk2 => uw_ne_zero (by omega))
+        (fun k hk1 hk2 => by
+          have := (ih k.toNat (by omega)).1
+          rwa [Int.toNat_of_nonneg (by omega)] at this)
+        (ih h (by omega)).2
+    rcases hh with rfl | rfl
+    · push_cast; exact key.1
+    · push_cast; exact key.2
 
-private theorem uw_rel (n : ℤ) :
-    SomosAt uw (X 0) (X 1) n ∧ InvAt uw (X 0) (X 1) (X 2) n := by
+private theorem uw_rel (n : ℤ) : SomosAt uw (X 0) (X 1) n ∧ InvAt uw (X 0) (X 1) (X 2) n := by
   rcases Int.eq_nat_or_neg n with ⟨k, rfl | rfl⟩
   · exact uw_rel_nat k
   · obtain ⟨hs, hi⟩ := uw_rel_nat k
@@ -237,20 +250,20 @@ end Universal
 
 variable {R : Type*} [CommRing R] (b c d : R)
 
-theorem normEDS_somos (n : ℤ) :
-    normEDS b c d (n + 2) * normEDS b c d (n - 2) =
-      b ^ 2 * normEDS b c d (n + 1) * normEDS b c d (n - 1) - c * normEDS b c d n ^ 2 := by
+theorem normEDS_somos (n : ℤ)
+    : normEDS b c d (n + 2) * normEDS b c d (n - 2)
+      = b ^ 2 * normEDS b c d (n + 1) * normEDS b c d (n - 1) - c * normEDS b c d n ^ 2 := by
   have h := (uw_rel n).1
   simp only [SomosAt, uw] at h
   have := congrArg (MvPolynomial.eval₂Hom (Int.castRingHom R) ![b, c, d]) h
   simp only [map_sub, map_mul, map_pow, map_normEDS] at this
   simpa using this
 
-theorem normEDS_invariant (n : ℤ) :
-    c * (normEDS b c d (n + 2) * normEDS b c d (n - 1) ^ 2 +
-        normEDS b c d (n - 2) * normEDS b c d (n + 1) ^ 2) =
-      (b ^ 4 + d) * normEDS b c d (n - 1) * normEDS b c d n * normEDS b c d (n + 1) -
-        b ^ 2 * c * normEDS b c d n ^ 3 := by
+theorem normEDS_invariant (n : ℤ)
+    : c * (normEDS b c d (n + 2) * normEDS b c d (n - 1) ^ 2
+        + normEDS b c d (n - 2) * normEDS b c d (n + 1) ^ 2)
+      = (b ^ 4 + d) * normEDS b c d (n - 1) * normEDS b c d n * normEDS b c d (n + 1)
+        - b ^ 2 * c * normEDS b c d n ^ 3 := by
   have h := (uw_rel n).2
   simp only [InvAt, uw] at h
   have := congrArg (MvPolynomial.eval₂Hom (Int.castRingHom R) ![b, c, d]) h

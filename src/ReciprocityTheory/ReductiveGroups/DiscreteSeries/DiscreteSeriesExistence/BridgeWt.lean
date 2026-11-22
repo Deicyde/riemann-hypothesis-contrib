@@ -23,9 +23,9 @@ theorem bwtDiag_inG (ε : Fin n → Bool) (θ : Fin n → ℝ) : inG ε (bwtDiag
   funext i
   by_cases hε : ε i = true <;> simp [hε, Complex.conj_I] <;> ring_nf
 
-theorem bwt_exp (θ : Fin n → ℝ) (t : ℝ) :
-    NormedSpace.exp ((t : ℂ) • bwtDiag θ) =
-      Matrix.diagonal (fun a => Complex.exp (((t * θ a : ℝ) : ℂ) * Complex.I)) := by
+theorem bwt_exp (θ : Fin n → ℝ) (t : ℝ)
+    : NormedSpace.exp ((t : ℂ) • bwtDiag θ)
+      = Matrix.diagonal (fun a => Complex.exp (((t * θ a : ℝ) : ℂ) * Complex.I)) := by
   have h : (t : ℂ) • bwtDiag θ = Matrix.diagonal (fun a => (t : ℂ) * ((θ a : ℂ) * Complex.I)) := by
     rw [bwtDiag]
     ext i j
@@ -40,8 +40,8 @@ theorem bwt_exp (θ : Fin n → ℝ) (t : ℝ) :
   push_cast
   ring
 
-theorem bwt_diag_mem_Kset (ε : Fin n → Bool) (θ : Fin n → ℝ) :
-    Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I)) ∈ Formalism.REAL.Kset ε := by
+theorem bwt_diag_mem_Kset (ε : Fin n → Bool) (θ : Fin n → ℝ)
+    : Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I)) ∈ Formalism.REAL.Kset ε := by
   refine ⟨?_, ?_⟩
   · rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose,
       Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
@@ -61,22 +61,24 @@ theorem bwt_diag_mem_Kset (ε : Fin n → Bool) (θ : Fin n → ℝ) :
 
 variable {M : Type*} [AddCommGroup M] [Module ℂ M]
 
-theorem bwt_actM_diag (E : Fin n → Fin n → Module.End ℂ M) (d : Fin n → ℂ) :
-    actM E (Matrix.diagonal d) = ∑ a, d a • E a a := by
+theorem bwt_actM_diag (E : Fin n → Fin n → Module.End ℂ M) (d : Fin n → ℂ)
+    : actM E (Matrix.diagonal d) = ∑ a, d a • E a a := by
   simp [actM, Matrix.diagonal_apply, ite_smul]
 
 section Rep
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H} {E : Fin n → Fin n → Module.End ℂ D}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
+  {E : Fin n → Fin n → Module.End ℂ D}
 
-theorem bwt_actM_apply (θ : Fin n → ℝ) (v : D) :
-    ((actM E (bwtDiag θ) v : D) : H) = ∑ a, ((θ a : ℂ) * Complex.I) • ((E a a v : D) : H) := by
+theorem bwt_actM_apply (θ : Fin n → ℝ) (v : D)
+    : ((actM E (bwtDiag θ) v : D) : H) = ∑ a, ((θ a : ℂ) * Complex.I) • ((E a a v : D) : H) := by
   rw [bwtDiag, bwt_actM_diag]
   simp
 
-private theorem exp_smul_bwtDiag_mem_UJset (ε : Fin n → Bool) (θ : Fin n → ℝ) (s : ℝ) :
-    NormedSpace.exp ((s : ℂ) • bwtDiag θ) ∈ UJset ε := by
+private theorem exp_smul_bwtDiag_mem_UJset (ε : Fin n → Bool) (θ : Fin n → ℝ) (s : ℝ)
+    : NormedSpace.exp ((s : ℂ) • bwtDiag θ) ∈ UJset ε := by
   have hK := bwt_diag_mem_Kset ε (fun a => s * θ a)
   obtain ⟨hu, hc⟩ := hK
   rw [bwt_exp]
@@ -87,24 +89,28 @@ private theorem exp_smul_bwtDiag_mem_UJset (ε : Fin n → Bool) (θ : Fin n →
   rw [hJJ, Matrix.mul_assoc, ← hc, ← Matrix.mul_assoc, ← Matrix.star_eq_conjTranspose, hu',
     Matrix.one_mul]
 
-private theorem apply_one_eq_exp_smul_of_hasDerivAt_smul {F : ℝ → H} {c : ℂ} (hF : ∀ s, HasDerivAt F (c • F s) s) :
-    F 1 = Complex.exp c • F 0 := by
+private theorem apply_one_eq_exp_smul_of_hasDerivAt_smul
+    {F : ℝ → H} {c : ℂ} (hF : ∀ s, HasDerivAt F (c • F s) s)
+    : F 1 = Complex.exp c • F 0 := by
   have hG : ∀ s : ℝ, HasDerivAt (fun t : ℝ => Complex.exp ((t : ℂ) * -c) • F t) 0 s := by
     intro s
     have h1 := (((hasDerivAt_id' s).ofReal_comp).mul_const (-c)).cexp
     refine (h1.smul (hF s)).congr_deriv ?_
     rw [smul_smul, ← add_smul]
     simp
-  have hconst := is_const_of_deriv_eq_zero (fun s => (hG s).differentiableAt)
-    (fun s => (hG s).deriv) 1 0
-  simp only [Complex.ofReal_one, one_mul, Complex.ofReal_zero, zero_mul, neg_zero,
-    Complex.exp_zero, one_smul] at hconst
+  have hconst :=
+    is_const_of_deriv_eq_zero (fun s => (hG s).differentiableAt) (fun s => (hG s).deriv) 1 0
+  simp only [Complex.ofReal_one, one_mul, Complex.ofReal_zero, zero_mul, neg_zero, Complex.exp_zero,
+      one_smul]
+    at hconst
   rw [← hconst, smul_smul, ← Complex.exp_add]
   simp
 
-private theorem hasDerivAt_of_shift_of_hasDerivAt_zero {G : ℝ → H} {L : H} (T : ℝ → (H →L[ℂ] H))
-    (hG0 : HasDerivAt G L 0) (hshift : ∀ s t, G (s + t) = T s (G t)) (s : ℝ) :
-    HasDerivAt G (T s L) s := by
+private theorem hasDerivAt_of_shift_of_hasDerivAt_zero
+    {G : ℝ → H} {L : H}
+    (T : ℝ → (H →L[ℂ] H))
+    (hG0 : HasDerivAt G L 0) (hshift : ∀ s t, G (s + t) = T s (G t)) (s : ℝ)
+    : HasDerivAt G (T s L) s := by
   have h1 := ((T s).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt (0 : ℝ) hG0
   have h2 : HasDerivAt (fun t => G (s + t)) (T s L) 0 := by
     convert h1 using 1 <;> first | rfl | (funext t; exact hshift s t)
@@ -112,23 +118,27 @@ private theorem hasDerivAt_of_shift_of_hasDerivAt_zero {G : ℝ → H} {L : H} (
   have h4 := HasDerivAt.scomp (h := fun x : ℝ => x - s) s h3 ((hasDerivAt_id' s).sub_const s)
   convert h4 using 1 <;> first | (funext x; simp) | simp
 
-theorem isWtOn_iff (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) (v : D) (μ : Fin n → ℝ) :
-    Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ (v : H) ↔ ∀ a, E a a v = ((μ a : ℝ) : ℂ) • v := by
+theorem isWtOn_iff (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) (v : D) (μ : Fin n → ℝ)
+    : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ (v : H)
+      ↔ ∀ a, E a a v = ((μ a : ℝ) : ℂ) • v := by
   constructor
   · intro hw a
     have hder := hD.deriv _ (bwtDiag_inG ε (Pi.single a 1)) v
-    have hfun : (fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • bwtDiag (Pi.single a 1))) (v : H)) =
-        fun t : ℝ => Complex.exp ((t : ℂ) * ((μ a : ℂ) * Complex.I)) • (v : H) := by
+    have hfun
+        : (fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • bwtDiag (Pi.single a 1))) (v : H))
+          = fun t : ℝ => Complex.exp ((t : ℂ) * ((μ a : ℂ) * Complex.I)) • (v : H) := by
       funext t
       have h := hw (fun b => t * (Pi.single a (1 : ℝ) : Fin n → ℝ) b) (bwt_diag_mem_Kset ε _)
       rw [bwt_exp, h]
       congr 2
       simp [Pi.single_apply] <;> ring
     rw [hfun, bwt_actM_apply] at hder
-    have hexp : HasDerivAt (fun t : ℝ => Complex.exp ((t : ℂ) * ((μ a : ℂ) * Complex.I)) • (v : H))
+    have hexp : HasDerivAt
+        (fun t : ℝ => Complex.exp ((t : ℂ) * ((μ a : ℂ) * Complex.I)) • (v : H))
         (((μ a : ℂ) * Complex.I) • (v : H)) 0 := by
-      have := ((((hasDerivAt_id' (0 : ℝ)).ofReal_comp).mul_const
-        ((μ a : ℂ) * Complex.I)).cexp).smul_const (v : H)
+      have :=
+        ((((hasDerivAt_id' (0 : ℝ)).ofReal_comp).mul_const ((μ a : ℂ) * Complex.I)).cexp).smul_const
+          (v : H)
       convert this using 1
       simp
     have heq := hder.unique hexp
@@ -139,11 +149,14 @@ theorem isWtOn_iff (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) (
       rw [heq, smul_smul, mul_comm]
     exact smul_right_injective H Complex.I_ne_zero h2
   · intro hE θ _
-    have hlam : ((actM E (bwtDiag θ) v : D) : H) =
-        (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • (v : H) := by
+    have hlam
+        : ((actM E (bwtDiag θ) v : D) : H)
+          = (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • (v : H) := by
       rw [bwt_actM_apply]
-      have hterm : ∀ a, ((θ a : ℂ) * Complex.I) • ((E a a v : D) : H) =
-          (((θ a : ℂ) * Complex.I) * (μ a : ℂ)) • (v : H) := by
+      have hterm
+          : ∀ a,
+            ((θ a : ℂ) * Complex.I) • ((E a a v : D) : H)
+              = (((θ a : ℂ) * Complex.I) * (μ a : ℂ)) • (v : H) := by
         intro a
         rw [hE a, Submodule.coe_smul, smul_smul]
       rw [Finset.sum_congr rfl fun a _ => hterm a, ← Finset.sum_smul]
@@ -153,24 +166,36 @@ theorem isWtOn_iff (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) (
       exact Finset.sum_congr rfl fun a _ => by ring
     have h0 := hD.deriv _ (bwtDiag_inG ε θ) v
     rw [hlam] at h0
-    have hshift : ∀ s t : ℝ, σ (NormedSpace.exp (((s + t : ℝ) : ℂ) • bwtDiag θ)) (v : H) =
-        σ (NormedSpace.exp ((s : ℂ) • bwtDiag θ)) (σ (NormedSpace.exp ((t : ℂ) • bwtDiag θ)) (v : H)) := by
+    have hshift
+        : ∀ s t : ℝ,
+          σ (NormedSpace.exp (((s + t : ℝ) : ℂ) • bwtDiag θ)) (v : H)
+            = σ (NormedSpace.exp ((s : ℂ) • bwtDiag θ))
+              (σ (NormedSpace.exp ((t : ℂ) • bwtDiag θ)) (v : H)) := by
       intro s t
-      have hmul : NormedSpace.exp (((s + t : ℝ) : ℂ) • bwtDiag θ) =
-          NormedSpace.exp ((s : ℂ) • bwtDiag θ) * NormedSpace.exp ((t : ℂ) • bwtDiag θ) := by
+      have hmul
+          : NormedSpace.exp (((s + t : ℝ) : ℂ) • bwtDiag θ)
+            = NormedSpace.exp ((s : ℂ) • bwtDiag θ) * NormedSpace.exp ((t : ℂ) • bwtDiag θ) := by
         rw [Complex.ofReal_add, add_smul]
         exact Matrix.exp_add_of_commute _ _ (((Commute.refl (bwtDiag θ)).smul_left _).smul_right _)
       rw [hmul, hσ.1.2 _ (exp_smul_bwtDiag_mem_UJset ε θ s) _ (exp_smul_bwtDiag_mem_UJset ε θ t)]
       rfl
-    have hF : ∀ s : ℝ, HasDerivAt (fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • bwtDiag θ)) (v : H))
-        ((((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) •
-          σ (NormedSpace.exp ((s : ℂ) • bwtDiag θ)) (v : H)) s := by
+    have hF
+        : ∀ s : ℝ,
+          HasDerivAt
+            (fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • bwtDiag θ)) (v : H))
+            ((((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I)
+              • σ (NormedSpace.exp ((s : ℂ) • bwtDiag θ)) (v : H))
+            s := by
       intro s
-      have := hasDerivAt_of_shift_of_hasDerivAt_zero (fun s : ℝ => σ (NormedSpace.exp ((s : ℂ) • bwtDiag θ))) h0 hshift s
+      have :=
+        hasDerivAt_of_shift_of_hasDerivAt_zero
+          (fun s : ℝ => σ (NormedSpace.exp ((s : ℂ) • bwtDiag θ)))
+          h0 hshift s
       rwa [map_smul] at this
     have hode := apply_one_eq_exp_smul_of_hasDerivAt_smul hF
-    have e1 : NormedSpace.exp (((1 : ℝ) : ℂ) • bwtDiag θ) =
-        Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I)) := by
+    have e1
+        : NormedSpace.exp (((1 : ℝ) : ℂ) • bwtDiag θ)
+          = Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I)) := by
       rw [bwt_exp]
       simp
     have e0 : NormedSpace.exp (((0 : ℝ) : ℂ) • bwtDiag θ) = 1 := by simp

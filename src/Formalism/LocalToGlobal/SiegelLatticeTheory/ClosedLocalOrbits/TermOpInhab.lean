@@ -15,10 +15,10 @@ section Flag
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T : E}
 
-theorem one_mem_isom : (1 : S.V ≃ₗ[E] S.V) ∈ Formalism.HermitianLatticesTheory.isom S.hT := (Formalism.HermitianLatticesTheory.isom S.hT).one_mem
+theorem one_mem_isom : (1 : S.V ≃ₗ[E] S.V) ∈ Formalism.HermitianLatticesTheory.isom S.hT :=
+  (Formalism.HermitianLatticesTheory.isom S.hT).one_mem
 
-theorem mapFlag_one (F : FlagG S r T) : mapFlag 1 one_mem_isom F = F := by
-  rfl
+theorem mapFlag_one (F : FlagG S r T) : mapFlag 1 one_mem_isom F = F := by rfl
 
 theorem mapLF_one (F : LFlag S r T) : mapLF 1 F = F := by
   unfold mapLF
@@ -42,18 +42,28 @@ theorem ratLink_one : RatLink X 1 1 := by
   · intro y
     simp
 
-variable {u : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
+variable
+  {u : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
   {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
-def idGTerm (Λ : Submodule (𝓞 D.host.E) (VS D).V) (hΛ : Λ ∈ what₂) (hrow : IsRowLat D F0 Λ) :
-    GTerm X u u F0 F0 what₂ what₂ :=
-  ⟨Λ, hΛ, Λ, hΛ, Quot.mk _ ⟨((1 : X.B.I.GA), (1 : (VS D).V ≃ₗ[D.host.E] (VS D).V)),
-    ratLink_one X, one_mem_isom, by
+def idGTerm (Λ : Submodule (𝓞 D.host.E) (VS D).V) (hΛ : Λ ∈ what₂) (hrow : IsRowLat D F0 Λ)
+    : GTerm X u u F0 F0 what₂ what₂ := ⟨
+  Λ,
+  hΛ,
+  Λ,
+  hΛ,
+  Quot.mk _ ⟨
+    ((1 : X.B.I.GA), (1 : (VS D).V ≃ₗ[D.host.E] (VS D).V)),
+    ratLink_one X,
+    one_mem_isom,
+    by
       unfold Formalism.HermitianLatticesTheory.gmap
       simp,
     by
       rw [mapLF_one]
-      exact TermDef.pd_self F0 Λ hrow⟩⟩
+      exact TermDef.pd_self F0 Λ hrow
+  ⟩
+⟩
 
 end Id
 
@@ -64,10 +74,13 @@ variable {D : D7} {X : Formalism.L2.SG.HidaSetting.HidaSetting D} (TR : TypedRed
 theorem gamma_one_pos : 0 < Gam1 TR := by
   unfold Gam1 Formalism.L2.SG.GGMirabolic.gamProd
   simp only [Pi.one_apply, Formalism.L2.SG.GGMirabolic.gam_one]
-  have hprod : (∏ v, ((Fintype.card (GL (Fin D.R.k) (TR.Fq v)) : ℂ) /
-      (Formalism.L2.SG.GGMirabolic.cardU (TR.Fq v) D.R.k : ℂ))) =
-      ((∏ v, ((Fintype.card (GL (Fin D.R.k) (TR.Fq v)) : ℝ) /
-        (Formalism.L2.SG.GGMirabolic.cardU (TR.Fq v) D.R.k : ℝ)) : ℝ) : ℂ) := by
+  have hprod
+      : (∏ v, ((Fintype.card (GL (Fin D.R.k) (TR.Fq v)) : ℂ) /
+          (Formalism.L2.SG.GGMirabolic.cardU (TR.Fq v) D.R.k : ℂ)))
+        = ((∏ v, ((Fintype.card (GL (Fin D.R.k) (TR.Fq v)) : ℝ) /
+            (Formalism.L2.SG.GGMirabolic.cardU (TR.Fq v) D.R.k : ℝ))
+            : ℝ)
+          : ℂ) := by
     push_cast
     rfl
   rw [hprod, Complex.ofReal_re]

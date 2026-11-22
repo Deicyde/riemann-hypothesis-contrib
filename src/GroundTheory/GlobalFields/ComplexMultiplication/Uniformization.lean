@@ -39,9 +39,8 @@ theorem weierstrassCurve_Δ : (weierstrassCurve L).Δ = discr L := by
   simp only [weierstrassCurve_a₄, weierstrassCurve_a₆]
   ring
 
-theorem weierstrassCurve_equation_iff (x Y : ℂ) :
-    (weierstrassCurve L).toAffine.Equation x Y ↔
-      (2 * Y) ^ 2 = 4 * x ^ 3 - L.g₂ * x - L.g₃ := by
+theorem weierstrassCurve_equation_iff (x Y : ℂ)
+    : (weierstrassCurve L).toAffine.Equation x Y ↔ (2 * Y) ^ 2 = 4 * x ^ 3 - L.g₂ * x - L.g₃ := by
   rw [WeierstrassCurve.Affine.equation_iff]
   simp only [weierstrassCurve_a₁, weierstrassCurve_a₂, weierstrassCurve_a₃, weierstrassCurve_a₄,
     weierstrassCurve_a₆]
@@ -51,8 +50,8 @@ theorem weierstrassCurve_equation_iff (x Y : ℂ) :
   · intro h
     linear_combination h / 4
 
-theorem equation_weierstrassP {z : ℂ} (hz : z ∉ L.lattice) :
-    (weierstrassCurve L).toAffine.Equation (℘[L] z) (℘'[L] z / 2) := by
+theorem equation_weierstrassP {z : ℂ} (hz : z ∉ L.lattice)
+    : (weierstrassCurve L).toAffine.Equation (℘[L] z) (℘'[L] z / 2) := by
   rw [weierstrassCurve_equation_iff, mul_div_cancel₀ _ two_ne_zero]
   exact L.derivWeierstrassP_sq z hz
 
@@ -171,30 +170,29 @@ lemma finite_support_toNat_torusOrder_weierstrassP_sub (c : ℂ) :
 lemma torus_mk_ne {z w : ℂ} (h : z - w ∉ L.lattice) : Torus.mk L z ≠ Torus.mk L w :=
   fun e ↦ h ((Torus.mk_eq_mk_iff L).1 e)
 
-theorem derivWeierstrassP_eq_zero_of_two_mul_mem {w : ℂ} (h : 2 * w ∈ L.lattice) :
-    ℘'[L] w = 0 := by
+theorem derivWeierstrassP_eq_zero_of_two_mul_mem {w : ℂ} (h : 2 * w ∈ L.lattice) : ℘'[L] w = 0 := by
   have h1 : ℘'[L] (w - 2 * w) = ℘'[L] w := L.derivWeierstrassP_sub_coe w ⟨_, h⟩
   rw [show w - 2 * w = -w by ring, L.derivWeierstrassP_neg] at h1
   linear_combination -h1 / 2
 
-theorem two_mul_mem_lattice_iff_derivWeierstrassP_eq_zero {w : ℂ} (hw : w ∉ L.lattice) :
-    2 * w ∈ L.lattice ↔ ℘'[L] w = 0 := by
+theorem two_mul_mem_lattice_iff_derivWeierstrassP_eq_zero {w : ℂ} (hw : w ∉ L.lattice)
+    : 2 * w ∈ L.lattice ↔ ℘'[L] w = 0 := by
   classical
   refine ⟨derivWeierstrassP_eq_zero_of_two_mul_mem, fun h' ↦ ?_⟩
   by_contra h2
   have hw' : -w ∉ L.lattice := fun h ↦ hw (by simpa using neg_mem h)
-  have hne : Torus.mk L w ≠ Torus.mk L (-w) :=
-    torus_mk_ne (by rwa [sub_neg_eq_add, ← two_mul])
-  have hsum := sum_le_finsum_of_finite (finite_support_toNat_torusOrder_weierstrassP_sub (℘[L] w))
-    {Torus.mk L w, Torus.mk L (-w)}
+  have hne : Torus.mk L w ≠ Torus.mk L (-w) := torus_mk_ne (by rwa [sub_neg_eq_add, ← two_mul])
+  have hsum :=
+    sum_le_finsum_of_finite (finite_support_toNat_torusOrder_weierstrassP_sub (℘[L] w))
+      {Torus.mk L w, Torus.mk L (-w)}
   rw [finsum_toNat_torusOrder_weierstrassP_sub, Finset.sum_pair hne] at hsum
   have o1 := two_le_toNat_torusOrder_weierstrassP_sub hw rfl h'
   have o2 := one_le_toNat_torusOrder_weierstrassP_sub hw' (L.weierstrassP_neg w)
   omega
 
-theorem sub_mem_or_add_mem_of_weierstrassP_eq {z w : ℂ} (hz : z ∉ L.lattice)
-    (hw : w ∉ L.lattice) (h : ℘[L] z = ℘[L] w) :
-    z - w ∈ L.lattice ∨ z + w ∈ L.lattice := by
+theorem sub_mem_or_add_mem_of_weierstrassP_eq
+    {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice) (h : ℘[L] z = ℘[L] w)
+    : z - w ∈ L.lattice ∨ z + w ∈ L.lattice := by
   classical
   by_contra hcon
   rw [not_or] at hcon
@@ -207,15 +205,17 @@ theorem sub_mem_or_add_mem_of_weierstrassP_eq {z w : ℂ} (hz : z ∉ L.lattice)
   by_cases h2w : 2 * w ∈ L.lattice
   · have hsum := sum_le_finsum_of_finite hfin {Torus.mk L z, Torus.mk L w}
     rw [htot, Finset.sum_pair hzw] at hsum
-    have ow := two_le_toNat_torusOrder_weierstrassP_sub hw rfl
-      (derivWeierstrassP_eq_zero_of_two_mul_mem h2w)
+    have ow :=
+      two_le_toNat_torusOrder_weierstrassP_sub hw rfl (derivWeierstrassP_eq_zero_of_two_mul_mem h2w)
     omega
   · have hzw' : Torus.mk L z ≠ Torus.mk L (-w) := torus_mk_ne (by rwa [sub_neg_eq_add])
-    have hww' : Torus.mk L w ≠ Torus.mk L (-w) :=
-      torus_mk_ne (by rwa [sub_neg_eq_add, ← two_mul])
+    have hww' : Torus.mk L w ≠ Torus.mk L (-w) := torus_mk_ne (by rwa [sub_neg_eq_add, ← two_mul])
     have hsum := sum_le_finsum_of_finite hfin {Torus.mk L z, Torus.mk L w, Torus.mk L (-w)}
-    rw [htot, Finset.sum_insert (by
-      simp only [Finset.mem_insert, Finset.mem_singleton, not_or]; exact ⟨hzw, hzw'⟩), Finset.sum_pair hww'] at hsum
+    rw [htot,
+        Finset.sum_insert (by
+          simp only [Finset.mem_insert, Finset.mem_singleton, not_or]; exact ⟨hzw, hzw'⟩),
+        Finset.sum_pair hww']
+      at hsum
     have ow := one_le_toNat_torusOrder_weierstrassP_sub hw rfl
     have ow' := one_le_toNat_torusOrder_weierstrassP_sub hw' (L.weierstrassP_neg w)
     omega
@@ -269,33 +269,35 @@ lemma halfPeriod_facts :
 
 variable (L)
 
-theorem weierstrassP_halfPeriods_ne :
-    ℘[L] (L.ω₁ / 2) ≠ ℘[L] (L.ω₂ / 2) ∧ ℘[L] (L.ω₁ / 2) ≠ ℘[L] ((L.ω₁ + L.ω₂) / 2) ∧
-      ℘[L] (L.ω₂ / 2) ≠ ℘[L] ((L.ω₁ + L.ω₂) / 2) :=
+theorem weierstrassP_halfPeriods_ne
+    : ℘[L] (L.ω₁ / 2) ≠ ℘[L] (L.ω₂ / 2) ∧ ℘[L] (L.ω₁ / 2) ≠ ℘[L] ((L.ω₁ + L.ω₂) / 2)
+      ∧ ℘[L] (L.ω₂ / 2) ≠ ℘[L] ((L.ω₁ + L.ω₂) / 2) :=
   let h := halfPeriod_facts (L := L)
   ⟨h.1, h.2.1, h.2.2.1⟩
 
-theorem discr_eq :
-    discr L = 16 * ((℘[L] (L.ω₁ / 2) - ℘[L] (L.ω₂ / 2)) *
-      (℘[L] (L.ω₁ / 2) - ℘[L] ((L.ω₁ + L.ω₂) / 2)) *
-      (℘[L] (L.ω₂ / 2) - ℘[L] ((L.ω₁ + L.ω₂) / 2))) ^ 2 := by
+theorem discr_eq
+    : discr L
+      = 16
+        * ((℘[L] (L.ω₁ / 2) - ℘[L] (L.ω₂ / 2)) * (℘[L] (L.ω₁ / 2) - ℘[L] ((L.ω₁ + L.ω₂) / 2))
+            * (℘[L] (L.ω₂ / 2) - ℘[L] ((L.ω₁ + L.ω₂) / 2)))
+          ^ 2 := by
   obtain ⟨-, -, -, hs, s12, hg3⟩ := halfPeriod_facts (L := L)
-  rw [discr, hg3, ← s12, show ℘[L] ((L.ω₁ + L.ω₂) / 2) = -℘[L] (L.ω₁ / 2) - ℘[L] (L.ω₂ / 2) by
-    linear_combination hs]
+  rw [discr, hg3, ← s12,
+    show ℘[L] ((L.ω₁ + L.ω₂) / 2) = - ℘[L] (L.ω₁ / 2) - ℘[L] (L.ω₂ / 2) by linear_combination hs]
   ring
 
 theorem discr_ne_zero : discr L ≠ 0 := by
   obtain ⟨d12, d13, d23⟩ := weierstrassP_halfPeriods_ne L
   rw [discr_eq]
-  exact mul_ne_zero (by norm_num) (pow_ne_zero 2 (mul_ne_zero (mul_ne_zero (sub_ne_zero.2 d12)
-    (sub_ne_zero.2 d13)) (sub_ne_zero.2 d23)))
+  exact mul_ne_zero (by norm_num)
+    (pow_ne_zero 2
+      (mul_ne_zero (mul_ne_zero (sub_ne_zero.2 d12) (sub_ne_zero.2 d13)) (sub_ne_zero.2 d23)))
 
 theorem weierstrassCurve_Δ_ne_zero : (weierstrassCurve L).Δ ≠ 0 := by
   rw [weierstrassCurve_Δ]
   exact discr_ne_zero L
 
-instance : (weierstrassCurve L).IsElliptic :=
-  ⟨isUnit_iff_ne_zero.2 (weierstrassCurve_Δ_ne_zero L)⟩
+instance : (weierstrassCurve L).IsElliptic := ⟨isUnit_iff_ne_zero.2 (weierstrassCurve_Δ_ne_zero L)⟩
 
 theorem weierstrassCurve_j : (weierstrassCurve L).j = 1728 * L.g₂ ^ 3 / discr L := by
   rw [WeierstrassCurve.j_of_isShortNF, discr]

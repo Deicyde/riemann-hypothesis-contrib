@@ -9,7 +9,14 @@ open scoped Formalism.Per
 
 namespace GlobalTheory
 
-theorem orbit_class_trivial : ∀ (o : ℕ) (p : ℝ) (f : ℕ → ℝ → ℝ), 0 < o → 1 < p → (∀ i, ContinuousOn (f i) (Set.Ioc 0 1)) → (∀ i, ∀ r ∈ Set.Ioc (0 : ℝ) 1, 0 ≤ f i r) → (∀ i j, ∀ r ∈ Set.Ioc (0 : ℝ) 1, 0 < f i r → 0 < f j r → i % o = j % o) → (∀ r ∈ Set.Ioc (0 : ℝ) 1, ∃ i, 0 < f i r) → (∀ i r, 0 < r → r ≤ 1 / p → 0 < f i r → 0 < f (i + 1) (p * r)) → o = 1 := by
+theorem orbit_class_trivial
+    : ∀ (o : ℕ) (p : ℝ) (f : ℕ → ℝ → ℝ),
+      0 < o → 1 < p → (∀ i, ContinuousOn (f i) (Set.Ioc 0 1))
+        → (∀ i, ∀ r ∈ Set.Ioc (0 : ℝ) 1, 0 ≤ f i r)
+        → (∀ i j, ∀ r ∈ Set.Ioc (0 : ℝ) 1, 0 < f i r → 0 < f j r → i % o = j % o)
+        → (∀ r ∈ Set.Ioc (0 : ℝ) 1, ∃ i, 0 < f i r)
+        → (∀ i r, 0 < r → r ≤ 1 / p → 0 < f i r → 0 < f (i + 1) (p * r))
+        → o = 1 := by
   intro o p f _ho hp hc _ hcl hcov hsh
   classical
   let g : ℝ → ℕ := fun r => if h : ∃ i, 0 < f i r then (Classical.choose h) % o else 0
@@ -27,8 +34,7 @@ theorem orbit_class_trivial : ∀ (o : ℕ) (p : ℝ) (f : ℕ → ℝ → ℝ),
     filter_upwards [h1, self_mem_nhdsWithin] with x hx hxs
     rw [hg x hxs i hx, hg r hr i hi]
   have hp0 : 0 < p := by linarith
-  have hr1 : 1 / p ∈ Set.Ioc (0 : ℝ) 1 :=
-    ⟨by positivity, by rw [div_le_one hp0]; exact hp.le⟩
+  have hr1 : 1 / p ∈ Set.Ioc (0 : ℝ) 1 := ⟨by positivity, by rw [div_le_one hp0]; exact hp.le⟩
   have h1 : (1 : ℝ) ∈ Set.Ioc (0 : ℝ) 1 := ⟨one_pos, le_rfl⟩
   have hconst : g (1 / p) = g 1 := isPreconnected_Ioc.constant gcont hr1 h1
   obtain ⟨i, hi⟩ := hcov (1 / p) hr1

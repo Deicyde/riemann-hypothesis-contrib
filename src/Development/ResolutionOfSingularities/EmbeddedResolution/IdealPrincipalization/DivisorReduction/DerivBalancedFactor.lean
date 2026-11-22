@@ -15,14 +15,14 @@ open CategoryTheory AlgebraicGeometry TopologicalSpace
 
 namespace FunctorialResolution.EmbeddedResolution
 
-private theorem exists_affineOpen_ideal_eq_top_of_not_mem_support {X : Scheme.{u}}
-    (I : X.IdealSheafData) (y : ↥X) (hy : y ∉ I.support) :
-    ∃ V : X.affineOpens, y ∈ V.1 ∧ I.ideal V = ⊤ := by
-  obtain ⟨U, hyU, -⟩ :=
-    Scheme.exists_affineOpens_mem_le (X := X) (x := y) (U := ⊤) trivial
+private theorem exists_affineOpen_ideal_eq_top_of_not_mem_support
+    {X : Scheme.{u}} (I : X.IdealSheafData) (y : ↥X) (hy : y ∉ I.support)
+    : ∃ V : X.affineOpens, y ∈ V.1 ∧ I.ideal V = ⊤ := by
+  obtain ⟨U, hyU, -⟩ := Scheme.exists_affineOpens_mem_le (X := X) (x := y) (U := ⊤) trivial
   have hny := hy
   rw [AlgebraicGeometry.Scheme.IdealSheafData.mem_support_iff_of_mem (I := I) (U := U) hyU,
-    AlgebraicGeometry.Scheme.mem_zeroLocus_iff] at hny
+      AlgebraicGeometry.Scheme.mem_zeroLocus_iff]
+    at hny
   push Not at hny
   obtain ⟨s, hs, hys⟩ := hny
   refine ⟨X.affineBasicOpen s, hys, ?_⟩
@@ -37,10 +37,11 @@ private theorem exists_affineOpen_ideal_eq_top_of_not_mem_support {X : Scheme.{u
     exact Ideal.mem_map_of_mem _ hs
   exact Ideal.eq_top_of_isUnit_mem _ hmem hunit
 
-theorem not_mem_support_of_mem_support_of_pow_mul {X : Scheme.{u}}
-    (Z I I₀ : X.IdealSheafData) (m : ℕ) (hfac : I = Z ^ m * I₀)
-    (hord : ∀ x : ↥X, orderAt I x ≤ (m : ℕ∞)) {x : ↥X} (hx : x ∈ Z.support) :
-    x ∉ I₀.support := by
+theorem not_mem_support_of_mem_support_of_pow_mul
+    {X : Scheme.{u}} (Z I I₀ : X.IdealSheafData)
+    (m : ℕ) (hfac : I = Z ^ m * I₀) (hord : ∀ x : ↥X, orderAt I x ≤ (m : ℕ∞))
+    {x : ↥X} (hx : x ∈ Z.support)
+    : x ∉ I₀.support := by
   intro hx0
   have hZ : stalkIdeal Z x ≤ IsLocalRing.maximalIdeal (X.presheaf.stalk x) :=
     (mem_support_iff_stalkIdeal_le_maximalIdeal Z x).mp hx
@@ -54,18 +55,20 @@ theorem not_mem_support_of_mem_support_of_pow_mul {X : Scheme.{u}}
   have h4 : m + 1 ≤ m := by exact_mod_cast h3
   omega
 
-theorem isDerivBalanced_of_pow_mul (k : Type u) [Field k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+theorem isDerivBalanced_of_pow_mul
+    (k : Type u) [Field k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
     (Z I I₀ : X.IdealSheafData) (m : ℕ) (hfac : I = Z ^ m * I₀)
-    (hord : ∀ x : ↥X, orderAt I x ≤ (m : ℕ∞)) (hbal : IsDerivBalanced k p I m) :
-    IsDerivBalanced k p I₀ m := by
+    (hord : ∀ x : ↥X, orderAt I x ≤ (m : ℕ∞)) (hbal : IsDerivBalanced k p I m)
+    : IsDerivBalanced k p I₀ m := by
   refine (isDerivBalanced_iff k p I₀ m).mpr ?_
   intro i hi
   refine le_of_forall_exists_affineOpen ?_
   intro y
   by_cases hyZ : y ∈ Z.support
-  · obtain ⟨V, hyV, hV⟩ := exists_affineOpen_ideal_eq_top_of_not_mem_support I₀ y
-      (not_mem_support_of_mem_support_of_pow_mul Z I I₀ m hfac hord hyZ)
+  · obtain ⟨V, hyV, hV⟩ :=
+      exists_affineOpen_ideal_eq_top_of_not_mem_support I₀ y
+        (not_mem_support_of_mem_support_of_pow_mul Z I I₀ m hfac hord hyZ)
     refine ⟨V, hyV, ?_⟩
     have htop : (I₀ ^ (m - i)).ideal V = ⊤ := by
       rw [Scheme.IdealSheafData.ideal_pow]
@@ -79,8 +82,8 @@ theorem isDerivBalanced_of_pow_mul (k : Type u) [Field k] {X : Scheme.{u}}
       rw [hfac, Scheme.IdealSheafData.ideal_mul, Scheme.IdealSheafData.ideal_pow]
       show Z.ideal V ^ m * I₀.ideal V = I₀.ideal V
       rw [hV, ← Ideal.one_eq_top, one_pow, one_mul]
-    have hder : (derivIdealSheafIterate k p i I).ideal V
-        = (derivIdealSheafIterate k p i I₀).ideal V := by
+    have hder
+        : (derivIdealSheafIterate k p i I).ideal V = (derivIdealSheafIterate k p i I₀).ideal V := by
       rw [derivIdealSheafIterate_ideal, derivIdealSheafIterate_ideal, hIV]
     have hb : ((derivIdealSheafIterate k p i I).ideal V) ^ m ≤ (I.ideal V) ^ (m - i) := by
       have hb0 := Scheme.IdealSheafData.le_def.mp ((isDerivBalanced_iff k p I m).mp hbal i hi) V

@@ -10,15 +10,19 @@ open TensorProduct CrystallineSemistableComparison CrystallineSemistableComparis
 
 namespace GlobalTheory.CompanionTheory.TwCok
 
-theorem pow_torsion_bounded {W : Type} [CommRing W] [IsNoetherianRing W] (r : W) (T : Type 1)
-    [AddCommGroup T] [Module W T] [Module.Finite W T] :
-    ∃ c : ℕ, ∀ (k : ℕ) (t : T), r ^ k • t = 0 → r ^ c • t = 0 := by
+theorem pow_torsion_bounded
+    {W : Type} [CommRing W] [IsNoetherianRing W]
+    (r : W)
+    (T : Type 1) [AddCommGroup T] [Module W T] [Module.Finite W T]
+    : ∃ c : ℕ, ∀ (k : ℕ) (t : T), r ^ k • t = 0 → r ^ c • t = 0 := by
   haveI := isNoetherian_of_isNoetherianRing_of_finite W T
-  let f : ℕ →o Submodule W T :=
-    ⟨fun k => LinearMap.ker ((r ^ k) • LinearMap.id : T →ₗ[W] T), fun a b hab t ht => by
+  let f : ℕ →o Submodule W T := ⟨
+    fun k => LinearMap.ker ((r ^ k) • LinearMap.id : T →ₗ[W] T),
+    fun a b hab t ht => by
       simp only [LinearMap.mem_ker, LinearMap.smul_apply, LinearMap.id_apply] at ht ⊢
       obtain ⟨c, rfl⟩ := Nat.exists_eq_add_of_le hab
-      rw [pow_add, mul_comm, mul_smul, ht, smul_zero]⟩
+      rw [pow_add, mul_comm, mul_smul, ht, smul_zero]
+  ⟩
   obtain ⟨n, hn⟩ := monotone_stabilizes_iff_noetherian.mpr inferInstance f
   refine ⟨n, fun k t ht => ?_⟩
   rcases le_total k n with hkn | hnk
@@ -37,8 +41,8 @@ variable {W : Type} [CommRing W] {l : ℕ} {S S' : Sys.{1} W}
 def conn (Q : LSeq l S S') (n : ℕ) (x : S.M n) : S'.lim :=
   ⟨fun a => Q.δ n a x, fun a => Q.δ_r n a x⟩
 
-theorem conn_smul (Q : LSeq l S S') (n : ℕ) (s : W) (x : S.M n) :
-    s • conn Q n x = conn Q n (s • x) := by
+theorem conn_smul (Q : LSeq l S S') (n : ℕ) (s : W) (x : S.M n)
+    : s • conn Q n x = conn Q n (s • x) := by
   apply Subtype.ext
   funext a
   simp [conn]
@@ -49,8 +53,9 @@ theorem conn_kill (Q : LSeq l S S') (n : ℕ) (x : S.M n) : ((l : W) ^ n) • co
   funext a
   simp [conn]
 
-theorem lift_of_conn_zero (Q : LSeq l S S') (hA : ∀ n, IsArtinian W (S.M n)) (n : ℕ) (x : S.M n)
-    (h : ∀ a, Q.δ n a x = 0) : ∃ y : S.lim, y.1 n = x := by
+theorem lift_of_conn_zero
+    (Q : LSeq l S S') (hA : ∀ n, IsArtinian W (S.M n)) (n : ℕ) (x : S.M n) (h : ∀ a, Q.δ n a x = 0)
+    : ∃ y : S.lim, y.1 n = x := by
   classical
   have hy : ∀ m, n ≤ m → ∃ u : S.M m, Q.ρ m n u = x := fun m hm =>
     Q.ex₂ (m - n) n m (by omega) x (h _)
@@ -86,9 +91,10 @@ theorem lift_of_conn_zero (Q : LSeq l S S') (hA : ∀ n, IsArtinian W (S.M n)) (
   rw [← h2]
   exact h1
 
-theorem lim_cokernel_bounded : ∀ (W : Type) [CommRing W] [IsNoetherianRing W] (l : ℕ) (S S' : Sys.{1} W)
-    (_ : LSeq l S S'), (∀ n, IsArtinian W (S.M n)) → Module.Finite W S'.lim →
-    ∃ c : ℕ, ∀ n (x : S.M n), ∃ y : S.lim, y.1 n = ((l : W) ^ c) • x := by
+theorem lim_cokernel_bounded
+    : ∀ (W : Type) [CommRing W] [IsNoetherianRing W] (l : ℕ) (S S' : Sys.{1} W) (_ : LSeq l S S'),
+      (∀ n, IsArtinian W (S.M n)) → Module.Finite W S'.lim
+        → ∃ c : ℕ, ∀ n (x : S.M n), ∃ y : S.lim, y.1 n = ((l : W) ^ c) • x := by
   intro W _ _ l S S' Q hA hF
   obtain ⟨c, hc⟩ := pow_torsion_bounded ((l : W)) S'.lim
   refine ⟨c, fun n x => lift_of_conn_zero Q hA n _ (fun a => ?_)⟩

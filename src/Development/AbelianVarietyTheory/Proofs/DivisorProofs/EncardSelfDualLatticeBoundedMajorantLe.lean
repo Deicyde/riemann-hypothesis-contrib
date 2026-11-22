@@ -9,7 +9,9 @@ public import Formalism.LatticeRigidity.HeightMinimum.PackingCountGeometricMean
 
 @[expose] public section
 
-open NumberField MeasureTheory ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates GlobalTheory.LevGeo
+open NumberField MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates GlobalTheory.LevGeo
 open scoped ENNReal
 
 noncomputable section
@@ -24,17 +26,18 @@ variable (X : Data E r) (x : Frame X.Ψ r)
 
 instance : AddCommGroup (MajV X x) := inferInstanceAs (AddCommGroup (↥X.Ψ → Fin r → ℂ))
 instance : Module ℝ (MajV X x) := inferInstanceAs (Module ℝ (↥X.Ψ → Fin r → ℂ))
-instance : FiniteDimensional ℝ (MajV X x) := inferInstanceAs (FiniteDimensional ℝ (↥X.Ψ → Fin r → ℂ))
+instance : FiniteDimensional ℝ (MajV X x) :=
+  inferInstanceAs (FiniteDimensional ℝ (↥X.Ψ → Fin r → ℂ))
 
 def majIp (u w : MajV X x) : ℝ := ∑ τ, (X.Hf x τ (u τ) (w τ)).re
 
-theorem Hf_add_left (τ : X.Ψ) (u u' w : Fin r → ℂ) :
-    X.Hf x τ (u + u') w = X.Hf x τ u w + X.Hf x τ u' w := by
+theorem Hf_add_left (τ : X.Ψ) (u u' w : Fin r → ℂ)
+    : X.Hf x τ (u + u') w = X.Hf x τ u w + X.Hf x τ u' w := by
   simp only [Data.Hf_eq_two_ppos, Data.ppos_add, hermC_add_left]
   ring
 
-theorem Hf_smul_left (τ : X.Ψ) (c : ℂ) (u w : Fin r → ℂ) :
-    X.Hf x τ (c • u) w = c * X.Hf x τ u w := by
+theorem Hf_smul_left (τ : X.Ψ) (c : ℂ) (u w : Fin r → ℂ)
+    : X.Hf x τ (c • u) w = c * X.Hf x τ u w := by
   simp only [Data.Hf_eq_two_ppos, Data.ppos_smul, hermC_smul_left]
   ring
 
@@ -42,15 +45,15 @@ theorem Hf_zero_left (τ : X.Ψ) (w : Fin r → ℂ) : X.Hf x τ 0 w = 0 := by
   have := Hf_smul_left X x τ 0 0 w
   rwa [zero_smul, zero_mul] at this
 
-theorem Hf_conj {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) (u w : Fin r → ℂ) :
-    starRingEnd ℂ (X.Hf x τ u w) = X.Hf x τ w u := by
+theorem Hf_conj {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) (u w : Fin r → ℂ)
+    : starRingEnd ℂ (X.Hf x τ u w) = X.Hf x τ w u := by
   have h1 := X.hermC_ppos_left hx τ u w
   have h2 := X.hermC_ppos_left hx τ w u
-  rw [Data.Hf_eq_two_ppos, Data.Hf_eq_two_ppos, h1, h2, map_sub, map_mul,
-    hermC_conj τ.1 X.Gm_herm, hermC_conj τ.1 X.Gm_herm, map_ofNat]
+  rw [Data.Hf_eq_two_ppos, Data.Hf_eq_two_ppos, h1, h2, map_sub, map_mul, hermC_conj τ.1 X.Gm_herm,
+    hermC_conj τ.1 X.Gm_herm, map_ofNat]
 
-theorem re_Hf_self_nonneg {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) (v : Fin r → ℂ) :
-    0 ≤ (X.Hf x τ v v).re := by
+theorem re_Hf_self_nonneg {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) (v : Fin r → ℂ)
+    : 0 ≤ (X.Hf x τ v v).re := by
   by_cases h : v = 0
   · rw [h, Hf_zero_left, Complex.zero_re]
   · rw [Data.Hf_self X hx, Complex.ofReal_re]
@@ -83,7 +86,6 @@ def majCore {x : Frame X.Ψ r} (hx : x ∈ X.dom) : InnerProductSpace.Core ℝ (
     rw [Data.Hf_self X hx, Complex.ofReal_re] at h0
     exact (X.maj_pos hx τ hne).ne' h0
 
-
 open NumberField.ComplexEmbedding in
 theorem card_cmType : X.Ψ.card = fdeg E := by
   classical
@@ -99,10 +101,9 @@ theorem card_cmType : X.Ψ.card = fdeg E := by
       exact ⟨conjugate σ, by rw [hc, hcc]; exact hσ, hcc σ⟩
   have hinj : (X.Ψ.image conjugate).card = X.Ψ.card :=
     Finset.card_image_of_injective _ (fun a b h => by simpa [hcc] using congrArg conjugate h)
-  have hsplit := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (E →+* ℂ)))
-    (p := (· ∈ X.Ψ))
-  have hf : Finset.univ.filter (· ∈ X.Ψ) = X.Ψ := by
-    ext σ; simp
+  have hsplit :=
+    Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (E →+* ℂ))) (p := (· ∈ X.Ψ))
+  have hf : Finset.univ.filter (· ∈ X.Ψ) = X.Ψ := by ext σ; simp
   rw [hf, ← himg, hinj, Finset.card_univ, Embeddings.card] at hsplit
   unfold fdeg
   omega
@@ -119,11 +120,14 @@ namespace GlobalTheory.LatCount
 
 open scoped ENNReal
 
-theorem encard_le (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : DataX E r)
-    (x : Frame X.Ψ r) (ε R : ℝ) (hx : x ∈ X.dom) (hε : 0 < ε) (hR : 0 ≤ R)
-    (hsep : ∀ v ∈ X.L', v ≠ 0 → ε ≤ ∑ τ, X.maj x τ (Data.emb τ.1 v)) :
-    ({v | v ∈ X.L' ∧ ∑ τ, X.maj x τ (Data.emb τ.1 v) ≤ R}.encard : ℝ≥0∞) ≤
-      ENNReal.ofReal ((1 + 2 * Real.sqrt (R / ε)) ^ (2 * fdeg E * r)) := by
+theorem encard_le
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (r : ℕ) (X : DataX E r) (x : Frame X.Ψ r)
+    (ε R : ℝ)
+    (hx : x ∈ X.dom) (hε : 0 < ε) (hR : 0 ≤ R)
+    (hsep : ∀ v ∈ X.L', v ≠ 0 → ε ≤ ∑ τ, X.maj x τ (Data.emb τ.1 v))
+    : ({v | v ∈ X.L' ∧ ∑ τ, X.maj x τ (Data.emb τ.1 v) ≤ R}.encard : ℝ≥0∞)
+      ≤ ENNReal.ofReal ((1 + 2 * Real.sqrt (R / ε)) ^ (2 * fdeg E * r)) := by
   classical
   set Q : (Fin r → E) → ℝ := fun v => ∑ τ, X.maj x τ (Data.emb τ.1 v) with hQ
   set S : Set (Fin r → E) := {v | v ∈ X.L' ∧ Q v ≤ R} with hS
@@ -146,8 +150,9 @@ theorem encard_le (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (
     rfl
   have hfin : ∀ T : Finset (Fin r → E), (↑T : Set (Fin r → E)) ⊆ S → (T.card : ℝ) ≤ B := by
     intro T hT
-    have h := Formalism.SA.P.card_le_of_separated T g (Real.sqrt ε) (Real.sqrt R) (Real.sqrt_pos.2 hε)
-      (Real.sqrt_nonneg _) ?_ ?_
+    have h :=
+      Formalism.SA.P.card_le_of_separated T g (Real.sqrt ε) (Real.sqrt R) (Real.sqrt_pos.2 hε)
+        (Real.sqrt_nonneg _) ?_ ?_
     · rw [finrank_majV, mul_div_assoc, ← Real.sqrt_div' R hε.le] at h
       rw [hB]
       exact h

@@ -11,10 +11,13 @@ open AlgebraicGeometry CategoryTheory Limits
 
 namespace GlobalTheory.NormSheafDescent
 
-theorem finiteDimensional_functionField : ∀ (Y Z : Scheme.{0}) (π : Y ⟶ Z) [IsFinite π] [IsIntegral Y]
-    (hK : IsField (Z.presheaf.stalk (GlobalTheory.NormSheafDescent.genPt π))),
-    letI := GlobalTheory.NormSheafDescent.fieldK π hK; letI := GlobalTheory.NormSheafDescent.algKL π
-    FiniteDimensional (Z.presheaf.stalk (GlobalTheory.NormSheafDescent.genPt π)) Y.functionField := by
+theorem finiteDimensional_functionField
+    : ∀ (Y Z : Scheme.{0}) (π : Y ⟶ Z) [IsFinite π] [IsIntegral Y]
+        (hK : IsField (Z.presheaf.stalk (GlobalTheory.NormSheafDescent.genPt π))),
+      letI := GlobalTheory.NormSheafDescent.fieldK π hK
+      letI := GlobalTheory.NormSheafDescent.algKL π
+      FiniteDimensional (Z.presheaf.stalk (GlobalTheory.NormSheafDescent.genPt π))
+        Y.functionField := by
   intro Y Z π _ _ hK
   letI := fieldK π hK
   letI := algKL π
@@ -24,8 +27,7 @@ theorem finiteDimensional_functionField : ∀ (Y Z : Scheme.{0}) (π : Y ⟶ Z) 
   have hV : IsAffineOpen (π ⁻¹ᵁ U) := hU.preimage π
   haveI : Nonempty (π ⁻¹ᵁ U) := ⟨⟨_, hηU⟩⟩
   let f : Γ(Z, U) →+* Z.presheaf.stalk (genPt π) := (Z.presheaf.germ U (genPt π) hζU).hom
-  let φ : Γ(Y, π ⁻¹ᵁ U) →+* Y.functionField :=
-    (Y.presheaf.germ (π ⁻¹ᵁ U) (genericPoint Y) hηU).hom
+  let φ : Γ(Y, π ⁻¹ᵁ U) →+* Y.functionField := (Y.presheaf.germ (π ⁻¹ᵁ U) (genericPoint Y) hηU).hom
   let g : Γ(Z, U) →+* Γ(Y, π ⁻¹ᵁ U) := (π.app U).hom
   have hsq : ∀ a, algebraMap (Z.presheaf.stalk (genPt π)) Y.functionField (f a) = φ (g a) :=
     fun a => Scheme.Hom.germ_stalkMap_apply π U _ hζU a
@@ -50,8 +52,10 @@ theorem finiteDimensional_functionField : ∀ (Y Z : Scheme.{0}) (π : Y ⟶ Z) 
     IntermediateField.finiteDimensional_adjoin (by
       rintro _ ⟨b, -, rfl⟩
       exact hint b)
-  have hmem : ∀ b, φ b ∈ IntermediateField.adjoin (Z.presheaf.stalk (genPt π))
-      (φ '' (s : Set Γ(Y, π ⁻¹ᵁ U))) := by
+  have hmem
+      : ∀ b,
+        φ b ∈ IntermediateField.adjoin (Z.presheaf.stalk (genPt π))
+          (φ '' (s : Set Γ(Y, π ⁻¹ᵁ U))) := by
     intro b
     have hb : b ∈ Submodule.span Γ(Z, U) (s : Set Γ(Y, π ⁻¹ᵁ U)) := hs ▸ Submodule.mem_top
     induction hb using Submodule.span_induction with
@@ -63,13 +67,15 @@ theorem finiteDimensional_functionField : ∀ (Y Z : Scheme.{0}) (π : Y ⟶ Z) 
         rw [hsq, Algebra.smul_def, map_mul]; rfl
       rw [e]
       exact mul_mem (IntermediateField.algebraMap_mem _ _) hx
-  have htop : IntermediateField.adjoin (Z.presheaf.stalk (genPt π))
-      (φ '' (s : Set Γ(Y, π ⁻¹ᵁ U))) = ⊤ := by
+  have htop
+      : IntermediateField.adjoin (Z.presheaf.stalk (genPt π)) (φ '' (s : Set Γ(Y, π ⁻¹ᵁ U)))
+        = ⊤ := by
     refine eq_top_iff.2 fun x _ => ?_
     obtain ⟨b, c, hc, rfl⟩ := IsFractionRing.div_surjective (A := Γ(Y, π ⁻¹ᵁ U)) x
     exact div_mem (hmem b) (hmem c)
   have h2 : FiniteDimensional (Z.presheaf.stalk (genPt π))
-      (⊤ : IntermediateField (Z.presheaf.stalk (genPt π)) Y.functionField) := htop ▸ hF
+      (⊤ : IntermediateField (Z.presheaf.stalk (genPt π)) Y.functionField) :=
+    htop ▸ hF
   exact LinearEquiv.finiteDimensional IntermediateField.topEquiv.toLinearEquiv
 
 end GlobalTheory.NormSheafDescent

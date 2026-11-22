@@ -10,18 +10,20 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.E.E3 PositivityTheory.Rg.BcB
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.E.E3
+  PositivityTheory.Rg.BcB
 
 namespace GlobalTheory.CompanionTheory.CentRe
 
-theorem no_growth (b I K : ℝ) (M : ℕ) (hb : 0 < b) (hI : 0 < I)
-    (h : ∀ s : ℝ, 0 ≤ s → I * Real.exp (b * s) ≤ K * (1 + s) ^ M) : False := by
+theorem no_growth
+    (b I K : ℝ) (M : ℕ)
+    (hb : 0 < b) (hI : 0 < I) (h : ∀ s : ℝ, 0 ≤ s → I * Real.exp (b * s) ≤ K * (1 + s) ^ M)
+    : False := by
   set K' : ℝ := K / b ^ M / I * Real.exp b with hK'
-  obtain ⟨x, hx1, hx2⟩ := (((Real.tendsto_exp_div_pow_atTop M).eventually_gt_atTop K').and
-    (eventually_ge_atTop b)).exists
+  obtain ⟨x, hx1, hx2⟩ :=
+    (((Real.tendsto_exp_div_pow_atTop M).eventually_gt_atTop K').and (eventually_ge_atTop b)).exists
   have hx0 : 0 < x := lt_of_lt_of_le hb hx2
-  have hs : 0 ≤ x / b - 1 := by
-    rw [sub_nonneg, le_div_iff₀ hb]; linarith
+  have hs : 0 ≤ x / b - 1 := by rw [sub_nonneg, le_div_iff₀ hb]; linarith
   have hh := h _ hs
   rw [lt_div_iff₀ (pow_pos hx0 M)] at hx1
   have h1 : I * Real.exp (-b) * (K' * x ^ M) < I * Real.exp (-b) * Real.exp x :=
@@ -40,18 +42,24 @@ theorem no_growth (b I K : ℝ) (M : ℕ) (hb : 0 < b) (hI : 0 < I)
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {N : ℕ}
 
-theorem lintegral_translate [MeasurableSpace (GA E N)] [BorelSpace (GA E N)] (μ : Measure (GA E N)) [μ.IsHaarMeasure]
-    (φ : GA E N → ℂ) (z : ℂ) (hz : ∀ (t : ℝ) g, φ (splitCentre E N t * g) = Complex.exp (z * t) * φ g)
-    (t : ℝ) (Q : Set (GA E N)) :
-    ∫⁻ g in (fun q => splitCentre E N t * q) '' Q, ‖φ g‖ₑ ^ 2 ∂μ =
-      ENNReal.ofReal (Real.exp (2 * z.re * t)) * ∫⁻ g in Q, ‖φ g‖ₑ ^ 2 ∂μ := by
+theorem lintegral_translate
+    [MeasurableSpace (GA E N)] [BorelSpace (GA E N)]
+    (μ : Measure (GA E N)) [μ.IsHaarMeasure]
+    (φ : GA E N → ℂ) (z : ℂ)
+    (hz : ∀ (t : ℝ) g, φ (splitCentre E N t * g) = Complex.exp (z * t) * φ g)
+    (t : ℝ) (Q : Set (GA E N))
+    : ∫⁻ g in (fun q => splitCentre E N t * q) '' Q, ‖φ g‖ₑ ^ 2 ∂μ
+      = ENNReal.ofReal (Real.exp (2 * z.re * t)) * ∫⁻ g in Q, ‖φ g‖ₑ ^ 2 ∂μ := by
   rw [← (measurePreserving_mul_left μ (splitCentre E N t)).setLIntegral_comp_emb
-    (measurableEmbedding_mulLeft _) (fun g => ‖φ g‖ₑ ^ 2) Q,
+      (measurableEmbedding_mulLeft _)
+      (fun g => ‖φ g‖ₑ ^ 2)
+      Q,
     ← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
   refine lintegral_congr fun g => ?_
   rw [hz, enorm_mul, mul_pow]
   congr 1
-  rw [← ofReal_norm_eq_enorm, Complex.norm_exp, ← ENNReal.ofReal_pow (Real.exp_pos _).le, ← Real.exp_nat_mul]
+  rw [← ofReal_norm_eq_enorm, Complex.norm_exp, ← ENNReal.ofReal_pow (Real.exp_pos _).le,
+    ← Real.exp_nat_mul]
   congr 2
   simp
   ring
@@ -71,8 +79,10 @@ theorem centReGlue_holds : CentReGlue := by
   obtain ⟨n, hn⟩ := hM E N Q hQ
   obtain ⟨C₁, hC₁, hsz⟩ := hS E N {1} Q isCompact_singleton hQ
   set I : ENNReal := ∫⁻ g in Q, ‖φ g‖ₑ ^ 2 ∂(Measure.haar : Measure (GA E N)) with hI
-  have key : ∀ t : ℝ, ENNReal.ofReal (Real.exp (2 * z.re * t)) * I ≤
-      ENNReal.ofReal (C * n * (1 + C₁ * (1 + |t|)) ^ M) := by
+  have key
+      : ∀ t : ℝ,
+        ENNReal.ofReal (Real.exp (2 * z.re * t)) * I
+          ≤ ENNReal.ofReal (C * n * (1 + C₁ * (1 + |t|)) ^ M) := by
     intro t
     rw [hI, ← lintegral_translate _ φ z hz t Q]
     refine hC _ (hQ.image (continuous_const.mul continuous_id)) n _ (by positivity) (hn _ ?_) ?_
@@ -88,8 +98,7 @@ theorem centReGlue_holds : CentReGlue := by
     rw [hI, setLIntegral_pos_iff (hφ.measurable.enorm.pow_const 2)]
     have hV : IsOpen (interior Q ∩ {x | φ x ≠ 0}) :=
       isOpen_interior.inter (isOpen_ne_fun hφ continuous_const)
-    have hVne : (interior Q ∩ {x | φ x ≠ 0}).Nonempty :=
-      ⟨x₀, mem_interior_iff_mem_nhds.2 hQn, hx₀⟩
+    have hVne : (interior Q ∩ {x | φ x ≠ 0}).Nonempty := ⟨x₀, mem_interior_iff_mem_nhds.2 hQn, hx₀⟩
     refine (hV.measure_pos _ hVne).trans_le (measure_mono ?_)
     rintro x ⟨hx1, hx2⟩
     refine ⟨?_, interior_subset hx1⟩
@@ -103,7 +112,8 @@ theorem centReGlue_holds : CentReGlue := by
     intro t
     have h := key t
     rw [← ENNReal.ofReal_toReal hItop, ← ENNReal.ofReal_mul (Real.exp_pos _).le,
-      ENNReal.ofReal_le_ofReal_iff'] at h
+        ENNReal.ofReal_le_ofReal_iff']
+      at h
     rcases h with h | h
     · rwa [mul_comm]
     · exact absurd h (not_le.2 (mul_pos (Real.exp_pos _) hI'))
@@ -118,10 +128,11 @@ theorem centReGlue_holds : CentReGlue := by
   rw [ht1, ht2] at h
   refine h.trans ?_
   have hb : 1 + C₁ * (1 + s) ≤ (1 + C₁) * (1 + s) := by nlinarith
-  calc C * n * (1 + C₁ * (1 + s)) ^ M ≤ |C * n| * (1 + C₁ * (1 + s)) ^ M :=
-        mul_le_mul_of_nonneg_right (le_abs_self _) (by positivity)
+  calc
+    C * n * (1 + C₁ * (1 + s)) ^ M ≤ |C * n| * (1 + C₁ * (1 + s)) ^ M :=
+      mul_le_mul_of_nonneg_right (le_abs_self _) (by positivity)
     _ ≤ |C * n| * ((1 + C₁) * (1 + s)) ^ M :=
-        mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) hb M) (abs_nonneg _)
+      mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) hb M) (abs_nonneg _)
     _ = |C * n| * (1 + C₁) ^ M * (1 + s) ^ M := by rw [mul_pow, mul_assoc]
 
 end GlobalTheory.CompanionTheory.CentRe

@@ -7,11 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.WittFrobe
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 namespace GlobalTheory
 
-theorem wittModule_free_finite_of_reduction : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (M V : Type) [AddCommGroup M] [Module (WittVector p k) M] [AddCommGroup V] [Module k V] [Module.Finite k V] (r : M →ₛₗ[(WittVector.constantCoeff : WittVector p k →+* k)] V), IsHausdorff (Ideal.span {(p : WittVector p k)}) M → (∀ m : M, (p : WittVector p k) • m = 0 → m = 0) → Function.Surjective r → (∀ m, r m = 0 → ∃ n, m = p • n) → Module.Free (WittVector p k) M ∧ Module.Finite (WittVector p k) M := by
+theorem wittModule_free_finite_of_reduction
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (M V : Type)
+        [AddCommGroup M] [Module (WittVector p k) M] [AddCommGroup V] [Module k V]
+        [Module.Finite k V] (r : M →ₛₗ[(WittVector.constantCoeff : WittVector p k →+* k)] V),
+      IsHausdorff (Ideal.span {(p : WittVector p k)}) M
+        → (∀ m : M, (p : WittVector p k) • m = 0 → m = 0) → Function.Surjective r
+        → (∀ m, r m = 0 → ∃ n, m = p • n)
+        → Module.Free (WittVector p k) M ∧ Module.Finite (WittVector p k) M := by
   intro p _ k _ _ _ M V _ _ _ _ _ r hH htf hr hker
   classical
   let I : Ideal (WittVector p k) := Ideal.span {(p : WittVector p k)}

@@ -9,15 +9,27 @@ open Filter Topology
 
 namespace GlobalTheory.InvolutionNorm
 
-theorem exists_compact_mod_kernel : ∀ (Z : Type) [Group Z] [TopologicalSpace Z] [IsTopologicalGroup Z] [LocallyCompactSpace Z] [SigmaCompactSpace Z] [T2Space Z], (∀ a b : Z, a * b = b * a) → ∀ τ : Z →* Z, Continuous τ → (∀ z, τ (τ z) = z) → (∃ W ∈ nhds (1 : Z), ∀ s ∈ W, τ s = s → ∃ r : Z, τ r = r ∧ r * r = s) → ∀ D : Set Z, IsCompact D → ∃ B : Set Z, IsCompact B ∧ ∀ z : Z, τ z * z ∈ D → ∃ t : Z, τ t * t = 1 ∧ ∃ b ∈ B, z = t * b := by
+theorem exists_compact_mod_kernel
+    : ∀ (Z : Type) [Group Z] [TopologicalSpace Z] [IsTopologicalGroup Z] [LocallyCompactSpace Z]
+        [SigmaCompactSpace Z] [T2Space Z],
+      (∀ a b : Z, a * b = b * a)
+        → ∀ τ : Z →* Z,
+          Continuous τ → (∀ z, τ (τ z) = z)
+            → (∃ W ∈ nhds (1 : Z), ∀ s ∈ W, τ s = s → ∃ r : Z, τ r = r ∧ r * r = s)
+            → ∀ D : Set Z,
+              IsCompact D
+                → ∃ B : Set Z,
+                  IsCompact B
+                    ∧ ∀ z : Z, τ z * z ∈ D → ∃ t : Z, τ t * t = 1 ∧ ∃ b ∈ B, z = t * b := by
   intro Z _ _ _ _ _ _ hc τ hτ hinv hW D hD
   obtain ⟨W, hW1, hWs⟩ := hW
-  let N : Z →* Z :=
-    { toFun := fun z => τ z * z
-      map_one' := by simp
-      map_mul' := fun a b => by
-        simp only [map_mul]
-        rw [mul_assoc, mul_assoc, ← mul_assoc (τ b) a b, hc (τ b) a, mul_assoc] }
+  let N : Z →* Z := {
+    toFun := fun z => τ z * z
+    map_one' := by simp
+    map_mul' := fun a b => by
+      simp only [map_mul]
+      rw [mul_assoc, mul_assoc, ← mul_assoc (τ b) a b, hc (τ b) a, mul_assoc]
+  }
   have hN : Continuous N := hτ.mul continuous_id
   have hNval : ∀ z, N z = τ z * z := fun _ => rfl
   let I : Subgroup Z := N.range
@@ -46,8 +58,11 @@ theorem exists_compact_mod_kernel : ∀ (Z : Type) [Group Z] [TopologicalSpace Z
   have hK' : IsCompact (Subtype.val ⁻¹' D : Set I) :=
     hIcl.isClosedEmbedding_subtypeVal.isCompact_preimage hD
   have key : ∃ C : Set Z, IsCompact C ∧ (Subtype.val ⁻¹' D : Set I) ⊆ f '' C := by
-    refine hK'.induction_on (p := fun s => ∃ C : Set Z, IsCompact C ∧ s ⊆ f '' C)
-      ⟨∅, isCompact_empty, Set.empty_subset _⟩ (fun s t hst ⟨C, hC, h⟩ => ⟨C, hC, hst.trans h⟩) ?_ ?_
+    refine hK'.induction_on
+      (p := fun s => ∃ C : Set Z, IsCompact C ∧ s ⊆ f '' C)
+      ⟨∅, isCompact_empty, Set.empty_subset _⟩
+      (fun s t hst ⟨C, hC, h⟩ => ⟨C, hC, hst.trans h⟩)
+      ?_ ?_
     · rintro s t ⟨C, hC, h⟩ ⟨D, hD, h'⟩
       exact ⟨C ∪ D, hC.union hD, by rw [Set.image_union]; exact Set.union_subset_union h h'⟩
     · intro y _

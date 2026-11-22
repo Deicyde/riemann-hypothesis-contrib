@@ -14,8 +14,9 @@ variable {n : ℕ}
 
 section OneBAux
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
 
 private lemma card_opposite_sign_above_add_below_le (e : Fin n → Bool) (a : Fin n) :
     ((univ.filter fun b => a < b ∧ e b ≠ e a).card : ℝ) +
@@ -43,11 +44,13 @@ private lemma card_opposite_sign_add_le_of_ne (e : Fin n → Bool) {r s : Fin n}
   rw [← Nat.cast_add, ← Finset.card_union_of_disjoint hd]
   exact_mod_cast (Finset.card_le_univ _).trans (by simp)
 
-theorem crossOp_eig_gap (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h) {θ : ℝ} {y : Big n 1 M}
-    (hy : y ∈ Module.End.eigenspace (crossOp ε E 1 0) (θ : ℂ) ⊓ ncV ε V 1) (hy0 : y ≠ 0) :
-    (0 < h - n + 1 ∧ h - n + 1 ≤ θ) ∨ (θ ≤ -h - 1 ∧ -h - 1 < 0) := by
+theorem crossOp_eig_gap
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h)
+    {θ : ℝ} {y : Big n 1 M}
+    (hy : y ∈ Module.End.eigenspace (crossOp ε E 1 0) (θ : ℂ) ⊓ ncV ε V 1) (hy0 : y ≠ 0)
+    : (0 < h - n + 1 ∧ h - n + 1 ≤ θ) ∨ (θ ≤ -h - 1 ∧ -h - 1 < 0) := by
   classical
   have hVfd : FiniteDimensional ℂ V := hV.1
   haveI := finiteDimensional_ncV (ε := ε) hVfd 1
@@ -91,22 +94,27 @@ theorem crossOp_eig_gap (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW
   have hrs : r ≠ s := fun h => hε (congrArg ε h)
   have hroot : ∀ u : Fin n → ℝ, nsq (u + root r s) - nsq u = 2 * (u r - u s) + 2 := by
     intro u
-    have hs : ∀ a, root r s a = (if a = r then (1 : ℝ) else 0) - (if a = s then 1 else 0) := fun a => by
+    have hs
+        : ∀ a, root r s a = (if a = r then (1 : ℝ) else 0) - (if a = s then 1 else 0) := fun a => by
       simp [root, Pi.single_apply]
     simp only [nsq, dot, Pi.add_apply, hs]
     rw [← Finset.sum_sub_distrib]
-    have e : ∀ a, (u a + ((if a = r then (1 : ℝ) else 0) - (if a = s then 1 else 0))) *
-        (u a + ((if a = r then (1 : ℝ) else 0) - (if a = s then 1 else 0))) - u a * u a =
-        2 * (if a = r then u a else 0) - 2 * (if a = s then u a else 0) +
-          (if a = r then (1 : ℝ) else 0) + (if a = s then (1 : ℝ) else 0) := fun a => by
+    have e
+        : ∀ a,
+          (u a + ((if a = r then (1 : ℝ) else 0) - (if a = s then 1 else 0)))
+                * (u a + ((if a = r then (1 : ℝ) else 0) - (if a = s then 1 else 0)))
+              - u a * u a
+            = 2 * (if a = r then u a else 0) - 2 * (if a = s then u a else 0)
+              + (if a = r then (1 : ℝ) else 0) + (if a = s then (1 : ℝ) else 0) := fun a => by
       split_ifs with h1 h2 h2
       · exact absurd (h1.symm.trans h2) hrs
       all_goals ring
     simp only [e, Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum,
       Finset.sum_ite_eq', Finset.mem_univ, if_true]
     ring
-  have hcas : casValK ε μ - casValK ε (lowK ε lam) =
-      2 * ((lowK ε lam + rhoC ε) r - (lowK ε lam + rhoC ε) s) + 2 := by
+  have hcas
+      : casValK ε μ - casValK ε (lowK ε lam)
+        = 2 * ((lowK ε lam + rhoC ε) r - (lowK ε lam + rhoC ε) s) + 2 := by
     rw [hμ]
     unfold casValK
     rw [show lowK ε lam + root r s + rhoC ε = (lowK ε lam + rhoC ε) + root r s by abel]
@@ -115,8 +123,13 @@ theorem crossOp_eig_gap (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW
   rw [hL r, hL s] at hcas
   have hθ : θ = (lam r + rhoN ε r) - (lam s + rhoN ε s) + 1 - n / 2 := by linarith
 
-  have hrN : ∀ a, rhoN ε a = (((univ.filter fun b => a < b ∧ ε b ≠ ε a).card : ℝ) -
-      ((univ.filter fun b => b < a ∧ ε b ≠ ε a).card : ℝ)) / 2 := fun a => rfl
+  have hrN
+      : ∀ a,
+        rhoN ε a
+          = (((univ.filter fun b => a < b ∧ ε b ≠ ε a).card : ℝ)
+              - ((univ.filter fun b => b < a ∧ ε b ≠ ε a).card : ℝ))
+            / 2 := fun a =>
+    rfl
   have hPr := card_opposite_sign_above_add_below_le ε r
   have hPs := card_opposite_sign_above_add_below_le ε s
   have hO := card_opposite_sign_add_le_of_ne ε hε
@@ -129,8 +142,10 @@ theorem crossOp_eig_gap (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW
     unfold pOf qOf
     obtain ⟨a1, ha1⟩ := hmem true
     obtain ⟨a2, ha2⟩ := hmem false
-    exact ⟨Nat.one_le_cast.2 (Finset.card_pos.2 ⟨a1, by simp [ha1]⟩),
-      Nat.one_le_cast.2 (Finset.card_pos.2 ⟨a2, by simp [ha2]⟩)⟩
+    exact ⟨
+      Nat.one_le_cast.2 (Finset.card_pos.2 ⟨a1, by simp [ha1]⟩),
+      Nat.one_le_cast.2 (Finset.card_pos.2 ⟨a2, by simp [ha2]⟩)
+    ⟩
   have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
   have hpq1 : (1 : ℝ) * 1 ≤ (pOf ε : ℝ) * (qOf ε : ℝ) :=
     mul_le_mul hpq.1 hpq.2 zero_le_one (by linarith [hpq.1])
@@ -139,8 +154,7 @@ theorem crossOp_eig_gap (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW
     exact mul_le_mul_of_nonneg_left hpq1 hn0
   have hhn : (n : ℝ) + 1 < h := by nlinarith
   rcases le_abs'.1 (hh r s hε) with hcase | hcase
-  ·
-    have hlt : s < r := not_le.1 fun hle => absurd (hmono.antitone hle) (not_le.2 (by linarith))
+  · have hlt : s < r := not_le.1 fun hle => absurd (hmono.antitone hle) (not_le.2 (by linarith))
     have h1 : (1 : ℝ) ≤ ((univ.filter fun b => s < b ∧ ε b ≠ ε s).card : ℝ) :=
       Nat.one_le_cast.2 (Finset.card_pos.2 ⟨r, by simp [hlt, hε]⟩)
     have h2' : (1 : ℝ) ≤ ((univ.filter fun b => b < r ∧ ε b ≠ ε r).card : ℝ) :=
@@ -149,8 +163,7 @@ theorem crossOp_eig_gap (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW
     refine ⟨?_, by linarith⟩
     rw [hθ, hrN r, hrN s]
     linarith
-  ·
-    have hlt : r < s := not_le.1 fun hle => absurd (hmono.antitone hle) (not_le.2 (by linarith))
+  · have hlt : r < s := not_le.1 fun hle => absurd (hmono.antitone hle) (not_le.2 (by linarith))
     have h1 : (1 : ℝ) ≤ ((univ.filter fun b => r < b ∧ ε b ≠ ε r).card : ℝ) :=
       Nat.one_le_cast.2 (Finset.card_pos.2 ⟨s, by simp [hlt, Ne.symm hε]⟩)
     have h2' : (1 : ℝ) ≤ ((univ.filter fun b => b < s ∧ ε b ≠ ε s).card : ℝ) :=

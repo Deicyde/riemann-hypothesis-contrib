@@ -5,10 +5,22 @@ public import Mathlib.RingTheory.Ideal.Norm.AbsNorm
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th GlobalTheory.GalOfCusp
+open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV
+  UpperTheory.V.Th GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Th.omFacts :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O], (l ≠ 2 → IsUnit (2 : O)) ∧ ∀ m : ℕ, Finite (Om O m) ∧ Nat.card (Om O m) = Nat.card (ResidueField O) ^ m ∧ (∀ x : Om O m, l ^ m • x = 0) ∧ (∀ a : ℤ_[l], PadicInt.toZModPow m a = 1 → algebraMap O (Om O m) (algebraMap ℤ_[l] O a) = 1) ∧ ∀ (Γ : Type) [TopologicalSpace Γ] (f : Γ → O), AdicCont (maximalIdeal O) f → IsLocallyConstant fun g => algebraMap O (Om O m) (f g) := by
+theorem UpperTheory.V.Th.omFacts
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] [Algebra ℤ_[l] O],
+      (l ≠ 2 → IsUnit (2 : O))
+        ∧ ∀ m : ℕ,
+          Finite (Om O m) ∧ Nat.card (Om O m) = Nat.card (ResidueField O) ^ m
+            ∧ (∀ x : Om O m, l ^ m • x = 0)
+            ∧ (∀ a : ℤ_[l],
+              PadicInt.toZModPow m a = 1 → algebraMap O (Om O m) (algebraMap ℤ_[l] O a) = 1)
+            ∧ ∀ (Γ : Type) [TopologicalSpace Γ] (f : Γ → O),
+              AdicCont (maximalIdeal O) f
+                → IsLocallyConstant fun g => algebraMap O (Om O m) (f g) := by
   intro l hl O _ _ _ hO _
   obtain ⟨-, hf, hc⟩ := hO
   have hlm : (l : O) ∈ maximalIdeal O := by

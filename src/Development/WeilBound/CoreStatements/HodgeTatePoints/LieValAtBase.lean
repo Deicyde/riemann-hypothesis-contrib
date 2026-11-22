@@ -15,47 +15,66 @@ set_option backward.isDefEq.respectTransparency false
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
 
 namespace PositivityTheory.HtPt.Ci
 
-theorem exists_base {S : Scheme.{0}} {G : Over S} [GrpObj G] {A R : Type} [CommRing A] [CommRing R] (φ : A →+* R)
-    (x : Spec (CommRingCat.of A) ⟶ S) (z : Spec (CommRingCat.of R) ⟶ S)
-    (hz : Spec.map (CommRingCat.ofHom φ) ≫ x = z) {E F : Type} [AddCommGroup E] [Module A E] [AddCommGroup F]
-    [Module R F] (M : LieModel G x E) (N : LieModel G z F) :
-    ∃ j : E →+ F, (∀ e, N.pt (j e) = LieTangent.epsBase φ hz ≫ M.pt e) ∧
-      (∀ (a : A) e, j (a • e) = φ a • j e) ∧
-      (Smooth G.hom → ∀ (n : ℕ) (b : Module.Basis (Fin n) A E),
-        ∃ b' : Module.Basis (Fin n) R F, ∀ k, b' k = j (b k)) := by
+theorem exists_base
+    {S : Scheme.{0}} {G : Over S} [GrpObj G]
+    {A R : Type} [CommRing A] [CommRing R]
+    (φ : A →+* R) (x : Spec (CommRingCat.of A) ⟶ S) (z : Spec (CommRingCat.of R) ⟶ S)
+    (hz : Spec.map (CommRingCat.ofHom φ) ≫ x = z)
+    {E F : Type} [AddCommGroup E] [Module A E] [AddCommGroup F] [Module R F]
+    (M : LieModel G x E) (N : LieModel G z F)
+    : ∃ j : E →+ F,
+      (∀ e, N.pt (j e) = LieTangent.epsBase φ hz ≫ M.pt e) ∧ (∀ (a : A) e, j (a • e) = φ a • j e)
+        ∧ (Smooth G.hom
+          → ∀ (n : ℕ) (b : Module.Basis (Fin n) A E), ∃ b' : Module.Basis (Fin n) R F, ∀ k,
+            b' k = j (b k)) := by
   subst hz
   letI := φ.toAlgebra
   obtain ⟨j, h1, h2, h3⟩ := PositivityTheory.HtPt.Htat.lie_bc S G A R x E F M N
   refine ⟨j, fun e => Over.OverMorphism.ext (h1 e), h2, fun hs n b => ?_⟩
   exact ⟨Module.Basis.mk (h3 hs n b).1 (h3 hs n b).2.ge, fun k => Module.Basis.mk_apply _ _ _⟩
 
-variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {G : Over X} [GrpObj G]
+variable
+  {X : Scheme.{0}} {Ω : Type} [Field Ω]
+  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {G : Over X} [GrpObj G]
   {V : Type} [AddCommGroup V] [Module Ω V]
 
-theorem lieValAt_base (hξ : IsCptGen ξ) {M : LieModel G ξ V} {R R' : Type} [CommRing R] [IsLocalRing R]
-    [CommRing R'] [IsLocalRing R'] (φ : R →+* R') {x : Spec (CommRingCat.of R) ⟶ X}
-    {z : Spec (CommRingCat.of R') ⟶ X} (hz : Spec.map (CommRingCat.ofHom φ) ≫ x = z) {e : V} {w : epsAt x ⟶ G}
-    (h : M.ValAt x e w) : M.ValAt z e (LieTangent.epsBase φ hz ≫ w) := by
+theorem lieValAt_base
+    (hξ : IsCptGen ξ)
+    {M : LieModel G ξ V} {R R' : Type} [CommRing R] [IsLocalRing R] [CommRing R'] [IsLocalRing R']
+    (φ : R →+* R')
+    {x : Spec (CommRingCat.of R) ⟶ X} {z : Spec (CommRingCat.of R') ⟶ X}
+    (hz : Spec.map (CommRingCat.ofHom φ) ≫ x = z)
+    {e : V} {w : epsAt x ⟶ G} (h : M.ValAt x e w)
+    : M.ValAt z e (LieTangent.epsBase φ hz ≫ w) := by
   subst hz
   rw [LieModel.valAt_iff] at h ⊢
   obtain ⟨hc, v, hv, rfl⟩ := h
   have hsp := LieTangent.centre_specializes φ x
   have hc' := LieTangent.specializes_of_injective (hξ.inj ⟨_, hc⟩) hsp
-  have F1 : Spec.map (CommRingCat.ofHom (X.presheaf.stalkSpecializes hsp).hom) ≫ X.fromSpecStalk (centre x) =
-      X.fromSpecStalk (centre (Spec.map (CommRingCat.ofHom φ) ≫ x)) :=
+  have F1
+      : Spec.map (CommRingCat.ofHom (X.presheaf.stalkSpecializes hsp).hom)
+          ≫ X.fromSpecStalk (centre x)
+        = X.fromSpecStalk (centre (Spec.map (CommRingCat.ofHom φ) ≫ x)) :=
     Scheme.SpecMap_stalkSpecializes_fromSpecStalk hsp
-  have hd : ∀ {A B D : Type} [CommRing A] [CommRing B] [CommRing D] (f : A →+* B) (g : B →+* D),
-      (dualMap g).comp (dualMap f) = dualMap (g.comp f) := by
+  have hd
+      : ∀ {A B D : Type} [CommRing A] [CommRing B] [CommRing D] (f : A →+* B) (g : B →+* D),
+        (dualMap g).comp (dualMap f) = dualMap (g.comp f) := by
     intro A B D _ _ _ f g
     refine RingHom.ext fun a => ?_
     ext <;> simp
   rw [LieModel.extends_iff] at hv
-  refine ⟨hc', LieTangent.epsBase (X.presheaf.stalkSpecializes hsp).hom F1 ≫ v,
-    (M.extends_iff _ _ _).2 ⟨LieTangent.isTanAt_base _ _ hv.1, ?_⟩, ?_⟩
+  refine ⟨
+    hc',
+    LieTangent.epsBase (X.presheaf.stalkSpecializes hsp).hom F1 ≫ v,
+    (M.extends_iff _ _ _).2 ⟨LieTangent.isTanAt_base _ _ hv.1, ?_⟩,
+    ?_
+  ⟩
   · rw [hv.2, ← Category.assoc]
     congr 1
     refine Over.OverMorphism.ext ?_
@@ -71,16 +90,23 @@ theorem lieValAt_base (hξ : IsCptGen ξ) {M : LieModel G ξ V} {R R' : Type} [C
     congr 3
     exact (congrArg CommRingCat.Hom.hom (LieTangent.stalk_base φ x)).symm
 
-theorem frame_basis [IsCommMonObj G] (hξ : IsCptGen ξ) (hs : Smooth G.hom) (M : LieModel G ξ V) {R : Type}
-    [CommRing R] [IsLocalRing R] (z : Spec (CommRingCat.of R) ⟶ X) (h : genPt ξ ⤳ centre z) {ER : Type}
-    [AddCommGroup ER] [Module R ER] (MR : LieModel G z ER) {n : ℕ} {b : Fin n → V}
-    (hb : M.lat.IsFrameAt b ⟨centre z, h⟩) :
-    ∃ bz : Module.Basis (Fin n) R ER, ∀ q, M.ValAt z (b q) (MR.pt (bz q)) := by
-  obtain ⟨EA, _, _, ⟨MA⟩⟩ := lieModel_exists X G (X.presheaf.stalk (centre z)) (X.fromSpecStalk (centre z))
-  obtain ⟨j, hj, -, hjb⟩ := exists_base (A := X.presheaf.stalk (centre z)) (Scheme.stalkClosedPointTo z).hom _ z
-    (LieTangent.spec_centre z) MA MR
-  obtain ⟨i, hi, his, -⟩ := exists_base (genMap ξ ⟨centre z, h⟩) _ ξ
-    (LieTangent.spec_genMap ξ ⟨centre z, h⟩) MA M
+theorem frame_basis
+    [IsCommMonObj G]
+    (hξ : IsCptGen ξ) (hs : Smooth G.hom)
+    (M : LieModel G ξ V)
+    {R : Type} [CommRing R] [IsLocalRing R]
+    (z : Spec (CommRingCat.of R) ⟶ X) (h : genPt ξ ⤳ centre z)
+    {ER : Type} [AddCommGroup ER] [Module R ER]
+    (MR : LieModel G z ER)
+    {n : ℕ} {b : Fin n → V} (hb : M.lat.IsFrameAt b ⟨centre z, h⟩)
+    : ∃ bz : Module.Basis (Fin n) R ER, ∀ q, M.ValAt z (b q) (MR.pt (bz q)) := by
+  obtain ⟨EA, _, _, ⟨MA⟩⟩ :=
+    lieModel_exists X G (X.presheaf.stalk (centre z)) (X.fromSpecStalk (centre z))
+  obtain ⟨j, hj, -, hjb⟩ :=
+    exists_base (A := X.presheaf.stalk (centre z)) (Scheme.stalkClosedPointTo z).hom _ z
+      (LieTangent.spec_centre z) MA MR
+  obtain ⟨i, hi, his, -⟩ :=
+    exists_base (genMap ξ ⟨centre z, h⟩) _ ξ (LieTangent.spec_genMap ξ ⟨centre z, h⟩) MA M
   have hext : ∀ a, M.Extends ⟨centre z, h⟩ (i a) (MA.pt a) := fun a =>
     (M.extends_iff _ _ _).2 ⟨MA.tan a, hi a⟩
   have hinj : ∀ a b, i a = i b → a = b := fun a b hab =>
@@ -91,8 +117,9 @@ theorem frame_basis [IsCommMonObj G] (hξ : IsCptGen ξ) (hs : Smooth G.hom) (M 
     obtain ⟨a, rfl⟩ := MA.onto v hv.1
     exact ⟨a, M.inj ((hi a).trans ((M.extends_iff _ _ _).1 hv).2.symm)⟩
   choose a ha using fun q => hsurj (b q) (by rw [hb.2]; exact Submodule.subset_span ⟨q, rfl⟩)
-  have hsum : ∀ c : Fin n → X.presheaf.stalk (centre z),
-      i (∑ q, c q • a q) = ∑ q, genMap ξ ⟨centre z, h⟩ (c q) • b q := by
+  have hsum
+      : ∀ c : Fin n → X.presheaf.stalk (centre z),
+        i (∑ q, c q • a q) = ∑ q, genMap ξ ⟨centre z, h⟩ (c q) • b q := by
     intro c
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
@@ -117,11 +144,18 @@ theorem frame_basis [IsCommMonObj G] (hξ : IsCptGen ξ) (hs : Smooth G.hom) (M 
   refine ⟨bz, fun q => (M.valAt_iff _ _ _).2 ⟨h, MA.pt (a q), ha q ▸ hext (a q), ?_⟩⟩
   rw [hbz, hj, Module.Basis.mk_apply]
 
-theorem frame_lat [IsCommMonObj G] (hξ : IsCptGen ξ) (hs : Smooth G.hom) (M : LieModel G ξ V) {K : Type} [Field K]
-    {C : ACurve K} {z : Spec (CommRingCat.of K) ⟶ X} (Y : CurveIn C z) {Vz : Type} [AddCommGroup Vz] [Module K Vz]
-    (Mz : LieModel G z Vz) {n : ℕ} {b : Fin n → V} (i : C.I) (h : genPt ξ ⤳ centre (Y.x i))
-    (hb : M.lat.IsFrameAt b ⟨centre (Y.x i), h⟩) :
-    ∃ bz : Module.Basis (Fin n) K Vz, (∀ q, M.ValAt z (b q) (Mz.pt (bz q))) ∧ IsLatOf C i bz (Y.lieLat Mz i) := by
+theorem frame_lat
+    [IsCommMonObj G]
+    (hξ : IsCptGen ξ) (hs : Smooth G.hom)
+    (M : LieModel G ξ V)
+    {K : Type} [Field K]
+    {C : ACurve K} {z : Spec (CommRingCat.of K) ⟶ X} (Y : CurveIn C z)
+    {Vz : Type} [AddCommGroup Vz] [Module K Vz]
+    (Mz : LieModel G z Vz)
+    {n : ℕ} {b : Fin n → V}
+    (i : C.I) (h : genPt ξ ⤳ centre (Y.x i)) (hb : M.lat.IsFrameAt b ⟨centre (Y.x i), h⟩)
+    : ∃ bz : Module.Basis (Fin n) K Vz,
+      (∀ q, M.ValAt z (b q) (Mz.pt (bz q))) ∧ IsLatOf C i bz (Y.lieLat Mz i) := by
   obtain ⟨ER, _, _, ⟨MR⟩⟩ := lieModel_exists X G _ (Y.x i)
   obtain ⟨bR, hbR⟩ := frame_basis hξ hs M (Y.x i) h MR hb
   obtain ⟨j, hj, hjs, hjb⟩ := exists_base (C.v i).valuationSubring.subtype _ z (Y.gen i) MR Mz
@@ -136,7 +170,8 @@ theorem frame_lat [IsCommMonObj G] (hξ : IsCptGen ξ) (hs : Smooth G.hom) (M : 
         exact ⟨u, Mz.inj ((hj u).trans (Over.OverMorphism.ext he.symm))⟩
       · rintro _ ⟨u, rfl⟩
         exact AddSubgroup.subset_closure ⟨MR.pt u, MR.tan u, congrArg (fun q => q.left) (hj u)⟩
-    have hsum : ∀ c : Fin n → (C.v i).valuationSubring, j (∑ q, c q • bR q) = ∑ q, (c q : K) • bz q := by
+    have hsum
+        : ∀ c : Fin n → (C.v i).valuationSubring, j (∑ q, c q • bR q) = ∑ q, (c q : K) • bz q := by
       intro c
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
@@ -147,6 +182,9 @@ theorem frame_lat [IsCommMonObj G] (hξ : IsCptGen ξ) (hs : Smooth G.hom) (M : 
       rw [← bR.sum_repr u, hsum, bz.repr_sum_self]
       exact (bR.repr u q).2
     · intro hx
-      exact ⟨∑ q, (⟨bz.repr x q, hx q⟩ : (C.v i).valuationSubring) • bR q, by rw [hsum]; exact bz.sum_repr x⟩
+      exact ⟨
+        ∑ q, (⟨bz.repr x q, hx q⟩ : (C.v i).valuationSubring) • bR q,
+        by rw [hsum]; exact bz.sum_repr x
+      ⟩
 
 end PositivityTheory.HtPt.Ci

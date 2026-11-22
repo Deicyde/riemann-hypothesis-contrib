@@ -8,11 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteAdelic
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open scoped Classical
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.unramOf :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.UnramOf := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.unramOf
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.UnramOf := by
   intro E _ _ _ n S π K' hlev w hw hK
   obtain ⟨φ, hφ, h0, hfix⟩ := hlev
   refine ⟨φ, hφ, h0, fun x hx hk => hfix w hw x hx ?_⟩
