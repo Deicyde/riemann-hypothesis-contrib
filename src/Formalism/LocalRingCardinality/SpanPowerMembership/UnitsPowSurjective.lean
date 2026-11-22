@@ -61,6 +61,7 @@ public import Mathlib.Algebra.Category.Grp.Injective
 public import Mathlib.Analysis.Complex.Cardinality
 public import Mathlib.RingTheory.RootsOfUnity.Complex
 public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
+public import Mathlib
 
 @[expose] public section
 

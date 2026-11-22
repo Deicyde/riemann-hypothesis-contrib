@@ -1,5 +1,6 @@
 module
 
+public import Mathlib.Topology.Algebra.Module.Basic
 public import ReciprocityTheory.GroupCohomology.ContinuousContractNth
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield

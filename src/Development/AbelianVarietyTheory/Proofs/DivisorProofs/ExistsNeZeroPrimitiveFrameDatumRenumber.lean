@@ -1,5 +1,8 @@
 module
 
+public import Mathlib.Analysis.Matrix.MeasurableSpace
+public import Formalism.DoubleCosetMeasures.StatementZ
+public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.RankEqCardIffExistsFrameMatrixFirstColumnBlock
 public import Mathlib.Data.Matrix.PEquiv
 import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels

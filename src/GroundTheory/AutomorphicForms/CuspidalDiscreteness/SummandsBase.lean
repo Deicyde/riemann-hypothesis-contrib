@@ -1,5 +1,6 @@
 module
 
+public import GroundTheory.AutomorphicForms.CuspidalDiscreteness.CuspFormsDecay
 public import GroundTheory.AutomorphicForms.CuspidalDiscreteness.Smoothing
 public import GroundTheory.AutomorphicForms.GKModules.SmoothVectors
 import Mathlib.Algebra.Order.Floor.Extended

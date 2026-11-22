@@ -52,6 +52,7 @@ public import Mathlib.Analysis.Calculus.MeanValue
 public import Mathlib.Analysis.Complex.RealDeriv
 public import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
+public import Mathlib
 
 @[expose] public section
 

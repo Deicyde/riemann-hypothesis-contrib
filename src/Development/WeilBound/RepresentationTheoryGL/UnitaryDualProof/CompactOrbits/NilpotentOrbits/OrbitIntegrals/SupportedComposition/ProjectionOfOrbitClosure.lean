@@ -56,6 +56,8 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
+public import GroundTheory.AutomorphicForms.GL2.GJFELevi
+public import GroundTheory.AutomorphicForms.MeasuresModulus
 
 @[expose] public section
 

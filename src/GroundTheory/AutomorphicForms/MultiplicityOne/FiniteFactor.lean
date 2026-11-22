@@ -43,6 +43,7 @@ import Mathlib.Tactic.TypeStar
 import Mathlib.Topology.Sheaves.Init
 import GroundTheory.AutomorphicForms.CuspidalDiscreteness.Counting
 import GroundTheory.AutomorphicForms.QuotientMeasure
+public import GroundTheory.AutomorphicForms.CuspidalDiscreteness.CuspFormsDecay
 
 @[expose] public section
 
